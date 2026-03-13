@@ -1,0 +1,42 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+/build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+.venv-wsl
+
+
+CLAUDE.md
+AGENTS.md
+.agents/
+.claude/
+# Data (available via gh release)
+data/
+
+# eddmpython관련 레퍼런스(로컬 전용, git 미포함)
+_reference/
+
+# Backup (파일 삭제 대신 이동)
+_backup/
+
+# Node modules (all locations)
+node_modules/
+
+# Landing page build artifacts
+landing/build/
+landing/.svelte-kit/
+landing/static/blog/assets/
+
+# MkDocs build
+site/
+
+# Local experiment artifacts
+experiments/**/output/
+experiments/**/*.parquet
+experiments/055_edgarDocs/*.parquet
+experiments/055_edgarDocs/batch/

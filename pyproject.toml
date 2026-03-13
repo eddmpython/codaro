@@ -1,0 +1,22 @@
+[project]
+name = "codaro"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+authors = [
+    { name = "eddmpython", email = "206024502+eddmpython@users.noreply.github.com" }
+]
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.135.1",
+    "pydantic>=2.12.5",
+    "pytest>=9.0.2",
+    "uvicorn[standard]>=0.41.0",
+]
+
+[project.scripts]
+codaro = "codaro:main"
+
+[build-system]
+requires = ["uv_build>=0.9.15,<0.10.0"]
+build-backend = "uv_build"
