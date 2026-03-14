@@ -26,6 +26,8 @@ _backup/
 
 # Node modules (all locations)
 node_modules/
+frontend/.svelte-kit/
+src/codaro/webBuild/
 
 # Landing page build artifacts
 landing/build/
