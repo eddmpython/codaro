@@ -6,12 +6,14 @@
   import EditorSidebar from "./EditorSidebar.svelte";
   import EditorToolbar from "./EditorToolbar.svelte";
   import { detectCycle, detectMultipleDefinitions } from "./dataflow.js";
+  import { ServerKernel } from "./serverKernel.js";
   import { WorkerClient } from "./workerClient.js";
   import { exportDocumentAtPath, loadDocumentAtPath, saveDocumentAtPath } from "./api.js";
 
   export let initialPath = "";
 
   let engine = null;
+  let engineType = "none";
   let engineStatus = "idle";
   let engineError = "";
   let currentPath = initialPath || "";
@@ -98,12 +100,20 @@
     engineStatus = "loading";
     engineError = "";
     try {
-      engine = new WorkerClient();
+      engine = new ServerKernel();
       await engine.initialize();
+      engineType = "server";
       engineStatus = "ready";
-    } catch (error) {
-      engineStatus = "error";
-      engineError = String(error);
+    } catch {
+      try {
+        engine = new WorkerClient();
+        await engine.initialize();
+        engineType = "pyodide";
+        engineStatus = "ready";
+      } catch (fallbackError) {
+        engineStatus = "error";
+        engineError = String(fallbackError);
+      }
     }
   }
 
@@ -700,7 +710,7 @@
       </div>
       <div class="headerMeta">
         <span>{documentState.blocks.length} cells</span>
-        <span>{documentState.runtime.defaultEngine}</span>
+        <span>{engineType === "server" ? "server" : engineType === "pyodide" ? "pyodide" : documentState.runtime.defaultEngine}</span>
         {#if variableNames.length > 0}
           <span>{variableNames.length} vars</span>
         {/if}
