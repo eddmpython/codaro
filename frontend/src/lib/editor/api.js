@@ -1,5 +1,7 @@
+import { apiUrl } from "./basePath.js";
+
 export async function loadDocumentAtPath(path) {
-  const response = await fetch("/api/document/load", {
+  const response = await fetch(apiUrl("/api/document/load"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path })
@@ -11,7 +13,7 @@ export async function loadDocumentAtPath(path) {
 }
 
 export async function saveDocumentAtPath(path, document) {
-  const response = await fetch("/api/document/save", {
+  const response = await fetch(apiUrl("/api/document/save"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path, document })
@@ -24,7 +26,7 @@ export async function saveDocumentAtPath(path, document) {
 }
 
 export async function exportDocumentAtPath(path, format, outputPath) {
-  const response = await fetch("/api/document/export", {
+  const response = await fetch(apiUrl("/api/document/export"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path, format, outputPath })
@@ -37,7 +39,7 @@ export async function exportDocumentAtPath(path, format, outputPath) {
 }
 
 export async function insertBlock(path, { anchorBlockId, direction, type, content }) {
-  const response = await fetch("/api/document/insert-block", {
+  const response = await fetch(apiUrl("/api/document/insert-block"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path, anchorBlockId, direction, type, content })
@@ -50,7 +52,7 @@ export async function insertBlock(path, { anchorBlockId, direction, type, conten
 }
 
 export async function removeBlock(path, blockId) {
-  const response = await fetch("/api/document/remove-block", {
+  const response = await fetch(apiUrl("/api/document/remove-block"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path, blockId })
@@ -63,7 +65,7 @@ export async function removeBlock(path, blockId) {
 }
 
 export async function updateBlock(path, blockId, { content, type }) {
-  const response = await fetch("/api/document/update-block", {
+  const response = await fetch(apiUrl("/api/document/update-block"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path, blockId, content, type })
@@ -76,7 +78,7 @@ export async function updateBlock(path, blockId, { content, type }) {
 }
 
 export async function runBlock(sessionId, path, blockId) {
-  const response = await fetch("/api/document/run-block", {
+  const response = await fetch(apiUrl("/api/document/run-block"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ sessionId, path, blockId })
@@ -89,7 +91,7 @@ export async function runBlock(sessionId, path, blockId) {
 }
 
 export async function listFiles(path) {
-  const response = await fetch("/api/fs/list", {
+  const response = await fetch(apiUrl("/api/fs/list"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path })
@@ -98,7 +100,7 @@ export async function listFiles(path) {
 }
 
 export async function readFileContent(path) {
-  const response = await fetch("/api/fs/read", {
+  const response = await fetch(apiUrl("/api/fs/read"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path })
@@ -111,7 +113,7 @@ export async function readFileContent(path) {
 }
 
 export async function writeFileContent(path, content) {
-  const response = await fetch("/api/fs/write", {
+  const response = await fetch(apiUrl("/api/fs/write"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path, content })
@@ -120,7 +122,7 @@ export async function writeFileContent(path, content) {
 }
 
 export async function deleteFileEntry(path) {
-  const response = await fetch("/api/fs/delete", {
+  const response = await fetch(apiUrl("/api/fs/delete"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path })
@@ -129,7 +131,7 @@ export async function deleteFileEntry(path) {
 }
 
 export async function moveFileEntry(source, destination) {
-  const response = await fetch("/api/fs/move", {
+  const response = await fetch(apiUrl("/api/fs/move"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ source, destination })
@@ -138,7 +140,7 @@ export async function moveFileEntry(source, destination) {
 }
 
 export async function createDir(path) {
-  const response = await fetch("/api/fs/mkdir", {
+  const response = await fetch(apiUrl("/api/fs/mkdir"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ path })
@@ -147,12 +149,12 @@ export async function createDir(path) {
 }
 
 export async function listInstalledPackages() {
-  const response = await fetch("/api/packages/list");
+  const response = await fetch(apiUrl("/api/packages/list"));
   return response.json();
 }
 
 export async function installPkg(name) {
-  const response = await fetch("/api/packages/install", {
+  const response = await fetch(apiUrl("/api/packages/install"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name })
@@ -161,7 +163,7 @@ export async function installPkg(name) {
 }
 
 export async function uninstallPkg(name) {
-  const response = await fetch("/api/packages/uninstall", {
+  const response = await fetch(apiUrl("/api/packages/uninstall"), {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ name })
@@ -170,6 +172,6 @@ export async function uninstallPkg(name) {
 }
 
 export async function getEnvironmentInfo() {
-  const response = await fetch("/api/env/info");
+  const response = await fetch(apiUrl("/api/env/info"));
   return response.json();
 }

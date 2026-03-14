@@ -1,3 +1,5 @@
+import { apiUrl, wsUrl } from "./basePath.js";
+
 export class ServerKernel {
   constructor() {
     this.sessionId = null;
@@ -7,7 +9,7 @@ export class ServerKernel {
   }
 
   async initialize() {
-    const response = await fetch("/api/kernel/create", {
+    const response = await fetch(apiUrl("/api/kernel/create"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({})
@@ -24,8 +26,7 @@ export class ServerKernel {
   }
 
   _connectWebSocket() {
-    const protocol = location.protocol === "https:" ? "wss:" : "ws:";
-    const url = `${protocol}//${location.host}/ws/kernel/${this.sessionId}`;
+    const url = wsUrl(`/ws/kernel/${this.sessionId}`);
 
     return new Promise((resolve, reject) => {
       this.ws = new WebSocket(url);
@@ -34,7 +35,7 @@ export class ServerKernel {
         resolve();
       };
 
-      this.ws.onerror = (event) => {
+      this.ws.onerror = () => {
         reject(new Error("WebSocket connection failed."));
       };
 
@@ -58,7 +59,7 @@ export class ServerKernel {
       if (pending) {
         this._pendingRequests.delete(message.requestId);
         pending.resolve({
-          type: message.data ? (message.stdout ? "text" : message.status === "error" ? "error" : "text") : "text",
+          type: message.data ? (message.status === "error" ? "error" : "text") : "text",
           data: message.data || "",
           stdout: message.stdout || "",
           stderr: message.stderr || "",
@@ -101,7 +102,7 @@ export class ServerKernel {
   }
 
   async _executeViaRest(code) {
-    const response = await fetch(`/api/kernel/${this.sessionId}/execute`, {
+    const response = await fetch(apiUrl(`/api/kernel/${this.sessionId}/execute`), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ code })
@@ -123,11 +124,11 @@ export class ServerKernel {
 
   async interrupt() {
     if (!this.sessionId) return;
-    await fetch(`/api/kernel/${this.sessionId}/interrupt`, { method: "POST" });
+    await fetch(apiUrl(`/api/kernel/${this.sessionId}/interrupt`), { method: "POST" });
   }
 
   async installPackage(packageName) {
-    const response = await fetch("/api/packages/install", {
+    const response = await fetch(apiUrl("/api/packages/install"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: packageName })
@@ -141,7 +142,7 @@ export class ServerKernel {
       this.ws = null;
     }
     if (this.sessionId) {
-      fetch(`/api/kernel/${this.sessionId}`, { method: "DELETE" }).catch(() => {});
+      fetch(apiUrl(`/api/kernel/${this.sessionId}`), { method: "DELETE" }).catch(() => {});
       this.sessionId = null;
     }
   }

@@ -9,9 +9,9 @@ from typing import Any
 
 from contextlib import asynccontextmanager
 
-from fastapi import FastAPI, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 import uvicorn
@@ -120,12 +120,14 @@ def createServerApp(mode: str = "edit", documentPath: Path | None = None) -> Fas
     def health() -> dict[str, str]:
         return {"status": "ok"}
 
-    @app.get("/api/bootstrap", response_model=BootstrapResponse)
-    def bootstrap() -> BootstrapResponse:
-        return BootstrapResponse(
-            appMode=mode == "app",
-            documentPath=str(documentPath) if documentPath else None,
-        )
+    @app.get("/api/bootstrap")
+    def bootstrap(request: Request) -> dict[str, Any]:
+        rootPath = request.scope.get("root_path", "")
+        return {
+            "appMode": mode == "app",
+            "documentPath": str(documentPath) if documentPath else None,
+            "rootPath": rootPath,
+        }
 
     @app.get("/api/env/info", response_model=EnvironmentInfo)
     def envInfo() -> EnvironmentInfo:
@@ -425,16 +427,23 @@ def createServerApp(mode: str = "edit", documentPath: Path | None = None) -> Fas
         return result.model_dump()
 
     if WEB_BUILD_ROOT.exists():
+        _indexHtml = (WEB_BUILD_ROOT / "index.html").read_text(encoding="utf-8")
+
         assetsPath = WEB_BUILD_ROOT / "_app"
         if assetsPath.exists():
             app.mount("/_app", StaticFiles(directory=assetsPath), name="app-assets")
 
-        @app.get("/{fullPath:path}")
-        def spa(fullPath: str) -> FileResponse:
+        @app.get("/{fullPath:path}", response_model=None)
+        def spa(fullPath: str, request: Request) -> FileResponse | HTMLResponse:
             filePath = WEB_BUILD_ROOT / fullPath
             if fullPath and filePath.exists() and filePath.is_file():
                 return FileResponse(filePath)
-            return FileResponse(WEB_BUILD_ROOT / "index.html")
+            rootPath = request.scope.get("root_path", "")
+            injected = _indexHtml.replace(
+                "</head>",
+                f'<meta name="codaro-base" content="{rootPath}">\n  </head>',
+            )
+            return HTMLResponse(injected)
     else:
 
         @app.get("/{fullPath:path}")
