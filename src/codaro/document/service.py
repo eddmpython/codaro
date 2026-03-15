@@ -6,6 +6,7 @@ import uuid
 from .codaroFormat import parseCodaroDocument, writeCodaroDocument
 from .jupyterFormat import parseJupyterDocument, writeJupyterDocument
 from .marimoFormat import parseMarimoDocument, writeMarimoDocument
+from .percentFormat import isPercentFormat, parsePercentDocument, writePercentDocument
 from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, RuntimeConfig
 
 
@@ -14,7 +15,7 @@ def createEmptyDocument(title: str = "Untitled") -> CodaroDocument:
         id=f"doc-{uuid.uuid4().hex[:10]}",
         title=title,
         blocks=[BlockConfig(id=f"block-{uuid.uuid4().hex[:8]}", type="code", content="")],
-        metadata=DocumentMetadata(sourceFormat="codaro"),
+        metadata=DocumentMetadata(sourceFormat="percent"),
         runtime=RuntimeConfig(),
         app=AppConfig(title=title),
     )
@@ -31,6 +32,9 @@ def loadDocument(pathLike: str) -> CodaroDocument:
     if "marimo.App" in source or "@app.cell" in source:
         return parseMarimoDocument(source, path)
 
+    if isPercentFormat(source):
+        return parsePercentDocument(source, path)
+
     return parseCodaroDocument(source, path)
 
 
@@ -44,14 +48,19 @@ def saveDocument(pathLike: str, document: CodaroDocument) -> Path:
             "app": document.app.model_copy(update={"title": document.title or path.stem}),
         }
     )
-    path.write_text(writeCodaroDocument(payload), encoding="utf-8")
+
+    sourceFormat = payload.metadata.sourceFormat
+    if sourceFormat == "percent":
+        path.write_text(writePercentDocument(payload), encoding="utf-8")
+    else:
+        path.write_text(writeCodaroDocument(payload), encoding="utf-8")
     return path
 
 
 def exportDocument(pathLike: str, formatName: str, outputPathLike: str | None = None) -> Path:
     document = loadDocument(pathLike)
     formatName = formatName.lower()
-    defaultSuffix = ".py" if formatName in {"codaro", "marimo"} else ".ipynb"
+    defaultSuffix = ".py" if formatName in {"codaro", "marimo", "percent"} else ".ipynb"
     outputPath = (
         Path(outputPathLike).expanduser().resolve()
         if outputPathLike
@@ -59,14 +68,16 @@ def exportDocument(pathLike: str, formatName: str, outputPathLike: str | None = 
     )
     outputPath.parent.mkdir(parents=True, exist_ok=True)
 
-    if formatName == "codaro":
-        payload = writeCodaroDocument(document)
+    if formatName == "percent":
+        text = writePercentDocument(document)
+    elif formatName == "codaro":
+        text = writeCodaroDocument(document)
     elif formatName == "marimo":
-        payload = writeMarimoDocument(document)
+        text = writeMarimoDocument(document)
     elif formatName == "ipynb":
-        payload = writeJupyterDocument(document)
+        text = writeJupyterDocument(document)
     else:
         raise ValueError(f"Unsupported export format: {formatName}")
 
-    outputPath.write_text(payload, encoding="utf-8")
+    outputPath.write_text(text, encoding="utf-8")
     return outputPath

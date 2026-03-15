@@ -49,6 +49,13 @@ class DefinitionVisitor(ast.NodeVisitor):
         if isinstance(node.ctx, ast.Load) and node.id not in PYTHON_BUILTINS:
             self.uses.add(node.id)
 
+    def visit_AugAssign(self, node: ast.AugAssign) -> None:
+        if isinstance(node.target, ast.Name):
+            self.uses.add(node.target.id)
+            if node.target.id not in self.defines:
+                self.defines.append(node.target.id)
+        self.generic_visit(node)
+
     def visit_FunctionDef(self, node: ast.FunctionDef) -> None:
         if node.name not in self.defines:
             self.defines.append(node.name)

@@ -34,7 +34,8 @@ def testSaveDocument(tmp_path: Path) -> None:
     assert response.status_code == 200
     assert path.exists()
     content = path.read_text(encoding="utf-8")
-    assert 'app = codaro.App(title="Saved")' in content or "app = codaro.App(title='Saved')" in content
+    assert "codaro:app" in content
+    assert "value = 42" in content
 
 
 def testKernelCreateAndExecute() -> None:

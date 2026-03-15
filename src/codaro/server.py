@@ -36,6 +36,7 @@ from .kernel.protocol import (
     WsResultMessage,
     WsStatusMessage,
 )
+from .kernel.reactive import executeReactive
 from .system import fileOps, packageOps
 from .system.fileOps import DirectoryListing, FileContent, MoveRequest, WriteFileRequest
 from .system.packageOps import InstallResult, PackageInfo
@@ -82,6 +83,11 @@ class RunBlockRequest(BaseModel):
     sessionId: str
     path: str
     blockId: str
+
+
+class ReactiveExecuteRequest(BaseModel):
+    blockId: str
+    blocks: list[dict[str, Any]]
 
 
 class PackageRequest(BaseModel):
@@ -290,6 +296,25 @@ def createServerApp(mode: str = "edit", documentPath: Path | None = None) -> Fas
             raise HTTPException(status_code=404, detail="Session not found.")
         return {"destroyed": True}
 
+    @app.post("/api/kernel/{sessionId}/execute-reactive")
+    async def apiExecuteReactive(sessionId: str, request: ReactiveExecuteRequest) -> dict[str, Any]:
+        session = sessionManager.getSession(sessionId)
+        if session is None:
+            raise HTTPException(status_code=404, detail="Session not found.")
+        results, executionOrder = await executeReactive(session, request.blocks, request.blockId)
+        return {
+            "results": [r.model_dump() for r in results],
+            "executionOrder": executionOrder,
+        }
+
+    @app.post("/api/kernel/{sessionId}/remove-cell")
+    def apiRemoveCellDefinitions(sessionId: str, request: ExecuteRequest) -> dict[str, str]:
+        session = sessionManager.getSession(sessionId)
+        if session is None:
+            raise HTTPException(status_code=404, detail="Session not found.")
+        session.removeCellDefinitions(request.blockId or "")
+        return {"status": "removed"}
+
     @app.websocket("/ws/kernel/{sessionId}")
     async def kernelWebSocket(websocket: WebSocket, sessionId: str) -> None:
         session = sessionManager.getSession(sessionId)
@@ -343,6 +368,42 @@ def createServerApp(mode: str = "edit", documentPath: Path | None = None) -> Fas
                     variables = session.getVariables()
                     await websocket.send_json(
                         {"type": "variables", "variables": [v.model_dump() for v in variables]}
+                    )
+
+                elif messageType == "executeReactive":
+                    requestId = message.get("requestId", "")
+                    changedBlockId = message.get("blockId", "")
+                    blocks = message.get("blocks", [])
+
+                    await websocket.send_json(
+                        WsStatusMessage(type="status", engineStatus="busy").model_dump()
+                    )
+
+                    results, executionOrder = await executeReactive(session, blocks, changedBlockId)
+
+                    for result in results:
+                        await websocket.send_json(
+                            WsResultMessage(
+                                type="result",
+                                requestId=requestId,
+                                blockId=result.blockId,
+                                status=result.status,
+                                data=result.data,
+                                stdout=result.stdout,
+                                stderr=result.stderr,
+                                variables=result.variables,
+                                executionCount=result.executionCount,
+                            ).model_dump()
+                        )
+
+                    await websocket.send_json({
+                        "type": "reactiveComplete",
+                        "requestId": requestId,
+                        "executionOrder": executionOrder,
+                    })
+
+                    await websocket.send_json(
+                        WsStatusMessage(type="status", engineStatus="ready").model_dump()
                     )
 
                 elif messageType == "reset":
