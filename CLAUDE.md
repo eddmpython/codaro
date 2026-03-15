@@ -29,6 +29,79 @@
   - 다른 도메인 앱이 올라가는 범용 작업면
 - `eddmpython`의 notebook/eddmlab은 참고 구현일 뿐이며, Codaro의 source of truth는 Codaro 코드와 문서다.
 
+## Codaro 확정 사상 (절대 흔들리지 않는 원칙)
+
+### 1. 실행 모델: 투명 스코프 격리
+
+- 사용자는 **그냥 Python을 쓴다**. 함수 래핑 없음, return 없음, 보일러플레이트 없음.
+- 엔진이 내부에서 셀마다 격리된 네임스페이스로 실행한다.
+- AST 분석으로 각 셀이 정의하는 변수(defines)와 사용하는 변수(uses)를 자동 추론한다.
+- 셀 실행 시 해당 셀이 사용하는 변수만 레지스트리에서 주입한다.
+- 셀이 삭제되면 그 셀이 정의한 변수도 레지스트리에서 사라진다.
+- **Jupyter의 편리함 + marimo의 안전성**, 사용자에게 보이지 않는 곳에서.
+
+### 2. 리액티브 실행
+
+- 셀 하나를 실행하면, 그 셀의 변수에 의존하는 하위 셀이 **자동으로 재실행**된다.
+- 의존 관계는 AST 분석 기반 (명시적 선언 불필요).
+- 에러 발생 시 전파 중단.
+- 실행 순서는 문서 순서를 따른다 (의존 관계 내에서).
+
+### 3. 파일 포맷: Percent Format (.py)
+
+- Codaro의 기본 저장 포맷은 Percent Format이다.
+- `# %% [code]`, `# %% [markdown]` 주석이 셀 경계를 구분한다.
+- 코드는 모듈 레벨 (들여쓰기 0칸). 함수로 감싸지 않는다.
+- `python file.py`로 그대로 실행 가능하다.
+- VS Code, Spyder, Jupytext가 동일한 `# %%` 포맷을 인식한다.
+- marimo/ipynb 호환 import/export는 유지한다.
+
+### 4. 실행 환경: Pyodide 기본, 로컬 확장
+
+- **Pyodide(브라우저)가 기본 실행 플랫폼**이다. 모든 학습 콘텐츠가 Pyodide에서 동작한다.
+- **로컬(서버 커널)은 Pyodide의 모든 것 + 추가 자동화**를 제공한다.
+  - 실제 파일 I/O, 패키지 자동 설치, DB 연결, 무거운 ML, 로컬 AI(Ollama).
+- 프론트엔드는 서버 커널 우선 → Pyodide 폴백으로 동작한다.
+- 편집기 코드가 실행 엔진의 구현을 직접 알지 않는다.
+
+### 5. 학습 시스템 3기둥
+
+- **기둥 1: 노트북 기능** — 학습의 실행 환경. 셀 편집/실행/리액티브/분할/병합.
+- **기둥 2: 뼈대 커리큘럼** — YAML 기반 130+ 레슨. 카테고리/레슨/미션/진행 추적.
+- **기둥 3: 학습 사상** — 코드로 정의된 교육 철학. AI도 사람도 이 사상을 따른다.
+  - 최소 설명, 최대 실행
+  - 빈칸부터 시작 (빈 셀이 아니라 거의 완성된 코드에서 빈칸 채우기)
+  - 예측 → 검증 (먼저 예측하게 하고 실행으로 확인)
+  - 오류는 학습 (일부러 버그가 있는 코드를 주고 고치게 한다)
+  - 점진적 빌드 (한 셀에 한 개념, 쌓아가며 완성)
+  - 수정 실험 ("이 값을 바꿔보세요")
+  - 3단계 힌트 (개념 → 구조 → 정답, 바로 답을 주지 않는다)
+  - 즉시 피드백 (맞았는지 1초 안에)
+  - 반복 변주 (같은 개념을 다른 상황에서)
+  - 실제 맥락 (추상적 예제가 아니라 현실 상황)
+
+### 6. AI 통합 원칙
+
+- **AI 없이도 모든 학습이 완전히 동작**한다. AI는 선택적 확장이다.
+- AI가 붙으면 편집기의 기존 API를 **도구(tool_use)로 사용**해서 가르친다.
+  - `insert-block`: 설명/예시/힌트 셀 삽입
+  - `execute-reactive`: 학생 코드 실행 후 결과 검증
+  - `GET variables`: 변수 상태 확인
+  - `update-block`: 피드백 추가
+  - `fs/write`, `packages/install`: 교육 환경 자동 설정
+- AI는 `GET /api/curriculum/learning-spec`에서 학습 사상을 읽고 동일한 철학으로 가르친다.
+- 커리큘럼에 없는 주제도 같은 사상(빈칸→수정→작성, 3단계 힌트, 즉시 피드백)으로 생성한다.
+- AI Provider는 교체 가능: GPT(OAuth), Ollama(로컬), Claude, 또는 없음.
+
+### 7. 마운팅과 통합
+
+- `createServerApp()`은 독립 실행 가능하면서 동시에 다른 서버에 마운팅 가능하다.
+- FastAPI: `app.mount("/codaro", createServerApp())`
+- Django: ASGI 라우팅 분기
+- Flask: WSGIMiddleware 래핑
+- 프론트엔드는 `<meta name="codaro-base">` 태그에서 root_path를 자동 감지한다.
+- GUI에서 되는 모든 것은 API로도 된다 (시스템적 수정 가능).
+
 ## 기본 기술 규칙
 
 - 기본 런타임은 Python `3.12+`를 기준으로 한다.
@@ -116,21 +189,16 @@
 
 ## 현재 코드 레이아웃
 
-- `src/codaro/document/` : Codaro native 문서 모델, codaro/marimo/ipynb 파서와 writer
-- `src/codaro/kernel/` : 서버 사이드 Python 실행 커널 (KernelSession, SessionManager, WebSocket 프로토콜)
+- `src/codaro/document/` : 문서 모델, percent/codaro/marimo/ipynb 파서와 writer, AST 의존 분석
+- `src/codaro/kernel/` : 투명 스코프 격리 커널, 리액티브 실행, SessionManager, WebSocket
+- `src/codaro/curriculum/` : YAML 콘텐츠 로더, 노트북 변환기, 진행 추적, 학습 사상, 연습 체커
 - `src/codaro/system/` : 파일 시스템 CRUD (`fileOps`) 및 패키지 관리 (`packageOps`)
 - `src/codaro/runtime/` : 실행 엔진 인터페이스와 `LocalEngine` placeholder
-- `src/codaro/server.py` : FastAPI 서버 — 문서, 커널, 파일, 패키지, 환경 API + WebSocket
+- `src/codaro/server.py` : FastAPI 서버 — 문서, 커널, 파일, 패키지, 커리큘럼, 환경 API + WebSocket
 - `src/codaro/cli.py` : `codaro edit`, `codaro run`, `codaro export`
 - `src/codaro/appRuntime.py` : native `.py` 문서에서 사용하는 `App`, `md`
-- `src/codaro/DEV.md` : 백엔드 아키텍처와 현재 구현 상태
-- `src/codaro/document/DEV.md` : 문서 모델과 포맷 변환 메모
-- `src/codaro/kernel/DEV.md` : 서버 실행 커널 메모
-- `src/codaro/system/DEV.md` : 파일 시스템/패키지 계층 메모
-- `src/codaro/runtime/DEV.md` : 실행 엔진 인터페이스 메모
-- `frontend/` : SvelteKit 편집기와 앱 모드, 서버 커널 우선 + Pyodide 폴백
-- `frontend/DEV.md` : 프론트 계층, 실행 경로, UX 상태 메모
-- `tests/` : 커널, 시스템, 문서, 서버 API 테스트
+- `frontend/` : SvelteKit 편집기, 학습 브라우저, 미션 체크 UI, 서버 커널 우선 + Pyodide 폴백
+- `tests/` : 커널, 리액티브, 시스템, 문서, 커리큘럼, 체커, 서버 API 테스트 (62개)
 
 ## 실행 환경 규칙
 
@@ -203,8 +271,8 @@
 
 ## 현재 우선순위
 
-- 1. Pyodide 기반 편집기 usable 상태 고도화
-- 2. Codaro native Python 포맷 안정화
+- 1. 학습 UI 고도화 (자동완성, 인라인 에러 피드백, 진행 표시)
+- 2. AI Teacher Provider 인터페이스 + GPT/Ollama 연동
 - 3. 앱 모드 런타임 품질 개선
-- 4. marimo/ipynb 호환성 보강
-- 5. LocalEngine 후속 설계
+- 4. 위젯/뷰 브리지 구현
+- 5. 모바일 대응
