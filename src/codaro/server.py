@@ -40,6 +40,9 @@ from .kernel.reactive import executeReactive
 from .system import fileOps, packageOps
 from .system.fileOps import DirectoryListing, FileContent, MoveRequest, WriteFileRequest
 from .system.packageOps import InstallResult, PackageInfo
+from .curriculum.contentLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS, ContentLoader
+from .curriculum.converter import yamlToDocument
+from .curriculum.progress import ProgressTracker
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
@@ -105,8 +108,21 @@ class EnvironmentInfo(BaseModel):
     executable: str
 
 
-def createServerApp(mode: str = "edit", documentPath: Path | None = None) -> FastAPI:
+EDDMPYTHON_CONTENT = Path(__file__).resolve().parent.parent.parent.parent / "nicegui" / "eddmpython" / "core" / "studyPython" / "content"
+
+
+class CurriculumProgressRequest(BaseModel):
+    category: str
+    contentId: str
+    missionId: str = ""
+    totalMissions: int = 0
+
+
+def createServerApp(mode: str = "edit", documentPath: Path | None = None, contentDir: Path | None = None) -> FastAPI:
     sessionManager = SessionManager()
+    resolvedContentDir = contentDir or EDDMPYTHON_CONTENT
+    curriculumLoader = ContentLoader(str(resolvedContentDir)) if resolvedContentDir.exists() else None
+    progressTracker = ProgressTracker()
 
     @asynccontextmanager
     async def lifespan(application: FastAPI):
@@ -486,6 +502,60 @@ def createServerApp(mode: str = "edit", documentPath: Path | None = None) -> Fas
     async def apiUninstallPackage(request: PackageRequest) -> dict[str, Any]:
         result = await packageOps.uninstallPackage(request.name)
         return result.model_dump()
+
+    @app.get("/api/curriculum/categories")
+    def apiCurriculumCategories() -> dict[str, Any]:
+        if curriculumLoader is None:
+            return {"categories": [], "groups": {}, "learningPaths": {}}
+        categories = curriculumLoader.listCategories()
+        return {
+            "categories": [c.model_dump() for c in categories],
+            "groups": CATEGORY_GROUPS,
+            "learningPaths": LEARNING_PATHS,
+        }
+
+    @app.get("/api/curriculum/contents/{category}")
+    def apiCurriculumContents(category: str) -> dict[str, Any]:
+        if curriculumLoader is None:
+            raise HTTPException(status_code=404, detail="Curriculum content not available.")
+        contents = curriculumLoader.listContents(category)
+        return {
+            "category": category,
+            "categoryName": CATEGORY_MAPPING.get(category, category),
+            "contents": [{"contentId": c.contentId, "title": c.title} for c in contents],
+        }
+
+    @app.get("/api/curriculum/content/{category}/{contentId}")
+    def apiCurriculumContent(category: str, contentId: str) -> dict[str, Any]:
+        if curriculumLoader is None:
+            raise HTTPException(status_code=404, detail="Curriculum content not available.")
+        try:
+            yamlContent = curriculumLoader.loadContent(category, contentId)
+        except FileNotFoundError:
+            raise HTTPException(status_code=404, detail="Content not found.")
+        document = yamlToDocument(yamlContent, category, contentId)
+        prevNext = curriculumLoader.getPrevNext(category, contentId)
+        progressTracker.markAccessed(category, contentId)
+        return {
+            "document": document.model_dump(),
+            "category": category,
+            "contentId": contentId,
+            "prevNext": prevNext,
+        }
+
+    @app.get("/api/curriculum/progress")
+    def apiCurriculumProgress() -> dict[str, Any]:
+        return progressTracker.getSummary()
+
+    @app.post("/api/curriculum/progress")
+    def apiUpdateProgress(request: CurriculumProgressRequest) -> dict[str, Any]:
+        if request.missionId:
+            lesson = progressTracker.completeMission(
+                request.category, request.contentId, request.missionId, request.totalMissions,
+            )
+            return lesson.model_dump()
+        progressTracker.markAccessed(request.category, request.contentId)
+        return {"status": "accessed"}
 
     if WEB_BUILD_ROOT.exists():
         _indexHtml = (WEB_BUILD_ROOT / "index.html").read_text(encoding="utf-8")
