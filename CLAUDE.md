@@ -106,6 +106,13 @@
   - 기능별 `SPEC.md`
 - 아키텍처가 바뀌면 코드보다 늦지 않게 문서를 갱신한다.
 - `_reference/` 아래 문서는 참고/실험 메모로만 두고 공식 source of truth로 쓰지 않는다.
+- 현재 내부 문서 경로:
+  - `src/codaro/DEV.md`
+  - `src/codaro/document/DEV.md`
+  - `src/codaro/kernel/DEV.md`
+  - `src/codaro/system/DEV.md`
+  - `src/codaro/runtime/DEV.md`
+  - `frontend/DEV.md`
 
 ## 현재 코드 레이아웃
 
@@ -116,7 +123,13 @@
 - `src/codaro/server.py` : FastAPI 서버 — 문서, 커널, 파일, 패키지, 환경 API + WebSocket
 - `src/codaro/cli.py` : `codaro edit`, `codaro run`, `codaro export`
 - `src/codaro/appRuntime.py` : native `.py` 문서에서 사용하는 `App`, `md`
+- `src/codaro/DEV.md` : 백엔드 아키텍처와 현재 구현 상태
+- `src/codaro/document/DEV.md` : 문서 모델과 포맷 변환 메모
+- `src/codaro/kernel/DEV.md` : 서버 실행 커널 메모
+- `src/codaro/system/DEV.md` : 파일 시스템/패키지 계층 메모
+- `src/codaro/runtime/DEV.md` : 실행 엔진 인터페이스 메모
 - `frontend/` : SvelteKit 편집기와 앱 모드, 서버 커널 우선 + Pyodide 폴백
+- `frontend/DEV.md` : 프론트 계층, 실행 경로, UX 상태 메모
 - `tests/` : 커널, 시스템, 문서, 서버 API 테스트
 
 ## 실행 환경 규칙
