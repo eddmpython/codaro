@@ -1,5 +1,6 @@
 <script>
-  import { Blocks, Variable, Cpu, FileCog, Network } from "lucide-svelte";
+  import { Blocks, Variable, Cpu, FileCog, Network, GraduationCap, ChevronLeft, ChevronRight, BookOpen, Check } from "lucide-svelte";
+  import { getCurriculumCategories, getCurriculumContents } from "./api.js";
 
   export let documentState;
   export let activeBlockId = null;
@@ -8,10 +9,13 @@
   export let engineError = "";
   export let hasCycle = false;
   export let duplicateDefinitions = new Map();
+  export let lessonInfo = null;
   export let onSelectBlock = () => {};
   export let onToggleHideCode = () => {};
+  export let onLoadLesson = () => {};
 
   const panels = [
+    { id: "learn", icon: GraduationCap, label: "Learn" },
     { id: "blocks", icon: Blocks, label: "Blocks" },
     { id: "variables", icon: Variable, label: "Variables" },
     { id: "runtime", icon: Cpu, label: "Runtime" },
@@ -20,7 +24,13 @@
   ];
 
   let sidebarOpen = true;
-  let activePanel = "blocks";
+  let activePanel = "learn";
+
+  let categories = [];
+  let selectedCategory = null;
+  let categoryContents = [];
+  let loadingCategories = false;
+  let loadingContents = false;
 
   function handlePanelClick(panelId) {
     if (activePanel === panelId && sidebarOpen) {
@@ -29,6 +39,37 @@
     }
     activePanel = panelId;
     sidebarOpen = true;
+    if (panelId === "learn" && categories.length === 0) {
+      fetchCategories();
+    }
+  }
+
+  async function fetchCategories() {
+    loadingCategories = true;
+    try {
+      const data = await getCurriculumCategories();
+      categories = data.categories || [];
+    } catch {
+      categories = [];
+    }
+    loadingCategories = false;
+  }
+
+  async function selectCategory(category) {
+    selectedCategory = category;
+    loadingContents = true;
+    try {
+      const data = await getCurriculumContents(category.key);
+      categoryContents = data.contents || [];
+    } catch {
+      categoryContents = [];
+    }
+    loadingContents = false;
+  }
+
+  function backToCategories() {
+    selectedCategory = null;
+    categoryContents = [];
   }
 
   function getBlockStatus(block) {
@@ -43,6 +84,9 @@
   }
 
   $: duplicateCount = duplicateDefinitions.size;
+  $: if (activePanel === "learn" && categories.length === 0 && sidebarOpen) {
+    fetchCategories();
+  }
 </script>
 
 <div class="sidebar" class:open={sidebarOpen}>
@@ -70,7 +114,69 @@
       </div>
 
       <div class="panelBody">
-        {#if activePanel === "blocks"}
+        {#if activePanel === "learn"}
+          <div class="panelSection">
+            {#if lessonInfo}
+              <div class="lessonBadge">
+                <BookOpen size={13} />
+                <span>{lessonInfo.title}</span>
+              </div>
+              {#if lessonInfo.prevNext?.prev}
+                <button class="lessonNav" onclick={() => onLoadLesson(lessonInfo.category, lessonInfo.prevNext.prev.contentId)}>
+                  <ChevronLeft size={12} />
+                  {lessonInfo.prevNext.prev.title}
+                </button>
+              {/if}
+              {#if lessonInfo.prevNext?.next}
+                <button class="lessonNav next" onclick={() => onLoadLesson(lessonInfo.category, lessonInfo.prevNext.next.contentId)}>
+                  {lessonInfo.prevNext.next.title}
+                  <ChevronRight size={12} />
+                </button>
+              {/if}
+            {/if}
+
+            {#if selectedCategory}
+              <button class="backButton" onclick={backToCategories}>
+                <ChevronLeft size={12} />
+                카테고리 목록
+              </button>
+              <div class="categoryHeader">
+                <strong>{selectedCategory.name}</strong>
+                <span class="countBadge">{selectedCategory.count}</span>
+              </div>
+              {#if selectedCategory.description}
+                <p class="categoryDesc">{selectedCategory.description}</p>
+              {/if}
+              {#if loadingContents}
+                <p class="emptyText">로딩 중...</p>
+              {:else}
+                {#each categoryContents as content}
+                  <button class="lessonItem" onclick={() => onLoadLesson(selectedCategory.key, content.contentId)}>
+                    <span class="lessonTitle">{content.title}</span>
+                  </button>
+                {/each}
+              {/if}
+            {:else}
+              {#if loadingCategories}
+                <p class="emptyText">카테고리 로딩 중...</p>
+              {:else if categories.length === 0}
+                <p class="emptyText">학습 콘텐츠를 찾을 수 없습니다. 서버가 실행 중인지 확인하세요.</p>
+              {:else}
+                {#each categories as category}
+                  <button class="categoryItem" onclick={() => selectCategory(category)}>
+                    <div class="categoryItemContent">
+                      <strong>{category.name}</strong>
+                      {#if category.description}
+                        <span class="categoryItemDesc">{category.description}</span>
+                      {/if}
+                    </div>
+                    <span class="countBadge">{category.count}</span>
+                  </button>
+                {/each}
+              {/if}
+            {/if}
+          </div>
+        {:else if activePanel === "blocks"}
           <div class="panelSection">
             <div class="panelMeta">
               <strong>{documentState.blocks.length}</strong>
@@ -229,14 +335,8 @@
   }
 
   @keyframes panelSlide {
-    from {
-      opacity: 0;
-      transform: translateX(-8px);
-    }
-    to {
-      opacity: 1;
-      transform: translateX(0);
-    }
+    from { opacity: 0; transform: translateX(-8px); }
+    to { opacity: 1; transform: translateX(0); }
   }
 
   .panelHeader {
@@ -286,6 +386,169 @@
     gap: 6px;
   }
 
+  .lessonBadge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: var(--nb-radius-md);
+    background: var(--nb-accent-soft);
+    border: 1px solid var(--nb-accent);
+    color: var(--nb-accent);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .lessonNav {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    padding: 7px 10px;
+    border: 1px solid var(--nb-border);
+    border-radius: var(--nb-radius-md);
+    background: var(--nb-card);
+    color: var(--nb-text-secondary);
+    cursor: pointer;
+    font-size: 11px;
+    text-align: left;
+    transition: all var(--nb-transition-fast);
+  }
+
+  .lessonNav.next {
+    text-align: right;
+    justify-content: flex-end;
+  }
+
+  .lessonNav:hover {
+    border-color: var(--nb-accent);
+    color: var(--nb-accent);
+  }
+
+  .backButton {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    width: 100%;
+    padding: 6px 10px;
+    border: 0;
+    border-radius: var(--nb-radius-md);
+    background: transparent;
+    color: var(--nb-text-muted);
+    cursor: pointer;
+    font-size: 11px;
+    transition: all var(--nb-transition-fast);
+  }
+
+  .backButton:hover {
+    background: var(--nb-card);
+    color: var(--nb-text);
+  }
+
+  .categoryHeader {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 10px;
+    border-radius: var(--nb-radius-md);
+    background: var(--nb-card);
+    border: 1px solid var(--nb-border);
+    font-size: 13px;
+    color: var(--nb-text);
+  }
+
+  .categoryDesc {
+    margin: 0;
+    padding: 6px 10px;
+    font-size: 11px;
+    color: var(--nb-text-muted);
+    line-height: 1.4;
+  }
+
+  .categoryItem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    text-align: left;
+    padding: 10px;
+    border: 1px solid var(--nb-border);
+    border-radius: var(--nb-radius-md);
+    background: var(--nb-card);
+    color: var(--nb-text-secondary);
+    cursor: pointer;
+    transition: all var(--nb-transition-fast);
+  }
+
+  .categoryItem:hover {
+    border-color: var(--nb-accent);
+    color: var(--nb-text);
+  }
+
+  .categoryItemContent {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    min-width: 0;
+  }
+
+  .categoryItemContent strong {
+    font-size: 12px;
+  }
+
+  .categoryItemDesc {
+    font-size: 10px;
+    color: var(--nb-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .countBadge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 6px;
+    border-radius: var(--nb-radius-pill);
+    background: var(--nb-surface);
+    border: 1px solid var(--nb-border);
+    font-size: 10px;
+    font-family: var(--nb-font-code);
+    color: var(--nb-text-muted);
+    flex-shrink: 0;
+  }
+
+  .lessonItem {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-align: left;
+    padding: 8px 10px;
+    border: 1px solid var(--nb-border);
+    border-radius: var(--nb-radius-md);
+    background: var(--nb-card);
+    color: var(--nb-text-secondary);
+    cursor: pointer;
+    transition: all var(--nb-transition-fast);
+  }
+
+  .lessonItem:hover {
+    border-color: var(--nb-accent);
+    color: var(--nb-text);
+    background: var(--nb-accent-soft);
+  }
+
+  .lessonTitle {
+    font-size: 12px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   .panelMeta,
   .varCount,
   .infoRow {
@@ -317,156 +580,36 @@
     transition: all var(--nb-transition-fast);
   }
 
-  .outlineItem:hover {
-    border-color: var(--nb-border-strong);
-    color: var(--nb-text);
-  }
+  .outlineItem:hover { border-color: var(--nb-border-strong); color: var(--nb-text); }
+  .outlineItem.selected { border-color: var(--nb-accent); background: var(--nb-accent-soft); color: var(--nb-text); }
 
-  .outlineItem.selected {
-    border-color: var(--nb-accent);
-    background: var(--nb-accent-soft);
-    color: var(--nb-text);
-  }
+  .outlineContent { flex: 1; min-width: 0; }
+  .outlineHeader { display: flex; align-items: center; gap: 6px; margin-bottom: 2px; }
+  .outlineIndex { font-family: var(--nb-font-code); font-size: 10px; font-weight: 600; color: var(--nb-text-muted); min-width: 14px; }
+  .outlineType { font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; }
+  .outlinePreview { font-size: 11px; font-family: var(--nb-font-code); color: var(--nb-text-muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .outlineContent {
-    flex: 1;
-    min-width: 0;
-  }
+  .statusDot { width: 8px; height: 8px; border-radius: var(--nb-radius-pill); background: var(--nb-border); flex: none; transition: background var(--nb-transition-fast); }
+  .statusDot.done { background: var(--nb-success); }
+  .statusDot.error, .statusDot.duplicate { background: var(--nb-error); }
+  .statusDot.running { background: var(--nb-accent); animation: dotPulse 1.2s ease-in-out infinite; }
+  @keyframes dotPulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 
-  .outlineHeader {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    margin-bottom: 2px;
-  }
+  .statusReady { color: var(--nb-success); }
+  .statusErr { color: var(--nb-error); }
 
-  .outlineIndex {
-    font-family: var(--nb-font-code);
-    font-size: 10px;
-    font-weight: 600;
-    color: var(--nb-text-muted);
-    min-width: 14px;
-  }
+  .tagGrid { display: flex; flex-wrap: wrap; gap: 4px; }
+  .tag { display: inline-flex; align-items: center; padding: 4px 8px; border-radius: var(--nb-radius-pill); background: var(--nb-card); border: 1px solid var(--nb-border); color: var(--nb-text-secondary); font-family: var(--nb-font-code); font-size: 11px; transition: all var(--nb-transition-fast); }
+  .tag:hover { border-color: var(--nb-accent); color: var(--nb-accent); }
 
-  .outlineType {
-    font-size: 11px;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-  }
+  .warningBox, .emptyText { margin: 0; padding: 10px; border-radius: var(--nb-radius-md); background: var(--nb-card); border: 1px solid var(--nb-border); color: var(--nb-text-muted); font-size: 12px; line-height: 1.5; }
+  .warningBox { border-color: rgba(220, 38, 38, 0.2); background: var(--nb-error-soft); color: var(--nb-error); }
 
-  .outlinePreview {
-    font-size: 11px;
-    font-family: var(--nb-font-code);
-    color: var(--nb-text-muted);
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .statusDot {
-    width: 8px;
-    height: 8px;
-    border-radius: var(--nb-radius-pill);
-    background: var(--nb-border);
-    flex: none;
-    transition: background var(--nb-transition-fast);
-  }
-
-  .statusDot.done {
-    background: var(--nb-success);
-  }
-
-  .statusDot.error,
-  .statusDot.duplicate {
-    background: var(--nb-error);
-  }
-
-  .statusDot.running {
-    background: var(--nb-accent);
-    animation: dotPulse 1.2s ease-in-out infinite;
-  }
-
-  @keyframes dotPulse {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.3; }
-  }
-
-  .statusReady {
-    color: var(--nb-success);
-  }
-
-  .statusErr {
-    color: var(--nb-error);
-  }
-
-  .tagGrid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-
-  .tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 8px;
-    border-radius: var(--nb-radius-pill);
-    background: var(--nb-card);
-    border: 1px solid var(--nb-border);
-    color: var(--nb-text-secondary);
-    font-family: var(--nb-font-code);
-    font-size: 11px;
-    transition: all var(--nb-transition-fast);
-  }
-
-  .tag:hover {
-    border-color: var(--nb-accent);
-    color: var(--nb-accent);
-  }
-
-  .warningBox,
-  .emptyText {
-    margin: 0;
-    padding: 10px;
-    border-radius: var(--nb-radius-md);
-    background: var(--nb-card);
-    border: 1px solid var(--nb-border);
-    color: var(--nb-text-muted);
-    font-size: 12px;
-    line-height: 1.5;
-  }
-
-  .warningBox {
-    border-color: rgba(220, 38, 38, 0.2);
-    background: var(--nb-error-soft);
-    color: var(--nb-error);
-  }
-
-  .toggleRow {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 10px;
-    border-radius: var(--nb-radius-md);
-    background: var(--nb-card);
-    border: 1px solid var(--nb-border);
-    color: var(--nb-text-secondary);
-    font-size: 12px;
-    cursor: pointer;
-    transition: all var(--nb-transition-fast);
-  }
-
-  .toggleRow:hover {
-    border-color: var(--nb-border-strong);
-  }
-
-  .toggleRow input[type="checkbox"] {
-    accent-color: var(--nb-accent);
-  }
+  .toggleRow { display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: var(--nb-radius-md); background: var(--nb-card); border: 1px solid var(--nb-border); color: var(--nb-text-secondary); font-size: 12px; cursor: pointer; transition: all var(--nb-transition-fast); }
+  .toggleRow:hover { border-color: var(--nb-border-strong); }
+  .toggleRow input[type="checkbox"] { accent-color: var(--nb-accent); }
 
   @media (max-width: 768px) {
-    .sidebar {
-      display: none;
-    }
+    .sidebar { display: none; }
   }
 </style>

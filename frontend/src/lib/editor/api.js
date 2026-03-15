@@ -175,3 +175,48 @@ export async function getEnvironmentInfo() {
   const response = await fetch(apiUrl("/api/env/info"));
   return response.json();
 }
+
+export async function getCurriculumCategories() {
+  const response = await fetch(apiUrl("/api/curriculum/categories"));
+  return response.json();
+}
+
+export async function getCurriculumContents(category) {
+  const response = await fetch(apiUrl(`/api/curriculum/contents/${category}`));
+  return response.json();
+}
+
+export async function getCurriculumContent(category, contentId) {
+  const response = await fetch(apiUrl(`/api/curriculum/content/${category}/${contentId}`));
+  return response.json();
+}
+
+export async function checkExercise(sessionId, studentCode, expectedCode, hints, currentHintLevel) {
+  const response = await fetch(apiUrl("/api/curriculum/check"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      sessionId,
+      studentCode,
+      expectedCode,
+      checkType: "output",
+      hints: hints || [],
+      currentHintLevel: currentHintLevel || 0,
+    })
+  });
+  return response.json();
+}
+
+export async function updateCurriculumProgress(category, contentId, missionId, totalMissions) {
+  const response = await fetch(apiUrl("/api/curriculum/progress"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ category, contentId, missionId, totalMissions })
+  });
+  return response.json();
+}
+
+export async function getCurriculumProgress() {
+  const response = await fetch(apiUrl("/api/curriculum/progress"));
+  return response.json();
+}

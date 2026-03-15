@@ -547,11 +547,12 @@ def createServerApp(mode: str = "edit", documentPath: Path | None = None, conten
             yamlContent = curriculumLoader.loadContent(category, contentId)
         except FileNotFoundError:
             raise HTTPException(status_code=404, detail="Content not found.")
-        document = yamlToDocument(yamlContent, category, contentId)
+        document, solutions = yamlToDocument(yamlContent, category, contentId)
         prevNext = curriculumLoader.getPrevNext(category, contentId)
         progressTracker.markAccessed(category, contentId)
         return {
             "document": document.model_dump(),
+            "solutions": solutions,
             "category": category,
             "contentId": contentId,
             "prevNext": prevNext,

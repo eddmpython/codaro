@@ -27,6 +27,9 @@
   export let onDrop = () => {};
   export let onSplit = null;
   export let onMerge = null;
+  export let onCheck = null;
+  export let hasSolution = false;
+  export let feedback = null;
   export let isSelected = false;
   export let dragTargetPosition = "";
   export let isDragSource = false;
@@ -166,6 +169,22 @@
             isError={cell.execution?.status === "error"}
             {multiDefVars}
           />
+        {/if}
+
+        {#if hasSolution && cell.type === "code"}
+          <div class="missionBar" class:passed={feedback?.passed} class:failed={feedback && !feedback.passed}>
+            <button class="checkButton" onclick={(event) => { event.stopPropagation(); if (onCheck) onCheck(); }}>
+              {#if feedback?.passed}
+                <CheckCircle2 size={13} />
+                정답!
+              {:else}
+                체크
+              {/if}
+            </button>
+            {#if feedback && !feedback.passed}
+              <span class="feedbackText">{feedback.feedback}</span>
+            {/if}
+          </div>
         {/if}
       </div>
     </div>
@@ -470,6 +489,57 @@
     border-color: var(--nb-border);
     border-left-color: var(--nb-accent);
     background: var(--nb-card);
+  }
+
+  .missionBar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border-top: 1px solid var(--nb-border);
+    font-size: 12px;
+  }
+
+  .missionBar.passed {
+    background: var(--nb-success-soft);
+    border-top-color: rgba(22, 163, 74, 0.2);
+  }
+
+  .missionBar.failed {
+    background: rgba(217, 119, 6, 0.06);
+  }
+
+  .checkButton {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border: 1px solid var(--nb-border);
+    border-radius: var(--nb-radius-pill);
+    background: var(--nb-card);
+    color: var(--nb-text-secondary);
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 600;
+    transition: all var(--nb-transition-fast);
+    flex-shrink: 0;
+  }
+
+  .checkButton:hover {
+    border-color: var(--nb-accent);
+    color: var(--nb-accent);
+  }
+
+  .passed .checkButton {
+    border-color: var(--nb-success);
+    color: var(--nb-success);
+    background: var(--nb-success-soft);
+  }
+
+  .feedbackText {
+    color: var(--nb-text-secondary);
+    font-size: 12px;
+    line-height: 1.4;
   }
 
   .execTime {

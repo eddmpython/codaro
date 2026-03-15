@@ -48,7 +48,7 @@ def testYamlToDocument() -> None:
         return
     loader = ContentLoader(str(CONTENT_DIR))
     content = loader.loadContent("30days", "day01_헬로월드")
-    document = yamlToDocument(content, "30days", "day01_헬로월드")
+    document, solutions = yamlToDocument(content, "30days", "day01_헬로월드")
 
     assert document.title == "헬로월드"
     assert len(document.blocks) > 5
@@ -57,8 +57,7 @@ def testYamlToDocument() -> None:
     assert "markdown" in types
     assert "code" in types
 
-    codeBlocks = [b for b in document.blocks if b.type == "code"]
-    assert any("print" in b.content for b in codeBlocks)
+    assert len(solutions) > 0
 
 
 def testDocumentHasMissions() -> None:
@@ -66,11 +65,15 @@ def testDocumentHasMissions() -> None:
         return
     loader = ContentLoader(str(CONTENT_DIR))
     content = loader.loadContent("30days", "day01_헬로월드")
-    document = yamlToDocument(content, "30days", "day01_헬로월드")
+    document, solutions = yamlToDocument(content, "30days", "day01_헬로월드")
 
     markdownBlocks = [b for b in document.blocks if b.type == "markdown"]
-    missionHeaders = [b for b in markdownBlocks if "미션" in (b.content or "") or "기본" in (b.content or "") or "심화" in (b.content or "")]
+    missionHeaders = [b for b in markdownBlocks if "기본" in (b.content or "") or "심화" in (b.content or "")]
     assert len(missionHeaders) > 0
+
+    missionCells = [b for b in document.blocks if b.id in solutions]
+    assert len(missionCells) > 0
+    assert all(b.content == "" for b in missionCells)
 
 
 def testPrevNext() -> None:

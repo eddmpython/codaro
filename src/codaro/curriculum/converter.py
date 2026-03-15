@@ -5,13 +5,14 @@ import uuid
 from ..document.models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, RuntimeConfig
 
 
-def yamlToDocument(content: dict, category: str, contentId: str) -> CodaroDocument:
+def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[CodaroDocument, dict[str, str]]:
     meta = content.get("meta", {})
     intro = content.get("intro", {})
     sections = content.get("sections", [])
 
     title = meta.get("title", contentId)
     blocks: list[BlockConfig] = []
+    solutions: dict[str, str] = {}
 
     blocks.append(_markdownBlock(_buildIntroMarkdown(title, intro)))
 
@@ -26,21 +27,31 @@ def yamlToDocument(content: dict, category: str, contentId: str) -> CodaroDocume
             blocks.append(_markdownBlock(header))
 
         for block in section.get("blocks", []):
-            converted = _convertBlock(block)
-            if converted:
-                blocks.extend(converted) if isinstance(converted, list) else blocks.append(converted)
+            if block.get("type") == "expansion":
+                converted = _convertExpansionBlock(block)
+                if converted:
+                    for cell in converted:
+                        blocks.append(cell)
+                    exerciseCell = converted[-1]
+                    solutionCode = block.get("code", "")
+                    if solutionCode:
+                        solutions[exerciseCell.id] = solutionCode
+            else:
+                converted = _convertBlock(block)
+                if converted:
+                    blocks.extend(converted) if isinstance(converted, list) else blocks.append(converted)
 
     if not blocks:
         blocks.append(_codeBlock(""))
 
-    return CodaroDocument(
+    return (CodaroDocument(
         id=f"doc-{uuid.uuid4().hex[:10]}",
         title=title,
         blocks=blocks,
         metadata=DocumentMetadata(sourceFormat="curriculum"),
         runtime=RuntimeConfig(),
         app=AppConfig(title=title),
-    )
+    ), solutions)
 
 
 def _convertBlock(block: dict) -> BlockConfig | list[BlockConfig] | None:
@@ -142,8 +153,7 @@ def _convertExpansionBlock(block: dict) -> list[BlockConfig]:
     expansionTitle = block.get("title", "Mission")
     result.append(_markdownBlock(f"### {expansionTitle}"))
 
-    code = block.get("code", "")
-    missionCell = _codeBlock(code)
+    missionCell = _codeBlock("")
     result.append(missionCell)
 
     return result

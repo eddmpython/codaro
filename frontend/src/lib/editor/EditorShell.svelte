@@ -8,7 +8,7 @@
   import { detectCycle, detectMultipleDefinitions } from "./dataflow.js";
   import { ServerKernel } from "./serverKernel.js";
   import { WorkerClient } from "./workerClient.js";
-  import { exportDocumentAtPath, loadDocumentAtPath, saveDocumentAtPath } from "./api.js";
+  import { exportDocumentAtPath, loadDocumentAtPath, saveDocumentAtPath, getCurriculumContent, checkExercise } from "./api.js";
 
   export let initialPath = "";
 
@@ -33,6 +33,9 @@
   let queuedBlockIds = new Set();
   let autoSaveTimer = null;
   let isDirty = false;
+  let lessonInfo = null;
+  let solutionMap = {};
+  let exerciseFeedback = {};
 
   $: activeCellIndex = activeBlockId
     ? Math.max(documentState.blocks.findIndex((block) => block.id === activeBlockId), 0) + 1
@@ -663,6 +666,52 @@
     };
   }
 
+  async function loadLesson(category, contentId) {
+    try {
+      const data = await getCurriculumContent(category, contentId);
+      documentState = data.document;
+      solutionMap = data.solutions || {};
+      exerciseFeedback = {};
+      lessonInfo = {
+        category,
+        contentId,
+        title: documentState.title,
+        prevNext: data.prevNext,
+      };
+      activeBlockId = documentState.blocks[0]?.id || null;
+      selectedBlockIds = activeBlockId ? [activeBlockId] : [];
+      currentPath = "";
+      refreshWarnings();
+    } catch (error) {
+      window.alert(String(error));
+    }
+  }
+
+  async function checkMission(blockId) {
+    if (!engine || !engine.sessionId) return;
+    const block = documentState.blocks.find((b) => b.id === blockId);
+    if (!block || block.type !== "code") return;
+
+    const solution = solutionMap[blockId];
+    if (!solution) return;
+
+    const currentFeedback = exerciseFeedback[blockId];
+    const currentHintLevel = currentFeedback?.hintLevel || 0;
+
+    try {
+      const result = await checkExercise(
+        engine.sessionId,
+        block.content,
+        solution,
+        [],
+        currentHintLevel,
+      );
+      exerciseFeedback = { ...exerciseFeedback, [blockId]: result };
+    } catch (error) {
+      exerciseFeedback = { ...exerciseFeedback, [blockId]: { passed: false, feedback: String(error) } };
+    }
+  }
+
   function handleGlobalKeydown(event) {
     const target = event.target;
     const isEditableTarget = target instanceof HTMLInputElement
@@ -766,12 +815,14 @@
     {engineError}
     {hasCycle}
     {duplicateDefinitions}
+    {lessonInfo}
     onSelectBlock={(blockId) => {
       activeBlockId = blockId;
       selectedBlockIds = [blockId];
       scrollCellIntoView(blockId);
     }}
     onToggleHideCode={toggleHideCode}
+    onLoadLesson={loadLesson}
   />
 
   <EditorToolbar
@@ -869,6 +920,9 @@
         isDragSource={draggedBlockId === block.id}
         dragTargetPosition={dragTargetBlockId === block.id ? dragTargetPosition : ""}
         multiDefVars={duplicateDefinitions.get(block.id) || []}
+        hasSolution={!!solutionMap[block.id]}
+        feedback={exerciseFeedback[block.id] || null}
+        onCheck={() => checkMission(block.id)}
         onSelect={(event) => handleCellSelect(block.id, event)}
         onRun={() => runBlock(block.id)}
         onRunAndMove={() => runBlock(block.id)}
