@@ -13,7 +13,7 @@ from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconn
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 import uvicorn
 
 from .document.models import (
@@ -40,8 +40,10 @@ from .kernel.reactive import executeReactive
 from .system import fileOps, packageOps
 from .system.fileOps import DirectoryListing, FileContent, MoveRequest, WriteFileRequest
 from .system.packageOps import InstallResult, PackageInfo
+from .curriculum.checker import checkByOutput, checkByVariable, checkContains, checkNoError
 from .curriculum.contentLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS, ContentLoader
 from .curriculum.converter import yamlToDocument
+from .curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, LESSON_STRUCTURE, PHILOSOPHY
 from .curriculum.progress import ProgressTracker
 
 
@@ -116,6 +118,18 @@ class CurriculumProgressRequest(BaseModel):
     contentId: str
     missionId: str = ""
     totalMissions: int = 0
+
+
+class CheckExerciseRequest(BaseModel):
+    sessionId: str
+    studentCode: str
+    expectedCode: str = ""
+    checkType: str = "output"
+    variableName: str = ""
+    expectedValue: str = ""
+    requiredPatterns: list[str] = Field(default_factory=list)
+    hints: list[str] = Field(default_factory=list)
+    currentHintLevel: int = 0
 
 
 def createServerApp(mode: str = "edit", documentPath: Path | None = None, contentDir: Path | None = None) -> FastAPI:
@@ -556,6 +570,50 @@ def createServerApp(mode: str = "edit", documentPath: Path | None = None, conten
             return lesson.model_dump()
         progressTracker.markAccessed(request.category, request.contentId)
         return {"status": "accessed"}
+
+    @app.post("/api/curriculum/check")
+    async def apiCheckExercise(request: CheckExerciseRequest) -> dict[str, Any]:
+        session = sessionManager.getSession(request.sessionId)
+        if session is None:
+            raise HTTPException(status_code=404, detail="Session not found.")
+
+        if request.checkType == "output" and request.expectedCode:
+            result = await checkByOutput(
+                session, request.studentCode, request.expectedCode,
+                hints=request.hints, currentHintLevel=request.currentHintLevel,
+            )
+        elif request.checkType == "variable" and request.variableName:
+            result = await checkByVariable(
+                session, request.studentCode, request.variableName,
+                request.expectedValue, hints=request.hints,
+                currentHintLevel=request.currentHintLevel,
+            )
+        elif request.checkType == "contains" and request.requiredPatterns:
+            result = await checkContains(request.studentCode, request.requiredPatterns)
+        elif request.checkType == "noError":
+            result = await checkNoError(session, request.studentCode)
+        else:
+            raise HTTPException(status_code=400, detail="Invalid check type or missing parameters.")
+
+        return {
+            "passed": result.passed,
+            "feedback": result.feedback,
+            "hintLevel": result.hintLevel,
+            "hints": result.hints,
+            "studentOutput": result.studentOutput,
+            "expectedOutput": result.expectedOutput,
+            "detail": result.detail,
+        }
+
+    @app.get("/api/curriculum/learning-spec")
+    def apiLearningSpec() -> dict[str, Any]:
+        return {
+            "philosophy": PHILOSOPHY,
+            "exerciseTypes": EXERCISE_TYPES,
+            "hintStrategy": HINT_STRATEGY,
+            "lessonStructure": LESSON_STRUCTURE,
+            "aiTeacherInstructions": AI_TEACHER_INSTRUCTIONS,
+        }
 
     if WEB_BUILD_ROOT.exists():
         _indexHtml = (WEB_BUILD_ROOT / "index.html").read_text(encoding="utf-8")
