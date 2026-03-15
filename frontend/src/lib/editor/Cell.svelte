@@ -25,6 +25,8 @@
   export let onDragEnd = () => {};
   export let onDragOver = () => {};
   export let onDrop = () => {};
+  export let onSplit = null;
+  export let onMerge = null;
   export let isSelected = false;
   export let dragTargetPosition = "";
   export let isDragSource = false;
@@ -144,6 +146,7 @@
             onContentChange={onUpdateContent}
             {onRun}
             onRunAndMove={onRunAndMove}
+            {onSplit}
           />
         {:else if cell.type === "markdown"}
           <MarkdownCell

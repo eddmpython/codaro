@@ -84,6 +84,76 @@ export class ServerKernel {
     }
   }
 
+  async executeReactive(blockId, blocks) {
+    if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
+      return this._executeReactiveViaRest(blockId, blocks);
+    }
+
+    const requestId = crypto.randomUUID();
+    const results = [];
+
+    return new Promise((resolve, reject) => {
+      const handler = (event) => {
+        const message = JSON.parse(event.data);
+
+        if (message.requestId !== requestId) return;
+
+        if (message.type === "result") {
+          results.push({
+            blockId: message.blockId,
+            type: message.status === "error" ? "error" : "text",
+            data: message.data || "",
+            stdout: message.stdout || "",
+            stderr: message.stderr || "",
+            variables: (message.variables || []).map(v => v.name),
+            status: message.status || "done",
+            executionCount: message.executionCount || 0,
+          });
+        }
+
+        if (message.type === "reactiveComplete") {
+          this.ws.removeEventListener("message", handler);
+          resolve({ results, executionOrder: message.executionOrder || [] });
+        }
+
+        if (message.type === "error") {
+          this.ws.removeEventListener("message", handler);
+          reject(new Error(message.message));
+        }
+      };
+
+      this.ws.addEventListener("message", handler);
+      this.ws.send(JSON.stringify({
+        type: "executeReactive",
+        requestId,
+        blockId,
+        blocks,
+      }));
+    });
+  }
+
+  async _executeReactiveViaRest(blockId, blocks) {
+    const response = await fetch(apiUrl(`/api/kernel/${this.sessionId}/execute-reactive`), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ blockId, blocks }),
+    });
+    if (!response.ok) throw new Error("Reactive execution failed.");
+    const data = await response.json();
+    return {
+      results: (data.results || []).map(r => ({
+        blockId: r.blockId,
+        type: r.type || "text",
+        data: r.data || "",
+        stdout: r.stdout || "",
+        stderr: r.stderr || "",
+        variables: (r.variables || []).map(v => v.name),
+        status: r.status || "done",
+      })),
+      executionOrder: data.executionOrder || [],
+    };
+  }
+
   async executeBlock(code) {
     if (!this.ws || this.ws.readyState !== WebSocket.OPEN) {
       return this._executeViaRest(code);

@@ -5,6 +5,7 @@ export let content = "";
 export let onContentChange = () => {};
 export let onRun = () => {};
 export let onRunAndMove = () => {};
+export let onSplit = null;
 </script>
 
 <div class="codeCell">
@@ -13,6 +14,7 @@ export let onRunAndMove = () => {};
       value={content}
       onChange={onContentChange}
       onRun={onRunAndMove || onRun}
+      {onSplit}
     />
   </div>
 </div>

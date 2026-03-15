@@ -11,6 +11,7 @@
   export let readOnly = false;
   export let onChange = () => {};
   export let onRun = () => {};
+  export let onSplit = null;
 
   let host;
   let view;
@@ -156,6 +157,16 @@
           run: () => {
             onRun();
             return true;
+          }
+        },
+        {
+          key: "Ctrl-Shift-Minus",
+          run: (v) => {
+            if (onSplit) {
+              onSplit(v.state.selection.main.head);
+              return true;
+            }
+            return false;
           }
         },
         ...defaultKeymap,

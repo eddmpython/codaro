@@ -30,6 +30,9 @@
   let dragTargetBlockId = null;
   let dragTargetPosition = "";
   let paletteOpen = false;
+  let queuedBlockIds = new Set();
+  let autoSaveTimer = null;
+  let isDirty = false;
 
   $: activeCellIndex = activeBlockId
     ? Math.max(documentState.blocks.findIndex((block) => block.id === activeBlockId), 0) + 1
@@ -188,6 +191,18 @@
       ))
     };
     refreshWarnings();
+    scheduleAutoSave();
+  }
+
+  function scheduleAutoSave() {
+    isDirty = true;
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+      if (isDirty && currentPath) {
+        isDirty = false;
+        saveDocument();
+      }
+    }, 2000);
   }
 
   function updateTitle(title) {
@@ -415,6 +430,41 @@
     scrollCellIntoView(nextBlock.id);
   }
 
+  function splitCell(blockId, cursorOffset) {
+    const block = documentState.blocks.find((b) => b.id === blockId);
+    if (!block || block.type !== "code") return;
+
+    const before = block.content.slice(0, cursorOffset).trimEnd();
+    const after = block.content.slice(cursorOffset).trimStart();
+
+    updateBlockContent(blockId, before);
+
+    const newBlock = createBlock(block.type, after);
+    const blocks = [...documentState.blocks];
+    const index = blocks.findIndex((b) => b.id === blockId);
+    blocks.splice(index + 1, 0, newBlock);
+    documentState = { ...documentState, blocks };
+    activeBlockId = newBlock.id;
+    selectedBlockIds = [newBlock.id];
+    refreshWarnings();
+  }
+
+  function mergeWithBelow(blockId) {
+    const blocks = [...documentState.blocks];
+    const index = blocks.findIndex((b) => b.id === blockId);
+    if (index < 0 || index >= blocks.length - 1) return;
+
+    const current = blocks[index];
+    const below = blocks[index + 1];
+    if (current.type !== below.type) return;
+
+    const merged = (current.content || "") + "\n" + (below.content || "");
+    blocks[index] = { ...current, content: merged };
+    blocks.splice(index + 1, 1);
+    documentState = { ...documentState, blocks };
+    refreshWarnings();
+  }
+
   function scrollCellIntoView(blockId) {
     requestAnimationFrame(() => {
       const cellEl = document.querySelector(`[data-cell-id="${blockId}"]`);
@@ -471,6 +521,11 @@
       return;
     }
 
+    if (engineType === "server" && engine.executeReactive) {
+      await runBlockReactive(blockId);
+      return;
+    }
+
     engineStatus = "running";
     engineError = "";
     updateExecution(blockId, { status: "running" });
@@ -500,6 +555,44 @@
         executionCount: (block.execution?.executionCount || 0) + 1,
         lastOutput: String(error)
       });
+    }
+  }
+
+  async function runBlockReactive(blockId) {
+    const codeBlocks = documentState.blocks
+      .filter((b) => b.type === "code")
+      .map((b) => ({ id: b.id, type: b.type, content: b.content }));
+
+    engineStatus = "running";
+    engineError = "";
+    updateExecution(blockId, { status: "running" });
+
+    try {
+      const { results, executionOrder } = await engine.executeReactive(blockId, codeBlocks);
+
+      const queued = new Set(executionOrder);
+      queued.delete(blockId);
+      queuedBlockIds = queued;
+
+      for (const result of results) {
+        const bid = result.blockId;
+        if (!bid) continue;
+        queuedBlockIds.delete(bid);
+        queuedBlockIds = queuedBlockIds;
+        variableNames = result.variables || [];
+        updateExecution(bid, {
+          status: result.status === "error" ? "error" : "done",
+          lastRunAt: new Date().toISOString(),
+          lastOutput: composeOutput(result),
+        });
+      }
+
+      queuedBlockIds = new Set();
+      engineStatus = "ready";
+    } catch (error) {
+      queuedBlockIds = new Set();
+      engineStatus = "error";
+      engineError = String(error);
     }
   }
 
@@ -585,6 +678,12 @@
     if ((event.ctrlKey || event.metaKey) && event.key.toLowerCase() === "k") {
       event.preventDefault();
       paletteOpen = !paletteOpen;
+      return;
+    }
+
+    if ((event.ctrlKey || event.metaKey) && event.shiftKey && event.key === "=") {
+      event.preventDefault();
+      if (activeBlockId) mergeWithBelow(activeBlockId);
       return;
     }
 
@@ -765,7 +864,7 @@
         cellIndex={index + 1}
         isActive={block.id === activeBlockId}
         isRunning={block.execution?.status === "running"}
-        isQueued={false}
+        isQueued={queuedBlockIds.has(block.id)}
         isSelected={selectedSet.has(block.id)}
         isDragSource={draggedBlockId === block.id}
         dragTargetPosition={dragTargetBlockId === block.id ? dragTargetPosition : ""}
@@ -780,6 +879,8 @@
         onAddAbove={() => addBlock("code", block.id, "before")}
         onAddBelow={() => addBlock("code", block.id, "after")}
         onDuplicate={() => duplicateBlock(block.id)}
+        onSplit={(cursorOffset) => splitCell(block.id, cursorOffset)}
+        onMerge={() => mergeWithBelow(block.id)}
         onToggleSelect={() => toggleSelectedBlock(block.id)}
         onDragStart={(event) => {
           draggedBlockId = block.id;
