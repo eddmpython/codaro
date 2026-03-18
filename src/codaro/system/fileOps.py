@@ -42,8 +42,37 @@ class DirectoryListing(BaseModel):
     totalDirectories: int = 0
 
 
-async def listDirectory(dirPath: str) -> DirectoryListing:
-    target = Path(dirPath).expanduser().resolve()
+class WorkspacePathError(ValueError):
+    def __init__(self, message: str, *, path: Path, workspaceRoot: Path):
+        super().__init__(message)
+        self.path = path
+        self.workspaceRoot = workspaceRoot
+
+
+def resolvePath(pathLike: str, workspaceRoot: str | Path | None = None) -> Path:
+    if workspaceRoot is None:
+        return Path(pathLike).expanduser().resolve()
+
+    root = Path(workspaceRoot).expanduser().resolve()
+    target = Path(pathLike).expanduser()
+    if not target.is_absolute():
+        target = root / target
+    target = target.resolve()
+
+    try:
+        target.relative_to(root)
+    except ValueError as error:
+        raise WorkspacePathError(
+            "Path must stay within the active workspace.",
+            path=target,
+            workspaceRoot=root,
+        ) from error
+
+    return target
+
+
+async def listDirectory(dirPath: str, workspaceRoot: str | Path | None = None) -> DirectoryListing:
+    target = resolvePath(dirPath, workspaceRoot)
     if not target.exists() or not target.is_dir():
         return DirectoryListing(path=str(target))
 
@@ -82,8 +111,12 @@ async def listDirectory(dirPath: str) -> DirectoryListing:
     )
 
 
-async def readFile(filePath: str, encoding: str = "utf-8") -> FileContent:
-    target = Path(filePath).expanduser().resolve()
+async def readFile(
+    filePath: str,
+    encoding: str = "utf-8",
+    workspaceRoot: str | Path | None = None,
+) -> FileContent:
+    target = resolvePath(filePath, workspaceRoot)
     content = target.read_text(encoding=encoding)
     return FileContent(
         path=str(target),
@@ -93,16 +126,22 @@ async def readFile(filePath: str, encoding: str = "utf-8") -> FileContent:
     )
 
 
-async def writeFile(filePath: str, content: str, encoding: str = "utf-8", createDirectories: bool = True) -> str:
-    target = Path(filePath).expanduser().resolve()
+async def writeFile(
+    filePath: str,
+    content: str,
+    encoding: str = "utf-8",
+    createDirectories: bool = True,
+    workspaceRoot: str | Path | None = None,
+) -> str:
+    target = resolvePath(filePath, workspaceRoot)
     if createDirectories:
         target.parent.mkdir(parents=True, exist_ok=True)
     target.write_text(content, encoding=encoding)
     return str(target)
 
 
-async def deleteEntry(filePath: str) -> str:
-    target = Path(filePath).expanduser().resolve()
+async def deleteEntry(filePath: str, workspaceRoot: str | Path | None = None) -> str:
+    target = resolvePath(filePath, workspaceRoot)
     if target.is_dir():
         shutil.rmtree(target)
     else:
@@ -110,19 +149,23 @@ async def deleteEntry(filePath: str) -> str:
     return str(target)
 
 
-async def moveEntry(sourcePath: str, destinationPath: str) -> str:
-    source = Path(sourcePath).expanduser().resolve()
-    destination = Path(destinationPath).expanduser().resolve()
+async def moveEntry(
+    sourcePath: str,
+    destinationPath: str,
+    workspaceRoot: str | Path | None = None,
+) -> str:
+    source = resolvePath(sourcePath, workspaceRoot)
+    destination = resolvePath(destinationPath, workspaceRoot)
     destination.parent.mkdir(parents=True, exist_ok=True)
     shutil.move(str(source), str(destination))
     return str(destination)
 
 
-async def createDirectory(dirPath: str) -> str:
-    target = Path(dirPath).expanduser().resolve()
+async def createDirectory(dirPath: str, workspaceRoot: str | Path | None = None) -> str:
+    target = resolvePath(dirPath, workspaceRoot)
     target.mkdir(parents=True, exist_ok=True)
     return str(target)
 
 
-async def fileExists(filePath: str) -> bool:
-    return Path(filePath).expanduser().resolve().exists()
+async def fileExists(filePath: str, workspaceRoot: str | Path | None = None) -> bool:
+    return resolvePath(filePath, workspaceRoot).exists()

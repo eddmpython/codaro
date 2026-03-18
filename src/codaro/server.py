@@ -1,147 +1,150 @@
 from __future__ import annotations
 
-import platform
-import subprocess
-import sys
-import uuid
-from pathlib import Path
-from typing import Any
-
+import time
 from contextlib import asynccontextmanager
+from dataclasses import dataclass
+from pathlib import Path
 
-from fastapi import FastAPI, HTTPException, Request, WebSocket, WebSocketDisconnect
+from fastapi import HTTPException
+from fastapi import FastAPI, Request, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, HTMLResponse
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel, Field
 import uvicorn
 
-from .document.models import (
-    BlockConfig,
-    BootstrapResponse,
-    CodaroDocument,
-    ExportRequest,
-    ExportResponse,
-    LoadRequest,
-    SaveRequest,
+from .api import (
+    ApiError,
+    apiErrorHandler,
+    createBootstrapRouter,
+    createCurriculumRouter,
+    createDocumentRouter,
+    createKernelRouter,
+    createServerState,
+    createSpaRouter,
+    createSystemRouter,
+    createWorkspaceRouter,
+    httpExceptionHandler,
+    unhandledExceptionHandler,
+    validationExceptionHandler,
 )
-from .document.service import createEmptyDocument, exportDocument, loadDocument, saveDocument
-from .kernel.manager import SessionManager
-from .kernel.protocol import (
-    CreateSessionRequest,
-    CreateSessionResponse,
-    ExecuteRequest,
-    ExecutionOutput,
-    WsErrorMessage,
-    WsResultMessage,
-    WsStatusMessage,
-)
-from .kernel.reactive import executeReactive
-from .system import fileOps, packageOps
-from .system.fileOps import DirectoryListing, FileContent, MoveRequest, WriteFileRequest
-from .system.packageOps import InstallResult, PackageInfo
-from .curriculum.checker import checkByOutput, checkByVariable, checkContains, checkNoError
-from .curriculum.contentLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS, ContentLoader
-from .curriculum.converter import yamlToDocument
-from .curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, LESSON_STRUCTURE, PHILOSOPHY
-from .curriculum.progress import ProgressTracker
+from .serverLog import configureServerLogging, formatLogFields, isVerboseLoggingEnabled, setVerboseLogging
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
-FRONTEND_ROOT = PACKAGE_ROOT.parent.parent.parent / "frontend"
+PROJECT_ROOT = PACKAGE_ROOT.parent.parent.parent
+FRONTEND_ROOT = PROJECT_ROOT / "frontend"
 WEB_BUILD_ROOT = PACKAGE_ROOT / "webBuild"
+CONTENT_ROOT = PROJECT_ROOT / "content" / "studyPython" / "content"
 
 
-class BlockPatch(BaseModel):
-    blockId: str
-    content: str | None = None
-    type: str | None = None
+@dataclass(slots=True)
+class FrontendBuildStatus:
+    status: str
+    indexPath: Path
+    assetsPath: Path
+    missingPaths: tuple[Path, ...]
 
 
-class InsertBlockRequest(BaseModel):
-    path: str
-    anchorBlockId: str | None = None
-    direction: str = "after"
-    type: str = "code"
-    content: str = ""
+class FrontendBuildError(RuntimeError):
+    pass
 
 
-class RemoveBlockRequest(BaseModel):
-    path: str
-    blockId: str
+def _displayPath(path: Path) -> str:
+    try:
+        return path.relative_to(PROJECT_ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
 
 
-class MoveBlockRequest(BaseModel):
-    path: str
-    blockId: str
-    offset: int
+def getFrontendBuildStatus(webBuildRoot: Path | None = None) -> FrontendBuildStatus:
+    buildRoot = webBuildRoot or WEB_BUILD_ROOT
+    indexPath = buildRoot / "index.html"
+    assetsPath = buildRoot / "_app"
+    missingPaths = tuple(
+        path
+        for path, exists in (
+            (indexPath, indexPath.is_file()),
+            (assetsPath, assetsPath.is_dir()),
+        )
+        if not exists
+    )
+    return FrontendBuildStatus(
+        status="ready" if not missingPaths else "missing",
+        indexPath=indexPath,
+        assetsPath=assetsPath,
+        missingPaths=missingPaths,
+    )
 
 
-class UpdateBlockRequest(BaseModel):
-    path: str
-    blockId: str
-    content: str | None = None
-    type: str | None = None
+def buildFrontendInstructions(status: FrontendBuildStatus) -> str:
+    missing = ", ".join(_displayPath(path) for path in status.missingPaths) or _displayPath(status.indexPath)
+    return "\n".join(
+        [
+            f"Codaro frontend build is missing: {missing}",
+            "Run:",
+            "  cd frontend",
+            "  npm install",
+            "  npm run build",
+            "For iterative frontend work:",
+            "  npm run build:watch",
+        ]
+    )
 
 
-class RunBlockRequest(BaseModel):
-    sessionId: str
-    path: str
-    blockId: str
+def requireFrontendBuildReady(
+    logger=None,
+    webBuildRoot: Path | None = None,
+) -> FrontendBuildStatus:
+    status = getFrontendBuildStatus(webBuildRoot)
+    if status.status == "ready":
+        return status
+
+    if logger is not None:
+        logger.error(
+            "frontend %s",
+            formatLogFields(
+                status="missing",
+                indexPath=_displayPath(status.indexPath),
+                assetsPath=_displayPath(status.assetsPath),
+            ),
+        )
+    raise FrontendBuildError(buildFrontendInstructions(status))
 
 
-class ReactiveExecuteRequest(BaseModel):
-    blockId: str
-    blocks: list[dict[str, Any]]
-
-
-class PackageRequest(BaseModel):
-    name: str
-
-
-class PathRequest(BaseModel):
-    path: str
-
-
-class EnvironmentInfo(BaseModel):
-    pythonVersion: str
-    platform: str
-    cwd: str
-    executable: str
-
-
-EDDMPYTHON_CONTENT = Path(__file__).resolve().parent.parent.parent.parent / "nicegui" / "eddmpython" / "core" / "studyPython" / "content"
-
-
-class CurriculumProgressRequest(BaseModel):
-    category: str
-    contentId: str
-    missionId: str = ""
-    totalMissions: int = 0
-
-
-class CheckExerciseRequest(BaseModel):
-    sessionId: str
-    studentCode: str
-    expectedCode: str = ""
-    checkType: str = "output"
-    variableName: str = ""
-    expectedValue: str = ""
-    requiredPatterns: list[str] = Field(default_factory=list)
-    hints: list[str] = Field(default_factory=list)
-    currentHintLevel: int = 0
-
-
-def createServerApp(mode: str = "edit", documentPath: Path | None = None, contentDir: Path | None = None) -> FastAPI:
-    sessionManager = SessionManager()
-    resolvedContentDir = contentDir or EDDMPYTHON_CONTENT
-    curriculumLoader = ContentLoader(str(resolvedContentDir)) if resolvedContentDir.exists() else None
-    progressTracker = ProgressTracker()
+def createServerApp(
+    mode: str = "edit",
+    documentPath: Path | None = None,
+    contentDir: Path | None = None,
+    workspaceRoot: Path | None = None,
+) -> FastAPI:
+    logger = configureServerLogging()
+    state = createServerState(
+        mode=mode,
+        documentPath=documentPath,
+        workspaceRoot=workspaceRoot or Path.cwd().resolve(),
+        contentRoot=contentDir or CONTENT_ROOT,
+        packageRoot=PACKAGE_ROOT,
+        frontendRoot=FRONTEND_ROOT,
+        webBuildRoot=WEB_BUILD_ROOT,
+    )
 
     @asynccontextmanager
     async def lifespan(application: FastAPI):
+        del application
+        logger.info(
+            "lifespan %s",
+            formatLogFields(
+                status="startup",
+                mode=state.mode,
+                workspaceRoot=state.workspaceRoot,
+                contentRoot=state.contentRoot if state.contentRoot.exists() else None,
+            ),
+        )
         yield
-        sessionManager.destroyAll()
+        logger.info(
+            "lifespan %s",
+            formatLogFields(status="shutdown", activeSessions=state.sessionManager.sessionCount),
+        )
+        state.sessionManager.destroyAll()
 
     app = FastAPI(title="Codaro", lifespan=lifespan)
     app.add_middleware(
@@ -151,505 +154,46 @@ def createServerApp(mode: str = "edit", documentPath: Path | None = None, conten
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    app.add_exception_handler(ApiError, apiErrorHandler)
+    app.add_exception_handler(HTTPException, httpExceptionHandler)
+    app.add_exception_handler(RequestValidationError, validationExceptionHandler)
+    app.add_exception_handler(Exception, unhandledExceptionHandler)
 
-    @app.get("/api/health")
-    def health() -> dict[str, str]:
-        return {"status": "ok"}
-
-    @app.get("/api/bootstrap")
-    def bootstrap(request: Request) -> dict[str, Any]:
-        rootPath = request.scope.get("root_path", "")
-        return {
-            "appMode": mode == "app",
-            "documentPath": str(documentPath) if documentPath else None,
-            "rootPath": rootPath,
-        }
-
-    @app.get("/api/env/info", response_model=EnvironmentInfo)
-    def envInfo() -> EnvironmentInfo:
-        return EnvironmentInfo(
-            pythonVersion=sys.version,
-            platform=platform.platform(),
-            cwd=str(Path.cwd()),
-            executable=sys.executable,
-        )
-
-    @app.post("/api/document/load")
-    def apiLoadDocument(request: LoadRequest) -> dict[str, Any]:
-        path = Path(request.path).expanduser()
-        if not path.exists():
-            return {
-                "path": str(path.resolve()),
-                "document": createEmptyDocument(title=path.stem or "Untitled").model_dump(),
-                "exists": False,
-            }
-        document = loadDocument(str(path))
-        return {"path": str(path.resolve()), "document": document.model_dump(), "exists": True}
-
-    @app.post("/api/document/save")
-    def apiSaveDocument(request: SaveRequest) -> dict[str, str]:
-        if not request.path:
-            raise HTTPException(status_code=400, detail="Path is required for save.")
-        savedPath = saveDocument(request.path, request.document)
-        return {"path": str(savedPath)}
-
-    @app.post("/api/document/export", response_model=ExportResponse)
-    def apiExportDocument(request: ExportRequest) -> ExportResponse:
-        try:
-            outputPath = exportDocument(request.path, request.format, request.outputPath)
-        except ValueError as error:
-            raise HTTPException(status_code=400, detail=str(error)) from error
-        return ExportResponse(path=request.path, outputPath=str(outputPath), format=request.format)
-
-    @app.post("/api/document/insert-block")
-    def apiInsertBlock(request: InsertBlockRequest) -> dict[str, Any]:
-        path = Path(request.path).expanduser().resolve()
-        if not path.exists():
-            raise HTTPException(status_code=404, detail="Document not found.")
-        document = loadDocument(str(path))
-        newBlock = BlockConfig(
-            id=f"block-{uuid.uuid4().hex[:8]}",
-            type=request.type,
-            content=request.content,
-        )
-        if not request.anchorBlockId:
-            document.blocks.append(newBlock)
-        else:
-            anchorIndex = _findBlockIndex(document, request.anchorBlockId)
-            insertionIndex = anchorIndex if request.direction == "before" else anchorIndex + 1
-            document.blocks.insert(insertionIndex, newBlock)
-        saveDocument(str(path), document)
-        return {"blockId": newBlock.id, "document": document.model_dump()}
-
-    @app.post("/api/document/remove-block")
-    def apiRemoveBlock(request: RemoveBlockRequest) -> dict[str, Any]:
-        path = Path(request.path).expanduser().resolve()
-        if not path.exists():
-            raise HTTPException(status_code=404, detail="Document not found.")
-        document = loadDocument(str(path))
-        document.blocks = [b for b in document.blocks if b.id != request.blockId]
-        saveDocument(str(path), document)
-        return {"document": document.model_dump()}
-
-    @app.post("/api/document/move-block")
-    def apiMoveBlock(request: MoveBlockRequest) -> dict[str, Any]:
-        path = Path(request.path).expanduser().resolve()
-        if not path.exists():
-            raise HTTPException(status_code=404, detail="Document not found.")
-        document = loadDocument(str(path))
-        index = _findBlockIndex(document, request.blockId)
-        nextIndex = index + request.offset
-        if nextIndex < 0 or nextIndex >= len(document.blocks):
-            raise HTTPException(status_code=400, detail="Move out of range.")
-        block = document.blocks.pop(index)
-        document.blocks.insert(nextIndex, block)
-        saveDocument(str(path), document)
-        return {"document": document.model_dump()}
-
-    @app.post("/api/document/update-block")
-    def apiUpdateBlock(request: UpdateBlockRequest) -> dict[str, Any]:
-        path = Path(request.path).expanduser().resolve()
-        if not path.exists():
-            raise HTTPException(status_code=404, detail="Document not found.")
-        document = loadDocument(str(path))
-        index = _findBlockIndex(document, request.blockId)
-        block = document.blocks[index]
-        if request.content is not None:
-            block = block.model_copy(update={"content": request.content})
-        if request.type is not None:
-            block = block.model_copy(update={"type": request.type})
-        document.blocks[index] = block
-        saveDocument(str(path), document)
-        return {"block": block.model_dump(), "document": document.model_dump()}
-
-    @app.post("/api/document/run-block")
-    async def apiRunBlock(request: RunBlockRequest) -> dict[str, Any]:
-        session = sessionManager.getSession(request.sessionId)
-        if session is None:
-            raise HTTPException(status_code=404, detail="Session not found.")
-        path = Path(request.path).expanduser().resolve()
-        if not path.exists():
-            raise HTTPException(status_code=404, detail="Document not found.")
-        document = loadDocument(str(path))
-        index = _findBlockIndex(document, request.blockId)
-        block = document.blocks[index]
-        if block.type != "code":
-            raise HTTPException(status_code=400, detail="Block is not a code block.")
-        result = await session.execute(block.content, blockId=block.id)
-        return {"result": result.model_dump(), "blockId": block.id}
-
-    @app.post("/api/kernel/create", response_model=CreateSessionResponse)
-    def apiCreateSession(request: CreateSessionRequest | None = None) -> CreateSessionResponse:
-        wd = request.workingDirectory if request else None
-        session = sessionManager.createSession(workingDirectory=wd)
-        return CreateSessionResponse(sessionId=session.sessionId, status=session.status)
-
-    @app.get("/api/kernel/sessions")
-    def apiListSessions() -> list[dict[str, Any]]:
-        return [s.model_dump() for s in sessionManager.listSessions()]
-
-    @app.post("/api/kernel/{sessionId}/execute")
-    async def apiExecute(sessionId: str, request: ExecuteRequest) -> dict[str, Any]:
-        session = sessionManager.getSession(sessionId)
-        if session is None:
-            raise HTTPException(status_code=404, detail="Session not found.")
-        result = await session.execute(request.code, blockId=request.blockId)
-        return result.model_dump()
-
-    @app.post("/api/kernel/{sessionId}/interrupt")
-    def apiInterrupt(sessionId: str) -> dict[str, bool]:
-        session = sessionManager.getSession(sessionId)
-        if session is None:
-            raise HTTPException(status_code=404, detail="Session not found.")
-        success = session.interrupt()
-        return {"interrupted": success}
-
-    @app.get("/api/kernel/{sessionId}/variables")
-    def apiGetVariables(sessionId: str) -> list[dict[str, Any]]:
-        session = sessionManager.getSession(sessionId)
-        if session is None:
-            raise HTTPException(status_code=404, detail="Session not found.")
-        return [v.model_dump() for v in session.getVariables()]
-
-    @app.post("/api/kernel/{sessionId}/reset")
-    def apiResetSession(sessionId: str) -> dict[str, str]:
-        session = sessionManager.getSession(sessionId)
-        if session is None:
-            raise HTTPException(status_code=404, detail="Session not found.")
-        session.reset()
-        return {"status": "reset"}
-
-    @app.delete("/api/kernel/{sessionId}")
-    def apiDestroySession(sessionId: str) -> dict[str, bool]:
-        success = sessionManager.destroySession(sessionId)
-        if not success:
-            raise HTTPException(status_code=404, detail="Session not found.")
-        return {"destroyed": True}
-
-    @app.post("/api/kernel/{sessionId}/execute-reactive")
-    async def apiExecuteReactive(sessionId: str, request: ReactiveExecuteRequest) -> dict[str, Any]:
-        session = sessionManager.getSession(sessionId)
-        if session is None:
-            raise HTTPException(status_code=404, detail="Session not found.")
-        results, executionOrder = await executeReactive(session, request.blocks, request.blockId)
-        return {
-            "results": [r.model_dump() for r in results],
-            "executionOrder": executionOrder,
-        }
-
-    @app.post("/api/kernel/{sessionId}/remove-cell")
-    def apiRemoveCellDefinitions(sessionId: str, request: ExecuteRequest) -> dict[str, str]:
-        session = sessionManager.getSession(sessionId)
-        if session is None:
-            raise HTTPException(status_code=404, detail="Session not found.")
-        session.removeCellDefinitions(request.blockId or "")
-        return {"status": "removed"}
-
-    @app.websocket("/ws/kernel/{sessionId}")
-    async def kernelWebSocket(websocket: WebSocket, sessionId: str) -> None:
-        session = sessionManager.getSession(sessionId)
-        if session is None:
-            await websocket.close(code=4004, reason="Session not found.")
-            return
-
-        await websocket.accept()
-        await websocket.send_json(
-            WsStatusMessage(type="status", engineStatus="ready").model_dump()
-        )
-
-        try:
-            while True:
-                message = await websocket.receive_json()
-                messageType = message.get("type", "")
-
-                if messageType == "execute":
-                    requestId = message.get("requestId", "")
-                    code = message.get("code", "")
-                    blockId = message.get("blockId")
-
-                    await websocket.send_json(
-                        WsStatusMessage(type="status", engineStatus="busy").model_dump()
-                    )
-
-                    result = await session.execute(code, blockId=blockId)
-
-                    await websocket.send_json(
-                        WsResultMessage(
-                            type="result",
-                            requestId=requestId,
-                            blockId=blockId,
-                            status=result.status,
-                            data=result.data,
-                            stdout=result.stdout,
-                            stderr=result.stderr,
-                            variables=result.variables,
-                            executionCount=result.executionCount,
-                        ).model_dump()
-                    )
-
-                    await websocket.send_json(
-                        WsStatusMessage(type="status", engineStatus="ready").model_dump()
-                    )
-
-                elif messageType == "interrupt":
-                    session.interrupt()
-
-                elif messageType == "getVariables":
-                    variables = session.getVariables()
-                    await websocket.send_json(
-                        {"type": "variables", "variables": [v.model_dump() for v in variables]}
-                    )
-
-                elif messageType == "executeReactive":
-                    requestId = message.get("requestId", "")
-                    changedBlockId = message.get("blockId", "")
-                    blocks = message.get("blocks", [])
-
-                    await websocket.send_json(
-                        WsStatusMessage(type="status", engineStatus="busy").model_dump()
-                    )
-
-                    results, executionOrder = await executeReactive(session, blocks, changedBlockId)
-
-                    for result in results:
-                        await websocket.send_json(
-                            WsResultMessage(
-                                type="result",
-                                requestId=requestId,
-                                blockId=result.blockId,
-                                status=result.status,
-                                data=result.data,
-                                stdout=result.stdout,
-                                stderr=result.stderr,
-                                variables=result.variables,
-                                executionCount=result.executionCount,
-                            ).model_dump()
-                        )
-
-                    await websocket.send_json({
-                        "type": "reactiveComplete",
-                        "requestId": requestId,
-                        "executionOrder": executionOrder,
-                    })
-
-                    await websocket.send_json(
-                        WsStatusMessage(type="status", engineStatus="ready").model_dump()
-                    )
-
-                elif messageType == "reset":
-                    session.reset()
-                    await websocket.send_json(
-                        WsStatusMessage(type="status", engineStatus="ready").model_dump()
-                    )
-
-        except WebSocketDisconnect:
-            pass
-        except Exception as error:
-            try:
-                await websocket.send_json(
-                    WsErrorMessage(type="error", message=str(error)).model_dump()
-                )
-            except Exception:
-                pass
-
-    @app.post("/api/fs/list", response_model=DirectoryListing)
-    async def apiListDirectory(request: PathRequest) -> DirectoryListing:
-        return await fileOps.listDirectory(request.path)
-
-    @app.post("/api/fs/read")
-    async def apiReadFile(request: PathRequest) -> dict[str, Any]:
-        try:
-            content = await fileOps.readFile(request.path)
-            return content.model_dump()
-        except FileNotFoundError:
-            raise HTTPException(status_code=404, detail="File not found.")
-        except UnicodeDecodeError:
-            raise HTTPException(status_code=400, detail="File is not a text file or has unsupported encoding.")
-
-    @app.post("/api/fs/write")
-    async def apiWriteFile(request: WriteFileRequest) -> dict[str, str]:
-        resultPath = await fileOps.writeFile(
-            request.path,
-            request.content,
-            encoding=request.encoding,
-            createDirectories=request.createDirectories,
-        )
-        return {"path": resultPath}
-
-    @app.post("/api/fs/delete")
-    async def apiDeleteFile(request: PathRequest) -> dict[str, str]:
-        try:
-            result = await fileOps.deleteEntry(request.path)
-            return {"deleted": result}
-        except FileNotFoundError:
-            raise HTTPException(status_code=404, detail="File not found.")
-
-    @app.post("/api/fs/move")
-    async def apiMoveFile(request: MoveRequest) -> dict[str, str]:
-        try:
-            result = await fileOps.moveEntry(request.source, request.destination)
-            return {"path": result}
-        except FileNotFoundError:
-            raise HTTPException(status_code=404, detail="Source not found.")
-
-    @app.post("/api/fs/mkdir")
-    async def apiMkdir(request: PathRequest) -> dict[str, str]:
-        result = await fileOps.createDirectory(request.path)
-        return {"path": result}
-
-    @app.post("/api/fs/exists")
-    async def apiFileExists(request: PathRequest) -> dict[str, bool]:
-        exists = await fileOps.fileExists(request.path)
-        return {"exists": exists}
-
-    @app.get("/api/packages/list")
-    async def apiListPackages() -> list[dict[str, str]]:
-        packages = await packageOps.listPackages()
-        return [p.model_dump() for p in packages]
-
-    @app.post("/api/packages/install")
-    async def apiInstallPackage(request: PackageRequest) -> dict[str, Any]:
-        result = await packageOps.installPackage(request.name)
-        return result.model_dump()
-
-    @app.post("/api/packages/uninstall")
-    async def apiUninstallPackage(request: PackageRequest) -> dict[str, Any]:
-        result = await packageOps.uninstallPackage(request.name)
-        return result.model_dump()
-
-    @app.get("/api/curriculum/categories")
-    def apiCurriculumCategories() -> dict[str, Any]:
-        if curriculumLoader is None:
-            return {"categories": [], "groups": {}, "learningPaths": {}}
-        categories = curriculumLoader.listCategories()
-        return {
-            "categories": [c.model_dump() for c in categories],
-            "groups": CATEGORY_GROUPS,
-            "learningPaths": LEARNING_PATHS,
-        }
-
-    @app.get("/api/curriculum/contents/{category}")
-    def apiCurriculumContents(category: str) -> dict[str, Any]:
-        if curriculumLoader is None:
-            raise HTTPException(status_code=404, detail="Curriculum content not available.")
-        contents = curriculumLoader.listContents(category)
-        return {
-            "category": category,
-            "categoryName": CATEGORY_MAPPING.get(category, category),
-            "contents": [{"contentId": c.contentId, "title": c.title} for c in contents],
-        }
-
-    @app.get("/api/curriculum/content/{category}/{contentId}")
-    def apiCurriculumContent(category: str, contentId: str) -> dict[str, Any]:
-        if curriculumLoader is None:
-            raise HTTPException(status_code=404, detail="Curriculum content not available.")
-        try:
-            yamlContent = curriculumLoader.loadContent(category, contentId)
-        except FileNotFoundError:
-            raise HTTPException(status_code=404, detail="Content not found.")
-        document, solutions = yamlToDocument(yamlContent, category, contentId)
-        prevNext = curriculumLoader.getPrevNext(category, contentId)
-        progressTracker.markAccessed(category, contentId)
-        return {
-            "document": document.model_dump(),
-            "solutions": solutions,
-            "category": category,
-            "contentId": contentId,
-            "prevNext": prevNext,
-        }
-
-    @app.get("/api/curriculum/progress")
-    def apiCurriculumProgress() -> dict[str, Any]:
-        return progressTracker.getSummary()
-
-    @app.post("/api/curriculum/progress")
-    def apiUpdateProgress(request: CurriculumProgressRequest) -> dict[str, Any]:
-        if request.missionId:
-            lesson = progressTracker.completeMission(
-                request.category, request.contentId, request.missionId, request.totalMissions,
+    @app.middleware("http")
+    async def disableFrontendCache(request: Request, callNext) -> Response:
+        startedAt = time.perf_counter()
+        response = await callNext(request)
+        if request.url.path == "/" or request.url.path.startswith("/_app"):
+            response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
+            response.headers["Pragma"] = "no-cache"
+            response.headers["Expires"] = "0"
+        if shouldLogRequest(request, response.status_code):
+            durationMs = round((time.perf_counter() - startedAt) * 1000, 1)
+            logMethod = logger.info
+            if response.status_code >= 500:
+                logMethod = logger.error
+            elif response.status_code >= 400:
+                logMethod = logger.warning
+            logMethod(
+                "request %s",
+                formatLogFields(
+                    method=request.method,
+                    path=buildRequestTarget(request),
+                    status=response.status_code,
+                    durationMs=durationMs,
+                    client=request.client.host if request.client else None,
+                ),
             )
-            return lesson.model_dump()
-        progressTracker.markAccessed(request.category, request.contentId)
-        return {"status": "accessed"}
+        return response
 
-    @app.post("/api/curriculum/check")
-    async def apiCheckExercise(request: CheckExerciseRequest) -> dict[str, Any]:
-        session = sessionManager.getSession(request.sessionId)
-        if session is None:
-            raise HTTPException(status_code=404, detail="Session not found.")
-
-        if request.checkType == "output" and request.expectedCode:
-            result = await checkByOutput(
-                session, request.studentCode, request.expectedCode,
-                hints=request.hints, currentHintLevel=request.currentHintLevel,
-            )
-        elif request.checkType == "variable" and request.variableName:
-            result = await checkByVariable(
-                session, request.studentCode, request.variableName,
-                request.expectedValue, hints=request.hints,
-                currentHintLevel=request.currentHintLevel,
-            )
-        elif request.checkType == "contains" and request.requiredPatterns:
-            result = await checkContains(request.studentCode, request.requiredPatterns)
-        elif request.checkType == "noError":
-            result = await checkNoError(session, request.studentCode)
-        else:
-            raise HTTPException(status_code=400, detail="Invalid check type or missing parameters.")
-
-        return {
-            "passed": result.passed,
-            "feedback": result.feedback,
-            "hintLevel": result.hintLevel,
-            "hints": result.hints,
-            "studentOutput": result.studentOutput,
-            "expectedOutput": result.expectedOutput,
-            "detail": result.detail,
-        }
-
-    @app.get("/api/curriculum/learning-spec")
-    def apiLearningSpec() -> dict[str, Any]:
-        return {
-            "philosophy": PHILOSOPHY,
-            "exerciseTypes": EXERCISE_TYPES,
-            "hintStrategy": HINT_STRATEGY,
-            "lessonStructure": LESSON_STRUCTURE,
-            "aiTeacherInstructions": AI_TEACHER_INSTRUCTIONS,
-        }
-
-    if WEB_BUILD_ROOT.exists():
-        _indexHtml = (WEB_BUILD_ROOT / "index.html").read_text(encoding="utf-8")
-
-        assetsPath = WEB_BUILD_ROOT / "_app"
-        if assetsPath.exists():
-            app.mount("/_app", StaticFiles(directory=assetsPath), name="app-assets")
-
-        @app.get("/{fullPath:path}", response_model=None)
-        def spa(fullPath: str, request: Request) -> FileResponse | HTMLResponse:
-            filePath = WEB_BUILD_ROOT / fullPath
-            if fullPath and filePath.exists() and filePath.is_file():
-                return FileResponse(filePath)
-            rootPath = request.scope.get("root_path", "")
-            injected = _indexHtml.replace(
-                "</head>",
-                f'<meta name="codaro-base" content="{rootPath}">\n  </head>',
-            )
-            return HTMLResponse(injected)
-    else:
-
-        @app.get("/{fullPath:path}")
-        def missingBuild(fullPath: str) -> dict[str, str]:
-            return {
-                "detail": "Codaro frontend build not found. Run `npm install` and `npm run build` in frontend/."
-            }
-
+    app.include_router(createBootstrapRouter(state))
+    app.include_router(createDocumentRouter(state))
+    app.include_router(createKernelRouter(state))
+    app.include_router(createSystemRouter(state))
+    app.include_router(createWorkspaceRouter(state))
+    app.include_router(createCurriculumRouter(state))
+    app.include_router(createSpaRouter(state))
     return app
-
-
-def _findBlockIndex(document: CodaroDocument, blockId: str) -> int:
-    for index, block in enumerate(document.blocks):
-        if block.id == blockId:
-            return index
-    raise HTTPException(status_code=404, detail=f"Block {blockId} not found.")
 
 
 def runServer(
@@ -657,17 +201,76 @@ def runServer(
     port: int = 8765,
     mode: str = "edit",
     documentPath: Path | None = None,
+    verbose: bool = False,
 ) -> None:
-    _ensureFrontendBuild()
-    app = createServerApp(mode=mode, documentPath=documentPath)
+    logger = setVerboseLogging(verbose)
+    frontendStatus = requireFrontendBuildReady(logger=logger)
+    workspaceRoot = Path.cwd().resolve()
+    app = createServerApp(mode=mode, documentPath=documentPath, workspaceRoot=workspaceRoot)
+    routePath = "/app" if mode == "app" else "/"
+    baseUrl = f"http://{host}:{port}{routePath}"
+    logger.info(
+        "frontend %s",
+        formatLogFields(
+            status=frontendStatus.status,
+            indexPath=_displayPath(frontendStatus.indexPath),
+        ),
+    )
+    logger.info(
+        "startup %s",
+        formatLogFields(
+            action="launch",
+            mode=mode,
+            url=baseUrl,
+            browser="enabled",
+            verbose=verbose,
+        ),
+    )
+    logger.info("workspace %s", formatLogFields(root=workspaceRoot, contentRoot=CONTENT_ROOT if CONTENT_ROOT.exists() else None))
+    if documentPath is not None:
+        logger.info("document %s", formatLogFields(path=documentPath))
+    logger.info(
+        "ready %s",
+        formatLogFields(
+            status="serving",
+            url=baseUrl,
+            frontend=frontendStatus.status,
+            document=documentPath.name if documentPath else None,
+        ),
+    )
+    if isVerboseLoggingEnabled():
+        logger.debug(
+            "startup %s",
+            formatLogFields(
+                host=host,
+                port=port,
+                route=routePath,
+                frontendRoot=FRONTEND_ROOT,
+                webBuildRoot=WEB_BUILD_ROOT,
+                workspaceRoot=workspaceRoot,
+                frontendIndexPath=_displayPath(frontendStatus.indexPath),
+            ),
+        )
     uvicorn.run(app, host=host, port=port, log_level="warning")
 
 
-def _ensureFrontendBuild() -> None:
-    if WEB_BUILD_ROOT.exists():
-        return
-    packageJson = FRONTEND_ROOT / "package.json"
-    if not packageJson.exists():
-        return
-    subprocess.run(["npm", "install"], cwd=FRONTEND_ROOT, check=True)
-    subprocess.run(["npm", "run", "build"], cwd=FRONTEND_ROOT, check=True)
+def shouldLogRequest(request: Request, statusCode: int) -> bool:
+    path = request.url.path
+    if path == "/api/health":
+        return False
+    if statusCode >= 400:
+        return True
+    if isVerboseLoggingEnabled():
+        if path == "/" or path == "/app":
+            return True
+        if path.startswith("/api/"):
+            return True
+    return False
+
+
+def buildRequestTarget(request: Request) -> str:
+    path = request.url.path
+    query = request.url.query
+    if not query:
+        return path
+    return f"{path}?{query}"

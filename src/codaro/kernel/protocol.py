@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Any, Literal
+
 from pydantic import BaseModel, Field
 
 
@@ -13,7 +15,7 @@ class VariableInfo(BaseModel):
 class ExecutionOutput(BaseModel):
     type: str
     blockId: str | None = None
-    data: str = ""
+    data: Any = ""
     stdout: str = ""
     stderr: str = ""
     variables: list[VariableInfo] = Field(default_factory=list)
@@ -24,6 +26,12 @@ class ExecutionOutput(BaseModel):
 class ExecuteRequest(BaseModel):
     code: str
     blockId: str | None = None
+
+
+class ReactiveBlockPayload(BaseModel):
+    id: str
+    type: Literal["code", "markdown"]
+    content: str
 
 
 class SessionInfo(BaseModel):
@@ -47,10 +55,29 @@ class ResetRequest(BaseModel):
 
 
 class WsExecuteMessage(BaseModel):
-    type: str = "execute"
+    type: Literal["execute"] = "execute"
     requestId: str
     code: str
     blockId: str | None = None
+
+
+class WsInterruptMessage(BaseModel):
+    type: Literal["interrupt"] = "interrupt"
+
+
+class WsGetVariablesMessage(BaseModel):
+    type: Literal["getVariables"] = "getVariables"
+
+
+class WsExecuteReactiveMessage(BaseModel):
+    type: Literal["executeReactive"] = "executeReactive"
+    requestId: str
+    blockId: str
+    blocks: list[ReactiveBlockPayload]
+
+
+class WsResetMessage(BaseModel):
+    type: Literal["reset"] = "reset"
 
 
 class WsResultMessage(BaseModel):
@@ -58,7 +85,7 @@ class WsResultMessage(BaseModel):
     requestId: str
     blockId: str | None = None
     status: str = "done"
-    data: str = ""
+    data: Any = ""
     stdout: str = ""
     stderr: str = ""
     variables: list[VariableInfo] = Field(default_factory=list)

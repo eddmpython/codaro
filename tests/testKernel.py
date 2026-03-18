@@ -1,7 +1,9 @@
 from __future__ import annotations
 
 import asyncio
+from pathlib import Path
 
+from codaro.kernel.manager import SessionManager
 from codaro.kernel.session import KernelSession
 
 
@@ -153,3 +155,157 @@ def testAugAssignTrackedAsUse() -> None:
     assert result.status == "done"
     assert "10" in result.data
     session.dispose()
+
+
+def testSerializeDataFramePayload() -> None:
+    session = KernelSession()
+    code = """
+class FakeDataFrame:
+    __module__ = "pandas.core.frame"
+
+    def __init__(self):
+        self.columns = ["name", "age"]
+        self.index = [0, 1]
+
+    def __len__(self):
+        return 2
+
+    def to_dict(self, orient="records"):
+        assert orient == "records"
+        return [
+            {"name": "Ada", "age": 30},
+            {"name": "Grace", "age": 28},
+        ]
+
+FakeDataFrame()
+"""
+    result = _run(session.execute(code, blockId="table"))
+
+    assert result.status == "done"
+    assert result.type == "dataframe"
+    assert result.data["columns"] == ["name", "age"]
+    assert result.data["totalRows"] == 2
+    assert result.data["rows"][0]["name"] == "Ada"
+    session.dispose()
+
+
+def testSerializeImagePayload() -> None:
+    session = KernelSession()
+    code = """
+class FakeImage:
+    def _repr_png_(self):
+        return b"png-binary"
+
+FakeImage()
+"""
+    result = _run(session.execute(code, blockId="image"))
+
+    assert result.status == "done"
+    assert result.type == "image"
+    assert result.data.startswith("data:image/png;base64,")
+    session.dispose()
+
+
+def testSerializeLayoutDescriptorPayload() -> None:
+    session = KernelSession()
+    code = """
+import codaro
+
+codaro.hstack(
+    [
+        codaro.md("# Revenue"),
+        codaro.callout(
+            codaro.stat("MRR", 4200, caption="USD", kind="success"),
+            kind="info",
+            title="Summary",
+        ),
+        codaro.ui.slider(0, 10, value=4, label="Level"),
+    ],
+    widths=[2, 2, 1],
+)
+"""
+    result = _run(session.execute(code, blockId="layout"))
+
+    assert result.status == "done"
+    assert result.type == "layout"
+    assert result.data["type"] == "hstack"
+    assert result.data["widths"] == [2.0, 2.0, 1.0]
+    assert result.data["items"][0]["type"] == "markdown"
+    assert result.data["items"][1]["type"] == "callout"
+    assert result.data["items"][1]["content"]["type"] == "stat"
+    assert result.data["items"][2]["type"] == "ui"
+    assert result.data["items"][2]["component"] == "slider"
+    session.dispose()
+
+
+def testSerializeTabsAndAccordionDescriptors() -> None:
+    session = KernelSession()
+    code = """
+import codaro
+
+codaro.tabs(
+    {
+        "Overview": codaro.stat("Users", 128, caption="active"),
+        "Filters": codaro.accordion(
+            {
+                "Region": codaro.ui.dropdown(["KR", "US"], value="KR", label="Region"),
+                "Toggle": codaro.ui.checkbox(True, label="Enabled"),
+            }
+        ),
+    },
+    value="Filters",
+)
+"""
+    result = _run(session.execute(code, blockId="tabs"))
+
+    assert result.status == "done"
+    assert result.type == "layout"
+    assert result.data["type"] == "tabs"
+    assert result.data["value"] == "Filters"
+    assert result.data["items"][1]["content"]["type"] == "accordion"
+    assert result.data["items"][1]["content"]["items"][0]["content"]["type"] == "ui"
+    assert result.data["items"][1]["content"]["items"][0]["content"]["component"] == "dropdown"
+    session.dispose()
+
+
+def testInterruptReturnsFalseWhenIdle() -> None:
+    session = KernelSession()
+
+    assert session.interrupt() is False
+
+    session.dispose()
+
+
+def testWorkingDirectoryIsolatedPerSession(tmp_path: Path) -> None:
+    firstDir = tmp_path / "first"
+    secondDir = tmp_path / "second"
+    firstDir.mkdir()
+    secondDir.mkdir()
+
+    firstSession = KernelSession(workingDirectory=str(firstDir))
+    secondSession = KernelSession(workingDirectory=str(secondDir))
+
+    firstResult = _run(firstSession.execute("import os\nos.getcwd()", blockId="one"))
+    secondResult = _run(secondSession.execute("import os\nos.getcwd()", blockId="two"))
+
+    assert Path(firstResult.data.strip("'")).resolve() == firstDir.resolve()
+    assert Path(secondResult.data.strip("'")).resolve() == secondDir.resolve()
+
+    firstSession.dispose()
+    secondSession.dispose()
+
+
+def testSessionManagerLifecycle() -> None:
+    manager = SessionManager()
+
+    first = manager.createSession()
+    second = manager.createSession()
+
+    assert manager.sessionCount == 2
+    assert manager.getSession(first.sessionId) is first
+    assert manager.destroySession(first.sessionId) is True
+    assert manager.getSession(first.sessionId) is None
+    assert manager.destroySession("missing") is False
+
+    manager.destroyAll()
+    assert manager.sessionCount == 0

@@ -78,11 +78,12 @@
 - 중복 정의 감지
 - 순환 참조 감지의 입력 데이터
 
-이 레이어는 아직 단순하다.
-- import
-- 함수/클래스 정의
-- 변수 대입
-- builtin 제외한 사용 이름
+현재 기준:
+- module scope define/use 계산
+- 함수 파라미터와 함수 내부 로컬 변수는 외부 의존성으로 세지 않음
+- comprehension 변수는 바깥 scope로 새지 않음
+- nested function/class/lambda 안에서 실제로 바깥 scope를 참조하는 이름만 use로 올림
+- builtin 이름은 use에서 제외
 
 ## 한계
 
@@ -97,3 +98,21 @@
 - 문서 레벨 schema version 추가
 - widget/view descriptor를 문서 모델에 포함
 - 분석 레이어를 dependency graph 중심으로 고도화
+
+## Current State
+
+- `analysis.py`는 이제 scope-aware defines/uses 분석을 수행한다
+- marimo export와 reactive graph가 함수 파라미터나 comprehension loop 변수를 잘못 dependency로 잡던 문제를 줄였다
+- nested free variable은 use로 유지해서 이후 reactive rerun과 engine dependency 계산에 활용할 수 있다
+
+## Next Action
+
+- attribute mutation, side effect, import graph까지 포함하는 richer dependency model을 설계한다
+- `runtime/LocalEngine`과 kernel capability 표면을 연결해서 문서 분석 결과를 실제 실행 엔진으로 넘긴다
+- block dependency graph에 stale reason과 rerun cause를 붙일 준비를 한다
+
+## Verification Left
+
+- class body, pattern matching, assignment expression 같은 Python edge case를 더 늘려야 한다
+- reactive rerun이 실제 문서 시나리오에서 과소/과대 실행되지 않는지 통합 테스트를 추가해야 한다
+- marimo export에서 복합 dependency가 파라미터로 안정적으로 직렬화되는지 케이스를 더 보강해야 한다

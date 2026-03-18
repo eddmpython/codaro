@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 
@@ -31,7 +32,6 @@ class ContentData(BaseModel):
 
 
 CATEGORY_MAPPING = {
-    "marimo": "파이썬과마리모",
     "30days": "30일완성",
     "advancedPython": "고급파이썬",
     "excel": "엑셀자동화",
@@ -48,12 +48,10 @@ CATEGORY_MAPPING = {
     "regex": "regex 비정형데이터",
     "pillow": "Pillow 이미지처리",
     "opencv": "OpenCV 컴퓨터비전",
-    "marimoUi": "marimo 앱",
     "practical": "실전파이썬",
 }
 
 CATEGORY_META = {
-    "marimo": {"description": "인터랙티브 Python 노트북으로 시작하는 프로그래밍"},
     "30days": {"description": "30일 만에 완성하는 체계적인 Python 기초"},
     "advancedPython": {"description": "고급 문법과 패턴으로 레벨업"},
     "excel": {"description": "엑셀 반복 작업을 자동화하세요"},
@@ -67,18 +65,18 @@ CATEGORY_META = {
 }
 
 CATEGORY_GROUPS = {
-    "기초": ["marimo", "30days", "advancedPython"],
+    "기초": ["30days", "advancedPython"],
     "데이터분석": ["pandas", "numpy", "polars", "duckdb", "excel"],
     "시각화": ["matplotlib", "seaborn", "plotly", "altair"],
     "수학/통계/ML": ["statsmodels", "sklearn"],
     "이미지": ["pillow", "opencv"],
-    "기타": ["regex", "marimoUi", "practical"],
+    "기타": ["regex", "practical"],
 }
 
 LEARNING_PATHS = {
-    "초급": {"categories": ["marimo", "30days"], "description": "프로그래밍이 처음이라면"},
+    "초급": {"categories": ["30days"], "description": "프로그래밍이 처음이라면"},
     "중급": {"categories": ["advancedPython", "pandas", "numpy"], "description": "기초를 마쳤다면"},
-    "고급": {"categories": ["sklearn", "practical", "marimoUi"], "description": "실무에 적용하고 싶다면"},
+    "고급": {"categories": ["sklearn", "practical"], "description": "실무에 적용하고 싶다면"},
 }
 
 
@@ -86,6 +84,11 @@ class ContentLoader:
     def __init__(self, contentDir: str | Path):
         self._contentDir = Path(contentDir).resolve()
         self._cache: dict[str, dict] = {}
+        self._contentIdCache: dict[str, list[str]] = {}
+        self._metaCache: dict[str, dict] = {}
+        self._categoryIndexCache: dict[str, list[dict] | None] = {}
+        self._summaryCache: dict[str, list[ContentSummary]] = {}
+        self._prevNextCache: dict[str, dict] = {}
 
     @property
     def contentDir(self) -> Path:
@@ -108,19 +111,35 @@ class ContentLoader:
         return result
 
     def listContents(self, category: str) -> list[ContentSummary]:
-        contentIds = self._listContentIds(category)
+        if category in self._summaryCache:
+            return list(self._summaryCache[category])
         summaries: list[ContentSummary] = []
-        for contentId in contentIds:
-            meta = self._loadMetaOnly(category, contentId)
-            title = meta.get("title", contentId)
-            sortKey = _extractSortKey(contentId)
-            summaries.append(ContentSummary(
-                contentId=contentId,
-                title=_buildMenuTitle(contentId, title),
-                category=category,
-                sortKey=sortKey,
-            ))
-        return sorted(summaries, key=lambda s: s.sortKey)
+        categoryIndex = self._loadCategoryIndex(category)
+        if categoryIndex:
+            for item in categoryIndex:
+                contentId = item["contentId"]
+                title = item["title"]
+                sortKey = _extractSortKey(contentId)
+                summaries.append(ContentSummary(
+                    contentId=contentId,
+                    title=_buildMenuTitle(contentId, title),
+                    category=category,
+                    sortKey=sortKey,
+                ))
+        else:
+            contentIds = self._listContentIds(category)
+            for contentId in contentIds:
+                meta = self._loadMetaOnly(category, contentId)
+                title = meta.get("title", contentId)
+                sortKey = _extractSortKey(contentId)
+                summaries.append(ContentSummary(
+                    contentId=contentId,
+                    title=_buildMenuTitle(contentId, title),
+                    category=category,
+                    sortKey=sortKey,
+                ))
+        self._summaryCache[category] = sorted(summaries, key=lambda s: s.sortKey)
+        return list(self._summaryCache[category])
 
     def loadContent(self, category: str, contentId: str) -> dict:
         cacheKey = f"{category}/{contentId}"
@@ -135,6 +154,9 @@ class ContentLoader:
         return content
 
     def getPrevNext(self, category: str, contentId: str) -> dict:
+        cacheKey = f"{category}/{contentId}"
+        if cacheKey in self._prevNextCache:
+            return dict(self._prevNextCache[cacheKey])
         contents = self.listContents(category)
         ids = [c.contentId for c in contents]
         if contentId not in ids:
@@ -142,9 +164,17 @@ class ContentLoader:
         idx = ids.index(contentId)
         prev = {"contentId": ids[idx - 1], "title": contents[idx - 1].title} if idx > 0 else None
         nxt = {"contentId": ids[idx + 1], "title": contents[idx + 1].title} if idx < len(ids) - 1 else None
-        return {"prev": prev, "next": nxt}
+        self._prevNextCache[cacheKey] = {"prev": prev, "next": nxt}
+        return dict(self._prevNextCache[cacheKey])
 
     def _listContentIds(self, category: str) -> list[str]:
+        if category in self._contentIdCache:
+            return list(self._contentIdCache[category])
+        categoryIndex = self._loadCategoryIndex(category)
+        if categoryIndex:
+            ids = [item["contentId"] for item in categoryIndex]
+            self._contentIdCache[category] = ids
+            return list(ids)
         categoryDir = self._contentDir / category
         if not categoryDir.exists():
             return []
@@ -156,7 +186,8 @@ class ContentLoader:
             for subDir in categoryDir.iterdir():
                 if subDir.is_dir() and (subDir / "study.yaml").exists():
                     ids.append(subDir.name)
-        return ids
+        self._contentIdCache[category] = ids
+        return list(ids)
 
     def _getContentPath(self, category: str, contentId: str) -> Path:
         if category == "practical":
@@ -166,11 +197,37 @@ class ContentLoader:
         return self._contentDir / category / f"{contentId}.yaml"
 
     def _loadMetaOnly(self, category: str, contentId: str) -> dict:
+        cacheKey = f"{category}/{contentId}"
+        if cacheKey in self._metaCache:
+            return dict(self._metaCache[cacheKey])
+        categoryIndex = self._loadCategoryIndex(category)
+        if categoryIndex:
+            for item in categoryIndex:
+                if item["contentId"] == contentId:
+                    meta = {"title": item["title"]}
+                    self._metaCache[cacheKey] = meta
+                    return dict(meta)
         try:
-            content = self.loadContent(category, contentId)
-            return content.get("meta", {})
+            filePath = self._getContentPath(category, contentId)
+            meta = _readMetaHeader(filePath)
+            self._metaCache[cacheKey] = meta
+            return dict(meta)
         except FileNotFoundError:
             return {}
+
+    def _loadCategoryIndex(self, category: str) -> list[dict] | None:
+        if category in self._categoryIndexCache:
+            cached = self._categoryIndexCache[category]
+            return list(cached) if cached else None
+        indexPath = self._contentDir / category / "curriculum.json"
+        if not indexPath.exists():
+            self._categoryIndexCache[category] = None
+            return None
+        with open(indexPath, "r", encoding="utf-8") as file:
+            payload = json.load(file)
+        entries = _extractIndexEntries(payload)
+        self._categoryIndexCache[category] = entries
+        return list(entries)
 
 
 def _extractSortKey(name: str) -> tuple:
@@ -205,3 +262,46 @@ def _buildMenuTitle(contentId: str, metaTitle: str) -> str:
         return f"{num}. {metaTitle}"
 
     return metaTitle
+
+
+def _extractIndexEntries(payload: dict) -> list[dict]:
+    for key in ("days", "modules", "lessons", "items"):
+        items = payload.get(key)
+        if not isinstance(items, list):
+            continue
+        entries: list[dict] = []
+        for item in items:
+            if not isinstance(item, dict):
+                continue
+            fileName = item.get("file")
+            if not isinstance(fileName, str) or not fileName.endswith(".yaml"):
+                continue
+            contentId = Path(fileName).stem
+            title = item.get("title", contentId)
+            entries.append({"contentId": contentId, "title": title})
+        if entries:
+            return entries
+    return []
+
+
+def _readMetaHeader(filePath: Path) -> dict:
+    with open(filePath, "r", encoding="utf-8") as file:
+        lines = file.readlines()
+    metaLines: list[str] = []
+    isMetaSection = False
+    for line in lines:
+        if not isMetaSection:
+            if line.startswith("meta:"):
+                isMetaSection = True
+                metaLines.append(line)
+            continue
+        if line.strip() and not line.startswith((" ", "\t")):
+            break
+        metaLines.append(line)
+    if not metaLines:
+        return {}
+    metaPayload = yaml.safe_load("".join(metaLines)) or {}
+    if not isinstance(metaPayload, dict):
+        return {}
+    meta = metaPayload.get("meta", {})
+    return meta if isinstance(meta, dict) else {}

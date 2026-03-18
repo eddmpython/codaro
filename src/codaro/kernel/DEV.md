@@ -16,7 +16,7 @@
 
 - `session.py`
   - `KernelSession`
-  - 실제 코드 실행
+  - runtime 결과를 kernel protocol로 변환하는 어댑터
   - interrupt
   - variable collection
 - `manager.py`
@@ -27,13 +27,13 @@
 
 ## 실행 모델
 
-세션 하나는 하나의 namespace를 유지한다.
+세션 하나는 하나의 engine state를 유지한다.
 즉 블록을 순서대로 실행하면 앞 블록의 변수와 함수가 뒤 블록에서 유지된다.
 
 현재 구현 방식:
-- `ThreadPoolExecutor(max_workers=1)`
-- 세션별 단일 실행 스레드
-- `ast.parse()`로 마지막 표현식을 분리
+- `KernelSession`이 `LocalEngine`을 소유한다
+- `LocalEngine`이 `ThreadPoolExecutor(max_workers=1)`로 실행한다
+- `ast.parse()`로 마지막 표현식을 분리한다
 - 본문은 `exec`
 - 마지막 식은 `eval`
 
@@ -73,11 +73,11 @@ FastAPI lifespan 종료 시 `SessionManager.destroyAll()`이 호출된다.
 - sandbox가 아니다
 - 장시간 작업 취소가 완전하지 않다
 - stdout/stderr 스트리밍이 아니라 최종 결과만 보낸다
-- 패키지 설치와 세션 실행 환경 경계가 느슨하다
+- process supervisor가 아니라 in-process engine이다
 
 ## 다음 작업
 
-- capability 기반 실행 엔진 표면 정의
+- capability 기반 실행 엔진 표면을 더 router까지 끌어올리기
 - 스트리밍 출력
 - richer mime output
 - 세션별 working directory 및 files capability 정리

@@ -1,7 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import subprocess
 from pathlib import Path
+
+import pytest
 
 from codaro.system import fileOps, packageOps
 
@@ -81,8 +84,96 @@ def testFileExists(tmp_path: Path) -> None:
     assert _run(fileOps.fileExists(str(tmp_path / "nope.txt"))) is False
 
 
+def testWorkspaceBoundaryRejectsOutsidePath(tmp_path: Path) -> None:
+    outside = tmp_path.parent / "outside.txt"
+
+    with pytest.raises(fileOps.WorkspacePathError):
+        _run(fileOps.writeFile(str(outside), "blocked", workspaceRoot=tmp_path))
+
+
+def testWorkspaceBoundaryAllowsRelativePathInsideWorkspace(tmp_path: Path) -> None:
+    resultPath = _run(fileOps.writeFile("nested/inside.txt", "ok", workspaceRoot=tmp_path))
+
+    assert Path(resultPath).resolve() == (tmp_path / "nested" / "inside.txt").resolve()
+
+
 def testListPackages() -> None:
     packages = _run(packageOps.listPackages())
 
     names = [p.name.lower() for p in packages]
     assert "fastapi" in names or "pydantic" in names
+
+
+def testListPackagesUsesProjectPython(monkeypatch, tmp_path: Path) -> None:
+    pythonPath = tmp_path / "python.exe"
+    pythonPath.write_text("", encoding="utf-8")
+
+    def fakeRun(command, **kwargs):
+        del kwargs
+        assert command[:3] == [str(pythonPath), "-X", "utf8"]
+        return subprocess.CompletedProcess(
+            command,
+            0,
+            stdout='[{"name": "CodaroPkg", "version": "1.2.3"}]',
+            stderr="",
+        )
+
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
+    monkeypatch.setattr(packageOps.subprocess, "run", fakeRun)
+
+    packages = _run(packageOps.listPackages())
+
+    assert packages == [packageOps.PackageInfo(name="CodaroPkg", version="1.2.3")]
+
+
+def testInstallPackageReportsMissingEnvironment(monkeypatch) -> None:
+    def fakeProjectPython():
+        raise packageOps.PackageEnvironmentError(
+            "package_environment_missing",
+            "Project virtual environment was not found.",
+        )
+
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", fakeProjectPython)
+
+    result = _run(packageOps.installPackage("rich"))
+
+    assert result.success is False
+    assert "virtual environment" in result.message
+
+
+def testInstallPackageReportsTimeout(monkeypatch, tmp_path: Path) -> None:
+    pythonPath = tmp_path / "python.exe"
+    pythonPath.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
+
+    def fakeRunUvPip(*args, **kwargs):
+        del args, kwargs
+        raise subprocess.TimeoutExpired("uv pip install", 180)
+
+    monkeypatch.setattr(packageOps, "runUvPip", fakeRunUvPip)
+
+    result = _run(packageOps.installPackage("rich"))
+
+    assert result.success is False
+    assert "timed out" in result.message
+
+
+def testUninstallPackageUsesProjectPython(monkeypatch, tmp_path: Path) -> None:
+    pythonPath = tmp_path / "python.exe"
+    pythonPath.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
+
+    def fakeRunUvPip(command, arguments, *, pythonPath, timeoutSeconds):
+        assert command == "uninstall"
+        assert arguments == ["rich", "-y"]
+        assert timeoutSeconds == 60
+        return subprocess.CompletedProcess(["uv"], 0, stdout="Removed rich", stderr="")
+
+    monkeypatch.setattr(packageOps, "runUvPip", fakeRunUvPip)
+
+    result = _run(packageOps.uninstallPackage("rich"))
+
+    assert result.success is True
+    assert "Removed rich" in result.message

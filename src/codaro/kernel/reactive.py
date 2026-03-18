@@ -60,6 +60,11 @@ def getReactiveOrder(graph: ReactiveGraph, changedBlockId: str) -> list[str]:
     return [bid for bid in graph.blockOrder if bid in affected]
 
 
+def previewReactiveOrder(blocks: list[dict[str, Any]], changedBlockId: str) -> list[str]:
+    graph = buildReactiveGraph(blocks)
+    return getReactiveOrder(graph, changedBlockId)
+
+
 async def executeReactive(
     session: KernelSession,
     blocks: list[dict[str, Any]],

@@ -1,15 +1,22 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from .protocol import SessionInfo
 from .session import KernelSession
 
 
 class SessionManager:
-    def __init__(self) -> None:
+    def __init__(self, workspaceRoot: str | Path | None = None) -> None:
         self._sessions: dict[str, KernelSession] = {}
+        self._workspaceRoot = Path(workspaceRoot).expanduser().resolve() if workspaceRoot is not None else None
 
     def createSession(self, workingDirectory: str | None = None) -> KernelSession:
-        session = KernelSession(workingDirectory=workingDirectory)
+        sessionWorkingDirectory = workingDirectory or (str(self._workspaceRoot) if self._workspaceRoot is not None else None)
+        session = KernelSession(
+            workingDirectory=sessionWorkingDirectory,
+            workspaceRoot=str(self._workspaceRoot) if self._workspaceRoot is not None else None,
+        )
         self._sessions[session.sessionId] = session
         return session
 

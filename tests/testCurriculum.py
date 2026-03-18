@@ -7,7 +7,7 @@ from codaro.curriculum.converter import yamlToDocument
 from codaro.curriculum.progress import ProgressTracker
 
 
-CONTENT_DIR = Path(__file__).resolve().parent.parent.parent / "nicegui" / "eddmpython" / "core" / "studyPython" / "content"
+CONTENT_DIR = Path(__file__).resolve().parent.parent / "content" / "studyPython" / "content"
 
 
 def testListCategories() -> None:
