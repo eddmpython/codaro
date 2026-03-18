@@ -6,6 +6,7 @@
     ChevronDown,
     CircleX,
     Command,
+    ExternalLink,
     FileText,
     FolderTree,
     KeyRound,
@@ -18,7 +19,6 @@
     ScrollText,
     SquareDashedBottomCode,
     Sparkles,
-    TextSearch,
     TriangleAlert,
     Unlink,
     Variable,
@@ -40,11 +40,13 @@
   } from "../documentAdapter";
   import { detectMultipleDefinitions } from "../dataflow";
   import { exportDocumentAtPath, getBootstrap, loadDocumentAtPath, saveDocumentAtPath } from "../api";
+  import { createContextHelpEntry, openPublicDoc } from "../contextHelp";
   import { PyodideEngine } from "../engines/pyodideEngine";
   import type { ExecutionEngine } from "../engines/executionEngine";
   import { ServerKernelEngine } from "../engines/serverKernelEngine";
   import type {
     CodaroDocument,
+    ContextHelpEntry,
     EngineExecutionResult,
     ReactiveBlockPayload,
     VariableInfo
@@ -67,6 +69,8 @@
   let saveState = "idle";
   let dirty = false;
   let selectedPanel = "";
+  let helpContextPanel = "editor";
+  let contextHelpEntry: ContextHelpEntry;
   const marimoVersion = "0.21.0";
   const marimoStaticBase = `${getBasePath()}/marimo`;
   const filenameInputClass =
@@ -75,13 +79,13 @@
     "flex items-center justify-center m-0 leading-none font-medium border border-foreground/10 shadow-xs-solid active:shadow-none dark:border-border text-sm mo-button rounded px-3 py-2";
   const sidebarButtonClass = "flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded hover:bg-(--sage-3)";
   const chromePanels = [
-    { key: "files", icon: FolderTree },
-    { key: "variables", icon: Variable },
-    { key: "packages", icon: Box },
-    { key: "ai", icon: Bot },
-    { key: "outline", icon: ScrollText },
-    { key: "documentation", icon: TextSearch },
-    { key: "dependencies", icon: Network }
+    { key: "files", label: "Files", icon: FolderTree },
+    { key: "variables", label: "Variables", icon: Variable },
+    { key: "packages", label: "Packages", icon: Box },
+    { key: "ai", label: "AI", icon: Bot },
+    { key: "outline", label: "Outline", icon: ScrollText },
+    { key: "help", label: "Context Help", icon: MessageCircleQuestionMark },
+    { key: "dependencies", label: "Dependencies", icon: Network }
   ];
   const developerTabs = [
     { key: "errors", label: "Errors", icon: CircleX },
@@ -105,7 +109,27 @@
   }
 
   function togglePanel(panelKey: string): void {
+    if (panelKey !== "help") {
+      helpContextPanel = panelKey;
+    }
     selectedPanel = selectedPanel === panelKey ? "" : panelKey;
+  }
+
+  function openHelpPanel(): void {
+    selectedPanel = "help";
+  }
+
+  function handleWindowKeydown(event: KeyboardEvent): void {
+    const isModKey = event.metaKey || event.ctrlKey;
+    if (isModKey && event.key.toLowerCase() === "s") {
+      event.preventDefault();
+      void saveDocument();
+      return;
+    }
+    if (event.key === "F1") {
+      event.preventDefault();
+      openHelpPanel();
+    }
   }
 
   async function createEngine(): Promise<void> {
@@ -452,17 +476,28 @@
   }
 
   $: documentBlocks = documentState?.blocks || [];
+  $: activeBlock = documentState?.blocks.find((block) => block.id === activeBlockId) || null;
   $: documentLocation = currentPath || documentState?.title || "Untitled.py";
   $: connectionState = engineStatus === "error" ? "CLOSED" : "OPEN";
   $: shellError = engineStatus === "error" ? engineError : pageError;
-  $: panelTitle = selectedPanel || "";
+  $: contextHelpEntry = createContextHelpEntry({
+    route: "editor",
+    panelKey: helpContextPanel,
+    blockType: activeBlock?.type || null,
+    engineName,
+    engineStatus,
+    errorState: shellError
+  });
+  $: panelTitle = chromePanels.find((panel) => panel.key === selectedPanel)?.label || selectedPanel;
   $: helperPanelSize = selectedPanel ? "30.0" : "0.0";
   $: saveButtonColor = dirty ? "yellow" : connectionState === "CLOSED" ? "gray" : "hint-green";
 
   onMount(() => {
     void initialize();
+    window.addEventListener("keydown", handleWindowKeydown);
 
     return () => {
+      window.removeEventListener("keydown", handleWindowKeydown);
       engine?.destroy();
     };
   });
@@ -553,8 +588,14 @@
               {/each}
             </div>
             <span data-focus-scope-end="true" hidden=""></span>
-            <button class={sidebarButtonClass} data-state="closed" type="button">
-              <MessageCircleQuestionMark class="h-5 w-5" />
+            <button
+              class={sidebarButtonClass}
+              data-state="closed"
+              type="button"
+              aria-label="Open public docs"
+              on:click={() => openPublicDoc("/docs")}
+            >
+              <ExternalLink class="h-5 w-5" />
             </button>
             <div class="flex-1"></div>
             <div class="flex flex-col-reverse gap-px overflow-hidden" data-state="closed"></div>
@@ -598,8 +639,54 @@
                         {/each}
                       {/if}
                     </div>
+                  {:else if selectedPanel === "help"}
+                    <div class="flex flex-col gap-4 text-sm">
+                      <div class="rounded-lg border border-border bg-background/70 p-3">
+                        <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{contextHelpEntry.when}</div>
+                        <p class="mt-3 text-sm leading-6 text-(--slate-11)">{contextHelpEntry.summary}</p>
+                      </div>
+
+                      <div class="rounded-lg border border-border bg-background/70 p-3">
+                        <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Focused actions</div>
+                        <div class="mt-3 flex flex-col gap-2">
+                          {#each contextHelpEntry.actions as action}
+                            <div class="rounded-md border border-border/70 px-3 py-2">
+                              <div class="flex items-center justify-between gap-3">
+                                <span class="text-sm font-medium text-(--slate-12)">{action.label}</span>
+                                {#if action.shortcut}
+                                  <span class="rounded bg-(--slate-3) px-2 py-0.5 font-mono text-[11px] text-muted-foreground">{action.shortcut}</span>
+                                {/if}
+                              </div>
+                              <p class="mt-1 text-xs leading-5 text-muted-foreground">{action.description}</p>
+                            </div>
+                          {/each}
+                        </div>
+                      </div>
+
+                      <div class="rounded-lg border border-border bg-background/70 p-3">
+                        <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Public docs</div>
+                        <div class="mt-3 flex flex-col gap-2">
+                          {#each contextHelpEntry.docLinks as docLink}
+                            <a
+                              class="flex items-center justify-between rounded-md border border-border/70 px-3 py-2 text-sm text-(--slate-12) hover:bg-(--slate-2)"
+                              href={docLink.href}
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              <span>{docLink.label}</span>
+                              <ExternalLink class="h-4 w-4 text-muted-foreground" />
+                            </a>
+                          {/each}
+                        </div>
+                      </div>
+                    </div>
                   {:else if selectedPanel}
-                    <div class="text-xs text-muted-foreground uppercase tracking-wide font-semibold">{selectedPanel}</div>
+                    <div class="flex flex-col gap-2">
+                      <div class="text-xs text-muted-foreground uppercase tracking-wide font-semibold">{panelTitle}</div>
+                      <div class="text-xs leading-5 text-muted-foreground">
+                        This panel stays inside the editor surface. Open Context Help for task-focused guidance or use the public docs button for long-form documentation.
+                      </div>
+                    </div>
                   {/if}
                 </div>
               </div>

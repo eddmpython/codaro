@@ -85,10 +85,17 @@ Codaro `frontend/` must reproduce the marimo edit frontend with `Svelte + CSS` a
 
 - `.__marimo_upstream/frontend/src/components/chat/chat-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/chat-components.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/chat-display.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/chat-history-popover.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/reasoning-accordion.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/tool-call-accordion.tsx`
+- `.__marimo_upstream/frontend/src/components/ai/ai-model-dropdown.tsx`
+- `.__marimo_upstream/frontend/src/components/mcp/mcp-status-indicator.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/acp/agent-panel.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/acp/agent-selector.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/acp/blocks.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/acp/model-selector.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/acp/scroll-to-bottom-button.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/acp/thread.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/acp/session-tabs.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/acp/agent-docs.tsx`
@@ -292,9 +299,26 @@ Source:
 
 - class from `EditApp`:
   - `pt-4 sm:pt-12 pb-2 mb-4 print:hidden z-50 sticky left-0`
+- render order:
+  - `children`
+  - disconnected banner when `connection.state === WebSocketState.CLOSED`
 - child branch when `viewState.mode === "edit"`:
   - `div.flex.items-center.justify-center.container`
     - `FilenameForm`
+- `FilenameForm` source contract:
+  - `FilenameInput`
+  - `placeholderText = filename ? Paths.basename(filename) : "untitled marimo notebook"`
+  - `initialValue = filename`
+  - `flexibleWidth = true`
+  - `resetOnBlur = true`
+  - `data-testid = "filename-input"`
+  - class branch:
+    - unnamed -> `missing-filename`
+    - named -> `filename`
+- filename rename path:
+  - `updateFilename(newFilename)`
+  - when the notebook was previously unnamed and the returned name is not null:
+    - `saveNotebook(name, true)`
 - disconnected add-on branch:
   - `Disconnected`
   - props:
@@ -448,6 +472,16 @@ Reorderable rail primitive contract:
 - accepted drag types:
   - custom MIME first when cross-list drag is enabled
   - always also accepts `text/plain`
+- cross-list receive gates:
+  - ignore items whose `sourceListId === crossListDrag.listId`
+  - ignore items already present in the destination list by `getKey(item)`
+  - accepted receive path first calls `setValue([...])`
+  - then calls `onReceive(item, fromListId, insertIndex)`
+- intra-list reorder algorithm:
+  - collect dragged items by `e.keys`
+  - remove them from the current list
+  - compute target index from `e.target.key` and `dropPosition`
+  - reinsert the dragged block while preserving its relative order
 - root collection primitive:
   - `ListBox`
   - `selectionMode: "none"`
@@ -465,6 +499,9 @@ Reorderable rail primitive contract:
 - available item checkbox rows use:
   - `ContextMenuCheckboxItem`
   - disabled when the item is selected and the list length is already at `minItems`
+- context-menu toggle rule:
+  - checked -> appends the item to the current list
+  - unchecked -> removes the item only when `value.length > minItems`
 - missing `onAction` target path logs:
   - `handleAction: item not found for key`
 - helper label row for sidebar item pickers:
@@ -521,6 +558,11 @@ Running indicator contract:
 
 #### 5.2 Helper Sidebar
 
+Source:
+
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/app-chrome.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/sidebar/sidebar.css`
+
 Panel identity:
 
 - `id="app-chrome-sidebar"`
@@ -576,6 +618,63 @@ Header title branch:
 - `ai` branch with `external_agents` flag shows segmented control:
   - tabs `Chat`, `Agents`
   - tab item class `py-0.5 text-xs uppercase tracking-wide font-bold`
+
+#### 5.2.0 Helper Panel Primitives
+
+Source:
+
+- `.__marimo_upstream/frontend/src/components/editor/chrome/panels/components.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/panels/empty-state.tsx`
+
+`PanelAccordionItem`:
+
+- primitive:
+  - `AccordionItem`
+- forwards ref
+- `lastItem` branch:
+  - adds `border-b-0`
+
+`PanelAccordionTrigger`:
+
+- primitive:
+  - `AccordionTrigger`
+- forwards ref
+- base class:
+  - `px-3 py-2 text-xs font-semibold uppercase tracking-wide hover:no-underline`
+- child wrapper:
+  - `span.flex.items-center.gap-2`
+
+`PanelAccordionContent`:
+
+- primitive:
+  - `AccordionContent`
+- forwards ref
+- wrapper padding override:
+  - `wrapperClassName="p-0"`
+
+`PanelBadge`:
+
+- primitive:
+  - `Badge`
+- variant:
+  - `secondary`
+- base class:
+  - `py-0 px-1.5 text-[10px]`
+
+`PanelEmptyState`:
+
+- outer wrapper:
+  - `mx-6 my-6 flex flex-col gap-2`
+- header row:
+  - `flex flex-row gap-2 items-center`
+- icon clone class:
+  - `text-accent-foreground flex-shrink-0`
+- title class:
+  - `mt-1 text-accent-foreground`
+- description class:
+  - `text-muted-foreground text-sm`
+- action wrapper:
+  - `mt-2`
 
 #### 5.2.1 Files Panel Body
 
@@ -988,6 +1087,8 @@ Local upload and drop contract:
 - dropzone options:
   - `multiple: true`
   - `maxSize: 104857600`
+- empty-drop guard:
+  - returns early when `acceptedFiles.length === 0`
 - upload progress titles:
   - single `Uploading file...`
   - plural `Uploading files...`
@@ -998,15 +1099,40 @@ Local upload and drop contract:
   - `File upload failed`
 - rejection description row:
   - `${file.name} (${errors.join(", ")})`
+- path derivation order:
+  - `file.webkitRelativePath`
+  - `file.path`
+  - `file.relativePath`
+- path normalization:
+  - strips any leading `/` before path splitting
+- directory target derivation:
+  - when a relative path exists, parent directory comes from `PathBuilder.guessDeliminator(filePath).dirname(filePath)`
+- upload body encoding:
+  - `serializeBlob(file)` is split on `,`
+  - upload sends the raw base64 tail as `contents`
+- per-file create request:
+  - `sendCreateFileOrFolder({ path: directoryPath, type: "file", name: file.name, contents: base64 })`
+- post-upload side effect:
+  - `refreshRoot()` runs after the file loop completes
 
 #### 5.2.2 Variables and Data Sources Panel Body
 
 Source:
 
+- `.__marimo_upstream/frontend/src/components/editor/chrome/panels/datasources-panel.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/app-chrome.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/session-panel.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/panels/variable-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/components.tsx`
 - `.__marimo_upstream/frontend/src/components/datasources/datasources.tsx`
 - `.__marimo_upstream/frontend/src/components/variables/variables-table.tsx`
+
+Visible mount contract:
+
+- `app-chrome.tsx` sidebar registry maps the visible `variables` panel key to:
+  - `LazySessionPanel`
+- `variable-panel.tsx` exists as a simpler standalone variable-only panel file
+- current visible marimo chrome mounts `session-panel.tsx`, not `variable-panel.tsx`
 
 Top-level sections:
 
@@ -1015,6 +1141,22 @@ Top-level sections:
 - sections:
   - `datasources`
   - `variables`
+- root class:
+  - `flex flex-col h-full overflow-auto`
+
+Persistent accordion state:
+
+- storage atom key:
+  - `marimo:session-panel:state`
+- default value:
+  - `{ openSections: ["variables"], hasUserInteracted: false }`
+- datasource count formula:
+  - `tables.length + dataConnections.length`
+- auto-open rule before user interaction:
+  - when datasource count is greater than `0`, `openSections` expands to include `datasources`
+- `onValueChange` path:
+  - stores the new `openSections`
+  - sets `hasUserInteracted: true`
 
 Data sources section header:
 
@@ -1039,6 +1181,9 @@ Data sources body:
 
 - source component:
   - `DataSources`
+- root command primitive:
+  - `Command`
+  - `shouldFilter: false`
 - empty state when both Python tables and external connections are absent:
   - title `No tables found`
   - description `Any datasets/dataframes in the global scope will be shown here.`
@@ -1047,11 +1192,30 @@ Data sources body:
   - `Search tables...`
 - search shell wrapper:
   - `flex items-center w-full border-b`
+- search behavior:
+  - `closeAllColumns(value.length > 0)`
+  - then updates local `searchValue`
+- search input class:
+  - `h-6 m-1`
+- search input rootClassName:
+  - `flex-1 border-r border-b-0`
+- clear-search button class:
+  - `float-right border-b px-2 m-0 h-full hover:bg-accent hover:text-accent-foreground`
+- add-connection button:
+  - wrapped by `AddConnectionDialog`
+  - `Button variant="ghost" size="sm" className="px-2 rounded-none focus-visible:outline-hidden"`
 - body wrapper:
   - `border-b bg-background rounded-none h-full pb-10 overflow-auto outline-hidden`
 
 Connection group contract:
 
+- Python table sorting:
+  - `sortedTablesAtom` sorts by the declaring variable's first `declaredBy` cell index
+  - tables with no `variable_name` sort to the top via `-1`
+- connection filtering and order:
+  - `connectionsAtom` removes internal SQL engines with zero databases
+  - it also removes an internal engine that has only the default DuckDB database and zero schemas
+  - remaining internal engines sort after user-defined connections
 - connection row class:
   - `pl-3 pr-2`
 - in-memory connection display name:
@@ -1074,6 +1238,14 @@ Table tree contract:
   - `Add table to notebook`
 - summary text format:
   - `${numRows} rows, ${numColumns} columns`
+- add-table click prelude:
+  - calls `maybeAddMarimoImport({ autoInstantiate, createNewCell, fromCellId: lastFocusedCellId })`
+- add-table code branches:
+  - catalog source -> `${engine}.load_table("${database}.${table}")` when database exists, otherwise `${engine}.load_table("${table}")`
+  - local source -> `mo.ui.table(${table.name})`
+  - duckdb or connection source -> `sqlCode({ table, columnName: "*", sqlTableContext })`
+- add-table insertion path:
+  - `useAddCodeToNewCell()(generatedCode)`
 
 Column row contract:
 
@@ -1085,15 +1257,55 @@ Column row contract:
   - `Indexed`
 - preview wrapper adds:
   - `pr-2 py-2 bg-(--slate-1) shadow-inner border-b`
+- local expansion side effects:
+  - when expanded, adds `${table.name}:${column.name}` to `expandedColumnsAtom`
+  - when collapsed, removes the same key
+- close-all-columns gate:
+  - when `closeAllColumnsAtom` becomes true while expanded, the column collapses immediately
+- PK badge shell:
+  - `text-xs text-black bg-gray-100 dark:invert rounded px-1`
+- IDX badge shell:
+  - `text-xs text-black bg-gray-100 dark:invert rounded px-1`
 
 Variables body:
 
 - when empty:
   - `No variables defined`
+  - wrapper class:
+    - `px-3 py-4 text-sm text-muted-foreground`
 - otherwise renders:
   - `VariableTable`
+  - props:
+    - `cellIds={cellIds.inOrderIds}`
+    - `variables={variables}`
 - variable table search placeholder:
   - `Search`
+- variable search input class:
+  - `w-full`
+- default variable sort:
+  - when there is no explicit sort, rows sort by the index of `declaredBy[0]` in notebook order
+- resolved variable naming:
+  - internal cell names render as `cell-${index}`
+  - unnamed cells also fall back to `cell-${index}`
+- declared-by click path:
+  - resolves `getCellEditorView(cellId)`
+  - when an editor exists, calls `goToVariableDefinition(editorView, variableName)`
+- used-by click path:
+  - `CellLinkList` passes the same highlight callback
+- type-value cell shell:
+  - outer wrapper `max-w-[150px]`
+  - data type line `text-ellipsis overflow-hidden whitespace-nowrap text-muted-foreground font-mono text-xs`
+  - value line `text-ellipsis overflow-hidden whitespace-nowrap`
+- table shell:
+  - `w-full text-sm flex-1 border-separate border-spacing-0`
+- header row class:
+  - `whitespace-nowrap text-xs`
+- sticky header cell class:
+  - `sticky top-0 bg-background border-b`
+- body row hover:
+  - `hover:bg-accent`
+- body cell border:
+  - `border-b`
 
 Variable table columns:
 
@@ -1117,6 +1329,7 @@ Source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/dependency-graph-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/dependency-graph/dependency-graph.tsx`
+- `.__marimo_upstream/frontend/src/components/dependency-graph/dependency-graph.css`
 - `.__marimo_upstream/frontend/src/components/dependency-graph/custom-node.tsx`
 - `.__marimo_upstream/frontend/src/components/dependency-graph/minimap-content.tsx`
 - `.__marimo_upstream/frontend/src/components/dependency-graph/panels.tsx`
@@ -1459,6 +1672,13 @@ Source:
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/empty-state.tsx`
 - `.__marimo_upstream/frontend/src/documentation.css`
 
+Codaro shipped-product fork:
+
+- marimo source exposes a full documentation panel in this slot
+- Codaro keeps the slot but ships `Context Help` instead of a docs browser
+- internal repo docs such as `DEV.md`, `PRD.md`, `SPEC.md`, and launcher design notes must never surface here
+- long-form docs, blog, and search always open the public `landing/` site
+
 Empty state:
 
 - title:
@@ -1467,6 +1687,8 @@ Empty state:
   - `Move your text cursor over a symbol to see its documentation.`
 - icon:
   - `TextSearchIcon`
+- source state:
+  - `useAtomValue(documentationAtom).documentation`
 
 Non-empty body:
 
@@ -1474,6 +1696,10 @@ Non-empty body:
   - `p-3 overflow-y-auto overflow-x-hidden h-full docs-documentation flex flex-col gap-4`
 - content source:
   - `renderHTML`
+- render path:
+  - `renderHTML({ html: documentation })`
+- imported stylesheet:
+  - `../../documentation.css`
 
 #### 5.2.5 Outline Panel Body
 
@@ -1501,6 +1727,78 @@ Non-empty body:
 - state source:
   - `activeHeaderId`
   - `activeOccurrences`
+- `headerElements` source:
+  - `findOutlineElements(items)`
+- active-state hook:
+  - `useActiveOutline(headerElements)`
+
+Panel outline list contract:
+
+- root class:
+  - `flex flex-col overflow-auto py-4 pl-2`
+- row base class:
+  - `px-2 py-1 cursor-pointer hover:bg-accent/50 hover:text-accent-foreground rounded-l`
+- level styling:
+  - `level 1 -> font-semibold`
+  - `level 2 -> ml-3`
+  - `level 3 -> ml-6`
+  - `level 4 -> ml-9`
+- active row add:
+  - `text-accent-foreground`
+- click path:
+  - `scrollToOutlineItem(item, occurrences)`
+- html branch:
+  - uses `dangerouslySetInnerHTML`
+- plain-text branch:
+  - renders `item.name`
+
+Floating outline contract:
+
+- hidden branch:
+  - returns `null` when `items.length < 2`
+- wrapper class:
+  - `fixed top-[25vh] right-8 z-10000 print:hidden hidden md:block`
+- hover state:
+  - local `isHovered`
+- sliding outline list class:
+  - `-top-4 max-h-[70vh] bg-background rounded-lg shadow-lg absolute overflow-auto transition-all duration-300 w-[300px] border`
+- hovered position:
+  - `-left-[280px] opacity-100`
+- idle position:
+  - `left-[300px] opacity-0`
+
+MiniMap contract:
+
+- root class:
+  - `flex flex-col gap-4 items-end max-h-[70vh] overflow-hidden`
+- glyph base class:
+  - `h-[2px] bg-muted-foreground/60`
+- width by level:
+  - `level 1 -> w-5`
+  - `level 2 -> w-4`
+  - `level 3 -> w-3`
+  - `level 4 -> w-2`
+- active glyph add:
+  - `bg-foreground`
+- glyph click path:
+  - `scrollToOutlineItem(item, occurrences)`
+
+Active-outline hook contract:
+
+- scroll root:
+  - edit mode uses `document.getElementById("App")`
+- observer config:
+  - `rootMargin: "0px"`
+  - `threshold: 0`
+- active selection rule:
+  - chooses the topmost intersecting header
+- scroll highlight path:
+  - `element.scrollIntoView({ behavior: "smooth", block: "start" })`
+  - adds `outline-item-highlight`
+  - removes it after `3000ms`
+- outline highlight CSS:
+  - `text-decoration: underline`
+  - `@apply decoration-primary`
 
 #### 5.2.6 Packages Panel Body
 
@@ -1522,6 +1820,11 @@ Top-level wrapper:
 
 - class:
   - `flex-1 flex flex-col overflow-hidden`
+- async load shape:
+  - `Promise.all([getPackageList(), getDependencyTree()])`
+  - result `{ list, tree }`
+- package-manager source:
+  - `useResolvedMarimoConfig().package_management.manager`
 
 Install/search prompt row:
 
@@ -1529,11 +1832,37 @@ Install/search prompt row:
   - `flex items-center w-full border-b`
 - input placeholder:
   - `Install packages with ${packageManager}...`
+- input primitive:
+  - `SearchInput`
+- input id:
+  - `PACKAGES_INPUT_ID`
+- input root class:
+  - `flex-1 border-none`
 - leading branch:
   - loading spinner `small`
   - otherwise tooltip `Change package manager`
+- package-manager icon:
+  - `BoxIcon className="mr-2 h-4 w-4 shrink-0 opacity-50 hover:opacity-80 cursor-pointer"`
+  - click path `openSettings("packageManagementAndData")`
+- atom handoff:
+  - watches `packagesToInstallAtom`
+  - when populated:
+    - copies atom value into local input
+    - clears atom to `null`
 - add button:
   - text `Add`
+- add button class:
+  - `float-right px-2 m-0 h-full text-sm text-secondary-foreground ml-2`
+- active-input add:
+  - `bg-accent text-accent-foreground`
+- disabled add state:
+  - `disabled:cursor-not-allowed disabled:opacity-50`
+- install path:
+  - `stripPackageManagerPrefix(input)`
+  - `handleInstallPackages([cleanedInput], onSuccessInstallPackages)`
+- success side effect:
+  - `onSuccess()`
+  - local input reset to `""`
 - tooltip help body documents accepted package formats:
   - package name
   - package and version
@@ -1571,9 +1900,29 @@ List branch:
   - `group`
 - row click copies:
   - `${name}==${version}`
+- row click success toast:
+  - `Copied to clipboard`
 - row actions:
   - `Upgrade`
   - `Remove`
+
+Package action button primitive:
+
+- loading branch:
+  - `Spinner size="small" className="h-4 w-4 shrink-0 opacity-50"`
+- button class:
+  - `px-2 h-full text-xs text-muted-foreground hover:text-foreground`
+  - `invisible group-hover:visible`
+- click wrapper:
+  - `Events.stopPropagation(onClick)`
+- upgrade action:
+  - hidden in WASM
+  - calls `addPackage({ package, upgrade: true, group })`
+  - success toast helper `showUpgradePackageToast`
+- remove action:
+  - calls `removePackage({ package, group })`
+  - success toast helper `showRemovePackageToast`
+- both actions derive `group` from the `group` tag when present
 
 Tree branch:
 
@@ -1586,6 +1935,8 @@ Tree branch:
   - icon `BoxIcon`
 - tree wrapper:
   - `flex-1 overflow-auto`
+- expanded state reset:
+  - `useEffect(() => setExpandedNodes(new Set()), [tree])`
 - top-level node row class:
   - `flex items-center group cursor-pointer text-sm whitespace-nowrap`
   - `hover:bg-(--slate-2) focus:bg-(--slate-2) focus:outline-hidden`
@@ -1593,6 +1944,13 @@ Tree branch:
   - `px-2 py-0.5`
 - nested row indent:
   - inline `paddingLeft`
+- role/aria:
+  - `role="treeitem"`
+  - `tabIndex={0}`
+  - `aria-selected={false}`
+  - `aria-expanded={hasChildren ? isExpanded : undefined}`
+- keyboard toggle:
+  - `Enter` or `Space`
 - tags:
   - `cycle`
   - `extra`
@@ -1700,7 +2058,11 @@ Source:
 - `.__marimo_upstream/frontend/src/components/chat/chat-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/chat-history-popover.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/chat-display.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/reasoning-accordion.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/chat-components.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/tool-call-accordion.tsx`
+- `.__marimo_upstream/frontend/src/components/ai/ai-model-dropdown.tsx`
+- `.__marimo_upstream/frontend/src/components/mcp/mcp-status-indicator.tsx`
 
 Unconfigured AI empty state:
 
@@ -1732,16 +2094,85 @@ Header controls:
   - settings tooltip `AI Settings`
   - history popover tooltip `Previous chats`
 
+MCP status indicator contract:
+
+- trigger wrapper:
+  - `Popover`
+  - `Tooltip content="MCP Status"`
+  - `PopoverTrigger asChild={true}`
+- trigger button:
+  - `Button variant="text" size="icon"`
+- icon:
+  - `PlugIcon className="h-4 w-4"`
+- icon color branch:
+  - `ok -> text-green-500`
+  - `partial -> text-yellow-500`
+  - `error && hasServers -> text-red-500`
+- popover content:
+  - `PopoverContent className="w-[320px]" align="start" side="right"`
+- popover root body:
+  - `div.space-y-3`
+- title:
+  - `MCP Server Status`
+- refresh button:
+  - `Button variant="ghost" size="xs"`
+  - loading icon `Loader2 className="h-3 w-3 animate-spin"`
+  - idle icon `RefreshCwIcon className="h-3 w-3"`
+- no-server empty copy:
+  - `No MCP servers configured.`
+  - `Configure under Settings > AI > MCP`
+- refresh success toast:
+  - `MCP refreshed`
+  - `MCP server configuration has been refreshed`
+- refresh failure toast:
+  - `Refresh failed`
+  - `Failed to refresh MCP`
+
 History popover:
 
+- trigger wrapper:
+  - `Popover`
+  - `Tooltip content="Previous chats"`
+  - `PopoverTrigger asChild={true}`
+- trigger button:
+  - `Button`
+  - `variant: "text"`
+  - `size: "icon"`
+- trigger icon:
+  - `ClockIcon`
+  - `className: "h-4 w-4"`
 - popover class:
   - `w-[480px] p-0`
 - search input wrapper:
   - `pt-3 px-3 w-full`
 - search placeholder:
   - `Search chat history...`
+- search input class:
+  - `text-xs`
 - scroll area:
   - `h-[450px] p-2`
+- grouped-chat root:
+  - `div.space-y-3`
+- grouping source:
+  - `groupChatsByDate(filteredChats)`
+- group label class:
+  - `text-xs px-1 text-muted-foreground/60`
+- per-chat row class:
+  - `w-full p-1 rounded-md cursor-pointer text-left flex items-center justify-between`
+- active row add:
+  - `bg-accent`
+- inactive row add:
+  - `hover:bg-muted/20`
+- title class:
+  - `text-sm truncate`
+- updated-time class:
+  - `text-xs text-muted-foreground/60 ml-2 flex-shrink-0`
+- relative time source:
+  - `timeAgo(chat.updatedAt, locale)`
+- click path:
+  - `setActiveChat(chat.id)`
+- group divider rule:
+  - render `<hr />` between groups except after the last group
 - empty states:
   - `No chats yet`
   - `Start a new chat to get started`
@@ -1790,6 +2221,44 @@ Chat footer controls:
 - stop button text:
   - `Stop`
 
+Chat model dropdown contract:
+
+- source primitive:
+  - `AIModelDropdown`
+- chat-panel props:
+  - `placeholder="Model"`
+  - `triggerClassName="h-6 text-xs shadow-none! ring-0! bg-muted hover:bg-muted/30 rounded-sm"`
+  - `iconSize="small"`
+  - `showAddCustomModelDocs={true}`
+  - `forRole="chat"`
+- trigger root:
+  - `DropdownMenuTrigger`
+  - base class `flex items-center justify-between px-2 py-0.5 border rounded-md hover:bg-accent hover:text-accent-foreground`
+- dropdown content:
+  - `DropdownMenuContent className="w-[300px]"`
+- current-model preview row:
+  - rendered before provider groups when `activeModel` exists
+  - followed by `DropdownMenuSeparator`
+- provider groups:
+  - rendered through `ProviderDropdownContent`
+  - each provider is a `DropdownMenuSub`
+  - submenu content class `max-h-[40vh] overflow-y-auto`
+- provider info block:
+  - optional description paragraph `text-sm text-muted-foreground p-2 max-w-[300px]`
+  - provider-details link paragraph `text-sm text-muted-foreground p-2 pt-0`
+- model row:
+  - `DropdownMenuSubTrigger showChevron={false} className="py-2"`
+  - embeds provider icon plus model name
+  - thinking models show `BrainIcon` tooltip `Reasoning model`
+  - custom models show `BotIcon` tooltip `Custom model`
+- model info flyout:
+  - `DropdownMenuSubContent className="p-4 w-80"`
+- add-custom-model row:
+  - only when `showAddCustomModelDocs` is true
+  - item class `h-7 flex items-center gap-2`
+  - icon `CircleHelpIcon className="h-3 w-3"`
+  - click path `handleClick("ai", "ai-models")`
+
 Chat message row contract:
 
 - row base class:
@@ -1797,6 +2266,71 @@ Chat message row contract:
 - alignment split:
   - `user -> justify-end`
   - `assistant -> justify-start`
+- user bubble shell:
+  - `w-[95%] bg-background border p-1 rounded-sm`
+- assistant bubble shell:
+  - `w-[95%] wrap-break-word`
+- assistant copy affordance:
+  - `absolute right-1 top-1 opacity-0 group-hover:opacity-100 transition-opacity`
+  - `CopyClipboardIcon className="h-3 w-3"`
+- user edit input primitive:
+  - `PromptInput`
+  - placeholder `Type your message...`
+  - submit guard ignores blank trimmed values
+
+`renderUIMessage` part mapping:
+
+- root return:
+  - `message.parts.map((part, index) => renderUIMessagePart(part, index))`
+- `tool-*` parts:
+  - render `ToolCallAccordion`
+  - `className: "my-2"`
+- `data-*` parts:
+  - logged with `Logger.debug("Found data part", part)`
+  - render `null`
+- `text` parts:
+  - when `part.text.includes("<marimo-")`:
+    - render through `renderHTML({ html: part.text })`
+  - otherwise:
+    - render `MarkdownRenderer`
+- `reasoning` parts:
+  - render `ReasoningAccordion`
+  - streaming gate is only true for the last part of the last streaming message
+- `file` parts:
+  - render `AttachmentRenderer`
+- `dynamic-tool` parts:
+  - render `ToolCallAccordion`
+  - `toolName={part.toolName}`
+- non-renderable parts:
+  - `source-document`
+  - `source-url`
+  - `step-start`
+  - all log debug and render `null`
+
+Reasoning accordion contract:
+
+- root primitive:
+  - `Accordion type="single" collapsible={true}`
+  - base class `w-full mb-2`
+- open-state gate:
+  - `value="reasoning"` only when `isStreaming` is true
+- item primitive:
+  - `AccordionItem value="reasoning" className="border-0"`
+- trigger class:
+  - `text-xs text-muted-foreground hover:bg-muted/50 px-2 py-1 h-auto rounded-sm [&[data-state=open]>svg]:rotate-180`
+- trigger icon:
+  - `BotMessageSquareIcon className="h-3 w-3"`
+- trigger label branch:
+  - streaming -> `Thinking (${reasoning.length} chars)`
+  - settled -> `View reasoning (${reasoning.length} chars)`
+- content wrapper:
+  - `AccordionContent className="pb-2 px-2"`
+- inner card:
+  - `bg-muted/30 border border-muted/50 rounded-md p-3 italic text-muted-foreground/90 relative`
+- markdown body wrapper:
+  - `pr-6`
+- renderer:
+  - `MarkdownRenderer content={reasoning}`
 
 Mode option metadata:
 
@@ -1818,14 +2352,58 @@ Input and attachment shells:
 - empty-thread attachment row adds:
   - `py-2 px-1`
 
+Footer button primitives from `chat-components.tsx`:
+
+- send button:
+  - wrapper tooltip text:
+    - loading `Stop`
+    - idle `Submit`
+  - trigger class:
+    - `h-6 min-w-6 p-0 hover:bg-muted/30 cursor-pointer`
+  - idle icon:
+    - `SendHorizontalIcon className="h-3.5 w-3.5"`
+  - loading icon branch:
+    - `StopCircleIcon className="size-4 text-error"`
+  - labeled loading branch:
+    - `div.flex.flex-row.items-center.gap-1.px-1.5`
+    - text `Stop`
+    - `Spinner size="small"`
+- add-context button:
+  - tooltip `Add context`
+  - `Button variant="text" size="icon"`
+  - icon `AtSignIcon className="h-3.5 w-3.5"`
+- attach-file button:
+  - tooltip `Attach a file`
+  - `Button variant="text" size="icon"`
+  - icon `PaperclipIcon className="h-3.5 w-3.5"`
+  - hidden input:
+    - `type: "file"`
+    - `multiple: true`
+    - `hidden: true`
+    - `accept={SUPPORTED_ATTACHMENT_TYPES.join(",")}`
+- file attachment pill:
+  - base class:
+    - `py-1 px-1.5 bg-muted rounded-md cursor-pointer flex flex-row gap-1 items-center text-xs`
+  - hovered icon branch:
+    - `XIcon className="h-3 w-3 mt-0.5"`
+  - idle icon branch:
+    - image -> `ImageIcon`
+    - text -> `FileTextIcon`
+    - fallback -> `FileIcon`
+    - all use `className: "h-3 w-3 mt-0.5"`
+
 #### 5.2.9 AI Agent Panel Body
 
 Source:
 
 - `.__marimo_upstream/frontend/src/components/chat/acp/agent-panel.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/acp/agent-selector.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/acp/thread.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/acp/blocks.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/acp/model-selector.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/acp/scroll-to-bottom-button.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/acp/session-tabs.tsx`
+- `.__marimo_upstream/frontend/src/components/chat/acp/agent-docs.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/acp/common.tsx`
 
 Empty-state branch:
@@ -1844,6 +2422,8 @@ Empty-state branch:
   - `Connect to an agent`
 - disconnected helper description prefix:
   - `Start agents by running these commands in your terminal:`
+- disconnected helper note suffix:
+  - `Note: This must be in the directory ${Paths.dirname(filename ?? "")}`
 
 Connected root:
 
@@ -1858,9 +2438,113 @@ Header contract:
 
 - class:
   - `flex border-b px-3 py-2 justify-between shrink-0 items-center`
+- left info row:
+  - `BotMessageSquareIcon className="h-4 w-4 text-muted-foreground"`
+  - optional `AgentTitle`
+  - optional `ConnectionStatus`
 - right-side controls:
   - `Restart`
   - `Connect` or `Disconnect`
+
+Connection status badge contract:
+
+- primitive:
+  - `Badge`
+- connected branch:
+  - icon `WifiIcon className="h-3 w-3"`
+  - label `Connected`
+  - variant `default`
+  - class `bg-[var(--blue-3)] text-[var(--blue-11)] border-[var(--blue-5)]`
+- connecting branch:
+  - icon `PlugIcon className="h-3 w-3 animate-pulse"`
+  - label `Connecting`
+  - variant `secondary`
+  - class `bg-[var(--yellow-3)] text-[var(--yellow-11)] border-[var(--yellow-5)]`
+- disconnected branch:
+  - icon `WifiOffIcon className="h-3 w-3"`
+  - label `Disconnected`
+  - variant `outline`
+  - class `bg-[var(--red-3)] text-[var(--red-11)] border-[var(--red-5)]`
+- fallback branch:
+  - icon `WifiOffIcon className="h-3 w-3"`
+  - label `status || "Unknown"`
+  - variant `outline`
+  - class `bg-[var(--gray-3)] text-[var(--gray-11)] border-[var(--gray-5)]`
+- label text shell:
+  - `span.ml-1.text-xs.font-medium`
+
+Session tabs contract:
+
+- empty-state root:
+  - `flex items-center border-b bg-muted/20`
+- empty-state child:
+  - `AgentSelector className="h-6"`
+- populated root:
+  - `flex items-center border-b bg-muted/20 overflow-hidden`
+- session-list wrapper:
+  - `flex min-w-0 flex-1 overflow-x-auto`
+- per-tab base class:
+  - `flex items-center gap-1 px-2 py-1 text-xs border-r border-border bg-muted/30 hover:bg-muted/50 cursor-pointer min-w-0`
+- active-tab adds:
+  - `bg-background border-b-0 relative z-1`
+- provider icon:
+  - `AiProviderIcon className="h-3 w-3"`
+- provider icon wrapper:
+  - `text-muted-foreground text-[10px] font-medium`
+- title shell:
+  - `span.truncate`
+  - `title={session.title}`
+- close button:
+  - `Button variant="ghost" size="sm"`
+  - `className: "h-4 w-4 p-0 hover:bg-destructive/20 hover:text-destructive flex-shrink-0"`
+  - icon `XIcon className="h-3 w-3"`
+- select path:
+  - `setActiveSession(sessionId)`
+  - `updateSessionLastUsed(prev, sessionId)`
+- close path:
+  - `removeSession(prev, sessionId)`
+- trailing selector in populated state:
+  - `AgentSelector className="h-6 flex-shrink-0"`
+
+Agent selector contract:
+
+- root primitive:
+  - `DropdownMenu`
+  - controlled by local `isOpen`
+- trigger:
+  - `DropdownMenuTrigger asChild={true}`
+  - `Button variant="ghost" size="sm"`
+  - class:
+    - `h-6 gap-1 px-2 text-xs bg-muted/30 hover:bg-muted/50 border border-border border-y-0 rounded-none focus-visible:ring-0`
+  - label `New session`
+  - icon `ChevronDownIcon className="h-3 w-3"`
+- dropdown content:
+  - `DropdownMenuContent align="start" className="w-fit"`
+- agent inventory:
+  - `Claude`
+  - `Gemini`
+  - `Codex`
+  - `OpenCode`
+- single-session reset branch:
+  - `DropdownMenuItem className="cursor-pointer"`
+  - text `Reset ${agent.displayName} session`
+- normal create branch:
+  - `DropdownMenuSub`
+  - trigger:
+    - `DropdownMenuSubTrigger`
+    - `showChevron={false}`
+    - `className: "cursor-pointer"`
+  - submenu content:
+    - `DropdownMenuSubContent className="w-120"`
+    - wrapper `px-2 py-2`
+    - helper copy class `text-xs font-medium text-muted-foreground mb-3`
+    - helper copy includes terminal command note and `Paths.dirname(filename ?? "")`
+    - embeds `AgentDocs agents={[agent.id]} showCopy={true}`
+- create-session path:
+  - `addSession(sessionState, { agentId })`
+  - `setActiveTab(newState.activeTabId)`
+  - `setIsOpen(false)`
+  - optional `onSessionCreated?.(agentId)`
 
 Connection/session transitional states:
 
@@ -1879,6 +2563,9 @@ Notification/content area:
 
 - content wrapper:
   - `flex-1 flex flex-col overflow-hidden flex-shrink-0 relative`
+- pending-permission wrapper:
+  - `p-3 border-b`
+  - renders `PermissionRequest`
 - scroll area:
   - `flex-1 bg-muted/20 w-full flex flex-col overflow-y-auto p-2`
 - session id label:
@@ -1894,6 +2581,32 @@ Permission/loading footer:
 - stop button text:
   - `Stop`
 
+Permission request contract:
+
+- outer card:
+  - `border border-[var(--amber-8)] bg-[var(--amber-2)] rounded-lg p-2`
+- header row:
+  - `flex items-center gap-2 mb-3`
+- header icon:
+  - `ShieldCheckIcon className="h-4 w-4 text-[var(--amber-11)]"`
+- title:
+  - `Permission Request`
+- intro text:
+  - `The AI agent is requesting permission to proceed:`
+  - class `text-sm text-[var(--amber-11)] mb-3`
+- body renderer:
+  - `ToolBodyBlock data={permission.toolCall}`
+- options row:
+  - `flex gap-2`
+- option button:
+  - `Button size="xs" variant="text"`
+  - allow color `text-[var(--blue-10)]`
+  - reject color `text-[var(--red-10)]`
+  - allow icon `CheckCircleIcon className="h-3 w-3 mr-1"`
+  - reject icon `XCircleIcon className="h-3 w-3 mr-1"`
+- resolve path:
+  - `onResolve({ outcome: { outcome: "selected", optionId } })`
+
 Prompt area:
 
 - input wrapper:
@@ -1903,12 +2616,100 @@ Prompt area:
 - footer wrapper:
   - `px-3 py-2 border-t border-border/20 flex flex-row items-center justify-between`
 
+Agent docs contract:
+
+- root class:
+  - `space-y-4`
+- heading wrapper:
+  - `space-y-2`
+- title class:
+  - `font-medium text-sm`
+- description class:
+  - `text-xs text-muted-foreground`
+- item wrapper:
+  - `space-y-2`
+- agent title row:
+  - `flex items-center gap-2`
+- agent name shell:
+  - `font-medium text-sm`
+- beta suffix:
+  - `(beta)`
+  - `className: "text-muted-foreground ml-1"`
+- command card:
+  - `bg-muted/50 rounded-md p-2 border`
+- command row:
+  - `flex items-start gap-2 text-xs`
+- command icon:
+  - `TerminalIcon className="h-4 w-4 mt-0.5 text-muted-foreground flex-shrink-0"`
+- command code shell:
+  - `text-xs font-mono break-words flex-1 whitespace-pre-wrap`
+- copy button:
+  - `Button size="xs" variant="outline" className="border"`
+- terminal-run button gate:
+  - shown only when `capabilities.terminal`
+- terminal-run tooltip:
+  - `Run in terminal`
+  - `delayDuration: 100`
+- terminal-run button:
+  - `Button size="xs" variant="outline"`
+  - `title: "Send to terminal"`
+  - icon `TerminalSquareIcon className="h-3 w-3"`
+- send-to-terminal path:
+  - `sendCommand(getAgentConnectionCommand(agentId))`
+
+Scroll-to-bottom button contract:
+
+- null gate:
+  - hidden when `isVisible` is false
+- wrapper class:
+  - `absolute bottom-2 right-6 z-10 animate-in fade-in-0 zoom-in-95 duration-200`
+- button primitive:
+  - `Button variant="secondary" size="sm"`
+- button class:
+  - `h-8 w-8 p-0 rounded-full`
+  - `bg-background/90 backdrop-blur-sm`
+  - `border border-border/50`
+  - `shadow-md shadow-black/10`
+  - `hover:bg-background hover:shadow-black/15`
+  - `transition-all duration-200`
+  - `focus:outline-none focus:ring-2 focus:ring-primary/50`
+- icon:
+  - `ArrowDownIcon className="h-4 w-4"`
+- sr-only label:
+  - `Scroll to bottom`
+
 Agent mode selector:
 
 - label:
   - `Agent Mode`
 - trigger class:
   - `h-6 text-xs border-border shadow-none! ring-0! bg-muted hover:bg-muted/30 py-0 px-2 gap-1 capitalize`
+- null gate:
+  - hidden when `availableModes.length === 0`
+- dropdown label:
+  - `Agent Mode`
+- item class:
+  - `text-xs`
+- subtitle shell:
+  - `text-muted-foreground text-xs pt-1 block`
+
+Model selector contract:
+
+- null gate:
+  - hidden when `!sessionModels || sessionModels.availableModels.length === 0`
+- trigger class:
+  - `h-6 text-xs border-border shadow-none! ring-0! bg-muted hover:bg-muted/30 py-0 px-2 gap-1`
+- dropdown label:
+  - `Model`
+- item class:
+  - `text-xs`
+- current trigger text:
+  - `currentModel?.name ?? currentModelId`
+- item subtitle shell:
+  - `text-muted-foreground text-xs pt-1 block`
+- first item adds:
+  - `(default)`
+  - `className: "text-muted-foreground ml-1"`
 
 Attachment and prompt shells:
 
@@ -1940,12 +2741,88 @@ Session notification block registry:
 - grouped notification wrapper sets:
   - `data-block-type="${sessionUpdate}"`
 
+Shared accordion primitive:
+
+- root:
+  - `Accordion type="single" collapsible={true} className="w-full"`
+- item:
+  - `AccordionItem value="tool-call" className="border-0"`
+- trigger base:
+  - `py-1 text-xs border-border shadow-none! ring-0! bg-muted hover:bg-muted/30 px-2 gap-1 rounded-sm [&[data-state=open]>svg]:rotate-180`
+- trigger error add:
+  - `text-destructive/80`
+- trigger success add:
+  - `text-[var(--blue-8)]`
+- content:
+  - `AccordionContent className="p-2"`
+  - body wrapper `space-y-3 max-h-64 overflow-y-auto scrollbar-thin`
+- loading icon:
+  - `Loader2 className="h-3 w-3 animate-spin"`
+- error icon:
+  - `XCircleIcon className="h-3 w-3 text-destructive"`
+- success icon:
+  - `CheckCircleIcon className="h-3 w-3 text-[var(--blue-9)]"`
+- title shell:
+  - `code.font-mono.text-xs.truncate`
+- error content card:
+  - `bg-destructive/10 border border-destructive/20 rounded-md p-3 text-xs text-destructive`
+
+Tool-call accordion contract:
+
+- root primitive:
+  - `Accordion type="single" collapsible={true}`
+  - base class `w-full`
+- item primitive:
+  - `AccordionItem value="tool-call" className="border-0"`
+- trigger base class:
+  - `h-6 text-xs border-border shadow-none! ring-0! bg-muted/60 hover:bg-muted py-0 px-2 gap-1 rounded-sm [&[data-state=open]>svg]:rotate-180 hover:no-underline`
+- status color adds:
+  - error -> `text-[var(--red-11)]/80`
+  - success -> `text-[var(--grass-11)]/80`
+- status icon branch:
+  - loading -> `Loader2 className="h-3 w-3 animate-spin"`
+  - error -> `XCircleIcon className="h-3 w-3 text-[var(--red-11)]"`
+  - success -> `CheckCircleIcon className="h-3 w-3 text-[var(--grass-11)]"`
+- status text branch:
+  - loading `Running`
+  - error `Failed`
+  - completed `Done`
+  - fallback `Tool call`
+- tool name formatting:
+  - removes the `tool-` prefix
+- content wrapper:
+  - `AccordionContent className="py-2 px-2"`
+- completion gate:
+  - body only renders when `state === "output-available"` and there is `result` or `error`
+- request block heading:
+  - `Tool Request`
+- result block heading:
+  - `Tool Result`
+- pretty-success wrapper:
+  - `flex flex-col gap-1.5`
+- success badge:
+  - `text-xs px-2 py-0.5 bg-[var(--grass-2)] text-[var(--grass-11)] rounded-full font-medium capitalize`
+- auth-required badge:
+  - `text-xs px-2 py-0.5 bg-[var(--amber-2)] text-[var(--amber-11)] rounded-full`
+- request/result pre shells:
+  - `bg-[var(--slate-2)] p-2 text-muted-foreground border border-[var(--slate-4)] rounded text-xs overflow-auto scrollbar-thin max-h-64`
+- error card shell:
+  - `bg-[var(--red-2)] border border-[var(--red-6)] rounded-lg p-3`
+- error heading row:
+  - `text-xs font-semibold text-[var(--red-11)] mb-2 flex items-center gap-2`
+- error body class:
+  - `text-sm text-[var(--red-11)] leading-relaxed`
+
 Agent connection idle block:
 
 - root class:
   - `flex-1 flex items-center justify-center h-full min-h-[200px] flex-col`
+- inner stack:
+  - `text-center space-y-3`
 - icon badge shell:
   - `w-12 h-12 mx-auto rounded-full bg-[var(--blue-3)] flex items-center justify-center`
+- icon:
+  - `BotMessageSquareIcon className="h-6 w-6 text-[var(--blue-10)]"`
 - title:
   - `Agent is connected`
 - description:
@@ -2272,15 +3149,17 @@ Main split layout:
 
 Source:
 
-- `tracing-panel-adLR9Xcg.js`, lazy-mount shell
-- `tracing-D_eBhjGe.js`, exported `Tracing`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/panels/tracing-panel.tsx`
+- `.__marimo_upstream/frontend/src/components/tracing/tracing.tsx`
 
 Fallback while lazy chunk loads:
 
 - wrapper class:
   - `flex flex-col items-center justify-center h-full`
 - child:
-  - spinner
+  - `Spinner`
+- lazy import path:
+  - `React.lazy(() => import("@/components/tracing/tracing").then((module) => ({ default: module.Tracing })))`
 
 Empty state:
 
@@ -2485,6 +3364,8 @@ Top action row:
   - `flex flex-row justify-start px-2 py-1`
 - clear button testid:
   - `clear-logs-button`
+- clear action path:
+  - `useCellActions().clearLogs`
 
 Log viewer:
 
@@ -2494,11 +3375,33 @@ Log viewer:
   - `grid text-xs font-mono gap-1 whitespace-break-spaces font-semibold align-left`
 - inner grid class:
   - `grid grid-cols-[30px_1fr]`
+- row wrapper:
+  - `div.contents.group`
+- line-number class:
+  - `text-right col-span-1 py-1 pr-1`
+- message cell class:
+  - `px-2 flex gap-x-1.5 py-1 flex-wrap`
+- hover token:
+  - `opacity-70 group-hover:bg-(--gray-3) group-hover:opacity-100`
 
 Log row state colors:
 
 - `stdout -> text-(--grass-9)`
 - `stderr -> text-(--red-9)`
+
+Rendered log fragment order:
+
+- timestamp:
+  - `[${formatLogTimestamp(log.timestamp)}]`
+  - class `shrink-0 text-(--gray-10) dark:text-(--gray-11)`
+- level:
+  - `log.level.toUpperCase()`
+  - class `shrink-0`
+- cell link wrapper:
+  - `(<CellLink cellId={log.cellId} />)`
+  - class `shrink-0 text-(--gray-10)`
+- message:
+  - raw `log.message`
 
 #### 5.3.6 Terminal Panel Body
 
@@ -3019,6 +3922,100 @@ AI button contract:
   - `isAiButtonOpenActions.toggle`
 - click when AI is disabled:
   - `handleClick("ai", "ai-providers")`
+
+Open AI composer contract:
+
+- source component:
+  - `AddCellWithAI`
+- root class:
+  - `flex flex-col w-full py-2`
+- persistent language storage:
+  - atom key `marimo:ai-language`
+  - values `"python" | "sql"`
+- prompt history storage:
+  - local-storage key `marimo:ai-prompt-history`
+- staged-cell pre-submit behavior:
+  - stores prompt history from `inputRef.current.view` when present
+  - always calls `deleteAllStagedCells()` before sending a new request
+- submit payload:
+  - `sendMessage({ text: input, files: fileParts })`
+- loading predicate:
+  - `status === "streaming" || status === "submitted"`
+- completion predicate:
+  - `stagedAICells.size > 0`
+- current model fallback:
+  - `ai.models.edit_model ?? DEFAULT_AI_MODEL`
+- attachment-support gate:
+  - only true when `PROVIDERS_THAT_SUPPORT_ATTACHMENTS` contains the current provider id
+
+Composer input row:
+
+- wrapper class:
+  - `flex items-center px-3`
+- leading icon:
+  - `SparklesIcon className="size-4 text-(--blue-11) mr-2"`
+- close button:
+  - `Button variant="text" size="sm" className="mb-0 px-1"`
+  - icon `XIcon className="size-4"`
+- close path:
+  - `deleteAllStagedCells()`
+  - `onClose()`
+
+Composer footer row:
+
+- wrapper class:
+  - `px-3 pt-1 flex flex-row items-center justify-between`
+- left cluster:
+  - `flex items-center gap-2`
+- right cluster:
+  - `flex flex-row items-center`
+- file-pill wrapper when attachments exist:
+  - `flex flex-row gap-1 flex-wrap pr-1`
+- model dropdown props:
+  - `triggerClassName: "h-7 text-xs max-w-64"`
+  - `iconSize: "small"`
+  - `forRole: "edit"`
+  - `showAddCustomModelDocs: true`
+- language trigger:
+  - `DropdownMenuTrigger`
+  - `className: "flex items-center justify-between h-7 text-xs px-2 py-0.5 border rounded-md hover:text-accent-foreground"`
+  - `data-testid="language-button"`
+- language menu heading:
+  - `Select language`
+- language options:
+  - `Python`
+  - `SQL`
+- accept-completion path:
+  - `clearStagedCells()`
+  - `onClose()`
+- decline-completion path:
+  - `deleteAllStagedCells()`
+
+`PromptInput` contract inside `AddCellWithAI`:
+
+- primitive:
+  - `ReactCodeMirror`
+- wrapper class:
+  - `flex-1 font-sans overflow-auto my-1`
+- width:
+  - `100%`
+- theme:
+  - `"dark"` when `useTheme().theme === "dark"`, otherwise `"light"`
+- default placeholder:
+  - `Generate with AI, @ to include context`
+- extensions include:
+  - `autocompletion({})`
+  - `markdown()`
+  - `resourceExtension(...)`
+  - prompt-history storage backed by `ZodLocalStorage`
+  - `EditorView.lineWrapping`
+  - `minimalSetup()`
+- enter-key contract:
+  - `Enter` with no meta or ctrl or shift submits
+  - `Shift+Enter` inserts a newline manually
+  - `Escape` closes the composer
+- extra completion hook:
+  - `mentionsCompletionSource(...)` via `additionalCompletions`
 
 Open-state visibility rule:
 
@@ -3559,10 +4556,14 @@ Preview or hide-code button:
 
 Command palette button:
 
+- source component:
+  - `.__marimo_upstream/frontend/src/components/editor/controls/command-palette-button.tsx`
 - `data-testid="command-palette-button"`
 - shape `rectangle`
 - color `hint-green`
 - tooltip comes from `renderShortcut("global.commandPalette")`
+- click path:
+  - `setCommandPaletteOpen((value) => !value)`
 - icon size:
   - `18`
 - stroke width:
@@ -3612,7 +4613,7 @@ Interrupt button:
 - inactive class add:
   - `inactive-button active:shadow-xs-solid`
 - inactive click handler:
-  - `kr.NOOP`
+  - `Functions.NOOP`
 - icon:
   - `SquareIcon`
   - size `16`
@@ -3624,6 +4625,7 @@ Source:
 
 - `.__marimo_upstream/frontend/src/components/app-config/app-config-button.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/controls/shutdown-button.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/actions/useConfigActions.tsx`
 
 App config button contract:
 
@@ -3778,7 +4780,7 @@ Recovery dialog strings and hooks:
   - `data-testid="download-recovery-button"`
   - label `Download`
 
-#### 7.5 Floating Staged Delete Recovery Bar
+#### 7.5 Floating Pending AI Cells Bar
 
 Source:
 
@@ -3788,6 +4790,8 @@ Source:
 
 Render gate and ownership:
 
+- source component:
+  - `PendingAICells`
 - reads staged-cell map from `stagedAICellsAtom`
 - returns `null` when `stagedAiCells.size === 0`
 - mounted by `app-chrome.tsx` as a floating overlay sibling inside the chrome wrapper
@@ -3840,7 +4844,7 @@ Pending-count navigator:
   - when selected index is `null`:
     - `${ids.length} pending`
   - otherwise:
-    - `${selectedIndex + 1} / ${ids.length}`
+    - `${currentIndex + 1} / ${ids.length}`
 - down button:
   - `Button`
   - `variant: "ghost"`
@@ -3861,7 +4865,7 @@ Accept control branch:
 
 - source call:
   - `AcceptCompletionButton`
-- props from `Rh`:
+- props passed from `PendingAICells`:
   - `multipleCompletions: true`
   - `onAccept: acceptAll`
   - `isLoading: false`
@@ -3898,7 +4902,7 @@ Reject control branch:
 
 - source call:
   - `RejectCompletionButton`
-- props from `Rh`:
+- props passed from `PendingAICells`:
   - `multipleCompletions: true`
   - `onDecline: rejectAll`
   - `size: "xs"`
@@ -5491,7 +6495,7 @@ Setting rows:
     - `Whether to automatically run dependent cells after running a cell`
 - `runtime.auto_reload`
   - row name `runtime.auto_reload`
-  - hidden in notebook app mode
+  - hidden when `isWasm()` is true
   - title `On module change`
   - subtitle `off`, `lazy`, or `autorun`
   - outer wrapper:
@@ -5511,6 +6515,10 @@ Setting rows:
     - text `✓`
   - tooltip:
     - `Whether to run affected cells, mark them as stale, or do nothing when an external module is updated`
+  - save path:
+    - `saveUserConfig({ config: { runtime: { auto_reload: option } } })`
+  - local merge path:
+    - `setUserConfig(prev => ({ ...prev, runtime: { ...prev.runtime, auto_reload: option } }))`
 
 #### 10.4 Footer Middle and Right Cluster
 
@@ -6209,7 +7217,7 @@ The marimo edit UI exposed by the traced sources is composed of these visible re
 - notebook menu inventory and nested action trees
 - bottom-right run and command controls
 - multi-cell selection toolbar and pending-delete confirmation bar
-- bottom-center staged delete recovery bar
+- bottom-center pending AI cells bar
 - command palette overlay
 - notebook settings popover and user settings dialog
 - shutdown confirm dialog
@@ -6225,7 +7233,7 @@ The marimo edit UI exposed by the traced sources is composed of these visible re
 - the PRD source of truth has been shifted from installed `_static` chunks to upstream React or TS source under `.__marimo_upstream/frontend/src/...` wherever those files are now traced
 - button primitives, button color variants, resize-handle CSS, filename hover and missing-filename shadows, bottom-right stack order, notebook menu inventory, and cell action dropdown group order are fixed from source
 - app config popover, notebook settings form fields, user settings package manager field, share static notebook dialog, notebook menu footer, duplicate prompt, save or recovery filename flows, package install alert widgets, usage stats widgets, backend or LSP health, Copilot or AI or RTC footer states, footer item primitive, and console hover or stdin shell are now documented from upstream source instead of bundle reconstruction
-- reorderable rail primitive, feedback modal shell, backend health button class, exact backend or LSP status strings, floating staged delete recovery bar, and command palette overlay shell are now documented from source instead of inferred from screenshots
+- reorderable rail primitive, feedback modal shell, backend health button class, exact backend or LSP status strings, floating pending AI cells bar, and command palette overlay shell are now documented from source instead of inferred from screenshots
 - helper sidebar `files`, `variables or data sources`, `dependencies`, `documentation`, `outline`, `packages`, `snippets`, and `AI chat or agents` panel bodies are now documented from source instead of inferred from screenshots
 - developer panel `errors`, `scratchpad`, `tracing`, `secrets`, `logs`, `terminal`, and `cache` panel bodies are now documented from source instead of inferred from screenshots
 - `write-secret-modal`, AI chat message-row and attachment shells, agent notification block registry, connection-change and error cards, plan or thought blocks, resource popovers, and tool-call accordions are now documented from source instead of inferred from screenshots
@@ -6241,6 +7249,14 @@ The marimo edit UI exposed by the traced sources is composed of these visible re
 - feedback dialog now documents its current source reality: informational prose only, fire-and-forget submit transport, and no rendered rating or message controls despite the submit handler reading both keys
 - share static notebook dialog now documents URL derivation, copy-button tooltip lifecycle, and the source fallthrough where an upload error toast is followed by the success toast in the same handler
 - shutdown and save or recovery flows now document `isWasm()` shutdown hiding, destructive confirm action wiring, delayed `window.close()`, `beforeunload` protection, `format_on_save`, empty-notebook save guard, and the exact serialized save payload keys
+- variables panel mount ownership is now documented, including the fact that visible chrome mounts `session-panel.tsx` rather than the standalone `variable-panel.tsx`
+- AI chat and agent sections now document nested visible widgets such as history popover rows, reasoning accordion, footer action buttons, session tabs, agent selector dropdown branches, model selector, agent docs cards, scroll-to-bottom button, and tool-call accordion status branches
+- AI chat header/footer controls now also document `MCPStatusIndicator` and the nested `AIModelDropdown` provider/model menu branches from source
+- AI message rendering and agent common primitives now also document `renderUIMessage` part mapping, `ConnectionStatus` badge branches, `PermissionRequest`, shared accordion shell, and `ReadyToChatBlock`
+- helper sidebar panel primitives are now documented centrally, including `PanelAccordionItem`, `PanelAccordionTrigger`, `PanelAccordionContent`, `PanelBadge`, and `PanelEmptyState`
+- documentation and outline panels now document `documentationAtom` render flow, `OutlineList` row classes, floating outline slide-in shell, minimap glyph sizing, and active-header observer behavior
+- packages and logs panels now document install-form atom handoff, package action buttons, dependency-tree keyboard/aria behavior, and log row fragment formatting from source
+- Codaro shipped product now treats the documentation slot as an explicit fork point: shell parity remains, but the rendered product panel is `Context Help` and external landing links rather than a full in-app docs viewer
 
 #### 12.2 Next Action
 
@@ -6248,6 +7264,7 @@ The marimo edit UI exposed by the traced sources is composed of these visible re
 - continue turning modal shells, popover content, and block-level renderer branches into upstream-file-backed PRD entries until no visible marimo surface remains only inventory-level documented
 - keep the PRD source-backed and docs-only for now; implementation port starts only after visible marimo frontend coverage is complete
 - after PRD completion, port each contract into Codaro Svelte without vendor import fallback
+- keep documenting Codaro fork points explicitly whenever shipped product behavior intentionally diverges from marimo source, starting with the documentation slot -> `Context Help`
 
 #### 12.3 Verification Left
 
@@ -6256,11 +7273,12 @@ The marimo edit UI exposed by the traced sources is composed of these visible re
 - confirm Codaro implementation uses the same split between notebook action buttons and text buttons
 - confirm filename bar hover, stale shadow, and rounded radius match these tokens exactly
 - confirm top-right row, notebook menu nested dropdowns, and bottom-right stack use the documented ownership split and state colors
-- confirm the floating staged delete recovery bar matches source wrapper tokens, count text, and accept or reject button shells
+- confirm the floating pending AI cells bar matches source wrapper tokens, count text, and accept or reject button shells
 - confirm the multi-cell selection toolbar matches source overlay class, primary action group order, overflow dropdown rows, and pending-delete confirmation flow
 - confirm the command palette overlay matches source dialog shell, cmdk attributes, group headings, and placeholder or empty strings
 - confirm the column footer add-cell strip matches source wrapper, hover reveal gate, button token, `createNewCell` payloads, AI tooltip, and `AddCellWithAI` open branch
 - confirm helper sidebar `files`, `variables or data sources`, `dependencies`, `documentation`, `outline`, `packages`, `snippets`, and `AI` panel bodies match the documented section shells, toolbar buttons, search placeholders, empty states, and split layouts
+- confirm shipped Codaro keeps the documented shell parity while routing the documentation slot to `Context Help` and public landing links instead of an embedded docs browser
 - confirm helper sidebar `files` body also matches prompt titles, delete dialog copy, duplicate naming rule, upload toasts, drag or drop rules, and remote preview metadata layout
 - confirm helper sidebar `files` body also matches selected local file detail lazy body, draft cache, warning banner, editability gates, and save hotkey behavior
 - confirm helper sidebar `dependencies` body also matches graph node creation filters, custom node shell, graph toolbar orientation buttons, settings popover toggles, dagre layout defaults, minimap glyph shifts, focused-row path geometry, node or edge selection panels, and focus-jump behavior
@@ -6288,7 +7306,7 @@ The implementation can only be called `marimo 1:1` when all of the following are
 - settings popover, user settings dialog, feedback dialog, save dialog, recovery dialog, and shutdown dialog all expose the same strings and hooks.
 - notebook menu top-level order, nested dropdown inventories, share-static dialog, and cell action dropdown match the documented source-backed branches.
 - top-right utility row contains only the source-owned controls for that row, and the bottom-right stack owns save, preview, command palette, and run controls with the documented state branches and `data-testid` hooks.
-- the floating staged delete recovery bar and command palette overlay use the documented mount order, classes, labels, and button primitives.
+- the floating pending AI cells bar and command palette overlay use the documented mount order, classes, labels, and button primitives.
 - multi-cell selection toolbar and pending-delete confirmation bar reproduce the documented group order, disabled rules, overlay shells, and destructive confirmation behavior.
 - column footer add-cell strip reproduces the documented reveal gate, text-button token, button order, create payloads, AI tooltip copy, and open-AI replacement branch.
 - footer runtime settings reproduces the same rows, labels, toggles, and visibility rules.
@@ -6303,15 +7321,16 @@ The implementation can only be called `marimo 1:1` when all of the following are
 - [ ] top-level `showChrome=false` branch reproduces `EditApp(hideControls=true)` plus `LazyCommandPalette` sibling mounting without the chrome wrapper.
 - [ ] left rail wrapper, sidebar item shell, feedback item, and queued or running indicator match source.
 - [ ] helper sidebar id, testid, resize behavior, header, and special `Dependencies` and `AI` header branches match source.
+- [ ] helper sidebar common primitives match source `PanelAccordionItem`, `PanelAccordionTrigger`, `PanelAccordionContent`, `PanelBadge`, and `PanelEmptyState` contracts.
 - [ ] helper sidebar `files` panel body matches source top-level branches, toolbar order, testids, drag overlay, tree row menu inventory, and remote storage shells.
 - [ ] helper sidebar `files` panel body matches source prompt titles, delete dialog copy, duplicate naming rule, upload toasts, drag or drop gates, and remote preview metadata shell.
-- [ ] helper sidebar `variables` or `data sources` panel matches source accordion sections, search bars, empty states, variable table columns, and add-table affordances.
+- [ ] helper sidebar `variables` or `data sources` panel matches source visible mount ownership, accordion storage state, auto-open rule, search bars, empty states, variable table columns, and add-table affordances.
 - [ ] helper sidebar `dependencies` panel matches source minimap and graph branch shells, minimap row button classes, graph fit-view overlay, and `Jump to focused cell` affordance.
 - [ ] helper sidebar `dependencies` panel matches source graph toolbar, settings toggles, selection panel shells, minimap relation glyph shifts, and focus-on-double-click behavior.
-- [ ] helper sidebar `documentation`, `outline`, `packages`, and `snippets` panels match source empty states, search or split layouts, header or toolbar shells, and action labels.
-- [ ] helper sidebar `AI` panel matches source `chat` and `agents` bodies, header rows, history popover, prompt shells, mode selectors, message-row alignment, attachment shells, loading states, stop or retry controls, and agent notification blocks.
+- [ ] helper sidebar `documentation`, `outline`, `packages`, and `snippets` panels match source empty states, `documentationAtom` render flow, `OutlineList` row classes, floating outline shell, minimap glyph sizing, install-form atom handoff, dependency-tree keyboard/aria behavior, search or split layouts, header or toolbar shells, and action labels.
+- [ ] helper sidebar `AI` panel matches source `chat` and `agents` bodies, `renderUIMessage` part mapping, header rows, `MCPStatusIndicator`, history popover rows, reasoning accordion, prompt shells, `AIModelDropdown`, mode selectors, model selector, footer action buttons, session tabs, agent selector dropdown branches, `ConnectionStatus`, `PermissionRequest`, shared accordion shell, agent docs cards, scroll-to-bottom button, loading states, stop or retry controls, tool-call accordion states, and agent notification blocks.
 - [ ] developer panel id, testid, resize behavior, reorderable tabs, backend health, and LSP health match source.
-- [ ] developer panel `errors`, `scratchpad`, `tracing`, `secrets`, `logs`, `terminal`, and `cache` bodies match source empty states, toolbars, split layouts, action strings, and the `Add Secret` modal contract.
+- [ ] developer panel `errors`, `scratchpad`, `tracing`, `secrets`, `logs`, `terminal`, and `cache` bodies match source empty states, toolbars, split layouts, log row formatting, action strings, and the `Add Secret` modal contract.
 - [ ] filename bar shell, cmdk root, list wrapper, input row, input class, hover shadow, and input testids match source.
 - [ ] banner stack and stdin waiting banner match source strings and placement.
 - [ ] column footer creation strip reproduces the reveal gate, `Python`, `Markdown`, `SQL`, and `Generate with AI` button order, wrapper tokens, `createNewCell` payloads, AI tooltip copy, and `AddCellWithAI` open branch.
@@ -6321,7 +7340,7 @@ The implementation can only be called `marimo 1:1` when all of the following are
 - [ ] bottom-right stack reproduces save, preview, command palette, `KeyboardShortcuts`, spacer, undo delete, run, and interrupt branches in the documented order.
 - [ ] shutdown button matches source `isWasm()` hidden gate, tooltip wrapper, destructive confirm action, `Confirm Shutdown` aria-label, and delayed `window.close()` shutdown path.
 - [ ] multi-cell selection toolbar reproduces the overlay shell, selected-count label, primary action groups, overflow dropdown rows, selection-clear listener, and pending-delete confirmation bar.
-- [ ] floating staged delete recovery bar reproduces the center-bottom wrapper, pending counter, ghost up or down buttons, divider, and accept or reject controls.
+- [ ] floating pending AI cells bar reproduces the center-bottom wrapper, pending counter, ghost up or down buttons, divider, and accept or reject controls.
 - [ ] notebook action button primitive and text button primitive match their source class contracts and color variants.
 - [ ] command palette overlay matches the source dialog wrapper, command root class, input wrapper, list or group shells, empty state, and `cmdk-*` attribute contract.
 - [ ] footer item primitive matches `FooterItem` base class, selected state, top-side tooltip behavior, and forwarded-ref `div` root contract.

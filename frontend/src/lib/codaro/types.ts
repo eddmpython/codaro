@@ -49,6 +49,26 @@ export interface VariableInfo {
   size?: number | null;
 }
 
+export interface ContextHelpAction {
+  label: string;
+  description: string;
+  shortcut?: string;
+}
+
+export interface ContextHelpDocLink {
+  label: string;
+  href: string;
+}
+
+export interface ContextHelpEntry {
+  id: string;
+  title: string;
+  summary: string;
+  when: string;
+  actions: ContextHelpAction[];
+  docLinks: ContextHelpDocLink[];
+}
+
 export interface EngineExecutionResult {
   type: string;
   blockId?: string | null;

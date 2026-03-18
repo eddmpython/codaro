@@ -20,11 +20,6 @@ The long-term product path is a managed launcher:
 - managed frontend assets
 - automatic update and rollback
 
-The internal source of truth for that work is:
-
-- `launcher/PRD.md`
-- `launcher/PACKAGING.md`
-
 ## Developer install
 
 Today, local development uses `uv` for Python environment and execution.

@@ -97,6 +97,10 @@
 - package install/list/uninstall은 프로젝트 루트 `.venv`를 기준으로 동작한다
 - 제품 배포 기준 source of truth는 장기적으로 `launcher/PRD.md`가 맡는다
 - public docs/blog/search는 `landing/` static build로 배포한다
+- editor surface는 full docs browser를 내장하지 않는다
+  - IDE 안에는 `Context Help`만 둔다
+  - 장문 docs/blog/search는 항상 `landing/` public site로 연다
+- `curriculum`과 `learning-spec`은 학습 runtime 계약이지 generic docs browsing API가 아니다
 - 서버 시작 시 frontend 자산 준비 상태, workspace root, content root, document path를 터미널에 출력한다
 - CLI 로그는 명령 정규화 결과, 모드, URL, 브라우저 오픈 여부를 기록한다
 - 기본 로그는 제품 모드 기준으로 조용해야 한다

@@ -2,7 +2,7 @@ import { error } from "@sveltejs/kit";
 import { docsPages, docsSections } from "$lib/generated/docsNav";
 
 export function entries() {
-  return docsPages.map((page) => ({ slug: page.slugSegments }));
+  return docsPages.map((page) => ({ slug: page.slugSegments.join("/") }));
 }
 
 export function load({ params }) {

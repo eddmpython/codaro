@@ -8,12 +8,19 @@
 이번 재구축은 감으로 새 UI를 만드는 작업이 아니다.
 먼저 설치된 `marimo`를 기준선으로 정확히 재현하고, 그 다음에 Codaro의 우위를 쌓는다.
 
+단, 문서 surface는 Codaro 제품 의도로 분기한다.
+- notebook chrome parity는 계속 유지한다
+- shipped product는 marimo의 full documentation panel을 그대로 싣지 않는다
+- helper sidebar의 해당 slot은 `Context Help`로 대체한다
+- 장문 docs/blog/search는 항상 `landing/` public site에서 연다
+
 ## 현재 상태
 
 - `frontend/`는 다시 복구되었고 `src/codaro/webBuild/`로 빌드된다
 - notebook shell은 설치된 `marimo` 정적 자산을 직접 벤더링해서 맞춘다
 - 벤더 경로는 `frontend/src/lib/vendor/marimo/assets/`다
 - 재구축의 기준선은 `eddmlab`이 아니라 프로젝트 `.venv`에 설치된 `marimo`다
+- IDE 안의 문서 surface는 full docs viewer가 아니라 compact `Context Help`로 고정한다
 
 ## 절대 규칙
 
@@ -67,6 +74,14 @@ Codaro의 실행 원칙은 그대로 유지한다.
 - engine adapter
 - workspace home
 - app mode
+
+### 6. parity와 제품 fork point를 같이 기록한다
+
+- `frontend/PRD.md`는 marimo source trace를 계속 유지한다
+- Codaro shipped product가 의도적으로 갈라지는 지점도 같은 문서에 함께 적는다
+- 현재 확정 fork point는 문서 surface다
+  - marimo source의 `documentation` panel trace는 남긴다
+  - Codaro 구현은 `Context Help`만 싣고 public docs는 외부로 연다
 
 ## Codaro 백엔드 경계
 
@@ -138,7 +153,7 @@ parity 이후에만 아래를 붙인다.
 | Notebook shell | `_static/` notebook chrome | 별도 영웅 섹션 없이 notebook 표면부터 시작 |
 | Cell frame | marimo cell rhythm | block id와 execution 상태를 가진 셀 프레임 |
 | Output area | `Html` 출력 흐름 | 서버 커널 결과와 Pyodide 결과를 같은 shape로 렌더 |
-| Sidebar chrome | `mo.sidebar`와 notebook side panels | parity 후 Codaro panel만 추가 |
+| Sidebar chrome | `mo.sidebar`와 notebook side panels | shell parity는 유지하되 문서 surface는 `Context Help`로 fork |
 
 ### Layout / Output
 
@@ -278,3 +293,23 @@ frontend/
 반드시 순서는 아래다.
 
 `marimo parity -> Codaro adapter -> Codaro advantage`
+
+## Current State
+
+- helper sidebar의 `documentation` slot은 shipped product에서 `Context Help`로 대체됐다
+- `Context Help` 데이터는 프론트 로컬 registry `frontend/src/lib/codaro/contextHelp.ts`가 만든다
+- IDE 안의 docs 링크는 in-app viewer가 아니라 public `landing` URL을 연다
+- `F1`은 `Context Help`, `Ctrl/Cmd+S`는 저장으로 연결됐다
+- curriculum/runtime surface는 그대로 유지되고 generic docs backend API는 추가하지 않았다
+
+## Next Action
+
+- `Context Help`를 현재 block type, runtime error, selected tool 기준으로 더 세밀하게 확장한다
+- command palette나 future toolbar help 액션이 생기면 전부 public `landing` 링크로만 연결한다
+- marimo parity 작업에서는 문서 slot을 계속 fork point로 명시한다
+
+## Verification Left
+
+- editor 실사용에서 `Context Help` 문구 밀도와 링크 구성이 과하거나 부족하지 않은지 본다
+- future helper panels가 추가될 때 full docs viewer가 다시 들어오지 않게 panel registry를 계속 점검한다
+- command palette/help affordance가 들어오면 embedded docs browser가 아니라 external docs open으로 유지되는지 확인한다

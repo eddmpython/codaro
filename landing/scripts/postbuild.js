@@ -1,4 +1,4 @@
-import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -71,7 +71,9 @@ writeFileSync(
 
 const docsIndexPath = resolve(buildRoot, "docs", "index.html");
 mkdirSync(dirname(docsIndexPath), { recursive: true });
-const docsIndex = readFileSync(docsIndexPath, "utf-8");
+const docsHtmlPath = resolve(buildRoot, "docs.html");
+const docsSourcePath = existsSync(docsIndexPath) ? docsIndexPath : docsHtmlPath;
+const docsIndex = existsSync(docsSourcePath) ? readFileSync(docsSourcePath, "utf-8") : "";
 if (!docsIndex.includes("http-equiv=\"refresh\"")) {
   const target = `${siteUrl}/docs/getting-started/installation`;
   writeFileSync(
