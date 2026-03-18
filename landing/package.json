@@ -1,0 +1,28 @@
+{
+  "name": "codaro-landing",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "scripts": {
+    "dev": "vite dev",
+    "prebuild": "node scripts/syncBrand.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js",
+    "build": "vite build",
+    "postbuild": "node scripts/postbuild.js",
+    "prepare": "svelte-kit sync || echo ''",
+    "check": "node scripts/syncBrand.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/kit": "^2.50.2",
+    "@sveltejs/vite-plugin-svelte": "^6.2.4",
+    "svelte": "^5.51.0",
+    "svelte-check": "^4.4.2",
+    "vite": "^7.3.1"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "lucide-svelte": "^0.575.0",
+    "marked": "^16.4.1"
+  }
+}

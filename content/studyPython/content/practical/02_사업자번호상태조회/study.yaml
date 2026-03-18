@@ -1,0 +1,640 @@
+meta:
+  title: 사업자번호 상태조회
+  practical: true
+  appPath: 02_사업자번호상태조회
+  category: API활용
+  tags: [사업자번호, 국세청API, requests, 공공데이터, REST API, 내부회계관리]
+
+intro:
+  emoji: "🏢"
+  title: 사업자번호 상태조회
+  goal: "국세청 공공데이터 API를 활용해 사업자등록번호의 휴폐업 상태를 조회합니다."
+  description: "거래처의 휴폐업 상태를 확인하는 것은 내부회계관리제도의 중요 통제항목입니다. 별거 아닌 것 같지만, 폐업한 업체에 대금을 지급하거나 허위 거래를 만드는 부정을 방지하는 핵심 통제입니다. 홈택스에 하나씩 입력하는 대신, Python과 공공데이터 API를 활용하면 수백 개의 사업자번호를 한 번에 조회할 수 있습니다."
+  prerequisites:
+    - text: "딕셔너리 기초"
+      url: "/study/30days/day11_딕셔너리기초"
+    - text: "반복문"
+      url: "/study/30days/day14_반복문"
+    - text: "함수 기초"
+      url: "/study/30days/day15_함수기초"
+
+sections:
+  - id: whatWeWillDo
+    title: 뭘 만들 건가요?
+    subtitle: 사업자번호 상태를 한 번에 조회하는 도구
+    blocks:
+    - type: text
+      content: "거래처 100곳의 사업자번호를 확인해야 한다면? 홈택스에 하나씩 입력하시겠습니까? Python과 공공데이터 API를 활용하면 몇 초 만에 모든 결과를 받아볼 수 있습니다."
+
+    - type: compare
+      left:
+        icon: "😫"
+        title: 수작업
+        subtitle: 매번 반복
+        items:
+          - "홈택스 접속 → 번호 입력 → 조회"
+          - "100개면 2시간 이상"
+          - "복사 붙여넣기 실수 가능"
+      right:
+        icon: "🚀"
+        title: API 자동화
+        subtitle: 한 번 만들면 끝
+        items:
+          - "사업자번호 붙여넣기 → 실행"
+          - "100개도 3초"
+          - "정확한 결과 보장"
+
+  - id: whyImportant
+    title: 왜 중요한가요?
+    subtitle: 내부회계관리제도와 부정 방지
+    blocks:
+    - type: text
+      content: "휴폐업 상태 확인은 단순한 절차가 아닙니다. <b>내부회계관리제도</b>에서 요구하는 중요 통제항목 중 하나입니다. 폐업한 업체와의 거래는 다음과 같은 부정의 단서가 될 수 있습니다."
+
+    - type: text
+      content: "<b>가공거래</b>: 실제로 거래하지 않은 폐업 업체에 허위 매출/매입을 기록<br><b>횡령</b>: 폐업 업체 명의로 대금을 지급하고 착복<br><b>세금계산서 위장</b>: 폐업 업체의 사업자번호로 허위 세금계산서 발행"
+
+    - type: tip
+      content: "감사에서 거래처 휴폐업 확인은 기본 절차입니다. 자동화해두면 정기적으로 전수 검사할 수 있습니다."
+
+  - id: apiRegistration
+    title: API 신청하기
+    subtitle: 공공데이터포털에서 서비스키 발급받기
+    blocks:
+    - type: text
+      content: "국세청 사업자등록정보 API를 사용하려면 먼저 공공데이터포털에서 서비스키를 발급받아야 합니다. 무료이며, 신청 후 바로 사용할 수 있습니다."
+
+    - type: text
+      content: "<b>1단계: 공공데이터포털 접속</b><br><a href='https://www.data.go.kr' target='_blank'>https://www.data.go.kr</a>에 접속해서 회원가입 후 로그인합니다."
+
+    - type: text
+      content: "<b>2단계: API 검색</b><br>검색창에 '국세청 사업자등록정보'를 입력하고, '국세청_사업자등록정보 진위확인 및 상태조회 서비스'를 찾습니다."
+
+    - type: text
+      content: "<b>3단계: 활용신청</b><br>'활용신청' 버튼을 클릭하고, 활용목적을 간단히 작성합니다. (예: 거래처 관리)"
+
+    - type: text
+      content: "<b>4단계: 서비스키 확인</b><br>마이페이지 → 데이터활용 → 오픈API → 신청한 서비스에서 '일반 인증키(Encoding)'를 복사합니다."
+
+    - type: tip
+      content: "서비스키는 URL 인코딩된 상태(%2B, %2F 등)로 제공됩니다. 그대로 사용하면 됩니다."
+
+  - id: marimoImport
+    title: marimo 임포트
+    subtitle: 노트북 UI를 만드는 라이브러리
+    blocks:
+    - type: text
+      content: "marimo는 Python으로 인터랙티브 웹 애플리케이션을 만드는 노트북 라이브러리입니다. Jupyter와 비슷하지만 셀 간 의존성을 자동으로 관리하고, 웹앱으로 바로 배포할 수 있다는 장점이 있습니다. mo.ui.radio()로 라디오 버튼을, mo.ui.file()로 파일 업로드 UI를 만들 수 있고, 이 앱에서 사용하는 모든 mo. 함수는 marimo 라이브러리에서 제공됩니다."
+
+    - type: code
+      title: marimo 불러오기
+      content: |-
+        import marimo as mo
+
+    - type: tip
+      content: "as mo로 별명을 붙여서 mo.ui.radio() 처럼 짧게 사용합니다."
+
+  - id: libraryImport
+    title: 라이브러리 임포트
+    subtitle: API 호출과 데이터 처리에 필요한 도구들
+    blocks:
+    - type: text
+      content: "이 앱에서 사용하는 라이브러리들을 불러옵니다. 각각의 역할을 이해하면 다른 API 연동에도 활용할 수 있습니다."
+
+    - type: text
+      content: "<b>pandas</b>: 표 형태 데이터(DataFrame) 처리. API 응답을 테이블로 변환하고 엑셀로 내보냅니다.<br><b>requests</b>: HTTP 요청 라이브러리. API 서버에 POST 요청을 보내고 응답을 받습니다.<br><b>json</b>: JSON 형식 변환. 딕셔너리를 JSON 문자열로, JSON을 딕셔너리로 변환합니다.<br><b>re</b>: 정규표현식. 사업자번호에서 하이픈, 공백 등을 제거해 숫자만 추출합니다.<br><b>BytesIO</b>: 메모리 파일 처리. 업로드된 파일이나 생성된 엑셀을 메모리에서 처리합니다."
+
+    - type: code
+      title: 라이브러리 불러오기
+      content: |-
+        import pandas as pd
+        import requests
+        import json
+        import re
+        from io import BytesIO
+
+    - type: tip
+      content: "requests는 pip install requests로 설치합니다. 나머지는 Python 기본 또는 표준 라이브러리입니다."
+
+  - id: apiConfig
+    title: API 설정
+    subtitle: 서비스키와 URL 구성
+    blocks:
+    - type: text
+      content: "발급받은 서비스키로 API URL을 구성합니다. 공공데이터 API가 점검 중일 때를 대비해 공지사항 URL도 함께 정의합니다."
+
+    - type: text
+      content: "<b>NTS_BIZ_STATUS_KEY</b>: 공공데이터포털에서 발급받은 서비스키입니다. URL 인코딩된 상태로 사용합니다.<br><b>URL</b>: 국세청 사업자등록정보 상태조회 API 엔드포인트입니다. serviceKey와 returnType=JSON을 쿼리스트링으로 포함합니다.<br><b>NOTICE_URL</b>: API 오류 시 사용자가 공지사항을 확인할 수 있는 링크입니다."
+
+    - type: code
+      title: API URL 설정
+      content: |-
+        NTS_BIZ_STATUS_KEY = "발급받은_서비스키"
+        URL = f"https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey={NTS_BIZ_STATUS_KEY}&returnType=JSON"
+        NOTICE_URL = "https://www.data.go.kr/bbs/ntc/selectNoticeListView.do?pageIndex=1&originId=&atchFileId=&nttApiYn=Y&searchCondition2=2&searchKeyword1="
+
+    - type: tip
+      content: "서비스키는 코드에 직접 넣지 말고 환경변수나 별도 파일로 관리하세요. 실수로 GitHub에 올리면 악용될 수 있습니다."
+
+  - id: fetchFunction
+    title: API 호출 함수
+    subtitle: requests로 POST 요청 보내기
+    blocks:
+    - type: text
+      content: "사업자번호 리스트를 받아 국세청 API를 호출하고, 결과를 정리해서 반환하는 함수입니다. 이 함수는 나중에 100개씩 배치 처리할 때 반복 호출됩니다."
+
+    - type: text
+      content: "<b>1단계: 요청 헤더 설정</b><br>Content-Type과 Accept를 application/json으로 설정합니다. '내가 보내는 데이터는 JSON이고, 응답도 JSON으로 달라'는 의미입니다."
+
+    - type: codeDescription
+      content: |-
+        headers = {"Content-Type": "application/json", "Accept": "application/json"}
+
+    - type: text
+      content: "<b>2단계: 요청 바디 구성</b><br>국세청 API는 b_no 키에 사업자번호 리스트를 담아 보내야 합니다. 한 번에 최대 100개까지 가능합니다."
+
+    - type: codeDescription
+      content: |-
+        body = {"b_no": nums}
+
+    - type: text
+      content: "<b>3단계: POST 요청 및 에러 처리</b><br>requests.post()로 요청을 보냅니다. json.dumps()로 딕셔너리를 JSON 문자열로 변환합니다. 응답 코드가 200이 아니면 에러 정보를 반환합니다."
+
+    - type: codeDescription
+      content: |-
+        res = requests.post(URL, data=json.dumps(body), headers=headers)
+        if res.status_code != 200:
+            return [{"사업자번호": n, "상태": "API 오류", "과세유형": f"HTTP {res.status_code}"} for n in nums], res.status_code
+
+    - type: text
+      content: "<b>4단계: 응답 파싱</b><br>res.json()으로 JSON 응답을 딕셔너리로 변환합니다. data 키 안에 각 사업자번호별 결과가 들어있습니다. item.get()은 키가 없을 때 기본값을 반환해 안전합니다."
+
+    - type: codeDescription
+      content: |-
+        data = res.json()
+        out = []
+        for item in data.get("data", []):
+            out.append({
+                "사업자번호": item.get("b_no", ""),
+                "상태": item.get("b_stt", ""),
+                "과세유형": item.get("tax_type", ""),
+            })
+        return out, None
+
+    - type: text
+      content: "<b>완성 코드</b>"
+
+    - type: code
+      title: API 호출 함수
+      content: |-
+        def fetchBizStatus(nums):
+            headers = {"Content-Type": "application/json", "Accept": "application/json"}
+            body = {"b_no": nums}
+
+            res = requests.post(URL, data=json.dumps(body), headers=headers)
+            if res.status_code != 200:
+                return [{"사업자번호": n, "상태": "API 오류", "과세유형": f"HTTP {res.status_code}"} for n in nums], res.status_code
+
+            data = res.json()
+            out = []
+            for item in data.get("data", []):
+                out.append({
+                    "사업자번호": item.get("b_no", ""),
+                    "상태": item.get("b_stt", ""),
+                    "과세유형": item.get("tax_type", ""),
+                })
+            return out, None
+
+    - type: tip
+      content: "b_stt 값: '계속사업자'(정상), '휴업자', '폐업자'. 휴업/폐업이면 거래 시 주의가 필요합니다."
+
+  - id: inputRadio
+    title: 입력 방식 선택
+    subtitle: 라디오 버튼 UI
+    blocks:
+    - type: text
+      content: "사용자가 사업자번호를 입력하는 방식을 선택하는 라디오 버튼입니다. 텍스트, 테이블, 엑셀 세 가지 방식을 제공하고, 선택에 따라 다른 입력 UI를 보여줍니다."
+
+    - type: code
+      title: 라디오 버튼 만들기
+      content: |-
+        selector = mo.ui.radio(
+            options=["텍스트", "테이블", "엑셀"],
+            value="텍스트",
+            inline=True
+        )
+        selector
+
+    - type: tip
+      content: "inline=True로 가로 배치합니다. selector.value로 현재 선택된 값을 가져옵니다."
+
+  - id: inputTextArea
+    title: 텍스트 입력 영역
+    subtitle: 복사-붙여넣기용 텍스트 영역
+    blocks:
+    - type: text
+      content: "mo.ui.text_area()로 여러 줄 텍스트를 입력받습니다. 엑셀에서 사업자번호 열을 복사해서 붙여넣으면 한 줄에 하나씩 입력됩니다. 가장 빠르고 간편한 입력 방식입니다."
+
+    - type: code
+      title: 텍스트 입력 영역 만들기
+      content: |-
+        text = mo.ui.text_area(
+            placeholder="사업자번호를 한 줄에 하나씩 입력하세요\n예시:\n123-45-67890\n1234567890",
+            rows=8,
+            full_width=True
+        )
+        text
+
+    - type: tip
+      content: "text.value로 입력된 전체 텍스트를 가져옵니다. full_width=True로 전체 너비를 사용합니다."
+
+  - id: inputTable
+    title: 테이블 편집기
+    subtitle: 스프레드시트 스타일 입력
+    blocks:
+    - type: text
+      content: "mo.ui.data_editor()는 스프레드시트처럼 편집 가능한 테이블입니다. 빈 DataFrame을 초기값으로 전달합니다. 셀을 클릭해서 입력하고, + 버튼으로 행을 추가합니다. 소량 데이터 직접 입력에 유용합니다."
+
+    - type: code
+      title: 테이블 편집기 만들기
+      content: |-
+        init = pd.DataFrame({"사업자번호": [""]})
+        table = mo.ui.data_editor(data=init)
+        table
+
+    - type: tip
+      content: "table.value로 편집된 DataFrame을 가져옵니다. + 버튼으로 행을 추가할 수 있습니다."
+
+  - id: inputFile
+    title: 파일 업로드
+    subtitle: 엑셀/CSV 파일 업로드
+    blocks:
+    - type: text
+      content: "mo.ui.file()은 파일 업로드 UI입니다. filetypes로 허용 확장자를, kind='area'로 드래그 앤 드롭 영역을 생성합니다. 대량 데이터는 엑셀 파일로 업로드하는 것이 편리합니다."
+
+    - type: code
+      title: 파일 업로드 영역 만들기
+      content: |-
+        file = mo.ui.file(
+            filetypes=[".xlsx", ".xls", ".csv"],
+            multiple=False,
+            kind="area",
+            label="엑셀/CSV 파일 (첫 번째 열 사용)"
+        )
+        file
+
+    - type: tip
+      content: "file.contents(0)으로 바이트 데이터를, file.name(0)으로 파일명을 가져옵니다."
+
+  - id: inputButton
+    title: 조회 버튼
+    subtitle: 실행 버튼
+    blocks:
+    - type: text
+      content: "mo.ui.run_button()은 클릭하면 True가 되는 버튼입니다. btn.value가 True일 때만 조회 로직이 실행됩니다. 텍스트가 바뀔 때마다 자동 실행되지 않고, 버튼을 눌러야 조회됩니다."
+
+    - type: code
+      title: 조회 버튼 만들기
+      content: |-
+        btn = mo.ui.run_button(label="조회하기")
+        btn
+
+    - type: tip
+      content: "btn.value가 True면 버튼이 클릭된 상태입니다. mo.stop(not btn.value, ...)으로 클릭 전에는 실행을 중단합니다."
+
+  - id: uiLayout
+    title: UI 배치
+    subtitle: vstack과 hstack으로 레이아웃
+    blocks:
+    - type: text
+      content: "앞에서 만든 UI 컴포넌트들을 화면에 배치합니다. 선택된 입력 방식에 따라 다른 UI를 보여주고, 라디오 버튼 옆에 설명을, 하단에 조회 버튼을 배치합니다."
+
+    - type: code
+      title: UI 배치
+      content: |-
+        desc = {
+            "텍스트": "한 줄에 하나씩 입력. 하이픈(-) 포함 가능.",
+            "테이블": "셀 클릭해서 입력. 행 추가는 + 버튼.",
+            "엑셀": "첫 번째 열에 사업자번호가 있는 파일."
+        }
+
+        area = text if selector.value == "텍스트" else (table if selector.value == "테이블" else file)
+
+        mo.vstack([
+            mo.hstack([selector, mo.md(f"<span style='color:#71717a; font-size:0.85rem;'>{desc[selector.value]}</span>")], align="center", gap="1rem"),
+            area,
+            mo.hstack([btn], justify="end")
+        ])
+
+    - type: tip
+      content: "vstack은 수직, hstack은 수평 배치입니다. 삼항 연산자로 선택된 방식에 맞는 UI를 보여줍니다."
+
+  - id: dataProcessing
+    title: 사업자번호 정제
+    subtitle: 정규표현식으로 숫자만 추출
+    blocks:
+    - type: text
+      content: "입력된 사업자번호를 API가 받을 수 있는 형태로 정제합니다. 사업자번호는 123-45-67890처럼 하이픈이 있거나 공백이 섞여 있을 수 있는데, API는 순수 숫자 10자리만 받습니다."
+
+    - type: text
+      content: "<b>1단계: 버튼 클릭 확인</b><br>mo.stop()은 조건이 True면 셀 실행을 중단합니다. 버튼을 누르지 않았으면 아무것도 하지 않습니다."
+
+    - type: codeDescription
+      content: |-
+        mo.stop(not btn.value, mo.md(""))
+        nums = []
+
+    - type: text
+      content: "<b>2단계: 텍스트 입력 처리</b><br>줄바꿈(\\n)으로 분리하고, 각 줄에서 re.sub()로 숫자가 아닌 문자를 모두 제거합니다. 결과가 10자리면 유효한 사업자번호입니다."
+
+    - type: codeDescription
+      content: |-
+        if selector.value == "텍스트":
+            if text.value:
+                for line in text.value.strip().split('\n'):
+                    num = re.sub(r'[^\d]', '', line)
+                    if len(num) == 10:
+                        nums.append(num)
+
+    - type: text
+      content: "<b>3단계: 테이블 입력 처리</b><br>DataFrame의 첫 번째 열(iloc[:, 0])을 순회합니다. pd.notna()로 빈 셀을 건너뛰고 같은 방식으로 정제합니다."
+
+    - type: codeDescription
+      content: |-
+        elif selector.value == "테이블":
+            df = table.value
+            if df is not None and len(df) > 0:
+                for val in df.iloc[:, 0]:
+                    if pd.notna(val):
+                        num = re.sub(r'[^\d]', '', str(val))
+                        if len(num) == 10:
+                            nums.append(num)
+
+    - type: text
+      content: "<b>4단계: 엑셀 파일 처리</b><br>업로드된 파일을 BytesIO로 감싸서 pandas가 읽을 수 있게 합니다. 확장자로 CSV와 Excel을 구분합니다."
+
+    - type: codeDescription
+      content: |-
+        elif selector.value == "엑셀":
+            if file.value:
+                raw = file.contents(0)
+                name = file.name(0)
+                df = pd.read_csv(BytesIO(raw)) if name.endswith('.csv') else pd.read_excel(BytesIO(raw))
+                for val in df.iloc[:, 0]:
+                    if pd.notna(val):
+                        num = re.sub(r'[^\d]', '', str(val))
+                        if len(num) == 10:
+                            nums.append(num)
+
+    - type: text
+      content: "<b>5단계: 유효성 검사</b><br>유효한 사업자번호가 하나도 없으면 경고 메시지를 출력하고 중단합니다."
+
+    - type: codeDescription
+      content: |-
+        mo.stop(len(nums) == 0, mo.md("⚠️ 유효한 10자리 사업자번호가 없습니다."))
+
+    - type: text
+      content: "<b>완성 코드</b>"
+
+    - type: code
+      title: 사업자번호 정제
+      content: |-
+        mo.stop(not btn.value, mo.md(""))
+
+        nums = []
+
+        if selector.value == "텍스트":
+            if text.value:
+                for line in text.value.strip().split('\n'):
+                    num = re.sub(r'[^\d]', '', line)
+                    if len(num) == 10:
+                        nums.append(num)
+
+        elif selector.value == "테이블":
+            df = table.value
+            if df is not None and len(df) > 0:
+                for val in df.iloc[:, 0]:
+                    if pd.notna(val):
+                        num = re.sub(r'[^\d]', '', str(val))
+                        if len(num) == 10:
+                            nums.append(num)
+
+        elif selector.value == "엑셀":
+            if file.value:
+                raw = file.contents(0)
+                name = file.name(0)
+                df = pd.read_csv(BytesIO(raw)) if name.endswith('.csv') else pd.read_excel(BytesIO(raw))
+                for val in df.iloc[:, 0]:
+                    if pd.notna(val):
+                        num = re.sub(r'[^\d]', '', str(val))
+                        if len(num) == 10:
+                            nums.append(num)
+
+        mo.stop(len(nums) == 0, mo.md("⚠️ 유효한 10자리 사업자번호가 없습니다."))
+        mo.md(f"**{len(nums)}개**의 유효한 사업자번호를 찾았습니다.")
+
+    - type: tip
+      content: "re.sub(r'[^\\d]', '', text)에서 [^\\d]는 '숫자가 아닌 모든 문자'입니다. 하이픈, 공백, 괄호 등을 한 번에 제거합니다."
+
+  - id: batchProcessing
+    title: 배치 처리
+    subtitle: 100개씩 나눠서 API 호출
+    blocks:
+    - type: text
+      content: "국세청 API는 한 번에 최대 100개까지만 조회할 수 있습니다. 1000개의 사업자번호가 있다면 10번에 나눠서 호출해야 합니다. 이런 처리를 배치(batch) 처리라고 합니다."
+
+    - type: text
+      content: "<b>1단계: 결과 리스트 초기화</b><br>results는 모든 API 응답을 모을 빈 리스트입니다. apiError는 에러 발생 시 상태 코드를 저장합니다."
+
+    - type: codeDescription
+      content: |-
+        results = []
+        apiError = None
+
+    - type: text
+      content: "<b>2단계: 100개씩 분할 반복</b><br>range(0, len(nums), 100)은 0, 100, 200, ... 순으로 인덱스를 생성합니다. nums[i:i+100]으로 100개씩 슬라이싱합니다. 마지막이 100개 미만이어도 정상 동작합니다."
+
+    - type: codeDescription
+      content: |-
+        for i in range(0, len(nums), 100):
+            batch = nums[i:i+100]
+            data, err = fetchBizStatus(batch)
+            if err:
+                apiError = err
+            results.extend(data)
+
+    - type: text
+      content: "<b>완성 코드</b>"
+
+    - type: code
+      title: 배치 처리
+      content: |-
+        results = []
+        apiError = None
+        for i in range(0, len(nums), 100):
+            batch = nums[i:i+100]
+            data, err = fetchBizStatus(batch)
+            if err:
+                apiError = err
+            results.extend(data)
+
+    - type: tip
+      content: "extend()는 리스트 원소들을 풀어서 추가합니다. [[a,b], [c,d]]가 아닌 [a,b,c,d]가 됩니다."
+
+  - id: resultDisplay
+    title: 결과 출력
+    subtitle: DataFrame으로 변환 후 테이블 표시
+    blocks:
+    - type: text
+      content: "배치 처리로 얻은 결과를 DataFrame으로 변환하고 테이블로 출력합니다. API 오류가 있었다면 경고 메시지도 함께 표시합니다."
+
+    - type: text
+      content: "<b>DataFrame 변환</b><br>딕셔너리 리스트를 pd.DataFrame()에 전달하면 각 키가 열 이름이 됩니다."
+
+    - type: codeDescription
+      content: |-
+        resultDf = pd.DataFrame(results)
+
+    - type: text
+      content: "<b>에러 표시</b><br>API 오류가 있었으면 경고 메시지와 공지사항 링크를 표시합니다."
+
+    - type: codeDescription
+      content: |-
+        if apiError:
+            mo.vstack([
+                mo.md(f"⚠️ **API 오류 발생** (HTTP {apiError})"),
+                mo.md(f"공공데이터포털 점검 중일 수 있습니다. <a href='{NOTICE_URL}' target='_blank'>📢 공지사항 확인</a>")
+            ])
+
+    - type: text
+      content: "<b>완성 코드</b>"
+
+    - type: code
+      title: 결과 테이블
+      content: |-
+        resultDf = pd.DataFrame(results)
+
+        if apiError:
+            mo.vstack([
+                mo.md(f"⚠️ **API 오류 발생** (HTTP {apiError})"),
+                mo.md(f"공공데이터포털 점검 중일 수 있습니다. <a href='{NOTICE_URL}' target='_blank'>📢 공지사항 확인</a>")
+            ])
+
+    - type: tip
+      content: "테이블에서 '폐업'을 검색하면 폐업자만 필터링됩니다. 정렬도 가능해서 문제 있는 거래처를 쉽게 찾을 수 있습니다."
+
+  - id: resultTable
+    title: 테이블 표시
+    subtitle: 인터랙티브 테이블로 결과 보기
+    blocks:
+    - type: text
+      content: "mo.ui.table()로 DataFrame을 인터랙티브 테이블로 표시합니다. 열 헤더 클릭으로 정렬, 검색창으로 필터링이 가능합니다."
+
+    - type: code
+      title: 테이블 표시
+      content: |-
+        mo.stop(resultDf.empty, mo.md(""))
+
+        mo.vstack([
+            mo.md(f"**조회 완료**: {len(resultDf)}건"),
+            mo.ui.table(resultDf, show_column_summaries=False)
+        ])
+
+    - type: tip
+      content: "mo.stop()으로 DataFrame이 비어있으면 빈 화면을 표시합니다."
+
+  - id: downloadButton
+    title: 엑셀 다운로드
+    subtitle: base64로 인코딩해서 브라우저에서 다운로드
+    blocks:
+    - type: text
+      content: "조회 결과를 엑셀 파일로 다운로드할 수 있게 합니다. 서버에 파일을 저장하지 않고 Data URL 방식으로 바로 다운로드합니다. API 오류가 있었으면 공지사항 확인 버튼도 함께 표시합니다."
+
+    - type: text
+      content: "<b>1단계: 엑셀 생성</b><br>BytesIO 버퍼에 DataFrame을 엑셀로 씁니다. seek(0)으로 포인터를 처음으로 되돌립니다."
+
+    - type: codeDescription
+      content: |-
+        outputBuffer = BytesIO()
+        resultDf.to_excel(outputBuffer, index=False, engine='openpyxl')
+        outputBuffer.seek(0)
+
+    - type: text
+      content: "<b>2단계: base64 인코딩</b><br>바이너리 데이터는 URL에 직접 넣을 수 없습니다. base64로 텍스트로 변환합니다."
+
+    - type: codeDescription
+      content: |-
+        import base64
+        excelB64 = base64.b64encode(outputBuffer.getvalue()).decode()
+
+    - type: text
+      content: "<b>3단계: 에러 여부 확인</b><br>결과에 'API 오류' 상태가 있는지 확인해서 공지사항 버튼 표시 여부를 결정합니다."
+
+    - type: codeDescription
+      content: |-
+        hasError = "상태" in resultDf.columns and (resultDf["상태"] == "API 오류").any()
+
+    - type: text
+      content: "<b>완성 코드</b>"
+
+    - type: code
+      title: 다운로드 버튼
+      content: |-
+        mo.stop(resultDf.empty, mo.md(""))
+
+        import base64
+        outputBuffer = BytesIO()
+        resultDf.to_excel(outputBuffer, index=False, engine='openpyxl')
+        outputBuffer.seek(0)
+        excelB64 = base64.b64encode(outputBuffer.getvalue()).decode()
+
+        hasError = "상태" in resultDf.columns and (resultDf["상태"] == "API 오류").any()
+        noticeBtn = f'''<button onclick="window.open('{NOTICE_URL}', '_blank')" style="background: #dc2626; color: white; height: 40px; padding: 0 20px; border-radius: 8px; border: none; cursor: pointer;">📢 공지사항 확인</button>''' if hasError else ""
+
+        mo.md(f'''
+        <div style="margin-top: 16px; display: flex; justify-content: center; gap: 8px;">
+            <a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{excelB64}" download="사업자번호_조회결과.xlsx"
+               style="display: inline-flex; align-items: center; background: #18181b; color: white; height: 40px; padding: 0 20px; border-radius: 8px; text-decoration: none; cursor: pointer;">
+                📥 엑셀 다운로드
+            </a>
+            {noticeBtn}
+        </div>
+        ''')
+
+    - type: tip
+      content: "API 오류 시 빨간색 '공지사항 확인' 버튼이 나타납니다. 공공데이터포털 점검 일정을 확인할 수 있습니다."
+
+footer:
+  challenge:
+    title: "🎯 도전해보세요"
+    description: "오늘 배운 코드에 기능을 추가해보세요"
+    items:
+      - "휴폐업 상태별로 행 배경색 다르게 표시하기"
+      - "조회 결과에 조회일시 열 추가하기"
+      - "여러 번 조회한 결과를 누적해서 보여주기"
+      - "거래처 원장과 조인해서 문제 거래처 자동 표시하기"
+
+  localUsage:
+    title: "💻 로컬에서 활용하기"
+    description: "엑셀 파일에서 사업자번호를 읽어 조회하는 스크립트"
+    code: |-
+      import pandas as pd
+      import requests
+      import json
+
+      API_KEY = "발급받은_서비스키"
+      API_URL = f"https://api.odcloud.kr/api/nts-businessman/v1/status?serviceKey={API_KEY}&returnType=JSON"
+
+      df = pd.read_excel("거래처목록.xlsx")
+      bizNos = df["사업자번호"].astype(str).str.replace(r"[^\d]", "", regex=True).tolist()
+
+      results = []
+      for i in range(0, len(bizNos), 100):
+          batch = bizNos[i:i+100]
+          response = requests.post(API_URL, data=json.dumps({"b_no": batch}), headers={"Content-Type": "application/json"})
+          results.extend(response.json()["data"])
+
+      resultDf = pd.DataFrame(results)
+      resultDf.to_excel("조회결과.xlsx", index=False)
+    tip: "12줄이면 끝! 거래처목록.xlsx의 '사업자번호' 열을 읽어서 조회하고 결과를 저장합니다."
+

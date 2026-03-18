@@ -1,0 +1,461 @@
+meta:
+  id: folium_02
+  title: 다양한마커표현
+  order: 2
+  category: folium
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["folium", "Marker", "Icon", "popup", "tooltip", "HTML"]
+  seo:
+    title: "Folium 마커 커스터마이징 - 아이콘과 팝업"
+    description: "Folium에서 다양한 마커 스타일을 사용합니다. 커스텀 아이콘, HTML 팝업, 툴팁을 배웁니다."
+    keywords: ["folium", "Marker", "Icon", "DivIcon", "popup", "tooltip"]
+
+intro:
+  emoji: "🎨"
+  goal: 여러 종류의 마커와 아이콘을 사용하여 지도를 꾸밉니다.
+  description: 마커의 다양한 표현 방법을 배웁니다. Icon()으로 색상과 아이콘을 변경하고, DivIcon()으로 완전한 커스텀 마커를 만듭니다. popup에 HTML을 넣어 풍부한 정보를 표시합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: folium과 marimo를 불러옵니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: folium과 marimo를 불러옵니다
+    content: |-
+      import folium
+      import marimo as mo
+
+- id: step2_icon_colors
+  title: 2단계. 아이콘 색상
+  subtitle: Icon(color=)
+  blocks:
+  - type: text
+    content: Icon()의 color 파라미터로 마커 색상을 지정합니다. 18가지 색상을 사용할 수 있습니다.
+  - type: code
+    language: python
+    title: 다양한 색상
+    description: 모든 기본 색상 표시
+    content: |-
+      seoulLoc = [37.5665, 126.9780]
+      colorList = ["red", "blue", "green", "purple", "orange",
+                   "darkred", "lightred", "beige", "darkblue", "darkgreen",
+                   "cadetblue", "darkpurple", "white", "pink", "lightblue",
+                   "lightgreen", "gray", "black"]
+
+      m1 = folium.Map(location=seoulLoc, zoom_start=13)
+
+      for i, clr in enumerate(colorList):
+          offset = [seoulLoc[0] + (i // 6) * 0.01, seoulLoc[1] + (i % 6) * 0.01]
+          folium.Marker(
+              location=offset,
+              popup=clr,
+              icon=folium.Icon(color=clr)
+          ).add_to(m1)
+
+      mo.iframe(m1._repr_html_())
+  - type: tip
+    content: 카테고리별로 색상을 다르게 하면 한눈에 구분할 수 있습니다. 음식점은 빨강, 카페는 파랑 등으로 구분하세요.
+
+- id: step3_icon_types
+  title: 3단계. 아이콘 종류
+  subtitle: Icon(icon=)
+  blocks:
+  - type: text
+    content: icon 파라미터로 마커 안의 아이콘을 변경합니다. Glyphicon과 Font Awesome 아이콘을 사용할 수 있습니다.
+  - type: code
+    language: python
+    title: Glyphicon 아이콘
+    description: Bootstrap Glyphicon 사용
+    content: |-
+      glyphicons = ["home", "star", "heart", "cloud", "music",
+                    "camera", "user", "glass", "flag", "gift"]
+
+      m2 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      for i, icn in enumerate(glyphicons):
+          offset = [seoulLoc[0] + (i // 5) * 0.008, seoulLoc[1] + (i % 5) * 0.008]
+          folium.Marker(
+              location=offset,
+              popup=icn,
+              icon=folium.Icon(color="blue", icon=icn)
+          ).add_to(m2)
+
+      mo.iframe(m2._repr_html_())
+  - type: code
+    language: python
+    title: Font Awesome 아이콘
+    description: prefix='fa' 사용
+    content: |-
+      faIcons = ["coffee", "cutlery", "shopping-cart", "car", "plane"]
+
+      m3 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      for i, icn in enumerate(faIcons):
+          offset = [seoulLoc[0], seoulLoc[1] + i * 0.008]
+          folium.Marker(
+              location=offset,
+              popup=icn,
+              icon=folium.Icon(color="red", icon=icn, prefix="fa")
+          ).add_to(m3)
+
+      mo.iframe(m3._repr_html_())
+  - type: tip
+    content: Font Awesome 아이콘을 사용하려면 prefix='fa'를 추가하세요. 더 다양한 아이콘을 사용할 수 있습니다.
+
+- id: step4_html_popup
+  title: 4단계. HTML 팝업
+  subtitle: 풍부한 정보 표시
+  blocks:
+  - type: text
+    content: popup에 HTML을 넣어 이미지, 링크, 표 등을 표시할 수 있습니다.
+  - type: code
+    language: python
+    title: HTML 팝업
+    description: 스타일이 적용된 팝업
+    content: |-
+      htmlContent = """
+      <div style="font-family: Arial; width: 200px;">
+          <h4 style="color: #2E86AB;">서울시청</h4>
+          <p style="margin: 5px 0;">주소: 서울특별시 중구 태평로1가</p>
+          <p style="margin: 5px 0;">전화: 02-120</p>
+          <hr>
+          <small>클릭하여 상세 정보 확인</small>
+      </div>
+      """
+
+      m4 = folium.Map(location=seoulLoc, zoom_start=15)
+      folium.Marker(
+          location=seoulLoc,
+          popup=folium.Popup(htmlContent, max_width=250),
+          icon=folium.Icon(color="red", icon="info-sign")
+      ).add_to(m4)
+
+      mo.iframe(m4._repr_html_())
+  - type: tip
+    content: Popup() 객체를 사용하면 max_width로 팝업 너비를 조절할 수 있습니다.
+
+- id: step5_tooltip_style
+  title: 5단계. 툴팁 스타일
+  subtitle: Tooltip()
+  blocks:
+  - type: text
+    content: Tooltip() 객체로 툴팁을 더 세밀하게 제어할 수 있습니다.
+  - type: code
+    language: python
+    title: 스타일 툴팁
+    description: permanent, sticky 옵션
+    content: |-
+      m5 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      folium.Marker(
+          location=[37.5665, 126.9780],
+          tooltip=folium.Tooltip("항상 표시", permanent=True),
+          icon=folium.Icon(color="blue")
+      ).add_to(m5)
+
+      folium.Marker(
+          location=[37.5665, 126.9880],
+          tooltip=folium.Tooltip("<b>HTML 툴팁</b><br>여러 줄 가능"),
+          icon=folium.Icon(color="green")
+      ).add_to(m5)
+
+      mo.iframe(m5._repr_html_())
+  - type: tip
+    content: permanent=True로 설정하면 마우스를 올리지 않아도 항상 툴팁이 표시됩니다.
+
+- id: step6_divicon
+  title: 6단계. DivIcon
+  subtitle: 완전 커스텀 마커
+  blocks:
+  - type: text
+    content: DivIcon()으로 HTML/CSS를 사용한 완전한 커스텀 마커를 만들 수 있습니다.
+  - type: code
+    language: python
+    title: 숫자 마커
+    description: 순번이 있는 마커
+    content: |-
+      spots = [
+          {"name": "1번", "loc": [37.5665, 126.9780]},
+          {"name": "2번", "loc": [37.5600, 126.9850]},
+          {"name": "3번", "loc": [37.5700, 126.9900]}
+      ]
+
+      m6 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      for i, spot in enumerate(spots, 1):
+          folium.Marker(
+              location=spot["loc"],
+              popup=spot["name"],
+              icon=folium.DivIcon(
+                  html=f"""
+                  <div style="
+                      background-color: #E74C3C;
+                      color: white;
+                      width: 25px;
+                      height: 25px;
+                      border-radius: 50%;
+                      text-align: center;
+                      line-height: 25px;
+                      font-weight: bold;
+                      font-size: 14px;
+                      border: 2px solid white;
+                      box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+                  ">{i}</div>
+                  """
+              )
+          ).add_to(m6)
+
+      mo.iframe(m6._repr_html_())
+  - type: tip
+    content: DivIcon은 아무 HTML이나 마커로 사용할 수 있어 자유도가 높습니다. 로고, 이모지, 커스텀 디자인 모두 가능합니다.
+
+- id: step7_emoji_marker
+  title: 7단계. 이모지 마커
+  subtitle: DivIcon으로 이모지 사용
+  blocks:
+  - type: text
+    content: DivIcon으로 이모지를 마커로 사용할 수 있습니다.
+  - type: code
+    language: python
+    title: 이모지 마커
+    description: 카테고리별 이모지
+    content: |-
+      emojiSpots = [
+          {"name": "카페", "loc": [37.5665, 126.9780], "emoji": "☕"},
+          {"name": "음식점", "loc": [37.5600, 126.9750], "emoji": "🍽️"},
+          {"name": "쇼핑", "loc": [37.5630, 126.9850], "emoji": "🛍️"},
+          {"name": "공원", "loc": [37.5700, 126.9800], "emoji": "🌳"},
+          {"name": "호텔", "loc": [37.5580, 126.9900], "emoji": "🏨"}
+      ]
+
+      m7 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      for spot in emojiSpots:
+          folium.Marker(
+              location=spot["loc"],
+              popup=spot["name"],
+              icon=folium.DivIcon(
+                  html=f'<div style="font-size: 24px;">{spot["emoji"]}</div>'
+              )
+          ).add_to(m7)
+
+      mo.iframe(m7._repr_html_())
+  - type: tip
+    content: 이모지 마커는 직관적이고 귀엽습니다. 카테고리별로 다른 이모지를 사용하면 구분이 쉽습니다.
+
+- id: step8_circle_marker
+  title: 8단계. CircleMarker
+  subtitle: 원형 마커
+  blocks:
+  - type: text
+    content: CircleMarker()는 크기가 고정된 원형 마커입니다. 줌 레벨에 상관없이 같은 크기로 표시됩니다.
+  - type: code
+    language: python
+    title: CircleMarker
+    description: 크기와 색상 지정
+    content: |-
+      m8 = folium.Map(location=seoulLoc, zoom_start=14)
+
+      folium.CircleMarker(
+          location=[37.5665, 126.9780],
+          radius=10,
+          color="red",
+          fill=True,
+          fill_color="red",
+          fill_opacity=0.7,
+          popup="작은 원"
+      ).add_to(m8)
+
+      folium.CircleMarker(
+          location=[37.5600, 126.9850],
+          radius=20,
+          color="blue",
+          fill=True,
+          fill_color="blue",
+          fill_opacity=0.5,
+          popup="중간 원"
+      ).add_to(m8)
+
+      folium.CircleMarker(
+          location=[37.5700, 126.9700],
+          radius=30,
+          color="green",
+          fill=True,
+          fill_color="green",
+          fill_opacity=0.3,
+          popup="큰 원"
+      ).add_to(m8)
+
+      mo.iframe(m8._repr_html_())
+  - type: tip
+    content: CircleMarker의 radius는 픽셀 단위입니다. Circle()의 radius는 미터 단위라서 줌에 따라 크기가 변합니다.
+
+- id: step9_data_driven
+  title: 9단계. 데이터 기반 마커
+  subtitle: 값에 따른 시각화
+  blocks:
+  - type: text
+    content: 데이터 값에 따라 마커 크기나 색상을 다르게 표시합니다.
+  - type: code
+    language: python
+    title: 매출 크기 마커
+    description: 값에 비례하는 크기
+    content: |-
+      stores = [
+          {"name": "강남점", "loc": [37.4979, 127.0276], "sales": 100},
+          {"name": "홍대점", "loc": [37.5563, 126.9236], "sales": 80},
+          {"name": "명동점", "loc": [37.5636, 126.9869], "sales": 150},
+          {"name": "여의도점", "loc": [37.5219, 126.9245], "sales": 60}
+      ]
+
+      m9 = folium.Map(location=seoulLoc, zoom_start=12)
+
+      for store in stores:
+          radius = store["sales"] / 5
+          folium.CircleMarker(
+              location=store["loc"],
+              radius=radius,
+              color="crimson",
+              fill=True,
+              fill_color="crimson",
+              fill_opacity=0.6,
+              popup=f"{store['name']}: {store['sales']}억"
+          ).add_to(m9)
+
+      mo.iframe(m9._repr_html_())
+  - type: tip
+    content: 데이터 값을 시각적 요소(크기, 색상, 투명도)에 매핑하면 패턴을 쉽게 파악할 수 있습니다.
+
+- id: step10_complete
+  title: 10단계. 완성 예제
+  subtitle: 맛집 지도
+  blocks:
+  - type: text
+    content: 다양한 마커 스타일을 종합하여 맛집 지도를 만듭니다.
+  - type: code
+    language: python
+    title: 맛집 지도
+    description: 종합 예제
+    content: |-
+      restaurants = [
+          {"name": "한식당", "loc": [37.5665, 126.9780], "category": "한식", "rating": 4.5},
+          {"name": "이탈리안", "loc": [37.5600, 126.9850], "category": "양식", "rating": 4.2},
+          {"name": "스시집", "loc": [37.5700, 126.9750], "category": "일식", "rating": 4.8},
+          {"name": "중화요리", "loc": [37.5630, 126.9700], "category": "중식", "rating": 4.0}
+      ]
+
+      categoryColors = {"한식": "red", "양식": "blue", "일식": "green", "중식": "orange"}
+      categoryIcons = {"한식": "🍚", "양식": "🍝", "일식": "🍣", "중식": "🥟"}
+
+      foodMap = folium.Map(location=seoulLoc, zoom_start=14)
+
+      for rest in restaurants:
+          cat = rest["category"]
+          htmlPopup = f"""
+          <div style="font-family: Arial; width: 150px;">
+              <h4>{categoryIcons[cat]} {rest['name']}</h4>
+              <p>카테고리: {cat}</p>
+              <p>평점: {'⭐' * int(rest['rating'])} {rest['rating']}</p>
+          </div>
+          """
+
+          folium.Marker(
+              location=rest["loc"],
+              popup=folium.Popup(htmlPopup, max_width=200),
+              tooltip=f"{rest['name']} ({rest['rating']}점)",
+              icon=folium.Icon(color=categoryColors[cat], icon="cutlery", prefix="fa")
+          ).add_to(foodMap)
+
+      mo.iframe(foodMap._repr_html_())
+
+- id: practice
+  title: 실습
+  subtitle: 마커 표현
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 관광 코스 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        tourCourse = [
+            {"order": 1, "name": "경복궁", "loc": [37.5796, 126.9770]},
+            {"order": 2, "name": "인사동", "loc": [37.5742, 126.9858]},
+            {"order": 3, "name": "명동", "loc": [37.5636, 126.9869]},
+            {"order": 4, "name": "남산타워", "loc": [37.5512, 126.9882]}
+        ]
+        tourCourse
+    - type: code
+      title: 지도 생성
+      content: |-
+        courseMap = folium.Map(location=[37.565, 126.985], zoom_start=14)
+
+        for spot in tourCourse:
+            folium.Marker(
+                location=spot["loc"],
+                popup=f"<b>{spot['order']}. {spot['name']}</b>",
+                tooltip=f"{spot['order']}번째",
+                icon=folium.DivIcon(
+                    html=f"""
+                    <div style="
+                        background: #3498DB;
+                        color: white;
+                        width: 28px;
+                        height: 28px;
+                        border-radius: 50%;
+                        text-align: center;
+                        line-height: 28px;
+                        font-weight: bold;
+                        border: 2px solid white;
+                    ">{spot['order']}</div>
+                    """
+                )
+            ).add_to(courseMap)
+
+        mo.iframe(courseMap._repr_html_())
+  - type: expansion
+    title: "미션2: 편의시설 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        facilities = [
+            {"name": "화장실", "loc": [37.5665, 126.9780], "type": "toilet", "emoji": "🚻"},
+            {"name": "주차장", "loc": [37.5630, 126.9820], "type": "parking", "emoji": "🅿️"},
+            {"name": "ATM", "loc": [37.5680, 126.9750], "type": "atm", "emoji": "🏧"},
+            {"name": "약국", "loc": [37.5650, 126.9850], "type": "pharmacy", "emoji": "💊"},
+            {"name": "편의점", "loc": [37.5690, 126.9810], "type": "store", "emoji": "🏪"}
+        ]
+        facilities
+    - type: code
+      title: 지도 생성
+      content: |-
+        facilityMap = folium.Map(location=[37.567, 126.980], zoom_start=15)
+
+        for fac in facilities:
+            folium.Marker(
+                location=fac["loc"],
+                popup=fac["name"],
+                tooltip=fac["emoji"] + " " + fac["name"],
+                icon=folium.DivIcon(
+                    html=f'<div style="font-size: 28px; text-shadow: 1px 1px 2px white;">{fac["emoji"]}</div>'
+                )
+            ).add_to(facilityMap)
+
+        mo.iframe(facilityMap._repr_html_())

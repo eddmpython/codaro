@@ -1,0 +1,618 @@
+meta:
+  id: "day27"
+  title: "제너레이터와 이터레이터"
+  day: 27
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 제너레이터와 이터레이터 - 효율적인 순회"
+    description: "yield, generator, iter, next, iterator protocol을 배웁니다."
+    keywords: ['제너레이터', 'generator', 'yield', 'iterator', 'iter', 'next']
+
+intro:
+  emoji: "♻️"
+  points:
+  - "yield로 제너레이터 생성"
+  - "메모리 효율적인 순회"
+  - "iter()와 next() 활용"
+  - "이터레이터 프로토콜 구현"
+
+sections:
+- id: "generator_basic"
+  title: "제너레이터 기초"
+  subtitle: "yield 키워드"
+  blocks:
+  - type: "text"
+    content: "제너레이터는 yield 키워드를 사용하여 값을 하나씩 생성하는 함수입니다. return과 달리 yield는 함수 실행을 일시 중지하고 값을 반환한 후, 다음 호출 시 중지된 지점부터 계속 실행됩니다. 모든 값을 메모리에 저장하지 않고 필요할 때마다 생성하므로 매우 효율적입니다."
+  - type: "list"
+    items:
+    - "yield: 값을 하나씩 생성"
+    - "함수 실행 일시 중지"
+    - "메모리 효율적"
+    - "필요할 때 값 생성"
+  - type: "code"
+    language: "python"
+    title: "기본 제너레이터"
+    description: "yield로 숫자를 하나씩 생성합니다."
+    content: |-
+      def simpleGen():
+          yield 1
+          yield 2
+          yield 3
+
+      gen = simpleGen()
+      next(gen), next(gen), next(gen)
+  - type: "code"
+    language: "python"
+    title: "범위 제너레이터"
+    description: "특정 범위의 숫자를 생성합니다."
+    content: |-
+      def rangeGen(n):
+          i = 0
+          while i < n:
+              yield i
+              i = i + 1
+
+      g = rangeGen(5)
+      list(g)
+  - type: "code"
+    language: "python"
+    title: "제너레이터 순회"
+    description: "for 루프로 제너레이터를 순회합니다."
+    content: |-
+      def countdown(n):
+          while n > 0:
+              yield n
+              n = n - 1
+
+      output = []
+      for val in countdown(5):
+          output.append(val)
+      output
+  - type: "tip"
+    content: "제너레이터는 한 번만 순회할 수 있습니다. 다시 순회하려면 새로 생성해야 합니다."
+
+- id: "generator_expression"
+  title: "제너레이터 표현식"
+  subtitle: "간결한 제너레이터 생성"
+  blocks:
+  - type: "text"
+    content: "제너레이터 표현식은 리스트 컴프리헨션과 비슷하지만 괄호를 사용합니다. (표현식 for 변수 in 시퀀스) 형태로 작성하며, 리스트를 만들지 않고 제너레이터를 반환합니다. 대량의 데이터를 처리할 때 메모리를 절약할 수 있습니다."
+  - type: "list"
+    items:
+    - "(표현식 for 변수 in 시퀀스) 형식"
+    - "괄호 사용"
+    - "리스트 대신 제너레이터"
+    - "메모리 절약"
+  - type: "code"
+    language: "python"
+    title: "기본 제너레이터 표현식"
+    description: "제곱수를 생성하는 제너레이터를 만듭니다."
+    content: |-
+      squares = (x ** 2 for x in range(5))
+      list(squares)
+  - type: "code"
+    language: "python"
+    title: "조건부 제너레이터"
+    description: "조건을 만족하는 값만 생성합니다."
+    content: |-
+      evens = (n for n in range(10) if n % 2 == 0)
+      list(evens)
+  - type: "code"
+    language: "python"
+    title: "변환 제너레이터"
+    description: "문자열을 대문자로 변환합니다."
+    content: |-
+      words = ['hello', 'world', 'python']
+      upper = (w.upper() for w in words)
+      list(upper)
+  - type: "tip"
+    content: "제너레이터 표현식은 sum(), max(), min() 같은 함수에 바로 전달할 수 있습니다."
+
+- id: "iterator_basic"
+  title: "이터레이터 기초"
+  subtitle: "iter()와 next()"
+  blocks:
+  - type: "text"
+    content: "이터레이터는 순회 가능한 객체입니다. iter() 함수로 이터레이터를 생성하고, next() 함수로 다음 값을 가져옵니다. 리스트, 튜플, 문자열 등 모든 시퀀스는 iter()로 이터레이터를 만들 수 있으며, 더 이상 값이 없으면 StopIteration 예외가 발생합니다."
+  - type: "list"
+    items:
+    - "iter(): 이터레이터 생성"
+    - "next(): 다음 값 가져오기"
+    - "StopIteration: 종료 신호"
+    - "모든 시퀀스 지원"
+  - type: "code"
+    language: "python"
+    title: "리스트 이터레이터"
+    description: "리스트를 이터레이터로 변환합니다."
+    content: |-
+      nums = [1, 2, 3]
+      it = iter(nums)
+      next(it), next(it), next(it)
+  - type: "code"
+    language: "python"
+    title: "문자열 이터레이터"
+    description: "문자열을 한 글자씩 순회합니다."
+    content: |-
+      text = 'abc'
+      textIter = iter(text)
+      next(textIter), next(textIter)
+  - type: "code"
+    language: "python"
+    title: "수동 순회"
+    description: "while과 next로 수동으로 순회합니다."
+    content: |-
+      items = [10, 20, 30]
+      iterator = iter(items)
+      collected = []
+      try:
+          while True:
+              collected.append(next(iterator))
+      except StopIteration:
+          pass
+      collected
+  - type: "tip"
+    content: "for 루프는 내부적으로 iter()와 next()를 사용하여 순회합니다."
+
+- id: "iterator_protocol"
+  title: "이터레이터 프로토콜"
+  subtitle: "__iter__와 __next__ 구현"
+  blocks:
+  - type: "text"
+    content: "이터레이터 프로토콜은 __iter__와 __next__ 메서드를 구현하여 객체를 순회 가능하게 만드는 규약입니다. __iter__는 self를 반환하고, __next__는 다음 값을 반환하거나 StopIteration을 발생시킵니다. 이를 통해 사용자 정의 객체를 for 루프에서 사용할 수 있습니다."
+  - type: "list"
+    items:
+    - "__iter__: self 반환"
+    - "__next__: 다음 값 반환"
+    - "StopIteration 발생"
+    - "for 루프 지원"
+  - type: "code"
+    language: "python"
+    title: "기본 이터레이터 클래스"
+    description: "숫자를 순회하는 이터레이터를 만듭니다."
+    content: |-
+      class Counter:
+          def __init__(self, max):
+              self.max = max
+              self.current = 0
+
+          def __iter__(self):
+              return self
+
+          def __next__(self):
+              if self.current < self.max:
+                  self.current = self.current + 1
+                  return self.current
+              raise StopIteration
+
+      c = Counter(3)
+      list(c)
+  - type: "code"
+    language: "python"
+    title: "범위 이터레이터"
+    description: "시작과 끝을 지정하는 이터레이터를 만듭니다."
+    content: |-
+      class Range:
+          def __init__(self, start, end):
+              self.current = start
+              self.end = end
+
+          def __iter__(self):
+              return self
+
+          def __next__(self):
+              if self.current < self.end:
+                  val = self.current
+                  self.current = self.current + 1
+                  return val
+              raise StopIteration
+
+      r = Range(5, 10)
+      list(r)
+  - type: "code"
+    language: "python"
+    title: "무한 이터레이터"
+    description: "무한히 값을 생성하는 이터레이터를 만듭니다."
+    content: |-
+      class Infinite:
+          def __init__(self):
+              self.num = 0
+
+          def __iter__(self):
+              return self
+
+          def __next__(self):
+              self.num = self.num + 1
+              return self.num
+
+      inf = Infinite()
+      values = []
+      for val in inf:
+          values.append(val)
+          if val >= 5:
+              break
+      values
+  - type: "tip"
+    content: "제너레이터는 이터레이터 프로토콜을 자동으로 구현합니다."
+
+- id: "generator_advanced"
+  title: "고급 제너레이터"
+  subtitle: "실전 활용 패턴"
+  blocks:
+  - type: "text"
+    content: "제너레이터는 파일 읽기, 무한 시퀀스 생성, 파이프라인 처리 등 다양한 실전 상황에서 활용됩니다. 메모리를 효율적으로 사용하면서도 코드를 간결하게 유지할 수 있어 대용량 데이터 처리에 매우 유용합니다."
+  - type: "list"
+    items:
+    - "파일 처리"
+    - "무한 시퀀스"
+    - "데이터 파이프라인"
+    - "메모리 효율성"
+  - type: "code"
+    language: "python"
+    title: "피보나치 제너레이터"
+    description: "피보나치 수열을 무한히 생성합니다."
+    content: |-
+      def fibonacci():
+          a = 0
+          b = 1
+          while True:
+              yield a
+              a, b = b, a + b
+
+      fib = fibonacci()
+      sequence = []
+      for i in range(10):
+          sequence.append(next(fib))
+      sequence
+  - type: "code"
+    language: "python"
+    title: "필터링 제너레이터"
+    description: "조건에 맞는 값만 생성합니다."
+    content: |-
+      def filterPositive(numbers):
+          for n in numbers:
+              if n > 0:
+                  yield n
+
+      dataset = [-2, -1, 0, 1, 2, 3]
+      filtered = filterPositive(dataset)
+      list(filtered)
+  - type: "code"
+    language: "python"
+    title: "변환 제너레이터"
+    description: "값을 변환하여 생성합니다."
+    content: |-
+      def doubleValues(nums):
+          for n in nums:
+              yield n * 2
+
+      source = [1, 2, 3, 4, 5]
+      doubled = doubleValues(source)
+      list(doubled)
+  - type: "tip"
+    content: "여러 제너레이터를 연결하여 데이터 파이프라인을 만들 수 있습니다."
+
+- id: "practical_patterns"
+  title: "실전 패턴"
+  subtitle: "제너레이터와 이터레이터 활용"
+  blocks:
+  - type: "text"
+    content: "제너레이터와 이터레이터는 실무에서 대용량 파일 처리, 배치 처리, 스트리밍 데이터 처리 등에 활용됩니다. 메모리를 절약하면서도 깔끔한 코드를 작성할 수 있어 파이썬의 강력한 기능 중 하나입니다."
+  - type: "list"
+    items:
+    - "배치 처리"
+    - "청크 단위 읽기"
+    - "파이프라인 구성"
+    - "메모리 최적화"
+  - type: "code"
+    language: "python"
+    title: "배치 제너레이터"
+    description: "데이터를 일정 크기로 묶어 생성합니다."
+    content: |-
+      def batchGen(elements, size):
+          chunk = []
+          for item in elements:
+              chunk.append(item)
+              if len(chunk) == size:
+                  yield chunk
+                  chunk = []
+          if chunk:
+              yield chunk
+
+      collection = [1, 2, 3, 4, 5, 6, 7]
+      batches = list(batchGen(collection, 3))
+      batches
+  - type: "code"
+    language: "python"
+    title: "체인 제너레이터"
+    description: "여러 제너레이터를 연결합니다."
+    content: |-
+      def square(values):
+          for n in values:
+              yield n ** 2
+
+      def addTen(integers):
+          for n in integers:
+              yield n + 10
+
+      original = [1, 2, 3, 4, 5]
+      pipeline = addTen(square(original))
+      list(pipeline)
+  - type: "code"
+    language: "python"
+    title: "조건부 생성"
+    description: "여러 조건을 조합하여 생성합니다."
+    content: |-
+      def complexFilter(entries):
+          for item in entries:
+              if item > 0 and item % 2 == 0:
+                  yield item * 3
+
+      integers = [-2, -1, 0, 1, 2, 3, 4, 5, 6]
+      outcomes = list(complexFilter(integers))
+      outcomes
+  - type: "tip"
+    content: "제너레이터는 필요한 만큼만 값을 생성하므로 대용량 데이터 처리에 이상적입니다."
+
+- id: "practice"
+  title: "Day 27 종합 복습"
+  subtitle: "제너레이터와 이터레이터 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 27에서 배운 제너레이터와 이터레이터를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 제너레이터"
+    code: |-
+      def simpleYield():
+          yield 10
+          yield 20
+          yield 30
+
+      generator = simpleYield()
+      list(generator)
+
+  - type: "expansion"
+    title: "🟢 기본2: 범위 생성"
+    code: |-
+      def genRange(n):
+          i = 0
+          while i < n:
+              yield i
+              i = i + 1
+
+      genObj = genRange(5)
+      list(genObj)
+
+  - type: "expansion"
+    title: "🟢 기본3: 제너레이터 표현식"
+    code: |-
+      cubes = (x ** 3 for x in range(5))
+      list(cubes)
+
+  - type: "expansion"
+    title: "🟢 기본4: iter와 next"
+    code: |-
+      elements = [5, 10, 15]
+      elementIter = iter(elements)
+      next(elementIter), next(elementIter)
+
+  - type: "expansion"
+    title: "🟢 기본5: 문자열 이터레이터"
+    code: |-
+      s = 'abc'
+      strIter = iter(s)
+      list(strIter)
+
+  - type: "expansion"
+    title: "🟡 응용1: 조건부 제너레이터"
+    code: |-
+      def odds(n):
+          i = 1
+          while i <= n:
+              if i % 2 == 1:
+                  yield i
+              i = i + 1
+
+      oddGen = odds(10)
+      list(oddGen)
+
+  - type: "expansion"
+    title: "🟡 응용2: 제너레이터 표현식 필터"
+    code: |-
+      digits = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      selected = (n for n in digits if n > 5)
+      list(selected)
+
+  - type: "expansion"
+    title: "🟡 응용3: 변환 제너레이터"
+    code: |-
+      def triple(nums):
+          for n in nums:
+              yield n * 3
+
+      vals = [1, 2, 3, 4, 5]
+      tripled = triple(vals)
+      list(tripled)
+
+  - type: "expansion"
+    title: "🟡 응용4: 이터레이터 클래스"
+    code: |-
+      class Countdown:
+          def __init__(self, start):
+              self.current = start
+
+          def __iter__(self):
+              return self
+
+          def __next__(self):
+              if self.current > 0:
+                  val = self.current
+                  self.current = self.current - 1
+                  return val
+              raise StopIteration
+
+      cd = Countdown(5)
+      list(cd)
+
+  - type: "expansion"
+    title: "🟡 응용5: 무한 카운터"
+    code: |-
+      def infiniteCounter():
+          n = 1
+          while True:
+              yield n
+              n = n + 1
+
+      counter = infiniteCounter()
+      accumulator = []
+      for i in range(5):
+          accumulator.append(next(counter))
+      accumulator
+
+  - type: "expansion"
+    title: "🔴 심화1: 피보나치 N개"
+    code: |-
+      def fib(n):
+          a = 0
+          b = 1
+          count = 0
+          while count < n:
+              yield a
+              a, b = b, a + b
+              count = count + 1
+
+      fibGen = fib(8)
+      list(fibGen)
+
+  - type: "expansion"
+    title: "🔴 심화2: 제곱수 필터"
+    code: |-
+      def squareFilter(start, end):
+          i = start
+          while i <= end:
+              if i ** 0.5 == int(i ** 0.5):
+                  yield i
+              i = i + 1
+
+      perfectSquares = squareFilter(1, 20)
+      list(perfectSquares)
+
+  - type: "expansion"
+    title: "🔴 심화3: 배치 생성"
+    code: |-
+      def makeBatch(data, batchSize):
+          batch = []
+          for item in data:
+              batch.append(item)
+              if len(batch) == batchSize:
+                  yield batch
+                  batch = []
+          if batch:
+              yield batch
+
+      range10 = list(range(1, 11))
+      groups = list(makeBatch(range10, 3))
+      groups
+
+  - type: "expansion"
+    title: "🔴 심화4: 파이프라인"
+    code: |-
+      def addFive(nums):
+          for n in nums:
+              yield n + 5
+
+      def multiplyTwo(nums):
+          for n in nums:
+              yield n * 2
+
+      base = [1, 2, 3, 4, 5]
+      pipe = multiplyTwo(addFive(base))
+      list(pipe)
+
+  - type: "expansion"
+    title: "🔴 심화5: 복합 필터"
+    code: |-
+      def complexGen(items):
+          for item in items:
+              if item > 0:
+                  if item % 2 == 0:
+                      yield item ** 2
+
+      numbers = [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6]
+      processed = list(complexGen(numbers))
+      processed
+
+  - type: "expansion"
+    title: "🔴 심화6: 커스텀 범위"
+    code: |-
+      class CustomRange:
+          def __init__(self, start, end, step):
+              self.current = start
+              self.end = end
+              self.step = step
+
+          def __iter__(self):
+              return self
+
+          def __next__(self):
+              if self.current < self.end:
+                  val = self.current
+                  self.current = self.current + self.step
+                  return val
+              raise StopIteration
+
+      cr = CustomRange(0, 10, 2)
+      list(cr)
+
+  - type: "expansion"
+    title: "🔴 심화7: 누적 합계"
+    code: |-
+      def cumulativeSum(nums):
+          total = 0
+          for n in nums:
+              total = total + n
+              yield total
+
+      numberList = [1, 2, 3, 4, 5]
+      cumSum = list(cumulativeSum(numberList))
+      cumSum
+
+  - type: "expansion"
+    title: "🔴 심화8: 윈도우 생성"
+    code: |-
+      def window(sequence, size):
+          i = 0
+          while i <= len(sequence) - size:
+              yield sequence[i:i + size]
+              i = i + 1
+
+      series = [1, 2, 3, 4, 5, 6, 7]
+      windows = list(window(series, 3))
+      windows
+
+  - type: "expansion"
+    title: "🔴 심화9: 조건부 변환"
+    code: |-
+      def conditionalTransform(nums):
+          for n in nums:
+              if n > 5:
+                  yield n * 2
+              else:
+                  yield n
+
+      inputData = [1, 3, 5, 7, 9, 11]
+      transformed = list(conditionalTransform(inputData))
+      transformed
+
+  - type: "expansion"
+    title: "🔴 심화10: 중첩 제너레이터"
+    code: |-
+      def flattenGen(nested):
+          for sublist in nested:
+              for item in sublist:
+                  yield item
+
+      nestedData = [[1, 2], [3, 4], [5, 6]]
+      flat = list(flattenGen(nestedData))
+      flat

@@ -1,0 +1,657 @@
+meta:
+  id: day02
+  title: 변수와 데이터 타입
+  day: 2
+  category: 30days
+  tags: []
+  seo:
+    title: "파이썬 변수와 데이터 타입"
+    description: "변수에 값을 저장하고 다양한 데이터 타입을 다루는 방법을 배웁니다."
+    keywords: ['변수', 'variable', 'int', 'float', 'str', 'bool', 'type']
+
+intro:
+  emoji: "📦"
+  points:
+  - 변수의 개념과 값 저장 방법
+  - 정수, 실수, 문자열, 불린 데이터 타입
+  - type() 함수로 타입 확인하기
+  - len() 함수로 길이 측정하기
+  - 타입 변환 (int, float, str)
+  - 다중 변수 할당 기법
+
+sections:
+- id: variable_concept
+  title: 변수란?
+  subtitle: 데이터를 저장하는 이름표
+  blocks:
+  - type: text
+    content: |-
+      변수(Variable)는 데이터를 저장하는 메모리 공간에 붙인 이름표입니다.
+      마치 상자에 물건을 넣고 라벨을 붙이는 것과 같습니다.
+      변수를 사용하면 데이터를 저장했다가 나중에 다시 사용할 수 있습니다.
+      = 기호는 수학의 "같다"가 아니라 "오른쪽 값을 왼쪽 변수에 저장한다"는 의미입니다.
+  - type: list
+    items:
+    - 변수명 = 값 형태로 할당
+    - 데이터를 저장하고 재사용
+    - "= 기호는 할당(assignment) 의미"
+    - 의미 있는 이름으로 가독성 향상
+  - type: code
+    language: python
+    title: 변수 기본 사용
+    description: "변수에 값을 저장하고 사용합니다."
+    content: |-
+      msg = 'Python'
+      msg
+  - type: tip
+    content: "변수명은 영문자, 숫자, 밑줄(_)만 사용 가능하며, 숫자로 시작할 수 없습니다."
+
+- id: "naming_convention"
+  title: "변수명 작성 스타일"
+  subtitle: "카멜케이스 vs 스네이크케이스"
+  blocks:
+  - type: "text"
+    content: "변수명을 지을 때 단어를 연결하는 방법에는 크게 두 가지 스타일이 있습니다. 카멜케이스(camelCase)는 첫 단어는 소문자로 시작하고 이후 단어의 첫 글자를 대문자로 쓰는 방식입니다. 스네이크케이스(snake_case)는 모든 단어를 소문자로 쓰고 밑줄(_)로 연결하는 방식입니다. 파이썬 공식 스타일 가이드(PEP 8)는 스네이크케이스를 권장하지만, 이 학습 컨텐츠는 작성자의 코딩 스타일에 따라 카멜케이스를 사용합니다."
+  - type: "list"
+    items:
+    - "카멜케이스: userName, totalPrice, isActive"
+    - "스네이크케이스: user_name, total_price, is_active"
+    - "파이썬 공식 가이드는 스네이크케이스 권장"
+    - "중요한 것은 한 프로젝트에서 일관성 유지"
+  - type: "code"
+    language: "python"
+    title: "두 가지 스타일 비교"
+    description: "카멜케이스와 스네이크케이스 모두 사용 가능합니다."
+    content: |-
+      userName = 'John Doe'
+      user_name = 'Jane Smith'
+      print('카멜케이스 : ', userName, '\n스네이크케이스 : ', user_name)
+  - type: "tip"
+    content: "이 학습 컨텐츠는 카멜케이스로 작성되었지만, 여러분은 원하는 스타일을 선택하여 사용하세요. 중요한 것은 선택한 스타일을 일관되게 유지하는 것입니다."
+
+- id: variable_reassign
+  title: 변수 값 변경하기
+  subtitle: 저장된 값을 새 값으로 교체
+  blocks:
+  - type: text
+    content: |-
+      변수는 언제든지 새로운 값으로 변경할 수 있습니다.
+      같은 변수에 새 값을 할당하면 이전 값은 사라지고 새 값으로 대체됩니다.
+      이것이 "변수(Variable)"라는 이름의 의미입니다.
+  - type: list
+    items:
+    - 같은 변수에 새 값 할당 가능
+    - 이전 값은 사라지고 새 값으로 대체
+    - 변할 수 있기에 "변수"
+  - type: code
+    language: python
+    title: 변수 값 변경
+    description: "변수에 새로운 값을 할당합니다."
+    content: |-
+      score = 80
+      score = 95
+      score
+  - type: tip
+    content: "변수는 최종적으로 할당된 값을 가집니다."
+
+- id: type_integer
+  title: 정수 타입
+  subtitle: 소수점 없는 숫자
+  blocks:
+  - type: text
+    content: |-
+      정수(Integer)는 소수점이 없는 숫자입니다.
+      1, 100, -5처럼 양수, 0, 음수 모두 정수입니다.
+      파이썬에서 정수 타입은 int로 표시됩니다.
+      int는 integer(정수)의 줄임말입니다.
+  - type: list
+    items:
+    - 소수점 없는 숫자
+    - 양수, 0, 음수 모두 가능
+    - 타입 이름은 int
+  - type: code
+    language: python
+    title: 정수 변수
+    description: "정수를 변수에 저장합니다."
+    content: |-
+      years = 25
+      years
+
+- id: type_float
+  title: 실수 타입
+  subtitle: 소수점 있는 숫자
+  blocks:
+  - type: text
+    content: |-
+      실수(Float)는 소수점이 있는 숫자입니다.
+      3.14, 2.5, -1.5처럼 소수점을 포함한 숫자입니다.
+      파이썬에서 실수 타입은 float로 표시됩니다.
+      float는 floating point(부동소수점)의 줄임말입니다.
+  - type: list
+    items:
+    - 소수점 있는 숫자
+    - 정밀한 계산에 사용
+    - 타입 이름은 float
+  - type: code
+    language: python
+    title: 실수 변수
+    description: "실수를 변수에 저장합니다."
+    content: |-
+      pi = 3.14159
+      pi
+
+- id: type_string
+  title: 문자열 타입
+  subtitle: 따옴표로 감싼 텍스트
+  blocks:
+  - type: text
+    content: |-
+      문자열(String)은 따옴표로 감싼 텍스트입니다.
+      'Hello', "Python"처럼 작은따옴표나 큰따옴표로 만듭니다.
+      문자 하나('A')도 문자열이고, 긴 문장도 문자열입니다.
+      파이썬에서 문자열 타입은 str로 표시됩니다.
+  - type: list
+    items:
+    - 따옴표로 감싼 텍스트
+    - 한 글자도 문자열
+    - 타입 이름은 str
+  - type: code
+    language: python
+    title: 문자열 변수
+    description: "문자열을 변수에 저장합니다."
+    content: |-
+      town = 'Seoul'
+      town
+
+- id: type_boolean
+  title: 불린 타입
+  subtitle: 참과 거짓
+  blocks:
+  - type: text
+    content: |-
+      불린(Boolean)은 참(True) 또는 거짓(False) 두 가지 값만 가지는 타입입니다.
+      영국 수학자 조지 불(George Boole)의 이름에서 유래했습니다.
+      True와 False는 첫 글자가 반드시 대문자여야 합니다.
+      조건 판단, 비교 연산에서 주로 사용됩니다.
+  - type: list
+    items:
+    - True 또는 False 두 값만 존재
+    - 첫 글자 반드시 대문자
+    - 조건 판단에 사용
+    - 타입 이름은 bool
+  - type: code
+    language: python
+    title: 불린 변수
+    description: "True와 False를 변수에 저장합니다."
+    content: |-
+      active = True
+      active
+
+- id: type_function
+  title: type() 함수
+  subtitle: 데이터 타입 확인하기
+  blocks:
+  - type: text
+    content: |-
+      type() 함수는 값이나 변수의 데이터 타입을 알려줍니다.
+      괄호 안에 변수나 값을 넣으면 그것의 타입을 반환합니다.
+      결과는 <class 'int'>, <class 'str'> 같은 형태로 표시됩니다.
+      디버깅이나 타입 확인에 매우 유용합니다.
+  - type: list
+    items:
+    - type(값) 형태로 사용
+    - 데이터 타입 확인
+    - "<class '타입이름'> 형태로 반환"
+  - type: code
+    language: python
+    title: type() 함수 사용
+    description: "다양한 값의 타입을 확인합니다."
+    content: |-
+      point = 100
+      type(point)
+
+- id: len_function
+  title: len() 함수
+  subtitle: 문자열 길이 측정
+  blocks:
+  - type: text
+    content: |-
+      len() 함수는 문자열의 길이(문자 개수)를 반환합니다.
+      len은 length(길이)의 줄임말입니다.
+      공백, 특수문자, 한글 모두 각각 1로 계산됩니다.
+      빈 문자열('')의 길이는 0입니다.
+  - type: list
+    items:
+    - len(문자열) 형태로 사용
+    - 문자 개수 반환
+    - 공백도 1로 계산
+  - type: code
+    language: python
+    title: len() 함수 사용
+    description: "문자열의 길이를 측정합니다."
+    content: |-
+      email = 'python@example.com'
+      len(email)
+  - type: tip
+    content: "'Hello World'의 길이는 11입니다. 공백도 문자로 계산됩니다."
+
+- id: convert_to_int
+  title: int() 변환
+  subtitle: 정수로 변환하기
+  blocks:
+  - type: text
+    content: |-
+      int() 함수는 다른 타입을 정수로 변환합니다.
+      문자열 '100'을 숫자 100으로 바꿀 수 있습니다.
+      단, 문자열은 숫자로만 이루어져 있어야 합니다.
+      실수를 정수로 변환하면 소수점 이하는 버려집니다.
+  - type: list
+    items:
+    - int(값) 형태로 사용
+    - 문자열을 정수로 변환
+    - 실수는 소수점 이하 버림
+  - type: code
+    language: python
+    title: int() 변환
+    description: "문자열과 실수를 정수로 변환합니다."
+    content: |-
+      text = '100'
+      int(text)
+
+- id: convert_to_float
+  title: float() 변환
+  subtitle: 실수로 변환하기
+  blocks:
+  - type: text
+    content: |-
+      float() 함수는 다른 타입을 실수로 변환합니다.
+      정수 10을 실수 10.0으로 바꿀 수 있습니다.
+      문자열 '3.14'를 숫자 3.14로 변환할 수 있습니다.
+  - type: list
+    items:
+    - float(값) 형태로 사용
+    - 정수를 실수로 변환
+    - 문자열을 실수로 변환
+  - type: code
+    language: python
+    title: float() 변환
+    description: "정수와 문자열을 실수로 변환합니다."
+    content: |-
+      val = 42
+      float(val)
+
+- id: convert_to_str
+  title: str() 변환
+  subtitle: 문자열로 변환하기
+  blocks:
+  - type: text
+    content: |-
+      str() 함수는 어떤 값이든 문자열로 변환합니다.
+      숫자 25를 문자열 '25'로 바꿀 수 있습니다.
+      문자열 연결이나 출력 메시지를 만들 때 자주 사용됩니다.
+  - type: list
+    items:
+    - str(값) 형태로 사용
+    - 모든 타입을 문자열로 변환
+    - 문자열 연결에 필수
+  - type: code
+    language: python
+    title: str() 변환
+    description: "숫자를 문자열로 변환합니다."
+    content: |-
+      code = 123
+      str(code)
+
+- id: multiple_assign
+  title: 다중 변수 할당
+  subtitle: 한 줄로 여러 변수 선언
+  blocks:
+  - type: text
+    content: |-
+      쉼표로 구분하여 한 줄에 여러 변수를 선언할 수 있습니다.
+      순서대로 매칭되므로 첫 번째 변수에 첫 번째 값이 저장됩니다.
+      코드를 더 간결하게 만들 수 있습니다.
+  - type: list
+    items:
+    - 쉼표로 변수와 값 구분
+    - 순서대로 매칭
+    - 코드 간결화
+  - type: code
+    language: python
+    title: 다중 변수 할당
+    description: "여러 변수를 한 줄에 선언합니다."
+    content: |-
+      name, age, city = 'Alice', 25, 'Seoul'
+      name, age, city
+
+- id: same_value_assign
+  title: 같은 값 할당
+  subtitle: 여러 변수에 동일한 값
+  blocks:
+  - type: text
+    content: |-
+      = 연산자를 연결하면 여러 변수에 같은 값을 동시에 할당할 수 있습니다.
+      모든 변수가 동일한 값을 가지게 됩니다.
+      초기화할 때 자주 사용하는 패턴입니다.
+  - type: list
+    items:
+    - "= 연산자 연결"
+    - 모든 변수에 같은 값
+    - 초기화에 유용
+  - type: code
+    language: python
+    title: 같은 값 할당
+    description: "여러 변수에 같은 값을 할당합니다."
+    content: |-
+      a = b = c = 0
+      a
+
+- id: practice
+  title: Day 2 종합 복습
+  subtitle: 변수와 타입 마스터하기
+  blocks:
+  - type: text
+    content: |-
+      Day 2에서 배운 변수, 데이터 타입, 타입 변환을 난이도별로 복습합니다.
+      🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+
+  - type: expansion
+    title: "🟢 기본1: 변수 선언"
+    code: |-
+      lang = 'Python'
+      lang
+
+  - type: expansion
+    title: "🟢 기본2: 정수 변수"
+    code: |-
+      num = 30
+      num
+
+  - type: expansion
+    title: "🟢 기본3: 실수 변수"
+    code: |-
+      cost = 19.99
+      cost
+
+  - type: expansion
+    title: "🟢 기본4: 타입 확인"
+    code: |-
+      greeting = 'Hello'
+      type(greeting)
+
+  - type: expansion
+    title: "🟢 기본5: 길이 확인"
+    code: |-
+      term = 'Python'
+      len(term)
+
+  - type: expansion
+    title: "🟡 응용1-1: 사용자 이름과 나이"
+    blocks:
+    - type: code
+      title: "사용자 이름"
+      content: |-
+        name = '홍길동'
+        print('name:', name)
+
+    - type: code
+      title: "사용자 나이"
+      content: |-
+        age = 25
+        print('age:', age)
+
+  - type: expansion
+    title: "🟡 응용1-2: 사용자 도시"
+    code: |-
+      city = '서울'
+      print('city:', city)
+
+  - type: expansion
+    title: "🟡 응용2: 나이 계산"
+    code: |-
+      birth = 2000
+      now = 2024
+      age = now - birth
+      age
+
+  - type: expansion
+    title: "🟡 응용3: 가격 계산"
+    code: |-
+      price = '15000'
+      unit = int(price)
+      qty = 3
+      total = unit * qty
+      total
+
+  - type: expansion
+    title: "🟡 응용4-1: 문자열 길이"
+    blocks:
+    - type: code
+      title: "문자열 내용"
+      content: |-
+        text = 'Hello Python'
+        print('text:', text)
+
+    - type: code
+      title: "문자열 길이"
+      content: |-
+        msg = 'Hello Python'
+        length = len(msg)
+        print('length:', length)
+
+  - type: expansion
+    title: "🟡 응용4-2: 문자열 타입"
+    code: |-
+      phrase = 'Hello Python'
+      form = type(phrase).__name__
+      print('type:', form)
+
+  - type: expansion
+    title: "🟡 응용5: 다중 할당 활용"
+    code: |-
+      x, y, z = 100, 200, 300
+      result = x + y + z
+      result
+
+  - type: expansion
+    title: "🔴 심화1-1: 프로필 기본 정보"
+    blocks:
+    - type: code
+      title: "이름"
+      content: |-
+        name = '김개발'
+        print('name:', name)
+
+    - type: code
+      title: "나이"
+      content: |-
+        age = 28
+        print('age:', age)
+
+    - type: code
+      title: "직업"
+      content: |-
+        job = '개발자'
+        print('job:', job)
+
+  - type: expansion
+    title: "🔴 심화1-2: 프로필 상세 정보"
+    blocks:
+    - type: code
+      title: "급여"
+      content: |-
+        salary = 50000.0
+        print('salary:', salary)
+
+    - type: code
+      title: "활성 상태"
+      content: |-
+        active = True
+        print('active:', active)
+
+    - type: code
+      title: "이름 길이"
+      content: |-
+        length = len('김개발')
+        print('name_length:', length)
+
+  - type: expansion
+    title: "🔴 심화2-1: 상품 기본 정보"
+    blocks:
+    - type: code
+      title: "상품명"
+      content: |-
+        product = '노트북'
+        print('product:', product)
+
+    - type: code
+      title: "단가"
+      content: |-
+        cost = '1200000'
+        price = int(cost)
+        print('unit_price:', price)
+
+  - type: expansion
+    title: "🔴 심화2-2: 상품 재고 가치"
+    blocks:
+    - type: code
+      title: "재고 수량"
+      content: |-
+        stock = 5
+        print('stock:', stock)
+
+    - type: code
+      title: "총 가치"
+      content: |-
+        price = 1200000
+        qty = 5
+        value = price * qty
+        print('total_value:', value)
+
+  - type: expansion
+    title: "🔴 심화3-1: 문자열 검증"
+    blocks:
+    - type: code
+      title: "텍스트 값"
+      content: |-
+        sample = 'Python123'
+        print('text_value:', sample)
+
+    - type: code
+      title: "텍스트 타입"
+      content: |-
+        token = 'Python123'
+        kind = type(token).__name__
+        print('text_type:', kind)
+
+    - type: code
+      title: "텍스트 길이"
+      content: |-
+        label = 'Python123'
+        size = len(label)
+        print('text_length:', size)
+
+  - type: expansion
+    title: "🔴 심화3-2: 숫자 변환 검증"
+    blocks:
+    - type: code
+      title: "문자열 숫자"
+      content: |-
+        text = '456'
+        print('number_as_str:', text)
+
+    - type: code
+      title: "정수로 변환"
+      content: |-
+        raw = '456'
+        num = int(raw)
+        print('number_as_int:', num)
+
+    - type: code
+      title: "변환된 타입"
+      content: |-
+        source = '456'
+        converted = int(source)
+        kind = type(converted).__name__
+        print('converted_type:', kind)
+
+  - type: expansion
+    title: "🔴 심화4-1: 학생 개별 과목 성적"
+    blocks:
+    - type: code
+      title: "학생 이름"
+      content: |-
+        student = '이학생'
+        print('name:', student)
+
+    - type: code
+      title: "수학 성적"
+      content: |-
+        math = 85
+        print('math:', math)
+
+    - type: code
+      title: "영어 성적"
+      content: |-
+        english = 90
+        print('english:', english)
+
+  - type: expansion
+    title: "🔴 심화4-2: 학생 평균 성적"
+    blocks:
+    - type: code
+      title: "과학 성적"
+      content: |-
+        science = 88
+        print('science:', science)
+
+    - type: code
+      title: "평균 계산"
+      content: |-
+        math = 85
+        eng = 90
+        sci = 88
+        avg = (math + eng + sci) / 3
+        print('average:', avg)
+
+  - type: expansion
+    title: "🔴 심화5-1: 타입 변환 1단계"
+    blocks:
+    - type: code
+      title: "원본 문자열"
+      content: |-
+        origin = '99.5'
+        print('original_str:', origin)
+
+    - type: code
+      title: "실수로 변환"
+      content: |-
+        raw = '99.5'
+        decimal = float(raw)
+        print('to_float:', decimal)
+
+    - type: code
+      title: "정수로 변환"
+      content: |-
+        src = '99.5'
+        dec = float(src)
+        num = int(dec)
+        print('to_int:', num)
+
+  - type: expansion
+    title: "🔴 심화5-2: 타입 변환 2단계"
+    blocks:
+    - type: code
+      title: "문자열로 변환"
+      content: |-
+        num = 99
+        text = str(num)
+        print('back_to_str:', text)
+
+    - type: code
+      title: "최종 길이"
+      content: |-
+        digit = 99
+        text = str(digit)
+        length = len(text)
+        print('final_length:', length)

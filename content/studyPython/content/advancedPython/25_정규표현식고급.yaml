@@ -1,0 +1,646 @@
+meta:
+  id: "25"
+  title: "정규표현식 고급"
+  day: 25
+  category: "advancedPython"
+  tags: ["regex", "lookahead", "lookbehind", "backreference", "group"]
+  seo:
+    title: "파이썬 정규표현식 고급"
+    description: "룩어헤드, 룩비하인드, 그룹, 백레퍼런스 등 고급 정규표현식 기법 학습"
+    keywords: ["정규표현식", "룩어헤드", "룩비하인드", "백레퍼런스"]
+
+intro:
+  emoji: "🔍"
+  points:
+  - "룩어헤드/룩비하인드 이해"
+  - "그룹과 백레퍼런스 활용"
+  - "복잡한 패턴 작성"
+  - "성능 최적화"
+
+sections:
+- id: "basic_review"
+  title: "기본 패턴 복습"
+  subtitle: "정규표현식 기초 문법"
+  blocks:
+  - type: "text"
+    content: "정규표현식 기본 문법 복습"
+  - type: "code"
+    language: "python"
+    title: "기본 패턴 매칭"
+    description: "숫자, 단어, 공백 패턴"
+    content: |-
+      import re
+
+      reviewText = "Hello World 123 Python3.9"
+      reviewDigits = re.findall(r'\d+', reviewText)
+      reviewWords = re.findall(r'\w+', reviewText)
+      reviewSplit = re.split(r'\s+', reviewText)
+      reviewResult = (reviewDigits, reviewWords, reviewSplit)
+      reviewResult
+  - type: "code"
+    language: "python"
+    title: "검증 패턴"
+    description: "이메일, 전화번호 검증"
+    content: |-
+      import re
+
+      validEmail = "user@example.com"
+      validPhone = "010-1234-5678"
+      emailOk = bool(re.match(r'^[\w.-]+@[\w.-]+\.\w+$', validEmail))
+      phoneOk = bool(re.match(r'^\d{3}-\d{4}-\d{4}$', validPhone))
+      validResult = (emailOk, phoneOk)
+      validResult
+
+- id: "groups_basic"
+  title: "그룹 기초"
+  subtitle: "캡처 그룹으로 부분 추출"
+  blocks:
+  - type: "text"
+    content: "괄호로 그룹을 만들면 매칭된 부분을 개별적으로 추출할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "날짜 그룹 추출"
+    description: "년월일 개별 추출"
+    content: |-
+      import re
+
+      dateStr = "2024-03-15"
+      dateMatch = re.match(r'(\d{4})-(\d{2})-(\d{2})', dateStr)
+      dateYear = dateMatch.group(1)
+      dateMonth = dateMatch.group(2)
+      dateDay = dateMatch.group(3)
+      dateAll = dateMatch.groups()
+      dateResult = (dateYear, dateMonth, dateDay, dateAll)
+      dateResult
+  - type: "code"
+    language: "python"
+    title: "명명된 그룹"
+    description: "이름으로 그룹 접근"
+    content: |-
+      import re
+
+      logLine = "ERROR [2024-03-15 10:30:45] Connection failed"
+      logPattern = r'(?P<level>\w+) \[(?P<date>\d{4}-\d{2}-\d{2}) (?P<time>\d{2}:\d{2}:\d{2})\] (?P<msg>.*)'
+      logMatch = re.match(logPattern, logLine)
+      logLevel = logMatch.group('level')
+      logDate = logMatch.group('date')
+      logDict = logMatch.groupdict()
+      logResult = (logLevel, logDate, logDict)
+      logResult
+
+- id: "lookahead"
+  title: "룩어헤드"
+  subtitle: "전방 탐색으로 조건부 매칭"
+  blocks:
+  - type: "text"
+    content: "(?=...) 긍정 룩어헤드: 뒤에 패턴이 있어야 매칭. (?!...) 부정 룩어헤드: 뒤에 패턴이 없어야 매칭."
+  - type: "code"
+    language: "python"
+    title: "긍정 룩어헤드"
+    description: "뒤에 특정 패턴이 있는 경우만"
+    content: |-
+      import re
+
+      laText = "foo123 bar456 foo789"
+      laPattern = r'\w+(?=\d{3})'
+      laFound = re.findall(laPattern, laText)
+      laResult = laFound
+      laResult
+  - type: "code"
+    language: "python"
+    title: "비밀번호 검증"
+    description: "룩어헤드로 조건 검사"
+    content: |-
+      import re
+
+      pwdText = "Passw0rd!"
+      pwdHasUpper = bool(re.search(r'(?=.*[A-Z])', pwdText))
+      pwdHasLower = bool(re.search(r'(?=.*[a-z])', pwdText))
+      pwdHasDigit = bool(re.search(r'(?=.*\d)', pwdText))
+      pwdHasSpecial = bool(re.search(r'(?=.*[!@#$%^&*])', pwdText))
+      pwdResult = (pwdHasUpper, pwdHasLower, pwdHasDigit, pwdHasSpecial)
+      pwdResult
+
+- id: "lookbehind"
+  title: "룩비하인드"
+  subtitle: "후방 탐색으로 조건부 매칭"
+  blocks:
+  - type: "text"
+    content: "(?<=...) 긍정 룩비하인드: 앞에 패턴이 있어야 매칭. (?<!...) 부정 룩비하인드: 앞에 패턴이 없어야 매칭."
+  - type: "code"
+    language: "python"
+    title: "긍정 룩비하인드"
+    description: "앞에 특정 패턴이 있는 경우만"
+    content: |-
+      import re
+
+      lbText = "Price: $100 and €50"
+      lbDollar = re.findall(r'(?<=\$)\d+', lbText)
+      lbEuro = re.findall(r'(?<=€)\d+', lbText)
+      lbResult = (lbDollar, lbEuro)
+      lbResult
+  - type: "code"
+    language: "python"
+    title: "HTML 내용 추출"
+    description: "태그 사이 텍스트"
+    content: |-
+      import re
+
+      htmlText = "<div>content</div><span>text</span>"
+      htmlContent = re.findall(r'(?<=>)[^<]+(?=<)', htmlText)
+      htmlResult = htmlContent
+      htmlResult
+
+- id: "backreference"
+  title: "백레퍼런스"
+  subtitle: "캡처한 그룹을 다시 참조"
+  blocks:
+  - type: "text"
+    content: "\\1, \\2 등으로 앞서 캡처한 그룹을 다시 매칭에 사용합니다."
+  - type: "code"
+    language: "python"
+    title: "중복 단어 찾기"
+    description: "연속 중복 단어 탐지"
+    content: |-
+      import re
+
+      dupText = "hello hello world world world"
+      dupPattern = r'\b(\w+)\s+\1\b'
+      dupFound = re.findall(dupPattern, dupText)
+      dupResult = dupFound
+      dupResult
+  - type: "code"
+    language: "python"
+    title: "HTML 태그 매칭"
+    description: "여는 태그와 닫는 태그 일치"
+    content: |-
+      import re
+
+      tagHtml = '<div class="box">content</div>'
+      tagPattern = r'<(\w+)[^>]*>.*?</\1>'
+      tagMatch = re.findall(tagPattern, tagHtml)
+      tagResult = tagMatch
+      tagResult
+  - type: "code"
+    language: "python"
+    title: "치환에서 백레퍼런스"
+    description: "순서 바꾸기, 포맷 변경"
+    content: |-
+      import re
+
+      swapName = "John Smith"
+      swapped = re.sub(r'(\w+) (\w+)', r'\2 \1', swapName)
+      reformatDate = "2024-03-15"
+      reformatted = re.sub(r'(\d{4})-(\d{2})-(\d{2})', r'\2/\3/\1', reformatDate)
+      backrefResult = (swapped, reformatted)
+      backrefResult
+
+- id: "non_capture"
+  title: "비캡처 그룹"
+  subtitle: "그룹화만 하고 캡처하지 않음"
+  blocks:
+  - type: "text"
+    content: "(?:...) 비캡처 그룹: 그룹화는 하지만 결과에 포함되지 않습니다. 성능과 가독성 향상."
+  - type: "code"
+    language: "python"
+    title: "캡처 vs 비캡처"
+    description: "결과 차이 비교"
+    content: |-
+      import re
+
+      ncText = "foobar foobaz"
+      ncCapture = re.findall(r'(foo)(bar|baz)', ncText)
+      ncNonCapture = re.findall(r'(?:foo)(bar|baz)', ncText)
+      ncResult = (ncCapture, ncNonCapture)
+      ncResult
+  - type: "code"
+    language: "python"
+    title: "URL 매칭"
+    description: "비캡처 그룹 활용"
+    content: |-
+      import re
+
+      urlText = "https://example.com or http://test.org"
+      urlPattern = r'https?://(?:\w+\.)+\w+'
+      urlFound = re.findall(urlPattern, urlText)
+      urlResult = urlFound
+      urlResult
+
+- id: "flags"
+  title: "플래그"
+  subtitle: "매칭 동작 변경"
+  blocks:
+  - type: "text"
+    content: "(?i) 대소문자 무시, (?m) 멀티라인, (?s) 점이 줄바꿈도 매칭, (?x) 확장 모드"
+  - type: "code"
+    language: "python"
+    title: "인라인 플래그"
+    description: "패턴 내 플래그 지정"
+    content: |-
+      import re
+
+      flagText = "HELLO hello HeLLo"
+      flagCaseInsensitive = re.findall(r'(?i)hello', flagText)
+      flagMultiText = "start line1\nstart line2"
+      flagMultiline = re.findall(r'(?m)^start', flagMultiText)
+      flagResult = (flagCaseInsensitive, flagMultiline)
+      flagResult
+
+- id: "substitution"
+  title: "치환"
+  subtitle: "패턴 기반 문자열 변환"
+  blocks:
+  - type: "text"
+    content: "re.sub()로 패턴에 매칭되는 부분을 치환합니다."
+  - type: "code"
+    language: "python"
+    title: "기본 치환"
+    description: "단순 문자열 교체"
+    content: |-
+      import re
+
+      subText = "cat dog cat bird"
+      subReplaced = re.sub(r'cat|dog', 'animal', subText)
+      subHtml = "<b>bold</b> and <i>italic</i>"
+      subStripped = re.sub(r'<[^>]+>', '', subHtml)
+      subResult = (subReplaced, subStripped)
+      subResult
+  - type: "code"
+    language: "python"
+    title: "콜백 함수"
+    description: "동적 치환"
+    content: |-
+      import re
+
+      def doubleNum(match):
+          return str(int(match.group()) * 2)
+
+      cbText = "price: 10, quantity: 5"
+      cbDoubled = re.sub(r'\d+', doubleNum, cbText)
+      cbResult = cbDoubled
+      cbResult
+  - type: "code"
+    language: "python"
+    title: "이메일 마스킹"
+    description: "콜백으로 부분 마스킹"
+    content: |-
+      import re
+
+      def maskMail(match):
+          local = match.group(1)
+          domain = match.group(2)
+          masked = local[0] + '*' * (len(local) - 1)
+          return f"{masked}@{domain}"
+
+      mailText = "Contact: john@example.com"
+      mailMasked = re.sub(r'(\w+)@([\w.]+)', maskMail, mailText)
+      mailResult = mailMasked
+      mailResult
+
+- id: "practice"
+  title: "종합 연습"
+  subtitle: "정규표현식 실습"
+  blocks:
+  - type: "text"
+    content: "Day 25에서 배운 고급 정규표현식을 난이도별로 복습합니다. 룩어헤드와 룩비하인드는 패턴의 앞뒤 문맥을 검사하는 강력한 도구입니다. 그룹과 백레퍼런스는 복잡한 텍스트 파싱과 치환에 필수적이며, 명명된 그룹은 가독성을 높입니다. 🟢 기본 문제로 이메일, 전화번호 등 실용적인 검증 패턴을 작성하고, 🟡 응용 문제로 룩어라운드와 조건부 매칭을 연습하세요. 🔴 심화 문제에서는 프로그래밍 언어 토크나이저, 로그 파서 등 복잡한 파싱기를 직접 구현해봅니다. 정규표현식 숙달은 텍스트 처리 생산성을 10배 이상 높여줍니다."
+  - type: "expansion"
+    title: "기본1: 이메일 검증"
+    code: |-
+      import re
+
+      def validateMail(email):
+          pattern = r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+          return bool(re.match(pattern, email))
+
+      ex1Emails = ["test@example.com", "invalid", "a@b.co"]
+      ex1Result = [validateMail(e) for e in ex1Emails]
+      ex1Result
+  - type: "expansion"
+    title: "기본2: 전화번호 포맷"
+    code: |-
+      import re
+
+      def formatTel(phone):
+          digits = re.sub(r'\D', '', phone)
+          if len(digits) == 11:
+              return re.sub(r'(\d{3})(\d{4})(\d{4})', r'\1-\2-\3', digits)
+          return phone
+
+      ex2Phones = ["01012345678", "010 1234 5678"]
+      ex2Result = [formatTel(p) for p in ex2Phones]
+      ex2Result
+  - type: "expansion"
+    title: "기본3: URL 파싱"
+    code: |-
+      import re
+
+      def parseUri(url):
+          pattern = r'^(?P<proto>https?)://(?P<domain>[\w.-]+)(?::(?P<port>\d+))?(?P<path>/[^?]*)?'
+          match = re.match(pattern, url)
+          return match.groupdict() if match else None
+
+      ex3Url = "https://example.com:8080/path/to/page"
+      ex3Result = parseUri(ex3Url)
+      ex3Result
+  - type: "expansion"
+    title: "기본4: HTML 태그 추출"
+    code: |-
+      import re
+
+      def extractTag(html):
+          pattern = r'<(\w+)[^>]*>'
+          return list(set(re.findall(pattern, html)))
+
+      ex4Html = "<div><p>Hello</p><span>World</span></div>"
+      ex4Result = extractTag(ex4Html)
+      ex4Result
+  - type: "expansion"
+    title: "기본5: 숫자 천단위 콤마"
+    code: |-
+      import re
+
+      def formatNum(num):
+          numStr = str(num)
+          return re.sub(r'(\d)(?=(\d{3})+$)', r'\1,', numStr)
+
+      ex5Nums = [1000, 1000000, 1234567890]
+      ex5Result = [formatNum(n) for n in ex5Nums]
+      ex5Result
+  - type: "expansion"
+    title: "중급6: 비밀번호 강도"
+    code: |-
+      import re
+
+      def checkPwd(pwd):
+          checks = {
+              'length': len(pwd) >= 8,
+              'upper': bool(re.search(r'[A-Z]', pwd)),
+              'lower': bool(re.search(r'[a-z]', pwd)),
+              'digit': bool(re.search(r'\d', pwd)),
+              'special': bool(re.search(r'[!@#$%^&*]', pwd))
+          }
+          score = sum(checks.values())
+          return {'checks': checks, 'score': score}
+
+      ex6Pwd = "MyP@ssw0rd!"
+      ex6Result = checkPwd(ex6Pwd)
+      ex6Result
+  - type: "expansion"
+    title: "중급7: 중복 단어 제거"
+    code: |-
+      import re
+
+      def removeDup(text):
+          pattern = r'\b(\w+)(?:\s+\1)+\b'
+          return re.sub(pattern, r'\1', text, flags=re.IGNORECASE)
+
+      ex7Text = "This is is a test test string"
+      ex7Result = removeDup(ex7Text)
+      ex7Result
+  - type: "expansion"
+    title: "중급8: 마크다운 링크"
+    code: |-
+      import re
+
+      def parseMdLink(text):
+          pattern = r'\[(?P<text>[^\]]+)\]\((?P<url>[^)]+)\)'
+          matches = re.finditer(pattern, text)
+          return [{'text': m.group('text'), 'url': m.group('url')} for m in matches]
+
+      ex8Md = "Check [Google](https://google.com) and [GitHub](https://github.com)"
+      ex8Result = parseMdLink(ex8Md)
+      ex8Result
+  - type: "expansion"
+    title: "중급9: 케이스 변환"
+    code: |-
+      import re
+
+      def toSnake(text):
+          result = re.sub(r'(?<!^)(?=[A-Z])', '_', text)
+          return result.lower()
+
+      def toCamel(text):
+          parts = text.split('_')
+          return parts[0] + ''.join(x.title() for x in parts[1:])
+
+      ex9Camel = "getUserNameById"
+      ex9Snake = "get_user_name_by_id"
+      ex9Result = (toSnake(ex9Camel), toCamel(ex9Snake))
+      ex9Result
+  - type: "expansion"
+    title: "중급10: IP 검증"
+    code: |-
+      import re
+
+      def validateIp(ip):
+          octet = r'(?:25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)'
+          pattern = rf'^{octet}\.{octet}\.{octet}\.{octet}$'
+          return bool(re.match(pattern, ip))
+
+      ex10Ips = ["192.168.1.1", "256.1.1.1", "10.0.0.1"]
+      ex10Result = [(ip, validateIp(ip)) for ip in ex10Ips]
+      ex10Result
+  - type: "expansion"
+    title: "고급11: 로그 파싱"
+    code: |-
+      import re
+
+      def parseLog(line):
+          pattern = r'(?P<ip>[\d.]+)\s+-\s+-\s+\[(?P<date>[^\]]+)\]\s+"(?P<method>\w+)\s+(?P<path>[^\s]+)'
+          match = re.match(pattern, line)
+          return match.groupdict() if match else None
+
+      ex11Log = '192.168.1.1 - - [15/Mar/2024:10:30:45] "GET /api/users'
+      ex11Result = parseLog(ex11Log)
+      ex11Result
+  - type: "expansion"
+    title: "고급12: 신용카드 마스킹"
+    code: |-
+      import re
+
+      def maskCard(text):
+          pattern = r'\b(\d{4})[\s-]?(\d{4})[\s-]?(\d{4})[\s-]?(\d{4})\b'
+          def masker(m):
+              return f"{m.group(1)}-****-****-{m.group(4)}"
+          return re.sub(pattern, masker, text)
+
+      ex12Card = "Card: 1234-5678-9012-3456"
+      ex12Result = maskCard(ex12Card)
+      ex12Result
+  - type: "expansion"
+    title: "고급13: 템플릿 렌더링"
+    code: |-
+      import re
+
+      def renderTpl(tpl, ctx):
+          pattern = r'\{\{\s*(\w+)\s*\}\}'
+          def replacer(m):
+              return str(ctx.get(m.group(1), m.group(0)))
+          return re.sub(pattern, replacer, tpl)
+
+      ex13Tpl = "Hello {{ name }}, you have {{ count }} messages."
+      ex13Ctx = {"name": "Alice", "count": 5}
+      ex13Result = renderTpl(ex13Tpl, ex13Ctx)
+      ex13Result
+  - type: "expansion"
+    title: "고급14: SQL 파싱"
+    code: |-
+      import re
+
+      def parseSql(query):
+          pattern = r'SELECT\s+(?P<cols>[\w\s,*]+)\s+FROM\s+(?P<tbl>\w+)(?:\s+WHERE\s+(?P<cond>.+))?'
+          match = re.match(pattern, query, re.IGNORECASE)
+          return match.groupdict() if match else None
+
+      ex14Sql = "SELECT id, name FROM users WHERE age > 18"
+      ex14Result = parseSql(ex14Sql)
+      ex14Result
+  - type: "expansion"
+    title: "고급15: 정규식 빌더"
+    code: |-
+      import re
+
+      class RxBuilder:
+          def __init__(self):
+              self.pat = ""
+
+          def literal(self, text):
+              self.pat += re.escape(text)
+              return self
+
+          def digit(self, n=1):
+              self.pat += r'\d' if n == 1 else rf'\d{{{n}}}'
+              return self
+
+          def group(self, pattern, name=None):
+              self.pat += f'(?P<{name}>{pattern})' if name else f'({pattern})'
+              return self
+
+          def build(self):
+              return self.pat
+
+      phoneRx = RxBuilder().group(r'\d{3}', 'area').literal('-').group(r'\d{4}', 'mid').literal('-').group(r'\d{4}', 'last').build()
+      ex15Match = re.match(phoneRx, "010-1234-5678")
+      ex15Result = (phoneRx, ex15Match.groupdict() if ex15Match else None)
+      ex15Result
+  - type: "expansion"
+    title: "고급16: 재귀 패턴"
+    code: |-
+      import re
+
+      def findNested(text, openChar='(', closeChar=')'):
+          result = []
+          depth = 0
+          start = -1
+          for i, c in enumerate(text):
+              if c == openChar:
+                  if depth == 0:
+                      start = i
+                  depth += 1
+              elif c == closeChar:
+                  depth -= 1
+                  if depth == 0 and start != -1:
+                      result.append(text[start:i+1])
+                      start = -1
+          return result
+
+      ex16Text = "calc((a+b)*(c+d))+((e))"
+      ex16Result = findNested(ex16Text)
+      ex16Result
+  - type: "expansion"
+    title: "고급17: 토큰화"
+    code: |-
+      import re
+
+      TOKEN_SPEC = [
+          ('NUMBER', r'\d+(?:\.\d+)?'),
+          ('OP', r'[+\-*/]'),
+          ('PAREN', r'[()]'),
+          ('ID', r'[a-zA-Z_]\w*'),
+          ('WS', r'\s+'),
+      ]
+
+      def tokenize(code):
+          pattern = '|'.join(f'(?P<{name}>{regex})' for name, regex in TOKEN_SPEC)
+          tokens = []
+          for m in re.finditer(pattern, code):
+              kind = m.lastgroup
+              value = m.group()
+              if kind != 'WS':
+                  tokens.append((kind, value))
+          return tokens
+
+      ex17Code = "x + 42 * (y - 3.14)"
+      ex17Result = tokenize(ex17Code)
+      ex17Result
+  - type: "expansion"
+    title: "고급18: 조건부 패턴"
+    code: |-
+      import re
+
+      def parseDate(text):
+          patterns = [
+              (r'(?P<y>\d{4})-(?P<m>\d{2})-(?P<d>\d{2})', 'ISO'),
+              (r'(?P<m>\d{2})/(?P<d>\d{2})/(?P<y>\d{4})', 'US'),
+              (r'(?P<d>\d{2})\.(?P<m>\d{2})\.(?P<y>\d{4})', 'EU'),
+          ]
+          for pat, fmt in patterns:
+              m = re.match(pat, text)
+              if m:
+                  return {'format': fmt, **m.groupdict()}
+          return None
+
+      ex18Dates = ["2024-03-15", "03/15/2024", "15.03.2024"]
+      ex18Result = [parseDate(d) for d in ex18Dates]
+      ex18Result
+  - type: "expansion"
+    title: "고급19: 유니코드 패턴"
+    code: |-
+      import re
+
+      def extractKorean(text):
+          return re.findall(r'[\uac00-\ud7a3]+', text)
+
+      def extractEmoji(text):
+          emojiPat = r'[\U0001F600-\U0001F64F\U0001F300-\U0001F5FF]'
+          return re.findall(emojiPat, text)
+
+      def hasHangul(text):
+          return bool(re.search(r'[\uac00-\ud7a3]', text))
+
+      ex19Mixed = "Hello 안녕하세요 World 세계"
+      ex19WithEmoji = "Great job! 👍 Keep going! 🚀"
+      ex19Result = {
+          "korean": extractKorean(ex19Mixed),
+          "emoji": extractEmoji(ex19WithEmoji),
+          "hasHangul": hasHangul(ex19Mixed)
+      }
+      ex19Result
+  - type: "expansion"
+    title: "고급20: 정규식 최적화"
+    code: |-
+      import re
+
+      EMAIL_COMPILED = re.compile(
+          r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+          re.IGNORECASE
+      )
+
+      URL_COMPILED = re.compile(
+          r'https?://(?:[\w-]+\.)+[\w-]+(?:/[\w./?%&=-]*)?',
+          re.IGNORECASE
+      )
+
+      def validateBatch(items, pattern):
+          return [(item, bool(pattern.match(item))) for item in items]
+
+      def extractAll(text, pattern):
+          return pattern.findall(text)
+
+      ex20Emails = ["test@example.com", "invalid", "user@domain.co.kr"]
+      ex20Text = "Visit https://google.com and http://github.com/test"
+      ex20Result = {
+          "emails": validateBatch(ex20Emails, EMAIL_COMPILED),
+          "urls": extractAll(ex20Text, URL_COMPILED)
+      }
+      ex20Result

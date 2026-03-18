@@ -1,0 +1,207 @@
+meta:
+  id: pillow_03
+  title: 흑백사진변환기
+  order: 3
+  category: pillow
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["Pillow", "convert", "grayscale", "sepia", "pixel"]
+  seo:
+    title: "Pillow 기초 - 흑백 사진 변환기"
+    description: "Pillow로 컬러 이미지를 흑백으로 변환하고 세피아 효과를 적용합니다. 색상 모드와 픽셀 연산을 배웁니다."
+    keywords: ["Pillow", "convert", "grayscale", "흑백", "세피아", "픽셀"]
+
+intro:
+  emoji: "🎞️"
+  goal: Lorem Picsum 이미지를 흑백과 세피아 톤으로 변환합니다.
+  description: convert() 메서드로 색상 모드를 변환하고, 픽셀 단위 연산으로 세피아 효과를 구현합니다. 이미지의 색상 구조를 이해합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 이미지 불러오기
+  subtitle: sklearn 샘플 이미지
+  blocks:
+  - type: text
+    content: sklearn에 내장된 샘플 이미지를 사용합니다. Pyodide 환경에서 외부 URL 접근이 제한되므로, 내장 이미지가 가장 안정적입니다. flower.jpg와 china.jpg 두 개의 샘플 이미지가 있습니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: 필요한 모듈을 임포트합니다
+    content: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flowerArr = load_sample_image('flower.jpg')
+      pic = Image.fromarray(flowerArr)
+      pic.size, pic.mode
+  - type: tip
+    content: sklearn에는 flower.jpg와 china.jpg 두 개의 샘플 이미지가 있습니다. load_sample_image()는 NumPy 배열을 반환하므로 Image.fromarray()로 PIL 이미지로 변환합니다.
+  - type: code
+    language: python
+    title: 원본 이미지
+    description: 컬러 이미지를 확인합니다
+    content: |-
+      pic
+
+- id: step2_grayscale
+  title: 2단계. 흑백 변환
+  subtitle: convert('L')
+  blocks:
+  - type: text
+    content: convert() 메서드는 이미지의 색상 모드를 변환합니다. 'L' 모드는 그레이스케일(흑백)을 의미합니다. RGB 세 채널이 하나의 밝기 채널로 합쳐집니다. 내부적으로 Y = 0.299R + 0.587G + 0.114B 공식이 사용됩니다.
+  - type: code
+    language: python
+    title: 흑백으로 변환
+    description: RGB를 L 모드로 변환합니다
+    content: |-
+      gray = pic.convert('L')
+      gray.mode
+  - type: code
+    language: python
+    title: 흑백 이미지
+    description: 색상 정보가 제거되었습니다
+    content: |-
+      gray
+  - type: tip
+    content: L 모드는 0(검정)부터 255(흰색)까지의 밝기 값 하나만 가집니다. 메모리 사용량이 RGB의 1/3입니다. 많은 이미지 처리 알고리즘이 흑백 이미지에서 더 빠르게 동작합니다.
+
+- id: step3_threshold
+  title: 3단계. 이진화 (흑백 대비)
+  subtitle: point()
+  blocks:
+  - type: text
+    content: point() 메서드는 각 픽셀에 함수를 적용합니다. 이진화는 특정 임계값을 기준으로 픽셀을 완전한 흑(0) 또는 백(255)으로 변환합니다. 마치 잉크 도장처럼 중간 톤이 없는 고대비 이미지가 됩니다.
+  - type: code
+    language: python
+    title: 임계값 설정
+    description: 128을 기준으로 이진화합니다
+    content: |-
+      threshold = 128
+      binary = gray.point(lambda x: 255 if x > threshold else 0)
+      binary.mode
+  - type: code
+    language: python
+    title: 이진화 결과
+    description: 흑백 두 색만 남습니다
+    content: |-
+      binary
+  - type: tip
+    content: point()의 람다 함수는 각 픽셀 값(0-255)을 받아 새 값을 반환합니다. 이진화에서 임계값을 낮추면 더 많은 영역이 흰색이 되고, 높이면 더 많은 영역이 검은색이 됩니다.
+
+- id: step4_sepia
+  title: 4단계. 세피아 효과
+  subtitle: 픽셀 연산
+  blocks:
+  - type: text
+    content: 세피아는 오래된 사진 느낌을 주는 갈색 톤입니다. 흑백 이미지를 RGB로 다시 변환한 뒤, R/G/B 각 채널에 다른 계수를 곱해 세피아 톤을 만듭니다. split()으로 채널을 분리하고 merge()로 합칩니다.
+  - type: code
+    language: python
+    title: 흑백을 RGB로
+    description: 세피아 적용을 위해 RGB로 변환합니다
+    content: |-
+      grayRgb = gray.convert('RGB')
+      grayRgb.mode
+  - type: code
+    language: python
+    title: 채널 분리
+    description: R, G, B 채널을 분리합니다
+    content: |-
+      r, g, b = grayRgb.split()
+      r.mode
+  - type: tip
+    content: split()은 RGB 이미지를 세 개의 L 모드 이미지로 분리합니다. 흑백을 RGB로 변환하면 R=G=B가 동일한 값을 가집니다. 각 채널을 개별 조작한 뒤 merge()로 합칠 수 있습니다.
+  - type: code
+    language: python
+    title: 세피아 계수 적용
+    description: R은 유지, G는 0.9배, B는 0.7배
+    content: |-
+      sepiaR = r.point(lambda x: min(255, int(x * 1.0)))
+      sepiaG = g.point(lambda x: min(255, int(x * 0.9)))
+      sepiaB = b.point(lambda x: min(255, int(x * 0.7)))
+      sepiaG.mode
+  - type: code
+    language: python
+    title: 채널 합성
+    description: merge()로 RGB 이미지를 만듭니다
+    content: |-
+      sepia = Image.merge('RGB', (sepiaR, sepiaG, sepiaB))
+      sepia
+  - type: tip
+    content: 세피아 효과는 R 채널을 강조하고 B 채널을 약화시켜 따뜻한 갈색 톤을 만듭니다. 계수를 조절하면 다양한 톤을 만들 수 있습니다. 빈티지 느낌에는 (1.0, 0.8, 0.6) 정도가 적합합니다.
+
+- id: step5_compare
+  title: 5단계. 결과 비교
+  subtitle: 변환 전후
+  blocks:
+  - type: text
+    content: 원본, 흑백, 이진화, 세피아 네 가지 버전을 비교해봅시다. 각 변환이 이미지의 분위기를 어떻게 바꾸는지 확인합니다.
+  - type: code
+    language: python
+    title: 모드 비교
+    description: 각 이미지의 색상 모드를 확인합니다
+    content: |-
+      modes = {
+          'original': pic.mode,
+          'gray': gray.mode,
+          'binary': binary.mode,
+          'sepia': sepia.mode
+      }
+      modes
+
+- id: practice
+  title: 실습
+  subtitle: 색상 변환 응용
+  blocks:
+  - type: text
+    content: sklearn 이미지에 흑백과 세피아 변환을 적용해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: flower 흑백 변환"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image
+        from sklearn.datasets import load_sample_image
+
+        bloomArr = load_sample_image('flower.jpg')
+        bloom = Image.fromarray(bloomArr)
+        bloom.mode
+    - type: code
+      title: "흑백 변환"
+      content: |-
+        bloomGray = bloom.convert('L')
+        bloomGray
+    - type: code
+      title: "이진화 적용"
+      content: |-
+        bloomBinary = bloomGray.point(lambda x: 255 if x > 100 else 0)
+        bloomBinary
+  - type: expansion
+    title: "미션2: china 세피아 변환"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image
+        from sklearn.datasets import load_sample_image
+
+        chinaArr = load_sample_image('china.jpg')
+        china = Image.fromarray(chinaArr)
+        china.size
+    - type: code
+      title: "흑백 후 RGB 변환"
+      content: |-
+        chinaGray = china.convert('L')
+        chinaRgb = chinaGray.convert('RGB')
+        chinaRgb.mode
+    - type: code
+      title: "세피아 적용"
+      content: |-
+        rCh, gCh, bCh = chinaRgb.split()
+        sepR = rCh.point(lambda x: min(255, int(x * 1.1)))
+        sepG = gCh.point(lambda x: min(255, int(x * 0.85)))
+        sepB = bCh.point(lambda x: min(255, int(x * 0.65)))
+        chinaSepia = Image.merge('RGB', (sepR, sepG, sepB))
+        chinaSepia

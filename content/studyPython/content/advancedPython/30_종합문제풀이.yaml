@@ -1,0 +1,1488 @@
+meta:
+  id: "30"
+  title: "종합 문제 풀이"
+  day: 30
+  category: "advancedPython"
+  tags: ["종합", "실전", "알고리즘", "자료구조", "디자인패턴", "최적화"]
+  seo:
+    title: "파이썬 종합 문제 풀이"
+    description: "30일간 학습한 고급 파이썬 개념을 종합적으로 활용하는 실전 문제 풀이"
+    keywords: ["종합", "실전", "알고리즘", "자료구조", "디자인패턴", "최적화"]
+
+intro:
+  emoji: "🎯"
+  points:
+    - "알고리즘 + 자료구조 통합 문제"
+    - "디자인패턴 적용 실전 문제"
+    - "최적화 및 리팩토링 종합 문제"
+    - "함수형 + 객체지향 혼합 문제"
+    - "메타프로그래밍 활용 문제"
+    - "정규표현식 + 문자열 알고리즘 통합"
+
+sections:
+  - id: "data-structure-algorithm"
+    title: "자료구조 + 알고리즘 통합"
+    subtitle: "LRU 캐시 with TTL"
+    blocks:
+      - type: "text"
+        content: "해시맵과 이중 연결 리스트를 결합하여 시간 제한 기능이 있는 LRU 캐시를 구현합니다."
+      - type: "code"
+        language: "python"
+        title: "LRU 캐시 with TTL 구현"
+        description: "TTL 기능이 있는 LRU 캐시"
+        content: |
+          from time import time as getTime
+
+          class CacheNode:
+              def __init__(self, key, value, ttl):
+                  self.key = key
+                  self.value = value
+                  self.expiry = getTime() + ttl
+                  self.prev = None
+                  self.next = None
+
+          class LRUCacheWithTTL:
+              def __init__(self, capacity, defaultTtl=60):
+                  self.capacity = capacity
+                  self.defaultTtl = defaultTtl
+                  self.cache = {}
+                  self.head = CacheNode(None, None, 0)
+                  self.tail = CacheNode(None, None, 0)
+                  self.head.next = self.tail
+                  self.tail.prev = self.head
+
+              def removeNode(self, node):
+                  node.prev.next = node.next
+                  node.next.prev = node.prev
+
+              def addToFront(self, node):
+                  node.next = self.head.next
+                  node.prev = self.head
+                  self.head.next.prev = node
+                  self.head.next = node
+
+              def get(self, key):
+                  if key not in self.cache:
+                      return None
+                  node = self.cache[key]
+                  if getTime() > node.expiry:
+                      self.removeNode(node)
+                      del self.cache[key]
+                      return None
+                  self.removeNode(node)
+                  self.addToFront(node)
+                  return node.value
+
+              def put(self, key, value, ttl=None):
+                  ttl = ttl or self.defaultTtl
+                  if key in self.cache:
+                      self.removeNode(self.cache[key])
+                  node = CacheNode(key, value, ttl)
+                  self.cache[key] = node
+                  self.addToFront(node)
+                  if len(self.cache) > self.capacity:
+                      lru = self.tail.prev
+                      self.removeNode(lru)
+                      del self.cache[lru.key]
+
+          lruCache = LRUCacheWithTTL(3, defaultTtl=10)
+          lruCache.put("a", 1)
+          lruCache.put("b", 2)
+          lruCache.put("c", 3)
+          lruCache.get("a")
+          lruCache.put("d", 4)
+          [lruCache.get(k) for k in ["a", "b", "c", "d"]]
+
+  - id: "design-pattern-integration"
+    title: "디자인패턴 통합 적용"
+    subtitle: "이벤트 기반 상태 머신"
+    blocks:
+      - type: "text"
+        content: "Observer, State, Command 패턴을 결합한 이벤트 기반 상태 머신을 구현합니다."
+      - type: "code"
+        language: "python"
+        title: "이벤트 기반 상태 머신"
+        description: "Observer + State + Command 패턴 결합"
+        content: |
+          from abc import ABC, abstractmethod
+
+          class EventObserver(ABC):
+              @abstractmethod
+              def onEvent(self, event, data):
+                  pass
+
+          class MachineState(ABC):
+              @abstractmethod
+              def handle(self, machine, event):
+                  pass
+
+          class IdleState(MachineState):
+              def handle(self, machine, event):
+                  if event == "start":
+                      machine.transition(RunningState())
+                      return "started"
+                  return "idle"
+
+          class RunningState(MachineState):
+              def handle(self, machine, event):
+                  if event == "pause":
+                      machine.transition(PausedState())
+                      return "paused"
+                  if event == "stop":
+                      machine.transition(IdleState())
+                      return "stopped"
+                  return "running"
+
+          class PausedState(MachineState):
+              def handle(self, machine, event):
+                  if event == "resume":
+                      machine.transition(RunningState())
+                      return "resumed"
+                  if event == "stop":
+                      machine.transition(IdleState())
+                      return "stopped"
+                  return "paused"
+
+          class StateMachine:
+              def __init__(self):
+                  self.state = IdleState()
+                  self.observers = []
+                  self.history = []
+
+              def addObserver(self, observer):
+                  self.observers.append(observer)
+
+              def notify(self, event, result):
+                  for obs in self.observers:
+                      obs.onEvent(event, result)
+
+              def transition(self, newState):
+                  self.state = newState
+
+              def dispatch(self, event):
+                  result = self.state.handle(self, event)
+                  self.history.append((event, result))
+                  self.notify(event, result)
+                  return result
+
+          class LogObserver(EventObserver):
+              def __init__(self):
+                  self.logs = []
+              def onEvent(self, event, data):
+                  self.logs.append(f"{event}: {data}")
+
+          fsm = StateMachine()
+          logger = LogObserver()
+          fsm.addObserver(logger)
+          fsm.dispatch("start")
+          fsm.dispatch("pause")
+          fsm.dispatch("resume")
+          fsm.dispatch("stop")
+          logger.logs
+
+  - id: "functional-oop-integration"
+    title: "함수형 + 객체지향 통합"
+    subtitle: "파이프라인 빌더"
+    blocks:
+      - type: "text"
+        content: "함수형 파이프라인을 객체지향 빌더 패턴으로 구성하여 유연한 데이터 처리 시스템을 만듭니다."
+      - type: "code"
+        language: "python"
+        title: "파이프라인 빌더 패턴"
+        description: "함수형 + 객체지향 결합"
+        content: |
+          from functools import reduce
+
+          class Pipeline:
+              def __init__(self):
+                  self.steps = []
+
+              def pipe(self, func):
+                  self.steps.append(func)
+                  return self
+
+              def filter(self, predicate):
+                  return self.pipe(lambda data: [x for x in data if predicate(x)])
+
+              def map(self, transform):
+                  return self.pipe(lambda data: [transform(x) for x in data])
+
+              def reduce(self, reducer, initial):
+                  return self.pipe(lambda data: reduce(reducer, data, initial))
+
+              def sort(self, key=None, reverse=False):
+                  return self.pipe(lambda data: sorted(data, key=key, reverse=reverse))
+
+              def take(self, n):
+                  return self.pipe(lambda data: data[:n])
+
+              def execute(self, data):
+                  result = data
+                  for step in self.steps:
+                      result = step(result)
+                  return result
+
+          sampleData = [
+              {"name": "Alice", "score": 85, "age": 22},
+              {"name": "Bob", "score": 92, "age": 25},
+              {"name": "Charlie", "score": 78, "age": 23},
+              {"name": "Diana", "score": 95, "age": 21},
+              {"name": "Eve", "score": 88, "age": 24}
+          ]
+
+          pipeline = (Pipeline()
+              .filter(lambda x: x["score"] >= 80)
+              .map(lambda x: {**x, "grade": "A" if x["score"] >= 90 else "B"})
+              .sort(key=lambda x: x["score"], reverse=True)
+              .take(3))
+
+          pipelineResult = pipeline.execute(sampleData)
+          pipelineResult
+
+  - id: "metaprogramming-practice"
+    title: "메타프로그래밍 실전"
+    subtitle: "자동 검증 데이터 클래스"
+    blocks:
+      - type: "text"
+        content: "메타클래스와 디스크립터를 활용하여 자동 타입 검증 기능이 있는 데이터 클래스를 구현합니다."
+      - type: "code"
+        language: "python"
+        title: "자동 검증 데이터 클래스"
+        description: "메타클래스 + 디스크립터 활용"
+        content: |
+          class TypedField:
+              def __init__(self, fieldType, validator=None):
+                  self.fieldType = fieldType
+                  self.validator = validator
+
+              def __set_name__(self, owner, name):
+                  self.name = name
+                  self.privateName = f"_{name}"
+
+              def __get__(self, obj, objtype=None):
+                  if obj is None:
+                      return self
+                  return getattr(obj, self.privateName, None)
+
+              def __set__(self, obj, value):
+                  if not isinstance(value, self.fieldType):
+                      raise TypeError(f"{self.name}: expected {self.fieldType.__name__}")
+                  if self.validator and not self.validator(value):
+                      raise ValueError(f"{self.name}: validation failed")
+                  setattr(obj, self.privateName, value)
+
+          class ValidatedMeta(type):
+              def __new__(mcs, name, bases, namespace):
+                  fields = {k: v for k, v in namespace.items()
+                           if isinstance(v, TypedField)}
+                  namespace["_fields"] = fields
+                  return super().__new__(mcs, name, bases, namespace)
+
+          class ValidatedModel(metaclass=ValidatedMeta):
+              def __init__(self, **kwargs):
+                  for field in self._fields:
+                      if field in kwargs:
+                          setattr(self, field, kwargs[field])
+
+              def toDict(self):
+                  return {f: getattr(self, f) for f in self._fields}
+
+          class UserModel(ValidatedModel):
+              username = TypedField(str, lambda x: len(x) >= 3)
+              age = TypedField(int, lambda x: 0 < x < 150)
+              email = TypedField(str, lambda x: "@" in x)
+
+          validUser = UserModel(username="alice", age=25, email="alice@test.com")
+          validUser.toDict()
+
+  - id: "string-regex-integration"
+    title: "문자열 알고리즘 + 정규표현식"
+    subtitle: "고급 텍스트 검색 엔진"
+    blocks:
+      - type: "text"
+        content: "Trie 자료구조와 정규표현식을 결합한 고급 텍스트 검색 시스템을 구현합니다."
+      - type: "code"
+        language: "python"
+        title: "고급 텍스트 검색 엔진"
+        description: "Trie + 정규표현식 결합"
+        content: |
+          import re
+
+          class TrieNode:
+              def __init__(self):
+                  self.children = {}
+                  self.isEnd = False
+                  self.docIds = set()
+
+          class SearchEngine:
+              def __init__(self):
+                  self.root = TrieNode()
+                  self.documents = {}
+                  self.docId = 0
+
+              def tokenize(self, text):
+                  return re.findall(r'\b[a-zA-Z]+\b', text.lower())
+
+              def addDocument(self, text):
+                  self.docId += 1
+                  self.documents[self.docId] = text
+                  for word in self.tokenize(text):
+                      self.insertWord(word, self.docId)
+                  return self.docId
+
+              def insertWord(self, word, docId):
+                  node = self.root
+                  for char in word:
+                      if char not in node.children:
+                          node.children[char] = TrieNode()
+                      node = node.children[char]
+                  node.isEnd = True
+                  node.docIds.add(docId)
+
+              def searchWord(self, word):
+                  node = self.root
+                  for char in word.lower():
+                      if char not in node.children:
+                          return set()
+                      node = node.children[char]
+                  return node.docIds if node.isEnd else set()
+
+              def searchPrefix(self, prefix):
+                  node = self.root
+                  for char in prefix.lower():
+                      if char not in node.children:
+                          return set()
+                      node = node.children[char]
+                  return self.collectDocs(node)
+
+              def collectDocs(self, node):
+                  docs = set(node.docIds)
+                  for child in node.children.values():
+                      docs |= self.collectDocs(child)
+                  return docs
+
+              def searchRegex(self, pattern):
+                  regex = re.compile(pattern, re.IGNORECASE)
+                  return {docId for docId, text in self.documents.items()
+                         if regex.search(text)}
+
+          searchEngine = SearchEngine()
+          searchEngine.addDocument("Python is a powerful programming language")
+          searchEngine.addDocument("Python supports functional programming")
+          searchEngine.addDocument("JavaScript is also popular for programming")
+          searchEngine.addDocument("Data structures are fundamental in programming")
+
+          wordResult = searchEngine.searchWord("python")
+          prefixResult = searchEngine.searchPrefix("prog")
+          regexResult = searchEngine.searchRegex(r"python.*programming")
+          {"word": wordResult, "prefix": prefixResult, "regex": regexResult}
+
+  - id: "optimization-dp"
+    title: "최적화 + 동적 프로그래밍"
+    subtitle: "메모이제이션 데코레이터 고급 버전"
+    blocks:
+      - type: "text"
+        content: "LRU 기반 메모이제이션에 통계 추적 기능을 추가한 고급 캐싱 데코레이터를 구현합니다."
+      - type: "code"
+        language: "python"
+        title: "고급 메모이제이션 데코레이터"
+        description: "LRU + 통계 추적 기능"
+        content: |
+          from functools import wraps
+          from collections import OrderedDict
+
+          def advancedMemo(maxSize=128, trackStats=True):
+              def decorator(func):
+                  cache = OrderedDict()
+                  stats = {"hits": 0, "misses": 0, "evictions": 0}
+
+                  @wraps(func)
+                  def wrapper(*args, **kwargs):
+                      key = (args, tuple(sorted(kwargs.items())))
+                      if key in cache:
+                          cache.move_to_end(key)
+                          stats["hits"] += 1
+                          return cache[key]
+
+                      stats["misses"] += 1
+                      result = func(*args, **kwargs)
+                      cache[key] = result
+
+                      if len(cache) > maxSize:
+                          cache.popitem(last=False)
+                          stats["evictions"] += 1
+
+                      return result
+
+                  def getStats():
+                      total = stats["hits"] + stats["misses"]
+                      hitRate = stats["hits"] / total if total > 0 else 0
+                      return {**stats, "hitRate": f"{hitRate:.2%}"}
+
+                  def clearCache():
+                      cache.clear()
+                      stats.update({"hits": 0, "misses": 0, "evictions": 0})
+
+                  wrapper.stats = getStats
+                  wrapper.clear = clearCache
+                  return wrapper
+              return decorator
+
+          @advancedMemo(maxSize=50)
+          def fibonacci(n):
+              if n < 2:
+                  return n
+              return fibonacci(n - 1) + fibonacci(n - 2)
+
+          fibResult = [fibonacci(i) for i in range(30)]
+          fibStats = fibonacci.stats()
+          {"fib30": fibResult[-1], "stats": fibStats}
+
+  - id: "practice-exercises"
+    title: "종합 실습 문제"
+    subtitle: "30일 과정 종합 문제"
+    blocks:
+      - type: "text"
+        content: "지금까지 학습한 모든 개념을 활용하여 문제를 해결하세요."
+      - type: "code"
+        language: "python"
+        title: "종합 문제 목록"
+        description: "기초/중급/고급 문제"
+        content: |
+          EXERCISES = """
+          기초 종합 (1-5)
+          1. 스택 2개로 큐 구현 (자료구조)
+          2. 싱글톤 + 팩토리 조합 (패턴)
+          3. 고차함수로 유효성 검사기 (함수형)
+          4. 프로퍼티 데코레이터 직접 구현 (메타)
+          5. 이메일 파싱 정규표현식 (정규식)
+
+          중급 종합 (6-10)
+          6. 이진 힙 + 우선순위 큐 통합 (자료구조+알고리즘)
+          7. 옵저버 + 전략 패턴 조합 (패턴)
+          8. 모나드 체이닝 파이프라인 (함수형)
+          9. 속성 접근 로깅 메타클래스 (메타)
+          10. 로그 파서 + 분석기 (정규식+알고리즘)
+
+          고급 종합 (11-20)
+          11. B-트리 삽입/검색 구현 (자료구조)
+          12. 이벤트 소싱 패턴 구현 (패턴+함수형)
+          13. 타입 추론 시스템 구현 (메타+함수형)
+          14. 컴파일러 렉서 구현 (정규식+자료구조)
+          15. 그래프 최단경로 + 캐싱 (알고리즘+최적화)
+          16. 플러그인 아키텍처 설계 (패턴+메타)
+          17. 표현식 파서 + 평가기 (알고리즘+패턴)
+          18. 비동기 작업 스케줄러 시뮬레이션 (자료구조+패턴)
+          19. 도메인 특화 언어(DSL) 구현 (메타+정규식)
+          20. 전체 시스템 통합 미니 프로젝트
+          """
+          EXERCISES
+
+      - type: "expansion"
+        title: "기초 문제 1: 스택 2개로 큐 구현"
+        code: |
+          class TwoStackQueue:
+              def __init__(self):
+                  self.inbox = []
+                  self.outbox = []
+
+              def enqueue(self, item):
+                  self.inbox.append(item)
+
+              def dequeue(self):
+                  if not self.outbox:
+                      while self.inbox:
+                          self.outbox.append(self.inbox.pop())
+                  return self.outbox.pop() if self.outbox else None
+
+              def peek(self):
+                  if not self.outbox:
+                      while self.inbox:
+                          self.outbox.append(self.inbox.pop())
+                  return self.outbox[-1] if self.outbox else None
+
+          ex1Queue = TwoStackQueue()
+          for i in range(1, 6):
+              ex1Queue.enqueue(i)
+          ex1Result = [ex1Queue.dequeue() for _ in range(5)]
+          ex1Result
+
+      - type: "expansion"
+        title: "기초 문제 2: 싱글톤 + 팩토리 조합"
+        code: |
+          class ServiceFactory:
+              _instance = None
+              _services = {}
+
+              def __new__(cls):
+                  if cls._instance is None:
+                      cls._instance = super().__new__(cls)
+                  return cls._instance
+
+              def register(self, name, creator):
+                  self._services[name] = creator
+
+              def create(self, name, *args, **kwargs):
+                  if name not in self._services:
+                      raise ValueError(f"Unknown service: {name}")
+                  return self._services[name](*args, **kwargs)
+
+          class DatabaseService:
+              def __init__(self, host):
+                  self.host = host
+
+          class CacheService:
+              def __init__(self, size):
+                  self.size = size
+
+          ex2Factory = ServiceFactory()
+          ex2Factory.register("db", DatabaseService)
+          ex2Factory.register("cache", CacheService)
+          ex2Db = ex2Factory.create("db", "localhost")
+          ex2Cache = ex2Factory.create("cache", 100)
+          ex2Result = {"db_host": ex2Db.host, "cache_size": ex2Cache.size}
+          ex2Result
+
+      - type: "expansion"
+        title: "기초 문제 3: 고차함수 유효성 검사기"
+        code: |
+          def createValidator(*rules):
+              def validate(value):
+                  errors = []
+                  for rule in rules:
+                      result = rule(value)
+                      if result is not True:
+                          errors.append(result)
+                  return {"valid": len(errors) == 0, "errors": errors}
+              return validate
+
+          def minLength(n):
+              return lambda x: True if len(x) >= n else f"min {n} chars"
+
+          def maxLength(n):
+              return lambda x: True if len(x) <= n else f"max {n} chars"
+
+          def hasDigit():
+              return lambda x: True if any(c.isdigit() for c in x) else "needs digit"
+
+          ex3Validator = createValidator(minLength(5), maxLength(20), hasDigit())
+          ex3Valid = ex3Validator("hello123")
+          ex3Invalid = ex3Validator("hi")
+          ex3Result = {"valid": ex3Valid, "invalid": ex3Invalid}
+          ex3Result
+
+      - type: "expansion"
+        title: "기초 문제 4: 프로퍼티 데코레이터 구현"
+        code: |
+          class CustomProperty:
+              def __init__(self, fget=None, fset=None, fdel=None):
+                  self.fget = fget
+                  self.fset = fset
+                  self.fdel = fdel
+
+              def __get__(self, obj, objtype=None):
+                  if obj is None:
+                      return self
+                  if self.fget is None:
+                      raise AttributeError("unreadable")
+                  return self.fget(obj)
+
+              def __set__(self, obj, value):
+                  if self.fset is None:
+                      raise AttributeError("readonly")
+                  self.fset(obj, value)
+
+              def setter(self, fset):
+                  return CustomProperty(self.fget, fset, self.fdel)
+
+          class Temperature:
+              def __init__(self, celsius=0):
+                  self._celsius = celsius
+
+              @CustomProperty
+              def celsius(self):
+                  return self._celsius
+
+              @celsius.setter
+              def celsius(self, value):
+                  self._celsius = value
+
+              @CustomProperty
+              def fahrenheit(self):
+                  return self._celsius * 9/5 + 32
+
+          ex4Temp = Temperature(25)
+          ex4Result = {"c": ex4Temp.celsius, "f": ex4Temp.fahrenheit}
+          ex4Temp.celsius = 30
+          ex4After = {"c": ex4Temp.celsius, "f": ex4Temp.fahrenheit}
+          {"before": ex4Result, "after": ex4After}
+
+      - type: "expansion"
+        title: "기초 문제 5: 이메일 파싱 정규표현식"
+        code: |
+          import re
+
+          def parseEmails(text):
+              pattern = r'([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,})'
+              matches = re.findall(pattern, text)
+              return [{"user": m[0], "domain": m[1], "tld": m[2]} for m in matches]
+
+          ex5Text = """
+          Contact us at support@example.com or sales@company.org.
+          For urgent matters: admin@test-site.co.uk
+          Invalid: @nodomain.com, noat.com
+          """
+          ex5Result = parseEmails(ex5Text)
+          ex5Result
+
+      - type: "expansion"
+        title: "중급 문제 6: 이진 힙 우선순위 큐"
+        code: |
+          class MinHeapPQ:
+              def __init__(self):
+                  self.heap = []
+
+              def parent(self, i):
+                  return (i - 1) // 2
+
+              def leftChild(self, i):
+                  return 2 * i + 1
+
+              def rightChild(self, i):
+                  return 2 * i + 2
+
+              def swap(self, i, j):
+                  self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
+
+              def push(self, priority, item):
+                  self.heap.append((priority, item))
+                  self.bubbleUp(len(self.heap) - 1)
+
+              def bubbleUp(self, i):
+                  while i > 0 and self.heap[self.parent(i)][0] > self.heap[i][0]:
+                      self.swap(i, self.parent(i))
+                      i = self.parent(i)
+
+              def pop(self):
+                  if not self.heap:
+                      return None
+                  if len(self.heap) == 1:
+                      return self.heap.pop()
+                  root = self.heap[0]
+                  self.heap[0] = self.heap.pop()
+                  self.bubbleDown(0)
+                  return root
+
+              def bubbleDown(self, i):
+                  size = len(self.heap)
+                  smallest = i
+                  left = self.leftChild(i)
+                  right = self.rightChild(i)
+                  if left < size and self.heap[left][0] < self.heap[smallest][0]:
+                      smallest = left
+                  if right < size and self.heap[right][0] < self.heap[smallest][0]:
+                      smallest = right
+                  if smallest != i:
+                      self.swap(i, smallest)
+                      self.bubbleDown(smallest)
+
+          ex6PQ = MinHeapPQ()
+          ex6PQ.push(3, "medium")
+          ex6PQ.push(1, "high")
+          ex6PQ.push(5, "low")
+          ex6PQ.push(2, "important")
+          ex6Result = [ex6PQ.pop() for _ in range(4)]
+          ex6Result
+
+      - type: "expansion"
+        title: "중급 문제 7: 옵저버 + 전략 패턴"
+        code: |
+          class NotificationStrategy:
+              def send(self, message):
+                  pass
+
+          class EmailStrategy(NotificationStrategy):
+              def send(self, message):
+                  return f"Email: {message}"
+
+          class SMSStrategy(NotificationStrategy):
+              def send(self, message):
+                  return f"SMS: {message}"
+
+          class PushStrategy(NotificationStrategy):
+              def send(self, message):
+                  return f"Push: {message}"
+
+          class NotificationCenter:
+              def __init__(self):
+                  self.subscribers = {}
+
+              def subscribe(self, event, strategy):
+                  if event not in self.subscribers:
+                      self.subscribers[event] = []
+                  self.subscribers[event].append(strategy)
+
+              def publish(self, event, message):
+                  results = []
+                  for strategy in self.subscribers.get(event, []):
+                      results.append(strategy.send(message))
+                  return results
+
+          ex7Center = NotificationCenter()
+          ex7Center.subscribe("alert", EmailStrategy())
+          ex7Center.subscribe("alert", SMSStrategy())
+          ex7Center.subscribe("update", PushStrategy())
+          ex7Alerts = ex7Center.publish("alert", "System warning!")
+          ex7Updates = ex7Center.publish("update", "New version")
+          ex7Result = {"alerts": ex7Alerts, "updates": ex7Updates}
+          ex7Result
+
+      - type: "expansion"
+        title: "중급 문제 8: 모나드 체이닝 파이프라인"
+        code: |
+          class Maybe:
+              def __init__(self, value):
+                  self.value = value
+
+              @classmethod
+              def just(cls, value):
+                  return cls(value)
+
+              @classmethod
+              def nothing(cls):
+                  return cls(None)
+
+              def isNothing(self):
+                  return self.value is None
+
+              def bind(self, func):
+                  if self.isNothing():
+                      return Maybe.nothing()
+                  try:
+                      result = func(self.value)
+                      return result if isinstance(result, Maybe) else Maybe.just(result)
+                  except:
+                      return Maybe.nothing()
+
+              def getOrElse(self, default):
+                  return default if self.isNothing() else self.value
+
+          def safeDivide(x):
+              return Maybe.just(100 / x) if x != 0 else Maybe.nothing()
+
+          def safeSquareRoot(x):
+              return Maybe.just(x ** 0.5) if x >= 0 else Maybe.nothing()
+
+          ex8Good = (Maybe.just(25)
+              .bind(safeDivide)
+              .bind(safeSquareRoot)
+              .getOrElse("error"))
+
+          ex8Bad = (Maybe.just(0)
+              .bind(safeDivide)
+              .bind(safeSquareRoot)
+              .getOrElse("error"))
+
+          ex8Result = {"good": ex8Good, "bad": ex8Bad}
+          ex8Result
+
+      - type: "expansion"
+        title: "중급 문제 9: 속성 접근 로깅 메타클래스"
+        code: |
+          class LoggedMeta(type):
+              def __new__(mcs, name, bases, namespace):
+                  accessLog = []
+                  namespace["_accessLog"] = accessLog
+
+                  originalGetattribute = namespace.get("__getattribute__",
+                      lambda self, name: object.__getattribute__(self, name))
+
+                  def loggedGetattribute(self, attrName):
+                      if not attrName.startswith("_"):
+                          self._accessLog.append(("get", attrName))
+                      return object.__getattribute__(self, attrName)
+
+                  def loggedSetattr(self, attrName, value):
+                      if not attrName.startswith("_"):
+                          self._accessLog.append(("set", attrName, value))
+                      object.__setattr__(self, attrName, value)
+
+                  namespace["__getattribute__"] = loggedGetattribute
+                  namespace["__setattr__"] = loggedSetattr
+
+                  return super().__new__(mcs, name, bases, namespace)
+
+          class TrackedModel(metaclass=LoggedMeta):
+              def __init__(self, name):
+                  self.name = name
+                  self.count = 0
+
+          ex9Model = TrackedModel("test")
+          ex9Model.count = 5
+          _ = ex9Model.name
+          _ = ex9Model.count
+          ex9Result = ex9Model._accessLog
+          ex9Result
+
+      - type: "expansion"
+        title: "중급 문제 10: 로그 파서 + 분석기"
+        code: |
+          import re
+          from collections import Counter
+
+          class LogAnalyzer:
+              def __init__(self):
+                  self.pattern = re.compile(
+                      r'\[(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})\]\s+'
+                      r'\[(\w+)\]\s+(.+)'
+                  )
+                  self.entries = []
+
+              def parse(self, logText):
+                  for line in logText.strip().split('\n'):
+                      match = self.pattern.match(line)
+                      if match:
+                          self.entries.append({
+                              "date": match.group(1),
+                              "time": match.group(2),
+                              "level": match.group(3),
+                              "message": match.group(4)
+                          })
+                  return self
+
+              def countByLevel(self):
+                  return dict(Counter(e["level"] for e in self.entries))
+
+              def filterByLevel(self, level):
+                  return [e for e in self.entries if e["level"] == level]
+
+          ex10Logs = """
+          [2024-01-15 10:30:45] [INFO] Server started
+          [2024-01-15 10:31:02] [DEBUG] Processing request
+          [2024-01-15 10:31:05] [ERROR] Connection failed
+          [2024-01-15 10:32:00] [INFO] Retry successful
+          [2024-01-15 10:32:15] [WARNING] High memory usage
+          [2024-01-15 10:33:00] [ERROR] Timeout occurred
+          """
+
+          ex10Analyzer = LogAnalyzer().parse(ex10Logs)
+          ex10Counts = ex10Analyzer.countByLevel()
+          ex10Errors = ex10Analyzer.filterByLevel("ERROR")
+          ex10Result = {"counts": ex10Counts, "errors": ex10Errors}
+          ex10Result
+
+      - type: "expansion"
+        title: "고급 문제 11: B-트리 기본 구현"
+        code: |
+          class BTreeNode:
+              def __init__(self, leaf=True):
+                  self.keys = []
+                  self.children = []
+                  self.leaf = leaf
+
+          class BTree:
+              def __init__(self, degree=2):
+                  self.root = BTreeNode()
+                  self.degree = degree
+                  self.minKeys = degree - 1
+                  self.maxKeys = 2 * degree - 1
+
+              def search(self, key, node=None):
+                  node = node or self.root
+                  i = 0
+                  while i < len(node.keys) and key > node.keys[i]:
+                      i += 1
+                  if i < len(node.keys) and key == node.keys[i]:
+                      return True
+                  if node.leaf:
+                      return False
+                  return self.search(key, node.children[i])
+
+              def insert(self, key):
+                  root = self.root
+                  if len(root.keys) == self.maxKeys:
+                      newRoot = BTreeNode(leaf=False)
+                      newRoot.children.append(self.root)
+                      self.splitChild(newRoot, 0)
+                      self.root = newRoot
+                  self.insertNonFull(self.root, key)
+
+              def insertNonFull(self, node, key):
+                  i = len(node.keys) - 1
+                  if node.leaf:
+                      node.keys.append(None)
+                      while i >= 0 and key < node.keys[i]:
+                          node.keys[i + 1] = node.keys[i]
+                          i -= 1
+                      node.keys[i + 1] = key
+                  else:
+                      while i >= 0 and key < node.keys[i]:
+                          i -= 1
+                      i += 1
+                      if len(node.children[i].keys) == self.maxKeys:
+                          self.splitChild(node, i)
+                          if key > node.keys[i]:
+                              i += 1
+                      self.insertNonFull(node.children[i], key)
+
+              def splitChild(self, parent, i):
+                  degree = self.degree
+                  child = parent.children[i]
+                  newNode = BTreeNode(leaf=child.leaf)
+                  parent.keys.insert(i, child.keys[degree - 1])
+                  parent.children.insert(i + 1, newNode)
+                  newNode.keys = child.keys[degree:]
+                  child.keys = child.keys[:degree - 1]
+                  if not child.leaf:
+                      newNode.children = child.children[degree:]
+                      child.children = child.children[:degree]
+
+          ex11Tree = BTree(degree=2)
+          for key in [10, 20, 5, 6, 12, 30, 7, 17]:
+              ex11Tree.insert(key)
+          ex11Result = {
+              "found_10": ex11Tree.search(10),
+              "found_15": ex11Tree.search(15),
+              "root_keys": ex11Tree.root.keys
+          }
+          ex11Result
+
+      - type: "expansion"
+        title: "고급 문제 12: 이벤트 소싱 패턴"
+        code: |
+          from functools import reduce
+
+          class Event:
+              def __init__(self, eventType, data, timestamp=0):
+                  self.type = eventType
+                  self.data = data
+                  self.timestamp = timestamp
+
+          class EventStore:
+              def __init__(self):
+                  self.events = []
+                  self.timestamp = 0
+
+              def append(self, eventType, data):
+                  self.timestamp += 1
+                  event = Event(eventType, data, self.timestamp)
+                  self.events.append(event)
+                  return event
+
+              def getEvents(self, afterTimestamp=0):
+                  return [e for e in self.events if e.timestamp > afterTimestamp]
+
+          class AccountAggregate:
+              @staticmethod
+              def apply(state, event):
+                  newState = dict(state)
+                  if event.type == "CREATED":
+                      newState["balance"] = 0
+                      newState["owner"] = event.data["owner"]
+                  elif event.type == "DEPOSITED":
+                      newState["balance"] = state.get("balance", 0) + event.data["amount"]
+                  elif event.type == "WITHDRAWN":
+                      newState["balance"] = state.get("balance", 0) - event.data["amount"]
+                  return newState
+
+              @staticmethod
+              def rebuild(events):
+                  return reduce(AccountAggregate.apply, events, {})
+
+          ex12Store = EventStore()
+          ex12Store.append("CREATED", {"owner": "Alice"})
+          ex12Store.append("DEPOSITED", {"amount": 100})
+          ex12Store.append("WITHDRAWN", {"amount": 30})
+          ex12Store.append("DEPOSITED", {"amount": 50})
+          ex12State = AccountAggregate.rebuild(ex12Store.events)
+          ex12Result = {"state": ex12State, "eventCount": len(ex12Store.events)}
+          ex12Result
+
+      - type: "expansion"
+        title: "고급 문제 13: 간단한 타입 추론"
+        code: |
+          class TypeInferrer:
+              def __init__(self):
+                  self.env = {}
+
+              def infer(self, expr):
+                  if isinstance(expr, int):
+                      return "int"
+                  if isinstance(expr, float):
+                      return "float"
+                  if isinstance(expr, str):
+                      return "str"
+                  if isinstance(expr, bool):
+                      return "bool"
+                  if isinstance(expr, list):
+                      if not expr:
+                          return "list[unknown]"
+                      elemTypes = set(self.infer(e) for e in expr)
+                      return f"list[{elemTypes.pop() if len(elemTypes) == 1 else 'mixed'}]"
+                  if isinstance(expr, dict):
+                      if not expr:
+                          return "dict[unknown, unknown]"
+                      keyTypes = set(self.infer(k) for k in expr.keys())
+                      valTypes = set(self.infer(v) for v in expr.values())
+                      keyType = keyTypes.pop() if len(keyTypes) == 1 else "mixed"
+                      valType = valTypes.pop() if len(valTypes) == 1 else "mixed"
+                      return f"dict[{keyType}, {valType}]"
+                  if callable(expr):
+                      return "callable"
+                  return "unknown"
+
+              def analyze(self, bindings):
+                  return {name: self.infer(value) for name, value in bindings.items()}
+
+          ex13Inferrer = TypeInferrer()
+          ex13Data = {
+              "age": 25,
+              "score": 95.5,
+              "name": "Alice",
+              "active": True,
+              "scores": [90, 85, 92],
+              "mixed": [1, "two", 3],
+              "mapping": {"a": 1, "b": 2}
+          }
+          ex13Result = ex13Inferrer.analyze(ex13Data)
+          ex13Result
+
+      - type: "expansion"
+        title: "고급 문제 14: 간단한 렉서 구현"
+        code: |
+          import re
+
+          class Token:
+              def __init__(self, tokenType, value):
+                  self.type = tokenType
+                  self.value = value
+
+              def __repr__(self):
+                  return f"Token({self.type}, {self.value!r})"
+
+          class SimpleLexer:
+              def __init__(self):
+                  self.rules = [
+                      (r'\d+\.?\d*', 'NUMBER'),
+                      (r'[a-zA-Z_]\w*', 'IDENTIFIER'),
+                      (r'\+', 'PLUS'),
+                      (r'-', 'MINUS'),
+                      (r'\*', 'MULTIPLY'),
+                      (r'/', 'DIVIDE'),
+                      (r'\(', 'LPAREN'),
+                      (r'\)', 'RPAREN'),
+                      (r'=', 'ASSIGN'),
+                      (r'\s+', 'WHITESPACE'),
+                  ]
+
+              def tokenize(self, text):
+                  tokens = []
+                  pos = 0
+                  while pos < len(text):
+                      matched = False
+                      for pattern, tokenType in self.rules:
+                          regex = re.compile(pattern)
+                          match = regex.match(text, pos)
+                          if match:
+                              value = match.group()
+                              if tokenType != 'WHITESPACE':
+                                  tokens.append(Token(tokenType, value))
+                              pos = match.end()
+                              matched = True
+                              break
+                      if not matched:
+                          raise SyntaxError(f"Unknown char at {pos}: {text[pos]}")
+                  return tokens
+
+          ex14Lexer = SimpleLexer()
+          ex14Tokens = ex14Lexer.tokenize("x = 10 + 20 * (3 - 1)")
+          ex14Result = [(t.type, t.value) for t in ex14Tokens]
+          ex14Result
+
+      - type: "expansion"
+        title: "고급 문제 15: 다익스트라 + 메모이제이션"
+        code: |
+          from collections import defaultdict
+          import heapq
+
+          class CachedGraph:
+              def __init__(self):
+                  self.graph = defaultdict(list)
+                  self.pathCache = {}
+
+              def addEdge(self, src, dest, weight):
+                  self.graph[src].append((dest, weight))
+                  self.graph[dest].append((src, weight))
+                  self.pathCache.clear()
+
+              def dijkstra(self, start, end):
+                  cacheKey = (start, end)
+                  if cacheKey in self.pathCache:
+                      return self.pathCache[cacheKey]
+
+                  distances = {start: 0}
+                  previous = {start: None}
+                  pq = [(0, start)]
+                  visited = set()
+
+                  while pq:
+                      dist, node = heapq.heappop(pq)
+                      if node in visited:
+                          continue
+                      visited.add(node)
+
+                      if node == end:
+                          break
+
+                      for neighbor, weight in self.graph[node]:
+                          if neighbor in visited:
+                              continue
+                          newDist = dist + weight
+                          if neighbor not in distances or newDist < distances[neighbor]:
+                              distances[neighbor] = newDist
+                              previous[neighbor] = node
+                              heapq.heappush(pq, (newDist, neighbor))
+
+                  path = []
+                  current = end
+                  while current is not None:
+                      path.append(current)
+                      current = previous.get(current)
+                  path.reverse()
+
+                  result = {"distance": distances.get(end, float('inf')), "path": path}
+                  self.pathCache[cacheKey] = result
+                  return result
+
+          ex15Graph = CachedGraph()
+          ex15Graph.addEdge("A", "B", 4)
+          ex15Graph.addEdge("A", "C", 2)
+          ex15Graph.addEdge("B", "C", 1)
+          ex15Graph.addEdge("B", "D", 5)
+          ex15Graph.addEdge("C", "D", 8)
+          ex15Graph.addEdge("C", "E", 10)
+          ex15Graph.addEdge("D", "E", 2)
+          ex15Result = ex15Graph.dijkstra("A", "E")
+          ex15Result
+
+      - type: "expansion"
+        title: "고급 문제 16: 플러그인 아키텍처"
+        code: |
+          class PluginRegistry(type):
+              plugins = {}
+
+              def __new__(mcs, name, bases, namespace):
+                  cls = super().__new__(mcs, name, bases, namespace)
+                  if name != "BasePlugin" and hasattr(cls, "name"):
+                      mcs.plugins[cls.name] = cls
+                  return cls
+
+              @classmethod
+              def getPlugin(mcs, name):
+                  return mcs.plugins.get(name)
+
+              @classmethod
+              def listPlugins(mcs):
+                  return list(mcs.plugins.keys())
+
+          class BasePlugin(metaclass=PluginRegistry):
+              name = None
+              def execute(self, data):
+                  raise NotImplementedError
+
+          class UppercasePlugin(BasePlugin):
+              name = "uppercase"
+              def execute(self, data):
+                  return data.upper()
+
+          class ReversePlugin(BasePlugin):
+              name = "reverse"
+              def execute(self, data):
+                  return data[::-1]
+
+          class CountPlugin(BasePlugin):
+              name = "count"
+              def execute(self, data):
+                  return len(data)
+
+          class PluginRunner:
+              def run(self, pluginName, data):
+                  plugin = PluginRegistry.getPlugin(pluginName)
+                  if plugin:
+                      return plugin().execute(data)
+                  return None
+
+          ex16Runner = PluginRunner()
+          ex16Available = PluginRegistry.listPlugins()
+          ex16Results = {name: ex16Runner.run(name, "Hello World")
+                        for name in ex16Available}
+          ex16Result = {"plugins": ex16Available, "results": ex16Results}
+          ex16Result
+
+      - type: "expansion"
+        title: "고급 문제 17: 수식 파서 및 평가기"
+        code: |
+          class ExpressionParser:
+              def __init__(self, text):
+                  self.text = text
+                  self.pos = 0
+
+              def parse(self):
+                  return self.parseExpr()
+
+              def parseExpr(self):
+                  left = self.parseTerm()
+                  while self.pos < len(self.text) and self.text[self.pos] in "+-":
+                      op = self.text[self.pos]
+                      self.pos += 1
+                      right = self.parseTerm()
+                      left = (op, left, right)
+                  return left
+
+              def parseTerm(self):
+                  left = self.parseFactor()
+                  while self.pos < len(self.text) and self.text[self.pos] in "*/":
+                      op = self.text[self.pos]
+                      self.pos += 1
+                      right = self.parseFactor()
+                      left = (op, left, right)
+                  return left
+
+              def parseFactor(self):
+                  self.skipSpaces()
+                  if self.text[self.pos] == "(":
+                      self.pos += 1
+                      result = self.parseExpr()
+                      self.pos += 1
+                      return result
+                  return self.parseNumber()
+
+              def parseNumber(self):
+                  self.skipSpaces()
+                  start = self.pos
+                  while self.pos < len(self.text) and self.text[self.pos].isdigit():
+                      self.pos += 1
+                  return int(self.text[start:self.pos])
+
+              def skipSpaces(self):
+                  while self.pos < len(self.text) and self.text[self.pos] == " ":
+                      self.pos += 1
+
+          class ExpressionEvaluator:
+              def evaluate(self, ast):
+                  if isinstance(ast, int):
+                      return ast
+                  op, left, right = ast
+                  leftVal = self.evaluate(left)
+                  rightVal = self.evaluate(right)
+                  ops = {"+": lambda a, b: a + b, "-": lambda a, b: a - b,
+                         "*": lambda a, b: a * b, "/": lambda a, b: a // b}
+                  return ops[op](leftVal, rightVal)
+
+          ex17Parser = ExpressionParser("3+4*2+(10-5)*3")
+          ex17Ast = ex17Parser.parse()
+          ex17Evaluator = ExpressionEvaluator()
+          ex17Value = ex17Evaluator.evaluate(ex17Ast)
+          ex17Result = {"expression": "3+4*2+(10-5)*3", "value": ex17Value}
+          ex17Result
+
+      - type: "expansion"
+        title: "고급 문제 18: 작업 스케줄러 시뮬레이션"
+        code: |
+          import heapq
+
+          class Task:
+              def __init__(self, taskId, priority, duration):
+                  self.id = taskId
+                  self.priority = priority
+                  self.duration = duration
+                  self.startTime = None
+                  self.endTime = None
+
+              def __lt__(self, other):
+                  return self.priority < other.priority
+
+          class TaskScheduler:
+              def __init__(self):
+                  self.queue = []
+                  self.completed = []
+                  self.currentTime = 0
+
+              def addTask(self, taskId, priority, duration):
+                  task = Task(taskId, priority, duration)
+                  heapq.heappush(self.queue, task)
+
+              def runNext(self):
+                  if not self.queue:
+                      return None
+                  task = heapq.heappop(self.queue)
+                  task.startTime = self.currentTime
+                  self.currentTime += task.duration
+                  task.endTime = self.currentTime
+                  self.completed.append(task)
+                  return task
+
+              def runAll(self):
+                  while self.queue:
+                      self.runNext()
+                  return self.getReport()
+
+              def getReport(self):
+                  return [{
+                      "id": t.id,
+                      "priority": t.priority,
+                      "start": t.startTime,
+                      "end": t.endTime
+                  } for t in self.completed]
+
+          ex18Scheduler = TaskScheduler()
+          ex18Scheduler.addTask("task_a", 3, 5)
+          ex18Scheduler.addTask("task_b", 1, 3)
+          ex18Scheduler.addTask("task_c", 2, 4)
+          ex18Scheduler.addTask("task_d", 1, 2)
+          ex18Result = ex18Scheduler.runAll()
+          ex18Result
+
+      - type: "expansion"
+        title: "고급 문제 19: 간단한 DSL 구현"
+        code: |
+          import re
+
+          class QueryDSL:
+              def __init__(self):
+                  self.data = []
+
+              def load(self, data):
+                  self.data = data
+                  return self
+
+              def execute(self, query):
+                  selectMatch = re.match(r'SELECT\s+(.+?)\s+FROM\s+data', query, re.I)
+                  whereMatch = re.search(r'WHERE\s+(.+?)(?:\s+ORDER|\s*$)', query, re.I)
+                  orderMatch = re.search(r'ORDER\s+BY\s+(\w+)(?:\s+(ASC|DESC))?', query, re.I)
+
+                  result = list(self.data)
+
+                  if whereMatch:
+                      condition = whereMatch.group(1).strip()
+                      result = self.applyWhere(result, condition)
+
+                  if orderMatch:
+                      field = orderMatch.group(1)
+                      desc = orderMatch.group(2) and orderMatch.group(2).upper() == "DESC"
+                      result = sorted(result, key=lambda x: x.get(field, 0), reverse=desc)
+
+                  if selectMatch:
+                      fields = [f.strip() for f in selectMatch.group(1).split(",")]
+                      if fields != ["*"]:
+                          result = [{f: r.get(f) for f in fields} for r in result]
+
+                  return result
+
+              def applyWhere(self, data, condition):
+                  gtMatch = re.match(r'(\w+)\s*>\s*(\d+)', condition)
+                  eqMatch = re.match(r'(\w+)\s*=\s*["\'](.+)["\']', condition)
+
+                  if gtMatch:
+                      field, value = gtMatch.groups()
+                      return [r for r in data if r.get(field, 0) > int(value)]
+                  if eqMatch:
+                      field, value = eqMatch.groups()
+                      return [r for r in data if r.get(field) == value]
+                  return data
+
+          ex19Data = [
+              {"name": "Alice", "age": 30, "dept": "Engineering"},
+              {"name": "Bob", "age": 25, "dept": "Sales"},
+              {"name": "Charlie", "age": 35, "dept": "Engineering"},
+              {"name": "Diana", "age": 28, "dept": "Marketing"}
+          ]
+
+          ex19DSL = QueryDSL().load(ex19Data)
+          ex19Query1 = ex19DSL.execute("SELECT name, age FROM data WHERE age > 27")
+          ex19Query2 = ex19DSL.execute("SELECT * FROM data ORDER BY age DESC")
+          ex19Result = {"filtered": ex19Query1, "sorted": ex19Query2}
+          ex19Result
+
+      - type: "expansion"
+        title: "고급 문제 20: 통합 미니 프로젝트"
+        code: |
+          from functools import reduce
+          from collections import defaultdict
+
+          class DataProcessor:
+              def __init__(self):
+                  self.transformers = []
+
+              def addTransform(self, func):
+                  self.transformers.append(func)
+                  return self
+
+              def process(self, data):
+                  return reduce(lambda d, f: f(d), self.transformers, data)
+
+          class AnalyticsEngine:
+              def __init__(self):
+                  self.processor = DataProcessor()
+                  self.cache = {}
+                  self.observers = []
+
+              def subscribe(self, callback):
+                  self.observers.append(callback)
+
+              def notify(self, event, data):
+                  for obs in self.observers:
+                      obs(event, data)
+
+              def configure(self, *transforms):
+                  for t in transforms:
+                      self.processor.addTransform(t)
+                  return self
+
+              def analyze(self, data, cacheKey=None):
+                  if cacheKey and cacheKey in self.cache:
+                      self.notify("cache_hit", cacheKey)
+                      return self.cache[cacheKey]
+
+                  self.notify("processing", len(data))
+                  result = self.processor.process(data)
+
+                  if cacheKey:
+                      self.cache[cacheKey] = result
+
+                  self.notify("completed", result)
+                  return result
+
+          class StatCollector:
+              def __init__(self):
+                  self.stats = defaultdict(list)
+
+              def __call__(self, event, data):
+                  self.stats[event].append(data)
+
+          ex20Data = [
+              {"product": "A", "sales": 100, "region": "East"},
+              {"product": "B", "sales": 150, "region": "West"},
+              {"product": "A", "sales": 200, "region": "West"},
+              {"product": "C", "sales": 80, "region": "East"},
+              {"product": "B", "sales": 120, "region": "East"}
+          ]
+
+          ex20Collector = StatCollector()
+
+          ex20Engine = (AnalyticsEngine()
+              .configure(
+                  lambda d: [x for x in d if x["sales"] >= 100],
+                  lambda d: sorted(d, key=lambda x: x["sales"], reverse=True),
+                  lambda d: {"items": d, "total": sum(x["sales"] for x in d),
+                            "avg": sum(x["sales"] for x in d) / len(d) if d else 0}
+              ))
+
+          ex20Engine.subscribe(ex20Collector)
+          ex20Analysis = ex20Engine.analyze(ex20Data, cacheKey="sales_report")
+          ex20Cached = ex20Engine.analyze(ex20Data, cacheKey="sales_report")
+          ex20Final = {
+              "analysis": ex20Analysis,
+              "events": dict(ex20Collector.stats)
+          }
+          ex20Final

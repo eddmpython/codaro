@@ -1,0 +1,488 @@
+meta:
+  id: "08_os"
+  title: "os - 운영체제 인터페이스"
+  category: "builtins"
+  tags: ["os", "파일", "디렉토리", "경로", "환경변수"]
+  seo:
+    title: "파이썬 os 모듈 완전 정복"
+    description: "os 모듈로 파일 시스템 조작, 경로 처리, 환경 변수 관리를 배웁니다."
+    keywords: ["os", "파일시스템", "경로", "디렉토리", "환경변수", "파이썬파일"]
+
+intro:
+  emoji: "📁"
+  points:
+  - "경로 조작과 확인"
+  - "디렉토리 탐색과 조작"
+  - "파일 정보 확인"
+  - "환경 변수 관리"
+
+sections:
+- id: "module_import"
+  title: "os 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "os는 파이썬 표준 라이브러리입니다. 운영체제 인터페이스를 제공하는 모듈입니다. 파일 시스템 조작, 경로 처리, 환경 변수 관리 등 다양한 기능을 제공합니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 os 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "os 모듈 불러오기"
+    description: "os 모듈을 불러오고 정상 작동을 확인합니다."
+    content: |-
+      import os
+
+      # 정상 로드 확인
+      os.name
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "path_manipulation"
+  title: "경로 조작"
+  subtitle: "join, dirname, basename, split"
+  blocks:
+  - type: "text"
+    content: "os.path는 경로 문자열을 조작하는 함수들을 제공합니다. join()으로 경로를 결합하고, dirname()과 basename()으로 경로를 분해합니다. 플랫폼에 관계없이 올바른 경로 구분자를 사용하므로 크로스 플랫폼 코드 작성에 필수적입니다."
+  - type: "list"
+    items:
+    - "join(): 경로 결합"
+    - "dirname(): 디렉토리 부분"
+    - "basename(): 파일명 부분"
+    - "split(): 경로 분리"
+    - "splitext(): 확장자 분리"
+  - type: "code"
+    language: "python"
+    title: "경로 결합"
+    description: "여러 경로 요소를 결합합니다."
+    content: |-
+      folderPath = os.path.join('home', 'user', 'documents')
+      folderPath
+  - type: "code"
+    language: "python"
+    title: "디렉토리와 파일명 분리"
+    description: "경로에서 디렉토리와 파일명을 추출합니다."
+    content: |-
+      fullPath = '/home/user/file.txt'
+      directory = os.path.dirname(fullPath)
+      filename = os.path.basename(fullPath)
+      (directory, filename)
+  - type: "code"
+    language: "python"
+    title: "경로 분리"
+    description: "경로를 디렉토리와 파일명으로 분리합니다."
+    content: |-
+      targetPath = '/var/log/app.log'
+      pathParts = os.path.split(targetPath)
+      pathParts
+  - type: "code"
+    language: "python"
+    title: "확장자 분리"
+    description: "파일명에서 확장자를 분리합니다."
+    content: |-
+      documentFile = 'report.pdf'
+      nameWithoutExt, extension = os.path.splitext(documentFile)
+      (nameWithoutExt, extension)
+  - type: "tip"
+    content: "os.path.join()은 운영체제에 맞는 경로 구분자(Windows: \\, Unix: /)를 자동으로 사용합니다."
+
+- id: "path_checking"
+  title: "경로 확인"
+  subtitle: "exists, isdir, isfile, isabs"
+  blocks:
+  - type: "text"
+    content: "경로의 존재 여부와 타입을 확인하는 함수들입니다. exists()로 존재 확인, isdir()과 isfile()로 타입 확인, isabs()로 절대경로 여부를 판단합니다. 파일 작업 전 반드시 확인하여 에러를 방지합니다."
+  - type: "list"
+    items:
+    - "exists(): 존재 확인"
+    - "isdir(): 디렉토리 여부"
+    - "isfile(): 파일 여부"
+    - "isabs(): 절대경로 여부"
+    - "abspath(): 절대경로 변환"
+  - type: "code"
+    language: "python"
+    title: "경로 존재 확인"
+    description: "경로가 존재하는지 확인합니다."
+    content: |-
+      rootExists = os.path.exists('/')
+      rootExists
+  - type: "code"
+    language: "python"
+    title: "디렉토리 여부 확인"
+    description: "경로가 디렉토리인지 확인합니다."
+    content: |-
+      isRootDir = os.path.isdir('/')
+      isRootDir
+  - type: "code"
+    language: "python"
+    title: "파일 여부 확인"
+    description: "경로가 파일인지 확인합니다."
+    content: |-
+      checkFile = os.path.isfile('/etc/hosts')
+      checkFile
+  - type: "code"
+    language: "python"
+    title: "절대경로 여부"
+    description: "경로가 절대경로인지 확인합니다."
+    content: |-
+      relativePath = 'docs/file.txt'
+      absolutePath = '/home/user/file.txt'
+      isRelative = os.path.isabs(relativePath)
+      isAbsolute = os.path.isabs(absolutePath)
+      (isRelative, isAbsolute)
+  - type: "code"
+    language: "python"
+    title: "절대경로 변환"
+    description: "상대경로를 절대경로로 변환합니다."
+    content: |-
+      relPath = 'test.txt'
+      absPath = os.path.abspath(relPath)
+      absPath
+  - type: "tip"
+    content: "Pyodide(웹 환경)에서는 가상 파일시스템만 접근 가능합니다. 실제 로컬 파일시스템은 접근할 수 없습니다."
+
+- id: "directory_operations"
+  title: "디렉토리 작업"
+  subtitle: "listdir, getcwd, mkdir, rmdir"
+  blocks:
+  - type: "text"
+    content: "디렉토리를 탐색하고 조작하는 함수들입니다. listdir()로 내용을 확인하고, getcwd()로 현재 디렉토리를 얻으며, mkdir()과 rmdir()로 디렉토리를 생성하고 삭제합니다. 파일 관리 스크립트의 핵심 기능입니다."
+  - type: "list"
+    items:
+    - "listdir(): 디렉토리 내용 조회"
+    - "getcwd(): 현재 작업 디렉토리"
+    - "chdir(): 디렉토리 변경"
+    - "mkdir(): 디렉토리 생성"
+    - "rmdir(): 디렉토리 삭제"
+  - type: "code"
+    language: "python"
+    title: "현재 디렉토리"
+    description: "현재 작업 디렉토리를 확인합니다."
+    content: |-
+      currentDir = os.getcwd()
+      currentDir
+  - type: "code"
+    language: "python"
+    title: "디렉토리 내용"
+    description: "디렉토리 내 파일과 폴더 목록을 가져옵니다."
+    content: |-
+      rootContents = os.listdir('/')
+      rootContents[:5]
+  - type: "code"
+    language: "python"
+    title: "디렉토리 생성"
+    description: "새 디렉토리를 생성합니다."
+    content: |-
+      testDir = '/tmp/test_folder'
+      os.mkdir(testDir)
+      dirCreated = os.path.exists(testDir)
+      dirCreated
+  - type: "code"
+    language: "python"
+    title: "디렉토리 삭제"
+    description: "빈 디렉토리를 삭제합니다."
+    content: |-
+      removeDir = '/tmp/test_folder'
+      os.rmdir(removeDir)
+      dirRemoved = not os.path.exists(removeDir)
+      dirRemoved
+  - type: "note"
+    content: "Pyodide에서 mkdir/rmdir은 가상 메모리 파일시스템에만 작동하며, 브라우저 새로고침 시 모두 사라집니다."
+
+- id: "file_operations"
+  title: "파일 작업"
+  subtitle: "remove, rename, stat"
+  blocks:
+  - type: "text"
+    content: "파일을 관리하는 함수들입니다. remove()로 파일을 삭제하고, rename()으로 이름을 변경하며, stat()으로 파일 정보를 확인합니다. 파일 크기, 수정 시간 등 메타데이터 접근이 가능합니다."
+  - type: "list"
+    items:
+    - "remove(): 파일 삭제"
+    - "rename(): 이름 변경"
+    - "stat(): 파일 정보"
+    - "path.getsize(): 파일 크기"
+    - "path.getmtime(): 수정 시간"
+  - type: "code"
+    language: "python"
+    title: "파일 크기"
+    description: "파일의 크기를 바이트 단위로 확인합니다."
+    content: |-
+      testFile = '/tmp/sample.txt'
+      with open(testFile, 'w') as f:
+          f.write('Hello, World!')
+      fileSize = os.path.getsize(testFile)
+      fileSize
+  - type: "code"
+    language: "python"
+    title: "파일 이름 변경"
+    description: "파일의 이름을 변경합니다."
+    content: |-
+      oldName = '/tmp/sample.txt'
+      newName = '/tmp/renamed.txt'
+      os.rename(oldName, newName)
+      renamed = os.path.exists(newName)
+      renamed
+  - type: "code"
+    language: "python"
+    title: "파일 삭제"
+    description: "파일을 삭제합니다."
+    content: |-
+      fileToDelete = '/tmp/renamed.txt'
+      os.remove(fileToDelete)
+      deleted = not os.path.exists(fileToDelete)
+      deleted
+  - type: "code"
+    language: "python"
+    title: "파일 정보"
+    description: "파일의 상세 정보를 확인합니다."
+    content: |-
+      infoFile = '/tmp/info_test.txt'
+      with open(infoFile, 'w') as f:
+          f.write('File info test')
+      fileInfo = os.stat(infoFile)
+      (fileInfo.st_size, fileInfo.st_mode)
+  - type: "tip"
+    content: "remove()는 파일만, rmdir()은 빈 디렉토리만 삭제합니다. 디렉토리와 내용을 함께 삭제하려면 shutil.rmtree()를 사용하세요."
+
+- id: "environment"
+  title: "환경 변수와 시스템 정보"
+  subtitle: "environ, getenv, name"
+  blocks:
+  - type: "text"
+    content: "시스템 환경 변수와 정보에 접근하는 방법입니다. environ은 모든 환경 변수를 담은 딕셔너리이고, getenv()로 개별 변수를 가져옵니다. os.name으로 운영체제를 확인할 수 있습니다."
+  - type: "list"
+    items:
+    - "environ: 환경 변수 딕셔너리"
+    - "getenv(key, default): 환경 변수 조회"
+    - "name: 운영체제 이름"
+    - "sep: 경로 구분자"
+    - "pathsep: PATH 구분자"
+  - type: "code"
+    language: "python"
+    title: "운영체제 이름"
+    description: "현재 운영체제를 확인합니다."
+    content: |-
+      systemName = os.name
+      systemName
+  - type: "code"
+    language: "python"
+    title: "경로 구분자"
+    description: "운영체제의 경로 구분자를 확인합니다."
+    content: |-
+      pathSeparator = os.sep
+      pathSeparator
+  - type: "code"
+    language: "python"
+    title: "환경 변수 조회"
+    description: "환경 변수를 가져옵니다. 없으면 기본값을 반환합니다."
+    content: |-
+      homeDir = os.getenv('HOME', '/default/home')
+      homeDir
+  - type: "code"
+    language: "python"
+    title: "모든 환경 변수"
+    description: "전체 환경 변수 개수를 확인합니다."
+    content: |-
+      envCount = len(os.environ)
+      envCount
+  - type: "code"
+    language: "python"
+    title: "PATH 구분자"
+    description: "PATH 환경 변수의 구분자를 확인합니다."
+    content: |-
+      pathDelimiter = os.pathsep
+      pathDelimiter
+  - type: "tip"
+    content: "Pyodide에서는 environ 읽기만 가능하고 수정은 제한적입니다."
+
+- id: "practice"
+  title: "os 모듈 종합 복습"
+  subtitle: "파일 시스템 마스터하기"
+  blocks:
+  - type: "text"
+    content: "os 모듈의 다양한 함수를 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 경로 결합"
+    code: |-
+      userDocsPath = os.path.join('home', 'user', 'documents')
+      userDocsPath
+
+  - type: "expansion"
+    title: "🟢 기본2: 파일명 추출"
+    code: |-
+      logPath = '/var/log/system.log'
+      logFileName = os.path.basename(logPath)
+      logFileName
+
+  - type: "expansion"
+    title: "🟢 기본3: 디렉토리 추출"
+    code: |-
+      pythonPath = '/usr/local/bin/python'
+      pythonDir = os.path.dirname(pythonPath)
+      pythonDir
+
+  - type: "expansion"
+    title: "🟢 기본4: 확장자 분리"
+    code: |-
+      pdfFile = 'document.pdf'
+      baseName, ext = os.path.splitext(pdfFile)
+      (baseName, ext)
+
+  - type: "expansion"
+    title: "🟢 기본5: 절대경로 확인"
+    code: |-
+      userHome = '/home/user'
+      isAbsolutePath = os.path.isabs(userHome)
+      isAbsolutePath
+
+  - type: "expansion"
+    title: "🟡 응용1: 파일 경로 분석"
+    code: |-
+      reportPath = '/data/reports/2024/annual.xlsx'
+      reportDir = os.path.dirname(reportPath)
+      reportFile = os.path.basename(reportPath)
+      reportName, reportExt = os.path.splitext(reportFile)
+      (reportDir, reportName, reportExt)
+
+  - type: "expansion"
+    title: "🟡 응용2: 다단계 경로 결합"
+    code: |-
+      componentPath = os.path.join('project', 'src', 'components', 'Button.tsx')
+      componentPath
+
+  - type: "expansion"
+    title: "🟡 응용3: 상대경로를 절대경로로"
+    code: |-
+      relativeFile = './data/input.csv'
+      absoluteFile = os.path.abspath(relativeFile)
+      absoluteFile
+
+  - type: "expansion"
+    title: "🟡 응용4: 경로 정규화"
+    code: |-
+      messyPath = '/home/user/../admin/./files'
+      cleanPath = os.path.normpath(messyPath)
+      cleanPath
+
+  - type: "expansion"
+    title: "🟡 응용5: 공통 경로 찾기"
+    code: |-
+      path1 = '/home/user/docs/file1.txt'
+      path2 = '/home/user/pics/photo.jpg'
+      commonPath = os.path.commonpath([path1, path2])
+      commonPath
+
+  - type: "expansion"
+    title: "🔴 심화1: 디렉토리 구조 생성"
+    code: |-
+      projectPath = '/tmp/project/src/utils'
+      os.makedirs(projectPath, exist_ok=True)
+      created = os.path.exists(projectPath)
+      created
+
+  - type: "expansion"
+    title: "🔴 심화2: 확장자별 파일 필터"
+    code: |-
+      testFolder = '/tmp/files'
+      os.makedirs(testFolder, exist_ok=True)
+      for name in ['file1.txt', 'file2.py', 'file3.txt', 'readme.md']:
+          open(os.path.join(testFolder, name), 'w').close()
+      allFiles = os.listdir(testFolder)
+      txtFiles = [f for f in allFiles if f.endswith('.txt')]
+      txtFiles
+
+  - type: "expansion"
+    title: "🔴 심화3: 파일 크기 합계"
+    code: |-
+      sizeFolder = '/tmp/size_test'
+      os.makedirs(sizeFolder, exist_ok=True)
+      for i in range(3):
+          with open(os.path.join(sizeFolder, f'file{i}.dat'), 'w') as f:
+              f.write('x' * (100 * (i + 1)))
+      totalSize = sum(os.path.getsize(os.path.join(sizeFolder, f))
+                      for f in os.listdir(sizeFolder))
+      totalSize
+
+  - type: "expansion"
+    title: "🔴 심화4: 파일 이름 일괄 변경"
+    code: |-
+      renameFolder = '/tmp/rename_test'
+      os.makedirs(renameFolder, exist_ok=True)
+      for name in ['data1.tmp', 'data2.tmp', 'keep.txt']:
+          open(os.path.join(renameFolder, name), 'w').close()
+      tmpFiles = [f for f in os.listdir(renameFolder) if f.endswith('.tmp')]
+      for oldFile in tmpFiles:
+          oldPath = os.path.join(renameFolder, oldFile)
+          newPath = os.path.join(renameFolder, oldFile.replace('.tmp', '.bak'))
+          os.rename(oldPath, newPath)
+      bakFiles = [f for f in os.listdir(renameFolder) if f.endswith('.bak')]
+      bakFiles
+
+  - type: "expansion"
+    title: "🔴 심화5: 디렉토리 트리 출력"
+    code: |-
+      treeRoot = '/tmp/tree'
+      os.makedirs(os.path.join(treeRoot, 'sub1'), exist_ok=True)
+      os.makedirs(os.path.join(treeRoot, 'sub2'), exist_ok=True)
+      open(os.path.join(treeRoot, 'root.txt'), 'w').close()
+      open(os.path.join(treeRoot, 'sub1', 'file1.txt'), 'w').close()
+      open(os.path.join(treeRoot, 'sub2', 'file2.txt'), 'w').close()
+
+      allPaths = []
+      for root, dirs, files in os.walk(treeRoot):
+          for file in files:
+              allPaths.append(os.path.join(root, file))
+      allPaths
+
+  - type: "expansion"
+    title: "🔴 심화6: 환경 변수 파싱"
+    code: |-
+      pathVar = os.getenv('PATH', '/usr/bin:/usr/local/bin')
+      pathList = pathVar.split(os.pathsep)
+      pathList[:3]
+
+  - type: "expansion"
+    title: "🔴 심화7: 상대 경로 계산"
+    code: |-
+      startPath = '/home/user/docs'
+      destPath = '/home/user/pics/photo.jpg'
+      relResult = os.path.relpath(destPath, startPath)
+      relResult
+
+  - type: "expansion"
+    title: "🔴 심화8: 파일 존재 확인 후 생성"
+    code: |-
+      checkPath = '/tmp/check_or_create.txt'
+      if not os.path.exists(checkPath):
+          with open(checkPath, 'w') as f:
+              f.write('Created')
+          result = 'created'
+      else:
+          result = os.path.getsize(checkPath)
+      result
+
+  - type: "expansion"
+    title: "🔴 심화9: 안전한 경로 결합"
+    code: |-
+      baseDir = '/var/www/uploads'
+      userInput = '../../../etc/passwd'
+      safePath = os.path.abspath(os.path.join(baseDir, userInput))
+      isSafe = safePath.startswith(os.path.abspath(baseDir))
+      (safePath, isSafe)
+
+  - type: "expansion"
+    title: "🔴 심화10: 디렉토리 크기 계산"
+    code: |-
+      calcRoot = '/tmp/calc_size'
+      os.makedirs(os.path.join(calcRoot, 'sub'), exist_ok=True)
+      with open(os.path.join(calcRoot, 'file1.dat'), 'w') as f:
+          f.write('a' * 200)
+      with open(os.path.join(calcRoot, 'sub', 'file2.dat'), 'w') as f:
+          f.write('b' * 150)
+
+      dirSize = 0
+      for root, dirs, files in os.walk(calcRoot):
+          for file in files:
+              filePath = os.path.join(root, file)
+              dirSize += os.path.getsize(filePath)
+      dirSize

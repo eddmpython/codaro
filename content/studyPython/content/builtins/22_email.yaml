@@ -1,0 +1,606 @@
+meta:
+  title: "email - 이메일 처리"
+  description: "이메일 메시지 생성과 파싱을 위한 email 모듈"
+  keywords: ["email", "MIME", "EmailMessage", "메일", "첨부파일"]
+
+intro:
+  emoji: "📧"
+  points:
+  - "이메일 메시지 생성"
+  - "MIME 타입 처리"
+  - "첨부 파일 추가"
+  - "이메일 파싱"
+
+sections:
+- id: "module_import"
+  title: "email 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "email은 파이썬 표준 라이브러리입니다. 이메일 메시지를 생성하고 파싱하는 기능을 제공합니다. MIME 형식 지원, 첨부 파일 처리, 헤더 관리 등 이메일 작업에 필요한 모든 기능을 포함합니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 email 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "email 모듈 불러오기"
+    description: "email의 주요 클래스를 불러옵니다."
+    content: |-
+      from email.message import EmailMessage
+      from email.mime.text import MIMEText
+      from email.mime.multipart import MIMEMultipart
+
+      # 정상 로드 확인
+      'email 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "message_basics"
+  title: "이메일 메시지 기본"
+  subtitle: "EmailMessage 클래스"
+  blocks:
+  - type: "text"
+    content: "EmailMessage는 이메일 메시지를 표현하는 기본 클래스입니다. 발신자, 수신자, 제목, 본문 등 이메일의 모든 요소를 관리합니다. 간단한 텍스트 이메일부터 복잡한 MIME 메시지까지 생성할 수 있습니다."
+  - type: "list"
+    items:
+    - "EmailMessage(): 메시지 생성"
+    - "set_content(): 본문 설정"
+    - "헤더: From, To, Subject"
+    - "as_string(): 문자열 변환"
+  - type: "code"
+    language: "python"
+    title: "간단한 메시지"
+    description: "기본 이메일 메시지를 생성합니다."
+    content: |-
+      simpleMsg = EmailMessage()
+      simpleMsg['From'] = 'sender@example.com'
+      simpleMsg['To'] = 'receiver@example.com'
+      simpleMsg['Subject'] = 'Hello'
+      simpleMsg.set_content('This is a test message.')
+
+      len(simpleMsg.as_string())
+  - type: "code"
+    language: "python"
+    title: "메시지 헤더 읽기"
+    description: "메시지의 헤더 정보를 읽습니다."
+    content: |-
+      headerMsg = EmailMessage()
+      headerMsg['From'] = 'alice@example.com'
+      headerMsg['To'] = 'bob@example.com'
+      headerMsg['Subject'] = 'Meeting'
+
+      (headerMsg['From'], headerMsg['Subject'])
+  - type: "code"
+    language: "python"
+    title: "여러 수신자"
+    description: "여러 명에게 메시지를 보냅니다."
+    content: |-
+      multiMsg = EmailMessage()
+      multiMsg['To'] = 'user1@example.com, user2@example.com'
+      multiMsg['Cc'] = 'user3@example.com'
+
+      recipients = multiMsg['To'].split(', ')
+      len(recipients)
+  - type: "tip"
+    content: "EmailMessage는 Python 3.6+에서 권장되는 최신 API입니다."
+
+- id: "mime_types"
+  title: "MIME 타입"
+  subtitle: "MIMEText, MIMEMultipart"
+  blocks:
+  - type: "text"
+    content: "MIME(Multipurpose Internet Mail Extensions)는 다양한 형식의 콘텐츠를 이메일로 전송할 수 있게 합니다. MIMEText는 텍스트, MIMEMultipart는 여러 파트로 구성된 메시지, MIMEImage는 이미지를 다룹니다. HTML 이메일, 첨부 파일 등에 필수적입니다."
+  - type: "list"
+    items:
+    - "MIMEText: 텍스트 메시지"
+    - "MIMEMultipart: 복합 메시지"
+    - "MIMEImage: 이미지"
+    - "MIMEApplication: 일반 파일"
+  - type: "code"
+    language: "python"
+    title: "텍스트 MIME"
+    description: "텍스트 타입 MIME 메시지를 생성합니다."
+    content: |-
+      textMsg = MIMEText('Hello, this is plain text.')
+      textMsg['Subject'] = 'Plain Text'
+      textMsg['From'] = 'sender@example.com'
+
+      textMsg.get_content_type()
+  - type: "code"
+    language: "python"
+    title: "HTML 메시지"
+    description: "HTML 형식의 이메일을 생성합니다."
+    content: |-
+      htmlContent = '<html><body><h1>Hello</h1><p>This is HTML.</p></body></html>'
+      htmlMsg = MIMEText(htmlContent, 'html')
+
+      htmlMsg.get_content_subtype()
+  - type: "code"
+    language: "python"
+    title: "멀티파트 메시지"
+    description: "여러 파트로 구성된 메시지를 생성합니다."
+    content: |-
+      multipartMsg = MIMEMultipart()
+      multipartMsg['Subject'] = 'Multipart Message'
+
+      textPart = MIMEText('Text version')
+      htmlPart = MIMEText('<p>HTML version</p>', 'html')
+
+      multipartMsg.attach(textPart)
+      multipartMsg.attach(htmlPart)
+
+      len(multipartMsg.get_payload())
+  - type: "tip"
+    content: "MIMEMultipart를 사용하면 텍스트와 HTML 버전을 함께 보낼 수 있습니다."
+
+- id: "headers"
+  title: "헤더 관리"
+  subtitle: "From, To, Subject, Date"
+  blocks:
+  - type: "text"
+    content: "이메일 헤더는 메시지의 메타데이터를 담습니다. From은 발신자, To는 수신자, Subject는 제목, Date는 날짜를 나타냅니다. Cc(참조), Bcc(숨은 참조), Reply-To 등 다양한 헤더를 설정할 수 있습니다."
+  - type: "list"
+    items:
+    - "From: 발신자"
+    - "To, Cc, Bcc: 수신자"
+    - "Subject: 제목"
+    - "Date, Message-ID: 메타데이터"
+  - type: "code"
+    language: "python"
+    title: "기본 헤더"
+    description: "필수 헤더를 설정합니다."
+    content: |-
+      from email.utils import formatdate
+
+      headerMsg = EmailMessage()
+      headerMsg['From'] = 'admin@example.com'
+      headerMsg['To'] = 'user@example.com'
+      headerMsg['Subject'] = 'Important Notice'
+      headerMsg['Date'] = formatdate(localtime=True)
+
+      headerMsg['Subject']
+  - type: "code"
+    language: "python"
+    title: "추가 헤더"
+    description: "Reply-To와 Cc 헤더를 추가합니다."
+    content: |-
+      replyMsg = EmailMessage()
+      replyMsg['From'] = 'noreply@example.com'
+      replyMsg['Reply-To'] = 'support@example.com'
+      replyMsg['Cc'] = 'manager@example.com'
+
+      replyMsg['Reply-To']
+  - type: "code"
+    language: "python"
+    title: "커스텀 헤더"
+    description: "사용자 정의 헤더를 추가합니다."
+    content: |-
+      customMsg = EmailMessage()
+      customMsg['X-Custom-Header'] = 'CustomValue'
+      customMsg['X-Priority'] = '1'
+
+      customMsg['X-Custom-Header']
+  - type: "tip"
+    content: "사용자 정의 헤더는 보통 'X-'로 시작합니다."
+
+- id: "attachments"
+  title: "첨부 파일"
+  subtitle: "add_attachment, get_content"
+  blocks:
+  - type: "text"
+    content: "첨부 파일은 이메일과 함께 전송되는 파일입니다. add_attachment()로 파일을 첨부하고, maintype과 subtype으로 파일 타입을 지정합니다. 텍스트, 이미지, PDF, ZIP 등 모든 형식의 파일을 첨부할 수 있습니다."
+  - type: "list"
+    items:
+    - "add_attachment(): 파일 첨부"
+    - "maintype, subtype: MIME 타입"
+    - "filename: 파일명"
+    - "iter_attachments(): 첨부 파일 순회"
+  - type: "code"
+    language: "python"
+    title: "텍스트 파일 첨부"
+    description: "텍스트 파일을 첨부합니다."
+    content: |-
+      attachMsg = EmailMessage()
+      attachMsg['Subject'] = 'File Attached'
+      attachMsg.set_content('Please see attached file.')
+
+      fileContent = 'This is a text file content.'
+      attachMsg.add_attachment(
+          fileContent.encode('utf-8'),
+          maintype='text',
+          subtype='plain',
+          filename='document.txt'
+      )
+
+      len(list(attachMsg.iter_attachments()))
+  - type: "code"
+    language: "python"
+    title: "바이너리 파일 첨부"
+    description: "바이너리 파일을 첨부합니다."
+    content: |-
+      binaryMsg = EmailMessage()
+      binaryMsg.set_content('Data file attached.')
+
+      binaryData = bytes([0, 1, 2, 255, 254, 253])
+      binaryMsg.add_attachment(
+          binaryData,
+          maintype='application',
+          subtype='octet-stream',
+          filename='data.bin'
+      )
+
+      attachments = list(binaryMsg.iter_attachments())
+      attachments[0].get_filename()
+  - type: "code"
+    language: "python"
+    title: "여러 파일 첨부"
+    description: "여러 개의 파일을 첨부합니다."
+    content: |-
+      multiAttach = EmailMessage()
+      multiAttach.set_content('Multiple files attached.')
+
+      files = [
+          ('file1.txt', 'Content of file 1'),
+          ('file2.txt', 'Content of file 2')
+      ]
+
+      for filename, content in files:
+          multiAttach.add_attachment(
+              content.encode('utf-8'),
+              maintype='text',
+              subtype='plain',
+              filename=filename
+          )
+
+      len(list(multiAttach.iter_attachments()))
+  - type: "tip"
+    content: "첨부 파일은 자동으로 Base64로 인코딩됩니다."
+
+- id: "parsing"
+  title: "이메일 파싱"
+  subtitle: "message_from_string, message_from_bytes"
+  blocks:
+  - type: "text"
+    content: "이메일 파싱은 문자열이나 바이트에서 EmailMessage 객체를 생성합니다. message_from_string()은 문자열을, message_from_bytes()는 바이트를 파싱합니다. 수신한 이메일을 분석하고 헤더와 본문을 추출할 수 있습니다."
+  - type: "list"
+    items:
+    - "message_from_string(): 문자열 파싱"
+    - "message_from_bytes(): 바이트 파싱"
+    - "get_content(): 본문 추출"
+    - "walk(): 모든 파트 순회"
+  - type: "code"
+    language: "python"
+    title: "문자열 파싱"
+    description: "이메일 문자열을 파싱합니다."
+    content: |-
+      from email import message_from_string
+
+      emailStr = "From: sender@example.com\nTo: receiver@example.com\nSubject: Test Email\n\nThis is the email body."
+
+      parsedMsg = message_from_string(emailStr)
+      parsedMsg['Subject']
+  - type: "code"
+    language: "python"
+    title: "본문 추출"
+    description: "파싱된 메시지에서 본문을 추출합니다."
+    content: |-
+      bodyEmailStr = "From: test@example.com\nSubject: Hello\n\nMessage body here."
+
+      bodyMsg = message_from_string(bodyEmailStr)
+      bodyContent = bodyMsg.get_payload()
+      bodyContent.strip()
+  - type: "code"
+    language: "python"
+    title: "멀티파트 파싱"
+    description: "멀티파트 메시지를 파싱합니다."
+    content: |-
+      multiMsg = MIMEMultipart()
+      multiMsg.attach(MIMEText('Part 1'))
+      multiMsg.attach(MIMEText('Part 2'))
+
+      msgStr = multiMsg.as_string()
+      reparsed = message_from_string(msgStr)
+
+      parts = [part.get_payload() for part in reparsed.walk() if part.get_content_type() == 'text/plain']
+      len(parts)
+  - type: "tip"
+    content: "walk()는 메시지의 모든 파트를 재귀적으로 순회합니다."
+
+- id: "practical"
+  title: "실전 활용 예제"
+  subtitle: "실무 이메일 처리"
+  blocks:
+  - type: "text"
+    content: "email 모듈을 활용한 실전 이메일 처리 예제를 다룹니다. HTML 뉴스레터, 파일 첨부 이메일, 템플릿 메일 등 실무에서 자주 사용하는 패턴을 배웁니다."
+  - type: "code"
+    language: "python"
+    title: "HTML 뉴스레터"
+    description: "HTML 형식의 뉴스레터를 생성합니다."
+    content: |-
+      def createNewsletter(recipient, subject, content):
+          newsletter = MIMEMultipart('alternative')
+          newsletter['From'] = 'newsletter@example.com'
+          newsletter['To'] = recipient
+          newsletter['Subject'] = subject
+
+          textPart = MIMEText(f"Newsletter: {content}", 'plain')
+          htmlPart = MIMEText(f'<html><body><h1>{content}</h1></body></html>', 'html')
+
+          newsletter.attach(textPart)
+          newsletter.attach(htmlPart)
+
+          return newsletter
+
+      newsMsg = createNewsletter('user@example.com', 'Weekly Update', 'Latest News')
+      newsMsg['Subject']
+  - type: "code"
+    language: "python"
+    title: "이메일 템플릿"
+    description: "템플릿 기반 이메일을 생성합니다."
+    content: |-
+      def emailTemplate(userName, action):
+          template = f"""
+          Dear {userName},
+
+          Your {action} has been processed successfully.
+
+          Best regards,
+          Support Team
+          """
+
+          templateMsg = EmailMessage()
+          templateMsg['Subject'] = f'{action.title()} Confirmation'
+          templateMsg.set_content(template.strip())
+
+          return templateMsg
+
+      confirmMsg = emailTemplate('John', 'registration')
+      len(confirmMsg.get_content())
+  - type: "code"
+    language: "python"
+    title: "첨부 파일 추출"
+    description: "이메일에서 첨부 파일을 추출합니다."
+    content: |-
+      def extractAttachments(emailMsg):
+          attachments = []
+          for part in emailMsg.walk():
+              if part.get_content_disposition() == 'attachment':
+                  attachments.append({
+                      'filename': part.get_filename(),
+                      'size': len(part.get_payload(decode=True))
+                  })
+          return attachments
+
+      testMsg = EmailMessage()
+      testMsg.add_attachment(b'data', maintype='application', subtype='octet-stream', filename='test.dat')
+
+      extracted = extractAttachments(testMsg)
+      extracted[0]['filename']
+  - type: "code"
+    language: "python"
+    title: "대량 메일 생성"
+    description: "여러 수신자를 위한 메일을 생성합니다."
+    content: |-
+      def bulkEmail(recipients, subject, body):
+          messages = []
+          for recipient in recipients:
+              bulkMsg = EmailMessage()
+              bulkMsg['To'] = recipient
+              bulkMsg['Subject'] = subject
+              bulkMsg.set_content(body)
+              messages.append(bulkMsg)
+          return messages
+
+      recipientList = ['user1@example.com', 'user2@example.com', 'user3@example.com']
+      bulkMsgs = bulkEmail(recipientList, 'Announcement', 'Important update')
+
+      len(bulkMsgs)
+  - type: "code"
+    language: "python"
+    title: "이메일 유효성 검사"
+    description: "이메일 주소 형식을 검증합니다."
+    content: |-
+      from email.utils import parseaddr
+
+      def validateEmail(emailAddr):
+          name, addr = parseaddr(emailAddr)
+          return '@' in addr and '.' in addr.split('@')[-1]
+
+      validationTests = {
+          'user@example.com': validateEmail('user@example.com'),
+          'invalid-email': validateEmail('invalid-email'),
+          'John Doe <john@example.com>': validateEmail('John Doe <john@example.com>')
+      }
+
+      validationTests
+  - type: "code"
+    language: "python"
+    title: "이메일 주소 포맷"
+    description: "이메일 주소를 표준 형식으로 변환합니다."
+    content: |-
+      from email.utils import formataddr
+
+      def formatEmailAddr(name, email):
+          return formataddr((name, email))
+
+      formattedAddrs = [
+          formatEmailAddr('Alice Smith', 'alice@example.com'),
+          formatEmailAddr('Bob Jones', 'bob@example.com')
+      ]
+
+      formattedAddrs
+
+- id: "practice"
+  title: "email 모듈 종합 복습"
+  subtitle: "이메일 처리 마스터하기"
+  blocks:
+  - type: "text"
+    content: "email 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 메시지 생성"
+    code: |-
+      basicMsg = EmailMessage()
+      basicMsg['Subject'] = 'Test'
+      basicMsg['Subject']
+
+  - type: "expansion"
+    title: "🟢 기본2: 발신자 설정"
+    code: |-
+      fromMsg = EmailMessage()
+      fromMsg['From'] = 'sender@example.com'
+      fromMsg['From']
+
+  - type: "expansion"
+    title: "🟢 기본3: 본문 설정"
+    code: |-
+      contentMsg = EmailMessage()
+      contentMsg.set_content('Hello World')
+      len(contentMsg.get_content())
+
+  - type: "expansion"
+    title: "🟢 기본4: 텍스트 MIME"
+    code: |-
+      textMime = MIMEText('Plain text message')
+      textMime.get_content_type()
+
+  - type: "expansion"
+    title: "🟢 기본5: HTML MIME"
+    code: |-
+      htmlMime = MIMEText('<h1>HTML</h1>', 'html')
+      htmlMime.get_content_subtype()
+
+  - type: "expansion"
+    title: "🟡 응용1: 여러 수신자"
+    code: |-
+      multiTo = EmailMessage()
+      multiTo['To'] = 'user1@example.com, user2@example.com'
+      len(multiTo['To'].split(', '))
+
+  - type: "expansion"
+    title: "🟡 응용2: 날짜 헤더"
+    code: |-
+      from email.utils import formatdate
+
+      dateMsg = EmailMessage()
+      dateMsg['Date'] = formatdate(localtime=True)
+      'Date' in dateMsg
+
+  - type: "expansion"
+    title: "🟡 응용3: 멀티파트"
+    code: |-
+      multipart = MIMEMultipart()
+      multipart.attach(MIMEText('Part 1'))
+      multipart.attach(MIMEText('Part 2'))
+      len(multipart.get_payload())
+
+  - type: "expansion"
+    title: "🟡 응용4: 파일 첨부"
+    code: |-
+      attachEmail = EmailMessage()
+      attachEmail.add_attachment(b'data', maintype='application', subtype='octet-stream', filename='file.bin')
+      len(list(attachEmail.iter_attachments()))
+
+  - type: "expansion"
+    title: "🟡 응용5: 메시지 파싱"
+    code: |-
+      from email import message_from_string
+
+      rawEmail = "Subject: Test\n\nBody"
+      parsed = message_from_string(rawEmail)
+      parsed['Subject']
+
+  - type: "expansion"
+    title: "🔴 심화1: HTML 뉴스레터"
+    code: |-
+      newsletter = MIMEMultipart('alternative')
+      newsletter['Subject'] = 'News'
+      newsletter.attach(MIMEText('Text version'))
+      newsletter.attach(MIMEText('<p>HTML version</p>', 'html'))
+
+      len(newsletter.get_payload())
+
+  - type: "expansion"
+    title: "🔴 심화2: 이메일 주소 파싱"
+    code: |-
+      from email.utils import parseaddr
+
+      fullAddr = 'John Doe <john@example.com>'
+      name, email = parseaddr(fullAddr)
+      email
+
+  - type: "expansion"
+    title: "🔴 심화3: 주소 포맷"
+    code: |-
+      from email.utils import formataddr
+
+      formatted = formataddr(('Alice Smith', 'alice@example.com'))
+      formatted
+
+  - type: "expansion"
+    title: "🔴 심화4: 첨부 파일 정보"
+    code: |-
+      infoMsg = EmailMessage()
+      infoMsg.add_attachment(b'test data', maintype='text', subtype='plain', filename='test.txt')
+
+      attachment = list(infoMsg.iter_attachments())[0]
+      attachment.get_filename()
+
+  - type: "expansion"
+    title: "🔴 심화5: 템플릿 메일"
+    code: |-
+      def makeEmail(name, action):
+          msg = EmailMessage()
+          msg['Subject'] = f'{action} Notification'
+          msg.set_content(f'Dear {name}, your {action} is complete.')
+          return msg
+
+      templated = makeEmail('Bob', 'order')
+      templated['Subject']
+
+  - type: "expansion"
+    title: "🔴 심화6: 대량 메일"
+    code: |-
+      def bulkCreate(recipients, subject):
+          return [EmailMessage() for _ in recipients]
+
+      emails = bulkCreate(['a@example.com', 'b@example.com'], 'Update')
+      len(emails)
+
+  - type: "expansion"
+    title: "🔴 심화7: 커스텀 헤더"
+    code: |-
+      customHeader = EmailMessage()
+      customHeader['X-Priority'] = 'High'
+      customHeader['X-Custom'] = 'Value'
+
+      'X-Priority' in customHeader
+
+  - type: "expansion"
+    title: "🔴 심화8: 본문 추출"
+    code: |-
+      extractMsg = EmailMessage()
+      extractMsg.set_content('Email body content')
+
+      body = extractMsg.get_content()
+      len(body)
+
+  - type: "expansion"
+    title: "🔴 심화9: Reply-To 설정"
+    code: |-
+      replyEmail = EmailMessage()
+      replyEmail['From'] = 'noreply@example.com'
+      replyEmail['Reply-To'] = 'support@example.com'
+
+      replyEmail['Reply-To']
+
+  - type: "expansion"
+    title: "🔴 심화10: 전체 메시지 변환"
+    code: |-
+      fullMsg = EmailMessage()
+      fullMsg['From'] = 'test@example.com'
+      fullMsg['To'] = 'user@example.com'
+      fullMsg['Subject'] = 'Complete'
+      fullMsg.set_content('Full message')
+
+      msgStr = fullMsg.as_string()
+      len(msgStr)

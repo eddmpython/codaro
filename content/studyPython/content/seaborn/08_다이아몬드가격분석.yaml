@@ -1,0 +1,263 @@
+meta:
+  id: seaborn_08
+  title: 다이아몬드가격분석
+  order: 8
+  category: seaborn
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["seaborn", "displot", "kdeplot", "ecdf", "diamonds", "분포분석"]
+  seo:
+    title: "Seaborn displot - 다이아몬드 가격 분포 분석"
+    description: "Seaborn displot, kdeplot, ecdf로 다이아몬드 가격 분포를 분석합니다. multiple, kind, 2차원 분포 시각화를 배웁니다."
+    keywords: ["seaborn", "displot", "kdeplot", "ecdf", "diamonds", "분포분석"]
+
+intro:
+  emoji: "💎"
+  goal: diamonds 데이터로 캐럿, 컷 등급별 가격 분포를 다양한 분포 차트로 분석합니다.
+  description: diamonds 데이터셋은 약 54,000개 다이아몬드의 캐럿, 컷, 색상, 투명도, 가격 정보를 담고 있습니다. displot()과 kdeplot()을 활용하여 분포를 분석합니다. 이전에 배운 relplot, heatmap, lineplot 개념을 함께 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: seaborn과 matplotlib을 불러옵니다. diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: seaborn과 matplotlib을 불러옵니다
+    content: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      diamonds = sns.load_dataset('diamonds')
+      diamonds
+  - type: tip
+    content: diamonds 데이터는 carat(캐럿), cut(컷 등급), color(색상 등급), clarity(투명도), price(가격) 등을 포함합니다. cut은 Fair < Good < Very Good < Premium < Ideal 순서입니다.
+
+- id: step2_histplot_basic
+  title: 2단계. 기본 히스토그램
+  subtitle: sns.histplot()
+  blocks:
+  - type: text
+    content: 가격 분포를 히스토그램으로 확인합니다. bins 파라미터로 구간 수를 조절합니다.
+  - type: code
+    language: python
+    title: 가격 분포
+    description: 가격 히스토그램을 그립니다
+    content: |-
+      figHist, axHist = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=diamonds, x='price', bins=50, ax=axHist)
+      axHist.set_title('Diamond Price Distribution')
+      figHist
+
+- id: step3_histplot_hue
+  title: 3단계. 컷 등급별 구분
+  subtitle: hue 파라미터
+  blocks:
+  - type: text
+    content: 컷 등급별로 색상을 구분합니다. 여러 그룹의 분포를 한 차트에서 비교할 수 있습니다.
+  - type: code
+    language: python
+    title: 컷별 가격 분포
+    description: 컷 등급별로 분포를 구분합니다
+    content: |-
+      figHistHue, axHistHue = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=diamonds, x='price', hue='cut', bins=50, ax=axHistHue)
+      axHistHue.set_title('Price Distribution by Cut')
+      figHistHue
+
+- id: step4_multiple
+  title: 4단계. 누적 히스토그램
+  subtitle: multiple 파라미터
+  blocks:
+  - type: text
+    content: multiple 파라미터로 히스토그램 표시 방식을 변경합니다. 'stack'은 그룹을 누적하여 표시합니다.
+  - type: code
+    language: python
+    title: 누적 히스토그램
+    description: 히스토그램을 누적 형태로 표시합니다
+    content: |-
+      figStack, axStack = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=diamonds, x='price', hue='cut', bins=50, multiple='stack', ax=axStack)
+      axStack.set_title('Stacked Price Distribution by Cut')
+      figStack
+  - type: tip
+    content: "multiple 옵션으로 여러 그룹의 히스토그램 표시 방식을 결정합니다. 'layer'(기본값, 겹침), 'stack'(누적), 'dodge'(나란히), 'fill'(비율 채움) 중 선택할 수 있습니다."
+
+- id: step5_kdeplot
+  title: 5단계. KDE 분포
+  subtitle: sns.kdeplot()
+  blocks:
+  - type: text
+    content: KDE(커널 밀도 추정)로 부드러운 분포를 그립니다. 히스토그램보다 연속적인 분포 형태를 파악하기 좋습니다.
+  - type: code
+    language: python
+    title: KDE 분포
+    description: KDE로 부드러운 분포를 그립니다
+    content: |-
+      figKde, axKde = plt.subplots(figsize=(10, 5))
+      sns.kdeplot(data=diamonds, x='price', hue='cut', ax=axKde)
+      axKde.set_title('Price KDE by Cut')
+      figKde
+  - type: tip
+    content: kdeplot()은 히스토그램을 부드러운 곡선으로 표현합니다. 데이터의 연속적인 분포 형태를 파악하기 좋습니다. 실제 빈도가 아닌 밀도를 보여주므로 서로 다른 크기의 그룹도 비교 가능합니다.
+
+- id: step6_kdeplot_fill
+  title: 6단계. 영역 채우기
+  subtitle: fill 파라미터
+  blocks:
+  - type: text
+    content: KDE에서 fill로 영역을 채웁니다. alpha로 투명도를 조절하여 겹치는 영역을 구분합니다.
+  - type: code
+    language: python
+    title: 채워진 KDE
+    description: KDE 영역을 채워서 표시합니다
+    content: |-
+      figKdeFill, axKdeFill = plt.subplots(figsize=(10, 5))
+      sns.kdeplot(data=diamonds, x='price', hue='cut', fill=True, alpha=0.5, ax=axKdeFill)
+      axKdeFill.set_title('Filled KDE by Cut')
+      figKdeFill
+
+- id: step7_displot
+  title: 7단계. displot 기본
+  subtitle: Figure-level 분포
+  blocks:
+  - type: text
+    content: displot()으로 Figure-level 분포 차트를 그립니다. kind로 히스토그램, KDE, ECDF 중 선택합니다.
+  - type: code
+    language: python
+    title: displot 히스토그램
+    description: displot으로 분포 차트를 그립니다
+    content: |-
+      gDis = sns.displot(data=diamonds, x='price', hue='cut', kind='hist', bins=30, height=5, aspect=1.5)
+      gDis.figure.suptitle('Price Distribution (displot)', y=1.02)
+      gDis.figure
+  - type: tip
+    content: "displot()은 Figure-level 분포 차트 함수입니다. kind='hist'(히스토그램), 'kde'(커널 밀도), 'ecdf'(누적분포) 중 선택 가능합니다. col, row로 다중 패널을 만들 수 있습니다."
+
+- id: step8_displot_col
+  title: 8단계. 패널 분리
+  subtitle: col 파라미터
+  blocks:
+  - type: text
+    content: 컷 등급별로 패널을 분리합니다. 각 그룹의 분포를 독립적으로 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 컷별 패널
+    description: 컷 등급별로 패널을 분리합니다
+    content: |-
+      gDisCol = sns.displot(data=diamonds, x='price', col='cut', col_wrap=3, bins=30, height=3, aspect=1.2)
+      gDisCol.figure.suptitle('Price Distribution by Cut', y=1.02)
+      gDisCol.figure
+
+- id: step9_2d_kde
+  title: 9단계. 2차원 KDE
+  subtitle: x, y 동시 지정
+  blocks:
+  - type: text
+    content: 캐럿과 가격의 2차원 분포를 확인합니다. 등고선 형태로 데이터가 밀집된 영역을 보여줍니다.
+  - type: code
+    language: python
+    title: 2차원 KDE
+    description: 캐럿과 가격의 2차원 분포를 확인합니다
+    content: |-
+      diamondsSample = diamonds.sample(n=5000, random_state=42)
+      gDis2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='kde', height=6)
+      gDis2d.figure.suptitle('Carat vs Price 2D KDE', y=1.02)
+      gDis2d.figure
+  - type: tip
+    content: x와 y 모두 지정하면 2차원 분포를 그립니다. 등고선 형태로 데이터가 밀집된 영역을 보여줍니다. 대용량 데이터는 샘플링하여 성능을 개선합니다.
+
+- id: step10_2d_hist
+  title: 10단계. 2차원 히스토그램
+  subtitle: 히트맵 형태
+  blocks:
+  - type: text
+    content: 2차원 히스토그램과 주변 분포를 함께 표시합니다. cbar로 컬러바를 추가합니다.
+  - type: code
+    language: python
+    title: 2차원 히스토그램
+    description: 2차원 히스토그램을 그립니다
+    content: |-
+      gDisHist2d = sns.displot(data=diamondsSample, x='carat', y='price', kind='hist', cbar=True, height=6)
+      gDisHist2d.figure.suptitle('Carat vs Price 2D Histogram', y=1.02)
+      gDisHist2d.figure
+
+- id: step11_ecdf
+  title: 11단계. 누적분포
+  subtitle: "kind='ecdf'"
+  blocks:
+  - type: text
+    content: 색상 등급별 가격 분포를 누적분포(ECDF)로 비교합니다. y축은 해당 x값 이하인 데이터의 비율입니다.
+  - type: code
+    language: python
+    title: ECDF
+    description: 누적분포를 그립니다
+    content: |-
+      gEcdf = sns.displot(data=diamonds, x='price', hue='color', kind='ecdf', height=5, aspect=1.5)
+      gEcdf.figure.suptitle('Price ECDF by Color', y=1.02)
+      gEcdf.figure
+  - type: tip
+    content: ECDF(Empirical Cumulative Distribution Function)는 누적분포를 보여줍니다. y축은 해당 x값 이하인 데이터의 비율입니다. 중앙값(y=0.5)이나 사분위수를 쉽게 비교할 수 있습니다.
+
+- id: step12_col_row
+  title: 12단계. 2차원 패널
+  subtitle: col과 row
+  blocks:
+  - type: text
+    content: 컷과 색상 조합별 가격 분포를 비교합니다. col과 row를 모두 사용하면 2차원 그리드로 패널을 배치합니다.
+  - type: code
+    language: python
+    title: 컷/색상 패널
+    description: 컷과 색상 조합별 분포를 비교합니다
+    content: |-
+      diamondsTop = diamonds[diamonds['cut'].isin(['Ideal', 'Premium'])].copy()
+      gDisColRow = sns.displot(data=diamondsTop, x='price', col='cut', row='color', kind='kde', height=2.5, aspect=1.5)
+      gDisColRow.figure.suptitle('Price by Cut and Color', y=1.02)
+      gDisColRow.figure
+  - type: tip
+    content: col과 row를 모두 사용하면 2차원 그리드로 패널을 배치합니다. 두 범주형 변수의 모든 조합을 한눈에 비교할 수 있습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 분포 시각화
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: tips 팁 금액 분포 다중 표시"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        data = sns.load_dataset('tips')
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart = sns.displot(data=data, x='tip', hue='time', col='sex', kind='kde', fill=True, height=4)
+        chart.figure.suptitle('Tip Distribution by Time and Sex', y=1.02)
+        chart.figure
+  - type: expansion
+    title: "미션2: penguins 부리 길이 ECDF 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        df = sns.load_dataset('penguins').dropna()
+    - type: code
+      title: "차트 생성"
+      content: |-
+        canvas = sns.displot(data=df, x='bill_length_mm', hue='species', col='island', kind='ecdf', height=4)
+        canvas.figure.suptitle('Bill Length ECDF by Species and Island', y=1.02)
+        canvas.figure

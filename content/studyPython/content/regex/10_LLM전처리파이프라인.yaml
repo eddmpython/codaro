@@ -1,0 +1,433 @@
+meta:
+  id: regex_10
+  title: LLM전처리파이프라인
+  order: 10
+  category: regex
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["LLM", "전처리", "파이프라인", "토큰 최적화", "실전 프로젝트"]
+  seo:
+    title: "정규표현식 실전 - LLM 전처리 완전 자동화"
+    description: "정규표현식으로 웹 데이터를 LLM 입력으로 최적화합니다. HTML 제거, 정제, 토큰 절약을 한 번에 처리합니다."
+    keywords: ["정규표현식", "regex", "LLM 전처리", "토큰 최적화", "파이프라인"]
+
+intro:
+  emoji: "🚀"
+  goal: 웹 크롤링 데이터를 LLM API 입력으로 최적화하는 완전 자동화 파이프라인을 구축합니다.
+  description: 지금까지 배운 모든 개념을 종합합니다. HTML 제거, 개인정보 마스킹, 텍스트 정제, 토큰 최적화를 한 번에 처리하여 API 비용을 30% 이상 절감합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: 정규표현식과 데이터 로드
+    content: |-
+      import re
+      import json
+      from pyodide.http import open_url
+
+- id: step2_load_data
+  title: 2단계. 실제 웹 데이터 로드
+  subtitle: JSONPlaceholder posts + HTML
+  blocks:
+  - type: text
+    content: 실제 웹에서 크롤링한 것처럼 HTML이 포함된 데이터를 만듭니다. 웹 페이지에는 본문 외에도 script, style 태그, 메타 정보 등 LLM 입력에 불필요한 요소가 많습니다. 또한 개인정보가 포함되어 있을 수 있어 마스킹이 필요합니다.
+  - type: code
+    language: python
+    title: 웹 데이터 로드
+    description: JSONPlaceholder에서 게시글을 가져와 HTML 추가
+    content: |-
+      postsData = json.loads(
+          open_url("https://jsonplaceholder.typicode.com/posts").read()
+      )
+
+      rawWebData = f"""
+      <html>
+      <head><title>블로그 게시글</title></head>
+      <body>
+          <div class="post">
+              <h1>{postsData[0]['title']}</h1>
+              <p class="author">작성자 ID: {postsData[0]['userId']}</p>
+              <p class="content">{postsData[0]['body']}</p>
+              <div class="contact">
+                  <span>문의: admin@blog.com</span>
+                  <span>전화: 010-1234-5678</span>
+                  <span>주민번호: 901225-1234567</span>
+              </div>
+          </div>
+          <script>console.log('tracking');</script>
+          <style>.post {{ color: red; }}</style>
+      </body>
+      </html>
+      """
+      len(rawWebData)
+
+- id: step3_step1_html
+  title: 3단계. HTML 태그 제거
+  subtitle: 순수 텍스트 추출
+  blocks:
+  - type: text
+    content: "첫 번째 단계로 script, style 태그와 모든 HTML 태그를 제거합니다. script와 style 태그는 본문 내용이 아니므로 먼저 제거하고, 그 다음 나머지 태그들을 정리합니다. 비탐욕적 매칭과 re.DOTALL 플래그를 함께 사용해 멀티라인 태그도 처리합니다."
+  - type: code
+    language: python
+    title: HTML 정제
+    description: script, style, 태그 순차 제거
+    content: |-
+      def removeHtml(text):
+          text = re.sub(r"<script.*?</script>", "", text, flags=re.DOTALL | re.IGNORECASE)
+          text = re.sub(r"<style.*?</style>", "", text, flags=re.DOTALL | re.IGNORECASE)
+          text = re.sub(r"<.*?>", "", text, flags=re.DOTALL)
+          return text
+
+      step1 = removeHtml(rawWebData)
+      step1[:200]
+  - type: text
+    content: |-
+      **토큰 절약: 1단계**
+      - 원본: ~400자 → 정제 후: ~200자
+      - **50% 절약!**
+
+- id: step4_step2_personal
+  title: 4단계. 개인정보 마스킹
+  subtitle: 보안 처리
+  blocks:
+  - type: text
+    content: "두 번째 단계로 개인정보를 자동으로 마스킹합니다. LLM에 개인정보를 그대로 전송하면 개인정보보호법 위반이 될 수 있습니다. 주민번호, 전화번호, 이메일 등을 자동으로 탐지하고 마스킹하는 함수를 만들어 파이프라인에 포함시킵니다."
+  - type: code
+    language: python
+    title: 개인정보 마스킹
+    description: 주민번호, 전화번호, 이메일 마스킹
+    content: |-
+      def maskPersonalInfo(text):
+          text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
+          text = re.sub(r"(\d{3})-(\d{3,4})-(\d{4})", r"\1-****-\3", text)
+          text = re.sub(r"([\w.]{1,2})[\w.]*@([\w.]+)", r"\1***@\2", text)
+          return text
+
+      step2 = maskPersonalInfo(step1)
+      step2[:300]
+  - type: text
+    content: 개인정보가 안전하게 마스킹되었습니다. 주민번호 뒷자리, 전화번호 중간자리, 이메일 아이디 일부가 별표로 대체되어 개인을 식별할 수 없지만 데이터의 맥락은 유지됩니다.
+
+- id: step5_step3_normalize
+  title: 5단계. 텍스트 정규화
+  subtitle: 공백과 특수문자 정리
+  blocks:
+  - type: text
+    content: "세 번째 단계: 연속 공백 제거, 특수문자 정리로 토큰을 추가 절약합니다."
+  - type: code
+    language: python
+    title: 텍스트 정규화
+    description: 공백 정리, 개행 통일
+    content: |-
+      def normalizeText(text):
+          text = re.sub(r"\s+", " ", text)
+          text = re.sub(r"[^\w\s가-힣-]", "", text)
+          text = text.strip()
+          return text
+
+      step3 = normalizeText(step2)
+      step3[:200]
+  - type: text
+    content: |-
+      **토큰 절약: 2단계**
+      - 공백 정규화: 10% 추가 절약
+      - 특수문자 제거: 5% 추가 절약
+
+- id: step6_step4_extract
+  title: 6단계. 핵심 정보 추출
+  subtitle: 필요한 부분만
+  blocks:
+  - type: text
+    content: "네 번째 단계: 제목, 내용 등 핵심 정보만 추출합니다."
+  - type: code
+    language: python
+    title: 구조화된 정보 추출
+    description: 제목, 내용, 작성자 등 파싱
+    content: |-
+      def extractKeyInfo(text):
+          title = re.search(r"([^가-힣\s]+(?:\s+[^가-힣\s]+)*)", text)
+          userId = re.search(r"ID\s*:?\s*(\d+)", text)
+          content = re.search(r"(?:내용|content)[:\s]+(.+?)(?:문의|$)", text, re.IGNORECASE)
+
+          return {
+              "title": title.group(1) if title else "",
+              "user_id": userId.group(1) if userId else "",
+              "content_preview": content.group(1)[:100] if content else text[:100]
+          }
+
+      extracted = extractKeyInfo(step3)
+      extracted
+
+- id: step7_complete_pipeline
+  title: 7단계. 완성된 파이프라인
+  subtitle: 모든 단계 통합
+  blocks:
+  - type: text
+    content: 모든 전처리 단계를 하나의 파이프라인으로 통합합니다.
+  - type: code
+    language: python
+    title: LLM 전처리 파이프라인
+    description: 원클릭 전처리 함수
+    content: |-
+      def preprocessForLLM(rawHtml):
+          noHtml = removeHtml(rawHtml)
+
+          masked = maskPersonalInfo(noHtml)
+
+          normalized = normalizeText(masked)
+
+          keyInfo = extractKeyInfo(normalized)
+
+          return {
+              "raw_length": len(rawHtml),
+              "processed_length": len(normalized),
+              "token_saved_percent": ((len(rawHtml) - len(normalized)) / len(rawHtml)) * 100,
+              "processed_text": normalized,
+              "extracted_info": keyInfo
+          }
+
+      result = preprocessForLLM(rawWebData)
+      f"원본: {result['raw_length']}자\n처리 후: {result['processed_length']}자\n절약: {result['token_saved_percent']:.1f}%"
+
+- id: step8_batch_processing
+  title: 8단계. 배치 처리
+  subtitle: 여러 문서 한 번에
+  blocks:
+  - type: text
+    content: 여러 웹 페이지를 한 번에 처리합니다.
+  - type: code
+    language: python
+    title: 배치 전처리
+    description: 여러 게시글을 한 번에 처리
+    content: |-
+      batchData = [
+          f"<h1>{post['title']}</h1><p>{post['body']}</p>"
+          for post in postsData[:5]
+      ]
+
+      batchResults = [preprocessForLLM(html) for html in batchData]
+
+      totalSaved = sum(r['token_saved_percent'] for r in batchResults) / len(batchResults)
+      f"평균 토큰 절약: {totalSaved:.1f}%"
+
+- id: step9_comparison
+  title: 9단계. 비용 절감 계산
+  subtitle: 실제 API 비용
+  blocks:
+  - type: text
+    content: LLM API 비용을 실제로 얼마나 절감하는지 계산합니다.
+  - type: code
+    language: python
+    title: API 비용 계산
+    description: GPT-4 기준 비용 절감액
+    content: |-
+      def calculateCostSaving(originalChars, processedChars):
+          tokensPerChar = 0.25
+          costPerToken = 0.00003
+
+          originalTokens = int(originalChars * tokensPerChar)
+          processedTokens = int(processedChars * tokensPerChar)
+
+          originalCost = originalTokens * costPerToken
+          processedCost = processedTokens * costPerToken
+          savedCost = originalCost - processedCost
+          savedPercent = (savedCost / originalCost) * 100
+
+          return {
+              "원본 토큰": originalTokens,
+              "처리 후 토큰": processedTokens,
+              "원본 비용": f"${originalCost:.4f}",
+              "처리 후 비용": f"${processedCost:.4f}",
+              "절약액": f"${savedCost:.4f}",
+              "절약률": f"{savedPercent:.1f}%"
+          }
+
+      cost = calculateCostSaving(result['raw_length'], result['processed_length'])
+      cost
+  - type: note
+    style: tip
+    title: "실제 비용 절감 효과"
+    content: |-
+      **100,000건 처리 시:**
+      - 전처리 없음: $30
+      - 전처리 사용: $18
+      - **절약: $12 (40%)**
+
+      월 1,000,000건이면 $120 절약!
+
+- id: step10_final_function
+  title: 10단계. 프로덕션 레디 함수
+  subtitle: 실전 배포용
+  blocks:
+  - type: text
+    content: 에러 처리와 로깅을 추가한 프로덕션 버전을 만듭니다.
+  - type: code
+    language: python
+    title: 프로덕션 전처리 함수
+    description: 에러 처리 포함 안전한 버전
+    content: |-
+      def productionPreprocess(rawHtml, options=None):
+          if options is None:
+              options = {
+                  "remove_html": True,
+                  "mask_personal": True,
+                  "normalize": True,
+                  "extract_info": True
+              }
+
+          try:
+              text = rawHtml
+
+              if options.get("remove_html"):
+                  text = removeHtml(text)
+
+              if options.get("mask_personal"):
+                  text = maskPersonalInfo(text)
+
+              if options.get("normalize"):
+                  text = normalizeText(text)
+
+              result = {
+                  "success": True,
+                  "processed_text": text,
+                  "original_length": len(rawHtml),
+                  "processed_length": len(text),
+                  "token_saved": ((len(rawHtml) - len(text)) / len(rawHtml)) * 100
+              }
+
+              if options.get("extract_info"):
+                  result["extracted"] = extractKeyInfo(text)
+
+              return result
+
+          except Exception as e:
+              return {
+                  "success": False,
+                  "error": str(e),
+                  "original_text": rawHtml[:100]
+              }
+
+      final = productionPreprocess(rawWebData)
+      f"성공: {final['success']}, 토큰 절약: {final['token_saved']:.1f}%"
+
+- id: practice
+  title: 실습
+  subtitle: LLM 전처리 종합 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 정규표현식 개념을 사용하여 자신만의 전처리 함수를 만들어보세요! 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: URL 제거 및 날짜 정규화"
+    blocks:
+    - type: code
+      title: "정제 함수 정의"
+      content: |-
+        import re
+
+        raw = """
+        <div>
+            <a href="https://example.com">링크</a>
+            <p>게시일: 2025/12/26</p>
+            <p>내용입니다</p>
+        </div>
+        """
+
+        def strip(text):
+            text = re.sub(r"<script.*?</script>", "", text, flags=re.DOTALL)
+            text = re.sub(r"<style.*?</style>", "", text, flags=re.DOTALL)
+            text = re.sub(r"<.*?>", "", text, flags=re.DOTALL)
+            return text
+
+        strip(raw)
+    - type: code
+      title: "URL 제거 및 날짜 변환"
+      content: |-
+        def clean(html):
+            html = strip(html)
+            html = re.sub(r"https?://\S+", "", html)
+            html = re.sub(r"(\d{4})/(\d{1,2})/(\d{1,2})", r"\1-\2-\3", html)
+            html = re.sub(r"\s+", " ", html).strip()
+            return html
+
+        clean(raw)
+  - type: expansion
+    title: "미션2: 종합 전처리 파이프라인"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 HTML 생성"
+      content: |-
+        import re
+        import json
+        from pyodide.http import open_url
+
+        posts = json.loads(
+            open_url("https://jsonplaceholder.typicode.com/posts").read()
+        )
+
+        html = f"""
+        <html>
+        <body>
+            <h1>{posts[0]['title']}</h1>
+            <p>{posts[0]['body']}</p>
+            <div>문의: admin@blog.com, 전화: 010-1234-5678</div>
+        </body>
+        </html>
+        """
+        html[:100]
+    - type: code
+      title: "파이프라인 함수 정의"
+      content: |-
+        def remove(text):
+            return re.sub(r"<.*?>", "", text, flags=re.DOTALL)
+
+        def mask(text):
+            text = re.sub(r"(\d{3})-(\d{3,4})-(\d{4})", r"\1-****-\3", text)
+            text = re.sub(r"([\w.]{1,2})[\w.]*@([\w.]+)", r"\1***@\2", text)
+            return text
+
+        def norm(text):
+            return re.sub(r"\s+", " ", text).strip()
+
+        norm(mask(remove(html)))
+    - type: code
+      title: "파이프라인 실행 및 결과"
+      content: |-
+        def pipe(raw):
+            out = remove(raw)
+            out = mask(out)
+            out = norm(out)
+            return {
+                "raw_length": len(raw),
+                "processed_length": len(out),
+                "token_saved": ((len(raw) - len(out)) / len(raw)) * 100,
+                "processed_text": out
+            }
+
+        result = pipe(html)
+        f"절약률: {result['token_saved']:.1f}%"
+
+- id: summary
+  title: 정리
+  subtitle: 열 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: "정규표현식 마스터 완성! 10개 프로젝트를 통해 모든 핵심 개념을 배웠습니다."
+  - type: list
+    items:
+    - "기본 패턴: \\w, \\d, \\s, ., ^, $"
+    - "수량자: +, *, ?, {n,m}, *?"
+    - "문자 클래스: [abc], [^abc]"
+    - "그룹: (), (?:), (?P<name>)"
+    - "함수: findall, search, sub, split, finditer"
+    - "플래그: re.I, re.M, re.S, re.DOTALL"
+    - "고급: (?<=), (?=), (?<!), (?!)"
+    - "실전: HTML 제거, 마스킹, 토큰 최적화"
+  - type: text
+    content: 이제 실무에서 자신있게 정규표현식을 사용하세요!

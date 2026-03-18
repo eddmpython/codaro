@@ -1,0 +1,129 @@
+meta:
+  title: 실전파이썬 소개
+  tags: [실전, 마리모, 앱, 자동화]
+
+intro:
+  emoji: "🔥"
+  title: 실전파이썬
+  goal: "실제 업무에서 바로 사용할 수 있는 Python 도구를 만들고 배웁니다."
+  description: "단순한 문법 학습을 넘어, 실무에서 진짜 쓰이는 자동화 도구를 직접 만들어봅니다. 각 도구는 마리모 앱으로 제작되어 웹에서 바로 사용할 수 있습니다."
+
+sections:
+  - id: concept
+    title: 실전파이썬이란?
+    subtitle: 학습과 실용을 동시에
+    blocks:
+    - type: text
+      content: "실전파이썬은 실제 업무에서 마주치는 반복 작업을 Python으로 자동화하는 프로젝트 모음입니다. 각 프로젝트는 두 가지를 제공합니다. 첫째, 바로 사용할 수 있는 마리모 앱. 둘째, 그 앱을 어떻게 만드는지 배우는 학습 콘텐츠. 도구가 필요하면 앱을 쓰고, 원리가 궁금하면 학습 페이지에서 배우세요."
+
+    - type: compare
+      left:
+        icon: "🎓"
+        title: 학습 페이지
+        subtitle: study.yaml
+        items:
+          - "앱 제작 과정을 단계별로 설명"
+          - "로컬 환경과 Pyodide 차이 이해"
+          - "마리모 UI 컴포넌트 사용법"
+          - "실무 팁과 확장 아이디어"
+      right:
+        icon: "🚀"
+        title: 마리모 앱
+        subtitle: note.py
+        items:
+          - "웹에서 바로 실행 가능"
+          - "파일 업로드/다운로드 지원"
+          - "인터랙티브 UI"
+          - "코드 수정 없이 사용"
+
+  - id: philosophy
+    title: 왜 실전파이썬인가?
+    subtitle: 학습과 실용의 연결
+    blocks:
+    - type: text
+      content: "많은 Python 강의가 문법과 개념에 집중합니다. 리스트, 딕셔너리, 함수를 배우지만 '그래서 뭘 만들지?'라는 질문에 답하기 어렵습니다. 실전파이썬은 반대로 접근합니다. 먼저 실제로 유용한 도구를 보여주고, 그 도구를 만드는 과정에서 필요한 개념을 자연스럽게 배웁니다."
+
+    - type: featureCards
+      cards:
+      - emoji: "🎯"
+        title: 목표 지향
+        description: "무엇을 만들지 먼저 정하고, 거기에 필요한 것만 배웁니다"
+      - emoji: "⚡"
+        title: 즉시 활용
+        description: "배운 즉시 실제 업무에 적용할 수 있는 도구를 얻습니다"
+      - emoji: "🔄"
+        title: 양방향 연결
+        description: "앱이 궁금하면 학습으로, 학습 후엔 앱으로 돌아갑니다"
+
+  - id: marimo
+    title: 왜 마리모인가?
+    subtitle: 브라우저에서 실행되는 Python
+    blocks:
+    - type: text
+      content: "마리모(Marimo)는 반응형 Python 노트북입니다. Jupyter와 비슷하지만 몇 가지 중요한 차이가 있습니다. 첫째, 순수 Python 파일(.py)로 저장되어 Git으로 버전 관리가 쉽습니다. 둘째, 셀 간 의존성을 자동 추적하여 값이 바뀌면 관련 셀이 자동 실행됩니다. 셋째, Pyodide를 통해 브라우저에서 설치 없이 실행할 수 있습니다."
+
+    - type: featureCards
+      cards:
+      - emoji: "🌐"
+        title: 웹 기반 실행
+        description: "Pyodide로 브라우저에서 Python 실행. 설치 불필요, URL 공유만으로 배포"
+      - emoji: "⚡"
+        title: 반응형 셀
+        description: "UI 값이 바뀌면 관련 셀이 자동 재실행. 인터랙티브 앱 제작이 쉬움"
+      - emoji: "📄"
+        title: 순수 Python
+        description: ".py 파일로 저장. Git diff가 깔끔하고 코드 리뷰가 가능"
+
+    - type: note
+      title: "Pyodide 환경의 특징"
+      content: "Pyodide는 브라우저에서 Python을 실행하는 기술입니다. 로컬 파일 시스템에 접근할 수 없어서 glob.glob() 같은 함수가 작동하지 않습니다. 대신 파일 업로드 UI를 사용합니다. 네트워크 요청, 데이터 처리, 시각화 등 대부분의 기능은 정상 작동합니다."
+
+  - id: tools
+    title: 제공하는 도구들
+    subtitle: 실무에서 바로 사용하세요
+    blocks:
+    - type: text
+      content: "실전파이썬은 파일 처리, 데이터 변환, 텍스트 처리 등 다양한 분야의 도구를 제공합니다. 각 도구는 실제 업무에서 자주 마주치는 반복 작업을 자동화합니다. 아래는 현재 제공 중이거나 준비 중인 도구 목록입니다."
+
+    - type: featureCards
+      cards:
+      - emoji: "📊"
+        title: 엑셀 파일 병합
+        description: "여러 엑셀 파일을 수직/수평으로 합치기"
+      - emoji: "📑"
+        title: PDF 병합
+        description: "여러 PDF를 하나로 합치기 (준비중)"
+      - emoji: "🖼️"
+        title: 이미지 일괄 변환
+        description: "PNG/JPG 포맷 변환 및 리사이즈 (준비중)"
+      - emoji: "📝"
+        title: CSV 인코딩 변환
+        description: "EUC-KR ↔ UTF-8 변환 (준비중)"
+
+  - id: howToUse
+    title: 사용 방법
+    subtitle: 두 가지 경로
+    blocks:
+    - type: text
+      content: "실전파이썬은 두 가지 방식으로 사용할 수 있습니다. 도구가 당장 필요하다면 마리모 앱으로 바로 이동하세요. 원리를 이해하고 싶거나 비슷한 도구를 직접 만들고 싶다면 학습 페이지를 먼저 살펴보세요."
+
+    - type: compare
+      left:
+        icon: "🚀"
+        title: 도구 먼저 사용
+        subtitle: 급하게 필요할 때
+        items:
+          - "사이드바에서 원하는 도구 선택"
+          - "마리모 앱에서 바로 사용"
+          - "사용 후 '어떻게 만들었지?' 궁금하면"
+          - "학습 페이지 링크 클릭"
+      right:
+        icon: "🎓"
+        title: 학습 먼저 하기
+        subtitle: 원리를 이해하고 싶을 때
+        items:
+          - "학습 페이지에서 단계별 설명 읽기"
+          - "코드 블록 따라 실행해보기"
+          - "원리 이해 후"
+          - "마리모 앱에서 실제 사용"
+

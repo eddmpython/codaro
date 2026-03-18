@@ -13,6 +13,7 @@ from ..kernel.protocol import (
     WsExecuteMessage,
     WsExecuteReactiveMessage,
     WsErrorMessage,
+    WsExecutionEventMessage,
     WsGetVariablesMessage,
     WsInterruptMessage,
     WsResetMessage,
@@ -21,14 +22,19 @@ from ..kernel.protocol import (
 )
 from ..kernel.reactive import executeReactive, previewReactiveOrder
 from ..serverLog import formatLogFields, getServerLogger
+from ..system.fileOps import MoveRequest, WorkspacePathError, WriteFileRequest
+from ..system.packageOps import PackageEnvironmentError
 from .appState import ServerState
 from .errors import fail
-from .requestModels import ReactiveExecuteRequest
+from .requestModels import PackageRequest, PathRequest, ReactiveExecuteRequest
 
 
 def createKernelRouter(state: ServerState) -> APIRouter:
     router = APIRouter()
     logger = getServerLogger()
+
+    def failWorkspaceBoundary(error: WorkspacePathError) -> None:
+        fail(403, "workspace_path_forbidden", str(error))
 
     @router.post("/api/kernel/create", response_model=CreateSessionResponse)
     def apiCreateSession(request: CreateSessionRequest | None = None) -> CreateSessionResponse:
@@ -157,6 +163,149 @@ def createKernelRouter(state: ServerState) -> APIRouter:
         )
         return {"status": "removed"}
 
+    @router.post("/api/kernel/{sessionId}/fs/list")
+    async def apiListSessionDirectory(sessionId: str, request: PathRequest) -> dict[str, Any]:
+        session = requireSession(state, sessionId)
+        try:
+            result = await session.getFiles(request.path)
+            logger.debug(
+                "kernel-fs %s",
+                formatLogFields(action="list", sessionId=sessionId, path=request.path, entryCount=len(result.entries)),
+            )
+            return result.model_dump()
+        except WorkspacePathError as error:
+            failWorkspaceBoundary(error)
+
+    @router.post("/api/kernel/{sessionId}/fs/read")
+    async def apiReadSessionFile(sessionId: str, request: PathRequest) -> dict[str, Any]:
+        session = requireSession(state, sessionId)
+        try:
+            content = await session.readFile(request.path)
+            logger.debug(
+                "kernel-fs %s",
+                formatLogFields(action="read", sessionId=sessionId, path=request.path, contentLength=len(content.content)),
+            )
+            return content.model_dump()
+        except WorkspacePathError as error:
+            failWorkspaceBoundary(error)
+        except FileNotFoundError:
+            fail(404, "file_not_found", "File not found.")
+        except UnicodeDecodeError:
+            fail(400, "file_not_text", "File is not a text file or has unsupported encoding.")
+
+    @router.post("/api/kernel/{sessionId}/fs/write")
+    async def apiWriteSessionFile(sessionId: str, request: WriteFileRequest) -> dict[str, str]:
+        session = requireSession(state, sessionId)
+        try:
+            resultPath = await session.writeFile(
+                request.path,
+                request.content,
+                encoding=request.encoding,
+                createDirectories=request.createDirectories,
+            )
+            logger.debug(
+                "kernel-fs %s",
+                formatLogFields(
+                    action="write",
+                    sessionId=sessionId,
+                    path=resultPath,
+                    contentLength=len(request.content),
+                    createDirectories=request.createDirectories,
+                ),
+            )
+            return {"path": resultPath}
+        except WorkspacePathError as error:
+            failWorkspaceBoundary(error)
+
+    @router.post("/api/kernel/{sessionId}/fs/delete")
+    async def apiDeleteSessionEntry(sessionId: str, request: PathRequest) -> dict[str, str]:
+        session = requireSession(state, sessionId)
+        try:
+            result = await session.deleteEntry(request.path)
+            logger.debug("kernel-fs %s", formatLogFields(action="delete", sessionId=sessionId, path=result))
+            return {"deleted": result}
+        except WorkspacePathError as error:
+            failWorkspaceBoundary(error)
+        except FileNotFoundError:
+            fail(404, "file_not_found", "File not found.")
+
+    @router.post("/api/kernel/{sessionId}/fs/move")
+    async def apiMoveSessionEntry(sessionId: str, request: MoveRequest) -> dict[str, str]:
+        session = requireSession(state, sessionId)
+        try:
+            result = await session.moveEntry(request.source, request.destination)
+            logger.debug(
+                "kernel-fs %s",
+                formatLogFields(
+                    action="move",
+                    sessionId=sessionId,
+                    source=request.source,
+                    destination=request.destination,
+                    path=result,
+                ),
+            )
+            return {"path": result}
+        except WorkspacePathError as error:
+            failWorkspaceBoundary(error)
+        except FileNotFoundError:
+            fail(404, "file_source_not_found", "Source not found.")
+
+    @router.post("/api/kernel/{sessionId}/fs/mkdir")
+    async def apiCreateSessionDirectory(sessionId: str, request: PathRequest) -> dict[str, str]:
+        session = requireSession(state, sessionId)
+        try:
+            result = await session.createDirectory(request.path)
+            logger.debug("kernel-fs %s", formatLogFields(action="mkdir", sessionId=sessionId, path=result))
+            return {"path": result}
+        except WorkspacePathError as error:
+            failWorkspaceBoundary(error)
+
+    @router.post("/api/kernel/{sessionId}/fs/exists")
+    async def apiSessionFileExists(sessionId: str, request: PathRequest) -> dict[str, bool]:
+        session = requireSession(state, sessionId)
+        try:
+            exists = await session.fileExists(request.path)
+            logger.debug(
+                "kernel-fs %s",
+                formatLogFields(action="exists", sessionId=sessionId, path=request.path, exists=exists),
+            )
+            return {"exists": exists}
+        except WorkspacePathError as error:
+            failWorkspaceBoundary(error)
+
+    @router.get("/api/kernel/{sessionId}/packages/list")
+    async def apiListSessionPackages(sessionId: str) -> list[dict[str, str]]:
+        session = requireSession(state, sessionId)
+        try:
+            packages = await session.listPackages()
+            logger.debug(
+                "kernel-packages %s",
+                formatLogFields(action="list", sessionId=sessionId, packageCount=len(packages)),
+            )
+            return [package.model_dump() for package in packages]
+        except PackageEnvironmentError as error:
+            fail(error.statusCode, error.code, error.message)
+
+    @router.post("/api/kernel/{sessionId}/packages/install")
+    async def apiInstallSessionPackage(sessionId: str, request: PackageRequest) -> dict[str, Any]:
+        session = requireSession(state, sessionId)
+        result = await session.installPackage(request.name)
+        logger.info(
+            "kernel-packages %s",
+            formatLogFields(action="install", sessionId=sessionId, name=request.name, success=result.success),
+        )
+        return result.model_dump()
+
+    @router.post("/api/kernel/{sessionId}/packages/uninstall")
+    async def apiUninstallSessionPackage(sessionId: str, request: PackageRequest) -> dict[str, Any]:
+        session = requireSession(state, sessionId)
+        result = await session.uninstallPackage(request.name)
+        logger.info(
+            "kernel-packages %s",
+            formatLogFields(action="uninstall", sessionId=sessionId, name=request.name, success=result.success),
+        )
+        return result.model_dump()
+
     @router.websocket("/ws/kernel/{sessionId}")
     async def kernelWebSocket(websocket: WebSocket, sessionId: str) -> None:
         session = state.sessionManager.getSession(sessionId)
@@ -261,7 +410,11 @@ async def handleExecuteMessage(websocket: WebSocket, session, message: WsExecute
 
     startedAt = time.perf_counter()
     await websocket.send_json(WsStatusMessage(type="status", engineStatus="busy").model_dump())
-    result = await session.execute(code, blockId=blockId)
+    result = await session.execute(
+        code,
+        blockId=blockId,
+        eventHandler=lambda event: sendExecutionEvent(websocket, requestId, event),
+    )
     logger.debug(
         "kernel-execute %s",
         formatLogFields(
@@ -284,6 +437,7 @@ async def handleExecuteMessage(websocket: WebSocket, session, message: WsExecute
             stdout=result.stdout,
             stderr=result.stderr,
             variables=result.variables,
+            stateDelta=result.stateDelta,
             executionCount=result.executionCount,
         ).model_dump()
     )
@@ -302,7 +456,18 @@ async def handleReactiveMessage(
 
     startedAt = time.perf_counter()
     await websocket.send_json(WsStatusMessage(type="status", engineStatus="busy").model_dump())
-    results, executionOrder = await executeReactive(session, blocks, changedBlockId)
+    reactiveEvents: list[dict[str, Any]] = []
+
+    async def eventHandler(event) -> None:
+        reactiveEvents.append(
+            {
+                "blockId": event.blockId,
+                "eventType": event.eventType,
+            }
+        )
+        await sendExecutionEvent(websocket, requestId, event)
+
+    results, executionOrder = await executeReactive(session, blocks, changedBlockId, eventHandler=eventHandler)
     logger.debug(
         "kernel-reactive %s",
         formatLogFields(
@@ -312,6 +477,7 @@ async def handleReactiveMessage(
             changedBlockId=changedBlockId,
             resultCount=len(results),
             executionCount=len(executionOrder),
+            eventCount=len(reactiveEvents),
             durationMs=round((time.perf_counter() - startedAt) * 1000, 1),
         ),
     )
@@ -326,6 +492,7 @@ async def handleReactiveMessage(
                 stdout=result.stdout,
                 stderr=result.stderr,
                 variables=result.variables,
+                stateDelta=result.stateDelta,
                 executionCount=result.executionCount,
             ).model_dump()
         )
@@ -335,3 +502,16 @@ async def handleReactiveMessage(
         "executionOrder": executionOrder,
     })
     await websocket.send_json(WsStatusMessage(type="status", engineStatus="ready").model_dump())
+
+
+async def sendExecutionEvent(websocket: WebSocket, requestId: str, event) -> None:
+    await websocket.send_json(
+        WsExecutionEventMessage(
+            requestId=requestId,
+            blockId=event.blockId,
+            sequence=event.sequence,
+            eventType=event.eventType,
+            executionCount=event.executionCount,
+            payload=event.payload,
+        ).model_dump()
+    )

@@ -1,0 +1,683 @@
+meta:
+  id: "day17"
+  title: "스코프와클로저"
+  day: 17
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 스코프와 클로저 - 변수 범위와 함수 상태"
+    description: "지역/전역 스코프, global, nonlocal, closure를 배웁니다."
+    keywords: ['스코프', 'scope', 'global', 'nonlocal', 'closure']
+
+intro:
+  emoji: "🔍"
+  points:
+  - "변수 스코프 이해"
+  - "global과 nonlocal"
+  - "클로저로 상태 보존"
+  - "고급 함수 패턴"
+
+sections:
+- id: "local_scope"
+  title: "지역 변수"
+  subtitle: "함수 내부 변수"
+  blocks:
+  - type: "text"
+    content: "함수 안에서 만든 변수는 지역 변수입니다. 지역 변수는 함수 내부에서만 사용할 수 있고, 함수가 끝나면 사라집니다. 함수 밖에서는 접근할 수 없습니다."
+  - type: "list"
+    items:
+    - "함수 내부에서만 유효"
+    - "함수 종료시 사라짐"
+    - "외부에서 접근 불가"
+    - "각 함수마다 독립적"
+  - type: "code"
+    language: "python"
+    title: "지역 변수 기본"
+    description: "함수 내부 변수는 외부에서 접근할 수 없습니다."
+    content: |-
+      def calculate():
+          result = 10 + 20
+          return result
+
+      calculate()
+  - type: "code"
+    language: "python"
+    title: "독립적인 지역 변수"
+    description: "같은 이름이어도 각 함수에서 독립적입니다."
+    content: |-
+      def addNumbers():
+          value = 100
+          return value + 50
+
+      def multiplyNumbers():
+          value = 10
+          return value * 5
+
+      addNumbers(), multiplyNumbers()
+  - type: "code"
+    language: "python"
+    title: "매개변수도 지역 변수"
+    description: "매개변수도 지역 변수입니다."
+    content: |-
+      def process(data):
+          data = data * 2
+          return data
+
+      process(15)
+  - type: "tip"
+    content: "지역 변수는 함수의 독립성을 보장합니다."
+
+- id: "global_scope"
+  title: "전역 변수"
+  subtitle: "함수 외부 변수"
+  blocks:
+  - type: "text"
+    content: "함수 밖에서 만든 변수는 전역 변수입니다. 전역 변수는 어디서든 읽을 수 있지만, 함수 안에서 수정하려면 global 키워드가 필요합니다."
+  - type: "list"
+    items:
+    - "함수 밖에서 정의"
+    - "어디서든 읽기 가능"
+    - "수정은 global 필요"
+    - "프로그램 종료시 사라짐"
+  - type: "code"
+    language: "python"
+    title: "전역 변수 읽기"
+    description: "함수에서 전역 변수를 읽을 수 있습니다."
+    content: |-
+      total = 100
+
+      def showTotal():
+          return total
+
+      showTotal()
+  - type: "code"
+    language: "python"
+    title: "지역 변수 우선"
+    description: "같은 이름이면 지역 변수가 우선됩니다."
+    content: |-
+      count = 50
+
+      def getCount():
+          count = 30
+          return count
+
+      getCount()
+  - type: "code"
+    language: "python"
+    title: "전역과 지역 분리"
+    description: "전역 변수는 함수 실행 후에도 유지됩니다."
+    content: |-
+      price = 1000
+
+      def calculate():
+          discount = 100
+          return price - discount
+
+      calculate()
+  - type: "tip"
+    content: "전역 변수는 최소한으로 사용하는 것이 좋습니다."
+
+- id: "global_keyword"
+  title: "global 키워드"
+  subtitle: "전역 변수 수정"
+  blocks:
+  - type: "text"
+    content: "global 키워드를 사용하면 함수 안에서 전역 변수를 수정할 수 있습니다. global 변수명 형식으로 선언하고 사용합니다. 전역 상태를 변경할 때 사용합니다."
+  - type: "list"
+    items:
+    - "global 변수명 선언"
+    - "전역 변수 수정 가능"
+    - "함수 시작 부분에 선언"
+    - "여러 변수 동시 선언 가능"
+  - type: "code"
+    language: "python"
+    title: "global 기본"
+    description: "global로 전역 변수를 수정합니다."
+    content: |-
+      balance = 1000
+
+      def deposit(amount):
+          global balance
+          balance = balance + amount
+          return balance
+
+      deposit(500)
+  - type: "code"
+    language: "python"
+    title: "여러 전역 변수"
+    description: "여러 전역 변수를 수정합니다."
+    content: |-
+      score = 0
+      level = 1
+
+      def levelUp():
+          global score, level
+          score = score + 100
+          level = level + 1
+          return score, level
+
+      levelUp()
+  - type: "code"
+    language: "python"
+    title: "카운터 구현"
+    description: "전역 변수로 카운터를 구현합니다."
+    content: |-
+      counter = 0
+
+      def increment():
+          global counter
+          counter = counter + 1
+          return counter
+
+      increment()
+      increment()
+  - type: "tip"
+    content: "global은 필요할 때만 사용하고, 가급적 return으로 값을 전달하세요."
+
+- id: "nested_function"
+  title: "중첩 함수"
+  subtitle: "함수 안의 함수"
+  blocks:
+  - type: "text"
+    content: "함수 안에 다른 함수를 정의할 수 있습니다. 내부 함수는 외부 함수의 변수에 접근할 수 있습니다. 외부 함수에서만 내부 함수를 호출할 수 있습니다."
+  - type: "list"
+    items:
+    - "함수 안에 함수 정의"
+    - "내부 함수는 외부 변수 접근"
+    - "외부 함수에서만 호출"
+    - "코드 구조화"
+  - type: "code"
+    language: "python"
+    title: "중첩 함수 기본"
+    description: "함수 안에 함수를 정의합니다."
+    content: |-
+      def outer():
+          msg = 'Hello'
+          def inner():
+              return msg + ' World'
+          return inner()
+
+      outer()
+  - type: "code"
+    language: "python"
+    title: "외부 변수 접근"
+    description: "내부 함수가 외부 함수의 변수를 사용합니다."
+    content: |-
+      def calculate(x):
+          base = 10
+          def add():
+              return x + base
+          return add()
+
+      calculate(5)
+  - type: "code"
+    language: "python"
+    title: "여러 내부 함수"
+    description: "여러 개의 내부 함수를 정의할 수 있습니다."
+    content: |-
+      def compute(num):
+          def double():
+              return num * 2
+          def triple():
+              return num * 3
+          return double() + triple()
+
+      compute(5)
+  - type: "tip"
+    content: "중첩 함수는 관련된 기능을 그룹화할 때 유용합니다."
+
+- id: "nonlocal_keyword"
+  title: "nonlocal 키워드"
+  subtitle: "외부 함수 변수 수정"
+  blocks:
+  - type: "text"
+    content: "nonlocal 키워드를 사용하면 내부 함수에서 외부 함수의 변수를 수정할 수 있습니다. nonlocal 변수명 형식으로 선언합니다. 클로저를 만들 때 중요합니다."
+  - type: "list"
+    items:
+    - "nonlocal 변수명 선언"
+    - "외부 함수 변수 수정"
+    - "전역이 아닌 외부 스코프"
+    - "클로저 구현에 필수"
+  - type: "code"
+    language: "python"
+    title: "nonlocal 기본"
+    description: "내부 함수에서 외부 함수 변수를 수정합니다."
+    content: |-
+      def outer():
+          count = 0
+          def increment():
+              nonlocal count
+              count = count + 1
+              return count
+          return increment()
+
+      outer()
+  - type: "code"
+    language: "python"
+    title: "여러 번 호출"
+    description: "내부 함수를 여러 번 호출합니다."
+    content: |-
+      def makeCounter():
+          total = 0
+          def add(n):
+              nonlocal total
+              total = total + n
+              return total
+          return add(10), add(20), add(30)
+
+      makeCounter()
+  - type: "code"
+    language: "python"
+    title: "상태 변경"
+    description: "외부 함수의 상태를 변경합니다."
+    content: |-
+      def manage():
+          value = 100
+          def update(delta):
+              nonlocal value
+              value = value + delta
+              return value
+          first = update(50)
+          second = update(-30)
+          return first, second
+
+      manage()
+  - type: "tip"
+    content: "nonlocal은 가장 가까운 외부 함수의 변수를 참조합니다."
+
+- id: "closure_basic"
+  title: "클로저 기본"
+  subtitle: "상태를 기억하는 함수"
+  blocks:
+  - type: "text"
+    content: "클로저는 외부 함수가 끝난 후에도 외부 함수의 변수를 기억하는 내부 함수입니다. 외부 함수가 내부 함수를 반환하면 클로저가 됩니다. 각 클로저는 독립적인 상태를 유지합니다."
+  - type: "list"
+    items:
+    - "내부 함수를 반환"
+    - "외부 변수를 기억"
+    - "독립적인 상태 유지"
+    - "데이터 캡슐화"
+  - type: "code"
+    language: "python"
+    title: "클로저 생성"
+    description: "내부 함수를 반환하여 클로저를 만듭니다."
+    content: |-
+      def makeAdder(n):
+          def add(x):
+              return x + n
+          return add
+
+      add5 = makeAdder(5)
+      add5(10)
+  - type: "code"
+    language: "python"
+    title: "독립적인 클로저"
+    description: "각 클로저는 독립적인 상태를 가집니다."
+    content: |-
+      def createMultiplier(factor):
+          def multiply(num):
+              return num * factor
+          return multiply
+
+      double = createMultiplier(2)
+      triple = createMultiplier(3)
+      double(5), triple(5)
+  - type: "code"
+    language: "python"
+    title: "여러 번 호출"
+    description: "클로저를 여러 번 호출합니다."
+    content: |-
+      def makePower(exp):
+          def power(base):
+              return base ** exp
+          return power
+
+      square = makePower(2)
+      square(3), square(4), square(5)
+  - type: "tip"
+    content: "클로저는 함수 팩토리 패턴을 구현할 때 유용합니다."
+
+- id: "closure_advanced"
+  title: "클로저 활용"
+  subtitle: "상태를 가진 함수"
+  blocks:
+  - type: "text"
+    content: "클로저를 사용하면 상태를 가진 함수를 만들 수 있습니다. nonlocal과 함께 사용하여 상태를 변경하고 유지할 수 있습니다. 카운터, 누적기 등을 구현할 때 유용합니다."
+  - type: "list"
+    items:
+    - "상태 유지 함수"
+    - "nonlocal로 상태 변경"
+    - "캡슐화된 데이터"
+    - "함수형 프로그래밍"
+  - type: "code"
+    language: "python"
+    title: "카운터 클로저"
+    description: "상태를 유지하는 카운터를 만듭니다."
+    content: |-
+      def makeCounter():
+          cnt = 0
+          def increment():
+              nonlocal cnt
+              cnt = cnt + 1
+              return cnt
+          return increment
+
+      counter = makeCounter()
+      counter(), counter(), counter()
+  - type: "code"
+    language: "python"
+    title: "누적기 클로저"
+    description: "값을 누적하는 함수를 만듭니다."
+    content: |-
+      def makeAccumulator():
+          total = 0
+          def add(val):
+              nonlocal total
+              total = total + val
+              return total
+          return add
+
+      acc = makeAccumulator()
+      acc(10), acc(20), acc(30)
+  - type: "code"
+    language: "python"
+    title: "범위 체커"
+    description: "범위를 기억하는 검사 함수를 만듭니다."
+    content: |-
+      def makeRangeChecker(minVal, maxVal):
+          def check(num):
+              return minVal <= num <= maxVal
+          return check
+
+      isValid = makeRangeChecker(10, 100)
+      isValid(50), isValid(5), isValid(150)
+  - type: "tip"
+    content: "클로저는 클래스 없이도 상태를 관리할 수 있게 해줍니다."
+
+- id: "practice"
+  title: "Day 17 종합 복습"
+  subtitle: "스코프와 클로저 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 17에서 배운 스코프와 클로저를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 지역 변수"
+    code: |-
+      def compute():
+          result = 15 * 3
+          return result
+
+      compute()
+
+  - type: "expansion"
+    title: "🟢 기본2: 전역 변수 읽기"
+    code: |-
+      price = 5000
+
+      def getPrice():
+          return price
+
+      getPrice()
+
+  - type: "expansion"
+    title: "🟢 기본3: global 키워드"
+    code: |-
+      stock = 10
+
+      def sell(qty):
+          global stock
+          stock = stock - qty
+          return stock
+
+      sell(3)
+
+  - type: "expansion"
+    title: "🟢 기본4: 중첩 함수"
+    code: |-
+      def outer():
+          text = 'Python'
+          def inner():
+              return text + ' Programming'
+          return inner()
+
+      outer()
+
+  - type: "expansion"
+    title: "🟢 기본5: 클로저"
+    code: |-
+      def makeAdd(n):
+          def add(x):
+              return x + n
+          return add
+
+      add10 = makeAdd(10)
+      add10(25)
+
+  - type: "expansion"
+    title: "🟡 응용1: 잔액 관리"
+    code: |-
+      balance = 10000
+
+      def withdraw(amt):
+          global balance
+          if balance >= amt:
+              balance = balance - amt
+              return balance
+          return balance
+
+      withdraw(3000)
+      withdraw(2000)
+
+  - type: "expansion"
+    title: "🟡 응용2: 점수 시스템"
+    code: |-
+      score = 0
+      level = 1
+
+      def earnPoints(pts):
+          global score, level
+          score = score + pts
+          if score >= 100:
+              level = level + 1
+              score = 0
+          return score, level
+
+      earnPoints(60)
+      earnPoints(50)
+
+  - type: "expansion"
+    title: "🟡 응용3: 함수 팩토리"
+    code: |-
+      def makeFormatter(prefix, suffix):
+          def format(text):
+              return prefix + text + suffix
+          return format
+
+      bracketize = makeFormatter('[', ']')
+      quote = makeFormatter('"', '"')
+      bracketize('Hello'), quote('World')
+
+  - type: "expansion"
+    title: "🟡 응용4: 카운터"
+    code: |-
+      def createCounter():
+          num = 0
+          def inc():
+              nonlocal num
+              num = num + 1
+              return num
+          return inc
+
+      cnt = createCounter()
+      cnt(), cnt(), cnt()
+
+  - type: "expansion"
+    title: "🟡 응용5: 곱셈기"
+    code: |-
+      def makeMultiplier(factor):
+          def multiply(val):
+              return val * factor
+          return multiply
+
+      times2 = makeMultiplier(2)
+      times5 = makeMultiplier(5)
+      times2(10), times5(10)
+
+  - type: "expansion"
+    title: "🔴 심화1-1: 게임 상태"
+    code: |-
+      health = 100
+      mana = 50
+
+      def useSkill():
+          global health, mana
+          if mana >= 10:
+              mana = mana - 10
+              health = health + 5
+          return health, mana
+
+      useSkill()
+      useSkill()
+
+  - type: "expansion"
+    title: "🔴 심화1-2: 누적 평균"
+    code: |-
+      def makeAverager():
+          total = 0
+          cnt = 0
+          def add(val):
+              nonlocal total, cnt
+              total = total + val
+              cnt = cnt + 1
+              return total / cnt
+          return add
+
+      avg = makeAverager()
+      avg(80), avg(90), avg(85)
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 할인 계산기"
+    code: |-
+      def makeDiscounter(rate):
+          def discount(price):
+              return price * (1 - rate)
+          return discount
+
+      vip = makeDiscounter(0.2)
+      member = makeDiscounter(0.1)
+      vip(10000), member(10000)
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 범위 필터"
+    code: |-
+      def makeFilter(minVal, maxVal):
+          def filterList(nums):
+              result = []
+              for n in nums:
+                  if minVal <= n <= maxVal:
+                      result.append(n)
+              return result
+          return filterList
+
+      ageFilter = makeFilter(20, 30)
+      ageFilter([15, 25, 35, 22, 40, 28])
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 통계 수집기"
+    code: |-
+      def makeStats():
+          data = []
+          def add(val):
+              nonlocal data
+              data.append(val)
+              total = 0
+              for v in data:
+                  total = total + v
+              return total / len(data)
+          return add
+
+      stats = makeStats()
+      stats(10), stats(20), stats(30)
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 최대/최소 추적"
+    code: |-
+      def makeTracker():
+          minVal = None
+          maxVal = None
+          def update(val):
+              nonlocal minVal, maxVal
+              if minVal is None or val < minVal:
+                  minVal = val
+              if maxVal is None or val > maxVal:
+                  maxVal = val
+              return minVal, maxVal
+          return update
+
+      track = makeTracker()
+      track(50)
+      track(30)
+      track(70)
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 함수 체이너"
+    code: |-
+      def makeChain(first):
+          def chain(second):
+              def apply(val):
+                  return second(first(val))
+              return apply
+          return chain
+
+      twice = lambda x: x * 2
+      plus5 = lambda x: x + 5
+      composed = makeChain(twice)(plus5)
+      composed(10)
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 메모이제이션"
+    code: |-
+      def makeMemoized(func):
+          cache = {}
+          def memoized(n):
+              nonlocal cache
+              if n not in cache:
+                  cache[n] = func(n)
+              return cache[n]
+          return memoized
+
+      def square(x):
+          return x * x
+
+      memoSquare = makeMemoized(square)
+      memoSquare(5), memoSquare(5), memoSquare(6)
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 카운트다운"
+    code: |-
+      def makeCountdown(start):
+          current = start
+          def tick():
+              nonlocal current
+              if current > 0:
+                  current = current - 1
+              return current
+          return tick
+
+      timer = makeCountdown(5)
+      timer(), timer(), timer()
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 토글 스위치"
+    code: |-
+      def makeToggle(initial):
+          state = initial
+          def toggle():
+              nonlocal state
+              state = not state
+              return state
+          return toggle
+
+      switch = makeToggle(False)
+      switch(), switch(), switch(), switch()

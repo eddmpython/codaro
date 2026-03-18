@@ -1,0 +1,780 @@
+meta:
+  id: "10"
+  title: "slots와 메모리 최적화"
+  day: 10
+  category: "advancedPython"
+  tags: ["__slots__", "memory", "optimization", "getsizeof"]
+  seo:
+    title: "파이썬 __slots__와 메모리 최적화 - 대량 객체 최적화"
+    description: "__slots__로 메모리를 절약합니다. sys.getsizeof, 상속과 slots, 성능 비교, weakref 지원까지."
+    keywords: ["__slots__", "메모리최적화", "getsizeof", "Python optimization"]
+
+intro:
+  emoji: "💾"
+  points:
+  - "__slots__의 동작 원리와 효과"
+  - "메모리 사용량 측정 방법"
+  - "상속에서의 __slots__ 처리"
+  - "제한사항과 트레이드오프"
+
+sections:
+- id: "slots_basic"
+  title: "__slots__ 기초"
+  subtitle: "__dict__ 제거"
+  blocks:
+  - type: "text"
+    content: "__slots__는 인스턴스가 가질 수 있는 속성을 미리 선언합니다. 일반 클래스는 각 인스턴스마다 __dict__ 딕셔너리를 생성하여 속성을 저장합니다. __slots__를 정의하면 __dict__가 생성되지 않고, 속성이 고정된 슬롯에 저장됩니다. 이로 인해 메모리가 크게 절약됩니다. 특히 수만~수백만 개의 인스턴스를 생성할 때 효과적입니다. 단점은 선언되지 않은 속성을 동적으로 추가할 수 없다는 것입니다."
+  - type: "list"
+    items:
+    - "__slots__ = ('attr1', 'attr2', ...)"
+    - "__dict__ 딕셔너리 생성 안 함"
+    - "메모리 크게 절약"
+    - "동적 속성 추가 불가"
+  - type: "code"
+    language: "python"
+    title: "기본 __slots__"
+    description: "__slots__를 사용한 클래스를 정의합니다."
+    content: |-
+      class Point:
+          __slots__ = ('x', 'y')
+
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+      p = Point(3, 4)
+      p.x, p.y
+  - type: "code"
+    language: "python"
+    title: "__dict__ 비교"
+    description: "__slots__ 유무에 따른 __dict__ 차이입니다."
+    content: |-
+      class WithDict:
+          def __init__(self, x):
+              self.x = x
+
+      class WithSlots:
+          __slots__ = ('x',)
+          def __init__(self, x):
+              self.x = x
+
+      hasattr(WithDict(1), '__dict__'), hasattr(WithSlots(1), '__dict__')
+  - type: "code"
+    language: "python"
+    title: "동적 속성 제한"
+    description: "__slots__에 없는 속성은 추가할 수 없습니다."
+    content: |-
+      class Rigid:
+          __slots__ = ('a', 'b')
+          def __init__(self, a, b):
+              self.a = a
+              self.b = b
+
+      rigid = Rigid(1, 2)
+      rigid.a, rigid.b
+  - type: "tip"
+    content: "__slots__에 '__dict__'을 포함하면 동적 속성 추가가 가능해지지만 메모리 이점이 사라집니다."
+
+- id: "memory_comparison"
+  title: "메모리 비교"
+  subtitle: "sys.getsizeof"
+  blocks:
+  - type: "text"
+    content: "sys.getsizeof()로 객체의 메모리 크기를 바이트 단위로 측정합니다. __slots__를 사용하면 인스턴스당 수십~수백 바이트를 절약할 수 있습니다. __dict__는 해시 테이블 구조로 오버헤드가 큽니다. 빈 딕셔너리도 약 64~112 바이트를 차지합니다. 수만 개의 객체를 생성하면 메가바이트 단위로 차이가 납니다. getsizeof는 얕은(shallow) 크기만 측정하므로, 참조하는 객체의 크기는 포함되지 않습니다."
+  - type: "list"
+    items:
+    - "sys.getsizeof(obj): 객체 크기 (바이트)"
+    - "__dict__ 오버헤드: 64~112 바이트"
+    - "__slots__ 인스턴스: 훨씬 작음"
+    - "얕은 크기만 측정 (참조 객체 제외)"
+  - type: "code"
+    language: "python"
+    title: "객체 크기 비교"
+    description: "__slots__ 유무에 따른 메모리 차이입니다."
+    content: |-
+      import sys
+
+      class Regular:
+          def __init__(self, x, y, z):
+              self.x = x
+              self.y = y
+              self.z = z
+
+      class Slotted:
+          __slots__ = ('x', 'y', 'z')
+          def __init__(self, x, y, z):
+              self.x = x
+              self.y = y
+              self.z = z
+
+      regular = Regular(1, 2, 3)
+      slotted = Slotted(1, 2, 3)
+
+      regularSize = sys.getsizeof(regular) + sys.getsizeof(regular.__dict__)
+      slottedSize = sys.getsizeof(slotted)
+      regularSize, slottedSize
+  - type: "code"
+    language: "python"
+    title: "대량 객체 메모리"
+    description: "많은 객체 생성 시 메모리 차이를 추정합니다."
+    content: |-
+      import sys
+
+      class Normal:
+          def __init__(self, v):
+              self.v = v
+
+      class Optimized:
+          __slots__ = ('v',)
+          def __init__(self, v):
+              self.v = v
+
+      count = 10000
+      normalObjs = [Normal(i) for i in range(count)]
+      optimizedObjs = [Optimized(i) for i in range(count)]
+
+      normalTotal = sum(sys.getsizeof(o) + sys.getsizeof(o.__dict__) for o in normalObjs)
+      optimizedTotal = sum(sys.getsizeof(o) for o in optimizedObjs)
+      f"Normal: {normalTotal:,} bytes, Optimized: {optimizedTotal:,} bytes"
+  - type: "code"
+    language: "python"
+    title: "빈 딕셔너리 크기"
+    description: "빈 __dict__도 메모리를 차지합니다."
+    content: |-
+      import sys
+
+      emptyDict = {}
+      sys.getsizeof(emptyDict)
+  - type: "tip"
+    content: "정확한 메모리 측정은 tracemalloc 모듈을 사용하세요."
+
+- id: "slots_inheritance"
+  title: "상속과 __slots__"
+  subtitle: "부모와 자식 슬롯"
+  blocks:
+  - type: "text"
+    content: "상속에서 __slots__는 누적됩니다. 자식 클래스가 __slots__를 정의하면 부모의 슬롯에 추가됩니다. 자식이 __slots__를 정의하지 않으면 __dict__가 생성되어 슬롯 이점이 사라집니다. 부모 슬롯에 있는 속성을 자식 슬롯에 중복 선언하면 메모리 낭비입니다. 빈 슬롯 __slots__ = ()도 유효하며, 새 속성 없이 슬롯 방식을 유지합니다. 다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 문제가 됩니다."
+  - type: "list"
+    items:
+    - "자식 슬롯 = 부모 슬롯 + 자신 슬롯"
+    - "자식에서 __slots__ 미정의 시 __dict__ 생성"
+    - "중복 슬롯 선언 피하기"
+    - "__slots__ = () 로 빈 슬롯 유지"
+  - type: "code"
+    language: "python"
+    title: "슬롯 상속"
+    description: "부모와 자식의 슬롯이 합쳐집니다."
+    content: |-
+      class Parent:
+          __slots__ = ('a', 'b')
+          def __init__(self, a, b):
+              self.a = a
+              self.b = b
+
+      class Child(Parent):
+          __slots__ = ('c',)
+          def __init__(self, a, b, c):
+              super().__init__(a, b)
+              self.c = c
+
+      child = Child(1, 2, 3)
+      child.a, child.b, child.c
+  - type: "code"
+    language: "python"
+    title: "빈 슬롯 유지"
+    description: "새 속성 없이 슬롯 방식을 유지합니다."
+    content: |-
+      class Base:
+          __slots__ = ('x', 'y')
+
+      class Extended(Base):
+          __slots__ = ()
+          def area(self):
+              return self.x * self.y
+
+      ext = Extended()
+      ext.x = 3
+      ext.y = 4
+      ext.area()
+  - type: "code"
+    language: "python"
+    title: "슬롯 미정의 시"
+    description: "__slots__ 없으면 __dict__가 생성됩니다."
+    content: |-
+      class SlottedParent:
+          __slots__ = ('x',)
+
+      class NormalChild(SlottedParent):
+          pass
+
+      nc = NormalChild()
+      nc.x = 1
+      nc.extra = "dynamic"
+      hasattr(nc, '__dict__'), nc.extra
+  - type: "tip"
+    content: "다중 상속에서 여러 부모가 비어 있지 않은 __slots__를 가지면 TypeError가 발생합니다."
+
+- id: "slots_limitations"
+  title: "제한사항"
+  subtitle: "트레이드오프"
+  blocks:
+  - type: "text"
+    content: "__slots__에는 여러 제한사항이 있습니다. 동적으로 속성을 추가할 수 없어 유연성이 줄어듭니다. __dict__가 없으므로 vars(), __dict__.update() 등을 사용할 수 없습니다. 기본값을 클래스 수준에서 정의할 수 없고, __init__에서 설정해야 합니다. 다중 상속에서 여러 부모가 비어 있지 않은 슬롯을 가지면 충돌합니다. weakref가 필요하면 '__weakref__'를 슬롯에 추가해야 합니다."
+  - type: "list"
+    items:
+    - "동적 속성 추가 불가"
+    - "vars(obj) 사용 불가"
+    - "클래스 수준 기본값 불가"
+    - "다중 상속 시 슬롯 충돌 주의"
+  - type: "code"
+    language: "python"
+    title: "동적 속성 제한"
+    description: "선언되지 않은 속성은 추가할 수 없습니다."
+    content: |-
+      class Strict:
+          __slots__ = ('x', 'y')
+
+      strict = Strict()
+      strict.x = 1
+      strict.y = 2
+      strict.x, strict.y
+  - type: "code"
+    language: "python"
+    title: "vars() 대안"
+    description: "슬롯의 값을 가져오는 방법입니다."
+    content: |-
+      class Slotted:
+          __slots__ = ('a', 'b', 'c')
+          def __init__(self, a, b, c):
+              self.a = a
+              self.b = b
+              self.c = c
+
+          def asDict(self):
+              return {slot: getattr(self, slot) for slot in self.__slots__}
+
+      Slotted(1, 2, 3).asDict()
+  - type: "code"
+    language: "python"
+    title: "다중 상속 충돌"
+    description: "비어 있지 않은 슬롯 간 다중 상속은 불가합니다."
+    content: |-
+      class A:
+          __slots__ = ('x',)
+
+      class B:
+          __slots__ = ()
+
+      class C(A, B):
+          __slots__ = ('y',)
+
+      cObj = C()
+      cObj.x = 1
+      cObj.y = 2
+      cObj.x, cObj.y
+  - type: "tip"
+    content: "pickle로 슬롯 객체를 직렬화하려면 __getstate__와 __setstate__를 구현해야 합니다."
+
+- id: "weakref_support"
+  title: "weakref 지원"
+  subtitle: "__weakref__ 슬롯"
+  blocks:
+  - type: "text"
+    content: "weakref는 객체에 대한 약한 참조를 생성합니다. 약한 참조는 참조 카운트를 증가시키지 않아 가비지 컬렉션을 방해하지 않습니다. 일반 클래스는 자동으로 weakref를 지원하지만, __slots__ 클래스는 '__weakref__'를 슬롯에 명시해야 합니다. 캐시, 옵저버 패턴 등에서 메모리 누수 방지에 유용합니다. __weakref__ 없이 weakref.ref()를 호출하면 TypeError가 발생합니다."
+  - type: "list"
+    items:
+    - "weakref: 약한 참조 (참조 카운트 X)"
+    - "일반 클래스: 자동 지원"
+    - "__slots__ 클래스: '__weakref__' 필요"
+    - "캐시, 옵저버에서 메모리 누수 방지"
+  - type: "code"
+    language: "python"
+    title: "weakref 기본"
+    description: "일반 클래스의 약한 참조입니다."
+    content: |-
+      import weakref
+
+      class Normal:
+          pass
+
+      obj = Normal()
+      ref = weakref.ref(obj)
+      ref() is obj
+  - type: "code"
+    language: "python"
+    title: "__slots__와 weakref"
+    description: "__weakref__를 슬롯에 추가합니다."
+    content: |-
+      import weakref
+
+      class WeakSlotted:
+          __slots__ = ('value', '__weakref__')
+          def __init__(self, value):
+              self.value = value
+
+      obj = WeakSlotted(42)
+      ref = weakref.ref(obj)
+      ref().value
+  - type: "code"
+    language: "python"
+    title: "WeakValueDictionary"
+    description: "약한 참조를 값으로 가지는 딕셔너리입니다."
+    content: |-
+      import weakref
+
+      class Item:
+          __slots__ = ('name', '__weakref__')
+          def __init__(self, name):
+              self.name = name
+
+      cache = weakref.WeakValueDictionary()
+      item = Item("test")
+      cache["key"] = item
+
+      "key" in cache, cache["key"].name
+  - type: "tip"
+    content: "WeakSet, WeakKeyDictionary, WeakValueDictionary로 자동 정리되는 컬렉션을 만들 수 있습니다."
+
+- id: "performance"
+  title: "성능 비교"
+  subtitle: "속성 접근 속도"
+  blocks:
+  - type: "text"
+    content: "__slots__는 메모리 절약 외에도 속성 접근 속도가 약간 빨라집니다. __dict__ 검색 대신 고정된 오프셋으로 직접 접근하기 때문입니다. 그러나 속도 향상은 미미하며, 주요 이점은 메모리 절약입니다. 성능이 중요한 경우 실제 환경에서 벤치마크하세요. __slots__ 결정은 메모리와 유연성 사이의 트레이드오프입니다. 대량의 단순 데이터 객체에 적합하고, 동적 속성이 필요한 경우에는 부적합합니다."
+  - type: "list"
+    items:
+    - "속성 접근 약간 빠름"
+    - "고정 오프셋 vs 해시 테이블 검색"
+    - "주요 이점은 메모리 절약"
+    - "대량 단순 객체에 적합"
+  - type: "code"
+    language: "python"
+    title: "접근 속도 비교"
+    description: "간단한 접근 성능을 비교합니다."
+    content: |-
+      class Normal:
+          def __init__(self, x):
+              self.x = x
+
+      class Slotted:
+          __slots__ = ('x',)
+          def __init__(self, x):
+              self.x = x
+
+      norm = Normal(1)
+      slot = Slotted(1)
+
+      def accessTest(obj, count):
+          for _ in range(count):
+              _ = obj.x
+          return "done"
+
+      accessTest(norm, 10000), accessTest(slot, 10000)
+  - type: "code"
+    language: "python"
+    title: "사용 시나리오"
+    description: "__slots__ 사용이 적합한 경우입니다."
+    content: |-
+      """
+      __slots__ 적합:
+      - 수만~수백만 개의 작은 객체
+      - 속성이 고정된 데이터 클래스
+      - 메모리가 제한된 환경
+      - 속성 추가가 필요 없는 경우
+
+      __slots__ 부적합:
+      - 동적 속성 추가 필요
+      - 다중 상속이 복잡한 경우
+      - 적은 수의 객체
+      - 유연한 API 필요
+      """
+      "guidelines"
+  - type: "code"
+    language: "python"
+    title: "dataclass와 slots"
+    description: "Python 3.10+ dataclass의 slots 옵션입니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass(slots=True)
+      class Coordinate:
+          x: float
+          y: float
+          z: float
+
+      coord = Coordinate(1.0, 2.0, 3.0)
+      coord.x, coord.y, coord.z, hasattr(coord, '__dict__')
+  - type: "tip"
+    content: "Python 3.10+에서는 @dataclass(slots=True)로 간단하게 슬롯 데이터클래스를 만들 수 있습니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "__slots__와 메모리 최적화 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 10에서 배운 __slots__와 메모리 최적화를 난이도별로 복습합니다. __slots__는 인스턴스 속성을 고정하여 __dict__ 생성을 막고 메모리를 절약하는 기법입니다. 수만~수백만 개의 객체를 생성할 때 효과적이며, 속성 접근 속도도 약간 빨라집니다. 🟢 기본 문제로 __slots__ 정의와 메모리 비교를 익히고, 🟡 응용 문제로 상속, weakref 지원 패턴을 연습하세요. 🔴 심화 문제에서는 pickle 직렬화, 동적 슬롯 클래스, dataclass(slots=True) 등 고급 기법을 다룹니다. __slots__는 메모리와 유연성 사이의 트레이드오프이므로 대량 데이터 객체에 선택적으로 적용하세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 기본 __slots__"
+    code: |-
+      class Point:
+          __slots__ = ('x', 'y')
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+      pt = Point(3, 4)
+      pt.x, pt.y
+
+  - type: "expansion"
+    title: "🟢 기본2: __dict__ 확인"
+    code: |-
+      class Normal:
+          def __init__(self, v):
+              self.v = v
+
+      class Slotted:
+          __slots__ = ('v',)
+          def __init__(self, v):
+              self.v = v
+
+      hasattr(Normal(1), '__dict__'), hasattr(Slotted(1), '__dict__')
+
+  - type: "expansion"
+    title: "🟢 기본3: 메모리 크기"
+    code: |-
+      import sys
+
+      class A:
+          def __init__(self):
+              self.x = 1
+
+      class B:
+          __slots__ = ('x',)
+          def __init__(self):
+              self.x = 1
+
+      a = A()
+      b = B()
+      sys.getsizeof(a), sys.getsizeof(b)
+
+  - type: "expansion"
+    title: "🟢 기본4: 슬롯 상속"
+    code: |-
+      class Parent:
+          __slots__ = ('a',)
+
+      class Child(Parent):
+          __slots__ = ('b',)
+          def __init__(self, a, b):
+              self.a = a
+              self.b = b
+
+      ch = Child(1, 2)
+      ch.a, ch.b
+
+  - type: "expansion"
+    title: "🟢 기본5: 빈 슬롯"
+    code: |-
+      class Base:
+          __slots__ = ('x', 'y')
+
+      class Extended(Base):
+          __slots__ = ()
+          def sum(self):
+              return self.x + self.y
+
+      extended = Extended()
+      extended.x, extended.y = 3, 4
+      extended.sum()
+
+  - type: "expansion"
+    title: "🟡 응용1: asDict 메서드"
+    code: |-
+      class Record:
+          __slots__ = ('id', 'name', 'value')
+
+          def __init__(self, id, name, value):
+              self.id = id
+              self.name = name
+              self.value = value
+
+          def asDict(self):
+              return {s: getattr(self, s) for s in self.__slots__}
+
+      Record(1, "test", 100).asDict()
+
+  - type: "expansion"
+    title: "🟡 응용2: __repr__ 구현"
+    code: |-
+      class Entity:
+          __slots__ = ('a', 'b', 'c')
+
+          def __init__(self, a, b, c):
+              self.a = a
+              self.b = b
+              self.c = c
+
+          def __repr__(self):
+              attrs = ", ".join(f"{s}={getattr(self, s)!r}" for s in self.__slots__)
+              return f"{self.__class__.__name__}({attrs})"
+
+      Entity(1, "hello", [1, 2, 3])
+
+  - type: "expansion"
+    title: "🟡 응용3: weakref 지원"
+    code: |-
+      import weakref
+
+      class Trackable:
+          __slots__ = ('data', '__weakref__')
+
+          def __init__(self, data):
+              self.data = data
+
+      obj = Trackable("important")
+      ref = weakref.ref(obj)
+      ref().data
+
+  - type: "expansion"
+    title: "🟡 응용4: 기본값 처리"
+    code: |-
+      class Config:
+          __slots__ = ('host', 'port', 'debug')
+
+          def __init__(self, host="localhost", port=8080, debug=False):
+              self.host = host
+              self.port = port
+              self.debug = debug
+
+      cfg1 = Config()
+      cfg2 = Config(host="0.0.0.0", port=3000)
+      (cfg1.host, cfg1.port), (cfg2.host, cfg2.port)
+
+  - type: "expansion"
+    title: "🟡 응용5: 복사 지원"
+    code: |-
+      class Copyable:
+          __slots__ = ('x', 'y')
+
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def copy(self):
+              new = self.__class__.__new__(self.__class__)
+              for slot in self.__slots__:
+                  setattr(new, slot, getattr(self, slot))
+              return new
+
+      original = Copyable(1, 2)
+      copied = original.copy()
+      original is copied, (copied.x, copied.y)
+
+  - type: "expansion"
+    title: "🔴 심화1: 메모리 대량 비교"
+    code: |-
+      import sys
+
+      class Normal:
+          def __init__(self, x, y, z):
+              self.x = x
+              self.y = y
+              self.z = z
+
+      class Slotted:
+          __slots__ = ('x', 'y', 'z')
+          def __init__(self, x, y, z):
+              self.x = x
+              self.y = y
+              self.z = z
+
+      count = 1000
+      normalList = [Normal(i, i, i) for i in range(count)]
+      slottedList = [Slotted(i, i, i) for i in range(count)]
+
+      normalMem = sum(sys.getsizeof(o) for o in normalList)
+      slottedMem = sum(sys.getsizeof(o) for o in slottedList)
+      f"Normal: {normalMem}, Slotted: {slottedMem}, Ratio: {normalMem/slottedMem:.2f}x"
+
+  - type: "expansion"
+    title: "🔴 심화2: 다중 상속 해결"
+    code: |-
+      class A:
+          __slots__ = ()
+          def methodA(self):
+              return "A"
+
+      class B:
+          __slots__ = ()
+          def methodB(self):
+              return "B"
+
+      class C(A, B):
+          __slots__ = ('x', 'y')
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+      cInst = C(1, 2)
+      cInst.methodA(), cInst.methodB(), cInst.x, cInst.y
+
+  - type: "expansion"
+    title: "🔴 심화3: pickle 지원"
+    code: |-
+      import pickle
+
+      class Serializable:
+          __slots__ = ('a', 'b')
+
+          def __init__(self, a, b):
+              self.a = a
+              self.b = b
+
+          def __getstate__(self):
+              return {slot: getattr(self, slot) for slot in self.__slots__}
+
+          def __setstate__(self, state):
+              for slot, value in state.items():
+                  setattr(self, slot, value)
+
+      obj = Serializable(1, 2)
+      data = pickle.dumps(obj)
+      restored = pickle.loads(data)
+      restored.a, restored.b
+
+  - type: "expansion"
+    title: "🔴 심화4: 동적 슬롯 클래스"
+    code: |-
+      def createSlottedClass(name, slots):
+          def initMethod(self, **kwargs):
+              for slot in slots:
+                  setattr(self, slot, kwargs.get(slot))
+          return type(name, (), {
+              '__slots__': tuple(slots),
+              '__init__': initMethod
+          })
+
+      Person = createSlottedClass("Person", ["name", "age", "email"])
+      person = Person(name="Alice", age=30, email="alice@example.com")
+      person.name, person.age
+
+  - type: "expansion"
+    title: "🔴 심화5: 불변 슬롯"
+    code: |-
+      class Immutable:
+          __slots__ = ('_x', '_y')
+
+          def __init__(self, x, y):
+              object.__setattr__(self, '_x', x)
+              object.__setattr__(self, '_y', y)
+
+          @property
+          def x(self):
+              return self._x
+
+          @property
+          def y(self):
+              return self._y
+
+          def __setattr__(self, name, value):
+              raise AttributeError("Immutable object")
+
+      im = Immutable(3, 4)
+      im.x, im.y
+
+  - type: "expansion"
+    title: "🔴 심화6: WeakSet 활용"
+    code: |-
+      import weakref
+
+      class Tracked:
+          __slots__ = ('id', '__weakref__')
+          instances = weakref.WeakSet()
+
+          def __init__(self, id):
+              self.id = id
+              Tracked.instances.add(self)
+
+      t1 = Tracked(1)
+      t2 = Tracked(2)
+      t3 = Tracked(3)
+
+      len(Tracked.instances)
+
+  - type: "expansion"
+    title: "🔴 심화7: 상속 체인"
+    code: |-
+      class L1:
+          __slots__ = ('a',)
+
+      class L2(L1):
+          __slots__ = ('b',)
+
+      class L3(L2):
+          __slots__ = ('c',)
+
+      class L4(L3):
+          __slots__ = ('d',)
+
+      obj = L4()
+      obj.a, obj.b, obj.c, obj.d = 1, 2, 3, 4
+      (obj.a, obj.b, obj.c, obj.d)
+
+  - type: "expansion"
+    title: "🔴 심화8: 프로퍼티와 슬롯"
+    code: |-
+      class Validated:
+          __slots__ = ('_value',)
+
+          def __init__(self, value):
+              self.value = value
+
+          @property
+          def value(self):
+              return self._value
+
+          @value.setter
+          def value(self, v):
+              if v < 0:
+                  raise ValueError("Must be non-negative")
+              self._value = v
+
+      validated = Validated(10)
+      validated.value = 20
+      validated.value
+
+  - type: "expansion"
+    title: "🔴 심화9: 메타클래스와 슬롯"
+    code: |-
+      class SlotMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              if 'FIELDS' in namespace:
+                  namespace['__slots__'] = tuple(namespace['FIELDS'])
+              return super().__new__(mcs, name, bases, namespace)
+
+      class Model(metaclass=SlotMeta):
+          FIELDS = ['id', 'name', 'active']
+
+          def __init__(self, id, name, active=True):
+              self.id = id
+              self.name = name
+              self.active = active
+
+      model = Model(1, "test")
+      model.id, model.name, model.active, hasattr(model, '__dict__')
+
+  - type: "expansion"
+    title: "🔴 심화10: dataclass slots"
+    code: |-
+      from dataclasses import dataclass, field
+
+      @dataclass(slots=True)
+      class Product:
+          id: int
+          name: str
+          price: float = 0.0
+          tags: list = field(default_factory=list)
+
+      prod = Product(1, "Widget", 9.99, ["new"])
+      prod.id, prod.name, prod.price, prod.tags, hasattr(prod, '__dict__')

@@ -1,0 +1,789 @@
+meta:
+  id: "17"
+  title: "정렬 알고리즘"
+  day: 17
+  category: "advancedPython"
+  tags: ["sorting", "bubble sort", "merge sort", "quick sort", "timsort"]
+  seo:
+    title: "파이썬 정렬 알고리즘 - 버블, 선택, 삽입, 병합, 퀵 정렬"
+    description: "정렬 알고리즘을 직접 구현하고 이해합니다. O(n²) 기본 정렬부터 O(n log n) 고급 정렬까지."
+    keywords: ["정렬", "bubble sort", "merge sort", "quick sort", "timsort"]
+
+intro:
+  emoji: "📊"
+  points:
+  - "O(n²) 기본 정렬: 버블, 선택, 삽입"
+  - "O(n log n) 고급 정렬: 병합, 퀵"
+  - "파이썬 내장 정렬 Timsort"
+  - "key 함수로 커스텀 정렬"
+
+sections:
+- id: "bubble_sort"
+  title: "버블 정렬"
+  subtitle: "인접 요소 교환"
+  blocks:
+  - type: "text"
+    content: "버블 정렬은 인접한 두 요소를 비교하여 교환하는 가장 단순한 정렬입니다. 가장 큰 값이 거품처럼 맨 뒤로 떠오릅니다. 시간 복잡도는 최악/평균 O(n²), 최선 O(n)입니다. 공간 복잡도는 O(1)로 제자리(in-place) 정렬입니다. 안정(stable) 정렬로 같은 값의 순서가 유지됩니다. 교육용으로는 좋지만 실무에서는 거의 사용하지 않습니다."
+  - type: "list"
+    items:
+    - "인접한 두 요소 비교/교환"
+    - "시간: O(n²) 최악/평균"
+    - "공간: O(1) 제자리 정렬"
+    - "안정 정렬"
+  - type: "code"
+    language: "python"
+    title: "버블 정렬"
+    description: "기본 버블 정렬을 구현합니다."
+    content: |-
+      def bubbleSort(arr):
+          n = len(arr)
+          for i in range(n):
+              for j in range(n - 1 - i):
+                  if arr[j] > arr[j + 1]:
+                      arr[j], arr[j + 1] = arr[j + 1], arr[j]
+          return arr
+
+      bubbleSort([64, 34, 25, 12, 22, 11, 90])
+  - type: "code"
+    language: "python"
+    title: "최적화 버블 정렬"
+    description: "교환이 없으면 조기 종료합니다."
+    content: |-
+      def bubbleSortOptimized(arr):
+          n = len(arr)
+          for i in range(n):
+              swapped = False
+              for j in range(n - 1 - i):
+                  if arr[j] > arr[j + 1]:
+                      arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                      swapped = True
+              if not swapped:
+                  break
+          return arr
+
+      bubbleSortOptimized([1, 2, 3, 4, 5])
+  - type: "code"
+    language: "python"
+    title: "비교 횟수"
+    description: "비교 횟수를 세어봅니다."
+    content: |-
+      def bubbleCount(arr):
+          n = len(arr)
+          count = 0
+          for i in range(n):
+              for j in range(n - 1 - i):
+                  count += 1
+                  if arr[j] > arr[j + 1]:
+                      arr[j], arr[j + 1] = arr[j + 1], arr[j]
+          return count
+
+      bubbleCount([5, 4, 3, 2, 1])
+  - type: "tip"
+    content: "n개 요소의 버블 정렬은 최대 n(n-1)/2번 비교합니다."
+
+- id: "selection_sort"
+  title: "선택 정렬"
+  subtitle: "최솟값 선택"
+  blocks:
+  - type: "text"
+    content: "선택 정렬은 남은 요소 중 최솟값을 찾아 현재 위치에 놓습니다. 각 패스에서 정확히 하나의 요소가 정렬됩니다. 시간 복잡도는 항상 O(n²)입니다. 공간 복잡도는 O(1)입니다. 교환 횟수가 적어 쓰기 비용이 높을 때 유리합니다. 불안정(unstable) 정렬로 같은 값의 순서가 바뀔 수 있습니다."
+  - type: "list"
+    items:
+    - "최솟값을 찾아 맨 앞에 배치"
+    - "시간: O(n²) 항상"
+    - "공간: O(1)"
+    - "불안정 정렬"
+  - type: "code"
+    language: "python"
+    title: "선택 정렬"
+    description: "선택 정렬을 구현합니다."
+    content: |-
+      def selectionSort(arr):
+          n = len(arr)
+          for i in range(n):
+              minIdx = i
+              for j in range(i + 1, n):
+                  if arr[j] < arr[minIdx]:
+                      minIdx = j
+              arr[i], arr[minIdx] = arr[minIdx], arr[i]
+          return arr
+
+      selectionSort([64, 25, 12, 22, 11])
+  - type: "code"
+    language: "python"
+    title: "교환 횟수"
+    description: "교환 횟수를 세어봅니다."
+    content: |-
+      def selectionCount(arr):
+          n = len(arr)
+          swaps = 0
+          for i in range(n):
+              minIdx = i
+              for j in range(i + 1, n):
+                  if arr[j] < arr[minIdx]:
+                      minIdx = j
+              if minIdx != i:
+                  arr[i], arr[minIdx] = arr[minIdx], arr[i]
+                  swaps += 1
+          return swaps
+
+      selectionCount([5, 4, 3, 2, 1])
+  - type: "code"
+    language: "python"
+    title: "최대값 선택"
+    description: "최대값을 뒤로 보내는 변형입니다."
+    content: |-
+      def selectionSortDesc(arr):
+          n = len(arr)
+          for i in range(n - 1, 0, -1):
+              maxIdx = 0
+              for j in range(1, i + 1):
+                  if arr[j] > arr[maxIdx]:
+                      maxIdx = j
+              arr[i], arr[maxIdx] = arr[maxIdx], arr[i]
+          return arr
+
+      selectionSortDesc([3, 1, 4, 1, 5])
+  - type: "tip"
+    content: "선택 정렬은 교환이 O(n)으로 버블 정렬보다 적습니다."
+
+- id: "insertion_sort"
+  title: "삽입 정렬"
+  subtitle: "정렬된 부분에 삽입"
+  blocks:
+  - type: "text"
+    content: "삽입 정렬은 각 요소를 이미 정렬된 부분의 올바른 위치에 삽입합니다. 카드 게임에서 손에 든 카드를 정렬하는 방식과 같습니다. 시간 복잡도는 최악 O(n²), 최선 O(n)입니다. 거의 정렬된 데이터에서 매우 효율적입니다. 안정 정렬이며 작은 데이터셋에 적합합니다. Timsort의 구성 요소로 사용됩니다."
+  - type: "list"
+    items:
+    - "정렬된 부분에 올바른 위치 삽입"
+    - "시간: O(n²) 최악, O(n) 최선"
+    - "거의 정렬된 데이터에 효율적"
+    - "안정 정렬"
+  - type: "code"
+    language: "python"
+    title: "삽입 정렬"
+    description: "삽입 정렬을 구현합니다."
+    content: |-
+      def insertionSort(arr):
+          for i in range(1, len(arr)):
+              key = arr[i]
+              j = i - 1
+              while j >= 0 and arr[j] > key:
+                  arr[j + 1] = arr[j]
+                  j -= 1
+              arr[j + 1] = key
+          return arr
+
+      insertionSort([12, 11, 13, 5, 6])
+  - type: "code"
+    language: "python"
+    title: "이진 삽입 정렬"
+    description: "이진 탐색으로 삽입 위치를 찾습니다."
+    content: |-
+      import bisect
+
+      def binaryInsertionSort(arr):
+          for i in range(1, len(arr)):
+              key = arr[i]
+              pos = bisect.bisect_left(arr, key, 0, i)
+              arr[pos+1:i+1] = arr[pos:i]
+              arr[pos] = key
+          return arr
+
+      binaryInsertionSort([5, 2, 4, 6, 1, 3])
+  - type: "code"
+    language: "python"
+    title: "정렬 상태 확인"
+    description: "거의 정렬된 데이터의 효율성을 확인합니다."
+    content: |-
+      def insertionCount(arr):
+          shifts = 0
+          for i in range(1, len(arr)):
+              key = arr[i]
+              j = i - 1
+              while j >= 0 and arr[j] > key:
+                  arr[j + 1] = arr[j]
+                  j -= 1
+                  shifts += 1
+              arr[j + 1] = key
+          return shifts
+
+      insertionCount([1, 2, 3, 5, 4]), insertionCount([5, 4, 3, 2, 1])
+  - type: "tip"
+    content: "삽입 정렬은 온라인 알고리즘으로 스트리밍 데이터에도 사용할 수 있습니다."
+
+- id: "merge_sort"
+  title: "병합 정렬"
+  subtitle: "분할정복 O(n log n)"
+  blocks:
+  - type: "text"
+    content: "병합 정렬은 분할정복 방식의 효율적인 정렬입니다. 배열을 반으로 나누고, 각각 정렬한 후, 병합합니다. 시간 복잡도는 항상 O(n log n)입니다. 공간 복잡도는 O(n)으로 추가 메모리가 필요합니다. 안정 정렬이며 연결 리스트에 적합합니다. 대용량 데이터의 외부 정렬에도 사용됩니다."
+  - type: "list"
+    items:
+    - "분할 → 정렬 → 병합"
+    - "시간: O(n log n) 항상"
+    - "공간: O(n) 추가 필요"
+    - "안정 정렬"
+  - type: "code"
+    language: "python"
+    title: "병합 정렬"
+    description: "병합 정렬을 구현합니다."
+    content: |-
+      def mergeSort(arr):
+          if len(arr) <= 1:
+              return arr
+          mid = len(arr) // 2
+          left = mergeSort(arr[:mid])
+          right = mergeSort(arr[mid:])
+          return merge(left, right)
+
+      def merge(left, right):
+          result = []
+          i = j = 0
+          while i < len(left) and j < len(right):
+              if left[i] <= right[j]:
+                  result.append(left[i])
+                  i += 1
+              else:
+                  result.append(right[j])
+                  j += 1
+          result.extend(left[i:])
+          result.extend(right[j:])
+          return result
+
+      mergeSort([38, 27, 43, 3, 9, 82, 10])
+  - type: "code"
+    language: "python"
+    title: "제자리 병합 정렬"
+    description: "인덱스를 사용한 제자리 버전입니다."
+    content: |-
+      def mergeSortInPlace(arr, left=0, right=None):
+          if right is None:
+              right = len(arr) - 1
+          if left < right:
+              mid = (left + right) // 2
+              mergeSortInPlace(arr, left, mid)
+              mergeSortInPlace(arr, mid + 1, right)
+              mergeInPlace(arr, left, mid, right)
+          return arr
+
+      def mergeInPlace(arr, left, mid, right):
+          leftArr = arr[left:mid+1]
+          rightArr = arr[mid+1:right+1]
+          i = j = 0
+          k = left
+          while i < len(leftArr) and j < len(rightArr):
+              if leftArr[i] <= rightArr[j]:
+                  arr[k] = leftArr[i]
+                  i += 1
+              else:
+                  arr[k] = rightArr[j]
+                  j += 1
+              k += 1
+          while i < len(leftArr):
+              arr[k] = leftArr[i]
+              i += 1
+              k += 1
+          while j < len(rightArr):
+              arr[k] = rightArr[j]
+              j += 1
+              k += 1
+
+      mergeSortInPlace([5, 2, 4, 6, 1, 3])
+  - type: "code"
+    language: "python"
+    title: "역순 쌍 개수"
+    description: "병합 정렬로 역순 쌍을 센다."
+    content: |-
+      def countInversions(arr):
+          if len(arr) <= 1:
+              return arr, 0
+          mid = len(arr) // 2
+          left, leftInv = countInversions(arr[:mid])
+          right, rightInv = countInversions(arr[mid:])
+          merged, splitInv = mergeCount(left, right)
+          return merged, leftInv + rightInv + splitInv
+
+      def mergeCount(left, right):
+          result = []
+          inversions = 0
+          i = j = 0
+          while i < len(left) and j < len(right):
+              if left[i] <= right[j]:
+                  result.append(left[i])
+                  i += 1
+              else:
+                  result.append(right[j])
+                  inversions += len(left) - i
+                  j += 1
+          result.extend(left[i:])
+          result.extend(right[j:])
+          return result, inversions
+
+      countInversions([2, 4, 1, 3, 5])[1]
+  - type: "tip"
+    content: "병합 정렬은 예측 가능한 성능이 필요할 때 좋습니다."
+
+- id: "quick_sort"
+  title: "퀵 정렬"
+  subtitle: "피벗 기반 분할"
+  blocks:
+  - type: "text"
+    content: "퀵 정렬은 피벗을 기준으로 작은 값과 큰 값을 분할합니다. 평균 시간 복잡도 O(n log n), 최악 O(n²)입니다. 공간 복잡도는 O(log n) 스택 공간입니다. 제자리 정렬이며 캐시 효율이 좋습니다. 피벗 선택이 성능에 큰 영향을 미칩니다. 불안정 정렬이지만 실무에서 가장 빠른 경우가 많습니다."
+  - type: "list"
+    items:
+    - "피벗 기준 분할"
+    - "시간: O(n log n) 평균, O(n²) 최악"
+    - "공간: O(log n) 스택"
+    - "불안정, 제자리 정렬"
+  - type: "code"
+    language: "python"
+    title: "퀵 정렬 (리스트)"
+    description: "새 리스트를 만드는 간단한 버전입니다."
+    content: |-
+      def quickSort(arr):
+          if len(arr) <= 1:
+              return arr
+          pivot = arr[len(arr) // 2]
+          left = [x for x in arr if x < pivot]
+          middle = [x for x in arr if x == pivot]
+          right = [x for x in arr if x > pivot]
+          return quickSort(left) + middle + quickSort(right)
+
+      quickSort([3, 6, 8, 10, 1, 2, 1])
+  - type: "code"
+    language: "python"
+    title: "퀵 정렬 (제자리)"
+    description: "제자리에서 정렬하는 버전입니다."
+    content: |-
+      def quickSortInPlace(arr, low=0, high=None):
+          if high is None:
+              high = len(arr) - 1
+          if low < high:
+              pi = partition(arr, low, high)
+              quickSortInPlace(arr, low, pi - 1)
+              quickSortInPlace(arr, pi + 1, high)
+          return arr
+
+      def partition(arr, low, high):
+          pivot = arr[high]
+          i = low - 1
+          for j in range(low, high):
+              if arr[j] <= pivot:
+                  i += 1
+                  arr[i], arr[j] = arr[j], arr[i]
+          arr[i + 1], arr[high] = arr[high], arr[i + 1]
+          return i + 1
+
+      quickSortInPlace([10, 7, 8, 9, 1, 5])
+  - type: "code"
+    language: "python"
+    title: "랜덤 피벗"
+    description: "랜덤 피벗으로 최악의 경우를 피합니다."
+    content: |-
+      import random
+
+      def quickSortRandom(arr, low=0, high=None):
+          if high is None:
+              high = len(arr) - 1
+          if low < high:
+              pivotIdx = random.randint(low, high)
+              arr[pivotIdx], arr[high] = arr[high], arr[pivotIdx]
+              pi = partition(arr, low, high)
+              quickSortRandom(arr, low, pi - 1)
+              quickSortRandom(arr, pi + 1, high)
+          return arr
+
+      quickSortRandom([1, 2, 3, 4, 5])
+  - type: "tip"
+    content: "정렬된 배열에서 첫/끝 피벗은 O(n²)가 됩니다. 중간 또는 랜덤 피벗을 사용하세요."
+
+- id: "python_sort"
+  title: "파이썬 정렬"
+  subtitle: "Timsort와 활용"
+  blocks:
+  - type: "text"
+    content: "파이썬의 sort()와 sorted()는 Timsort를 사용합니다. Timsort는 병합 정렬과 삽입 정렬의 하이브리드입니다. 시간 복잡도는 최악 O(n log n), 최선 O(n)입니다. 안정 정렬이며 실세계 데이터에 최적화되어 있습니다. key 함수로 정렬 기준을 지정합니다. reverse=True로 내림차순 정렬합니다."
+  - type: "list"
+    items:
+    - "Timsort: 병합 + 삽입 하이브리드"
+    - "시간: O(n log n) 최악, O(n) 최선"
+    - "안정 정렬"
+    - "key, reverse 파라미터"
+  - type: "code"
+    language: "python"
+    title: "기본 정렬"
+    description: "sorted()와 list.sort()입니다."
+    content: |-
+      numbers = [3, 1, 4, 1, 5, 9, 2, 6]
+      sortedNums = sorted(numbers)
+      numbers.sort(reverse=True)
+      sortedNums, numbers
+  - type: "code"
+    language: "python"
+    title: "key 함수"
+    description: "정렬 기준을 지정합니다."
+    content: |-
+      words = ["banana", "Apple", "cherry", "date"]
+      byLength = sorted(words, key=len)
+      byLower = sorted(words, key=str.lower)
+      byLength, byLower
+  - type: "code"
+    language: "python"
+    title: "복합 정렬"
+    description: "여러 기준으로 정렬합니다."
+    content: |-
+      students = [
+          ("Alice", 85, 22),
+          ("Bob", 90, 20),
+          ("Charlie", 85, 21)
+      ]
+      byScore = sorted(students, key=lambda x: (-x[1], x[2]))
+      byScore
+  - type: "tip"
+    content: "operator.itemgetter, operator.attrgetter로 key 함수를 더 효율적으로 만들 수 있습니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "정렬 알고리즘 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 17에서 배운 정렬 알고리즘을 난이도별로 복습합니다. 정렬은 데이터를 특정 순서로 배열하는 기본적이면서 중요한 알고리즘으로, 시간복잡도와 공간복잡도의 트레이드오프를 이해하는 핵심 주제입니다. O(n²) 알고리즘(버블, 선택, 삽입)과 O(n log n) 알고리즘(병합, 퀵)의 차이를 체감해보세요. 🟢 기본 문제로 버블, 선택, 삽입 정렬을 구현하고, 🟡 응용 문제로 병합 정렬과 퀵 정렬을 연습하세요. 🔴 심화 문제에서는 안정 정렬, 키 함수 정렬, 복합 정렬 조건 등 실무 패턴을 다룹니다. 실무에서는 대부분 내장 sorted()를 사용하지만, 원리를 알면 최적화 판단에 도움이 됩니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 버블 정렬"
+    code: |-
+      def bubble(arr):
+          n = len(arr)
+          for i in range(n):
+              for j in range(n - 1 - i):
+                  if arr[j] > arr[j+1]:
+                      arr[j], arr[j+1] = arr[j+1], arr[j]
+          return arr
+
+      bubble([5, 3, 8, 4, 2])
+
+  - type: "expansion"
+    title: "🟢 기본2: 선택 정렬"
+    code: |-
+      def selection(arr):
+          n = len(arr)
+          for i in range(n):
+              minIdx = i
+              for j in range(i+1, n):
+                  if arr[j] < arr[minIdx]:
+                      minIdx = j
+              arr[i], arr[minIdx] = arr[minIdx], arr[i]
+          return arr
+
+      selection([64, 25, 12, 22, 11])
+
+  - type: "expansion"
+    title: "🟢 기본3: 삽입 정렬"
+    code: |-
+      def insertion(arr):
+          for i in range(1, len(arr)):
+              key = arr[i]
+              j = i - 1
+              while j >= 0 and arr[j] > key:
+                  arr[j+1] = arr[j]
+                  j -= 1
+              arr[j+1] = key
+          return arr
+
+      insertion([12, 11, 13, 5, 6])
+
+  - type: "expansion"
+    title: "🟢 기본4: sorted() 사용"
+    code: |-
+      nums = [3, 1, 4, 1, 5, 9]
+      sorted(nums), sorted(nums, reverse=True)
+
+  - type: "expansion"
+    title: "🟢 기본5: key 함수"
+    code: |-
+      words = ["Python", "java", "C++", "go"]
+      sorted(words, key=len), sorted(words, key=str.lower)
+
+  - type: "expansion"
+    title: "🟡 응용1: 병합 정렬"
+    code: |-
+      def mergeSort(arr):
+          if len(arr) <= 1:
+              return arr
+          mid = len(arr) // 2
+          left = mergeSort(arr[:mid])
+          right = mergeSort(arr[mid:])
+          return merge(left, right)
+
+      def merge(l, r):
+          result = []
+          i = j = 0
+          while i < len(l) and j < len(r):
+              if l[i] <= r[j]:
+                  result.append(l[i])
+                  i += 1
+              else:
+                  result.append(r[j])
+                  j += 1
+          return result + l[i:] + r[j:]
+
+      mergeSort([38, 27, 43, 3, 9])
+
+  - type: "expansion"
+    title: "🟡 응용2: 퀵 정렬"
+    code: |-
+      def quickSort(arr):
+          if len(arr) <= 1:
+              return arr
+          pivot = arr[len(arr)//2]
+          left = [x for x in arr if x < pivot]
+          mid = [x for x in arr if x == pivot]
+          right = [x for x in arr if x > pivot]
+          return quickSort(left) + mid + quickSort(right)
+
+      quickSort([3, 6, 8, 10, 1, 2, 1])
+
+  - type: "expansion"
+    title: "🟡 응용3: 안정 정렬 확인"
+    code: |-
+      items = [('a', 2), ('b', 1), ('c', 2), ('d', 1)]
+      sorted(items, key=lambda x: x[1])
+
+  - type: "expansion"
+    title: "🟡 응용4: 복합 키"
+    code: |-
+      from operator import itemgetter
+
+      data = [
+          {"name": "Alice", "age": 30, "score": 85},
+          {"name": "Bob", "age": 25, "score": 90},
+          {"name": "Charlie", "age": 30, "score": 88}
+      ]
+      sorted(data, key=lambda x: (-x["age"], x["score"]))
+
+  - type: "expansion"
+    title: "🟡 응용5: 부분 정렬"
+    code: |-
+      import heapq
+
+      def partialSort(arr, k):
+          return heapq.nsmallest(k, arr)
+
+      partialSort([3, 1, 4, 1, 5, 9, 2, 6], 3)
+
+  - type: "expansion"
+    title: "🔴 심화1: 카운팅 정렬"
+    code: |-
+      def countingSort(arr):
+          if not arr:
+              return arr
+          minVal, maxVal = min(arr), max(arr)
+          count = [0] * (maxVal - minVal + 1)
+          for x in arr:
+              count[x - minVal] += 1
+          result = []
+          for i, c in enumerate(count):
+              result.extend([i + minVal] * c)
+          return result
+
+      countingSort([4, 2, 2, 8, 3, 3, 1])
+
+  - type: "expansion"
+    title: "🔴 심화2: 기수 정렬"
+    code: |-
+      def radixSort(arr):
+          if not arr:
+              return arr
+          maxVal = max(arr)
+          exp = 1
+          while maxVal // exp > 0:
+              arr = countingSortByDigit(arr, exp)
+              exp *= 10
+          return arr
+
+      def countingSortByDigit(arr, exp):
+          n = len(arr)
+          output = [0] * n
+          count = [0] * 10
+          for x in arr:
+              idx = (x // exp) % 10
+              count[idx] += 1
+          for i in range(1, 10):
+              count[i] += count[i-1]
+          for i in range(n-1, -1, -1):
+              idx = (arr[i] // exp) % 10
+              output[count[idx]-1] = arr[i]
+              count[idx] -= 1
+          return output
+
+      radixSort([170, 45, 75, 90, 802, 24, 2, 66])
+
+  - type: "expansion"
+    title: "🔴 심화3: 3-way 퀵정렬"
+    code: |-
+      def quickSort3Way(arr, lo=0, hi=None):
+          if hi is None:
+              hi = len(arr) - 1
+          if lo >= hi:
+              return arr
+          lt, gt = lo, hi
+          pivot = arr[lo]
+          i = lo + 1
+          while i <= gt:
+              if arr[i] < pivot:
+                  arr[lt], arr[i] = arr[i], arr[lt]
+                  lt += 1
+                  i += 1
+              elif arr[i] > pivot:
+                  arr[gt], arr[i] = arr[i], arr[gt]
+                  gt -= 1
+              else:
+                  i += 1
+          quickSort3Way(arr, lo, lt - 1)
+          quickSort3Way(arr, gt + 1, hi)
+          return arr
+
+      quickSort3Way([3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5])
+
+  - type: "expansion"
+    title: "🔴 심화4: K번째 요소"
+    code: |-
+      def quickSelect(arr, k):
+          if len(arr) == 1:
+              return arr[0]
+          pivot = arr[len(arr)//2]
+          left = [x for x in arr if x < pivot]
+          mid = [x for x in arr if x == pivot]
+          right = [x for x in arr if x > pivot]
+          if k <= len(left):
+              return quickSelect(left, k)
+          elif k <= len(left) + len(mid):
+              return pivot
+          else:
+              return quickSelect(right, k - len(left) - len(mid))
+
+      arr = [3, 1, 4, 1, 5, 9, 2, 6]
+      quickSelect(arr, 3)
+
+  - type: "expansion"
+    title: "🔴 심화5: 사용자 정의 비교"
+    code: |-
+      from functools import cmp_to_key
+
+      def compare(a, b):
+          ab = str(a) + str(b)
+          ba = str(b) + str(a)
+          if ab > ba:
+              return -1
+          elif ab < ba:
+              return 1
+          return 0
+
+      nums = [3, 30, 34, 5, 9]
+      sorted(nums, key=cmp_to_key(compare))
+
+  - type: "expansion"
+    title: "🔴 심화6: 힙 정렬"
+    code: |-
+      def heapSort(arr):
+          n = len(arr)
+          for i in range(n // 2 - 1, -1, -1):
+              heapify(arr, n, i)
+          for i in range(n - 1, 0, -1):
+              arr[0], arr[i] = arr[i], arr[0]
+              heapify(arr, i, 0)
+          return arr
+
+      def heapify(arr, n, i):
+          largest = i
+          left = 2 * i + 1
+          right = 2 * i + 2
+          if left < n and arr[left] > arr[largest]:
+              largest = left
+          if right < n and arr[right] > arr[largest]:
+              largest = right
+          if largest != i:
+              arr[i], arr[largest] = arr[largest], arr[i]
+              heapify(arr, n, largest)
+
+      heapSort([12, 11, 13, 5, 6, 7])
+
+  - type: "expansion"
+    title: "🔴 심화7: 위상 정렬"
+    code: |-
+      from collections import deque, defaultdict
+
+      def topologicalSort(n, edges):
+          graph = defaultdict(list)
+          indegree = [0] * n
+          for u, v in edges:
+              graph[u].append(v)
+              indegree[v] += 1
+          queue = deque([i for i in range(n) if indegree[i] == 0])
+          result = []
+          while queue:
+              node = queue.popleft()
+              result.append(node)
+              for neighbor in graph[node]:
+                  indegree[neighbor] -= 1
+                  if indegree[neighbor] == 0:
+                      queue.append(neighbor)
+          return result if len(result) == n else []
+
+      topologicalSort(6, [(5,2),(5,0),(4,0),(4,1),(2,3),(3,1)])
+
+  - type: "expansion"
+    title: "🔴 심화8: 외부 병합 정렬"
+    code: |-
+      def externalMergeSort(chunks):
+          import heapq
+          heap = []
+          for i, chunk in enumerate(chunks):
+              if chunk:
+                  heapq.heappush(heap, (chunk[0], i, 0))
+          result = []
+          while heap:
+              val, chunkIdx, elemIdx = heapq.heappop(heap)
+              result.append(val)
+              if elemIdx + 1 < len(chunks[chunkIdx]):
+                  nextVal = chunks[chunkIdx][elemIdx + 1]
+                  heapq.heappush(heap, (nextVal, chunkIdx, elemIdx + 1))
+          return result
+
+      chunks = [[1, 4, 7], [2, 5, 8], [3, 6, 9]]
+      externalMergeSort(chunks)
+
+  - type: "expansion"
+    title: "🔴 심화9: 간격 병합"
+    code: |-
+      def mergeIntervals(intervals):
+          if not intervals:
+              return []
+          intervals.sort(key=lambda x: x[0])
+          result = [intervals[0]]
+          for start, end in intervals[1:]:
+              if start <= result[-1][1]:
+                  result[-1][1] = max(result[-1][1], end)
+              else:
+                  result.append([start, end])
+          return result
+
+      mergeIntervals([[1,3],[2,6],[8,10],[15,18]])
+
+  - type: "expansion"
+    title: "🔴 심화10: 정렬 검증"
+    code: |-
+      def isSorted(arr, key=None, reverse=False):
+          if key is None:
+              key = lambda x: x
+          for i in range(len(arr) - 1):
+              if reverse:
+                  if key(arr[i]) < key(arr[i+1]):
+                      return False
+              else:
+                  if key(arr[i]) > key(arr[i+1]):
+                      return False
+          return True
+
+      isSorted([1, 2, 3, 4]), isSorted([4, 3, 2, 1], reverse=True)

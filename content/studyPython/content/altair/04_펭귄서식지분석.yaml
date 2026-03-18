@@ -1,0 +1,340 @@
+meta:
+  id: altair_04
+  title: 펭귄서식지분석
+  order: 4
+  category: altair
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["mark_area", "layer", "stack", "penguins"]
+  seo:
+    title: "Altair 영역 차트 - 펭귄 서식지 분석"
+    description: "Altair로 영역 차트를 만들고 레이어를 활용합니다. mark_area, layer, 스택 시각화를 배웁니다."
+    keywords: ["altair area", "mark_area", "layer", "stacked chart"]
+
+intro:
+  emoji: "🐧"
+  goal: 펭귄 3종(Adelie, Chinstrap, Gentoo)의 서식지와 신체 특성을 영역 차트로 분석합니다.
+  description: mark_area()로 영역 차트를 만들고, layer(+)로 여러 차트를 겹쳐서 표현합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: seaborn-data
+  blocks:
+  - type: text
+    content: |-
+      GitHub에서 penguins 데이터를 불러옵니다. 남극 3개 섬에 사는 펭귄 344마리의 측정 데이터입니다.
+
+      species(종), island(섬), bill_length_mm(부리 길이), bill_depth_mm(부리 깊이), flipper_length_mm(지느러미 길이), body_mass_g(체중), sex(성별) 컬럼이 있습니다.
+  - type: code
+    language: python
+    title: penguins 데이터 불러오기
+    description: pandas로 CSV 로드
+    content: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+
+      penguinsUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
+      penguins = pd.read_csv(penguinsUrl)
+      penguins.head()
+
+- id: step2_basic_area
+  title: 2단계. 기본 영역 차트
+  subtitle: mark_area()
+  blocks:
+  - type: text
+    content: |-
+      mark_area()는 선 아래 영역을 채운 차트를 만듭니다. mark_bar()가 막대를 그리는 것처럼, mark_area()는 영역을 그립니다.
+
+      종(species)별 펭귄 수를 영역 차트로 표현합니다. x축에 종, y축에 개수(count())를 배치합니다.
+
+      영역 차트는 막대 차트와 비슷하지만 더 부드럽게 보이며, 연속적인 흐름을 표현할 때 유용합니다.
+  - type: code
+    language: python
+    title: 기본 영역 차트
+    description: mark_area로 개수 표현
+    content: |-
+      chartArea = alt.Chart(penguins).mark_area().encode(
+          x='species:N',
+          y='count()'
+      )
+      chartArea
+  - type: tip
+    content: |-
+      mark_area()는 mark_bar()와 비슷하지만 부드러운 곡선으로 영역을 채웁니다. 연속적인 데이터 흐름을 표현할 때 유용합니다.
+
+- id: step3_stacked_area
+  title: 3단계. 스택 영역 차트
+  subtitle: color로 쌓기
+  blocks:
+  - type: text
+    content: |-
+      color 인코딩을 추가하면 자동으로 스택(쌓인) 영역 차트가 됩니다.
+
+      섬(island)별로 종 분포를 스택 영역 차트로 시각화합니다.
+  - type: code
+    language: python
+    title: 스택 영역 차트
+    description: 섬별 종 분포
+    content: |-
+      chartStacked = alt.Chart(penguins).mark_area().encode(
+          x='island:N',
+          y='count()',
+          color='species:N'
+      )
+      chartStacked
+  - type: tip
+    content: |-
+      Biscoe 섬에는 Adelie와 Gentoo가, Dream 섬에는 Adelie와 Chinstrap이, Torgersen 섬에는 Adelie만 살고 있습니다.
+
+- id: step4_opacity
+  title: 4단계. 투명도 조절
+  subtitle: opacity 파라미터
+  blocks:
+  - type: text
+    content: |-
+      영역이 겹칠 때 opacity(투명도)를 조절하면 아래 데이터도 볼 수 있습니다.
+
+      mark_area()에 opacity 파라미터를 추가합니다.
+  - type: code
+    language: python
+    title: 투명도 적용
+    description: 반투명 영역
+    content: |-
+      chartOpacity = alt.Chart(penguins).mark_area(
+          opacity=0.6
+      ).encode(
+          x='island:N',
+          y='count()',
+          color='species:N'
+      )
+      chartOpacity
+
+- id: step5_layer_intro
+  title: 5단계. 레이어 개념
+  subtitle: + 연산자
+  blocks:
+  - type: text
+    content: |-
+      Altair에서 + 연산자로 여러 차트를 겹칠 수 있습니다. 이를 레이어(layer)라고 합니다. 더하기(+) 기호로 차트를 합칩니다.
+
+      먼저 scatter라는 변수에 산점도를 만들고, meanLine이라는 변수에 평균선을 만듭니다. 그다음 scatter + meanLine으로 두 차트를 겹칩니다.
+
+      mark_rule()은 선을 그리는 함수입니다. y만 지정하면 가로선, x만 지정하면 세로선이 됩니다. color='red'로 선 색상을, strokeWidth=2로 선 굵기를 지정합니다.
+  - type: code
+    language: python
+    title: 레이어 기본
+    description: 산점도 + 평균선
+    content: |-
+      scatter = alt.Chart(penguins).mark_circle(opacity=0.6).encode(
+          x='bill_length_mm:Q',
+          y='bill_depth_mm:Q',
+          color='species:N'
+      )
+
+      meanLine = alt.Chart(penguins).mark_rule(color='red', strokeWidth=2).encode(
+          y='mean(bill_depth_mm):Q'
+      )
+
+      chartLayer = scatter + meanLine
+      chartLayer
+  - type: tip
+    content: |-
+      같은 셀 안에서 여러 변수를 만들 수 있습니다. scatter = ... 후 meanLine = ... 후 chartLayer = ...처럼 여러 줄에 걸쳐 변수를 선언합니다.
+
+      마지막 줄(chartLayer)이 출력됩니다. 이것은 scatter + meanLine으로 두 차트를 합친 결과입니다.
+
+- id: step6_layer_text
+  title: 6단계. 텍스트 레이어
+  subtitle: mark_text()
+  blocks:
+  - type: text
+    content: |-
+      막대 차트 위에 값을 텍스트로 표시할 수 있습니다. mark_text()는 텍스트를 그리는 함수입니다.
+
+      bars 변수에 막대 차트를, text 변수에 텍스트 차트를 만들고, bars + text로 합칩니다.
+
+      mark_text()의 dy=-10은 텍스트를 위로 10픽셀 이동시킵니다. dy는 delta y(y 변화량)의 약자입니다. 음수는 위로, 양수는 아래로 이동합니다.
+
+      encode()에서 text='count()'는 표시할 텍스트 내용을 지정합니다. count() 값이 숫자로 표시됩니다.
+  - type: code
+    language: python
+    title: 막대 + 텍스트
+    description: 값 레이블 표시
+    content: |-
+      bars = alt.Chart(penguins).mark_bar().encode(
+          x='species:N',
+          y='count()',
+          color='species:N'
+      )
+
+      text = alt.Chart(penguins).mark_text(
+          dy=-10,
+          fontSize=14
+      ).encode(
+          x='species:N',
+          y='count()',
+          text='count()'
+      )
+
+      chartWithText = bars + text
+      chartWithText
+  - type: tip
+    content: |-
+      (weightBars + weightText)를 괄호로 감싸고 .properties()를 연결할 수 있습니다. 괄호는 두 차트를 먼저 합친 후 properties를 적용하라는 의미입니다.
+
+      괄호 없이 weightBars + weightText.properties(...)처럼 쓰면 weightText에만 properties가 적용됩니다.
+
+- id: step7_body_analysis
+  title: 7단계. 신체 특성 분석
+  subtitle: 종별 체중 비교
+  blocks:
+  - type: text
+    content: |-
+      지금까지 배운 내용으로 펭귄 종별 신체 특성을 분석합니다.
+
+      종별 평균 체중을 막대 차트로 시각화하고 텍스트 레이블을 추가합니다.
+  - type: code
+    language: python
+    title: 종별 체중 분석
+    description: 막대 + 텍스트 레이어
+    content: |-
+      weightBars = alt.Chart(penguins).mark_bar().encode(
+          x=alt.X('species:N', title='펭귄 종'),
+          y=alt.Y('mean(body_mass_g):Q', title='평균 체중 (g)'),
+          color='species:N'
+      )
+
+      weightText = alt.Chart(penguins).mark_text(
+          dy=-10,
+          fontSize=12
+      ).encode(
+          x='species:N',
+          y='mean(body_mass_g):Q',
+          text='mean(body_mass_g):Q'
+      )
+
+      chartWeight = (weightBars + weightText).properties(
+          title='펭귄 종별 평균 체중',
+          width=300,
+          height=250
+      )
+      chartWeight
+
+- id: step8_final
+  title: 8단계. 최종 결과물
+  subtitle: 펭귄 서식지 대시보드
+  blocks:
+  - type: text
+    content: |-
+      지금까지 배운 모든 개념을 종합해 펭귄 데이터를 시각화합니다.
+
+      섬별 펭귄 분포와 신체 특성을 함께 표현합니다.
+  - type: code
+    language: python
+    title: 산점도 생성
+    description: 지느러미 길이 vs 체중
+    content: |-
+      dotFinal = alt.Chart(penguins).mark_circle(size=80, opacity=0.7).encode(
+          x=alt.X('flipper_length_mm:Q', title='지느러미 길이 (mm)'),
+          y=alt.Y('body_mass_g:Q', title='체중 (g)'),
+          color=alt.Color('species:N', title='종'),
+          shape=alt.Shape('island:N', title='서식지'),
+          tooltip=['species', 'island', 'flipper_length_mm', 'body_mass_g', 'sex']
+      )
+  - type: code
+    language: python
+    title: 평균선 레이어 추가
+    description: 종별 평균 체중 점선
+    content: |-
+      meanLines = alt.Chart(penguins).mark_rule(strokeDash=[5, 5], opacity=0.5).encode(
+          y='mean(body_mass_g):Q', color='species:N'
+      )
+      chartFinal = (dotFinal + meanLines).properties(
+          title='펭귄 종별 지느러미 길이와 체중', width=500, height=400
+      )
+      chartFinal
+  - type: text
+    content: |-
+      Gentoo 펭귄이 가장 크고 무겁습니다. 지느러미 길이와 체중 사이에 양의 상관관계가 있습니다.
+
+      점선은 각 종의 평균 체중을 나타냅니다.
+
+- id: practice
+  title: 실습
+  subtitle: 펭귄 데이터 레이어 프로젝트
+  blocks:
+  - type: text
+    content: |-
+      이 프로젝트에서 배운 내용을 정리합니다. mark_area()로 영역 차트를, mark_rule()로 선을, mark_text()로 텍스트를 그렸습니다.
+
+      + 연산자로 여러 차트를 레이어로 겹쳤습니다. 두 차트를 더하면 하나로 합쳐집니다.
+
+      opacity로 투명도를, dy로 텍스트 위치를, strokeDash로 점선을 설정했습니다. 각 미션에서 이 개념들을 활용해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 섬별 평균 부리 길이 (막대 + 텍스트)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        birdUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
+        bird = pd.read_csv(birdUrl)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        barIsland = alt.Chart(bird).mark_bar().encode(
+            x='island:N',
+            y='mean(bill_length_mm):Q',
+            color='island:N'
+        )
+        labelIsland = alt.Chart(bird).mark_text(dy=-10).encode(
+            x='island:N',
+            y='mean(bill_length_mm):Q',
+            text='mean(bill_length_mm):Q'
+        )
+        figIsland = barIsland + labelIsland
+        figIsland
+  - type: expansion
+    title: "미션2: 부리 길이 vs 깊이 (산점도 + 평균선)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        antUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
+        ant = pd.read_csv(antUrl)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        dotBill = alt.Chart(ant).mark_circle(opacity=0.6).encode(
+            x='bill_length_mm:Q',
+            y='bill_depth_mm:Q',
+            color='species:N'
+        )
+        hLine = alt.Chart(ant).mark_rule(color='gray').encode(y='mean(bill_depth_mm):Q')
+        vLine = alt.Chart(ant).mark_rule(color='gray').encode(x='mean(bill_length_mm):Q')
+        figBill = dotBill + hLine + vLine
+        figBill
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair로 영역 차트와 레이어를 마스터했습니다!
+  - type: list
+    items:
+    - "mark_area() - 영역 차트 마크"
+    - "mark_area(opacity) - 투명도 조절"
+    - "mark_rule() - 수평선/수직선"
+    - "mark_text(dy, fontSize) - 텍스트 레이블"
+    - "chart1 + chart2 - 레이어 결합"
+    - "스택 영역 차트 - color로 자동 스택"
+  - type: text
+    content: 다음 프로젝트에서는 타이타닉 데이터로 facet과 필터를 배웁니다.

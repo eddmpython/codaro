@@ -1,0 +1,372 @@
+meta:
+  id: statsmodels_06
+  title: 다중회귀심화
+  order: 6
+  category: statsmodels
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  dataUrl: https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv
+  tags: ["다중회귀", "VIF", "다중공선성", "특성선택", "모델비교"]
+  seo:
+    title: "statsmodels 다중회귀 심화 - 다중공선성과 특성 선택"
+    description: "다중회귀의 고급 기법을 배웁니다. VIF로 다중공선성을 진단하고 최적 변수를 선택합니다."
+    keywords: ["statsmodels", "다중회귀", "VIF", "다중공선성", "특성선택", "모델비교"]
+
+intro:
+  emoji: "📊"
+  goal: 여러 광고 매체를 동시에 분석하여 최적 조합 찾기
+  description: 3개 광고 매체(TV, Radio, Newspaper)를 모두 사용한 다중회귀 모델을 만들고, VIF로 다중공선성을 진단하며, 최적 변수 조합을 찾습니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: 광고비 데이터 준비
+  blocks:
+  - type: text
+    content: "01 프로젝트에서 사용한 Advertising 데이터를 다시 불러옵니다. 이번에는 TV 한 가지가 아니라 Radio, Newspaper 광고비도 모두 활용하여 매출을 예측하는 다중회귀 모델을 만듭니다. 01 프로젝트의 단순회귀는 독립변수가 하나뿐이었지만, 다중회귀는 여러 독립변수를 동시에 고려하므로 각 변수의 '순수한' 영향을 분리하고 더 정확한 예측이 가능합니다. 이 프로젝트에서는 VIF(다중공선성 진단), 변수 선택, 상호작용 효과 등 다중회귀의 심화 개념을 배웁니다."
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: 광고비 데이터셋
+    content: |-
+      import pandas as pd
+      import numpy as np
+      import statsmodels.api as sm
+
+      url = "https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv"
+      adData = pd.read_csv(url, index_col=0)
+      adData.shape
+  - type: tip
+    content: index_col=0은 첫 번째 컬럼을 인덱스로 사용합니다. shape은 (행, 열) 튜플로 데이터 크기를 반환하며, 200개 시장과 4개 컬럼(TV, Radio, Newspaper, Sales)을 확인할 수 있습니다.
+
+- id: step2_correlation
+  title: 2단계. 변수 간 상관관계
+  subtitle: 다중공선성 예비 확인
+  blocks:
+  - type: text
+    content: 다중회귀를 하기 전 독립변수들 간의 상관관계를 확인하는 것은 필수입니다. 상관계수는 -1에서 1 사이 값으로, 절대값이 0.8 이상이면 강한 상관관계를 의미하며 다중공선성(multicollinearity) 문제가 발생할 수 있습니다. 다중공선성은 독립변수들끼리 높은 상관관계를 가질 때 발생하며, 회귀 계수가 불안정해지고 해석이 어려워집니다. 02 프로젝트에서 배운 상관관계 분석 기법을 다중회귀 준비에 활용합니다.
+  - type: code
+    language: python
+    title: 상관관계 행렬
+    description: 모든 변수 간 상관계수
+    content: |-
+      adData.corr()
+  - type: tip
+    content: corr()는 모든 변수 쌍의 피어슨 상관계수를 계산합니다. 대각선은 자기 자신과의 상관이므로 항상 1.0입니다. TV와 Radio는 0.05로 거의 무상관이지만, TV와 Newspaper는 0.06으로 약한 양의 상관입니다. Sales와 각 광고비의 상관을 보면 TV(0.78), Radio(0.58), Newspaper(0.23) 순으로 높습니다.
+
+- id: step3_multiple_regression
+  title: 3단계. 다중회귀 모델 학습
+  subtitle: 3개 변수 모두 사용
+  blocks:
+  - type: text
+    content: "TV, Radio, Newspaper 광고비를 모두 독립변수로 사용하여 매출을 예측합니다. 다중회귀식은 y = β₀ + β₁X₁ + β₂X₂ + β₃X₃ 형태로, 각 변수의 계수 β는 '다른 변수를 고정했을 때' 해당 변수의 순수 효과를 나타냅니다. 예를 들어 TV 계수가 0.046이면 Radio와 Newspaper 광고비가 같을 때 TV 광고비 1천 달러 증가 시 매출이 46개 증가한다는 뜻입니다. 01 프로젝트의 단순회귀와 코드는 같지만 X DataFrame에 여러 컬럼을 포함한다는 차이가 있습니다."
+  - type: code
+    language: python
+    title: 다중회귀 모델
+    description: TV + Radio + Newspaper → Sales
+    content: |-
+      XRaw = adData[['TV', 'Radio', 'Newspaper']]
+      y = adData['Sales']
+      X = sm.add_constant(XRaw)
+
+      modelAll = sm.OLS(y, X).fit()
+      modelAll.summary()
+  - type: tip
+    content: adData[['TV', 'Radio', 'Newspaper']]는 대괄호 2개로 여러 컬럼을 선택하여 DataFrame을 반환합니다. add_constant()는 절편용 const 컬럼을 추가하며, 01 프로젝트에서 배운 필수 단계입니다. OLS(y, X).fit()으로 최소제곱법으로 3개 계수를 동시에 추정합니다.
+
+- id: step4_interpret_coefficients
+  title: 4단계. 계수 해석
+  subtitle: 각 광고 매체의 효과
+  blocks:
+  - type: text
+    content: "다중회귀 계수는 '다른 변수를 고정했을 때'라는 중요한 조건이 붙습니다. TV 계수 0.046은 Radio와 Newspaper 광고비가 같을 때 TV 광고비 1천 달러 증가 시 매출 46개 증가를 의미합니다. 01 프로젝트의 단순회귀 TV 계수(0.048)와 다중회귀 TV 계수(0.046)가 다른 이유는 다른 변수의 영향을 통제(control)했기 때문입니다. 특히 Newspaper 계수가 0에 가깝거나 음수라면, Radio와 TV를 고려했을 때 Newspaper의 순수 효과는 미미하다는 뜻입니다."
+  - type: code
+    language: python
+    title: 회귀 계수 확인
+    description: 각 광고의 효과
+    content: |-
+      modelAll.params
+  - type: tip
+    content: params는 절편(const)과 각 변수의 기울기를 보여줍니다. TV 계수가 0.046이면 다른 광고비를 고정하고 TV 광고비만 1천 달러 늘리면 매출이 46개 증가합니다. Newspaper 계수가 음수나 0에 가까우면 Newspaper 광고는 다른 매체를 고려했을 때 효과가 미미하다는 뜻입니다.
+
+- id: step5_rsquared_comparison
+  title: 5단계. R² 비교
+  subtitle: 단순회귀 vs 다중회귀
+  blocks:
+  - type: text
+    content: 다중회귀의 R²는 단순회귀보다 항상 크거나 같습니다. 변수를 추가하면 R²는 자동으로 증가하므로, Adjusted R²(조정된 R²)로 비교해야 합니다. Adjusted R²는 변수 개수에 페널티를 부여하여 변수 추가가 실제로 모델을 개선하는지 판단합니다. 02 프로젝트에서 배운 Adjusted R² 개념을 모델 비교에 활용합니다.
+  - type: code
+    language: python
+    title: R² 비교
+    description: 단순회귀와 비교
+    content: |-
+      XTvRaw = adData[['TV']]
+      XTv = sm.add_constant(XTvRaw)
+      modelTv = sm.OLS(y, XTv).fit()
+
+      f"TV만: R² = {modelTv.rsquared:.4f}, Adj R² = {modelTv.rsquared_adj:.4f}"
+      f"전체: R² = {modelAll.rsquared:.4f}, Adj R² = {modelAll.rsquared_adj:.4f}"
+  - type: tip
+    content: rsquared는 R², rsquared_adj는 Adjusted R²입니다. TV만 사용한 모델의 R²가 0.61, 3개 변수 모델이 0.90이면 설명력이 크게 향상되었습니다. Adjusted R²도 함께 증가하면 변수 추가가 실제로 도움이 되는 것입니다.
+
+- id: step6_vif
+  title: 6단계. VIF로 다중공선성 진단
+  subtitle: 변수 독립성 확인
+  blocks:
+  - type: text
+    content: VIF(Variance Inflation Factor, 분산팽창인자)는 다중공선성을 정량적으로 측정하는 지표입니다. VIF=1은 완전 독립, VIF>10이면 심각한 다중공선성으로 변수 제거를 고려해야 합니다. VIF는 각 독립변수를 다른 독립변수들로 회귀했을 때 R²를 사용하여 VIF = 1/(1-R²)로 계산됩니다. 예를 들어 TV를 Radio와 Newspaper로 예측했을 때 R²=0.9이면 VIF=10으로 높은 다중공선성을 의미합니다.
+  - type: code
+    language: python
+    title: VIF 계산
+    description: 다중공선성 진단
+    content: |-
+      from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+      vifData = pd.DataFrame()
+      vifData['Feature'] = XRaw.columns
+      vifData['VIF'] = [variance_inflation_factor(XRaw.values, i) for i in range(XRaw.shape[1])]
+      vifData
+  - type: tip
+    content: variance_inflation_factor(X, i)는 i번째 변수의 VIF를 계산합니다. XRaw.values는 DataFrame을 numpy 배열로 변환하며, range(XRaw.shape[1])은 컬럼 개수만큼 반복합니다. VIF < 5면 문제없음, 5-10이면 주의, >10이면 다중공선성 문제가 있어 변수 제거를 고려해야 합니다.
+
+- id: step7_vif_viz
+  title: 7단계. VIF 시각화
+  subtitle: 다중공선성 시각화
+  blocks:
+  - type: text
+    content: VIF를 막대 그래프로 시각화하면 어떤 변수가 다중공선성 문제가 있는지 한눈에 파악할 수 있습니다. VIF < 5면 녹색(안전), 5-10이면 노란색(주의), > 10이면 빨간색(위험)으로 표시합니다.
+  - type: code
+    language: python
+    title: VIF 막대 그래프
+    description: Altair 시각화
+    content: |-
+      import altair as alt
+
+      vifData['Risk'] = vifData['VIF'].apply(lambda x: 'Safe' if x < 5 else ('Warning' if x < 10 else 'Danger'))
+
+      vifChart = alt.Chart(vifData).mark_bar().encode(
+          x=alt.X('VIF:Q', title='VIF', scale=alt.Scale(domain=[0, 12])),
+          y=alt.Y('Feature:N', sort='-x', title='Variable'),
+          color=alt.Color('Risk:N', scale=alt.Scale(domain=['Safe', 'Warning', 'Danger'], range=['#2ecc71', '#f39c12', '#e74c3c']))
+      ).properties(width=400, height=150, title='VIF by Variable')
+
+      threshLine = alt.Chart(pd.DataFrame({'x': [5, 10]})).mark_rule(strokeDash=[3, 3]).encode(
+          x='x:Q', color=alt.value('gray')
+      )
+      vifChart + threshLine
+  - type: tip
+    content: 녹색(VIF < 5)은 안전, 노란색(5-10)은 주의, 빨간색(> 10)은 변수 제거 고려입니다. 점선은 5와 10 기준선입니다.
+
+- id: step8_pvalues
+  title: 8단계. p-value로 변수 유의성 확인
+  subtitle: 통계적 유의성 검정
+  blocks:
+  - type: text
+    content: "p-value는 해당 변수가 종속변수에 실제로 영향을 미치는지 통계적으로 검정하는 지표입니다. 귀무가설(H₀)은 '계수가 0이다(영향 없음)'이며, p-value < 0.05면 귀무가설을 기각하여 95% 신뢰수준에서 유의미한 영향이 있다고 판단합니다. 0.05 이상이면 우연일 가능성이 높아 변수 제거를 고려합니다. summary()의 P>|t| 컬럼이 p-value이며, Newspaper의 p-value가 0.86으로 높으면 다른 변수를 고려했을 때 Newspaper는 통계적으로 유의미한 효과가 없다는 뜻입니다."
+  - type: code
+    language: python
+    title: p-value 확인
+    description: 변수별 유의성
+    content: |-
+      modelAll.pvalues.drop('const')
+  - type: tip
+    content: pvalues는 각 변수의 p-value를 Series로 반환합니다. drop('const')는 절편을 제외하고 독립변수만 확인합니다. p-value가 0.000이면 거의 확실히 영향을 미치며, 0.860이면 86% 확률로 우연이므로 효과가 없을 가능성이 높습니다.
+
+- id: step9_remove_newspaper
+  title: 9단계. 유의미하지 않은 변수 제거
+  subtitle: TV + Radio 모델
+  blocks:
+  - type: text
+    content: "Newspaper의 p-value가 0.05보다 높으면 이 변수를 제거하고 TV와 Radio만으로 모델을 다시 학습합니다. 변수 제거 후 R²는 약간 감소할 수 있지만, Adjusted R²가 유지되거나 오히려 증가하면 제거한 변수는 불필요했다는 증거입니다. 더 간결한 모델은 해석이 쉽고, 불필요한 변수를 제거하면 과적합(overfitting)을 방지하여 새로운 데이터에 대한 예측 안정성이 향상됩니다. 이것이 '파시모니(parsimony) 원칙', 즉 간결한 모델이 좋은 모델이라는 통계학의 핵심 원칙입니다."
+  - type: code
+    language: python
+    title: TV + Radio 모델
+    description: Newspaper 제거
+    content: |-
+      XTvRadioRaw = adData[['TV', 'Radio']]
+      XTvRadio = sm.add_constant(XTvRadioRaw)
+      modelTvRadio = sm.OLS(y, XTvRadio).fit()
+
+      f"전체(3개): R² = {modelAll.rsquared:.4f}, Adj R² = {modelAll.rsquared_adj:.4f}"
+      f"TV+Radio: R² = {modelTvRadio.rsquared:.4f}, Adj R² = {modelTvRadio.rsquared_adj:.4f}"
+  - type: tip
+    content: 변수를 제거했는데 Adjusted R²가 거의 같거나 증가하면 제거한 변수는 불필요했다는 뜻입니다. R²는 0.90에서 0.897로 약간 감소했지만 Adjusted R²는 거의 유지되면 TV+Radio 모델이 더 간결하고 실용적입니다.
+
+- id: step10_interaction
+  title: 10단계. 상호작용 효과
+  subtitle: TV × Radio
+  blocks:
+  - type: text
+    content: "상호작용(interaction)은 두 변수가 함께 작용할 때 발생하는 추가 효과입니다. TV와 Radio 광고를 동시에 집행하면 시너지 효과로 개별 효과의 합보다 더 큰 매출 증가가 발생할 수 있습니다. 예를 들어 TV만 보던 소비자가 Radio에서 같은 광고를 들으면 기억이 강화되어 구매 전환율이 높아집니다. 상호작용항은 TV × Radio를 새로운 변수로 추가하며, 계수가 양수면 시너지 효과(1+1>2), 음수면 상쇄 효과(1+1<2)를 의미합니다. 마케팅 믹스 최적화에서 매우 중요한 개념입니다."
+  - type: code
+    language: python
+    title: 상호작용 모델
+    description: TV × Radio 추가
+    content: |-
+      adDataInteraction = adData.copy()
+      adDataInteraction['TV_Radio'] = adDataInteraction['TV'] * adDataInteraction['Radio']
+
+      XInteractionRaw = adDataInteraction[['TV', 'Radio', 'TV_Radio']]
+      XInteraction = sm.add_constant(XInteractionRaw)
+      modelInteraction = sm.OLS(y, XInteraction).fit()
+
+      f"상호작용 R²: {modelInteraction.rsquared:.4f}"
+      f"TV_Radio 계수: {modelInteraction.params['TV_Radio']:.6f}"
+  - type: tip
+    content: adData['TV'] * adData['Radio']는 요소별 곱셈으로 새로운 컬럼을 만듭니다. 상호작용 계수가 0.001이면 TV와 Radio를 각각 100씩 증가시킬 때 개별 효과 외에 추가로 0.001×100×100=10개 매출 증가가 발생합니다. R²가 증가하고 p-value < 0.05면 상호작용이 유의미합니다.
+
+- id: step11_coef_comparison
+  title: 11단계. 모델별 계수 비교
+  subtitle: 시각화
+  blocks:
+  - type: text
+    content: 단순회귀와 다중회귀의 계수를 비교하면 변수 추가가 각 계수에 미치는 영향을 파악할 수 있습니다. Newspaper 계수가 단순회귀에서는 양수였다가 다중회귀에서 0에 가까워지면, 다른 변수를 통제했을 때 실제 효과가 없다는 뜻입니다.
+  - type: code
+    language: python
+    title: 계수 비교 그래프
+    description: seaborn 시각화
+    content: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+
+      coefCompare = pd.DataFrame({
+          'Variable': ['TV', 'Radio', 'Newspaper'],
+          'Simple': [modelTv.params['TV'], radioModel.params['Radio'] if 'radioModel' in dir() else 0.2, 0.055],
+          'Multiple': [modelAll.params['TV'], modelAll.params['Radio'], modelAll.params['Newspaper']]
+      })
+
+      coefMelt = coefCompare.melt(id_vars='Variable', var_name='Model', value_name='Coefficient')
+      coefFig, coefAx = plt.subplots(figsize=(8, 4))
+      sns.barplot(data=coefMelt, x='Variable', y='Coefficient', hue='Model', ax=coefAx)
+      coefAx.set_title('Simple vs Multiple Regression Coefficients')
+      coefAx.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
+      coefFig
+  - type: tip
+    content: 파란색은 단순회귀 계수, 주황색은 다중회귀 계수입니다. Newspaper가 다중회귀에서 0에 가까워지면 다른 변수 효과를 통제했을 때 실제 효과가 미미하다는 뜻입니다.
+
+- id: step12_predict
+  title: 12단계. 최종 모델로 예측
+  subtitle: 새로운 광고 예산 시나리오
+  blocks:
+  - type: text
+    content: "최종 선택한 TV+Radio 모델로 새로운 광고 예산 시나리오의 매출을 예측합니다. 예를 들어 TV 광고비 200천 달러, Radio 30천 달러 투입 시 예상 매출을 계산하여 마케팅 예산 배분 의사결정에 활용합니다. 01 프로젝트에서 배운 predict() 사용법을 다중회귀에 적용하며, 여러 변수 값을 포함한 DataFrame을 입력합니다. 다양한 시나리오를 시뮬레이션하면 최적 예산 배분을 찾을 수 있습니다."
+  - type: code
+    language: python
+    title: 매출 예측
+    description: TV=200, Radio=30
+    content: |-
+      newScenario = pd.DataFrame({'const': [1], 'TV': [200], 'Radio': [30]})
+      predictedSales = modelTvRadio.predict(newScenario)[0]
+      f"예상 매출: {predictedSales:.2f}천 개"
+  - type: tip
+    content: predict()는 학습된 계수로 y = β₀ + β₁X₁ + β₂X₂를 계산합니다. newScenario는 모델 학습 시 X와 같은 컬럼(const, TV, Radio)을 가져야 하며, 순서는 상관없지만 이름은 정확히 일치해야 합니다. [0]은 예측값 배열의 첫 번째 원소를 추출합니다.
+
+- id: practice
+  title: 실습
+  subtitle: 다중회귀 마스터 프로젝트
+  blocks:
+  - type: text
+    content: 마케팅 전략 분석가가 되어 최적 광고 믹스를 찾아냅니다. 각 미션은 데이터 로딩부터 다중회귀 모델링, VIF 분석, 최적화까지 전체 과정을 독립적으로 수행합니다. 01-05 프로젝트에서 배운 모든 기법과 이번 프로젝트의 심화 내용을 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 세 매체 개별 모델 vs 다중회귀 비교 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 단순회귀 모델들"
+      content: |-
+        import pandas as pd
+        import statsmodels.api as sm
+
+        cmpUrl = "https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv"
+        cmpData = pd.read_csv(cmpUrl, index_col=0)
+        cmpY = cmpData['Sales']
+
+        tvX = sm.add_constant(cmpData[['TV']])
+        radioX = sm.add_constant(cmpData[['Radio']])
+        newsX = sm.add_constant(cmpData[['Newspaper']])
+
+        tvModel = sm.OLS(cmpY, tvX).fit()
+        radioModel = sm.OLS(cmpY, radioX).fit()
+        newsModel = sm.OLS(cmpY, newsX).fit()
+        tvModel.rsquared
+    - type: code
+      title: "다중회귀 모델 및 R² 비교"
+      content: |-
+        allX = sm.add_constant(cmpData[['TV', 'Radio', 'Newspaper']])
+        allModel = sm.OLS(cmpY, allX).fit()
+
+        r2Df = pd.DataFrame({
+            'Model': ['TV만', 'Radio만', 'Newspaper만', 'TV+Radio+Newspaper'],
+            'R²': [tvModel.rsquared, radioModel.rsquared, newsModel.rsquared, allModel.rsquared],
+            'Adj R²': [tvModel.rsquared_adj, radioModel.rsquared_adj, newsModel.rsquared_adj, allModel.rsquared_adj]
+        })
+        r2Df
+    - type: code
+      title: "VIF 다중공선성 진단"
+      content: |-
+        from statsmodels.stats.outliers_influence import variance_inflation_factor
+
+        rawX = cmpData[['TV', 'Radio', 'Newspaper']]
+        vifDf = pd.DataFrame()
+        vifDf['Feature'] = rawX.columns
+        vifDf['VIF'] = [variance_inflation_factor(rawX.values, i) for i in range(rawX.shape[1])]
+        vifDf
+  - type: expansion
+    title: "미션2: 예산 최적화 시뮬레이션 및 잔차 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 TV+Radio 모델"
+      content: |-
+        import pandas as pd
+        import statsmodels.api as sm
+
+        optUrl = "https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv"
+        optData = pd.read_csv(optUrl, index_col=0)
+
+        optY = optData['Sales']
+        optX = sm.add_constant(optData[['TV', 'Radio']])
+        optModel = sm.OLS(optY, optX).fit()
+        optModel.params
+    - type: code
+      title: "예산 배분 시뮬레이션"
+      content: |-
+        budget = 300
+        simResults = []
+
+        for tv in range(0, budget+1, 10):
+            radio = budget - tv
+            scenario = pd.DataFrame({'const': [1], 'TV': [tv], 'Radio': [radio]})
+            sales = optModel.predict(scenario)[0]
+            simResults.append({'TV': tv, 'Radio': radio, 'Sales': sales})
+
+        simDf = pd.DataFrame(simResults)
+        bestRow = simDf.loc[simDf['Sales'].idxmax()]
+        bestRow
+    - type: code
+      title: "잔차 시각화"
+      content: |-
+        import plotly.express as px
+
+        residDf = pd.DataFrame({'Fitted': optModel.fittedvalues, 'Residuals': optModel.resid})
+
+        residFig = px.scatter(residDf, x='Fitted', y='Residuals', title='Residual Plot (TV + Radio)', opacity=0.6)
+        residFig.add_hline(y=0, line_dash='dash', line_color='red')
+        residFig
+
+- id: summary
+  title: 정리
+  subtitle: 여섯 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 Advertising 데이터로 TV, Radio, Newspaper 3개 광고 매체를 모두 사용한 다중회귀 모델을 만들었습니다. VIF로 다중공선성을 진단하고, p-value로 Newspaper가 유의미하지 않음을 확인하여 TV+Radio 모델을 최종 선택했습니다. 상호작용 효과도 분석하여 TV와 Radio의 시너지를 발견했으며, Adjusted R² 0.897로 높은 설명력을 달성했습니다. 이제 다중회귀의 핵심 개념인 변수 선택, 다중공선성 진단, 모델 비교를 활용하여 실전 마케팅 의사결정을 수행할 수 있습니다.
+  - type: list
+    items:
+    - "다중회귀 - 여러 독립변수로 동시 예측"
+    - "VIF - 다중공선성 정량적 측정 (>10이면 문제)"
+    - "p-value - 변수 유의성 검정 (<0.05면 유의미)"
+    - "Adjusted R² - 변수 개수 고려한 모델 평가"
+    - "상호작용 - 변수 간 시너지 효과 분석"
+    - "변수 선택 - 불필요한 변수 제거로 간결한 모델"
+  - type: text
+    content: 다음 프로젝트에서는 시계열 데이터를 다룹니다. 지금까지 배운 회귀분석 기법과 시계열 특성을 결합하여 시간에 따라 변하는 패턴을 분석하고 미래를 예측하는 고급 기법을 익힙니다.

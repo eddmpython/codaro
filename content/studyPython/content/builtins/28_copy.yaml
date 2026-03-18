@@ -1,0 +1,651 @@
+meta:
+  title: "copy - 객체 복사"
+  description: "얕은 복사와 깊은 복사를 위한 copy 모듈"
+  keywords: ["copy", "복사", "deepcopy", "shallow", "clone"]
+
+intro:
+  emoji: "📋"
+  points:
+  - "얕은 복사 vs 깊은 복사"
+  - "가변 객체 복제"
+  - "중첩 구조 처리"
+  - "참조 문제 해결"
+
+sections:
+- id: "module_import"
+  title: "모듈 임포트"
+  subtitle: "copy 시작하기"
+  blocks:
+  - type: "text"
+    content: "copy는 파이썬 표준 라이브러리입니다. 객체의 얕은 복사와 깊은 복사를 제공합니다."
+  - type: "list"
+    items:
+    - "copy(): 얕은 복사"
+    - "deepcopy(): 깊은 복사"
+    - "가변 객체 복제"
+    - "중첩 구조 독립 복사"
+  - type: "code"
+    language: "python"
+    title: "기본 임포트"
+    description: "copy 모듈 임포트 및 기본 사용법"
+    content: |-
+      import copy
+
+      original = [1, 2, 3]
+      duplicated = copy.copy(original)
+
+      original, duplicated
+  - type: "note"
+    content: "단순 할당(=)은 참조를 복사하고, copy()는 새 객체를 만들지만 내부 요소는 참조를 공유합니다. deepcopy()는 모든 것을 재귀적으로 복사합니다."
+
+- id: "shallow_copy"
+  title: "얕은 복사"
+  subtitle: "copy() 함수"
+  blocks:
+  - type: "text"
+    content: "얕은 복사는 객체의 최상위 레벨만 새로 생성하고, 내부 객체는 참조를 공유합니다."
+  - type: "list"
+    items:
+    - "copy.copy(): 얕은 복사"
+    - "리스트.copy(): 리스트 메서드"
+    - "list(), dict(): 생성자 복사"
+    - "최상위만 독립, 내부는 공유"
+  - type: "code"
+    language: "python"
+    title: "기본 얕은 복사"
+    description: "리스트 복사"
+    content: |-
+      import copy
+
+      source = [1, 2, 3, 4, 5]
+      cloned = copy.copy(source)
+
+      cloned.append(6)
+
+      source, cloned
+  - type: "code"
+    language: "python"
+    title: "중첩 리스트 문제"
+    description: "내부 리스트는 공유됨"
+    content: |-
+      import copy
+
+      nested = [[1, 2], [3, 4]]
+      shallowCopy = copy.copy(nested)
+
+      shallowCopy[0].append(999)
+
+      nested, shallowCopy
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 얕은 복사"
+    description: "dict.copy() 사용"
+    content: |-
+      import copy
+
+      data = {'a': 1, 'b': 2, 'c': 3}
+      copied = data.copy()
+
+      copied['d'] = 4
+
+      data, copied
+  - type: "tip"
+    content: "얕은 복사는 중첩된 가변 객체(리스트 안의 리스트)에서 예상치 못한 동작을 일으킬 수 있습니다. 이런 경우 deepcopy()를 사용하세요."
+
+- id: "deep_copy"
+  title: "깊은 복사"
+  subtitle: "deepcopy() 함수"
+  blocks:
+  - type: "text"
+    content: "깊은 복사는 객체와 그 안의 모든 객체를 재귀적으로 복사하여 완전히 독립적인 복제본을 만듭니다."
+  - type: "list"
+    items:
+    - "copy.deepcopy(): 깊은 복사"
+    - "재귀적 복사"
+    - "완전 독립적 객체"
+    - "순환 참조 처리"
+  - type: "code"
+    language: "python"
+    title: "중첩 리스트 깊은 복사"
+    description: "완전히 독립적인 복사"
+    content: |-
+      import copy
+
+      original = [[1, 2], [3, 4]]
+      deepClone = copy.deepcopy(original)
+
+      deepClone[0].append(999)
+
+      original, deepClone
+  - type: "code"
+    language: "python"
+    title: "복잡한 구조 복사"
+    description: "딕셔너리 내 리스트"
+    content: |-
+      import copy
+
+      complex = {'users': ['Alice', 'Bob'], 'scores': [100, 200]}
+      fullCopy = copy.deepcopy(complex)
+
+      fullCopy['users'].append('Charlie')
+
+      complex, fullCopy
+  - type: "code"
+    language: "python"
+    title: "다층 중첩 구조"
+    description: "3단계 중첩"
+    content: |-
+      import copy
+
+      multilevel = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+      deepMulti = copy.deepcopy(multilevel)
+
+      deepMulti[0][0].append(99)
+
+      multilevel, deepMulti
+  - type: "tip"
+    content: "deepcopy()는 모든 레벨을 재귀적으로 복사하므로 메모리와 시간이 더 소요됩니다. 필요한 경우에만 사용하세요."
+
+- id: "assignment_vs_copy"
+  title: "할당 vs 복사"
+  subtitle: "참조와 복제의 차이"
+  blocks:
+  - type: "text"
+    content: "단순 할당(=)은 객체를 복사하지 않고 같은 객체를 가리키는 참조만 만듭니다."
+  - type: "list"
+    items:
+    - "할당(=): 참조 복사"
+    - "copy(): 얕은 복사"
+    - "deepcopy(): 깊은 복사"
+    - "id() 함수로 확인"
+  - type: "code"
+    language: "python"
+    title: "할당은 참조"
+    description: "같은 객체를 가리킴"
+    content: |-
+      import copy
+
+      listA = [1, 2, 3]
+      listB = listA
+
+      listB.append(4)
+
+      listA, listB
+  - type: "code"
+    language: "python"
+    title: "얕은 복사는 새 객체"
+    description: "최상위만 독립"
+    content: |-
+      import copy
+
+      listX = [1, 2, 3]
+      listY = copy.copy(listX)
+
+      listY.append(4)
+
+      listX, listY
+  - type: "code"
+    language: "python"
+    title: "ID 비교"
+    description: "객체 식별자 확인"
+    content: |-
+      import copy
+
+      base = [1, 2, 3]
+      reference = base
+      shallow = copy.copy(base)
+      deep = copy.deepcopy(base)
+
+      sameAsBase = id(reference) == id(base)
+      differentShallow = id(shallow) != id(base)
+      differentDeep = id(deep) != id(base)
+
+      sameAsBase, differentShallow, differentDeep
+  - type: "tip"
+    content: "가변 객체(리스트, 딕셔너리)를 함수 인자로 전달할 때 의도치 않은 수정을 방지하려면 복사본을 전달하세요."
+
+- id: "mutable_immutable"
+  title: "가변 vs 불변 객체"
+  subtitle: "복사 동작의 차이"
+  blocks:
+  - type: "text"
+    content: "불변 객체(int, str, tuple)는 복사가 필요 없지만, 가변 객체(list, dict, set)는 복사가 중요합니다."
+  - type: "list"
+    items:
+    - "불변: int, str, tuple, frozenset"
+    - "가변: list, dict, set"
+    - "불변 객체는 복사 불필요"
+    - "가변 객체는 deepcopy 필요할 수 있음"
+  - type: "code"
+    language: "python"
+    title: "불변 객체"
+    description: "복사 불필요"
+    content: |-
+      import copy
+
+      immutableStr = "hello"
+      copiedStr = copy.copy(immutableStr)
+
+      sameObject = id(immutableStr) == id(copiedStr)
+      sameObject
+  - type: "code"
+    language: "python"
+    title: "가변 객체 복사"
+    description: "새 객체 생성"
+    content: |-
+      import copy
+
+      mutableList = [1, 2, 3]
+      copiedList = copy.copy(mutableList)
+
+      differentObject = id(mutableList) != id(copiedList)
+      copiedList.append(4)
+
+      mutableList, copiedList, differentObject
+  - type: "code"
+    language: "python"
+    title: "튜플 안의 리스트"
+    description: "불변 안의 가변"
+    content: |-
+      import copy
+
+      tupleWithList = ([1, 2], [3, 4])
+      shallowTuple = copy.copy(tupleWithList)
+      deepTuple = copy.deepcopy(tupleWithList)
+
+      deepTuple[0].append(999)
+
+      tupleWithList, deepTuple
+  - type: "tip"
+    content: "튜플은 불변이지만 내부에 가변 객체를 포함할 수 있습니다. 이 경우 deepcopy()로 내부 가변 객체도 복사해야 합니다."
+
+- id: "custom_objects"
+  title: "커스텀 객체 복사"
+  subtitle: "클래스 인스턴스"
+  blocks:
+  - type: "text"
+    content: "사용자 정의 클래스의 인스턴스도 copy와 deepcopy로 복사할 수 있습니다."
+  - type: "list"
+    items:
+    - "클래스 인스턴스 복사 가능"
+    - "__copy__(): 얕은 복사 커스터마이징"
+    - "__deepcopy__(): 깊은 복사 커스터마이징"
+    - "속성도 복사됨"
+  - type: "code"
+    language: "python"
+    title: "클래스 얕은 복사"
+    description: "인스턴스 복제"
+    content: |-
+      import copy
+
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      person1 = Person('Alice', 30)
+      person2 = copy.copy(person1)
+
+      person2.age = 31
+
+      person1.age, person2.age
+  - type: "code"
+    language: "python"
+    title: "중첩 객체 깊은 복사"
+    description: "객체 안의 리스트"
+    content: |-
+      import copy
+
+      class Team:
+          def __init__(self, name, members):
+              self.name = name
+              self.members = members
+
+      team1 = Team('Alpha', ['Alice', 'Bob'])
+      team2 = copy.deepcopy(team1)
+
+      team2.members.append('Charlie')
+
+      team1.members, team2.members
+  - type: "code"
+    language: "python"
+    title: "복잡한 객체 구조"
+    description: "여러 속성 복사"
+    content: |-
+      import copy
+
+      class Project:
+          def __init__(self, title, tasks):
+              self.title = title
+              self.tasks = tasks
+              self.completed = False
+
+      proj1 = Project('Web App', ['Design', 'Code', 'Test'])
+      proj2 = copy.deepcopy(proj1)
+
+      proj2.title = 'Mobile App'
+      proj2.tasks.append('Deploy')
+
+      proj1.tasks, proj2.tasks
+  - type: "tip"
+    content: "클래스에 __copy__()와 __deepcopy__() 메서드를 정의하면 복사 동작을 커스터마이징할 수 있습니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "실무 복사 패턴"
+  blocks:
+  - type: "text"
+    content: "실제 프로그래밍에서 자주 사용되는 복사 패턴들입니다."
+  - type: "code"
+    language: "python"
+    title: "설정 객체 복사"
+    description: "기본 설정 유지"
+    content: |-
+      import copy
+
+      defaultConfig = {
+          'host': 'localhost',
+          'port': 8080,
+          'features': ['auth', 'cache']
+      }
+
+      customConfig = copy.deepcopy(defaultConfig)
+      customConfig['port'] = 3000
+      customConfig['features'].append('logging')
+
+      defaultConfig, customConfig
+  - type: "code"
+    language: "python"
+    title: "게임 상태 저장"
+    description: "세이브 포인트"
+    content: |-
+      import copy
+
+      gameState = {
+          'player': {'hp': 100, 'level': 5},
+          'inventory': ['sword', 'potion'],
+          'position': [10, 20]
+      }
+
+      checkpoint = copy.deepcopy(gameState)
+
+      gameState['player']['hp'] = 50
+      gameState['inventory'].append('shield')
+
+      checkpoint, gameState
+  - type: "code"
+    language: "python"
+    title: "데이터 변환 파이프라인"
+    description: "원본 보존"
+    content: |-
+      import copy
+
+      rawData = [
+          {'name': 'Alice', 'score': 85},
+          {'name': 'Bob', 'score': 92}
+      ]
+
+      processedData = copy.deepcopy(rawData)
+
+      for item in processedData:
+          item['grade'] = 'A' if item['score'] >= 90 else 'B'
+
+      rawData, processedData
+  - type: "tip"
+    content: "원본 데이터를 보존해야 할 때는 항상 복사본을 만들어 작업하세요. 특히 설정, 상태, 데이터 변환에서 중요합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  blocks:
+  - type: "expansion"
+    title: "🟢 기본1: 리스트 얕은 복사"
+    code: |-
+      import copy
+
+      nums = [1, 2, 3]
+      numsCopy = copy.copy(nums)
+
+      nums, numsCopy
+  - type: "expansion"
+    title: "🟢 기본2: 딕셔너리 복사"
+    code: |-
+      import copy
+
+      info = {'name': 'Alice', 'age': 30}
+      infoCopy = copy.copy(info)
+
+      info, infoCopy
+  - type: "expansion"
+    title: "🟢 기본3: deepcopy 사용"
+    code: |-
+      import copy
+
+      matrix = [[1, 2], [3, 4]]
+      matrixDeep = copy.deepcopy(matrix)
+
+      matrix, matrixDeep
+  - type: "expansion"
+    title: "🟢 기본4: 리스트 메서드 복사"
+    code: |-
+      import copy
+
+      items = ['a', 'b', 'c']
+      itemsCopy = items.copy()
+
+      items, itemsCopy
+  - type: "expansion"
+    title: "🟢 기본5: 단순 할당"
+    code: |-
+      values = [10, 20, 30]
+      reference = values
+
+      values.append(40)
+
+      values, reference
+  - type: "expansion"
+    title: "🟡 응용1: 중첩 리스트 얕은 복사"
+    code: |-
+      import copy
+
+      nested1 = [[1, 2], [3, 4]]
+      shallow1 = copy.copy(nested1)
+
+      shallow1[0].append(99)
+
+      nested1
+  - type: "expansion"
+    title: "🟡 응용2: 중첩 리스트 깊은 복사"
+    code: |-
+      import copy
+
+      nested2 = [[1, 2], [3, 4]]
+      deep1 = copy.deepcopy(nested2)
+
+      deep1[0].append(99)
+
+      nested2, deep1
+  - type: "expansion"
+    title: "🟡 응용3: 딕셔너리 내 리스트"
+    code: |-
+      import copy
+
+      record = {'tags': ['python', 'coding']}
+      recordDeep = copy.deepcopy(record)
+
+      recordDeep['tags'].append('tutorial')
+
+      record, recordDeep
+  - type: "expansion"
+    title: "🟡 응용4: ID 확인"
+    code: |-
+      import copy
+
+      obj = [1, 2, 3]
+      shallowObj = copy.copy(obj)
+
+      isDifferent = id(obj) != id(shallowObj)
+      isDifferent
+  - type: "expansion"
+    title: "🟡 응용5: 클래스 복사"
+    code: |-
+      import copy
+
+      class Point:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+      p1 = Point(10, 20)
+      p2 = copy.copy(p1)
+
+      p2.x = 30
+
+      p1.x, p2.x
+  - type: "expansion"
+    title: "🔴 심화1: 3단계 중첩"
+    code: |-
+      import copy
+
+      triple = [[[1]]]
+      tripleDeep = copy.deepcopy(triple)
+
+      tripleDeep[0][0].append(2)
+
+      triple, tripleDeep
+  - type: "expansion"
+    title: "🔴 심화2: 설정 복사"
+    code: |-
+      import copy
+
+      config = {'db': {'host': 'localhost', 'port': 5432}}
+      newConfig = copy.deepcopy(config)
+
+      newConfig['db']['port'] = 3306
+
+      config, newConfig
+  - type: "expansion"
+    title: "🔴 심화3: 리스트 안의 딕셔너리"
+    code: |-
+      import copy
+
+      users = [{'name': 'Alice'}, {'name': 'Bob'}]
+      usersDeep = copy.deepcopy(users)
+
+      usersDeep[0]['name'] = 'Charlie'
+
+      users, usersDeep
+  - type: "expansion"
+    title: "🔴 심화4: 튜플 안의 리스트"
+    code: |-
+      import copy
+
+      tupleData = ([1, 2], [3, 4])
+      tupleDeep = copy.deepcopy(tupleData)
+
+      tupleDeep[0].append(99)
+
+      tupleData, tupleDeep
+  - type: "expansion"
+    title: "🔴 심화5: 클래스 중첩 복사"
+    code: |-
+      import copy
+
+      class Container:
+          def __init__(self, items):
+              self.items = items
+
+      c1 = Container([1, 2, 3])
+      c2 = copy.deepcopy(c1)
+
+      c2.items.append(4)
+
+      c1.items, c2.items
+  - type: "expansion"
+    title: "🔴 심화6: 게임 인벤토리"
+    code: |-
+      import copy
+
+      inventory = {'weapons': ['sword'], 'armor': ['helmet']}
+      backup = copy.deepcopy(inventory)
+
+      inventory['weapons'].append('bow')
+
+      backup, inventory
+  - type: "expansion"
+    title: "🔴 심화7: 복잡한 딕셔너리"
+    code: |-
+      import copy
+
+      schema = {
+          'tables': {
+              'users': ['id', 'name'],
+              'posts': ['id', 'title']
+          }
+      }
+      schemaCopy = copy.deepcopy(schema)
+
+      schemaCopy['tables']['users'].append('email')
+
+      schema, schemaCopy
+  - type: "expansion"
+    title: "🔴 심화8: 기본값 패턴"
+    code: |-
+      import copy
+
+      defaults = {'timeout': 30, 'retry': 3, 'headers': {'auth': 'token'}}
+      options = copy.deepcopy(defaults)
+
+      options['timeout'] = 60
+      options['headers']['auth'] = 'new-token'
+
+      defaults, options
+  - type: "expansion"
+    title: "🔴 심화9: 상태 스냅샷"
+    code: |-
+      import copy
+
+      state = {
+          'counter': 0,
+          'history': []
+      }
+
+      snapshot1 = copy.deepcopy(state)
+      state['counter'] = 10
+      state['history'].append('action1')
+
+      snapshot2 = copy.deepcopy(state)
+      state['counter'] = 20
+
+      snapshot1['counter'], snapshot2['counter'], state['counter']
+  - type: "expansion"
+    title: "🔴 심화10: 전체 활용 - 데이터 버전 관리"
+    code: |-
+      import copy
+
+      originalData = {
+          'version': 1,
+          'users': [
+              {'id': 1, 'name': 'Alice', 'roles': ['admin']},
+              {'id': 2, 'name': 'Bob', 'roles': ['user']}
+          ],
+          'settings': {
+              'theme': 'dark',
+              'notifications': True
+          }
+      }
+
+      v1 = copy.deepcopy(originalData)
+
+      originalData['version'] = 2
+      originalData['users'][0]['roles'].append('moderator')
+      originalData['settings']['theme'] = 'light'
+
+      v2 = copy.deepcopy(originalData)
+
+      {
+          'v1_version': v1['version'],
+          'v1_alice_roles': v1['users'][0]['roles'],
+          'v2_version': v2['version'],
+          'v2_alice_roles': v2['users'][0]['roles'],
+          'current_theme': originalData['settings']['theme']
+      }

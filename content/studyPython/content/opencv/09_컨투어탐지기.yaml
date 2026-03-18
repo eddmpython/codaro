@@ -1,0 +1,402 @@
+meta:
+  id: opencv_09
+  title: 컨투어탐지기
+  order: 9
+  category: opencv
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["OpenCV", "findContours", "drawContours", "contourArea", "컨투어"]
+  seo:
+    title: "OpenCV 심화 - 컨투어 탐지기"
+    description: "OpenCV findContours, drawContours로 객체 윤곽을 검출하고 분석합니다."
+    keywords: ["OpenCV", "findContours", "drawContours", "contourArea", "컨투어"]
+
+intro:
+  emoji: "🔍"
+  goal: findContours로 객체 윤곽을 검출하고 drawContours로 시각화합니다.
+  description: 컨투어(contour)는 같은 색상이나 밝기를 가진 연속된 점들을 연결한 곡선으로, 객체의 윤곽선입니다. 객체 감지, 형태 분석, 면적 계산에 활용됩니다.
+
+sections:
+- id: step1_create
+  title: 1단계. 테스트 이미지 생성
+  subtitle: 도형이 있는 이미지
+  blocks:
+  - type: text
+    content: 컨투어 검출을 위한 테스트 이미지를 생성합니다. 여러 도형을 그려 다양한 컨투어를 검출해봅니다.
+  - type: code
+    language: python
+    title: 라이브러리와 기본 이미지
+    description: 검은 배경에 흰색 도형을 그립니다
+    content: |-
+      import cv2
+      import numpy as np
+      import matplotlib.pyplot as plt
+
+      board = np.zeros((400, 500, 3), dtype=np.uint8)
+      cv2.rectangle(board, (50, 50), (150, 150), (255, 255, 255), -1)
+      cv2.circle(board, (280, 100), 60, (255, 255, 255), -1)
+      cv2.ellipse(board, (400, 100), (50, 30), 0, 0, 360, (255, 255, 255), -1)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(board, cv2.COLOR_BGR2RGB))
+      plt.title('Base Shapes')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 삼각형 추가
+    description: 다각형도 추가합니다
+    content: |-
+      triangle = np.array([[100, 220], [50, 320], [150, 320]], np.int32)
+      cv2.fillPoly(board, [triangle], (255, 255, 255))
+      pentagon = np.array([[250, 220], [200, 270], [220, 340], [280, 340], [300, 270]], np.int32)
+      cv2.fillPoly(board, [pentagon], (255, 255, 255))
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(board, cv2.COLOR_BGR2RGB))
+      plt.title('All Shapes')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 테스트 이미지 출력
+    description: 다양한 도형이 있는 이미지입니다
+    content: |-
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(board, cv2.COLOR_BGR2RGB))
+      plt.title('Test Image with Shapes')
+      plt.axis('off')
+      plt.tight_layout()
+
+- id: step2_find
+  title: 2단계. 컨투어 검출
+  subtitle: findContours()
+  blocks:
+  - type: text
+    content: findContours()는 이진 이미지에서 컨투어(윤곽선)를 검출합니다. 흰색(255) 영역과 검은색(0) 영역의 경계를 찾아 점들의 좌표 리스트로 반환합니다. 입력은 반드시 이진 이미지여야 하므로, 그레이스케일 변환 후 threshold나 Canny로 이진화합니다. 검출 모드(RETR_*)와 근사 방법(CHAIN_APPROX_*)에 따라 결과가 달라집니다.
+  - type: code
+    language: python
+    title: 이진화
+    description: 컨투어 검출을 위해 이진화합니다
+    content: |-
+      gray = cv2.cvtColor(board, cv2.COLOR_BGR2GRAY)
+      ret, thresh = cv2.threshold(gray, 127, 255, cv2.THRESH_BINARY)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(thresh, cmap='gray')
+      plt.title('Binary Threshold')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 컨투어 검출
+    description: findContours로 윤곽을 찾습니다
+    content: |-
+      contours, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+      len(contours)
+  - type: tip
+    content: findContours()는 (contours, hierarchy)를 반환합니다. RETR_EXTERNAL은 외곽 컨투어만 검출합니다. CHAIN_APPROX_SIMPLE은 직선 부분의 끝점만 저장하여 메모리를 절약합니다.
+  - type: code
+    language: python
+    title: 컨투어 정보
+    description: 각 컨투어의 점 개수를 확인합니다
+    content: |-
+      cntInfo = [(i, len(cnt)) for i, cnt in enumerate(contours)]
+      cntInfo
+
+- id: step3_draw
+  title: 3단계. 컨투어 그리기
+  subtitle: drawContours()
+  blocks:
+  - type: text
+    content: drawContours()로 검출된 컨투어를 이미지에 그립니다. 특정 컨투어나 전체 컨투어를 그릴 수 있습니다.
+  - type: code
+    language: python
+    title: 전체 컨투어 그리기
+    description: 모든 컨투어를 녹색으로 그립니다
+    content: |-
+      drawn = board.copy()
+      cv2.drawContours(drawn, contours, -1, (0, 255, 0), 2)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(drawn, cv2.COLOR_BGR2RGB))
+      plt.title('All Contours (Green)')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: drawContours(image, contours, contourIdx, color, thickness)에서 contourIdx가 -1이면 모든 컨투어를 그립니다. 특정 인덱스를 지정하면 해당 컨투어만 그립니다.
+  - type: code
+    language: python
+    title: 개별 컨투어 그리기
+    description: 각 컨투어를 다른 색으로 그립니다
+    content: |-
+      colorDrawn = board.copy()
+      colors = [(255, 0, 0), (0, 255, 0), (0, 0, 255), (255, 255, 0), (255, 0, 255)]
+      for i, cnt in enumerate(contours):
+          cv2.drawContours(colorDrawn, [cnt], 0, colors[i % len(colors)], 3)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(colorDrawn, cv2.COLOR_BGR2RGB))
+      plt.title('Colored Contours')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 컨투어 비교
+    description: 원본과 컨투어가 그려진 이미지입니다
+    content: |-
+      figContour, axContour = plt.subplots(1, 2, figsize=(12, 5))
+      axContour[0].imshow(cv2.cvtColor(board, cv2.COLOR_BGR2RGB))
+      axContour[0].set_title('Original')
+      axContour[0].axis('off')
+      axContour[1].imshow(cv2.cvtColor(colorDrawn, cv2.COLOR_BGR2RGB))
+      axContour[1].set_title('Contours')
+      axContour[1].axis('off')
+      plt.tight_layout()
+
+- id: step4_area
+  title: 4단계. 면적과 둘레
+  subtitle: contourArea, arcLength
+  blocks:
+  - type: text
+    content: contourArea()는 컨투어가 둘러싼 영역의 면적(픽셀 수)을 계산합니다. arcLength()는 컨투어의 둘레(perimeter) 길이를 계산합니다. 이 두 값으로 원형도(circularity = 4π×면적/둘레²)를 계산할 수 있는데, 완전한 원은 1에 가깝고 길쭉한 형태는 0에 가깝습니다. 객체 분류와 필터링에 유용합니다.
+  - type: code
+    language: python
+    title: 면적 계산
+    description: 각 컨투어의 면적을 계산합니다
+    content: |-
+      areas = []
+      for cnt in contours:
+          area = cv2.contourArea(cnt)
+          areas.append(area)
+      areas
+  - type: code
+    language: python
+    title: 둘레 계산
+    description: 각 컨투어의 둘레를 계산합니다
+    content: |-
+      perimeters = []
+      for cnt in contours:
+          peri = cv2.arcLength(cnt, True)
+          perimeters.append(peri)
+      perimeters
+  - type: tip
+    content: arcLength(curve, closed)의 closed가 True이면 닫힌 곡선으로 계산합니다. 면적과 둘레를 이용해 원형도(circularity)나 종횡비를 계산할 수 있습니다.
+  - type: code
+    language: python
+    title: 면적 표시
+    description: 각 도형에 면적을 표시합니다
+    content: |-
+      labeled = board.copy()
+      for i, cnt in enumerate(contours):
+          mom = cv2.moments(cnt)
+          if mom['m00'] != 0:
+              centX = int(mom['m10'] / mom['m00'])
+              centY = int(mom['m01'] / mom['m00'])
+              cv2.putText(labeled, f'{int(areas[i])}', (centX - 30, centY), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 0), 2)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(labeled, cv2.COLOR_BGR2RGB))
+      plt.title('Area Labels')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 면적 라벨링 결과
+    description: 각 도형의 면적이 표시됩니다
+    content: |-
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(labeled, cv2.COLOR_BGR2RGB))
+      plt.title('Area Labels')
+      plt.axis('off')
+      plt.tight_layout()
+
+- id: step5_bound
+  title: 5단계. 외접 도형
+  subtitle: boundingRect, minEnclosingCircle
+  blocks:
+  - type: text
+    content: 외접 도형(bounding shape)은 컨투어를 감싸는 가장 작은 도형입니다. boundingRect()는 축에 평행한 사각형(AABB, Axis-Aligned Bounding Box)을, minEnclosingCircle()은 최소 외접원을 반환합니다. 객체 위치, 크기 추정, ROI(관심 영역) 추출에 사용됩니다.
+  - type: code
+    language: python
+    title: 외접 사각형
+    description: 각 컨투어의 바운딩 박스를 계산합니다
+    content: |-
+      boxed = board.copy()
+      for cnt in contours:
+          bx, by, bw, bh = cv2.boundingRect(cnt)
+          cv2.rectangle(boxed, (bx, by), (bx + bw, by + bh), (0, 255, 0), 2)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(boxed, cv2.COLOR_BGR2RGB))
+      plt.title('Bounding Rectangles')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 최소 외접원
+    description: 각 컨투어를 감싸는 최소 원입니다
+    content: |-
+      circled = board.copy()
+      for cnt in contours:
+          (circX, circY), radius = cv2.minEnclosingCircle(cnt)
+          cv2.circle(circled, (int(circX), int(circY)), int(radius), (0, 0, 255), 2)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(circled, cv2.COLOR_BGR2RGB))
+      plt.title('Min Enclosing Circles')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 외접 도형 비교
+    description: 사각형과 원을 비교합니다
+    content: |-
+      figBound, axBound = plt.subplots(1, 2, figsize=(12, 5))
+      axBound[0].imshow(cv2.cvtColor(boxed, cv2.COLOR_BGR2RGB))
+      axBound[0].set_title('Bounding Rectangles')
+      axBound[0].axis('off')
+      axBound[1].imshow(cv2.cvtColor(circled, cv2.COLOR_BGR2RGB))
+      axBound[1].set_title('Min Enclosing Circles')
+      axBound[1].axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: boundingRect()는 축에 평행한 사각형, minAreaRect()는 회전된 최소 면적 사각형을 반환합니다. 객체 방향 분석에는 minAreaRect가 유용합니다.
+
+- id: step6_approx
+  title: 6단계. 컨투어 근사
+  subtitle: approxPolyDP
+  blocks:
+  - type: text
+    content: approxPolyDP()는 Douglas-Peucker 알고리즘으로 컨투어를 단순화합니다. 복잡한 곡선을 더 적은 꼭짓점으로 근사하여, 결과 꼭짓점 수로 도형을 분류할 수 있습니다(3개=삼각형, 4개=사각형, 많으면 원). epsilon 파라미터가 근사 정밀도를 결정하며, 작을수록 원본에 가깝습니다.
+  - type: code
+    language: python
+    title: 컨투어 근사
+    description: epsilon에 따른 근사 정도를 확인합니다
+    content: |-
+      approxed = board.copy()
+      for cnt in contours:
+          epsilon = 0.02 * cv2.arcLength(cnt, True)
+          approx = cv2.approxPolyDP(cnt, epsilon, True)
+          cv2.drawContours(approxed, [approx], 0, (0, 255, 255), 2)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(approxed, cv2.COLOR_BGR2RGB))
+      plt.title('Approximated Contours')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: epsilon은 근사 정밀도입니다. 작을수록 원본에 가깝고, 클수록 단순화됩니다. 둘레의 1-5% 정도를 사용합니다. 반환된 점 개수로 도형을 구분할 수 있습니다(3점=삼각형, 4점=사각형 등).
+  - type: code
+    language: python
+    title: 도형 인식
+    description: 꼭짓점 수로 도형을 분류합니다
+    content: |-
+      identified = board.copy()
+      for cnt in contours:
+          eps = 0.04 * cv2.arcLength(cnt, True)
+          approxShape = cv2.approxPolyDP(cnt, eps, True)
+          vertices = len(approxShape)
+          momId = cv2.moments(cnt)
+          if momId['m00'] != 0:
+              idX = int(momId['m10'] / momId['m00'])
+              idY = int(momId['m01'] / momId['m00'])
+              if vertices == 3:
+                  label = 'Tri'
+              elif vertices == 4:
+                  label = 'Rect'
+              elif vertices == 5:
+                  label = 'Pent'
+              elif vertices > 6:
+                  label = 'Circle'
+              else:
+                  label = str(vertices)
+              cv2.putText(identified, label, (idX - 20, idY), cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(identified, cv2.COLOR_BGR2RGB))
+      plt.title('Shape Identification')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 도형 인식 결과
+    description: 각 도형이 분류되었습니다
+    content: |-
+      plt.figure(figsize=(10, 6))
+      plt.imshow(cv2.cvtColor(identified, cv2.COLOR_BGR2RGB))
+      plt.title('Shape Identification')
+      plt.axis('off')
+      plt.tight_layout()
+
+- id: practice
+  title: 실습
+  subtitle: 컨투어 프로젝트
+  blocks:
+  - type: text
+    content: 실제 이미지에서 컨투어를 검출해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: flower 에지 컨투어"
+    blocks:
+    - type: code
+      title: "이미지 로드 및 에지 검출"
+      content: |-
+        import cv2
+        import numpy as np
+        from sklearn.datasets import load_sample_image
+        import matplotlib.pyplot as plt
+
+        flower = load_sample_image('flower.jpg')
+        flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+        flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
+        flowerEdge = cv2.Canny(flowerGray, 50, 150)
+        plt.imshow(flower)
+        plt.axis('off')
+    - type: code
+      title: "컨투어 검출"
+      content: |-
+        flowerCnts, flowerHier = cv2.findContours(flowerEdge, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        flowerDrawn = flowerBgr.copy()
+        cv2.drawContours(flowerDrawn, flowerCnts, -1, (0, 255, 0), 1)
+        len(flowerCnts)
+    - type: code
+      title: "결과 시각화"
+      content: |-
+        figFlower, axFlower = plt.subplots(1, 2, figsize=(12, 5))
+        axFlower[0].imshow(flower)
+        axFlower[0].set_title('Original')
+        axFlower[0].axis('off')
+        axFlower[1].imshow(cv2.cvtColor(flowerDrawn, cv2.COLOR_BGR2RGB))
+        axFlower[1].set_title(f'Contours: {len(flowerCnts)}')
+        axFlower[1].axis('off')
+        plt.tight_layout()
+  - type: expansion
+    title: "미션2: 면적 필터링"
+    blocks:
+    - type: code
+      title: "테스트 이미지 생성"
+      content: |-
+        import cv2
+        import numpy as np
+        import matplotlib.pyplot as plt
+
+        testBoard = np.zeros((300, 400), dtype=np.uint8)
+        cv2.circle(testBoard, (80, 80), 20, 255, -1)
+        cv2.circle(testBoard, (200, 100), 50, 255, -1)
+        cv2.circle(testBoard, (320, 80), 30, 255, -1)
+        cv2.rectangle(testBoard, (50, 180), (100, 250), 255, -1)
+        cv2.rectangle(testBoard, (150, 150), (280, 280), 255, -1)
+        plt.imshow(testBoard, cmap='gray')
+        plt.axis('off')
+    - type: code
+      title: "면적 필터링"
+      content: |-
+        testCnts, testHier = cv2.findContours(testBoard, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        filtered = np.zeros_like(testBoard)
+        minArea = 2000
+        largeCnts = [c for c in testCnts if cv2.contourArea(c) > minArea]
+        cv2.drawContours(filtered, largeCnts, -1, 255, -1)
+        len(largeCnts)
+    - type: code
+      title: "필터링 결과"
+      content: |-
+        figFilter, axFilter = plt.subplots(1, 2, figsize=(10, 4))
+        axFilter[0].imshow(testBoard, cmap='gray')
+        axFilter[0].set_title(f'Original ({len(testCnts)} contours)')
+        axFilter[0].axis('off')
+        axFilter[1].imshow(filtered, cmap='gray')
+        axFilter[1].set_title(f'Area > {minArea} ({len(largeCnts)} contours)')
+        axFilter[1].axis('off')
+        plt.tight_layout()

@@ -1,0 +1,338 @@
+meta:
+  id: sympy_01
+  title: 기초수식계산
+  order: 1
+  category: sympy
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["sympy", "symbols", "expand", "factor", "simplify"]
+  seo:
+    title: "SymPy 기초 - 기호 정의와 수식 정리"
+    description: "SymPy로 기호를 정의하고 수식을 전개, 인수분해, 간소화합니다. 기호 수학의 첫걸음을 배웁니다."
+    keywords: ["sympy", "symbols", "expand", "factor", "simplify", "기호수학"]
+
+intro:
+  emoji: "✏️"
+  goal: 기호를 정의하고 수식을 만들어 전개, 인수분해, 간소화를 수행합니다.
+  description: "SymPy의 핵심은 기호(symbol)입니다. 일반 계산기는 숫자만 다루지만, SymPy는 x, y 같은 미지수를 그대로 수식으로 다룹니다. 중고등학교에서 손으로 했던 (x+1)² = x²+2x+1 전개, x²-1 = (x+1)(x-1) 인수분해를 SymPy가 정확하게 수행합니다. 복잡한 분수식 약분, 동류항 정리까지 한 줄의 코드로 해결됩니다. 이 프로젝트를 완료하면 어떤 다항식이든 전개하고 인수분해하며, 복잡한 수식을 간결하게 정리할 수 있게 됩니다."
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "SymPy는 파이썬의 기호 수학 라이브러리입니다. symbols로 변수를 정의하고, expand, factor, simplify로 수식을 조작합니다. sqrt와 Rational은 제곱근과 분수를 정확하게 표현합니다. init_printing()을 호출하면 수식이 수학 교과서처럼 예쁘게 출력됩니다. 웹 환경에서는 LaTeX 렌더링으로 x² 같은 표현이 그대로 보입니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sympy를 불러옵니다
+    content: |-
+      from sympy import symbols, expand, factor, simplify, collect, sqrt, Rational
+      from sympy import init_printing
+      init_printing()
+
+- id: step2_symbol
+  title: 2단계. 기호 정의
+  subtitle: symbols()
+  blocks:
+  - type: text
+    content: "symbols() 함수로 수학에서 사용하는 미지수를 만듭니다. x = symbols('x')를 실행하면 x는 더 이상 파이썬 변수가 아니라 수학 기호가 됩니다. 이 기호는 값이 정해지지 않은 상태로 수식에 참여합니다. 방정식의 미지수, 함수의 변수 등 모든 수학적 계산의 출발점입니다. y, z처럼 여러 기호가 필요하면 한 번에 정의할 수 있어 편리합니다."
+  - type: code
+    language: python
+    title: 단일 기호 정의
+    description: x 기호를 정의합니다
+    content: |-
+      x = symbols('x')
+      x
+  - type: code
+    language: python
+    title: 여러 기호 정의
+    description: 여러 기호를 한 번에 정의합니다
+    content: |-
+      y, z = symbols('y z')
+      y, z
+  - type: tip
+    content: symbols('x y z')처럼 공백으로 구분하면 여러 기호를 한 번에 만들 수 있습니다. 반환값을 같은 수의 변수에 할당합니다.
+
+- id: step3_expr
+  title: 3단계. 수식 생성
+  subtitle: 기본 연산
+  blocks:
+  - type: text
+    content: "정의한 기호로 수식(expression)을 만듭니다. 파이썬의 +, -, *, / 연산자를 그대로 사용하고, 거듭제곱은 **를 씁니다. x**2 + 2*x + 1처럼 작성하면 SymPy가 자동으로 수학 수식 객체를 생성합니다. 이 수식은 단순한 문자열이 아니라, 전개, 인수분해, 미분 등 다양한 수학 연산이 가능한 객체입니다. 여러 변수를 섞어 다변수 다항식도 만들 수 있습니다."
+  - type: code
+    language: python
+    title: 다항식 생성
+    description: 2차 다항식을 만듭니다
+    content: |-
+      expr = x**2 + 2*x + 1
+      expr
+  - type: code
+    language: python
+    title: 복잡한 수식
+    description: 여러 변수를 포함한 수식을 만듭니다
+    content: |-
+      poly = x**3 + y**2 - 2*x*y + z
+      poly
+  - type: tip
+    content: SymPy 수식에서 곱셈은 *를 명시해야 합니다. 2x가 아니라 2*x로 씁니다. 거듭제곱 x²는 x**2로 표현합니다.
+
+- id: step4_expand
+  title: 4단계. 수식 전개
+  subtitle: expand()
+  blocks:
+  - type: text
+    content: "expand()는 괄호를 풀어 전개하는 함수입니다. 중학교에서 배운 곱셈 공식 (a+b)² = a²+2ab+b²를 자동으로 적용합니다. 손으로 계산하면 실수하기 쉬운 (x+y)³ 같은 복잡한 전개도 정확하게 처리합니다. 물리학에서 테일러 급수 전개 후 정리할 때, 공학에서 제어 시스템 전달함수를 분석할 때 등 실무에서도 자주 사용됩니다. 복잡한 곱셈을 풀어헤쳐 각 항을 명확하게 보고 싶을 때 expand()를 사용합니다."
+  - type: code
+    language: python
+    title: 제곱 전개
+    description: 완전제곱식을 전개합니다
+    content: |-
+      squared = (x + 1)**2
+      expanded = expand(squared)
+      expanded
+  - type: code
+    language: python
+    title: 곱셈 전개
+    description: 두 다항식의 곱을 전개합니다
+    content: |-
+      product = (x + 2)*(x - 3)
+      mult = expand(product)
+      mult
+  - type: code
+    language: python
+    title: 세제곱 전개
+    description: 세제곱을 전개합니다
+    content: |-
+      cubed = (x + y)**3
+      cube = expand(cubed)
+      cube
+  - type: tip
+    content: expand()는 분배법칙을 적용하여 모든 괄호를 풉니다. 복잡한 곱셈도 한 번에 전개할 수 있습니다.
+
+- id: step5_factor
+  title: 5단계. 인수분해
+  subtitle: factor()
+  blocks:
+  - type: text
+    content: "factor()는 expand()의 역연산으로, 다항식을 인수들의 곱으로 분해합니다. x²-1을 (x+1)(x-1)로, x²+5x+6을 (x+2)(x+3)으로 만듭니다. 인수분해는 방정식을 풀 때 핵심 기법입니다. x²-1=0을 (x+1)(x-1)=0으로 바꾸면 x=-1 또는 x=1이라는 해를 쉽게 찾을 수 있습니다. 복잡한 분수식을 약분하거나, 다항식의 근을 찾거나, 수식을 간결하게 표현할 때 factor()를 사용합니다."
+  - type: code
+    language: python
+    title: 차의 제곱 인수분해
+    description: 완전제곱식을 인수분해합니다
+    content: |-
+      diff2 = x**2 - 1
+      factored = factor(diff2)
+      factored
+  - type: code
+    language: python
+    title: 2차식 인수분해
+    description: ax²+bx+c 형태를 인수분해합니다
+    content: |-
+      quadratic = x**2 + 5*x + 6
+      quad = factor(quadratic)
+      quad
+  - type: code
+    language: python
+    title: 합과 차 공식
+    description: 세제곱 공식을 인수분해합니다
+    content: |-
+      sum3 = x**3 + y**3
+      fsum = factor(sum3)
+      fsum
+  - type: tip
+    content: factor()는 정수 계수 범위에서 인수분해합니다. 인수분해가 불가능하면 원래 수식을 그대로 반환합니다.
+
+- id: step6_simplify
+  title: 6단계. 수식 간소화
+  subtitle: simplify()
+  blocks:
+  - type: text
+    content: "simplify()는 수식을 가장 간단한 형태로 자동 정리합니다. 분수 (x²-1)/(x-1)을 x+1로 약분하고, 동류항을 합치고, 삼각함수 항등식 sin²x+cos²x=1을 적용합니다. expand()나 factor()와 달리 특정 방향으로 변환하는 것이 아니라, 가장 짧고 깔끔한 표현을 자동으로 찾아줍니다. 복잡한 계산 결과를 정리할 때, 답안을 검증할 때, 수식을 읽기 쉽게 만들 때 유용합니다."
+  - type: code
+    language: python
+    title: 분수식 간소화
+    description: 분수를 약분합니다
+    content: |-
+      frac = (x**2 - 1)/(x - 1)
+      simplified = simplify(frac)
+      simplified
+  - type: code
+    language: python
+    title: 복잡한 수식 정리
+    description: 여러 단계로 복잡한 수식을 정리합니다
+    content: |-
+      messy = (x**3 + x**2 - x - 1)/(x**2 - 1)
+      clean = simplify(messy)
+      clean
+  - type: tip
+    content: simplify()는 다양한 기법을 시도하여 가장 짧은 표현을 찾습니다. 때로는 expand()나 factor()가 더 적절할 수 있습니다.
+
+- id: step7_collect
+  title: 7단계. 변수로 정리
+  subtitle: collect()
+  blocks:
+  - type: text
+    content: "collect()는 특정 변수를 기준으로 수식을 정리합니다. x*y + x² + 2*x + y*x² 같은 복잡한 다변수 수식을 x로 정리하면 x²(1+y) + x(2+y)처럼 x의 거듭제곱별로 계수가 묶입니다. 물리학에서 여러 매개변수가 섞인 수식을 특정 변수 관점으로 정리할 때, 미분방정식의 계수를 파악할 때 자주 사용합니다. expand()로 펼친 수식을 다시 특정 구조로 재정리하고 싶을 때 collect()가 유용합니다."
+  - type: code
+    language: python
+    title: x로 정리
+    description: x의 거듭제곱으로 정리합니다
+    content: |-
+      mixed = x*y + x**2 + 2*x + y*x**2
+      byX = collect(mixed, x)
+      byX
+  - type: code
+    language: python
+    title: y로 정리
+    description: y의 거듭제곱으로 정리합니다
+    content: |-
+      byY = collect(mixed, y)
+      byY
+  - type: tip
+    content: collect(expr, x)는 x의 거듭제곱별로 계수를 묶습니다. 여러 변수가 있을 때 특정 변수 기준으로 정리하고 싶을 때 사용합니다.
+
+- id: step8_rational
+  title: 8단계. 정확한 분수
+  subtitle: Rational()
+  blocks:
+  - type: text
+    content: "Rational()은 분수를 정확하게 표현합니다. 파이썬에서 1/3을 계산하면 0.3333333...으로 근사되어 오차가 발생합니다. 하지만 Rational(1, 3)은 정확히 1/3 그 자체를 유지합니다. Rational(1,3) + Rational(1,6) = Rational(1,2)처럼 분수 연산도 정확합니다. 과학 계산에서 반올림 오차가 누적되면 결과가 틀어질 수 있는데, Rational을 사용하면 최종 결과까지 정확한 값을 유지할 수 있습니다."
+  - type: code
+    language: python
+    title: 분수 생성
+    description: 정확한 분수를 만듭니다
+    content: |-
+      half = Rational(1, 2)
+      third = Rational(1, 3)
+      half, third
+  - type: code
+    language: python
+    title: 분수 연산
+    description: 분수로 수식을 만듭니다
+    content: |-
+      frac2 = Rational(1, 2)*x**2 + Rational(2, 3)*x
+      frac2
+  - type: tip
+    content: 파이썬의 1/3은 0.333...으로 근사됩니다. Rational(1, 3)은 정확한 1/3을 유지합니다. 기호 수학에서는 정확한 값이 중요합니다.
+
+- id: step9_sqrt
+  title: 9단계. 제곱근
+  subtitle: sqrt()
+  blocks:
+  - type: text
+    content: "sqrt()는 제곱근을 기호로 표현합니다. 파이썬의 math.sqrt(2)는 1.4142135...로 근사하지만, SymPy의 sqrt(2)는 √2 그 자체를 유지합니다. sqrt(2) * sqrt(8) = sqrt(16) = 4처럼 제곱근끼리의 연산도 정확하게 처리합니다. 기하학에서 정확한 대각선 길이, 물리학에서 무리수가 포함된 공식을 다룰 때 근사 없이 정확한 값을 유지할 수 있습니다. simplify()와 함께 사용하면 복잡한 제곱근 수식도 깔끔하게 정리됩니다."
+  - type: code
+    language: python
+    title: 제곱근 생성
+    description: 루트 2를 만듭니다
+    content: |-
+      root2 = sqrt(2)
+      root2
+  - type: code
+    language: python
+    title: 제곱근 연산
+    description: 제곱근끼리 연산합니다
+    content: |-
+      rprod = sqrt(2) * sqrt(8)
+      simp2 = simplify(rprod)
+      simp2
+  - type: code
+    language: python
+    title: 제곱근 수식
+    description: 제곱근이 포함된 수식을 정리합니다
+    content: |-
+      rexpr = (sqrt(x) + 1)**2
+      eroot = expand(rexpr)
+      eroot
+
+- id: step10_combine
+  title: 10단계. 종합 예제
+  subtitle: 함께 사용하기
+  blocks:
+  - type: text
+    content: "지금까지 배운 expand(), factor(), simplify(), collect()를 조합하면 어떤 복잡한 수식도 원하는 형태로 변환할 수 있습니다. 실제 수학 문제에서는 전개 후 정리, 인수분해 후 약분 등 여러 단계를 거칩니다. (a+b)²(a-b)를 전개하고, 그 결과를 다시 인수분해하면 원래 형태로 돌아오는지 확인할 수 있습니다. 이렇게 역변환으로 검증하는 습관은 수학 계산의 정확성을 보장합니다."
+  - type: code
+    language: python
+    title: 복잡한 전개 후 정리
+    description: 전개 후 특정 변수로 정리합니다
+    content: |-
+      a, b = symbols('a b')
+      comb = (a + b)**2 * (a - b)
+      step1 = expand(comb)
+      step1
+  - type: code
+    language: python
+    title: 인수분해로 검증
+    description: 전개한 결과를 다시 인수분해합니다
+    content: |-
+      step2 = factor(step1)
+      step2
+  - type: code
+    language: python
+    title: 분수식 종합
+    description: 분수식을 간소화합니다
+    content: |-
+      fcomp = (x**3 - x)/(x**2 + x)
+      final = simplify(fcomp)
+      final
+
+- id: practice
+  title: 실습
+  subtitle: 수식 조작 연습
+  blocks:
+  - type: text
+    content: "지금까지 배운 symbols, expand, factor, simplify, collect를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 곱셈 공식의 전개와 인수분해를 연습합니다. (p+q)⁴ 같은 고차 전개도 SymPy면 한 줄입니다. 미션2는 분수식의 간소화를 다룹니다. 분자분모를 인수분해하고 약분하는 과정을 SymPy가 자동으로 처리합니다. 각 미션은 독립적으로 실행 가능하므로 원하는 것부터 시작하세요."
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 곱셈 공식 전개와 인수분해"
+    blocks:
+    - type: code
+      title: "4제곱 전개"
+      content: |-
+        from sympy import symbols, expand, factor
+
+        p, q = symbols('p q')
+
+        formula = (p + q)**4
+        spread = expand(formula)
+        spread
+    - type: code
+      title: "인수분해 검증"
+      content: |-
+        back = factor(spread)
+        back
+    - type: code
+      title: "차와 합 공식"
+      content: |-
+        product = (p**2 - q**2)*(p**2 + q**2)
+        opened = expand(product)
+        closed = factor(opened)
+        opened, closed
+  - type: expansion
+    title: "미션2: 분수식 간소화"
+    blocks:
+    - type: code
+      title: "세제곱 분수"
+      content: |-
+        from sympy import symbols, simplify, factor, Rational
+
+        m, n = symbols('m n')
+
+        ratio = (m**3 - 8)/(m - 2)
+        reduced = simplify(ratio)
+        reduced
+    - type: code
+      title: "두 변수 분수"
+      content: |-
+        ratio2 = (m**2 - n**2)/(m**2 + 2*m*n + n**2)
+        reduced2 = simplify(ratio2)
+        reduced2
+    - type: code
+      title: "분수 계수 정리"
+      content: |-
+        combo = Rational(1, 2)*(m + n)**2 - Rational(1, 2)*(m - n)**2
+        result = simplify(combo)
+        result

@@ -1,0 +1,702 @@
+meta:
+  id: "15"
+  title: "typing 고급"
+  day: 15
+  category: "advancedPython"
+  tags: ["Literal", "Final", "TypedDict", "Annotated", "NewType"]
+  seo:
+    title: "파이썬 typing 고급 - Literal, Final, TypedDict, Annotated"
+    description: "고급 타이핑을 마스터합니다. Literal, Final, TypedDict, Annotated, NewType, TypeGuard 완벽 이해."
+    keywords: ["Literal", "Final", "TypedDict", "Annotated", "NewType"]
+
+intro:
+  emoji: "🔒"
+  points:
+  - "Literal로 특정 값만 허용"
+  - "Final로 상수 표시"
+  - "TypedDict로 딕셔너리 타입"
+  - "Annotated로 메타데이터 추가"
+
+sections:
+- id: "literal"
+  title: "Literal"
+  subtitle: "특정 값만 허용"
+  blocks:
+  - type: "text"
+    content: "Literal은 특정 리터럴 값만 허용하는 타입입니다. 문자열, 정수, 불리언, None 등의 리터럴을 지정할 수 있습니다. 함수 인자나 반환 타입을 특정 값으로 제한합니다. @overload와 함께 사용하면 값에 따른 반환 타입을 정확히 표현할 수 있습니다. 타입 체커가 허용되지 않은 값을 감지합니다. 설정 옵션, 모드 선택 등에 유용합니다."
+  - type: "list"
+    items:
+    - "Literal['a', 'b']: 'a' 또는 'b'만"
+    - "문자열, 정수, bool, None 지원"
+    - "허용되지 않은 값은 타입 에러"
+    - "@overload와 함께 정밀한 타입"
+  - type: "code"
+    language: "python"
+    title: "Literal 기본"
+    description: "특정 문자열만 허용합니다."
+    content: |-
+      from typing import Literal
+
+      def setMode(mode: Literal['read', 'write', 'append']) -> str:
+          return f"Mode set to {mode}"
+
+      setMode('read'), setMode('write')
+  - type: "code"
+    language: "python"
+    title: "Literal과 overload"
+    description: "값에 따라 반환 타입이 다릅니다."
+    content: |-
+      from typing import Literal, overload, List
+
+      @overload
+      def fetch(many: Literal[False]) -> dict: ...
+      @overload
+      def fetch(many: Literal[True]) -> List[dict]: ...
+
+      def fetch(many: bool = False):
+          if many:
+              return [{"id": 1}, {"id": 2}]
+          return {"id": 1}
+
+      fetch(False), fetch(True)
+  - type: "code"
+    language: "python"
+    title: "숫자 Literal"
+    description: "특정 정수만 허용합니다."
+    content: |-
+      from typing import Literal
+
+      def setVerbosity(level: Literal[0, 1, 2, 3]) -> str:
+          return f"Verbosity: {level}"
+
+      setVerbosity(0), setVerbosity(2)
+  - type: "tip"
+    content: "Literal[True]와 Literal[False]를 사용하면 불리언 값에 따른 조건부 타입을 표현할 수 있습니다."
+
+- id: "final"
+  title: "Final"
+  subtitle: "상수 표시"
+  blocks:
+  - type: "text"
+    content: "Final은 변수나 속성이 재할당되어서는 안 된다는 것을 표시합니다. 타입 체커가 재할당 시도를 감지합니다. 클래스 속성에 사용하면 오버라이드도 금지합니다. @final 데코레이터는 메서드나 클래스의 상속/오버라이드를 금지합니다. 상수를 명시적으로 표시하여 의도를 전달합니다. 런타임에는 아무 효과가 없습니다."
+  - type: "list"
+    items:
+    - "Final[T]: 재할당 금지"
+    - "@final: 상속/오버라이드 금지"
+    - "타입 체커가 위반 감지"
+    - "런타임에는 영향 없음"
+  - type: "code"
+    language: "python"
+    title: "Final 변수"
+    description: "상수를 선언합니다."
+    content: |-
+      from typing import Final
+
+      MAX_SIZE: Final[int] = 100
+      API_URL: Final = "https://api.example.com"
+
+      MAX_SIZE, API_URL
+  - type: "code"
+    language: "python"
+    title: "클래스에서 Final"
+    description: "클래스 상수와 인스턴스 상수입니다."
+    content: |-
+      from typing import Final
+
+      class Config:
+          VERSION: Final[str] = "1.0.0"
+
+          def __init__(self, name: str):
+              self.name: Final = name
+
+      Config.VERSION
+  - type: "code"
+    language: "python"
+    title: "@final 데코레이터"
+    description: "상속이나 오버라이드를 금지합니다."
+    content: |-
+      from typing import final
+
+      class Base:
+          @final
+          def criticalMethod(self) -> str:
+              return "Cannot override"
+
+      @final
+      class FinalClass:
+          pass
+
+      Base().criticalMethod()
+  - type: "tip"
+    content: "Final은 문서화 역할도 하여 코드를 읽는 사람에게 의도를 전달합니다."
+
+- id: "typeddict"
+  title: "TypedDict"
+  subtitle: "타입 있는 딕셔너리"
+  blocks:
+  - type: "text"
+    content: "TypedDict는 키 이름과 값 타입을 지정한 딕셔너리 타입입니다. API 응답, 설정 파일 등 구조화된 딕셔너리에 유용합니다. 필수 키와 선택적 키를 구분할 수 있습니다. total=False로 모든 키를 선택적으로 만들 수 있습니다. NotRequired와 Required로 개별 키의 필수 여부를 지정합니다. 런타임에는 일반 dict로 동작합니다."
+  - type: "list"
+    items:
+    - "TypedDict: 키별 타입 지정"
+    - "total=False: 모든 키 선택적"
+    - "NotRequired, Required: 개별 지정"
+    - "런타임에는 일반 dict"
+  - type: "code"
+    language: "python"
+    title: "TypedDict 기본"
+    description: "키별 타입을 지정합니다."
+    content: |-
+      from typing import TypedDict
+
+      class User(TypedDict):
+          id: int
+          name: str
+          email: str
+
+      user: User = {"id": 1, "name": "Alice", "email": "alice@example.com"}
+      user
+  - type: "code"
+    language: "python"
+    title: "선택적 키"
+    description: "NotRequired로 선택적 키를 지정합니다."
+    content: |-
+      from typing import TypedDict, NotRequired
+
+      class Config(TypedDict):
+          host: str
+          port: int
+          debug: NotRequired[bool]
+          timeout: NotRequired[int]
+
+      config: Config = {"host": "localhost", "port": 8080}
+      config
+  - type: "code"
+    language: "python"
+    title: "total=False"
+    description: "모든 키를 선택적으로 만듭니다."
+    content: |-
+      from typing import TypedDict, Required
+
+      class PartialUser(TypedDict, total=False):
+          id: Required[int]
+          name: str
+          email: str
+
+      user: PartialUser = {"id": 1}
+      user
+  - type: "tip"
+    content: "TypedDict는 상속도 지원합니다. class Admin(User): role: str"
+
+- id: "annotated"
+  title: "Annotated"
+  subtitle: "메타데이터 추가"
+  blocks:
+  - type: "text"
+    content: "Annotated는 타입에 추가 메타데이터를 첨부합니다. Annotated[T, metadata1, metadata2, ...]로 사용합니다. 타입 체커는 첫 번째 인자(T)만 사용하고 나머지는 무시합니다. 메타데이터는 런타임에 접근할 수 있습니다. 검증 라이브러리(Pydantic 등)에서 제약 조건을 표현하는 데 사용됩니다. 문서화, 직렬화 힌트 등 다양한 용도로 활용됩니다."
+  - type: "list"
+    items:
+    - "Annotated[T, metadata, ...]"
+    - "타입 체커는 T만 사용"
+    - "메타데이터는 런타임 접근 가능"
+    - "검증, 문서화 등에 활용"
+  - type: "code"
+    language: "python"
+    title: "Annotated 기본"
+    description: "타입에 메타데이터를 추가합니다."
+    content: |-
+      from typing import Annotated
+
+      PositiveInt = Annotated[int, "must be positive"]
+      EmailStr = Annotated[str, "valid email format"]
+
+      def createUser(age: PositiveInt, email: EmailStr) -> dict:
+          return {"age": age, "email": email}
+
+      createUser(25, "user@example.com")
+  - type: "code"
+    language: "python"
+    title: "제약 조건 클래스"
+    description: "제약 조건을 클래스로 표현합니다."
+    content: |-
+      from typing import Annotated
+      from dataclasses import dataclass
+
+      @dataclass
+      class Range:
+          min: int
+          max: int
+
+      @dataclass
+      class MaxLength:
+          length: int
+
+      Score = Annotated[int, Range(0, 100)]
+      Username = Annotated[str, MaxLength(20)]
+
+      def validate(score: Score, name: Username) -> bool:
+          return True
+
+      validate(85, "alice")
+  - type: "code"
+    language: "python"
+    title: "런타임 접근"
+    description: "메타데이터를 런타임에 읽습니다."
+    content: |-
+      from typing import Annotated, get_type_hints, get_args, get_origin
+
+      def getAnnotations(func):
+          hints = get_type_hints(func, include_extras=True)
+          result = {}
+          for name, hint in hints.items():
+              if get_origin(hint) is Annotated:
+                  args = get_args(hint)
+                  result[name] = {"type": args[0], "metadata": args[1:]}
+          return result
+
+      def example(x: Annotated[int, "positive"]) -> None:
+          pass
+
+      getAnnotations(example)
+  - type: "tip"
+    content: "Pydantic v2는 Annotated를 적극 활용하여 Field 정보를 표현합니다."
+
+- id: "newtype"
+  title: "NewType"
+  subtitle: "타입 별칭 강화"
+  blocks:
+  - type: "text"
+    content: "NewType은 기존 타입의 구별되는 새 타입을 만듭니다. 타입 별칭(TypeAlias)과 달리 타입 체커가 다른 타입으로 취급합니다. UserId = NewType('UserId', int)로 정의하면 int와 호환되지만 구별됩니다. 실수로 잘못된 값을 전달하는 것을 방지합니다. 런타임에는 아무 변환도 하지 않습니다(제로 오버헤드)."
+  - type: "list"
+    items:
+    - "NewType(name, base): 새 타입 생성"
+    - "기본 타입과 구별됨"
+    - "잘못된 값 전달 방지"
+    - "런타임 오버헤드 없음"
+  - type: "code"
+    language: "python"
+    title: "NewType 기본"
+    description: "구별되는 새 타입을 만듭니다."
+    content: |-
+      from typing import NewType
+
+      UserId = NewType('UserId', int)
+      OrderId = NewType('OrderId', int)
+
+      def getUser(userId: UserId) -> dict:
+          return {"id": userId}
+
+      userId = UserId(123)
+      getUser(userId)
+  - type: "code"
+    language: "python"
+    title: "타입 구별"
+    description: "같은 기본 타입이지만 구별됩니다."
+    content: |-
+      from typing import NewType
+
+      Meters = NewType('Meters', float)
+      Feet = NewType('Feet', float)
+
+      def toFeet(distance: Meters) -> Feet:
+          return Feet(distance * 3.28084)
+
+      distance = Meters(100.0)
+      toFeet(distance)
+  - type: "code"
+    language: "python"
+    title: "NewType vs TypeAlias"
+    description: "NewType과 TypeAlias의 차이입니다."
+    content: |-
+      from typing import NewType, TypeAlias
+
+      UserIdAlias: TypeAlias = int
+      UserIdNew = NewType('UserIdNew', int)
+
+      def aliasFunc(x: UserIdAlias) -> None:
+          pass
+
+      def newFunc(x: UserIdNew) -> None:
+          pass
+
+      aliasFunc(123)
+      newFunc(UserIdNew(123))
+  - type: "tip"
+    content: "NewType은 상속할 수 없습니다. 더 복잡한 경우 클래스를 사용하세요."
+
+- id: "type_guards"
+  title: "타입 가드"
+  subtitle: "TypeGuard와 타입 좁히기"
+  blocks:
+  - type: "text"
+    content: "TypeGuard는 타입 좁히기(type narrowing) 함수를 정의합니다. 함수가 True를 반환하면 인자가 특정 타입임을 보장합니다. isinstance보다 복잡한 조건을 표현할 수 있습니다. 타입 체커가 이후 코드에서 좁혀진 타입을 사용합니다. Python 3.10+에서는 TypeIs도 도입되었습니다. 커스텀 타입 검사 함수에 유용합니다."
+  - type: "list"
+    items:
+    - "TypeGuard[T]: 타입 좁히기 함수"
+    - "True 반환 시 인자가 T 타입"
+    - "복잡한 조건 표현 가능"
+    - "isinstance 대안"
+  - type: "code"
+    language: "python"
+    title: "TypeGuard 기본"
+    description: "커스텀 타입 가드를 정의합니다."
+    content: |-
+      from typing import TypeGuard, List, Union
+
+      def isStringList(val: List[Union[str, int]]) -> TypeGuard[List[str]]:
+          return all(isinstance(x, str) for x in val)
+
+      def process(items: List[Union[str, int]]) -> str:
+          if isStringList(items):
+              return ",".join(items)
+          return "mixed"
+
+      process(["a", "b"]), process([1, 2])
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 타입 가드"
+    description: "특정 키가 있는지 검사합니다."
+    content: |-
+      from typing import TypeGuard, TypedDict, Any
+
+      class User(TypedDict):
+          id: int
+          name: str
+
+      def isUser(data: dict[str, Any]) -> TypeGuard[User]:
+          return (
+              isinstance(data.get("id"), int) and
+              isinstance(data.get("name"), str)
+          )
+
+      data = {"id": 1, "name": "Alice"}
+      if isUser(data):
+          data["name"]
+      else:
+          "invalid"
+  - type: "code"
+    language: "python"
+    title: "None 체크"
+    description: "None이 아님을 보장합니다."
+    content: |-
+      from typing import TypeGuard, Optional
+
+      def isNotNone(val: Optional[str]) -> TypeGuard[str]:
+          return val is not None
+
+      def process(value: Optional[str]) -> str:
+          if isNotNone(value):
+              return value.upper()
+          return "empty"
+
+      process("hello"), process(None)
+  - type: "tip"
+    content: "Python 3.13+에서는 TypeIs가 더 정확한 타입 좁히기를 제공합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "typing 고급 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 15에서 배운 고급 typing을 난이도별로 복습합니다. Literal로 특정 값만 허용하고, Final로 상수를 표시하며, TypedDict로 딕셔너리 구조를, Annotated로 메타데이터를 표현합니다. NewType은 같은 기본 타입이지만 의미가 다른 값을 구별하고, TypeGuard는 타입 좁히기 함수를 정의합니다. 🟢 기본 문제로 각 타입의 기본 사용법을 익히고, 🟡 응용 문제로 복합 타입과 overload 조합을 연습하세요. 🔴 심화 문제에서는 Unpack, 재귀 타입, Self 등 최신 타입 시스템을 다룹니다. 정밀한 타입 정의는 타입 체커의 도움을 극대화하고 런타임 버그를 사전에 방지합니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: Literal"
+    code: |-
+      from typing import Literal
+
+      def getColor(name: Literal['red', 'green', 'blue']) -> str:
+          return f"Color: {name}"
+
+      getColor('red')
+
+  - type: "expansion"
+    title: "🟢 기본2: Final"
+    code: |-
+      from typing import Final
+
+      PI: Final = 3.14159
+      MAX_RETRIES: Final[int] = 3
+
+      PI, MAX_RETRIES
+
+  - type: "expansion"
+    title: "🟢 기본3: TypedDict"
+    code: |-
+      from typing import TypedDict
+
+      class Point(TypedDict):
+          x: int
+          y: int
+
+      p: Point = {"x": 10, "y": 20}
+      p
+
+  - type: "expansion"
+    title: "🟢 기본4: Annotated"
+    code: |-
+      from typing import Annotated
+
+      Age = Annotated[int, "0-150"]
+
+      def setAge(age: Age) -> str:
+          return f"Age: {age}"
+
+      setAge(25)
+
+  - type: "expansion"
+    title: "🟢 기본5: NewType"
+    code: |-
+      from typing import NewType
+
+      UserId = NewType('UserId', int)
+
+      def getUser(uid: UserId) -> dict:
+          return {"id": uid}
+
+      getUser(UserId(1))
+
+  - type: "expansion"
+    title: "🟡 응용1: Literal Union"
+    code: |-
+      from typing import Literal, Union
+
+      HTTPMethod = Literal['GET', 'POST', 'PUT', 'DELETE']
+
+      def request(method: HTTPMethod, url: str) -> str:
+          return f"{method} {url}"
+
+      request('GET', '/api/users')
+
+  - type: "expansion"
+    title: "🟡 응용2: TypedDict 상속"
+    code: |-
+      from typing import TypedDict
+
+      class BaseUser(TypedDict):
+          id: int
+          name: str
+
+      class AdminUser(BaseUser):
+          role: str
+          permissions: list
+
+      admin: AdminUser = {"id": 1, "name": "Admin", "role": "admin", "permissions": ["all"]}
+      admin
+
+  - type: "expansion"
+    title: "🟡 응용3: Annotated 제약"
+    code: |-
+      from typing import Annotated
+      from dataclasses import dataclass
+
+      @dataclass
+      class Gt:
+          value: int
+
+      @dataclass
+      class Lt:
+          value: int
+
+      PositiveInt = Annotated[int, Gt(0)]
+      Percentage = Annotated[float, Gt(0), Lt(100)]
+
+      def calculate(score: Percentage) -> str:
+          return f"Score: {score}%"
+
+      calculate(85.5)
+
+  - type: "expansion"
+    title: "🟡 응용4: TypeGuard"
+    code: |-
+      from typing import TypeGuard, Any
+
+      def isIntList(val: Any) -> TypeGuard[list[int]]:
+          return isinstance(val, list) and all(isinstance(x, int) for x in val)
+
+      data: Any = [1, 2, 3]
+      if isIntList(data):
+          sum(data)
+
+  - type: "expansion"
+    title: "🟡 응용5: 복합 타입"
+    code: |-
+      from typing import TypedDict, Literal, NotRequired
+
+      class APIResponse(TypedDict):
+          status: Literal['success', 'error']
+          data: NotRequired[dict]
+          error: NotRequired[str]
+
+      success: APIResponse = {"status": "success", "data": {"id": 1}}
+      error: APIResponse = {"status": "error", "error": "Not found"}
+      success, error
+
+  - type: "expansion"
+    title: "🔴 심화1: Required/NotRequired"
+    code: |-
+      from typing import TypedDict, Required, NotRequired
+
+      class UserCreate(TypedDict, total=False):
+          username: Required[str]
+          password: Required[str]
+          email: NotRequired[str]
+          age: NotRequired[int]
+
+      user: UserCreate = {"username": "alice", "password": "secret"}
+      user
+
+  - type: "expansion"
+    title: "🔴 심화2: Literal overload"
+    code: |-
+      from typing import Literal, overload
+
+      @overload
+      def process(mode: Literal['text']) -> str: ...
+      @overload
+      def process(mode: Literal['binary']) -> bytes: ...
+
+      def process(mode: str):
+          if mode == 'text':
+              return "text data"
+          return b"binary data"
+
+      process('text'), process('binary')
+
+  - type: "expansion"
+    title: "🔴 심화3: 중첩 TypedDict"
+    code: |-
+      from typing import TypedDict, List
+
+      class Address(TypedDict):
+          street: str
+          city: str
+
+      class Company(TypedDict):
+          name: str
+          address: Address
+          employees: List[str]
+
+      company: Company = {
+          "name": "TechCorp",
+          "address": {"street": "123 Main", "city": "Seoul"},
+          "employees": ["Alice", "Bob"]
+      }
+      company
+
+  - type: "expansion"
+    title: "🔴 심화4: Annotated 검증"
+    code: |-
+      from typing import Annotated, get_type_hints, get_origin, get_args
+
+      class Positive:
+          pass
+
+      class Max:
+          def __init__(self, value: int):
+              self.value = value
+
+      Score = Annotated[int, Positive(), Max(100)]
+
+      def validate(func, **kwargs):
+          hints = get_type_hints(func, include_extras=True)
+          for name, value in kwargs.items():
+              hint = hints.get(name)
+              if get_origin(hint) is Annotated:
+                  for meta in get_args(hint)[1:]:
+                      if isinstance(meta, Max) and value > meta.value:
+                          return False
+          return True
+
+      def setScore(score: Score) -> int:
+          return score
+
+      validate(setScore, score=85), validate(setScore, score=150)
+
+  - type: "expansion"
+    title: "🔴 심화5: Self 타입"
+    code: |-
+      from typing import Self
+
+      class Builder:
+          def __init__(self):
+              self.value = 0
+
+          def add(self, n: int) -> Self:
+              self.value += n
+              return self
+
+          def multiply(self, n: int) -> Self:
+              self.value *= n
+              return self
+
+      Builder().add(5).multiply(2).value
+
+  - type: "expansion"
+    title: "🔴 심화6: LiteralString"
+    code: |-
+      from typing import LiteralString
+
+      def executeSQL(query: LiteralString) -> str:
+          return f"Executing: {query}"
+
+      executeSQL("SELECT * FROM users")
+
+  - type: "expansion"
+    title: "🔴 심화7: TypedDict 함수형"
+    code: |-
+      from typing import TypedDict
+
+      Point = TypedDict('Point', {'x': int, 'y': int})
+      Point3D = TypedDict('Point3D', {'x': int, 'y': int, 'z': int})
+
+      p2: Point = {'x': 1, 'y': 2}
+      p3: Point3D = {'x': 1, 'y': 2, 'z': 3}
+      p2, p3
+
+  - type: "expansion"
+    title: "🔴 심화8: Unpack과 TypedDict"
+    code: |-
+      from typing import TypedDict, Unpack
+
+      class Options(TypedDict, total=False):
+          timeout: int
+          retries: int
+          debug: bool
+
+      def request(url: str, **kwargs: Unpack[Options]) -> dict:
+          return {"url": url, **kwargs}
+
+      request("/api", timeout=30, debug=True)
+
+  - type: "expansion"
+    title: "🔴 심화9: 재귀 타입"
+    code: |-
+      from typing import TypeAlias, Union, Dict, List
+
+      JSON: TypeAlias = Union[
+          str, int, float, bool, None,
+          List['JSON'],
+          Dict[str, 'JSON']
+      ]
+
+      data: JSON = {
+          "name": "Alice",
+          "age": 30,
+          "tags": ["admin", "user"],
+          "meta": {"active": True}
+      }
+      data
+
+  - type: "expansion"
+    title: "🔴 심화10: Never"
+    code: |-
+      from typing import Never, NoReturn
+
+      def fail(message: str) -> Never:
+          raise RuntimeError(message)
+
+      def assertNever(value: Never) -> Never:
+          raise AssertionError(f"Unhandled: {value}")
+
+      "never returns"

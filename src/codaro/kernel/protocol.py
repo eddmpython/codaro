@@ -12,6 +12,20 @@ class VariableInfo(BaseModel):
     size: int | None = None
 
 
+class VariableDelta(BaseModel):
+    added: list[VariableInfo] = Field(default_factory=list)
+    updated: list[VariableInfo] = Field(default_factory=list)
+    removed: list[str] = Field(default_factory=list)
+
+
+class ExecutionEvent(BaseModel):
+    sequence: int
+    eventType: str
+    blockId: str | None = None
+    executionCount: int = 0
+    payload: Any = None
+
+
 class ExecutionOutput(BaseModel):
     type: str
     blockId: str | None = None
@@ -19,6 +33,8 @@ class ExecutionOutput(BaseModel):
     stdout: str = ""
     stderr: str = ""
     variables: list[VariableInfo] = Field(default_factory=list)
+    stateDelta: VariableDelta = Field(default_factory=VariableDelta)
+    events: list[ExecutionEvent] = Field(default_factory=list)
     executionCount: int = 0
     status: str = "done"
 
@@ -89,7 +105,18 @@ class WsResultMessage(BaseModel):
     stdout: str = ""
     stderr: str = ""
     variables: list[VariableInfo] = Field(default_factory=list)
+    stateDelta: VariableDelta = Field(default_factory=VariableDelta)
     executionCount: int = 0
+
+
+class WsExecutionEventMessage(BaseModel):
+    type: str = "executionEvent"
+    requestId: str
+    blockId: str | None = None
+    sequence: int
+    eventType: str
+    executionCount: int = 0
+    payload: Any = None
 
 
 class WsStatusMessage(BaseModel):

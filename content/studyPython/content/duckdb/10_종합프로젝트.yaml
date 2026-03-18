@@ -1,0 +1,594 @@
+meta:
+  id: duckdb_10
+  title: 종합프로젝트
+  order: 10
+  category: duckdb
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["tips", "titanic", "CTE", "윈도우함수", "서브쿼리", "종합"]
+  seo:
+    title: "DuckDB 종합 프로젝트 - 실전 분석 파이프라인"
+    description: "tips와 titanic 데이터로 모든 SQL 개념을 종합한 복합 쿼리를 설계합니다. CTE, 윈도우 함수, 서브쿼리까지 총정리합니다."
+    keywords: ["duckdb 종합", "CTE", "윈도우 함수", "SQL 분석", "실전 파이프라인"]
+
+intro:
+  emoji: "🔥"
+  goal: tips와 titanic 데이터로 "실전 분석 파이프라인"을 완성합니다.
+  description: CTE, 윈도우 함수, 서브쿼리, CASE WHEN, GROUP BY, 문자열 함수, JOIN까지 모든 개념을 종합합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: tips + titanic
+  blocks:
+  - type: text
+    content: 두 데이터셋을 불러옵니다. tips는 레스토랑 팁 데이터, titanic은 타이타닉 생존자 데이터입니다. 이 종합 프로젝트에서는 두 데이터로 CTE, 윈도우 함수, 서브쿼리, CASE WHEN, GROUP BY 등 모든 SQL 개념을 통합하여 실전 분석 파이프라인을 구축합니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: 두 데이터셋 로드
+    content: |-
+      import pandas as pd
+      import duckdb
+
+      baseUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
+      dfTips = pd.read_csv(f"{baseUrl}/tips.csv")
+      dfTitanic = pd.read_csv(f"{baseUrl}/titanic.csv")
+      tips = duckdb.from_df(dfTips)
+      titanic = duckdb.from_df(dfTitanic)
+      print(f"tips: {len(dfTips)}행, titanic: {len(dfTitanic)}행")
+
+- id: step2_business_question
+  title: 2단계. 비즈니스 질문 정의
+  subtitle: 분석 목표 설정
+  blocks:
+  - type: text
+    content: 복잡한 분석은 명확한 질문에서 시작합니다. tips 데이터로 다음을 분석합니다.
+  - type: list
+    items:
+    - "질문1: 요일별, 시간대별 매출과 팁 패턴은?"
+    - "질문2: 고객 유형별 팁 성향 비교는?"
+    - "질문3: 상위 팁 고객의 특징은?"
+  - type: code
+    language: python
+    title: 데이터 구조 확인
+    description: tips 데이터 컬럼
+    content: |-
+      duckdb.sql("""
+          SELECT * FROM tips LIMIT 5
+      """)
+
+- id: step3_cte_basic
+  title: 3단계. CTE로 구조화
+  subtitle: WITH 절 활용
+  blocks:
+  - type: text
+    content: CTE(Common Table Expression)로 복잡한 쿼리를 단계별로 분리합니다. WITH 절을 사용하면 쿼리를 논리적 단위로 나누어 가독성을 높이고 재사용할 수 있습니다. 복잡한 비즈니스 로직을 명확하게 표현하는 핵심 기법입니다.
+  - type: code
+    language: python
+    title: 기본 CTE 구조
+    description: 요일별 통계
+    content: |-
+      duckdb.sql("""
+          WITH dailyStats AS (
+              SELECT
+                  day,
+                  COUNT(*) AS orderCount,
+                  SUM(total_bill) AS totalSales,
+                  AVG(tip) AS avgTip
+              FROM tips
+              GROUP BY day
+          )
+          SELECT
+              day,
+              orderCount,
+              ROUND(totalSales, 2) AS totalSales,
+              ROUND(avgTip, 2) AS avgTip
+          FROM dailyStats
+          ORDER BY totalSales DESC
+      """)
+
+- id: step4_multi_cte
+  title: 4단계. 다중 CTE
+  subtitle: 여러 CTE 연결
+  blocks:
+  - type: text
+    content: 여러 CTE를 연결하여 단계별로 데이터를 가공합니다. 첫 번째 CTE에서 기본 집계를 하고, 두 번째 CTE에서 순위를 매기는 식으로 파이프라인을 구성합니다. 각 단계가 명확히 분리되어 디버깅과 유지보수가 쉬워집니다.
+  - type: code
+    language: python
+    title: 다중 CTE
+    description: 요일 + 시간대 분석
+    content: |-
+      duckdb.sql("""
+          WITH dailyStats AS (
+              SELECT
+                  day,
+                  time,
+                  COUNT(*) AS orderCount,
+                  SUM(total_bill) AS totalSales
+              FROM tips
+              GROUP BY day, time
+          ),
+          ranked AS (
+              SELECT
+                  *,
+                  RANK() OVER (PARTITION BY time ORDER BY totalSales DESC) AS salesRank
+              FROM dailyStats
+          )
+          SELECT
+              day,
+              time,
+              orderCount,
+              ROUND(totalSales, 2) AS totalSales,
+              salesRank
+          FROM ranked
+          WHERE salesRank <= 3
+          ORDER BY time, salesRank
+      """)
+
+- id: step5_window_row_number
+  title: 5단계. ROW_NUMBER 활용
+  subtitle: 순위 번호 부여
+  blocks:
+  - type: text
+    content: ROW_NUMBER로 각 그룹 내 순위를 매깁니다. ROW_NUMBER는 같은 값이라도 고유한 번호를 부여하며, PARTITION BY로 그룹을 나누고 ORDER BY로 정렬 기준을 정합니다. 각 요일별 팁 상위 3건만 추출하는 등의 분석에 유용합니다.
+  - type: code
+    language: python
+    title: 요일별 팁 순위
+    description: 각 요일의 팁 순위
+    content: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              total_bill,
+              tip,
+              ROW_NUMBER() OVER (PARTITION BY day ORDER BY tip DESC) AS tipRank
+          FROM tips
+          QUALIFY tipRank <= 3
+      """)
+
+- id: step6_window_lag
+  title: 6단계. LAG 함수
+  subtitle: 이전 값과 비교
+  blocks:
+  - type: text
+    content: LAG로 이전 행과 비교 분석합니다. titanic 데이터로 나이별 생존율 변화를 봅니다. LAG(컬럼, n)은 n행 앞의 값을 가져오며, 시계열 분석이나 연속된 그룹 간 차이를 계산할 때 매우 유용합니다.
+  - type: code
+    language: python
+    title: 연령대별 생존율 변화
+    description: LAG로 이전 값 비교
+    content: |-
+      duckdb.sql("""
+          WITH ageGroup AS (
+              SELECT
+                  CASE
+                      WHEN age < 10 THEN '0-9'
+                      WHEN age < 20 THEN '10-19'
+                      WHEN age < 30 THEN '20-29'
+                      WHEN age < 40 THEN '30-39'
+                      WHEN age < 50 THEN '40-49'
+                      ELSE '50+'
+                  END AS ageRange,
+                  survived
+              FROM titanic
+              WHERE age IS NOT NULL
+          ),
+          survivalRate AS (
+              SELECT
+                  ageRange,
+                  COUNT(*) AS total,
+                  SUM(survived) AS survivors,
+                  ROUND(100.0 * SUM(survived) / COUNT(*), 1) AS rate
+              FROM ageGroup
+              GROUP BY ageRange
+          )
+          SELECT
+              ageRange,
+              total,
+              survivors,
+              rate,
+              LAG(rate) OVER (ORDER BY ageRange) AS prevRate,
+              ROUND(rate - LAG(rate) OVER (ORDER BY ageRange), 1) AS rateDiff
+          FROM survivalRate
+          ORDER BY ageRange
+      """)
+
+- id: step7_subquery
+  title: 7단계. 서브쿼리 활용
+  subtitle: 중첩 쿼리
+  blocks:
+  - type: text
+    content: 서브쿼리로 평균 이상인 데이터를 필터링합니다. WHERE tip > (SELECT AVG(tip) FROM tips)처럼 서브쿼리를 사용하면 하드코딩 없이 동적 기준으로 필터링할 수 있습니다. 데이터가 변해도 쿼리를 수정할 필요가 없습니다.
+  - type: code
+    language: python
+    title: 평균 이상 팁
+    description: 서브쿼리 필터
+    content: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              time,
+              total_bill,
+              tip,
+              ROUND(100.0 * tip / total_bill, 1) AS tipRate
+          FROM tips
+          WHERE tip > (SELECT AVG(tip) FROM tips)
+          ORDER BY tip DESC
+          LIMIT 10
+      """)
+
+- id: step8_case_when
+  title: 8단계. CASE WHEN 분류
+  subtitle: 조건부 분류
+  blocks:
+  - type: text
+    content: CASE WHEN으로 데이터를 분류하고 분석합니다. 연속형 변수를 범주형으로 변환하거나, 복잡한 비즈니스 규칙을 적용할 때 필수적입니다. VIP, 우수, 보통 같은 고객 등급을 만들어 세그먼트별 분석을 수행할 수 있습니다.
+  - type: code
+    language: python
+    title: 팁 등급 분류
+    description: 고객 세그먼트
+    content: |-
+      duckdb.sql("""
+          WITH tipGrade AS (
+              SELECT
+                  *,
+                  CASE
+                      WHEN tip / total_bill >= 0.2 THEN 'VIP'
+                      WHEN tip / total_bill >= 0.15 THEN '우수'
+                      WHEN tip / total_bill >= 0.1 THEN '보통'
+                      ELSE '저조'
+                  END AS grade
+              FROM tips
+          )
+          SELECT
+              grade,
+              COUNT(*) AS count,
+              ROUND(AVG(total_bill), 2) AS avgBill,
+              ROUND(AVG(tip), 2) AS avgTip,
+              ROUND(100.0 * AVG(tip / total_bill), 1) AS avgTipRate
+          FROM tipGrade
+          GROUP BY grade
+          ORDER BY avgTipRate DESC
+      """)
+
+- id: step9_having
+  title: 9단계. GROUP BY + HAVING
+  subtitle: 집계 후 필터
+  blocks:
+  - type: text
+    content: HAVING으로 집계 결과를 필터링합니다. WHERE는 행 단위 필터이고, HAVING은 그룹 단위 필터입니다. COUNT(*) >= 5처럼 집계 함수 결과로 조건을 걸 때는 반드시 HAVING을 사용해야 합니다.
+  - type: code
+    language: python
+    title: 5건 이상 조건
+    description: HAVING 필터
+    content: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              time,
+              smoker,
+              COUNT(*) AS orderCount,
+              ROUND(SUM(total_bill), 2) AS totalSales,
+              ROUND(AVG(tip), 2) AS avgTip
+          FROM tips
+          GROUP BY day, time, smoker
+          HAVING COUNT(*) >= 5
+          ORDER BY totalSales DESC
+      """)
+
+- id: step10_string_function
+  title: 10단계. 문자열 함수
+  subtitle: 텍스트 가공
+  blocks:
+  - type: text
+    content: 문자열 함수로 데이터를 가공합니다. SPLIT_PART로 이름에서 호칭을 추출하고, TRIM으로 공백을 제거합니다. 텍스트 데이터를 정제하고 분석 가능한 형태로 변환하는 것은 실무에서 매우 중요한 스킬입니다.
+  - type: code
+    language: python
+    title: titanic 이름 분석
+    description: 호칭 추출
+    content: |-
+      duckdb.sql("""
+          WITH titleExtract AS (
+              SELECT
+                  name,
+                  TRIM(SPLIT_PART(SPLIT_PART(name, ',', 2), '.', 1)) AS title,
+                  survived,
+                  sex,
+                  age
+              FROM titanic
+          )
+          SELECT
+              title,
+              COUNT(*) AS count,
+              ROUND(100.0 * SUM(survived) / COUNT(*), 1) AS survivalRate,
+              ROUND(AVG(age), 1) AS avgAge
+          FROM titleExtract
+          GROUP BY title
+          HAVING COUNT(*) >= 5
+          ORDER BY survivalRate DESC
+      """)
+
+- id: step11_comprehensive_tips
+  title: 11단계. Tips 종합 분석
+  subtitle: 모든 개념 결합
+  blocks:
+  - type: text
+    content: 모든 개념을 결합한 종합 분석 쿼리입니다. 다중 CTE로 기본 데이터 가공 → 세그먼트 집계 → 순위 매기기를 단계별로 수행합니다. 이런 구조화된 쿼리는 복잡한 비즈니스 요구사항을 명확하게 구현하며, 협업 시 이해하기 쉽습니다.
+  - type: code
+    language: python
+    title: Tips 종합 분석
+    description: 실전 파이프라인
+    content: |-
+      duckdb.sql("""
+          WITH baseData AS (
+              SELECT
+                  *,
+                  ROUND(100.0 * tip / total_bill, 2) AS tipRate,
+                  CASE
+                      WHEN size <= 2 THEN '소규모'
+                      WHEN size <= 4 THEN '중규모'
+                      ELSE '대규모'
+                  END AS partySize,
+                  CASE
+                      WHEN tip / total_bill >= 0.2 THEN 'VIP'
+                      WHEN tip / total_bill >= 0.15 THEN '우수'
+                      ELSE '일반'
+                  END AS customerGrade
+              FROM tips
+          ),
+          segmentStats AS (
+              SELECT
+                  day,
+                  time,
+                  partySize,
+                  customerGrade,
+                  COUNT(*) AS orderCount,
+                  SUM(total_bill) AS totalSales,
+                  AVG(tipRate) AS avgTipRate
+              FROM baseData
+              GROUP BY day, time, partySize, customerGrade
+          ),
+          ranked AS (
+              SELECT
+                  *,
+                  RANK() OVER (PARTITION BY day ORDER BY totalSales DESC) AS salesRank
+              FROM segmentStats
+          )
+          SELECT
+              day,
+              time,
+              partySize,
+              customerGrade,
+              orderCount,
+              ROUND(totalSales, 2) AS totalSales,
+              ROUND(avgTipRate, 1) AS avgTipRate,
+              salesRank
+          FROM ranked
+          WHERE salesRank <= 5
+          ORDER BY day, salesRank
+      """)
+
+- id: step12_comprehensive_titanic
+  title: 12단계. Titanic 종합 분석
+  subtitle: 생존 분석 파이프라인
+  blocks:
+  - type: text
+    content: titanic 데이터로 생존 요인을 종합 분석합니다. 승객 프로필 생성 → 생존율 분석 → 순위 매기기를 3단계 CTE로 구성합니다. 호칭, 나이 그룹, 요금 등급을 조합하여 생존율에 영향을 미친 복합 요인을 파악합니다.
+  - type: code
+    language: python
+    title: Titanic 생존 분석
+    description: 복합 요인 분석
+    content: |-
+      duckdb.sql("""
+          WITH passengerProfile AS (
+              SELECT
+                  *,
+                  TRIM(SPLIT_PART(SPLIT_PART(name, ',', 2), '.', 1)) AS title,
+                  CASE
+                      WHEN age < 18 THEN '미성년'
+                      WHEN age < 60 THEN '성인'
+                      ELSE '노년'
+                  END AS ageGroup,
+                  CASE
+                      WHEN fare = 0 THEN '무임'
+                      WHEN fare < 20 THEN '저가'
+                      WHEN fare < 50 THEN '중가'
+                      ELSE '고가'
+                  END AS fareClass
+              FROM titanic
+              WHERE age IS NOT NULL
+          ),
+          survivalAnalysis AS (
+              SELECT
+                  pclass,
+                  sex,
+                  ageGroup,
+                  fareClass,
+                  COUNT(*) AS total,
+                  SUM(survived) AS survivors,
+                  ROUND(100.0 * SUM(survived) / COUNT(*), 1) AS survivalRate
+              FROM passengerProfile
+              GROUP BY pclass, sex, ageGroup, fareClass
+              HAVING COUNT(*) >= 5
+          ),
+          ranked AS (
+              SELECT
+                  *,
+                  RANK() OVER (ORDER BY survivalRate DESC) AS overallRank,
+                  RANK() OVER (PARTITION BY pclass ORDER BY survivalRate DESC) AS classRank
+              FROM survivalAnalysis
+          )
+          SELECT
+              pclass,
+              sex,
+              ageGroup,
+              fareClass,
+              total,
+              survivors,
+              survivalRate,
+              overallRank,
+              classRank
+          FROM ranked
+          WHERE classRank <= 3
+          ORDER BY pclass, classRank
+      """)
+
+- id: step13_final_pipeline
+  title: 13단계. 최종 파이프라인
+  subtitle: 분석 보고서 생성
+  blocks:
+  - type: text
+    content: 최종 분석 결과를 보고서 형태로 출력합니다. UNION ALL로 전체 통계와 요일별 통계를 하나의 결과로 합치고, 서브쿼리로 매출 점유율을 계산합니다. 이런 형태의 요약 보고서는 경영진 보고용으로 자주 활용됩니다.
+  - type: code
+    language: python
+    title: Tips 분석 보고서
+    description: 최종 결과물
+    content: |-
+      duckdb.sql("""
+          WITH summary AS (
+              SELECT
+                  '전체' AS category,
+                  COUNT(*) AS count,
+                  ROUND(SUM(total_bill), 2) AS totalSales,
+                  ROUND(AVG(tip), 2) AS avgTip,
+                  ROUND(100.0 * AVG(tip / total_bill), 1) AS avgTipRate
+              FROM tips
+
+              UNION ALL
+
+              SELECT
+                  day AS category,
+                  COUNT(*) AS count,
+                  ROUND(SUM(total_bill), 2) AS totalSales,
+                  ROUND(AVG(tip), 2) AS avgTip,
+                  ROUND(100.0 * AVG(tip / total_bill), 1) AS avgTipRate
+              FROM tips
+              GROUP BY day
+          )
+          SELECT
+              category,
+              count,
+              totalSales,
+              avgTip,
+              avgTipRate,
+              ROUND(100.0 * totalSales / (SELECT SUM(total_bill) FROM tips), 1) AS salesShare
+          FROM summary
+          ORDER BY
+              CASE WHEN category = '전체' THEN 0 ELSE 1 END,
+              totalSales DESC
+      """)
+
+- id: practice
+  title: 실습
+  subtitle: 심화 미션
+  blocks:
+  - type: text
+    content: 모든 개념을 종합하여 복합 분석 쿼리를 작성해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: Tips 흡연자 vs 비흡연자 종합 비교"
+    blocks:
+    - type: code
+      title: 데이터 로드
+      content: |-
+        import pandas as pd
+        import duckdb
+        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+        tbl1 = duckdb.from_df(data)
+    - type: code
+      title: 쿼리 실행
+      content: |-
+        duckdb.sql("""
+            WITH base AS (
+                SELECT
+                    smoker,
+                    day,
+                    time,
+                    COUNT(*) AS cnt,
+                    ROUND(SUM(total_bill), 2) AS sales,
+                    ROUND(AVG(tip), 2) AS avgTip,
+                    ROUND(100.0 * AVG(tip / total_bill), 1) AS tipPct
+                FROM tbl1
+                GROUP BY smoker, day, time
+            ),
+            ranked AS (
+                SELECT
+                    *,
+                    RANK() OVER (PARTITION BY smoker ORDER BY sales DESC) AS rk,
+                    SUM(sales) OVER (PARTITION BY smoker) AS grpTotal
+                FROM base
+            )
+            SELECT
+                smoker,
+                day,
+                time,
+                cnt,
+                sales,
+                avgTip,
+                tipPct,
+                rk,
+                ROUND(100.0 * sales / grpTotal, 1) AS share
+            FROM ranked
+            WHERE rk <= 3
+            ORDER BY smoker, rk
+        """)
+  - type: expansion
+    title: "미션2: Titanic 객실등급별 생존 분석"
+    blocks:
+    - type: code
+      title: 데이터 로드
+      content: |-
+        import pandas as pd
+        import duckdb
+        frame = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv")
+        tbl2 = duckdb.from_df(frame)
+    - type: code
+      title: 쿼리 실행
+      content: |-
+        duckdb.sql("""
+            WITH stats AS (
+                SELECT
+                    pclass,
+                    sex,
+                    COUNT(*) AS cnt,
+                    SUM(survived) AS surv,
+                    ROUND(100.0 * SUM(survived) / COUNT(*), 1) AS survRate
+                FROM tbl2
+                GROUP BY pclass, sex
+            ),
+            compare AS (
+                SELECT
+                    *,
+                    LAG(survRate) OVER (PARTITION BY sex ORDER BY pclass) AS prevRate,
+                    survRate - (SELECT AVG(100.0 * survived) FROM tbl2) AS diffAvg
+                FROM stats
+            )
+            SELECT
+                pclass,
+                sex,
+                cnt,
+                surv,
+                survRate,
+                prevRate,
+                ROUND(survRate - COALESCE(prevRate, survRate), 1) AS gap,
+                ROUND(diffAvg, 1) AS diffAvg
+            FROM compare
+            ORDER BY pclass, sex
+        """)
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: tips와 titanic 데이터로 DuckDB의 모든 개념을 종합한 분석 파이프라인을 완성했습니다!
+  - type: list
+    items:
+    - "CTE: WITH 절로 쿼리 구조화, 다중 CTE 연결"
+    - "윈도우 함수: ROW_NUMBER, RANK, LAG로 순위와 비교"
+    - "서브쿼리: 중첩 쿼리로 동적 필터링"
+    - "CASE WHEN: 조건부 분류와 세그먼트 생성"
+    - "GROUP BY + HAVING: 집계와 집계 후 필터"
+    - "문자열 함수: SPLIT_PART, TRIM으로 텍스트 가공"
+  - type: text
+    content: 10개 프로젝트를 완료하며 DuckDB SQL의 핵심 개념을 모두 마스터했습니다. 이제 어떤 데이터든 효과적으로 분석할 수 있습니다!

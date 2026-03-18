@@ -1,0 +1,521 @@
+meta:
+  id: pydantic_07
+  title: 커스텀타입정의
+  order: 7
+  category: pydantic
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["pydantic", "custom-type", "Annotated", "AfterValidator", "타입"]
+  seo:
+    title: "Pydantic 커스텀 타입 - 재사용 가능한 검증 타입"
+    description: "Pydantic으로 커스텀 타입을 정의합니다. Annotated, AfterValidator, 제약 타입을 배웁니다."
+    keywords: ["pydantic", "custom-type", "Annotated", "validator"]
+
+intro:
+  emoji: "🎨"
+  goal: 도메인 특화 커스텀 타입으로 한국형 비즈니스 데이터 검증 라이브러리를 구축합니다.
+  description: "같은 검증 로직을 여러 모델에서 반복하면 유지보수가 어려워집니다. Annotated와 검증기를 조합하여 재사용 가능한 커스텀 타입을 정의하면, 전화번호, 사업자번호, 우편번호 등 도메인 특화 타입을 만들어 프로젝트 전체에서 일관되게 사용할 수 있습니다."
+
+sections:
+- id: load
+  title: 라이브러리 로드
+  subtitle: Pydantic 설치 및 import
+  blocks:
+  - type: text
+    content: "Annotated는 Python 타입 힌트에 메타데이터를 추가하는 표준 방법입니다. Pydantic은 Annotated에 Field나 검증기를 넣어 타입 자체에 검증 규칙을 포함시킵니다. 이렇게 만든 타입 별칭은 어떤 모델에서든 재사용할 수 있습니다."
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: micropip으로 pydantic 설치
+    content: |-
+      import micropip
+      await micropip.install('pydantic')
+  - type: code
+    language: python
+    title: 핵심 모듈 import
+    description: Annotated와 검증기
+    content: |-
+      from typing import Annotated
+      from pydantic import BaseModel, Field, AfterValidator, BeforeValidator, WrapValidator, ValidationError
+      import re
+
+- id: annotated
+  title: Annotated 기초
+  subtitle: 타입에 메타데이터 추가
+  blocks:
+  - type: text
+    content: "Annotated[타입, 메타데이터]로 기존 타입에 검증 규칙을 추가합니다. Field의 제약조건(gt, min_length 등)을 타입 자체에 포함시키면 모든 필드에서 동일한 규칙을 적용할 수 있습니다."
+  - type: code
+    language: python
+    title: 기본 제약 타입
+    description: 양수, 짧은 문자열
+    content: |-
+      PositiveInt = Annotated[int, Field(gt=0)]
+      ShortString = Annotated[str, Field(max_length=50)]
+
+      class Product(BaseModel):
+          productId: PositiveInt
+          name: ShortString
+          price: PositiveInt
+
+      product = Product(productId=1, name="Laptop", price=999)
+      product
+  - type: tip
+    content: "PositiveInt를 사용하는 모든 필드에 gt=0 제약이 자동 적용됩니다. 규칙 변경 시 타입 정의만 수정하면 됩니다."
+  - type: code
+    language: python
+    title: 제약조건 테스트
+    description: 음수 값 거부
+    content: |-
+      try:
+          badProduct = Product(productId=-1, name="Test", price=100)
+      except ValidationError as e:
+          annotatedErr = e.errors()
+          annotatedErr
+
+- id: aftervalidator
+  title: AfterValidator
+  subtitle: 값 변환과 검증
+  blocks:
+  - type: text
+    content: "AfterValidator는 타입 변환 후 추가 검증이나 정규화를 수행합니다. 이메일 소문자 변환, 전화번호 형식 통일, 공백 제거 등에 활용합니다. 함수에서 ValueError를 발생시키면 검증 실패로 처리됩니다."
+  - type: code
+    language: python
+    title: 이메일 정규화
+    description: 소문자 변환
+    content: |-
+      def normalizeEmail(v: str) -> str:
+          return v.lower().strip()
+
+      NormalizedEmail = Annotated[str, AfterValidator(normalizeEmail)]
+
+      class User(BaseModel):
+          email: NormalizedEmail
+
+      user = User(email="  ALICE@EXAMPLE.COM  ")
+      user.email
+  - type: code
+    language: python
+    title: 전화번호 검증
+    description: 형식 통일
+    content: |-
+      def validatePhone(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 11 or not cleaned.startswith('010'):
+              raise ValueError("유효한 휴대폰 번호가 아닙니다")
+          return f"{cleaned[:3]}-{cleaned[3:7]}-{cleaned[7:]}"
+
+      PhoneNumber = Annotated[str, AfterValidator(validatePhone)]
+
+      class Contact(BaseModel):
+          phone: PhoneNumber
+
+      contact = Contact(phone="010 1234 5678")
+      contact.phone
+
+- id: beforevalidator
+  title: BeforeValidator
+  subtitle: 사전 변환
+  blocks:
+  - type: text
+    content: "BeforeValidator는 타입 변환 전에 실행됩니다. 다양한 형식의 입력을 통일하거나, 특수한 값을 처리할 때 유용합니다. 날짜 문자열을 여러 형식으로 받거나, yes/no를 bool로 변환하는 등에 활용합니다."
+  - type: code
+    language: python
+    title: 유연한 불리언
+    description: 다양한 입력 허용
+    content: |-
+      def parseBoolean(v):
+          if isinstance(v, bool):
+              return v
+          if isinstance(v, str):
+              if v.lower() in ('true', 'yes', '1', 'on', 'y'):
+                  return True
+              if v.lower() in ('false', 'no', '0', 'off', 'n'):
+                  return False
+          raise ValueError(f"불리언으로 변환 불가: {v}")
+
+      FlexBool = Annotated[bool, BeforeValidator(parseBoolean)]
+
+      class Settings(BaseModel):
+          debug: FlexBool
+          cache: FlexBool
+
+      settings = Settings(debug="yes", cache="off")
+      settings.debug, settings.cache
+  - type: code
+    language: python
+    title: 유연한 날짜
+    description: 여러 형식 지원
+    content: |-
+      from datetime import date, datetime
+
+      def parseDate(v):
+          if isinstance(v, date):
+              return v
+          if isinstance(v, str):
+              for fmt in ("%Y-%m-%d", "%Y/%m/%d", "%d.%m.%Y", "%Y년%m월%d일"):
+                  try:
+                      return datetime.strptime(v, fmt).date()
+                  except ValueError:
+                      continue
+          raise ValueError(f"날짜 형식 인식 불가: {v}")
+
+      FlexDate = Annotated[date, BeforeValidator(parseDate)]
+
+      class Event(BaseModel):
+          eventDate: FlexDate
+
+      event = Event(eventDate="2024년03월15일")
+      event.eventDate
+
+- id: combined
+  title: 검증기 조합
+  subtitle: 다중 검증기 체인
+  blocks:
+  - type: text
+    content: "여러 검증기를 조합하여 복잡한 변환 파이프라인을 구성할 수 있습니다. BeforeValidator로 전처리하고, AfterValidator로 후처리하는 식으로 단계별 검증을 구현합니다."
+  - type: code
+    language: python
+    title: 검증기 체인
+    description: 정규화 + 검증 + 변환
+    content: |-
+      def stripWhitespace(v: str) -> str:
+          return v.strip()
+
+      def validateNotEmpty(v: str) -> str:
+          if not v:
+              raise ValueError("빈 문자열 불허")
+          return v
+
+      def capitalizeFirst(v: str) -> str:
+          return v.capitalize()
+
+      CleanName = Annotated[
+          str,
+          BeforeValidator(stripWhitespace),
+          AfterValidator(validateNotEmpty),
+          AfterValidator(capitalizeFirst)
+      ]
+
+      class Person(BaseModel):
+          name: CleanName
+
+      person = Person(name="  alice  ")
+      person.name
+
+- id: constrained
+  title: 제약 타입
+  subtitle: constr, conint, confloat
+  blocks:
+  - type: text
+    content: "Pydantic은 자주 사용되는 제약 타입을 제공합니다. constr은 문자열 길이와 패턴을, conint와 confloat는 숫자 범위를 제한합니다. 간단한 제약에는 이들을 사용하고, 복잡한 로직은 AfterValidator를 사용합니다."
+  - type: code
+    language: python
+    title: 제약 타입 사용
+    description: constr, conint
+    content: |-
+      from pydantic import constr, conint, confloat
+
+      Username = constr(min_length=3, max_length=20, pattern=r'^[a-zA-Z0-9_]+$')
+      Age = conint(ge=0, le=150)
+      Price = confloat(gt=0, le=100000000)
+
+      class Account(BaseModel):
+          username: Username
+          age: Age
+          balance: Price
+
+      account = Account(username="alice_123", age=25, balance=10000.50)
+      account
+  - type: code
+    language: python
+    title: 패턴 불일치
+    description: 특수문자 포함 시 실패
+    content: |-
+      try:
+          badAccount = Account(username="alice@123", age=25, balance=100)
+      except ValidationError as e:
+          constrainedErr = e.errors()
+          constrainedErr
+
+- id: string
+  title: 문자열 제약
+  subtitle: StringConstraints
+  blocks:
+  - type: text
+    content: "StringConstraints는 문자열에 대한 상세한 제약을 정의합니다. 길이, 패턴 외에도 자동 소문자 변환(to_lower), 공백 제거(strip_whitespace) 등의 변환도 포함할 수 있습니다."
+  - type: code
+    language: python
+    title: 슬러그 타입
+    description: URL-safe 문자열
+    content: |-
+      from pydantic import StringConstraints
+
+      SlugType = Annotated[str, StringConstraints(
+          min_length=3,
+          max_length=50,
+          pattern=r'^[a-z0-9]+(?:-[a-z0-9]+)*$',
+          to_lower=True,
+          strip_whitespace=True
+      )]
+
+      class Article(BaseModel):
+          slug: SlugType
+
+      article = Article(slug="  my-first-post  ")
+      article.slug
+
+- id: domain
+  title: 도메인 타입
+  subtitle: 한국형 비즈니스 타입
+  blocks:
+  - type: text
+    content: "실제 비즈니스에서 필요한 한국형 데이터 타입을 정의합니다. 사업자등록번호, 주민등록번호 앞자리, 우편번호 등 한국 시장에 특화된 검증 로직을 타입으로 캡슐화합니다."
+  - type: code
+    language: python
+    title: 사업자등록번호
+    description: 10자리 검증
+    content: |-
+      def validateBizNumber(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 10:
+              raise ValueError("사업자등록번호는 10자리입니다")
+          return f"{cleaned[:3]}-{cleaned[3:5]}-{cleaned[5:]}"
+
+      BusinessNumber = Annotated[str, AfterValidator(validateBizNumber)]
+
+      class Company(BaseModel):
+          bizNumber: BusinessNumber
+
+      company = Company(bizNumber="123-45-67890")
+      company.bizNumber
+  - type: code
+    language: python
+    title: 우편번호
+    description: 5자리 검증
+    content: |-
+      def validatePostalCode(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 5:
+              raise ValueError("우편번호는 5자리입니다")
+          return cleaned
+
+      PostalCode = Annotated[str, AfterValidator(validatePostalCode)]
+
+      class Address(BaseModel):
+          zipCode: PostalCode
+
+      addr = Address(zipCode="06234")
+      addr.zipCode
+
+- id: library
+  title: 타입 라이브러리
+  subtitle: 재사용 가능한 타입 모음
+  blocks:
+  - type: text
+    content: "프로젝트에서 공통으로 사용할 타입들을 모아 라이브러리로 정리합니다. 한 곳에서 정의하고 모든 모델에서 import하여 사용하면 일관성을 유지하고 유지보수가 쉬워집니다."
+  - type: code
+    language: python
+    title: 공통 타입 정의
+    description: 숫자, 문자열 타입
+    content: |-
+      PositiveFloat = Annotated[float, Field(gt=0)]
+      NonNegativeInt = Annotated[int, Field(ge=0)]
+      Percentage = Annotated[float, Field(ge=0, le=100)]
+      NonEmptyStr = Annotated[str, Field(min_length=1)]
+      ShortText = Annotated[str, Field(max_length=100)]
+      LongText = Annotated[str, Field(max_length=10000)]
+
+      class OrderLine(BaseModel):
+          productName: NonEmptyStr
+          quantity: NonNegativeInt
+          unitPrice: PositiveFloat
+          discount: Percentage = 0
+
+      orderLine = OrderLine(productName="Laptop", quantity=2, unitPrice=1000000, discount=10)
+      orderLine
+
+- id: result
+  title: 한국형 비즈니스 타입
+  subtitle: 종합 타입 라이브러리
+  blocks:
+  - type: text
+    content: "지금까지 배운 모든 기법을 종합하여 한국 비즈니스 환경에 맞는 타입 라이브러리를 완성합니다. 휴대폰 번호, 사업자등록번호, 우편번호, 금액 등을 모두 포함합니다."
+  - type: code
+    language: python
+    title: 한국형 타입 라이브러리
+    description: 종합 타입
+    content: |-
+      def validateKorPhone(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 11 or not cleaned.startswith('010'):
+              raise ValueError("유효한 휴대폰 번호가 아닙니다")
+          return f"{cleaned[:3]}-{cleaned[3:7]}-{cleaned[7:]}"
+
+      def validateBizNum(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 10:
+              raise ValueError("사업자등록번호는 10자리입니다")
+          return f"{cleaned[:3]}-{cleaned[3:5]}-{cleaned[5:]}"
+
+      def validatePostal(v: str) -> str:
+          cleaned = re.sub(r'[^0-9]', '', v)
+          if len(cleaned) != 5:
+              raise ValueError("우편번호는 5자리입니다")
+          return cleaned
+
+      KoreanPhone = Annotated[str, AfterValidator(validateKorPhone)]
+      BizNumber = Annotated[str, AfterValidator(validateBizNum)]
+      KorPostal = Annotated[str, AfterValidator(validatePostal)]
+      KRWAmount = Annotated[int, Field(ge=0, description="원화 금액")]
+
+      class BusinessEntity(BaseModel):
+          companyName: NonEmptyStr
+          bizNumber: BizNumber
+          phone: KoreanPhone
+          postalCode: KorPostal
+          capital: KRWAmount
+
+      entity = BusinessEntity(
+          companyName="테크회사",
+          bizNumber="1234567890",
+          phone="010.1234.5678",
+          postalCode="06234",
+          capital=100000000
+      )
+      entity
+  - type: code
+    language: python
+    title: 검증 결과 확인
+    description: 정규화된 값
+    content: |-
+      entityInfo = {
+          "company": entity.companyName,
+          "bizNumber": entity.bizNumber,
+          "phone": entity.phone,
+          "postal": entity.postalCode,
+          "capital": entity.capital
+      }
+      entityInfo
+
+- id: practice
+  title: 실습
+  subtitle: 커스텀 타입 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 Annotated, AfterValidator, BeforeValidator, 제약 타입을 활용하여 도메인 특화 타입을 정의합니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 금융 타입"
+    blocks:
+    - type: code
+      title: 카드 및 금융 타입
+      content: |-
+        from typing import Annotated
+        from pydantic import BaseModel, Field, AfterValidator, BeforeValidator, ValidationError
+        import re
+
+        def validateCardNumber(v: str) -> str:
+            cleaned = re.sub(r'[^0-9]', '', v)
+            if len(cleaned) != 16:
+                raise ValueError("카드번호는 16자리입니다")
+            return f"{cleaned[:4]}-{cleaned[4:8]}-{cleaned[8:12]}-{cleaned[12:]}"
+
+        def maskCard(v: str) -> str:
+            cleaned = re.sub(r'[^0-9]', '', v)
+            if len(cleaned) < 16:
+                raise ValueError("카드번호는 16자리입니다")
+            return f"{cleaned[:4]}-****-****-{cleaned[12:]}"
+
+        def validateCVV(v: str) -> str:
+            if not v.isdigit() or len(v) not in (3, 4):
+                raise ValueError("CVV는 3-4자리 숫자입니다")
+            return v
+
+        CardNumber = Annotated[str, AfterValidator(validateCardNumber)]
+        MaskedCard = Annotated[str, AfterValidator(maskCard)]
+        CVV = Annotated[str, AfterValidator(validateCVV)]
+        MoneyAmount = Annotated[float, Field(gt=0)]
+
+        class PaymentCard(BaseModel):
+            cardNumber: CardNumber
+            cvv: CVV
+            expiryMonth: int = Field(ge=1, le=12)
+            expiryYear: int = Field(ge=2024, le=2040)
+
+        card = PaymentCard(
+            cardNumber="1234 5678 9012 3456",
+            cvv="123",
+            expiryMonth=12,
+            expiryYear=2025
+        )
+        card
+    - type: code
+      title: 마스킹 테스트
+      content: |-
+        class PaymentInfo(BaseModel):
+            maskedCard: MaskedCard
+            amount: MoneyAmount
+
+        payment = PaymentInfo(maskedCard="1234567890123456", amount=50000)
+        paymentData = {
+            "original": card.cardNumber,
+            "masked": payment.maskedCard,
+            "amount": payment.amount
+        }
+        paymentData
+  - type: expansion
+    title: "미션2: 주소 타입"
+    blocks:
+    - type: code
+      title: 주소 관련 타입
+      content: |-
+        from typing import Annotated
+        from pydantic import BaseModel, Field, AfterValidator
+        import re
+
+        def validateKorPostal(v: str) -> str:
+            cleaned = re.sub(r'[^0-9]', '', v)
+            if len(cleaned) != 5:
+                raise ValueError("우편번호는 5자리입니다")
+            return cleaned
+
+        def normalizeAddr(v: str) -> str:
+            return re.sub(r'\s+', ' ', v.strip())
+
+        KorPostalCode = Annotated[str, AfterValidator(validateKorPostal)]
+        AddressLine = Annotated[str, AfterValidator(normalizeAddr), Field(min_length=5, max_length=200)]
+        CityName = Annotated[str, Field(min_length=2, max_length=50)]
+
+        class KoreanAddress(BaseModel):
+            postalCode: KorPostalCode
+            city: CityName
+            district: str = Field(min_length=2)
+            streetAddress: AddressLine
+            detailAddress: AddressLine | None = None
+
+            def formatFull(self) -> str:
+                parts = [f"({self.postalCode})", self.city, self.district, self.streetAddress]
+                if self.detailAddress:
+                    parts.append(self.detailAddress)
+                return " ".join(parts)
+
+        address = KoreanAddress(
+            postalCode="06234",
+            city="서울특별시",
+            district="강남구",
+            streetAddress="테헤란로   123",
+            detailAddress="  5층  501호  "
+        )
+        address
+    - type: code
+      title: 주소 정규화 확인
+      content: |-
+        addressInfo = {
+            "postal": address.postalCode,
+            "street": address.streetAddress,
+            "detail": address.detailAddress,
+            "full": address.formatFull()
+        }
+        addressInfo

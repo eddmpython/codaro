@@ -1,0 +1,508 @@
+meta:
+  id: pydantic_04
+  title: 타입변환기
+  order: 4
+  category: pydantic
+  difficulty: "⭐⭐"
+  badge: 기본
+  tags: ["pydantic", "coercion", "타입변환", "strict", "serializer"]
+  seo:
+    title: "Pydantic 타입 변환 - 자동 변환과 엄격 모드"
+    description: "Pydantic의 타입 변환 동작을 이해합니다. 자동 강제 변환, 엄격 모드, 커스텀 직렬화를 배웁니다."
+    keywords: ["pydantic", "타입변환", "coercion", "strict", "serializer"]
+
+intro:
+  emoji: "🔄"
+  goal: Pydantic의 타입 변환과 직렬화를 제어합니다.
+  description: 자동 타입 강제 변환의 동작을 이해하고, 엄격 모드와 커스텀 직렬화기로 세밀하게 제어합니다.
+
+sections:
+- id: step1_install
+  title: 1단계. 패키지 설치
+  subtitle: micropip
+  blocks:
+  - type: text
+    content: Pydantic은 가능한 경우 입력값을 대상 타입으로 자동 변환합니다.
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: micropip으로 pydantic 설치
+    content: |-
+      import micropip
+      await micropip.install('pydantic')
+
+- id: step2_auto_coercion
+  title: 2단계. 자동 타입 변환
+  subtitle: 기본 동작
+  blocks:
+  - type: text
+    content: Pydantic은 문자열을 숫자로, 숫자를 문자열로 자동 변환합니다.
+  - type: code
+    language: python
+    title: 기본 모델
+    description: 다양한 타입
+    content: |-
+      from pydantic import BaseModel
+
+      class Data(BaseModel):
+          intVal: int
+          floatVal: float
+          strVal: str
+          boolVal: bool
+
+      data1 = Data(intVal="123", floatVal="45.67", strVal=999, boolVal=1)
+      data1
+  - type: code
+    language: python
+    title: 변환 결과
+    description: 타입 확인
+    content: |-
+      typeInfo = {
+          "intVal": (data1.intVal, type(data1.intVal).__name__),
+          "floatVal": (data1.floatVal, type(data1.floatVal).__name__),
+          "strVal": (data1.strVal, type(data1.strVal).__name__),
+          "boolVal": (data1.boolVal, type(data1.boolVal).__name__)
+      }
+      typeInfo
+  - type: tip
+    content: 1, "1", "true", "yes", "on"은 True로, 0, "0", "false", "no", "off"는 False로 변환됩니다.
+
+- id: step3_strict_mode
+  title: 3단계. 엄격 모드
+  subtitle: strict=True
+  blocks:
+  - type: text
+    content: model_config에서 strict=True를 설정하면 타입 강제 변환이 비활성화됩니다.
+  - type: code
+    language: python
+    title: 엄격 모드 모델
+    description: 타입 불일치 거부
+    content: |-
+      class StrictData(BaseModel):
+          model_config = {"strict": True}
+          intVal: int
+          strVal: str
+
+      strictData = StrictData(intVal=123, strVal="hello")
+      strictData
+  - type: code
+    language: python
+    title: 엄격 모드 실패
+    description: 타입 불일치 에러
+    content: |-
+      from pydantic import ValidationError
+
+      try:
+          badStrict = StrictData(intVal="123", strVal="hello")
+      except ValidationError as e:
+          strictError = e.errors()
+          strictError
+  - type: tip
+    content: 엄격 모드에서는 정확한 타입만 허용됩니다. int 필드에 문자열 "123"을 넣으면 실패합니다.
+
+- id: step4_field_strict
+  title: 4단계. 필드별 엄격 모드
+  subtitle: Field(strict=True)
+  blocks:
+  - type: text
+    content: 특정 필드만 엄격 모드로 설정할 수 있습니다.
+  - type: code
+    language: python
+    title: 혼합 모드
+    description: 일부만 엄격
+    content: |-
+      from pydantic import Field
+
+      class MixedData(BaseModel):
+          flexibleInt: int
+          strictInt: int = Field(strict=True)
+          flexibleStr: str
+
+      mixed1 = MixedData(flexibleInt="100", strictInt=200, flexibleStr=300)
+      mixed1
+  - type: code
+    language: python
+    title: 엄격 필드 실패
+    description: strictInt에 문자열
+    content: |-
+      try:
+          badMixed = MixedData(flexibleInt="100", strictInt="200", flexibleStr="hello")
+      except ValidationError as e:
+          fieldStrictError = e.errors()
+          fieldStrictError
+
+- id: step5_datetime
+  title: 5단계. 날짜/시간 변환
+  subtitle: datetime 타입
+  blocks:
+  - type: text
+    content: Pydantic은 문자열을 datetime, date, time 객체로 자동 변환합니다.
+  - type: code
+    language: python
+    title: 날짜 시간 모델
+    description: datetime 변환
+    content: |-
+      from datetime import datetime, date, time
+
+      class Event(BaseModel):
+          eventName: str
+          eventDate: date
+          startTime: time
+          createdAt: datetime
+
+      event1 = Event(
+          eventName="Conference",
+          eventDate="2024-06-15",
+          startTime="09:30:00",
+          createdAt="2024-01-01T12:00:00"
+      )
+      event1
+  - type: code
+    language: python
+    title: 타입 확인
+    description: 변환된 객체
+    content: |-
+      dateTypes = {
+          "eventDate": type(event1.eventDate).__name__,
+          "startTime": type(event1.startTime).__name__,
+          "createdAt": type(event1.createdAt).__name__
+      }
+      dateTypes
+  - type: code
+    language: python
+    title: 타임스탬프 변환
+    description: Unix 타임스탬프
+    content: |-
+      class Timestamp(BaseModel):
+          createdAt: datetime
+
+      ts1 = Timestamp(createdAt=1704067200)
+      ts1.createdAt
+
+- id: step6_enum
+  title: 6단계. Enum 타입
+  subtitle: 열거형 변환
+  blocks:
+  - type: text
+    content: Enum 타입은 문자열이나 값으로 자동 변환됩니다.
+  - type: code
+    language: python
+    title: Enum 정의
+    description: 상태 열거형
+    content: |-
+      from enum import Enum
+
+      class Status(str, Enum):
+          PENDING = "pending"
+          ACTIVE = "active"
+          COMPLETED = "completed"
+
+      class Task(BaseModel):
+          taskId: str
+          status: Status
+
+      task1 = Task(taskId="T001", status="active")
+      task1
+  - type: code
+    language: python
+    title: Enum 접근
+    description: 값과 이름
+    content: |-
+      task1.status, task1.status.value, task1.status.name
+  - type: code
+    language: python
+    title: 잘못된 Enum
+    description: 허용되지 않은 값
+    content: |-
+      try:
+          badTask = Task(taskId="T002", status="invalid")
+      except ValidationError as e:
+          enumError = e.errors()
+          enumError
+
+- id: step7_literal
+  title: 7단계. Literal 타입
+  subtitle: 특정 값만 허용
+  blocks:
+  - type: text
+    content: Literal로 필드가 가질 수 있는 값을 제한합니다.
+  - type: code
+    language: python
+    title: Literal 타입
+    description: 허용 값 제한
+    content: |-
+      from typing import Literal
+
+      class Priority(BaseModel):
+          level: Literal["low", "medium", "high"]
+          score: Literal[1, 2, 3, 4, 5]
+
+      priority1 = Priority(level="high", score=5)
+      priority1
+  - type: code
+    language: python
+    title: Literal 위반
+    description: 허용되지 않은 값
+    content: |-
+      try:
+          badPriority = Priority(level="urgent", score=10)
+      except ValidationError as e:
+          literalError = e.errors()
+          literalError
+
+- id: step8_serializer
+  title: 8단계. 필드 직렬화기
+  subtitle: field_serializer
+  blocks:
+  - type: text
+    content: field_serializer로 필드의 직렬화 방식을 커스터마이즈합니다.
+  - type: code
+    language: python
+    title: 커스텀 직렬화
+    description: 날짜 형식 지정
+    content: |-
+      from pydantic import field_serializer
+
+      class Article(BaseModel):
+          title: str
+          publishedAt: datetime
+
+          @field_serializer('publishedAt')
+          def serializeDate(self, v: datetime) -> str:
+              return v.strftime("%Y년 %m월 %d일")
+
+      article1 = Article(title="뉴스 기사", publishedAt="2024-03-15T10:30:00")
+      article1.model_dump()
+  - type: code
+    language: python
+    title: JSON 출력
+    description: 형식화된 날짜
+    content: |-
+      article1.model_dump_json()
+
+- id: step9_computed
+  title: 9단계. 계산 필드 직렬화
+  subtitle: computed_field
+  blocks:
+  - type: text
+    content: computed_field로 다른 필드에서 계산된 값을 직렬화에 포함합니다.
+  - type: code
+    language: python
+    title: 계산 필드
+    description: 총액 계산
+    content: |-
+      from pydantic import computed_field
+
+      class Invoice(BaseModel):
+          itemPrice: float
+          quantity: int
+          taxRate: float = 10
+
+          @computed_field
+          @property
+          def subtotal(self) -> float:
+              return self.itemPrice * self.quantity
+
+          @computed_field
+          @property
+          def tax(self) -> float:
+              return self.subtotal * self.taxRate / 100
+
+          @computed_field
+          @property
+          def total(self) -> float:
+              return self.subtotal + self.tax
+
+      invoice1 = Invoice(itemPrice=10000, quantity=3)
+      invoice1.model_dump()
+
+- id: step10_mode
+  title: 10단계. 직렬화 모드
+  subtitle: mode 파라미터
+  blocks:
+  - type: text
+    content: model_dump의 mode 파라미터로 직렬화 형식을 제어합니다.
+  - type: code
+    language: python
+    title: Python 모드
+    description: 기본 모드
+    content: |-
+      class Sample(BaseModel):
+          createdAt: datetime
+          price: float
+
+      sample1 = Sample(createdAt="2024-01-15T10:00:00", price=99.99)
+      pythonMode = sample1.model_dump(mode='python')
+      pythonMode
+  - type: code
+    language: python
+    title: JSON 모드
+    description: JSON 호환
+    content: |-
+      jsonMode = sample1.model_dump(mode='json')
+      jsonMode
+  - type: tip
+    content: mode='python'은 Python 객체를 유지하고, mode='json'은 JSON 직렬화 가능한 형태로 변환합니다.
+
+- id: step11_exclude
+  title: 11단계. 필드 제외
+  subtitle: exclude, include
+  blocks:
+  - type: text
+    content: model_dump에서 특정 필드를 제외하거나 포함할 수 있습니다.
+  - type: code
+    language: python
+    title: 필드 제외
+    description: exclude 옵션
+    content: |-
+      class UserProfile(BaseModel):
+          userId: str
+          username: str
+          password: str
+          email: str
+
+      profile1 = UserProfile(userId="U001", username="alice", password="secret123", email="alice@mail.com")
+      safeProfile = profile1.model_dump(exclude={"password"})
+      safeProfile
+  - type: code
+    language: python
+    title: 필드 포함
+    description: include 옵션
+    content: |-
+      publicInfo = profile1.model_dump(include={"userId", "username"})
+      publicInfo
+  - type: code
+    language: python
+    title: 중첩 제외
+    description: 중첩 필드 제어
+    content: |-
+      class Address(BaseModel):
+          street: str
+          city: str
+          zipCode: str
+
+      class Contact(BaseModel):
+          name: str
+          address: Address
+
+      contact1 = Contact(name="Bob", address={"street": "123 Main", "city": "Seoul", "zipCode": "12345"})
+      partial = contact1.model_dump(exclude={"address": {"zipCode"}})
+      partial
+
+- id: step12_alias_serial
+  title: 12단계. 별칭 직렬화
+  subtitle: by_alias
+  blocks:
+  - type: text
+    content: by_alias=True로 직렬화 시 별칭을 사용합니다.
+  - type: code
+    language: python
+    title: 별칭 직렬화
+    description: by_alias 옵션
+    content: |-
+      class ApiData(BaseModel):
+          userId: int = Field(alias="user_id")
+          userName: str = Field(alias="user_name")
+
+      apiData1 = ApiData(user_id=1, user_name="Alice")
+
+      normalDump = apiData1.model_dump()
+      aliasDump = apiData1.model_dump(by_alias=True)
+      normalDump, aliasDump
+  - type: code
+    language: python
+    title: JSON 별칭
+    description: API 응답 형식
+    content: |-
+      apiData1.model_dump_json(by_alias=True, indent=2)
+
+- id: practice
+  title: 실습
+  subtitle: 타입 변환 프로젝트
+  blocks:
+  - type: text
+    content: 다양한 타입 변환과 직렬화를 적용합니다.
+  - type: expansion
+    title: "미션1: API 응답 모델"
+    code: |-
+      from pydantic import BaseModel, Field, field_serializer, computed_field
+      from datetime import datetime
+      from typing import Literal
+
+      class ApiResponse(BaseModel):
+          statusCode: int = Field(alias="status_code")
+          message: str
+          timestamp: datetime
+          responseTime: float = Field(alias="response_time_ms")
+
+          @field_serializer('timestamp')
+          def formatTimestamp(self, v: datetime) -> str:
+              return v.isoformat()
+
+          @computed_field
+          @property
+          def isSuccess(self) -> bool:
+              return 200 <= self.statusCode < 300
+
+      resp = ApiResponse(
+          status_code=200,
+          message="Success",
+          timestamp="2024-03-15T10:30:00",
+          response_time_ms=45.5
+      )
+      respOutput = {
+          "normal": resp.model_dump(),
+          "alias": resp.model_dump(by_alias=True)
+      }
+      respOutput
+  - type: expansion
+    title: "미션2: 결제 처리 모델"
+    code: |-
+      from pydantic import BaseModel, Field, field_serializer, computed_field
+      from datetime import datetime
+      from enum import Enum
+      from typing import Literal
+
+      class PaymentStatus(str, Enum):
+          PENDING = "pending"
+          PROCESSING = "processing"
+          COMPLETED = "completed"
+          FAILED = "failed"
+
+      class Payment(BaseModel):
+          model_config = {"strict": False}
+
+          paymentId: str
+          amount: float = Field(gt=0)
+          currency: Literal["KRW", "USD", "EUR"] = "KRW"
+          status: PaymentStatus = PaymentStatus.PENDING
+          createdAt: datetime
+          processedAt: datetime | None = None
+
+          @field_serializer('amount')
+          def formatAmount(self, v: float) -> str:
+              if self.currency == "KRW":
+                  return f"₩{v:,.0f}"
+              elif self.currency == "USD":
+                  return f"${v:,.2f}"
+              return f"€{v:,.2f}"
+
+          @field_serializer('createdAt', 'processedAt')
+          def formatDate(self, v: datetime | None) -> str | None:
+              return v.strftime("%Y-%m-%d %H:%M") if v else None
+
+          @computed_field
+          @property
+          def isPending(self) -> bool:
+              return self.status == PaymentStatus.PENDING
+
+      payment = Payment(
+          paymentId="PAY-001",
+          amount="150000",
+          currency="KRW",
+          status="completed",
+          createdAt="2024-03-15T10:30:00",
+          processedAt="2024-03-15T10:31:00"
+      )
+      paymentOutput = payment.model_dump()
+      paymentOutput

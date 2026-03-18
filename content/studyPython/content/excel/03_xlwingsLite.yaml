@@ -1,0 +1,345 @@
+meta:
+  id: "xlwings03"
+  title: "xlwings lite 완벽 가이드"
+  order: 3
+  category: "excel"
+  tags: ["xlwings", "xlwings-lite", "WASM", "Pyodide"]
+  seo:
+    title: "xlwings lite - 설치 없이 브라우저에서 엑셀 자동화"
+    description: "xlwings lite로 설치 없이 브라우저에서 엑셀 자동화를 시작하세요. WASM/Pyodide 기반으로 어디서나 실행 가능합니다."
+    keywords: ["xlwings lite", "브라우저 엑셀", "WASM 파이썬", "Pyodide", "온라인 엑셀 자동화"]
+
+sections:
+  - id: "mainHeader"
+    title: "xlwings lite 소개"
+    blocks:
+      - type: mainHeader
+        emoji: "☁️"
+        title: "xlwings lite 완벽 가이드"
+        subtitle: "설치 없이 브라우저에서 바로 시작하는 Excel 자동화!"
+        description: "복잡한 설정 없이 브라우저에서 바로 Excel 자동화를 경험해보세요"
+        gradient: "from-blue-500 via-cyan-500 to-teal-500"
+
+  - id: "whatIsXlwingsLite"
+    title: "xlwings lite란?"
+    blocks:
+      - type: sectionHeader
+        emoji: "🚀"
+        title: "xlwings lite란?"
+        subtitle: "Office.js 애드인으로 구현된 브라우저 기반 Excel 자동화 솔루션"
+        color: "cyan"
+
+      - type: video
+        platform: youtube
+        videoId: "ZOTg-F8QazU"
+
+      - type: video
+        platform: youtube
+        videoId: "amCCEbJ39W8"
+
+      - type: sectionHeader
+        emoji: "🌟"
+        title: "xlwings Lite가 뭔가요?"
+        subtitle: "브라우저만 있으면 Excel에서 Python을 바로 사용할 수 있는 무료 도구입니다"
+        color: "cyan"
+
+      - type: info
+        title: "🚀 xlwings Lite 핵심 정리"
+        htmlContent: |
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+            <div class="bg-gradient-to-br from-cyan-50 to-blue-50 p-6 rounded-xl border border-cyan-200">
+              <h4 class="font-bold text-cyan-700 mb-4 text-lg flex items-center">
+                <span class="mr-2">💡</span>
+                간단히 말하면?
+              </h4>
+              <p class="text-gray-700 leading-relaxed">
+                Excel에 Python 편집기가 내장된 것처럼 사용할 수 있는 무료 도구입니다.
+                <strong>Python 설치 없이</strong> 브라우저에서 바로 Python 코드를 작성하고 실행할 수 있어요!
+              </p>
+            </div>
+            <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
+              <h4 class="font-bold text-green-700 mb-4 text-lg flex items-center">
+                <span class="mr-2">⚡</span>
+                어떻게 작동하나요?
+              </h4>
+              <p class="text-gray-700 leading-relaxed">
+                WASM(WebAssembly) 기술로 브라우저에서 Python을 실행합니다.
+                Office.js API를 통해 Excel과 직접 통신하여 <strong>셀 읽기/쓰기, 차트 생성, 데이터 분석</strong> 등이 가능해요!
+              </p>
+            </div>
+          </div>
+        color: "cyan"
+
+      - type: featureCards
+        cards:
+          - emoji: "🔧"
+            title: "Pyodide 기반"
+            description: "• Pyodide: WebAssembly로 실행\n• Office.js로 내부의 브라우저 엔진 활용\n• 로컬에서 실행되는 완전한 Python 환경\n• pandas등 파이썬 주요 라이브러리 지원"
+            color: "blue"
+          - emoji: "⚡"
+            title: "Python 설치 불필요"
+            description: "• 별도 Python 설치 없이 바로 사용\n• 애드인만 설치하면 끝\n• Excel 365 및 Office 2021+ 지원\n• 웹브라우저 환경에서 실행"
+            color: "green"
+          - emoji: "🌐"
+            title: "Office.js 애드인 구조"
+            description: "• 모던 Excel 애드인 기술 사용\n• 브라우저가 Excel 내부에서 실행\n• Excel 객체 모델에 직접 접근 가능\n• 시트 추가, 서식 변경 등 완전한 제어"
+            color: "purple"
+          - emoji: "🔒"
+            title: "프라이버시 우선 설계"
+            description: "• 모든 코드가 사용자 컴퓨터에서 실행\n• 클라우드로 데이터 전송하지 않음\n• Azure 클라우드 사용X\n• 완전한 오프라인 작업 가능"
+            color: "orange"
+
+  - id: "step1Prerequisites"
+    title: "1단계: 사전 준비사항"
+    blocks:
+      - type: sectionHeader
+        emoji: "📋"
+        title: "1단계: 사전 준비사항"
+        subtitle: "xlwings lite를 사용하기 위해 필요한 것들을 미리 확인해보세요"
+        color: "blue"
+
+      - type: stepCard
+        stepNumber: "체크리스트"
+        title: "시작하기 전 필수 확인사항"
+        description: "xlwings lite가 제대로 작동하려면 다음 조건들이 필요합니다. 하나씩 확인해보세요!"
+        tips:
+          - "✅ Excel 365 또는 Excel 2021 이상 버전 설치"
+          - "✅ 최신 웹브라우저 (Chrome, Firefox, Safari, Edge)"
+          - "✅ 안정적인 인터넷 연결 (초기 로딩용)"
+          - "⚠️ Excel 2019, 2016 등 구버전에서는 작동하지 않음"
+        color: "blue"
+
+      - type: warning
+        title: "🚨 중요: Excel 365/2021+ 버전이 필요합니다!"
+        description: "xlwings lite는 최신 Excel 기능을 사용하므로 Excel 365 또는 Excel 2021 이상 버전이 반드시 필요합니다. 구버전에서는 작동하지 않으니 미리 확인해주세요!"
+        warningType: "error"
+
+  - id: "step2Install"
+    title: "2단계: xlwings lite 설치하기"
+    blocks:
+      - type: sectionHeader
+        emoji: "🌟"
+        title: "2단계: xlwings lite 설치하기"
+        subtitle: "브라우저만 있으면 5분 안에 Excel 자동화를 시작할 수 있어요!"
+        color: "green"
+
+      - type: stepCard
+        stepNumber: "STEP 2-1"
+        title: "xlwings lite 웹사이트 접속하기"
+        description: "먼저 xlwings lite 공식 웹사이트에 접속해보겠습니다. 별도 가입 없이 바로 사용할 수 있어요!"
+        imageUrl: "python/excel/xlwingslite설치1.png"
+        tips:
+          - "🌐 웹브라우저에서 xlwings lite 사이트로 이동하세요"
+          - "💻 Chrome, Firefox, Safari 등 모든 브라우저에서 작동해요"
+          - "🔑 별도 회원가입이나 로그인이 필요하지 않습니다"
+          - "🚀 'Try Now' 또는 '시작하기' 버튼을 찾아보세요"
+        color: "green"
+        buttonText: "🌐 xlwings lite 바로가기"
+        buttonLink: "https://lite.xlwings.org"
+
+      - type: stepCard
+        stepNumber: "STEP 2-2"
+        title: "Microsoft AppSource에서 'Get it now' 클릭하기"
+        description: "Microsoft AppSource에서 xlwings Lite 앱을 찾아서 'Get it now' 버튼을 클릭해보겠습니다!"
+        imageUrl: "python/excel/xlwingslite설치2.png"
+        tips:
+          - "🔍 Microsoft AppSource에서 'xlwings Lite'를 검색하세요"
+          - "🏢 개발사가 'Zoomer Analytics GmbH'인지 확인하세요"
+          - "⭐ 평점과 리뷰를 확인해보세요"
+          - "🆓 'Free' 표시와 파란색 'Get it now' 버튼을 클릭하세요"
+        color: "green"
+
+      - type: stepCard
+        stepNumber: "STEP 2-3"
+        title: "Excel에서 직접 추가 기능으로 설치하기 (다른방법)"
+        description: "Excel을 이미 열어두신 분들을 위한 더 간편한 방법! Excel에서 바로 xlwings Lite를 설치할 수 있어요."
+        imageUrl: "python/excel/xlwingslite설치3.png"
+        tips:
+          - "📊 Excel을 먼저 실행하세요 (새 통합문서나 기존 파일)"
+          - "🔧 상단 리본에서 '추가 기능' 버튼을 클릭하세요"
+          - "🔍 오른쪽 '내 추가 기능' 패널에서 'xlwings' 검색하세요"
+          - "⬇️ 'xlwings Lite' 앱을 찾아서 설치하세요"
+        color: "green"
+
+      - type: warning
+        title: "💡 어떤 방법을 선택하든 OK!"
+        description: "STEP 2-1~2-3 중 아무 방법이나 선택하세요. 모든 방법은 같은 xlwings Lite 앱을 설치합니다. 본인에게 가장 편한 방법을 사용하시면 됩니다!"
+        warningType: "info"
+
+  - id: "step3Usage"
+    title: "3단계: 실제 사용해보기"
+    blocks:
+      - type: sectionHeader
+        emoji: "🚀"
+        title: "3단계: 실제 사용해보기"
+        subtitle: "이제 설치된 xlwings Lite를 실제로 사용해보겠습니다!"
+        color: "cyan"
+
+      - type: stepCard
+        stepNumber: "STEP 3-1"
+        title: "Hello World 샘플 실행하기"
+        description: "Excel 우상단의 xlwings Lite 버튼을 클릭해서 편집기를 열고, 미리 작성된 Hello World 샘플을 실행해보겠습니다!"
+        imageUrl: "python/excel/xlwingslite실행1.png"
+        tips:
+          - "📊 Excel 우상단의 'xlwings Lite' 버튼을 클릭하세요"
+          - "📝 우측에 편집기가 열리고 미리 작성된 샘플코드가 보입니다"
+          - "🔘 'hello_world' 버튼을 클릭하세요"
+          - "⚡ A1 셀에 'Hello World!'가 자동으로 입력됩니다"
+          - "드랍다운으로 다른 함수도 실행해보세요!"
+        color: "green"
+
+      - type: stepCard
+        stepNumber: "STEP 3-2"
+        title: "UDF로 Excel 함수 만들기"
+        description: "Python으로 만든 함수를 Excel에서 일반 함수처럼 사용해보겠습니다. hello 함수를 만들어서 Excel 셀에서 직접 호출해보세요!"
+        imageUrl: "python/excel/xlwingslite실행2.png"
+        tips:
+          - "🔧 UDF(User Defined Function): Python으로 만든 사용자 정의 함수"
+          - "📝 편집기에서 hello 함수 코드를 확인하세요"
+          - "📊 Excel 셀에 '=hello(\"이름\")' 형태로 입력할 수 있어요"
+          - "⚡ Python 함수가 Excel 내장 함수처럼 동작합니다!"
+        color: "green"
+
+      - type: warning
+        title: "💡 UDF란 무엇인가요?"
+        description: |
+          UDF(User Defined Function)는 사용자가 직접 만든 함수를 Excel에서 사용할 수 있게 해주는 기능입니다.
+
+          • Python으로 복잡한 계산 로직을 작성
+          • Excel에서 =함수명() 형태로 간편하게 호출
+          • 반복되는 계산 작업을 함수로 만들어 재사용
+          • VBA 대신 Python으로 Excel 기능 확장
+        warningType: "info"
+
+  - id: "step4Technical"
+    title: "4단계: 기술적 이해"
+    blocks:
+      - type: sectionHeader
+        emoji: "🔧"
+        title: "4단계: 기술적 이해"
+        subtitle: "xlwings Lite가 어떻게 작동하는지 더 깊이 알아보세요!"
+        color: "indigo"
+
+      - type: info
+        title: "🤔 WASM과 Pyodide가 뭔가요?"
+        htmlContent: |
+          <p class="mb-4">xlwings Lite는 최신 웹 기술을 사용해서 Excel 내부에서 Python을 실행합니다.</p>
+          <ul class="space-y-3 mb-4">
+            <li>🔧 <strong>WebAssembly (WASM):</strong> 브라우저에서 네이티브 수준의 성능으로 다양한 언어를 실행하는 기술</li>
+            <li>🐍 <strong>Pyodide:</strong> CPython을 WebAssembly로 컴파일한 Python 배포판. 브라우저에서 완전한 Python 환경을 제공</li>
+            <li>📱 <strong>Office.js:</strong> Excel 내부에 웹브라우저를 임베드하는 Microsoft의 애드인 플랫폼</li>
+            <li>🔗 <strong>연결 구조:</strong> Python(Pyodide) ↔ JavaScript ↔ Office.js ↔ Excel</li>
+          </ul>
+          <div class="bg-gray-100 p-4 rounded-lg">
+            <p class="font-bold text-indigo-600">Excel이 내부적으로 웹브라우저를 실행하고, 그 브라우저에서 Python이 동작합니다!</p>
+          </div>
+        color: "indigo"
+
+      - type: warning
+        title: "🤷‍♂️ Excel과 Python이 어떻게 통신하나요?"
+        htmlContent: |
+          핵심 동작 원리를 쉽게 설명드릴게요!<br/><br/>
+          1️⃣ Excel 내부에 브라우저 창이 열립니다 (Office.js 애드인)<br/>
+          2️⃣ 브라우저에서 Pyodide가 Python 환경을 제공합니다<br/>
+          3️⃣ Python 코드가 JavaScript API를 통해 Excel과 통신합니다<br/>
+          4️⃣ 모든 작업이 로컬 컴퓨터에서 실행됩니다 (클라우드 X)<br/><br/>
+          📊 결과: Python 코드로 Excel 셀 읽기/쓰기, 시트 추가, 서식 변경 등이 가능!<br/>
+          🔒 보안: 데이터가 외부로 전송되지 않아 완전히 안전합니다.
+        warningType: "info"
+
+  - id: "limitations"
+    title: "xlwings Lite 제약사항"
+    blocks:
+      - type: sectionHeader
+        emoji: "⚠️"
+        title: "xlwings Lite 제약사항"
+        subtitle: "사용하기 전에 알아두면 좋은 제한사항들"
+        color: "yellow"
+
+      - type: warning
+        title: "📋 시스템 요구사항"
+        htmlContent: |
+          • Excel 365 또는 Excel 2021 이상 버전 필수<br>
+          • Excel 2019, 2016 등 구버전에서는 작동하지 않음<br>
+          • 최신 웹브라우저 필요 (Internet Explorer 불가)<br>
+          • 초기 로딩 시 인터넷 연결 필요
+        warningType: "warning"
+
+      - type: warning
+        title: "🔧 기능 제한사항"
+        htmlContent: |
+          <strong>💻 WebAssembly 환경 제약:</strong><br>
+          • 일부 Python 패키지는 WASM에서 지원되지 않음 (PyTorch, TensorFlow 등)<br>
+          • 네이티브 바이너리 의존성이 있는 패키지는 제한적<br>
+          • 메모리 사용량이 브라우저 제한을 받음<br><br>
+          <strong>🌐 웹 환경 보안 제약:</strong><br>
+          • 로컬 파일 시스템에 직접 접근 불가<br>
+          • 데이터베이스 직접 연결 불가 (웹 API를 통해서만 가능)<br>
+          • CORS가 설정된 웹 API만 호출 가능<br><br>
+          <strong>📊 Excel 호환성:</strong><br>
+          • VBA 매크로와는 별개의 환경<br>
+          • Office.js API 범위 내에서만 Excel 제어 가능<br>
+          • 일부 고급 Excel 기능은 아직 미지원
+        warningType: "info"
+
+  - id: "alternatives"
+    title: "다른 솔루션과의 비교"
+    blocks:
+      - type: sectionHeader
+        emoji: "🤔"
+        title: "다른 Excel Python 솔루션과의 비교"
+        subtitle: "Python in Excel과 Anaconda Code와 xlwings Lite의 차이점을 알아봅시다"
+        color: "purple"
+
+      - type: fullWidthComparison
+        title: "🔍 Excel에서 Python을 사용하는 3가지 방법"
+        cards:
+          - title: "Python in Excel"
+            icon: "☁️"
+            items:
+              - "Microsoft 공식 솔루션"
+              - "Azure 클라우드에서 실행"
+              - "Microsoft 365 구독 필요"
+              - "셀 기반 코딩 환경"
+            colors:
+              bgFrom: "#dbeafe"
+              bgTo: "#bfdbfe"
+              border: "#93c5fd"
+              text: "#1e40af"
+          - title: "Anaconda Code"
+            icon: "🐍"
+            items:
+              - "Anaconda Inc. 솔루션"
+              - "Pyodide 기반 (로컬 실행)"
+              - "Anaconda 계정 로그인 필요"
+              - "사용 데이터 외부 수집됨"
+            colors:
+              bgFrom: "#dcfce7"
+              bgTo: "#bbf7d0"
+              border: "#86efac"
+              text: "#166534"
+          - title: "xlwings Lite"
+            icon: "🌟"
+            items:
+              - "로그인 불필요"
+              - "Pyodide 기반 (로컬 실행)"
+              - "Excel 객체 모델 접근 가능"
+              - "프라이버시 우선 설계"
+            colors:
+              bgFrom: "#ecfeff"
+              bgTo: "#cffafe"
+              border: "#67e8f9"
+              text: "#155e75"
+        color: "purple"
+
+      - type: linkButtons
+        buttons:
+          - text: "🌐 xlwings Lite 공식문서 바로가기"
+            url: "https://lite.xlwings.org/"
+            color: "cyan"
+          - text: "📊 Python in Excel vs xlwings Lite 상세 비교"
+            url: "https://lite.xlwings.org/xlwingslite_vs_pythoninexcel"
+            color: "blue"
+          - text: "🐍 Anaconda Code vs xlwings Lite 상세 비교"
+            url: "https://lite.xlwings.org/xlwingslite_vs_anacondacode"
+            color: "green"

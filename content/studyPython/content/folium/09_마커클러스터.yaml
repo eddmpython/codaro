@@ -1,0 +1,479 @@
+meta:
+  id: folium_09
+  title: 마커 클러스터
+  order: 9
+  category: folium
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["folium", "MarkerCluster", "클러스터", "대량마커", "그룹화"]
+  seo:
+    title: "Folium MarkerCluster - 대량 마커 효율적 표시"
+    description: "Folium으로 마커 클러스터를 만듭니다. 수백, 수천 개의 마커를 효율적으로 그룹화합니다."
+    keywords: ["folium", "MarkerCluster", "클러스터", "대량마커", "줌"]
+
+intro:
+  emoji: "🔢"
+  goal: 대량의 마커를 클러스터로 효율적으로 표시합니다.
+  description: 마커가 많으면 지도가 느려지고 보기 어렵습니다. MarkerCluster는 가까운 마커들을 숫자로 그룹화하고, 줌인하면 개별 마커가 나타납니다. 수천 개의 위치도 깔끔하게 표시할 수 있습니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: folium과 MarkerCluster 플러그인을 불러옵니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: MarkerCluster 플러그인 포함
+    content: |-
+      import folium
+      from folium.plugins import MarkerCluster
+      import marimo as mo
+
+- id: step2_basic_cluster
+  title: 2단계. 기본 클러스터
+  subtitle: MarkerCluster()
+  blocks:
+  - type: text
+    content: MarkerCluster를 생성하고 마커를 추가합니다. 마커들이 자동으로 그룹화됩니다.
+  - type: code
+    language: python
+    title: 기본 클러스터
+    description: 마커 그룹화
+    content: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=12)
+
+      markerCluster = MarkerCluster().add_to(m1)
+
+      locations = [
+          [37.5665, 126.9780],
+          [37.5670, 126.9785],
+          [37.5660, 126.9775],
+          [37.5700, 126.9750],
+          [37.5710, 126.9760],
+          [37.5720, 126.9770],
+          [37.5500, 126.9900],
+          [37.5510, 126.9910],
+          [37.5490, 126.9890]
+      ]
+
+      for loc in locations:
+          folium.Marker(location=loc).add_to(markerCluster)
+
+      mo.iframe(m1._repr_html_())
+  - type: tip
+    content: 클러스터에 표시된 숫자는 그룹에 포함된 마커 수입니다. 클릭하거나 줌인하면 분리됩니다.
+
+- id: step3_large_data
+  title: 3단계. 대량 데이터
+  subtitle: 많은 마커
+  blocks:
+  - type: text
+    content: 수백 개의 마커를 클러스터로 효율적으로 표시합니다.
+  - type: code
+    language: python
+    title: 200개 마커
+    description: 랜덤 위치
+    content: |-
+      import random
+
+      m2 = folium.Map(location=seoulCenter, zoom_start=11)
+      cluster2 = MarkerCluster().add_to(m2)
+
+      for _ in range(200):
+          lat = 37.5 + random.uniform(-0.1, 0.1)
+          lon = 127.0 + random.uniform(-0.1, 0.1)
+          folium.Marker([lat, lon]).add_to(cluster2)
+
+      mo.iframe(m2._repr_html_())
+  - type: tip
+    content: 200개 마커도 클러스터로 표시하면 지도가 깔끔합니다. 줌인해서 개별 마커를 확인하세요.
+
+- id: step4_popup_tooltip
+  title: 4단계. 팝업과 툴팁
+  subtitle: 마커 정보
+  blocks:
+  - type: text
+    content: 클러스터 내 마커에도 팝업과 툴팁을 추가할 수 있습니다.
+  - type: code
+    language: python
+    title: 정보 포함 마커
+    description: 팝업/툴팁 추가
+    content: |-
+      m3 = folium.Map(location=seoulCenter, zoom_start=13)
+      cluster3 = MarkerCluster().add_to(m3)
+
+      stores = [
+          {"name": "강남점", "loc": [37.4979, 127.0276]},
+          {"name": "홍대점", "loc": [37.5563, 126.9236]},
+          {"name": "명동점", "loc": [37.5636, 126.9869]},
+          {"name": "시청점", "loc": [37.5665, 126.9780]},
+          {"name": "여의도점", "loc": [37.5219, 126.9245]},
+          {"name": "잠실점", "loc": [37.5133, 127.1001]}
+      ]
+
+      for store in stores:
+          folium.Marker(
+              location=store["loc"],
+              popup=f"<b>{store['name']}</b>",
+              tooltip=store["name"]
+          ).add_to(cluster3)
+
+      mo.iframe(m3._repr_html_())
+  - type: tip
+    content: 줌인해서 개별 마커를 클릭하면 팝업이 표시됩니다.
+
+- id: step5_custom_icon
+  title: 5단계. 커스텀 아이콘
+  subtitle: Icon 적용
+  blocks:
+  - type: text
+    content: 클러스터 내 마커에 커스텀 아이콘을 적용합니다.
+  - type: code
+    language: python
+    title: 아이콘 적용
+    description: 색상/아이콘 변경
+    content: |-
+      m4 = folium.Map(location=seoulCenter, zoom_start=12)
+      cluster4 = MarkerCluster().add_to(m4)
+
+      cafes = [
+          {"name": "스타벅스 강남", "loc": [37.4979, 127.0276]},
+          {"name": "스타벅스 홍대", "loc": [37.5563, 126.9236]},
+          {"name": "스타벅스 명동", "loc": [37.5636, 126.9869]},
+          {"name": "스타벅스 시청", "loc": [37.5665, 126.9780]},
+          {"name": "스타벅스 을지로", "loc": [37.5660, 126.9910]}
+      ]
+
+      for cafe in cafes:
+          folium.Marker(
+              location=cafe["loc"],
+              popup=cafe["name"],
+              icon=folium.Icon(color="green", icon="cloud")
+          ).add_to(cluster4)
+
+      mo.iframe(m4._repr_html_())
+  - type: tip
+    content: 클러스터 아이콘(숫자 원)은 자동 생성되고, 개별 마커는 지정한 아이콘으로 표시됩니다.
+
+- id: step6_multiple_clusters
+  title: 6단계. 여러 클러스터
+  subtitle: 카테고리별 분류
+  blocks:
+  - type: text
+    content: 카테고리별로 별도의 클러스터를 만들어 분류합니다.
+  - type: code
+    language: python
+    title: 카페 vs 음식점
+    description: 분리 클러스터
+    content: |-
+      m5 = folium.Map(location=seoulCenter, zoom_start=12)
+
+      cafeCluster = MarkerCluster(name="카페").add_to(m5)
+      restaurantCluster = MarkerCluster(name="음식점").add_to(m5)
+
+      cafeLocations = [
+          [37.5665, 126.9780],
+          [37.5670, 126.9790],
+          [37.5660, 126.9770],
+          [37.5700, 126.9750]
+      ]
+
+      restaurantLocations = [
+          [37.5600, 126.9850],
+          [37.5610, 126.9860],
+          [37.5590, 126.9840],
+          [37.5620, 126.9870]
+      ]
+
+      for loc in cafeLocations:
+          folium.Marker(
+              location=loc,
+              icon=folium.Icon(color="cadetblue", icon="cloud")
+          ).add_to(cafeCluster)
+
+      for loc in restaurantLocations:
+          folium.Marker(
+              location=loc,
+              icon=folium.Icon(color="red", icon="cutlery")
+          ).add_to(restaurantCluster)
+
+      folium.LayerControl().add_to(m5)
+
+      mo.iframe(m5._repr_html_())
+  - type: tip
+    content: LayerControl로 카테고리별 클러스터를 켜고 끌 수 있습니다.
+
+- id: step7_cluster_options
+  title: 7단계. 클러스터 옵션
+  subtitle: 동작 설정
+  blocks:
+  - type: text
+    content: MarkerCluster에 다양한 옵션을 설정할 수 있습니다.
+  - type: code
+    language: python
+    title: 옵션 설정
+    description: 클러스터 동작 변경
+    content: |-
+      import random
+
+      m6 = folium.Map(location=seoulCenter, zoom_start=12)
+
+      optionCluster = MarkerCluster(
+          options={
+              "maxClusterRadius": 50,
+              "disableClusteringAtZoom": 15,
+              "spiderfyOnMaxZoom": True
+          }
+      ).add_to(m6)
+
+      for _ in range(50):
+          lat = 37.55 + random.uniform(-0.03, 0.03)
+          lon = 126.98 + random.uniform(-0.03, 0.03)
+          folium.Marker([lat, lon]).add_to(optionCluster)
+
+      mo.iframe(m6._repr_html_())
+  - type: tip
+    content: maxClusterRadius는 클러스터 반경(픽셀), disableClusteringAtZoom은 클러스터링 해제 줌 레벨입니다.
+
+- id: step8_show_coverage
+  title: 8단계. 커버리지 표시
+  subtitle: 클러스터 범위
+  blocks:
+  - type: text
+    content: showCoverageOnHover 옵션으로 클러스터의 범위를 시각화합니다.
+  - type: code
+    language: python
+    title: 범위 표시
+    description: 호버 시 영역
+    content: |-
+      import random
+
+      m7 = folium.Map(location=seoulCenter, zoom_start=12)
+
+      coverageCluster = MarkerCluster(
+          options={
+              "showCoverageOnHover": True
+          }
+      ).add_to(m7)
+
+      for _ in range(80):
+          lat = 37.55 + random.uniform(-0.05, 0.05)
+          lon = 126.98 + random.uniform(-0.05, 0.05)
+          folium.Marker([lat, lon]).add_to(coverageCluster)
+
+      mo.iframe(m7._repr_html_())
+  - type: tip
+    content: 클러스터 위에 마우스를 올리면 포함된 마커들의 범위가 표시됩니다.
+
+- id: step9_with_other_elements
+  title: 9단계. 다른 요소와 조합
+  subtitle: 클러스터 + 도형
+  blocks:
+  - type: text
+    content: 클러스터와 일반 마커, 도형을 함께 사용합니다.
+  - type: code
+    language: python
+    title: 본사 + 지점 클러스터
+    description: 조합 예제
+    content: |-
+      import random
+
+      m8 = folium.Map(location=seoulCenter, zoom_start=12, tiles="CartoDB Positron")
+
+      hqLocation = [37.5665, 126.9780]
+
+      folium.Marker(
+          location=hqLocation,
+          popup="<b>본사</b>",
+          icon=folium.Icon(color="red", icon="home")
+      ).add_to(m8)
+
+      folium.Circle(
+          location=hqLocation,
+          radius=3000,
+          color="red",
+          fill=True,
+          fill_opacity=0.1,
+          popup="서비스 권역"
+      ).add_to(m8)
+
+      branchCluster = MarkerCluster(name="지점").add_to(m8)
+
+      for _ in range(40):
+          lat = 37.55 + random.uniform(-0.04, 0.04)
+          lon = 126.98 + random.uniform(-0.04, 0.04)
+          folium.Marker(
+              [lat, lon],
+              icon=folium.Icon(color="blue", icon="briefcase")
+          ).add_to(branchCluster)
+
+      mo.iframe(m8._repr_html_())
+  - type: tip
+    content: 중요한 위치는 일반 마커로, 대량의 위치는 클러스터로 표시합니다.
+
+- id: step10_complete
+  title: 10단계. 완성 예제
+  subtitle: 전국 매장 지도
+  blocks:
+  - type: text
+    content: 전국 매장 위치를 클러스터로 표시하는 완성 예제입니다.
+  - type: code
+    language: python
+    title: 전국 매장 지도
+    description: 종합 예제
+    content: |-
+      import random
+
+      storeMap = folium.Map(
+          location=[36.5, 127.5],
+          zoom_start=7,
+          tiles="CartoDB Positron"
+      )
+
+      storeCluster = MarkerCluster(
+          name="전국 매장",
+          options={
+              "maxClusterRadius": 80,
+              "showCoverageOnHover": True,
+              "spiderfyOnMaxZoom": True
+          }
+      ).add_to(storeMap)
+
+      regions = [
+          {"name": "서울", "center": [37.5665, 126.9780], "count": 50},
+          {"name": "부산", "center": [35.1796, 129.0756], "count": 30},
+          {"name": "대전", "center": [36.3504, 127.3845], "count": 20},
+          {"name": "대구", "center": [35.8714, 128.6014], "count": 25},
+          {"name": "광주", "center": [35.1595, 126.8526], "count": 15},
+          {"name": "제주", "center": [33.4996, 126.5312], "count": 10}
+      ]
+
+      for region in regions:
+          for i in range(region["count"]):
+              lat = region["center"][0] + random.uniform(-0.05, 0.05)
+              lon = region["center"][1] + random.uniform(-0.05, 0.05)
+              folium.Marker(
+                  location=[lat, lon],
+                  popup=f"{region['name']} {i+1}호점",
+                  tooltip=f"{region['name']} 매장",
+                  icon=folium.Icon(color="green", icon="shopping-cart")
+              ).add_to(storeCluster)
+
+      for region in regions:
+          folium.CircleMarker(
+              location=region["center"],
+              radius=8,
+              color="darkblue",
+              fill=True,
+              fill_color="blue",
+              popup=f"<b>{region['name']}</b><br>매장 수: {region['count']}"
+          ).add_to(storeMap)
+
+      folium.LayerControl().add_to(storeMap)
+
+      mo.iframe(storeMap._repr_html_())
+
+- id: practice
+  title: 실습
+  subtitle: 마커 클러스터
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  - type: expansion
+    title: "미션1: 편의점 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        from folium.plugins import MarkerCluster
+        import random
+        import marimo as mo
+
+        convenienceStores = []
+        for _ in range(100):
+            lat = 37.55 + random.uniform(-0.05, 0.05)
+            lon = 126.98 + random.uniform(-0.05, 0.05)
+            brand = random.choice(["CU", "GS25", "세븐일레븐"])
+            convenienceStores.append({"loc": [lat, lon], "brand": brand})
+
+        len(convenienceStores)
+    - type: code
+      title: 지도 생성
+      content: |-
+        convMap = folium.Map(location=[37.55, 126.98], zoom_start=13)
+
+        cuCluster = MarkerCluster(name="CU").add_to(convMap)
+        gsCluster = MarkerCluster(name="GS25").add_to(convMap)
+        sevenCluster = MarkerCluster(name="세븐일레븐").add_to(convMap)
+
+        brandColors = {"CU": "purple", "GS25": "orange", "세븐일레븐": "green"}
+        brandClusters = {"CU": cuCluster, "GS25": gsCluster, "세븐일레븐": sevenCluster}
+
+        for store in convenienceStores:
+            brand = store["brand"]
+            folium.Marker(
+                location=store["loc"],
+                popup=brand,
+                icon=folium.Icon(color=brandColors[brand])
+            ).add_to(brandClusters[brand])
+
+        folium.LayerControl().add_to(convMap)
+
+        mo.iframe(convMap._repr_html_())
+  - type: expansion
+    title: "미션2: 관광지 클러스터"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        from folium.plugins import MarkerCluster
+        import random
+        import marimo as mo
+
+        tourSpots = [
+            {"name": "경복궁", "loc": [37.5796, 126.9770], "category": "역사"},
+            {"name": "창덕궁", "loc": [37.5794, 126.9910], "category": "역사"},
+            {"name": "북촌한옥마을", "loc": [37.5826, 126.9831], "category": "역사"},
+            {"name": "명동", "loc": [37.5636, 126.9869], "category": "쇼핑"},
+            {"name": "동대문", "loc": [37.5711, 127.0095], "category": "쇼핑"},
+            {"name": "남산타워", "loc": [37.5512, 126.9882], "category": "관광"},
+            {"name": "한강공원", "loc": [37.5283, 126.9340], "category": "자연"},
+            {"name": "북한산", "loc": [37.6608, 126.9933], "category": "자연"}
+        ]
+        tourSpots
+    - type: code
+      title: 지도 생성
+      content: |-
+        tourMap = folium.Map(location=[37.56, 126.98], zoom_start=11)
+
+        tourCluster = MarkerCluster(
+            name="관광지",
+            options={"showCoverageOnHover": True}
+        ).add_to(tourMap)
+
+        categoryIcons = {
+            "역사": {"color": "red", "icon": "tower"},
+            "쇼핑": {"color": "pink", "icon": "shopping-cart"},
+            "관광": {"color": "blue", "icon": "camera"},
+            "자연": {"color": "green", "icon": "leaf"}
+        }
+
+        for spot in tourSpots:
+            cat = spot["category"]
+            folium.Marker(
+                location=spot["loc"],
+                popup=f"<b>{spot['name']}</b><br>{cat}",
+                tooltip=spot["name"],
+                icon=folium.Icon(
+                    color=categoryIcons[cat]["color"],
+                    icon=categoryIcons[cat]["icon"]
+                )
+            ).add_to(tourCluster)
+
+        mo.iframe(tourMap._repr_html_())

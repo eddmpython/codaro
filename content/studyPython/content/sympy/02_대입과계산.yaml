@@ -1,0 +1,353 @@
+meta:
+  id: sympy_02
+  title: 대입과계산
+  order: 2
+  category: sympy
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["sympy", "subs", "evalf", "N", "대입", "수치계산"]
+  seo:
+    title: "SymPy 대입과 계산 - subs, evalf 사용법"
+    description: "SymPy로 수식에 값을 대입하고 수치 계산을 수행합니다. subs()와 evalf()로 기호에서 숫자로 변환하는 방법을 배웁니다."
+    keywords: ["sympy", "subs", "evalf", "대입", "수치계산", "N"]
+
+intro:
+  emoji: "🔢"
+  goal: 수식에 값을 대입하고 수치 계산을 수행합니다.
+  description: "기호 수학의 진정한 힘은 수식을 만든 후 원하는 값을 대입할 수 있다는 점입니다. 원의 넓이 πr²을 공식으로 정의해두고, r=5일 때, r=10일 때 값을 바로 계산할 수 있습니다. subs()로 기호에 값을 대입하고, evalf()로 π나 √2 같은 무리수를 소수점으로 변환합니다. 물리 공식에 측정값을 넣거나, 수학 함수의 특정 점에서 값을 구하거나, 복잡한 계산을 단계별로 검증할 때 이 기능들이 핵심입니다."
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "SymPy에서 기호 정의, 수식 조작, 대입과 수치 계산에 필요한 함수들을 불러옵니다. 이번 프로젝트에서는 subs()와 evalf()가 핵심입니다. pi는 원주율 3.14159..., E는 자연상수 2.71828...을 정확한 기호로 제공합니다. N()은 evalf()의 간편 버전으로, 수식을 빠르게 수치로 변환할 때 사용합니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sympy 함수들을 불러옵니다
+    content: |-
+      from sympy import symbols, expand, factor, simplify, sqrt, Rational
+      from sympy import pi, E, N
+      from sympy import init_printing
+      init_printing()
+
+- id: step2_subs_basic
+  title: 2단계. 기본 대입
+  subtitle: subs()
+  blocks:
+  - type: text
+    content: "subs()는 substitute(대입)의 줄임말입니다. expr.subs(x, 3)은 수식 expr에서 x를 3으로 바꿉니다. 중요한 점은 원본 수식이 변경되지 않고 새로운 수식이 반환된다는 것입니다. 같은 공식에 여러 값을 대입해 비교할 때 원본을 보존하는 이 특성이 유용합니다. 예를 들어 이차함수 f(x) = x²+2x+1에서 f(0), f(1), f(2)를 각각 구할 수 있습니다."
+  - type: code
+    language: python
+    title: 기호 정의와 수식 생성
+    description: x와 2차식을 정의합니다
+    content: |-
+      x = symbols('x')
+      expr = x**2 + 2*x + 1
+      expr
+  - type: code
+    language: python
+    title: 값 대입
+    description: x에 3을 대입합니다
+    content: |-
+      result = expr.subs(x, 3)
+      result
+  - type: tip
+    content: subs(기호, 값) 형식으로 사용합니다. 반환되는 것은 새로운 수식이며, 원본 expr은 그대로 유지됩니다.
+
+- id: step3_subs_symbol
+  title: 3단계. 기호로 대입
+  subtitle: 기호 치환
+  blocks:
+  - type: text
+    content: "subs()는 숫자뿐 아니라 다른 기호나 수식으로도 대입할 수 있습니다. x를 y로 바꾸면 변수명 변경, x를 y+1로 바꾸면 수식 변환이 됩니다. 이 기능은 수학에서 변수 치환(substitution)이라고 부르는 중요한 기법입니다. 예를 들어 적분에서 u = x+1로 치환하거나, 좌표 변환에서 x를 r*cos(θ)로 바꾸는 것과 같습니다."
+  - type: code
+    language: python
+    title: 기호로 대입
+    description: x를 y로 치환합니다
+    content: |-
+      y = symbols('y')
+      replaced = expr.subs(x, y)
+      replaced
+  - type: code
+    language: python
+    title: 수식으로 대입
+    description: x를 y+1로 치환합니다
+    content: |-
+      transformed = expr.subs(x, y + 1)
+      etrans = expand(transformed)
+      etrans
+  - type: tip
+    content: x를 y+1로 대입하면 (y+1)²+2(y+1)+1이 됩니다. expand()로 전개하면 정리된 결과를 얻습니다.
+
+- id: step4_subs_multiple
+  title: 4단계. 여러 값 대입
+  subtitle: 딕셔너리 사용
+  blocks:
+  - type: text
+    content: "여러 기호에 동시에 값을 대입할 때는 파이썬 딕셔너리를 사용합니다. {x: 1, y: 2, z: 3} 형식으로 전달하면 x, y, z 모두 한 번에 대입됩니다. 물리 공식에서 여러 상수(중력가속도, 질량, 속도 등)를 동시에 넣거나, 연립방정식의 해를 검증할 때 유용합니다. 일부 기호만 대입하고 나머지는 기호로 남겨둘 수도 있어, 단계별로 계산을 진행할 때 편리합니다."
+  - type: code
+    language: python
+    title: 두 변수 수식
+    description: x, y가 포함된 수식을 만듭니다
+    content: |-
+      z = symbols('z')
+      multi = x**2 + y**2 + z
+      multi
+  - type: code
+    language: python
+    title: 여러 값 동시 대입
+    description: 딕셔너리로 여러 값을 대입합니다
+    content: |-
+      values = {x: 1, y: 2, z: 3}
+      mresult = multi.subs(values)
+      mresult
+  - type: code
+    language: python
+    title: 일부만 대입
+    description: 일부 기호만 대입합니다
+    content: |-
+      partial = multi.subs({x: 1, y: 2})
+      partial
+  - type: tip
+    content: 딕셔너리에 포함되지 않은 기호는 그대로 남습니다. 단계별로 값을 대입할 때 유용합니다.
+
+- id: step5_evalf
+  title: 5단계. 수치 계산
+  subtitle: evalf()
+  blocks:
+  - type: text
+    content: "evalf()는 evaluate float의 줄임말로, 수식을 부동소수점 숫자로 계산합니다. √2는 1.4142135..., π는 3.1415926...으로 변환됩니다. 기본 정밀도는 15자리이지만, evalf(50)처럼 원하는 자릿수를 지정할 수 있습니다. 과학 계산에서 고정밀도가 필요하거나, 결과를 소수점으로 확인하고 싶을 때 사용합니다. 기호 계산으로 정확한 답을 구한 후, 마지막에 evalf()로 수치 결과를 얻는 것이 권장 패턴입니다."
+  - type: code
+    language: python
+    title: 제곱근 계산
+    description: √2를 소수로 변환합니다
+    content: |-
+      root2 = sqrt(2)
+      decimal = root2.evalf()
+      decimal
+  - type: code
+    language: python
+    title: 정밀도 지정
+    description: 소수점 자릿수를 지정합니다
+    content: |-
+      precise = root2.evalf(50)
+      precise
+  - type: code
+    language: python
+    title: 파이 계산
+    description: π를 소수로 변환합니다
+    content: |-
+      pival = pi.evalf(30)
+      pival
+  - type: tip
+    content: evalf(n)에서 n은 유효숫자 개수입니다. 기본값은 15자리입니다. 고정밀 계산이 필요할 때 자릿수를 늘릴 수 있습니다.
+
+- id: step6_N
+  title: 6단계. N() 함수
+  subtitle: 간편 수치화
+  blocks:
+  - type: text
+    content: "N()은 evalf()의 간편 버전입니다. expr.evalf() 대신 N(expr)처럼 함수 형태로 호출할 수 있습니다. 기능은 동일하지만, 여러 수식을 연속으로 수치화할 때 N(sqrt(2)), N(pi), N(E)처럼 간결하게 쓸 수 있어 편리합니다. N(expr, 20)처럼 정밀도 지정도 가능합니다."
+  - type: code
+    language: python
+    title: N() 사용
+    description: N()으로 수치 변환합니다
+    content: |-
+      val1 = N(sqrt(3))
+      val1
+  - type: code
+    language: python
+    title: 정밀도 지정
+    description: N()에서도 정밀도를 지정합니다
+    content: |-
+      val2 = N(E, 20)
+      val2
+  - type: tip
+    content: E는 자연상수 e(≈2.718...)입니다. SymPy에서 대문자 E로 사용합니다. exp(1)과 같습니다.
+
+- id: step7_combine
+  title: 7단계. 대입 후 수치화
+  subtitle: subs + evalf
+  blocks:
+  - type: text
+    content: "실제 계산에서는 subs()로 값을 대입한 후 evalf()로 수치 결과를 얻는 패턴을 가장 많이 사용합니다. circle.subs(x, 5).evalf()처럼 체이닝으로 한 줄에 처리할 수 있습니다. 원의 넓이 πr²에 r=5를 넣고 수치로 변환하면 78.5398...이 나옵니다. 피타고라스 정리로 빗변 길이를 구하거나, 복리 이자를 계산하는 등 실생활 공식에 이 패턴을 적용할 수 있습니다."
+  - type: code
+    language: python
+    title: 대입 후 수치화
+    description: 값 대입 후 소수로 계산합니다
+    content: |-
+      circle = pi * x**2
+      area = circle.subs(x, 5).evalf()
+      area
+  - type: code
+    language: python
+    title: 복잡한 수식 계산
+    description: 여러 단계 계산을 연결합니다
+    content: |-
+      formula = sqrt(x**2 + y**2)
+      distance = formula.subs({x: 3, y: 4}).evalf()
+      distance
+  - type: tip
+    content: .subs().evalf() 체이닝으로 대입과 수치화를 한 줄에 처리합니다. 수학 공식에 값을 넣어 결과를 구할 때 유용합니다.
+
+- id: step8_simplify_subs
+  title: 8단계. 간소화 후 대입
+  subtitle: 효율적 계산
+  blocks:
+  - type: text
+    content: "복잡한 수식은 먼저 simplify()로 간소화한 후 값을 대입하면 효율적입니다. (x²-1)/(x-1)을 x+1로 간소화하면 계산이 훨씬 간단해집니다. 또한 간소화되지 않은 분수식에 특정 값(예: x=1)을 대입하면 0/0이 되어 문제가 생길 수 있지만, 간소화 후에는 정상적으로 계산됩니다. 과학 계산에서 수식이 복잡할수록 먼저 정리하는 것이 오류를 줄이는 좋은 습관입니다."
+  - type: code
+    language: python
+    title: 복잡한 수식
+    description: 간소화 가능한 수식을 만듭니다
+    content: |-
+      messy = (x**2 - 1)/(x - 1)
+      messy
+  - type: code
+    language: python
+    title: 직접 대입 vs 간소화 후 대입
+    description: 두 방법을 비교합니다
+    content: |-
+      direct = messy.subs(x, 5)
+      direct
+  - type: code
+    language: python
+    title: 간소화 후 대입
+    description: 먼저 간소화합니다
+    content: |-
+      clean = simplify(messy)
+      indirect = clean.subs(x, 5)
+      clean, indirect
+  - type: tip
+    content: (x²-1)/(x-1) = x+1로 간소화됩니다. 간소화 후 대입하면 더 깔끔하고 빠릅니다.
+
+- id: step9_constants
+  title: 9단계. 수학 상수
+  subtitle: pi, E, oo
+  blocks:
+  - type: text
+    content: "SymPy는 π(pi), e(E), ∞(oo) 같은 수학 상수를 기호로 제공합니다. 이 상수들은 정확한 값을 유지하므로 2*pi는 2π로, pi**2는 π²로 표현됩니다. 구의 부피 (4/3)πr³ 같은 공식을 정확하게 표현하고, 마지막에 evalf()로 수치 결과를 얻을 수 있습니다. 무한대 oo는 극한 계산 등에서 사용됩니다."
+  - type: code
+    language: python
+    title: 상수 확인
+    description: 수학 상수들을 확인합니다
+    content: |-
+      from sympy import oo
+      constants = pi, E, oo
+      constants
+  - type: code
+    language: python
+    title: 상수 연산
+    description: 상수를 포함한 수식을 계산합니다
+    content: |-
+      sphere = Rational(4, 3) * pi * x**3
+      vol = sphere.subs(x, 3)
+      vol
+  - type: code
+    language: python
+    title: 수치 변환
+    description: 결과를 소수로 변환합니다
+    content: |-
+      vnum = vol.evalf()
+      vnum
+  - type: tip
+    content: "oo는 무한대(infinity)입니다. 극한 계산 등에서 사용합니다. pi*r²처럼 공식을 정확하게 표현할 수 있습니다."
+
+- id: step10_practical
+  title: 10단계. 실전 예제
+  subtitle: 공식 계산
+  blocks:
+  - type: text
+    content: "실제 수학/과학 공식에 값을 대입하는 실전 예제입니다. 이차방정식의 판별식 b²-4ac로 근의 개수를 판단하고, 피타고라스 정리 √(a²+b²)로 빗변 길이를 구하고, 복리 이자 공식 P(1+r)ⁿ으로 미래 가치를 계산합니다. 공식을 기호로 정의해두면 여러 값에 대해 재사용할 수 있어 효율적입니다."
+  - type: code
+    language: python
+    title: 이차방정식 판별식
+    description: ax²+bx+c의 판별식 b²-4ac
+    content: |-
+      a, b, c = symbols('a b c')
+      discriminant = b**2 - 4*a*c
+      disc1 = discriminant.subs({a: 1, b: 5, c: 6})
+      disc1
+  - type: code
+    language: python
+    title: 피타고라스 정리
+    description: 빗변 길이 계산
+    content: |-
+      hypotenuse = sqrt(a**2 + b**2)
+      length = hypotenuse.subs({a: 5, b: 12})
+      length
+  - type: code
+    language: python
+    title: 복리 이자
+    description: 원금×(1+이율)^기간
+    content: |-
+      r, n = symbols('r n')
+      compound = a * (1 + r)**n
+      fut = compound.subs({a: 1000, r: Rational(5, 100), n: 10})
+      fnum = fut.evalf()
+      fnum
+
+- id: practice
+  title: 실습
+  subtitle: 대입과 계산 연습
+  blocks:
+  - type: text
+    content: "지금까지 배운 subs, evalf, N, simplify를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 원의 둘레와 넓이 공식에 값을 대입하고 비율을 분석합니다. 미션2는 물리학의 포물선 운동 방정식에 초기값을 대입하여 시간별 높이를 계산합니다. 각 미션은 독립적으로 실행 가능하므로 원하는 것부터 시작하세요."
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 원의 둘레와 넓이"
+    blocks:
+    - type: code
+      title: "공식 정의"
+      content: |-
+        from sympy import symbols, pi, Rational, simplify
+
+        radius = symbols('radius')
+
+        perimeter = 2 * pi * radius
+        surface = pi * radius**2
+
+        perim5 = perimeter.subs(radius, 5)
+        surf5 = surface.subs(radius, 5)
+        perim5, surf5
+    - type: code
+      title: "수치 변환"
+      content: |-
+        perimNum = perim5.evalf()
+        surfNum = surf5.evalf()
+        perimNum, surfNum
+    - type: code
+      title: "비율 계산"
+      content: |-
+        proportion = simplify(surface / perimeter)
+        propVal = proportion.subs(radius, 10).evalf()
+        proportion, propVal
+  - type: expansion
+    title: "미션2: 운동 방정식 계산"
+    blocks:
+    - type: code
+      title: "방정식 정의"
+      content: |-
+        from sympy import symbols, Rational, sqrt, simplify
+
+        vel, grav, time, alt = symbols('vel grav time alt')
+
+        position = alt + vel*time - Rational(1, 2)*grav*time**2
+        position
+    - type: code
+      title: "초기값 대입"
+      content: |-
+        params = {alt: 100, vel: 20, grav: 10}
+        trajectory = position.subs(params)
+        trajectory
+    - type: code
+      title: "시간별 높이"
+      content: |-
+        pos1 = trajectory.subs(time, 1)
+        pos2 = trajectory.subs(time, 2)
+        pos3 = trajectory.subs(time, 3)
+        pos1, pos2, pos3

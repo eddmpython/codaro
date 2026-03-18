@@ -1,0 +1,145 @@
+meta:
+  id: folium_00
+  title: Folium 소개
+  order: 0
+  category: folium
+  difficulty: "⭐"
+  badge: 소개
+  tags: ["folium", "지도", "Leaflet", "시각화", "소개"]
+  seo:
+    title: "Folium 소개 - 파이썬 인터랙티브 지도"
+    description: "Folium으로 인터랙티브 지도를 만듭니다. Leaflet.js 기반의 파이썬 지도 시각화 라이브러리를 소개합니다."
+    keywords: ["folium", "지도", "Leaflet", "파이썬", "인터랙티브"]
+
+intro:
+  emoji: "🗺️"
+  goal: Folium이 무엇이고 어떤 지도를 만들 수 있는지 알아봅니다.
+  description: Folium은 Leaflet.js를 파이썬으로 감싼 지도 시각화 라이브러리입니다. 몇 줄의 코드로 인터랙티브 지도를 만들 수 있습니다. 마커, 폴리곤, 히트맵 등 다양한 요소를 지도에 추가합니다.
+
+sections:
+- id: what_is_folium
+  title: Folium이란?
+  subtitle: 파이썬 지도 라이브러리
+  blocks:
+  - type: text
+    content: Folium은 파이썬에서 인터랙티브 지도를 만드는 라이브러리입니다. JavaScript 라이브러리인 Leaflet.js를 파이썬에서 쉽게 사용할 수 있게 해줍니다. 2013년에 시작되어 현재 가장 인기 있는 파이썬 지도 라이브러리입니다.
+  - type: text
+    content: "지도에 마커를 찍고, 경로를 그리고, 영역을 색칠하고, 히트맵을 만들 수 있습니다. 모든 지도는 줌, 패닝, 클릭 등 인터랙션이 가능합니다."
+  - type: tip
+    content: "Leaflet.js는 OpenStreetMap 기반의 오픈소스 지도 라이브러리입니다. 구글맵 API와 달리 무료이고 API 키가 필요 없습니다."
+
+- id: why_folium
+  title: 왜 Folium인가?
+  subtitle: matplotlib으로 지도 안 되나요?
+  blocks:
+  - type: text
+    content: "**matplotlib으로 지도를 그리면**: 정적 이미지입니다. 확대/축소가 안 되고, 마커 클릭도 안 됩니다. 지도 타일을 직접 관리해야 합니다."
+  - type: text
+    content: "**Folium으로 지도를 그리면**: 줌인/줌아웃이 자유롭습니다. 마커를 클릭하면 팝업이 뜹니다. 드래그로 지도를 이동할 수 있습니다. 전 세계 어디든 탐색 가능합니다."
+  - type: text
+    content: "**핵심 차이**: Folium은 HTML/JavaScript를 생성합니다. 브라우저에서 실제 지도처럼 동작합니다."
+  - type: tip
+    content: Folium은 순수 파이썬으로 작성되어 Pyodide(브라우저 파이썬)에서도 완벽히 동작합니다.
+
+- id: what_can_do
+  title: 무엇을 만들 수 있나?
+  subtitle: Folium의 기능
+  blocks:
+  - type: text
+    content: "**마커와 아이콘**: 위치를 점으로 표시합니다. 클릭하면 정보가 팝업됩니다. 아이콘 색상과 모양을 커스터마이징합니다."
+  - type: text
+    content: "**도형 그리기**: 원, 사각형, 다각형으로 영역을 표시합니다. 폴리라인으로 경로나 노선을 그립니다."
+  - type: text
+    content: "**히트맵**: 데이터 밀도를 색상으로 시각화합니다. 인구 밀집도, 매장 분포 등을 표현합니다."
+  - type: text
+    content: "**단계구분도(Choropleth)**: 지역별로 다른 색상을 칠합니다. 통계 데이터를 지도에 시각화합니다."
+  - type: text
+    content: "**마커 클러스터**: 수천 개의 마커를 효율적으로 표시합니다. 줌 레벨에 따라 자동으로 그룹화됩니다."
+
+- id: real_world_examples
+  title: 실제 활용 예시
+  subtitle: 어디서 사용할까?
+  blocks:
+  - type: text
+    content: "**매장/지점 위치 지도**: 프랜차이즈 매장, 은행 지점, 편의점 위치를 지도에 표시합니다."
+  - type: text
+    content: "**배달/물류 경로**: 배달 경로, 택배 동선, 버스 노선을 지도에 그립니다."
+  - type: text
+    content: "**부동산/상권 분석**: 지역별 집값, 상권 분포, 유동인구를 시각화합니다."
+  - type: text
+    content: "**여행/관광 지도**: 관광지, 맛집, 숙소를 카테고리별로 표시합니다."
+  - type: text
+    content: "**재난/안전 지도**: 대피소 위치, 위험 지역, 사고 발생 현황을 표시합니다."
+
+- id: basic_concept
+  title: 기본 개념
+  subtitle: 지도의 구성 요소
+  blocks:
+  - type: text
+    content: "**Map (지도)**: 기본 캔버스입니다. 중심 좌표와 줌 레벨을 설정합니다."
+  - type: text
+    content: "**Tile Layer (타일 레이어)**: 지도 배경입니다. OpenStreetMap, CartoDB 등 다양한 스타일이 있습니다."
+  - type: text
+    content: "**Marker (마커)**: 특정 위치를 표시하는 점입니다. 팝업과 툴팁을 추가할 수 있습니다."
+  - type: text
+    content: "**Layer (레이어)**: 지도 위에 겹쳐지는 요소들입니다. 마커, 도형, 히트맵 등이 각각 레이어입니다."
+  - type: text
+    content: "**GeoJSON**: 지리 데이터의 표준 형식입니다. 지역 경계, 도로, 건물 등을 표현합니다."
+  - type: tip
+    content: 위도(latitude)는 남북 위치(-90~90), 경도(longitude)는 동서 위치(-180~180)입니다. 서울은 약 [37.5, 127.0]입니다.
+
+- id: coordinates
+  title: 좌표 이해하기
+  subtitle: 위도와 경도
+  blocks:
+  - type: text
+    content: "**위도(Latitude)**: 적도 기준 남북 위치입니다. 북쪽이 양수, 남쪽이 음수입니다. 서울은 약 37.5도입니다."
+  - type: text
+    content: "**경도(Longitude)**: 본초자오선 기준 동서 위치입니다. 동쪽이 양수, 서쪽이 음수입니다. 서울은 약 127도입니다."
+  - type: text
+    content: "**좌표 형식**: Folium에서는 [위도, 경도] 순서로 입력합니다. 서울시청은 [37.5665, 126.9780]입니다."
+  - type: text
+    content: "**좌표 찾기**: 구글맵에서 원하는 위치를 클릭하면 좌표가 표시됩니다. 또는 주소를 좌표로 변환하는 지오코딩 서비스를 사용합니다."
+  - type: tip
+    content: 좌표 순서 주의! Folium은 [lat, lon], 구글맵 URL은 lat,lon, GeoJSON은 [lon, lat]입니다. 혼동하기 쉬우니 주의하세요.
+
+- id: marimo_output
+  title: Marimo에서 출력
+  subtitle: mo.iframe() 사용
+  blocks:
+  - type: text
+    content: Folium은 HTML과 JavaScript를 생성합니다. Marimo에서 지도를 표시하려면 mo.iframe()을 사용해야 합니다.
+  - type: text
+    content: "**기본 패턴**: `mo.iframe(m._repr_html_())`입니다. m은 지도 객체이고, _repr_html_()이 HTML을 생성합니다."
+  - type: text
+    content: "**주의**: mo.Html()은 JavaScript를 실행하지 않습니다. 반드시 mo.iframe()을 사용하세요."
+  - type: tip
+    content: 모든 코드 블록 마지막에 mo.iframe(m._repr_html_())를 넣어야 지도가 표시됩니다.
+
+- id: learning_path
+  title: 학습 순서
+  subtitle: 10개 프로젝트 로드맵
+  blocks:
+  - type: text
+    content: "**입문 (01-02)**: 기본 지도 생성, 마커 추가, 아이콘 커스터마이징을 배웁니다."
+  - type: text
+    content: "**기초 (03-05)**: 도형 그리기, 타일 스타일 변경, 레이어 관리를 배웁니다."
+  - type: text
+    content: "**중급 (06-08)**: GeoJSON, 단계구분도, 히트맵으로 데이터를 시각화합니다."
+  - type: text
+    content: "**심화 (09-10)**: 마커 클러스터, 종합 프로젝트로 실전 지도를 만듭니다."
+  - type: tip
+    content: 각 프로젝트는 독립적으로 실행 가능합니다. 순서대로 진행하면 개념이 점진적으로 쌓입니다.
+
+- id: no_api_key
+  title: API 키 불필요
+  subtitle: 무료로 시작
+  blocks:
+  - type: text
+    content: Folium은 OpenStreetMap 기반이라 API 키가 필요 없습니다. 설치 후 바로 사용할 수 있습니다.
+  - type: text
+    content: "**무료 타일 제공자**: OpenStreetMap, CartoDB, Stamen 등 여러 무료 타일을 사용할 수 있습니다."
+  - type: text
+    content: "**제한 없음**: 구글맵 API처럼 일일 요청 제한이 없습니다. 학습과 프로토타이핑에 적합합니다."
+  - type: tip
+    content: 상업적 용도나 대량 트래픽의 경우 타일 제공자의 이용약관을 확인하세요.

@@ -1,0 +1,449 @@
+meta:
+  id: polars_08
+  title: 소셜미디어분석
+  order: 8
+  category: polars
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["소셜미디어", "unpivot", "체이닝", "over", "rolling", "시간대분석"]
+  seo:
+    title: "Polars 소셜미디어 분석 - unpivot과 복합 체이닝"
+    description: "소셜미디어 데이터로 시간대별 게시물 패턴을 분석합니다. unpivot, over 윈도우, rolling, 복합 표현식 체이닝을 배웁니다."
+    keywords: ["Polars unpivot", "표현식 체이닝", "윈도우 함수", "소셜미디어 분석"]
+
+intro:
+  emoji: "📱"
+  goal: 소셜미디어 데이터에서 "시간대별 게시물 패턴"을 분석하는 대시보드를 만듭니다.
+  description: 게시물 데이터를 탐색하고 시간대별 패턴을 찾습니다. unpivot으로 데이터를 변환하고, over 윈도우 함수로 그룹별 계산을 수행하며, rolling으로 이동평균을 구하고, 복합 표현식 체이닝으로 효율적인 분석을 수행합니다. Polars의 강력한 표현식 시스템을 활용하여 pandas보다 간결하고 빠른 코드를 작성합니다.
+
+sections:
+- id: step1_data
+  title: 1단계. 데이터 생성
+  subtitle: 소셜미디어 게시물 데이터
+  blocks:
+  - type: text
+    content: 소셜미디어 게시물 데이터를 생성합니다. 실무에서는 Twitter API, Instagram API 등에서 수집한 데이터를 사용하지만, 여기서는 실습용으로 1000개의 샘플 게시물을 생성합니다. 게시 시간(postTime), 플랫폼(platform), 좋아요(likes), 댓글(comments), 공유(shares), 해시태그(hashtag) 등 실제 소셜미디어 분석에 필요한 정보를 포함합니다. 시간대별, 플랫폼별 패턴을 분석하여 최적의 게시 전략을 수립할 수 있습니다.
+  - type: code
+    language: python
+    title: 라이브러리 및 설정
+    description: 필요한 라이브러리와 기본 설정
+    content: |-
+      import polars as pl
+      from datetime import datetime, timedelta
+      import random
+
+      random.seed(42)
+      baseDate = datetime(2024, 1, 1)
+      hashtags = ["#python", "#data", "#ai", "#ml", "#tech", "#coding", "#dev", "#learn"]
+      platforms = ["twitter", "instagram", "facebook"]
+  - type: code
+    language: python
+    title: 게시물 데이터 생성
+    description: 1000개의 샘플 게시물
+    content: |-
+      posts = []
+      for i in range(1000):
+          postDate = baseDate + timedelta(days=random.randint(0, 89), hours=random.randint(0, 23))
+          platform = random.choice(platforms)
+          likes = random.randint(0, 500) if platform != "instagram" else random.randint(50, 1000)
+          posts.append({
+              "postId": i + 1, "platform": platform, "postTime": postDate,
+              "content": f"Post about {random.choice(['python', 'data', 'ai'])}",
+              "hashtag": random.choice(hashtags), "likes": likes,
+              "comments": random.randint(0, int(likes * 0.3)),
+              "shares": random.randint(0, int(likes * 0.2))
+          })
+      df = pl.DataFrame(posts)
+      df.head(10)
+  - type: tip
+    content: random.seed(42)를 사용하면 매번 동일한 랜덤 데이터가 생성되어 재현 가능한 분석이 됩니다. 실무에서는 재현성이 중요하므로 시드를 고정하는 습관을 들이는 것이 좋습니다.
+
+- id: step2_explore
+  title: 2단계. 데이터 탐색
+  subtitle: 기본 정보 확인
+  blocks:
+  - type: text
+    content: 생성된 데이터의 구조와 기본 통계를 확인합니다. describe() 메서드는 수치형 컬럼의 count, null_count, mean, std, min, 25%, 50%, 75%, max를 한 번에 보여줍니다. 이를 통해 데이터 분포, 이상치, null 여부를 빠르게 파악할 수 있습니다. 좋아요 수의 평균과 표준편차, 최솟값과 최댓값을 확인하면 데이터 품질을 검증할 수 있습니다.
+  - type: code
+    language: python
+    title: 스키마 및 통계
+    description: 데이터 구조 파악
+    content: |-
+      df.describe()
+  - type: tip
+    content: describe()는 pandas의 describe()와 동일하지만, Polars는 더 빠르고 메모리 효율적입니다. select(pl.all().describe())로 모든 통계를 한눈에 볼 수도 있습니다.
+
+- id: step3_datetime
+  title: 3단계. 날짜/시간 처리
+  subtitle: dt 네임스페이스 활용
+  blocks:
+  - type: text
+    content: postTime 컬럼에서 연(year), 월(month), 일(day), 시간(hour), 요일(weekday)을 추출합니다. Polars의 dt 네임스페이스는 날짜/시간 데이터를 처리하는 전용 메서드를 제공합니다. dt.year(), dt.month(), dt.hour(), dt.weekday()로 각 구성 요소를 쉽게 추출할 수 있으며, 시간대별, 요일별 패턴 분석에 필수적입니다. weekday는 0=월요일, 6=일요일을 의미합니다.
+  - type: code
+    language: python
+    title: 날짜/시간 컬럼 추가
+    description: dt.year, dt.month, dt.hour, dt.weekday
+    content: |-
+      df = df.with_columns([
+          pl.col("postTime").dt.year().alias("year"),
+          pl.col("postTime").dt.month().alias("month"),
+          pl.col("postTime").dt.day().alias("day"),
+          pl.col("postTime").dt.hour().alias("hour"),
+          pl.col("postTime").dt.weekday().alias("weekday")
+      ])
+      df.head(5)
+  - type: tip
+    content: dt 네임스페이스에는 dt.date(), dt.time(), dt.timestamp(), dt.strftime() 등 다양한 메서드가 있습니다. pandas의 dt와 유사하지만, Polars는 타입 안정성이 더 높고 성능도 우수합니다.
+
+- id: step4_string
+  title: 4단계. 문자열 처리
+  subtitle: str 네임스페이스 활용
+  blocks:
+  - type: text
+    content: 해시태그에서 # 기호를 제거하고 대문자로 변환합니다. str 네임스페이스는 문자열 데이터 처리 전용 메서드를 제공합니다. str.replace()로 특정 문자열을 다른 문자열로 치환하고, str.to_uppercase()로 대문자 변환을 수행합니다. 이러한 문자열 정제는 데이터 분석에서 매우 빈번하게 사용되며, 여러 메서드를 체이닝하여 한 번에 처리할 수 있습니다.
+  - type: code
+    language: python
+    title: 해시태그 정리
+    description: str.replace, str.to_uppercase
+    content: |-
+      df = df.with_columns(
+          pl.col("hashtag").str.replace("#", "").str.to_uppercase().alias("tag")
+      )
+      df.select(["hashtag", "tag"]).head(5)
+  - type: tip
+    content: str 네임스페이스에는 str.slice(), str.contains(), str.starts_with(), str.split() 등 다양한 메서드가 있습니다. 정규표현식도 지원하여 복잡한 텍스트 처리가 가능합니다.
+
+- id: step5_groupby
+  title: 5단계. 그룹별 집계
+  subtitle: 플랫폼별 통계
+  blocks:
+  - type: text
+    content: 플랫폼별로 게시물 수, 평균 좋아요, 평균 댓글, 평균 공유를 계산합니다. 이를 통해 어떤 플랫폼이 인게이지먼트가 높은지 비교할 수 있습니다. 일반적으로 Instagram은 좋아요 수가 높고, Twitter는 공유(리트윗)가 활발하며, Facebook은 댓글이 많은 경향이 있습니다. round(1)로 소수점 첫째 자리까지만 표시하여 가독성을 높입니다.
+  - type: code
+    language: python
+    title: 플랫폼별 통계
+    description: group_by와 agg
+    content: |-
+      df.group_by("platform").agg([
+          pl.count().alias("postCount"),
+          pl.col("likes").mean().round(1).alias("avgLikes"),
+          pl.col("comments").mean().round(1).alias("avgComments"),
+          pl.col("shares").mean().round(1).alias("avgShares")
+      ])
+  - type: tip
+    content: pl.count()는 그룹 내 행 개수를 세는 집계 함수입니다. pl.len()과 동일하지만, pl.count()가 더 명시적이고 SQL과 유사합니다.
+
+- id: step6_multi_group
+  title: 6단계. 다중 그룹 집계
+  subtitle: 플랫폼 + 시간대별
+  blocks:
+  - type: text
+    content: 플랫폼과 시간대(오전/오후)별로 집계합니다. when-then-otherwise로 hour를 오전(0-11)과 오후(12-23)로 분류한 후, 플랫폼과 시간대 두 개의 컬럼으로 그룹화합니다. 이렇게 다중 그룹 집계를 하면 "Instagram은 오후에 좋아요가 많다" 같은 세밀한 인사이트를 발견할 수 있습니다. sort()로 플랫폼과 시간대 순으로 정렬하여 비교하기 쉽게 만듭니다.
+  - type: code
+    language: python
+    title: 시간대 분류
+    description: 오전(0-11), 오후(12-23)
+    content: |-
+      df = df.with_columns(
+          pl.when(pl.col("hour") < 12)
+          .then(pl.lit("morning"))
+          .otherwise(pl.lit("afternoon"))
+          .alias("timeSlot")
+      )
+
+      df.group_by(["platform", "timeSlot"]).agg([
+          pl.count().alias("postCount"),
+          pl.col("likes").mean().round(1).alias("avgLikes")
+      ]).sort(["platform", "timeSlot"])
+  - type: tip
+    content: group_by([컬럼1, 컬럼2])로 여러 컬럼을 동시에 그룹화할 수 있습니다. 결과는 모든 조합에 대한 집계가 생성됩니다. SQL의 GROUP BY col1, col2와 동일합니다.
+
+- id: step7_over
+  title: 7단계. over 윈도우 함수
+  subtitle: 그룹별 계산 유지
+  blocks:
+  - type: text
+    content: over()를 사용하면 그룹별 계산 결과를 원본 행에 붙일 수 있습니다. group_by()와의 차이점은 행 개수가 유지된다는 것입니다. group_by()는 그룹당 하나의 행으로 축소되지만, over()는 각 행에 그룹 통계를 추가합니다. 예를 들어 각 게시물이 해당 플랫폼 평균 대비 얼마나 좋아요를 받았는지 비교할 수 있습니다. 이는 SQL의 윈도우 함수(OVER PARTITION BY)와 동일한 개념입니다.
+  - type: code
+    language: python
+    title: 플랫폼 평균 대비 비교
+    description: over로 그룹별 평균 계산
+    content: |-
+      df = df.with_columns([
+          pl.col("likes").mean().over("platform").round(1).alias("platformAvgLikes"),
+          (pl.col("likes") - pl.col("likes").mean().over("platform")).round(1).alias("diffFromAvg")
+      ])
+      df.select(["platform", "likes", "platformAvgLikes", "diffFromAvg"]).head(10)
+  - type: tip
+    content: over('platform')은 각 행이 속한 플랫폼의 집계 결과를 반환합니다. GROUP BY와 달리 행 수가 유지되므로, 원본 데이터와 그룹 통계를 함께 볼 수 있습니다. over([컬럼1, 컬럼2])로 여러 컬럼으로 그룹화도 가능합니다.
+
+- id: step8_rolling
+  title: 8단계. rolling 이동평균
+  subtitle: 시계열 분석
+  blocks:
+  - type: text
+    content: 날짜별 좋아요 합계의 7일 이동평균을 계산합니다. 이동평균(moving average)은 시계열 데이터의 트렌드를 파악하는 핵심 기법으로, 단기 변동을 제거하고 장기 추세를 드러냅니다. rolling_mean(window_size=7)은 현재 행을 포함한 최근 7개 값의 평균을 계산합니다. 일별 집계 후 날짜 순으로 정렬한 뒤 이동평균을 적용하면 소셜미디어 인기도의 추세를 시각화할 수 있습니다.
+  - type: code
+    language: python
+    title: 일별 집계 후 이동평균
+    description: rolling_mean으로 7일 평균
+    content: |-
+      dailyStats = df.group_by(pl.col("postTime").dt.date().alias("date")).agg([
+          pl.count().alias("postCount"),
+          pl.col("likes").sum().alias("totalLikes")
+      ]).sort("date")
+
+      dailyStats = dailyStats.with_columns(
+          pl.col("totalLikes").rolling_mean(window_size=7).round(1).alias("ma7Likes")
+      )
+      dailyStats.head(15)
+  - type: tip
+    content: rolling_mean(window_size=7)은 현재 행 포함 최근 7개 값의 평균입니다. window_size를 조정하여 단기/장기 추세를 파악할 수 있습니다. rolling_sum(), rolling_max(), rolling_std() 등 다양한 rolling 함수를 지원합니다.
+
+- id: step9_unpivot
+  title: 9단계. unpivot 변환
+  subtitle: 넓은 형태를 긴 형태로
+  blocks:
+  - type: text
+    content: likes, comments, shares 컬럼을 하나의 metric 컬럼으로 변환합니다. unpivot(언피벗)은 여러 컬럼에 분산된 값을 variable-value 형태로 모으는 작업으로, pandas의 melt()와 동일합니다. 넓은 형태(wide format)를 긴 형태(long format)로 변환하면 메트릭별 비교 분석이 쉬워집니다. 예를 들어 "어떤 메트릭이 플랫폼별로 차이가 큰가?"를 한 번에 분석할 수 있습니다.
+  - type: code
+    language: python
+    title: unpivot 적용
+    description: 3개 컬럼을 metric/value로 변환
+    content: |-
+      melted = df.select(["postId", "platform", "likes", "comments", "shares"]).unpivot(
+          on=["likes", "comments", "shares"],
+          index=["postId", "platform"],
+          variable_name="metric",
+          value_name="value"
+      )
+      melted.head(15)
+  - type: tip
+    content: unpivot(on=[열1, 열2], index=고정열)은 on에 지정한 열들을 variable/value 쌍으로 변환합니다. index는 고정되어 유지되는 컬럼입니다. pandas의 melt(id_vars, value_vars)와 같은 기능이지만 파라미터 이름이 다릅니다.
+
+- id: step10_unpivot_agg
+  title: 10단계. unpivot 후 집계
+  subtitle: 메트릭별 통계
+  blocks:
+  - type: text
+    content: unpivot된 데이터에서 플랫폼별, 메트릭별 평균을 계산합니다. 이렇게 하면 "Instagram은 likes가 높고, Twitter는 shares가 높다"처럼 메트릭별로 플랫폼 특성을 비교할 수 있습니다. group_by([플랫폼, 메트릭])으로 두 축을 동시에 그룹화하고, sort()로 정렬하여 패턴을 명확히 드러냅니다.
+  - type: code
+    language: python
+    title: 메트릭별 플랫폼 비교
+    description: 어떤 플랫폼이 어떤 지표에서 강한가
+    content: |-
+      melted.group_by(["platform", "metric"]).agg(
+          pl.col("value").mean().round(1).alias("avgValue")
+      ).sort(["metric", "platform"])
+
+- id: step11_chaining
+  title: 11단계. 복합 체이닝
+  subtitle: 여러 변환을 한 번에
+  blocks:
+  - type: text
+    content: filter, with_columns, group_by, agg, sort를 체이닝하여 한 번에 복잡한 분석을 수행합니다. Polars의 강력한 표현식 체이닝을 활용하면 중간 변수 없이 읽기 쉬운 파이프라인을 만들 수 있습니다. 여기서는 "Instagram 오후 게시물의 해시태그별 인게이지먼트"를 분석합니다. filter로 조건 필터링, with_columns로 파생 변수 생성, group_by로 집계, sort로 정렬을 한 줄로 연결합니다. 이는 pandas보다 간결하고 빠른 Polars의 장점입니다.
+  - type: code
+    language: python
+    title: 필터링 및 파생변수
+    description: 인스타그램 오후 게시물 추출
+    content: |-
+      filtered = df.filter((pl.col("platform") == "instagram") & (pl.col("hour") >= 12))
+      withEngagement = filtered.with_columns(
+          (pl.col("likes") + pl.col("comments") + pl.col("shares")).alias("engagement")
+      )
+      withEngagement.head()
+  - type: code
+    language: python
+    title: 집계 및 정렬
+    description: 해시태그별 성과 분석
+    content: |-
+      result = withEngagement.group_by("tag").agg([
+          pl.count().alias("postCount"),
+          pl.col("engagement").mean().round(1).alias("avgEngagement"),
+          pl.col("engagement").max().alias("maxEngagement")
+      ]).sort("avgEngagement", descending=True)
+      result
+  - type: tip
+    content: 복합 체이닝은 filter(...).with_columns(...).group_by(...).agg(...).sort(...) 형태로 여러 변환을 연결합니다. 각 단계는 새로운 DataFrame을 반환하므로 불변성(immutability)이 유지됩니다. 괄호로 감싸면 여러 줄로 나눠 쓸 수 있어 가독성이 좋습니다.
+
+- id: step12_dashboard
+  title: 12단계. 대시보드 데이터
+  subtitle: 시간대별 분석 완성
+  blocks:
+  - type: text
+    content: 최종 대시보드에 필요한 시간대별 통계를 생성합니다. 0-23시 각 시간대의 게시물 수, 평균 좋아요, 댓글, 공유, 총 인게이지먼트를 계산하고, 전체 게시물 대비 비율도 추가합니다. over(pl.lit(1))은 전체 데이터를 하나의 그룹으로 보고 총합을 계산하는 트릭입니다. 이렇게 만든 시간대별 통계로 "언제 게시하는 것이 가장 효과적인가?"를 답할 수 있습니다.
+  - type: code
+    language: python
+    title: 시간대별 기본 집계
+    description: 0-23시 각 시간대 통계
+    content: |-
+      hourlyStats = df.group_by("hour").agg([
+          pl.count().alias("postCount"),
+          pl.col("likes").mean().round(1).alias("avgLikes"),
+          pl.col("comments").mean().round(1).alias("avgComments"),
+          pl.col("shares").mean().round(1).alias("avgShares"),
+          (pl.col("likes") + pl.col("comments") + pl.col("shares")).mean().round(1).alias("avgEngagement")
+      ])
+      hourlyStats.head()
+  - type: code
+    language: python
+    title: 비율 계산
+    description: 전체 대비 비율 추가
+    content: |-
+      hourlyDashboard = hourlyStats.with_columns(
+          pl.col("postCount").sum().over(pl.lit(1)).alias("totalPosts")
+      ).with_columns(
+          (pl.col("postCount") * 100 / pl.col("totalPosts")).round(2).alias("pctOfTotal")
+      ).sort("hour")
+      hourlyDashboard
+  - type: tip
+    content: over(pl.lit(1))은 전체 데이터를 하나의 윈도우로 보는 트릭입니다. pl.lit(1)은 모든 행이 같은 값(1)을 가지므로, 전체가 하나의 그룹이 됩니다. 이를 이용해 전체 총합, 전체 평균 등을 계산할 수 있습니다.
+
+- id: step13_peak
+  title: 13단계. 피크 시간대 분석
+  subtitle: 최적 게시 시간
+  blocks:
+  - type: text
+    content: 평균 인게이지먼트가 전체 평균보다 높은 시간대를 필터링하여 최적의 게시 시간을 찾습니다. 이렇게 찾은 피크 시간대에 게시하면 더 많은 사용자 반응을 얻을 수 있습니다.
+  - type: code
+    language: python
+    title: 최적 게시 시간 찾기
+    description: 참여도가 높은 시간대
+    content: |-
+      (
+          hourlyDashboard
+          .filter(pl.col("avgEngagement") > pl.col("avgEngagement").mean())
+          .select(["hour", "postCount", "avgEngagement", "pctOfTotal"])
+          .sort("avgEngagement", descending=True)
+      )
+
+- id: step14_weekday
+  title: 14단계. 요일별 분석
+  subtitle: 복합 체이닝으로 요일 패턴
+  blocks:
+  - type: text
+    content: 요일별 게시물 수와 평균 인게이지먼트를 계산하고, 전체 평균과의 차이를 구합니다. 이를 통해 "주말에 인게이지먼트가 높다" 같은 요일별 패턴을 발견할 수 있습니다.
+  - type: code
+    language: python
+    title: 요일별 집계
+    description: 0=월요일, 6=일요일
+    content: |-
+      weekdayStats = df.group_by("weekday").agg([
+          pl.count().alias("postCount"),
+          (pl.col("likes") + pl.col("comments") + pl.col("shares")).mean().round(1).alias("avgEngagement")
+      ])
+      weekdayStats
+  - type: code
+    language: python
+    title: 전체 평균과 비교
+    description: 요일별 성과 차이 분석
+    content: |-
+      weekdayResult = weekdayStats.with_columns(
+          pl.col("avgEngagement").mean().over(pl.lit(1)).alias("overallAvg")
+      ).with_columns(
+          (pl.col("avgEngagement") - pl.col("overallAvg")).round(1).alias("diffFromOverall")
+      ).sort("weekday")
+      weekdayResult
+
+- id: practice
+  title: 실습
+  subtitle: 소셜미디어 분석 프로젝트
+  blocks:
+  - type: text
+    content: 소셜미디어 분석가가 되어 배운 모든 개념을 심층적으로 활용해봅시다. unpivot으로 메트릭 변환, over로 그룹별 비교, rolling으로 트렌드 분석, 복합 체이닝으로 다단계 분석을 모두 사용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 플랫폼별 메트릭 분석과 unpivot 변환"
+    blocks:
+    - type: code
+      title: "데이터 생성"
+      content: |-
+        import polars as pl
+        from datetime import datetime, timedelta
+        import random
+
+        random.seed(42)
+        baseDate = datetime(2024, 1, 1)
+        hashtags = ["#python", "#data", "#ai", "#ml", "#tech"]
+        platforms = ["twitter", "instagram", "facebook"]
+        posts = []
+        for i in range(500):
+            postDate = baseDate + timedelta(days=random.randint(0, 89), hours=random.randint(0, 23))
+            platform = random.choice(platforms)
+            likes = random.randint(0, 500) if platform != "instagram" else random.randint(50, 1000)
+            posts.append({"postId": i + 1, "platform": platform, "postTime": postDate,
+                "likes": likes, "comments": random.randint(0, int(likes * 0.3)),
+                "shares": random.randint(0, int(likes * 0.2))})
+        socialRaw = pl.DataFrame(posts)
+    - type: code
+      title: "unpivot 변환 및 분석"
+      content: |-
+        platformMetrics = socialRaw.select(["platform", "likes", "comments", "shares"]).unpivot(
+            on=["likes", "comments", "shares"],
+            index=["platform"],
+            variable_name="metric",
+            value_name="value"
+        ).group_by(["platform", "metric"]).agg(
+            pl.col("value").mean().round(1).alias("avgValue")
+        ).sort(["platform", "metric"])
+        platformMetrics
+  - type: expansion
+    title: "미션2: 시간대별 인게이지먼트 분석과 over 윈도우"
+    blocks:
+    - type: code
+      title: "데이터 생성"
+      content: |-
+        import polars as pl
+        from datetime import datetime, timedelta
+        import random
+
+        random.seed(42)
+        baseDate = datetime(2024, 1, 1)
+        platforms = ["twitter", "instagram", "facebook"]
+        posts = []
+        for i in range(500):
+            postDate = baseDate + timedelta(days=random.randint(0, 89), hours=random.randint(0, 23))
+            platform = random.choice(platforms)
+            likes = random.randint(0, 500) if platform != "instagram" else random.randint(50, 1000)
+            posts.append({"postId": i + 1, "platform": platform, "postTime": postDate,
+                "hour": postDate.hour, "likes": likes, "comments": random.randint(0, int(likes * 0.3)),
+                "shares": random.randint(0, int(likes * 0.2))})
+        postRaw = pl.DataFrame(posts)
+    - type: code
+      title: "인게이지먼트 계산"
+      content: |-
+        withEngagement = postRaw.with_columns(
+            (pl.col("likes") + pl.col("comments") + pl.col("shares")).alias("engagement")
+        )
+        hourlyAgg = withEngagement.group_by("hour").agg([
+            pl.count().alias("postCount"),
+            pl.col("engagement").mean().round(1).alias("avgEngagement")
+        ])
+        hourlyAgg.head()
+    - type: code
+      title: "전체 평균과 비교"
+      content: |-
+        hourlyEngagement = hourlyAgg.with_columns(
+            pl.col("avgEngagement").mean().over(pl.lit(1)).alias("overallAvg")
+        ).with_columns(
+            (pl.col("avgEngagement") - pl.col("overallAvg")).round(1).alias("diffFromAvg")
+        ).sort("hour")
+        hourlyEngagement
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 소셜미디어 분석을 통해 Polars의 고급 기능을 마스터했습니다. over, rolling, unpivot, 복합 체이닝은 실무 데이터 분석의 핵심 기법입니다.
+  - type: list
+    items:
+    - "dt.hour(), dt.weekday() - 날짜/시간 구성 요소 추출, 시간대/요일별 분석"
+    - "str.replace(), str.to_uppercase() - 문자열 정제 및 변환"
+    - "over('col') - 그룹별 윈도우 계산, 행 수 유지하며 그룹 통계 추가"
+    - "rolling_mean(window_size=N) - N개 값의 이동평균, 시계열 트렌드 분석"
+    - "unpivot(on=[], index=[]) - 넓은 형태를 긴 형태로, 메트릭별 비교 분석"
+    - "filter().with_columns().group_by().agg() - 복합 체이닝, 중간 변수 없이 파이프라인 구축"
+    - "over(pl.lit(1)) - 전체 데이터를 하나의 윈도우로, 전체 통계 계산"
+  - type: text
+    content: 다음 시간에는 대용량 로그 데이터로 Lazy Evaluation과 쿼리 최적화를 배웁니다. explain()으로 쿼리 실행 계획을 확인하고 Predicate Pushdown을 경험합니다.

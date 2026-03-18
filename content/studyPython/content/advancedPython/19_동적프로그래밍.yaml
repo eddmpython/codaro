@@ -1,0 +1,812 @@
+meta:
+  id: "19"
+  title: "동적 프로그래밍"
+  day: 19
+  category: "advancedPython"
+  tags: ["dynamic-programming", "memoization", "tabulation", "dp"]
+  seo:
+    title: "파이썬 동적 프로그래밍 - 메모이제이션과 타뷸레이션"
+    description: "복잡한 문제를 하위 문제로 분해하고 메모이제이션과 타뷸레이션으로 효율적으로 해결합니다."
+    keywords: ["동적프로그래밍", "DP", "메모이제이션", "타뷸레이션", "최적화"]
+
+intro:
+  emoji: "🧩"
+  points:
+  - "DP의 핵심 개념: 중복 부분문제와 최적 부분구조"
+  - "메모이제이션(Top-down)과 타뷸레이션(Bottom-up)"
+  - "상태 전이 방정식 설계 방법"
+  - "1D, 2D DP와 공간 최적화 기법"
+
+sections:
+- id: "dp_intro"
+  title: "동적 프로그래밍 개념"
+  subtitle: "DP의 핵심 원리"
+  blocks:
+  - type: "text"
+    content: "동적 프로그래밍(DP)은 복잡한 문제를 작은 하위 문제로 나누어 해결하는 알고리즘 기법입니다. 핵심은 중복되는 하위 문제의 결과를 저장하여 재계산을 방지하는 것입니다. DP가 적용되려면 두 가지 조건이 필요합니다. 첫째, 최적 부분구조(Optimal Substructure) - 큰 문제의 최적해가 작은 문제의 최적해로 구성됩니다. 둘째, 중복 부분문제(Overlapping Subproblems) - 같은 하위 문제가 여러 번 계산됩니다."
+  - type: "list"
+    items:
+    - "최적 부분구조: 큰 문제 = 작은 문제들의 조합"
+    - "중복 부분문제: 같은 계산이 반복됨"
+    - "Top-down: 재귀 + 메모이제이션"
+    - "Bottom-up: 반복문 + 테이블"
+  - type: "code"
+    language: "python"
+    title: "재귀 vs DP 비교 (피보나치)"
+    description: "재귀의 중복 계산을 DP로 제거합니다."
+    content: |-
+      def fibRecursive(n):
+          if n <= 1:
+              return n
+          return fibRecursive(n - 1) + fibRecursive(n - 2)
+
+      def fibDP(n, memo=None):
+          if memo is None:
+              memo = {}
+          if n in memo:
+              return memo[n]
+          if n <= 1:
+              return n
+          memo[n] = fibDP(n - 1, memo) + fibDP(n - 2, memo)
+          return memo[n]
+
+      f"DP 피보나치(30): {fibDP(30)}"
+  - type: "tip"
+    content: "재귀 피보나치는 O(2^n), DP 피보나치는 O(n)입니다. 30번째 값도 즉시 계산됩니다."
+
+- id: "memoization"
+  title: "메모이제이션"
+  subtitle: "Top-down 방식"
+  blocks:
+  - type: "text"
+    content: "메모이제이션은 재귀 함수의 결과를 캐시에 저장하여 중복 계산을 방지하는 기법입니다. 위에서 아래로(Top-down) 문제를 해결하며, 필요한 하위 문제만 계산합니다. 파이썬의 functools.lru_cache 데코레이터로 쉽게 구현할 수 있습니다. 딕셔너리를 사용한 수동 구현도 가능합니다."
+  - type: "list"
+    items:
+    - "재귀 + 캐싱 조합"
+    - "필요한 부분문제만 계산"
+    - "lru_cache 데코레이터 활용"
+    - "딕셔너리로 수동 구현 가능"
+  - type: "code"
+    language: "python"
+    title: "lru_cache 사용"
+    description: "데코레이터로 간단히 메모이제이션합니다."
+    content: |-
+      from functools import lru_cache
+
+      @lru_cache(maxsize=None)
+      def fibMemo(n):
+          if n <= 1:
+              return n
+          return fibMemo(n - 1) + fibMemo(n - 2)
+
+      fibMemoResult = [fibMemo(i) for i in range(15)]
+      f"피보나치 수열: {fibMemoResult}"
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 캐시"
+    description: "수동으로 캐시를 관리합니다."
+    content: |-
+      fibCache = {}
+
+      def fibManual(n):
+          if n in fibCache:
+              return fibCache[n]
+          if n <= 1:
+              fibCache[n] = n
+          else:
+              fibCache[n] = fibManual(n - 1) + fibManual(n - 2)
+          return fibCache[n]
+
+      fibManualResult = [fibManual(i) for i in range(15)]
+      f"수동 캐시 피보나치: {fibManualResult}"
+  - type: "code"
+    language: "python"
+    title: "팩토리얼 메모이제이션"
+    description: "팩토리얼도 메모이제이션으로 최적화합니다."
+    content: |-
+      @lru_cache(maxsize=None)
+      def factorialMemo(n):
+          if n <= 1:
+              return 1
+          return n * factorialMemo(n - 1)
+
+      factResults = [factorialMemo(i) for i in range(1, 11)]
+      f"팩토리얼 1~10: {factResults}"
+  - type: "tip"
+    content: "lru_cache는 해시 가능한 인자만 캐싱합니다. 리스트는 튜플로 변환하세요."
+
+- id: "tabulation"
+  title: "타뷸레이션"
+  subtitle: "Bottom-up 방식"
+  blocks:
+  - type: "text"
+    content: "타뷸레이션은 작은 문제부터 차례로 해결하여 테이블을 채워나가는 방식입니다. 아래에서 위로(Bottom-up) 진행하며 반복문을 사용합니다. 재귀 호출 오버헤드가 없어 일반적으로 더 빠릅니다. 모든 하위 문제를 계산하므로 필요 없는 계산이 포함될 수 있습니다."
+  - type: "list"
+    items:
+    - "반복문으로 테이블 채우기"
+    - "재귀 오버헤드 없음"
+    - "스택 오버플로우 위험 없음"
+    - "모든 하위 문제 계산"
+  - type: "code"
+    language: "python"
+    title: "피보나치 타뷸레이션"
+    description: "테이블을 채워가며 계산합니다."
+    content: |-
+      def fibTable(n):
+          if n <= 1:
+              return n
+          dp = [0] * (n + 1)
+          dp[1] = 1
+          for i in range(2, n + 1):
+              dp[i] = dp[i - 1] + dp[i - 2]
+          return dp[n]
+
+      fibTableResult = fibTable(30)
+      f"타뷸레이션 피보나치(30): {fibTableResult}"
+  - type: "code"
+    language: "python"
+    title: "공간 최적화"
+    description: "O(n) 공간을 O(1)로 줄입니다."
+    content: |-
+      def fibOptimized(n):
+          if n <= 1:
+              return n
+          prev2 = 0
+          prev1 = 1
+          for _ in range(2, n + 1):
+              curr = prev2 + prev1
+              prev2 = prev1
+              prev1 = curr
+          return prev1
+
+      fibOptResult = fibOptimized(50)
+      f"최적화 피보나치(50): {fibOptResult}"
+  - type: "code"
+    language: "python"
+    title: "삼각수 타뷸레이션"
+    description: "n번째 삼각수를 계산합니다."
+    content: |-
+      def triangularNumber(n):
+          dp = [0] * (n + 1)
+          for i in range(1, n + 1):
+              dp[i] = dp[i - 1] + i
+          return dp[n]
+
+      triResult = triangularNumber(10)
+      f"10번째 삼각수: {triResult}"
+  - type: "tip"
+    content: "이전 상태만 필요하면 전체 테이블 대신 변수 몇 개만 사용하세요."
+
+- id: "classic_problems"
+  title: "클래식 DP 문제"
+  subtitle: "계단 오르기와 배낭 문제"
+  blocks:
+  - type: "text"
+    content: "DP의 대표적인 문제들을 살펴봅니다. 계단 오르기는 1칸 또는 2칸씩 오를 때 가능한 경우의 수를 구합니다. 0/1 배낭 문제는 제한된 용량에서 최대 가치를 구합니다. 동전 교환 문제는 최소 동전 개수를 구합니다. 이 문제들은 상태 전이 방정식을 설계하는 좋은 예시입니다."
+  - type: "list"
+    items:
+    - "계단 오르기: dp[n] = dp[n-1] + dp[n-2]"
+    - "배낭 문제: dp[i][w] = max(포함, 미포함)"
+    - "동전 교환: dp[n] = min(dp[n-coin]) + 1"
+    - "상태 전이 방정식 설계가 핵심"
+  - type: "code"
+    language: "python"
+    title: "계단 오르기"
+    description: "n개 계단을 오르는 경우의 수입니다."
+    content: |-
+      def climbStairs(n):
+          if n <= 2:
+              return n
+          dp = [0] * (n + 1)
+          dp[1] = 1
+          dp[2] = 2
+          for i in range(3, n + 1):
+              dp[i] = dp[i - 1] + dp[i - 2]
+          return dp[n]
+
+      stairsResult = climbStairs(10)
+      f"10계단 오르기 경우의 수: {stairsResult}"
+  - type: "code"
+    language: "python"
+    title: "0/1 배낭 문제"
+    description: "최대 가치를 구합니다."
+    content: |-
+      def knapsack01(capacity, weights, values):
+          n = len(weights)
+          dp = [[0] * (capacity + 1) for _ in range(n + 1)]
+          for i in range(1, n + 1):
+              wt = weights[i - 1]
+              val = values[i - 1]
+              for w in range(capacity + 1):
+                  if wt <= w:
+                      dp[i][w] = max(dp[i - 1][w], dp[i - 1][w - wt] + val)
+                  else:
+                      dp[i][w] = dp[i - 1][w]
+          return dp[n][capacity]
+
+      bagWeights = [2, 3, 4, 5]
+      bagValues = [3, 4, 5, 6]
+      bagCapacity = 8
+      knapsackResult = knapsack01(bagCapacity, bagWeights, bagValues)
+      f"배낭 최대 가치: {knapsackResult}"
+  - type: "code"
+    language: "python"
+    title: "동전 교환 (최소 개수)"
+    description: "금액을 만드는 최소 동전 개수입니다."
+    content: |-
+      def minCoins(coins, amount):
+          dp = [float('inf')] * (amount + 1)
+          dp[0] = 0
+          for coin in coins:
+              for amt in range(coin, amount + 1):
+                  dp[amt] = min(dp[amt], dp[amt - coin] + 1)
+          return dp[amount] if dp[amount] != float('inf') else -1
+
+      coinSet = [1, 5, 10, 25]
+      targetAmount = 63
+      minCoinResult = minCoins(coinSet, targetAmount)
+      f"63센트 최소 동전: {minCoinResult}개"
+  - type: "tip"
+    content: "배낭 문제는 1차원 DP로 공간 최적화할 수 있습니다. 역순으로 순회하세요."
+
+- id: "string_dp"
+  title: "문자열 DP"
+  subtitle: "LCS와 편집 거리"
+  blocks:
+  - type: "text"
+    content: "문자열 관련 DP 문제는 2차원 테이블을 사용합니다. LCS(최장 공통 부분수열)는 두 문자열의 공통 부분수열 중 가장 긴 것을 찾습니다. 편집 거리(Levenshtein Distance)는 한 문자열을 다른 문자열로 변환하는 최소 연산 횟수입니다. 두 문제 모두 dp[i][j]로 부분 문자열의 결과를 저장합니다."
+  - type: "list"
+    items:
+    - "LCS: 공통 부분수열 최대 길이"
+    - "편집 거리: 삽입/삭제/치환 최소 횟수"
+    - "2D 테이블: dp[i][j]"
+    - "문자열 비교 문제에 광범위하게 활용"
+  - type: "code"
+    language: "python"
+    title: "최장 공통 부분수열 (LCS)"
+    description: "두 문자열의 LCS 길이를 구합니다."
+    content: |-
+      def lcsLength(s1, s2):
+          m, n = len(s1), len(s2)
+          dp = [[0] * (n + 1) for _ in range(m + 1)]
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  if s1[i - 1] == s2[j - 1]:
+                      dp[i][j] = dp[i - 1][j - 1] + 1
+                  else:
+                      dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+          return dp[m][n]
+
+      strA = "ABCDGH"
+      strB = "AEDFHR"
+      lcsResult = lcsLength(strA, strB)
+      f"LCS 길이: {lcsResult}"
+  - type: "code"
+    language: "python"
+    title: "LCS 문자열 복원"
+    description: "LCS 문자열 자체를 구합니다."
+    content: |-
+      def lcsString(s1, s2):
+          m, n = len(s1), len(s2)
+          dp = [[0] * (n + 1) for _ in range(m + 1)]
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  if s1[i - 1] == s2[j - 1]:
+                      dp[i][j] = dp[i - 1][j - 1] + 1
+                  else:
+                      dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+          result = []
+          i, j = m, n
+          while i > 0 and j > 0:
+              if s1[i - 1] == s2[j - 1]:
+                  result.append(s1[i - 1])
+                  i -= 1
+                  j -= 1
+              elif dp[i - 1][j] > dp[i][j - 1]:
+                  i -= 1
+              else:
+                  j -= 1
+          return ''.join(reversed(result))
+
+      seqX = "AGGTAB"
+      seqY = "GXTXAYB"
+      lcsStrResult = lcsString(seqX, seqY)
+      f"LCS 문자열: {lcsStrResult}"
+  - type: "code"
+    language: "python"
+    title: "편집 거리"
+    description: "최소 편집 연산 횟수를 구합니다."
+    content: |-
+      def editDistance(word1, word2):
+          m, n = len(word1), len(word2)
+          dp = [[0] * (n + 1) for _ in range(m + 1)]
+          for i in range(m + 1):
+              dp[i][0] = i
+          for j in range(n + 1):
+              dp[0][j] = j
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  if word1[i - 1] == word2[j - 1]:
+                      dp[i][j] = dp[i - 1][j - 1]
+                  else:
+                      dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+          return dp[m][n]
+
+      editWord1 = "horse"
+      editWord2 = "ros"
+      editResult = editDistance(editWord1, editWord2)
+      f"편집 거리: {editResult}"
+  - type: "tip"
+    content: "편집 거리는 맞춤법 검사, DNA 서열 비교 등에 활용됩니다."
+
+- id: "advanced_dp"
+  title: "고급 DP 패턴"
+  subtitle: "LIS와 구간 DP"
+  blocks:
+  - type: "text"
+    content: "최장 증가 부분수열(LIS)은 배열에서 순서를 유지하며 증가하는 가장 긴 부분수열입니다. 이진 탐색으로 O(n log n)에 해결할 수 있습니다. 구간 DP는 구간을 분할하여 최적해를 구하는 패턴입니다. 행렬 체인 곱셈, 버스트 풍선 등이 대표적인 예시입니다."
+  - type: "list"
+    items:
+    - "LIS: O(n²) 기본, O(n log n) 최적화"
+    - "구간 DP: dp[i][j]로 구간 [i, j] 표현"
+    - "부분집합 DP: 비트마스킹 활용"
+    - "상태 압축 기법"
+  - type: "code"
+    language: "python"
+    title: "최장 증가 부분수열 (LIS)"
+    description: "O(n²) 기본 알고리즘입니다."
+    content: |-
+      def lisLength(nums):
+          n = len(nums)
+          dp = [1] * n
+          for i in range(1, n):
+              for j in range(i):
+                  if nums[j] < nums[i]:
+                      dp[i] = max(dp[i], dp[j] + 1)
+          return max(dp)
+
+      lisNums = [10, 9, 2, 5, 3, 7, 101, 18]
+      lisResult = lisLength(lisNums)
+      f"LIS 길이: {lisResult}"
+  - type: "code"
+    language: "python"
+    title: "LIS O(n log n)"
+    description: "이진 탐색으로 최적화합니다."
+    content: |-
+      import bisect
+
+      def lisOptimized(nums):
+          tails = []
+          for num in nums:
+              pos = bisect.bisect_left(tails, num)
+              if pos == len(tails):
+                  tails.append(num)
+              else:
+                  tails[pos] = num
+          return len(tails)
+
+      lisOptNums = [10, 9, 2, 5, 3, 7, 101, 18]
+      lisOptResult = lisOptimized(lisOptNums)
+      f"LIS 길이 (최적화): {lisOptResult}"
+  - type: "code"
+    language: "python"
+    title: "행렬 체인 곱셈"
+    description: "최소 곱셈 연산 횟수를 구합니다."
+    content: |-
+      def matrixChainOrder(dims):
+          n = len(dims) - 1
+          dp = [[0] * n for _ in range(n)]
+          for length in range(2, n + 1):
+              for i in range(n - length + 1):
+                  j = i + length - 1
+                  dp[i][j] = float('inf')
+                  for k in range(i, j):
+                      cost = dp[i][k] + dp[k + 1][j] + dims[i] * dims[k + 1] * dims[j + 1]
+                      dp[i][j] = min(dp[i][j], cost)
+          return dp[0][n - 1]
+
+      matDims = [10, 20, 30, 40, 30]
+      matResult = matrixChainOrder(matDims)
+      f"최소 곱셈 연산: {matResult}"
+  - type: "tip"
+    content: "구간 DP는 대각선 방향으로 테이블을 채웁니다. 작은 구간부터 큰 구간으로 확장합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "동적 프로그래밍 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 19에서 배운 동적 프로그래밍을 난이도별로 복습합니다. DP는 중복되는 하위 문제를 한 번만 계산하고 결과를 저장하여 재사용하는 최적화 기법입니다. 상향식(bottom-up) 테이블 채우기와 하향식(top-down) 메모이제이션 두 가지 접근법이 있습니다. 🟢 기본 문제로 계단 오르기, 피보나치 DP를 익히고, 🟡 응용 문제로 최장 증가 부분 수열(LIS), 배낭 문제를 연습하세요. 🔴 심화 문제에서는 2차원 DP, 경로 문제, 문자열 DP 등 코딩 테스트 필수 유형을 다룹니다. DP 문제 해결의 핵심은 점화식을 세우고 기저 사례를 정의하는 것입니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 계단 오르기 (K칸)"
+    code: |-
+      def climbKSteps(n, k):
+          dp = [0] * (n + 1)
+          dp[0] = 1
+          for i in range(1, n + 1):
+              for step in range(1, min(k, i) + 1):
+                  dp[i] += dp[i - step]
+          return dp[n]
+
+      ex1Result = climbKSteps(10, 3)
+      f"10계단 3칸까지: {ex1Result}"
+
+  - type: "expansion"
+    title: "🟢 기본2: 최소 비용 경로"
+    code: |-
+      def minCostPath(grid):
+          rows, cols = len(grid), len(grid[0])
+          dp = [[0] * cols for _ in range(rows)]
+          dp[0][0] = grid[0][0]
+          for c in range(1, cols):
+              dp[0][c] = dp[0][c - 1] + grid[0][c]
+          for r in range(1, rows):
+              dp[r][0] = dp[r - 1][0] + grid[r][0]
+          for r in range(1, rows):
+              for c in range(1, cols):
+                  dp[r][c] = min(dp[r - 1][c], dp[r][c - 1]) + grid[r][c]
+          return dp[rows - 1][cols - 1]
+
+      costGrid = [[1, 3, 1], [1, 5, 1], [4, 2, 1]]
+      ex2Result = minCostPath(costGrid)
+      f"최소 비용: {ex2Result}"
+
+  - type: "expansion"
+    title: "🟢 기본3: 고유 경로 수"
+    code: |-
+      def uniquePaths(m, n):
+          dp = [[1] * n for _ in range(m)]
+          for i in range(1, m):
+              for j in range(1, n):
+                  dp[i][j] = dp[i - 1][j] + dp[i][j - 1]
+          return dp[m - 1][n - 1]
+
+      ex3Result = uniquePaths(3, 7)
+      f"3x7 고유 경로: {ex3Result}"
+
+  - type: "expansion"
+    title: "🟢 기본4: 집 도둑 문제"
+    code: |-
+      def houseRobber(nums):
+          if not nums:
+              return 0
+          if len(nums) <= 2:
+              return max(nums)
+          dp = [0] * len(nums)
+          dp[0] = nums[0]
+          dp[1] = max(nums[0], nums[1])
+          for i in range(2, len(nums)):
+              dp[i] = max(dp[i - 1], dp[i - 2] + nums[i])
+          return dp[-1]
+
+      houseValues = [2, 7, 9, 3, 1]
+      ex4Result = houseRobber(houseValues)
+      f"최대 약탈: {ex4Result}"
+
+  - type: "expansion"
+    title: "🟢 기본5: 동전 교환 (경우의 수)"
+    code: |-
+      def countWays(coins, amount):
+          dp = [0] * (amount + 1)
+          dp[0] = 1
+          for coin in coins:
+              for amt in range(coin, amount + 1):
+                  dp[amt] += dp[amt - coin]
+          return dp[amount]
+
+      denomSet = [1, 2, 5]
+      ex5Result = countWays(denomSet, 10)
+      f"10원 만드는 경우의 수: {ex5Result}"
+
+  - type: "expansion"
+    title: "🟡 응용1: 부분집합 합"
+    code: |-
+      def subsetSum(nums, target):
+          dp = [False] * (target + 1)
+          dp[0] = True
+          for num in nums:
+              for t in range(target, num - 1, -1):
+                  dp[t] = dp[t] or dp[t - num]
+          return dp[target]
+
+      subNums = [3, 34, 4, 12, 5, 2]
+      ex6Result = subsetSum(subNums, 9)
+      f"합이 9인 부분집합 존재: {ex6Result}"
+
+  - type: "expansion"
+    title: "🟡 응용2: 최장 팰린드롬 부분수열"
+    code: |-
+      def longestPalinSubseq(s):
+          n = len(s)
+          dp = [[0] * n for _ in range(n)]
+          for i in range(n):
+              dp[i][i] = 1
+          for length in range(2, n + 1):
+              for i in range(n - length + 1):
+                  j = i + length - 1
+                  if s[i] == s[j]:
+                      dp[i][j] = dp[i + 1][j - 1] + 2
+                  else:
+                      dp[i][j] = max(dp[i + 1][j], dp[i][j - 1])
+          return dp[0][n - 1]
+
+      lpsText = "bbbab"
+      ex7Result = longestPalinSubseq(lpsText)
+      f"최장 팰린드롬 부분수열: {ex7Result}"
+
+  - type: "expansion"
+    title: "🟡 응용3: 단어 분리"
+    code: |-
+      def wordBreak(s, wordDict):
+          wordSet = set(wordDict)
+          dp = [False] * (len(s) + 1)
+          dp[0] = True
+          for i in range(1, len(s) + 1):
+              for j in range(i):
+                  if dp[j] and s[j:i] in wordSet:
+                      dp[i] = True
+                      break
+          return dp[len(s)]
+
+      wbText = "leetcode"
+      wbDict = ["leet", "code"]
+      ex8Result = wordBreak(wbText, wbDict)
+      f"분리 가능: {ex8Result}"
+
+  - type: "expansion"
+    title: "🟡 응용4: 배낭 1D 최적화"
+    code: |-
+      def knapsack1D(capacity, weights, values):
+          dp = [0] * (capacity + 1)
+          for i in range(len(weights)):
+              for w in range(capacity, weights[i] - 1, -1):
+                  dp[w] = max(dp[w], dp[w - weights[i]] + values[i])
+          return dp[capacity]
+
+      optWeights = [1, 2, 3, 4]
+      optValues = [2, 4, 4, 5]
+      ex9Result = knapsack1D(5, optWeights, optValues)
+      f"최대 가치: {ex9Result}"
+
+  - type: "expansion"
+    title: "🟡 응용5: 최대 정사각형"
+    code: |-
+      def maximalSquare(matrix):
+          if not matrix:
+              return 0
+          rows, cols = len(matrix), len(matrix[0])
+          dp = [[0] * (cols + 1) for _ in range(rows + 1)]
+          maxSide = 0
+          for i in range(1, rows + 1):
+              for j in range(1, cols + 1):
+                  if matrix[i - 1][j - 1] == '1':
+                      dp[i][j] = min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]) + 1
+                      maxSide = max(maxSide, dp[i][j])
+          return maxSide * maxSide
+
+      sqMatrix = [['1', '0', '1', '0'], ['1', '0', '1', '1'], ['1', '0', '1', '1'], ['1', '1', '1', '1']]
+      ex10Result = maximalSquare(sqMatrix)
+      f"최대 정사각형 넓이: {ex10Result}"
+
+  - type: "expansion"
+    title: "🔴 심화1: 정규표현식 매칭"
+    code: |-
+      def regexMatch(text, pattern):
+          m, n = len(text), len(pattern)
+          dp = [[False] * (n + 1) for _ in range(m + 1)]
+          dp[0][0] = True
+          for j in range(1, n + 1):
+              if pattern[j - 1] == '*':
+                  dp[0][j] = dp[0][j - 2]
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  if pattern[j - 1] == '.' or pattern[j - 1] == text[i - 1]:
+                      dp[i][j] = dp[i - 1][j - 1]
+                  elif pattern[j - 1] == '*':
+                      dp[i][j] = dp[i][j - 2]
+                      if pattern[j - 2] == '.' or pattern[j - 2] == text[i - 1]:
+                          dp[i][j] = dp[i][j] or dp[i - 1][j]
+          return dp[m][n]
+
+      regText = "aab"
+      regPattern = "c*a*b"
+      ex11Result = regexMatch(regText, regPattern)
+      f"정규식 매칭: {ex11Result}"
+
+  - type: "expansion"
+    title: "🔴 심화2: 와일드카드 매칭"
+    code: |-
+      def wildcardMatch(text, pattern):
+          m, n = len(text), len(pattern)
+          dp = [[False] * (n + 1) for _ in range(m + 1)]
+          dp[0][0] = True
+          for j in range(1, n + 1):
+              if pattern[j - 1] == '*':
+                  dp[0][j] = dp[0][j - 1]
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  if pattern[j - 1] == '?' or pattern[j - 1] == text[i - 1]:
+                      dp[i][j] = dp[i - 1][j - 1]
+                  elif pattern[j - 1] == '*':
+                      dp[i][j] = dp[i - 1][j] or dp[i][j - 1]
+          return dp[m][n]
+
+      wcText = "adceb"
+      wcPattern = "*a*b"
+      ex12Result = wildcardMatch(wcText, wcPattern)
+      f"와일드카드 매칭: {ex12Result}"
+
+  - type: "expansion"
+    title: "🔴 심화3: 인터리빙 문자열"
+    code: |-
+      def isInterleave(s1, s2, s3):
+          m, n = len(s1), len(s2)
+          if m + n != len(s3):
+              return False
+          dp = [[False] * (n + 1) for _ in range(m + 1)]
+          dp[0][0] = True
+          for i in range(1, m + 1):
+              dp[i][0] = dp[i - 1][0] and s1[i - 1] == s3[i - 1]
+          for j in range(1, n + 1):
+              dp[0][j] = dp[0][j - 1] and s2[j - 1] == s3[j - 1]
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  dp[i][j] = (dp[i - 1][j] and s1[i - 1] == s3[i + j - 1]) or \
+                             (dp[i][j - 1] and s2[j - 1] == s3[i + j - 1])
+          return dp[m][n]
+
+      intS1 = "aabcc"
+      intS2 = "dbbca"
+      intS3 = "aadbbcbcac"
+      ex13Result = isInterleave(intS1, intS2, intS3)
+      f"인터리빙 가능: {ex13Result}"
+
+  - type: "expansion"
+    title: "🔴 심화4: 버스트 풍선"
+    code: |-
+      def maxBurstCoins(nums):
+          balloons = [1] + nums + [1]
+          n = len(balloons)
+          dp = [[0] * n for _ in range(n)]
+          for length in range(2, n):
+              for left in range(n - length):
+                  right = left + length
+                  for last in range(left + 1, right):
+                      coins = balloons[left] * balloons[last] * balloons[right]
+                      coins += dp[left][last] + dp[last][right]
+                      dp[left][right] = max(dp[left][right], coins)
+          return dp[0][n - 1]
+
+      burstNums = [3, 1, 5, 8]
+      ex14Result = maxBurstCoins(burstNums)
+      f"최대 코인: {ex14Result}"
+
+  - type: "expansion"
+    title: "🔴 심화5: 팰린드롬 분할"
+    code: |-
+      def minPalindromeCut(s):
+          n = len(s)
+          isPalin = [[False] * n for _ in range(n)]
+          for i in range(n):
+              isPalin[i][i] = True
+          for length in range(2, n + 1):
+              for i in range(n - length + 1):
+                  j = i + length - 1
+                  if length == 2:
+                      isPalin[i][j] = s[i] == s[j]
+                  else:
+                      isPalin[i][j] = s[i] == s[j] and isPalin[i + 1][j - 1]
+          cuts = [0] * n
+          for i in range(n):
+              if isPalin[0][i]:
+                  cuts[i] = 0
+              else:
+                  cuts[i] = float('inf')
+                  for j in range(i):
+                      if isPalin[j + 1][i] and cuts[j] + 1 < cuts[i]:
+                          cuts[i] = cuts[j] + 1
+          return cuts[n - 1]
+
+      palinText = "aab"
+      ex15Result = minPalindromeCut(palinText)
+      f"최소 분할: {ex15Result}"
+
+  - type: "expansion"
+    title: "🔴 심화6: 러시안 돌 봉투"
+    code: |-
+      import bisect
+
+      def maxEnvelopes(envelopes):
+          if not envelopes:
+              return 0
+          sortedEnv = sorted(envelopes, key=lambda x: (x[0], -x[1]))
+          heights = [e[1] for e in sortedEnv]
+          lis = []
+          for h in heights:
+              pos = bisect.bisect_left(lis, h)
+              if pos == len(lis):
+                  lis.append(h)
+              else:
+                  lis[pos] = h
+          return len(lis)
+
+      envList = [[5, 4], [6, 4], [6, 7], [2, 3]]
+      ex16Result = maxEnvelopes(envList)
+      f"최대 봉투: {ex16Result}"
+
+  - type: "expansion"
+    title: "🔴 심화7: 범위 합 쿼리"
+    code: |-
+      class NumMatrix:
+          def __init__(self, matrix):
+              if not matrix:
+                  return
+              rows, cols = len(matrix), len(matrix[0])
+              self.prefix = [[0] * (cols + 1) for _ in range(rows + 1)]
+              for i in range(1, rows + 1):
+                  for j in range(1, cols + 1):
+                      self.prefix[i][j] = matrix[i - 1][j - 1] + self.prefix[i - 1][j] + self.prefix[i][j - 1] - self.prefix[i - 1][j - 1]
+
+          def sumRegion(self, r1, c1, r2, c2):
+              return self.prefix[r2 + 1][c2 + 1] - self.prefix[r1][c2 + 1] - self.prefix[r2 + 1][c1] + self.prefix[r1][c1]
+
+      rangeMatrix = [[3, 0, 1, 4, 2], [5, 6, 3, 2, 1], [1, 2, 0, 1, 5], [4, 1, 0, 1, 7], [1, 0, 3, 0, 5]]
+      numMat = NumMatrix(rangeMatrix)
+      ex17Result = numMat.sumRegion(2, 1, 4, 3)
+      f"범위 합: {ex17Result}"
+
+  - type: "expansion"
+    title: "🔴 심화8: 주식 거래 (쿨다운)"
+    code: |-
+      def maxProfitCooldown(prices):
+          if len(prices) < 2:
+              return 0
+          hold = -prices[0]
+          sold = 0
+          rest = 0
+          for price in prices[1:]:
+              prevHold = hold
+              prevSold = sold
+              hold = max(prevHold, rest - price)
+              sold = prevHold + price
+              rest = max(rest, prevSold)
+          return max(sold, rest)
+
+      stockPrices = [1, 2, 3, 0, 2]
+      ex18Result = maxProfitCooldown(stockPrices)
+      f"최대 이익: {ex18Result}"
+
+  - type: "expansion"
+    title: "🔴 심화9: 균등 분할"
+    code: |-
+      def canPartition(nums):
+          total = sum(nums)
+          if total % 2 != 0:
+              return False
+          target = total // 2
+          dp = [False] * (target + 1)
+          dp[0] = True
+          for num in nums:
+              for t in range(target, num - 1, -1):
+                  dp[t] = dp[t] or dp[t - num]
+          return dp[target]
+
+      partNums = [1, 5, 11, 5]
+      ex19Result = canPartition(partNums)
+      f"균등 분할 가능: {ex19Result}"
+
+  - type: "expansion"
+    title: "🔴 심화10: 최소 경로 합 (삼각형)"
+    code: |-
+      def minimumTotal(triangle):
+          n = len(triangle)
+          dp = triangle[-1][:]
+          for row in range(n - 2, -1, -1):
+              for col in range(row + 1):
+                  dp[col] = triangle[row][col] + min(dp[col], dp[col + 1])
+          return dp[0]
+
+      triGrid = [[2], [3, 4], [6, 5, 7], [4, 1, 8, 3]]
+      ex20Result = minimumTotal(triGrid)
+      f"최소 경로 합: {ex20Result}"

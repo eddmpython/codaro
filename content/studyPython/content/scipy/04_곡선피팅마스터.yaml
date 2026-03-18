@@ -1,0 +1,346 @@
+meta:
+  id: scipy_04
+  title: 곡선피팅마스터
+  order: 4
+  category: scipy
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["scipy.optimize", "curve_fit", "비선형회귀", "모델피팅", "파라미터추정"]
+  seo:
+    title: "scipy.optimize curve_fit - 데이터에 곡선 맞추기"
+    description: "scipy.optimize의 curve_fit으로 데이터에 수학 함수를 피팅합니다. 지수함수, 로그함수, 다항식 피팅을 배웁니다."
+    keywords: ["scipy", "curve_fit", "비선형회귀", "피팅", "파라미터추정"]
+
+intro:
+  emoji: "📐"
+  goal: 스타트업 사용자 증가 데이터를 지수 성장 모델로 피팅하여 미래 사용자를 예측합니다.
+  description: "스타트업에서 12개월간 사용자 수를 기록했습니다. 이 데이터가 지수 성장을 따르는지 확인하고, 수학 모델 y = a × e^(bx)의 파라미터 a와 b를 찾아 18개월 후 사용자 수를 예측합니다. scipy.optimize.curve_fit은 비선형 최소제곱법으로 데이터에 가장 잘 맞는 곡선의 파라미터를 자동으로 찾아줍니다. 성장률 추정, 모델 검증, 예측까지 전체 워크플로우를 완성합니다."
+
+sections:
+- id: load
+  title: 라이브러리 및 데이터 로드
+  subtitle: scipy.optimize
+  blocks:
+  - type: text
+    content: "곡선 피팅(Curve Fitting)은 데이터에 가장 잘 맞는 수학 함수의 파라미터를 찾는 과정입니다. 사용자 증가율, 약물 농도 감소, 온도 냉각 등 자연 현상을 수학 모델로 표현하면 미래 예측이 가능해집니다. scipy.optimize.curve_fit은 비선형 함수도 피팅할 수 있어 선형 회귀보다 훨씬 유연합니다. 이 프로젝트에서는 가상의 스타트업 사용자 증가 데이터를 분석합니다."
+  - type: code
+    language: python
+    title: 패키지 설치 및 데이터 준비
+    content: |-
+      import micropip
+      await micropip.install('scipy')
+
+      import numpy as np
+      from scipy import optimize
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(42)
+      months = np.arange(1, 13)
+      users = 1000 * np.exp(0.15 * months) + np.random.normal(0, 200, 12)
+      users = np.maximum(users, 0).astype(int)
+  - type: code
+    language: python
+    title: 원본 데이터 확인
+    content: |-
+      userDf = pd.DataFrame({'Month': months, 'Users': users})
+      userDf
+  - type: tip
+    content: "이 데이터는 y = 1000 × e^(0.15x) + 노이즈로 생성되었습니다. 월 15% 성장률을 가정한 지수 성장 모델입니다. curve_fit이 이 파라미터들을 얼마나 잘 찾아내는지 확인합니다."
+
+- id: explore
+  title: 데이터 탐색
+  subtitle: 성장 패턴 시각화
+  blocks:
+  - type: text
+    content: "피팅 전에 데이터를 시각화하여 어떤 모델이 적합한지 파악합니다. 사용자 수가 선형으로 증가하는지, 지수적으로 증가하는지에 따라 적용할 함수가 달라집니다. 그래프에서 증가 속도가 점점 빨라지면 지수 성장, 일정하면 선형 성장입니다. 로그 스케일로 그렸을 때 직선이면 지수 성장의 확실한 증거입니다."
+  - type: code
+    language: python
+    title: 성장 추세 시각화
+    content: |-
+      figExplore, (axExplore1, axExplore2) = plt.subplots(1, 2, figsize=(14, 5))
+
+      axExplore1.scatter(months, users, s=100, c='blue', label='Actual Users')
+      axExplore1.set_xlabel('Month')
+      axExplore1.set_ylabel('Users')
+      axExplore1.set_title('User Growth (Linear Scale)')
+      axExplore1.grid(True, alpha=0.3)
+
+      axExplore2.scatter(months, users, s=100, c='blue')
+      axExplore2.set_yscale('log')
+      axExplore2.set_xlabel('Month')
+      axExplore2.set_ylabel('Users (log scale)')
+      axExplore2.set_title('User Growth (Log Scale)')
+      axExplore2.grid(True, alpha=0.3)
+      figExplore
+  - type: tip
+    content: "로그 스케일에서 거의 직선으로 보이면 지수 성장입니다. log(y) = log(a) + bx 형태가 되어 직선이 됩니다."
+
+- id: define_model
+  title: 지수 성장 모델 정의
+  subtitle: curve_fit용 함수
+  blocks:
+  - type: text
+    content: "curve_fit에 사용할 함수를 정의합니다. 함수의 첫 번째 인자는 반드시 독립변수(x)이고, 나머지 인자들이 찾을 파라미터입니다. 지수 성장 모델 y = a × e^(bx)에서 a는 초기 사용자 수, b는 성장률입니다. 함수는 numpy 배열을 입력받아 numpy 배열을 반환해야 합니다."
+  - type: code
+    language: python
+    title: 지수함수 정의
+    content: |-
+      def expGrowth(x, a, b):
+          return a * np.exp(b * x)
+  - type: code
+    language: python
+    title: 함수 테스트
+    content: |-
+      testY = expGrowth(months, 1000, 0.15)
+      testY[:5]
+  - type: tip
+    content: "def expGrowth(x, a, b)에서 x는 독립변수, a와 b가 curve_fit이 최적화할 파라미터입니다. 파라미터 수는 제한이 없습니다."
+
+- id: fitting
+  title: 곡선 피팅 실행
+  subtitle: curve_fit
+  blocks:
+  - type: text
+    content: "curve_fit(함수, x데이터, y데이터)를 호출하면 최적 파라미터와 공분산 행렬을 반환합니다. p0 인자로 초기 추정값을 제공하면 수렴이 빠르고 안정적입니다. 비선형 최적화는 초기값에 따라 결과가 달라질 수 있으므로, 도메인 지식을 활용하여 합리적인 초기값을 설정하는 것이 중요합니다."
+  - type: code
+    language: python
+    title: 피팅 실행
+    content: |-
+      params, covariance = optimize.curve_fit(expGrowth, months, users, p0=[1000, 0.1])
+      aFit, bFit = params
+      aFit, bFit
+  - type: tip
+    content: "p0=[1000, 0.1]은 '초기 사용자 약 1000명, 월 10% 성장률'이라는 초기 추정입니다. curve_fit은 이 값에서 시작하여 최적값을 찾습니다."
+  - type: code
+    language: python
+    title: 파라미터 해석
+    content: |-
+      paramDf = pd.DataFrame({
+          'Parameter': ['a (Initial Users)', 'b (Growth Rate)'],
+          'True Value': [1000, 0.15],
+          'Estimated': [aFit, bFit],
+          'Error (%)': [abs(aFit - 1000) / 1000 * 100, abs(bFit - 0.15) / 0.15 * 100]
+      })
+      paramDf
+
+- id: validate
+  title: 피팅 검증
+  subtitle: R² 및 잔차 분석
+  blocks:
+  - type: text
+    content: "피팅 품질을 평가하기 위해 R²(결정계수)와 잔차를 분석합니다. R²는 0~1 사이 값으로, 1에 가까울수록 모델이 데이터를 잘 설명합니다. 잔차(실제값 - 예측값)가 무작위로 분포하면 좋은 모델이고, 패턴이 있으면 모델이 데이터의 특성을 놓치고 있다는 의미입니다."
+  - type: code
+    language: python
+    title: R² 계산
+    content: |-
+      usersPred = expGrowth(months, aFit, bFit)
+      ssRes = np.sum((users - usersPred) ** 2)
+      ssTot = np.sum((users - np.mean(users)) ** 2)
+      rSquared = 1 - (ssRes / ssTot)
+      rSquared
+  - type: code
+    language: python
+    title: 잔차 분석
+    content: |-
+      residuals = users - usersPred
+
+      figResid, (axResid1, axResid2) = plt.subplots(1, 2, figsize=(12, 4))
+
+      axResid1.scatter(months, residuals, s=80, c='coral')
+      axResid1.axhline(y=0, color='gray', linestyle='--')
+      axResid1.set_xlabel('Month')
+      axResid1.set_ylabel('Residual')
+      axResid1.set_title('Residual Plot')
+      axResid1.grid(True, alpha=0.3)
+
+      axResid2.hist(residuals, bins=8, color='steelblue', edgecolor='white', alpha=0.7)
+      axResid2.set_xlabel('Residual')
+      axResid2.set_ylabel('Frequency')
+      axResid2.set_title('Residual Distribution')
+      figResid
+  - type: tip
+    content: "잔차가 0 주위에 무작위로 분포하고 특별한 패턴이 없으면 모델이 적합합니다. 잔차에 곡선 패턴이 있으면 모델을 변경해야 합니다."
+
+- id: predict
+  title: 미래 예측
+  subtitle: 18개월 후 사용자
+  blocks:
+  - type: text
+    content: "피팅된 모델로 미래 사용자 수를 예측합니다. 단, 외삽(데이터 범위 밖 예측)은 불확실성이 크므로 주의해야 합니다. 파라미터의 표준오차를 이용하여 예측의 신뢰구간도 계산합니다. 공분산 행렬의 대각 원소 제곱근이 각 파라미터의 표준오차입니다."
+  - type: code
+    language: python
+    title: 18개월 예측
+    content: |-
+      futureMonths = np.arange(1, 19)
+      futureUsers = expGrowth(futureMonths, aFit, bFit)
+
+      predDf = pd.DataFrame({
+          'Month': [12, 15, 18],
+          'Predicted Users': [int(expGrowth(12, aFit, bFit)), int(expGrowth(15, aFit, bFit)), int(expGrowth(18, aFit, bFit))]
+      })
+      predDf
+  - type: code
+    language: python
+    title: 예측 시각화
+    content: |-
+      monthsSmooth = np.linspace(1, 18, 100)
+      usersSmooth = expGrowth(monthsSmooth, aFit, bFit)
+
+      figPred, axPred = plt.subplots(figsize=(12, 6))
+      axPred.scatter(months, users, s=100, c='blue', label='Actual Users', zorder=5)
+      axPred.plot(monthsSmooth, usersSmooth, 'r-', linewidth=2, label=f'Fit: {aFit:.0f} × e^({bFit:.3f}x)')
+      axPred.axvline(x=12, color='gray', linestyle='--', alpha=0.5, label='Prediction Start')
+      axPred.fill_between(monthsSmooth, usersSmooth * 0.8, usersSmooth * 1.2, alpha=0.2, color='red', label='±20% Band')
+      axPred.set_xlabel('Month')
+      axPred.set_ylabel('Users')
+      axPred.set_title(f'User Growth Prediction (R² = {rSquared:.4f})')
+      axPred.legend()
+      axPred.grid(True, alpha=0.3)
+      figPred
+
+- id: result
+  title: 최종 분석 보고서
+  subtitle: 성장률 및 예측 요약
+  blocks:
+  - type: text
+    content: "곡선 피팅 결과를 종합하여 비즈니스 인사이트를 도출합니다. 월별 성장률, 배증 시간(사용자가 2배가 되는 기간), 연간 성장률 등을 계산합니다. 이러한 지표는 투자자 보고, 사업 계획, 인프라 확장 계획에 활용됩니다."
+  - type: code
+    language: python
+    title: 성장 지표 계산
+    content: |-
+      monthlyGrowthRate = bFit
+      doublingTime = np.log(2) / bFit
+      annualGrowthRate = (np.exp(bFit * 12) - 1) * 100
+
+      growthDf = pd.DataFrame({
+          'Metric': ['Monthly Growth Rate', 'Doubling Time', 'Annual Growth Rate', 'Initial Users (a)', 'R² Score'],
+          'Value': [f'{monthlyGrowthRate*100:.1f}%', f'{doublingTime:.1f} months', f'{annualGrowthRate:.0f}%', f'{aFit:.0f}', f'{rSquared:.4f}']
+      })
+      growthDf
+  - type: code
+    language: python
+    title: 최종 시각화
+    content: |-
+      figFinal, axFinal = plt.subplots(figsize=(12, 7))
+      axFinal.scatter(months, users, s=120, c='blue', label='Actual Data', zorder=5)
+      axFinal.plot(monthsSmooth, usersSmooth, 'r-', linewidth=3, label=f'Model: y = {aFit:.0f} × e^({bFit:.3f}x)')
+
+      for m, u in zip([6, 12, 18], [expGrowth(6, aFit, bFit), expGrowth(12, aFit, bFit), expGrowth(18, aFit, bFit)]):
+          axFinal.annotate(f'{int(u):,}', xy=(m, u), xytext=(m+0.5, u*1.1), fontsize=10, ha='left')
+
+      axFinal.set_xlabel('Month', fontsize=12)
+      axFinal.set_ylabel('Users', fontsize=12)
+      axFinal.set_title(f'Startup User Growth Analysis\nGrowth Rate: {monthlyGrowthRate*100:.1f}%/month, Doubling Time: {doublingTime:.1f} months', fontsize=14)
+      axFinal.legend()
+      axFinal.grid(True, alpha=0.3)
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 곡선 피팅 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 curve_fit, 파라미터 해석, R² 계산, 예측을 활용하여 다양한 현상을 모델링합니다. 미션1은 배터리 방전 곡선(지수 감쇠), 미션2는 로지스틱 성장 모델(S자 곡선)입니다. 각 미션은 함수 정의, 피팅, 검증, 시각화를 포함합니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 배터리 방전 곡선"
+    blocks:
+    - type: code
+      title: 데이터 생성
+      content: |-
+        import numpy as np
+        from scipy import optimize
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        def batteryDecay(t, v0, tau, vMin):
+            return (v0 - vMin) * np.exp(-t / tau) + vMin
+
+        np.random.seed(222)
+        hours = np.arange(0, 25, 2)
+        voltage = (4.2 - 3.0) * np.exp(-hours / 10) + 3.0 + np.random.normal(0, 0.05, len(hours))
+    - type: code
+      title: 피팅 및 분석
+      content: |-
+        batParams, batCov = optimize.curve_fit(batteryDecay, hours, voltage, p0=[4.2, 10, 3.0])
+        v0Fit, tauFit, vMinFit = batParams
+
+        voltagePred = batteryDecay(hours, v0Fit, tauFit, vMinFit)
+        ssResBat = np.sum((voltage - voltagePred) ** 2)
+        ssTotBat = np.sum((voltage - np.mean(voltage)) ** 2)
+        rSquaredBat = 1 - (ssResBat / ssTotBat)
+
+        batDf = pd.DataFrame({
+            'Parameter': ['Initial Voltage (V0)', 'Time Constant (τ)', 'Min Voltage', 'R²'],
+            'Value': [f'{v0Fit:.3f} V', f'{tauFit:.1f} hours', f'{vMinFit:.3f} V', f'{rSquaredBat:.4f}']
+        })
+        batDf
+    - type: code
+      title: 시각화
+      content: |-
+        hourSmooth = np.linspace(0, 24, 100)
+        voltageFit = batteryDecay(hourSmooth, v0Fit, tauFit, vMinFit)
+
+        figBat, axBat = plt.subplots(figsize=(10, 6))
+        axBat.scatter(hours, voltage, s=100, c='blue', label='Measured')
+        axBat.plot(hourSmooth, voltageFit, 'r-', linewidth=2, label=f'Fit: τ={tauFit:.1f}h')
+        axBat.axhline(y=vMinFit, color='gray', linestyle='--', alpha=0.5, label=f'Min: {vMinFit:.2f}V')
+        axBat.set_xlabel('Time (hours)')
+        axBat.set_ylabel('Voltage (V)')
+        axBat.set_title('Battery Discharge Curve Fitting')
+        axBat.legend()
+        axBat.grid(True, alpha=0.3)
+        figBat
+  - type: expansion
+    title: "미션2: 시장 점유율 (로지스틱 성장)"
+    blocks:
+    - type: code
+      title: 데이터 생성
+      content: |-
+        import numpy as np
+        from scipy import optimize
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        def logisticGrowth(x, L, k, x0):
+            return L / (1 + np.exp(-k * (x - x0)))
+
+        np.random.seed(789)
+        weeks = np.arange(1, 25)
+        shareActual = 60 / (1 + np.exp(-0.3 * (weeks - 12))) + np.random.normal(0, 3, len(weeks))
+        shareActual = np.clip(shareActual, 0, 100)
+    - type: code
+      title: 피팅 및 분석
+      content: |-
+        logParams, logCov = optimize.curve_fit(logisticGrowth, weeks, shareActual, p0=[60, 0.3, 12], maxfev=5000)
+        lFit, kFit, x0Fit = logParams
+
+        sharePred = logisticGrowth(weeks, lFit, kFit, x0Fit)
+        ssResLog = np.sum((shareActual - sharePred) ** 2)
+        ssTotLog = np.sum((shareActual - np.mean(shareActual)) ** 2)
+        rSquaredLog = 1 - (ssResLog / ssTotLog)
+
+        logDf = pd.DataFrame({
+            'Parameter': ['Max Share (L)', 'Growth Rate (k)', 'Inflection Point (x0)', 'R²'],
+            'Value': [f'{lFit:.1f}%', f'{kFit:.3f}', f'Week {x0Fit:.1f}', f'{rSquaredLog:.4f}']
+        })
+        logDf
+    - type: code
+      title: 시각화
+      content: |-
+        weeksSmooth = np.linspace(1, 30, 100)
+        shareFit = logisticGrowth(weeksSmooth, lFit, kFit, x0Fit)
+
+        figLog, axLog = plt.subplots(figsize=(10, 6))
+        axLog.scatter(weeks, shareActual, s=80, c='green', label='Actual')
+        axLog.plot(weeksSmooth, shareFit, 'r-', linewidth=2, label=f'Logistic: L={lFit:.0f}%')
+        axLog.axhline(y=lFit, color='gray', linestyle='--', alpha=0.5, label=f'Saturation: {lFit:.0f}%')
+        axLog.axvline(x=x0Fit, color='orange', linestyle=':', alpha=0.5, label=f'Inflection: Week {x0Fit:.0f}')
+        axLog.set_xlabel('Week')
+        axLog.set_ylabel('Market Share (%)')
+        axLog.set_title('Market Share Growth (Logistic Model)')
+        axLog.legend()
+        axLog.grid(True, alpha=0.3)
+        figLog

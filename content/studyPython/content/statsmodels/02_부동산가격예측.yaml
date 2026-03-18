@@ -1,0 +1,364 @@
+meta:
+  id: statsmodels_02
+  title: 부동산가격예측
+  order: 2
+  category: statsmodels
+  difficulty: "⭐⭐"
+  badge: 입문
+  dataUrl: https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv
+  tags: ["다중회귀", "특성선택", "잔차분석", "부동산", "가격예측"]
+  seo:
+    title: "statsmodels 다중선형회귀 - 보스턴 주택 가격 예측"
+    description: "여러 변수로 집값을 예측하는 다중선형회귀 모델을 구축합니다. 특성 선택과 잔차 분석을 배웁니다."
+    keywords: ["statsmodels", "다중회귀", "특성선택", "잔차분석", "부동산가격", "VIF"]
+
+intro:
+  emoji: "🏠"
+  goal: 방 개수, 범죄율 등 여러 요인으로 주택 가격을 예측합니다.
+  description: 보스턴 지역 506개 주택의 13가지 특성으로 집값을 예측합니다. 어떤 요인이 가격에 가장 큰 영향을 미치는지 분석하여 부동산 가격 책정에 활용할 수 있습니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: 보스턴 주택 데이터셋
+  blocks:
+  - type: text
+    content: "Boston Housing 데이터셋은 1970년대 보스턴 지역 506개 주택의 13개 특성(방 개수, 범죄율, 세금, 학생-교사 비율 등)과 중앙값 가격(MEDV)을 담고 있습니다. 통계학과 머신러닝 교육에서 가장 많이 사용되는 대표적인 벤치마크 데이터셋입니다. 이 데이터로 어떤 요인이 집값에 가장 큰 영향을 미치는지 분석하면, 부동산 가격 책정, 투자 의사결정, 도시 계획 정책 수립에 활용할 수 있습니다. 실제 부동산 회사에서도 유사한 분석으로 적정 가격을 산출합니다."
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: CSV 파일 로드
+    content: |-
+      import pandas as pd
+      import statsmodels.api as sm
+
+      url = "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv"
+      bostonData = pd.read_csv(url)
+      bostonData.shape
+
+- id: step2_head
+  title: 2단계. 데이터 미리보기
+  subtitle: 컬럼 확인
+  blocks:
+  - type: text
+    content: "주요 컬럼은 CRIM(인구 1인당 범죄율), RM(평균 방 개수), TAX(10,000달러당 재산세율), LSTAT(저소득층 인구 비율), MEDV(주택 가격 중앙값, 천 달러 단위)입니다. MEDV가 종속변수(예측할 값)이고 나머지 13개가 독립변수(예측에 사용할 값)입니다. 각 컬럼의 의미를 정확히 이해해야 회귀 계수를 올바르게 해석할 수 있으며, 예를 들어 RM 계수가 양수이면 방이 많을수록 집값이 비싸다는 것을 의미합니다."
+  - type: code
+    language: python
+    title: 처음 5행 확인
+    description: 컬럼 구조 파악
+    content: |-
+      bostonData.head()
+
+- id: step3_describe
+  title: 3단계. 기초 통계량
+  subtitle: 데이터 범위 확인
+  blocks:
+  - type: text
+    content: "describe()로 각 변수의 평균, 표준편차, 최소/최대값을 확인합니다. RM(방 개수)의 평균은 6.3개, MEDV(가격)의 평균은 22.5천 달러입니다. 주목할 점은 변수들의 스케일이 크게 다르다는 것입니다. CRIM은 0에서 89까지, RM은 3에서 9까지, TAX는 187에서 711까지 범위가 다릅니다. 회귀 계수 크기를 직접 비교하려면 표준화가 필요하지만, OLS 회귀 자체는 스케일에 영향받지 않아 표준화 없이도 정확한 예측이 가능합니다."
+  - type: code
+    language: python
+    title: 기초 통계량
+    description: 평균, 표준편차, 최소/최대
+    content: |-
+      bostonData.describe()
+
+- id: step4_corr
+  title: 4단계. 상관관계 분석
+  subtitle: 변수 간 관계 파악
+  blocks:
+  - type: text
+    content: "다중회귀분석을 하기 전에 변수 간 상관관계(correlation)를 확인하는 것은 필수 단계입니다. 상관계수는 -1에서 1 사이 값으로 두 변수가 함께 움직이는 정도를 나타내며, 1에 가까우면 강한 양의 상관(한 변수 증가 → 다른 변수도 증가), -1에 가까우면 강한 음의 상관(한 변수 증가 → 다른 변수 감소)입니다. 이 데이터에서 RM(방 개수)과 MEDV(가격)는 +0.7의 양의 상관관계를 보여 방이 많을수록 집값이 비싸고, LSTAT(저소득층 비율)과 MEDV는 -0.74의 음의 상관관계로 저소득층이 많은 지역일수록 집값이 쌉니다. 상관관계가 너무 높은 독립변수들끼리는(예로 0.9 이상) 다중공선성(multicollinearity) 문제를 일으켜 계수 해석이 불안정해지므로, 하나를 제거하거나 주성분 분석으로 결합해야 합니다."
+  - type: code
+    language: python
+    title: 상관관계 행렬
+    description: MEDV와 다른 변수들의 상관관계
+    content: |-
+      bostonData.corr()['medv'].sort_values(ascending=False)
+  - type: tip
+    content: corr()는 상관계수 행렬을 반환합니다. -1~1 사이 값으로, 1에 가까우면 강한 양의 상관, -1에 가까우면 강한 음의 상관입니다. ['MEDV']로 MEDV와 다른 변수들의 상관관계만 추출했습니다.
+
+- id: step5_select_features
+  title: 5단계. 주요 변수 선택
+  subtitle: 상관관계 기반 특성 선택
+  blocks:
+  - type: text
+    content: "모든 13개 변수를 사용할 수도 있지만, 먼저 MEDV와 상관관계가 높은 5개 변수로 시작합니다. RM(방 개수, +0.70), LSTAT(저소득층 비율, -0.74), PTRATIO(학생-교사 비율, -0.51), INDUS(비소매 비즈니스 비율, -0.48), TAX(재산세, -0.47)를 선택합니다. 변수를 줄이면 모델 해석이 쉬워지고, 불필요한 변수를 포함했을 때 발생하는 과적합(overfitting)을 방지할 수 있습니다. 실무에서도 모든 변수를 투입하기보다 비즈니스 의미가 있는 핵심 변수를 선별하는 것이 중요합니다."
+  - type: code
+    language: python
+    title: 5개 주요 변수 선택
+    description: 상관관계 상위 변수
+    content: |-
+      features = ['rm', 'lstat', 'ptratio', 'indus', 'tax']
+      X = bostonData[features]
+      y = bostonData['medv']
+  - type: tip
+    content: 리스트 ['RM', 'LSTAT', ...]는 대괄호 []로 여러 값을 묶은 것으로, 여러 컬럼 이름을 한번에 지정할 때 사용합니다. bostonData[['RM', 'LSTAT']]처럼 DataFrame에 리스트를 넣으면 해당 컬럼들만 추출하며, 결과는 자동으로 DataFrame(2차원 표)이 됩니다. features = [...] 형태로 변수에 저장하면 나중에 재사용할 수 있어 코드가 깔끔해집니다. =(등호)는 할당 연산자로 오른쪽 값을 왼쪽 변수에 저장합니다.
+
+- id: step6_add_constant
+  title: 6단계. 상수항 추가
+  subtitle: 절편 계산
+  blocks:
+  - type: text
+    content: "01 프로젝트에서 배운 것처럼 statsmodels는 절편(intercept)을 자동으로 추가하지 않습니다. add_constant()로 값이 모두 1인 const 컬럼을 추가해야 절편이 계산됩니다. 절편은 모든 독립변수가 0일 때의 기본 집값을 의미하며, 회귀식 y = β₀ + β₁X₁ + β₂X₂ + ...에서 β₀에 해당합니다. sklearn과 달리 statsmodels는 이 과정을 명시적으로 수행해야 하며, 이는 통계적 투명성을 위한 설계입니다."
+  - type: code
+    language: python
+    title: 상수항 추가
+    description: 절편용 컬럼 추가
+    content: |-
+      XWithConst = sm.add_constant(X)
+      XWithConst.head()
+
+- id: step7_fit_model
+  title: 7단계. 다중회귀 모델 학습
+  subtitle: 5개 변수로 예측
+  blocks:
+  - type: text
+    content: OLS(y, X).fit()으로 다중회귀 모델을 학습합니다. 다중회귀(multiple regression)는 여러 독립변수(X1, X2, X3...)를 동시에 사용하여 종속변수(y)를 예측하는 방법으로, 단순회귀가 "직선"을 찾는다면 다중회귀는 "평면" 또는 "고차원 공간"을 찾습니다. 사용법은 단순회귀와 같지만, X가 여러 컬럼을 가진 DataFrame이라는 차이가 있습니다. 최소제곱법으로 각 변수의 회귀 계수를 동시에 계산하며, 수식은 y = β₀ + β₁X₁ + β₂X₂ + ... 형태입니다. 예를 들어 집값 = 절편 + (방개수 계수 × 방개수) + (범죄율 계수 × 범죄율)로 표현됩니다.
+  - type: code
+    language: python
+    title: 다중회귀 모델 학습
+    description: 5개 변수로 가격 예측
+    content: |-
+      model = sm.OLS(y, XWithConst).fit()
+
+- id: step8_summary
+  title: 8단계. 결과 요약
+  subtitle: summary 해석
+  blocks:
+  - type: text
+    content: "summary()에서 R²는 약 0.69로, 선택한 5개 변수가 주택 가격 변동의 69%를 설명합니다. 각 변수의 P>|t| 값(p-value)이 0.05보다 작으면 해당 변수가 통계적으로 유의미하게 가격에 영향을 미친다는 뜻입니다. coef(계수)는 다른 변수를 고정했을 때의 순수 영향력을 나타내며, 예를 들어 RM 계수가 4.09이면 다른 조건이 같을 때 방 1개 추가 시 집값이 4,090달러 상승한다는 의미입니다."
+  - type: code
+    language: python
+    title: 회귀 결과 요약
+    description: R², p-value, 계수
+    content: |-
+      model.summary()
+  - type: tip
+    content: 다중회귀에서 계수 해석은 "다른 변수가 일정할 때"라는 조건이 붙습니다. RM 계수가 4.09이면 "다른 조건이 같을 때 방 1개 증가 시 가격이 4.09천 달러 증가"합니다. 단순회귀와 달리 다른 변수의 영향을 통제한 순수 효과입니다.
+
+- id: step9_rsquared
+  title: 9단계. R² 확인
+  subtitle: 모델 설명력
+  blocks:
+  - type: text
+    content: "R² 0.69는 5개 변수가 가격 변동의 69%를 설명한다는 뜻으로, 01 프로젝트의 TV 광고비 단일 변수(R² 0.61)보다 높은 설명력을 보입니다. 그러나 변수를 추가하면 실제 성능 향상과 무관하게 R²는 항상 증가하는 문제가 있습니다. 따라서 Adjusted R²(수정 결정계수)를 함께 확인해야 합니다. Adjusted R²는 변수 개수에 페널티를 부여하여, 쓸모없는 변수를 추가하면 오히려 감소합니다. 두 값의 차이가 크면 불필요한 변수가 포함되었을 가능성이 있습니다."
+  - type: code
+    language: python
+    title: R² 값
+    description: 결정계수 확인
+    content: |-
+      f"R²: {model.rsquared:.3f}"
+      f"Adjusted R²: {model.rsquared_adj:.3f}"
+  - type: tip
+    content: Adjusted R²는 변수 개수를 고려한 R²입니다. 변수를 추가해도 모델 성능이 실제로 개선되지 않으면 Adjusted R²는 오히려 감소합니다. 변수 선택 시 Adjusted R²를 기준으로 판단하는 것이 더 정확합니다.
+
+- id: step10_params
+  title: 10단계. 회귀 계수 해석
+  subtitle: 각 변수의 영향력
+  blocks:
+  - type: text
+    content: "params로 각 변수의 회귀 계수를 확인합니다. RM(방 개수)은 +4.09로 양의 영향, LSTAT(저소득층 비율)는 -0.62로 음의 영향을 미칩니다. 양수 계수는 해당 변수 증가 시 집값 상승, 음수는 하락을 의미합니다. 주의할 점은 계수 크기로 중요도를 직접 비교할 수 없다는 것입니다. RM은 3~9 범위, TAX는 187~711 범위로 스케일이 다르기 때문입니다. 변수 간 중요도를 비교하려면 표준화 계수(standardized coefficient)나 VIF를 사용해야 합니다."
+  - type: code
+    language: python
+    title: 회귀 계수
+    description: 각 변수의 영향력
+    content: |-
+      model.params
+
+- id: step11_residual_plot
+  title: 11단계. 잔차 플롯
+  subtitle: 모델 진단
+  blocks:
+  - type: text
+    content: "잔차(residual)는 실제값과 예측값의 차이(오차)로, 모델이 설명하지 못한 부분입니다. 잔차 플롯은 예측값(X축)과 잔차(Y축)를 그린 그래프로, 모델의 적합성을 진단하는 핵심 도구입니다. 이상적인 잔차 플롯은 (1) 잔차가 0 주변에 랜덤하게 분포하고, (2) 특정 패턴이나 추세가 없으며, (3) 분산이 일정해야 합니다. 만약 잔차가 깔때기 모양을 보이면 이분산성(heteroscedasticity), 곡선 패턴을 보이면 비선형 관계를 의미하여 모델 개선이 필요합니다. 예를 들어 고가 주택(예측값 30 이상)에서 잔차가 커지면 고가 주택 예측이 불안정하다는 뜻이므로, 로그 변환이나 추가 변수 투입을 고려해야 합니다."
+  - type: code
+    language: python
+    title: 잔차 플롯
+    description: 예측값 vs 잔차
+    content: |-
+      import plotly.express as px
+
+      residuals = model.resid
+      fittedValues = model.fittedvalues
+
+      residualDf = pd.DataFrame({'Fitted': fittedValues, 'Residuals': residuals})
+      residualFig = px.scatter(residualDf, x='Fitted', y='Residuals',
+                               title='Residual Plot',
+                               labels={'Fitted': 'Fitted values', 'Residuals': 'Residuals'},
+                               opacity=0.6)
+      residualFig.add_hline(y=0, line_dash='dash', line_color='red')
+      residualFig.show()
+  - type: tip
+    content: model.resid는 잔차(실제값 - 예측값), model.fittedvalues는 예측값입니다. plotly의 add_hline()은 y=0에 수평선을 그리며, line_dash='dash'로 점선 스타일을 지정합니다. 잔차가 0 주변에 고르게 분포하고 특정 패턴이 없으면 좋은 모델이며, 깔때기 모양이나 곡선 패턴이 보이면 모델 가정을 위반하는 것입니다. 마우스를 올리면 특정 점의 예측값과 잔차를 확인할 수 있어 이상치(outlier)를 쉽게 찾을 수 있습니다.
+
+- id: step12_qq_plot
+  title: 12단계. Q-Q 플롯
+  subtitle: 정규성 검정
+  blocks:
+  - type: text
+    content: "Q-Q 플롯(Quantile-Quantile plot)은 잔차의 분위수와 이론적 정규분포의 분위수를 비교하여 정규성을 확인하는 진단 도구입니다. X축은 이론적 정규분포의 분위수, Y축은 실제 잔차의 분위수를 나타내며, 점들이 45도 대각선에 가까우면 잔차가 정규분포를 따른다는 뜻입니다. 선형 회귀분석은 잔차가 평균 0, 일정한 분산의 정규분포를 따른다고 가정하므로(정규성 가정), Q-Q 플롯으로 이 가정을 검증합니다. 양 끝에서 약간 벗어나는 것은 정상이지만, 중간 부분이 S자 곡선을 그리거나 크게 벗어나면 정규성을 위반하는 것이므로 로그 변환이나 Box-Cox 변환을 고려해야 합니다. 정규성이 심하게 위반되면 p-value와 신뢰구간이 부정확해집니다."
+  - type: code
+    language: python
+    title: Q-Q 플롯
+    description: 잔차 정규성 확인
+    content: |-
+      import plotly.graph_objects as go
+      import scipy.stats as stats
+      import numpy as np
+
+      (quantiles, ordered_residuals), (slope, intercept, r) = stats.probplot(residuals, dist="norm")
+
+      qqFig = go.Figure()
+      qqFig.add_trace(go.Scatter(x=quantiles, y=ordered_residuals,
+                                  mode='markers', name='Residuals',
+                                  marker=dict(size=6, opacity=0.6)))
+      qqFig.add_trace(go.Scatter(x=quantiles, y=slope * quantiles + intercept,
+                                  mode='lines', name='Normal line',
+                                  line=dict(color='red', width=2)))
+      qqFig.update_layout(title='Q-Q Plot',
+                          xaxis_title='Theoretical Quantiles',
+                          yaxis_title='Sample Quantiles')
+      qqFig.show()
+  - type: tip
+    content: scipy.stats.probplot()은 Q-Q 플롯 데이터를 계산하며, quantiles는 이론적 분위수, ordered_residuals는 정렬된 잔차입니다. slope와 intercept로 정규분포 기준선을 그립니다. dist="norm"은 정규분포와 비교한다는 뜻입니다. 점들이 빨간 대각선을 따라 분포하면 정규성을 만족하고, S자 곡선이나 큰 이탈이 보이면 변환이 필요합니다. 정규성 위반은 특히 작은 샘플(n<30)에서 문제가 되므로, 큰 데이터셋에서는 약간의 이탈은 허용됩니다.
+
+- id: step13_coef_plot
+  title: 13단계. 계수 시각화
+  subtitle: 신뢰구간 포함
+  blocks:
+  - type: text
+    content: 회귀 계수를 막대그래프로 시각화하면 각 변수의 영향력을 한눈에 비교할 수 있습니다. 신뢰구간(confidence interval)을 함께 표시하면 계수의 불확실성도 확인할 수 있습니다. 신뢰구간이 0을 포함하면 그 변수는 통계적으로 유의하지 않을 수 있습니다. seaborn의 barplot과 에러바를 사용해 직관적인 시각화를 만듭니다.
+  - type: code
+    language: python
+    title: 계수 막대 그래프
+    description: 신뢰구간 에러바 포함
+    content: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+
+      coefDf = pd.DataFrame({
+          'variable': model.params.index[1:],
+          'coef': model.params.values[1:],
+          'lower': model.conf_int()[0].values[1:],
+          'upper': model.conf_int()[1].values[1:]
+      })
+      coefDf['error'] = coefDf['upper'] - coefDf['coef']
+
+      coefFig, coefAx = plt.subplots(figsize=(8, 5))
+      colors = ['#2ecc71' if c > 0 else '#e74c3c' for c in coefDf['coef']]
+      coefAx.barh(coefDf['variable'], coefDf['coef'], xerr=coefDf['error'], color=colors, capsize=5)
+      coefAx.axvline(x=0, color='black', linestyle='--', linewidth=1)
+      coefAx.set_xlabel('Coefficient')
+      coefAx.set_title('Regression Coefficients with 95% CI')
+      plt.tight_layout()
+      coefFig
+  - type: tip
+    content: model.conf_int()는 95% 신뢰구간의 하한과 상한을 반환합니다. 녹색은 양의 계수(가격 상승), 빨간색은 음의 계수(가격 하락)입니다. 에러바가 0을 지나지 않으면 통계적으로 유의미합니다.
+
+- id: step14_predict
+  title: 14단계. 새로운 주택 가격 예측
+  subtitle: 실전 예측
+  blocks:
+  - type: text
+    content: "학습된 모델로 새로운 주택의 예상 가격을 예측합니다. 방 7개, LSTAT 10%, PTRATIO 18, INDUS 5%, TAX 300인 주택의 적정 가격을 계산해봅니다. predict() 사용법은 01 프로젝트와 동일하지만, 5개 변수를 모두 포함한 DataFrame을 입력해야 합니다. 이 예측 기능은 부동산 중개업체의 시세 산정, 매수자의 적정 가격 판단, 도시 개발 시 가격 영향 평가 등 실무에서 활용됩니다. 변수 값을 바꿔가며 시뮬레이션하면 가격 민감도 분석도 가능합니다."
+  - type: code
+    language: python
+    title: 새 주택 가격 예측
+    description: 5개 변수 입력
+    content: |-
+      newHouse = pd.DataFrame({
+          'const': [1],
+          'rm': [7],
+          'lstat': [10],
+          'ptratio': [18],
+          'indus': [5],
+          'tax': [300]
+      })
+      predictedPrice = model.predict(newHouse)[0]
+      f"예상 가격: ${predictedPrice:.2f}천"
+
+- id: practice
+  title: 실습
+  subtitle: 부동산 가격 분석 프로젝트
+  blocks:
+  - type: text
+    content: 부동산 분석가가 되어 보스턴 주택 시장을 분석해봅시다. 각 미션은 데이터 로딩부터 모델링, 평가, 시각화까지 전체 과정을 독립적으로 수행합니다. 01 프로젝트에서 배운 OLS와 summary 해석, 그리고 이번 프로젝트에서 배운 다중회귀, 특성 선택, 잔차 분석을 모두 활용하여 실무 분석 역량을 키워봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 전체 변수 다중회귀"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import pandas as pd
+        import statsmodels.api as sm
+
+        allUrl = "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv"
+        allData = pd.read_csv(allUrl)
+        allData.shape
+    - type: code
+      title: "모델 학습"
+      content: |-
+        allFeatures = allData.drop('medv', axis=1)
+        allY = allData['medv']
+        allX = sm.add_constant(allFeatures)
+        allModel = sm.OLS(allY, allX).fit()
+        allModel.summary()
+    - type: code
+      title: "잔차 플롯"
+      content: |-
+        import plotly.express as px
+
+        allResidDf = pd.DataFrame({'Fitted': allModel.fittedvalues, 'Residuals': allModel.resid})
+        allResidFig = px.scatter(allResidDf, x='Fitted', y='Residuals', title='Residual Plot', opacity=0.6)
+        allResidFig.add_hline(y=0, line_dash='dash', line_color='red')
+        allResidFig
+  - type: expansion
+    title: "미션2: 모델 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import pandas as pd
+        import statsmodels.api as sm
+
+        cmpUrl = "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv"
+        cmpData = pd.read_csv(cmpUrl)
+        cmpY = cmpData['medv']
+        cmpData.head()
+    - type: code
+      title: "두 모델 학습"
+      content: |-
+        rmX = sm.add_constant(cmpData[['rm']])
+        rmModel = sm.OLS(cmpY, rmX).fit()
+
+        fiveFeatures = ['rm', 'lstat', 'ptratio', 'indus', 'tax']
+        fiveX = sm.add_constant(cmpData[fiveFeatures])
+        fiveModel = sm.OLS(cmpY, fiveX).fit()
+    - type: code
+      title: "비교표"
+      content: |-
+        cmpTable = pd.DataFrame({
+            'Model': ['RM만', '5개 변수'],
+            'R²': [rmModel.rsquared, fiveModel.rsquared],
+            'Adj R²': [rmModel.rsquared_adj, fiveModel.rsquared_adj]
+        })
+        cmpTable
+
+- id: summary
+  title: 정리
+  subtitle: 두 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 보스턴 주택 데이터로 방 개수, 저소득층 비율 등 5가지 요인으로 집값을 예측했습니다. 다중회귀 모델의 R²는 0.69로 단순회귀(01 프로젝트)보다 높은 설명력을 보였고, 잔차 플롯과 Q-Q 플롯으로 모델의 적합성을 진단했습니다. 이 모델로 신규 주택의 적정 가격을 책정하고, 어떤 요인이 가격에 가장 큰 영향을 미치는지 파악할 수 있습니다.
+  - type: list
+    items:
+    - "다중선형회귀 - 여러 변수로 예측"
+    - "특성 선택 - 상관관계 기반 주요 변수 선택"
+    - "Adjusted R² - 변수 개수를 고려한 모델 평가"
+    - "잔차 플롯 - 예측값 vs 잔차로 모델 진단"
+    - "Q-Q 플롯 - 잔차 정규성 검정"
+    - "계수 해석 - 다른 변수 고정 시 순수 효과"
+  - type: text
+    content: 다음 프로젝트에서는 의료보험 비용 데이터로 로그 변환과 범주형 변수 처리를 배웁니다. 나이, 흡연 여부 등으로 보험료를 예측해봅니다.

@@ -1,0 +1,892 @@
+meta:
+  id: "18"
+  title: "탐색 알고리즘"
+  day: 18
+  category: "advancedPython"
+  tags: ["search", "binary-search", "bisect", "bfs", "dfs", "graph"]
+  seo:
+    title: "파이썬 탐색 알고리즘 - 선형, 이진, BFS, DFS"
+    description: "선형 탐색, 이진 탐색, bisect 모듈, BFS, DFS, 해시 탐색까지 파이썬 탐색 알고리즘 완벽 가이드"
+    keywords: ["탐색", "이진탐색", "bisect", "BFS", "DFS", "그래프"]
+
+intro:
+  emoji: "🔍"
+  points:
+  - "선형 탐색 O(n) vs 이진 탐색 O(log n) 시간 복잡도 비교"
+  - "bisect 모듈로 정렬 유지하며 효율적 삽입/탐색"
+  - "BFS(너비 우선)와 DFS(깊이 우선) 그래프 탐색"
+  - "해시 기반 O(1) 탐색의 원리와 활용"
+
+sections:
+- id: "linear_search"
+  title: "선형 탐색"
+  subtitle: "순차 검색"
+  blocks:
+  - type: "text"
+    content: "선형 탐색(Linear Search)은 가장 기본적인 탐색 알고리즘입니다. 배열의 처음부터 끝까지 순차적으로 탐색하며 원하는 값을 찾습니다. 시간 복잡도는 O(n)이며, 공간 복잡도는 O(1)입니다. 정렬되지 않은 데이터에서도 사용할 수 있고 구현이 매우 간단합니다. 작은 데이터셋이나 정렬 비용이 높은 경우에 적합합니다."
+  - type: "list"
+    items:
+    - "순차적으로 모든 요소 검사"
+    - "시간: O(n)"
+    - "공간: O(1)"
+    - "정렬 불필요"
+  - type: "code"
+    language: "python"
+    title: "기본 선형 탐색"
+    description: "배열에서 값을 찾아 인덱스를 반환합니다."
+    content: |-
+      def linearSearch(arr, target):
+          for i, val in enumerate(arr):
+              if val == target:
+                  return i
+          return -1
+
+      linearNums = [4, 2, 7, 1, 9, 3, 6, 8, 5]
+      linearIdx = linearSearch(linearNums, 7)
+      f"7의 인덱스: {linearIdx}"
+  - type: "code"
+    language: "python"
+    title: "조건 기반 탐색"
+    description: "조건에 맞는 첫 번째 요소를 찾습니다."
+    content: |-
+      def findByCondition(arr, predicate):
+          for item in arr:
+              if predicate(item):
+                  return item
+          return None
+
+      productList = [
+          {"name": "사과", "price": 1000},
+          {"name": "바나나", "price": 800},
+          {"name": "오렌지", "price": 1500}
+      ]
+      expensiveItem = findByCondition(productList, lambda p: p["price"] > 1200)
+      f"1200원 초과 상품: {expensiveItem}"
+  - type: "code"
+    language: "python"
+    title: "모든 일치 항목 찾기"
+    description: "조건에 맞는 모든 요소를 반환합니다."
+    content: |-
+      def findAllMatching(arr, predicate):
+          return [item for item in arr if predicate(item)]
+
+      numberList = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      evenNumbers = findAllMatching(numberList, lambda x: x % 2 == 0)
+      f"짝수들: {evenNumbers}"
+  - type: "tip"
+    content: "파이썬의 in 연산자와 index() 메서드도 내부적으로 선형 탐색을 사용합니다."
+
+- id: "binary_search"
+  title: "이진 탐색"
+  subtitle: "분할 정복 O(log n)"
+  blocks:
+  - type: "text"
+    content: "이진 탐색(Binary Search)은 정렬된 데이터에서 절반씩 범위를 줄여나가는 효율적인 알고리즘입니다. 중간값과 비교하여 탐색 범위를 절반으로 줄입니다. 시간 복잡도는 O(log n)으로, 100만 개 데이터도 최대 20번 비교로 찾습니다. 반드시 정렬된 데이터에서만 사용해야 합니다. 반복문과 재귀 두 가지 방식으로 구현할 수 있습니다."
+  - type: "list"
+    items:
+    - "중간값 비교로 범위 절반 축소"
+    - "시간: O(log n)"
+    - "전제: 정렬된 데이터"
+    - "100만개도 최대 20번 비교"
+  - type: "code"
+    language: "python"
+    title: "반복문 이진 탐색"
+    description: "while 루프로 이진 탐색을 구현합니다."
+    content: |-
+      def binarySearchIterative(arr, target):
+          lo, hi = 0, len(arr) - 1
+          while lo <= hi:
+              mid = (lo + hi) // 2
+              if arr[mid] == target:
+                  return mid
+              elif arr[mid] < target:
+                  lo = mid + 1
+              else:
+                  hi = mid - 1
+          return -1
+
+      sortedNums = [1, 3, 5, 7, 9, 11, 13, 15, 17, 19]
+      bsIdx = binarySearchIterative(sortedNums, 11)
+      f"11의 인덱스: {bsIdx}"
+  - type: "code"
+    language: "python"
+    title: "재귀 이진 탐색"
+    description: "재귀 함수로 이진 탐색을 구현합니다."
+    content: |-
+      def binarySearchRecursive(arr, target, lo, hi):
+          if lo > hi:
+              return -1
+          mid = (lo + hi) // 2
+          if arr[mid] == target:
+              return mid
+          elif arr[mid] < target:
+              return binarySearchRecursive(arr, target, mid + 1, hi)
+          else:
+              return binarySearchRecursive(arr, target, lo, mid - 1)
+
+      recData = [2, 4, 6, 8, 10, 12, 14, 16, 18, 20]
+      recResult = binarySearchRecursive(recData, 12, 0, len(recData) - 1)
+      f"12의 인덱스: {recResult}"
+  - type: "code"
+    language: "python"
+    title: "삽입 위치 찾기"
+    description: "값을 삽입할 적절한 위치를 찾습니다."
+    content: |-
+      def findInsertPos(arr, target):
+          lo, hi = 0, len(arr)
+          while lo < hi:
+              mid = (lo + hi) // 2
+              if arr[mid] < target:
+                  lo = mid + 1
+              else:
+                  hi = mid
+          return lo
+
+      insertList = [1, 3, 5, 7, 9]
+      insertPos = findInsertPos(insertList, 6)
+      f"6을 삽입할 위치: {insertPos}"
+  - type: "tip"
+    content: "lo <= hi는 값 찾기, lo < hi는 삽입 위치 찾기에 사용합니다."
+
+- id: "bisect_module"
+  title: "bisect 모듈"
+  subtitle: "표준 라이브러리 이진 탐색"
+  blocks:
+  - type: "text"
+    content: "bisect 모듈은 정렬된 리스트에서 O(log n) 탐색과 삽입을 제공하는 표준 라이브러리입니다. bisect_left는 같은 값의 왼쪽 위치를, bisect_right는 오른쪽 위치를 반환합니다. insort 함수로 정렬을 유지하며 삽입할 수 있습니다. 직접 구현보다 빠르고 안정적이므로 실무에서는 bisect 사용을 권장합니다."
+  - type: "list"
+    items:
+    - "bisect_left: 왼쪽 삽입 위치"
+    - "bisect_right: 오른쪽 삽입 위치"
+    - "insort: 정렬 유지하며 삽입"
+    - "직접 구현보다 빠르고 안정적"
+  - type: "code"
+    language: "python"
+    title: "bisect_left vs bisect_right"
+    description: "같은 값에 대해 다른 위치를 반환합니다."
+    content: |-
+      import bisect
+
+      gradeList = [60, 70, 80, 90]
+      leftPosition = bisect.bisect_left(gradeList, 80)
+      rightPosition = bisect.bisect_right(gradeList, 80)
+      f"bisect_left(80): {leftPosition}, bisect_right(80): {rightPosition}"
+  - type: "code"
+    language: "python"
+    title: "정렬 유지하며 삽입"
+    description: "insort로 정렬 순서를 유지합니다."
+    content: |-
+      import bisect
+
+      scoreList = [55, 70, 85, 95]
+      bisect.insort(scoreList, 75)
+      bisect.insort(scoreList, 60)
+      bisect.insort(scoreList, 90)
+      f"정렬 유지된 리스트: {scoreList}"
+  - type: "code"
+    language: "python"
+    title: "성적 등급 계산"
+    description: "bisect로 구간 기반 등급을 계산합니다."
+    content: |-
+      import bisect
+
+      def getGrade(score, breakpoints, gradeLabels):
+          gradeIdx = bisect.bisect(breakpoints, score)
+          return gradeLabels[gradeIdx]
+
+      gradeBreakpoints = [60, 70, 80, 90]
+      gradeLabels = ['F', 'D', 'C', 'B', 'A']
+      testScores = [55, 65, 75, 85, 95]
+      gradeResults = [(s, getGrade(s, gradeBreakpoints, gradeLabels)) for s in testScores]
+      f"점수별 등급: {gradeResults}"
+  - type: "tip"
+    content: "bisect는 key 파라미터도 지원합니다 (Python 3.10+)."
+
+- id: "bfs"
+  title: "너비 우선 탐색 (BFS)"
+  subtitle: "레벨 순서 탐색"
+  blocks:
+  - type: "text"
+    content: "BFS(Breadth-First Search)는 시작 노드에서 가까운 노드부터 탐색하는 알고리즘입니다. 큐(Queue) 자료구조를 사용하여 레벨 순서로 탐색합니다. 시간 복잡도는 O(V + E)로 정점과 간선 수에 비례합니다. 가중치 없는 그래프에서 최단 경로를 보장합니다. 미로 탐색, 네트워크 분석, 레벨 순회 등에 사용됩니다."
+  - type: "list"
+    items:
+    - "큐(Queue) 사용"
+    - "레벨 순서 탐색"
+    - "시간: O(V + E)"
+    - "최단 경로 보장 (무가중치)"
+  - type: "code"
+    language: "python"
+    title: "기본 BFS 구현"
+    description: "deque를 사용한 BFS 탐색입니다."
+    content: |-
+      from collections import deque
+
+      def bfsTraversal(graph, start):
+          visitedBfs = set()
+          queueBfs = deque([start])
+          orderBfs = []
+          visitedBfs.add(start)
+          while queueBfs:
+              nodeBfs = queueBfs.popleft()
+              orderBfs.append(nodeBfs)
+              for neighbor in graph[nodeBfs]:
+                  if neighbor not in visitedBfs:
+                      visitedBfs.add(neighbor)
+                      queueBfs.append(neighbor)
+          return orderBfs
+
+      graphBfs = {
+          'A': ['B', 'C'],
+          'B': ['A', 'D', 'E'],
+          'C': ['A', 'F'],
+          'D': ['B'],
+          'E': ['B', 'F'],
+          'F': ['C', 'E']
+      }
+      bfsOrder = bfsTraversal(graphBfs, 'A')
+      f"BFS 순서: {' -> '.join(bfsOrder)}"
+  - type: "code"
+    language: "python"
+    title: "레벨별 탐색"
+    description: "각 레벨을 구분하여 탐색합니다."
+    content: |-
+      from collections import deque
+
+      def bfsLevelTraversal(graph, start):
+          visitedLevel = {start}
+          queueLevel = deque([start])
+          allLevels = []
+          while queueLevel:
+              levelSize = len(queueLevel)
+              currentLevel = []
+              for _ in range(levelSize):
+                  nodeLevel = queueLevel.popleft()
+                  currentLevel.append(nodeLevel)
+                  for neighbor in graph[nodeLevel]:
+                      if neighbor not in visitedLevel:
+                          visitedLevel.add(neighbor)
+                          queueLevel.append(neighbor)
+              allLevels.append(currentLevel)
+          return allLevels
+
+      treeGraph = {
+          'A': ['B', 'C'], 'B': ['D', 'E'], 'C': ['F'],
+          'D': [], 'E': ['G'], 'F': [], 'G': []
+      }
+      levelResult = bfsLevelTraversal(treeGraph, 'A')
+      f"레벨별 탐색: {levelResult}"
+  - type: "code"
+    language: "python"
+    title: "최단 경로 찾기"
+    description: "BFS로 두 노드 간 최단 경로를 찾습니다."
+    content: |-
+      from collections import deque
+
+      def shortestPathBfs(graph, start, end):
+          if start == end:
+              return [start]
+          visitedPath = {start}
+          queuePath = deque([(start, [start])])
+          while queuePath:
+              nodePath, pathList = queuePath.popleft()
+              for neighbor in graph[nodePath]:
+                  if neighbor == end:
+                      return pathList + [neighbor]
+                  if neighbor not in visitedPath:
+                      visitedPath.add(neighbor)
+                      queuePath.append((neighbor, pathList + [neighbor]))
+          return []
+
+      mazeGraph = {
+          'S': ['A', 'B'], 'A': ['S', 'C'], 'B': ['S', 'D', 'E'],
+          'C': ['A', 'F'], 'D': ['B'], 'E': ['B', 'G'], 'F': ['C'], 'G': ['E']
+      }
+      shortestRoute = shortestPathBfs(mazeGraph, 'S', 'G')
+      f"S에서 G까지 최단 경로: {' -> '.join(shortestRoute)}"
+  - type: "tip"
+    content: "BFS는 가중치가 없는 그래프에서만 최단 경로를 보장합니다. 가중치가 있으면 다익스트라를 사용하세요."
+
+- id: "dfs"
+  title: "깊이 우선 탐색 (DFS)"
+  subtitle: "경로 우선 탐색"
+  blocks:
+  - type: "text"
+    content: "DFS(Depth-First Search)는 한 경로를 끝까지 탐색한 후 되돌아오는 알고리즘입니다. 스택 또는 재귀를 사용하여 구현합니다. 시간 복잡도는 O(V + E)로 BFS와 동일합니다. 최단 경로를 보장하지 않지만 모든 경로 탐색에 유리합니다. 사이클 탐지, 위상 정렬, 백트래킹 등에 사용됩니다."
+  - type: "list"
+    items:
+    - "스택/재귀 사용"
+    - "깊이 먼저 탐색"
+    - "시간: O(V + E)"
+    - "모든 경로 탐색에 유리"
+  - type: "code"
+    language: "python"
+    title: "재귀 DFS"
+    description: "재귀 함수로 DFS를 구현합니다."
+    content: |-
+      def dfsRecursive(graph, node, visitedDfs=None):
+          if visitedDfs is None:
+              visitedDfs = set()
+          visitedDfs.add(node)
+          orderDfs = [node]
+          for neighbor in graph[node]:
+              if neighbor not in visitedDfs:
+                  orderDfs.extend(dfsRecursive(graph, neighbor, visitedDfs))
+          return orderDfs
+
+      graphDfs = {
+          'A': ['B', 'C'], 'B': ['A', 'D', 'E'],
+          'C': ['A', 'F'], 'D': ['B'], 'E': ['B', 'F'], 'F': ['C', 'E']
+      }
+      dfsResult = dfsRecursive(graphDfs, 'A')
+      f"DFS 순서 (재귀): {' -> '.join(dfsResult)}"
+  - type: "code"
+    language: "python"
+    title: "스택 DFS"
+    description: "명시적 스택으로 DFS를 구현합니다."
+    content: |-
+      def dfsIterative(graph, start):
+          visitedStack = set()
+          stackDfs = [start]
+          orderStack = []
+          while stackDfs:
+              nodeStack = stackDfs.pop()
+              if nodeStack in visitedStack:
+                  continue
+              visitedStack.add(nodeStack)
+              orderStack.append(nodeStack)
+              for neighbor in reversed(graph[nodeStack]):
+                  if neighbor not in visitedStack:
+                      stackDfs.append(neighbor)
+          return orderStack
+
+      networkDfs = {
+          'A': ['B', 'C'], 'B': ['D', 'E'], 'C': ['F'],
+          'D': [], 'E': ['G'], 'F': [], 'G': []
+      }
+      stackResult = dfsIterative(networkDfs, 'A')
+      f"DFS 순서 (스택): {' -> '.join(stackResult)}"
+  - type: "code"
+    language: "python"
+    title: "모든 경로 찾기"
+    description: "두 노드 사이의 모든 경로를 찾습니다."
+    content: |-
+      def findAllPathsDfs(graph, start, end, currentPath=None):
+          if currentPath is None:
+              currentPath = []
+          currentPath = currentPath + [start]
+          if start == end:
+              return [currentPath]
+          if start not in graph:
+              return []
+          allFoundPaths = []
+          for neighbor in graph[start]:
+              if neighbor not in currentPath:
+                  newPaths = findAllPathsDfs(graph, neighbor, end, currentPath)
+                  allFoundPaths.extend(newPaths)
+          return allFoundPaths
+
+      routeGraph = {'A': ['B', 'C'], 'B': ['C', 'D'], 'C': ['D'], 'D': []}
+      allRoutes = findAllPathsDfs(routeGraph, 'A', 'D')
+      f"A에서 D까지 모든 경로: {allRoutes}"
+  - type: "tip"
+    content: "파이썬 기본 재귀 한도는 1000입니다. 깊은 그래프는 스택 버전을 사용하세요."
+
+- id: "hash_search"
+  title: "해시 탐색"
+  subtitle: "O(1) 상수 시간"
+  blocks:
+  - type: "text"
+    content: "해시 탐색은 해시 함수를 사용하여 평균 O(1) 시간에 탐색하는 방법입니다. 파이썬의 dict와 set이 해시 테이블로 구현되어 있습니다. 해시 충돌이 많으면 최악 O(n)이 될 수 있습니다. 키 존재 여부 확인, 빈도 카운팅, 중복 제거에 최적입니다. 메모리를 더 사용하지만 탐색 속도가 매우 빠릅니다."
+  - type: "list"
+    items:
+    - "평균 O(1) 탐색"
+    - "dict, set이 해시 테이블"
+    - "키 존재, 빈도 카운팅에 최적"
+    - "메모리 vs 속도 트레이드오프"
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 기반 탐색"
+    description: "dict로 O(1) 탐색을 수행합니다."
+    content: |-
+      employeeDict = {
+          'E001': {'name': '김철수', 'dept': '개발팀'},
+          'E002': {'name': '이영희', 'dept': '기획팀'},
+          'E003': {'name': '박지민', 'dept': '디자인팀'}
+      }
+      foundEmployee = employeeDict.get('E002')
+      f"E002 정보: {foundEmployee}"
+  - type: "code"
+    language: "python"
+    title: "집합 기반 멤버십 테스트"
+    description: "set으로 빠른 포함 여부를 확인합니다."
+    content: |-
+      validCodeSet = {'A100', 'B200', 'C300', 'D400', 'E500'}
+      testCodeList = ['A100', 'B201', 'C300', 'F600']
+      codeValidation = [(code, code in validCodeSet) for code in testCodeList]
+      f"코드 유효성: {codeValidation}"
+  - type: "code"
+    language: "python"
+    title: "빈도 카운팅"
+    description: "Counter로 빈도를 계산합니다."
+    content: |-
+      from collections import Counter
+
+      sampleText = "abracadabra"
+      charFreq = Counter(sampleText)
+      topChars = charFreq.most_common(3)
+      f"가장 빈번한 3개: {topChars}"
+  - type: "tip"
+    content: "리스트에서 in 연산은 O(n), set에서는 O(1)입니다. 반복 탐색은 set을 사용하세요."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "탐색 알고리즘 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 18에서 배운 탐색 알고리즘을 난이도별로 복습합니다. 탐색은 데이터에서 원하는 값을 찾는 기본 연산으로, 선형 탐색 O(n)과 이진 탐색 O(log n)의 성능 차이를 이해하는 것이 핵심입니다. 해시 탐색은 O(1)을 제공하며, 그래프 탐색(BFS, DFS)은 복잡한 구조 탐색의 기반입니다. 🟢 기본 문제로 선형 탐색, 최댓값/최솟값 찾기를 익히고, 🟡 응용 문제로 이진 탐색, 해시 탐색을 연습하세요. 🔴 심화 문제에서는 BFS/DFS, 경로 찾기, bisect 모듈 활용 등 고급 탐색을 다룹니다. 탐색 알고리즘 선택은 데이터 정렬 여부, 크기, 접근 패턴에 따라 달라집니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 최댓값 인덱스 찾기"
+    code: |-
+      def findMaxIndex(arr):
+          if not arr:
+              return -1
+          maxIdx = 0
+          for i in range(1, len(arr)):
+              if arr[i] > arr[maxIdx]:
+                  maxIdx = i
+          return maxIdx
+
+      ex1Nums = [3, 7, 2, 9, 4, 6, 8, 1, 5]
+      ex1Result = findMaxIndex(ex1Nums)
+      f"최댓값 {ex1Nums[ex1Result]}의 인덱스: {ex1Result}"
+
+  - type: "expansion"
+    title: "🟢 기본2: 이진 탐색으로 제곱근 구하기"
+    code: |-
+      def sqrtBinary(n, precision=0.0001):
+          lo, hi = 0, n
+          while hi - lo > precision:
+              mid = (lo + hi) / 2
+              if mid * mid < n:
+                  lo = mid
+              else:
+                  hi = mid
+          return (lo + hi) / 2
+
+      ex2Result = sqrtBinary(2)
+      f"√2 ≈ {ex2Result:.6f}"
+
+  - type: "expansion"
+    title: "🟢 기본3: 정렬된 리스트 병합"
+    code: |-
+      import bisect
+
+      def mergeSortedLists(arr1, arr2):
+          merged = arr1.copy()
+          for x in arr2:
+              bisect.insort(merged, x)
+          return merged
+
+      ex3Result = mergeSortedLists([1, 3, 5, 7], [2, 4, 6, 8])
+      f"병합 결과: {ex3Result}"
+
+  - type: "expansion"
+    title: "🟢 기본4: 그래프 연결 확인"
+    code: |-
+      def isConnected(graph, node1, node2):
+          visitedConn = set()
+          stackConn = [node1]
+          while stackConn:
+              nodeConn = stackConn.pop()
+              if nodeConn == node2:
+                  return True
+              if nodeConn not in visitedConn:
+                  visitedConn.add(nodeConn)
+                  stackConn.extend(graph.get(nodeConn, []))
+          return False
+
+      ex4Graph = {'A': ['B', 'C'], 'B': ['D'], 'C': [], 'D': [], 'E': ['F'], 'F': []}
+      f"A-D 연결: {isConnected(ex4Graph, 'A', 'D')}, A-E 연결: {isConnected(ex4Graph, 'A', 'E')}"
+
+  - type: "expansion"
+    title: "🟢 기본5: 애너그램 검사"
+    code: |-
+      from collections import Counter
+
+      def isAnagram(s1, s2):
+          return Counter(s1.replace(' ', '').lower()) == Counter(s2.replace(' ', '').lower())
+
+      ex5Pairs = [('listen', 'silent'), ('hello', 'world')]
+      ex5Results = [(p[0], p[1], isAnagram(p[0], p[1])) for p in ex5Pairs]
+      f"애너그램 검사: {ex5Results}"
+
+  - type: "expansion"
+    title: "🟡 응용1: 회전된 배열에서 이진 탐색"
+    code: |-
+      def searchRotatedArray(arr, target):
+          lo, hi = 0, len(arr) - 1
+          while lo <= hi:
+              mid = (lo + hi) // 2
+              if arr[mid] == target:
+                  return mid
+              if arr[lo] <= arr[mid]:
+                  if arr[lo] <= target < arr[mid]:
+                      hi = mid - 1
+                  else:
+                      lo = mid + 1
+              else:
+                  if arr[mid] < target <= arr[hi]:
+                      lo = mid + 1
+                  else:
+                      hi = mid - 1
+          return -1
+
+      ex6Rotated = [4, 5, 6, 7, 0, 1, 2]
+      f"5의 위치: {searchRotatedArray(ex6Rotated, 5)}, 1의 위치: {searchRotatedArray(ex6Rotated, 1)}"
+
+  - type: "expansion"
+    title: "🟡 응용2: K번째 최솟값 트래커"
+    code: |-
+      import bisect
+
+      class KthSmallestTracker:
+          def __init__(self, k):
+              self.k = k
+              self.data = []
+
+          def add(self, val):
+              bisect.insort(self.data, val)
+              return self.data[self.k - 1] if len(self.data) >= self.k else None
+
+      ex7Tracker = KthSmallestTracker(3)
+      ex7Results = [ex7Tracker.add(x) for x in [5, 2, 8, 1, 9, 3]]
+      f"3번째 최솟값 변화: {ex7Results}"
+
+  - type: "expansion"
+    title: "🟡 응용3: 그래프 깊이 계산"
+    code: |-
+      from collections import deque
+
+      def graphMaxDepth(graph, start):
+          visitedDepth = {start}
+          queueDepth = deque([(start, 0)])
+          maxDepth = 0
+          while queueDepth:
+              nodeDepth, depth = queueDepth.popleft()
+              maxDepth = max(maxDepth, depth)
+              for neighbor in graph.get(nodeDepth, []):
+                  if neighbor not in visitedDepth:
+                      visitedDepth.add(neighbor)
+                      queueDepth.append((neighbor, depth + 1))
+          return maxDepth
+
+      ex8Tree = {'A': ['B', 'C'], 'B': ['D', 'E'], 'C': ['F'], 'D': [], 'E': ['G'], 'F': [], 'G': []}
+      f"트리 깊이: {graphMaxDepth(ex8Tree, 'A')}"
+
+  - type: "expansion"
+    title: "🟡 응용4: 2D 그리드 BFS"
+    code: |-
+      from collections import deque
+
+      def gridBfsDistance(grid, start, end):
+          rows, cols = len(grid), len(grid[0])
+          directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+          visitedGrid = {start}
+          queueGrid = deque([(start, 0)])
+          while queueGrid:
+              (r, c), dist = queueGrid.popleft()
+              if (r, c) == end:
+                  return dist
+              for dr, dc in directions:
+                  nr, nc = r + dr, c + dc
+                  if 0 <= nr < rows and 0 <= nc < cols:
+                      if (nr, nc) not in visitedGrid and grid[nr][nc] == 0:
+                          visitedGrid.add((nr, nc))
+                          queueGrid.append(((nr, nc), dist + 1))
+          return -1
+
+      ex9Maze = [[0, 0, 0, 0], [1, 1, 0, 1], [0, 0, 0, 0], [0, 1, 1, 0]]
+      f"(0,0)에서 (3,3)까지 거리: {gridBfsDistance(ex9Maze, (0, 0), (3, 3))}"
+
+  - type: "expansion"
+    title: "🟡 응용5: 위상 정렬"
+    code: |-
+      from collections import deque
+
+      def topologicalSortKahn(graph):
+          inDegree = {node: 0 for node in graph}
+          for node in graph:
+              for neighbor in graph[node]:
+                  inDegree[neighbor] = inDegree.get(neighbor, 0) + 1
+          queueTopo = deque([node for node in inDegree if inDegree[node] == 0])
+          topoResult = []
+          while queueTopo:
+              nodeTopo = queueTopo.popleft()
+              topoResult.append(nodeTopo)
+              for neighbor in graph[nodeTopo]:
+                  inDegree[neighbor] -= 1
+                  if inDegree[neighbor] == 0:
+                      queueTopo.append(neighbor)
+          return topoResult if len(topoResult) == len(graph) else []
+
+      ex10Tasks = {'A': ['B', 'C'], 'B': ['D'], 'C': ['D'], 'D': ['E'], 'E': []}
+      f"작업 순서: {topologicalSortKahn(ex10Tasks)}"
+
+  - type: "expansion"
+    title: "🔴 심화1: 매개변수 탐색"
+    code: |-
+      def canFinishTasks(tasks, workers, maxTime):
+          workersNeeded = 0
+          currentTime = 0
+          for task in tasks:
+              if task > maxTime:
+                  return False
+              if currentTime + task > maxTime:
+                  workersNeeded += 1
+                  currentTime = task
+              else:
+                  currentTime += task
+          return workersNeeded + 1 <= workers
+
+      def minMaxTimeRequired(tasks, workers):
+          lo, hi = max(tasks), sum(tasks)
+          while lo < hi:
+              mid = (lo + hi) // 2
+              if canFinishTasks(tasks, workers, mid):
+                  hi = mid
+              else:
+                  lo = mid + 1
+          return lo
+
+      ex11Tasks = [7, 2, 5, 10, 8]
+      f"2명이 처리할 때 최소 최대시간: {minMaxTimeRequired(ex11Tasks, 2)}"
+
+  - type: "expansion"
+    title: "🔴 심화2: 연결 요소 개수"
+    code: |-
+      def countConnectedComponents(n, edges):
+          graphComp = {i: [] for i in range(n)}
+          for a, b in edges:
+              graphComp[a].append(b)
+              graphComp[b].append(a)
+          visitedComp = set()
+          componentCount = 0
+          def dfsComp(node):
+              visitedComp.add(node)
+              for neighbor in graphComp[node]:
+                  if neighbor not in visitedComp:
+                      dfsComp(neighbor)
+          for node in range(n):
+              if node not in visitedComp:
+                  dfsComp(node)
+                  componentCount += 1
+          return componentCount
+
+      ex12Edges = [(0, 1), (1, 2), (3, 4)]
+      f"연결 요소 개수: {countConnectedComponents(5, ex12Edges)}"
+
+  - type: "expansion"
+    title: "🔴 심화3: 이분 그래프 판별"
+    code: |-
+      from collections import deque
+
+      def isBipartiteGraph(graph):
+          colorMap = {}
+          for start in graph:
+              if start in colorMap:
+                  continue
+              queueBi = deque([start])
+              colorMap[start] = 0
+              while queueBi:
+                  nodeBi = queueBi.popleft()
+                  for neighbor in graph[nodeBi]:
+                      if neighbor not in colorMap:
+                          colorMap[neighbor] = 1 - colorMap[nodeBi]
+                          queueBi.append(neighbor)
+                      elif colorMap[neighbor] == colorMap[nodeBi]:
+                          return False
+          return True
+
+      ex13Bipartite = {'A': ['B', 'D'], 'B': ['A', 'C'], 'C': ['B', 'D'], 'D': ['A', 'C']}
+      ex13NonBipartite = {'A': ['B', 'C'], 'B': ['A', 'C'], 'C': ['A', 'B']}
+      f"이분: {isBipartiteGraph(ex13Bipartite)}, 비이분: {isBipartiteGraph(ex13NonBipartite)}"
+
+  - type: "expansion"
+    title: "🔴 심화4: 크루스칼 MST"
+    code: |-
+      def kruskalMst(nodes, edges):
+          parentMst = {n: n for n in nodes}
+          def find(x):
+              if parentMst[x] != x:
+                  parentMst[x] = find(parentMst[x])
+              return parentMst[x]
+          def union(a, b):
+              pa, pb = find(a), find(b)
+              if pa != pb:
+                  parentMst[pa] = pb
+                  return True
+              return False
+          mstEdges = []
+          for weight, u, v in sorted(edges):
+              if union(u, v):
+                  mstEdges.append((u, v, weight))
+          return mstEdges
+
+      ex14Vertices = ['A', 'B', 'C', 'D']
+      ex14Edges = [(1, 'A', 'B'), (3, 'A', 'C'), (2, 'B', 'C'), (4, 'B', 'D'), (5, 'C', 'D')]
+      f"MST: {kruskalMst(ex14Vertices, ex14Edges)}"
+
+  - type: "expansion"
+    title: "🔴 심화5: 다익스트라"
+    code: |-
+      import heapq
+
+      def dijkstraShortestPath(graph, start):
+          distancesDij = {node: float('inf') for node in graph}
+          distancesDij[start] = 0
+          heapDij = [(0, start)]
+          while heapDij:
+              dist, nodeDij = heapq.heappop(heapDij)
+              if dist > distancesDij[nodeDij]:
+                  continue
+              for neighbor, weight in graph[nodeDij]:
+                  newDist = dist + weight
+                  if newDist < distancesDij[neighbor]:
+                      distancesDij[neighbor] = newDist
+                      heapq.heappush(heapDij, (newDist, neighbor))
+          return distancesDij
+
+      ex15Graph = {
+          'A': [('B', 1), ('C', 4)],
+          'B': [('C', 2), ('D', 5)],
+          'C': [('D', 1)],
+          'D': []
+      }
+      f"A에서 각 노드까지: {dijkstraShortestPath(ex15Graph, 'A')}"
+
+  - type: "expansion"
+    title: "🔴 심화6: 부분집합 합"
+    code: |-
+      def canPartitionEqual(nums):
+          total = sum(nums)
+          if total % 2 != 0:
+              return False
+          target = total // 2
+          possibleSums = {0}
+          for num in nums:
+              possibleSums = possibleSums | {x + num for x in possibleSums if x + num <= target}
+          return target in possibleSums
+
+      ex16Cases = [[1, 5, 11, 5], [1, 2, 3, 5]]
+      ex16Results = [(arr, canPartitionEqual(arr)) for arr in ex16Cases]
+      f"균등 분할 가능: {ex16Results}"
+
+  - type: "expansion"
+    title: "🔴 심화7: 섬 개수"
+    code: |-
+      def countIslands(grid):
+          if not grid:
+              return 0
+          rowsIsland, colsIsland = len(grid), len(grid[0])
+          islandCount = 0
+          def dfsIsland(r, c):
+              if r < 0 or r >= rowsIsland or c < 0 or c >= colsIsland or grid[r][c] == 0:
+                  return
+              grid[r][c] = 0
+              dfsIsland(r + 1, c)
+              dfsIsland(r - 1, c)
+              dfsIsland(r, c + 1)
+              dfsIsland(r, c - 1)
+          for r in range(rowsIsland):
+              for c in range(colsIsland):
+                  if grid[r][c] == 1:
+                      dfsIsland(r, c)
+                      islandCount += 1
+          return islandCount
+
+      ex17Map = [[1, 1, 0, 0, 0], [1, 1, 0, 0, 0], [0, 0, 1, 0, 0], [0, 0, 0, 1, 1]]
+      f"섬 개수: {countIslands([row[:] for row in ex17Map])}"
+
+  - type: "expansion"
+    title: "🔴 심화8: 단어 사다리"
+    code: |-
+      from collections import deque
+
+      def wordLadderLength(beginWord, endWord, wordList):
+          wordSet = set(wordList)
+          if endWord not in wordSet:
+              return 0
+          queueWord = deque([(beginWord, 1)])
+          visitedWord = {beginWord}
+          while queueWord:
+              word, length = queueWord.popleft()
+              if word == endWord:
+                  return length
+              for i in range(len(word)):
+                  for c in 'abcdefghijklmnopqrstuvwxyz':
+                      newWord = word[:i] + c + word[i+1:]
+                      if newWord in wordSet and newWord not in visitedWord:
+                          visitedWord.add(newWord)
+                          queueWord.append((newWord, length + 1))
+          return 0
+
+      ex18Words = ['hot', 'dot', 'dog', 'lot', 'log', 'cog']
+      f"hit → cog 변환 횟수: {wordLadderLength('hit', 'cog', ex18Words)}"
+
+  - type: "expansion"
+    title: "🔴 심화9: 사이클 탐지"
+    code: |-
+      def hasCycleDfs(graph):
+          visitedCycle = set()
+          recStackCycle = set()
+          def dfs(node):
+              visitedCycle.add(node)
+              recStackCycle.add(node)
+              for neighbor in graph.get(node, []):
+                  if neighbor not in visitedCycle:
+                      if dfs(neighbor):
+                          return True
+                  elif neighbor in recStackCycle:
+                      return True
+              recStackCycle.remove(node)
+              return False
+          for node in graph:
+              if node not in visitedCycle:
+                  if dfs(node):
+                      return True
+          return False
+
+      cycleGraph = {'A': ['B'], 'B': ['C'], 'C': ['A']}
+      noCycleGraph = {'A': ['B'], 'B': ['C'], 'C': []}
+      f"사이클 있음: {hasCycleDfs(cycleGraph)}, 없음: {hasCycleDfs(noCycleGraph)}"
+
+  - type: "expansion"
+    title: "🔴 심화10: A* 경로 탐색"
+    code: |-
+      import heapq
+
+      def astarSearch(grid, start, goal):
+          def heuristic(a, b):
+              return abs(a[0] - b[0]) + abs(a[1] - b[1])
+          rowsAstar, colsAstar = len(grid), len(grid[0])
+          openSet = [(heuristic(start, goal), 0, start, [start])]
+          visitedAstar = set()
+          while openSet:
+              f, g, current, pathAstar = heapq.heappop(openSet)
+              if current == goal:
+                  return pathAstar
+              if current in visitedAstar:
+                  continue
+              visitedAstar.add(current)
+              for dr, dc in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
+                  nr, nc = current[0] + dr, current[1] + dc
+                  if 0 <= nr < rowsAstar and 0 <= nc < colsAstar and grid[nr][nc] == 0:
+                      if (nr, nc) not in visitedAstar:
+                          newG = g + 1
+                          newF = newG + heuristic((nr, nc), goal)
+                          heapq.heappush(openSet, (newF, newG, (nr, nc), pathAstar + [(nr, nc)]))
+          return []
+
+      ex20Grid = [[0, 0, 0, 0], [1, 1, 0, 0], [0, 0, 0, 1], [0, 1, 0, 0]]
+      f"A* 경로: {astarSearch(ex20Grid, (0, 0), (3, 3))}"

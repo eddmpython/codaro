@@ -1,0 +1,490 @@
+meta:
+  id: day02_1
+  title: 변수와내장함수
+  day: 2
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 변수와 내장함수 - 데이터 저장하기"
+    description: "변수에 데이터를 저장하고 내장함수를 사용하는 방법을 배웁니다."
+    keywords: ['변수', '내장함수', 'type', 'len', 'input']
+intro:
+  emoji: "📦"
+  points:
+  - 변수의 개념과 선언 방법
+  - 올바른 변수 명명 규칙
+  - 다중 변수 할당 기법
+  - 파이썬 내장 함수 소개
+  - print() 함수 완전 정복
+  - len(), type(), input() 함수 활용
+  - 데이터 타입 변환 (Type Casting)
+  - 문자열과 숫자 간 변환
+  - 실전 예제를 통한 종합 실습
+sections:
+- id: variables_intro
+  title: 변수란 무엇인가?
+  subtitle: 데이터를 저장하는 메모리 공간
+  blocks:
+  - type: text
+    content: 변수(Variable)는 데이터를 저장하는 메모리 공간에 붙인 이름표입니다. 마치 상자에 물건을 넣고 라벨을 붙이는 것과 같습니다. 변수를 사용하면 데이터를 저장해두었다가 나중에 다시 사용할 수 있고, 프로그램 실행 중에 값을 변경할 수도 있습니다. 변수명은 그 안에 담긴 데이터가 무엇인지 알 수 있도록 의미 있는 이름으로 짓는 것이 좋습니다. 변수에 값을 저장하는 것을 '할당(assignment)'이라고 하며, = 기호를 사용합니다. 이때 =는 수학의 '같다'가 아니라 '오른쪽 값을 왼쪽 변수에 저장한다'는 의미입니다.
+  - type: list
+    items:
+    - 변수명 = 값 형태로 할당
+    - 데이터를 저장하고 나중에 참조
+    - 프로그램 실행 중 값 변경 가능
+    - 의미 있는 이름으로 코드 가독성 향상
+  - type: code
+    language: python
+    title: 변수 기본 개념
+    description: "변수명 = 값 형식으로 변수를 만듭니다. = 기호는 '할당한다'는 의미입니다."
+    content: |-
+      name = 'Python'
+      age = 30
+
+      print(name)
+      print(age)
+  - type: tip
+    content: "변수에 값을 저장하는 것을 '할당(assignment)'이라고 합니다. = 기호는 수학의 '같다'가 아니라 '오른쪽 값을 왼쪽 변수에 저장한다'는 의미입니다."
+- id: variable_types
+  title: 변수에 저장되는 데이터 타입
+  subtitle: 문자열과 숫자
+  blocks:
+  - type: text
+    content: 데이터 타입(Data Type)이란 데이터의 종류를 의미합니다. 마치 물건을 분류할 때 '과일', '채소', '고기'로 나누듯이, 프로그래밍에서도 데이터를 종류별로 구분합니다. 파이썬에서 가장 자주 사용하는 기본 데이터 타입은 세 가지입니다. 문자열(str)은 따옴표로 감싼 텍스트 데이터이고, 정수(int)는 소수점이 없는 숫자(1, 2, 100 등)이며, 실수(float)는 소수점이 있는 숫자(3.14, 2.5 등)입니다. 파이썬은 값을 보고 자동으로 타입을 결정하므로 별도로 타입을 선언할 필요가 없습니다.
+  - type: list
+    items:
+    - "문자열(str): 따옴표로 감싼 텍스트 - 'Hello', \"Python\""
+    - "정수(int): 소수점 없는 숫자 - 1, 100, -5"
+    - "실수(float): 소수점 있는 숫자 - 3.14, 2.5"
+  - type: code
+    language: python
+    title: 세 가지 기본 데이터 타입
+    description: "문자열(str), 정수(int), 실수(float)를 변수에 저장합니다."
+    content: |-
+      country = 'Finland'
+      population = 5000000
+      temperature = 15.5
+
+      print(country)
+      print(population)
+      print(temperature)
+  - type: tip
+    content: "파이썬은 값을 보고 자동으로 타입을 결정합니다. 'Hello'는 문자열, 100은 정수, 3.14는 실수로 자동 인식됩니다."
+- id: variable_naming
+  title: 변수 명명 규칙
+  subtitle: 올바른 변수명 작성법
+  blocks:
+  - type: text
+    content: 파이썬에서 변수명을 정할 때 반드시 지켜야 할 규칙이 있습니다. 규칙을 어기면 에러가 발생하거나 예상치 못한 동작이 일어날 수 있습니다. 변수명은 문자, 숫자, 밑줄(_)만 사용할 수 있고, 숫자로 시작할 수 없습니다(1name 불가, name1 가능). 또한 if, for, while 같은 파이썬 예약어는 변수명으로 사용할 수 없습니다. 좋은 변수명은 그 안에 담긴 데이터가 무엇인지 바로 알 수 있어야 합니다. x, y, temp 같은 이름보다 userName, totalPrice 같은 의미 있는 이름이 좋습니다.
+  - type: list
+    items:
+    - 문자, 숫자, 밑줄(_)만 사용 가능
+    - 숫자로 시작할 수 없음 (1name 불가)
+    - if, for, while 같은 예약어 사용 불가
+    - 대소문자 구분 (Name과 name은 다른 변수)
+  - type: code
+    language: python
+    title: 올바른 변수명 예시
+    description: "의미 있는 이름, 카멜케이스(firstName) 또는 스네이크케이스(first_name)를 권장합니다."
+    content: |-
+      cityName = 'Seoul'
+      totalCount = 100
+      averageScore = 85.5
+      maxValue = 999
+      PI = 3.14159
+
+      print(cityName)
+      print(totalCount)
+      print(PI)
+  - type: tip
+    content: "잘못된 변수명 예: 1name(숫자로 시작), my-name(하이픈 사용), my name(공백 사용), if(예약어). 모두 에러가 발생합니다."
+- id: variable_reassign
+  title: 변수 값 변경하기
+  subtitle: 변수는 언제든 새 값을 할당할 수 있습니다
+  blocks:
+  - type: text
+    content: 변수(Variable)라는 이름처럼 변수에 저장된 값은 프로그램 실행 중 언제든지 변경할 수 있습니다. 같은 변수에 새로운 값을 할당하면 이전 값은 사라지고 새 값으로 대체됩니다. 파이썬은 동적 타이핑(Dynamic Typing) 언어이므로 심지어 타입이 다른 값으로도 변경할 수 있습니다. 동적 타이핑이란 변수를 만들 때 타입을 미리 지정하지 않아도 된다는 뜻입니다.
+  - type: list
+    items:
+    - 같은 변수에 새 값 할당 가능
+    - 이전 값은 사라지고 새 값으로 대체
+    - 타입이 다른 값으로도 변경 가능
+    - 동적 타이핑 언어의 특징
+  - type: code
+    language: python
+    title: 변수 값 변경
+    description: "같은 변수에 새 값을 할당하면 기존 값은 사라지고 새 값으로 바뀝니다."
+    content: |-
+      score = 80
+      print(score)
+      score = 95
+      print(score)
+
+      data = 100
+      print(data)
+      data = 'Hello'
+      print(data)
+
+- id: multiple_assignment
+  title: 다중 변수 할당
+  subtitle: 한 번에 여러 변수 선언하기
+  blocks:
+  - type: text
+    content: 파이썬에서는 한 줄로 여러 변수에 값을 할당할 수 있습니다. 쉼표로 변수명과 값을 구분하면 한 줄로 깔끔하게 여러 변수를 선언할 수 있습니다. 순서대로 매칭되므로 첫 번째 변수에 첫 번째 값, 두 번째 변수에 두 번째 값이 저장됩니다. 또한 = 연산자를 연결하면 여러 변수에 같은 값을 동시에 할당할 수도 있습니다.
+  - type: list
+    items:
+    - 쉼표로 구분하여 동시 할당
+    - 순서대로 매칭 (첫 번째 변수 = 첫 번째 값)
+    - 같은 값을 여러 변수에 할당 가능
+    - 변수 개수와 값 개수가 일치해야 함
+  - type: code
+    language: python
+    title: 다중 변수 할당
+    description: "쉼표로 구분하여 한 줄에 여러 변수를 선언합니다."
+    content: |-
+      userName, userEmail, userAge = 'john', 'john@email.com', 25
+      print(userName)
+      print(userEmail)
+      print(userAge)
+
+      x = y = z = 0
+      print(x, y, z)
+  - type: tip
+    content: "다중 할당 시 변수 개수와 값의 개수가 일치해야 합니다. a, b = 1, 2, 3처럼 개수가 맞지 않으면 에러가 발생합니다."
+- id: builtin_functions_intro
+  title: 내장 함수란?
+  subtitle: 파이썬이 제공하는 기본 함수들
+  blocks:
+  - type: text
+    content: 함수(Function)란 특정 작업을 수행하는 코드 묶음에 이름을 붙인 것입니다. 마치 전자레인지의 '데우기' 버튼처럼, 버튼 하나로 복잡한 동작을 실행할 수 있습니다. 함수는 이름 뒤에 괄호()를 붙여 호출하며, 괄호 안에 필요한 데이터(인자)를 넣어줍니다. 예를 들어 print('Hello')는 print라는 함수에 'Hello'라는 데이터를 전달하여 화면에 출력하는 것입니다. 내장 함수(Built-in Function)는 파이썬이 미리 만들어서 제공하는 함수들로, 별도로 만들거나 불러올 필요 없이 바로 사용할 수 있습니다.
+  - type: list
+    items:
+    - 함수는 특정 작업을 수행하는 코드 묶음
+    - 함수명() 형태로 호출
+    - 내장 함수는 별도 import 없이 즉시 사용
+    - print(), len(), type(), input() 등
+  - type: code
+    language: python
+    title: 주요 내장 함수들
+    description: "파이썬이 기본 제공하는 내장 함수들입니다."
+    content: |-
+      print('주요 내장 함수들:')
+      print('print() - 출력')
+      print('len() - 길이 측정')
+      print('type() - 타입 확인')
+      print('input() - 입력 받기')
+      print('int() - 정수 변환')
+      print('str() - 문자열 변환')
+      print('float() - 실수 변환')
+- id: print_function
+  title: print() 함수 기본
+  subtitle: 화면에 출력하기
+  blocks:
+  - type: text
+    content: print() 함수는 데이터를 화면에 출력하는 가장 기본적인 함수입니다. 문자열, 숫자, 변수 등 어떤 값이든 화면에 표시할 수 있습니다. 여러 값을 쉼표로 구분해서 한 번에 출력할 수도 있으며, 이 경우 값 사이에 공백이 자동으로 추가됩니다.
+  - type: list
+    items:
+    - 문자열, 숫자, 변수 모두 출력 가능
+    - 여러 값을 쉼표로 구분해 한 번에 출력
+    - 값 사이에 공백이 자동 추가됨
+    - 디버깅과 결과 확인에 필수
+  - type: code
+    language: python
+    title: print() 기본 사용
+    description: "문자열, 숫자, 변수를 출력합니다. 쉼표로 여러 값을 한 번에 출력할 수 있습니다."
+    content: |-
+      print('Hello, World!')
+      print(123)
+
+      language = 'Python'
+      version = 3.12
+      print(language)
+      print('언어:', language, '버전:', version)
+- id: print_advanced
+  title: print() 함수 옵션
+  subtitle: sep과 end 활용하기
+  blocks:
+  - type: text
+    content: print() 함수는 sep과 end라는 옵션(매개변수)으로 출력 형태를 조절할 수 있습니다. sep(separator, 구분자)은 여러 값 사이에 무엇을 넣을지 지정합니다. 기본값은 공백(' ')입니다. end는 출력 끝에 무엇을 추가할지 지정하며, 기본값은 줄바꿈(\n)입니다. 줄바꿈이란 다음 출력이 새 줄에서 시작되도록 하는 것입니다.
+  - type: list
+    items:
+    - "sep: 값 사이 구분자 (기본값 공백)"
+    - "end: 출력 끝 문자 (기본값 줄바꿈)"
+    - 출력 형태 커스터마이징 가능
+    - 날짜, 경로 등 포맷팅에 유용
+  - type: code
+    language: python
+    title: sep과 end 옵션
+    description: "sep은 값 사이 구분자, end는 출력 끝 문자를 지정합니다."
+    content: |-
+      print('Hello', 'World', '!')
+      print('Hello', 'World', '!', sep='-')
+      print('2023', '12', '25', sep='/')
+
+      print('Hello', end=' ')
+      print('World')
+  - type: tip
+    content: "\\n은 줄바꿈을 의미합니다. print()는 기본적으로 출력 후 줄바꿈을 하지만, end=''를 사용하면 줄바꿈 없이 이어서 출력합니다."
+- id: len_function
+  title: len() 함수
+  subtitle: 문자열 길이 측정하기
+  blocks:
+  - type: text
+    content: len() 함수는 문자열의 길이(문자 개수)를 반환합니다. len은 length(길이)의 줄임말입니다. 공백, 특수문자, 한글 모두 각각 1로 계산됩니다. 빈 문자열('')의 길이는 0입니다. 프로그래밍에서 문자열의 길이를 확인하는 것은 매우 자주 필요한 작업입니다.
+  - type: list
+    items:
+    - 문자열의 길이(문자 개수) 반환
+    - 공백, 특수문자도 1로 계산
+    - 빈 문자열은 0
+    - len은 length의 줄임말
+  - type: code
+    language: python
+    title: len() 함수 사용
+    description: "len() 함수에 문자열을 넣으면 문자 개수를 반환합니다."
+    content: |-
+      email = 'test@python.org'
+      emailLength = len(email)
+      print('이메일:', email)
+      print('길이:', emailLength)
+  - type: tip
+    content: "'Hello World'는 공백을 포함해서 11입니다. 공백도 하나의 문자로 계산됩니다."
+- id: type_function
+  title: type() 함수
+  subtitle: 데이터 타입 확인하기
+  blocks:
+  - type: text
+    content: type() 함수는 변수나 값의 데이터 타입을 확인할 수 있습니다. 결과는 <class 'int'>, <class 'str'> 같은 형태로 표시됩니다. 파이썬은 동적 타이핑 언어라서 변수에 어떤 타입의 값이든 저장할 수 있으므로, 디버깅(오류 찾기)이나 타입 확인에 type() 함수가 매우 유용합니다.
+  - type: list
+    items:
+    - 값이나 변수의 타입 확인
+    - "<class 'int'>, <class 'str'> 형태로 반환"
+    - 디버깅에 유용
+    - 동적 타이핑 확인
+  - type: code
+    language: python
+    title: type() 함수 사용
+    description: "type() 함수로 값이나 변수의 타입을 확인합니다."
+    content: |-
+      count = 100
+      title = 'Python Tutorial'
+      price = 19.99
+
+      print('count 타입:', type(count))
+      print('title 타입:', type(title))
+      print('price 타입:', type(price))
+  - type: tip
+    content: "int는 정수, float는 실수, str은 문자열 타입을 의미합니다."
+- id: input_function
+  title: input() 함수
+  subtitle: 사용자로부터 입력 받기
+  blocks:
+  - type: text
+    content: input() 함수는 사용자로부터 키보드 입력을 받는 함수입니다. 프로그램 실행 중 사용자에게 데이터를 입력받아 처리할 수 있습니다. 괄호 안에 문자열을 넣으면 사용자에게 안내 메시지로 표시됩니다. 중요한 점은 input()으로 받은 값은 항상 문자열(str) 타입이라는 것입니다. 숫자를 입력해도 문자열로 저장됩니다.
+  - type: list
+    items:
+    - 사용자로부터 키보드 입력 받기
+    - 괄호 안에 안내 메시지 표시 가능
+    - 항상 문자열(str) 타입으로 반환
+    - 숫자를 입력해도 문자열로 저장됨
+  - type: code
+    language: python
+    title: input() 함수 사용
+    description: "input()으로 사용자 입력을 받습니다. 입력값은 항상 문자열입니다."
+    content: |-
+      yourAge = input('How old are you? ')
+      print('입력값:', yourAge)
+      print('타입:', type(yourAge))
+  - type: tip
+    content: "input()으로 받은 값으로 계산하려면 int()나 float()로 변환해야 합니다. 예: int(input('나이: '))"
+- id: type_casting_intro
+  title: 타입 변환이란?
+  subtitle: 데이터 타입 간 변환하기
+  blocks:
+  - type: text
+    content: 타입 변환(Type Casting)은 한 데이터 타입을 다른 데이터 타입으로 바꾸는 것입니다. 왜 필요할까요? 예를 들어 사용자가 키보드로 '25'를 입력하면 이것은 숫자가 아닌 문자열입니다. 이 값으로 계산을 하려면 숫자로 변환해야 합니다. 또한 숫자 25와 문자열 '세'를 합쳐서 '25세'를 만들려면 숫자를 문자열로 변환해야 합니다. 이처럼 서로 다른 타입의 데이터를 함께 사용하려면 타입 변환이 필수입니다.
+  - type: list
+    items:
+    - 한 타입을 다른 타입으로 변환
+    - "int(): 정수로 변환"
+    - "float(): 실수로 변환"
+    - "str(): 문자열로 변환"
+  - type: code
+    language: python
+    title: 타입 변환 개요
+    description: "int(), float(), str() 함수로 타입을 변환합니다."
+    content: |-
+      value = 10
+      valueFloat = float(value)
+      valueStr = str(value)
+
+      print(value, type(value))
+      print(valueFloat, type(valueFloat))
+      print(valueStr, type(valueStr))
+- id: int_conversion
+  title: int() 함수
+  subtitle: 정수로 변환하기
+  blocks:
+  - type: text
+    content: int() 함수는 다른 타입의 값을 정수(int)로 변환합니다. 문자열은 숫자로만 이루어져 있어야 하고, 실수는 소수점 이하가 버려집니다(반올림이 아님). 변환할 수 없는 값(예 'abc', '10.5')은 에러가 발생합니다.
+  - type: list
+    items:
+    - 문자열을 정수로 변환 ('10' → 10)
+    - 실수를 정수로 변환 (3.99 → 3)
+    - 소수점 이하는 버림 (반올림 아님)
+    - 숫자가 아닌 문자열은 에러
+  - type: code
+    language: python
+    title: int() 함수 사용
+    description: "문자열이나 실수를 정수로 변환합니다. 실수는 소수점 이하가 버려집니다."
+    content: |-
+      scoreStr = '95'
+      scoreInt = int(scoreStr)
+      priceFloat = 19.99
+      priceInt = int(priceFloat)
+
+      print('문자열:', scoreStr, '→', scoreInt)
+      print('실수:', priceFloat, '→', priceInt)
+  - type: tip
+    content: "int(3.9)는 4가 아니라 3입니다. 소수점 이하를 버리기(truncate) 때문입니다. 반올림은 round() 함수를 사용합니다."
+- id: float_conversion
+  title: float() 함수
+  subtitle: 실수로 변환하기
+  blocks:
+  - type: text
+    content: float() 함수는 다른 타입의 값을 실수(float)로 변환합니다. 정수를 실수로 변환하면 소수점이 추가되고(.0), 숫자 형태의 문자열도 실수로 변환할 수 있습니다.
+  - type: list
+    items:
+    - 정수를 실수로 변환 (10 → 10.0)
+    - 문자열을 실수로 변환 ('3.14' → 3.14)
+    - 정수 문자열도 변환 가능 ('100' → 100.0)
+    - 숫자가 아닌 문자열은 에러
+  - type: code
+    language: python
+    title: float() 함수 사용
+    description: "정수나 문자열을 실수로 변환합니다."
+    content: |-
+      distance = 42
+      distanceFloat = float(distance)
+      rateStr = '98.5'
+      rateFloat = float(rateStr)
+
+      print('정수:', distance, '→', distanceFloat)
+      print('문자열:', rateStr, '→', rateFloat)
+
+- id: str_conversion
+  title: str() 함수
+  subtitle: 문자열로 변환하기
+  blocks:
+  - type: text
+    content: str() 함수는 어떤 값이든 문자열(str)로 변환합니다. 숫자를 문자열과 연결하거나, 출력 메시지를 만들 때 자주 사용됩니다. 모든 타입은 str()로 변환할 수 있으므로 에러가 발생할 일이 거의 없습니다.
+  - type: list
+    items:
+    - 정수를 문자열로 변환 (25 → '25')
+    - 실수를 문자열로 변환 (3.14 → '3.14')
+    - 모든 타입 변환 가능
+    - 문자열 연결에 필수
+  - type: code
+    language: python
+    title: str() 함수 사용
+    description: "숫자를 문자열로 변환하면 + 연산자로 다른 문자열과 연결할 수 있습니다."
+    content: |-
+      level = 42
+      levelStr = str(level)
+      print(level, type(level))
+      print(levelStr, type(levelStr))
+
+      player = 'Hero'
+      info = player + '의 레벨은 ' + str(level) + '입니다.'
+      print(info)
+  - type: tip
+    content: "숫자 + 문자열은 에러가 발생합니다. '나이: ' + 25는 불가능하지만, '나이: ' + str(25)는 '나이: 25'가 됩니다."
+- id: input_with_casting
+  title: input()과 타입 변환 활용
+  subtitle: 사용자 입력으로 계산하기
+  blocks:
+  - type: text
+    content: input()으로 받은 값은 항상 문자열이므로, 숫자로 계산하려면 int()나 float()로 변환해야 합니다. 변환 없이 더하면 문자열 연결이 되어 의도와 다른 결과가 나옵니다.
+  - type: list
+    items:
+    - input() 결과는 항상 문자열
+    - 계산하려면 int() 또는 float()로 변환 필수
+    - 변환 없이 더하면 문자열 연결됨
+    - "'10' + '20' = '1020' (문자열)"
+  - type: code
+    language: python
+    title: 입력값 계산하기
+    description: "input()으로 받은 값을 int()로 변환하여 계산합니다."
+    content: |-
+      val1 = '10'
+      val2 = '20'
+
+      wrongResult = val1 + val2
+      print('문자열 더하기:', wrongResult)
+
+      correctResult = int(val1) + int(val2)
+      print('숫자로 변환 후:', correctResult)
+  - type: tip
+    content: "사용자가 숫자가 아닌 값을 입력하면 int() 변환 시 에러가 발생합니다. 실제 프로그램에서는 에러 처리가 필요합니다."
+
+
+- id: practice
+  title: 2일차 복습
+  subtitle: 변수와 내장함수 종합 미션
+  blocks:
+  - type: text
+    content: 2일차에서 배운 변수, 내장함수, 타입변환을 복습하는 미션입니다. 각 미션을 펼쳐서 정답을 확인하기 전에 먼저 직접 작성해보세요.
+  - type: expansion
+    title: "미션1: 변수 선언과 출력"
+    code: |-
+      name = 'Python'
+      version = 3.12
+      year = 1991
+      print(name)
+      print(version)
+      print(year)
+  - type: expansion
+    title: "미션2: 다중 변수 할당"
+    code: |-
+      a, b, c = 10, 20, 30
+      print(a, b, c)
+      x = y = z = 100
+      print(x, y, z)
+  - type: expansion
+    title: "미션3: print() sep과 end 활용"
+    code: |-
+      print('Python', 'Java', 'JavaScript', sep=' / ')
+      print('Hello', end=' ')
+      print('World')
+  - type: expansion
+    title: "미션4: len()과 type() 활용"
+    code: |-
+      message = 'Hello, Python!'
+      print('문자열:', message)
+      print('길이:', len(message))
+      print('타입:', type(message))
+  - type: expansion
+    title: "미션5: 타입 변환 연습"
+    code: |-
+      numStr = '100'
+      numInt = int(numStr)
+      numFloat = float(numStr)
+      print(numInt + 50)
+      print(numFloat + 0.5)
+  - type: expansion
+    title: "미션6: 문자열 연결과 str() 활용"
+    code: |-
+      personName = '홍길동'
+      personAge = 25
+      greeting = personName + '님은 ' + str(personAge) + '세입니다.'
+      print(greeting)
+  - type: expansion
+    title: "미션7: 종합 - 나이 계산기"
+    code: |-
+      yearBirth = '1998'
+      yearNow = 2024
+      calcAge = yearNow - int(yearBirth)
+      print('출생년도: ' + yearBirth)
+      print('현재 나이: ' + str(calcAge) + '세')
+      print('내년 나이: ' + str(calcAge + 1) + '세')

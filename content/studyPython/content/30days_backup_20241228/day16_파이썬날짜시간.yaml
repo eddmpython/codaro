@@ -1,0 +1,432 @@
+meta:
+  id: day16
+  title: 파이썬날짜시간
+  day: 16
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 날짜와 시간 - datetime"
+    description: "datetime 모듈로 날짜와 시간을 다루는 방법."
+    keywords: ['datetime', '날짜', '시간']
+intro:
+  emoji: "📅"
+  points:
+  - datetime 모듈의 기본 개념과 구조
+  - 현재 날짜와 시간 정보 가져오기
+  - strftime()으로 날짜 형식 지정하기
+  - strptime()으로 문자열을 날짜로 변환
+  - date, time 클래스 개별 활용법
+  - timedelta로 날짜 계산과 차이 구하기
+sections:
+- id: datetime_imports
+  title: datetime 모듈 불러오기
+  subtitle: 날짜와 시간 처리를 위한 준비
+  blocks:
+  - type: text
+    content: datetime은 파이썬 표준 라이브러리에 포함된 모듈로, 날짜와 시간을 처리하는 기능을 제공합니다. date는 영어로 날짜라는 뜻이고, time은 시간이라는 뜻입니다. 두 단어를 합쳐서 datetime은 날짜와 시간을 모두 다루는 모듈입니다. 모듈을 사용하려면 import 문으로 먼저 불러와야 합니다. 이 파일에서 사용할 모든 datetime 관련 기능을 여기서 한 번에 불러옵니다.
+  - type: list
+    items:
+    - datetime 모듈은 날짜와 시간을 다루는 표준 라이브러리
+    - import 문으로 모듈을 불러와야 사용 가능
+    - datetime, date, time, timedelta 클래스 포함
+    - 이후 섹션에서는 import 없이 바로 사용
+  - type: code
+    language: python
+    title: datetime 모듈 import
+    description: 날짜와 시간 처리에 필요한 모든 모듈을 불러옵니다.
+    content: |-
+      import datetime
+      from datetime import date, time, timedelta
+  - type: tip
+    content: "모듈 학습 이후에는 파일 최상단에 import를 한 번만 작성하고, 이후 섹션에서는 import를 반복하지 않습니다."
+
+- id: datetime_introduction
+  title: 날짜와 시간 소개
+  subtitle: 파이썬에서 날짜와 시간 다루기
+  blocks:
+  - type: text
+    content: 시간은 프로그래밍에서 매우 중요한 구성 요소입니다. 로그 파일에서 언제 에러가 발생했는지 추적하거나, 데이터베이스에서 사용자가 언제 가입했는지 기록하거나, 웹사이트에서 게시물이 언제 작성되었는지 표시하는 등 실생활에서 날짜와 시간은 어디에나 사용됩니다. 파이썬의 datetime 모듈은 이러한 날짜와 시간을 처리하는 강력한 도구를 제공합니다. datetime.datetime은 날짜와 시간을 모두 포함하는 클래스이고, datetime.date는 날짜만, datetime.time은 시간만 다루는 클래스입니다.
+  - type: list
+    items:
+    - 현재 날짜와 시간 가져오기
+    - datetime.datetime.now()로 현재 시각 확인
+    - datetime.date.today()로 오늘 날짜 확인
+    - 날짜와 시간 정보를 프로그램에서 활용
+  - type: code
+    language: python
+    title: datetime 모듈 기본 사용법
+    description: datetime 모듈의 기본 사용법을 확인합니다.
+    content: |-
+      introNow = datetime.datetime.now()
+      print(introNow)
+
+      introToday = datetime.date.today()
+      print(introToday)
+
+      introCurrentTime = datetime.datetime.now()
+      print(introCurrentTime)
+  - type: tip
+    content: "datetime.datetime은 날짜와 시간을 모두 포함하고, datetime.date는 날짜만, datetime.time은 시간만 다룹니다."
+
+- id: getting_datetime_info
+  title: 날짜와 시간 정보 가져오기
+  subtitle: 현재 날짜와 시간의 각 구성 요소 추출
+  blocks:
+  - type: text
+    content: datetime 객체에서 연도, 월, 일, 시간, 분, 초 등의 개별 정보를 추출할 수 있습니다. 예를 들어 2024년 12월 28일 15시 30분 45초라는 datetime 객체에서 연도만 추출하면 2024가 나옵니다. 이는 특정 날짜 구성 요소만 필요할 때 매우 유용합니다. 예를 들어 생일 축하 메시지를 보낼 때 오늘 날짜의 월과 일만 확인하면 됩니다. weekday는 영어로 평일이라는 뜻이지만, 여기서는 요일을 숫자로 반환하는 메서드입니다.
+  - type: list
+    items:
+    - year, month, day 속성으로 날짜 정보 추출
+    - hour, minute, second 속성으로 시간 정보 추출
+    - microsecond 속성으로 마이크로초 확인
+    - weekday() 메서드로 요일을 숫자로 확인
+  - type: code
+    language: python
+    title: 날짜와 시간 정보 추출
+    description: datetime 객체에서 각 정보를 추출합니다.
+    content: |-
+      infoNow = datetime.datetime.now()
+      print(infoNow)
+
+      print(infoNow.year)
+      print(infoNow.month)
+      print(infoNow.day)
+      print(infoNow.hour)
+      print(infoNow.minute)
+      print(infoNow.second)
+
+      print(infoNow.weekday())
+      print(infoNow.timestamp())
+  - type: tip
+    content: "weekday()는 0이 월요일, 6이 일요일입니다. isoweekday()는 1이 월요일, 7이 일요일입니다."
+
+- id: formatting_date_strftime
+  title: strftime 형식 지정
+  subtitle: datetime 객체를 문자열로 변환
+  blocks:
+  - type: text
+    content: strftime()은 'string format time'의 줄임말로, datetime 객체를 지정된 형식의 문자열로 변환합니다. format은 영어로 형식이라는 뜻입니다. 예를 들어 2024-12-28 15:30:45라는 datetime 객체를 2024년 12월 28일이라는 문자열로 바꿀 수 있습니다. 다양한 형식 코드를 사용하여 원하는 형태로 날짜와 시간을 표시할 수 있습니다. 형식 코드는 %로 시작하는 특수 문자로, %Y는 연도, %m은 월, %d는 일을 의미합니다. 이 방법은 웹사이트에서 날짜를 보기 좋게 표시하거나 로그 파일에 시간을 기록할 때 자주 사용됩니다.
+  - type: list
+    items:
+    - "%Y는 4자리 연도, %y는 2자리 연도"
+    - "%m은 월(01-12), %B는 월 이름, %b는 월 약어"
+    - "%d는 일(01-31), %A는 요일 이름, %a는 요일 약어"
+    - "%H는 시간(00-23), %I는 시간(01-12), %p는 AM/PM"
+  - type: code
+    language: python
+    title: strftime 형식 코드
+    description: 다양한 형식 코드로 날짜를 변환합니다.
+    content: |-
+      formatNow = datetime.datetime.now()
+
+      print(formatNow.strftime("%Y-%m-%d"))
+      print(formatNow.strftime("%d/%m/%Y"))
+      print(formatNow.strftime("%d %B %Y"))
+      print(formatNow.strftime("%A, %B %d, %Y"))
+
+      print(formatNow.strftime("%H:%M:%S"))
+      print(formatNow.strftime("%I:%M:%S %p"))
+
+      print(formatNow.strftime("%Y년 %m월 %d일 %H시 %M분"))
+      print(formatNow.strftime("[%Y-%m-%d %H:%M:%S]"))
+      print(formatNow.strftime("%Y%m%d_%H%M%S"))
+  - type: tip
+    content: "로그용은 [%Y-%m-%d %H:%M:%S], 파일명용은 %Y%m%d_%H%M%S 형식을 자주 사용합니다."
+
+- id: string_to_time_strptime
+  title: 문자열을 시간으로 변환
+  subtitle: strptime으로 문자열 파싱
+  blocks:
+  - type: text
+    content: strptime()은 'string parse time'의 줄임말로, 문자열을 datetime 객체로 변환합니다. parse는 영어로 분석하다, 해석하다라는 뜻입니다. strftime()이 datetime을 문자열로 바꾼다면, strptime()은 그 반대로 문자열을 datetime으로 바꿉니다. 예를 들어 2024-12-28이라는 문자열을 datetime 객체로 바꿀 수 있습니다. 문자열의 형식을 정확히 지정해야 하며, strftime()과 같은 형식 코드를 사용합니다. 이 방법은 파일에서 날짜 데이터를 읽어올 때나 사용자가 입력한 날짜를 처리할 때 자주 사용됩니다.
+  - type: list
+    items:
+    - 문자열을 datetime 객체로 변환
+    - 문자열 형식을 정확히 지정해야 함
+    - strftime과 동일한 형식 코드 사용
+    - 다양한 입력 형식 지원 가능
+  - type: code
+    language: python
+    title: strptime 기본 사용법
+    description: 문자열을 datetime 객체로 변환합니다.
+    content: |-
+      parseString1 = "5 December, 2019"
+      parseObject1 = datetime.datetime.strptime(parseString1, "%d %B, %Y")
+      print(parseObject1)
+
+      parseString2 = "21/11/06"
+      parseObject2 = datetime.datetime.strptime(parseString2, "%d/%m/%y")
+      print(parseObject2)
+
+      parseString3 = "2021-07-08 14:30:25"
+      parseObject3 = datetime.datetime.strptime(parseString3, "%Y-%m-%d %H:%M:%S")
+      print(parseObject3)
+
+      parseString4 = "14:30:25"
+      parseObject4 = datetime.datetime.strptime(parseString4, "%H:%M:%S")
+      print(parseObject4)
+  - type: tip
+    content: "strptime에서 형식이 일치하지 않으면 ValueError가 발생합니다. 입력 형식을 정확히 파악하세요."
+
+- id: using_date_from_datetime
+  title: date 클래스 사용하기
+  subtitle: 날짜만 다루는 date 객체
+  blocks:
+  - type: text
+    content: datetime 모듈의 date 클래스는 시간 정보 없이 날짜만 다룹니다. 예를 들어 2024년 12월 28일만 저장하고 몇 시 몇 분인지는 저장하지 않습니다. 생일, 기념일, 마감일 등 시간이 중요하지 않은 날짜를 다룰 때 유용합니다. date(2024, 12, 28)처럼 연도, 월, 일을 순서대로 입력하여 날짜 객체를 만들 수 있습니다. today()는 오늘 날짜를 가져오는 메서드이고, strftime()을 사용하여 날짜를 원하는 형식의 문자열로 바꿀 수 있습니다.
+  - type: list
+    items:
+    - 날짜만 저장하고 시간 정보는 없음
+    - today()로 현재 날짜 가져오기
+    - 날짜 비교 연산 가능 (>, <, ==)
+    - strftime으로 형식 지정 가능
+  - type: code
+    language: python
+    title: date 객체 생성과 사용
+    description: date 객체의 생성과 사용법을 확인합니다.
+    content: |-
+      dateToday = date.today()
+      print(dateToday)
+
+      dateNewYear = date(2020, 1, 1)
+      print(dateNewYear)
+
+      print(dateToday.year)
+      print(dateToday.month)
+      print(dateToday.day)
+
+      print(dateToday.weekday())
+
+      print(dateToday.strftime("%A, %B %d, %Y"))
+
+      dateChristmas = date(2021, 12, 25)
+      print(dateChristmas > dateToday)
+
+- id: using_time_from_datetime
+  title: time 클래스 사용하기
+  subtitle: 시간만 다루는 time 객체
+  blocks:
+  - type: text
+    content: datetime 모듈의 time 클래스는 날짜 정보 없이 시간만 다룹니다. 예를 들어 14시 30분 59초만 저장하고 몇 년 몇 월 몇 일인지는 저장하지 않습니다. 일정한 시간, 알람 시간, 업무 시작 시간 등을 표현할 때 유용합니다. time(14, 30, 59)처럼 시, 분, 초를 순서대로 입력하여 시간 객체를 만들 수 있습니다. microsecond는 영어로 마이크로초라는 뜻으로, 1초의 백만분의 1을 의미합니다. time.min은 가장 빠른 시간인 00:00:00이고, time.max는 가장 늦은 시간인 23:59:59입니다.
+  - type: list
+    items:
+    - 시간만 저장하고 날짜 정보는 없음
+    - 마이크로초까지 정밀하게 지원
+    - hour, minute, second 속성으로 정보 추출
+    - strftime으로 형식 지정 가능
+  - type: code
+    language: python
+    title: time 객체 생성과 사용
+    description: time 객체의 생성과 사용법을 확인합니다.
+    content: |-
+      timeT1 = time(14, 30, 59)
+      print(timeT1)
+
+      timeT2 = time(14, 30, 59, 123456)
+      print(timeT2)
+
+      print(timeT1.hour)
+      print(timeT1.minute)
+      print(timeT1.second)
+      print(timeT2.microsecond)
+
+      print(timeT1.strftime("%H:%M:%S"))
+      print(timeT1.strftime("%I:%M:%S %p"))
+
+      print(time.min)
+      print(time.max)
+
+      timeCurrent = datetime.datetime.now().time()
+      print(timeCurrent)
+
+- id: time_difference_timedelta
+  title: timedelta 기본 사용법
+  subtitle: 시간 차이 계산과 날짜 연산
+  blocks:
+  - type: text
+    content: timedelta는 두 날짜나 시간 사이의 차이를 나타내는 클래스입니다. delta는 그리스 문자로 변화량이나 차이를 의미합니다. 예를 들어 오늘이 12월 28일이면 내일은 12월 29일인데, timedelta(days=1)을 오늘에 더하면 내일 날짜가 나옵니다. 반대로 timedelta(days=1)을 오늘에서 빼면 어제 날짜가 나옵니다. 날짜 계산, 기간 측정, 미래나 과거 날짜 계산 등에 사용됩니다. total_seconds()는 timedelta를 초 단위로 환산하는 메서드입니다.
+  - type: list
+    items:
+    - 두 날짜나 시간 사이의 차이 표현
+    - 날짜 연산 (더하기, 빼기 가능)
+    - days, weeks, hours, minutes, seconds 단위 지원
+    - total_seconds()로 총 초 계산 가능
+  - type: code
+    language: python
+    title: timedelta 기본 사용법
+    description: timedelta를 사용한 날짜 계산을 확인합니다.
+    content: |-
+      deltaNow = datetime.datetime.now()
+      print(deltaNow)
+
+      deltaOneDay = timedelta(days=1)
+      deltaOneWeek = timedelta(weeks=1)
+      deltaOneHour = timedelta(hours=1)
+
+      deltaTomorrow = deltaNow + deltaOneDay
+      print(deltaTomorrow)
+
+      deltaYesterday = deltaNow - deltaOneDay
+      print(deltaYesterday)
+
+      deltaNextWeek = deltaNow + deltaOneWeek
+      print(deltaNextWeek)
+
+      deltaComplex = timedelta(days=7, hours=3, minutes=30, seconds=45)
+      deltaFutureTime = deltaNow + deltaComplex
+      print(deltaFutureTime)
+
+      deltaNewYear = datetime.datetime(2022, 1, 1)
+      deltaDifference = deltaNewYear - deltaNow
+      print(deltaDifference.days)
+      print(deltaDifference.total_seconds())
+  - type: tip
+    content: "timedelta의 days 속성은 정수 일수만 반환합니다. 정확한 시간은 total_seconds()를 사용하세요."
+
+- id: practical_examples
+  title: 실용적인 날짜 계산
+  subtitle: 실무에서 자주 사용하는 패턴
+  blocks:
+  - type: text
+    content: 실제 프로그램에서 자주 사용되는 날짜 계산 패턴들을 학습합니다. 나이 계산은 생년월일부터 오늘까지의 일수를 365로 나누면 됩니다. 생일까지 남은 일수는 올해 생일이 지났으면 내년 생일로 계산해야 합니다. D-day는 특정 목표일까지 남은 일수를 세는 것입니다. 프로젝트 기간은 시작일부터 종료일까지의 차이를 계산합니다. 이런 날짜 계산은 웹사이트, 앱, 업무 시스템에서 매우 자주 사용됩니다.
+  - type: list
+    items:
+    - 생년월일로 나이 계산하기
+    - 생일까지 남은 일수 계산
+    - D-day 카운터 만들기
+    - 프로젝트 기간 계산하기
+  - type: code
+    language: python
+    title: 실용적인 날짜 계산
+    description: 실무에서 자주 사용하는 날짜 계산 예제입니다.
+    content: |-
+      practicalToday = date.today()
+
+      practicalBirthDate = date(1990, 5, 15)
+      practicalAgeDelta = practicalToday - practicalBirthDate
+      print(practicalAgeDelta.days)
+      print(practicalAgeDelta.days // 365)
+
+      practicalBirthday = date(practicalToday.year, 12, 25)
+      if practicalBirthday < practicalToday:
+          practicalBirthday = date(practicalToday.year + 1, 12, 25)
+
+      practicalDaysUntilBirthday = practicalBirthday - practicalToday
+      print(practicalDaysUntilBirthday.days)
+
+      practicalProjectStart = date(2021, 1, 1)
+      practicalProjectEnd = date(2021, 7, 8)
+      practicalProjectDuration = practicalProjectEnd - practicalProjectStart
+      print(practicalProjectDuration.days)
+
+- id: practice
+  title: 16일차 복습
+  subtitle: 날짜와 시간 미션
+  blocks:
+  - type: text
+    content: 16일차에서 배운 datetime 모듈을 복습하는 미션입니다. 날짜 형식 변환, 시간 계산 등을 연습해봅시다. 이전 day에서 배운 조건문, 반복문, 함수, 리스트, 딕셔너리 등의 개념도 함께 활용합니다.
+  - type: expansion
+    title: "미션1: 현재 날짜 형식 변환"
+    code: |-
+      mission1Now = datetime.datetime.now()
+      print(mission1Now.strftime("%Y-%m-%d"))
+      print(mission1Now.strftime("%Y년 %m월 %d일"))
+      print(mission1Now.strftime("%H시 %M분 %S초"))
+  - type: expansion
+    title: "미션2: 요일 확인하기"
+    code: |-
+      mission2Date = date(2021, 12, 25)
+      mission2Weekdays = ['월', '화', '수', '목', '금', '토', '일']
+      print(mission2Weekdays[mission2Date.weekday()])
+  - type: expansion
+    title: "미션3: 문자열을 날짜로"
+    code: |-
+      mission3Str = "2021-07-08 14:30:25"
+      mission3Obj = datetime.datetime.strptime(mission3Str, "%Y-%m-%d %H:%M:%S")
+      print(mission3Obj)
+      print(mission3Obj.year)
+      print(mission3Obj.month)
+  - type: expansion
+    title: "미션4: 나이 계산기"
+    code: |-
+      mission4BirthDate = date(1990, 5, 15)
+      mission4Today = date.today()
+      mission4AgeDays = mission4Today - mission4BirthDate
+      mission4AgeYears = mission4AgeDays.days // 365
+      print(mission4AgeYears)
+  - type: expansion
+    title: "미션5: D-day 카운터"
+    code: |-
+      mission5Today = date.today()
+      mission5TargetDate = date(2025, 12, 31)
+      mission5Remaining = mission5TargetDate - mission5Today
+      print(mission5Remaining.days)
+  - type: expansion
+    title: "미션6: 날짜 연산"
+    code: |-
+      mission6Now = datetime.datetime.now()
+      mission6After7Days = mission6Now + timedelta(days=7)
+      mission6Before30Days = mission6Now - timedelta(days=30)
+      print(mission6After7Days.strftime("%Y-%m-%d"))
+      print(mission6Before30Days.strftime("%Y-%m-%d"))
+  - type: expansion
+    title: "미션7: 근무 시간 계산"
+    code: |-
+      mission7StartTime = datetime.datetime(2021, 7, 8, 9, 0)
+      mission7EndTime = datetime.datetime(2021, 7, 8, 18, 0)
+      mission7LunchBreak = timedelta(hours=1)
+
+      mission7WorkDuration = mission7EndTime - mission7StartTime - mission7LunchBreak
+      mission7WorkHours = mission7WorkDuration.total_seconds() / 3600
+      print(mission7WorkHours)
+  - type: expansion
+    title: "미션8: 여러 날짜 비교"
+    code: |-
+      mission8Dates = [
+          date(2024, 1, 1),
+          date(2024, 6, 15),
+          date(2024, 12, 31)
+      ]
+
+      mission8Today = date.today()
+      for mission8D in mission8Dates:
+          if mission8D > mission8Today:
+              print("미래")
+          elif mission8D < mission8Today:
+              print("과거")
+          else:
+              print("오늘")
+  - type: expansion
+    title: "미션9: 월별 날짜 딕셔너리"
+    code: |-
+      mission9MonthDict = {
+          1: "January",
+          2: "February",
+          3: "March",
+          4: "April",
+          5: "May",
+          6: "June",
+          7: "July",
+          8: "August",
+          9: "September",
+          10: "October",
+          11: "November",
+          12: "December"
+      }
+
+      mission9Today = date.today()
+      mission9MonthName = mission9MonthDict[mission9Today.month]
+      print(mission9MonthName)
+  - type: expansion
+    title: "미션10: 날짜 범위 생성"
+    code: |-
+      mission10Start = date(2024, 1, 1)
+      mission10DateList = []
+
+      for mission10I in range(7):
+          mission10NewDate = mission10Start + timedelta(days=mission10I)
+          mission10DateList.append(mission10NewDate)
+
+      print(mission10DateList)

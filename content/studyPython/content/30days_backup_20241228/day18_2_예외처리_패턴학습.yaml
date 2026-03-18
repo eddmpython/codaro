@@ -1,0 +1,270 @@
+meta:
+  id: day18_2
+  title: 예외처리 패턴학습
+  day: 18
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 예외처리 try-except"
+    description: "try-except로 예외를 처리하는 방법을 배웁니다."
+    keywords: ['예외처리', 'try', 'except']
+intro:
+  title: 예외처리 마스터 패턴북
+  emoji: 🔥
+  description: 이것만 외우면 예외처리 마스터!
+  points:
+  - '📝 try-except: 기본 예외처리'
+  - '🔄 finally: 항상 실행되는 코드'
+  - '📊 else: 예외 없을 때 실행'
+  - '🔍 raise: 예외 발생시키기'
+  - '📦 커스텀 예외: class MyError(Exception)'
+  summary: 🔥 예외처리는 안정적인 프로그램의 핵심!
+sections:
+- id: exception_basic
+  title: 1. 기본 예외처리
+  subtitle: try - except
+  blocks:
+  - type: text
+    content: try-except는 예외 처리의 기본 구문입니다. try 블록에서 오류가 발생하면 except 블록이 실행되어 프로그램이 중단되지 않습니다.
+  - type: code
+    language: python
+    title: 기본 try-except
+    description: 프로그램 실행 중 발생할 수 있는 오류를 처리하는 가장 기본적인 방법입니다.
+    content: |-
+      try:
+          patBasicNum = int("abc")
+          patBasicResult = 10 / patBasicNum
+          print(f"결과: {patBasicResult}")
+      except:
+          print("오류가 발생했습니다!")
+- id: exception_specific
+  title: 2. 특정 예외처리
+  subtitle: 'except 예외타입:'
+  blocks:
+  - type: text
+    content: 예외 타입을 구체적으로 지정하면 각 상황에 맞는 정확한 오류 처리가 가능합니다.
+  - type: code
+    language: python
+    title: 특정 예외 처리하기
+    description: 특정 예외 타입을 명시하여 처리합니다.
+    content: |-
+      try:
+          patSpecNumbers = [1, 2, 3]
+          patSpecIndex = int("abc")
+          print(patSpecNumbers[patSpecIndex])
+      except ValueError:
+          print("숫자를 입력해주세요!")
+      except IndexError:
+          print("범위를 벗어난 인덱스입니다!")
+- id: exception_else
+  title: 3. try-except-else
+  subtitle: 'else: 오류 없을 때'
+  blocks:
+  - type: text
+    content: else 블록은 예외가 발생하지 않았을 때만 실행됩니다. 정상 처리 후 추가 작업을 정의할 때 사용합니다.
+  - type: code
+    language: python
+    title: try-except-else 구문
+    description: else 블록은 try 블록에서 예외가 발생하지 않았을 때만 실행됩니다.
+    content: |-
+      try:
+          patElseAge = int("25")
+      except ValueError:
+          print("올바른 숫자를 입력해주세요!")
+      else:
+          if patElseAge >= 18:
+              print("성인입니다.")
+          else:
+              print("미성년자입니다.")
+- id: exception_finally
+  title: 4. try-except-finally
+  subtitle: 'finally: 항상 실행'
+  blocks:
+  - type: text
+    content: finally 블록은 예외 발생 여부와 관계없이 항상 실행됩니다. 리소스 정리 작업에 사용합니다.
+  - type: code
+    language: python
+    title: try-except-finally 구문
+    description: finally 블록은 예외 발생 여부와 관계없이 항상 실행됩니다.
+    content: |-
+      patFinallyFile = None
+      try:
+          patFinallyFile = open("data.txt", "r")
+          patFinallyContent = patFinallyFile.read()
+          print(patFinallyContent)
+      except FileNotFoundError:
+          print("파일을 찾을 수 없습니다!")
+      finally:
+          print("작업을 완료했습니다.")
+          if patFinallyFile:
+              patFinallyFile.close()
+  - type: tip
+    content: "finally는 파일 닫기, 연결 해제 등 반드시 실행되어야 하는 정리 작업에 활용합니다."
+- id: exception_multiple
+  title: 5. 여러 예외 한번에
+  subtitle: 'except (예외1, 예외2):'
+  blocks:
+  - type: code
+    language: python
+    title: 여러 예외를 한번에 처리
+    description: 여러 예외 타입을 튜플로 묶어서 동시에 처리합니다.
+    content: |-
+      try:
+          patMultiX = int("10")
+          patMultiY = int("0")
+          patMultiResult = patMultiX / patMultiY
+          print(f"결과: {patMultiResult}")
+      except (ValueError, TypeError):
+          print("올바른 숫자를 입력해주세요!")
+      except ZeroDivisionError:
+          print("0으로 나눌 수 없습니다!")
+- id: exception_info
+  title: 6. 예외 정보 가져오기
+  subtitle: 'except Exception as e:'
+  blocks:
+  - type: code
+    language: python
+    title: 예외 정보 활용하기
+    description: as 키워드로 예외 객체를 변수에 저장하고 자세한 정보를 확인합니다.
+    content: |-
+      try:
+          patInfoNumbers = [1, 2, 3]
+          patInfoIndex = int("abc")
+          print(patInfoNumbers[patInfoIndex])
+      except IndexError as e:
+          print(f"인덱스 오류: {e}")
+      except ValueError as e:
+          print(f"값 오류: {e}")
+      except Exception as e:
+          print(f"알 수 없는 오류: {type(e).__name__}: {e}")
+- id: exception_custom
+  title: 7. 사용자 정의 예외
+  subtitle: 'class CustomError(Exception):'
+  blocks:
+  - type: text
+    content: Exception 클래스를 상속받아 자신만의 예외를 정의할 수 있습니다. 프로그램에 특화된 예외 처리가 가능합니다.
+  - type: code
+    language: python
+    title: 사용자 정의 예외 만들기
+    description: 특별한 상황에 맞는 예외를 직접 정의합니다.
+    content: |-
+      class AgeError(Exception):
+          pass
+
+      def patCustomCheckAge(age):
+          if age < 0:
+              raise AgeError("나이는 음수일 수 없습니다!")
+          elif age > 150:
+              raise AgeError("나이가 너무 큽니다!")
+          return "올바른 나이입니다."
+
+      try:
+          patCustomUserAge = 25
+          patCustomResult = patCustomCheckAge(patCustomUserAge)
+          print(patCustomResult)
+      except AgeError as e:
+          print(f"나이 오류: {e}")
+- id: exception_raise
+  title: 8. 예외 발생시키기
+  subtitle: raise 예외
+  blocks:
+  - type: code
+    language: python
+    title: raise로 예외 발생
+    description: raise 문으로 의도적으로 예외를 발생시킵니다.
+    content: |-
+      def patRaiseDivide(a, b):
+          if b == 0:
+              raise ValueError("0으로 나눌 수 없습니다!")
+          return a / b
+
+      def patRaiseCheckPositive(num):
+          if num < 0:
+              raise ValueError("양수만 입력 가능합니다!")
+          return num
+
+      try:
+          patRaiseX = patRaiseCheckPositive(-5)
+          patRaiseResult = patRaiseDivide(10, patRaiseX)
+          print(patRaiseResult)
+      except ValueError as e:
+          print(f"오류: {e}")
+- id: exception_assert
+  title: 9. assert 문
+  subtitle: assert 조건, 메시지
+  blocks:
+  - type: text
+    content: assert 문은 디버깅용 간단한 예외 처리 방법입니다. 조건이 False면 AssertionError를 발생시킵니다.
+  - type: code
+    language: python
+    title: assert로 조건 검사
+    description: assert 문으로 조건을 검사하고 AssertionError를 발생시킵니다.
+    content: |-
+      def patAssertCalcAvg(scores):
+          assert len(scores) > 0, "점수 목록이 비어있습니다!"
+          assert all(0 <= score <= 100 for score in scores), "점수는 0-100 사이여야 합니다!"
+          return sum(scores) / len(scores)
+
+      try:
+          patAssertScores = [85, 92, 78, 105]
+          patAssertAvg = patAssertCalcAvg(patAssertScores)
+          print(f"평균: {patAssertAvg}")
+      except AssertionError as e:
+          print(f"검증 오류: {e}")
+- id: exception_with
+  title: 10. with 문 활용
+  subtitle: with 리소스 관리
+  blocks:
+  - type: text
+    content: with 문은 리소스를 안전하게 관리합니다. 파일을 자동으로 닫아주어 예외 상황에서도 안전합니다.
+  - type: code
+    language: python
+    title: with 문으로 안전한 리소스 관리
+    description: with 문으로 파일을 자동으로 관리합니다.
+    content: |-
+      try:
+          with open("patWith.txt", "w") as patWithFile:
+              patWithFile.write("안녕하세요!")
+              patWithFile.write("with 문을 사용한 파일 처리")
+          print("파일 작성 완료!")
+
+          with open("patWith.txt", "r") as patWithFile2:
+              patWithContent = patWithFile2.read()
+              print(f"파일 내용: {patWithContent}")
+      except FileNotFoundError:
+          print("파일을 찾을 수 없습니다!")
+      except PermissionError:
+          print("파일 접근 권한이 없습니다!")
+  - type: tip
+    content: "with 문을 사용하면 finally에서 파일을 닫을 필요가 없어 코드가 더 간결해집니다."
+- id: exception_chaining
+  title: 11. 예외 연쇄
+  subtitle: raise from
+  blocks:
+  - type: text
+    content: raise from을 사용하면 원래 예외의 정보를 보존하면서 새로운 예외를 발생시킬 수 있습니다. 예외의 원인을 추적할 때 유용합니다.
+  - type: code
+    language: python
+    title: 예외 연쇄로 원인 추적
+    description: raise from으로 예외의 원인을 추적합니다.
+    content: |-
+      def patChainProcessData(data):
+          try:
+              patChainResult = int(data) / 0
+              return patChainResult
+          except ZeroDivisionError as e:
+              raise ValueError("데이터 처리 중 오류 발생") from e
+
+      def patChainMain():
+          try:
+              patChainRes = patChainProcessData("10")
+              print(patChainRes)
+          except ValueError as e:
+              print(f"메인 오류: {e}")
+              print(f"원인: {e.__cause__}")
+
+      patChainMain()
+  - type: tip
+    content: "예외 연쇄를 사용하면 디버깅 시 오류의 근본 원인을 쉽게 파악할 수 있습니다."

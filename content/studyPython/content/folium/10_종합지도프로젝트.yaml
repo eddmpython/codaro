@@ -1,0 +1,671 @@
+meta:
+  id: folium_10
+  title: 종합 지도 프로젝트
+  order: 10
+  category: folium
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["folium", "종합", "프로젝트", "인터랙티브", "대시보드"]
+  seo:
+    title: "Folium 종합 프로젝트 - 서울 관광 지도"
+    description: "Folium의 모든 기능을 종합한 인터랙티브 지도를 만듭니다. 마커, 히트맵, 클러스터, GeoJSON을 조합합니다."
+    keywords: ["folium", "종합", "프로젝트", "인터랙티브", "관광지도"]
+
+intro:
+  emoji: "🏆"
+  goal: 모든 기능을 종합한 인터랙티브 지도를 제작합니다.
+  description: 지금까지 배운 모든 내용을 활용합니다. 마커, 클러스터, 히트맵, GeoJSON, 레이어 컨트롤을 조합하여 완성도 높은 지도를 만듭니다. 서울 관광 종합 지도를 예제로 구현합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: 모든 플러그인 import
+  blocks:
+  - type: text
+    content: 필요한 모든 라이브러리와 플러그인을 불러옵니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: 전체 import
+    content: |-
+      import folium
+      from folium.plugins import HeatMap, MarkerCluster
+      import branca.colormap as cm
+      import random
+      import marimo as mo
+
+- id: step2_base_map
+  title: 2단계. 베이스 맵 설정
+  subtitle: 기본 지도
+  blocks:
+  - type: text
+    content: 다중 타일 레이어를 지원하는 베이스 맵을 만듭니다.
+  - type: code
+    language: python
+    title: 베이스 맵
+    description: 타일 레이어 설정
+    content: |-
+      seoulCenter = [37.5665, 126.9780]
+
+      tourMap = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles=None
+      )
+
+      folium.TileLayer(
+          "CartoDB Positron",
+          name="밝은 지도"
+      ).add_to(tourMap)
+
+      folium.TileLayer(
+          "CartoDB Dark_Matter",
+          name="어두운 지도"
+      ).add_to(tourMap)
+
+      folium.TileLayer(
+          "OpenStreetMap",
+          name="상세 지도"
+      ).add_to(tourMap)
+
+      mo.iframe(tourMap._repr_html_())
+  - type: tip
+    content: 여러 타일을 추가하면 LayerControl에서 전환할 수 있습니다.
+
+- id: step3_landmark_markers
+  title: 3단계. 주요 랜드마크
+  subtitle: 개별 마커
+  blocks:
+  - type: text
+    content: 주요 랜드마크는 개별 마커로 강조합니다.
+  - type: code
+    language: python
+    title: 랜드마크 데이터
+    description: 주요 관광지
+    content: |-
+      landmarks = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770], "desc": "조선 왕궁", "icon": "tower"},
+          {"name": "남산타워", "loc": [37.5512, 126.9882], "desc": "서울 랜드마크", "icon": "signal"},
+          {"name": "광화문", "loc": [37.5760, 126.9769], "desc": "조선 정문", "icon": "flag"},
+          {"name": "동대문DDP", "loc": [37.5673, 127.0095], "desc": "디자인플라자", "icon": "th-large"}
+      ]
+      landmarks
+  - type: code
+    language: python
+    title: 랜드마크 마커
+    description: 개별 마커 추가
+    content: |-
+      landmarkGroup = folium.FeatureGroup(name="주요 랜드마크")
+
+      for lm in landmarks:
+          folium.Marker(
+              location=lm["loc"],
+              popup=f"<b>{lm['name']}</b><br>{lm['desc']}",
+              tooltip=lm["name"],
+              icon=folium.Icon(color="red", icon=lm["icon"])
+          ).add_to(landmarkGroup)
+
+      landmarkGroup.add_to(tourMap)
+
+      mo.iframe(tourMap._repr_html_())
+  - type: tip
+    content: 중요한 위치는 개별 마커로 표시하여 클러스터에 묻히지 않게 합니다.
+
+- id: step4_cafe_cluster
+  title: 4단계. 카페 클러스터
+  subtitle: MarkerCluster
+  blocks:
+  - type: text
+    content: 카페 위치를 클러스터로 표시합니다. 대량 데이터를 효율적으로 관리합니다.
+  - type: code
+    language: python
+    title: 카페 데이터 생성
+    description: 랜덤 카페 위치
+    content: |-
+      cafeCluster = MarkerCluster(name="카페")
+
+      cafeAreas = [
+          [37.5796, 126.9770],
+          [37.5636, 126.9869],
+          [37.5563, 126.9236],
+          [37.4979, 127.0276]
+      ]
+
+      for area in cafeAreas:
+          for i in range(15):
+              lat = area[0] + random.uniform(-0.008, 0.008)
+              lon = area[1] + random.uniform(-0.008, 0.008)
+              folium.Marker(
+                  location=[lat, lon],
+                  popup=f"카페 {i+1}",
+                  icon=folium.Icon(color="cadetblue", icon="cloud")
+              ).add_to(cafeCluster)
+
+      cafeCluster.add_to(tourMap)
+
+      mo.iframe(tourMap._repr_html_())
+  - type: tip
+    content: 60개 카페가 클러스터로 깔끔하게 표시됩니다.
+
+- id: step5_restaurant_cluster
+  title: 5단계. 음식점 클러스터
+  subtitle: 별도 클러스터
+  blocks:
+  - type: text
+    content: 음식점용 별도 클러스터를 만들어 카테고리를 분리합니다.
+  - type: code
+    language: python
+    title: 음식점 클러스터
+    description: 별도 레이어
+    content: |-
+      restaurantCluster = MarkerCluster(name="음식점", show=False)
+
+      restaurantAreas = [
+          [37.5636, 126.9869],
+          [37.5701, 126.9995],
+          [37.5660, 126.9910]
+      ]
+
+      for area in restaurantAreas:
+          for i in range(20):
+              lat = area[0] + random.uniform(-0.006, 0.006)
+              lon = area[1] + random.uniform(-0.006, 0.006)
+              folium.Marker(
+                  location=[lat, lon],
+                  popup=f"맛집 {i+1}",
+                  icon=folium.Icon(color="orange", icon="cutlery")
+              ).add_to(restaurantCluster)
+
+      restaurantCluster.add_to(tourMap)
+
+      mo.iframe(tourMap._repr_html_())
+  - type: tip
+    content: show=False로 기본 숨김 상태입니다. LayerControl에서 켤 수 있습니다.
+
+- id: step6_heatmap
+  title: 6단계. 관광객 밀도 히트맵
+  subtitle: HeatMap
+  blocks:
+  - type: text
+    content: 관광객 밀도를 히트맵으로 시각화합니다.
+  - type: code
+    language: python
+    title: 밀도 히트맵
+    description: 관광객 분포
+    content: |-
+      densityGroup = folium.FeatureGroup(name="관광객 밀도", show=False)
+
+      densityData = []
+
+      hotspots = [
+          {"loc": [37.5796, 126.9770], "weight": 1.0},
+          {"loc": [37.5636, 126.9869], "weight": 0.9},
+          {"loc": [37.5512, 126.9882], "weight": 0.8},
+          {"loc": [37.5563, 126.9236], "weight": 0.7}
+      ]
+
+      for hs in hotspots:
+          for _ in range(50):
+              lat = hs["loc"][0] + random.uniform(-0.01, 0.01)
+              lon = hs["loc"][1] + random.uniform(-0.01, 0.01)
+              densityData.append([lat, lon, hs["weight"]])
+
+      HeatMap(
+          densityData,
+          radius=20,
+          blur=15,
+          gradient={0.4: "blue", 0.6: "lime", 0.8: "yellow", 1: "red"}
+      ).add_to(densityGroup)
+
+      densityGroup.add_to(tourMap)
+
+      mo.iframe(tourMap._repr_html_())
+  - type: tip
+    content: 히트맵도 FeatureGroup에 넣으면 레이어 컨트롤로 제어됩니다.
+
+- id: step7_gu_boundaries
+  title: 7단계. 구 경계 GeoJSON
+  subtitle: 행정구역
+  blocks:
+  - type: text
+    content: 서울의 주요 구 경계를 GeoJSON으로 표시합니다.
+  - type: code
+    language: python
+    title: 구 경계 데이터
+    description: GeoJSON 정의
+    content: |-
+      guBoundaries = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "종로구", "visitors": 85000},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.57], [127.00, 37.57],
+                          [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                      ]]
+                  }
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "중구", "visitors": 120000},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.54], [127.00, 37.54],
+                          [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                      ]]
+                  }
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "용산구", "visitors": 65000},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.51], [127.00, 37.51],
+                          [127.00, 37.54], [126.96, 37.54], [126.96, 37.51]
+                      ]]
+                  }
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "마포구", "visitors": 75000},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.90, 37.54], [126.96, 37.54],
+                          [126.96, 37.57], [126.90, 37.57], [126.90, 37.54]
+                      ]]
+                  }
+              }
+          ]
+      }
+      guBoundaries
+  - type: code
+    language: python
+    title: 구 경계 레이어
+    description: 스타일 적용
+    content: |-
+      boundaryGroup = folium.FeatureGroup(name="구 경계", show=False)
+
+      visitorColormap = cm.LinearColormap(
+          colors=["#fee8c8", "#fc8d59", "#b30000"],
+          vmin=50000,
+          vmax=130000,
+          caption="월 관광객 수"
+      )
+
+      def guStyle(feature):
+          visitors = feature["properties"]["visitors"]
+          return {
+              "fillColor": visitorColormap(visitors),
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.5
+          }
+
+      def guHighlight(feature):
+          return {
+              "fillColor": "#2ecc71",
+              "color": "black",
+              "weight": 3,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guBoundaries,
+          style_function=guStyle,
+          highlight_function=guHighlight,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "visitors"],
+              aliases=["구:", "월 관광객:"]
+          )
+      ).add_to(boundaryGroup)
+
+      boundaryGroup.add_to(tourMap)
+      visitorColormap.add_to(tourMap)
+
+      mo.iframe(tourMap._repr_html_())
+  - type: tip
+    content: 컬러맵 범례가 우측 하단에 표시됩니다.
+
+- id: step8_routes
+  title: 8단계. 관광 코스
+  subtitle: PolyLine
+  blocks:
+  - type: text
+    content: 추천 관광 코스를 경로로 표시합니다.
+  - type: code
+    language: python
+    title: 관광 코스
+    description: 추천 경로
+    content: |-
+      routeGroup = folium.FeatureGroup(name="추천 코스", show=False)
+
+      palaceRoute = [
+          [37.5796, 126.9770],
+          [37.5794, 126.9910],
+          [37.5826, 126.9831],
+          [37.5760, 126.9769]
+      ]
+
+      folium.PolyLine(
+          locations=palaceRoute,
+          color="purple",
+          weight=5,
+          opacity=0.8,
+          popup="궁궐 투어 (2시간)"
+      ).add_to(routeGroup)
+
+      shoppingRoute = [
+          [37.5636, 126.9869],
+          [37.5673, 127.0095],
+          [37.5701, 126.9995]
+      ]
+
+      folium.PolyLine(
+          locations=shoppingRoute,
+          color="pink",
+          weight=5,
+          opacity=0.8,
+          dash_array="10",
+          popup="쇼핑 투어 (3시간)"
+      ).add_to(routeGroup)
+
+      routeGroup.add_to(tourMap)
+
+      mo.iframe(tourMap._repr_html_())
+  - type: tip
+    content: 실선과 점선으로 코스를 구분합니다.
+
+- id: step9_layer_control
+  title: 9단계. 레이어 컨트롤
+  subtitle: LayerControl
+  blocks:
+  - type: text
+    content: LayerControl을 추가하여 모든 레이어를 제어합니다.
+  - type: code
+    language: python
+    title: 레이어 컨트롤 추가
+    description: 최종 컨트롤
+    content: |-
+      folium.LayerControl(collapsed=False).add_to(tourMap)
+
+      mo.iframe(tourMap._repr_html_())
+  - type: tip
+    content: collapsed=False로 항상 펼쳐진 상태로 표시됩니다.
+
+- id: step10_complete
+  title: 10단계. 완성 코드
+  subtitle: 전체 종합
+  blocks:
+  - type: text
+    content: 지금까지 작성한 모든 코드를 하나로 합친 완성 버전입니다.
+  - type: code
+    language: python
+    title: 서울 관광 종합 지도
+    description: 완성 코드
+    content: |-
+      import folium
+      from folium.plugins import HeatMap, MarkerCluster
+      import branca.colormap as cm
+      import random
+      import marimo as mo
+
+      seoulCenter = [37.5665, 126.9780]
+      finalMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer("CartoDB Positron", name="밝은 지도").add_to(finalMap)
+      folium.TileLayer("CartoDB Dark_Matter", name="어두운 지도").add_to(finalMap)
+
+      landmarks = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770], "icon": "tower"},
+          {"name": "남산타워", "loc": [37.5512, 126.9882], "icon": "signal"},
+          {"name": "광화문", "loc": [37.5760, 126.9769], "icon": "flag"},
+          {"name": "동대문DDP", "loc": [37.5673, 127.0095], "icon": "th-large"}
+      ]
+
+      lmGroup = folium.FeatureGroup(name="랜드마크")
+      for lm in landmarks:
+          folium.Marker(
+              location=lm["loc"],
+              popup=f"<b>{lm['name']}</b>",
+              tooltip=lm["name"],
+              icon=folium.Icon(color="red", icon=lm["icon"])
+          ).add_to(lmGroup)
+      lmGroup.add_to(finalMap)
+
+      cafeCluster = MarkerCluster(name="카페")
+      cafeAreas = [[37.5796, 126.9770], [37.5636, 126.9869], [37.5563, 126.9236]]
+      for area in cafeAreas:
+          for i in range(10):
+              lat = area[0] + random.uniform(-0.006, 0.006)
+              lon = area[1] + random.uniform(-0.006, 0.006)
+              folium.Marker(
+                  [lat, lon],
+                  popup=f"카페",
+                  icon=folium.Icon(color="cadetblue", icon="cloud")
+              ).add_to(cafeCluster)
+      cafeCluster.add_to(finalMap)
+
+      densityGroup = folium.FeatureGroup(name="관광객 밀도", show=False)
+      densityData = []
+      for area in cafeAreas:
+          for _ in range(30):
+              lat = area[0] + random.uniform(-0.01, 0.01)
+              lon = area[1] + random.uniform(-0.01, 0.01)
+              densityData.append([lat, lon, 0.8])
+      HeatMap(densityData, radius=20, blur=15).add_to(densityGroup)
+      densityGroup.add_to(finalMap)
+
+      guGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "종로구", "score": 90},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [126.96, 37.57], [127.00, 37.57],
+                      [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                  ]]}
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "중구", "score": 85},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [126.96, 37.54], [127.00, 37.54],
+                      [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                  ]]}
+              }
+          ]
+      }
+
+      guGroup = folium.FeatureGroup(name="구 경계", show=False)
+      scoreColormap = cm.LinearColormap(
+          ["#fee8c8", "#e74c3c"],
+          vmin=70, vmax=100,
+          caption="관광 만족도"
+      )
+      folium.GeoJson(
+          guGeo,
+          style_function=lambda f: {
+              "fillColor": scoreColormap(f["properties"]["score"]),
+              "color": "white", "weight": 2, "fillOpacity": 0.5
+          },
+          tooltip=folium.GeoJsonTooltip(fields=["name", "score"])
+      ).add_to(guGroup)
+      guGroup.add_to(finalMap)
+      scoreColormap.add_to(finalMap)
+
+      routeGroup = folium.FeatureGroup(name="추천 코스", show=False)
+      folium.PolyLine(
+          [[37.5796, 126.9770], [37.5760, 126.9769], [37.5636, 126.9869]],
+          color="purple", weight=4, popup="궁궐-명동 코스"
+      ).add_to(routeGroup)
+      routeGroup.add_to(finalMap)
+
+      folium.LayerControl(collapsed=False).add_to(finalMap)
+
+      mo.iframe(finalMap._repr_html_())
+
+- id: practice
+  title: 실습
+  subtitle: 종합 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용하여 나만의 종합 지도를 만들어봅시다.
+  - type: expansion
+    title: "미션1: 부동산 분석 지도"
+    blocks:
+    - type: code
+      title: 전체 코드
+      content: |-
+        import folium
+        from folium.plugins import HeatMap, MarkerCluster
+        import branca.colormap as cm
+        import random
+        import marimo as mo
+
+        gangnamCenter = [37.4979, 127.0276]
+        realEstateMap = folium.Map(location=gangnamCenter, zoom_start=14, tiles="CartoDB Positron")
+
+        priceGeo = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {"name": "역삼동", "price": 15},
+                    "geometry": {"type": "Polygon", "coordinates": [[
+                        [127.02, 37.49], [127.04, 37.49],
+                        [127.04, 37.51], [127.02, 37.51], [127.02, 37.49]
+                    ]]}
+                },
+                {
+                    "type": "Feature",
+                    "properties": {"name": "삼성동", "price": 18},
+                    "geometry": {"type": "Polygon", "coordinates": [[
+                        [127.04, 37.49], [127.06, 37.49],
+                        [127.06, 37.51], [127.04, 37.51], [127.04, 37.49]
+                    ]]}
+                }
+            ]
+        }
+
+        priceColormap = cm.LinearColormap(
+            ["#fee8c8", "#e74c3c"],
+            vmin=10, vmax=20,
+            caption="평당 가격(억원)"
+        )
+
+        priceGroup = folium.FeatureGroup(name="시세")
+        folium.GeoJson(
+            priceGeo,
+            style_function=lambda f: {
+                "fillColor": priceColormap(f["properties"]["price"]),
+                "color": "white", "weight": 2, "fillOpacity": 0.6
+            },
+            tooltip=folium.GeoJsonTooltip(
+                fields=["name", "price"],
+                aliases=["동:", "평당가:"]
+            )
+        ).add_to(priceGroup)
+        priceGroup.add_to(realEstateMap)
+        priceColormap.add_to(realEstateMap)
+
+        aptCluster = MarkerCluster(name="아파트")
+        for _ in range(30):
+            lat = 37.50 + random.uniform(-0.015, 0.015)
+            lon = 127.03 + random.uniform(-0.02, 0.02)
+            folium.Marker(
+                [lat, lon],
+                icon=folium.Icon(color="blue", icon="home")
+            ).add_to(aptCluster)
+        aptCluster.add_to(realEstateMap)
+
+        infraGroup = folium.FeatureGroup(name="인프라")
+        infras = [
+            {"name": "강남역", "loc": [37.4979, 127.0276]},
+            {"name": "선릉역", "loc": [37.5045, 127.0490]}
+        ]
+        for inf in infras:
+            folium.CircleMarker(
+                location=inf["loc"],
+                radius=10,
+                color="green",
+                fill=True,
+                popup=inf["name"]
+            ).add_to(infraGroup)
+        infraGroup.add_to(realEstateMap)
+
+        folium.LayerControl().add_to(realEstateMap)
+
+        mo.iframe(realEstateMap._repr_html_())
+  - type: expansion
+    title: "미션2: 맛집 탐방 지도"
+    blocks:
+    - type: code
+      title: 전체 코드
+      content: |-
+        import folium
+        from folium.plugins import HeatMap, MarkerCluster
+        import random
+        import marimo as mo
+
+        hongdaeCenter = [37.5563, 126.9236]
+        foodMap = folium.Map(location=hongdaeCenter, zoom_start=15, tiles=None)
+
+        folium.TileLayer("CartoDB Positron", name="기본").add_to(foodMap)
+        folium.TileLayer("CartoDB Dark_Matter", name="야간").add_to(foodMap)
+
+        categories = {
+            "한식": {"color": "red", "icon": "fire"},
+            "일식": {"color": "blue", "icon": "tint"},
+            "양식": {"color": "green", "icon": "leaf"},
+            "카페": {"color": "cadetblue", "icon": "cloud"}
+        }
+
+        for catName, catInfo in categories.items():
+            cluster = MarkerCluster(name=catName)
+            for _ in range(15):
+                lat = hongdaeCenter[0] + random.uniform(-0.008, 0.008)
+                lon = hongdaeCenter[1] + random.uniform(-0.008, 0.008)
+                folium.Marker(
+                    [lat, lon],
+                    popup=f"{catName} 맛집",
+                    icon=folium.Icon(color=catInfo["color"], icon=catInfo["icon"])
+                ).add_to(cluster)
+            cluster.add_to(foodMap)
+
+        hotspotGroup = folium.FeatureGroup(name="핫플레이스", show=False)
+        hotspotData = []
+        for _ in range(100):
+            lat = hongdaeCenter[0] + random.uniform(-0.006, 0.006)
+            lon = hongdaeCenter[1] + random.uniform(-0.006, 0.006)
+            hotspotData.append([lat, lon])
+        HeatMap(
+            hotspotData,
+            radius=15,
+            gradient={0.4: "yellow", 0.7: "orange", 1: "red"}
+        ).add_to(hotspotGroup)
+        hotspotGroup.add_to(foodMap)
+
+        walkRoute = [
+            [37.5563, 126.9200],
+            [37.5570, 126.9236],
+            [37.5555, 126.9270]
+        ]
+        routeGroup = folium.FeatureGroup(name="맛집 투어")
+        folium.PolyLine(
+            walkRoute,
+            color="purple",
+            weight=4,
+            popup="2시간 맛집 코스"
+        ).add_to(routeGroup)
+        routeGroup.add_to(foodMap)
+
+        folium.LayerControl(collapsed=False).add_to(foodMap)
+
+        mo.iframe(foodMap._repr_html_())

@@ -1,0 +1,367 @@
+meta:
+  id: matplotlib_02
+  title: 팁데이터분포탐색
+  order: 2
+  category: matplotlib
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["matplotlib", "hist", "boxplot", "subplots", "tips", "분포"]
+  seo:
+    title: "Matplotlib 히스토그램과 박스플롯 - 팁 데이터 분포 분석"
+    description: "Matplotlib으로 팁 데이터의 분포를 히스토그램과 박스플롯으로 시각화합니다. hist, boxplot, subplots 사용법을 배웁니다."
+    keywords: ["matplotlib", "histogram", "boxplot", "분포", "tips", "subplots"]
+
+intro:
+  emoji: "💵"
+  goal: 레스토랑 팁 데이터의 분포를 히스토그램과 박스플롯으로 분석합니다.
+  description: 데이터 분포를 파악하는 두 가지 핵심 차트를 배웁니다. 히스토그램으로 전체 분포를, 박스플롯으로 요약 통계를 시각화합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: seaborn의 내장 데이터셋인 tips를 사용합니다. tips 데이터는 레스토랑에서 수집한 팁 정보로, 총 결제금액, 팁, 요일, 시간대, 인원수 등이 포함되어 있습니다. 실제 서비스업 데이터 분석에 자주 사용되는 예제입니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: matplotlib, seaborn을 불러오고 데이터를 로드합니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+      import pandas as pd
+  - type: tip
+    content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  subtitle: Pyodide 환경 폰트
+  blocks:
+  - type: text
+    content: Pyodide(웹 브라우저) 환경에서는 시스템 폰트를 사용할 수 없어 한글이 깨집니다. CDN에서 폰트 파일을 다운로드하여 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+  - type: code
+    language: python
+    title: 한글 폰트 설정
+    description: Pretendard 폰트를 다운로드하여 matplotlib에 등록합니다
+    content: |-
+      import micropip
+      await micropip.install('pyodide-http')
+
+      import pyodide_http
+      pyodide_http.patch_all()
+
+      from matplotlib import font_manager
+      from js import fetch
+      from pathlib import Path
+
+      fontUrl = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Regular.otf"
+      response = await fetch(fontUrl)
+      fontBuffer = await response.arrayBuffer()
+
+      fontPath = Path("/tmp/Pretendard-Regular.otf")
+      fontPath.write_bytes(fontBuffer.to_py())
+
+      font_manager.fontManager.addfont(str(fontPath))
+      plt.rcParams['font.family'] = 'Pretendard'
+      plt.rcParams['axes.unicode_minus'] = False
+  - type: tip
+    content: Pyodide 환경에서는 fetch API로 외부 리소스를 가져옵니다. font_manager.addfont()로 폰트를 등록하고, rcParams로 기본 폰트를 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: sns.load_dataset()
+  blocks:
+  - type: text
+    content: seaborn의 load_dataset() 함수로 tips 데이터를 불러옵니다. 이 데이터셋은 244개의 레스토랑 결제 기록을 담고 있으며, 팁 예측 모델이나 고객 분석에 자주 사용됩니다.
+  - type: code
+    language: python
+    title: tips 데이터 로드
+    description: seaborn 내장 데이터셋을 불러옵니다
+    content: |-
+      tips = sns.load_dataset('tips')
+      tips.head()
+  - type: tip
+    content: sns.load_dataset('데이터셋명')은 seaborn에 내장된 예제 데이터를 불러옵니다. 'tips', 'iris', 'penguins', 'titanic' 등 다양한 데이터셋이 있습니다. 인터넷 연결이 필요하지만 한 번 다운로드하면 캐시됩니다.
+
+- id: step3_explore
+  title: 3단계. 데이터 탐색
+  subtitle: 기본 통계
+  blocks:
+  - type: text
+    content: 시각화 전에 데이터의 기본 통계를 확인합니다. describe()로 수치형 컬럼의 평균, 표준편차, 최소/최대값 등을 파악할 수 있습니다. 팁의 평균은 약 3달러, 총 결제금액의 평균은 약 20달러입니다.
+  - type: code
+    language: python
+    title: 기본 통계 확인
+    description: 수치형 컬럼의 요약 통계를 확인합니다
+    content: |-
+      tips.describe()
+
+- id: step4_hist
+  title: 4단계. 히스토그램 그리기
+  subtitle: ax.hist()
+  blocks:
+  - type: text
+    content: 히스토그램은 데이터의 분포를 보여주는 차트입니다. 값의 범위를 구간(bin)으로 나누고, 각 구간에 속하는 데이터 개수를 막대로 표시합니다. 팁 금액이 어디에 집중되어 있는지, 이상치가 있는지 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 팁 분포 히스토그램
+    description: 팁 금액의 분포를 히스토그램으로 표시합니다
+    content: |-
+      figHist, axHist = plt.subplots(figsize=(10, 6))
+      axHist.hist(tips['tip'], bins=20, color='steelblue', edgecolor='white')
+      axHist.set_title('팁 금액 분포', fontsize=14)
+      axHist.set_xlabel('팁 ($)', fontsize=12)
+      axHist.set_ylabel('빈도', fontsize=12)
+      figHist
+  - type: tip
+    content: ax.hist(데이터, bins=구간수)로 히스토그램을 그립니다. bins는 구간 개수로, 숫자가 클수록 세밀한 분포를 보여줍니다. 기본값은 10이며, 20~30 정도가 적당합니다. edgecolor로 막대 테두리 색상을 지정하면 구간 구분이 명확해집니다.
+
+- id: step5_hist_color
+  title: 5단계. 히스토그램 색상 설정
+  subtitle: color, alpha
+  blocks:
+  - type: text
+    content: 히스토그램의 색상과 투명도를 조정하면 더 보기 좋은 차트를 만들 수 있습니다. alpha로 투명도를 설정하면 여러 히스토그램을 겹쳐서 비교할 때 유용합니다.
+  - type: code
+    language: python
+    title: 색상과 투명도 설정
+    description: 색상과 투명도를 조정합니다
+    content: |-
+      figHist2, axHist2 = plt.subplots(figsize=(10, 6))
+      axHist2.hist(tips['tip'], bins=25, color='#E74C3C', edgecolor='white', alpha=0.7)
+      axHist2.set_title('팁 금액 분포', fontsize=14)
+      axHist2.set_xlabel('팁 ($)', fontsize=12)
+      axHist2.set_ylabel('빈도', fontsize=12)
+      axHist2.grid(True, alpha=0.3, axis='y')
+      figHist2
+
+- id: step6_boxplot
+  title: 6단계. 박스플롯 그리기
+  subtitle: ax.boxplot()
+  blocks:
+  - type: text
+    content: 박스플롯(상자 그림)은 데이터의 요약 통계를 시각화합니다. 중앙값, 사분위수, 이상치를 한눈에 파악할 수 있습니다. 상자의 중앙선은 중앙값, 상자의 상하단은 1사분위수(25%)와 3사분위수(75%), 수염은 최소/최대값(이상치 제외), 점은 이상치를 나타냅니다.
+  - type: code
+    language: python
+    title: 팁 박스플롯
+    description: 팁 금액의 요약 통계를 박스플롯으로 표시합니다
+    content: |-
+      figBox, axBox = plt.subplots(figsize=(8, 6))
+      axBox.boxplot(tips['tip'], vert=True)
+      axBox.set_title('팁 금액 분포 (박스플롯)', fontsize=14)
+      axBox.set_ylabel('팁 ($)', fontsize=12)
+      axBox.grid(True, alpha=0.3, axis='y')
+      figBox
+  - type: tip
+    content: ax.boxplot(데이터)로 박스플롯을 그립니다. vert=True는 수직(기본값), vert=False는 수평입니다. 박스 안의 선은 중앙값, 박스 범위는 IQR(사분위범위), 수염은 1.5*IQR 이내, 그 밖의 점은 이상치입니다.
+
+- id: step7_subplots
+  title: 7단계. 서브플롯으로 비교
+  subtitle: plt.subplots(nrows, ncols)
+  blocks:
+  - type: text
+    content: 서브플롯을 사용하면 여러 차트를 한 Figure에 배치할 수 있습니다. 히스토그램과 박스플롯을 나란히 배치하여 같은 데이터를 다른 관점에서 비교할 수 있습니다. nrows와 ncols로 행과 열 개수를 지정합니다.
+  - type: code
+    language: python
+    title: Figure 생성 및 히스토그램
+    description: 1행 2열로 배치하고 히스토그램을 그립니다
+    content: |-
+      figSub, (axSub1, axSub2) = plt.subplots(1, 2, figsize=(14, 5))
+
+      axSub1.hist(tips['tip'], bins=20, color='steelblue', edgecolor='white')
+      axSub1.set_title('팁 분포 (히스토그램)', fontsize=12)
+      axSub1.set_xlabel('팁 ($)')
+      axSub1.set_ylabel('빈도')
+      figSub
+  - type: code
+    language: python
+    title: 박스플롯 추가
+    description: 오른쪽 패널에 박스플롯을 그립니다
+    content: |-
+      axSub2.boxplot(tips['tip'], vert=True)
+      axSub2.set_title('팁 분포 (박스플롯)', fontsize=12)
+      axSub2.set_ylabel('팁 ($)')
+      plt.tight_layout()
+      figSub
+  - type: tip
+    content: plt.subplots(행, 열)로 여러 Axes를 생성합니다. 반환값은 (fig, axes)이며, axes는 배열입니다. 1x2면 axes[0], axes[1]로, 2x2면 axes[0,0], axes[0,1] 등으로 접근합니다. 튜플 언패킹으로 (ax1, ax2)처럼 받을 수도 있습니다.
+
+- id: step8_bill_hist
+  title: 8단계. 총 결제금액 분포
+  subtitle: 다른 변수 분석
+  blocks:
+  - type: text
+    content: 팁뿐만 아니라 총 결제금액(total_bill)의 분포도 분석해봅니다. 결제금액의 분포를 알면 레스토랑의 가격대나 고객 특성을 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 총 결제금액 분포
+    description: total_bill의 분포를 히스토그램으로 표시합니다
+    content: |-
+      figBill, axBill = plt.subplots(figsize=(10, 6))
+      axBill.hist(tips['total_bill'], bins=25, color='#27AE60', edgecolor='white', alpha=0.8)
+      axBill.set_title('총 결제금액 분포', fontsize=14)
+      axBill.set_xlabel('결제금액 ($)', fontsize=12)
+      axBill.set_ylabel('빈도', fontsize=12)
+      axBill.grid(True, alpha=0.3, axis='y')
+      figBill
+
+- id: step9_xlim
+  title: 9단계. 축 범위 설정
+  subtitle: set_xlim(), set_ylim()
+  blocks:
+  - type: text
+    content: 때로는 특정 범위에 집중하여 분석하고 싶을 때가 있습니다. set_xlim()과 set_ylim()으로 축의 표시 범위를 직접 설정할 수 있습니다. 이상치를 제외하고 주요 분포만 자세히 보고 싶을 때 유용합니다.
+  - type: code
+    language: python
+    title: 축 범위 설정
+    description: x축을 0~40으로 제한합니다
+    content: |-
+      figLim, axLim = plt.subplots(figsize=(10, 6))
+      axLim.hist(tips['total_bill'], bins=30, color='#3498DB', edgecolor='white')
+      axLim.set_title('총 결제금액 분포 (0~40$ 범위)', fontsize=14)
+      axLim.set_xlabel('결제금액 ($)', fontsize=12)
+      axLim.set_ylabel('빈도', fontsize=12)
+      axLim.set_xlim(0, 40)
+      axLim.grid(True, alpha=0.3)
+      figLim
+  - type: tip
+    content: ax.set_xlim(최소, 최대)로 x축 범위를, ax.set_ylim(최소, 최대)로 y축 범위를 설정합니다. 범위 밖의 데이터는 표시되지 않습니다. None을 사용하면 해당 방향은 자동으로 설정됩니다.
+
+- id: step10_final
+  title: 10단계. 최종 비교 시각화
+  subtitle: 2x2 서브플롯
+  blocks:
+  - type: text
+    content: 팁과 결제금액의 히스토그램, 박스플롯을 2x2 격자로 배치하여 종합적인 분포 분석 차트를 만듭니다. 이런 멀티 패널 차트는 데이터 탐색 초기 단계에서 전체적인 분포를 파악하는 데 매우 유용합니다.
+  - type: code
+    language: python
+    title: Figure 생성 및 팁 분포
+    description: 2x2 격자를 만들고 팁 히스토그램과 박스플롯을 그립니다
+    content: |-
+      figFinal, axes = plt.subplots(2, 2, figsize=(12, 10))
+
+      axes[0, 0].hist(tips['tip'], bins=20, color='#E74C3C', edgecolor='white')
+      axes[0, 0].set_title('팁 분포', fontsize=12)
+      axes[0, 0].set_xlabel('팁 ($)')
+      axes[0, 0].set_ylabel('빈도')
+
+      axes[0, 1].boxplot(tips['tip'])
+      axes[0, 1].set_title('팁 박스플롯', fontsize=12)
+      axes[0, 1].set_ylabel('팁 ($)')
+      figFinal
+  - type: code
+    language: python
+    title: 결제금액 분포 추가
+    description: 결제금액 히스토그램과 박스플롯을 그립니다
+    content: |-
+      axes[1, 0].hist(tips['total_bill'], bins=25, color='#27AE60', edgecolor='white')
+      axes[1, 0].set_title('결제금액 분포', fontsize=12)
+      axes[1, 0].set_xlabel('결제금액 ($)')
+      axes[1, 0].set_ylabel('빈도')
+
+      axes[1, 1].boxplot(tips['total_bill'])
+      axes[1, 1].set_title('결제금액 박스플롯', fontsize=12)
+      axes[1, 1].set_ylabel('결제금액 ($)')
+
+      plt.suptitle('레스토랑 팁 데이터 분포 분석', fontsize=16, fontweight='bold')
+      plt.tight_layout()
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 팁 데이터 분포 분석 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용해서 팁 데이터를 다양한 관점에서 분석해봅시다. hist, boxplot, subplots, xlim/ylim, color 등 모든 개념을 종합적으로 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 요일별 팁 분포 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        tips2 = sns.load_dataset('tips')
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart, panels = plt.subplots(2, 2, figsize=(12, 10))
+
+        days = ['Thur', 'Fri', 'Sat', 'Sun']
+        palette = ['#3498DB', '#E74C3C', '#27AE60', '#9B59B6']
+
+        for idx, day in enumerate(days):
+            row = idx // 2
+            col = idx % 2
+            subset = tips2[tips2['day'] == day]['tip']
+            panels[row, col].hist(subset, bins=15, color=palette[idx], edgecolor='white', alpha=0.8)
+            panels[row, col].set_title(f'{day} 팁 분포', fontsize=12)
+            panels[row, col].set_xlabel('팁 ($)')
+            panels[row, col].set_ylabel('빈도')
+            panels[row, col].set_xlim(0, 10)
+
+        plt.suptitle('요일별 팁 분포 비교', fontsize=16, fontweight='bold')
+        plt.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: 시간대별 결제금액 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        tips3 = sns.load_dataset('tips')
+        lunch = tips3[tips3['time'] == 'Lunch']['total_bill']
+        dinner = tips3[tips3['time'] == 'Dinner']['total_bill']
+    - type: code
+      title: "히스토그램"
+      content: |-
+        canvas, grid = plt.subplots(2, 2, figsize=(14, 10))
+
+        grid[0, 0].hist(lunch, bins=20, color='#F39C12', edgecolor='white', alpha=0.8)
+        grid[0, 0].set_title('점심 결제금액 분포', fontsize=12)
+        grid[0, 0].set_xlabel('결제금액 ($)')
+        grid[0, 0].set_ylabel('빈도')
+
+        grid[0, 1].hist(dinner, bins=20, color='#8E44AD', edgecolor='white', alpha=0.8)
+        grid[0, 1].set_title('저녁 결제금액 분포', fontsize=12)
+        grid[0, 1].set_xlabel('결제금액 ($)')
+        grid[0, 1].set_ylabel('빈도')
+    - type: code
+      title: "박스플롯"
+      content: |-
+        grid[1, 0].boxplot([lunch, dinner], labels=['Lunch', 'Dinner'])
+        grid[1, 0].set_title('시간대별 결제금액 비교', fontsize=12)
+        grid[1, 0].set_ylabel('결제금액 ($)')
+
+        grid[1, 1].boxplot([tips3[tips3['time'] == 'Lunch']['tip'],
+                            tips3[tips3['time'] == 'Dinner']['tip']],
+                           labels=['Lunch', 'Dinner'])
+        grid[1, 1].set_title('시간대별 팁 비교', fontsize=12)
+        grid[1, 1].set_ylabel('팁 ($)')
+
+        plt.suptitle('시간대별 결제 패턴 분석', fontsize=16, fontweight='bold')
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 히스토그램과 박스플롯으로 데이터 분포를 분석했습니다.
+  - type: list
+    items:
+    - "ax.hist(data, bins) - 히스토그램으로 분포 시각화"
+    - "ax.boxplot(data) - 박스플롯으로 요약 통계 시각화"
+    - "plt.subplots(rows, cols) - 여러 차트를 한 Figure에 배치"
+    - "color, alpha, edgecolor - 색상과 투명도 설정"
+    - "set_xlim(), set_ylim() - 축 범위 설정"
+    - "plt.suptitle() - 전체 Figure의 제목"
+  - type: text
+    content: 다음 시간에는 붓꽃 데이터로 산점도와 마커 스타일을 배웁니다.

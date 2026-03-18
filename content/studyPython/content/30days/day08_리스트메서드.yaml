@@ -1,0 +1,689 @@
+meta:
+  id: "day08"
+  title: "리스트메서드"
+  day: 8
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 리스트 메서드 - 리스트 조작 완벽 가이드"
+    description: "append, insert, remove, pop, sort, reverse 등 리스트 메서드를 배웁니다."
+    keywords: ['리스트메서드', 'append', 'insert', 'remove', 'pop', 'sort']
+
+intro:
+  emoji: "🔧"
+  points:
+  - "append/insert로 요소 추가"
+  - "remove/pop으로 요소 삭제"
+  - "sort/reverse로 정렬과 뒤집기"
+  - "extend/copy로 리스트 확장과 복사"
+
+sections:
+- id: "method_intro"
+  title: "리스트 메서드란?"
+  subtitle: "리스트를 조작하는 내장 함수"
+  blocks:
+  - type: "text"
+    content: "메서드(Method)는 객체가 가지고 있는 함수입니다. 리스트에는 요소를 추가, 삭제, 정렬하는 다양한 메서드가 내장되어 있습니다. 메서드는 리스트 이름 뒤에 점(.)을 찍고 메서드 이름을 쓰는 형식으로 사용합니다. 대부분의 리스트 메서드는 원본 리스트를 직접 변경하며 None을 반환합니다."
+  - type: "list"
+    items:
+    - "list.method() 형식으로 사용"
+    - "원본 리스트를 직접 수정"
+    - "대부분 None을 반환"
+    - "리스트 조작의 핵심 도구"
+  - type: "code"
+    language: "python"
+    title: "메서드 사용 예시"
+    description: "리스트 메서드의 기본 사용법입니다."
+    content: |-
+      nums = [1, 2, 3]
+      nums.append(4)
+      nums
+  - type: "tip"
+    content: "메서드는 원본을 변경하므로 사용 후 리스트가 달라집니다."
+
+- id: "append_method"
+  title: "append() 메서드"
+  subtitle: "리스트 끝에 요소 추가"
+  blocks:
+  - type: "text"
+    content: "append() 메서드는 리스트의 끝에 새로운 요소를 추가합니다. 괄호 안에 추가할 값을 넣으면 리스트 마지막에 그 값이 추가됩니다. 원본 리스트가 직접 변경되며, None을 반환합니다. 리스트를 점진적으로 만들어갈 때 가장 많이 사용하는 메서드입니다."
+  - type: "list"
+    items:
+    - "list.append(값) 형식"
+    - "리스트 끝에 요소 추가"
+    - "원본 리스트 직접 변경"
+    - "반환값은 None"
+  - type: "code"
+    language: "python"
+    title: "append로 요소 추가"
+    description: "리스트 끝에 새로운 요소를 추가합니다."
+    content: |-
+      fruits = ['사과', '바나나']
+      fruits.append('오렌지')
+      fruits.append('포도')
+      fruits
+  - type: "tip"
+    content: "append()는 한 번에 하나의 요소만 추가합니다."
+
+- id: "insert_method"
+  title: "insert() 메서드"
+  subtitle: "원하는 위치에 요소 추가"
+  blocks:
+  - type: "text"
+    content: "insert() 메서드는 리스트의 특정 위치에 요소를 추가합니다. 첫 번째 인수로 인덱스를, 두 번째 인수로 추가할 값을 받습니다. 그 위치에 값이 삽입되고, 기존 요소들은 뒤로 밀립니다. append()와 달리 원하는 위치에 정확히 추가할 수 있습니다."
+  - type: "list"
+    items:
+    - "list.insert(인덱스, 값) 형식"
+    - "특정 위치에 요소 삽입"
+    - "기존 요소는 뒤로 이동"
+    - "순서가 중요할 때 유용"
+  - type: "code"
+    language: "python"
+    title: "insert로 특정 위치에 추가"
+    description: "원하는 위치에 정확히 요소를 삽입합니다."
+    content: |-
+      colors = ['빨강', '파랑']
+      colors.insert(1, '초록')
+      colors
+  - type: "tip"
+    content: "insert(0, 값)은 리스트 맨 앞에 추가합니다."
+
+- id: "remove_method"
+  title: "remove() 메서드"
+  subtitle: "값으로 요소 삭제"
+  blocks:
+  - type: "text"
+    content: "remove() 메서드는 리스트에서 특정 값을 찾아 삭제합니다. 괄호 안에 삭제할 값을 넣으면 그 값이 처음 나타나는 위치에서 제거됩니다. 같은 값이 여러 개 있어도 첫 번째 것만 삭제됩니다. 값이 리스트에 없으면 에러가 발생합니다."
+  - type: "list"
+    items:
+    - "list.remove(값) 형식"
+    - "해당 값을 찾아 삭제"
+    - "첫 번째로 발견된 값만 삭제"
+    - "값이 없으면 에러 발생"
+  - type: "code"
+    language: "python"
+    title: "remove로 값 삭제"
+    description: "특정 값을 찾아서 삭제합니다."
+    content: |-
+      items = ['사과', '바나나', '오렌지', '바나나']
+      items.remove('바나나')
+      items
+  - type: "tip"
+    content: "값이 여러 개 있어도 첫 번째 것만 삭제됩니다."
+
+- id: "pop_method"
+  title: "pop() 메서드"
+  subtitle: "인덱스로 요소 삭제하고 반환"
+  blocks:
+  - type: "text"
+    content: "pop() 메서드는 리스트에서 특정 인덱스의 요소를 제거하고 그 값을 반환합니다. 괄호 안에 인덱스를 넣으면 그 위치의 요소가 삭제됩니다. 인덱스를 생략하면 마지막 요소가 삭제됩니다. remove()와 달리 삭제된 값을 받을 수 있어 유용합니다."
+  - type: "list"
+    items:
+    - "list.pop() 또는 list.pop(인덱스)"
+    - "요소를 삭제하고 값을 반환"
+    - "인덱스 생략시 마지막 요소 삭제"
+    - "삭제된 값을 사용 가능"
+  - type: "code"
+    language: "python"
+    title: "마지막 요소 pop"
+    description: "pop()으로 마지막 요소를 삭제하고 반환합니다."
+    content: |-
+      nums = [10, 20, 30, 40, 50]
+      nums.pop()
+  - type: "code"
+    language: "python"
+    title: "첫 번째 요소 pop"
+    description: "pop(0)으로 첫 번째 요소를 삭제하고 반환합니다."
+    content: |-
+      vals = [10, 20, 30, 40, 50]
+      vals.pop(0)
+  - type: "tip"
+    content: "pop()은 스택(stack) 자료구조 구현에 자주 사용됩니다."
+
+- id: "clear_method"
+  title: "clear() 메서드"
+  subtitle: "모든 요소 삭제"
+  blocks:
+  - type: "text"
+    content: "clear() 메서드는 리스트의 모든 요소를 삭제하여 빈 리스트로 만듭니다. 리스트 자체는 그대로 유지되고 내용만 비워집니다. 리스트를 초기화할 때 사용합니다. 변수에 []를 할당하는 것과 비슷하지만, 같은 리스트를 참조하는 다른 변수가 있을 때 차이가 있습니다."
+  - type: "list"
+    items:
+    - "list.clear() 형식"
+    - "모든 요소 삭제"
+    - "빈 리스트가 됨"
+    - "리스트 초기화에 사용"
+  - type: "code"
+    language: "python"
+    title: "clear로 모두 삭제"
+    description: "리스트의 모든 요소를 삭제합니다."
+    content: |-
+      nums = [1, 2, 3, 4, 5]
+      nums.clear()
+      nums
+  - type: "tip"
+    content: "clear()는 리스트를 재사용할 때 유용합니다."
+
+- id: "extend_method"
+  title: "extend() 메서드"
+  subtitle: "리스트 합치기"
+  blocks:
+  - type: "text"
+    content: "extend() 메서드는 리스트에 다른 리스트의 모든 요소를 추가합니다. + 연산자와 비슷하지만, + 는 새 리스트를 만들고 extend()는 원본 리스트를 변경합니다. 여러 요소를 한 번에 추가할 때 append()를 반복하는 것보다 효율적입니다."
+  - type: "list"
+    items:
+    - "list.extend(다른리스트) 형식"
+    - "다른 리스트의 모든 요소 추가"
+    - "원본 리스트 직접 변경"
+    - "+ 연산자보다 메모리 효율적"
+  - type: "code"
+    language: "python"
+    title: "extend로 리스트 확장"
+    description: "다른 리스트의 모든 요소를 추가합니다."
+    content: |-
+      base = [1, 2, 3]
+      extra = [4, 5, 6]
+      base.extend(extra)
+      base
+  - type: "tip"
+    content: "append([4,5,6])은 리스트를 통째로 추가하지만, extend([4,5,6])은 요소들을 개별적으로 추가합니다."
+
+- id: "sort_method"
+  title: "sort() 메서드"
+  subtitle: "리스트 정렬"
+  blocks:
+  - type: "text"
+    content: "sort() 메서드는 리스트의 요소를 오름차순으로 정렬합니다. 숫자는 작은 것부터, 문자열은 사전 순으로 정렬됩니다. reverse=True 인수를 주면 내림차순으로 정렬됩니다. 원본 리스트가 직접 변경되며, None을 반환합니다."
+  - type: "list"
+    items:
+    - "list.sort() 형식"
+    - "오름차순 정렬 (기본)"
+    - "reverse=True로 내림차순"
+    - "원본 리스트 직접 변경"
+  - type: "code"
+    language: "python"
+    title: "오름차순 정렬"
+    description: "sort()로 리스트를 오름차순으로 정렬합니다."
+    content: |-
+      data = [5, 2, 8, 1, 9]
+      data.sort()
+      data
+  - type: "code"
+    language: "python"
+    title: "내림차순 정렬"
+    description: "sort(reverse=True)로 내림차순으로 정렬합니다."
+    content: |-
+      scores = [5, 2, 8, 1, 9]
+      scores.sort(reverse=True)
+      scores
+  - type: "tip"
+    content: "sorted() 함수는 원본을 유지하고 정렬된 새 리스트를 반환합니다."
+
+- id: "reverse_method"
+  title: "reverse() 메서드"
+  subtitle: "리스트 뒤집기"
+  blocks:
+  - type: "text"
+    content: "reverse() 메서드는 리스트의 순서를 완전히 뒤집습니다. 첫 번째와 마지막, 두 번째와 끝에서 두 번째 같은 식으로 위치를 바꿉니다. 정렬과는 다르며, 단순히 순서만 반대로 만듭니다. 원본 리스트가 직접 변경됩니다."
+  - type: "list"
+    items:
+    - "list.reverse() 형식"
+    - "순서를 완전히 반대로"
+    - "정렬과는 다른 개념"
+    - "원본 리스트 직접 변경"
+  - type: "code"
+    language: "python"
+    title: "reverse로 뒤집기"
+    description: "리스트의 순서를 반대로 만듭니다."
+    content: |-
+      chars = ['A', 'B', 'C', 'D', 'E']
+      chars.reverse()
+      chars
+  - type: "tip"
+    content: "[::-1] 슬라이싱도 리스트를 뒤집지만 새 리스트를 만듭니다."
+
+- id: "copy_method"
+  title: "copy() 메서드"
+  subtitle: "리스트 복사"
+  blocks:
+  - type: "text"
+    content: "copy() 메서드는 리스트의 얕은 복사본을 만듭니다. 원본과 똑같은 내용의 새로운 리스트가 생성됩니다. 단순히 변수에 할당(=)하면 같은 리스트를 참조하지만, copy()는 완전히 독립적인 리스트를 만듭니다. 한쪽을 변경해도 다른 쪽에 영향을 주지 않습니다."
+  - type: "list"
+    items:
+    - "list.copy() 형식"
+    - "독립적인 새 리스트 생성"
+    - "원본과 복사본은 서로 독립적"
+    - "= 할당과는 다름"
+  - type: "code"
+    language: "python"
+    title: "copy로 복사"
+    description: "원본과 독립적인 리스트를 만듭니다."
+    content: |-
+      orig = [1, 2, 3]
+      copy = orig.copy()
+      copy.append(4)
+      copy
+  - type: "tip"
+    content: "list[:] 슬라이싱도 복사본을 만듭니다."
+
+- id: "count_method"
+  title: "count() 메서드"
+  subtitle: "요소 개수 세기"
+  blocks:
+  - type: "text"
+    content: "count() 메서드는 리스트에서 특정 값이 몇 번 나타나는지 세어줍니다. 괄호 안에 찾을 값을 넣으면 그 값의 개수를 반환합니다. 값이 없으면 0을 반환합니다. 리스트를 변경하지 않고 정보만 알려줍니다."
+  - type: "list"
+    items:
+    - "list.count(값) 형식"
+    - "특정 값의 개수 반환"
+    - "없으면 0 반환"
+    - "리스트는 변경 안됨"
+  - type: "code"
+    language: "python"
+    title: "값 개수 세기"
+    description: "count()로 특정 값이 몇 번 나타나는지 셉니다."
+    content: |-
+      nums = [1, 2, 3, 2, 4, 2, 5]
+      nums.count(2)
+  - type: "code"
+    language: "python"
+    title: "없는 값 개수"
+    description: "없는 값을 세면 0을 반환합니다."
+    content: |-
+      arr = [1, 2, 3, 2, 4, 2, 5]
+      arr.count(6)
+  - type: "tip"
+    content: "count()는 데이터 분석에서 빈도 계산에 유용합니다."
+
+- id: "index_method"
+  title: "index() 메서드"
+  subtitle: "요소 위치 찾기"
+  blocks:
+  - type: "text"
+    content: "index() 메서드는 리스트에서 특정 값이 처음 나타나는 위치의 인덱스를 반환합니다. 같은 값이 여러 개 있어도 첫 번째 위치만 알려줍니다. 값이 리스트에 없으면 에러가 발생합니다. 요소의 위치를 알아야 할 때 사용합니다."
+  - type: "list"
+    items:
+    - "list.index(값) 형식"
+    - "값의 첫 번째 인덱스 반환"
+    - "값이 없으면 에러 발생"
+    - "위치 파악에 유용"
+  - type: "code"
+    language: "python"
+    title: "첫 번째 위치 찾기"
+    description: "index()로 값의 첫 번째 위치를 찾습니다."
+    content: |-
+      fruits = ['사과', '바나나', '오렌지', '바나나']
+      fruits.index('바나나')
+  - type: "code"
+    language: "python"
+    title: "다른 값 위치 찾기"
+    description: "다른 값의 인덱스를 찾습니다."
+    content: |-
+      basket = ['사과', '바나나', '오렌지', '바나나']
+      basket.index('오렌지')
+  - type: "tip"
+    content: "in 연산자로 값의 존재 여부를 먼저 확인한 후 index()를 사용하면 안전합니다."
+
+- id: "practice"
+  title: "Day 8 종합 복습"
+  subtitle: "리스트 메서드 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 8에서 배운 리스트 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: append 사용"
+    code: |-
+      lst = [1, 2, 3]
+      lst.append(4)
+      lst.append(5)
+      lst
+
+  - type: "expansion"
+    title: "🟢 기본2: remove 사용"
+    code: |-
+      fruits = ['사과', '바나나', '오렌지']
+      fruits.remove('바나나')
+      fruits
+
+  - type: "expansion"
+    title: "🟢 기본3: sort 사용"
+    code: |-
+      digits = [5, 2, 8, 1, 9]
+      digits.sort()
+      digits
+
+  - type: "expansion"
+    title: "🟢 기본4: reverse 사용"
+    code: |-
+      arr = [1, 2, 3, 4, 5]
+      arr.reverse()
+      arr
+
+  - type: "expansion"
+    title: "🟢 기본5: pop 사용"
+    blocks:
+    - type: "code"
+      title: "리스트 상태"
+      content: |-
+        nums = [10, 20, 30, 40]
+        last = nums.pop()
+        print('list:', nums)
+    - type: "code"
+      title: "제거된 값"
+      content: |-
+        vals = [10, 20, 30, 40]
+        removed = vals.pop()
+        print('removed:', removed)
+
+  - type: "expansion"
+    title: "🟡 응용1: 할일 목록 관리"
+    blocks:
+    - type: "code"
+      title: "남은 할일"
+      content: |-
+        todos = ['운동', '공부']
+        todos.append('독서')
+        todos.insert(1, '아침식사')
+        done = todos.pop(0)
+        print('todos:', todos)
+    - type: "code"
+      title: "완료한 할일"
+      content: |-
+        tasks = ['운동', '공부']
+        tasks.append('독서')
+        tasks.insert(1, '아침식사')
+        completed = tasks.pop(0)
+        print('completed:', completed)
+
+  - type: "expansion"
+    title: "🟡 응용2: 점수 정렬"
+    blocks:
+    - type: "code"
+      title: "원본"
+      content: |-
+        scores = [85, 92, 78, 95, 88]
+        print('original:', scores)
+    - type: "code"
+      title: "오름차순"
+      content: |-
+        grades = [85, 92, 78, 95, 88]
+        asc = grades[:]
+        asc.sort()
+        print('ascending:', asc)
+    - type: "code"
+      title: "내림차순"
+      content: |-
+        marks = [85, 92, 78, 95, 88]
+        desc = marks[:]
+        desc.sort(reverse=True)
+        print('descending:', desc)
+
+  - type: "expansion"
+    title: "🟡 응용3: 장바구니 수정"
+    blocks:
+    - type: "code"
+      title: "장바구니 내용"
+      content: |-
+        cart = ['우유', '빵', '계란']
+        cart.append('사과')
+        cart.remove('빵')
+        cart.insert(0, '물')
+        print('cart:', cart)
+    - type: "code"
+      title: "아이템 개수"
+      content: |-
+        basket = ['우유', '빵', '계란']
+        basket.append('사과')
+        basket.remove('빵')
+        basket.insert(0, '물')
+        count = len(basket)
+        print('items:', count)
+
+  - type: "expansion"
+    title: "🟡 응용4: 학생 명단 관리"
+    blocks:
+    - type: "code"
+      title: "전체 학생"
+      content: |-
+        students = ['김철수', '이영희', '박민수']
+        students.append('정지은')
+        students.sort()
+        print('students:', students)
+    - type: "code"
+      title: "첫 번째 학생"
+      content: |-
+        pupils = ['김철수', '이영희', '박민수']
+        pupils.append('정지은')
+        pupils.sort()
+        first = pupils[0]
+        print('first:', first)
+    - type: "code"
+      title: "마지막 학생"
+      content: |-
+        members = ['김철수', '이영희', '박민수']
+        members.append('정지은')
+        members.sort()
+        last = members[-1]
+        print('last:', last)
+
+  - type: "expansion"
+    title: "🟡 응용5: 숫자 목록 조작"
+    blocks:
+    - type: "code"
+      title: "리스트"
+      content: |-
+        nums = [3, 1, 4, 1, 5]
+        nums.extend([9, 2, 6])
+        print('list:', nums)
+    - type: "code"
+      title: "1의 개수"
+      content: |-
+        data = [3, 1, 4, 1, 5]
+        data.extend([9, 2, 6])
+        cnt = data.count(1)
+        print('count_1:', cnt)
+    - type: "code"
+      title: "4의 위치"
+      content: |-
+        arr = [3, 1, 4, 1, 5]
+        arr.extend([9, 2, 6])
+        idx = arr.index(4)
+        print('index_4:', idx)
+
+  - type: "expansion"
+    title: "🔴 심화1: 재고 관리 시스템"
+    blocks:
+    - type: "code"
+      title: "제품 목록"
+      content: |-
+        products = ['노트북', '마우스', '키보드']
+        products.append('모니터')
+        print('products:', products)
+    - type: "code"
+      title: "재고 수량"
+      content: |-
+        items = ['노트북', '마우스', '키보드']
+        stock = [5, 20, 15]
+        items.append('모니터')
+        stock.append(8)
+        idx = items.index('마우스')
+        stock[idx] = stock[idx] - 5
+        print('stock:', stock)
+    - type: "code"
+      title: "재고 부족 제품"
+      content: |-
+        goods = ['노트북', '마우스', '키보드', '모니터']
+        qty = [5, 15, 15, 8]
+        low = []
+        i = 0
+        while i < len(qty):
+            if qty[i] < 10:
+                low.append(goods[i])
+            i = i + 1
+        print('low_stock:', low)
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 플레이리스트 추가 및 재생"
+    blocks:
+    - type: "code"
+      title: "현재 플레이리스트"
+      content: |-
+        playlist = ['노래1', '노래2', '노래3']
+        playlist.extend(['노래4', '노래5'])
+        playlist.insert(2, '새노래')
+        played = playlist.pop(0)
+        print('current:', playlist)
+    - type: "code"
+      title: "재생한 노래"
+      content: |-
+        tracks = ['노래1', '노래2', '노래3']
+        tracks.extend(['노래4', '노래5'])
+        tracks.insert(2, '새노래')
+        current = tracks.pop(0)
+        print('played:', current)
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 플레이리스트 정렬"
+    blocks:
+    - type: "code"
+      title: "정렬된 복사본"
+      content: |-
+        songs = ['새노래', '노래2', '노래3', '노래4', '노래5']
+        songs.reverse()
+        clone = songs.copy()
+        clone.sort()
+        print('sorted_copy:', clone)
+    - type: "code"
+      title: "전체 개수"
+      content: |-
+        music = ['새노래', '노래2', '노래3', '노래4', '노래5']
+        print('total:', len(music))
+
+  - type: "expansion"
+    title: "🔴 심화3: 메시지 큐"
+    blocks:
+    - type: "code"
+      title: "남은 큐"
+      content: |-
+        queue = []
+        queue.append('메시지1')
+        queue.append('메시지2')
+        queue.append('메시지3')
+        done = []
+        done.append(queue.pop(0))
+        done.append(queue.pop(0))
+        print('queue:', queue)
+    - type: "code"
+      title: "처리된 메시지"
+      content: |-
+        msgs = []
+        msgs.append('메시지1')
+        msgs.append('메시지2')
+        msgs.append('메시지3')
+        handled = []
+        handled.append(msgs.pop(0))
+        handled.append(msgs.pop(0))
+        print('processed:', handled)
+    - type: "code"
+      title: "남은 개수"
+      content: |-
+        buffer = []
+        buffer.append('메시지1')
+        buffer.append('메시지2')
+        buffer.append('메시지3')
+        sent = []
+        sent.append(buffer.pop(0))
+        sent.append(buffer.pop(0))
+        remaining = len(buffer)
+        print('remaining:', remaining)
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 투표 개수 집계"
+    blocks:
+    - type: "code"
+      title: "전체 투표"
+      content: |-
+        votes = ['A', 'B', 'A', 'C', 'A', 'B', 'A', 'C', 'A']
+        print('votes:', votes)
+    - type: "code"
+      title: "A 득표수"
+      content: |-
+        ballots = ['A', 'B', 'A', 'C', 'A', 'B', 'A', 'C', 'A']
+        countA = ballots.count('A')
+        print('A:', countA)
+    - type: "code"
+      title: "B 득표수"
+      content: |-
+        poll = ['A', 'B', 'A', 'C', 'A', 'B', 'A', 'C', 'A']
+        countB = poll.count('B')
+        print('B:', countB)
+    - type: "code"
+      title: "C 득표수"
+      content: |-
+        choices = ['A', 'B', 'A', 'C', 'A', 'B', 'A', 'C', 'A']
+        countC = choices.count('C')
+        print('C:', countC)
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 투표 결과 분석"
+    code: |-
+      cntA = 5
+      cntB = 2
+      cntC = 2
+      results = [cntA, cntB, cntC]
+      top = results[0]
+      if results[1] > top:
+          top = results[1]
+      if results[2] > top:
+          top = results[2]
+      winner = 'A'
+      if top == cntB:
+          winner = 'B'
+      if top == cntC:
+          winner = 'C'
+      print('winner:', winner)
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 게임 플레이어 추가"
+    blocks:
+    - type: "code"
+      title: "플레이어 목록"
+      content: |-
+        players = ['철수', '영희', '민수', '지은']
+        player = '동욱'
+        players.append(player)
+        print('players:', players)
+    - type: "code"
+      title: "점수 목록"
+      content: |-
+        gamers = ['철수', '영희', '민수', '지은']
+        scores = [1500, 2300, 1800, 2100]
+        score = 1900
+        scores.append(score)
+        print('scores:', scores)
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 게임 랭킹 분석"
+    blocks:
+    - type: "code"
+      title: "점수 랭킹"
+      content: |-
+        points = [1500, 2300, 1800, 2100, 1900]
+        ranking = points.copy()
+        ranking.sort(reverse=True)
+        print('ranking:', ranking)
+    - type: "code"
+      title: "상위 3명"
+      content: |-
+        scores = [1500, 2300, 1800, 2100, 1900]
+        rank = scores.copy()
+        rank.sort(reverse=True)
+        top3 = rank[:3]
+        print('top_3:', top3)
+    - type: "code"
+      title: "영희 점수"
+      content: |-
+        names = ['철수', '영희', '민수', '지은', '동욱']
+        scores = [1500, 2300, 1800, 2100, 1900]
+        value = scores[names.index('영희')]
+        print('younghee_score:', target)

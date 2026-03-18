@@ -1,0 +1,267 @@
+meta:
+  id: plotly_01
+  title: 세계기대수명비교
+  order: 1
+  category: plotly
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["gapminder", "bar", "color", "기초"]
+  seo:
+    title: "Plotly Express 막대 그래프 - 대륙별 기대수명 비교"
+    description: "gapminder 데이터로 대륙별 기대수명을 막대 그래프로 시각화합니다. px.bar, color, title 사용법을 배웁니다."
+    keywords: ["plotly express", "px.bar", "막대그래프", "gapminder", "기대수명"]
+
+intro:
+  emoji: "🌍"
+  goal: 대륙별 평균 기대수명을 막대 그래프로 비교합니다.
+  description: Plotly Express로 첫 번째 시각화를 만듭니다. 데이터 로드 → 집계 → 시각화의 흐름을 익힙니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: Plotly Express는 파이썬에서 인터랙티브 시각화를 만드는 강력한 라이브러리입니다. 정적 이미지만 제공하는 matplotlib와 달리, 마우스로 확대/축소/이동이 가능하고 호버 시 상세 정보를 볼 수 있습니다. 웹 브라우저에서 직접 작동하므로 별도 설치 없이 사용자가 데이터를 탐색할 수 있고, HTML로 저장하면 프레젠테이션이나 보고서에 바로 삽입할 수 있습니다. 특히 웹 기반 대시보드나 데이터 탐색에 매우 효과적입니다. pandas는 데이터를 불러오고 가공하는 데 사용하며, Plotly Express와 완벽하게 호환됩니다. 두 라이브러리를 함께 사용하면 데이터 분석부터 시각화까지 한 번에 처리할 수 있습니다. Plotly Express의 px라는 짧은 이름은 데이터 과학 커뮤니티의 표준 관례로, 코드 가독성을 높여줍니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: plotly.express를 px로, pandas를 pd로 불러옵니다
+    content: |-
+      import plotly.express as px
+      import pandas as pd
+  - type: tip
+    content: import plotly.express as px는 plotly.express 라이브러리를 px라는 짧은 이름으로 불러오는 관례입니다. px.bar(), px.scatter()처럼 짧고 직관적으로 사용할 수 있습니다. import pandas as pd와 마찬가지로, 데이터 과학 커뮤니티에서 널리 사용하는 표준 방식입니다. as 키워드는 alias(별칭)를 만드는 것으로, plotly.express.bar(...) 대신 px.bar(...)로 간결하게 작성할 수 있어 코드 타이핑을 크게 줄여줍니다. 실무에서는 수십 개의 차트를 만들기 때문에 이런 짧은 표기법이 생산성에 큰 영향을 미칩니다.
+
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  subtitle: px.data.gapminder()
+  blocks:
+  - type: text
+    content: gapminder는 세계 각국의 발전 지표를 담은 유명한 데이터셋입니다. 1952년부터 2007년까지 5년 단위로 기대수명(lifeExp), 인구(pop), 1인당 GDP(gdpPercap) 등이 기록되어 있습니다. 이 데이터는 Hans Rosling 교수가 세계 발전 상황을 설명하는 데 사용했던 것으로, 경제 발전과 건강 수준의 관계를 명확히 보여줍니다. Plotly Express는 이런 유용한 데이터를 내장하고 있어 별도로 CSV를 다운로드하거나 URL을 찾을 필요가 없습니다. 실무에서는 공공 데이터 포털이나 API에서 데이터를 받지만, 학습 단계에서는 이렇게 내장 데이터로 빠르게 시각화 기법을 익힐 수 있습니다.
+  - type: code
+    language: python
+    title: gapminder 데이터 로드
+    description: px.data.gapminder()로 데이터를 불러옵니다
+    content: |-
+      df = px.data.gapminder()
+  - type: tip
+    content: px.data.gapminder()는 Plotly Express에 내장된 데이터셋을 불러오는 함수입니다. 괄호()를 붙여야 실제 데이터가 로드됩니다. 다른 내장 데이터로는 px.data.iris()(붓꽃 품종 데이터), px.data.tips()(레스토랑 팁 데이터), px.data.stocks()(주식 시계열 데이터) 등이 있으며, 모두 연습용으로 매우 유용합니다. 각 데이터셋은 특정 시각화 기법을 학습하기에 최적화되어 있어 튜토리얼과 문서 예제에서 널리 사용됩니다.
+
+- id: step3_explore
+  title: 3단계. 데이터 확인
+  subtitle: df.head(), df.shape
+  blocks:
+  - type: text
+    content: 데이터를 분석하기 전에 먼저 구조를 파악하는 것이 중요합니다. head() 메서드는 처음 5개 행을 보여줘서 어떤 형태인지 빠르게 확인할 수 있습니다. gapminder 데이터는 1704개의 행(각 국가의 연도별 기록)과 8개의 열(변수)로 구성되어 있습니다. 주요 컬럼으로는 country(국가명), continent(대륙), year(연도), lifeExp(기대수명), pop(인구), gdpPercap(1인당 GDP) 등이 있습니다. 이 정보를 통해 경제 발전과 건강 수준의 관계를 분석할 수 있습니다.
+  - type: code
+    language: python
+    title: 데이터 미리보기
+    description: 처음 5행을 확인합니다
+    content: |-
+      df.head()
+  - type: tip
+    content: head() 메서드는 DataFrame의 처음 5개 행을 반환합니다. 인자를 전달하면 원하는 개수만큼 볼 수 있습니다(예. head(10)). 반대로 tail()은 마지막 N개 행을 보여줍니다. info() 메서드를 사용하면 각 컬럼의 데이터 타입, null 개수, 메모리 사용량 등 더 상세한 정보를 확인할 수 있습니다. describe()는 수치형 컬럼의 평균, 표준편차, 최소값, 최대값, 사분위수를 요약해줍니다. 데이터 탐색의 첫 단계에서는 이 세 가지 메서드(head, info, describe)를 순서대로 사용하는 것이 표준 워크플로우입니다.
+
+- id: step4_columns
+  title: 4단계. 컬럼 확인
+  subtitle: df.columns
+  blocks:
+  - type: text
+    content: columns 속성은 DataFrame에 포함된 모든 열(컬럼)의 이름을 보여줍니다. 시각화를 만들 때 정확한 컬럼명을 알아야 x축, y축, 색상 등에 지정할 수 있기 때문에 이 단계는 필수적입니다. 예를 들어 기대수명을 시각화하려면 lifeExp라는 정확한 이름을 사용해야 하며, LifeExp나 life_exp처럼 다르게 쓰면 에러가 발생합니다. Python은 대소문자를 구분하므로 컬럼명을 정확히 기억하거나 복사해서 사용하는 것이 좋습니다. 데이터 탐색의 첫 단계에서 반드시 확인해야 할 정보입니다.
+  - type: code
+    language: python
+    title: 컬럼 목록
+    description: 데이터에 포함된 컬럼들을 확인합니다
+    content: |-
+      df.columns
+  - type: tip
+    content: columns는 DataFrame의 속성으로, 괄호() 없이 사용합니다. Index 객체를 반환하며, 리스트로 변환하려면 df.columns.tolist()를 사용할 수 있습니다. shape 속성은 (행 개수, 열 개수) 튜플을 반환하여 데이터 크기를 파악할 수 있습니다. dtypes 속성은 각 컬럼의 데이터 타입(int64, float64, object 등)을 보여줍니다. 실무에서는 컬럼명이 수십 개일 수 있으므로, 특정 패턴을 포함하는 컬럼을 찾을 때 [col for col in df.columns if 'price' in col]처럼 리스트 컴프리헨션을 사용하기도 합니다.
+
+- id: step5_filter
+  title: 5단계. 최근 연도 필터링
+  subtitle: 조건 필터링
+  blocks:
+  - type: text
+    content: gapminder 데이터는 1952년부터 2007년까지 여러 연도를 포함하고 있어, 시계열 분석도 가능하지만 여기서는 특정 시점의 스냅샷이 필요합니다. 대륙별 기대수명을 비교하려면 같은 시점의 데이터만 사용해야 공정한 비교가 가능하므로, 가장 최근인 2007년 데이터만 추출합니다. 이렇게 조건 필터링을 하면 142개 국가의 2007년 기록만 남게 되어, 1704개 행이 142개 행으로 줄어듭니다. DataFrame에서 조건 필터링은 df[조건]의 형태로 작성하며, df['year'] == 2007은 year 컬럼 값이 2007과 같은 행만 True로 표시하여 선택하라는 불리언 인덱싱(Boolean Indexing) 방식입니다. 이는 pandas 데이터 처리의 가장 기본적이고 강력한 기능입니다.
+  - type: code
+    language: python
+    title: 2007년 데이터 필터링
+    description: year가 2007인 행만 선택합니다
+    content: |-
+      df2007 = df[df['year'] == 2007]
+      df2007.shape
+  - type: tip
+    content: "불리언 인덱싱은 df[조건] 형태로 사용하며, 조건에는 비교 연산자(==, !=, >, <, >=, <=)를 사용합니다. 여러 조건을 결합할 때는 &(and), |(or), ~(not)을 사용하며, 각 조건을 괄호로 감싸야 합니다. 예를 들어 df[(df['year'] == 2007) & (df['continent'] == 'Asia')]는 2007년 아시아 데이터만 선택합니다. query() 메서드를 사용하면 더 읽기 쉬운 형태로 작성할 수 있습니다: df.query('year == 2007 and continent == \"Asia\"'). isin() 메서드로 여러 값 중 하나와 일치하는 행을 선택할 수도 있습니다: df[df['year'].isin([2002, 2007])]. 필터링 후 shape로 행 개수를 확인하는 습관을 들이면 의도대로 필터링되었는지 검증할 수 있습니다."
+
+- id: step6_groupby
+  title: 6단계. 대륙별 평균 계산
+  subtitle: groupby().mean()
+  blocks:
+  - type: text
+    content: 각 국가의 기대수명을 대륙별로 묶어서 평균을 계산합니다. groupby('continent')는 같은 대륙끼리 그룹화하는 명령이고, ['lifeExp'].mean()은 각 그룹의 기대수명 평균을 구하는 것입니다. 예를 들어 아시아에 속한 모든 국가의 기대수명을 더해서 국가 수로 나누면 아시아의 평균 기대수명이 됩니다. reset_index()는 결과를 깔끔한 DataFrame 형태로 만들어서 시각화하기 쉽게 만듭니다. 이 과정을 통해 142개 국가 데이터가 5개 대륙의 평균 데이터로 요약됩니다.
+  - type: code
+    language: python
+    title: 대륙별 평균 기대수명
+    description: continent별로 lifeExp 평균을 계산합니다
+    content: |-
+      continentLife = df2007.groupby('continent')['lifeExp'].mean().reset_index()
+      continentLife
+  - type: tip
+    content: groupby()는 pandas의 핵심 기능으로, 특정 컬럼을 기준으로 데이터를 그룹화합니다. groupby('컬럼명')['집계할컬럼'].집계함수() 형태로 사용하며, 집계함수로는 mean()(평균), sum()(합계), count()(개수), max()(최대), min()(최소) 등이 있습니다. reset_index()를 붙이면 인덱스가 초기화되어 일반 컬럼으로 변환됩니다.
+
+- id: step7_bar
+  title: 7단계. 막대 그래프 만들기
+  subtitle: px.bar()
+  blocks:
+  - type: text
+    content: Plotly Express로 막대 그래프를 만드는 것은 매우 간단합니다. px.bar() 함수에 데이터프레임을 전달하고, x축과 y축에 어떤 컬럼을 표시할지만 지정하면 됩니다. 첫 번째 인자는 데이터, x는 가로축에 표시할 범주(여기서는 대륙), y는 세로축에 표시할 수치(여기서는 기대수명)입니다. 이 한 줄의 코드로 인터랙티브한 차트가 자동으로 생성되며, 마우스를 올리면 정확한 값을 확인할 수 있습니다. Plotly의 가장 큰 장점은 코드 한 줄로 완성도 높은 차트를 만들 수 있다는 점입니다. matplotlib처럼 복잡한 설정 없이도 축 라벨, 눈금, 그리드, 호버 기능이 모두 자동으로 제공됩니다.
+  - type: code
+    language: python
+    title: 기본 막대 그래프
+    description: x축에 대륙, y축에 기대수명을 배치합니다
+    content: |-
+      figBar = px.bar(continentLife, x='continent', y='lifeExp')
+      figBar
+  - type: tip
+    content: px.bar(데이터, x='x축컬럼', y='y축컬럼')이 기본 형태입니다. 첫 번째 인자에는 DataFrame을 넣고, x와 y 파라미터에는 컬럼명을 문자열로 지정합니다. 컬럼명은 따옴표로 감싸야 하며, DataFrame에 실제로 존재하는 컬럼명을 사용해야 합니다. 반환된 차트 객체(Figure)는 변수에 저장하거나 바로 표시할 수 있습니다. marimo 환경에서는 변수명만 작성하면 자동으로 차트가 렌더링됩니다. 실무에서는 여러 차트를 만들 때 figBar, figLine처럼 차트 종류를 변수명에 포함시켜 구분합니다.
+
+- id: step8_color
+  title: 8단계. 색상으로 구분하기
+  subtitle: color 파라미터
+  blocks:
+  - type: text
+    content: 막대 그래프에 색상을 추가하면 시각적 구분이 명확해져서 정보 전달력이 높아집니다. color 파라미터에 컬럼명을 지정하면 Plotly가 자동으로 각 값에 서로 다른 색상을 배정합니다. 여기서는 각 대륙마다 고유한 색상이 지정되어 한눈에 구분할 수 있습니다. 또한 자동으로 범례(legend)가 생성되어 어떤 색이 어떤 대륙인지 쉽게 확인할 수 있습니다. 실무에서는 프레젠테이션이나 보고서에 사용할 때 색상을 활용하면 청중의 이해를 크게 높일 수 있습니다. 데이터 시각화 연구에 따르면 색상을 적절히 사용한 차트는 정보 전달 속도가 최대 3배 빨라진다고 합니다. 특히 여러 카테고리를 비교할 때 색상 구분은 필수적입니다.
+  - type: code
+    language: python
+    title: 색상 추가
+    description: color='continent'로 대륙별 색상을 지정합니다
+    content: |-
+      figColor = px.bar(continentLife, x='continent', y='lifeExp', color='continent')
+      figColor
+  - type: tip
+    content: color='컬럼명' 형태로 사용하며, 해당 컬럼의 고유한 값마다 자동으로 다른 색상이 배정됩니다. 범주형 데이터(문자열)에는 구분되는 색상이, 연속형 데이터(숫자)에는 그라디언트 색상이 적용됩니다. 범례는 자동으로 생성되며, 클릭하면 해당 항목을 숨기거나 표시할 수 있습니다. 더블클릭하면 해당 항목만 단독으로 표시됩니다. Plotly는 colorblind-friendly 색상 팔레트를 기본으로 사용하여 색맹인 사람도 구분할 수 있도록 배려합니다. color_discrete_sequence 파라미터로 사용자 정의 색상을 지정할 수도 있습니다.
+
+- id: step9_labels
+  title: 9단계. 축 라벨 변경
+  subtitle: labels 파라미터
+  blocks:
+  - type: text
+    content: |-
+      기본적으로 Plotly는 컬럼명을 그대로 축 이름으로 사용합니다. 하지만 continent, lifeExp 같은 영문 컬럼명보다는 한글이나 더 설명적인 이름을 사용하면 차트를 보는 사람이 이해하기 쉽습니다. labels 파라미터는 딕셔너리 형태로 원래 컬럼명(key)과 표시할 이름(value)을 매핑합니다. 예를 들어 {'continent': '대륙'}은 continent라는 컬럼명을 차트에서는 대륙으로 표시하라는 의미입니다. 이는 축 제목뿐만 아니라 호버 정보와 범례에도 적용됩니다.
+  - type: code
+    language: python
+    title: 축 라벨 한글화
+    description: labels로 x축, y축 이름을 변경합니다
+    content: |-
+      figLabels = px.bar(
+          continentLife,
+          x='continent',
+          y='lifeExp',
+          color='continent',
+          labels={'continent': '대륙', 'lifeExp': '평균 기대수명(년)'}
+      )
+      figLabels
+  - type: tip
+    content: |-
+      labels는 딕셔너리 형태로 작성합니다. labels={'원래컬럼명': '표시할이름'} 형태이며, 여러 개를 동시에 지정할 수 있습니다. 이 설정은 축 제목, 호버 텍스트, 범례 등 모든 곳에 일괄 적용되어 일관성 있는 차트를 만들 수 있습니다.
+
+- id: step10_title
+  title: 10단계. 제목 추가
+  subtitle: title 파라미터
+  blocks:
+  - type: text
+    content: 차트에 제목을 추가하면 무엇을 보여주는 시각화인지 명확하게 전달할 수 있습니다. title 파라미터에 문자열을 지정하면 차트 상단에 제목이 표시됩니다. 좋은 제목은 시간(2007년), 비교 대상(대륙별), 측정 지표(평균 기대수명)를 모두 포함해야 합니다. 이렇게 하면 차트만 봐도 맥락을 이해할 수 있어 보고서나 프레젠테이션에서 매우 유용합니다. 이제 색상, 축 라벨, 제목까지 모두 갖춘 완성도 높은 시각화가 완성되었습니다.
+  - type: code
+    language: python
+    title: 최종 시각화
+    description: title로 차트 제목을 추가합니다
+    content: |-
+      figFinal = px.bar(
+          continentLife,
+          x='continent',
+          y='lifeExp',
+          color='continent',
+          labels={'continent': '대륙', 'lifeExp': '평균 기대수명(년)'},
+          title='2007년 대륙별 평균 기대수명 비교'
+      )
+      figFinal
+  - type: tip
+    content: title 파라미터는 문자열로 지정하며, 차트 상단 중앙에 표시됩니다. 제목은 간결하면서도 핵심 정보(무엇을, 언제, 어떻게)를 담아야 합니다. 나중에 update_layout(title=dict(text='제목', x=0.5, font_size=20))처럼 위치와 스타일을 세밀하게 조정할 수도 있습니다.
+
+- id: practice
+  title: 실습
+  subtitle: gapminder 데이터 분석 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 내용을 활용해서 gapminder 데이터를 다양한 각도로 분석해봅시다. 데이터 필터링, groupby 집계, px.bar 시각화, color/labels/title 설정까지 전 과정을 직접 수행합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 대륙별 평균 GDP 막대 그래프"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import plotly.express as px
+        import pandas as pd
+
+        data = px.data.gapminder()
+        data2007 = data[data['year'] == 2007]
+        gdpByContinent = data2007.groupby('continent')['gdpPercap'].mean().reset_index()
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart = px.bar(
+            gdpByContinent,
+            x='continent',
+            y='gdpPercap',
+            color='continent',
+            labels={'continent': '대륙', 'gdpPercap': '1인당 GDP($)'},
+            title='2007년 대륙별 평균 1인당 GDP 비교'
+        )
+        chart
+  - type: expansion
+    title: "미션2: 1952년과 2007년 대륙별 기대수명 비교"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import plotly.express as px
+        import pandas as pd
+
+        gap = px.data.gapminder()
+        lifeOld = gap[gap['year'] == 1952].groupby('continent')['lifeExp'].mean().reset_index()
+        lifeRecent = gap[gap['year'] == 2007].groupby('continent')['lifeExp'].mean().reset_index()
+        lifeOld['year'] = '1952'
+        lifeRecent['year'] = '2007'
+        lifeCompare = pd.concat([lifeOld, lifeRecent])
+    - type: code
+      title: "차트 생성"
+      content: |-
+        canvas = px.bar(
+            lifeCompare,
+            x='continent',
+            y='lifeExp',
+            color='year',
+            barmode='group',
+            labels={'continent': '대륙', 'lifeExp': '평균 기대수명(년)', 'year': '연도'},
+            title='1952년 vs 2007년 대륙별 평균 기대수명 비교'
+        )
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Plotly Express로 첫 시각화를 완성했습니다.
+  - type: list
+    items:
+    - "import plotly.express as px - Plotly Express 불러오기"
+    - "px.data.gapminder() - 내장 데이터 로드"
+    - "px.bar(df, x, y) - 막대 그래프 기본"
+    - "color='컬럼' - 색상으로 그룹 구분"
+    - "labels={} - 축 라벨 변경"
+    - "title='' - 차트 제목 추가"
+  - type: text
+    content: 다음 시간에는 팁 데이터로 히스토그램과 박스 플롯을 배웁니다.

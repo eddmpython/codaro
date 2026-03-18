@@ -1,0 +1,225 @@
+meta:
+  id: day07_2
+  title: 집합 패턴학습
+  day: 7
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 집합(Set) - 중복 제거"
+    description: "집합 자료형으로 중복을 제거하고 집합 연산을 배웁니다."
+    keywords: ['집합', 'set', '중복제거', '합집합']
+intro:
+  title: 집합 마스터 패턴북
+  emoji: 🔥
+  description: 이것만 외우면 집합 마스터! 핵심 패턴만 모았습니다.
+  points:
+  - '📝 생성: {값1, 값2, 값3} 또는 set()'
+  - '➕ 추가: add(), update()'
+  - '➖ 삭제: remove(), discard(), pop()'
+  - '🔗 합집합: | 또는 union()'
+  - '✂️ 교집합: & 또는 intersection()'
+  - '➖ 차집합: - 또는 difference()'
+  - '🔍 포함: in, issubset(), issuperset()'
+  - '🚫 중복제거: set(리스트)'
+  summary: 🔥 집합은 중복 없는 데이터! 집합 연산에 사용!
+sections:
+- id: creation
+  title: 1. 집합 생성 패턴
+  subtitle: '{value1, value2}'
+  blocks:
+  - type: code
+    language: python
+    title: 집합 생성
+    description: 집합 생성 패턴을 복습합니다.
+    content: |-
+      createFruits = {"apple", "banana", "cherry"}
+      createNumbers = {1, 2, 3, 4, 5}
+      print(createFruits)
+
+      createColors = set(["red", "green", "blue"])
+      print(createColors)
+
+      createEmptySet = set()
+      print(createEmptySet)
+- id: duplicate_removal
+  title: 2. 중복 제거 패턴
+  subtitle: set(list)
+  blocks:
+  - type: code
+    language: python
+    title: 자동 중복 제거
+    description: 집합의 중복 제거 패턴을 복습합니다.
+    content: |-
+      dupList = [1, 2, 2, 3, 3, 3, 4]
+      dupUnique = set(dupList)
+      print(dupUnique)
+
+      dupText = "hello"
+      dupChars = set(dupText)
+      print(dupChars)
+
+      dupNumbers = {1, 2, 2, 3, 3, 3}
+      print(dupNumbers)
+- id: add
+  title: 3. 추가 패턴
+  subtitle: set.add()
+  blocks:
+  - type: code
+    language: python
+    title: 요소 추가
+    description: add() 메서드 패턴을 복습합니다.
+    content: |-
+      addFruits = {"apple", "banana"}
+      addFruits.add("cherry")
+      print(addFruits)
+
+      addFruits.add("apple")
+      print(addFruits)
+
+      addMixed = {1, 2, 3}
+      addMixed.add("hello")
+      print(addMixed)
+- id: update
+  title: 4. 대량 추가 패턴
+  subtitle: set.update()
+  blocks:
+  - type: code
+    language: python
+    title: 여러 요소 추가
+    description: update() 메서드 패턴을 복습합니다.
+    content: |-
+      updateColors = {"red", "green"}
+      updateColors.update(["blue", "yellow"])
+      print(updateColors)
+
+      updateLetters = {"a", "b"}
+      updateLetters.update("cde")
+      print(updateLetters)
+
+      updateSet1 = {1, 2, 3}
+      updateSet2 = {4, 5, 6}
+      updateSet1.update(updateSet2)
+      print(updateSet1)
+- id: remove
+  title: 5. 제거 패턴
+  subtitle: remove(), discard()
+  blocks:
+  - type: code
+    language: python
+    title: 요소 제거
+    description: remove()와 discard() 패턴을 복습합니다.
+    content: |-
+      removeFruits = {"apple", "banana", "cherry"}
+
+      removeFruits.remove("banana")
+      print(removeFruits)
+
+      removeFruits.discard("grape")
+      print(removeFruits)
+
+      removeFruits.clear()
+      print(removeFruits)
+- id: membership
+  title: 6. 멤버십 패턴
+  subtitle: in, not in
+  blocks:
+  - type: code
+    language: python
+    title: 포함 여부 확인
+    description: 멤버십 연산자 패턴을 복습합니다.
+    content: |-
+      memberColors = {"red", "green", "blue"}
+
+      memberRed = "red" in memberColors
+      print(memberRed)
+
+      memberPurple = "purple" in memberColors
+      print(memberPurple)
+
+      memberNoYellow = "yellow" not in memberColors
+      print(memberNoYellow)
+- id: union
+  title: 7. 합집합 패턴
+  subtitle: set1 | set2
+  blocks:
+  - type: code
+    language: python
+    title: 집합 합치기
+    description: 합집합 연산 패턴을 복습합니다.
+    content: |-
+      unionSet1 = {1, 2, 3}
+      unionSet2 = {3, 4, 5}
+
+      unionResult = unionSet1 | unionSet2
+      print(unionResult)
+
+      unionResult2 = unionSet1.union(unionSet2)
+      print(unionResult2)
+
+      unionSet3 = {6, 7}
+      unionAll = unionSet1 | unionSet2 | unionSet3
+      print(unionAll)
+- id: intersection
+  title: 8. 교집합 패턴
+  subtitle: set1 & set2
+  blocks:
+  - type: code
+    language: python
+    title: 공통 요소 찾기
+    description: 교집합 연산 패턴을 복습합니다.
+    content: |-
+      interSet1 = {1, 2, 3, 4}
+      interSet2 = {3, 4, 5, 6}
+
+      interCommon = interSet1 & interSet2
+      print(interCommon)
+
+      interCommon2 = interSet1.intersection(interSet2)
+      print(interCommon2)
+
+      interSet3 = {7, 8, 9}
+      interNoCommon = interSet1 & interSet3
+      print(interNoCommon)
+- id: difference
+  title: 9. 차집합 패턴
+  subtitle: set1 - set2
+  blocks:
+  - type: code
+    language: python
+    title: 차이점 찾기
+    description: 차집합 연산 패턴을 복습합니다.
+    content: |-
+      diffSet1 = {1, 2, 3, 4, 5}
+      diffSet2 = {3, 4, 5, 6, 7}
+
+      diffResult = diffSet1 - diffSet2
+      print(diffResult)
+
+      diffResult2 = diffSet1.difference(diffSet2)
+      print(diffResult2)
+
+      diffReverse = diffSet2 - diffSet1
+      print(diffReverse)
+- id: copy_len
+  title: 10. 복사와 크기 패턴
+  subtitle: copy(), len()
+  blocks:
+  - type: code
+    language: python
+    title: 집합 복사와 크기
+    description: copy()와 len() 패턴을 복습합니다.
+    content: |-
+      copyOriginal = {1, 2, 3, 4, 5}
+
+      copyCopied = copyOriginal.copy()
+      copyCopied.add(6)
+      print(copyOriginal)
+      print(copyCopied)
+
+      copySize = len(copyOriginal)
+      print(copySize)
+
+      copyEmpty = set()
+      print(len(copyEmpty))

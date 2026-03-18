@@ -1,0 +1,408 @@
+meta:
+  id: "xlwings02"
+  title: "xlwings 설치 완벽 가이드"
+  order: 2
+  category: "excel"
+  tags: ["xlwings", "설치", "파이썬", "엑셀"]
+  seo:
+    title: "xlwings 설치 가이드 - pip install부터 Excel 연동까지"
+    description: "xlwings 설치 방법을 단계별로 안내합니다. pip install xlwings부터 Excel Add-in 설정까지 완벽 가이드."
+    keywords: ["xlwings 설치", "pip install xlwings", "엑셀 애드인", "xlwings 설정", "파이썬 엑셀 연동"]
+
+sections:
+  - id: "mainHeader"
+    title: "xlwings 설치 가이드"
+    blocks:
+      - type: mainHeader
+        emoji: "📊"
+        title: "xlwings 설치 완벽 가이드"
+        subtitle: "Python으로 Excel을 완전히 제어하세요!"
+        description: "설치부터 실무 활용까지, Excel 자동화의 모든 것을 한 번에 배워보세요"
+
+  - id: "whyXlwings"
+    title: "왜 xlwings인가요?"
+    blocks:
+      - type: sectionHeader
+        emoji: "🚀"
+        title: "왜 xlwings인가요?"
+        subtitle: "Python에서 Excel을 다루는 최강의 도구, xlwings의 놀라운 기능들을 확인해보세요"
+        color: "indigo"
+
+      - type: video
+        platform: local
+        url: "python/excel/xlwings_sample.webm"
+
+      - type: featureCards
+        cards:
+          - emoji: "📊"
+            title: "실시간 Excel 조작"
+            description: "• Excel 파일 열고 실시간 셀 값 변경\n• 차트, 표, 피벗테이블 자동 생성\n• 매크로 없이도 복잡한 작업 자동화\n• 기존 Excel 파일과 완벽 호환"
+            color: "blue"
+          - emoji: "🔄"
+            title: "양방향 데이터 교환"
+            description: "• Python → Excel\n• Excel → Python\n• 대용량 데이터 처리 후 Excel에 재배치\n• 실시간 데이터 동기화"
+            color: "green"
+          - emoji: "⚡"
+            title: "VBA 대체재"
+            description: "• VBA보다 강력하고 직관적인 문법\n• 수십 배 빠른 처리 속도\n• 외부 라이브러리와 쉬운 연동\n• 크로스 플랫폼 지원 (Windows/Mac)"
+            color: "purple"
+          - emoji: "🎯"
+            title: "실무 바로 적용"
+            description: "• 월별 보고서 자동 생성\n• 여러 파일 데이터 통합 분석\n• 차트와 그래프 자동 업데이트\n• 이메일 첨부파일 자동 처리"
+            color: "orange"
+
+  - id: "prerequisites"
+    title: "사전 준비사항"
+    blocks:
+      - type: sectionHeader
+        emoji: "📋"
+        title: "사전 준비사항"
+        subtitle: "xlwings를 사용하기 위해 필요한 것들을 미리 확인해보세요"
+        color: "blue"
+
+      - type: stepCard
+        stepNumber: "체크리스트"
+        title: "설치 전 필수 확인사항"
+        description: "xlwings가 제대로 작동하려면 다음 조건들이 필요합니다. 하나씩 확인해보세요!"
+        tips:
+          - "✅ Python 3.7 이상 설치 (python --version으로 확인)"
+          - "✅ Microsoft Excel 설치 (Excel 2007 이상)"
+          - "✅ Windows 또는 macOS 운영체제"
+          - "✅ 관리자 권한 (설치 시에만 필요)"
+          - "⚠️ Linux에서는 LibreOffice Calc 사용 가능하지만 제한적"
+        color: "blue"
+
+      - type: warning
+        title: "🚨 중요: Excel이 설치되어 있어야 합니다!"
+        description: "xlwings는 실제 Excel 프로그램을 제어하는 방식으로 작동합니다. 따라서 컴퓨터에 Microsoft Excel이 반드시 설치되어 있어야 해요. Excel Online이나 다른 스프레드시트 프로그램으로는 작동하지 않습니다."
+        warningType: "error"
+
+  - id: "step1Python"
+    title: "1단계: Python 설치하기"
+    blocks:
+      - type: sectionHeader
+        emoji: "🐍"
+        title: "1단계: Python 설치하기"
+        subtitle: "xlwings를 사용하기 위해서는 Python이 필요해요. 매우 간단하게 설치할 수 있습니다!"
+        color: "green"
+
+      - type: stepCard
+        stepNumber: "STEP 1-1"
+        title: "Python 다운로드하기"
+        description: "먼저 Python 공식 사이트에서 설치 파일을 다운로드받겠습니다."
+        imageUrl: "python/1파이썬다운로드.gif"
+        tips:
+          - "🌐 python.org 사이트로 이동하세요"
+          - "⬇️ 큰 노란색 'Download Python' 버튼을 클릭하세요"
+          - "💾 파일이 다운로드되는 것을 확인하세요 (보통 다운로드 폴더에 저장됩니다)"
+          - "📁 python-3.x.x.exe 같은 이름의 파일이 다운로드됩니다"
+        color: "green"
+        buttonText: "Python.org 다운로드 페이지로 이동"
+        buttonLink: "https://www.python.org/downloads/"
+
+      - type: stepCard
+        stepNumber: "STEP 1-2"
+        title: "Python 설치하기 (중요한 주의사항 있음!)"
+        description: "다운로드받은 파일을 실행하여 Python을 설치합니다. 설치할 때 매우 중요한 옵션이 있으니 꼭 확인하세요!"
+        imageUrl: "python/1파이썬설치.png"
+        tips:
+          - "💾 다운로드받은 .exe 파일을 더블클릭하여 실행하세요"
+          - "⚠️ 중요: 설치 시 맨 아래 'Add Python to PATH' 체크박스를 꼭 체크하세요!"
+          - "✅ '지금 설치(Install Now)' 버튼을 클릭하세요"
+          - "⏳ 설치가 완료될 때까지 기다리세요 (몇 분 소요)"
+        color: "green"
+
+      - type: warning
+        title: "🚨 설치할 때 반드시 확인하세요!"
+        description: "Python 설치 시 반드시 'Add Python to PATH' 옵션을 체크해주세요! 이 옵션을 놓치면 xlwings를 설치할 수 없습니다. 설치 화면 맨 아래에 있는 체크박스를 꼭 확인하세요."
+        warningType: "error"
+
+  - id: "step2Cmd"
+    title: "2단계: 명령 프롬프트 사용하기"
+    blocks:
+      - type: sectionHeader
+        emoji: "💻"
+        title: "2단계: 명령 프롬프트 사용하기"
+        subtitle: "Python과 xlwings를 사용하려면 명령 프롬프트라는 도구를 알아야 해요. 생각보다 쉬워요!"
+        color: "indigo"
+
+      - type: info
+        title: "🤔 명령 프롬프트가 뭔가요?"
+        htmlContent: |
+          <p class="mb-4">명령 프롬프트는 컴퓨터와 글자로 대화하는 창입니다. 마우스 클릭 대신 키보드로 명령어를 입력해서 컴퓨터에게 일을 시킬 수 있어요.</p>
+          <ul class="space-y-2 mb-4">
+            <li>💻 <strong>Windows:</strong> CMD, PowerShell, 명령 프롬프트라고 부름</li>
+            <li>🍎 <strong>Mac:</strong> Terminal, 터미널이라고 부름</li>
+            <li>🐧 <strong>Linux:</strong> Terminal, Shell이라고 부름</li>
+          </ul>
+          <p class="font-bold text-indigo-600">프로그래밍을 하려면 꼭 알아야 하는 기본 도구예요!</p>
+        color: "indigo"
+
+      - type: stepCard
+        stepNumber: "STEP 2-1"
+        title: "명령 프롬프트 열기 (Windows)"
+        description: "명령 프롬프트를 여는 방법은 여러 가지가 있어요. 가장 쉬운 방법부터 알아보겠습니다!"
+        videoUrl: "python/cmd.mp4"
+        tips:
+          - "🔍 방법 1: Windows키 + R → 'cmd' 입력 → 엔터"
+          - "🔍 방법 2: 시작메뉴에서 'cmd' 또는 '명령 프롬프트' 검색"
+          - "🔍 방법 3: 시작메뉴 → Windows 시스템 → 명령 프롬프트"
+          - "⚫ 검은 창이 열리면 성공! 깜빡이는 커서가 보일 거예요"
+        color: "indigo"
+
+      - type: stepCard
+        stepNumber: "STEP 2-2"
+        title: "Python 설치가 잘 되었는지 확인하기"
+        description: "Python 설치가 완료되었다면 정말로 잘 설치되었는지 확인해보겠습니다. 명령 프롬프트에서 확인할 수 있어요!"
+        imageUrl: "python/cmd2.gif"
+        code: |
+          python --version
+          pip --version
+        tips:
+          - "설치 후에는 명령 프롬프트를 새로 열어야 합니다"
+          - "두 명령어 모두 버전이 나와야 정상입니다"
+          - "여전히 오류가 나면 컴퓨터를 재시작해보세요"
+          - "그래도 안 되면 Python을 다시 설치하되 'Add to PATH' 옵션을 꼭 체크하세요"
+        color: "indigo"
+
+  - id: "step3Install"
+    title: "3단계: xlwings 설치 및 엑셀연동"
+    blocks:
+      - type: sectionHeader
+        emoji: "📦"
+        title: "3단계: xlwings 설치 및 엑셀연동"
+        subtitle: "이제 Python이 준비되었으니 xlwings를 설치해보겠습니다!"
+        color: "blue"
+
+      - type: stepCard
+        stepNumber: "STEP 3-1"
+        title: "xlwings 설치하기"
+        description: "명령 프롬프트에서 pip 명령어로 xlwings를 설치합니다. 인터넷 연결만 되어 있으면 자동으로 설치돼요!"
+        imageUrl: "python/excel/xlwings_install.png"
+        code: "pip install xlwings"
+        tips:
+          - "명령 프롬프트(Windows) 또는 터미널(Mac)을 열어주세요"
+          - "위 명령어를 입력하고 엔터를 누르세요"
+          - "설치 중 여러 줄의 텍스트가 나오는데 정상이에요"
+          - "✅ 'Successfully installed xlwings' 메시지가 나오면 성공!"
+        color: "blue"
+
+      - type: stepCard
+        stepNumber: "STEP 3-2"
+        title: "xlwings 애드인 설치하기"
+        description: "Excel에서 xlwings를 더 편리하게 사용할 수 있도록 애드인을 설치해보겠습니다!"
+        imageUrl: "python/excel/xlwings_addin.png"
+        code: "xlwings addin install"
+        tips:
+          - "명령 프롬프트에서 위 명령어를 실행하세요"
+          - "애드인 설치가 완료되면 Excel에 xlwings 탭이 추가됩니다"
+          - "애드인이 없어도 Python에서 Excel 제어는 가능해요"
+          - "나중에 'xlwings addin remove'로 제거할 수 있어요"
+        color: "blue"
+
+      - type: stepCard
+        stepNumber: "STEP 3-3"
+        title: "pip list로 설치 확인하기"
+        description: "xlwings가 제대로 설치되었는지 pip list로 확인해보겠습니다!"
+        imageUrl: "python/excel/xlwings_pip_list.png"
+        code: "pip list | findstr xlwings"
+        tips:
+          - "명령 프롬프트에서 'pip list'를 입력하면 설치된 모든 패키지가 나와요"
+          - "'pip list | findstr xlwings'로 xlwings만 찾을 수 있어요 (Windows)"
+          - "Mac/Linux에서는 'pip list | grep xlwings' 사용하세요"
+          - "xlwings와 버전이 표시되면 설치 성공!"
+        color: "blue"
+
+      - type: stepCard
+        stepNumber: "STEP 3-4"
+        title: "Excel에서 xlwings 탭 확인하기"
+        description: "이제 Excel을 열어서 xlwings 탭이 제대로 생겼는지 확인해보겠습니다!"
+        imageUrl: "python/excel/xlwings_tab.png"
+        tips:
+          - "Excel을 열어보세요 (새 통합문서 또는 기존 파일)"
+          - "상단 메뉴에서 'xlwings' 탭이 있는지 확인하세요"
+          - "xlwings 탭이 보이면 애드인 설치 성공!"
+          - "탭이 안 보인다면 3-2 단계를 다시 해보세요"
+        color: "blue"
+
+  - id: "step4Security"
+    title: "4단계: Excel 보안 설정"
+    blocks:
+      - type: sectionHeader
+        emoji: "🔐"
+        title: "4단계: Excel 보안 설정"
+        subtitle: "xlwings가 Excel과 완벽하게 소통할 수 있도록 보안 설정을 조정해보겠습니다"
+        color: "purple"
+
+      - type: warning
+        title: "🚨 중요: 언제 이 설정이 필요한가요?"
+        htmlContent: |
+          <ul class="space-y-2 mb-4">
+            <li><strong>Excel 365 구독 버전:</strong> 이 설정이 필요하지 않을 수 있습니다</li>
+            <li><strong>Excel 영구 버전 (2019, 2016 등):</strong> 반드시 이 설정이 필요합니다</li>
+            <li><strong>Finjang 템플릿 사용 시:</strong> 이런 설정 없이도 바로 사용 가능합니다</li>
+          </ul>
+          <p class="font-bold text-blue-600">하지만 xlwings의 원리를 이해하고 응용하려면 이 과정을 꼭 알아두세요!</p>
+        warningType: "info"
+
+      - type: stepCard
+        stepNumber: "STEP 4-1"
+        title: "Excel 옵션 열기"
+        description: "먼저 Excel에서 옵션 메뉴에 접근해보겠습니다. 여기서 모든 보안 설정을 관리할 수 있어요."
+        imageUrl: "python/excel/보안1.png"
+        tips:
+          - "Excel을 먼저 실행하세요"
+          - "좌측 상단의 '파일' 탭을 클릭하세요"
+          - "메뉴 맨 아래에 있는 '옵션'을 클릭하세요"
+          - "Excel 옵션 대화상자가 열리면 성공!"
+        color: "purple"
+
+      - type: stepCard
+        stepNumber: "STEP 4-2"
+        title: "추가 기능 등록하기"
+        description: "Excel에서 xlwings 추가 기능을 등록하기 위해 Excel 추가기능 화면으로 이동합니다."
+        imageUrl: "python/excel/보안2.png"
+        tips:
+          - "Excel 추가기능 대화상자가 열렸습니다"
+          - "'추가 기능' 탭에서 추가 기능 관련 설정을 할 수 있어요"
+        color: "purple"
+
+      - type: stepCard
+        stepNumber: "STEP 4-3"
+        title: "추가 기능에서 xlwings 찾기"
+        description: "추가 기능 대화상자에서 '찾아보기' 버튼을 클릭하여 xlwings 파일을 찾아보겠습니다."
+        imageUrl: "python/excel/보안3.png"
+        tips:
+          - "추가 기능 대화상자가 열렸습니다"
+          - "화면 우측의 '찾아보기(B)' 버튼을 클릭하세요"
+          - "이 버튼을 통해 xlwings.xlam 파일을 직접 찾을 수 있어요"
+          - "파일 탐색기가 열리면 xlwings 설치 폴더로 이동하세요"
+        color: "purple"
+
+      - type: stepCard
+        stepNumber: "STEP 4-4"
+        title: "xlwings 애드인 파일 찾기"
+        description: "xlwings 애드인 파일(.xlam)을 직접 찾아서 Excel에 등록해보겠습니다."
+        imageUrl: "python/excel/보안4.png"
+        tips:
+          - "보통 C:\\Users\\사용자명\\AppData\\Roaming\\Microsoft\\Excel\\XLSTART 경로에 있어요"
+          - "xlwings.xlam 파일을 찾으세요"
+          - "파일이 보이지 않으면 숨김 파일 표시를 활성화하세요"
+          - "파일을 선택하고 '열기'를 클릭하세요"
+        color: "purple"
+
+      - type: stepCard
+        stepNumber: "STEP 4-5"
+        title: "추가 기능에서 xlwings 활성화"
+        description: "Excel의 추가 기능 관리자에서 xlwings를 활성화합니다."
+        imageUrl: "python/excel/보안5.png"
+        tips:
+          - "Excel에서 파일 > 옵션 > 추가 기능으로 이동하세요"
+          - "관리 항목에서 'Excel 추가 기능'을 선택하고 '이동' 버튼 클릭"
+          - "xlwings 항목을 찾아서 체크박스를 선택하세요"
+          - "'확인' 버튼을 클릭하여 활성화하세요"
+        color: "purple"
+
+      - type: stepCard
+        stepNumber: "STEP 4-6"
+        title: "보안 센터 설정 최종 확인"
+        description: "보안 센터에서 xlwings 사용을 위한 최종 설정을 확인합니다."
+        imageUrl: "python/excel/보안6.png"
+        tips:
+          - "보안 센터 설정 창에서 모든 설정을 최종 확인하세요"
+          - "보안 센터 설정 적용을 위해 '확인' 버튼을 클릭하세요"
+          - "Excel을 재시작해야 설정이 완전히 적용됩니다"
+          - "설정 변경 후에는 Excel을 닫았다가 다시 열어주세요"
+        color: "purple"
+
+      - type: stepCard
+        stepNumber: "STEP 4-7"
+        title: "매크로 보안 설정 조정"
+        description: "xlwings가 Excel을 제어할 수 있도록 매크로 보안 설정을 조정합니다. 가장 중요한 단계예요!"
+        imageUrl: "python/excel/보안7.png"
+        tips:
+          - "보안 센터에서 '매크로 설정'을 선택하세요"
+          - "'모든 매크로 사용(권장하지 않음)' 또는 '디지털 서명된 매크로만 사용' 선택"
+          - "'VBA 프로젝트 개체 모델에 대한 액세스 신뢰' 체크박스도 선택하세요"
+          - "⚠️ 보안 위험이 있으니 xlwings 사용 후에는 설정을 되돌리는 것을 권장합니다"
+        color: "purple"
+
+      - type: warning
+        title: "🔒 보안 주의사항"
+        description: "매크로 보안을 완전히 열어두면 악성 코드의 위험이 있습니다. xlwings 작업이 끝나면 보안 설정을 다시 강화하는 것을 권장합니다. 또는 신뢰할 수 있는 위치에 xlwings 파일만 두고 사용하세요."
+        warningType: "warning"
+
+  - id: "step5FirstExample"
+    title: "5단계: 첫 번째 Excel 자동화"
+    blocks:
+      - type: sectionHeader
+        emoji: "🎯"
+        title: "5단계: 첫 번째 Excel 자동화 해보기"
+        subtitle: "드디어 Python으로 Excel을 제어해볼 시간입니다! xlwings quickstart로 간단하게 시작해보겠습니다"
+        color: "orange"
+
+      - type: stepCard
+        stepNumber: "STEP 5-1"
+        title: "xlwings quickstart로 프로젝트 생성하기"
+        description: "xlwings의 quickstart 명령어로 기본 템플릿 프로젝트를 생성해보겠습니다. 이 명령어 하나로 Python 파일과 Excel 파일이 자동으로 생성됩니다!"
+        imageUrl: "python/excel/실행1.png"
+        code: "xlwings quickstart testwings"
+        tips:
+          - "명령 프롬프트나 터미널에서 위 명령어를 실행하세요"
+          - "'testwings'는 프로젝트 이름입니다. 원하는 이름으로 변경 가능해요"
+          - "testwings.py와 testwings.xlsm 파일이 자동으로 생성됩니다"
+          - "xlsm 파일은 매크로가 포함된 Excel 파일입니다"
+        color: "orange"
+
+      - type: stepCard
+        stepNumber: "STEP 5-2"
+        title: "Excel에서 'Run main' 버튼 클릭하기"
+        description: "생성된 Excel 파일을 열고 xlwings 탭에서 'Run main' 버튼을 클릭해보겠습니다. 이 버튼이 Python 코드를 실행시켜줍니다!"
+        imageUrl: "python/excel/실행2.png"
+        tips:
+          - "생성된 testwings.xlsm 파일을 Excel로 열어주세요"
+          - "상단 메뉴에서 'xlwings' 탭을 찾아 클릭하세요"
+          - "좌측의 빨간 'Run main' 버튼을 클릭하세요"
+          - "이 버튼이 testwings.py 파일의 main() 함수를 실행합니다"
+        color: "orange"
+
+      - type: stepCard
+        stepNumber: "STEP 5-3"
+        title: "실행 결과 확인하기"
+        description: "Python 코드가 성공적으로 실행되어 Excel 셀에 'Hello xlwings!' 메시지가 표시되었습니다! 이것이 바로 Python과 Excel의 연동입니다."
+        imageUrl: "python/excel/실행3.png"
+        tips:
+          - "A1 셀에 'Hello xlwings!' 메시지가 나타났나요?"
+          - "이것은 Python 코드가 Excel을 직접 제어한 결과입니다"
+          - "만약 메시지가 나타나지 않으면 보안 설정을 다시 확인해보세요"
+          - "성공했다면 xlwings가 정상적으로 작동하는 것입니다!"
+        color: "orange"
+
+      - type: stepCard
+        stepNumber: "STEP 5-4"
+        title: "VBA 코드 구조 확인하기"
+        description: "Excel에서 Alt+F11을 눌러 VBA 편집기를 열고, xlwings가 어떻게 Python과 연동되는지 내부 구조를 확인해보겠습니다."
+        imageUrl: "python/excel/실행4.png"
+        tips:
+          - "Excel에서 Alt+F11을 눌러 VBA 편집기를 열어보세요"
+          - "Module1에서 SampleCall() 함수를 확인할 수 있어요"
+          - "이 함수가 Python의 main() 함수를 호출하는 브릿지 역할을 합니다"
+          - "xlwings가 VBA와 Python을 연결해주는 원리를 이해할 수 있어요"
+        color: "orange"
+
+      - type: warning
+        title: "🎉 축하합니다!"
+        htmlContent: |
+          <p class="mb-3"><strong>첫 번째 xlwings 자동화에 성공했습니다!</strong></p>
+          <ul class="space-y-2">
+            <li>✅ <strong>Python → Excel:</strong> Python 코드가 Excel 셀에 데이터를 입력했어요</li>
+            <li>✅ <strong>자동 연동:</strong> 버튼 하나로 Python 스크립트가 실행되었어요</li>
+            <li>✅ <strong>실시간 제어:</strong> Excel이 살아있는 상태에서 실시간으로 제어했어요</li>
+          </ul>
+          <p class="mt-3 font-bold text-green-600">이제 본격적인 Excel 자동화를 시작할 준비가 되었습니다!</p>
+        warningType: "success"
+
+      - type: link
+        text: "🌐 xlwings 공식문서 바로가기"
+        url: "https://docs.xlwings.org/en/latest/"
+        color: "green"

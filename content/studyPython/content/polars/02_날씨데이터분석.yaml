@@ -1,0 +1,307 @@
+meta:
+  id: polars_02
+  title: 날씨데이터분석
+  order: 2
+  category: polars
+  difficulty: "⭐"
+  badge: 입문
+  dataUrl: https://raw.githubusercontent.com/datasets/global-temp/master/data/monthly.csv
+  tags: ["날씨", "기온", "with_columns", "dt", "sort", "group_by"]
+  seo:
+    title: "Polars 날씨 데이터 분석 - with_columns, dt 날짜처리"
+    description: "세계 도시 기온 데이터로 Polars를 배웁니다. with_columns로 새 열 추가, dt로 날짜 처리, sort로 정렬하는 방법을 실습합니다."
+    keywords: ["polars with_columns", "dt.year", "dt.month", "sort", "날씨 데이터분석"]
+
+intro:
+  emoji: "🌡️"
+  goal: 도시별 월평균 기온 데이터를 처리하고 분석합니다.
+  description: with_columns로 새 열을 추가하고, dt로 날짜를 처리합니다. 이전에 배운 select, filter, group_by를 반복하면서 새로운 개념을 익힙니다.
+
+sections:
+- id: step1_import
+  title: 1단계. Polars 불러오기
+  subtitle: import polars as pl
+  blocks:
+  - type: text
+    content: 지난 시간에 이어서 Polars를 계속 사용합니다. Polars는 고성능 데이터 처리 라이브러리로, 특히 날짜와 시간 데이터를 다루는 데 강력한 기능을 제공합니다. dt accessor를 통해 연도, 월, 일, 시간 등을 쉽게 추출하고 계산할 수 있습니다. 이번 프로젝트에서는 날씨 데이터를 분석하면서 날짜 처리 방법을 배웁니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: polars를 pl로 불러옵니다
+    content: |-
+      import polars as pl
+  - type: tip
+    content: "Polars는 시간 데이터 처리에 특화되어 있습니다. pandas에 비해 날짜/시간 연산이 빠르고, dt accessor로 연도, 월, 주, 요일 등을 간단하게 추출할 수 있습니다. 시계열 데이터 분석에 매우 유용합니다."
+
+- id: step2_load
+  title: 2단계. CSV 불러오기
+  subtitle: pl.read_csv()
+  blocks:
+  - type: text
+    content: 전 세계 월별 평균 기온 데이터를 불러옵니다. 이 데이터는 지구 온난화 추세를 확인할 수 있는 역사적 기후 데이터입니다. NASA와 같은 기관에서 수집한 장기간의 기온 기록으로, 수십 년간의 변화를 분석할 수 있습니다. 날짜(Date) 컬럼과 평균 기온(Mean) 컬럼이 포함되어 있으며, 이를 통해 시간에 따른 기온 변화 패턴을 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: URL에서 CSV 파일을 가져와서 df 변수에 저장
+    content: |-
+      dataUrl = "https://raw.githubusercontent.com/datasets/global-temp/master/data/monthly.csv"
+      df = pl.read_csv(dataUrl)
+  - type: tip
+    content: "pl.read_csv()는 이전 프로젝트에서 배운 함수입니다. 반복해서 사용하면서 자연스럽게 익숙해집니다. Polars는 대용량 CSV 파일도 빠르게 읽으며, 자동으로 데이터 타입을 추론합니다."
+
+- id: step3_preview
+  title: 3단계. 데이터 확인
+  subtitle: head()와 shape
+  blocks:
+  - type: text
+    content: head()로 데이터의 처음 몇 행을 확인하여 어떤 형태인지 파악합니다. Date 컬럼은 연도-월-일 형식의 날짜이고, Source는 데이터 출처(GCAG, GISTEMP 등), Mean은 평균 기온 편차를 나타냅니다. 기온 편차는 기준 기간(보통 20세기 평균) 대비 얼마나 높거나 낮은지를 나타내는 값으로, 양수면 평균보다 따뜻하고 음수면 평균보다 추운 것입니다.
+  - type: code
+    language: python
+    title: 처음 5행 보기
+    description: head()로 데이터 미리보기
+    content: |-
+      df.head()
+  - type: tip
+    content: "head()는 반복 학습 개념입니다. 데이터를 불러온 직후 항상 head()로 확인하는 습관을 들이세요. 데이터 구조와 값의 형태를 빠르게 파악할 수 있습니다."
+
+- id: step4_schema
+  title: 4단계. 컬럼과 타입 확인
+  subtitle: schema
+  blocks:
+  - type: text
+    content: schema로 컬럼명과 데이터 타입을 확인합니다. Date는 문자열(String)로 저장되어 있어 날짜 연산을 하려면 타입 변환이 필요합니다. Source는 데이터 출처, Mean은 기온 편차를 나타내며 Float64 타입입니다.
+  - type: code
+    language: python
+    title: 스키마 확인
+    description: 컬럼별 데이터 타입을 확인합니다
+    content: |-
+      df.schema
+
+- id: step5_select
+  title: 5단계. 컬럼 선택
+  subtitle: select와 pl.col
+  blocks:
+  - type: text
+    content: select로 필요한 컬럼을 선택합니다. pl.col()로 컬럼을 지정하며, 여러 컬럼을 선택할 때는 쉼표로 구분합니다. 분석에 필요한 Date와 Mean 컬럼만 선택하여 데이터를 간결하게 만듭니다.
+  - type: code
+    language: python
+    title: Date와 Mean 컬럼 선택
+    description: 날짜와 평균 기온만 선택
+    content: |-
+      df.select(pl.col("Date"), pl.col("Mean"))
+
+- id: step6_filter
+  title: 6단계. 조건 필터링
+  subtitle: filter와 비교연산
+  blocks:
+  - type: text
+    content: filter로 조건에 맞는 행만 선택합니다. Mean이 0보다 큰 데이터만 필터링하면 평균보다 따뜻했던 기간만 추출할 수 있습니다. 비교 연산자(>, <, ==, !=)를 사용하여 다양한 조건을 설정할 수 있습니다.
+  - type: code
+    language: python
+    title: 양수 기온만 필터링
+    description: Mean > 0 조건으로 필터링
+    content: |-
+      df.filter(pl.col("Mean") > 0)
+
+- id: step7_parse_date
+  title: 7단계. 날짜 파싱
+  subtitle: str.to_date()
+  blocks:
+  - type: text
+    content: CSV 파일에서 날짜는 보통 문자열(String)로 저장됩니다. 문자열 상태에서는 날짜 연산(연도 추출, 월 계산 등)을 할 수 없으므로 Date 타입으로 변환해야 합니다. str.to_date()는 문자열을 날짜로 파싱하는 함수입니다. %Y-%m-%d는 날짜 형식을 지정하는 패턴으로, %Y는 4자리 연도, %m은 2자리 월, %d는 2자리 일을 의미합니다. with_columns()는 새로운 컬럼을 추가하거나 기존 컬럼을 변환할 때 사용하는 Polars의 핵심 메서드입니다.
+  - type: code
+    language: python
+    title: 날짜 타입으로 변환
+    description: 문자열을 Date 타입으로 파싱
+    content: |-
+      dfParsed = df.with_columns(
+          pl.col("Date").str.to_date("%Y-%m-%d").alias("ParsedDate")
+      )
+      dfParsed.head()
+  - type: tip
+    content: "with_columns()는 기존 DataFrame에 새 컬럼을 추가하거나 기존 컬럼을 수정합니다. 원본은 변경하지 않고 새로운 DataFrame을 반환합니다(immutable). pandas의 df.assign()과 비슷하지만 더 강력하고 빠릅니다. 여러 컬럼을 리스트로 한 번에 추가할 수도 있습니다."
+
+- id: step8_extract_year
+  title: 8단계. 연도 추출
+  subtitle: dt.year()
+  blocks:
+  - type: text
+    content: 날짜 타입으로 변환한 후에는 dt accessor를 사용하여 다양한 정보를 추출할 수 있습니다. dt는 "datetime accessor"의 약자로, 날짜/시간 관련 메서드를 모아놓은 것입니다. dt.year()는 날짜에서 연도만 추출합니다. 예를 들어 "2020-05-15"에서 2020만 가져오는 것입니다. 이렇게 추출한 연도로 연도별 분석을 할 수 있습니다. pandas의 .dt와 사용법이 거의 동일하지만 Polars가 훨씬 빠릅니다.
+  - type: code
+    language: python
+    title: 연도 컬럼 추가
+    description: 날짜에서 연도만 추출하여 새 컬럼으로
+    content: |-
+      dfYear = dfParsed.with_columns(
+          pl.col("ParsedDate").dt.year().alias("Year")
+      )
+      dfYear.head()
+  - type: tip
+    content: "dt accessor는 날짜/시간 데이터의 특수 메서드에 접근하는 도구입니다. dt.year()(연도), dt.month()(월), dt.day()(일), dt.weekday()(요일), dt.hour()(시간) 등을 사용할 수 있습니다. pandas의 .dt와 동일한 방식이지만 Polars가 훨씬 빠르게 처리합니다."
+
+- id: step9_extract_month
+  title: 9단계. 월 추출
+  subtitle: dt.month()
+  blocks:
+  - type: text
+    content: 연도뿐만 아니라 월도 추출하면 계절성 분석이 가능합니다. dt.month()는 날짜에서 월(1~12)을 추출합니다. 월별로 그룹화하면 여름(6~8월)이 더운지, 겨울(12~2월)이 추운지 등의 패턴을 확인할 수 있습니다. with_columns()를 연속으로 사용하여 Year와 Month 컬럼을 모두 추가했습니다. 이처럼 메서드 체이닝으로 여러 변환을 순차적으로 적용할 수 있습니다.
+  - type: code
+    language: python
+    title: 월 컬럼 추가
+    description: 날짜에서 월만 추출하여 새 컬럼으로
+    content: |-
+      dfMonthly = dfYear.with_columns(
+          pl.col("ParsedDate").dt.month().alias("Month")
+      )
+      dfMonthly.head()
+  - type: tip
+    content: "dt.month()는 1~12의 정수로 월을 반환합니다. 여러 with_columns()를 체이닝하거나, with_columns([컬럼1, 컬럼2]) 형태로 한 번에 여러 컬럼을 추가할 수도 있습니다. 후자가 성능상 더 유리합니다."
+
+- id: step10_groupby
+  title: 10단계. 연도별 평균 기온
+  subtitle: group_by + mean
+  blocks:
+  - type: text
+    content: group_by로 연도별 그룹을 만들고 mean으로 평균을 계산합니다. 같은 연도에 속한 모든 월별 데이터가 하나의 그룹이 되어 평균값으로 집계됩니다. agg() 내에서 alias()를 사용해 결과 컬럼에 의미있는 이름을 붙입니다.
+  - type: code
+    language: python
+    title: 연도별 평균 기온
+    description: Year로 그룹화하여 Mean의 평균 계산
+    content: |-
+      yearlyAvg = dfMonthly.group_by("Year").agg(
+          pl.col("Mean").mean().alias("AvgTemp")
+      )
+      yearlyAvg
+
+- id: step11_sort
+  title: 11단계. 정렬
+  subtitle: sort()
+  blocks:
+  - type: text
+    content: sort로 연도순으로 정렬합니다. 시계열 분석에서는 시간 순서가 매우 중요하며, 정렬을 통해 추세를 파악할 수 있습니다. 기본값은 오름차순이며, descending=True로 내림차순 정렬도 가능합니다.
+  - type: code
+    language: python
+    title: 연도순 정렬
+    description: Year 컬럼을 기준으로 오름차순 정렬
+    content: |-
+      yearlyAvgSorted = yearlyAvg.sort("Year")
+      yearlyAvgSorted
+  - type: note
+    style: tip
+    title: sort 함수
+    content: sort()는 기본적으로 오름차순 정렬입니다. 내림차순은 sort("컬럼", descending=True)를 사용합니다.
+
+- id: step12_result
+  title: 12단계. 연도별 기온 추이 확인
+  subtitle: DataFrame 결과
+  blocks:
+  - type: text
+    content: 연도별 평균 기온 추이를 DataFrame으로 확인합니다. 최근 연도로 갈수록 AvgTemp 값이 높아지는 추세가 보인다면 지구 온난화의 증거입니다. 이렇게 시계열 데이터를 집계하면 장기적인 패턴을 발견할 수 있습니다.
+  - type: code
+    language: python
+    title: 연도별 기온 추이
+    description: 정렬된 연도별 평균 기온 확인
+    content: |-
+      yearlyAvgSorted
+
+- id: step13_monthly_trend
+  title: 13단계. 월별 평균 기온
+  subtitle: 계절성 분석
+  blocks:
+  - type: text
+    content: 월별 평균 기온을 계산하여 계절성을 확인합니다. 1~12월 각각에 대해 전체 기간의 평균을 구하면 어떤 달이 더 따뜻하고 추운지 알 수 있습니다. 북반구 기준으로 7~8월이 가장 높고 1~2월이 가장 낮을 것입니다.
+  - type: code
+    language: python
+    title: 월별 평균
+    description: Month로 그룹화하여 평균 계산 후 정렬
+    content: |-
+      monthlyAvg = dfMonthly.group_by("Month").agg(
+          pl.col("Mean").mean().alias("AvgTemp")
+      ).sort("Month")
+      monthlyAvg
+
+- id: step14_final
+  title: 14단계. 월별 기온 패턴 확인
+  subtitle: DataFrame 결과
+  blocks:
+  - type: text
+    content: 월별 기온 패턴을 DataFrame으로 확인합니다. 정렬된 결과에서 Month 컬럼이 1부터 12까지 순서대로 나열되어 계절에 따른 기온 변화를 명확히 볼 수 있습니다. 이런 계절성(seasonality) 분석은 시계열 데이터의 핵심입니다.
+  - type: code
+    language: python
+    title: 월별 기온 패턴
+    description: 월별 평균 기온 패턴 확인
+    content: |-
+      monthlyAvg
+
+- id: practice
+  title: 실습
+  subtitle: 날씨 데이터 분석 프로젝트
+  blocks:
+  - type: text
+    content: 배운 내용을 활용하여 다양한 분석을 해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 2000년 이후 연도별 평균 기온과 최고/최저 기온"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 전처리"
+      content: |-
+        import polars as pl
+
+        tempUrl = "https://raw.githubusercontent.com/datasets/global-temp/master/data/monthly.csv"
+        tempParsed = pl.read_csv(tempUrl).with_columns(
+            pl.col("Date").str.to_date("%Y-%m-%d").alias("ParsedDate")
+        ).with_columns(
+            pl.col("ParsedDate").dt.year().alias("Year")
+        )
+    - type: code
+      title: "2000년 이후 연도별 집계"
+      content: |-
+        yearlyTemp = tempParsed.filter(pl.col("Year") >= 2000).group_by("Year").agg(
+            pl.col("Mean").mean().alias("AvgTemp"),
+            pl.col("Mean").max().alias("MaxTemp"),
+            pl.col("Mean").min().alias("MinTemp")
+        ).sort("Year")
+        yearlyTemp
+  - type: expansion
+    title: "미션2: 월별 평균 기온과 기온 변동폭 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 전처리"
+      content: |-
+        import polars as pl
+
+        climateUrl = "https://raw.githubusercontent.com/datasets/global-temp/master/data/monthly.csv"
+        climateParsed = pl.read_csv(climateUrl).with_columns(
+            pl.col("Date").str.to_date("%Y-%m-%d").alias("ParsedDate")
+        ).with_columns(
+            pl.col("ParsedDate").dt.month().alias("Month")
+        )
+    - type: code
+      title: "월별 집계"
+      content: |-
+        monthlyTemp = climateParsed.group_by("Month").agg(
+            pl.col("Mean").mean().alias("AvgTemp"),
+            pl.col("Mean").std().alias("StdTemp"),
+            pl.col("Mean").count().alias("Count")
+        ).sort("Month")
+        monthlyTemp
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Polars로 날짜 데이터를 처리하고 분석했습니다.
+  - type: list
+    items:
+    - "pl.read_csv() - CSV 불러오기"
+    - "select(pl.col()) - 컬럼 선택"
+    - "filter(조건) - 조건 필터링"
+    - "with_columns() - 새 컬럼 추가"
+    - "str.to_date() - 문자열을 날짜로 변환"
+    - "dt.year(), dt.month() - 연/월 추출"
+    - "group_by().agg() - 그룹별 집계"
+    - "sort() - 정렬"
+  - type: text
+    content: 다음 시간에는 게임 판매 데이터로 다중 그룹 집계를 배웁니다.

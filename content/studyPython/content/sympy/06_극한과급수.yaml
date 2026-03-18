@@ -1,0 +1,341 @@
+meta:
+  id: sympy_06
+  title: 극한과급수
+  order: 6
+  category: sympy
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["sympy", "limit", "series", "summation", "극한", "테일러급수"]
+  seo:
+    title: "SymPy 극한과 급수 - limit, series 사용법"
+    description: "SymPy로 극한값을 계산하고 테일러 급수를 전개합니다. limit()와 series()로 해석학의 기초를 배웁니다."
+    keywords: ["sympy", "limit", "series", "summation", "극한", "테일러급수"]
+
+intro:
+  emoji: "∞"
+  goal: limit()로 극한값을 계산하고 series()로 급수 전개를 수행합니다.
+  description: "극한(limit)은 해석학의 기초로, 함수가 특정 점에 가까워질 때의 값을 정의합니다. (x²-1)/(x-1)은 x=1에서 0/0이지만 극한값은 2입니다. 급수(series)는 무한 합을 다루고, 테일러 급수는 sin(x), eˣ 같은 함수를 다항식으로 근사합니다. 이 개념들은 미분과 적분의 엄밀한 정의, 함수의 근사, 수치 계산의 기초가 됩니다. 이 프로젝트를 완료하면 극한값 계산, 급수 전개, 무한급수의 합까지 다룰 수 있게 됩니다."
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "극한과 급수에 필요한 함수들을 불러옵니다. limit()는 극한값을 계산하고, series()는 테일러 급수를 전개합니다. summation()은 유한/무한 합을 계산하고, factorial(n)은 n! = n×(n-1)×...×1입니다. oo는 무한대를 나타냅니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sympy 함수들을 불러옵니다
+    content: |-
+      from sympy import symbols, limit, series, summation, Sum
+      from sympy import sin, cos, exp, log, sqrt, pi, oo, Rational
+      from sympy import simplify, factorial
+      from sympy import init_printing
+      init_printing()
+
+- id: step2_limit_basic
+  title: 2단계. 기본 극한
+  subtitle: limit()
+  blocks:
+  - type: text
+    content: "limit(f, x, a)는 x가 a에 가까워질 때 f(x)의 극한값을 계산합니다. x=a에서 함수값이 정의되지 않아도 극한은 존재할 수 있습니다. (x²-1)/(x-1)에 x=1을 대입하면 0/0이지만, 인수분해하면 x+1이 되어 극한값은 2입니다. limit()는 이런 부정형을 자동으로 처리합니다."
+  - type: code
+    language: python
+    title: 기호 정의
+    description: 변수 x를 정의합니다
+    content: |-
+      x = symbols('x')
+  - type: code
+    language: python
+    title: 간단한 극한
+    description: x→2일 때 x²의 극한
+    content: |-
+      lim1 = limit(x**2, x, 2)
+      lim1
+  - type: code
+    language: python
+    title: 0/0 형태
+    description: (x²-1)/(x-1)의 x→1 극한
+    content: |-
+      lim2 = limit((x**2 - 1)/(x - 1), x, 1)
+      lim2
+  - type: tip
+    content: (x²-1)/(x-1)에 x=1을 대입하면 0/0이지만, 인수분해하면 x+1이 되어 극한값은 2입니다. limit()가 자동 처리합니다.
+
+- id: step3_infinity
+  title: 3단계. 무한대 극한
+  subtitle: x → ∞
+  blocks:
+  - type: text
+    content: "x가 무한대로 갈 때의 극한은 함수의 장기적 행동을 보여줍니다. limit(1/x, x, oo) = 0으로 x가 커지면 1/x는 0에 가까워집니다. 유리함수 (2x+1)/(x+3)의 극한은 최고차항 계수의 비인 2입니다. 발산하는 경우 oo 또는 -oo가 반환됩니다."
+  - type: code
+    language: python
+    title: 무한대로 가는 극한
+    description: 1/x의 x→∞ 극한
+    content: |-
+      lim3 = limit(1/x, x, oo)
+      lim3
+  - type: code
+    language: python
+    title: 유리함수 극한
+    description: (2x+1)/(x+3)의 x→∞ 극한
+    content: |-
+      lim4 = limit((2*x + 1)/(x + 3), x, oo)
+      lim4
+  - type: code
+    language: python
+    title: 지수함수 극한
+    description: e⁻ˣ의 x→∞ 극한
+    content: |-
+      lim5 = limit(exp(-x), x, oo)
+      lim5
+
+- id: step4_sided
+  title: 4단계. 좌극한과 우극한
+  subtitle: 방향 지정
+  blocks:
+  - type: text
+    content: "함수가 불연속인 점에서는 왼쪽에서 접근하는 값(좌극한)과 오른쪽에서 접근하는 값(우극한)이 다를 수 있습니다. 1/x의 x→0 극한은 오른쪽에서 +∞, 왼쪽에서 -∞입니다. limit(f, x, a, '+')는 우극한, limit(f, x, a, '-')는 좌극한입니다. 좌극한과 우극한이 같을 때만 극한이 존재합니다."
+  - type: code
+    language: python
+    title: 우극한
+    description: 1/x의 x→0⁺ 극한
+    content: |-
+      lright = limit(1/x, x, 0, '+')
+      lright
+  - type: code
+    language: python
+    title: 좌극한
+    description: 1/x의 x→0⁻ 극한
+    content: |-
+      lleft = limit(1/x, x, 0, '-')
+      lleft
+  - type: tip
+    content: "dir='+' 또는 '+'는 오른쪽(양의 방향)에서 접근합니다. dir='-' 또는 '-'는 왼쪽(음의 방향)에서 접근합니다."
+
+- id: step5_special
+  title: 5단계. 특수 극한
+  subtitle: 유명한 극한
+  blocks:
+  - type: text
+    content: "미적분에서 반복적으로 등장하는 유명한 극한들이 있습니다. lim[x→0] sin(x)/x = 1은 삼각함수 미분의 기초입니다. lim[n→∞] (1+1/n)ⁿ = e는 자연상수 e의 정의입니다. lim[x→0] (eˣ-1)/x = 1은 지수함수 미분에 사용됩니다. 이 극한들은 암기할 가치가 있습니다."
+  - type: code
+    language: python
+    title: sin(x)/x 극한
+    description: 가장 유명한 극한
+    content: |-
+      lsin = limit(sin(x)/x, x, 0)
+      lsin
+  - type: code
+    language: python
+    title: (1+1/n)ⁿ 극한
+    description: 자연상수 e의 정의
+    content: |-
+      n = symbols('n')
+      le = limit((1 + 1/n)**n, n, oo)
+      le
+  - type: code
+    language: python
+    title: (eˣ-1)/x 극한
+    description: 지수함수 기본 극한
+    content: |-
+      lexp = limit((exp(x) - 1)/x, x, 0)
+      lexp
+
+- id: step6_series
+  title: 6단계. 테일러 급수
+  subtitle: series()
+  blocks:
+  - type: text
+    content: "테일러 급수(Taylor series)는 함수를 다항식으로 근사합니다. eˣ = 1 + x + x²/2! + x³/3! + ..., sin(x) = x - x³/6 + x⁵/120 - ...입니다. series(f, x, 0, n)은 x=0에서 n항까지 전개합니다. 결과에 O(xⁿ)은 오차항을 나타냅니다. 컴퓨터가 삼각함수를 계산할 때 실제로 테일러 급수를 사용합니다."
+  - type: code
+    language: python
+    title: eˣ 급수
+    description: e^x의 테일러 급수
+    content: |-
+      sexp = series(exp(x), x, 0, 6)
+      sexp
+  - type: code
+    language: python
+    title: sin(x) 급수
+    description: sin x의 테일러 급수
+    content: |-
+      ssin = series(sin(x), x, 0, 7)
+      ssin
+  - type: code
+    language: python
+    title: cos(x) 급수
+    description: cos x의 테일러 급수
+    content: |-
+      scos = series(cos(x), x, 0, 7)
+      scos
+  - type: tip
+    content: series(f, x, 0, n)은 x=0에서 n항까지 전개합니다. O(x^n)은 나머지 오차항입니다. removeO()로 제거할 수 있습니다.
+
+- id: step7_remove_o
+  title: 7단계. 급수 활용
+  subtitle: 다항식 추출
+  blocks:
+  - type: text
+    content: "series() 결과에서 removeO()를 호출하면 오차항 O(xⁿ)을 제거하고 순수한 다항식을 얻습니다. 이 다항식으로 원래 함수를 근사할 수 있습니다. sin(0.5)의 정확한 값 0.479...과 테일러 다항식의 근사값을 비교하면 매우 가깝습니다. 항이 많을수록 더 넓은 범위에서 정확하게 근사합니다."
+  - type: code
+    language: python
+    title: 오차항 제거
+    description: 다항식만 추출합니다
+    content: |-
+      spoly = series(sin(x), x, 0, 7).removeO()
+      spoly
+  - type: code
+    language: python
+    title: 근사 비교
+    description: 원래 함수와 비교합니다
+    content: |-
+      exact = sin(x).subs(x, Rational(1, 2)).evalf()
+      approx = spoly.subs(x, Rational(1, 2)).evalf()
+      exact, approx
+  - type: tip
+    content: 테일러 다항식은 중심 근처에서 원래 함수를 잘 근사합니다. 항이 많을수록 더 넓은 범위에서 정확합니다.
+
+- id: step8_summation
+  title: 8단계. 급수 합
+  subtitle: summation()
+  blocks:
+  - type: text
+    content: "summation()은 Σ 기호로 표현되는 급수의 합을 계산합니다. summation(k, (k, 1, 10))은 1+2+...+10 = 55입니다. 변수 n을 사용하면 1+2+...+n = n(n+1)/2 같은 공식을 유도합니다. 무한급수도 수렴하면 정확한 값을 반환합니다. 기하급수 Σ(1/2)ᵏ = 2입니다."
+  - type: code
+    language: python
+    title: 유한 합
+    description: 1+2+...+10을 계산합니다
+    content: |-
+      n, k = symbols('n k')
+      fsum = summation(k, (k, 1, 10))
+      fsum
+  - type: code
+    language: python
+    title: 공식 유도
+    description: 1+2+...+n 공식
+    content: |-
+      formula = summation(k, (k, 1, n))
+      formula
+  - type: code
+    language: python
+    title: 무한 급수
+    description: 기하급수의 합
+    content: |-
+      geo = summation(Rational(1, 2)**k, (k, 0, oo))
+      geo
+  - type: tip
+    content: summation(f, (k, a, b))는 k=a부터 k=b까지의 합입니다. b=oo로 무한급수를 계산합니다. 수렴하면 값을 반환합니다.
+
+- id: step9_famous
+  title: 9단계. 유명한 급수
+  subtitle: 바젤 문제 등
+  blocks:
+  - type: text
+    content: "수학사에서 중요한 급수들을 SymPy로 검증합니다. 바젤 문제 Σ(1/n²)은 1735년 오일러가 π²/6임을 증명하여 수학계를 놀라게 했습니다. 조화급수 Σ(1/n)은 발산하여 무한대가 됩니다. 1/n²은 수렴하는데 1/n은 발산하는 이유는 항의 감소 속도 차이 때문입니다. 교대급수 Σ((-1)ⁿ/n)은 ln(2)에 수렴합니다. 이런 급수들은 해석학의 기초 예제로 널리 사용됩니다."
+  - type: code
+    language: python
+    title: 바젤 문제
+    description: Σ(1/n²) 계산
+    content: |-
+      basel = summation(1/n**2, (n, 1, oo))
+      basel
+  - type: code
+    language: python
+    title: 조화급수
+    description: Σ(1/n)은 발산합니다
+    content: |-
+      harmonic = summation(1/n, (n, 1, oo))
+      harmonic
+  - type: code
+    language: python
+    title: 교대급수
+    description: Σ((-1)ⁿ/n) 계산
+    content: |-
+      alternating = summation((-1)**(n+1)/n, (n, 1, oo))
+      alternating
+
+- id: step10_combine
+  title: 10단계. 극한과 급수 연결
+  subtitle: 종합
+  blocks:
+  - type: text
+    content: "극한과 급수는 미적분학의 근간입니다. 미분의 정의 f'(x) = lim[h→0] (f(x+h)-f(x))/h는 극한으로 정의됩니다. x=2에서 x²의 미분값 4를 극한 정의로 계산하면 limit((f(2+h)-f(2))/h, h, 0) = 4입니다. 자연상수 e도 급수 Σ(1/n!)으로 정의됩니다. SymPy는 미분을 극한 정의 없이 diff()로 바로 계산하지만, 극한 정의를 이해하면 미분의 본질을 알 수 있습니다."
+  - type: code
+    language: python
+    title: 미분의 극한 정의
+    description: f'(a) = lim[h→0] (f(a+h)-f(a))/h
+    content: |-
+      from sympy import diff
+      h = symbols('h')
+      f = x**2
+      ddef = limit((f.subs(x, 2+h) - f.subs(x, 2))/h, h, 0)
+      ddef
+  - type: code
+    language: python
+    title: 미분 직접 계산
+    description: 비교 확인
+    content: |-
+      ddirect = diff(f, x).subs(x, 2)
+      ddirect
+  - type: code
+    language: python
+    title: e의 정의
+    description: 급수로 e 계산
+    content: |-
+      esum = summation(1/factorial(n), (n, 0, oo))
+      esum
+
+- id: practice
+  title: 실습
+  subtitle: 극한과 급수 연습
+  blocks:
+  - type: text
+    content: "이제 limit(), series(), summation()을 종합적으로 활용합니다. 미션1에서는 다양한 부정형 극한을 계산합니다. (1-cos(u))/u²은 0/0형태이고, u·log(u)는 0·(-∞)형태입니다. 미션2에서는 ln(1+v)와 √(1+v)의 테일러 급수를 구하고, 1/k⁴의 무한합이 π⁴/90임을 확인합니다. 이런 계산은 물리학의 근사 계산, 수치해석의 오차 분석에 필수적입니다."
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 다양한 극한 계산"
+    blocks:
+    - type: code
+      title: "삼각 극한"
+      content: |-
+        from sympy import symbols, limit, sin, cos, exp, log, oo
+
+        u = symbols('u')
+
+        val1 = limit((1 - cos(u))/u**2, u, 0)
+        val1
+    - type: code
+      title: "로그 극한"
+      content: |-
+        val2 = limit(u*log(u), u, 0, '+')
+        val2
+    - type: code
+      title: "지수 극한"
+      content: |-
+        val3 = limit((exp(u) - exp(-u))/(2*u), u, 0)
+        val3
+  - type: expansion
+    title: "미션2: 급수 전개와 합"
+    blocks:
+    - type: code
+      title: "로그 급수"
+      content: |-
+        from sympy import symbols, series, summation, log, Rational, oo
+
+        v, k = symbols('v k')
+
+        lnTaylor = series(log(1 + v), v, 0, 6).removeO()
+        lnTaylor
+    - type: code
+      title: "제곱근 급수"
+      content: |-
+        sqrtTaylor = series((1 + v)**(Rational(1, 2)), v, 0, 5).removeO()
+        sqrtTaylor
+    - type: code
+      title: "무한급수 합"
+      content: |-
+        total = summation(1/k**4, (k, 1, oo))
+        total

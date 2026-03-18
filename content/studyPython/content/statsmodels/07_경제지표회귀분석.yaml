@@ -1,0 +1,448 @@
+meta:
+  id: statsmodels_07
+  title: 경제지표회귀분석
+  order: 7
+  category: statsmodels
+  difficulty: "⭐⭐⭐⭐"
+  badge: 중급
+  tags: ["시계열회귀", "외생변수", "경제지표", "GDP예측", "인플레이션"]
+  seo:
+    title: "statsmodels 시계열 회귀 - 경제 지표로 GDP 예측하기"
+    description: "CPI, 실업률 등 경제 지표로 GDP를 예측합니다. 외생변수를 포함한 시계열 회귀를 배웁니다."
+    keywords: ["statsmodels", "시계열회귀", "GDP예측", "외생변수", "경제지표", "macrodata"]
+
+intro:
+  emoji: "📈"
+  goal: 여러 경제 지표로 GDP를 예측하는 시계열 회귀 모델 만들기
+  description: 1959-2009년 미국 거시경제 데이터로 실업률, 인플레이션, 금리 등 경제 지표가 GDP에 미치는 영향을 분석합니다. 외생변수를 포함한 시계열 회귀로 경제 예측 능력을 기릅니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: 미국 거시경제 데이터
+  blocks:
+  - type: text
+    content: "statsmodels에 내장된 macrodata는 1959년 1분기부터 2009년 3분기까지 미국 거시경제 지표를 담고 있습니다. GDP, 소비, 투자, CPI, 실업률, 인플레이션 등 14개 변수가 분기별로 기록되어 있어 경제 분석에 최적입니다. 이 데이터는 50년간 미국 경제의 성장과 침체를 보여주며, 중앙은행, 투자기관, 정책연구소에서 거시경제 모델을 검증할 때 자주 사용하는 표준 데이터셋입니다. 외부 URL 없이 statsmodels 패키지에서 직접 불러올 수 있어 재현성이 보장됩니다."
+  - type: code
+    language: python
+    title: 거시경제 데이터 로드
+    description: statsmodels 내장 데이터셋
+    content: |-
+      import pandas as pd
+      import numpy as np
+      import statsmodels.api as sm
+      import plotly.express as px
+      import plotly.graph_objects as go
+
+      macro = sm.datasets.macrodata.load_pandas().data
+      macro.shape
+  - type: tip
+    content: load_pandas()는 statsmodels 데이터셋을 pandas DataFrame으로 반환합니다. .data 속성으로 실제 데이터에 접근합니다. macrodata는 경제학 교과서에서 자주 사용되는 표준 시계열 데이터셋입니다.
+
+- id: step2_explore
+  title: 2단계. 변수 탐색
+  subtitle: 경제 지표 이해하기
+  blocks:
+  - type: text
+    content: "데이터에는 실질GDP(realgdp), 소비(realcons), 투자(realinv), CPI(물가지수), 실업률(unemp), 인플레이션(infl), 실질금리(realint) 등이 포함됩니다. 이 변수들은 경제학 교과서에서 배우는 핵심 지표들로, GDP는 경제 규모를, CPI는 물가 수준을, 실업률은 노동시장 상황을 나타냅니다. 경제 변수들은 서로 밀접하게 연관되어 있어 다중회귀 분석에 적합하며, 실업률이 오르면 GDP가 감소하는 등의 관계를 정량적으로 분석할 수 있습니다."
+  - type: code
+    language: python
+    title: 컬럼 목록 확인
+    description: 14개 경제 지표
+    content: |-
+      macro.columns.tolist()
+  - type: tip
+    content: realgdp는 실질GDP(물가 조정 GDP), realcons는 실질소비, cpi는 소비자물가지수, unemp는 실업률(%), infl은 인플레이션율(%), tbilrate는 3개월 국채 금리입니다. 'real'이 붙은 변수는 인플레이션 효과를 제거한 실질 값입니다.
+
+- id: step3_head
+  title: 3단계. 데이터 미리보기
+  subtitle: 시계열 구조 확인
+  blocks:
+  - type: text
+    content: "year와 quarter 컬럼으로 시간 정보를 확인할 수 있습니다. 1959년 1분기부터 2009년 3분기까지 203개 분기(약 50년) 데이터가 포함됩니다. 경제 데이터는 월별, 분기별, 연간 단위로 발표되는데, 분기별 데이터는 월별보다 노이즈가 적고 연간보다 변화를 자세히 관찰할 수 있어 거시경제 분석에 많이 사용됩니다. 분기별 데이터이므로 계절성보다는 장기 추세 분석이 핵심입니다."
+  - type: code
+    language: python
+    title: 처음 5행 확인
+    description: 분기별 구조
+    content: |-
+      macro.head()
+
+- id: step4_time_index
+  title: 4단계. 시간 인덱스 생성
+  subtitle: 날짜 형식 변환
+  blocks:
+  - type: text
+    content: "시계열 분석을 위해 year와 quarter를 결합하여 날짜 인덱스를 생성합니다. 날짜 인덱스가 있으면 시계열 그래프를 그리거나 특정 기간을 필터링할 때 매우 편리합니다. 예를 들어 2008년 금융위기 전후 데이터만 추출하거나, 1970년대 오일쇼크 기간과 비교하는 분석이 가능해집니다. pandas의 DatetimeIndex는 분기 데이터에도 적용할 수 있어 경제 시계열 분석에 필수적인 도구입니다."
+  - type: code
+    language: python
+    title: 분기별 인덱스 생성
+    description: year + quarter → 날짜
+    content: |-
+      macro['date'] = pd.to_datetime(macro['year'].astype(int).astype(str) + '-' + (macro['quarter'].astype(int) * 3 - 2).astype(str) + '-01')
+      macro = macro.set_index('date')
+      macro.index
+  - type: tip
+    content: 분기를 월로 변환하려면 1분기=1월, 2분기=4월, 3분기=7월, 4분기=10월이므로 quarter * 3 - 2 공식을 사용합니다. pd.to_datetime()으로 문자열을 날짜로 변환하고, set_index()로 인덱스를 설정합니다. 04 프로젝트의 시계열 인덱스 개념을 복습합니다.
+
+- id: step5_gdp_trend
+  title: 5단계. GDP 추세 시각화
+  subtitle: 50년 경제 성장
+  blocks:
+  - type: text
+    content: "1959-2009년 미국 GDP 추세를 시각화합니다. 50년간 실질GDP는 약 3조 달러에서 13조 달러로 4배 이상 성장했으며, 이 과정에서 여러 경기침체 시기를 겪었습니다. 1970년대 오일쇼크, 1980년대 초 스태그플레이션, 2001년 닷컴버블 붕괴, 2008년 글로벌 금융위기 등이 그래프에서 급락으로 나타납니다. 경제 분석에서 시각화는 숫자만으로는 보이지 않는 추세와 변곡점을 발견하게 해줍니다."
+  - type: code
+    language: python
+    title: GDP 시계열 그래프
+    description: 50년 추세 확인
+    content: |-
+      gdpFig = px.line(macro.reset_index(), x='date', y='realgdp',
+                       title='US Real GDP (1959-2009)',
+                       labels={'date': 'Date', 'realgdp': 'Real GDP (Billions)'})
+      gdpFig.show()
+  - type: tip
+    content: reset_index()로 인덱스를 컬럼으로 변환해야 plotly에서 x축으로 사용할 수 있습니다. 그래프에서 1970년대 오일쇼크, 1980년대 초 경기침체, 2001년 닷컴버블, 2008년 금융위기 시기의 GDP 변동을 확인할 수 있습니다.
+
+- id: step6_correlation
+  title: 6단계. 변수 간 상관관계
+  subtitle: 경제 지표 연관성
+  blocks:
+  - type: text
+    content: "GDP와 다른 경제 지표의 상관관계를 확인합니다. 상관분석은 회귀 모델에 어떤 변수를 넣을지 결정하는 첫 단계입니다. 소비(realcons)와 투자(realinv)는 GDP를 구성하는 요소이므로 0.99에 가까운 높은 상관을 보일 것입니다. 반면 실업률(unemp)은 경기가 좋으면 낮아지고 나쁘면 높아지므로 GDP와 음의 상관이 예상됩니다. 이런 경제적 직관을 데이터로 검증하는 것이 분석의 첫걸음입니다."
+  - type: code
+    language: python
+    title: GDP와 상관관계
+    description: 주요 변수 선택
+    content: |-
+      targetVars = ['realgdp', 'realcons', 'realinv', 'unemp', 'cpi', 'infl', 'realint']
+      macro[targetVars].corr()['realgdp'].sort_values(ascending=False)
+  - type: tip
+    content: corr()['realgdp']로 GDP와 각 변수의 상관계수만 추출합니다. realcons(소비)가 0.99로 거의 완벽한 양의 상관, unemp(실업률)가 음의 상관을 보입니다. cpi(물가)도 GDP와 양의 상관인데, 경제 성장과 물가가 함께 올라가는 경향을 반영합니다.
+
+- id: step7_feature_selection
+  title: 7단계. 독립변수 선택
+  subtitle: 외생변수 결정
+  blocks:
+  - type: text
+    content: "GDP 예측 모델에 사용할 외생변수를 선택합니다. 외생변수(exogenous variable)란 모델 외부에서 결정되어 종속변수에 영향을 주는 변수입니다. 실업률, 인플레이션, 금리는 중앙은행 정책이나 노동시장 상황에 따라 결정되므로 GDP의 원인이 될 수 있습니다. 반면 소비(realcons)는 GDP의 구성요소여서 원인보다는 결과에 가깝습니다. 변수 선택 시 인과관계 방향을 고려해야 의미 있는 예측 모델을 만들 수 있습니다."
+  - type: code
+    language: python
+    title: 외생변수 선택
+    description: 원인이 될 수 있는 변수
+    content: |-
+      exogVars = ['unemp', 'infl', 'realint', 'cpi']
+      XRaw = macro[exogVars]
+      y = macro['realgdp']
+      XRaw.describe()
+  - type: tip
+    content: 외생변수(exogenous variable)는 모델 외부에서 결정되어 종속변수에 영향을 주는 변수입니다. 실업률 상승 → GDP 하락, 인플레이션 → GDP 변동 같은 인과관계를 분석할 수 있습니다. describe()로 각 변수의 범위와 분포를 확인합니다.
+
+- id: step8_scatter_matrix
+  title: 8단계. 산점도 행렬
+  subtitle: 변수 관계 시각화
+  blocks:
+  - type: text
+    content: "GDP와 외생변수의 관계를 산점도로 확인합니다. 산점도 행렬(scatter matrix)은 여러 변수 쌍의 관계를 한눈에 볼 수 있어 다변량 데이터 탐색에 효과적입니다. 실업률과 GDP 산점도에서 우하향 패턴이 보이면 음의 관계를, CPI와 GDP에서 우상향 패턴이 보이면 양의 관계를 의미합니다. 비선형 패턴이 발견되면 변환이나 다항 항을 고려해야 합니다."
+  - type: code
+    language: python
+    title: 산점도 행렬
+    description: GDP vs 외생변수
+    content: |-
+      scatterData = macro[['realgdp'] + exogVars].reset_index(drop=True)
+      scatterFig = px.scatter_matrix(scatterData, dimensions=['realgdp', 'unemp', 'cpi'],
+                                     title='GDP vs Unemployment vs CPI')
+      scatterFig.update_traces(diagonal_visible=False)
+      scatterFig.show()
+  - type: tip
+    content: scatter_matrix()는 모든 변수 쌍의 산점도를 한 번에 그립니다. diagonal_visible=False로 대각선(자기 자신과의 관계)을 숨깁니다. unemp-realgdp 산점도에서 역U자 형태가 보이면 비선형 관계일 수 있습니다.
+
+- id: step9_multiple_regression
+  title: 9단계. 다중회귀 모델
+  subtitle: 4개 외생변수 사용
+  blocks:
+  - type: text
+    content: "실업률, 인플레이션, 실질금리, CPI를 독립변수로 GDP를 예측하는 다중회귀 모델을 학습합니다. 다중회귀는 여러 요인이 결과에 미치는 개별 영향력을 분리하여 측정할 수 있어 정책 분석에 필수적입니다. 예를 들어 실업률 1%p 증가가 다른 조건이 같을 때 GDP에 미치는 순수 효과를 계수로 확인할 수 있습니다. R²가 높으면 선택한 경제 지표가 GDP 변동을 잘 설명한다는 의미입니다."
+  - type: code
+    language: python
+    title: 다중회귀 학습
+    description: 외생변수 → GDP
+    content: |-
+      X = sm.add_constant(XRaw)
+      modelGdp = sm.OLS(y, X).fit()
+      modelGdp.summary()
+  - type: tip
+    content: R²가 높으면 선택한 경제 지표가 GDP 변동을 잘 설명합니다. 각 계수의 부호를 확인하세요. unemp 계수가 음수면 실업률 1%p 증가 시 GDP가 감소, cpi 계수가 양수면 물가와 GDP가 함께 증가하는 관계입니다.
+
+- id: step10_coefficient_interpret
+  title: 10단계. 계수 해석
+  subtitle: 경제적 의미
+  blocks:
+  - type: text
+    content: "각 계수의 경제적 의미를 해석합니다. 회귀 계수는 '다른 변수가 고정되었을 때' 해당 변수 1단위 증가의 효과를 나타냅니다. 예를 들어 unemp 계수가 -100이면 인플레이션, 금리, 물가가 그대로일 때 실업률 1%p 증가 시 GDP가 100억 달러 감소한다는 의미입니다. 이 해석은 정책 효과를 분석할 때 핵심이며, p-value로 이 효과가 통계적으로 유의미한지도 함께 확인해야 합니다."
+  - type: code
+    language: python
+    title: 계수와 p-value
+    description: 유의한 변수 확인
+    content: |-
+      coefDf = pd.DataFrame({
+          'Coefficient': modelGdp.params,
+          'Std Error': modelGdp.bse,
+          'p-value': modelGdp.pvalues
+      }).round(4)
+      coefDf
+  - type: tip
+    content: p-value가 0.05 미만이면 해당 변수는 통계적으로 유의합니다. const(절편)는 모든 독립변수가 0일 때 GDP 기대값입니다. 계수의 부호가 경제 이론과 일치하는지 확인하세요. 실업률이 상승하면 GDP가 하락하는 것이 일반적입니다.
+
+- id: step11_residual_analysis
+  title: 11단계. 잔차 분석
+  subtitle: 모델 진단
+  blocks:
+  - type: text
+    content: "잔차 분석으로 모델의 적합성을 진단합니다. 잔차(residual)는 실제값과 예측값의 차이로, 모델이 설명하지 못한 부분입니다. 좋은 모델이라면 잔차가 무작위하게 0 주위에 분포해야 합니다. 시간에 따라 잔차가 커지거나 특정 패턴을 보이면 모델에 문제가 있습니다. 특히 시계열 데이터에서는 잔차의 자기상관(autocorrelation), 즉 이전 시점 오차가 현재 시점 오차에 영향을 주는지도 확인해야 합니다."
+  - type: code
+    language: python
+    title: 잔차 플롯
+    description: 시간에 따른 잔차
+    content: |-
+      residuals = modelGdp.resid
+      residDf = pd.DataFrame({'Date': macro.index, 'Residuals': residuals})
+
+      residFig = px.scatter(residDf, x='Date', y='Residuals',
+                            title='Residuals Over Time',
+                            opacity=0.6)
+      residFig.add_hline(y=0, line_dash='dash', line_color='red')
+      residFig.show()
+  - type: tip
+    content: 잔차가 시간에 따라 증가하거나 감소하는 추세가 있으면 모델이 추세를 제대로 포착하지 못한 것입니다. 특정 시기에 잔차가 집중되면 구조적 변화가 있을 수 있습니다(2008년 금융위기 등). macro.index는 이미 DatetimeIndex이므로 바로 사용할 수 있습니다.
+
+- id: step12_durbin_watson
+  title: 12단계. 자기상관 검정
+  subtitle: Durbin-Watson 통계량
+  blocks:
+  - type: text
+    content: "시계열 회귀에서 잔차의 자기상관(autocorrelation)은 중요한 진단 지표입니다. 자기상관이 있으면 표준오차가 과소추정되어 p-value가 부정확해지므로, 유의미하지 않은 변수를 유의미하다고 잘못 판단할 수 있습니다. Durbin-Watson 통계량은 이를 검정하는 도구로, 2에 가까우면 자기상관이 없고, 0에 가까우면 양의 자기상관(어제 오차가 양수면 오늘도 양수), 4에 가까우면 음의 자기상관을 의미합니다."
+  - type: code
+    language: python
+    title: Durbin-Watson 검정
+    description: 잔차 자기상관 확인
+    content: |-
+      from statsmodels.stats.stattools import durbin_watson
+
+      dwStat = durbin_watson(modelGdp.resid)
+      f"Durbin-Watson: {dwStat:.3f}"
+  - type: tip
+    content: DW 통계량이 1.5~2.5면 자기상관이 심각하지 않습니다. 0에 가까우면 양의 자기상관(어제 오차가 양수면 오늘도 양수일 가능성), 4에 가까우면 음의 자기상관입니다. 자기상관이 있으면 표준오차가 과소추정되어 p-value가 부정확해집니다.
+
+- id: step13_prediction
+  title: 13단계. GDP 예측
+  subtitle: 새로운 경제 시나리오
+  blocks:
+  - type: text
+    content: "특정 경제 시나리오에서 GDP를 예측합니다. 회귀 모델의 가장 큰 장점은 가상의 조건에서 결과를 예측할 수 있다는 점입니다. 실업률 6%, 인플레이션 3%, 실질금리 2%, CPI 200인 가상 시나리오를 설정하고 GDP를 예측해봅니다. 이런 시나리오 분석은 정책 결정, 투자 계획, 리스크 관리에서 다양한 상황에 대비하는 데 활용됩니다."
+  - type: code
+    language: python
+    title: 시나리오별 GDP 예측
+    description: 새로운 경제 지표 입력
+    content: |-
+      scenarioData = {col: [0] for col in exogVars}
+      scenarioData['unemp'] = [6.0]
+      scenarioData['infl'] = [3.0]
+      scenarioData['realint'] = [2.0]
+      scenarioData['cpi'] = [200.0]
+
+      scenarioDf = pd.DataFrame(scenarioData)[exogVars]
+      scenarioWithConst = sm.add_constant(scenarioDf, has_constant='add')
+      predictedGdp = modelGdp.predict(scenarioWithConst)[0]
+      f"예측 GDP: {predictedGdp:.2f} billion"
+  - type: tip
+    content: has_constant='add'는 단일 행 데이터에도 상수항을 추가합니다. 03 프로젝트에서 배운 더미 변수 처리와 동일한 패턴입니다. 예측값이 현실적인 범위(5000-15000)인지 확인하세요.
+
+- id: step14_scenario_comparison
+  title: 14단계. 시나리오 비교
+  subtitle: 경기침체 vs 호황
+  blocks:
+  - type: text
+    content: "경기침체와 호황 시나리오를 비교합니다. 침체 시나리오는 실업률 9%, 저인플레이션, 저금리를 설정하고, 호황 시나리오는 실업률 4%, 적정 인플레이션, 정상 금리를 설정합니다. 두 시나리오의 예측 GDP 차이를 계산하면 경제 상황 변화가 GDP에 미치는 영향의 규모를 파악할 수 있습니다. 이런 비교 분석은 경기 전망 보고서나 정책 제안서 작성에 자주 활용됩니다."
+  - type: code
+    language: python
+    title: 침체 vs 호황 비교
+    description: 두 시나리오 GDP 예측
+    content: |-
+      recessionData = {col: [0] for col in exogVars}
+      recessionData['unemp'] = [9.0]
+      recessionData['infl'] = [1.0]
+      recessionData['realint'] = [0.5]
+      recessionData['cpi'] = [180.0]
+
+      boomData = {col: [0] for col in exogVars}
+      boomData['unemp'] = [4.0]
+      boomData['infl'] = [3.5]
+      boomData['realint'] = [3.0]
+      boomData['cpi'] = [220.0]
+
+      recessionDf = pd.DataFrame(recessionData)[exogVars]
+      boomDf = pd.DataFrame(boomData)[exogVars]
+
+      recessionConst = sm.add_constant(recessionDf, has_constant='add')
+      boomConst = sm.add_constant(boomDf, has_constant='add')
+
+      recessionGdp = modelGdp.predict(recessionConst)[0]
+      boomGdp = modelGdp.predict(boomConst)[0]
+
+      compareDf = pd.DataFrame({
+          'Scenario': ['Recession', 'Boom'],
+          'Unemployment': [9.0, 4.0],
+          'Inflation': [1.0, 3.5],
+          'Predicted GDP': [recessionGdp, boomGdp]
+      })
+      compareDf
+
+- id: step15_time_effect
+  title: 15단계. 시간 효과 추가
+  subtitle: 추세 변수 포함
+  blocks:
+  - type: text
+    content: "경제는 기술 발전, 인구 증가, 생산성 향상으로 장기적으로 성장하는 추세가 있습니다. 이 추세를 무시하면 다른 변수들이 추세 효과까지 흡수하여 계수 해석이 왜곡됩니다. 시간 변수를 추가하면 추세 효과가 분리되어, 다른 변수 계수는 '추세를 제외한 순수 효과'로 바뀝니다. 시간 변수 추가 전후의 R², 계수, AIC를 비교하면 추세 효과의 크기를 확인할 수 있습니다."
+  - type: code
+    language: python
+    title: 시간 변수 추가
+    description: 추세 포함 모델
+    content: |-
+      macro['time'] = range(len(macro))
+
+      XWithTime = macro[exogVars + ['time']]
+      XWithTimeConst = sm.add_constant(XWithTime)
+
+      modelWithTime = sm.OLS(y, XWithTimeConst).fit()
+
+      compareSummary = pd.DataFrame({
+          'Model': ['Without Time', 'With Time'],
+          'R²': [modelGdp.rsquared, modelWithTime.rsquared],
+          'Adj R²': [modelGdp.rsquared_adj, modelWithTime.rsquared_adj],
+          'AIC': [modelGdp.aic, modelWithTime.aic]
+      })
+      compareSummary
+  - type: tip
+    content: time 변수는 0, 1, 2, ... 순으로 증가하는 추세 변수입니다. 시간 변수를 추가하면 다른 변수의 계수는 "추세를 제외한 순수 효과"로 해석이 바뀝니다. R²와 Adj R² 차이가 크면 과적합 가능성이 있습니다.
+
+- id: step16_fitted_vs_actual
+  title: 16단계. 예측 vs 실제 비교
+  subtitle: 모델 적합도 시각화
+  blocks:
+  - type: text
+    content: "모델의 예측값과 실제 GDP를 시각화하여 적합도를 확인합니다. 실제값과 예측값 그래프가 가까울수록 모델이 데이터를 잘 설명한다는 의미입니다. 특히 2008년 금융위기 같은 급격한 변동 시점에서 두 선의 차이를 확인하세요. 모델이 예측하지 못한 큰 오차가 있다면 그 시점에 특별한 사건이 있었거나 모델에 포함되지 않은 요인이 작용했을 수 있습니다."
+  - type: code
+    language: python
+    title: 예측 vs 실제 그래프
+    description: 시계열 비교
+    content: |-
+      fittedValues = modelWithTime.fittedvalues
+
+      compFig = go.Figure()
+      compFig.add_trace(go.Scatter(x=macro.index, y=y, mode='lines', name='Actual GDP'))
+      compFig.add_trace(go.Scatter(x=macro.index, y=fittedValues, mode='lines', name='Predicted GDP', line=dict(dash='dash')))
+      compFig.update_layout(title='Actual vs Predicted GDP', xaxis_title='Date', yaxis_title='GDP (Billions)')
+      compFig.show()
+
+- id: practice
+  title: 실습
+  subtitle: 거시경제 분석 프로젝트
+  blocks:
+  - type: text
+    content: "경제 분석가가 되어 거시경제 지표를 분석합니다. 실제 경제 분석에서는 여러 지표 조합, 시간 변수 포함 여부, 진단 검정 결과를 종합적으로 판단하여 최적의 모델을 선택합니다. 각 미션은 데이터 로딩부터 회귀 분석, 진단, 예측까지 전체 과정을 독립적으로 수행합니다. 본 프로젝트에서 배운 외생변수 선택, Durbin-Watson 검정, 시나리오 분석을 실습을 통해 체화해봅니다."
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 소비(realcons)로 GDP 예측 + 시간 변수 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 전처리"
+      content: |-
+        import pandas as pd
+        import numpy as np
+        import statsmodels.api as sm
+
+        consMacro = sm.datasets.macrodata.load_pandas().data
+        consMacro['date'] = pd.to_datetime(consMacro['year'].astype(int).astype(str) + '-' + (consMacro['quarter'].astype(int) * 3 - 2).astype(str) + '-01')
+        consMacro = consMacro.set_index('date')
+        consY = consMacro['realgdp']
+        consMacro.head()
+    - type: code
+      title: "소비만 vs 소비+시간 모델"
+      content: |-
+        consX = sm.add_constant(consMacro[['realcons']])
+        consModel = sm.OLS(consY, consX).fit()
+
+        consMacro['time'] = range(len(consMacro))
+        consTimeX = sm.add_constant(consMacro[['realcons', 'time']])
+        consTimeModel = sm.OLS(consY, consTimeX).fit()
+
+        consCmpDf = pd.DataFrame({
+            'Model': ['realcons only', 'realcons + time'],
+            'R²': [consModel.rsquared, consTimeModel.rsquared],
+            'Adj R²': [consModel.rsquared_adj, consTimeModel.rsquared_adj],
+            'AIC': [consModel.aic, consTimeModel.aic]
+        })
+        consCmpDf
+  - type: expansion
+    title: "미션2: 인플레이션과 실업률의 GDP 영향 비교 + 잔차 진단"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 전처리"
+      content: |-
+        import pandas as pd
+        import numpy as np
+        import statsmodels.api as sm
+
+        inflMacro = sm.datasets.macrodata.load_pandas().data
+        inflMacro['date'] = pd.to_datetime(inflMacro['year'].astype(int).astype(str) + '-' + (inflMacro['quarter'].astype(int) * 3 - 2).astype(str) + '-01')
+        inflMacro = inflMacro.set_index('date')
+        inflMacro['time'] = range(len(inflMacro))
+        inflY = inflMacro['realgdp']
+        inflMacro.head()
+    - type: code
+      title: "3개 모델 비교"
+      content: |-
+        from statsmodels.stats.stattools import durbin_watson
+
+        inflX = sm.add_constant(inflMacro[['infl', 'time']])
+        unempX = sm.add_constant(inflMacro[['unemp', 'time']])
+        bothX = sm.add_constant(inflMacro[['infl', 'unemp', 'time']])
+
+        inflModel = sm.OLS(inflY, inflX).fit()
+        unempModel = sm.OLS(inflY, unempX).fit()
+        bothModel = sm.OLS(inflY, bothX).fit()
+
+        modelCmpDf = pd.DataFrame({
+            'Model': ['infl + time', 'unemp + time', 'infl + unemp + time'],
+            'R²': [inflModel.rsquared, unempModel.rsquared, bothModel.rsquared],
+            'AIC': [inflModel.aic, unempModel.aic, bothModel.aic],
+            'DW': [durbin_watson(inflModel.resid), durbin_watson(unempModel.resid), durbin_watson(bothModel.resid)]
+        })
+        modelCmpDf
+    - type: code
+      title: "잔차 시각화"
+      content: |-
+        import plotly.express as px
+
+        residDf = pd.DataFrame({'Date': inflMacro.index, 'Residuals': bothModel.resid})
+
+        inflResidFig = px.scatter(residDf, x='Date', y='Residuals', title='Residuals: infl + unemp + time Model', opacity=0.6)
+        inflResidFig.add_hline(y=0, line_dash='dash', line_color='red')
+        inflResidFig
+
+- id: summary
+  title: 정리
+  subtitle: 일곱 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 1959-2009년 미국 거시경제 데이터로 GDP를 예측했습니다. 실업률, 인플레이션, CPI 등 외생변수를 포함한 다중회귀 모델을 구축하고, Durbin-Watson 검정으로 시계열 잔차의 자기상관을 진단했습니다. 시간 변수를 추가하여 추세 효과를 명시적으로 모델링하고, 경기침체와 호황 시나리오별 GDP를 예측했습니다. 이제 경제 지표 분석, 정책 효과 예측, 시나리오 플래닝에 시계열 회귀를 활용할 수 있습니다.
+  - type: list
+    items:
+    - "외생변수 - 모델 외부에서 결정되어 종속변수에 영향을 주는 변수"
+    - "시계열 회귀 - 시간에 따른 데이터의 추세와 변동을 회귀로 분석"
+    - "Durbin-Watson - 잔차의 자기상관 검정 (2에 가까우면 양호)"
+    - "시간 변수 - 추세 효과를 명시적으로 모델에 포함"
+    - "시나리오 분석 - 여러 경제 상황에서 결과 예측"
+    - "PeriodIndex - 분기/월별 시계열 인덱스"
+  - type: text
+    content: 다음 프로젝트에서는 IBM HR 데이터로 직원 퇴사를 예측합니다. 05 프로젝트에서 배운 로지스틱 회귀를 확장하여 가설 검정과 범주형 변수 처리를 심화합니다.

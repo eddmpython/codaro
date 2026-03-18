@@ -1,0 +1,500 @@
+meta:
+  id: pydantic_06
+  title: JSON스키마생성
+  order: 6
+  category: pydantic
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["pydantic", "json-schema", "OpenAPI", "문서화", "API"]
+  seo:
+    title: "Pydantic JSON Schema - API 문서화와 OpenAPI"
+    description: "Pydantic 모델에서 JSON Schema를 생성합니다. OpenAPI 문서화, 스키마 커스터마이즈를 배웁니다."
+    keywords: ["pydantic", "json-schema", "OpenAPI", "문서화"]
+
+intro:
+  emoji: "📋"
+  goal: Pydantic 모델에서 REST API 문서화용 JSON Schema를 자동 생성합니다.
+  description: "API를 개발할 때 문서화는 필수입니다. 하지만 코드와 문서를 따로 관리하면 불일치가 생깁니다. Pydantic은 모델 정의에서 자동으로 JSON Schema를 생성하여 코드와 문서가 항상 동기화됩니다. FastAPI는 이 기능을 활용해 Swagger UI를 자동 생성합니다."
+
+sections:
+- id: load
+  title: 라이브러리 로드
+  subtitle: Pydantic 설치 및 import
+  blocks:
+  - type: text
+    content: "JSON Schema는 JSON 데이터의 구조를 정의하는 표준입니다. Pydantic의 model_json_schema() 메서드는 모델 정의를 분석하여 자동으로 JSON Schema를 생성합니다. 이 스키마는 API 문서화, 폼 자동 생성, 클라이언트 코드 생성 등에 활용됩니다."
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: micropip으로 pydantic 설치
+    content: |-
+      import micropip
+      await micropip.install('pydantic')
+  - type: code
+    language: python
+    title: 핵심 모듈 import
+    description: BaseModel과 Field
+    content: |-
+      from pydantic import BaseModel, Field, computed_field
+      from typing import Optional, Union
+      from enum import Enum
+      import json
+
+- id: basic
+  title: 기본 스키마 생성
+  subtitle: model_json_schema
+  blocks:
+  - type: text
+    content: "model_json_schema() 클래스 메서드를 호출하면 JSON Schema 딕셔너리가 반환됩니다. 기본 타입(str, int, float, bool)은 해당 JSON Schema 타입으로 매핑되고, 필수 필드와 선택 필드가 자동으로 구분됩니다."
+  - type: code
+    language: python
+    title: 기본 모델 스키마
+    description: model_json_schema 호출
+    content: |-
+      class User(BaseModel):
+          name: str
+          age: int
+          email: str
+
+      userSchema = User.model_json_schema()
+      userSchema
+  - type: tip
+    content: "스키마의 'properties'에 필드 정보가, 'required'에 필수 필드 목록이 포함됩니다."
+  - type: code
+    language: python
+    title: 예쁜 출력
+    description: JSON 형식화
+    content: |-
+      prettySchema = json.dumps(userSchema, indent=2)
+      prettySchema
+
+- id: description
+  title: 필드 설명 추가
+  subtitle: Field description
+  blocks:
+  - type: text
+    content: "Field의 description 파라미터로 필드에 설명을 추가하면 JSON Schema에 포함됩니다. API 문서를 보는 개발자가 각 필드의 의미와 용도를 이해할 수 있습니다. 제약조건(gt, le, min_length 등)도 스키마에 반영됩니다."
+  - type: code
+    language: python
+    title: 문서화된 상품 모델
+    description: 설명과 제약조건
+    content: |-
+      class Product(BaseModel):
+          productId: str = Field(description="고유 상품 식별자")
+          name: str = Field(description="상품명", min_length=1, max_length=100)
+          price: float = Field(description="상품 가격 (원)", gt=0)
+          stock: int = Field(default=0, description="재고 수량", ge=0)
+
+      productSchema = Product.model_json_schema()
+      json.dumps(productSchema, indent=2, ensure_ascii=False)
+  - type: code
+    language: python
+    title: 개별 필드 스키마
+    description: 제약조건 확인
+    content: |-
+      productSchema["properties"]["price"]
+
+- id: examples
+  title: 예시 값 추가
+  subtitle: examples 파라미터
+  blocks:
+  - type: text
+    content: "Field의 examples 파라미터로 예시 값을 추가하면 API 문서에서 사용자가 필드 형식을 이해하기 쉬워집니다. json_schema_extra로 모델 전체에 예시 데이터를 추가할 수도 있습니다."
+  - type: code
+    language: python
+    title: 필드별 예시
+    description: examples 사용
+    content: |-
+      class Contact(BaseModel):
+          name: str = Field(description="이름", examples=["홍길동", "김철수"])
+          phone: str = Field(description="전화번호", examples=["010-1234-5678"])
+          email: str = Field(description="이메일", examples=["user@example.com"])
+
+      contactSchema = Contact.model_json_schema()
+      contactSchema["properties"]["name"]
+  - type: code
+    language: python
+    title: 모델 전체 예시
+    description: json_schema_extra
+    content: |-
+      class Address(BaseModel):
+          model_config = {
+              "json_schema_extra": {
+                  "examples": [
+                      {"street": "강남대로 123", "city": "서울", "zipCode": "06234"},
+                      {"street": "해운대로 456", "city": "부산", "zipCode": "48099"}
+                  ]
+              }
+          }
+          street: str
+          city: str
+          zipCode: str
+
+      addressSchema = Address.model_json_schema()
+      addressSchema.get("examples")
+
+- id: nested
+  title: 중첩 모델 스키마
+  subtitle: $defs와 $ref
+  blocks:
+  - type: text
+    content: "중첩된 모델은 JSON Schema의 $defs 섹션에 정의되고 $ref로 참조됩니다. 이 방식으로 복잡한 모델도 깔끔하게 표현되고, 같은 모델을 여러 곳에서 재사용할 때 중복을 피할 수 있습니다."
+  - type: code
+    language: python
+    title: 중첩 모델 스키마
+    description: Author → Article
+    content: |-
+      class Author(BaseModel):
+          authorId: str = Field(description="작성자 ID")
+          name: str = Field(description="작성자 이름")
+
+      class Article(BaseModel):
+          title: str = Field(description="기사 제목")
+          content: str = Field(description="기사 내용")
+          author: Author
+
+      articleSchema = Article.model_json_schema()
+      json.dumps(articleSchema, indent=2, ensure_ascii=False)
+  - type: code
+    language: python
+    title: $ref 참조 확인
+    description: author 필드
+    content: |-
+      articleSchema["properties"]["author"]
+
+- id: optional
+  title: Optional과 Union 스키마
+  subtitle: anyOf 표현
+  blocks:
+  - type: text
+    content: "Optional 타입은 해당 타입 또는 null을 허용하는 anyOf로 표현됩니다. Union 타입도 마찬가지로 여러 타입 중 하나를 허용하는 구조로 변환됩니다."
+  - type: code
+    language: python
+    title: Optional 스키마
+    description: null 허용
+    content: |-
+      class Profile(BaseModel):
+          username: str
+          bio: Optional[str] = None
+          website: Optional[str] = None
+
+      profileSchema = Profile.model_json_schema()
+      profileSchema["properties"]["bio"]
+  - type: code
+    language: python
+    title: Union 스키마
+    description: 여러 타입
+    content: |-
+      class FlexValue(BaseModel):
+          value: Union[str, int, float]
+
+      flexSchema = FlexValue.model_json_schema()
+      flexSchema["properties"]["value"]
+
+- id: enum
+  title: Enum과 Literal 스키마
+  subtitle: 허용값 목록
+  blocks:
+  - type: text
+    content: "Enum과 Literal 타입은 허용되는 값 목록으로 스키마가 생성됩니다. API 문서에서 클라이언트 개발자가 어떤 값을 사용할 수 있는지 명확하게 알 수 있습니다."
+  - type: code
+    language: python
+    title: Enum 스키마
+    description: 상태 열거형
+    content: |-
+      class Status(str, Enum):
+          PENDING = "pending"
+          ACTIVE = "active"
+          COMPLETED = "completed"
+
+      class Task(BaseModel):
+          taskId: str
+          status: Status = Field(description="작업 상태")
+
+      taskSchema = Task.model_json_schema()
+      taskSchema["$defs"]["Status"]
+  - type: code
+    language: python
+    title: Literal 스키마
+    description: 허용값 목록
+    content: |-
+      from typing import Literal
+
+      class Priority(BaseModel):
+          level: Literal["low", "medium", "high"] = Field(description="우선순위")
+
+      prioritySchema = Priority.model_json_schema()
+      prioritySchema["properties"]["level"]
+
+- id: list
+  title: 리스트와 딕셔너리
+  subtitle: array와 object
+  blocks:
+  - type: text
+    content: "list 타입은 JSON Schema의 array로, dict 타입은 object로 변환됩니다. 리스트와 딕셔너리의 요소 타입도 정확하게 스키마에 반영됩니다."
+  - type: code
+    language: python
+    title: 리스트 스키마
+    description: array 타입
+    content: |-
+      class TaggedItem(BaseModel):
+          itemId: str
+          tags: list[str] = Field(description="태그 목록")
+          scores: list[int] = Field(default=[], description="점수 목록")
+
+      taggedSchema = TaggedItem.model_json_schema()
+      taggedSchema["properties"]["tags"]
+  - type: code
+    language: python
+    title: 딕셔너리 스키마
+    description: additionalProperties
+    content: |-
+      class Metadata(BaseModel):
+          data: dict[str, str] = Field(description="메타데이터")
+          counts: dict[str, int] = Field(default={}, description="카운트 정보")
+
+      metaSchema = Metadata.model_json_schema()
+      metaSchema["properties"]["data"]
+
+- id: mode
+  title: 스키마 생성 모드
+  subtitle: validation vs serialization
+  blocks:
+  - type: text
+    content: "model_json_schema()의 mode 파라미터로 용도에 맞는 스키마를 생성합니다. 'validation'은 입력 검증용(computed_field 미포함), 'serialization'은 출력용(computed_field 포함) 스키마입니다."
+  - type: code
+    language: python
+    title: 검증 모드
+    description: computed_field 미포함
+    content: |-
+      class Item(BaseModel):
+          name: str
+          price: float
+
+          @computed_field
+          @property
+          def formattedPrice(self) -> str:
+              return f"₩{self.price:,.0f}"
+
+      validationSchema = Item.model_json_schema(mode='validation')
+      "formattedPrice" in validationSchema.get("properties", {})
+  - type: tip
+    content: "validation 모드는 클라이언트가 보낼 데이터 형식을, serialization 모드는 서버가 응답할 데이터 형식을 정의합니다."
+  - type: code
+    language: python
+    title: 직렬화 모드
+    description: computed_field 포함
+    content: |-
+      serializationSchema = Item.model_json_schema(mode='serialization')
+      "formattedPrice" in serializationSchema.get("properties", {})
+
+- id: custom
+  title: 커스텀 스키마 수정
+  subtitle: json_schema_extra
+  blocks:
+  - type: text
+    content: "json_schema_extra로 생성된 스키마에 추가 정보를 삽입할 수 있습니다. OpenAPI 확장 필드(x-), 버전 정보, 태그 등 표준 스키마에 없는 메타데이터를 추가할 때 유용합니다."
+  - type: code
+    language: python
+    title: 확장 필드 추가
+    description: x- 접두사 필드
+    content: |-
+      class CustomModel(BaseModel):
+          model_config = {
+              "json_schema_extra": {
+                  "x-api-version": "v1",
+                  "x-deprecated": False,
+                  "x-tags": ["users", "auth"]
+              }
+          }
+          userId: str
+          role: str
+
+      customSchema = CustomModel.model_json_schema()
+      customSchema.get("x-api-version"), customSchema.get("x-tags")
+
+- id: result
+  title: REST API 스키마 시스템
+  subtitle: 요청/응답 스키마 완성
+  blocks:
+  - type: text
+    content: "지금까지 배운 모든 기법을 종합하여 실제 REST API의 요청/응답 스키마를 생성합니다. FastAPI와 같은 프레임워크에서 이 스키마를 활용하여 자동으로 Swagger 문서를 생성합니다."
+  - type: code
+    language: python
+    title: API 요청 모델
+    description: 사용자 생성 요청
+    content: |-
+      class CreateUserRequest(BaseModel):
+          model_config = {
+              "json_schema_extra": {
+                  "examples": [{
+                      "username": "alice",
+                      "email": "alice@example.com",
+                      "password": "secure123"
+                  }]
+              }
+          }
+          username: str = Field(min_length=3, max_length=50, description="사용자명")
+          email: str = Field(description="이메일 주소")
+          password: str = Field(min_length=8, description="비밀번호")
+
+      requestSchema = CreateUserRequest.model_json_schema()
+      json.dumps(requestSchema, indent=2, ensure_ascii=False)
+  - type: code
+    language: python
+    title: API 응답 모델
+    description: 사용자 생성 응답
+    content: |-
+      class CreateUserResponse(BaseModel):
+          userId: str = Field(description="생성된 사용자 ID")
+          username: str = Field(description="사용자명")
+          createdAt: str = Field(description="생성 시각")
+
+      responseSchema = CreateUserResponse.model_json_schema()
+      responseSchema
+  - type: code
+    language: python
+    title: OpenAPI 경로 정의
+    description: 스키마 조합
+    content: |-
+      openApiPath = {
+          "/users": {
+              "post": {
+                  "summary": "사용자 생성",
+                  "requestBody": {
+                      "content": {
+                          "application/json": {"schema": requestSchema}
+                      }
+                  },
+                  "responses": {
+                      "201": {
+                          "description": "생성 성공",
+                          "content": {
+                              "application/json": {"schema": responseSchema}
+                          }
+                      }
+                  }
+              }
+          }
+      }
+      list(openApiPath.keys())
+
+- id: practice
+  title: 실습
+  subtitle: API 스키마 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 model_json_schema, Field, examples, Enum, 중첩 모델을 활용하여 완전한 API 스키마를 생성합니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 블로그 API 스키마"
+    blocks:
+    - type: code
+      title: 블로그 모델 정의
+      content: |-
+        from pydantic import BaseModel, Field
+        from typing import Optional
+        from enum import Enum
+        import json
+
+        class PostStatus(str, Enum):
+            DRAFT = "draft"
+            PUBLISHED = "published"
+            ARCHIVED = "archived"
+
+        class AuthorInfo(BaseModel):
+            authorId: str = Field(description="작성자 고유 ID")
+            name: str = Field(description="작성자 이름")
+
+        class BlogPostRequest(BaseModel):
+            model_config = {
+                "json_schema_extra": {
+                    "examples": [{
+                        "title": "Pydantic 시작하기",
+                        "content": "Pydantic은 데이터 검증 라이브러리입니다...",
+                        "tags": ["python", "pydantic"]
+                    }]
+                }
+            }
+            title: str = Field(min_length=1, max_length=200, description="포스트 제목")
+            content: str = Field(min_length=10, description="포스트 본문")
+            tags: list[str] = Field(default=[], description="태그 목록")
+            status: PostStatus = Field(default=PostStatus.DRAFT, description="게시 상태")
+
+        class BlogPostResponse(BaseModel):
+            postId: str = Field(description="포스트 고유 ID")
+            title: str = Field(description="포스트 제목")
+            content: str = Field(description="포스트 본문")
+            author: AuthorInfo
+            tags: list[str] = Field(description="태그 목록")
+            status: PostStatus = Field(description="게시 상태")
+            createdAt: str = Field(description="생성 시각")
+            updatedAt: Optional[str] = Field(default=None, description="수정 시각")
+
+        blogReqSchema = BlogPostRequest.model_json_schema()
+        blogReqSchema
+    - type: code
+      title: 스키마 확인
+      content: |-
+        blogRespSchema = BlogPostResponse.model_json_schema()
+        blogSummary = {
+            "request_fields": list(blogReqSchema["properties"].keys()),
+            "response_fields": list(blogRespSchema["properties"].keys()),
+            "has_author_ref": "$ref" in str(blogRespSchema)
+        }
+        blogSummary
+  - type: expansion
+    title: "미션2: E-커머스 API 스키마"
+    blocks:
+    - type: code
+      title: 상품 모델 정의
+      content: |-
+        from pydantic import BaseModel, Field
+        from typing import Optional
+        import json
+
+        class ProductCategory(BaseModel):
+            categoryId: str = Field(description="카테고리 ID")
+            name: str = Field(description="카테고리명")
+
+        class ProductRequest(BaseModel):
+            model_config = {
+                "json_schema_extra": {
+                    "title": "상품 등록",
+                    "examples": [{
+                        "name": "노트북",
+                        "price": 1500000,
+                        "categoryId": "electronics"
+                    }]
+                }
+            }
+            name: str = Field(min_length=2, max_length=100, description="상품명")
+            price: float = Field(gt=0, description="가격")
+            description: Optional[str] = Field(default=None, max_length=1000, description="상품 설명")
+            categoryId: str = Field(description="카테고리 ID")
+            stock: int = Field(default=0, ge=0, description="재고 수량")
+            isActive: bool = Field(default=True, description="판매 활성화 여부")
+
+        class ProductResponse(BaseModel):
+            productId: str = Field(description="상품 고유 ID")
+            name: str = Field(description="상품명")
+            price: float = Field(description="가격")
+            description: Optional[str] = Field(description="상품 설명")
+            category: ProductCategory
+            stock: int = Field(description="재고 수량")
+            isActive: bool = Field(description="판매 활성화 여부")
+            createdAt: str = Field(description="등록 시각")
+
+        prodReqSchema = ProductRequest.model_json_schema()
+        prodReqSchema
+    - type: code
+      title: 스키마 요약
+      content: |-
+        prodRespSchema = ProductResponse.model_json_schema()
+        ecommerceSummary = {
+            "request_required": prodReqSchema.get("required", []),
+            "response_fields": list(prodRespSchema["properties"].keys()),
+            "has_examples": "examples" in prodReqSchema
+        }
+        ecommerceSummary

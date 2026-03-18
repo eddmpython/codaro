@@ -1,0 +1,536 @@
+meta:
+  id: folium_05
+  title: 레이어 관리
+  order: 5
+  category: folium
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["folium", "FeatureGroup", "LayerControl", "레이어", "그룹"]
+  seo:
+    title: "Folium 레이어 관리 - FeatureGroup과 LayerControl"
+    description: "Folium으로 레이어를 그룹화하고 토글합니다. FeatureGroup과 LayerControl로 지도 요소를 관리합니다."
+    keywords: ["folium", "FeatureGroup", "LayerControl", "레이어", "그룹화"]
+
+intro:
+  emoji: "📚"
+  goal: 여러 레이어를 그룹으로 관리하고 토글합니다.
+  description: 지도에 많은 요소가 있으면 관리가 어렵습니다. FeatureGroup으로 요소를 그룹화하고 LayerControl로 켜고 끌 수 있게 합니다. 카테고리별로 마커를 분류하고 사용자가 원하는 것만 표시합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: folium과 marimo를 불러옵니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: folium과 marimo 불러오기
+    content: |-
+      import folium
+      import marimo as mo
+
+- id: step2_feature_group
+  title: 2단계. FeatureGroup 생성
+  subtitle: FeatureGroup()
+  blocks:
+  - type: text
+    content: FeatureGroup()은 여러 요소를 하나의 그룹으로 묶습니다. 그룹 단위로 표시/숨김을 제어할 수 있습니다.
+  - type: code
+    language: python
+    title: 기본 FeatureGroup
+    description: 그룹 생성
+    content: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      cafeGroup = folium.FeatureGroup(name="카페")
+
+      cafes = [
+          [37.5665, 126.9780],
+          [37.5700, 126.9750],
+          [37.5630, 126.9820]
+      ]
+
+      for loc in cafes:
+          folium.Marker(
+              location=loc,
+              icon=folium.Icon(color="cadetblue", icon="cloud")
+          ).add_to(cafeGroup)
+
+      cafeGroup.add_to(m1)
+
+      mo.iframe(m1._repr_html_())
+  - type: tip
+    content: 마커를 그룹에 추가하고(add_to(group)), 그룹을 지도에 추가합니다(add_to(map)).
+
+- id: step3_multiple_groups
+  title: 3단계. 여러 그룹 만들기
+  subtitle: 카테고리별 분류
+  blocks:
+  - type: text
+    content: 여러 FeatureGroup을 만들어 카테고리별로 마커를 분류합니다.
+  - type: code
+    language: python
+    title: 음식점 vs 카페
+    description: 두 그룹 분류
+    content: |-
+      m2 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      restaurantGroup = folium.FeatureGroup(name="음식점")
+      cafeGroup2 = folium.FeatureGroup(name="카페")
+
+      restaurants = [
+          {"name": "한식당", "loc": [37.5680, 126.9760]},
+          {"name": "일식당", "loc": [37.5650, 126.9800]},
+          {"name": "양식당", "loc": [37.5620, 126.9750]}
+      ]
+
+      cafes2 = [
+          {"name": "스타벅스", "loc": [37.5670, 126.9820]},
+          {"name": "투썸", "loc": [37.5640, 126.9770]},
+          {"name": "이디야", "loc": [37.5690, 126.9790]}
+      ]
+
+      for r in restaurants:
+          folium.Marker(
+              location=r["loc"],
+              popup=r["name"],
+              icon=folium.Icon(color="red", icon="cutlery")
+          ).add_to(restaurantGroup)
+
+      for c in cafes2:
+          folium.Marker(
+              location=c["loc"],
+              popup=c["name"],
+              icon=folium.Icon(color="blue", icon="cloud")
+          ).add_to(cafeGroup2)
+
+      restaurantGroup.add_to(m2)
+      cafeGroup2.add_to(m2)
+
+      mo.iframe(m2._repr_html_())
+  - type: tip
+    content: 그룹별로 아이콘 색상을 다르게 하면 구분하기 쉽습니다.
+
+- id: step4_layer_control
+  title: 4단계. LayerControl 추가
+  subtitle: LayerControl()
+  blocks:
+  - type: text
+    content: LayerControl()을 추가하면 우측 상단에 레이어 토글 버튼이 생깁니다.
+  - type: code
+    language: python
+    title: 레이어 컨트롤
+    description: 토글 기능 추가
+    content: |-
+      m3 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      restaurantGroup2 = folium.FeatureGroup(name="음식점")
+      cafeGroup3 = folium.FeatureGroup(name="카페")
+
+      for r in restaurants:
+          folium.Marker(
+              location=r["loc"],
+              popup=r["name"],
+              icon=folium.Icon(color="red", icon="cutlery")
+          ).add_to(restaurantGroup2)
+
+      for c in cafes2:
+          folium.Marker(
+              location=c["loc"],
+              popup=c["name"],
+              icon=folium.Icon(color="blue", icon="cloud")
+          ).add_to(cafeGroup3)
+
+      restaurantGroup2.add_to(m3)
+      cafeGroup3.add_to(m3)
+
+      folium.LayerControl().add_to(m3)
+
+      mo.iframe(m3._repr_html_())
+  - type: tip
+    content: 우측 상단 아이콘을 클릭하면 레이어 목록이 나타납니다. 체크박스로 레이어를 켜고 끌 수 있습니다.
+
+- id: step5_overlay_vs_base
+  title: 5단계. 오버레이 vs 베이스 레이어
+  subtitle: 레이어 종류
+  blocks:
+  - type: text
+    content: 베이스 레이어는 라디오 버튼(하나만 선택), 오버레이는 체크박스(다중 선택)입니다. FeatureGroup은 기본적으로 오버레이입니다.
+  - type: code
+    language: python
+    title: 타일 + 오버레이
+    description: 베이스와 오버레이 조합
+    content: |-
+      m4 = folium.Map(location=seoulCenter, zoom_start=13, tiles=None)
+
+      folium.TileLayer("OpenStreetMap", name="기본 지도").add_to(m4)
+      folium.TileLayer("CartoDB Positron", name="심플 지도").add_to(m4)
+
+      markerGroup = folium.FeatureGroup(name="마커")
+      folium.Marker(seoulCenter, popup="시청").add_to(markerGroup)
+      markerGroup.add_to(m4)
+
+      circleGroup = folium.FeatureGroup(name="영역")
+      folium.Circle(seoulCenter, radius=500, color="blue").add_to(circleGroup)
+      circleGroup.add_to(m4)
+
+      folium.LayerControl().add_to(m4)
+
+      mo.iframe(m4._repr_html_())
+  - type: tip
+    content: 타일 레이어는 베이스(라디오), FeatureGroup은 오버레이(체크박스)로 표시됩니다.
+
+- id: step6_show_option
+  title: 6단계. 기본 표시 설정
+  subtitle: show 파라미터
+  blocks:
+  - type: text
+    content: show=False로 설정하면 처음에는 숨겨진 상태로 시작합니다.
+  - type: code
+    language: python
+    title: 기본 숨김 설정
+    description: 초기 표시 상태
+    content: |-
+      m5 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      visibleGroup = folium.FeatureGroup(name="기본 표시", show=True)
+      hiddenGroup = folium.FeatureGroup(name="숨김 시작", show=False)
+
+      folium.Marker(
+          [37.5665, 126.9750],
+          popup="항상 보임",
+          icon=folium.Icon(color="green")
+      ).add_to(visibleGroup)
+
+      folium.Marker(
+          [37.5665, 126.9810],
+          popup="레이어 켜야 보임",
+          icon=folium.Icon(color="gray")
+      ).add_to(hiddenGroup)
+
+      visibleGroup.add_to(m5)
+      hiddenGroup.add_to(m5)
+
+      folium.LayerControl().add_to(m5)
+
+      mo.iframe(m5._repr_html_())
+  - type: tip
+    content: 선택적 정보(주차장, 화장실 등)는 show=False로 숨겨두면 지도가 깔끔합니다.
+
+- id: step7_shapes_grouping
+  title: 7단계. 도형 그룹화
+  subtitle: 도형별 레이어
+  blocks:
+  - type: text
+    content: 마커뿐 아니라 원, 폴리곤 등 모든 요소를 그룹에 넣을 수 있습니다.
+  - type: code
+    language: python
+    title: 마커 + 영역 그룹
+    description: 다양한 요소 그룹화
+    content: |-
+      m6 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      spotGroup = folium.FeatureGroup(name="관광지")
+      areaGroup = folium.FeatureGroup(name="관광 구역")
+
+      spots = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770]},
+          {"name": "명동", "loc": [37.5636, 126.9869]},
+          {"name": "남산타워", "loc": [37.5512, 126.9882]}
+      ]
+
+      for spot in spots:
+          folium.Marker(
+              location=spot["loc"],
+              popup=spot["name"],
+              icon=folium.Icon(color="red", icon="star")
+          ).add_to(spotGroup)
+
+          folium.Circle(
+              location=spot["loc"],
+              radius=300,
+              color="orange",
+              fill=True,
+              fill_opacity=0.2
+          ).add_to(areaGroup)
+
+      spotGroup.add_to(m6)
+      areaGroup.add_to(m6)
+
+      folium.LayerControl().add_to(m6)
+
+      mo.iframe(m6._repr_html_())
+  - type: tip
+    content: 마커와 영역을 별도 그룹으로 분리하면 사용자가 원하는 정보만 볼 수 있습니다.
+
+- id: step8_collapsed
+  title: 8단계. 컨트롤 옵션
+  subtitle: collapsed
+  blocks:
+  - type: text
+    content: LayerControl의 collapsed 옵션으로 기본 펼침/접힘 상태를 설정합니다.
+  - type: code
+    language: python
+    title: 항상 펼쳐진 컨트롤
+    description: collapsed=False
+    content: |-
+      m7 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      group1 = folium.FeatureGroup(name="그룹1")
+      group2 = folium.FeatureGroup(name="그룹2")
+
+      folium.Marker([37.5665, 126.9750]).add_to(group1)
+      folium.Marker([37.5665, 126.9810]).add_to(group2)
+
+      group1.add_to(m7)
+      group2.add_to(m7)
+
+      folium.LayerControl(collapsed=False).add_to(m7)
+
+      mo.iframe(m7._repr_html_())
+  - type: tip
+    content: collapsed=False면 처음부터 레이어 목록이 펼쳐져 있습니다. 레이어가 중요할 때 사용합니다.
+
+- id: step9_complex_example
+  title: 9단계. 복잡한 레이어 구조
+  subtitle: 다중 카테고리
+  blocks:
+  - type: text
+    content: 여러 카테고리와 타일을 조합한 복잡한 레이어 구조를 만듭니다.
+  - type: code
+    language: python
+    title: 관광 지도 레이어
+    description: 복잡한 구조
+    content: |-
+      m8 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer("CartoDB Positron", name="밝은 지도").add_to(m8)
+      folium.TileLayer("CartoDB Dark_Matter", name="어두운 지도").add_to(m8)
+
+      historyGroup = folium.FeatureGroup(name="역사 유적")
+      shoppingGroup = folium.FeatureGroup(name="쇼핑")
+      foodGroup = folium.FeatureGroup(name="맛집", show=False)
+
+      historySites = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770]},
+          {"name": "창덕궁", "loc": [37.5794, 126.9910]}
+      ]
+
+      shoppingSites = [
+          {"name": "명동", "loc": [37.5636, 126.9869]},
+          {"name": "동대문", "loc": [37.5711, 127.0095]}
+      ]
+
+      foodSites = [
+          {"name": "광장시장", "loc": [37.5701, 126.9995]},
+          {"name": "을지로 골목", "loc": [37.5660, 126.9910]}
+      ]
+
+      for site in historySites:
+          folium.Marker(
+              location=site["loc"],
+              popup=site["name"],
+              icon=folium.Icon(color="purple", icon="tower")
+          ).add_to(historyGroup)
+
+      for site in shoppingSites:
+          folium.Marker(
+              location=site["loc"],
+              popup=site["name"],
+              icon=folium.Icon(color="pink", icon="shopping-cart")
+          ).add_to(shoppingGroup)
+
+      for site in foodSites:
+          folium.Marker(
+              location=site["loc"],
+              popup=site["name"],
+              icon=folium.Icon(color="orange", icon="cutlery")
+          ).add_to(foodGroup)
+
+      historyGroup.add_to(m8)
+      shoppingGroup.add_to(m8)
+      foodGroup.add_to(m8)
+
+      folium.LayerControl().add_to(m8)
+
+      mo.iframe(m8._repr_html_())
+  - type: tip
+    content: 베이스 레이어(타일)와 오버레이(마커 그룹)를 조합하면 유연한 지도를 만들 수 있습니다.
+
+- id: step10_complete
+  title: 10단계. 완성 예제
+  subtitle: 관광지 필터 지도
+  blocks:
+  - type: text
+    content: 카테고리별 필터 기능이 있는 서울 관광 지도를 완성합니다.
+  - type: code
+    language: python
+    title: 서울 관광 필터 지도
+    description: 종합 예제
+    content: |-
+      filterMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer("CartoDB Positron", name="기본").add_to(filterMap)
+      folium.TileLayer("Stamen Terrain", name="지형").add_to(filterMap)
+
+      palaceGroup = folium.FeatureGroup(name="궁궐")
+      parkGroup = folium.FeatureGroup(name="공원")
+      stationGroup = folium.FeatureGroup(name="지하철역", show=False)
+
+      palaces = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770]},
+          {"name": "창덕궁", "loc": [37.5794, 126.9910]},
+          {"name": "덕수궁", "loc": [37.5658, 126.9750]}
+      ]
+
+      parks = [
+          {"name": "남산공원", "loc": [37.5512, 126.9882]},
+          {"name": "올림픽공원", "loc": [37.5200, 127.1212]},
+          {"name": "한강공원", "loc": [37.5283, 126.9340]}
+      ]
+
+      stations = [
+          {"name": "서울역", "loc": [37.5547, 126.9707]},
+          {"name": "강남역", "loc": [37.4979, 127.0276]},
+          {"name": "홍대입구역", "loc": [37.5563, 126.9236]}
+      ]
+
+      for p in palaces:
+          folium.Marker(
+              location=p["loc"],
+              popup=f"<b>{p['name']}</b>",
+              tooltip=p["name"],
+              icon=folium.Icon(color="red", icon="star")
+          ).add_to(palaceGroup)
+
+      for p in parks:
+          folium.Marker(
+              location=p["loc"],
+              popup=f"<b>{p['name']}</b>",
+              tooltip=p["name"],
+              icon=folium.Icon(color="green", icon="tree-deciduous")
+          ).add_to(parkGroup)
+
+      for s in stations:
+          folium.CircleMarker(
+              location=s["loc"],
+              radius=8,
+              color="blue",
+              fill=True,
+              popup=s["name"]
+          ).add_to(stationGroup)
+
+      palaceGroup.add_to(filterMap)
+      parkGroup.add_to(filterMap)
+      stationGroup.add_to(filterMap)
+
+      folium.LayerControl(collapsed=False).add_to(filterMap)
+
+      mo.iframe(filterMap._repr_html_())
+
+- id: practice
+  title: 실습
+  subtitle: 레이어 관리
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  - type: expansion
+    title: "미션1: 편의시설 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        toilets = [
+            {"name": "시청 화장실", "loc": [37.5665, 126.9780]},
+            {"name": "광화문 화장실", "loc": [37.5725, 126.9768]}
+        ]
+        parking = [
+            {"name": "시청 주차장", "loc": [37.5655, 126.9790]},
+            {"name": "세종로 주차장", "loc": [37.5710, 126.9760]}
+        ]
+        data = {"toilets": toilets, "parking": parking}
+        data
+    - type: code
+      title: 지도 생성
+      content: |-
+        facilityMap = folium.Map(location=[37.568, 126.977], zoom_start=15)
+
+        toiletGroup = folium.FeatureGroup(name="화장실")
+        parkingGroup = folium.FeatureGroup(name="주차장", show=False)
+
+        for t in toilets:
+            folium.Marker(
+                location=t["loc"],
+                popup=t["name"],
+                icon=folium.Icon(color="blue", icon="tint")
+            ).add_to(toiletGroup)
+
+        for p in parking:
+            folium.Marker(
+                location=p["loc"],
+                popup=p["name"],
+                icon=folium.Icon(color="gray", icon="road")
+            ).add_to(parkingGroup)
+
+        toiletGroup.add_to(facilityMap)
+        parkingGroup.add_to(facilityMap)
+
+        folium.LayerControl().add_to(facilityMap)
+
+        mo.iframe(facilityMap._repr_html_())
+  - type: expansion
+    title: "미션2: 테마별 서울 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        culture = [
+            {"name": "국립중앙박물관", "loc": [37.5238, 126.9805]},
+            {"name": "예술의전당", "loc": [37.4785, 127.0118]}
+        ]
+        nature = [
+            {"name": "북한산", "loc": [37.6608, 126.9933]},
+            {"name": "한강", "loc": [37.5283, 126.9340]}
+        ]
+        data = {"culture": culture, "nature": nature}
+        data
+    - type: code
+      title: 지도 생성
+      content: |-
+        themeMap = folium.Map(location=[37.55, 127.0], zoom_start=11, tiles=None)
+
+        folium.TileLayer("CartoDB Positron", name="기본").add_to(themeMap)
+        folium.TileLayer("Stamen Terrain", name="자연").add_to(themeMap)
+
+        cultureGroup = folium.FeatureGroup(name="문화시설")
+        natureGroup = folium.FeatureGroup(name="자연명소")
+
+        for c in culture:
+            folium.Marker(
+                location=c["loc"],
+                popup=c["name"],
+                icon=folium.Icon(color="purple", icon="education")
+            ).add_to(cultureGroup)
+
+        for n in nature:
+            folium.Marker(
+                location=n["loc"],
+                popup=n["name"],
+                icon=folium.Icon(color="green", icon="leaf")
+            ).add_to(natureGroup)
+
+        cultureGroup.add_to(themeMap)
+        natureGroup.add_to(themeMap)
+
+        folium.LayerControl().add_to(themeMap)
+
+        mo.iframe(themeMap._repr_html_())

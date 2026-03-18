@@ -1,0 +1,661 @@
+meta:
+  id: matplotlib_09
+  title: 고급주석차트
+  order: 9
+  category: matplotlib
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["matplotlib", "annotate", "LaTeX", "bbox", "errorbar", "annotation"]
+  seo:
+    title: "Matplotlib 고급 주석 - annotate, LaTeX, errorbar로 전문 차트 만들기"
+    description: "Matplotlib으로 전문적인 주석 차트를 만듭니다. annotate 화살표, LaTeX 수식, bbox 텍스트박스, errorbar 오차막대 사용법을 배웁니다."
+    keywords: ["matplotlib", "annotate", "LaTeX", "bbox", "errorbar", "주석", "수식"]
+
+intro:
+  emoji: "📝"
+  goal: 주요 이벤트가 표시된 주가 차트를 만듭니다.
+  description: annotate로 화살표와 주석을 추가하고, LaTeX로 수학 표현식을 넣으며, bbox로 텍스트 박스를 꾸밉니다. errorbar로 불확실성을 표현하는 방법도 배웁니다. 이전에 배운 plot, figure, legend, spines 개념을 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: 주가 데이터를 생성하고 주요 이벤트를 표시하는 고급 차트를 만듭니다. annotate로 화살표와 설명을 추가하고, LaTeX로 수식을 표현하며, bbox로 텍스트를 강조합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: matplotlib과 numpy를 불러옵니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import numpy as np
+      import pandas as pd
+  - type: tip
+    content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. numpy는 np로, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  subtitle: Pyodide 환경 폰트
+  blocks:
+  - type: text
+    content: Pyodide(웹 브라우저) 환경에서는 시스템 폰트를 사용할 수 없어 한글이 깨집니다. CDN에서 폰트 파일을 다운로드하여 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+  - type: code
+    language: python
+    title: 한글 폰트 설정
+    description: Pretendard 폰트를 다운로드하여 matplotlib에 등록합니다
+    content: |-
+      import micropip
+      await micropip.install('pyodide-http')
+
+      import pyodide_http
+      pyodide_http.patch_all()
+
+      from matplotlib import font_manager
+      from js import fetch
+      from pathlib import Path
+
+      fontUrl = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Regular.otf"
+      response = await fetch(fontUrl)
+      fontBuffer = await response.arrayBuffer()
+
+      fontPath = Path("/tmp/Pretendard-Regular.otf")
+      fontPath.write_bytes(fontBuffer.to_py())
+
+      font_manager.fontManager.addfont(str(fontPath))
+      plt.rcParams['font.family'] = 'Pretendard'
+      plt.rcParams['axes.unicode_minus'] = False
+  - type: tip
+    content: Pyodide 환경에서는 fetch API로 외부 리소스를 가져옵니다. font_manager.addfont()로 폰트를 등록하고, rcParams로 기본 폰트를 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+
+- id: step2_data
+  title: 2단계. 주가 데이터 생성
+  subtitle: 시뮬레이션 데이터
+  blocks:
+  - type: text
+    content: 1년간의 가상 주가 데이터를 생성합니다. 랜덤 워크 방식으로 현실적인 주가 변동을 시뮬레이션합니다. 주요 이벤트 날짜도 정의합니다.
+  - type: code
+    language: python
+    title: 주가 데이터 생성
+    description: 1년간 일별 주가 데이터를 생성합니다
+    content: |-
+      np.random.seed(42)
+
+      days = pd.date_range('2024-01-01', periods=252, freq='B')
+      returns = np.random.normal(0.001, 0.02, 252)
+      price = 100 * np.cumprod(1 + returns)
+
+      stockData = pd.DataFrame({
+          'date': days,
+          'price': price
+      })
+
+      stockData.head()
+
+- id: step3_basic_annotate
+  title: 3단계. annotate 기본
+  subtitle: 화살표 주석
+  blocks:
+  - type: text
+    content: annotate는 특정 데이터 포인트에 화살표와 텍스트를 추가합니다. xy는 화살표가 가리키는 위치, xytext는 텍스트가 표시되는 위치입니다. arrowprops로 화살표 스타일을 지정합니다.
+  - type: code
+    language: python
+    title: 기본 annotate
+    description: 최고점에 화살표 주석을 추가합니다
+    content: |-
+      figAnnotate, axAnnotate = plt.subplots(figsize=(12, 6))
+
+      axAnnotate.plot(stockData['date'], stockData['price'], color='#2C3E50', linewidth=1.5)
+
+      maxIdx = stockData['price'].idxmax()
+      maxDate = stockData.loc[maxIdx, 'date']
+      maxPrice = stockData.loc[maxIdx, 'price']
+
+      axAnnotate.annotate('최고점',
+                         xy=(maxDate, maxPrice),
+                         xytext=(maxDate - pd.Timedelta(days=30), maxPrice + 10),
+                         fontsize=11,
+                         arrowprops=dict(arrowstyle='->', color='#E74C3C'))
+
+      axAnnotate.set_title('주가 추이 (기본 주석)', fontsize=14)
+      axAnnotate.set_xlabel('날짜')
+      axAnnotate.set_ylabel('주가 ($)')
+
+      figAnnotate
+  - type: tip
+    content: ax.annotate(텍스트, xy=(x, y), xytext=(tx, ty), arrowprops=dict())로 화살표 주석을 추가합니다. xy는 화살표 끝점, xytext는 텍스트 시작점입니다. arrowstyle에는 '->', '-|>', '<->', 'fancy', 'wedge' 등이 있습니다.
+
+- id: step4_arrow_styles
+  title: 4단계. 다양한 화살표 스타일
+  subtitle: arrowprops 옵션
+  blocks:
+  - type: text
+    content: arrowprops에는 다양한 옵션이 있습니다. connectionstyle로 화살표 경로를 조절하고, facecolor와 edgecolor로 색상을 지정합니다. shrink로 화살표 시작/끝 여백을 조절합니다.
+  - type: code
+    language: python
+    title: Figure와 최저점 주석
+    description: 차트를 만들고 최저점에 fancy 화살표를 추가합니다
+    content: |-
+      figArrow, axArrow = plt.subplots(figsize=(12, 7))
+      axArrow.plot(stockData['date'], stockData['price'], color='#2C3E50', linewidth=1.5)
+
+      minIdx = stockData['price'].idxmin()
+      minDate = stockData.loc[minIdx, 'date']
+      minPrice = stockData.loc[minIdx, 'price']
+
+      axArrow.annotate('최저점',
+                      xy=(minDate, minPrice),
+                      xytext=(minDate + pd.Timedelta(days=40), minPrice - 5),
+                      fontsize=11, fontweight='bold', color='#27AE60',
+                      arrowprops=dict(arrowstyle='fancy',
+                                     facecolor='#27AE60',
+                                     edgecolor='none',
+                                     connectionstyle='arc3,rad=0.3'))
+      figArrow
+  - type: code
+    language: python
+    title: 최고점 주석
+    description: 최고점에 wedge 화살표를 추가합니다
+    content: |-
+      axArrow.annotate('최고점',
+                      xy=(maxDate, maxPrice),
+                      xytext=(maxDate - pd.Timedelta(days=40), maxPrice + 8),
+                      fontsize=11, fontweight='bold', color='#E74C3C',
+                      arrowprops=dict(arrowstyle='wedge,tail_width=0.5',
+                                     facecolor='#E74C3C',
+                                     edgecolor='none',
+                                     connectionstyle='arc3,rad=-0.2'))
+
+      axArrow.set_title('다양한 화살표 스타일', fontsize=14)
+      axArrow.set_xlabel('날짜')
+      axArrow.set_ylabel('주가 ($)')
+      figArrow
+  - type: tip
+    content: "connectionstyle로 화살표 곡선을 조절합니다. 'arc3,rad=0.3'은 호 형태로 rad 값이 클수록 많이 휩니다. 양수는 시계방향, 음수는 반시계방향입니다. 'angle,angleA=0,angleB=90'으로 꺾인 화살표도 가능합니다."
+
+- id: step5_bbox
+  title: 5단계. bbox 텍스트 박스
+  subtitle: 텍스트 강조
+  blocks:
+  - type: text
+    content: bbox 파라미터로 텍스트 주위에 박스를 그릴 수 있습니다. boxstyle로 박스 모양을, facecolor로 배경색을, alpha로 투명도를 지정합니다. 주석 텍스트를 더 잘 보이게 만듭니다.
+  - type: code
+    language: python
+    title: Figure와 저항선 주석
+    description: 차트를 만들고 저항선 돌파에 round 박스를 추가합니다
+    content: |-
+      figBbox, axBbox = plt.subplots(figsize=(12, 7))
+      axBbox.plot(stockData['date'], stockData['price'], color='#2C3E50', linewidth=1.5)
+
+      axBbox.annotate('주요 저항선 돌파',
+                     xy=(maxDate, maxPrice),
+                     xytext=(maxDate - pd.Timedelta(days=50), maxPrice + 12),
+                     fontsize=11, fontweight='bold',
+                     bbox=dict(boxstyle='round,pad=0.5',
+                              facecolor='#FDEBD0',
+                              edgecolor='#E67E22',
+                              linewidth=2),
+                     arrowprops=dict(arrowstyle='->',
+                                    color='#E67E22',
+                                    connectionstyle='arc3,rad=0.2'))
+      figBbox
+  - type: code
+    language: python
+    title: 지지선 주석
+    description: 지지선 테스트에 sawtooth 박스를 추가합니다
+    content: |-
+      axBbox.annotate('지지선 테스트',
+                     xy=(minDate, minPrice),
+                     xytext=(minDate + pd.Timedelta(days=50), minPrice - 8),
+                     fontsize=11, fontweight='bold',
+                     bbox=dict(boxstyle='sawtooth,pad=0.5',
+                              facecolor='#D5F5E3',
+                              edgecolor='#27AE60',
+                              linewidth=2),
+                     arrowprops=dict(arrowstyle='->',
+                                    color='#27AE60',
+                                    connectionstyle='arc3,rad=-0.2'))
+
+      axBbox.set_title('텍스트 박스 스타일', fontsize=14)
+      axBbox.set_xlabel('날짜')
+      axBbox.set_ylabel('주가 ($)')
+      axBbox.spines['top'].set_visible(False)
+      axBbox.spines['right'].set_visible(False)
+      figBbox
+  - type: tip
+    content: "bbox=dict(boxstyle='스타일', facecolor=배경색, edgecolor=테두리색)로 텍스트 박스를 만듭니다. boxstyle 옵션: 'round'(둥근 모서리), 'square'(직각), 'circle', 'rarrow'(화살표), 'sawtooth'(톱니), 'roundtooth'(둥근톱니). pad로 여백을 조절합니다."
+
+- id: step6_latex
+  title: 6단계. LaTeX 수식
+  subtitle: 수학 표현식
+  blocks:
+  - type: text
+    content: Matplotlib은 LaTeX 문법을 지원합니다. 달러 기호($) 안에 수식을 작성하면 수학 표현식으로 렌더링됩니다. 통계량, 공식, 그리스 문자 등을 표현할 수 있습니다.
+  - type: code
+    language: python
+    title: Figure와 기준선
+    description: 차트를 만들고 평균과 표준편차 기준선을 추가합니다
+    content: |-
+      figLatex, axLatex = plt.subplots(figsize=(12, 7))
+      axLatex.plot(stockData['date'], stockData['price'], color='#2C3E50', linewidth=1.5)
+
+      meanPrice = stockData['price'].mean()
+      stdPrice = stockData['price'].std()
+
+      axLatex.axhline(y=meanPrice, color='#E74C3C', linestyle='--', linewidth=1.5, label='평균')
+      axLatex.axhline(y=meanPrice + stdPrice, color='#3498DB', linestyle=':', linewidth=1.5)
+      axLatex.axhline(y=meanPrice - stdPrice, color='#3498DB', linestyle=':', linewidth=1.5)
+      figLatex
+  - type: code
+    language: python
+    title: LaTeX 라벨
+    description: 기준선에 LaTeX 수식 라벨을 추가합니다
+    content: |-
+      axLatex.text(stockData['date'].iloc[10], meanPrice + 2,
+                  r'$\mu = %.2f$' % meanPrice,
+                  fontsize=12, color='#E74C3C',
+                  bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+
+      axLatex.text(stockData['date'].iloc[10], meanPrice + stdPrice + 2,
+                  r'$\mu + \sigma = %.2f$' % (meanPrice + stdPrice),
+                  fontsize=11, color='#3498DB')
+
+      axLatex.text(stockData['date'].iloc[10], meanPrice - stdPrice - 4,
+                  r'$\mu - \sigma = %.2f$' % (meanPrice - stdPrice),
+                  fontsize=11, color='#3498DB')
+
+      axLatex.set_title(r'주가 통계 분석: $\sigma$ = %.2f' % stdPrice, fontsize=14)
+      axLatex.set_xlabel('날짜')
+      axLatex.set_ylabel('주가 ($)')
+      axLatex.legend()
+      axLatex.spines['top'].set_visible(False)
+      axLatex.spines['right'].set_visible(False)
+      figLatex
+  - type: tip
+    content: "LaTeX 문법은 r'$...$' 형태로 작성합니다. r은 raw string으로 역슬래시를 이스케이프하지 않습니다. 주요 기호: \\mu(μ), \\sigma(σ), \\alpha(α), \\beta(β), \\sum(Σ), \\frac{a}{b}(분수), ^{n}(위첨자), _{n}(아래첨자)."
+
+- id: step7_latex_advanced
+  title: 7단계. 복잡한 수식
+  subtitle: 공식 표현
+  blocks:
+  - type: text
+    content: 더 복잡한 수식도 LaTeX로 표현할 수 있습니다. 분수, 제곱근, 합계 기호 등 다양한 수학 기호를 사용해봅니다. 금융 공식이나 통계 공식을 차트에 직접 표시할 수 있습니다.
+  - type: code
+    language: python
+    title: Figure와 샤프 비율 계산
+    description: 차트를 만들고 샤프 비율을 계산합니다
+    content: |-
+      figFormula, axFormula = plt.subplots(figsize=(12, 7))
+      axFormula.plot(stockData['date'], stockData['price'], color='#2C3E50', linewidth=1.5)
+
+      dailyReturns = stockData['price'].pct_change().dropna()
+      sharpeRatio = np.sqrt(252) * dailyReturns.mean() / dailyReturns.std()
+      figFormula
+  - type: code
+    language: python
+    title: 수식 텍스트 추가
+    description: 샤프 비율 공식과 변동성 공식을 추가합니다
+    content: |-
+      formulaText = r'Sharpe Ratio = $\frac{\bar{r} - r_f}{\sigma_r} \times \sqrt{252}$'
+      axFormula.text(0.02, 0.95, formulaText,
+                    transform=axFormula.transAxes,
+                    fontsize=13,
+                    verticalalignment='top',
+                    bbox=dict(boxstyle='round', facecolor='#EBF5FB', edgecolor='#3498DB', linewidth=2))
+
+      resultText = r'$= %.3f$' % sharpeRatio
+      axFormula.text(0.02, 0.85, resultText,
+                    transform=axFormula.transAxes,
+                    fontsize=14, fontweight='bold', color='#2980B9')
+
+      volatilityFormula = r'$\sigma = \sqrt{\frac{1}{N}\sum_{i=1}^{N}(r_i - \bar{r})^2}$'
+      axFormula.text(0.98, 0.05, volatilityFormula,
+                    transform=axFormula.transAxes,
+                    fontsize=12,
+                    horizontalalignment='right',
+                    bbox=dict(boxstyle='round', facecolor='#FDEDEC', edgecolor='#E74C3C'))
+
+      axFormula.set_title('금융 지표 분석', fontsize=14, fontweight='bold')
+      axFormula.set_xlabel('날짜')
+      axFormula.set_ylabel('주가 ($)')
+      axFormula.spines['top'].set_visible(False)
+      axFormula.spines['right'].set_visible(False)
+      figFormula
+  - type: tip
+    content: "transform=ax.transAxes를 사용하면 데이터 좌표가 아닌 Axes 좌표(0~1)로 위치를 지정합니다. (0,0)은 좌하단, (1,1)은 우상단입니다. 차트 크기가 변해도 텍스트 위치가 고정됩니다."
+
+- id: step8_errorbar
+  title: 8단계. 오차 막대
+  subtitle: errorbar
+  blocks:
+  - type: text
+    content: errorbar는 데이터의 불확실성이나 변동성을 표현합니다. 주간 평균 주가와 함께 표준편차를 오차 막대로 표시합니다. 과학 논문이나 통계 보고서에서 자주 사용됩니다.
+  - type: code
+    language: python
+    title: 주간 통계 계산
+    description: 주간 평균과 표준편차를 계산합니다
+    content: |-
+      stockData['week'] = stockData['date'].dt.isocalendar().week
+      weeklyStats = stockData.groupby('week')['price'].agg(['mean', 'std']).reset_index()
+      weeklyStats = weeklyStats.iloc[:20]
+      weeklyStats.head()
+  - type: code
+    language: python
+    title: 오차 막대 차트
+    description: 주간 평균과 표준편차를 오차 막대로 표시합니다
+    content: |-
+      figError, axError = plt.subplots(figsize=(12, 6))
+
+      axError.errorbar(weeklyStats['week'], weeklyStats['mean'],
+                      yerr=weeklyStats['std'],
+                      fmt='o-',
+                      color='#2C3E50',
+                      ecolor='#E74C3C',
+                      elinewidth=2,
+                      capsize=4,
+                      capthick=2,
+                      markersize=8,
+                      label='주간 평균 ± 1σ')
+
+      axError.set_title('주간 주가 변동성', fontsize=14, fontweight='bold')
+      axError.set_xlabel('주차')
+      axError.set_ylabel('주가 ($)')
+      axError.legend()
+      axError.grid(True, alpha=0.3)
+      axError.spines['top'].set_visible(False)
+      axError.spines['right'].set_visible(False)
+      figError
+  - type: tip
+    content: ax.errorbar(x, y, yerr=오차)로 오차 막대를 그립니다. fmt='o-'는 마커와 선 스타일, ecolor는 오차 막대 색상, capsize는 캡 크기입니다. xerr로 x축 오차도 표시할 수 있습니다. yerr에 [하단오차, 상단오차] 배열을 전달하면 비대칭 오차도 가능합니다.
+
+- id: step9_combined
+  title: 9단계. 이벤트 차트
+  subtitle: 모든 기법 조합
+  blocks:
+  - type: text
+    content: 지금까지 배운 annotate, LaTeX, bbox, errorbar를 모두 활용하여 주요 이벤트가 표시된 전문적인 주가 차트를 만듭니다.
+  - type: code
+    language: python
+    title: Figure와 이벤트 데이터
+    description: 차트를 만들고 이벤트 목록을 정의합니다
+    content: |-
+      figEvent, axEvent = plt.subplots(figsize=(14, 8))
+      axEvent.plot(stockData['date'], stockData['price'], color='#2C3E50', linewidth=1.5, label='일별 종가')
+      axEvent.axhline(y=meanPrice, color='#95A5A6', linestyle='--', linewidth=1, alpha=0.7)
+
+      events = [
+          {'date': stockData['date'].iloc[50], 'label': '실적 발표', 'color': '#27AE60'},
+          {'date': stockData['date'].iloc[120], 'label': '금리 인하', 'color': '#3498DB'},
+          {'date': stockData['date'].iloc[180], 'label': '신제품 출시', 'color': '#9B59B6'}
+      ]
+      figEvent
+  - type: code
+    language: python
+    title: 이벤트 주석
+    description: 각 이벤트에 세로선과 주석을 추가합니다
+    content: |-
+      for event in events:
+          eventIdx = (stockData['date'] - event['date']).abs().idxmin()
+          eventPrice = stockData.loc[eventIdx, 'price']
+          axEvent.axvline(x=event['date'], color=event['color'], linestyle=':', alpha=0.5)
+          axEvent.annotate(event['label'],
+                          xy=(event['date'], eventPrice),
+                          xytext=(event['date'], eventPrice + 15),
+                          fontsize=10, fontweight='bold',
+                          color=event['color'],
+                          ha='center',
+                          bbox=dict(boxstyle='round,pad=0.3',
+                                   facecolor='white',
+                                   edgecolor=event['color'],
+                                   alpha=0.9),
+                          arrowprops=dict(arrowstyle='->',
+                                         color=event['color'],
+                                         connectionstyle='arc3,rad=0'))
+      figEvent
+  - type: code
+    language: python
+    title: 최고점과 통계 정보
+    description: ATH 주석과 통계 정보를 추가합니다
+    content: |-
+      axEvent.annotate(r'ATH: $\$%.2f$' % maxPrice,
+                      xy=(maxDate, maxPrice),
+                      xytext=(maxDate + pd.Timedelta(days=20), maxPrice + 5),
+                      fontsize=11, fontweight='bold', color='#E74C3C',
+                      bbox=dict(boxstyle='round', facecolor='#FADBD8', edgecolor='#E74C3C'),
+                      arrowprops=dict(arrowstyle='fancy', facecolor='#E74C3C', edgecolor='none'))
+
+      statsText = r'$\mu = %.2f$' % meanPrice + '\n' + r'$\sigma = %.2f$' % stdPrice
+      axEvent.text(0.02, 0.98, statsText,
+                  transform=axEvent.transAxes,
+                  fontsize=11, verticalalignment='top',
+                  bbox=dict(boxstyle='round', facecolor='#F8F9FA', edgecolor='#BDC3C7'))
+
+      axEvent.set_title('2024년 주가 분석 - 주요 이벤트 표시', fontsize=14, fontweight='bold')
+      axEvent.set_xlabel('날짜')
+      axEvent.set_ylabel('주가 ($)')
+      axEvent.legend(loc='upper left')
+      axEvent.spines['top'].set_visible(False)
+      axEvent.spines['right'].set_visible(False)
+      figEvent
+
+- id: step10_final
+  title: 10단계. 최종 분석 차트
+  subtitle: 전문가급 차트
+  blocks:
+  - type: text
+    content: 모든 기법을 종합하여 논문이나 보고서에 바로 사용할 수 있는 전문가급 차트를 완성합니다. 주요 구간 표시, 통계 정보, 이벤트 주석을 모두 포함합니다.
+  - type: code
+    language: python
+    title: Figure와 기본 플롯
+    description: Figure를 만들고 주가선과 표준편차 범위를 추가합니다
+    content: |-
+      figFinal, axFinal = plt.subplots(figsize=(16, 9))
+
+      axFinal.plot(stockData['date'], stockData['price'], color='#2C3E50', linewidth=1.8, label='일별 종가')
+      axFinal.fill_between(stockData['date'], meanPrice - stdPrice, meanPrice + stdPrice,
+                          color='#3498DB', alpha=0.1, label=r'$\pm 1\sigma$ 범위')
+      axFinal.axhline(y=meanPrice, color='#E74C3C', linestyle='--', linewidth=1.5)
+      figFinal
+  - type: code
+    language: python
+    title: 수익률 화살표
+    description: 시작점에서 끝점까지 수익률 화살표를 추가합니다
+    content: |-
+      startDate = stockData['date'].iloc[0]
+      endDate = stockData['date'].iloc[-1]
+      startPrice = stockData['price'].iloc[0]
+      endPrice = stockData['price'].iloc[-1]
+      totalReturn = (endPrice / startPrice - 1) * 100
+
+      axFinal.annotate('',
+                      xy=(endDate, endPrice),
+                      xytext=(startDate, startPrice),
+                      arrowprops=dict(arrowstyle='->', color='#27AE60', lw=2))
+
+      midDate = stockData['date'].iloc[len(stockData)//2]
+      midPrice = (startPrice + endPrice) / 2
+      axFinal.text(midDate, midPrice + 5,
+                  r'총 수익률: $%.1f\%%$' % totalReturn,
+                  fontsize=12, fontweight='bold', color='#27AE60',
+                  bbox=dict(boxstyle='round', facecolor='#D5F5E3', edgecolor='#27AE60'))
+      figFinal
+  - type: code
+    language: python
+    title: 최고점 최저점 주석
+    description: 최고점과 최저점에 wedge 화살표 주석을 추가합니다
+    content: |-
+      axFinal.annotate(r'최고점 $\$%.2f$' % maxPrice,
+                      xy=(maxDate, maxPrice),
+                      xytext=(maxDate - pd.Timedelta(days=45), maxPrice + 10),
+                      fontsize=11, fontweight='bold',
+                      bbox=dict(boxstyle='round,pad=0.4', facecolor='#FADBD8', edgecolor='#E74C3C', lw=2),
+                      arrowprops=dict(arrowstyle='wedge,tail_width=0.5', facecolor='#E74C3C', edgecolor='none',
+                                     connectionstyle='arc3,rad=0.2'))
+
+      axFinal.annotate(r'최저점 $\$%.2f$' % minPrice,
+                      xy=(minDate, minPrice),
+                      xytext=(minDate + pd.Timedelta(days=45), minPrice - 8),
+                      fontsize=11, fontweight='bold',
+                      bbox=dict(boxstyle='round,pad=0.4', facecolor='#D5F5E3', edgecolor='#27AE60', lw=2),
+                      arrowprops=dict(arrowstyle='wedge,tail_width=0.5', facecolor='#27AE60', edgecolor='none',
+                                     connectionstyle='arc3,rad=-0.2'))
+      figFinal
+  - type: code
+    language: python
+    title: 정보 박스와 마무리
+    description: 통계 정보 박스와 제목을 추가합니다
+    content: |-
+      infoBox = (r'통계 요약' + '\n' +
+                r'$\mu = %.2f$' % meanPrice + '\n' +
+                r'$\sigma = %.2f$' % stdPrice + '\n' +
+                r'Sharpe = $%.3f$' % sharpeRatio)
+      axFinal.text(0.02, 0.98, infoBox,
+                  transform=axFinal.transAxes,
+                  fontsize=11, verticalalignment='top',
+                  family='monospace',
+                  bbox=dict(boxstyle='round', facecolor='#F8F9FA', edgecolor='#2C3E50', lw=2))
+
+      formulaBox = (r'Sharpe Ratio' + '\n' +
+                   r'$= \frac{\bar{r}}{\sigma_r} \times \sqrt{252}$')
+      axFinal.text(0.98, 0.02, formulaBox,
+                  transform=axFinal.transAxes,
+                  fontsize=10, ha='right', va='bottom',
+                  bbox=dict(boxstyle='round', facecolor='#EBF5FB', edgecolor='#3498DB'))
+
+      axFinal.set_title('2024년 주가 종합 분석 리포트', fontsize=16, fontweight='bold', pad=15)
+      axFinal.set_xlabel('날짜', fontsize=12)
+      axFinal.set_ylabel('주가 ($)', fontsize=12)
+      axFinal.legend(loc='upper left', fontsize=10)
+      axFinal.grid(True, alpha=0.3, linestyle=':')
+      axFinal.spines['top'].set_visible(False)
+      axFinal.spines['right'].set_visible(False)
+      plt.tight_layout()
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 고급 주석 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 annotate, LaTeX, bbox, errorbar를 활용해서 전문적인 분석 차트를 만들어봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 분기별 매출 오차 막대 차트"
+    blocks:
+    - type: code
+      title: "데이터 생성"
+      content: |-
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        np.random.seed(123)
+        periods = ['Q1', 'Q2', 'Q3', 'Q4']
+        sales = np.array([120, 145, 138, 165])
+        margin = np.array([8, 12, 10, 15])
+    - type: code
+      title: "막대 + 오차막대"
+      content: |-
+        chart, plot = plt.subplots(figsize=(10, 6))
+
+        palette = ['#3498DB', '#27AE60', '#F39C12', '#E74C3C']
+        bars = plot.bar(periods, sales, color=palette, alpha=0.8, edgecolor='white', linewidth=2)
+
+        plot.errorbar(periods, sales, yerr=margin,
+                      fmt='none', ecolor='#2C3E50', elinewidth=2, capsize=6, capthick=2)
+    - type: code
+      title: "주석 추가"
+      content: |-
+        peakQ = np.argmax(sales)
+        plot.annotate(r'최고 매출: $\$%dM$' % sales[peakQ],
+                      xy=(periods[peakQ], sales[peakQ] + margin[peakQ]),
+                      xytext=(periods[peakQ], sales[peakQ] + 25),
+                      fontsize=11, fontweight='bold', ha='center',
+                      bbox=dict(boxstyle='round', facecolor='#FADBD8', edgecolor='#E74C3C'),
+                      arrowprops=dict(arrowstyle='->', color='#E74C3C'))
+
+        growth = (sales[-1] / sales[0] - 1) * 100
+        plot.text(0.02, 0.95, r'연간 성장률: $%.1f\%%$' % growth,
+                  transform=plot.transAxes, fontsize=12, fontweight='bold',
+                  bbox=dict(boxstyle='round', facecolor='#D5F5E3', edgecolor='#27AE60'))
+
+        plot.set_title('2024년 분기별 매출 분석', fontsize=14, fontweight='bold')
+        plot.set_ylabel('매출 (백만 달러)')
+        plot.spines['top'].set_visible(False)
+        plot.spines['right'].set_visible(False)
+
+        chart
+  - type: expansion
+    title: "미션2: 과학 실험 데이터 차트"
+    blocks:
+    - type: code
+      title: "데이터 생성"
+      content: |-
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        np.random.seed(456)
+        xValues = np.linspace(0, 10, 20)
+        yValues = 2.5 * xValues + 3 + np.random.normal(0, 2, 20)
+        uncertainty = np.random.uniform(1, 3, 20)
+
+        coef, offset = np.polyfit(xValues, yValues, 1)
+        xLine = np.linspace(0, 10, 100)
+        yLine = coef * xLine + offset
+    - type: code
+      title: "데이터 + 회귀선"
+      content: |-
+        canvas, panel = plt.subplots(figsize=(10, 7))
+
+        panel.errorbar(xValues, yValues, yerr=uncertainty,
+                       fmt='o', color='#3498DB', ecolor='#95A5A6',
+                       elinewidth=1.5, capsize=4, markersize=8, label='측정값')
+
+        panel.plot(xLine, yLine, '--', color='#E74C3C', linewidth=2, label='회귀선')
+    - type: code
+      title: "수식 + 주석"
+      content: |-
+        formula = r'$y = %.2fx + %.2f$' % (coef, offset)
+        panel.text(0.05, 0.95, formula,
+                   transform=panel.transAxes, fontsize=14,
+                   bbox=dict(boxstyle='round', facecolor='#FDEDEC', edgecolor='#E74C3C', lw=2))
+
+        rsq = 1 - np.sum((yValues - (coef * xValues + offset))**2) / np.sum((yValues - np.mean(yValues))**2)
+        panel.text(0.05, 0.85, r'$R^2 = %.4f$' % rsq,
+                   transform=panel.transAxes, fontsize=12,
+                   bbox=dict(boxstyle='round', facecolor='#EBF5FB', edgecolor='#3498DB'))
+
+        anomalyIdx = np.argmax(np.abs(yValues - (coef * xValues + offset)))
+        panel.annotate('이상치?',
+                       xy=(xValues[anomalyIdx], yValues[anomalyIdx]),
+                       xytext=(xValues[anomalyIdx] + 1, yValues[anomalyIdx] + 5),
+                       fontsize=10, color='#9B59B6',
+                       bbox=dict(boxstyle='round', facecolor='#F5EEF8', edgecolor='#9B59B6'),
+                       arrowprops=dict(arrowstyle='->', color='#9B59B6'))
+
+        panel.set_title('선형 회귀 분석', fontsize=14, fontweight='bold')
+        panel.set_xlabel(r'독립변수 $x$', fontsize=12)
+        panel.set_ylabel(r'종속변수 $y$', fontsize=12)
+        panel.legend(loc='lower right', fontsize=10)
+        panel.grid(True, alpha=0.3)
+        panel.spines['top'].set_visible(False)
+        panel.spines['right'].set_visible(False)
+
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: annotate, LaTeX, bbox, errorbar로 고급 주석 차트를 만들었습니다.
+  - type: list
+    items:
+    - "ax.annotate(text, xy, xytext, arrowprops) - 화살표 주석"
+    - "arrowstyle: '->', 'fancy', 'wedge' 등 다양한 스타일"
+    - "connectionstyle: 'arc3,rad=0.3' 곡선 화살표"
+    - "bbox=dict(boxstyle, facecolor, edgecolor) - 텍스트 박스"
+    - "r'$\\mu$', r'$\\sigma$' - LaTeX 수식 표현"
+    - "transform=ax.transAxes - Axes 좌표 사용"
+    - "ax.errorbar(x, y, yerr) - 오차 막대 차트"
+  - type: text
+    content: 다음 시간에는 모든 개념을 종합한 분석 리포트를 만듭니다.

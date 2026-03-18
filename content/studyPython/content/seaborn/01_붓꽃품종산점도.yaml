@@ -1,0 +1,287 @@
+meta:
+  id: seaborn_01
+  title: 붓꽃품종산점도
+  order: 1
+  category: seaborn
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["seaborn", "scatterplot", "hue", "palette", "iris"]
+  seo:
+    title: "Seaborn 산점도 - 붓꽃 품종별 특성 시각화"
+    description: "Seaborn scatterplot으로 붓꽃 품종별 꽃잎/꽃받침 특성을 시각화합니다. hue와 palette 사용법을 배웁니다."
+    keywords: ["seaborn", "scatterplot", "hue", "palette", "iris", "산점도"]
+
+intro:
+  emoji: "🌸"
+  goal: 붓꽃 품종별 꽃잎/꽃받침 특성을 산점도로 시각화합니다.
+  description: Seaborn의 가장 기본적인 함수인 scatterplot을 배웁니다. hue 파라미터로 품종별 색상을 구분하고, palette로 색상 팔레트를 변경합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: Seaborn은 통계 시각화에 특화된 라이브러리입니다. matplotlib.pyplot과 함께 사용하면 더 세밀한 조정이 가능합니다. seaborn은 관례적으로 sns라는 별칭을 사용합니다. 이 별칭은 미국 드라마 The West Wing의 등장인물 Samuel Norman Seaborn에서 따왔다고 합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: seaborn과 matplotlib을 불러옵니다
+    content: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+  - type: tip
+    content: import seaborn as sns는 seaborn을 sns라는 짧은 이름으로 불러오는 관례입니다. sns.scatterplot(), sns.histplot()처럼 간결하게 사용할 수 있습니다.
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: iris 데이터셋
+  blocks:
+  - type: text
+    content: iris(붓꽃) 데이터셋은 머신러닝과 시각화에서 가장 유명한 데이터입니다. 1936년 통계학자 Ronald Fisher가 발표했습니다. 3가지 품종(setosa, versicolor, virginica)의 꽃잎(petal)과 꽃받침(sepal) 길이/너비를 측정한 150개 샘플로 구성되어 있습니다.
+  - type: code
+    language: python
+    title: iris 데이터 로드
+    description: seaborn 내장 데이터셋을 불러옵니다
+    content: |-
+      iris = sns.load_dataset('iris')
+      iris.head()
+  - type: tip
+    content: sns.load_dataset('데이터셋명')은 seaborn의 GitHub 저장소에서 CSV 파일을 다운로드하여 DataFrame으로 반환합니다. 인터넷 연결이 필요하며, 한 번 로드하면 캐시됩니다.
+
+- id: step3_basic_scatter
+  title: 3단계. 기본 산점도
+  subtitle: scatterplot()
+  blocks:
+  - type: text
+    content: scatterplot()은 두 연속 변수의 관계를 점으로 표현합니다. data에 DataFrame을 전달하고, x와 y에 컬럼명을 문자열로 지정합니다. Matplotlib과 달리 데이터를 직접 전달하는 방식으로 코드가 더 직관적입니다.
+  - type: code
+    language: python
+    title: 기본 산점도
+    description: 꽃잎 길이와 너비의 관계를 산점도로 표시합니다
+    content: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.scatterplot(data=iris, x='petal_length', y='petal_width', ax=ax)
+      ax.set_title('Petal Length vs Width')
+      fig
+  - type: tip
+    content: sns.scatterplot(data=df, x='컬럼명', y='컬럼명')으로 산점도를 그립니다. ax 파라미터로 기존 Matplotlib Axes에 그릴 수 있어 서브플롯과 조합이 가능합니다.
+
+- id: step4_hue
+  title: 4단계. hue로 색상 구분
+  subtitle: 범주별 색상
+  blocks:
+  - type: text
+    content: hue 파라미터는 Seaborn의 핵심 기능입니다. 세 번째 변수(보통 범주형)를 색상으로 매핑하여 그룹별 패턴을 한눈에 파악할 수 있습니다. 범례는 자동으로 생성됩니다. 품종별로 색상을 다르게 하면 각 품종의 특성 차이가 명확하게 보입니다.
+  - type: code
+    language: python
+    title: 품종별 색상 구분
+    description: hue로 품종별 색상을 다르게 표시합니다
+    content: |-
+      figHue, axHue = plt.subplots(figsize=(8, 6))
+      sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species', ax=axHue)
+      axHue.set_title('Petal by Species')
+      figHue
+  - type: tip
+    content: hue='컬럼명'으로 범주형 변수를 색상에 매핑합니다. 범례가 자동 생성되고, 기본 색상 팔레트가 적용됩니다. 연속형 변수를 지정하면 그라데이션 색상이 적용됩니다.
+
+- id: step5_palette
+  title: 5단계. 색상 팔레트 변경
+  subtitle: palette
+  blocks:
+  - type: text
+    content: palette 파라미터로 색상 체계를 변경할 수 있습니다. Seaborn은 다양한 내장 팔레트를 제공합니다. deep, muted, bright, pastel, dark, colorblind 등이 있으며, matplotlib의 컬러맵(Set1, Set2, tab10 등)도 사용할 수 있습니다.
+  - type: code
+    language: python
+    title: 팔레트 변경
+    description: Set2 팔레트를 적용합니다
+    content: |-
+      figPalette, axPalette = plt.subplots(figsize=(8, 6))
+      sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species', palette='Set2', ax=axPalette)
+      axPalette.set_title('Petal by Species (Set2)')
+      figPalette
+  - type: tip
+    content: "palette='팔레트명'으로 색상을 변경합니다. 주요 팔레트: 'deep'(기본), 'Set1', 'Set2', 'husl', 'colorblind'(색맹 친화적). 리스트로 직접 색상을 지정할 수도 있습니다: palette=['red', 'green', 'blue']"
+
+- id: step6_sepal
+  title: 6단계. 꽃받침 데이터 시각화
+  subtitle: 다른 변수 탐색
+  blocks:
+  - type: text
+    content: 같은 방식으로 꽃받침(sepal) 데이터도 시각화해봅니다. 꽃잎 데이터와 비교하면 품종 간 분리 정도가 다른 것을 알 수 있습니다. setosa는 꽃잎에서 더 명확하게 구분되지만, versicolor와 virginica는 꽃받침에서도 겹치는 영역이 있습니다.
+  - type: code
+    language: python
+    title: 꽃받침 산점도
+    description: 꽃받침 길이와 너비의 관계를 시각화합니다
+    content: |-
+      figSepal, axSepal = plt.subplots(figsize=(8, 6))
+      sns.scatterplot(data=iris, x='sepal_length', y='sepal_width', hue='species', palette='Set2', ax=axSepal)
+      axSepal.set_title('Sepal by Species')
+      figSepal
+
+- id: step7_style
+  title: 7단계. 스타일 추가
+  subtitle: 마커와 크기
+  blocks:
+  - type: text
+    content: s 파라미터로 점 크기를, alpha로 투명도를 조절할 수 있습니다. 점이 많이 겹칠 때 alpha를 낮추면 밀집 영역을 파악하기 쉽습니다. edgecolor로 점 테두리 색상도 지정할 수 있습니다.
+  - type: code
+    language: python
+    title: 스타일 적용
+    description: 점 크기와 투명도를 조절합니다
+    content: |-
+      figStyle, axStyle = plt.subplots(figsize=(8, 6))
+      sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species',
+                     palette='Set2', s=100, alpha=0.7, edgecolor='white', ax=axStyle)
+      axStyle.set_title('Styled Scatter')
+      figStyle
+
+- id: step8_comparison
+  title: 8단계. 두 차트 비교
+  subtitle: 서브플롯 활용
+  blocks:
+  - type: text
+    content: Matplotlib의 subplots와 조합하면 여러 차트를 한 그림에 배치할 수 있습니다. ax 파라미터로 각 Axes에 Seaborn 차트를 그립니다. 꽃잎과 꽃받침을 나란히 비교하면 품종별 특성 차이를 더 명확하게 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 꽃잎/꽃받침 비교
+    description: 두 차트를 나란히 배치합니다
+    content: |-
+      figCompare, (axPetal, axSepalSub) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species',
+                     palette='Set2', s=80, alpha=0.7, ax=axPetal)
+      axPetal.set_title('Petal')
+
+      sns.scatterplot(data=iris, x='sepal_length', y='sepal_width', hue='species',
+                     palette='Set2', s=80, alpha=0.7, ax=axSepalSub)
+      axSepalSub.set_title('Sepal')
+
+      plt.tight_layout()
+      figCompare
+
+- id: step9_legend
+  title: 9단계. 범례 커스터마이징
+  subtitle: legend 조정
+  blocks:
+  - type: text
+    content: Seaborn이 자동 생성한 범례를 Matplotlib 메서드로 조정할 수 있습니다. ax.legend()로 위치, 제목, 크기 등을 변경합니다. bbox_to_anchor로 범례를 차트 밖으로 배치할 수도 있습니다.
+  - type: code
+    language: python
+    title: 범례 조정
+    description: 범례 위치와 스타일을 변경합니다
+    content: |-
+      figLegend, axLegend = plt.subplots(figsize=(8, 6))
+      sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species',
+                     palette='Set2', s=80, alpha=0.7, ax=axLegend)
+      axLegend.legend(title='Species', loc='upper left', frameon=True, fontsize=10)
+      axLegend.set_xlabel('Petal Length (cm)')
+      axLegend.set_ylabel('Petal Width (cm)')
+      axLegend.set_title('Iris Petal Dimensions by Species')
+      figLegend
+
+- id: step10_final
+  title: 10단계. 최종 차트
+  subtitle: 완성된 시각화
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 요소를 종합하여 완성도 높은 차트를 만듭니다. 적절한 제목, 축 라벨, 범례, 스타일을 적용하면 발표나 보고서에 바로 사용할 수 있는 차트가 됩니다.
+  - type: code
+    language: python
+    title: 최종 산점도
+    description: 모든 스타일을 적용한 완성 차트
+    content: |-
+      figFinal, axFinal = plt.subplots(figsize=(10, 7))
+
+      sns.scatterplot(data=iris, x='petal_length', y='petal_width', hue='species',
+                     palette='Set2', s=100, alpha=0.8, edgecolor='white', linewidth=0.5, ax=axFinal)
+
+      axFinal.set_xlabel('Petal Length (cm)', fontsize=12)
+      axFinal.set_ylabel('Petal Width (cm)', fontsize=12)
+      axFinal.set_title('Iris Dataset: Petal Dimensions by Species', fontsize=14, fontweight='bold')
+      axFinal.legend(title='Species', title_fontsize=11, fontsize=10, loc='upper left')
+      axFinal.grid(True, alpha=0.3)
+
+      axFinal.spines['top'].set_visible(False)
+      axFinal.spines['right'].set_visible(False)
+
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 산점도 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 scatterplot, hue, palette를 활용해서 다양한 산점도를 만들어봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 펭귄 데이터 산점도"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        data = sns.load_dataset('penguins').dropna()
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart, plot = plt.subplots(figsize=(10, 7))
+
+        sns.scatterplot(data=data, x='flipper_length_mm', y='body_mass_g',
+                       hue='species', palette='husl', s=80, alpha=0.7, edgecolor='white', ax=plot)
+
+        plot.set_xlabel('Flipper Length (mm)', fontsize=11)
+        plot.set_ylabel('Body Mass (g)', fontsize=11)
+        plot.set_title('Penguin Flipper vs Body Mass by Species', fontsize=13, fontweight='bold')
+        plot.legend(title='Species')
+        plot.grid(True, alpha=0.3)
+
+        chart
+  - type: expansion
+    title: "미션2: tips 데이터 산점도 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        df = sns.load_dataset('tips')
+    - type: code
+      title: "차트 생성"
+      content: |-
+        canvas, (panel1, panel2) = plt.subplots(1, 2, figsize=(14, 5))
+
+        sns.scatterplot(data=df, x='total_bill', y='tip', hue='time',
+                       palette='Set1', s=70, alpha=0.7, ax=panel1)
+        panel1.set_title('Tip by Time')
+        panel1.set_xlabel('Total Bill ($)')
+        panel1.set_ylabel('Tip ($)')
+
+        sns.scatterplot(data=df, x='total_bill', y='tip', hue='day',
+                       palette='Set2', s=70, alpha=0.7, ax=panel2)
+        panel2.set_title('Tip by Day')
+        panel2.set_xlabel('Total Bill ($)')
+        panel2.set_ylabel('Tip ($)')
+
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Seaborn scatterplot으로 붓꽃 품종별 산점도를 만들었습니다.
+  - type: list
+    items:
+    - "sns.load_dataset('iris') - seaborn 내장 데이터 로드"
+    - "sns.scatterplot(data, x, y) - 기본 산점도"
+    - "hue='species' - 범주형 변수를 색상으로 구분"
+    - "palette='Set2' - 색상 팔레트 변경"
+    - "s, alpha, edgecolor - 점 스타일 조정"
+    - "ax 파라미터로 Matplotlib 서브플롯과 조합"
+  - type: text
+    content: 다음 시간에는 histplot과 stripplot으로 분포를 탐색합니다.

@@ -1,0 +1,463 @@
+meta:
+  id: day20
+  title: 파일핸들링
+  day: 20
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 파일 입출력"
+    description: "open으로 파일을 읽고 쓰는 방법을 배웁니다."
+    keywords: ['파일', 'open', 'read', 'write']
+intro:
+  emoji: "📁"
+  points:
+  - 파일 열기와 닫기 (open, close)
+  - 파일 읽기 메소드들 (read, readline, readlines)
+  - 파일 쓰기와 추가 (write, append)
+  - with 문으로 안전한 파일 처리
+  - 파일 시스템 작업 (os 모듈)
+  - JSON, CSV 데이터 처리
+sections:
+- id: imports_section
+  title: 모듈 불러오기
+  subtitle: 파일 처리에 필요한 모듈들
+  blocks:
+  - type: text
+    content: 파일 핸들링을 배우기 전에 필요한 모듈들을 먼저 불러옵니다. os 모듈은 파일 시스템을 관리하고, json 모듈은 JSON 형식의 데이터를 처리하며, csv 모듈은 CSV 형식의 데이터를 다룹니다. 모듈은 한 번만 불러오면 이후 모든 섹션에서 계속 사용할 수 있습니다.
+  - type: list
+    items:
+    - os - 파일과 폴더를 관리하는 운영체제 모듈
+    - json - JSON 형식 데이터를 읽고 쓰는 모듈
+    - csv - CSV 형식 데이터를 읽고 쓰는 모듈
+  - type: code
+    language: python
+    title: 필요한 모듈 불러오기
+    description: 파일 처리에 필요한 모든 모듈을 불러옵니다.
+    content: |-
+      import os
+      import json
+      import csv
+
+- id: file_handling_introduction
+  title: 파일 핸들링 소개
+  subtitle: 파이썬에서 파일 읽기와 쓰기
+  blocks:
+  - type: text
+    content: 파일 핸들링(File Handling)은 컴퓨터에 저장된 파일을 읽고, 쓰고, 수정하는 작업을 의미합니다. 영어로 'handle'은 '다루다'라는 뜻으로, 파일을 다루는 모든 작업을 파일 핸들링이라고 부릅니다. 프로그램은 실행되는 동안에만 데이터를 메모리에 보관하는데, 프로그램이 종료되면 메모리의 데이터는 모두 사라집니다. 하지만 파일에 데이터를 저장하면 프로그램이 종료된 후에도 데이터가 영구적으로 보존되어, 나중에 다시 불러와서 사용할 수 있습니다. 일상에서 노트에 메모를 적어두고 나중에 다시 읽는 것처럼, 파일은 프로그램의 '기억 저장소' 역할을 합니다.
+  - type: list
+    items:
+    - 데이터를 영구적으로 저장하고 불러오기
+    - 텍스트 파일과 바이너리 파일 다루기
+    - 파일 열기, 읽기, 쓰기, 닫기 작업
+    - with 문으로 안전하게 파일 처리하기
+  - type: code
+    language: python
+    title: 파일 핸들링 기본
+    description: 파일 열기, 읽기, 닫기의 기본 과정입니다.
+    content: |-
+      introFile = open('example.txt', 'r')
+      introContent = introFile.read()
+      print(introContent)
+      introFile.close()
+
+      with open('example.txt', 'r') as introWithFile:
+          introWithContent = introWithFile.read()
+          print(introWithContent)
+  - type: tip
+    content: "with 문을 사용하면 파일이 자동으로 닫히므로 close()를 호출할 필요가 없습니다."
+
+- id: opening_files
+  title: 파일 열기
+  subtitle: open() 함수와 파일 모드
+  blocks:
+  - type: text
+    content: open() 함수는 파일을 열 때 사용하는 파이썬 내장 함수입니다. 'open'은 영어로 '열다'라는 뜻으로, 파일을 열어서 읽거나 쓸 수 있도록 준비하는 역할을 합니다. open() 함수는 파일 객체(File Object)를 반환하는데, 이 객체를 통해 파일의 내용을 읽거나 쓸 수 있습니다. 파일을 열 때는 어떤 작업을 할 것인지 알려주는 '모드(Mode)'를 지정해야 합니다. 모드는 'r'(읽기), 'w'(쓰기), 'a'(추가) 등이 있으며, 마치 문을 열 때 읽기용으로 열지, 쓰기용으로 열지 정하는 것과 같습니다.
+  - type: list
+    items:
+    - "r - 읽기 모드, 파일 내용을 읽을 때 사용 (기본값)"
+    - "w - 쓰기 모드, 파일을 새로 쓰거나 덮어쓸 때 사용"
+    - "a - 추가 모드, 파일 끝에 내용을 추가할 때 사용"
+    - "r+ - 읽기/쓰기 모드, 파일을 읽고 쓸 수 있음"
+    - "b - 바이너리 모드, 이미지나 동영상 같은 파일 처리"
+  - type: code
+    language: python
+    title: 다양한 파일 모드
+    description: 파일을 여는 다양한 모드입니다.
+    content: |-
+      openReadFile = open('example.txt', 'r')
+      openReadFile.close()
+
+      openWriteFile = open('example.txt', 'w')
+      openWriteFile.close()
+
+      openAppendFile = open('example.txt', 'a')
+      openAppendFile.close()
+
+      openUtfFile = open('example.txt', 'r', encoding='utf-8')
+      openUtfFile.close()
+
+      openBinaryFile = open('image.png', 'rb')
+      openBinaryFile.close()
+  - type: tip
+    content: "한글 파일은 encoding='utf-8'을 지정하면 깨짐 없이 읽을 수 있습니다."
+
+- id: reading_files
+  title: 파일 읽기
+  subtitle: read(), readline(), readlines() 메소드
+  blocks:
+  - type: text
+    content: 파일을 열었다면 이제 파일의 내용을 읽어와야 합니다. 파이썬은 파일을 읽는 다양한 메소드를 제공합니다. read()는 'read'(읽다)라는 뜻으로 파일 전체를 한 번에 읽어옵니다. readline()은 'read line'(줄을 읽다)의 뜻으로 파일에서 한 줄씩 읽어옵니다. readlines()는 'read lines'(여러 줄을 읽다)의 뜻으로 파일의 모든 줄을 리스트 형태로 읽어옵니다. 용도에 따라 적절한 메소드를 선택하여 사용할 수 있으며, 작은 파일은 read()로 한 번에 읽고, 큰 파일은 readline()이나 for 문으로 한 줄씩 읽는 것이 효율적입니다.
+  - type: list
+    items:
+    - read() - 파일 전체를 하나의 문자열로 읽기
+    - read(n) - 파일에서 n바이트만큼만 읽기
+    - readline() - 파일에서 한 줄씩 읽기
+    - readlines() - 파일의 모든 줄을 리스트로 읽기
+  - type: code
+    language: python
+    title: 파일 읽기 메소드
+    description: 다양한 방식으로 파일을 읽습니다.
+    content: |-
+      with open('example.txt', 'r') as readAllFile:
+          readAllContent = readAllFile.read()
+          print(readAllContent)
+
+      with open('example.txt', 'r') as readChunkFile:
+          readChunk = readChunkFile.read(10)
+          print(readChunk)
+
+      with open('example.txt', 'r') as readLineFile:
+          readOneLine = readLineFile.readline()
+          print(readOneLine)
+
+      with open('example.txt', 'r') as readLinesFile:
+          readAllLines = readLinesFile.readlines()
+          print(readAllLines)
+
+      with open('example.txt', 'r') as readLoopFile:
+          for readEachLine in readLoopFile:
+              print(readEachLine.strip())
+
+- id: writing_files
+  title: 파일 쓰기
+  subtitle: write()와 writelines() 메소드
+  blocks:
+  - type: text
+    content: 파일에 데이터를 쓰는 작업은 write() 메소드를 사용합니다. write()는 'write'(쓰다)라는 뜻으로, 파일에 문자열을 기록합니다. writelines()는 'write lines'(여러 줄을 쓰다)의 뜻으로, 리스트에 담긴 여러 문자열을 파일에 한 번에 기록합니다. 파일을 쓰기 모드('w')로 열면 기존 파일의 내용이 모두 지워지고 새로운 내용으로 덮어쓰기됩니다. 추가 모드('a')로 열면 기존 내용은 그대로 두고 파일의 끝에 새로운 내용을 추가합니다. 일상에서 노트에 내용을 지우고 새로 쓰는 것이 'w' 모드이고, 기존 내용 뒤에 계속 이어서 쓰는 것이 'a' 모드입니다.
+  - type: list
+    items:
+    - write() - 문자열 하나를 파일에 쓰기
+    - writelines() - 리스트에 담긴 여러 문자열을 파일에 쓰기
+    - "w 모드 - 파일 내용을 지우고 새로 쓰기 (덮어쓰기)"
+    - "a 모드 - 파일 끝에 내용 추가하기"
+  - type: code
+    language: python
+    title: 파일 쓰기
+    description: 파일에 데이터를 씁니다.
+    content: |-
+      with open('output.txt', 'w') as writeFile:
+          writeFile.write('Hello, World!\n')
+          writeFile.write('Python is great!\n')
+
+      writeLinesData = ['첫 번째 줄\n', '두 번째 줄\n', '세 번째 줄\n']
+      with open('output.txt', 'w') as writeLinesFile:
+          writeLinesFile.writelines(writeLinesData)
+
+      with open('output.txt', 'a') as appendFile:
+          appendFile.write('추가된 줄\n')
+  - type: tip
+    content: "write()는 자동으로 줄바꿈을 하지 않습니다. 줄바꿈이 필요하면 '\\n'을 직접 추가하세요."
+
+- id: with_statement
+  title: with 문 사용
+  subtitle: 안전한 파일 처리
+  blocks:
+  - type: text
+    content: with 문은 파일을 안전하게 다루기 위한 파이썬의 특별한 구문입니다. 'with'는 영어로 '~와 함께'라는 뜻으로, 파일과 함께 작업을 수행하고 작업이 끝나면 자동으로 파일을 닫아줍니다. 일반적인 방법으로 파일을 열면 사용 후 반드시 close()를 호출해서 파일을 닫아야 하는데, 이를 잊어버리거나 오류가 발생하면 파일이 제대로 닫히지 않아 문제가 생길 수 있습니다. with 문을 사용하면 블록이 끝날 때 자동으로 파일을 닫아주므로 안전하며, 코드도 더 간결해집니다. 일상에서 문을 열고 나갈 때 자동으로 문이 닫히는 것처럼, with 문은 파일을 자동으로 관리해줍니다.
+  - type: list
+    items:
+    - 파일을 자동으로 닫아주어 close() 호출 불필요
+    - 오류가 발생해도 파일이 안전하게 닫힘
+    - 코드가 간결하고 읽기 쉬워짐
+    - 리소스 관리를 자동으로 처리
+  - type: code
+    language: python
+    title: with 문 사용법
+    description: with 문으로 안전한 파일 처리를 합니다.
+    content: |-
+      with open('example.txt', 'r') as withReadFile:
+          withReadContent = withReadFile.read()
+          print(withReadContent)
+
+      with open('output.txt', 'w') as withWriteFile:
+          withWriteFile.write('Hello, World!')
+
+      with open('input.txt', 'r') as withSourceFile:
+          with open('output.txt', 'w') as withDestFile:
+              withSourceContent = withSourceFile.read()
+              withDestFile.write(withSourceContent.upper())
+  - type: tip
+    content: "with 블록을 벗어나면 파일이 자동으로 닫히므로 close()를 호출할 필요가 없습니다."
+
+- id: file_operations
+  title: 파일 연산
+  subtitle: 파일 존재 확인과 삭제
+  blocks:
+  - type: text
+    content: 파일을 읽고 쓰는 것 외에도 파일의 존재 여부를 확인하거나, 파일을 삭제하고, 이름을 바꾸는 등의 파일 시스템 연산이 필요할 때가 있습니다. 파이썬의 os 모듈은 Operating System(운영체제)의 약자로, 컴퓨터의 파일 시스템을 관리하는 기능을 제공합니다. os.path.exists()는 파일이나 폴더가 존재하는지 확인하고, os.remove()는 파일을 삭제하며, os.makedirs()는 새로운 폴더를 만듭니다. os.rename()은 파일 이름을 변경하고, os.listdir()은 폴더 안의 파일 목록을 보여줍니다. 이러한 기능들은 파일을 안전하게 관리하고 처리하는 데 필수적입니다.
+  - type: list
+    items:
+    - os.path.exists() - 파일이나 폴더 존재 확인
+    - os.remove() - 파일 삭제
+    - os.makedirs() - 새로운 폴더 생성
+    - os.rename() - 파일 이름 변경
+    - os.listdir() - 폴더 안의 파일 목록 조회
+  - type: code
+    language: python
+    title: 파일 연산
+    description: 파일 시스템 연산 예제입니다.
+    content: |-
+      if os.path.exists('example.txt'):
+          print('파일이 존재합니다')
+
+      if os.path.exists('delete_me.txt'):
+          os.remove('delete_me.txt')
+          print('파일이 삭제되었습니다')
+
+      if not os.path.exists('new_folder'):
+          os.makedirs('new_folder')
+
+      if os.path.exists('old.txt'):
+          os.rename('old.txt', 'new.txt')
+
+      filesInFolder = os.listdir('.')
+      print(filesInFolder)
+  - type: tip
+    content: "파일을 삭제하거나 이름을 바꾸기 전에 os.path.exists()로 파일이 존재하는지 먼저 확인하는 것이 안전합니다."
+
+- id: json_files
+  title: JSON 파일 처리
+  subtitle: JSON 데이터 읽기와 쓰기
+  blocks:
+  - type: text
+    content: JSON은 JavaScript Object Notation의 약자로, 데이터를 저장하고 전송하는 데 널리 사용되는 형식입니다. JSON은 자바스크립트에서 객체를 표현하는 방법에서 유래했지만, 지금은 거의 모든 프로그래밍 언어에서 사용됩니다. JSON 형식은 파이썬의 딕셔너리와 매우 유사하여 데이터를 키와 값의 쌍으로 저장합니다. 파이썬의 json 모듈을 사용하면 JSON 파일을 쉽게 읽고 쓸 수 있으며, 파이썬 딕셔너리를 JSON 형식으로 변환하거나 그 반대로 변환할 수 있습니다. JSON은 웹 API, 설정 파일, 데이터 교환 등에서 표준처럼 사용되는 중요한 형식입니다.
+  - type: list
+    items:
+    - json.load() - JSON 파일을 읽어서 파이썬 딕셔너리로 변환
+    - json.dump() - 파이썬 딕셔너리를 JSON 파일로 저장
+    - json.loads() - JSON 문자열을 파이썬 딕셔너리로 변환
+    - json.dumps() - 파이썬 딕셔너리를 JSON 문자열로 변환
+  - type: code
+    language: python
+    title: JSON 파일 처리
+    description: JSON 데이터 읽기와 쓰기입니다.
+    content: |-
+      with open('data.json', 'r', encoding='utf-8') as jsonReadFile:
+          jsonReadData = json.load(jsonReadFile)
+          print(jsonReadData)
+
+      jsonWriteData = {'name': '홍길동', 'age': 30, 'city': '서울'}
+      with open('output.json', 'w', encoding='utf-8') as jsonWriteFile:
+          json.dump(jsonWriteData, jsonWriteFile, ensure_ascii=False, indent=2)
+
+      jsonString = '{"name": "Alice", "age": 25}'
+      jsonParsed = json.loads(jsonString)
+      print(jsonParsed['name'])
+
+      jsonDictData = {'key': 'value'}
+      jsonStringData = json.dumps(jsonDictData)
+      print(jsonStringData)
+  - type: tip
+    content: "ensure_ascii=False로 설정하면 한글이 유니코드로 변환되지 않고 그대로 저장됩니다."
+
+- id: csv_files
+  title: CSV 파일 처리
+  subtitle: CSV 데이터 읽기와 쓰기
+  blocks:
+  - type: text
+    content: CSV는 Comma Separated Values의 약자로, '쉼표로 구분된 값들'이라는 뜻입니다. CSV는 엑셀 같은 표 형태의 데이터를 텍스트 파일로 저장할 때 사용하는 가장 간단한 형식입니다. 각 줄이 표의 한 행을 나타내고, 같은 줄 안에서 쉼표로 각 열의 값을 구분합니다. 예를 들어 '이름,나이,도시' 형식으로 데이터를 저장합니다. CSV 파일은 엑셀, 구글 시트 등 대부분의 스프레드시트 프로그램에서 열 수 있어서 데이터 공유에 매우 유용합니다. 파이썬의 csv 모듈을 사용하면 CSV 파일을 쉽게 읽고 쓸 수 있으며, 데이터를 딕셔너리 형태로도 처리할 수 있습니다.
+  - type: list
+    items:
+    - csv.reader() - CSV 파일을 행 단위로 읽기
+    - csv.writer() - CSV 파일에 행 단위로 쓰기
+    - csv.DictReader() - CSV 파일을 딕셔너리로 읽기
+    - csv.DictWriter() - 딕셔너리를 CSV 파일로 쓰기
+  - type: code
+    language: python
+    title: CSV 파일 처리
+    description: CSV 데이터 읽기와 쓰기입니다.
+    content: |-
+      with open('data.csv', 'r', encoding='utf-8') as csvReadFile:
+          csvReader = csv.reader(csvReadFile)
+          for csvRow in csvReader:
+              print(csvRow)
+
+      with open('output.csv', 'w', newline='', encoding='utf-8') as csvWriteFile:
+          csvWriter = csv.writer(csvWriteFile)
+          csvWriter.writerow(['이름', '나이', '도시'])
+          csvWriter.writerow(['홍길동', 30, '서울'])
+          csvWriter.writerow(['김철수', 25, '부산'])
+
+      with open('data.csv', 'r', encoding='utf-8') as csvDictFile:
+          csvDictReader = csv.DictReader(csvDictFile)
+          for csvDictRow in csvDictReader:
+              print(csvDictRow['이름'], csvDictRow['나이'])
+  - type: tip
+    content: "Windows에서 CSV 파일을 쓸 때 newline=''을 지정하면 빈 줄이 추가되는 것을 방지합니다."
+
+- id: practical_examples
+  title: 실용적인 예제
+  subtitle: 실무에서 자주 사용하는 패턴
+  blocks:
+  - type: text
+    content: 지금까지 배운 파일 처리 기능들을 조합하면 실무에서 유용한 다양한 작업을 수행할 수 있습니다. 파일 복사는 한 파일의 내용을 읽어서 다른 파일에 그대로 쓰는 작업으로 백업이나 데이터 이동에 사용됩니다. 줄 번호를 추가하는 작업은 코드나 로그 파일을 분석할 때 유용하며, enumerate() 함수로 쉽게 구현할 수 있습니다. 특정 확장자를 가진 파일을 검색하는 것은 폴더 정리나 일괄 처리에 필요하며, 파일 내용을 필터링하여 특정 조건에 맞는 줄만 추출하는 것은 로그 분석이나 데이터 정제에 자주 사용됩니다.
+  - type: list
+    items:
+    - 파일 복사 - 한 파일의 내용을 다른 파일로 복사
+    - 줄 번호 추가 - 각 줄 앞에 번호 붙이기
+    - 파일 검색 - 특정 확장자 파일 찾기
+    - 데이터 필터링 - 조건에 맞는 줄만 추출
+  - type: code
+    language: python
+    title: 실용적인 파일 처리 예제
+    description: 실무에서 자주 사용하는 패턴입니다.
+    content: |-
+      with open('source.txt', 'r') as copySourceFile:
+          with open('copy.txt', 'w') as copyDestFile:
+              copyDestFile.write(copySourceFile.read())
+
+      with open('input.txt', 'r') as numberInputFile:
+          numberLines = numberInputFile.readlines()
+      with open('numbered.txt', 'w') as numberOutputFile:
+          for lineNum, lineContent in enumerate(numberLines, 1):
+              numberOutputFile.write(f'{lineNum}: {lineContent}')
+
+      for searchFilename in os.listdir('.'):
+          if searchFilename.endswith('.txt'):
+              print(searchFilename)
+
+      with open('data.txt', 'r') as filterFile:
+          filterLines = [filterLine for filterLine in filterFile if 'python' in filterLine.lower()]
+      print(filterLines)
+
+- id: practice
+  title: 20일차 복습
+  subtitle: 파일 핸들링 미션
+  blocks:
+  - type: text
+    content: 20일차에서 배운 파일 핸들링을 복습하는 미션입니다. 파일 읽기, 쓰기, JSON/CSV 처리를 연습하고, 이전에 배운 문자열, 리스트, 딕셔너리, 조건문, 반복문 등을 활용해봅시다.
+  - type: expansion
+    title: "미션1: 파일 읽기와 문자열 처리"
+    code: |-
+      with open('example.txt', 'r', encoding='utf-8') as mission1File:
+          mission1Content = mission1File.read()
+          print(mission1Content)
+          print(f"글자 수: {len(mission1Content)}")
+          print(f"대문자 변환: {mission1Content.upper()}")
+  - type: expansion
+    title: "미션2: 파일 쓰기와 리스트"
+    code: |-
+      mission2Lines = ['첫 번째 줄\n', '두 번째 줄\n', '세 번째 줄\n']
+      with open('output.txt', 'w', encoding='utf-8') as mission2File:
+          mission2File.writelines(mission2Lines)
+      print("파일 저장 완료")
+  - type: expansion
+    title: "미션3: 줄 단위 처리와 반복문"
+    code: |-
+      with open('input.txt', 'r', encoding='utf-8') as mission3File:
+          for mission3Num, mission3Line in enumerate(mission3File, 1):
+              print(f"{mission3Num}: {mission3Line.strip()}")
+  - type: expansion
+    title: "미션4: JSON과 딕셔너리"
+    code: |-
+      mission4Data = {'name': '홍길동', 'scores': [85, 90, 95], 'city': '서울'}
+      with open('data.json', 'w', encoding='utf-8') as mission4WriteFile:
+          json.dump(mission4Data, mission4WriteFile, ensure_ascii=False, indent=2)
+
+      with open('data.json', 'r', encoding='utf-8') as mission4ReadFile:
+          mission4Loaded = json.load(mission4ReadFile)
+          print(mission4Loaded)
+          print(f"평균 점수: {sum(mission4Loaded['scores']) / len(mission4Loaded['scores'])}")
+  - type: expansion
+    title: "미션5: CSV와 리스트 컴프리헨션"
+    code: |-
+      mission5Rows = [['이름', '나이', '도시'], ['Alice', 25, 'Seoul'], ['Bob', 30, 'Busan']]
+      with open('data.csv', 'w', newline='', encoding='utf-8') as mission5WriteFile:
+          mission5Writer = csv.writer(mission5WriteFile)
+          mission5Writer.writerows(mission5Rows)
+
+      with open('data.csv', 'r', encoding='utf-8') as mission5ReadFile:
+          mission5Reader = csv.reader(mission5ReadFile)
+          mission5AllRows = [mission5Row for mission5Row in mission5Reader]
+          for mission5Row in mission5AllRows:
+              print(mission5Row)
+  - type: expansion
+    title: "미션6: 파일 존재 확인과 조건문"
+    code: |-
+      mission6Filename = 'test.txt'
+      if os.path.exists(mission6Filename):
+          print(f"{mission6Filename} 존재함")
+          mission6Size = os.path.getsize(mission6Filename)
+          if mission6Size > 1000:
+              print(f"큰 파일: {mission6Size} 바이트")
+          else:
+              print(f"작은 파일: {mission6Size} 바이트")
+      else:
+          print(f"{mission6Filename} 존재하지 않음")
+  - type: expansion
+    title: "미션7: 파일 검색과 필터링"
+    code: |-
+      mission7TxtFiles = []
+      for mission7Filename in os.listdir('.'):
+          if mission7Filename.endswith('.txt'):
+              mission7TxtFiles.append(mission7Filename)
+
+      print(f"txt 파일 수: {len(mission7TxtFiles)}")
+      mission7SortedFiles = sorted(mission7TxtFiles)
+      for mission7File in mission7SortedFiles:
+          print(mission7File)
+  - type: expansion
+    title: "미션8: 파일 복사와 변환"
+    code: |-
+      with open('source.txt', 'r', encoding='utf-8') as mission8SourceFile:
+          mission8Content = mission8SourceFile.read()
+          mission8UpperContent = mission8Content.upper()
+
+      with open('upper_copy.txt', 'w', encoding='utf-8') as mission8DestFile:
+          mission8DestFile.write(mission8UpperContent)
+
+      print("대문자로 변환하여 복사 완료")
+  - type: expansion
+    title: "미션9: 데이터 필터링과 저장"
+    code: |-
+      with open('data.txt', 'r', encoding='utf-8') as mission9ReadFile:
+          mission9AllLines = mission9ReadFile.readlines()
+
+      mission9FilteredLines = [mission9Line for mission9Line in mission9AllLines if 'python' in mission9Line.lower()]
+
+      with open('filtered.txt', 'w', encoding='utf-8') as mission9WriteFile:
+          mission9WriteFile.writelines(mission9FilteredLines)
+
+      print(f"필터링된 줄 수: {len(mission9FilteredLines)}")
+  - type: expansion
+    title: "미션10: 종합 실습 - 학생 성적 관리"
+    code: |-
+      mission10Students = [
+          {'name': '김철수', 'scores': [85, 90, 88]},
+          {'name': '이영희', 'scores': [92, 88, 95]},
+          {'name': '박민수', 'scores': [78, 85, 80]}
+      ]
+
+      for mission10Student in mission10Students:
+          mission10Avg = sum(mission10Student['scores']) / len(mission10Student['scores'])
+          mission10Student['average'] = mission10Avg
+
+      with open('students.json', 'w', encoding='utf-8') as mission10File:
+          json.dump(mission10Students, mission10File, ensure_ascii=False, indent=2)
+
+      with open('students.json', 'r', encoding='utf-8') as mission10ReadFile:
+          mission10LoadedStudents = json.load(mission10ReadFile)
+          for mission10Student in mission10LoadedStudents:
+              print(f"{mission10Student['name']}: 평균 {mission10Student['average']:.2f}점")

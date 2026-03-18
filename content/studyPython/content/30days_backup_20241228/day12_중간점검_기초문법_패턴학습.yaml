@@ -1,0 +1,361 @@
+meta:
+  id: day12
+  title: 중간점검 기초문법 패턴학습
+  day: 12
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 기초문법 중간점검"
+    description: "1-11일차에 배운 파이썬 기초 문법을 복습합니다."
+    keywords: ['중간점검', '복습', '기초문법']
+intro:
+  title: 기초문법 중간점검 패턴북
+  emoji: 🔥
+  description: 1-11일차 핵심 내용 총정리!
+  points:
+  - '📦 변수: 변수명 = 값'
+  - '➕ 연산자: 산술, 비교, 논리'
+  - '📝 문자열: 생성, 조작, 포맷팅'
+  - '📊 리스트: 생성, 추가, 삭제'
+  - '🔒 튜플: 불변 시퀀스'
+  - '🔗 집합: 중복 없는 데이터'
+  - '🔑 딕셔너리: 키-값 쌍'
+  - '🔄 조건문: if-elif-else'
+  - '🔁 반복문: for, while'
+  - '📦 함수: def, return'
+  summary: 🔥 기초문법 완전 정복! 다음 단계로 도약!
+sections:
+- id: day1
+  title: '1일차: 출력'
+  subtitle: print()
+  blocks:
+  - type: text
+    content: |-
+      지금까지 배운 출력 패턴을 복습합니다. print() 함수는 화면에 값을 표시하는 가장 기본적인 함수입니다. f-string 포맷팅을 사용하면 변수 값을 문자열 안에 쉽게 넣을 수 있고, sep 매개변수로 출력 값 사이의 구분자를 지정할 수 있습니다. 이 두 가지 기법을 조합하면 출력을 완전히 제어할 수 있습니다.
+  - type: code
+    language: python
+    title: 출력 마스터 패턴
+    description: f-string과 sep으로 출력을 완전히 제어하는 패턴입니다.
+    content: |-
+      day1Name, day1Age, day1Score = "김철수", 25, 85.5
+      print(f"이름: {day1Name}, 나이: {day1Age}, 점수: {day1Score:.1f}")
+      print(day1Name, day1Age, day1Score, sep=" | ")
+- id: day2
+  title: '2일차: 변수'
+  subtitle: 변수명 = 값
+  blocks:
+  - type: text
+    content: |-
+      변수 선언과 타입 변환 패턴을 복습합니다. 변수는 데이터를 저장하는 상자이고, 타입 변환은 한 데이터 타입을 다른 타입으로 바꾸는 것입니다. int()는 문자열을 정수로 변환하고, 다중 할당은 한 줄에 여러 변수를 동시에 선언할 수 있습니다. 이 패턴들을 활용하면 데이터를 유연하게 처리할 수 있습니다.
+  - type: code
+    language: python
+    title: 변수 마스터 패턴
+    description: 타입 변환과 다중 할당으로 데이터를 유연하게 처리하는 패턴입니다.
+    content: |-
+      day2AgeStr = "25"
+      day2Age = int(day2AgeStr)
+      day2Name, day2Score = "철수", 85.5
+      print(f"{day2Name}: {day2Age}세, {day2Score}점")
+  - type: tip
+    content: 변수명은 의미를 명확히 드러내는 이름을 사용하세요. ageStr, userName처럼 타입이나 용도를 포함하면 코드를 읽기 쉽습니다.
+- id: day3
+  title: '3일차: 연산자'
+  subtitle: +, -, *, /, ==, and
+  blocks:
+  - type: text
+    content: |-
+      산술 연산자, 비교 연산자, 논리 연산자를 조합하는 패턴을 복습합니다. 비교 연산자는 두 값을 비교해서 True나 False를 반환하고, 논리 연산자 and는 두 조건이 모두 True일 때만 True를 반환합니다. 삼항 연산자는 조건에 따라 다른 값을 한 줄로 선택하는 간결한 방법입니다. 이 패턴들을 조합하면 복잡한 조건 처리를 간단하게 만들 수 있습니다.
+  - type: code
+    language: python
+    title: 연산자 마스터 패턴
+    description: 산술, 비교, 논리 연산과 삼항 연산자를 조합하는 패턴입니다.
+    content: |-
+      day3Age, day3Score = 25, 85
+      day3Result = (day3Score >= 80) and (18 <= day3Age <= 65)
+      day3Total = day3Score * 1.1 if day3Result else day3Score
+      print(f"가산점 적용: {day3Total}")
+  - type: tip
+    content: 범위 비교는 18 <= age <= 65처럼 한 번에 표현할 수 있습니다. 이는 파이썬의 강력한 기능입니다.
+- id: day4
+  title: '4일차: 문자열'
+  subtitle: f'{변수}'
+  blocks:
+  - type: text
+    content: |-
+      문자열 처리 패턴을 복습합니다. strip()은 앞뒤 공백을 제거하고, split()은 문자열을 구분자로 나누어 리스트로 만들고, title()은 각 단어의 첫 글자를 대문자로 바꾸고, upper()는 모든 글자를 대문자로 바꿉니다. f-string은 중괄호 안에 변수를 넣어서 문자열을 만드는 가장 편리한 포맷팅 방법입니다. 이 메서드들을 연결해서 사용하면 복잡한 문자열 처리를 한 번에 할 수 있습니다.
+  - type: code
+    language: python
+    title: 문자열 마스터 패턴
+    description: strip, split, f-string을 조합해서 문자열을 완전히 제어하는 패턴입니다.
+    content: |-
+      day4Data = "  kim,25,engineer  "
+      day4Name, day4Age, day4Job = day4Data.strip().split(",")
+      day4Result = f"{day4Name.title()}님 ({day4Age}세, {day4Job.upper()})"
+      print(day4Result)
+  - type: tip
+    content: 메서드 체이닝으로 여러 문자열 메서드를 연결할 수 있습니다. data.strip().split().upper()처럼 점으로 이어서 작성하세요.
+- id: day5
+  title: '5일차: 리스트'
+  subtitle: '[값1, 값2, 값3]'
+  blocks:
+  - type: text
+    content: |-
+      리스트 조작 패턴을 복습합니다. 리스트는 여러 값을 순서대로 저장하는 가변 데이터 타입입니다. append()는 리스트 끝에 새 요소를 추가하고, 리스트 컴프리헨션은 기존 리스트에서 조건에 맞는 요소만 선택해서 새 리스트를 만드는 간결한 방법입니다. 이 패턴들을 활용하면 리스트를 동적으로 관리할 수 있습니다.
+  - type: code
+    language: python
+    title: 리스트 마스터 패턴
+    description: append와 리스트 컴프리헨션으로 리스트를 동적으로 관리하는 패턴입니다.
+    content: |-
+      day5Scores = [85, 90, 78, 92]
+      day5Scores.append(88)
+      day5HighScores = [s for s in day5Scores if s >= 85]
+      print(f"우수: {day5HighScores}")
+  - type: tip
+    content: 리스트 컴프리헨션은 for와 if를 한 줄로 작성하는 파이썬의 강력한 기능입니다. 간결하지만 처음엔 읽기 어려울 수 있으니 천천히 익히세요.
+- id: day6
+  title: '6일차: 튜플'
+  subtitle: (값1, 값2, 값3)
+  blocks:
+  - type: text
+    content: |-
+      튜플 활용 패턴을 복습합니다. 튜플은 한 번 만들면 변경할 수 없는 불변 데이터 타입입니다. 리스트와 달리 값을 추가하거나 삭제할 수 없기 때문에 좌표, 설정값처럼 바뀌면 안 되는 데이터를 안전하게 저장할 때 사용합니다. 튜플 언패킹은 튜플의 각 요소를 개별 변수에 할당하는 편리한 방법입니다.
+  - type: code
+    language: python
+    title: 튜플 마스터 패턴
+    description: 불변 데이터 구조로 좌표나 설정값을 안전하게 관리하는 패턴입니다.
+    content: |-
+      day6Point = (10, 20)
+      day6Config = ("localhost", 8080, True)
+      day6Host, day6Port, day6Ssl = day6Config
+      print(f"서버: {day6Host}:{day6Port}, SSL: {day6Ssl}")
+  - type: tip
+    content: 튜플은 변경할 수 없기 때문에 리스트보다 메모리를 적게 사용하고 처리 속도도 빠릅니다. 데이터가 바뀌지 않을 때는 튜플을 사용하세요.
+- id: day7
+  title: '7일차: 집합'
+  subtitle: '{값1, 값2, 값3}'
+  blocks:
+  - type: text
+    content: |-
+      집합 연산 패턴을 복습합니다. 집합은 중복을 허용하지 않고 순서가 없는 데이터 타입입니다. 교집합(&)은 두 집합에 모두 포함된 요소를 찾고, 합집합(|)은 두 집합의 모든 요소를 합치고, 차집합(-)은 한 집합에만 있는 요소를 찾습니다. 집합은 멤버십 테스트(in)가 매우 빠르기 때문에 대량의 데이터에서 특정 값을 찾을 때 유용합니다.
+  - type: code
+    language: python
+    title: 집합 마스터 패턴
+    description: 교집합 연산으로 공통 요소를 효율적으로 찾는 패턴입니다.
+    content: |-
+      day7TeamA = {"김철수", "이영희", "박민수"}
+      day7TeamB = {"이영희", "최수진", "김철수"}
+      day7Common = day7TeamA & day7TeamB
+      print(f"공통 멤버: {day7Common}")
+  - type: tip
+    content: 집합 연산자를 기억하세요. & (교집합), | (합집합), - (차집합), ^ (대칭차집합). 수학 집합 연산을 그대로 코드로 옮길 수 있습니다.
+- id: day8
+  title: '8일차: 딕셔너리'
+  subtitle: '{"키": "값"}'
+  blocks:
+  - type: text
+    content: |-
+      딕셔너리 조작 패턴을 복습합니다. 딕셔너리는 키-값 쌍으로 데이터를 저장하는 타입으로, 키를 통해 값을 빠르게 찾을 수 있습니다. update()는 여러 키-값 쌍을 한 번에 추가하거나 수정하고, get()은 키가 없을 때 기본값을 반환해서 에러를 방지합니다. 대괄호 표기법은 키로 값을 직접 접근하지만 키가 없으면 에러가 발생하므로 주의해야 합니다.
+  - type: code
+    language: python
+    title: 딕셔너리 마스터 패턴
+    description: update와 get으로 안전하게 데이터를 조회하고 수정하는 패턴입니다.
+    content: |-
+      day8User = {"name": "김철수", "age": 25}
+      day8User.update({"city": "서울", "age": 26})
+      day8Info = day8User.get("phone", "등록안됨")
+      print(f"{day8User['name']}: {day8Info}")
+  - type: tip
+    content: get() 메서드는 키가 없어도 에러가 발생하지 않습니다. 안전한 코드를 위해 딕셔너리 조회 시 get()을 습관화하세요.
+- id: day9
+  title: '9일차: 조건문'
+  subtitle: if-elif-else
+  blocks:
+  - type: text
+    content: |-
+      조건문 패턴을 복습합니다. if-elif-else는 조건에 따라 다른 코드를 실행하는 제어 구조입니다. 범위 조건은 18 <= age <= 65처럼 한 번에 표현할 수 있고, 중첩된 삼항 연산자는 여러 조건을 한 줄로 처리합니다. 삼항 연산자는 "값1 if 조건 else 값2" 형태로, 조건이 True면 값1을, False면 값2를 선택합니다. 이를 연결하면 elif 효과를 낼 수 있습니다.
+  - type: code
+    language: python
+    title: 조건문 마스터 패턴
+    description: 중첩 조건과 삼항 연산자로 복잡한 논리를 간단하게 처리하는 패턴입니다.
+    content: |-
+      day9Age, day9Score = 25, 85
+      if 18 <= day9Age <= 65:
+          day9Grade = "A" if day9Score >= 90 else "B" if day9Score >= 80 else "C"
+      else:
+          day9Grade = "대상외"
+      print(f"등급: {day9Grade}")
+  - type: tip
+    content: 삼항 연산자를 너무 중첩하면 읽기 어려워집니다. 2~3단계까지만 사용하고, 그 이상은 if-elif-else로 풀어 쓰세요.
+- id: day10
+  title: '10일차: 반복문'
+  subtitle: for, while
+  blocks:
+  - type: text
+    content: |-
+      반복문 패턴을 복습합니다. for는 시퀀스의 각 요소를 순회하고, while은 조건이 True인 동안 계속 반복합니다. enumerate()는 리스트를 순회하면서 인덱스와 값을 동시에 가져오는 편리한 함수입니다. while 반복문에서는 조건을 and로 연결해서 여러 조건을 동시에 검사할 수 있습니다. 이 패턴들을 활용하면 데이터를 효율적으로 순회하고 처리할 수 있습니다.
+  - type: code
+    language: python
+    title: 반복문 마스터 패턴
+    description: enumerate와 조건부 while로 인덱스와 조건을 활용하는 패턴입니다.
+    content: |-
+      day10Names = ["철수", "영희", "민수"]
+      for i, name in enumerate(day10Names):
+          print(f"{i+1}. {name}")
+
+      day10Count = 0
+      while day10Count < len(day10Names) and day10Names[day10Count] != "영희":
+          day10Count += 1
+      print(f"영희 위치: {day10Count+1}")
+  - type: tip
+    content: enumerate(list, start=1)로 시작 번호를 지정할 수 있습니다. 1부터 번호를 매기고 싶을 때 i+1 대신 start를 사용하세요.
+- id: day11
+  title: '11일차: 함수'
+  subtitle: 'def 함수명():'
+  blocks:
+  - type: text
+    content: |-
+      함수 정의 패턴을 복습합니다. 함수는 반복되는 코드를 하나로 묶어서 재사용할 수 있게 만드는 코드 블록입니다. def 키워드로 함수를 정의하고, 매개변수에 기본값을 지정하면 호출할 때 해당 인수를 생략할 수 있습니다. return은 여러 값을 쉼표로 구분해서 반환할 수 있고, 호출하는 쪽에서는 여러 변수로 받을 수 있습니다. 키워드 인수는 인수 이름을 명시해서 전달하므로 코드가 명확해집니다.
+  - type: code
+    language: python
+    title: 함수 마스터 패턴
+    description: 기본값, 키워드 인수, 다중 반환으로 유연한 함수를 만드는 패턴입니다.
+    content: |-
+      def day11AnalyzeScore(name, score, bonus=0):
+          day11Total = score + bonus
+          day11Grade = "A" if day11Total >= 90 else "B" if day11Total >= 80 else "C"
+          return day11Total, day11Grade
+
+      day11Score, day11Grade = day11AnalyzeScore("철수", 85, bonus=5)
+      print(f"최종: {day11Score}점, {day11Grade}등급")
+  - type: tip
+    content: 함수 이름은 동사로 시작하세요. analyzeScore, calculateTotal처럼 함수가 무엇을 하는지 명확히 드러내면 코드를 읽기 쉽습니다.
+expansion:
+  id: midterm-review
+  title: 중간점검 종합 미션
+  subtitle: 1-11일차 전체 복습
+  description: |-
+    지금까지 배운 모든 개념을 종합해서 실전 문제를 풀어봅니다. 변수, 연산자, 문자열, 리스트, 튜플, 집합, 딕셔너리, 조건문, 반복문, 함수를 모두 활용하는 종합 미션입니다.
+  blocks:
+  - type: text
+    content: |-
+      1-11일차에 배운 모든 내용을 종합해서 학생 성적 관리 시스템을 만들어봅니다. 이 미션은 여러 단계로 나뉘어 있고, 각 단계에서 배운 개념을 복습하고 적용합니다. 변수 선언부터 시작해서 문자열 처리, 리스트 조작, 딕셔너리 활용, 조건문과 반복문, 그리고 함수까지 모든 개념을 사용합니다. 각 미션을 순서대로 풀면서 파이썬 기초 문법을 완전히 내 것으로 만드세요.
+  - type: list
+    items:
+    - 미션1에서 학생 데이터를 변수에 저장합니다
+    - 미션2에서 문자열을 처리하고 포맷팅합니다
+    - 미션3에서 리스트와 튜플로 데이터를 관리합니다
+    - 미션4에서 집합과 딕셔너리로 데이터를 조작합니다
+    - 미션5에서 조건문과 반복문으로 데이터를 분석합니다
+    - 미션6에서 함수로 코드를 재사용 가능하게 만듭니다
+  - type: code
+    language: python
+    title: 미션1 - 변수와 타입 변환
+    description: 학생 정보를 변수에 저장하고 타입을 변환합니다.
+    content: |-
+      mission1Name = "김철수"
+      mission1AgeStr = "25"
+      mission1Age = int(mission1AgeStr)
+      mission1School, mission1Major = "서울대", "컴퓨터공학"
+
+      print(f"{mission1Name} ({mission1Age}세)")
+      print(f"{mission1School} {mission1Major}")
+  - type: code
+    language: python
+    title: 미션2 - 문자열 처리
+    description: 여러 학생 데이터를 문자열로 받아서 처리합니다.
+    content: |-
+      mission2Data = "  kim,25,85  "
+      mission2Name, mission2Age, mission2Score = mission2Data.strip().split(",")
+      mission2Result = f"{mission2Name.title()}님: {mission2Age}세, {mission2Score}점"
+
+      print(mission2Result)
+  - type: code
+    language: python
+    title: 미션3 - 리스트와 튜플
+    description: 여러 학생의 점수를 리스트로 관리하고 통계를 냅니다.
+    content: |-
+      mission3Scores = [85, 90, 78, 92, 88]
+      mission3HighScores = [s for s in mission3Scores if s >= 85]
+      mission3Stats = (min(mission3Scores), max(mission3Scores), sum(mission3Scores) / len(mission3Scores))
+      mission3Min, mission3Max, mission3Avg = mission3Stats
+
+      print(f"우수 점수: {mission3HighScores}")
+      print(f"통계: 최소 {mission3Min}, 최대 {mission3Max}, 평균 {mission3Avg:.1f}")
+  - type: code
+    language: python
+    title: 미션4 - 집합과 딕셔너리
+    description: 수강생 명단을 집합으로 관리하고 학생 정보를 딕셔너리로 저장합니다.
+    content: |-
+      mission4ClassA = {"김철수", "이영희", "박민수"}
+      mission4ClassB = {"이영희", "최수진", "김철수"}
+      mission4Common = mission4ClassA & mission4ClassB
+      mission4Only = mission4ClassA - mission4ClassB
+
+      mission4Student = {"name": "김철수", "age": 25, "score": 85}
+      mission4Student.update({"major": "컴퓨터공학", "grade": "A"})
+      mission4Phone = mission4Student.get("phone", "미등록")
+
+      print(f"공통 수강: {mission4Common}")
+      print(f"A반만 수강: {mission4Only}")
+      print(f"{mission4Student['name']}: {mission4Student['grade']}등급, 연락처 {mission4Phone}")
+  - type: code
+    language: python
+    title: 미션5 - 조건문과 반복문
+    description: 여러 학생의 점수를 등급으로 변환하고 합격자를 찾습니다.
+    content: |-
+      mission5Students = [
+          ("김철수", 85),
+          ("이영희", 92),
+          ("박민수", 78),
+          ("최수진", 88)
+      ]
+
+      for i, (name, score) in enumerate(mission5Students):
+          if score >= 90:
+              grade = "A"
+          elif score >= 80:
+              grade = "B"
+          else:
+              grade = "C"
+          print(f"{i+1}. {name}: {score}점 ({grade}등급)")
+
+      mission5PassCount = 0
+      mission5Index = 0
+      while mission5Index < len(mission5Students):
+          if mission5Students[mission5Index][1] >= 80:
+              mission5PassCount += 1
+          mission5Index += 1
+      print(f"합격자: {mission5PassCount}명")
+  - type: code
+    language: python
+    title: 미션6 - 함수 종합
+    description: 학생 성적을 분석하는 함수를 만들어서 재사용합니다.
+    content: |-
+      def mission6AnalyzeStudent(name, score, bonus=0):
+          mission6Total = score + bonus
+          if mission6Total >= 90:
+              mission6Grade = "A"
+          elif mission6Total >= 80:
+              mission6Grade = "B"
+          elif mission6Total >= 70:
+              mission6Grade = "C"
+          else:
+              mission6Grade = "F"
+          mission6Pass = mission6Total >= 80
+          return mission6Total, mission6Grade, mission6Pass
+
+      mission6Students = [
+          ("김철수", 85, 5),
+          ("이영희", 92, 0),
+          ("박민수", 78, 10)
+      ]
+
+      for name, score, bonus in mission6Students:
+          total, grade, passed = mission6AnalyzeStudent(name, score, bonus)
+          status = "합격" if passed else "불합격"
+          print(f"{name}: {total}점 ({grade}등급) - {status}")
+  - type: tip
+    content: |-
+      종합 미션을 풀 때는 각 단계를 천천히 이해하면서 진행하세요. 막히는 부분이 있다면 해당 일차로 돌아가서 복습하고, 다시 도전하세요. 모든 개념이 연결되어 있으므로 하나씩 쌓아가면 어느새 실전 코드를 작성할 수 있습니다.

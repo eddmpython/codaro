@@ -1,0 +1,322 @@
+meta:
+  id: pandas_03
+  title: 펭귄종비교분석
+  order: 3
+  category: pandas
+  difficulty: "⭐⭐⭐"
+  badge: 기초
+  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv
+  tags: ["penguins", "groupby", "query", "agg"]
+  seo:
+    title: "pandas groupby 완전정복 - 펭귄 데이터로 그룹별 통계"
+    description: "펭귄 데이터로 groupby를 배웁니다. 종별 평균 체중, agg로 여러 통계 한번에, query로 간결한 필터링을 실습합니다."
+    keywords: ["pandas groupby", "agg", "query", "그룹별 통계", "펭귄 데이터"]
+
+intro:
+  emoji: "🐧"
+  goal: 펭귄 3종의 신체 데이터에서 "어떤 종이 가장 클까?"를 비교 분석합니다.
+  description: groupby를 사용하면 한번에 그룹별 통계를 구할 수 있습니다. 종마다 필터링하고 평균을 구하는 반복 작업을 한 줄로!
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: 펭귄 데이터
+  blocks:
+  - type: text
+    content: 펭귄 데이터셋은 남극 팔머 제도의 3개 섬에서 관찰된 펭귄 344마리의 신체 측정 데이터입니다. Adelie(아델리), Gentoo(젠투), Chinstrap(턱끈) 3종의 펭귄이 포함되어 있으며, 각 개체의 부리 길이, 부리 깊이, 날개 길이, 체중, 성별, 서식 섬 등이 기록되어 있습니다. 이 데이터는 iris 데이터의 현대적 대안으로 자주 사용되며, groupby를 배우기에 매우 적합한 구조를 가지고 있습니다. 종별 비교를 통해 각 펭귄 종의 신체적 특징을 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: 펭귄 데이터를 불러옵니다
+    content: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
+      penguins = pd.read_csv(url)
+      penguins.shape
+
+- id: step2_value_counts
+  title: 2단계. 종별 개수
+  subtitle: value_counts로 확인
+  blocks:
+  - type: text
+    content: Adelie 152, Gentoo 124, Chinstrap 68마리입니다.
+  - type: code
+    language: python
+    title: 종별 개수
+    description: 펭귄 종이 몇 종인지
+    content: |-
+      penguins['species'].value_counts()
+
+- id: step3_head
+  title: 3단계. 미리보기
+  subtitle: 데이터 구조 파악
+  blocks:
+  - type: text
+    content: body_mass_g(체중), flipper_length_mm(날개 길이), bill_length_mm(부리 길이) 등이 있습니다.
+  - type: code
+    language: python
+    title: 미리보기
+    description: 데이터가 어떻게 생겼는지
+    content: |-
+      penguins.head()
+
+- id: step3_5_describe
+  title: 3.5단계. 전체 통계 복습
+  subtitle: describe()로 숫자 요약
+  blocks:
+  - type: text
+    content: 이전 프로젝트(01번, 02번)에서 배운 describe()를 다시 활용합니다. 펭귄의 체중, 날개 길이, 부리 치수 등 모든 숫자 컬럼의 통계를 한 번에 확인할 수 있습니다. 체중은 평균 약 4200g, 최소 2700g, 최대 6300g입니다. 날개 길이는 평균 약 201mm입니다. describe()는 데이터를 처음 접할 때 전체적인 범위와 분포를 빠르게 파악하는 데 필수적입니다.
+  - type: code
+    language: python
+    title: 숫자 컬럼 통계
+    description: describe()로 전체 요약
+    content: |-
+      penguins.describe()
+  - type: tip
+    content: "describe()는 pandas의 가장 기본적이면서도 강력한 메서드입니다. count(개수), mean(평균), std(표준편차), min(최소), 25%(1사분위), 50%(중앙값), 75%(3사분위), max(최대)를 자동으로 계산합니다. 이전 프로젝트에서 배운 개념을 계속 반복하면서 익숙해지는 것이 중요합니다."
+
+- id: step4_filter_problem
+  title: 4단계. 필터링의 문제
+  subtitle: 종마다 반복 작업
+  blocks:
+  - type: text
+    content: 지금까지 배운 필터링 방법으로 종별 평균 체중을 구하려면 어떻게 해야 할까요? Adelie를 필터링해서 평균, Gentoo를 필터링해서 평균, Chinstrap을 필터링해서 평균... 이렇게 각 종마다 똑같은 코드를 반복해야 합니다. 3종이면 3번 반복하면 되지만, 만약 10종이면 10번, 100종이면 100번 반복해야 합니다. 코드가 길어지고 실수하기 쉬우며, 비효율적입니다. 이런 반복 작업을 한 번에 해결하는 것이 바로 groupby입니다.
+  - type: code
+    language: python
+    title: Adelie 평균 체중
+    description: Adelie만 필터링해서 평균
+    content: |-
+      adelie = penguins[penguins['species'] == 'Adelie']
+      adelie['body_mass_g'].mean()
+
+- id: step5_groupby
+  title: 5단계. groupby 기본
+  subtitle: 한 줄로 그룹별 통계
+  blocks:
+  - type: text
+    content: groupby는 데이터를 특정 기준으로 그룹으로 묶어서 각 그룹별로 계산을 수행하는 강력한 메서드입니다. "species 컬럼을 기준으로 그룹을 만들고, 각 그룹의 body_mass_g 평균을 계산해줘"라는 의미입니다. SQL의 GROUP BY와 동일한 개념으로, Split(분할) - Apply(적용) - Combine(결합) 세 단계를 자동으로 처리합니다. 3종의 평균 체중을 단 한 줄로 계산할 수 있습니다. Gentoo가 가장 무겁고(약 5076g), Chinstrap과 Adelie는 비슷합니다.
+  - type: code
+    language: python
+    title: 종별 평균 체중
+    description: 한 줄로 3종의 평균을 한번에!
+    content: |-
+      penguins.groupby('species')['body_mass_g'].mean()
+
+  - type: tip
+    content: "groupby('컬럼')은 해당 컬럼의 고유한 값들로 그룹을 만듭니다. species에는 Adelie, Gentoo, Chinstrap 3개 값이 있으므로 3개 그룹이 생성됩니다. 각 그룹에 대해 뒤에 오는 집계 함수(mean, sum 등)가 적용됩니다."
+
+- id: step6_max
+  title: 6단계. 다른 통계 함수
+  subtitle: max, min, sum, count
+  blocks:
+  - type: text
+    content: mean() 대신 max(), min(), sum(), count() 등을 사용할 수 있습니다.
+  - type: code
+    language: python
+    title: 종별 최대 체중
+    description: max()로 최대값
+    content: |-
+      penguins.groupby('species')['body_mass_g'].max()
+
+- id: step7_size
+  title: 7단계. 그룹 크기
+  subtitle: size()로 개수
+  blocks:
+  - type: text
+    content: size()는 각 그룹의 행 수를 세어줍니다.
+  - type: code
+    language: python
+    title: 종별 개수
+    description: size()로 개수
+    content: |-
+      penguins.groupby('species').size()
+
+- id: step8_reset_index
+  title: 8단계. 인덱스 복원
+  subtitle: reset_index()
+  blocks:
+  - type: text
+    content: groupby 결과는 기본적으로 그룹 기준 컬럼이 인덱스가 됩니다. 즉, species가 행 이름이 되어버립니다. 이 결과를 일반 DataFrame처럼 다시 컬럼으로 만들려면 reset_index()를 사용합니다. 인덱스를 컬럼으로 복원하면 추가 분석이나 시각화를 할 때 더 편리합니다. 예를 들어 그래프를 그릴 때 species를 x축으로 사용하려면 컬럼이어야 합니다. reset_index()는 인덱스를 0, 1, 2...로 초기화하고, 기존 인덱스를 새 컬럼으로 추가합니다.
+  - type: code
+    language: python
+    title: 인덱스를 컬럼으로
+    description: reset_index()로 일반 DataFrame으로 변환
+    content: |-
+      penguins.groupby('species')['body_mass_g'].mean().reset_index()
+
+  - type: tip
+    content: "reset_index()를 사용하지 않으면 결과가 Series 형태로 나옵니다. DataFrame으로 만들려면 reset_index()를 붙이거나, 처음부터 groupby('species')[['body_mass_g']].mean()처럼 2겹 대괄호를 사용하면 됩니다."
+
+- id: step9_multi_group
+  title: 9단계. 여러 컬럼으로 그룹핑
+  subtitle: 종 + 성별
+  blocks:
+  - type: text
+    content: groupby는 하나의 컬럼뿐만 아니라 여러 컬럼을 동시에 기준으로 사용할 수 있습니다. 리스트 형태로 여러 컬럼을 전달하면 해당 컬럼들의 조합으로 그룹이 만들어집니다. 예를 들어 ['species', 'sex']로 그룹핑하면 (Adelie, MALE), (Adelie, FEMALE), (Gentoo, MALE), (Gentoo, FEMALE)... 이렇게 종과 성별의 모든 조합별로 그룹이 생성됩니다. 교차 분석이 필요할 때 매우 유용합니다. 같은 종 내에서도 수컷과 암컷의 체중 차이를 비교할 수 있습니다.
+  - type: code
+    language: python
+    title: 종 + 성별로 그룹핑
+    description: 리스트로 여러 컬럼 지정
+    content: |-
+      penguins.groupby(['species', 'sex'])['body_mass_g'].mean()
+
+  - type: tip
+    content: "여러 컬럼으로 그룹핑하면 결과의 인덱스가 MultiIndex(다층 인덱스)가 됩니다. reset_index()로 평평하게 만들거나, as_index=False 파라미터를 추가하면 처음부터 평평한 DataFrame을 얻을 수 있습니다."
+
+- id: step10_agg_list
+  title: 10단계. 여러 통계 한번에
+  subtitle: agg() 리스트
+  blocks:
+  - type: text
+    content: 지금까지는 mean(), max() 같은 함수를 하나씩만 적용했습니다. 하지만 agg(aggregate, 집계) 메서드를 사용하면 여러 통계 함수를 동시에 적용할 수 있습니다. 함수 이름을 리스트로 전달하면 각 함수의 결과가 컬럼으로 나란히 출력됩니다. 예를 들어 ['mean', 'min', 'max']를 전달하면 평균, 최소, 최대값을 한 번에 볼 수 있습니다. 데이터의 전체적인 분포를 파악하는 데 매우 효율적입니다. 한 줄로 종별 체중의 평균, 최소, 최대를 모두 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 여러 통계 한번에
+    description: 평균, 최소, 최대를 동시에
+    content: |-
+      penguins.groupby('species')['body_mass_g'].agg(['mean', 'min', 'max'])
+
+  - type: tip
+    content: "agg()에는 'mean', 'sum', 'min', 'max', 'std'(표준편차), 'count', 'median'(중앙값), 'var'(분산) 등 다양한 집계 함수를 사용할 수 있습니다. 사용자 정의 함수도 lambda나 def로 만들어 전달할 수 있습니다."
+
+- id: step11_agg_dict
+  title: 11단계. 컬럼별 다른 함수
+  subtitle: agg() 딕셔너리
+  blocks:
+  - type: text
+    content: |-
+      agg()의 진정한 강력함은 컬럼마다 다른 집계 함수를 적용할 수 있다는 것입니다. 딕셔너리 형태로 {'컬럼명': '함수'} 또는 {'컬럼명': ['함수1', '함수2']}처럼 작성하면 됩니다. 예를 들어 체중은 평균을 보고 싶고, 부리 길이는 최대값을 보고 싶다면 각각 다른 함수를 지정할 수 있습니다. 각 컬럼의 특성에 맞는 통계량을 선택적으로 계산할 수 있어 매우 유연합니다. 실무에서 리포트를 만들 때 자주 사용하는 패턴입니다.
+  - type: code
+    language: python
+    title: 컬럼별 다른 함수
+    description: 체중은 평균, 부리 길이는 최대
+    content: |-
+      penguins.groupby('species').agg({
+          'body_mass_g': 'mean',
+          'bill_length_mm': 'max'
+      })
+
+  - type: tip
+    content: "딕셔너리의 값으로 리스트를 주면 한 컬럼에 여러 함수를 적용할 수 있습니다. 예: {'body_mass_g': ['mean', 'std'], 'bill_length_mm': 'max'}처럼 작성하면 체중은 평균과 표준편차, 부리는 최대값을 계산합니다."
+
+- id: step12_query
+  title: 12단계. query 필터링
+  subtitle: 간결한 조건문
+  blocks:
+  - type: text
+    content: query() 메서드는 기존의 DataFrame[조건] 방식보다 더 간결하고 읽기 쉬운 필터링을 제공합니다. 조건을 문자열로 작성하기 때문에 대괄호 중첩이 줄어들고, SQL의 WHERE 절처럼 직관적입니다. penguins[penguins['body_mass_g'] > 5000] 대신 penguins.query('body_mass_g > 5000')처럼 작성할 수 있습니다. 컬럼명을 따옴표로 감싸지 않아도 되고, 복잡한 조건을 and, or로 연결할 때 특히 편리합니다.
+  - type: code
+    language: python
+    title: 기본 query
+    description: 체중 5000g 초과
+    content: |-
+      penguins.query('body_mass_g > 5000')
+
+  - type: tip
+    content: "query()는 내부적으로 문자열을 파싱해서 조건을 평가합니다. 비교 연산자(>, <, ==, !=)뿐만 아니라 and, or, not 같은 논리 연산자도 사용할 수 있습니다. 예: query('body_mass_g > 4000 and sex == \"MALE\"')"
+
+- id: step13_query_string
+  title: 13단계. query 문자열 조건
+  subtitle: 따옴표 사용법
+  blocks:
+  - type: text
+    content: query()에서 문자열 값을 비교할 때는 따옴표 중첩에 주의해야 합니다. query 전체를 작은따옴표로 감싸고, 비교할 문자열 값은 큰따옴표로 감싸는 것이 일반적입니다. 즉, query('species == "Gentoo"') 형태입니다. 반대로 바깥을 큰따옴표, 안을 작은따옴표로 해도 되지만, 파이썬에서는 바깥 작은따옴표가 관례입니다. 이렇게 하면 문자열 비교 조건을 명확하게 작성할 수 있습니다.
+  - type: code
+    language: python
+    title: 문자열 조건
+    description: Gentoo 종만
+    content: |-
+      penguins.query('species == "Gentoo"')
+
+  - type: tip
+    content: "query() 안에서 여러 조건을 연결할 때: query('species == \"Gentoo\" and body_mass_g > 5000')처럼 and로 연결하거나, query('sex == \"MALE\" or sex == \"FEMALE\"')처럼 or를 사용할 수 있습니다. &, |도 가능하지만 and, or가 더 읽기 쉽습니다."
+
+- id: step14_filter_groupby
+  title: 14단계. 필터링 + 그룹핑
+  subtitle: 조합해서 분석
+  blocks:
+  - type: text
+    content: 필터링과 그룹핑을 조합하면 더 정교한 분석이 가능합니다.
+  - type: code
+    language: python
+    title: 암컷만 종별 비교
+    description: 필터링 후 그룹핑
+    content: |-
+      penguins.query('sex == "FEMALE"').groupby('species')['body_mass_g'].mean()
+
+- id: step15_idxmax
+  title: 15단계. 최대값 위치 찾기
+  subtitle: idxmax() 활용
+  blocks:
+  - type: text
+    content: max()는 최대값 자체를 반환하지만, idxmax()는 최대값이 위치한 인덱스(행 번호)를 반환합니다. 이 인덱스를 loc과 함께 사용하면 최대값을 가진 행 전체를 가져올 수 있습니다. 예를 들어 가장 무거운 펭귄의 체중뿐만 아니라 그 펭귄의 종, 성별, 부리 길이 등 모든 정보를 확인할 수 있습니다. 데이터에서 극값(최대/최소)을 가진 케이스의 전체 정보를 파악할 때 매우 유용한 패턴입니다. 반대로 idxmin()은 최소값의 위치를 찾습니다.
+  - type: code
+    language: python
+    title: 가장 무거운 펭귄
+    description: idxmax로 인덱스 찾기
+    content: |-
+      maxIdx = penguins['body_mass_g'].idxmax()
+      penguins.loc[maxIdx]
+
+  - type: tip
+    content: "idxmax()와 idxmin()은 결측치(NaN)가 있으면 무시하고 계산합니다. 만약 결측치가 있는 행도 고려하려면 skipna=False 파라미터를 추가하면 됩니다. 예: penguins['body_mass_g'].idxmax(skipna=False)"
+
+- id: practice
+  title: 실습
+  subtitle: 펭귄 종 비교 프로젝트
+  blocks:
+  - type: text
+    content: 펭귄 연구원이 되어 종별 특성을 분석해봅시다.
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 종별 날개 통계 + 성별 조합 분석"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv")
+    - type: code
+      title: "분석 수행"
+      content: |-
+        flipperStats = data.groupby('species')['flipper_length_mm'].agg(['mean', 'max'])
+        speciesSexWeight = data.groupby(['species', 'sex'])['body_mass_g'].mean().reset_index()
+        (flipperStats, speciesSexWeight)
+  - type: expansion
+    title: "미션2: query 필터링 + agg 다중 집계"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv")
+    - type: code
+      title: "분석 수행"
+      content: |-
+        gentooCount = len(df.query('body_mass_g >= 4500 and species == "Gentoo"'))
+        multiAgg = df.groupby('species').agg({
+            'body_mass_g': 'mean',
+            'bill_length_mm': 'max',
+            'flipper_length_mm': 'min'
+        })
+        (gentooCount, multiAgg)
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: groupby의 핵심 개념을 배웠습니다. 반복적인 필터링 없이 그룹별 통계를 한 번에 계산하고, agg로 여러 함수를 조합하며, query로 간결한 필터링을 수행하는 방법을 익혔습니다. 이 기술들은 실무 데이터 분석에서 필수적인 스킬입니다.
+  - type: list
+    items:
+    - "df.groupby('컬럼').mean() - 그룹별 평균 (Split-Apply-Combine)"
+    - "df.groupby('컬럼').size() - 그룹별 개수"
+    - "df.groupby(['컬럼1', '컬럼2']) - 여러 컬럼으로 그룹핑 (교차 분석)"
+    - "df.groupby('컬럼').agg(['mean', 'max']) - 여러 통계 한번에"
+    - "df.groupby('컬럼').agg({'컬럼1': 'mean', '컬럼2': 'max'}) - 컬럼별 다른 함수"
+    - ".reset_index() - 인덱스를 컬럼으로 복원"
+    - "df.query('조건') - 간결한 필터링 (SQL WHERE 스타일)"
+    - "df['컬럼'].idxmax() - 최대값 위치 찾기"
+  - type: text
+    content: 다음 시간에는 붓꽃 데이터로 결측치 처리와 새 컬럼 만들기를 배웁니다. assign, apply, map 등 데이터 변환 기술을 익힙니다.

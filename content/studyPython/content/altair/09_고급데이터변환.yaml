@@ -1,0 +1,382 @@
+meta:
+  id: altair_09
+  title: 고급데이터변환
+  order: 9
+  category: altair
+  difficulty: "⭐⭐⭐"
+  badge: 심화
+  tags: ["transform_calculate", "transform_aggregate", "transform_window", "transform_fold"]
+  seo:
+    title: "Altair 데이터 변환 - calculate, aggregate, window"
+    description: "Altair로 데이터를 변환합니다. calculate, aggregate, window, fold로 고급 분석을 배웁니다."
+    keywords: ["altair transform", "calculate", "aggregate", "window", "fold"]
+
+intro:
+  emoji: "🔄"
+  goal: 팁 데이터를 다양한 방식으로 변환하고 집계하여 고급 분석 차트를 만듭니다.
+  description: transform_calculate, transform_aggregate, transform_window, transform_fold로 데이터를 가공합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: seaborn-data
+  blocks:
+  - type: text
+    content: |-
+      GitHub에서 tips(팁) 데이터를 불러옵니다. 레스토랑에서 고객들이 낸 팁을 기록한 데이터입니다.
+
+      total_bill은 총 계산 금액, tip은 팁 금액, sex는 성별, smoker는 흡연 여부, day는 요일, time은 시간대(Lunch/Dinner), size는 일행 수입니다.
+
+      이 프로젝트에서는 데이터를 차트에 표시하기 전에 먼저 가공하는 방법을 배웁니다. 새로운 값을 계산하거나, 그룹별로 집계하거나, 순위를 매기는 등의 변환 작업을 수행합니다.
+  - type: code
+    language: python
+    title: tips 데이터 불러오기
+    description: pandas로 CSV 로드
+    content: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+
+      tipsUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+      tips = pd.read_csv(tipsUrl)
+      tips.head()
+
+- id: step2_calculate
+  title: 2단계. 계산 필드 생성
+  subtitle: transform_calculate
+  blocks:
+  - type: text
+    content: |-
+      데이터에 없는 새로운 값을 계산해서 추가할 수 있습니다. transform_calculate()는 "계산해서 변환하라"는 명령입니다.
+
+      팁 비율(tip_pct)을 계산합니다. tip_pct = 'datum.tip / datum.total_bill * 100'은 "팁을 총 금액으로 나누고 100을 곱하라(퍼센트로 만들기)"는 의미입니다.
+
+      datum.컬럼명으로 각 행의 값에 접근합니다. 계산식은 JavaScript 문법으로 작성하며, 따옴표 안에 넣습니다. 계산된 tip_pct 필드를 마치 원래 있던 컬럼처럼 encode()에서 사용할 수 있습니다.
+  - type: code
+    language: python
+    title: 팁 비율 계산
+    description: 새 필드 생성
+    content: |-
+      chartCalc = alt.Chart(tips).mark_point().encode(
+          x='total_bill:Q',
+          y='tip_pct:Q',
+          color='day:N'
+      ).transform_calculate(
+          tip_pct='datum.tip / datum.total_bill * 100'
+      ).properties(
+          width=400,
+          height=300,
+          title='금액 대비 팁 비율'
+      )
+      chartCalc
+  - type: tip
+    content: |-
+      transform_calculate()는 메서드 체이닝으로 연결됩니다. alt.Chart().mark_point().encode().transform_calculate() 순서로 이어집니다.
+
+      계산식 안에서 사용하는 연산자: / 는 나누기, * 는 곱하기, + 는 더하기, - 는 빼기입니다. JavaScript 문법이지만 일반적인 수학 기호와 같습니다.
+
+- id: step3_calculate_condition
+  title: 3단계. 조건부 계산
+  subtitle: 삼항 연산자
+  blocks:
+  - type: text
+    content: |-
+      단순 계산뿐만 아니라 조건에 따라 다른 값을 넣을 수도 있습니다. 삼항 연산자는 "조건 ? 참일때값 : 거짓일때값" 형태입니다.
+
+      >= 0.15 ? "관대함" : "보통"은 "팁 비율이 0.15(15%) 이상이면 '관대함', 아니면 '보통'"이라는 뜻입니다. 물음표(?)는 "이면", 콜론(:)은 "아니면"을 의미합니다.
+
+      이렇게 만든 tip_category 필드로 팁을 두 그룹으로 분류해서 차트를 그릴 수 있습니다.
+  - type: code
+    language: python
+    title: 조건부 필드
+    description: 삼항 연산자 사용
+    content: |-
+      chartCondCalc = alt.Chart(tips).mark_bar().encode(
+          x='tip_category:N',
+          y='count()',
+          color='tip_category:N'
+      ).transform_calculate(
+          tip_pct='datum.tip / datum.total_bill * 100',
+          tip_category='datum.tip / datum.total_bill >= 0.15 ? "관대함" : "보통"'
+      ).properties(
+          title='팁 비율 카테고리별 분포'
+      )
+      chartCondCalc
+
+- id: step4_aggregate
+  title: 4단계. 그룹별 집계
+  subtitle: transform_aggregate
+  blocks:
+  - type: text
+    content: |-
+      이번에는 데이터를 그룹으로 묶어서 요약하는 방법을 배웁니다. transform_aggregate()는 "집계해서 변환하라"는 명령입니다.
+
+      aggregate는 "모으다, 합치다"라는 뜻입니다. 여러 행을 하나로 모아서 평균, 합계, 개수 등을 계산합니다.
+
+      avg_tip='mean(tip)'은 "tip 컬럼의 평균(mean)을 계산해서 avg_tip이라는 이름으로 저장하라"는 뜻입니다. groupby=['day']는 "day(요일)별로 그룹을 나눠서 계산하라"는 의미입니다. 월요일 그룹, 화요일 그룹 등 각각의 평균을 구합니다.
+  - type: code
+    language: python
+    title: 그룹별 집계
+    description: 요일별 평균
+    content: |-
+      chartAgg = alt.Chart(tips).mark_bar().encode(
+          x='day:N',
+          y='avg_tip:Q',
+          color='day:N'
+      ).transform_aggregate(
+          avg_tip='mean(tip)',
+          avg_bill='mean(total_bill)',
+          groupby=['day']
+      ).properties(
+          title='요일별 평균 팁'
+      )
+      chartAgg
+  - type: tip
+    content: |-
+      사용 가능한 집계 함수: mean(평균), sum(합계), count(개수), median(중앙값), min(최솟값), max(최댓값), stdev(표준편차) 등이 있습니다.
+
+      groupby에는 여러 컬럼을 넣을 수 있습니다. groupby=['day', 'time']은 "요일과 시간대 조합별로 그룹을 나눠라"는 뜻입니다. 예: 월요일 점심, 월요일 저녁, 화요일 점심...
+
+- id: step5_multi_aggregate
+  title: 5단계. 다중 그룹 집계
+  subtitle: 여러 기준으로 집계
+  blocks:
+  - type: text
+    content: |-
+      여러 컬럼으로 그룹화할 수 있습니다.
+
+      요일과 시간대별 평균 금액을 계산합니다.
+  - type: code
+    language: python
+    title: 다중 그룹 집계
+    description: 요일 x 시간대
+    content: |-
+      chartMultiAgg = alt.Chart(tips).mark_rect().encode(
+          x='day:O',
+          y='time:N',
+          color='avg_bill:Q'
+      ).transform_aggregate(
+          avg_bill='mean(total_bill)',
+          groupby=['day', 'time']
+      ).properties(
+          width=300,
+          height=150,
+          title='요일-시간대별 평균 금액'
+      )
+      chartMultiAgg
+
+- id: step6_window
+  title: 6단계. 윈도우 함수
+  subtitle: transform_window
+  blocks:
+  - type: text
+    content: |-
+      윈도우 함수는 각 행마다 주변 행들을 "창문(window)"처럼 보면서 계산하는 기능입니다. 순위, 누적합, 이동평균 등을 구할 때 사용합니다.
+
+      transform_window()는 "윈도우 함수로 변환하라"는 명령입니다. rank='rank()'는 "순위를 매겨서 rank라는 필드에 저장하라"는 뜻입니다.
+
+      sort=[alt.SortField('tip', order='descending')]은 "tip을 내림차순(descending, 큰 것부터)으로 정렬해서 순위를 매기라"는 의미입니다. groupby=['day']는 "각 요일 안에서 따로 순위를 매기라"입니다. transform_filter()로 상위 5개만 남깁니다.
+  - type: code
+    language: python
+    title: 순위 계산
+    description: rank() 윈도우 함수
+    content: |-
+      chartWindow = alt.Chart(tips).mark_point().encode(
+          x='rank:O',
+          y='tip:Q',
+          color='day:N'
+      ).transform_window(
+          rank='rank()',
+          sort=[alt.SortField('tip', order='descending')],
+          groupby=['day']
+      ).transform_filter(
+          alt.datum.rank <= 5
+      ).properties(
+          title='요일별 팁 Top 5'
+      )
+      chartWindow
+  - type: tip
+    content: |-
+      윈도우 함수 종류: rank()는 순위(동점일 때 다음 순위 건너뜀), row_number()는 행 번호(무조건 1, 2, 3...), dense_rank()는 빽빽한 순위(동점 다음이 바로 이어짐)입니다.
+
+      transform_filter(alt.datum.rank <= 5)는 "rank 값이 5 이하인 행만 남기라"는 뜻입니다. 각 그룹의 상위 5개씩만 차트에 표시됩니다.
+
+- id: step7_cumulative
+  title: 7단계. 누적 계산
+  subtitle: 누적합/누적평균
+  blocks:
+  - type: text
+    content: |-
+      윈도우 함수로 누적합이나 이동 평균을 계산할 수 있습니다.
+
+      금액순 누적 팁을 계산합니다.
+  - type: code
+    language: python
+    title: 누적합 계산
+    description: 금액순 누적 팁
+    content: |-
+      chartCumulative = alt.Chart(tips).mark_line().encode(
+          x='row_num:Q',
+          y='cumulative_tip:Q'
+      ).transform_window(
+          row_num='row_number()',
+          cumulative_tip='sum(tip)',
+          sort=[alt.SortField('total_bill', order='ascending')]
+      ).properties(
+          width=400,
+          height=250,
+          title='금액순 누적 팁'
+      )
+      chartCumulative
+
+- id: step8_fold
+  title: 8단계. 데이터 피벗
+  subtitle: transform_fold
+  blocks:
+  - type: text
+    content: |-
+      데이터 구조를 변경하는 방법을 배웁니다. fold는 "접다"라는 뜻으로, 여러 컬럼을 하나의 긴 형태로 변환합니다.
+
+      transform_fold(['total_bill', 'tip'], as_=['key', 'value'])는 "total_bill과 tip 두 컬럼을 key와 value 두 컬럼으로 변환하라"는 뜻입니다.
+
+      원래 데이터가 total_bill=10, tip=2 형태였다면, 변환 후에는 (key='total_bill', value=10), (key='tip', value=2) 두 행으로 나뉩니다. 이렇게 하면 두 컬럼을 하나의 차트에 나란히 비교할 수 있습니다. xOffset='key:N'으로 막대를 옆으로 배치합니다.
+  - type: code
+    language: python
+    title: 데이터 피벗
+    description: fold로 비교 차트
+    content: |-
+      chartFold = alt.Chart(tips).mark_bar().encode(
+          x='day:N',
+          y='mean(value):Q',
+          color='key:N',
+          xOffset='key:N'
+      ).transform_fold(
+          ['total_bill', 'tip'],
+          as_=['key', 'value']
+      ).properties(
+          width=350,
+          height=250,
+          title='요일별 금액 vs 팁 비교'
+      )
+      chartFold
+  - type: tip
+    content: |-
+      wide(넓은) 형식은 컬럼이 많고 행이 적은 형태입니다. long(긴) 형식은 컬럼이 적고 행이 많은 형태입니다. fold는 wide를 long으로 바꿉니다.
+
+      as_=['key', 'value']는 "새로 만들 컬럼 이름을 key와 value로 하라"는 뜻입니다. 원하는 이름으로 바꿀 수 있습니다(예: as_=['항목', '값']).
+
+- id: step9_final
+  title: 9단계. 최종 결과물
+  subtitle: 복합 변환 차트
+  blocks:
+  - type: text
+    content: |-
+      지금까지 배운 변환 기법을 종합해 분석 차트를 완성합니다.
+
+      팁 비율을 계산하고, 그룹별로 집계한 뒤 시각화합니다.
+  - type: code
+    language: python
+    title: 최종 분석 차트
+    description: 프로젝트 완성!
+    content: |-
+      chartFinal = alt.Chart(tips).mark_bar().encode(
+          x=alt.X('day:O', sort=['Thur', 'Fri', 'Sat', 'Sun'], title='요일'),
+          y=alt.Y('avg_tip_pct:Q', title='평균 팁 비율 (%)'),
+          color=alt.Color('time:N', title='시간대'),
+          xOffset='time:N',
+          tooltip=[
+              alt.Tooltip('day:O', title='요일'),
+              alt.Tooltip('time:N', title='시간대'),
+              alt.Tooltip('avg_tip_pct:Q', title='평균 팁 비율', format='.1f'),
+              alt.Tooltip('count:Q', title='건수')
+          ]
+      ).transform_calculate(
+          tip_pct='datum.tip / datum.total_bill * 100'
+      ).transform_aggregate(
+          avg_tip_pct='mean(tip_pct)',
+          count='count()',
+          groupby=['day', 'time']
+      ).properties(
+          width=400,
+          height=300,
+          title='요일-시간대별 평균 팁 비율'
+      )
+      chartFinal
+  - type: text
+    content: |-
+      calculate로 팁 비율을 계산하고, aggregate로 요일-시간대별 평균을 집계했습니다.
+
+      Dinner 시간대의 팁 비율이 Lunch보다 약간 높습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 데이터 변환 프로젝트
+  blocks:
+  - type: text
+    content: |-
+      이 프로젝트에서 배운 내용을 정리하면: transform_calculate()로 새 필드 계산, 삼항 연산자(?:)로 조건부 값 지정, transform_aggregate()로 그룹별 집계, groupby로 그룹 기준 지정, transform_window()로 순위와 누적 계산, transform_fold()로 wide를 long으로 변환입니다.
+
+      이제 배운 변환 기법들을 조합해 데이터를 다양하게 분석해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 1인당 금액 계산 (per_person = total_bill / size)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        billUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+        bill = pd.read_csv(billUrl)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        figPerson = alt.Chart(bill).mark_point().encode(
+            x='size:O',
+            y='per_person:Q',
+            color='day:N'
+        ).transform_calculate(
+            per_person='datum.total_bill / datum.size'
+        ).properties(title='인원수별 1인당 금액')
+        figPerson
+  - type: expansion
+    title: "미션2: 성별-흡연 여부별 평균 집계"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        payUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+        pay = pd.read_csv(payUrl)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        figGroup = alt.Chart(pay).mark_bar().encode(
+            x='sex:N',
+            y='avg_tip:Q',
+            color='smoker:N',
+            xOffset='smoker:N'
+        ).transform_aggregate(
+            avg_tip='mean(tip)',
+            groupby=['sex', 'smoker']
+        ).properties(title='성별-흡연 여부별 평균 팁')
+        figGroup
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair로 고급 데이터 변환을 마스터했습니다!
+  - type: list
+    items:
+    - "transform_calculate(필드='표현식') - 새 계산 필드 생성"
+    - "datum.컬럼명 - 각 행의 값 접근"
+    - "transform_aggregate(집계필드, groupby) - 그룹별 집계"
+    - "transform_window(함수, sort, groupby) - 윈도우 함수"
+    - "rank(), row_number(), sum() - 윈도우 함수 종류"
+    - "transform_fold([컬럼], as_) - wide to long 변환"
+  - type: text
+    content: 다음 프로젝트에서는 모든 기법을 종합한 대시보드를 만듭니다.

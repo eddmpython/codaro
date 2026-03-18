@@ -1,0 +1,588 @@
+meta:
+  id: matplotlib_08
+  title: 다중패널대시보드
+  order: 8
+  category: matplotlib
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["matplotlib", "GridSpec", "style", "tight_layout", "dashboard", "pie"]
+  seo:
+    title: "Matplotlib 대시보드 - GridSpec으로 다중 패널 레이아웃"
+    description: "Matplotlib으로 4개 이상의 차트를 조합한 대시보드를 만듭니다. GridSpec, style, tight_layout, pie 사용법을 배웁니다."
+    keywords: ["matplotlib", "GridSpec", "대시보드", "pie", "스타일", "레이아웃"]
+
+intro:
+  emoji: "📋"
+  goal: 4개 차트로 구성된 팁 데이터 분석 대시보드를 만듭니다.
+  description: GridSpec으로 복잡한 레이아웃을 구성하고, 여러 차트 유형을 조합합니다. 이전에 배운 plot, hist, scatter, bar, boxplot, pie, subplots 개념을 모두 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: tips 데이터를 사용하여 레스토랑 팁 분석 대시보드를 만듭니다. GridSpec은 서브플롯보다 더 유연한 레이아웃을 구성할 수 있습니다. 스타일 시트를 적용하면 기본 디자인이 크게 개선됩니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: matplotlib, seaborn, GridSpec을 불러옵니다
+    content: |-
+      import matplotlib.pyplot as plt
+      from matplotlib.gridspec import GridSpec
+      import seaborn as sns
+      import numpy as np
+  - type: tip
+    content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. GridSpec은 복잡한 레이아웃을 구성할 때 사용합니다.
+
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  subtitle: Pyodide 환경 폰트
+  blocks:
+  - type: text
+    content: Pyodide(웹 브라우저) 환경에서는 시스템 폰트를 사용할 수 없어 한글이 깨집니다. CDN에서 폰트 파일을 다운로드하여 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+  - type: code
+    language: python
+    title: 한글 폰트 설정
+    description: Pretendard 폰트를 다운로드하여 matplotlib에 등록합니다
+    content: |-
+      import micropip
+      await micropip.install('pyodide-http')
+
+      import pyodide_http
+      pyodide_http.patch_all()
+
+      from matplotlib import font_manager
+      from js import fetch
+      from pathlib import Path
+
+      fontUrl = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Regular.otf"
+      response = await fetch(fontUrl)
+      fontBuffer = await response.arrayBuffer()
+
+      fontPath = Path("/tmp/Pretendard-Regular.otf")
+      fontPath.write_bytes(fontBuffer.to_py())
+
+      font_manager.fontManager.addfont(str(fontPath))
+      plt.rcParams['font.family'] = 'Pretendard'
+      plt.rcParams['axes.unicode_minus'] = False
+  - type: tip
+    content: Pyodide 환경에서는 fetch API로 외부 리소스를 가져옵니다. font_manager.addfont()로 폰트를 등록하고, rcParams로 기본 폰트를 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: tips 데이터
+  blocks:
+  - type: text
+    content: tips 데이터를 불러오고 기본 통계를 확인합니다. 대시보드에는 총 결제금액, 팁, 요일, 시간대, 인원수 등 다양한 변수를 활용합니다.
+  - type: code
+    language: python
+    title: tips 데이터 로드
+    description: 레스토랑 팁 데이터를 불러옵니다
+    content: |-
+      tips = sns.load_dataset('tips')
+      tips.head()
+
+- id: step3_style
+  title: 3단계. 스타일 시트 적용
+  subtitle: plt.style.use()
+  blocks:
+  - type: text
+    content: Matplotlib은 다양한 내장 스타일 시트를 제공합니다. 스타일을 적용하면 배경색, 그리드, 폰트 등이 일괄 변경됩니다. 'seaborn-v0_8-whitegrid'는 깔끔한 비즈니스 차트에 적합합니다.
+  - type: code
+    language: python
+    title: 스타일 확인
+    description: 사용 가능한 스타일 목록을 확인합니다
+    content: |-
+      plt.style.available[:10]
+  - type: tip
+    content: "plt.style.use('스타일명')으로 스타일을 적용합니다. 주요 스타일: 'seaborn-v0_8-whitegrid'(깔끔한 격자), 'ggplot'(R 스타일), 'dark_background'(어두운 배경), 'fivethirtyeight'(뉴스 사이트 스타일). plt.style.available로 전체 목록을 볼 수 있습니다."
+
+- id: step4_gridspec
+  title: 4단계. GridSpec 기본
+  subtitle: 그리드 레이아웃
+  blocks:
+  - type: text
+    content: GridSpec은 Figure를 그리드로 분할하고, 각 셀에 차트를 배치합니다. 2x2 그리드를 만들고 각 위치에 다른 차트를 배치해봅니다. subplots보다 더 유연한 레이아웃이 가능합니다.
+  - type: code
+    language: python
+    title: 2x2 그리드
+    description: GridSpec으로 2x2 레이아웃을 만듭니다
+    content: |-
+      figGrid = plt.figure(figsize=(12, 10))
+      gs = GridSpec(2, 2, figure=figGrid)
+
+      ax1 = figGrid.add_subplot(gs[0, 0])
+      ax2 = figGrid.add_subplot(gs[0, 1])
+      ax3 = figGrid.add_subplot(gs[1, 0])
+      ax4 = figGrid.add_subplot(gs[1, 1])
+
+      ax1.set_title('위치 [0, 0]')
+      ax2.set_title('위치 [0, 1]')
+      ax3.set_title('위치 [1, 0]')
+      ax4.set_title('위치 [1, 1]')
+
+      plt.tight_layout()
+      figGrid
+  - type: tip
+    content: GridSpec(rows, cols, figure=fig)로 그리드를 정의합니다. fig.add_subplot(gs[row, col])로 특정 위치에 Axes를 추가합니다. gs[0:2, 0]처럼 슬라이싱으로 여러 셀을 합칠 수 있습니다.
+
+- id: step5_hist_box
+  title: 5단계. 히스토그램과 박스플롯
+  subtitle: 분포 시각화
+  blocks:
+  - type: text
+    content: 첫 번째 행에 팁 금액의 분포를 히스토그램과 박스플롯으로 표시합니다. 이전에 배운 기법들을 적용합니다.
+  - type: code
+    language: python
+    title: 그리드와 히스토그램
+    description: GridSpec을 만들고 히스토그램을 배치합니다
+    content: |-
+      figDist = plt.figure(figsize=(14, 5))
+      gs = GridSpec(1, 2, figure=figDist)
+
+      axHist = figDist.add_subplot(gs[0, 0])
+      axHist.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+      axHist.set_title('팁 금액 분포', fontsize=12)
+      axHist.set_xlabel('팁 ($)')
+      axHist.set_ylabel('빈도')
+      figDist
+  - type: code
+    language: python
+    title: 박스플롯
+    description: 오른쪽에 요일별 박스플롯을 배치합니다
+    content: |-
+      axBox = figDist.add_subplot(gs[0, 1])
+      bp = axBox.boxplot([tips[tips['day'] == d]['tip'] for d in ['Thur', 'Fri', 'Sat', 'Sun']],
+                        labels=['Thur', 'Fri', 'Sat', 'Sun'], patch_artist=True)
+      colors = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+      for patch, color in zip(bp['boxes'], colors):
+          patch.set_facecolor(color)
+          patch.set_alpha(0.7)
+      axBox.set_title('요일별 팁 분포', fontsize=12)
+      axBox.set_ylabel('팁 ($)')
+
+      plt.tight_layout()
+      figDist
+
+- id: step6_scatter_bar
+  title: 6단계. 산점도와 막대 그래프
+  subtitle: 관계와 비교
+  blocks:
+  - type: text
+    content: 두 번째 행에 결제금액-팁 관계 산점도와 시간대별 평균 팁 막대 그래프를 배치합니다.
+  - type: code
+    language: python
+    title: 그리드와 산점도
+    description: GridSpec을 만들고 산점도를 배치합니다
+    content: |-
+      figRelation = plt.figure(figsize=(14, 5))
+      gs = GridSpec(1, 2, figure=figRelation)
+
+      axScatter = figRelation.add_subplot(gs[0, 0])
+      colors = {'Lunch': '#3498DB', 'Dinner': '#E74C3C'}
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axScatter.scatter(subset['total_bill'], subset['tip'],
+                           c=colors[time], label=time, alpha=0.6, s=50)
+      axScatter.set_title('결제금액 vs 팁', fontsize=12)
+      axScatter.set_xlabel('결제금액 ($)')
+      axScatter.set_ylabel('팁 ($)')
+      axScatter.legend()
+      figRelation
+  - type: code
+    language: python
+    title: 막대 그래프
+    description: 오른쪽에 평균 팁 막대 그래프를 배치합니다
+    content: |-
+      axBar = figRelation.add_subplot(gs[0, 1])
+      tipByTime = tips.groupby('time')['tip'].mean()
+      axBar.bar(tipByTime.index, tipByTime.values, color=['#3498DB', '#E74C3C'], alpha=0.8)
+      axBar.set_title('시간대별 평균 팁', fontsize=12)
+      axBar.set_ylabel('평균 팁 ($)')
+
+      for i, v in enumerate(tipByTime.values):
+          axBar.text(i, v + 0.05, f'${v:.2f}', ha='center', fontweight='bold')
+
+      plt.tight_layout()
+      figRelation
+
+- id: step7_pie
+  title: 7단계. 파이 차트
+  subtitle: 비율 시각화
+  blocks:
+  - type: text
+    content: 파이 차트는 전체 대비 각 부분의 비율을 보여줍니다. 요일별 주문 비율을 파이 차트로 시각화합니다. autopct로 퍼센트를 표시하고, explode로 특정 조각을 강조할 수 있습니다.
+  - type: code
+    language: python
+    title: 파이 차트
+    description: 요일별 주문 비율을 파이 차트로 표시합니다
+    content: |-
+      figPie, axPie = plt.subplots(figsize=(8, 8))
+
+      dayCount = tips['day'].value_counts()
+      colors = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+      explode = (0, 0, 0.05, 0)
+
+      axPie.pie(dayCount, labels=dayCount.index, autopct='%1.1f%%',
+               colors=colors, explode=explode, shadow=True, startangle=90)
+      axPie.set_title('요일별 주문 비율', fontsize=14, fontweight='bold')
+
+      figPie
+  - type: tip
+    content: ax.pie(값, labels=라벨, autopct='%1.1f%%')로 파이 차트를 그립니다. explode로 조각을 떼어내어 강조하고, shadow=True로 그림자 효과를 줍니다. startangle로 시작 각도를 조절합니다.
+
+- id: step8_dashboard
+  title: 8단계. 4패널 대시보드
+  subtitle: 모든 차트 조합
+  blocks:
+  - type: text
+    content: 지금까지 만든 4가지 차트를 하나의 대시보드로 조합합니다. 2x2 GridSpec으로 레이아웃을 구성하고, 각 위치에 적절한 차트를 배치합니다.
+  - type: code
+    language: python
+    title: 대시보드 그리드와 히스토그램
+    description: 2x2 GridSpec을 만들고 히스토그램을 배치합니다
+    content: |-
+      figDash = plt.figure(figsize=(14, 12))
+      gs = GridSpec(2, 2, figure=figDash, hspace=0.3, wspace=0.3)
+
+      ax1Dash = figDash.add_subplot(gs[0, 0])
+      ax1Dash.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+      ax1Dash.set_title('팁 금액 분포', fontsize=12, fontweight='bold')
+      ax1Dash.set_xlabel('팁 ($)')
+      ax1Dash.set_ylabel('빈도')
+      ax1Dash.spines['top'].set_visible(False)
+      ax1Dash.spines['right'].set_visible(False)
+      figDash
+  - type: code
+    language: python
+    title: 산점도 패널
+    description: 오른쪽 위에 산점도를 배치합니다
+    content: |-
+      ax2Dash = figDash.add_subplot(gs[0, 1])
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          ax2Dash.scatter(subset['total_bill'], subset['tip'],
+                         c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                         label=time, alpha=0.6, s=40)
+      ax2Dash.set_title('결제금액 vs 팁', fontsize=12, fontweight='bold')
+      ax2Dash.set_xlabel('결제금액 ($)')
+      ax2Dash.set_ylabel('팁 ($)')
+      ax2Dash.legend()
+      ax2Dash.spines['top'].set_visible(False)
+      ax2Dash.spines['right'].set_visible(False)
+      figDash
+  - type: code
+    language: python
+    title: 박스플롯 패널
+    description: 왼쪽 아래에 박스플롯을 배치합니다
+    content: |-
+      ax3Dash = figDash.add_subplot(gs[1, 0])
+      bp = ax3Dash.boxplot([tips[tips['day'] == d]['tip'] for d in ['Thur', 'Fri', 'Sat', 'Sun']],
+                          labels=['목', '금', '토', '일'], patch_artist=True)
+      colors = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+      for patch, color in zip(bp['boxes'], colors):
+          patch.set_facecolor(color)
+          patch.set_alpha(0.7)
+      ax3Dash.set_title('요일별 팁 분포', fontsize=12, fontweight='bold')
+      ax3Dash.set_ylabel('팁 ($)')
+      ax3Dash.spines['top'].set_visible(False)
+      ax3Dash.spines['right'].set_visible(False)
+      figDash
+  - type: code
+    language: python
+    title: 파이 차트 패널
+    description: 오른쪽 아래에 파이 차트를 배치합니다
+    content: |-
+      ax4Dash = figDash.add_subplot(gs[1, 1])
+      dayCount = tips['day'].value_counts()
+      ax4Dash.pie(dayCount, labels=['토', '일', '목', '금'], autopct='%1.1f%%',
+                 colors=colors, shadow=True, startangle=90)
+      ax4Dash.set_title('요일별 주문 비율', fontsize=12, fontweight='bold')
+
+      figDash.suptitle('레스토랑 팁 데이터 분석 대시보드', fontsize=16, fontweight='bold', y=0.98)
+      figDash
+
+- id: step9_advanced
+  title: 9단계. 고급 레이아웃
+  subtitle: 불균등 그리드
+  blocks:
+  - type: text
+    content: GridSpec으로 불균등한 크기의 셀을 만들 수 있습니다. 위쪽에 큰 차트, 아래쪽에 작은 차트 3개를 배치하는 등 다양한 레이아웃이 가능합니다.
+  - type: code
+    language: python
+    title: 불균등 그리드와 메인 차트
+    description: 2x3 그리드를 만들고 메인 산점도를 배치합니다
+    content: |-
+      figAdvanced = plt.figure(figsize=(14, 10))
+      gs = GridSpec(2, 3, figure=figAdvanced, height_ratios=[2, 1], hspace=0.3, wspace=0.3)
+
+      axMain = figAdvanced.add_subplot(gs[0, :])
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axMain.scatter(subset['total_bill'], subset['tip'],
+                        c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                        label=time, alpha=0.6, s=60)
+      axMain.set_title('결제금액과 팁의 관계', fontsize=14, fontweight='bold')
+      axMain.set_xlabel('결제금액 ($)', fontsize=12)
+      axMain.set_ylabel('팁 ($)', fontsize=12)
+      axMain.legend(fontsize=11)
+      axMain.grid(True, alpha=0.3)
+      figAdvanced
+  - type: code
+    language: python
+    title: 하단 소형 차트들
+    description: 아래 행에 3개의 작은 차트를 배치합니다
+    content: |-
+      axSmall1 = figAdvanced.add_subplot(gs[1, 0])
+      tipByDay = tips.groupby('day')['tip'].mean()
+      axSmall1.bar(tipByDay.index, tipByDay.values, color='#27AE60', alpha=0.8)
+      axSmall1.set_title('요일별 평균 팁', fontsize=11)
+      axSmall1.set_ylabel('평균 팁 ($)')
+
+      axSmall2 = figAdvanced.add_subplot(gs[1, 1])
+      axSmall2.hist(tips['total_bill'], bins=15, color='#9B59B6', alpha=0.8, edgecolor='white')
+      axSmall2.set_title('결제금액 분포', fontsize=11)
+      axSmall2.set_xlabel('결제금액 ($)')
+
+      axSmall3 = figAdvanced.add_subplot(gs[1, 2])
+      sizeCount = tips['size'].value_counts().sort_index()
+      axSmall3.bar(sizeCount.index, sizeCount.values, color='#F39C12', alpha=0.8)
+      axSmall3.set_title('테이블 크기 분포', fontsize=11)
+      axSmall3.set_xlabel('인원수')
+
+      figAdvanced.suptitle('팁 데이터 종합 분석', fontsize=16, fontweight='bold')
+      figAdvanced
+
+- id: step10_final
+  title: 10단계. 최종 대시보드
+  subtitle: 완성된 분석 리포트
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 요소를 종합하여 완성도 높은 분석 대시보드를 만듭니다. 일관된 스타일, 명확한 제목, 적절한 여백으로 전문적인 리포트를 완성합니다.
+  - type: code
+    language: python
+    title: 최종 그리드와 메인 산점도
+    description: 그리드를 만들고 메인 산점도를 배치합니다
+    content: |-
+      figFinal = plt.figure(figsize=(16, 12))
+      gs = GridSpec(2, 3, figure=figFinal, height_ratios=[1.2, 1], hspace=0.35, wspace=0.3)
+      colorsPie = ['#E74C3C', '#27AE60', '#9B59B6', '#F39C12']
+
+      axFinal1 = figFinal.add_subplot(gs[0, 0:2])
+      for time in ['Lunch', 'Dinner']:
+          subset = tips[tips['time'] == time]
+          axFinal1.scatter(subset['total_bill'], subset['tip'],
+                          c='#3498DB' if time == 'Lunch' else '#E74C3C',
+                          label=time, alpha=0.6, s=70, edgecolors='white')
+      axFinal1.set_title('결제금액과 팁의 관계', fontsize=13, fontweight='bold')
+      axFinal1.set_xlabel('결제금액 ($)', fontsize=11)
+      axFinal1.set_ylabel('팁 ($)', fontsize=11)
+      axFinal1.legend(fontsize=10)
+      axFinal1.grid(True, alpha=0.3)
+      axFinal1.spines['top'].set_visible(False)
+      axFinal1.spines['right'].set_visible(False)
+      figFinal
+  - type: code
+    language: python
+    title: 파이 차트
+    description: 오른쪽 위에 파이 차트를 배치합니다
+    content: |-
+      axFinal2 = figFinal.add_subplot(gs[0, 2])
+      dayCount = tips['day'].value_counts()
+      axFinal2.pie(dayCount, labels=dayCount.index, autopct='%1.1f%%',
+                  colors=colorsPie, shadow=True, startangle=90)
+      axFinal2.set_title('요일별 주문 비율', fontsize=13, fontweight='bold')
+      figFinal
+  - type: code
+    language: python
+    title: 히스토그램과 박스플롯
+    description: 아래 행에 히스토그램과 박스플롯을 배치합니다
+    content: |-
+      axFinal3 = figFinal.add_subplot(gs[1, 0])
+      axFinal3.hist(tips['tip'], bins=20, color='#3498DB', edgecolor='white', alpha=0.8)
+      axFinal3.set_title('팁 금액 분포', fontsize=12, fontweight='bold')
+      axFinal3.set_xlabel('팁 ($)')
+      axFinal3.set_ylabel('빈도')
+      axFinal3.spines['top'].set_visible(False)
+      axFinal3.spines['right'].set_visible(False)
+
+      axFinal4 = figFinal.add_subplot(gs[1, 1])
+      bp = axFinal4.boxplot([tips[tips['day'] == d]['tip'] for d in ['Thur', 'Fri', 'Sat', 'Sun']],
+                           labels=['목', '금', '토', '일'], patch_artist=True)
+      for patch, color in zip(bp['boxes'], colorsPie):
+          patch.set_facecolor(color)
+          patch.set_alpha(0.7)
+      axFinal4.set_title('요일별 팁 분포', fontsize=12, fontweight='bold')
+      axFinal4.set_ylabel('팁 ($)')
+      axFinal4.spines['top'].set_visible(False)
+      axFinal4.spines['right'].set_visible(False)
+      figFinal
+  - type: code
+    language: python
+    title: 막대 그래프와 마무리
+    description: 막대 그래프와 전체 제목을 추가합니다
+    content: |-
+      axFinal5 = figFinal.add_subplot(gs[1, 2])
+      tipByTime = tips.groupby('time')['tip'].mean()
+      barsFinal = axFinal5.bar(tipByTime.index, tipByTime.values,
+                               color=['#3498DB', '#E74C3C'], alpha=0.8)
+      axFinal5.set_title('시간대별 평균 팁', fontsize=12, fontweight='bold')
+      axFinal5.set_ylabel('평균 팁 ($)')
+      for bar, val in zip(barsFinal, tipByTime.values):
+          axFinal5.text(bar.get_x() + bar.get_width()/2, val + 0.05,
+                       f'${val:.2f}', ha='center', fontweight='bold')
+      axFinal5.spines['top'].set_visible(False)
+      axFinal5.spines['right'].set_visible(False)
+
+      figFinal.suptitle('레스토랑 팁 데이터 분석 리포트', fontsize=18, fontweight='bold', y=0.98)
+      plt.tight_layout()
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 대시보드 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용해서 다양한 데이터로 대시보드를 만들어봅시다. GridSpec, pie, style, tight_layout 등 모든 개념을 종합적으로 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 펭귄 데이터 분석 대시보드"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        from matplotlib.gridspec import GridSpec
+        import seaborn as sns
+
+        data = sns.load_dataset('penguins').dropna()
+
+        chart = plt.figure(figsize=(14, 10))
+        grid = GridSpec(2, 2, figure=chart, hspace=0.35, wspace=0.3)
+
+        kinds = data['species'].unique()
+        palette = ['#E74C3C', '#27AE60', '#3498DB']
+    - type: code
+      title: "산점도"
+      content: |-
+        plot1 = chart.add_subplot(grid[0, 0])
+        for sp, clr in zip(kinds, palette):
+            subset = data[data['species'] == sp]
+            plot1.scatter(subset['flipper_length_mm'], subset['body_mass_g'],
+                          c=clr, label=sp, alpha=0.6, s=50)
+        plot1.set_title('날개 길이 vs 체중', fontsize=12, fontweight='bold')
+        plot1.set_xlabel('날개 길이 (mm)')
+        plot1.set_ylabel('체중 (g)')
+        plot1.legend()
+    - type: code
+      title: "파이차트"
+      content: |-
+        plot2 = chart.add_subplot(grid[0, 1])
+        kindCount = data['species'].value_counts()
+        plot2.pie(kindCount, labels=kindCount.index, autopct='%1.1f%%',
+                  colors=palette, shadow=True)
+        plot2.set_title('종별 비율', fontsize=12, fontweight='bold')
+    - type: code
+      title: "박스플롯"
+      content: |-
+        plot3 = chart.add_subplot(grid[1, 0])
+        massData = [data[data['species'] == sp]['body_mass_g'] for sp in kinds]
+        boxes = plot3.boxplot(massData, labels=kinds, patch_artist=True)
+        for patch, tone in zip(boxes['boxes'], palette):
+            patch.set_facecolor(tone)
+            patch.set_alpha(0.7)
+        plot3.set_title('종별 체중 분포', fontsize=12, fontweight='bold')
+        plot3.set_ylabel('체중 (g)')
+    - type: code
+      title: "히스토그램"
+      content: |-
+        plot4 = chart.add_subplot(grid[1, 1])
+        plot4.hist(data['bill_length_mm'], bins=20, color='#9B59B6',
+                   edgecolor='white', alpha=0.8)
+        plot4.set_title('부리 길이 분포', fontsize=12, fontweight='bold')
+        plot4.set_xlabel('부리 길이 (mm)')
+        plot4.set_ylabel('빈도')
+
+        chart.suptitle('펭귄 데이터 분석 대시보드', fontsize=16, fontweight='bold')
+        plt.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: iris 데이터 불균등 레이아웃 대시보드"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        from matplotlib.gridspec import GridSpec
+        import seaborn as sns
+
+        df = sns.load_dataset('iris')
+
+        canvas = plt.figure(figsize=(14, 10))
+        layout = GridSpec(2, 3, figure=canvas, height_ratios=[1.5, 1], hspace=0.35, wspace=0.3)
+
+        types = ['setosa', 'versicolor', 'virginica']
+        tones = ['#E74C3C', '#27AE60', '#3498DB']
+        marks = ['o', 's', '^']
+    - type: code
+      title: "메인 산점도"
+      content: |-
+        mainPanel = canvas.add_subplot(layout[0, :])
+        for sp, clr, mk in zip(types, tones, marks):
+            subset = df[df['species'] == sp]
+            mainPanel.scatter(subset['petal_length'], subset['petal_width'],
+                              c=clr, marker=mk, label=sp, alpha=0.7, s=60)
+        mainPanel.set_title('품종별 꽃잎 특성', fontsize=14, fontweight='bold')
+        mainPanel.set_xlabel('꽃잎 길이 (cm)')
+        mainPanel.set_ylabel('꽃잎 너비 (cm)')
+        mainPanel.legend()
+        mainPanel.grid(True, alpha=0.3)
+    - type: code
+      title: "히스토그램"
+      content: |-
+        panel1 = canvas.add_subplot(layout[1, 0])
+        for sp, clr in zip(types, tones):
+            subset = df[df['species'] == sp]
+            panel1.hist(subset['sepal_length'], bins=10, color=clr, alpha=0.5, label=sp)
+        panel1.set_title('꽃받침 길이 분포', fontsize=11)
+        panel1.set_xlabel('꽃받침 길이 (cm)')
+        panel1.legend(fontsize=8)
+    - type: code
+      title: "막대 + 박스플롯"
+      content: |-
+        panel2 = canvas.add_subplot(layout[1, 1])
+        avgByType = df.groupby('species')['petal_length'].mean()
+        panel2.bar(avgByType.index, avgByType.values, color=tones, alpha=0.8)
+        panel2.set_title('품종별 평균 꽃잎 길이', fontsize=11)
+        panel2.set_ylabel('평균 길이 (cm)')
+
+        panel3 = canvas.add_subplot(layout[1, 2])
+        petalData = [df[df['species'] == sp]['petal_length'] for sp in types]
+        boxResult = panel3.boxplot(petalData, labels=types, patch_artist=True)
+        for patch, shade in zip(boxResult['boxes'], tones):
+            patch.set_facecolor(shade)
+            patch.set_alpha(0.7)
+        panel3.set_title('꽃잎 길이 박스플롯', fontsize=11)
+
+        canvas.suptitle('붓꽃 품종 분석 대시보드', fontsize=16, fontweight='bold')
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: GridSpec으로 다중 패널 대시보드를 만들었습니다.
+  - type: list
+    items:
+    - "GridSpec(rows, cols) - 유연한 그리드 레이아웃 정의"
+    - "fig.add_subplot(gs[row, col]) - 그리드 위치에 Axes 추가"
+    - "gs[0:2, 0] - 슬라이싱으로 여러 셀 합치기"
+    - "height_ratios, width_ratios - 불균등 크기 설정"
+    - "ax.pie(values, autopct) - 파이 차트"
+    - "plt.style.use() - 스타일 시트 적용"
+    - "plt.tight_layout() - 자동 여백 조정"
+  - type: text
+    content: 다음 시간에는 annotate와 LaTeX로 고급 주석 차트를 만듭니다.

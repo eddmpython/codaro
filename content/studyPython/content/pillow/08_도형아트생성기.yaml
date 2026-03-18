@@ -1,0 +1,261 @@
+meta:
+  id: pillow_08
+  title: 도형아트생성기
+  order: 8
+  category: pillow
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["Pillow", "ImageDraw", "rectangle", "ellipse", "line", "polygon"]
+  seo:
+    title: "Pillow 중급 - 도형 아트 생성기"
+    description: "Pillow ImageDraw로 사각형, 원, 선, 다각형을 그려 아트워크를 만듭니다."
+    keywords: ["Pillow", "ImageDraw", "도형그리기", "rectangle", "ellipse", "polygon"]
+
+intro:
+  emoji: "🎨"
+  goal: ImageDraw로 다양한 도형을 그려 디지털 아트워크를 만듭니다.
+  description: rectangle, ellipse, line, polygon 등 ImageDraw의 도형 그리기 메서드를 배웁니다. 합성 이미지 위에 도형을 그려 창의적인 아트를 생성합니다.
+
+sections:
+- id: step1_canvas
+  title: 1단계. 캔버스 생성
+  subtitle: Image.new()
+  blocks:
+  - type: text
+    content: 도형을 그릴 빈 캔버스를 생성합니다. Image.new()로 원하는 크기와 배경색의 이미지를 만듭니다. 모드, 크기, 색상 순서로 인자를 전달합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: ImageDraw를 임포트합니다
+    content: |-
+      from PIL import Image, ImageDraw
+
+      board = Image.new('RGB', (400, 300), color='white')
+      board.size, board.mode
+  - type: code
+    language: python
+    title: 빈 캔버스
+    description: 흰색 배경의 캔버스입니다
+    content: |-
+      board
+  - type: tip
+    content: Image.new()의 color는 'white', 'skyblue' 같은 이름이나 (255, 200, 100) RGB 튜플로 지정합니다. RGBA 모드면 (255, 200, 100, 255)처럼 네 값을 줍니다.
+
+- id: step2_rectangle
+  title: 2단계. 사각형 그리기
+  subtitle: rectangle()
+  blocks:
+  - type: text
+    content: rectangle() 메서드는 사각형을 그립니다. xy 파라미터로 좌상단과 우하단 좌표를 지정하고, fill은 채우기 색, outline은 테두리 색입니다.
+  - type: code
+    language: python
+    title: Draw 객체 생성
+    description: 캔버스에 그릴 준비를 합니다
+    content: |-
+      canvas = Image.new('RGB', (400, 300), 'lightgray')
+      artist = ImageDraw.Draw(canvas)
+      type(artist)
+  - type: code
+    language: python
+    title: 채워진 사각형
+    description: fill로 내부를 채웁니다
+    content: |-
+      artist.rectangle([50, 50, 150, 120], fill='blue')
+      canvas
+  - type: code
+    language: python
+    title: 테두리만 있는 사각형
+    description: outline으로 테두리만 그립니다
+    content: |-
+      artist.rectangle([200, 50, 350, 150], outline='red', width=3)
+      canvas
+  - type: tip
+    content: xy는 [(x1, y1), (x2, y2)] 또는 [x1, y1, x2, y2] 형식 모두 가능합니다. width는 테두리 두께입니다. fill과 outline을 동시에 지정하면 테두리가 있는 채워진 사각형이 됩니다.
+
+- id: step3_ellipse
+  title: 3단계. 원과 타원 그리기
+  subtitle: ellipse()
+  blocks:
+  - type: text
+    content: ellipse() 메서드는 원 또는 타원을 그립니다. 지정한 사각형에 내접하는 타원이 그려집니다. 정사각형을 지정하면 원이 됩니다.
+  - type: code
+    language: python
+    title: 새 캔버스
+    description: 원 그리기용 캔버스입니다
+    content: |-
+      circleCanvas = Image.new('RGB', (400, 300), 'white')
+      drawer = ImageDraw.Draw(circleCanvas)
+      type(drawer)
+  - type: code
+    language: python
+    title: 원 그리기
+    description: 정사각형에 내접하는 원입니다
+    content: |-
+      drawer.ellipse([50, 50, 150, 150], fill='green')
+      circleCanvas
+  - type: code
+    language: python
+    title: 타원 그리기
+    description: 가로로 긴 타원입니다
+    content: |-
+      drawer.ellipse([200, 50, 380, 150], fill='orange', outline='black', width=2)
+      circleCanvas
+  - type: tip
+    content: ellipse()도 rectangle()과 같은 좌표 형식을 사용합니다. 지정한 사각형의 경계에 맞춰 타원이 그려집니다. 정사각형이면 완벽한 원이 됩니다.
+
+- id: step4_line
+  title: 4단계. 선 그리기
+  subtitle: line()
+  blocks:
+  - type: text
+    content: line() 메서드는 여러 점을 연결하는 선을 그립니다. 두 점을 연결하면 직선, 여러 점을 연결하면 꺾은선이 됩니다.
+  - type: code
+    language: python
+    title: 직선 그리기
+    description: 두 점을 연결합니다
+    content: |-
+      lineCanvas = Image.new('RGB', (400, 300), 'white')
+      pen = ImageDraw.Draw(lineCanvas)
+      pen.line([(50, 50), (350, 50)], fill='blue', width=3)
+      lineCanvas
+  - type: code
+    language: python
+    title: 꺾은선 그리기
+    description: 여러 점을 연결합니다
+    content: |-
+      points = [(50, 100), (150, 200), (250, 100), (350, 200)]
+      pen.line(points, fill='red', width=2)
+      lineCanvas
+  - type: code
+    language: python
+    title: 대각선들
+    description: 여러 선을 그립니다
+    content: |-
+      pen.line([(0, 0), (400, 300)], fill='gray', width=1)
+      pen.line([(400, 0), (0, 300)], fill='gray', width=1)
+      lineCanvas
+  - type: tip
+    content: line()은 연결된 선분들을 그립니다. 닫힌 도형을 만들려면 마지막 점을 첫 점과 같게 하거나 polygon()을 사용합니다.
+
+- id: step5_polygon
+  title: 5단계. 다각형 그리기
+  subtitle: polygon()
+  blocks:
+  - type: text
+    content: polygon() 메서드는 여러 점을 연결하여 닫힌 다각형을 그립니다. 삼각형, 오각형 등 원하는 모양을 만들 수 있습니다.
+  - type: code
+    language: python
+    title: 삼각형
+    description: 세 점으로 삼각형을 그립니다
+    content: |-
+      polyCanvas = Image.new('RGB', (400, 300), 'white')
+      brush = ImageDraw.Draw(polyCanvas)
+      triangle = [(200, 50), (100, 200), (300, 200)]
+      brush.polygon(triangle, fill='yellow', outline='black')
+      polyCanvas
+  - type: code
+    language: python
+    title: 오각형
+    description: 다섯 점으로 오각형을 그립니다
+    content: |-
+      import math
+      cx, cy, r = 200, 150, 80
+      pentagon = [(cx + r * math.cos(math.radians(90 + 72*i)),
+                   cy - r * math.sin(math.radians(90 + 72*i))) for i in range(5)]
+      brush.polygon(pentagon, fill='purple', outline='white', width=2)
+      polyCanvas
+  - type: tip
+    content: polygon()은 자동으로 마지막 점과 첫 점을 연결하여 닫힌 도형을 만듭니다. 정다각형은 중심점과 반지름으로 각 꼭짓점 좌표를 계산하면 됩니다.
+
+- id: step6_art
+  title: 6단계. 도형 아트 생성
+  subtitle: 종합 활용
+  blocks:
+  - type: text
+    content: 다양한 도형을 조합하여 추상 아트를 만들어봅시다. 랜덤 요소를 추가하면 매번 다른 결과가 나옵니다.
+  - type: code
+    language: python
+    title: 아트 캔버스
+    description: 어두운 배경의 캔버스입니다
+    content: |-
+      import random
+      artBoard = Image.new('RGB', (400, 300), (30, 30, 50))
+      artPen = ImageDraw.Draw(artBoard)
+      artBoard
+  - type: code
+    language: python
+    title: 랜덤 원 그리기
+    description: 크기와 색상이 다른 원들입니다
+    content: |-
+      random.seed(42)
+      for _ in range(20):
+          x = random.randint(0, 350)
+          y = random.randint(0, 250)
+          size = random.randint(20, 60)
+          color = (random.randint(100, 255), random.randint(100, 255), random.randint(100, 255))
+          artPen.ellipse([x, y, x+size, y+size], fill=color)
+      artBoard
+  - type: code
+    language: python
+    title: 선 추가
+    description: 대각선 패턴을 추가합니다
+    content: |-
+      for i in range(0, 400, 40):
+          artPen.line([(i, 0), (i+100, 300)], fill=(255, 255, 255, 50), width=1)
+      artBoard
+
+- id: practice
+  title: 실습
+  subtitle: 도형 아트 프로젝트
+  blocks:
+  - type: text
+    content: 자신만의 도형 아트를 만들어봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 체스판 패턴"
+    blocks:
+    - type: code
+      title: "캔버스 생성"
+      content: |-
+        from PIL import Image, ImageDraw
+
+        chessBoard = Image.new('RGB', (320, 320), 'white')
+        chessPen = ImageDraw.Draw(chessBoard)
+        chessBoard.size
+    - type: code
+      title: "체스판 그리기"
+      content: |-
+        cellSize = 40
+        for row in range(8):
+            for col in range(8):
+                if (row + col) % 2 == 1:
+                    x1, y1 = col * cellSize, row * cellSize
+                    x2, y2 = x1 + cellSize, y1 + cellSize
+                    chessPen.rectangle([x1, y1, x2, y2], fill='black')
+        chessBoard
+  - type: expansion
+    title: "미션2: 동심원 패턴"
+    blocks:
+    - type: code
+      title: "캔버스 생성"
+      content: |-
+        from PIL import Image, ImageDraw
+
+        circleArt = Image.new('RGB', (400, 400), 'navy')
+        circlePen = ImageDraw.Draw(circleArt)
+        circleArt.size
+    - type: code
+      title: "동심원 그리기"
+      content: |-
+        cx, cy = 200, 200
+        colors = ['red', 'orange', 'yellow', 'green', 'blue', 'purple']
+        for i, radius in enumerate(range(180, 0, -30)):
+            color = colors[i % len(colors)]
+            circlePen.ellipse([cx-radius, cy-radius, cx+radius, cy+radius], outline=color, width=5)
+        circleArt
+    - type: code
+      title: "중앙 원 채우기"
+      content: |-
+        circlePen.ellipse([cx-30, cy-30, cx+30, cy+30], fill='white')
+        circleArt

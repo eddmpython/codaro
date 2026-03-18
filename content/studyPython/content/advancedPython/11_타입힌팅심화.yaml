@@ -1,0 +1,800 @@
+meta:
+  id: "11"
+  title: "타입 힌팅 심화"
+  day: 11
+  category: "advancedPython"
+  tags: ["typing", "Generic", "TypeVar", "Protocol", "overload"]
+  seo:
+    title: "파이썬 타입 힌팅 심화 - Generic, TypeVar, Protocol 완벽 가이드"
+    description: "고급 타입 힌팅을 마스터합니다. Generic 클래스, TypeVar, Protocol, @overload, Callable 타입 힌팅."
+    keywords: ["Generic", "TypeVar", "Protocol", "overload", "Callable", "타입힌팅"]
+
+intro:
+  emoji: "🏷️"
+  points:
+  - "Generic과 TypeVar로 타입 파라미터화"
+  - "Protocol로 구조적 서브타이핑"
+  - "@overload로 함수 오버로딩 힌팅"
+  - "Callable로 함수 타입 표현"
+
+sections:
+- id: "generic_class"
+  title: "Generic 클래스"
+  subtitle: "타입 파라미터화"
+  blocks:
+  - type: "text"
+    content: "Generic은 타입을 파라미터로 받는 클래스를 정의합니다. List[int], Dict[str, int]처럼 구체적인 타입을 지정할 수 있게 합니다. typing.Generic을 상속받고 TypeVar로 정의한 타입 변수를 사용합니다. Generic 클래스는 여러 타입 파라미터를 가질 수 있습니다. 타입 체커(mypy, pyright)가 타입 일관성을 검증합니다. 런타임에는 타입 정보가 지워지지만(type erasure), 개발 시 타입 안전성을 보장합니다."
+  - type: "list"
+    items:
+    - "Generic[T]: 타입 파라미터 T를 가진 클래스"
+    - "TypeVar('T'): 타입 변수 정의"
+    - "여러 타입 파라미터: Generic[T, U, V]"
+    - "타입 체커가 일관성 검증"
+  - type: "code"
+    language: "python"
+    title: "기본 Generic"
+    description: "단일 타입 파라미터를 가진 Generic 클래스입니다."
+    content: |-
+      from typing import Generic, TypeVar
+
+      T = TypeVar('T')
+
+      class Box(Generic[T]):
+          def __init__(self, item: T):
+              self.item = item
+
+          def get(self) -> T:
+              return self.item
+
+      intBox: Box[int] = Box(42)
+      strBox: Box[str] = Box("hello")
+      intBox.get(), strBox.get()
+  - type: "code"
+    language: "python"
+    title: "다중 타입 파라미터"
+    description: "여러 타입 파라미터를 가진 Generic입니다."
+    content: |-
+      from typing import Generic, TypeVar
+
+      K = TypeVar('K')
+      V = TypeVar('V')
+
+      class Pair(Generic[K, V]):
+          def __init__(self, key: K, value: V):
+              self.key = key
+              self.value = value
+
+          def swap(self) -> 'Pair[V, K]':
+              return Pair(self.value, self.key)
+
+      pair: Pair[str, int] = Pair("age", 30)
+      swapped = pair.swap()
+      (pair.key, pair.value), (swapped.key, swapped.value)
+  - type: "code"
+    language: "python"
+    title: "Generic 스택"
+    description: "타입 안전한 스택 구현입니다."
+    content: |-
+      from typing import Generic, TypeVar, List
+
+      T = TypeVar('T')
+
+      class Stack(Generic[T]):
+          def __init__(self):
+              self._items: List[T] = []
+
+          def push(self, item: T) -> None:
+              self._items.append(item)
+
+          def pop(self) -> T:
+              return self._items.pop()
+
+          def isEmpty(self) -> bool:
+              return len(self._items) == 0
+
+      stack: Stack[int] = Stack()
+      stack.push(1)
+      stack.push(2)
+      stack.pop(), stack.pop()
+  - type: "tip"
+    content: "Python 3.9+에서는 list[int], dict[str, int]처럼 내장 타입을 직접 Generic으로 사용할 수 있습니다."
+
+- id: "typevar"
+  title: "TypeVar"
+  subtitle: "타입 변수"
+  blocks:
+  - type: "text"
+    content: "TypeVar는 타입 변수를 정의합니다. 함수나 클래스에서 같은 타입을 여러 곳에서 참조할 때 사용합니다. bound 파라미터로 상한 타입을 지정할 수 있습니다. constraints로 허용되는 타입을 제한할 수 있습니다. covariant=True는 공변성을, contravariant=True는 반공변성을 지정합니다. TypeVar는 타입 힌팅에만 사용되며 런타임에 영향을 주지 않습니다."
+  - type: "list"
+    items:
+    - "TypeVar('T'): 기본 타입 변수"
+    - "TypeVar('T', bound=Base): 상한 타입"
+    - "TypeVar('T', int, str): 허용 타입 제한"
+    - "covariant, contravariant: 변성 지정"
+  - type: "code"
+    language: "python"
+    title: "기본 TypeVar"
+    description: "입력과 출력 타입이 같음을 보장합니다."
+    content: |-
+      from typing import TypeVar, List
+
+      T = TypeVar('T')
+
+      def first(items: List[T]) -> T:
+          return items[0]
+
+      first([1, 2, 3]), first(["a", "b", "c"])
+  - type: "code"
+    language: "python"
+    title: "bound 사용"
+    description: "상한 타입을 지정합니다."
+    content: |-
+      from typing import TypeVar
+
+      class Comparable:
+          def compare(self, other: 'Comparable') -> int:
+              return 0
+
+      class Number(Comparable):
+          def __init__(self, value: int):
+              self.value = value
+
+          def compare(self, other: 'Number') -> int:
+              return self.value - other.value
+
+      T = TypeVar('T', bound=Comparable)
+
+      def maxItem(a: T, b: T) -> T:
+          return a if a.compare(b) > 0 else b
+
+      maxItem(Number(5), Number(3)).value
+  - type: "code"
+    language: "python"
+    title: "constraints 사용"
+    description: "허용되는 타입을 제한합니다."
+    content: |-
+      from typing import TypeVar
+
+      Number = TypeVar('Number', int, float)
+
+      def add(a: Number, b: Number) -> Number:
+          return a + b
+
+      add(1, 2), add(1.5, 2.5)
+  - type: "tip"
+    content: "bound는 해당 타입과 서브타입을 허용하고, constraints는 정확히 나열된 타입만 허용합니다."
+
+- id: "protocol_typing"
+  title: "Protocol"
+  subtitle: "구조적 서브타이핑"
+  blocks:
+  - type: "text"
+    content: "Protocol은 구조적 서브타이핑(structural subtyping)을 제공합니다. 명시적으로 상속하지 않아도 필요한 메서드를 가지면 해당 타입으로 인정됩니다. 덕 타이핑을 정적 타입 검사와 결합합니다. @runtime_checkable을 추가하면 isinstance()로 검사할 수 있습니다. Protocol에 속성, 메서드, 클래스 메서드를 정의할 수 있습니다. 기존 클래스를 수정하지 않고 타입 호환성을 만들 수 있습니다."
+  - type: "list"
+    items:
+    - "Protocol: 구조적 타입 정의"
+    - "명시적 상속 없이 타입 매칭"
+    - "@runtime_checkable: isinstance 지원"
+    - "기존 클래스와 호환"
+  - type: "code"
+    language: "python"
+    title: "Protocol 정의"
+    description: "메서드 시그니처로 인터페이스를 정의합니다."
+    content: |-
+      from typing import Protocol
+
+      class Renderable(Protocol):
+          def render(self) -> str:
+              ...
+
+      class Button:
+          def render(self) -> str:
+              return "<button>Click</button>"
+
+      class TextField:
+          def render(self) -> str:
+              return "<input type='text'/>"
+
+      def display(widget: Renderable) -> str:
+          return widget.render()
+
+      display(Button()), display(TextField())
+  - type: "code"
+    language: "python"
+    title: "runtime_checkable"
+    description: "런타임에 isinstance로 검사합니다."
+    content: |-
+      from typing import Protocol, runtime_checkable
+
+      @runtime_checkable
+      class Sized(Protocol):
+          def __len__(self) -> int:
+              ...
+
+      isinstance([1, 2, 3], Sized), isinstance("hello", Sized), isinstance(42, Sized)
+  - type: "code"
+    language: "python"
+    title: "Protocol with 속성"
+    description: "속성도 Protocol에 정의할 수 있습니다."
+    content: |-
+      from typing import Protocol
+
+      class Named(Protocol):
+          name: str
+
+      class User:
+          def __init__(self, name: str):
+              self.name = name
+
+      class Product:
+          def __init__(self):
+              self.name = "Widget"
+
+      def greet(obj: Named) -> str:
+          return f"Hello, {obj.name}"
+
+      greet(User("Alice")), greet(Product())
+  - type: "tip"
+    content: "@runtime_checkable은 메서드/속성 존재만 확인하며 시그니처는 검사하지 않습니다."
+
+- id: "overload"
+  title: "@overload"
+  subtitle: "함수 오버로딩"
+  blocks:
+  - type: "text"
+    content: "@overload 데코레이터는 함수의 여러 시그니처를 타입 체커에게 알려줍니다. 실제 구현은 @overload 없이 마지막에 정의합니다. @overload 함수는 런타임에 호출되지 않습니다. 입력 타입에 따라 다른 반환 타입을 명시할 때 유용합니다. Union 반환보다 더 정확한 타입 추론이 가능합니다. typing_extensions에서도 사용할 수 있습니다."
+  - type: "list"
+    items:
+    - "@overload: 시그니처 정의 (런타임 X)"
+    - "마지막에 실제 구현"
+    - "입력에 따른 반환 타입 분기"
+    - "Union보다 정확한 타입 추론"
+  - type: "code"
+    language: "python"
+    title: "기본 overload"
+    description: "인자 타입에 따른 반환 타입을 정의합니다."
+    content: |-
+      from typing import overload, Union
+
+      @overload
+      def process(x: int) -> int: ...
+
+      @overload
+      def process(x: str) -> str: ...
+
+      def process(x: Union[int, str]) -> Union[int, str]:
+          if isinstance(x, int):
+              return x * 2
+          return x.upper()
+
+      process(5), process("hello")
+  - type: "code"
+    language: "python"
+    title: "리터럴과 overload"
+    description: "Literal 타입과 함께 사용합니다."
+    content: |-
+      from typing import overload, Literal, List
+
+      @overload
+      def fetch(id: int, many: Literal[False] = False) -> dict: ...
+
+      @overload
+      def fetch(id: int, many: Literal[True]) -> List[dict]: ...
+
+      def fetch(id: int, many: bool = False):
+          if many:
+              return [{"id": id}, {"id": id + 1}]
+          return {"id": id}
+
+      fetch(1), fetch(1, True)
+  - type: "code"
+    language: "python"
+    title: "None 처리"
+    description: "Optional 반환을 정확히 표현합니다."
+    content: |-
+      from typing import overload, Optional
+
+      @overload
+      def getValue(key: str, default: None = None) -> Optional[int]: ...
+
+      @overload
+      def getValue(key: str, default: int) -> int: ...
+
+      def getValue(key: str, default: Optional[int] = None) -> Optional[int]:
+          data = {"a": 1, "b": 2}
+          return data.get(key, default)
+
+      getValue("a"), getValue("x"), getValue("x", 0)
+  - type: "tip"
+    content: "@overload 함수는 ...로 본문을 비워두고, 실제 구현만 런타임에 실행됩니다."
+
+- id: "callable"
+  title: "Callable"
+  subtitle: "함수 타입 힌팅"
+  blocks:
+  - type: "text"
+    content: "Callable은 호출 가능한 객체(함수, 메서드, 람다 등)의 타입을 표현합니다. Callable[[인자타입들], 반환타입] 형식으로 사용합니다. 인자가 없으면 Callable[[], 반환타입]입니다. 모든 인자를 허용하려면 Callable[..., 반환타입]을 사용합니다. 고차 함수(함수를 받거나 반환하는 함수)를 정의할 때 필수적입니다. ParamSpec을 사용하면 더 정교한 함수 시그니처를 표현할 수 있습니다."
+  - type: "list"
+    items:
+    - "Callable[[Arg1, Arg2], Return]"
+    - "Callable[[], Return]: 인자 없음"
+    - "Callable[..., Return]: 모든 인자 허용"
+    - "ParamSpec: 인자 시그니처 유지"
+  - type: "code"
+    language: "python"
+    title: "Callable 기본"
+    description: "함수를 인자로 받는 함수입니다."
+    content: |-
+      from typing import Callable, List
+
+      def applyToAll(func: Callable[[int], int], items: List[int]) -> List[int]:
+          return [func(x) for x in items]
+
+      applyToAll(lambda x: x * 2, [1, 2, 3, 4])
+  - type: "code"
+    language: "python"
+    title: "함수 반환"
+    description: "함수를 반환하는 함수입니다."
+    content: |-
+      from typing import Callable
+
+      def multiplier(n: int) -> Callable[[int], int]:
+          def inner(x: int) -> int:
+              return x * n
+          return inner
+
+      double = multiplier(2)
+      triple = multiplier(3)
+      double(5), triple(5)
+  - type: "code"
+    language: "python"
+    title: "콜백 패턴"
+    description: "콜백 함수를 타입 힌팅합니다."
+    content: |-
+      from typing import Callable, Optional
+
+      def fetchData(
+          url: str,
+          onSuccess: Callable[[dict], None],
+          onError: Optional[Callable[[str], None]] = None
+      ) -> None:
+          result = {"data": "sample", "url": url}
+          onSuccess(result)
+
+      results = []
+      fetchData("/api", lambda d: results.append(d["data"]))
+      results
+  - type: "tip"
+    content: "Python 3.10+에서는 Callable 대신 (int, str) -> bool 형식의 문법도 사용할 수 있습니다."
+
+- id: "advanced_types"
+  title: "고급 타입"
+  subtitle: "Union, Optional, Any"
+  blocks:
+  - type: "text"
+    content: "Union은 여러 타입 중 하나를 허용합니다. Optional[T]는 Union[T, None]의 축약입니다. Any는 모든 타입과 호환되며 타입 검사를 우회합니다. Python 3.10+에서는 X | Y 문법으로 Union을 대체할 수 있습니다. Never(NoReturn)는 함수가 정상적으로 반환하지 않음을 표시합니다. 이런 타입들을 적절히 조합하면 복잡한 타입도 표현할 수 있습니다."
+  - type: "list"
+    items:
+    - "Union[A, B]: A 또는 B"
+    - "Optional[T]: T 또는 None"
+    - "Any: 모든 타입 허용"
+    - "X | Y: Union의 Python 3.10+ 문법"
+  - type: "code"
+    language: "python"
+    title: "Union 사용"
+    description: "여러 타입 중 하나를 받습니다."
+    content: |-
+      from typing import Union, List
+
+      def normalize(value: Union[int, str, List[int]]) -> str:
+          if isinstance(value, int):
+              return str(value)
+          elif isinstance(value, str):
+              return value
+          else:
+              return ",".join(str(v) for v in value)
+
+      normalize(42), normalize("hello"), normalize([1, 2, 3])
+  - type: "code"
+    language: "python"
+    title: "Optional 사용"
+    description: "None이 될 수 있는 값입니다."
+    content: |-
+      from typing import Optional, Dict
+
+      def findUser(userId: int) -> Optional[Dict[str, str]]:
+          users = {1: {"name": "Alice"}, 2: {"name": "Bob"}}
+          return users.get(userId)
+
+      findUser(1), findUser(99)
+  - type: "code"
+    language: "python"
+    title: "| 연산자 (3.10+)"
+    description: "Union의 간편 문법입니다."
+    content: |-
+      def process(value: int | str | None) -> str:
+          if value is None:
+              return "empty"
+          return str(value)
+
+      process(42), process("hello"), process(None)
+  - type: "tip"
+    content: "Any는 타입 검사를 무력화하므로 꼭 필요한 경우에만 사용하세요."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "타입 힌팅 심화 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 11에서 배운 고급 타입 힌팅을 난이도별로 복습합니다. Generic과 TypeVar로 타입을 파라미터화하고, Protocol로 구조적 서브타이핑을 구현하며, @overload로 정밀한 함수 시그니처를 정의합니다. Callable은 고차 함수의 타입을 표현하는 핵심 도구입니다. 🟢 기본 문제로 Generic, Protocol, Callable의 기본 사용법을 익히고, 🟡 응용 문제로 bound TypeVar, Protocol 상속을 연습하세요. 🔴 심화 문제에서는 ParamSpec, TypeGuard, 재귀 타입 등 최신 타입 시스템을 다룹니다. 타입 힌팅은 IDE 지원, 버그 예방, 문서화 효과를 동시에 제공하므로 적극 활용하세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: Generic 박스"
+    code: |-
+      from typing import Generic, TypeVar
+
+      T = TypeVar('T')
+
+      class Container(Generic[T]):
+          def __init__(self, value: T):
+              self.value = value
+
+      Container(42).value, Container("hello").value
+
+  - type: "expansion"
+    title: "🟢 기본2: TypeVar 함수"
+    code: |-
+      from typing import TypeVar, List
+
+      T = TypeVar('T')
+
+      def last(items: List[T]) -> T:
+          return items[-1]
+
+      last([1, 2, 3]), last(["a", "b", "c"])
+
+  - type: "expansion"
+    title: "🟢 기본3: Protocol 정의"
+    code: |-
+      from typing import Protocol
+
+      class Drawable(Protocol):
+          def draw(self) -> str:
+              ...
+
+      class Circle:
+          def draw(self) -> str:
+              return "O"
+
+      def render(shape: Drawable) -> str:
+          return shape.draw()
+
+      render(Circle())
+
+  - type: "expansion"
+    title: "🟢 기본4: Callable 기본"
+    code: |-
+      from typing import Callable
+
+      def apply(f: Callable[[int], int], x: int) -> int:
+          return f(x)
+
+      apply(lambda x: x * 2, 5)
+
+  - type: "expansion"
+    title: "🟢 기본5: Optional"
+    code: |-
+      from typing import Optional
+
+      def divide(a: int, b: int) -> Optional[float]:
+          if b == 0:
+              return None
+          return a / b
+
+      divide(10, 2), divide(10, 0)
+
+  - type: "expansion"
+    title: "🟡 응용1: 다중 TypeVar"
+    code: |-
+      from typing import TypeVar, Tuple
+
+      T = TypeVar('T')
+      U = TypeVar('U')
+
+      def swap(pair: Tuple[T, U]) -> Tuple[U, T]:
+          return (pair[1], pair[0])
+
+      swap((1, "hello")), swap(("a", 3.14))
+
+  - type: "expansion"
+    title: "🟡 응용2: bound TypeVar"
+    code: |-
+      from typing import TypeVar, List
+
+      class Sortable:
+          def __init__(self, value: int):
+              self.value = value
+          def __lt__(self, other: 'Sortable') -> bool:
+              return self.value < other.value
+
+      T = TypeVar('T', bound=Sortable)
+
+      def minItem(items: List[T]) -> T:
+          return min(items, key=lambda x: x.value)
+
+      minItem([Sortable(3), Sortable(1), Sortable(2)]).value
+
+  - type: "expansion"
+    title: "🟡 응용3: Protocol 상속"
+    code: |-
+      from typing import Protocol
+
+      class Readable(Protocol):
+          def read(self) -> str: ...
+
+      class Writable(Protocol):
+          def write(self, data: str) -> None: ...
+
+      class ReadWritable(Readable, Writable, Protocol):
+          pass
+
+      class File:
+          def read(self) -> str:
+              return "content"
+          def write(self, data: str) -> None:
+              pass
+
+      def copy(src: Readable, dest: Writable) -> None:
+          dest.write(src.read())
+
+      f = File()
+      copy(f, f)
+      "success"
+
+  - type: "expansion"
+    title: "🟡 응용4: overload 패턴"
+    code: |-
+      from typing import overload, Union, List
+
+      @overload
+      def double(x: int) -> int: ...
+
+      @overload
+      def double(x: str) -> str: ...
+
+      @overload
+      def double(x: List[int]) -> List[int]: ...
+
+      def double(x: Union[int, str, List[int]]) -> Union[int, str, List[int]]:
+          if isinstance(x, int):
+              return x * 2
+          elif isinstance(x, str):
+              return x + x
+          else:
+              return [i * 2 for i in x]
+
+      double(5), double("ab"), double([1, 2])
+
+  - type: "expansion"
+    title: "🟡 응용5: 고차 함수"
+    code: |-
+      from typing import Callable, TypeVar
+
+      T = TypeVar('T')
+      R = TypeVar('R')
+
+      def compose(f: Callable[[T], R], g: Callable[[R], R]) -> Callable[[T], R]:
+          def composed(x: T) -> R:
+              return g(f(x))
+          return composed
+
+      double = lambda x: x * 2
+      addOne = lambda x: x + 1
+      composed = compose(double, addOne)
+      composed(5)
+
+  - type: "expansion"
+    title: "🔴 심화1: Generic 상속"
+    code: |-
+      from typing import Generic, TypeVar, List
+
+      T = TypeVar('T')
+
+      class Collection(Generic[T]):
+          def __init__(self):
+              self._items: List[T] = []
+
+          def add(self, item: T) -> None:
+              self._items.append(item)
+
+      class SortedCollection(Collection[T]):
+          def getAll(self) -> List[T]:
+              return sorted(self._items)
+
+      sc: SortedCollection[int] = SortedCollection()
+      sc.add(3)
+      sc.add(1)
+      sc.add(2)
+      sc.getAll()
+
+  - type: "expansion"
+    title: "🔴 심화2: Generic Protocol"
+    code: |-
+      from typing import Protocol, TypeVar, Generic
+
+      T = TypeVar('T')
+
+      class Repository(Protocol[T]):
+          def get(self, id: int) -> T: ...
+          def save(self, item: T) -> None: ...
+
+      class User:
+          def __init__(self, id: int, name: str):
+              self.id = id
+              self.name = name
+
+      class UserRepo:
+          def __init__(self):
+              self._data: dict = {}
+
+          def get(self, id: int) -> User:
+              return self._data.get(id, User(0, "unknown"))
+
+          def save(self, item: User) -> None:
+              self._data[item.id] = item
+
+      repo: Repository[User] = UserRepo()
+      repo.save(User(1, "Alice"))
+      repo.get(1).name
+
+  - type: "expansion"
+    title: "🔴 심화3: 복잡한 Callable"
+    code: |-
+      from typing import Callable, TypeVar, List
+
+      T = TypeVar('T')
+      R = TypeVar('R')
+
+      def mapWith(
+          transformer: Callable[[T], R]
+      ) -> Callable[[List[T]], List[R]]:
+          def inner(items: List[T]) -> List[R]:
+              return [transformer(x) for x in items]
+          return inner
+
+      toStr = mapWith(str)
+      doubled = mapWith(lambda x: x * 2)
+
+      toStr([1, 2, 3]), doubled([1, 2, 3])
+
+  - type: "expansion"
+    title: "🔴 심화4: 조건부 타입"
+    code: |-
+      from typing import TypeVar, overload, Literal
+
+      T = TypeVar('T')
+
+      @overload
+      def parse(data: str, asInt: Literal[True]) -> int: ...
+
+      @overload
+      def parse(data: str, asInt: Literal[False]) -> str: ...
+
+      def parse(data: str, asInt: bool = False):
+          if asInt:
+              return int(data)
+          return data
+
+      parse("42", True), parse("hello", False)
+
+  - type: "expansion"
+    title: "🔴 심화5: Self 타입"
+    code: |-
+      from typing import TypeVar
+
+      T = TypeVar('T', bound='Builder')
+
+      class Builder:
+          def __init__(self):
+              self._value = 0
+
+          def add(self: T, n: int) -> T:
+              self._value += n
+              return self
+
+          def multiply(self: T, n: int) -> T:
+              self._value *= n
+              return self
+
+          def build(self) -> int:
+              return self._value
+
+      Builder().add(5).multiply(2).add(3).build()
+
+  - type: "expansion"
+    title: "🔴 심화6: 재귀 타입"
+    code: |-
+      from typing import Dict, List, Union
+
+      JSON = Union[str, int, float, bool, None, List['JSON'], Dict[str, 'JSON']]
+
+      def countKeys(data: JSON, depth: int = 0) -> int:
+          if isinstance(data, dict):
+              return len(data) + sum(countKeys(v) for v in data.values())
+          elif isinstance(data, list):
+              return sum(countKeys(item) for item in data)
+          return 0
+
+      sample: JSON = {"a": 1, "b": {"c": 2, "d": [{"e": 3}]}}
+      countKeys(sample)
+
+  - type: "expansion"
+    title: "🔴 심화7: ParamSpec"
+    code: |-
+      from typing import TypeVar, Callable, ParamSpec
+
+      P = ParamSpec('P')
+      R = TypeVar('R')
+
+      def logged(func: Callable[P, R]) -> Callable[P, R]:
+          def wrapper(*args: P.args, **kwargs: P.kwargs) -> R:
+              result = func(*args, **kwargs)
+              return result
+          return wrapper
+
+      @logged
+      def add(a: int, b: int) -> int:
+          return a + b
+
+      add(1, 2)
+
+  - type: "expansion"
+    title: "🔴 심화8: TypeGuard"
+    code: |-
+      from typing import TypeGuard, List, Union
+
+      def isStrList(val: List[Union[str, int]]) -> TypeGuard[List[str]]:
+          return all(isinstance(x, str) for x in val)
+
+      def process(items: List[Union[str, int]]) -> str:
+          if isStrList(items):
+              return ",".join(items)
+          return str(sum(x for x in items if isinstance(x, int)))
+
+      process(["a", "b", "c"]), process([1, 2, 3])
+
+  - type: "expansion"
+    title: "🔴 심화9: 타입 별칭"
+    code: |-
+      from typing import Dict, List, Callable, TypeAlias
+
+      UserId: TypeAlias = int
+      UserName: TypeAlias = str
+      UserData: TypeAlias = Dict[str, str | int]
+      UserList: TypeAlias = List[UserData]
+      UserHandler: TypeAlias = Callable[[UserId], UserData]
+
+      def getUser(userId: UserId) -> UserData:
+          return {"id": userId, "name": "Alice"}
+
+      def processUsers(users: UserList) -> List[UserName]:
+          return [str(u.get("name", "")) for u in users]
+
+      processUsers([{"id": 1, "name": "Alice"}, {"id": 2, "name": "Bob"}])
+
+  - type: "expansion"
+    title: "🔴 심화10: Final과 ClassVar"
+    code: |-
+      from typing import Final, ClassVar
+
+      class Config:
+          VERSION: Final[str] = "1.0.0"
+          instanceCount: ClassVar[int] = 0
+
+          def __init__(self, name: str):
+              self.name: Final[str] = name
+              Config.instanceCount += 1
+
+      c1 = Config("app1")
+      c2 = Config("app2")
+      Config.VERSION, Config.instanceCount, c1.name

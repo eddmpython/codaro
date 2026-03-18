@@ -1,0 +1,756 @@
+meta:
+  id: "03"
+  title: "클로저와 상태 관리"
+  day: 3
+  category: "advancedPython"
+  tags: ["closure", "nonlocal", "상태관리", "메모이제이션"]
+  seo:
+    title: "파이썬 클로저와 상태 관리 - 함수형 프로그래밍 핵심"
+    description: "클로저의 정의와 동작 원리를 이해하고 상태 캡슐화, 메모이제이션 패턴을 마스터합니다."
+    keywords: ["closure", "클로저", "nonlocal", "메모이제이션", "상태관리"]
+
+intro:
+  emoji: "🔒"
+  points:
+  - "클로저의 정의와 자유 변수 개념"
+  - "nonlocal 키워드로 외부 스코프 변수 수정"
+  - "클로저를 이용한 상태 캡슐화 패턴"
+  - "메모이제이션으로 성능 최적화"
+
+sections:
+- id: "closure_definition"
+  title: "클로저 정의"
+  subtitle: "자유 변수를 기억하는 함수"
+  blocks:
+  - type: "text"
+    content: "클로저(Closure)는 자신이 정의된 스코프의 변수를 기억하는 함수입니다. 내부 함수가 외부 함수의 지역 변수를 참조하면, 외부 함수가 종료되어도 그 변수가 메모리에 유지됩니다. 이렇게 내부 함수에 의해 참조되는 외부 변수를 '자유 변수(free variable)'라고 합니다. 파이썬에서 클로저는 함수 객체의 __closure__ 속성에 셀(cell) 객체로 자유 변수를 저장합니다. 클로저는 데이터를 함수와 함께 묶어두는 방법으로, 객체지향의 인스턴스와 유사한 역할을 할 수 있습니다."
+  - type: "list"
+    items:
+    - "클로저 = 자유 변수를 기억하는 함수"
+    - "외부 함수 종료 후에도 변수 유지"
+    - "__closure__에 셀 객체로 저장"
+    - "데이터와 함수를 함께 캡슐화"
+  - type: "code"
+    language: "python"
+    title: "기본 클로저 구조"
+    description: "외부 함수의 변수를 기억하는 내부 함수입니다."
+    content: |-
+      def outer(x):
+          def inner(y):
+              return x + y
+          return inner
+
+      addFive = outer(5)
+      addFive(3)
+  - type: "code"
+    language: "python"
+    title: "__closure__ 확인"
+    description: "클로저가 저장한 자유 변수를 확인합니다."
+    content: |-
+      def makeMultiplier(n):
+          def multiplier(x):
+              return x * n
+          return multiplier
+
+      triple = makeMultiplier(3)
+      triple.__closure__[0].cell_contents
+  - type: "code"
+    language: "python"
+    title: "여러 자유 변수"
+    description: "여러 변수를 캡처하는 클로저입니다."
+    content: |-
+      def createCalculator(a, b):
+          def calculate(op):
+              if op == "+":
+                  return a + b
+              elif op == "*":
+                  return a * b
+              return 0
+          return calculate
+
+      calc = createCalculator(10, 5)
+      calc("+"), calc("*")
+  - type: "tip"
+    content: "클로저는 함수가 일급 객체인 언어에서 강력한 패턴입니다. 데코레이터도 클로저를 활용합니다."
+
+- id: "state_encapsulation"
+  title: "상태 캡슐화"
+  subtitle: "프라이빗 변수 흉내내기"
+  blocks:
+  - type: "text"
+    content: "클로저를 사용하면 외부에서 직접 접근할 수 없는 '프라이빗' 상태를 만들 수 있습니다. 외부 함수의 지역 변수는 반환된 내부 함수를 통해서만 접근하거나 수정할 수 있습니다. 이 패턴은 데이터 은닉(data hiding)을 구현하는 함수형 프로그래밍 방식입니다. 클래스의 프라이빗 속성과 유사하지만 더 간결하게 표현할 수 있습니다. 카운터, 누산기, 토글 등 간단한 상태 관리에 자주 사용됩니다."
+  - type: "list"
+    items:
+    - "외부에서 직접 접근 불가능한 변수"
+    - "내부 함수를 통해서만 조작"
+    - "데이터 은닉 패턴"
+    - "간단한 상태 관리에 적합"
+  - type: "code"
+    language: "python"
+    title: "카운터 클로저"
+    description: "외부에서 직접 수정할 수 없는 카운터입니다."
+    content: |-
+      def makeCounter():
+          count = 0
+          def counter():
+              nonlocal count
+              count += 1
+              return count
+          return counter
+
+      counter1 = makeCounter()
+      counter1(), counter1(), counter1()
+  - type: "code"
+    language: "python"
+    title: "누산기 클로저"
+    description: "값을 누적하는 함수입니다."
+    content: |-
+      def makeAccumulator(initial=0):
+          total = initial
+          def accumulate(value):
+              nonlocal total
+              total += value
+              return total
+          return accumulate
+
+      acc = makeAccumulator(100)
+      acc(10), acc(20), acc(30)
+  - type: "code"
+    language: "python"
+    title: "토글 클로저"
+    description: "상태를 번갈아 전환합니다."
+    content: |-
+      def makeToggle():
+          state = False
+          def toggle():
+              nonlocal state
+              state = not state
+              return state
+          return toggle
+
+      toggle = makeToggle()
+      toggle(), toggle(), toggle()
+  - type: "tip"
+    content: "복잡한 상태 관리가 필요하면 클래스를 사용하세요. 클로저는 간단한 경우에 적합합니다."
+
+- id: "factory_pattern"
+  title: "팩토리 패턴"
+  subtitle: "함수 생성기"
+  blocks:
+  - type: "text"
+    content: "클로저는 특정 설정이 적용된 함수를 생성하는 팩토리로 활용됩니다. 외부 함수가 설정값을 받아 그 값이 적용된 함수를 반환합니다. 이 패턴은 비슷한 동작을 하지만 세부 설정이 다른 여러 함수를 만들 때 유용합니다. 예를 들어 특정 진법으로 변환하는 함수, 특정 형식으로 포맷팅하는 함수 등을 팩토리로 생성할 수 있습니다. 팩토리 패턴은 코드 재사용성을 높이고 설정의 분리를 가능하게 합니다."
+  - type: "list"
+    items:
+    - "설정값이 적용된 함수 생성"
+    - "비슷하지만 다른 여러 함수 생성"
+    - "코드 재사용성 향상"
+    - "설정과 동작의 분리"
+  - type: "code"
+    language: "python"
+    title: "포맷터 팩토리"
+    description: "다양한 형식의 포맷터를 생성합니다."
+    content: |-
+      def makeFormatter(template):
+          def formatter(value):
+              return template.format(value=value)
+          return formatter
+
+      dollarFormat = makeFormatter("${value:.2f}")
+      percentFormat = makeFormatter("{value:.1%}")
+      dollarFormat(1234.5), percentFormat(0.856)
+  - type: "code"
+    language: "python"
+    title: "필터 팩토리"
+    description: "조건에 맞는 필터 함수를 생성합니다."
+    content: |-
+      def makeRangeFilter(minVal, maxVal):
+          def rangeFilter(x):
+              return minVal <= x <= maxVal
+          return rangeFilter
+
+      teenFilter = makeRangeFilter(13, 19)
+      adultFilter = makeRangeFilter(20, 64)
+      teenFilter(15), adultFilter(30)
+  - type: "code"
+    language: "python"
+    title: "연산자 팩토리"
+    description: "다양한 연산 함수를 생성합니다."
+    content: |-
+      def makeOperator(op):
+          operators = {
+              "+": lambda a, b: a + b,
+              "-": lambda a, b: a - b,
+              "*": lambda a, b: a * b,
+              "/": lambda a, b: a / b if b != 0 else None
+          }
+          return operators.get(op, lambda a, b: None)
+
+      adder = makeOperator("+")
+      multiplier = makeOperator("*")
+      adder(10, 5), multiplier(10, 5)
+  - type: "tip"
+    content: "functools.partial도 비슷한 역할을 하지만, 클로저는 더 복잡한 로직을 캡슐화할 수 있습니다."
+
+- id: "memoization"
+  title: "메모이제이션"
+  subtitle: "결과 캐싱으로 성능 최적화"
+  blocks:
+  - type: "text"
+    content: "메모이제이션(Memoization)은 함수 호출 결과를 저장하여 같은 인자로 다시 호출될 때 저장된 결과를 반환하는 최적화 기법입니다. 클로저를 사용하면 캐시를 함수와 함께 캡슐화할 수 있습니다. 재귀 함수에서 특히 효과적이며, 피보나치 수열 같은 중복 계산이 많은 알고리즘의 성능을 극적으로 향상시킵니다. 실제로는 functools.lru_cache를 사용하는 것이 더 편리하지만, 원리를 이해하는 것이 중요합니다."
+  - type: "list"
+    items:
+    - "동일 인자에 대한 결과 캐싱"
+    - "중복 계산 방지로 성능 향상"
+    - "재귀 함수 최적화에 효과적"
+    - "functools.lru_cache의 원리"
+  - type: "code"
+    language: "python"
+    title: "기본 메모이제이션"
+    description: "클로저로 캐시를 구현합니다."
+    content: |-
+      def memoize(func):
+          cache = {}
+          def wrapper(*args):
+              if args not in cache:
+                  cache[args] = func(*args)
+              return cache[args]
+          wrapper.cache = cache
+          return wrapper
+
+      @memoize
+      def slowAdd(a, b):
+          return a + b
+
+      slowAdd(1, 2), slowAdd(1, 2), slowAdd.cache
+  - type: "code"
+    language: "python"
+    title: "피보나치 메모이제이션"
+    description: "재귀 피보나치를 최적화합니다."
+    content: |-
+      def memoFib(func):
+          memo = {}
+          def wrapper(n):
+              if n not in memo:
+                  memo[n] = func(n)
+              return memo[n]
+          wrapper.memo = memo
+          return wrapper
+
+      @memoFib
+      def fib(n):
+          if n < 2:
+              return n
+          return fib(n - 1) + fib(n - 2)
+
+      fib(30), len(fib.memo)
+  - type: "code"
+    language: "python"
+    title: "제한된 캐시"
+    description: "최대 크기가 있는 캐시를 구현합니다."
+    content: |-
+      def limitedCache(maxSize):
+          def decorator(func):
+              cache = {}
+              keys = []
+              def wrapper(*args):
+                  if args in cache:
+                      return cache[args]
+                  result = func(*args)
+                  if len(keys) >= maxSize:
+                      oldest = keys.pop(0)
+                      del cache[oldest]
+                  cache[args] = result
+                  keys.append(args)
+                  return result
+              wrapper.cache = cache
+              return wrapper
+          return decorator
+
+      @limitedCache(3)
+      def compute(x):
+          return x ** 2
+
+      compute(1), compute(2), compute(3), compute(4)
+      compute.cache
+  - type: "tip"
+    content: "실무에서는 @functools.lru_cache를 사용하세요. 스레드 안전하고 더 많은 기능을 제공합니다."
+
+- id: "nonlocal_keyword"
+  title: "nonlocal 키워드"
+  subtitle: "외부 스코프 변수 수정"
+  blocks:
+  - type: "text"
+    content: "nonlocal 키워드는 내부 함수에서 외부 함수의 지역 변수를 수정할 때 사용합니다. 파이썬에서 변수에 값을 할당하면 기본적으로 가장 가까운 스코프에 새 변수를 생성합니다. nonlocal을 사용하면 바깥 스코프의 기존 변수를 참조하여 수정할 수 있습니다. global은 모듈 수준의 전역 변수를, nonlocal은 감싸고 있는 함수의 지역 변수를 수정합니다. 클로저에서 상태를 변경해야 할 때 필수적입니다."
+  - type: "list"
+    items:
+    - "외부 함수의 지역 변수 수정에 사용"
+    - "할당 시 새 변수 생성 방지"
+    - "global과 달리 가장 가까운 외부 스코프"
+    - "클로저에서 상태 변경에 필수"
+  - type: "code"
+    language: "python"
+    title: "nonlocal 없이 문제"
+    description: "nonlocal 없이는 외부 변수를 수정할 수 없습니다."
+    content: |-
+      def outerBad():
+          count = 0
+          def inner():
+              count = count + 1
+              return count
+          return inner
+
+      try:
+          badCounter = outerBad()
+          badCounter()
+      except UnboundLocalError as e:
+          str(e)[:50]
+  - type: "code"
+    language: "python"
+    title: "nonlocal로 해결"
+    description: "nonlocal로 외부 변수를 수정합니다."
+    content: |-
+      def outerGood():
+          count = 0
+          def inner():
+              nonlocal count
+              count = count + 1
+              return count
+          return inner
+
+      goodCounter = outerGood()
+      goodCounter(), goodCounter(), goodCounter()
+  - type: "code"
+    language: "python"
+    title: "여러 변수에 nonlocal"
+    description: "여러 외부 변수를 수정합니다."
+    content: |-
+      def createStats():
+          total = 0
+          count = 0
+          def addValue(value):
+              nonlocal total, count
+              total += value
+              count += 1
+              return total / count if count > 0 else 0
+          return addValue
+
+      avgCalc = createStats()
+      avgCalc(10), avgCalc(20), avgCalc(30)
+  - type: "tip"
+    content: "nonlocal 없이도 리스트나 딕셔너리 같은 가변 객체의 내용은 수정할 수 있습니다."
+
+- id: "closure_vs_class"
+  title: "클로저 vs 클래스"
+  subtitle: "언제 무엇을 사용할까"
+  blocks:
+  - type: "text"
+    content: "클로저와 클래스는 둘 다 상태를 캡슐화할 수 있습니다. 클로저는 단일 동작과 간단한 상태에 적합하고, 클래스는 여러 메서드와 복잡한 상태에 적합합니다. 클로저는 코드가 더 간결하고 함수형 스타일에 맞지만, 디버깅이 어려울 수 있습니다. 클래스는 명시적이고 확장성이 좋으며, 타입 힌팅과 IDE 지원이 더 좋습니다. 콜백이나 데코레이터처럼 함수를 인자로 전달해야 하는 경우에는 클로저가 자연스럽습니다."
+  - type: "list"
+    items:
+    - "클로저: 단일 동작, 간단한 상태, 함수형 스타일"
+    - "클래스: 여러 메서드, 복잡한 상태, 확장성"
+    - "클로저: 콜백, 데코레이터에 자연스러움"
+    - "클래스: 명시적, 디버깅 용이"
+  - type: "code"
+    language: "python"
+    title: "클로저 버전 카운터"
+    description: "클로저로 구현한 카운터입니다."
+    content: |-
+      def makeClosureCounter():
+          value = 0
+          def increment():
+              nonlocal value
+              value += 1
+              return value
+          def get():
+              return value
+          return increment, get
+
+      inc, get = makeClosureCounter()
+      inc(), inc(), get()
+  - type: "code"
+    language: "python"
+    title: "클래스 버전 카운터"
+    description: "클래스로 구현한 동일한 카운터입니다."
+    content: |-
+      class ClassCounter:
+          def __init__(self):
+              self.value = 0
+
+          def increment(self):
+              self.value += 1
+              return self.value
+
+          def get(self):
+              return self.value
+
+      clsCounter = ClassCounter()
+      clsCounter.increment(), clsCounter.increment(), clsCounter.get()
+  - type: "code"
+    language: "python"
+    title: "callable 클래스"
+    description: "__call__로 함수처럼 동작하는 클래스입니다."
+    content: |-
+      class CallableCounter:
+          def __init__(self):
+              self.count = 0
+
+          def __call__(self):
+              self.count += 1
+              return self.count
+
+      callCounter = CallableCounter()
+      callCounter(), callCounter(), callCounter.count
+  - type: "tip"
+    content: "상태가 하나이고 동작도 하나라면 클로저, 그 외에는 클래스를 고려하세요."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "클로저와 상태 관리 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 3에서 배운 클로저와 상태 관리를 난이도별로 복습합니다. 클로저는 외부 함수의 변수를 기억하는 내부 함수로, 상태를 캡슐화하는 핵심 메커니즘입니다. nonlocal 키워드로 외부 변수를 수정하고, 이를 활용해 카운터, 캐시, 팩토리 등을 만들 수 있습니다. 🟢 기본 문제로 클로저 생성과 변수 캡처를 익히고, 🟡 응용 문제로 상태 관리 패턴을 연습하세요. 🔴 심화 문제에서는 메모이제이션, 지연 평가, 데코레이터 구현 등 고급 활용법을 다룹니다. 클로저를 이해하면 데코레이터, 콜백, 이벤트 핸들러 등 고급 패턴의 동작 원리가 명확해집니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 클로저"
+    code: |-
+      def greetMaker(greeting):
+          def greet(name):
+              return f"{greeting}, {name}!"
+          return greet
+
+      sayHello = greetMaker("Hello")
+      sayHello("World")
+
+  - type: "expansion"
+    title: "🟢 기본2: 자유 변수 확인"
+    code: |-
+      def power(exp):
+          def raise_to(base):
+              return base ** exp
+          return raise_to
+
+      square = power(2)
+      square.__closure__[0].cell_contents
+
+  - type: "expansion"
+    title: "🟢 기본3: 기본 카운터"
+    code: |-
+      def counter():
+          n = 0
+          def inc():
+              nonlocal n
+              n += 1
+              return n
+          return inc
+
+      myCounter = counter()
+      myCounter(), myCounter(), myCounter()
+
+  - type: "expansion"
+    title: "🟢 기본4: 값 기억하기"
+    code: |-
+      def remember(val):
+          def recall():
+              return val
+          return recall
+
+      r = remember(42)
+      r()
+
+  - type: "expansion"
+    title: "🟢 기본5: 팩토리 패턴"
+    code: |-
+      def makePrefixer(prefix):
+          def prefixer(text):
+              return prefix + text
+          return prefixer
+
+      addHash = makePrefixer("#")
+      addHash("python")
+
+  - type: "expansion"
+    title: "🟡 응용1: 히스토리 저장"
+    code: |-
+      def makeHistory():
+          history = []
+          def record(value):
+              history.append(value)
+              return history[:]
+          return record
+
+      hist = makeHistory()
+      hist(1), hist(2), hist(3)
+
+  - type: "expansion"
+    title: "🟡 응용2: 범위 검증기"
+    code: |-
+      def makeValidator(minV, maxV):
+          def validate(value):
+              return minV <= value <= maxV
+          return validate
+
+      isPercent = makeValidator(0, 100)
+      isPercent(50), isPercent(150)
+
+  - type: "expansion"
+    title: "🟡 응용3: 평균 계산기"
+    code: |-
+      def makeAverager():
+          total = 0
+          count = 0
+          def average(newValue):
+              nonlocal total, count
+              total += newValue
+              count += 1
+              return total / count
+          return average
+
+      avg = makeAverager()
+      avg(10), avg(20), avg(30)
+
+  - type: "expansion"
+    title: "🟡 응용4: 상태 토글"
+    code: |-
+      def makeSwitch(states):
+          idx = 0
+          def switch():
+              nonlocal idx
+              result = states[idx]
+              idx = (idx + 1) % len(states)
+              return result
+          return switch
+
+      traffic = makeSwitch(["red", "yellow", "green"])
+      traffic(), traffic(), traffic(), traffic()
+
+  - type: "expansion"
+    title: "🟡 응용5: 지연 실행"
+    code: |-
+      def defer(func, *args, **kwargs):
+          def execute():
+              return func(*args, **kwargs)
+          return execute
+
+      def addThree(a, b, c):
+          return a + b + c
+
+      delayed = defer(addThree, 1, 2, 3)
+      delayed()
+
+  - type: "expansion"
+    title: "🔴 심화1: 메모이제이션 직접 구현"
+    code: |-
+      def memo(fn):
+          cache = {}
+          def wrapped(*args):
+              if args not in cache:
+                  cache[args] = fn(*args)
+              return cache[args]
+          wrapped.cache = cache
+          return wrapped
+
+      @memo
+      def factorial(n):
+          if n <= 1:
+              return 1
+          return n * factorial(n - 1)
+
+      factorial(10), len(factorial.cache)
+
+  - type: "expansion"
+    title: "🔴 심화2: 다중 상태 관리"
+    code: |-
+      def makeBank(initial):
+          balance = initial
+          transactions = []
+          def deposit(amount):
+              nonlocal balance
+              balance += amount
+              transactions.append(("deposit", amount))
+              return balance
+          def withdraw(amount):
+              nonlocal balance
+              if amount <= balance:
+                  balance -= amount
+                  transactions.append(("withdraw", amount))
+                  return balance
+              return None
+          def history():
+              return transactions[:]
+          return deposit, withdraw, history
+
+      dep, wit, hist = makeBank(100)
+      dep(50), wit(30), hist()
+
+  - type: "expansion"
+    title: "🔴 심화3: 제한된 호출"
+    code: |-
+      def limitCalls(maxCalls):
+          def decorator(func):
+              calls = 0
+              def wrapper(*args, **kwargs):
+                  nonlocal calls
+                  if calls >= maxCalls:
+                      return None
+                  calls += 1
+                  return func(*args, **kwargs)
+              wrapper.getCalls = lambda: calls
+              return wrapper
+          return decorator
+
+      @limitCalls(3)
+      def greetOnce(name):
+          return f"Hello, {name}"
+
+      greetOnce("A"), greetOnce("B"), greetOnce("C"), greetOnce("D")
+
+  - type: "expansion"
+    title: "🔴 심화4: 체인 클로저"
+    code: |-
+      def chain():
+          funcs = []
+          def add(fn):
+              funcs.append(fn)
+              return chain_call
+          def chain_call(value):
+              result = value
+              for fn in funcs:
+                  result = fn(result)
+              return result
+          chain_call.add = add
+          return chain_call
+
+      ch = chain()
+      ch.add(lambda x: x + 1).add(lambda x: x * 2).add(lambda x: x ** 2)
+      ch(5)
+
+  - type: "expansion"
+    title: "🔴 심화5: 이벤트 핸들러"
+    code: |-
+      def eventEmitter():
+          handlers = {}
+          def on(event, handler):
+              if event not in handlers:
+                  handlers[event] = []
+              handlers[event].append(handler)
+          def emit(event, *args):
+              results = []
+              for handler in handlers.get(event, []):
+                  results.append(handler(*args))
+              return results
+          return on, emit
+
+      on, emit = eventEmitter()
+      on("click", lambda x: x * 2)
+      on("click", lambda x: x + 10)
+      emit("click", 5)
+
+  - type: "expansion"
+    title: "🔴 심화6: 상태 머신"
+    code: |-
+      def stateMachine(initial, transitions):
+          state = initial
+          def transition(action):
+              nonlocal state
+              key = (state, action)
+              if key in transitions:
+                  state = transitions[key]
+              return state
+          transition.getState = lambda: state
+          return transition
+
+      trans = {
+          ("idle", "start"): "running",
+          ("running", "pause"): "paused",
+          ("paused", "resume"): "running",
+          ("running", "stop"): "idle"
+      }
+      sm = stateMachine("idle", trans)
+      sm("start"), sm("pause"), sm("resume"), sm("stop")
+
+  - type: "expansion"
+    title: "🔴 심화7: 캐시 만료"
+    code: |-
+      def expiringCache(maxAge):
+          import time
+          cache = {}
+          def memoize(func):
+              def wrapper(*args):
+                  now = time.time()
+                  if args in cache:
+                      value, timestamp = cache[args]
+                      if now - timestamp < maxAge:
+                          return value
+                  result = func(*args)
+                  cache[args] = (result, now)
+                  return result
+              wrapper.cache = cache
+              return wrapper
+          return memoize
+
+      @expiringCache(10)
+      def compute(x):
+          return x ** 2
+
+      compute(5), len(compute.cache)
+
+  - type: "expansion"
+    title: "🔴 심화8: 재귀 제한"
+    code: |-
+      def withRecursionLimit(maxDepth):
+          def decorator(func):
+              depth = 0
+              def wrapper(*args, **kwargs):
+                  nonlocal depth
+                  if depth >= maxDepth:
+                      raise RecursionError(f"Max depth {maxDepth} exceeded")
+                  depth += 1
+                  try:
+                      return func(*args, **kwargs)
+                  finally:
+                      depth -= 1
+              return wrapper
+          return decorator
+
+      @withRecursionLimit(5)
+      def countDown(n):
+          if n <= 0:
+              return "done"
+          return countDown(n - 1)
+
+      countDown(3)
+
+  - type: "expansion"
+    title: "🔴 심화9: 속성 래퍼"
+    code: |-
+      def privateAttr(initial):
+          value = initial
+          def getter():
+              return value
+          def setter(newVal):
+              nonlocal value
+              value = newVal
+              return value
+          return getter, setter
+
+      getAge, setAge = privateAttr(25)
+      getAge(), setAge(30), getAge()
+
+  - type: "expansion"
+    title: "🔴 심화10: 커링 구현"
+    code: |-
+      def curry(func, arity):
+          collected = []
+          def curried(arg):
+              collected.append(arg)
+              if len(collected) == arity:
+                  return func(*collected)
+              return curried
+          return curried
+
+      def addFour(a, b, c, d):
+          return a + b + c + d
+
+      curriedAdd = curry(addFour, 4)
+      curriedAdd(1)(2)(3)(4)

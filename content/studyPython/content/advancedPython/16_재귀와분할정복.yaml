@@ -1,0 +1,668 @@
+meta:
+  id: "16"
+  title: "재귀와 분할정복"
+  day: 16
+  category: "advancedPython"
+  tags: ["recursion", "divide and conquer", "memoization", "fibonacci"]
+  seo:
+    title: "파이썬 재귀와 분할정복 - 알고리즘의 기초"
+    description: "재귀 함수와 분할정복 패턴을 마스터합니다. 메모이제이션, 꼬리 재귀, 반복 변환까지."
+    keywords: ["재귀", "분할정복", "memoization", "fibonacci", "recursion"]
+
+intro:
+  emoji: "🔁"
+  points:
+  - "재귀 함수의 기저 조건과 재귀 조건"
+  - "메모이제이션으로 중복 계산 제거"
+  - "분할정복 패턴 이해"
+  - "재귀를 반복으로 변환"
+
+sections:
+- id: "recursion_basics"
+  title: "재귀 기초"
+  subtitle: "자기 자신을 호출"
+  blocks:
+  - type: "text"
+    content: "재귀(recursion)는 함수가 자기 자신을 호출하는 기법입니다. 모든 재귀 함수는 두 가지 요소가 필요합니다. 기저 조건(base case)은 재귀를 멈추는 조건입니다. 재귀 조건(recursive case)은 문제를 더 작은 부분으로 나누어 자신을 호출합니다. 기저 조건이 없으면 무한 재귀에 빠집니다. 파이썬의 기본 재귀 제한은 약 1000입니다. sys.setrecursionlimit()으로 늘릴 수 있지만 권장하지 않습니다."
+  - type: "list"
+    items:
+    - "기저 조건: 재귀 종료 조건"
+    - "재귀 조건: 자신을 호출"
+    - "문제를 더 작은 부분으로 분해"
+    - "파이썬 재귀 제한: ~1000"
+  - type: "code"
+    language: "python"
+    title: "카운트다운"
+    description: "간단한 재귀 예제입니다."
+    content: |-
+      def countdown(n):
+          if n <= 0:
+              return []
+          return [n] + countdown(n - 1)
+
+      countdown(5)
+  - type: "code"
+    language: "python"
+    title: "합계 계산"
+    description: "리스트 합을 재귀로 계산합니다."
+    content: |-
+      def recursiveSum(lst):
+          if not lst:
+              return 0
+          return lst[0] + recursiveSum(lst[1:])
+
+      recursiveSum([1, 2, 3, 4, 5])
+  - type: "code"
+    language: "python"
+    title: "재귀 제한 확인"
+    description: "현재 재귀 제한을 확인합니다."
+    content: |-
+      import sys
+      sys.getrecursionlimit()
+  - type: "tip"
+    content: "재귀가 깊어지면 스택 오버플로가 발생합니다. 반복으로 변환하거나 꼬리 재귀를 고려하세요."
+
+- id: "factorial_fibonacci"
+  title: "팩토리얼과 피보나치"
+  subtitle: "전형적인 재귀 예제"
+  blocks:
+  - type: "text"
+    content: "팩토리얼(n!)과 피보나치 수열은 재귀의 대표적인 예제입니다. 팩토리얼은 n! = n × (n-1)!이고, 0! = 1입니다. 피보나치는 F(n) = F(n-1) + F(n-2)이고, F(0) = 0, F(1) = 1입니다. 단순 피보나치 재귀는 지수 시간 복잡도 O(2^n)입니다. 같은 값을 여러 번 계산하기 때문입니다. 메모이제이션으로 O(n)으로 최적화할 수 있습니다."
+  - type: "list"
+    items:
+    - "팩토리얼: n! = n × (n-1)!, 0! = 1"
+    - "피보나치: F(n) = F(n-1) + F(n-2)"
+    - "단순 재귀: O(2^n) 지수 복잡도"
+    - "메모이제이션: O(n)으로 개선"
+  - type: "code"
+    language: "python"
+    title: "팩토리얼"
+    description: "재귀로 팩토리얼을 계산합니다."
+    content: |-
+      def factorial(n):
+          if n <= 1:
+              return 1
+          return n * factorial(n - 1)
+
+      factorial(5), factorial(10)
+  - type: "code"
+    language: "python"
+    title: "피보나치 (단순)"
+    description: "단순 재귀 피보나치입니다."
+    content: |-
+      def fibSimple(n):
+          if n <= 1:
+              return n
+          return fibSimple(n - 1) + fibSimple(n - 2)
+
+      [fibSimple(i) for i in range(10)]
+  - type: "code"
+    language: "python"
+    title: "호출 횟수 확인"
+    description: "단순 재귀의 비효율을 확인합니다."
+    content: |-
+      callCount = 0
+
+      def fibCount(n):
+          global callCount
+          callCount += 1
+          if n <= 1:
+              return n
+          return fibCount(n - 1) + fibCount(n - 2)
+
+      callCount = 0
+      fibCount(20)
+      callCount
+  - type: "tip"
+    content: "fib(5) 계산 시 fib(2)가 3번, fib(1)이 5번 호출됩니다."
+
+- id: "memoization"
+  title: "메모이제이션"
+  subtitle: "결과 캐싱"
+  blocks:
+  - type: "text"
+    content: "메모이제이션은 이미 계산한 결과를 저장하여 재사용하는 기법입니다. 중복 계산을 제거하여 시간 복잡도를 크게 줄입니다. 딕셔너리로 직접 구현하거나 functools.lru_cache를 사용합니다. lru_cache는 데코레이터로 간편하게 적용할 수 있습니다. 피보나치의 경우 O(2^n)에서 O(n)으로 개선됩니다. 공간은 O(n)을 추가로 사용합니다."
+  - type: "list"
+    items:
+    - "계산 결과를 저장하여 재사용"
+    - "딕셔너리 또는 lru_cache 사용"
+    - "시간 복잡도 크게 개선"
+    - "공간 복잡도 O(n) 추가"
+  - type: "code"
+    language: "python"
+    title: "수동 메모이제이션"
+    description: "딕셔너리로 결과를 캐싱합니다."
+    content: |-
+      def fibMemo(n, cache=None):
+          if cache is None:
+              cache = {}
+          if n in cache:
+              return cache[n]
+          if n <= 1:
+              return n
+          cache[n] = fibMemo(n - 1, cache) + fibMemo(n - 2, cache)
+          return cache[n]
+
+      fibMemo(50)
+  - type: "code"
+    language: "python"
+    title: "lru_cache 사용"
+    description: "데코레이터로 간편하게 적용합니다."
+    content: |-
+      from functools import lru_cache
+
+      @lru_cache(maxsize=None)
+      def fibCached(n):
+          if n <= 1:
+              return n
+          return fibCached(n - 1) + fibCached(n - 2)
+
+      fibCached(100)
+  - type: "code"
+    language: "python"
+    title: "캐시 정보"
+    description: "캐시 히트/미스를 확인합니다."
+    content: |-
+      from functools import lru_cache
+
+      @lru_cache(maxsize=128)
+      def fibInfo(n):
+          if n <= 1:
+              return n
+          return fibInfo(n - 1) + fibInfo(n - 2)
+
+      fibInfo(30)
+      fibInfo.cache_info()
+  - type: "tip"
+    content: "Python 3.9+에서 @cache는 maxsize=None인 lru_cache의 축약입니다."
+
+- id: "divide_conquer"
+  title: "분할정복"
+  subtitle: "나누고 정복하고 합치기"
+  blocks:
+  - type: "text"
+    content: "분할정복(Divide and Conquer)은 문제를 작은 부분으로 나누고, 각각을 해결한 후, 결과를 합치는 패턴입니다. 분할(Divide): 문제를 더 작은 하위 문제로 나눕니다. 정복(Conquer): 하위 문제를 재귀적으로 해결합니다. 결합(Combine): 하위 문제의 해를 합쳐 원래 문제의 해를 구합니다. 병합 정렬, 퀵 정렬, 이진 탐색 등이 분할정복입니다."
+  - type: "list"
+    items:
+    - "분할: 작은 문제로 나누기"
+    - "정복: 재귀적으로 해결"
+    - "결합: 해를 합치기"
+    - "예: 병합 정렬, 퀵 정렬, 이진 탐색"
+  - type: "code"
+    language: "python"
+    title: "이진 탐색"
+    description: "분할정복으로 이진 탐색을 구현합니다."
+    content: |-
+      def binarySearch(arr, target, left=0, right=None):
+          if right is None:
+              right = len(arr) - 1
+          if left > right:
+              return -1
+          mid = (left + right) // 2
+          if arr[mid] == target:
+              return mid
+          elif arr[mid] > target:
+              return binarySearch(arr, target, left, mid - 1)
+          else:
+              return binarySearch(arr, target, mid + 1, right)
+
+      binarySearch([1, 3, 5, 7, 9, 11], 7)
+  - type: "code"
+    language: "python"
+    title: "거듭제곱"
+    description: "분할정복으로 거듭제곱을 O(log n)에 계산합니다."
+    content: |-
+      def power(base, exp):
+          if exp == 0:
+              return 1
+          if exp % 2 == 0:
+              half = power(base, exp // 2)
+              return half * half
+          else:
+              return base * power(base, exp - 1)
+
+      power(2, 10), power(3, 5)
+  - type: "code"
+    language: "python"
+    title: "최대값 찾기"
+    description: "분할정복으로 최대값을 찾습니다."
+    content: |-
+      def findMax(arr, left=0, right=None):
+          if right is None:
+              right = len(arr) - 1
+          if left == right:
+              return arr[left]
+          mid = (left + right) // 2
+          leftMax = findMax(arr, left, mid)
+          rightMax = findMax(arr, mid + 1, right)
+          return max(leftMax, rightMax)
+
+      findMax([3, 1, 4, 1, 5, 9, 2, 6])
+  - type: "tip"
+    content: "분할정복의 시간 복잡도는 마스터 정리로 분석합니다."
+
+- id: "tail_recursion"
+  title: "꼬리 재귀"
+  subtitle: "최적화 개념"
+  blocks:
+  - type: "text"
+    content: "꼬리 재귀(tail recursion)는 재귀 호출이 함수의 마지막 연산인 경우입니다. 일부 언어는 꼬리 재귀를 반복으로 최적화(TCO)하여 스택을 사용하지 않습니다. 그러나 파이썬은 꼬리 재귀 최적화를 지원하지 않습니다. 파이썬에서는 반복으로 변환하거나 누적자(accumulator) 패턴을 사용합니다. 꼬리 재귀 개념을 이해하면 재귀를 반복으로 변환하기 쉽습니다."
+  - type: "list"
+    items:
+    - "꼬리 재귀: 마지막 연산이 재귀 호출"
+    - "TCO: 꼬리 재귀 최적화"
+    - "파이썬은 TCO 미지원"
+    - "누적자 패턴으로 구조 개선"
+  - type: "code"
+    language: "python"
+    title: "일반 재귀 vs 꼬리 재귀"
+    description: "팩토리얼의 두 가지 형태입니다."
+    content: |-
+      def factorialNormal(n):
+          if n <= 1:
+              return 1
+          return n * factorialNormal(n - 1)
+
+      def factorialTail(n, acc=1):
+          if n <= 1:
+              return acc
+          return factorialTail(n - 1, n * acc)
+
+      factorialNormal(5), factorialTail(5)
+  - type: "code"
+    language: "python"
+    title: "꼬리 재귀 피보나치"
+    description: "누적자를 사용한 피보나치입니다."
+    content: |-
+      def fibTail(n, a=0, b=1):
+          if n == 0:
+              return a
+          if n == 1:
+              return b
+          return fibTail(n - 1, b, a + b)
+
+      fibTail(50)
+  - type: "code"
+    language: "python"
+    title: "합계 꼬리 재귀"
+    description: "리스트 합의 꼬리 재귀 버전입니다."
+    content: |-
+      def sumTail(lst, acc=0):
+          if not lst:
+              return acc
+          return sumTail(lst[1:], acc + lst[0])
+
+      sumTail([1, 2, 3, 4, 5])
+  - type: "tip"
+    content: "꼬리 재귀 형태로 작성하면 반복으로 변환하기가 훨씬 쉽습니다."
+
+- id: "iteration_conversion"
+  title: "반복 변환"
+  subtitle: "재귀를 반복으로"
+  blocks:
+  - type: "text"
+    content: "모든 재귀는 반복(루프)으로 변환할 수 있습니다. 반복은 스택 오버플로 위험이 없고 보통 더 빠릅니다. 꼬리 재귀 형태는 while 루프로 직접 변환됩니다. 일반 재귀는 명시적 스택을 사용하여 변환합니다. 트리 순회 같은 복잡한 재귀도 스택으로 변환 가능합니다. 실무에서는 상황에 따라 가독성과 성능을 고려하여 선택합니다."
+  - type: "list"
+    items:
+    - "모든 재귀는 반복으로 변환 가능"
+    - "꼬리 재귀 → while 루프"
+    - "일반 재귀 → 명시적 스택"
+    - "반복이 보통 더 효율적"
+  - type: "code"
+    language: "python"
+    title: "팩토리얼 반복"
+    description: "팩토리얼을 반복으로 구현합니다."
+    content: |-
+      def factorialIter(n):
+          result = 1
+          for i in range(2, n + 1):
+              result *= i
+          return result
+
+      factorialIter(5), factorialIter(10)
+  - type: "code"
+    language: "python"
+    title: "피보나치 반복"
+    description: "피보나치를 반복으로 구현합니다."
+    content: |-
+      def fibIter(n):
+          if n <= 1:
+              return n
+          a, b = 0, 1
+          for _ in range(2, n + 1):
+              a, b = b, a + b
+          return b
+
+      fibIter(50)
+  - type: "code"
+    language: "python"
+    title: "스택으로 변환"
+    description: "명시적 스택으로 재귀를 시뮬레이션합니다."
+    content: |-
+      def factorialStack(n):
+          stack = []
+          while n > 1:
+              stack.append(n)
+              n -= 1
+          result = 1
+          while stack:
+              result *= stack.pop()
+          return result
+
+      factorialStack(5)
+  - type: "tip"
+    content: "성능이 중요하면 반복, 가독성이 중요하면 재귀(+메모이제이션)를 선택하세요."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "재귀와 분할정복 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 16에서 배운 재귀와 분할정복을 난이도별로 복습합니다. 재귀는 함수가 자기 자신을 호출하는 기법으로, 복잡한 문제를 작은 하위 문제로 분해하는 핵심 패턴입니다. 분할정복은 문제를 분할하고, 각각 해결한 뒤, 결과를 합치는 알고리즘 설계 전략입니다. 🟢 기본 문제로 팩토리얼, 피보나치, 리스트 합계 등 기본 재귀를 익히고, 🟡 응용 문제로 이진 탐색, 거듭제곱 등 분할정복을 연습하세요. 🔴 심화 문제에서는 하노이 탑, 병합 정렬, 퀵 정렬 등 고급 분할정복 알고리즘을 구현해봅니다. 재귀는 스택 오버플로우와 메모이제이션을 함께 고려해야 효율적으로 사용할 수 있습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 팩토리얼"
+    code: |-
+      def factorial(n):
+          if n <= 1:
+              return 1
+          return n * factorial(n - 1)
+
+      factorial(6)
+
+  - type: "expansion"
+    title: "🟢 기본2: 리스트 합"
+    code: |-
+      def sumList(lst):
+          if not lst:
+              return 0
+          return lst[0] + sumList(lst[1:])
+
+      sumList([1, 2, 3, 4, 5])
+
+  - type: "expansion"
+    title: "🟢 기본3: 리스트 길이"
+    code: |-
+      def length(lst):
+          if not lst:
+              return 0
+          return 1 + length(lst[1:])
+
+      length([1, 2, 3, 4])
+
+  - type: "expansion"
+    title: "🟢 기본4: 거듭제곱"
+    code: |-
+      def power(base, exp):
+          if exp == 0:
+              return 1
+          return base * power(base, exp - 1)
+
+      power(2, 8)
+
+  - type: "expansion"
+    title: "🟢 기본5: 피보나치"
+    code: |-
+      from functools import lru_cache
+
+      @lru_cache
+      def fib(n):
+          if n <= 1:
+              return n
+          return fib(n - 1) + fib(n - 2)
+
+      [fib(i) for i in range(10)]
+
+  - type: "expansion"
+    title: "🟡 응용1: 문자열 뒤집기"
+    code: |-
+      def reverse(s):
+          if len(s) <= 1:
+              return s
+          return reverse(s[1:]) + s[0]
+
+      reverse("hello")
+
+  - type: "expansion"
+    title: "🟡 응용2: 이진 탐색"
+    code: |-
+      def binarySearch(arr, target, lo=0, hi=None):
+          if hi is None:
+              hi = len(arr) - 1
+          if lo > hi:
+              return -1
+          mid = (lo + hi) // 2
+          if arr[mid] == target:
+              return mid
+          elif arr[mid] > target:
+              return binarySearch(arr, target, lo, mid - 1)
+          else:
+              return binarySearch(arr, target, mid + 1, hi)
+
+      binarySearch([1, 3, 5, 7, 9], 5)
+
+  - type: "expansion"
+    title: "🟡 응용3: 최대공약수"
+    code: |-
+      def gcd(a, b):
+          if b == 0:
+              return a
+          return gcd(b, a % b)
+
+      gcd(48, 18), gcd(100, 25)
+
+  - type: "expansion"
+    title: "🟡 응용4: 빠른 거듭제곱"
+    code: |-
+      def fastPow(base, exp):
+          if exp == 0:
+              return 1
+          if exp % 2 == 0:
+              half = fastPow(base, exp // 2)
+              return half * half
+          return base * fastPow(base, exp - 1)
+
+      fastPow(2, 20)
+
+  - type: "expansion"
+    title: "🟡 응용5: 하노이 탑"
+    code: |-
+      def hanoi(n, source, target, auxiliary):
+          if n == 1:
+              return [(source, target)]
+          moves = hanoi(n - 1, source, auxiliary, target)
+          moves.append((source, target))
+          moves.extend(hanoi(n - 1, auxiliary, target, source))
+          return moves
+
+      len(hanoi(3, 'A', 'C', 'B'))
+
+  - type: "expansion"
+    title: "🔴 심화1: 병합 정렬"
+    code: |-
+      def mergeSort(arr):
+          if len(arr) <= 1:
+              return arr
+          mid = len(arr) // 2
+          left = mergeSort(arr[:mid])
+          right = mergeSort(arr[mid:])
+          return merge(left, right)
+
+      def merge(left, right):
+          result = []
+          i = j = 0
+          while i < len(left) and j < len(right):
+              if left[i] <= right[j]:
+                  result.append(left[i])
+                  i += 1
+              else:
+                  result.append(right[j])
+                  j += 1
+          result.extend(left[i:])
+          result.extend(right[j:])
+          return result
+
+      mergeSort([3, 1, 4, 1, 5, 9, 2, 6])
+
+  - type: "expansion"
+    title: "🔴 심화2: 퀵 정렬"
+    code: |-
+      def quickSort(arr):
+          if len(arr) <= 1:
+              return arr
+          pivot = arr[len(arr) // 2]
+          left = [x for x in arr if x < pivot]
+          middle = [x for x in arr if x == pivot]
+          right = [x for x in arr if x > pivot]
+          return quickSort(left) + middle + quickSort(right)
+
+      quickSort([3, 6, 8, 10, 1, 2, 1])
+
+  - type: "expansion"
+    title: "🔴 심화3: 부분집합"
+    code: |-
+      def subsets(lst):
+          if not lst:
+              return [[]]
+          first = lst[0]
+          rest = subsets(lst[1:])
+          return rest + [[first] + s for s in rest]
+
+      subsets([1, 2, 3])
+
+  - type: "expansion"
+    title: "🔴 심화4: 순열"
+    code: |-
+      def permutations(lst):
+          if len(lst) <= 1:
+              return [lst]
+          result = []
+          for i, elem in enumerate(lst):
+              rest = lst[:i] + lst[i+1:]
+              for perm in permutations(rest):
+                  result.append([elem] + perm)
+          return result
+
+      permutations([1, 2, 3])
+
+  - type: "expansion"
+    title: "🔴 심화5: N-Queen 카운트"
+    code: |-
+      def nQueens(n):
+          def canPlace(queens, row, col):
+              for r, c in enumerate(queens):
+                  if c == col or abs(r - row) == abs(c - col):
+                      return False
+              return True
+
+          def solve(row, queens):
+              if row == n:
+                  return 1
+              count = 0
+              for col in range(n):
+                  if canPlace(queens, row, col):
+                      count += solve(row + 1, queens + [col])
+              return count
+
+          return solve(0, [])
+
+      nQueens(8)
+
+  - type: "expansion"
+    title: "🔴 심화6: 트리 높이"
+    code: |-
+      def treeHeight(tree):
+          if tree is None:
+              return 0
+          if isinstance(tree, dict):
+              left = tree.get('left')
+              right = tree.get('right')
+              return 1 + max(treeHeight(left), treeHeight(right))
+          return 1
+
+      tree = {
+          'val': 1,
+          'left': {'val': 2, 'left': {'val': 4}, 'right': None},
+          'right': {'val': 3}
+      }
+      treeHeight(tree)
+
+  - type: "expansion"
+    title: "🔴 심화7: 카탈란 수"
+    code: |-
+      from functools import lru_cache
+
+      @lru_cache
+      def catalan(n):
+          if n <= 1:
+              return 1
+          result = 0
+          for i in range(n):
+              result += catalan(i) * catalan(n - 1 - i)
+          return result
+
+      [catalan(i) for i in range(10)]
+
+  - type: "expansion"
+    title: "🔴 심화8: 분할 가능 체크"
+    code: |-
+      from functools import lru_cache
+
+      def canPartition(nums):
+          total = sum(nums)
+          if total % 2 != 0:
+              return False
+          target = total // 2
+
+          @lru_cache(maxsize=None)
+          def dp(idx, remain):
+              if remain == 0:
+                  return True
+              if idx >= len(nums) or remain < 0:
+                  return False
+              return dp(idx + 1, remain - nums[idx]) or dp(idx + 1, remain)
+
+          return dp(0, target)
+
+      canPartition([1, 5, 11, 5])
+
+  - type: "expansion"
+    title: "🔴 심화9: 문자열 파싱"
+    code: |-
+      def parseNested(s):
+          def parse(idx):
+              result = []
+              while idx < len(s):
+                  if s[idx] == '[':
+                      inner, idx = parse(idx + 1)
+                      result.append(inner)
+                  elif s[idx] == ']':
+                      return result, idx + 1
+                  elif s[idx].isdigit():
+                      result.append(int(s[idx]))
+                      idx += 1
+                  else:
+                      idx += 1
+              return result, idx
+          return parse(0)[0]
+
+      parseNested("[1,[2,3],[4,[5]]]")
+
+  - type: "expansion"
+    title: "🔴 심화10: 반복으로 변환"
+    code: |-
+      def fibIterative(n):
+          if n <= 1:
+              return n
+          prev, curr = 0, 1
+          for _ in range(2, n + 1):
+              prev, curr = curr, prev + curr
+          return curr
+
+      def factIterative(n):
+          result = 1
+          for i in range(2, n + 1):
+              result *= i
+          return result
+
+      fibIterative(50), factIterative(20)

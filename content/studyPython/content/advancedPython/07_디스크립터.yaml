@@ -1,0 +1,1029 @@
+meta:
+  id: "07"
+  title: "디스크립터"
+  day: 7
+  category: "advancedPython"
+  tags: ["descriptor", "__get__", "__set__", "property"]
+  seo:
+    title: "파이썬 디스크립터 프로토콜 - 속성 접근 제어의 핵심"
+    description: "디스크립터 프로토콜의 동작 원리를 이해합니다. __get__, __set__, __delete__ 구현과 property의 내부 동작."
+    keywords: ["descriptor", "__get__", "__set__", "property", "데이터 디스크립터"]
+
+intro:
+  emoji: "🔧"
+  points:
+  - "__get__, __set__, __delete__ 프로토콜 이해"
+  - "데이터 디스크립터와 비데이터 디스크립터 구분"
+  - "property가 디스크립터인 이유"
+  - "검증/지연로딩 디스크립터 구현"
+
+sections:
+- id: "descriptor_protocol"
+  title: "디스크립터 프로토콜"
+  subtitle: "속성 접근 가로채기"
+  blocks:
+  - type: "text"
+    content: "디스크립터는 속성 접근을 가로채는 객체입니다. __get__, __set__, __delete__ 중 하나 이상을 구현하면 디스크립터가 됩니다. 클래스 속성으로 할당된 디스크립터는 해당 속성에 접근할 때 자동으로 호출됩니다. __get__(self, obj, objtype)은 속성을 읽을 때, __set__(self, obj, value)는 속성에 값을 할당할 때, __delete__(self, obj)는 속성을 삭제할 때 호출됩니다. obj는 인스턴스, objtype은 클래스입니다. 클래스에서 직접 접근하면 obj는 None입니다."
+  - type: "list"
+    items:
+    - "__get__(self, obj, objtype): 속성 읽기"
+    - "__set__(self, obj, value): 속성 쓰기"
+    - "__delete__(self, obj): 속성 삭제"
+    - "obj: 인스턴스 (클래스 접근 시 None)"
+    - "objtype: 클래스 타입"
+  - type: "code"
+    language: "python"
+    title: "기본 디스크립터"
+    description: "간단한 디스크립터를 정의합니다."
+    content: |-
+      class Verbose:
+          def __get__(self, obj, objtype=None):
+              return f"Getting from {objtype.__name__}"
+
+          def __set__(self, obj, value):
+              return f"Setting to {value}"
+
+      class MyClass:
+          attr = Verbose()
+
+      MyClass.attr, MyClass().attr
+  - type: "code"
+    language: "python"
+    title: "값 저장 디스크립터"
+    description: "인스턴스에 값을 저장하는 디스크립터입니다."
+    content: |-
+      class StoredValue:
+          def __set_name__(self, owner, name):
+              self.name = f"_stored_{name}"
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              return getattr(obj, self.name, None)
+
+          def __set__(self, obj, value):
+              setattr(obj, self.name, value)
+
+      class Container:
+          data = StoredValue()
+
+      cont = Container()
+      cont.data = 42
+      cont.data
+  - type: "code"
+    language: "python"
+    title: "__set_name__ 활용"
+    description: "Python 3.6+에서 속성 이름을 자동으로 받습니다."
+    content: |-
+      class Named:
+          def __set_name__(self, owner, name):
+              self.publicName = name
+              self.privateName = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              return getattr(obj, self.privateName, None)
+
+          def __set__(self, obj, value):
+              setattr(obj, self.privateName, value)
+
+      class Person:
+          name = Named()
+          age = Named()
+
+      person = Person()
+      person.name = "Alice"
+      person.age = 30
+      person.name, person.age
+  - type: "tip"
+    content: "__set_name__(self, owner, name)은 클래스 생성 시 자동으로 호출되어 속성 이름을 알려줍니다."
+
+- id: "non_data_descriptor"
+  title: "비데이터 디스크립터"
+  subtitle: "__get__만 정의"
+  blocks:
+  - type: "text"
+    content: "비데이터 디스크립터(non-data descriptor)는 __get__만 정의합니다. 인스턴스 __dict__에 같은 이름의 속성이 있으면 그것이 우선합니다. 함수, classmethod, staticmethod가 비데이터 디스크립터입니다. 함수는 클래스에서 정의되면 비데이터 디스크립터가 되어, 인스턴스에서 접근할 때 바운드 메서드로 변환됩니다. 비데이터 디스크립터는 인스턴스별로 다른 값을 가질 수 있게 합니다."
+  - type: "list"
+    items:
+    - "__get__만 정의 = 비데이터 디스크립터"
+    - "인스턴스 __dict__가 우선"
+    - "함수, classmethod, staticmethod"
+    - "오버라이드 가능"
+  - type: "code"
+    language: "python"
+    title: "비데이터 디스크립터"
+    description: "__get__만 정의합니다."
+    content: |-
+      class NonData:
+          def __get__(self, obj, objtype=None):
+              return "descriptor value"
+
+      class Example:
+          attr = NonData()
+
+      ex = Example()
+      ex.attr
+  - type: "code"
+    language: "python"
+    title: "인스턴스 오버라이드"
+    description: "인스턴스 __dict__가 비데이터 디스크립터보다 우선합니다."
+    content: |-
+      class NonDataDesc:
+          def __get__(self, obj, objtype=None):
+              return "from descriptor"
+
+      class Test:
+          value = NonDataDesc()
+
+      testObj = Test()
+      testObj.value
+
+  - type: "code"
+    language: "python"
+    title: "인스턴스에 직접 할당"
+    description: "__dict__에 직접 값을 넣으면 디스크립터보다 우선합니다."
+    content: |-
+      class NonData2:
+          def __get__(self, obj, objtype=None):
+              return "descriptor"
+
+      class Sample:
+          attr = NonData2()
+
+      sample = Sample()
+      sample.__dict__["attr"] = "instance value"
+      sample.attr
+  - type: "tip"
+    content: "함수가 메서드로 동작하는 것도 함수의 __get__이 self를 바인딩하기 때문입니다."
+
+- id: "data_descriptor"
+  title: "데이터 디스크립터"
+  subtitle: "__get__과 __set__"
+  blocks:
+  - type: "text"
+    content: "데이터 디스크립터(data descriptor)는 __get__과 __set__ 모두 정의합니다. 데이터 디스크립터는 인스턴스 __dict__보다 우선합니다. 따라서 인스턴스에서 속성에 값을 할당해도 디스크립터의 __set__이 호출됩니다. property가 데이터 디스크립터의 대표적인 예입니다. 데이터 디스크립터는 속성 접근을 완전히 제어할 때 사용합니다. __delete__만 있어도 데이터 디스크립터로 취급됩니다."
+  - type: "list"
+    items:
+    - "__get__ + __set__ = 데이터 디스크립터"
+    - "인스턴스 __dict__보다 우선"
+    - "속성 접근을 완전히 제어"
+    - "__delete__만 있어도 데이터 디스크립터"
+  - type: "code"
+    language: "python"
+    title: "데이터 디스크립터"
+    description: "__get__과 __set__ 모두 정의합니다."
+    content: |-
+      class DataDesc:
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              return obj.__dict__.get("_value", 0)
+
+          def __set__(self, obj, value):
+              obj.__dict__["_value"] = value
+
+      class Counter:
+          count = DataDesc()
+
+      counter = Counter()
+      counter.count = 10
+      counter.count
+  - type: "code"
+    language: "python"
+    title: "인스턴스 __dict__보다 우선"
+    description: "데이터 디스크립터가 인스턴스 속성보다 우선합니다."
+    content: |-
+      class Priority:
+          def __get__(self, obj, objtype=None):
+              return "descriptor wins"
+
+          def __set__(self, obj, value):
+              pass
+
+      class Demo:
+          attr = Priority()
+
+      demo = Demo()
+      demo.__dict__["attr"] = "instance value"
+      demo.attr
+  - type: "code"
+    language: "python"
+    title: "속성 검색 순서"
+    description: "파이썬의 속성 검색 순서를 보여줍니다."
+    content: |-
+      """
+      속성 검색 순서:
+      1. 데이터 디스크립터 (type(obj).__mro__에서)
+      2. 인스턴스 __dict__
+      3. 비데이터 디스크립터 / 클래스 속성
+      4. __getattr__ (정의된 경우)
+      """
+
+      class Order:
+          pass
+
+      Order.__doc__
+  - type: "tip"
+    content: "__set__에서 실제로 아무것도 안 해도 데이터 디스크립터가 됩니다."
+
+- id: "property_internal"
+  title: "property 내부"
+  subtitle: "property도 디스크립터"
+  blocks:
+  - type: "text"
+    content: "property는 파이썬 내장 디스크립터입니다. getter, setter, deleter 함수를 받아 속성처럼 동작합니다. property(fget, fset, fdel, doc)로 생성하거나 @property 데코레이터를 사용합니다. 내부적으로 __get__에서 fget을 호출하고, __set__에서 fset을 호출합니다. property를 직접 구현하면 디스크립터의 동작을 이해할 수 있습니다. classmethod, staticmethod도 디스크립터로 구현되어 있습니다."
+  - type: "list"
+    items:
+    - "property는 내장 데이터 디스크립터"
+    - "getter, setter, deleter 래핑"
+    - "@property 데코레이터 = property(fget)"
+    - "classmethod, staticmethod도 디스크립터"
+  - type: "code"
+    language: "python"
+    title: "property 기본"
+    description: "@property로 getter/setter를 정의합니다."
+    content: |-
+      class Circle:
+          def __init__(self, radius):
+              self._radius = radius
+
+          @property
+          def radius(self):
+              return self._radius
+
+          @radius.setter
+          def radius(self, value):
+              if value < 0:
+                  raise ValueError("Radius must be non-negative")
+              self._radius = value
+
+      circle = Circle(5)
+      circle.radius
+  - type: "code"
+    language: "python"
+    title: "property 직접 구현"
+    description: "디스크립터로 property를 구현합니다."
+    content: |-
+      class MyProperty:
+          def __init__(self, fget=None, fset=None, fdel=None):
+              self.fget = fget
+              self.fset = fset
+              self.fdel = fdel
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              if self.fget is None:
+                  raise AttributeError("unreadable attribute")
+              return self.fget(obj)
+
+          def __set__(self, obj, value):
+              if self.fset is None:
+                  raise AttributeError("can't set attribute")
+              self.fset(obj, value)
+
+          def setter(self, fset):
+              return type(self)(self.fget, fset, self.fdel)
+
+      class Demo:
+          def __init__(self):
+              self._x = 0
+
+          @MyProperty
+          def x(self):
+              return self._x
+
+          @x.setter
+          def x(self, val):
+              self._x = val
+
+      demo2 = Demo()
+      demo2.x = 10
+      demo2.x
+  - type: "code"
+    language: "python"
+    title: "staticmethod 동작"
+    description: "staticmethod도 디스크립터입니다."
+    content: |-
+      class MyStatic:
+          def __init__(self, func):
+              self.func = func
+
+          def __get__(self, obj, objtype=None):
+              return self.func
+
+      class Utils:
+          @MyStatic
+          def add(a, b):
+              return a + b
+
+      Utils.add(3, 4), Utils().add(3, 4)
+  - type: "tip"
+    content: "classmethod의 __get__은 첫 번째 인자로 클래스를 바인딩합니다."
+
+- id: "validation_descriptor"
+  title: "검증 디스크립터"
+  subtitle: "타입과 범위 검사"
+  blocks:
+  - type: "text"
+    content: "디스크립터의 가장 일반적인 활용은 속성 검증입니다. __set__에서 값을 검증하고 조건에 맞지 않으면 예외를 발생시킵니다. 타입 검사, 범위 검사, 형식 검사 등 다양한 검증 로직을 캡슐화할 수 있습니다. 한 번 정의한 검증 디스크립터는 여러 클래스, 여러 속성에서 재사용할 수 있습니다. 이는 property의 setter마다 검증 코드를 반복하는 것보다 효율적입니다."
+  - type: "list"
+    items:
+    - "__set__에서 값 검증"
+    - "타입 검사, 범위 검사"
+    - "재사용 가능한 검증 로직"
+    - "여러 속성에 동일한 규칙 적용"
+  - type: "code"
+    language: "python"
+    title: "타입 검사 디스크립터"
+    description: "특정 타입만 허용하는 디스크립터입니다."
+    content: |-
+      class Typed:
+          def __init__(self, expectedType):
+              self.expectedType = expectedType
+
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              return getattr(obj, self.name, None)
+
+          def __set__(self, obj, value):
+              if not isinstance(value, self.expectedType):
+                  raise TypeError(f"Expected {self.expectedType.__name__}")
+              setattr(obj, self.name, value)
+
+      class Person:
+          name = Typed(str)
+          age = Typed(int)
+
+      p2 = Person()
+      p2.name = "Alice"
+      p2.age = 30
+      p2.name, p2.age
+  - type: "code"
+    language: "python"
+    title: "범위 검사 디스크립터"
+    description: "최소/최대값을 검증합니다."
+    content: |-
+      class Range:
+          def __init__(self, minVal=None, maxVal=None):
+              self.minVal = minVal
+              self.maxVal = maxVal
+
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              return getattr(obj, self.name, None)
+
+          def __set__(self, obj, value):
+              if self.minVal is not None and value < self.minVal:
+                  raise ValueError(f"Value must be >= {self.minVal}")
+              if self.maxVal is not None and value > self.maxVal:
+                  raise ValueError(f"Value must be <= {self.maxVal}")
+              setattr(obj, self.name, value)
+
+      class Product:
+          price = Range(minVal=0)
+          quantity = Range(minVal=0, maxVal=1000)
+
+      prod = Product()
+      prod.price = 99.99
+      prod.quantity = 50
+      prod.price, prod.quantity
+  - type: "code"
+    language: "python"
+    title: "조합 검증"
+    description: "여러 조건을 조합합니다."
+    content: |-
+      class Validated:
+          def __init__(self, *validators):
+              self.validators = validators
+
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              return getattr(obj, self.name, None)
+
+          def __set__(self, obj, value):
+              for validator in self.validators:
+                  validator(value)
+              setattr(obj, self.name, value)
+
+      def notEmpty(val):
+          if not val:
+              raise ValueError("Value cannot be empty")
+
+      def maxLength(n):
+          def check(val):
+              if len(val) > n:
+                  raise ValueError(f"Length must be <= {n}")
+          return check
+
+      class User:
+          username = Validated(notEmpty, maxLength(20))
+
+      user = User()
+      user.username = "alice"
+      user.username
+  - type: "tip"
+    content: "dataclasses의 field와 함께 사용하면 더 강력한 데이터 검증이 가능합니다."
+
+- id: "lazy_descriptor"
+  title: "지연 로딩 디스크립터"
+  subtitle: "계산된 속성 캐싱"
+  blocks:
+  - type: "text"
+    content: "지연 로딩(lazy loading)은 속성에 처음 접근할 때만 값을 계산하고 이후에는 캐시된 값을 반환합니다. 비용이 많이 드는 계산이나 데이터 로딩에 유용합니다. 비데이터 디스크립터로 구현하면 첫 접근 후 인스턴스 __dict__에 저장되어 이후 접근은 디스크립터를 거치지 않습니다. Python 3.8+에서는 functools.cached_property가 이 패턴을 제공합니다."
+  - type: "list"
+    items:
+    - "첫 접근 시에만 계산"
+    - "이후 접근은 캐시된 값 반환"
+    - "비데이터 디스크립터로 구현"
+    - "functools.cached_property (Python 3.8+)"
+  - type: "code"
+    language: "python"
+    title: "지연 로딩 구현"
+    description: "첫 접근 시 계산하고 캐시합니다."
+    content: |-
+      class LazyProperty:
+          def __init__(self, func):
+              self.func = func
+              self.name = func.__name__
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              value = self.func(obj)
+              setattr(obj, self.name, value)
+              return value
+
+      class DataLoader:
+          @LazyProperty
+          def data(self):
+              return [i * 2 for i in range(10)]
+
+      loader = DataLoader()
+      "data" in loader.__dict__
+  - type: "code"
+    language: "python"
+    title: "지연 로딩 확인"
+    description: "첫 접근 후 __dict__에 저장됩니다."
+    content: |-
+      class Lazy:
+          def __init__(self, func):
+              self.func = func
+              self.attrName = func.__name__
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              result = self.func(obj)
+              setattr(obj, self.attrName, result)
+              return result
+
+      class Expensive:
+          @Lazy
+          def computed(self):
+              return sum(range(1000))
+
+      expensive = Expensive()
+      before = "computed" in expensive.__dict__
+      val = expensive.computed
+      after = "computed" in expensive.__dict__
+      before, after, val
+  - type: "code"
+    language: "python"
+    title: "cached_property"
+    description: "Python 3.8+의 내장 cached_property입니다."
+    content: |-
+      from functools import cached_property
+
+      class Calculator:
+          def __init__(self, numbers):
+              self.numbers = numbers
+
+          @cached_property
+          def total(self):
+              return sum(self.numbers)
+
+          @cached_property
+          def average(self):
+              return self.total / len(self.numbers)
+
+      calc = Calculator([1, 2, 3, 4, 5])
+      calc.total, calc.average
+  - type: "tip"
+    content: "cached_property는 스레드 안전하지 않습니다. 멀티스레드에서는 주의가 필요합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "디스크립터 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 7에서 배운 디스크립터를 난이도별로 복습합니다. 디스크립터는 __get__, __set__, __delete__ 메서드를 정의하여 속성 접근을 제어하는 객체입니다. 파이썬의 property, classmethod, staticmethod가 모두 디스크립터로 구현되어 있습니다. 🟢 기본 문제로 데이터/비데이터 디스크립터의 차이와 기본 구현을 익히고, 🟡 응용 문제로 타입 검증, 지연 로딩 패턴을 연습하세요. 🔴 심화 문제에서는 캐싱, 감사 로깅, 의존성 주입 등 고급 속성 관리 기법을 구현해봅니다. 디스크립터를 이해하면 파이썬 객체 모델의 핵심 동작 원리를 파악할 수 있습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 기본 디스크립터"
+    code: |-
+      class Simple:
+          def __get__(self, obj, objtype=None):
+              return 42
+
+      class Test:
+          value = Simple()
+
+      Test().value
+
+  - type: "expansion"
+    title: "🟢 기본2: __set_name__"
+    code: |-
+      class Named:
+          def __set_name__(self, owner, name):
+              self.name = name
+
+          def __get__(self, obj, objtype=None):
+              return f"Attribute: {self.name}"
+
+      class Demo:
+          x = Named()
+          y = Named()
+
+      Demo().x, Demo().y
+
+  - type: "expansion"
+    title: "🟢 기본3: 값 저장"
+    code: |-
+      class Stored:
+          def __set_name__(self, owner, name):
+              self.key = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              return getattr(obj, self.key, None) if obj else self
+
+          def __set__(self, obj, value):
+              setattr(obj, self.key, value)
+
+      class Box:
+          item = Stored()
+
+      box = Box()
+      box.item = "apple"
+      box.item
+
+  - type: "expansion"
+    title: "🟢 기본4: property 기본"
+    code: |-
+      class Square:
+          def __init__(self, side):
+              self._side = side
+
+          @property
+          def area(self):
+              return self._side ** 2
+
+      Square(5).area
+
+  - type: "expansion"
+    title: "🟢 기본5: 비데이터 디스크립터"
+    code: |-
+      class NonData:
+          def __get__(self, obj, objtype=None):
+              return "from descriptor"
+
+      class Test:
+          attr = NonData()
+
+      test2 = Test()
+      test2.__dict__["attr"] = "from instance"
+      test2.attr
+
+  - type: "expansion"
+    title: "🟡 응용1: 타입 검증"
+    code: |-
+      class TypedAttr:
+          def __init__(self, typ):
+              self.typ = typ
+
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              return getattr(obj, self.name, None) if obj else self
+
+          def __set__(self, obj, value):
+              if not isinstance(value, self.typ):
+                  raise TypeError(f"Expected {self.typ.__name__}")
+              setattr(obj, self.name, value)
+
+      class Config:
+          port = TypedAttr(int)
+
+      config = Config()
+      config.port = 8080
+      config.port
+
+  - type: "expansion"
+    title: "🟡 응용2: 범위 검증"
+    code: |-
+      class Bounded:
+          def __init__(self, lo, hi):
+              self.lo, self.hi = lo, hi
+
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              return getattr(obj, self.name, None) if obj else self
+
+          def __set__(self, obj, value):
+              if not (self.lo <= value <= self.hi):
+                  raise ValueError(f"Must be between {self.lo} and {self.hi}")
+              setattr(obj, self.name, value)
+
+      class Score:
+          value = Bounded(0, 100)
+
+      score = Score()
+      score.value = 85
+      score.value
+
+  - type: "expansion"
+    title: "🟡 응용3: 지연 로딩"
+    code: |-
+      class Lazy:
+          def __init__(self, func):
+              self.func = func
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              val = self.func(obj)
+              setattr(obj, self.func.__name__, val)
+              return val
+
+      class Report:
+          @Lazy
+          def summary(self):
+              return "Computed once"
+
+      report = Report()
+      report.summary, report.summary
+
+  - type: "expansion"
+    title: "🟡 응용4: 읽기 전용"
+    code: |-
+      class ReadOnly:
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              return getattr(obj, self.name, None) if obj else self
+
+          def __set__(self, obj, value):
+              if hasattr(obj, self.name):
+                  raise AttributeError("Read-only attribute")
+              setattr(obj, self.name, value)
+
+      class Entity:
+          id = ReadOnly()
+
+      entity = Entity()
+      entity.id = 123
+      entity.id
+
+  - type: "expansion"
+    title: "🟡 응용5: 기본값"
+    code: |-
+      class DefaultValue:
+          def __init__(self, default):
+              self.default = default
+
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              return getattr(obj, self.name, self.default)
+
+          def __set__(self, obj, value):
+              setattr(obj, self.name, value)
+
+      class Settings:
+          theme = DefaultValue("light")
+          fontSize = DefaultValue(14)
+
+      settings = Settings()
+      settings.theme, settings.fontSize
+
+  - type: "expansion"
+    title: "🔴 심화1: 변환 디스크립터"
+    code: |-
+      class Transformed:
+          def __init__(self, transformer):
+              self.transformer = transformer
+
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              return getattr(obj, self.name, None) if obj else self
+
+          def __set__(self, obj, value):
+              setattr(obj, self.name, self.transformer(value))
+
+      class User:
+          email = Transformed(str.lower)
+          name = Transformed(str.title)
+
+      user2 = User()
+      user2.email = "ALICE@EXAMPLE.COM"
+      user2.name = "bob smith"
+      user2.email, user2.name
+
+  - type: "expansion"
+    title: "🔴 심화2: 히스토리 추적"
+    code: |-
+      class Tracked:
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+              self.historyName = f"_{name}_history"
+
+          def __get__(self, obj, objtype=None):
+              return getattr(obj, self.name, None) if obj else self
+
+          def __set__(self, obj, value):
+              history = getattr(obj, self.historyName, [])
+              current = getattr(obj, self.name, None)
+              if current is not None:
+                  history.append(current)
+              setattr(obj, self.historyName, history)
+              setattr(obj, self.name, value)
+
+          def getHistory(self, obj):
+              return getattr(obj, self.historyName, [])
+
+      class Document:
+          version = Tracked()
+
+      doc = Document()
+      doc.version = "1.0"
+      doc.version = "1.1"
+      doc.version = "2.0"
+      Document.version.getHistory(doc), doc.version
+
+  - type: "expansion"
+    title: "🔴 심화3: 조건부 캐시"
+    code: |-
+      class CachedWithTTL:
+          def __init__(self, func, ttl=5):
+              self.func = func
+              self.ttl = ttl
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              import time
+              cache = getattr(obj, "_cache", {})
+              name = self.func.__name__
+              now = time.time()
+              if name in cache:
+                  val, timestamp = cache[name]
+                  if now - timestamp < self.ttl:
+                      return val
+              val = self.func(obj)
+              cache[name] = (val, now)
+              obj._cache = cache
+              return val
+
+      class API:
+          @CachedWithTTL
+          def fetchData(self):
+              return {"status": "ok"}
+
+      api = API()
+      api.fetchData()
+
+  - type: "expansion"
+    title: "🔴 심화4: 의존성 계산"
+    code: |-
+      class Computed:
+          def __init__(self, func, *deps):
+              self.func = func
+              self.deps = deps
+
+          def __set_name__(self, owner, name):
+              self.name = name
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              return self.func(obj)
+
+      class Rectangle:
+          def __init__(self, w, h):
+              self.width = w
+              self.height = h
+
+          @Computed
+          def area(self):
+              return self.width * self.height
+
+          @Computed
+          def perimeter(self):
+              return 2 * (self.width + self.height)
+
+      rect = Rectangle(3, 4)
+      rect.area, rect.perimeter
+
+  - type: "expansion"
+    title: "🔴 심화5: 체인 검증"
+    code: |-
+      class Validated:
+          def __init__(self):
+              self.validators = []
+
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              return getattr(obj, self.name, None) if obj else self
+
+          def __set__(self, obj, value):
+              for v in self.validators:
+                  v(value)
+              setattr(obj, self.name, value)
+
+          def addValidator(self, func):
+              self.validators.append(func)
+              return self
+
+      class Form:
+          email = Validated()
+          email.addValidator(lambda x: None if "@" in x else (_ for _ in ()).throw(ValueError("Invalid email")))
+
+      form = Form()
+      form.email = "test@example.com"
+      form.email
+
+  - type: "expansion"
+    title: "🔴 심화6: 프록시 디스크립터"
+    code: |-
+      class Proxy:
+          def __init__(self, targetAttr):
+              self.targetAttr = targetAttr
+
+          def __set_name__(self, owner, name):
+              self.name = name
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              target = getattr(obj, self.targetAttr, None)
+              return getattr(target, self.name, None) if target else None
+
+          def __set__(self, obj, value):
+              target = getattr(obj, self.targetAttr, None)
+              if target:
+                  setattr(target, self.name, value)
+
+      class Inner:
+          def __init__(self):
+              self.value = 0
+
+      class Outer:
+          inner = None
+          value = Proxy("inner")
+
+      outer = Outer()
+      outer.inner = Inner()
+      outer.value = 42
+      outer.inner.value
+
+  - type: "expansion"
+    title: "🔴 심화7: 슬롯 디스크립터"
+    code: |-
+      class SlotDescriptor:
+          def __init__(self, name):
+              self.name = name
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              try:
+                  return object.__getattribute__(obj, self.name)
+              except AttributeError:
+                  return None
+
+          def __set__(self, obj, value):
+              object.__setattr__(obj, self.name, value)
+
+      class Optimized:
+          __slots__ = ("_x", "_y")
+          x = SlotDescriptor("_x")
+          y = SlotDescriptor("_y")
+
+      opt = Optimized()
+      opt.x = 10
+      opt.y = 20
+      opt.x, opt.y
+
+  - type: "expansion"
+    title: "🔴 심화8: 콜백 디스크립터"
+    code: |-
+      class Observable:
+          def __init__(self):
+              self.callbacks = []
+
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              return getattr(obj, self.name, None) if obj else self
+
+          def __set__(self, obj, value):
+              oldVal = getattr(obj, self.name, None)
+              setattr(obj, self.name, value)
+              for cb in self.callbacks:
+                  cb(obj, oldVal, value)
+
+          def onchange(self, func):
+              self.callbacks.append(func)
+              return func
+
+      class Model:
+          status = Observable()
+
+      Model.status.onchange(lambda obj, old, new: setattr(obj, "changed", True))
+
+      m = Model()
+      m.status = "active"
+      m.changed
+
+  - type: "expansion"
+    title: "🔴 심화9: 다중 타입"
+    code: |-
+      class MultiTyped:
+          def __init__(self, *types):
+              self.types = types
+
+          def __set_name__(self, owner, name):
+              self.name = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              return getattr(obj, self.name, None) if obj else self
+
+          def __set__(self, obj, value):
+              if not isinstance(value, self.types):
+                  typeNames = ", ".join(t.__name__ for t in self.types)
+                  raise TypeError(f"Expected one of: {typeNames}")
+              setattr(obj, self.name, value)
+
+      class Flexible:
+          data = MultiTyped(int, float, str)
+
+      flex = Flexible()
+      flex.data = 42
+      flex.data = 3.14
+      flex.data = "hello"
+      flex.data
+
+  - type: "expansion"
+    title: "🔴 심화10: 재사용 팩토리"
+    code: |-
+      def typed(typ):
+          class TypedDescriptor:
+              def __set_name__(self, owner, name):
+                  self.name = f"_{name}"
+
+              def __get__(self, obj, objtype=None):
+                  return getattr(obj, self.name, None) if obj else self
+
+              def __set__(self, obj, value):
+                  if not isinstance(value, typ):
+                      raise TypeError(f"Expected {typ.__name__}")
+                  setattr(obj, self.name, value)
+
+          return TypedDescriptor()
+
+      class Entity:
+          name = typed(str)
+          count = typed(int)
+          price = typed(float)
+
+      ent = Entity()
+      ent.name = "Widget"
+      ent.count = 100
+      ent.price = 9.99
+      ent.name, ent.count, ent.price

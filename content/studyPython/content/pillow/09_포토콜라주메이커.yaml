@@ -1,0 +1,262 @@
+meta:
+  id: pillow_09
+  title: 포토콜라주메이커
+  order: 9
+  category: pillow
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["Pillow", "paste", "collage", "합성", "resize", "레이아웃"]
+  seo:
+    title: "Pillow 심화 - 포토 콜라주 메이커"
+    description: "Pillow로 여러 이미지를 배치하여 콜라주를 만듭니다. paste와 좌표 계산을 배웁니다."
+    keywords: ["Pillow", "콜라주", "paste", "이미지합성", "레이아웃"]
+
+intro:
+  emoji: "🖼️"
+  goal: 여러 이미지를 배치하여 4분할 콜라주를 만듭니다.
+  description: paste()로 이미지를 특정 위치에 붙이고, resize()로 크기를 맞춥니다. 좌표 계산을 통해 정렬된 레이아웃을 구성합니다.
+
+sections:
+- id: step1_images
+  title: 1단계. 이미지 준비
+  subtitle: sklearn 샘플 이미지 활용
+  blocks:
+  - type: text
+    content: sklearn 샘플 이미지를 다양하게 변형하여 콜라주용 이미지를 만듭니다. flower와 china 이미지를 크롭하고 리사이즈하여 네 장의 이미지를 준비합니다.
+  - type: code
+    language: python
+    title: 라이브러리와 원본 이미지
+    description: 두 개의 샘플 이미지를 로드합니다
+    content: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flower = Image.fromarray(load_sample_image('flower.jpg'))
+      china = Image.fromarray(load_sample_image('china.jpg'))
+      flower.size, china.size
+  - type: code
+    language: python
+    title: 콜라주용 이미지 준비
+    description: 네 장으로 변형합니다
+    content: |-
+      size = (200, 200)
+      img1 = flower.crop((0, 0, 400, 400)).resize(size)
+      img2 = flower.crop((200, 100, 600, 500)).resize(size)
+      img3 = china.crop((0, 0, 400, 400)).resize(size)
+      img4 = china.crop((100, 50, 500, 450)).resize(size)
+      img1.size, img2.size, img3.size, img4.size
+  - type: tip
+    content: 한정된 이미지로도 crop()과 resize()를 활용하면 다양한 콜라주 소재를 만들 수 있습니다. 각기 다른 영역을 잘라내면 다른 이미지처럼 보입니다.
+
+- id: step2_canvas
+  title: 2단계. 콜라주 캔버스
+  subtitle: 전체 크기 계산
+  blocks:
+  - type: text
+    content: 2x2 그리드의 콜라주 캔버스를 생성합니다. 각 이미지가 200x200이면 전체 캔버스는 400x400입니다. 여백을 추가하면 더 보기 좋습니다.
+  - type: code
+    language: python
+    title: 캔버스 크기 계산
+    description: 여백 포함 크기를 계산합니다
+    content: |-
+      cellSize = 200
+      gap = 10
+      cols, rows = 2, 2
+      totalW = cols * cellSize + (cols + 1) * gap
+      totalH = rows * cellSize + (rows + 1) * gap
+      totalW, totalH
+  - type: code
+    language: python
+    title: 캔버스 생성
+    description: 흰색 배경의 콜라주 캔버스입니다
+    content: |-
+      collage = Image.new('RGB', (totalW, totalH), 'white')
+      collage.size
+  - type: code
+    language: python
+    title: 빈 캔버스 확인
+    description: 이미지를 붙이기 전 상태입니다
+    content: |-
+      collage
+
+- id: step3_paste
+  title: 3단계. 이미지 배치
+  subtitle: paste()
+  blocks:
+  - type: text
+    content: paste() 메서드로 이미지를 캔버스의 특정 위치에 붙입니다. 위치는 (x, y) 좌표로 지정하며, 붙일 이미지의 왼쪽 상단이 해당 좌표에 배치됩니다.
+  - type: code
+    language: python
+    title: 첫 번째 이미지 배치
+    description: 왼쪽 상단에 붙입니다
+    content: |-
+      x1 = gap
+      y1 = gap
+      collage.paste(img1, (x1, y1))
+      collage
+  - type: tip
+    content: paste()는 원본 이미지를 직접 수정합니다. 반환값이 없으며, 원본을 보존하려면 copy() 후 paste()해야 합니다.
+  - type: code
+    language: python
+    title: 나머지 이미지 배치
+    description: 2x2 그리드로 배치합니다
+    content: |-
+      x2 = gap + cellSize + gap
+      collage.paste(img2, (x2, y1))
+      y2 = gap + cellSize + gap
+      collage.paste(img3, (x1, y2))
+      collage.paste(img4, (x2, y2))
+      collage
+
+- id: step4_resize_fit
+  title: 4단계. 크기 맞춤
+  subtitle: 다른 크기 이미지 처리
+  blocks:
+  - type: text
+    content: 실제 이미지는 크기가 제각각입니다. sklearn 이미지를 콜라주에 넣으려면 resize()로 크기를 맞춰야 합니다.
+  - type: code
+    language: python
+    title: sklearn 이미지 로드
+    description: 크기가 다른 이미지입니다
+    content: |-
+      from sklearn.datasets import load_sample_image
+
+      bloomArr = load_sample_image('flower.jpg')
+      bloom = Image.fromarray(bloomArr)
+      bloom.size
+  - type: code
+    language: python
+    title: 크기 조절
+    description: 셀 크기에 맞춥니다
+    content: |-
+      bloomResized = bloom.resize((cellSize, cellSize))
+      bloomResized.size
+  - type: code
+    language: python
+    title: 콜라주에 추가
+    description: 리사이즈된 이미지를 붙입니다
+    content: |-
+      newCollage = Image.new('RGB', (totalW, totalH), 'lightgray')
+      newCollage.paste(bloomResized, (gap, gap))
+      newCollage
+  - type: tip
+    content: resize()는 비율을 무시하고 정확한 크기로 변환합니다. 비율을 유지하려면 thumbnail()을 사용하거나, 비율 계산 후 resize()합니다.
+
+- id: step5_mixed
+  title: 5단계. 혼합 콜라주
+  subtitle: 다양한 소스 조합
+  blocks:
+  - type: text
+    content: sklearn 이미지와 Lorem Picsum 이미지를 섞어 콜라주를 만듭니다. 각 이미지를 셀 크기에 맞게 조절합니다.
+  - type: code
+    language: python
+    title: china 이미지 추가
+    description: sklearn의 다른 이미지입니다
+    content: |-
+      sceneArr = load_sample_image('china.jpg')
+      scene = Image.fromarray(sceneArr)
+      sceneResized = scene.resize((cellSize, cellSize))
+      sceneResized.size
+  - type: code
+    language: python
+    title: 혼합 콜라주 생성
+    description: 네 이미지를 배치합니다
+    content: |-
+      mixedCollage = Image.new('RGB', (totalW, totalH), 'white')
+      mixedCollage.paste(bloomResized, (gap, gap))
+      mixedCollage.paste(sceneResized, (gap + cellSize + gap, gap))
+      mixedCollage.paste(img1.resize((cellSize, cellSize)), (gap, gap + cellSize + gap))
+      mixedCollage.paste(img2.resize((cellSize, cellSize)), (gap + cellSize + gap, gap + cellSize + gap))
+      mixedCollage
+
+- id: step6_border
+  title: 6단계. 테두리 추가
+  subtitle: ImageDraw 활용
+  blocks:
+  - type: text
+    content: ImageDraw로 각 이미지 주변에 테두리를 그려 콜라주를 더 세련되게 만듭니다.
+  - type: code
+    language: python
+    title: 테두리 그리기
+    description: 각 셀 주변에 테두리를 추가합니다
+    content: |-
+      from PIL import ImageDraw
+
+      finalCollage = mixedCollage.copy()
+      borderPen = ImageDraw.Draw(finalCollage)
+
+      positions = [
+          (gap, gap),
+          (gap + cellSize + gap, gap),
+          (gap, gap + cellSize + gap),
+          (gap + cellSize + gap, gap + cellSize + gap)
+      ]
+
+      for x, y in positions:
+          borderPen.rectangle([x-2, y-2, x+cellSize+1, y+cellSize+1], outline='black', width=2)
+
+      finalCollage
+
+- id: practice
+  title: 실습
+  subtitle: 콜라주 프로젝트
+  blocks:
+  - type: text
+    content: 다양한 레이아웃의 콜라주를 만들어봅시다. 위에서 배운 paste()와 좌표 계산을 활용하여 가로 스트립과 듀오 콜라주를 직접 구성합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 가로 스트립 콜라주"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image
+        from sklearn.datasets import load_sample_image
+
+        bloomImg = Image.fromarray(load_sample_image('flower.jpg'))
+        sceneImg = Image.fromarray(load_sample_image('china.jpg'))
+
+        stripSize = (150, 100)
+        strip1 = bloomImg.crop((0, 0, 300, 200)).resize(stripSize)
+        strip2 = bloomImg.crop((200, 150, 500, 350)).resize(stripSize)
+        strip3 = sceneImg.crop((0, 0, 300, 200)).resize(stripSize)
+        strip1
+    - type: code
+      title: "가로 스트립 생성"
+      content: |-
+        stripWidth = 150 * 3 + 10 * 4
+        stripCollage = Image.new('RGB', (stripWidth, 120), 'white')
+        stripCollage.paste(strip1, (10, 10))
+        stripCollage.paste(strip2, (170, 10))
+        stripCollage.paste(strip3, (330, 10))
+        stripCollage
+  - type: expansion
+    title: "미션2: sklearn 듀오 콜라주"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image, ImageDraw
+        from sklearn.datasets import load_sample_image
+
+        duoFlower = Image.fromarray(load_sample_image('flower.jpg'))
+        duoChina = Image.fromarray(load_sample_image('china.jpg'))
+        duoFlower
+    - type: code
+      title: "리사이즈"
+      content: |-
+        targetSize = (300, 200)
+        duoFlowerFit = duoFlower.resize(targetSize)
+        duoChinaFit = duoChina.resize(targetSize)
+        duoFlowerFit.size
+    - type: code
+      title: "듀오 콜라주 생성"
+      content: |-
+        duoCanvas = Image.new('RGB', (620, 220), 'darkgray')
+        duoCanvas.paste(duoFlowerFit, (10, 10))
+        duoCanvas.paste(duoChinaFit, (320, 10))
+        duoPen = ImageDraw.Draw(duoCanvas)
+        duoPen.rectangle([8, 8, 312, 212], outline='white', width=2)
+        duoPen.rectangle([318, 8, 612, 212], outline='white', width=2)
+        duoCanvas

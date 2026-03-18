@@ -1,0 +1,227 @@
+meta:
+  id: pillow_07
+  title: 워터마크생성기
+  order: 7
+  category: pillow
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["Pillow", "ImageDraw", "text", "paste", "RGBA", "alpha", "워터마크"]
+  seo:
+    title: "Pillow 중급 - 워터마크 생성기"
+    description: "Pillow로 이미지에 텍스트 워터마크를 추가합니다. ImageDraw와 투명도 처리를 배웁니다."
+    keywords: ["Pillow", "워터마크", "ImageDraw", "text", "투명도", "alpha"]
+
+intro:
+  emoji: "💧"
+  goal: 이미지에 반투명 텍스트 워터마크를 추가합니다.
+  description: ImageDraw.text()로 텍스트를 그리고, RGBA 모드와 paste()로 반투명 워터마크를 합성합니다. 저작권 표시나 브랜딩에 활용되는 기법입니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 기본 이미지 준비
+  subtitle: 워터마크를 적용할 이미지
+  blocks:
+  - type: text
+    content: sklearn의 flower 이미지를 불러옵니다. 워터마크는 보통 사진의 저작권을 표시하거나 브랜드를 각인시키는 데 사용됩니다.
+  - type: code
+    language: python
+    title: 라이브러리와 이미지
+    description: ImageDraw 모듈을 임포트합니다
+    content: |-
+      from PIL import Image, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+      flowerArr = load_sample_image('flower.jpg')
+      base = Image.fromarray(flowerArr)
+      base.size, base.mode
+  - type: code
+    language: python
+    title: 원본 이미지
+    description: 워터마크 적용 전입니다
+    content: |-
+      base
+
+- id: step2_simple_text
+  title: 2단계. 기본 텍스트 삽입
+  subtitle: ImageDraw.text()
+  blocks:
+  - type: text
+    content: ImageDraw.Draw()로 그리기 객체를 생성하고 text() 메서드로 텍스트를 삽입합니다. 좌표, 텍스트, 색상을 지정할 수 있습니다. 기본 폰트를 사용하면 크기가 작습니다.
+  - type: code
+    language: python
+    title: 그리기 객체 생성
+    description: 이미지에 그릴 준비를 합니다
+    content: |-
+      baseCopy = base.copy()
+      draw = ImageDraw.Draw(baseCopy)
+      type(draw)
+  - type: code
+    language: python
+    title: 텍스트 삽입
+    description: 왼쪽 상단에 텍스트를 넣습니다
+    content: |-
+      draw.text((10, 10), "Sample Watermark", fill='white')
+      baseCopy
+  - type: tip
+    content: text()의 첫 번째 인자는 (x, y) 좌표로 텍스트의 왼쪽 상단 위치입니다. fill은 텍스트 색상입니다. 색상은 'white', 'red' 같은 이름이나 (255, 255, 255) RGB 튜플로 지정합니다.
+
+- id: step3_rgba
+  title: 3단계. RGBA 모드
+  subtitle: 투명도 채널
+  blocks:
+  - type: text
+    content: 반투명 워터마크를 만들려면 RGBA 모드를 사용해야 합니다. RGBA는 RGB에 Alpha(투명도) 채널이 추가된 것입니다. Alpha 값이 0이면 완전 투명, 255면 완전 불투명입니다.
+  - type: code
+    language: python
+    title: RGBA로 변환
+    description: 투명도 채널을 추가합니다
+    content: |-
+      baseRgba = base.convert('RGBA')
+      baseRgba.mode
+  - type: code
+    language: python
+    title: 투명 레이어 생성
+    description: 워터마크용 투명 이미지를 만듭니다
+    content: |-
+      watermark = Image.new('RGBA', base.size, (0, 0, 0, 0))
+      watermark.mode, watermark.size
+  - type: tip
+    content: Image.new('RGBA', size, (0, 0, 0, 0))은 완전 투명한 이미지를 생성합니다. 네 번째 값 0이 Alpha=0(투명)을 의미합니다. 이 투명 레이어 위에 워터마크를 그립니다.
+
+- id: step4_watermark_text
+  title: 4단계. 워터마크 텍스트 그리기
+  subtitle: 반투명 텍스트
+  blocks:
+  - type: text
+    content: 투명 레이어에 반투명 색상으로 텍스트를 그립니다. 색상의 네 번째 값이 Alpha입니다. (255, 255, 255, 128)은 50% 투명한 흰색입니다.
+  - type: code
+    language: python
+    title: 워터마크 그리기
+    description: 반투명 흰색 텍스트입니다
+    content: |-
+      artist = ImageDraw.Draw(watermark)
+      artist.text((50, 50), "WATERMARK", fill=(255, 255, 255, 128))
+      watermark
+  - type: code
+    language: python
+    title: 더 큰 워터마크
+    description: 여러 위치에 그립니다
+    content: |-
+      positions = [(50, 50), (200, 150), (350, 250)]
+      for pos in positions:
+          artist.text(pos, "SAMPLE", fill=(255, 255, 255, 100))
+      watermark
+  - type: tip
+    content: Alpha 값 128은 약 50% 투명입니다. 값을 낮추면 더 투명해지고(흐릿), 높이면 더 불투명해집니다(선명). 워터마크는 보통 80~150 정도의 Alpha가 적당합니다.
+
+- id: step5_composite
+  title: 5단계. 이미지 합성
+  subtitle: alpha_composite()
+  blocks:
+  - type: text
+    content: alpha_composite()는 두 RGBA 이미지를 투명도를 고려하여 합성합니다. paste()와 달리 Alpha 채널을 올바르게 처리합니다.
+  - type: code
+    language: python
+    title: 워터마크 합성
+    description: 원본과 워터마크를 합칩니다
+    content: |-
+      combined = Image.alpha_composite(baseRgba, watermark)
+      combined
+  - type: tip
+    content: alpha_composite()는 두 이미지 모두 RGBA 모드여야 합니다. paste()도 mask 인자로 투명도를 처리할 수 있지만, alpha_composite()가 더 직관적입니다.
+
+- id: step6_corner
+  title: 6단계. 코너 워터마크
+  subtitle: 위치 계산
+  blocks:
+  - type: text
+    content: 워터마크를 오른쪽 하단 같은 특정 위치에 배치하려면 좌표를 계산해야 합니다. 이미지 크기와 텍스트 크기를 고려하여 위치를 정합니다.
+  - type: code
+    language: python
+    title: 새 워터마크 레이어
+    description: 오른쪽 하단용 레이어입니다
+    content: |-
+      cornerMark = Image.new('RGBA', base.size, (0, 0, 0, 0))
+      pencil = ImageDraw.Draw(cornerMark)
+      w, h = base.size
+      w, h
+  - type: code
+    language: python
+    title: 오른쪽 하단에 배치
+    description: 마진을 두고 위치를 계산합니다
+    content: |-
+      text = "© 2024 Sample"
+      margin = 20
+      pencil.text((w - 150, h - margin - 15), text, fill=(255, 255, 255, 180))
+      cornerMark
+  - type: code
+    language: python
+    title: 최종 합성
+    description: 코너 워터마크를 적용합니다
+    content: |-
+      final = Image.alpha_composite(baseRgba, cornerMark)
+      final
+  - type: tip
+    content: 텍스트 크기를 정확히 알려면 draw.textbbox()나 draw.textlength()를 사용합니다. Pyodide에서는 기본 폰트만 사용 가능하므로 대략적인 추정치로 위치를 정합니다.
+
+- id: practice
+  title: 실습
+  subtitle: 워터마크 프로젝트
+  blocks:
+  - type: text
+    content: china 이미지에 다양한 워터마크를 적용해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 대각선 워터마크"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image, ImageDraw
+        from sklearn.datasets import load_sample_image
+
+        chinaArr = load_sample_image('china.jpg')
+        china = Image.fromarray(chinaArr).convert('RGBA')
+        china
+    - type: code
+      title: "대각선 배치"
+      content: |-
+        diagonal = Image.new('RGBA', china.size, (0, 0, 0, 0))
+        brush = ImageDraw.Draw(diagonal)
+        for i in range(5):
+            x = 50 + i * 120
+            y = 30 + i * 80
+            brush.text((x, y), "SAMPLE", fill=(255, 255, 255, 100))
+        diagonal
+    - type: code
+      title: "합성"
+      content: |-
+        chinaMark = Image.alpha_composite(china, diagonal)
+        chinaMark
+  - type: expansion
+    title: "미션2: 반복 패턴 워터마크"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image, ImageDraw
+        from sklearn.datasets import load_sample_image
+
+        imgArr = load_sample_image('flower.jpg')
+        photo = Image.fromarray(imgArr).convert('RGBA')
+        photo
+    - type: code
+      title: "그리드 패턴"
+      content: |-
+        pattern = Image.new('RGBA', photo.size, (0, 0, 0, 0))
+        pen = ImageDraw.Draw(pattern)
+        for y in range(0, photo.size[1], 100):
+            for x in range(0, photo.size[0], 150):
+                pen.text((x, y), "©", fill=(200, 200, 200, 80))
+        pattern
+    - type: code
+      title: "합성"
+      content: |-
+        patternResult = Image.alpha_composite(photo, pattern)
+        patternResult

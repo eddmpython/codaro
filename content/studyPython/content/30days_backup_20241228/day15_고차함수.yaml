@@ -1,0 +1,499 @@
+meta:
+  id: day15
+  title: 고차함수
+  day: 15
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 고차함수 - map, filter, reduce"
+    description: "map, filter, reduce 함수 사용법을 배웁니다."
+    keywords: ['고차함수', 'map', 'filter', 'reduce']
+intro:
+  emoji: "🚀"
+  points:
+  - 고차 함수의 개념과 활용법
+  - 함수를 매개변수로 전달하고 반환하기
+  - map 함수로 데이터 변환하기
+  - filter 함수로 데이터 필터링하기
+  - reduce 함수로 데이터 집계하기
+  - 클로저와 데코레이터 기초
+sections:
+- id: higher_order_introduction
+  title: 고차 함수 소개
+  subtitle: 함수를 다루는 함수
+  blocks:
+  - type: text
+    content: 고차 함수(Higher-Order Function)는 함수를 매개변수로 받거나, 함수를 반환값으로 돌려주는 함수입니다. 영어로 'Higher-Order'는 '더 높은 단계의'라는 뜻으로, 일반 함수보다 한 단계 위에서 함수 자체를 다룬다는 의미입니다. 파이썬에서 함수는 "일급 시민(first-class citizen)"으로 취급되어 변수에 저장하거나, 다른 함수에 전달하거나, 함수에서 반환할 수 있습니다. 이는 마치 숫자나 문자열을 변수에 넣고 함수의 인수로 전달하는 것처럼, 함수도 똑같이 다룰 수 있다는 것을 의미합니다. 고차 함수를 사용하면 코드의 재사용성이 높아지고, 더 유연하고 간결한 프로그램을 작성할 수 있습니다.
+  - type: list
+    items:
+    - 함수를 매개변수로 받을 수 있음
+    - 함수를 반환값으로 사용할 수 있음
+    - 함수를 변수에 할당할 수 있음
+    - 함수형 프로그래밍의 핵심 개념
+  - type: code
+    language: python
+    title: 고차 함수 기본
+    description: "함수를 변수에 저장하고 다른 함수에 전달합니다."
+    content: |-
+      def greet():
+          return 'Hello World'
+
+      sayHello = greet
+      sayHello()
+
+      def square(x):
+          return x * x
+
+      def doSomething(func, x):
+          return func(x)
+
+      result = doSomething(square, 5)
+      result
+  - type: tip
+    content: "함수를 인수로 전달할 때는 괄호 없이 함수 이름만 씁니다. square()가 아니라 square입니다. 괄호를 붙이면 함수를 실행한 결과가 전달되고, 괄호 없이 쓰면 함수 자체가 전달됩니다."
+
+- id: function_as_parameter
+  title: 함수를 매개변수로 받기
+  subtitle: 함수를 인수로 전달
+  blocks:
+  - type: text
+    content: 고차 함수의 첫 번째 특징은 함수를 매개변수로 받을 수 있다는 것입니다. 이를 통해 함수의 동작 방식을 외부에서 주입할 수 있습니다. 예를 들어 숫자 리스트를 처리하는 함수가 있을 때, 어떤 연산을 할지를 매개변수로 받은 함수에게 위임할 수 있습니다. 이는 마치 레스토랑에서 요리사(함수)에게 재료(데이터)와 함께 조리법(매개변수 함수)을 전달하는 것과 같습니다. 같은 재료라도 조리법에 따라 전혀 다른 요리가 나오듯이, 같은 데이터라도 전달하는 함수에 따라 다른 결과를 얻을 수 있습니다.
+  - type: list
+    items:
+    - 함수에 다른 함수를 전달
+    - 동작 방식을 외부에서 결정
+    - 코드 재사용성 증가
+    - 유연한 프로그래밍 가능
+  - type: code
+    language: python
+    title: 함수를 매개변수로 받기
+    description: "다양한 함수를 전달하여 다른 결과를 얻습니다."
+    content: |-
+      def applyFunc(func, numList):
+          resultList = []
+          for num in numList:
+              resultList.append(func(num))
+          return resultList
+
+      def squareNum(x):
+          return x * x
+
+      def cubeNum(x):
+          return x * x * x
+
+      numbersParam = [1, 2, 3, 4, 5]
+
+      squaredResults = applyFunc(squareNum, numbersParam)
+      squaredResults
+
+      cubedResults = applyFunc(cubeNum, numbersParam)
+      cubedResults
+  - type: tip
+    content: "applyFunc는 어떤 함수든 받아서 리스트의 모든 요소에 적용합니다. 이런 패턴을 '전략 패턴'이라고 부르며, 실행 시점에 동작을 결정할 수 있습니다."
+
+- id: function_as_return
+  title: 함수를 반환하는 함수
+  subtitle: 함수 팩토리 패턴
+  blocks:
+  - type: text
+    content: 고차 함수의 두 번째 특징은 다른 함수를 반환할 수 있다는 것입니다. 이를 '함수 팩토리(Function Factory)' 패턴이라고 부르며, 함수를 만드는 함수를 의미합니다. 영어로 'Factory'는 공장이라는 뜻으로, 제품을 찍어내듯이 함수를 생성해낸다는 비유입니다. 조건에 따라 다른 함수를 반환하거나, 설정값을 기억하는 함수를 동적으로 생성할 수 있습니다. 이는 마치 옷 공장에서 사이즈에 따라 다른 옷을 만들어내는 것처럼, 요청에 따라 맞춤형 함수를 만들어낼 수 있습니다.
+  - type: list
+    items:
+    - 함수에서 다른 함수를 반환
+    - 조건에 따라 다른 함수 생성
+    - 함수 팩토리 패턴 구현
+    - 클로저 개념의 기초
+  - type: code
+    language: python
+    title: 함수 반환하기
+    description: "함수에서 다른 함수를 반환합니다."
+    content: |-
+      def squareReturn(x):
+          return x * x
+
+      def cubeReturn(x):
+          return x * x * x
+
+      def getFunction(funcType):
+          if funcType == 'square':
+              return squareReturn
+          elif funcType == 'cube':
+              return cubeReturn
+
+      funcSquare = getFunction('square')
+      funcSquare(3)
+
+      funcCube = getFunction('cube')
+      funcCube(3)
+  - type: tip
+    content: "getFunction은 문자열을 받아 해당하는 함수를 반환합니다. 반환된 함수를 변수에 저장한 후 나중에 호출할 수 있습니다. 이는 조건에 따라 다른 동작을 하는 함수를 동적으로 선택할 때 유용합니다."
+
+- id: closure
+  title: 클로저
+  subtitle: 외부 변수를 기억하는 함수
+  blocks:
+  - type: text
+    content: 클로저(Closure)는 내부 함수가 외부 함수의 변수를 "기억"하는 현상입니다. 영어로 'Closure'는 '닫혀있음, 감싸고 있음'을 의미하며, 내부 함수가 외부 함수의 환경을 감싸서 보관한다는 뜻입니다. 일반적으로 함수가 종료되면 그 함수 안의 변수들은 모두 사라지지만, 클로저에서는 외부 함수가 종료된 후에도 내부 함수가 외부 변수에 접근할 수 있습니다. 이는 마치 집을 나가면서 열쇠를 가지고 나가는 것과 같습니다. 집(외부 함수)은 사라져도 열쇠(내부 함수)는 그 집의 정보(외부 변수)를 여전히 기억하고 있는 것입니다. 클로저를 사용하면 상태를 유지하는 함수를 만들 수 있고, 데이터를 은닉하여 보호할 수 있습니다.
+  - type: list
+    items:
+    - 내부 함수가 외부 함수의 변수를 기억
+    - 외부 함수 종료 후에도 접근 가능
+    - 상태 보존과 데이터 캡슐화에 유용
+    - 함수 팩토리 패턴의 핵심 메커니즘
+  - type: code
+    language: python
+    title: 클로저 예제
+    description: "내부 함수가 외부 변수를 기억합니다."
+    content: |-
+      def addTen():
+          ten = 10
+          def add(num):
+              return num + ten
+          return add
+
+      closureResult = addTen()
+      closureResult(5)
+      closureResult(10)
+
+      def makeMultiplier(x):
+          def multiplier(num):
+              return num * x
+          return multiplier
+
+      double = makeMultiplier(2)
+      triple = makeMultiplier(3)
+
+      double(5)
+      triple(5)
+  - type: tip
+    content: "addTen()을 호출하면 내부 함수 add가 반환되는데, 이 함수는 ten=10을 기억합니다. makeMultiplier(2)는 x=2를 기억하는 함수를, makeMultiplier(3)은 x=3을 기억하는 함수를 각각 생성합니다. 이처럼 클로저는 함수가 생성될 때의 환경을 기억합니다."
+
+- id: map_function
+  title: map 함수
+  subtitle: 모든 요소에 함수 적용
+  blocks:
+  - type: text
+    content: map() 함수는 이터러블(리스트, 튜플 등)의 모든 요소에 함수를 적용하여 새로운 이터러블을 반환하는 내장 고차 함수입니다. 영어로 'map'은 '지도를 그리다, 대응시키다'라는 뜻으로, 각 요소를 새로운 값으로 대응시킨다는 의미입니다. 사용 형태는 "map(함수, 이터러블)"이며, 결과는 map 객체이므로 list()로 변환하여 사용합니다. 예를 들어 숫자 리스트의 모든 요소를 제곱하고 싶을 때, for 반복문을 사용하는 대신 map을 사용하면 한 줄로 간결하게 표현할 수 있습니다. map은 원본 데이터를 변경하지 않고 새로운 결과를 생성하므로, 데이터 변환 작업에 안전하게 사용할 수 있습니다.
+  - type: list
+    items:
+    - "map(함수, 이터러블) 형태로 사용"
+    - 모든 요소에 함수를 적용
+    - 새로운 map 객체 반환
+    - "list()로 변환하여 확인"
+  - type: code
+    language: python
+    title: map 함수 사용
+    description: "모든 요소에 함수를 적용합니다."
+    content: |-
+      mapNumbers = [1, 2, 3, 4, 5]
+
+      def squareMap(x):
+          return x * x
+
+      squaredMap = map(squareMap, mapNumbers)
+      list(squaredMap)
+
+      squared2Map = map(lambda x: x * x, mapNumbers)
+      list(squared2Map)
+
+      mapNames = ['Alice', 'Bob', 'Charlie']
+      uppersMap = map(lambda n: n.upper(), mapNames)
+      list(uppersMap)
+
+      strNumsMap = ['1', '2', '3', '4', '5']
+      intNumsMap = map(int, strNumsMap)
+      list(intNumsMap)
+  - type: tip
+    content: "map 결과는 map 객체라는 특수한 형태로 반환되며, 한 번만 순회할 수 있습니다. 여러 번 사용하려면 list()로 변환해두세요. lambda를 사용하면 별도의 함수 정의 없이 간단한 함수를 바로 전달할 수 있고, int처럼 내장 함수도 직접 전달할 수 있습니다."
+
+- id: filter_function
+  title: filter 함수
+  subtitle: 조건에 맞는 요소만 선택
+  blocks:
+  - type: text
+    content: filter() 함수는 이터러블에서 조건 함수가 True를 반환하는 요소만 선택하는 내장 고차 함수입니다. 영어로 'filter'는 '거르다, 걸러내다'라는 뜻으로, 조건에 맞지 않는 요소를 걸러내고 필요한 것만 남긴다는 의미입니다. 사용 형태는 "filter(조건함수, 이터러블)"이며, 조건 함수는 각 요소를 받아 True 또는 False를 반환해야 합니다. True를 반환하는 요소만 결과에 포함됩니다. 예를 들어 숫자 리스트에서 짝수만 골라내거나, 문자열 리스트에서 길이가 5 이상인 것만 선택할 때 사용합니다. map이 모든 요소를 변환한다면, filter는 일부 요소만 선택한다는 점에서 차이가 있습니다.
+  - type: list
+    items:
+    - "filter(조건함수, 이터러블) 형태로 사용"
+    - True를 반환하는 요소만 선택
+    - 필터링과 걸러내기에 사용
+    - "list()로 변환하여 확인"
+  - type: code
+    language: python
+    title: filter 함수 사용
+    description: "조건에 맞는 요소만 선택합니다."
+    content: |-
+      filterNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+      def isEven(x):
+          return x % 2 == 0
+
+      evensFilter = filter(isEven, filterNumbers)
+      list(evensFilter)
+
+      oddsFilter = filter(lambda x: x % 2 != 0, filterNumbers)
+      list(oddsFilter)
+
+      filterNames = ['Alice', 'Bob', 'Charlie', 'Dave']
+      longNamesFilter = filter(lambda n: len(n) > 4, filterNames)
+      list(longNamesFilter)
+
+      positivesFilter = filter(lambda x: x > 0, [-2, -1, 0, 1, 2])
+      list(positivesFilter)
+  - type: tip
+    content: "조건 함수는 반드시 True 또는 False를 반환해야 합니다. isEven(x)는 x가 짝수면 True를, 홀수면 False를 반환합니다. lambda x: x > 0처럼 비교 연산자를 사용하면 조건을 간단하게 표현할 수 있습니다."
+
+- id: reduce_function
+  title: reduce 함수
+  subtitle: 모든 요소를 하나로 집계
+  blocks:
+  - type: text
+    content: reduce() 함수는 이터러블의 모든 요소를 누적하여 하나의 값으로 만드는 고차 함수입니다. 영어로 'reduce'는 '줄이다, 축소하다'라는 뜻으로, 여러 개의 요소를 하나로 줄인다는 의미입니다. reduce는 map이나 filter와 달리 내장 함수가 아니므로 functools 모듈에서 import해야 합니다. 사용 형태는 "reduce(함수, 이터러블)"이며, 함수는 두 개의 인수를 받아 하나의 결과를 반환해야 합니다. 첫 번째와 두 번째 요소를 처리한 결과를 다시 세 번째 요소와 처리하는 방식으로 모든 요소를 순차적으로 누적 처리합니다. 예를 들어 리스트의 합계나 곱을 구하거나, 문자열을 모두 연결하는 작업에 사용할 수 있습니다. map이 '변환', filter가 '선택'이라면, reduce는 '집계'를 담당합니다.
+  - type: list
+    items:
+    - "from functools import reduce로 먼저 가져오기"
+    - 두 인수를 받아 하나로 합치는 함수 사용
+    - 합계와 곱 등 집계 작업에 사용
+    - 이터러블을 단일 값으로 축약
+  - type: code
+    language: python
+    title: reduce 함수 사용
+    description: "모든 요소를 하나의 값으로 집계합니다."
+    content: |-
+      from functools import reduce
+
+      reduceNumbers = [1, 2, 3, 4, 5]
+
+      totalReduce = reduce(lambda a, b: a + b, reduceNumbers)
+      totalReduce
+
+      productReduce = reduce(lambda a, b: a * b, reduceNumbers)
+      productReduce
+
+      wordsReduce = ['Hello', ' ', 'World', '!']
+      sentenceReduce = reduce(lambda a, b: a + b, wordsReduce)
+      sentenceReduce
+
+      maxNumReduce = reduce(lambda a, b: a if a > b else b, reduceNumbers)
+      maxNumReduce
+  - type: tip
+    content: "reduce의 함수는 두 개의 인수를 받습니다. lambda a, b: a + b에서 첫 호출 때는 a=1, b=2이고 결과는 3입니다. 두 번째 호출 때는 a=3(이전 결과), b=3(다음 요소)이고 결과는 6입니다. 이런 식으로 누적됩니다. 간단한 합계는 sum(), 최댓값은 max()를 사용하는 것이 더 읽기 쉽습니다."
+
+- id: decorator
+  title: 데코레이터
+  subtitle: 함수를 꾸미는 함수
+  blocks:
+  - type: text
+    content: 데코레이터(Decorator)는 기존 함수를 수정하지 않고 새로운 기능을 추가하는 고차 함수 패턴입니다. 영어로 'Decorator'는 '장식하는 사람, 꾸미는 것'을 의미하며, 함수를 꾸며서 기능을 추가한다는 뜻입니다. @ 기호를 사용하여 함수 정의 위에 적용하며, 데코레이터 함수는 다른 함수를 인수로 받아 새로운 기능이 추가된 함수를 반환합니다. 이는 마치 선물 상자를 포장지로 감싸는 것과 같습니다. 선물(원본 함수)은 그대로지만 포장지(데코레이터)가 추가 기능을 제공합니다. 로깅, 실행 시간 측정, 권한 체크 등 여러 함수에 공통으로 적용할 기능을 데코레이터로 만들면 코드 중복을 줄이고 재사용성을 높일 수 있습니다. 데코레이터는 클로저를 활용하여 구현됩니다.
+  - type: list
+    items:
+    - "@ 기호로 함수 위에 적용"
+    - 기존 함수 수정 없이 기능 추가
+    - 로깅과 권한 체크 등에 활용
+    - 코드 재사용성 향상
+  - type: code
+    language: python
+    title: 데코레이터 기본
+    description: "@로 함수에 기능을 추가합니다."
+    content: |-
+      def uppercaseDecorator(func):
+          def wrapper():
+              result = func()
+              return result.upper()
+          return wrapper
+
+      @uppercaseDecorator
+      def greeting():
+          return 'Welcome to Python'
+
+      greeting()
+
+      def logDecorator(func):
+          def wrapper(*args, **kwargs):
+              resultLog = func(*args, **kwargs)
+              return resultLog
+          return wrapper
+
+      @logDecorator
+      def addDeco(a, b):
+          return a + b
+
+      addDeco(3, 5)
+  - type: tip
+    content: "@uppercaseDecorator는 greeting = uppercaseDecorator(greeting)과 같은 의미입니다. uppercaseDecorator는 함수를 받아 wrapper 함수를 반환하고, wrapper는 원본 함수의 결과를 대문자로 변환합니다. *args와 **kwargs는 모든 인수를 받을 수 있게 하여 다양한 함수에 데코레이터를 적용할 수 있게 합니다."
+
+- id: chaining
+  title: 고차 함수 체이닝
+  subtitle: map, filter, reduce 조합
+  blocks:
+  - type: text
+    content: map, filter, reduce를 조합하여 복잡한 데이터 처리를 간결하게 표현할 수 있습니다. 체이닝(Chaining)은 '사슬처럼 연결한다'는 뜻으로, 여러 함수를 연결하여 데이터가 파이프라인처럼 흐르며 순차적으로 변환되도록 합니다. 예를 들어 숫자 리스트를 제곱한 후(map), 짝수만 선택하고(filter), 모두 더하는(reduce) 작업을 한 번에 처리할 수 있습니다. 이는 마치 공장의 컨베이어 벨트처럼, 재료가 여러 가공 단계를 거쳐 최종 제품이 되는 것과 같습니다. 각 고차 함수는 이전 단계의 결과를 받아 다음 단계로 전달하므로, 데이터의 흐름을 명확하게 표현할 수 있고 함수형 프로그래밍 스타일로 코드를 작성할 수 있습니다.
+  - type: list
+    items:
+    - 여러 고차 함수를 연결하여 사용
+    - 데이터 파이프라인 구성
+    - 가독성 있는 데이터 처리
+    - 함수형 프로그래밍 스타일
+  - type: code
+    language: python
+    title: 고차 함수 체이닝
+    description: "map, filter, reduce를 조합합니다."
+    content: |-
+      from functools import reduce
+
+      chainingNumbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+      resultChaining = reduce(
+          lambda a, b: a + b,
+          filter(
+              lambda x: x % 2 == 0,
+              map(lambda x: x * x, chainingNumbers)
+          )
+      )
+      resultChaining
+
+      countriesChaining = ['Finland', 'Sweden', 'Norway', 'Iceland']
+      result2Chaining = list(
+          map(
+              lambda c: c.upper(),
+              filter(lambda c: len(c) > 6, countriesChaining)
+          )
+      )
+      result2Chaining
+  - type: tip
+    content: "첫 번째 예제는 안쪽부터 실행됩니다. map으로 제곱(1,4,9,16,25,36,49,64,81,100), filter로 짝수만(4,16,36,64,100), reduce로 합계(220). 두 번째 예제는 길이 6 초과인 나라(Finland, Iceland)를 대문자로 변환합니다. 체이닝은 강력하지만 너무 중첩하면 읽기 어려우므로 적절히 사용해야 합니다."
+
+- id: practice
+  title: 15일차 복습
+  subtitle: 고차 함수 미션
+  blocks:
+  - type: text
+    content: 15일차에서 배운 고차 함수를 복습하는 미션입니다. 고차 함수, 함수를 매개변수로 받기, 함수를 반환하기, 클로저, map, filter, reduce, 데코레이터, 체이닝을 종합적으로 연습해봅시다. 이전 day에서 배운 조건문, 반복문, 함수, 리스트, 람다도 함께 활용합니다.
+  - type: expansion
+    title: "미션1: 고차 함수로 리스트 처리"
+    code: |-
+      def processNumbers(func, numList):
+          processedList = []
+          for n in numList:
+              processedList.append(func(n))
+          return processedList
+
+      def triple(x):
+          return x * 3
+
+      mission1Numbers = [1, 2, 3, 4, 5]
+      processNumbers(triple, mission1Numbers)
+  - type: expansion
+    title: "미션2: 함수 팩토리로 연산 함수 생성"
+    code: |-
+      def createOperation(operation):
+          if operation == 'add10':
+              return lambda x: x + 10
+          elif operation == 'multiply5':
+              return lambda x: x * 5
+
+      addFunc = createOperation('add10')
+      addFunc(7)
+
+      mulFunc = createOperation('multiply5')
+      mulFunc(7)
+  - type: expansion
+    title: "미션3: 클로저로 카운터 만들기"
+    code: |-
+      def makeCounter(start):
+          def counter(increment):
+              return start + increment
+          return counter
+
+      counter10 = makeCounter(10)
+      counter10(5)
+      counter10(20)
+
+      counter100 = makeCounter(100)
+      counter100(50)
+  - type: expansion
+    title: "미션4: map으로 문자열 변환"
+    code: |-
+      mission4Words = ['python', 'java', 'javascript', 'ruby']
+      upperWords = list(map(lambda w: w.upper(), mission4Words))
+      upperWords
+
+      lengthsList = list(map(len, mission4Words))
+      lengthsList
+  - type: expansion
+    title: "미션5: filter로 조건 필터링"
+    code: |-
+      mission5Numbers = [5, 12, 17, 23, 8, 30, 45, 2]
+      bigNumbers = list(filter(lambda x: x > 10, mission5Numbers))
+      bigNumbers
+
+      mission5Words = ['cat', 'elephant', 'dog', 'butterfly']
+      longWords = list(filter(lambda w: len(w) >= 5, mission5Words))
+      longWords
+  - type: expansion
+    title: "미션6: reduce로 최솟값 찾기"
+    code: |-
+      from functools import reduce
+
+      mission6Numbers = [15, 8, 23, 4, 16, 42]
+      minValue = reduce(lambda a, b: a if a < b else b, mission6Numbers)
+      minValue
+
+      mission6Words = ['apple', 'banana', 'cherry']
+      combined = reduce(lambda a, b: a + ', ' + b, mission6Words)
+      combined
+  - type: expansion
+    title: "미션7: map, filter, reduce 체이닝"
+    code: |-
+      from functools import reduce
+
+      mission7Numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+      resultMission7 = reduce(
+          lambda a, b: a * b,
+          filter(
+              lambda x: x % 2 != 0,
+              map(lambda x: x + 1, mission7Numbers)
+          )
+      )
+      resultMission7
+  - type: expansion
+    title: "미션8: 데코레이터로 결과 두 배 만들기"
+    code: |-
+      def doubleDecorator(func):
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return result * 2
+          return wrapper
+
+      @doubleDecorator
+      def sum2Numbers(a, b):
+          return a + b
+
+      sum2Numbers(5, 10)
+  - type: expansion
+    title: "미션9: 클로저와 map 조합"
+    code: |-
+      def createAdder(addValue):
+          def adder(x):
+              return x + addValue
+          return adder
+
+      add100 = createAdder(100)
+      mission9Numbers = [1, 2, 3, 4, 5]
+      resultsMission9 = list(map(add100, mission9Numbers))
+      resultsMission9
+  - type: expansion
+    title: "미션10: 종합 - 숫자 리스트 전처리"
+    code: |-
+      from functools import reduce
+
+      mission10Data = [10, 15, 20, 25, 30, 35, 40]
+
+      stepMap = list(map(lambda x: x - 5, mission10Data))
+      stepFilter = list(filter(lambda x: x % 2 == 0, stepMap))
+      stepReduce = reduce(lambda a, b: a + b, stepFilter)
+
+      stepReduce

@@ -1,0 +1,514 @@
+meta:
+  id: pydantic_05
+  title: 설정관리기
+  order: 5
+  category: pydantic
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["pydantic", "settings", "환경변수", "config", "dotenv"]
+  seo:
+    title: "Pydantic Settings - 환경변수와 설정 관리"
+    description: "pydantic-settings로 애플리케이션 설정을 관리합니다. 환경변수, 중첩 설정, SecretStr을 배웁니다."
+    keywords: ["pydantic", "settings", "환경변수", "config", "dotenv"]
+
+intro:
+  emoji: "⚙️"
+  goal: pydantic-settings로 마이크로서비스 설정 시스템을 구축합니다.
+  description: "실제 서비스에서 설정은 환경(개발/스테이징/운영)에 따라 달라집니다. 데이터베이스 주소, API 키, 포트 번호 등을 코드에 하드코딩하면 배포할 때마다 수정해야 합니다. pydantic-settings는 환경변수에서 설정을 읽고, 타입 검증까지 해주어 안전하고 유연한 설정 관리를 가능하게 합니다."
+
+sections:
+- id: load
+  title: 라이브러리 로드
+  subtitle: pydantic-settings 설치
+  blocks:
+  - type: text
+    content: "pydantic-settings는 Pydantic V2에서 별도 패키지로 분리되었습니다. BaseSettings를 상속하면 환경변수에서 자동으로 값을 읽어오고, 타입 힌트에 맞게 변환합니다. 환경변수 → .env 파일 → 기본값 순서로 값을 찾아 유연하게 설정을 관리할 수 있습니다."
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: pydantic-settings 설치
+    content: |-
+      import micropip
+      await micropip.install(['pydantic', 'pydantic-settings'])
+  - type: code
+    language: python
+    title: 핵심 모듈 import
+    description: BaseSettings 가져오기
+    content: |-
+      from pydantic_settings import BaseSettings
+      from pydantic import BaseModel, Field, SecretStr
+      from typing import Optional
+      import os
+
+- id: basic
+  title: 기본 설정 클래스
+  subtitle: BaseSettings 상속
+  blocks:
+  - type: text
+    content: "BaseSettings를 상속한 클래스는 필드명과 같은 이름의 환경변수에서 자동으로 값을 읽습니다. 필드에 기본값을 지정하면 환경변수가 없을 때 사용됩니다. 타입 힌트에 따라 문자열 환경변수가 자동으로 int, bool 등으로 변환됩니다."
+  - type: code
+    language: python
+    title: 기본 설정 클래스
+    description: BaseSettings 상속
+    content: |-
+      class AppSettings(BaseSettings):
+          appName: str = "MyApp"
+          debug: bool = False
+          port: int = 8000
+
+      settings = AppSettings()
+      settings
+  - type: tip
+    content: "BaseSettings는 대소문자를 구분하지 않습니다. appName 필드는 APPNAME, AppName, appname 등 어떤 형태의 환경변수도 읽습니다."
+  - type: code
+    language: python
+    title: 설정 값 접근
+    description: 속성으로 읽기
+    content: |-
+      settings.appName, settings.debug, settings.port
+
+- id: environ
+  title: 환경변수 연동
+  subtitle: os.environ 시뮬레이션
+  blocks:
+  - type: text
+    content: "실제 서버에서는 환경변수로 설정을 주입합니다. os.environ으로 환경변수를 설정하면 BaseSettings가 자동으로 읽어옵니다. 이 패턴으로 Docker, Kubernetes 등에서 설정을 주입할 수 있습니다."
+  - type: code
+    language: python
+    title: 환경변수 설정
+    description: os.environ 사용
+    content: |-
+      os.environ["APPNAME"] = "ProductionApp"
+      os.environ["DEBUG"] = "true"
+      os.environ["PORT"] = "9000"
+
+      prodSettings = AppSettings()
+      prodSettings
+  - type: code
+    language: python
+    title: 타입 변환 확인
+    description: 문자열 → bool, int
+    content: |-
+      envTypes = {
+          "debug_value": prodSettings.debug,
+          "debug_type": type(prodSettings.debug).__name__,
+          "port_value": prodSettings.port,
+          "port_type": type(prodSettings.port).__name__
+      }
+      envTypes
+  - type: code
+    language: python
+    title: 환경변수 정리
+    description: 테스트 후 정리
+    content: |-
+      del os.environ["APPNAME"]
+      del os.environ["DEBUG"]
+      del os.environ["PORT"]
+
+- id: prefix
+  title: 환경변수 접두사
+  subtitle: env_prefix 설정
+  blocks:
+  - type: text
+    content: "여러 서비스가 같은 환경에서 실행될 때 환경변수 이름 충돌을 방지하려면 접두사를 사용합니다. model_config의 env_prefix로 모든 환경변수에 공통 접두사를 적용합니다. DB_HOST, DB_PORT처럼 의미있는 네이밍이 가능해집니다."
+  - type: code
+    language: python
+    title: 데이터베이스 설정
+    description: DB_ 접두사 적용
+    content: |-
+      class DbSettings(BaseSettings):
+          model_config = {"env_prefix": "DB_"}
+
+          host: str = "localhost"
+          port: int = 5432
+          name: str = "mydb"
+          user: str = "admin"
+
+      os.environ["DB_HOST"] = "production-db.example.com"
+      os.environ["DB_PORT"] = "5433"
+      os.environ["DB_NAME"] = "production_db"
+
+      dbSettings = DbSettings()
+      dbSettings
+  - type: code
+    language: python
+    title: 설정 확인
+    description: 환경변수에서 읽은 값
+    content: |-
+      dbInfo = {
+          "host": dbSettings.host,
+          "port": dbSettings.port,
+          "name": dbSettings.name,
+          "user": dbSettings.user
+      }
+      dbInfo
+
+      for key in ["DB_HOST", "DB_PORT", "DB_NAME"]:
+          if key in os.environ:
+              del os.environ[key]
+
+- id: nested
+  title: 중첩 설정
+  subtitle: 설정 그룹화
+  blocks:
+  - type: text
+    content: "복잡한 애플리케이션은 설정을 논리적으로 그룹화해야 합니다. 데이터베이스 설정, 캐시 설정, 로깅 설정 등을 별도 모델로 분리하고 메인 설정에서 조합합니다. 중첩된 BaseModel은 JSON 환경변수로 설정할 수 있습니다."
+  - type: code
+    language: python
+    title: 중첩 설정 모델
+    description: 설정 그룹
+    content: |-
+      class DatabaseConfig(BaseModel):
+          host: str = "localhost"
+          port: int = 5432
+          name: str = "app_db"
+          poolSize: int = 5
+
+      class CacheConfig(BaseModel):
+          enabled: bool = True
+          ttl: int = 3600
+          maxSize: int = 1000
+
+      class FullSettings(BaseSettings):
+          appName: str = "MyApp"
+          database: DatabaseConfig = DatabaseConfig()
+          cache: CacheConfig = CacheConfig()
+
+      fullSettings = FullSettings()
+      fullSettings
+  - type: code
+    language: python
+    title: 중첩 값 접근
+    description: 점 표기법
+    content: |-
+      nestedInfo = {
+          "db_host": fullSettings.database.host,
+          "db_pool": fullSettings.database.poolSize,
+          "cache_enabled": fullSettings.cache.enabled,
+          "cache_ttl": fullSettings.cache.ttl
+      }
+      nestedInfo
+
+- id: validation
+  title: 설정 검증
+  subtitle: Field 제약조건
+  blocks:
+  - type: text
+    content: "BaseSettings도 일반 Pydantic 모델처럼 Field와 validator를 사용한 검증을 지원합니다. 포트 번호 범위, 타임아웃 최소값, 워커 수 제한 등 비즈니스 규칙을 설정 단계에서 강제할 수 있습니다."
+  - type: code
+    language: python
+    title: 검증된 서버 설정
+    description: 제약조건 추가
+    content: |-
+      from pydantic import field_validator
+
+      class ServerSettings(BaseSettings):
+          host: str = Field(default="0.0.0.0", min_length=1)
+          port: int = Field(default=8000, ge=1, le=65535)
+          workers: int = Field(default=4, ge=1, le=32)
+          timeout: int = Field(default=30, ge=1)
+
+          @field_validator('host')
+          @classmethod
+          def validateHost(cls, v):
+              if v == "":
+                  raise ValueError("호스트는 비어있을 수 없습니다")
+              return v
+
+      serverSettings = ServerSettings()
+      serverSettings
+  - type: code
+    language: python
+    title: 잘못된 설정 테스트
+    description: 검증 실패
+    content: |-
+      from pydantic import ValidationError
+
+      os.environ["PORT"] = "99999"
+
+      try:
+          badServer = ServerSettings()
+      except ValidationError as e:
+          settingsErr = e.errors()
+          settingsErr
+
+      del os.environ["PORT"]
+
+- id: secret
+  title: 비밀 값 관리
+  subtitle: SecretStr
+  blocks:
+  - type: text
+    content: "비밀번호, API 키 같은 민감한 정보는 로그에 노출되면 안 됩니다. SecretStr 타입을 사용하면 출력 시 자동으로 마스킹되고, get_secret_value()로만 실제 값에 접근할 수 있습니다. 디버깅 로그에서 비밀이 노출되는 것을 방지합니다."
+  - type: code
+    language: python
+    title: 인증 설정
+    description: SecretStr 사용
+    content: |-
+      class AuthSettings(BaseSettings):
+          model_config = {"env_prefix": "AUTH_"}
+
+          apiKey: SecretStr
+          dbPassword: SecretStr
+          jwtSecret: SecretStr = SecretStr("default-secret")
+
+      os.environ["AUTH_APIKEY"] = "super-secret-api-key-12345"
+      os.environ["AUTH_DBPASSWORD"] = "db-password-xyz"
+
+      authSettings = AuthSettings()
+      authSettings
+  - type: tip
+    content: "SecretStr은 repr에서 '**********'로 표시됩니다. 실제 값은 .get_secret_value() 메서드로 접근합니다."
+  - type: code
+    language: python
+    title: 비밀 값 접근
+    description: 마스킹과 실제 값
+    content: |-
+      secretInfo = {
+          "masked": str(authSettings.apiKey),
+          "actual": authSettings.apiKey.get_secret_value(),
+          "dumped": authSettings.model_dump()
+      }
+      secretInfo
+
+      del os.environ["AUTH_APIKEY"]
+      del os.environ["AUTH_DBPASSWORD"]
+
+- id: json
+  title: JSON 환경변수
+  subtitle: 복잡한 값
+  blocks:
+  - type: text
+    content: "리스트나 딕셔너리 같은 복잡한 값도 JSON 문자열로 환경변수에 넣을 수 있습니다. BaseSettings가 자동으로 파싱하여 Python 객체로 변환합니다. CORS 허용 도메인 목록, 기능 플래그 등에 유용합니다."
+  - type: code
+    language: python
+    title: JSON 환경변수
+    description: 복잡한 설정
+    content: |-
+      class JsonSettings(BaseSettings):
+          allowedHosts: list[str] = []
+          features: dict[str, bool] = {}
+          ports: list[int] = [8000]
+
+      os.environ["ALLOWEDHOSTS"] = '["localhost", "example.com", "api.example.com"]'
+      os.environ["FEATURES"] = '{"darkMode": true, "beta": false, "analytics": true}'
+      os.environ["PORTS"] = '[8000, 8001, 8002]'
+
+      jsonSettings = JsonSettings()
+      jsonSettings
+  - type: code
+    language: python
+    title: 파싱된 값
+    description: Python 객체
+    content: |-
+      jsonInfo = {
+          "hosts": jsonSettings.allowedHosts,
+          "features": jsonSettings.features,
+          "ports": jsonSettings.ports,
+          "types": [type(jsonSettings.allowedHosts).__name__, type(jsonSettings.features).__name__]
+      }
+      jsonInfo
+
+      for key in ["ALLOWEDHOSTS", "FEATURES", "PORTS"]:
+          if key in os.environ:
+              del os.environ[key]
+
+- id: singleton
+  title: 싱글톤 패턴
+  subtitle: lru_cache 활용
+  blocks:
+  - type: text
+    content: "설정을 매번 새로 로드하면 성능이 낭비됩니다. functools.lru_cache를 사용하면 설정 객체를 캐싱하여 애플리케이션 전체에서 동일한 인스턴스를 재사용합니다. FastAPI 등 프레임워크에서 권장하는 패턴입니다."
+  - type: code
+    language: python
+    title: 캐싱된 설정
+    description: lru_cache 사용
+    content: |-
+      from functools import lru_cache
+
+      class AppConfig(BaseSettings):
+          appName: str = "MyApp"
+          version: str = "1.0.0"
+          debug: bool = False
+
+      @lru_cache
+      def getSettings() -> AppConfig:
+          return AppConfig()
+
+      config1 = getSettings()
+      config2 = getSettings()
+      config1 is config2
+  - type: tip
+    content: "lru_cache는 동일한 인자에 대해 같은 결과를 반환합니다. 설정을 변경하려면 getSettings.cache_clear()로 캐시를 비워야 합니다."
+
+- id: result
+  title: 마이크로서비스 설정
+  subtitle: 종합 설정 시스템
+  blocks:
+  - type: text
+    content: "지금까지 배운 모든 기법을 종합하여 실제 마이크로서비스에서 사용할 수 있는 설정 시스템을 완성합니다. 중첩 설정, 환경별 분리, 비밀 관리, 검증까지 모두 포함한 완전한 설정 관리 시스템입니다."
+  - type: code
+    language: python
+    title: 완성된 설정 시스템
+    description: 마이크로서비스 설정
+    content: |-
+      from typing import Literal
+
+      class DbConfig(BaseModel):
+          host: str = "localhost"
+          port: int = Field(default=5432, ge=1, le=65535)
+          name: str = "app_db"
+          poolMin: int = Field(default=2, ge=1)
+          poolMax: int = Field(default=10, ge=1)
+
+      class RedisConfig(BaseModel):
+          host: str = "localhost"
+          port: int = 6379
+          db: int = 0
+
+      class ServiceSettings(BaseSettings):
+          model_config = {"env_prefix": "SVC_"}
+
+          serviceName: str
+          environment: Literal["dev", "staging", "prod"] = "dev"
+          logLevel: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+          database: DbConfig = DbConfig()
+          redis: RedisConfig = RedisConfig()
+          apiKey: SecretStr | None = None
+          allowedOrigins: list[str] = ["http://localhost:3000"]
+
+      os.environ["SVC_SERVICENAME"] = "user-service"
+      os.environ["SVC_ENVIRONMENT"] = "prod"
+      os.environ["SVC_LOGLEVEL"] = "WARNING"
+      os.environ["SVC_APIKEY"] = "prod-api-key-secret"
+      os.environ["SVC_ALLOWEDORIGINS"] = '["https://example.com", "https://api.example.com"]'
+
+      svcSettings = ServiceSettings()
+      svcSettings
+  - type: code
+    language: python
+    title: 설정 요약
+    description: 종합 정보
+    content: |-
+      svcSummary = {
+          "service": svcSettings.serviceName,
+          "env": svcSettings.environment,
+          "logLevel": svcSettings.logLevel,
+          "db": f"{svcSettings.database.host}:{svcSettings.database.port}",
+          "hasApiKey": svcSettings.apiKey is not None,
+          "origins": svcSettings.allowedOrigins
+      }
+      svcSummary
+
+      for key in ["SVC_SERVICENAME", "SVC_ENVIRONMENT", "SVC_LOGLEVEL", "SVC_APIKEY", "SVC_ALLOWEDORIGINS"]:
+          if key in os.environ:
+              del os.environ[key]
+
+- id: practice
+  title: 실습
+  subtitle: 설정 관리 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 BaseSettings, 접두사, 중첩 설정, SecretStr, JSON 환경변수를 활용하여 실제 애플리케이션 설정 시스템을 구축합니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 웹 서버 설정"
+    blocks:
+    - type: code
+      title: 웹 서버 설정 모델
+      content: |-
+        from pydantic_settings import BaseSettings
+        from pydantic import BaseModel, Field, SecretStr
+        from functools import lru_cache
+        import os
+
+        class ServerConfig(BaseModel):
+            host: str = "0.0.0.0"
+            port: int = Field(default=8000, ge=1, le=65535)
+            workers: int = Field(default=4, ge=1)
+            debug: bool = False
+
+        class DatabaseConfig(BaseModel):
+            host: str = "localhost"
+            port: int = 5432
+            name: str = "app_db"
+            poolSize: int = Field(default=5, ge=1, le=20)
+
+        class WebAppSettings(BaseSettings):
+            model_config = {"env_prefix": "WEBAPP_"}
+
+            appName: str = "WebApp"
+            version: str = "1.0.0"
+            server: ServerConfig = ServerConfig()
+            database: DatabaseConfig = DatabaseConfig()
+
+        @lru_cache
+        def getWebAppSettings() -> WebAppSettings:
+            return WebAppSettings()
+
+        webSettings = getWebAppSettings()
+        webSettings
+    - type: code
+      title: 설정 확인
+      content: |-
+        webConfig = {
+            "app": webSettings.appName,
+            "version": webSettings.version,
+            "serverPort": webSettings.server.port,
+            "dbHost": webSettings.database.host
+        }
+        webConfig
+  - type: expansion
+    title: "미션2: API 게이트웨이 설정"
+    blocks:
+    - type: code
+      title: API 게이트웨이 모델
+      content: |-
+        from pydantic_settings import BaseSettings
+        from pydantic import BaseModel, Field, SecretStr, field_validator
+        from typing import Literal
+        import os
+
+        class GatewaySettings(BaseSettings):
+            model_config = {"env_prefix": "GW_"}
+
+            serviceName: str
+            environment: Literal["dev", "staging", "prod"] = "dev"
+            logLevel: Literal["DEBUG", "INFO", "WARNING", "ERROR"] = "INFO"
+            apiKey: SecretStr | None = None
+            timeout: int = Field(default=30, ge=1)
+            retryCount: int = Field(default=3, ge=0, le=10)
+            upstreamUrls: list[str] = []
+            rateLimits: dict[str, int] = {}
+
+            @field_validator('serviceName')
+            @classmethod
+            def validateName(cls, v):
+                if not v or len(v) < 2:
+                    raise ValueError("서비스 이름은 2자 이상이어야 합니다")
+                return v.lower().replace(" ", "-")
+
+        os.environ["GW_SERVICENAME"] = "API Gateway"
+        os.environ["GW_ENVIRONMENT"] = "prod"
+        os.environ["GW_APIKEY"] = "gateway-secret-key"
+        os.environ["GW_UPSTREAMURLS"] = '["http://svc1:8000", "http://svc2:8001"]'
+        os.environ["GW_RATELIMITS"] = '{"default": 100, "premium": 1000}'
+
+        gwSettings = GatewaySettings()
+        gwSettings
+    - type: code
+      title: 설정 요약
+      content: |-
+        gwConfig = {
+            "service": gwSettings.serviceName,
+            "env": gwSettings.environment,
+            "hasApiKey": gwSettings.apiKey is not None,
+            "upstreams": gwSettings.upstreamUrls,
+            "rateLimits": gwSettings.rateLimits
+        }
+        gwConfig
+
+        for key in ["GW_SERVICENAME", "GW_ENVIRONMENT", "GW_APIKEY", "GW_UPSTREAMURLS", "GW_RATELIMITS"]:
+            if key in os.environ:
+                del os.environ[key]

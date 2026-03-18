@@ -1,0 +1,779 @@
+meta:
+  id: "day07"
+  title: "리스트기초"
+  day: 7
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 리스트 기초 - 리스트 생성과 활용"
+    description: "리스트의 기본 개념, 생성, 인덱싱, 슬라이싱, 수정 방법을 배웁니다."
+    keywords: ['리스트', 'list', '인덱싱', '슬라이싱', 'indexing']
+
+intro:
+  emoji: "📦"
+  points:
+  - "리스트로 여러 값을 한 번에 관리"
+  - "인덱스로 원하는 요소에 접근"
+  - "슬라이싱으로 부분 리스트 추출"
+  - "리스트 수정과 연산"
+
+sections:
+- id: "list_intro"
+  title: "리스트란?"
+  subtitle: "여러 값을 담는 상자"
+  blocks:
+  - type: "text"
+    content: "리스트(List)는 여러 개의 값을 순서대로 담을 수 있는 자료구조입니다. 대괄호 []로 만들고, 쉼표로 값을 구분합니다. 숫자, 문자열, 불린 등 어떤 타입의 값도 담을 수 있습니다. 리스트는 순서가 있어서 첫 번째, 두 번째 같은 위치로 값에 접근할 수 있습니다."
+  - type: "list"
+    items:
+    - "대괄호 []로 생성"
+    - "여러 값을 쉼표로 구분"
+    - "순서가 있는 자료구조"
+    - "다양한 타입 저장 가능"
+  - type: "code"
+    language: "python"
+    title: "리스트 만들기"
+    description: "대괄호를 사용하여 리스트를 만듭니다."
+    content: |-
+      items = [1, 2, 3, 4, 5]
+      items
+  - type: "tip"
+    content: "리스트는 프로그래밍에서 가장 많이 사용하는 자료구조 중 하나입니다."
+
+- id: "list_create"
+  title: "다양한 리스트 생성"
+  subtitle: "타입 제한 없이 자유롭게"
+  blocks:
+  - type: "text"
+    content: "리스트는 숫자만, 문자열만 담을 수도 있고, 여러 타입을 섞어서 담을 수도 있습니다. 빈 리스트도 만들 수 있습니다. 리스트 안에 리스트를 넣어 중첩 리스트도 만들 수 있습니다."
+  - type: "list"
+    items:
+    - "숫자 리스트: [1, 2, 3]"
+    - "문자열 리스트: ['a', 'b', 'c']"
+    - "혼합 리스트: [1, 'hello', True]"
+    - "빈 리스트: []"
+  - type: "code"
+    language: "python"
+    title: "숫자 리스트"
+    description: "숫자만 담은 리스트를 만듭니다."
+    content: |-
+      nums = [10, 20, 30]
+      nums
+  - type: "code"
+    language: "python"
+    title: "문자열 리스트"
+    description: "문자열만 담은 리스트를 만듭니다."
+    content: |-
+      fruits = ['사과', '바나나', '오렌지']
+      fruits
+  - type: "code"
+    language: "python"
+    title: "혼합 리스트"
+    description: "여러 타입을 섞어서 리스트를 만듭니다."
+    content: |-
+      mixed = [1, 'hello', True, 3.14]
+      mixed
+  - type: "code"
+    language: "python"
+    title: "빈 리스트"
+    description: "빈 리스트를 만듭니다."
+    content: |-
+      empty = []
+      empty
+  - type: "tip"
+    content: "빈 리스트는 나중에 값을 추가할 때 유용합니다."
+
+- id: "list_indexing"
+  title: "리스트 인덱싱"
+  subtitle: "위치로 값 가져오기"
+  blocks:
+  - type: "text"
+    content: "리스트의 각 요소는 인덱스(위치 번호)로 접근할 수 있습니다. 인덱스는 0부터 시작합니다. 첫 번째 요소는 [0], 두 번째는 [1], 세 번째는 [2]입니다. 리스트 이름 뒤에 대괄호를 쓰고 인덱스를 넣으면 그 위치의 값을 가져옵니다."
+  - type: "list"
+    items:
+    - "인덱스는 0부터 시작"
+    - "list[0]은 첫 번째 요소"
+    - "list[1]은 두 번째 요소"
+    - "대괄호 안에 인덱스 작성"
+  - type: "code"
+    language: "python"
+    title: "첫 번째 요소"
+    description: "인덱스 0으로 첫 번째 요소에 접근합니다."
+    content: |-
+      basket = ['사과', '바나나', '오렌지', '포도']
+      basket[0]
+  - type: "code"
+    language: "python"
+    title: "두 번째 요소"
+    description: "인덱스 1로 두 번째 요소에 접근합니다."
+    content: |-
+      produce = ['사과', '바나나', '오렌지', '포도']
+      produce[1]
+  - type: "code"
+    language: "python"
+    title: "세 번째 요소"
+    description: "인덱스 2로 세 번째 요소에 접근합니다."
+    content: |-
+      snacks = ['사과', '바나나', '오렌지', '포도']
+      snacks[2]
+  - type: "tip"
+    content: "리스트 길이보다 큰 인덱스를 사용하면 에러가 발생합니다."
+
+- id: "list_negative"
+  title: "음수 인덱싱"
+  subtitle: "뒤에서부터 접근하기"
+  blocks:
+  - type: "text"
+    content: "음수 인덱스를 사용하면 리스트의 뒤에서부터 접근할 수 있습니다. -1은 마지막 요소, -2는 뒤에서 두 번째 요소, -3은 뒤에서 세 번째 요소입니다. 리스트가 길 때 마지막 요소에 접근하는 간편한 방법입니다."
+  - type: "list"
+    items:
+    - "음수 인덱스는 뒤에서부터 접근"
+    - "list[-1]은 마지막 요소"
+    - "list[-2]는 뒤에서 두 번째"
+    - "긴 리스트에서 유용"
+  - type: "code"
+    language: "python"
+    title: "마지막 요소"
+    description: "음수 인덱스 -1로 마지막 요소에 접근합니다."
+    content: |-
+      values = [10, 20, 30, 40, 50]
+      values[-1]
+  - type: "code"
+    language: "python"
+    title: "뒤에서 두 번째"
+    description: "음수 인덱스 -2로 뒤에서 두 번째 요소에 접근합니다."
+    content: |-
+      digits = [10, 20, 30, 40, 50]
+      digits[-2]
+  - type: "code"
+    language: "python"
+    title: "뒤에서 세 번째"
+    description: "음수 인덱스 -3으로 뒤에서 세 번째 요소에 접근합니다."
+    content: |-
+      counts = [10, 20, 30, 40, 50]
+      counts[-3]
+  - type: "tip"
+    content: "리스트 길이를 몰라도 [-1]로 마지막 요소에 접근할 수 있습니다."
+
+- id: "list_slicing"
+  title: "리스트 슬라이싱"
+  subtitle: "범위로 잘라내기"
+  blocks:
+  - type: "text"
+    content: "슬라이싱은 리스트의 일부분을 잘라내어 새 리스트를 만듭니다. [시작:끝] 형식으로 사용하며, 시작 인덱스부터 끝 인덱스 직전까지 가져옵니다. 시작을 생략하면 처음부터, 끝을 생략하면 끝까지 가져옵니다."
+  - type: "list"
+    items:
+    - "list[시작:끝] 형식"
+    - "시작 인덱스 포함, 끝 인덱스 미포함"
+    - "list[:3]은 처음부터 2번 인덱스까지"
+    - "list[2:]는 2번 인덱스부터 끝까지"
+  - type: "code"
+    language: "python"
+    title: "처음부터 3개"
+    description: "[:3]으로 처음부터 3개 요소를 가져옵니다."
+    content: |-
+      rainbow = ['빨강', '주황', '노랑', '초록', '파랑', '남색', '보라']
+      rainbow[:3]
+  - type: "code"
+    language: "python"
+    title: "중간 범위"
+    description: "[2:5]로 인덱스 2부터 4까지 가져옵니다."
+    content: |-
+      palette = ['빨강', '주황', '노랑', '초록', '파랑', '남색', '보라']
+      palette[2:5]
+  - type: "code"
+    language: "python"
+    title: "마지막 3개"
+    description: "[-3:]으로 마지막 3개 요소를 가져옵니다."
+    content: |-
+      hues = ['빨강', '주황', '노랑', '초록', '파랑', '남색', '보라']
+      hues[-3:]
+  - type: "tip"
+    content: "슬라이싱은 원본 리스트를 변경하지 않고 새 리스트를 만듭니다."
+
+- id: "list_step"
+  title: "슬라이싱 step"
+  subtitle: "간격을 두고 가져오기"
+  blocks:
+  - type: "text"
+    content: "슬라이싱에 step을 추가하면 지정한 간격으로 요소를 가져올 수 있습니다. [시작:끝:step] 형식으로 사용합니다. step이 2면 하나 건너 하나씩, 3이면 두 개 건너 하나씩 가져옵니다. 음수 step을 사용하면 역순으로 가져옵니다."
+  - type: "list"
+    items:
+    - "list[시작:끝:step] 형식"
+    - "step이 2면 하나 건너 가져오기"
+    - "step이 -1이면 역순"
+    - "list[::2]는 처음부터 끝까지 하나 건너"
+  - type: "code"
+    language: "python"
+    title: "하나 건너 가져오기"
+    description: "[::2]로 하나 건너 하나씩 가져옵니다."
+    content: |-
+      sequence = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      sequence[::2]
+  - type: "code"
+    language: "python"
+    title: "두 개 건너 가져오기"
+    description: "[::3]으로 두 개 건너 하나씩 가져옵니다."
+    content: |-
+      series = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      series[::3]
+  - type: "code"
+    language: "python"
+    title: "역순으로 가져오기"
+    description: "[::-1]로 리스트를 역순으로 만듭니다."
+    content: |-
+      chain = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      chain[::-1]
+  - type: "tip"
+    content: "[::-1]은 리스트를 뒤집는 간편한 방법입니다."
+
+- id: "list_modify"
+  title: "리스트 수정"
+  subtitle: "인덱스로 값 변경하기"
+  blocks:
+  - type: "text"
+    content: "리스트는 수정 가능한(mutable) 자료구조입니다. 인덱스를 사용하여 특정 위치의 값을 다른 값으로 변경할 수 있습니다. list[0] = 'new value' 형식으로 할당하면 그 위치의 값이 바뀝니다. 문자열과 달리 리스트는 생성 후에도 내용을 변경할 수 있습니다."
+  - type: "list"
+    items:
+    - "list[인덱스] = 새값으로 수정"
+    - "리스트는 수정 가능(mutable)"
+    - "문자열은 수정 불가(immutable)"
+    - "원본 리스트가 직접 변경됨"
+  - type: "code"
+    language: "python"
+    title: "수정 전"
+    description: "원본 리스트를 확인합니다."
+    content: |-
+      before = ['사과', '바나나', '오렌지']
+      print('before:', before)
+  - type: "code"
+    language: "python"
+    title: "수정 후"
+    description: "인덱스를 사용하여 리스트의 값을 변경합니다."
+    content: |-
+      after = ['사과', '바나나', '오렌지']
+      after[1] = '딸기'
+      print('after:', after)
+
+- id: "list_length"
+  title: "리스트 길이"
+  subtitle: "len() 함수 사용"
+  blocks:
+  - type: "text"
+    content: "len() 함수는 리스트에 담긴 요소의 개수를 반환합니다. 리스트가 몇 개의 항목을 가지고 있는지 알아야 할 때 사용합니다. 빈 리스트의 길이는 0입니다. 리스트의 마지막 인덱스는 len(list) - 1입니다."
+  - type: "list"
+    items:
+    - "len(list)로 요소 개수 확인"
+    - "빈 리스트는 길이가 0"
+    - "마지막 인덱스는 길이 - 1"
+    - "반복문에서 자주 사용"
+  - type: "code"
+    language: "python"
+    title: "리스트 길이"
+    description: "len() 함수로 리스트 요소 개수를 확인합니다."
+    content: |-
+      goods = ['사과', '바나나', '오렌지', '포도', '딸기']
+      len(goods)
+  - type: "code"
+    language: "python"
+    title: "마지막 인덱스"
+    description: "길이에서 1을 빼면 마지막 인덱스입니다."
+    content: |-
+      treats = ['사과', '바나나', '오렌지', '포도', '딸기']
+      len(treats) - 1
+  - type: "tip"
+    content: "len() 함수는 문자열의 길이도 확인할 수 있습니다."
+
+- id: "list_concat"
+  title: "리스트 연결"
+  subtitle: "+ 연산자로 합치기"
+  blocks:
+  - type: "text"
+    content: "두 개 이상의 리스트를 + 연산자로 연결하여 하나의 긴 리스트를 만들 수 있습니다. 원본 리스트는 변경되지 않고 새로운 리스트가 생성됩니다. 여러 리스트를 순서대로 합칠 때 유용합니다."
+  - type: "list"
+    items:
+    - "+ 연산자로 리스트 연결"
+    - "원본 리스트는 변경 안됨"
+    - "새로운 리스트 생성"
+    - "순서대로 합쳐짐"
+  - type: "code"
+    language: "python"
+    title: "두 리스트 연결"
+    description: "+ 연산자로 두 리스트를 연결합니다."
+    content: |-
+      front = [1, 2, 3]
+      back = [4, 5, 6]
+      front + back
+  - type: "code"
+    language: "python"
+    title: "세 리스트 연결"
+    description: "+ 연산자로 여러 리스트를 연결합니다."
+    content: |-
+      first = [1, 2, 3]
+      second = [4, 5, 6]
+      third = [7, 8, 9]
+      first + second + third
+  - type: "tip"
+    content: "리스트 + 리스트만 가능합니다. 리스트 + 숫자는 에러가 발생합니다."
+
+- id: "list_repeat"
+  title: "리스트 반복"
+  subtitle: "* 연산자로 복제하기"
+  blocks:
+  - type: "text"
+    content: "리스트에 * 연산자를 사용하면 리스트를 여러 번 반복한 새 리스트를 만들 수 있습니다. list * 3은 리스트를 3번 반복합니다. 같은 값을 여러 개 가진 리스트를 만들 때 편리합니다."
+  - type: "list"
+    items:
+    - "* 연산자로 리스트 반복"
+    - "list * n은 n번 반복"
+    - "새로운 리스트 생성"
+    - "초기값 설정에 유용"
+  - type: "code"
+    language: "python"
+    title: "리스트 3번 반복"
+    description: "* 연산자로 리스트를 3번 반복합니다."
+    content: |-
+      base = [1, 2, 3]
+      base * 3
+  - type: "code"
+    language: "python"
+    title: "0으로 채우기"
+    description: "[0] * 5로 0이 5개인 리스트를 만듭니다."
+    content: |-
+      zeros = [0] * 5
+      zeros
+  - type: "tip"
+    content: "[0] * 10으로 0이 10개인 리스트를 쉽게 만들 수 있습니다."
+
+- id: "list_membership"
+  title: "in/not in 연산자"
+  subtitle: "요소 포함 여부 확인"
+  blocks:
+  - type: "text"
+    content: "in 연산자는 특정 값이 리스트에 있는지 확인합니다. not in은 그 반대입니다. 결과는 True 또는 False입니다. 리스트에서 값을 찾을 때 인덱스를 모두 확인할 필요 없이 간편하게 검사할 수 있습니다."
+  - type: "list"
+    items:
+    - "값 in 리스트로 포함 여부 확인"
+    - "값 not in 리스트로 미포함 확인"
+    - "결과는 True 또는 False"
+    - "조건문에서 자주 사용"
+  - type: "code"
+    language: "python"
+    title: "값 포함 확인"
+    description: "in 연산자로 값이 리스트에 있는지 확인합니다."
+    content: |-
+      bucket = ['사과', '바나나', '오렌지']
+      '바나나' in bucket
+  - type: "code"
+    language: "python"
+    title: "값 미포함 확인"
+    description: "not in 연산자로 값이 리스트에 없는지 확인합니다."
+    content: |-
+      cart = ['사과', '바나나', '오렌지']
+      '딸기' not in cart
+  - type: "tip"
+    content: "in 연산자는 문자열에서 부분 문자열 검색에도 사용됩니다."
+
+- id: "practice"
+  title: "Day 7 종합 복습"
+  subtitle: "리스트 기초 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 7에서 배운 리스트 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 숫자 리스트"
+    code: |-
+      nums = [10, 20, 30, 40, 50]
+      nums
+
+  - type: "expansion"
+    title: "🟢 기본2: 과일 리스트"
+    code: |-
+      fruits = ['사과', '바나나', '오렌지']
+      fruits
+
+  - type: "expansion"
+    title: "🟢 기본3: 첫 요소"
+    code: |-
+      colors = ['빨강', '초록', '파랑']
+      first = colors[0]
+      first
+
+  - type: "expansion"
+    title: "🟢 기본4: 마지막 요소"
+    code: |-
+      days = ['월', '화', '수', '목', '금']
+      last = days[-1]
+      last
+
+  - type: "expansion"
+    title: "🟢 기본5: 슬라이싱"
+    code: |-
+      digits = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      part = digits[2:5]
+      part
+
+  - type: "expansion"
+    title: "🟡 응용1: 학생 명단"
+    blocks:
+    - type: "code"
+      title: "전체 학생"
+      content: |-
+        students = ['김철수', '이영희', '박민수', '정지은', '최동욱']
+        print('students:', students)
+    - type: "code"
+      title: "학생 수"
+      content: |-
+        roster = ['김철수', '이영희', '박민수', '정지은', '최동욱']
+        count = len(roster)
+        print('total:', count)
+    - type: "code"
+      title: "처음 3명"
+      content: |-
+        members = ['김철수', '이영희', '박민수', '정지은', '최동욱']
+        top3 = members[:3]
+        print('first_3:', top3)
+
+  - type: "expansion"
+    title: "🟡 응용2: 점수 평균"
+    blocks:
+    - type: "code"
+      title: "전체 점수"
+      content: |-
+        scores = [85, 90, 78, 92, 88]
+        print('scores:', scores)
+    - type: "code"
+      title: "합계"
+      content: |-
+        marks = [85, 90, 78, 92, 88]
+        total = marks[0] + marks[1] + marks[2] + marks[3] + marks[4]
+        print('sum:', total)
+    - type: "code"
+      title: "평균"
+      content: |-
+        grades = [85, 90, 78, 92, 88]
+        result = grades[0] + grades[1] + grades[2] + grades[3] + grades[4]
+        count = len(grades)
+        avg = result / count
+        print('average:', avg)
+
+  - type: "expansion"
+    title: "🟡 응용3: 쇼핑 리스트 수정"
+    blocks:
+    - type: "code"
+      title: "수정 전"
+      content: |-
+        cart = ['우유', '빵', '계란', '사과']
+        print('original:', cart)
+    - type: "code"
+      title: "수정 후"
+      content: |-
+        shopping = ['우유', '빵', '계란', '사과']
+        shopping[2] = '바나나'
+        print('modified:', shopping)
+
+  - type: "expansion"
+    title: "🟡 응용4: 주중/주말 분리"
+    blocks:
+    - type: "code"
+      title: "전체 요일"
+      content: |-
+        week = ['월', '화', '수', '목', '금', '토', '일']
+        print('week:', week)
+    - type: "code"
+      title: "주중"
+      content: |-
+        days = ['월', '화', '수', '목', '금', '토', '일']
+        weekday = days[:5]
+        print('weekday:', weekday)
+    - type: "code"
+      title: "주말"
+      content: |-
+        days = ['월', '화', '수', '목', '금', '토', '일']
+        weekend = days[-2:]
+        print('weekend:', weekend)
+
+  - type: "expansion"
+    title: "🟡 응용5: 메뉴 검색"
+    blocks:
+    - type: "code"
+      title: "전체 메뉴"
+      content: |-
+        menu = ['피자', '햄버거', '치킨', '파스타']
+        print('menu:', menu)
+    - type: "code"
+      title: "피자 포함 여부"
+      content: |-
+        foods = ['피자', '햄버거', '치킨', '파스타']
+        found = '피자' in foods
+        print('has_pizza:', found)
+    - type: "code"
+      title: "초밥 포함 여부"
+      content: |-
+        dishes = ['피자', '햄버거', '치킨', '파스타']
+        found = '초밥' in dishes
+        print('has_sushi:', found)
+
+  - type: "expansion"
+    title: "🔴 심화1-1: 재고 목록 조회"
+    blocks:
+    - type: "code"
+      title: "제품 목록"
+      content: |-
+        products = ['노트북', '마우스', '키보드', '모니터', '헤드셋']
+        print('products:', products)
+    - type: "code"
+      title: "재고 수량"
+      content: |-
+        stock = [5, 20, 15, 8, 12]
+        print('stock:', stock)
+    - type: "code"
+      title: "첫 번째 제품"
+      content: |-
+        items = ['노트북', '마우스', '키보드', '모니터', '헤드셋']
+        first = items[0]
+        print('first_product:', first)
+    - type: "code"
+      title: "첫 번째 재고"
+      content: |-
+        inventory = [5, 20, 15, 8, 12]
+        first = inventory[0]
+        print('first_stock:', first)
+
+  - type: "expansion"
+    title: "🔴 심화1-2: 재고 분석"
+    blocks:
+    - type: "code"
+      title: "재고 부족 여부"
+      content: |-
+        qty = [5, 20, 15, 8, 12]
+        low = qty[0] < 10
+        print('low_stock:', low)
+    - type: "code"
+      title: "전체 제품 수"
+      content: |-
+        catalog = ['노트북', '마우스', '키보드', '모니터', '헤드셋']
+        count = len(catalog)
+        print('total_items:', count)
+    - type: "code"
+      title: "마지막 제품"
+      content: |-
+        gadgets = ['노트북', '마우스', '키보드', '모니터', '헤드셋']
+        last = gadgets[-1]
+        print('last_product:', last)
+    - type: "code"
+      title: "마지막 재고"
+      content: |-
+        amounts = [5, 20, 15, 8, 12]
+        last = amounts[-1]
+        print('last_stock:', last)
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 성적 데이터 조회"
+    blocks:
+    - type: "code"
+      title: "과목 목록"
+      content: |-
+        subjects = ['국어', '영어', '수학', '과학', '사회']
+        print('subjects:', subjects)
+    - type: "code"
+      title: "전체 점수"
+      content: |-
+        scores = [88, 92, 85, 90, 87]
+        print('scores:', scores)
+    - type: "code"
+      title: "하나 건너 점수"
+      content: |-
+        points = [88, 92, 85, 90, 87]
+        alt = points[::2]
+        print('high_scores:', alt)
+    - type: "code"
+      title: "상위 3개 점수"
+      content: |-
+        ratings = [88, 92, 85, 90, 87]
+        top = ratings[:3]
+        print('top_3:', top)
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 성적 통계 계산"
+    blocks:
+    - type: "code"
+      title: "총점"
+      content: |-
+        exams = [88, 92, 85, 90, 87]
+        sumA = exams[0] + exams[1] + exams[2] + exams[3] + exams[4]
+        print('total:', sumA)
+    - type: "code"
+      title: "평균"
+      content: |-
+        records = [88, 92, 85, 90, 87]
+        sumB = records[0] + records[1] + records[2] + records[3] + records[4]
+        average = sumB / len(records)
+        print('average:', average)
+    - type: "code"
+      title: "합격 여부"
+      content: |-
+        finals = [88, 92, 85, 90, 87]
+        total = finals[0] + finals[1] + finals[2] + finals[3] + finals[4]
+        avg = total / len(finals)
+        passed = avg >= 80
+        print('passed:', passed)
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 할일 목록 수정"
+    blocks:
+    - type: "code"
+      title: "수정 전"
+      content: |-
+        tasks = ['운동하기', '책읽기', '코딩하기', '청소하기']
+        print('original:', tasks)
+    - type: "code"
+      title: "수정 후"
+      content: |-
+        todos = ['운동하기', '책읽기', '코딩하기', '청소하기']
+        todos[1] = '영어공부'
+        print('modified:', todos)
+    - type: "code"
+      title: "긴급 할일"
+      content: |-
+        jobs = ['운동하기', '영어공부', '코딩하기', '청소하기']
+        urgent = jobs[:2]
+        print('urgent:', urgent)
+    - type: "code"
+      title: "일반 할일"
+      content: |-
+        works = ['운동하기', '영어공부', '코딩하기', '청소하기']
+        normal = works[2:]
+        print('normal:', normal)
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 할일 검색"
+    blocks:
+    - type: "code"
+      title: "코딩 포함 여부"
+      content: |-
+        tasks = ['운동하기', '영어공부', '코딩하기', '청소하기']
+        found = '코딩하기' in tasks
+        print('has_coding:', found)
+    - type: "code"
+      title: "전체 할일 수"
+      content: |-
+        tasks2 = ['운동하기', '영어공부', '코딩하기', '청소하기']
+        cnt = len(tasks2)
+        print('total:', cnt)
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 순위표 조회"
+    blocks:
+    - type: "code"
+      title: "전체 이름"
+      content: |-
+        names = ['김철수', '이영희', '박민수', '정지은', '최동욱']
+        print('names:', names)
+    - type: "code"
+      title: "전체 점수"
+      content: |-
+        ranking = [950, 920, 880, 870, 850]
+        print('scores:', ranking)
+    - type: "code"
+      title: "상위 3명 이름"
+      content: |-
+        names2 = ['김철수', '이영희', '박민수', '정지은', '최동욱']
+        top3Names = names2[:3]
+        print('top_3_names:', top3Names)
+    - type: "code"
+      title: "상위 3명 점수"
+      content: |-
+        ranking2 = [950, 920, 880, 870, 850]
+        top3Scores = ranking2[:3]
+        print('top_3_scores:', top3Scores)
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 순위표 분석"
+    blocks:
+    - type: "code"
+      title: "1등 이름"
+      content: |-
+        pupils = ['김철수', '이영희', '박민수', '정지은', '최동욱']
+        first = pupils[0]
+        print('first:', first)
+    - type: "code"
+      title: "1등 점수"
+      content: |-
+        grades = [950, 920, 880, 870, 850]
+        first = grades[0]
+        print('first_score:', first)
+    - type: "code"
+      title: "꼴등 이름"
+      content: |-
+        pupils2 = ['김철수', '이영희', '박민수', '정지은', '최동욱']
+        last = pupils2[-1]
+        print('last:', last)
+    - type: "code"
+      title: "꼴등 점수"
+      content: |-
+        grades2 = [950, 920, 880, 870, 850]
+        last = grades2[-1]
+        print('last_score:', last)
+    - type: "code"
+      title: "점수 차이"
+      content: |-
+        grades3 = [950, 920, 880, 870, 850]
+        diff = grades3[0] - grades3[-1]
+        print('score_diff:', diff)
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 플레이리스트 분할"
+    blocks:
+    - type: "code"
+      title: "전체 노래"
+      content: |-
+        songs = ['노래1', '노래2', '노래3', '노래4', '노래5', '노래6']
+        print('songs:', songs)
+    - type: "code"
+      title: "플레이리스트 1"
+      content: |-
+        songs2 = ['노래1', '노래2', '노래3', '노래4', '노래5', '노래6']
+        playlist1 = songs2[:3]
+        print('playlist_1:', playlist1)
+    - type: "code"
+      title: "플레이리스트 2"
+      content: |-
+        songs3 = ['노래1', '노래2', '노래3', '노래4', '노래5', '노래6']
+        playlist2 = songs3[3:]
+        print('playlist_2:', playlist2)
+    - type: "code"
+      title: "역순"
+      content: |-
+        songs4 = ['노래1', '노래2', '노래3', '노래4', '노래5', '노래6']
+        reverse = songs4[::-1]
+        print('reverse:', reverse)
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 플레이리스트 조작"
+    blocks:
+    - type: "code"
+      title: "하나 건너"
+      content: |-
+        tracks = ['노래1', '노래2', '노래3', '노래4', '노래5', '노래6']
+        alt = tracks[::2]
+        print('every_other:', alt)
+    - type: "code"
+      title: "결합"
+      content: |-
+        tracks2 = ['노래1', '노래2', '노래3', '노래4', '노래5', '노래6']
+        combined = tracks2[:3] + tracks2[3:]
+        print('combined:', combined)
+    - type: "code"
+      title: "반복"
+      content: |-
+        tracks3 = ['노래1', '노래2', '노래3', '노래4', '노래5', '노래6']
+        repeated = tracks3[:2] * 2
+        print('repeated:', repeated)
+    - type: "code"
+      title: "노래3 포함 여부"
+      content: |-
+        tracks4 = ['노래1', '노래2', '노래3', '노래4', '노래5', '노래6']
+        found = '노래3' in tracks4
+        print('has_song_3:', found)

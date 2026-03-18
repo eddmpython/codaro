@@ -1,0 +1,533 @@
+meta:
+  id: polars_10
+  title: 실전종합프로젝트
+  order: 10
+  category: polars
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["Polars", "다중소스", "통합분석", "Lazy", "종합프로젝트"]
+  seo:
+    title: "Polars 실전 종합 프로젝트 - 다중 데이터 통합 분석"
+    description: "여러 데이터셋을 결합하여 종합 분석 파이프라인을 구축합니다. 모든 Polars 개념을 총정리합니다."
+    keywords: ["polars", "다중 데이터", "통합 분석", "lazy evaluation", "종합 프로젝트"]
+
+intro:
+  emoji: "🏆"
+  goal: 영화, 배우, 수익 데이터를 통합하여 "영화 산업 종합 분석 대시보드"를 완성합니다.
+  description: 모든 Polars 개념(read_csv, select, filter, with_columns, group_by, join, concat, window, lazy, pivot)을 종합하여 실전 데이터 파이프라인을 구축합니다.
+
+sections:
+- id: step1_goal
+  title: 1단계. 프로젝트 목표
+  subtitle: 다중 소스 통합 분석
+  blocks:
+  - type: text
+    content: 10개의 Polars 프로젝트를 마무리하는 종합 프로젝트입니다. 지금까지 배운 모든 개념을 하나의 데이터 파이프라인에 통합하여 실전 분석 능력을 완성합니다. 실무 데이터 분석에서는 단일 테이블이 아닌 여러 소스의 데이터를 결합하여 분석하는 경우가 대부분입니다. 이 프로젝트에서는 영화 정보, 배우 정보, 수익 데이터라는 3개의 독립적인 데이터셋을 movieId라는 공통 키로 조인하여 영화 산업 전반을 분석합니다. 데이터 로드부터 전처리, 결합, 변환, 집계, 윈도우 함수, 피벗, Lazy 최적화까지 모든 단계를 경험하며, 종합 대시보드를 만드는 완전한 데이터 파이프라인을 구축합니다. 이 프로젝트를 완료하면 Polars로 어떤 분석 업무도 수행할 수 있는 역량을 갖추게 됩니다.
+  - type: featureCards
+    cards:
+      - emoji: "🎬"
+        title: "영화 데이터"
+        description: "영화 제목, 장르, 개봉연도, 평점"
+      - emoji: "🌟"
+        title: "배우 데이터"
+        description: "배우명, 출연 영화, 출연료"
+      - emoji: "💰"
+        title: "수익 데이터"
+        description: "영화별 제작비, 흥행 수익"
+  - type: code
+    title: 프로젝트 개요
+    description: 통합 분석 파이프라인 구조
+    content: |-
+      import polars as pl
+
+      projectPlan = pl.DataFrame({
+          "단계": ["1.로드", "2.전처리", "3.결합", "4.변환", "5.필터", "6.집계", "7.윈도우", "8.피벗", "9.Lazy", "10.대시보드"],
+          "핵심함수": ["read_csv", "cast/null", "join", "with_columns", "filter", "group_by", "over", "pivot", "lazy/collect", "agg"],
+          "설명": ["3개 DataFrame 생성", "타입변환/결측치", "movieId로 조인", "ROI/등급 파생", "조건 추출", "장르별 통계", "순위/누적", "교차표 생성", "쿼리 최적화", "종합 요약"]
+      })
+      projectPlan
+
+- id: step2_load
+  title: 2단계. 데이터 생성 및 로드
+  subtitle: 세 개의 DataFrame (A1, A3 반복)
+  blocks:
+  - type: text
+    content: 실전 분석을 시뮬레이션하기 위해 3개의 독립적인 DataFrame을 생성합니다. 실무 환경에서는 영화 정보는 영화사 데이터베이스에서, 배우 정보는 인사 시스템에서, 수익 데이터는 재무 시스템에서 각각 추출하여 pl.read_csv()나 pl.read_database()로 불러옵니다. 이렇게 분산된 데이터 소스를 하나로 통합하는 것이 데이터 엔지니어링의 핵심입니다. dfMovies는 영화 제목, 장르, 개봉연도, 평점, 국가 정보를 담고 있고, dfActors는 배우명과 출연료를, dfRevenue는 제작비와 흥행 수익을 포함합니다. 세 테이블은 모두 movieId라는 공통 식별자를 가지고 있어 조인이 가능합니다. 스키마를 확인하면 각 테이블의 구조와 데이터 타입을 파악할 수 있으며, 이는 조인 전략을 수립하는 첫 단계입니다. 실무에서는 수백만 건의 데이터를 다루지만, 여기서는 학습을 위해 10건의 대표적인 영화를 사용합니다.
+  - type: code
+    language: python
+    title: 영화 데이터
+    description: 제목, 장르, 개봉연도, 평점
+    content: |-
+      import polars as pl
+
+      dfMovies = pl.DataFrame({
+          "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "title": ["Avengers", "Titanic", "Avatar", "Joker", "Frozen", "Inception", "Interstellar", "Parasite", "The Batman", "Dune"],
+          "genre": ["Action", "Romance", "Sci-Fi", "Drama", "Animation", "Sci-Fi", "Sci-Fi", "Drama", "Action", "Sci-Fi"],
+          "year": [2012, 1997, 2009, 2019, 2013, 2010, 2014, 2019, 2022, 2021],
+          "rating": [8.0, 7.9, 7.8, 8.4, 7.4, 8.8, 8.6, 8.5, 7.8, 8.0],
+          "country": ["USA", "USA", "USA", "USA", "USA", "USA", "USA", "Korea", "USA", "USA"]
+      })
+      dfMovies
+  - type: code
+    language: python
+    title: 배우 및 수익 데이터
+    description: 출연료, 제작비, 흥행수익
+    content: |-
+      dfActors = pl.DataFrame({
+          "actorId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "name": ["Robert Downey Jr.", "Leonardo DiCaprio", "Sam Worthington", "Joaquin Phoenix", "Kristen Bell", "Leonardo DiCaprio", "Matthew McConaughey", "Song Kang-ho", "Robert Pattinson", "Timothee Chalamet"],
+          "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10], "salary": [50.0, 20.0, 10.0, 4.5, 3.0, 25.0, 15.0, 2.0, 3.0, 4.0]
+      })
+      dfRevenue = pl.DataFrame({
+          "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+          "budget": [220.0, 200.0, 237.0, 55.0, 150.0, 160.0, 165.0, 11.4, 185.0, 165.0],
+          "boxOffice": [1518.8, 2187.5, 2847.2, 1074.3, 1280.8, 829.9, 701.7, 258.8, 770.8, 402.0],
+          "releaseDate": ["2012-05-04", "1997-12-19", "2009-12-18", "2019-10-04", "2013-11-27", "2010-07-16", "2014-11-07", "2019-05-30", "2022-03-04", "2021-10-22"]
+      })
+      dfActors
+  - type: code
+    language: python
+    title: 스키마 확인
+    description: 각 DataFrame의 구조
+    content: |-
+      dfMovies.schema, dfActors.schema, dfRevenue.schema
+
+- id: step3_preprocess
+  title: 3단계. 전처리
+  subtitle: null 처리, 타입 변환 (C5, D3, D5 반복)
+  blocks:
+  - type: text
+    content: 원시 데이터(raw data)는 그대로 분석에 사용할 수 없는 경우가 많습니다. 전처리(preprocessing) 단계에서 데이터 타입을 변환하고, 결측치를 처리하고, 이상치를 제거하는 등의 작업을 수행합니다. 여기서는 releaseDate가 문자열("2012-05-04")로 저장되어 있어 날짜 연산이 불가능합니다. str.to_date()로 Date 타입으로 변환하면 연도, 월, 요일 추출, 날짜 차이 계산 등의 시계열 분석이 가능해집니다. null 값 확인은 데이터 품질 점검의 필수 단계입니다. null이 있으면 집계 결과가 왜곡되거나 조인 실패가 발생할 수 있습니다. 실무에서는 전처리 단계에서 데이터 품질 리포트를 생성하고, 문제가 있는 데이터는 소스 시스템에 피드백하거나 규칙에 따라 처리합니다. 좋은 분석의 80%는 전처리에서 결정됩니다.
+  - type: code
+    language: python
+    title: 타입 변환
+    description: 문자열을 날짜로
+    content: |-
+      dfRevenue = dfRevenue.with_columns(
+          pl.col("releaseDate").str.to_date("%Y-%m-%d").alias("releaseDate")
+      )
+      dfRevenue
+  - type: code
+    language: python
+    title: null 확인
+    description: 결측치 점검
+    content: |-
+      dfMovies.null_count(), dfActors.null_count(), dfRevenue.null_count()
+
+- id: step4_join
+  title: 4단계. 데이터 결합
+  subtitle: join, concat (F1, F4 반복)
+  blocks:
+  - type: text
+    content: 분산된 데이터를 하나의 분석 테이블로 통합하는 것이 데이터 결합(join)입니다. SQL의 JOIN과 동일한 개념으로, 공통 키(movieId)를 기준으로 여러 테이블의 정보를 결합합니다. left join을 사용하면 왼쪽 테이블(dfMovies)의 모든 행을 유지하고, 오른쪽 테이블에서 매칭되는 정보를 가져옵니다. 먼저 영화와 배우 데이터를 결합하고(dfMovieActor), 그 결과에 수익 데이터를 추가로 결합합니다(dfFull). 단계별로 조인하면 각 단계의 결과를 확인하며 진행할 수 있습니다. 조인 후에는 영화 제목, 배우명, 출연료, 제작비, 흥행 수익 등 모든 정보가 하나의 행에 모이므로 종합적인 분석이 가능해집니다. 실무에서는 수십 개의 테이블을 조인하는 경우도 있으며, 조인 키 선택, 조인 방식(inner/left/outer), 중복 처리 등이 중요한 이슈입니다. Polars의 조인은 pandas보다 훨씬 빠른 성능을 제공합니다.
+  - type: code
+    language: python
+    title: 영화 + 배우 결합
+    description: left join
+    content: |-
+      dfMovieActor = dfMovies.join(
+          dfActors,
+          on="movieId",
+          how="left"
+      )
+      dfMovieActor
+  - type: code
+    language: python
+    title: 전체 통합
+    description: 수익 데이터까지 결합
+    content: |-
+      dfFull = dfMovieActor.join(
+          dfRevenue,
+          on="movieId",
+          how="left"
+      )
+      dfFull
+
+- id: step5_transform
+  title: 5단계. 파생 컬럼 생성
+  subtitle: with_columns, alias, when-then (D1, D2, D6 반복)
+  blocks:
+  - type: text
+    content: 원본 데이터에는 없지만 분석에 필요한 파생 변수(derived variable)를 생성합니다. 수익률(ROI)은 "(흥행 수익 - 제작비) / 제작비 * 100"으로 계산하며, 투자 대비 수익을 백분율로 표현합니다. ROI가 200%면 투자금의 3배를 벌었다는 의미입니다. 날짜에서 연도(releaseYear)와 월(releaseMonth)을 추출하면 시계열 분석과 계절성 분석이 가능합니다. when-then-otherwise 구문으로 수익률을 기준으로 "대박", "성공", "보통", "실패" 등급을 부여하면 영화를 범주화할 수 있습니다. 이렇게 연속형 변수를 범주화하면 그룹별 비교가 쉬워집니다. 파생 변수는 원본 데이터에는 없지만 비즈니스 인사이트를 얻는 데 핵심적인 역할을 합니다. 실무에서는 도메인 지식을 바탕으로 의미 있는 파생 변수를 설계하는 것이 데이터 분석가의 중요한 역량입니다. with_columns()로 여러 파생 변수를 한 번에 생성할 수 있습니다.
+  - type: code
+    language: python
+    title: 수익률 계산
+    description: ROI = (수익 - 비용) / 비용
+    content: |-
+      dfFull = dfFull.with_columns([
+          ((pl.col("boxOffice") - pl.col("budget")) / pl.col("budget") * 100).alias("roi"),
+          pl.col("releaseDate").dt.year().alias("releaseYear"),
+          pl.col("releaseDate").dt.month().alias("releaseMonth")
+      ])
+      dfFull.select(["title", "budget", "boxOffice", "roi", "releaseYear", "releaseMonth"])
+  - type: code
+    language: python
+    title: 등급 분류
+    description: when-then-otherwise
+    content: |-
+      dfFull = dfFull.with_columns(
+          pl.when(pl.col("roi") >= 500)
+          .then(pl.lit("대박"))
+          .when(pl.col("roi") >= 200)
+          .then(pl.lit("성공"))
+          .when(pl.col("roi") >= 0)
+          .then(pl.lit("보통"))
+          .otherwise(pl.lit("실패"))
+          .alias("successLevel")
+      )
+      dfFull.select(["title", "roi", "successLevel"])
+
+- id: step6_filter
+  title: 6단계. 필터링
+  subtitle: filter, 비교/논리연산, str.contains (C1, C2, C3, C4 반복)
+  blocks:
+  - type: text
+    content: 전체 데이터에서 분석 목적에 맞는 부분집합을 추출하는 것이 필터링입니다. 평점 8점 이상이면서 수익률 200% 이상인 영화만 추출하면 "흥행과 작품성을 모두 갖춘 히트작"을 선별할 수 있습니다. &(and), |(or) 같은 논리 연산자로 복합 조건을 만들 수 있습니다. 문자열 필터에서는 str.contains()로 장르가 "Sci-Fi"를 포함하는 영화를 찾을 수 있습니다. 정규표현식도 지원하므로 복잡한 패턴 매칭도 가능합니다. 필터링은 데이터 탐색의 기본이며, 적절한 필터링으로 노이즈를 제거하고 핵심 데이터에 집중할 수 있습니다. Lazy 모드에서는 Predicate Pushdown으로 필터가 최우선으로 적용되어 성능이 극대화됩니다. 실무에서는 비즈니스 규칙에 따라 복잡한 필터 조건을 설계합니다.
+  - type: code
+    language: python
+    title: 복합 조건 필터
+    description: 평점 8점 이상 AND 수익률 200% 이상
+    content: |-
+      dfHits = dfFull.filter(
+          (pl.col("rating") >= 8.0) & (pl.col("roi") >= 200)
+      )
+      dfHits.select(["title", "rating", "roi", "successLevel"])
+  - type: code
+    language: python
+    title: 문자열 필터
+    description: Sci-Fi 장르
+    content: |-
+      dfSciFi = dfFull.filter(
+          pl.col("genre").str.contains("Sci-Fi")
+      )
+      dfSciFi.select(["title", "genre", "year"])
+
+- id: step7_select
+  title: 7단계. 열 선택
+  subtitle: select, pl.col, 다중열, exclude (B1, B2, B4, B5 반복)
+  blocks:
+  - type: text
+    content: 분석 목적에 맞는 핵심 컬럼만 선택하여 데이터를 간결하게 만듭니다. 전체 테이블에는 수십 개의 컬럼이 있을 수 있지만, 특정 분석에서는 그 중 일부만 필요합니다. select()로 title, genre, rating, boxOffice 등 필요한 컬럼만 선택하면 데이터 크기가 줄어들어 메모리 효율이 높아지고 가독성도 향상됩니다. alias()로 컬럼명을 변경하여 더 명확하게 표현할 수 있습니다. 반대로 exclude()를 사용하면 특정 컬럼만 제외하고 나머지를 선택할 수 있습니다. 예를 들어 movieId, actorId 같은 내부 식별자는 분석 결과에서 제외하는 것이 좋습니다. Projection Pushdown 최적화에서는 select가 일찍 적용되어 불필요한 컬럼을 읽지 않으므로 I/O 비용이 크게 감소합니다. 실무에서는 리포트마다 필요한 컬럼 세트가 다르므로 적절한 선택이 중요합니다.
+  - type: code
+    language: python
+    title: 다중 열 선택
+    description: 핵심 컬럼만
+    content: |-
+      dfCore = dfFull.select([
+          pl.col("title"),
+          pl.col("genre"),
+          pl.col("year"),
+          pl.col("rating"),
+          pl.col("name").alias("leadActor"),
+          pl.col("boxOffice"),
+          pl.col("roi")
+      ])
+      dfCore
+  - type: code
+    language: python
+    title: 열 제외
+    description: ID 컬럼 제외
+    content: |-
+      dfClean = dfFull.select(
+          pl.all().exclude(["movieId", "actorId"])
+      )
+      dfClean.columns
+
+- id: step8_group
+  title: 8단계. 집계 분석
+  subtitle: group_by, agg, 다중그룹 (E1, E2, E3, E4, E5 반복)
+  blocks:
+  - type: text
+    content: 개별 데이터를 그룹별로 요약하여 전체적인 패턴을 파악하는 것이 집계 분석입니다. group_by("genre")로 장르별로 그룹화하고, agg()로 각 그룹의 총 수익, 평균 수익, 평균 평점, 영화 수를 계산하면 "어떤 장르가 가장 수익성이 높은지" 한눈에 알 수 있습니다. 다중 그룹 집계에서는 ["genre", "successLevel"]처럼 여러 컬럼으로 그룹화하여 교차 분석을 수행합니다. 예를 들어 "Sci-Fi 장르의 대박 영화는 몇 편인지"를 확인할 수 있습니다. sum, mean, count, first, n_unique 등 다양한 집계 함수를 조합하면 풍부한 통계를 산출할 수 있습니다. 집계 결과를 정렬하면 상위/하위 그룹을 빠르게 파악할 수 있습니다. Polars의 group_by는 pandas보다 월등히 빠르며, 수백만 건의 데이터도 초 단위로 집계합니다. 실무에서는 집계 데이터를 대시보드나 리포트에 활용합니다.
+  - type: code
+    language: python
+    title: 장르별 분석
+    description: 기본 집계
+    content: |-
+      genreStats = dfFull.group_by("genre").agg([
+          pl.col("boxOffice").sum().alias("totalRevenue"),
+          pl.col("boxOffice").mean().alias("avgRevenue"),
+          pl.col("rating").mean().alias("avgRating"),
+          pl.len().alias("movieCount")
+      ]).sort("totalRevenue", descending=True)
+      genreStats
+  - type: code
+    language: python
+    title: 다중 그룹 집계
+    description: 장르 + 등급
+    content: |-
+      genreLevelStats = dfFull.group_by(["genre", "successLevel"]).agg([
+          pl.col("boxOffice").sum().alias("totalRevenue"),
+          pl.len().alias("count"),
+          pl.col("rating").first().alias("sampleRating"),
+          pl.col("title").n_unique().alias("uniqueMovies")
+      ])
+      genreLevelStats
+
+- id: step9_window
+  title: 9단계. 윈도우 함수
+  subtitle: over, rank, rolling, cum_sum, shift (I1, I2, I3, I4, I5 반복)
+  blocks:
+  - type: text
+    content: 윈도우 함수는 집계와 달리 행을 줄이지 않고 각 행에 그룹 내 통계를 추가하는 고급 기법입니다. rank().over("genre")는 각 장르 내에서 흥행 순위를 계산합니다. 예를 들어 Sci-Fi 장르 안에서 Avatar가 1위, Dune이 2위처럼 매기는 것입니다. 이렇게 하면 "각 장르의 최고 흥행작"을 쉽게 찾을 수 있습니다. 시계열 분석에서는 cum_sum()으로 누적 합계를 계산하여 "시간에 따른 총 수익 증가 추세"를 볼 수 있고, shift()로 이전 값과 비교하여 증가율을 계산할 수 있습니다. rolling()로 이동 평균을 계산하면 단기 트렌드를 파악할 수 있습니다. 윈도우 함수는 SQL의 OVER 절, pandas의 transform()과 유사하지만 Polars가 더 빠릅니다. 실무에서는 순위, 비율, 증가율, 이동 평균 등 복잡한 비즈니스 로직을 윈도우 함수로 구현합니다.
+  - type: code
+    language: python
+    title: 장르 내 순위
+    description: rank().over()
+    content: |-
+      dfRanked = dfFull.with_columns(
+          pl.col("boxOffice").rank(descending=True).over("genre").alias("genreRank")
+      ).select(["title", "genre", "boxOffice", "genreRank"]).sort(["genre", "genreRank"])
+      dfRanked
+  - type: code
+    language: python
+    title: 연도별 시계열
+    description: 누적 합계, 이동 평균
+    content: |-
+      dfYearly = dfFull.sort("year").with_columns([
+          pl.col("boxOffice").cum_sum().alias("cumRevenue"),
+          pl.col("boxOffice").shift(1).alias("prevRevenue")
+      ]).select(["title", "year", "boxOffice", "cumRevenue", "prevRevenue"])
+      dfYearly
+
+- id: step10_sort
+  title: 10단계. 정렬 및 상위 N개
+  subtitle: sort, head/tail (G1, G5 반복)
+  blocks:
+  - type: text
+    content: 데이터를 특정 기준으로 순서대로 배열하는 것이 정렬입니다. sort("roi", descending=True)는 수익률 내림차순 정렬로, 가장 수익성이 높은 영화가 맨 위에 옵니다. head(5)와 조합하면 Top 5를 추출할 수 있습니다. 반대로 rating 오름차순 정렬 후 head(3)하면 평점이 낮은 하위 3개 영화를 찾을 수 있습니다. 다중 정렬도 가능하여 ["genre", "rating"]으로 정렬하면 "장르별로 그룹화되고, 각 장르 내에서는 평점 순"으로 정렬됩니다. tail()은 하위 N개를 추출합니다. 정렬은 데이터 탐색과 리포트 생성에 필수적이며, 상위/하위 항목을 찾는 것은 의사결정에 직접 활용됩니다. 실무에서는 "Top 10 고객", "하위 5% 제품" 같은 분석을 자주 수행합니다.
+  - type: code
+    language: python
+    title: 수익률 Top 5
+    description: 정렬 후 head
+    content: |-
+      top5Roi = dfFull.sort("roi", descending=True).head(5).select(["title", "genre", "roi", "successLevel"])
+      top5Roi
+  - type: code
+    language: python
+    title: 평점 하위 3개
+    description: 정렬 후 tail
+    content: |-
+      bottom3Rating = dfFull.sort("rating").head(3).select(["title", "rating", "genre"])
+      bottom3Rating
+
+- id: step11_pivot
+  title: 11단계. 피벗
+  subtitle: pivot, unpivot, 체이닝 (J1, J2, J3 반복)
+  blocks:
+  - type: text
+    content: 피벗은 데이터의 형태를 바꾸어 교차표(cross-tabulation)를 만드는 기법입니다. 행 데이터를 열로 펼치면 가독성이 높은 매트릭스 형태가 됩니다. 장르별, 성공등급별 수익을 계산한 후 pivot(on="successLevel", index="genre", values="revenue")하면 장르가 행, 성공등급(대박/성공/보통/실패)이 열이 되는 테이블이 생성됩니다. 이렇게 하면 "Sci-Fi 장르의 대박 영화 수익은 얼마인지" 한눈에 볼 수 있습니다. fill_null(0)로 값이 없는 셀을 0으로 채웁니다. Excel의 피벗 테이블, pandas의 pivot_table()과 동일한 기능입니다. unpivot()은 반대로 넓은 형태를 긴 형태로 변환합니다. 메서드 체이닝으로 filter, group_by, pivot, sort를 한 줄로 연결하면 복잡한 분석도 간결하게 표현할 수 있습니다. 실무에서는 피벗 테이블을 리포트나 대시보드의 핵심 뷰로 사용합니다.
+  - type: code
+    language: python
+    title: 피벗 테이블
+    description: 장르 x 성공등급
+    content: |-
+      pivotTable = dfFull.group_by(["genre", "successLevel"]).agg(
+          pl.col("boxOffice").sum().alias("revenue")
+      ).pivot(
+          on="successLevel",
+          index="genre",
+          values="revenue"
+      ).fill_null(0)
+      pivotTable
+  - type: code
+    language: python
+    title: 체이닝 예시
+    description: 한 줄로 분석
+    content: |-
+      result = (
+          dfFull
+          .filter(pl.col("year") >= 2015)
+          .group_by("genre")
+          .agg([
+              pl.col("boxOffice").sum().alias("revenue"),
+              pl.col("rating").mean().alias("avgRating")
+          ])
+          .sort("revenue", descending=True)
+      )
+      result
+
+- id: step12_lazy
+  title: 12단계. Lazy 최적화
+  subtitle: lazy, collect, explain (H1, H2, H3 반복)
+  blocks:
+  - type: text
+    content: 복잡한 데이터 파이프라인을 Lazy 모드로 작성하면 Polars가 자동으로 쿼리를 최적화합니다. lazy()로 시작하여 filter, group_by, agg, sort 등을 체이닝하면 쿼리 계획이 수집됩니다. explain()으로 최적화된 실행 계획을 확인하면 Predicate Pushdown, Projection Pushdown 등이 적용된 것을 볼 수 있습니다. 예를 들어 "ROI > 100 필터링"이 맨 앞으로 이동하여 불필요한 데이터 처리를 건너뜁니다. collect()를 호출하면 최적화된 계획이 실제로 실행되어 DataFrame을 반환합니다. 실무에서는 대부분의 분석을 Lazy 모드로 작성하여 성능을 극대화합니다. 특히 수백만 건 이상의 대용량 데이터나 복잡한 조인이 포함된 쿼리에서 Lazy 모드의 성능 이점이 두드러집니다. 쿼리 개발 시에는 fetch(100)으로 상위 100개만 빠르게 테스트하고, 최종 실행 시 collect()를 사용하는 것이 효율적입니다.
+  - type: code
+    language: python
+    title: Lazy 쿼리
+    description: 쿼리 최적화
+    content: |-
+      lazyQuery = (
+          dfFull.lazy()
+          .filter(pl.col("roi") > 100)
+          .group_by("genre")
+          .agg([
+              pl.col("boxOffice").sum().alias("totalRevenue"),
+              pl.len().alias("count")
+          ])
+          .sort("totalRevenue", descending=True)
+      )
+      lazyQuery.explain()
+  - type: code
+    language: python
+    title: 실행
+    description: collect()로 결과
+    content: |-
+      lazyResult = lazyQuery.collect()
+      lazyResult
+
+- id: step13_dashboard
+  title: 13단계. 종합 대시보드
+  subtitle: 최종 결과물
+  blocks:
+  - type: text
+    content: 데이터 파이프라인의 최종 산출물은 의사결정에 활용할 수 있는 인사이트입니다. 종합 대시보드는 여러 관점의 집계 데이터를 한곳에 모아 전체 상황을 조망할 수 있게 합니다. 장르별 요약에서는 영화 수, 총수익, 평균수익, 평균ROI, 평균평점을 계산하여 "어떤 장르가 가장 수익성이 높고 안정적인지" 파악합니다. 연도별 요약은 시계열 트렌드를 보여주어 "영화 산업이 성장하는지, 제작비 대비 수익이 개선되는지" 분석할 수 있습니다. 배우별 요약은 "어떤 배우가 출연료 대비 흥행 효율이 높은지" 평가하여 캐스팅 의사결정에 활용할 수 있습니다. round()로 소수점을 정리하고 한글 컬럼명을 사용하면 리포트 가독성이 향상됩니다. 실무에서는 이런 집계 데이터를 Tableau, Power BI, Grafana 같은 BI 도구에 연결하거나, CSV로 저장하여 공유합니다. 데이터 분석의 최종 목표는 비즈니스 가치를 창출하는 것입니다.
+  - type: code
+    language: python
+    title: 장르별 요약
+    description: 핵심 지표
+    content: |-
+      dashboardGenre = dfFull.group_by("genre").agg([
+          pl.len().alias("영화수"),
+          pl.col("boxOffice").sum().round(1).alias("총수익"),
+          pl.col("boxOffice").mean().round(1).alias("평균수익"),
+          pl.col("roi").mean().round(1).alias("평균ROI"),
+          pl.col("rating").mean().round(2).alias("평균평점")
+      ]).sort("총수익", descending=True)
+      dashboardGenre
+  - type: code
+    language: python
+    title: 연도별 요약
+    description: 시계열 트렌드
+    content: |-
+      dashboardYear = dfFull.group_by("releaseYear").agg([
+          pl.len().alias("영화수"),
+          pl.col("boxOffice").sum().round(1).alias("총수익"),
+          pl.col("budget").sum().round(1).alias("총제작비")
+      ]).sort("releaseYear")
+      dashboardYear
+  - type: code
+    language: python
+    title: Top 배우
+    description: 출연료 vs 흥행
+    content: |-
+      dashboardActor = dfFull.group_by("name").agg([
+          pl.col("boxOffice").sum().alias("총흥행"),
+          pl.col("salary").sum().alias("총출연료"),
+          pl.col("title").first().alias("대표작")
+      ]).with_columns(
+          (pl.col("총흥행") / pl.col("총출연료")).round(1).alias("투자수익비")
+      ).sort("총흥행", descending=True)
+      dashboardActor
+
+- id: practice
+  title: 실습
+  subtitle: 고급 확장 과제
+  blocks:
+  - type: text
+    content: 10개 프로젝트에서 배운 모든 Polars 개념을 종합하여 실전 수준의 심화 분석을 수행합니다. 복잡한 필터 조건, 다중 조인, 윈도우 함수, 피벗, Lazy 최적화를 모두 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 2015년 이후 Sci-Fi 장르 영화 연도별 평균 ROI 계산"
+    blocks:
+    - type: code
+      title: "데이터 생성"
+      content: |-
+        import polars as pl
+
+        movies = pl.DataFrame({
+            "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "title": ["Avengers", "Titanic", "Avatar", "Joker", "Frozen", "Inception", "Interstellar", "Parasite", "The Batman", "Dune"],
+            "genre": ["Action", "Romance", "Sci-Fi", "Drama", "Animation", "Sci-Fi", "Sci-Fi", "Drama", "Action", "Sci-Fi"],
+            "year": [2012, 1997, 2009, 2019, 2013, 2010, 2014, 2019, 2022, 2021],
+            "rating": [8.0, 7.9, 7.8, 8.4, 7.4, 8.8, 8.6, 8.5, 7.8, 8.0]
+        })
+        revenue = pl.DataFrame({"movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "budget": [220.0, 200.0, 237.0, 55.0, 150.0, 160.0, 165.0, 11.4, 185.0, 165.0],
+            "boxOffice": [1518.8, 2187.5, 2847.2, 1074.3, 1280.8, 829.9, 701.7, 258.8, 770.8, 402.0]})
+        movieRevenue = movies.join(revenue, on="movieId", how="left").with_columns(
+            ((pl.col("boxOffice") - pl.col("budget")) / pl.col("budget") * 100).alias("roi"))
+        movieRevenue.head()
+    - type: code
+      title: "Sci-Fi 연도별 평균 ROI"
+      content: |-
+        sciFiQuery = movieRevenue.lazy().filter(
+            (pl.col("year") >= 2015) & (pl.col("genre") == "Sci-Fi")
+        ).group_by("year").agg([
+            pl.col("roi").mean().round(1).alias("avgRoi"),
+            pl.len().alias("count"), pl.col("title").first().alias("sample")
+        ]).sort("year")
+        sciFiRoi = sciFiQuery.collect()
+        sciFiRoi
+  - type: expansion
+    title: "미션2: 배우별 출연료 대비 흥행 효율 순위 산출"
+    blocks:
+    - type: code
+      title: "영화 및 배우 데이터"
+      content: |-
+        import polars as pl
+
+        filmInfo = pl.DataFrame({
+            "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "title": ["Avengers", "Titanic", "Avatar", "Joker", "Frozen", "Inception", "Interstellar", "Parasite", "The Batman", "Dune"],
+            "genre": ["Action", "Romance", "Sci-Fi", "Drama", "Animation", "Sci-Fi", "Sci-Fi", "Drama", "Action", "Sci-Fi"],
+            "rating": [8.0, 7.9, 7.8, 8.4, 7.4, 8.8, 8.6, 8.5, 7.8, 8.0]
+        })
+        castInfo = pl.DataFrame({
+            "actorId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "name": ["Robert Downey Jr.", "Leonardo DiCaprio", "Sam Worthington", "Joaquin Phoenix", "Kristen Bell", "Leonardo DiCaprio", "Matthew McConaughey", "Song Kang-ho", "Robert Pattinson", "Timothee Chalamet"],
+            "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "salary": [50.0, 20.0, 10.0, 4.5, 3.0, 25.0, 15.0, 2.0, 3.0, 4.0]
+        })
+    - type: code
+      title: "수익 데이터 및 결합"
+      content: |-
+        boxOfficeData = pl.DataFrame({
+            "movieId": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            "boxOffice": [1518.8, 2187.5, 2847.2, 1074.3, 1280.8, 829.9, 701.7, 258.8, 770.8, 402.0]
+        })
+        actorMovie = filmInfo.join(castInfo, on="movieId", how="left").join(boxOfficeData, on="movieId", how="left")
+        actorMovie.head()
+    - type: code
+      title: "배우별 집계"
+      content: |-
+        actorStats = actorMovie.lazy().group_by("name").agg([
+            pl.len().alias("movieCount"),
+            pl.col("rating").mean().round(2).alias("avgRating"),
+            pl.col("salary").sum().alias("totalSalary"),
+            pl.col("boxOffice").sum().alias("totalRevenue")
+        ])
+    - type: code
+      title: "효율 순위 계산"
+      content: |-
+        actorEfficiency = (
+            actorStats
+            .with_columns((pl.col("totalRevenue") / pl.col("totalSalary")).round(1).alias("efficiency"))
+            .with_columns(pl.col("efficiency").rank(descending=True).alias("efficiencyRank"))
+            .sort("efficiencyRank")
+            .collect()
+        )
+        actorEfficiency
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 10개 프로젝트를 완주하며 Polars의 모든 핵심 개념을 마스터했습니다! 다중 데이터 소스를 통합하고, 전처리하고, 변환하고, 집계하고, 시각화 준비까지 완료하는 완전한 데이터 파이프라인을 구축할 수 있는 능력을 갖추었습니다. 이제 실무 환경에서 어떤 데이터 분석 과제가 주어져도 Polars로 효율적으로 처리할 수 있습니다. pandas보다 수십 배 빠른 성능, Lazy Evaluation을 통한 자동 최적화, 풍부한 표현식 API는 Polars를 현대 데이터 분석의 필수 도구로 만들어줍니다. 계속해서 실전 프로젝트를 경험하며 역량을 키워나가시기 바랍니다!
+  - type: list
+    items:
+    - "A. 데이터 로드: read_csv, schema 확인"
+    - "B. 선택: select, pl.col, 다중열, exclude"
+    - "C. 필터링: filter, 비교/논리연산, str.contains, null 처리"
+    - "D. 변환: with_columns, alias, cast, str, dt, when-then"
+    - "E. 집계: group_by, agg, 기본/고급집계, 다중그룹"
+    - "F. 결합: join, concat"
+    - "G. 정렬: sort, head/tail"
+    - "H. Lazy: lazy, collect, explain"
+    - "I. 윈도우: over, rank, rolling, cum_sum, shift"
+    - "J. 피벗: pivot, unpivot, 체이닝"
+  - type: text
+    content: 10개 프로젝트를 완료하며 Polars의 모든 핵심 개념을 마스터했습니다! 영화 평점 분석부터 시작하여 날씨 데이터, 게임 판매, 주식 시계열, 음악 스트리밍, 부동산 가격, 스포츠 통계, 소셜 미디어, 대용량 로그, 그리고 이 종합 프로젝트까지 다양한 도메인의 데이터를 다루며 실전 감각을 익혔습니다. 이제 pandas를 대체하여 월등히 빠른 성능으로 대용량 데이터를 처리할 수 있고, Lazy Evaluation으로 쿼리를 자동 최적화하며, 윈도우 함수와 표현식 API로 복잡한 분석도 간결하게 수행할 수 있습니다. 실전 데이터 파이프라인을 자유롭게 구축할 수 있는 역량을 갖추셨습니다. 다음 단계로 DuckDB, Altair 등 다른 도구와 함께 사용하며 데이터 분석 능력을 더욱 확장해나가세요!

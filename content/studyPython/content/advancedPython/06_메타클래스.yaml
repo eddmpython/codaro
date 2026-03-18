@@ -1,0 +1,734 @@
+meta:
+  id: "06"
+  title: "메타클래스"
+  day: 6
+  category: "advancedPython"
+  tags: ["metaclass", "type", "class", "__init_subclass__"]
+  seo:
+    title: "파이썬 메타클래스 완벽 이해 - 클래스를 만드는 클래스"
+    description: "메타클래스의 동작 원리를 이해합니다. type 함수로 동적 클래스 생성, 커스텀 메타클래스, __init_subclass__ 활용법."
+    keywords: ["metaclass", "type", "메타클래스", "__new__", "__init_subclass__"]
+
+intro:
+  emoji: "🏭"
+  points:
+  - "클래스도 객체라는 개념 이해"
+  - "type()으로 동적 클래스 생성"
+  - "커스텀 메타클래스 구현"
+  - "__init_subclass__로 서브클래스 훅"
+
+sections:
+- id: "class_is_object"
+  title: "클래스도 객체"
+  subtitle: "타입 계층 이해"
+  blocks:
+  - type: "text"
+    content: "파이썬에서 모든 것은 객체입니다. 클래스도 예외가 아닙니다. 클래스는 type이라는 메타클래스의 인스턴스입니다. int, str, list 같은 내장 타입도 모두 type의 인스턴스입니다. type(클래스)를 호출하면 <class 'type'>이 반환됩니다. 클래스의 __class__ 속성도 type을 가리킵니다. 이 구조를 이해하면 메타클래스가 어떻게 클래스를 생성하고 제어하는지 알 수 있습니다. 재미있는 점은 type의 타입도 type이라는 것입니다. type(type)은 type 자신을 반환합니다."
+  - type: "list"
+    items:
+    - "모든 클래스는 type의 인스턴스"
+    - "type(MyClass) → <class 'type'>"
+    - "MyClass.__class__ → <class 'type'>"
+    - "type(type) → <class 'type'> (자기 참조)"
+  - type: "code"
+    language: "python"
+    title: "타입 계층 확인"
+    description: "클래스와 인스턴스의 타입을 확인합니다."
+    content: |-
+      class MyClass:
+          pass
+
+      obj = MyClass()
+
+      type(obj), type(MyClass), type(type)
+  - type: "code"
+    language: "python"
+    title: "내장 타입도 동일"
+    description: "내장 타입들도 type의 인스턴스입니다."
+    content: |-
+      type(int), type(str), type(list), type(dict)
+  - type: "code"
+    language: "python"
+    title: "__class__ 속성"
+    description: "__class__로 타입을 확인합니다."
+    content: |-
+      class Animal:
+          pass
+
+      cat = Animal()
+      cat.__class__, Animal.__class__
+  - type: "tip"
+    content: "isinstance(MyClass, type)은 True입니다. 모든 클래스는 type의 인스턴스입니다."
+
+- id: "type_function"
+  title: "type()으로 클래스 생성"
+  subtitle: "동적 클래스 생성"
+  blocks:
+  - type: "text"
+    content: "type 함수는 두 가지 용도로 사용됩니다. 인자가 하나면 객체의 타입을 반환합니다. 인자가 세 개면 새 클래스를 생성합니다. type(name, bases, dict)에서 name은 클래스 이름, bases는 부모 클래스들의 튜플, dict는 클래스 속성과 메서드를 담은 딕셔너리입니다. class 문법은 사실 type 호출의 문법적 설탕(syntactic sugar)입니다. 동적으로 클래스를 생성해야 할 때 type을 직접 사용할 수 있습니다."
+  - type: "list"
+    items:
+    - "type(obj): 객체의 타입 반환"
+    - "type(name, bases, dict): 새 클래스 생성"
+    - "name: 클래스 이름 문자열"
+    - "bases: 부모 클래스 튜플 (빈 튜플이면 object)"
+    - "dict: 속성/메서드 딕셔너리"
+  - type: "code"
+    language: "python"
+    title: "type으로 클래스 생성"
+    description: "type을 사용해 동적으로 클래스를 만듭니다."
+    content: |-
+      Dog = type("Dog", (), {"species": "Canis familiaris"})
+      dog = Dog()
+      dog.species
+  - type: "code"
+    language: "python"
+    title: "메서드 포함 클래스"
+    description: "메서드를 가진 클래스를 동적으로 생성합니다."
+    content: |-
+      def speak(self):
+          return f"{self.name} says woof!"
+
+      def initDog(self, name):
+          self.name = name
+
+      Puppy = type("Puppy", (), {
+          "__init__": initDog,
+          "speak": speak
+      })
+
+      pup = Puppy("Max")
+      pup.speak()
+  - type: "code"
+    language: "python"
+    title: "상속과 type"
+    description: "type으로 상속 관계를 정의합니다."
+    content: |-
+      class Animal:
+          def breathe(self):
+              return "breathing"
+
+      Cat = type("Cat", (Animal,), {"sound": "meow"})
+      myCat = Cat()
+      myCat.breathe(), myCat.sound
+  - type: "tip"
+    content: "class 문을 사용할 때 파이썬은 내부적으로 type(name, bases, namespace)를 호출합니다."
+
+- id: "metaclass_basic"
+  title: "메타클래스 기초"
+  subtitle: "__new__와 __init__"
+  blocks:
+  - type: "text"
+    content: "메타클래스는 클래스를 생성하는 클래스입니다. type을 상속받아 커스텀 메타클래스를 만들 수 있습니다. 메타클래스의 __new__는 클래스 객체를 생성할 때 호출됩니다. __init__은 생성된 클래스 객체를 초기화합니다. __call__은 클래스가 인스턴스를 생성할 때 호출됩니다. 메타클래스를 사용하면 클래스 생성 과정을 가로채 속성을 수정하거나 검증할 수 있습니다."
+  - type: "list"
+    items:
+    - "메타클래스는 type을 상속"
+    - "__new__(mcs, name, bases, namespace): 클래스 생성"
+    - "__init__(cls, name, bases, namespace): 클래스 초기화"
+    - "__call__(cls, *args): 인스턴스 생성 시 호출"
+  - type: "code"
+    language: "python"
+    title: "기본 메타클래스"
+    description: "커스텀 메타클래스를 정의합니다."
+    content: |-
+      class Meta(type):
+          def __new__(mcs, name, bases, namespace):
+              namespace["created_by"] = "Meta"
+              return super().__new__(mcs, name, bases, namespace)
+
+      class MyClass(metaclass=Meta):
+          pass
+
+      MyClass.created_by
+  - type: "code"
+    language: "python"
+    title: "메타클래스 __init__"
+    description: "클래스 초기화 시점에 로직을 추가합니다."
+    content: |-
+      class LogMeta(type):
+          def __init__(cls, name, bases, namespace):
+              super().__init__(name, bases, namespace)
+              cls.classInfo = f"Class {name} with {len(namespace)} attributes"
+
+      class Sample(metaclass=LogMeta):
+          x = 1
+          y = 2
+
+      Sample.classInfo
+  - type: "code"
+    language: "python"
+    title: "메타클래스 __call__"
+    description: "인스턴스 생성을 제어합니다."
+    content: |-
+      class CounterMeta(type):
+          def __call__(cls, *args, **kwargs):
+              cls.instanceCount = getattr(cls, "instanceCount", 0) + 1
+              return super().__call__(*args, **kwargs)
+
+      class Tracked(metaclass=CounterMeta):
+          pass
+
+      inst1 = Tracked()
+      inst2 = Tracked()
+      inst3 = Tracked()
+      Tracked.instanceCount
+  - type: "tip"
+    content: "메타클래스의 __new__는 클래스 자체를 만들고, 클래스의 __new__는 인스턴스를 만듭니다."
+
+- id: "metaclass_example"
+  title: "메타클래스 예제"
+  subtitle: "실전 패턴"
+  blocks:
+  - type: "text"
+    content: "메타클래스의 대표적인 활용 사례를 살펴봅니다. 싱글톤 패턴은 클래스의 인스턴스가 하나만 존재하도록 보장합니다. 레지스트리 패턴은 생성된 모든 서브클래스를 자동으로 등록합니다. 검증 패턴은 클래스 정의 시 특정 조건을 강제합니다. 이런 패턴들은 프레임워크나 ORM에서 자주 사용됩니다. Django 모델, SQLAlchemy 테이블, pytest 플러그인 등이 메타클래스를 활용합니다."
+  - type: "list"
+    items:
+    - "싱글톤: 인스턴스 하나만 유지"
+    - "레지스트리: 서브클래스 자동 등록"
+    - "검증: 클래스 정의 규칙 강제"
+    - "속성 자동 추가/수정"
+  - type: "code"
+    language: "python"
+    title: "싱글톤 메타클래스"
+    description: "인스턴스를 하나만 생성합니다."
+    content: |-
+      class SingletonMeta(type):
+          _instances = {}
+
+          def __call__(cls, *args, **kwargs):
+              if cls not in cls._instances:
+                  cls._instances[cls] = super().__call__(*args, **kwargs)
+              return cls._instances[cls]
+
+      class Database(metaclass=SingletonMeta):
+          def __init__(self):
+              self.connection = "connected"
+
+      db1 = Database()
+      db2 = Database()
+      db1 is db2
+  - type: "code"
+    language: "python"
+    title: "레지스트리 메타클래스"
+    description: "서브클래스를 자동으로 등록합니다."
+    content: |-
+      class PluginMeta(type):
+          plugins = {}
+
+          def __new__(mcs, name, bases, namespace):
+              cls = super().__new__(mcs, name, bases, namespace)
+              if bases:
+                  mcs.plugins[name] = cls
+              return cls
+
+      class Plugin(metaclass=PluginMeta):
+          pass
+
+      class AuthPlugin(Plugin):
+          pass
+
+      class CachePlugin(Plugin):
+          pass
+
+      PluginMeta.plugins
+  - type: "code"
+    language: "python"
+    title: "검증 메타클래스"
+    description: "클래스 정의 시 필수 메서드를 검증합니다."
+    content: |-
+      class InterfaceMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              if bases:
+                  required = ["execute", "validate"]
+                  for method in required:
+                      if method not in namespace:
+                          raise TypeError(f"Missing required method: {method}")
+              return super().__new__(mcs, name, bases, namespace)
+
+      class Command(metaclass=InterfaceMeta):
+          pass
+
+      class SaveCommand(Command):
+          def execute(self):
+              return "saving"
+          def validate(self):
+              return True
+
+      SaveCommand().execute()
+  - type: "tip"
+    content: "대부분의 경우 데코레이터나 __init_subclass__로 충분합니다. 메타클래스는 최후의 수단으로 사용하세요."
+
+- id: "init_subclass"
+  title: "__init_subclass__"
+  subtitle: "가벼운 대안"
+  blocks:
+  - type: "text"
+    content: "__init_subclass__는 Python 3.6에서 도입된 클래스 메서드입니다. 서브클래스가 생성될 때 자동으로 호출됩니다. 메타클래스보다 간단하게 서브클래스 훅을 구현할 수 있습니다. 부모 클래스에 정의하면 모든 서브클래스에 적용됩니다. 클래스 정의 시 키워드 인자를 받을 수도 있습니다. 서브클래스 등록, 속성 검증, 자동 속성 추가 등 대부분의 메타클래스 사용 사례를 더 간단하게 구현할 수 있습니다."
+  - type: "list"
+    items:
+    - "Python 3.6+ 도입"
+    - "서브클래스 생성 시 자동 호출"
+    - "메타클래스보다 훨씬 간단"
+    - "키워드 인자 지원: class Sub(Base, key=value)"
+  - type: "code"
+    language: "python"
+    title: "__init_subclass__ 기초"
+    description: "서브클래스 생성 시 훅을 실행합니다."
+    content: |-
+      class Base:
+          subclasses = []
+
+          def __init_subclass__(cls, **kwargs):
+              super().__init_subclass__(**kwargs)
+              cls.subclasses.append(cls.__name__)
+
+      class Child1(Base):
+          pass
+
+      class Child2(Base):
+          pass
+
+      Base.subclasses
+  - type: "code"
+    language: "python"
+    title: "키워드 인자 사용"
+    description: "클래스 정의 시 키워드 인자를 받습니다."
+    content: |-
+      class Serializable:
+          def __init_subclass__(cls, format="json", **kwargs):
+              super().__init_subclass__(**kwargs)
+              cls.serializationFormat = format
+
+      class UserData(Serializable, format="xml"):
+          pass
+
+      class ConfigData(Serializable):
+          pass
+
+      UserData.serializationFormat, ConfigData.serializationFormat
+  - type: "code"
+    language: "python"
+    title: "속성 검증"
+    description: "__init_subclass__로 필수 속성을 검증합니다."
+    content: |-
+      class Model:
+          def __init_subclass__(cls, **kwargs):
+              super().__init_subclass__(**kwargs)
+              if not hasattr(cls, "tableName"):
+                  raise TypeError(f"{cls.__name__} must define tableName")
+
+      class UserModel(Model):
+          tableName = "users"
+
+      UserModel.tableName
+  - type: "tip"
+    content: "__init_subclass__는 메타클래스와 달리 상속 체인을 복잡하게 만들지 않습니다."
+
+- id: "when_to_use"
+  title: "언제 사용하나"
+  subtitle: "적절한 도구 선택"
+  blocks:
+  - type: "text"
+    content: "메타클래스는 강력하지만 복잡합니다. 대부분의 경우 더 간단한 대안이 있습니다. 클래스 데코레이터는 클래스 생성 후 수정이 필요할 때 적합합니다. __init_subclass__는 서브클래스 훅에 적합합니다. 메타클래스는 클래스 생성 과정 자체를 제어해야 할 때만 사용합니다. 프레임워크 개발, ORM 구현, API 자동 생성 등 특수한 경우에 메타클래스가 필요합니다. 일반 애플리케이션 개발에서는 거의 사용하지 않습니다."
+  - type: "list"
+    items:
+    - "클래스 데코레이터: 생성 후 수정"
+    - "__init_subclass__: 서브클래스 훅"
+    - "메타클래스: 생성 과정 제어 (최후의 수단)"
+    - "프레임워크/ORM/API 자동화에 주로 사용"
+  - type: "code"
+    language: "python"
+    title: "클래스 데코레이터 대안"
+    description: "데코레이터로 클래스를 수정합니다."
+    content: |-
+      def addRepr(cls):
+          def customRepr(self):
+              attrs = ", ".join(f"{k}={v}" for k, v in vars(self).items())
+              return f"{cls.__name__}({attrs})"
+          cls.__repr__ = customRepr
+          return cls
+
+      @addRepr
+      class Point:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+      Point(3, 4)
+  - type: "code"
+    language: "python"
+    title: "선택 기준"
+    description: "상황별 적절한 도구를 보여줍니다."
+    content: |-
+      class Framework:
+          """
+          도구 선택 가이드:
+
+          1. 인스턴스 동작 수정 → 일반 메서드/프로퍼티
+          2. 클래스 속성 추가 → 클래스 데코레이터
+          3. 서브클래스 등록/검증 → __init_subclass__
+          4. 클래스 생성 제어 → 메타클래스
+
+          복잡도: 메서드 < 데코레이터 < __init_subclass__ < 메타클래스
+          """
+          pass
+
+      Framework.__doc__
+  - type: "code"
+    language: "python"
+    title: "실무 예시: 자동 등록"
+    description: "명령어 패턴에서 자동 등록을 구현합니다."
+    content: |-
+      class CommandRegistry:
+          commands = {}
+
+          def __init_subclass__(cls, name=None, **kwargs):
+              super().__init_subclass__(**kwargs)
+              commandName = name or cls.__name__.lower()
+              CommandRegistry.commands[commandName] = cls
+
+      class HelpCommand(CommandRegistry, name="help"):
+          def run(self):
+              return "Showing help"
+
+      class ExitCommand(CommandRegistry, name="quit"):
+          def run(self):
+              return "Exiting"
+
+      CommandRegistry.commands
+  - type: "tip"
+    content: "Tim Peters: '메타클래스가 필요한지 고민된다면, 아마도 필요하지 않을 것이다.'"
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "메타클래스 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 6에서 배운 메타클래스를 난이도별로 복습합니다. 메타클래스는 '클래스의 클래스'로, 클래스 생성 과정을 제어하는 파이썬의 가장 강력한 메타프로그래밍 도구입니다. type()으로 동적 클래스 생성, __new__와 __init__으로 클래스 커스터마이징, __init_subclass__로 상속 제어를 할 수 있습니다. 🟢 기본 문제로 type의 역할과 기본 메타클래스를 익히고, 🟡 응용 문제로 클래스 검증과 자동 속성 주입을 연습하세요. 🔴 심화 문제에서는 싱글톤, ORM 스타일 모델, 플러그인 시스템 등 실무 패턴을 구현해봅니다. 메타클래스는 과도하게 사용하면 복잡해지므로 꼭 필요한 경우에만 적용하는 것이 좋습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 타입 확인"
+    code: |-
+      class Example:
+          pass
+
+      type(Example), type(Example())
+
+  - type: "expansion"
+    title: "🟢 기본2: type으로 클래스 생성"
+    code: |-
+      Simple = type("Simple", (), {"value": 42})
+      Simple().value
+
+  - type: "expansion"
+    title: "🟢 기본3: 상속과 type"
+    code: |-
+      class Parent:
+          def greet(self):
+              return "Hello"
+
+      Child = type("Child", (Parent,), {})
+      Child().greet()
+
+  - type: "expansion"
+    title: "🟢 기본4: 기본 메타클래스"
+    code: |-
+      class SimpleMeta(type):
+          def __new__(mcs, name, bases, ns):
+              ns["version"] = "1.0"
+              return super().__new__(mcs, name, bases, ns)
+
+      class App(metaclass=SimpleMeta):
+          pass
+
+      App.version
+
+  - type: "expansion"
+    title: "🟢 기본5: __init_subclass__ 기초"
+    code: |-
+      class Base:
+          registry = []
+          def __init_subclass__(cls, **kwargs):
+              super().__init_subclass__(**kwargs)
+              cls.registry.append(cls.__name__)
+
+      class Sub1(Base): pass
+      class Sub2(Base): pass
+      Base.registry
+
+  - type: "expansion"
+    title: "🟡 응용1: 메서드와 type"
+    code: |-
+      def calculate(self, x, y):
+          return x + y
+
+      Calculator = type("Calculator", (), {"add": calculate})
+      Calculator().add(3, 5)
+
+  - type: "expansion"
+    title: "🟡 응용2: __call__ 오버라이드"
+    code: |-
+      class CountMeta(type):
+          def __call__(cls, *args, **kwargs):
+              cls.count = getattr(cls, "count", 0) + 1
+              return super().__call__(*args, **kwargs)
+
+      class Item(metaclass=CountMeta):
+          pass
+
+      Item(), Item(), Item()
+      Item.count
+
+  - type: "expansion"
+    title: "🟡 응용3: 키워드 인자"
+    code: |-
+      class Configurable:
+          def __init_subclass__(cls, debug=False, **kwargs):
+              super().__init_subclass__(**kwargs)
+              cls.debugMode = debug
+
+      class Production(Configurable, debug=False): pass
+      class Development(Configurable, debug=True): pass
+
+      Production.debugMode, Development.debugMode
+
+  - type: "expansion"
+    title: "🟡 응용4: 속성 자동 추가"
+    code: |-
+      class AutoMeta(type):
+          def __new__(mcs, name, bases, ns):
+              ns["className"] = name
+              ns["attrCount"] = len([k for k in ns if not k.startswith("_")])
+              return super().__new__(mcs, name, bases, ns)
+
+      class MyModel(metaclass=AutoMeta):
+          field1 = "a"
+          field2 = "b"
+
+      MyModel.className, MyModel.attrCount
+
+  - type: "expansion"
+    title: "🟡 응용5: 검증"
+    code: |-
+      class ValidateMeta(type):
+          def __new__(mcs, name, bases, ns):
+              if bases and "process" not in ns:
+                  raise TypeError(f"{name} must implement process()")
+              return super().__new__(mcs, name, bases, ns)
+
+      class Handler(metaclass=ValidateMeta):
+          pass
+
+      class Worker(Handler):
+          def process(self):
+              return "working"
+
+      Worker().process()
+
+  - type: "expansion"
+    title: "🔴 심화1: 싱글톤 구현"
+    code: |-
+      class SingletonMeta(type):
+          _cache = {}
+          def __call__(cls, *args, **kwargs):
+              if cls not in cls._cache:
+                  cls._cache[cls] = super().__call__(*args, **kwargs)
+              return cls._cache[cls]
+
+      class Config(metaclass=SingletonMeta):
+          def __init__(self):
+              self.setting = "default"
+
+      c1, c2 = Config(), Config()
+      c1.setting = "changed"
+      c1 is c2, c2.setting
+
+  - type: "expansion"
+    title: "🔴 심화2: 레지스트리 패턴"
+    code: |-
+      class ServiceRegistry:
+          services = {}
+
+          def __init_subclass__(cls, name=None, **kwargs):
+              super().__init_subclass__(**kwargs)
+              serviceName = name or cls.__name__
+              ServiceRegistry.services[serviceName] = cls
+
+      class EmailService(ServiceRegistry, name="email"): pass
+      class SMSService(ServiceRegistry, name="sms"): pass
+
+      ServiceRegistry.services
+
+  - type: "expansion"
+    title: "🔴 심화3: 속성 변환"
+    code: |-
+      class UpperMeta(type):
+          def __new__(mcs, name, bases, ns):
+              upperNs = {}
+              for key, val in ns.items():
+                  if not key.startswith("_") and isinstance(val, str):
+                      upperNs[key] = val.upper()
+                  else:
+                      upperNs[key] = val
+              return super().__new__(mcs, name, bases, upperNs)
+
+      class Labels(metaclass=UpperMeta):
+          title = "hello"
+          message = "world"
+
+      Labels.title, Labels.message
+
+  - type: "expansion"
+    title: "🔴 심화4: 메서드 래핑"
+    code: |-
+      class TraceMeta(type):
+          def __new__(mcs, name, bases, ns):
+              for key, val in ns.items():
+                  if callable(val) and not key.startswith("_"):
+                      ns[key] = mcs.wrapMethod(val, key)
+              return super().__new__(mcs, name, bases, ns)
+
+          @staticmethod
+          def wrapMethod(method, methodName):
+              def wrapper(*args, **kwargs):
+                  result = method(*args, **kwargs)
+                  wrapper.callCount = getattr(wrapper, "callCount", 0) + 1
+                  return result
+              wrapper.__name__ = methodName
+              wrapper.callCount = 0
+              return wrapper
+
+      class Service(metaclass=TraceMeta):
+          def process(self):
+              return "done"
+
+      s = Service()
+      s.process()
+      s.process()
+      Service.process.callCount
+
+  - type: "expansion"
+    title: "🔴 심화5: 추상 강제"
+    code: |-
+      class AbstractMeta(type):
+          def __call__(cls, *args, **kwargs):
+              for name in dir(cls):
+                  method = getattr(cls, name)
+                  if getattr(method, "__isabstractmethod__", False):
+                      raise TypeError(f"Cannot instantiate abstract class {cls.__name__}")
+              return super().__call__(*args, **kwargs)
+
+      class Base(metaclass=AbstractMeta):
+          @property
+          def abstract(self):
+              raise NotImplementedError
+          abstract.__isabstractmethod__ = True
+
+      class Concrete(Base):
+          @property
+          def abstract(self):
+              return "implemented"
+
+      Concrete().abstract
+
+  - type: "expansion"
+    title: "🔴 심화6: 속성 잠금"
+    code: |-
+      class FrozenMeta(type):
+          def __setattr__(cls, name, value):
+              if hasattr(cls, "_frozen") and cls._frozen:
+                  raise AttributeError(f"Cannot modify frozen class {cls.__name__}")
+              super().__setattr__(name, value)
+
+      class Constants(metaclass=FrozenMeta):
+          PI = 3.14159
+          E = 2.71828
+          _frozen = True
+
+      Constants.PI
+
+  - type: "expansion"
+    title: "🔴 심화7: 자동 프로퍼티"
+    code: |-
+      class AutoPropertyMeta(type):
+          def __new__(mcs, name, bases, ns):
+              slots = ns.get("__slots__", ())
+              for slot in slots:
+                  if not slot.startswith("_"):
+                      privateName = f"_{slot}"
+                      ns[slot] = property(
+                          lambda self, n=privateName: getattr(self, n, None),
+                          lambda self, v, n=privateName: setattr(self, n, v)
+                      )
+              return super().__new__(mcs, name, bases, ns)
+
+      class Person(metaclass=AutoPropertyMeta):
+          __slots__ = ("name", "age", "_name", "_age")
+
+      p = Person()
+      p.name = "Alice"
+      p.name
+
+  - type: "expansion"
+    title: "🔴 심화8: 조건부 상속"
+    code: |-
+      class ConditionalMeta(type):
+          def __new__(mcs, name, bases, ns, condition=True, **kwargs):
+              if condition:
+                  ns["enabled"] = True
+              else:
+                  ns["enabled"] = False
+              return super().__new__(mcs, name, bases, ns)
+
+          def __init__(cls, name, bases, ns, **kwargs):
+              super().__init__(name, bases, ns)
+
+      class FeatureA(metaclass=ConditionalMeta, condition=True):
+          pass
+
+      class FeatureB(metaclass=ConditionalMeta, condition=False):
+          pass
+
+      FeatureA.enabled, FeatureB.enabled
+
+  - type: "expansion"
+    title: "🔴 심화9: 플러그인 시스템"
+    code: |-
+      class PluginSystem:
+          handlers = {}
+
+          def __init_subclass__(cls, event=None, **kwargs):
+              super().__init_subclass__(**kwargs)
+              if event:
+                  if event not in PluginSystem.handlers:
+                      PluginSystem.handlers[event] = []
+                  PluginSystem.handlers[event].append(cls)
+
+      class OnStartup(PluginSystem, event="startup"): pass
+      class OnShutdown(PluginSystem, event="shutdown"): pass
+      class AnotherStartup(PluginSystem, event="startup"): pass
+
+      {k: [c.__name__ for c in v] for k, v in PluginSystem.handlers.items()}
+
+  - type: "expansion"
+    title: "🔴 심화10: 데코레이터 vs 메타클래스"
+    code: |-
+      def addTimestamp(cls):
+          from datetime import datetime
+          cls.createdAt = datetime.now().isoformat()
+          return cls
+
+      class TimestampMeta(type):
+          def __new__(mcs, name, bases, ns):
+              from datetime import datetime
+              ns["createdAt"] = datetime.now().isoformat()
+              return super().__new__(mcs, name, bases, ns)
+
+      @addTimestamp
+      class DecoratedClass:
+          pass
+
+      class MetaClass(metaclass=TimestampMeta):
+          pass
+
+      bool(DecoratedClass.createdAt), bool(MetaClass.createdAt)

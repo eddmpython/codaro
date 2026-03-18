@@ -1,0 +1,1 @@
+import{d as p,w as i,x as l}from"./_Uint8Array-C0aUZfE0.js";import{p as m}from"./_baseIsEqual-EYp9AUJI.js";var v=i?i.isConcatSpreadable:void 0;function d(r){return l(r)||p(r)||!!(v&&r&&r[v])}var g=d;function c(r,n,e,s,o){var t=-1,f=r.length;for(e||(e=g),o||(o=[]);++t<f;){var a=r[t];n>0&&e(a)?n>1?c(a,n-1,e,s,o):m(o,a):s||(o[o.length]=a)}return o}var h=c;export{h as t};

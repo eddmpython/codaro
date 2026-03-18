@@ -1,0 +1,391 @@
+meta:
+  id: networkx_07
+  title: 커뮤니티탐지
+  order: 7
+  category: networkx
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["networkx", "커뮤니티", "모듈성", "그리디", "레미제라블"]
+  seo:
+    title: "NetworkX 커뮤니티 탐지 - 그룹 발견"
+    description: "NetworkX로 네트워크에서 커뮤니티(그룹)를 찾습니다. 모듈성 최적화, 그리디 알고리즘, 레미제라블 데이터를 활용합니다."
+    keywords: ["networkx", "커뮤니티", "community", "modularity", "그리디", "레미제라블"]
+
+intro:
+  emoji: "👥"
+  goal: 그래프에서 커뮤니티(밀접하게 연결된 그룹)를 찾습니다.
+  description: 커뮤니티 탐지는 네트워크에서 밀접하게 연결된 노드 그룹을 찾는 것입니다. 소셜 네트워크의 친구 그룹, 웹의 주제별 페이지 등을 발견합니다. 모듈성(modularity)을 최적화하는 그리디 알고리즘으로 커뮤니티를 탐지합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NetworkX와 커뮤니티 탐지 알고리즘을 불러옵니다. 커뮤니티 탐지(Community Detection)는 네트워크에서 밀접하게 연결된 노드들의 그룹을 자동으로 찾는 기법입니다. 소셜 네트워크의 친구 그룹, 생물학 네트워크의 기능적 모듈, 웹 페이지의 주제별 클러스터 등을 발견하는 데 활용됩니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: networkx와 matplotlib을 불러옵니다
+    content: |-
+      import networkx as nx
+      from networkx.algorithms import community
+      import matplotlib.pyplot as plt
+
+- id: step2_modularity
+  title: 2단계. 모듈성 개념
+  subtitle: modularity
+  blocks:
+  - type: text
+    content: 모듈성(Modularity)은 2004년 Newman과 Girvan이 제안한 커뮤니티 분할의 품질 지표입니다. 커뮤니티 내부의 실제 연결 수가 무작위 그래프에서 기대되는 연결 수보다 얼마나 많은지를 측정합니다. -0.5 ~ 1 범위이며, 0.3 이상이면 유의미한 커뮤니티 구조가 있고, 0.7 이상이면 매우 강한 구조입니다. 대부분의 커뮤니티 탐지 알고리즘은 이 모듈성을 최대화하려고 합니다.
+  - type: code
+    language: python
+    title: 샘플 그래프
+    description: 명확한 두 커뮤니티
+    content: |-
+      G = nx.Graph()
+      G.add_edges_from([(1, 2), (1, 3), (2, 3), (2, 4), (3, 4)])
+      G.add_edges_from([(5, 6), (5, 7), (6, 7), (6, 8), (7, 8)])
+      G.add_edge(4, 5)
+      G.number_of_nodes(), G.number_of_edges()
+  - type: code
+    language: python
+    title: 모듈성 계산
+    description: 수동 분할의 모듈성
+    content: |-
+      comm1 = {1, 2, 3, 4}
+      comm2 = {5, 6, 7, 8}
+      partition = [comm1, comm2]
+
+      mod = nx.community.modularity(G, partition)
+      mod
+  - type: tip
+    content: 모듈성이 0.3 이상이면 의미 있는 커뮤니티 구조가 있다고 봅니다. 0.7 이상이면 매우 강한 구조입니다.
+
+- id: step3_greedy
+  title: 3단계. 그리디 모듈성 최적화
+  subtitle: greedy_modularity_communities()
+  blocks:
+  - type: text
+    content: 그리디 모듈성 최적화 알고리즘은 처음에 각 노드를 개별 커뮤니티로 시작하여, 모듈성이 가장 많이 증가하는 방향으로 커뮤니티를 병합해 나갑니다. Clauset, Newman, Moore가 2004년에 제안한 이 방법은 O(n log² n)의 시간 복잡도로 빠르면서도 효과적입니다. 커뮤니티 수를 미리 지정할 필요가 없으며, 알고리즘이 최적의 분할을 자동으로 찾습니다.
+  - type: code
+    language: python
+    title: 그리디 커뮤니티 탐지
+    description: 자동으로 커뮤니티 찾기
+    content: |-
+      communities = community.greedy_modularity_communities(G)
+      commList = [set(c) for c in communities]
+      commList
+  - type: code
+    language: python
+    title: 탐지된 모듈성
+    description: 알고리즘 결과의 모듈성
+    content: |-
+      modGreedy = nx.community.modularity(G, commList)
+      modGreedy
+  - type: tip
+    content: greedy_modularity_communities()는 frozenset의 리스트를 반환합니다. set()으로 변환하면 다루기 쉽습니다.
+
+- id: step4_visualize
+  title: 4단계. 커뮤니티 시각화
+  subtitle: 그룹별 색상
+  blocks:
+  - type: text
+    content: 탐지된 커뮤니티를 서로 다른 색으로 시각화하면 네트워크의 그룹 구조를 직관적으로 파악할 수 있습니다. 각 노드가 속한 커뮤니티에 따라 색상을 지정하고, spring_layout으로 배치하면 같은 커뮤니티의 노드들이 자연스럽게 가깝게 모이는 것을 볼 수 있습니다.
+  - type: code
+    language: python
+    title: 커뮤니티 색상 매핑
+    description: 노드별 색상 지정
+    content: |-
+      colorPalette = ['skyblue', 'salmon', 'lightgreen', 'gold', 'plum']
+
+      nodeColors = []
+      for n in G.nodes():
+          for i, comm in enumerate(commList):
+              if n in comm:
+                  nodeColors.append(colorPalette[i % len(colorPalette)])
+                  break
+
+      posG = nx.spring_layout(G, seed=42)
+      fig1, ax1 = plt.subplots(figsize=(8, 6))
+      nx.draw(G, pos=posG, with_labels=True, node_color=nodeColors,
+              node_size=700, font_size=12, ax=ax1)
+      ax1.set_title('Detected Communities')
+      fig1
+
+- id: step5_les_miserables
+  title: 5단계. 레미제라블 네트워크
+  subtitle: les_miserables_graph()
+  blocks:
+  - type: text
+    content: 레미제라블(Les Misérables) 네트워크는 Victor Hugo의 소설에 등장하는 인물들 간의 관계를 나타냅니다. 77명의 인물과 254개의 관계로 구성되며, 같은 장면에 함께 등장하면 연결됩니다. 이 데이터셋은 네트워크 분석의 대표적인 벤치마크로, 장발장(Valjean), 코제트(Cosette), 마리우스(Marius) 등 스토리라인별로 자연스러운 커뮤니티가 형성되어 있습니다.
+  - type: code
+    language: python
+    title: 데이터 로드
+    description: 내장 레미제라블 그래프
+    content: |-
+      lesmis = nx.les_miserables_graph()
+      numNodesLM = lesmis.number_of_nodes()
+      numEdgesLM = lesmis.number_of_edges()
+      numNodesLM, numEdgesLM
+  - type: code
+    language: python
+    title: 주요 등장인물
+    description: 연결 수 상위 10명
+    content: |-
+      degLM = dict(lesmis.degree())
+      topChars = sorted(degLM.items(), key=lambda x: x[1], reverse=True)[:10]
+      topChars
+  - type: tip
+    content: 레미제라블은 Victor Hugo의 소설입니다. 장발장(Valjean), 코제트(Cosette) 등 유명 캐릭터가 등장합니다.
+
+- id: step6_lesmis_community
+  title: 6단계. 레미제라블 커뮤니티
+  subtitle: 등장인물 그룹
+  blocks:
+  - type: text
+    content: 레미제라블 네트워크에 커뮤니티 탐지를 적용하면 소설의 스토리라인과 일치하는 그룹들이 발견됩니다. 주교와 관련된 초반부 인물들, 팡틴과 코제트 관련 인물들, 바리케이드 혁명가들 등이 각각 커뮤니티를 형성합니다. 이는 알고리즘이 네트워크 구조만으로 의미 있는 그룹을 찾아낼 수 있음을 보여줍니다.
+  - type: code
+    language: python
+    title: 커뮤니티 탐지
+    description: 그리디 알고리즘 적용
+    content: |-
+      lmComms = community.greedy_modularity_communities(lesmis)
+      lmCommList = [set(c) for c in lmComms]
+      numComms = len(lmCommList)
+      numComms
+  - type: code
+    language: python
+    title: 모듈성 확인
+    description: 커뮤니티 품질
+    content: |-
+      lmMod = nx.community.modularity(lesmis, lmCommList)
+      lmMod
+  - type: code
+    language: python
+    title: 각 커뮤니티 크기
+    description: 그룹별 인원 수
+    content: |-
+      commSizes = [(i, len(c)) for i, c in enumerate(lmCommList)]
+      commSizes
+
+- id: step7_lesmis_viz
+  title: 7단계. 레미제라블 시각화
+  subtitle: 커뮤니티별 색상
+  blocks:
+  - type: text
+    content: 레미제라블 네트워크를 커뮤니티별로 시각화합니다. 77개의 노드가 있으므로 레이블 대신 색상으로 커뮤니티를 구분합니다. k 파라미터를 조정하여 노드 간 간격을 넓히면 구조가 더 잘 보입니다. 시각화를 통해 소설의 스토리 구조와 인물 관계를 한눈에 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 커뮤니티 시각화
+    description: 등장인물 그룹
+    content: |-
+      lmColors = []
+      for n in lesmis.nodes():
+          for i, comm in enumerate(lmCommList):
+              if n in comm:
+                  lmColors.append(colorPalette[i % len(colorPalette)])
+                  break
+
+      posLM = nx.spring_layout(lesmis, seed=42, k=0.5)
+      fig2, ax2 = plt.subplots(figsize=(14, 10))
+      nx.draw(lesmis, pos=posLM, node_color=lmColors, node_size=100,
+              edge_color='lightgray', alpha=0.8, ax=ax2)
+      ax2.set_title(f'Les Miserables Communities ({numComms} groups)')
+      fig2
+  - type: code
+    language: python
+    title: 주요 커뮤니티 멤버
+    description: 가장 큰 커뮤니티
+    content: |-
+      largestComm = max(lmCommList, key=len)
+      largestComm
+
+- id: step8_louvain
+  title: 8단계. 루뱅 알고리즘
+  subtitle: louvain_communities()
+  blocks:
+  - type: text
+    content: 루뱅(Louvain) 알고리즘은 2008년 벨기에 루뱅 대학에서 개발된 대규모 네트워크용 커뮤니티 탐지 방법입니다. 2단계 과정을 반복합니다. 먼저 각 노드를 이웃 커뮤니티로 이동시켜 로컬 모듈성을 최적화하고, 그 다음 커뮤니티들을 하나의 노드로 축약하여 새 그래프를 만듭니다. 이 과정을 모듈성 증가가 없을 때까지 반복합니다. 수백만 노드의 네트워크도 처리할 수 있으며, 그리디보다 높은 모듈성을 달성하는 경우가 많습니다.
+  - type: code
+    language: python
+    title: 루뱅 알고리즘
+    description: 레미제라블에 적용
+    content: |-
+      louvainComms = community.louvain_communities(lesmis, seed=42)
+      louvainList = [set(c) for c in louvainComms]
+      numLouvain = len(louvainList)
+      numLouvain
+  - type: code
+    language: python
+    title: 루뱅 모듈성
+    description: 그리디와 비교
+    content: |-
+      louvainMod = nx.community.modularity(lesmis, louvainList)
+      louvainMod
+  - type: tip
+    content: 루뱅 알고리즘은 그리디보다 더 높은 모듈성을 달성하는 경우가 많습니다. 대규모 네트워크에서도 빠릅니다.
+
+- id: step9_label_propagation
+  title: 9단계. 레이블 전파
+  subtitle: label_propagation_communities()
+  blocks:
+  - type: text
+    content: 레이블 전파(Label Propagation)는 2007년 Raghavan 등이 제안한 간단하면서 빠른 알고리즘입니다. 처음에 각 노드에 고유 레이블을 부여한 뒤, 반복적으로 각 노드가 이웃들 중 가장 많이 가진 레이블을 채택하게 합니다. 안정 상태에 도달하면 같은 레이블을 가진 노드들이 커뮤니티를 형성합니다. O(n + m) 시간으로 매우 빠르지만, 비결정적이라 실행마다 결과가 달라질 수 있습니다.
+  - type: code
+    language: python
+    title: 레이블 전파
+    description: 빠른 커뮤니티 탐지
+    content: |-
+      lpComms = community.label_propagation_communities(lesmis)
+      lpList = [set(c) for c in lpComms]
+      numLP = len(lpList)
+      numLP
+  - type: code
+    language: python
+    title: 레이블 전파 모듈성
+    description: 품질 확인
+    content: |-
+      lpMod = nx.community.modularity(lesmis, lpList)
+      lpMod
+  - type: code
+    language: python
+    title: 알고리즘 비교
+    description: 세 가지 방법 비교
+    content: |-
+      comparison = {
+          'Greedy': (numComms, round(lmMod, 3)),
+          'Louvain': (numLouvain, round(louvainMod, 3)),
+          'LabelProp': (numLP, round(lpMod, 3))
+      }
+      comparison
+
+- id: step10_karate_community
+  title: 10단계. 가라테 클럽 커뮤니티
+  subtitle: 실제 분리와 비교
+  blocks:
+  - type: text
+    content: 가라테 클럽은 실제 분리 결과가 알려진 유일한 벤치마크 데이터입니다. 1977년 Zachary가 관찰한 실제 분열과 알고리즘이 탐지한 커뮤니티를 비교하여 알고리즘의 정확도를 검증할 수 있습니다. 네트워크 구조만으로 실제 사회적 분열을 얼마나 정확하게 예측할 수 있는지 확인해봅니다.
+  - type: code
+    language: python
+    title: 가라테 클럽 로드
+    description: 실제 분리 정보 포함
+    content: |-
+      karate = nx.karate_club_graph()
+
+      actualHi = {n for n in karate.nodes() if karate.nodes[n]['club'] == 'Mr. Hi'}
+      actualOfficer = {n for n in karate.nodes() if karate.nodes[n]['club'] == 'Officer'}
+      actualHi, actualOfficer
+  - type: code
+    language: python
+    title: 알고리즘 탐지
+    description: 그리디로 커뮤니티 찾기
+    content: |-
+      karateComms = community.greedy_modularity_communities(karate)
+      karateCommList = [set(c) for c in karateComms]
+      karateCommList
+  - type: code
+    language: python
+    title: 정확도 비교
+    description: 실제와 탐지 결과 비교
+    content: |-
+      detected1 = karateCommList[0]
+      detected2 = karateCommList[1]
+
+      overlap1 = len(detected1 & actualHi) + len(detected2 & actualOfficer)
+      overlap2 = len(detected1 & actualOfficer) + len(detected2 & actualHi)
+
+      accuracy = max(overlap1, overlap2) / karate.number_of_nodes()
+      accuracy
+  - type: tip
+    content: 커뮤니티 탐지 알고리즘이 실제 분리를 상당히 정확하게 예측합니다. 네트워크 구조만으로 그룹을 발견할 수 있습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 커뮤니티 탐지
+  blocks:
+  - type: text
+    content: 지금까지 배운 커뮤니티 탐지 알고리즘을 활용하여 실전 미션을 수행해봅시다. 여러 알고리즘의 결과를 비교하고, 피렌체 가문 네트워크에서 역사적 동맹 관계를 탐지해봅니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 알고리즘 비교"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import networkx as nx
+        from networkx.algorithms import community
+        import matplotlib.pyplot as plt
+
+        data = nx.karate_club_graph()
+        data.number_of_nodes(), data.number_of_edges()
+    - type: code
+      title: 세 가지 알고리즘
+      content: |-
+        greedyComm = [set(c) for c in community.greedy_modularity_communities(data)]
+        louvainComm = [set(c) for c in community.louvain_communities(data, seed=42)]
+        lpComm = [set(c) for c in community.label_propagation_communities(data)]
+
+        modGreedy = nx.community.modularity(data, greedyComm)
+        modLouvain = nx.community.modularity(data, louvainComm)
+        modLP = nx.community.modularity(data, lpComm)
+
+        results = {
+            'Greedy': (len(greedyComm), round(modGreedy, 3)),
+            'Louvain': (len(louvainComm), round(modLouvain, 3)),
+            'LabelProp': (len(lpComm), round(modLP, 3))
+        }
+        results
+    - type: code
+      title: 시각화
+      content: |-
+        palette = ['skyblue', 'salmon', 'lightgreen', 'gold']
+        colors = []
+        for n in data.nodes():
+            for i, comm in enumerate(louvainComm):
+                if n in comm:
+                    colors.append(palette[i % len(palette)])
+                    break
+
+        chart, plot = plt.subplots(figsize=(10, 8))
+        posData = nx.spring_layout(data, seed=42)
+        nx.draw(data, pos=posData, with_labels=True, node_color=colors,
+                node_size=500, font_size=9, ax=plot)
+        plot.set_title(f'Louvain Communities (Modularity: {round(modLouvain, 3)})')
+        chart
+  - type: expansion
+    title: "미션2: 피렌체 가문 분석"
+    blocks:
+    - type: code
+      title: 데이터 로드
+      content: |-
+        import networkx as nx
+        from networkx.algorithms import community
+        import matplotlib.pyplot as plt
+
+        df = nx.florentine_families_graph()
+        df.number_of_nodes(), df.number_of_edges()
+    - type: code
+      title: 커뮤니티 탐지
+      content: |-
+        floComms = [set(c) for c in community.greedy_modularity_communities(df)]
+        floMod = nx.community.modularity(df, floComms)
+        len(floComms), floMod
+    - type: code
+      title: 결과 시각화
+      content: |-
+        tones = ['lightblue', 'lightcoral', 'lightgreen', 'wheat']
+        nodeColors = []
+        for n in df.nodes():
+            for i, comm in enumerate(floComms):
+                if n in comm:
+                    nodeColors.append(tones[i % len(tones)])
+                    break
+
+        canvas, panel = plt.subplots(figsize=(10, 8))
+        posFlo = nx.spring_layout(df, seed=42)
+        nx.draw(df, pos=posFlo, with_labels=True, node_color=nodeColors,
+                node_size=800, font_size=9, ax=panel)
+        panel.set_title('Florentine Families Communities')
+        canvas

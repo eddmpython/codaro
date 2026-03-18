@@ -1,0 +1,674 @@
+meta:
+  id: folium_06
+  title: GeoJSON 활용
+  order: 6
+  category: folium
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["folium", "GeoJSON", "GeoJson", "지역경계", "스타일"]
+  seo:
+    title: "Folium GeoJSON - 지역 경계 표시"
+    description: "Folium으로 GeoJSON 데이터를 사용합니다. 지역 경계를 그리고 스타일을 적용합니다."
+    keywords: ["folium", "GeoJSON", "GeoJson", "지역경계", "style_function"]
+
+intro:
+  emoji: "🗾"
+  goal: GeoJSON 데이터로 지역 경계를 표시합니다.
+  description: GeoJSON은 지리 정보를 표현하는 표준 형식입니다. 도시 경계, 행정구역, 도로 등을 표현합니다. Folium의 GeoJson()으로 이 데이터를 지도에 표시하고 스타일을 적용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: folium과 marimo를 불러옵니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: folium과 marimo 불러오기
+    content: |-
+      import folium
+      import marimo as mo
+
+- id: step2_geojson_structure
+  title: 2단계. GeoJSON 구조
+  subtitle: 기본 형식
+  blocks:
+  - type: text
+    content: GeoJSON은 type, geometry, properties로 구성됩니다. geometry에 좌표 정보가 있고, properties에 속성 정보가 있습니다.
+  - type: code
+    language: python
+    title: GeoJSON 기본 구조
+    description: 점 데이터
+    content: |-
+      pointGeo = {
+          "type": "Feature",
+          "geometry": {
+              "type": "Point",
+              "coordinates": [126.9780, 37.5665]
+          },
+          "properties": {
+              "name": "서울시청"
+          }
+      }
+      pointGeo
+  - type: tip
+    content: "주의: GeoJSON은 [경도, 위도] 순서입니다. Folium의 [위도, 경도]와 반대입니다."
+
+- id: step3_polygon_geojson
+  title: 3단계. 폴리곤 GeoJSON
+  subtitle: 영역 데이터
+  blocks:
+  - type: text
+    content: Polygon 타입으로 영역을 표현합니다. 좌표 리스트의 리스트 형태이고, 시작점과 끝점이 같아야 합니다.
+  - type: code
+    language: python
+    title: 사각형 영역
+    description: Polygon 타입
+    content: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=14)
+
+      areaGeo = {
+          "type": "Feature",
+          "geometry": {
+              "type": "Polygon",
+              "coordinates": [[
+                  [126.9730, 37.5630],
+                  [126.9830, 37.5630],
+                  [126.9830, 37.5700],
+                  [126.9730, 37.5700],
+                  [126.9730, 37.5630]
+              ]]
+          },
+          "properties": {
+              "name": "시청 주변"
+          }
+      }
+
+      folium.GeoJson(areaGeo).add_to(m1)
+
+      mo.iframe(m1._repr_html_())
+  - type: tip
+    content: Polygon 좌표는 이중 리스트입니다. 외곽선과 내부 구멍을 표현하기 위함입니다.
+
+- id: step4_feature_collection
+  title: 4단계. FeatureCollection
+  subtitle: 여러 도형 묶기
+  blocks:
+  - type: text
+    content: FeatureCollection으로 여러 Feature를 하나로 묶습니다. 대부분의 GeoJSON 파일은 이 형태입니다.
+  - type: code
+    language: python
+    title: 여러 영역
+    description: FeatureCollection
+    content: |-
+      m2 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      areasGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.9730, 37.5630],
+                          [126.9780, 37.5630],
+                          [126.9780, 37.5680],
+                          [126.9730, 37.5680],
+                          [126.9730, 37.5630]
+                      ]]
+                  },
+                  "properties": {"name": "A구역", "value": 100}
+              },
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.9780, 37.5630],
+                          [126.9830, 37.5630],
+                          [126.9830, 37.5680],
+                          [126.9780, 37.5680],
+                          [126.9780, 37.5630]
+                      ]]
+                  },
+                  "properties": {"name": "B구역", "value": 80}
+              },
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.9730, 37.5680],
+                          [126.9780, 37.5680],
+                          [126.9780, 37.5730],
+                          [126.9730, 37.5730],
+                          [126.9730, 37.5680]
+                      ]]
+                  },
+                  "properties": {"name": "C구역", "value": 60}
+              }
+          ]
+      }
+
+      folium.GeoJson(areasGeo).add_to(m2)
+
+      mo.iframe(m2._repr_html_())
+  - type: tip
+    content: properties에 원하는 속성을 추가할 수 있습니다. name, value, category 등 다양한 정보를 담습니다.
+
+- id: step5_style_function
+  title: 5단계. 스타일 함수
+  subtitle: style_function
+  blocks:
+  - type: text
+    content: style_function으로 GeoJSON 요소의 스타일을 지정합니다. 함수는 feature를 받아 스타일 딕셔너리를 반환합니다.
+  - type: code
+    language: python
+    title: 기본 스타일
+    description: 색상 지정
+    content: |-
+      m3 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      def styleFunc(feature):
+          return {
+              "fillColor": "green",
+              "color": "darkgreen",
+              "weight": 2,
+              "fillOpacity": 0.4
+          }
+
+      folium.GeoJson(
+          areasGeo,
+          style_function=styleFunc
+      ).add_to(m3)
+
+      mo.iframe(m3._repr_html_())
+  - type: code
+    language: python
+    title: 조건부 스타일
+    description: 속성에 따라 다른 색상
+    content: |-
+      m4 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      def conditionalStyle(feature):
+          value = feature["properties"]["value"]
+          if value >= 90:
+              color = "red"
+          elif value >= 70:
+              color = "orange"
+          else:
+              color = "green"
+          return {
+              "fillColor": color,
+              "color": "black",
+              "weight": 1,
+              "fillOpacity": 0.5
+          }
+
+      folium.GeoJson(
+          areasGeo,
+          style_function=conditionalStyle
+      ).add_to(m4)
+
+      mo.iframe(m4._repr_html_())
+  - type: tip
+    content: feature["properties"]로 속성에 접근합니다. 값에 따라 다른 색상을 반환하면 데이터 시각화가 됩니다.
+
+- id: step6_popup_tooltip
+  title: 6단계. 팝업과 툴팁
+  subtitle: GeoJsonPopup, GeoJsonTooltip
+  blocks:
+  - type: text
+    content: GeoJsonPopup과 GeoJsonTooltip으로 클릭/호버 시 정보를 표시합니다. fields에 표시할 속성을 지정합니다.
+  - type: code
+    language: python
+    title: 팝업 추가
+    description: GeoJsonPopup
+    content: |-
+      m5 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      folium.GeoJson(
+          areasGeo,
+          style_function=lambda x: {"fillColor": "blue", "fillOpacity": 0.3},
+          popup=folium.GeoJsonPopup(fields=["name", "value"])
+      ).add_to(m5)
+
+      mo.iframe(m5._repr_html_())
+  - type: code
+    language: python
+    title: 툴팁 추가
+    description: GeoJsonTooltip
+    content: |-
+      m6 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      folium.GeoJson(
+          areasGeo,
+          style_function=lambda x: {"fillColor": "purple", "fillOpacity": 0.3},
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "value"],
+              aliases=["구역명:", "수치:"]
+          )
+      ).add_to(m6)
+
+      mo.iframe(m6._repr_html_())
+  - type: tip
+    content: aliases로 표시되는 라벨을 변경할 수 있습니다. fields와 같은 순서로 지정합니다.
+
+- id: step7_highlight
+  title: 7단계. 하이라이트 효과
+  subtitle: highlight_function
+  blocks:
+  - type: text
+    content: highlight_function으로 마우스 호버 시 스타일을 변경합니다.
+  - type: code
+    language: python
+    title: 호버 하이라이트
+    description: 마우스 올리면 강조
+    content: |-
+      m7 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      def normalStyle(feature):
+          return {
+              "fillColor": "blue",
+              "color": "black",
+              "weight": 1,
+              "fillOpacity": 0.3
+          }
+
+      def highlightStyle(feature):
+          return {
+              "fillColor": "yellow",
+              "color": "black",
+              "weight": 3,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          areasGeo,
+          style_function=normalStyle,
+          highlight_function=highlightStyle,
+          tooltip=folium.GeoJsonTooltip(fields=["name"])
+      ).add_to(m7)
+
+      mo.iframe(m7._repr_html_())
+  - type: tip
+    content: 하이라이트는 인터랙티브 지도에서 사용자 경험을 향상시킵니다.
+
+- id: step8_line_geojson
+  title: 8단계. 라인 GeoJSON
+  subtitle: LineString
+  blocks:
+  - type: text
+    content: LineString 타입으로 선(경로, 도로)을 표현합니다.
+  - type: code
+    language: python
+    title: 경로 데이터
+    description: LineString
+    content: |-
+      m8 = folium.Map(location=[37.54, 126.95], zoom_start=13)
+
+      routeGeo = {
+          "type": "Feature",
+          "geometry": {
+              "type": "LineString",
+              "coordinates": [
+                  [126.9200, 37.5283],
+                  [126.9300, 37.5300],
+                  [126.9400, 37.5350],
+                  [126.9500, 37.5400]
+              ]
+          },
+          "properties": {
+              "name": "한강 산책로",
+              "distance": "3km"
+          }
+      }
+
+      folium.GeoJson(
+          routeGeo,
+          style_function=lambda x: {
+              "color": "blue",
+              "weight": 5,
+              "opacity": 0.8
+          },
+          tooltip=folium.GeoJsonTooltip(fields=["name", "distance"])
+      ).add_to(m8)
+
+      mo.iframe(m8._repr_html_())
+  - type: tip
+    content: LineString은 좌표들을 연결한 선입니다. 도로, 경로, 강 등을 표현합니다.
+
+- id: step9_seoul_gu
+  title: 9단계. 서울 구 경계 예제
+  subtitle: 행정구역
+  blocks:
+  - type: text
+    content: 서울의 구 경계를 간단한 GeoJSON으로 표현합니다.
+  - type: code
+    language: python
+    title: 서울 3개 구
+    description: 종로, 중구, 용산
+    content: |-
+      m9 = folium.Map(location=[37.56, 126.98], zoom_start=12)
+
+      seoulGu = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.58],
+                          [127.00, 37.58],
+                          [127.00, 37.61],
+                          [126.96, 37.61],
+                          [126.96, 37.58]
+                      ]]
+                  },
+                  "properties": {"name": "종로구", "population": 150000}
+              },
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.55],
+                          [127.00, 37.55],
+                          [127.00, 37.58],
+                          [126.96, 37.58],
+                          [126.96, 37.55]
+                      ]]
+                  },
+                  "properties": {"name": "중구", "population": 130000}
+              },
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.52],
+                          [127.00, 37.52],
+                          [127.00, 37.55],
+                          [126.96, 37.55],
+                          [126.96, 37.52]
+                      ]]
+                  },
+                  "properties": {"name": "용산구", "population": 230000}
+              }
+          ]
+      }
+
+      def popStyle(feature):
+          pop = feature["properties"]["population"]
+          if pop >= 200000:
+              return {"fillColor": "red", "fillOpacity": 0.5, "color": "black", "weight": 2}
+          elif pop >= 150000:
+              return {"fillColor": "orange", "fillOpacity": 0.5, "color": "black", "weight": 2}
+          else:
+              return {"fillColor": "green", "fillOpacity": 0.5, "color": "black", "weight": 2}
+
+      folium.GeoJson(
+          seoulGu,
+          style_function=popStyle,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "population"],
+              aliases=["구:", "인구:"]
+          )
+      ).add_to(m9)
+
+      mo.iframe(m9._repr_html_())
+  - type: tip
+    content: 실제 행정구역 GeoJSON은 data.seoul.go.kr 등에서 다운로드할 수 있습니다.
+
+- id: step10_complete
+  title: 10단계. 완성 예제
+  subtitle: 구역별 정보 지도
+  blocks:
+  - type: text
+    content: GeoJSON으로 구역을 표시하고 스타일, 팝업, 하이라이트를 모두 적용합니다.
+  - type: code
+    language: python
+    title: 완성 예제
+    description: 종합 GeoJSON 지도
+    content: |-
+      zoneMap = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Positron")
+
+      zonesGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.970, 37.560],
+                          [126.980, 37.560],
+                          [126.980, 37.570],
+                          [126.970, 37.570],
+                          [126.970, 37.560]
+                      ]]
+                  },
+                  "properties": {"name": "상업지구", "type": "commercial", "score": 85}
+              },
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.980, 37.560],
+                          [126.990, 37.560],
+                          [126.990, 37.570],
+                          [126.980, 37.570],
+                          [126.980, 37.560]
+                      ]]
+                  },
+                  "properties": {"name": "주거지구", "type": "residential", "score": 72}
+              },
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.970, 37.570],
+                          [126.980, 37.570],
+                          [126.980, 37.580],
+                          [126.970, 37.580],
+                          [126.970, 37.570]
+                      ]]
+                  },
+                  "properties": {"name": "녹지지구", "type": "green", "score": 90}
+              }
+          ]
+      }
+
+      colorMap = {
+          "commercial": "#e74c3c",
+          "residential": "#3498db",
+          "green": "#2ecc71"
+      }
+
+      def zoneStyle(feature):
+          zoneType = feature["properties"]["type"]
+          return {
+              "fillColor": colorMap.get(zoneType, "gray"),
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.5
+          }
+
+      def zoneHighlight(feature):
+          return {
+              "fillColor": "yellow",
+              "color": "black",
+              "weight": 3,
+              "fillOpacity": 0.8
+          }
+
+      folium.GeoJson(
+          zonesGeo,
+          style_function=zoneStyle,
+          highlight_function=zoneHighlight,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "type", "score"],
+              aliases=["구역:", "용도:", "점수:"],
+              style="font-size: 12px;"
+          ),
+          popup=folium.GeoJsonPopup(
+              fields=["name", "score"],
+              aliases=["구역명:", "평가점수:"]
+          )
+      ).add_to(zoneMap)
+
+      mo.iframe(zoneMap._repr_html_())
+
+- id: practice
+  title: 실습
+  subtitle: GeoJSON 활용
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  - type: expansion
+    title: "미션1: 배달 구역 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        deliveryZones = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [126.970, 37.560],
+                            [126.985, 37.560],
+                            [126.985, 37.575],
+                            [126.970, 37.575],
+                            [126.970, 37.560]
+                        ]]
+                    },
+                    "properties": {"zone": "A", "fee": 0}
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [126.960, 37.550],
+                            [126.995, 37.550],
+                            [126.995, 37.585],
+                            [126.960, 37.585],
+                            [126.960, 37.550]
+                        ]]
+                    },
+                    "properties": {"zone": "B", "fee": 1000}
+                }
+            ]
+        }
+        deliveryZones
+    - type: code
+      title: 지도 생성
+      content: |-
+        deliveryMap = folium.Map(location=[37.567, 126.977], zoom_start=14)
+
+        def deliveryStyle(feature):
+            fee = feature["properties"]["fee"]
+            if fee == 0:
+                return {"fillColor": "green", "fillOpacity": 0.4, "color": "darkgreen", "weight": 2}
+            else:
+                return {"fillColor": "orange", "fillOpacity": 0.3, "color": "darkorange", "weight": 2}
+
+        folium.GeoJson(
+            deliveryZones,
+            style_function=deliveryStyle,
+            tooltip=folium.GeoJsonTooltip(
+                fields=["zone", "fee"],
+                aliases=["구역:", "배달비:"]
+            )
+        ).add_to(deliveryMap)
+
+        folium.Marker(
+            [37.5665, 126.9780],
+            popup="매장",
+            icon=folium.Icon(color="red")
+        ).add_to(deliveryMap)
+
+        mo.iframe(deliveryMap._repr_html_())
+  - type: expansion
+    title: "미션2: 학군 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        schoolDistricts = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [126.965, 37.555],
+                            [126.980, 37.555],
+                            [126.980, 37.570],
+                            [126.965, 37.570],
+                            [126.965, 37.555]
+                        ]]
+                    },
+                    "properties": {"school": "A초등학교", "students": 800}
+                },
+                {
+                    "type": "Feature",
+                    "geometry": {
+                        "type": "Polygon",
+                        "coordinates": [[
+                            [126.980, 37.555],
+                            [126.995, 37.555],
+                            [126.995, 37.570],
+                            [126.980, 37.570],
+                            [126.980, 37.555]
+                        ]]
+                    },
+                    "properties": {"school": "B초등학교", "students": 600}
+                }
+            ]
+        }
+        schoolDistricts
+    - type: code
+      title: 지도 생성
+      content: |-
+        schoolMap = folium.Map(location=[37.562, 126.980], zoom_start=14)
+
+        def schoolStyle(feature):
+            students = feature["properties"]["students"]
+            if students >= 700:
+                return {"fillColor": "blue", "fillOpacity": 0.4, "color": "navy", "weight": 2}
+            else:
+                return {"fillColor": "lightblue", "fillOpacity": 0.4, "color": "blue", "weight": 2}
+
+        def schoolHighlight(feature):
+            return {"fillColor": "yellow", "fillOpacity": 0.7, "color": "black", "weight": 3}
+
+        folium.GeoJson(
+            schoolDistricts,
+            style_function=schoolStyle,
+            highlight_function=schoolHighlight,
+            tooltip=folium.GeoJsonTooltip(
+                fields=["school", "students"],
+                aliases=["학교:", "학생수:"]
+            )
+        ).add_to(schoolMap)
+
+        mo.iframe(schoolMap._repr_html_())

@@ -1,0 +1,594 @@
+meta:
+  id: "07_functools"
+  title: "functools - 함수형 프로그래밍"
+  category: "builtins"
+  tags: ["functools", "partial", "reduce", "lru_cache", "wraps"]
+  seo:
+    title: "파이썬 functools 모듈 완전 정복"
+    description: "functools 모듈의 partial, reduce, lru_cache, wraps 등 함수형 프로그래밍 도구를 배웁니다."
+    keywords: ["functools", "partial", "reduce", "lru_cache", "데코레이터", "함수형프로그래밍"]
+
+intro:
+  emoji: "🔧"
+  points:
+  - "partial로 함수 인자 고정"
+  - "reduce로 누적 연산"
+  - "lru_cache로 성능 최적화"
+  - "wraps로 데코레이터 작성"
+
+sections:
+- id: "module_import"
+  title: "functools 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "functools은 파이썬 표준 라이브러리입니다. 고차 함수와 함수형 프로그래밍 도구를 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 functools 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "functools 모듈 불러오기"
+    description: "functools 모듈을 불러옵니다."
+    content: |-
+      from functools import partial, reduce, lru_cache, wraps, total_ordering, cmp_to_key
+
+      # 모듈 로드 확인
+      'functools 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "partial"
+  title: "partial - 부분 적용 함수"
+  subtitle: "인자를 미리 고정하기"
+  blocks:
+  - type: "text"
+    content: "partial은 함수의 일부 인자를 미리 고정한 새 함수를 만듭니다. 같은 함수를 다른 기본값으로 여러 번 사용할 때 코드 중복을 줄이고, 콜백 함수나 이벤트 핸들러에서 추가 인자를 전달할 때 유용합니다."
+  - type: "list"
+    items:
+    - "partial(함수, *args, **kwargs)"
+    - "위치 인자와 키워드 인자 고정 가능"
+    - "새로운 함수 객체 반환"
+    - "원본 함수는 변경되지 않음"
+  - type: "code"
+    language: "python"
+    title: "기본 사용"
+    description: "2를 곱하는 함수를 만듭니다."
+    content: |-
+      def multiply(x, y):
+          return x * y
+
+      double = partial(multiply, 2)
+      output = double(5)
+      output
+  - type: "code"
+    language: "python"
+    title: "키워드 인자 고정"
+    description: "기본 구분자를 설정한 split 함수를 만듭니다."
+    content: |-
+      splitComma = partial(str.split, sep=',')
+      parts = splitComma('a,b,c')
+      parts
+  - type: "code"
+    language: "python"
+    title: "여러 인자 고정"
+    description: "여러 인자를 미리 고정할 수 있습니다."
+    content: |-
+      def power(base, exp):
+          return base ** exp
+
+      squared = partial(power, exp=2)
+      cube = partial(power, exp=3)
+      squared(4), cube(2)
+  - type: "tip"
+    content: "partial은 람다보다 명확하고 디버깅이 쉽습니다. lambda x: func(2, x) 대신 partial(func, 2)를 사용하세요."
+
+- id: "reduce"
+  title: "reduce - 누적 연산"
+  subtitle: "반복 가능한 객체 축소하기"
+  blocks:
+  - type: "text"
+    content: "reduce는 이항 함수를 누적 적용하여 반복 가능한 객체를 단일 값으로 줄입니다. 리스트의 모든 요소를 합치거나, 곱하거나, 최댓값을 찾는 등 누적 연산에 사용됩니다. Python 3에서는 functools 모듈로 이동되었습니다."
+  - type: "list"
+    items:
+    - "reduce(함수, 반복가능, 초기값?)"
+    - "왼쪽부터 누적 적용"
+    - "초기값 생략 가능 (첫 요소 사용)"
+    - "빈 시퀀스는 초기값 필요"
+  - type: "code"
+    language: "python"
+    title: "합계 계산"
+    description: "모든 숫자를 더합니다."
+    content: |-
+      seq = [1, 2, 3, 4, 5]
+      total = reduce(lambda x, y: x + y, seq)
+      total
+  - type: "code"
+    language: "python"
+    title: "곱셈 연산"
+    description: "모든 숫자를 곱합니다."
+    content: |-
+      factors = [2, 3, 4]
+      product = reduce(lambda a, b: a * b, factors)
+      product
+  - type: "code"
+    language: "python"
+    title: "초기값 사용"
+    description: "초기값 10부터 시작하여 합계를 계산합니다."
+    content: |-
+      items = [1, 2, 3]
+      sumWith10 = reduce(lambda x, y: x + y, items, 10)
+      sumWith10
+  - type: "tip"
+    content: "sum(), max(), min()이 있다면 reduce보다 그것을 사용하는 것이 더 명확합니다."
+
+- id: "lru_cache"
+  title: "lru_cache - 메모이제이션"
+  subtitle: "함수 결과 캐싱하기"
+  blocks:
+  - type: "text"
+    content: "lru_cache는 함수 호출 결과를 캐싱하여 같은 인자로 다시 호출될 때 저장된 값을 반환합니다. LRU(Least Recently Used) 알고리즘으로 캐시 크기를 관리하며, 재귀 함수나 비용이 큰 계산의 성능을 크게 향상시킵니다."
+  - type: "list"
+    items:
+    - "@lru_cache 데코레이터"
+    - "maxsize: 캐시 최대 크기"
+    - "cache_info(): 히트/미스 통계"
+    - "cache_clear(): 캐시 초기화"
+  - type: "code"
+    language: "python"
+    title: "피보나치 캐싱"
+    description: "재귀 함수의 성능을 극적으로 향상시킵니다."
+    content: |-
+      @lru_cache(maxsize=128)
+      def fibonacci(n):
+          if n < 2:
+              return n
+          return fibonacci(n - 1) + fibonacci(n - 2)
+
+      fib10 = fibonacci(10)
+      fib10
+  - type: "code"
+    language: "python"
+    title: "캐시 통계"
+    description: "캐시 히트와 미스 정보를 확인합니다."
+    content: |-
+      @lru_cache(maxsize=3)
+      def expensive(n):
+          return n * n
+
+      expensive(1)
+      expensive(2)
+      expensive(1)
+      cacheInfo = expensive.cache_info()
+      cacheInfo.hits, cacheInfo.misses
+  - type: "code"
+    language: "python"
+    title: "무제한 캐시"
+    description: "maxsize=None으로 무제한 캐시를 만듭니다."
+    content: |-
+      @lru_cache(maxsize=None)
+      def factorial(n):
+          if n <= 1:
+              return 1
+          return n * factorial(n - 1)
+
+      fact5 = factorial(5)
+      fact5
+  - type: "tip"
+    content: "Python 3.9+에서는 @cache 데코레이터를 사용하면 무제한 캐시를 더 간단히 만들 수 있습니다."
+
+- id: "wraps"
+  title: "wraps - 데코레이터 작성"
+  subtitle: "함수 메타데이터 보존하기"
+  blocks:
+  - type: "text"
+    content: "wraps는 데코레이터를 만들 때 원본 함수의 메타데이터(__name__, __doc__ 등)를 보존합니다. 데코레이터로 함수를 감쌀 때 함수의 이름과 문서가 바뀌는 것을 방지하여 디버깅과 문서화를 돕습니다."
+  - type: "list"
+    items:
+    - "@wraps(원본함수) 데코레이터"
+    - "__name__, __doc__ 보존"
+    - "데코레이터 작성 필수 패턴"
+    - "functools.WRAPPER_ASSIGNMENTS 속성 복사"
+  - type: "code"
+    language: "python"
+    title: "기본 데코레이터"
+    description: "실행 시간을 측정하는 데코레이터를 만듭니다."
+    content: |-
+      import time
+      def timer(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              start = time.time()
+              result = func(*args, **kwargs)
+              elapsed = time.time() - start
+              return result
+          return wrapper
+
+      @timer
+      def slowFunc():
+          time.sleep(0.1)
+          return 'done'
+
+      slowFunc.__name__
+  - type: "code"
+    language: "python"
+    title: "문서 보존"
+    description: "원본 함수의 docstring이 보존됩니다."
+    content: |-
+      def myDecorator(func):
+          @wraps(func)
+          def wrapper():
+              return func()
+          return wrapper
+
+      @myDecorator
+      def greet():
+          '''인사 함수'''
+          return 'Hello'
+
+      greet.__doc__
+  - type: "code"
+    language: "python"
+    title: "wraps 없이"
+    description: "wraps를 사용하지 않으면 메타데이터가 손실됩니다."
+    content: |-
+      def badDecorator(func):
+          def wrapper():
+              return func()
+          return wrapper
+
+      @badDecorator
+      def original():
+          return 'test'
+
+      original.__name__
+  - type: "tip"
+    content: "데코레이터를 만들 때는 항상 @wraps를 사용하여 원본 함수 정보를 보존하세요."
+
+- id: "ordering"
+  title: "total_ordering - 비교 연산자"
+  subtitle: "클래스에 순서 부여하기"
+  blocks:
+  - type: "text"
+    content: "total_ordering은 클래스에 __eq__와 하나의 비교 메서드만 정의하면 나머지 비교 연산자를 자동 생성합니다. <, <=, >, >= 중 하나와 ==만 구현하면 되므로 코드를 줄이고 일관성을 보장합니다."
+  - type: "list"
+    items:
+    - "@total_ordering 클래스 데코레이터"
+    - "__eq__ + 하나의 비교 메서드 필요"
+    - "나머지 비교 연산자 자동 생성"
+    - "__lt__, __le__, __gt__, __ge__ 지원"
+  - type: "code"
+    language: "python"
+    title: "학생 클래스"
+    description: "점수로 학생을 비교할 수 있게 만듭니다."
+    content: |-
+      @total_ordering
+      class Student:
+          def __init__(self, name, score):
+              self.name = name
+              self.score = score
+          def __eq__(self, other):
+              return self.score == other.score
+          def __lt__(self, other):
+              return self.score < other.score
+
+      alice = Student('Alice', 90)
+      bob = Student('Bob', 85)
+      alice > bob
+  - type: "code"
+    language: "python"
+    title: "정렬 가능"
+    description: "비교 연산자가 있으면 정렬할 수 있습니다."
+    content: |-
+      @total_ordering
+      class Point:
+          def __init__(self, x):
+              self.x = x
+          def __eq__(self, other):
+              return self.x == other.x
+          def __lt__(self, other):
+              return self.x < other.x
+
+      points = [Point(3), Point(1), Point(2)]
+      sortedPoints = sorted(points, key=lambda p: p.x)
+      [p.x for p in sortedPoints]
+  - type: "code"
+    language: "python"
+    title: "모든 비교 연산"
+    description: "두 메서드만 정의했지만 모든 비교가 가능합니다."
+    content: |-
+      @total_ordering
+      class Version:
+          def __init__(self, major, minor):
+              self.major = major
+              self.minor = minor
+          def __eq__(self, other):
+              return (self.major, self.minor) == (other.major, other.minor)
+          def __lt__(self, other):
+              return (self.major, self.minor) < (other.major, other.minor)
+
+      v1 = Version(1, 2)
+      v2 = Version(1, 5)
+      v1 <= v2
+  - type: "tip"
+    content: "성능이 중요하다면 모든 비교 메서드를 직접 구현하는 것이 더 빠를 수 있습니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "functools 실무 패턴"
+  blocks:
+  - type: "text"
+    content: "실무에서 자주 사용하는 functools 활용 패턴을 살펴봅니다. 성능 최적화, 데코레이터 체이닝, 함수 조합, 재사용 가능한 유틸리티 작성 등 다양한 문제를 functools로 해결할 수 있습니다."
+  - type: "list"
+    items:
+    - "API 호출 재시도"
+    - "로깅 데코레이터"
+    - "함수 조합 패턴"
+    - "설정 기반 함수 생성"
+  - type: "code"
+    language: "python"
+    title: "재시도 데코레이터"
+    description: "실패 시 자동으로 재시도하는 데코레이터입니다."
+    content: |-
+      def retry(times):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(*args, **kwargs):
+                  for attempt in range(times):
+                      try:
+                          return func(*args, **kwargs)
+                      except Exception:
+                          if attempt == times - 1:
+                              raise
+                  return None
+              return wrapper
+          return decorator
+
+      @retry(3)
+      def unstable():
+          return 'success'
+
+      unstable()
+  - type: "code"
+    language: "python"
+    title: "부분 적용 활용"
+    description: "설정 기반으로 여러 함수를 만듭니다."
+    content: |-
+      def process(data, prefix, suffix):
+          return f'{prefix}{data}{suffix}'
+
+      addBrackets = partial(process, prefix='[', suffix=']')
+      addParens = partial(process, prefix='(', suffix=')')
+      addBrackets('test'), addParens('test')
+  - type: "code"
+    language: "python"
+    title: "캐시 활용"
+    description: "비용이 큰 연산을 캐싱합니다."
+    content: |-
+      @lru_cache(maxsize=32)
+      def expensiveQuery(userId):
+          return f'User data for {userId}'
+
+      firstCall = expensiveQuery(1)
+      secondCall = expensiveQuery(1)
+      firstCall, secondCall
+  - type: "tip"
+    content: "여러 데코레이터를 조합할 때 @wraps는 가장 안쪽(함수에 가장 가까운 곳)에 위치해야 합니다."
+
+- id: "practice"
+  title: "functools 모듈 종합 복습"
+  subtitle: "함수형 프로그래밍 마스터하기"
+  blocks:
+  - type: "text"
+    content: "functools 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: partial 사용"
+    code: |-
+      def add(a, b):
+          return a + b
+
+      add5 = partial(add, 5)
+      add5(3)
+
+  - type: "expansion"
+    title: "🟢 기본2: reduce 합계"
+    code: |-
+      values = [1, 2, 3, 4]
+      sumAll = reduce(lambda x, y: x + y, values)
+      sumAll
+
+  - type: "expansion"
+    title: "🟢 기본3: lru_cache 기본"
+    code: |-
+      @lru_cache
+      def square(n):
+          return n * n
+
+      square(4)
+
+  - type: "expansion"
+    title: "🟢 기본4: wraps 사용"
+    code: |-
+      def simple(func):
+          @wraps(func)
+          def inner():
+              return func()
+          return inner
+
+      @simple
+      def myFunc():
+          return 'ok'
+
+      myFunc.__name__
+
+  - type: "expansion"
+    title: "🟢 기본5: reduce 곱셈"
+    code: |-
+      multipliers = [2, 3, 4]
+      productAll = reduce(lambda a, b: a * b, multipliers)
+      productAll
+
+  - type: "expansion"
+    title: "🟡 응용1: partial 키워드 인자"
+    code: |-
+      def greet(name, greeting='Hello'):
+          return f'{greeting}, {name}'
+
+      sayHi = partial(greet, greeting='Hi')
+      sayHi('Alice')
+
+  - type: "expansion"
+    title: "🟡 응용2: reduce 최댓값"
+    code: |-
+      nums = [3, 7, 2, 9, 1]
+      maximum = reduce(lambda x, y: x if x > y else y, nums)
+      maximum
+
+  - type: "expansion"
+    title: "🟡 응용3: lru_cache 통계"
+    code: |-
+      @lru_cache(maxsize=2)
+      def compute(x):
+          return x * 2
+
+      compute(1)
+      compute(2)
+      compute(1)
+      details = compute.cache_info()
+      details.hits
+
+  - type: "expansion"
+    title: "🟡 응용4: total_ordering"
+    code: |-
+      @total_ordering
+      class Item:
+          def __init__(self, val):
+              self.val = val
+          def __eq__(self, other):
+              return self.val == other.val
+          def __lt__(self, other):
+              return self.val < other.val
+
+      Item(5) > Item(3)
+
+  - type: "expansion"
+    title: "🟡 응용5: reduce 문자열 결합"
+    code: |-
+      words = ['hello', 'world', 'python']
+      sentence = reduce(lambda x, y: x + ' ' + y, words)
+      sentence
+
+  - type: "expansion"
+    title: "🔴 심화1: 피보나치 최적화"
+    code: |-
+      @lru_cache(maxsize=None)
+      def fib(n):
+          if n < 2:
+              return n
+          return fib(n - 1) + fib(n - 2)
+
+      fib(20)
+
+  - type: "expansion"
+    title: "🔴 심화2: reduce 초기값"
+    code: |-
+      data = [1, 2, 3]
+      sumWith100 = reduce(lambda x, y: x + y, data, 100)
+      sumWith100
+
+  - type: "expansion"
+    title: "🔴 심화3: 인자 여러 개 고정"
+    code: |-
+      def format_log(level, msg, timestamp):
+          return f'[{timestamp}] {level}: {msg}'
+
+      errorLog = partial(format_log, 'ERROR', timestamp='2024-01-01')
+      errorLog('Failed')
+
+  - type: "expansion"
+    title: "🔴 심화4: 데코레이터 팩토리"
+    code: |-
+      def repeat(times):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(*args):
+                  return [func(*args) for _ in range(times)]
+              return wrapper
+          return decorator
+
+      @repeat(3)
+      def getNum():
+          return 5
+
+      getNum()
+
+  - type: "expansion"
+    title: "🔴 심화5: reduce로 flatten"
+    code: |-
+      nested = [[1, 2], [3, 4], [5]]
+      flat = reduce(lambda x, y: x + y, nested)
+      flat
+
+  - type: "expansion"
+    title: "🔴 심화6: lru_cache 크기 제한"
+    code: |-
+      @lru_cache(maxsize=2)
+      def fetch(n):
+          return n * 10
+
+      fetch(1)
+      fetch(2)
+      fetch(3)
+      fetch(1)
+      cacheStats = fetch.cache_info()
+      cacheStats.misses
+
+  - type: "expansion"
+    title: "🔴 심화7: partial과 map"
+    code: |-
+      def power(base, exp):
+          return base ** exp
+
+      squareFunc = partial(power, exp=2)
+      numbers = [1, 2, 3, 4]
+      squares = list(map(squareFunc, numbers))
+      squares
+
+  - type: "expansion"
+    title: "🔴 심화8: 캐시 초기화"
+    code: |-
+      @lru_cache(maxsize=10)
+      def calc(n):
+          return n + 100
+
+      calc(1)
+      calc(2)
+      calc.cache_clear()
+      afterClear = calc.cache_info()
+      afterClear.currsize
+
+  - type: "expansion"
+    title: "🔴 심화9: reduce 딕셔너리 병합"
+    code: |-
+      dicts = [{'a': 1}, {'b': 2}, {'c': 3}]
+      merged = reduce(lambda x, y: {**x, **y}, dicts)
+      merged
+
+  - type: "expansion"
+    title: "🔴 심화10: 복잡한 데코레이터"
+    code: |-
+      def validate(check):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(x):
+                  if check(x):
+                      return func(x)
+                  return None
+              return wrapper
+          return decorator
+
+      @validate(lambda n: n > 0)
+      def process(num):
+          return num * 2
+
+      process(5), process(-1)

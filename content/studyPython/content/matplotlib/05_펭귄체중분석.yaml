@@ -1,0 +1,479 @@
+meta:
+  id: matplotlib_05
+  title: 펭귄체중분석
+  order: 5
+  category: matplotlib
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["matplotlib", "boxplot", "violinplot", "sharex", "spines", "penguins"]
+  seo:
+    title: "Matplotlib 바이올린 플롯 - 펭귄 체중 분포 분석"
+    description: "Matplotlib으로 펭귄 데이터의 종별 체중 분포를 바이올린 플롯과 박스플롯으로 비교합니다. violinplot, sharex, spines 사용법을 배웁니다."
+    keywords: ["matplotlib", "violinplot", "boxplot", "penguins", "분포", "spines"]
+
+intro:
+  emoji: "🐧"
+  goal: 펭귄 종별 체중 분포를 바이올린 플롯과 박스플롯으로 비교 분석합니다.
+  description: 바이올린 플롯은 분포의 밀도를 시각적으로 보여줍니다. 박스플롯과 함께 사용하면 분포 특성을 더 완전하게 파악할 수 있습니다. 이전에 배운 hist, scatter, bar, subplots 개념을 함께 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: penguins(펭귄) 데이터셋은 남극 펭귄 3종의 신체 측정 데이터입니다. 아델리(Adelie), 친스트랩(Chinstrap), 젠투(Gentoo) 펭귄의 부리 길이, 부리 깊이, 날개 길이, 체중 등이 포함되어 있습니다. iris 데이터와 유사하게 분류 문제에 자주 사용됩니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: matplotlib, seaborn, pandas를 불러옵니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+      import pandas as pd
+  - type: tip
+    content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  subtitle: Pyodide 환경 폰트
+  blocks:
+  - type: text
+    content: Pyodide(웹 브라우저) 환경에서는 시스템 폰트를 사용할 수 없어 한글이 깨집니다. CDN에서 폰트 파일을 다운로드하여 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+  - type: code
+    language: python
+    title: 한글 폰트 설정
+    description: Pretendard 폰트를 다운로드하여 matplotlib에 등록합니다
+    content: |-
+      import micropip
+      await micropip.install('pyodide-http')
+
+      import pyodide_http
+      pyodide_http.patch_all()
+
+      from matplotlib import font_manager
+      from js import fetch
+      from pathlib import Path
+
+      fontUrl = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Regular.otf"
+      response = await fetch(fontUrl)
+      fontBuffer = await response.arrayBuffer()
+
+      fontPath = Path("/tmp/Pretendard-Regular.otf")
+      fontPath.write_bytes(fontBuffer.to_py())
+
+      font_manager.fontManager.addfont(str(fontPath))
+      plt.rcParams['font.family'] = 'Pretendard'
+      plt.rcParams['axes.unicode_minus'] = False
+  - type: tip
+    content: Pyodide 환경에서는 fetch API로 외부 리소스를 가져옵니다. font_manager.addfont()로 폰트를 등록하고, rcParams로 기본 폰트를 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: penguins 데이터
+  blocks:
+  - type: text
+    content: seaborn의 load_dataset()으로 penguins 데이터를 불러옵니다. 344개의 샘플이 있으며, 일부 결측치가 있습니다. dropna()로 결측치를 제거한 후 분석합니다.
+  - type: code
+    language: python
+    title: penguins 데이터 로드
+    description: 펭귄 데이터를 불러오고 결측치를 제거합니다
+    content: |-
+      penguins = sns.load_dataset('penguins').dropna()
+      penguins.head()
+
+- id: step3_explore
+  title: 3단계. 종별 통계
+  subtitle: groupby 집계
+  blocks:
+  - type: text
+    content: 각 펭귄 종별로 체중의 기본 통계를 확인합니다. groupby와 agg를 사용하면 여러 통계량을 한 번에 계산할 수 있습니다. 젠투 펭귄이 가장 무겁고, 친스트랩 펭귄이 가장 가벼운 것을 알 수 있습니다.
+  - type: code
+    language: python
+    title: 종별 체중 통계
+    description: 종별 체중의 평균, 표준편차, 최소/최대값을 확인합니다
+    content: |-
+      penguins.groupby('species')['body_mass_g'].agg(['mean', 'std', 'min', 'max'])
+
+- id: step4_boxplot
+  title: 4단계. 종별 박스플롯
+  subtitle: 그룹별 boxplot
+  blocks:
+  - type: text
+    content: 이전에 배운 박스플롯을 종별로 그려봅니다. 여러 그룹의 박스플롯을 한 번에 그리려면 각 그룹의 데이터를 리스트로 전달합니다. labels로 각 박스에 라벨을 지정합니다.
+  - type: code
+    language: python
+    title: 종별 박스플롯
+    description: 3종의 체중 분포를 박스플롯으로 비교합니다
+    content: |-
+      figBox, axBox = plt.subplots(figsize=(10, 6))
+
+      speciesBox = ['Adelie', 'Chinstrap', 'Gentoo']
+      weightBox = [penguins[penguins['species'] == sp]['body_mass_g'] for sp in speciesBox]
+
+      axBox.boxplot(weightBox, labels=speciesBox)
+      axBox.set_title('펭귄 종별 체중 분포', fontsize=14)
+      axBox.set_xlabel('종', fontsize=12)
+      axBox.set_ylabel('체중 (g)', fontsize=12)
+      axBox.grid(True, axis='y', alpha=0.3)
+      figBox
+
+- id: step5_violin
+  title: 5단계. 바이올린 플롯
+  subtitle: ax.violinplot()
+  blocks:
+  - type: text
+    content: 바이올린 플롯은 박스플롯과 커널 밀도 추정(KDE)을 결합한 차트입니다. 분포의 형태를 시각적으로 보여주어 박스플롯보다 더 풍부한 정보를 제공합니다. 데이터가 어디에 집중되어 있는지, 양봉 분포인지 등을 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 바이올린 플롯
+    description: 종별 체중 분포를 바이올린 플롯으로 표시합니다
+    content: |-
+      figViolin, axViolin = plt.subplots(figsize=(10, 6))
+
+      speciesViolin = ['Adelie', 'Chinstrap', 'Gentoo']
+      weightViolin = [penguins[penguins['species'] == sp]['body_mass_g'] for sp in speciesViolin]
+
+      partsViolin = axViolin.violinplot(weightViolin, positions=[1, 2, 3], showmeans=True, showmedians=True)
+      axViolin.set_xticks([1, 2, 3])
+      axViolin.set_xticklabels(speciesViolin)
+      axViolin.set_title('펭귄 종별 체중 분포 (바이올린 플롯)', fontsize=14)
+      axViolin.set_xlabel('종', fontsize=12)
+      axViolin.set_ylabel('체중 (g)', fontsize=12)
+      axViolin.grid(True, axis='y', alpha=0.3)
+      figViolin
+  - type: tip
+    content: ax.violinplot(데이터리스트)로 바이올린 플롯을 그립니다. showmeans=True는 평균선, showmedians=True는 중앙값선을 표시합니다. positions로 x축 위치를 지정합니다. 반환값(parts)으로 각 요소의 스타일을 커스터마이징할 수 있습니다.
+
+- id: step6_violin_style
+  title: 6단계. 바이올린 플롯 스타일링
+  subtitle: 색상 커스터마이징
+  blocks:
+  - type: text
+    content: 바이올린 플롯의 색상을 커스터마이징하면 더 보기 좋은 차트를 만들 수 있습니다. violinplot이 반환하는 딕셔너리의 'bodies' 키로 각 바이올린에 접근하여 색상을 변경합니다.
+  - type: code
+    language: python
+    title: 데이터 준비 및 바이올린 플롯
+    description: 종별 데이터를 준비하고 바이올린 플롯을 그립니다
+    content: |-
+      figViolinColor, axViolinColor = plt.subplots(figsize=(10, 6))
+
+      speciesColor = ['Adelie', 'Chinstrap', 'Gentoo']
+      colorsColor = ['#E74C3C', '#27AE60', '#3498DB']
+      weightColor = [penguins[penguins['species'] == sp]['body_mass_g'] for sp in speciesColor]
+
+      partsColor = axViolinColor.violinplot(weightColor, positions=[1, 2, 3], showmeans=True)
+      figViolinColor
+  - type: code
+    language: python
+    title: 색상 및 스타일 적용
+    description: 각 종에 다른 색상을 적용합니다
+    content: |-
+      for idx, body in enumerate(partsColor['bodies']):
+          body.set_facecolor(colorsColor[idx])
+          body.set_edgecolor('black')
+          body.set_alpha(0.7)
+
+      axViolinColor.set_xticks([1, 2, 3])
+      axViolinColor.set_xticklabels(speciesColor)
+      axViolinColor.set_title('펭귄 종별 체중 분포', fontsize=14)
+      axViolinColor.set_xlabel('종', fontsize=12)
+      axViolinColor.set_ylabel('체중 (g)', fontsize=12)
+      figViolinColor
+
+- id: step7_sharex
+  title: 7단계. 축 공유 서브플롯
+  subtitle: sharex, sharey
+  blocks:
+  - type: text
+    content: 박스플롯과 바이올린 플롯을 같은 y축 범위로 비교하면 두 차트의 차이점을 명확하게 볼 수 있습니다. sharey=True로 y축을 공유하면 스케일이 동일하게 유지됩니다.
+  - type: code
+    language: python
+    title: 데이터 준비 및 박스플롯
+    description: y축을 공유하는 서브플롯을 만들고 박스플롯을 그립니다
+    content: |-
+      figShare, (axBoxShare, axViolinShare) = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
+
+      speciesShare = ['Adelie', 'Chinstrap', 'Gentoo']
+      colorsShare = ['#E74C3C', '#27AE60', '#3498DB']
+      weightShare = [penguins[penguins['species'] == sp]['body_mass_g'] for sp in speciesShare]
+
+      bpShare = axBoxShare.boxplot(weightShare, labels=speciesShare, patch_artist=True)
+      for patch, color in zip(bpShare['boxes'], colorsShare):
+          patch.set_facecolor(color)
+          patch.set_alpha(0.7)
+      axBoxShare.set_title('박스플롯', fontsize=12)
+      axBoxShare.set_xlabel('종')
+      axBoxShare.set_ylabel('체중 (g)')
+      figShare
+  - type: code
+    language: python
+    title: 바이올린 플롯 추가
+    description: 오른쪽 패널에 바이올린 플롯을 그립니다
+    content: |-
+      partsShare = axViolinShare.violinplot(weightShare, positions=[1, 2, 3], showmeans=True)
+      for idx, body in enumerate(partsShare['bodies']):
+          body.set_facecolor(colorsShare[idx])
+          body.set_alpha(0.7)
+      axViolinShare.set_xticks([1, 2, 3])
+      axViolinShare.set_xticklabels(speciesShare)
+      axViolinShare.set_title('바이올린 플롯', fontsize=12)
+      axViolinShare.set_xlabel('종')
+
+      plt.suptitle('펭귄 체중 분포 비교', fontsize=14, fontweight='bold')
+      plt.tight_layout()
+      figShare
+  - type: tip
+    content: plt.subplots(sharex=True)는 x축을, sharey=True는 y축을 공유합니다. 같은 데이터를 다른 방식으로 시각화할 때 스케일을 통일하여 정확한 비교가 가능합니다. patch_artist=True로 박스플롯에 색상을 채울 수 있습니다.
+
+- id: step8_spines
+  title: 8단계. 스파인 제거
+  subtitle: spines 설정
+  blocks:
+  - type: text
+    content: 스파인(spine)은 차트 영역의 테두리입니다. 불필요한 스파인을 제거하면 더 깔끔하고 현대적인 디자인이 됩니다. 보통 상단과 우측 스파인을 제거하고, 좌측과 하단만 남깁니다.
+  - type: code
+    language: python
+    title: 데이터 준비 및 바이올린 플롯
+    description: 바이올린 플롯을 그리고 색상을 적용합니다
+    content: |-
+      figSpines, axSpines = plt.subplots(figsize=(10, 6))
+
+      speciesSpines = ['Adelie', 'Chinstrap', 'Gentoo']
+      colorsSpines = ['#E74C3C', '#27AE60', '#3498DB']
+      weightSpines = [penguins[penguins['species'] == sp]['body_mass_g'] for sp in speciesSpines]
+
+      partsSpines = axSpines.violinplot(weightSpines, positions=[1, 2, 3], showmeans=True)
+      for idx, body in enumerate(partsSpines['bodies']):
+          body.set_facecolor(colorsSpines[idx])
+          body.set_alpha(0.7)
+      figSpines
+  - type: code
+    language: python
+    title: 스타일링 및 스파인 제거
+    description: 제목을 추가하고 상단/우측 스파인을 제거합니다
+    content: |-
+      axSpines.set_xticks([1, 2, 3])
+      axSpines.set_xticklabels(speciesSpines)
+      axSpines.set_title('펭귄 종별 체중 분포', fontsize=14)
+      axSpines.set_xlabel('종', fontsize=12)
+      axSpines.set_ylabel('체중 (g)', fontsize=12)
+
+      axSpines.spines['top'].set_visible(False)
+      axSpines.spines['right'].set_visible(False)
+      figSpines
+  - type: tip
+    content: ax.spines['위치'].set_visible(False)로 스파인을 숨깁니다. 위치는 'top', 'bottom', 'left', 'right' 중 하나입니다. set_color(), set_linewidth()로 스파인 스타일도 변경할 수 있습니다.
+
+- id: step9_subplot_compare
+  title: 9단계. 2x2 비교 차트
+  subtitle: 여러 특성 비교
+  blocks:
+  - type: text
+    content: 체중뿐만 아니라 다른 신체 특성도 함께 비교합니다. 2x2 서브플롯으로 체중, 부리 길이, 부리 깊이, 날개 길이를 한눈에 볼 수 있습니다.
+  - type: code
+    language: python
+    title: Figure 및 데이터 정의
+    description: 2x2 Figure를 만들고 특성 목록을 정의합니다
+    content: |-
+      figMulti, axesMulti = plt.subplots(2, 2, figsize=(12, 10))
+
+      speciesMulti = ['Adelie', 'Chinstrap', 'Gentoo']
+      colorsMulti = ['#E74C3C', '#27AE60', '#3498DB']
+      featuresMulti = ['body_mass_g', 'bill_length_mm', 'bill_depth_mm', 'flipper_length_mm']
+      titlesMulti = ['체중 (g)', '부리 길이 (mm)', '부리 깊이 (mm)', '날개 길이 (mm)']
+  - type: code
+    language: python
+    title: 4개 박스플롯 그리기
+    description: 각 패널에 특성별 박스플롯을 그립니다
+    content: |-
+      for idx, (feature, title) in enumerate(zip(featuresMulti, titlesMulti)):
+          row = idx // 2
+          col = idx % 2
+          ax = axesMulti[row, col]
+
+          dataBySpecies = [penguins[penguins['species'] == sp][feature] for sp in speciesMulti]
+          bpMulti = ax.boxplot(dataBySpecies, labels=speciesMulti, patch_artist=True)
+          for patch, color in zip(bpMulti['boxes'], colorsMulti):
+              patch.set_facecolor(color)
+              patch.set_alpha(0.7)
+
+          ax.set_title(title, fontsize=11)
+          ax.spines['top'].set_visible(False)
+          ax.spines['right'].set_visible(False)
+
+      plt.suptitle('펭귄 종별 신체 특성 비교', fontsize=14, fontweight='bold')
+      plt.tight_layout()
+      figMulti
+
+- id: step10_final
+  title: 10단계. 최종 시각화
+  subtitle: 완성된 분포 비교
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 요소를 종합하여 완성도 높은 펭귄 체중 분석 차트를 만듭니다. 바이올린 플롯과 박스플롯의 장점을 모두 활용합니다.
+  - type: code
+    language: python
+    title: 데이터 준비 및 바이올린 플롯
+    description: 바이올린 플롯을 그리고 색상을 적용합니다
+    content: |-
+      figFinal, axFinal = plt.subplots(figsize=(11, 7))
+
+      speciesFinal = ['Adelie', 'Chinstrap', 'Gentoo']
+      colorsFinal = ['#E74C3C', '#27AE60', '#3498DB']
+      weightFinal = [penguins[penguins['species'] == sp]['body_mass_g'] for sp in speciesFinal]
+
+      partsFinal = axFinal.violinplot(weightFinal, positions=[1, 2, 3], showmeans=False, showmedians=False)
+      for idx, body in enumerate(partsFinal['bodies']):
+          body.set_facecolor(colorsFinal[idx])
+          body.set_edgecolor('white')
+          body.set_alpha(0.7)
+      figFinal
+  - type: code
+    language: python
+    title: 박스플롯 오버레이
+    description: 바이올린 플롯 위에 박스플롯을 겹칩니다
+    content: |-
+      bpFinal = axFinal.boxplot(weightFinal, positions=[1, 2, 3], widths=0.15,
+                          patch_artist=True, showfliers=False)
+      for patch in bpFinal['boxes']:
+          patch.set_facecolor('white')
+          patch.set_edgecolor('black')
+      for median in bpFinal['medians']:
+          median.set_color('black')
+          median.set_linewidth(2)
+      figFinal
+  - type: code
+    language: python
+    title: 스타일링 적용
+    description: 제목, 라벨, 스파인, 그리드를 설정합니다
+    content: |-
+      axFinal.set_xticks([1, 2, 3])
+      axFinal.set_xticklabels(['Adelie\n(아델리)', 'Chinstrap\n(친스트랩)', 'Gentoo\n(젠투)'])
+      axFinal.set_title('남극 펭귄 3종의 체중 분포 비교', fontsize=16, fontweight='bold')
+      axFinal.set_ylabel('체중 (g)', fontsize=12)
+      axFinal.spines['top'].set_visible(False)
+      axFinal.spines['right'].set_visible(False)
+      axFinal.grid(True, axis='y', alpha=0.3, linestyle='--')
+      plt.tight_layout()
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 펭귄 데이터 분석 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용해서 펭귄 데이터를 다양한 관점에서 분석해봅시다. boxplot, violinplot, sharex/sharey, spines 등 모든 개념을 종합적으로 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 섬별 펭귄 체중 분포 비교 (바이올린 + 박스플롯)"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        data = sns.load_dataset('penguins').dropna()
+
+        chart, (violin, box) = plt.subplots(1, 2, figsize=(14, 6), sharey=True)
+
+        islands = data['island'].unique()
+        palette = ['#9B59B6', '#F39C12', '#1ABC9C']
+        mass = [data[data['island'] == isl]['body_mass_g'] for isl in islands]
+    - type: code
+      title: "바이올린 플롯"
+      content: |-
+        vp = violin.violinplot(mass, positions=[1, 2, 3], showmeans=True)
+        for idx, body in enumerate(vp['bodies']):
+            body.set_facecolor(palette[idx])
+            body.set_alpha(0.7)
+        violin.set_xticks([1, 2, 3])
+        violin.set_xticklabels(islands)
+        violin.set_title('바이올린 플롯', fontsize=12)
+        violin.set_ylabel('체중 (g)')
+        violin.spines['top'].set_visible(False)
+        violin.spines['right'].set_visible(False)
+    - type: code
+      title: "박스플롯"
+      content: |-
+        bx = box.boxplot(mass, labels=islands, patch_artist=True)
+        for patch, clr in zip(bx['boxes'], palette):
+            patch.set_facecolor(clr)
+            patch.set_alpha(0.7)
+        box.set_title('박스플롯', fontsize=12)
+        box.spines['top'].set_visible(False)
+        box.spines['right'].set_visible(False)
+
+        plt.suptitle('섬별 펭귄 체중 분포 비교', fontsize=14, fontweight='bold')
+        plt.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: 성별 x 종별 체중 비교 (그룹화된 박스플롯)"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+        import numpy as np
+
+        df = sns.load_dataset('penguins').dropna()
+
+        canvas, panel = plt.subplots(figsize=(12, 7))
+
+        kinds = ['Adelie', 'Chinstrap', 'Gentoo']
+        genders = ['Male', 'Female']
+        male = '#3498DB'
+        female = '#E74C3C'
+        xpos = []
+        weights = []
+        tones = []
+
+        for idx, sp in enumerate(kinds):
+            for jdx, sex in enumerate(genders):
+                subset = df[(df['species'] == sp) & (df['sex'] == sex)]
+                weights.append(subset['body_mass_g'].values)
+                xpos.append(idx * 3 + jdx)
+                tones.append(male if sex == 'Male' else female)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        result = panel.boxplot(weights, positions=xpos, widths=0.6, patch_artist=True)
+        for patch, clr in zip(result['boxes'], tones):
+            patch.set_facecolor(clr)
+            patch.set_alpha(0.7)
+
+        panel.set_xticks([0.5, 3.5, 6.5])
+        panel.set_xticklabels(kinds)
+        panel.set_title('펭귄 종별/성별 체중 비교', fontsize=14, fontweight='bold')
+        panel.set_xlabel('종', fontsize=12)
+        panel.set_ylabel('체중 (g)', fontsize=12)
+
+        from matplotlib.patches import Patch
+        legend = [Patch(facecolor=male, alpha=0.7, label='Male'),
+                  Patch(facecolor=female, alpha=0.7, label='Female')]
+        panel.legend(handles=legend, loc='upper left')
+
+        panel.spines['top'].set_visible(False)
+        panel.spines['right'].set_visible(False)
+        panel.grid(True, axis='y', alpha=0.3)
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 바이올린 플롯과 박스플롯으로 펭귄 체중 분포를 분석했습니다.
+  - type: list
+    items:
+    - "ax.violinplot(data) - 분포 밀도를 시각화하는 바이올린 플롯"
+    - "showmeans, showmedians - 평균선, 중앙값선 표시"
+    - "parts['bodies'] - 바이올린 요소 접근 및 스타일링"
+    - "plt.subplots(sharey=True) - y축 공유로 스케일 통일"
+    - "patch_artist=True - 박스플롯에 색상 채우기"
+    - "ax.spines[].set_visible(False) - 스파인 제거로 깔끔한 디자인"
+  - type: text
+    content: 다음 시간에는 히트맵으로 상관관계를 시각화합니다.

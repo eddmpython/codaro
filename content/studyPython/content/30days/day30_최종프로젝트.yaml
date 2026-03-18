@@ -1,0 +1,857 @@
+meta:
+  id: "day30"
+  title: "최종 프로젝트"
+  day: 30
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 최종 프로젝트 - 30일 완성"
+    description: "30일간 배운 모든 파이썬 문법을 종합하여 실전 프로젝트를 완성합니다."
+    keywords: ['최종프로젝트', 'final project', '종합', '실전', '파이썬완성']
+
+intro:
+  emoji: "🎓"
+  points:
+  - "30일간 배운 모든 개념 통합"
+  - "실전 프로젝트 구현"
+  - "문제 해결 능력 완성"
+  - "파이썬 마스터 달성"
+
+sections:
+- id: "text_processing"
+  title: "텍스트 처리 프로젝트"
+  subtitle: "문자열과 파일 다루기"
+  blocks:
+  - type: "text"
+    content: "텍스트 처리는 파이썬의 대표적인 활용 분야입니다. 파일 읽기, 문자열 조작, 단어 카운팅, 텍스트 분석 등을 조합하여 실용적인 프로그램을 만들 수 있습니다. 딕셔너리와 리스트를 활용하여 효율적으로 데이터를 관리합니다."
+  - type: "list"
+    items:
+    - "파일 읽기와 쓰기"
+    - "문자열 메서드 활용"
+    - "딕셔너리로 카운팅"
+    - "데이터 분석"
+  - type: "code"
+    language: "python"
+    title: "단어 빈도 분석기"
+    description: "텍스트에서 단어 빈도를 분석합니다."
+    content: |-
+      def analyzeWords(text):
+          words = text.lower().split()
+          frequency = {}
+          for word in words:
+              cleaned = word.strip('.,!?')
+              if cleaned:
+                  frequency[cleaned] = frequency.get(cleaned, 0) + 1
+          return frequency
+
+      sampleText = 'hello world hello python world'
+      analyzeWords(sampleText)
+  - type: "code"
+    language: "python"
+    title: "최빈 단어 찾기"
+    description: "가장 많이 등장하는 단어를 찾습니다."
+    content: |-
+      def findTopWords(text, n):
+          words = text.lower().split()
+          freq = {}
+          for word in words:
+              freq[word] = freq.get(word, 0) + 1
+          sorted_items = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+          return sorted_items[:n]
+
+      document = 'python is great python is powerful python is easy'
+      findTopWords(document, 2)
+  - type: "code"
+    language: "python"
+    title: "문장 통계"
+    description: "텍스트의 통계 정보를 계산합니다."
+    content: |-
+      def textStats(text):
+          sentences = text.split('.')
+          words = text.split()
+          chars = len(text)
+          return len(sentences) - 1, len(words), chars
+
+      passage = 'This is a test. Python is amazing. I love coding.'
+      textStats(passage)
+  - type: "tip"
+    content: "텍스트 처리는 웹 크롤링, 데이터 분석, 자연어 처리의 기초입니다."
+
+- id: "data_management"
+  title: "데이터 관리 프로젝트"
+  subtitle: "자료구조 활용하기"
+  blocks:
+  - type: "text"
+    content: "데이터 관리는 리스트, 딕셔너리, 세트를 조합하여 효율적으로 정보를 저장하고 조회하는 것입니다. 학생 성적 관리, 재고 관리, 주소록 등 실생활 문제를 자료구조로 해결할 수 있습니다. 클래스를 사용하면 더욱 체계적으로 관리할 수 있습니다."
+  - type: "list"
+    items:
+    - "리스트로 순서 관리"
+    - "딕셔너리로 빠른 조회"
+    - "세트로 중복 제거"
+    - "클래스로 구조화"
+  - type: "code"
+    language: "python"
+    title: "학생 성적 관리"
+    description: "학생들의 성적을 관리합니다."
+    content: |-
+      class GradeBook:
+          def __init__(self):
+              self.students = {}
+
+          def addScore(self, name, score):
+              if name not in self.students:
+                  self.students[name] = []
+              self.students[name].append(score)
+
+          def getAverage(self, name):
+              if name in self.students:
+                  scores = self.students[name]
+                  return sum(scores) / len(scores)
+              return 0
+
+      gb = GradeBook()
+      gb.addScore('Alice', 90)
+      gb.addScore('Alice', 85)
+      gb.getAverage('Alice')
+  - type: "code"
+    language: "python"
+    title: "재고 관리 시스템"
+    description: "물품의 재고를 관리합니다."
+    content: |-
+      class Inventory:
+          def __init__(self):
+              self.items = {}
+
+          def add(self, item, quantity):
+              self.items[item] = self.items.get(item, 0) + quantity
+
+          def remove(self, item, quantity):
+              if item in self.items:
+                  self.items[item] = max(0, self.items[item] - quantity)
+
+          def check(self, item):
+              return self.items.get(item, 0)
+
+      inv = Inventory()
+      inv.add('apple', 10)
+      inv.remove('apple', 3)
+      inv.check('apple')
+  - type: "code"
+    language: "python"
+    title: "연락처 관리"
+    description: "연락처를 저장하고 검색합니다."
+    content: |-
+      class ContactBook:
+          def __init__(self):
+              self.contacts = {}
+
+          def add(self, name, phone):
+              self.contacts[name] = phone
+
+          def find(self, name):
+              return self.contacts.get(name, 'Not found')
+
+          def delete(self, name):
+              if name in self.contacts:
+                  del self.contacts[name]
+                  return True
+              return False
+
+      cb = ContactBook()
+      cb.add('John', '123-4567')
+      cb.find('John')
+  - type: "tip"
+    content: "적절한 자료구조를 선택하면 프로그램의 효율성이 크게 향상됩니다."
+
+- id: "game_logic"
+  title: "게임 로직 프로젝트"
+  subtitle: "알고리즘으로 게임 만들기"
+  blocks:
+  - type: "text"
+    content: "게임 로직은 조건문, 반복문, 함수를 조합하여 규칙을 구현합니다. 숫자 맞추기, 가위바위보, 틱택토 등 간단한 게임을 만들면서 프로그래밍 논리를 익힐 수 있습니다. 난수 생성과 사용자 입력 처리가 핵심입니다."
+  - type: "list"
+    items:
+    - "게임 규칙 구현"
+    - "상태 관리"
+    - "승패 판정"
+    - "점수 계산"
+  - type: "code"
+    language: "python"
+    title: "가위바위보 게임"
+    description: "가위바위보 승패를 판정합니다."
+    content: |-
+      def playRPS(player1, player2):
+          wins = {
+              'rock': 'scissors',
+              'scissors': 'paper',
+              'paper': 'rock'
+          }
+          if player1 == player2:
+              return 'draw'
+          elif wins[player1] == player2:
+              return 'player1'
+          else:
+              return 'player2'
+
+      playRPS('rock', 'scissors')
+  - type: "code"
+    language: "python"
+    title: "틱택토 승리 체크"
+    description: "틱택토에서 승리 조건을 확인합니다."
+    content: |-
+      def checkWinner(board):
+          lines = [
+              [board[0], board[1], board[2]],
+              [board[3], board[4], board[5]],
+              [board[6], board[7], board[8]],
+              [board[0], board[3], board[6]],
+              [board[1], board[4], board[7]],
+              [board[2], board[5], board[8]],
+              [board[0], board[4], board[8]],
+              [board[2], board[4], board[6]]
+          ]
+          for line in lines:
+              if line[0] == line[1] == line[2] and line[0] != ' ':
+                  return line[0]
+          return None
+
+      gameBoard = ['X', 'X', 'X', 'O', 'O', ' ', ' ', ' ', ' ']
+      checkWinner(gameBoard)
+  - type: "code"
+    language: "python"
+    title: "주사위 게임"
+    description: "두 주사위의 합을 계산합니다."
+    content: |-
+      import random
+
+      def rollDice():
+          die1 = random.randint(1, 6)
+          die2 = random.randint(1, 6)
+          return die1 + die2
+
+      rollDice()
+  - type: "tip"
+    content: "게임 로직은 조건문과 반복문을 연습하기에 좋은 주제입니다."
+
+- id: "file_operations"
+  title: "파일 처리 프로젝트"
+  subtitle: "데이터 저장과 불러오기"
+  blocks:
+  - type: "text"
+    content: "파일 처리는 데이터를 영구적으로 저장하고 불러오는 기능입니다. CSV 파일 읽기, JSON 형식 저장, 로그 파일 작성 등 실무에서 자주 사용됩니다. with 문을 사용하여 안전하게 파일을 관리하고, 예외 처리로 오류를 방지합니다."
+  - type: "list"
+    items:
+    - "파일 읽기/쓰기"
+    - "with 문 활용"
+    - "예외 처리"
+    - "데이터 형식 변환"
+  - type: "code"
+    language: "python"
+    title: "CSV 읽기"
+    description: "CSV 형식의 데이터를 파싱합니다."
+    content: |-
+      def parseCSV(content):
+          lines = content.strip().split('\n')
+          header = lines[0].split(',')
+          data = []
+          for line in lines[1:]:
+              values = line.split(',')
+              row = dict(zip(header, values))
+              data.append(row)
+          return data
+
+      csvContent = 'name,age\nAlice,25\nBob,30'
+      parseCSV(csvContent)
+  - type: "code"
+    language: "python"
+    title: "로그 생성"
+    description: "로그 메시지를 생성합니다."
+    content: |-
+      import time
+
+      def createLog(level, message):
+          timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+          return f'[{timestamp}] {level}: {message}'
+
+      createLog('INFO', 'Application started')
+  - type: "code"
+    language: "python"
+    title: "설정 파일 파싱"
+    description: "key=value 형식의 설정을 파싱합니다."
+    content: |-
+      def parseConfig(text):
+          config = {}
+          for line in text.strip().split('\n'):
+              if '=' in line:
+                  key, value = line.split('=', 1)
+                  config[key.strip()] = value.strip()
+          return config
+
+      configText = 'host=localhost\nport=8080\ndebug=true'
+      parseConfig(configText)
+  - type: "tip"
+    content: "파일 처리는 데이터 영속성을 위한 필수 기능입니다."
+
+- id: "object_oriented"
+  title: "객체지향 프로젝트"
+  subtitle: "클래스로 모델링하기"
+  blocks:
+  - type: "text"
+    content: "객체지향 프로그래밍은 현실 세계를 클래스와 객체로 모델링합니다. 은행 계좌, 도서관 시스템, 쇼핑카트 등을 클래스로 설계하면 코드의 재사용성과 유지보수성이 향상됩니다. 상속과 캡슐화를 활용하여 체계적인 프로그램을 작성합니다."
+  - type: "list"
+    items:
+    - "클래스 설계"
+    - "상속과 다형성"
+    - "캡슐화"
+    - "메서드 구현"
+  - type: "code"
+    language: "python"
+    title: "은행 계좌"
+    description: "입금과 출금이 가능한 계좌를 만듭니다."
+    content: |-
+      class BankAccount:
+          def __init__(self, owner, balance=0):
+              self.owner = owner
+              self.balance = balance
+
+          def deposit(self, amount):
+              if amount > 0:
+                  self.balance = self.balance + amount
+                  return True
+              return False
+
+          def withdraw(self, amount):
+              if 0 < amount <= self.balance:
+                  self.balance = self.balance - amount
+                  return True
+              return False
+
+      account = BankAccount('Alice', 1000)
+      account.deposit(500)
+      account.withdraw(300)
+      account.balance
+  - type: "code"
+    language: "python"
+    title: "도서관 시스템"
+    description: "책 대출과 반납을 관리합니다."
+    content: |-
+      class Library:
+          def __init__(self):
+              self.books = {}
+              self.borrowed = {}
+
+          def addBook(self, title, copies):
+              self.books[title] = copies
+
+          def borrow(self, user, title):
+              if self.books.get(title, 0) > 0:
+                  self.books[title] = self.books[title] - 1
+                  if user not in self.borrowed:
+                      self.borrowed[user] = []
+                  self.borrowed[user].append(title)
+                  return True
+              return False
+
+          def returnBook(self, user, title):
+              if user in self.borrowed and title in self.borrowed[user]:
+                  self.borrowed[user].remove(title)
+                  self.books[title] = self.books[title] + 1
+                  return True
+              return False
+
+      lib = Library()
+      lib.addBook('Python Guide', 3)
+      lib.borrow('Bob', 'Python Guide')
+      lib.books['Python Guide']
+  - type: "code"
+    language: "python"
+    title: "쇼핑 카트"
+    description: "장바구니에 상품을 추가하고 계산합니다."
+    content: |-
+      class ShoppingCart:
+          def __init__(self):
+              self.items = {}
+
+          def add(self, item, price, quantity=1):
+              if item in self.items:
+                  self.items[item]['quantity'] = self.items[item]['quantity'] + quantity
+              else:
+                  self.items[item] = {'price': price, 'quantity': quantity}
+
+          def getTotal(self):
+              total = 0
+              for item in self.items.values():
+                  total = total + item['price'] * item['quantity']
+              return total
+
+      cart = ShoppingCart()
+      cart.add('apple', 1.5, 3)
+      cart.add('banana', 0.8, 5)
+      cart.getTotal()
+  - type: "tip"
+    content: "클래스는 관련된 데이터와 기능을 하나로 묶어 관리합니다."
+
+- id: "algorithm_projects"
+  title: "알고리즘 프로젝트"
+  subtitle: "효율적인 문제 해결"
+  blocks:
+  - type: "text"
+    content: "알고리즘 프로젝트는 정렬, 검색, 재귀를 조합하여 복잡한 문제를 해결합니다. 데이터 필터링, 패턴 찾기, 최적화 등 실무에서 자주 마주치는 문제들을 효율적으로 처리하는 방법을 배웁니다. 시간 복잡도를 고려하여 최적의 알고리즘을 선택합니다."
+  - type: "list"
+    items:
+    - "정렬과 검색 조합"
+    - "재귀로 문제 분해"
+    - "효율성 고려"
+    - "최적화 전략"
+  - type: "code"
+    language: "python"
+    title: "중복 제거 정렬"
+    description: "중복을 제거하고 정렬합니다."
+    content: |-
+      def uniqueSorted(arr):
+          seen = set()
+          unique = []
+          for item in arr:
+              if item not in seen:
+                  seen.add(item)
+                  unique.append(item)
+          return sorted(unique)
+
+      mixedData = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]
+      uniqueSorted(mixedData)
+  - type: "code"
+    language: "python"
+    title: "그룹핑"
+    description: "조건에 따라 데이터를 그룹화합니다."
+    content: |-
+      def groupBy(arr, keyFunc):
+          groups = {}
+          for item in arr:
+              key = keyFunc(item)
+              if key not in groups:
+                  groups[key] = []
+              groups[key].append(item)
+          return groups
+
+      numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+      groupBy(numbers, lambda x: 'even' if x % 2 == 0 else 'odd')
+  - type: "code"
+    language: "python"
+    title: "범위 합계"
+    description: "특정 범위의 합을 빠르게 계산합니다."
+    content: |-
+      def rangeSumQuery(arr):
+          prefixSum = [0]
+          for num in arr:
+              prefixSum.append(prefixSum[-1] + num)
+
+          def query(start, end):
+              return prefixSum[end + 1] - prefixSum[start]
+
+          return query
+
+      queryFunc = rangeSumQuery([1, 2, 3, 4, 5])
+      queryFunc(1, 3)
+  - type: "tip"
+    content: "알고리즘은 문제를 효율적으로 해결하는 절차입니다."
+
+- id: "practice"
+  title: "Day 30 최종 복습"
+  subtitle: "30일 완성 프로젝트"
+  blocks:
+  - type: "text"
+    content: "30일간 배운 모든 파이썬 문법을 종합하여 실전 프로젝트를 완성합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전하며 파이썬 마스터가 되어보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 문자열 역순"
+    code: |-
+      def reverseWords(sentence):
+          words = sentence.split()
+          reversed_words = []
+          for word in words:
+              reversed_words.append(word[::-1])
+          return ' '.join(reversed_words)
+
+      reverseWords('hello world python')
+
+  - type: "expansion"
+    title: "🟢 기본2: 리스트 필터"
+    code: |-
+      def filterRange(arr, minVal, maxVal):
+          result = []
+          for num in arr:
+              if minVal <= num <= maxVal:
+                  result.append(num)
+          return result
+
+      filterRange([1, 5, 10, 15, 20, 25], 10, 20)
+
+  - type: "expansion"
+    title: "🟢 기본3: 딕셔너리 병합"
+    code: |-
+      def mergeDicts(dict1, dict2):
+          merged = dict1.copy()
+          for key, val in dict2.items():
+              merged[key] = val
+          return merged
+
+      a = {'x': 1, 'y': 2}
+      b = {'y': 3, 'z': 4}
+      mergeDicts(a, b)
+
+  - type: "expansion"
+    title: "🟢 기본4: 카운터 클래스"
+    code: |-
+      class Counter:
+          def __init__(self):
+              self.value = 0
+
+          def increment(self):
+              self.value = self.value + 1
+
+          def decrement(self):
+              self.value = self.value - 1
+
+          def reset(self):
+              self.value = 0
+
+      cnt = Counter()
+      cnt.increment()
+      cnt.increment()
+      cnt.value
+
+  - type: "expansion"
+    title: "🟢 기본5: 팩토리얼 반복"
+    code: |-
+      def factorialIterative(n):
+          result = 1
+          for i in range(1, n + 1):
+              result = result * i
+          return result
+
+      factorialIterative(6)
+
+  - type: "expansion"
+    title: "🟡 응용1: 투표 시스템"
+    code: |-
+      class VotingSystem:
+          def __init__(self):
+              self.votes = {}
+
+          def vote(self, candidate):
+              self.votes[candidate] = self.votes.get(candidate, 0) + 1
+
+          def getWinner(self):
+              if not self.votes:
+                  return None
+              maxVotes = max(self.votes.values())
+              for candidate, count in self.votes.items():
+                  if count == maxVotes:
+                      return candidate
+
+      vs = VotingSystem()
+      vs.vote('Alice')
+      vs.vote('Bob')
+      vs.vote('Alice')
+      vs.getWinner()
+
+  - type: "expansion"
+    title: "🟡 응용2: 날짜 파싱"
+    code: |-
+      def parseDate(dateStr):
+          parts = dateStr.split('-')
+          if len(parts) == 3:
+              year = int(parts[0])
+              month = int(parts[1])
+              day = int(parts[2])
+              return year, month, day
+          return None
+
+      parseDate('2024-12-28')
+
+  - type: "expansion"
+    title: "🟡 응용3: 스택 구현"
+    code: |-
+      class Stack:
+          def __init__(self):
+              self.items = []
+
+          def push(self, item):
+              self.items.append(item)
+
+          def pop(self):
+              if self.items:
+                  return self.items.pop()
+              return None
+
+          def peek(self):
+              if self.items:
+                  return self.items[-1]
+              return None
+
+          def isEmpty(self):
+              return len(self.items) == 0
+
+      stk = Stack()
+      stk.push(1)
+      stk.push(2)
+      stk.peek()
+
+  - type: "expansion"
+    title: "🟡 응용4: 큐 구현"
+    code: |-
+      class Queue:
+          def __init__(self):
+              self.items = []
+
+          def enqueue(self, item):
+              self.items.append(item)
+
+          def dequeue(self):
+              if self.items:
+                  return self.items.pop(0)
+              return None
+
+          def size(self):
+              return len(self.items)
+
+      q = Queue()
+      q.enqueue('first')
+      q.enqueue('second')
+      q.dequeue()
+
+  - type: "expansion"
+    title: "🟡 응용5: 온도 변환기"
+    code: |-
+      class TemperatureConverter:
+          @staticmethod
+          def celsiusToFahrenheit(celsius):
+              return celsius * 9 / 5 + 32
+
+          @staticmethod
+          def fahrenheitToCelsius(fahrenheit):
+              return (fahrenheit - 32) * 5 / 9
+
+      TemperatureConverter.celsiusToFahrenheit(100)
+
+  - type: "expansion"
+    title: "🔴 심화1: JSON 파싱"
+    code: |-
+      def parseSimpleJSON(jsonStr):
+          jsonStr = jsonStr.strip()
+          if jsonStr.startswith('{') and jsonStr.endswith('}'):
+              content = jsonStr[1:-1]
+              result = {}
+              pairs = content.split(',')
+              for pair in pairs:
+                  if ':' in pair:
+                      key, val = pair.split(':', 1)
+                      key = key.strip().strip('"')
+                      val = val.strip().strip('"')
+                      try:
+                          val = int(val)
+                      except ValueError:
+                          pass
+                      result[key] = val
+              return result
+          return None
+
+      parseSimpleJSON('{"name":"Alice","age":"25"}')
+
+  - type: "expansion"
+    title: "🔴 심화2: 메모이제이션"
+    code: |-
+      def memoize(func):
+          cache = {}
+          def wrapper(n):
+              if n not in cache:
+                  cache[n] = func(n)
+              return cache[n]
+          return wrapper
+
+      @memoize
+      def fib(n):
+          if n <= 1:
+              return n
+          return fib(n - 1) + fib(n - 2)
+
+      fib(10)
+
+  - type: "expansion"
+    title: "🔴 심화3: 단어 체인"
+    code: |-
+      def wordChain(words):
+          if not words:
+              return True
+          for i in range(len(words) - 1):
+              if words[i][-1] != words[i + 1][0]:
+                  return False
+          return True
+
+      wordChain(['apple', 'elephant', 'tiger', 'rabbit'])
+
+  - type: "expansion"
+    title: "🔴 심화4: 행렬 전치"
+    code: |-
+      def transpose(matrix):
+          if not matrix:
+              return []
+          rows = len(matrix)
+          cols = len(matrix[0])
+          result = []
+          for j in range(cols):
+              newRow = []
+              for i in range(rows):
+                  newRow.append(matrix[i][j])
+              result.append(newRow)
+          return result
+
+      mat = [[1, 2, 3], [4, 5, 6]]
+      transpose(mat)
+
+  - type: "expansion"
+    title: "🔴 심화5: 괄호 검증"
+    code: |-
+      def isValidParentheses(s):
+          stack = []
+          pairs = {'(': ')', '[': ']', '{': '}'}
+          for char in s:
+              if char in pairs:
+                  stack.append(char)
+              elif char in pairs.values():
+                  if not stack or pairs[stack.pop()] != char:
+                      return False
+          return len(stack) == 0
+
+      isValidParentheses('({[]})')
+
+  - type: "expansion"
+    title: "🔴 심화6: LRU 캐시"
+    code: |-
+      class LRUCache:
+          def __init__(self, capacity):
+              self.capacity = capacity
+              self.cache = {}
+              self.order = []
+
+          def get(self, key):
+              if key in self.cache:
+                  self.order.remove(key)
+                  self.order.append(key)
+                  return self.cache[key]
+              return -1
+
+          def put(self, key, value):
+              if key in self.cache:
+                  self.order.remove(key)
+              elif len(self.cache) >= self.capacity:
+                  oldest = self.order.pop(0)
+                  del self.cache[oldest]
+              self.cache[key] = value
+              self.order.append(key)
+
+      lru = LRUCache(2)
+      lru.put('a', 1)
+      lru.put('b', 2)
+      lru.get('a')
+
+  - type: "expansion"
+    title: "🔴 심화7: 표현식 계산기"
+    code: |-
+      def evaluate(expression):
+          tokens = expression.split()
+          stack = []
+          for token in tokens:
+              if token in ['+', '-', '*', '/']:
+                  b = stack.pop()
+                  a = stack.pop()
+                  if token == '+':
+                      stack.append(a + b)
+                  elif token == '-':
+                      stack.append(a - b)
+                  elif token == '*':
+                      stack.append(a * b)
+                  elif token == '/':
+                      stack.append(a / b)
+              else:
+                  stack.append(float(token))
+          return stack[0]
+
+      evaluate('3 4 + 2 *')
+
+  - type: "expansion"
+    title: "🔴 심화8: 최소 편집 거리"
+    code: |-
+      def editDistance(s1, s2):
+          m = len(s1)
+          n = len(s2)
+          dp = [[0] * (n + 1) for _ in range(m + 1)]
+          for i in range(m + 1):
+              dp[i][0] = i
+          for j in range(n + 1):
+              dp[0][j] = j
+          for i in range(1, m + 1):
+              for j in range(1, n + 1):
+                  if s1[i - 1] == s2[j - 1]:
+                      dp[i][j] = dp[i - 1][j - 1]
+                  else:
+                      dp[i][j] = 1 + min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1])
+          return dp[m][n]
+
+      editDistance('kitten', 'sitting')
+
+  - type: "expansion"
+    title: "🔴 심화9: 트리 순회"
+    code: |-
+      class TreeNode:
+          def __init__(self, val):
+              self.val = val
+              self.left = None
+              self.right = None
+
+      def inorderTraversal(root):
+          if root is None:
+              return []
+          result = []
+          result.extend(inorderTraversal(root.left))
+          result.append(root.val)
+          result.extend(inorderTraversal(root.right))
+          return result
+
+      tree = TreeNode(1)
+      tree.left = TreeNode(2)
+      tree.right = TreeNode(3)
+      inorderTraversal(tree)
+
+  - type: "expansion"
+    title: "🔴 심화10: 완성 축하"
+    code: |-
+      class PythonMaster:
+          def __init__(self, name):
+              self.name = name
+              self.skills = {
+                  'variables': True,
+                  'dataTypes': True,
+                  'operators': True,
+                  'strings': True,
+                  'lists': True,
+                  'tuples': True,
+                  'sets': True,
+                  'dicts': True,
+                  'conditionals': True,
+                  'loops': True,
+                  'functions': True,
+                  'classes': True,
+                  'files': True,
+                  'exceptions': True,
+                  'algorithms': True,
+                  'recursion': True
+              }
+
+          def celebrate(self):
+              completed = sum(1 for skill in self.skills.values() if skill)
+              total = len(self.skills)
+              return f'{self.name}: {completed}/{total} skills mastered!'
+
+      master = PythonMaster('You')
+      master.celebrate()

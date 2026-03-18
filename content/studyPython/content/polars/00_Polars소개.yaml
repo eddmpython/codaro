@@ -1,0 +1,245 @@
+meta:
+  id: polars_00
+  title: Polars소개
+  order: 0
+  category: polars
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags: ["Polars", "Rust", "DataFrame", "Lazy Evaluation", "병렬처리", "Apache Arrow"]
+  seo:
+    title: "Polars 입문 - Rust 기반 초고속 DataFrame"
+    description: "Polars로 초고속 데이터 처리를 경험하세요. Lazy Evaluation, 병렬 처리, Apache Arrow 기반의 현대적 DataFrame 라이브러리입니다."
+    keywords: ["Polars", "Rust", "DataFrame", "Lazy Evaluation", "병렬처리", "Apache Arrow", "pandas 대안"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "⚡"
+      title: "Polars??"
+      subtitle: "pandas 말고 뭐가 더 있어?"
+
+    - type: hero
+      emoji: "🦀"
+      title: "Rust 기반 초고속 DataFrame"
+      subtitle: "pandas보다 10~100배 빠른 데이터 처리"
+      points:
+        - emoji: "🚀"
+          title: "Rust로 작성된 초고속 엔진"
+        - emoji: "💤"
+          title: "Lazy Evaluation 쿼리 최적화"
+        - emoji: "🔄"
+          title: "자동 병렬 처리"
+        - emoji: "🏹"
+          title: "Apache Arrow 기반 메모리 효율"
+
+    - type: image
+      src: "https://raw.githubusercontent.com/pola-rs/polars-static/master/banner/polars_github_banner.svg"
+
+- id: why_polars
+  blocks:
+    - type: sectionHeader
+      title: "🤔 pandas로 충분하지 않나요?"
+      subtitle: "대용량 데이터에서의 한계"
+
+    - type: compare
+      left:
+        title: "pandas"
+        subtitle: "전통적인 방식"
+        icon: "🐼"
+        color: "gray"
+        items:
+          - "싱글 스레드 처리"
+          - "메모리 비효율적"
+          - "즉시 실행 (Eager)"
+          - "대용량에서 느려짐"
+          - "GIL 제한"
+        infoBox: "소규모 데이터에 적합"
+      right:
+        title: "Polars"
+        subtitle: "현대적인 방식"
+        icon: "⚡"
+        color: "green"
+        items:
+          - "자동 멀티스레딩"
+          - "Apache Arrow 메모리 효율"
+          - "Lazy Evaluation 최적화"
+          - "대용량에서도 빠름"
+          - "GIL 우회"
+        infoBox: "대용량 데이터에 최적"
+
+- id: key_features
+  blocks:
+    - type: sectionHeader
+      title: "🎯 Polars의 핵심 기능"
+      subtitle: "왜 Polars가 빠른가?"
+
+    - type: featureCards
+      cards:
+        - emoji: "💤"
+          title: "Lazy Evaluation"
+          description: "쿼리를 즉시 실행하지 않고 최적화 후 실행. 불필요한 연산 제거"
+        - emoji: "🔄"
+          title: "병렬 처리"
+          description: "멀티코어 CPU 자동 활용. GIL 없이 진정한 병렬 처리"
+        - emoji: "🏹"
+          title: "Apache Arrow"
+          description: "제로카피 데이터 공유. 메모리 효율 극대화"
+        - emoji: "🎨"
+          title: "표현식 API"
+          description: "직관적이고 읽기 쉬운 메서드 체이닝"
+
+- id: expression_api
+  blocks:
+    - type: sectionHeader
+      title: "📝 표현식 API"
+      subtitle: "직관적인 데이터 처리 문법"
+
+    - type: note
+      style: info
+      title: "Polars의 강점"
+      content: "Polars는 표현식 기반 API를 제공합니다. select, filter, groupBy, agg 등을 체이닝하여 복잡한 데이터 처리도 읽기 쉽게 작성할 수 있습니다."
+
+    - type: featureCards
+      cards:
+        - emoji: "🔍"
+          title: "select"
+          description: "컬럼 선택 및 변환"
+        - emoji: "🎯"
+          title: "filter"
+          description: "조건에 맞는 행 필터링"
+        - emoji: "📊"
+          title: "groupBy"
+          description: "그룹별 집계"
+        - emoji: "🔗"
+          title: "join"
+          description: "테이블 결합"
+
+- id: lazy_vs_eager
+  blocks:
+    - type: sectionHeader
+      title: "💤 Lazy vs Eager"
+      subtitle: "두 가지 실행 모드"
+
+    - type: compare
+      left:
+        title: "Eager Mode"
+        subtitle: "즉시 실행"
+        icon: "▶️"
+        color: "blue"
+        items:
+          - "코드 작성 즉시 실행"
+          - "결과 바로 확인"
+          - "디버깅에 편리"
+          - "소규모 데이터에 적합"
+        infoBox: "pl.read_csv()"
+      right:
+        title: "Lazy Mode"
+        subtitle: "최적화 후 실행"
+        icon: "💤"
+        color: "green"
+        items:
+          - "collect() 호출 시 실행"
+          - "쿼리 플랜 최적화"
+          - "불필요한 연산 제거"
+          - "대용량 데이터에 최적"
+        infoBox: "pl.scan_csv()"
+
+    - type: note
+      style: tip
+      title: "Lazy 우선 권장"
+      content: "대용량 데이터를 다룰 때는 scan_csv로 Lazy하게 읽고, 필요한 연산을 정의한 후 collect()로 실행하세요. 쿼리 최적화로 성능이 크게 향상됩니다."
+
+- id: projects_preview
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 10개 프로젝트 미리보기"
+      subtitle: "이 순서대로 배웁니다"
+
+    - type: table
+      headers: ["단계", "프로젝트", "배울 내용"]
+      rows:
+        - ["입문", "01 영화데이터분석", "기본 문법, read/scan, select, filter"]
+        - ["입문", "02 날씨데이터분석", "groupBy, agg, 정렬, 통계 함수"]
+        - ["기초", "03 게임데이터분석", "표현식 심화, withColumns, alias"]
+        - ["기초", "04 주식데이터분석", "시계열, 윈도우 함수, rolling"]
+        - ["기초", "05 음악데이터분석", "문자열 처리, 조건부 컬럼"]
+        - ["중급", "06 부동산데이터분석", "join, concat, 복합 집계"]
+        - ["중급", "07 스포츠데이터분석", "pivot, melt, 데이터 변환"]
+        - ["중급", "08 소셜미디어분석", "Lazy 최적화, 쿼리 플랜"]
+        - ["심화", "09 대용량처리", "파티셔닝, 스트리밍, 성능 튜닝"]
+        - ["심화", "10 종합프로젝트", "전체 개념 종합 활용"]
+
+    - type: note
+      style: info
+      title: "프로젝트 기반 학습"
+      content: "각 프로젝트는 완성된 결과물을 만듭니다. 개념만 배우는 게 아니라 실제 분석을 수행합니다."
+
+- id: pyodide_support
+  blocks:
+    - type: sectionHeader
+      title: "🌐 브라우저에서도 동작"
+      subtitle: "Pyodide 지원"
+
+    - type: note
+      style: tip
+      title: "pyodide에서 Polars 사용"
+      content: "Polars는 WebAssembly로 컴파일되어 브라우저에서도 동작합니다. 별도 서버 없이 웹에서 대용량 데이터 분석이 가능합니다."
+
+    - type: featureCards
+      cards:
+        - emoji: "🌐"
+          title: "브라우저 실행"
+          description: "서버 없이 웹에서 바로 실행"
+        - emoji: "📦"
+          title: "WASM 컴파일"
+          description: "Rust에서 WebAssembly로 빌드"
+        - emoji: "⚡"
+          title: "네이티브급 성능"
+          description: "브라우저에서도 빠른 처리"
+
+- id: comparison_table
+  blocks:
+    - type: sectionHeader
+      title: "📊 DataFrame 라이브러리 비교"
+      subtitle: "어떤 상황에 어떤 도구?"
+
+    - type: table
+      headers: ["라이브러리", "특징", "추천 상황"]
+      rows:
+        - ["pandas", "가장 널리 사용, 풍부한 생태계", "소규모 데이터, 빠른 프로토타이핑"]
+        - ["Polars", "초고속, Lazy Evaluation", "대용량 데이터, 성능 중요"]
+        - ["DuckDB", "SQL 기반, OLAP 특화", "분석 쿼리, SQL 선호"]
+        - ["Dask", "분산 처리, pandas 호환", "클러스터, 분산 환경"]
+        - ["Vaex", "아웃오브코어, 대용량", "메모리 초과 데이터"]
+
+    - type: note
+      style: info
+      title: "pandas 지식 활용"
+      content: "Polars API는 pandas와 유사합니다. pandas를 알고 있다면 Polars 학습이 훨씬 수월합니다."
+
+- id: resources
+  blocks:
+    - type: sectionHeader
+      title: "📚 참고 자료"
+      subtitle: "더 깊이 공부하고 싶다면"
+
+    - type: links
+      items:
+        - text: Polars 공식 문서
+          url: https://docs.pola.rs/
+          icon: "🔗"
+        - text: Polars User Guide
+          url: https://docs.pola.rs/user-guide/
+          icon: "🔗"
+        - text: Polars Cheat Sheet
+          url: https://franzdiebold.github.io/polars-cheat-sheet/Polars_cheat_sheet.pdf
+          icon: "🔗"
+
+- id: next
+  blocks:
+    - type: hero
+      emoji: "👉"
+      title: "다음: 영화 데이터 분석"
+      subtitle: "Polars 기본 문법으로 영화 데이터를 분석합니다"

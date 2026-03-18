@@ -1,0 +1,433 @@
+meta:
+  id: "day26"
+  title: "컴프리헨션"
+  day: 26
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 컴프리헨션 - 간결한 데이터 구조 생성"
+    description: "리스트, 딕셔너리, 집합 컴프리헨션으로 간결하고 효율적인 코드를 작성합니다."
+    keywords: ['컴프리헨션', 'list comprehension', 'dict comprehension', 'set comprehension']
+
+intro:
+  emoji: "🔄"
+  points:
+  - "리스트 컴프리헨션으로 간결한 코드"
+  - "딕셔너리 컴프리헨션으로 변환"
+  - "집합 컴프리헨션으로 중복 제거"
+  - "중첩 컴프리헨션으로 다차원 처리"
+
+sections:
+- id: "list_comprehension_basic"
+  title: "리스트 컴프리헨션 기초"
+  subtitle: "간결한 리스트 생성"
+  blocks:
+  - type: "text"
+    content: "리스트 컴프리헨션은 for 반복문을 한 줄로 압축하여 새로운 리스트를 만드는 방법입니다. [표현식 for 변수 in 시퀀스] 형태로 작성하며, 기존 반복문보다 간결하고 읽기 쉬운 코드를 만들 수 있습니다. 파이썬스러운 코드 작성의 핵심 기법입니다."
+  - type: "list"
+    items:
+    - "[표현식 for 변수 in 시퀀스] 형식"
+    - "한 줄로 리스트 생성"
+    - "반복문보다 간결"
+    - "파이썬스러운 코드"
+  - type: "code"
+    language: "python"
+    title: "기본 컴프리헨션"
+    description: "리스트의 각 요소를 제곱합니다."
+    content: |-
+      nums = [1, 2, 3, 4, 5]
+      squared = [x ** 2 for x in nums]
+      squared
+  - type: "code"
+    language: "python"
+    title: "문자열 변환"
+    description: "문자열 리스트를 모두 대문자로 변환합니다."
+    content: |-
+      words = ['hello', 'world', 'python']
+      upper = [w.upper() for w in words]
+      upper
+  - type: "code"
+    language: "python"
+    title: "계산 결과"
+    description: "범위의 각 수에 10을 곱합니다."
+    content: |-
+      multiplied = [n * 10 for n in range(5)]
+      multiplied
+  - type: "tip"
+    content: "리스트 컴프리헨션은 간결하지만, 너무 복잡하면 가독성이 떨어지니 적절히 사용하세요."
+
+- id: "list_comprehension_condition"
+  title: "조건부 컴프리헨션"
+  subtitle: "필터링과 조건문"
+  blocks:
+  - type: "text"
+    content: "리스트 컴프리헨션에 if 조건을 추가하여 특정 요소만 선택할 수 있습니다. [표현식 for 변수 in 시퀀스 if 조건] 형태로 작성하며, 조건을 만족하는 요소만 결과에 포함됩니다. 필터링과 변환을 동시에 수행할 수 있어 매우 강력합니다."
+  - type: "list"
+    items:
+    - "[표현식 for 변수 in 시퀀스 if 조건]"
+    - "조건 만족 요소만 포함"
+    - "필터링과 변환 동시 수행"
+    - "깔끔한 데이터 처리"
+  - type: "code"
+    language: "python"
+    title: "짝수 필터링"
+    description: "짝수만 선택하여 리스트를 만듭니다."
+    content: |-
+      range10 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      evens = [n for n in range10 if n % 2 == 0]
+      evens
+  - type: "code"
+    language: "python"
+    title: "길이 조건"
+    description: "특정 길이 이상인 문자열만 선택합니다."
+    content: |-
+      texts = ['a', 'ab', 'abc', 'abcd']
+      long = [t for t in texts if len(t) >= 3]
+      long
+  - type: "code"
+    language: "python"
+    title: "필터링과 변환"
+    description: "양수만 선택하여 제곱합니다."
+    content: |-
+      values = [-2, -1, 0, 1, 2, 3]
+      positiveSquares = [v ** 2 for v in values if v > 0]
+      positiveSquares
+  - type: "tip"
+    content: "if-else를 사용하려면 [표현식1 if 조건 else 표현식2 for 변수 in 시퀀스] 형태로 작성합니다."
+
+- id: "list_comprehension_advanced"
+  title: "고급 리스트 컴프리헨션"
+  subtitle: "복잡한 표현식과 다중 조건"
+  blocks:
+  - type: "text"
+    content: "리스트 컴프리헨션은 복잡한 표현식, if-else 구문, 다중 조건을 모두 지원합니다. 삼항 연산자를 활용하거나 여러 조건을 and/or로 연결할 수 있습니다. 다만 너무 복잡해지면 일반 반복문이 더 읽기 쉬울 수 있습니다."
+  - type: "list"
+    items:
+    - "if-else 삼항 연산자"
+    - "다중 조건 결합"
+    - "복잡한 표현식"
+    - "가독성 고려 필수"
+  - type: "code"
+    language: "python"
+    title: "if-else 사용"
+    description: "홀수는 그대로, 짝수는 2배로 만듭니다."
+    content: |-
+      data = [1, 2, 3, 4, 5]
+      result = [x if x % 2 == 1 else x * 2 for x in data]
+      result
+  - type: "code"
+    language: "python"
+    title: "다중 조건"
+    description: "여러 조건을 만족하는 요소만 선택합니다."
+    content: |-
+      scores = [45, 55, 65, 75, 85, 95]
+      passing = [s for s in scores if s >= 60 and s < 80]
+      passing
+  - type: "code"
+    language: "python"
+    title: "메서드 체이닝"
+    description: "여러 메서드를 연결하여 변환합니다."
+    content: |-
+      items = ['  Hello  ', '  World  ', '  Python  ']
+      cleaned = [item.strip().lower() for item in items]
+      cleaned
+  - type: "tip"
+    content: "한 줄이 너무 길어지면 괄호 안에서 여러 줄로 나눌 수 있습니다."
+
+- id: "dict_comprehension"
+  title: "딕셔너리 컴프리헨션"
+  subtitle: "딕셔너리 생성과 변환"
+  blocks:
+  - type: "text"
+    content: "딕셔너리 컴프리헨션은 리스트 컴프리헨션과 비슷하지만 중괄호를 사용하고 key: value 쌍을 생성합니다. {key: value for 변수 in 시퀀스} 형태로 작성하며, 기존 데이터를 딕셔너리로 변환하거나 딕셔너리를 필터링할 때 유용합니다."
+  - type: "list"
+    items:
+    - "{key: value for 변수 in 시퀀스}"
+    - "key-value 쌍 생성"
+    - "딕셔너리 변환과 필터링"
+    - "간결한 매핑 생성"
+  - type: "code"
+    language: "python"
+    title: "기본 딕셔너리 생성"
+    description: "숫자와 그 제곱을 매핑합니다."
+    content: |-
+      squares = {n: n ** 2 for n in range(5)}
+      squares
+  - type: "code"
+    language: "python"
+    title: "리스트를 딕셔너리로"
+    description: "문자열 리스트를 길이와 매핑합니다."
+    content: |-
+      terms = ['cat', 'dog', 'elephant']
+      lengths = {w: len(w) for w in terms}
+      lengths
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 필터링"
+    description: "조건을 만족하는 항목만 선택합니다."
+    content: |-
+      prices = {'apple': 100, 'banana': 50, 'cherry': 200}
+      expensive = {k: v for k, v in prices.items() if v >= 100}
+      expensive
+  - type: "tip"
+    content: "딕셔너리 컴프리헨션으로 두 리스트를 zip과 함께 사용하면 매핑을 쉽게 만들 수 있습니다."
+
+- id: "set_comprehension"
+  title: "집합 컴프리헨션"
+  subtitle: "중복 없는 집합 생성"
+  blocks:
+  - type: "text"
+    content: "집합 컴프리헨션은 중괄호를 사용하지만 key: value가 아닌 단일 값만 생성합니다. {표현식 for 변수 in 시퀀스} 형태로 작성하며, 자동으로 중복이 제거된 집합을 만듭니다. 유일한 값만 필요할 때 매우 유용합니다."
+  - type: "list"
+    items:
+    - "{표현식 for 변수 in 시퀀스}"
+    - "중복 자동 제거"
+    - "순서 없는 집합"
+    - "유일한 값 추출"
+  - type: "code"
+    language: "python"
+    title: "중복 제거"
+    description: "리스트에서 중복을 제거한 집합을 만듭니다."
+    content: |-
+      digits = [1, 2, 2, 3, 3, 3, 4, 4, 5]
+      unique = {n for n in digits}
+      unique
+  - type: "code"
+    language: "python"
+    title: "변환 후 중복 제거"
+    description: "문자열 길이를 집합으로 만듭니다."
+    content: |-
+      strings = ['a', 'ab', 'abc', 'ab', 'a']
+      uniqueLengths = {len(w) for w in strings}
+      uniqueLengths
+  - type: "code"
+    language: "python"
+    title: "조건부 집합"
+    description: "조건을 만족하는 유일한 값만 선택합니다."
+    content: |-
+      amounts = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      evenSet = {v for v in amounts if v % 2 == 0}
+      evenSet
+  - type: "tip"
+    content: "집합 컴프리헨션과 딕셔너리 컴프리헨션은 중괄호로 구분이 어려우니 : 유무로 판단하세요."
+
+- id: "nested_comprehension"
+  title: "중첩 컴프리헨션"
+  subtitle: "다차원 데이터 처리"
+  blocks:
+  - type: "text"
+    content: "중첩 컴프리헨션은 여러 개의 for 문을 하나의 컴프리헨션에 작성하는 것입니다. 2차원 리스트를 평탄화하거나, 중첩 반복문을 간결하게 표현할 때 사용합니다. 다만 너무 복잡하면 가독성이 떨어지므로 2중 정도까지만 사용하는 것이 좋습니다."
+  - type: "list"
+    items:
+    - "여러 for 문 연결"
+    - "2차원 데이터 처리"
+    - "평탄화와 조합"
+    - "가독성 주의 필요"
+  - type: "code"
+    language: "python"
+    title: "2차원 리스트 평탄화"
+    description: "중첩 리스트를 1차원으로 만듭니다."
+    content: |-
+      matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      flat = [num for row in matrix for num in row]
+      flat
+  - type: "code"
+    language: "python"
+    title: "좌표 생성"
+    description: "두 범위의 모든 조합을 만듭니다."
+    content: |-
+      coords = [(x, y) for x in range(3) for y in range(3)]
+      coords
+  - type: "code"
+    language: "python"
+    title: "조건부 중첩"
+    description: "중첩 컴프리헨션에 조건을 추가합니다."
+    content: |-
+      pairs = [(a, b) for a in range(1, 5) for b in range(1, 5) if a < b]
+      pairs
+  - type: "tip"
+    content: "중첩 컴프리헨션의 for 순서는 일반 중첩 반복문과 같습니다. 왼쪽이 바깥쪽 반복문입니다."
+
+- id: "comprehension_practice"
+  title: "컴프리헨션 실전"
+  subtitle: "실용적인 활용 패턴"
+  blocks:
+  - type: "text"
+    content: "컴프리헨션은 데이터 변환, 필터링, 집계 등 다양한 실무 작업을 간결하게 처리할 수 있습니다. 리스트 처리, 딕셔너리 변환, 데이터 정제 등에서 자주 사용되는 패턴을 익히면 효율적인 코드를 작성할 수 있습니다."
+  - type: "list"
+    items:
+    - "데이터 변환과 정제"
+    - "필터링과 매핑"
+    - "중복 제거와 집계"
+    - "실무 패턴 활용"
+  - type: "code"
+    language: "python"
+    title: "데이터 정제"
+    description: "공백을 제거하고 소문자로 변환합니다."
+    content: |-
+      rawData = ['  Apple  ', '  BANANA  ', '  Cherry  ']
+      trimmed = [d.strip().lower() for d in rawData]
+      trimmed
+  - type: "code"
+    language: "python"
+    title: "점수 등급 변환"
+    description: "점수를 등급으로 변환합니다."
+    content: |-
+      marks = [95, 87, 72, 65, 58]
+      grades = ['A' if s >= 90 else 'B' if s >= 80 else 'C' if s >= 70 else 'D' if s >= 60 else 'F' for s in marks]
+      grades
+  - type: "code"
+    language: "python"
+    title: "키워드 추출"
+    description: "특정 접두사로 시작하는 단어만 추출합니다."
+    content: |-
+      tags = ['python', 'javascript', 'java', 'ruby', 'rust']
+      jTags = [t for t in tags if t.startswith('j')]
+      jTags
+  - type: "tip"
+    content: "컴프리헨션은 강력하지만, 복잡한 로직은 일반 반복문이 더 명확할 수 있습니다."
+
+- id: "practice"
+  title: "Day 26 종합 복습"
+  subtitle: "컴프리헨션 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 26에서 배운 컴프리헨션을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 리스트 변환"
+    code: |-
+      baseNums = [1, 2, 3, 4, 5]
+      doubled = [n * 2 for n in baseNums]
+      doubled
+
+  - type: "expansion"
+    title: "🟢 기본2: 문자열 변환"
+    code: |-
+      labels = ['hello', 'world']
+      caps = [w.upper() for w in labels]
+      caps
+
+  - type: "expansion"
+    title: "🟢 기본3: 범위 리스트"
+    code: |-
+      sqList = [i ** 2 for i in range(10)]
+      sqList
+
+  - type: "expansion"
+    title: "🟢 기본4: 딕셔너리 생성"
+    code: |-
+      integers = [1, 2, 3, 4, 5]
+      cubes = {n: n ** 3 for n in integers}
+      cubes
+
+  - type: "expansion"
+    title: "🟢 기본5: 집합 중복 제거"
+    code: |-
+      elements = [1, 2, 2, 3, 3, 3]
+      uniqueItems = {i for i in elements}
+      uniqueItems
+
+  - type: "expansion"
+    title: "🟡 응용1: 조건부 필터링"
+    code: |-
+      numbers = [10, 15, 20, 25, 30]
+      filtered = [v for v in numbers if v >= 20]
+      filtered
+
+  - type: "expansion"
+    title: "🟡 응용2: if-else 변환"
+    code: |-
+      sequence = [1, 2, 3, 4, 5, 6]
+      transformed = ['even' if n % 2 == 0 else 'odd' for n in sequence]
+      transformed
+
+  - type: "expansion"
+    title: "🟡 응용3: 딕셔너리 필터링"
+    code: |-
+      ages = {'Alice': 25, 'Bob': 17, 'Charlie': 30}
+      adults = {k: v for k, v in ages.items() if v >= 18}
+      adults
+
+  - type: "expansion"
+    title: "🟡 응용4: 문자열 길이 매핑"
+    code: |-
+      fruits = ['apple', 'banana', 'cherry']
+      fruitLengths = {f: len(f) for f in fruits}
+      fruitLengths
+
+  - type: "expansion"
+    title: "🟡 응용5: 중첩 평탄화"
+    code: |-
+      nested = [[1, 2], [3, 4], [5, 6]]
+      flatList = [n for sublist in nested for n in sublist]
+      flatList
+
+  - type: "expansion"
+    title: "🔴 심화1: 복합 조건 필터링"
+    code: |-
+      dataset = [5, 12, 18, 23, 30, 35]
+      selected = [d for d in dataset if d > 10 and d < 30]
+      selected
+
+  - type: "expansion"
+    title: "🔴 심화2: 다중 변환"
+    code: |-
+      messages = ['  HELLO  ', '  world  ', '  PYTHON  ']
+      normalized = [t.strip().lower() for t in messages]
+      normalized
+
+  - type: "expansion"
+    title: "🔴 심화3: 딕셔너리 값 변환"
+    code: |-
+      costs = {'apple': 100, 'banana': 50, 'cherry': 150}
+      discounted = {k: v * 0.9 for k, v in costs.items()}
+      discounted
+
+  - type: "expansion"
+    title: "🔴 심화4: 조건부 딕셔너리"
+    code: |-
+      exams = {'math': 85, 'english': 92, 'science': 78}
+      highScores = {k: v for k, v in exams.items() if v >= 80}
+      highScores
+
+  - type: "expansion"
+    title: "🔴 심화5: 좌표 조합"
+    code: |-
+      points = [(x, y) for x in range(3) for y in range(3) if x != y]
+      points
+
+  - type: "expansion"
+    title: "🔴 심화6: 단어 필터링"
+    code: |-
+      sentence = 'the quick brown fox jumps over the lazy dog'
+      longWords = [w for w in sentence.split() if len(w) > 3]
+      longWords
+
+  - type: "expansion"
+    title: "🔴 심화7: 중첩 변환"
+    code: |-
+      grid = [[1, 2, 3], [4, 5, 6]]
+      doubledGrid = [[n * 2 for n in row] for row in grid]
+      doubledGrid
+
+  - type: "expansion"
+    title: "🔴 심화8: 집합 조건부"
+    code: |-
+      vals = [1, 2, 3, 4, 5, 6, 7, 8]
+      oddSet = {n for n in vals if n % 2 == 1}
+      oddSet
+
+  - type: "expansion"
+    title: "🔴 심화9: 키-값 교환"
+    code: |-
+      original = {'a': 1, 'b': 2, 'c': 3}
+      swapped = {v: k for k, v in original.items()}
+      swapped
+
+  - type: "expansion"
+    title: "🔴 심화10: 복합 평탄화"
+    code: |-
+      nestedData = [[[1, 2], [3, 4]], [[5, 6], [7, 8]]]
+      flattened = [num for outer in nestedData for inner in outer for num in inner]
+      flattened

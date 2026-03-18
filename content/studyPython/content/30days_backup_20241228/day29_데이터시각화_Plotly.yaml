@@ -1,0 +1,465 @@
+meta:
+  id: day29
+  title: 데이터시각화 Plotly
+  day: 29
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 데이터 시각화 Plotly"
+    description: "Plotly로 인터랙티브 차트를 만드는 방법."
+    keywords: ['시각화', 'Plotly', '차트']
+intro:
+  emoji: "📈"
+  points:
+  - Plotly 소개와 설치
+  - 선 그래프와 막대 그래프
+  - 산점도와 히스토그램
+  - 원형 차트와 박스 플롯
+  - 히트맵과 서브플롯
+  - 인터랙티브 기능
+  - 실전 대시보드
+sections:
+- id: imports
+  title: 라이브러리 준비
+  subtitle: Plotly 모듈 불러오기
+  blocks:
+  - type: text
+    content: Plotly를 사용하기 전에 필요한 모듈을 불러옵니다. plotly.express는 간편한 시각화를 위한 고수준 API이고, plotly.graph_objects는 세밀한 제어를 위한 저수준 API입니다. subplots는 여러 그래프를 한 화면에 배치할 때 사용합니다. numpy와 pandas는 데이터 생성과 처리에 필요합니다.
+  - type: list
+    items:
+    - "plotly.express - 간편한 차트 생성"
+    - "plotly.graph_objects - 세밀한 제어"
+    - "plotly.subplots - 다중 그래프 배치"
+    - "numpy, pandas - 데이터 처리"
+  - type: code
+    language: python
+    title: 모듈 불러오기
+    description: Plotly와 데이터 처리 라이브러리를 불러옵니다.
+    content: |-
+      import plotly.express as px
+      import plotly.graph_objects as go
+      from plotly.subplots import make_subplots
+      import numpy as np
+      import pandas as pd
+  - type: tip
+    content: "pip install plotly numpy pandas로 설치하세요."
+
+- id: plotly_intro
+  title: Plotly 소개
+  subtitle: 인터랙티브 시각화
+  blocks:
+  - type: text
+    content: Plotly는 인터랙티브 차트를 만드는 Python 라이브러리입니다. Interactive는 상호작용이 가능하다는 뜻으로, 마우스로 확대하거나 축소하고 데이터 위에 마우스를 올리면 상세 정보를 볼 수 있습니다. 웹 브라우저에서 바로 확인할 수 있어 보고서나 대시보드 제작에 매우 유용합니다. Matplotlib 같은 정적 차트와 달리 사용자가 직접 조작할 수 있어 데이터 탐색에 효과적입니다.
+  - type: list
+    items:
+    - 인터랙티브 차트 생성 (확대, 축소, 호버)
+    - 다양한 차트 타입 지원
+    - 웹 브라우저에서 바로 확인
+    - plotly.express로 간편 사용
+  - type: code
+    language: python
+    title: 첫 Plotly 그래프
+    description: 간단한 선 그래프를 만들어봅니다.
+    content: |-
+      introX = [1, 2, 3, 4, 5]
+      introY = [2, 4, 6, 8, 10]
+
+      introFig = px.line(x=introX, y=introY, title="첫 Plotly 그래프")
+      introFig.update_layout(template='plotly_white')
+      introFig.show()
+  - type: tip
+    content: "Jupyter나 marimo에서 바로 확인 가능합니다. 브라우저에서 그래프를 클릭하고 드래그해보세요."
+
+- id: line_chart
+  title: 선 그래프
+  subtitle: 시간에 따른 변화 표현
+  blocks:
+  - type: text
+    content: px.line()으로 선 그래프를 만듭니다. Line은 선이라는 뜻으로, 점들을 선으로 연결하여 시간의 흐름이나 연속적인 변화를 보여주는 가장 기본적인 그래프입니다. labels 파라미터로 축 이름을 지정하고, update_traces로 선의 색상과 두께를 변경할 수 있습니다. 주식 차트, 기온 변화, 성장 추이 등을 표현할 때 주로 사용합니다.
+  - type: list
+    items:
+    - "px.line() - 선 그래프 생성"
+    - "labels - 축 레이블 지정"
+    - "update_traces - 선 스타일 수정"
+    - "template - 전체 테마 설정"
+  - type: code
+    language: python
+    title: 온도 변화 그래프
+    description: 일주일간 온도 변화를 선 그래프로 표현합니다.
+    content: |-
+      lineDays = ['월', '화', '수', '목', '금', '토', '일']
+      lineTemperature = [22, 25, 23, 27, 24, 26, 28]
+
+      lineFig = px.line(x=lineDays, y=lineTemperature,
+                    title="일주일간 온도 변화",
+                    labels={'x': '요일', 'y': '온도(°C)'})
+
+      lineFig.update_traces(line=dict(color='red', width=3))
+      lineFig.update_layout(template='plotly_white')
+      lineFig.show()
+
+- id: bar_chart
+  title: 막대 그래프
+  subtitle: 카테고리별 비교
+  blocks:
+  - type: text
+    content: px.bar()로 막대 그래프를 만듭니다. Bar는 막대라는 뜻으로, 서로 다른 카테고리의 값을 비교할 때 가장 효과적입니다. color 파라미터로 값에 따라 색상을 다르게 표현할 수 있고, texttemplate로 막대 위에 정확한 수치를 표시할 수 있습니다. 판매량 비교, 점수 비교, 인구 비교 등에 사용합니다.
+  - type: list
+    items:
+    - "px.bar() - 세로 막대 그래프"
+    - "orientation='h' - 가로 막대로 변경"
+    - "color - 값에 따른 색상 설정"
+    - "texttemplate - 막대 위 값 표시"
+  - type: code
+    language: python
+    title: 과목별 성적
+    description: 과목별 점수를 막대 그래프로 비교합니다.
+    content: |-
+      barSubjects = ['수학', '영어', '과학', '국어', '사회']
+      barScores = [85, 92, 78, 88, 90]
+
+      barFig = px.bar(x=barSubjects, y=barScores,
+                   title="과목별 성적",
+                   labels={'x': '과목', 'y': '점수'},
+                   color=barScores,
+                   color_continuous_scale='viridis')
+
+      barFig.update_traces(texttemplate='%{y}점', textposition='outside')
+      barFig.update_layout(template='plotly_white')
+      barFig.show()
+
+- id: scatter_plot
+  title: 산점도
+  subtitle: 두 변수의 관계 발견
+  blocks:
+  - type: text
+    content: px.scatter()로 산점도를 만듭니다. Scatter는 흩뿌리다라는 뜻으로, 점들을 평면에 흩뿌려놓은 것처럼 보입니다. 두 변수 사이의 관계를 한눈에 볼 수 있어 상관관계 분석에 유용합니다. 점들이 일정한 패턴을 보이면 두 변수 사이에 관계가 있다는 것을 의미합니다. 공부시간과 성적, 키와 몸무게, 기온과 아이스크림 판매량 같은 관계를 분석할 때 사용합니다.
+  - type: list
+    items:
+    - "px.scatter() - 산점도 생성"
+    - "size - 점의 크기 조절"
+    - "color - 점의 색상 설정"
+    - "trendline - 추세선 추가"
+  - type: code
+    language: python
+    title: 공부시간과 성적
+    description: 공부시간과 성적의 상관관계를 산점도로 확인합니다.
+    content: |-
+      scatterHours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      scatterScores = [45, 55, 60, 70, 75, 80, 85, 90, 92, 95]
+
+      scatterFig = px.scatter(x=scatterHours, y=scatterScores,
+                       title="공부시간 vs 성적",
+                       labels={'x': '공부시간(시간)', 'y': '성적(점)'},
+                       color=scatterScores,
+                       color_continuous_scale='blues')
+
+      scatterFig.update_layout(template='plotly_white')
+      scatterFig.show()
+
+- id: histogram
+  title: 히스토그램
+  subtitle: 데이터 분포 확인
+  blocks:
+  - type: text
+    content: px.histogram()으로 히스토그램을 만듭니다. Histogram은 데이터를 구간별로 나누어 각 구간에 속하는 데이터 개수를 막대로 표현한 그래프입니다. 데이터가 어떤 범위에 몰려있는지 분포를 확인할 수 있어 통계 분석의 기본이 됩니다. nbins 파라미터로 구간 개수를 조절하고, add_vline으로 평균이나 중앙값 같은 기준선을 추가할 수 있습니다.
+  - type: list
+    items:
+    - "px.histogram() - 히스토그램 생성"
+    - "nbins - 구간 개수 설정"
+    - "add_vline - 수직선 추가"
+    - 데이터 분포와 정규분포 확인
+  - type: code
+    language: python
+    title: 학생 키 분포
+    description: 학생들의 키 분포를 히스토그램으로 확인합니다.
+    content: |-
+      np.random.seed(42)
+      histHeights = np.random.normal(170, 10, 100)
+
+      histFig = px.histogram(x=histHeights,
+                         title="학생들의 키 분포",
+                         labels={'x': '키(cm)', 'y': '학생 수'},
+                         nbins=20)
+
+      histFig.add_vline(x=np.mean(histHeights), line_dash="dash",
+                    annotation_text=f"평균: {np.mean(histHeights):.1f}cm")
+
+      histFig.update_layout(template='plotly_white')
+      histFig.show()
+
+- id: pie_chart
+  title: 원형 차트
+  subtitle: 비율 표현
+  blocks:
+  - type: text
+    content: px.pie()로 원형 차트를 만듭니다. Pie는 파이라는 뜻으로, 원을 조각 파이처럼 나누어 전체에서 각 부분이 차지하는 비율을 직관적으로 보여줍니다. values 파라미터로 각 항목의 값을, names로 항목 이름을 지정합니다. hole 파라미터를 추가하면 가운데가 뚫린 도넛 차트를 만들 수 있습니다. 시장 점유율, 예산 배분, 설문 결과 같은 비율 데이터를 표현할 때 효과적입니다.
+  - type: list
+    items:
+    - "px.pie() - 원형 차트 생성"
+    - "values - 각 항목의 값"
+    - "names - 항목 이름 레이블"
+    - "hole - 도넛 차트 만들기"
+  - type: code
+    language: python
+    title: 취미 선호도
+    description: 취미별 선호도 비율을 원형 차트로 표현합니다.
+    content: |-
+      pieHobbies = ['독서', '영화감상', '운동', '게임', '음악감상']
+      pieCounts = [25, 30, 20, 15, 10]
+
+      pieFig = px.pie(values=pieCounts, names=pieHobbies,
+                   title="취미 선호도 분포")
+
+      pieFig.update_traces(textposition='inside', textinfo='percent+label')
+      pieFig.update_layout(template='plotly_white')
+      pieFig.show()
+
+- id: box_plot
+  title: 박스 플롯
+  subtitle: 분포와 이상치 분석
+  blocks:
+  - type: text
+    content: px.box()로 박스 플롯을 만듭니다. Box는 상자라는 뜻으로, 상자 모양으로 데이터의 분포를 표현합니다. 중앙값을 중심으로 데이터의 25%, 50%, 75% 지점(사분위수)을 보여주고, 상자 밖의 점들은 이상치로 표시합니다. 여러 그룹의 데이터를 비교할 때 각 그룹의 분포를 한눈에 파악할 수 있어 통계 분석에 자주 사용됩니다.
+  - type: list
+    items:
+    - "px.box() - 박스 플롯 생성"
+    - 중앙값과 사분위수 자동 계산
+    - 이상치 자동 탐지 및 표시
+    - 여러 그룹 동시 비교 가능
+  - type: code
+    language: python
+    title: 반별 점수 분포
+    description: 세 반의 점수 분포를 박스 플롯으로 비교합니다.
+    content: |-
+      np.random.seed(42)
+      boxClassA = np.random.normal(80, 10, 30)
+      boxClassB = np.random.normal(75, 15, 30)
+      boxClassC = np.random.normal(85, 8, 30)
+
+      boxData = pd.DataFrame({
+          'score': np.concatenate([boxClassA, boxClassB, boxClassC]),
+          'class': ['A반']*30 + ['B반']*30 + ['C반']*30
+      })
+
+      boxFig = px.box(boxData, x='class', y='score',
+                   title="반별 수학 점수 분포",
+                   color='class')
+
+      boxFig.update_layout(template='plotly_white')
+      boxFig.show()
+
+- id: heatmap
+  title: 히트맵
+  subtitle: 색상으로 데이터 강도 표현
+  blocks:
+  - type: text
+    content: px.imshow()로 히트맵을 만듭니다. Heat는 열이라는 뜻으로, 열화상 카메라처럼 데이터의 크기를 색상의 진하기로 표현합니다. 숫자가 크면 진한 색, 작으면 연한 색으로 표시되어 데이터의 패턴을 시각적으로 쉽게 발견할 수 있습니다. color_continuous_scale로 색상 조합을 선택하고, text_auto로 각 칸에 숫자를 표시할 수 있습니다. 시간대별 트래픽, 상관관계 행렬, 지역별 매출 같은 2차원 데이터를 표현할 때 유용합니다.
+  - type: list
+    items:
+    - "px.imshow() - 히트맵 생성"
+    - "color_continuous_scale - 색상 조합 설정"
+    - "text_auto - 각 칸에 숫자 표시"
+    - 2차원 데이터 패턴 발견에 효과적
+  - type: code
+    language: python
+    title: 시간대별 방문객
+    description: 요일별 시간대별 카페 방문객을 히트맵으로 표현합니다.
+    content: |-
+      heatDays = ['월', '화', '수', '목', '금', '토', '일']
+      heatHours = ['9시', '12시', '15시', '18시', '21시']
+
+      np.random.seed(42)
+      heatVisitors = np.random.randint(10, 100, size=(7, 5))
+
+      heatFig = px.imshow(heatVisitors, x=heatHours, y=heatDays,
+                      title="시간대별 카페 방문객",
+                      color_continuous_scale='Blues',
+                      text_auto=True)
+
+      heatFig.update_layout(template='plotly_white')
+      heatFig.show()
+
+- id: subplots
+  title: 서브플롯
+  subtitle: 여러 그래프 배치
+  blocks:
+  - type: text
+    content: make_subplots()로 여러 그래프를 한 화면에 배치합니다. Subplot은 부분 플롯이라는 뜻으로, 큰 화면을 여러 칸으로 나누어 각 칸에 다른 그래프를 배치할 수 있습니다. rows와 cols로 행과 열의 개수를 정하고, add_trace로 각 위치에 그래프를 추가합니다. 같은 데이터를 다른 방식으로 보거나, 관련된 여러 지표를 한눈에 비교할 때 유용합니다.
+  - type: list
+    items:
+    - "make_subplots() - 서브플롯 틀 생성"
+    - "rows, cols - 행과 열 개수 설정"
+    - "add_trace() - 각 위치에 그래프 추가"
+    - "row, col - 그래프 배치 위치 지정"
+  - type: code
+    language: python
+    title: 다중 그래프
+    description: 여러 종류의 그래프를 한 화면에 배치합니다.
+    content: |-
+      subFig = make_subplots(rows=2, cols=2,
+                          subplot_titles=('선', '막대', '산점도', '히스토그램'))
+
+      subX = [1, 2, 3, 4, 5]
+      subY = [2, 4, 6, 8, 10]
+
+      subFig.add_trace(go.Scatter(x=subX, y=subY, name='선'), row=1, col=1)
+      subFig.add_trace(go.Bar(x=['A', 'B', 'C'], y=[10, 15, 12]), row=1, col=2)
+      subFig.add_trace(go.Scatter(x=subX, y=[1,3,5,7,9], mode='markers'), row=2, col=1)
+      subFig.add_trace(go.Histogram(x=np.random.randn(100)), row=2, col=2)
+
+      subFig.update_layout(height=600, showlegend=False, template='plotly_white')
+      subFig.show()
+
+- id: interactive
+  title: 인터랙티브 기능
+  subtitle: 사용자 상호작용
+  blocks:
+  - type: text
+    content: Plotly의 가장 큰 강점은 인터랙티브 기능입니다. rangeselector는 날짜 범위를 버튼 클릭으로 선택할 수 있게 하고, rangeslider는 슬라이더를 드래그하여 원하는 구간을 확대할 수 있습니다. hovermode는 마우스를 올렸을 때 어떤 정보를 보여줄지 설정합니다. 사용자가 직접 조작하며 데이터를 탐색할 수 있어 정적 차트보다 훨씬 효과적입니다.
+  - type: list
+    items:
+    - "rangeselector - 날짜 범위 선택 버튼"
+    - "rangeslider - 구간 드래그 슬라이더"
+    - "hovermode - 마우스 오버 정보 표시"
+    - 클릭, 드래그로 확대 축소 가능
+  - type: code
+    language: python
+    title: 인터랙티브 차트
+    description: 날짜 범위 선택 기능이 있는 주가 차트를 만듭니다.
+    content: |-
+      interDates = pd.date_range('2024-01-01', periods=100, freq='D')
+      np.random.seed(42)
+      interPrices = 100 + np.cumsum(np.random.randn(100) * 2)
+
+      interFig = go.Figure()
+      interFig.add_trace(go.Scatter(x=interDates, y=interPrices, name='주가'))
+
+      interFig.update_layout(
+          title="주가 추이",
+          xaxis=dict(
+              rangeselector=dict(
+                  buttons=[
+                      dict(count=7, label="7일", step="day"),
+                      dict(count=30, label="30일", step="day"),
+                      dict(step="all", label="전체")
+                  ]
+              ),
+              rangeslider=dict(visible=True)
+          ),
+          hovermode='x unified'
+      )
+      interFig.show()
+
+- id: practical_example
+  title: 실전 예제
+  subtitle: 종합 대시보드
+  blocks:
+  - type: text
+    content: 지금까지 배운 Plotly를 활용하여 여러 지표를 한눈에 보여주는 대시보드를 만들어봅니다. 대시보드는 여러 핵심 지표를 한 화면에 모아놓은 것으로, 경영진이나 관리자가 빠르게 현황을 파악할 수 있게 도와줍니다. 매출과 비용 추이, 제품별 판매량, 지역별 비율, 수익률 등 다양한 정보를 서로 다른 차트 형태로 표현하여 직관적으로 이해할 수 있습니다.
+  - type: list
+    items:
+    - 선 그래프로 매출과 비용 추이 표현
+    - 막대 그래프로 제품별 판매량 비교
+    - 원형 차트로 지역별 비율 표시
+    - 영역 그래프로 수익률 변화 시각화
+  - type: code
+    language: python
+    title: 경영 대시보드
+    description: 회사 경영 지표를 종합적으로 보여주는 대시보드입니다.
+    content: |-
+      dashMonths = ['1월', '2월', '3월', '4월', '5월', '6월']
+      dashRevenue = [1200, 1350, 1480, 1620, 1780, 1950]
+      dashCosts = [800, 900, 980, 1050, 1150, 1250]
+      dashProducts = ['스마트폰', '태블릿', '노트북', '이어폰']
+      dashSales = [450, 280, 320, 680]
+
+      dashFig = make_subplots(rows=2, cols=2,
+                          subplot_titles=('매출/비용', '제품별 판매량',
+                                          '지역별 비율', '수익률'),
+                          specs=[[{}, {}], [{"type": "pie"}, {}]])
+
+      dashFig.add_trace(go.Scatter(x=dashMonths, y=dashRevenue, name='매출'), row=1, col=1)
+      dashFig.add_trace(go.Scatter(x=dashMonths, y=dashCosts, name='비용'), row=1, col=1)
+      dashFig.add_trace(go.Bar(x=dashProducts, y=dashSales), row=1, col=2)
+      dashFig.add_trace(go.Pie(labels=['서울','경기','부산','기타'],
+                           values=[35,25,20,20]), row=2, col=1)
+
+      dashProfitRate = [(r-c)/r*100 for r,c in zip(dashRevenue, dashCosts)]
+      dashFig.add_trace(go.Scatter(x=dashMonths, y=dashProfitRate, fill='tozeroy'), row=2, col=2)
+
+      dashFig.update_layout(height=700, title="경영 대시보드")
+      dashFig.show()
+
+- id: practice
+  title: 29일차 복습
+  subtitle: Plotly 미션
+  blocks:
+  - type: text
+    content: 29일차에서 배운 Plotly를 복습하는 미션입니다.
+  - type: expansion
+    title: "미션1: 선 그래프"
+    code: |-
+      import plotly.express as px
+
+      x = [1, 2, 3, 4, 5]
+      y = [10, 20, 15, 25, 30]
+      fig = px.line(x=x, y=y, title="선 그래프")
+      fig.show()
+  - type: expansion
+    title: "미션2: 막대 그래프"
+    code: |-
+      import plotly.express as px
+
+      fruits = ['사과', '바나나', '오렌지']
+      counts = [10, 15, 8]
+      fig = px.bar(x=fruits, y=counts, title="과일 판매량")
+      fig.show()
+  - type: expansion
+    title: "미션3: 산점도"
+    code: |-
+      import plotly.express as px
+
+      x = [1, 2, 3, 4, 5]
+      y = [2, 4, 5, 4, 5]
+      fig = px.scatter(x=x, y=y, title="산점도")
+      fig.show()
+  - type: expansion
+    title: "미션4: 원형 차트"
+    code: |-
+      import plotly.express as px
+
+      values = [30, 40, 30]
+      names = ['A', 'B', 'C']
+      fig = px.pie(values=values, names=names, title="비율")
+      fig.show()
+  - type: expansion
+    title: "미션5: 히스토그램"
+    code: |-
+      import plotly.express as px
+      import numpy as np
+
+      data = np.random.randn(100)
+      fig = px.histogram(x=data, title="분포")
+      fig.show()
+  - type: expansion
+    title: "미션6: 박스 플롯"
+    code: |-
+      import plotly.express as px
+      import numpy as np
+
+      data = np.random.randn(50)
+      fig = px.box(y=data, title="박스 플롯")
+      fig.show()
+  - type: expansion
+    title: "미션7: 서브플롯"
+    code: |-
+      from plotly.subplots import make_subplots
+      import plotly.graph_objects as go
+
+      fig = make_subplots(rows=1, cols=2)
+      fig.add_trace(go.Scatter(x=[1,2,3], y=[4,5,6]), row=1, col=1)
+      fig.add_trace(go.Bar(x=['A','B'], y=[1,2]), row=1, col=2)
+      fig.show()

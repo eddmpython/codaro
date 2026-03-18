@@ -1,0 +1,337 @@
+meta:
+  id: sympy_03
+  title: 방정식풀이
+  order: 3
+  category: sympy
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["sympy", "solve", "Eq", "solveset", "방정식", "연립방정식"]
+  seo:
+    title: "SymPy 방정식 풀이 - solve, Eq 사용법"
+    description: "SymPy로 일차방정식, 이차방정식, 연립방정식을 풉니다. solve()와 Eq()로 다양한 방정식을 해결하는 방법을 배웁니다."
+    keywords: ["sympy", "solve", "Eq", "solveset", "방정식", "연립방정식"]
+
+intro:
+  emoji: "🎯"
+  goal: solve()와 Eq()로 다양한 방정식을 풀고 해를 구합니다.
+  description: "방정식 풀이는 SymPy의 가장 강력한 기능 중 하나입니다. 손으로 풀면 실수하기 쉬운 이차방정식, 연립방정식을 solve() 한 줄로 정확하게 해결합니다. x²-5x+6=0의 해가 x=2, x=3임을 즉시 구하고, 두 변수 연립방정식도 딕셔너리 형태로 깔끔하게 반환합니다. 나이 문제, 속도 문제, 도형 문제 등 실생활 문제를 방정식으로 모델링하고 SymPy로 풀 수 있습니다. 이 프로젝트를 완료하면 어떤 대수 방정식이든 자신있게 풀 수 있게 됩니다."
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "방정식 풀이에 필요한 함수들을 불러옵니다. solve()가 가장 많이 쓰이는 핵심 함수입니다. Eq()는 좌변=우변 형태의 등식을 명시적으로 표현할 때 사용합니다. solveset()은 해를 집합 형태로 반환하여 해가 없거나 무한히 많은 경우를 명확하게 처리합니다. S는 SymPy의 단일 객체(Singleton)로, S.Reals(실수), S.Integers(정수) 같은 수 집합에 접근할 때 사용합니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sympy 함수들을 불러옵니다
+    content: |-
+      from sympy import symbols, solve, Eq, solveset, S
+      from sympy import sqrt, Rational, simplify, expand
+      from sympy import init_printing
+      init_printing()
+
+- id: step2_solve_basic
+  title: 2단계. 기본 방정식
+  subtitle: solve()
+  blocks:
+  - type: text
+    content: "solve()는 방정식의 해를 구하는 핵심 함수입니다. solve(x**2-4, x)는 x²-4=0을 풀어 x=2, x=-2를 반환합니다. 수식을 0과 같다고 가정하고 해를 찾습니다. 결과는 파이썬 리스트로 반환되어 solutions[0], solutions[1]처럼 각 해에 접근할 수 있습니다. 해가 하나면 리스트에 원소가 하나, 해가 없으면 빈 리스트가 반환됩니다."
+  - type: code
+    language: python
+    title: 기호 정의
+    description: 변수 x를 정의합니다
+    content: |-
+      x = symbols('x')
+  - type: code
+    language: python
+    title: 간단한 방정식
+    description: x²-4=0을 풉니다
+    content: |-
+      sol1 = solve(x**2 - 4, x)
+      sol1
+  - type: tip
+    content: solve(수식, 변수)는 수식=0이 되는 변수 값을 찾습니다. 해가 여러 개면 리스트로 반환됩니다.
+
+- id: step3_linear
+  title: 3단계. 일차방정식
+  subtitle: ax + b = 0
+  blocks:
+  - type: text
+    content: "일차방정식 ax+b=0은 해가 정확히 하나입니다. 2x+6=0을 풀면 x=-3이 나옵니다. solve()는 양변을 정리하고 이항하는 과정을 자동으로 수행합니다. 분수 계수가 있어도 Rational을 사용하면 정확한 해를 구합니다. 일차방정식은 가장 기본적인 형태이지만, 연립방정식의 구성 요소가 되므로 확실히 익혀두세요."
+  - type: code
+    language: python
+    title: 일차방정식 풀기
+    description: 2x+6=0을 풉니다
+    content: |-
+      linear1 = solve(2*x + 6, x)
+      linear1
+  - type: code
+    language: python
+    title: 분수 계수
+    description: 분수가 포함된 방정식을 풉니다
+    content: |-
+      linear2 = solve(Rational(1, 2)*x - 3, x)
+      linear2
+
+- id: step4_eq
+  title: 4단계. 등식 표현
+  subtitle: Eq()
+  blocks:
+  - type: text
+    content: "Eq()는 Equation의 줄임말로, 좌변=우변 형태의 등식을 명시적으로 표현합니다. solve(2*x+3-7, x) 대신 solve(Eq(2*x+3, 7), x)처럼 쓰면 수학적으로 더 자연스럽습니다. 2x+3=7을 그대로 표현할 수 있어 문제를 읽고 바로 코드로 옮기기 좋습니다. Eq 객체는 출력할 때도 2x+3=7 형태로 보여져서 가독성이 높습니다."
+  - type: code
+    language: python
+    title: Eq로 방정식 표현
+    description: 2x+3=7을 표현합니다
+    content: |-
+      eq1 = Eq(2*x + 3, 7)
+      eq1
+  - type: code
+    language: python
+    title: Eq 방정식 풀기
+    description: Eq로 정의한 방정식을 풉니다
+    content: |-
+      sol2 = solve(eq1, x)
+      sol2
+  - type: tip
+    content: Eq(좌변, 우변)으로 등식을 만듭니다. solve()에 Eq 객체를 전달하면 자동으로 처리합니다.
+
+- id: step5_quadratic
+  title: 5단계. 이차방정식
+  subtitle: ax² + bx + c = 0
+  blocks:
+  - type: text
+    content: "이차방정식 ax²+bx+c=0은 판별식 b²-4ac에 따라 해의 개수가 달라집니다. 양수면 서로 다른 두 실근, 0이면 중근(같은 해 2개), 음수면 복소수 해입니다. solve()는 근의 공식을 적용하여 정확한 해를 구합니다. x²-2=0의 해는 ±√2처럼 무리수로, x²+1=0의 해는 ±i처럼 허수로 정확하게 표현됩니다. 손으로 풀면 계산 실수가 잦은 이차방정식을 SymPy로 확실하게 검증할 수 있습니다."
+  - type: code
+    language: python
+    title: 인수분해 가능
+    description: 정수 해를 가진 이차방정식
+    content: |-
+      quad1 = solve(x**2 - 5*x + 6, x)
+      quad1
+  - type: code
+    language: python
+    title: 무리수 해
+    description: 근호가 포함된 해
+    content: |-
+      quad2 = solve(x**2 - 2, x)
+      quad2
+  - type: code
+    language: python
+    title: 복소수 해
+    description: 판별식이 음수인 경우
+    content: |-
+      quad3 = solve(x**2 + 1, x)
+      quad3
+  - type: tip
+    content: SymPy는 복소수 해도 자동으로 구합니다. I는 허수단위 √(-1)입니다.
+
+- id: step6_higher
+  title: 6단계. 고차방정식
+  subtitle: 3차, 4차 방정식
+  blocks:
+  - type: text
+    content: "3차, 4차 방정식도 solve()로 풀 수 있습니다. x³-1=0은 실근 1과 복소근 2개를 모두 반환합니다. 인수분해가 가능한 x³-6x²+11x-6=0은 정수 해 1, 2, 3을 정확하게 구합니다. 5차 이상 방정식은 일반적인 근의 공식이 없지만(갈루아 이론), SymPy는 특수한 경우에 해를 구하거나 수치 근사를 제공합니다."
+  - type: code
+    language: python
+    title: 3차방정식
+    description: x³-1=0을 풉니다
+    content: |-
+      cubic = solve(x**3 - 1, x)
+      cubic
+  - type: code
+    language: python
+    title: 인수분해 가능한 고차
+    description: x³-6x²+11x-6=0
+    content: |-
+      cubic2 = solve(x**3 - 6*x**2 + 11*x - 6, x)
+      cubic2
+
+- id: step7_system
+  title: 7단계. 연립방정식
+  subtitle: 여러 방정식
+  blocks:
+  - type: text
+    content: "연립방정식은 여러 방정식을 동시에 만족하는 해를 찾는 것입니다. solve([eq1, eq2], [x, y])처럼 방정식 리스트와 변수 리스트를 전달합니다. 해는 {x: 값, y: 값} 딕셔너리로 반환되어 result[x], result[y]로 각 변수의 값에 접근할 수 있습니다. 중학교에서 배운 가감법, 대입법을 SymPy가 자동으로 적용합니다. 3원 연립방정식도 같은 방식으로 풀 수 있습니다."
+  - type: code
+    language: python
+    title: 두 변수 정의
+    description: x, y를 정의합니다
+    content: |-
+      y = symbols('y')
+  - type: code
+    language: python
+    title: 연립일차방정식
+    description: 두 방정식을 동시에 풉니다
+    content: |-
+      eq1 = Eq(x + y, 10)
+      eq2 = Eq(x - y, 4)
+      system1 = solve([eq1, eq2], [x, y])
+      system1
+  - type: code
+    language: python
+    title: 연립방정식 다른 형태
+    description: 수식=0 형태로 풉니다
+    content: |-
+      system2 = solve([2*x + 3*y - 7, x - y - 1], [x, y])
+      system2
+  - type: tip
+    content: "solve([방정식들], [변수들])로 연립방정식을 풉니다. 결과는 {x: 값, y: 값} 딕셔너리입니다."
+
+- id: step8_solveset
+  title: 8단계. 해집합
+  subtitle: solveset()
+  blocks:
+  - type: text
+    content: "solveset()은 solve()의 발전된 버전으로, 해를 수학적 집합으로 반환합니다. 해가 2개면 {-2, 2}, 해가 없으면 공집합 ∅, 해가 무한히 많으면 조건 집합으로 표현합니다. domain=S.Reals를 지정하면 실수 범위에서만 해를 찾아, x²+1=0처럼 실수 해가 없는 경우 공집합을 반환합니다. 해의 존재 여부를 명확하게 판단해야 할 때 solveset()이 더 적합합니다."
+  - type: code
+    language: python
+    title: 기본 solveset
+    description: solveset으로 방정식을 풉니다
+    content: |-
+      ss1 = solveset(x**2 - 4, x)
+      ss1
+  - type: code
+    language: python
+    title: 해 없음
+    description: 해가 없는 방정식
+    content: |-
+      ss2 = solveset(x**2 + 1, x, domain=S.Reals)
+      ss2
+  - type: code
+    language: python
+    title: 실수 범위 지정
+    description: 실수 해만 구합니다
+    content: |-
+      ss3 = solveset(x**2 - 2, x, domain=S.Reals)
+      ss3
+  - type: tip
+    content: domain=S.Reals로 실수 범위만 지정할 수 있습니다. S.Complexes는 복소수 전체입니다. 기본값은 복소수입니다.
+
+- id: step9_verify
+  title: 9단계. 해 검증
+  subtitle: subs로 확인
+  blocks:
+  - type: text
+    content: "구한 해가 정말 맞는지 검증하는 습관은 매우 중요합니다. 해를 원래 방정식에 subs()로 대입하면 0이 나와야 합니다(수식=0 형태이므로). x²-5x+6=0의 해 x=2, x=3을 대입하면 4-10+6=0, 9-15+6=0으로 모두 0이 됩니다. 특히 복잡한 방정식을 풀었을 때 검증 단계를 거치면 오류를 방지할 수 있습니다."
+  - type: code
+    language: python
+    title: 해 검증
+    description: 해를 대입하여 확인합니다
+    content: |-
+      expr = x**2 - 5*x + 6
+      solutions = solve(expr, x)
+      solutions
+  - type: code
+    language: python
+    title: 첫 번째 해 검증
+    description: x=2를 대입합니다
+    content: |-
+      check1 = expr.subs(x, solutions[0])
+      check1
+  - type: code
+    language: python
+    title: 두 번째 해 검증
+    description: x=3을 대입합니다
+    content: |-
+      check2 = expr.subs(x, solutions[1])
+      check2
+
+- id: step10_practical
+  title: 10단계. 실전 문제
+  subtitle: 응용 예제
+  blocks:
+  - type: text
+    content: "실생활 문제를 방정식으로 모델링하고 푸는 것이 수학의 진정한 활용입니다. 나이 문제(현재 아버지가 아들보다 30살 많고, 5년 후 아버지 나이가 아들의 3배), 속도 문제(거리=속력×시간 관계), 도형 문제(둘레와 넓이 조건) 등을 연립방정식으로 표현합니다. 문제를 읽고 변수를 정의하고 조건을 방정식으로 옮기는 연습이 중요합니다."
+  - type: code
+    language: python
+    title: 나이 문제
+    description: 5년 후 아버지 나이가 아들의 3배
+    content: |-
+      father, son = symbols('father son')
+      eq1 = Eq(father, son + 30)
+      eq2 = Eq(father + 5, 3*(son + 5))
+      ages = solve([eq1, eq2], [father, son])
+      ages
+  - type: code
+    language: python
+    title: 속도 문제
+    description: 거리=속력×시간
+    content: |-
+      v, t = symbols('v t')
+      eq1 = Eq(v*t, 120)
+      eq2 = Eq((v + 20)*(t - 1), 120)
+      speed = solve([eq1, eq2], [v, t])
+      speed
+  - type: code
+    language: python
+    title: 넓이 문제
+    description: 직사각형 둘레와 넓이
+    content: |-
+      w, h = symbols('w h')
+      perimeter = Eq(2*(w + h), 24)
+      area = Eq(w*h, 32)
+      dims = solve([perimeter, area], [w, h])
+      dims
+
+- id: practice
+  title: 실습
+  subtitle: 방정식 풀이 연습
+  blocks:
+  - type: text
+    content: "지금까지 배운 solve, Eq, solveset, subs를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 1차, 2차, 3차 방정식을 순서대로 풀어보는 기본 연습입니다. 미션2는 3원 연립방정식과 비선형 연립방정식(원과 직선의 교점)을 다룹니다. 각 미션은 독립적으로 실행 가능하므로 원하는 것부터 시작하세요."
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 다양한 방정식 풀기"
+    blocks:
+    - type: code
+      title: "1차 방정식"
+      content: |-
+        from sympy import symbols, solve, Eq, sqrt
+
+        u = symbols('u')
+
+        linear = solve(3*u - 9, u)
+        linear
+    - type: code
+      title: "2차 방정식"
+      content: |-
+        quadratic = solve(u**2 - 7*u + 12, u)
+        quadratic
+    - type: code
+      title: "3차 방정식"
+      content: |-
+        cubic = solve(u**3 - 8, u)
+        cubic
+  - type: expansion
+    title: "미션2: 연립방정식 실전"
+    blocks:
+    - type: code
+      title: "3원 연립방정식"
+      content: |-
+        from sympy import symbols, solve, Eq
+
+        s, t, w = symbols('s t w')
+
+        cond1 = Eq(s + t + w, 100)
+        cond2 = Eq(s - t, 10)
+        cond3 = Eq(t + w, 70)
+        answer = solve([cond1, cond2, cond3], [s, t, w])
+        answer
+    - type: code
+      title: "검산"
+      content: |-
+        verify = answer[s] + answer[t] + answer[w]
+        verify
+    - type: code
+      title: "비선형 연립"
+      content: |-
+        p, q = symbols('p q')
+        circle = Eq(p**2 + q**2, 25)
+        line = Eq(p + q, 7)
+        points = solve([circle, line], [p, q])
+        points

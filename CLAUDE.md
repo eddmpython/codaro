@@ -13,7 +13,7 @@
 
 ## 진입점 규칙 동기화
 
-- `AGENT.md`와 `CLAUDE.md`의 공통 규칙은 항상 동일하게 유지한다.
+- `AGENTS.md`와 `CLAUDE.md`의 공통 규칙은 항상 동일하게 유지한다.
 - 한쪽을 수정하면 다른 쪽도 즉시 같은 의미로 반영한다.
 - Codaro는 초기 단계이므로 상세 설계는 코드 옆 `DEV.md` 또는 기능 폴더의 `SPEC.md`에 둔다.
 
@@ -185,20 +185,28 @@
   - `src/codaro/kernel/DEV.md`
   - `src/codaro/system/DEV.md`
   - `src/codaro/runtime/DEV.md`
+  - `launcher/PRD.md`
+  - `launcher/PACKAGING.md`
   - `frontend/DEV.md`
+  - `landing/DEV.md`
 
 ## 현재 코드 레이아웃
 
+- `src/codaro/api/` : FastAPI router 계층, 서버 상태, 요청 모델, bootstrap/document/kernel/system/curriculum/spa 조립
 - `src/codaro/document/` : 문서 모델, percent/codaro/marimo/ipynb 파서와 writer, AST 의존 분석
 - `src/codaro/kernel/` : 투명 스코프 격리 커널, 리액티브 실행, SessionManager, WebSocket
 - `src/codaro/curriculum/` : YAML 콘텐츠 로더, 노트북 변환기, 진행 추적, 학습 사상, 연습 체커
 - `src/codaro/system/` : 파일 시스템 CRUD (`fileOps`) 및 패키지 관리 (`packageOps`)
-- `src/codaro/runtime/` : 실행 엔진 인터페이스와 `LocalEngine` placeholder
-- `src/codaro/server.py` : FastAPI 서버 — 문서, 커널, 파일, 패키지, 커리큘럼, 환경 API + WebSocket
+- `src/codaro/runtime/` : 실행 엔진 인터페이스, `LocalEngine`, child process worker, execution event stream
+- `launcher/` : Rust launcher, embedded Python 배포, install/update/rollback PRD와 이후 구현 위치
+- `src/codaro/server.py` : FastAPI 앱 조립기, middleware, 프론트 빌드 stale 감지, SPA 서빙 진입점
 - `src/codaro/cli.py` : `codaro edit`, `codaro run`, `codaro export`
 - `src/codaro/appRuntime.py` : native `.py` 문서에서 사용하는 `App`, `md`
-- `frontend/` : SvelteKit 편집기, 학습 브라우저, 미션 체크 UI, 서버 커널 우선 + Pyodide 폴백
-- `tests/` : 커널, 리액티브, 시스템, 문서, 커리큘럼, 체커, 서버 API 테스트 (62개)
+- `content/studyPython/content/` : Codaro 로컬 학습 커리큘럼 YAML
+- `frontend/` : SvelteKit + Tailwind v4 편집기, shadcn 패턴 공용 UI, marimo 기준 notebook chrome, 학습 브라우저, 미션 체크 UI, 서버 커널 우선 + Pyodide 폴백
+- `landing/` : SvelteKit static public site, docs/blog/search, GitHub Pages build
+- `blog/` : public blog source (`category/post/index.md + assets/`)
+- `tests/` : 커널, 리액티브, 시스템, 문서, 커리큘럼, 체커, 서버 API, 서버 런타임 테스트 (119개)
 
 ## 실행 환경 규칙
 
@@ -253,6 +261,89 @@
   - code, learning, automation
 - 다른 앱이 올라가는 기반 레이어로 보이게 설계한다.
 
+## Marimo 1:1 체크리스트
+
+- 이 체크리스트는 `frontend`가 marimo와 **정말 1:1인지** 판정하는 기준이다.
+- 세부 source branch, DOM 계약, class 계약, 상태 분기는 반드시 `frontend/PRD.md`를 따른다.
+- 이 문서는 상위 게이트이고, 구현 상세는 `frontend/PRD.md`가 source of truth다.
+- source of truth는 추측이 아니라 로컬 설치본 marimo 정적 자산이다.
+  - `.venv/Lib/site-packages/marimo/_static/index.html`
+  - `.venv/Lib/site-packages/marimo/_static/assets/*.js`
+  - `.venv/Lib/site-packages/marimo/_static/assets/*.css`
+- 하나라도 안 맞으면 "marimo-like", "near-marimo"로만 표현하고 `1:1`이라고 말하지 않는다.
+- 항목을 체크할 때는 DOM 계층, class, id, data-testid, hover 위치, padding, asset preload, 실제 렌더 결과를 함께 본다.
+
+### Root / Head
+
+- [ ] `app.html`, route head, notebook head가 marimo `index.html`과 같은 역할 분리를 가진다.
+- [ ] favicon, apple-touch-icon, manifest, preload image/font, theme-color, description이 marimo와 같은 종류와 순서로 들어간다.
+- [ ] `marimo-filename`, `marimo-version`, `marimo-user-config`, `marimo-server-token` 태그가 같은 위치와 의미로 존재한다.
+- [ ] `#root`, `#app`, `#App` 계층이 marimo 기준과 같은 책임으로 배치된다.
+
+### Shell / Chrome
+
+- [ ] 좌측 chrome, 중앙 notebook surface, 우측 helper panel, 하단 footer의 DOM 계층이 marimo와 1:1이다.
+- [ ] floating action 버튼의 id, data-testid, 배치 순서가 marimo와 같다.
+- [ ] helper panel open/close 구조, panel header, resize handle, footer status 위치가 marimo와 같다.
+- [ ] notebook filename bar, top spacing, page frame width, fullscreen/print 관련 wrapper가 marimo와 같다.
+
+### Cell Frame
+
+- [ ] 각 셀 루트가 marimo와 같은 커스텀 태그, class, data-selected, focus/hover 구조를 가진다.
+- [ ] selection ring, error ring, touched/focused 상태 표현이 marimo CSS 동작과 같다.
+- [ ] code cell과 markdown cell의 내부 wrapper 수와 순서가 marimo와 같다.
+- [ ] 셀 간 간격, 상하 패딩, 출력과 입력 사이 spacing이 marimo와 같다.
+
+### Hover / Overlay Controls
+
+- [ ] 마우스 hover 시 드러나는 버튼 그룹의 wrapper 위치값이 marimo와 같다.
+- [ ] 언어 토글은 marimo처럼 editor 내부 overlay에서 렌더된다.
+- [ ] `language-toggle-button`의 variant, size, class, opacity, padding이 marimo와 같다.
+- [ ] run button, move, duplicate, delete, hide code, action dropdown의 위치와 등장 방식이 marimo와 같다.
+- [ ] hover opacity transition과 focus-within 노출 방식이 marimo와 같다.
+
+### Editor
+
+- [ ] `cell-editor` 루트가 marimo와 같은 class와 DOM 계층을 가진다.
+- [ ] editor top padding이 overlay 버튼을 포함한 실제 marimo 배치와 같다.
+- [ ] hide code, markdown toggle, selection mode, keyboard focus 이동이 marimo와 같은 구조를 따른다.
+- [ ] 에디터 외부 셸이 아니라 marimo와 같은 내부 wrapper에서 overlay와 editor가 결합된다.
+
+### Markdown / Output
+
+- [ ] markdown preview가 `mo-markdown-renderer`와 같은 DOM/CSS 체인을 사용한다.
+- [ ] markdown edit/view 전환 구조와 상단 control 위치가 marimo와 같다.
+- [ ] output wrapper, stdout, stderr, error, html, return 출력 class와 순서가 marimo와 같다.
+- [ ] empty output일 때의 공간 사용과 non-empty output일 때 spacing이 marimo와 같다.
+
+### Assets / Style Chain
+
+- [ ] marimo CSS import 순서가 유지된다.
+- [ ] marimo에서 쓰는 static asset은 같은 파일명과 같은 용도로 로드된다.
+- [ ] 폰트, 배경 이미지, noise/gradient가 marimo와 같은 로드 경로와 역할을 가진다.
+- [ ] Codaro 전용 스타일은 marimo와 동일하지 않은 부분을 만드는 대신, 필요한 최소 보정만 한다.
+
+### Verification
+
+- [ ] 코드 비교만 하지 않고 실제 브라우저 렌더를 marimo와 나란히 놓고 확인한다.
+- [ ] hover 버튼 위치, sidebar width, footer height, cell padding을 실제 화면에서 다시 본다.
+- [ ] 빌드가 성공하고 a11y 또는 Svelte 경고가 남지 않는다.
+- [ ] 이 체크리스트가 전부 충족되기 전에는 완료 선언을 하지 않는다.
+
+## 프론트/브랜드 확정 규칙
+
+- Codaro 제품 UI 언어는 영어만 사용한다.
+  - index, editor, app mode, docs, blog 모두 영어 기준이다.
+- 모든 공용 컴포넌트 톤은 `zinc` 계열을 기본으로 한다.
+- 공용 UI는 `shadcn-svelte` 패턴을 기본으로 사용한다.
+- 기본 avatar와 favicon source는 `assets/brand/mascot/source/codaro-sheet-01.png`의 첫 번째 왼쪽 pose다.
+- pose sheet source는 `assets/brand/mascot/source/codaro-sheet-01.png`, `assets/brand/mascot/source/codaro-sheet-02.png`다.
+- 아바타는 항상 배경 제거 후 캐릭터만 사용한다.
+- 브랜드 자산 경로 source of truth는 `frontend/src/lib/theme/appBrand.ts`다.
+- 색상/반지름/그림자 source of truth는 `frontend/src/lib/theme/brandTheme.ts`다.
+- GitHub Pages는 Svelte로 운영한다.
+  - 문서와 블로그도 같은 Svelte 기반, 같은 브랜드 톤으로 운영한다.
+
 ## Git 및 릴리즈 원칙
 
 - 커밋, 주석, 문서 어디에도 AI 생성 흔적 문구를 남기지 않는다.
@@ -268,6 +359,17 @@
 - 세션 시작 시 `CLAUDE.md`와 실제 코드 구조를 대조하고, 낡은 내용이 있으면 즉시 갱신한다.
 - 파일/폴더 추가, 삭제, 이동이 있으면 관련 경로와 구조 설명을 함께 갱신한다.
 - 삭제된 기능이나 파일에 대한 죽은 참조를 남기지 않는다.
+
+## 세션 이어가기 원칙
+
+- 세션이 끝나도 다음 세션이 채팅 없이 바로 이어갈 수 있게 현재 결정, 진행 상태, 다음 액션, 남은 검증을 반드시 저장소 문서에 남긴다.
+- 중간 상태의 TODO, blocker, diff는 채팅이 아니라 관련 기능 문서의 체크리스트로 남긴다.
+- 작업이 여러 세션에 걸리면 가장 가까운 `DEV.md`, `SPEC.md`, `PRD.md`에 최소한 `Current State`, `Next Action`, `Verification Left`를 갱신한다.
+- 다음 세션은 먼저 프로젝트 메모리, 그다음 관련 기능 문서, 마지막으로 직전 수정 파일을 읽고 시작한다.
+- 채팅 기록만 믿고 이어가지 않는다. 설계 결정과 남은 작업은 반드시 저장소 안 문서로 고정한다.
+- 코드 변경이 있었는데 문서가 업데이트되지 않았다면 세션 종료 전에 문서를 먼저 맞춘다.
+- marimo 1:1 작업은 `frontend/PRD.md`를 상세 source of truth로 유지한다.
+- `frontend/PRD.md`에는 마지막으로 확인한 source branch 또는 asset, 완료한 UI 영역, 아직 미완료인 체크리스트 항목, 알려진 diff 또는 blocker, 다음 비교 포인트를 항상 남긴다.
 
 ## 현재 우선순위
 

@@ -1,0 +1,461 @@
+meta:
+  id: day10_1
+  title: 반복문
+  day: 10
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 반복문 for, while"
+    description: "for, while 반복문으로 코드를 반복 실행하는 방법을 배웁니다."
+    keywords: ['반복문', 'for', 'while', 'range']
+intro:
+  emoji: "🔄"
+  points:
+  - 반복문의 기본 개념과 필요성
+  - while 반복문과 조건 기반 반복
+  - for 반복문과 시퀀스 순회
+  - range() 함수의 다양한 활용법
+  - 중첩 반복문으로 복잡한 패턴 처리
+  - break와 continue로 반복 제어
+sections:
+- id: loop_introduction
+  title: 반복문 소개
+  subtitle: 반복 작업을 효율적으로 처리하기
+  blocks:
+  - type: text
+    content: 반복문은 특정 코드 블록을 여러 번 실행할 수 있게 해주는 파이썬의 핵심 구문입니다. 같은 작업을 100번 해야 한다면 코드를 100번 쓰는 대신 반복문을 사용하면 됩니다. 파이썬에는 while 반복문과 for 반복문 두 가지가 있으며, while은 조건이 참인 동안 반복하고, for는 시퀀스의 각 요소를 순회하며 반복합니다.
+  - type: list
+    items:
+    - while 반복문 - 조건이 참인 동안 반복
+    - for 반복문 - 시퀀스를 순회하며 반복
+    - break - 반복문 강제 종료
+    - continue - 현재 반복 건너뛰기
+  - type: code
+    language: python
+    title: 반복문 기본 개념
+    description: "반복문의 기본 구조를 이해합니다."
+    content: |-
+      loopIntroCount = 0
+      while loopIntroCount < 3:
+          print(loopIntroCount)
+          loopIntroCount = loopIntroCount + 1
+
+      for loopIntroIndex in range(3):
+          print(loopIntroIndex)
+  - type: tip
+    content: "반복문 내부 코드는 반드시 들여쓰기를 해야 합니다. 들여쓰기가 같은 코드가 하나의 블록으로 반복됩니다."
+
+- id: while_loop
+  title: while 반복문
+  subtitle: 조건이 참인 동안 반복하기
+  blocks:
+  - type: text
+    content: while 반복문은 주어진 조건이 참(True)인 동안 코드 블록을 계속 실행합니다. 조건이 거짓(False)이 되면 반복이 종료됩니다. 반복 변수를 수동으로 업데이트해야 하며, 이를 잊으면 무한 루프에 빠질 수 있습니다. 조건이 처음부터 거짓이면 한 번도 실행되지 않습니다.
+  - type: list
+    items:
+    - while 키워드 뒤에 조건식
+    - 조건이 True인 동안 계속 실행
+    - 반복 변수를 수동으로 업데이트
+    - 무한 루프 주의 필요
+  - type: code
+    language: python
+    title: while 반복문 사용
+    description: "조건이 참인 동안 반복합니다."
+    content: |-
+      whileLoopCount = 0
+      while whileLoopCount < 5:
+          print(whileLoopCount)
+          whileLoopCount = whileLoopCount + 1
+      print('반복문 종료!')
+
+      whileLoopSkip = 10
+      while whileLoopSkip < 5:
+          print('이 코드는 실행되지 않습니다')
+          whileLoopSkip = whileLoopSkip + 1
+      print('조건이 처음부터 거짓이면 실행 안됨')
+
+- id: while_else
+  title: while-else 문
+  subtitle: 반복문 정상 종료 시 실행
+  blocks:
+  - type: text
+    content: while 반복문에 else 절을 추가할 수 있습니다. else 블록은 while 조건이 거짓이 되어 정상적으로 반복문이 종료될 때 실행됩니다. break로 반복문이 중단되면 else 블록은 실행되지 않습니다. 이 기능은 검색 알고리즘에서 요소를 찾지 못했을 때 유용합니다.
+  - type: list
+    items:
+    - while 조건이 False가 될 때 else 실행
+    - break로 종료되면 else 실행되지 않음
+    - 반복문 완료 후 추가 작업에 유용
+    - 선택적으로 사용 가능
+  - type: code
+    language: python
+    title: while-else 문 사용
+    description: "반복문이 정상 종료되면 else가 실행됩니다."
+    content: |-
+      whileElseCount = 0
+      while whileElseCount < 3:
+          print(whileElseCount)
+          whileElseCount = whileElseCount + 1
+      else:
+          print('반복이 정상 완료됨')
+
+      whileElseBreak = 0
+      while whileElseBreak < 6:
+          print(whileElseBreak)
+          whileElseBreak = whileElseBreak + 1
+          if whileElseBreak == 3:
+              break
+      else:
+          print('이 메시지는 출력되지 않음')
+      print('break로 중단됨')
+
+- id: for_loop
+  title: for 반복문
+  subtitle: 시퀀스를 순회하며 반복하기
+  blocks:
+  - type: text
+    content: for 반복문은 시퀀스(리스트, 튜플, 문자열 등)나 반복 가능한 객체의 각 요소를 순회하며 코드를 실행합니다. while 반복문보다 간결하고 안전하며, 파이썬에서 가장 많이 사용되는 반복문입니다. 반복 변수가 자동으로 업데이트되므로 무한 루프 위험이 적습니다.
+  - type: list
+    items:
+    - for 키워드와 in 키워드 사용
+    - 시퀀스의 각 요소를 자동으로 순회
+    - 반복 변수 자동 업데이트
+    - 무한 루프 위험이 적음
+  - type: code
+    language: python
+    title: for 반복문 사용
+    description: "시퀀스의 각 요소를 순회합니다."
+    content: |-
+      forLoopNumbers = [0, 1, 2, 3, 4, 5]
+      for forLoopNumber in forLoopNumbers:
+          print(forLoopNumber)
+
+      forLoopLanguage = 'Python'
+      for forLoopLetter in forLoopLanguage:
+          print(forLoopLetter)
+
+      forLoopColors = ('red', 'green', 'blue')
+      for forLoopColor in forLoopColors:
+          print(forLoopColor)
+
+- id: for_dict
+  title: 딕셔너리 순회
+  subtitle: 딕셔너리 키와 값 처리하기
+  blocks:
+  - type: text
+    content: 딕셔너리를 for 반복문으로 순회할 때는 기본적으로 키(key)를 순회합니다. keys() 메서드는 키만, values() 메서드는 값만, items() 메서드는 키-값 쌍을 튜플로 순회합니다. items()를 사용하면 키와 값을 동시에 처리할 수 있어 매우 편리합니다.
+  - type: list
+    items:
+    - 기본적으로 키(key) 순회
+    - keys() - 키만 순회
+    - values() - 값만 순회
+    - items() - 키-값 쌍 순회
+  - type: code
+    language: python
+    title: 딕셔너리 순회
+    description: "딕셔너리의 키와 값을 순회합니다."
+    content: |-
+      forDictPerson = {'name': '홍길동', 'age': 25, 'city': '서울'}
+
+      for forDictKey in forDictPerson:
+          print(forDictKey)
+
+      for forDictKey2 in forDictPerson.keys():
+          print(forDictKey2, ':', forDictPerson[forDictKey2])
+
+      for forDictValue in forDictPerson.values():
+          print(forDictValue)
+
+      for forDictKey3, forDictValue2 in forDictPerson.items():
+          print(forDictKey3, ':', forDictValue2)
+
+- id: for_else
+  title: for-else 문
+  subtitle: 모든 요소 순회 완료 시 실행
+  blocks:
+  - type: text
+    content: for 반복문에도 else 절을 추가할 수 있습니다. else 블록은 for 반복문이 모든 요소를 순회하고 정상적으로 완료될 때 실행됩니다. break로 반복문이 중단되면 else 블록은 실행되지 않습니다. 빈 시퀀스를 순회해도 else는 실행됩니다.
+  - type: list
+    items:
+    - 모든 요소 순회 완료 시 실행
+    - break로 중단되면 실행되지 않음
+    - 빈 시퀀스에서도 else 실행
+    - 검색 알고리즘에서 유용
+  - type: code
+    language: python
+    title: for-else 문 사용
+    description: "반복문이 정상 종료되면 else가 실행됩니다."
+    content: |-
+      forElseNumbers = [0, 1, 2, 3, 4, 5]
+      for forElseNumber in forElseNumbers:
+          print(forElseNumber)
+      else:
+          print('모든 요소 순회 완료')
+
+      for forElseNumber2 in forElseNumbers:
+          print(forElseNumber2)
+          if forElseNumber2 == 3:
+              break
+      else:
+          print('이 메시지는 출력되지 않음')
+
+      forElseEmpty = []
+      for forElseItem in forElseEmpty:
+          print(forElseItem)
+      else:
+          print('빈 리스트도 else 실행됨')
+
+- id: range_function
+  title: range() 함수
+  subtitle: 숫자 시퀀스 생성하기
+  blocks:
+  - type: text
+    content: range() 함수는 연속된 숫자 시퀀스를 생성하는 내장 함수입니다. range(stop)은 0부터 stop-1까지, range(start, stop)은 start부터 stop-1까지, range(start, stop, step)은 step 간격으로 숫자를 생성합니다. 음수 step을 사용하면 역순으로 생성할 수 있습니다.
+  - type: list
+    items:
+    - range(stop) - 0부터 stop-1까지
+    - range(start, stop) - start부터 stop-1까지
+    - range(start, stop, step) - step 간격으로
+    - 음수 step으로 역순 생성 가능
+  - type: code
+    language: python
+    title: range() 함수 사용
+    description: "다양한 방식으로 숫자 시퀀스를 생성합니다."
+    content: |-
+      for rangeIndex1 in range(5):
+          print(rangeIndex1)
+
+      for rangeIndex2 in range(2, 7):
+          print(rangeIndex2)
+
+      for rangeIndex3 in range(0, 11, 2):
+          print(rangeIndex3)
+
+      for rangeIndex4 in range(10, 0, -1):
+          print(rangeIndex4)
+
+      rangeNumList = list(range(5))
+      print('리스트로 변환:', rangeNumList)
+
+- id: nested_loops
+  title: 중첩 반복문
+  subtitle: 반복문 안에 반복문 넣기
+  blocks:
+  - type: text
+    content: 반복문 안에 또 다른 반복문을 넣어 2차원 이상의 데이터 구조를 처리하거나 복잡한 패턴을 생성할 수 있습니다. 외부 반복문이 한 번 실행될 때마다 내부 반복문이 완전히 실행됩니다. 중첩이 깊어지면 시간 복잡도가 증가하므로 주의해야 합니다.
+  - type: list
+    items:
+    - 반복문 내부에 또 다른 반복문
+    - 2차원 배열이나 행렬 처리에 유용
+    - 패턴 생성이나 조합 문제 해결
+    - 시간 복잡도 증가 주의
+  - type: code
+    language: python
+    title: 중첩 반복문 사용
+    description: "반복문 안에 반복문을 넣어 복잡한 패턴을 처리합니다."
+    content: |-
+      for nestedRow1 in range(3):
+          for nestedCol1 in range(3):
+              print('(', nestedRow1, ',', nestedCol1, ')')
+
+      for nestedRow2 in range(1, 4):
+          for nestedCol2 in range(1, 4):
+              print(nestedRow2, 'x', nestedCol2, '=', nestedRow2 * nestedCol2)
+          print()
+
+      for nestedRow3 in range(5):
+          for nestedCol3 in range(nestedRow3 + 1):
+              print('*', end='')
+          print()
+
+- id: break_statement
+  title: break 문
+  subtitle: 반복문 강제 종료하기
+  blocks:
+  - type: text
+    content: break 문은 현재 실행 중인 반복문을 즉시 종료하고 반복문 다음 코드로 이동합니다. 특정 조건이 만족되었을 때 반복을 중단하고 싶을 때 사용합니다. 중첩 반복문에서는 가장 안쪽 반복문만 종료됩니다. break로 종료되면 else 블록은 실행되지 않습니다.
+  - type: list
+    items:
+    - 반복문을 즉시 종료
+    - 조건부로 반복 중단
+    - 중첩 반복문에서는 가장 안쪽만 종료
+    - else 블록은 실행되지 않음
+  - type: code
+    language: python
+    title: break 문 사용
+    description: "조건에 따라 반복문을 중단합니다."
+    content: |-
+      breakNumbers = [0, 1, 2, 3, 4, 5]
+      for breakNumber in breakNumbers:
+          print(breakNumber)
+          if breakNumber == 3:
+              break
+      print('break로 종료됨')
+
+      breakCount = 0
+      while breakCount < 10:
+          print(breakCount)
+          breakCount = breakCount + 1
+          if breakCount == 5:
+              break
+      print('while도 break 가능')
+
+- id: continue_statement
+  title: continue 문
+  subtitle: 현재 반복 건너뛰기
+  blocks:
+  - type: text
+    content: continue 문은 현재 반복의 나머지 코드를 건너뛰고 다음 반복으로 이동합니다. 특정 조건에서 일부 코드를 실행하지 않고 다음 반복을 계속하고 싶을 때 사용합니다. while 반복문에서 continue를 사용할 때는 반복 변수를 적절히 업데이트해야 무한 루프를 방지할 수 있습니다.
+  - type: list
+    items:
+    - 현재 반복의 나머지 코드 건너뛰기
+    - 다음 반복으로 즉시 이동
+    - 반복문 자체는 계속 실행
+    - while문에서는 변수 업데이트 주의
+  - type: code
+    language: python
+    title: continue 문 사용
+    description: "조건에 따라 현재 반복을 건너뜁니다."
+    content: |-
+      continueNumbers = [0, 1, 2, 3, 4, 5]
+      for continueNumber in continueNumbers:
+          if continueNumber == 3:
+              continue
+          print(continueNumber)
+
+      for continueIndex in range(10):
+          if continueIndex % 2 == 1:
+              continue
+          print(continueIndex, '는 짝수')
+
+      continueCount = 0
+      while continueCount < 6:
+          continueCount = continueCount + 1
+          if continueCount == 3:
+              continue
+          print(continueCount)
+
+- id: practical_examples
+  title: 실전 응용 예제
+  subtitle: 반복문 활용 패턴
+  blocks:
+  - type: text
+    content: 반복문은 데이터 처리, 계산, 검색, 필터링 등 다양한 실무 상황에서 활용됩니다. 합계 계산, 조건부 필터링, 딕셔너리 처리, 문자열 분석 등의 패턴을 익히면 대부분의 반복 작업을 효율적으로 처리할 수 있습니다.
+  - type: list
+    items:
+    - 리스트 요소 합계 계산
+    - 조건에 맞는 요소만 처리
+    - 딕셔너리 데이터 순회
+    - 문자열 분석과 카운팅
+  - type: code
+    language: python
+    title: 실전 응용 예제
+    description: "다양한 반복문 활용 패턴을 익힙니다."
+    content: |-
+      practicalNumbers1 = [1, 2, 3, 4, 5]
+      practicalTotal = 0
+      for practicalNumber1 in practicalNumbers1:
+          practicalTotal = practicalTotal + practicalNumber1
+      print('합계:', practicalTotal)
+
+      practicalNumbers2 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      practicalEvens = []
+      for practicalNumber2 in practicalNumbers2:
+          if practicalNumber2 % 2 == 0:
+              practicalEvens.append(practicalNumber2)
+      print('짝수:', practicalEvens)
+
+      practicalPerson = {'name': '홍길동', 'age': 25, 'city': '서울'}
+      for practicalKey, practicalValue in practicalPerson.items():
+          print(practicalKey, ':', practicalValue)
+
+      practicalText = 'Hello Python'
+      practicalVowels = 'aeiouAEIOU'
+      practicalVowelCount = 0
+      for practicalChar in practicalText:
+          if practicalChar in practicalVowels:
+              practicalVowelCount = practicalVowelCount + 1
+      print('모음 개수:', practicalVowelCount)
+
+- id: practice
+  title: 10일차 복습
+  subtitle: 반복문 미션
+  blocks:
+  - type: text
+    content: 10일차에서 배운 반복문 개념을 복습하는 미션입니다. while, for, range, break, continue 등을 종합적으로 연습해봅시다.
+  - type: expansion
+    title: "미션1: 0부터 10까지 출력"
+    code: |-
+      for mission1Index in range(11):
+          print(mission1Index)
+
+      mission1Count = 0
+      while mission1Count <= 10:
+          print(mission1Count)
+          mission1Count = mission1Count + 1
+  - type: expansion
+    title: "미션2: 10부터 0까지 카운트다운"
+    code: |-
+      for mission2Index in range(10, -1, -1):
+          print(mission2Index)
+
+      mission2Count = 10
+      while mission2Count >= 0:
+          print(mission2Count)
+          mission2Count = mission2Count - 1
+  - type: expansion
+    title: "미션3: 삼각형 패턴"
+    code: |-
+      for mission3Row1 in range(1, 8):
+          print('#' * mission3Row1)
+
+      for mission3Row2 in range(1, 8):
+          for mission3Col in range(mission3Row2):
+              print('#', end='')
+          print()
+  - type: expansion
+    title: "미션4: 구구단"
+    code: |-
+      mission4Dan = 5
+      for mission4Index in range(1, 10):
+          print(mission4Dan, 'x', mission4Index, '=', mission4Dan * mission4Index)
+
+      for mission4Row in range(2, 10):
+          print(mission4Row, '단')
+          for mission4Col in range(1, 10):
+              print(mission4Row, 'x', mission4Col, '=', mission4Row * mission4Col)
+          print()
+  - type: expansion
+    title: "미션5: 리스트 합계와 평균"
+    code: |-
+      mission5Numbers = [10, 20, 30, 40, 50]
+      mission5Total = 0
+      for mission5Num in mission5Numbers:
+          mission5Total = mission5Total + mission5Num
+      mission5Average = mission5Total / len(mission5Numbers)
+      print('합계:', mission5Total)
+      print('평균:', mission5Average)
+  - type: expansion
+    title: "미션6: 짝수만 필터링"
+    code: |-
+      mission6Numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      mission6Evens = []
+      for mission6Num in mission6Numbers:
+          if mission6Num % 2 == 0:
+              mission6Evens.append(mission6Num)
+      print('짝수:', mission6Evens)
+  - type: expansion
+    title: "미션7: break와 continue"
+    code: |-
+      for mission7Index1 in range(10):
+          if mission7Index1 == 5:
+              break
+          print(mission7Index1)
+      print('5에서 중단됨')
+
+      for mission7Index2 in range(10):
+          if mission7Index2 == 5:
+              continue
+          print(mission7Index2)
+      print('5만 건너뜀')

@@ -1,0 +1,260 @@
+meta:
+  id: pandas_08
+  title: 교통사고원인분석
+  order: 8
+  category: pandas
+  difficulty: "⭐⭐⭐⭐"
+  badge: 중급
+  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/car_crashes.csv
+  tags: ["car_crashes", "지역비교", "rank", "시각화", "heatmap"]
+  seo:
+    title: "pandas 지역별 비교 분석 - 미국 교통사고 데이터"
+    description: "미국 주별 교통사고 데이터로 지역 비교를 배웁니다. rank 순위, 상관관계 히트맵, 위험도 점수 계산을 실습합니다."
+    keywords: ["pandas rank", "지역비교", "상관분석", "car_crashes", "히트맵"]
+
+intro:
+  emoji: "🚗"
+  goal: 미국 주별 교통사고 데이터에서 "가장 위험한 주는 어디인가?"를 분석합니다.
+  description: 지역별 비교 분석을 배웁니다. 순위를 매기고, 여러 지표를 종합해서 위험도를 계산합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: 51개 주 교통사고 통계
+  blocks:
+  - type: text
+    content: 미국 51개 주(워싱턴DC 포함)의 교통사고 원인별 통계입니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: 51개 행, 8개 컬럼
+    content: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/car_crashes.csv"
+      crashes = pd.read_csv(url)
+      crashes.shape
+
+- id: step2_head
+  title: 2단계. 미리보기
+  subtitle: 데이터 구조 파악
+  blocks:
+  - type: text
+    content: total(총 사고), speeding(과속), alcohol(음주), not_distracted(집중), ins_premium(보험료), abbrev(주 약자)
+  - type: code
+    language: python
+    title: 미리보기
+    description: 주별 사고 원인 통계
+    content: |-
+      crashes.head()
+
+- id: step3_set_index
+  title: 3단계. 인덱스 설정
+  subtitle: 주 약자를 인덱스로
+  blocks:
+  - type: text
+    content: 주 약자(abbrev)를 인덱스로 설정하면 'CA', 'TX'처럼 이름으로 접근할 수 있습니다. 인덱스를 의미있는 값으로 설정하면 데이터 조회가 직관적이고 편리해집니다.
+  - type: code
+    language: python
+    title: 주 약자를 인덱스로
+    description: abbrev 컬럼을 인덱스로 설정
+    content: |-
+      indexed = crashes.set_index('abbrev')
+      indexed.head()
+  - type: tip
+    content: set_index()는 특정 컬럼을 인덱스로 설정합니다. 인덱스는 각 행을 식별하는 라벨입니다. 기본 인덱스(0, 1, 2...)보다 의미있는 값(주 이름, 날짜 등)을 인덱스로 설정하면 loc으로 직관적인 조회가 가능합니다.
+
+- id: step4_loc
+  title: 4단계. 특정 주 조회
+  subtitle: loc으로 이름 접근
+  blocks:
+  - type: text
+    content: 인덱스를 설정하면 주 이름으로 바로 조회할 수 있습니다. 인덱스 기반 조회는 속도도 빠릅니다.
+  - type: code
+    language: python
+    title: 특정 주 조회
+    description: 캘리포니아(CA)의 데이터
+    content: |-
+      indexed.loc['CA']
+
+- id: step5_multi_loc
+  title: 5단계. 여러 주 비교
+  subtitle: 리스트로 여러 행 조회
+  blocks:
+  - type: text
+    content: 리스트를 넣으면 여러 주를 동시에 비교할 수 있습니다. 관심있는 주들만 선택해서 볼 수 있어 편리합니다.
+  - type: code
+    language: python
+    title: 여러 주 비교
+    description: 캘리포니아, 텍사스, 뉴욕 비교
+    content: |-
+      indexed.loc[['CA', 'TX', 'NY']]
+
+- id: step6_rank
+  title: 6단계. 순위 매기기
+  subtitle: rank()
+  blocks:
+  - type: text
+    content: rank()는 값의 순위를 매깁니다. ascending=False로 큰 값이 1위가 됩니다. 순위를 매기면 상대적인 위치를 쉽게 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 총 사고율 순위
+    description: 사고가 많은 주일수록 1위에 가까움
+    content: |-
+      ranked = indexed.copy()
+      ranked['totalRank'] = ranked['total'].rank(ascending=False)
+      ranked[['total', 'totalRank']].sort_values('totalRank').head(10)
+  - type: tip
+    content: rank()는 값의 순위를 매깁니다. ascending=False면 큰 값이 1위(낮은 순위 번호), True면 작은 값이 1위입니다. 기본값은 True입니다. 동점이 있으면 method 파라미터로 처리 방식을 선택할 수 있습니다(average, min, max 등).
+
+- id: step7_alcohol_rank
+  title: 7단계. 음주사고 순위
+  subtitle: 다른 지표에도 적용
+  blocks:
+  - type: text
+    content: 음주사고율이 높은 주의 순위를 매깁니다. 여러 지표의 순위를 비교하면 주별 특성을 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 음주사고 순위
+    description: 음주사고가 많은 주
+    content: |-
+      ranked['alcoholRank'] = ranked['alcohol'].rank(ascending=False)
+      ranked[['alcohol', 'alcoholRank']].sort_values('alcoholRank').head(10)
+
+- id: step8_corr
+  title: 8단계. 상관관계 분석
+  subtitle: 원인들 사이의 관계
+  blocks:
+  - type: text
+    content: 음주사고가 총 사고율과 0.85로 높은 상관관계를 보입니다. 상관관계 분석으로 어떤 요인들이 함께 움직이는지 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 상관관계 행렬
+    description: 수치형 컬럼들의 상관관계
+    content: |-
+      indexed[['total', 'speeding', 'alcohol', 'not_distracted']].corr()
+
+- id: step9_normalize_func
+  title: 9단계. 정규화 함수
+  subtitle: 0~1 스케일로 변환
+  blocks:
+  - type: text
+    content: 여러 지표를 종합하려면 같은 스케일로 맞춰야 합니다. 과속은 0~20, 음주는 0~10처럼 범위가 다르면 단순히 더할 수 없습니다. 모든 값을 0~1 사이로 정규화하면 공정하게 비교할 수 있습니다. Min-Max 정규화 방식을 사용합니다.
+  - type: tip
+    title: "함수 정의 (def)"
+    content: |-
+      def는 '함수를 정의한다'는 뜻입니다. 함수는 특정 작업을 수행하는 코드 묶음으로, 한 번 정의하면 여러 번 재사용할 수 있습니다. def 함수명(입력값): 형태로 작성하고, return으로 결과를 반환합니다. 아래 코드에서 normalize(series)처럼 함수명과 괄호 안에 입력값을 넣으면 함수가 실행됩니다. 함수를 사용하면 같은 계산을 여러 컬럼에 반복 적용할 때 코드가 깔끔해지고, 수정할 때도 한 곳만 바꾸면 됩니다.
+  - type: code
+    language: python
+    title: 정규화 함수
+    description: 0~1 사이로 변환(최소=0, 최대=1)
+    content: |-
+      def normalize(series):
+          return (series - series.min()) / (series.max() - series.min())
+  - type: tip
+    content: 정규화(normalization)는 서로 다른 범위의 값들을 동일한 스케일로 변환하는 작업입니다. Min-Max 정규화는 (값 - 최소) / (최대 - 최소) 공식으로 모든 값을 0~1 사이로 변환합니다. 최소값은 0, 최대값은 1이 됩니다.
+
+- id: step10_danger_score
+  title: 10단계. 위험도 점수 계산
+  subtitle: 여러 지표 종합
+  blocks:
+  - type: text
+    content: 과속, 음주, 산만 운전을 종합해서 위험도 점수를 계산합니다. not_distracted는 높을수록 안전하므로 1에서 빼서 위험도로 변환합니다. 세 가지를 더한 뒤 3으로 나누면 평균 위험도 점수가 됩니다.
+  - type: code
+    language: python
+    title: 위험도 점수 계산
+    description: 과속, 음주, 산만 운전의 평균
+    content: |-
+      danger = indexed.copy()
+      danger['dangerScore'] = (
+          normalize(danger['speeding']) +
+          normalize(danger['alcohol']) +
+          (1 - normalize(danger['not_distracted']))
+      ) / 3
+      danger[['dangerScore']].sort_values('dangerScore', ascending=False).head(10)
+
+- id: step11_top_dangerous
+  title: 11단계. 가장 위험한 주
+  subtitle: nlargest 활용
+  blocks:
+  - type: text
+    content: 종합 위험도 상위 5개 주를 확인합니다. nlargest는 가장 큰 값을 빠르게 찾습니다.
+  - type: code
+    language: python
+    title: 가장 위험한 주 TOP 5
+    description: 종합 위험도 상위 5개 주
+    content: |-
+      danger.nlargest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+
+- id: step12_safest
+  title: 12단계. 가장 안전한 주
+  subtitle: nsmallest 활용
+  blocks:
+  - type: text
+    content: 종합 위험도가 가장 낮은 5개 주입니다. nsmallest는 가장 작은 값을 빠르게 찾습니다.
+  - type: code
+    language: python
+    title: 가장 안전한 주 TOP 5
+    description: 종합 위험도 하위 5개 주
+    content: |-
+      danger.nsmallest(5, 'dangerScore')[['total', 'speeding', 'alcohol', 'dangerScore']]
+  - type: tip
+    content: nlargest(n, column)와 nsmallest(n, column)은 특정 컬럼 기준으로 상위/하위 n개 행을 빠르게 찾습니다. sort_values()로 정렬한 뒤 head()를 쓰는 것보다 성능이 좋습니다. 대용량 데이터에서 TOP N을 찾을 때 유용합니다.
+
+- id: practice
+  title: 실습
+  subtitle: 교통안전 분석 프로젝트
+  blocks:
+  - type: text
+    content: 교통안전 분석가가 되어 주별 위험도를 분석해봅시다.
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: TOP N 분석 + 상관관계"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/car_crashes.csv")
+        dataIndexed = data.set_index('abbrev')
+    - type: code
+      title: "분석 수행"
+      content: |-
+        topPremium = dataIndexed.nlargest(5, 'ins_premium')[['ins_premium', 'total']]
+        speedingCorr = dataIndexed[['speeding', 'ins_premium']].corr()
+        (topPremium, speedingCorr)
+  - type: expansion
+    title: "미션2: 순위 비교 + 손실 비율 분석"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/car_crashes.csv")
+        dfIndexed = df.set_index('abbrev')
+        dfIndexed['totalRank'] = dfIndexed['total'].rank(ascending=False)
+        dfIndexed['alcoholRank'] = dfIndexed['alcohol'].rank(ascending=False)
+    - type: code
+      title: "분석 수행"
+      content: |-
+        dfIndexed['rankDiff'] = abs(dfIndexed['totalRank'] - dfIndexed['alcoholRank'])
+        rankDiffTop = dfIndexed[['totalRank', 'alcoholRank', 'rankDiff']].sort_values('rankDiff', ascending=False).head(10)
+        dfIndexed['lossRatio'] = dfIndexed['ins_losses'] / dfIndexed['ins_premium']
+        lossRatioTop = dfIndexed.nlargest(5, 'lossRatio')[['ins_premium', 'ins_losses', 'lossRatio']]
+        (rankDiffTop, lossRatioTop)
+
+- id: summary
+  title: 정리
+  subtitle: 중급 과정 완료!
+  blocks:
+  - type: text
+    content: pandas 중급 과정을 모두 마쳤습니다!
+  - type: list
+    items:
+    - "set_index() - 의미있는 인덱스 설정"
+    - "rank() - 순위 매기기"
+    - "정규화 - 0~1 사이로 스케일 조정"
+    - "종합 점수 - 여러 지표를 하나로"
+  - type: text
+    content: 다음 시간부터는 심화 과정입니다. 여러 데이터를 합치는 merge를 배웁니다.

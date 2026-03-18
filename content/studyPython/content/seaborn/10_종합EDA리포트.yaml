@@ -1,0 +1,353 @@
+meta:
+  id: seaborn_10
+  title: 종합EDA리포트
+  order: 10
+  category: seaborn
+  difficulty: "⭐⭐⭐"
+  badge: 심화
+  tags: ["seaborn", "EDA", "FacetGrid", "set_theme", "penguins", "종합분석"]
+  seo:
+    title: "Seaborn 종합 EDA - 펭귄 데이터 탐색적 분석"
+    description: "Seaborn의 모든 기능을 활용하여 펭귄 데이터셋의 완전한 EDA 리포트를 작성합니다. FacetGrid, 테마 설정, 다양한 차트 유형을 종합합니다."
+    keywords: ["seaborn", "EDA", "FacetGrid", "set_theme", "penguins", "종합분석"]
+
+intro:
+  emoji: "📊"
+  goal: penguins 데이터로 지금까지 배운 모든 Seaborn 기능을 종합하여 완전한 EDA 리포트를 작성합니다.
+  description: 이 프로젝트에서는 테마 설정, countplot, histplot, boxplot, violinplot, scatterplot, pairplot, heatmap, jointplot, lmplot, FacetGrid 등 모든 Seaborn 기능을 활용합니다. 이전에 배운 모든 개념을 종합하여 실전 EDA를 수행합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리와 테마 설정
+  subtitle: set_theme()
+  blocks:
+  - type: text
+    content: 데이터를 로드하고 Seaborn 테마를 설정합니다. set_theme()으로 전역 스타일을 지정합니다.
+  - type: code
+    language: python
+    title: 테마 설정
+    description: 데이터 로드와 테마 설정
+    content: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      sns.set_theme(style='whitegrid', palette='Set2', font_scale=1.1)
+      penguins = sns.load_dataset('penguins').dropna()
+      penguins
+  - type: tip
+    content: "set_theme()은 전역 스타일을 설정합니다. style은 'white', 'dark', 'whitegrid', 'darkgrid', 'ticks' 중 선택합니다. palette는 색상 팔레트, font_scale은 글꼴 크기 배율입니다."
+
+- id: step2_describe
+  title: 2단계. 기초 통계
+  subtitle: describe()
+  blocks:
+  - type: text
+    content: 데이터 기본 정보를 확인합니다. describe()로 수치형 변수의 통계량을 확인합니다.
+  - type: code
+    language: python
+    title: 기초 통계
+    description: 기본 통계량 확인
+    content: |-
+      penguins.describe()
+
+- id: step3_countplot
+  title: 3단계. 종별 개체 수
+  subtitle: sns.countplot()
+  blocks:
+  - type: text
+    content: 종별 개체 수를 countplot으로 확인합니다. hue로 성별을 구분합니다.
+  - type: code
+    language: python
+    title: 종별 카운트
+    description: 종과 성별 개체 수 확인
+    content: |-
+      figCount, axCount = plt.subplots(figsize=(8, 5))
+      sns.countplot(data=penguins, x='species', hue='sex', palette='Set2', ax=axCount)
+      axCount.set_title('Penguin Count by Species and Sex')
+      figCount
+
+- id: step4_island
+  title: 4단계. 섬별 분포
+  subtitle: 그룹별 비교
+  blocks:
+  - type: text
+    content: 섬별 종 분포를 확인합니다. 각 섬에 어떤 종이 서식하는지 파악합니다.
+  - type: code
+    language: python
+    title: 섬별 분포
+    description: 섬별 종 분포 확인
+    content: |-
+      figIsland, axIsland = plt.subplots(figsize=(10, 5))
+      sns.countplot(data=penguins, x='island', hue='species', palette='Set2', ax=axIsland)
+      axIsland.set_title('Species Distribution by Island')
+      figIsland
+
+- id: step5_histplot
+  title: 5단계. 체중 분포
+  subtitle: sns.histplot()
+  blocks:
+  - type: text
+    content: 체중 분포를 종별로 비교합니다. kde=True로 밀도 곡선을 추가합니다.
+  - type: code
+    language: python
+    title: 체중 히스토그램
+    description: 종별 체중 분포 비교
+    content: |-
+      figMass, axMass = plt.subplots(figsize=(10, 5))
+      sns.histplot(data=penguins, x='body_mass_g', hue='species', kde=True, palette='Set2', ax=axMass)
+      axMass.set_title('Body Mass Distribution by Species')
+      figMass
+
+- id: step6_boxplot
+  title: 6단계. 부리 길이 박스플롯
+  subtitle: sns.boxplot()
+  blocks:
+  - type: text
+    content: 박스플롯으로 부리 길이 분포를 비교합니다. 중앙값, 사분위수, 이상치를 확인합니다.
+  - type: code
+    language: python
+    title: 부리 길이 박스플롯
+    description: 종과 성별 부리 길이 비교
+    content: |-
+      figBox, axBox = plt.subplots(figsize=(10, 5))
+      sns.boxplot(data=penguins, x='species', y='bill_length_mm', hue='sex', palette='Set2', ax=axBox)
+      axBox.set_title('Bill Length by Species and Sex')
+      figBox
+
+- id: step7_violinplot
+  title: 7단계. 날개 길이 바이올린
+  subtitle: sns.violinplot()
+  blocks:
+  - type: text
+    content: 바이올린 플롯으로 날개 길이 분포를 확인합니다. split=True로 성별을 양쪽에 표시합니다.
+  - type: code
+    language: python
+    title: 바이올린 플롯
+    description: 날개 길이 분포 시각화
+    content: |-
+      figViolin, axViolin = plt.subplots(figsize=(10, 5))
+      sns.violinplot(data=penguins, x='species', y='flipper_length_mm', hue='sex', split=True, palette='Set2', ax=axViolin)
+      axViolin.set_title('Flipper Length Distribution')
+      figViolin
+
+- id: step8_scatterplot
+  title: 8단계. 다차원 산점도
+  subtitle: size, style
+  blocks:
+  - type: text
+    content: 부리 길이와 깊이의 관계를 산점도로 분석합니다. hue, style, size로 4개 변수를 동시에 표현합니다.
+  - type: code
+    language: python
+    title: 다차원 산점도
+    description: 부리 치수와 체중 관계
+    content: |-
+      figScatter, axScatter = plt.subplots(figsize=(10, 6))
+      sns.scatterplot(data=penguins, x='bill_length_mm', y='bill_depth_mm', hue='species', style='sex', size='body_mass_g', sizes=(50, 300), palette='Set2', alpha=0.7, ax=axScatter)
+      axScatter.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
+      axScatter.set_title('Bill Dimensions with Size = Body Mass')
+      figScatter
+
+- id: step9_pairplot
+  title: 9단계. pairplot
+  subtitle: 전체 변수 관계
+  blocks:
+  - type: text
+    content: pairplot으로 모든 수치 변수 관계를 탐색합니다. 대각선에는 KDE, 비대각선에는 산점도가 표시됩니다.
+  - type: code
+    language: python
+    title: pairplot
+    description: 모든 변수 쌍 시각화
+    content: |-
+      gPair = sns.pairplot(penguins, hue='species', diag_kind='kde', palette='Set2', height=2.5)
+      gPair.figure.suptitle('Penguin Measurements Pairplot', y=1.02)
+      gPair.figure
+
+- id: step10_heatmap
+  title: 10단계. 상관계수 히트맵
+  subtitle: sns.heatmap()
+  blocks:
+  - type: text
+    content: 상관계수 히트맵을 그립니다. 변수 간 선형 관계 강도를 색상으로 표현합니다.
+  - type: code
+    language: python
+    title: 상관 히트맵
+    description: 변수 간 상관관계 시각화
+    content: |-
+      penguinsNumeric = penguins[['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g']]
+      corrMatrix = penguinsNumeric.corr()
+      figCorr, axCorr = plt.subplots(figsize=(8, 6))
+      sns.heatmap(corrMatrix, annot=True, fmt='.2f', cmap='RdYlBu_r', vmin=-1, vmax=1, center=0, linewidths=0.5, ax=axCorr)
+      axCorr.set_title('Correlation Matrix')
+      figCorr
+
+- id: step11_jointplot
+  title: 11단계. jointplot
+  subtitle: 상세 2변수 분석
+  blocks:
+  - type: text
+    content: jointplot으로 날개 길이와 체중 관계를 상세 분석합니다. 중앙에 산점도, 양 축에 분포를 표시합니다.
+  - type: code
+    language: python
+    title: jointplot
+    description: 날개 길이와 체중 관계
+    content: |-
+      gJoint = sns.jointplot(data=penguins, x='flipper_length_mm', y='body_mass_g', hue='species', kind='scatter', palette='Set2', height=7)
+      gJoint.figure.suptitle('Flipper Length vs Body Mass', y=1.02)
+      gJoint.figure
+
+- id: step12_lmplot
+  title: 12단계. lmplot 회귀
+  subtitle: 그룹별 회귀
+  blocks:
+  - type: text
+    content: lmplot으로 종별 회귀 분석을 수행합니다. col로 성별 패널을 분리합니다.
+  - type: code
+    language: python
+    title: 회귀 분석
+    description: 종과 성별 회귀선 비교
+    content: |-
+      gLm = sns.lmplot(data=penguins, x='flipper_length_mm', y='body_mass_g', hue='species', col='sex', palette='Set2', height=4)
+      gLm.figure.suptitle('Regression by Species and Sex', y=1.02)
+      gLm.figure
+
+- id: step13_facetgrid
+  title: 13단계. FacetGrid 기본
+  subtitle: 커스텀 다중 패널
+  blocks:
+  - type: text
+    content: FacetGrid를 사용하여 커스텀 다중 패널을 만듭니다. col, row, hue를 조합하여 다차원 비교가 가능합니다.
+  - type: code
+    language: python
+    title: FacetGrid 산점도
+    description: 종, 성별, 섬별 비교
+    content: |-
+      gFacet = sns.FacetGrid(penguins, col='species', row='sex', hue='island', palette='Set2', height=3, aspect=1.2)
+      gFacet.map(sns.scatterplot, 'bill_length_mm', 'bill_depth_mm', alpha=0.7)
+      gFacet.add_legend()
+      gFacet.figure.suptitle('Bill Dimensions by Species, Sex, and Island', y=1.02)
+      gFacet.figure
+  - type: tip
+    content: FacetGrid는 가장 유연한 다중 패널 도구입니다. col, row로 그리드를 정의하고, map()으로 각 패널에 그릴 플롯 함수를 지정합니다. Axes-level 함수만 사용 가능합니다.
+
+- id: step14_facetgrid_hist
+  title: 14단계. FacetGrid 히스토그램
+  subtitle: map() 활용
+  blocks:
+  - type: text
+    content: FacetGrid에 히스토그램을 적용합니다. map()에 다양한 플롯 함수를 전달할 수 있습니다.
+  - type: code
+    language: python
+    title: FacetGrid 히스토그램
+    description: 종과 성별 체중 분포
+    content: |-
+      gFacetHist = sns.FacetGrid(penguins, col='species', hue='sex', palette='Set2', height=4)
+      gFacetHist.map(sns.histplot, 'body_mass_g', kde=True, alpha=0.6)
+      gFacetHist.add_legend()
+      gFacetHist.figure.suptitle('Body Mass Distribution by Species and Sex', y=1.02)
+      gFacetHist.figure
+
+- id: step15_style_compare
+  title: 15단계. 스타일 비교
+  subtitle: axes_style()
+  blocks:
+  - type: text
+    content: 다양한 스타일을 비교해봅니다. axes_style()은 컨텍스트 매니저로 특정 플롯에만 스타일을 적용합니다.
+  - type: code
+    language: python
+    title: 스타일 비교
+    description: 5가지 스타일 비교
+    content: |-
+      styles = ['white', 'dark', 'whitegrid', 'darkgrid', 'ticks']
+      figStyles, axesStyles = plt.subplots(1, 5, figsize=(20, 4))
+      for idx, styleName in enumerate(styles):
+          with sns.axes_style(styleName):
+              sns.boxplot(data=penguins, x='species', y='body_mass_g', palette='Set2', ax=axesStyles[idx])
+              axesStyles[idx].set_title(styleName)
+              axesStyles[idx].set_xlabel('')
+      figStyles.suptitle('Seaborn Style Comparison', y=1.02)
+      figStyles.tight_layout()
+      figStyles
+  - type: tip
+    content: axes_style()은 컨텍스트 매니저로 특정 플롯에만 스타일을 적용합니다. with 문 안에서만 해당 스타일이 적용되고 이후에는 원래 스타일로 돌아갑니다.
+
+- id: step16_context
+  title: 16단계. 컨텍스트 비교
+  subtitle: plotting_context()
+  blocks:
+  - type: text
+    content: 컨텍스트 크기를 비교합니다. 출력 목적에 맞는 크기를 선택합니다.
+  - type: code
+    language: python
+    title: 컨텍스트 비교
+    description: 4가지 컨텍스트 크기 비교
+    content: |-
+      contexts = ['paper', 'notebook', 'talk', 'poster']
+      figContext, axesContext = plt.subplots(2, 2, figsize=(12, 10))
+      axesFlat = axesContext.flatten()
+      for idx, contextName in enumerate(contexts):
+          with sns.plotting_context(contextName):
+              sns.barplot(data=penguins, x='species', y='body_mass_g', palette='Set2', ax=axesFlat[idx])
+              axesFlat[idx].set_title(f'Context: {contextName}')
+      figContext.suptitle('Seaborn Context Comparison', y=1.02)
+      figContext.tight_layout()
+      figContext
+  - type: tip
+    content: "plotting_context()로 출력 목적에 맞는 크기를 설정합니다. 'paper'(논문), 'notebook'(기본), 'talk'(발표), 'poster'(포스터) 순으로 요소 크기가 커집니다."
+
+- id: practice
+  title: 실습
+  subtitle: 종합 EDA
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: tips 종합 EDA 대시보드"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        sns.set_theme(style='whitegrid', palette='husl')
+        data = sns.load_dataset('tips')
+    - type: code
+      title: "상단 패널"
+      content: |-
+        chart, plots = plt.subplots(2, 2, figsize=(14, 10))
+        sns.histplot(data=data, x='total_bill', hue='time', kde=True, ax=plots[0, 0])
+        plots[0, 0].set_title('Bill Distribution by Time')
+        sns.boxplot(data=data, x='day', y='tip', hue='sex', ax=plots[0, 1])
+        plots[0, 1].set_title('Tip by Day and Sex')
+    - type: code
+      title: "하단 패널"
+      content: |-
+        sns.scatterplot(data=data, x='total_bill', y='tip', hue='size', size='size', sizes=(50, 200), ax=plots[1, 0])
+        plots[1, 0].set_title('Bill vs Tip by Party Size')
+        sns.countplot(data=data, x='day', hue='time', ax=plots[1, 1])
+        plots[1, 1].set_title('Count by Day and Time')
+        chart.suptitle('Tips Dataset EDA Dashboard', y=1.02)
+        chart.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: iris FacetGrid 다면 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        sns.set_theme(style='ticks', palette='Dark2')
+        df = sns.load_dataset('iris')
+    - type: code
+      title: "차트 생성"
+      content: |-
+        canvas = sns.FacetGrid(df, col='species', height=4, aspect=1)
+        canvas.map(sns.scatterplot, 'sepal_length', 'sepal_width', alpha=0.7)
+        canvas.map(sns.regplot, 'sepal_length', 'sepal_width', scatter=False, color='red')
+        canvas.figure.suptitle('Iris Sepal Dimensions by Species', y=1.02)
+        canvas.figure

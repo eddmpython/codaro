@@ -1,0 +1,451 @@
+meta:
+  id: "02_random"
+  title: "random - 난수 생성"
+  category: "builtins"
+  tags: ["random", "난수", "무작위", "랜덤"]
+  seo:
+    title: "파이썬 random 모듈 완전 정복"
+    description: "random 모듈로 난수 생성, 무작위 선택, 셔플 등 다양한 무작위 작업을 배웁니다."
+    keywords: ["random", "난수", "randint", "choice", "shuffle", "파이썬랜덤"]
+
+intro:
+  emoji: "🎲"
+  points:
+  - "정수/실수 난수 생성"
+  - "무작위 선택과 샘플링"
+  - "시퀀스 셔플"
+  - "게임과 시뮬레이션 활용"
+
+sections:
+- id: "module_import"
+  title: "random 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "random은 파이썬 표준 라이브러리입니다. 난수를 생성하고 무작위 선택을 수행하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 random 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "random 모듈 불러오기"
+    description: "random 모듈을 불러옵니다."
+    content: |-
+      import random
+
+      # 모듈 로드 확인
+      'random 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "basic_random"
+  title: "기본 난수 생성"
+  subtitle: "실수와 정수 난수"
+  blocks:
+  - type: "text"
+    content: "random 모듈은 난수를 생성하는 파이썬 표준 라이브러리입니다. random()은 0.0 이상 1.0 미만의 실수를 반환하고, randint()는 지정 범위의 정수를 반환합니다. uniform()은 특정 범위의 실수를 생성합니다. 게임, 시뮬레이션, 테스트 데이터 생성에 필수적입니다."
+  - type: "list"
+    items:
+    - "random(): 0.0 ~ 1.0 실수"
+    - "randint(a, b): a ~ b 정수"
+    - "uniform(a, b): a ~ b 실수"
+    - "randrange(): range()처럼 동작"
+  - type: "code"
+    language: "python"
+    title: "기본 난수"
+    description: "0과 1 사이의 실수를 생성합니다."
+    content: |-
+      randomFloat = random.random()
+      randomFloat
+  - type: "code"
+    language: "python"
+    title: "정수 난수"
+    description: "1부터 10까지의 정수를 무작위로 생성합니다."
+    content: |-
+      randomInteger = random.randint(1, 10)
+      randomInteger
+  - type: "code"
+    language: "python"
+    title: "범위 실수"
+    description: "5.0부터 10.0 사이의 실수를 생성합니다."
+    content: |-
+      uniformValue = random.uniform(5.0, 10.0)
+      uniformValue
+  - type: "tip"
+    content: "randint(a, b)는 a와 b를 모두 포함하지만, randrange(a, b)는 b를 포함하지 않습니다."
+
+- id: "sequence_operations"
+  title: "시퀀스 무작위 선택"
+  subtitle: "리스트에서 선택하기"
+  blocks:
+  - type: "text"
+    content: "시퀀스에서 무작위로 요소를 선택하는 함수들입니다. choice()는 하나를 선택하고, choices()는 여러 개를 중복 허용하여 선택합니다. sample()은 중복 없이 여러 개를 선택합니다. 이들은 추첨, 무작위 샘플링, 게임 구현에 유용합니다."
+  - type: "list"
+    items:
+    - "choice(): 하나 선택"
+    - "choices(k=n): n개 중복 선택"
+    - "sample(k=n): n개 중복 없이 선택"
+    - "가중치 적용 가능"
+  - type: "code"
+    language: "python"
+    title: "하나 선택"
+    description: "리스트에서 무작위로 하나를 선택합니다."
+    content: |-
+      fruits = ['apple', 'banana', 'cherry', 'date']
+      chosen = random.choice(fruits)
+      chosen
+  - type: "code"
+    language: "python"
+    title: "여러 개 선택 (중복 허용)"
+    description: "중복을 허용하여 3개를 선택합니다."
+    content: |-
+      colors = ['red', 'green', 'blue']
+      selected = random.choices(colors, k=3)
+      selected
+  - type: "code"
+    language: "python"
+    title: "샘플링 (중복 없음)"
+    description: "중복 없이 3개를 선택합니다."
+    content: |-
+      numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      sampled = random.sample(numbers, k=3)
+      sampled
+  - type: "tip"
+    content: "sample()의 k는 모집단 크기를 초과할 수 없지만, choices()는 가능합니다."
+
+- id: "shuffling"
+  title: "셔플과 섞기"
+  subtitle: "순서 무작위화"
+  blocks:
+  - type: "text"
+    content: "shuffle()은 리스트를 제자리에서 무작위로 섞습니다. 카드 게임, 플레이리스트 섞기, 데이터 무작위화에 사용됩니다. 원본 리스트가 변경되므로 주의해야 하며, 복사본을 만들어 섞는 것이 안전합니다."
+  - type: "list"
+    items:
+    - "shuffle(): 제자리 섞기"
+    - "원본 리스트 변경됨"
+    - "반환값 None"
+    - "복사 후 섞기 권장"
+  - type: "code"
+    language: "python"
+    title: "리스트 섞기"
+    description: "리스트를 무작위로 섞습니다."
+    content: |-
+      deck = [1, 2, 3, 4, 5]
+      random.shuffle(deck)
+      deck
+  - type: "code"
+    language: "python"
+    title: "카드 덱 섞기"
+    description: "52장의 카드를 섞습니다."
+    content: |-
+      suits = ['♠', '♥', '♦', '♣']
+      ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K']
+      cards = [f'{rank}{suit}' for suit in suits for rank in ranks]
+      random.shuffle(cards)
+      cards[:5]
+  - type: "code"
+    language: "python"
+    title: "복사 후 섞기"
+    description: "원본을 유지하고 복사본을 섞습니다."
+    content: |-
+      original = ['a', 'b', 'c', 'd']
+      shuffled = original.copy()
+      random.shuffle(shuffled)
+      original, shuffled
+  - type: "tip"
+    content: "shuffle()은 반환값이 없습니다. shuffled = random.shuffle(list)는 None을 반환합니다."
+
+- id: "distributions"
+  title: "확률 분포"
+  subtitle: "통계적 난수 생성"
+  blocks:
+  - type: "text"
+    content: "random 모듈은 다양한 확률 분포를 지원합니다. 정규분포(gauss), 삼각분포(triangular), 베타분포(betavariate) 등 통계적 시뮬레이션과 과학 계산에 사용되는 분포들을 제공합니다. 실제 데이터를 모방하는 테스트 데이터를 생성할 때 유용합니다."
+  - type: "list"
+    items:
+    - "gauss(mu, sigma): 정규분포"
+    - "triangular(low, high, mode): 삼각분포"
+    - "expovariate(lambd): 지수분포"
+    - "betavariate(alpha, beta): 베타분포"
+  - type: "code"
+    language: "python"
+    title: "정규분포"
+    description: "평균 100, 표준편차 15의 정규분포 난수를 생성합니다."
+    content: |-
+      normalValue = random.gauss(100, 15)
+      normalValue
+  - type: "code"
+    language: "python"
+    title: "삼각분포"
+    description: "최솟값 0, 최댓값 10, 최빈값 5의 삼각분포를 생성합니다."
+    content: |-
+      triangularValue = random.triangular(0, 10, 5)
+      triangularValue
+  - type: "code"
+    language: "python"
+    title: "지수분포"
+    description: "람다 0.5의 지수분포를 생성합니다."
+    content: |-
+      exponentialValue = random.expovariate(0.5)
+      exponentialValue
+  - type: "tip"
+    content: "gauss()는 정규분포를, normalvariate()는 스레드 안전한 정규분포를 생성합니다."
+
+- id: "seed_control"
+  title: "시드와 재현성"
+  subtitle: "난수 제어하기"
+  blocks:
+  - type: "text"
+    content: "seed()는 난수 생성기의 시작점을 설정합니다. 같은 시드를 사용하면 항상 같은 난수 시퀀스가 생성되어 재현 가능한 결과를 얻을 수 있습니다. 디버깅, 테스트, 과학 실험에서 필수적입니다. getstate()와 setstate()로 난수 생성기 상태를 저장하고 복원할 수 있습니다."
+  - type: "list"
+    items:
+    - "seed(n): 시드 설정"
+    - "같은 시드 → 같은 결과"
+    - "getstate(): 상태 저장"
+    - "setstate(): 상태 복원"
+  - type: "code"
+    language: "python"
+    title: "시드 설정"
+    description: "시드를 42로 설정하여 재현 가능한 난수를 생성합니다."
+    content: |-
+      random.seed(42)
+      firstValue = random.randint(1, 100)
+      random.seed(42)
+      secondValue = random.randint(1, 100)
+      firstValue, secondValue
+  - type: "code"
+    language: "python"
+    title: "재현 가능한 시퀀스"
+    description: "같은 시드로 같은 시퀀스를 생성합니다."
+    content: |-
+      random.seed(123)
+      sequence1 = [random.randint(1, 10) for _ in range(5)]
+      random.seed(123)
+      sequence2 = [random.randint(1, 10) for _ in range(5)]
+      sequence1, sequence2
+  - type: "code"
+    language: "python"
+    title: "상태 저장과 복원"
+    description: "난수 생성기 상태를 저장하고 복원합니다."
+    content: |-
+      random.seed(999)
+      state = random.getstate()
+      val1 = random.randint(1, 100)
+      random.setstate(state)
+      val2 = random.randint(1, 100)
+      val1, val2
+  - type: "tip"
+    content: "시드를 설정하지 않으면 시스템 시간을 기반으로 난수가 생성됩니다."
+
+- id: "practical_applications"
+  title: "실전 활용"
+  subtitle: "게임과 시뮬레이션"
+  blocks:
+  - type: "text"
+    content: "random 모듈의 실전 활용 예제를 살펴봅니다. 주사위 굴리기, 동전 던지기, 비밀번호 생성, 로또 번호 추첨 등 실생활 문제를 해결할 수 있습니다. 여러 함수를 조합하여 복잡한 무작위 작업을 구현합니다."
+  - type: "list"
+    items:
+    - "게임 로직 구현"
+    - "테스트 데이터 생성"
+    - "추첨 시스템"
+    - "시뮬레이션"
+  - type: "code"
+    language: "python"
+    title: "주사위 굴리기"
+    description: "두 개의 주사위를 굴립니다."
+    content: |-
+      dice1 = random.randint(1, 6)
+      dice2 = random.randint(1, 6)
+      dice1, dice2, dice1 + dice2
+  - type: "code"
+    language: "python"
+    title: "로또 번호 생성"
+    description: "1부터 45까지 중 6개를 중복 없이 선택합니다."
+    content: |-
+      lottoNumbers = sorted(random.sample(range(1, 46), k=6))
+      lottoNumbers
+  - type: "code"
+    language: "python"
+    title: "비밀번호 생성"
+    description: "문자와 숫자를 조합한 8자리 비밀번호를 생성합니다."
+    content: |-
+      import string
+      characters = string.ascii_letters + string.digits
+      password = ''.join(random.choices(characters, k=8))
+      password
+  - type: "tip"
+    content: "보안이 중요한 경우 secrets 모듈을 사용하세요. random은 암호학적으로 안전하지 않습니다."
+
+- id: "practice"
+  title: "random 모듈 종합 복습"
+  subtitle: "난수 생성 마스터하기"
+  blocks:
+  - type: "text"
+    content: "random 모듈의 다양한 함수를 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 실수 난수"
+    code: |-
+      floatNum = random.random()
+      floatNum
+
+  - type: "expansion"
+    title: "🟢 기본2: 정수 난수"
+    code: |-
+      intNum = random.randint(1, 100)
+      intNum
+
+  - type: "expansion"
+    title: "🟢 기본3: 리스트 선택"
+    code: |-
+      items = ['cat', 'dog', 'bird', 'fish']
+      picked = random.choice(items)
+      picked
+
+  - type: "expansion"
+    title: "🟢 기본4: 리스트 섞기"
+    code: |-
+      nums = [1, 2, 3, 4, 5]
+      random.shuffle(nums)
+      nums
+
+  - type: "expansion"
+    title: "🟢 기본5: 범위 실수"
+    code: |-
+      rangeFloat = random.uniform(10, 20)
+      rangeFloat
+
+  - type: "expansion"
+    title: "🟡 응용1: 샘플 3개"
+    code: |-
+      population = list(range(1, 11))
+      samples = random.sample(population, k=3)
+      samples
+
+  - type: "expansion"
+    title: "🟡 응용2: 가중치 선택"
+    code: |-
+      options = ['A', 'B', 'C']
+      weights = [0.5, 0.3, 0.2]
+      weighted = random.choices(options, weights=weights, k=10)
+      weighted
+
+  - type: "expansion"
+    title: "🟡 응용3: 정규분포"
+    code: |-
+      scores = [random.gauss(75, 10) for _ in range(5)]
+      scores
+
+  - type: "expansion"
+    title: "🟡 응용4: 재현 가능한 난수"
+    code: |-
+      random.seed(2024)
+      reproducible = [random.randint(1, 100) for _ in range(3)]
+      reproducible
+
+  - type: "expansion"
+    title: "🟡 응용5: 동전 던지기"
+    code: |-
+      flips = [random.choice(['H', 'T']) for _ in range(10)]
+      flips
+
+  - type: "expansion"
+    title: "🔴 심화1: 로또 시뮬레이션"
+    code: |-
+      myNumbers = [3, 7, 15, 23, 31, 42]
+      drawnNumbers = sorted(random.sample(range(1, 46), k=6))
+      matches = len(set(myNumbers) & set(drawnNumbers))
+      matches, drawnNumbers
+
+  - type: "expansion"
+    title: "🔴 심화2: 주사위 통계"
+    code: |-
+      rolls = [random.randint(1, 6) for _ in range(100)]
+      average = sum(rolls) / len(rolls)
+      average
+
+  - type: "expansion"
+    title: "🔴 심화3: 무작위 팀 나누기"
+    code: |-
+      players = ['Alice', 'Bob', 'Charlie', 'David', 'Eve', 'Frank']
+      shuffledPlayers = players.copy()
+      random.shuffle(shuffledPlayers)
+      team1 = shuffledPlayers[:3]
+      team2 = shuffledPlayers[3:]
+      team1, team2
+
+  - type: "expansion"
+    title: "🔴 심화4: 몬테카르로 파이"
+    code: |-
+      inside = 0
+      trials = 1000
+      for _ in range(trials):
+          x = random.uniform(-1, 1)
+          y = random.uniform(-1, 1)
+          if x*x + y*y <= 1:
+              inside = inside + 1
+      piEstimate = 4 * inside / trials
+      piEstimate
+
+  - type: "expansion"
+    title: "🔴 심화5: 랜덤 워크"
+    code: |-
+      position = 0
+      steps = 100
+      for _ in range(steps):
+          position = position + random.choice([-1, 1])
+      position
+
+  - type: "expansion"
+    title: "🔴 심화6: 확률 시뮬레이션"
+    code: |-
+      successes = 0
+      experiments = 1000
+      for _ in range(experiments):
+          if random.random() < 0.3:
+              successes = successes + 1
+      probability = successes / experiments
+      probability
+
+  - type: "expansion"
+    title: "🔴 심화7: 부트스트랩 샘플링"
+    code: |-
+      dataset = [10, 20, 30, 40, 50]
+      bootstrapSample = random.choices(dataset, k=len(dataset))
+      bootstrapSample
+
+  - type: "expansion"
+    title: "🔴 심화8: 무작위 문자열"
+    code: |-
+      import string
+      chars = string.ascii_uppercase + string.digits
+      randomString = ''.join(random.choices(chars, k=10))
+      randomString
+
+  - type: "expansion"
+    title: "🔴 심화9: 가위바위보 시뮬레이션"
+    code: |-
+      choices = ['rock', 'paper', 'scissors']
+      games = 100
+      wins = 0
+      for _ in range(games):
+          player = random.choice(choices)
+          computer = random.choice(choices)
+          if (player == 'rock' and computer == 'scissors') or \
+             (player == 'paper' and computer == 'rock') or \
+             (player == 'scissors' and computer == 'paper'):
+              wins = wins + 1
+      winRate = wins / games
+      winRate
+
+  - type: "expansion"
+    title: "🔴 심화10: 복권 당첨 확률"
+    code: |-
+      simulations = 10000
+      winCount = 0
+      for _ in range(simulations):
+          ticket = random.sample(range(1, 46), k=6)
+          winning = random.sample(range(1, 46), k=6)
+          if len(set(ticket) & set(winning)) >= 3:
+              winCount = winCount + 1
+      winProbability = winCount / simulations
+      winProbability

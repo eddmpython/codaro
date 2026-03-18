@@ -1,0 +1,575 @@
+meta:
+  id: "10_sys"
+  title: "sys - 시스템 파라미터"
+  category: "builtins"
+  tags: ["sys", "시스템", "버전", "경로", "인터프리터"]
+  seo:
+    title: "파이썬 sys 모듈 완전 정복"
+    description: "sys 모듈로 시스템 정보, 모듈 경로, 표준 스트림을 배웁니다."
+    keywords: ["sys", "시스템", "버전정보", "path", "argv", "파이썬시스템"]
+
+intro:
+  emoji: "⚙️"
+  points:
+  - "파이썬 버전과 플랫폼 정보"
+  - "모듈 경로 관리"
+  - "표준 입출력 스트림"
+  - "런타임 환경 제어"
+
+sections:
+- id: "module_import"
+  title: "sys 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "sys는 파이썬 인터프리터와 관련된 시스템 정보를 제공하는 표준 라이브러리입니다. 버전 정보, 모듈 경로, 표준 스트림 등을 다룹니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 sys 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "sys 모듈 임포트하기"
+    description: "sys 모듈을 불러옵니다."
+    content: |-
+      import sys
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다."
+
+- id: "version_info"
+  title: "버전 정보"
+  subtitle: "파이썬 버전과 플랫폼 확인"
+  blocks:
+  - type: "text"
+    content: "sys 모듈은 현재 실행 중인 파이썬의 버전 정보를 제공합니다. version_info는 major, minor, micro 버전을 튜플로 제공하며, 버전 비교에 활용할 수 있습니다."
+  - type: "list"
+    items:
+    - "version: 버전 문자열"
+    - "version_info: 버전 정보 튜플"
+    - "platform: 플랫폼 식별자"
+    - "major, minor, micro: 버전 구성요소"
+  - type: "code"
+    language: "python"
+    title: "파이썬 버전 문자열"
+    description: "현재 파이썬 버전을 문자열로 확인합니다."
+    content: |-
+      pythonVersion = sys.version
+      pythonVersion
+  - type: "code"
+    language: "python"
+    title: "버전 정보 튜플"
+    description: "버전 정보를 튜플 형태로 가져옵니다."
+    content: |-
+      versionTuple = sys.version_info
+      versionTuple
+  - type: "code"
+    language: "python"
+    title: "메이저 버전"
+    description: "주요 버전 번호를 확인합니다."
+    content: |-
+      majorVersion = sys.version_info.major
+      majorVersion
+  - type: "code"
+    language: "python"
+    title: "마이너 버전"
+    description: "부 버전 번호를 확인합니다."
+    content: |-
+      minorVersion = sys.version_info.minor
+      minorVersion
+  - type: "code"
+    language: "python"
+    title: "마이크로 버전"
+    description: "마이크로 버전 번호를 확인합니다."
+    content: |-
+      microVersion = sys.version_info.micro
+      microVersion
+  - type: "code"
+    language: "python"
+    title: "플랫폼 식별자"
+    description: "운영체제 플랫폼을 확인합니다."
+    content: |-
+      platformId = sys.platform
+      platformId
+  - type: "code"
+    language: "python"
+    title: "버전 비교 (3.8 이상)"
+    description: "파이썬 3.8 이상인지 확인합니다."
+    content: |-
+      isModern = sys.version_info >= (3, 8)
+      isModern
+  - type: "code"
+    language: "python"
+    title: "버전 정보 딕셔너리"
+    description: "버전 정보를 딕셔너리로 구성합니다."
+    content: |-
+      versionDict = {
+          'major': sys.version_info.major,
+          'minor': sys.version_info.minor,
+          'micro': sys.version_info.micro
+      }
+      versionDict
+  - type: "tip"
+    content: "version_info는 튜플이므로 직접 비교 연산이 가능합니다."
+
+- id: "path_management"
+  title: "모듈 경로"
+  subtitle: "모듈 검색 경로 관리"
+  blocks:
+  - type: "text"
+    content: "sys.path는 파이썬이 모듈을 검색하는 디렉토리 목록입니다. sys.modules는 현재 로드된 모듈을 딕셔너리 형태로 관리합니다."
+  - type: "list"
+    items:
+    - "path: 모듈 검색 경로 리스트"
+    - "modules: 로드된 모듈 딕셔너리"
+    - "append(): 경로 추가"
+    - "insert(): 우선순위 경로 삽입"
+  - type: "code"
+    language: "python"
+    title: "모듈 검색 경로 목록"
+    description: "파이썬이 모듈을 찾는 경로를 확인합니다."
+    content: |-
+      searchPaths = sys.path
+      searchPaths
+  - type: "code"
+    language: "python"
+    title: "첫 번째 경로"
+    description: "가장 우선순위가 높은 경로를 확인합니다."
+    content: |-
+      firstPath = sys.path[0]
+      firstPath
+  - type: "code"
+    language: "python"
+    title: "경로 개수"
+    description: "등록된 경로의 개수를 확인합니다."
+    content: |-
+      pathCount = len(sys.path)
+      pathCount
+  - type: "code"
+    language: "python"
+    title: "새 경로 추가"
+    description: "경로 목록 끝에 새 경로를 추가합니다."
+    content: |-
+      sys.path.append('/custom/path')
+      updatedPaths = sys.path
+      updatedPaths
+  - type: "code"
+    language: "python"
+    title: "경로 앞에 삽입"
+    description: "우선순위를 높이기 위해 맨 앞에 삽입합니다."
+    content: |-
+      sys.path.insert(0, '/priority/path')
+      pathsWithPriority = sys.path
+      pathsWithPriority
+  - type: "code"
+    language: "python"
+    title: "로드된 모듈 딕셔너리"
+    description: "현재 메모리에 로드된 모든 모듈을 확인합니다."
+    content: |-
+      loadedModules = sys.modules
+      loadedModules
+  - type: "code"
+    language: "python"
+    title: "특정 모듈 확인"
+    description: "math 모듈이 로드되었는지 확인합니다."
+    content: |-
+      hasMath = 'math' in sys.modules
+      hasMath
+  - type: "code"
+    language: "python"
+    title: "로드된 모듈 개수"
+    description: "현재 로드된 모듈의 개수를 확인합니다."
+    content: |-
+      moduleCount = len(sys.modules)
+      moduleCount
+  - type: "tip"
+    content: "sys.path를 수정하면 동적으로 모듈 검색 경로를 변경할 수 있습니다."
+
+- id: "standard_streams"
+  title: "표준 스트림"
+  subtitle: "입출력 스트림 관리"
+  blocks:
+  - type: "text"
+    content: "sys는 표준 입력, 출력, 에러 스트림을 제공합니다. stdin, stdout, stderr를 통해 입출력을 제어할 수 있습니다."
+  - type: "list"
+    items:
+    - "stdout: 표준 출력 스트림"
+    - "stderr: 표준 에러 스트림"
+    - "stdin: 표준 입력 스트림"
+    - "encoding: 스트림 인코딩"
+  - type: "code"
+    language: "python"
+    title: "표준 출력 객체"
+    description: "Pyodide에서는 브라우저 콘솔로 리다이렉트됩니다."
+    content: |-
+      stdoutStream = sys.stdout
+      stdoutStream
+  - type: "code"
+    language: "python"
+    title: "표준 에러 객체"
+    description: "Pyodide에서는 브라우저 콘솔로 리다이렉트됩니다."
+    content: |-
+      stderrStream = sys.stderr
+      stderrStream
+  - type: "code"
+    language: "python"
+    title: "표준 입력 객체"
+    description: "Pyodide에서는 제한적으로 동작합니다."
+    content: |-
+      stdinStream = sys.stdin
+      stdinStream
+  - type: "code"
+    language: "python"
+    title: "출력 스트림 인코딩"
+    description: "현재 출력 스트림의 인코딩을 확인합니다."
+    content: |-
+      outputEncoding = sys.stdout.encoding
+      outputEncoding
+  - type: "code"
+    language: "python"
+    title: "스트림 쓰기 가능 여부"
+    description: "stdout이 쓰기 가능한지 확인합니다."
+    content: |-
+      isWritable = sys.stdout.writable()
+      isWritable
+  - type: "code"
+    language: "python"
+    title: "스트림 정보 딕셔너리"
+    description: "모든 스트림의 타입 정보를 확인합니다."
+    content: |-
+      streamInfo = {
+          'stdout': str(type(sys.stdout)),
+          'stderr': str(type(sys.stderr)),
+          'stdin': str(type(sys.stdin))
+      }
+      streamInfo
+  - type: "tip"
+    content: "브라우저 환경에서는 표준 스트림이 제한적으로 동작합니다."
+
+- id: "runtime_info"
+  title: "런타임 정보"
+  subtitle: "인터프리터 실행 환경"
+  blocks:
+  - type: "text"
+    content: "sys 모듈은 파이썬 인터프리터의 실행 환경 정보를 제공합니다. 실행 파일 경로, 설치 위치, 재귀 깊이 등을 확인할 수 있습니다."
+  - type: "list"
+    items:
+    - "executable: 인터프리터 실행 파일"
+    - "prefix: 설치 경로 접두사"
+    - "getrecursionlimit(): 최대 재귀 깊이"
+    - "maxsize: 최대 정수 크기"
+  - type: "code"
+    language: "python"
+    title: "인터프리터 실행 파일 경로"
+    description: "Pyodide에서는 빈 문자열을 반환합니다."
+    content: |-
+      executablePath = sys.executable
+      executablePath
+  - type: "code"
+    language: "python"
+    title: "설치 경로 접두사"
+    description: "파이썬 설치 경로를 확인합니다."
+    content: |-
+      installPrefix = sys.prefix
+      installPrefix
+  - type: "code"
+    language: "python"
+    title: "기본 접두사"
+    description: "기본 설치 경로를 확인합니다."
+    content: |-
+      basePrefix = sys.base_prefix
+      basePrefix
+  - type: "code"
+    language: "python"
+    title: "가상환경 여부"
+    description: "현재 가상환경에서 실행 중인지 확인합니다."
+    content: |-
+      isVirtualEnv = sys.prefix != sys.base_prefix
+      isVirtualEnv
+  - type: "code"
+    language: "python"
+    title: "최대 재귀 깊이"
+    description: "함수 호출 스택의 최대 깊이를 확인합니다."
+    content: |-
+      maxRecursion = sys.getrecursionlimit()
+      maxRecursion
+  - type: "code"
+    language: "python"
+    title: "바이트 순서"
+    description: "시스템의 바이트 순서를 확인합니다."
+    content: |-
+      byteOrder = sys.byteorder
+      byteOrder
+  - type: "code"
+    language: "python"
+    title: "최대 정수 크기"
+    description: "시스템이 지원하는 최대 정수값을 확인합니다."
+    content: |-
+      maxSize = sys.maxsize
+      maxSize
+  - type: "code"
+    language: "python"
+    title: "런타임 정보 요약"
+    description: "주요 런타임 정보를 딕셔너리로 정리합니다."
+    content: |-
+      runtimeSummary = {
+          'platform': sys.platform,
+          'version': sys.version_info[:3],
+          'maxsize': sys.maxsize,
+          'recursion': sys.getrecursionlimit()
+      }
+      runtimeSummary
+  - type: "tip"
+    content: "setrecursionlimit()로 재귀 깊이를 변경할 수 있지만 신중히 사용하세요."
+
+- id: "exit_and_args"
+  title: "종료와 인자"
+  subtitle: "명령행 인자와 시스템 정보"
+  blocks:
+  - type: "text"
+    content: "sys.argv는 명령행 인자를 리스트로 제공합니다. implementation은 파이썬 구현 정보를 담고 있습니다."
+  - type: "list"
+    items:
+    - "argv: 명령행 인자 리스트"
+    - "implementation: 파이썬 구현 정보"
+    - "maxunicode: 최대 유니코드 값"
+    - "bit_length(): 정수 비트 크기"
+  - type: "code"
+    language: "python"
+    title: "명령행 인자 목록"
+    description: "Pyodide에서는 빈 리스트 또는 제한된 값을 반환합니다."
+    content: |-
+      commandArgs = sys.argv
+      commandArgs
+  - type: "code"
+    language: "python"
+    title: "스크립트 이름"
+    description: "Pyodide에서는 사용 불가합니다."
+    content: |-
+      scriptName = sys.argv[0] if sys.argv else 'N/A'
+      scriptName
+  - type: "code"
+    language: "python"
+    title: "인자 개수"
+    description: "전달된 인자의 개수를 확인합니다."
+    content: |-
+      argCount = len(sys.argv)
+      argCount
+  - type: "code"
+    language: "python"
+    title: "인자 존재 여부"
+    description: "스크립트에 인자가 전달되었는지 확인합니다."
+    content: |-
+      hasArgs = len(sys.argv) > 1
+      hasArgs
+  - type: "code"
+    language: "python"
+    title: "정수 크기 비트"
+    description: "시스템의 정수 비트 크기를 계산합니다."
+    content: |-
+      intBits = sys.maxsize.bit_length() + 1
+      intBits
+  - type: "code"
+    language: "python"
+    title: "파이썬 구현"
+    description: "현재 파이썬 구현체 이름을 확인합니다."
+    content: |-
+      implementation = sys.implementation.name
+      implementation
+  - type: "code"
+    language: "python"
+    title: "구현 버전"
+    description: "구현체의 버전 정보를 확인합니다."
+    content: |-
+      implVersion = sys.implementation.version
+      implVersion
+  - type: "code"
+    language: "python"
+    title: "시스템 정보 통합"
+    description: "주요 시스템 정보를 하나로 정리합니다."
+    content: |-
+      systemInfo = {
+          'impl': sys.implementation.name,
+          'platform': sys.platform,
+          'version': f"{sys.version_info.major}.{sys.version_info.minor}",
+          'bits': sys.maxsize.bit_length() + 1
+      }
+      systemInfo
+  - type: "tip"
+    content: "CPython, PyPy, Jython 등 다양한 파이썬 구현체를 구분할 수 있습니다."
+
+- id: "practice"
+  title: "sys 모듈 종합 복습"
+  subtitle: "시스템 정보 마스터하기"
+  blocks:
+  - type: "text"
+    content: "sys 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 버전 문자열 첫 5글자"
+    code: |-
+      versionPrefix = sys.version[:5]
+      versionPrefix
+
+  - type: "expansion"
+    title: "🟢 기본2: 파이썬 3 여부"
+    code: |-
+      isPython3 = sys.version_info.major == 3
+      isPython3
+
+  - type: "expansion"
+    title: "🟢 기본3: 경로 개수 세기"
+    code: |-
+      totalPaths = len(sys.path)
+      totalPaths
+
+  - type: "expansion"
+    title: "🟢 기본4: 플랫폼 문자열"
+    code: |-
+      platformName = sys.platform
+      platformName
+
+  - type: "expansion"
+    title: "🟢 기본5: 최대 정수값"
+    code: |-
+      maxIntValue = sys.maxsize
+      maxIntValue
+
+  - type: "expansion"
+    title: "🟡 응용1: 버전 튜플 문자열"
+    code: |-
+      versionStr = f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}"
+      versionStr
+
+  - type: "expansion"
+    title: "🟡 응용2: sys 모듈 확인"
+    code: |-
+      hasSysModule = 'sys' in sys.modules
+      hasSysModule
+
+  - type: "expansion"
+    title: "🟡 응용3: 재귀 깊이 절반"
+    code: |-
+      halfRecursion = sys.getrecursionlimit() // 2
+      halfRecursion
+
+  - type: "expansion"
+    title: "🟡 응용4: 경로에 현재 디렉토리"
+    code: |-
+      hasCurrentDir = '.' in sys.path or '' in sys.path
+      hasCurrentDir
+
+  - type: "expansion"
+    title: "🟡 응용5: 64비트 시스템 여부"
+    code: |-
+      is64Bit = sys.maxsize > 2**32
+      is64Bit
+
+  - type: "expansion"
+    title: "🔴 심화1: 버전 정보 완전 분해"
+    code: |-
+      fullVersionInfo = {
+          'major': sys.version_info.major,
+          'minor': sys.version_info.minor,
+          'micro': sys.version_info.micro,
+          'releaselevel': sys.version_info.releaselevel,
+          'serial': sys.version_info.serial
+      }
+      fullVersionInfo
+
+  - type: "expansion"
+    title: "🔴 심화2: 모듈 경로 통계"
+    code: |-
+      pathStats = {
+          'total': len(sys.path),
+          'first': sys.path[0] if sys.path else None,
+          'last': sys.path[-1] if sys.path else None,
+          'unique': len(set(sys.path))
+      }
+      pathStats
+
+  - type: "expansion"
+    title: "🔴 심화3: 환경 정보 종합"
+    code: |-
+      envInfo = {
+          'platform': sys.platform,
+          'implementation': sys.implementation.name,
+          'version': tuple(sys.version_info[:3]),
+          'is_venv': sys.prefix != sys.base_prefix,
+          'encoding': sys.stdout.encoding
+      }
+      envInfo
+
+  - type: "expansion"
+    title: "🔴 심화4: 내장 모듈 필터링"
+    code: |-
+      builtinModules = [m for m in sys.modules.keys() if not '.' in m][:5]
+      builtinModules
+
+  - type: "expansion"
+    title: "🔴 심화5: 재귀 제한 분석"
+    code: |-
+      recursionInfo = {
+          'limit': sys.getrecursionlimit(),
+          'safe_depth': sys.getrecursionlimit() * 0.8,
+          'warning_depth': sys.getrecursionlimit() * 0.9
+      }
+      recursionInfo
+
+  - type: "expansion"
+    title: "🔴 심화6: 시스템 용량 정보"
+    code: |-
+      capacityInfo = {
+          'maxsize': sys.maxsize,
+          'bits': sys.maxsize.bit_length() + 1,
+          'max_unicode': sys.maxunicode,
+          'byteorder': sys.byteorder
+      }
+      capacityInfo
+
+  - type: "expansion"
+    title: "🔴 심화7: 버전 호환성 체크"
+    code: |-
+      compatCheck = {
+          'min_38': sys.version_info >= (3, 8),
+          'min_39': sys.version_info >= (3, 9),
+          'min_310': sys.version_info >= (3, 10),
+          'min_311': sys.version_info >= (3, 11)
+      }
+      compatCheck
+
+  - type: "expansion"
+    title: "🔴 심화8: 스트림 상태 분석"
+    code: |-
+      streamStatus = {
+          'stdout_writable': sys.stdout.writable(),
+          'stderr_writable': sys.stderr.writable(),
+          'stdin_readable': sys.stdin.readable(),
+          'stdout_encoding': sys.stdout.encoding
+      }
+      streamStatus
+
+  - type: "expansion"
+    title: "🔴 심화9: 경로 중복 제거"
+    code: |-
+      uniquePaths = list(dict.fromkeys(sys.path))
+      pathCleanup = {
+          'original': len(sys.path),
+          'unique': len(uniquePaths),
+          'duplicates': len(sys.path) - len(uniquePaths)
+      }
+      pathCleanup
+
+  - type: "expansion"
+    title: "🔴 심화10: 완전한 시스템 프로파일"
+    code: |-
+      systemProfile = {
+          'python': f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+          'implementation': sys.implementation.name,
+          'platform': sys.platform,
+          'architecture': f"{sys.maxsize.bit_length() + 1}-bit",
+          'byteorder': sys.byteorder,
+          'encoding': sys.stdout.encoding,
+          'recursion_limit': sys.getrecursionlimit(),
+          'path_count': len(sys.path),
+          'modules_loaded': len(sys.modules),
+          'is_virtual_env': sys.prefix != sys.base_prefix
+      }
+      systemProfile

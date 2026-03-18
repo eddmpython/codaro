@@ -1,0 +1,262 @@
+meta:
+  id: matplotlib_00
+  title: Matplotlib소개
+  order: 0
+  category: matplotlib
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags: ["Matplotlib", "시각화", "정적 차트", "Figure", "Axes", "pyplot"]
+  seo:
+    title: "Matplotlib 입문 - 파이썬 시각화의 기본"
+    description: "Matplotlib으로 고품질 정적 차트를 만들어보세요. 논문, 보고서에 적합한 출판 품질의 시각화를 경험합니다."
+    keywords: ["Matplotlib", "pyplot", "정적 차트", "데이터 시각화", "Figure", "Axes"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "📈"
+      title: "Matplotlib"
+      subtitle: "파이썬 시각화의 시작점"
+
+    - type: hero
+      emoji: "🎨"
+      title: "출판 품질의 시각화"
+      subtitle: "논문과 보고서를 위한 정적 차트"
+      points:
+        - emoji: "📄"
+          title: "PNG, PDF, SVG 고품질 저장"
+        - emoji: "🔧"
+          title: "픽셀 단위 세밀한 조정"
+        - emoji: "📊"
+          title: "모든 차트 유형 지원"
+        - emoji: "🏛️"
+          title: "20년 검증된 표준 라이브러리"
+
+- id: matplotlib_history
+  blocks:
+    - type: sectionHeader
+      title: "🏛️ Matplotlib의 역사"
+      subtitle: "파이썬 시각화의 뿌리"
+
+    - type: text
+      content: |-
+        Matplotlib은 2003년 John Hunter가 만들었습니다. 당시 그는 뇌전증 환자의 뇌파 데이터를 분석하던 신경생물학자였습니다. MATLAB의 시각화 기능을 파이썬에서 사용하고 싶어서 시작된 프로젝트입니다.
+
+        20년이 넘는 시간 동안 과학/공학 분야의 표준 시각화 도구로 자리잡았습니다. Seaborn, Pandas의 plot 기능, 심지어 일부 다른 시각화 라이브러리도 내부적으로 Matplotlib을 기반으로 합니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🔬"
+          title: "과학 커뮤니티 표준"
+          description: "Nature, Science 등 학술지 논문의 대부분이 Matplotlib 사용"
+        - emoji: "📚"
+          title: "방대한 문서와 예제"
+          description: "20년간 축적된 튜토리얼, 갤러리, Stack Overflow 답변"
+        - emoji: "🧬"
+          title: "다른 라이브러리의 기반"
+          description: "Seaborn, Pandas plot 등이 Matplotlib 위에 구축됨"
+        - emoji: "🔧"
+          title: "완전한 제어권"
+          description: "그래프의 모든 요소를 픽셀 단위로 조정 가능"
+
+- id: visualization_tools
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 파이썬 시각화 생태계"
+      subtitle: "다양한 도구들의 역할"
+
+    - type: text
+      content: |-
+        파이썬에는 다양한 시각화 라이브러리가 있습니다. 각각 장단점이 있어서 용도에 맞게 선택하면 됩니다. Matplotlib을 먼저 배우면 다른 라이브러리를 이해하기 쉬워집니다.
+
+    - type: table
+      headers: ["라이브러리", "특징", "주요 용도"]
+      rows:
+        - ["Matplotlib", "정적 차트, 완전한 제어, 논문 품질", "논문, 보고서, 출판물"]
+        - ["Seaborn", "통계 시각화, 예쁜 기본 스타일", "탐색적 분석, 통계 차트"]
+        - ["Plotly", "인터랙티브, 웹 기반, 호버 정보", "대시보드, 웹 앱"]
+        - ["Altair", "선언형 문법, 간결한 코드", "빠른 프로토타이핑"]
+        - ["Bokeh", "대용량 데이터, 스트리밍", "실시간 대시보드"]
+        - ["Pandas plot", "DataFrame에서 바로 시각화", "빠른 탐색"]
+
+    - type: note
+      style: info
+      title: "Matplotlib이 먼저인 이유"
+      content: "Seaborn은 Matplotlib 위에 만들어졌고, Pandas plot도 내부적으로 Matplotlib을 사용합니다. Matplotlib의 Figure, Axes 개념을 이해하면 다른 라이브러리도 쉽게 배울 수 있습니다."
+
+- id: figure_axes
+  blocks:
+    - type: sectionHeader
+      title: "🖼️ Figure와 Axes 이해하기"
+      subtitle: "Matplotlib의 핵심 구조"
+
+    - type: text
+      content: |-
+        Matplotlib을 제대로 사용하려면 Figure와 Axes의 관계를 이해해야 합니다.
+
+        Figure는 전체 그림판입니다. 도화지 한 장이라고 생각하세요. Axes는 실제 차트가 그려지는 영역입니다. 하나의 Figure에 여러 개의 Axes를 배치할 수 있습니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🖼️"
+          title: "Figure"
+          description: "전체 그림판. 크기, 해상도, 배경색 등을 설정"
+        - emoji: "📊"
+          title: "Axes"
+          description: "실제 차트 영역. 데이터, 축, 제목 등을 설정"
+        - emoji: "📐"
+          title: "Axis"
+          description: "x축, y축. 눈금, 범위, 라벨 설정"
+        - emoji: "🎨"
+          title: "Artist"
+          description: "화면에 그려지는 모든 요소 (선, 점, 텍스트 등)"
+
+    - type: note
+      style: info
+      title: "pyplot vs 객체 지향"
+      content: "plt.plot() 같은 pyplot 방식은 빠르게 그릴 때 편리합니다. fig, ax = plt.subplots() 같은 객체 지향 방식은 복잡한 차트를 세밀하게 제어할 때 사용합니다. 이 과정에서는 두 방식 모두 배웁니다."
+
+- id: chart_types
+  blocks:
+    - type: sectionHeader
+      title: "📊 지원하는 차트 종류"
+      subtitle: "기본부터 고급까지"
+
+    - type: table
+      headers: ["카테고리", "차트 종류", "함수"]
+      rows:
+        - ["기본", "선 그래프", "plot()"]
+        - ["기본", "산점도", "scatter()"]
+        - ["기본", "막대 그래프", "bar(), barh()"]
+        - ["기본", "히스토그램", "hist()"]
+        - ["기본", "파이 차트", "pie()"]
+        - ["분포", "박스 플롯", "boxplot()"]
+        - ["분포", "바이올린 플롯", "violinplot()"]
+        - ["고급", "히트맵", "imshow(), pcolormesh()"]
+        - ["고급", "등고선", "contour(), contourf()"]
+        - ["고급", "3D 플롯", "Axes3D"]
+        - ["고급", "오차 막대", "errorbar()"]
+        - ["특수", "극좌표", "projection='polar'"]
+        - ["특수", "지도", "Basemap, Cartopy 연동"]
+
+- id: projects_preview
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 10개 프로젝트 미리보기"
+      subtitle: "이 순서대로 배웁니다"
+
+    - type: table
+      headers: ["단계", "프로젝트", "배울 내용"]
+      rows:
+        - ["입문", "01 주가추세분석", "plot, figure, title, legend, grid"]
+        - ["입문", "02 팁데이터분포탐색", "hist, boxplot, subplots, color"]
+        - ["기초", "03 붓꽃품종산점도", "scatter, legend, marker, text"]
+        - ["기초", "04 대륙별인구비교", "bar, xticks, annotate"]
+        - ["기초", "05 펭귄체중분석", "violin, boxplot, sharex, spines"]
+        - ["중급", "06 상관관계히트맵", "imshow, cmap, colorbar"]
+        - ["중급", "07 시계열다중축차트", "twinx, fill_between, 이중 축"]
+        - ["중급", "08 다중패널대시보드", "GridSpec, style, tight_layout"]
+        - ["심화", "09 고급주석차트", "annotate, LaTeX, bbox, errorbar"]
+        - ["심화", "10 종합분석리포트", "모든 개념 종합, savefig, dpi"]
+
+    - type: note
+      style: info
+      title: "프로젝트 기반 학습"
+      content: "각 프로젝트는 완성된 결과물을 만듭니다. 개념을 배우면서 실제 분석 차트를 그려봅니다."
+
+- id: styling
+  blocks:
+    - type: sectionHeader
+      title: "🎨 스타일링 기능"
+      subtitle: "전문가 수준의 차트 디자인"
+
+    - type: featureCards
+      cards:
+        - emoji: "🎨"
+          title: "스타일 시트"
+          description: "ggplot, seaborn, dark_background 등 내장 스타일"
+        - emoji: "🖌️"
+          title: "색상 팔레트"
+          description: "viridis, plasma, coolwarm 등 과학적 컬러맵"
+        - emoji: "✏️"
+          title: "폰트 설정"
+          description: "글꼴, 크기, 굵기 완전 제어"
+        - emoji: "📏"
+          title: "레이아웃"
+          description: "여백, 간격, 정렬 세밀하게 조정"
+
+    - type: note
+      style: tip
+      title: "스타일 시트 활용"
+      content: "plt.style.use('seaborn-v0_8-whitegrid')처럼 한 줄로 전체 스타일을 바꿀 수 있습니다. 직접 모든 걸 설정하지 않아도 됩니다."
+
+- id: save_formats
+  blocks:
+    - type: sectionHeader
+      title: "💾 저장 형식"
+      subtitle: "용도에 맞는 포맷 선택"
+
+    - type: table
+      headers: ["형식", "특징", "추천 용도"]
+      rows:
+        - ["PNG", "래스터, 투명 배경 가능", "웹, 프레젠테이션"]
+        - ["PDF", "벡터, 확대해도 선명", "논문, 출판물"]
+        - ["SVG", "벡터, 웹 편집 가능", "웹, 일러스트레이터"]
+        - ["EPS", "벡터, LaTeX 호환", "학술 논문"]
+
+    - type: note
+      style: info
+      title: "해상도 설정"
+      content: "plt.savefig('chart.png', dpi=300)으로 고해상도 이미지를 저장할 수 있습니다. 인쇄용은 300dpi, 웹용은 72-150dpi가 적당합니다."
+
+- id: when_to_use
+  blocks:
+    - type: sectionHeader
+      title: "⚖️ 언제 Matplotlib을 선택할까?"
+      subtitle: "상황별 가이드"
+
+    - type: table
+      headers: ["상황", "적합도", "이유"]
+      rows:
+        - ["논문/보고서 삽입", "O", "고품질 정적 이미지 저장"]
+        - ["세밀한 커스터마이징", "O", "모든 요소 픽셀 단위 제어"]
+        - ["고해상도 이미지 필요", "O", "300dpi 이상 출력 가능"]
+        - ["3D 시각화", "O", "Axes3D 지원"]
+        - ["탐색적 데이터 분석", "△", "가능하지만 코드가 길어질 수 있음"]
+        - ["웹 대시보드", "X", "정적 이미지만 가능"]
+        - ["상호작용 필요", "X", "줌/팬/호버 미지원"]
+
+    - type: note
+      style: tip
+      title: "정적 시각화의 장점"
+      content: "인터랙티브 차트는 웹에서 편리하지만, 논문이나 보고서에 넣을 때는 고해상도 이미지가 필요합니다. Matplotlib은 이런 상황에 최적화되어 있습니다."
+
+- id: resources
+  blocks:
+    - type: sectionHeader
+      title: "📚 참고 자료"
+      subtitle: "더 깊이 공부하고 싶다면"
+
+    - type: links
+      items:
+        - text: Matplotlib 공식 문서
+          url: https://matplotlib.org/stable/
+          icon: "🔗"
+        - text: Matplotlib 갤러리
+          url: https://matplotlib.org/stable/gallery/
+          icon: "🔗"
+        - text: Matplotlib Cheatsheets
+          url: https://matplotlib.org/cheatsheets/
+          icon: "🔗"
+        - text: Scientific Visualization Book
+          url: https://github.com/rougier/scientific-visualization-book
+          icon: "🔗"
+
+- id: next
+  blocks:
+    - type: hero
+      emoji: "👉"
+      title: "다음: 주가 추세 분석"
+      subtitle: "선 그래프로 일별 주가 변동을 시각화합니다"

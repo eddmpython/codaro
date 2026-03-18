@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from collections.abc import Awaitable, Callable
 from typing import Any
 
 from ..document.analysis import analyzeCode
@@ -69,6 +70,7 @@ async def executeReactive(
     session: KernelSession,
     blocks: list[dict[str, Any]],
     changedBlockId: str,
+    eventHandler: Callable[[Any], Awaitable[None]] | None = None,
 ) -> tuple[list[ExecutionOutput], list[str]]:
     graph = buildReactiveGraph(blocks)
     executionOrder = getReactiveOrder(graph, changedBlockId)
@@ -88,6 +90,7 @@ async def executeReactive(
             block["content"],
             blockId=blockId,
             injectedVars=injectedVars,
+            eventHandler=eventHandler,
         )
         results.append(result)
         if result.status == "error":

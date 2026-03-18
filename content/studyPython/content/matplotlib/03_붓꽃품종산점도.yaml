@@ -1,0 +1,470 @@
+meta:
+  id: matplotlib_03
+  title: 붓꽃품종산점도
+  order: 3
+  category: matplotlib
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["matplotlib", "scatter", "marker", "legend", "iris", "산점도"]
+  seo:
+    title: "Matplotlib 산점도 - 붓꽃 품종별 특성 시각화"
+    description: "Matplotlib으로 붓꽃 데이터의 품종별 특성을 산점도로 시각화합니다. scatter, marker, legend, text 사용법을 배웁니다."
+    keywords: ["matplotlib", "scatter", "산점도", "iris", "marker", "품종분류"]
+
+intro:
+  emoji: "🌸"
+  goal: 붓꽃 품종별 꽃잎/꽃받침 특성을 산점도로 시각화합니다.
+  description: 산점도로 두 변수 간의 관계를 파악하고, 색상과 마커로 그룹을 구분합니다. 이전에 배운 plot, hist, subplots 개념을 함께 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: iris(붓꽃) 데이터셋은 머신러닝의 가장 유명한 예제 데이터입니다. 3가지 품종(setosa, versicolor, virginica)의 꽃잎(petal)과 꽃받침(sepal)의 길이와 너비를 담고 있습니다. 품종 분류 문제의 대표적인 데이터셋으로, 시각화를 통해 품종별 특성 차이를 명확하게 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: matplotlib, seaborn, pandas를 불러옵니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+      import pandas as pd
+  - type: tip
+    content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  subtitle: Pyodide 환경 폰트
+  blocks:
+  - type: text
+    content: Pyodide(웹 브라우저) 환경에서는 시스템 폰트를 사용할 수 없어 한글이 깨집니다. CDN에서 폰트 파일을 다운로드하여 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+  - type: code
+    language: python
+    title: 한글 폰트 설정
+    description: Pretendard 폰트를 다운로드하여 matplotlib에 등록합니다
+    content: |-
+      import micropip
+      await micropip.install('pyodide-http')
+
+      import pyodide_http
+      pyodide_http.patch_all()
+
+      from matplotlib import font_manager
+      from js import fetch
+      from pathlib import Path
+
+      fontUrl = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Regular.otf"
+      response = await fetch(fontUrl)
+      fontBuffer = await response.arrayBuffer()
+
+      fontPath = Path("/tmp/Pretendard-Regular.otf")
+      fontPath.write_bytes(fontBuffer.to_py())
+
+      font_manager.fontManager.addfont(str(fontPath))
+      plt.rcParams['font.family'] = 'Pretendard'
+      plt.rcParams['axes.unicode_minus'] = False
+  - type: tip
+    content: Pyodide 환경에서는 fetch API로 외부 리소스를 가져옵니다. font_manager.addfont()로 폰트를 등록하고, rcParams로 기본 폰트를 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: iris 데이터
+  blocks:
+  - type: text
+    content: seaborn의 load_dataset()으로 iris 데이터를 불러옵니다. 150개의 샘플이 있으며, 각 품종당 50개씩 균등하게 분포되어 있습니다. 4개의 수치형 특성과 1개의 범주형 특성(species)으로 구성됩니다.
+  - type: code
+    language: python
+    title: iris 데이터 로드
+    description: 붓꽃 데이터를 불러오고 확인합니다
+    content: |-
+      iris = sns.load_dataset('iris')
+      iris.head()
+
+- id: step3_explore
+  title: 3단계. 품종 확인
+  subtitle: unique()
+  blocks:
+  - type: text
+    content: species 컬럼의 고유값을 확인하여 어떤 품종이 있는지 파악합니다. 3가지 품종이 있으며, 각각 다른 특성을 가지고 있어 산점도에서 군집으로 나타납니다.
+  - type: code
+    language: python
+    title: 품종 확인
+    description: 데이터에 포함된 품종을 확인합니다
+    content: |-
+      iris['species'].unique()
+
+- id: step4_scatter
+  title: 4단계. 기본 산점도
+  subtitle: ax.scatter()
+  blocks:
+  - type: text
+    content: 산점도는 두 변수 간의 관계를 점으로 표시하는 차트입니다. x축에 꽃받침 길이, y축에 꽃받침 너비를 배치하면 두 변수의 상관관계를 파악할 수 있습니다. 점들이 어떤 패턴을 보이는지 관찰해봅시다.
+  - type: code
+    language: python
+    title: 기본 산점도
+    description: 꽃받침 길이와 너비의 관계를 표시합니다
+    content: |-
+      figScatter, axScatter = plt.subplots(figsize=(10, 7))
+      axScatter.scatter(iris['sepal_length'], iris['sepal_width'])
+      axScatter.set_title('꽃받침 길이 vs 너비', fontsize=14)
+      axScatter.set_xlabel('꽃받침 길이 (cm)', fontsize=12)
+      axScatter.set_ylabel('꽃받침 너비 (cm)', fontsize=12)
+      figScatter
+  - type: tip
+    content: ax.scatter(x, y)로 산점도를 그립니다. x와 y에는 같은 길이의 배열이나 Series를 전달합니다. plot()과 달리 점들을 선으로 연결하지 않고 개별 점으로 표시합니다.
+
+- id: step5_color
+  title: 5단계. 품종별 색상 구분
+  subtitle: c 파라미터
+  blocks:
+  - type: text
+    content: 품종별로 다른 색상을 지정하면 그룹 간 차이를 명확하게 볼 수 있습니다. 각 품종을 순서대로 플롯하고 다른 색상과 라벨을 지정합니다. 이렇게 하면 setosa가 다른 품종과 명확히 구분되는 것을 알 수 있습니다.
+  - type: code
+    language: python
+    title: Figure 생성 및 데이터 정의
+    description: Figure를 만들고 품종별 색상을 정의합니다
+    content: |-
+      figColor, axColor = plt.subplots(figsize=(10, 7))
+
+      speciesColor = ['setosa', 'versicolor', 'virginica']
+      colorsColor = ['#E74C3C', '#27AE60', '#3498DB']
+  - type: code
+    language: python
+    title: 품종별 산점도 그리기
+    description: 각 품종을 다른 색상으로 표시합니다
+    content: |-
+      for sp, col in zip(speciesColor, colorsColor):
+          subset = iris[iris['species'] == sp]
+          axColor.scatter(subset['sepal_length'], subset['sepal_width'],
+                         c=col, label=sp, alpha=0.7)
+
+      axColor.set_title('품종별 꽃받침 특성', fontsize=14)
+      axColor.set_xlabel('꽃받침 길이 (cm)', fontsize=12)
+      axColor.set_ylabel('꽃받침 너비 (cm)', fontsize=12)
+      axColor.legend()
+      figColor
+
+- id: step6_marker
+  title: 6단계. 마커 스타일 변경
+  subtitle: marker 파라미터
+  blocks:
+  - type: text
+    content: 색상뿐만 아니라 마커 모양도 다르게 설정하면 흑백 인쇄에서도 구분이 가능합니다. 'o'(원), 's'(사각형), '^'(삼각형), 'd'(다이아몬드) 등 다양한 마커를 사용할 수 있습니다. 학술 논문에서는 색상과 마커를 함께 사용하는 것이 권장됩니다.
+  - type: code
+    language: python
+    title: Figure 및 스타일 정의
+    description: Figure를 만들고 마커 스타일을 정의합니다
+    content: |-
+      figMarker, axMarker = plt.subplots(figsize=(10, 7))
+
+      speciesMarker = ['setosa', 'versicolor', 'virginica']
+      colorsMarker = ['#E74C3C', '#27AE60', '#3498DB']
+      markersMarker = ['o', 's', '^']
+  - type: code
+    language: python
+    title: 마커별 산점도 그리기
+    description: 품종별로 다른 마커 모양을 적용합니다
+    content: |-
+      for sp, col, mk in zip(speciesMarker, colorsMarker, markersMarker):
+          subset = iris[iris['species'] == sp]
+          axMarker.scatter(subset['sepal_length'], subset['sepal_width'],
+                          c=col, marker=mk, label=sp, s=60, alpha=0.7)
+
+      axMarker.set_title('품종별 꽃받침 특성 (마커 구분)', fontsize=14)
+      axMarker.set_xlabel('꽃받침 길이 (cm)', fontsize=12)
+      axMarker.set_ylabel('꽃받침 너비 (cm)', fontsize=12)
+      axMarker.legend()
+      figMarker
+  - type: tip
+    content: "marker 파라미터로 점의 모양을 지정합니다. 주요 마커: 'o'(원), 's'(사각형), '^'(위 삼각형), 'v'(아래 삼각형), 'd'(다이아몬드), 'x'(X표), '+'(플러스). s 파라미터는 마커 크기입니다."
+
+- id: step7_text
+  title: 7단계. 텍스트 추가
+  subtitle: ax.text()
+  blocks:
+  - type: text
+    content: 차트에 텍스트를 추가하면 중요한 정보를 직접 표시할 수 있습니다. 예를 들어 각 품종 군집의 중심에 품종명을 표시하거나, 특이값에 주석을 달 수 있습니다. text() 함수로 원하는 위치에 텍스트를 배치합니다.
+  - type: code
+    language: python
+    title: Figure 및 스타일 정의
+    description: Figure를 만들고 스타일을 정의합니다
+    content: |-
+      figText, axText = plt.subplots(figsize=(10, 7))
+
+      speciesText = ['setosa', 'versicolor', 'virginica']
+      colorsText = ['#E74C3C', '#27AE60', '#3498DB']
+      markersText = ['o', 's', '^']
+  - type: code
+    language: python
+    title: 산점도와 텍스트 추가
+    description: 각 품종 군집에 라벨을 표시합니다
+    content: |-
+      for sp, col, mk in zip(speciesText, colorsText, markersText):
+          subset = iris[iris['species'] == sp]
+          axText.scatter(subset['sepal_length'], subset['sepal_width'],
+                        c=col, marker=mk, label=sp, s=60, alpha=0.7)
+          centerX = subset['sepal_length'].mean()
+          centerY = subset['sepal_width'].mean()
+          axText.text(centerX, centerY, sp, fontsize=11, fontweight='bold',
+                     ha='center', va='center',
+                     bbox=dict(boxstyle='round', facecolor='white', alpha=0.8))
+      figText
+  - type: code
+    language: python
+    title: 스타일링 적용
+    description: 제목, 라벨, 범례를 추가합니다
+    content: |-
+      axText.set_title('품종별 꽃받침 특성', fontsize=14)
+      axText.set_xlabel('꽃받침 길이 (cm)', fontsize=12)
+      axText.set_ylabel('꽃받침 너비 (cm)', fontsize=12)
+      axText.legend(loc='upper right')
+      figText
+  - type: tip
+    content: ax.text(x, y, '텍스트')로 지정한 좌표에 텍스트를 표시합니다. ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bbox로 텍스트 배경 상자를 추가할 수 있습니다.
+
+- id: step8_petal
+  title: 8단계. 꽃잎 특성 산점도
+  subtitle: 다른 변수 조합
+  blocks:
+  - type: text
+    content: 꽃받침(sepal) 대신 꽃잎(petal) 특성으로 산점도를 그려봅니다. 꽃잎 특성에서는 품종 간 구분이 더 명확하게 나타납니다. 특히 setosa는 꽃잎이 작아서 다른 품종과 완전히 분리됩니다.
+  - type: code
+    language: python
+    title: Figure 및 스타일 정의
+    description: Figure를 만들고 스타일을 정의합니다
+    content: |-
+      figPetal, axPetal = plt.subplots(figsize=(10, 7))
+
+      speciesPetal = ['setosa', 'versicolor', 'virginica']
+      colorsPetal = ['#E74C3C', '#27AE60', '#3498DB']
+      markersPetal = ['o', 's', '^']
+  - type: code
+    language: python
+    title: 꽃잎 산점도 그리기
+    description: 꽃잎 길이와 너비로 산점도를 그립니다
+    content: |-
+      for sp, col, mk in zip(speciesPetal, colorsPetal, markersPetal):
+          subset = iris[iris['species'] == sp]
+          axPetal.scatter(subset['petal_length'], subset['petal_width'],
+                         c=col, marker=mk, label=sp, s=60, alpha=0.7)
+
+      axPetal.set_title('품종별 꽃잎 특성', fontsize=14)
+      axPetal.set_xlabel('꽃잎 길이 (cm)', fontsize=12)
+      axPetal.set_ylabel('꽃잎 너비 (cm)', fontsize=12)
+      axPetal.legend()
+      axPetal.grid(True, alpha=0.3)
+      figPetal
+
+- id: step9_subplot
+  title: 9단계. 2개 산점도 비교
+  subtitle: subplots로 비교
+  blocks:
+  - type: text
+    content: 꽃받침과 꽃잎 특성을 나란히 비교하면 어느 특성이 품종 구분에 더 유용한지 파악할 수 있습니다. 이전에 배운 subplots를 활용하여 두 차트를 한 Figure에 배치합니다.
+  - type: code
+    language: python
+    title: Figure 및 데이터 정의
+    description: 1x2 Figure를 만들고 스타일을 정의합니다
+    content: |-
+      figCompare, (axSepal, axPetalCompare) = plt.subplots(1, 2, figsize=(14, 6))
+
+      speciesCompare = ['setosa', 'versicolor', 'virginica']
+      colorsCompare = ['#E74C3C', '#27AE60', '#3498DB']
+  - type: code
+    language: python
+    title: 산점도 그리기
+    description: 두 패널에 품종별 산점도를 그립니다
+    content: |-
+      for sp, col in zip(speciesCompare, colorsCompare):
+          subset = iris[iris['species'] == sp]
+          axSepal.scatter(subset['sepal_length'], subset['sepal_width'],
+                         c=col, label=sp, s=50, alpha=0.7)
+          axPetalCompare.scatter(subset['petal_length'], subset['petal_width'],
+                                c=col, label=sp, s=50, alpha=0.7)
+      figCompare
+  - type: code
+    language: python
+    title: 스타일링 적용
+    description: 제목, 라벨, 범례를 추가합니다
+    content: |-
+      axSepal.set_title('꽃받침 특성', fontsize=12)
+      axSepal.set_xlabel('길이 (cm)')
+      axSepal.set_ylabel('너비 (cm)')
+      axSepal.legend()
+
+      axPetalCompare.set_title('꽃잎 특성', fontsize=12)
+      axPetalCompare.set_xlabel('길이 (cm)')
+      axPetalCompare.set_ylabel('너비 (cm)')
+      axPetalCompare.legend()
+
+      plt.suptitle('붓꽃 품종별 특성 비교', fontsize=14, fontweight='bold')
+      plt.tight_layout()
+      figCompare
+
+- id: step10_final
+  title: 10단계. 최종 시각화
+  subtitle: 완성된 산점도
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 요소를 종합하여 완성도 높은 품종 분류 산점도를 만듭니다. 그리드, 범례, 마커 스타일을 모두 적용하고 tight_layout으로 레이아웃을 정리합니다.
+  - type: code
+    language: python
+    title: Figure 및 스타일 정의
+    description: Figure를 만들고 스타일을 정의합니다
+    content: |-
+      figFinal, axFinal = plt.subplots(figsize=(11, 8))
+
+      speciesFinal = ['setosa', 'versicolor', 'virginica']
+      colorsFinal = ['#E74C3C', '#27AE60', '#3498DB']
+      markersFinal = ['o', 's', '^']
+      labelsFinal = ['Setosa', 'Versicolor', 'Virginica']
+  - type: code
+    language: python
+    title: 산점도 그리기
+    description: 품종별 산점도를 그립니다
+    content: |-
+      for sp, col, mk, lb in zip(speciesFinal, colorsFinal, markersFinal, labelsFinal):
+          subset = iris[iris['species'] == sp]
+          axFinal.scatter(subset['petal_length'], subset['petal_width'],
+                         c=col, marker=mk, label=lb, s=80, alpha=0.7, edgecolors='white')
+      figFinal
+  - type: code
+    language: python
+    title: 스타일링 적용
+    description: 제목, 라벨, 범례, 그리드를 추가합니다
+    content: |-
+      axFinal.set_title('붓꽃 품종별 꽃잎 특성 분류', fontsize=16, fontweight='bold')
+      axFinal.set_xlabel('꽃잎 길이 (cm)', fontsize=12)
+      axFinal.set_ylabel('꽃잎 너비 (cm)', fontsize=12)
+      axFinal.legend(title='품종', loc='upper left', fontsize=10)
+      axFinal.grid(True, alpha=0.3, linestyle='--')
+      plt.tight_layout()
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 붓꽃 데이터 분석 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용해서 붓꽃 데이터를 다양한 관점에서 분석해봅시다. scatter, marker, text, legend, subplots 등 모든 개념을 종합적으로 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 4가지 특성 조합 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        iris2 = sns.load_dataset('iris')
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart, panels = plt.subplots(2, 2, figsize=(12, 12))
+
+        types = ['setosa', 'versicolor', 'virginica']
+        palette = ['#E74C3C', '#27AE60', '#3498DB']
+
+        pairs = [
+            ('sepal_length', 'sepal_width', '꽃받침 길이 vs 너비'),
+            ('petal_length', 'petal_width', '꽃잎 길이 vs 너비'),
+            ('sepal_length', 'petal_length', '꽃받침 길이 vs 꽃잎 길이'),
+            ('sepal_width', 'petal_width', '꽃받침 너비 vs 꽃잎 너비')
+        ]
+
+        for idx, (xCol, yCol, title) in enumerate(pairs):
+            row = idx // 2
+            col = idx % 2
+            for sp, clr in zip(types, palette):
+                group = iris2[iris2['species'] == sp]
+                panels[row, col].scatter(group[xCol], group[yCol],
+                                         c=clr, label=sp, s=50, alpha=0.7)
+            panels[row, col].set_title(title, fontsize=11)
+            panels[row, col].set_xlabel(xCol)
+            panels[row, col].set_ylabel(yCol)
+            if idx == 0:
+                panels[row, col].legend(fontsize=8)
+
+        plt.suptitle('붓꽃 특성 조합별 산점도', fontsize=14, fontweight='bold')
+        plt.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: 품종별 분포 종합 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        import seaborn as sns
+
+        iris3 = sns.load_dataset('iris')
+
+        canvas, grid = plt.subplots(2, 2, figsize=(14, 12))
+
+        kinds = ['setosa', 'versicolor', 'virginica']
+        tones = ['#E74C3C', '#27AE60', '#3498DB']
+        shapes = ['o', 's', '^']
+    - type: code
+      title: "산점도"
+      content: |-
+        for kind, tone, shape in zip(kinds, tones, shapes):
+            part = iris3[iris3['species'] == kind]
+            grid[0, 0].scatter(part['petal_length'], part['petal_width'],
+                               c=tone, marker=shape, label=kind, s=60, alpha=0.7)
+
+        grid[0, 0].set_title('꽃잎 특성 산점도', fontsize=12)
+        grid[0, 0].set_xlabel('꽃잎 길이 (cm)')
+        grid[0, 0].set_ylabel('꽃잎 너비 (cm)')
+        grid[0, 0].legend()
+    - type: code
+      title: "히스토그램"
+      content: |-
+        for kind, tone in zip(kinds, tones):
+            part = iris3[iris3['species'] == kind]
+            grid[0, 1].hist(part['petal_length'], bins=15, color=tone,
+                            alpha=0.5, label=kind, edgecolor='white')
+        grid[0, 1].set_title('꽃잎 길이 분포', fontsize=12)
+        grid[0, 1].set_xlabel('꽃잎 길이 (cm)')
+        grid[0, 1].set_ylabel('빈도')
+        grid[0, 1].legend()
+
+        for kind, tone in zip(kinds, tones):
+            part = iris3[iris3['species'] == kind]
+            grid[1, 0].hist(part['petal_width'], bins=15, color=tone,
+                            alpha=0.5, label=kind, edgecolor='white')
+        grid[1, 0].set_title('꽃잎 너비 분포', fontsize=12)
+        grid[1, 0].set_xlabel('꽃잎 너비 (cm)')
+        grid[1, 0].set_ylabel('빈도')
+        grid[1, 0].legend()
+    - type: code
+      title: "박스플롯"
+      content: |-
+        lengths = [iris3[iris3['species'] == kind]['petal_length'] for kind in kinds]
+        grid[1, 1].boxplot(lengths, labels=kinds)
+        grid[1, 1].set_title('품종별 꽃잎 길이 박스플롯', fontsize=12)
+        grid[1, 1].set_ylabel('꽃잎 길이 (cm)')
+
+        plt.suptitle('붓꽃 품종별 종합 분석', fontsize=14, fontweight='bold')
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 산점도로 붓꽃 품종별 특성을 분석했습니다.
+  - type: list
+    items:
+    - "ax.scatter(x, y) - 산점도로 두 변수 관계 시각화"
+    - "c, color - 점의 색상 지정"
+    - "marker - 점의 모양 지정 (o, s, ^, d 등)"
+    - "s - 점의 크기 지정"
+    - "ax.text(x, y, text) - 차트에 텍스트 추가"
+    - "alpha - 투명도 설정"
+    - "legend(title) - 범례에 제목 추가"
+  - type: text
+    content: 다음 시간에는 막대 그래프로 대륙별 인구를 비교합니다.

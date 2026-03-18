@@ -6,6 +6,7 @@ import pytest
 
 import codaro.server as serverModule
 from codaro.server import FrontendBuildError, getFrontendBuildStatus, requireFrontendBuildReady, runServer
+from codaro.server import resolveWebBuildRoot
 
 
 def testGetFrontendBuildStatusReportsMissingPaths(tmp_path: Path) -> None:
@@ -76,3 +77,9 @@ def testRunServerStartsWithExistingFrontendBuild(monkeypatch, tmp_path: Path) ->
     assert captured["uvicorn"]["host"] == "0.0.0.0"
     assert captured["uvicorn"]["port"] == 9011
     assert captured["uvicorn"]["logLevel"] == "warning"
+
+
+def testResolveWebBuildRootUsesEnvironmentOverride(monkeypatch, tmp_path: Path) -> None:
+    monkeypatch.setenv("CODARO_WEB_BUILD_ROOT", str(tmp_path))
+
+    assert resolveWebBuildRoot() == tmp_path.resolve()

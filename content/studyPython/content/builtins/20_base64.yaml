@@ -1,0 +1,925 @@
+meta:
+  title: "base64 - Base64 인코딩"
+  description: "바이너리 데이터를 ASCII 문자열로 인코딩하는 base64 모듈"
+  keywords: ["base64", "b64encode", "b64decode", "urlsafe", "encoding"]
+
+intro:
+  - type: "content"
+    title: "base64 모듈이란?"
+    content: |-
+      base64 모듈은 바이너리 데이터를 텍스트 형식으로 인코딩하여 전송하거나 저장할 수 있게 합니다.
+      이메일, URL, JSON 등 텍스트만 지원하는 환경에서 바이너리 데이터를 다룰 때 유용합니다.
+
+sections:
+  - name: "module_import"
+    title: "⚠️ base64 모듈 임포트"
+    blocks:
+      - type: "content"
+        title: "표준 라이브러리 임포트"
+        content: |-
+          base64는 Python 표준 라이브러리이므로 별도 설치 없이 사용할 수 있습니다.
+
+      - type: "code"
+        language: "python"
+        title: "base64 임포트"
+        description: "base64 모듈을 임포트합니다."
+        content: |-
+          import base64
+
+  - name: "standard_base64"
+    title: "표준 Base64 인코딩"
+    blocks:
+      - type: "content"
+        title: "b64encode와 b64decode"
+        content: |-
+          표준 Base64 인코딩은 바이너리 데이터를 64개의 ASCII 문자로 표현합니다.
+
+      - type: "code"
+        language: "python"
+        title: "기본 인코딩"
+        description: "문자열을 Base64로 인코딩합니다."
+        content: |-
+          message = "Hello World"
+          messageBytes = message.encode('utf-8')
+          encodedBytes = base64.b64encode(messageBytes)
+          encodedStr = encodedBytes.decode('utf-8')
+          encodedStr
+
+      - type: "tip"
+        title: "바이트 변환"
+        content: "base64는 bytes 객체를 입력받고 bytes를 반환합니다."
+
+      - type: "code"
+        language: "python"
+        title: "기본 디코딩"
+        description: "Base64 문자열을 원본으로 복원합니다."
+        content: |-
+          encodedStr = "SGVsbG8gV29ybGQ="
+          encodedBytes = encodedStr.encode('utf-8')
+          decodedBytes = base64.b64decode(encodedBytes)
+          decodedStr = decodedBytes.decode('utf-8')
+          decodedStr
+
+      - type: "code"
+        language: "python"
+        title: "바이너리 데이터 인코딩"
+        description: "임의의 바이너리 데이터를 인코딩합니다."
+        content: |-
+          binaryData = bytes([0, 1, 2, 255, 254, 253])
+          encoded = base64.b64encode(binaryData)
+          decoded = base64.b64decode(encoded)
+
+          {
+              "original": list(binaryData),
+              "encoded": encoded.decode('utf-8'),
+              "decoded": list(decoded),
+              "match": binaryData == decoded
+          }
+
+      - type: "tip"
+        title: "데이터 무결성"
+        content: "인코딩 후 디코딩하면 원본 데이터가 완벽하게 복원됩니다."
+
+      - type: "code"
+        language: "python"
+        title: "긴 텍스트 인코딩"
+        description: "긴 텍스트를 Base64로 인코딩합니다."
+        content: |-
+          longText = "Python is a high-level programming language. " * 3
+          encoded = base64.b64encode(longText.encode('utf-8'))
+
+          {
+              "original_length": len(longText),
+              "encoded_length": len(encoded),
+              "ratio": round(len(encoded) / len(longText), 2)
+          }
+
+      - type: "tip"
+        title: "크기 증가"
+        content: "Base64 인코딩은 데이터 크기를 약 33% 증가시킵니다."
+
+      - type: "code"
+        language: "python"
+        title: "한글 인코딩"
+        description: "UTF-8로 인코딩된 한글을 Base64로 변환합니다."
+        content: |-
+          koreanText = "안녕하세요"
+          encoded = base64.b64encode(koreanText.encode('utf-8'))
+          decoded = base64.b64decode(encoded).decode('utf-8')
+
+          {
+              "original": koreanText,
+              "encoded": encoded.decode('utf-8'),
+              "decoded": decoded
+          }
+
+  - name: "urlsafe_base64"
+    title: "URL 안전 Base64"
+    blocks:
+      - type: "content"
+        title: "urlsafe_b64encode와 urlsafe_b64decode"
+        content: |-
+          URL 안전 Base64는 +와 /를 -와 _로 대체하여 URL에 안전하게 사용할 수 있습니다.
+
+      - type: "code"
+        language: "python"
+        title: "URL 안전 인코딩"
+        description: "URL에서 사용 가능한 형식으로 인코딩합니다."
+        content: |-
+          data = "subject=test&value=123"
+          dataBytes = data.encode('utf-8')
+
+          standardEncoded = base64.b64encode(dataBytes).decode('utf-8')
+          urlsafeEncoded = base64.urlsafe_b64encode(dataBytes).decode('utf-8')
+
+          {
+              "standard": standardEncoded,
+              "urlsafe": urlsafeEncoded
+          }
+
+      - type: "tip"
+        title: "URL 파라미터"
+        content: "URL 파라미터나 쿼리 스트링에 인코딩된 데이터를 포함할 때 유용합니다."
+
+      - type: "code"
+        language: "python"
+        title: "URL 안전 디코딩"
+        description: "URL 안전 Base64를 디코딩합니다."
+        content: |-
+          urlsafeEncoded = "c3ViamVjdD10ZXN0JnZhbHVlPTEyMw=="
+          decoded = base64.urlsafe_b64decode(urlsafeEncoded)
+          decodedStr = decoded.decode('utf-8')
+          decodedStr
+
+      - type: "code"
+        language: "python"
+        title: "특수 문자 비교"
+        description: "표준과 URL 안전 인코딩의 차이를 비교합니다."
+        content: |-
+          data = bytes([255, 254, 253])
+
+          standard = base64.b64encode(data).decode('utf-8')
+          urlsafe = base64.urlsafe_b64encode(data).decode('utf-8')
+
+          {
+              "standard": standard,
+              "urlsafe": urlsafe,
+              "has_plus_slash": '+' in standard or '/' in standard,
+              "has_minus_underscore": '-' in urlsafe or '_' in urlsafe
+          }
+
+      - type: "code"
+        language: "python"
+        title: "토큰 생성"
+        description: "URL 안전 토큰을 생성합니다."
+        content: |-
+          import secrets
+
+          randomBytes = secrets.token_bytes(16)
+          token = base64.urlsafe_b64encode(randomBytes).decode('utf-8')
+
+          {
+              "token_length": len(token),
+              "token": token,
+              "url_safe": all(c not in token for c in ['+', '/', '='])
+          }
+
+      - type: "tip"
+        title: "패딩 제거"
+        content: "rstrip('=')로 패딩을 제거하면 더 깔끔한 토큰을 만들 수 있습니다."
+
+  - name: "other_encodings"
+    title: "기타 인코딩 방식"
+    blocks:
+      - type: "content"
+        title: "Base32와 Base16"
+        content: |-
+          Base32는 32개 문자를 사용하고, Base16은 16개 문자(hex)를 사용합니다.
+
+      - type: "code"
+        language: "python"
+        title: "Base32 인코딩"
+        description: "Base32로 데이터를 인코딩합니다."
+        content: |-
+          data = "Hello"
+          encoded = base64.b32encode(data.encode('utf-8'))
+          decoded = base64.b32decode(encoded)
+
+          {
+              "original": data,
+              "encoded": encoded.decode('utf-8'),
+              "decoded": decoded.decode('utf-8')
+          }
+
+      - type: "tip"
+        title: "Base32 특징"
+        content: "대소문자 구분 없이 사용할 수 있어 사용자 입력에 유용합니다."
+
+      - type: "code"
+        language: "python"
+        title: "Base16 인코딩"
+        description: "Base16(hex)으로 데이터를 인코딩합니다."
+        content: |-
+          data = "ABC"
+          encoded = base64.b16encode(data.encode('utf-8'))
+          decoded = base64.b16decode(encoded)
+
+          {
+              "original": data,
+              "encoded": encoded.decode('utf-8'),
+              "decoded": decoded.decode('utf-8')
+          }
+
+      - type: "code"
+        language: "python"
+        title: "인코딩 방식 비교"
+        description: "같은 데이터를 다양한 방식으로 인코딩합니다."
+        content: |-
+          data = "Test"
+          dataBytes = data.encode('utf-8')
+
+          {
+              "base64": base64.b64encode(dataBytes).decode('utf-8'),
+              "base32": base64.b32encode(dataBytes).decode('utf-8'),
+              "base16": base64.b16encode(dataBytes).decode('utf-8')
+          }
+
+      - type: "tip"
+        title: "크기 비교"
+        content: "Base16 > Base32 > Base64 순으로 인코딩 결과 크기가 작습니다."
+
+      - type: "code"
+        language: "python"
+        title: "Base32 대소문자"
+        description: "Base32는 대소문자를 구분하지 않습니다."
+        content: |-
+          encoded = "JBSWY3DPEBLW64TMMQ======"
+
+          upper = base64.b32decode(encoded.upper())
+          lower = base64.b32decode(encoded.lower())
+
+          {
+              "upper_decoded": upper.decode('utf-8'),
+              "lower_decoded": lower.decode('utf-8'),
+              "same_result": upper == lower
+          }
+
+  - name: "ascii85_base85"
+    title: "ASCII85와 Base85"
+    blocks:
+      - type: "content"
+        title: "고효율 인코딩"
+        content: |-
+          ASCII85와 Base85는 Base64보다 효율적인 인코딩 방식입니다.
+
+      - type: "code"
+        language: "python"
+        title: "ASCII85 인코딩"
+        description: "ASCII85(a85)로 데이터를 인코딩합니다."
+        content: |-
+          data = "Hello World"
+          encoded = base64.a85encode(data.encode('utf-8'))
+          decoded = base64.a85decode(encoded)
+
+          {
+              "original": data,
+              "encoded": encoded.decode('utf-8'),
+              "decoded": decoded.decode('utf-8')
+          }
+
+      - type: "tip"
+        title: "ASCII85 사용처"
+        content: "PostScript와 PDF 파일에서 주로 사용됩니다."
+
+      - type: "code"
+        language: "python"
+        title: "Base85 인코딩"
+        description: "Base85(b85)로 데이터를 인코딩합니다."
+        content: |-
+          data = "Python"
+          encoded = base64.b85encode(data.encode('utf-8'))
+          decoded = base64.b85decode(encoded)
+
+          {
+              "original": data,
+              "encoded": encoded.decode('utf-8'),
+              "decoded": decoded.decode('utf-8')
+          }
+
+      - type: "code"
+        language: "python"
+        title: "효율성 비교"
+        description: "Base64, ASCII85, Base85의 인코딩 크기를 비교합니다."
+        content: |-
+          data = "The quick brown fox jumps over the lazy dog"
+          dataBytes = data.encode('utf-8')
+
+          b64 = base64.b64encode(dataBytes)
+          a85 = base64.a85encode(dataBytes)
+          b85 = base64.b85encode(dataBytes)
+
+          {
+              "original_size": len(dataBytes),
+              "base64_size": len(b64),
+              "ascii85_size": len(a85),
+              "base85_size": len(b85)
+          }
+
+      - type: "tip"
+        title: "크기 효율"
+        content: "ASCII85와 Base85가 Base64보다 약 20% 더 효율적입니다."
+
+      - type: "code"
+        language: "python"
+        title: "바이너리 데이터 처리"
+        description: "큰 바이너리 데이터를 Base85로 인코딩합니다."
+        content: |-
+          binaryData = bytes(range(256))
+          encoded = base64.b85encode(binaryData)
+          decoded = base64.b85decode(encoded)
+
+          {
+              "original_size": len(binaryData),
+              "encoded_size": len(encoded),
+              "compression_ratio": round(len(encoded) / len(binaryData), 2),
+              "integrity": binaryData == decoded
+          }
+
+  - name: "encoding_options"
+    title: "인코딩 옵션"
+    blocks:
+      - type: "content"
+        title: "고급 옵션"
+        content: |-
+          인코딩 함수는 다양한 옵션을 제공하여 동작을 세밀하게 제어할 수 있습니다.
+
+      - type: "code"
+        language: "python"
+        title: "대체 문자 지정"
+        description: "altchars로 +와 /를 다른 문자로 대체합니다."
+        content: |-
+          data = b"test data"
+
+          standard = base64.b64encode(data)
+          customChars = base64.b64encode(data, altchars=b'-_')
+
+          {
+              "standard": standard.decode('utf-8'),
+              "custom": customChars.decode('utf-8')
+          }
+
+      - type: "tip"
+        title: "altchars 용도"
+        content: "특정 환경에 맞는 문자 세트를 사용할 수 있습니다."
+
+      - type: "code"
+        language: "python"
+        title: "유효성 검사"
+        description: "validate 옵션으로 디코딩 시 검증합니다."
+        content: |-
+          validEncoded = b"SGVsbG8="
+          invalidEncoded = b"SGVs!bG8="
+
+          try:
+              result1 = base64.b64decode(validEncoded, validate=True)
+              success1 = True
+          except Exception as e:
+              success1 = False
+
+          try:
+              result2 = base64.b64decode(invalidEncoded, validate=True)
+              success2 = True
+          except Exception as e:
+              success2 = False
+
+          {
+              "valid_decoded": success1,
+              "invalid_decoded": success2
+          }
+
+      - type: "code"
+        language: "python"
+        title: "패딩 처리"
+        description: "패딩 문자(=)를 다루는 방법을 이해합니다."
+        content: |-
+          texts = ["A", "AB", "ABC", "ABCD"]
+
+          results = []
+          for text in texts:
+              encoded = base64.b64encode(text.encode('utf-8')).decode('utf-8')
+              paddingCount = encoded.count('=')
+              results.append({
+                  "text": text,
+                  "encoded": encoded,
+                  "padding": paddingCount
+              })
+
+          results
+
+      - type: "tip"
+        title: "패딩 규칙"
+        content: "Base64는 4의 배수로 맞추기 위해 패딩(=)을 추가합니다."
+
+      - type: "code"
+        language: "python"
+        title: "ASCII85 옵션"
+        description: "ASCII85의 foldspaces와 adobe 옵션을 사용합니다."
+        content: |-
+          data = b"    "
+
+          default = base64.a85encode(data)
+          foldspaces = base64.a85encode(data, foldspaces=True)
+          adobe = base64.a85encode(data, adobe=True)
+
+          {
+              "default": default.decode('utf-8'),
+              "foldspaces": foldspaces.decode('utf-8'),
+              "adobe": adobe.decode('utf-8')
+          }
+
+      - type: "code"
+        language: "python"
+        title: "casefold 옵션"
+        description: "Base32 디코딩 시 대소문자 변환을 처리합니다."
+        content: |-
+          mixedCase = "JbSwY3DpEbLw64TmMq======"
+
+          try:
+              decoded = base64.b32decode(mixedCase, casefold=True)
+              result = decoded.decode('utf-8')
+          except Exception as e:
+              result = str(e)
+
+          result
+
+      - type: "tip"
+        title: "casefold 사용"
+        content: "casefold=True로 대소문자 혼용 입력을 처리할 수 있습니다."
+
+  - name: "practical"
+    title: "실전 활용 예제"
+    blocks:
+      - type: "content"
+        title: "실무 시나리오"
+        content: |-
+          base64를 활용한 실전 데이터 인코딩 예제를 다룹니다.
+
+      - type: "code"
+        language: "python"
+        title: "이미지 데이터 URL"
+        description: "이미지를 Data URL로 변환합니다."
+        content: |-
+          def createDataUrl(imageBytes, mimeType="image/png"):
+              encoded = base64.b64encode(imageBytes).decode('utf-8')
+              dataUrl = f"data:{mimeType};base64,{encoded}"
+              return dataUrl
+
+          sampleImageData = bytes([137, 80, 78, 71, 13, 10, 26, 10])
+          dataUrl = createDataUrl(sampleImageData)
+
+          {
+              "data_url_length": len(dataUrl),
+              "preview": dataUrl[:50] + "..."
+          }
+
+      - type: "code"
+        language: "python"
+        title: "API 토큰 생성"
+        description: "안전한 API 토큰을 생성합니다."
+        content: |-
+          import secrets
+          import time
+
+          def generateApiToken(userId):
+              timestamp = int(time.time())
+              randomPart = secrets.token_bytes(16)
+              data = f"{userId}:{timestamp}".encode('utf-8') + randomPart
+              token = base64.urlsafe_b64encode(data).decode('utf-8').rstrip('=')
+              return token
+
+          token = generateApiToken("user123")
+
+          {
+              "token": token,
+              "length": len(token)
+          }
+
+      - type: "tip"
+        title: "보안 주의"
+        content: "실제 인증에는 서명이나 암호화가 추가로 필요합니다."
+
+      - type: "code"
+        language: "python"
+        title: "JSON 데이터 인코딩"
+        description: "JSON 데이터를 Base64로 인코딩하여 전송합니다."
+        content: |-
+          import json
+
+          def encodeJsonData(data):
+              jsonStr = json.dumps(data)
+              jsonBytes = jsonStr.encode('utf-8')
+              encoded = base64.b64encode(jsonBytes).decode('utf-8')
+              return encoded
+
+          def decodeJsonData(encoded):
+              jsonBytes = base64.b64decode(encoded)
+              jsonStr = jsonBytes.decode('utf-8')
+              data = json.loads(jsonStr)
+              return data
+
+          originalData = {"user": "john", "age": 30, "active": True}
+          encoded = encodeJsonData(originalData)
+          decoded = decodeJsonData(encoded)
+
+          {
+              "encoded": encoded,
+              "decoded": decoded
+          }
+
+      - type: "code"
+        language: "python"
+        title: "파일 첨부 인코딩"
+        description: "이메일 첨부 파일을 Base64로 인코딩합니다."
+        content: |-
+          def encodeAttachment(filename, content):
+              encodedContent = base64.b64encode(content).decode('utf-8')
+
+              chunks = [encodedContent[i:i+76] for i in range(0, len(encodedContent), 76)]
+
+              return {
+                  "filename": filename,
+                  "encoding": "base64",
+                  "content": "\n".join(chunks[:3])
+              }
+
+          fileContent = b"Sample file content for email attachment"
+          attachment = encodeAttachment("sample.txt", fileContent)
+          attachment
+
+      - type: "tip"
+        title: "줄 바꿈"
+        content: "이메일 표준은 76자마다 줄 바꿈을 요구합니다."
+
+      - type: "code"
+        language: "python"
+        title: "URL 파라미터 인코딩"
+        description: "복잡한 데이터를 URL 파라미터로 전달합니다."
+        content: |-
+          def encodeUrlParam(data):
+              dataStr = str(data)
+              encoded = base64.urlsafe_b64encode(dataStr.encode('utf-8')).decode('utf-8')
+              return encoded.rstrip('=')
+
+          def decodeUrlParam(encoded):
+              padding = 4 - (len(encoded) % 4)
+              if padding != 4:
+                  encoded += '=' * padding
+              decoded = base64.urlsafe_b64decode(encoded).decode('utf-8')
+              return decoded
+
+          complexData = {"filter": "name=test&value>100", "sort": "date"}
+          encoded = encodeUrlParam(complexData)
+          url = f"https://api.example.com/data?params={encoded}"
+
+          {
+              "url": url,
+              "decoded": decodeUrlParam(encoded)
+          }
+
+      - type: "code"
+        language: "python"
+        title: "캐시 키 생성"
+        description: "복잡한 입력으로부터 캐시 키를 생성합니다."
+        content: |-
+          def createCacheKey(params):
+              import hashlib
+
+              paramStr = json.dumps(params, sort_keys=True)
+              paramHash = hashlib.sha256(paramStr.encode('utf-8')).digest()
+              cacheKey = base64.urlsafe_b64encode(paramHash).decode('utf-8')[:16]
+
+              return cacheKey
+
+          queryParams = {"user": "john", "filter": "active", "limit": 100}
+          cacheKey = createCacheKey(queryParams)
+
+          {
+              "params": queryParams,
+              "cache_key": cacheKey
+          }
+
+      - type: "code"
+        language: "python"
+        title: "바이너리 로그 인코딩"
+        description: "바이너리 로그 데이터를 텍스트로 저장합니다."
+        content: |-
+          def encodeBinaryLog(logData):
+              import datetime
+
+              timestamp = datetime.datetime.now().isoformat()
+              encoded = base64.b64encode(logData).decode('utf-8')
+
+              return {
+                  "timestamp": timestamp,
+                  "type": "binary",
+                  "data": encoded
+              }
+
+          binaryLog = bytes([0xFF, 0x00, 0x1A, 0x2B, 0x3C])
+          logEntry = encodeBinaryLog(binaryLog)
+          logEntry
+
+  - name: "practice"
+    title: "연습 문제"
+    blocks:
+      - type: "expansion"
+        title: "🟢 문자열 인코딩"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "문자열을 Base64로 인코딩하세요"
+            content: |-
+              text = "Hello Python"
+              encoded = base64.b64encode(text.encode('utf-8')).decode('utf-8')
+              encoded
+
+      - type: "expansion"
+        title: "🟢 문자열 디코딩"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "Base64 문자열을 디코딩하세요"
+            content: |-
+              encoded = "SGVsbG8gUHl0aG9u"
+              decoded = base64.b64decode(encoded).decode('utf-8')
+              decoded
+
+      - type: "expansion"
+        title: "🟢 URL 안전 인코딩"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "URL 안전 Base64로 인코딩하세요"
+            content: |-
+              text = "test@example.com"
+              encoded = base64.urlsafe_b64encode(text.encode('utf-8')).decode('utf-8')
+              encoded
+
+      - type: "expansion"
+        title: "🟢 Base32 인코딩"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "문자열을 Base32로 인코딩하세요"
+            content: |-
+              text = "ABC"
+              encoded = base64.b32encode(text.encode('utf-8')).decode('utf-8')
+              encoded
+
+      - type: "expansion"
+        title: "🟢 Base16 인코딩"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "문자열을 Base16으로 인코딩하세요"
+            content: |-
+              text = "xyz"
+              encoded = base64.b16encode(text.encode('utf-8')).decode('utf-8')
+              encoded
+
+      - type: "expansion"
+        title: "🟡 바이너리 데이터 인코딩"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "바이너리 데이터를 Base64로 인코딩하고 크기를 비교하세요"
+            content: |-
+              binaryData = bytes([0, 128, 255])
+              encoded = base64.b64encode(binaryData)
+
+              {
+                  "original_size": len(binaryData),
+                  "encoded_size": len(encoded),
+                  "encoded": encoded.decode('utf-8')
+              }
+
+      - type: "expansion"
+        title: "🟡 인코딩 무결성"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "인코딩 후 디코딩하여 원본과 같은지 확인하세요"
+            content: |-
+              original = "Test data 123"
+              encoded = base64.b64encode(original.encode('utf-8'))
+              decoded = base64.b64decode(encoded).decode('utf-8')
+              match = original == decoded
+              match
+
+      - type: "expansion"
+        title: "🟡 ASCII85 인코딩"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "문자열을 ASCII85로 인코딩하세요"
+            content: |-
+              text = "Test"
+              encoded = base64.a85encode(text.encode('utf-8')).decode('utf-8')
+              encoded
+
+      - type: "expansion"
+        title: "🟡 크기 비교"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "Base64와 Base32 인코딩 크기를 비교하세요"
+            content: |-
+              text = "Compare"
+              b64 = base64.b64encode(text.encode('utf-8'))
+              b32 = base64.b32encode(text.encode('utf-8'))
+
+              {
+                  "base64_size": len(b64),
+                  "base32_size": len(b32)
+              }
+
+      - type: "expansion"
+        title: "🟡 패딩 확인"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "Base64 인코딩 결과의 패딩 문자 개수를 세세요"
+            content: |-
+              text = "Hi"
+              encoded = base64.b64encode(text.encode('utf-8')).decode('utf-8')
+              paddingCount = encoded.count('=')
+              paddingCount
+
+      - type: "expansion"
+        title: "🔴 Data URL 생성"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "텍스트 데이터로 Data URL을 생성하세요"
+            content: |-
+              text = "Sample text"
+              encoded = base64.b64encode(text.encode('utf-8')).decode('utf-8')
+              dataUrl = f"data:text/plain;base64,{encoded}"
+              dataUrl
+
+      - type: "expansion"
+        title: "🔴 JSON 인코딩"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "JSON 데이터를 Base64로 인코딩하고 디코딩하세요"
+            content: |-
+              import json
+
+              data = {"name": "test", "value": 123}
+              jsonStr = json.dumps(data)
+              encoded = base64.b64encode(jsonStr.encode('utf-8')).decode('utf-8')
+              decodedStr = base64.b64decode(encoded).decode('utf-8')
+              decodedData = json.loads(decodedStr)
+
+              decodedData
+
+      - type: "expansion"
+        title: "🔴 URL 파라미터"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "URL 파라미터로 사용할 수 있도록 인코딩하세요 (패딩 제거)"
+            content: |-
+              data = "user=test&value=123"
+              encoded = base64.urlsafe_b64encode(data.encode('utf-8')).decode('utf-8')
+              withoutPadding = encoded.rstrip('=')
+              withoutPadding
+
+      - type: "expansion"
+        title: "🔴 토큰 생성"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "랜덤 바이트로 URL 안전 토큰을 생성하세요"
+            content: |-
+              import secrets
+
+              randomBytes = secrets.token_bytes(16)
+              token = base64.urlsafe_b64encode(randomBytes).decode('utf-8').rstrip('=')
+
+              {
+                  "token": token,
+                  "length": len(token)
+              }
+
+      - type: "expansion"
+        title: "🔴 다중 인코딩 비교"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "Base64, Base32, Base16의 인코딩 결과를 비교하세요"
+            content: |-
+              text = "Test"
+              textBytes = text.encode('utf-8')
+
+              {
+                  "base64": base64.b64encode(textBytes).decode('utf-8'),
+                  "base32": base64.b32encode(textBytes).decode('utf-8'),
+                  "base16": base64.b16encode(textBytes).decode('utf-8')
+              }
+
+      - type: "expansion"
+        title: "🔴 이메일 첨부"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "파일 내용을 76자씩 줄바꿈하여 인코딩하세요"
+            content: |-
+              content = b"Sample file content for email attachment test"
+              encoded = base64.b64encode(content).decode('utf-8')
+              lines = [encoded[i:i+76] for i in range(0, len(encoded), 76)]
+              formatted = "\n".join(lines)
+              formatted
+
+      - type: "expansion"
+        title: "🔴 Base85 효율성"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "Base64와 Base85의 크기 효율을 비교하세요"
+            content: |-
+              data = b"Efficiency test data"
+              b64 = base64.b64encode(data)
+              b85 = base64.b85encode(data)
+
+              {
+                  "original": len(data),
+                  "base64": len(b64),
+                  "base85": len(b85),
+                  "savings": len(b64) - len(b85)
+              }
+
+      - type: "expansion"
+        title: "🔴 유효성 검증"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "잘못된 Base64 문자열 디코딩 시 에러를 처리하세요"
+            content: |-
+              invalidEncoded = "Invalid!Data"
+
+              try:
+                  decoded = base64.b64decode(invalidEncoded, validate=True)
+                  result = "Success"
+              except Exception as e:
+                  result = "Error detected"
+
+              result
+
+      - type: "expansion"
+        title: "🔴 캐시 키 생성"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "문자열의 해시값으로 짧은 캐시 키를 만드세요"
+            content: |-
+              import hashlib
+
+              data = "cache key data"
+              hashValue = hashlib.md5(data.encode('utf-8')).digest()
+              cacheKey = base64.urlsafe_b64encode(hashValue).decode('utf-8')[:12]
+              cacheKey
+
+      - type: "expansion"
+        title: "🔴 바이트 배열 처리"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "바이트 배열을 Base64로 인코딩하고 다시 복원하세요"
+            content: |-
+              byteArray = bytes([10, 20, 30, 40, 50])
+              encoded = base64.b64encode(byteArray)
+              decoded = base64.b64decode(encoded)
+              restored = list(decoded)
+              restored

@@ -1,0 +1,582 @@
+meta:
+  id: pydantic_08
+  title: 에러처리기법
+  order: 8
+  category: pydantic
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["pydantic", "ValidationError", "에러처리", "커스텀에러", "로깅"]
+  seo:
+    title: "Pydantic 에러 처리 - ValidationError 다루기"
+    description: "Pydantic의 ValidationError를 효과적으로 처리합니다. 에러 분석, 커스텀 메시지, 로깅을 배웁니다."
+    keywords: ["pydantic", "ValidationError", "에러처리", "검증"]
+
+intro:
+  emoji: "🚨"
+  goal: ValidationError를 활용한 REST API 에러 응답 시스템을 구축합니다.
+  description: "API 서버에서 잘못된 데이터가 들어오면 클라이언트에게 정확하고 친절한 에러 메시지를 반환해야 합니다. Pydantic의 ValidationError는 어떤 필드에서 어떤 문제가 발생했는지 상세한 정보를 제공합니다. 이 프로젝트에서는 이 정보를 분석하고, 사용자 친화적인 응답을 생성하며, 로깅과 모니터링에 활용합니다."
+
+sections:
+- id: load
+  title: 라이브러리 로드
+  subtitle: Pydantic 설치 및 import
+  blocks:
+  - type: text
+    content: "ValidationError는 검증 실패 시 발생하는 예외입니다. errors() 메서드로 각 에러의 상세 정보를, error_count()로 에러 개수를, json()으로 JSON 형식의 에러 정보를 얻을 수 있습니다. 이 정보들을 조합하여 API 응답이나 로그를 구성합니다."
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: micropip으로 pydantic 설치
+    content: |-
+      import micropip
+      await micropip.install('pydantic')
+  - type: code
+    language: python
+    title: 핵심 모듈 import
+    description: ValidationError 포함
+    content: |-
+      from pydantic import BaseModel, ValidationError, Field, field_validator
+      from typing import Optional
+      import json
+
+- id: basic
+  title: 기본 에러 구조
+  subtitle: ValidationError 분석
+  blocks:
+  - type: text
+    content: "ValidationError가 발생하면 errors() 메서드로 각 에러의 상세 정보를 리스트로 얻습니다. 각 항목은 loc(위치), msg(메시지), type(에러 타입), input(입력값)을 포함합니다. error_count()는 발생한 에러의 총 개수를 반환합니다."
+  - type: code
+    language: python
+    title: 에러 발생 유도
+    description: 잘못된 데이터
+    content: |-
+      class User(BaseModel):
+          name: str = Field(min_length=2)
+          age: int = Field(ge=0, le=150)
+          email: str
+
+      try:
+          invalidUser = User(name="A", age=-5, email="invalid")
+      except ValidationError as e:
+          validationErr = e
+          validationErr
+  - type: tip
+    content: "에러 개수는 error_count()로, 에러 목록은 errors()로, 모델 이름은 title 속성으로 확인합니다."
+  - type: code
+    language: python
+    title: 에러 메서드 활용
+    description: 다양한 접근 방법
+    content: |-
+      errorInfo = {
+          "error_count": validationErr.error_count(),
+          "title": validationErr.title,
+          "first_error": validationErr.errors()[0]
+      }
+      errorInfo
+
+- id: structure
+  title: 에러 상세 분석
+  subtitle: errors() 메서드
+  blocks:
+  - type: text
+    content: "errors() 리스트의 각 항목을 분석하면 에러 위치, 메시지, 타입, 입력값을 알 수 있습니다. loc은 튜플로 필드 위치를 나타내고, 중첩 모델이나 리스트에서는 경로 전체가 포함됩니다."
+  - type: code
+    language: python
+    title: 전체 에러 목록
+    description: errors() 분석
+    content: |-
+      errorList = validationErr.errors()
+      errorList
+  - type: code
+    language: python
+    title: 개별 에러 구조
+    description: loc, msg, type, input
+    content: |-
+      for err in errorList:
+          errDetail = {
+              "field": err["loc"],
+              "message": err["msg"],
+              "type": err["type"],
+              "input": err["input"]
+          }
+      errDetail
+
+- id: nested
+  title: 중첩 모델 에러
+  subtitle: 깊은 위치 추적
+  blocks:
+  - type: text
+    content: "중첩 모델에서 에러가 발생하면 loc이 경로 전체를 포함합니다. 예를 들어 ('address', 'zipCode')는 address 필드 내의 zipCode에서 에러가 발생했음을 의미합니다. 리스트의 경우 ('items', 1, 'price')처럼 인덱스도 포함됩니다."
+  - type: code
+    language: python
+    title: 중첩 모델 에러
+    description: 깊은 경로
+    content: |-
+      class Address(BaseModel):
+          city: str = Field(min_length=2)
+          zipCode: str = Field(pattern=r'^\d{5}$')
+
+      class Person(BaseModel):
+          name: str
+          address: Address
+
+      try:
+          badPerson = Person(name="Alice", address={"city": "S", "zipCode": "abc"})
+      except ValidationError as e:
+          nestedErr = e.errors()
+          nestedErr
+  - type: code
+    language: python
+    title: 경로 해석
+    description: loc 분석
+    content: |-
+      locationInfo = [(err["loc"], err["msg"]) for err in nestedErr]
+      locationInfo
+  - type: code
+    language: python
+    title: 리스트 에러
+    description: 인덱스 포함
+    content: |-
+      class Item(BaseModel):
+          name: str
+          price: float = Field(gt=0)
+
+      class Order(BaseModel):
+          items: list[Item]
+
+      try:
+          badOrder = Order(items=[
+              {"name": "A", "price": 100},
+              {"name": "B", "price": -50},
+              {"name": "C", "price": 0}
+          ])
+      except ValidationError as e:
+          listErr = e.errors()
+          listErr
+
+- id: json
+  title: JSON 에러 응답
+  subtitle: API 응답 생성
+  blocks:
+  - type: text
+    content: "json() 메서드는 에러 정보를 JSON 문자열로 반환합니다. 하지만 직접 API 응답 형식을 정의하면 더 유연하게 에러를 표현할 수 있습니다. 필드명을 점 표기법으로 변환하거나, 에러 메시지를 한글화하는 등의 가공이 가능합니다."
+  - type: code
+    language: python
+    title: json() 메서드
+    description: 기본 JSON 형식
+    content: |-
+      errorJson = validationErr.json()
+      errorJson
+  - type: code
+    language: python
+    title: 커스텀 응답 함수
+    description: API 응답 형식
+    content: |-
+      def formatApiError(error: ValidationError) -> dict:
+          formatted = {
+              "success": False,
+              "errorCount": error.error_count(),
+              "errors": []
+          }
+          for err in error.errors():
+              formatted["errors"].append({
+                  "field": ".".join(str(loc) for loc in err["loc"]),
+                  "message": err["msg"],
+                  "type": err["type"]
+              })
+          return formatted
+
+      apiError = formatApiError(validationErr)
+      apiError
+  - type: tip
+    content: "loc은 튜플이므로 '.'.join()으로 'address.zipCode' 같은 점 표기법 경로로 변환합니다."
+
+- id: custom
+  title: 커스텀 에러 메시지
+  subtitle: field_validator 활용
+  blocks:
+  - type: text
+    content: "field_validator에서 ValueError를 발생시키면 커스텀 에러 메시지를 정의할 수 있습니다. 비즈니스 규칙에 맞는 친절한 한글 메시지를 제공하면 클라이언트가 문제를 쉽게 이해하고 수정할 수 있습니다."
+  - type: code
+    language: python
+    title: 커스텀 메시지 정의
+    description: 사용자 정의 검증
+    content: |-
+      class Registration(BaseModel):
+          username: str
+          password: str
+          age: int
+
+          @field_validator('username')
+          @classmethod
+          def validateUsername(cls, v):
+              if len(v) < 4:
+                  raise ValueError("사용자명은 4자 이상이어야 합니다")
+              if not v.isalnum():
+                  raise ValueError("사용자명은 영문과 숫자만 허용됩니다")
+              return v
+
+          @field_validator('password')
+          @classmethod
+          def validatePassword(cls, v):
+              if len(v) < 8:
+                  raise ValueError("비밀번호는 8자 이상이어야 합니다")
+              if not any(c.isdigit() for c in v):
+                  raise ValueError("비밀번호에 숫자가 포함되어야 합니다")
+              return v
+
+      try:
+          badReg = Registration(username="ab@", password="short", age=25)
+      except ValidationError as e:
+          customErr = e.errors()
+          customErr
+
+- id: safe
+  title: 안전한 검증
+  subtitle: 예외 없는 검증
+  blocks:
+  - type: text
+    content: "try-except를 매번 쓰는 대신 결과 객체를 반환하는 래퍼 함수를 만들면 코드가 깔끔해집니다. 성공 시 데이터를, 실패 시 에러 목록을 포함하는 결과 객체로 일관된 처리가 가능합니다."
+  - type: code
+    language: python
+    title: 안전한 검증 함수
+    description: 결과 객체 반환
+    content: |-
+      from typing import TypeVar, Generic
+
+      T = TypeVar('T', bound=BaseModel)
+
+      class ValidationResult(Generic[T]):
+          def __init__(self, success: bool, data: T | None = None, errors: list = None):
+              self.success = success
+              self.data = data
+              self.errors = errors or []
+
+      def safeValidate(modelClass, data: dict) -> ValidationResult:
+          try:
+              instance = modelClass.model_validate(data)
+              return ValidationResult(success=True, data=instance)
+          except ValidationError as e:
+              return ValidationResult(success=False, errors=e.errors())
+
+      result1 = safeValidate(User, {"name": "Alice", "age": 25, "email": "a@b.com"})
+      result2 = safeValidate(User, {"name": "A", "age": -5, "email": "bad"})
+      result1.success, result2.success
+  - type: code
+    language: python
+    title: 결과 활용
+    description: 조건부 처리
+    content: |-
+      if result1.success:
+          validData = result1.data.model_dump()
+      else:
+          validData = {"error": result1.errors}
+
+      if result2.success:
+          invalidData = result2.data.model_dump()
+      else:
+          invalidData = {"errorCount": len(result2.errors)}
+
+      validData, invalidData
+
+- id: batch
+  title: 배치 검증
+  subtitle: 여러 데이터 검증
+  blocks:
+  - type: text
+    content: "CSV나 API 배치 요청처럼 여러 레코드를 한번에 검증해야 할 때가 있습니다. 각 레코드의 성공/실패를 추적하고, 실패한 레코드에 대한 상세 정보를 수집하면 배치 작업의 품질 보고서를 생성할 수 있습니다."
+  - type: code
+    language: python
+    title: 배치 검증 함수
+    description: 여러 레코드 처리
+    content: |-
+      class Product(BaseModel):
+          productId: str
+          name: str = Field(min_length=2)
+          price: float = Field(gt=0)
+
+      dataList = [
+          {"productId": "P1", "name": "Laptop", "price": 1000},
+          {"productId": "P2", "name": "A", "price": 50},
+          {"productId": "P3", "name": "Mouse", "price": -10},
+          {"productId": "P4", "name": "Keyboard", "price": 100}
+      ]
+
+      def batchValidate(modelClass, dataItems):
+          results = {"valid": [], "invalid": []}
+          for idx, item in enumerate(dataItems):
+              try:
+                  validated = modelClass.model_validate(item)
+                  results["valid"].append({"index": idx, "data": validated.model_dump()})
+              except ValidationError as e:
+                  results["invalid"].append({"index": idx, "input": item, "errors": e.errors()})
+          return results
+
+      batchResults = batchValidate(Product, dataList)
+      batchResults
+  - type: code
+    language: python
+    title: 배치 요약
+    description: 통계 정보
+    content: |-
+      batchSummary = {
+          "total": len(dataList),
+          "valid": len(batchResults["valid"]),
+          "invalid": len(batchResults["invalid"]),
+          "successRate": f"{len(batchResults['valid']) / len(dataList) * 100:.1f}%"
+      }
+      batchSummary
+
+- id: logging
+  title: 에러 로깅
+  subtitle: 모니터링 통합
+  blocks:
+  - type: text
+    content: "프로덕션 환경에서는 검증 에러를 로깅하여 데이터 품질 문제를 추적해야 합니다. 어떤 필드에서 어떤 에러가 자주 발생하는지 분석하면 API 문서 개선이나 클라이언트 버그 발견에 도움이 됩니다."
+  - type: code
+    language: python
+    title: 에러 로거
+    description: 구조화된 로깅
+    content: |-
+      from datetime import datetime
+
+      class ValidationLogger:
+          def __init__(self):
+              self.logs = []
+
+          def logError(self, modelName: str, error: ValidationError, inputData: dict):
+              logEntry = {
+                  "timestamp": datetime.now().isoformat(),
+                  "model": modelName,
+                  "errorCount": error.error_count(),
+                  "errors": [
+                      {"field": ".".join(str(l) for l in e["loc"]), "type": e["type"]}
+                      for e in error.errors()
+                  ],
+                  "inputSample": str(inputData)[:100]
+              }
+              self.logs.append(logEntry)
+              return logEntry
+
+          def getStats(self):
+              if not self.logs:
+                  return {"totalErrors": 0}
+              errorTypes = {}
+              for log in self.logs:
+                  for err in log["errors"]:
+                      errorTypes[err["type"]] = errorTypes.get(err["type"], 0) + 1
+              return {
+                  "totalLogs": len(self.logs),
+                  "errorTypeDistribution": errorTypes
+              }
+
+      logger = ValidationLogger()
+
+      testData = {"name": "A", "age": -5, "email": "bad"}
+      try:
+          User.model_validate(testData)
+      except ValidationError as e:
+          logEntry = logger.logError("User", e, testData)
+          logEntry
+  - type: code
+    language: python
+    title: 통계 확인
+    description: 에러 분포
+    content: |-
+      logger.getStats()
+
+- id: result
+  title: API 에러 응답 시스템
+  subtitle: 종합 에러 처리
+  blocks:
+  - type: text
+    content: "지금까지 배운 모든 기법을 종합하여 실제 REST API에서 사용할 수 있는 에러 응답 시스템을 완성합니다. 일관된 형식, 상세한 정보, 친절한 메시지를 제공하는 완전한 에러 처리 체계입니다."
+  - type: code
+    language: python
+    title: API 에러 응답 모델
+    description: 표준 에러 형식
+    content: |-
+      class ErrorDetail(BaseModel):
+          field: str
+          message: str
+          code: str
+
+      class ApiErrorResponse(BaseModel):
+          success: bool = False
+          errorCode: str
+          message: str
+          details: list[ErrorDetail] = []
+
+      def createApiError(error: ValidationError, code: str = "VALIDATION_ERROR") -> ApiErrorResponse:
+          details = []
+          for err in error.errors():
+              details.append(ErrorDetail(
+                  field=".".join(str(loc) for loc in err["loc"]),
+                  message=err["msg"],
+                  code=err["type"]
+              ))
+          return ApiErrorResponse(
+              errorCode=code,
+              message=f"{error.error_count()}개의 검증 오류가 발생했습니다",
+              details=details
+          )
+
+      try:
+          badUser = User(name="A", age=-5, email="bad")
+      except ValidationError as e:
+          apiErrorResp = createApiError(e)
+          apiErrorResp.model_dump_json(indent=2)
+  - type: code
+    language: python
+    title: 완전한 에러 핸들러
+    description: 로깅 포함
+    content: |-
+      class CompleteErrorHandler:
+          def __init__(self):
+              self.logger = ValidationLogger()
+
+          def handle(self, modelName: str, error: ValidationError, inputData: dict) -> dict:
+              self.logger.logError(modelName, error, inputData)
+              apiResp = createApiError(error)
+              return {
+                  "response": apiResp.model_dump(),
+                  "logged": True
+              }
+
+      handler = CompleteErrorHandler()
+
+      badData = {"name": "X", "age": 200, "email": ""}
+      try:
+          User.model_validate(badData)
+      except ValidationError as e:
+          handlerResult = handler.handle("User", e, badData)
+          handlerResult
+
+- id: practice
+  title: 실습
+  subtitle: 에러 처리 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 ValidationError 분석, 커스텀 메시지, 안전한 검증, 배치 처리, 로깅을 활용하여 완전한 에러 처리 시스템을 구축합니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 폼 검증 시스템"
+    blocks:
+    - type: code
+      title: 폼 검증 모델
+      content: |-
+        from pydantic import BaseModel, Field, field_validator, ValidationError
+        from typing import Optional
+
+        class FormValidator:
+            errorMessages = {
+                "string_too_short": "최소 {min_length}자 이상 입력해주세요",
+                "string_too_long": "최대 {max_length}자까지 입력 가능합니다",
+                "greater_than": "0보다 큰 값을 입력해주세요",
+                "string_pattern_mismatch": "올바른 형식이 아닙니다"
+            }
+
+            @classmethod
+            def localizeError(cls, error: dict) -> str:
+                errType = error.get("type", "")
+                ctx = error.get("ctx", {})
+                template = cls.errorMessages.get(errType, error.get("msg", "검증 오류"))
+                try:
+                    return template.format(**ctx)
+                except KeyError:
+                    return template
+
+        class ContactForm(BaseModel):
+            name: str = Field(min_length=2, max_length=50)
+            email: str = Field(pattern=r'^[\w.-]+@[\w.-]+\.\w+$')
+            phone: str = Field(pattern=r'^\d{3}-\d{4}-\d{4}$')
+            message: str = Field(min_length=10, max_length=1000)
+
+        formData = {"name": "A", "email": "bad", "phone": "123", "message": "short"}
+
+        try:
+            ContactForm.model_validate(formData)
+        except ValidationError as e:
+            localizedErrors = []
+            for err in e.errors():
+                localizedErrors.append({
+                    "field": err["loc"][0],
+                    "message": FormValidator.localizeError(err)
+                })
+            localizedErrors
+    - type: code
+      title: 폼 응답 생성
+      content: |-
+        formResponse = {
+            "success": False,
+            "errors": localizedErrors,
+            "errorCount": len(localizedErrors)
+        }
+        formResponse
+  - type: expansion
+    title: "미션2: 데이터 가져오기 리포트"
+    blocks:
+    - type: code
+      title: 가져오기 처리
+      content: |-
+        from pydantic import BaseModel, Field, ValidationError
+        from datetime import datetime
+
+        class ImportRecord(BaseModel):
+            recordId: str = Field(min_length=1)
+            name: str = Field(min_length=2)
+            amount: float = Field(gt=0)
+            category: str
+
+        class ImportReport:
+            def __init__(self):
+                self.successCount = 0
+                self.failCount = 0
+                self.failures = []
+
+            def process(self, records: list[dict]) -> dict:
+                for idx, record in enumerate(records):
+                    try:
+                        validated = ImportRecord.model_validate(record)
+                        self.successCount += 1
+                    except ValidationError as e:
+                        self.failCount += 1
+                        self.failures.append({
+                            "row": idx + 1,
+                            "data": record,
+                            "errors": [err["msg"] for err in e.errors()]
+                        })
+                return self.generateReport()
+
+            def generateReport(self) -> dict:
+                total = self.successCount + self.failCount
+                return {
+                    "processedAt": datetime.now().isoformat(),
+                    "summary": {
+                        "total": total,
+                        "success": self.successCount,
+                        "failed": self.failCount,
+                        "successRate": f"{self.successCount/total*100:.1f}%" if total > 0 else "0%"
+                    },
+                    "failures": self.failures[:5]
+                }
+
+        testRecords = [
+            {"recordId": "R1", "name": "Product A", "amount": 100, "category": "electronics"},
+            {"recordId": "R2", "name": "B", "amount": 50, "category": "food"},
+            {"recordId": "", "name": "Product C", "amount": -10, "category": "books"},
+            {"recordId": "R4", "name": "Product D", "amount": 200, "category": "clothing"}
+        ]
+
+        importReport = ImportReport()
+        importResult = importReport.process(testRecords)
+        importResult
+    - type: code
+      title: 실패 분석
+      content: |-
+        failureSummary = {
+            "totalFailures": len(importResult["failures"]),
+            "failureRows": [f["row"] for f in importResult["failures"]]
+        }
+        failureSummary

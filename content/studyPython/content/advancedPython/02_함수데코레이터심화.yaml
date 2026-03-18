@@ -1,0 +1,934 @@
+meta:
+  id: "02"
+  title: "함수 데코레이터 심화"
+  day: 2
+  category: "advancedPython"
+  tags: ["decorator", "functools", "wraps", "메타프로그래밍"]
+  seo:
+    title: "파이썬 데코레이터 심화 - 인자 있는 데코레이터와 클래스 데코레이터"
+    description: "데코레이터의 내부 동작 원리를 완벽히 이해하고 인자 있는 데코레이터, 다중 데코레이터, 클래스 데코레이터를 마스터합니다."
+    keywords: ["decorator", "functools", "wraps", "클래스데코레이터", "메타프로그래밍"]
+
+intro:
+  emoji: "🎭"
+  points:
+  - "데코레이터의 내부 동작 원리 완벽 이해"
+  - "인자를 받는 데코레이터 구현"
+  - "다중 데코레이터의 실행 순서"
+  - "functools.wraps로 메타데이터 보존"
+
+sections:
+- id: "decorator_review"
+  title: "데코레이터 복습"
+  subtitle: "기본 패턴 이해"
+  blocks:
+  - type: "text"
+    content: "데코레이터는 함수를 인자로 받아 새로운 함수를 반환하는 고차 함수입니다. @decorator 문법은 func = decorator(func)의 문법적 설탕(syntactic sugar)입니다. 데코레이터는 원본 함수를 감싸는 wrapper 함수를 만들어 원본 함수 호출 전후에 추가 동작을 수행합니다. 이 패턴으로 로깅, 인증, 캐싱, 타이밍 측정 등 다양한 횡단 관심사(cross-cutting concerns)를 구현할 수 있습니다. 데코레이터는 함수를 수정하지 않고 기능을 확장하는 개방-폐쇄 원칙(OCP)의 좋은 예입니다."
+  - type: "list"
+    items:
+    - "@decorator는 func = decorator(func)와 동일"
+    - "wrapper 함수로 원본 함수를 감싸기"
+    - "함수 호출 전후에 로직 추가 가능"
+    - "횡단 관심사 분리에 유용"
+  - type: "code"
+    language: "python"
+    title: "기본 데코레이터 구조"
+    description: "함수 호출 전후에 메시지를 출력하는 데코레이터입니다."
+    content: |-
+      def simpleDecorator(func):
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return result
+          return wrapper
+
+      @simpleDecorator
+      def greet(name):
+          return f"Hello, {name}!"
+
+      greet("Python")
+  - type: "code"
+    language: "python"
+    title: "데코레이터 동작 확인"
+    description: "@ 문법 없이 데코레이터를 직접 적용합니다."
+    content: |-
+      def logDecorator(func):
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return result
+          return wrapper
+
+      def addNums(a, b):
+          return a + b
+
+      decorated = logDecorator(addNums)
+      decorated(3, 5)
+  - type: "code"
+    language: "python"
+    title: "실행 흐름 추적"
+    description: "데코레이터의 실행 순서를 확인합니다."
+    content: |-
+      trace = []
+
+      def tracingDeco(func):
+          def wrapper(*args, **kwargs):
+              trace.append("before")
+              result = func(*args, **kwargs)
+              trace.append("after")
+              return result
+          return wrapper
+
+      @tracingDeco
+      def compute(x):
+          trace.append("computing")
+          return x * 2
+
+      output = compute(5)
+      trace, output
+  - type: "tip"
+    content: "*args와 **kwargs를 사용하면 어떤 시그니처의 함수에도 적용할 수 있는 범용 데코레이터를 만들 수 있습니다."
+
+- id: "parameterized"
+  title: "인자 있는 데코레이터"
+  subtitle: "데코레이터 팩토리 패턴"
+  blocks:
+  - type: "text"
+    content: "인자를 받는 데코레이터는 3중 중첩 함수 구조로 구현합니다. 가장 바깥 함수가 데코레이터 인자를 받고, 중간 함수가 실제 데코레이터(함수를 받음), 가장 안쪽 함수가 wrapper입니다. @decorator(arg)는 decorator(arg)를 먼저 호출하여 실제 데코레이터를 얻고, 그 데코레이터가 함수에 적용됩니다. 이 패턴을 '데코레이터 팩토리'라고 부릅니다. 데코레이터에 설정값을 전달하거나 동작을 커스터마이징할 때 사용합니다."
+  - type: "list"
+    items:
+    - "3중 중첩: 인자받기 → 함수받기 → wrapper"
+    - "@decorator(arg)는 decorator(arg)(func)와 동일"
+    - "데코레이터 팩토리 패턴"
+    - "설정값이나 옵션 전달에 활용"
+  - type: "code"
+    language: "python"
+    title: "반복 횟수 지정 데코레이터"
+    description: "함수를 n번 실행하는 데코레이터입니다."
+    content: |-
+      def repeat(times):
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  results = []
+                  for _ in range(times):
+                      results.append(func(*args, **kwargs))
+                  return results
+              return wrapper
+          return decorator
+
+      @repeat(3)
+      def sayHello():
+          return "Hello!"
+
+      sayHello()
+  - type: "code"
+    language: "python"
+    title: "접두어 추가 데코레이터"
+    description: "반환값에 접두어를 붙이는 데코레이터입니다."
+    content: |-
+      def addPrefix(prefix):
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  result = func(*args, **kwargs)
+                  return f"{prefix}{result}"
+              return wrapper
+          return decorator
+
+      @addPrefix("[INFO] ")
+      def getMessage():
+          return "작업이 완료되었습니다"
+
+      getMessage()
+  - type: "code"
+    language: "python"
+    title: "조건부 실행 데코레이터"
+    description: "조건에 따라 함수 실행 여부를 결정합니다."
+    content: |-
+      def runIf(condition):
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  if condition:
+                      return func(*args, **kwargs)
+                  return None
+              return wrapper
+          return decorator
+
+      debugMode = True
+
+      @runIf(debugMode)
+      def debugLog(msg):
+          return f"DEBUG: {msg}"
+
+      debugLog("테스트 메시지")
+  - type: "tip"
+    content: "인자 없이도 사용할 수 있게 하려면 인자 유무를 감지하는 추가 로직이 필요합니다."
+
+- id: "multiple_decorators"
+  title: "다중 데코레이터"
+  subtitle: "데코레이터 스택"
+  blocks:
+  - type: "text"
+    content: "하나의 함수에 여러 데코레이터를 적용할 수 있습니다. 데코레이터는 아래에서 위로 적용되고, 호출은 위에서 아래로 진행됩니다. @A @B @C def func()는 A(B(C(func)))와 같습니다. 즉 C가 먼저 func를 감싸고, B가 그 결과를 감싸고, A가 최종적으로 감쌉니다. 실행 시에는 A의 wrapper가 먼저 시작하고, 그 안에서 B의 wrapper, 그 안에서 C의 wrapper가 호출됩니다. 이 순서를 이해하는 것이 다중 데코레이터를 올바르게 사용하는 핵심입니다."
+  - type: "list"
+    items:
+    - "데코레이터는 아래에서 위로 적용"
+    - "실행은 위에서 아래로 진행"
+    - "@A @B def f는 A(B(f))와 동일"
+    - "순서에 따라 결과가 달라질 수 있음"
+  - type: "code"
+    language: "python"
+    title: "다중 데코레이터 순서"
+    description: "두 데코레이터의 실행 순서를 확인합니다."
+    content: |-
+      executionOrder = []
+
+      def deco1(func):
+          def wrapper(*args, **kwargs):
+              executionOrder.append("deco1 start")
+              result = func(*args, **kwargs)
+              executionOrder.append("deco1 end")
+              return result
+          return wrapper
+
+      def deco2(func):
+          def wrapper(*args, **kwargs):
+              executionOrder.append("deco2 start")
+              result = func(*args, **kwargs)
+              executionOrder.append("deco2 end")
+              return result
+          return wrapper
+
+      @deco1
+      @deco2
+      def testFunc():
+          executionOrder.append("function")
+          return "done"
+
+      testFunc()
+      executionOrder
+  - type: "code"
+    language: "python"
+    title: "변환 데코레이터 스택"
+    description: "반환값을 순차적으로 변환합니다."
+    content: |-
+      def uppercase(func):
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return result.upper()
+          return wrapper
+
+      def addExclaim(func):
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return result + "!"
+          return wrapper
+
+      @uppercase
+      @addExclaim
+      def greetPerson(name):
+          return f"hello, {name}"
+
+      greetPerson("world")
+  - type: "code"
+    language: "python"
+    title: "순서 바꿔보기"
+    description: "데코레이터 순서를 바꾸면 결과가 달라집니다."
+    content: |-
+      def toUpper(func):
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return result.upper()
+          return wrapper
+
+      def addBang(func):
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return result + "!"
+          return wrapper
+
+      @addBang
+      @toUpper
+      def greetWorld(name):
+          return f"hello, {name}"
+
+      greetWorld("world")
+  - type: "tip"
+    content: "데코레이터 순서가 중요한 경우 주석으로 의도를 명확히 남기세요."
+
+- id: "functools_wraps"
+  title: "functools.wraps"
+  subtitle: "메타데이터 보존"
+  blocks:
+  - type: "text"
+    content: "데코레이터로 함수를 감싸면 원본 함수의 __name__, __doc__, __annotations__ 등의 메타데이터가 wrapper 함수의 것으로 덮어씌워집니다. 이는 디버깅, 문서화, 인트로스펙션에서 문제가 됩니다. functools.wraps 데코레이터를 wrapper 함수에 적용하면 원본 함수의 메타데이터를 wrapper로 복사합니다. 이것은 데코레이터를 작성할 때 반드시 적용해야 하는 모범 사례입니다. wraps는 __wrapped__ 속성도 설정하여 원본 함수에 접근할 수 있게 해줍니다."
+  - type: "list"
+    items:
+    - "wrapper 함수에 @functools.wraps(func) 적용"
+    - "__name__, __doc__ 등 메타데이터 복사"
+    - "__wrapped__로 원본 함수 접근 가능"
+    - "디버깅과 문서화를 위한 필수 관행"
+  - type: "code"
+    language: "python"
+    title: "wraps 없이 문제 확인"
+    description: "메타데이터가 손실되는 것을 확인합니다."
+    content: |-
+      def badDecorator(func):
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          return wrapper
+
+      @badDecorator
+      def originalFunc():
+          """원본 함수의 독스트링"""
+          return "original"
+
+      originalFunc.__name__, originalFunc.__doc__
+  - type: "code"
+    language: "python"
+    title: "wraps로 해결"
+    description: "functools.wraps로 메타데이터를 보존합니다."
+    content: |-
+      from functools import wraps
+
+      def goodDecorator(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          return wrapper
+
+      @goodDecorator
+      def documentedFunc():
+          """이것은 원본 독스트링입니다"""
+          return "documented"
+
+      documentedFunc.__name__, documentedFunc.__doc__
+  - type: "code"
+    language: "python"
+    title: "__wrapped__ 접근"
+    description: "원본 함수에 직접 접근합니다."
+    content: |-
+      from functools import wraps
+
+      def myDecorator(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs) + " (decorated)"
+          return wrapper
+
+      @myDecorator
+      def baseFunc():
+          return "base"
+
+      baseFunc(), baseFunc.__wrapped__()
+  - type: "tip"
+    content: "항상 @wraps를 사용하세요. 이것은 파이썬 커뮤니티의 표준 관행입니다."
+
+- id: "class_decorator"
+  title: "클래스 데코레이터"
+  subtitle: "클래스를 수정하는 데코레이터"
+  blocks:
+  - type: "text"
+    content: "데코레이터는 함수뿐만 아니라 클래스에도 적용할 수 있습니다. 클래스 데코레이터는 클래스를 인자로 받아 수정된 클래스나 새로운 클래스를 반환합니다. 클래스에 메서드를 추가하거나, 속성을 수정하거나, 클래스를 래핑하는 등의 작업을 할 수 있습니다. @dataclass, @total_ordering 같은 표준 라이브러리 데코레이터가 클래스 데코레이터의 예입니다. 메타클래스보다 간단하고 직관적인 방법으로 클래스를 수정할 수 있습니다."
+  - type: "list"
+    items:
+    - "클래스를 받아 수정된 클래스 반환"
+    - "메서드나 속성 추가 가능"
+    - "@dataclass, @total_ordering이 대표적 예"
+    - "메타클래스보다 간단한 대안"
+  - type: "code"
+    language: "python"
+    title: "메서드 추가 데코레이터"
+    description: "클래스에 새로운 메서드를 추가합니다."
+    content: |-
+      def addRepr(cls):
+          def customRepr(self):
+              attrs = ", ".join(f"{k}={v}" for k, v in self.__dict__.items())
+              return f"{cls.__name__}({attrs})"
+          cls.__repr__ = customRepr
+          return cls
+
+      @addRepr
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      p = Person("Alice", 30)
+      repr(p)
+  - type: "code"
+    language: "python"
+    title: "속성 검증 데코레이터"
+    description: "클래스 속성에 타입 검증을 추가합니다."
+    content: |-
+      def enforceTypes(cls):
+          originalInit = cls.__init__
+          def newInit(self, *args, **kwargs):
+              originalInit(self, *args, **kwargs)
+              for attr, expected in cls.__annotations__.items():
+                  value = getattr(self, attr, None)
+                  if value is not None and not isinstance(value, expected):
+                      raise TypeError(f"{attr}은 {expected.__name__}이어야 합니다")
+          cls.__init__ = newInit
+          return cls
+
+      @enforceTypes
+      class Product:
+          name: str
+          price: int
+          def __init__(self, name, price):
+              self.name = name
+              self.price = price
+
+      prod = Product("Apple", 1000)
+      prod.name, prod.price
+  - type: "code"
+    language: "python"
+    title: "싱글톤 데코레이터"
+    description: "클래스를 싱글톤으로 만듭니다."
+    content: |-
+      def singleton(cls):
+          instances = {}
+          def getInstance(*args, **kwargs):
+              if cls not in instances:
+                  instances[cls] = cls(*args, **kwargs)
+              return instances[cls]
+          return getInstance
+
+      @singleton
+      class Database:
+          def __init__(self, host):
+              self.host = host
+
+      db1 = Database("localhost")
+      db2 = Database("remote")
+      db1 is db2, db1.host
+  - type: "tip"
+    content: "클래스 데코레이터는 메타클래스보다 이해하기 쉽고 대부분의 경우 충분합니다."
+
+- id: "method_decorator"
+  title: "메서드 데코레이터"
+  subtitle: "self 처리하기"
+  blocks:
+  - type: "text"
+    content: "클래스의 메서드에 데코레이터를 적용할 때는 self 인자를 올바르게 처리해야 합니다. 일반 함수 데코레이터와 동일하게 *args, **kwargs를 사용하면 self도 자동으로 전달됩니다. 그러나 self에 접근해야 하는 경우에는 첫 번째 인자를 명시적으로 self로 받을 수 있습니다. classmethod나 staticmethod와 함께 사용할 때는 데코레이터 순서에 주의해야 합니다. 일반적으로 @classmethod나 @staticmethod가 가장 안쪽(함수에 가장 가깝게)에 위치해야 합니다."
+  - type: "list"
+    items:
+    - "*args, **kwargs로 self 자동 전달"
+    - "첫 번째 인자로 self 명시 가능"
+    - "@classmethod, @staticmethod는 가장 안쪽에"
+    - "인스턴스 상태 접근 가능"
+  - type: "code"
+    language: "python"
+    title: "메서드 데코레이터 기본"
+    description: "인스턴스 메서드에 데코레이터를 적용합니다."
+    content: |-
+      from functools import wraps
+
+      def logMethod(func):
+          @wraps(func)
+          def wrapper(self, *args, **kwargs):
+              result = func(self, *args, **kwargs)
+              return result
+          return wrapper
+
+      class Calculator:
+          @logMethod
+          def add(self, a, b):
+              return a + b
+
+      calc = Calculator()
+      calc.add(3, 5)
+  - type: "code"
+    language: "python"
+    title: "인스턴스 속성 접근"
+    description: "데코레이터에서 self를 통해 인스턴스에 접근합니다."
+    content: |-
+      from functools import wraps
+
+      def countCalls(func):
+          @wraps(func)
+          def wrapper(self, *args, **kwargs):
+              self.callCount = getattr(self, "callCount", 0) + 1
+              return func(self, *args, **kwargs)
+          return wrapper
+
+      class Counter:
+          @countCalls
+          def increment(self, value):
+              return value + 1
+
+      cnt = Counter()
+      cnt.increment(5)
+      cnt.increment(10)
+      cnt.callCount
+  - type: "code"
+    language: "python"
+    title: "classmethod와 함께 사용"
+    description: "데코레이터 순서에 주의합니다."
+    content: |-
+      from functools import wraps
+
+      def logClassMethod(func):
+          @wraps(func)
+          def wrapper(cls, *args, **kwargs):
+              return func(cls, *args, **kwargs)
+          return wrapper
+
+      class Factory:
+          count = 0
+
+          @classmethod
+          @logClassMethod
+          def create(cls):
+              cls.count += 1
+              return cls.count
+
+      Factory.create(), Factory.create(), Factory.count
+  - type: "tip"
+    content: "@property에 데코레이터를 적용하려면 property 객체를 반환하도록 특별히 처리해야 합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "데코레이터 심화 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 2에서 배운 데코레이터 심화 내용을 난이도별로 복습합니다. 데코레이터는 함수나 클래스의 동작을 수정하는 강력한 메타프로그래밍 도구입니다. 기본 데코레이터부터 인자를 받는 데코레이터, 클래스 데코레이터까지 단계별로 학습했습니다. 🟢 기본 문제로 래퍼 함수 작성법을 익히고, 🟡 응용 문제로 functools.wraps와 다중 데코레이터를 연습하세요. 🔴 심화 문제에서는 메모이제이션, 검증, 로깅 등 실무 패턴을 직접 구현해봅니다. 프레임워크와 라이브러리에서 데코레이터는 핵심 API이므로 완벽히 이해해두면 코드 품질이 크게 향상됩니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 데코레이터"
+    code: |-
+      def addBrackets(func):
+          def wrapper(*args, **kwargs):
+              return f"[{func(*args, **kwargs)}]"
+          return wrapper
+
+      @addBrackets
+      def getText():
+          return "content"
+
+      getText()
+
+  - type: "expansion"
+    title: "🟢 기본2: 인자 있는 데코레이터"
+    code: |-
+      def multiplyResult(factor):
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  return func(*args, **kwargs) * factor
+              return wrapper
+          return decorator
+
+      @multiplyResult(3)
+      def getNumber():
+          return 10
+
+      getNumber()
+
+  - type: "expansion"
+    title: "🟢 기본3: wraps 사용"
+    code: |-
+      from functools import wraps
+
+      def simpleWrap(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          return wrapper
+
+      @simpleWrap
+      def myFunc():
+          """My function docstring"""
+          return 42
+
+      myFunc.__name__, myFunc.__doc__
+
+  - type: "expansion"
+    title: "🟢 기본4: 다중 데코레이터"
+    code: |-
+      def addA(func):
+          def wrapper(*args, **kwargs):
+              return "A" + func(*args, **kwargs)
+          return wrapper
+
+      def addB(func):
+          def wrapper(*args, **kwargs):
+              return "B" + func(*args, **kwargs)
+          return wrapper
+
+      @addA
+      @addB
+      def baseStr():
+          return "X"
+
+      baseStr()
+
+  - type: "expansion"
+    title: "🟢 기본5: 메서드 데코레이터"
+    code: |-
+      def doubleReturn(func):
+          def wrapper(self, *args, **kwargs):
+              return func(self, *args, **kwargs) * 2
+          return wrapper
+
+      class Multiplier:
+          @doubleReturn
+          def getValue(self, x):
+              return x
+
+      m = Multiplier()
+      m.getValue(5)
+
+  - type: "expansion"
+    title: "🟡 응용1: 호출 횟수 추적"
+    code: |-
+      def trackCalls(func):
+          def wrapper(*args, **kwargs):
+              wrapper.calls += 1
+              return func(*args, **kwargs)
+          wrapper.calls = 0
+          return wrapper
+
+      @trackCalls
+      def addTwo(x):
+          return x + 2
+
+      addTwo(1)
+      addTwo(2)
+      addTwo(3)
+      addTwo.calls
+
+  - type: "expansion"
+    title: "🟡 응용2: 결과 캐싱"
+    code: |-
+      def memoize(func):
+          cache = {}
+          def wrapper(*args):
+              if args not in cache:
+                  cache[args] = func(*args)
+              return cache[args]
+          wrapper.cache = cache
+          return wrapper
+
+      @memoize
+      def fibonacci(n):
+          if n < 2:
+              return n
+          return fibonacci(n - 1) + fibonacci(n - 2)
+
+      fibonacci(10), len(fibonacci.cache)
+
+  - type: "expansion"
+    title: "🟡 응용3: 타입 검증"
+    code: |-
+      def validateTypes(*types):
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  for arg, expected in zip(args, types):
+                      if not isinstance(arg, expected):
+                          raise TypeError(f"Expected {expected.__name__}")
+                  return func(*args, **kwargs)
+              return wrapper
+          return decorator
+
+      @validateTypes(int, int)
+      def addInts(a, b):
+          return a + b
+
+      addInts(3, 5)
+
+  - type: "expansion"
+    title: "🟡 응용4: 재시도 데코레이터"
+    code: |-
+      def retry(maxAttempts):
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  for attempt in range(maxAttempts):
+                      try:
+                          return func(*args, **kwargs)
+                      except Exception:
+                          if attempt == maxAttempts - 1:
+                              raise
+                  return None
+              return wrapper
+          return decorator
+
+      counter = {"val": 0}
+
+      @retry(3)
+      def flakyFunc():
+          counter["val"] += 1
+          if counter["val"] < 3:
+              raise ValueError("Not ready")
+          return "Success"
+
+      flakyFunc(), counter["val"]
+
+  - type: "expansion"
+    title: "🟡 응용5: 클래스 데코레이터"
+    code: |-
+      def addTimestamp(cls):
+          import time
+          originalInit = cls.__init__
+          def newInit(self, *args, **kwargs):
+              originalInit(self, *args, **kwargs)
+              self.createdAt = time.time()
+          cls.__init__ = newInit
+          return cls
+
+      @addTimestamp
+      class Event:
+          def __init__(self, name):
+              self.name = name
+
+      e = Event("test")
+      e.name, hasattr(e, "createdAt")
+
+  - type: "expansion"
+    title: "🔴 심화1: 선택적 인자 데코레이터"
+    code: |-
+      from functools import wraps
+
+      def optionalArgs(decorator):
+          @wraps(decorator)
+          def newDecorator(*args, **kwargs):
+              if len(args) == 1 and callable(args[0]):
+                  return decorator()(args[0])
+              return decorator(*args, **kwargs)
+          return newDecorator
+
+      @optionalArgs
+      def repeatN(n=2):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(*args, **kwargs):
+                  return [func(*args, **kwargs) for _ in range(n)]
+              return wrapper
+          return decorator
+
+      @repeatN
+      def sayHi():
+          return "Hi"
+
+      @repeatN(3)
+      def sayBye():
+          return "Bye"
+
+      sayHi(), sayBye()
+
+  - type: "expansion"
+    title: "🔴 심화2: 데코레이터 체인 분석"
+    code: |-
+      log = []
+
+      def decoA(func):
+          def wrapper(*args, **kwargs):
+              log.append("A-before")
+              result = func(*args, **kwargs)
+              log.append("A-after")
+              return result
+          return wrapper
+
+      def decoB(func):
+          def wrapper(*args, **kwargs):
+              log.append("B-before")
+              result = func(*args, **kwargs)
+              log.append("B-after")
+              return result
+          return wrapper
+
+      def decoC(func):
+          def wrapper(*args, **kwargs):
+              log.append("C-before")
+              result = func(*args, **kwargs)
+              log.append("C-after")
+              return result
+          return wrapper
+
+      @decoA
+      @decoB
+      @decoC
+      def process():
+          log.append("process")
+          return "done"
+
+      process()
+      log
+
+  - type: "expansion"
+    title: "🔴 심화3: 조건부 데코레이터"
+    code: |-
+      def conditionalDecorator(condition, decorator):
+          def wrapper(func):
+              if condition:
+                  return decorator(func)
+              return func
+          return wrapper
+
+      def doubler(func):
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs) * 2
+          return wrapper
+
+      enabled = True
+
+      @conditionalDecorator(enabled, doubler)
+      def getVal():
+          return 5
+
+      getVal()
+
+  - type: "expansion"
+    title: "🔴 심화4: 클래스 기반 데코레이터"
+    code: |-
+      class CallCounter:
+          def __init__(self, func):
+              self.func = func
+              self.count = 0
+
+          def __call__(self, *args, **kwargs):
+              self.count += 1
+              return self.func(*args, **kwargs)
+
+      @CallCounter
+      def greetUser(name):
+          return f"Hello, {name}"
+
+      greetUser("Alice")
+      greetUser("Bob")
+      greetUser.count
+
+  - type: "expansion"
+    title: "🔴 심화5: 디스크립터 데코레이터"
+    code: |-
+      class LazyProperty:
+          def __init__(self, func):
+              self.func = func
+              self.attrName = None
+
+          def __set_name__(self, owner, name):
+              self.attrName = name
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              value = self.func(obj)
+              setattr(obj, self.attrName, value)
+              return value
+
+      class Circle:
+          def __init__(self, radius):
+              self.radius = radius
+
+          @LazyProperty
+          def area(self):
+              return 3.14159 * self.radius ** 2
+
+      c = Circle(5)
+      c.area, c.__dict__
+
+  - type: "expansion"
+    title: "🔴 심화6: 인자 변환 데코레이터"
+    code: |-
+      def transformArgs(*transformers):
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  newArgs = [t(a) for t, a in zip(transformers, args)]
+                  return func(*newArgs, **kwargs)
+              return wrapper
+          return decorator
+
+      @transformArgs(str.upper, int)
+      def display(name, age):
+          return f"{name} is {age} years old"
+
+      display("alice", "25")
+
+  - type: "expansion"
+    title: "🔴 심화7: 반환값 검증"
+    code: |-
+      def ensureType(expectedType):
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  result = func(*args, **kwargs)
+                  if not isinstance(result, expectedType):
+                      raise TypeError(f"Expected {expectedType.__name__}")
+                  return result
+              return wrapper
+          return decorator
+
+      @ensureType(int)
+      def computeAge(birthYear, currentYear):
+          return currentYear - birthYear
+
+      computeAge(1990, 2024)
+
+  - type: "expansion"
+    title: "🔴 심화8: 다중 상태 데코레이터"
+    code: |-
+      def stateful():
+          state = {"initialized": False, "callCount": 0}
+          def decorator(func):
+              def wrapper(*args, **kwargs):
+                  if not state["initialized"]:
+                      state["initialized"] = True
+                  state["callCount"] += 1
+                  return func(*args, **kwargs), state.copy()
+              return wrapper
+          return decorator
+
+      @stateful()
+      def doWork():
+          return "working"
+
+      doWork()
+      doWork()
+
+  - type: "expansion"
+    title: "🔴 심화9: 데코레이터 합성"
+    code: |-
+      def composeDecorators(*decorators):
+          def decorator(func):
+              for deco in reversed(decorators):
+                  func = deco(func)
+              return func
+          return decorator
+
+      def addX(func):
+          def wrapper(*a, **kw):
+              return func(*a, **kw) + "X"
+          return wrapper
+
+      def addY(func):
+          def wrapper(*a, **kw):
+              return func(*a, **kw) + "Y"
+          return wrapper
+
+      @composeDecorators(addX, addY)
+      def base():
+          return "O"
+
+      base()
+
+  - type: "expansion"
+    title: "🔴 심화10: 메타데이터 완전 보존"
+    code: |-
+      from functools import wraps, WRAPPER_ASSIGNMENTS, WRAPPER_UPDATES
+
+      def fullWrap(func):
+          @wraps(func, assigned=WRAPPER_ASSIGNMENTS + ('__dict__',), updated=WRAPPER_UPDATES)
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          return wrapper
+
+      def annotated():
+          """Docstring here"""
+          return 1
+
+      annotated.customAttr = "custom"
+
+      @fullWrap
+      def annotatedCopy():
+          """Docstring here"""
+          return 1
+
+      annotatedCopy.customAttr = "custom"
+
+      annotatedCopy.__name__, hasattr(annotatedCopy, "__wrapped__")

@@ -1,0 +1,401 @@
+meta:
+  id: "01_math"
+  title: "math - 수학 함수"
+  category: "builtins"
+  tags: ["math", "수학", "계산", "삼각함수"]
+  seo:
+    title: "파이썬 math 모듈 완전 정복"
+    description: "math 모듈의 삼각함수, 로그, 지수, 반올림 등 모든 함수를 실전 예제로 배웁니다."
+    keywords: ["math", "수학함수", "sin", "cos", "log", "sqrt", "파이썬수학"]
+
+intro:
+  emoji: "🔢"
+  points:
+  - "삼각함수와 로그 계산"
+  - "반올림과 절댓값"
+  - "수학 상수 활용"
+  - "실전 과학 계산"
+
+sections:
+- id: "module_import"
+  title: "math 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "math는 파이썬 표준 수학 라이브러리입니다. 삼각함수, 로그, 지수, 반올림 등 다양한 수학 함수를 제공합니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 math 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "math 모듈 불러오기"
+    description: "math 모듈을 불러오고 정상 작동을 확인합니다."
+    content: |-
+      import math
+      
+      # 정상 로드 확인
+      math.pi
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "basic_functions"
+  title: "기본 수학 함수"
+  subtitle: "자주 사용하는 핵심 함수"
+  blocks:
+  - type: "text"
+    content: "math 모듈은 파이썬의 표준 수학 라이브러리입니다. 제곱근, 거듭제곱, 절댓값 등 기본적인 수학 계산부터 과학 계산까지 다양한 함수를 제공합니다. 모든 함수는 부동소수점 연산을 수행하며, 정확하고 빠른 계산을 보장합니다."
+  - type: "list"
+    items:
+    - "sqrt(): 제곱근 계산"
+    - "pow(): 거듭제곱"
+    - "fabs(): 절댓값"
+    - "ceil(), floor(): 올림, 내림"
+  - type: "code"
+    language: "python"
+    title: "제곱근 계산"
+    description: "양수의 제곱근을 구합니다."
+    content: |-
+      squareRoot = math.sqrt(16)
+      squareRoot
+  - type: "code"
+    language: "python"
+    title: "거듭제곱"
+    description: "x의 y제곱을 계산합니다."
+    content: |-
+      powered = math.pow(2, 10)
+      powered
+  - type: "code"
+    language: "python"
+    title: "절댓값"
+    description: "음수를 양수로 변환합니다."
+    content: |-
+      absolute = math.fabs(-3.14)
+      absolute
+  - type: "tip"
+    content: "sqrt()는 음수에 사용하면 ValueError가 발생합니다. 복소수 계산은 cmath 모듈을 사용하세요."
+
+- id: "trigonometric"
+  title: "삼각함수"
+  subtitle: "각도와 라디안 계산"
+  blocks:
+  - type: "text"
+    content: "삼각함수는 각도를 다루는 계산에 필수적입니다. math 모듈의 삼각함수는 라디안 단위를 사용하므로, 도(degree)를 라디안으로 변환해야 합니다. sin, cos, tan 함수와 역삼각함수 asin, acos, atan을 제공합니다."
+  - type: "list"
+    items:
+    - "radians(): 도를 라디안으로"
+    - "degrees(): 라디안을 도로"
+    - "sin(), cos(), tan(): 삼각함수"
+    - "asin(), acos(), atan(): 역삼각함수"
+  - type: "code"
+    language: "python"
+    title: "도를 라디안으로 변환"
+    description: "각도를 라디안으로 변환합니다."
+    content: |-
+      angleInRadians = math.radians(45)
+      angleInRadians
+  - type: "code"
+    language: "python"
+    title: "사인 계산"
+    description: "라디안 단위 각도의 사인값을 구합니다."
+    content: |-
+      sineValue = math.sin(math.radians(30))
+      sineValue
+  - type: "code"
+    language: "python"
+    title: "코사인 계산"
+    description: "0도의 코사인값은 1입니다."
+    content: |-
+      cosineValue = math.cos(0)
+      cosineValue
+  - type: "tip"
+    content: "파이썬의 삼각함수는 라디안을 사용합니다. 도 단위는 radians()로 변환하세요."
+
+- id: "logarithmic"
+  title: "로그와 지수"
+  subtitle: "지수 및 로그 함수"
+  blocks:
+  - type: "text"
+    content: "로그와 지수 함수는 과학 계산, 금융, 데이터 분석에서 자주 사용됩니다. math.log()는 자연로그(밑이 e), math.log10()은 상용로그(밑이 10)를 계산합니다. math.exp()는 e의 거듭제곱을 계산합니다."
+  - type: "list"
+    items:
+    - "exp(): e의 거듭제곱"
+    - "log(): 자연로그 (밑 e)"
+    - "log10(): 상용로그 (밑 10)"
+    - "log2(): 이진로그 (밑 2)"
+  - type: "code"
+    language: "python"
+    title: "자연 지수"
+    description: "e의 거듭제곱을 계산합니다."
+    content: |-
+      exponential = math.exp(1)
+      exponential
+  - type: "code"
+    language: "python"
+    title: "자연 로그"
+    description: "자연로그는 e를 밑으로 하는 로그입니다."
+    content: |-
+      naturalLog = math.log(math.e)
+      naturalLog
+  - type: "code"
+    language: "python"
+    title: "상용 로그"
+    description: "10을 밑으로 하는 로그입니다."
+    content: |-
+      commonLog = math.log10(100)
+      commonLog
+  - type: "tip"
+    content: "log(x, base)로 임의의 밑을 지정할 수 있습니다. 예: math.log(8, 2) = 3"
+
+- id: "rounding"
+  title: "반올림과 정수 변환"
+  subtitle: "올림, 내림, 반올림"
+  blocks:
+  - type: "text"
+    content: "수를 정수로 변환하는 방법은 여러 가지입니다. ceil()은 올림, floor()는 내림, trunc()는 소수점 제거를 수행합니다. round()는 내장 함수로 반올림하지만, math.modf()는 정수부와 소수부를 분리합니다."
+  - type: "list"
+    items:
+    - "ceil(): 올림 (작은 정수)"
+    - "floor(): 내림 (큰 정수)"
+    - "trunc(): 소수점 제거"
+    - "modf(): 정수부와 소수부 분리"
+  - type: "code"
+    language: "python"
+    title: "올림 연산"
+    description: "3.2를 올림하면 4입니다."
+    content: |-
+      ceilingValue = math.ceil(3.2)
+      ceilingValue
+  - type: "code"
+    language: "python"
+    title: "내림 연산"
+    description: "3.9를 내림하면 3입니다."
+    content: |-
+      floorValue = math.floor(3.9)
+      floorValue
+  - type: "code"
+    language: "python"
+    title: "정수부와 소수부 분리"
+    description: "modf()는 소수부와 정수부를 튜플로 반환합니다."
+    content: |-
+      fractional, integer = math.modf(3.14)
+      fractional, integer
+  - type: "tip"
+    content: "음수에서 ceil()과 floor()의 동작에 주의하세요. ceil(-3.2) = -3, floor(-3.2) = -4"
+
+- id: "constants"
+  title: "수학 상수"
+  subtitle: "파이와 자연상수"
+  blocks:
+  - type: "text"
+    content: "math 모듈은 중요한 수학 상수를 제공합니다. math.pi는 원주율(3.141592...), math.e는 자연상수(2.718281...), math.tau는 2π, math.inf는 무한대를 나타냅니다. 이 상수들은 과학 계산에 필수적입니다."
+  - type: "list"
+    items:
+    - "pi: 원주율 (3.141592...)"
+    - "e: 자연상수 (2.718281...)"
+    - "tau: 2π (6.283185...)"
+    - "inf: 양의 무한대"
+  - type: "code"
+    language: "python"
+    title: "원의 넓이"
+    description: "반지름 5인 원의 넓이를 계산합니다."
+    content: |-
+      radius = 5
+      circleArea = math.pi * radius ** 2
+      circleArea
+  - type: "code"
+    language: "python"
+    title: "원의 둘레"
+    description: "반지름 3인 원의 둘레를 계산합니다."
+    content: |-
+      r = 3
+      circumference = 2 * math.pi * r
+      circumference
+  - type: "code"
+    language: "python"
+    title: "자연상수 활용"
+    description: "e의 2제곱을 계산합니다."
+    content: |-
+      eSquared = math.e ** 2
+      eSquared
+  - type: "tip"
+    content: "math.tau는 2π로, 라디안 계산에서 더 직관적입니다. 한 바퀴는 tau 라디안입니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "실무 계산 예제"
+  blocks:
+  - type: "text"
+    content: "math 모듈을 실전에서 활용하는 예제를 살펴봅니다. 거리 계산, 각도 변환, 통계 계산 등 다양한 분야에서 수학 함수를 조합하여 복잡한 문제를 해결할 수 있습니다."
+  - type: "list"
+    items:
+    - "hypot(): 직각삼각형 빗변"
+    - "factorial(): 팩토리얼"
+    - "gcd(): 최대공약수"
+    - "조합: 여러 함수 활용"
+  - type: "code"
+    language: "python"
+    title: "피타고라스 정리"
+    description: "직각삼각형의 빗변을 계산합니다."
+    content: |-
+      hypotenuse = math.hypot(3, 4)
+      hypotenuse
+  - type: "code"
+    language: "python"
+    title: "팩토리얼"
+    description: "5! = 5 × 4 × 3 × 2 × 1을 계산합니다."
+    content: |-
+      factorialResult = math.factorial(5)
+      factorialResult
+  - type: "code"
+    language: "python"
+    title: "최대공약수"
+    description: "두 수의 최대공약수를 구합니다."
+    content: |-
+      greatestCommonDivisor = math.gcd(48, 18)
+      greatestCommonDivisor
+  - type: "tip"
+    content: "hypot()는 여러 인자를 받을 수 있습니다. math.hypot(3, 4, 5)로 3차원 거리를 계산할 수 있습니다."
+
+- id: "practice"
+  title: "math 모듈 종합 복습"
+  subtitle: "수학 함수 마스터하기"
+  blocks:
+  - type: "text"
+    content: "math 모듈의 다양한 함수를 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 제곱근"
+    code: |-
+      sqrtValue = math.sqrt(25)
+      sqrtValue
+
+  - type: "expansion"
+    title: "🟢 기본2: 거듭제곱"
+    code: |-
+      cubed = math.pow(3, 3)
+      cubed
+
+  - type: "expansion"
+    title: "🟢 기본3: 절댓값"
+    code: |-
+      absValue = math.fabs(-7.5)
+      absValue
+
+  - type: "expansion"
+    title: "🟢 기본4: 올림"
+    code: |-
+      roundedUp = math.ceil(4.1)
+      roundedUp
+
+  - type: "expansion"
+    title: "🟢 기본5: 내림"
+    code: |-
+      roundedDown = math.floor(4.9)
+      roundedDown
+
+  - type: "expansion"
+    title: "🟡 응용1: 사인 30도"
+    code: |-
+      sin30 = math.sin(math.radians(30))
+      sin30
+
+  - type: "expansion"
+    title: "🟡 응용2: 코사인 60도"
+    code: |-
+      cos60 = math.cos(math.radians(60))
+      cos60
+
+  - type: "expansion"
+    title: "🟡 응용3: 자연로그"
+    code: |-
+      lnValue = math.log(math.e ** 2)
+      lnValue
+
+  - type: "expansion"
+    title: "🟡 응용4: 상용로그"
+    code: |-
+      log1000 = math.log10(1000)
+      log1000
+
+  - type: "expansion"
+    title: "🟡 응용5: 원의 넓이"
+    code: |-
+      radiusVal = 10
+      area = math.pi * radiusVal ** 2
+      area
+
+  - type: "expansion"
+    title: "🔴 심화1: 두 점 사이 거리"
+    code: |-
+      x1, y1 = 0, 0
+      x2, y2 = 3, 4
+      distance = math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2)
+      distance
+
+  - type: "expansion"
+    title: "🔴 심화2: 구의 부피"
+    code: |-
+      sphereRadius = 5
+      volume = (4 / 3) * math.pi * sphereRadius ** 3
+      volume
+
+  - type: "expansion"
+    title: "🔴 심화3: 삼각형 넓이"
+    code: |-
+      a, b, angleC = 5, 7, 60
+      triangleArea = 0.5 * a * b * math.sin(math.radians(angleC))
+      triangleArea
+
+  - type: "expansion"
+    title: "🔴 심화4: 복리 계산"
+    code: |-
+      principal = 1000
+      rate = 0.05
+      years = 10
+      compound = principal * math.exp(rate * years)
+      compound
+
+  - type: "expansion"
+    title: "🔴 심화5: 표준편차 계산"
+    code: |-
+      dataPoints = [2, 4, 4, 4, 5, 5, 7, 9]
+      mean = sum(dataPoints) / len(dataPoints)
+      variance = sum((x - mean) ** 2 for x in dataPoints) / len(dataPoints)
+      stdDev = math.sqrt(variance)
+      stdDev
+
+  - type: "expansion"
+    title: "🔴 심화6: 각도 정규화"
+    code: |-
+      angleDeg = 450
+      normalized = angleDeg % 360
+      inRadians = math.radians(normalized)
+      inRadians
+
+  - type: "expansion"
+    title: "🔴 심화7: 로그 변환"
+    code: |-
+      values = [1, 10, 100, 1000]
+      logTransformed = [math.log10(v) for v in values]
+      logTransformed
+
+  - type: "expansion"
+    title: "🔴 심화8: 최소공배수"
+    code: |-
+      num1, num2 = 12, 18
+      lcm = abs(num1 * num2) // math.gcd(num1, num2)
+      lcm
+
+  - type: "expansion"
+    title: "🔴 심화9: 극좌표 변환"
+    code: |-
+      xCoord, yCoord = 3, 4
+      distanceFromOrigin = math.hypot(xCoord, yCoord)
+      angleFromX = math.degrees(math.atan2(yCoord, xCoord))
+      distanceFromOrigin, angleFromX
+
+  - type: "expansion"
+    title: "🔴 심화10: 조합 계산"
+    code: |-
+      n, r = 10, 3
+      combinations = math.factorial(n) // (math.factorial(r) * math.factorial(n - r))
+      combinations

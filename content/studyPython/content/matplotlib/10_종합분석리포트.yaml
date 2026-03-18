@@ -1,0 +1,728 @@
+meta:
+  id: matplotlib_10
+  title: 종합분석리포트
+  order: 10
+  category: matplotlib
+  difficulty: "⭐⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["matplotlib", "savefig", "inset_axes", "Normalize", "comprehensive", "report"]
+  seo:
+    title: "Matplotlib 종합 분석 리포트 - 모든 개념 총정리"
+    description: "Matplotlib의 모든 개념을 종합하여 6패널 분석 리포트를 만듭니다. savefig, inset_axes, Normalize 등 고급 기법을 마스터합니다."
+    keywords: ["matplotlib", "savefig", "inset_axes", "Normalize", "분석리포트", "대시보드"]
+
+intro:
+  emoji: "📊"
+  goal: 6개 패널로 구성된 종합 분석 리포트를 만듭니다.
+  description: 지금까지 배운 모든 개념(plot, scatter, bar, hist, boxplot, violin, pie, imshow, errorbar, fill_between, twinx, GridSpec, annotate, LaTeX, bbox, colormap 등)을 종합합니다. inset_axes로 인셋 차트를 추가하고, savefig로 고품질 이미지로 저장하는 방법도 배웁니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: 모든 개념을 활용한 종합 분석 리포트를 만듭니다. gapminder와 tips 데이터를 사용하여 다양한 관점에서 데이터를 분석합니다. inset_axes와 Normalize 등 새로운 개념도 배웁니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: 필요한 모든 라이브러리를 불러옵니다
+    content: |-
+      import matplotlib.pyplot as plt
+      from matplotlib.gridspec import GridSpec
+      from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+      from matplotlib.colors import Normalize
+      import matplotlib.cm as cm
+      import seaborn as sns
+      import numpy as np
+      import pandas as pd
+  - type: tip
+    content: 종합 분석에는 다양한 matplotlib 서브모듈이 필요합니다. GridSpec은 레이아웃, inset_axes는 인셋 차트, Normalize와 cm은 컬러맵 설정에 사용됩니다.
+
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  subtitle: Pyodide 환경 폰트
+  blocks:
+  - type: text
+    content: Pyodide(웹 브라우저) 환경에서는 시스템 폰트를 사용할 수 없어 한글이 깨집니다. CDN에서 폰트 파일을 다운로드하여 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+  - type: code
+    language: python
+    title: 한글 폰트 설정
+    description: Pretendard 폰트를 다운로드하여 matplotlib에 등록합니다
+    content: |-
+      import micropip
+      await micropip.install('pyodide-http')
+
+      import pyodide_http
+      pyodide_http.patch_all()
+
+      from matplotlib import font_manager
+      from js import fetch
+      from pathlib import Path
+
+      fontUrl = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Regular.otf"
+      response = await fetch(fontUrl)
+      fontBuffer = await response.arrayBuffer()
+
+      fontPath = Path("/tmp/Pretendard-Regular.otf")
+      fontPath.write_bytes(fontBuffer.to_py())
+
+      font_manager.fontManager.addfont(str(fontPath))
+      plt.rcParams['font.family'] = 'Pretendard'
+      plt.rcParams['axes.unicode_minus'] = False
+  - type: tip
+    content: Pyodide 환경에서는 fetch API로 외부 리소스를 가져옵니다. font_manager.addfont()로 폰트를 등록하고, rcParams로 기본 폰트를 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: gapminder + tips
+  blocks:
+  - type: text
+    content: gapminder 데이터로 국가별 경제/인구 분석을, tips 데이터로 서비스업 분석을 수행합니다. 두 데이터셋을 조합하여 다양한 인사이트를 도출합니다.
+  - type: code
+    language: python
+    title: 데이터 로드
+    description: gapminder와 tips 데이터를 불러옵니다
+    content: |-
+      baseUrl = "https://raw.githubusercontent.com"
+      gapminder = pd.read_csv(f"{baseUrl}/plotly/datasets/master/gapminder_unfiltered.csv")
+
+      tips = sns.load_dataset('tips')
+
+      gapminder2007 = gapminder[gapminder['year'] == 2007].copy()
+
+      gapminder2007.head()
+
+- id: step3_inset_axes
+  title: 3단계. 인셋 차트
+  subtitle: inset_axes
+  blocks:
+  - type: text
+    content: inset_axes는 기존 Axes 안에 작은 차트를 삽입합니다. 메인 차트의 특정 부분을 확대하거나, 보조 정보를 표시할 때 유용합니다. 위치와 크기를 자유롭게 조절할 수 있습니다.
+  - type: code
+    language: python
+    title: 메인 산점도
+    description: 대륙별 경제/기대수명 산점도를 그립니다
+    content: |-
+      figInset, axInset = plt.subplots(figsize=(12, 7))
+
+      continentColors = {'Asia': '#E74C3C', 'Europe': '#3498DB', 'Africa': '#27AE60',
+                        'Americas': '#9B59B6', 'Oceania': '#F39C12'}
+
+      for continent in continentColors:
+          subset = gapminder2007[gapminder2007['continent'] == continent]
+          axInset.scatter(subset['gdpPercap'], subset['lifeExp'],
+                         s=subset['pop']/1e6, c=continentColors[continent],
+                         alpha=0.6, label=continent, edgecolors='white')
+
+      axInset.set_xlabel('1인당 GDP ($)', fontsize=11)
+      axInset.set_ylabel('기대수명 (세)', fontsize=11)
+      axInset.set_title('국가별 경제수준과 기대수명 (2007)', fontsize=14, fontweight='bold')
+      axInset.legend(loc='lower right')
+      axInset.set_xlim(0, 50000)
+      figInset
+  - type: code
+    language: python
+    title: 인셋 차트 추가
+    description: inset_axes로 유럽 확대 차트를 추가합니다
+    content: |-
+      axInsetSmall = inset_axes(axInset, width="35%", height="35%", loc='upper left',
+                                borderpad=2)
+      europeData = gapminder2007[gapminder2007['continent'] == 'Europe']
+      axInsetSmall.scatter(europeData['gdpPercap'], europeData['lifeExp'],
+                          s=30, c='#3498DB', alpha=0.7, edgecolors='white')
+      axInsetSmall.set_xlim(5000, 50000)
+      axInsetSmall.set_ylim(70, 85)
+      axInsetSmall.set_title('유럽 확대', fontsize=9)
+      axInsetSmall.tick_params(labelsize=8)
+      figInset
+  - type: tip
+    content: "inset_axes(ax, width, height, loc)로 인셋 차트를 만듭니다. width/height는 퍼센트('30%') 또는 고정값(1.5)으로 지정합니다. loc은 'upper left', 'lower right' 등 위치입니다. borderpad로 부모 Axes와의 간격을 조절합니다."
+
+- id: step4_normalize
+  title: 4단계. 색상 정규화
+  subtitle: Normalize
+  blocks:
+  - type: text
+    content: Normalize는 데이터 값을 0~1 범위로 변환하여 컬러맵에 매핑합니다. 연속적인 값에 따라 색상이 변하는 차트를 만들 때 사용합니다. 로그 스케일에는 LogNorm을 사용합니다.
+  - type: code
+    language: python
+    title: 색상 정규화
+    description: Normalize로 연속적인 색상을 적용합니다
+    content: |-
+      figNorm, axNorm = plt.subplots(figsize=(12, 7))
+
+      norm = Normalize(vmin=gapminder2007['lifeExp'].min(),
+                      vmax=gapminder2007['lifeExp'].max())
+      cmap = cm.RdYlGn
+
+      scatter = axNorm.scatter(gapminder2007['gdpPercap'], gapminder2007['pop']/1e6,
+                              s=100, c=gapminder2007['lifeExp'],
+                              cmap=cmap, norm=norm, alpha=0.7, edgecolors='white')
+
+      cbar = plt.colorbar(scatter, ax=axNorm)
+      cbar.set_label('기대수명 (세)', fontsize=11)
+
+      axNorm.set_xlabel('1인당 GDP ($)', fontsize=11)
+      axNorm.set_ylabel('인구 (백만 명)', fontsize=11)
+      axNorm.set_title('GDP, 인구, 기대수명의 관계', fontsize=14, fontweight='bold')
+      axNorm.set_xscale('log')
+      axNorm.set_yscale('log')
+
+      figNorm
+  - type: tip
+    content: "Normalize(vmin, vmax)로 데이터 범위를 0~1로 매핑합니다. scatter의 c 파라미터에 연속값을 전달하고, cmap과 norm을 함께 사용합니다. LogNorm은 로그 스케일 데이터에 적합합니다. BoundaryNorm은 구간별 색상 매핑에 사용합니다."
+
+- id: step5_multi_panel
+  title: 5단계. 6패널 레이아웃
+  subtitle: GridSpec 복잡 레이아웃
+  blocks:
+  - type: text
+    content: GridSpec으로 6개 패널을 배치합니다. 상단에 큰 메인 차트, 하단에 작은 보조 차트들을 배치하는 비대칭 레이아웃을 구성합니다.
+  - type: code
+    language: python
+    title: 6패널 레이아웃
+    description: 복잡한 레이아웃을 구성합니다
+    content: |-
+      figLayout = plt.figure(figsize=(18, 12))
+      gs = GridSpec(3, 4, figure=figLayout, height_ratios=[1.5, 1, 1],
+                   hspace=0.35, wspace=0.3)
+
+      axMain = figLayout.add_subplot(gs[0, :3])
+      axSide = figLayout.add_subplot(gs[0, 3])
+      axBot1 = figLayout.add_subplot(gs[1, 0:2])
+      axBot2 = figLayout.add_subplot(gs[1, 2:4])
+      axBot3 = figLayout.add_subplot(gs[2, 0:2])
+      axBot4 = figLayout.add_subplot(gs[2, 2:4])
+
+      for ax, title in zip([axMain, axSide, axBot1, axBot2, axBot3, axBot4],
+                           ['메인', '사이드', '하단1', '하단2', '하단3', '하단4']):
+          ax.set_title(title, fontsize=12)
+          ax.spines['top'].set_visible(False)
+          ax.spines['right'].set_visible(False)
+
+      figLayout.suptitle('6패널 분석 리포트 레이아웃', fontsize=16, fontweight='bold')
+      figLayout
+
+- id: step6_main_chart
+  title: 6단계. 메인 차트
+  subtitle: 시계열 + 이벤트
+  blocks:
+  - type: text
+    content: 메인 차트에 시계열 데이터와 중요 이벤트를 표시합니다. fill_between으로 영역을 강조하고, annotate로 주요 포인트를 설명합니다.
+  - type: code
+    language: python
+    title: 데이터와 GDP 차트
+    description: 한국 데이터를 준비하고 GDP 차트를 그립니다
+    content: |-
+      years = gapminder[gapminder['country'] == 'Korea, Rep.']['year'].values
+      koreaGdp = gapminder[gapminder['country'] == 'Korea, Rep.']['gdpPercap'].values
+      koreaLife = gapminder[gapminder['country'] == 'Korea, Rep.']['lifeExp'].values
+
+      figMain, axMain = plt.subplots(figsize=(14, 6))
+      axMain.fill_between(years, koreaGdp, alpha=0.3, color='#3498DB')
+      axMain.plot(years, koreaGdp, 'o-', color='#2C3E50', linewidth=2, markersize=8, label='1인당 GDP')
+      axMain.set_ylabel('1인당 GDP ($)', fontsize=11, color='#3498DB')
+      axMain.tick_params(axis='y', labelcolor='#3498DB')
+      figMain
+  - type: code
+    language: python
+    title: 이중 축과 주석
+    description: 기대수명 이중 축과 이벤트 주석을 추가합니다
+    content: |-
+      axTwin = axMain.twinx()
+      axTwin.plot(years, koreaLife, 's--', color='#E74C3C', linewidth=2, markersize=8, label='기대수명')
+      axTwin.set_ylabel('기대수명 (세)', fontsize=11, color='#E74C3C')
+      axTwin.tick_params(axis='y', labelcolor='#E74C3C')
+
+      axMain.annotate('IMF 외환위기',
+                     xy=(1997, koreaGdp[years == 1997][0]),
+                     xytext=(1990, koreaGdp[years == 1997][0] + 5000),
+                     fontsize=10, fontweight='bold',
+                     bbox=dict(boxstyle='round', facecolor='#FADBD8', edgecolor='#E74C3C'),
+                     arrowprops=dict(arrowstyle='->', color='#E74C3C'))
+
+      axMain.set_xlabel('연도', fontsize=11)
+      axMain.set_title('한국 경제 성장과 기대수명 변화', fontsize=14, fontweight='bold')
+
+      lines1, labels1 = axMain.get_legend_handles_labels()
+      lines2, labels2 = axTwin.get_legend_handles_labels()
+      axMain.legend(lines1 + lines2, labels1 + labels2, loc='upper left')
+      figMain
+
+- id: step7_side_chart
+  title: 7단계. 사이드 차트
+  subtitle: 파이 + 통계
+  blocks:
+  - type: text
+    content: 사이드 패널에 비율을 보여주는 파이 차트와 LaTeX로 표현된 통계 정보를 추가합니다.
+  - type: code
+    language: python
+    title: 파이 차트
+    description: 대륙별 인구 비율 파이 차트를 그립니다
+    content: |-
+      figSide, (axPie, axStats) = plt.subplots(2, 1, figsize=(6, 10))
+
+      continentPop = gapminder2007.groupby('continent')['pop'].sum()
+      colors = ['#E74C3C', '#3498DB', '#27AE60', '#9B59B6', '#F39C12']
+      explode = (0, 0, 0.05, 0, 0)
+
+      axPie.pie(continentPop, labels=continentPop.index, autopct='%1.1f%%',
+               colors=colors, explode=explode, shadow=True, startangle=90)
+      axPie.set_title('대륙별 인구 비율 (2007)', fontsize=12, fontweight='bold')
+      figSide
+  - type: code
+    language: python
+    title: 통계 정보
+    description: LaTeX로 세계 통계를 표시합니다
+    content: |-
+      axStats.axis('off')
+      statsText = (
+          r'$\mathbf{2007년\ 세계\ 통계}$' + '\n\n' +
+          r'전체 인구: $%.2f$ 억 명' % (gapminder2007['pop'].sum() / 1e9) + '\n\n' +
+          r'평균 기대수명: $\mu = %.1f$ 세' % gapminder2007['lifeExp'].mean() + '\n\n' +
+          r'기대수명 표준편차: $\sigma = %.1f$ 세' % gapminder2007['lifeExp'].std() + '\n\n' +
+          r'평균 GDP: $\$%.0f$' % gapminder2007['gdpPercap'].mean() + '\n\n' +
+          r'국가 수: $N = %d$' % len(gapminder2007)
+      )
+      axStats.text(0.5, 0.5, statsText, transform=axStats.transAxes,
+                  fontsize=13, ha='center', va='center',
+                  bbox=dict(boxstyle='round', facecolor='#F8F9FA', edgecolor='#2C3E50', lw=2))
+
+      plt.tight_layout()
+      figSide
+
+- id: step8_bottom_charts
+  title: 8단계. 하단 차트들
+  subtitle: 히스토그램, 박스플롯, 히트맵
+  blocks:
+  - type: text
+    content: 하단 패널에 다양한 차트 유형을 배치합니다. 히스토그램으로 분포를, 박스플롯으로 그룹별 비교를, 히트맵으로 상관관계를 시각화합니다.
+  - type: code
+    language: python
+    title: 레이아웃 설정
+    description: 2x2 서브플롯 구성
+    content: |-
+      figBottom, axes = plt.subplots(2, 2, figsize=(14, 10))
+      axHist, axBox, axHeat, axError = axes.flatten()
+  - type: code
+    language: python
+    title: 히스토그램 + 박스플롯
+    description: 기대수명 분포와 대륙별 비교
+    content: |-
+      axHist.hist(gapminder2007['lifeExp'], bins=20, color='#3498DB',
+                 edgecolor='white', alpha=0.8)
+      axHist.axvline(gapminder2007['lifeExp'].mean(), color='#E74C3C',
+                    linestyle='--', linewidth=2, label=r'$\mu$')
+      axHist.set_title('기대수명 분포', fontsize=12, fontweight='bold')
+      axHist.set_xlabel('기대수명 (세)')
+      axHist.set_ylabel('빈도')
+      axHist.legend()
+
+      continentLife = [gapminder2007[gapminder2007['continent'] == c]['lifeExp']
+                      for c in ['Africa', 'Americas', 'Asia', 'Europe', 'Oceania']]
+      bp = axBox.boxplot(continentLife, labels=['Afr', 'Amer', 'Asia', 'Eur', 'Oce'],
+                        patch_artist=True)
+      for patch, color in zip(bp['boxes'], colors):
+          patch.set_facecolor(color)
+          patch.set_alpha(0.7)
+      axBox.set_title('대륙별 기대수명 분포', fontsize=12, fontweight='bold')
+      axBox.set_ylabel('기대수명 (세)')
+  - type: code
+    language: python
+    title: 히트맵 + 오차막대
+    description: 상관관계와 요일별 팁 통계
+    content: |-
+      corrData = tips[['total_bill', 'tip', 'size']].corr()
+      im = axHeat.imshow(corrData, cmap='RdYlBu_r', vmin=-1, vmax=1)
+      axHeat.set_xticks(range(len(corrData.columns)))
+      axHeat.set_yticks(range(len(corrData.columns)))
+      axHeat.set_xticklabels(['결제액', '팁', '인원'])
+      axHeat.set_yticklabels(['결제액', '팁', '인원'])
+      for i in range(len(corrData)):
+          for j in range(len(corrData)):
+              axHeat.text(j, i, f'{corrData.iloc[i, j]:.2f}',
+                         ha='center', va='center', fontsize=11, fontweight='bold')
+      axHeat.set_title('변수 상관관계', fontsize=12, fontweight='bold')
+      plt.colorbar(im, ax=axHeat, shrink=0.8)
+
+      dayMean = tips.groupby('day')['tip'].mean()
+      dayStd = tips.groupby('day')['tip'].std()
+      axError.errorbar(dayMean.index, dayMean.values, yerr=dayStd.values,
+                      fmt='o-', color='#2C3E50', ecolor='#E74C3C',
+                      elinewidth=2, capsize=5, capthick=2, markersize=10)
+      axError.set_title('요일별 팁 (평균 ± 표준편차)', fontsize=12, fontweight='bold')
+      axError.set_ylabel('팁 ($)')
+      axError.grid(True, alpha=0.3)
+
+      for ax in axes.flatten():
+          ax.spines['top'].set_visible(False)
+          ax.spines['right'].set_visible(False)
+
+      plt.tight_layout()
+      figBottom
+
+- id: step9_savefig
+  title: 9단계. 이미지 저장
+  subtitle: savefig
+  blocks:
+  - type: text
+    content: savefig로 차트를 이미지 파일로 저장합니다. dpi로 해상도를, bbox_inches로 여백을, transparent로 배경 투명도를 설정합니다. 논문이나 보고서용 고품질 이미지를 생성할 수 있습니다.
+  - type: code
+    language: python
+    title: 이미지 저장 예시
+    description: 다양한 옵션으로 이미지 저장
+    content: |-
+      figSave, axSave = plt.subplots(figsize=(10, 6))
+
+      axSave.bar(['A', 'B', 'C', 'D'], [25, 40, 30, 55],
+                color=['#E74C3C', '#3498DB', '#27AE60', '#9B59B6'])
+      axSave.set_title('저장 테스트 차트', fontsize=14, fontweight='bold')
+      axSave.spines['top'].set_visible(False)
+      axSave.spines['right'].set_visible(False)
+
+      figSave
+  - type: tip
+    content: "fig.savefig('파일명.png', dpi=300, bbox_inches='tight')로 저장합니다. dpi는 해상도(논문용 300, 웹용 72-150). bbox_inches='tight'는 여백을 자동 조절합니다. format='pdf', 'svg', 'eps' 등 다양한 형식을 지원합니다. facecolor와 transparent로 배경을 설정합니다."
+
+- id: step10_final
+  title: 10단계. 최종 리포트
+  subtitle: 모든 개념 종합
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 개념을 종합하여 완성도 높은 6패널 분석 리포트를 만듭니다. 각 패널은 서로 다른 인사이트를 제공하며, 전체적으로 일관된 스타일을 유지합니다.
+  - type: code
+    language: python
+    title: 레이아웃 설정
+    description: GridSpec으로 6패널 레이아웃 구성
+    content: |-
+      figReport = plt.figure(figsize=(20, 14))
+      gs = GridSpec(3, 4, figure=figReport, height_ratios=[1.3, 1, 1],
+                   hspace=0.4, wspace=0.35)
+  - type: code
+    language: python
+    title: 상단 메인 패널
+    description: 대륙별 경제/건강 산점도와 파이차트
+    content: |-
+      axR1 = figReport.add_subplot(gs[0, :3])
+      for continent in ['Asia', 'Europe', 'Americas']:
+          subset = gapminder2007[gapminder2007['continent'] == continent]
+          scatter = axR1.scatter(subset['gdpPercap'], subset['lifeExp'],
+                                s=subset['pop']/2e6, c=continentColors[continent],
+                                alpha=0.6, label=continent, edgecolors='white')
+      axR1.set_xlabel('1인당 GDP ($)', fontsize=11)
+      axR1.set_ylabel('기대수명 (세)', fontsize=11)
+      axR1.set_title('주요 대륙 경제/건강 지표 (2007)', fontsize=13, fontweight='bold')
+      axR1.legend(loc='lower right')
+      axR1.set_xlim(0, 50000)
+      axR1.grid(True, alpha=0.3)
+
+      koreaIdx = gapminder2007[gapminder2007['country'] == 'Korea, Rep.'].index[0]
+      koreaGdpVal = gapminder2007.loc[koreaIdx, 'gdpPercap']
+      koreaLifeVal = gapminder2007.loc[koreaIdx, 'lifeExp']
+      axR1.annotate('한국',
+                   xy=(koreaGdpVal, koreaLifeVal),
+                   xytext=(koreaGdpVal + 5000, koreaLifeVal + 3),
+                   fontsize=10, fontweight='bold',
+                   bbox=dict(boxstyle='round', facecolor='#FCF3CF', edgecolor='#F39C12'),
+                   arrowprops=dict(arrowstyle='->', color='#F39C12'))
+
+      axR2 = figReport.add_subplot(gs[0, 3])
+      continentPop = gapminder2007.groupby('continent')['pop'].sum()
+      axR2.pie(continentPop, labels=continentPop.index, autopct='%1.1f%%',
+              colors=list(continentColors.values()), shadow=True, startangle=90)
+      axR2.set_title('인구 비율', fontsize=12, fontweight='bold')
+  - type: code
+    language: python
+    title: 중단 패널
+    description: 한국 경제성장 추이와 대륙별 기대수명
+    content: |-
+      axR3 = figReport.add_subplot(gs[1, :2])
+      axR3.plot(years, koreaGdp, 'o-', color='#3498DB', linewidth=2, markersize=6)
+      axR3.fill_between(years, koreaGdp, alpha=0.2, color='#3498DB')
+      axR3.set_xlabel('연도')
+      axR3.set_ylabel('1인당 GDP ($)')
+      axR3.set_title('한국 경제 성장 추이', fontsize=12, fontweight='bold')
+      axR3.annotate(r'성장률: $%.1f\times$' % (koreaGdp[-1]/koreaGdp[0]),
+                   xy=(years[-1], koreaGdp[-1]),
+                   xytext=(years[-3], koreaGdp[-1] * 0.7),
+                   fontsize=10,
+                   bbox=dict(boxstyle='round', facecolor='#D5F5E3', edgecolor='#27AE60'),
+                   arrowprops=dict(arrowstyle='->', color='#27AE60'))
+
+      axR4 = figReport.add_subplot(gs[1, 2:])
+      continentLife = [gapminder2007[gapminder2007['continent'] == c]['lifeExp']
+                      for c in continentColors.keys()]
+      bp2 = axR4.boxplot(continentLife, labels=list(continentColors.keys()), patch_artist=True)
+      for patch, color in zip(bp2['boxes'], continentColors.values()):
+          patch.set_facecolor(color)
+          patch.set_alpha(0.7)
+      axR4.set_ylabel('기대수명 (세)')
+      axR4.set_title('대륙별 기대수명 분포', fontsize=12, fontweight='bold')
+  - type: code
+    language: python
+    title: 하단 패널
+    description: 요일별 팁과 결제금액 산점도
+    content: |-
+      axR5 = figReport.add_subplot(gs[2, :2])
+      tipByDay = tips.groupby('day')['tip'].agg(['mean', 'std']).reset_index()
+      tipByDay = tipByDay.set_index('day').loc[['Thur', 'Fri', 'Sat', 'Sun']]
+      barsR5 = axR5.bar(tipByDay.index, tipByDay['mean'],
+                       color=['#E74C3C', '#27AE60', '#9B59B6', '#F39C12'], alpha=0.8)
+      axR5.errorbar(tipByDay.index, tipByDay['mean'], yerr=tipByDay['std'],
+                   fmt='none', ecolor='#2C3E50', capsize=5, capthick=2)
+      axR5.set_ylabel('평균 팁 ($)')
+      axR5.set_title('요일별 평균 팁', fontsize=12, fontweight='bold')
+      for bar, val in zip(barsR5, tipByDay['mean']):
+          axR5.text(bar.get_x() + bar.get_width()/2, val + 0.3,
+                   f'${val:.2f}', ha='center', fontweight='bold', fontsize=9)
+
+      axR6 = figReport.add_subplot(gs[2, 2:])
+      for time, color in zip(['Lunch', 'Dinner'], ['#3498DB', '#E74C3C']):
+          subset = tips[tips['time'] == time]
+          axR6.scatter(subset['total_bill'], subset['tip'],
+                      c=color, label=time, alpha=0.6, s=40, edgecolors='white')
+      axR6.set_xlabel('결제금액 ($)')
+      axR6.set_ylabel('팁 ($)')
+      axR6.set_title('결제금액 vs 팁', fontsize=12, fontweight='bold')
+      axR6.legend()
+
+      axInsetR6 = inset_axes(axR6, width="30%", height="30%", loc='upper left', borderpad=2)
+      tipRatio = tips['tip'] / tips['total_bill'] * 100
+      axInsetR6.hist(tipRatio, bins=15, color='#9B59B6', alpha=0.7, edgecolor='white')
+      axInsetR6.set_title('팁 비율 (%)', fontsize=9)
+      axInsetR6.tick_params(labelsize=7)
+  - type: code
+    language: python
+    title: 스타일 마무리
+    description: 스파인 제거와 제목 추가
+    content: |-
+      for ax in [axR1, axR3, axR4, axR5, axR6]:
+          ax.spines['top'].set_visible(False)
+          ax.spines['right'].set_visible(False)
+
+      figReport.suptitle('글로벌 경제/건강 지표 및 서비스업 분석 리포트',
+                        fontsize=18, fontweight='bold', y=0.98)
+
+      infoText = r'데이터: Gapminder (2007) + Tips | $N_{country}=%d$, $N_{tips}=%d$' % (len(gapminder2007), len(tips))
+      figReport.text(0.99, 0.01, infoText, ha='right', fontsize=9, style='italic')
+
+      plt.tight_layout()
+      figReport
+
+- id: practice
+  title: 실습
+  subtitle: 종합 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 개념을 활용해서 나만의 종합 분석 리포트를 만들어봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 펭귄 데이터 종합 리포트"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        from matplotlib.gridspec import GridSpec
+        from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+        import seaborn as sns
+        import numpy as np
+
+        data = sns.load_dataset('penguins').dropna()
+
+        chart = plt.figure(figsize=(16, 12))
+        grid = GridSpec(2, 3, figure=chart, hspace=0.35, wspace=0.3)
+
+        palette = {'Adelie': '#E74C3C', 'Chinstrap': '#27AE60', 'Gentoo': '#3498DB'}
+    - type: code
+      title: "상단 패널"
+      content: |-
+        plot1 = chart.add_subplot(grid[0, :2])
+        for sp, clr in palette.items():
+            subset = data[data['species'] == sp]
+            plot1.scatter(subset['flipper_length_mm'], subset['body_mass_g'],
+                          c=clr, label=sp, alpha=0.6, s=60, edgecolors='white')
+        plot1.set_xlabel('날개 길이 (mm)')
+        plot1.set_ylabel('체중 (g)')
+        plot1.set_title('종별 날개 길이 vs 체중', fontsize=13, fontweight='bold')
+        plot1.legend()
+
+        heavyIdx = data[data['species'] == 'Gentoo']['body_mass_g'].idxmax()
+        heavyFlipper = data.loc[heavyIdx, 'flipper_length_mm']
+        heavyMass = data.loc[heavyIdx, 'body_mass_g']
+        plot1.annotate('최대 체중',
+                       xy=(heavyFlipper, heavyMass),
+                       xytext=(heavyFlipper - 15, heavyMass + 300),
+                       fontsize=10, fontweight='bold',
+                       bbox=dict(boxstyle='round', facecolor='#EBF5FB', edgecolor='#3498DB'),
+                       arrowprops=dict(arrowstyle='->', color='#3498DB'))
+
+        plot2 = chart.add_subplot(grid[0, 2])
+        kindCount = data['species'].value_counts()
+        plot2.pie(kindCount, labels=kindCount.index, autopct='%1.1f%%',
+                  colors=list(palette.values()), shadow=True)
+        plot2.set_title('종별 비율', fontsize=12, fontweight='bold')
+    - type: code
+      title: "하단 패널"
+      content: |-
+        plot3 = chart.add_subplot(grid[1, 0])
+        weights = [data[data['species'] == sp]['body_mass_g'] for sp in palette]
+        boxes = plot3.boxplot(weights, labels=list(palette.keys()), patch_artist=True)
+        for patch, tone in zip(boxes['boxes'], palette.values()):
+            patch.set_facecolor(tone)
+            patch.set_alpha(0.7)
+        plot3.set_ylabel('체중 (g)')
+        plot3.set_title('종별 체중 분포', fontsize=12, fontweight='bold')
+
+        plot4 = chart.add_subplot(grid[1, 1])
+        plot4.hist(data['bill_length_mm'], bins=20, color='#9B59B6',
+                   edgecolor='white', alpha=0.8)
+        avgBill = data['bill_length_mm'].mean()
+        plot4.axvline(avgBill, color='#E74C3C', linestyle='--', linewidth=2)
+        plot4.text(avgBill + 1, plot4.get_ylim()[1] * 0.9,
+                   r'$\mu = %.1f$' % avgBill, fontsize=11, color='#E74C3C')
+        plot4.set_xlabel('부리 길이 (mm)')
+        plot4.set_ylabel('빈도')
+        plot4.set_title('부리 길이 분포', fontsize=12, fontweight='bold')
+
+        plot5 = chart.add_subplot(grid[1, 2])
+        statsByIsland = data.groupby('island')['body_mass_g'].agg(['mean', 'std'])
+        bars = plot5.bar(statsByIsland.index, statsByIsland['mean'],
+                         color=['#F39C12', '#1ABC9C', '#8E44AD'], alpha=0.8)
+        plot5.errorbar(statsByIsland.index, statsByIsland['mean'], yerr=statsByIsland['std'],
+                       fmt='none', ecolor='#2C3E50', capsize=5, capthick=2)
+        plot5.set_ylabel('평균 체중 (g)')
+        plot5.set_title('섬별 평균 체중', fontsize=12, fontweight='bold')
+
+        for ax in [plot1, plot3, plot4, plot5]:
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+
+        chart.suptitle('펭귄 종합 분석 리포트', fontsize=16, fontweight='bold')
+        plt.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: iris 고급 분석 리포트"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        from matplotlib.gridspec import GridSpec
+        from mpl_toolkits.axes_grid1.inset_locator import inset_axes
+        from matplotlib.colors import Normalize
+        import matplotlib.cm as cm
+        import seaborn as sns
+        import numpy as np
+
+        df = sns.load_dataset('iris')
+
+        canvas = plt.figure(figsize=(16, 12))
+        layout = GridSpec(2, 3, figure=canvas, hspace=0.35, wspace=0.35)
+
+        tones = {'setosa': '#E74C3C', 'versicolor': '#27AE60', 'virginica': '#3498DB'}
+        marks = {'setosa': 'o', 'versicolor': 's', 'virginica': '^'}
+    - type: code
+      title: "상단 패널"
+      content: |-
+        panel1 = canvas.add_subplot(layout[0, :2])
+        for sp in tones:
+            subset = df[df['species'] == sp]
+            panel1.scatter(subset['petal_length'], subset['petal_width'],
+                           c=tones[sp], marker=marks[sp],
+                           label=sp, alpha=0.7, s=80, edgecolors='white')
+        panel1.set_xlabel('꽃잎 길이 (cm)')
+        panel1.set_ylabel('꽃잎 너비 (cm)')
+        panel1.set_title('품종별 꽃잎 특성', fontsize=13, fontweight='bold')
+        panel1.legend()
+
+        panel1.annotate(r'$r = %.3f$' % df['petal_length'].corr(df['petal_width']),
+                        xy=(5, 2), fontsize=12,
+                        bbox=dict(boxstyle='round', facecolor='#F8F9FA', edgecolor='#2C3E50'))
+
+        inset = inset_axes(panel1, width="25%", height="25%", loc='lower right', borderpad=2)
+        setosaRows = df[df['species'] == 'setosa']
+        inset.scatter(setosaRows['petal_length'], setosaRows['petal_width'],
+                      c='#E74C3C', alpha=0.7, s=30)
+        inset.set_title('setosa 확대', fontsize=8)
+        inset.tick_params(labelsize=7)
+
+        panel2 = canvas.add_subplot(layout[0, 2])
+        matrix = df[['sepal_length', 'sepal_width', 'petal_length', 'petal_width']].corr()
+        heatmap = panel2.imshow(matrix, cmap='RdYlBu_r', vmin=-1, vmax=1)
+        panel2.set_xticks(range(4))
+        panel2.set_yticks(range(4))
+        panel2.set_xticklabels(['SL', 'SW', 'PL', 'PW'])
+        panel2.set_yticklabels(['SL', 'SW', 'PL', 'PW'])
+        for i in range(4):
+            for j in range(4):
+                panel2.text(j, i, f'{matrix.iloc[i, j]:.2f}',
+                            ha='center', va='center', fontsize=10, fontweight='bold')
+        panel2.set_title('상관관계 히트맵', fontsize=12, fontweight='bold')
+        plt.colorbar(heatmap, ax=panel2, shrink=0.8)
+    - type: code
+      title: "하단 패널"
+      content: |-
+        panel3 = canvas.add_subplot(layout[1, 0])
+        sepalData = [df[df['species'] == sp]['sepal_length'] for sp in tones]
+        violin = panel3.violinplot(sepalData, positions=[1, 2, 3], showmeans=True, showmedians=True)
+        for i, body in enumerate(violin['bodies']):
+            body.set_facecolor(list(tones.values())[i])
+            body.set_alpha(0.7)
+        panel3.set_xticks([1, 2, 3])
+        panel3.set_xticklabels(list(tones.keys()))
+        panel3.set_ylabel('꽃받침 길이 (cm)')
+        panel3.set_title('품종별 꽃받침 길이', fontsize=12, fontweight='bold')
+
+        panel4 = canvas.add_subplot(layout[1, 1])
+        avgByType = df.groupby('species')[['petal_length', 'petal_width']].mean()
+        xPos = np.arange(len(avgByType))
+        barWidth = 0.35
+        lengthBars = panel4.bar(xPos - barWidth/2, avgByType['petal_length'], barWidth,
+                                label='꽃잎 길이', color='#3498DB', alpha=0.8)
+        widthBars = panel4.bar(xPos + barWidth/2, avgByType['petal_width'], barWidth,
+                               label='꽃잎 너비', color='#E74C3C', alpha=0.8)
+        panel4.set_xticks(xPos)
+        panel4.set_xticklabels(avgByType.index)
+        panel4.set_ylabel('평균 (cm)')
+        panel4.set_title('품종별 평균 꽃잎 크기', fontsize=12, fontweight='bold')
+        panel4.legend()
+
+        panel5 = canvas.add_subplot(layout[1, 2])
+        colorNorm = Normalize(vmin=df['sepal_width'].min(), vmax=df['sepal_width'].max())
+        scatter = panel5.scatter(df['sepal_length'], df['petal_length'],
+                                 c=df['sepal_width'], cmap='viridis',
+                                 norm=colorNorm, s=60, alpha=0.7, edgecolors='white')
+        plt.colorbar(scatter, ax=panel5, label='꽃받침 너비')
+        panel5.set_xlabel('꽃받침 길이 (cm)')
+        panel5.set_ylabel('꽃잎 길이 (cm)')
+        panel5.set_title('3변수 관계', fontsize=12, fontweight='bold')
+
+        for ax in [panel1, panel3, panel4, panel5]:
+            ax.spines['top'].set_visible(False)
+            ax.spines['right'].set_visible(False)
+
+        canvas.suptitle('붓꽃 품종 고급 분석 리포트', fontsize=16, fontweight='bold')
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Matplotlib의 모든 개념을 종합하여 6패널 분석 리포트를 만들었습니다.
+  - type: list
+    items:
+    - "inset_axes(ax, width, height, loc) - 인셋 차트 추가"
+    - "Normalize(vmin, vmax) - 연속값을 0~1로 정규화"
+    - "GridSpec으로 복잡한 비대칭 레이아웃 구성"
+    - "여러 차트 유형 조합 (scatter, bar, hist, box, violin, pie, heatmap)"
+    - "annotate, LaTeX, bbox로 전문적인 주석 추가"
+    - "errorbar로 불확실성 표현"
+    - "fill_between으로 영역 강조"
+    - "twinx로 이중 축 차트 생성"
+    - "fig.savefig(path, dpi, bbox_inches) - 고품질 이미지 저장"
+  - type: text
+    content: Matplotlib 커리큘럼을 완료했습니다. 이제 논문, 보고서, 프레젠테이션에 사용할 수 있는 전문적인 시각화를 만들 수 있습니다.

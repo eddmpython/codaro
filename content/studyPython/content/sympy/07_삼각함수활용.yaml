@@ -1,0 +1,373 @@
+meta:
+  id: sympy_07
+  title: 삼각함수활용
+  order: 7
+  category: sympy
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["sympy", "sin", "cos", "tan", "삼각함수", "항등식"]
+  seo:
+    title: "SymPy 삼각함수 - 항등식과 방정식 풀이"
+    description: "SymPy로 삼각함수 항등식을 정리하고 삼각방정식을 풉니다. sin, cos, tan과 역삼각함수를 배웁니다."
+    keywords: ["sympy", "sin", "cos", "tan", "삼각함수", "항등식", "역삼각함수"]
+
+intro:
+  emoji: "📐"
+  goal: 삼각함수 항등식을 정리하고 삼각방정식을 풀어봅니다.
+  description: "삼각함수는 주기적인 현상(파동, 진동, 회전)을 수학적으로 표현하는 핵심 도구입니다. sin, cos, tan은 각도를 입력받아 비율을 반환하고, 역삼각함수는 그 반대입니다. SymPy는 sin²x + cos²x = 1 같은 항등식을 자동으로 적용하여 복잡한 수식을 간소화합니다. 덧셈정리 sin(a+b) = sin(a)cos(b) + cos(a)sin(b), 배각공식 sin(2x) = 2sin(x)cos(x)도 자동 처리됩니다. 이 프로젝트를 완료하면 삼각함수 수식 정리, 삼각방정식 풀이, 삼각함수 미적분까지 다룰 수 있게 됩니다."
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "삼각함수 작업에 필요한 함수들을 불러옵니다. sin, cos, tan은 기본 삼각함수이고, cot, sec, csc는 역수 관계입니다. asin, acos, atan은 역삼각함수로 각도를 구합니다. trigsimp()는 sin²+cos²=1 같은 항등식을 적용하여 수식을 간소화하고, expand_trig()는 sin(a+b) 같은 합성을 풀어헤칩니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sympy 함수들을 불러옵니다
+    content: |-
+      from sympy import symbols, sin, cos, tan, cot, sec, csc
+      from sympy import asin, acos, atan, atan2
+      from sympy import pi, sqrt, Rational, simplify
+      from sympy import trigsimp, expand_trig, solve, diff, integrate
+      from sympy import init_printing
+      init_printing()
+
+- id: step2_basic
+  title: 2단계. 기본 삼각함수
+  subtitle: sin, cos, tan
+  blocks:
+  - type: text
+    content: "sin, cos, tan은 직각삼각형의 변의 비율로 정의됩니다. 30°(π/6), 45°(π/4), 60°(π/3) 같은 특수각의 삼각비는 √2, √3을 포함한 정확한 값으로 표현됩니다. sin(π/6) = 1/2, cos(π/4) = √2/2, tan(π/3) = √3입니다. SymPy는 이 값들을 소수가 아닌 기호로 정확하게 표현합니다. tan(x) = sin(x)/cos(x) 관계도 자동으로 인식합니다."
+  - type: code
+    language: python
+    title: 기호 정의
+    description: 변수 x를 정의합니다
+    content: |-
+      x = symbols('x')
+  - type: code
+    language: python
+    title: 특수각 값
+    description: 30°, 45°, 60°의 삼각비
+    content: |-
+      sin30 = sin(pi/6)
+      cos45 = cos(pi/4)
+      tan60 = tan(pi/3)
+      sin30, cos45, tan60
+  - type: code
+    language: python
+    title: 삼각함수 관계
+    description: tan = sin/cos
+    content: |-
+      tdef = sin(x)/cos(x)
+      simp = simplify(tdef - tan(x))
+      simp
+  - type: tip
+    content: sin(π/6) = 1/2, cos(π/4) = √2/2, tan(π/3) = √3입니다. SymPy는 정확한 값을 기호로 표현합니다.
+
+- id: step3_identity
+  title: 3단계. 피타고라스 항등식
+  subtitle: sin² + cos² = 1
+  blocks:
+  - type: text
+    content: "피타고라스 항등식 sin²x + cos²x = 1은 단위원에서 유도되는 가장 기본적인 관계입니다. 모든 x에 대해 성립하며, 이를 변형하면 tan²x + 1 = sec²x, 1 + cot²x = csc²x도 얻습니다. trigsimp()는 이 항등식을 자동으로 적용합니다. sin⁴x + 2sin²x·cos²x + cos⁴x = (sin²x + cos²x)² = 1도 계산합니다."
+  - type: code
+    language: python
+    title: 항등식 확인
+    description: sin² + cos² = 1 확인
+    content: |-
+      identity = sin(x)**2 + cos(x)**2
+      result = trigsimp(identity)
+      result
+  - type: code
+    language: python
+    title: 복잡한 수식 정리
+    description: trigsimp으로 간소화
+    content: |-
+      messy = sin(x)**4 + 2*sin(x)**2*cos(x)**2 + cos(x)**4
+      clean = trigsimp(messy)
+      clean
+  - type: tip
+    content: trigsimp()는 삼각함수 수식을 간소화합니다. 피타고라스 항등식을 적용하여 sin²+cos²=1로 변환합니다.
+
+- id: step4_addition
+  title: 4단계. 덧셈정리
+  subtitle: sin(a+b), cos(a+b)
+  blocks:
+  - type: text
+    content: "덧셈정리는 두 각의 합/차에 대한 삼각함수를 개별 각의 삼각함수로 표현합니다. sin(a+b) = sin(a)cos(b) + cos(a)sin(b), cos(a+b) = cos(a)cos(b) - sin(a)sin(b)입니다. expand_trig()는 합성 각을 분리하고, trigsimp()는 분리된 형태를 다시 합칩니다. 이 공식은 벡터의 회전, 신호 처리, 푸리에 분석의 기초가 됩니다."
+  - type: code
+    language: python
+    title: 두 변수 정의
+    description: a, b를 정의합니다
+    content: |-
+      a, b = symbols('a b')
+  - type: code
+    language: python
+    title: 사인 덧셈정리
+    description: sin(a+b) 전개
+    content: |-
+      ssum = expand_trig(sin(a + b))
+      ssum
+  - type: code
+    language: python
+    title: 코사인 덧셈정리
+    description: cos(a+b) 전개
+    content: |-
+      csum = expand_trig(cos(a + b))
+      csum
+  - type: code
+    language: python
+    title: 다시 합치기
+    description: 전개된 수식을 원래 형태로
+    content: |-
+      expanded = sin(a)*cos(b) + cos(a)*sin(b)
+      back = trigsimp(expanded)
+      back
+  - type: tip
+    content: sin(a+b) = sin(a)cos(b) + cos(a)sin(b), cos(a+b) = cos(a)cos(b) - sin(a)sin(b)입니다. expand_trig()가 자동 적용합니다.
+
+- id: step5_double
+  title: 5단계. 배각공식
+  subtitle: sin(2x), cos(2x)
+  blocks:
+  - type: text
+    content: "배각공식은 덧셈정리에서 a=b=x를 대입하여 유도됩니다. sin(2x) = 2sin(x)cos(x), cos(2x) = cos²x - sin²x = 2cos²x - 1 = 1 - 2sin²x입니다. 3배각, 4배각 공식도 expand_trig()로 전개됩니다. 반각공식 cos²x = (1+cos(2x))/2는 적분에서 자주 사용됩니다. 이 공식들은 적분 계산과 삼각방정식 풀이에 필수적입니다."
+  - type: code
+    language: python
+    title: 2배각 공식
+    description: sin(2x), cos(2x) 전개
+    content: |-
+      s2x = expand_trig(sin(2*x))
+      c2x = expand_trig(cos(2*x))
+      s2x, c2x
+  - type: code
+    language: python
+    title: 3배각 공식
+    description: sin(3x) 전개
+    content: |-
+      s3x = expand_trig(sin(3*x))
+      s3x
+  - type: code
+    language: python
+    title: 반각공식 유도
+    description: cos²(x) = (1+cos(2x))/2
+    content: |-
+      half = (1 + cos(2*x))/2
+      hsimp = trigsimp(half - cos(x)**2)
+      hsimp
+
+- id: step6_inverse
+  title: 6단계. 역삼각함수
+  subtitle: asin, acos, atan
+  blocks:
+  - type: text
+    content: "역삼각함수는 비율로부터 각도를 구합니다. asin(1/2)는 sin(θ)=1/2인 θ=π/6을 반환합니다. asin의 범위는 [-π/2, π/2], acos는 [0, π], atan은 (-π/2, π/2)입니다. sin(asin(x)) = x는 항상 성립하지만, asin(sin(x)) = x는 범위 내에서만 성립합니다. 역삼각함수의 미분 d/dx asin(x) = 1/√(1-x²)은 적분에서 자주 등장합니다."
+  - type: code
+    language: python
+    title: 역삼각함수 값
+    description: 특수값 계산
+    content: |-
+      asin1 = asin(Rational(1, 2))
+      acos1 = acos(sqrt(2)/2)
+      atan1 = atan(1)
+      asin1, acos1, atan1
+  - type: code
+    language: python
+    title: 합성 확인
+    description: sin(asin(x)) = x
+    content: |-
+      comp = sin(asin(x))
+      comp
+  - type: code
+    language: python
+    title: 역삼각 미분
+    description: d/dx asin(x)
+    content: |-
+      dasin = diff(asin(x), x)
+      dasin
+  - type: tip
+    content: asin(1/2) = π/6, acos(√2/2) = π/4, atan(1) = π/4입니다. 역삼각함수의 미분은 1/√(1-x²) 형태입니다.
+
+- id: step7_equations
+  title: 7단계. 삼각방정식
+  subtitle: solve() 활용
+  blocks:
+  - type: text
+    content: "삼각방정식 sin(x) = 1/2의 해는 x = π/6 + 2nπ 또는 x = 5π/6 + 2nπ로 무한히 많습니다. solve()는 주기성을 제외한 주값(principal value)을 반환합니다. 복합 방정식 2sin(x)cos(x) = 1은 sin(2x) = 1로 변환되어 x = π/4가 됩니다. SymPy는 항등식을 활용하여 복잡한 삼각방정식도 풉니다."
+  - type: code
+    language: python
+    title: 기본 삼각방정식
+    description: sin(x) = 1/2 풀기
+    content: |-
+      sol1 = solve(sin(x) - Rational(1, 2), x)
+      sol1
+  - type: code
+    language: python
+    title: cos 방정식
+    description: cos(x) = 0 풀기
+    content: |-
+      sol2 = solve(cos(x), x)
+      sol2
+  - type: code
+    language: python
+    title: 복합 방정식
+    description: 2sin(x)cos(x) = 1 풀기
+    content: |-
+      eq = 2*sin(x)*cos(x) - 1
+      sol3 = solve(eq, x)
+      sol3
+  - type: tip
+    content: 삼각방정식의 해는 주기성이 있어 무한히 많습니다. SymPy는 주값(principal value)을 반환합니다.
+
+- id: step8_calculus
+  title: 8단계. 삼각함수 미적분
+  subtitle: 미분과 적분
+  blocks:
+  - type: text
+    content: "삼각함수의 미분은 순환 패턴을 따릅니다. (sin x)' = cos x, (cos x)' = -sin x, (-sin x)' = -cos x, (-cos x)' = sin x입니다. (tan x)' = sec²x = 1/cos²x입니다. 적분은 미분의 역과정으로 ∫sin(x)dx = -cos(x), ∫cos(x)dx = sin(x)입니다. 이 패턴을 이해하면 복잡한 삼각함수 미적분도 쉽게 풀 수 있습니다."
+  - type: code
+    language: python
+    title: 삼각함수 미분
+    description: sin, cos 미분
+    content: |-
+      dsin = diff(sin(x), x)
+      dcos = diff(cos(x), x)
+      dtan = diff(tan(x), x)
+      dsin, dcos, simplify(dtan)
+  - type: code
+    language: python
+    title: 삼각함수 적분
+    description: sin, cos 적분
+    content: |-
+      isin = integrate(sin(x), x)
+      icos = integrate(cos(x), x)
+      isin, icos
+  - type: code
+    language: python
+    title: tan, sec 적분
+    description: tan(x), sec²(x) 적분
+    content: |-
+      itan = integrate(tan(x), x)
+      isec2 = integrate(1/cos(x)**2, x)
+      simplify(itan), isec2
+
+- id: step9_product
+  title: 9단계. 곱을 합으로
+  subtitle: 적분 기법
+  blocks:
+  - type: text
+    content: "삼각함수의 곱을 합차로 변환하면 적분이 쉬워집니다. sin(a)cos(b) = (sin(a+b) + sin(a-b))/2, cos(a)cos(b) = (cos(a+b) + cos(a-b))/2입니다. sin(x)sin(2x)의 적분은 직접 하기 어렵지만, 곱을 합으로 변환하면 각 항을 개별 적분할 수 있습니다. cos²x의 적분도 반각공식 (1+cos(2x))/2를 사용하면 x/2 + sin(2x)/4가 됩니다."
+  - type: code
+    language: python
+    title: sin×cos 변환
+    description: 곱을 합으로
+    content: |-
+      prod = sin(a)*cos(b)
+      expanded = expand_trig(prod)
+      expanded
+  - type: code
+    language: python
+    title: sin×sin 적분
+    description: 곱의 적분
+    content: |-
+      integral1 = integrate(sin(x)*sin(2*x), x)
+      simplify(integral1)
+  - type: code
+    language: python
+    title: cos² 적분
+    description: 반각공식 활용
+    content: |-
+      integral2 = integrate(cos(x)**2, x)
+      simplify(integral2)
+
+- id: step10_applications
+  title: 10단계. 응용 문제
+  subtitle: 물리와 공학
+  blocks:
+  - type: text
+    content: "삼각함수는 물리학의 진동과 파동을 수학적으로 표현합니다. 단진동 x(t) = A·sin(ωt)에서 속도 v = Aω·cos(ωt), 가속도 a = -Aω²·sin(ωt) = -ω²x입니다. 가속도가 위치에 비례하고 반대 방향인 것이 진동의 특성입니다. sin(x) + cos(x) = √2·sin(x + π/4)로 합성하면 진폭과 위상을 알 수 있습니다. 이 원리는 전자회로, 음향공학, 구조역학에 널리 적용됩니다."
+  - type: code
+    language: python
+    title: 단진동 운동
+    description: x(t) = A×sin(ωt)
+    content: |-
+      t, A, omega = symbols('t A omega', positive=True)
+      position = A*sin(omega*t)
+      velocity = diff(position, t)
+      accel = diff(velocity, t)
+      position, velocity, simplify(accel)
+  - type: code
+    language: python
+    title: 가속도와 위치 관계
+    description: 가속도 = -ω²×위치
+    content: |-
+      relation = simplify(accel + omega**2 * position)
+      relation
+  - type: code
+    language: python
+    title: 합성파 진폭
+    description: sin + cos 합성
+    content: |-
+      wave = sin(x) + cos(x)
+      amplitude = trigsimp(wave)
+      amplitude
+
+- id: practice
+  title: 실습
+  subtitle: 삼각함수 연습
+  blocks:
+  - type: text
+    content: "이제 삼각함수의 항등식, 방정식, 미적분을 종합적으로 연습합니다. 미션1에서는 피타고라스 항등식의 변형들을 정리합니다. (1-cos²θ)/sinθ = sinθ임을 확인하고, sin⁴θ - cos⁴θ가 간단히 정리됨을 봅니다. 미션2에서는 sin(φ)+cos(φ)=0인 방정식을 풀고, sin³φ를 미분하고, sinφ·cos²φ를 적분합니다. 이 연습들은 물리학과 공학 문제의 기초가 됩니다."
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 항등식 정리"
+    blocks:
+    - type: code
+      title: "피타고라스 항등식"
+      content: |-
+        from sympy import symbols, sin, cos, tan, trigsimp, expand_trig, simplify
+
+        theta = symbols('theta')
+
+        form1 = (1 - cos(theta)**2)/sin(theta)
+        simp1 = trigsimp(form1)
+        simp1
+    - type: code
+      title: "차이 공식"
+      content: |-
+        form2 = sin(theta)**4 - cos(theta)**4
+        simp2 = trigsimp(form2)
+        simp2
+    - type: code
+      title: "4배각 공식"
+      content: |-
+        form3 = expand_trig(cos(4*theta))
+        form3
+  - type: expansion
+    title: "미션2: 삼각방정식과 미적분"
+    blocks:
+    - type: code
+      title: "삼각방정식 풀기"
+      content: |-
+        from sympy import symbols, sin, cos, solve, diff, integrate, pi, trigsimp
+
+        phi = symbols('phi')
+
+        equation = sin(phi) + cos(phi)
+        roots = solve(equation, phi)
+        roots
+    - type: code
+      title: "삼각함수 미분"
+      content: |-
+        cubic = sin(phi)**3
+        dcubic = diff(cubic, phi)
+        trigsimp(dcubic)
+    - type: code
+      title: "삼각함수 적분"
+      content: |-
+        mixed = integrate(sin(phi)*cos(phi)**2, phi)
+        trigsimp(mixed)

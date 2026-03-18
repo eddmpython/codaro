@@ -1,0 +1,460 @@
+meta:
+  id: "03_datetime"
+  title: "datetime - 날짜와 시간"
+  category: "builtins"
+  tags: ["datetime", "날짜", "시간", "date", "time"]
+  seo:
+    title: "파이썬 datetime 모듈 완전 정복"
+    description: "datetime 모듈로 날짜와 시간 처리, 연산, 포매팅을 배웁니다."
+    keywords: ["datetime", "날짜", "시간", "date", "timedelta", "strftime", "파이썬날짜"]
+
+intro:
+  emoji: "📅"
+  points:
+  - "날짜와 시간 객체 생성"
+  - "날짜 연산과 비교"
+  - "포매팅과 파싱"
+  - "실전 날짜 처리"
+
+sections:
+- id: "module_import"
+  title: "datetime 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "datetime은 파이썬 표준 라이브러리입니다. 날짜와 시간을 처리하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 datetime 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "datetime 모듈 불러오기"
+    description: "datetime 모듈을 불러옵니다."
+    content: |-
+      from datetime import date, datetime, timedelta
+
+      # 모듈 로드 확인
+      'datetime 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "datetime_objects"
+  title: "날짜와 시간 객체"
+  subtitle: "date, time, datetime"
+  blocks:
+  - type: "text"
+    content: "datetime 모듈은 날짜와 시간을 다루는 파이썬 표준 라이브러리입니다. date는 날짜만, time은 시간만, datetime은 날짜와 시간을 함께 표현합니다. 각 객체는 불변이므로 연산 결과로 새 객체가 생성됩니다. 일정 관리, 로그 분석, 데이터 처리에 필수적입니다."
+  - type: "list"
+    items:
+    - "date: 날짜 (년, 월, 일)"
+    - "time: 시간 (시, 분, 초, 마이크로초)"
+    - "datetime: 날짜 + 시간"
+    - "timedelta: 시간 간격"
+  - type: "code"
+    language: "python"
+    title: "날짜 생성"
+    description: "특정 날짜를 생성합니다."
+    content: |-
+      birthday = date(2000, 1, 15)
+      birthday
+  - type: "code"
+    language: "python"
+    title: "오늘 날짜"
+    description: "현재 날짜를 가져옵니다."
+    content: |-
+      today = date.today()
+      today
+  - type: "code"
+    language: "python"
+    title: "날짜와 시간 생성"
+    description: "특정 날짜와 시간을 생성합니다."
+    content: |-
+      event = datetime(2024, 12, 25, 14, 30, 0)
+      event
+  - type: "tip"
+    content: "datetime.now()로 현재 날짜와 시간을 가져올 수 있습니다."
+
+- id: "date_arithmetic"
+  title: "날짜 연산"
+  subtitle: "timedelta로 날짜 계산"
+  blocks:
+  - type: "text"
+    content: "timedelta는 두 날짜 사이의 차이를 나타내거나 날짜에 더하고 뺄 수 있습니다. days, seconds, microseconds로 시간 간격을 표현하며, weeks 파라미터도 사용할 수 있습니다. D-day 계산, 기한 설정, 일정 관리에 활용됩니다."
+  - type: "list"
+    items:
+    - "timedelta(days, seconds, microseconds)"
+    - "날짜 + timedelta = 새 날짜"
+    - "날짜 - 날짜 = timedelta"
+    - "비교 연산 가능"
+  - type: "code"
+    language: "python"
+    title: "날짜 더하기"
+    description: "오늘로부터 7일 후를 계산합니다."
+    content: |-
+      currentDate = date.today()
+      weekLater = currentDate + timedelta(days=7)
+      weekLater
+  - type: "code"
+    language: "python"
+    title: "날짜 빼기"
+    description: "두 날짜 사이의 차이를 계산합니다."
+    content: |-
+      startDate = date(2024, 1, 1)
+      endDate = date(2024, 12, 31)
+      difference = endDate - startDate
+      difference.days
+  - type: "code"
+    language: "python"
+    title: "특정 기간 빼기"
+    description: "30일 전의 날짜를 계산합니다."
+    content: |-
+      now = date.today()
+      monthAgo = now - timedelta(days=30)
+      monthAgo
+  - type: "tip"
+    content: "timedelta는 weeks 파라미터를 지원합니다. timedelta(weeks=2)는 14일과 같습니다."
+
+- id: "formatting"
+  title: "포매팅과 파싱"
+  subtitle: "strftime과 strptime"
+  blocks:
+  - type: "text"
+    content: "strftime()은 날짜를 문자열로 변환하고, strptime()은 문자열을 날짜로 변환합니다. 포맷 코드(%Y, %m, %d 등)로 원하는 형식을 지정할 수 있습니다. 로그 파일 분석, 사용자 입력 처리, API 통신에서 필수적입니다."
+  - type: "list"
+    items:
+    - "strftime(): 날짜 → 문자열"
+    - "strptime(): 문자열 → 날짜"
+    - "%Y: 년(4자리), %m: 월, %d: 일"
+    - "%H: 시(24), %M: 분, %S: 초"
+  - type: "code"
+    language: "python"
+    title: "날짜를 문자열로"
+    description: "날짜를 원하는 형식의 문자열로 변환합니다."
+    content: |-
+      myDate = date(2024, 3, 15)
+      formatted = myDate.strftime('%Y-%m-%d')
+      formatted
+  - type: "code"
+    language: "python"
+    title: "문자열을 날짜로"
+    description: "문자열을 파싱하여 날짜 객체를 생성합니다."
+    content: |-
+      dateString = '2024-12-25 14:30:00'
+      parsed = datetime.strptime(dateString, '%Y-%m-%d %H:%M:%S')
+      parsed
+  - type: "code"
+    language: "python"
+    title: "다양한 포맷"
+    description: "다른 형식으로 날짜를 표현합니다."
+    content: |-
+      moment = datetime.now()
+      koreanFormat = moment.strftime('%Y년 %m월 %d일')
+      koreanFormat
+  - type: "tip"
+    content: "strftime과 strptime의 포맷 문자열은 정확히 일치해야 합니다."
+
+- id: "datetime_components"
+  title: "날짜 구성 요소"
+  subtitle: "년, 월, 일, 시, 분, 초 추출"
+  blocks:
+  - type: "text"
+    content: "날짜 객체에서 개별 구성 요소를 추출할 수 있습니다. year, month, day, hour, minute, second, microsecond 속성으로 각 요소에 접근합니다. weekday()는 요일을, isocalendar()는 ISO 주차를 반환합니다."
+  - type: "list"
+    items:
+    - "year, month, day: 날짜 요소"
+    - "hour, minute, second: 시간 요소"
+    - "weekday(): 요일 (0=월요일)"
+    - "isoweekday(): 요일 (1=월요일)"
+  - type: "code"
+    language: "python"
+    title: "날짜 분해"
+    description: "날짜의 각 구성 요소를 추출합니다."
+    content: |-
+      someDate = date(2024, 12, 25)
+      yearValue = someDate.year
+      monthValue = someDate.month
+      dayValue = someDate.day
+      yearValue, monthValue, dayValue
+  - type: "code"
+    language: "python"
+    title: "요일 확인"
+    description: "날짜의 요일을 확인합니다."
+    content: |-
+      christmas = date(2024, 12, 25)
+      dayOfWeek = christmas.weekday()
+      dayOfWeek
+  - type: "code"
+    language: "python"
+    title: "datetime 분해"
+    description: "datetime에서 시간 요소를 추출합니다."
+    content: |-
+      timestamp = datetime(2024, 6, 15, 14, 30, 45)
+      hourPart = timestamp.hour
+      minutePart = timestamp.minute
+      secondPart = timestamp.second
+      hourPart, minutePart, secondPart
+  - type: "tip"
+    content: "weekday()는 0(월)~6(일), isoweekday()는 1(월)~7(일)을 반환합니다."
+
+- id: "comparison"
+  title: "날짜 비교"
+  subtitle: "날짜 크기 비교와 정렬"
+  blocks:
+  - type: "text"
+    content: "날짜 객체는 비교 연산자(<, >, ==, !=, <=, >=)를 지원합니다. 과거 날짜가 미래 날짜보다 작으므로 날짜 리스트를 정렬할 수 있습니다. 기한 체크, 유효성 검증, 일정 정렬에 활용됩니다."
+  - type: "list"
+    items:
+    - "날짜끼리 직접 비교"
+    - "과거 < 현재 < 미래"
+    - "sorted()로 정렬 가능"
+    - "min(), max() 사용 가능"
+  - type: "code"
+    language: "python"
+    title: "날짜 비교"
+    description: "두 날짜를 비교합니다."
+    content: |-
+      date1 = date(2024, 1, 1)
+      date2 = date(2024, 12, 31)
+      isEarlier = date1 < date2
+      isEarlier
+  - type: "code"
+    language: "python"
+    title: "날짜 정렬"
+    description: "날짜 리스트를 시간순으로 정렬합니다."
+    content: |-
+      dates = [date(2024, 6, 15), date(2024, 1, 1), date(2024, 12, 25)]
+      sortedDates = sorted(dates)
+      sortedDates
+  - type: "code"
+    language: "python"
+    title: "기한 체크"
+    description: "오늘이 특정 날짜 이전인지 확인합니다."
+    content: |-
+      deadline = date(2024, 12, 31)
+      currentDay = date.today()
+      isPastDeadline = currentDay > deadline
+      isPastDeadline
+  - type: "tip"
+    content: "max()와 min()으로 날짜 리스트에서 가장 최근/오래된 날짜를 찾을 수 있습니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "날짜 처리 실무 패턴"
+  blocks:
+  - type: "text"
+    content: "실무에서 자주 사용하는 날짜 처리 패턴을 살펴봅니다. D-day 계산, 나이 계산, 영업일 계산, 월말/월초 처리 등 실생활 문제를 datetime으로 해결할 수 있습니다."
+  - type: "list"
+    items:
+    - "D-day 계산"
+    - "나이 계산"
+    - "월의 첫날/마지막날"
+    - "날짜 범위 생성"
+  - type: "code"
+    language: "python"
+    title: "D-day 계산"
+    description: "특정 날짜까지 남은 일수를 계산합니다."
+    content: |-
+      targetDate = date(2025, 1, 1)
+      todayDate = date.today()
+      daysLeft = (targetDate - todayDate).days
+      daysLeft
+  - type: "code"
+    language: "python"
+    title: "나이 계산"
+    description: "생년월일로 나이를 계산합니다."
+    content: |-
+      birthDate = date(2000, 5, 15)
+      presentDay = date.today()
+      ageYears = presentDay.year - birthDate.year
+      if (presentDay.month, presentDay.day) < (birthDate.month, birthDate.day):
+          ageYears = ageYears - 1
+      ageYears
+  - type: "code"
+    language: "python"
+    title: "날짜 범위 생성"
+    description: "연속된 날짜 리스트를 생성합니다."
+    content: |-
+      beginDate = date(2024, 1, 1)
+      dateRange = [beginDate + timedelta(days=i) for i in range(7)]
+      dateRange
+  - type: "tip"
+    content: "calendar 모듈과 함께 사용하면 월말일, 윤년 등을 쉽게 처리할 수 있습니다."
+
+- id: "practice"
+  title: "datetime 모듈 종합 복습"
+  subtitle: "날짜와 시간 마스터하기"
+  blocks:
+  - type: "text"
+    content: "datetime 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 날짜 생성"
+    code: |-
+      myBirthday = date(1995, 7, 20)
+      myBirthday
+
+  - type: "expansion"
+    title: "🟢 기본2: 오늘 날짜"
+    code: |-
+      todayIs = date.today()
+      todayIs
+
+  - type: "expansion"
+    title: "🟢 기본3: 7일 후"
+    code: |-
+      today = date.today()
+      nextWeek = today + timedelta(days=7)
+      nextWeek
+
+  - type: "expansion"
+    title: "🟢 기본4: 날짜 차이"
+    code: |-
+      start = date(2024, 1, 1)
+      finish = date(2024, 1, 31)
+      duration = (finish - start).days
+      duration
+
+  - type: "expansion"
+    title: "🟢 기본5: 날짜 포맷"
+    code: |-
+      someDay = date(2024, 6, 15)
+      formatted = someDay.strftime('%Y/%m/%d')
+      formatted
+
+  - type: "expansion"
+    title: "🟡 응용1: 문자열 파싱"
+    code: |-
+      textDate = '2024-12-25'
+      parsedDate = datetime.strptime(textDate, '%Y-%m-%d')
+      parsedDate
+
+  - type: "expansion"
+    title: "🟡 응용2: 요일 확인"
+    code: |-
+      newYear = date(2024, 1, 1)
+      dayIndex = newYear.weekday()
+      days = ['월', '화', '수', '목', '금', '토', '일']
+      days[dayIndex]
+
+  - type: "expansion"
+    title: "🟡 응용3: 날짜 비교"
+    code: |-
+      eventDate = date(2024, 12, 25)
+      referenceDate = date.today()
+      isFuture = eventDate > referenceDate
+      isFuture
+
+  - type: "expansion"
+    title: "🟡 응용4: 월 추출"
+    code: |-
+      targetDate = date(2024, 8, 15)
+      monthNumber = targetDate.month
+      monthNumber
+
+  - type: "expansion"
+    title: "🟡 응용5: 시간 포함 datetime"
+    code: |-
+      meeting = datetime(2024, 6, 15, 14, 30)
+      meeting.strftime('%Y-%m-%d %H:%M')
+
+  - type: "expansion"
+    title: "🔴 심화1: D-day 계산기"
+    code: |-
+      exam = date(2025, 3, 15)
+      now = date.today()
+      remaining = (exam - now).days
+      f'D-{remaining}' if remaining > 0 else f'D+{abs(remaining)}'
+
+  - type: "expansion"
+    title: "🔴 심화2: 주말 카운트"
+    code: |-
+      firstDay = date(2024, 1, 1)
+      lastDay = date(2024, 1, 31)
+      weekendCount = 0
+      checkDate = firstDay
+      while checkDate <= lastDay:
+          if checkDate.weekday() >= 5:
+              weekendCount = weekendCount + 1
+          checkDate = checkDate + timedelta(days=1)
+      weekendCount
+
+  - type: "expansion"
+    title: "🔴 심화3: 분기 계산"
+    code: |-
+      checkDay = date(2024, 7, 15)
+      quarter = (checkDay.month - 1) // 3 + 1
+      quarter
+
+  - type: "expansion"
+    title: "🔴 심화4: 근무 일수"
+    code: |-
+      hireDate = date(2024, 1, 1)
+      currentDate = date.today()
+      workDays = 0
+      tempDate = hireDate
+      while tempDate <= currentDate:
+          if tempDate.weekday() < 5:
+              workDays = workDays + 1
+          tempDate = tempDate + timedelta(days=1)
+      workDays
+
+  - type: "expansion"
+    title: "🔴 심화5: 생일까지 일수"
+    code: |-
+      birth = date(2000, 8, 20)
+      present = date.today()
+      nextBirthday = date(present.year, birth.month, birth.day)
+      if nextBirthday < present:
+          nextBirthday = date(present.year + 1, birth.month, birth.day)
+      daysUntil = (nextBirthday - present).days
+      daysUntil
+
+  - type: "expansion"
+    title: "🔴 심화6: 매월 15일 생성"
+    code: |-
+      year = 2024
+      fifteenths = [date(year, month, 15) for month in range(1, 13)]
+      fifteenths
+
+  - type: "expansion"
+    title: "🔴 심화7: 윤년 확인"
+    code: |-
+      def isLeapYear(year):
+          try:
+              date(year, 2, 29)
+              return True
+          except ValueError:
+              return False
+
+      isLeapYear(2024)
+
+  - type: "expansion"
+    title: "🔴 심화8: 시간차 계산"
+    code: |-
+      startTime = datetime(2024, 6, 15, 9, 0, 0)
+      endTime = datetime(2024, 6, 15, 17, 30, 0)
+      elapsed = endTime - startTime
+      hoursWorked = elapsed.total_seconds() / 3600
+      hoursWorked
+
+  - type: "expansion"
+    title: "🔴 심화9: 월의 첫날과 마지막날"
+    code: |-
+      anyDate = date(2024, 6, 15)
+      firstOfMonth = date(anyDate.year, anyDate.month, 1)
+      if anyDate.month == 12:
+          nextMonth = date(anyDate.year + 1, 1, 1)
+      else:
+          nextMonth = date(anyDate.year, anyDate.month + 1, 1)
+      lastOfMonth = nextMonth - timedelta(days=1)
+      firstOfMonth, lastOfMonth
+  - type: "expansion"
+    title: "🔴 심화10: 날짜 유효성 검사"
+    code: |-
+      def isValidDate(dateStr):
+          try:
+              datetime.strptime(dateStr, '%Y-%m-%d')
+              return True
+          except ValueError:
+              return False
+
+      isValidDate('2024-02-30'), isValidDate('2024-02-28')

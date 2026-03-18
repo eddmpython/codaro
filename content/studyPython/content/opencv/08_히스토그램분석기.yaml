@@ -1,0 +1,392 @@
+meta:
+  id: opencv_08
+  title: 히스토그램분석기
+  order: 8
+  category: opencv
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["OpenCV", "calcHist", "equalizeHist", "CLAHE", "히스토그램"]
+  seo:
+    title: "OpenCV 중급 - 히스토그램 분석기"
+    description: "OpenCV calcHist, equalizeHist, CLAHE로 이미지 히스토그램을 분석하고 개선합니다."
+    keywords: ["OpenCV", "calcHist", "equalizeHist", "CLAHE", "히스토그램"]
+
+intro:
+  emoji: "📊"
+  goal: calcHist로 히스토그램을 분석하고 equalizeHist, CLAHE로 이미지 품질을 개선합니다.
+  description: 히스토그램(histogram)은 각 밝기 값(0-255)에 해당하는 픽셀 수를 막대 그래프로 표현한 것입니다. 히스토그램 평활화로 대비를 향상시키는 방법을 배웁니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 이미지 불러오기
+  subtitle: 히스토그램 분석 준비
+  blocks:
+  - type: text
+    content: sklearn의 flower 이미지를 불러옵니다. 히스토그램 분석은 이미지의 밝기 분포를 이해하는 데 도움이 됩니다.
+  - type: code
+    language: python
+    title: 라이브러리와 이미지 로드
+    description: flower 이미지를 불러옵니다
+    content: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      flower = load_sample_image('flower.jpg')
+      original = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+      gray = cv2.cvtColor(original, cv2.COLOR_BGR2GRAY)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(gray, cmap='gray')
+      plt.title(f'Grayscale: {gray.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 원본 이미지 출력
+    description: 분석할 이미지입니다
+    content: |-
+      figOrig, axOrig = plt.subplots(1, 2, figsize=(12, 5))
+      axOrig[0].imshow(flower)
+      axOrig[0].set_title('Color')
+      axOrig[0].axis('off')
+      axOrig[1].imshow(gray, cmap='gray')
+      axOrig[1].set_title('Grayscale')
+      axOrig[1].axis('off')
+      plt.tight_layout()
+
+- id: step2_calc
+  title: 2단계. 히스토그램 계산
+  subtitle: calcHist()
+  blocks:
+  - type: text
+    content: calcHist()는 히스토그램을 계산하는 함수입니다. 히스토그램의 각 빈(bin)은 특정 밝기 범위에 속하는 픽셀 수를 나타냅니다. 256개 빈을 사용하면 각 밝기 값(0-255)별 픽셀 수를 얻습니다. 히스토그램의 분포를 보면 이미지가 어두운지(왼쪽에 집중), 밝은지(오른쪽에 집중), 대비가 낮은지(좁은 범위에 집중) 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 그레이스케일 히스토그램
+    description: 밝기 분포를 계산합니다
+    content: |-
+      hist = cv2.calcHist([gray], [0], None, [256], [0, 256])
+      plt.figure(figsize=(10, 4))
+      plt.plot(hist, color='gray')
+      plt.title(f'Histogram: {hist.shape}')
+      plt.xlabel('Pixel Value')
+      plt.ylabel('Frequency')
+      plt.xlim([0, 256])
+      plt.tight_layout()
+  - type: tip
+    content: calcHist([images], [channels], mask, [histSize], [ranges])에서 images와 channels는 리스트입니다. histSize는 빈(bin) 개수, ranges는 값 범위입니다. None 마스크는 전체 이미지를 사용합니다.
+  - type: code
+    language: python
+    title: 히스토그램 시각화
+    description: 밝기 분포를 그래프로 표시합니다
+    content: |-
+      plt.figure(figsize=(10, 4))
+      plt.plot(hist, color='gray')
+      plt.title('Grayscale Histogram')
+      plt.xlabel('Pixel Value')
+      plt.ylabel('Frequency')
+      plt.xlim([0, 256])
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 컬러 히스토그램
+    description: BGR 각 채널의 히스토그램입니다
+    content: |-
+      colors = ('b', 'g', 'r')
+      plt.figure(figsize=(10, 4))
+      for i, col in enumerate(colors):
+          histC = cv2.calcHist([original], [i], None, [256], [0, 256])
+          plt.plot(histC, color=col, label=col.upper())
+      plt.title('Color Histogram')
+      plt.xlabel('Pixel Value')
+      plt.ylabel('Frequency')
+      plt.xlim([0, 256])
+      plt.legend()
+      plt.tight_layout()
+
+- id: step3_equalize
+  title: 3단계. 히스토그램 평활화
+  subtitle: equalizeHist()
+  blocks:
+  - type: text
+    content: equalizeHist()는 히스토그램 평활화(histogram equalization)를 수행합니다. 누적 분포 함수(CDF, Cumulative Distribution Function)를 이용해 픽셀 값을 재분배하여, 히스토그램이 0-255 전체 범위에 고르게 분포하도록 만듭니다. 이를 통해 대비(contrast)가 향상되어 어둡거나 흐릿한 이미지의 디테일이 살아납니다.
+  - type: code
+    language: python
+    title: 평활화 적용
+    description: 그레이스케일 이미지를 평활화합니다
+    content: |-
+      equalized = cv2.equalizeHist(gray)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(equalized, cmap='gray')
+      plt.title('Equalized')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 평활화 히스토그램
+    description: 평활화 전후 히스토그램을 비교합니다
+    content: |-
+      histEq = cv2.calcHist([equalized], [0], None, [256], [0, 256])
+      figHist, axHist = plt.subplots(1, 2, figsize=(12, 4))
+      axHist[0].plot(hist, color='gray')
+      axHist[0].set_title('Original Histogram')
+      axHist[0].set_xlim([0, 256])
+      axHist[1].plot(histEq, color='gray')
+      axHist[1].set_title('Equalized Histogram')
+      axHist[1].set_xlim([0, 256])
+      plt.tight_layout()
+  - type: tip
+    content: 평활화 후 히스토그램이 전체 범위에 걸쳐 더 고르게 분포합니다. 이는 대비 향상을 의미합니다. 하지만 과도한 평활화는 부자연스러울 수 있습니다.
+  - type: code
+    language: python
+    title: 이미지 비교
+    description: 평활화 전후 이미지를 비교합니다
+    content: |-
+      figEq, axEq = plt.subplots(1, 2, figsize=(12, 5))
+      axEq[0].imshow(gray, cmap='gray')
+      axEq[0].set_title('Original')
+      axEq[0].axis('off')
+      axEq[1].imshow(equalized, cmap='gray')
+      axEq[1].set_title('Equalized')
+      axEq[1].axis('off')
+      plt.tight_layout()
+
+- id: step4_clahe
+  title: 4단계. CLAHE
+  subtitle: 적응형 히스토그램 평활화
+  blocks:
+  - type: text
+    content: CLAHE(Contrast Limited Adaptive Histogram Equalization, 대비 제한 적응형 히스토그램 평활화)는 이미지를 작은 타일(tile)로 나누어 각각 평활화합니다. 전역 평활화(equalizeHist)는 밝은 영역과 어두운 영역이 함께 있을 때 한쪽이 과도하게 변할 수 있지만, CLAHE는 지역별로 처리하므로 자연스럽습니다. clipLimit은 대비 증폭을 제한하여 노이즈 증가를 방지합니다.
+  - type: code
+    language: python
+    title: CLAHE 생성
+    description: CLAHE 객체를 생성합니다
+    content: |-
+      clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+      type(clahe)
+  - type: code
+    language: python
+    title: CLAHE 적용
+    description: 적응형 평활화를 적용합니다
+    content: |-
+      enhanced = clahe.apply(gray)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(enhanced, cmap='gray')
+      plt.title('CLAHE Enhanced')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: clipLimit은 대비 제한 값으로, 높으면 대비가 강해집니다. tileGridSize는 영역 분할 크기입니다. (8, 8)은 이미지를 8x8 블록으로 나눕니다.
+  - type: code
+    language: python
+    title: 세 가지 비교
+    description: 원본, equalizeHist, CLAHE를 비교합니다
+    content: |-
+      figCompare, axCompare = plt.subplots(1, 3, figsize=(14, 5))
+      axCompare[0].imshow(gray, cmap='gray')
+      axCompare[0].set_title('Original')
+      axCompare[0].axis('off')
+      axCompare[1].imshow(equalized, cmap='gray')
+      axCompare[1].set_title('equalizeHist')
+      axCompare[1].axis('off')
+      axCompare[2].imshow(enhanced, cmap='gray')
+      axCompare[2].set_title('CLAHE')
+      axCompare[2].axis('off')
+      plt.tight_layout()
+
+- id: step5_color
+  title: 5단계. 컬러 이미지 평활화
+  subtitle: LAB 색공간 활용
+  blocks:
+  - type: text
+    content: 컬러 이미지에 평활화를 적용하려면 LAB 색공간을 사용합니다. L 채널(밝기)만 평활화하면 색상이 왜곡되지 않습니다.
+  - type: code
+    language: python
+    title: LAB 변환
+    description: LAB 색공간으로 변환합니다
+    content: |-
+      lab = cv2.cvtColor(original, cv2.COLOR_BGR2LAB)
+      lCh, aCh, bCh = cv2.split(lab)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(lCh, cmap='gray')
+      plt.title(f'L Channel: {lCh.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: L 채널 CLAHE
+    description: 밝기 채널만 평활화합니다
+    content: |-
+      claheL = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+      lEnhanced = claheL.apply(lCh)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(lEnhanced, cmap='gray')
+      plt.title('L Channel Enhanced')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 채널 병합
+    description: 평활화된 L과 원본 A, B를 합칩니다
+    content: |-
+      labEnhanced = cv2.merge([lEnhanced, aCh, bCh])
+      colorEnhanced = cv2.cvtColor(labEnhanced, cv2.COLOR_LAB2BGR)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(cv2.cvtColor(colorEnhanced, cv2.COLOR_BGR2RGB))
+      plt.title('Color Enhanced')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 컬러 비교
+    description: 원본과 개선된 이미지를 비교합니다
+    content: |-
+      figColor, axColor = plt.subplots(1, 2, figsize=(12, 5))
+      axColor[0].imshow(flower)
+      axColor[0].set_title('Original')
+      axColor[0].axis('off')
+      axColor[1].imshow(cv2.cvtColor(colorEnhanced, cv2.COLOR_BGR2RGB))
+      axColor[1].set_title('CLAHE Enhanced')
+      axColor[1].axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: LAB 색공간에서 L은 밝기, A와 B는 색상 정보입니다. L만 처리하면 색상을 유지하면서 대비를 개선할 수 있습니다.
+
+- id: step6_params
+  title: 6단계. CLAHE 파라미터
+  subtitle: clipLimit와 tileGridSize
+  blocks:
+  - type: text
+    content: CLAHE의 두 파라미터가 결과에 미치는 영향을 확인합니다. clipLimit은 대비 강도, tileGridSize는 지역성을 조절합니다.
+  - type: code
+    language: python
+    title: clipLimit 비교
+    description: 다양한 clipLimit 값을 비교합니다
+    content: |-
+      claheLow = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(8, 8))
+      claheMid = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8, 8))
+      claheHigh = cv2.createCLAHE(clipLimit=8.0, tileGridSize=(8, 8))
+      enhLow = claheLow.apply(gray)
+      enhMid = claheMid.apply(gray)
+      enhHigh = claheHigh.apply(gray)
+      figCl, axCl = plt.subplots(1, 3, figsize=(12, 4))
+      axCl[0].imshow(enhLow, cmap='gray')
+      axCl[0].set_title('clipLimit=1.0')
+      axCl[0].axis('off')
+      axCl[1].imshow(enhMid, cmap='gray')
+      axCl[1].set_title('clipLimit=4.0')
+      axCl[1].axis('off')
+      axCl[2].imshow(enhHigh, cmap='gray')
+      axCl[2].set_title('clipLimit=8.0')
+      axCl[2].axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: clipLimit 시각화
+    description: 대비 강도 차이를 확인합니다
+    content: |-
+      figClip, axClip = plt.subplots(1, 3, figsize=(12, 4))
+      axClip[0].imshow(enhLow, cmap='gray')
+      axClip[0].set_title('clipLimit=1.0')
+      axClip[0].axis('off')
+      axClip[1].imshow(enhMid, cmap='gray')
+      axClip[1].set_title('clipLimit=4.0')
+      axClip[1].axis('off')
+      axClip[2].imshow(enhHigh, cmap='gray')
+      axClip[2].set_title('clipLimit=8.0')
+      axClip[2].axis('off')
+      plt.tight_layout()
+
+- id: practice
+  title: 실습
+  subtitle: 히스토그램 프로젝트
+  blocks:
+  - type: text
+    content: china 이미지로 히스토그램 분석을 연습해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: china 히스토그램 분석"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        import cv2
+        import numpy as np
+        from sklearn.datasets import load_sample_image
+        import matplotlib.pyplot as plt
+
+        china = load_sample_image('china.jpg')
+        chinaBgr = cv2.cvtColor(china, cv2.COLOR_RGB2BGR)
+        chinaGray = cv2.cvtColor(chinaBgr, cv2.COLOR_BGR2GRAY)
+        plt.imshow(china)
+        plt.axis('off')
+    - type: code
+      title: "히스토그램과 통계"
+      content: |-
+        chinaHist = cv2.calcHist([chinaGray], [0], None, [256], [0, 256])
+        meanVal = chinaGray.mean()
+        stdVal = chinaGray.std()
+        meanVal, stdVal
+    - type: code
+      title: "히스토그램 시각화"
+      content: |-
+        figChina, axChina = plt.subplots(1, 2, figsize=(12, 4))
+        axChina[0].imshow(china)
+        axChina[0].set_title(f'Mean: {meanVal:.1f}, Std: {stdVal:.1f}')
+        axChina[0].axis('off')
+        axChina[1].plot(chinaHist, color='gray')
+        axChina[1].set_title('Histogram')
+        axChina[1].set_xlim([0, 256])
+        axChina[1].axvline(x=meanVal, color='r', linestyle='--', label='Mean')
+        axChina[1].legend()
+        plt.tight_layout()
+  - type: expansion
+    title: "미션2: 어두운 이미지 개선"
+    blocks:
+    - type: code
+      title: "어두운 이미지 생성"
+      content: |-
+        import cv2
+        import numpy as np
+        from sklearn.datasets import load_sample_image
+        import matplotlib.pyplot as plt
+
+        scene = load_sample_image('china.jpg')
+        sceneBgr = cv2.cvtColor(scene, cv2.COLOR_RGB2BGR)
+        dark = (sceneBgr * 0.4).astype(np.uint8)
+        darkGray = cv2.cvtColor(dark, cv2.COLOR_BGR2GRAY)
+        plt.imshow(scene)
+        plt.axis('off')
+    - type: code
+      title: "CLAHE 개선"
+      content: |-
+        darkLab = cv2.cvtColor(dark, cv2.COLOR_BGR2LAB)
+        darkL, darkA, darkB = cv2.split(darkLab)
+        claheDark = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8, 8))
+        darkLEnh = claheDark.apply(darkL)
+        darkLabEnh = cv2.merge([darkLEnh, darkA, darkB])
+        darkEnhanced = cv2.cvtColor(darkLabEnh, cv2.COLOR_LAB2BGR)
+        figDe, axDe = plt.subplots(1, 2, figsize=(10, 4))
+        axDe[0].imshow(cv2.cvtColor(dark, cv2.COLOR_BGR2RGB))
+        axDe[0].set_title('Dark')
+        axDe[0].axis('off')
+        axDe[1].imshow(cv2.cvtColor(darkEnhanced, cv2.COLOR_BGR2RGB))
+        axDe[1].set_title('Enhanced')
+        axDe[1].axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "개선 결과 비교"
+      content: |-
+        figDark, axDark = plt.subplots(1, 3, figsize=(14, 5))
+        axDark[0].imshow(scene)
+        axDark[0].set_title('Original')
+        axDark[0].axis('off')
+        axDark[1].imshow(cv2.cvtColor(dark, cv2.COLOR_BGR2RGB))
+        axDark[1].set_title('Dark (40%)')
+        axDark[1].axis('off')
+        axDark[2].imshow(cv2.cvtColor(darkEnhanced, cv2.COLOR_BGR2RGB))
+        axDark[2].set_title('CLAHE Enhanced')
+        axDark[2].axis('off')
+        plt.tight_layout()

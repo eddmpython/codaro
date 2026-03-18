@@ -1,0 +1,377 @@
+meta:
+  id: day27_2
+  title: 웹개발 marimo
+  day: 27
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 웹개발 marimo"
+    description: "marimo로 반응형 노트북을 만드는 방법."
+    keywords: ['웹개발', 'marimo', 'notebook']
+intro:
+  emoji: "🦑"
+  points:
+  - marimo 소개와 설치
+  - 반응형 셀과 의존성 관리
+  - UI 위젯 (텍스트, 숫자, 슬라이더)
+  - 체크박스, 드롭다운, 라디오 버튼
+  - 테이블과 폼 위젯
+  - 실시간 데이터 연동
+sections:
+- id: import_section
+  title: 모듈 불러오기
+  subtitle: marimo 라이브러리 준비
+  blocks:
+  - type: text
+    content: marimo는 반응형 Python 노트북 환경을 제공하는 라이브러리입니다. 이 파일에서 사용할 모든 import를 최상단에 작성합니다. day13 모듈에서 배운 import 문법을 사용하며, as 키워드로 marimo를 mo라는 짧은 별칭으로 사용합니다. 별칭을 사용하면 코드가 간결해지고 타이핑이 줄어듭니다. from datetime import date는 day16에서 배운 날짜 처리를 위한 모듈입니다.
+  - type: list
+    items:
+    - "import marimo as mo - marimo를 mo로 짧게 사용"
+    - "from datetime import date - 날짜 기능 가져오기"
+    - 파일 최상단에 import 섹션 하나만 작성
+    - 이후 섹션에서는 import 사용 금지
+  - type: code
+    language: python
+    title: 필요한 모듈 불러오기
+    description: marimo와 날짜 모듈을 불러옵니다.
+    content: |-
+      import marimo as mo
+      from datetime import date
+  - type: tip
+    content: "pip install marimo 명령으로 먼저 설치하세요."
+
+- id: marimo_intro
+  title: marimo 소개
+  subtitle: 반응형 Python 노트북
+  blocks:
+  - type: text
+    content: marimo는 반응형 Python 노트북입니다. 반응형은 Reactive의 번역으로, 데이터가 변경되면 관련된 부분이 자동으로 업데이트되는 것을 의미합니다. 일반 Jupyter 노트북은 셀을 수동으로 재실행해야 하지만, marimo는 변수가 변경되면 그 변수를 사용하는 모든 셀을 자동으로 재실행합니다. mo.md()는 마크다운 문법으로 텍스트를 예쁘게 표시하는 함수입니다. 이런 자동 의존성 추적 덕분에 데이터 분석과 프로토타입 개발이 매우 빠르고 편리합니다.
+  - type: list
+    items:
+    - 자동 의존성 추적과 셀 재실행
+    - 풍부한 UI 위젯 제공
+    - Jupyter 노트북과 호환
+    - 웹앱으로 배포 가능
+  - type: code
+    language: python
+    title: marimo 시작하기
+    description: 마크다운으로 인사 메시지를 표시합니다.
+    content: |-
+      introMessage = mo.md("Hello, marimo!")
+      introMessage
+  - type: tip
+    content: "marimo edit 명령으로 노트북 편집기를 시작하세요."
+
+- id: text_input
+  title: 텍스트 입력
+  subtitle: 사용자 입력 받기
+  blocks:
+  - type: text
+    content: mo.ui.text()는 사용자로부터 텍스트를 입력받는 위젯을 만듭니다. placeholder는 입력 필드가 비어있을 때 보여지는 안내 문구이고, label은 입력 필드 위에 표시되는 제목입니다. value 속성으로 현재 입력된 값에 접근할 수 있으며, 이 값이 변경되면 해당 변수를 사용하는 모든 셀이 자동으로 재실행됩니다. day04에서 배운 문자열 포매팅을 사용하여 입력값을 메시지에 넣을 수 있습니다.
+  - type: list
+    items:
+    - "mo.ui.text() - 텍스트 입력"
+    - ".value - 입력된 값 접근"
+    - placeholder로 안내 텍스트 표시
+    - label로 레이블 추가
+  - type: code
+    language: python
+    title: 텍스트 입력 위젯
+    description: 이름을 입력받아 인사 메시지를 표시합니다.
+    content: |-
+      textUserName = mo.ui.text(placeholder="이름을 입력하세요", label="이름")
+      textUserName
+
+      textGreeting = mo.md(f"안녕하세요, {textUserName.value}님!")
+      textGreeting
+
+- id: number_slider
+  title: 숫자와 슬라이더
+  subtitle: 숫자 입력과 조절
+  blocks:
+  - type: text
+    content: mo.ui.number()는 숫자를 직접 입력하거나 화살표 버튼으로 조절할 수 있는 위젯을 만듭니다. start는 최소값, stop은 최대값, value는 초기값을 의미합니다. mo.ui.slider()는 마우스로 드래그하여 값을 조절하는 슬라이더를 만듭니다. step 매개변수를 사용하면 증가 단위를 설정할 수 있습니다. 두 위젯 모두 value 속성으로 현재 값에 접근하며, day02에서 배운 변수 할당 방식으로 값을 사용합니다.
+  - type: list
+    items:
+    - "mo.ui.number() - 숫자 입력"
+    - "mo.ui.slider() - 슬라이더"
+    - "start, stop - 범위 설정"
+    - "step - 증가 단위"
+  - type: code
+    language: python
+    title: 숫자 입력과 슬라이더
+    description: 숫자 입력과 슬라이더로 값을 조절합니다.
+    content: |-
+      numberUserAge = mo.ui.number(start=1, stop=120, value=25, label="나이")
+      numberUserAge
+
+      sliderTemp = mo.ui.slider(start=-10, stop=40, value=20, label="온도")
+      sliderTemp
+
+      numberResult = mo.md(f"나이: {numberUserAge.value}세, 온도: {sliderTemp.value}도")
+      numberResult
+
+- id: checkbox_dropdown
+  title: 체크박스와 드롭다운
+  subtitle: 선택 위젯들
+  blocks:
+  - type: text
+    content: mo.ui.checkbox()는 참/거짓 값을 선택하는 체크박스를 만듭니다. 체크하면 True, 해제하면 False 값을 가지며, 동의 여부나 옵션 선택에 사용합니다. mo.ui.dropdown()은 여러 선택지 중 하나를 고르는 드롭다운 메뉴를 만듭니다. options는 day05에서 배운 리스트로 선택 가능한 항목들을 지정하고, value는 초기 선택값을 설정합니다. day09에서 배운 if 조건문으로 체크박스 상태에 따라 다른 내용을 표시할 수 있습니다.
+  - type: list
+    items:
+    - "mo.ui.checkbox() - 체크박스"
+    - "mo.ui.dropdown() - 드롭다운"
+    - "options - 선택 옵션 리스트"
+    - "value - 기본 선택값"
+  - type: code
+    language: python
+    title: 체크박스와 드롭다운
+    description: 동의 체크박스와 도시 선택 드롭다운을 만듭니다.
+    content: |-
+      checkAgree = mo.ui.checkbox(label="이용약관에 동의합니다")
+      checkAgree
+
+      dropdownCity = mo.ui.dropdown(
+          options=["서울", "부산", "대구", "인천"],
+          value="서울",
+          label="도시 선택"
+      )
+      dropdownCity
+
+      if checkAgree.value:
+          checkResult = mo.md(f"{dropdownCity.value}에서 가입 가능합니다!")
+          checkResult
+
+- id: radio_multiselect
+  title: 라디오와 멀티셀렉트
+  subtitle: 다양한 선택 방식
+  blocks:
+  - type: text
+    content: mo.ui.radio()는 여러 선택지 중 하나만 선택할 수 있는 라디오 버튼을 만듭니다. 라디오는 Radio의 한글 발음으로, 옛날 라디오처럼 버튼 하나를 누르면 다른 버튼이 튀어나오는 방식을 의미합니다. mo.ui.multiselect()는 여러 개를 동시에 선택할 수 있는 위젯으로, 선택된 값들을 day05에서 배운 리스트로 반환합니다. 라디오는 단일 선택(성별, 학년 등)에 사용하고, 멀티셀렉트는 복수 선택(관심사, 기술 스택 등)에 사용합니다.
+  - type: list
+    items:
+    - "mo.ui.radio() - 라디오 버튼"
+    - "mo.ui.multiselect() - 복수 선택"
+    - 하나만 선택 vs 여러 개 선택
+    - 선택값 리스트로 반환
+  - type: code
+    language: python
+    title: 라디오 버튼과 멀티셀렉트
+    description: 분야 선택과 기술 스택 선택을 만듭니다.
+    content: |-
+      radioField = mo.ui.radio(
+          options=["웹 개발", "데이터 분석", "AI/ML"],
+          value="웹 개발",
+          label="관심 분야"
+      )
+      radioField
+
+      multiSkills = mo.ui.multiselect(
+          options=["Python", "JavaScript", "React", "SQL"],
+          label="보유 기술"
+      )
+      multiSkills
+
+      radioResult = mo.md(f"분야: {radioField.value}, 기술: {multiSkills.value}")
+      radioResult
+
+- id: date_table
+  title: 날짜와 테이블
+  subtitle: 날짜 선택과 데이터 표시
+  blocks:
+  - type: text
+    content: mo.ui.date()는 달력에서 날짜를 선택할 수 있는 위젯을 만듭니다. day16에서 배운 datetime 모듈의 date 객체를 반환하며, 생년월일이나 예약 날짜를 입력받을 때 사용합니다. mo.ui.table()은 day08에서 배운 딕셔너리 리스트를 테이블 형태로 보여주는 위젯입니다. selection 매개변수를 'multi'로 설정하면 여러 행을 선택할 수 있고, 선택된 행들은 리스트로 반환됩니다. or 연산자는 값이 None일 때 빈 리스트를 기본값으로 사용하는 day03 연산자입니다.
+  - type: list
+    items:
+    - "mo.ui.date() - 날짜 선택"
+    - "mo.ui.table() - 테이블 표시"
+    - "selection='multi' - 다중 선택"
+    - 선택한 행 데이터 접근
+  - type: code
+    language: python
+    title: 날짜와 테이블
+    description: 날짜 선택과 데이터 테이블을 만듭니다.
+    content: |-
+      dateBirth = mo.ui.date(label="생년월일")
+      dateBirth
+
+      tableStudentData = [
+          {"이름": "김철수", "나이": 25, "점수": 85},
+          {"이름": "이영희", "나이": 30, "점수": 92}
+      ]
+
+      tableStudents = mo.ui.table(tableStudentData, selection="multi")
+      tableStudents
+
+      tableSelected = tableStudents.value or []
+      tableResult = mo.md(f"선택: {len(tableSelected)}명")
+      tableResult
+
+- id: tabs_accordion
+  title: 탭과 아코디언
+  subtitle: 콘텐츠 정리하기
+  blocks:
+  - type: text
+    content: mo.ui.tabs()는 여러 콘텐츠를 탭 형태로 정리하는 위젯을 만듭니다. 탭은 Tab의 한글 발음으로, 파일 폴더의 탭처럼 클릭하면 다른 내용이 보이는 UI 패턴입니다. day08에서 배운 딕셔너리로 각 탭의 제목과 내용을 정의하며, 키는 탭 이름, 값은 탭 내용이 됩니다. 현재 선택된 탭은 value 속성으로 확인할 수 있습니다. 많은 정보를 화면에 깔끔하게 정리할 때 유용하며, 웹사이트의 메뉴 구조를 만들 때 자주 사용됩니다.
+  - type: list
+    items:
+    - "mo.ui.tabs() - 탭 네비게이션"
+    - "mo.accordion() - 접기/펼치기"
+    - 딕셔너리로 탭 콘텐츠 정의
+    - 선택된 탭 값 접근
+  - type: code
+    language: python
+    title: 탭 위젯
+    description: 탭으로 콘텐츠를 구분합니다.
+    content: |-
+      tabsContent = mo.ui.tabs({
+          "홈": "메인 페이지",
+          "프로필": "사용자 정보",
+          "설정": "환경 설정"
+      })
+      tabsContent
+
+      tabsSelected = tabsContent.value
+      tabsResult = mo.md(f"현재 탭: {tabsSelected}")
+      tabsResult
+
+- id: form_widget
+  title: 폼 위젯
+  subtitle: 여러 입력 묶기
+  blocks:
+  - type: text
+    content: mo.ui.form()은 여러 입력 위젯을 하나의 폼으로 묶는 기능입니다. 폼은 Form의 한글 발음으로, 웹에서 사용자 정보를 입력받는 양식을 의미합니다. day08에서 배운 딕셔너리로 각 입력 필드를 정의하며, 키는 필드 이름, 값은 위젯 객체입니다. 제출 버튼이 자동으로 생성되고, 사용자가 버튼을 클릭하면 모든 입력값이 딕셔너리로 한 번에 반환됩니다. 회원가입이나 설문조사처럼 여러 정보를 한꺼번에 수집할 때 매우 유용합니다.
+  - type: list
+    items:
+    - "mo.ui.form() - 폼 생성"
+    - 딕셔너리로 위젯들 묶기
+    - 제출 버튼 자동 생성
+    - 폼 데이터 한 번에 처리
+  - type: code
+    language: python
+    title: 폼 위젯
+    description: 프로필 입력 폼을 만듭니다.
+    content: |-
+      formProfile = mo.ui.form({
+          "name": mo.ui.text(placeholder="이름", label="이름"),
+          "age": mo.ui.number(start=1, stop=120, value=25, label="나이"),
+          "city": mo.ui.dropdown(options=["서울", "부산", "대구"], label="도시")
+      })
+      formProfile
+
+      if formProfile.value:
+          formData = formProfile.value
+          formResult = mo.md(f"이름: {formData['name']}, 나이: {formData['age']}, 도시: {formData['city']}")
+          formResult
+
+- id: practical_example
+  title: 실전 예제
+  subtitle: 간단한 계산기
+  blocks:
+  - type: text
+    content: 지금까지 배운 marimo 위젯들을 종합하여 실용적인 계산기를 만들어봅니다. mo.ui.number()로 두 숫자를 입력받고, mo.ui.dropdown()으로 연산자를 선택하며, day09에서 배운 if-elif-else 조건문으로 선택된 연산을 수행합니다. day03에서 배운 사칙연산 연산자를 사용하고, 0으로 나누는 경우를 방지하기 위해 조건 표현식을 활용합니다. marimo의 반응형 특성 덕분에 숫자나 연산자를 변경하면 결과가 자동으로 업데이트됩니다.
+  - type: list
+    items:
+    - 숫자 입력 위젯
+    - 연산자 선택 드롭다운
+    - 실시간 계산 결과
+    - 반응형 업데이트
+  - type: code
+    language: python
+    title: 간단한 계산기
+    description: 두 숫자의 사칙연산을 수행하는 계산기입니다.
+    content: |-
+      calcNum1 = mo.ui.number(value=10, label="첫 번째 숫자")
+      calcNum2 = mo.ui.number(value=5, label="두 번째 숫자")
+      calcOperator = mo.ui.dropdown(
+          options=["+", "-", "*", "/"],
+          value="+",
+          label="연산자"
+      )
+
+      calcDisplay = mo.md(f"{calcNum1} {calcOperator} {calcNum2}")
+      calcDisplay
+
+      if calcOperator.value == "+":
+          calcResult = calcNum1.value + calcNum2.value
+      elif calcOperator.value == "-":
+          calcResult = calcNum1.value - calcNum2.value
+      elif calcOperator.value == "*":
+          calcResult = calcNum1.value * calcNum2.value
+      else:
+          calcResult = calcNum1.value / calcNum2.value if calcNum2.value != 0 else "오류"
+
+      calcOutput = mo.md(f"결과: {calcResult}")
+      calcOutput
+
+- id: practice
+  title: 27일차 복습
+  subtitle: marimo 미션
+  blocks:
+  - type: text
+    content: 27일차에서 배운 marimo를 복습하는 미션입니다. 각 미션을 통해 모듈 불러오기, 텍스트 입력, 숫자 슬라이더, 선택 위젯들, 테이블, 폼까지 모든 내용을 종합적으로 연습합니다.
+  - type: expansion
+    title: "미션1: 텍스트 입력 위젯"
+    code: |-
+      import marimo as mo
+
+      mission1Name = mo.ui.text(label="이름")
+      mission1Name
+      mission1Result = mo.md(f"입력: {mission1Name.value}")
+      mission1Result
+  - type: expansion
+    title: "미션2: 슬라이더 위젯"
+    code: |-
+      mission2Slider = mo.ui.slider(start=0, stop=100, value=50, label="값")
+      mission2Slider
+      mission2Result = mo.md(f"값: {mission2Slider.value}")
+      mission2Result
+  - type: expansion
+    title: "미션3: 체크박스 위젯"
+    code: |-
+      mission3Check = mo.ui.checkbox(label="동의")
+      mission3Check
+      mission3Result = mo.md(f"동의: {mission3Check.value}")
+      mission3Result
+  - type: expansion
+    title: "미션4: 드롭다운 위젯"
+    code: |-
+      mission4Dropdown = mo.ui.dropdown(options=["A", "B", "C"], label="선택")
+      mission4Dropdown
+      mission4Result = mo.md(f"선택: {mission4Dropdown.value}")
+      mission4Result
+  - type: expansion
+    title: "미션5: 라디오 버튼 위젯"
+    code: |-
+      mission5Radio = mo.ui.radio(options=["옵션1", "옵션2"], value="옵션1")
+      mission5Radio
+      mission5Result = mo.md(f"선택: {mission5Radio.value}")
+      mission5Result
+  - type: expansion
+    title: "미션6: 테이블 위젯"
+    code: |-
+      mission6Data = [{"이름": "A", "값": 1}, {"이름": "B", "값": 2}]
+      mission6Table = mo.ui.table(mission6Data)
+      mission6Table
+  - type: expansion
+    title: "미션7: 폼 위젯"
+    code: |-
+      mission7Form = mo.ui.form({
+          "name": mo.ui.text(label="이름"),
+          "age": mo.ui.number(value=20, label="나이")
+      })
+      mission7Form
+  - type: expansion
+    title: "미션8: 종합 프로젝트 - BMI 계산기"
+    code: |-
+      bmiHeight = mo.ui.number(value=170, label="키(cm)")
+      bmiWeight = mo.ui.number(value=70, label="몸무게(kg)")
+
+      bmiHeightM = bmiHeight.value / 100
+      bmiValue = bmiWeight.value / (bmiHeightM ** 2)
+      bmiResult = mo.md(f"BMI: {bmiValue:.1f}")
+
+      mo.md(f"{bmiHeight.value}cm, {bmiWeight.value}kg")
+      bmiResult

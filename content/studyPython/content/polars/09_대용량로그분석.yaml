@@ -1,0 +1,374 @@
+meta:
+  id: polars_09
+  title: 대용량로그분석
+  order: 9
+  category: polars
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["lazy", "collect", "explain", "query optimization", "log analysis"]
+  seo:
+    title: "Polars Lazy 실행 - 대용량 로그 패턴 분석"
+    description: "Polars의 Lazy Evaluation으로 대용량 로그를 효율적으로 분석합니다. lazy, collect, explain으로 쿼리 최적화를 경험합니다."
+    keywords: ["Polars lazy", "collect", "explain", "쿼리 최적화", "로그 분석"]
+
+intro:
+  emoji: "📊"
+  goal: 서버 로그 데이터에서 "에러 패턴과 시간대별 트래픽"을 분석합니다.
+  description: Lazy Evaluation을 배웁니다. lazy()로 쿼리를 지연 실행하고, explain()으로 최적화된 계획을 확인합니다.
+
+sections:
+- id: step1_generate
+  title: 1단계. 로그 데이터 생성
+  subtitle: 대용량 로그 시뮬레이션
+  blocks:
+  - type: text
+    content: 실제 서버 환경을 시뮬레이션하는 10,000건의 로그 데이터를 생성합니다. 프로덕션 환경의 웹 서버는 초당 수백에서 수천 건의 로그를 생성하며, 이 데이터에는 요청 시각(timestamp), 로그 수준(level), API 엔드포인트(endpoint), 응답 시간(responseTime), HTTP 상태 코드(statusCode) 등이 포함됩니다. 로그 분석은 서비스 모니터링, 장애 진단, 성능 최적화에 필수적이며, DevOps와 SRE의 핵심 업무입니다. 실무에서는 ElasticSearch, Splunk 같은 로그 수집 시스템에서 데이터를 추출하여 Polars로 분석합니다. 대용량 로그는 일반적인 방법으로는 처리가 느리지만, Polars의 Lazy Evaluation을 사용하면 효율적으로 분석할 수 있습니다.
+  - type: code
+    language: python
+    title: 라이브러리 및 설정
+    description: 필요한 라이브러리와 기본값 정의
+    content: |-
+      import polars as pl
+      import random
+      from datetime import datetime, timedelta
+
+      random.seed(42)
+      n = 10000
+      levels = ["INFO", "WARN", "ERROR", "DEBUG"]
+      endpoints = ["/api/users", "/api/products", "/api/orders", "/api/auth", "/api/search"]
+      statusCodes = [200, 201, 400, 401, 403, 404, 500, 502, 503]
+  - type: code
+    language: python
+    title: 로그 데이터 생성
+    description: 10,000건의 서버 로그
+    content: |-
+      baseTime = datetime(2024, 1, 1)
+      timestamps = [baseTime + timedelta(seconds=random.randint(0, 86400 * 7)) for _ in range(n)]
+      logs = pl.DataFrame({
+          "timestamp": timestamps, "level": [random.choice(levels) for _ in range(n)],
+          "endpoint": [random.choice(endpoints) for _ in range(n)],
+          "responseTime": [random.randint(10, 5000) for _ in range(n)],
+          "statusCode": [random.choice(statusCodes) for _ in range(n)]
+      })
+      logs.shape
+
+- id: step2_preview
+  title: 2단계. 데이터 미리보기
+  subtitle: 구조 확인
+  blocks:
+  - type: text
+    content: 생성된 로그 데이터의 구조와 샘플을 확인합니다. timestamp는 DateTime 타입으로 시간 연산이 가능하고, level과 endpoint는 문자열 타입으로 그룹 분석에 사용됩니다. responseTime은 밀리초 단위의 정수로 성능 지표를 나타내며, statusCode는 HTTP 응답 코드로 요청 성공 여부를 판단할 수 있습니다. 데이터 분석의 첫 단계는 항상 스키마 확인입니다. 데이터 타입을 정확히 파악해야 어떤 연산과 함수를 사용할 수 있는지 알 수 있고, 타입 변환이 필요한지 판단할 수 있습니다. head()로 상위 5개 행을 보면 데이터의 전반적인 패턴을 빠르게 이해할 수 있습니다.
+  - type: code
+    language: python
+    title: 미리보기
+    description: 스키마와 상위 5건
+    content: |-
+      logs.head()
+
+- id: step3_eager
+  title: 3단계. Eager 실행
+  subtitle: 기존 방식
+  blocks:
+  - type: text
+    content: 지금까지 배운 Polars의 기본 방식은 Eager Execution(즉시 실행)입니다. filter, group_by, agg, sort 등의 메서드를 호출하면 해당 연산이 즉시 수행되고 결과 DataFrame이 반환됩니다. 이 방식은 직관적이고 이해하기 쉬워 대부분의 작업에 적합하지만, 복잡한 쿼리나 대용량 데이터에서는 비효율적일 수 있습니다. 예를 들어 필터링 전에 불필요한 컬럼까지 모두 읽어오거나, 중간 결과를 매번 메모리에 저장하는 오버헤드가 발생합니다. pandas도 Eager 방식만 지원하지만, Polars는 Lazy Evaluation이라는 강력한 대안을 제공합니다.
+  - type: code
+    language: python
+    title: Eager 실행
+    description: 연산이 바로 실행됨
+    content: |-
+      result = (
+          logs
+          .filter(pl.col("level") == "ERROR")
+          .group_by("endpoint")
+          .agg(pl.col("responseTime").mean().alias("avgTime"))
+          .sort("avgTime", descending=True)
+      )
+      result
+
+- id: step4_lazy_intro
+  title: 4단계. Lazy 모드 진입
+  subtitle: lazy()
+  blocks:
+  - type: text
+    content: lazy()를 호출하면 DataFrame이 LazyFrame으로 변환됩니다. LazyFrame은 연산을 즉시 실행하지 않고 쿼리 계획(query plan)만 수집하는 특별한 객체입니다. 이는 SQL의 실행 계획이나 Apache Spark의 Lazy Evaluation과 동일한 개념입니다. 쿼리 계획은 "어떤 연산을 어떤 순서로 수행할지"에 대한 청사진으로, 실제 데이터는 건드리지 않습니다. Lazy 모드의 핵심 아이디어는 "모든 연산을 한꺼번에 보고 최적화할 수 있다"는 것입니다. Eager 모드에서는 각 단계마다 즉시 실행되어 최적화 기회가 제한되지만, Lazy 모드에서는 전체 파이프라인을 분석하여 불필요한 연산을 제거하고 순서를 재배치할 수 있습니다. 대용량 데이터 처리에서 Lazy Evaluation은 10배 이상의 성능 향상을 가져올 수 있습니다.
+  - type: code
+    language: python
+    title: Lazy 모드 진입
+    description: LazyFrame 생성
+    content: |-
+      lazyLogs = logs.lazy()
+      type(lazyLogs)
+  - type: tip
+    content: lazy()는 DataFrame을 LazyFrame으로 변환합니다. LazyFrame은 쿼리를 즉시 실행하지 않고 계획만 저장하는 지연 실행 객체입니다. 이는 SQL 데이터베이스의 실행 계획이나 Spark의 transformation과 유사한 개념으로, 최종 결과가 필요한 시점까지 실제 연산을 미룹니다. 대용량 CSV 파일을 읽을 때도 pl.scan_csv()를 사용하면 처음부터 LazyFrame으로 불러올 수 있어, 파일 전체를 메모리에 로드하지 않고 필요한 부분만 읽을 수 있습니다. Lazy 모드는 특히 필터링이 강한 쿼리, 복잡한 집계, 다중 조인에서 큰 성능 이점을 제공합니다.
+
+- id: step5_lazy_chain
+  title: 5단계. Lazy 체이닝
+  subtitle: 쿼리 계획 수집
+  blocks:
+  - type: text
+    content: LazyFrame에 filter, group_by, agg, sort 등의 연산을 체이닝하면 쿼리 계획이 차례로 누적됩니다. 중요한 점은 이 시점에서는 아무것도 실행되지 않는다는 것입니다. 데이터를 읽지도, 필터링하지도, 집계하지도 않습니다. 단지 "이런 연산을 이런 순서로 할 예정이다"라는 계획만 기록됩니다. 이렇게 쌓인 쿼리 계획은 나중에 Polars의 쿼리 옵티마이저가 분석하여 최적화합니다. 예를 들어 "필터링 후 특정 컬럼만 선택"하는 쿼리가 있다면, 옵티마이저는 "필요한 컬럼만 먼저 읽고 필터링"하도록 순서를 재배치합니다(Projection Pushdown). 이런 최적화는 Eager 모드에서는 불가능합니다. LazyFrame은 여러 연산을 체이닝하면서도 메모리를 거의 사용하지 않으며, 실제 실행 전까지는 문법 오류만 검사합니다.
+  - type: code
+    language: python
+    title: Lazy 체이닝
+    description: 쿼리 계획만 수집
+    content: |-
+      lazyQuery = (
+          lazyLogs
+          .filter(pl.col("level") == "ERROR")
+          .group_by("endpoint")
+          .agg(pl.col("responseTime").mean().alias("avgTime"))
+          .sort("avgTime", descending=True)
+      )
+      type(lazyQuery)
+
+- id: step6_collect
+  title: 6단계. 실행하기
+  subtitle: collect()
+  blocks:
+  - type: text
+    content: collect()를 호출하는 순간 쿼리가 실제로 실행됩니다. LazyFrame에 쌓인 모든 연산이 한꺼번에 처리되며, Polars의 쿼리 옵티마이저가 최적화된 실행 계획을 생성합니다. collect()는 최종 DataFrame을 반환하므로, 이후에는 다시 Eager 모드가 됩니다. Polars는 collect() 호출 시 자동으로 여러 최적화 기법을 적용합니다. Predicate Pushdown(필터를 최대한 앞으로), Projection Pushdown(필요한 컬럼만 선택), Common Subexpression Elimination(중복 계산 제거), Parallel Execution(병렬 처리) 등이 자동으로 수행됩니다. 사용자는 이런 최적화를 신경 쓸 필요 없이 collect()만 호출하면 됩니다. 실무에서는 쿼리를 개발할 때는 Lazy로 작성하고, 최종 결과가 필요한 시점에만 collect()를 호출하는 것이 좋습니다.
+  - type: code
+    language: python
+    title: 쿼리 실행
+    description: collect()로 실행
+    content: |-
+      lazyQuery.collect()
+  - type: tip
+    content: collect()는 LazyFrame의 쿼리 계획을 실행하여 DataFrame을 반환합니다. Polars의 쿼리 옵티마이저가 자동으로 최적화를 수행하므로, 수동으로 작성한 쿼리보다 훨씬 빠른 경우가 많습니다. SQL의 EXPLAIN ANALYZE와 유사하게, explain()으로 최적화된 계획을 미리 확인할 수 있습니다. Lazy 쿼리는 중간 결과를 메모리에 저장하지 않고 스트리밍 방식으로 처리하므로 메모리 효율도 뛰어납니다. 대용량 CSV 파일(수 GB 이상)을 처리할 때 pl.scan_csv().lazy()로 시작하면 파일 전체를 메모리에 로드하지 않고도 분석할 수 있습니다. fetch(n) 메서드를 사용하면 상위 n개 행만 빠르게 테스트할 수도 있습니다.
+
+- id: step7_explain
+  title: 7단계. 쿼리 계획 확인
+  subtitle: explain()
+  blocks:
+  - type: text
+    content: explain() 메서드는 LazyFrame의 최적화된 실행 계획을 문자열로 반환합니다. 이는 SQL의 EXPLAIN 명령과 동일한 역할로, Polars가 실제로 어떤 순서로 연산을 수행할지 보여줍니다. 실행 계획을 보면 FILTER, SELECT, GROUP BY, SORT 등의 연산이 어떤 순서로 배치되는지 확인할 수 있습니다. 특히 Predicate Pushdown이 적용되었는지 확인하려면 FILTER 연산이 앞쪽에 있는지 살펴보면 됩니다. explain()은 실제로 데이터를 처리하지 않으므로 매우 빠르며, 쿼리를 실행하기 전에 최적화 여부를 검증할 수 있습니다. 대용량 데이터를 다룰 때는 explain()으로 쿼리 계획을 먼저 확인하고, 비효율적인 부분이 있으면 쿼리를 수정한 후 collect()를 실행하는 것이 좋습니다. 실무에서는 성능 문제를 디버깅할 때 explain()이 필수 도구입니다.
+  - type: code
+    language: python
+    title: 쿼리 계획 확인
+    description: 최적화된 실행 순서
+    content: |-
+      lazyQuery.explain()
+  - type: tip
+    content: explain()은 최적화된 쿼리 계획을 트리 구조의 문자열로 반환합니다. 출력 결과에서 FILTER, SELECT, PROJECT, AGGREGATE, SORT 등의 연산을 확인할 수 있으며, 들여쓰기로 연산 순서를 표현합니다. 계획 트리의 위쪽이 먼저 실행되는 연산입니다. Predicate Pushdown이 적용되면 FILTER가 상단에 배치되고, Projection Pushdown이 적용되면 필요한 컬럼만 선택하는 PROJECT가 앞에 옵니다. explain()과 함께 describe_optimized_plan()을 사용하면 더 상세한 최적화 정보를 볼 수 있습니다. SQL 데이터베이스의 EXPLAIN ANALYZE처럼 실제 실행 시간은 보여주지 않지만, 쿼리 구조를 이해하고 최적화 여부를 확인하는 데 매우 유용합니다.
+
+- id: step8_optimization
+  title: 8단계. 최적화 효과
+  subtitle: Predicate Pushdown
+  blocks:
+  - type: text
+    content: Lazy Evaluation의 가장 강력한 최적화 기법은 Predicate Pushdown입니다. 이는 필터 조건을 가능한 한 빨리 적용하여 처리할 데이터의 양을 최소화하는 기법입니다. 예를 들어 "전체 데이터를 읽고 → 여러 컬럼을 계산하고 → 필터링"하는 쿼리가 있다면, Polars는 "필터링 후 → 필요한 데이터만 읽고 → 계산"하도록 순서를 재배치합니다. 이렇게 하면 불필요한 행에 대한 연산을 완전히 건너뛸 수 있습니다. 10,000건 중 100건만 필터링된다면, 나머지 9,900건에 대한 모든 계산을 피할 수 있어 10배 이상의 성능 향상이 가능합니다. Projection Pushdown도 함께 적용되어 필요한 컬럼만 읽어오므로 메모리와 I/O 비용도 줄어듭니다. 이런 최적화는 데이터베이스 엔진과 동일한 수준이며, Polars는 이를 자동으로 수행합니다. explain()으로 확인하면 FILTER가 상단에 배치된 것을 볼 수 있습니다.
+  - type: code
+    language: python
+    title: 파생변수 추가 및 필터
+    description: 시간, 에러 플래그, 응답시간 조건
+    content: |-
+      complexQuery = logs.lazy().with_columns(
+          pl.col("timestamp").dt.hour().alias("hour"),
+          pl.when(pl.col("statusCode") >= 500).then(pl.lit(1)).otherwise(pl.lit(0)).alias("isError")
+      ).filter(pl.col("responseTime") > 100)
+      type(complexQuery)
+  - type: code
+    language: python
+    title: 집계 및 정렬
+    description: 시간대별 엔드포인트 통계
+    content: |-
+      complexQuery = complexQuery.group_by(["hour", "endpoint"]).agg([
+          pl.col("responseTime").mean().alias("avgTime"),
+          pl.col("isError").sum().alias("errorCount"),
+          pl.len().alias("requestCount")
+      ]).sort(["hour", "avgTime"], descending=[False, True])
+      complexQuery.explain()
+
+- id: step9_collect_result
+  title: 9단계. 복잡한 쿼리 실행
+  subtitle: 최적화된 결과
+  blocks:
+  - type: text
+    content: 복잡한 쿼리도 collect() 한 번으로 최적화되어 실행됩니다. 여러 단계의 변환, 필터, 집계가 포함된 쿼리라도 Polars는 전체 파이프라인을 분석하여 최적의 실행 순서를 찾아냅니다. 예를 들어 시간대 추출, 에러 플래그 생성, 응답 시간 필터링, 다중 그룹 집계, 정렬이 모두 포함된 쿼리에서도 Polars는 필터를 먼저 적용하고, 필요한 컬럼만 읽고, 중복 계산을 제거하는 등의 최적화를 자동으로 수행합니다. 병렬 처리도 자동으로 적용되어 멀티코어 CPU를 효율적으로 활용합니다. 사용자는 복잡한 최적화 전략을 고민할 필요 없이 직관적으로 쿼리를 작성하기만 하면 됩니다. 이것이 Lazy Evaluation의 핵심 가치입니다.
+  - type: code
+    language: python
+    title: 복잡한 쿼리 실행
+    description: 시간대별 엔드포인트 통계
+    content: |-
+      complexQuery.collect()
+
+- id: step10_error_pattern
+  title: 10단계. 에러 패턴 분석
+  subtitle: 이전 개념 종합
+  blocks:
+  - type: text
+    content: 서비스 안정성을 위해서는 에러 패턴 분석이 필수적입니다. HTTP 상태 코드 400 이상(클라이언트/서버 에러)인 로그만 필터링하여 어떤 엔드포인트에서 어떤 에러가 얼마나 발생하는지 분석합니다. 엔드포인트와 상태 코드별로 그룹화하면 "특정 API가 특정 에러를 자주 발생시킨다"는 패턴을 발견할 수 있습니다. 에러 발생 횟수와 평균 응답 시간을 함께 보면 "에러가 발생할 때 응답이 느려지는지" 같은 인사이트도 얻을 수 있습니다. 실무에서는 이런 분석 결과를 바탕으로 버그를 수정하거나 인프라를 개선합니다. Lazy 모드로 작성하면 대용량 로그에서도 빠르게 에러 패턴을 추출할 수 있습니다.
+  - type: code
+    language: python
+    title: 에러 필터 및 집계
+    description: 엔드포인트별 에러 분포
+    content: |-
+      errorQuery = logs.lazy().filter(pl.col("statusCode") >= 400).group_by(["endpoint", "statusCode"]).agg([
+          pl.len().alias("count"), pl.col("responseTime").mean().alias("avgTime")
+      ]).sort("count", descending=True)
+      errorPattern = errorQuery.collect()
+      errorPattern.head(10)
+
+- id: step11_peak_hours
+  title: 11단계. 피크 시간대 분석
+  subtitle: 시간대별 트래픽
+  blocks:
+  - type: text
+    content: 트래픽 패턴을 이해하기 위해 시간대별 요청 수와 응답 시간을 분석합니다. dt.hour()로 timestamp에서 시간 정보를 추출하면 0시부터 23시까지의 시간대별 통계를 계산할 수 있습니다. 피크 시간대를 파악하면 서버 리소스를 효율적으로 배치할 수 있습니다. 예를 들어 오후 8시에 요청이 집중된다면 그 시간대에 서버 인스턴스를 늘리는 Auto Scaling 정책을 설정할 수 있습니다. 평균 응답 시간이 특정 시간대에 급증한다면 그 시간에 무거운 작업이 실행되는지 확인해야 합니다. 최대 응답 시간(maxTime)도 함께 보면 느린 요청(outlier)을 감지할 수 있습니다. 시계열 분석은 서비스 모니터링의 기본입니다.
+  - type: code
+    language: python
+    title: 피크 시간대
+    description: 시간대별 트래픽
+    content: |-
+      peakQuery = logs.lazy().with_columns(
+          pl.col("timestamp").dt.hour().alias("hour")
+      ).group_by("hour").agg([
+          pl.len().alias("requestCount"),
+          pl.col("responseTime").mean().alias("avgTime"),
+          pl.col("responseTime").max().alias("maxTime")
+      ]).sort("hour")
+      peakHours = peakQuery.collect()
+      peakHours
+
+- id: step12_slow_requests
+  title: 12단계. 느린 요청 분석
+  subtitle: 응답 시간 임계값
+  blocks:
+  - type: text
+    content: 사용자 경험에 직접 영향을 주는 느린 요청(slow query)을 분석합니다. 응답 시간이 1000ms(1초)를 초과하면 사용자는 지연을 체감하며, 이는 서비스 품질 저하로 이어집니다. 어떤 엔드포인트가 어떤 시간대에 느려지는지 파악하면 성능 병목을 찾을 수 있습니다. 예를 들어 "/api/search"가 특정 시간대에 느려진다면 데이터베이스 인덱스 부족이나 캐시 미스가 원인일 수 있습니다. slowCount와 avgSlowTime을 함께 보면 "자주 느린지, 가끔 매우 느린지"를 구분할 수 있습니다. 실무에서는 이런 분석으로 최적화 우선순위를 정합니다. SLA(Service Level Agreement)에서 보통 95% 요청이 100ms 이내, 99% 요청이 1초 이내 같은 기준을 사용합니다.
+  - type: code
+    language: python
+    title: 느린 요청 분석
+    description: 1초 이상 걸린 요청
+    content: |-
+      slowQuery = logs.lazy().filter(pl.col("responseTime") > 1000).with_columns(
+          pl.col("timestamp").dt.hour().alias("hour")
+      ).group_by(["endpoint", "hour"]).agg([
+          pl.len().alias("slowCount"),
+          pl.col("responseTime").mean().alias("avgSlowTime")
+      ]).sort("slowCount", descending=True).head(10)
+      slowRequests = slowQuery.collect()
+      slowRequests
+
+- id: step13_dashboard
+  title: 13단계. 대시보드 데이터 준비
+  subtitle: 종합 리포트
+  blocks:
+  - type: text
+    content: DevOps 팀의 모니터링 대시보드에 표시할 종합 통계를 준비합니다. 상태 코드를 2xx(성공), 3xx(리다이렉트), 4xx(클라이언트 에러), 5xx(서버 에러)로 그룹화하면 서비스 상태를 한눈에 파악할 수 있습니다. 엔드포인트별, 상태 그룹별로 요청 수, 평균 응답 시간, 95 percentile 응답 시간(p95)을 계산합니다. p95는 "95%의 요청이 이 시간 안에 완료된다"는 의미로, 평균보다 실제 사용자 경험을 더 잘 반영합니다. 평균은 극단값에 영향을 받지만, percentile은 안정적인 지표입니다. 실무에서는 Grafana나 Kibana 같은 대시보드 도구에 이런 통계를 실시간으로 표시하며, Polars로 전처리한 데이터를 시각화 도구에 연결합니다. Lazy 쿼리로 작성하면 대용량 로그에서도 빠르게 대시보드를 업데이트할 수 있습니다.
+  - type: code
+    language: python
+    title: 상태 그룹 분류
+    description: 2xx, 3xx, 4xx, 5xx 분류
+    content: |-
+      withStatus = logs.lazy().with_columns([
+          pl.col("timestamp").dt.hour().alias("hour"),
+          pl.when(pl.col("statusCode") >= 500).then(pl.lit("5xx"))
+          .when(pl.col("statusCode") >= 400).then(pl.lit("4xx"))
+          .when(pl.col("statusCode") >= 300).then(pl.lit("3xx"))
+          .otherwise(pl.lit("2xx")).alias("statusGroup")
+      ])
+      type(withStatus)
+  - type: code
+    language: python
+    title: 대시보드 통계
+    description: 종합 리포트
+    content: |-
+      dashboardQuery = withStatus.group_by(["endpoint", "statusGroup"]).agg([
+          pl.len().alias("count"),
+          pl.col("responseTime").mean().alias("avgTime"),
+          pl.col("responseTime").quantile(0.95).alias("p95Time")
+      ]).sort(["endpoint", "statusGroup"])
+      dashboardStats = dashboardQuery.collect()
+      dashboardStats
+
+- id: practice
+  title: 실습
+  subtitle: 로그 분석 프로젝트
+  blocks:
+  - type: text
+    content: DevOps 엔지니어가 되어 실전 서버 로그 분석 업무를 수행해봅시다. Lazy Evaluation, 시계열 분석, 에러 패턴 탐지, percentile 계산 등 로그 분석에 필요한 모든 개념을 종합적으로 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 요일별 에러율 계산 (Lazy)"
+    blocks:
+    - type: code
+      title: "로그 데이터 생성"
+      content: |-
+        import polars as pl
+        import random
+        from datetime import datetime, timedelta
+
+        random.seed(42)
+        n = 10000
+        levels = ["INFO", "WARN", "ERROR", "DEBUG"]
+        endpoints = ["/api/users", "/api/products", "/api/orders", "/api/auth", "/api/search"]
+        statusCodes = [200, 201, 400, 401, 403, 404, 500, 502, 503]
+        baseTime = datetime(2024, 1, 1)
+        timestamps = [baseTime + timedelta(seconds=random.randint(0, 86400 * 7)) for _ in range(n)]
+        logRaw = pl.DataFrame({"timestamp": timestamps, "level": [random.choice(levels) for _ in range(n)],
+            "endpoint": [random.choice(endpoints) for _ in range(n)],
+            "responseTime": [random.randint(10, 5000) for _ in range(n)],
+            "statusCode": [random.choice(statusCodes) for _ in range(n)]})
+    - type: code
+      title: "에러 플래그 및 집계"
+      content: |-
+        errorQuery = logRaw.lazy().with_columns([
+            pl.col("timestamp").dt.weekday().alias("weekday"),
+            pl.when(pl.col("statusCode") >= 400).then(pl.lit(1)).otherwise(pl.lit(0)).alias("isError")
+        ]).group_by("weekday").agg([pl.len().alias("total"), pl.col("isError").sum().alias("errors")])
+        errorQuery.collect().head()
+    - type: code
+      title: "에러율 계산"
+      content: |-
+        weekdayError = errorQuery.with_columns(
+            (pl.col("errors") * 100.0 / pl.col("total")).round(2).alias("errorRate")
+        ).sort("weekday").collect()
+        weekdayError
+  - type: expansion
+    title: "미션2: 엔드포인트별 응답 시간 분포 (p50, p95, p99)"
+    blocks:
+    - type: code
+      title: "로그 데이터 생성"
+      content: |-
+        import polars as pl
+        import random
+        from datetime import datetime, timedelta
+
+        random.seed(42)
+        n = 10000
+        levels = ["INFO", "WARN", "ERROR", "DEBUG"]
+        endpoints = ["/api/users", "/api/products", "/api/orders", "/api/auth", "/api/search"]
+        statusCodes = [200, 201, 400, 401, 403, 404, 500, 502, 503]
+        baseTime = datetime(2024, 1, 1)
+        timestamps = [baseTime + timedelta(seconds=random.randint(0, 86400 * 7)) for _ in range(n)]
+        requestRaw = pl.DataFrame({"timestamp": timestamps, "level": [random.choice(levels) for _ in range(n)],
+            "endpoint": [random.choice(endpoints) for _ in range(n)],
+            "responseTime": [random.randint(10, 5000) for _ in range(n)],
+            "statusCode": [random.choice(statusCodes) for _ in range(n)]})
+    - type: code
+      title: "응답 시간 분포 계산"
+      content: |-
+        latencyQuery = requestRaw.lazy().group_by("endpoint").agg([
+            pl.col("responseTime").quantile(0.5).alias("p50"),
+            pl.col("responseTime").quantile(0.95).alias("p95"),
+            pl.col("responseTime").quantile(0.99).alias("p99")
+        ]).sort("p95", descending=True)
+        responseLatency = latencyQuery.collect()
+        responseLatency
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Lazy Evaluation을 마스터했습니다! 대용량 로그 데이터를 효율적으로 분석하는 방법을 배웠고, Polars의 강력한 쿼리 최적화 엔진을 활용할 수 있게 되었습니다. Lazy 모드는 pandas와 Polars를 구분하는 핵심 기능이며, 프로덕션 환경에서 대용량 데이터를 다룰 때 필수적인 기술입니다. 이제 수 GB의 로그 파일도 메모리 부족 없이 분석할 수 있습니다.
+  - type: list
+    items:
+    - "lazy() - LazyFrame으로 변환"
+    - "collect() - 쿼리 실행"
+    - "explain() - 쿼리 계획 확인"
+    - "Predicate Pushdown - 필터 먼저 적용"
+    - "쿼리 최적화 - Polars가 자동 수행"
+  - type: text
+    content: 다음 시간에는 실전 종합 프로젝트입니다. 모든 개념을 활용한 데이터 파이프라인을 구축합니다.

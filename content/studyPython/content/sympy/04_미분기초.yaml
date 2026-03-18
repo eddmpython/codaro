@@ -1,0 +1,398 @@
+meta:
+  id: sympy_04
+  title: 미분기초
+  order: 4
+  category: sympy
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["sympy", "diff", "미분", "도함수", "접선", "편미분"]
+  seo:
+    title: "SymPy 미분 - diff 사용법과 접선의 방정식"
+    description: "SymPy로 함수를 미분하고 접선의 방정식을 구합니다. diff()로 도함수를 구하고 고차 미분, 편미분을 배웁니다."
+    keywords: ["sympy", "diff", "미분", "도함수", "derivative", "접선"]
+
+intro:
+  emoji: "📐"
+  goal: diff()로 함수를 미분하고 접선의 방정식을 구합니다.
+  description: "미분은 함수의 순간 변화율을 구하는 연산으로, 미적분학의 핵심입니다. 속도, 가속도, 기울기, 최적화 등 수많은 응용이 있습니다. SymPy의 diff()는 x²을 2x로, sin(x)를 cos(x)로 정확하게 미분합니다. 손으로 계산하면 연쇄법칙, 곱의 미분에서 실수하기 쉬운데, SymPy는 어떤 복잡한 함수도 정확하게 처리합니다. 이 프로젝트를 완료하면 도함수 계산, 접선의 방정식, 극값 찾기까지 할 수 있게 됩니다."
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "미분에 필요한 함수들을 불러옵니다. diff()가 핵심 함수이며, sin, cos, tan은 삼각함수, exp는 지수함수 eˣ, log는 자연로그 ln(x)입니다. 이 함수들의 미분은 미적분학에서 가장 기본적인 공식으로, SymPy가 모두 정확하게 처리합니다. simplify와 expand는 미분 결과를 정리할 때 사용합니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sympy 함수들을 불러옵니다
+    content: |-
+      from sympy import symbols, diff, simplify, expand, solve, Eq
+      from sympy import sin, cos, tan, exp, log, sqrt, pi
+      from sympy import init_printing
+      init_printing()
+
+- id: step2_diff_basic
+  title: 2단계. 기본 미분
+  subtitle: diff()
+  blocks:
+  - type: text
+    content: "diff()는 differentiate(미분하다)의 줄임말로, 함수의 도함수를 구합니다. diff(f, x)는 f를 x에 대해 미분합니다. 기본 공식 xⁿ의 미분은 n×xⁿ⁻¹입니다. x²을 미분하면 2x, x³을 미분하면 3x²가 됩니다. 상수의 미분은 0입니다. 이 규칙들을 diff()가 자동으로 적용합니다."
+  - type: code
+    language: python
+    title: 기호 정의
+    description: 변수 x를 정의합니다
+    content: |-
+      x = symbols('x')
+  - type: code
+    language: python
+    title: 다항식 미분
+    description: x²을 미분합니다
+    content: |-
+      f = x**2
+      df = diff(f, x)
+      df
+  - type: code
+    language: python
+    title: 더 복잡한 다항식
+    description: 3차 다항식을 미분합니다
+    content: |-
+      g = x**3 - 2*x**2 + 5*x - 3
+      dg = diff(g, x)
+      dg
+  - type: tip
+    content: diff(수식, 변수)로 미분합니다. 다항식 xⁿ의 미분은 n×xⁿ⁻¹입니다. 상수의 미분은 0입니다.
+
+- id: step3_rules
+  title: 3단계. 미분 규칙
+  subtitle: 합, 곱, 몫
+  blocks:
+  - type: text
+    content: "SymPy는 미분의 기본 규칙들을 자동으로 적용합니다. 합의 미분 (f+g)' = f'+g'는 각 항을 따로 미분합니다. 곱의 미분 (fg)' = f'g + fg'는 라이프니츠 규칙입니다. 몫의 미분 (f/g)' = (f'g - fg')/g²도 자동 적용됩니다. 손으로 계산하면 부호 실수가 잦은 이 규칙들을 SymPy가 정확하게 처리합니다."
+  - type: code
+    language: python
+    title: 합의 미분
+    description: 각 항을 따로 미분합니다
+    content: |-
+      h = x**2 + 3*x + 1
+      dh = diff(h, x)
+      dh
+  - type: code
+    language: python
+    title: 곱의 미분
+    description: 곱셈 규칙을 적용합니다
+    content: |-
+      prod = x**2 * (x + 1)
+      dprod = diff(prod, x)
+      expand(dprod)
+  - type: code
+    language: python
+    title: 몫의 미분
+    description: 나눗셈 규칙을 적용합니다
+    content: |-
+      quot = x / (x + 1)
+      dquot = diff(quot, x)
+      simplify(dquot)
+  - type: tip
+    content: 곱의 미분은 (fg)' = f'g + fg'입니다. 몫의 미분은 (f/g)' = (f'g - fg')/g²입니다. SymPy가 자동 적용합니다.
+
+- id: step4_special
+  title: 4단계. 특수 함수 미분
+  subtitle: sin, cos, exp, log
+  blocks:
+  - type: text
+    content: "삼각함수, 지수함수, 로그함수는 특별한 미분 공식을 가집니다. (sin x)' = cos x, (cos x)' = -sin x로 삼각함수끼리 순환합니다. (eˣ)' = eˣ로 지수함수는 자기 자신이 도함수입니다. (ln x)' = 1/x로 로그함수는 역수가 됩니다. 이 공식들은 미적분학의 기본으로, 반드시 암기해야 합니다. SymPy로 검증하면서 익히세요."
+  - type: code
+    language: python
+    title: 삼각함수 미분
+    description: sin, cos을 미분합니다
+    content: |-
+      dsin = diff(sin(x), x)
+      dcos = diff(cos(x), x)
+      dsin, dcos
+  - type: code
+    language: python
+    title: 지수함수 미분
+    description: eˣ를 미분합니다
+    content: |-
+      dexp = diff(exp(x), x)
+      dexp
+  - type: code
+    language: python
+    title: 로그함수 미분
+    description: ln(x)를 미분합니다
+    content: |-
+      dlog = diff(log(x), x)
+      dlog
+  - type: tip
+    content: (sin x)' = cos x, (cos x)' = -sin x, (eˣ)' = eˣ, (ln x)' = 1/x입니다. 이것은 암기해야 할 기본 공식입니다.
+
+- id: step5_chain
+  title: 5단계. 연쇄 법칙
+  subtitle: 합성함수 미분
+  blocks:
+  - type: text
+    content: "연쇄 법칙(chain rule)은 합성함수 f(g(x))를 미분하는 규칙입니다. 바깥 함수를 미분하고 안쪽 함수의 미분을 곱합니다. sin(x²)의 미분은 cos(x²)×2x = 2x·cos(x²)입니다. e^(3x)의 미분은 e^(3x)×3 = 3e^(3x)입니다. 복잡한 합성함수일수록 연쇄 법칙을 손으로 적용하기 어려운데, SymPy는 아무리 복잡해도 정확하게 처리합니다."
+  - type: code
+    language: python
+    title: sin(x²) 미분
+    description: 합성함수를 미분합니다
+    content: |-
+      comp1 = sin(x**2)
+      dcomp1 = diff(comp1, x)
+      dcomp1
+  - type: code
+    language: python
+    title: e^(3x) 미분
+    description: 지수 합성함수를 미분합니다
+    content: |-
+      comp2 = exp(3*x)
+      dcomp2 = diff(comp2, x)
+      dcomp2
+  - type: code
+    language: python
+    title: ln(x²+1) 미분
+    description: 로그 합성함수를 미분합니다
+    content: |-
+      comp3 = log(x**2 + 1)
+      dcomp3 = diff(comp3, x)
+      dcomp3
+
+- id: step6_higher
+  title: 6단계. 고차 미분
+  subtitle: 2차, 3차 미분
+  blocks:
+  - type: text
+    content: "고차 미분은 도함수를 다시 미분하는 것입니다. diff(f, x, 2)는 f를 x로 두 번 미분하여 2차 도함수 f''를 구합니다. x³을 미분하면 3x², 한 번 더 미분하면 6x, 세 번째는 6, 네 번째는 0입니다. 물리학에서 위치의 1차 미분은 속도, 2차 미분은 가속도입니다. sin(x)는 4번 미분하면 다시 sin(x)로 돌아오는 재미있는 패턴이 있습니다."
+  - type: code
+    language: python
+    title: 2차 미분
+    description: x³을 두 번 미분합니다
+    content: |-
+      func = x**3
+      d1 = diff(func, x)
+      d2 = diff(func, x, 2)
+      d1, d2
+  - type: code
+    language: python
+    title: 3차 미분
+    description: 세 번 미분합니다
+    content: |-
+      d3 = diff(func, x, 3)
+      d3
+  - type: code
+    language: python
+    title: sin 고차 미분
+    description: sin의 미분 패턴을 확인합니다
+    content: |-
+      s1 = diff(sin(x), x, 1)
+      s2 = diff(sin(x), x, 2)
+      s3 = diff(sin(x), x, 3)
+      s4 = diff(sin(x), x, 4)
+      s1, s2, s3, s4
+  - type: tip
+    content: sin x를 4번 미분하면 다시 sin x가 됩니다. 주기가 4입니다. diff(f, x, n)으로 n차 미분을 한 번에 계산합니다.
+
+- id: step7_partial
+  title: 7단계. 편미분
+  subtitle: 다변수 함수
+  blocks:
+  - type: text
+    content: "편미분(partial derivative)은 여러 변수가 있는 함수에서 특정 변수만 미분하고 나머지는 상수로 취급하는 것입니다. f(x,y) = x²y + xy²에서 x로 편미분하면 y를 상수로 보고 2xy + y²가 됩니다. y로 편미분하면 x를 상수로 보고 x² + 2xy가 됩니다. 다변수 함수의 그래디언트, 경제학의 한계효용, 열역학의 상태방정식 등에서 편미분이 필수입니다."
+  - type: code
+    language: python
+    title: 두 변수 함수
+    description: f(x,y) = x²y + xy²
+    content: |-
+      y = symbols('y')
+      fxy = x**2 * y + x * y**2
+      fxy
+  - type: code
+    language: python
+    title: x로 편미분
+    description: y를 상수로 취급합니다
+    content: |-
+      dfx = diff(fxy, x)
+      dfx
+  - type: code
+    language: python
+    title: y로 편미분
+    description: x를 상수로 취급합니다
+    content: |-
+      dfy = diff(fxy, y)
+      dfy
+  - type: code
+    language: python
+    title: 혼합 편미분
+    description: x로 먼저, y로 다음에 미분
+    content: |-
+      dfxy = diff(fxy, x, y)
+      dfxy
+  - type: tip
+    content: 편미분에서 다른 변수는 상수로 취급합니다. diff(f, x, y)는 먼저 x로, 그 다음 y로 미분합니다.
+
+- id: step8_tangent
+  title: 8단계. 접선의 방정식
+  subtitle: 미분의 응용
+  blocks:
+  - type: text
+    content: "접선의 방정식은 미분의 가장 대표적인 응용입니다. 곡선 y=f(x) 위의 점 (a, f(a))에서 접선의 기울기는 그 점에서의 미분값 f'(a)입니다. 접선의 방정식은 y = f'(a)(x-a) + f(a)입니다. 예를 들어 y=x²에서 x=2일 때, f(2)=4, f'(2)=4이므로 접선은 y=4(x-2)+4=4x-4입니다. 물리학의 순간 속도, 경제학의 한계 비용 등이 모두 이 개념입니다."
+  - type: code
+    language: python
+    title: 함수와 도함수
+    description: f(x) = x²의 접선 준비
+    content: |-
+      func = x**2
+      dfunc = diff(func, x)
+      func, dfunc
+  - type: code
+    language: python
+    title: x=2에서 접선
+    description: 접점의 좌표와 기울기 계산
+    content: |-
+      a = 2
+      yVal = func.subs(x, a)
+      slope = dfunc.subs(x, a)
+      yVal, slope
+  - type: code
+    language: python
+    title: 접선의 방정식
+    description: y = 기울기 × (x - a) + f(a)
+    content: |-
+      tangent = slope * (x - a) + yVal
+      expand(tangent)
+  - type: tip
+    content: 접선의 기울기는 그 점에서의 미분값입니다. y = f'(a)(x - a) + f(a) 공식을 사용합니다.
+
+- id: step9_extrema
+  title: 9단계. 극값 찾기
+  subtitle: 미분으로 최대/최소
+  blocks:
+  - type: text
+    content: "함수의 극대점(local maximum)과 극소점(local minimum)은 도함수가 0인 점에서 발생합니다. 먼저 solve(f', x)로 임계점(critical point)을 찾습니다. 그 다음 2차 도함수 f''를 이용해 판별합니다. f''(a) > 0이면 아래로 볼록하여 극소, f''(a) < 0이면 위로 볼록하여 극대입니다. 최적화 문제에서 비용을 최소화하거나 수익을 최대화하는 점을 찾을 때 이 방법을 사용합니다."
+  - type: code
+    language: python
+    title: 3차 함수
+    description: 극값을 가지는 함수
+    content: |-
+      cubic = x**3 - 3*x
+      dcubic = diff(cubic, x)
+      cubic, dcubic
+  - type: code
+    language: python
+    title: 임계점 찾기
+    description: f'(x) = 0인 점
+    content: |-
+      critical = solve(dcubic, x)
+      critical
+  - type: code
+    language: python
+    title: 2차 미분 판별
+    description: f''로 극대/극소 판별
+    content: |-
+      d2cubic = diff(cubic, x, 2)
+      test1 = d2cubic.subs(x, critical[0])
+      test2 = d2cubic.subs(x, critical[1])
+      test1, test2
+  - type: tip
+    content: f''(a) > 0이면 극소, f''(a) < 0이면 극대입니다. x=-1에서 극대, x=1에서 극소입니다.
+
+- id: step10_velocity
+  title: 10단계. 속도와 가속도
+  subtitle: 물리적 의미
+  blocks:
+  - type: text
+    content: "물리학에서 미분의 가장 직관적인 응용은 운동입니다. 위치 함수 s(t)를 시간 t로 미분하면 순간 속도 v(t) = ds/dt가 됩니다. 속도를 한 번 더 미분하면 가속도 a(t) = dv/dt = d²s/dt²가 됩니다. s(t) = t³-6t²+9t일 때 속도 v(t) = 3t²-12t+9, 가속도 a(t) = 6t-12입니다. v(t)=0인 시점에서 물체가 정지합니다."
+  - type: code
+    language: python
+    title: 위치 함수
+    description: s(t) = t³ - 6t² + 9t
+    content: |-
+      t = symbols('t')
+      position = t**3 - 6*t**2 + 9*t
+      position
+  - type: code
+    language: python
+    title: 속도 함수
+    description: v = ds/dt
+    content: |-
+      velocity = diff(position, t)
+      velocity
+  - type: code
+    language: python
+    title: 가속도 함수
+    description: a = dv/dt
+    content: |-
+      acceleration = diff(velocity, t)
+      acceleration
+  - type: code
+    language: python
+    title: 정지 시점
+    description: v(t) = 0인 시간
+    content: |-
+      stop = solve(velocity, t)
+      stop
+
+- id: practice
+  title: 실습
+  subtitle: 미분 연습
+  blocks:
+  - type: text
+    content: "지금까지 배운 diff, solve, subs를 모두 활용하여 실전 문제를 풀어봅시다. 미션1은 다항식, 삼각함수, 지수로그함수를 미분하는 기본 연습입니다. 미션2는 접선의 방정식을 구하고 임계점을 찾아 극값을 판별합니다. 각 미션은 독립적으로 실행 가능하므로 원하는 것부터 시작하세요."
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 다양한 함수 미분"
+    blocks:
+    - type: code
+      title: "다항식 미분"
+      content: |-
+        from sympy import symbols, diff, sin, cos, exp, log, simplify
+
+        v = symbols('v')
+
+        poly = v**4 - 3*v**2 + 2*v
+        dpoly = diff(poly, v)
+        dpoly
+    - type: code
+      title: "삼각함수 미분"
+      content: |-
+        trig = sin(v) * cos(v)
+        dtrig = diff(trig, v)
+        simplify(dtrig)
+    - type: code
+      title: "지수로그 미분"
+      content: |-
+        explog = exp(v) * log(v)
+        dexplog = diff(explog, v)
+        dexplog
+  - type: expansion
+    title: "미션2: 접선과 극값"
+    blocks:
+    - type: code
+      title: "접선 구하기"
+      content: |-
+        from sympy import symbols, diff, solve, expand
+
+        w = symbols('w')
+
+        func = w**3 - 3*w + 2
+        dfunc = diff(func, w)
+
+        at = 1
+        yval = func.subs(w, at)
+        slope = dfunc.subs(w, at)
+        tangent = slope * (w - at) + yval
+        expand(tangent)
+    - type: code
+      title: "임계점 찾기"
+      content: |-
+        crits = solve(dfunc, w)
+        crits
+    - type: code
+      title: "극값 판별"
+      content: |-
+        d2func = diff(func, w, 2)
+        analysis = [(pt, func.subs(w, pt), d2func.subs(w, pt)) for pt in crits]
+        analysis

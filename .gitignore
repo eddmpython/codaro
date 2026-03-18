@@ -20,6 +20,7 @@ data/
 
 # eddmpython관련 레퍼런스(로컬 전용, git 미포함)
 _reference/
+.__marimo_upstream/
 
 # Backup (파일 삭제 대신 이동)
 _backup/
@@ -28,6 +29,8 @@ _backup/
 node_modules/
 frontend/.svelte-kit/
 src/codaro/webBuild/
+launcher/target/
+launcher/cargo-test.log
 
 # Landing page build artifacts
 landing/build/

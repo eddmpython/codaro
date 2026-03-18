@@ -1,0 +1,347 @@
+meta:
+  id: day13_2
+  title: 모듈 심화
+  day: 13
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 모듈과 import"
+    description: "import로 모듈을 불러오고 사용하는 방법을 배웁니다."
+    keywords: ['모듈', 'import', '라이브러리']
+intro:
+  title: 모듈 심화 패턴북
+  emoji: 🔥
+  description: 모듈 심화 학습!
+  points:
+  - '📦 import: import 모듈명'
+  - '📝 from import: from 모듈 import 함수'
+  - '🔄 별칭: import 모듈 as 별칭'
+  - '📊 __name__: 메인 모듈 확인'
+  - '🔍 dir(): 모듈 내용 확인'
+  - '📦 패키지: 폴더 구조 모듈'
+  summary: 🔥 모듈은 코드 재사용의 핵심!
+sections:
+- id: collections_module
+  title: 1. Collections 모듈
+  subtitle: Counter, defaultdict, namedtuple
+  blocks:
+  - type: code
+    language: python
+    title: Counter - 개수 세기
+    description: 빈도 분석의 강력한 도구!
+    content: 'from collections import Counter
+
+
+      # 문자 빈도
+
+      Counter(''hello world'')  # Counter({''l'': 3, ''o'': 2, ...})
+
+
+      # 단어 빈도
+
+      words = [''apple'', ''banana'', ''apple'']
+
+      Counter(words).most_common(1)  # [(''apple'', 2)]
+
+
+      # 리스트 요소 빈도
+
+      numbers = [1,1,2,2,2,3]
+
+      Counter(numbers)[2]  # 3 (2가 3번 등장)'
+  - type: code
+    language: python
+    title: defaultdict - 기본값 딕셔너리
+    description: KeyError 없이 안전하게!
+    content: 'from collections import defaultdict
+
+
+      # 리스트 그룹핑
+
+      groups = defaultdict(list)
+
+      groups[''team1''].append(''Alice'')  # KeyError 없음!
+
+
+      # 카운팅
+
+      counts = defaultdict(int)
+
+      counts[''apple''] += 1  # 자동으로 0에서 시작
+
+
+      # 중첩 딕셔너리
+
+      nested = defaultdict(dict)
+
+      nested[''user''][''name''] = ''Bob'''
+  - type: code
+    language: python
+    title: namedtuple - 구조화된 데이터
+    description: 클래스보다 가볍고 튜플보다 명확하게!
+    content: 'from collections import namedtuple
+
+
+      # 좌표 정의
+
+      Point = namedtuple(''Point'', ''x y'')
+
+      p = Point(1, 2)
+
+      print(p.x, p.y)  # 1 2
+
+
+      # 사람 정보
+
+      Person = namedtuple(''Person'', [''name'', ''age''])
+
+      bob = Person(''Bob'', 25)
+
+      print(f"{bob.name}는 {bob.age}세")
+
+
+      # 색상 정보
+
+      Color = namedtuple(''Color'', ''r g b'')
+
+      red = Color(255, 0, 0)'
+- id: datetime_module
+  title: 2. Datetime 모듈
+  subtitle: 날짜/시간 계산과 포맷팅
+  blocks:
+  - type: code
+    language: python
+    title: 날짜 기본 조작
+    description: 현재 시간부터 시작하자!
+    content: 'import datetime
+
+
+      # 현재 시간
+
+      now = datetime.datetime.now()
+
+      today = datetime.date.today()
+
+
+      # 100일 후
+
+      future = today + datetime.timedelta(days=100)
+
+
+      # 한국식 형식
+
+      now.strftime("%Y년 %m월 %d일")  # "2024년 12월 31일"
+
+
+      # 나이 계산
+
+      birthday = datetime.date(1990, 1, 1)
+
+      age = (today - birthday).days // 365'
+  - type: code
+    language: python
+    title: 시간 연산과 변환
+    description: 실무에서 자주 쓰는 패턴들!
+    content: 'import datetime
+
+
+      # 시간 차이 계산
+
+      start = datetime.datetime(2024, 1, 1, 9, 0)
+
+      end = datetime.datetime(2024, 1, 1, 17, 30)
+
+      diff = end - start
+
+      hours = diff.total_seconds() / 3600  # 8.5시간
+
+
+      # 문자열을 날짜로 변환
+
+      date_str = "2024-12-31"
+
+      date_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+
+
+      # 월의 마지막 날
+
+      import calendar
+
+      calendar.monthrange(2024, 2)[1]  # 29 (윤년)
+
+
+      # 요일 확인
+
+      date_obj.weekday()  # 0=월요일, 6=일요일'
+- id: json_module
+  title: 3. JSON 모듈
+  subtitle: dumps, loads, dump, load
+  blocks:
+  - type: code
+    language: python
+    title: JSON 기본 변환
+    description: Python ↔ JSON 변환의 핵심!
+    content: "import json\n\n# Dict → JSON 문자열\ndata = {\"name\": \"김파이썬\", \"age\": 30}\njson_str = json.dumps(data, ensure_ascii=False)\n# '{\"name\": \"김파이썬\", \"age\": 30}'\n\n# JSON 문자열 → Dict\nparsed = json.loads(json_str)\nprint(parsed[\"name\"])  # \"김파이썬\"\n\n# 파일 저장/읽기\nwith open('data.json', 'w') as f:\n    json.dump(data, f, ensure_ascii=False)\n\nwith open('data.json', 'r') as f:\n    loaded = json.load(f)"
+  - type: code
+    language: python
+    title: JSON 실무 패턴
+    description: 에러 처리와 중첩 데이터 다루기!
+    content: "import json\n\n# API 응답 처리\napi_data = '{\"status\": \"ok\", \"result\": {\"count\": 5}}'\nresponse = json.loads(api_data)\ncount = response[\"result\"][\"count\"]  # 5\n\n# 안전한 JSON 파싱\ndef safe_json_load(text):\n    try:\n        return json.loads(text)\n    except json.JSONDecodeError:\n        return None\n\n# 중첩 데이터 접근\ndata = {\"users\": [{\"name\": \"Alice\", \"score\": 95}]}\nfirst_user_score = data[\"users\"][0][\"score\"]  # 95\n\n# Pretty print\nprint(json.dumps(data, indent=2, ensure_ascii=False))"
+- id: regex_module
+  title: 4. 정규표현식
+  subtitle: findall, search, sub
+  blocks:
+  - type: code
+    language: python
+    title: 패턴 찾기
+    description: 정규표현식으로 패턴 매칭!
+    content: 'import re
+
+
+      # 이메일 찾기
+
+      text = "연락처: john@example.com, mary@gmail.com"
+
+      emails = re.findall(r''[\w.-]+@[\w.-]+\.\w+'', text)
+
+      # [''john@example.com'', ''mary@gmail.com'']
+
+
+      # 전화번호 찾기
+
+      phone = "010-1234-5678, 02-9876-5432"
+
+      phones = re.findall(r''\d{2,3}-\d{3,4}-\d{4}'', phone)
+
+
+      # 숫자만 추출
+
+      text = "가격은 1,200,000원"
+
+      numbers = re.findall(r''\d+'', text)  # [''1'', ''200'', ''000'']
+
+
+      # 한글 이름
+
+      names = re.findall(r''[가-힣]{2,4}'', "김철수, 이영희")'
+  - type: code
+    language: python
+    title: re.search - 첫 번째 매치
+    description: 패턴 그룹으로 데이터 추출!
+    content: "import re\n\n# 그룹으로 데이터 추출\ntext = \"2024-01-15 ERROR: Database failed\"\npattern = r'(\\d{4}-\\d{2}-\\d{2}) (\\w+): (.+)'\nmatch = re.search(pattern, text)\n\nif match:\n    date, level, message = match.groups()\n    print(f\"날짜: {date}, 레벨: {level}\")"
+  - type: code
+    language: python
+    title: re.sub - 문자열 대체
+    description: 패턴 매치해서 바꾸기!
+    content: "import re\n\n# 민감정보 마스킹\ntext = \"주민번호: 123456-1234567\"\nmasked = re.sub(r'(\\d{6})-(\\d{7})', r'\x01-*******', text)\nprint(masked)  # \"주민번호: 123456-*******\"\n\n# HTML 태그 제거\nhtml = \"<p>안녕하세요</p>\"\nclean = re.sub(r'<[^>]+>', '', html)  # \"안녕하세요\"\n\n# 공백 정리\nmessy = \"여러    공백\"\nclean = re.sub(r'\\s+', ' ', messy)  # \"여러 공백\""
+- id: pathlib_module
+  title: 5. Pathlib 모듈
+  subtitle: Path 객체로 파일 경로 관리
+  blocks:
+  - type: code
+    language: python
+    title: Pathlib 기본 사용법
+    description: 현대적인 경로 처리 방법을 배워보세요!
+    content: 'from pathlib import Path
+
+      import datetime
+
+
+      # 경로 객체 생성
+
+      current_file = Path(__file__)
+
+      current_dir = Path.cwd()
+
+      home_dir = Path.home()
+
+
+      print(f"현재 파일: {current_file}")
+
+      print(f"현재 디렉토리: {current_dir}")
+
+      print(f"홈 디렉토리: {home_dir}")
+
+
+      # 경로 조작
+
+      project_dir = current_dir / "my_project"
+
+      data_file = project_dir / "data" / "users.json"
+
+
+      print(f"프로젝트 경로: {project_dir}")
+
+      print(f"데이터 파일 경로: {data_file}")
+
+
+      # 경로 정보 추출
+
+      print(f"파일명: {current_file.name}")
+
+      print(f"확장자: {current_file.suffix}")
+
+      print(f"확장자 제외 이름: {current_file.stem}")
+
+      print(f"부모 디렉토리: {current_file.parent}")
+
+
+      # 경로 존재 여부 확인
+
+      print(f"현재 파일 존재: {current_file.exists()}")
+
+      print(f"파일인가: {current_file.is_file()}")
+
+      print(f"디렉토리인가: {current_dir.is_dir()}")'
+  - type: code
+    language: python
+    title: 파일 시스템 탐색
+    description: Pathlib으로 파일 시스템을 효율적으로 탐색해보세요!
+    content: "from pathlib import Path\nimport datetime\n\n# 현재 디렉토리의 모든 Python 파일 찾기\ncurrent_dir = Path.cwd()\npython_files = list(current_dir.glob(\"*.py\"))\nprint(f\"Python 파일들: {[f.name for f in python_files[:5]]}\")\n\n# 재귀적으로 모든 Python 파일 찾기\nall_python_files = list(current_dir.rglob(\"*.py\"))\nprint(f\"전체 Python 파일 개수: {len(all_python_files)}\")\n\n# 파일 정보 가져오기\nfor py_file in python_files[:3]:\n    if py_file.exists():\n        stat = py_file.stat()\n        size = stat.st_size\n        modified = datetime.datetime.fromtimestamp(stat.st_mtime)\n        print(f\"{py_file.name}: {size}바이트, 수정일: {modified}\")\n\n# 디렉토리 생성과 파일 쓰기\ntemp_dir = Path(\"temp_example\")\ntemp_dir.mkdir(exist_ok=True)\n\ndata_file = temp_dir / \"example.txt\"\ndata_file.write_text(\"Hello, Pathlib!\", encoding=\"utf-8\")\n\nprint(f\"파일 내용: {data_file.read_text(encoding='utf-8')}\")\n\n# 정리\nimport shutil\nif temp_dir.exists():\n    shutil.rmtree(temp_dir)\n    print(\"임시 디렉토리 정리 완료\")"
+- id: advanced_exercises
+  title: 6. 종합 활용
+  subtitle: 여러 모듈 조합하기
+  blocks:
+  - type: code
+    language: python
+    title: 로그 분석기
+    description: re + Counter + datetime 조합!
+    content: 'import re
+
+      from collections import Counter
+
+      from datetime import datetime
+
+
+      # 로그 데이터
+
+      logs = """
+
+      2024-01-15 10:30:25 INFO: App started
+
+      2024-01-15 10:31:12 ERROR: DB failed
+
+      2024-01-15 11:15:33 INFO: Request processed
+
+      """
+
+
+      # 로그 레벨 카운트
+
+      levels = re.findall(r''(\w+):'', logs)
+
+      Counter(levels)  # Counter({''INFO'': 2, ''ERROR'': 1})
+
+
+      # 시간대별 분석
+
+      times = re.findall(r''\d{4}-\d{2}-\d{2} (\d{2}):'', logs)
+
+      hour_counts = Counter(times)  # Counter({''10'': 2, ''11'': 1})'
+  - type: code
+    language: python
+    title: 설정 파일 관리
+    description: JSON + pathlib로 설정 관리!
+    content: "import json\nfrom pathlib import Path\n\n# 설정 파일 생성\nconfig = {\"debug\": True, \"port\": 8080}\nPath(\"config.json\").write_text(json.dumps(config))\n\n# 설정 파일 읽기\nif Path(\"config.json\").exists():\n    data = json.loads(Path(\"config.json\").read_text())\n    print(data[\"port\"])  # 8080\n\n# 안전한 설정 읽기\ndef load_config(path):\n    try:\n        return json.loads(Path(path).read_text())\n    except (FileNotFoundError, json.JSONDecodeError):\n        return {\"debug\": False, \"port\": 3000}  # 기본값"

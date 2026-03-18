@@ -1,0 +1,348 @@
+meta:
+  id: scipy_03
+  title: 데이터보간기
+  order: 3
+  category: scipy
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["scipy.interpolate", "보간법", "interp1d", "스플라인", "결측값"]
+  seo:
+    title: "scipy.interpolate 보간법 - 데이터 사이 값 추정하기"
+    description: "scipy.interpolate로 데이터 사이 값을 추정합니다. 선형보간, 스플라인, 다차원 보간을 배웁니다."
+    keywords: ["scipy", "interpolate", "보간", "스플라인", "interp1d"]
+
+intro:
+  emoji: "📈"
+  goal: 센서 데이터의 결측값을 보간하고 해상도를 높여 부드러운 온도 변화 곡선을 만듭니다.
+  description: "IoT 온도 센서가 2시간마다 데이터를 수집합니다. 하지만 1시간 간격으로 더 세밀한 온도 변화를 알고 싶습니다. 또한 센서 오류로 일부 데이터가 누락되었습니다. scipy.interpolate의 보간 기법으로 측정되지 않은 시점의 값을 추정합니다. 선형보간, 3차 스플라인, PCHIP 등 다양한 방법을 비교하고, 각 상황에 맞는 최적의 방법을 선택합니다."
+
+sections:
+- id: load
+  title: 라이브러리 및 데이터 로드
+  subtitle: scipy.interpolate
+  blocks:
+  - type: text
+    content: "보간(Interpolation)은 알려진 데이터 점들 사이의 값을 추정하는 기법입니다. 센서 데이터 결측 처리, 해상도 증가, 부드러운 곡선 생성에 광범위하게 활용됩니다. scipy.interpolate 모듈은 1차원부터 다차원까지 다양한 보간 함수를 제공합니다. 이 프로젝트에서는 하루 동안 2시간 간격으로 측정된 온도 데이터를 사용합니다."
+  - type: code
+    language: python
+    title: 패키지 설치 및 데이터 준비
+    content: |-
+      import micropip
+      await micropip.install('scipy')
+
+      import numpy as np
+      from scipy import interpolate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      hours = np.array([0, 2, 4, 6, 8, 10, 12, 14, 16, 18, 20, 22, 24])
+      temps = np.array([15, 14, 13, 14, 17, 21, 24, 26, 25, 22, 19, 17, 15])
+  - type: code
+    language: python
+    title: 원본 데이터 확인
+    content: |-
+      tempDf = pd.DataFrame({'Hour': hours, 'Temperature': temps})
+      tempDf
+  - type: tip
+    content: "이 데이터는 전형적인 일일 온도 패턴입니다. 새벽에 가장 낮고, 오후 2시경에 가장 높습니다. 13개 측정점을 25개 이상으로 늘려 더 부드러운 곡선을 만들겠습니다."
+
+- id: explore
+  title: 데이터 탐색
+  subtitle: 측정 지점 시각화
+  blocks:
+  - type: text
+    content: "보간 전에 원본 데이터를 시각화합니다. 측정 지점을 점으로, 연결선을 점선으로 표시하면 현재 데이터의 해상도를 직관적으로 파악할 수 있습니다. 2시간 간격의 직선 연결은 실제 온도 변화의 부드러운 곡선을 제대로 표현하지 못합니다. 보간을 통해 이 문제를 해결합니다."
+  - type: code
+    language: python
+    title: 원본 데이터 시각화
+    content: |-
+      figOrig, axOrig = plt.subplots(figsize=(12, 6))
+      axOrig.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured Points')
+      axOrig.plot(hours, temps, 'r--', alpha=0.5, label='Linear Connection')
+      axOrig.set_xlabel('Hour')
+      axOrig.set_ylabel('Temperature (°C)')
+      axOrig.set_title('Original Temperature Measurements (2-hour intervals)')
+      axOrig.set_xticks(range(0, 25, 2))
+      axOrig.legend()
+      axOrig.grid(True, alpha=0.3)
+      figOrig
+
+- id: linear
+  title: 선형 보간
+  subtitle: interp1d(kind='linear')
+  blocks:
+  - type: text
+    content: "선형 보간은 두 측정점을 직선으로 연결하여 중간값을 추정합니다. 가장 단순하고 계산이 빠르지만, 꺾이는 점에서 부자연스러운 각이 생깁니다. interp1d 함수는 보간 함수 객체를 반환하며, 이 함수에 새로운 x값을 입력하면 보간된 y값을 얻습니다. kind 파라미터로 보간 방식을 지정합니다."
+  - type: code
+    language: python
+    title: 선형 보간 함수 생성
+    content: |-
+      linearFunc = interpolate.interp1d(hours, temps, kind='linear')
+
+      hoursNew = np.arange(0, 24.1, 1)
+      tempsLinear = linearFunc(hoursNew)
+      tempsLinear
+  - type: tip
+    content: "interp1d는 함수를 반환합니다. linearFunc(5)처럼 호출하면 5시의 보간된 온도를 얻습니다. 배열을 입력하면 여러 값을 한 번에 계산합니다."
+  - type: code
+    language: python
+    title: 선형 보간 시각화
+    content: |-
+      figLinear, axLinear = plt.subplots(figsize=(12, 6))
+      axLinear.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured')
+      axLinear.plot(hoursNew, tempsLinear, 'b-', linewidth=2, label='Linear Interpolation')
+      axLinear.set_xlabel('Hour')
+      axLinear.set_ylabel('Temperature (°C)')
+      axLinear.set_title('Linear Interpolation (1-hour resolution)')
+      axLinear.set_xticks(range(0, 25, 2))
+      axLinear.legend()
+      axLinear.grid(True, alpha=0.3)
+      figLinear
+
+- id: cubic
+  title: 3차 스플라인 보간
+  subtitle: kind='cubic'
+  blocks:
+  - type: text
+    content: "3차 스플라인(cubic spline)은 각 구간을 3차 다항식으로 맞추고, 연결점에서 1차 및 2차 도함수가 연속이 되도록 합니다. 결과적으로 매우 부드러운 곡선이 생성됩니다. 자연 현상의 연속적인 변화를 표현할 때 선호되는 방법입니다. 단점은 극값 근처에서 약간의 오버슈팅이 발생할 수 있습니다."
+  - type: code
+    language: python
+    title: 3차 스플라인 보간
+    content: |-
+      cubicFunc = interpolate.interp1d(hours, temps, kind='cubic')
+      tempsCubic = cubicFunc(hoursNew)
+
+      figCubic, axCubic = plt.subplots(figsize=(12, 6))
+      axCubic.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured')
+      axCubic.plot(hoursNew, tempsCubic, 'g-', linewidth=2, label='Cubic Spline')
+      axCubic.set_xlabel('Hour')
+      axCubic.set_ylabel('Temperature (°C)')
+      axCubic.set_title('Cubic Spline Interpolation')
+      axCubic.set_xticks(range(0, 25, 2))
+      axCubic.legend()
+      axCubic.grid(True, alpha=0.3)
+      figCubic
+  - type: tip
+    content: "cubic 스플라인은 연속적인 자연 현상(온도, 고도, 속도 등)을 표현할 때 가장 많이 사용됩니다. 부드러운 곡선이 필요한 경우 기본 선택입니다."
+
+- id: compare
+  title: 보간 방법 비교
+  subtitle: linear vs cubic vs PCHIP
+  blocks:
+  - type: text
+    content: "다양한 보간 방법을 비교합니다. PCHIP(Piecewise Cubic Hermite Interpolating Polynomial)은 데이터의 단조성을 보존하여 오버슈팅 없이 안정적인 보간을 제공합니다. 각 방법의 특성을 이해하고 데이터에 맞는 방법을 선택하는 것이 중요합니다."
+  - type: code
+    language: python
+    title: PCHIP 보간 추가
+    content: |-
+      pchipFunc = interpolate.PchipInterpolator(hours, temps)
+      tempsPchip = pchipFunc(hoursNew)
+      tempsPchip[:5]
+  - type: code
+    language: python
+    title: 세 가지 방법 비교
+    content: |-
+      figCompare, axCompare = plt.subplots(figsize=(12, 6))
+      axCompare.scatter(hours, temps, s=100, c='red', zorder=5, label='Measured')
+      axCompare.plot(hoursNew, tempsLinear, 'b-', linewidth=2, alpha=0.7, label='Linear')
+      axCompare.plot(hoursNew, tempsCubic, 'g-', linewidth=2, alpha=0.7, label='Cubic')
+      axCompare.plot(hoursNew, tempsPchip, 'm-', linewidth=2, alpha=0.7, label='PCHIP')
+      axCompare.set_xlabel('Hour')
+      axCompare.set_ylabel('Temperature (°C)')
+      axCompare.set_title('Comparison of Interpolation Methods')
+      axCompare.set_xticks(range(0, 25, 2))
+      axCompare.legend()
+      axCompare.grid(True, alpha=0.3)
+      figCompare
+  - type: tip
+    content: "PCHIP은 오버슈팅이 없어 안전한 선택입니다. 최고/최저점이 측정값을 초과하지 않습니다. 금융 데이터나 단조 변화가 예상되는 경우에 적합합니다."
+
+- id: missing
+  title: 결측값 처리
+  subtitle: NaN 보간
+  blocks:
+  - type: text
+    content: "보간의 가장 실용적인 활용 중 하나는 결측값 처리입니다. 센서 오류, 통신 장애, 데이터 손실 등으로 일부 값이 누락된 경우 주변 데이터로부터 추정할 수 있습니다. 먼저 유효한 데이터만 추출하고, 이를 바탕으로 보간 함수를 만든 후 결측 위치의 값을 채웁니다."
+  - type: code
+    language: python
+    title: 결측값 있는 센서 데이터
+    content: |-
+      sensorData = np.array([20, 21, np.nan, 23, np.nan, np.nan, 26, 25, 24, np.nan, 22])
+      timePoints = np.arange(len(sensorData))
+
+      sensorDf = pd.DataFrame({'Time': timePoints, 'Value': sensorData})
+      sensorDf
+  - type: code
+    language: python
+    title: 결측값 보간
+    content: |-
+      validMask = ~np.isnan(sensorData)
+      validTime = timePoints[validMask]
+      validData = sensorData[validMask]
+
+      fillFunc = interpolate.interp1d(validTime, validData, kind='cubic', fill_value='extrapolate')
+      filledData = fillFunc(timePoints)
+
+      fillDf = pd.DataFrame({
+          'Time': timePoints,
+          'Original': sensorData,
+          'Filled': np.round(filledData, 2),
+          'Was NaN': np.isnan(sensorData)
+      })
+      fillDf
+  - type: code
+    language: python
+    title: 결측값 처리 시각화
+    content: |-
+      figFill, axFill = plt.subplots(figsize=(12, 6))
+      axFill.plot(timePoints, filledData, 'b-', linewidth=2, label='Interpolated')
+      axFill.scatter(validTime, validData, s=100, c='green', zorder=5, label='Original')
+      axFill.scatter(timePoints[np.isnan(sensorData)], filledData[np.isnan(sensorData)], s=100, c='red', marker='x', zorder=5, label='Filled NaN')
+      axFill.set_xlabel('Time')
+      axFill.set_ylabel('Value')
+      axFill.set_title('Missing Value Interpolation')
+      axFill.legend()
+      axFill.grid(True, alpha=0.3)
+      figFill
+
+- id: result
+  title: 최종 온도 분석 보고서
+  subtitle: 고해상도 온도 곡선
+  blocks:
+  - type: text
+    content: "2시간 간격 데이터를 1시간 간격으로 보간하여 더 세밀한 온도 변화를 분석합니다. 최고/최저 온도 시간, 변화율이 가장 큰 시간대 등을 정밀하게 파악할 수 있습니다. 실무에서는 이런 고해상도 데이터가 에너지 관리, 농업, 기상 예보 등에 활용됩니다."
+  - type: code
+    language: python
+    title: 고해상도 분석
+    content: |-
+      hoursHigh = np.arange(0, 24.1, 0.5)
+      tempsHigh = pchipFunc(hoursHigh)
+
+      maxIdx = np.argmax(tempsHigh)
+      minIdx = np.argmin(tempsHigh)
+
+      analysisDf = pd.DataFrame({
+          'Metric': ['Max Temperature', 'Max Time', 'Min Temperature', 'Min Time', 'Daily Range'],
+          'Value': [f'{tempsHigh[maxIdx]:.1f}°C', f'{hoursHigh[maxIdx]:.1f}h', f'{tempsHigh[minIdx]:.1f}°C', f'{hoursHigh[minIdx]:.1f}h', f'{tempsHigh[maxIdx] - tempsHigh[minIdx]:.1f}°C']
+      })
+      analysisDf
+  - type: code
+    language: python
+    title: 최종 시각화
+    content: |-
+      derivFunc = pchipFunc.derivative()
+      derivHigh = derivFunc(hoursHigh)
+
+      figResult, (axResult1, axResult2) = plt.subplots(2, 1, figsize=(12, 8), sharex=True)
+
+      axResult1.plot(hoursHigh, tempsHigh, 'b-', linewidth=2, label='Interpolated (0.5h)')
+      axResult1.scatter(hours, temps, s=80, c='red', zorder=5, label='Measured (2h)')
+      axResult1.axhline(tempsHigh[maxIdx], color='orange', linestyle='--', alpha=0.5)
+      axResult1.axhline(tempsHigh[minIdx], color='cyan', linestyle='--', alpha=0.5)
+      axResult1.set_ylabel('Temperature (°C)')
+      axResult1.set_title('High-Resolution Temperature Profile')
+      axResult1.legend()
+      axResult1.grid(True, alpha=0.3)
+
+      axResult2.plot(hoursHigh, derivHigh, 'orange', linewidth=2)
+      axResult2.axhline(y=0, color='gray', linestyle='--', alpha=0.5)
+      axResult2.fill_between(hoursHigh, derivHigh, where=(derivHigh > 0), alpha=0.3, color='red', label='Warming')
+      axResult2.fill_between(hoursHigh, derivHigh, where=(derivHigh < 0), alpha=0.3, color='blue', label='Cooling')
+      axResult2.set_xlabel('Hour')
+      axResult2.set_ylabel('Rate of Change (°C/h)')
+      axResult2.legend()
+      axResult2.grid(True, alpha=0.3)
+      figResult
+
+- id: practice
+  title: 실습
+  subtitle: 보간 활용 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 선형보간, 스플라인, PCHIP, 결측값 처리를 활용하여 실제 데이터 문제를 해결합니다. 미션1은 주가 데이터의 결측값 처리입니다. 미션2는 저해상도 신호를 업샘플링하여 부드러운 곡선을 만듭니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 주가 결측값 처리"
+    blocks:
+    - type: code
+      title: 데이터 생성
+      content: |-
+        import numpy as np
+        from scipy import interpolate
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        np.random.seed(123)
+        days = np.arange(1, 31)
+        basePrices = 100 + np.cumsum(np.random.randn(30) * 2)
+
+        missingIdx = [4, 5, 10, 15, 16, 17, 22]
+        pricesWithNan = basePrices.copy()
+        pricesWithNan[missingIdx] = np.nan
+    - type: code
+      title: PCHIP 보간
+      content: |-
+        validDays = days[~np.isnan(pricesWithNan)]
+        validPrices = pricesWithNan[~np.isnan(pricesWithNan)]
+
+        priceFunc = interpolate.PchipInterpolator(validDays, validPrices)
+        filledPrices = priceFunc(days)
+
+        priceDf = pd.DataFrame({
+            'Day': days,
+            'Original': pricesWithNan,
+            'Filled': np.round(filledPrices, 2)
+        })
+        priceDf
+    - type: code
+      title: 시각화
+      content: |-
+        figStock, axStock = plt.subplots(figsize=(12, 6))
+        axStock.plot(days, filledPrices, 'b-', linewidth=2, label='Interpolated')
+        axStock.scatter(validDays, validPrices, s=80, c='green', zorder=5, label='Original')
+        axStock.scatter(days[missingIdx], filledPrices[missingIdx], s=100, c='red', marker='x', zorder=5, label='Filled')
+        axStock.set_xlabel('Day')
+        axStock.set_ylabel('Stock Price ($)')
+        axStock.set_title('Stock Price with Missing Values Filled (PCHIP)')
+        axStock.legend()
+        axStock.grid(True, alpha=0.3)
+        figStock
+  - type: expansion
+    title: "미션2: 신호 업샘플링"
+    blocks:
+    - type: code
+      title: 저해상도 데이터
+      content: |-
+        import numpy as np
+        from scipy import interpolate
+        import matplotlib.pyplot as plt
+
+        xLow = np.array([0, 1, 2, 3, 4, 5])
+        yLow = np.array([0, 0.8, 1.0, 0.9, 0.6, 0.1])
+
+        xHigh = np.linspace(0, 5, 100)
+    - type: code
+      title: 다중 보간 비교
+      content: |-
+        linearUp = interpolate.interp1d(xLow, yLow, kind='linear')
+        cubicUp = interpolate.interp1d(xLow, yLow, kind='cubic')
+        pchipUp = interpolate.PchipInterpolator(xLow, yLow)
+
+        yLinear = linearUp(xHigh)
+        yCubic = cubicUp(xHigh)
+        yPchip = pchipUp(xHigh)
+    - type: code
+      title: 시각화
+      content: |-
+        figUp, axUp = plt.subplots(figsize=(12, 6))
+        axUp.scatter(xLow, yLow, s=150, c='red', zorder=5, label='Original (6 points)')
+        axUp.plot(xHigh, yLinear, 'b--', linewidth=2, alpha=0.7, label='Linear')
+        axUp.plot(xHigh, yCubic, 'g-', linewidth=2, alpha=0.7, label='Cubic')
+        axUp.plot(xHigh, yPchip, 'm-', linewidth=2, label='PCHIP')
+        axUp.set_xlabel('X')
+        axUp.set_ylabel('Y')
+        axUp.set_title('Signal Upsampling: 6 → 100 points')
+        axUp.legend()
+        axUp.grid(True, alpha=0.3)
+        figUp

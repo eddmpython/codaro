@@ -1,0 +1,444 @@
+meta:
+  id: day18_1
+  title: 예외처리
+  day: 18
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 예외처리 try-except"
+    description: "try-except로 예외를 처리하는 방법을 배웁니다."
+    keywords: ['예외처리', 'try', 'except']
+intro:
+  emoji: "🛡️"
+  points:
+  - try-except 구문의 기본 사용법
+  - 다양한 예외 타입별 처리 방법
+  - else와 finally 절 활용법
+  - 사용자 정의 예외 만들기
+  - 예외 발생시키기 (raise)
+sections:
+- id: exception_introduction
+  title: 예외 처리 소개
+  subtitle: 오류를 우아하게 처리하기
+  blocks:
+  - type: text
+    content: 파이썬 프로그램을 실행하다 보면 다양한 오류 상황이 발생합니다. 0으로 나누거나, 존재하지 않는 리스트 인덱스에 접근하거나, 숫자가 아닌 문자열을 정수로 변환하려 할 때 오류가 발생합니다. 이러한 오류를 예외(Exception)라고 부릅니다. Exception은 영어로 '예외, 특별한 경우'라는 뜻으로, 정상적인 프로그램 흐름에서 벗어난 특별한 상황을 의미합니다. 예외가 발생하면 프로그램이 즉시 중단되는데, 예외 처리(Exception Handling)를 사용하면 이러한 오류 상황을 미리 대비하여 프로그램이 갑자기 종료되지 않고 안정적으로 실행되도록 할 수 있습니다.
+  - type: list
+    items:
+    - 프로그램 안정성 향상과 예상치 못한 종료 방지
+    - 사용자에게 친화적인 오류 메시지 제공
+    - 오류 원인 파악과 디버깅 지원
+    - 로그 기록을 통한 문제 추적
+  - type: code
+    language: python
+    title: 예외 발생 상황
+    description: 예외가 발생하는 다양한 상황을 확인합니다.
+    content: |-
+      introValue = 10
+      introList = [1, 2, 3]
+      introDict = {"name": "Alice"}
+
+      print(f"정상 실행: {introValue}")
+      print(f"정상 실행: {introList[0]}")
+      print(f"정상 실행: {introDict['name']}")
+  - type: tip
+    content: "예외가 발생하면 프로그램이 즉시 종료됩니다. try-except로 이를 방지할 수 있습니다."
+
+- id: try_except_basic
+  title: 기본 try-except 구문
+  subtitle: 예외를 포착하고 처리하기
+  blocks:
+  - type: text
+    content: 예외 처리의 가장 기본적인 구문은 try-except입니다. try는 영어로 '시도하다'라는 뜻이고, except는 '제외하고, ~을 제외하면'이라는 뜻입니다. try 블록 안에는 예외가 발생할 수 있는 코드를 작성하고, except 블록 안에는 예외가 발생했을 때 실행할 코드를 작성합니다. 프로그램이 try 블록의 코드를 실행하다가 예외가 발생하면 즉시 except 블록으로 이동하여 예외 처리 코드를 실행합니다. 예외가 발생하지 않으면 except 블록은 실행되지 않고 다음 코드로 넘어갑니다. 이렇게 하면 오류가 발생해도 프로그램이 중단되지 않고 계속 실행될 수 있습니다.
+  - type: list
+    items:
+    - try 블록에 예외 발생 가능한 코드 작성
+    - except 블록에 예외 처리 코드 작성
+    - 예외 발생 시 except 블록으로 이동하여 실행
+    - 프로그램이 중단되지 않고 계속 실행됨
+  - type: code
+    language: python
+    title: 기본 try-except 사용법
+    description: 가장 기본적인 try-except 구문입니다.
+    content: |-
+      try:
+          basicResult = 10 / 0
+          print(basicResult)
+      except:
+          print("오류가 발생했습니다")
+
+      try:
+          basicNumber = int("hello")
+      except:
+          print("숫자로 변환할 수 없습니다")
+
+      print("프로그램이 계속 실행됩니다")
+  - type: tip
+    content: "모든 예외를 처리하는 except:보다 구체적인 예외 타입을 지정하는 것이 좋습니다."
+
+- id: specific_exception
+  title: 구체적인 예외 처리
+  subtitle: 예외 타입별 세밀한 처리
+  blocks:
+  - type: text
+    content: "파이썬에는 다양한 종류의 예외가 있습니다. ZeroDivisionError는 0으로 나눌 때 발생하고, ValueError는 잘못된 값을 사용할 때 발생하며, IndexError는 리스트 인덱스가 범위를 벗어날 때 발생합니다. 모든 예외를 동일하게 처리하는 except 대신, 예외 타입을 구체적으로 지정하면 각 상황에 맞는 적절한 메시지를 제공할 수 있습니다. 여러 except 블록을 순서대로 작성하면 서로 다른 예외를 각각 다르게 처리할 수 있습니다. 파이썬은 위에서부터 순서대로 예외 타입을 확인하여 일치하는 except 블록을 실행합니다."
+  - type: list
+    items:
+    - 예외 타입을 구체적으로 지정하여 처리
+    - 여러 except 블록으로 다양한 예외 구분 처리
+    - 정확한 문제 진단과 적절한 오류 메시지 제공
+    - 각 상황에 맞는 복구 조치 수행
+  - type: code
+    language: python
+    title: 구체적인 예외 타입 처리
+    description: 여러 예외 타입을 구체적으로 처리합니다.
+    content: |-
+      def specificProcess(value):
+          try:
+              specificNum = int(value)
+              specificResult = 100 / specificNum
+              return specificResult
+          except ValueError:
+              print("숫자를 입력해주세요")
+          except ZeroDivisionError:
+              print("0으로 나눌 수 없습니다")
+          return None
+
+      print(specificProcess("10"))
+      print(specificProcess("hello"))
+      print(specificProcess("0"))
+
+- id: exception_object
+  title: 예외 객체 사용
+  subtitle: 예외 정보 가져오기
+  blocks:
+  - type: text
+    content: 예외가 발생하면 파이썬은 예외 객체(Exception Object)를 생성합니다. 이 객체에는 어떤 오류가 발생했는지, 왜 발생했는지에 대한 상세 정보가 담겨 있습니다. except 구문에서 as 키워드를 사용하면 이 예외 객체를 변수에 저장할 수 있습니다. as는 영어로 '~로서'라는 뜻으로, 예외를 특정 변수로 받겠다는 의미입니다. 예외 객체를 변수에 저장하면 오류 메시지를 화면에 출력하거나 로그 파일에 기록할 수 있어 디버깅과 문제 추적에 매우 유용합니다. 예외 객체를 출력하면 어떤 문제가 발생했는지 명확하게 파악할 수 있습니다.
+  - type: list
+    items:
+    - as 키워드로 예외 객체를 변수에 저장
+    - 예외 객체에서 상세 오류 메시지 확인
+    - 오류 원인 파악과 디버깅에 유용
+    - 로그 기록을 통한 문제 추적에 활용
+  - type: code
+    language: python
+    title: 예외 객체 활용
+    description: 예외 객체에서 상세 정보를 가져옵니다.
+    content: |-
+      try:
+          objResult = 10 / 0
+      except ZeroDivisionError as e:
+          print(f"에러 발생: {e}")
+
+      try:
+          objNumbers = [1, 2, 3]
+          print(objNumbers[10])
+      except IndexError as e:
+          print(f"에러 발생: {e}")
+
+      try:
+          objData = {"name": "Alice"}
+          print(objData["age"])
+      except KeyError as e:
+          print(f"존재하지 않는 키: {e}")
+  - type: tip
+    content: "예외 객체를 출력하면 발생한 오류에 대한 상세 정보를 확인할 수 있습니다."
+
+- id: else_finally
+  title: else와 finally 절
+  subtitle: 완전한 예외 처리 구조
+  blocks:
+  - type: text
+    content: try-except 구문을 더욱 강력하게 만드는 두 가지 절이 있습니다. else 절은 예외가 발생하지 않았을 때만 실행되는 코드 블록입니다. else는 영어로 '그렇지 않으면'이라는 뜻으로, 예외가 발생하지 않은 정상적인 상황에서 실행할 코드를 작성합니다. finally 절은 예외 발생 여부와 관계없이 항상 실행되는 코드 블록입니다. finally는 '최종적으로, 마침내'라는 뜻으로, 마지막에 반드시 실행되어야 하는 정리 작업을 작성합니다. finally는 파일을 닫거나 네트워크 연결을 해제하는 등 리소스 정리 작업에 매우 유용하며, return 문 이후에도 실행되는 특별한 블록입니다.
+  - type: list
+    items:
+    - else 절은 예외가 발생하지 않았을 때만 실행
+    - finally 절은 예외 발생 여부와 관계없이 항상 실행
+    - finally는 파일 닫기와 리소스 정리 작업에 활용
+    - 완전한 예외 처리 제어 흐름 구현
+  - type: code
+    language: python
+    title: else와 finally 절 사용
+    description: 완전한 예외 처리 구조를 확인합니다.
+    content: |-
+      def elseDivide(a, b):
+          try:
+              elseResult = a / b
+          except ZeroDivisionError:
+              print("0으로 나눌 수 없습니다")
+              return None
+          else:
+              print("계산 성공!")
+              return elseResult
+          finally:
+              print("계산 시도 완료")
+
+      print(elseDivide(10, 2))
+      print(elseDivide(10, 0))
+  - type: tip
+    content: "finally 블록은 return 문 이후에도 실행됩니다. 리소스 정리에 활용하세요."
+
+- id: multiple_exceptions
+  title: 다중 예외 처리
+  subtitle: 여러 예외를 한 번에 처리
+  blocks:
+  - type: text
+    content: 때로는 여러 종류의 예외를 동일한 방식으로 처리해야 할 때가 있습니다. 이럴 때 여러 예외 타입을 튜플로 묶어서 하나의 except 블록에서 처리할 수 있습니다. 튜플은 day06에서 배운 괄호로 묶인 자료구조입니다. 예를 들어 ValueError와 IndexError가 발생했을 때 모두 같은 오류 메시지를 보여주고 싶다면, 두 예외를 튜플로 묶어서 하나의 except 블록으로 처리할 수 있습니다. 이렇게 하면 같은 코드를 여러 번 반복하지 않아도 되어 코드가 간결해지고 유지보수가 쉬워집니다.
+  - type: list
+    items:
+    - 여러 예외 타입을 튜플로 묶어 그룹화
+    - 동일한 처리 로직을 한 번에 적용
+    - 코드 중복을 줄이고 간결하게 작성
+    - 유지보수가 쉽고 효율적인 예외 처리
+  - type: code
+    language: python
+    title: 다중 예외 처리
+    description: 여러 예외를 함께 처리합니다.
+    content: |-
+      def multiProcess(value, index):
+          try:
+              multiNum = int(value)
+              multiList = [1, 2, 3]
+              return multiList[index] / multiNum
+          except (ValueError, IndexError, ZeroDivisionError) as e:
+              print(f"오류 발생: {type(e).__name__}: {e}")
+              return None
+
+      print(multiProcess("2", 1))
+      print(multiProcess("hello", 1))
+      print(multiProcess("2", 10))
+      print(multiProcess("0", 1))
+
+- id: raise_exception
+  title: 예외 발생시키기
+  subtitle: raise로 의도적인 예외 발생
+  blocks:
+  - type: text
+    content: 예외는 자동으로 발생하기도 하지만, raise 키워드를 사용하여 직접 예외를 발생시킬 수도 있습니다. raise는 영어로 '올리다, 일으키다'라는 뜻으로, 예외를 일으킨다는 의미입니다. 함수에 잘못된 값이 전달되었거나 프로그램이 처리할 수 없는 상태가 되었을 때, raise를 사용하여 명시적으로 예외를 발생시킬 수 있습니다. 예를 들어 나이가 음수이거나 너무 큰 값이면 ValueError를 발생시켜서 함수를 호출한 쪽에 문제를 알릴 수 있습니다. 이렇게 하면 잘못된 데이터가 프로그램 전체로 퍼지는 것을 막고, 문제가 발생한 시점에서 바로 처리할 수 있습니다.
+  - type: list
+    items:
+    - raise 키워드로 의도적으로 예외 발생
+    - 입력값 검증과 유효성 확인에 활용
+    - 조건이 충족되지 않을 때 호출자에게 알림
+    - 사용자 정의 오류 메시지 제공
+  - type: code
+    language: python
+    title: 예외 발생시키기
+    description: raise로 예외를 발생시킵니다.
+    content: |-
+      def raiseSetAge(age):
+          if age < 0:
+              raise ValueError("나이는 음수일 수 없습니다")
+          if age > 150:
+              raise ValueError("나이가 너무 큽니다")
+          return age
+
+      try:
+          raiseAge1 = raiseSetAge(25)
+          print(f"나이: {raiseAge1}")
+      except ValueError as e:
+          print(f"오류: {e}")
+
+      try:
+          raiseAge2 = raiseSetAge(-5)
+      except ValueError as e:
+          print(f"오류: {e}")
+  - type: tip
+    content: "raise는 함수 내에서 잘못된 인수나 상태를 호출자에게 알릴 때 사용합니다."
+
+- id: custom_exception
+  title: 사용자 정의 예외
+  subtitle: 커스텀 예외 클래스 만들기
+  blocks:
+  - type: text
+    content: 파이썬이 제공하는 기본 예외 외에도 자신만의 예외 클래스를 만들 수 있습니다. day21에서 배울 클래스를 사용하여 Exception 클래스를 상속받아 새로운 예외를 정의합니다. 상속(Inheritance)은 기존 클래스의 기능을 물려받아 새로운 클래스를 만드는 것입니다. 사용자 정의 예외는 프로그램의 특정 상황을 명확하게 표현할 수 있어서 코드를 읽는 사람이 어떤 오류인지 즉시 이해할 수 있습니다. 예를 들어 은행 시스템에서 InsufficientBalanceError라는 예외를 만들면, 잔액 부족 상황을 명확하게 나타낼 수 있습니다. 이렇게 도메인에 특화된 예외를 사용하면 코드의 가독성과 유지보수성이 크게 향상됩니다.
+  - type: list
+    items:
+    - Exception 클래스를 상속받아 새로운 예외 정의
+    - 프로그램 도메인에 특화된 예외 생성
+    - 오류 상황을 명확하게 표현하여 가독성 향상
+    - 유지보수와 디버깅이 쉬운 코드 작성
+  - type: code
+    language: python
+    title: 사용자 정의 예외
+    description: 커스텀 예외 클래스를 만듭니다.
+    content: |-
+      class NegativeValueError(Exception):
+          def __init__(self, value):
+              self.value = value
+              self.message = f"음수 값은 허용되지 않습니다: {value}"
+              super().__init__(self.message)
+
+      class InsufficientBalanceError(Exception):
+          pass
+
+      def customDeposit(amount):
+          if amount < 0:
+              raise NegativeValueError(amount)
+          return amount
+
+      try:
+          customDeposit(-100)
+      except NegativeValueError as e:
+          print(f"오류: {e}")
+
+- id: practical_examples
+  title: 실용적인 예외 처리
+  subtitle: 실무에서 자주 사용하는 패턴
+  blocks:
+  - type: text
+    content: 실제 프로그램을 만들 때 자주 사용하는 예외 처리 패턴을 알아봅니다. 사용자 입력을 안전하게 정수로 변환하거나, 나눗셈 오류를 방지하거나, 리스트 인덱스 오류를 처리하는 등의 상황에서 예외 처리를 활용합니다. 이런 함수들의 공통점은 기본값(default)을 제공한다는 것입니다. 예외가 발생하면 프로그램을 중단하는 대신 미리 정해둔 기본값을 반환하여 프로그램이 계속 실행될 수 있도록 합니다. 이러한 패턴을 사용하면 예외가 발생해도 프로그램이 안정적으로 동작하며, 사용자에게 더 나은 경험을 제공할 수 있습니다.
+  - type: list
+    items:
+    - 안전한 타입 변환과 사용자 입력 검증
+    - 0으로 나누기 등 연산 오류 방지
+    - 리스트 인덱스 범위 오류 처리
+    - 예외 발생 시 기본값 반환하여 프로그램 안정성 확보
+  - type: code
+    language: python
+    title: 실용적인 예외 처리 패턴
+    description: 실무에서 자주 사용하는 패턴입니다.
+    content: |-
+      def pracSafeInt(value, default=0):
+          try:
+              return int(value)
+          except (ValueError, TypeError):
+              return default
+
+      print(pracSafeInt("123"))
+      print(pracSafeInt("hello"))
+      print(pracSafeInt(None, -1))
+
+      def pracSafeDivide(a, b, default=None):
+          try:
+              return a / b
+          except ZeroDivisionError:
+              return default
+
+      print(pracSafeDivide(10, 2))
+      print(pracSafeDivide(10, 0, 0))
+
+      def pracSafeGet(lst, index, default=None):
+          try:
+              return lst[index]
+          except (IndexError, TypeError):
+              return default
+
+      pracNumbers = [1, 2, 3]
+      print(pracSafeGet(pracNumbers, 1))
+      print(pracSafeGet(pracNumbers, 10, -1))
+
+- id: practice
+  title: 18일차 복습
+  subtitle: 예외 처리 미션
+  blocks:
+  - type: text
+    content: 18일차에서 배운 예외 처리를 복습하는 미션입니다. try-except, else, finally, raise를 활용하여 안정적인 프로그램을 만들어봅시다. 이전 day에서 배운 문자열, 리스트, 딕셔너리, 조건문, 반복문, 함수를 함께 활용합니다.
+  - type: expansion
+    title: "미션1: 안전한 정수 변환"
+    code: |-
+      def revSafeInt(value):
+          try:
+              return int(value)
+          except ValueError:
+              return None
+
+      print(revSafeInt("123"))
+      print(revSafeInt("abc"))
+  - type: expansion
+    title: "미션2: 안전한 나누기"
+    code: |-
+      def revSafeDivide(a, b):
+          try:
+              return a / b
+          except ZeroDivisionError:
+              return None
+
+      print(revSafeDivide(10, 2))
+      print(revSafeDivide(10, 0))
+  - type: expansion
+    title: "미션3: 다중 예외 처리"
+    code: |-
+      def revProcessData(data, index, key):
+          try:
+              revItem = data[index]
+              return revItem[key]
+          except (IndexError, KeyError, TypeError) as e:
+              return f"오류: {type(e).__name__}"
+
+      revData = [{"name": "Alice"}]
+      print(revProcessData(revData, 0, "name"))
+      print(revProcessData(revData, 5, "name"))
+  - type: expansion
+    title: "미션4: else와 finally"
+    code: |-
+      def revReadNumber(value):
+          try:
+              revNum = int(value)
+          except ValueError:
+              print("변환 실패")
+              return None
+          else:
+              print("변환 성공")
+              return revNum
+          finally:
+              print("처리 완료")
+
+      revReadNumber("123")
+      revReadNumber("abc")
+  - type: expansion
+    title: "미션5: 예외 발생시키기"
+    code: |-
+      def revValidateAge(age):
+          if not isinstance(age, int):
+              raise TypeError("나이는 정수여야 합니다")
+          if age < 0:
+              raise ValueError("나이는 음수일 수 없습니다")
+          return age
+
+      try:
+          revValidateAge(-5)
+      except (TypeError, ValueError) as e:
+          print(f"오류: {e}")
+  - type: expansion
+    title: "미션6: 사용자 정의 예외"
+    code: |-
+      class InvalidScoreError(Exception):
+          pass
+
+      def revSetScore(score):
+          if not 0 <= score <= 100:
+              raise InvalidScoreError(f"점수는 0-100 사이: {score}")
+          return score
+
+      try:
+          revSetScore(150)
+      except InvalidScoreError as e:
+          print(e)
+  - type: expansion
+    title: "미션7: 종합 예제"
+    code: |-
+      def revCalculate(expr):
+          try:
+              revA, revOp, revB = expr.split()
+              revA, revB = float(revA), float(revB)
+              if revOp == "+":
+                  return revA + revB
+              elif revOp == "-":
+                  return revA - revB
+              elif revOp == "*":
+                  return revA * revB
+              elif revOp == "/":
+                  return revA / revB
+              else:
+                  raise ValueError(f"알 수 없는 연산자: {revOp}")
+          except ZeroDivisionError:
+              return "0으로 나눌 수 없음"
+          except ValueError as e:
+              return f"오류: {e}"
+
+      print(revCalculate("10 + 5"))
+      print(revCalculate("10 / 0"))
+      print(revCalculate("abc"))

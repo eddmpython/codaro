@@ -1,0 +1,320 @@
+meta:
+  id: scipy_00
+  title: scipy소개
+  order: 0
+  category: scipy
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags: ["scipy", "과학계산", "최적화", "통계검정", "신호처리"]
+  seo:
+    title: "SciPy 입문 - Python 과학 계산의 핵심"
+    description: "SciPy로 최적화, 통계검정, 신호처리, 보간법을 시작하세요. NumPy를 확장한 고급 과학 계산 라이브러리입니다."
+    keywords: ["scipy", "과학계산", "최적화", "통계검정", "보간", "신호처리"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "🔬"
+      title: "SciPy??"
+      subtitle: "Python 과학 계산의 핵심 라이브러리"
+
+    - type: hero
+      emoji: "⚗️"
+      title: "NumPy를 확장한 고급 과학 도구"
+      subtitle: "수학, 과학, 공학 문제를 해결하는 알고리즘 모음"
+      points:
+        - emoji: "📈"
+          title: "최적화"
+        - emoji: "📊"
+          title: "통계 검정"
+        - emoji: "🔊"
+          title: "신호 처리"
+        - emoji: "📐"
+          title: "수치 적분"
+
+- id: what_is_scipy
+  blocks:
+    - type: sectionHeader
+      title: "🤔 SciPy가 뭔가요?"
+      subtitle: "과학 계산을 위한 스위스 군용 칼"
+
+    - type: note
+      style: info
+      title: "NumPy vs SciPy"
+      content: |-
+        NumPy는 배열 연산의 기초입니다. 행렬 곱셈, 인덱싱, 기본 통계는 NumPy로 충분합니다. SciPy는 NumPy 위에 구축된 고급 알고리즘 모음입니다. 최적화, 적분, 보간, 신호처리, 통계검정 등 전문적인 과학 계산 기능을 제공합니다. NumPy가 기초 수학이라면, SciPy는 응용 수학입니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🎯"
+          title: "scipy.optimize"
+          description: "함수 최소화, 방정식 풀이, 곡선 피팅"
+        - emoji: "📊"
+          title: "scipy.stats"
+          description: "확률분포, 가설검정, 기술통계"
+        - emoji: "🔊"
+          title: "scipy.signal"
+          description: "필터 설계, FFT, 스펙트럼 분석"
+        - emoji: "📐"
+          title: "scipy.integrate"
+          description: "수치적분, 미분방정식"
+
+- id: why_scipy
+  blocks:
+    - type: sectionHeader
+      title: "🌟 왜 SciPy가 필요한가요?"
+      subtitle: "기존 라이브러리와의 차이"
+
+    - type: note
+      style: info
+      title: "전문 알고리즘의 보고"
+      content: |-
+        직접 구현하면 수백 줄이 필요한 알고리즘을 한 줄로 호출할 수 있습니다. 최적화 문제에서 minimize() 한 번이면 복잡한 경사하강법을 실행합니다. 통계검정에서 ttest_ind() 한 번이면 t-검정 결과를 얻습니다. FORTRAN과 C로 작성된 검증된 알고리즘을 Python에서 편리하게 사용할 수 있습니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "⚡"
+          title: "검증된 알고리즘"
+          description: "수십 년간 검증된 수치해석 코드"
+        - emoji: "🚀"
+          title: "최적화된 성능"
+          description: "C/FORTRAN 기반 고속 연산"
+        - emoji: "📚"
+          title: "풍부한 문서"
+          description: "상세한 API 문서와 예제"
+        - emoji: "🔧"
+          title: "NumPy 호환"
+          description: "ndarray 기반 일관된 인터페이스"
+
+- id: scipy_modules
+  blocks:
+    - type: sectionHeader
+      title: "📦 SciPy 주요 모듈"
+      subtitle: "어떤 기능이 있나요?"
+
+    - type: table
+      headers: ["모듈", "기능", "대표 함수"]
+      rows:
+        - ["scipy.optimize", "최적화, 방정식", "minimize, curve_fit, root"]
+        - ["scipy.stats", "통계, 확률분포", "ttest_ind, norm, describe"]
+        - ["scipy.interpolate", "보간법", "interp1d, griddata"]
+        - ["scipy.integrate", "적분, 미분방정식", "quad, odeint"]
+        - ["scipy.signal", "신호처리", "butter, filtfilt, spectrogram"]
+        - ["scipy.linalg", "선형대수", "solve, eig, svd"]
+        - ["scipy.sparse", "희소행렬", "csr_matrix, linalg.spsolve"]
+        - ["scipy.spatial", "공간 알고리즘", "distance, KDTree"]
+
+    - type: note
+      style: tip
+      title: "모듈별 import"
+      content: |-
+        SciPy는 모듈별로 import합니다. from scipy import optimize처럼 필요한 모듈만 불러옵니다. scipy 전체를 import하면 느리고 메모리를 많이 사용합니다. 각 모듈은 독립적이므로 필요한 것만 선택적으로 사용하세요.
+
+- id: scipy_vs_others
+  blocks:
+    - type: sectionHeader
+      title: "🆚 SciPy vs 다른 라이브러리"
+      subtitle: "언제 무엇을 쓸까?"
+
+    - type: compare
+      left:
+        title: "NumPy"
+        subtitle: "배열 연산 기초"
+        icon: "🔢"
+        color: "blue"
+        items:
+          - "배열 생성, 인덱싱"
+          - "기본 수학 연산"
+          - "선형대수 기초"
+          - "난수 생성"
+        infoBox: "SciPy의 기반, 항상 함께 사용"
+      right:
+        title: "SciPy"
+        subtitle: "고급 과학 계산"
+        icon: "🔬"
+        color: "green"
+        items:
+          - "최적화, 피팅"
+          - "통계 검정"
+          - "신호처리, FFT"
+          - "수치적분, ODE"
+        infoBox: "NumPy 확장, 전문 알고리즘"
+
+    - type: compare
+      left:
+        title: "statsmodels"
+        subtitle: "통계 모델링"
+        icon: "📊"
+        color: "purple"
+        items:
+          - "회귀분석 summary"
+          - "시계열 ARIMA"
+          - "p-value, 신뢰구간"
+          - "모델 진단"
+        infoBox: "통계적 추론, 해석 중심"
+      right:
+        title: "scipy.stats"
+        subtitle: "확률/검정 도구"
+        icon: "🎲"
+        color: "green"
+        items:
+          - "확률분포 계산"
+          - "가설검정 함수"
+          - "기술통계량"
+          - "난수 샘플링"
+        infoBox: "기본 통계 함수, statsmodels 보완"
+
+- id: core_concepts
+  blocks:
+    - type: sectionHeader
+      title: "🧩 핵심 개념"
+      subtitle: "SciPy로 무엇을 할 수 있나요?"
+
+    - type: featureCards
+      cards:
+        - emoji: "1️⃣"
+          title: "최적화 (Optimization)"
+          description: "함수의 최소값/최대값 찾기, 비용 최소화"
+        - emoji: "2️⃣"
+          title: "통계 검정 (Statistical Test)"
+          description: "두 집단 비교, 정규성 검정, 상관분석"
+        - emoji: "3️⃣"
+          title: "보간법 (Interpolation)"
+          description: "데이터 사이 값 추정, 곡선 연결"
+        - emoji: "4️⃣"
+          title: "곡선 피팅 (Curve Fitting)"
+          description: "데이터에 수식 맞추기, 모델 파라미터 추정"
+        - emoji: "5️⃣"
+          title: "신호 처리 (Signal Processing)"
+          description: "노이즈 제거, 주파수 분석"
+        - emoji: "6️⃣"
+          title: "수치 적분 (Integration)"
+          description: "면적 계산, 누적량 산출"
+
+- id: use_cases
+  blocks:
+    - type: sectionHeader
+      title: "💼 실전 활용 사례"
+      subtitle: "SciPy로 해결하는 문제들"
+
+    - type: featureCards
+      cards:
+        - emoji: "💰"
+          title: "투자 포트폴리오 최적화"
+          description: "위험 대비 수익 최대화 자산 배분"
+        - emoji: "🧪"
+          title: "A/B 테스트 분석"
+          description: "두 버전의 성과 차이 검정"
+        - emoji: "📈"
+          title: "성장 곡선 피팅"
+          description: "사용자 증가율 모델링"
+        - emoji: "🔊"
+          title: "오디오 필터링"
+          description: "노이즈 제거, 이퀄라이저"
+        - emoji: "🌡️"
+          title: "센서 데이터 보간"
+          description: "결측 구간 값 추정"
+        - emoji: "📊"
+          title: "분포 적합도 검정"
+          description: "데이터가 정규분포인지 확인"
+
+- id: projects_preview
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 앞으로 배울 내용"
+      subtitle: "10개 프로젝트로 마스터하기"
+
+    - type: table
+      headers: ["단계", "프로젝트", "배울 내용", "실용 가치"]
+      rows:
+        - ["입문", "확률분포 탐색기", "norm, uniform, 확률밀도함수", "통계 기초 이해"]
+        - ["입문", "A/B 테스트 분석", "ttest_ind, p-value 해석", "마케팅 의사결정"]
+        - ["기초", "데이터 보간기", "interp1d, 스플라인", "결측값 처리"]
+        - ["기초", "곡선 피팅 마스터", "curve_fit, 비선형 회귀", "성장률 모델링"]
+        - ["기초", "정규성 검정기", "shapiro, normaltest", "분석 전제 확인"]
+        - ["중급", "포트폴리오 최적화", "minimize, 제약조건", "투자 전략"]
+        - ["중급", "신호 필터링", "butter, filtfilt", "센서 데이터 정제"]
+        - ["중급", "수치 적분기", "quad, 면적 계산", "물리량 계산"]
+        - ["심화", "스펙트럼 분석기", "fft, spectrogram", "주파수 분석"]
+        - ["심화", "종합 과학 프로젝트", "모든 모듈 통합", "실전 문제 해결"]
+
+    - type: note
+      style: info
+      title: "프로젝트 기반 학습"
+      content: |-
+        각 프로젝트는 실제 문제를 해결합니다. A/B 테스트로 마케팅 결정을 내리고, 포트폴리오 최적화로 투자 전략을 수립하고, 신호 필터링으로 센서 데이터를 정제합니다. 10개 프로젝트를 완료하면 과학/공학 계산의 핵심 도구를 모두 다룰 수 있게 됩니다.
+
+- id: pyodide_note
+  blocks:
+    - type: sectionHeader
+      title: "⚠️ Pyodide 환경 참고사항"
+      subtitle: "브라우저에서 실행 시 주의점"
+
+    - type: note
+      style: warning
+      title: "제한사항"
+      content: |-
+        SciPy는 Pyodide에서 완벽히 지원됩니다. 다만 초기 로딩 시 약 15-25MB를 다운로드하므로 처음 실행 시 시간이 걸릴 수 있습니다. scipy.sparse의 일부 기능은 제한될 수 있습니다. 대부분의 optimize, stats, interpolate, signal 기능은 정상 작동합니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "✅"
+          title: "정상 작동"
+          description: "optimize, stats, interpolate, signal, integrate"
+        - emoji: "⚠️"
+          title: "주의 필요"
+          description: "sparse 일부 기능, 대용량 연산"
+        - emoji: "📦"
+          title: "설치 방법"
+          description: "await micropip.install('scipy')"
+
+- id: installation
+  blocks:
+    - type: sectionHeader
+      title: "📦 설치 및 시작"
+      subtitle: "pyodide 환경에서 바로 사용"
+
+    - type: note
+      style: info
+      title: "브라우저에서 바로 실행"
+      content: |-
+        이 강의는 marimo pyodide 환경에서 실행됩니다. 별도 설치 없이 브라우저에서 바로 코드를 실행할 수 있습니다. micropip.install()로 scipy를 불러오면 모든 준비가 끝납니다. 로컬 환경에서는 pip install scipy로 설치하면 됩니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🌐"
+          title: "pyodide 환경"
+          description: "브라우저에서 Python 실행"
+        - emoji: "📦"
+          title: "micropip 설치"
+          description: "await micropip.install('scipy')"
+        - emoji: "🚀"
+          title: "바로 시작"
+          description: "from scipy import optimize, stats"
+
+- id: resources
+  blocks:
+    - type: sectionHeader
+      title: "📚 참고 자료"
+      subtitle: "더 깊이 공부하고 싶다면"
+
+    - type: links
+      items:
+        - text: SciPy 공식 문서
+          url: https://docs.scipy.org/doc/scipy/
+          icon: "🔗"
+        - text: SciPy Tutorial
+          url: https://docs.scipy.org/doc/scipy/tutorial/
+          icon: "🔗"
+        - text: SciPy API Reference
+          url: https://docs.scipy.org/doc/scipy/reference/
+          icon: "🔗"
+
+- id: next
+  blocks:
+    - type: hero
+      emoji: "👉"
+      title: "다음: 확률분포 탐색기"
+      subtitle: "scipy.stats로 정규분포, 균등분포를 시각화하고 확률을 계산합니다"

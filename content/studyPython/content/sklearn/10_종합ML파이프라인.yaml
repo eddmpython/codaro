@@ -1,0 +1,439 @@
+meta:
+  id: sklearn_10
+  title: 종합ML파이프라인
+  order: 10
+  category: sklearn
+  difficulty: "⭐⭐⭐⭐"
+  badge: 고급
+  tags: ["sklearn", "Pipeline", "ColumnTransformer", "전처리", "워크플로우"]
+  seo:
+    title: "Sklearn Pipeline - 종합 ML 워크플로우"
+    description: "Pipeline과 ColumnTransformer로 전처리부터 모델 학습까지 통합합니다. 재현 가능한 ML 워크플로우를 구축합니다."
+    keywords: ["sklearn", "Pipeline", "ColumnTransformer", "workflow", "preprocessing"]
+
+intro:
+  emoji: "🔧"
+  goal: Pipeline으로 전처리와 모델 학습을 통합하고 재현 가능한 ML 워크플로우를 구축합니다.
+  description: Pipeline은 여러 변환 단계와 모델을 하나로 연결합니다. ColumnTransformer는 수치형/범주형 컬럼에 다른 전처리를 적용합니다. 이전에 배운 모든 개념을 통합하여 실전 ML 파이프라인을 구축합니다.
+
+sections:
+- id: step1_data
+  title: 1단계. 데이터 로딩
+  subtitle: 타이타닉 데이터
+  blocks:
+  - type: text
+    content: 타이타닉 생존 데이터를 사용합니다. 수치형과 범주형 변수가 혼합되어 있어 Pipeline 실습에 적합합니다.
+  - type: code
+    language: python
+    title: 데이터 로딩
+    description: 타이타닉 데이터를 불러옵니다
+    content: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.model_selection import train_test_split, cross_val_score, GridSearchCV
+      from sklearn.preprocessing import StandardScaler, OneHotEncoder
+      from sklearn.impute import SimpleImputer
+      from sklearn.compose import ColumnTransformer
+      from sklearn.pipeline import Pipeline
+      from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, classification_report, roc_auc_score
+      import matplotlib.pyplot as plt
+
+      url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+      titanic = pd.read_csv(url)
+      titanic.head()
+  - type: tip
+    content: 타이타닉 데이터는 Pclass(좌석등급), Sex(성별), Age(나이), SibSp(형제자매), Parch(부모자녀), Fare(요금), Embarked(승선항) 등으로 Survived(생존) 여부를 예측합니다.
+
+- id: step2_eda
+  title: 2단계. 데이터 탐색
+  subtitle: 결측치와 분포
+  blocks:
+  - type: text
+    content: 결측치 현황과 생존 분포를 확인합니다.
+  - type: code
+    language: python
+    title: 결측치 확인
+    description: 각 컬럼의 결측치를 확인합니다
+    content: |-
+      missingDf = pd.DataFrame({
+          "missing": titanic.isnull().sum(),
+          "percent": (titanic.isnull().sum() / len(titanic) * 100).round(2)
+      })
+      missingDf[missingDf["missing"] > 0]
+  - type: code
+    language: python
+    title: 생존 분포
+    description: 생존 여부 분포를 확인합니다
+    content: |-
+      figSurv, axSurv = plt.subplots(figsize=(6, 4))
+      titanic["Survived"].value_counts().plot(kind="bar", color=["coral", "steelblue"], ax=axSurv)
+      axSurv.set_xticklabels(["Died", "Survived"], rotation=0)
+      axSurv.set_ylabel("Count")
+      axSurv.set_title("Survival Distribution")
+      figSurv
+
+- id: step3_select
+  title: 3단계. 특성 선택
+  subtitle: 수치형/범주형 분류
+  blocks:
+  - type: text
+    content: 분석에 사용할 특성을 선택하고 수치형/범주형으로 분류합니다.
+  - type: code
+    language: python
+    title: 특성 분류
+    description: 수치형과 범주형 컬럼을 분류합니다
+    content: |-
+      numCols = ["Age", "SibSp", "Parch", "Fare"]
+      catCols = ["Pclass", "Sex", "Embarked"]
+
+      featureCols = numCols + catCols
+      X = titanic[featureCols].copy()
+      y = titanic["Survived"].copy()
+      X.shape, y.shape
+  - type: tip
+    content: Age와 Embarked에 결측치가 있습니다. Pipeline에서 SimpleImputer로 자동 처리합니다.
+
+- id: step4_split
+  title: 4단계. 데이터 분할
+  subtitle: 학습/테스트 분리
+  blocks:
+  - type: text
+    content: 학습/테스트 데이터로 분할합니다. 파이프라인 구축 전에 분할하여 데이터 누수를 방지합니다.
+  - type: code
+    language: python
+    title: 데이터 분할
+    description: 학습/테스트 데이터로 분할합니다
+    content: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+      xTrain.shape, xTest.shape
+  - type: tip
+    content: 전처리(스케일링, 인코딩)는 반드시 분할 후 학습 데이터에만 fit하고 테스트 데이터에는 transform만 적용합니다. Pipeline이 이를 자동으로 처리합니다.
+
+- id: step5_preprocessor
+  title: 5단계. 전처리 파이프라인
+  subtitle: ColumnTransformer
+  blocks:
+  - type: text
+    content: ColumnTransformer로 수치형/범주형 컬럼에 다른 전처리를 적용합니다.
+  - type: code
+    language: python
+    title: 수치형 파이프라인
+    description: 수치형 컬럼 전처리를 정의합니다
+    content: |-
+      numPipeline = Pipeline([
+          ("imputer", SimpleImputer(strategy="median")),
+          ("scaler", StandardScaler())
+      ])
+      numPipeline
+  - type: code
+    language: python
+    title: 범주형 파이프라인
+    description: 범주형 컬럼 전처리를 정의합니다
+    content: |-
+      catPipeline = Pipeline([
+          ("imputer", SimpleImputer(strategy="most_frequent")),
+          ("encoder", OneHotEncoder(drop="first", sparse_output=False, handle_unknown="ignore"))
+      ])
+      catPipeline
+  - type: code
+    language: python
+    title: ColumnTransformer
+    description: 두 파이프라인을 결합합니다
+    content: |-
+      preprocessor = ColumnTransformer([
+          ("num", numPipeline, numCols),
+          ("cat", catPipeline, catCols)
+      ])
+      preprocessor
+  - type: tip
+    content: "ColumnTransformer는 컬럼별로 다른 변환을 적용합니다. remainder='passthrough'로 나머지 컬럼을 유지하거나 'drop'으로 제거할 수 있습니다."
+
+- id: step6_fullpipe
+  title: 6단계. 전체 파이프라인
+  subtitle: 전처리 + 모델
+  blocks:
+  - type: text
+    content: 전처리와 모델을 하나의 파이프라인으로 연결합니다. fit과 predict가 한 번에 실행됩니다.
+  - type: code
+    language: python
+    title: 전체 파이프라인
+    description: 전처리와 모델을 연결합니다
+    content: |-
+      fullPipeline = Pipeline([
+          ("preprocessor", preprocessor),
+          ("classifier", RandomForestClassifier(n_estimators=100, random_state=42))
+      ])
+      fullPipeline
+  - type: code
+    language: python
+    title: 학습 및 예측
+    description: 파이프라인으로 학습하고 예측합니다
+    content: |-
+      fullPipeline.fit(xTrain, yTrain)
+      yPred = fullPipeline.predict(xTest)
+      acc = accuracy_score(yTest, yPred)
+      print(f"Accuracy: {acc:.4f}")
+  - type: tip
+    content: Pipeline.fit()은 모든 전처리 단계의 fit_transform()과 마지막 모델의 fit()을 순차적으로 실행합니다. predict()도 마찬가지입니다.
+
+- id: step7_cv
+  title: 7단계. 교차검증
+  subtitle: 파이프라인 CV
+  blocks:
+  - type: text
+    content: 파이프라인 전체에 교차검증을 적용합니다. 각 폴드에서 전처리도 다시 수행됩니다.
+  - type: code
+    language: python
+    title: 교차검증
+    description: 파이프라인에 교차검증을 적용합니다
+    content: |-
+      cvScores = cross_val_score(fullPipeline, xTrain, yTrain, cv=5, scoring="accuracy")
+      print(f"CV Scores: {cvScores}")
+      print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
+  - type: code
+    language: python
+    title: CV 결과 시각화
+    description: 폴드별 점수를 막대 그래프로 표시합니다
+    content: |-
+      figCv, axCv = plt.subplots(figsize=(8, 4))
+      folds = [f"Fold {i+1}" for i in range(5)]
+      axCv.bar(folds, cvScores, color="steelblue")
+      axCv.axhline(cvScores.mean(), color="red", linestyle="--", label=f"Mean: {cvScores.mean():.3f}")
+      axCv.set_ylabel("Accuracy")
+      axCv.set_title("Pipeline Cross-Validation Scores")
+      axCv.legend()
+      figCv
+  - type: tip
+    content: 파이프라인에 교차검증을 적용하면 각 폴드에서 전처리가 독립적으로 수행되어 데이터 누수를 완벽히 방지합니다.
+
+- id: step8_grid
+  title: 8단계. 파이프라인 GridSearch
+  subtitle: 하이퍼파라미터 튜닝
+  blocks:
+  - type: text
+    content: 파이프라인의 모델 파라미터를 GridSearchCV로 튜닝합니다. 파라미터명에 단계명을 접두사로 붙입니다.
+  - type: code
+    language: python
+    title: 파라미터 그리드
+    description: 파이프라인 파라미터를 정의합니다
+    content: |-
+      paramGrid = {
+          "classifier__n_estimators": [50, 100],
+          "classifier__max_depth": [5, 10, None],
+          "classifier__min_samples_split": [2, 5]
+      }
+      paramGrid
+  - type: code
+    language: python
+    title: GridSearchCV
+    description: 파이프라인 그리드 서치를 실행합니다
+    content: |-
+      gridSearch = GridSearchCV(fullPipeline, paramGrid, cv=5, scoring="accuracy")
+      gridSearch.fit(xTrain, yTrain)
+      print(f"Best Params: {gridSearch.best_params_}")
+      print(f"Best CV Score: {gridSearch.best_score_:.4f}")
+  - type: tip
+    content: "파이프라인 파라미터명 형식: '단계명__파라미터명'. classifier__n_estimators는 classifier 단계의 n_estimators 파라미터입니다."
+
+- id: step9_models
+  title: 9단계. 모델 비교
+  subtitle: 여러 알고리즘
+  blocks:
+  - type: text
+    content: 동일한 전처리로 여러 모델의 성능을 비교합니다. 파이프라인을 재사용하면 효율적입니다.
+  - type: code
+    language: python
+    title: 모델 비교
+    description: 여러 모델의 성능을 비교합니다
+    content: |-
+      models = {
+          "LogisticRegression": LogisticRegression(max_iter=1000, random_state=42),
+          "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42),
+          "GradientBoosting": GradientBoostingClassifier(n_estimators=100, random_state=42)
+      }
+
+      results = {}
+      for name, model in models.items():
+          pipe = Pipeline([
+              ("preprocessor", preprocessor),
+              ("classifier", model)
+          ])
+          scores = cross_val_score(pipe, xTrain, yTrain, cv=5, scoring="accuracy")
+          results[name] = {"mean": scores.mean(), "std": scores.std()}
+          print(f"{name}: {scores.mean():.4f} (+/- {scores.std() * 2:.4f})")
+  - type: code
+    language: python
+    title: 비교 시각화
+    description: 모델별 성능을 막대 그래프로 비교합니다
+    content: |-
+      figModels, axModels = plt.subplots(figsize=(8, 5))
+      names = list(results.keys())
+      means = [results[n]["mean"] for n in names]
+      stds = [results[n]["std"] for n in names]
+      colors = ["coral", "steelblue", "forestgreen"]
+      axModels.bar(names, means, yerr=stds, color=colors, capsize=5)
+      axModels.set_ylabel("Accuracy")
+      axModels.set_title("Model Comparison (5-Fold CV)")
+      axModels.set_ylim(0.7, 0.9)
+      figModels
+
+- id: step10_final
+  title: 10단계. 최종 평가
+  subtitle: 테스트 성능
+  blocks:
+  - type: text
+    content: 최적 모델로 테스트 데이터 성능을 평가합니다.
+  - type: code
+    language: python
+    title: 최종 모델 평가
+    description: 최적 파이프라인으로 테스트 데이터를 평가합니다
+    content: |-
+      bestPipe = gridSearch.best_estimator_
+      yPredFinal = bestPipe.predict(xTest)
+      accFinal = accuracy_score(yTest, yPredFinal)
+      print(f"Test Accuracy: {accFinal:.4f}")
+  - type: code
+    language: python
+    title: 분류 리포트
+    description: 상세 성능 지표를 확인합니다
+    content: |-
+      print(classification_report(yTest, yPredFinal, target_names=["Died", "Survived"]))
+
+- id: step11_proba
+  title: 11단계. 확률 예측
+  subtitle: ROC-AUC
+  blocks:
+  - type: text
+    content: 생존 확률을 예측하고 ROC-AUC로 성능을 평가합니다.
+  - type: code
+    language: python
+    title: 확률 예측 및 AUC
+    description: 생존 확률과 AUC를 계산합니다
+    content: |-
+      yProba = bestPipe.predict_proba(xTest)[:, 1]
+      auc = roc_auc_score(yTest, yProba)
+      print(f"ROC-AUC: {auc:.4f}")
+  - type: code
+    language: python
+    title: 확률 분포
+    description: 생존/사망별 예측 확률 분포를 확인합니다
+    content: |-
+      figProba, axProba = plt.subplots(figsize=(8, 5))
+      axProba.hist(yProba[yTest == 0], bins=20, alpha=0.6, label="Died", color="coral")
+      axProba.hist(yProba[yTest == 1], bins=20, alpha=0.6, label="Survived", color="steelblue")
+      axProba.set_xlabel("Predicted Survival Probability")
+      axProba.set_ylabel("Count")
+      axProba.set_title("Prediction Probability Distribution")
+      axProba.legend()
+      figProba
+
+- id: step12_importance
+  title: 12단계. 특성 중요도
+  subtitle: 모델 해석
+  blocks:
+  - type: text
+    content: 파이프라인에서 특성 중요도를 추출합니다. OneHotEncoder로 생성된 특성명을 복원합니다.
+  - type: code
+    language: python
+    title: 특성명 추출
+    description: 전처리 후 특성명을 추출합니다
+    content: |-
+      numFeatures = numCols
+      catEncoder = bestPipe.named_steps["preprocessor"].named_transformers_["cat"].named_steps["encoder"]
+      catFeatures = catEncoder.get_feature_names_out(catCols).tolist()
+      allFeatures = numFeatures + catFeatures
+      allFeatures
+  - type: code
+    language: python
+    title: 특성 중요도 시각화
+    description: 특성 중요도를 막대 그래프로 표시합니다
+    content: |-
+      rfModel = bestPipe.named_steps["classifier"]
+      impDf = pd.DataFrame({"feature": allFeatures, "importance": rfModel.feature_importances_})
+      impDf = impDf.sort_values("importance", ascending=True)
+
+      figImp, axImp = plt.subplots(figsize=(8, 6))
+      axImp.barh(impDf["feature"], impDf["importance"], color="steelblue")
+      axImp.set_xlabel("Importance")
+      axImp.set_title("Feature Importances")
+      figImp
+  - type: tip
+    content: 타이타닉 생존 예측에서 Sex(성별), Fare(요금), Age(나이), Pclass(좌석등급)가 중요한 요인입니다. 여성, 고가 티켓, 1등석 승객의 생존율이 높았습니다.
+
+- id: practice
+  title: 실습
+  subtitle: ML 파이프라인
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 당뇨병 회귀 파이프라인"
+    code: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_diabetes
+      from sklearn.model_selection import train_test_split, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.pipeline import Pipeline
+      from sklearn.linear_model import Ridge
+      from sklearn.metrics import mean_squared_error, r2_score
+      import matplotlib.pyplot as plt
+
+      diabetes = load_diabetes()
+      xDiab = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+      yDiab = diabetes.target
+      xTrD, xTeD, yTrD, yTeD = train_test_split(xDiab, yDiab, test_size=0.2, random_state=42)
+
+      regPipe = Pipeline([
+          ("scaler", StandardScaler()),
+          ("regressor", Ridge(alpha=1.0))
+      ])
+      regPipe.fit(xTrD, yTrD)
+      predD = regPipe.predict(xTeD)
+      r2D = r2_score(yTeD, predD)
+      print(f"R2 Score: {r2D:.4f}")
+
+      cvR2 = cross_val_score(regPipe, xTrD, yTrD, cv=5, scoring="r2")
+      print(f"CV R2: {cvR2.mean():.4f} (+/- {cvR2.std() * 2:.4f})")
+  - type: expansion
+    title: "미션2: 붓꽃 분류 파이프라인 비교"
+    code: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_iris
+      from sklearn.model_selection import train_test_split, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.pipeline import Pipeline
+      from sklearn.svm import SVC
+      from sklearn.ensemble import RandomForestClassifier
+      from sklearn.neighbors import KNeighborsClassifier
+      import matplotlib.pyplot as plt
+
+      iris = load_iris()
+      xIris = pd.DataFrame(iris.data, columns=iris.feature_names)
+      yIris = iris.target
+      xTrI, xTeI, yTrI, yTeI = train_test_split(xIris, yIris, test_size=0.2, random_state=42)
+
+      modelsI = {
+          "SVM": SVC(random_state=42),
+          "RandomForest": RandomForestClassifier(n_estimators=100, random_state=42),
+          "KNN": KNeighborsClassifier(n_neighbors=5)
+      }
+
+      resultsI = {}
+      for name, model in modelsI.items():
+          pipeI = Pipeline([("scaler", StandardScaler()), ("clf", model)])
+          scoresI = cross_val_score(pipeI, xTrI, yTrI, cv=5)
+          resultsI[name] = scoresI.mean()
+          print(f"{name}: {scoresI.mean():.4f}")
+
+      figM2, axM2 = plt.subplots(figsize=(7, 4))
+      axM2.bar(resultsI.keys(), resultsI.values(), color=["coral", "steelblue", "forestgreen"])
+      axM2.set_ylabel("Accuracy")
+      axM2.set_title("Iris Classification: Model Comparison")
+      axM2.set_ylim(0.9, 1.0)
+      figM2

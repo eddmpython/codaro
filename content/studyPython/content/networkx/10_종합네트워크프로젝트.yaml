@@ -1,0 +1,553 @@
+meta:
+  id: networkx_10
+  title: 종합네트워크프로젝트
+  order: 10
+  category: networkx
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["networkx", "종합", "분석", "시각화", "대시보드"]
+  seo:
+    title: "NetworkX 종합 프로젝트 - 네트워크 분석 대시보드"
+    description: "NetworkX로 종합 네트워크 분석을 수행합니다. 모든 개념을 통합하여 분석 파이프라인을 구축합니다."
+    keywords: ["networkx", "종합", "분석", "시각화", "대시보드", "파이프라인"]
+
+intro:
+  emoji: "🎓"
+  goal: 지금까지 배운 모든 개념을 활용하여 종합 네트워크 분석을 수행합니다.
+  description: 이 프로젝트에서는 레미제라블 네트워크를 완전히 분석합니다. 기본 통계, 중심성, 경로, 클러스터링, 커뮤니티, 연결성을 모두 분석하고 종합 시각화합니다. 분석 파이프라인을 구축하여 어떤 네트워크에도 적용할 수 있게 합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: 종합 분석에 필요한 모든 라이브러리를 불러옵니다. 이 프로젝트에서는 지금까지 배운 NetworkX의 모든 기능을 활용합니다. 기본 통계, 중심성 분석, 경로 분석, 클러스터링, 커뮤니티 탐지, 연결성 분석을 통합하여 하나의 네트워크를 완전히 분석하는 파이프라인을 구축합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: networkx와 관련 모듈
+    content: |-
+      import networkx as nx
+      from networkx.algorithms import community
+      import matplotlib.pyplot as plt
+
+- id: step2_load_data
+  title: 2단계. 데이터 로드
+  subtitle: 레미제라블 네트워크
+  blocks:
+  - type: text
+    content: Victor Hugo의 소설 '레미제라블'에 등장하는 인물들의 관계 네트워크를 로드합니다. 77명의 인물과 254개의 관계로 구성되며, 엣지의 weight 속성은 두 인물이 같은 장면에 함께 등장한 횟수를 나타냅니다. 이 데이터셋은 규모가 적당하면서도 풍부한 구조를 가지고 있어 네트워크 분석 학습에 이상적입니다.
+  - type: code
+    language: python
+    title: 네트워크 로드
+    description: 내장 데이터셋
+    content: |-
+      G = nx.les_miserables_graph()
+      numNodes = G.number_of_nodes()
+      numEdges = G.number_of_edges()
+      numNodes, numEdges
+  - type: code
+    language: python
+    title: 노드/엣지 샘플
+    description: 데이터 확인
+    content: |-
+      sampleNodes = list(G.nodes())[:10]
+      sampleEdges = list(G.edges(data=True))[:5]
+      sampleNodes, sampleEdges
+  - type: tip
+    content: 레미제라블 네트워크는 77명의 등장인물과 254개의 관계로 구성됩니다. 엣지의 weight는 함께 등장한 횟수입니다.
+
+- id: step3_basic_stats
+  title: 3단계. 기본 통계
+  subtitle: 네트워크 개요
+  blocks:
+  - type: text
+    content: 네트워크의 기본 통계량을 계산합니다. 밀도는 전체 가능한 연결 중 실제 연결의 비율, 평균 차수는 인물당 평균 관계 수, 지름은 가장 먼 두 인물 사이의 거리, 클러스터링은 친구의 친구가 친구인 정도를 나타냅니다. 이 지표들로 네트워크의 전반적인 특성을 파악합니다.
+  - type: code
+    language: python
+    title: 밀도와 차수
+    description: 기본 지표
+    content: |-
+      density = nx.density(G)
+      degrees = [d for n, d in G.degree()]
+      avgDegree = sum(degrees) / len(degrees)
+      minDeg = min(degrees)
+      maxDeg = max(degrees)
+      density, avgDegree, minDeg, maxDeg
+  - type: code
+    language: python
+    title: 경로와 지름
+    description: 연결 구조
+    content: |-
+      isConnected = nx.is_connected(G)
+      diameter = nx.diameter(G) if isConnected else None
+      avgPath = nx.average_shortest_path_length(G) if isConnected else None
+      isConnected, diameter, round(avgPath, 2)
+  - type: code
+    language: python
+    title: 클러스터링
+    description: 군집화 정도
+    content: |-
+      avgClustering = nx.average_clustering(G)
+      transitivity = nx.transitivity(G)
+      avgClustering, transitivity
+
+- id: step4_centrality
+  title: 4단계. 중심성 분석
+  subtitle: 주요 인물 찾기
+  blocks:
+  - type: text
+    content: 다양한 중심성 지표로 소설의 핵심 인물들을 찾습니다. 연결 중심성은 가장 많은 인물과 관계를 가진 사람, 매개 중심성은 서로 다른 그룹을 연결하는 중요한 위치의 인물, 근접 중심성은 모든 인물에게 빠르게 도달할 수 있는 중앙에 위치한 인물, 고유벡터 중심성은 중요한 인물들과 연결된 인물을 찾아냅니다.
+  - type: code
+    language: python
+    title: 중심성 계산
+    description: 4가지 중심성
+    content: |-
+      degCent = nx.degree_centrality(G)
+      betCent = nx.betweenness_centrality(G)
+      closeCent = nx.closeness_centrality(G)
+      eigCent = nx.eigenvector_centrality(G)
+  - type: code
+    language: python
+    title: 연결 중심성 상위
+    description: 가장 많이 연결된 인물
+    content: |-
+      topDegree = sorted(degCent.items(), key=lambda x: x[1], reverse=True)[:5]
+      topDegree
+  - type: code
+    language: python
+    title: 매개 중심성 상위
+    description: 다리 역할 인물
+    content: |-
+      topBetween = sorted(betCent.items(), key=lambda x: x[1], reverse=True)[:5]
+      topBetween
+  - type: code
+    language: python
+    title: 종합 중심성 순위
+    description: 모든 지표 통합
+    content: |-
+      topNodes = set()
+      for cent in [degCent, betCent, closeCent, eigCent]:
+          topNodes.update([n for n, v in sorted(cent.items(), key=lambda x: x[1], reverse=True)[:5]])
+
+      centralityRank = {}
+      for n in topNodes:
+          centralityRank[n] = {
+              'degree': round(degCent[n], 3),
+              'betweenness': round(betCent[n], 3),
+              'closeness': round(closeCent[n], 3),
+              'eigenvector': round(eigCent[n], 3)
+          }
+      centralityRank
+
+- id: step5_community
+  title: 5단계. 커뮤니티 탐지
+  subtitle: 그룹 발견
+  blocks:
+  - type: text
+    content: 커뮤니티 탐지 알고리즘으로 등장인물 그룹을 찾습니다. 소설에서 함께 등장하는 인물들은 자연스럽게 스토리라인별로 그룹을 형성합니다. 알고리즘이 발견한 커뮤니티가 소설의 실제 스토리 구조와 어떻게 일치하는지 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 커뮤니티 탐지
+    description: 루뱅 알고리즘
+    content: |-
+      communities = community.louvain_communities(G, seed=42)
+      commList = [set(c) for c in communities]
+      numComms = len(commList)
+      numComms
+  - type: code
+    language: python
+    title: 모듈성
+    description: 커뮤니티 품질
+    content: |-
+      modularity = nx.community.modularity(G, commList)
+      modularity
+  - type: code
+    language: python
+    title: 커뮤니티 크기
+    description: 각 그룹 인원
+    content: |-
+      commSizes = [(i, len(c)) for i, c in enumerate(commList)]
+      sorted(commSizes, key=lambda x: x[1], reverse=True)
+  - type: code
+    language: python
+    title: 노드별 커뮤니티
+    description: 커뮤니티 매핑
+    content: |-
+      nodeComm = {}
+      for i, comm in enumerate(commList):
+          for n in comm:
+              nodeComm[n] = i
+
+      sampleComm = {n: nodeComm[n] for n in list(G.nodes())[:10]}
+      sampleComm
+
+- id: step6_path_analysis
+  title: 6단계. 경로 분석
+  subtitle: 주요 인물 간 거리
+  blocks:
+  - type: text
+    content: 주요 등장인물 사이의 최단 경로를 분석합니다. 중심성이 높은 주요 인물들 간의 거리 행렬을 계산하면 소설의 인물 관계 구조를 이해할 수 있습니다. 장발장과 미리엘 주교, 코제트와 마리우스 등 중요한 인물들이 어떻게 연결되어 있는지 경로를 추적합니다.
+  - type: code
+    language: python
+    title: 주요 인물 선정
+    description: 중심성 상위 5명
+    content: |-
+      mainChars = [n for n, v in sorted(degCent.items(), key=lambda x: x[1], reverse=True)[:5]]
+      mainChars
+  - type: code
+    language: python
+    title: 경로 행렬
+    description: 인물 간 거리
+    content: |-
+      pathMatrix = {}
+      for i, src in enumerate(mainChars):
+          pathMatrix[src] = {}
+          for tgt in mainChars:
+              if src != tgt:
+                  pathMatrix[src][tgt] = nx.shortest_path_length(G, src, tgt)
+              else:
+                  pathMatrix[src][tgt] = 0
+      pathMatrix
+  - type: code
+    language: python
+    title: 구체적 경로
+    description: Valjean과 Myriel 사이
+    content: |-
+      pathVM = nx.shortest_path(G, 'Valjean', 'Myriel')
+      pathVM
+
+- id: step7_connectivity
+  title: 7단계. 연결성 분석
+  subtitle: 네트워크 구조
+  blocks:
+  - type: text
+    content: 네트워크의 연결 구조와 취약점을 분석합니다. 노드 연결도는 네트워크를 분리하기 위해 제거해야 하는 최소 노드 수, 엣지 연결도는 최소 엣지 수를 나타냅니다. 절단점(articulation point)은 제거 시 네트워크가 분리되는 중요 노드입니다. 소설에서 이 절단점들이 어떤 역할을 하는지 분석합니다.
+  - type: code
+    language: python
+    title: 연결성 지표
+    description: 노드/엣지 연결도
+    content: |-
+      nodeConn = nx.node_connectivity(G)
+      edgeConn = nx.edge_connectivity(G)
+      nodeConn, edgeConn
+  - type: code
+    language: python
+    title: 브릿지와 절단점
+    description: 취약점 확인
+    content: |-
+      bridges = list(nx.bridges(G))
+      artPoints = list(nx.articulation_points(G))
+      len(bridges), len(artPoints)
+  - type: code
+    language: python
+    title: 절단점 목록
+    description: 중요 노드
+    content: |-
+      artPoints[:10] if len(artPoints) > 10 else artPoints
+  - type: tip
+    content: 절단점이 많다는 것은 네트워크가 특정 노드에 의존적임을 의미합니다.
+
+- id: step8_visualization
+  title: 8단계. 종합 시각화
+  subtitle: 대시보드
+  blocks:
+  - type: text
+    content: 분석 결과를 종합하여 다중 패널 대시보드를 생성합니다. 커뮤니티+연결중심성, 커뮤니티+매개중심성, 클러스터링 계수, 차수 분포의 네 가지 뷰를 하나의 그림에 배치합니다. 이런 종합 시각화는 네트워크의 다양한 측면을 한눈에 파악할 수 있게 해줍니다.
+  - type: code
+    language: python
+    title: 레이아웃 계산
+    description: 노드 위치
+    content: |-
+      pos = nx.spring_layout(G, seed=42, k=0.5)
+  - type: code
+    language: python
+    title: 커뮤니티 색상
+    description: 그룹별 색상 매핑
+    content: |-
+      colorPalette = ['#e41a1c', '#377eb8', '#4daf4a', '#984ea3', '#ff7f00',
+                      '#ffff33', '#a65628', '#f781bf', '#999999', '#66c2a5']
+      nodeColors = [colorPalette[nodeComm[n] % len(colorPalette)] for n in G.nodes()]
+  - type: code
+    language: python
+    title: 종합 시각화
+    description: 4패널 대시보드
+    content: |-
+      fig, axes = plt.subplots(2, 2, figsize=(16, 14))
+
+      nodeSizes1 = [3000 * degCent[n] for n in G.nodes()]
+      nx.draw(G, pos=pos, node_color=nodeColors, node_size=nodeSizes1,
+              edge_color='lightgray', alpha=0.8, ax=axes[0, 0])
+      axes[0, 0].set_title('Community + Degree Centrality')
+
+      nodeSizes2 = [5000 * betCent[n] + 50 for n in G.nodes()]
+      nx.draw(G, pos=pos, node_color=nodeColors, node_size=nodeSizes2,
+              edge_color='lightgray', alpha=0.8, ax=axes[0, 1])
+      axes[0, 1].set_title('Community + Betweenness Centrality')
+
+      clustCoeffs = nx.clustering(G)
+      clustColors = [clustCoeffs[n] for n in G.nodes()]
+      nodes3 = nx.draw_networkx_nodes(G, pos=pos, node_color=clustColors,
+                                       cmap=plt.cm.YlOrRd, node_size=100, ax=axes[1, 0])
+      nx.draw_networkx_edges(G, pos=pos, edge_color='lightgray', ax=axes[1, 0])
+      plt.colorbar(nodes3, ax=axes[1, 0], label='Clustering')
+      axes[1, 0].set_title('Clustering Coefficient')
+
+      degreeList = [d for n, d in G.degree()]
+      axes[1, 1].hist(degreeList, bins=20, color='steelblue', edgecolor='black')
+      axes[1, 1].set_xlabel('Degree')
+      axes[1, 1].set_ylabel('Count')
+      axes[1, 1].set_title('Degree Distribution')
+
+      fig.suptitle('Les Misérables Network Analysis Dashboard', fontsize=16)
+      fig.tight_layout()
+      fig
+
+- id: step9_summary_report
+  title: 9단계. 분석 리포트
+  subtitle: 결과 정리
+  blocks:
+  - type: text
+    content: 분석 결과를 정리하여 리포트를 생성합니다. 데이터 분석에서 리포트는 단순한 결과 나열이 아니라, 발견한 패턴과 인사이트를 체계적으로 전달하는 중요한 산출물입니다. 네트워크 분석 리포트에는 기본 통계, 구조적 특성, 핵심 노드, 커뮤니티 정보를 포함합니다. Python의 딕셔너리를 활용하면 계층적이고 구조화된 리포트를 쉽게 만들 수 있습니다.
+  - type: code
+    language: python
+    title: 네트워크 요약
+    description: 기본 지표 정리
+    content: |-
+      report = {
+          'Basic Stats': {
+              'Nodes': numNodes,
+              'Edges': numEdges,
+              'Density': round(density, 4),
+              'Average Degree': round(avgDegree, 2),
+              'Diameter': diameter,
+              'Average Path Length': round(avgPath, 2)
+          },
+          'Clustering': {
+              'Average Clustering': round(avgClustering, 3),
+              'Transitivity': round(transitivity, 3)
+          },
+          'Community': {
+              'Number of Communities': numComms,
+              'Modularity': round(modularity, 3)
+          },
+          'Connectivity': {
+              'Node Connectivity': nodeConn,
+              'Edge Connectivity': edgeConn,
+              'Articulation Points': len(artPoints),
+              'Bridges': len(bridges)
+          }
+      }
+      report
+  - type: code
+    language: python
+    title: 핵심 인물 리포트
+    description: 중심성 상위 인물
+    content: |-
+      keyCharacters = {
+          'Most Connected': topDegree[0][0],
+          'Most Influential': topBetween[0][0],
+          'Top 5 by Degree': [n for n, v in topDegree]
+      }
+      keyCharacters
+  - type: code
+    language: python
+    title: 인사이트
+    description: 분석 결론
+    content: |-
+      insights = [
+          f"1. 네트워크는 {numNodes}명의 인물과 {numEdges}개의 관계로 구성됨",
+          f"2. 평균 {round(avgDegree, 1)}개의 관계를 가지며, 밀도는 {round(density, 3)}",
+          f"3. {numComms}개의 커뮤니티가 발견됨 (모듈성: {round(modularity, 3)})",
+          f"4. {topDegree[0][0]}이(가) 가장 많은 관계를 가진 핵심 인물",
+          f"5. {topBetween[0][0]}이(가) 다리 역할의 핵심 인물",
+          f"6. 평균 {round(avgPath, 1)} 단계로 모든 인물에 도달 가능"
+      ]
+      insights
+
+- id: step10_function
+  title: 10단계. 재사용 함수
+  subtitle: 분석 파이프라인
+  blocks:
+  - type: text
+    content: 분석 과정을 함수로 정리하여 어떤 네트워크에도 적용할 수 있게 합니다. 소프트웨어 공학에서 반복되는 작업을 함수화하는 것은 재사용성, 유지보수성, 일관성을 높이는 핵심 원칙입니다. 네트워크 분석 함수를 만들어두면 새로운 데이터셋에 동일한 분석을 즉시 적용할 수 있습니다. 가라테 클럽과 레미제라블 네트워크를 비교 분석하며 함수의 활용법을 익힙니다.
+  - type: code
+    language: python
+    title: 분석 함수
+    description: 종합 분석 파이프라인
+    content: |-
+      def analyzeNetwork(graph):
+          result = {}
+
+          result['nodes'] = graph.number_of_nodes()
+          result['edges'] = graph.number_of_edges()
+          result['density'] = round(nx.density(graph), 4)
+
+          degs = [d for n, d in graph.degree()]
+          result['avgDegree'] = round(sum(degs) / len(degs), 2)
+
+          result['avgClustering'] = round(nx.average_clustering(graph), 3)
+
+          if nx.is_connected(graph):
+              result['avgPath'] = round(nx.average_shortest_path_length(graph), 2)
+              result['diameter'] = nx.diameter(graph)
+          else:
+              result['avgPath'] = None
+              result['diameter'] = None
+
+          comms = community.louvain_communities(graph, seed=42)
+          result['numCommunities'] = len(comms)
+          result['modularity'] = round(nx.community.modularity(graph, comms), 3)
+
+          degCentG = nx.degree_centrality(graph)
+          result['topNode'] = max(degCentG, key=degCentG.get)
+
+          return result
+
+      analyzeNetwork(G)
+  - type: code
+    language: python
+    title: 다른 네트워크 적용
+    description: 가라테 클럽 분석
+    content: |-
+      karate = nx.karate_club_graph()
+      karateResult = analyzeNetwork(karate)
+      karateResult
+  - type: code
+    language: python
+    title: 비교 분석
+    description: 두 네트워크 비교
+    content: |-
+      lesmisResult = analyzeNetwork(G)
+
+      comparisonFinal = {
+          'Les Miserables': lesmisResult,
+          'Karate Club': karateResult
+      }
+      comparisonFinal
+
+- id: practice
+  title: 실습
+  subtitle: 종합 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다. 미션1에서는 르네상스 시대 피렌체 주요 가문들의 정치적 혼인 관계를 분석합니다. 이 데이터는 사회학 연구의 고전으로, 메디치 가문이 어떻게 네트워크 중심에서 권력을 장악했는지 보여줍니다. 미션2에서는 실제 네트워크와 랜덤 그래프 모델을 비교하여 어떤 모델이 현실을 가장 잘 설명하는지 분석합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 피렌체 가문 종합 분석"
+    blocks:
+    - type: code
+      title: 데이터 로드
+      content: |-
+        import networkx as nx
+        from networkx.algorithms import community
+        import matplotlib.pyplot as plt
+
+        data = nx.florentine_families_graph()
+        numN = data.number_of_nodes()
+        numE = data.number_of_edges()
+        numN, numE
+    - type: code
+      title: 기본 분석
+      content: |-
+        densityF = nx.density(data)
+        avgClustF = nx.average_clustering(data)
+        avgPathF = nx.average_shortest_path_length(data)
+
+        degCentF = nx.degree_centrality(data)
+        betCentF = nx.betweenness_centrality(data)
+
+        topFamily = max(degCentF, key=degCentF.get)
+        bridgeFamily = max(betCentF, key=betCentF.get)
+
+        analysisF = {
+            'density': round(densityF, 3),
+            'avgClustering': round(avgClustF, 3),
+            'avgPath': round(avgPathF, 2),
+            'topFamily': topFamily,
+            'bridgeFamily': bridgeFamily
+        }
+        analysisF
+    - type: code
+      title: 시각화
+      content: |-
+        posF = nx.spring_layout(data, seed=42)
+        sizesF = [3000 * degCentF[n] for n in data.nodes()]
+
+        chart, plot = plt.subplots(figsize=(10, 8))
+        nx.draw(data, pos=posF, with_labels=True, node_size=sizesF,
+                node_color='gold', font_size=9, ax=plot)
+        plot.set_title('Florentine Families Network')
+        chart
+  - type: expansion
+    title: "미션2: 랜덤 그래프와 실제 비교"
+    blocks:
+    - type: code
+      title: 실제 네트워크 분석
+      content: |-
+        import networkx as nx
+        from networkx.algorithms import community
+        import matplotlib.pyplot as plt
+
+        df = nx.karate_club_graph()
+        nK = df.number_of_nodes()
+        mK = df.number_of_edges()
+
+        realStats = {
+            'nodes': nK,
+            'edges': mK,
+            'clustering': round(nx.average_clustering(df), 3),
+            'avgPath': round(nx.average_shortest_path_length(df), 2)
+        }
+        realStats
+    - type: code
+      title: 랜덤 그래프 비교
+      content: |-
+        pEst = 2 * mK / (nK * (nK - 1))
+
+        erG = nx.erdos_renyi_graph(nK, pEst, seed=42)
+        baG = nx.barabasi_albert_graph(nK, 2, seed=42)
+        wsG = nx.watts_strogatz_graph(nK, 4, 0.3, seed=42)
+
+        modelStats = {
+            'ER': {
+                'clustering': round(nx.average_clustering(erG), 3),
+                'avgPath': round(nx.average_shortest_path_length(erG), 2) if nx.is_connected(erG) else None
+            },
+            'BA': {
+                'clustering': round(nx.average_clustering(baG), 3),
+                'avgPath': round(nx.average_shortest_path_length(baG), 2) if nx.is_connected(baG) else None
+            },
+            'WS': {
+                'clustering': round(nx.average_clustering(wsG), 3),
+                'avgPath': round(nx.average_shortest_path_length(wsG), 2) if nx.is_connected(wsG) else None
+            }
+        }
+        modelStats
+    - type: code
+      title: 비교 시각화
+      content: |-
+        canvas, panels = plt.subplots(1, 4, figsize=(16, 4))
+
+        posReal = nx.spring_layout(df, seed=42)
+        posER = nx.spring_layout(erG, seed=42)
+        posBA = nx.spring_layout(baG, seed=42)
+        posWS = nx.spring_layout(wsG, seed=42)
+
+        nx.draw(df, pos=posReal, node_size=50, node_color='lightblue', ax=panels[0])
+        panels[0].set_title(f'Karate\nC={realStats["clustering"]}')
+
+        nx.draw(erG, pos=posER, node_size=50, node_color='salmon', ax=panels[1])
+        panels[1].set_title(f'ER\nC={modelStats["ER"]["clustering"]}')
+
+        nx.draw(baG, pos=posBA, node_size=50, node_color='lightgreen', ax=panels[2])
+        panels[2].set_title(f'BA\nC={modelStats["BA"]["clustering"]}')
+
+        nx.draw(wsG, pos=posWS, node_size=50, node_color='wheat', ax=panels[3])
+        panels[3].set_title(f'WS\nC={modelStats["WS"]["clustering"]}')
+
+        canvas.suptitle('Real vs Random Graph Models')
+        canvas.tight_layout()
+        canvas

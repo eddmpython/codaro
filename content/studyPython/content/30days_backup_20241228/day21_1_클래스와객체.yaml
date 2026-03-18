@@ -1,0 +1,504 @@
+meta:
+  id: day21_1
+  title: 클래스와객체
+  day: 21
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 클래스와 객체지향"
+    description: "class로 클래스를 정의하고 객체를 생성하는 방법."
+    keywords: ['클래스', 'class', '객체', 'OOP']
+intro:
+  emoji: "🏛️"
+  points:
+  - 클래스와 객체의 기본 개념
+  - 생성자(__init__) 메서드 사용법
+  - 객체 메서드 정의와 호출
+  - 상속(Inheritance)의 개념과 구현
+  - 메서드 오버라이딩과 super() 함수
+sections:
+- id: oop_introduction
+  title: 객체 지향 프로그래밍 소개
+  subtitle: OOP의 기본 개념 이해하기
+  blocks:
+  - type: text
+    content: 객체 지향 프로그래밍(Object-Oriented Programming, OOP)은 현실 세계의 사물을 프로그램으로 표현하는 프로그래밍 방식입니다. Object는 영어로 '물건, 대상'을 뜻하며, 우리가 일상에서 보는 모든 것(사람, 자동차, 책 등)을 객체로 생각할 수 있습니다. 파이썬에서는 숫자, 문자열, 리스트 같은 모든 데이터가 실제로 객체입니다. 객체는 데이터(속성)와 그 데이터를 처리하는 기능(메서드)을 하나로 묶어서 관리합니다. 이렇게 관련된 것들을 하나로 묶으면 코드를 이해하고 관리하기가 훨씬 쉬워집니다.
+  - type: list
+    items:
+    - 객체(Object) - 속성과 메서드를 가진 독립적인 단위
+    - 캡슐화(Encapsulation) - 관련된 데이터와 기능을 하나로 묶기
+    - 상속(Inheritance) - 기존 클래스의 특성을 물려받아 확장하기
+    - 다형성(Polymorphism) - 같은 이름의 메서드가 다르게 동작하기
+  - type: code
+    language: python
+    title: 파이썬의 모든 것은 객체
+    description: 파이썬에서 모든 데이터는 객체입니다.
+    content: |-
+      oopNumber = 10
+      oopString = "hello"
+      oopList = [1, 2, 3]
+      oopDict = {}
+
+      print(type(oopNumber))
+      print(type(oopString))
+      print(type(oopList))
+      print(type(oopDict))
+
+      oopText = "Python"
+      print(oopText.upper())
+      print(oopText.lower())
+  - type: tip
+    content: "파이썬의 모든 데이터 타입(int, str, list 등)은 클래스로 정의되어 있으며, 우리가 만드는 모든 값은 객체입니다."
+
+- id: class_basic
+  title: 클래스 기본 정의
+  subtitle: 클래스 생성과 객체 인스턴스화
+  blocks:
+  - type: text
+    content: 클래스(Class)는 영어로 '종류, 부류'를 뜻하며, 객체를 만들기 위한 설계도나 틀입니다. 붕어빵 틀을 생각하면 쉽습니다. 클래스는 붕어빵 틀이고, 그 틀로 만든 붕어빵들이 객체(인스턴스)입니다. class 키워드로 클래스를 정의하며, 클래스 이름은 PascalCase(첫 글자를 대문자로)를 사용합니다. 인스턴스(Instance)는 '실례, 사례'를 뜻하며, 클래스로부터 실제로 만들어진 객체를 말합니다. 같은 클래스로 만든 여러 인스턴스는 각각 독립적인 메모리 공간을 가지므로 서로 영향을 주지 않습니다.
+  - type: list
+    items:
+    - 클래스(Class) - 객체를 만들기 위한 설계도
+    - 인스턴스(Instance) - 클래스로부터 생성된 실제 객체
+    - class 키워드로 정의하고 클래스명은 PascalCase 사용
+    - 클래스명()으로 새로운 인스턴스 생성
+    - 각 인스턴스는 독립적인 메모리 공간 보유
+  - type: code
+    language: python
+    title: 클래스 정의와 객체 생성
+    description: 기본 클래스 정의와 객체 생성 방법입니다.
+    content: |-
+      class Car:
+          pass
+
+      class Student:
+          pass
+
+      basicCar = Car()
+      basicStudent1 = Student()
+      basicStudent2 = Student()
+
+      print(type(basicCar))
+      print(id(basicStudent1))
+      print(id(basicStudent2))
+  - type: tip
+    content: "pass 키워드는 아무 내용도 없는 빈 클래스를 만들 때 사용합니다. 나중에 내용을 추가할 수 있습니다."
+
+- id: init_method
+  title: __init__ 생성자
+  subtitle: 객체 초기화 메서드
+  blocks:
+  - type: text
+    content: __init__은 생성자(Constructor)라고 부르는 특별한 메서드입니다. Constructor는 '건설자'라는 뜻으로, 객체를 만들 때 초기 설정을 해주는 역할을 합니다. __init__ 메서드는 클래스명()으로 인스턴스를 생성할 때 자동으로 호출됩니다. self 매개변수는 생성되는 인스턴스 자신을 가리키며, 모든 인스턴스 메서드의 첫 번째 매개변수로 반드시 작성해야 합니다. 속성(Attribute)은 객체가 가지는 데이터를 의미하며, self.속성명 형태로 정의합니다. 생성자에서 매개변수를 받아 각 인스턴스마다 다른 초기값을 설정할 수 있습니다.
+  - type: list
+    items:
+    - __init__ - 객체 생성 시 자동으로 호출되는 생성자
+    - self - 생성되는 인스턴스 자신을 가리키는 매개변수
+    - 속성(Attribute) - self.속성명 형태로 인스턴스가 가지는 데이터
+    - 매개변수로 초기값을 받아 각 인스턴스마다 다른 속성값 설정
+    - 인스턴스 메서드는 첫 번째 매개변수로 반드시 self 작성
+  - type: code
+    language: python
+    title: __init__ 메서드 사용
+    description: 생성자로 객체를 초기화합니다.
+    content: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      initPerson1 = Person("김철수", 25)
+      initPerson2 = Person("이영희", 30)
+
+      print(initPerson1.name)
+      print(initPerson1.age)
+      print(initPerson2.name)
+  - type: tip
+    content: "__init__의 앞뒤 밑줄 2개는 파이썬의 특별한 메서드(매직 메서드)를 나타냅니다. 이름을 임의로 바꿀 수 없습니다."
+
+- id: class_instance_attributes
+  title: 클래스 속성과 인스턴스 속성
+  subtitle: 공유 변수와 개별 변수
+  blocks:
+  - type: text
+    content: 속성에는 두 가지 종류가 있습니다. 클래스 속성(Class Attribute)은 클래스에 속한 변수로, 그 클래스로 만든 모든 인스턴스가 함께 공유합니다. 마치 학교 이름처럼 모든 학생이 같은 값을 가지는 정보입니다. 클래스 속성은 클래스 본문에 직접 정의합니다. 반면 인스턴스 속성(Instance Attribute)은 각 인스턴스마다 개별적으로 가지는 변수로, 학생마다 다른 이름이나 나이처럼 고유한 정보입니다. 인스턴스 속성은 __init__ 메서드에서 self.속성명으로 정의합니다. 클래스 속성은 클래스명.속성명으로, 인스턴스 속성은 인스턴스명.속성명으로 접근합니다.
+  - type: list
+    items:
+    - 클래스 속성 - 모든 인스턴스가 공유하는 변수
+    - 인스턴스 속성 - 각 인스턴스가 개별적으로 가지는 변수
+    - 클래스 속성은 클래스 본문에 정의
+    - 인스턴스 속성은 __init__에서 self.속성명으로 정의
+    - 클래스명.속성명으로 클래스 속성 접근
+  - type: code
+    language: python
+    title: 클래스 속성 vs 인스턴스 속성
+    description: 두 종류의 속성 차이를 확인합니다.
+    content: |-
+      class Dog:
+          species = "Canis lupus"
+
+          def __init__(self, name):
+              self.name = name
+
+      attrDog1 = Dog("멍멍이")
+      attrDog2 = Dog("바둑이")
+
+      print(Dog.species)
+      print(attrDog1.species)
+      print(attrDog1.name)
+      print(attrDog2.name)
+  - type: tip
+    content: "클래스 속성은 설정값이나 카운터 등 모든 인스턴스가 공유해야 하는 데이터에 사용하고, 인스턴스 속성은 각 객체의 고유한 상태를 저장할 때 사용합니다."
+
+- id: instance_methods
+  title: 인스턴스 메서드
+  subtitle: 객체의 행동 정의하기
+  blocks:
+  - type: text
+    content: 메서드(Method)는 클래스 안에 정의된 함수를 말합니다. Method는 '방법, 수단'이라는 뜻으로, 객체가 할 수 있는 행동이나 기능을 나타냅니다. 인스턴스 메서드(Instance Method)는 각 인스턴스가 수행할 수 있는 행동을 정의하며, 첫 번째 매개변수로 반드시 self를 받습니다. self를 통해 그 인스턴스의 속성에 접근하고 값을 변경할 수 있습니다. 메서드는 인스턴스명.메서드명() 형태로 호출하며, 이때 self 매개변수에는 자동으로 인스턴스 자신이 전달됩니다. 메서드를 사용하면 객체의 데이터와 그 데이터를 다루는 기능을 함께 관리할 수 있습니다.
+  - type: list
+    items:
+    - 메서드(Method) - 클래스 안에 정의된 함수
+    - 인스턴스 메서드 - 각 인스턴스가 수행할 수 있는 행동
+    - 첫 번째 매개변수로 반드시 self 작성
+    - self를 통해 인스턴스 속성에 접근하고 수정 가능
+    - 인스턴스명.메서드명() 형태로 호출
+  - type: code
+    language: python
+    title: 인스턴스 메서드 정의
+    description: 메서드로 객체의 기능을 구현합니다.
+    content: |-
+      class BankAccount:
+          def __init__(self, owner, balance):
+              self.owner = owner
+              self.balance = balance
+
+          def deposit(self, amount):
+              self.balance += amount
+              return self.balance
+
+          def withdraw(self, amount):
+              if amount <= self.balance:
+                  self.balance -= amount
+              return self.balance
+
+      methodAccount = BankAccount("김철수", 1000)
+      print(methodAccount.deposit(500))
+      print(methodAccount.withdraw(200))
+  - type: tip
+    content: "메서드 안에서 self.속성명으로 인스턴스 속성을 읽거나 수정할 수 있습니다. self를 빼먹으면 에러가 발생합니다."
+
+- id: class_methods
+  title: 클래스 메서드
+  subtitle: '@classmethod 데코레이터'
+  blocks:
+  - type: text
+    content: 클래스 메서드(Class Method)는 인스턴스가 아닌 클래스 자체에 속하는 메서드입니다. @classmethod라는 데코레이터(Decorator)를 메서드 위에 붙여서 정의합니다. 데코레이터는 '장식하다'라는 뜻으로, 함수나 메서드에 추가 기능을 부여하는 문법입니다. 클래스 메서드는 첫 번째 매개변수로 cls를 받는데, 이는 클래스 자체를 가리킵니다. self가 인스턴스를 가리키는 것과 대비됩니다. 클래스 메서드는 인스턴스를 만들지 않고도 클래스명.메서드명()으로 바로 호출할 수 있으며, 주로 대안 생성자를 만들거나 클래스 속성을 조작할 때 사용합니다.
+  - type: list
+    items:
+    - 클래스 메서드 - 클래스 자체에 속하는 메서드
+    - "@classmethod 데코레이터를 메서드 위에 작성"
+    - 첫 번째 매개변수로 cls(클래스 자체) 받음
+    - 인스턴스 생성 없이 클래스명.메서드명()으로 호출
+    - 대안 생성자나 클래스 속성 조작에 활용
+  - type: code
+    language: python
+    title: 클래스 메서드 사용
+    description: 클래스 메서드 정의와 호출 방법입니다.
+    content: |-
+      class Person:
+          population = 0
+
+          def __init__(self, name):
+              self.name = name
+              Person.population += 1
+
+          @classmethod
+          def getPopulation(cls):
+              return cls.population
+
+          @classmethod
+          def fromString(cls, nameStr):
+              return cls(nameStr.strip())
+
+      print(Person.getPopulation())
+      clsPerson1 = Person("김철수")
+      print(Person.getPopulation())
+      clsPerson2 = Person.fromString("이영희  ")
+      print(clsPerson2.name)
+  - type: tip
+    content: "클래스 메서드는 cls를 통해 클래스 속성에 접근하거나 새로운 인스턴스를 생성할 수 있습니다."
+
+- id: static_methods
+  title: 정적 메서드
+  subtitle: '@staticmethod 데코레이터'
+  blocks:
+  - type: text
+    content: 정적 메서드(Static Method)는 클래스나 인스턴스의 상태와 관계없이 독립적으로 동작하는 메서드입니다. Static은 '정적인, 고정된'이라는 뜻으로, 인스턴스나 클래스의 변화하는 상태와 무관하게 항상 같은 방식으로 동작합니다. @staticmethod 데코레이터를 사용하며, self나 cls 매개변수를 받지 않습니다. 클래스와 논리적으로 관련은 있지만 인스턴스나 클래스의 데이터가 필요 없는 유틸리티 함수를 만들 때 사용합니다. 일반 함수를 클래스 안에 묶어서 코드를 체계적으로 관리할 수 있게 해줍니다.
+  - type: list
+    items:
+    - 정적 메서드 - 클래스나 인스턴스 상태와 독립적인 메서드
+    - "@staticmethod 데코레이터 사용"
+    - self나 cls 매개변수를 받지 않음
+    - 인스턴스나 클래스의 데이터에 접근하지 않음
+    - 클래스와 관련된 유틸리티 함수 구현에 활용
+  - type: code
+    language: python
+    title: 정적 메서드 사용
+    description: 정적 메서드 정의와 호출 방법입니다.
+    content: |-
+      class MathUtils:
+          @staticmethod
+          def add(a, b):
+              return a + b
+
+          @staticmethod
+          def isEven(number):
+              return number % 2 == 0
+
+          @staticmethod
+          def factorial(n):
+              if n <= 1:
+                  return 1
+              return n * MathUtils.factorial(n - 1)
+
+      print(MathUtils.add(5, 3))
+      print(MathUtils.isEven(10))
+      print(MathUtils.factorial(5))
+  - type: tip
+    content: "정적 메서드는 클래스의 네임스페이스를 활용해 관련 함수들을 묶어 관리할 때 유용합니다."
+
+- id: property_decorator
+  title: 프로퍼티 데코레이터
+  subtitle: '@property와 getter/setter'
+  blocks:
+  - type: text
+    content: 프로퍼티(Property)는 메서드를 마치 속성처럼 사용할 수 있게 해주는 기능입니다. Property는 '속성, 특성'이라는 뜻입니다. @property 데코레이터로 getter(읽기 메서드)를 정의하고, @속성명.setter 데코레이터로 setter(쓰기 메서드)를 정의합니다. Getter는 '얻는 사람', Setter는 '설정하는 사람'이라는 뜻입니다. 프로퍼티를 사용하면 속성에 접근할 때 자동으로 메서드가 실행되므로, 값을 읽거나 쓸 때 유효성 검증이나 추가 처리를 할 수 있습니다. 파이썬의 관례로 내부용 속성은 이름 앞에 _(밑줄)을 붙이고, 외부에서는 프로퍼티를 통해 안전하게 접근합니다.
+  - type: list
+    items:
+    - 프로퍼티 - 메서드를 속성처럼 사용하는 기능
+    - "@property로 getter(읽기) 메서드 정의"
+    - "@속성명.setter로 setter(쓰기) 메서드 정의"
+    - 속성처럼 접근하지만 내부적으로 메서드 실행
+    - 값의 유효성 검증이나 계산된 값 제공에 활용
+  - type: code
+    language: python
+    title: 프로퍼티 사용
+    description: getter와 setter를 구현합니다.
+    content: |-
+      class Circle:
+          def __init__(self, radius):
+              self._radius = radius
+
+          @property
+          def radius(self):
+              return self._radius
+
+          @radius.setter
+          def radius(self, value):
+              if value < 0:
+                  raise ValueError("반지름은 0 이상")
+              self._radius = value
+
+          @property
+          def area(self):
+              return 3.14 * self._radius ** 2
+
+      propCircle = Circle(5)
+      print(propCircle.radius)
+      print(propCircle.area)
+      propCircle.radius = 10
+      print(propCircle.area)
+  - type: tip
+    content: "프로퍼티를 사용하면 나중에 속성을 메서드로 바꾸더라도 기존 코드를 수정할 필요가 없습니다."
+
+- id: comprehensive_example
+  title: 종합 클래스 예제
+  subtitle: 모든 개념을 종합한 실전 예제
+  blocks:
+  - type: text
+    content: 지금까지 배운 클래스의 모든 개념을 한 예제에 종합해봅니다. 클래스 속성으로 모든 계좌가 공유하는 은행 정보를 저장하고, 인스턴스 속성으로 각 계좌의 고유 정보를 관리합니다. 인스턴스 메서드로 입출금 기능을 구현하고, 프로퍼티로 잔액을 안전하게 읽습니다. 클래스 메서드로 전체 은행 정보를 조회하고, 정적 메서드로 금액 형식을 변환합니다. 실제 은행 시스템처럼 객체지향 프로그래밍의 장점을 모두 활용한 예제입니다.
+  - type: list
+    items:
+    - 클래스 속성으로 은행명과 총 계좌 수 공유
+    - 생성자와 인스턴스 속성으로 계좌 정보 초기화
+    - 프로퍼티로 잔액 안전하게 읽기
+    - 인스턴스 메서드로 입출금 기능 구현
+    - 클래스 메서드로 은행 전체 정보 조회
+  - type: code
+    language: python
+    title: 은행 계좌 시스템
+    description: 모든 OOP 개념을 활용한 예제입니다.
+    content: |-
+      class BankAccount:
+          bankName = "파이썬 은행"
+          totalAccounts = 0
+
+          def __init__(self, owner, balance=0):
+              self._owner = owner
+              self._balance = balance
+              BankAccount.totalAccounts += 1
+
+          @property
+          def balance(self):
+              return self._balance
+
+          def deposit(self, amount):
+              self._balance += amount
+              return self._balance
+
+          def withdraw(self, amount):
+              if amount <= self._balance:
+                  self._balance -= amount
+              return self._balance
+
+          @classmethod
+          def getBankInfo(cls):
+              return f"{cls.bankName} - 총 {cls.totalAccounts}개 계좌"
+
+          @staticmethod
+          def formatCurrency(amount):
+              return f"{amount:,}원"
+
+      compAccount1 = BankAccount("김철수", 100000)
+      compAccount2 = BankAccount("이영희", 50000)
+
+      compAccount1.deposit(30000)
+      print(BankAccount.formatCurrency(compAccount1.balance))
+      print(BankAccount.getBankInfo())
+  - type: tip
+    content: "객체지향 프로그래밍은 복잡한 프로그램을 체계적으로 구조화하여 이해하고 유지보수하기 쉽게 만듭니다."
+
+- id: practice
+  title: 21일차 복습
+  subtitle: 클래스와 객체 미션
+  blocks:
+  - type: text
+    content: 21일차에서 배운 클래스와 객체지향 프로그래밍의 모든 개념을 복습합니다. 클래스 정의부터 생성자, 인스턴스 메서드, 클래스 속성, 클래스 메서드, 정적 메서드, 프로퍼티까지 실전 예제로 연습해봅니다.
+  - type: list
+    items:
+    - 기본 클래스 정의와 인스턴스 생성
+    - 생성자와 인스턴스 속성 활용
+    - 인스턴스 메서드로 객체 기능 구현
+    - 클래스 속성과 클래스 메서드 사용
+    - 정적 메서드와 프로퍼티 활용
+  - type: expansion
+    title: "미션1: 기본 클래스 정의"
+    code: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      mission1Person = Person("홍길동", 25)
+      print(mission1Person.name)
+      print(mission1Person.age)
+  - type: expansion
+    title: "미션2: 인스턴스 메서드"
+    code: |-
+      class Calculator:
+          def __init__(self, value=0):
+              self.value = value
+
+          def add(self, n):
+              self.value += n
+              return self
+
+          def multiply(self, n):
+              self.value *= n
+              return self
+
+      mission2Calc = Calculator(10)
+      mission2Calc.add(5).multiply(2)
+      print(mission2Calc.value)
+  - type: expansion
+    title: "미션3: 클래스 속성과 인스턴스 속성"
+    code: |-
+      class Student:
+          school = "파이썬 고등학교"
+          count = 0
+
+          def __init__(self, name):
+              self.name = name
+              Student.count += 1
+
+      mission3S1 = Student("김철수")
+      mission3S2 = Student("이영희")
+      print(Student.school)
+      print(Student.count)
+  - type: expansion
+    title: "미션4: 프로퍼티 사용"
+    code: |-
+      class Temperature:
+          def __init__(self, celsius):
+              self._celsius = celsius
+
+          @property
+          def celsius(self):
+              return self._celsius
+
+          @property
+          def fahrenheit(self):
+              return self._celsius * 9/5 + 32
+
+      mission4Temp = Temperature(25)
+      print(mission4Temp.celsius)
+      print(mission4Temp.fahrenheit)
+  - type: expansion
+    title: "미션5: 정적 메서드"
+    code: |-
+      class StringUtils:
+          @staticmethod
+          def reverse(s):
+              return s[::-1]
+
+          @staticmethod
+          def isPalindrome(s):
+              return s == s[::-1]
+
+      print(StringUtils.reverse("hello"))
+      print(StringUtils.isPalindrome("level"))
+  - type: expansion
+    title: "미션6: 클래스 메서드"
+    code: |-
+      class Date:
+          def __init__(self, year, month, day):
+              self.year = year
+              self.month = month
+              self.day = day
+
+          @classmethod
+          def fromString(cls, dateStr):
+              year, month, day = map(int, dateStr.split('-'))
+              return cls(year, month, day)
+
+      mission6Date = Date.fromString("2024-12-25")
+      print(mission6Date.year, mission6Date.month, mission6Date.day)
+  - type: expansion
+    title: "미션7: 종합 예제"
+    code: |-
+      class Product:
+          discount = 0.1
+
+          def __init__(self, name, price):
+              self.name = name
+              self._price = price
+
+          @property
+          def price(self):
+              return self._price
+
+          @property
+          def discountedPrice(self):
+              return self._price * (1 - Product.discount)
+
+          @classmethod
+          def setDiscount(cls, rate):
+              cls.discount = rate
+
+      mission7Product = Product("노트북", 1000000)
+      print(mission7Product.discountedPrice)
+      Product.setDiscount(0.2)
+      print(mission7Product.discountedPrice)

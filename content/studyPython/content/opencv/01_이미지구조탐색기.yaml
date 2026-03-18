@@ -1,0 +1,319 @@
+meta:
+  id: opencv_01
+  title: 이미지구조탐색기
+  order: 1
+  category: opencv
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["OpenCV", "cv2", "ndarray", "shape", "dtype", "BGR", "RGB"]
+  seo:
+    title: "OpenCV 입문 - 이미지 구조 탐색기"
+    description: "OpenCV에서 이미지가 NumPy 배열로 어떻게 표현되는지 배웁니다. shape, dtype, BGR 순서를 이해합니다."
+    keywords: ["OpenCV", "cv2", "ndarray", "shape", "dtype", "BGR"]
+
+intro:
+  emoji: "🔬"
+  goal: OpenCV에서 이미지가 NumPy 배열로 어떻게 표현되는지 탐색합니다.
+  description: 이미지의 shape, dtype을 확인하고 BGR과 RGB의 차이를 이해합니다. matplotlib으로 이미지를 출력하는 방법도 배웁니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 이미지 불러오기
+  subtitle: sklearn 이미지를 OpenCV로
+  blocks:
+  - type: text
+    content: sklearn의 샘플 이미지는 RGB 순서의 NumPy 배열입니다. OpenCV는 BGR 순서를 사용하므로, 두 형식 간 변환을 이해하는 것이 중요합니다. 먼저 이미지를 로드하고 구조를 살펴봅시다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: cv2와 sklearn을 임포트합니다
+    content: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      img = load_sample_image('flower.jpg')
+      plt.figure(figsize=(8, 6))
+      plt.imshow(img)
+      plt.title(f'Flower Image: {type(img).__name__}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: load_sample_image()는 NumPy ndarray를 반환합니다. 이 배열은 RGB 순서입니다. OpenCV 함수들은 BGR 순서를 기대하므로 변환이 필요합니다.
+
+- id: step2_shape
+  title: 2단계. 이미지 shape 확인
+  subtitle: 높이, 너비, 채널
+  blocks:
+  - type: text
+    content: NumPy 배열의 shape은 이미지의 구조를 알려줍니다. (높이, 너비, 채널) 순서로, 채널이 3이면 컬러, 2차원이면 흑백입니다. 주의할 점은 높이가 먼저 온다는 것입니다.
+  - type: code
+    language: python
+    title: shape 확인
+    description: 이미지의 차원을 확인합니다
+    content: |-
+      height, width, channels = img.shape
+      f"높이: {height}px, 너비: {width}px, 채널: {channels}"
+  - type: tip
+    content: shape은 (높이, 너비, 채널) 순서입니다. (427, 640, 3)이면 세로 427픽셀, 가로 640픽셀, 3채널(RGB 또는 BGR)입니다. Pillow의 size는 (너비, 높이)로 순서가 반대입니다.
+
+- id: step3_dtype
+  title: 3단계. 데이터 타입 확인
+  subtitle: dtype과 값 범위
+  blocks:
+  - type: text
+    content: 이미지 배열의 dtype(data type)은 보통 uint8입니다. uint8은 unsigned integer 8-bit의 약자로, 부호 없는 8비트 정수를 의미합니다. 8비트는 2^8 = 256가지 값(0~255)을 표현할 수 있어 픽셀 밝기를 저장하기에 적합합니다. 0은 완전한 검정, 255는 완전한 흰색(또는 해당 채널의 최대 강도)입니다.
+  - type: code
+    language: python
+    title: dtype 확인
+    description: 데이터 타입을 확인합니다
+    content: |-
+      img.dtype
+  - type: code
+    language: python
+    title: 값 범위 확인
+    description: 최소값과 최대값을 확인합니다
+    content: |-
+      img.min(), img.max()
+  - type: code
+    language: python
+    title: 전체 픽셀 수
+    description: size 속성으로 확인합니다
+    content: |-
+      img.size
+  - type: tip
+    content: uint8은 unsigned 8-bit integer로 0-255 범위입니다. 일부 연산은 float32(0.0-1.0)를 사용하기도 합니다. dtype을 확인하고 필요시 변환해야 합니다.
+
+- id: step4_bgr
+  title: 4단계. BGR vs RGB
+  subtitle: 색순서 이해하기
+  blocks:
+  - type: text
+    content: OpenCV는 역사적 이유로 BGR(Blue-Green-Red) 순서를 사용합니다. 초기 카메라 하드웨어가 이 순서를 사용했기 때문입니다. 반면 sklearn, matplotlib, Pillow 등 대부분의 라이브러리는 RGB(Red-Green-Blue) 순서를 사용합니다. cvtColor()(convert color의 약자) 함수로 색상 순서를 변환합니다. 변환 없이 출력하면 빨강과 파랑이 뒤바뀌어 이상한 색으로 보입니다.
+  - type: code
+    language: python
+    title: RGB 이미지 그대로 출력
+    description: sklearn 이미지는 RGB입니다
+    content: |-
+      plt.figure(figsize=(8, 6))
+      plt.imshow(img)
+      plt.title('RGB (Original)')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: BGR로 변환
+    description: cvtColor로 BGR로 바꿉니다
+    content: |-
+      bgr = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(bgr)
+      plt.title('BGR (shown as RGB - colors inverted)')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: cv2.COLOR_RGB2BGR는 RGB를 BGR로 변환합니다. 반대는 cv2.COLOR_BGR2RGB입니다. OpenCV 함수에 전달할 때는 BGR, matplotlib으로 출력할 때는 RGB를 사용합니다.
+  - type: code
+    language: python
+    title: BGR을 RGB인 것처럼 출력
+    description: 색이 뒤바뀐 것을 확인합니다
+    content: |-
+      plt.figure(figsize=(8, 6))
+      plt.imshow(bgr)
+      plt.title('BGR shown as RGB (Wrong colors)')
+      plt.axis('off')
+      plt.tight_layout()
+
+- id: step5_pixel
+  title: 5단계. 픽셀 접근
+  subtitle: 배열 인덱싱
+  blocks:
+  - type: text
+    content: NumPy 배열이므로 인덱싱으로 특정 픽셀에 접근할 수 있습니다. img[y, x]로 (x, y) 위치의 픽셀 값을 얻습니다. 주의할 점은 y(행)가 먼저 온다는 것입니다.
+  - type: code
+    language: python
+    title: 특정 픽셀 값
+    description: (100, 200) 위치의 RGB 값입니다
+    content: |-
+      pixel = img[100, 200]
+      pixel
+  - type: code
+    language: python
+    title: 각 채널 값
+    description: R, G, B를 분리합니다
+    content: |-
+      r, g, b = pixel
+      r, g, b
+  - type: tip
+    content: img[y, x]에서 y는 행(세로 위치), x는 열(가로 위치)입니다. 반환되는 값은 [R, G, B] 또는 [B, G, R] 배열로, 이미지의 색순서에 따라 다릅니다.
+
+- id: step6_slice
+  title: 6단계. 영역 슬라이싱
+  subtitle: 이미지 일부 추출
+  blocks:
+  - type: text
+    content: NumPy 슬라이싱으로 이미지의 일부 영역을 추출할 수 있습니다. img[y1:y2, x1:x2]로 사각형 영역을 잘라냅니다. 이렇게 추출한 관심 영역을 ROI(Region of Interest)라고 부릅니다. ROI는 얼굴 인식에서 얼굴 영역, 문서 스캔에서 문서 영역처럼 분석하고자 하는 특정 부분을 의미합니다.
+  - type: code
+    language: python
+    title: 중앙 영역 추출
+    description: 이미지 중앙 부분을 자릅니다
+    content: |-
+      centerY = height // 2
+      centerX = width // 2
+      roi = img[centerY-100:centerY+100, centerX-150:centerX+150]
+      plt.figure(figsize=(6, 4))
+      plt.imshow(roi)
+      plt.title(f'ROI: {roi.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 추출 영역 출력
+    description: 잘라낸 영역을 확인합니다
+    content: |-
+      plt.figure(figsize=(6, 4))
+      plt.imshow(roi)
+      plt.title('ROI (Region of Interest)')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: ROI는 Region of Interest의 약자로 관심 영역을 의미합니다. 슬라이싱은 복사가 아닌 뷰를 반환하므로, 원본을 보존하려면 .copy()를 사용하세요.
+
+- id: step7_draw
+  title: 7단계. 기본 그리기
+  subtitle: 도형과 텍스트
+  blocks:
+  - type: text
+    content: OpenCV의 그리기 함수들은 이미지를 직접 수정합니다. 복사본을 만들어서 작업하는 것이 좋습니다. BGR 색상을 사용해야 합니다.
+  - type: code
+    language: python
+    title: 복사본 생성
+    description: 원본을 보존합니다
+    content: |-
+      canvas = bgr.copy()
+      canvasRgb = cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(canvasRgb)
+      plt.title('Canvas (copy of BGR)')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 사각형 그리기
+    description: 녹색 사각형을 그립니다
+    content: |-
+      cv2.rectangle(canvas, (50, 50), (200, 150), (0, 255, 0), 2)
+      rectRgb = cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(rectRgb)
+      plt.title('Green Rectangle Added')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 원 그리기
+    description: 빨간 원을 그립니다
+    content: |-
+      cv2.circle(canvas, (400, 200), 50, (0, 0, 255), -1)
+      circleRgb = cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(circleRgb)
+      plt.title('Red Circle Added')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: 색상은 BGR 순서로 (B, G, R)입니다. (0, 255, 0)은 녹색, (0, 0, 255)는 빨강입니다. 두께 -1은 채우기를 의미합니다.
+  - type: code
+    language: python
+    title: 텍스트 추가
+    description: 흰색 텍스트를 넣습니다
+    content: |-
+      cv2.putText(canvas, 'OpenCV', (250, 300), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255), 2)
+      rgb = cv2.cvtColor(canvas, cv2.COLOR_BGR2RGB)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(rgb)
+      plt.title('Drawing on Image')
+      plt.axis('off')
+      plt.tight_layout()
+
+- id: practice
+  title: 실습
+  subtitle: 이미지 구조 분석
+  blocks:
+  - type: text
+    content: china 이미지를 분석하고 그리기를 연습해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: china 이미지 구조 분석"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        import cv2
+        import numpy as np
+        from sklearn.datasets import load_sample_image
+        import matplotlib.pyplot as plt
+
+        china = load_sample_image('china.jpg')
+        plt.figure(figsize=(10, 6))
+        plt.imshow(china)
+        plt.title(f'China: {china.shape}, {china.dtype}')
+        plt.axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "픽셀 값 확인"
+      content: |-
+        h, w, c = china.shape
+        centerPx = china[h//2, w//2]
+        centerPx
+    - type: code
+      title: "출력"
+      content: |-
+        plt.figure(figsize=(10, 6))
+        plt.imshow(china)
+        plt.title(f'China: {w}x{h}, {c} channels')
+        plt.axis('off')
+        plt.tight_layout()
+  - type: expansion
+    title: "미션2: 도형과 텍스트 그리기"
+    blocks:
+    - type: code
+      title: "이미지 로드 및 BGR 변환"
+      content: |-
+        import cv2
+        import numpy as np
+        from sklearn.datasets import load_sample_image
+        import matplotlib.pyplot as plt
+
+        scene = load_sample_image('china.jpg')
+        sceneBgr = cv2.cvtColor(scene, cv2.COLOR_RGB2BGR)
+        plt.figure(figsize=(10, 6))
+        plt.imshow(sceneBgr)
+        plt.title(f'BGR: {sceneBgr.shape}')
+        plt.axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "도형 그리기"
+      content: |-
+        board = sceneBgr.copy()
+        cv2.rectangle(board, (100, 100), (300, 250), (255, 0, 0), 3)
+        cv2.circle(board, (500, 200), 80, (0, 255, 255), -1)
+        cv2.line(board, (50, 350), (600, 350), (255, 255, 0), 2)
+        boardRgb = cv2.cvtColor(board, cv2.COLOR_BGR2RGB)
+        plt.figure(figsize=(10, 6))
+        plt.imshow(boardRgb)
+        plt.title('Shapes Added')
+        plt.axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "텍스트 추가 및 출력"
+      content: |-
+        cv2.putText(board, 'China Landscape', (150, 50), cv2.FONT_HERSHEY_DUPLEX, 1, (255, 255, 255), 2)
+        display = cv2.cvtColor(board, cv2.COLOR_BGR2RGB)
+        plt.figure(figsize=(10, 6))
+        plt.imshow(display)
+        plt.title('Annotated Image')
+        plt.axis('off')
+        plt.tight_layout()

@@ -1,0 +1,1333 @@
+meta:
+  id: "21"
+  title: "디자인 패턴 1"
+  day: 21
+  category: "advancedPython"
+  tags: ["design-pattern", "singleton", "factory", "builder", "adapter", "decorator"]
+  seo:
+    title: "파이썬 디자인 패턴 1 - 생성 패턴과 구조 패턴"
+    description: "싱글톤, 팩토리, 빌더, 어댑터, 데코레이터 패턴을 학습합니다."
+    keywords: ["디자인 패턴", "싱글톤", "팩토리", "빌더", "어댑터", "데코레이터"]
+
+intro:
+  emoji: "🎨"
+  points:
+  - "싱글톤 패턴으로 인스턴스 하나만 생성"
+  - "팩토리 패턴으로 객체 생성 위임"
+  - "빌더 패턴으로 복잡한 객체 단계적 생성"
+  - "어댑터와 데코레이터로 구조 확장"
+
+sections:
+- id: "singleton"
+  title: "싱글톤 패턴"
+  subtitle: "인스턴스 하나만 생성"
+  blocks:
+  - type: "text"
+    content: "인스턴스를 하나만 생성하는 패턴"
+  - type: "code"
+    language: "python"
+    title: "메타클래스 싱글톤"
+    description: "메타클래스를 사용한 싱글톤 구현입니다."
+    content: |-
+      class SingletonMeta(type):
+          _instances = {}
+
+          def __call__(cls, *args, **kwargs):
+              if cls not in cls._instances:
+                  cls._instances[cls] = super().__call__(*args, **kwargs)
+              return cls._instances[cls]
+
+      class Database(metaclass=SingletonMeta):
+          def __init__(self):
+              self.connection = "Connected"
+
+      db1 = Database()
+      db2 = Database()
+      singletonCheck = db1 is db2
+      singletonCheck
+  - type: "code"
+    language: "python"
+    title: "데코레이터 싱글톤"
+    description: "데코레이터를 사용한 싱글톤 구현입니다."
+    content: |-
+      class SingletonDecorator:
+          def __init__(self, cls):
+              self._cls = cls
+              self._instance = None
+
+          def __call__(self, *args, **kwargs):
+              if self._instance is None:
+                  self._instance = self._cls(*args, **kwargs)
+              return self._instance
+
+      @SingletonDecorator
+      class Config:
+          def __init__(self):
+              self.settings = {"debug": True}
+
+      cfg1 = Config()
+      cfg2 = Config()
+      decoratorCheck = cfg1 is cfg2
+      decoratorCheck
+
+- id: "factory"
+  title: "팩토리 패턴"
+  subtitle: "객체 생성 위임"
+  blocks:
+  - type: "text"
+    content: "객체 생성을 서브클래스에 위임하는 패턴"
+  - type: "code"
+    language: "python"
+    title: "심플 팩토리"
+    description: "간단한 팩토리 패턴 구현입니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Animal(ABC):
+          @abstractmethod
+          def speak(self):
+              pass
+
+      class Dog(Animal):
+          def speak(self):
+              return "Woof!"
+
+      class Cat(Animal):
+          def speak(self):
+              return "Meow!"
+
+      class AnimalFactory:
+          @staticmethod
+          def create(animalType):
+              if animalType == "dog":
+                  return Dog()
+              elif animalType == "cat":
+                  return Cat()
+              raise ValueError(f"Unknown type: {animalType}")
+
+      factoryDog = AnimalFactory.create("dog")
+      factoryCat = AnimalFactory.create("cat")
+      factoryResult = (factoryDog.speak(), factoryCat.speak())
+      factoryResult
+  - type: "code"
+    language: "python"
+    title: "추상 팩토리"
+    description: "추상 팩토리 패턴 구현입니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Button(ABC):
+          @abstractmethod
+          def render(self):
+              pass
+
+      class WindowsButton(Button):
+          def render(self):
+              return "Windows Button"
+
+      class MacButton(Button):
+          def render(self):
+              return "Mac Button"
+
+      class GUIFactory(ABC):
+          @abstractmethod
+          def createButton(self):
+              pass
+
+      class WindowsFactory(GUIFactory):
+          def createButton(self):
+              return WindowsButton()
+
+      class MacFactory(GUIFactory):
+          def createButton(self):
+              return MacButton()
+
+      def getFactory(os):
+          if os == "windows":
+              return WindowsFactory()
+          return MacFactory()
+
+      winFactory = getFactory("windows")
+      macFactory = getFactory("mac")
+      abstractFactoryResult = (winFactory.createButton().render(), macFactory.createButton().render())
+      abstractFactoryResult
+
+- id: "builder"
+  title: "빌더 패턴"
+  subtitle: "복잡한 객체 단계적 생성"
+  blocks:
+  - type: "text"
+    content: "복잡한 객체를 단계적으로 생성하는 패턴"
+  - type: "code"
+    language: "python"
+    title: "피자 빌더"
+    description: "빌더 패턴으로 피자를 만듭니다."
+    content: |-
+      class Pizza:
+          def __init__(self):
+              self.size = None
+              self.cheese = False
+              self.pepperoni = False
+              self.mushrooms = False
+
+          def __str__(self):
+              toppings = []
+              if self.cheese:
+                  toppings.append("cheese")
+              if self.pepperoni:
+                  toppings.append("pepperoni")
+              if self.mushrooms:
+                  toppings.append("mushrooms")
+              return f"{self.size} pizza with {', '.join(toppings)}"
+
+      class PizzaBuilder:
+          def __init__(self):
+              self.pizza = Pizza()
+
+          def setSize(self, size):
+              self.pizza.size = size
+              return self
+
+          def addCheese(self):
+              self.pizza.cheese = True
+              return self
+
+          def addPepperoni(self):
+              self.pizza.pepperoni = True
+              return self
+
+          def addMushrooms(self):
+              self.pizza.mushrooms = True
+              return self
+
+          def build(self):
+              return self.pizza
+
+      pizzaBuilt = PizzaBuilder().setSize("large").addCheese().addPepperoni().build()
+      pizzaStr = str(pizzaBuilt)
+      pizzaStr
+  - type: "code"
+    language: "python"
+    title: "컴퓨터 빌더와 디렉터"
+    description: "디렉터를 사용한 빌더 패턴입니다."
+    content: |-
+      class Computer:
+          def __init__(self):
+              self.cpu = None
+              self.ram = None
+              self.storage = None
+              self.gpu = None
+
+          def specs(self):
+              return f"CPU: {self.cpu}, RAM: {self.ram}, Storage: {self.storage}, GPU: {self.gpu}"
+
+      class ComputerBuilder:
+          def __init__(self):
+              self.computer = Computer()
+
+          def setCPU(self, cpu):
+              self.computer.cpu = cpu
+              return self
+
+          def setRAM(self, ram):
+              self.computer.ram = ram
+              return self
+
+          def setStorage(self, storage):
+              self.computer.storage = storage
+              return self
+
+          def setGPU(self, gpu):
+              self.computer.gpu = gpu
+              return self
+
+          def build(self):
+              return self.computer
+
+      class ComputerDirector:
+          @staticmethod
+          def buildGamingPC(builder):
+              return builder.setCPU("i9").setRAM("32GB").setStorage("2TB SSD").setGPU("RTX 4090").build()
+
+          @staticmethod
+          def buildOfficePC(builder):
+              return builder.setCPU("i5").setRAM("16GB").setStorage("512GB SSD").setGPU("Integrated").build()
+
+      gamingPC = ComputerDirector.buildGamingPC(ComputerBuilder())
+      officePC = ComputerDirector.buildOfficePC(ComputerBuilder())
+      directorResult = (gamingPC.specs(), officePC.specs())
+      directorResult
+
+- id: "adapter"
+  title: "어댑터 패턴"
+  subtitle: "인터페이스 연결"
+  blocks:
+  - type: "text"
+    content: "호환되지 않는 인터페이스를 연결하는 패턴"
+  - type: "code"
+    language: "python"
+    title: "프린터 어댑터"
+    description: "레거시 프린터를 새 인터페이스에 연결합니다."
+    content: |-
+      class OldPrinter:
+          def printOld(self, text):
+              return f"[OLD] {text}"
+
+      class NewPrinter:
+          def printNew(self, text):
+              return f"[NEW] {text}"
+
+      class PrinterAdapter:
+          def __init__(self, oldPrinter):
+              self.oldPrinter = oldPrinter
+
+          def printNew(self, text):
+              return self.oldPrinter.printOld(text)
+
+      oldPrt = OldPrinter()
+      adapter = PrinterAdapter(oldPrt)
+      adapterResult = adapter.printNew("Hello World")
+      adapterResult
+  - type: "code"
+    language: "python"
+    title: "소켓 어댑터"
+    description: "유럽 소켓을 미국 소켓에 연결합니다."
+    content: |-
+      class EuropeanSocket:
+          def voltage(self):
+              return 230
+
+          def plugType(self):
+              return "Type C"
+
+      class USSocket:
+          def voltage(self):
+              return 120
+
+          def plugType(self):
+              return "Type A"
+
+      class SocketAdapter:
+          def __init__(self, europeanSocket):
+              self.socket = europeanSocket
+
+          def voltage(self):
+              return 120
+
+          def plugType(self):
+              return "Type A"
+
+          def originalVoltage(self):
+              return self.socket.voltage()
+
+      euSocket = EuropeanSocket()
+      socketAdapter = SocketAdapter(euSocket)
+      socketResult = (socketAdapter.voltage(), socketAdapter.plugType(), socketAdapter.originalVoltage())
+      socketResult
+
+- id: "decorator_pattern"
+  title: "데코레이터 패턴"
+  subtitle: "동적 기능 추가"
+  blocks:
+  - type: "text"
+    content: "객체에 동적으로 기능을 추가하는 패턴"
+  - type: "code"
+    language: "python"
+    title: "커피 데코레이터"
+    description: "커피에 재료를 추가합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Coffee(ABC):
+          @abstractmethod
+          def cost(self):
+              pass
+
+          @abstractmethod
+          def description(self):
+              pass
+
+      class SimpleCoffee(Coffee):
+          def cost(self):
+              return 2.0
+
+          def description(self):
+              return "Simple Coffee"
+
+      class CoffeeDecorator(Coffee):
+          def __init__(self, coffee):
+              self._coffee = coffee
+
+          def cost(self):
+              return self._coffee.cost()
+
+          def description(self):
+              return self._coffee.description()
+
+      class MilkDecorator(CoffeeDecorator):
+          def cost(self):
+              return self._coffee.cost() + 0.5
+
+          def description(self):
+              return self._coffee.description() + ", Milk"
+
+      class SugarDecorator(CoffeeDecorator):
+          def cost(self):
+              return self._coffee.cost() + 0.2
+
+          def description(self):
+              return self._coffee.description() + ", Sugar"
+
+      simpleCoffee = SimpleCoffee()
+      milkCoffee = MilkDecorator(simpleCoffee)
+      sweetMilkCoffee = SugarDecorator(milkCoffee)
+      coffeeResult = (sweetMilkCoffee.description(), sweetMilkCoffee.cost())
+      coffeeResult
+  - type: "code"
+    language: "python"
+    title: "텍스트 프로세서"
+    description: "텍스트 처리 데코레이터 체인입니다."
+    content: |-
+      class TextProcessor:
+          def process(self, text):
+              return text
+
+      class UpperCaseDecorator:
+          def __init__(self, processor):
+              self.processor = processor
+
+          def process(self, text):
+              return self.processor.process(text).upper()
+
+      class TrimDecorator:
+          def __init__(self, processor):
+              self.processor = processor
+
+          def process(self, text):
+              return self.processor.process(text).strip()
+
+      class ReplaceDecorator:
+          def __init__(self, processor, old, new):
+              self.processor = processor
+              self.old = old
+              self.new = new
+
+          def process(self, text):
+              return self.processor.process(text).replace(self.old, self.new)
+
+      processor = TextProcessor()
+      trimmedProcessor = TrimDecorator(processor)
+      upperProcessor = UpperCaseDecorator(trimmedProcessor)
+      replacedProcessor = ReplaceDecorator(upperProcessor, " ", "_")
+      textResult = replacedProcessor.process("  hello world  ")
+      textResult
+
+- id: "prototype"
+  title: "프로토타입 패턴"
+  subtitle: "객체 복제"
+  blocks:
+  - type: "text"
+    content: "기존 객체를 복제하여 새 객체를 생성하는 패턴"
+  - type: "code"
+    language: "python"
+    title: "문서 프로토타입"
+    description: "문서를 복제합니다."
+    content: |-
+      import copy
+
+      class Prototype:
+          def clone(self):
+              return copy.deepcopy(self)
+
+      class Document(Prototype):
+          def __init__(self, title, content):
+              self.title = title
+              self.content = content
+              self.attachments = []
+
+          def addAttachment(self, attachment):
+              self.attachments.append(attachment)
+
+          def __str__(self):
+              return f"{self.title}: {self.content} ({len(self.attachments)} attachments)"
+
+      originalDoc = Document("Report", "Annual Report 2024")
+      originalDoc.addAttachment("chart.png")
+      clonedDoc = originalDoc.clone()
+      clonedDoc.title = "Report Copy"
+      clonedDoc.addAttachment("table.xlsx")
+      protoResult = (str(originalDoc), str(clonedDoc))
+      protoResult
+  - type: "code"
+    language: "python"
+    title: "도형 레지스트리"
+    description: "도형을 등록하고 복제합니다."
+    content: |-
+      import copy
+
+      class ShapePrototype:
+          def __init__(self):
+              self.shapes = {}
+
+          def register(self, name, shape):
+              self.shapes[name] = shape
+
+          def create(self, name):
+              if name in self.shapes:
+                  return copy.deepcopy(self.shapes[name])
+              raise ValueError(f"Shape {name} not found")
+
+      class Circle:
+          def __init__(self, radius, color):
+              self.radius = radius
+              self.color = color
+
+          def __str__(self):
+              return f"Circle(r={self.radius}, color={self.color})"
+
+      class Rectangle:
+          def __init__(self, width, height, color):
+              self.width = width
+              self.height = height
+              self.color = color
+
+          def __str__(self):
+              return f"Rectangle({self.width}x{self.height}, color={self.color})"
+
+      shapeRegistry = ShapePrototype()
+      shapeRegistry.register("redCircle", Circle(5, "red"))
+      shapeRegistry.register("blueRect", Rectangle(10, 5, "blue"))
+      circle1 = shapeRegistry.create("redCircle")
+      circle2 = shapeRegistry.create("redCircle")
+      circle2.radius = 10
+      registryResult = (str(circle1), str(circle2))
+      registryResult
+
+- id: "practice"
+  title: "종합 연습"
+  subtitle: "디자인 패턴 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 21에서 배운 생성 패턴과 구조 패턴을 난이도별로 복습합니다. 싱글톤 패턴은 데이터베이스 연결, 로거, 설정 관리 등 인스턴스가 하나만 필요한 경우에 필수적입니다. 팩토리 패턴은 객체 생성 로직을 분리하여 유연성을 높이고, 빌더 패턴은 복잡한 객체를 단계적으로 생성합니다. 🟢 기본 문제로 각 패턴의 핵심 구조를 익히고, 🟡 응용 문제로 패턴 조합을 연습하세요. 🔴 심화 문제에서는 실제 프레임워크에서 사용되는 고급 패턴 변형을 직접 구현해봅니다. 디자인 패턴은 암기보다 '왜 이 패턴이 필요한가'를 이해하는 것이 중요합니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 싱글톤"
+    code: |-
+      class Logger:
+          _instance = None
+
+          def __new__(cls):
+              if cls._instance is None:
+                  cls._instance = super().__new__(cls)
+                  cls._instance.logs = []
+              return cls._instance
+
+          def log(self, message):
+              self.logs.append(message)
+
+          def getLogs(self):
+              return self.logs
+
+      logger1 = Logger()
+      logger1.log("First message")
+      logger2 = Logger()
+      logger2.log("Second message")
+      ex1Result = (logger1 is logger2, logger1.getLogs())
+      ex1Result
+
+  - type: "expansion"
+    title: "🟢 기본2: 간단한 팩토리"
+    code: |-
+      class Shape:
+          def draw(self):
+              pass
+
+      class CircleShape(Shape):
+          def draw(self):
+              return "Drawing Circle"
+
+      class SquareShape(Shape):
+          def draw(self):
+              return "Drawing Square"
+
+      class TriangleShape(Shape):
+          def draw(self):
+              return "Drawing Triangle"
+
+      class ShapeFactory:
+          @staticmethod
+          def create(shapeType):
+              shapes = {
+                  "circle": CircleShape,
+                  "square": SquareShape,
+                  "triangle": TriangleShape
+              }
+              return shapes.get(shapeType, Shape)()
+
+      ex2Circle = ShapeFactory.create("circle")
+      ex2Square = ShapeFactory.create("square")
+      ex2Result = (ex2Circle.draw(), ex2Square.draw())
+      ex2Result
+
+  - type: "expansion"
+    title: "🟢 기본3: 간단한 빌더"
+    code: |-
+      class House:
+          def __init__(self):
+              self.walls = 0
+              self.doors = 0
+              self.windows = 0
+              self.roof = False
+              self.garage = False
+
+          def __str__(self):
+              return f"House: {self.walls} walls, {self.doors} doors, {self.windows} windows, roof={self.roof}, garage={self.garage}"
+
+      class HouseBuilder:
+          def __init__(self):
+              self.house = House()
+
+          def buildWalls(self, count):
+              self.house.walls = count
+              return self
+
+          def buildDoors(self, count):
+              self.house.doors = count
+              return self
+
+          def buildWindows(self, count):
+              self.house.windows = count
+              return self
+
+          def buildRoof(self):
+              self.house.roof = True
+              return self
+
+          def buildGarage(self):
+              self.house.garage = True
+              return self
+
+          def getHouse(self):
+              return self.house
+
+      houseBuilt = HouseBuilder().buildWalls(4).buildDoors(2).buildWindows(6).buildRoof().getHouse()
+      ex3Result = str(houseBuilt)
+      ex3Result
+
+  - type: "expansion"
+    title: "🟢 기본4: 간단한 어댑터"
+    code: |-
+      class LegacyPayment:
+          def makePaymentOld(self, amount):
+              return f"Legacy payment: ${amount}"
+
+      class ModernPaymentInterface:
+          def pay(self, amount):
+              pass
+
+      class PaymentAdapter(ModernPaymentInterface):
+          def __init__(self, legacyPayment):
+              self.legacy = legacyPayment
+
+          def pay(self, amount):
+              return self.legacy.makePaymentOld(amount)
+
+      legacyPay = LegacyPayment()
+      payAdapter = PaymentAdapter(legacyPay)
+      ex4Result = payAdapter.pay(100)
+      ex4Result
+
+  - type: "expansion"
+    title: "🟢 기본5: 간단한 데코레이터"
+    code: |-
+      class Notifier:
+          def send(self, message):
+              return f"Basic: {message}"
+
+      class SMSDecorator:
+          def __init__(self, notifier):
+              self.notifier = notifier
+
+          def send(self, message):
+              return self.notifier.send(message) + f" | SMS: {message}"
+
+      class EmailDecorator:
+          def __init__(self, notifier):
+              self.notifier = notifier
+
+          def send(self, message):
+              return self.notifier.send(message) + f" | Email: {message}"
+
+      notifier = Notifier()
+      smsNotifier = SMSDecorator(notifier)
+      fullNotifier = EmailDecorator(smsNotifier)
+      ex5Result = fullNotifier.send("Alert!")
+      ex5Result
+
+  - type: "expansion"
+    title: "🟡 응용1: 팩토리 메서드 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Transport(ABC):
+          @abstractmethod
+          def deliver(self):
+              pass
+
+      class Truck(Transport):
+          def deliver(self):
+              return "Deliver by land in a truck"
+
+      class Ship(Transport):
+          def deliver(self):
+              return "Deliver by sea in a ship"
+
+      class Logistics(ABC):
+          @abstractmethod
+          def createTransport(self):
+              pass
+
+          def planDelivery(self):
+              transport = self.createTransport()
+              return transport.deliver()
+
+      class RoadLogistics(Logistics):
+          def createTransport(self):
+              return Truck()
+
+      class SeaLogistics(Logistics):
+          def createTransport(self):
+              return Ship()
+
+      roadLog = RoadLogistics()
+      seaLog = SeaLogistics()
+      ex6Result = (roadLog.planDelivery(), seaLog.planDelivery())
+      ex6Result
+
+  - type: "expansion"
+    title: "🟡 응용2: 파사드 패턴"
+    code: |-
+      class CPU:
+          def freeze(self):
+              return "CPU frozen"
+
+          def execute(self):
+              return "CPU executing"
+
+      class Memory:
+          def load(self, position, data):
+              return f"Memory loaded at {position}"
+
+      class HardDrive:
+          def read(self, sector, size):
+              return f"HardDrive read sector {sector}"
+
+      class ComputerFacade:
+          def __init__(self):
+              self.cpu = CPU()
+              self.memory = Memory()
+              self.hardDrive = HardDrive()
+
+          def start(self):
+              steps = []
+              steps.append(self.cpu.freeze())
+              steps.append(self.hardDrive.read(0, 1024))
+              steps.append(self.memory.load(0, "boot"))
+              steps.append(self.cpu.execute())
+              return steps
+
+      computerFacade = ComputerFacade()
+      ex7Result = computerFacade.start()
+      ex7Result
+
+  - type: "expansion"
+    title: "🟡 응용3: 컴포지트 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class FileComponent(ABC):
+          @abstractmethod
+          def getSize(self):
+              pass
+
+          @abstractmethod
+          def getName(self):
+              pass
+
+      class File(FileComponent):
+          def __init__(self, name, size):
+              self.name = name
+              self.size = size
+
+          def getSize(self):
+              return self.size
+
+          def getName(self):
+              return self.name
+
+      class Folder(FileComponent):
+          def __init__(self, name):
+              self.name = name
+              self.children = []
+
+          def add(self, component):
+              self.children.append(component)
+
+          def getSize(self):
+              return sum(child.getSize() for child in self.children)
+
+          def getName(self):
+              return self.name
+
+      rootFolder = Folder("root")
+      docFolder = Folder("documents")
+      docFolder.add(File("resume.pdf", 100))
+      docFolder.add(File("cover.docx", 50))
+      rootFolder.add(docFolder)
+      rootFolder.add(File("readme.txt", 10))
+      ex8Result = (rootFolder.getName(), rootFolder.getSize())
+      ex8Result
+
+  - type: "expansion"
+    title: "🟡 응용4: 브릿지 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Renderer(ABC):
+          @abstractmethod
+          def renderShape(self, shape):
+              pass
+
+      class VectorRenderer(Renderer):
+          def renderShape(self, shape):
+              return f"Drawing {shape} as vectors"
+
+      class RasterRenderer(Renderer):
+          def renderShape(self, shape):
+              return f"Drawing {shape} as pixels"
+
+      class ShapeBridge(ABC):
+          def __init__(self, renderer):
+              self.renderer = renderer
+
+          @abstractmethod
+          def draw(self):
+              pass
+
+      class CircleBridge(ShapeBridge):
+          def __init__(self, renderer, radius):
+              super().__init__(renderer)
+              self.radius = radius
+
+          def draw(self):
+              return self.renderer.renderShape(f"Circle(r={self.radius})")
+
+      vectorCircle = CircleBridge(VectorRenderer(), 5)
+      rasterCircle = CircleBridge(RasterRenderer(), 5)
+      ex9Result = (vectorCircle.draw(), rasterCircle.draw())
+      ex9Result
+
+  - type: "expansion"
+    title: "🟡 응용5: 플라이웨이트 패턴"
+    code: |-
+      class TreeType:
+          def __init__(self, name, color, texture):
+              self.name = name
+              self.color = color
+              self.texture = texture
+
+          def draw(self, x, y):
+              return f"{self.name}({self.color}) at ({x}, {y})"
+
+      class TreeFactory:
+          _types = {}
+
+          @classmethod
+          def getTreeType(cls, name, color, texture):
+              key = (name, color, texture)
+              if key not in cls._types:
+                  cls._types[key] = TreeType(name, color, texture)
+              return cls._types[key]
+
+          @classmethod
+          def getTypeCount(cls):
+              return len(cls._types)
+
+      class Tree:
+          def __init__(self, x, y, treeType):
+              self.x = x
+              self.y = y
+              self.treeType = treeType
+
+          def draw(self):
+              return self.treeType.draw(self.x, self.y)
+
+      forest = []
+      for i in range(100):
+          treeType = TreeFactory.getTreeType("Oak", "Green", "Rough")
+          forest.append(Tree(i * 10, i * 5, treeType))
+      for i in range(50):
+          treeType = TreeFactory.getTreeType("Pine", "DarkGreen", "Smooth")
+          forest.append(Tree(i * 20, i * 10, treeType))
+      ex10TypeCount = TreeFactory.getTypeCount()
+      ex10TreeCount = len(forest)
+      ex10Result = (ex10TypeCount, ex10TreeCount)
+      ex10Result
+
+  - type: "expansion"
+    title: "🔴 심화1: 추상 팩토리 확장"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Chair(ABC):
+          @abstractmethod
+          def sitOn(self):
+              pass
+
+      class Table(ABC):
+          @abstractmethod
+          def putOn(self):
+              pass
+
+      class ModernChair(Chair):
+          def sitOn(self):
+              return "Sitting on modern chair"
+
+      class VictorianChair(Chair):
+          def sitOn(self):
+              return "Sitting on victorian chair"
+
+      class ModernTable(Table):
+          def putOn(self):
+              return "Putting on modern table"
+
+      class VictorianTable(Table):
+          def putOn(self):
+              return "Putting on victorian table"
+
+      class FurnitureFactory(ABC):
+          @abstractmethod
+          def createChair(self):
+              pass
+
+          @abstractmethod
+          def createTable(self):
+              pass
+
+      class ModernFurnitureFactory(FurnitureFactory):
+          def createChair(self):
+              return ModernChair()
+
+          def createTable(self):
+              return ModernTable()
+
+      class VictorianFurnitureFactory(FurnitureFactory):
+          def createChair(self):
+              return VictorianChair()
+
+          def createTable(self):
+              return VictorianTable()
+
+      modernFactory = ModernFurnitureFactory()
+      victorianFactory = VictorianFurnitureFactory()
+      ex11Modern = (modernFactory.createChair().sitOn(), modernFactory.createTable().putOn())
+      ex11Victorian = (victorianFactory.createChair().sitOn(), victorianFactory.createTable().putOn())
+      ex11Result = (ex11Modern, ex11Victorian)
+      ex11Result
+
+  - type: "expansion"
+    title: "🔴 심화2: 빌더 + 디렉터 확장"
+    code: |-
+      class Meal:
+          def __init__(self):
+              self.items = []
+              self.price = 0
+
+          def addItem(self, name, price):
+              self.items.append(name)
+              self.price += price
+
+          def __str__(self):
+              return f"Meal: {', '.join(self.items)} = ${self.price}"
+
+      class MealBuilder:
+          def __init__(self):
+              self.meal = Meal()
+
+          def addBurger(self, burgerType):
+              prices = {"veg": 5, "chicken": 7, "beef": 9}
+              self.meal.addItem(f"{burgerType} burger", prices.get(burgerType, 5))
+              return self
+
+          def addDrink(self, drinkType):
+              prices = {"coke": 2, "juice": 3, "water": 1}
+              self.meal.addItem(drinkType, prices.get(drinkType, 2))
+              return self
+
+          def addSide(self, sideType):
+              prices = {"fries": 3, "salad": 4, "onion rings": 3}
+              self.meal.addItem(sideType, prices.get(sideType, 3))
+              return self
+
+          def build(self):
+              return self.meal
+
+      class MealDirector:
+          @staticmethod
+          def prepareVegMeal():
+              return MealBuilder().addBurger("veg").addDrink("juice").addSide("salad").build()
+
+          @staticmethod
+          def prepareNonVegMeal():
+              return MealBuilder().addBurger("chicken").addDrink("coke").addSide("fries").build()
+
+      vegMeal = MealDirector.prepareVegMeal()
+      nonVegMeal = MealDirector.prepareNonVegMeal()
+      ex12Result = (str(vegMeal), str(nonVegMeal))
+      ex12Result
+
+  - type: "expansion"
+    title: "🔴 심화3: 데코레이터 체인"
+    code: |-
+      class DataSource:
+          def writeData(self, data):
+              return data
+
+          def readData(self):
+              return ""
+
+      class FileDataSource(DataSource):
+          def __init__(self):
+              self.data = ""
+
+          def writeData(self, data):
+              self.data = data
+              return f"Written: {data}"
+
+          def readData(self):
+              return self.data
+
+      class DataSourceDecorator(DataSource):
+          def __init__(self, source):
+              self.wrappee = source
+
+          def writeData(self, data):
+              return self.wrappee.writeData(data)
+
+          def readData(self):
+              return self.wrappee.readData()
+
+      class EncryptionDecorator(DataSourceDecorator):
+          def writeData(self, data):
+              encrypted = ''.join(chr(ord(c) + 1) for c in data)
+              return self.wrappee.writeData(encrypted)
+
+          def readData(self):
+              data = self.wrappee.readData()
+              return ''.join(chr(ord(c) - 1) for c in data)
+
+      class CompressionDecorator(DataSourceDecorator):
+          def writeData(self, data):
+              compressed = f"[compressed:{len(data)}]{data[:5]}..."
+              return self.wrappee.writeData(compressed)
+
+          def readData(self):
+              return self.wrappee.readData()
+
+      fileSource = FileDataSource()
+      encrypted = EncryptionDecorator(fileSource)
+      compressed = CompressionDecorator(encrypted)
+      writeResult = compressed.writeData("Hello World")
+      readResult = fileSource.data
+      ex13Result = (writeResult, readResult)
+      ex13Result
+
+  - type: "expansion"
+    title: "🔴 심화4: 프록시 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Image(ABC):
+          @abstractmethod
+          def display(self):
+              pass
+
+      class RealImage(Image):
+          def __init__(self, filename):
+              self.filename = filename
+              self.loaded = True
+
+          def display(self):
+              return f"Displaying {self.filename}"
+
+      class ProxyImage(Image):
+          def __init__(self, filename):
+              self.filename = filename
+              self.realImage = None
+
+          def display(self):
+              if self.realImage is None:
+                  self.realImage = RealImage(self.filename)
+              return self.realImage.display()
+
+      class CachedProxyImage(Image):
+          _cache = {}
+
+          def __init__(self, filename):
+              self.filename = filename
+
+          def display(self):
+              if self.filename not in CachedProxyImage._cache:
+                  CachedProxyImage._cache[self.filename] = RealImage(self.filename)
+              return CachedProxyImage._cache[self.filename].display()
+
+      proxy1 = ProxyImage("photo1.jpg")
+      proxy2 = CachedProxyImage("photo2.jpg")
+      proxy3 = CachedProxyImage("photo2.jpg")
+      ex14Result = (proxy1.display(), proxy2.display(), proxy3.display())
+      ex14Result
+
+  - type: "expansion"
+    title: "🔴 심화5: 싱글톤 + 팩토리 조합"
+    code: |-
+      class DatabaseConnection:
+          _instance = None
+          _connections = {}
+
+          def __new__(cls):
+              if cls._instance is None:
+                  cls._instance = super().__new__(cls)
+              return cls._instance
+
+          def getConnection(self, dbType):
+              if dbType not in self._connections:
+                  self._connections[dbType] = self._createConnection(dbType)
+              return self._connections[dbType]
+
+          def _createConnection(self, dbType):
+              connections = {
+                  "mysql": "MySQL Connection",
+                  "postgres": "PostgreSQL Connection",
+                  "sqlite": "SQLite Connection"
+              }
+              return connections.get(dbType, "Unknown Connection")
+
+      dbManager1 = DatabaseConnection()
+      dbManager2 = DatabaseConnection()
+      mysqlConn = dbManager1.getConnection("mysql")
+      postgresConn = dbManager2.getConnection("postgres")
+      ex15IsSame = dbManager1 is dbManager2
+      ex15Result = (ex15IsSame, mysqlConn, postgresConn)
+      ex15Result
+
+  - type: "expansion"
+    title: "🔴 심화6: 빌더 with 검증"
+    code: |-
+      class Email:
+          def __init__(self):
+              self.sender = None
+              self.recipients = []
+              self.subject = None
+              self.body = None
+              self.attachments = []
+
+          def __str__(self):
+              return f"From: {self.sender}, To: {self.recipients}, Subject: {self.subject}"
+
+      class EmailBuilder:
+          def __init__(self):
+              self.email = Email()
+
+          def setSender(self, sender):
+              if "@" not in sender:
+                  raise ValueError("Invalid sender email")
+              self.email.sender = sender
+              return self
+
+          def addRecipient(self, recipient):
+              if "@" not in recipient:
+                  raise ValueError("Invalid recipient email")
+              self.email.recipients.append(recipient)
+              return self
+
+          def setSubject(self, subject):
+              if len(subject) > 100:
+                  raise ValueError("Subject too long")
+              self.email.subject = subject
+              return self
+
+          def setBody(self, body):
+              self.email.body = body
+              return self
+
+          def addAttachment(self, filename):
+              self.email.attachments.append(filename)
+              return self
+
+          def build(self):
+              if not self.email.sender:
+                  raise ValueError("Sender required")
+              if not self.email.recipients:
+                  raise ValueError("At least one recipient required")
+              return self.email
+
+      emailBuilt = EmailBuilder().setSender("from@test.com").addRecipient("to@test.com").setSubject("Hello").setBody("Content").build()
+      ex16Result = str(emailBuilt)
+      ex16Result
+
+  - type: "expansion"
+    title: "🔴 심화7: 객체 풀 패턴"
+    code: |-
+      class Connection:
+          def __init__(self, connId):
+              self.connId = connId
+              self.inUse = False
+
+          def execute(self, query):
+              return f"Connection {self.connId}: {query}"
+
+      class ConnectionPool:
+          _instance = None
+
+          def __new__(cls, size=3):
+              if cls._instance is None:
+                  cls._instance = super().__new__(cls)
+                  cls._instance.pool = [Connection(i) for i in range(size)]
+              return cls._instance
+
+          def acquire(self):
+              for conn in self.pool:
+                  if not conn.inUse:
+                      conn.inUse = True
+                      return conn
+              return None
+
+          def release(self, conn):
+              conn.inUse = False
+
+          def getStatus(self):
+              available = sum(1 for c in self.pool if not c.inUse)
+              return f"{available}/{len(self.pool)} available"
+
+      connPool = ConnectionPool(3)
+      conn1 = connPool.acquire()
+      conn2 = connPool.acquire()
+      status1 = connPool.getStatus()
+      connPool.release(conn1)
+      status2 = connPool.getStatus()
+      ex17Result = (status1, status2)
+      ex17Result
+
+  - type: "expansion"
+    title: "🔴 심화8: 널 객체 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Customer(ABC):
+          @abstractmethod
+          def getName(self):
+              pass
+
+          @abstractmethod
+          def isNull(self):
+              pass
+
+      class RealCustomer(Customer):
+          def __init__(self, name):
+              self.name = name
+
+          def getName(self):
+              return self.name
+
+          def isNull(self):
+              return False
+
+      class NullCustomer(Customer):
+          def getName(self):
+              return "Guest"
+
+          def isNull(self):
+              return True
+
+      class CustomerFactory:
+          _customers = {"Alice": RealCustomer("Alice"), "Bob": RealCustomer("Bob")}
+
+          @classmethod
+          def getCustomer(cls, name):
+              return cls._customers.get(name, NullCustomer())
+
+      alice = CustomerFactory.getCustomer("Alice")
+      unknown = CustomerFactory.getCustomer("Unknown")
+      ex18Result = (alice.getName(), alice.isNull(), unknown.getName(), unknown.isNull())
+      ex18Result
+
+  - type: "expansion"
+    title: "🔴 심화9: 멀티톤 패턴"
+    code: |-
+      class DatabaseMultiton:
+          _instances = {}
+
+          def __new__(cls, dbName):
+              if dbName not in cls._instances:
+                  instance = super().__new__(cls)
+                  instance.dbName = dbName
+                  instance.connected = True
+                  cls._instances[dbName] = instance
+              return cls._instances[dbName]
+
+          def query(self, sql):
+              return f"[{self.dbName}] {sql}"
+
+          @classmethod
+          def getInstanceCount(cls):
+              return len(cls._instances)
+
+      db1 = DatabaseMultiton("users")
+      db2 = DatabaseMultiton("orders")
+      db3 = DatabaseMultiton("users")
+      ex19Same = db1 is db3
+      ex19Different = db1 is db2
+      ex19Count = DatabaseMultiton.getInstanceCount()
+      ex19Result = (ex19Same, ex19Different, ex19Count)
+      ex19Result
+
+  - type: "expansion"
+    title: "🔴 심화10: 레지스트리 패턴"
+    code: |-
+      class ServiceRegistry:
+          _services = {}
+
+          @classmethod
+          def register(cls, name, service):
+              cls._services[name] = service
+
+          @classmethod
+          def get(cls, name):
+              return cls._services.get(name)
+
+          @classmethod
+          def unregister(cls, name):
+              if name in cls._services:
+                  del cls._services[name]
+
+          @classmethod
+          def listServices(cls):
+              return list(cls._services.keys())
+
+      class EmailService:
+          def send(self, to, msg):
+              return f"Email to {to}: {msg}"
+
+      class SMSService:
+          def send(self, to, msg):
+              return f"SMS to {to}: {msg}"
+
+      ServiceRegistry.register("email", EmailService())
+      ServiceRegistry.register("sms", SMSService())
+      emailSvc = ServiceRegistry.get("email")
+      smsSvc = ServiceRegistry.get("sms")
+      ex20EmailSent = emailSvc.send("user@test.com", "Hello")
+      ex20SmsSent = smsSvc.send("123-456", "Hi")
+      ex20Services = ServiceRegistry.listServices()
+      ex20Result = (ex20EmailSent, ex20SmsSent, ex20Services)
+      ex20Result

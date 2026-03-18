@@ -1,0 +1,712 @@
+meta:
+  id: "12"
+  title: "dataclasses 마스터"
+  day: 12
+  category: "advancedPython"
+  tags: ["dataclass", "field", "frozen", "__post_init__"]
+  seo:
+    title: "파이썬 dataclasses 완벽 가이드 - 보일러플레이트 없는 클래스"
+    description: "dataclasses로 깔끔한 데이터 클래스를 만듭니다. field(), __post_init__, frozen, slots 옵션 완벽 이해."
+    keywords: ["dataclass", "field", "frozen", "__post_init__", "slots"]
+
+intro:
+  emoji: "📦"
+  points:
+  - "@dataclass 데코레이터 활용"
+  - "field()로 세밀한 필드 제어"
+  - "__post_init__으로 초기화 후처리"
+  - "frozen=True로 불변 객체 생성"
+
+sections:
+- id: "dataclass_basic"
+  title: "@dataclass 기초"
+  subtitle: "자동 __init__, __repr__"
+  blocks:
+  - type: "text"
+    content: "@dataclass 데코레이터는 __init__, __repr__, __eq__ 등의 특수 메서드를 자동 생성합니다. 클래스 속성에 타입 힌트를 추가하면 그것이 인스턴스 필드가 됩니다. 기본값이 있는 필드는 기본값 없는 필드 뒤에 와야 합니다. 데이터를 담는 클래스를 만들 때 보일러플레이트 코드를 크게 줄여줍니다. Python 3.7에서 도입되었으며, 이후 버전에서 기능이 계속 추가되었습니다."
+  - type: "list"
+    items:
+    - "@dataclass: 특수 메서드 자동 생성"
+    - "__init__, __repr__, __eq__ 자동"
+    - "타입 힌트가 필드 정의"
+    - "기본값 순서 규칙 있음"
+  - type: "code"
+    language: "python"
+    title: "기본 dataclass"
+    description: "간단한 dataclass를 정의합니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class Point:
+          x: float
+          y: float
+
+      pt = Point(3.0, 4.0)
+      pt
+  - type: "code"
+    language: "python"
+    title: "기본값 사용"
+    description: "필드에 기본값을 지정합니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class User:
+          name: str
+          email: str
+          active: bool = True
+          loginCount: int = 0
+
+      User("Alice", "alice@example.com")
+  - type: "code"
+    language: "python"
+    title: "__eq__ 자동 생성"
+    description: "필드 값으로 동등성을 비교합니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class Coordinate:
+          lat: float
+          lon: float
+
+      c1 = Coordinate(37.5, 127.0)
+      c2 = Coordinate(37.5, 127.0)
+      c3 = Coordinate(35.0, 129.0)
+      c1 == c2, c1 == c3
+  - type: "tip"
+    content: "dataclass 옵션: @dataclass(init=True, repr=True, eq=True, order=False, frozen=False)"
+
+- id: "field_function"
+  title: "field() 함수"
+  subtitle: "세밀한 필드 제어"
+  blocks:
+  - type: "text"
+    content: "field() 함수로 각 필드의 동작을 세밀하게 제어합니다. default_factory는 가변 기본값(리스트, 딕셔너리)을 안전하게 사용합니다. repr=False로 __repr__에서 필드를 숨길 수 있습니다. compare=False로 __eq__ 비교에서 제외합니다. init=False로 __init__ 파라미터에서 제외합니다. metadata로 추가 정보를 저장할 수 있습니다."
+  - type: "list"
+    items:
+    - "default_factory: 가변 기본값 팩토리"
+    - "repr=False: __repr__에서 제외"
+    - "compare=False: 비교에서 제외"
+    - "init=False: __init__에서 제외"
+  - type: "code"
+    language: "python"
+    title: "default_factory"
+    description: "가변 기본값을 안전하게 사용합니다."
+    content: |-
+      from dataclasses import dataclass, field
+      from typing import List
+
+      @dataclass
+      class ShoppingCart:
+          items: List[str] = field(default_factory=list)
+          discount: float = 0.0
+
+      cart1 = ShoppingCart()
+      cart2 = ShoppingCart()
+      cart1.items.append("apple")
+      cart1.items, cart2.items
+  - type: "code"
+    language: "python"
+    title: "repr과 compare"
+    description: "표시와 비교 동작을 제어합니다."
+    content: |-
+      from dataclasses import dataclass, field
+
+      @dataclass
+      class Account:
+          username: str
+          password: str = field(repr=False)
+          createdAt: str = field(compare=False, default="2024-01-01")
+
+      a1 = Account("alice", "secret123", "2024-01-01")
+      a2 = Account("alice", "different", "2024-06-15")
+      repr(a1), a1 == a2
+  - type: "code"
+    language: "python"
+    title: "init=False"
+    description: "__init__에서 제외하고 나중에 설정합니다."
+    content: |-
+      from dataclasses import dataclass, field
+
+      @dataclass
+      class Order:
+          productId: int
+          quantity: int
+          total: float = field(init=False)
+
+          def __post_init__(self):
+              self.total = self.quantity * 10.0
+
+      Order(1, 5)
+  - type: "tip"
+    content: "field(default_factory=dict)처럼 사용하면 각 인스턴스가 독립적인 딕셔너리를 가집니다."
+
+- id: "post_init"
+  title: "__post_init__"
+  subtitle: "초기화 후처리"
+  blocks:
+  - type: "text"
+    content: "__post_init__ 메서드는 __init__이 끝난 후 자동으로 호출됩니다. 필드 값을 기반으로 계산된 속성을 설정하거나 유효성 검사를 수행합니다. InitVar 타입을 사용하면 __init__에만 전달되고 필드로 저장되지 않는 값을 정의할 수 있습니다. __post_init__은 InitVar 값을 순서대로 인자로 받습니다. 복잡한 초기화 로직을 깔끔하게 분리할 수 있습니다."
+  - type: "list"
+    items:
+    - "__post_init__: __init__ 후 자동 호출"
+    - "계산된 필드 설정"
+    - "유효성 검사 수행"
+    - "InitVar: 초기화 전용 파라미터"
+  - type: "code"
+    language: "python"
+    title: "계산된 필드"
+    description: "__post_init__에서 필드를 계산합니다."
+    content: |-
+      from dataclasses import dataclass, field
+
+      @dataclass
+      class Rectangle:
+          width: float
+          height: float
+          area: float = field(init=False)
+          perimeter: float = field(init=False)
+
+          def __post_init__(self):
+              self.area = self.width * self.height
+              self.perimeter = 2 * (self.width + self.height)
+
+      Rectangle(3, 4)
+  - type: "code"
+    language: "python"
+    title: "유효성 검사"
+    description: "__post_init__에서 값을 검증합니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class PositiveNumber:
+          value: float
+
+          def __post_init__(self):
+              if self.value <= 0:
+                  raise ValueError("Value must be positive")
+
+      PositiveNumber(10)
+  - type: "code"
+    language: "python"
+    title: "InitVar 사용"
+    description: "초기화에만 사용되는 파라미터입니다."
+    content: |-
+      from dataclasses import dataclass, field, InitVar
+
+      @dataclass
+      class DatabaseConnection:
+          host: str
+          port: int
+          password: InitVar[str]
+          connectionString: str = field(init=False)
+
+          def __post_init__(self, password: str):
+              self.connectionString = f"db://{self.host}:{self.port}?pw={password[:2]}***"
+
+      DatabaseConnection("localhost", 5432, "secretpassword")
+  - type: "tip"
+    content: "InitVar 필드는 __repr__이나 __eq__에 포함되지 않습니다."
+
+- id: "frozen_dataclass"
+  title: "frozen=True"
+  subtitle: "불변 인스턴스"
+  blocks:
+  - type: "text"
+    content: "frozen=True 옵션은 인스턴스를 불변(immutable)으로 만듭니다. 필드 값을 변경하려고 하면 FrozenInstanceError가 발생합니다. frozen 객체는 해시 가능(hashable)하여 딕셔너리 키나 집합 요소로 사용할 수 있습니다. 불변 객체는 함수형 프로그래밍 패턴과 잘 맞습니다. 변경이 필요하면 replace() 함수로 새 인스턴스를 만듭니다."
+  - type: "list"
+    items:
+    - "frozen=True: 필드 변경 불가"
+    - "해시 가능 (딕셔너리 키, 집합 요소)"
+    - "FrozenInstanceError 발생"
+    - "replace()로 새 인스턴스 생성"
+  - type: "code"
+    language: "python"
+    title: "frozen 기본"
+    description: "불변 dataclass를 정의합니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass(frozen=True)
+      class Point:
+          x: float
+          y: float
+
+      pt = Point(3.0, 4.0)
+      pt.x, pt.y
+  - type: "code"
+    language: "python"
+    title: "해시 가능"
+    description: "frozen 객체는 집합과 딕셔너리에 사용할 수 있습니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass(frozen=True)
+      class Coordinate:
+          lat: float
+          lon: float
+
+      locations = {
+          Coordinate(37.5, 127.0): "Seoul",
+          Coordinate(35.1, 129.0): "Busan"
+      }
+      locations[Coordinate(37.5, 127.0)]
+  - type: "code"
+    language: "python"
+    title: "replace() 함수"
+    description: "일부 필드만 변경한 새 인스턴스를 만듭니다."
+    content: |-
+      from dataclasses import dataclass, replace
+
+      @dataclass(frozen=True)
+      class Config:
+          host: str
+          port: int
+          debug: bool
+
+      prod = Config("api.example.com", 443, False)
+      dev = replace(prod, host="localhost", port=8080, debug=True)
+      prod, dev
+  - type: "tip"
+    content: "frozen=True면 __hash__가 자동 생성됩니다. 가변 dataclass는 unsafe_hash=True로 강제할 수 있습니다."
+
+- id: "slots_dataclass"
+  title: "slots=True"
+  subtitle: "메모리 최적화"
+  blocks:
+  - type: "text"
+    content: "Python 3.10+에서 slots=True 옵션이 추가되었습니다. __slots__를 자동 생성하여 메모리를 절약합니다. 많은 인스턴스를 생성할 때 효과적입니다. __dict__가 없어 동적 속성 추가가 불가능합니다. frozen=True와 함께 사용하면 불변 + 메모리 효율적인 객체가 됩니다. 상속 시 부모도 slots를 사용해야 합니다."
+  - type: "list"
+    items:
+    - "slots=True: __slots__ 자동 생성"
+    - "메모리 절약"
+    - "동적 속성 추가 불가"
+    - "Python 3.10+ 기능"
+  - type: "code"
+    language: "python"
+    title: "slots 기본"
+    description: "slots=True로 메모리 효율적인 dataclass입니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass(slots=True)
+      class Point3D:
+          x: float
+          y: float
+          z: float
+
+      p3d = Point3D(1.0, 2.0, 3.0)
+      hasattr(p3d, '__dict__'), hasattr(p3d, '__slots__')
+  - type: "code"
+    language: "python"
+    title: "frozen + slots"
+    description: "불변이면서 메모리 효율적입니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass(frozen=True, slots=True)
+      class ImmutablePoint:
+          x: float
+          y: float
+
+      immutable = ImmutablePoint(3.0, 4.0)
+      hash(immutable), immutable.x
+  - type: "code"
+    language: "python"
+    title: "메모리 비교"
+    description: "slots 사용 시 메모리 절약을 확인합니다."
+    content: |-
+      import sys
+      from dataclasses import dataclass
+
+      @dataclass
+      class NormalData:
+          a: int
+          b: int
+          c: int
+
+      @dataclass(slots=True)
+      class SlotData:
+          a: int
+          b: int
+          c: int
+
+      normal = NormalData(1, 2, 3)
+      slotted = SlotData(1, 2, 3)
+      sys.getsizeof(normal), sys.getsizeof(slotted)
+  - type: "tip"
+    content: "weakref가 필요하면 weakref_slot=True 옵션을 추가하세요 (Python 3.11+)."
+
+- id: "inheritance"
+  title: "상속"
+  subtitle: "dataclass 상속"
+  blocks:
+  - type: "text"
+    content: "dataclass는 다른 dataclass를 상속할 수 있습니다. 자식 클래스의 필드가 부모 필드 뒤에 추가됩니다. 부모의 기본값 있는 필드 뒤에 자식의 기본값 없는 필드가 오면 오류가 발생합니다. 이 문제는 field(default=...)나 kw_only=True로 해결합니다. Python 3.10+에서는 kw_only 옵션으로 키워드 전용 인자를 지정할 수 있습니다."
+  - type: "list"
+    items:
+    - "자식 필드는 부모 필드 뒤에"
+    - "기본값 순서 규칙 적용"
+    - "kw_only=True로 순서 문제 해결"
+    - "Python 3.10+ kw_only 지원"
+  - type: "code"
+    language: "python"
+    title: "기본 상속"
+    description: "dataclass를 상속합니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class Animal:
+          name: str
+          age: int
+
+      @dataclass
+      class Dog(Animal):
+          breed: str
+
+      Dog("Buddy", 3, "Labrador")
+  - type: "code"
+    language: "python"
+    title: "기본값 순서 문제 해결"
+    description: "kw_only로 순서 제약을 우회합니다."
+    content: |-
+      from dataclasses import dataclass, field
+
+      @dataclass
+      class Base:
+          id: int
+          name: str = "default"
+
+      @dataclass
+      class Extended(Base):
+          value: int = field(default=0)
+
+      Extended(1, "test", 100)
+  - type: "code"
+    language: "python"
+    title: "kw_only 옵션"
+    description: "키워드 전용 인자로 만듭니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass(kw_only=True)
+      class Config:
+          host: str
+          port: int
+          debug: bool = False
+
+      Config(host="localhost", port=8080)
+  - type: "tip"
+    content: "복잡한 상속 구조에서는 합성(composition)을 고려하세요."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "dataclasses 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 12에서 배운 dataclasses를 난이도별로 복습합니다. @dataclass는 __init__, __repr__, __eq__ 등 보일러플레이트 코드를 자동 생성하여 데이터 클래스 작성을 크게 단순화합니다. field()로 세밀한 필드 제어, __post_init__으로 초기화 후처리, frozen=True로 불변 객체를 만들 수 있습니다. 🟢 기본 문제로 dataclass 정의와 기본값 설정을 익히고, 🟡 응용 문제로 default_factory, InitVar 패턴을 연습하세요. 🔴 심화 문제에서는 상속, slots=True, asdict/astuple 변환 등 고급 기법을 다룹니다. 데이터 중심 클래스에는 dataclass를 기본으로 사용하고, 더 복잡한 검증이 필요하면 Pydantic을 고려하세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 기본 dataclass"
+    code: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class Book:
+          title: str
+          author: str
+          pages: int
+
+      Book("Python Guide", "Alice", 300)
+
+  - type: "expansion"
+    title: "🟢 기본2: 기본값"
+    code: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class Product:
+          name: str
+          price: float
+          quantity: int = 1
+
+      Product("Widget", 9.99)
+
+  - type: "expansion"
+    title: "🟢 기본3: __eq__ 확인"
+    code: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class Point:
+          x: int
+          y: int
+
+      Point(1, 2) == Point(1, 2), Point(1, 2) == Point(3, 4)
+
+  - type: "expansion"
+    title: "🟢 기본4: default_factory"
+    code: |-
+      from dataclasses import dataclass, field
+      from typing import List
+
+      @dataclass
+      class Team:
+          name: str
+          members: List[str] = field(default_factory=list)
+
+      team = Team("Alpha")
+      team.members.append("Alice")
+      team
+
+  - type: "expansion"
+    title: "🟢 기본5: frozen"
+    code: |-
+      from dataclasses import dataclass
+
+      @dataclass(frozen=True)
+      class Constant:
+          name: str
+          value: int
+
+      const = Constant("PI_100", 314)
+      hash(const)
+
+  - type: "expansion"
+    title: "🟡 응용1: __post_init__"
+    code: |-
+      from dataclasses import dataclass, field
+
+      @dataclass
+      class Circle:
+          radius: float
+          area: float = field(init=False)
+
+          def __post_init__(self):
+              import math
+              self.area = math.pi * self.radius ** 2
+
+      Circle(5)
+
+  - type: "expansion"
+    title: "🟡 응용2: repr=False"
+    code: |-
+      from dataclasses import dataclass, field
+
+      @dataclass
+      class Credential:
+          username: str
+          password: str = field(repr=False)
+          token: str = field(repr=False, default="")
+
+      Credential("admin", "secret123")
+
+  - type: "expansion"
+    title: "🟡 응용3: compare=False"
+    code: |-
+      from dataclasses import dataclass, field
+
+      @dataclass
+      class CacheEntry:
+          key: str
+          value: str
+          timestamp: float = field(compare=False, default=0.0)
+
+      CacheEntry("k1", "v1", 1.0) == CacheEntry("k1", "v1", 2.0)
+
+  - type: "expansion"
+    title: "🟡 응용4: InitVar"
+    code: |-
+      from dataclasses import dataclass, field, InitVar
+
+      @dataclass
+      class TemperatureCelsius:
+          fahrenheit: InitVar[float]
+          celsius: float = field(init=False)
+
+          def __post_init__(self, fahrenheit: float):
+              self.celsius = (fahrenheit - 32) * 5 / 9
+
+      TemperatureCelsius(100)
+
+  - type: "expansion"
+    title: "🟡 응용5: replace()"
+    code: |-
+      from dataclasses import dataclass, replace
+
+      @dataclass(frozen=True)
+      class Settings:
+          theme: str
+          fontSize: int
+          showGrid: bool
+
+      default = Settings("light", 14, True)
+      custom = replace(default, theme="dark", fontSize=16)
+      default, custom
+
+  - type: "expansion"
+    title: "🔴 심화1: 상속"
+    code: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class Entity:
+          id: int
+          name: str
+
+      @dataclass
+      class User(Entity):
+          email: str
+
+      User(1, "Alice", "alice@example.com")
+
+  - type: "expansion"
+    title: "🔴 심화2: slots"
+    code: |-
+      from dataclasses import dataclass
+      import sys
+
+      @dataclass(slots=True)
+      class Compact:
+          x: int
+          y: int
+          z: int
+
+      compact = Compact(1, 2, 3)
+      hasattr(compact, '__slots__'), not hasattr(compact, '__dict__')
+
+  - type: "expansion"
+    title: "🔴 심화3: kw_only"
+    code: |-
+      from dataclasses import dataclass
+
+      @dataclass(kw_only=True)
+      class APIRequest:
+          endpoint: str
+          method: str = "GET"
+          body: dict = None
+
+      APIRequest(endpoint="/users", body={"name": "Alice"})
+
+  - type: "expansion"
+    title: "🔴 심화4: 검증과 변환"
+    code: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class Email:
+          address: str
+
+          def __post_init__(self):
+              self.address = self.address.lower().strip()
+              if "@" not in self.address:
+                  raise ValueError("Invalid email")
+
+      Email("  ALICE@EXAMPLE.COM  ")
+
+  - type: "expansion"
+    title: "🔴 심화5: 중첩 dataclass"
+    code: |-
+      from dataclasses import dataclass, field
+      from typing import List
+
+      @dataclass
+      class Address:
+          street: str
+          city: str
+
+      @dataclass
+      class Company:
+          name: str
+          address: Address
+          employees: List[str] = field(default_factory=list)
+
+      Company("TechCorp", Address("123 Main St", "Seoul"), ["Alice", "Bob"])
+
+  - type: "expansion"
+    title: "🔴 심화6: asdict와 astuple"
+    code: |-
+      from dataclasses import dataclass, asdict, astuple
+
+      @dataclass
+      class Person:
+          name: str
+          age: int
+          email: str
+
+      person = Person("Alice", 30, "alice@example.com")
+      asdict(person), astuple(person)
+
+  - type: "expansion"
+    title: "🔴 심화7: fields()"
+    code: |-
+      from dataclasses import dataclass, fields, field
+
+      @dataclass
+      class Model:
+          id: int
+          name: str = field(metadata={"max_length": 100})
+          active: bool = True
+
+      [(f.name, f.type, f.metadata) for f in fields(Model)]
+
+  - type: "expansion"
+    title: "🔴 심화8: 팩토리 패턴"
+    code: |-
+      from dataclasses import dataclass
+      from typing import ClassVar
+
+      @dataclass
+      class Counter:
+          id: int
+          value: int = 0
+          _nextId: ClassVar[int] = 1
+
+          @classmethod
+          def create(cls, value: int = 0) -> 'Counter':
+              instance = cls(cls._nextId, value)
+              cls._nextId += 1
+              return instance
+
+      Counter.create(10), Counter.create(20)
+
+  - type: "expansion"
+    title: "🔴 심화9: match_args"
+    code: |-
+      from dataclasses import dataclass
+
+      @dataclass
+      class Point:
+          x: int
+          y: int
+
+      def describe(p):
+          match p:
+              case Point(0, 0):
+                  return "origin"
+              case Point(0, y):
+                  return f"on y-axis at {y}"
+              case Point(x, 0):
+                  return f"on x-axis at {x}"
+              case Point(x, y):
+                  return f"at ({x}, {y})"
+
+      describe(Point(0, 0)), describe(Point(3, 4))
+
+  - type: "expansion"
+    title: "🔴 심화10: order=True"
+    code: |-
+      from dataclasses import dataclass
+
+      @dataclass(order=True)
+      class Version:
+          major: int
+          minor: int
+          patch: int
+
+      versions = [Version(2, 0, 0), Version(1, 10, 5), Version(1, 9, 0)]
+      sorted(versions)

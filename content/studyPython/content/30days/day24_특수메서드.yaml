@@ -1,0 +1,879 @@
+meta:
+  id: "day24"
+  title: "특수 메서드"
+  day: 24
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 특수 메서드 - 매직 메서드로 객체 동작 정의"
+    description: "__str__, __repr__, __len__, __add__, __eq__, __getitem__ 등 특수 메서드를 배웁니다."
+    keywords: ['특수메서드', 'magic method', 'dunder', '__str__', '__repr__']
+
+intro:
+  emoji: "✨"
+  points:
+  - "__str__과 __repr__로 문자열 표현"
+  - "__len__으로 길이 정의"
+  - "__add__, __eq__로 연산자 구현"
+  - "__getitem__으로 인덱싱 지원"
+
+sections:
+- id: "str_method"
+  title: "__str__ 메서드"
+  subtitle: "사람이 읽기 쉬운 문자열 표현"
+  blocks:
+  - type: "text"
+    content: "__str__ 메서드는 객체를 문자열로 변환할 때 호출됩니다. str(객체)나 print(객체)를 사용하면 자동으로 __str__이 호출되어 사람이 읽기 쉬운 형태로 출력됩니다. 이 메서드를 정의하지 않으면 기본적으로 객체의 메모리 주소가 출력됩니다."
+  - type: "list"
+    items:
+    - "__str__(self): 형식"
+    - "str(), print()에서 자동 호출"
+    - "사용자 친화적인 출력"
+    - "문자열 반환 필수"
+  - type: "code"
+    language: "python"
+    title: "기본 __str__"
+    description: "__str__을 정의하여 객체를 문자열로 표현합니다."
+    content: |-
+      class Book:
+          def __init__(self, title, author):
+              self.title = title
+              self.author = author
+
+          def __str__(self):
+              return self.title + ' by ' + self.author
+
+      book = Book('Python Guide', 'Kim')
+      str(book)
+  - type: "code"
+    language: "python"
+    title: "상세한 문자열"
+    description: "여러 속성을 조합하여 정보를 제공합니다."
+    content: |-
+      class Product:
+          def __init__(self, name, price):
+              self.name = name
+              self.price = price
+
+          def __str__(self):
+              return self.name + ': ' + str(self.price) + '원'
+
+      item = Product('Laptop', 1500000)
+      str(item)
+  - type: "code"
+    language: "python"
+    title: "조건부 문자열"
+    description: "상태에 따라 다른 문자열을 반환합니다."
+    content: |-
+      class Account:
+          def __init__(self, owner, balance):
+              self.owner = owner
+              self.balance = balance
+
+          def __str__(self):
+              status = 'positive' if self.balance >= 0 else 'negative'
+              return self.owner + ' (' + status + ')'
+
+      acc = Account('Alice', -1000)
+      str(acc)
+  - type: "tip"
+    content: "__str__은 최종 사용자를 위한 읽기 쉬운 출력을 만드는 데 사용합니다."
+
+- id: "repr_method"
+  title: "__repr__ 메서드"
+  subtitle: "개발자를 위한 명확한 표현"
+  blocks:
+  - type: "text"
+    content: "__repr__ 메서드는 객체의 공식적인 문자열 표현을 정의합니다. repr(객체)를 호출하거나 인터프리터에서 객체를 직접 입력하면 호출됩니다. 주로 디버깅이나 로깅에 사용되며, 가능하면 객체를 재생성할 수 있는 형태의 문자열을 반환해야 합니다."
+  - type: "list"
+    items:
+    - "__repr__(self): 형식"
+    - "repr()에서 자동 호출"
+    - "개발자용 명확한 표현"
+    - "디버깅과 로깅에 유용"
+  - type: "code"
+    language: "python"
+    title: "기본 __repr__"
+    description: "객체 정보를 명확하게 표현합니다."
+    content: |-
+      class Point:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __repr__(self):
+              return 'Point(' + str(self.x) + ', ' + str(self.y) + ')'
+
+      pt = Point(3, 4)
+      repr(pt)
+  - type: "code"
+    language: "python"
+    title: "재생성 가능한 표현"
+    description: "반환된 문자열로 객체를 재생성할 수 있게 합니다."
+    content: |-
+      class Color:
+          def __init__(self, r, g, b):
+              self.r = r
+              self.g = g
+              self.b = b
+
+          def __repr__(self):
+              return 'Color(' + str(self.r) + ', ' + str(self.g) + ', ' + str(self.b) + ')'
+
+      color = Color(255, 128, 0)
+      repr(color)
+  - type: "code"
+    language: "python"
+    title: "__str__과 __repr__ 함께"
+    description: "두 메서드를 모두 정의할 수 있습니다."
+    content: |-
+      class User:
+          def __init__(self, name, userId):
+              self.name = name
+              self.userId = userId
+
+          def __str__(self):
+              return self.name
+
+          def __repr__(self):
+              return 'User(' + str(self.userId) + ')'
+
+      user = User('Bob', 1001)
+      str(user), repr(user)
+  - type: "tip"
+    content: "__str__이 없으면 __repr__이 대신 사용됩니다. 하나만 정의한다면 __repr__을 권장합니다."
+
+- id: "len_method"
+  title: "__len__ 메서드"
+  subtitle: "객체의 길이 정의"
+  blocks:
+  - type: "text"
+    content: "__len__ 메서드는 객체의 길이를 정의합니다. len(객체)를 호출하면 자동으로 __len__이 호출되어 정수값을 반환합니다. 컬렉션 타입 클래스를 만들 때 매우 유용하며, 반드시 음이 아닌 정수를 반환해야 합니다."
+  - type: "list"
+    items:
+    - "__len__(self): 형식"
+    - "len()에서 자동 호출"
+    - "정수값 반환 필수"
+    - "컬렉션 클래스에 필수"
+  - type: "code"
+    language: "python"
+    title: "기본 __len__"
+    description: "내부 리스트의 길이를 반환합니다."
+    content: |-
+      class Playlist:
+          def __init__(self):
+              self.songs = []
+
+          def add(self, song):
+              self.songs.append(song)
+
+          def __len__(self):
+              return len(self.songs)
+
+      pl = Playlist()
+      pl.add('Song A')
+      pl.add('Song B')
+      len(pl)
+  - type: "code"
+    language: "python"
+    title: "커스텀 길이 계산"
+    description: "특정 기준으로 길이를 계산합니다."
+    content: |-
+      class TextDoc:
+          def __init__(self, content):
+              self.content = content
+
+          def __len__(self):
+              return len(self.content.split())
+
+      doc = TextDoc('Hello world from Python')
+      len(doc)
+  - type: "code"
+    language: "python"
+    title: "여러 속성 기반 길이"
+    description: "여러 속성을 조합하여 길이를 계산합니다."
+    content: |-
+      class Inventory:
+          def __init__(self):
+              self.items = []
+
+          def add(self, item, qty):
+              self.items.append({'item': item, 'qty': qty})
+
+          def __len__(self):
+              total = 0
+              for entry in self.items:
+                  total = total + entry['qty']
+              return total
+
+      inv = Inventory()
+      inv.add('apple', 5)
+      inv.add('banana', 3)
+      len(inv)
+  - type: "tip"
+    content: "__len__은 bool() 판단에도 사용됩니다. len이 0이면 False, 아니면 True입니다."
+
+- id: "add_method"
+  title: "__add__ 메서드"
+  subtitle: "+ 연산자 구현"
+  blocks:
+  - type: "text"
+    content: "__add__ 메서드는 + 연산자의 동작을 정의합니다. a + b를 실행하면 a.__add__(b)가 호출됩니다. 이를 통해 사용자 정의 클래스에서도 덧셈 연산을 의미있게 구현할 수 있습니다. 새로운 객체를 반환하는 것이 일반적입니다."
+  - type: "list"
+    items:
+    - "__add__(self, other): 형식"
+    - "+ 연산자에서 자동 호출"
+    - "새 객체 반환 권장"
+    - "연산자 오버로딩"
+  - type: "code"
+    language: "python"
+    title: "기본 __add__"
+    description: "두 벡터를 더합니다."
+    content: |-
+      class Vector:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __add__(self, other):
+              return Vector(self.x + other.x, self.y + other.y)
+
+          def __repr__(self):
+              return 'Vector(' + str(self.x) + ', ' + str(self.y) + ')'
+
+      v1 = Vector(1, 2)
+      v2 = Vector(3, 4)
+      v3 = v1 + v2
+      repr(v3)
+  - type: "code"
+    language: "python"
+    title: "문자열 결합"
+    description: "객체를 더해서 새로운 문자열을 만듭니다."
+    content: |-
+      class Name:
+          def __init__(self, text):
+              self.text = text
+
+          def __add__(self, other):
+              return Name(self.text + ' ' + other.text)
+
+          def __str__(self):
+              return self.text
+
+      first = Name('John')
+      last = Name('Doe')
+      full = first + last
+      str(full)
+  - type: "code"
+    language: "python"
+    title: "숫자 누적"
+    description: "카운터를 더해서 합산합니다."
+    content: |-
+      class Counter:
+          def __init__(self, val):
+              self.val = val
+
+          def __add__(self, other):
+              return Counter(self.val + other.val)
+
+      cnt1 = Counter(10)
+      cnt2 = Counter(20)
+      combined = cnt1 + cnt2
+      combined.val
+  - type: "tip"
+    content: "__sub__, __mul__, __div__ 등으로 다른 연산자도 구현할 수 있습니다."
+
+- id: "eq_method"
+  title: "__eq__ 메서드"
+  subtitle: "== 연산자 구현"
+  blocks:
+  - type: "text"
+    content: "__eq__ 메서드는 == 연산자의 동작을 정의합니다. a == b를 실행하면 a.__eq__(b)가 호출됩니다. 기본적으로 객체는 같은 메모리 주소일 때만 같다고 판단하지만, __eq__를 정의하면 값 기반 비교가 가능합니다. True나 False를 반환해야 합니다."
+  - type: "list"
+    items:
+    - "__eq__(self, other): 형식"
+    - "== 연산자에서 자동 호출"
+    - "True/False 반환"
+    - "값 기반 비교 가능"
+  - type: "code"
+    language: "python"
+    title: "기본 __eq__"
+    description: "좌표가 같으면 같은 점으로 판단합니다."
+    content: |-
+      class Location:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __eq__(self, other):
+              return self.x == other.x and self.y == other.y
+
+      loc1 = Location(1, 2)
+      loc2 = Location(1, 2)
+      loc1 == loc2
+  - type: "code"
+    language: "python"
+    title: "문자열 비교"
+    description: "내용이 같으면 같은 객체로 판단합니다."
+    content: |-
+      class Tag:
+          def __init__(self, name):
+              self.name = name
+
+          def __eq__(self, other):
+              return self.name == other.name
+
+      tag1 = Tag('python')
+      tag2 = Tag('python')
+      tag1 == tag2
+  - type: "code"
+    language: "python"
+    title: "복합 조건 비교"
+    description: "여러 속성을 모두 비교합니다."
+    content: |-
+      class Card:
+          def __init__(self, rank, suit):
+              self.rank = rank
+              self.suit = suit
+
+          def __eq__(self, other):
+              return self.rank == other.rank and self.suit == other.suit
+
+      card1 = Card('A', 'hearts')
+      card2 = Card('A', 'spades')
+      card1 == card2
+  - type: "tip"
+    content: "__ne__(!=), __lt__(<), __le__(<=), __gt__(>), __ge__(>=)도 구현할 수 있습니다."
+
+- id: "getitem_method"
+  title: "__getitem__ 메서드"
+  subtitle: "인덱싱과 슬라이싱 지원"
+  blocks:
+  - type: "text"
+    content: "__getitem__ 메서드는 객체[키] 형태의 인덱싱을 가능하게 합니다. obj[key]를 실행하면 obj.__getitem__(key)가 호출됩니다. 리스트처럼 동작하는 커스텀 컨테이너를 만들 때 필수적이며, 슬라이싱도 지원할 수 있습니다."
+  - type: "list"
+    items:
+    - "__getitem__(self, key): 형식"
+    - "obj[key]에서 자동 호출"
+    - "인덱싱과 슬라이싱 지원"
+    - "컨테이너 인터페이스"
+  - type: "code"
+    language: "python"
+    title: "기본 __getitem__"
+    description: "인덱스로 내부 리스트에 접근합니다."
+    content: |-
+      class Items:
+          def __init__(self):
+              self.data = []
+
+          def add(self, item):
+              self.data.append(item)
+
+          def __getitem__(self, idx):
+              return self.data[idx]
+
+      items = Items()
+      items.add('first')
+      items.add('second')
+      items[0]
+  - type: "code"
+    language: "python"
+    title: "딕셔너리형 접근"
+    description: "키로 값을 조회합니다."
+    content: |-
+      class Config:
+          def __init__(self):
+              self.settings = {}
+
+          def set(self, key, val):
+              self.settings[key] = val
+
+          def __getitem__(self, key):
+              return self.settings.get(key, 'Not found')
+
+      cfg = Config()
+      cfg.set('host', 'localhost')
+      cfg['host']
+  - type: "code"
+    language: "python"
+    title: "계산된 값 반환"
+    description: "인덱스에 따라 계산된 값을 반환합니다."
+    content: |-
+      class Fibonacci:
+          def __getitem__(self, n):
+              if n <= 1:
+                  return n
+              a = 0
+              b = 1
+              for i in range(2, n + 1):
+                  c = a + b
+                  a = b
+                  b = c
+              return b
+
+      fib = Fibonacci()
+      fib[7]
+  - type: "tip"
+    content: "__setitem__과 __delitem__으로 obj[key] = val과 del obj[key]도 구현할 수 있습니다."
+
+- id: "special_methods_practice"
+  title: "특수 메서드 실전"
+  subtitle: "여러 특수 메서드 조합"
+  blocks:
+  - type: "text"
+    content: "실제 클래스는 여러 특수 메서드를 함께 구현하여 파이썬 내장 타입처럼 동작하게 만듭니다. __str__, __len__, __getitem__ 등을 조합하면 강력하고 직관적인 인터페이스를 제공할 수 있습니다."
+  - type: "list"
+    items:
+    - "여러 특수 메서드 조합"
+    - "내장 타입처럼 동작"
+    - "직관적인 인터페이스"
+    - "파이썬스러운 코드"
+  - type: "code"
+    language: "python"
+    title: "완전한 컬렉션 클래스"
+    description: "여러 특수 메서드를 함께 구현합니다."
+    content: |-
+      class TodoList:
+          def __init__(self):
+              self.tasks = []
+
+          def add(self, task):
+              self.tasks.append(task)
+
+          def __len__(self):
+              return len(self.tasks)
+
+          def __getitem__(self, idx):
+              return self.tasks[idx]
+
+          def __str__(self):
+              return str(len(self.tasks)) + ' tasks'
+
+      todo = TodoList()
+      todo.add('Study')
+      todo.add('Code')
+      len(todo), str(todo), todo[0]
+  - type: "code"
+    language: "python"
+    title: "수학적 객체"
+    description: "덧셈과 비교를 모두 지원합니다."
+    content: |-
+      class Money:
+          def __init__(self, amount):
+              self.amount = amount
+
+          def __add__(self, other):
+              return Money(self.amount + other.amount)
+
+          def __eq__(self, other):
+              return self.amount == other.amount
+
+          def __str__(self):
+              return str(self.amount) + '원'
+
+      m1 = Money(1000)
+      m2 = Money(2000)
+      m3 = m1 + m2
+      str(m3)
+  - type: "code"
+    language: "python"
+    title: "체이닝 가능한 클래스"
+    description: "여러 연산을 연결할 수 있습니다."
+    content: |-
+      class Chain:
+          def __init__(self, val):
+              self.val = val
+
+          def __add__(self, other):
+              return Chain(self.val + other.val)
+
+          def __repr__(self):
+              return 'Chain(' + str(self.val) + ')'
+
+      c1 = Chain(10)
+      c2 = Chain(20)
+      c3 = Chain(30)
+      chained = c1 + c2 + c3
+      repr(chained)
+  - type: "tip"
+    content: "특수 메서드를 잘 활용하면 사용자 정의 클래스가 파이썬 내장 타입만큼 자연스럽게 동작합니다."
+
+- id: "practice"
+  title: "Day 24 종합 복습"
+  subtitle: "특수 메서드 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 24에서 배운 특수 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: __str__ 구현"
+    code: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+          def __str__(self):
+              return self.name + ' (' + str(self.age) + ')'
+
+      p = Person('Alice', 25)
+      str(p)
+
+  - type: "expansion"
+    title: "🟢 기본2: __repr__ 구현"
+    code: |-
+      class Coord:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __repr__(self):
+              return 'Coord(' + str(self.x) + ', ' + str(self.y) + ')'
+
+      c = Coord(10, 20)
+      repr(c)
+
+  - type: "expansion"
+    title: "🟢 기본3: __len__ 구현"
+    code: |-
+      class Words:
+          def __init__(self):
+              self.items = []
+
+          def add(self, word):
+              self.items.append(word)
+
+          def __len__(self):
+              return len(self.items)
+
+      w = Words()
+      w.add('hello')
+      w.add('world')
+      len(w)
+
+  - type: "expansion"
+    title: "🟢 기본4: __add__ 구현"
+    code: |-
+      class Number:
+          def __init__(self, val):
+              self.val = val
+
+          def __add__(self, other):
+              return Number(self.val + other.val)
+
+      n1 = Number(5)
+      n2 = Number(3)
+      n3 = n1 + n2
+      n3.val
+
+  - type: "expansion"
+    title: "🟢 기본5: __eq__ 구현"
+    code: |-
+      class ID:
+          def __init__(self, code):
+              self.code = code
+
+          def __eq__(self, other):
+              return self.code == other.code
+
+      id1 = ID('A123')
+      id2 = ID('A123')
+      id1 == id2
+
+  - type: "expansion"
+    title: "🟡 응용1: __str__과 __repr__ 함께"
+    code: |-
+      class Item:
+          def __init__(self, name, price):
+              self.name = name
+              self.price = price
+
+          def __str__(self):
+              return self.name
+
+          def __repr__(self):
+              return 'Item(' + self.name + ', ' + str(self.price) + ')'
+
+      it = Item('Mouse', 25000)
+      str(it), repr(it)
+
+  - type: "expansion"
+    title: "🟡 응용2: 단어 수 __len__"
+    code: |-
+      class Text:
+          def __init__(self, content):
+              self.content = content
+
+          def __len__(self):
+              return len(self.content.split())
+
+      txt = Text('Python is awesome')
+      len(txt)
+
+  - type: "expansion"
+    title: "🟡 응용3: 벡터 덧셈"
+    code: |-
+      class Vec2D:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __add__(self, other):
+              return Vec2D(self.x + other.x, self.y + other.y)
+
+      vec1 = Vec2D(1, 2)
+      vec2 = Vec2D(3, 4)
+      vec3 = vec1 + vec2
+      vec3.x, vec3.y
+
+  - type: "expansion"
+    title: "🟡 응용4: __getitem__ 리스트형"
+    code: |-
+      class Stack:
+          def __init__(self):
+              self.data = []
+
+          def push(self, val):
+              self.data.append(val)
+
+          def __getitem__(self, idx):
+              return self.data[idx]
+
+      stk = Stack()
+      stk.push(10)
+      stk.push(20)
+      stk[1]
+
+  - type: "expansion"
+    title: "🟡 응용5: 복합 비교"
+    code: |-
+      class Rectangle:
+          def __init__(self, w, h):
+              self.w = w
+              self.h = h
+
+          def __eq__(self, other):
+              return self.w == other.w and self.h == other.h
+
+      r1 = Rectangle(5, 10)
+      r2 = Rectangle(5, 10)
+      r1 == r2
+
+  - type: "expansion"
+    title: "🔴 심화1: 문자열 포맷팅"
+    code: |-
+      class Employee:
+          def __init__(self, name, dept, salary):
+              self.name = name
+              self.dept = dept
+              self.salary = salary
+
+          def __str__(self):
+              return self.name + ' - ' + self.dept
+
+          def __repr__(self):
+              return 'Employee(' + self.name + ', ' + str(self.salary) + ')'
+
+      emp = Employee('John', 'IT', 50000)
+      str(emp), repr(emp)
+
+  - type: "expansion"
+    title: "🔴 심화2: 커스텀 길이"
+    code: |-
+      class Cart:
+          def __init__(self):
+              self.items = []
+
+          def add(self, name, qty):
+              self.items.append({'name': name, 'qty': qty})
+
+          def __len__(self):
+              total = 0
+              for entry in self.items:
+                  total = total + entry['qty']
+              return total
+
+      cart = Cart()
+      cart.add('apple', 3)
+      cart.add('banana', 5)
+      len(cart)
+
+  - type: "expansion"
+    title: "🔴 심화3: 연산 체이닝"
+    code: |-
+      class Num:
+          def __init__(self, val):
+              self.val = val
+
+          def __add__(self, other):
+              return Num(self.val + other.val)
+
+          def __str__(self):
+              return str(self.val)
+
+      num1 = Num(1)
+      num2 = Num(2)
+      num3 = Num(3)
+      result = num1 + num2 + num3
+      str(result)
+
+  - type: "expansion"
+    title: "🔴 심화4: 딕셔너리형 접근"
+    code: |-
+      class Store:
+          def __init__(self):
+              self.data = {}
+
+          def set(self, key, val):
+              self.data[key] = val
+
+          def __getitem__(self, key):
+              return self.data.get(key, None)
+
+          def __len__(self):
+              return len(self.data)
+
+      store = Store()
+      store.set('apple', 100)
+      store.set('banana', 200)
+      store['apple'], len(store)
+
+  - type: "expansion"
+    title: "🔴 심화5: 범위 체크"
+    code: |-
+      class SafeList:
+          def __init__(self):
+              self.items = []
+
+          def add(self, val):
+              self.items.append(val)
+
+          def __getitem__(self, idx):
+              if 0 <= idx < len(self.items):
+                  return self.items[idx]
+              else:
+                  return None
+
+          def __len__(self):
+              return len(self.items)
+
+      sl = SafeList()
+      sl.add('a')
+      sl.add('b')
+      sl[0], sl[5]
+
+  - type: "expansion"
+    title: "🔴 심화6: 시퀀스 프로토콜"
+    code: |-
+      class Range:
+          def __init__(self, start, end):
+              self.start = start
+              self.end = end
+
+          def __len__(self):
+              return self.end - self.start
+
+          def __getitem__(self, idx):
+              if idx >= len(self):
+                  return None
+              return self.start + idx
+
+      rng = Range(5, 10)
+      len(rng), rng[0], rng[3]
+
+  - type: "expansion"
+    title: "🔴 심화7: 불변 객체"
+    code: |-
+      class ImmutablePoint:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def __add__(self, other):
+              return ImmutablePoint(self.x + other.x, self.y + other.y)
+
+          def __eq__(self, other):
+              return self.x == other.x and self.y == other.y
+
+          def __repr__(self):
+              return 'ImmutablePoint(' + str(self.x) + ', ' + str(self.y) + ')'
+
+      ip1 = ImmutablePoint(1, 2)
+      ip2 = ImmutablePoint(3, 4)
+      ip3 = ip1 + ip2
+      repr(ip3)
+
+  - type: "expansion"
+    title: "🔴 심화8: 스마트 컨테이너"
+    code: |-
+      class SmartList:
+          def __init__(self):
+              self.data = []
+
+          def add(self, val):
+              if val not in self.data:
+                  self.data.append(val)
+
+          def __len__(self):
+              return len(self.data)
+
+          def __getitem__(self, idx):
+              return self.data[idx]
+
+          def __str__(self):
+              return 'SmartList(' + str(len(self.data)) + ')'
+
+      smart = SmartList()
+      smart.add(1)
+      smart.add(2)
+      smart.add(1)
+      len(smart), str(smart)
+
+  - type: "expansion"
+    title: "🔴 심화9: 비교 연산자"
+    code: |-
+      class Score:
+          def __init__(self, val):
+              self.val = val
+
+          def __eq__(self, other):
+              return self.val == other.val
+
+          def __lt__(self, other):
+              return self.val < other.val
+
+          def __str__(self):
+              return str(self.val)
+
+      s1 = Score(85)
+      s2 = Score(90)
+      s1 == s2, s1 < s2
+
+  - type: "expansion"
+    title: "🔴 심화10: 완전한 자료구조"
+    code: |-
+      class Queue:
+          def __init__(self):
+              self.items = []
+
+          def enqueue(self, val):
+              self.items.append(val)
+
+          def dequeue(self):
+              if len(self.items) > 0:
+                  return self.items.pop(0)
+              return None
+
+          def __len__(self):
+              return len(self.items)
+
+          def __getitem__(self, idx):
+              return self.items[idx]
+
+          def __str__(self):
+              return 'Queue(' + str(len(self.items)) + ' items)'
+
+      q = Queue()
+      q.enqueue('first')
+      q.enqueue('second')
+      len(q), str(q), q[0]

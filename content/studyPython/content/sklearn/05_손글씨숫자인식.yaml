@@ -1,0 +1,359 @@
+meta:
+  id: sklearn_05
+  title: 손글씨숫자인식
+  order: 5
+  category: sklearn
+  difficulty: "⭐⭐⭐"
+  badge: 기초
+  tags: ["다중분류", "이미지", "PCA", "digits", "시각화"]
+  seo:
+    title: "scikit-learn 다중 분류 - 손글씨 숫자 인식"
+    description: "이미지 데이터로 0~9 숫자를 분류합니다. PCA로 고차원 데이터를 시각화합니다."
+    keywords: ["scikit-learn", "다중분류", "digits", "PCA", "이미지"]
+
+intro:
+  emoji: "✍️"
+  goal: 이미지 데이터로 손글씨 숫자(0~9)를 인식하는 모델을 만듭니다.
+  description: 64픽셀(8x8) 이미지 데이터로 10개 클래스 분류를 수행합니다. PCA로 고차원 데이터를 2차원으로 축소하여 시각화합니다. 이전 프로젝트의 train_test_split, StandardScaler, 다중분류 개념을 복습하고 PCA를 새로 배웁니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: 손글씨 숫자 인식에 필요한 라이브러리를 불러옵니다. 차원 축소를 위해 PCA를 추가로 임포트합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sklearn PCA 모듈 임포트
+    content: |-
+      from sklearn.datasets import load_digits
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+      from sklearn.decomposition import PCA
+      import pandas as pd
+      import numpy as np
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  subtitle: load_digits()
+  blocks:
+  - type: text
+    content: 손글씨 숫자 데이터셋은 8x8 픽셀 이미지 1,797개를 담고 있습니다. 각 픽셀은 0~16 사이의 밝기값입니다. 이미지가 64차원 벡터로 펼쳐져 있습니다.
+  - type: code
+    language: python
+    title: 데이터 로드
+    description: 손글씨 데이터 불러오기
+    content: |-
+      digits = load_digits()
+      X = digits.data
+      y = digits.target
+      X.shape
+  - type: tip
+    content: 8x8=64 픽셀이 1차원으로 펼쳐져 있습니다. digits.images를 사용하면 (1797, 8, 8) 형태의 원래 이미지를 볼 수 있습니다.
+
+- id: step3_visualize
+  title: 3단계. 이미지 시각화
+  subtitle: 샘플 확인
+  blocks:
+  - type: text
+    content: 실제 이미지가 어떻게 생겼는지 확인합니다. 8x8 해상도지만 사람이 숫자를 인식할 수 있습니다.
+  - type: code
+    language: python
+    title: 샘플 이미지
+    description: 0~9 숫자 이미지 확인
+    content: |-
+      fig, axes = plt.subplots(2, 5, figsize=(10, 5))
+      for i, ax in enumerate(axes.flat):
+          ax.imshow(digits.images[i], cmap='gray')
+          ax.set_title(f'Label: {digits.target[i]}')
+          ax.axis('off')
+      fig.suptitle('Sample Digit Images')
+      fig
+
+- id: step4_split
+  title: 4단계. 데이터 분할
+  subtitle: train_test_split
+  blocks:
+  - type: text
+    content: 이전 프로젝트와 동일하게 학습/테스트 데이터로 분할합니다.
+  - type: code
+    language: python
+    title: 데이터 분할
+    description: 80:20 분할
+    content: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+
+- id: step5_scale
+  title: 5단계. 스케일링
+  subtitle: StandardScaler
+  blocks:
+  - type: text
+    content: 픽셀값은 0~16 범위이지만, 스케일링을 적용하면 LogisticRegression의 수렴이 빨라집니다.
+  - type: code
+    language: python
+    title: 스케일링
+    description: 표준화 적용
+    content: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+
+- id: step6_model
+  title: 6단계. 모델 학습
+  subtitle: LogisticRegression
+  blocks:
+  - type: text
+    content: 10개 클래스(0~9)를 분류하는 다중 분류 문제입니다. LogisticRegression은 자동으로 다중 분류를 처리합니다.
+  - type: code
+    language: python
+    title: 모델 학습
+    description: 다중 분류 모델
+    content: |-
+      model = LogisticRegression(max_iter=1000)
+      model.fit(xTrainSc, yTrain)
+  - type: tip
+    content: LogisticRegression은 기본적으로 OvR(One-vs-Rest) 방식으로 다중 분류를 처리합니다. 각 클래스에 대해 이진 분류기를 학습하고, 가장 높은 확률의 클래스를 선택합니다.
+
+- id: step7_evaluate
+  title: 7단계. 평가
+  subtitle: 정확도와 분류 리포트
+  blocks:
+  - type: text
+    content: 10개 클래스의 분류 성능을 평가합니다. 어떤 숫자가 인식하기 어려운지 확인합니다.
+  - type: code
+    language: python
+    title: 정확도
+    description: 전체 정확도 확인
+    content: |-
+      yPred = model.predict(xTestSc)
+      acc = accuracy_score(yTest, yPred)
+      f"정확도: {acc:.2%}"
+  - type: code
+    language: python
+    title: 분류 리포트
+    description: 숫자별 성능
+    content: |-
+      report = classification_report(yTest, yPred)
+      report
+
+- id: step8_confusion
+  title: 8단계. 혼동행렬
+  subtitle: 오분류 패턴
+  blocks:
+  - type: text
+    content: 10x10 혼동행렬로 어떤 숫자가 어떤 숫자로 잘못 인식되는지 확인합니다. 예를 들어 8과 3이 혼동되는 경우가 많습니다.
+  - type: code
+    language: python
+    title: 혼동행렬 시각화
+    description: 10x10 히트맵
+    content: |-
+      cm = confusion_matrix(yTest, yPred)
+      fig, ax = plt.subplots(figsize=(10, 8))
+      sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=ax)
+      ax.set_xlabel('Predicted')
+      ax.set_ylabel('Actual')
+      ax.set_title('Confusion Matrix - Digits')
+      fig
+
+- id: step9_errors
+  title: 9단계. 오분류 분석
+  subtitle: 잘못 예측한 이미지
+  blocks:
+  - type: text
+    content: 모델이 잘못 예측한 이미지를 확인합니다. 사람도 헷갈릴 수 있는 필체인지, 모델의 한계인지 파악합니다.
+  - type: code
+    language: python
+    title: 오분류 샘플
+    description: 잘못 예측한 이미지 확인
+    content: |-
+      errors = np.where(yPred != yTest)[0]
+      fig, axes = plt.subplots(2, 5, figsize=(12, 5))
+      for i, ax in enumerate(axes.flat):
+          if i < len(errors):
+              idx = errors[i]
+              img = xTest[idx].reshape(8, 8)
+              ax.imshow(img, cmap='gray')
+              ax.set_title(f'True: {yTest[idx]}, Pred: {yPred[idx]}')
+          ax.axis('off')
+      fig.suptitle('Misclassified Samples')
+      fig
+
+- id: step10_pca_intro
+  title: 10단계. PCA 소개
+  subtitle: 차원 축소
+  blocks:
+  - type: text
+    content: PCA(Principal Component Analysis)는 고차원 데이터를 저차원으로 압축합니다. 64차원 데이터를 2차원으로 축소하면 시각화할 수 있습니다. 정보 손실을 최소화하면서 차원을 줄입니다.
+  - type: code
+    language: python
+    title: PCA 적용
+    description: 64차원 → 2차원
+    content: |-
+      pca = PCA(n_components=2)
+      xPca = pca.fit_transform(xTrainSc)
+      xPca.shape
+  - type: tip
+    content: PCA는 분산을 최대화하는 방향(주성분)을 찾습니다. 첫 번째 주성분이 가장 많은 분산을 설명하고, 두 번째가 그 다음입니다. n_components로 유지할 주성분 수를 지정합니다.
+
+- id: step11_pca_visualize
+  title: 11단계. PCA 시각화
+  subtitle: 2D 산점도
+  blocks:
+  - type: text
+    content: 2차원으로 축소된 데이터를 산점도로 시각화합니다. 같은 숫자끼리 군집을 이루는지, 어떤 숫자가 겹치는지 확인합니다.
+  - type: code
+    language: python
+    title: PCA 산점도
+    description: 숫자별 색상 구분
+    content: |-
+      fig, ax = plt.subplots(figsize=(10, 8))
+      scatter = ax.scatter(xPca[:, 0], xPca[:, 1], c=yTrain, cmap='tab10', alpha=0.6)
+      ax.set_xlabel('PC1')
+      ax.set_ylabel('PC2')
+      ax.set_title('Digits in 2D (PCA)')
+      cbar = plt.colorbar(scatter, ax=ax)
+      cbar.set_label('Digit')
+      fig
+  - type: code
+    language: python
+    title: 설명된 분산
+    description: PC1, PC2가 설명하는 분산 비율
+    content: |-
+      expVar = pca.explained_variance_ratio_
+      f"PC1: {expVar[0]:.2%}, PC2: {expVar[1]:.2%}, Total: {expVar.sum():.2%}"
+  - type: tip
+    content: explained_variance_ratio_는 각 주성분이 전체 분산의 몇 %를 설명하는지 나타냅니다. 2개 주성분으로 약 20~30%를 설명하면, 나머지 70~80%의 정보가 손실됩니다.
+
+- id: step12_pca_components
+  title: 12단계. 적정 차원 수
+  subtitle: 분산 누적
+  blocks:
+  - type: text
+    content: 몇 개의 주성분으로 충분한 정보를 유지할 수 있는지 확인합니다. 보통 95% 분산을 유지하는 차원 수를 선택합니다.
+  - type: code
+    language: python
+    title: 분산 누적 그래프
+    description: 주성분별 누적 분산
+    content: |-
+      pcaFull = PCA()
+      pcaFull.fit(xTrainSc)
+      cumVar = np.cumsum(pcaFull.explained_variance_ratio_)
+
+      fig, ax = plt.subplots(figsize=(10, 5))
+      ax.plot(range(1, 65), cumVar, 'bo-')
+      ax.axhline(0.95, color='r', linestyle='--', label='95% threshold')
+      ax.set_xlabel('Number of Components')
+      ax.set_ylabel('Cumulative Explained Variance')
+      ax.set_title('PCA - Cumulative Variance')
+      ax.legend()
+      fig
+  - type: code
+    language: python
+    title: 95% 달성 차원
+    description: 필요한 최소 주성분 수
+    content: |-
+      nFor95 = np.argmax(cumVar >= 0.95) + 1
+      f"95% 분산 유지에 필요한 주성분: {nFor95}개"
+
+- id: step13_summary
+  title: 13단계. 정리
+  subtitle: 이미지 분류와 PCA 완료
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 손글씨 숫자 인식 모델을 만들어 이미지 분류를 학습했습니다. 64차원 데이터를 PCA로 축소하여 시각화하는 방법을 배웠습니다. 고차원 데이터에서 패턴을 파악하는 데 PCA가 유용합니다.
+  - type: code
+    language: python
+    title: 최종 요약
+    description: 주요 결과 정리
+    content: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Features', 'Classes', 'Accuracy', 'PCA for 95%'],
+          'Value': ['Digits (1,797)', '64 (8x8)', '10 (0-9)', f'{acc:.2%}', f'{nFor95} components']
+      })
+      summary
+
+- id: practice
+  title: 실습
+  subtitle: 숫자 인식 프로젝트
+  blocks:
+  - type: text
+    content: OCR 개발자가 되어 숫자 인식 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LogisticRegression, PCA, confusion_matrix를 모두 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: PCA 차원별 분류 정확도 비교"
+    code: |-
+      from sklearn.datasets import load_digits
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.decomposition import PCA
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score
+      import pandas as pd
+
+      data = load_digits()
+      xData = data.data
+      yData = data.target
+
+      xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+      sc = StandardScaler()
+      xTrSc = sc.fit_transform(xTr)
+      xTeSc = sc.transform(xTe)
+
+      dims = [2, 5, 10, 20, 30, 64]
+      results = []
+
+      for d in dims:
+          if d < 64:
+              pca = PCA(n_components=d)
+              xTrPca = pca.fit_transform(xTrSc)
+              xTePca = pca.transform(xTeSc)
+          else:
+              xTrPca, xTePca = xTrSc, xTeSc
+
+          model = LogisticRegression(max_iter=1000)
+          model.fit(xTrPca, yTr)
+          pred = model.predict(xTePca)
+          results.append({'Dimensions': d, 'Accuracy': accuracy_score(yTe, pred)})
+
+      pd.DataFrame(results)
+  - type: expansion
+    title: "미션2: 가장 혼동이 많은 숫자 쌍 분석"
+    code: |-
+      from sklearn.datasets import load_digits
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import confusion_matrix
+      import pandas as pd
+      import numpy as np
+
+      digits = load_digits()
+      xData = digits.data
+      yData = digits.target
+
+      xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+      sc = StandardScaler()
+
+      model = LogisticRegression(max_iter=1000)
+      model.fit(sc.fit_transform(xTr), yTr)
+      pred = model.predict(sc.transform(xTe))
+
+      cm = confusion_matrix(yTe, pred)
+      np.fill_diagonal(cm, 0)
+
+      pairs = []
+      for i in range(10):
+          for j in range(10):
+              if i != j and cm[i, j] > 0:
+                  pairs.append({'True': i, 'Predicted': j, 'Count': cm[i, j]})
+
+      pairDf = pd.DataFrame(pairs).sort_values('Count', ascending=False)
+      pairDf.head(10)

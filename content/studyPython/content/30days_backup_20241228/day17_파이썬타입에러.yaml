@@ -1,0 +1,638 @@
+meta:
+  id: day17
+  title: 파이썬타입에러
+  day: 17
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 타입 에러 해결하기"
+    description: "자주 발생하는 TypeError, ValueError 해결 방법."
+    keywords: ['TypeError', 'ValueError', '에러']
+intro:
+  emoji: "⚠️"
+  points:
+  - 파이썬 에러 타입의 종류와 특징
+  - SyntaxError, NameError, IndexError 이해
+  - ModuleNotFoundError, AttributeError 해결
+  - KeyError, TypeError, ValueError 처리
+  - ImportError, ZeroDivisionError 예방
+  - 효과적인 디버깅 전략과 팁
+sections:
+- id: error_introduction
+  title: 에러 소개
+  subtitle: 파이썬에서 발생하는 다양한 에러 타입
+  blocks:
+  - type: text
+    content: 에러(Error)는 프로그램 실행 중 발생하는 문제로, 파이썬 인터프리터가 코드를 실행할 수 없을 때 표시하는 메시지입니다. 영어로 'Error'는 '실수, 오류'를 의미하며, 코딩 과정에서 오타, 문법 실수, 잘못된 데이터 사용 등 다양한 원인으로 발생합니다. 에러 메시지는 문제가 발생한 파일명, 줄 번호, 에러 타입, 구체적인 설명을 포함하고 있어 디버깅의 핵심 정보를 제공합니다. 에러를 두려워하지 말고 에러 메시지를 주의 깊게 읽는 습관을 기르면, 빠르게 문제를 해결하고 프로그래밍 실력을 향상시킬 수 있습니다. 에러는 프로그래머의 적이 아니라 코드를 개선하도록 안내하는 친절한 선생님입니다.
+  - type: list
+    items:
+    - 에러 메시지에서 파일명과 줄 번호 확인
+    - 에러 타입으로 문제의 성격 파악
+    - 에러 설명으로 구체적인 원인 분석
+    - 반복 학습으로 디버깅 능력 향상
+  - type: code
+    language: python
+    title: 주요 에러 타입 확인
+    description: 파이썬에서 자주 발생하는 에러 타입들을 출력합니다.
+    content: |-
+      errorTypes = [
+          "SyntaxError: 문법 오류",
+          "NameError: 정의되지 않은 이름",
+          "IndexError: 인덱스 범위 초과",
+          "ModuleNotFoundError: 모듈 없음",
+          "AttributeError: 속성 없음",
+          "KeyError: 존재하지 않는 키",
+          "TypeError: 타입 불일치",
+          "ValueError: 잘못된 값",
+          "ImportError: import 실패",
+          "ZeroDivisionError: 0으로 나누기"
+      ]
+
+      for errorType in errorTypes:
+          print(errorType)
+  - type: tip
+    content: "에러 메시지를 잘 읽으면 문제를 빠르게 해결할 수 있습니다. 에러 타입과 설명을 주의 깊게 확인하세요."
+
+- id: syntax_error
+  title: SyntaxError
+  subtitle: 문법 오류
+  blocks:
+  - type: text
+    content: SyntaxError는 파이썬 문법(Syntax) 규칙을 위반했을 때 발생하는 에러입니다. 'Syntax'는 '문법, 구문'을 의미하며, 마치 한글 문장에서 띄어쓰기나 맞춤법을 틀린 것처럼 파이썬 언어의 규칙을 어겼을 때 나타납니다. 괄호를 열고 닫지 않거나, 따옴표를 한쪽만 쓰거나, if문 뒤에 콜론(:)을 빼먹는 등의 실수가 대표적인 원인입니다. 들여쓰기를 잘못하거나 탭과 스페이스를 섞어 사용해도 SyntaxError가 발생합니다. 이 에러는 코드를 실행하기 전에 파이썬 인터프리터가 코드를 읽는 단계에서 발견되므로, 한 글자라도 틀리면 프로그램이 아예 시작되지 않습니다.
+  - type: list
+    items:
+    - 괄호, 대괄호, 중괄호의 열림과 닫힘 불일치
+    - 따옴표 시작과 끝 불일치
+    - if, for, while, def 뒤 콜론 누락
+    - 들여쓰기 오류 또는 탭과 스페이스 혼용
+  - type: code
+    language: python
+    title: SyntaxError 없는 올바른 코드
+    description: 모든 문법 규칙을 준수한 코드입니다.
+    content: |-
+      syntaxGreeting = 'hello world'
+      print(syntaxGreeting)
+
+      syntaxNumbers = [1, 2, 3, 4]
+      print(syntaxNumbers)
+
+      syntaxName = 'Python'
+      print(syntaxName)
+
+      syntaxValue = 10
+      if syntaxValue > 5:
+          print("큰 수입니다")
+
+      def syntaxFunction():
+          return "완료"
+
+      print(syntaxFunction())
+  - type: tip
+    content: "print 함수는 괄호가 필수입니다. 파이썬 3에서는 print('hello')처럼 괄호 안에 넣어야 합니다."
+
+- id: name_error
+  title: NameError
+  subtitle: 정의되지 않은 변수나 함수 사용
+  blocks:
+  - type: text
+    content: NameError는 정의되지 않은 이름(Name)을 사용하려고 할 때 발생하는 에러입니다. 'Name'은 변수명, 함수명 등 코드에서 사용하는 모든 이름을 의미합니다. 마치 처음 보는 사람의 이름을 부르는 것처럼, 파이썬도 한 번도 본 적 없는 이름을 만나면 혼란스러워합니다. 변수를 사용하기 전에 값을 할당하지 않거나, 함수를 정의하지 않고 호출하거나, 오타로 인해 이름이 달라진 경우에 발생합니다. 예를 들어 'age'라는 변수를 정의하고 'Age'로 잘못 쓰면 대소문자가 다르므로 NameError가 나타납니다. 스코프(scope) 문제로 함수 내부에서 정의한 변수를 외부에서 사용하려고 해도 발생합니다.
+  - type: list
+    items:
+    - 값을 할당하지 않은 변수 사용
+    - 정의하지 않은 함수 호출
+    - 변수명이나 함수명 오타
+    - 대소문자 불일치
+    - 스코프 범위 밖 변수 접근
+  - type: code
+    language: python
+    title: NameError 없는 올바른 코드
+    description: 변수와 함수를 정의한 후 사용합니다.
+    content: |-
+      nameAge = 25
+      print(nameAge)
+
+      namePerson = "Python"
+      print(namePerson)
+
+      print("Hello")
+
+      def nameGreet():
+          return "안녕하세요"
+
+      print(nameGreet())
+  - type: tip
+    content: "변수명을 사용하기 전에 반드시 값을 할당해야 합니다. 오타도 NameError의 원인이 됩니다."
+
+- id: index_error
+  title: IndexError
+  subtitle: 범위를 벗어난 인덱스 접근
+  blocks:
+  - type: text
+    content: IndexError는 리스트, 튜플, 문자열 등의 시퀀스에서 존재하지 않는 인덱스(Index)에 접근하려고 할 때 발생하는 에러입니다. 'Index'는 '색인, 위치'를 의미하며, 책의 페이지 번호처럼 데이터의 위치를 나타냅니다. 파이썬의 인덱스는 0부터 시작하므로, 5개 항목이 있는 리스트의 유효한 인덱스는 0, 1, 2, 3, 4입니다. 길이가 5인 리스트에서 인덱스 5를 사용하면 6번째 항목을 찾으려는 것이므로 IndexError가 발생합니다. 음수 인덱스를 사용하면 뒤에서부터 접근할 수 있는데, -1은 마지막 항목, -2는 뒤에서 두 번째 항목을 의미합니다. 인덱스 접근 전에 len() 함수로 길이를 확인하거나 조건문으로 범위를 검사하면 에러를 예방할 수 있습니다.
+  - type: list
+    items:
+    - 인덱스는 0부터 시작
+    - 길이가 n이면 유효 인덱스는 0부터 n-1까지
+    - 음수 인덱스는 뒤에서부터 접근
+    - len() 함수로 범위 사전 확인
+    - 조건문으로 인덱스 유효성 검사
+  - type: code
+    language: python
+    title: IndexError 없는 올바른 코드
+    description: 올바른 인덱스 범위로 접근합니다.
+    content: |-
+      indexNumbers = [1, 2, 3, 4, 5]
+
+      print(indexNumbers[0])
+      print(indexNumbers[4])
+      print(indexNumbers[-1])
+
+      if len(indexNumbers) > 5:
+          print(indexNumbers[5])
+      else:
+          print("인덱스 5는 범위를 벗어남")
+
+      indexText = "Python"
+      print(indexText[5])
+      print(len(indexText))
+  - type: tip
+    content: "리스트 길이가 5이면 유효한 인덱스는 0, 1, 2, 3, 4입니다. 인덱스 5는 범위를 벗어납니다."
+
+- id: module_not_found_error
+  title: ModuleNotFoundError
+  subtitle: 존재하지 않는 모듈 import
+  blocks:
+  - type: text
+    content: ModuleNotFoundError는 import하려는 모듈(Module)을 찾을 수 없을 때 발생하는 에러입니다. 'Module'은 '모듈, 부품'을 의미하며, 파이썬에서는 미리 만들어진 코드 묶음을 뜻합니다. 마치 레고 블록을 찾는 것처럼, 존재하지 않는 모듈을 찾으려고 하면 에러가 발생합니다. 모듈 이름을 잘못 입력하거나 대소문자를 틀리면 발생합니다. 외부 라이브러리의 경우 pip install로 설치하지 않으면 ModuleNotFoundError가 나타납니다. 가상환경을 사용할 때는 올바른 환경이 활성화되어 있는지도 확인해야 합니다. math, os, sys 같은 표준 라이브러리는 파이썬 설치 시 함께 제공되므로 별도 설치 없이 바로 사용할 수 있습니다.
+  - type: list
+    items:
+    - 모듈 이름 오타 확인
+    - 대소문자 정확히 입력
+    - pip install로 외부 패키지 설치
+    - 가상환경 활성화 상태 확인
+    - 표준 라이브러리는 별도 설치 불필요
+  - type: code
+    language: python
+    title: ModuleNotFoundError 없는 올바른 코드
+    description: 올바른 모듈 이름으로 import합니다.
+    content: |-
+      import math
+
+      moduleMathPi = math.pi
+      print(moduleMathPi)
+      moduleSqrt = math.sqrt(16)
+      print(moduleSqrt)
+      moduleCeil = math.ceil(4.3)
+      print(moduleCeil)
+
+      import os
+      moduleOsName = os.name
+      print(moduleOsName)
+
+      import sys
+      moduleSysVersion = sys.version
+      print(moduleSysVersion)
+  - type: tip
+    content: "모듈 이름은 대소문자를 구분합니다. math는 올바르지만 Math나 MATH는 찾을 수 없습니다."
+
+- id: attribute_error
+  title: AttributeError
+  subtitle: 존재하지 않는 속성이나 메소드 접근
+  blocks:
+  - type: text
+    content: AttributeError는 객체에 존재하지 않는 속성(Attribute)이나 메소드에 접근하려고 할 때 발생하는 에러입니다. 'Attribute'는 '속성, 특성'을 의미하며, 객체가 가지고 있는 데이터나 함수를 뜻합니다. 마치 사람에게 없는 능력을 요구하는 것처럼, 객체도 자신이 가지지 않은 속성이나 메소드를 사용하려고 하면 에러를 발생시킵니다. 대표적으로 대소문자를 틀리거나, 존재하지 않는 메소드명을 쓰거나, 타입에 맞지 않는 메소드를 사용할 때 나타납니다. 예를 들어 math.pi는 소문자로 되어 있는데 math.PI로 쓰면 AttributeError가 발생합니다. 리스트에는 append() 메소드가 있지만 문자열에는 없으므로, 문자열에 append()를 사용하면 에러가 납니다.
+  - type: list
+    items:
+    - 속성이나 메소드 이름 정확히 입력
+    - 대소문자 철저히 확인
+    - 타입별로 사용 가능한 메소드 차이 이해
+    - dir() 함수로 사용 가능한 속성 확인
+    - 공식 문서로 올바른 이름 확인
+  - type: code
+    language: python
+    title: AttributeError 없는 올바른 코드
+    description: 올바른 속성과 메소드를 사용합니다.
+    content: |-
+      import math
+
+      attrPi = math.pi
+      print(attrPi)
+      attrSin = math.sin(0.5)
+      print(attrSin)
+
+      attrText = "Hello World"
+      attrReversed = attrText[::-1]
+      print(attrReversed)
+
+      attrUpper = attrText.upper()
+      print(attrUpper)
+      attrLower = attrText.lower()
+      print(attrLower)
+
+      attrNumbers = [1, 2, 3]
+      attrNumbers.append(4)
+      print(attrNumbers)
+  - type: tip
+    content: "math.pi는 소문자입니다. math.PI는 AttributeError가 발생합니다."
+
+- id: key_error
+  title: KeyError
+  subtitle: 딕셔너리에 존재하지 않는 키 접근
+  blocks:
+  - type: text
+    content: KeyError는 딕셔너리에서 존재하지 않는 키(Key)에 접근하려고 할 때 발생하는 에러입니다. 'Key'는 '열쇠, 핵심'을 의미하며, 딕셔너리에서는 값을 찾기 위한 이름표 역할을 합니다. 마치 사전에서 존재하지 않는 단어를 찾는 것처럼, 딕셔너리에 없는 키를 사용하면 에러가 발생합니다. 대괄호 []를 사용해 직접 접근할 때는 키가 없으면 KeyError가 나타나지만, get() 메소드를 사용하면 키가 없어도 에러 없이 None을 반환하거나 기본값을 줄 수 있습니다. in 연산자로 키가 존재하는지 먼저 확인한 후 접근하면 안전합니다. 키 이름에 오타가 있거나 대소문자가 다른 경우에도 KeyError가 발생하므로 정확히 입력해야 합니다.
+  - type: list
+    items:
+    - 대괄호 접근 시 키 존재 여부 확인 필요
+    - get() 메소드로 안전하게 접근
+    - get() 두 번째 인수로 기본값 지정 가능
+    - in 연산자로 키 존재 여부 사전 검사
+    - 키 이름과 대소문자 정확히 입력
+  - type: code
+    language: python
+    title: KeyError 없는 올바른 코드
+    description: 안전한 딕셔너리 접근 방법을 사용합니다.
+    content: |-
+      keyUsers = {'name': 'Asabeneh', 'age': 250, 'country': 'Finland'}
+
+      keyName = keyUsers['name']
+      print(keyName)
+      keyCountry = keyUsers['country']
+      print(keyCountry)
+
+      keyAge = keyUsers.get('age')
+      print(keyAge)
+      keyHeight = keyUsers.get('height')
+      print(keyHeight)
+      keyHeightDefault = keyUsers.get('height', 0)
+      print(keyHeightDefault)
+
+      if 'email' in keyUsers:
+          print(keyUsers['email'])
+      else:
+          print("이메일 정보가 없습니다")
+  - type: tip
+    content: "get() 메소드는 키가 없어도 에러를 발생시키지 않고 None이나 기본값을 반환합니다."
+
+- id: type_error
+  title: TypeError
+  subtitle: 잘못된 데이터 타입 연산
+  blocks:
+  - type: text
+    content: TypeError는 잘못된 타입(Type)의 데이터에 연산이나 함수를 적용할 때 발생하는 에러입니다. 'Type'은 '유형, 종류'를 의미하며, 파이썬에서는 데이터의 종류(정수, 실수, 문자열, 리스트 등)를 나타냅니다. 마치 사과와 바나나를 섞어서 계산할 수 없는 것처럼, 서로 다른 타입의 데이터는 함께 연산할 수 없습니다. 대표적으로 숫자와 문자열을 더하려고 하면 TypeError가 발생합니다. 예를 들어 4 + '3'은 에러지만, 4 + int('3')처럼 타입을 맞추면 정상 작동합니다. 함수에 잘못된 타입의 인수를 전달하거나, 리스트 인덱스에 문자열을 넣거나, 지원하지 않는 연산을 시도할 때도 TypeError가 나타납니다.
+  - type: list
+    items:
+    - 서로 다른 타입 간 연산 불가
+    - int(), str(), float() 등으로 타입 변환
+    - 함수 인수는 올바른 타입으로 전달
+    - 인덱스는 정수만 사용 가능
+    - 각 타입별로 지원하는 연산 확인
+  - type: code
+    language: python
+    title: TypeError 없는 올바른 코드
+    description: 타입을 올바르게 변환하여 사용합니다.
+    content: |-
+      typeIntAdd = 4 + int('3')
+      print(typeIntAdd)
+      typeFloatAdd = 4 + float('3')
+      print(typeFloatAdd)
+
+      typeStrAdd = str(4) + '3'
+      print(typeStrAdd)
+
+      typeNumbers = [1, 2, 3, 4, 5]
+      typeFirst = typeNumbers[0]
+      print(typeFirst)
+
+      typeLen = len("123")
+      print(typeLen)
+
+      typeText = "Hello"
+      typeNewText = 'h' + typeText[1:]
+      print(typeNewText)
+  - type: tip
+    content: "숫자와 문자열을 더하려면 int(), str() 등으로 타입을 맞춰야 합니다."
+
+- id: value_error
+  title: ValueError
+  subtitle: 올바른 타입이지만 부적절한 값
+  blocks:
+  - type: text
+    content: ValueError는 함수에 올바른 타입이지만 부적절한 값(Value)이 전달될 때 발생하는 에러입니다. 'Value'는 '값'을 의미하며, 데이터의 실제 내용을 나타냅니다. TypeError는 타입 자체가 틀린 것이고, ValueError는 타입은 맞지만 값이 적절하지 않을 때 발생합니다. 대표적으로 int() 함수는 문자열을 받을 수 있지만, '12a'처럼 숫자로 변환할 수 없는 문자열이 들어오면 ValueError가 나타납니다. int('12')는 정상 작동하지만 int('abc')는 에러가 발생합니다. math.sqrt() 함수에 음수를 넣거나, 정해진 범위를 벗어난 값을 사용하거나, 형식에 맞지 않는 값을 전달할 때 ValueError가 발생합니다.
+  - type: list
+    items:
+    - 타입은 맞지만 값이 부적절한 경우
+    - 숫자로 변환 불가능한 문자열
+    - 허용되지 않는 범위의 값
+    - 형식에 맞지 않는 데이터
+    - try-except로 안전하게 처리
+  - type: code
+    language: python
+    title: ValueError 없는 올바른 코드
+    description: 올바른 값을 사용하고 안전하게 처리합니다.
+    content: |-
+      valueInt1 = int('12')
+      print(valueInt1)
+      valueInt2 = int('123')
+      print(valueInt2)
+      valueFloat = float('12.5')
+      print(valueFloat)
+
+      valueBinary = int('10', 2)
+      print(valueBinary)
+      valueHex = int('FF', 16)
+      print(valueHex)
+
+      import math
+      valueSqrt = math.sqrt(4)
+      print(valueSqrt)
+
+      def valueSafeInt(value):
+          try:
+              return int(value)
+          except ValueError:
+              return None
+
+      valueResult1 = valueSafeInt('123')
+      print(valueResult1)
+      valueResult2 = valueSafeInt('12a')
+      print(valueResult2)
+  - type: tip
+    content: "int('12a')는 ValueError가 발생합니다. 문자 'a'가 포함되어 있기 때문입니다."
+
+- id: zero_division_error
+  title: ZeroDivisionError
+  subtitle: 0으로 나누기 오류
+  blocks:
+  - type: text
+    content: ZeroDivisionError는 숫자를 0으로 나누려고 할 때 발생하는 에러입니다. 'Division'은 '나누기'를 의미하며, 수학에서 어떤 수를 0으로 나누는 것은 정의되지 않은 연산입니다. 마치 10개의 사과를 0명에게 나눠줄 수 없는 것처럼, 컴퓨터도 0으로 나누기를 처리할 수 없습니다. 나누기 연산(/)뿐만 아니라 나머지 연산(%)에서도 0을 사용하면 ZeroDivisionError가 발생합니다. 평균을 계산할 때 항목 개수가 0인 경우나, 사용자 입력값이 0일 때 주의해야 합니다. 나누기 전에 if문으로 분모가 0인지 확인하거나, try-except 구문으로 에러를 처리하면 프로그램이 중단되지 않고 안전하게 작동합니다.
+  - type: list
+    items:
+    - 나누기와 나머지 연산에서 0 사용 불가
+    - 수학적으로 정의되지 않은 연산
+    - 나누기 전 분모가 0인지 확인
+    - if문으로 사전 검사
+    - try-except로 에러 처리
+  - type: code
+    language: python
+    title: ZeroDivisionError 없는 올바른 코드
+    description: 안전한 나누기를 구현합니다.
+    content: |-
+      def zeroSafeDivide(a, b):
+          if b == 0:
+              return None
+          return a / b
+
+      zeroDivResult1 = zeroSafeDivide(10, 2)
+      print(zeroDivResult1)
+      zeroDivResult2 = zeroSafeDivide(10, 0)
+      print(zeroDivResult2)
+
+      def zeroCalculateAverage(total, count):
+          if count == 0:
+              return 0
+          return total / count
+
+      zeroAvg1 = zeroCalculateAverage(100, 5)
+      print(zeroAvg1)
+      zeroAvg2 = zeroCalculateAverage(100, 0)
+      print(zeroAvg2)
+  - type: tip
+    content: "나누기 전에 분모가 0인지 확인하거나 try-except로 처리하세요."
+
+- id: import_error
+  title: ImportError
+  subtitle: 모듈에서 특정 함수 import 실패
+  blocks:
+  - type: text
+    content: ImportError는 모듈에서 특정 함수나 클래스를 import할 수 없을 때 발생하는 에러입니다. 'Import'는 '가져오다'를 의미하며, 다른 파일이나 모듈에서 함수를 가져와 사용하는 것을 말합니다. ModuleNotFoundError는 모듈 자체를 찾을 수 없을 때 발생하고, ImportError는 모듈은 있지만 그 안에서 특정 함수나 클래스를 찾을 수 없을 때 나타납니다. 예를 들어 math 모듈은 존재하지만 from math import power라고 쓰면 ImportError가 발생합니다. 올바른 이름은 pow입니다. 함수 이름 오타, 대소문자 불일치, 모듈 버전 차이로 인해 함수가 없는 경우 등이 원인입니다. from 키워드로 특정 함수만 가져올 때 이름을 정확히 확인해야 합니다.
+  - type: list
+    items:
+    - 모듈은 있지만 특정 함수나 클래스 없음
+    - 함수 이름 오타 확인
+    - 대소문자 정확히 입력
+    - 모듈 버전에 따른 함수 존재 여부 확인
+    - 공식 문서로 정확한 함수명 확인
+  - type: code
+    language: python
+    title: ImportError 없는 올바른 코드
+    description: 올바른 함수 이름으로 import합니다.
+    content: |-
+      from math import pow
+      importPow = pow(2, 3)
+      print(importPow)
+
+      from math import sin, cos, tan, pi
+      importSin = sin(pi/2)
+      print(importSin)
+      importCos = cos(0)
+      print(importCos)
+
+      from math import sqrt
+      importSqrt = sqrt(16)
+      print(importSqrt)
+
+      import math
+      importMathPow = math.pow(2, 3)
+      print(importMathPow)
+  - type: tip
+    content: "math 모듈에는 power가 아닌 pow가 있습니다. 함수 이름을 정확히 확인하세요."
+
+- id: practice
+  title: 17일차 복습
+  subtitle: 에러 처리 미션
+  blocks:
+  - type: text
+    content: 17일차에서 배운 에러 타입들을 복습하는 미션입니다. 각 에러를 이해하고 올바르게 처리해봅시다. SyntaxError부터 ImportError까지 모든 에러 타입을 활용한 실전 예제로 구성되어 있습니다.
+  - type: expansion
+    title: "미션1: 문자열 조작 (SyntaxError, NameError 방지)"
+    code: |-
+      practiceGreeting = "Hello"
+      practiceName = "Python"
+
+      practiceMessage = practiceGreeting + " " + practiceName
+      print(practiceMessage)
+
+      practiceUpper = practiceMessage.upper()
+      print(practiceUpper)
+
+      practiceLength = len(practiceMessage)
+      print(practiceLength)
+  - type: expansion
+    title: "미션2: 리스트 인덱싱 (IndexError 방지)"
+    code: |-
+      practiceFruits = ['apple', 'banana', 'orange', 'grape']
+
+      if len(practiceFruits) > 0:
+          practiceFirst = practiceFruits[0]
+          print(practiceFirst)
+
+      if len(practiceFruits) > 3:
+          practiceFourth = practiceFruits[3]
+          print(practiceFourth)
+
+      practiceLast = practiceFruits[-1]
+      print(practiceLast)
+  - type: expansion
+    title: "미션3: 안전한 딕셔너리 접근 (KeyError 방지)"
+    code: |-
+      practiceStudent = {'name': 'Alice', 'age': 20, 'grade': 'A'}
+
+      practiceStuName = practiceStudent.get('name')
+      print(practiceStuName)
+
+      practiceStuEmail = practiceStudent.get('email', 'no email')
+      print(practiceStuEmail)
+
+      if 'grade' in practiceStudent:
+          practiceStuGrade = practiceStudent['grade']
+          print(practiceStuGrade)
+  - type: expansion
+    title: "미션4: 타입 변환 (TypeError, ValueError 방지)"
+    code: |-
+      practiceNum1 = 10
+      practiceStr1 = '5'
+
+      practiceSum = practiceNum1 + int(practiceStr1)
+      print(practiceSum)
+
+      practiceConcat = str(practiceNum1) + practiceStr1
+      print(practiceConcat)
+
+      practiceFloatStr = '3.14'
+      practiceFloatNum = float(practiceFloatStr)
+      print(practiceFloatNum)
+  - type: expansion
+    title: "미션5: 안전한 나누기 (ZeroDivisionError 방지)"
+    code: |-
+      def practiceSafeDivide(a, b):
+          if b == 0:
+              return None
+          return a / b
+
+      practiceDiv1 = practiceSafeDivide(10, 2)
+      print(practiceDiv1)
+
+      practiceDiv2 = practiceSafeDivide(10, 0)
+      print(practiceDiv2)
+
+      practiceDiv3 = practiceSafeDivide(15, 3)
+      print(practiceDiv3)
+  - type: expansion
+    title: "미션6: 모듈 사용 (ModuleNotFoundError, AttributeError 방지)"
+    code: |-
+      import math
+
+      practicePi = math.pi
+      print(practicePi)
+
+      practiceSqrtVal = math.sqrt(16)
+      print(practiceSqrtVal)
+
+      practiceCeilVal = math.ceil(4.3)
+      print(practiceCeilVal)
+
+      practiceFloorVal = math.floor(4.7)
+      print(practiceFloorVal)
+  - type: expansion
+    title: "미션7: 안전한 정수 변환 함수 (ValueError 처리)"
+    code: |-
+      def practiceSafeInt(value):
+          try:
+              return int(value)
+          except ValueError:
+              return None
+
+      practiceInt1 = practiceSafeInt('123')
+      print(practiceInt1)
+
+      practiceInt2 = practiceSafeInt('abc')
+      print(practiceInt2)
+
+      practiceInt3 = practiceSafeInt('45')
+      print(practiceInt3)
+  - type: expansion
+    title: "미션8: 리스트와 반복문 활용"
+    code: |-
+      practiceNumbers = [1, 2, 3, 4, 5]
+
+      for practiceNum in practiceNumbers:
+          practiceSquare = practiceNum * practiceNum
+          print(practiceSquare)
+
+      practiceSum = 0
+      for practiceNum in practiceNumbers:
+          practiceSum = practiceSum + practiceNum
+      print(practiceSum)
+  - type: expansion
+    title: "미션9: 딕셔너리와 반복문"
+    code: |-
+      practicePerson = {
+          'name': 'Bob',
+          'age': 25,
+          'city': 'Seoul',
+          'job': 'Developer'
+      }
+
+      for practiceKey in practicePerson:
+          practiceValue = practicePerson[practiceKey]
+          print(practiceKey + ": " + str(practiceValue))
+  - type: expansion
+    title: "미션10: 조건문과 함수"
+    code: |-
+      def practiceGradeCheck(score):
+          if score >= 90:
+              return 'A'
+          if score >= 80:
+              return 'B'
+          if score >= 70:
+              return 'C'
+          if score >= 60:
+              return 'D'
+          return 'F'
+
+      practiceGrade1 = practiceGradeCheck(95)
+      print(practiceGrade1)
+
+      practiceGrade2 = practiceGradeCheck(75)
+      print(practiceGrade2)
+
+      practiceGrade3 = practiceGradeCheck(55)
+      print(practiceGrade3)
+  - type: expansion
+    title: "미션11: 안전한 리스트 접근 함수"
+    code: |-
+      def practiceSafeGet(lst, index):
+          if 0 <= index < len(lst):
+              return lst[index]
+          return None
+
+      practiceColors = ['red', 'green', 'blue']
+
+      practiceColor1 = practiceSafeGet(practiceColors, 1)
+      print(practiceColor1)
+
+      practiceColor2 = practiceSafeGet(practiceColors, 10)
+      print(practiceColor2)
+  - type: expansion
+    title: "미션12: 종합 데이터 처리"
+    code: |-
+      practiceStudents = [
+          {'name': 'Alice', 'score': 95},
+          {'name': 'Bob', 'score': 87},
+          {'name': 'Charlie', 'score': 92}
+      ]
+
+      for practiceStu in practiceStudents:
+          practiceStuName = practiceStu.get('name')
+          practiceStuScore = practiceStu.get('score')
+          print(practiceStuName + ": " + str(practiceStuScore))
+
+      practiceTotalScore = 0
+      for practiceStu in practiceStudents:
+          practiceTotalScore = practiceTotalScore + practiceStu['score']
+
+      practiceAverage = practiceTotalScore / len(practiceStudents)
+      print(practiceAverage)

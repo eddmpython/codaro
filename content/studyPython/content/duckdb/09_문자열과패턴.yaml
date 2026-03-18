@@ -1,0 +1,483 @@
+meta:
+  id: duckdb_09
+  title: 문자열과패턴
+  order: 9
+  category: duckdb
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv
+  tags: ["string", "LIKE", "CONCAT", "REGEXP", "문자열함수", "titanic"]
+  seo:
+    title: "DuckDB 문자열 함수와 패턴 매칭 - LIKE, REGEXP, CONCAT"
+    description: "타이타닉 이름 데이터로 문자열 함수를 마스터합니다. LIKE 패턴, 정규표현식, CONCAT, SPLIT_PART 등 텍스트 처리 기법을 실습합니다."
+    keywords: ["DuckDB 문자열", "LIKE", "정규표현식", "CONCAT", "문자열 함수"]
+
+intro:
+  emoji: "✍️"
+  goal: 타이타닉 이름 데이터로 문자열 함수와 패턴 매칭을 마스터합니다.
+  description: 문자열 처리는 실무 데이터 정제의 핵심입니다. LIKE로 패턴 검색, CONCAT으로 결합, SUBSTR로 추출, REGEXP_EXTRACT로 정규표현식 사용까지 배웁니다. 이름에서 호칭 추출, 패턴 분석 등 실전 기법을 익힙니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 준비
+  subtitle: titanic 데이터 로드
+  blocks:
+  - type: text
+    content: 타이타닉 승객 데이터를 불러옵니다. 이번 프로젝트에서는 name 컬럼의 텍스트 데이터를 분석합니다. 승객 이름에는 "Mr.", "Mrs.", "Miss." 같은 호칭이 포함되어 있고, 이를 추출하여 생존율 등을 분석할 수 있습니다. 문자열 함수는 실무에서 데이터 정제, 전처리, 패턴 추출에 필수적입니다. 이메일에서 도메인 추출, 주소에서 지역 분리, 상품명에서 브랜드 파싱 등 다양하게 활용됩니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: titanic 데이터를 DuckDB로 변환
+    content: |-
+      import pandas as pd
+      import duckdb
+
+      baseUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
+      dfTitanic = pd.read_csv(f"{baseUrl}/titanic.csv")
+      titanic = duckdb.from_df(dfTitanic)
+
+      duckdb.sql("SELECT name FROM titanic LIMIT 5").show()
+
+- id: step2_like_intro
+  title: 2단계. LIKE 패턴 매칭
+  subtitle: 문자열 검색의 기본
+  blocks:
+  - type: text
+    content: LIKE는 문자열 패턴을 검색하는 기본 연산자입니다. %는 임의 길이의 문자열(0개 이상), _는 정확히 1개의 문자를 의미합니다. 예를 들어 LIKE '%Mr.%'는 "Mr."이 포함된 모든 문자열을 찾습니다. LIKE는 간단한 패턴 검색에 유용하며, 정규표현식보다 성능이 좋고 직관적입니다. 이름, 주소, 상품명 등에서 특정 키워드를 찾을 때 자주 사용됩니다.
+  - type: code
+    language: python
+    title: Mr. 포함 검색
+    description: LIKE '%Mr.%' 사용
+    content: |-
+      duckdb.sql("""
+          SELECT name
+          FROM titanic
+          WHERE name LIKE '%Mr.%'
+          LIMIT 5
+      """).show()
+  - type: tip
+    content: "LIKE '%pattern%'은 pattern이 문자열 어디든 포함되면 매칭됩니다. LIKE 'pattern%'은 pattern으로 시작, LIKE '%pattern'은 pattern으로 끝나는 문자열을 찾습니다. _ 는 정확히 1개 문자를 의미하므로 LIKE '___'은 정확히 3글자인 문자열을 찾습니다."
+
+- id: step3_like_variants
+  title: 3단계. 다양한 LIKE 패턴
+  subtitle: Mrs., Miss., Master.
+  blocks:
+  - type: text
+    content: 타이타닉 이름 데이터에서 다양한 호칭을 검색합니다. Mrs.는 기혼 여성, Miss.는 미혼 여성, Master.는 소년을 나타냅니다. LIKE 패턴으로 각 호칭을 가진 승객을 필터링할 수 있습니다. 여러 패턴을 OR로 연결하거나 CASE WHEN으로 분류할 수 있습니다.
+  - type: code
+    language: python
+    title: 다양한 호칭 검색
+    description: Mrs., Miss. 검색
+    content: |-
+      duckdb.sql("""
+          SELECT
+              CASE
+                  WHEN name LIKE '%Mr.%' THEN 'Mr.'
+                  WHEN name LIKE '%Mrs.%' THEN 'Mrs.'
+                  WHEN name LIKE '%Miss.%' THEN 'Miss.'
+                  WHEN name LIKE '%Master.%' THEN 'Master.'
+                  ELSE 'Other'
+              END AS title,
+              COUNT(*) AS cnt
+          FROM titanic
+          GROUP BY title
+          ORDER BY cnt DESC
+      """).show()
+
+- id: step4_concat_intro
+  title: 4단계. CONCAT - 문자열 결합
+  subtitle: 여러 컬럼 합치기
+  blocks:
+  - type: text
+    content: CONCAT 함수는 여러 문자열을 하나로 합칩니다. CONCAT(a, b, c)는 a, b, c를 순서대로 연결합니다. || 연산자도 동일한 기능을 합니다. 예를 들어 성과 이름을 합치거나, 여러 컬럼을 조합하여 새로운 식별자를 만들 때 사용합니다. 실무에서는 보고서용 라벨 생성, 전체 주소 조합, ID 생성 등에 활용됩니다.
+  - type: code
+    language: python
+    title: CONCAT 사용
+    description: 여러 컬럼 결합
+    content: |-
+      duckdb.sql("""
+          SELECT
+              CONCAT(class, ' - ', who) AS classInfo,
+              name
+          FROM titanic
+          LIMIT 5
+      """).show()
+  - type: tip
+    content: "CONCAT(a, b, c)는 a || b || c와 동일합니다. ||는 SQL 표준 문자열 연결 연산자입니다. NULL을 포함하면 결과도 NULL이 되므로 COALESCE로 기본값을 지정하는 것이 안전합니다. 예: CONCAT(COALESCE(col1, ''), col2)"
+
+- id: step5_substr_intro
+  title: 5단계. SUBSTR - 부분 문자열 추출
+  subtitle: 문자열 자르기
+  blocks:
+  - type: text
+    content: SUBSTR(문자열, 시작위치, 길이)는 문자열의 일부를 추출합니다. 시작위치는 1부터 시작하며(0이 아님), 길이만큼 잘라냅니다. 예를 들어 SUBSTR('Hello', 1, 2)는 'He'를 반환합니다. 긴 텍스트를 요약하거나 고정 길이 필드에서 특정 부분만 추출할 때 유용합니다. 주민등록번호에서 생년월일, 전화번호에서 지역번호 추출 등에 사용됩니다.
+  - type: code
+    language: python
+    title: 이름 20자로 자르기
+    description: SUBSTR 사용
+    content: |-
+      duckdb.sql("""
+          SELECT
+              name,
+              SUBSTR(name, 1, 20) AS shortName
+          FROM titanic
+          LIMIT 5
+      """).show()
+  - type: tip
+    content: "SUBSTR(str, start, len)의 start는 1부터 시작합니다. SUBSTR(str, 1, 10)은 첫 10글자를 추출합니다. len을 생략하면 start부터 끝까지 모두 가져옵니다. SUBSTR(str, -5)는 뒤에서 5글자를 의미하는 DB도 있지만 DuckDB는 양수만 지원합니다."
+
+- id: step6_upper_lower
+  title: 6단계. UPPER, LOWER - 대소문자 변환
+  subtitle: 대소문자 통일
+  blocks:
+  - type: text
+    content: UPPER는 모든 문자를 대문자로, LOWER는 모든 문자를 소문자로 변환합니다. 대소문자 구분 없이 비교하거나 데이터를 정규화할 때 필수적입니다. 예를 들어 사용자 입력('seoul', 'Seoul', 'SEOUL')을 모두 소문자로 통일하면 비교가 쉬워집니다. 실무에서는 중복 제거, 그룹화, 검색 전처리에 자주 사용됩니다.
+  - type: code
+    language: python
+    title: 대소문자 변환
+    description: UPPER, LOWER 사용
+    content: |-
+      duckdb.sql("""
+          SELECT
+              embark_town,
+              UPPER(embark_town) AS upperTown,
+              LOWER(embark_town) AS lowerTown
+          FROM titanic
+          WHERE embark_town IS NOT NULL
+          LIMIT 5
+      """).show()
+  - type: tip
+    content: "UPPER와 LOWER는 영문자만 변환하고 숫자나 특수문자는 그대로 유지합니다. 대소문자 구분 없이 비교하려면 WHERE LOWER(col) = LOWER('pattern')처럼 양쪽을 모두 변환해야 합니다. 성능을 위해 WHERE 절에서는 함수 호출을 최소화하는 것이 좋습니다."
+
+- id: step7_trim
+  title: 7단계. TRIM - 공백 제거
+  subtitle: 앞뒤 공백 정리
+  blocks:
+  - type: text
+    content: TRIM은 문자열 앞뒤의 공백을 제거합니다. LTRIM은 왼쪽, RTRIM은 오른쪽만 제거합니다. 사용자 입력이나 파일에서 읽은 데이터는 불필요한 공백이 포함되는 경우가 많아 TRIM으로 정제해야 합니다. 공백 때문에 같은 값이 다르게 인식되는 문제를 방지할 수 있습니다. 실무 데이터 정제의 기본 단계입니다.
+  - type: code
+    language: python
+    title: 공백 제거
+    description: TRIM, LTRIM, RTRIM
+    content: |-
+      duckdb.sql("""
+          SELECT
+              TRIM('  Hello World  ') AS trimmed,
+              LTRIM('  Hello World  ') AS leftTrimmed,
+              RTRIM('  Hello World  ') AS rightTrimmed
+      """).show()
+  - type: tip
+    content: "TRIM은 공백(스페이스, 탭, 줄바꿈)을 제거합니다. TRIM(BOTH ' ' FROM col)처럼 제거할 문자를 명시할 수도 있습니다. 데이터를 비교하거나 그룹화하기 전에 TRIM을 적용하면 공백으로 인한 불일치를 방지할 수 있습니다."
+
+- id: step8_length
+  title: 8단계. LENGTH - 문자열 길이
+  subtitle: 글자 수 세기
+  blocks:
+  - type: text
+    content: LENGTH는 문자열의 길이(글자 수)를 반환합니다. 바이트가 아닌 문자 개수를 세므로 한글도 1글자로 계산됩니다. 문자열 검증(최소/최대 길이 확인), 정렬, 필터링에 사용됩니다. 예를 들어 비밀번호 길이 검증, 트윗 140자 제한, 상품명 길이 분석 등에 활용됩니다.
+  - type: code
+    language: python
+    title: 이름 길이 순 정렬
+    description: LENGTH 사용
+    content: |-
+      duckdb.sql("""
+          SELECT
+              name,
+              LENGTH(name) AS nameLength
+          FROM titanic
+          ORDER BY nameLength DESC
+          LIMIT 5
+      """).show()
+  - type: tip
+    content: "LENGTH는 문자 개수를 반환합니다. 공백도 1글자로 계산됩니다. 바이트 길이가 필요하면 OCTET_LENGTH를 사용합니다. 한글, 이모지 등 멀티바이트 문자는 LENGTH와 OCTET_LENGTH가 다를 수 있습니다."
+
+- id: step9_replace
+  title: 9단계. REPLACE - 문자열 치환
+  subtitle: 패턴 바꾸기
+  blocks:
+  - type: text
+    content: REPLACE(문자열, 찾을값, 바꿀값)는 문자열 내 특정 패턴을 다른 값으로 치환합니다. 모든 일치 항목을 변경하므로 일괄 수정에 유용합니다. 예를 들어 전화번호 형식 변경, 특수문자 제거, 오타 일괄 수정 등에 사용됩니다. 데이터 정제와 표준화의 핵심 함수입니다.
+  - type: code
+    language: python
+    title: 문자열 치환
+    description: Southampton → S-town
+    content: |-
+      duckdb.sql("""
+          SELECT
+              embark_town,
+              REPLACE(embark_town, 'Southampton', 'S-town') AS replaced
+          FROM titanic
+          WHERE embark_town IS NOT NULL
+          LIMIT 5
+      """).show()
+  - type: tip
+    content: "REPLACE는 대소문자를 구분합니다. 'Southampton'와 'southampton'은 다릅니다. 대소문자 구분 없이 치환하려면 LOWER나 UPPER로 먼저 변환해야 합니다. 여러 패턴을 치환하려면 REPLACE를 중첩하거나 REGEXP_REPLACE를 사용합니다."
+
+- id: step10_split_part
+  title: 10단계. SPLIT_PART - 문자열 분리
+  subtitle: 구분자로 나누기
+  blocks:
+  - type: text
+    content: SPLIT_PART(문자열, 구분자, 위치)는 구분자로 문자열을 나누고 특정 위치의 부분을 반환합니다. 예를 들어 'a,b,c'를 콤마로 나누면 SPLIT_PART(..., ',', 1)은 'a', SPLIT_PART(..., ',', 2)는 'b'를 반환합니다. 타이타닉 이름 데이터는 "성, 호칭. 이름" 형식이므로 콤마와 점으로 분리하여 호칭을 추출할 수 있습니다. CSV 파싱, 경로 분해, 구조화된 텍스트 추출에 매우 유용합니다.
+  - type: code
+    language: python
+    title: 이름에서 호칭 추출
+    description: SPLIT_PART 중첩 사용
+    content: |-
+      duckdb.sql("""
+          SELECT
+              name,
+              TRIM(SPLIT_PART(SPLIT_PART(name, ',', 2), '.', 1)) AS title
+          FROM titanic
+          LIMIT 5
+      """).show()
+  - type: tip
+    content: "SPLIT_PART의 위치는 1부터 시작합니다. 존재하지 않는 위치를 지정하면 빈 문자열을 반환합니다. 여러 단계로 분리하려면 SPLIT_PART를 중첩합니다. 예: SPLIT_PART(SPLIT_PART(str, ',', 2), '.', 1)은 먼저 콤마로 나누고 그 결과를 점으로 다시 나눕니다."
+
+- id: step11_regexp_intro
+  title: 11단계. 정규표현식 기초
+  subtitle: REGEXP_MATCHES 패턴 체크
+  blocks:
+  - type: text
+    content: 정규표현식(Regular Expression)은 복잡한 패턴을 표현하는 강력한 도구입니다. REGEXP_MATCHES(문자열, 패턴)은 패턴이 일치하면 true를 반환합니다. LIKE보다 훨씬 유연하고 정교한 패턴을 만들 수 있습니다. 예를 들어 이메일 형식 검증, 전화번호 패턴 확인, 특정 단어 조합 찾기 등에 사용됩니다. 학습 곡선이 있지만 마스터하면 텍스트 처리 능력이 크게 향상됩니다.
+  - type: code
+    language: python
+    title: 정규표현식으로 호칭 검색
+    description: REGEXP_MATCHES 사용
+    content: |-
+      duckdb.sql("""
+          SELECT
+              name,
+              REGEXP_MATCHES(name, 'Mr\\.') AS hasMr,
+              REGEXP_MATCHES(name, 'Mrs?\\.')  AS hasMrOrMrs
+          FROM titanic
+          LIMIT 10
+      """).show()
+  - type: tip
+    content: "정규표현식에서 .은 임의의 문자를 의미하므로 실제 점을 찾으려면 \\.로 이스케이프해야 합니다. ? 는 0개 또는 1개를 의미하므로 Mrs?\\.은 Mr. 또는 Mrs. 모두 매칭됩니다. ^는 시작, $는 끝, .*는 임의 문자 0개 이상을 의미합니다."
+
+- id: step12_regexp_extract
+  title: 12단계. REGEXP_EXTRACT - 패턴 추출
+  subtitle: 정규표현식으로 값 뽑기
+  blocks:
+  - type: text
+    content: REGEXP_EXTRACT는 정규표현식 패턴에 일치하는 부분을 추출합니다. SPLIT_PART보다 복잡한 패턴을 다룰 수 있습니다. 괄호()로 그룹을 지정하면 해당 부분만 추출할 수 있습니다. 실무에서 이메일 주소에서 도메인 추출, URL에서 파라미터 파싱, 로그에서 특정 값 추출 등에 활용됩니다.
+  - type: code
+    language: python
+    title: 정규표현식으로 호칭 추출
+    description: REGEXP_EXTRACT 사용
+    content: |-
+      duckdb.sql("""
+          SELECT
+              name,
+              REGEXP_EXTRACT(name, '(Mr|Mrs|Miss|Master)\\.') AS title
+          FROM titanic
+          WHERE REGEXP_MATCHES(name, '(Mr|Mrs|Miss|Master)\\.')
+          LIMIT 10
+      """).show()
+
+- id: step13_title_analysis
+  title: 13단계. 호칭별 생존율 분석
+  subtitle: 문자열 추출 + 집계
+  blocks:
+  - type: text
+    content: 이름에서 호칭을 추출하여 호칭별 생존율을 분석합니다. 문자열 함수로 데이터를 정제한 후 GROUP BY로 집계하는 전형적인 실무 패턴입니다. 호칭은 나이와 성별 정보를 내포하므로 생존율에 큰 영향을 미칩니다.
+  - type: code
+    language: python
+    title: 호칭별 생존율
+    description: CASE WHEN + LIKE
+    content: |-
+      duckdb.sql("""
+          SELECT
+              CASE
+                  WHEN name LIKE '%Mr.%' THEN 'Mr.'
+                  WHEN name LIKE '%Mrs.%' THEN 'Mrs.'
+                  WHEN name LIKE '%Miss.%' THEN 'Miss.'
+                  WHEN name LIKE '%Master.%' THEN 'Master.'
+                  ELSE 'Other'
+              END AS title,
+              COUNT(*) AS total,
+              SUM(survived) AS survivors,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          GROUP BY title
+          ORDER BY survivalRate DESC
+      """).show()
+
+- id: step14_length_analysis
+  title: 14단계. 이름 길이별 분석
+  subtitle: LENGTH + CASE WHEN
+  blocks:
+  - type: text
+    content: 이름 길이를 기준으로 분류하여 생존율을 분석합니다. LENGTH로 길이를 구하고 CASE WHEN으로 범주화한 후 집계합니다. 이름이 긴 사람은 귀족일 가능성이 높아 생존율이 다를 수 있습니다.
+  - type: code
+    language: python
+    title: 이름 길이별 생존율
+    description: LENGTH + 범주화
+    content: |-
+      duckdb.sql("""
+          SELECT
+              CASE
+                  WHEN LENGTH(name) < 25 THEN 'Short'
+                  WHEN LENGTH(name) < 40 THEN 'Medium'
+                  ELSE 'Long'
+              END AS nameCategory,
+              COUNT(*) AS total,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          GROUP BY nameCategory
+          ORDER BY survivalRate DESC
+      """).show()
+
+- id: step15_complex_string
+  title: 15단계. 복합 문자열 처리
+  subtitle: CONCAT + UPPER + CASE
+  blocks:
+  - type: text
+    content: 여러 문자열 함수를 조합하여 복잡한 문자열을 생성합니다. CONCAT, UPPER, CASE WHEN 등을 결합하여 보고서용 라벨을 만드는 실전 패턴입니다. 실무에서는 이런 조합으로 다양한 형식의 출력물을 생성합니다.
+  - type: code
+    language: python
+    title: 승객 정보 요약
+    description: 여러 함수 조합
+    content: |-
+      duckdb.sql("""
+          SELECT
+              CONCAT(
+                  UPPER(class),
+                  ' | ',
+                  who,
+                  ' | ',
+                  CASE WHEN survived = 1 THEN 'Survived' ELSE 'Died' END
+              ) AS passengerSummary,
+              name
+          FROM titanic
+          LIMIT 10
+      """).show()
+
+- id: step16_final
+  title: 16단계. 최종 종합 분석
+  subtitle: 모든 문자열 기법 활용
+  blocks:
+  - type: text
+    content: SPLIT_PART로 호칭을 정교하게 추출하고, CASE WHEN으로 그룹화한 후 생존율을 분석하는 종합 쿼리입니다. 실무에서 이런 패턴으로 텍스트 데이터를 정제하고 인사이트를 도출합니다.
+  - type: code
+    language: python
+    title: 호칭 추출 + 생존율 종합 분석
+    description: SPLIT_PART + CASE + 집계
+    content: |-
+      duckdb.sql("""
+          WITH titleExtract AS (
+              SELECT
+                  *,
+                  TRIM(SPLIT_PART(SPLIT_PART(name, ',', 2), '.', 1)) AS title
+              FROM titanic
+          ),
+          titleGroup AS (
+              SELECT
+                  CASE
+                      WHEN title IN ('Mr', 'Mrs', 'Miss', 'Master') THEN title
+                      WHEN title IN ('Dr', 'Rev') THEN '전문직'
+                      WHEN title IN ('Col', 'Major', 'Capt') THEN '군인'
+                      ELSE '귀족/기타'
+                  END AS titleCategory,
+                  survived,
+                  age,
+                  fare
+              FROM titleExtract
+          )
+          SELECT
+              titleCategory,
+              COUNT(*) AS total,
+              SUM(survived) AS survivors,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate,
+              ROUND(AVG(age), 1) AS avgAge,
+              ROUND(AVG(fare), 2) AS avgFare
+          FROM titleGroup
+          GROUP BY titleCategory
+          ORDER BY survivalRate DESC
+      """).show()
+
+- id: practice
+  title: 실습
+  subtitle: 문자열 함수 종합 프로젝트
+  blocks:
+  - type: text
+    content: 문자열 함수를 종합 활용하여 타이타닉 데이터를 심층 분석해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: LIKE와 CASE WHEN으로 호칭별 생존율 분석"
+    blocks:
+    - type: code
+      title: 데이터 로드
+      content: |-
+        import pandas as pd
+        import duckdb
+        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv")
+        tbl1 = duckdb.from_df(data)
+    - type: code
+      title: 쿼리 실행
+      content: |-
+        duckdb.sql("""
+            SELECT
+                CASE
+                    WHEN name LIKE '%Dr.%' OR name LIKE '%Rev.%' THEN '전문직'
+                    WHEN name LIKE '%Col.%' OR name LIKE '%Major.%' OR name LIKE '%Capt.%' THEN '군인'
+                    WHEN name LIKE '%Mr.%' THEN 'Mr.'
+                    WHEN name LIKE '%Mrs.%' THEN 'Mrs.'
+                    WHEN name LIKE '%Miss.%' THEN 'Miss.'
+                    ELSE 'Other'
+                END AS titleGroup,
+                COUNT(*) AS total,
+                SUM(survived) AS survivors,
+                ROUND(AVG(survived) * 100, 1) AS survivalRate
+            FROM tbl1
+            GROUP BY titleGroup
+            ORDER BY survivalRate DESC
+        """)
+  - type: expansion
+    title: "미션2: SPLIT_PART + REGEXP_EXTRACT로 성(surname) 추출 및 가족 분석"
+    blocks:
+    - type: code
+      title: 데이터 로드
+      content: |-
+        import pandas as pd
+        import duckdb
+        frame = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv")
+        tbl2 = duckdb.from_df(frame)
+    - type: code
+      title: 쿼리 실행
+      content: |-
+        duckdb.sql("""
+            SELECT
+                TRIM(SPLIT_PART(name, ',', 1)) AS surname,
+                COUNT(*) AS familySize,
+                SUM(survived) AS survivors,
+                ROUND(AVG(survived) * 100, 1) AS survivalRate,
+                ROUND(AVG(fare), 2) AS avgFare
+            FROM tbl2
+            GROUP BY surname
+            HAVING COUNT(*) >= 3
+            ORDER BY familySize DESC, survivalRate DESC
+            LIMIT 10
+        """)
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 문자열 함수와 패턴 매칭을 완벽히 마스터했습니다!
+  - type: list
+    items:
+    - "LIKE - 간단한 패턴 검색 (%는 임의 문자열, _는 1개 문자)"
+    - "CONCAT - 문자열 결합 (|| 연산자와 동일)"
+    - "SUBSTR - 부분 문자열 추출 (시작위치 1부터)"
+    - "UPPER, LOWER - 대소문자 변환"
+    - "TRIM - 공백 제거 (LTRIM, RTRIM)"
+    - "LENGTH - 문자열 길이"
+    - "REPLACE - 문자열 치환"
+    - "SPLIT_PART - 구분자로 분리 후 추출"
+    - "REGEXP_MATCHES - 정규표현식 패턴 체크"
+    - "REGEXP_EXTRACT - 정규표현식으로 값 추출"
+  - type: text
+    content: 다음 시간에는 모든 개념을 종합한 최종 프로젝트를 진행합니다!

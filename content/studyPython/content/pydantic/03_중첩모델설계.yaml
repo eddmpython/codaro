@@ -1,0 +1,557 @@
+meta:
+  id: pydantic_03
+  title: 중첩모델설계
+  order: 3
+  category: pydantic
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["pydantic", "nested", "중첩모델", "복합타입", "리스트"]
+  seo:
+    title: "Pydantic 중첩 모델 - 복잡한 데이터 구조 설계"
+    description: "Pydantic으로 중첩된 모델을 설계합니다. 모델 안의 모델, 리스트, 딕셔너리 타입을 활용합니다."
+    keywords: ["pydantic", "nested", "중첩모델", "복합타입"]
+
+intro:
+  emoji: "🏗️"
+  goal: 중첩 모델로 E-커머스 주문 시스템을 구축합니다.
+  description: "실제 서비스에서 데이터는 단순한 구조가 아닙니다. 주문에는 여러 상품이 포함되고, 상품에는 카테고리 정보가 있고, 고객에는 배송지 정보가 있습니다. 이 프로젝트에서는 모델 안에 다른 모델을 포함하고, 리스트와 딕셔너리를 활용하여 실제 API 응답 같은 복잡한 구조를 다룹니다."
+
+sections:
+- id: load
+  title: 라이브러리 로드
+  subtitle: Pydantic 설치 및 import
+  blocks:
+  - type: text
+    content: "중첩 모델은 실제 애플리케이션에서 가장 많이 사용되는 패턴입니다. JSON API 응답, 데이터베이스 관계, 복잡한 설정 파일 등 모두 중첩 구조를 가집니다. Pydantic은 중첩된 모델도 자동으로 검증하고 변환해주어, 타입 안전성을 유지하면서 복잡한 데이터를 쉽게 다룰 수 있습니다."
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: micropip으로 pydantic 설치
+    content: |-
+      import micropip
+      await micropip.install('pydantic')
+  - type: code
+    language: python
+    title: 핵심 모듈 import
+    description: 타입 힌트 포함
+    content: |-
+      from pydantic import BaseModel, Field
+      from typing import Optional, Union
+      from datetime import datetime
+
+- id: basic
+  title: 기본 중첩 모델
+  subtitle: 모델 안의 모델
+  blocks:
+  - type: text
+    content: "한 모델의 필드 타입으로 다른 모델을 지정하면 자동으로 중첩 검증됩니다. 딕셔너리를 넘기면 자동으로 해당 모델 인스턴스로 변환되고, 중첩된 모델의 필드도 모두 검증됩니다. 점 표기법으로 깊숙한 필드에도 타입 안전하게 접근할 수 있습니다."
+  - type: code
+    language: python
+    title: 주소 모델
+    description: 중첩용 기본 모델
+    content: |-
+      class Address(BaseModel):
+          street: str
+          city: str
+          zipCode: str
+
+      addr = Address(street="123 Main St", city="Seoul", zipCode="12345")
+      addr
+  - type: code
+    language: python
+    title: 사용자 모델
+    description: Address 포함
+    content: |-
+      class Customer(BaseModel):
+          name: str
+          email: str
+          address: Address
+
+      customerData = {
+          "name": "Alice",
+          "email": "alice@example.com",
+          "address": {"street": "456 Oak Ave", "city": "Busan", "zipCode": "67890"}
+      }
+      customer = Customer.model_validate(customerData)
+      customer
+  - type: tip
+    content: "딕셔너리를 넘기면 자동으로 Address 인스턴스로 변환됩니다. 물론 Address 인스턴스를 직접 넘겨도 됩니다."
+  - type: code
+    language: python
+    title: 중첩 필드 접근
+    description: 점 표기법 사용
+    content: |-
+      customer.name, customer.address.city, customer.address.zipCode
+
+- id: listmodel
+  title: 모델 리스트
+  subtitle: list[Model] 타입
+  blocks:
+  - type: text
+    content: "list[Model] 타입으로 여러 개의 모델을 포함하는 필드를 정의합니다. 주문에 여러 상품이 포함되는 경우처럼, 실제 비즈니스 로직에서 매우 흔한 패턴입니다. 리스트의 각 항목도 자동으로 검증되어 타입 안전성이 보장됩니다."
+  - type: code
+    language: python
+    title: 주문 아이템 모델
+    description: 개별 상품 정보
+    content: |-
+      class OrderItem(BaseModel):
+          productId: str
+          name: str
+          price: float = Field(gt=0)
+          quantity: int = Field(ge=1)
+
+      item = OrderItem(productId="P001", name="Laptop", price=999.99, quantity=1)
+      item
+  - type: code
+    language: python
+    title: 주문 모델
+    description: 아이템 리스트 포함
+    content: |-
+      class Order(BaseModel):
+          orderId: str
+          customerId: str
+          items: list[OrderItem]
+
+      orderData = {
+          "orderId": "ORD-001",
+          "customerId": "C100",
+          "items": [
+              {"productId": "P001", "name": "Laptop", "price": 999.99, "quantity": 1},
+              {"productId": "P002", "name": "Mouse", "price": 29.99, "quantity": 2}
+          ]
+      }
+      order = Order.model_validate(orderData)
+      order
+  - type: code
+    language: python
+    title: 리스트 순회
+    description: 아이템 합계 계산
+    content: |-
+      itemSummary = [(i.name, i.price * i.quantity) for i in order.items]
+      itemSummary
+
+- id: optional
+  title: 선택적 중첩
+  subtitle: Optional[Model]
+  blocks:
+  - type: text
+    content: "Optional[Model]로 중첩 모델을 선택적으로 만들 수 있습니다. 사용자의 프로필 정보가 있을 수도 없을 수도 있는 경우처럼, 비즈니스 로직에 따라 유연하게 설계할 수 있습니다. 기본값으로 None을 지정하면 해당 필드 없이도 모델을 생성할 수 있습니다."
+  - type: code
+    language: python
+    title: 선택적 프로필
+    description: Optional 중첩
+    content: |-
+      class Profile(BaseModel):
+          bio: str
+          website: Optional[str] = None
+
+      class Member(BaseModel):
+          memberId: str
+          name: str
+          profile: Optional[Profile] = None
+
+      minimal = Member(memberId="M001", name="Bob")
+      minimal
+  - type: code
+    language: python
+    title: 프로필 포함
+    description: 선택 필드 제공
+    content: |-
+      withProfile = Member(
+          memberId="M002",
+          name="Carol",
+          profile={"bio": "Developer", "website": "https://carol.dev"}
+      )
+      withProfile
+
+- id: dict
+  title: 딕셔너리 타입
+  subtitle: dict[str, T]
+  blocks:
+  - type: text
+    content: "dict[str, T] 타입으로 동적 키를 가진 구조를 정의합니다. 메타데이터, 설정 값, 태그 등 키가 미리 정해지지 않은 데이터에 유용합니다. 값 타입도 지정할 수 있어 dict[str, int], dict[str, Model] 등 다양한 형태로 활용됩니다."
+  - type: code
+    language: python
+    title: 메타데이터 모델
+    description: 동적 키-값
+    content: |-
+      class Document(BaseModel):
+          docId: str
+          title: str
+          metadata: dict[str, str]
+
+      doc = Document(
+          docId="D001",
+          title="Report",
+          metadata={"author": "Alice", "version": "1.0", "status": "draft"}
+      )
+      doc
+  - type: code
+    language: python
+    title: 모델 딕셔너리
+    description: dict[str, Model]
+    content: |-
+      class Score(BaseModel):
+          value: float
+          grade: str
+
+      class StudentScores(BaseModel):
+          studentId: str
+          scores: dict[str, Score]
+
+      scoreData = {
+          "studentId": "S001",
+          "scores": {
+              "math": {"value": 95, "grade": "A"},
+              "english": {"value": 88, "grade": "B"}
+          }
+      }
+      studentScore = StudentScores.model_validate(scoreData)
+      studentScore.scores["math"].value
+
+- id: deep
+  title: 깊은 중첩
+  subtitle: 3단계 이상 구조
+  blocks:
+  - type: text
+    content: "실제 애플리케이션에서는 3단계 이상의 깊은 중첩도 흔합니다. 회사 > 부서 > 직원 구조처럼 계층적 데이터를 표현할 때 유용합니다. Pydantic은 아무리 깊은 중첩도 자동으로 검증하고, 에러 발생 시 정확한 위치를 알려줍니다."
+  - type: code
+    language: python
+    title: 3단계 중첩
+    description: Company > Department > Employee
+    content: |-
+      class Employee(BaseModel):
+          empId: str
+          name: str
+          role: str
+
+      class Department(BaseModel):
+          deptId: str
+          deptName: str
+          employees: list[Employee]
+
+      class Company(BaseModel):
+          companyId: str
+          companyName: str
+          departments: list[Department]
+
+      companyData = {
+          "companyId": "C001",
+          "companyName": "TechCorp",
+          "departments": [
+              {
+                  "deptId": "D001",
+                  "deptName": "Engineering",
+                  "employees": [
+                      {"empId": "E001", "name": "Alice", "role": "Developer"},
+                      {"empId": "E002", "name": "Bob", "role": "Designer"}
+                  ]
+              }
+          ]
+      }
+      company = Company.model_validate(companyData)
+      company
+  - type: code
+    language: python
+    title: 깊은 접근
+    description: 중첩 탐색
+    content: |-
+      firstDept = company.departments[0]
+      firstEmp = firstDept.employees[0]
+      company.companyName, firstDept.deptName, firstEmp.name
+
+- id: selfref
+  title: 자기 참조 모델
+  subtitle: 트리 구조
+  blocks:
+  - type: text
+    content: "트리 구조나 연결 리스트처럼 모델이 자기 자신을 참조하는 경우가 있습니다. Python 3.11 이상에서는 문자열로 타입을 지정하거나, 클래스 정의 후 update_forward_refs()를 호출합니다. 카테고리 계층, 댓글 스레드 등에 활용됩니다."
+  - type: code
+    language: python
+    title: 트리 노드 모델
+    description: 자기 참조
+    content: |-
+      class TreeNode(BaseModel):
+          value: str
+          children: list["TreeNode"] = []
+
+      treeData = {
+          "value": "root",
+          "children": [
+              {"value": "child1", "children": []},
+              {"value": "child2", "children": [{"value": "grandchild", "children": []}]}
+          ]
+      }
+      tree = TreeNode.model_validate(treeData)
+      tree
+  - type: code
+    language: python
+    title: 트리 탐색
+    description: 자식 노드 접근
+    content: |-
+      tree.value, tree.children[1].children[0].value
+
+- id: union
+  title: Union 타입
+  subtitle: 여러 타입 허용
+  blocks:
+  - type: text
+    content: "Union으로 필드가 여러 타입 중 하나를 가질 수 있게 합니다. 메시지가 텍스트일 수도, 이미지일 수도 있는 경우처럼 다형성이 필요할 때 사용합니다. Pydantic은 순서대로 타입을 시도하여 첫 번째로 성공하는 타입으로 변환합니다."
+  - type: code
+    language: python
+    title: 다형성 콘텐츠
+    description: 텍스트 또는 이미지
+    content: |-
+      class TextContent(BaseModel):
+          contentType: str = "text"
+          text: str
+
+      class ImageContent(BaseModel):
+          contentType: str = "image"
+          url: str
+          width: int
+          height: int
+
+      class Message(BaseModel):
+          msgId: str
+          content: Union[TextContent, ImageContent]
+
+      textMsg = Message(msgId="M001", content={"contentType": "text", "text": "Hello!"})
+      textMsg
+  - type: code
+    language: python
+    title: 이미지 메시지
+    description: 다른 타입
+    content: |-
+      imageMsg = Message(
+          msgId="M002",
+          content={"contentType": "image", "url": "https://img.com/a.png", "width": 800, "height": 600}
+      )
+      imageMsg.content.url
+
+- id: serial
+  title: 중첩 직렬화
+  subtitle: model_dump 옵션
+  blocks:
+  - type: text
+    content: "중첩 모델도 자동으로 직렬화됩니다. model_dump()는 중첩된 모델을 딕셔너리로, model_dump_json()은 JSON 문자열로 변환합니다. exclude 옵션으로 특정 필드를 제외하고, by_alias로 별칭을 사용할 수도 있습니다."
+  - type: code
+    language: python
+    title: 전체 직렬화
+    description: 중첩 포함
+    content: |-
+      orderDict = order.model_dump()
+      orderDict
+  - type: code
+    language: python
+    title: JSON 직렬화
+    description: 예쁜 출력
+    content: |-
+      orderJson = order.model_dump_json(indent=2)
+      orderJson
+  - type: code
+    language: python
+    title: 특정 필드 제외
+    description: exclude 옵션
+    content: |-
+      partial = order.model_dump(exclude={"items": {"__all__": {"productId"}}})
+      partial
+
+- id: result
+  title: E-커머스 주문 시스템
+  subtitle: 종합 모델 설계
+  blocks:
+  - type: text
+    content: "지금까지 배운 중첩 모델, 리스트, Optional, 딕셔너리를 모두 활용하여 실제 E-커머스 서비스에서 사용할 수 있는 주문 시스템을 완성합니다. 고객 정보, 상품 목록, 배송지, 결제 정보를 모두 포함한 복잡한 구조입니다."
+  - type: code
+    language: python
+    title: 완성된 주문 시스템
+    description: 종합 모델
+    content: |-
+      from pydantic import computed_field
+
+      class ShippingAddress(BaseModel):
+          recipient: str
+          phone: str
+          address: str
+          zipCode: str
+
+      class CartItem(BaseModel):
+          productId: str
+          productName: str
+          unitPrice: float = Field(gt=0)
+          quantity: int = Field(ge=1)
+          discount: float = Field(ge=0, le=100, default=0)
+
+          @computed_field
+          @property
+          def subtotal(self) -> float:
+              return self.unitPrice * self.quantity * (1 - self.discount / 100)
+
+      class CompleteOrder(BaseModel):
+          orderId: str
+          customerId: str
+          items: list[CartItem] = Field(min_length=1)
+          shipping: ShippingAddress
+          couponCode: Optional[str] = None
+          note: Optional[str] = None
+
+          @computed_field
+          @property
+          def totalAmount(self) -> float:
+              return sum(item.subtotal for item in self.items)
+
+          @computed_field
+          @property
+          def itemCount(self) -> int:
+              return sum(item.quantity for item in self.items)
+
+      fullOrder = CompleteOrder(
+          orderId="ORD-2024-001",
+          customerId="C100",
+          items=[
+              {"productId": "P001", "productName": "노트북", "unitPrice": 1200000, "quantity": 1, "discount": 10},
+              {"productId": "P002", "productName": "마우스", "unitPrice": 50000, "quantity": 2}
+          ],
+          shipping={"recipient": "홍길동", "phone": "010-1234-5678", "address": "서울시 강남구", "zipCode": "06234"}
+      )
+      fullOrder
+  - type: code
+    language: python
+    title: 주문 요약
+    description: 계산 필드 확인
+    content: |-
+      orderSummary = {
+          "orderId": fullOrder.orderId,
+          "itemCount": fullOrder.itemCount,
+          "totalAmount": fullOrder.totalAmount,
+          "shipping": fullOrder.shipping.recipient
+      }
+      orderSummary
+
+- id: practice
+  title: 실습
+  subtitle: 중첩 모델 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 중첩 모델, 리스트, Optional, Union, computed_field를 활용하여 복잡한 데이터 구조를 설계합니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 블로그 포스트"
+    blocks:
+    - type: code
+      title: 블로그 모델 정의
+      content: |-
+        from pydantic import BaseModel, Field, computed_field
+        from typing import Optional
+
+        class Author(BaseModel):
+            authorId: str
+            name: str
+            email: str
+
+        class CommentItem(BaseModel):
+            commentId: str
+            author: Author
+            content: str
+            createdAt: str
+
+        class BlogPost(BaseModel):
+            postId: str
+            title: str
+            content: str
+            author: Author
+            tags: list[str] = []
+            comments: list[CommentItem] = []
+            publishedAt: Optional[str] = None
+
+            @computed_field
+            @property
+            def commentCount(self) -> int:
+                return len(self.comments)
+
+        postData = {
+            "postId": "P001",
+            "title": "Pydantic 시작하기",
+            "content": "Pydantic은 데이터 검증 라이브러리입니다...",
+            "author": {"authorId": "A001", "name": "Alice", "email": "alice@blog.com"},
+            "tags": ["python", "pydantic"],
+            "comments": [
+                {"commentId": "C001", "author": {"authorId": "A002", "name": "Bob", "email": "bob@mail.com"}, "content": "좋은 글!", "createdAt": "2024-01-15"}
+            ],
+            "publishedAt": "2024-01-14"
+        }
+        post = BlogPost.model_validate(postData)
+        post
+    - type: code
+      title: 블로그 요약
+      content: |-
+        postSummary = {
+            "title": post.title,
+            "author": post.author.name,
+            "tags": post.tags,
+            "commentCount": post.commentCount
+        }
+        postSummary
+  - type: expansion
+    title: "미션2: 쇼핑 카트"
+    blocks:
+    - type: code
+      title: 카트 모델 정의
+      content: |-
+        from pydantic import BaseModel, Field, computed_field
+        from typing import Optional
+
+        class ProductInfo(BaseModel):
+            sku: str
+            name: str
+            unitPrice: float = Field(gt=0)
+            category: str
+
+        class CartEntry(BaseModel):
+            product: ProductInfo
+            quantity: int = Field(ge=1)
+            discount: float = Field(ge=0, le=100, default=0)
+
+            @computed_field
+            @property
+            def lineTotal(self) -> float:
+                return self.product.unitPrice * self.quantity * (1 - self.discount / 100)
+
+        class ShoppingCart(BaseModel):
+            cartId: str
+            userId: str
+            items: list[CartEntry] = []
+            couponCode: Optional[str] = None
+
+            @computed_field
+            @property
+            def grandTotal(self) -> float:
+                return sum(item.lineTotal for item in self.items)
+
+            @computed_field
+            @property
+            def totalQuantity(self) -> int:
+                return sum(item.quantity for item in self.items)
+
+        cartData = {
+            "cartId": "CART-001",
+            "userId": "U100",
+            "items": [
+                {"product": {"sku": "SKU001", "name": "노트북", "unitPrice": 1200000, "category": "전자기기"}, "quantity": 1, "discount": 10},
+                {"product": {"sku": "SKU002", "name": "마우스", "unitPrice": 50000, "category": "주변기기"}, "quantity": 2}
+            ]
+        }
+        cart = ShoppingCart.model_validate(cartData)
+        cart
+    - type: code
+      title: 카트 요약
+      content: |-
+        cartSummary = {
+            "cartId": cart.cartId,
+            "totalQuantity": cart.totalQuantity,
+            "grandTotal": cart.grandTotal,
+            "items": [(i.product.name, i.lineTotal) for i in cart.items]
+        }
+        cartSummary

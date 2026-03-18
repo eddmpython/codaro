@@ -1,0 +1,814 @@
+meta:
+  id: "day25"
+  title: "프로퍼티와 데코레이터"
+  day: 25
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 프로퍼티와 데코레이터 - 메서드 활용 고급 기법"
+    description: "property, setter, deleter, staticmethod, classmethod, 데코레이터를 배웁니다."
+    keywords: ['프로퍼티', 'property', 'setter', 'staticmethod', 'classmethod', '데코레이터']
+
+intro:
+  emoji: "🎨"
+  points:
+  - "@property로 속성처럼 사용"
+  - "setter/deleter로 값 제어"
+  - "@staticmethod, @classmethod 활용"
+  - "데코레이터로 기능 확장"
+
+sections:
+- id: "property_basic"
+  title: "프로퍼티 기초"
+  subtitle: "@property 데코레이터"
+  blocks:
+  - type: "text"
+    content: "프로퍼티는 메서드를 속성처럼 사용할 수 있게 해주는 기능입니다. @property 데코레이터를 메서드에 붙이면 obj.method() 대신 obj.method로 접근할 수 있습니다. 이를 통해 계산된 값을 속성처럼 제공하거나, 내부 속성에 대한 접근을 제어할 수 있습니다."
+  - type: "list"
+    items:
+    - "@property 데코레이터 사용"
+    - "메서드를 속성처럼 접근"
+    - "괄호 없이 호출"
+    - "계산된 값 제공"
+  - type: "code"
+    language: "python"
+    title: "기본 프로퍼티"
+    description: "메서드를 속성처럼 사용합니다."
+    content: |-
+      class Circle:
+          def __init__(self, radius):
+              self.radius = radius
+
+          @property
+          def area(self):
+              return 3.14 * self.radius ** 2
+
+      cir = Circle(5)
+      cir.area
+  - type: "code"
+    language: "python"
+    title: "여러 프로퍼티"
+    description: "하나의 클래스에 여러 프로퍼티를 정의할 수 있습니다."
+    content: |-
+      class Rectangle:
+          def __init__(self, width, height):
+              self.width = width
+              self.height = height
+
+          @property
+          def area(self):
+              return self.width * self.height
+
+          @property
+          def perimeter(self):
+              return 2 * (self.width + self.height)
+
+      rect = Rectangle(4, 6)
+      rect.area, rect.perimeter
+  - type: "code"
+    language: "python"
+    title: "조건부 프로퍼티"
+    description: "조건에 따라 다른 값을 반환합니다."
+    content: |-
+      class Account:
+          def __init__(self, balance):
+              self.balance = balance
+
+          @property
+          def status(self):
+              if self.balance >= 0:
+                  return 'positive'
+              else:
+                  return 'negative'
+
+      acc = Account(-100)
+      acc.status
+  - type: "tip"
+    content: "프로퍼티는 읽기 전용 속성을 만들 때 매우 유용합니다."
+
+- id: "setter_deleter"
+  title: "setter와 deleter"
+  subtitle: "값 설정과 삭제 제어"
+  blocks:
+  - type: "text"
+    content: "프로퍼티는 getter뿐만 아니라 setter와 deleter도 정의할 수 있습니다. @프로퍼티명.setter는 값을 설정할 때, @프로퍼티명.deleter는 값을 삭제할 때 호출됩니다. 이를 통해 값의 유효성 검사나 부가 작업을 수행할 수 있습니다."
+  - type: "list"
+    items:
+    - "@property.setter: 값 설정"
+    - "@property.deleter: 값 삭제"
+    - "유효성 검사 가능"
+    - "내부 속성 보호"
+  - type: "code"
+    language: "python"
+    title: "setter 정의"
+    description: "값을 설정할 때 유효성을 검사합니다."
+    content: |-
+      class Temperature:
+          def __init__(self):
+              self._celsius = 0
+
+          @property
+          def celsius(self):
+              return self._celsius
+
+          @celsius.setter
+          def celsius(self, value):
+              if value < -273:
+                  self._celsius = -273
+              else:
+                  self._celsius = value
+
+      temp = Temperature()
+      temp.celsius = -300
+      temp.celsius
+  - type: "code"
+    language: "python"
+    title: "계산된 setter"
+    description: "설정된 값으로 다른 속성도 업데이트합니다."
+    content: |-
+      class Product:
+          def __init__(self, price):
+              self._price = price
+
+          @property
+          def price(self):
+              return self._price
+
+          @price.setter
+          def price(self, value):
+              self._price = value
+              self._tax = value * 0.1
+
+      prod = Product(1000)
+      prod.price = 2000
+      prod._tax
+  - type: "code"
+    language: "python"
+    title: "deleter 정의"
+    description: "속성 삭제를 제어합니다."
+    content: |-
+      class Cache:
+          def __init__(self):
+              self._data = {}
+
+          @property
+          def data(self):
+              return self._data
+
+          @data.deleter
+          def data(self):
+              self._data = {}
+
+      cache = Cache()
+      cache._data['key'] = 'value'
+      del cache.data
+      len(cache._data)
+  - type: "tip"
+    content: "setter를 사용하면 직접 속성에 접근하는 것처럼 보이지만 내부적으로 검증 로직을 실행할 수 있습니다."
+
+- id: "staticmethod"
+  title: "@staticmethod"
+  subtitle: "정적 메서드"
+  blocks:
+  - type: "text"
+    content: "정적 메서드는 클래스나 인스턴스와 무관하게 독립적으로 동작하는 메서드입니다. @staticmethod 데코레이터를 사용하며, self나 cls 매개변수를 받지 않습니다. 주로 유틸리티 함수나 헬퍼 함수를 클래스 내부에 정의할 때 사용합니다."
+  - type: "list"
+    items:
+    - "@staticmethod 데코레이터"
+    - "self, cls 없음"
+    - "독립적인 유틸리티 함수"
+    - "클래스명.메서드() 호출"
+  - type: "code"
+    language: "python"
+    title: "기본 정적 메서드"
+    description: "클래스와 독립적인 함수를 정의합니다."
+    content: |-
+      class Math:
+          @staticmethod
+          def add(a, b):
+              return a + b
+
+          @staticmethod
+          def multiply(a, b):
+              return a * b
+
+      Math.add(3, 4)
+  - type: "code"
+    language: "python"
+    title: "유효성 검사 메서드"
+    description: "정적 메서드로 검증 로직을 제공합니다."
+    content: |-
+      class Validator:
+          @staticmethod
+          def isPositive(num):
+              return num > 0
+
+          @staticmethod
+          def isEmail(text):
+              return '@' in text
+
+      Validator.isPositive(10)
+  - type: "code"
+    language: "python"
+    title: "변환 메서드"
+    description: "데이터 변환 로직을 정적 메서드로 구현합니다."
+    content: |-
+      class Converter:
+          @staticmethod
+          def celsiusToFahrenheit(c):
+              return c * 9 / 5 + 32
+
+          @staticmethod
+          def fahrenheitToCelsius(f):
+              return (f - 32) * 5 / 9
+
+      Converter.celsiusToFahrenheit(25)
+  - type: "tip"
+    content: "정적 메서드는 클래스 내부에 관련 함수를 그룹화하여 네임스페이스를 깔끔하게 유지합니다."
+
+- id: "classmethod"
+  title: "@classmethod"
+  subtitle: "클래스 메서드"
+  blocks:
+  - type: "text"
+    content: "클래스 메서드는 클래스 자체를 첫 번째 매개변수로 받는 메서드입니다. @classmethod 데코레이터를 사용하며, 첫 매개변수는 관례적으로 cls로 명명합니다. 주로 팩토리 메서드나 클래스 레벨의 작업을 수행할 때 사용합니다."
+  - type: "list"
+    items:
+    - "@classmethod 데코레이터"
+    - "첫 매개변수는 cls"
+    - "클래스 참조 가능"
+    - "팩토리 메서드 구현"
+  - type: "code"
+    language: "python"
+    title: "기본 클래스 메서드"
+    description: "클래스를 매개변수로 받아 인스턴스를 생성합니다."
+    content: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+          @classmethod
+          def fromBirthYear(cls, name, birthYear):
+              age = 2024 - birthYear
+              return cls(name, age)
+
+      p = Person.fromBirthYear('Alice', 2000)
+      p.age
+  - type: "code"
+    language: "python"
+    title: "여러 팩토리 메서드"
+    description: "다양한 방식으로 객체를 생성합니다."
+    content: |-
+      class Point:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          @classmethod
+          def origin(cls):
+              return cls(0, 0)
+
+          @classmethod
+          def unit(cls):
+              return cls(1, 1)
+
+      pt = Point.origin()
+      pt.x, pt.y
+  - type: "code"
+    language: "python"
+    title: "문자열 파싱"
+    description: "문자열을 파싱하여 객체를 생성합니다."
+    content: |-
+      class RGB:
+          def __init__(self, r, g, b):
+              self.r = r
+              self.g = g
+              self.b = b
+
+          @classmethod
+          def fromHex(cls, hexCode):
+              r = int(hexCode[0:2], 16)
+              g = int(hexCode[2:4], 16)
+              b = int(hexCode[4:6], 16)
+              return cls(r, g, b)
+
+      color = RGB.fromHex('FF8800')
+      color.r, color.g
+  - type: "tip"
+    content: "클래스 메서드는 상속 시 자식 클래스의 타입을 자동으로 따릅니다."
+
+- id: "decorator_basic"
+  title: "데코레이터 기초"
+  subtitle: "함수를 꾸미는 함수"
+  blocks:
+  - type: "text"
+    content: "데코레이터는 다른 함수를 감싸서 기능을 추가하는 함수입니다. @데코레이터명 형태로 함수 위에 붙여 사용하며, 원래 함수의 동작을 변경하거나 확장할 수 있습니다. 로깅, 타이밍, 캐싱 등 다양한 용도로 활용됩니다."
+  - type: "list"
+    items:
+    - "함수를 감싸는 함수"
+    - "@데코레이터명 형태"
+    - "기능 추가와 확장"
+    - "재사용 가능한 패턴"
+  - type: "code"
+    language: "python"
+    title: "간단한 데코레이터"
+    description: "함수 호출 전후에 로그를 출력합니다."
+    content: |-
+      def logger(func):
+          def wrapper():
+              msg = 'Calling ' + func.__name__
+              result = func()
+              return msg + ' -> ' + str(result)
+          return wrapper
+
+      @logger
+      def greet():
+          return 'Hello'
+
+      greet()
+  - type: "code"
+    language: "python"
+    title: "인자를 받는 데코레이터"
+    description: "데코레이터가 인자를 받는 함수도 감쌀 수 있습니다."
+    content: |-
+      def double(func):
+          def wrapper(x):
+              result = func(x)
+              return result * 2
+          return wrapper
+
+      @double
+      def square(n):
+          return n * n
+
+      square(5)
+  - type: "code"
+    language: "python"
+    title: "여러 데코레이터"
+    description: "하나의 함수에 여러 데코레이터를 적용할 수 있습니다."
+    content: |-
+      def addOne(func):
+          def wrapper(x):
+              return func(x) + 1
+          return wrapper
+
+      def triple(func):
+          def wrapper(x):
+              return func(x) * 3
+          return wrapper
+
+      @addOne
+      @triple
+      def getValue(n):
+          return n
+
+      getValue(10)
+  - type: "tip"
+    content: "데코레이터는 아래에서 위로 적용됩니다. @addOne @triple은 triple을 먼저 적용하고 addOne을 나중에 적용합니다."
+
+- id: "practical_patterns"
+  title: "실전 패턴"
+  subtitle: "프로퍼티와 데코레이터 활용"
+  blocks:
+  - type: "text"
+    content: "프로퍼티와 데코레이터를 함께 사용하면 깔끔하고 유지보수하기 쉬운 코드를 작성할 수 있습니다. 캐싱, 유효성 검사, 접근 제어 등 다양한 패턴을 구현할 수 있습니다."
+  - type: "list"
+    items:
+    - "프로퍼티로 캡슐화"
+    - "데코레이터로 기능 확장"
+    - "코드 재사용성 향상"
+    - "깔끔한 인터페이스"
+  - type: "code"
+    language: "python"
+    title: "프로퍼티 캐싱"
+    description: "계산 결과를 캐싱하여 성능을 향상시킵니다."
+    content: |-
+      class Fibonacci:
+          def __init__(self):
+              self._cache = {}
+
+          @property
+          def tenth(self):
+              if 10 not in self._cache:
+                  self._cache[10] = self._fib(10)
+              return self._cache[10]
+
+          def _fib(self, n):
+              if n <= 1:
+                  return n
+              return self._fib(n - 1) + self._fib(n - 2)
+
+      fib = Fibonacci()
+      fib.tenth
+  - type: "code"
+    language: "python"
+    title: "유효성 검사 프로퍼티"
+    description: "프로퍼티와 setter로 안전한 접근을 보장합니다."
+    content: |-
+      class User:
+          def __init__(self, name, age):
+              self._name = name
+              self._age = age
+
+          @property
+          def age(self):
+              return self._age
+
+          @age.setter
+          def age(self, value):
+              if 0 <= value <= 150:
+                  self._age = value
+
+      user = User('Bob', 25)
+      user.age = 200
+      user.age
+  - type: "code"
+    language: "python"
+    title: "클래스 메서드 팩토리"
+    description: "클래스 메서드로 다양한 생성 방법을 제공합니다."
+    content: |-
+      class Config:
+          def __init__(self, host, port):
+              self.host = host
+              self.port = port
+
+          @classmethod
+          def development(cls):
+              return cls('localhost', 8000)
+
+          @classmethod
+          def production(cls):
+              return cls('server.com', 80)
+
+      cfg = Config.development()
+      cfg.host, cfg.port
+  - type: "tip"
+    content: "프로퍼티와 데코레이터를 적절히 조합하면 파이썬스러운 깔끔한 코드를 작성할 수 있습니다."
+
+- id: "practice"
+  title: "Day 25 종합 복습"
+  subtitle: "프로퍼티와 데코레이터 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 25에서 배운 프로퍼티와 데코레이터를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 읽기 프로퍼티"
+    code: |-
+      class Square:
+          def __init__(self, side):
+              self.side = side
+
+          @property
+          def area(self):
+              return self.side ** 2
+
+      sq = Square(4)
+      sq.area
+
+  - type: "expansion"
+    title: "🟢 기본2: 정적 메서드"
+    code: |-
+      class Calculator:
+          @staticmethod
+          def add(a, b):
+              return a + b
+
+      Calculator.add(10, 20)
+
+  - type: "expansion"
+    title: "🟢 기본3: 클래스 메서드"
+    code: |-
+      class Item:
+          def __init__(self, name):
+              self.name = name
+
+          @classmethod
+          def createDefault(cls):
+              return cls('default')
+
+      item = Item.createDefault()
+      item.name
+
+  - type: "expansion"
+    title: "🟢 기본4: setter 사용"
+    code: |-
+      class Box:
+          def __init__(self):
+              self._size = 0
+
+          @property
+          def size(self):
+              return self._size
+
+          @size.setter
+          def size(self, val):
+              if val >= 0:
+                  self._size = val
+
+      bx = Box()
+      bx.size = 10
+      bx.size
+
+  - type: "expansion"
+    title: "🟢 기본5: 간단한 데코레이터"
+    code: |-
+      def uppercase(func):
+          def wrapper():
+              result = func()
+              return result.upper()
+          return wrapper
+
+      @uppercase
+      def getName():
+          return 'alice'
+
+      getName()
+
+  - type: "expansion"
+    title: "🟡 응용1: 여러 프로퍼티"
+    code: |-
+      class Triangle:
+          def __init__(self, base, height):
+              self.base = base
+              self.height = height
+
+          @property
+          def area(self):
+              return self.base * self.height / 2
+
+          @property
+          def perimeter(self):
+              return self.base + self.height + ((self.base ** 2 + self.height ** 2) ** 0.5)
+
+      tri = Triangle(3, 4)
+      tri.area
+
+  - type: "expansion"
+    title: "🟡 응용2: 검증 setter"
+    code: |-
+      class Price:
+          def __init__(self):
+              self._amount = 0
+
+          @property
+          def amount(self):
+              return self._amount
+
+          @amount.setter
+          def amount(self, val):
+              if val < 0:
+                  self._amount = 0
+              else:
+                  self._amount = val
+
+      price = Price()
+      price.amount = -100
+      price.amount
+
+  - type: "expansion"
+    title: "🟡 응용3: 팩토리 메서드"
+    code: |-
+      class Date:
+          def __init__(self, year, month, day):
+              self.year = year
+              self.month = month
+              self.day = day
+
+          @classmethod
+          def today(cls):
+              return cls(2024, 1, 1)
+
+      dt = Date.today()
+      dt.year
+
+  - type: "expansion"
+    title: "🟡 응용4: 여러 정적 메서드"
+    code: |-
+      class StringUtil:
+          @staticmethod
+          def reverse(text):
+              return text[::-1]
+
+          @staticmethod
+          def capitalize(text):
+              return text[0].upper() + text[1:]
+
+      StringUtil.reverse('hello')
+
+  - type: "expansion"
+    title: "🟡 응용5: 데코레이터 체이닝"
+    code: |-
+      def addTen(func):
+          def wrapper(n):
+              return func(n) + 10
+          return wrapper
+
+      def double(func):
+          def wrapper(n):
+              return func(n) * 2
+          return wrapper
+
+      @addTen
+      @double
+      def getNum(x):
+          return x
+
+      getNum(5)
+
+  - type: "expansion"
+    title: "🔴 심화1: 계산 프로퍼티"
+    code: |-
+      class Cuboid:
+          def __init__(self, length, width, height):
+              self.length = length
+              self.width = width
+              self.height = height
+
+          @property
+          def volume(self):
+              return self.length * self.width * self.height
+
+          @property
+          def surfaceArea(self):
+              lw = self.length * self.width
+              lh = self.length * self.height
+              wh = self.width * self.height
+              return 2 * (lw + lh + wh)
+
+      cube = Cuboid(2, 3, 4)
+      cube.volume, cube.surfaceArea
+
+  - type: "expansion"
+    title: "🔴 심화2: 범위 검증"
+    code: |-
+      class Percentage:
+          def __init__(self):
+              self._value = 0
+
+          @property
+          def value(self):
+              return self._value
+
+          @value.setter
+          def value(self, val):
+              if val < 0:
+                  self._value = 0
+              elif val > 100:
+                  self._value = 100
+              else:
+                  self._value = val
+
+      pct = Percentage()
+      pct.value = 150
+      pct.value
+
+  - type: "expansion"
+    title: "🔴 심화3: 파싱 팩토리"
+    code: |-
+      class Coordinate:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          @classmethod
+          def fromString(cls, text):
+              parts = text.split(',')
+              x = int(parts[0])
+              y = int(parts[1])
+              return cls(x, y)
+
+      coord = Coordinate.fromString('10,20')
+      coord.x, coord.y
+
+  - type: "expansion"
+    title: "🔴 심화4: 유틸리티 클래스"
+    code: |-
+      class TextHelper:
+          @staticmethod
+          def wordCount(text):
+              return len(text.split())
+
+          @staticmethod
+          def charCount(text):
+              return len(text)
+
+          @staticmethod
+          def isPalindrome(text):
+              return text == text[::-1]
+
+      TextHelper.wordCount('hello world python')
+
+  - type: "expansion"
+    title: "🔴 심화5: 조건부 데코레이터"
+    code: |-
+      def onlyPositive(func):
+          def wrapper(n):
+              if n < 0:
+                  return 0
+              return func(n)
+          return wrapper
+
+      @onlyPositive
+      def square(x):
+          return x * x
+
+      square(-5)
+
+  - type: "expansion"
+    title: "🔴 심화6: 캐싱 프로퍼티"
+    code: |-
+      class ExpensiveCalc:
+          def __init__(self, n):
+              self.n = n
+              self._cached = None
+
+          @property
+          def result(self):
+              if self._cached is None:
+                  total = 0
+                  for i in range(self.n):
+                      total = total + i
+                  self._cached = total
+              return self._cached
+
+      calc = ExpensiveCalc(100)
+      calc.result
+
+  - type: "expansion"
+    title: "🔴 심화7: 다중 팩토리"
+    code: |-
+      class Employee:
+          def __init__(self, name, salary):
+              self.name = name
+              self.salary = salary
+
+          @classmethod
+          def intern(cls, name):
+              return cls(name, 2000000)
+
+          @classmethod
+          def senior(cls, name):
+              return cls(name, 8000000)
+
+      emp = Employee.intern('Alice')
+      emp.salary
+
+  - type: "expansion"
+    title: "🔴 심화8: 로깅 데코레이터"
+    code: |-
+      def logCall(func):
+          def wrapper(x, y):
+              result = func(x, y)
+              msg = func.__name__ + '(' + str(x) + ', ' + str(y) + ') = ' + str(result)
+              return msg
+          return wrapper
+
+      @logCall
+      def multiply(a, b):
+          return a * b
+
+      multiply(3, 4)
+
+  - type: "expansion"
+    title: "🔴 심화9: 읽기전용 프로퍼티"
+    code: |-
+      class ImmutablePoint:
+          def __init__(self, x, y):
+              self._x = x
+              self._y = y
+
+          @property
+          def x(self):
+              return self._x
+
+          @property
+          def y(self):
+              return self._y
+
+      point = ImmutablePoint(5, 10)
+      point.x, point.y
+
+  - type: "expansion"
+    title: "🔴 심화10: 체인 데코레이터"
+    code: |-
+      def makePositive(func):
+          def wrapper(n):
+              result = func(n)
+              if result < 0:
+                  return -result
+              return result
+          return wrapper
+
+      def addFive(func):
+          def wrapper(n):
+              return func(n) + 5
+          return wrapper
+
+      @makePositive
+      @addFive
+      def process(x):
+          return x
+
+      process(-10)

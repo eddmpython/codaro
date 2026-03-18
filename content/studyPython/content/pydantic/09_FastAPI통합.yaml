@@ -1,0 +1,599 @@
+meta:
+  id: pydantic_09
+  title: FastAPI통합
+  order: 9
+  category: pydantic
+  difficulty: "⭐⭐⭐⭐"
+  badge: 고급
+  tags: ["pydantic", "FastAPI", "API", "웹개발", "스키마"]
+  seo:
+    title: "Pydantic과 FastAPI - 웹 API 개발"
+    description: "Pydantic 모델을 FastAPI와 통합합니다. 요청/응답 스키마, 자동 문서화, 검증을 배웁니다."
+    keywords: ["pydantic", "FastAPI", "API", "웹개발"]
+
+intro:
+  emoji: "⚡"
+  goal: Pydantic 모델로 완전한 REST API 모델 세트를 설계합니다.
+  description: "FastAPI는 Pydantic을 핵심 검증 엔진으로 사용하는 현대적인 웹 프레임워크입니다. 요청 본문, 응답 스키마, 쿼리 파라미터를 모두 Pydantic 모델로 정의하면 자동 검증, 타입 변환, API 문서화까지 한번에 해결됩니다. 이 프로젝트에서는 실제 API에서 사용하는 CRUD 모델 패턴을 설계합니다."
+
+sections:
+- id: load
+  title: 라이브러리 로드
+  subtitle: Pydantic 설치 및 import
+  blocks:
+  - type: text
+    content: "FastAPI는 Pyodide 환경에서 직접 실행하기 어렵지만, Pydantic 모델 설계는 동일합니다. FastAPI에서 요청 본문은 BaseModel로 정의하고, 응답도 BaseModel로 정의하여 자동 직렬화와 OpenAPI 문서 생성이 가능합니다. 이 패턴을 익히면 실제 FastAPI 프로젝트에 바로 적용할 수 있습니다."
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: micropip으로 pydantic 설치
+    content: |-
+      import micropip
+      await micropip.install('pydantic')
+  - type: code
+    language: python
+    title: 핵심 모듈 import
+    description: FastAPI 통합용
+    content: |-
+      from pydantic import BaseModel, Field, computed_field
+      from typing import Optional, Generic, TypeVar, Literal
+      from datetime import datetime
+      from enum import Enum
+
+- id: request
+  title: 요청 모델
+  subtitle: Request Body
+  blocks:
+  - type: text
+    content: "요청 본문을 Pydantic 모델로 정의하면 FastAPI가 자동으로 JSON을 파싱하고 검증합니다. 잘못된 데이터가 들어오면 422 Unprocessable Entity 응답이 자동으로 반환됩니다. 모델에 Field를 사용하면 OpenAPI 문서에 설명과 예시가 포함됩니다."
+  - type: code
+    language: python
+    title: 사용자 생성 요청
+    description: 요청 스키마
+    content: |-
+      class CreateUserRequest(BaseModel):
+          username: str = Field(min_length=3, max_length=50, description="사용자명")
+          email: str = Field(description="이메일 주소")
+          password: str = Field(min_length=8, description="비밀번호")
+          fullName: Optional[str] = Field(default=None, description="전체 이름")
+
+      requestData = {
+          "username": "alice",
+          "email": "alice@example.com",
+          "password": "secure123",
+          "fullName": "Alice Smith"
+      }
+      createReq = CreateUserRequest.model_validate(requestData)
+      createReq
+  - type: tip
+    content: "요청 모델에는 password처럼 민감한 정보가 포함될 수 있습니다. 응답 모델에서는 이를 제외해야 합니다."
+  - type: code
+    language: python
+    title: 요청 직렬화
+    description: 검증된 데이터
+    content: |-
+      createReq.model_dump()
+
+- id: response
+  title: 응답 모델
+  subtitle: Response Schema
+  blocks:
+  - type: text
+    content: "응답 모델은 클라이언트에게 반환할 데이터 구조를 정의합니다. 요청 모델과 달리 ID, 생성일시 등 서버에서 생성하는 필드가 포함되고, 비밀번호 같은 민감 정보는 제외됩니다. FastAPI는 응답 모델에 맞게 자동으로 JSON 직렬화합니다."
+  - type: code
+    language: python
+    title: 사용자 응답 모델
+    description: 응답 스키마
+    content: |-
+      class UserResponse(BaseModel):
+          userId: str = Field(description="사용자 고유 ID")
+          username: str = Field(description="사용자명")
+          email: str = Field(description="이메일")
+          fullName: Optional[str] = Field(description="전체 이름")
+          createdAt: datetime = Field(description="생성 시각")
+          isActive: bool = Field(default=True, description="활성 상태")
+
+      responseData = {
+          "userId": "usr_123456",
+          "username": "alice",
+          "email": "alice@example.com",
+          "fullName": "Alice Smith",
+          "createdAt": "2024-03-15T10:30:00",
+          "isActive": True
+      }
+      userResp = UserResponse.model_validate(responseData)
+      userResp
+  - type: code
+    language: python
+    title: JSON 응답
+    description: 직렬화
+    content: |-
+      userResp.model_dump_json(indent=2)
+
+- id: crud
+  title: CRUD 모델 세트
+  subtitle: 생성/읽기/수정 분리
+  blocks:
+  - type: text
+    content: "실무에서는 같은 리소스에 대해 생성, 읽기, 수정용 모델을 분리합니다. Base 모델에 공통 필드를 정의하고 상속하면 중복을 줄일 수 있습니다. Update 모델은 모든 필드를 Optional로 하여 부분 수정(PATCH)을 지원합니다."
+  - type: code
+    language: python
+    title: 상품 CRUD 모델
+    description: Base, Create, Update, Response
+    content: |-
+      class ProductBase(BaseModel):
+          name: str = Field(min_length=2, max_length=100)
+          description: Optional[str] = Field(default=None, max_length=1000)
+          price: float = Field(gt=0)
+          category: str
+
+      class ProductCreate(ProductBase):
+          sku: str = Field(description="상품 코드")
+
+      class ProductUpdate(BaseModel):
+          name: Optional[str] = Field(default=None, min_length=2, max_length=100)
+          description: Optional[str] = Field(default=None, max_length=1000)
+          price: Optional[float] = Field(default=None, gt=0)
+          category: Optional[str] = None
+
+      class ProductResponse(ProductBase):
+          productId: str
+          sku: str
+          createdAt: datetime
+          updatedAt: Optional[datetime] = None
+  - type: code
+    language: python
+    title: CRUD 사용 예시
+    description: 생성과 수정
+    content: |-
+      createProduct = ProductCreate(
+          name="노트북",
+          description="고성능 노트북",
+          price=1500000,
+          category="electronics",
+          sku="NB-001"
+      )
+
+      updateProduct = ProductUpdate(price=1400000)
+      createProduct.model_dump(), updateProduct.model_dump(exclude_unset=True)
+
+- id: query
+  title: 쿼리 파라미터
+  subtitle: 검색과 필터링
+  blocks:
+  - type: text
+    content: "FastAPI에서 쿼리 파라미터도 Pydantic 모델로 정의할 수 있습니다. 검색어, 필터, 정렬, 페이지네이션 등을 모델로 묶으면 검증과 기본값 처리가 자동화됩니다. Literal로 정렬 옵션을 제한하면 API 문서에도 반영됩니다."
+  - type: code
+    language: python
+    title: 검색 파라미터
+    description: 쿼리 스키마
+    content: |-
+      class SearchParams(BaseModel):
+          query: Optional[str] = Field(default=None, min_length=1, description="검색어")
+          category: Optional[str] = Field(default=None, description="카테고리 필터")
+          minPrice: Optional[float] = Field(default=None, ge=0, description="최소 가격")
+          maxPrice: Optional[float] = Field(default=None, ge=0, description="최대 가격")
+          sortBy: Literal["name", "price", "createdAt"] = Field(default="createdAt")
+          sortOrder: Literal["asc", "desc"] = Field(default="desc")
+          page: int = Field(default=1, ge=1)
+          pageSize: int = Field(default=20, ge=1, le=100)
+
+      searchParams = SearchParams(
+          query="laptop",
+          category="electronics",
+          minPrice=500000,
+          sortBy="price",
+          sortOrder="asc"
+      )
+      searchParams.model_dump()
+
+- id: pagination
+  title: 페이지네이션 응답
+  subtitle: 목록 래퍼
+  blocks:
+  - type: text
+    content: "목록 API는 데이터와 함께 페이지네이션 정보를 반환해야 합니다. Generic을 사용하면 어떤 타입의 목록이든 감쌀 수 있는 재사용 가능한 래퍼 모델을 만들 수 있습니다. 전체 개수, 현재 페이지, 다음/이전 페이지 존재 여부 등을 포함합니다."
+  - type: code
+    language: python
+    title: 페이지네이션 래퍼
+    description: 제네릭 응답
+    content: |-
+      T = TypeVar('T')
+
+      class PaginatedResponse(BaseModel, Generic[T]):
+          items: list[T] = Field(description="데이터 목록")
+          total: int = Field(description="전체 개수")
+          page: int = Field(description="현재 페이지")
+          pageSize: int = Field(description="페이지 크기")
+          totalPages: int = Field(description="전체 페이지 수")
+          hasNext: bool = Field(description="다음 페이지 존재")
+          hasPrev: bool = Field(description="이전 페이지 존재")
+
+      class SimpleProduct(BaseModel):
+          productId: str
+          name: str
+          price: float
+
+      sampleProducts = [
+          SimpleProduct(productId="P1", name="Product A", price=100),
+          SimpleProduct(productId="P2", name="Product B", price=200)
+      ]
+
+      paginatedResp = PaginatedResponse[SimpleProduct](
+          items=sampleProducts,
+          total=50,
+          page=1,
+          pageSize=20,
+          totalPages=3,
+          hasNext=True,
+          hasPrev=False
+      )
+      paginatedResp.model_dump()
+
+- id: error
+  title: 에러 응답
+  subtitle: 표준 에러 형식
+  blocks:
+  - type: text
+    content: "API 에러 응답도 일관된 형식으로 정의합니다. 에러 코드, 메시지, 상세 정보를 포함하면 클라이언트가 에러를 적절히 처리할 수 있습니다. FastAPI의 HTTPException과 함께 사용하면 표준화된 에러 응답을 반환할 수 있습니다."
+  - type: code
+    language: python
+    title: 에러 응답 모델
+    description: 표준 형식
+    content: |-
+      class ErrorDetail(BaseModel):
+          field: str = Field(description="에러 필드")
+          message: str = Field(description="에러 메시지")
+          code: str = Field(description="에러 코드")
+
+      class ErrorResponse(BaseModel):
+          success: bool = False
+          error: str = Field(description="에러 타입")
+          message: str = Field(description="에러 설명")
+          details: list[ErrorDetail] = Field(default=[], description="상세 에러")
+          timestamp: datetime = Field(default_factory=datetime.now)
+
+      errorResp = ErrorResponse(
+          error="VALIDATION_ERROR",
+          message="입력 데이터 검증 실패",
+          details=[
+              ErrorDetail(field="email", message="유효한 이메일 형식이 아닙니다", code="invalid_format"),
+              ErrorDetail(field="password", message="8자 이상이어야 합니다", code="too_short")
+          ]
+      )
+      errorResp.model_dump_json(indent=2)
+
+- id: nested
+  title: 중첩 API 모델
+  subtitle: 복잡한 요청/응답
+  blocks:
+  - type: text
+    content: "실제 API는 중첩된 복잡한 구조를 가집니다. 주문 생성 요청에는 여러 상품, 배송지, 결제 정보가 포함됩니다. 이런 중첩 구조도 Pydantic 모델로 정의하면 전체가 자동으로 검증됩니다."
+  - type: code
+    language: python
+    title: 주문 요청 모델
+    description: 중첩 구조
+    content: |-
+      class OrderItemRequest(BaseModel):
+          productId: str
+          quantity: int = Field(ge=1)
+          note: Optional[str] = None
+
+      class ShippingAddress(BaseModel):
+          recipientName: str
+          phone: str
+          address: str
+          zipCode: str
+
+      class CreateOrderRequest(BaseModel):
+          items: list[OrderItemRequest] = Field(min_length=1)
+          shippingAddress: ShippingAddress
+          paymentMethod: Literal["card", "bank", "cash"]
+          couponCode: Optional[str] = None
+
+      orderRequest = CreateOrderRequest(
+          items=[
+              {"productId": "P001", "quantity": 2},
+              {"productId": "P002", "quantity": 1, "note": "선물포장"}
+          ],
+          shippingAddress={
+              "recipientName": "홍길동",
+              "phone": "010-1234-5678",
+              "address": "서울시 강남구 테헤란로 123",
+              "zipCode": "06234"
+          },
+          paymentMethod="card"
+      )
+      orderRequest.model_dump()
+
+- id: filter
+  title: 응답 필터링
+  subtitle: include/exclude
+  blocks:
+  - type: text
+    content: "상황에 따라 응답에서 특정 필드만 포함하거나 제외해야 할 때가 있습니다. 공개 프로필은 최소 정보만, 관리자 뷰는 전체 정보를 반환하는 식입니다. model_dump의 include/exclude 옵션으로 유연하게 제어할 수 있습니다."
+  - type: code
+    language: python
+    title: 필드 필터링
+    description: 조건부 응답
+    content: |-
+      class FullUserProfile(BaseModel):
+          userId: str
+          username: str
+          email: str
+          phone: str
+          address: str
+          birthDate: str
+          createdAt: datetime
+          lastLoginAt: Optional[datetime] = None
+          isAdmin: bool = False
+
+      fullProfile = FullUserProfile(
+          userId="U001",
+          username="alice",
+          email="alice@example.com",
+          phone="010-1234-5678",
+          address="서울시 강남구",
+          birthDate="1990-01-15",
+          createdAt="2024-01-01T00:00:00",
+          lastLoginAt="2024-03-15T10:30:00",
+          isAdmin=False
+      )
+
+      publicView = fullProfile.model_dump(include={"userId", "username"})
+      basicView = fullProfile.model_dump(include={"userId", "username", "email", "createdAt"})
+      publicView, basicView
+
+- id: computed
+  title: 계산 필드 응답
+  subtitle: computed_field
+  blocks:
+  - type: text
+    content: "응답에 계산된 값을 포함하려면 computed_field를 사용합니다. 장바구니 총액, 주문 상태 텍스트, 사용자 등급 등 다른 필드에서 계산되는 값을 자동으로 직렬화에 포함시킬 수 있습니다."
+  - type: code
+    language: python
+    title: 장바구니 응답
+    description: 계산 필드
+    content: |-
+      class CartItem(BaseModel):
+          productId: str
+          productName: str
+          unitPrice: float
+          quantity: int
+
+          @computed_field
+          @property
+          def subtotal(self) -> float:
+              return self.unitPrice * self.quantity
+
+      class CartResponse(BaseModel):
+          cartId: str
+          items: list[CartItem]
+
+          @computed_field
+          @property
+          def totalAmount(self) -> float:
+              return sum(item.subtotal for item in self.items)
+
+          @computed_field
+          @property
+          def itemCount(self) -> int:
+              return sum(item.quantity for item in self.items)
+
+      cart = CartResponse(
+          cartId="CART-001",
+          items=[
+              CartItem(productId="P1", productName="노트북", unitPrice=1000000, quantity=1),
+              CartItem(productId="P2", productName="마우스", unitPrice=50000, quantity=2)
+          ]
+      )
+      cart.model_dump()
+
+- id: result
+  title: 완전한 API 모델 세트
+  subtitle: 종합 설계
+  blocks:
+  - type: text
+    content: "지금까지 배운 모든 패턴을 종합하여 실제 서비스에서 사용할 수 있는 완전한 API 모델 세트를 완성합니다. 성공/실패 응답 래퍼, 상태 Enum, 중첩 모델까지 모두 포함합니다."
+  - type: code
+    language: python
+    title: 성공 응답 래퍼
+    description: 표준 응답 형식
+    content: |-
+      class ApiResponse(BaseModel, Generic[T]):
+          success: bool = True
+          data: T
+          timestamp: datetime = Field(default_factory=datetime.now)
+
+      successResp = ApiResponse[UserResponse](data=userResp)
+      successResp.model_dump_json(indent=2)[:300]
+  - type: code
+    language: python
+    title: 상태 Enum
+    description: 주문 상태
+    content: |-
+      class OrderStatus(str, Enum):
+          PENDING = "pending"
+          CONFIRMED = "confirmed"
+          SHIPPING = "shipping"
+          DELIVERED = "delivered"
+          CANCELLED = "cancelled"
+
+      class OrderResponse(BaseModel):
+          orderId: str
+          status: OrderStatus
+          totalAmount: float
+          createdAt: datetime
+
+          @computed_field
+          @property
+          def statusText(self) -> str:
+              texts = {
+                  "pending": "주문 대기",
+                  "confirmed": "주문 확인",
+                  "shipping": "배송 중",
+                  "delivered": "배송 완료",
+                  "cancelled": "주문 취소"
+              }
+              return texts.get(self.status.value, self.status.value)
+
+      orderResp = OrderResponse(
+          orderId="ORD-001",
+          status=OrderStatus.SHIPPING,
+          totalAmount=1100000,
+          createdAt="2024-03-15T10:00:00"
+      )
+      orderResp.model_dump()
+
+- id: practice
+  title: 실습
+  subtitle: API 모델 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 요청/응답 모델, CRUD 패턴, 페이지네이션, 에러 응답, computed_field를 활용하여 완전한 API 모델을 설계합니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 블로그 API"
+    blocks:
+    - type: code
+      title: 블로그 모델
+      content: |-
+        from pydantic import BaseModel, Field, computed_field
+        from typing import Optional, Literal
+        from datetime import datetime
+
+        class AuthorInfo(BaseModel):
+            authorId: str
+            name: str
+            avatarUrl: Optional[str] = None
+
+        class PostBase(BaseModel):
+            title: str = Field(min_length=1, max_length=200)
+            content: str = Field(min_length=10)
+            tags: list[str] = Field(default=[])
+
+        class CreatePostRequest(PostBase):
+            status: Literal["draft", "published"] = "draft"
+
+        class UpdatePostRequest(BaseModel):
+            title: Optional[str] = Field(default=None, min_length=1, max_length=200)
+            content: Optional[str] = Field(default=None, min_length=10)
+            tags: Optional[list[str]] = None
+            status: Optional[Literal["draft", "published"]] = None
+
+        class PostResponse(PostBase):
+            postId: str
+            author: AuthorInfo
+            status: str
+            viewCount: int = 0
+            likeCount: int = 0
+            createdAt: datetime
+            updatedAt: Optional[datetime] = None
+
+            @computed_field
+            @property
+            def isPublished(self) -> bool:
+                return self.status == "published"
+
+        createReq = CreatePostRequest(
+            title="Pydantic 가이드",
+            content="Pydantic은 Python 데이터 검증 라이브러리입니다...",
+            tags=["python", "pydantic"],
+            status="published"
+        )
+        createReq.model_dump()
+    - type: code
+      title: 블로그 응답 생성
+      content: |-
+        postResp = PostResponse(
+            postId="POST-001",
+            title="Pydantic 가이드",
+            content="Pydantic은 Python 데이터 검증 라이브러리입니다...",
+            tags=["python", "pydantic"],
+            author=AuthorInfo(authorId="A001", name="Alice"),
+            status="published",
+            viewCount=150,
+            likeCount=25,
+            createdAt="2024-03-15T10:00:00"
+        )
+        postSummary = {
+            "postId": postResp.postId,
+            "title": postResp.title,
+            "isPublished": postResp.isPublished,
+            "engagement": postResp.viewCount + postResp.likeCount
+        }
+        postSummary
+  - type: expansion
+    title: "미션2: E-커머스 주문"
+    blocks:
+    - type: code
+      title: 주문 모델
+      content: |-
+        from pydantic import BaseModel, Field, computed_field
+        from typing import Optional, Literal
+        from datetime import datetime
+        from enum import Enum
+
+        class PaymentStatus(str, Enum):
+            PENDING = "pending"
+            PAID = "paid"
+            FAILED = "failed"
+            REFUNDED = "refunded"
+
+        class OrderItemResponse(BaseModel):
+            productId: str
+            productName: str
+            unitPrice: float
+            quantity: int
+
+            @computed_field
+            @property
+            def lineTotal(self) -> float:
+                return self.unitPrice * self.quantity
+
+        class OrderSummary(BaseModel):
+            orderId: str
+            userId: str
+            items: list[OrderItemResponse]
+            shippingFee: float = 0
+            discount: float = 0
+            paymentStatus: PaymentStatus
+            createdAt: datetime
+
+            @computed_field
+            @property
+            def subtotal(self) -> float:
+                return sum(item.lineTotal for item in self.items)
+
+            @computed_field
+            @property
+            def finalAmount(self) -> float:
+                return self.subtotal + self.shippingFee - self.discount
+
+        orderData = OrderSummary(
+            orderId="ORD-2024-001",
+            userId="U100",
+            items=[
+                OrderItemResponse(productId="P1", productName="노트북", unitPrice=1200000, quantity=1),
+                OrderItemResponse(productId="P2", productName="마우스", unitPrice=50000, quantity=2)
+            ],
+            shippingFee=3000,
+            discount=50000,
+            paymentStatus=PaymentStatus.PAID,
+            createdAt="2024-03-15T14:30:00"
+        )
+        orderData.model_dump()
+    - type: code
+      title: 주문 요약
+      content: |-
+        orderSummaryView = {
+            "orderId": orderData.orderId,
+            "itemCount": len(orderData.items),
+            "subtotal": orderData.subtotal,
+            "shipping": orderData.shippingFee,
+            "discount": orderData.discount,
+            "final": orderData.finalAmount,
+            "status": orderData.paymentStatus.value
+        }
+        orderSummaryView

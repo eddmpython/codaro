@@ -1,0 +1,404 @@
+meta:
+  id: networkx_05
+  title: 소셜네트워크분석
+  order: 5
+  category: networkx
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["networkx", "소셜네트워크", "가라테클럽", "클러스터링", "삼각형"]
+  seo:
+    title: "NetworkX 소셜 네트워크 분석 - 가라테 클럽"
+    description: "NetworkX로 유명한 가라테 클럽 네트워크를 분석합니다. 클러스터링 계수, 삼각형, 소셜 네트워크 구조를 배웁니다."
+    keywords: ["networkx", "소셜네트워크", "karate", "클러스터링", "transitivity"]
+
+intro:
+  emoji: "🥋"
+  goal: 가라테 클럽 네트워크로 소셜 네트워크 분석을 실습합니다.
+  description: 가라테 클럽 네트워크는 네트워크 과학에서 가장 유명한 데이터셋입니다. 34명의 회원 간 친분 관계를 나타냅니다. 클러스터링 계수, 삼각형, 네트워크 밀도 등 소셜 네트워크의 특성을 분석합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NetworkX와 matplotlib을 불러옵니다. 소셜 네트워크 분석(SNA)은 사람들 간의 관계를 네트워크로 모델링하여 사회 구조를 이해하는 학문입니다. 누가 영향력이 있는지, 그룹이 어떻게 형성되는지, 정보가 어떻게 퍼지는지 등을 분석합니다. 이 장에서는 네트워크 과학에서 가장 유명한 데이터셋인 가라테 클럽을 분석합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: networkx와 matplotlib을 불러옵니다
+    content: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+- id: step2_karate
+  title: 2단계. 가라테 클럽 데이터
+  subtitle: karate_club_graph()
+  blocks:
+  - type: text
+    content: karate_club_graph()는 1977년 사회학자 Wayne Zachary가 연구한 실제 가라테 클럽의 사회적 관계망입니다. 34명의 회원과 78개의 친분 관계로 구성됩니다. 이 클럽은 회장(Officer)과 교관(Mr. Hi) 사이의 갈등으로 결국 두 그룹으로 분리되었는데, Zachary는 네트워크 구조만으로 이 분열을 예측할 수 있음을 보여주었습니다. 커뮤니티 탐지 알고리즘의 벤치마크로 널리 사용됩니다.
+  - type: code
+    language: python
+    title: 데이터 로드
+    description: 내장 가라테 클럽 그래프
+    content: |-
+      karate = nx.karate_club_graph()
+      numNodes = karate.number_of_nodes()
+      numEdges = karate.number_of_edges()
+      numNodes, numEdges
+  - type: code
+    language: python
+    title: 노드 정보
+    description: 노드 속성 확인
+    content: |-
+      nodeData = list(karate.nodes(data=True))[:5]
+      nodeData
+  - type: tip
+    content: 가라테 클럽은 내부 갈등으로 두 그룹으로 분리되었습니다. 'club' 속성이 'Mr. Hi' 또는 'Officer'로 실제 분리 결과를 나타냅니다.
+
+- id: step3_visualize
+  title: 3단계. 네트워크 시각화
+  subtitle: 그룹별 색상
+  blocks:
+  - type: text
+    content: 실제로 분리된 두 그룹을 다른 색으로 시각화합니다. 각 노드의 'club' 속성에는 분열 후 각 회원이 어느 그룹에 속했는지가 기록되어 있습니다. Mr. Hi 그룹은 교관을 따라간 회원들, Officer 그룹은 회장을 따라간 회원들입니다. 시각화를 통해 두 그룹이 네트워크 구조에서도 자연스럽게 분리되어 있음을 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 그룹별 색상
+    description: Mr. Hi vs Officer
+    content: |-
+      clubs = [karate.nodes[n]['club'] for n in karate.nodes()]
+      colorMap = ['skyblue' if c == 'Mr. Hi' else 'salmon' for c in clubs]
+
+      posKarate = nx.spring_layout(karate, seed=42)
+      fig1, ax1 = plt.subplots(figsize=(10, 8))
+      nx.draw(karate, pos=posKarate, with_labels=True, node_color=colorMap,
+              node_size=500, font_size=9, ax=ax1)
+      ax1.set_title('Zachary Karate Club Network')
+      fig1
+  - type: tip
+    content: 노드 0(Mr. Hi)과 노드 33(Officer)이 각 그룹의 리더입니다. 이들 주변에 각 그룹이 형성되어 있습니다.
+
+- id: step4_basic_stats
+  title: 4단계. 기본 통계
+  subtitle: 네트워크 특성
+  blocks:
+  - type: text
+    content: 네트워크의 기본 통계량을 계산합니다. 밀도(density)는 가능한 모든 연결 중 실제 연결의 비율로, 네트워크가 얼마나 촘촘한지를 나타냅니다. 평균 차수는 회원당 평균 친구 수입니다. 이런 기본 통계량은 네트워크의 전반적인 특성을 빠르게 파악하는 데 유용합니다.
+  - type: code
+    language: python
+    title: 네트워크 밀도
+    description: 가능한 엣지 대비 실제 엣지
+    content: |-
+      density = nx.density(karate)
+      density
+  - type: code
+    language: python
+    title: 평균 차수
+    description: 평균 친구 수
+    content: |-
+      degrees = [d for n, d in karate.degree()]
+      avgDegree = sum(degrees) / len(degrees)
+      avgDegree
+  - type: code
+    language: python
+    title: 차수 분포
+    description: 최소, 최대 차수
+    content: |-
+      minDeg = min(degrees)
+      maxDeg = max(degrees)
+      minDeg, maxDeg
+  - type: tip
+    content: 밀도는 0~1 사이 값입니다. 완전 그래프는 1, 엣지가 없으면 0입니다. 소셜 네트워크는 보통 낮은 밀도를 가집니다.
+
+- id: step5_clustering
+  title: 5단계. 클러스터링 계수
+  subtitle: clustering()
+  blocks:
+  - type: text
+    content: 클러스터링 계수(Clustering Coefficient)는 노드의 이웃들이 서로 연결된 정도를 측정합니다. "내 친구의 친구가 내 친구이기도 한가?"라는 질문에 대한 답입니다. 소셜 네트워크에서는 이 현상이 자주 발생하는데, 같은 동아리 멤버들끼리 서로 아는 경우가 많은 것과 같습니다. 클러스터링 계수가 1이면 모든 이웃이 서로 연결되어 있음을 의미합니다.
+  - type: code
+    language: python
+    title: 노드별 클러스터링
+    description: 각 노드의 클러스터링 계수
+    content: |-
+      clustering = nx.clustering(karate)
+      clusteringList = [(n, round(c, 3)) for n, c in clustering.items()]
+      clusteringList[:10]
+  - type: code
+    language: python
+    title: 평균 클러스터링
+    description: 전체 네트워크 평균
+    content: |-
+      avgClustering = nx.average_clustering(karate)
+      avgClustering
+  - type: code
+    language: python
+    title: 최고 클러스터링
+    description: 가장 밀집된 이웃 구조
+    content: |-
+      maxClustNode = max(clustering, key=clustering.get)
+      maxClustValue = clustering[maxClustNode]
+      maxClustNode, maxClustValue
+  - type: tip
+    content: 클러스터링 계수 1은 이웃들이 모두 서로 연결됨을 의미합니다. 소셜 네트워크는 높은 클러스터링을 보이는 경향이 있습니다.
+
+- id: step6_triangles
+  title: 6단계. 삼각형
+  subtitle: triangles()
+  blocks:
+  - type: text
+    content: 삼각형은 세 노드가 모두 서로 연결된 완전 부분그래프입니다. A가 B를 알고, B가 C를 알고, C가 A를 알면 삼각형이 형성됩니다. 소셜 네트워크에서 삼각형이 많다는 것은 긴밀한 커뮤니티가 존재함을 의미합니다. 이행성(transitivity)은 네트워크 전체에서 삼각형 형성 경향을 측정하며, 높은 이행성은 사회적 응집력이 강함을 나타냅니다.
+  - type: code
+    language: python
+    title: 노드별 삼각형 수
+    description: 각 노드가 속한 삼각형
+    content: |-
+      triangles = nx.triangles(karate)
+      trianglesList = [(n, t) for n, t in triangles.items()]
+      trianglesList[:10]
+  - type: code
+    language: python
+    title: 전체 삼각형 수
+    description: 네트워크의 총 삼각형
+    content: |-
+      totalTriangles = sum(triangles.values()) // 3
+      totalTriangles
+  - type: code
+    language: python
+    title: 이행성
+    description: transitivity
+    content: |-
+      transitivity = nx.transitivity(karate)
+      transitivity
+  - type: tip
+    content: 이행성(transitivity)은 "연결된 두 노드가 공통 이웃을 가질 확률"입니다. 삼각형 수와 연결된 트리플 수의 비율입니다.
+
+- id: step7_centrality
+  title: 7단계. 주요 인물 찾기
+  subtitle: 중심성 분석
+  blocks:
+  - type: text
+    content: 가라테 클럽에서 가장 영향력 있는 회원을 중심성 분석으로 찾습니다. 연결 중심성은 친구가 많은 인기 있는 회원을, 매개 중심성은 서로 다른 그룹 사이를 연결하는 중재자 역할의 회원을 찾아냅니다. 노드 0(Mr. Hi)과 노드 33(Officer)이 두 리더로, 이들이 각 그룹에서 높은 중심성을 보입니다.
+  - type: code
+    language: python
+    title: 연결 중심성
+    description: 친구가 많은 사람
+    content: |-
+      degCent = nx.degree_centrality(karate)
+      topDeg = sorted(degCent.items(), key=lambda x: x[1], reverse=True)[:5]
+      topDeg
+  - type: code
+    language: python
+    title: 매개 중심성
+    description: 다리 역할하는 사람
+    content: |-
+      betCent = nx.betweenness_centrality(karate)
+      topBet = sorted(betCent.items(), key=lambda x: x[1], reverse=True)[:5]
+      topBet
+  - type: code
+    language: python
+    title: 리더 확인
+    description: 노드 0과 33
+    content: |-
+      leader0 = degCent[0], betCent[0]
+      leader33 = degCent[33], betCent[33]
+      leader0, leader33
+  - type: tip
+    content: 노드 0(Mr. Hi)과 노드 33(Officer)이 모두 높은 중심성을 가집니다. 두 리더 사이의 갈등이 클럽 분리의 원인이었습니다.
+
+- id: step8_path_analysis
+  title: 8단계. 경로 분석
+  subtitle: 두 리더 사이
+  blocks:
+  - type: text
+    content: 두 리더(노드 0 - Mr. Hi, 노드 33 - Officer) 사이의 관계를 상세히 분석합니다. 흥미롭게도 두 리더는 직접 연결되어 있고 공통 친구도 있습니다. 그럼에도 불구하고 클럽이 분열된 것은 단순한 연결보다 깊은 사회적 역학이 작용했음을 시사합니다. 경로 분석을 통해 두 리더 간의 거리와 중간 매개자를 파악합니다.
+  - type: code
+    language: python
+    title: 최단 경로
+    description: 0에서 33까지
+    content: |-
+      pathLeaders = nx.shortest_path(karate, 0, 33)
+      pathLeaders
+  - type: code
+    language: python
+    title: 경로 길이
+    description: 몇 다리 건너
+    content: |-
+      distLeaders = nx.shortest_path_length(karate, 0, 33)
+      distLeaders
+  - type: code
+    language: python
+    title: 공통 친구
+    description: 두 리더의 공통 이웃
+    content: |-
+      neighbors0 = set(karate.neighbors(0))
+      neighbors33 = set(karate.neighbors(33))
+      commonFriends = neighbors0 & neighbors33
+      commonFriends
+  - type: tip
+    content: 두 리더가 직접 연결되어 있고 공통 친구도 있습니다. 그럼에도 갈등으로 클럽이 분리되었습니다.
+
+- id: step9_group_analysis
+  title: 9단계. 그룹 분석
+  subtitle: 두 그룹 비교
+  blocks:
+  - type: text
+    content: Mr. Hi 그룹과 Officer 그룹의 구조적 특성을 비교합니다. 각 그룹 내부의 밀도를 계산하면 그룹 내 결속력을 알 수 있습니다. 또한 두 그룹 사이를 연결하는 엣지 수를 파악하면 분열 전에 얼마나 많은 교류가 있었는지 알 수 있습니다. 그룹 내 밀도가 그룹 간 연결보다 높다면, 이는 자연스러운 커뮤니티 구조가 존재함을 의미합니다.
+  - type: code
+    language: python
+    title: 그룹 분리
+    description: 노드를 그룹별로 분류
+    content: |-
+      hiGroup = [n for n in karate.nodes() if karate.nodes[n]['club'] == 'Mr. Hi']
+      officerGroup = [n for n in karate.nodes() if karate.nodes[n]['club'] == 'Officer']
+      len(hiGroup), len(officerGroup)
+  - type: code
+    language: python
+    title: 그룹 내 밀도
+    description: 각 그룹 내부 연결 밀도
+    content: |-
+      hiSubgraph = karate.subgraph(hiGroup)
+      officerSubgraph = karate.subgraph(officerGroup)
+
+      hiDensity = nx.density(hiSubgraph)
+      officerDensity = nx.density(officerSubgraph)
+      hiDensity, officerDensity
+  - type: code
+    language: python
+    title: 그룹 간 엣지
+    description: 두 그룹 사이 연결
+    content: |-
+      betweenEdges = [(u, v) for u, v in karate.edges()
+                      if (u in hiGroup and v in officerGroup) or
+                         (u in officerGroup and v in hiGroup)]
+      len(betweenEdges)
+  - type: tip
+    content: 그룹 내 밀도가 그룹 간 연결보다 높습니다. 이것이 커뮤니티 구조의 특징입니다.
+
+- id: step10_clustering_viz
+  title: 10단계. 클러스터링 시각화
+  subtitle: 종합 시각화
+  blocks:
+  - type: text
+    content: 클러스터링 계수와 중심성을 결합하여 종합적으로 시각화합니다. 노드 크기를 연결 중심성에 비례하게 하면 영향력 있는 회원이 크게 표시됩니다. 색상으로 그룹이나 클러스터링 계수를 표현하면 네트워크 구조와 커뮤니티 특성을 한눈에 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 종합 시각화
+    description: 크기=연결, 색상=그룹
+    content: |-
+      nodeSizes = [1500 * degCent[n] for n in karate.nodes()]
+
+      fig2, ax2 = plt.subplots(figsize=(12, 9))
+      nx.draw(karate, pos=posKarate, with_labels=True, node_color=colorMap,
+              node_size=nodeSizes, font_size=8, edge_color='lightgray', ax=ax2)
+      ax2.set_title('Karate Club: Size=Degree, Color=Group')
+      fig2
+  - type: code
+    language: python
+    title: 클러스터링 색상
+    description: 클러스터링 계수로 색상
+    content: |-
+      clusterColors = [clustering[n] for n in karate.nodes()]
+
+      fig3, ax3 = plt.subplots(figsize=(12, 9))
+      nodes = nx.draw_networkx_nodes(karate, pos=posKarate, node_color=clusterColors,
+                                      cmap=plt.cm.YlOrRd, node_size=500, ax=ax3)
+      nx.draw_networkx_edges(karate, pos=posKarate, edge_color='lightgray', ax=ax3)
+      nx.draw_networkx_labels(karate, pos=posKarate, font_size=8, ax=ax3)
+      plt.colorbar(nodes, ax=ax3, label='Clustering Coefficient')
+      ax3.set_title('Karate Club: Clustering Coefficient')
+      fig3
+
+- id: practice
+  title: 실습
+  subtitle: 소셜 네트워크 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 소셜 네트워크 분석 기법을 활용하여 실전 미션을 수행해봅시다. 커뮤니티 경계에 있는 회원들을 찾아 분석하고, 클러스터링 계수와 연결 수의 관계를 탐구합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 커뮤니티 경계 분석"
+    blocks:
+    - type: code
+      title: 경계 노드 찾기
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        karateM = nx.karate_club_graph()
+
+        hiNodes = [n for n in karateM.nodes() if karateM.nodes[n]['club'] == 'Mr. Hi']
+        officerNodes = [n for n in karateM.nodes() if karateM.nodes[n]['club'] == 'Officer']
+
+        boundaryNodes = []
+        for n in karateM.nodes():
+            neighbors = set(karateM.neighbors(n))
+            if n in hiNodes:
+                if any(nb in officerNodes for nb in neighbors):
+                    boundaryNodes.append(n)
+            else:
+                if any(nb in hiNodes for nb in neighbors):
+                    boundaryNodes.append(n)
+        boundaryNodes
+    - type: code
+      title: 경계 노드 매개 중심성
+      content: |-
+        betCentM = nx.betweenness_centrality(karateM)
+        boundaryBet = {n: betCentM[n] for n in boundaryNodes}
+        sorted(boundaryBet.items(), key=lambda x: x[1], reverse=True)
+    - type: code
+      title: 경계 노드 시각화
+      content: |-
+        posM = nx.spring_layout(karateM, seed=42)
+        colorsM = []
+        for n in karateM.nodes():
+            if n in boundaryNodes:
+                colorsM.append('yellow')
+            elif karateM.nodes[n]['club'] == 'Mr. Hi':
+                colorsM.append('skyblue')
+            else:
+                colorsM.append('salmon')
+
+        figM, axM = plt.subplots(figsize=(10, 8))
+        nx.draw(karateM, pos=posM, with_labels=True, node_color=colorsM,
+                node_size=500, font_size=9, ax=axM)
+        axM.set_title('Boundary Nodes (Yellow)')
+        figM
+  - type: expansion
+    title: "미션2: 친밀도 분석"
+    blocks:
+    - type: code
+      title: 클러스터링 계수 분석
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        karateN = nx.karate_club_graph()
+
+        clusteringN = nx.clustering(karateN)
+        avgClust = nx.average_clustering(karateN)
+
+        highClust = [n for n, c in clusteringN.items() if c > avgClust]
+        lowClust = [n for n, c in clusteringN.items() if c <= avgClust]
+        len(highClust), len(lowClust)
+    - type: code
+      title: 클러스터링과 차수 관계
+      content: |-
+        highDegrees = [karateN.degree(n) for n in highClust]
+        lowDegrees = [karateN.degree(n) for n in lowClust]
+        avgHighDeg = sum(highDegrees) / len(highDegrees)
+        avgLowDeg = sum(lowDegrees) / len(lowDegrees)
+        avgHighDeg, avgLowDeg
+    - type: code
+      title: 클러스터링 시각화
+      content: |-
+        posN = nx.spring_layout(karateN, seed=42)
+        sizesN = [1000 * clusteringN[n] + 200 for n in karateN.nodes()]
+
+        figN, axN = plt.subplots(figsize=(10, 8))
+        nx.draw(karateN, pos=posN, with_labels=True, node_size=sizesN,
+                node_color='lightgreen', font_size=8, ax=axN)
+        axN.set_title('Node Size by Clustering Coefficient')
+        figN

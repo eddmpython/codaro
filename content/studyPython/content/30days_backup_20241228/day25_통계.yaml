@@ -1,0 +1,298 @@
+meta:
+  id: day25
+  title: 통계
+  day: 25
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 통계 - statistics"
+    description: "statistics 모듈로 통계를 계산하는 방법."
+    keywords: ['통계', 'statistics', '평균']
+intro:
+  emoji: "📊"
+  points:
+  - 통계학 기본 개념과 Python 라이브러리
+  - 중심경향성 - 평균, 중앙값, 최빈값
+  - 산포도 - 분산, 표준편차, 범위
+  - NumPy를 활용한 통계 분석
+  - 데이터 분석 실전 예제
+sections:
+- id: import_section
+  title: import 섹션
+  subtitle: 필요한 모듈 import
+  blocks:
+  - type: text
+    content: 통계 분석에 필요한 모듈을 import합니다. statistics는 파이썬 내장 통계 모듈이고, numpy는 수치 계산용 외부 라이브러리입니다. import는 day13에서 배운 개념으로, 외부 모듈의 기능을 사용하기 위해 불러오는 명령입니다. 모든 import는 파일 최상단에 한 번만 작성하며, 이후 섹션에서는 import 없이 바로 사용합니다.
+  - type: list
+    items:
+    - import statistics - 파이썬 내장 통계 모듈
+    - import numpy as np - 수치 계산 라이브러리
+    - 파일 최상단에 모든 import 작성
+    - 이후 섹션에서 import 재사용 금지
+    - numpy는 pip install numpy로 설치
+  - type: code
+    language: python
+    title: import 섹션
+    description: 통계 분석에 필요한 모듈을 import합니다.
+    content: |-
+      import statistics
+      import numpy as np
+
+- id: statistics_intro
+  title: 통계학 소개
+  subtitle: 데이터 분석의 기초
+  blocks:
+  - type: text
+    content: 통계학(Statistics)은 데이터를 수집, 분석, 해석하는 수학의 한 분야입니다. statistics는 영어로 '통계'라는 뜻이며, 라틴어 status(상태)에서 유래했습니다. 국가의 인구, 경제 상태를 파악하기 위해 시작된 학문입니다. 파이썬의 statistics 모듈은 평균, 중앙값, 표준편차 같은 기본 통계 함수를 제공하며, numpy는 더 빠르고 강력한 수치 계산 기능을 제공합니다. 데이터 분석의 첫 단계는 데이터의 중심과 퍼짐 정도를 파악하는 것입니다.
+  - type: list
+    items:
+    - 데이터 수집과 정리
+    - 중심경향성 측정 (평균, 중앙값, 최빈값)
+    - 산포도 측정 (분산, 표준편차)
+    - 상관관계 분석
+    - statistics와 numpy 활용
+  - type: code
+    language: python
+    title: 통계 기본 데이터
+    description: 통계 분석용 샘플 데이터를 생성합니다.
+    content: |-
+      introData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      introAges = [22, 25, 28, 30, 32, 35, 37, 40, 42, 45]
+
+      print(f"데이터: {introData}")
+      print(f"나이: {introAges}")
+  - type: tip
+    content: "statistics 모듈은 Python 내장 모듈이며, NumPy는 pip install numpy로 설치합니다."
+
+- id: central_tendency
+  title: 중심경향성 측정
+  subtitle: 평균, 중앙값, 최빈값
+  blocks:
+  - type: text
+    content: 중심경향성(Central Tendency)은 데이터의 중심값을 나타내는 통계량입니다. central은 '중심의', tendency는 '경향'이라는 뜻으로, 데이터가 어느 값을 중심으로 모여있는지를 나타냅니다. 평균(Mean)은 모든 값을 더해서 개수로 나눈 값이고, 중앙값(Median)은 데이터를 크기순으로 정렬했을 때 정중앙에 있는 값입니다. 최빈값(Mode)은 가장 자주 나타나는 값으로, mode는 '유행'이라는 뜻에서 유래했습니다. 평균은 극단값(이상치)의 영향을 많이 받지만, 중앙값은 이상치에 덜 민감합니다.
+  - type: list
+    items:
+    - "평균(Mean) - 모든 값의 합 / 개수"
+    - "중앙값(Median) - 정렬된 데이터의 중간값"
+    - "최빈값(Mode) - 가장 자주 나타나는 값"
+    - 이상치에 따른 영향도 차이
+    - statistics.mean(), median(), mode() 함수
+  - type: code
+    language: python
+    title: 중심경향성 계산하기
+    description: 평균, 중앙값, 최빈값을 계산합니다.
+    content: |-
+      centralScores = [85, 90, 78, 92, 88, 76, 95, 89, 87, 91, 88, 88]
+
+      centralMean = statistics.mean(centralScores)
+      centralMedian = statistics.median(centralScores)
+      centralMode = statistics.mode(centralScores)
+
+      print(f"점수 데이터: {centralScores}")
+      print(f"평균: {centralMean:.2f}")
+      print(f"중앙값: {centralMedian}")
+      print(f"최빈값: {centralMode}")
+
+      centralSorted = sorted(centralScores)
+      print(f"정렬된 점수: {centralSorted}")
+
+- id: variability
+  title: 산포도 측정
+  subtitle: 분산, 표준편차, 범위
+  blocks:
+  - type: text
+    content: 산포도(Variability)는 데이터가 얼마나 퍼져있는지를 나타내는 측정값입니다. variability는 '변동성'이라는 뜻으로, 데이터가 평균을 중심으로 얼마나 흩어져 있는지를 수치화합니다. 범위(Range)는 최댓값에서 최솟값을 뺀 값으로 가장 간단한 산포도입니다. 분산(Variance)은 각 데이터가 평균에서 떨어진 거리의 제곱을 평균낸 값입니다. 표준편차(Standard Deviation)는 분산의 제곱근으로, 원래 데이터와 같은 단위를 가져서 해석이 쉽습니다. 산포도가 클수록 데이터가 평균에서 멀리 퍼져있어 예측이 어렵습니다.
+  - type: list
+    items:
+    - "범위(Range) - 최댓값 - 최솟값"
+    - "분산(Variance) - 편차 제곱의 평균"
+    - "표준편차(Stdev) - 분산의 제곱근"
+    - 값이 클수록 데이터가 넓게 분포
+    - statistics.variance(), stdev() 함수
+  - type: code
+    language: python
+    title: 산포도 계산하기
+    description: 범위, 분산, 표준편차를 계산합니다.
+    content: |-
+      varGroupA = [75, 80, 85, 90, 95]
+      varGroupB = [60, 70, 85, 100, 110]
+
+      varRangeA = max(varGroupA) - min(varGroupA)
+      varRangeB = max(varGroupB) - min(varGroupB)
+
+      varVarianceA = statistics.variance(varGroupA)
+      varVarianceB = statistics.variance(varGroupB)
+
+      varStdevA = statistics.stdev(varGroupA)
+      varStdevB = statistics.stdev(varGroupB)
+
+      print("그룹 A vs 그룹 B 비교:")
+      print(f"평균: {statistics.mean(varGroupA):.1f} vs {statistics.mean(varGroupB):.1f}")
+      print(f"범위: {varRangeA} vs {varRangeB}")
+      print(f"분산: {varVarianceA:.2f} vs {varVarianceB:.2f}")
+      print(f"표준편차: {varStdevA:.2f} vs {varStdevB:.2f}")
+  - type: tip
+    content: "표준편차가 클수록 데이터가 평균에서 멀리 퍼져있습니다."
+
+- id: numpy_statistics
+  title: NumPy 통계 함수
+  subtitle: NumPy를 활용한 통계 분석
+  blocks:
+  - type: text
+    content: NumPy는 대규모 데이터의 통계 분석에 최적화되어 있습니다. numpy는 numerical python의 약자로, 수치 계산에 특화된 라이브러리입니다. statistics 모듈보다 빠르고 다양한 기능을 제공합니다. 분위수(percentile)는 데이터를 백분율로 나눈 기준점으로, 25% 분위수는 전체 데이터의 하위 25% 위치에 있는 값을 의미합니다. 50% 분위수는 중앙값과 같습니다. numpy는 배열(array) 자료구조를 사용하며, 리스트보다 메모리 효율이 좋고 계산이 빠릅니다.
+  - type: list
+    items:
+    - np.mean() - 평균
+    - np.std() - 표준편차
+    - np.percentile() - 분위수
+    - np.min(), np.max() - 최솟값, 최댓값
+    - np.array() - 배열 생성
+  - type: code
+    language: python
+    title: NumPy 통계 함수
+    description: NumPy로 통계를 계산합니다.
+    content: |-
+      npData = np.array([85, 90, 78, 92, 88, 76, 95, 89, 87, 91])
+
+      print(f"평균: {np.mean(npData):.2f}")
+      print(f"표준편차: {np.std(npData):.2f}")
+      print(f"최솟값: {np.min(npData)}")
+      print(f"최댓값: {np.max(npData)}")
+
+      print(f"25% 분위수: {np.percentile(npData, 25):.2f}")
+      print(f"50% 분위수: {np.percentile(npData, 50):.2f}")
+      print(f"75% 분위수: {np.percentile(npData, 75):.2f}")
+
+- id: correlation
+  title: 상관관계 분석
+  subtitle: 변수 간의 관계 분석
+  blocks:
+  - type: text
+    content: 상관관계(Correlation)는 두 변수 간의 선형적 관계 강도를 나타냅니다. correlation은 '상호관련성'이라는 뜻으로, 한 변수가 변할 때 다른 변수가 어떻게 변하는지를 측정합니다. 피어슨 상관계수는 -1부터 1까지의 값을 가지며, 1에 가까우면 강한 양의 상관관계(함께 증가), -1에 가까우면 강한 음의 상관관계(하나 증가, 하나 감소)입니다. 0에 가까우면 두 변수 간에 선형 관계가 없다는 뜻입니다. 공부시간과 시험점수는 양의 상관관계, 운동시간과 체지방률은 음의 상관관계를 가질 수 있습니다.
+  - type: list
+    items:
+    - "강한 양의 상관관계 (0.7~1.0)"
+    - "약한 양의 상관관계 (0.3~0.7)"
+    - "상관관계 없음 (-0.3~0.3)"
+    - "음의 상관관계 (-1.0~-0.3)"
+    - np.corrcoef() 함수 사용
+  - type: code
+    language: python
+    title: 상관관계 분석하기
+    description: 피어슨 상관계수를 계산합니다.
+    content: |-
+      corrStudyHours = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      corrTestScores = [50, 55, 65, 70, 75, 80, 85, 90, 95, 98]
+
+      corrHeights = [160, 165, 170, 175, 180, 185]
+      corrWeights = [50, 60, 70, 80, 90, 100]
+
+      corrStudyResult = np.corrcoef(corrStudyHours, corrTestScores)[0, 1]
+      corrHeightResult = np.corrcoef(corrHeights, corrWeights)[0, 1]
+
+      print(f"공부시간 vs 시험점수: {corrStudyResult:.3f}")
+      print(f"키 vs 몸무게: {corrHeightResult:.3f}")
+
+      def interpretCorr(r):
+          if r >= 0.7:
+              return "강한 양의 상관관계"
+          elif r >= 0.3:
+              return "약한 양의 상관관계"
+          elif r >= -0.3:
+              return "상관관계 없음"
+          else:
+              return "음의 상관관계"
+
+      print(f"해석: {interpretCorr(corrStudyResult)}")
+
+- id: practical_example
+  title: 실전 통계 분석
+  subtitle: 실제 데이터 분석 예제
+  blocks:
+  - type: text
+    content: 실제 데이터 분석에서는 데이터 탐색, 기술통계 계산, 해석의 순서로 진행됩니다. 기술통계(descriptive statistics)는 데이터의 특성을 요약하는 통계로, 평균, 표준편차, 범위 등이 포함됩니다. 여러 그룹을 비교할 때는 for 반복문과 딕셔너리를 활용하면 효율적입니다. 평균이 같아도 표준편차가 다르면 데이터의 분포가 다르므로, 여러 통계량을 종합적으로 고려해야 올바른 결론을 내릴 수 있습니다. 통계 분석은 단순히 수치를 계산하는 것이 아니라 그 의미를 해석하는 과정이 중요합니다.
+  - type: list
+    items:
+    - 데이터 탐색과 전처리
+    - 기술통계량 계산
+    - 그룹별 비교 분석
+    - 결과 해석과 결론 도출
+    - 딕셔너리와 반복문 활용
+  - type: code
+    language: python
+    title: 종합 통계 분석 예제
+    description: 3개 반의 성적 데이터를 분석합니다.
+    content: |-
+      practicalClassA = [85, 90, 78, 92, 88, 76, 95, 89, 87, 91]
+      practicalClassB = [82, 85, 79, 88, 84, 80, 90, 86, 83, 87]
+      practicalClassC = [70, 95, 65, 98, 72, 93, 68, 96, 74, 89]
+
+      practicalClasses = {'A반': practicalClassA, 'B반': practicalClassB, 'C반': practicalClassC}
+
+      print("=== 3개 반 성적 분석 ===\n")
+
+      for className, classScores in practicalClasses.items():
+          classMean = statistics.mean(classScores)
+          classStdev = statistics.stdev(classScores)
+          classRange = max(classScores) - min(classScores)
+
+          print(f"{className}:")
+          print(f"  평균: {classMean:.1f}점")
+          print(f"  표준편차: {classStdev:.1f}점")
+          print(f"  범위: {classRange}점")
+          print(f"  최고/최저: {max(classScores)}/{min(classScores)}점\n")
+
+- id: practice
+  title: 25일차 복습
+  subtitle: 통계 미션
+  blocks:
+  - type: text
+    content: 25일차에서 배운 통계를 복습하는 미션입니다.
+  - type: expansion
+    title: "미션1: 평균, 중앙값, 최빈값"
+    code: |-
+      mission1Data = [10, 20, 20, 30, 40, 50]
+      print(statistics.mean(mission1Data))
+      print(statistics.median(mission1Data))
+      print(statistics.mode(mission1Data))
+  - type: expansion
+    title: "미션2: 분산과 표준편차"
+    code: |-
+      mission2Data = [85, 90, 78, 92, 88]
+      print(statistics.variance(mission2Data))
+      print(statistics.stdev(mission2Data))
+  - type: expansion
+    title: "미션3: NumPy 기본 통계"
+    code: |-
+      mission3Data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+      print(np.mean(mission3Data))
+      print(np.std(mission3Data))
+      print(np.min(mission3Data), np.max(mission3Data))
+  - type: expansion
+    title: "미션4: 분위수 계산"
+    code: |-
+      mission4Data = np.array([10, 20, 30, 40, 50, 60, 70, 80, 90, 100])
+      print(np.percentile(mission4Data, 25))
+      print(np.percentile(mission4Data, 50))
+      print(np.percentile(mission4Data, 75))
+  - type: expansion
+    title: "미션5: 상관계수"
+    code: |-
+      mission5X = [1, 2, 3, 4, 5]
+      mission5Y = [2, 4, 6, 8, 10]
+      mission5Corr = np.corrcoef(mission5X, mission5Y)[0, 1]
+      print(f"상관계수: {mission5Corr:.3f}")
+  - type: expansion
+    title: "미션6: 수동 평균 계산"
+    code: |-
+      mission6Data = [10, 20, 30, 40, 50]
+      mission6ManualMean = sum(mission6Data) / len(mission6Data)
+      print(f"수동 평균: {mission6ManualMean}")
+  - type: expansion
+    title: "미션7: 범위 계산"
+    code: |-
+      mission7Data = [15, 25, 35, 45, 55, 65, 75]
+      mission7Range = max(mission7Data) - min(mission7Data)
+      print(f"범위: {mission7Range}")

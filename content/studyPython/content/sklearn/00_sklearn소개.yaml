@@ -1,0 +1,377 @@
+meta:
+  id: sklearn_00
+  title: sklearn소개
+  order: 0
+  category: sklearn
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags: ["scikit-learn", "머신러닝", "분류", "회귀", "클러스터링"]
+  seo:
+    title: "scikit-learn 입문 - Python 머신러닝의 표준"
+    description: "scikit-learn으로 분류, 회귀, 클러스터링을 시작하세요. 통일된 API로 다양한 ML 알고리즘을 쉽게 사용할 수 있습니다."
+    keywords: ["scikit-learn", "머신러닝", "분류", "회귀", "클러스터링", "예측"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "🤖"
+      title: "scikit-learn??"
+      subtitle: "Python 머신러닝의 표준 라이브러리"
+
+    - type: hero
+      emoji: "🎯"
+      title: "예측을 위한 라이브러리"
+      subtitle: "데이터에서 패턴을 학습하고 미래를 예측"
+      points:
+        - emoji: "📊"
+          title: "분류/회귀"
+        - emoji: "🔮"
+          title: "예측 모델링"
+        - emoji: "🎨"
+          title: "클러스터링"
+        - emoji: "⚙️"
+          title: "통일된 API"
+
+- id: what_is_sklearn
+  blocks:
+    - type: sectionHeader
+      title: "🤔 scikit-learn이 뭔가요?"
+      subtitle: "머신러닝을 쉽게 만드는 도구"
+
+    - type: note
+      style: info
+      title: "머신러닝이란?"
+      content: |-
+        머신러닝은 데이터에서 패턴을 학습하여 새로운 데이터를 예측하는 기술입니다. "이 이메일이 스팸인가?", "이 환자가 당뇨병일 확률은?", "이 집의 가격은 얼마일까?" 같은 질문에 답합니다. scikit-learn은 이런 머신러닝 알고리즘을 쉽게 사용할 수 있게 만든 Python 라이브러리입니다. fit/predict/transform이라는 일관된 인터페이스로 수십 개의 알고리즘을 동일한 방식으로 사용할 수 있습니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🏷️"
+          title: "분류 (Classification)"
+          description: "카테고리 예측 - 스팸/정상, 양성/악성"
+        - emoji: "📈"
+          title: "회귀 (Regression)"
+          description: "연속 값 예측 - 가격, 수량, 점수"
+        - emoji: "🎨"
+          title: "클러스터링 (Clustering)"
+          description: "비슷한 데이터 그룹화 - 고객 세분화"
+        - emoji: "📉"
+          title: "차원 축소 (Dimensionality)"
+          description: "특성 압축 - PCA, 시각화"
+
+- id: why_sklearn
+  blocks:
+    - type: sectionHeader
+      title: "🌟 왜 scikit-learn인가요?"
+      subtitle: "머신러닝 라이브러리 선택 이유"
+
+    - type: note
+      style: info
+      title: "산업 표준"
+      content: |-
+        scikit-learn은 가장 많이 사용되는 Python ML 라이브러리입니다. 수천 개의 기업과 연구기관에서 사용합니다. 문서화가 잘 되어 있고, 커뮤니티가 활발합니다. 취업 시장에서도 sklearn 경험은 필수입니다. TensorFlow, PyTorch 같은 딥러닝 프레임워크를 배우기 전에 sklearn으로 ML 기초를 다지는 것이 좋습니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🔄"
+          title: "통일된 API"
+          description: "fit(), predict(), transform() 일관된 인터페이스"
+        - emoji: "📚"
+          title: "풍부한 문서"
+          description: "예제, 튜토리얼, API 레퍼런스"
+        - emoji: "🧩"
+          title: "파이프라인"
+          description: "전처리 → 학습 → 평가 자동화"
+        - emoji: "⚡"
+          title: "최적화된 성능"
+          description: "NumPy, Cython 기반 고속 연산"
+        - emoji: "🛠️"
+          title: "다양한 도구"
+          description: "교차검증, 그리드서치, 특성선택"
+        - emoji: "🌐"
+          title: "Pyodide 지원"
+          description: "브라우저에서 바로 실행 가능"
+
+- id: statsmodels_vs_sklearn
+  blocks:
+    - type: sectionHeader
+      title: "🆚 statsmodels vs scikit-learn"
+      subtitle: "통계 분석과 머신러닝의 차이"
+
+    - type: compare
+      left:
+        title: "statsmodels"
+        subtitle: "통계적 추론"
+        icon: "📊"
+        color: "green"
+        items:
+          - "왜 이런 결과인지 이해"
+          - "p-value, 신뢰구간, 계수 해석"
+          - "가설 검정, 통계적 유의성"
+          - "단순하고 해석 가능한 모델"
+          - "논문, 리포트 작성"
+        infoBox: "선수 과목 - 통계적 기반 이해"
+      right:
+        title: "scikit-learn"
+        subtitle: "예측 정확도"
+        icon: "🤖"
+        color: "blue"
+        items:
+          - "얼마나 정확하게 예측하는지"
+          - "정확도, F1, MSE, ROC-AUC"
+          - "교차검증, 과적합 방지"
+          - "복잡한 앙상블 모델"
+          - "프로덕션 시스템 배포"
+        infoBox: "본 과목 - 예측 모델 구축"
+
+    - type: note
+      style: tip
+      title: "학습 순서가 중요합니다"
+      content: |-
+        statsmodels를 먼저 배운 이유가 있습니다. "왜 이 변수가 중요한지" 통계적으로 이해한 뒤에 "어떻게 예측을 최적화할지" 배우는 것이 올바른 순서입니다. 통계적 기반 없이 ML을 시작하면 모델이 블랙박스가 됩니다. statsmodels에서 배운 회귀 개념, R², p-value 해석 능력이 sklearn에서도 활용됩니다.
+
+- id: sklearn_workflow
+  blocks:
+    - type: sectionHeader
+      title: "🔄 scikit-learn 워크플로우"
+      subtitle: "데이터에서 예측까지"
+
+    - type: note
+      style: info
+      title: "일관된 5단계 프로세스"
+      content: |-
+        모든 sklearn 모델은 동일한 패턴을 따릅니다. 1) 데이터 분할: train_test_split으로 학습/테스트 분리. 2) 전처리: StandardScaler, LabelEncoder로 데이터 변환. 3) 모델 학습: model.fit(X_train, y_train). 4) 예측: model.predict(X_test). 5) 평가: accuracy_score, MSE 등으로 성능 측정. 이 패턴을 익히면 어떤 알고리즘이든 동일하게 적용할 수 있습니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "✂️"
+          title: "1. 데이터 분할"
+          description: "train_test_split으로 학습/테스트 분리"
+        - emoji: "🔧"
+          title: "2. 전처리"
+          description: "스케일링, 인코딩, 결측치 처리"
+        - emoji: "📚"
+          title: "3. 모델 학습"
+          description: "model.fit(X_train, y_train)"
+        - emoji: "🔮"
+          title: "4. 예측"
+          description: "model.predict(X_test)"
+        - emoji: "📊"
+          title: "5. 평가"
+          description: "accuracy, MSE, F1, ROC-AUC"
+        - emoji: "🔄"
+          title: "6. 개선"
+          description: "하이퍼파라미터 튜닝, 교차검증"
+
+- id: algorithms
+  blocks:
+    - type: sectionHeader
+      title: "🧠 주요 알고리즘"
+      subtitle: "scikit-learn이 제공하는 모델들"
+
+    - type: table
+      headers: ["유형", "알고리즘", "용도"]
+      rows:
+        - ["분류", "LogisticRegression", "이진/다중 분류 기본"]
+        - ["분류", "RandomForestClassifier", "앙상블, 특성 중요도"]
+        - ["분류", "GradientBoostingClassifier", "고성능 앙상블"]
+        - ["분류", "SVC", "서포트 벡터 머신"]
+        - ["회귀", "LinearRegression", "선형 회귀 기본"]
+        - ["회귀", "Ridge, Lasso", "정규화 회귀"]
+        - ["회귀", "RandomForestRegressor", "앙상블 회귀"]
+        - ["클러스터링", "KMeans", "K개 군집으로 분리"]
+        - ["클러스터링", "DBSCAN", "밀도 기반 군집화"]
+        - ["차원축소", "PCA", "주성분 분석"]
+        - ["전처리", "StandardScaler", "표준화"]
+        - ["전처리", "MinMaxScaler", "정규화 (0~1)"]
+
+    - type: note
+      style: tip
+      title: "알고리즘 선택 가이드"
+      content: |-
+        분류 문제라면 LogisticRegression으로 시작하세요. 성능이 부족하면 RandomForest, GradientBoosting 순으로 시도합니다. 회귀 문제는 LinearRegression 기본, 과적합 방지에는 Ridge/Lasso를 사용합니다. 클러스터링은 KMeans가 가장 직관적입니다. 어떤 알고리즘이든 fit/predict 패턴은 동일합니다.
+
+- id: key_concepts
+  blocks:
+    - type: sectionHeader
+      title: "🧩 핵심 개념"
+      subtitle: "ML을 이해하기 위한 필수 용어"
+
+    - type: featureCards
+      cards:
+        - emoji: "✂️"
+          title: "Train/Test Split"
+          description: "학습 데이터와 평가 데이터 분리"
+        - emoji: "📉"
+          title: "과적합 (Overfitting)"
+          description: "학습 데이터에만 너무 맞춰진 상태"
+        - emoji: "🔄"
+          title: "교차검증 (Cross-Validation)"
+          description: "데이터를 K개로 나눠 반복 검증"
+        - emoji: "⚙️"
+          title: "하이퍼파라미터"
+          description: "모델 외부에서 설정하는 값"
+        - emoji: "📊"
+          title: "특성 (Feature)"
+          description: "예측에 사용하는 입력 변수"
+        - emoji: "🎯"
+          title: "타겟 (Target)"
+          description: "예측하려는 출력 변수"
+
+- id: metrics
+  blocks:
+    - type: sectionHeader
+      title: "📋 평가 지표"
+      subtitle: "모델 성능을 측정하는 방법"
+
+    - type: table
+      headers: ["지표", "유형", "의미", "해석"]
+      rows:
+        - ["Accuracy", "분류", "정확도", "전체 중 맞춘 비율"]
+        - ["Precision", "분류", "정밀도", "양성 예측 중 실제 양성"]
+        - ["Recall", "분류", "재현율", "실제 양성 중 맞춘 비율"]
+        - ["F1 Score", "분류", "조화평균", "정밀도와 재현율의 균형"]
+        - ["ROC-AUC", "분류", "곡선 아래 면적", "1에 가까울수록 좋음"]
+        - ["MSE", "회귀", "평균제곱오차", "낮을수록 좋음"]
+        - ["RMSE", "회귀", "MSE의 제곱근", "원래 단위로 해석"]
+        - ["R²", "회귀", "결정계수", "1에 가까울수록 좋음"]
+
+    - type: note
+      style: info
+      title: "지표 선택 가이드"
+      content: |-
+        분류에서 클래스 불균형이 있다면 Accuracy보다 F1 Score를 사용하세요. 암 진단처럼 놓치면 안 되는 경우 Recall을 중시하고, 스팸 필터처럼 오탐이 문제면 Precision을 중시합니다. 회귀에서는 MSE가 기본이고, 해석 편의를 위해 RMSE를 사용합니다. R²는 모델 설명력을 보여줍니다.
+
+- id: preprocessing
+  blocks:
+    - type: sectionHeader
+      title: "🔧 전처리의 중요성"
+      subtitle: "좋은 예측은 좋은 데이터에서"
+
+    - type: note
+      style: info
+      title: "왜 전처리가 필요한가?"
+      content: |-
+        대부분의 ML 알고리즘은 숫자만 처리할 수 있습니다. 범주형 데이터(성별, 지역)는 숫자로 변환해야 합니다. 또한 특성 간 스케일이 다르면 일부 알고리즘이 제대로 작동하지 않습니다. 예를 들어 나이(0~100)와 수입(0~10000000)을 함께 사용하면 수입이 모델을 지배합니다. StandardScaler로 모든 특성을 같은 스케일로 맞추면 이 문제를 해결합니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "📏"
+          title: "StandardScaler"
+          description: "평균 0, 표준편차 1로 변환"
+        - emoji: "📐"
+          title: "MinMaxScaler"
+          description: "0~1 범위로 정규화"
+        - emoji: "🏷️"
+          title: "LabelEncoder"
+          description: "범주를 숫자로 변환"
+        - emoji: "📊"
+          title: "OneHotEncoder"
+          description: "범주를 이진 벡터로 변환"
+
+- id: pyodide_note
+  blocks:
+    - type: sectionHeader
+      title: "⚠️ Pyodide 환경 참고사항"
+      subtitle: "브라우저에서 실행 시 주의점"
+
+    - type: note
+      style: warning
+      title: "제한사항"
+      content: |-
+        이 강의는 브라우저 기반 Pyodide 환경에서 실행됩니다. 대부분의 sklearn 기능이 정상 작동하지만 몇 가지 제한이 있습니다. n_jobs=-1 (병렬 처리)은 WebAssembly 제한으로 작동하지 않습니다. 초기 로딩 시 약 10-20MB를 다운로드합니다. 대용량 데이터셋 처리는 브라우저 메모리 한계가 있을 수 있습니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "✅"
+          title: "정상 작동"
+          description: "LinearRegression, LogisticRegression, RandomForest, KMeans, PCA, StandardScaler"
+        - emoji: "⚠️"
+          title: "주의 필요"
+          description: "n_jobs=-1 → n_jobs=1로 변경 필요"
+        - emoji: "📦"
+          title: "설치 방법"
+          description: "await micropip.install('scikit-learn')"
+
+- id: projects_preview
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 앞으로 배울 내용"
+      subtitle: "10개 프로젝트로 마스터하기"
+
+    - type: table
+      headers: ["단계", "프로젝트", "배울 내용", "비즈니스 가치"]
+      rows:
+        - ["입문", "와인 품질 분류", "train_test_split, 다중분류, 스케일링", "품질 자동 분류"]
+        - ["입문", "유방암 진단", "이진분류, 정밀도/재현율, F1", "의료 진단 자동화"]
+        - ["기초", "당뇨병 진행도 예측", "LinearRegression, MSE, R²", "건강 위험도 예측"]
+        - ["기초", "주택 가격 예측", "다중특성 회귀, 교차검증", "부동산 가격 책정"]
+        - ["기초", "손글씨 숫자 인식", "이미지 분류, PCA 시각화", "OCR 기초"]
+        - ["중급", "고객 세분화", "KMeans, 엘보우, 실루엣", "마케팅 세분화"]
+        - ["중급", "소나 신호 분류", "RandomForest, 특성 중요도", "신호 탐지 자동화"]
+        - ["중급", "심장병 예측", "GradientBoosting, ROC-AUC", "건강 관리 시스템"]
+        - ["심화", "신호 탐지 최적화", "GridSearchCV, 하이퍼파라미터", "레이더 시스템"]
+        - ["심화", "종합 ML 파이프라인", "Pipeline, 모든 개념 종합", "실전 ML 시스템"]
+
+    - type: note
+      style: info
+      title: "프로젝트 기반 학습"
+      content: |-
+        각 프로젝트는 실제 데이터로 실제 문제를 해결합니다. 와인 품종 분류, 암 진단, 주택 가격 예측 등 현실적인 문제를 다룹니다. 프로젝트를 진행하면서 이전에 배운 개념을 반복 사용하고, 새로운 개념을 추가로 학습합니다. 10개 프로젝트를 완료하면 데이터에서 예측 모델을 구축하는 전체 워크플로우를 마스터하게 됩니다.
+
+- id: prerequisites
+  blocks:
+    - type: sectionHeader
+      title: "📋 선수 지식"
+      subtitle: "시작하기 전에 알아야 할 것"
+
+    - type: note
+      style: tip
+      title: "권장 선수 과목"
+      content: |-
+        pandas 기초 (데이터 로딩, 필터링, 그룹화), NumPy 기초 (배열 연산), statsmodels 기초 (회귀 개념, R² 해석)를 미리 학습하는 것을 권장합니다. 특히 statsmodels에서 배운 회귀 개념은 sklearn에서도 그대로 활용됩니다. Python 기본 문법(함수, 리스트, 딕셔너리)도 알아야 합니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🐼"
+          title: "pandas"
+          description: "DataFrame, 필터링, 그룹화"
+        - emoji: "🔢"
+          title: "NumPy"
+          description: "배열 연산, 인덱싱"
+        - emoji: "📊"
+          title: "statsmodels"
+          description: "회귀 개념, R², p-value"
+        - emoji: "🐍"
+          title: "Python 기초"
+          description: "함수, 리스트, 딕셔너리"
+
+- id: resources
+  blocks:
+    - type: sectionHeader
+      title: "📚 참고 자료"
+      subtitle: "더 깊이 공부하고 싶다면"
+
+    - type: links
+      items:
+        - text: scikit-learn 공식 문서
+          url: https://scikit-learn.org/
+          icon: "🔗"
+        - text: scikit-learn User Guide
+          url: https://scikit-learn.org/stable/user_guide.html
+          icon: "🔗"
+        - text: scikit-learn API Reference
+          url: https://scikit-learn.org/stable/modules/classes.html
+          icon: "🔗"
+        - text: scikit-learn Tutorials
+          url: https://scikit-learn.org/stable/tutorial/index.html
+          icon: "🔗"
+
+- id: next
+  blocks:
+    - type: hero
+      emoji: "👉"
+      title: "다음: 와인 품질 분류"
+      subtitle: "첫 번째 머신러닝 모델을 만들어봅니다"

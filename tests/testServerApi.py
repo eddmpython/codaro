@@ -6,7 +6,9 @@ from fastapi.testclient import TestClient
 
 import codaro.server as serverModule
 from codaro.document import createEmptyDocument
+from codaro.runtime import LocalEngine
 from codaro.server import createServerApp
+from codaro.system import packageOps
 
 
 def testLoadMissingDocument(tmp_path: Path) -> None:
@@ -54,6 +56,15 @@ def testKernelCreateAndExecute() -> None:
     result = execResponse.json()
     assert result["status"] == "done"
     assert "20" in result["data"]
+    assert result["stateDelta"]["added"] == [
+        {
+            "name": "x",
+            "typeName": "int",
+            "repr": "10",
+            "size": None,
+        }
+    ]
+    assert [event["eventType"] for event in result["events"]] == ["started", "display", "stateDelta", "finished"]
 
     varsResponse = client.get(f"/api/kernel/{sessionId}/variables")
     assert varsResponse.status_code == 200
@@ -93,6 +104,53 @@ def testKernelReset() -> None:
     client.delete(f"/api/kernel/{sessionId}")
 
 
+def testKernelSessionFileApi(tmp_path: Path) -> None:
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+    sessionId = client.post(
+        "/api/kernel/create",
+        json={"workingDirectory": str(tmp_path)},
+    ).json()["sessionId"]
+
+    writeResponse = client.post(
+        f"/api/kernel/{sessionId}/fs/write",
+        json={"path": "session-note.txt", "content": "hello session fs"},
+    )
+    assert writeResponse.status_code == 200
+
+    readResponse = client.post(
+        f"/api/kernel/{sessionId}/fs/read",
+        json={"path": "session-note.txt"},
+    )
+    assert readResponse.status_code == 200
+    assert readResponse.json()["content"] == "hello session fs"
+
+    existsResponse = client.post(
+        f"/api/kernel/{sessionId}/fs/exists",
+        json={"path": "session-note.txt"},
+    )
+    assert existsResponse.status_code == 200
+    assert existsResponse.json()["exists"] is True
+
+    client.delete(f"/api/kernel/{sessionId}")
+
+
+def testKernelSessionPackagesListUsesEngine(monkeypatch) -> None:
+    async def fakeListPackages(self):
+        del self
+        return [packageOps.PackageInfo(name="SessionPkg", version="1.0.0")]
+
+    monkeypatch.setattr(LocalEngine, "listPackages", fakeListPackages)
+    client = TestClient(createServerApp())
+    sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]
+
+    response = client.get(f"/api/kernel/{sessionId}/packages/list")
+
+    assert response.status_code == 200
+    assert response.json() == [{"name": "SessionPkg", "version": "1.0.0"}]
+
+    client.delete(f"/api/kernel/{sessionId}")
+
+
 def testFileSystemApi(tmp_path: Path) -> None:
     client = TestClient(createServerApp(workspaceRoot=tmp_path))
 
@@ -125,6 +183,37 @@ def testPackagesList() -> None:
     assert response.status_code == 200
     packages = response.json()
     assert len(packages) > 0
+
+
+def testFileSystemApiUsesWorkspaceEngine(monkeypatch, tmp_path: Path) -> None:
+    async def fakeWriteFile(self, path: str, content: str, *, encoding: str = "utf-8", createDirectories: bool = True):
+        del self, content, encoding, createDirectories
+        return str(tmp_path / f"engine-{Path(path).name}")
+
+    monkeypatch.setattr(LocalEngine, "writeFile", fakeWriteFile)
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+
+    response = client.post(
+        "/api/fs/write",
+        json={"path": "delegated.txt", "content": "engine path"},
+    )
+
+    assert response.status_code == 200
+    assert response.json()["path"] == str(tmp_path / "engine-delegated.txt")
+
+
+def testPackagesListUsesWorkspaceEngine(monkeypatch) -> None:
+    async def fakeListPackages(self):
+        del self
+        return [packageOps.PackageInfo(name="WorkspacePkg", version="9.9.9")]
+
+    monkeypatch.setattr(LocalEngine, "listPackages", fakeListPackages)
+    client = TestClient(createServerApp())
+
+    response = client.get("/api/packages/list")
+
+    assert response.status_code == 200
+    assert response.json() == [{"name": "WorkspacePkg", "version": "9.9.9"}]
 
 
 def testEnvironmentInfo() -> None:
@@ -357,12 +446,30 @@ def testKernelWebSocketExecuteAndVariables() -> None:
         })
 
         assert websocket.receive_json() == {"type": "status", "engineStatus": "busy"}
-        result = websocket.receive_json()
+        messages = []
+        while True:
+            message = websocket.receive_json()
+            messages.append(message)
+            if message["type"] == "result":
+                break
+
+        eventMessages = [message for message in messages if message["type"] == "executionEvent"]
+        result = messages[-1]
         assert result["type"] == "result"
         assert result["requestId"] == "req-1"
         assert result["blockId"] == "b1"
         assert result["status"] == "done"
         assert "42" in result["data"]
+        assert result["stateDelta"]["added"] == [
+            {
+                "name": "value",
+                "typeName": "int",
+                "repr": "42",
+                "size": None,
+            }
+        ]
+        assert [message["eventType"] for message in eventMessages] == ["started", "display", "stateDelta", "finished"]
+        assert eventMessages[1]["payload"] == {"outputType": "text", "data": "42"}
         assert websocket.receive_json() == {"type": "status", "engineStatus": "ready"}
 
         websocket.send_json({"type": "getVariables"})
@@ -388,11 +495,44 @@ def testKernelWebSocketReactiveAndReset() -> None:
         })
 
         assert websocket.receive_json() == {"type": "status", "engineStatus": "busy"}
-        first = websocket.receive_json()
-        second = websocket.receive_json()
+        messages = []
+        while True:
+            message = websocket.receive_json()
+            messages.append(message)
+            if message["type"] == "reactiveComplete":
+                break
+
+        resultMessages = [message for message in messages if message["type"] == "result"]
+        eventMessages = [message for message in messages if message["type"] == "executionEvent"]
+        first = resultMessages[0]
+        second = resultMessages[1]
         assert first["blockId"] == "b1"
+        assert first["stateDelta"]["added"] == [
+            {
+                "name": "x",
+                "typeName": "int",
+                "repr": "1",
+                "size": None,
+            }
+        ]
         assert second["blockId"] == "b2"
-        complete = websocket.receive_json()
+        assert second["stateDelta"]["added"] == [
+            {
+                "name": "y",
+                "typeName": "int",
+                "repr": "3",
+                "size": None,
+            }
+        ]
+        assert {(message["blockId"], message["eventType"]) for message in eventMessages} >= {
+            ("b1", "started"),
+            ("b1", "stateDelta"),
+            ("b1", "finished"),
+            ("b2", "started"),
+            ("b2", "stateDelta"),
+            ("b2", "finished"),
+        }
+        complete = messages[-1]
         assert complete == {
             "type": "reactiveComplete",
             "requestId": "req-reactive",

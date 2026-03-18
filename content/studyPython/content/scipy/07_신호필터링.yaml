@@ -1,0 +1,448 @@
+meta:
+  id: scipy_07
+  title: 신호필터링
+  order: 7
+  category: scipy
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["scipy.signal", "필터", "butter", "filtfilt", "노이즈제거"]
+  seo:
+    title: "scipy.signal 필터링 - 노이즈 제거와 신호 처리"
+    description: "scipy.signal로 신호에서 노이즈를 제거합니다. 버터워스 필터, 저역통과, 고역통과 필터를 배웁니다."
+    keywords: ["scipy", "signal", "filter", "butter", "노이즈제거"]
+
+intro:
+  emoji: "🔊"
+  goal: scipy.signal로 신호에서 노이즈를 제거하고 원하는 주파수 성분을 추출합니다.
+  description: 센서 데이터, 오디오 신호, 생체신호에서 노이즈를 제거하는 디지털 필터를 설계하고 적용합니다. 버터워스 필터를 중심으로 저역통과, 고역통과, 대역통과 필터를 배웁니다.
+
+sections:
+- id: load
+  title: 데이터 로드
+  subtitle: 노이즈가 섞인 신호
+  blocks:
+  - type: text
+    content: 디지털 신호 처리(DSP)에서 필터는 특정 주파수 대역을 통과시키거나 제거합니다. 이 프로젝트에서는 5Hz 사인파에 고주파 노이즈가 섞인 신호를 생성하고, 필터링으로 원래 신호를 복원합니다. 실제 센서 데이터나 생체신호 분석에서 필수적인 기술입니다.
+  - type: code
+    language: python
+    title: 라이브러리 및 신호 생성
+    description: 깨끗한 신호 + 노이즈
+    content: |-
+      import micropip
+      await micropip.install('scipy')
+
+      import numpy as np
+      from scipy import signal
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      fs = 500
+      t = np.linspace(0, 1, fs)
+
+      cleanSig = np.sin(2 * np.pi * 5 * t)
+      noise = 0.5 * np.sin(2 * np.pi * 50 * t) + 0.3 * np.random.randn(len(t))
+      noisySig = cleanSig + noise
+  - type: code
+    language: python
+    title: 신호 시각화
+    description: 원본 vs 노이즈
+    content: |-
+      figLoad, axesLoad = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+
+      axesLoad[0].plot(t, cleanSig, 'b-', linewidth=1.5, label='Clean (5 Hz)')
+      axesLoad[0].set_ylabel('Amplitude')
+      axesLoad[0].set_title('Original Clean Signal')
+      axesLoad[0].legend()
+      axesLoad[0].grid(True, alpha=0.3)
+
+      axesLoad[1].plot(t, noisySig, 'r-', linewidth=0.8, label='Noisy')
+      axesLoad[1].set_xlabel('Time (s)')
+      axesLoad[1].set_ylabel('Amplitude')
+      axesLoad[1].set_title('Signal with Noise')
+      axesLoad[1].legend()
+      axesLoad[1].grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figLoad
+
+- id: butter
+  title: 버터워스 필터 설계
+  subtitle: signal.butter
+  blocks:
+  - type: text
+    content: 버터워스 필터는 통과대역에서 가장 평탄한 주파수 응답을 가집니다. butter 함수로 필터 계수(b, a)를 설계합니다. 차단 주파수는 나이퀴스트 주파수(샘플링 주파수의 절반)로 정규화해야 합니다.
+  - type: code
+    language: python
+    title: 저역통과 필터 설계
+    description: 10Hz 이하만 통과
+    content: |-
+      cutoff = 10
+      nyquist = fs / 2
+      normalCutoff = cutoff / nyquist
+      order = 4
+
+      b, a = signal.butter(order, normalCutoff, btype='low')
+
+      filterDf = pd.DataFrame({
+          'Parameter': ['Cutoff Frequency', 'Nyquist Frequency', 'Normalized Cutoff', 'Filter Order'],
+          'Value': [f'{cutoff} Hz', f'{nyquist} Hz', f'{normalCutoff:.3f}', order]
+      })
+      filterDf
+  - type: tip
+    content: btype='low'는 저역통과(저주파만 통과), 'high'는 고역통과, 'band'는 대역통과입니다. order가 높을수록 전이대역이 급격하지만 위상왜곡이 커집니다.
+
+- id: freqresp
+  title: 주파수 응답
+  subtitle: 필터 특성 확인
+  blocks:
+  - type: text
+    content: 설계된 필터가 각 주파수를 얼마나 통과시키는지 주파수 응답으로 확인합니다. -3dB 지점이 차단 주파수이며, 이 지점에서 신호 전력이 절반으로 감소합니다. 차단 주파수 이상의 고주파는 급격히 감쇄됩니다.
+  - type: code
+    language: python
+    title: 주파수 응답 플롯
+    description: 크기와 위상
+    content: |-
+      w, h = signal.freqz(b, a, worN=2000)
+      freqs = w * fs / (2 * np.pi)
+
+      figFreq, (axFreqM, axFreqP) = plt.subplots(2, 1, figsize=(10, 6), sharex=True)
+
+      axFreqM.plot(freqs, 20 * np.log10(abs(h)), 'b-', linewidth=2)
+      axFreqM.axvline(cutoff, color='r', linestyle='--', label=f'Cutoff: {cutoff} Hz')
+      axFreqM.axhline(-3, color='gray', linestyle=':', label='-3 dB')
+      axFreqM.set_ylabel('Magnitude (dB)')
+      axFreqM.set_title('Butterworth Lowpass Filter Frequency Response')
+      axFreqM.set_ylim(-60, 5)
+      axFreqM.legend()
+      axFreqM.grid(True, alpha=0.3)
+
+      axFreqP.plot(freqs, np.angle(h, deg=True), 'g-', linewidth=2)
+      axFreqP.set_xlabel('Frequency (Hz)')
+      axFreqP.set_ylabel('Phase (degrees)')
+      axFreqP.grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figFreq
+
+- id: filtfilt
+  title: 제로위상 필터링
+  subtitle: signal.filtfilt
+  blocks:
+  - type: text
+    content: filtfilt은 신호를 정방향과 역방향으로 두 번 필터링하여 위상 왜곡을 제거합니다. 시간 지연 없이 깨끗한 필터링 결과를 얻습니다. 오프라인 분석에서는 항상 filtfilt을 사용하는 것이 좋습니다.
+  - type: code
+    language: python
+    title: filtfilt 적용
+    description: 제로위상 필터링
+    content: |-
+      filteredSig = signal.filtfilt(b, a, noisySig)
+
+      figFilt, axFilt = plt.subplots(figsize=(12, 5))
+
+      axFilt.plot(t, noisySig, 'r-', alpha=0.5, linewidth=0.8, label='Noisy')
+      axFilt.plot(t, filteredSig, 'b-', linewidth=2, label='Filtered')
+      axFilt.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original Clean')
+
+      axFilt.set_xlabel('Time (s)')
+      axFilt.set_ylabel('Amplitude')
+      axFilt.set_title('Noise Removal with Butterworth Lowpass Filter')
+      axFilt.legend()
+      axFilt.grid(True, alpha=0.3)
+      figFilt
+  - type: code
+    language: python
+    title: 복원 정확도
+    description: RMSE 계산
+    content: |-
+      rmseNoisy = np.sqrt(np.mean((noisySig - cleanSig)**2))
+      rmseFiltered = np.sqrt(np.mean((filteredSig - cleanSig)**2))
+
+      rmseDf = pd.DataFrame({
+          'Signal': ['Noisy', 'Filtered'],
+          'RMSE': [f'{rmseNoisy:.4f}', f'{rmseFiltered:.4f}'],
+          'Improvement': ['baseline', f'{(1 - rmseFiltered/rmseNoisy)*100:.1f}%']
+      })
+      rmseDf
+
+- id: lfilter
+  title: lfilter vs filtfilt
+  subtitle: 위상 지연 비교
+  blocks:
+  - type: text
+    content: "lfilter는 실시간 필터링에 사용하지만 위상 지연이 발생합니다. 실시간 처리가 필요한 경우(예: 라이브 센서)에만 lfilter를 사용하고, 오프라인 분석에서는 filtfilt을 사용하세요."
+  - type: code
+    language: python
+    title: 두 방식 비교
+    description: 위상 지연 확인
+    content: |-
+      lfilterResult = signal.lfilter(b, a, noisySig)
+
+      figLfilt, axLfilt = plt.subplots(figsize=(12, 5))
+
+      axLfilt.plot(t, cleanSig, 'g--', linewidth=2, label='Original')
+      axLfilt.plot(t, lfilterResult, 'r-', linewidth=1.5, alpha=0.7, label='lfilter (has delay)')
+      axLfilt.plot(t, filteredSig, 'b-', linewidth=1.5, label='filtfilt (zero-phase)')
+
+      axLfilt.set_xlim(0, 0.3)
+      axLfilt.set_xlabel('Time (s)')
+      axLfilt.set_ylabel('Amplitude')
+      axLfilt.set_title('lfilter vs filtfilt - Phase Delay Comparison')
+      axLfilt.legend()
+      axLfilt.grid(True, alpha=0.3)
+      figLfilt
+  - type: tip
+    content: lfilter의 위상 지연은 필터 차수와 차단 주파수에 따라 달라집니다. filtfilt은 두 번 필터링하므로 감쇄가 2배가 되어 더 급격한 롤오프를 보입니다.
+
+- id: highpass
+  title: 고역통과 필터
+  subtitle: 저주파 제거
+  blocks:
+  - type: text
+    content: 고역통과 필터는 저주파 성분(드리프트, DC 오프셋)을 제거합니다. 심전도(ECG) 신호에서 기저선 변동을 제거하거나, 가속도계에서 중력 성분을 제거할 때 사용합니다.
+  - type: code
+    language: python
+    title: 드리프트 신호 생성
+    description: 저주파 변동 포함
+    content: |-
+      drift = 0.5 * np.sin(2 * np.pi * 0.5 * t)
+      driftSig = cleanSig + drift
+  - type: code
+    language: python
+    title: 고역통과 적용
+    description: 드리프트 제거
+    content: |-
+      highCutoff = 2
+      bHigh, aHigh = signal.butter(4, highCutoff / nyquist, btype='high')
+      driftRemoved = signal.filtfilt(bHigh, aHigh, driftSig)
+
+      figHigh, axesHigh = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+
+      axesHigh[0].plot(t, driftSig, 'r-', linewidth=1.5, label='With Drift')
+      axesHigh[0].plot(t, cleanSig, 'g--', alpha=0.7, label='Original')
+      axesHigh[0].set_ylabel('Amplitude')
+      axesHigh[0].set_title('Signal with Low-Frequency Drift')
+      axesHigh[0].legend()
+      axesHigh[0].grid(True, alpha=0.3)
+
+      axesHigh[1].plot(t, driftRemoved, 'b-', linewidth=2, label='Highpass Filtered')
+      axesHigh[1].plot(t, cleanSig, 'g--', alpha=0.7, label='Original')
+      axesHigh[1].set_xlabel('Time (s)')
+      axesHigh[1].set_ylabel('Amplitude')
+      axesHigh[1].set_title('Drift Removed with Highpass Filter')
+      axesHigh[1].legend()
+      axesHigh[1].grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figHigh
+
+- id: bandpass
+  title: 대역통과 필터
+  subtitle: 특정 주파수 대역 추출
+  blocks:
+  - type: text
+    content: 대역통과 필터는 두 차단 주파수 사이의 성분만 통과시킵니다. 특정 주파수 대역의 신호를 추출할 때 사용합니다. 예를 들어 심박수 분석에서 0.5-4Hz 대역만 추출하거나, 특정 진동 주파수를 분석할 때 유용합니다.
+  - type: code
+    language: python
+    title: 복합 신호 생성
+    description: 여러 주파수 성분
+    content: |-
+      comp1 = np.sin(2 * np.pi * 5 * t)
+      comp2 = 0.5 * np.sin(2 * np.pi * 20 * t)
+      comp3 = 0.3 * np.sin(2 * np.pi * 60 * t)
+      complexSig = comp1 + comp2 + comp3
+  - type: code
+    language: python
+    title: 대역통과 적용
+    description: 15-25 Hz 추출
+    content: |-
+      lowBand = 15
+      highBand = 25
+      bBand, aBand = signal.butter(4, [lowBand / nyquist, highBand / nyquist], btype='band')
+      bandFiltered = signal.filtfilt(bBand, aBand, complexSig)
+
+      figBand, axesBand = plt.subplots(3, 1, figsize=(12, 8), sharex=True)
+
+      axesBand[0].plot(t, complexSig, 'r-', linewidth=0.8)
+      axesBand[0].set_ylabel('Amplitude')
+      axesBand[0].set_title('Original Complex Signal (5 + 20 + 60 Hz)')
+      axesBand[0].grid(True, alpha=0.3)
+
+      axesBand[1].plot(t, bandFiltered, 'b-', linewidth=1.5)
+      axesBand[1].set_ylabel('Amplitude')
+      axesBand[1].set_title('Bandpass Filtered (15-25 Hz)')
+      axesBand[1].grid(True, alpha=0.3)
+
+      axesBand[2].plot(t, comp2, 'g--', linewidth=1.5)
+      axesBand[2].set_xlabel('Time (s)')
+      axesBand[2].set_ylabel('Amplitude')
+      axesBand[2].set_title('Original 20 Hz Component')
+      axesBand[2].grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figBand
+
+- id: notch
+  title: 노치 필터
+  subtitle: 특정 주파수 제거
+  blocks:
+  - type: text
+    content: 노치(대역저지) 필터는 특정 주파수만 제거합니다. 전력선 간섭(50Hz 또는 60Hz)을 제거할 때 주로 사용합니다. 생체신호(ECG, EEG) 분석에서 필수적인 전처리 단계입니다.
+  - type: code
+    language: python
+    title: 노치 필터 적용
+    description: 50Hz 전력선 제거
+    content: |-
+      notchFreq = 50
+      quality = 30
+      bNotch, aNotch = signal.iirnotch(notchFreq / nyquist, quality)
+
+      powerNoise = 0.8 * np.sin(2 * np.pi * 50 * t)
+      contaminated = cleanSig + powerNoise
+      notchFiltered = signal.filtfilt(bNotch, aNotch, contaminated)
+
+      figNotch, axNotch = plt.subplots(figsize=(12, 5))
+      axNotch.plot(t, contaminated, 'r-', alpha=0.5, linewidth=0.8, label='With 50Hz Noise')
+      axNotch.plot(t, notchFiltered, 'b-', linewidth=1.5, label='Notch Filtered')
+      axNotch.plot(t, cleanSig, 'g--', alpha=0.7, label='Original')
+      axNotch.set_xlim(0, 0.5)
+      axNotch.set_xlabel('Time (s)')
+      axNotch.set_ylabel('Amplitude')
+      axNotch.set_title('50Hz Power Line Noise Removal')
+      axNotch.legend()
+      axNotch.grid(True, alpha=0.3)
+      figNotch
+
+- id: sos
+  title: SOS 형식 필터
+  subtitle: 수치 안정성
+  blocks:
+  - type: text
+    content: 높은 차수의 필터는 b/a 형식으로 불안정할 수 있습니다. SOS(Second-Order Sections) 형식이 더 안정적입니다. 고차 필터(order > 4)에서는 SOS를 권장합니다.
+  - type: code
+    language: python
+    title: SOS 필터 사용
+    description: 안정적인 고차 필터
+    content: |-
+      sos = signal.butter(8, normalCutoff, btype='low', output='sos')
+      sosFiltered = signal.sosfiltfilt(sos, noisySig)
+
+      figSos, axSos = plt.subplots(figsize=(12, 5))
+      axSos.plot(t, noisySig, 'r-', alpha=0.4, linewidth=0.8, label='Noisy')
+      axSos.plot(t, sosFiltered, 'b-', linewidth=2, label='SOS Filtered (order 8)')
+      axSos.plot(t, cleanSig, 'g--', linewidth=1.5, label='Original')
+      axSos.set_xlabel('Time (s)')
+      axSos.set_ylabel('Amplitude')
+      axSos.set_title('Filtering with SOS Format (Higher Order)')
+      axSos.legend()
+      axSos.grid(True, alpha=0.3)
+      figSos
+  - type: tip
+    content: output='sos'로 SOS 형식 계수를 얻고, sosfiltfilt로 필터링합니다. 수치적으로 훨씬 안정적이며, 특히 협대역 필터에서 중요합니다.
+
+- id: result
+  title: 필터 선택 가이드
+  subtitle: 상황별 권장
+  blocks:
+  - type: text
+    content: 필터 유형은 제거하려는 노이즈의 주파수 특성에 따라 선택합니다. 고주파 노이즈는 저역통과, 저주파 드리프트는 고역통과, 특정 간섭은 노치 필터를 사용합니다. 필터 차수는 4-6차가 일반적이며, 높은 차수는 SOS 형식을 사용하세요.
+  - type: code
+    language: python
+    title: 필터 가이드
+    description: 용도별 정리
+    content: |-
+      guideDf = pd.DataFrame({
+          'Filter Type': ['Lowpass', 'Highpass', 'Bandpass', 'Notch'],
+          'Purpose': ['고주파 노이즈 제거', '저주파 드리프트 제거', '특정 대역 추출', '특정 주파수 제거'],
+          'Example Use': ['센서 스무딩', 'ECG 기저선 보정', '특정 진동 추출', '전력선 간섭 제거'],
+          'btype': ['low', 'high', 'band', 'iirnotch']
+      })
+      guideDf
+
+- id: practice
+  title: 실습
+  subtitle: 신호처리 프로젝트
+  blocks:
+  - type: tip
+    content: 신호처리 엔지니어가 되어 다양한 노이즈를 제거해보세요. ECG 신호에서 기저선 변동과 전력선 간섭을 동시에 제거하거나, 가속도계 데이터에서 고주파 진동을 필터링하세요.
+  - type: expansion
+    title: "미션1: ECG 신호 정제"
+    blocks:
+    - type: code
+      language: python
+      title: ECG 신호 생성
+      description: 노이즈 포함
+      content: |-
+        fsEcg = 360
+        tEcg = np.linspace(0, 2, fsEcg * 2)
+        nyqEcg = fsEcg / 2
+
+        ecgClean = np.sin(2 * np.pi * 1.2 * tEcg) * np.exp(-((tEcg % 0.8 - 0.1) ** 2) / 0.01)
+        ecgClean += 0.3 * np.sin(2 * np.pi * 1.2 * tEcg)
+
+        baseline = 0.5 * np.sin(2 * np.pi * 0.3 * tEcg)
+        powerline = 0.2 * np.sin(2 * np.pi * 60 * tEcg)
+        muscle = 0.1 * np.random.randn(len(tEcg))
+        ecgNoisy = ecgClean + baseline + powerline + muscle
+    - type: code
+      language: python
+      title: 필터 체인 적용
+      description: 다단계 필터링
+      content: |-
+        sosHigh = signal.butter(4, 0.5 / nyqEcg, btype='high', output='sos')
+        ecgNoDrift = signal.sosfiltfilt(sosHigh, ecgNoisy)
+
+        bNotch60, aNotch60 = signal.iirnotch(60 / nyqEcg, 30)
+        ecgNoHz = signal.filtfilt(bNotch60, aNotch60, ecgNoDrift)
+
+        sosLow = signal.butter(4, 40 / nyqEcg, btype='low', output='sos')
+        ecgFinal = signal.sosfiltfilt(sosLow, ecgNoHz)
+
+        figEcg, axesEcg = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+        axesEcg[0].plot(tEcg, ecgNoisy, 'r-', linewidth=0.5, label='Noisy ECG')
+        axesEcg[0].set_ylabel('Amplitude')
+        axesEcg[0].set_title('Raw ECG Signal')
+        axesEcg[0].legend()
+        axesEcg[0].grid(True, alpha=0.3)
+
+        axesEcg[1].plot(tEcg, ecgFinal, 'b-', linewidth=1, label='Filtered ECG')
+        axesEcg[1].set_xlabel('Time (s)')
+        axesEcg[1].set_ylabel('Amplitude')
+        axesEcg[1].set_title('Cleaned ECG Signal')
+        axesEcg[1].legend()
+        axesEcg[1].grid(True, alpha=0.3)
+        plt.tight_layout()
+        figEcg
+  - type: expansion
+    title: "미션2: 가속도계 스무딩"
+    blocks:
+    - type: code
+      language: python
+      title: 가속도 데이터 생성
+      description: 진동 노이즈 포함
+      content: |-
+        fsAcc = 100
+        tAcc = np.linspace(0, 5, fsAcc * 5)
+        nyqAcc = fsAcc / 2
+
+        motion = np.sin(2 * np.pi * 0.5 * tAcc) + 0.5 * np.sin(2 * np.pi * 1 * tAcc)
+        vibration = 0.3 * np.sin(2 * np.pi * 25 * tAcc)
+        accNoise = 0.2 * np.random.randn(len(tAcc))
+        accRaw = motion + vibration + accNoise
+    - type: code
+      language: python
+      title: 저역통과 스무딩
+      description: 5Hz 컷오프
+      content: |-
+        sosAcc = signal.butter(4, 5 / nyqAcc, btype='low', output='sos')
+        accSmooth = signal.sosfiltfilt(sosAcc, accRaw)
+
+        figAcc, axAcc = plt.subplots(figsize=(12, 5))
+        axAcc.plot(tAcc, accRaw, 'r-', alpha=0.5, linewidth=0.5, label='Raw Accelerometer')
+        axAcc.plot(tAcc, accSmooth, 'b-', linewidth=2, label='Smoothed (5Hz LPF)')
+        axAcc.plot(tAcc, motion, 'g--', linewidth=1.5, alpha=0.7, label='True Motion')
+        axAcc.set_xlabel('Time (s)')
+        axAcc.set_ylabel('Acceleration')
+        axAcc.set_title('Accelerometer Signal Smoothing')
+        axAcc.legend()
+        axAcc.grid(True, alpha=0.3)
+        figAcc

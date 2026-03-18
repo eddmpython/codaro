@@ -1,0 +1,332 @@
+meta:
+  id: seaborn_03
+  title: 펭귄체중분포비교
+  order: 3
+  category: seaborn
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["seaborn", "boxplot", "violinplot", "penguins", "분포비교"]
+  seo:
+    title: "Seaborn 박스플롯과 바이올린플롯 - 펭귄 체중 분포 비교"
+    description: "Seaborn boxplot, violinplot으로 펭귄 종별/성별 체중 분포를 비교합니다. hue로 다중 그룹 비교를 배웁니다."
+    keywords: ["seaborn", "boxplot", "violinplot", "penguins", "분포", "비교"]
+
+intro:
+  emoji: "🐧"
+  goal: 펭귄 종별/성별 체중 분포를 박스플롯과 바이올린플롯으로 비교합니다.
+  description: boxplot으로 분포의 요약 통계량을, violinplot으로 분포의 모양을 시각화합니다. hue로 성별을 추가하여 다중 그룹을 비교합니다. 이전에 배운 scatterplot, histplot, stripplot 개념을 함께 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: seaborn과 matplotlib을 불러옵니다. penguins 데이터는 남극 팔머 군도에서 수집한 펭귄 데이터입니다. Adelie, Chinstrap, Gentoo 세 종의 부리 크기, 날개 길이, 체중 등이 측정되어 있습니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: seaborn과 matplotlib을 불러옵니다
+    content: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: penguins 데이터셋
+  blocks:
+  - type: text
+    content: penguins 데이터셋은 344개의 펭귄 관측 기록입니다. species(종), island(섬), bill_length_mm(부리 길이), bill_depth_mm(부리 깊이), flipper_length_mm(날개 길이), body_mass_g(체중), sex(성별) 컬럼이 있습니다. 결측값이 있으므로 dropna()로 제거합니다.
+  - type: code
+    language: python
+    title: penguins 데이터 로드
+    description: 펭귄 데이터를 불러오고 결측값을 제거합니다
+    content: |-
+      penguins = sns.load_dataset('penguins').dropna()
+      penguins.head()
+
+- id: step3_basic_box
+  title: 3단계. 기본 박스플롯
+  subtitle: boxplot()
+  blocks:
+  - type: text
+    content: boxplot()은 분포의 5가지 요약 통계량을 시각화합니다. 박스의 아래/위는 1사분위수(Q1)와 3사분위수(Q3), 중앙선은 중앙값(median), 수염은 1.5*IQR 범위, 그 밖의 점은 이상치입니다. 종별 체중 분포를 비교해봅니다.
+  - type: code
+    language: python
+    title: 기본 박스플롯
+    description: 종별 체중 분포를 박스플롯으로 표시합니다
+    content: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.boxplot(data=penguins, x='species', y='body_mass_g', ax=ax)
+      ax.set_title('Body Mass by Species')
+      ax.set_ylabel('Body Mass (g)')
+      fig
+  - type: tip
+    content: sns.boxplot(data, x='범주형', y='연속형')으로 범주별 분포를 비교합니다. 박스는 IQR(Q3-Q1)을, 수염은 Q1-1.5*IQR ~ Q3+1.5*IQR 범위를, 점은 이상치를 나타냅니다.
+
+- id: step4_hue_box
+  title: 4단계. hue로 성별 구분
+  subtitle: 다중 그룹 비교
+  blocks:
+  - type: text
+    content: hue 파라미터로 두 번째 범주형 변수를 추가할 수 있습니다. 종별로 나누고 성별로 색상을 구분하면 두 가지 요인의 효과를 동시에 비교할 수 있습니다. 같은 종에서도 수컷과 암컷의 체중 차이를 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 성별 추가
+    description: hue로 성별을 색상으로 구분합니다
+    content: |-
+      figHue, axHue = plt.subplots(figsize=(10, 6))
+      sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axHue)
+      axHue.set_title('Body Mass by Species and Sex')
+      axHue.set_ylabel('Body Mass (g)')
+      axHue.legend(title='Sex')
+      figHue
+
+- id: step5_violin
+  title: 5단계. 바이올린플롯
+  subtitle: violinplot()
+  blocks:
+  - type: text
+    content: violinplot()은 박스플롯과 KDE를 결합한 형태입니다. 양쪽으로 대칭인 KDE 곡선으로 분포의 모양을 보여줍니다. 박스플롯보다 분포의 세부적인 형태(다봉분포, 비대칭 등)를 파악하기 좋습니다.
+  - type: code
+    language: python
+    title: 바이올린플롯
+    description: 종별 체중 분포를 바이올린플롯으로 표시합니다
+    content: |-
+      figViolin, axViolin = plt.subplots(figsize=(8, 6))
+      sns.violinplot(data=penguins, x='species', y='body_mass_g', ax=axViolin)
+      axViolin.set_title('Body Mass by Species (Violin)')
+      axViolin.set_ylabel('Body Mass (g)')
+      figViolin
+  - type: tip
+    content: sns.violinplot()은 분포의 모양(밀도)을 시각화합니다. 폭이 넓은 부분은 데이터가 많은 구간입니다. inner 파라미터로 내부 표시를 조절할 수 있습니다.
+
+- id: step6_violin_hue
+  title: 6단계. 바이올린플롯 hue
+  subtitle: split 옵션
+  blocks:
+  - type: text
+    content: violinplot에 hue를 적용하면 두 그룹의 분포를 나란히 비교할 수 있습니다. split=True를 설정하면 한 바이올린을 반으로 나누어 두 그룹을 좌우에 표시합니다. 공간을 절약하면서 직접 비교가 가능합니다.
+  - type: code
+    language: python
+    title: split 바이올린
+    description: split으로 성별을 좌우에 표시합니다
+    content: |-
+      figSplit, axSplit = plt.subplots(figsize=(10, 6))
+      sns.violinplot(data=penguins, x='species', y='body_mass_g', hue='sex',
+                    split=True, palette='Set2', ax=axSplit)
+      axSplit.set_title('Body Mass by Species and Sex (Split)')
+      axSplit.set_ylabel('Body Mass (g)')
+      axSplit.legend(title='Sex')
+      figSplit
+  - type: tip
+    content: split=True는 두 그룹을 하나의 바이올린 좌우에 표시합니다. hue가 2개 범주일 때만 사용 가능하며, 직접적인 비교에 효과적입니다.
+
+- id: step7_inner
+  title: 7단계. inner 파라미터
+  subtitle: 내부 표시 옵션
+  blocks:
+  - type: text
+    content: inner 파라미터로 바이올린 내부에 표시할 내용을 지정합니다. 'box'는 미니 박스플롯, 'quartile'은 사분위선, 'point'는 개별 점, 'stick'은 막대, None은 빈 공간입니다. 목적에 따라 선택합니다.
+  - type: code
+    language: python
+    title: inner 옵션
+    description: 다양한 inner 옵션을 비교합니다
+    content: |-
+      figInner, (axQuartile, axPoint) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.violinplot(data=penguins, x='species', y='body_mass_g', inner='quartile', ax=axQuartile)
+      axQuartile.set_title('inner="quartile"')
+
+      sns.violinplot(data=penguins, x='species', y='body_mass_g', inner='point', ax=axPoint)
+      axPoint.set_title('inner="point"')
+
+      plt.tight_layout()
+      figInner
+
+- id: step8_comparison
+  title: 8단계. 박스 vs 바이올린
+  subtitle: 두 방식 비교
+  blocks:
+  - type: text
+    content: 박스플롯과 바이올린플롯을 나란히 비교합니다. 박스플롯은 요약 통계량을 명확히 보여주고, 바이올린플롯은 분포의 세부 형태를 보여줍니다. 두 차트를 함께 보면 데이터를 더 완전하게 이해할 수 있습니다.
+  - type: code
+    language: python
+    title: 두 방식 비교
+    description: boxplot과 violinplot을 나란히 배치합니다
+    content: |-
+      figCompare, (axBox, axViol) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axBox)
+      axBox.set_title('Box Plot')
+      axBox.set_ylabel('Body Mass (g)')
+
+      sns.violinplot(data=penguins, x='species', y='body_mass_g', hue='sex',
+                    split=True, palette='Set2', ax=axViol)
+      axViol.set_title('Violin Plot')
+      axViol.set_ylabel('Body Mass (g)')
+
+      plt.tight_layout()
+      figCompare
+
+- id: step9_strip_overlay
+  title: 9단계. 점 오버레이
+  subtitle: 박스플롯 + 스트립플롯
+  blocks:
+  - type: text
+    content: 박스플롯 위에 stripplot을 겹쳐서 개별 데이터 포인트를 함께 표시할 수 있습니다. 요약 통계량과 실제 데이터를 동시에 보여주어 분포의 특성을 더 잘 파악할 수 있습니다. dodge 파라미터를 맞춰야 점이 올바른 위치에 표시됩니다.
+  - type: code
+    language: python
+    title: 점 오버레이
+    description: 박스플롯 위에 개별 점을 표시합니다
+    content: |-
+      figOverlay, axOverlay = plt.subplots(figsize=(10, 6))
+
+      sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axOverlay)
+      sns.stripplot(data=penguins, x='species', y='body_mass_g', hue='sex',
+                   dodge=True, color='black', alpha=0.5, size=4, ax=axOverlay, legend=False)
+
+      axOverlay.set_title('Body Mass with Individual Points')
+      axOverlay.set_ylabel('Body Mass (g)')
+      axOverlay.legend(title='Sex')
+      figOverlay
+
+- id: step10_flipper
+  title: 10단계. 다른 변수 탐색
+  subtitle: 날개 길이 분포
+  blocks:
+  - type: text
+    content: 같은 방식으로 날개 길이(flipper_length_mm) 분포도 탐색해봅니다. 이전에 배운 scatterplot으로 체중과 날개 길이의 관계도 함께 확인하면 더 풍부한 인사이트를 얻을 수 있습니다.
+  - type: code
+    language: python
+    title: 날개 길이 분포
+    description: 날개 길이를 박스플롯과 산점도로 분석합니다
+    content: |-
+      figFlipper, (axFlipBox, axFlipScatter) = plt.subplots(1, 2, figsize=(14, 5))
+
+      sns.boxplot(data=penguins, x='species', y='flipper_length_mm', hue='sex', palette='Set2', ax=axFlipBox)
+      axFlipBox.set_title('Flipper Length by Species')
+      axFlipBox.set_ylabel('Flipper Length (mm)')
+
+      sns.scatterplot(data=penguins, x='flipper_length_mm', y='body_mass_g',
+                     hue='species', palette='Set2', alpha=0.7, ax=axFlipScatter)
+      axFlipScatter.set_title('Flipper vs Body Mass')
+
+      plt.tight_layout()
+      figFlipper
+
+- id: step11_final
+  title: 11단계. 최종 종합 분석
+  subtitle: 네 가지 관점
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 차트 유형을 종합하여 펭귄 데이터를 다각도로 분석합니다. 히스토그램으로 전체 분포, 박스플롯으로 요약 통계, 바이올린플롯으로 분포 형태, 산점도로 변수 관계를 함께 확인합니다.
+  - type: code
+    language: python
+    title: 종합 분석
+    description: 네 가지 차트로 펭귄 데이터를 분석합니다
+    content: |-
+      figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+      sns.histplot(data=penguins, x='body_mass_g', hue='species', kde=True, palette='Set2', ax=axesFinal[0, 0])
+      axesFinal[0, 0].set_title('Body Mass Distribution')
+
+      sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axesFinal[0, 1])
+      axesFinal[0, 1].set_title('Body Mass by Species and Sex')
+
+      sns.violinplot(data=penguins, x='species', y='flipper_length_mm',
+                    hue='sex', split=True, palette='Set2', ax=axesFinal[1, 0])
+      axesFinal[1, 0].set_title('Flipper Length Distribution')
+
+      sns.scatterplot(data=penguins, x='bill_length_mm', y='bill_depth_mm',
+                     hue='species', style='sex', palette='Set2', ax=axesFinal[1, 1])
+      axesFinal[1, 1].set_title('Bill Dimensions')
+
+      plt.tight_layout()
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 분포 비교 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 boxplot, violinplot, hue, split, inner를 활용해서 다양한 분포를 비교해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: tips 데이터 요일별/시간대별 팁 분포"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        data = sns.load_dataset('tips')
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart, (plot1, plot2) = plt.subplots(1, 2, figsize=(14, 5))
+
+        sns.boxplot(data=data, x='day', y='tip', hue='time', palette='Set1', ax=plot1)
+        plot1.set_title('Tip by Day and Time (Box)')
+        plot1.set_ylabel('Tip ($)')
+
+        sns.violinplot(data=data, x='day', y='tip', hue='time',
+                      split=True, palette='Set1', inner='quartile', ax=plot2)
+        plot2.set_title('Tip by Day and Time (Violin)')
+        plot2.set_ylabel('Tip ($)')
+
+        plt.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: iris 품종별 꽃잎 특성 종합 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        df = sns.load_dataset('iris')
+    - type: code
+      title: "상단 패널"
+      content: |-
+        canvas, panels = plt.subplots(2, 2, figsize=(12, 10))
+
+        sns.boxplot(data=df, x='species', y='petal_length', palette='Set2', ax=panels[0, 0])
+        sns.stripplot(data=df, x='species', y='petal_length',
+                     color='black', alpha=0.5, size=4, ax=panels[0, 0])
+        panels[0, 0].set_title('Petal Length (Box + Points)')
+
+        sns.violinplot(data=df, x='species', y='petal_width',
+                      palette='Set2', inner='box', ax=panels[0, 1])
+        panels[0, 1].set_title('Petal Width (Violin)')
+    - type: code
+      title: "하단 패널"
+      content: |-
+        sns.boxplot(data=df, x='species', y='sepal_length', palette='Set2', ax=panels[1, 0])
+        panels[1, 0].set_title('Sepal Length (Box)')
+
+        sns.scatterplot(data=df, x='petal_length', y='petal_width',
+                       hue='species', palette='Set2', ax=panels[1, 1])
+        panels[1, 1].set_title('Petal Dimensions')
+
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Seaborn boxplot과 violinplot으로 펭귄 체중 분포를 비교했습니다.
+  - type: list
+    items:
+    - "sns.boxplot() - 5가지 요약 통계량 시각화"
+    - "sns.violinplot() - 분포 모양(KDE) 시각화"
+    - "hue로 다중 그룹 비교"
+    - "split=True - 바이올린을 좌우로 분할"
+    - "inner='box'/'quartile'/'point' - 내부 표시 옵션"
+    - "stripplot 오버레이로 개별 점 표시"
+  - type: text
+    content: 다음 시간에는 regplot으로 회귀 분석을 시각화합니다.

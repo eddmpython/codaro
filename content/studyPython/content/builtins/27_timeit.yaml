@@ -1,0 +1,580 @@
+meta:
+  title: "timeit - 성능 측정"
+  description: "코드 실행 시간 측정을 위한 timeit 모듈"
+  keywords: ["timeit", "성능", "벤치마크", "속도", "측정"]
+
+intro:
+  emoji: "⏱️"
+  points:
+  - "정확한 실행 시간 측정"
+  - "여러 번 반복 실행"
+  - "코드 성능 비교"
+  - "마이크로벤치마크"
+
+sections:
+- id: "module_import"
+  title: "모듈 임포트"
+  subtitle: "timeit 시작하기"
+  blocks:
+  - type: "text"
+    content: "timeit는 파이썬 표준 라이브러리입니다. 작은 코드 조각의 실행 시간을 정확하게 측정할 수 있습니다."
+  - type: "list"
+    items:
+    - "timeit(): 단일 측정"
+    - "repeat(): 여러 번 측정"
+    - "Timer: 타이머 객체"
+    - "default_timer: 플랫폼별 최적 타이머"
+  - type: "code"
+    language: "python"
+    title: "기본 임포트"
+    description: "timeit 모듈 임포트 및 기본 사용법"
+    content: |-
+      import timeit
+
+      duration = timeit.timeit('x = 2 + 2', number=100000)
+      duration
+  - type: "note"
+    content: "timeit는 가비지 컬렉션을 일시적으로 비활성화하여 더 정확한 측정을 합니다. number 파라미터로 반복 횟수를 지정합니다."
+
+- id: "basic_timing"
+  title: "기본 측정"
+  subtitle: "timeit 함수 사용"
+  blocks:
+  - type: "text"
+    content: "timeit() 함수로 간단하게 코드의 실행 시간을 측정할 수 있습니다."
+  - type: "list"
+    items:
+    - "stmt: 측정할 코드"
+    - "setup: 사전 설정 코드"
+    - "number: 반복 횟수 (기본 1,000,000)"
+    - "globals: 전역 네임스페이스"
+  - type: "code"
+    language: "python"
+    title: "문자열 코드 측정"
+    description: "간단한 연산 측정"
+    content: |-
+      import timeit
+
+      addTime = timeit.timeit('sum([1, 2, 3, 4, 5])', number=100000)
+      addTime
+  - type: "code"
+    language: "python"
+    title: "setup 사용"
+    description: "사전 설정 코드 지정"
+    content: |-
+      import timeit
+
+      setupCode = 'data = list(range(100))'
+      testCode = 'sum(data)'
+
+      elapsed = timeit.timeit(testCode, setup=setupCode, number=10000)
+      elapsed
+  - type: "code"
+    language: "python"
+    title: "함수 측정"
+    description: "함수 실행 시간"
+    content: |-
+      import timeit
+
+      def squareSum():
+          return sum(x**2 for x in range(10))
+
+      funcTime = timeit.timeit(squareSum, number=10000)
+      funcTime
+  - type: "tip"
+    content: "number를 크게 설정하면 더 정확한 측정이 가능하지만, 실행 시간이 길어집니다. 적절한 균형을 찾으세요."
+
+- id: "repeat_timing"
+  title: "반복 측정"
+  subtitle: "repeat 함수"
+  blocks:
+  - type: "text"
+    content: "repeat() 함수로 여러 번 측정하여 최솟값을 얻을 수 있습니다. 이는 시스템 노이즈의 영향을 최소화합니다."
+  - type: "list"
+    items:
+    - "repeat: 측정 반복 횟수"
+    - "number: 각 측정당 실행 횟수"
+    - "min(): 최솟값 선택 권장"
+    - "평균보다 최솟값이 더 정확"
+  - type: "code"
+    language: "python"
+    title: "기본 repeat"
+    description: "여러 번 측정"
+    content: |-
+      import timeit
+
+      results = timeit.repeat('[x**2 for x in range(10)]', repeat=5, number=10000)
+      results
+  - type: "code"
+    language: "python"
+    title: "최솟값 선택"
+    description: "가장 빠른 시간"
+    content: |-
+      import timeit
+
+      measurements = timeit.repeat('"-".join(str(n) for n in range(10))', repeat=3, number=10000)
+      bestTime = min(measurements)
+      bestTime
+  - type: "code"
+    language: "python"
+    title: "평균과 최솟값 비교"
+    description: "통계 계산"
+    content: |-
+      import timeit
+
+      times = timeit.repeat('list(range(100))', repeat=5, number=10000)
+      avgTime = sum(times) / len(times)
+      minTime = min(times)
+
+      avgTime, minTime
+  - type: "tip"
+    content: "시스템 부하나 다른 프로세스의 영향으로 측정값이 달라질 수 있으므로, 평균보다 최솟값을 사용하는 것이 권장됩니다."
+
+- id: "timer_class"
+  title: "Timer 클래스"
+  subtitle: "재사용 가능한 타이머"
+  blocks:
+  - type: "text"
+    content: "Timer 클래스로 타이머 객체를 만들어 여러 번 재사용할 수 있습니다."
+  - type: "list"
+    items:
+    - "Timer(stmt, setup): 타이머 생성"
+    - "timeit(number): 측정 실행"
+    - "repeat(repeat, number): 반복 측정"
+    - "재사용 가능"
+  - type: "code"
+    language: "python"
+    title: "Timer 객체 생성"
+    description: "재사용 가능한 타이머"
+    content: |-
+      import timeit
+
+      timer = timeit.Timer('x = [i for i in range(100)]')
+      execution = timer.timeit(number=10000)
+      execution
+  - type: "code"
+    language: "python"
+    title: "Timer로 repeat"
+    description: "타이머 객체 반복 실행"
+    content: |-
+      import timeit
+
+      myTimer = timeit.Timer(stmt='sorted([3, 1, 4, 1, 5])')
+      runs = myTimer.repeat(repeat=3, number=10000)
+      runs
+  - type: "code"
+    language: "python"
+    title: "setup과 함께"
+    description: "초기화 코드 포함"
+    content: |-
+      import timeit
+
+      timerWithSetup = timeit.Timer(
+          stmt='result = x * 2',
+          setup='x = 42'
+      )
+      setupTime = timerWithSetup.timeit(number=100000)
+      setupTime
+  - type: "tip"
+    content: "Timer 객체는 같은 코드를 여러 번 측정할 때 유용합니다. 한 번 생성하고 여러 번 재사용할 수 있습니다."
+
+- id: "comparing_code"
+  title: "코드 비교"
+  subtitle: "성능 차이 측정"
+  blocks:
+  - type: "text"
+    content: "여러 구현 방법의 성능을 비교하여 최적의 방법을 선택할 수 있습니다."
+  - type: "list"
+    items:
+    - "동일한 number로 측정"
+    - "비율 계산으로 비교"
+    - "여러 번 반복 측정"
+    - "공정한 비교 환경"
+  - type: "code"
+    language: "python"
+    title: "리스트 vs 제너레이터"
+    description: "두 방법 비교"
+    content: |-
+      import timeit
+
+      listTime = timeit.timeit('[x**2 for x in range(100)]', number=10000)
+      genTime = timeit.timeit('list(x**2 for x in range(100))', number=10000)
+
+      listTime, genTime
+  - type: "code"
+    language: "python"
+    title: "문자열 결합 방법 비교"
+    description: "join vs +"
+    content: |-
+      import timeit
+
+      plusMethod = timeit.timeit(
+          'result = ""; [result := result + str(i) for i in range(100)]',
+          number=1000
+      )
+      joinMethod = timeit.timeit(
+          '"".join(str(i) for i in range(100))',
+          number=1000
+      )
+
+      ratio = plusMethod / joinMethod
+      ratio
+  - type: "code"
+    language: "python"
+    title: "정렬 알고리즘 비교"
+    description: "sorted vs list.sort"
+    content: |-
+      import timeit
+
+      sortedFunc = timeit.timeit(
+          'sorted(data)',
+          setup='data = [3, 1, 4, 1, 5, 9, 2, 6]',
+          number=10000
+      )
+      sortMethod = timeit.timeit(
+          'data.sort()',
+          setup='data = [3, 1, 4, 1, 5, 9, 2, 6]',
+          number=10000
+      )
+
+      sortedFunc, sortMethod
+  - type: "tip"
+    content: "비교할 때는 동일한 number와 repeat를 사용하고, 비율로 얼마나 빠른지 표현하면 이해하기 쉽습니다."
+
+- id: "best_practices"
+  title: "모범 사례"
+  subtitle: "정확한 측정을 위한 팁"
+  blocks:
+  - type: "text"
+    content: "정확하고 신뢰할 수 있는 성능 측정을 위한 모범 사례들입니다."
+  - type: "list"
+    items:
+    - "충분한 반복 횟수 사용"
+    - "여러 번 측정하고 최솟값 선택"
+    - "측정 대상만 포함"
+    - "동일한 환경에서 비교"
+  - type: "code"
+    language: "python"
+    title: "globals 활용"
+    description: "현재 네임스페이스 사용"
+    content: |-
+      import timeit
+
+      testData = [1, 2, 3, 4, 5]
+
+      def processData(items):
+          return [x * 2 for x in items]
+
+      withGlobals = timeit.timeit(
+          'processData(testData)',
+          globals=globals(),
+          number=10000
+      )
+      withGlobals
+  - type: "code"
+    language: "python"
+    title: "적절한 number 선택"
+    description: "자동 조정"
+    content: |-
+      import timeit
+
+      def autoNumber(stmt):
+          for n in [100, 1000, 10000, 100000]:
+              t = timeit.timeit(stmt, number=n)
+              if t > 0.1:
+                  return n, t
+          return 100000, timeit.timeit(stmt, number=100000)
+
+      iterations, timeSpent = autoNumber('x = [i**2 for i in range(10)]')
+      iterations, timeSpent
+  - type: "code"
+    language: "python"
+    title: "마이크로초 단위 변환"
+    description: "읽기 쉬운 형식"
+    content: |-
+      import timeit
+
+      rawTime = timeit.timeit('sum(range(100))', number=10000)
+      microseconds = rawTime * 1_000_000 / 10000
+      microseconds
+  - type: "tip"
+    content: "너무 빠른 코드는 number를 크게, 느린 코드는 작게 설정하여 측정 시간이 0.1초 이상이 되도록 조정하세요."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "실무 벤치마킹"
+  blocks:
+  - type: "text"
+    content: "실제 코드 최적화에서 사용되는 벤치마킹 패턴들입니다."
+  - type: "code"
+    language: "python"
+    title: "함수 최적화"
+    description: "여러 구현 비교"
+    content: |-
+      import timeit
+
+      def fibonacci1(n):
+          if n <= 1:
+              return n
+          return fibonacci1(n-1) + fibonacci1(n-2)
+
+      def fibonacci2(n):
+          a, b = 0, 1
+          for _ in range(n):
+              a, b = b, a + b
+          return a
+
+      recursiveTime = timeit.timeit('fibonacci1(10)', globals=globals(), number=1000)
+      iterativeTime = timeit.timeit('fibonacci2(10)', globals=globals(), number=1000)
+
+      speedup = recursiveTime / iterativeTime
+      speedup
+  - type: "code"
+    language: "python"
+    title: "자료구조 선택"
+    description: "list vs set 검색"
+    content: |-
+      import timeit
+
+      listSearch = timeit.timeit(
+          '500 in data',
+          setup='data = list(range(1000))',
+          number=10000
+      )
+      setSearch = timeit.timeit(
+          '500 in data',
+          setup='data = set(range(1000))',
+          number=10000
+      )
+
+      improvement = listSearch / setSearch
+      improvement
+  - type: "code"
+    language: "python"
+    title: "벤치마크 리포트"
+    description: "여러 방법 종합 비교"
+    content: |-
+      import timeit
+
+      methods = {
+          'comprehension': '[x**2 for x in range(100)]',
+          'map': 'list(map(lambda x: x**2, range(100)))',
+          'loop': '[item for item in [x**2 for x in range(100)]]'
+      }
+
+      benchmarks = {}
+      for name, code in methods.items():
+          t = timeit.timeit(code, number=10000)
+          benchmarks[name] = round(t * 1000, 3)
+
+      benchmarks
+  - type: "tip"
+    content: "실무에서는 여러 방법을 비교하여 가장 빠른 방법을 선택합니다. 단, 가독성과 유지보수성도 함께 고려해야 합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  blocks:
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 측정"
+    code: |-
+      import timeit
+
+      simple = timeit.timeit('x = 10 + 20', number=100000)
+      simple
+  - type: "expansion"
+    title: "🟢 기본2: 리스트 생성"
+    code: |-
+      import timeit
+
+      listCreate = timeit.timeit('list(range(50))', number=10000)
+      listCreate
+  - type: "expansion"
+    title: "🟢 기본3: 함수 호출"
+    code: |-
+      import timeit
+
+      def add():
+          return 5 + 5
+
+      callTime = timeit.timeit(add, number=100000)
+      callTime
+  - type: "expansion"
+    title: "🟢 기본4: 문자열 연산"
+    code: |-
+      import timeit
+
+      strTime = timeit.timeit('"hello" + "world"', number=100000)
+      strTime
+  - type: "expansion"
+    title: "🟢 기본5: sum 함수"
+    code: |-
+      import timeit
+
+      sumTime = timeit.timeit('sum([1, 2, 3, 4, 5])', number=10000)
+      sumTime
+  - type: "expansion"
+    title: "🟡 응용1: repeat 사용"
+    code: |-
+      import timeit
+
+      repeated = timeit.repeat('[i for i in range(20)]', repeat=3, number=10000)
+      repeated
+  - type: "expansion"
+    title: "🟡 응용2: 최솟값"
+    code: |-
+      import timeit
+
+      trials = timeit.repeat('sorted([3, 1, 2])', repeat=5, number=10000)
+      fastest = min(trials)
+      fastest
+  - type: "expansion"
+    title: "🟡 응용3: setup 사용"
+    code: |-
+      import timeit
+
+      withSetup = timeit.timeit(
+          'total = sum(nums)',
+          setup='nums = [1, 2, 3, 4, 5]',
+          number=10000
+      )
+      withSetup
+  - type: "expansion"
+    title: "🟡 응용4: Timer 객체"
+    code: |-
+      import timeit
+
+      t = timeit.Timer('[x*x for x in range(10)]')
+      measured = t.timeit(number=10000)
+      measured
+  - type: "expansion"
+    title: "🟡 응용5: globals 활용"
+    code: |-
+      import timeit
+
+      myList = [1, 2, 3]
+
+      withGlobal = timeit.timeit('len(myList)', globals=globals(), number=10000)
+      withGlobal
+  - type: "expansion"
+    title: "🔴 심화1: 두 방법 비교"
+    code: |-
+      import timeit
+
+      method1 = timeit.timeit('[i for i in range(50)]', number=10000)
+      method2 = timeit.timeit('list(range(50))', number=10000)
+
+      method1, method2
+  - type: "expansion"
+    title: "🔴 심화2: 비율 계산"
+    code: |-
+      import timeit
+
+      slow = timeit.timeit('sum([x**2 for x in range(100)])', number=1000)
+      fast = timeit.timeit('sum(x**2 for x in range(100))', number=1000)
+
+      speedRatio = slow / fast
+      speedRatio
+  - type: "expansion"
+    title: "🔴 심화3: 함수 비교"
+    code: |-
+      import timeit
+
+      def version1():
+          return [x * 2 for x in range(20)]
+
+      def version2():
+          return list(map(lambda x: x * 2, range(20)))
+
+      v1Time = timeit.timeit(version1, number=10000)
+      v2Time = timeit.timeit(version2, number=10000)
+
+      v1Time, v2Time
+  - type: "expansion"
+    title: "🔴 심화4: 평균과 최소"
+    code: |-
+      import timeit
+
+      runs = timeit.repeat('"_".join(str(i) for i in range(10))', repeat=5, number=1000)
+      average = sum(runs) / len(runs)
+      minimum = min(runs)
+
+      average, minimum
+  - type: "expansion"
+    title: "🔴 심화5: 마이크로초 변환"
+    code: |-
+      import timeit
+
+      seconds = timeit.timeit('x = 2**10', number=10000)
+      microseconds = (seconds / 10000) * 1_000_000
+
+      microseconds
+  - type: "expansion"
+    title: "🔴 심화6: in 연산 비교"
+    code: |-
+      import timeit
+
+      inList = timeit.timeit('50 in x', setup='x = list(range(100))', number=10000)
+      inSet = timeit.timeit('50 in x', setup='x = set(range(100))', number=10000)
+
+      improvement = inList / inSet
+      improvement
+  - type: "expansion"
+    title: "🔴 심화7: 딕셔너리 접근"
+    code: |-
+      import timeit
+
+      dictAccess = timeit.timeit(
+          'd["key"]',
+          setup='d = {"key": "value"}',
+          number=100000
+      )
+      dictAccess
+  - type: "expansion"
+    title: "🔴 심화8: 조건문 최적화"
+    code: |-
+      import timeit
+
+      ifElse = timeit.timeit(
+          'x if x > 5 else 0',
+          setup='x = 10',
+          number=100000
+      )
+      maxFunc = timeit.timeit(
+          'max(x, 0) if x > 5 else 0',
+          setup='x = 10',
+          number=100000
+      )
+
+      ifElse, maxFunc
+  - type: "expansion"
+    title: "🔴 심화9: 문자열 포매팅"
+    code: |-
+      import timeit
+
+      percent = timeit.timeit('"%s %d" % ("test", 42)', number=10000)
+      format = timeit.timeit('"{} {}".format("test", 42)', number=10000)
+      fstring = timeit.timeit('f"{"test"} {42}"', number=10000)
+
+      percent, format, fstring
+  - type: "expansion"
+    title: "🔴 심화10: 전체 활용 - 성능 프로파일"
+    code: |-
+      import timeit
+
+      implementations = {
+          'list_comp': '[x**2 for x in range(100)]',
+          'map_lambda': 'list(map(lambda x: x**2, range(100)))',
+          'generator': 'list(x**2 for x in range(100))'
+      }
+
+      profile = {}
+      for name, code in implementations.items():
+          measurements = timeit.repeat(code, repeat=3, number=1000)
+          bestRun = min(measurements)
+          avgRun = sum(measurements) / len(measurements)
+          profile[name] = {
+              'best': round(bestRun * 1000, 3),
+              'avg': round(avgRun * 1000, 3)
+          }
+
+      profile

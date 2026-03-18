@@ -1,0 +1,342 @@
+meta:
+  id: opencv_02
+  title: 색공간변환기
+  order: 2
+  category: opencv
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["OpenCV", "cvtColor", "BGR", "RGB", "Gray", "HSV", "LAB"]
+  seo:
+    title: "OpenCV 입문 - 색공간 변환기"
+    description: "OpenCV cvtColor로 BGR, RGB, Gray, HSV, LAB 등 다양한 색공간을 변환합니다."
+    keywords: ["OpenCV", "cvtColor", "색공간", "HSV", "Gray", "LAB"]
+
+intro:
+  emoji: "🌈"
+  goal: cvtColor()로 다양한 색공간(Gray, HSV, LAB)을 변환하고 비교합니다.
+  description: 색공간 변환은 이미지 처리의 기본입니다. 흑백 변환, HSV를 이용한 색상 분리, LAB 색공간의 특징을 배웁니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 이미지 불러오기
+  subtitle: BGR 변환 준비
+  blocks:
+  - type: text
+    content: sklearn의 china 이미지를 불러와 BGR로 변환합니다. OpenCV의 cvtColor() 함수는 BGR 이미지를 기준으로 다양한 색공간으로 변환합니다.
+  - type: code
+    language: python
+    title: 라이브러리와 이미지
+    description: china 이미지를 BGR로 변환합니다
+    content: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      photo = load_sample_image('china.jpg')
+      plt.figure(figsize=(10, 6))
+      plt.imshow(photo)
+      plt.title(f'Original: {photo.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: BGR로 변환
+    description: OpenCV 처리를 위해 BGR로 변환합니다
+    content: |-
+      photoBgr = cv2.cvtColor(photo, cv2.COLOR_RGB2BGR)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(photoBgr)
+      plt.title('BGR (colors inverted when shown as RGB)')
+      plt.axis('off')
+      plt.tight_layout()
+
+- id: step2_gray
+  title: 2단계. 그레이스케일 변환
+  subtitle: COLOR_BGR2GRAY
+  blocks:
+  - type: text
+    content: 그레이스케일(grayscale, 흑백) 변환은 가장 기본적인 색공간 변환입니다. 컬러 이미지의 3채널(R, G, B)을 1채널(밝기)로 변환합니다. 단순 평균이 아닌 Y = 0.299R + 0.587G + 0.114B 공식을 사용하는데, 이는 인간의 눈이 녹색에 가장 민감하고 파란색에 가장 둔감하기 때문입니다. 에지 검출, 이진화, 히스토그램 분석 등 많은 이미지 처리가 그레이스케일에서 수행됩니다.
+  - type: code
+    language: python
+    title: 그레이스케일 변환
+    description: BGR을 Gray로 변환합니다
+    content: |-
+      gray = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2GRAY)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(gray, cmap='gray')
+      plt.title(f'Grayscale: {gray.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: 그레이스케일은 2차원 배열입니다. shape이 (높이, 너비)로 채널이 없습니다. Y = 0.299R + 0.587G + 0.114B 공식으로 밝기를 계산합니다.
+  - type: code
+    language: python
+    title: 그레이스케일 출력
+    description: cmap='gray'로 출력합니다
+    content: |-
+      plt.figure(figsize=(10, 6))
+      plt.imshow(gray, cmap='gray')
+      plt.title('Grayscale')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: matplotlib에서 2D 배열을 imshow()하면 기본적으로 컬러맵이 적용됩니다. cmap='gray'를 지정해야 올바른 흑백으로 표시됩니다.
+
+- id: step3_hsv
+  title: 3단계. HSV 색공간
+  subtitle: 색상, 채도, 명도
+  blocks:
+  - type: text
+    content: HSV는 Hue(색상), Saturation(채도), Value(명도)로 색을 표현하는 색공간입니다. Hue는 색의 종류(빨강, 노랑, 초록 등)를 각도로 표현하고, Saturation은 색의 선명도(회색~원색), Value는 밝기(검정~밝음)를 나타냅니다. RGB에서는 "빨간색 계열"을 찾으려면 복잡한 조건이 필요하지만, HSV에서는 H 값만 보면 됩니다. 색상 기반 객체 추적, 크로마키(배경 제거) 등에 널리 사용됩니다.
+  - type: code
+    language: python
+    title: HSV 변환
+    description: BGR을 HSV로 변환합니다
+    content: |-
+      hsv = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2HSV)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(hsv)
+      plt.title(f'HSV: {hsv.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: HSV 채널 분리
+    description: H, S, V를 개별 확인합니다
+    content: |-
+      hue, sat, val = cv2.split(hsv)
+      figSplit, axSplit = plt.subplots(1, 3, figsize=(12, 4))
+      axSplit[0].imshow(hue, cmap='hsv')
+      axSplit[0].set_title(f'Hue: {hue.shape}')
+      axSplit[0].axis('off')
+      axSplit[1].imshow(sat, cmap='gray')
+      axSplit[1].set_title(f'Saturation: {sat.shape}')
+      axSplit[1].axis('off')
+      axSplit[2].imshow(val, cmap='gray')
+      axSplit[2].set_title(f'Value: {val.shape}')
+      axSplit[2].axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: OpenCV의 HSV에서 H는 0-179 범위입니다(일반적인 0-360의 절반). S와 V는 0-255 범위입니다. H=0은 빨강, H=60은 초록, H=120은 파랑입니다.
+  - type: code
+    language: python
+    title: HSV 채널 시각화
+    description: 세 채널을 나란히 표시합니다
+    content: |-
+      figHsv, axHsv = plt.subplots(1, 3, figsize=(12, 4))
+      axHsv[0].imshow(hue, cmap='hsv')
+      axHsv[0].set_title('Hue (Color)')
+      axHsv[0].axis('off')
+      axHsv[1].imshow(sat, cmap='gray')
+      axHsv[1].set_title('Saturation')
+      axHsv[1].axis('off')
+      axHsv[2].imshow(val, cmap='gray')
+      axHsv[2].set_title('Value (Brightness)')
+      axHsv[2].axis('off')
+      plt.tight_layout()
+
+- id: step4_lab
+  title: 4단계. LAB 색공간
+  subtitle: 밝기와 색 분리
+  blocks:
+  - type: text
+    content: LAB(또는 L*a*b*) 색공간은 L(Lightness, 밝기), A(녹색-빨강 축), B(파랑-노랑 축)로 구성됩니다. CIE(국제조명위원회)가 인간의 색 인지를 모델링하여 만든 색공간으로, 모든 인간이 볼 수 있는 색을 포함합니다. L 채널은 밝기만, A와 B 채널은 색상만 담당하여 완전히 분리됩니다. 이 특성 덕분에 L 채널에만 히스토그램 평활화를 적용하면 색상 왜곡 없이 대비를 개선할 수 있습니다.
+  - type: code
+    language: python
+    title: LAB 변환
+    description: BGR을 LAB로 변환합니다
+    content: |-
+      lab = cv2.cvtColor(photoBgr, cv2.COLOR_BGR2LAB)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(lab)
+      plt.title(f'LAB: {lab.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: LAB 채널 분리
+    description: L, A, B를 분리합니다
+    content: |-
+      lCh, aCh, bCh = cv2.split(lab)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(lCh, cmap='gray')
+      plt.title(f'L Channel: {lCh.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: LAB의 L 채널은 그레이스케일과 유사하지만 인간의 시각 인지에 더 가깝게 설계되었습니다. A는 녹색(-) ~ 빨강(+), B는 파랑(-) ~ 노랑(+) 축입니다.
+  - type: code
+    language: python
+    title: LAB 채널 시각화
+    description: 세 채널을 나란히 표시합니다
+    content: |-
+      figLab, axLab = plt.subplots(1, 3, figsize=(12, 4))
+      axLab[0].imshow(lCh, cmap='gray')
+      axLab[0].set_title('L (Lightness)')
+      axLab[0].axis('off')
+      axLab[1].imshow(aCh, cmap='RdYlGn_r')
+      axLab[1].set_title('A (Green-Red)')
+      axLab[1].axis('off')
+      axLab[2].imshow(bCh, cmap='YlGnBu_r')
+      axLab[2].set_title('B (Blue-Yellow)')
+      axLab[2].axis('off')
+      plt.tight_layout()
+
+- id: step5_compare
+  title: 5단계. 색공간 비교
+  subtitle: 변환 결과 비교
+  blocks:
+  - type: text
+    content: 원본과 각 색공간 변환 결과를 나란히 비교해봅시다. 각 색공간이 이미지 정보를 어떻게 다르게 표현하는지 확인합니다.
+  - type: code
+    language: python
+    title: 4분할 비교
+    description: 원본, Gray, HSV-H, LAB-L을 비교합니다
+    content: |-
+      figCompare, axCompare = plt.subplots(2, 2, figsize=(10, 8))
+      axCompare[0, 0].imshow(photo)
+      axCompare[0, 0].set_title('Original (RGB)')
+      axCompare[0, 0].axis('off')
+      axCompare[0, 1].imshow(gray, cmap='gray')
+      axCompare[0, 1].set_title('Grayscale')
+      axCompare[0, 1].axis('off')
+      axCompare[1, 0].imshow(hue, cmap='hsv')
+      axCompare[1, 0].set_title('HSV - Hue')
+      axCompare[1, 0].axis('off')
+      axCompare[1, 1].imshow(lCh, cmap='gray')
+      axCompare[1, 1].set_title('LAB - Lightness')
+      axCompare[1, 1].axis('off')
+      plt.tight_layout()
+
+- id: step6_back
+  title: 6단계. 역변환
+  subtitle: 색공간 복원
+  blocks:
+  - type: text
+    content: HSV나 LAB에서 수정 후 다시 BGR/RGB로 변환할 수 있습니다. 변환 과정에서 약간의 정보 손실이 있을 수 있습니다.
+  - type: code
+    language: python
+    title: HSV에서 BGR로
+    description: HSV를 다시 BGR로 변환합니다
+    content: |-
+      backBgr = cv2.cvtColor(hsv, cv2.COLOR_HSV2BGR)
+      backRgb = cv2.cvtColor(backBgr, cv2.COLOR_BGR2RGB)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(backRgb)
+      plt.title(f'Restored: {backRgb.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 복원 결과 확인
+    description: 원본과 비교합니다
+    content: |-
+      diff = np.abs(photo.astype(int) - backRgb.astype(int))
+      figDiff, axDiff = plt.subplots(1, 2, figsize=(12, 5))
+      axDiff[0].imshow(photo)
+      axDiff[0].set_title('Original')
+      axDiff[0].axis('off')
+      axDiff[1].imshow(diff.astype(np.uint8) * 50)
+      axDiff[1].set_title(f'Difference (max: {diff.max()})')
+      axDiff[1].axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: 색공간 변환은 대부분 가역적이지만, 양자화 오차로 완벽히 동일하지 않을 수 있습니다. 정밀한 작업에서는 이 점을 고려해야 합니다.
+
+- id: practice
+  title: 실습
+  subtitle: 색공간 활용
+  blocks:
+  - type: text
+    content: flower 이미지로 색공간 변환을 연습해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: flower 그레이스케일과 HSV"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        import cv2
+        import numpy as np
+        from sklearn.datasets import load_sample_image
+        import matplotlib.pyplot as plt
+
+        flower = load_sample_image('flower.jpg')
+        flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+        plt.figure(figsize=(10, 6))
+        plt.imshow(flower)
+        plt.title(f'Flower: {flower.shape}')
+        plt.axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "그레이스케일 변환"
+      content: |-
+        flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
+        plt.figure(figsize=(10, 6))
+        plt.imshow(flowerGray, cmap='gray')
+        plt.title(f'Grayscale: {flowerGray.shape}')
+        plt.axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "HSV 변환 및 시각화"
+      content: |-
+        flowerHsv = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2HSV)
+        fHue, fSat, fVal = cv2.split(flowerHsv)
+        figFlower, axFlower = plt.subplots(1, 3, figsize=(12, 4))
+        axFlower[0].imshow(flower)
+        axFlower[0].set_title('Original')
+        axFlower[0].axis('off')
+        axFlower[1].imshow(flowerGray, cmap='gray')
+        axFlower[1].set_title('Grayscale')
+        axFlower[1].axis('off')
+        axFlower[2].imshow(fHue, cmap='hsv')
+        axFlower[2].set_title('Hue')
+        axFlower[2].axis('off')
+        plt.tight_layout()
+  - type: expansion
+    title: "미션2: LAB 채널 분석"
+    blocks:
+    - type: code
+      title: "이미지 로드 및 LAB 변환"
+      content: |-
+        import cv2
+        import numpy as np
+        from sklearn.datasets import load_sample_image
+        import matplotlib.pyplot as plt
+
+        scene = load_sample_image('china.jpg')
+        sceneBgr = cv2.cvtColor(scene, cv2.COLOR_RGB2BGR)
+        sceneLab = cv2.cvtColor(sceneBgr, cv2.COLOR_BGR2LAB)
+        plt.figure(figsize=(10, 6))
+        plt.imshow(scene)
+        plt.title(f'Scene: {scene.shape}')
+        plt.axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "채널 분리"
+      content: |-
+        sL, sA, sB = cv2.split(sceneLab)
+        plt.figure(figsize=(10, 6))
+        plt.imshow(sL, cmap='gray')
+        plt.title(f'L Channel: min={sL.min()}, max={sL.max()}')
+        plt.axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "채널별 시각화"
+      content: |-
+        figScene, axScene = plt.subplots(2, 2, figsize=(10, 8))
+        axScene[0, 0].imshow(scene)
+        axScene[0, 0].set_title('Original')
+        axScene[0, 0].axis('off')
+        axScene[0, 1].imshow(sL, cmap='gray')
+        axScene[0, 1].set_title('L Channel')
+        axScene[0, 1].axis('off')
+        axScene[1, 0].imshow(sA, cmap='RdYlGn_r')
+        axScene[1, 0].set_title('A Channel')
+        axScene[1, 0].axis('off')
+        axScene[1, 1].imshow(sB, cmap='YlGnBu_r')
+        axScene[1, 1].set_title('B Channel')
+        axScene[1, 1].axis('off')
+        plt.tight_layout()

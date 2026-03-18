@@ -1,0 +1,779 @@
+meta:
+  id: "12_shutil"
+  title: "shutil - 파일 연산"
+  category: "builtins"
+  tags: ["shutil", "파일", "복사", "이동", "압축"]
+  seo:
+    title: "파이썬 shutil 모듈 완전 정복"
+    description: "shutil 모듈로 파일 복사, 이동, 압축을 배웁니다."
+    keywords: ["shutil", "파일복사", "파일이동", "압축", "파이썬파일"]
+
+intro:
+  emoji: "📋"
+  points:
+  - "파일 복사와 이동"
+  - "디렉토리 전체 작업"
+  - "압축 파일 생성/해제"
+  - "디스크 사용량 확인"
+
+sections:
+- id: "module_import"
+  title: "shutil 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "shutil은 파일과 디렉토리를 고수준으로 다루는 모듈입니다. 복사, 이동, 삭제, 압축 등의 작업을 간단하게 수행할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "shutil 모듈 불러오기"
+    description: "shutil 모듈을 불러옵니다."
+    content: |-
+      import shutil
+
+- id: "file_operations"
+  title: "파일 복사/이동"
+  subtitle: "파일 단위 작업"
+  blocks:
+  - type: "text"
+    content: "copy는 파일을 복사하고, copy2는 메타데이터도 복사합니다. move는 파일을 이동하거나 이름을 변경합니다."
+  - type: "code"
+    language: "python"
+    title: "파일 복사"
+    description: "파일을 복사합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      sourceFile = os.path.join(tempDir, "source.txt")
+      with open(sourceFile, "w") as f:
+          f.write("Original content")
+
+      destFile = os.path.join(tempDir, "dest.txt")
+      shutil.copy(sourceFile, destFile)
+      os.path.exists(destFile)
+  - type: "code"
+    language: "python"
+    title: "메타데이터 포함 복사"
+    description: "파일을 메타데이터와 함께 복사합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      originalFile = os.path.join(tempDir, "original.txt")
+      with open(originalFile, "w") as f:
+          f.write("Data")
+
+      copiedFile = os.path.join(tempDir, "copied.txt")
+      shutil.copy2(originalFile, copiedFile)
+      with open(copiedFile, "r") as f:
+          f.read()
+  - type: "code"
+    language: "python"
+    title: "파일 이동"
+    description: "파일을 이동합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      oldPath = os.path.join(tempDir, "old.txt")
+      with open(oldPath, "w") as f:
+          f.write("Moving")
+
+      newPath = os.path.join(tempDir, "new.txt")
+      shutil.move(oldPath, newPath)
+      os.path.exists(newPath)
+  - type: "code"
+    language: "python"
+    title: "이동 후 원본 확인"
+    description: "파일 이동 후 원본이 사라졌는지 확인합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      fileToMove = os.path.join(tempDir, "file.txt")
+      with open(fileToMove, "w") as f:
+          f.write("Content")
+
+      movedFile = os.path.join(tempDir, "moved.txt")
+      shutil.move(fileToMove, movedFile)
+      os.path.exists(fileToMove)
+  - type: "code"
+    language: "python"
+    title: "복사 결과 확인"
+    description: "복사된 파일의 경로를 확인합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      srcFile = os.path.join(tempDir, "src.txt")
+      with open(srcFile, "w") as f:
+          f.write("Test")
+
+      dstFile = os.path.join(tempDir, "dst.txt")
+      result = shutil.copy(srcFile, dstFile)
+      os.path.basename(result)
+
+- id: "directory_operations"
+  title: "디렉토리 작업"
+  subtitle: "디렉토리 단위 작업"
+  blocks:
+  - type: "text"
+    content: "copytree는 디렉토리를 재귀적으로 복사합니다. rmtree는 디렉토리와 내용을 모두 삭제합니다."
+  - type: "code"
+    language: "python"
+    title: "디렉토리 복사"
+    description: "디렉토리를 재귀적으로 복사합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      srcDir = os.path.join(tempDir, "source")
+      os.makedirs(srcDir)
+      with open(os.path.join(srcDir, "file.txt"), "w") as f:
+          f.write("Data")
+
+      dstDir = os.path.join(tempDir, "destination")
+      shutil.copytree(srcDir, dstDir)
+      os.path.exists(dstDir)
+  - type: "code"
+    language: "python"
+    title: "복사 후 내부 파일 확인"
+    description: "복사된 디렉토리 내부 파일을 확인합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      sourceDir = os.path.join(tempDir, "src")
+      os.makedirs(sourceDir)
+      with open(os.path.join(sourceDir, "test.txt"), "w") as f:
+          f.write("Content")
+
+      destDir = os.path.join(tempDir, "dst")
+      shutil.copytree(sourceDir, destDir)
+      os.path.exists(os.path.join(destDir, "test.txt"))
+  - type: "code"
+    language: "python"
+    title: "디렉토리 삭제"
+    description: "디렉토리와 내용을 모두 삭제합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      dirToRemove = os.path.join(tempDir, "remove")
+      os.makedirs(dirToRemove)
+      with open(os.path.join(dirToRemove, "file.txt"), "w") as f:
+          f.write("Delete me")
+
+      shutil.rmtree(dirToRemove)
+      os.path.exists(dirToRemove)
+  - type: "code"
+    language: "python"
+    title: "중첩 디렉토리 복사"
+    description: "중첩된 디렉토리 구조를 복사합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      nestedDir = os.path.join(tempDir, "parent", "child")
+      os.makedirs(nestedDir)
+      with open(os.path.join(nestedDir, "data.txt"), "w") as f:
+          f.write("Nested")
+
+      copiedDir = os.path.join(tempDir, "copied")
+      shutil.copytree(os.path.join(tempDir, "parent"), copiedDir)
+      os.path.exists(os.path.join(copiedDir, "child", "data.txt"))
+  - type: "code"
+    language: "python"
+    title: "하위 디렉토리 포함 삭제"
+    description: "하위 디렉토리를 포함하여 삭제합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      testDir = os.path.join(tempDir, "test")
+      os.makedirs(testDir)
+      subDir = os.path.join(testDir, "sub")
+      os.makedirs(subDir)
+
+      shutil.rmtree(testDir)
+      os.path.exists(subDir)
+
+- id: "archive_operations"
+  title: "압축 파일"
+  subtitle: "압축 생성 및 해제"
+  blocks:
+  - type: "text"
+    content: "make_archive는 압축 파일을 생성합니다. unpack_archive는 압축 파일을 해제합니다. Pyodide에서는 제한적으로 동작할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "압축 파일 생성"
+    description: "디렉토리를 zip으로 압축합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      sourceDir = os.path.join(tempDir, "data")
+      os.makedirs(sourceDir)
+      with open(os.path.join(sourceDir, "file.txt"), "w") as f:
+          f.write("Archive me")
+
+      archivePath = os.path.join(tempDir, "archive")
+      result = shutil.make_archive(archivePath, 'zip', sourceDir)
+      os.path.exists(result)
+  - type: "code"
+    language: "python"
+    title: "압축 파일명 확인"
+    description: "생성된 압축 파일명을 확인합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      dataDir = os.path.join(tempDir, "mydata")
+      os.makedirs(dataDir)
+      with open(os.path.join(dataDir, "info.txt"), "w") as f:
+          f.write("Info")
+
+      archiveName = os.path.join(tempDir, "myarchive")
+      shutil.make_archive(archiveName, 'zip', dataDir)
+      os.path.basename(archiveName + '.zip')
+  - type: "code"
+    language: "python"
+    title: "압축 해제"
+    description: "zip 파일을 해제합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      contentDir = os.path.join(tempDir, "content")
+      os.makedirs(contentDir)
+      with open(os.path.join(contentDir, "doc.txt"), "w") as f:
+          f.write("Document")
+
+      zipPath = os.path.join(tempDir, "backup")
+      shutil.make_archive(zipPath, 'zip', contentDir)
+      extractDir = os.path.join(tempDir, "extracted")
+      shutil.unpack_archive(zipPath + '.zip', extractDir)
+      os.path.exists(extractDir)
+  - type: "code"
+    language: "python"
+    title: "압축 해제 후 파일 확인"
+    description: "압축 해제 후 내부 파일을 확인합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      filesDir = os.path.join(tempDir, "files")
+      os.makedirs(filesDir)
+      with open(os.path.join(filesDir, "test.txt"), "w") as f:
+          f.write("Test data")
+
+      archiveBase = os.path.join(tempDir, "compressed")
+      shutil.make_archive(archiveBase, 'zip', filesDir)
+      unpackDir = os.path.join(tempDir, "unpacked")
+      shutil.unpack_archive(archiveBase + '.zip', unpackDir)
+      os.path.exists(os.path.join(unpackDir, "test.txt"))
+  - type: "code"
+    language: "python"
+    title: "지원 압축 형식 확인"
+    description: "지원하는 압축 형식을 확인합니다."
+    content: |-
+      import shutil
+      shutil.get_archive_formats()[:2]
+
+- id: "disk_usage"
+  title: "디스크 사용량"
+  subtitle: "디스크 정보 확인"
+  blocks:
+  - type: "text"
+    content: "disk_usage는 디스크 사용량 정보를 반환합니다. total, used, free 값을 튜플로 제공합니다. Pyodide에서는 가상 파일시스템 정보를 반환합니다."
+  - type: "code"
+    language: "python"
+    title: "디스크 사용량 타입"
+    description: "디스크 사용량 객체 타입을 확인합니다."
+    content: |-
+      import shutil
+      usageInfo = shutil.disk_usage("/")
+      type(usageInfo).__name__
+  - type: "code"
+    language: "python"
+    title: "사용량 정보 개수"
+    description: "반환되는 정보 개수를 확인합니다."
+    content: |-
+      import shutil
+      diskInfo = shutil.disk_usage(".")
+      len(diskInfo)
+  - type: "code"
+    language: "python"
+    title: "전체 용량 확인"
+    description: "디스크 전체 용량을 확인합니다."
+    content: |-
+      import shutil
+      usage = shutil.disk_usage("/")
+      usage.total > 0
+  - type: "code"
+    language: "python"
+    title: "사용 용량 확인"
+    description: "디스크 사용 용량을 확인합니다."
+    content: |-
+      import shutil
+      stats = shutil.disk_usage(".")
+      stats.used >= 0
+  - type: "code"
+    language: "python"
+    title: "여유 공간 확인"
+    description: "디스크 여유 공간을 확인합니다."
+    content: |-
+      import shutil
+      info = shutil.disk_usage("/")
+      info.free >= 0
+
+- id: "practical_use"
+  title: "실전 활용"
+  subtitle: "실무 계산 예제"
+  blocks:
+  - type: "text"
+    content: "shutil을 활용한 백업, 배포, 정리 작업 예제입니다. 실무에서 자주 사용되는 패턴을 학습합니다."
+  - type: "code"
+    language: "python"
+    title: "프로젝트 백업"
+    description: "프로젝트 디렉토리를 백업합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      projectDir = os.path.join(tempDir, "project")
+      os.makedirs(projectDir)
+      with open(os.path.join(projectDir, "main.py"), "w") as f:
+          f.write("code")
+
+      backupDir = os.path.join(tempDir, "backup")
+      shutil.copytree(projectDir, backupDir)
+      os.path.exists(backupDir)
+  - type: "code"
+    language: "python"
+    title: "로그 압축 보관"
+    description: "로그 파일을 압축하여 보관합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      logDir = os.path.join(tempDir, "logs")
+      os.makedirs(logDir)
+      for i in range(3):
+          with open(os.path.join(logDir, f"log{i}.txt"), "w") as f:
+              f.write(f"Log {i}")
+
+      archivePath = os.path.join(tempDir, "logs_backup")
+      shutil.make_archive(archivePath, 'zip', logDir)
+      os.path.exists(archivePath + '.zip')
+  - type: "code"
+    language: "python"
+    title: "디렉토리 이름 변경"
+    description: "디렉토리를 이동하여 이름을 변경합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      oldDir = os.path.join(tempDir, "old")
+      os.makedirs(oldDir)
+      with open(os.path.join(oldDir, "data.txt"), "w") as f:
+          f.write("old data")
+
+      newDir = os.path.join(tempDir, "new")
+      shutil.move(oldDir, newDir)
+      os.path.exists(newDir)
+  - type: "code"
+    language: "python"
+    title: "캐시 정리"
+    description: "캐시 디렉토리를 삭제합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      cacheDir = os.path.join(tempDir, "cache")
+      os.makedirs(cacheDir)
+      for i in range(5):
+          with open(os.path.join(cacheDir, f"cache{i}.tmp"), "w") as f:
+              f.write("temp")
+
+      shutil.rmtree(cacheDir)
+      os.path.exists(cacheDir)
+  - type: "code"
+    language: "python"
+    title: "릴리스 패키징"
+    description: "배포용 디렉토리를 복사하고 압축합니다."
+    content: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      distDir = os.path.join(tempDir, "dist")
+      os.makedirs(distDir)
+      with open(os.path.join(distDir, "app.exe"), "w") as f:
+          f.write("binary")
+
+      releaseDir = os.path.join(tempDir, "release")
+      shutil.copytree(distDir, releaseDir)
+      releaseArchive = os.path.join(tempDir, "release")
+      result = shutil.make_archive(releaseArchive, 'zip', releaseDir)
+      os.path.exists(result)
+
+- id: "practice"
+  title: "shutil 모듈 종합 복습"
+  subtitle: "파일 연산 마스터하기"
+  blocks:
+  - type: "text"
+    content: "지금까지 배운 shutil 모듈의 모든 기능을 복습합니다. 🟢 기초 5개, 🟡 중급 5개, 🔴 고급 10개 문제를 풀어보세요."
+
+  - type: "expansion"
+    title: "🟢 기초1: 파일 복사"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      sourceFile = os.path.join(tempDir, "source.txt")
+      with open(sourceFile, "w") as f:
+          f.write("data")
+
+      backupFile = os.path.join(tempDir, "backup.txt")
+      shutil.copy(sourceFile, backupFile)
+      os.path.exists(backupFile)
+
+  - type: "expansion"
+    title: "🟢 기초2: 파일 이동"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      oldFile = os.path.join(tempDir, "old.txt")
+      with open(oldFile, "w") as f:
+          f.write("content")
+
+      newFile = os.path.join(tempDir, "new.txt")
+      shutil.move(oldFile, newFile)
+      os.path.exists(newFile)
+
+  - type: "expansion"
+    title: "🟢 기초3: 디렉토리 삭제"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      removeDir = os.path.join(tempDir, "temp")
+      os.makedirs(removeDir)
+      shutil.rmtree(removeDir)
+      os.path.exists(removeDir)
+
+  - type: "expansion"
+    title: "🟢 기초4: 디스크 사용량 확인"
+    code: |-
+      import shutil
+      usage = shutil.disk_usage("/")
+      usage.total > 0
+
+  - type: "expansion"
+    title: "🟢 기초5: 압축 형식 개수"
+    code: |-
+      import shutil
+      formats = shutil.get_archive_formats()
+      len(formats) >= 5
+
+  - type: "expansion"
+    title: "🟡 중급1: 디렉토리 복사"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      srcDir = os.path.join(tempDir, "src")
+      os.makedirs(srcDir)
+      with open(os.path.join(srcDir, "file.txt"), "w") as f:
+          f.write("data")
+
+      dstDir = os.path.join(tempDir, "dst")
+      shutil.copytree(srcDir, dstDir)
+      os.path.exists(os.path.join(dstDir, "file.txt"))
+
+  - type: "expansion"
+    title: "🟡 중급2: 메타데이터 복사"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      origFile = os.path.join(tempDir, "original.txt")
+      with open(origFile, "w") as f:
+          f.write("metadata")
+
+      copiedFile = os.path.join(tempDir, "copied.txt")
+      shutil.copy2(origFile, copiedFile)
+      os.path.exists(copiedFile)
+
+  - type: "expansion"
+    title: "🟡 중급3: 디렉토리 압축"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      dataDir = os.path.join(tempDir, "data")
+      os.makedirs(dataDir)
+      with open(os.path.join(dataDir, "info.txt"), "w") as f:
+          f.write("info")
+
+      archiveName = os.path.join(tempDir, "archive")
+      result = shutil.make_archive(archiveName, 'zip', dataDir)
+      os.path.exists(result)
+
+  - type: "expansion"
+    title: "🟡 중급4: 여유 공간 확인"
+    code: |-
+      import shutil
+      diskInfo = shutil.disk_usage(".")
+      diskInfo.free >= 0
+
+  - type: "expansion"
+    title: "🟡 중급5: 복사 후 원본 유지"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      originalPath = os.path.join(tempDir, "original.txt")
+      with open(originalPath, "w") as f:
+          f.write("keep")
+
+      copyPath = os.path.join(tempDir, "copy.txt")
+      shutil.copy(originalPath, copyPath)
+      os.path.exists(originalPath)
+
+  - type: "expansion"
+    title: "🔴 고급1: 백업 시스템"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      projectDir = os.path.join(tempDir, "project")
+      os.makedirs(projectDir)
+      with open(os.path.join(projectDir, "main.py"), "w") as f:
+          f.write("print('hello')")
+      with open(os.path.join(projectDir, "config.json"), "w") as f:
+          f.write("{}")
+
+      backupBase = os.path.join(tempDir, "backup")
+      shutil.copytree(projectDir, backupBase + "_copy")
+      result = shutil.make_archive(backupBase, 'zip', backupBase + "_copy")
+      os.path.exists(result)
+
+  - type: "expansion"
+    title: "🔴 고급2: 로그 정리 압축"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      logsDir = os.path.join(tempDir, "logs")
+      os.makedirs(logsDir)
+      logFiles = []
+      for i in range(5):
+          logPath = os.path.join(logsDir, f"app{i}.log")
+          with open(logPath, "w") as f:
+              f.write(f"log entry {i}")
+          logFiles.append(logPath)
+
+      archiveDest = os.path.join(tempDir, "logs_archive")
+      shutil.make_archive(archiveDest, 'zip', logsDir)
+      shutil.rmtree(logsDir)
+      os.path.exists(archiveDest + '.zip') and not os.path.exists(logsDir)
+
+  - type: "expansion"
+    title: "🔴 고급3: 압축 해제 검증"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      contentDir = os.path.join(tempDir, "content")
+      os.makedirs(contentDir)
+      targetFile = os.path.join(contentDir, "target.txt")
+      with open(targetFile, "w") as f:
+          f.write("important data")
+
+      zipPath = os.path.join(tempDir, "package")
+      shutil.make_archive(zipPath, 'zip', contentDir)
+
+      extractDir = os.path.join(tempDir, "extracted")
+      shutil.unpack_archive(zipPath + '.zip', extractDir)
+      os.path.exists(os.path.join(extractDir, "target.txt"))
+
+  - type: "expansion"
+    title: "🔴 고급4: 디렉토리 이동 검증"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      oldLocation = os.path.join(tempDir, "old")
+      os.makedirs(oldLocation)
+      for i in range(3):
+          with open(os.path.join(oldLocation, f"file{i}.txt"), "w") as f:
+              f.write(str(i))
+
+      newLocation = os.path.join(tempDir, "new")
+      shutil.move(oldLocation, newLocation)
+      len(os.listdir(newLocation))
+
+  - type: "expansion"
+    title: "🔴 고급5: 중첩 구조 복사"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      deepDir = os.path.join(tempDir, "level1", "level2", "level3")
+      os.makedirs(deepDir)
+      deepFile = os.path.join(deepDir, "deep.txt")
+      with open(deepFile, "w") as f:
+          f.write("deep content")
+
+      copyRoot = os.path.join(tempDir, "copied")
+      shutil.copytree(os.path.join(tempDir, "level1"), copyRoot)
+      os.path.exists(os.path.join(copyRoot, "level2", "level3", "deep.txt"))
+
+  - type: "expansion"
+    title: "🔴 고급6: 캐시 정리 패턴"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      baseDir = tempfile.mkdtemp()
+      cacheDir = os.path.join(baseDir, "cache")
+      os.makedirs(cacheDir)
+      for i in range(10):
+          with open(os.path.join(cacheDir, f"cache{i}.tmp"), "w") as f:
+              f.write("temp data")
+      fileCount = len(os.listdir(cacheDir))
+      shutil.rmtree(cacheDir)
+      fileCount == 10 and not os.path.exists(cacheDir)
+
+  - type: "expansion"
+    title: "🔴 고급7: 배포 패키징"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      buildDir = os.path.join(tempDir, "build")
+      os.makedirs(buildDir)
+      with open(os.path.join(buildDir, "app.exe"), "w") as f:
+          f.write("binary")
+      with open(os.path.join(buildDir, "readme.txt"), "w") as f:
+          f.write("instructions")
+
+      releaseDir = os.path.join(tempDir, "release")
+      finalArchive = os.path.join(tempDir, "release_v1")
+      shutil.copytree(buildDir, releaseDir)
+      result = shutil.make_archive(finalArchive, 'zip', releaseDir)
+      os.path.exists(result) and os.path.exists(releaseDir)
+
+  - type: "expansion"
+    title: "🔴 고급8: 디스크 사용률 계산"
+    code: |-
+      import shutil
+      diskStats = shutil.disk_usage("/")
+      usagePercent = (diskStats.used / diskStats.total) * 100
+      0 <= usagePercent <= 100
+
+  - type: "expansion"
+    title: "🔴 고급9: 복사 후 삭제"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      srcFile = os.path.join(tempDir, "source.dat")
+      with open(srcFile, "w") as f:
+          f.write("data to move")
+
+      dstFile = os.path.join(tempDir, "destination.dat")
+      shutil.copy(srcFile, dstFile)
+      os.remove(srcFile)
+      os.path.exists(dstFile) and not os.path.exists(srcFile)
+
+  - type: "expansion"
+    title: "🔴 고급10: 다중 백업 버전"
+    code: |-
+      import shutil
+      import tempfile
+      import os
+
+      tempDir = tempfile.mkdtemp()
+      dataDir = os.path.join(tempDir, "data")
+      os.makedirs(dataDir)
+      with open(os.path.join(dataDir, "important.txt"), "w") as f:
+          f.write("critical data")
+
+      backupNames = []
+      for version in range(3):
+          backupPath = os.path.join(tempDir, f"backup_v{version}")
+          backupNames.append(backupPath + '.zip')
+      for version in range(3):
+          archivePath = os.path.join(tempDir, f"backup_v{version}")
+          shutil.make_archive(archivePath, 'zip', dataDir)
+      all(os.path.exists(name) for name in backupNames)

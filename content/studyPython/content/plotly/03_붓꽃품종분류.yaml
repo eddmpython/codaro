@@ -1,0 +1,358 @@
+meta:
+  id: plotly_03
+  title: 붓꽃품종분류
+  order: 3
+  category: plotly
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["scatter", "violin", "size", "hover", "trendline", "scatter_matrix"]
+  seo:
+    title: "Plotly 산점도와 바이올린 - 붓꽃 품종 분류"
+    description: "Plotly로 붓꽃 품종별 특성을 산점도, 바이올린, 추세선으로 시각화합니다. 최종 산점도 매트릭스로 품종을 구분합니다."
+    keywords: ["plotly scatter", "바이올린 플롯", "추세선 trendline", "scatter_matrix"]
+
+intro:
+  emoji: "🌸"
+  goal: 붓꽃 3품종의 특성을 산점도 매트릭스로 시각화하여 품종을 구분합니다.
+  description: 산점도로 두 변수 관계를, 바이올린으로 분포를, 추세선으로 경향성을 파악합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: 붓꽃 150송이
+  blocks:
+  - type: text
+    content: px.data.iris()는 머신러닝과 데이터 과학의 고전적인 데이터셋으로, 붓꽃 3품종(setosa, versicolor, virginica)의 꽃잎과 꽃받침 크기를 측정한 데이터입니다. 각 품종당 50개씩 총 150개의 관측치가 있으며, 4개의 측정값(꽃잎 길이, 꽃잎 너비, 꽃받침 길이, 꽃받침 너비)과 품종 라벨로 구성되어 있습니다. 이 데이터는 1936년 통계학자 Ronald Fisher가 발표한 이후 분류(classification) 알고리즘의 벤치마크 데이터로 널리 사용되고 있습니다. Plotly Express에 내장되어 있어 별도로 다운로드할 필요 없이 바로 사용할 수 있습니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: Plotly 내장 iris 데이터
+    content: |-
+      import plotly.express as px
+      import pandas as pd
+      iris = px.data.iris()
+      iris
+
+- id: step2_scatter_basic
+  title: 2단계. 기본 산점도
+  subtitle: 두 변수의 관계
+  blocks:
+  - type: text
+    content: 산점도(scatter plot)는 두 개의 연속형 변수 간의 관계를 점으로 표현하는 차트입니다. 각 점은 하나의 데이터 행을 나타내며, x축과 y축의 교차점에 배치됩니다. 붓꽃 데이터에서 꽃잎 길이(petal_length)와 꽃잎 너비(petal_width)의 관계를 시각화하면 두 변수가 비례 관계인지, 어떤 패턴이 있는지 한눈에 파악할 수 있습니다. 산점도는 상관관계를 분석하는 가장 직관적인 방법으로, 양의 상관관계(오른쪽 위로 상승), 음의 상관관계(오른쪽 아래로 하강), 무상관(랜덤 분포)을 시각적으로 확인할 수 있습니다. 통계학에서 회귀분석, 이상치 탐지, 변수 선택의 첫 단계로 활용됩니다.
+  - type: code
+    language: python
+    title: 기본 산점도
+    description: 꽃잎 길이 vs 너비
+    content: |-
+      figScatterBasic = px.scatter(
+          iris,
+          x="petal_length",
+          y="petal_width",
+          title="꽃잎 길이 vs 너비"
+      )
+      figScatterBasic
+  - type: tip
+    content: px.scatter(데이터, x='x축컬럼', y='y축컬럼')이 기본 형태입니다. 두 변수 사이의 관계를 점으로 표현하며, 각 점은 하나의 데이터 행(관측치)을 의미합니다. x축은 독립변수(설명변수), y축은 종속변수(반응변수)로 배치하는 것이 관례입니다. 점들이 일정한 패턴을 보이면 두 변수 간에 관계가 있다는 증거입니다. 산점도는 선형 회귀, 로지스틱 회귀 등 머신러닝 모델링의 기초가 되는 탐색적 데이터 분석(EDA)의 핵심 도구입니다.
+
+- id: step3_scatter_color
+  title: 3단계. 품종별 색상 구분
+  subtitle: color로 그룹 구분
+  blocks:
+  - type: text
+    content: color 파라미터로 품종별로 다른 색상을 지정하면 산점도에서 각 품종의 패턴을 명확히 구분할 수 있습니다. 이전 프로젝트에서 배운 color 파라미터를 산점도에 적용하면 범주형 변수를 시각적으로 분리할 수 있습니다. 세 가지 붓꽃 품종(setosa, versicolor, virginica)이 각각 다른 색상으로 표시되어, 꽃잎 길이와 너비의 조합으로 품종을 구분할 수 있는지 확인할 수 있습니다. 만약 세 품종이 산점도에서 명확히 분리되면 이 두 변수만으로도 품종 분류가 가능하다는 의미입니다. 머신러닝에서 feature engineering(특성 공학)의 기초가 됩니다.
+  - type: code
+    language: python
+    title: 품종별 색상
+    description: color로 품종 구분
+    content: |-
+      figScatterColor = px.scatter(
+          iris,
+          x="petal_length",
+          y="petal_width",
+          color="species",
+          title="품종별 꽃잎 특성"
+      )
+      figScatterColor
+
+- id: step4_scatter_size
+  title: 4단계. 크기로 추가 정보 표현
+  subtitle: size 파라미터
+  blocks:
+  - type: text
+    content: size 파라미터를 사용하면 점의 크기에 세 번째 변수를 매핑하여 다차원 데이터를 2D 평면에 표현할 수 있습니다. 산점도는 기본적으로 x축과 y축 두 변수만 표현하지만, color(색상), size(크기), symbol(모양) 등을 추가하면 최대 5~6개 변수를 한 차트에 시각화할 수 있습니다. 여기서는 꽃받침 길이(sepal_length)를 점 크기로 표현하여, 꽃잎 길이/너비/품종/꽃받침 길이 총 4개 변수를 동시에 보여줍니다. 이런 다차원 시각화는 변수 간의 복잡한 관계를 한눈에 파악할 수 있게 해주며, 비즈니스 인텔리전스나 과학 연구에서 핵심 인사이트를 발견하는 데 매우 유용합니다.
+  - type: code
+    language: python
+    title: 크기 추가
+    description: 꽃받침 길이를 크기로
+    content: |-
+      figScatterSize = px.scatter(
+          iris,
+          x="petal_length",
+          y="petal_width",
+          color="species",
+          size="sepal_length",
+          title="품종별 꽃잎 특성 (크기: 꽃받침 길이)"
+      )
+      figScatterSize
+  - type: tip
+    content: size='컬럼명'으로 점 크기를 조절합니다. 값이 클수록 점이 커집니다. 3개 이상의 변수를 한 차트에 표현할 때 유용하며, 버블 차트라고도 부릅니다. size_max 파라미터로 점의 최대 크기를 제한할 수 있고, 기본값은 20입니다. 크기가 너무 크면 점들이 겹쳐서 보기 어려우므로 적절한 값을 찾는 것이 중요합니다. 실무에서는 인구(크기)와 GDP(x축), 기대수명(y축), 대륙(색상)을 조합한 Gapminder 차트가 유명한 예시입니다.
+
+- id: step5_hover
+  title: 5단계. 호버 정보 추가
+  subtitle: hover_data와 hover_name
+  blocks:
+  - type: text
+    content: Plotly의 인터랙티브 차트에서 마우스를 올리면 기본적으로 x, y 값이 표시되지만, hover_name과 hover_data를 사용하면 추가 정보를 자유롭게 커스터마이징할 수 있습니다. hover_name은 호버 툴팁의 제목으로 표시되며, hover_data는 리스트 형태로 여러 컬럼을 추가할 수 있어 차트에 표시되지 않은 정보도 마우스 오버만으로 확인할 수 있습니다. 예를 들어 산점도에는 2개 변수만 표시되지만, 호버로 4~5개 변수를 모두 제공할 수 있어 정보 밀도를 크게 높일 수 있습니다. 이는 대시보드나 보고서에서 독자가 직접 데이터를 탐색할 수 있게 해주는 핵심 기능입니다.
+  - type: code
+    language: python
+    title: 호버 정보
+    description: 추가 정보 표시
+    content: |-
+      px.scatter(
+          iris,
+          x="petal_length",
+          y="petal_width",
+          color="species",
+          size="sepal_length",
+          hover_name="species",
+          hover_data=["sepal_width"],
+          title="품종별 꽃잎 특성"
+      )
+  - type: tip
+    content: "hover_name은 호버 제목, hover_data는 추가 정보입니다. hover_data=['컬럼1', '컬럼2']처럼 리스트로 여러 개 지정합니다."
+
+- id: step6_trendline
+  title: 6단계. 추세선 추가
+  subtitle: trendline 파라미터
+  blocks:
+  - type: text
+    content: trendline="ols"(Ordinary Least Squares, 최소제곱법) 파라미터를 추가하면 산점도에 회귀선이 자동으로 그려져 두 변수 간의 선형 관계를 명확히 파악할 수 있습니다. 점들이 회귀선 주변에 밀집되어 있으면 강한 선형 관계를, 멀리 흩어져 있으면 약한 관계를 의미합니다. color 파라미터와 함께 사용하면 각 그룹(품종)마다 별도의 추세선이 그려져, 그룹별로 관계의 강도와 방향이 어떻게 다른지 비교할 수 있습니다. 실무에서는 이런 추세선으로 예측 모델의 방향성을 먼저 확인하거나, 그룹 간 기울기 차이로 상호작용 효과를 탐지합니다.
+  - type: code
+    language: python
+    title: 추세선 추가
+    description: 회귀선으로 경향 파악
+    content: |-
+      px.scatter(
+          iris,
+          x="petal_length",
+          y="petal_width",
+          color="species",
+          trendline="ols",
+          title="품종별 꽃잎 특성 (추세선 포함)"
+      )
+  - type: tip
+    content: "trendline='ols'는 최소제곱법 회귀선입니다. 각 품종별로 별도의 추세선이 그려집니다. 기울기가 비슷하면 비례 관계가 유사합니다."
+
+- id: step7_violin_basic
+  title: 7단계. 바이올린 플롯
+  subtitle: 분포 형태 시각화
+  blocks:
+  - type: text
+    content: px.violin()은 데이터의 분포를 바이올린 모양으로 표현하여 박스플롯보다 훨씬 더 풍부한 정보를 제공합니다. 바이올린 플롯은 커널 밀도 추정(Kernel Density Estimation)을 사용하여 데이터가 어느 구간에 얼마나 밀집되어 있는지 곡선의 너비로 보여줍니다. 박스플롯이 5가지 요약 통계(최소, 1사분위, 중앙값, 3사분위, 최대)만 표시하는 반면, 바이올린 플롯은 분포의 전체 형태(단봉 또는 다봉, 왜도 등)를 시각적으로 드러냅니다. 이를 통해 데이터가 정규분포인지, 여러 피크가 있는지, 비대칭인지 등을 직관적으로 파악할 수 있어 고급 통계 분석에 매우 유용합니다.
+  - type: code
+    language: python
+    title: 기본 바이올린
+    description: 품종별 꽃잎 길이 분포
+    content: |-
+      px.violin(
+          iris,
+          x="species",
+          y="petal_length",
+          color="species",
+          title="품종별 꽃잎 길이 분포"
+      )
+  - type: tip
+    content: "바이올린 플롯은 박스플롯 + 밀도 플롯입니다. 넓은 부분은 데이터가 많이 모여있는 구간입니다."
+
+- id: step8_violin_box
+  title: 8단계. 바이올린 + 박스
+  subtitle: box=True
+  blocks:
+  - type: text
+    content: box=True 파라미터를 추가하면 바이올린 플롯 안에 작은 박스플롯이 함께 표시되어 분포의 형태와 요약 통계를 동시에 파악할 수 있습니다. 바이올린의 곡선은 전체적인 분포 패턴을 보여주고, 그 안의 박스는 중앙값과 사분위수라는 정확한 수치를 제공하여 두 가지 장점을 결합합니다. 이렇게 하면 분포가 단봉인지 다봉인지 보면서도 정확한 중심 경향과 산포도를 확인할 수 있어, 단독으로 사용하는 것보다 훨씬 더 많은 정보를 얻을 수 있습니다.
+  - type: code
+    language: python
+    title: 바이올린 + 박스
+    description: 두 가지 정보를 한번에
+    content: |-
+      px.violin(
+          iris,
+          x="species",
+          y="petal_length",
+          color="species",
+          box=True,
+          title="품종별 꽃잎 길이 분포 (박스 포함)"
+      )
+
+- id: step9_violin_points
+  title: 9단계. 개별 데이터 포인트
+  subtitle: points 파라미터
+  blocks:
+  - type: text
+    content: points="all" 파라미터를 사용하면 바이올린 플롯 위에 실제 데이터 포인트가 모두 점으로 표시되어 원본 데이터의 분포를 직접 확인할 수 있습니다. 이는 바이올린의 밀도 곡선과 박스플롯이 요약한 정보가 실제 데이터를 얼마나 잘 대표하는지 검증할 수 있게 해주며, 이상치나 특이한 패턴을 쉽게 발견할 수 있습니다. 데이터 개수가 적을 때(수십~수백 개)는 모든 점을 표시하는 것이 유용하지만, 수천 개 이상이면 점들이 겹쳐서 오히려 보기 어려울 수 있으므로 상황에 맞게 선택해야 합니다.
+  - type: code
+    language: python
+    title: 데이터 포인트 표시
+    description: 모든 데이터 점으로 표시
+    content: |-
+      px.violin(
+          iris,
+          x="species",
+          y="petal_length",
+          color="species",
+          box=True,
+          points="all",
+          title="품종별 꽃잎 길이 분포 (전체 데이터)"
+      )
+
+- id: step10_scatter_sepal
+  title: 10단계. 꽃받침 특성 분석
+  subtitle: 다른 변수 조합
+  blocks:
+  - type: text
+    content: 이전 단계에서는 꽃잎(petal) 특성으로 품종을 분석했으니, 이번에는 꽃받침(sepal) 특성으로도 품종 구분이 가능한지 확인합니다. 꽃받침 길이와 너비를 산점도로 그려보면 꽃잎 데이터와는 다른 패턴을 보일 수 있으며, 어떤 특성이 품종 분류에 더 유용한지 비교할 수 있습니다. 만약 꽃받침만으로는 품종이 잘 구분되지 않는다면, 머신러닝 모델에서는 꽃잎 특성에 더 높은 가중치를 부여해야 한다는 인사이트를 얻을 수 있습니다. 이런 탐색적 분석은 feature selection(특성 선택)의 기초가 됩니다.
+  - type: code
+    language: python
+    title: 꽃받침 산점도
+    description: 꽃받침 길이 vs 너비
+    content: |-
+      px.scatter(
+          iris,
+          x="sepal_length",
+          y="sepal_width",
+          color="species",
+          size="petal_length",
+          hover_data=["petal_width"],
+          trendline="ols",
+          title="품종별 꽃받침 특성"
+      )
+
+- id: step11_matrix
+  title: 11단계. 산점도 매트릭스
+  subtitle: 모든 변수 조합 한눈에
+  blocks:
+  - type: text
+    content: px.scatter_matrix()는 여러 변수를 한 번에 분석할 수 있는 강력한 도구로, 모든 수치형 변수 쌍의 산점도를 격자 형태로 배치하여 변수 간 관계를 종합적으로 파악할 수 있게 해줍니다. 대각선에는 각 변수의 히스토그램(또는 밀도 플롯)이 표시되고, 나머지 칸에는 변수 쌍의 산점도가 그려집니다. 4개 변수면 4x4=16개의 서브플롯이 생성되어, 일일이 개별 산점도를 만들 필요 없이 한눈에 모든 관계를 비교할 수 있습니다. 머신러닝에서 특성 간 다중공선성을 확인하거나, 어떤 변수 조합이 타겟 변수를 잘 설명하는지 탐색할 때 필수적인 도구입니다.
+  - type: code
+    language: python
+    title: 산점도 매트릭스
+    description: 목표 결과물 완성!
+    content: |-
+      px.scatter_matrix(
+          iris,
+          dimensions=["sepal_length", "sepal_width", "petal_length", "petal_width"],
+          color="species",
+          title="붓꽃 품종별 특성 산점도 매트릭스"
+      )
+  - type: text
+    content: 대각선은 각 변수의 히스토그램, 나머지는 변수 쌍의 산점도입니다. petal_length와 petal_width 조합에서 품종 구분이 가장 뚜렷합니다.
+
+- id: step12_matrix_hover
+  title: 12단계. 매트릭스 호버 개선
+  subtitle: hover_name 추가
+  blocks:
+  - type: code
+    language: python
+    title: 호버 정보 추가
+    description: 품종명 호버 표시
+    content: |-
+      px.scatter_matrix(
+          iris,
+          dimensions=["sepal_length", "sepal_width", "petal_length", "petal_width"],
+          color="species",
+          hover_name="species_id",
+          title="붓꽃 품종별 특성 산점도 매트릭스"
+      )
+
+- id: step13_violin_sepal
+  title: 13단계. 꽃받침 분포 비교
+  subtitle: 추가 분석
+  blocks:
+  - type: code
+    language: python
+    title: 꽃받침 너비 분포
+    description: 품종별 분포 차이
+    content: |-
+      px.violin(
+          iris,
+          x="species",
+          y="sepal_width",
+          color="species",
+          box=True,
+          points="all",
+          title="품종별 꽃받침 너비 분포"
+      )
+  - type: text
+    content: 바이올린 플롯을 보면 setosa 품종은 꽃받침 너비가 다른 두 품종보다 명확히 넓다는 것을 알 수 있습니다. 반면 versicolor와 virginica는 꽃받침 너비 분포가 상당히 겹쳐 있어, 이 특성만으로는 두 품종을 정확히 구분하기 어렵습니다. 이는 품종 분류 모델을 만들 때 꽃받침 너비만으로는 충분하지 않으며, 꽃잎 특성을 함께 사용해야 높은 정확도를 달성할 수 있음을 시사합니다. 실제로 이전 산점도 매트릭스에서 본 것처럼 꽃잎 길이와 너비 조합이 세 품종을 가장 명확히 구분해주었습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 붓꽃 시각화 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 시각화 기법을 종합하여 붓꽃 데이터를 다각도로 분석해봅시다. 산점도로 변수 간 관계를 파악하고, 바이올린 플롯으로 분포의 형태를 확인하며, 추세선으로 경향성을 시각화하고, 호버 기능으로 상세 정보를 제공하는 완성도 높은 차트를 만들어봅니다. 각 미션은 서로 다른 변수 조합과 시각화 기법을 사용하여 데이터의 다양한 측면을 탐색하도록 설계되었습니다. 실전에서는 이런 다양한 각도의 분석을 통해 데이터의 숨겨진 패턴과 인사이트를 발견할 수 있습니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 꽃잎 너비 vs 꽃받침 길이 산점도"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import plotly.express as px
+        import pandas as pd
+
+        flower = px.data.iris()
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart = px.scatter(
+            flower,
+            x="sepal_length",
+            y="petal_width",
+            color="species",
+            trendline="ols",
+            title="꽃받침 길이 vs 꽃잎 너비"
+        )
+        chart
+  - type: expansion
+    title: "미션2: 꽃잎 면적 품종별 산점도"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import plotly.express as px
+        import pandas as pd
+
+        irisData = px.data.iris()
+        irisData["petalArea"] = irisData["petal_length"] * irisData["petal_width"]
+    - type: code
+      title: "차트 생성"
+      content: |-
+        canvas = px.scatter(
+            irisData,
+            x="sepal_length",
+            y="petalArea",
+            color="species",
+            size="sepal_width",
+            hover_data=["petal_length", "petal_width"],
+            title="품종별 꽃잎 면적"
+        )
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 산점도와 바이올린으로 붓꽃 품종 특성을 시각화했습니다!
+  - type: list
+    items:
+    - "px.scatter(df, x, y) - 두 변수 관계를 점으로 표현"
+    - "color='컬럼' - 그룹별 색상 구분"
+    - "size='컬럼' - 점 크기로 추가 변수 표현"
+    - "hover_name, hover_data - 호버 정보 커스터마이징"
+    - "trendline='ols' - 회귀 추세선 추가"
+    - "px.violin(df, x, y, box=True, points='all') - 분포 시각화"
+    - "px.scatter_matrix(df, dimensions) - 모든 변수 조합 산점도"
+  - type: text
+    content: 다음 시간에는 세계 인구 데이터로 애니메이션 차트를 만듭니다. 시간에 따른 변화를 동적으로 표현합니다.

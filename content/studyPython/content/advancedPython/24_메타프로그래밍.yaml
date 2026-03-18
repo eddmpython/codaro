@@ -1,0 +1,1118 @@
+meta:
+  id: "24"
+  title: "메타프로그래밍"
+  day: 24
+  category: "advancedPython"
+  tags: ["metaclass", "descriptor", "dynamic", "metaprogramming"]
+  seo:
+    title: "파이썬 메타프로그래밍"
+    description: "메타클래스, 디스크립터, 동적 속성, 코드 생성을 학습합니다."
+    keywords: ["메타클래스", "디스크립터", "동적 속성", "코드 생성"]
+
+intro:
+  emoji: "🔮"
+  points:
+  - "메타클래스 이해"
+  - "디스크립터 활용"
+  - "동적 속성 구현"
+  - "코드 생성 기법"
+
+sections:
+- id: "metaclass_basics"
+  title: "메타클래스 기초"
+  subtitle: "클래스를 생성하는 클래스"
+  blocks:
+  - type: "text"
+    content: "클래스를 생성하는 클래스 - 메타클래스"
+  - type: "code"
+    language: "python"
+    title: "SimpleMeta 메타클래스"
+    description: "기본 메타클래스 정의와 사용"
+    content: |-
+      class SimpleMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              namespace['created_by'] = 'SimpleMeta'
+              return super().__new__(mcs, name, bases, namespace)
+
+      class MyClass(metaclass=SimpleMeta):
+          pass
+
+      metaInstance = MyClass()
+      metaCreatedBy = MyClass.created_by
+      metaType = type(MyClass)
+      metaResult = (metaCreatedBy, metaType.__name__)
+      metaResult
+  - type: "code"
+    language: "python"
+    title: "UpperAttrMeta 메타클래스"
+    description: "속성명을 대문자로 변환하는 메타클래스"
+    content: |-
+      class UpperAttrMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              upperAttrs = {}
+              for key, value in namespace.items():
+                  if not key.startswith('_'):
+                      upperAttrs[key.upper()] = value
+                  else:
+                      upperAttrs[key] = value
+              return super().__new__(mcs, name, bases, upperAttrs)
+
+      class Foo(metaclass=UpperAttrMeta):
+          bar = 'baz'
+          hello = 'world'
+
+      upperFoo = Foo()
+      upperBarExists = hasattr(Foo, 'BAR')
+      upperBarValue = getattr(Foo, 'BAR', None)
+      upperHelloValue = getattr(Foo, 'HELLO', None)
+      upperResult = (upperBarExists, upperBarValue, upperHelloValue)
+      upperResult
+
+- id: "metaclass_patterns"
+  title: "메타클래스 활용"
+  subtitle: "싱글톤, 등록, 검증 패턴"
+  blocks:
+  - type: "text"
+    content: "싱글톤, 등록, 검증 등 메타클래스 활용 패턴"
+  - type: "code"
+    language: "python"
+    title: "SingletonMeta"
+    description: "싱글톤 패턴 구현"
+    content: |-
+      class SingletonMeta(type):
+          _instances = {}
+
+          def __call__(cls, *args, **kwargs):
+              if cls not in cls._instances:
+                  cls._instances[cls] = super().__call__(*args, **kwargs)
+              return cls._instances[cls]
+
+      class DatabaseConn(metaclass=SingletonMeta):
+          def __init__(self):
+              self.connected = True
+
+      dbConn1 = DatabaseConn()
+      dbConn2 = DatabaseConn()
+      singletonCheck = dbConn1 is dbConn2
+      singletonCheck
+  - type: "code"
+    language: "python"
+    title: "RegistryMeta"
+    description: "플러그인 등록 패턴"
+    content: |-
+      class RegistryMeta(type):
+          registry = {}
+
+          def __new__(mcs, name, bases, namespace):
+              cls = super().__new__(mcs, name, bases, namespace)
+              if name != 'BasePlugin':
+                  mcs.registry[name] = cls
+              return cls
+
+      class BasePlugin(metaclass=RegistryMeta):
+          pass
+
+      class AuthPlugin(BasePlugin):
+          name = "auth"
+
+      class CachePlugin(BasePlugin):
+          name = "cache"
+
+      class LogPlugin(BasePlugin):
+          name = "log"
+
+      registeredPlugins = list(RegistryMeta.registry.keys())
+      registeredPlugins
+
+- id: "descriptors"
+  title: "디스크립터"
+  subtitle: "속성 접근 제어"
+  blocks:
+  - type: "text"
+    content: "속성 접근을 제어하는 디스크립터 프로토콜"
+  - type: "code"
+    language: "python"
+    title: "TypedProperty 디스크립터"
+    description: "타입 검증 디스크립터"
+    content: |-
+      class TypedProperty:
+          def __init__(self, name, expectedType):
+              self.name = name
+              self.expectedType = expectedType
+
+          def __get__(self, obj, objType=None):
+              if obj is None:
+                  return self
+              return obj.__dict__.get(self.name)
+
+          def __set__(self, obj, value):
+              if not isinstance(value, self.expectedType):
+                  raise TypeError(f"Expected {self.expectedType.__name__}")
+              obj.__dict__[self.name] = value
+
+      class Person:
+          name = TypedProperty('name', str)
+          age = TypedProperty('age', int)
+
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      typedPerson = Person("Alice", 30)
+      typedName = typedPerson.name
+      typedAge = typedPerson.age
+      typedResult = (typedName, typedAge)
+      typedResult
+  - type: "code"
+    language: "python"
+    title: "Validated 디스크립터"
+    description: "커스텀 검증 디스크립터"
+    content: |-
+      class Validated:
+          def __init__(self, validator, errorMsg="Validation failed"):
+              self.validator = validator
+              self.errorMsg = errorMsg
+
+          def __set_name__(self, owner, name):
+              self.name = name
+
+          def __get__(self, obj, objType=None):
+              if obj is None:
+                  return self
+              return obj.__dict__.get(self.name)
+
+          def __set__(self, obj, value):
+              if not self.validator(value):
+                  raise ValueError(self.errorMsg)
+              obj.__dict__[self.name] = value
+
+      class Product:
+          price = Validated(lambda x: x > 0, "Price must be positive")
+          quantity = Validated(lambda x: x >= 0, "Quantity cannot be negative")
+
+          def __init__(self, price, quantity):
+              self.price = price
+              self.quantity = quantity
+
+      validProduct = Product(100, 5)
+      productPrice = validProduct.price
+      productQty = validProduct.quantity
+      validatedResult = (productPrice, productQty)
+      validatedResult
+
+- id: "dynamic_attrs"
+  title: "동적 속성"
+  subtitle: "__getattr__, __setattr__ 활용"
+  blocks:
+  - type: "text"
+    content: "__getattr__, __setattr__, __getattribute__ 활용"
+  - type: "code"
+    language: "python"
+    title: "DynamicAttrs 클래스"
+    description: "동적 속성 접근"
+    content: |-
+      class DynamicAttrs:
+          def __init__(self):
+              self._data = {}
+
+          def __getattr__(self, name):
+              if name.startswith('_'):
+                  raise AttributeError(name)
+              return self._data.get(name, f"<undefined:{name}>")
+
+          def __setattr__(self, name, value):
+              if name.startswith('_'):
+                  super().__setattr__(name, value)
+              else:
+                  self._data[name] = value
+
+          def __delattr__(self, name):
+              if name in self._data:
+                  del self._data[name]
+
+      dynamicObj = DynamicAttrs()
+      dynamicObj.foo = "bar"
+      dynamicObj.count = 42
+      dynamicFoo = dynamicObj.foo
+      dynamicCount = dynamicObj.count
+      dynamicUndef = dynamicObj.undefined
+      dynamicResult = (dynamicFoo, dynamicCount, dynamicUndef)
+      dynamicResult
+  - type: "code"
+    language: "python"
+    title: "LazyProperty 디스크립터"
+    description: "지연 계산 프로퍼티"
+    content: |-
+      class LazyProperty:
+          def __init__(self, func):
+              self.func = func
+              self.name = func.__name__
+
+          def __get__(self, obj, objType=None):
+              if obj is None:
+                  return self
+              value = self.func(obj)
+              setattr(obj, self.name, value)
+              return value
+
+      class ExpensiveObject:
+          def __init__(self, data):
+              self._data = data
+              self.computeCount = 0
+
+          @LazyProperty
+          def processed(self):
+              self.computeCount += 1
+              return sum(self._data) * 2
+
+      expensiveObj = ExpensiveObject([1, 2, 3, 4, 5])
+      lazyFirst = expensiveObj.processed
+      lazySecond = expensiveObj.processed
+      lazyCount = expensiveObj.computeCount
+      lazyResult = (lazyFirst, lazySecond, lazyCount)
+      lazyResult
+
+- id: "new_init"
+  title: "__new__와 __init__"
+  subtitle: "객체 생성 과정 제어"
+  blocks:
+  - type: "text"
+    content: "객체 생성 과정 제어하기"
+  - type: "code"
+    language: "python"
+    title: "ImmutablePoint"
+    description: "불변 객체 생성"
+    content: |-
+      class ImmutablePoint:
+          def __new__(cls, x, y):
+              instance = super().__new__(cls)
+              object.__setattr__(instance, 'x', x)
+              object.__setattr__(instance, 'y', y)
+              return instance
+
+          def __setattr__(self, name, value):
+              raise AttributeError("ImmutablePoint is immutable")
+
+          def __repr__(self):
+              return f"ImmutablePoint({self.x}, {self.y})"
+
+      immutablePt = ImmutablePoint(3, 4)
+      ptX = immutablePt.x
+      ptY = immutablePt.y
+      ptRepr = repr(immutablePt)
+      immutableResult = (ptX, ptY, ptRepr)
+      immutableResult
+  - type: "code"
+    language: "python"
+    title: "Cached 클래스"
+    description: "인스턴스 캐싱"
+    content: |-
+      class Cached:
+          _cache = {}
+
+          def __new__(cls, key):
+              if key in cls._cache:
+                  return cls._cache[key]
+              instance = super().__new__(cls)
+              cls._cache[key] = instance
+              return instance
+
+          def __init__(self, key):
+              self.key = key
+
+      cached1 = Cached("a")
+      cached2 = Cached("b")
+      cached3 = Cached("a")
+      cachedSame = cached1 is cached3
+      cachedDiff = cached1 is cached2
+      cachedResult = (cachedSame, cachedDiff, len(Cached._cache))
+      cachedResult
+
+- id: "dynamic_class"
+  title: "동적 클래스 생성"
+  subtitle: "type()으로 클래스 생성"
+  blocks:
+  - type: "text"
+    content: "type()을 사용한 동적 클래스 생성"
+  - type: "code"
+    language: "python"
+    title: "makeClass 함수"
+    description: "동적 클래스 생성 함수"
+    content: |-
+      def makeClass(className, **attrs):
+          def initMethod(self, **kwargs):
+              for key, value in kwargs.items():
+                  setattr(self, key, value)
+
+          def reprMethod(self):
+              attrs = ', '.join(f"{k}={v!r}" for k, v in self.__dict__.items())
+              return f"{self.__class__.__name__}({attrs})"
+
+          namespace = {
+              '__init__': initMethod,
+              '__repr__': reprMethod,
+              **attrs
+          }
+          return type(className, (), namespace)
+
+      DynamicUser = makeClass('DynamicUser', role='user')
+      dynUser = DynamicUser(name="Alice", age=30)
+      dynUserRepr = repr(dynUser)
+      dynUserRole = DynamicUser.role
+      dynamicClassResult = (dynUserRepr, dynUserRole)
+      dynamicClassResult
+  - type: "code"
+    language: "python"
+    title: "createDataClass 함수"
+    description: "데이터 클래스 동적 생성"
+    content: |-
+      def createDataClass(name, fields):
+          def initFunc(self, **kwargs):
+              for field in fields:
+                  setattr(self, field, kwargs.get(field))
+
+          def eqFunc(self, other):
+              if not isinstance(other, self.__class__):
+                  return False
+              return all(getattr(self, f) == getattr(other, f) for f in fields)
+
+          def hashFunc(self):
+              return hash(tuple(getattr(self, f) for f in fields))
+
+          def reprFunc(self):
+              values = ', '.join(f"{f}={getattr(self, f)!r}" for f in fields)
+              return f"{name}({values})"
+
+          return type(name, (), {
+              '__init__': initFunc,
+              '__eq__': eqFunc,
+              '__hash__': hashFunc,
+              '__repr__': reprFunc,
+              '_fields': fields
+          })
+
+      PointData = createDataClass('PointData', ['x', 'y'])
+      pt1 = PointData(x=1, y=2)
+      pt2 = PointData(x=1, y=2)
+      pt3 = PointData(x=3, y=4)
+      dataClassEq = pt1 == pt2
+      dataClassNeq = pt1 == pt3
+      dataClassRepr = repr(pt1)
+      dataClassResult = (dataClassEq, dataClassNeq, dataClassRepr)
+      dataClassResult
+
+- id: "practice"
+  title: "종합 연습"
+  subtitle: "메타프로그래밍 실습"
+  blocks:
+  - type: "text"
+    content: "Day 24에서 배운 메타프로그래밍을 난이도별로 복습합니다. 메타클래스는 클래스 생성 과정을 제어하여 ORM, 검증 프레임워크 등의 기반이 됩니다. 디스크립터는 속성 접근을 세밀하게 제어하고, 동적 속성은 런타임에 클래스를 조작합니다. 🟢 기본 문제로 메타클래스의 __new__와 __init__ 동작을 익히고, 🟡 응용 문제로 디스크립터와 동적 속성 생성을 연습하세요. 🔴 심화 문제에서는 Django ORM, SQLAlchemy 스타일의 선언적 모델 정의를 직접 구현해봅니다. 메타프로그래밍은 프레임워크 설계자의 핵심 도구이므로 원리를 깊이 이해해야 합니다."
+  - type: "expansion"
+    title: "기본1: 간단한 메타클래스"
+    code: |-
+      class CounterMeta(type):
+          count = 0
+
+          def __new__(mcs, name, bases, namespace):
+              CounterMeta.count += 1
+              namespace['instanceNumber'] = CounterMeta.count
+              return super().__new__(mcs, name, bases, namespace)
+
+      class A(metaclass=CounterMeta):
+          pass
+
+      class B(metaclass=CounterMeta):
+          pass
+
+      class C(metaclass=CounterMeta):
+          pass
+
+      ex1Result = (A.instanceNumber, B.instanceNumber, C.instanceNumber)
+      ex1Result
+  - type: "expansion"
+    title: "기본2: 속성 자동 변환"
+    code: |-
+      class AutoStrMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              for key, value in list(namespace.items()):
+                  if not key.startswith('_') and not callable(value):
+                      namespace[key] = str(value)
+              return super().__new__(mcs, name, bases, namespace)
+
+      class Config(metaclass=AutoStrMeta):
+          port = 8080
+          debug = True
+          timeout = 30.5
+
+      ex2Port = Config.port
+      ex2Debug = Config.debug
+      ex2Timeout = Config.timeout
+      ex2Result = (ex2Port, type(ex2Port).__name__, ex2Debug, ex2Timeout)
+      ex2Result
+  - type: "expansion"
+    title: "기본3: 필수 메서드 검증"
+    code: |-
+      class RequiredMethodMeta(type):
+          requiredMethods = []
+
+          def __new__(mcs, name, bases, namespace):
+              if bases:
+                  for method in mcs.requiredMethods:
+                      if method not in namespace:
+                          raise TypeError(f"Missing required method: {method}")
+              return super().__new__(mcs, name, bases, namespace)
+
+      class PluginMeta(RequiredMethodMeta):
+          requiredMethods = ['activate', 'deactivate']
+
+      class ValidPlugin(metaclass=PluginMeta):
+          def activate(self):
+              return "activated"
+
+          def deactivate(self):
+              return "deactivated"
+
+      validPlug = ValidPlugin()
+      ex3Activate = validPlug.activate()
+      ex3Deactivate = validPlug.deactivate()
+      ex3Result = (ex3Activate, ex3Deactivate)
+      ex3Result
+  - type: "expansion"
+    title: "기본4: 간단한 디스크립터"
+    code: |-
+      class Positive:
+          def __set_name__(self, owner, name):
+              self.name = name
+
+          def __get__(self, obj, objType=None):
+              if obj is None:
+                  return self
+              return obj.__dict__.get(self.name, 0)
+
+          def __set__(self, obj, value):
+              if value < 0:
+                  raise ValueError(f"{self.name} must be positive")
+              obj.__dict__[self.name] = value
+
+      class Account:
+          balance = Positive()
+
+          def __init__(self, balance):
+              self.balance = balance
+
+      acct = Account(100)
+      acctBalance = acct.balance
+      acct.balance = 200
+      acctNewBalance = acct.balance
+      ex4Result = (acctBalance, acctNewBalance)
+      ex4Result
+  - type: "expansion"
+    title: "기본5: __getattr__ 활용"
+    code: |-
+      class FlexibleDict:
+          def __init__(self, data=None):
+              self._data = data or {}
+
+          def __getattr__(self, name):
+              if name.startswith('_'):
+                  raise AttributeError(name)
+              value = self._data.get(name)
+              if isinstance(value, dict):
+                  return FlexibleDict(value)
+              return value
+
+          def __setattr__(self, name, value):
+              if name.startswith('_'):
+                  super().__setattr__(name, value)
+              else:
+                  self._data[name] = value
+
+      flexDict = FlexibleDict({"user": {"name": "Alice", "profile": {"age": 30}}})
+      flexName = flexDict.user.name
+      flexAge = flexDict.user.profile.age
+      ex5Result = (flexName, flexAge)
+      ex5Result
+  - type: "expansion"
+    title: "중급6: 추상 메타클래스"
+    code: |-
+      class AbstractMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              cls = super().__new__(mcs, name, bases, namespace)
+              abstractMethods = set()
+              for base in cls.__mro__:
+                  for attrName, attr in base.__dict__.items():
+                      if getattr(attr, '_abstract', False):
+                          abstractMethods.add(attrName)
+              for method in abstractMethods:
+                  if method in cls.__dict__:
+                      if not getattr(cls.__dict__[method], '_abstract', False):
+                          abstractMethods.discard(method)
+              cls._abstractMethods = abstractMethods
+              return cls
+
+          def __call__(cls, *args, **kwargs):
+              if cls._abstractMethods:
+                  raise TypeError(f"Cannot instantiate abstract class with methods: {cls._abstractMethods}")
+              return super().__call__(*args, **kwargs)
+
+      def abstractmethod(fn):
+          fn._abstract = True
+          return fn
+
+      class Shape(metaclass=AbstractMeta):
+          @abstractmethod
+          def area(self):
+              pass
+
+      class Rectangle(Shape):
+          def __init__(self, w, h):
+              self.w = w
+              self.h = h
+
+          def area(self):
+              return self.w * self.h
+
+      rect = Rectangle(3, 4)
+      ex6Area = rect.area()
+      ex6Result = ex6Area
+      ex6Result
+  - type: "expansion"
+    title: "중급7: 체인 디스크립터"
+    code: |-
+      class ChainedDescriptor:
+          def __init__(self, *validators):
+              self.validators = validators
+
+          def __set_name__(self, owner, name):
+              self.name = name
+
+          def __get__(self, obj, objType=None):
+              if obj is None:
+                  return self
+              return obj.__dict__.get(self.name)
+
+          def __set__(self, obj, value):
+              for validator in self.validators:
+                  value = validator(value)
+              obj.__dict__[self.name] = value
+
+      def notEmpty(value):
+          if not value:
+              raise ValueError("Cannot be empty")
+          return value
+
+      def trimmed(value):
+          return value.strip()
+
+      def lowercase(value):
+          return value.lower()
+
+      class User:
+          username = ChainedDescriptor(notEmpty, trimmed, lowercase)
+
+      chainUser = User()
+      chainUser.username = "  ALICE  "
+      ex7Result = chainUser.username
+      ex7Result
+  - type: "expansion"
+    title: "중급8: 프록시 패턴 with __getattribute__"
+    code: |-
+      class LoggingProxy:
+          def __init__(self, target):
+              object.__setattr__(self, '_target', target)
+              object.__setattr__(self, '_log', [])
+
+          def __getattribute__(self, name):
+              if name.startswith('_'):
+                  return object.__getattribute__(self, name)
+              target = object.__getattribute__(self, '_target')
+              log = object.__getattribute__(self, '_log')
+              log.append(f"GET: {name}")
+              return getattr(target, name)
+
+          def __setattr__(self, name, value):
+              if name.startswith('_'):
+                  object.__setattr__(self, name, value)
+              else:
+                  log = object.__getattribute__(self, '_log')
+                  log.append(f"SET: {name}={value}")
+                  target = object.__getattribute__(self, '_target')
+                  setattr(target, name, value)
+
+      class Target:
+          def __init__(self):
+              self.value = 0
+
+      target = Target()
+      proxy = LoggingProxy(target)
+      proxy.value = 10
+      proxyValue = proxy.value
+      proxyLog = proxy._log
+      ex8Result = (proxyValue, proxyLog)
+      ex8Result
+  - type: "expansion"
+    title: "중급9: 자동 프로퍼티 생성"
+    code: |-
+      class AutoPropertyMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              slots = namespace.get('__slots__', [])
+              for slot in slots:
+                  privateName = f'_{slot}'
+
+                  def makeGetter(pn):
+                      return lambda self: getattr(self, pn, None)
+
+                  def makeSetter(pn):
+                      return lambda self, value: setattr(self, pn, value)
+
+                  namespace[slot] = property(makeGetter(privateName), makeSetter(privateName))
+              return super().__new__(mcs, name, bases, namespace)
+
+      class AutoPropPerson(metaclass=AutoPropertyMeta):
+          __slots__ = ['name', 'age']
+
+          def __init__(self, name, age):
+              self._name = name
+              self._age = age
+
+      autoPropPerson = AutoPropPerson("Bob", 25)
+      autoPropName = autoPropPerson.name
+      autoPropPerson.age = 26
+      autoPropAge = autoPropPerson.age
+      ex9Result = (autoPropName, autoPropAge)
+      ex9Result
+  - type: "expansion"
+    title: "중급10: 이벤트 디스크립터"
+    code: |-
+      class Observable:
+          def __init__(self):
+              self._callbacks = []
+
+          def __set_name__(self, owner, name):
+              self.name = name
+
+          def __get__(self, obj, objType=None):
+              if obj is None:
+                  return self
+              return obj.__dict__.get(self.name)
+
+          def __set__(self, obj, value):
+              oldValue = obj.__dict__.get(self.name)
+              obj.__dict__[self.name] = value
+              for callback in self._callbacks:
+                  callback(obj, self.name, oldValue, value)
+
+          def addListener(self, callback):
+              self._callbacks.append(callback)
+
+      class Model:
+          value = Observable()
+
+      changeLog = []
+      def onChange(obj, name, old, new):
+          changeLog.append(f"{name}: {old} -> {new}")
+
+      Model.value.addListener(onChange)
+      model = Model()
+      model.value = 10
+      model.value = 20
+      ex10Result = changeLog
+      ex10Result
+  - type: "expansion"
+    title: "고급11: 의존성 주입 메타클래스"
+    code: |-
+      class DIContainer:
+          _services = {}
+
+          @classmethod
+          def register(cls, name, service):
+              cls._services[name] = service
+
+          @classmethod
+          def resolve(cls, name):
+              return cls._services.get(name)
+
+      class InjectMeta(type):
+          def __call__(cls, *args, **kwargs):
+              instance = super().__call__(*args, **kwargs)
+              for name, annotation in getattr(cls, '__annotations__', {}).items():
+                  if hasattr(annotation, '__name__'):
+                      service = DIContainer.resolve(annotation.__name__)
+                      if service:
+                          setattr(instance, name, service)
+              return instance
+
+      class Logger:
+          def log(self, msg):
+              return f"LOG: {msg}"
+
+      class Service(metaclass=InjectMeta):
+          logger: Logger
+
+          def doWork(self):
+              return self.logger.log("Working")
+
+      DIContainer.register('Logger', Logger())
+      svc = Service()
+      ex11Result = svc.doWork()
+      ex11Result
+  - type: "expansion"
+    title: "고급12: 버전 관리 디스크립터"
+    code: |-
+      class Versioned:
+          def __set_name__(self, owner, name):
+              self.name = name
+              self.historyName = f'_{name}_history'
+
+          def __get__(self, obj, objType=None):
+              if obj is None:
+                  return self
+              history = getattr(obj, self.historyName, [])
+              return history[-1] if history else None
+
+          def __set__(self, obj, value):
+              if not hasattr(obj, self.historyName):
+                  setattr(obj, self.historyName, [])
+              getattr(obj, self.historyName).append(value)
+
+          def getHistory(self, obj):
+              return getattr(obj, self.historyName, [])
+
+          def rollback(self, obj, steps=1):
+              history = getattr(obj, self.historyName, [])
+              for _ in range(min(steps, len(history) - 1)):
+                  history.pop()
+
+      class Document:
+          content = Versioned()
+
+      doc = Document()
+      doc.content = "v1"
+      doc.content = "v2"
+      doc.content = "v3"
+      currentContent = doc.content
+      contentHistory = Document.content.getHistory(doc)
+      Document.content.rollback(doc)
+      rolledBack = doc.content
+      ex12Result = (currentContent, contentHistory, rolledBack)
+      ex12Result
+  - type: "expansion"
+    title: "고급13: 계약 프로그래밍"
+    code: |-
+      class ContractMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              for attrName, attr in namespace.items():
+                  if callable(attr) and hasattr(attr, '_preconditions'):
+                      namespace[attrName] = mcs.wrapWithContract(attr)
+              return super().__new__(mcs, name, bases, namespace)
+
+          @staticmethod
+          def wrapWithContract(fn):
+              def wrapped(*args, **kwargs):
+                  for pre in fn._preconditions:
+                      if not pre(*args, **kwargs):
+                          raise ValueError(f"Precondition failed")
+                  result = fn(*args, **kwargs)
+                  for post in getattr(fn, '_postconditions', []):
+                      if not post(result):
+                          raise ValueError(f"Postcondition failed")
+                  return result
+              return wrapped
+
+      def precondition(*conditions):
+          def decorator(fn):
+              fn._preconditions = conditions
+              return fn
+          return decorator
+
+      def postcondition(*conditions):
+          def decorator(fn):
+              fn._postconditions = conditions
+              return fn
+          return decorator
+
+      class Calculator(metaclass=ContractMeta):
+          @precondition(lambda self, a, b: b != 0)
+          @postcondition(lambda result: result is not None)
+          def divide(self, a, b):
+              return a / b
+
+      calc = Calculator()
+      divResult = calc.divide(10, 2)
+      ex13Result = divResult
+      ex13Result
+  - type: "expansion"
+    title: "고급14: 자동 캐싱 메타클래스"
+    code: |-
+      class CachingMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              for attrName, attr in namespace.items():
+                  if callable(attr) and getattr(attr, '_cached', False):
+                      namespace[attrName] = mcs.makeCached(attr)
+              return super().__new__(mcs, name, bases, namespace)
+
+          @staticmethod
+          def makeCached(fn):
+              cache = {}
+              def wrapped(self, *args):
+                  key = args
+                  if key not in cache:
+                      cache[key] = fn(self, *args)
+                  return cache[key]
+              wrapped._cache = cache
+              return wrapped
+
+      def cached(fn):
+          fn._cached = True
+          return fn
+
+      class Fibonacci(metaclass=CachingMeta):
+          callCount = 0
+
+          @cached
+          def compute(self, n):
+              Fibonacci.callCount += 1
+              if n <= 1:
+                  return n
+              return self.compute(n - 1) + self.compute(n - 2)
+
+      fib = Fibonacci()
+      fibResult = fib.compute(10)
+      fibCallCount = Fibonacci.callCount
+      ex14Result = (fibResult, fibCallCount)
+      ex14Result
+  - type: "expansion"
+    title: "고급15: 믹스인 자동 적용"
+    code: |-
+      class AutoMixinMeta(type):
+          def __new__(mcs, name, bases, namespace, mixins=None):
+              if mixins:
+                  bases = tuple(mixins) + bases
+              return super().__new__(mcs, name, bases, namespace)
+
+      class LogMixin:
+          def log(self, msg):
+              return f"[LOG] {msg}"
+
+      class TimestampMixin:
+          def getTimestamp(self):
+              return "2024-01-01"
+
+      class Service(metaclass=AutoMixinMeta, mixins=[LogMixin, TimestampMixin]):
+          def process(self):
+              return "processed"
+
+      mixinSvc = Service()
+      mixinLog = mixinSvc.log("test")
+      mixinTs = mixinSvc.getTimestamp()
+      mixinProcess = mixinSvc.process()
+      ex15Result = (mixinLog, mixinTs, mixinProcess)
+      ex15Result
+  - type: "expansion"
+    title: "고급16: 속성 위임"
+    code: |-
+      class DelegateDescriptor:
+          def __init__(self, targetAttr, delegatedAttr):
+              self.targetAttr = targetAttr
+              self.delegatedAttr = delegatedAttr
+
+          def __set_name__(self, owner, name):
+              self.name = name
+
+          def __get__(self, obj, objType=None):
+              if obj is None:
+                  return self
+              target = getattr(obj, self.targetAttr)
+              return getattr(target, self.delegatedAttr)
+
+          def __set__(self, obj, value):
+              target = getattr(obj, self.targetAttr)
+              setattr(target, self.delegatedAttr, value)
+
+      class Engine:
+          def __init__(self):
+              self.power = 100
+              self.status = "off"
+
+      class Car:
+          def __init__(self):
+              self._engine = Engine()
+
+          power = DelegateDescriptor('_engine', 'power')
+          status = DelegateDescriptor('_engine', 'status')
+
+      car = Car()
+      carPower = car.power
+      car.status = "running"
+      carStatus = car.status
+      ex16Result = (carPower, carStatus)
+      ex16Result
+  - type: "expansion"
+    title: "고급17: 메서드 체이닝 메타클래스"
+    code: |-
+      class ChainableMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              for attrName, attr in namespace.items():
+                  if callable(attr) and not attrName.startswith('_') and attrName != 'build':
+                      namespace[attrName] = mcs.makeChainable(attr)
+              return super().__new__(mcs, name, bases, namespace)
+
+          @staticmethod
+          def makeChainable(fn):
+              def wrapped(self, *args, **kwargs):
+                  result = fn(self, *args, **kwargs)
+                  if result is None:
+                      return self
+                  return result
+              return wrapped
+
+      class QueryBuilder(metaclass=ChainableMeta):
+          def __init__(self):
+              self._table = None
+              self._conditions = []
+              self._limit = None
+
+          def table(self, name):
+              self._table = name
+
+          def where(self, condition):
+              self._conditions.append(condition)
+
+          def limit(self, n):
+              self._limit = n
+
+          def build(self):
+              query = f"SELECT * FROM {self._table}"
+              if self._conditions:
+                  query += " WHERE " + " AND ".join(self._conditions)
+              if self._limit:
+                  query += f" LIMIT {self._limit}"
+              return query
+
+      queryBuilt = QueryBuilder().table("users").where("age > 18").where("active = 1").limit(10).build()
+      ex17Result = queryBuilt
+      ex17Result
+  - type: "expansion"
+    title: "고급18: 속성 암호화"
+    code: |-
+      class EncryptedDescriptor:
+          def __init__(self, key=3):
+              self.key = key
+
+          def __set_name__(self, owner, name):
+              self.name = name
+
+          def _encrypt(self, value):
+              return ''.join(chr(ord(c) + self.key) for c in str(value))
+
+          def _decrypt(self, value):
+              return ''.join(chr(ord(c) - self.key) for c in value)
+
+          def __get__(self, obj, objType=None):
+              if obj is None:
+                  return self
+              encrypted = obj.__dict__.get(self.name)
+              if encrypted is None:
+                  return None
+              return self._decrypt(encrypted)
+
+          def __set__(self, obj, value):
+              obj.__dict__[self.name] = self._encrypt(value)
+
+      class Secret:
+          password = EncryptedDescriptor(key=5)
+
+      secret = Secret()
+      secret.password = "hello"
+      decrypted = secret.password
+      encrypted = secret.__dict__['password']
+      ex18Result = (decrypted, encrypted)
+      ex18Result
+  - type: "expansion"
+    title: "고급19: 자동 직렬화"
+    code: |-
+      class SerializableMeta(type):
+          def __new__(mcs, name, bases, namespace):
+              cls = super().__new__(mcs, name, bases, namespace)
+
+              def toDict(self):
+                  return {k: v for k, v in self.__dict__.items() if not k.startswith('_')}
+
+              @classmethod
+              def fromDict(cls, data):
+                  instance = cls.__new__(cls)
+                  for k, v in data.items():
+                      setattr(instance, k, v)
+                  return instance
+
+              def toJson(self):
+                  import json
+                  return json.dumps(self.toDict())
+
+              cls.toDict = toDict
+              cls.fromDict = fromDict
+              cls.toJson = toJson
+              return cls
+
+      class Entity(metaclass=SerializableMeta):
+          def __init__(self, name, value):
+              self.name = name
+              self.value = value
+
+      entity = Entity("test", 42)
+      entityDict = entity.toDict()
+      entityJson = entity.toJson()
+      restored = Entity.fromDict(entityDict)
+      ex19Result = (entityDict, restored.name, restored.value)
+      ex19Result
+  - type: "expansion"
+    title: "고급20: 플러그인 시스템"
+    code: |-
+      class PluginSystem:
+          _plugins = {}
+          _hooks = {}
+
+          @classmethod
+          def register(cls, name):
+              def decorator(pluginCls):
+                  cls._plugins[name] = pluginCls()
+                  return pluginCls
+              return decorator
+
+          @classmethod
+          def hook(cls, hookName):
+              def decorator(fn):
+                  if hookName not in cls._hooks:
+                      cls._hooks[hookName] = []
+                  cls._hooks[hookName].append(fn)
+                  return fn
+              return decorator
+
+          @classmethod
+          def trigger(cls, hookName, *args, **kwargs):
+              results = []
+              for fn in cls._hooks.get(hookName, []):
+                  results.append(fn(*args, **kwargs))
+              return results
+
+          @classmethod
+          def getPlugin(cls, name):
+              return cls._plugins.get(name)
+
+      @PluginSystem.register('auth')
+      class AuthPlugin:
+          @PluginSystem.hook('beforeRequest')
+          def checkAuth(self, request):
+              return f"Auth checked: {request}"
+
+      @PluginSystem.register('logging')
+      class LogPlugin:
+          @PluginSystem.hook('beforeRequest')
+          def logRequest(self, request):
+              return f"Logged: {request}"
+
+      hookResults = PluginSystem.trigger('beforeRequest', 'GET /api/users')
+      authPlugin = PluginSystem.getPlugin('auth')
+      logPlugin = PluginSystem.getPlugin('logging')
+      ex20Result = (len(hookResults), type(authPlugin).__name__, type(logPlugin).__name__)
+      ex20Result

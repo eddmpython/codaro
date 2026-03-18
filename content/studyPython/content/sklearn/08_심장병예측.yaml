@@ -1,0 +1,417 @@
+meta:
+  id: sklearn_08
+  title: 심장병예측
+  order: 8
+  category: sklearn
+  difficulty: "⭐⭐⭐"
+  badge: 심화
+  tags: ["sklearn", "GradientBoosting", "ROC-AUC", "앙상블", "심장병"]
+  seo:
+    title: "Sklearn GradientBoosting - 심장병 예측"
+    description: "GradientBoosting으로 심장병을 예측하고 ROC-AUC로 성능을 평가합니다. Boosting 앙상블과 확률 기반 평가를 배웁니다."
+    keywords: ["sklearn", "GradientBoosting", "ROC", "AUC", "앙상블", "심장병"]
+
+intro:
+  emoji: "❤️"
+  goal: GradientBoosting으로 심장병을 예측하고 ROC-AUC로 모델 성능을 평가합니다.
+  description: 심장병 데이터는 나이, 성별, 혈압, 콜레스테롤 등의 건강 지표로 구성됩니다. GradientBoosting은 이전 모델의 오차를 보완하는 방식으로 학습합니다. ROC-AUC는 임계값에 독립적인 분류 성능 지표입니다.
+
+sections:
+- id: step1_data
+  title: 1단계. 데이터 로딩
+  subtitle: 심장병 데이터
+  blocks:
+  - type: text
+    content: UCI 심장병 데이터를 로딩합니다. 14개 특성과 심장병 유무(target)로 구성됩니다.
+  - type: code
+    language: python
+    title: 데이터 로딩
+    description: 심장병 데이터를 불러옵니다
+    content: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.ensemble import GradientBoostingClassifier
+      from sklearn.metrics import accuracy_score, roc_auc_score, roc_curve, classification_report
+      import matplotlib.pyplot as plt
+
+      url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/heart.csv"
+      heart = pd.read_csv(url)
+      heart
+  - type: tip
+    content: 주요 특성은 age(나이), sex(성별), cp(흉통유형), trestbps(혈압), chol(콜레스테롤), fbs(공복혈당), thalach(최대심박수)입니다. target=1이 심장병 있음입니다.
+
+- id: step2_eda
+  title: 2단계. 데이터 탐색
+  subtitle: 클래스 분포
+  blocks:
+  - type: text
+    content: 심장병 유무 비율과 주요 특성의 분포를 확인합니다.
+  - type: code
+    language: python
+    title: 클래스 분포
+    description: 심장병 유무 비율을 확인합니다
+    content: |-
+      figDist, axDist = plt.subplots(figsize=(6, 4))
+      heart["target"].value_counts().plot(kind="bar", color=["steelblue", "coral"], ax=axDist)
+      axDist.set_xticklabels(["No Disease", "Disease"], rotation=0)
+      axDist.set_ylabel("Count")
+      axDist.set_title("Heart Disease Distribution")
+      figDist
+  - type: code
+    language: python
+    title: 나이 분포
+    description: 심장병 유무별 나이 분포를 확인합니다
+    content: |-
+      figAge, axAge = plt.subplots(figsize=(8, 4))
+      heart[heart["target"] == 0]["age"].hist(bins=20, alpha=0.6, label="No Disease", ax=axAge)
+      heart[heart["target"] == 1]["age"].hist(bins=20, alpha=0.6, label="Disease", ax=axAge)
+      axAge.set_xlabel("Age")
+      axAge.set_ylabel("Count")
+      axAge.legend()
+      axAge.set_title("Age Distribution by Target")
+      figAge
+
+- id: step3_prep
+  title: 3단계. 데이터 준비
+  subtitle: 분할 및 스케일링
+  blocks:
+  - type: text
+    content: 특성과 타깃을 분리하고 학습/테스트 데이터로 분할합니다.
+  - type: code
+    language: python
+    title: 데이터 분할
+    description: 학습/테스트 데이터로 분할합니다
+    content: |-
+      X = heart.drop("target", axis=1)
+      y = heart["target"]
+
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+      xTrain.shape, xTest.shape
+  - type: code
+    language: python
+    title: 스케일링
+    description: StandardScaler를 적용합니다
+    content: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+      xTrainSc.shape
+
+- id: step4_gb
+  title: 4단계. GradientBoosting 학습
+  subtitle: Boosting 앙상블
+  blocks:
+  - type: text
+    content: GradientBoosting은 이전 모델의 잔차(오차)를 학습하는 순차적 앙상블입니다. n_estimators로 트리 개수, learning_rate로 학습률을 조절합니다.
+  - type: code
+    language: python
+    title: GradientBoosting 학습
+    description: GradientBoosting 모델을 학습합니다
+    content: |-
+      gb = GradientBoostingClassifier(n_estimators=100, learning_rate=0.1, max_depth=3, random_state=42)
+      gb.fit(xTrainSc, yTrain)
+      gb
+  - type: tip
+    content: Boosting은 순차적으로 모델을 학습합니다. 각 단계에서 이전 모델이 틀린 샘플에 가중치를 부여하여 점진적으로 성능을 개선합니다.
+
+- id: step5_eval
+  title: 5단계. 기본 평가
+  subtitle: 정확도와 분류 리포트
+  blocks:
+  - type: text
+    content: 테스트 데이터로 정확도와 상세 지표를 확인합니다.
+  - type: code
+    language: python
+    title: 예측 및 평가
+    description: 정확도를 계산합니다
+    content: |-
+      yPred = gb.predict(xTestSc)
+      acc = accuracy_score(yTest, yPred)
+      print(f"Accuracy: {acc:.4f}")
+  - type: code
+    language: python
+    title: 분류 리포트
+    description: precision, recall, f1을 확인합니다
+    content: |-
+      print(classification_report(yTest, yPred, target_names=["No Disease", "Disease"]))
+
+- id: step6_proba
+  title: 6단계. 확률 예측
+  subtitle: predict_proba
+  blocks:
+  - type: text
+    content: predict_proba로 클래스별 확률을 얻습니다. 양성(심장병) 확률을 기준으로 ROC 분석을 수행합니다.
+  - type: code
+    language: python
+    title: 확률 예측
+    description: 각 샘플의 심장병 확률을 계산합니다
+    content: |-
+      yProba = gb.predict_proba(xTestSc)
+      yProba[:5]
+  - type: code
+    language: python
+    title: 양성 확률
+    description: 심장병 확률(1번 클래스)만 추출합니다
+    content: |-
+      yProbaPos = yProba[:, 1]
+      probaDf = pd.DataFrame({"actual": yTest.values, "prob_disease": yProbaPos})
+      probaDf.head(10)
+  - type: tip
+    content: predict_proba는 각 클래스에 속할 확률을 반환합니다. 이진분류에서 [:,1]은 양성(1) 클래스 확률입니다.
+
+- id: step7_roc
+  title: 7단계. ROC 곡선
+  subtitle: TPR vs FPR
+  blocks:
+  - type: text
+    content: ROC 곡선은 다양한 임계값에서 TPR(민감도)과 FPR(1-특이도)의 관계를 보여줍니다.
+  - type: code
+    language: python
+    title: ROC 곡선
+    description: ROC 곡선을 그립니다
+    content: |-
+      fpr, tpr, thresholds = roc_curve(yTest, yProbaPos)
+
+      figRoc, axRoc = plt.subplots(figsize=(7, 6))
+      axRoc.plot(fpr, tpr, color="steelblue", linewidth=2, label="ROC Curve")
+      axRoc.plot([0, 1], [0, 1], "k--", label="Random")
+      axRoc.set_xlabel("False Positive Rate")
+      axRoc.set_ylabel("True Positive Rate")
+      axRoc.set_title("ROC Curve")
+      axRoc.legend()
+      figRoc
+  - type: tip
+    content: ROC 곡선이 왼쪽 상단에 가까울수록 좋은 모델입니다. 대각선은 무작위 분류기의 성능입니다.
+
+- id: step8_auc
+  title: 8단계. AUC 계산
+  subtitle: 곡선 아래 면적
+  blocks:
+  - type: text
+    content: AUC(Area Under Curve)는 ROC 곡선 아래 면적입니다. 1에 가까울수록 좋은 분류 성능을 의미합니다.
+  - type: code
+    language: python
+    title: AUC 스코어
+    description: AUC를 계산합니다
+    content: |-
+      auc = roc_auc_score(yTest, yProbaPos)
+      print(f"AUC: {auc:.4f}")
+  - type: code
+    language: python
+    title: ROC-AUC 시각화
+    description: AUC 값을 ROC 곡선에 표시합니다
+    content: |-
+      figAuc, axAuc = plt.subplots(figsize=(7, 6))
+      axAuc.fill_between(fpr, tpr, alpha=0.3, color="steelblue")
+      axAuc.plot(fpr, tpr, color="steelblue", linewidth=2)
+      axAuc.plot([0, 1], [0, 1], "k--")
+      axAuc.set_xlabel("False Positive Rate")
+      axAuc.set_ylabel("True Positive Rate")
+      axAuc.set_title(f"ROC Curve (AUC = {auc:.4f})")
+      figAuc
+  - type: tip
+    content: "AUC 해석 기준: 0.9+ 우수, 0.8-0.9 좋음, 0.7-0.8 보통, 0.6-0.7 낮음, 0.5 무작위"
+
+- id: step9_threshold
+  title: 9단계. 임계값 조정
+  subtitle: 최적 임계값
+  blocks:
+  - type: text
+    content: 기본 임계값 0.5 대신 최적 임계값을 찾습니다. Youden's J statistic(TPR-FPR 최대화)을 사용합니다.
+  - type: code
+    language: python
+    title: 최적 임계값
+    description: TPR-FPR을 최대화하는 임계값을 찾습니다
+    content: |-
+      jStat = tpr - fpr
+      optIdx = np.argmax(jStat)
+      optThresh = thresholds[optIdx]
+      print(f"Optimal Threshold: {optThresh:.4f}")
+      print(f"TPR: {tpr[optIdx]:.4f}, FPR: {fpr[optIdx]:.4f}")
+  - type: code
+    language: python
+    title: 임계값 적용
+    description: 최적 임계값으로 예측합니다
+    content: |-
+      yPredOpt = (yProbaPos >= optThresh).astype(int)
+      accOpt = accuracy_score(yTest, yPredOpt)
+      print(f"Accuracy (threshold=0.5): {acc:.4f}")
+      print(f"Accuracy (threshold={optThresh:.3f}): {accOpt:.4f}")
+
+- id: step10_lr
+  title: 10단계. 학습률 비교
+  subtitle: learning_rate
+  blocks:
+  - type: text
+    content: learning_rate는 각 트리의 기여도를 조절합니다. 낮을수록 많은 트리가 필요하지만 안정적입니다.
+  - type: code
+    language: python
+    title: 학습률별 성능
+    description: 학습률을 변경하며 AUC를 비교합니다
+    content: |-
+      lrList = [0.01, 0.05, 0.1, 0.2, 0.5]
+      aucList = []
+      for lr in lrList:
+          gbTemp = GradientBoostingClassifier(n_estimators=100, learning_rate=lr, max_depth=3, random_state=42)
+          gbTemp.fit(xTrainSc, yTrain)
+          probaTemp = gbTemp.predict_proba(xTestSc)[:, 1]
+          aucList.append(roc_auc_score(yTest, probaTemp))
+
+      figLr, axLr = plt.subplots(figsize=(8, 5))
+      axLr.plot(lrList, aucList, "o-", color="coral")
+      axLr.set_xlabel("Learning Rate")
+      axLr.set_ylabel("AUC")
+      axLr.set_title("AUC vs Learning Rate")
+      figLr
+  - type: tip
+    content: learning_rate가 너무 높으면 과적합, 너무 낮으면 학습 부족(underfitting)이 발생합니다. 일반적으로 0.01~0.1 사이 값을 사용합니다.
+
+- id: step11_importance
+  title: 11단계. 특성 중요도
+  subtitle: feature_importances_
+  blocks:
+  - type: text
+    content: GradientBoosting도 특성 중요도를 제공합니다. 심장병 예측에 중요한 요인을 확인합니다.
+  - type: code
+    language: python
+    title: 특성 중요도
+    description: 특성 중요도를 시각화합니다
+    content: |-
+      impGb = pd.DataFrame({"feature": X.columns, "importance": gb.feature_importances_})
+      impGb = impGb.sort_values("importance", ascending=True)
+
+      figImp, axImp = plt.subplots(figsize=(8, 6))
+      axImp.barh(impGb["feature"], impGb["importance"], color="coral")
+      axImp.set_xlabel("Importance")
+      axImp.set_title("GradientBoosting Feature Importances")
+      figImp
+  - type: tip
+    content: 심장병 예측에서 주로 thalach(최대심박수), cp(흉통유형), ca(주요혈관수), oldpeak(ST depression) 등이 중요합니다.
+
+- id: step12_compare
+  title: 12단계. 앙상블 비교
+  subtitle: RF vs GB
+  blocks:
+  - type: text
+    content: RandomForest(Bagging)와 GradientBoosting(Boosting)의 성능을 비교합니다.
+  - type: code
+    language: python
+    title: RF vs GB
+    description: 두 앙상블 방법을 비교합니다
+    content: |-
+      from sklearn.ensemble import RandomForestClassifier
+
+      rf = RandomForestClassifier(n_estimators=100, random_state=42)
+      rf.fit(xTrainSc, yTrain)
+      rfProba = rf.predict_proba(xTestSc)[:, 1]
+      rfAuc = roc_auc_score(yTest, rfProba)
+
+      gbAuc = roc_auc_score(yTest, yProbaPos)
+
+      fprRf, tprRf, _ = roc_curve(yTest, rfProba)
+
+      figComp, axComp = plt.subplots(figsize=(7, 6))
+      axComp.plot(fpr, tpr, label=f"GradientBoosting (AUC={gbAuc:.3f})", color="coral")
+      axComp.plot(fprRf, tprRf, label=f"RandomForest (AUC={rfAuc:.3f})", color="steelblue")
+      axComp.plot([0, 1], [0, 1], "k--")
+      axComp.set_xlabel("False Positive Rate")
+      axComp.set_ylabel("True Positive Rate")
+      axComp.set_title("ROC Comparison: RF vs GB")
+      axComp.legend()
+      figComp
+  - type: tip
+    content: Bagging(RF)은 분산을 줄이고, Boosting(GB)은 편향을 줄입니다. 데이터 특성에 따라 적합한 방법이 다릅니다.
+
+- id: practice
+  title: 실습
+  subtitle: Boosting과 ROC-AUC
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 유방암 ROC-AUC 분석"
+    code: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_breast_cancer
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.ensemble import GradientBoostingClassifier
+      from sklearn.metrics import roc_auc_score, roc_curve
+      import matplotlib.pyplot as plt
+
+      cancer = load_breast_cancer()
+      xCancer = pd.DataFrame(cancer.data, columns=cancer.feature_names)
+      yCancer = cancer.target
+
+      xTrC, xTeC, yTrC, yTeC = train_test_split(xCancer, yCancer, test_size=0.2, random_state=42)
+      scalerC = StandardScaler()
+      xTrCsc = scalerC.fit_transform(xTrC)
+      xTeCsc = scalerC.transform(xTeC)
+
+      gbC = GradientBoostingClassifier(n_estimators=100, random_state=42)
+      gbC.fit(xTrCsc, yTrC)
+      probaC = gbC.predict_proba(xTeCsc)[:, 1]
+      aucC = roc_auc_score(yTeC, probaC)
+      fprC, tprC, _ = roc_curve(yTeC, probaC)
+
+      figM1, axM1 = plt.subplots(figsize=(7, 6))
+      axM1.fill_between(fprC, tprC, alpha=0.3, color="coral")
+      axM1.plot(fprC, tprC, color="coral", linewidth=2)
+      axM1.plot([0, 1], [0, 1], "k--")
+      axM1.set_xlabel("False Positive Rate")
+      axM1.set_ylabel("True Positive Rate")
+      axM1.set_title(f"Breast Cancer ROC (AUC = {aucC:.4f})")
+      figM1
+  - type: expansion
+    title: "미션2: 학습률과 트리 개수 조합"
+    code: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_breast_cancer
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.ensemble import GradientBoostingClassifier
+      from sklearn.metrics import roc_auc_score
+      import matplotlib.pyplot as plt
+
+      cancer = load_breast_cancer()
+      xB = cancer.data
+      yB = cancer.target
+      xTrB, xTeB, yTrB, yTeB = train_test_split(xB, yB, test_size=0.2, random_state=42)
+      scalerB = StandardScaler()
+      xTrBsc = scalerB.fit_transform(xTrB)
+      xTeBsc = scalerB.transform(xTeB)
+
+      lrVals = [0.05, 0.1, 0.2]
+      nVals = [50, 100, 150]
+      results = []
+      for lr in lrVals:
+          for n in nVals:
+              gbB = GradientBoostingClassifier(n_estimators=n, learning_rate=lr, random_state=42)
+              gbB.fit(xTrBsc, yTrB)
+              probaB = gbB.predict_proba(xTeBsc)[:, 1]
+              aucB = roc_auc_score(yTeB, probaB)
+              results.append({"lr": lr, "n_estimators": n, "auc": aucB})
+
+      resultsDf = pd.DataFrame(results)
+      pivot = resultsDf.pivot(index="lr", columns="n_estimators", values="auc")
+
+      figM2, axM2 = plt.subplots(figsize=(8, 5))
+      im = axM2.imshow(pivot.values, cmap="YlOrRd", aspect="auto")
+      axM2.set_xticks(range(len(nVals)))
+      axM2.set_yticks(range(len(lrVals)))
+      axM2.set_xticklabels(nVals)
+      axM2.set_yticklabels(lrVals)
+      axM2.set_xlabel("n_estimators")
+      axM2.set_ylabel("learning_rate")
+      axM2.set_title("AUC Heatmap: LR vs N_estimators")
+      for i in range(len(lrVals)):
+          for j in range(len(nVals)):
+              axM2.text(j, i, f"{pivot.values[i, j]:.3f}", ha="center", va="center")
+      plt.colorbar(im, ax=axM2)
+      figM2

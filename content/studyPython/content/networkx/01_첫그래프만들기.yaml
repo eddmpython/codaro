@@ -1,0 +1,390 @@
+meta:
+  id: networkx_01
+  title: 첫그래프만들기
+  order: 1
+  category: networkx
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["networkx", "Graph", "노드", "엣지", "시각화"]
+  seo:
+    title: "NetworkX 첫걸음 - 그래프 생성과 시각화"
+    description: "NetworkX로 첫 그래프를 만듭니다. 노드와 엣지를 추가하고 시각화하는 방법을 배웁니다."
+    keywords: ["networkx", "Graph", "노드", "엣지", "add_node", "add_edge", "시각화"]
+
+intro:
+  emoji: "🌐"
+  goal: 그래프를 생성하고 노드/엣지를 추가하여 시각화합니다.
+  description: NetworkX의 기본인 그래프 생성을 배웁니다. Graph() 객체를 만들고, add_node()와 add_edge()로 노드와 엣지를 추가합니다. nodes()와 edges()로 그래프를 탐색하고, nx.draw()로 시각화합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "NetworkX와 시각화를 위한 matplotlib을 불러옵니다. networkx는 관례적으로 nx라는 별칭으로 임포트합니다. 이 별칭은 공식 문서와 대부분의 튜토리얼에서 사용하는 표준이므로 그대로 따르는 것이 좋습니다. matplotlib.pyplot은 그래프를 그림으로 그릴 때 필요합니다. NetworkX 자체는 그래프 데이터 구조와 알고리즘을 제공하고, 실제 시각화는 matplotlib이 담당합니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: networkx와 matplotlib을 불러옵니다
+    content: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+- id: step2_create
+  title: 2단계. 빈 그래프 생성
+  subtitle: Graph()
+  blocks:
+  - type: text
+    content: "nx.Graph()를 호출하면 빈 무방향 그래프 객체가 생성됩니다. 이 시점에서는 노드도 엣지도 없는 빈 컨테이너입니다. 변수명은 관례적으로 대문자 G를 사용하지만, 여러 그래프를 다룰 때는 의미 있는 이름(friends, network, road 등)을 사용하는 것이 좋습니다. 무방향 그래프는 엣지에 방향이 없어서 A-B 연결이 있으면 A에서 B로, B에서 A로 모두 이동 가능합니다."
+  - type: code
+    language: python
+    title: 빈 그래프 생성
+    description: Graph 객체를 만듭니다
+    content: |-
+      G = nx.Graph()
+      G
+  - type: code
+    language: python
+    title: 그래프 정보
+    description: 노드와 엣지 개수 확인
+    content: |-
+      numNodes = G.number_of_nodes()
+      numEdges = G.number_of_edges()
+      numNodes, numEdges
+  - type: tip
+    content: Graph()는 무방향 그래프입니다. 방향 그래프는 DiGraph()를 사용합니다. 다음 프로젝트에서 배웁니다.
+
+- id: step3_add_nodes
+  title: 3단계. 노드 추가
+  subtitle: add_node()
+  blocks:
+  - type: text
+    content: "add_node() 메서드로 그래프에 노드를 하나씩 추가합니다. 노드는 해시 가능한(hashable) 모든 파이썬 객체가 될 수 있습니다. 정수(1, 2, 3), 문자열('Alice', 'Bob'), 튜플((0, 1)) 등을 노드로 사용할 수 있습니다. 다만 리스트나 딕셔너리처럼 변경 가능한(mutable) 객체는 노드가 될 수 없습니다. 실무에서는 사람 이름, 도시 이름, 제품 ID 등 의미 있는 식별자를 노드로 사용합니다."
+  - type: code
+    language: python
+    title: 노드 하나 추가
+    description: add_node()로 노드 추가
+    content: |-
+      G1 = nx.Graph()
+      G1.add_node(1)
+      G1.add_node(2)
+      G1.add_node("A")
+      list(G1.nodes())
+  - type: code
+    language: python
+    title: 여러 노드 한번에 추가
+    description: add_nodes_from()으로 리스트 추가
+    content: |-
+      G2 = nx.Graph()
+      G2.add_nodes_from([1, 2, 3, 4, 5])
+      G2.add_nodes_from(["Alice", "Bob", "Carol"])
+      list(G2.nodes())
+  - type: tip
+    content: add_nodes_from()은 리스트나 이터러블을 받아 여러 노드를 한번에 추가합니다.
+
+- id: step4_add_edges
+  title: 4단계. 엣지 추가
+  subtitle: add_edge()
+  blocks:
+  - type: text
+    content: "add_edge(u, v) 메서드로 노드 u와 노드 v 사이에 엣지(연결)를 추가합니다. 네트워크 분석에서 엣지는 관계를 나타냅니다. 친구 관계, 도로 연결, 협업 관계 등이 엣지가 됩니다. add_edge()의 편리한 점은 노드가 아직 존재하지 않아도 자동으로 생성해준다는 것입니다. 노드를 먼저 추가하지 않고 바로 엣지를 추가해도 됩니다. 여러 엣지를 한번에 추가할 때는 add_edges_from()에 튜플 리스트를 전달합니다."
+  - type: code
+    language: python
+    title: 엣지 추가
+    description: 두 노드 연결
+    content: |-
+      G3 = nx.Graph()
+      G3.add_edge(1, 2)
+      G3.add_edge(2, 3)
+      G3.add_edge(1, 3)
+      list(G3.edges())
+  - type: code
+    language: python
+    title: 여러 엣지 한번에 추가
+    description: add_edges_from()으로 리스트 추가
+    content: |-
+      G4 = nx.Graph()
+      edgeList = [(1, 2), (2, 3), (3, 4), (4, 1)]
+      G4.add_edges_from(edgeList)
+      list(G4.nodes()), list(G4.edges())
+  - type: tip
+    content: 엣지를 추가할 때 노드가 없으면 자동 생성됩니다. 노드를 먼저 추가하지 않아도 됩니다.
+
+- id: step5_explore
+  title: 5단계. 그래프 탐색
+  subtitle: nodes(), edges(), degree()
+  blocks:
+  - type: text
+    content: "그래프를 생성했으면 그 구조를 탐색해야 합니다. nodes()는 모든 노드를, edges()는 모든 엣지를 반환합니다. degree(노드)는 해당 노드의 차수, 즉 연결된 엣지의 개수를 반환합니다. 차수가 높은 노드는 많은 관계를 가진 중요한 노드입니다. neighbors(노드)는 해당 노드와 직접 연결된 이웃 노드들을 반환합니다. 이 기본 메서드들로 네트워크의 구조를 파악하고, 특정 노드의 연결 상태를 확인할 수 있습니다."
+  - type: code
+    language: python
+    title: 기본 정보
+    description: 노드, 엣지, 차수 확인
+    content: |-
+      G5 = nx.Graph()
+      G5.add_edges_from([(1, 2), (1, 3), (1, 4), (2, 3)])
+      nodeList = list(G5.nodes())
+      edgeList5 = list(G5.edges())
+      nodeList, edgeList5
+  - type: code
+    language: python
+    title: 차수 확인
+    description: 각 노드의 연결 수
+    content: |-
+      deg1 = G5.degree(1)
+      deg2 = G5.degree(2)
+      deg1, deg2
+  - type: code
+    language: python
+    title: 이웃 노드
+    description: 특정 노드와 연결된 노드들
+    content: |-
+      neighbors1 = list(G5.neighbors(1))
+      neighbors2 = list(G5.neighbors(2))
+      neighbors1, neighbors2
+  - type: tip
+    content: degree(노드)는 해당 노드의 연결 수입니다. neighbors(노드)는 연결된 이웃 노드 목록입니다.
+
+- id: step6_visualize
+  title: 6단계. 그래프 시각화
+  subtitle: nx.draw()
+  blocks:
+  - type: text
+    content: "nx.draw() 함수로 그래프를 시각적으로 표현합니다. 노드는 원으로, 엣지는 선으로 그려집니다. with_labels=True를 설정하면 노드 안에 라벨(노드 이름)이 표시됩니다. node_color로 노드 색상, node_size로 노드 크기, edge_color로 엣지 색상을 지정할 수 있습니다. matplotlib의 Figure와 Axes를 사용하면 더 세밀한 제어가 가능합니다. 시각화는 네트워크 구조를 직관적으로 이해하는 데 매우 유용합니다."
+  - type: code
+    language: python
+    title: 기본 시각화
+    description: 간단한 그래프 그리기
+    content: |-
+      G6 = nx.Graph()
+      G6.add_edges_from([(1, 2), (1, 3), (2, 3), (3, 4)])
+
+      fig1, ax1 = plt.subplots(figsize=(6, 4))
+      nx.draw(G6, with_labels=True, ax=ax1)
+      ax1.set_title('Simple Graph')
+      fig1
+  - type: code
+    language: python
+    title: 스타일 지정
+    description: 색상과 크기 커스터마이징
+    content: |-
+      fig2, ax2 = plt.subplots(figsize=(6, 4))
+      nx.draw(G6, with_labels=True, node_color='skyblue',
+              node_size=700, font_size=12, edge_color='gray', ax=ax2)
+      ax2.set_title('Styled Graph')
+      fig2
+  - type: tip
+    content: with_labels=True로 노드 라벨을 표시합니다. node_color, node_size, edge_color 등으로 스타일을 지정합니다.
+
+- id: step7_layout
+  title: 7단계. 레이아웃
+  subtitle: 노드 위치 결정
+  blocks:
+  - type: text
+    content: "레이아웃(layout)은 2D 평면에서 노드의 위치를 결정하는 알고리즘입니다. spring_layout은 물리적인 스프링 시뮬레이션을 사용합니다. 연결된 노드 사이에는 인력이, 모든 노드 사이에는 척력이 작용한다고 가정하여 균형 위치를 찾습니다. 결과적으로 연결된 노드는 가까이, 연결되지 않은 노드는 멀리 배치됩니다. circular_layout은 모든 노드를 원형으로 배치합니다. 레이아웃 함수는 노드 이름을 키로, 좌표를 값으로 하는 딕셔너리를 반환합니다."
+  - type: code
+    language: python
+    title: 스프링 레이아웃
+    description: 물리적 시뮬레이션 기반
+    content: |-
+      G7 = nx.Graph()
+      G7.add_edges_from([(1, 2), (1, 3), (2, 3), (3, 4), (4, 5), (5, 6)])
+
+      pos7 = nx.spring_layout(G7, seed=42)
+      fig3, ax3 = plt.subplots(figsize=(6, 4))
+      nx.draw(G7, pos=pos7, with_labels=True, node_color='lightgreen',
+              node_size=600, ax=ax3)
+      ax3.set_title('Spring Layout')
+      fig3
+  - type: code
+    language: python
+    title: 원형 레이아웃
+    description: 노드를 원형으로 배치
+    content: |-
+      posCircle = nx.circular_layout(G7)
+      fig4, ax4 = plt.subplots(figsize=(6, 4))
+      nx.draw(G7, pos=posCircle, with_labels=True, node_color='salmon',
+              node_size=600, ax=ax4)
+      ax4.set_title('Circular Layout')
+      fig4
+  - type: tip
+    content: seed 파라미터를 설정하면 매번 같은 레이아웃을 얻습니다. 재현성을 위해 seed를 지정하세요.
+
+- id: step8_friends
+  title: 8단계. 친구 네트워크 만들기
+  subtitle: 실습 예제
+  blocks:
+  - type: text
+    content: "지금까지 배운 내용을 종합하여 실제 친구 관계 네트워크를 만들어봅시다. 사람 이름을 노드로, 친구 관계를 엣지로 표현합니다. 먼저 노드(사람들)를 추가하고, 친구 관계를 엣지로 연결합니다. 그런 다음 시각화하여 누가 누구와 연결되어 있는지 한눈에 확인합니다. 마지막으로 각 사람의 친구 수(차수)를 분석하여 가장 인기 있는 사람을 찾아봅니다."
+  - type: code
+    language: python
+    title: 친구 네트워크 생성
+    description: 이름으로 노드 생성
+    content: |-
+      friends = nx.Graph()
+      friendNames = ["Alice", "Bob", "Carol", "David", "Eve"]
+      friends.add_nodes_from(friendNames)
+
+      friendships = [
+          ("Alice", "Bob"),
+          ("Alice", "Carol"),
+          ("Bob", "Carol"),
+          ("Bob", "David"),
+          ("Carol", "Eve"),
+          ("David", "Eve")
+      ]
+      friends.add_edges_from(friendships)
+      friends.number_of_nodes(), friends.number_of_edges()
+  - type: code
+    language: python
+    title: 친구 네트워크 시각화
+    description: 완성된 네트워크 그리기
+    content: |-
+      posFriends = nx.spring_layout(friends, seed=42)
+      fig5, ax5 = plt.subplots(figsize=(8, 6))
+      nx.draw(friends, pos=posFriends, with_labels=True,
+              node_color='lightblue', node_size=1500, font_size=11,
+              edge_color='gray', width=2, ax=ax5)
+      ax5.set_title('Friend Network')
+      fig5
+  - type: code
+    language: python
+    title: 친구 관계 분석
+    description: 각 사람의 친구 수
+    content: |-
+      degFriends = dict(friends.degree())
+      degFriends
+
+- id: step9_check
+  title: 9단계. 연결 확인
+  subtitle: has_node(), has_edge()
+  blocks:
+  - type: text
+    content: "그래프에 특정 노드나 엣지가 있는지 확인해야 할 때가 있습니다. has_node(노드)는 해당 노드가 그래프에 존재하면 True, 없으면 False를 반환합니다. has_edge(u, v)는 노드 u와 v 사이에 엣지가 있으면 True를 반환합니다. 이 메서드들은 조건문과 함께 사용하여 노드나 엣지가 있을 때만 특정 작업을 수행하도록 할 수 있습니다. 존재하지 않는 노드에 접근하면 에러가 발생하므로 사전 확인이 중요합니다."
+  - type: code
+    language: python
+    title: 노드 존재 확인
+    description: has_node()로 확인
+    content: |-
+      hasAlice = friends.has_node("Alice")
+      hasFrank = friends.has_node("Frank")
+      hasAlice, hasFrank
+  - type: code
+    language: python
+    title: 엣지 존재 확인
+    description: has_edge()로 확인
+    content: |-
+      edgeAB = friends.has_edge("Alice", "Bob")
+      edgeAD = friends.has_edge("Alice", "David")
+      edgeAB, edgeAD
+  - type: tip
+    content: has_node()와 has_edge()는 True/False를 반환합니다. 노드나 연결 존재 여부를 빠르게 확인할 수 있습니다.
+
+- id: step10_remove
+  title: 10단계. 노드/엣지 삭제
+  subtitle: remove_node(), remove_edge()
+  blocks:
+  - type: text
+    content: "그래프에서 노드나 엣지를 삭제할 수 있습니다. remove_edge(u, v)는 두 노드 사이의 연결만 끊고 노드는 그대로 남깁니다. remove_node(노드)는 해당 노드를 삭제하는데, 이때 그 노드와 연결된 모든 엣지도 자동으로 함께 삭제됩니다. 예를 들어 친구 네트워크에서 한 사람을 삭제하면 그 사람과의 모든 친구 관계도 사라집니다. 삭제 작업은 원본 그래프를 직접 수정하므로 주의가 필요합니다."
+  - type: code
+    language: python
+    title: 엣지 삭제
+    description: 연결 끊기
+    content: |-
+      G8 = nx.Graph()
+      G8.add_edges_from([(1, 2), (2, 3), (3, 1)])
+      G8.remove_edge(1, 2)
+      list(G8.edges())
+  - type: code
+    language: python
+    title: 노드 삭제
+    description: 노드와 연결된 엣지 모두 삭제
+    content: |-
+      G9 = nx.Graph()
+      G9.add_edges_from([(1, 2), (2, 3), (3, 4)])
+      G9.remove_node(2)
+      list(G9.nodes()), list(G9.edges())
+  - type: tip
+    content: 노드를 삭제하면 해당 노드와 연결된 모든 엣지가 자동으로 삭제됩니다.
+
+- id: practice
+  title: 실습
+  subtitle: 그래프 만들기
+  blocks:
+  - type: text
+    content: "지금까지 배운 그래프 생성, 노드/엣지 추가, 탐색, 시각화 기능을 활용하여 미션을 수행해봅시다. 미션1에서는 팀 조직도를 네트워크로 표현하고, 미션2에서는 중심 노드와 외곽 노드로 구성된 별 모양 그래프를 만듭니다. 각 미션은 독립적으로 실행 가능하며, 앞에서 배운 모든 개념을 종합적으로 활용합니다."
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 팀 네트워크"
+    blocks:
+    - type: code
+      title: 팀 네트워크 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        team = nx.Graph()
+        members = ["Leader", "Dev1", "Dev2", "Designer", "PM"]
+        team.add_nodes_from(members)
+
+        teamLinks = [
+            ("Leader", "Dev1"),
+            ("Leader", "Dev2"),
+            ("Leader", "Designer"),
+            ("Leader", "PM"),
+            ("Dev1", "Dev2"),
+            ("Designer", "PM")
+        ]
+        team.add_edges_from(teamLinks)
+        team.number_of_nodes(), team.number_of_edges()
+    - type: code
+      title: 팀 네트워크 시각화
+      content: |-
+        posTeam = nx.spring_layout(team, seed=42)
+        figTeam, axTeam = plt.subplots(figsize=(8, 6))
+        nx.draw(team, pos=posTeam, with_labels=True, node_color='gold',
+                node_size=1200, font_size=10, edge_color='brown', ax=axTeam)
+        axTeam.set_title('Team Network')
+        figTeam
+    - type: code
+      title: 리더 분석
+      content: |-
+        leaderDeg = team.degree("Leader")
+        leaderNeighbors = list(team.neighbors("Leader"))
+        leaderDeg, leaderNeighbors
+  - type: expansion
+    title: "미션2: 별 그래프 만들기"
+    blocks:
+    - type: code
+      title: 별 그래프 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        star = nx.Graph()
+        center = "Hub"
+        spokes = ["A", "B", "C", "D", "E"]
+        star.add_node(center)
+        star.add_nodes_from(spokes)
+
+        for spoke in spokes:
+            star.add_edge(center, spoke)
+        list(star.edges())
+    - type: code
+      title: 별 그래프 시각화
+      content: |-
+        posStar = nx.spring_layout(star, seed=42)
+        figStar, axStar = plt.subplots(figsize=(7, 5))
+        colors = ['red'] + ['lightblue'] * 5
+        nx.draw(star, pos=posStar, with_labels=True, node_color=colors,
+                node_size=900, font_size=11, ax=axStar)
+        axStar.set_title('Star Graph')
+        figStar
+    - type: code
+      title: 차수 비교
+      content: |-
+        degHub = star.degree("Hub")
+        degA = star.degree("A")
+        degHub, degA

@@ -1,0 +1,290 @@
+meta:
+  id: pandas_09
+  title: 두데이터합치기
+  order: 9
+  category: pandas
+  difficulty: "⭐⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["merge", "concat", "join", "병합", "실무"]
+  seo:
+    title: "pandas merge, concat 완전정복 - 데이터 합치기"
+    description: "여러 데이터프레임을 합치는 방법을 배웁니다. concat으로 세로/가로 연결, merge로 키 기준 병합, left/right/outer join을 실습합니다."
+    keywords: ["pandas merge", "concat", "join", "데이터 병합", "left join"]
+
+intro:
+  emoji: "🔗"
+  goal: 여러 개의 데이터프레임을 하나로 합치는 방법을 배웁니다.
+  description: 실무에서는 데이터가 여러 파일에 나눠져 있습니다. 고객 정보, 주문 정보, 상품 정보를 합쳐야 분석이 가능합니다.
+
+sections:
+- id: step1_customers
+  title: 1단계. 고객 데이터 생성
+  subtitle: 학습용 데이터 준비
+  blocks:
+  - type: text
+    content: 온라인 쇼핑몰 데이터를 예로 들어봅시다. 먼저 고객 정보를 만듭니다.
+  - type: code
+    language: python
+    title: 고객 데이터
+    description: 고객 ID, 이름, 등급
+    content: |-
+      import pandas as pd
+
+      customers = pd.DataFrame({
+          'customerId': [1, 2, 3, 4],
+          'name': ['김철수', '이영희', '박민수', '최지은'],
+          'grade': ['VIP', '일반', 'VIP', '일반']
+      })
+      customers
+
+- id: step2_orders
+  title: 2단계. 주문 데이터 생성
+  subtitle: 주문 정보 만들기
+  blocks:
+  - type: text
+    content: 주문 데이터를 만듭니다. 각 주문에는 주문번호, 고객번호, 상품번호, 수량이 포함됩니다. 여기서 중요한 점은 customerId=5가 고객 테이블에 없는 값이라는 것입니다. 이런 불일치 데이터는 실무에서 자주 발생하며, 병합 방식(inner, left, outer)에 따라 처리가 달라집니다.
+  - type: code
+    language: python
+    title: 주문 데이터
+    description: 주문 ID, 고객 ID, 상품 ID, 수량
+    content: |-
+      orders = pd.DataFrame({
+          'orderId': [101, 102, 103, 104, 105],
+          'customerId': [1, 2, 1, 3, 5],
+          'productId': ['A', 'B', 'A', 'C', 'B'],
+          'quantity': [2, 1, 3, 1, 2]
+      })
+      orders
+
+- id: step3_products
+  title: 3단계. 상품 데이터 생성
+  subtitle: 상품 정보 만들기
+  blocks:
+  - type: text
+    content: 상품 정보를 만듭니다. productId가 주문 테이블의 productId와 연결되는 키 역할을 합니다. 이렇게 여러 테이블이 공통 키로 연결되는 구조를 관계형 데이터베이스 모델이라고 합니다. 고객-주문-상품 세 테이블을 합치면 "누가 무엇을 얼마나 샀는지" 전체 그림을 볼 수 있습니다.
+  - type: code
+    language: python
+    title: 상품 데이터
+    description: 상품 ID, 상품명, 가격
+    content: |-
+      products = pd.DataFrame({
+          'productId': ['A', 'B', 'C'],
+          'productName': ['노트북', '마우스', '키보드'],
+          'price': [1500000, 50000, 100000]
+      })
+      products
+
+- id: step4_concat
+  title: 4단계. concat 기본
+  subtitle: 세로로 단순 연결
+  blocks:
+  - type: text
+    content: concat은 같은 구조의 데이터를 단순히 붙입니다. 1월 주문 + 2월 주문 합치기처럼 같은 형태의 데이터를 이어붙일 때 사용합니다. ignore_index=True로 인덱스를 새로 부여합니다.
+  - type: code
+    language: python
+    title: 세로로 연결
+    description: 1월 주문 + 2월 주문 합치기
+    content: |-
+      jan = pd.DataFrame({'orderId': [1, 2], 'amount': [10000, 20000]})
+      feb = pd.DataFrame({'orderId': [3, 4], 'amount': [15000, 25000]})
+
+      pd.concat([jan, feb], ignore_index=True)
+  - type: tip
+    content: pd.concat()은 여러 DataFrame을 연결합니다. 리스트로 DataFrame들을 넘기면 세로로 이어붙입니다(axis=0, 기본값). ignore_index=True로 인덱스를 0부터 다시 부여합니다. axis=1로 설정하면 가로로 붙입니다.
+
+- id: step5_merge_inner
+  title: 5단계. merge 기본 (inner)
+  subtitle: 키 기준 병합
+  blocks:
+  - type: text
+    content: merge는 공통 키를 기준으로 합칩니다. SQL의 JOIN과 같은 개념입니다. 기본은 inner join으로 양쪽 모두에 있는 키만 결과에 포함됩니다. customerId=5는 고객 테이블에 없으므로 제외됩니다.
+  - type: code
+    language: python
+    title: 기본 merge (inner join)
+    description: 주문에 고객 정보 붙이기
+    content: |-
+      pd.merge(orders, customers, on='customerId')
+  - type: tip
+    content: pd.merge()는 공통 키 컬럼을 기준으로 두 DataFrame을 병합합니다. on 파라미터로 키 컬럼을 지정합니다. 기본은 how='inner'로 양쪽 모두에 존재하는 키만 남깁니다. concat은 단순 연결, merge는 키 기준 병합입니다.
+
+- id: step6_merge_product
+  title: 6단계. 상품 정보 병합
+  subtitle: 여러 테이블 합치기
+  blocks:
+  - type: text
+    content: 여러 테이블을 연속으로 합칠 수 있습니다. 먼저 주문과 고객을 합치고, 그 결과에 상품을 합칩니다. 실무에서 여러 테이블을 조인하는 패턴입니다.
+  - type: code
+    language: python
+    title: 상품 정보도 붙이기
+    description: 주문 + 고객 + 상품 모두 합치기
+    content: |-
+      merged = pd.merge(orders, customers, on='customerId')
+      full = pd.merge(merged, products, on='productId')
+      full
+
+- id: step7_calculate
+  title: 7단계. 금액 계산
+  subtitle: 병합 후 계산
+  blocks:
+  - type: text
+    content: 합쳐진 데이터로 주문 금액을 계산합니다. merge를 통해 필요한 정보를 모았으므로 이제 계산이 가능합니다.
+  - type: code
+    language: python
+    title: 주문 금액 계산
+    description: 수량 × 가격
+    content: |-
+      priced = full.copy()
+      priced['totalPrice'] = priced['quantity'] * priced['price']
+      priced[['orderId', 'name', 'productName', 'quantity', 'totalPrice']]
+
+- id: step8_left_join
+  title: 8단계. left join
+  subtitle: 왼쪽 데이터 모두 유지
+  blocks:
+  - type: text
+    content: how='left'는 왼쪽 데이터를 모두 유지하고, 오른쪽에 없으면 NaN을 채웁니다. 모든 주문을 유지하면서 고객 정보를 붙이고 싶을 때 사용합니다. customerId=5는 고객이 없지만 주문은 남아있습니다.
+  - type: code
+    language: python
+    title: left join
+    description: 모든 주문 유지, 고객 없으면 NaN
+    content: |-
+      pd.merge(orders, customers, on='customerId', how='left')
+  - type: tip
+    content: how='left'는 왼쪽 DataFrame의 모든 행을 유지합니다. 오른쪽에 매칭되는 키가 없으면 NaN으로 채웁니다. how='right'는 반대로 오른쪽을 유지, how='outer'는 양쪽 모두 유지, how='inner'(기본값)는 양쪽 모두 존재하는 것만 유지합니다.
+
+- id: step9_right_join
+  title: 9단계. right join
+  subtitle: 오른쪽 데이터 모두 유지
+  blocks:
+  - type: text
+    content: how='right'는 오른쪽 DataFrame의 모든 행을 유지합니다. 왼쪽에 매칭되는 키가 없으면 NaN으로 채웁니다. 이 경우 모든 고객을 유지하면서 주문 정보를 붙이므로, 주문이 없는 고객도 결과에 포함됩니다. left join의 반대 개념입니다.
+  - type: code
+    language: python
+    title: right join
+    description: 모든 고객 유지, 주문 없으면 NaN
+    content: |-
+      pd.merge(orders, customers, on='customerId', how='right')
+
+- id: step10_outer_join
+  title: 10단계. outer join
+  subtitle: 양쪽 모두 유지
+  blocks:
+  - type: text
+    content: how='outer'는 양쪽 DataFrame의 모든 행을 유지합니다. 주문이 있지만 고객 정보가 없는 경우(customerId=5), 고객 정보는 있지만 주문이 없는 경우(customerId=4) 모두 결과에 포함됩니다. 데이터 검증이나 불일치 찾기에 유용합니다.
+  - type: code
+    language: python
+    title: outer join
+    description: 양쪽 모두 유지
+    content: |-
+      pd.merge(orders, customers, on='customerId', how='outer')
+
+- id: step11_diff_keys
+  title: 11단계. 다른 키 이름
+  subtitle: left_on, right_on
+  blocks:
+  - type: text
+    content: 실무에서는 두 테이블의 키 컬럼 이름이 다른 경우가 많습니다. 예를 들어 한 테이블은 customerId, 다른 테이블은 custId를 사용할 수 있습니다. 이때 left_on과 right_on으로 각각의 키 컬럼을 지정합니다. 병합 후 두 컬럼이 모두 남으므로 필요시 drop()으로 정리합니다.
+  - type: code
+    language: python
+    title: 키 이름이 다를 때
+    description: customerId vs custId
+    content: |-
+      diffCust = customers.rename(columns={'customerId': 'custId'})
+      pd.merge(orders, diffCust, left_on='customerId', right_on='custId')
+
+- id: step12_multi_keys
+  title: 12단계. 여러 키로 병합
+  subtitle: 복수 컬럼 매칭
+  blocks:
+  - type: text
+    content: 하나의 컬럼만으로 고유하게 식별할 수 없을 때 여러 컬럼을 키로 사용합니다. 예를 들어 연도와 월의 조합으로 월별 실적과 목표를 매칭합니다. on 파라미터에 리스트로 여러 컬럼을 전달하면 모든 컬럼이 일치하는 경우에만 병합됩니다.
+  - type: code
+    language: python
+    title: 여러 키로 병합
+    description: 연도 + 월로 매칭
+    content: |-
+      sales = pd.DataFrame({'year': [2023, 2023, 2024], 'month': [1, 2, 1], 'sales': [100, 150, 120]})
+      targets = pd.DataFrame({'year': [2023, 2023, 2024], 'month': [1, 2, 1], 'target': [90, 140, 130]})
+
+      pd.merge(sales, targets, on=['year', 'month'])
+
+- id: practice
+  title: 실습
+  subtitle: 데이터 병합 프로젝트
+  blocks:
+  - type: text
+    content: 배운 내용으로 데이터를 병합해봅시다.
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: VIP 필터링 + 고객별 주문 집계"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        data = pd.DataFrame({
+            'customerId': [1, 2, 3, 4],
+            'name': ['김철수', '이영희', '박민수', '최지은'],
+            'grade': ['VIP', '일반', 'VIP', '일반']
+        })
+        dataOrders = pd.DataFrame({
+            'orderId': [101, 102, 103, 104, 105],
+            'customerId': [1, 2, 1, 3, 5],
+            'productId': ['A', 'B', 'A', 'C', 'B'],
+            'quantity': [2, 1, 3, 1, 2]
+        })
+    - type: code
+      title: "분석 수행"
+      content: |-
+        dataMerged = pd.merge(dataOrders, data, on='customerId')
+        vipOrders = dataMerged[dataMerged['grade'] == 'VIP']
+        quantityByName = dataMerged.groupby('name')['quantity'].sum()
+        (vipOrders, quantityByName)
+  - type: expansion
+    title: "미션2: left join + 금액 계산"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        df = pd.DataFrame({
+            'customerId': [1, 2, 3, 4],
+            'name': ['김철수', '이영희', '박민수', '최지은'],
+            'grade': ['VIP', '일반', 'VIP', '일반']
+        })
+        dfOrders = pd.DataFrame({
+            'orderId': [101, 102, 103, 104, 105],
+            'customerId': [1, 2, 1, 3, 5],
+            'productId': ['A', 'B', 'A', 'C', 'B'],
+            'quantity': [2, 1, 3, 1, 2]
+        })
+        dfProducts = pd.DataFrame({
+            'productId': ['A', 'B', 'C'],
+            'productName': ['노트북', '마우스', '키보드'],
+            'price': [1500000, 50000, 100000]
+        })
+    - type: code
+      title: "분석 수행"
+      content: |-
+        leftMerged = pd.merge(df, dfOrders, on='customerId', how='left')
+        noOrders = leftMerged[leftMerged['orderId'].isna()]
+        fullMerged = pd.merge(pd.merge(dfOrders, df, on='customerId'), dfProducts, on='productId')
+        fullMerged['totalPrice'] = fullMerged['quantity'] * fullMerged['price']
+        revenueByName = fullMerged.groupby('name')['totalPrice'].sum()
+        (noOrders, revenueByName)
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 데이터 병합을 배웠습니다.
+  - type: list
+    items:
+    - "concat() - 같은 구조의 데이터를 단순 연결"
+    - "merge() - 키 기준으로 데이터 병합"
+    - "how='left' - 왼쪽 데이터 모두 유지"
+    - "how='outer' - 양쪽 데이터 모두 유지"
+    - "on, left_on, right_on - 병합 키 지정"
+  - type: text
+    content: 다음 시간에는 지금까지 배운 모든 것을 활용하는 실전 프로젝트입니다.

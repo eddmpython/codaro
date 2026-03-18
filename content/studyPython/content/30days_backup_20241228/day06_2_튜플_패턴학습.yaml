@@ -1,0 +1,210 @@
+meta:
+  id: day06_2
+  title: 튜플 패턴학습
+  day: 6
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 튜플 - 변경 불가능한 데이터"
+    description: "튜플의 특징과 사용법, 리스트와의 차이점을 배웁니다."
+    keywords: ['튜플', 'tuple', '언패킹', '불변']
+intro:
+  title: 튜플 마스터 패턴북
+  emoji: 🔥
+  description: 이것만 외우면 튜플 마스터! 핵심 패턴만 모았습니다.
+  points:
+  - '📝 생성: (값1, 값2, 값3)'
+  - '🔒 불변: 생성 후 수정 불가'
+  - '🔍 검색: in, index(), count()'
+  - '✂️ 슬라이싱: 튜플[시작:끝]'
+  - '📏 길이: len(튜플)'
+  - '🔗 연결: + 연산자로 튜플 합치기'
+  - '📦 언패킹: a, b, c = 튜플'
+  - '🔢 인덱싱: 튜플[인덱스]'
+  summary: 🔥 튜플은 불변 리스트! 안전한 데이터 저장에 사용!
+sections:
+- id: creation
+  title: 1. 튜플 생성 패턴
+  subtitle: (value1, value2)
+  blocks:
+  - type: code
+    language: python
+    title: 튜플 생성
+    description: 튜플은 불변(immutable) 자료구조입니다. 소괄호로 생성하며, 요소가 하나일 때는 반드시 쉼표를 붙여야 합니다.
+    content: |-
+      numbers = (1, 2, 3, 4, 5)
+      fruits = ("apple", "banana", "cherry")
+      print(numbers)
+
+      colors = tuple(["red", "green", "blue"])
+      print(colors)
+
+      single = (42,)
+      print(single)
+- id: access
+  title: 2. 접근 패턴
+  subtitle: tuple[index]
+  blocks:
+  - type: code
+    language: python
+    title: 인덱싱과 슬라이싱
+    description: 튜플의 접근 방법은 리스트와 완전히 동일합니다. 인덱싱과 슬라이싱을 모두 사용할 수 있습니다.
+    content: |-
+      data = ("a", "b", "c", "d", "e")
+
+      print(data[0])
+      print(data[-1])
+
+      print(data[1:4])
+      print(data[::-1])
+- id: immutable
+  title: 3. 불변 패턴
+  subtitle: 수정 불가능
+  blocks:
+  - type: code
+    language: python
+    title: 수정 불가능한 특성
+    description: 튜플은 생성 후 수정할 수 없습니다. 수정이 필요하면 리스트로 변환한 후 다시 튜플로 만들어야 합니다.
+    content: |-
+      numbers = (1, 2, 3)
+
+      tempList = list(numbers)
+      tempList[0] = 10
+      newNumbers = tuple(tempList)
+      print(newNumbers)
+- id: unpacking
+  title: 4. 언패킹 패턴
+  subtitle: a, b = tuple
+  blocks:
+  - type: code
+    language: python
+    title: 튜플 언패킹
+    description: 언패킹은 튜플의 가장 강력한 기능입니다. 튜플의 각 요소를 개별 변수에 한 번에 할당할 수 있습니다.
+    content: |-
+      point = (3, 4)
+      x, y = point
+      print(x, y)
+
+      a, b = 10, 20
+      a, b = b, a
+      print(a, b)
+
+      name, age, city = ("Kim", 25, "Seoul")
+      print(name, age, city)
+- id: star_unpacking
+  title: 5. 별표 언패킹 패턴
+  subtitle: '*variable'
+  blocks:
+  - type: code
+    language: python
+    title: 별표 언패킹
+    description: 별표(*)를 사용하면 나머지 요소들을 리스트로 받을 수 있습니다. 첫 번째나 마지막 요소만 따로 처리할 때 유용합니다.
+    content: |-
+      numbers = (1, 2, 3, 4, 5)
+
+      first, *rest = numbers
+      print(first)
+      print(rest)
+
+      *beginning, last = numbers
+      print(beginning)
+      print(last)
+- id: conversion
+  title: 6. 변환 패턴
+  subtitle: tuple(), list()
+  blocks:
+  - type: code
+    language: python
+    title: 자료형 변환
+    description: 튜플과 다른 자료형 간의 변환이 가능합니다. 리스트, 문자열 등을 튜플로, 튜플을 다른 자료형으로 변환할 수 있습니다.
+    content: |-
+      myList = [1, 2, 3, 4]
+      myTuple = tuple(myList)
+      print(myTuple)
+
+      backToList = list(myTuple)
+      print(backToList)
+
+      word = "hello"
+      charTuple = tuple(word)
+      print(charTuple)
+- id: methods
+  title: 7. 메서드 패턴
+  subtitle: count(), index()
+  blocks:
+  - type: code
+    language: python
+    title: 튜플 메서드
+    description: 튜플은 수정이 불가능하므로 메서드가 많지 않습니다. count()로 개수를 세고, index()로 위치를 찾을 수 있습니다.
+    content: |-
+      numbers = (1, 2, 3, 2, 2, 4)
+
+      count2 = numbers.count(2)
+      print(count2)
+
+      pos = numbers.index(3)
+      print(pos)
+
+      length = len(numbers)
+      print(length)
+- id: membership
+  title: 8. 멤버십 패턴
+  subtitle: in, not in
+  blocks:
+  - type: code
+    language: python
+    title: 포함 여부 확인
+    description: in 연산자로 특정 요소가 튜플에 포함되어 있는지 확인할 수 있습니다. 튜플에서도 빠른 검색이 가능합니다.
+    content: |-
+      fruits = ("apple", "banana", "cherry")
+
+      appleExists = "apple" in fruits
+      print(appleExists)
+
+      grapeExists = "grape" in fruits
+      print(grapeExists)
+
+      noOrange = "orange" not in fruits
+      print(noOrange)
+- id: concatenation
+  title: 9. 연결 패턴
+  subtitle: tuple1 + tuple2
+  blocks:
+  - type: code
+    language: python
+    title: 튜플 연결
+    description: + 연산자로 두 튜플을 연결하여 새로운 튜플을 만들 수 있습니다. 원본 튜플은 변경되지 않고 새로운 튜플이 생성됩니다.
+    content: |-
+      tuple1 = (1, 2, 3)
+      tuple2 = (4, 5, 6)
+
+      combined = tuple1 + tuple2
+      print(combined)
+
+      repeated = tuple1 * 3
+      print(repeated)
+
+      print(tuple1)
+- id: comparison
+  title: 10. 비교 패턴
+  subtitle: ==, !=, <, >
+  blocks:
+  - type: code
+    language: python
+    title: 튜플 비교
+    description: 튜플은 요소별로 순서대로 비교됩니다. 첫 번째 요소부터 차례로 비교하여 크기를 결정합니다.
+    content: |-
+      tuple1 = (1, 2, 3)
+      tuple2 = (1, 2, 3)
+      tuple3 = (1, 2, 4)
+
+      print(tuple1 == tuple2)
+      print(tuple1 == tuple3)
+
+      print(tuple1 < tuple3)
+      print(tuple3 > tuple1)
+
+      short = (1, 2)
+      print(short < tuple1)

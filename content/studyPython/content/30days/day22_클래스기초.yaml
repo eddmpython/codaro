@@ -1,0 +1,631 @@
+meta:
+  id: "day22"
+  title: "클래스 기초"
+  day: 22
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 클래스 기초 - 객체지향 프로그래밍 시작"
+    description: "class, __init__, self, 메서드, 속성, 인스턴스를 배웁니다."
+    keywords: ['클래스', 'class', 'init', 'self', '메서드', '속성']
+
+intro:
+  emoji: "🏗️"
+  points:
+  - "class로 클래스 정의"
+  - "__init__으로 초기화"
+  - "self로 인스턴스 참조"
+  - "메서드와 속성 활용"
+
+sections:
+- id: "class_basic"
+  title: "클래스 정의"
+  subtitle: "class 키워드"
+  blocks:
+  - type: "text"
+    content: "클래스는 객체를 만드는 설계도입니다. class 키워드로 클래스를 정의하고, 클래스명()으로 인스턴스를 생성합니다. 클래스명은 대문자로 시작하는 것이 관례입니다."
+  - type: "list"
+    items:
+    - "class 클래스명: 형식"
+    - "대문자로 시작"
+    - "클래스명()으로 인스턴스 생성"
+    - "설계도와 실제 객체"
+  - type: "code"
+    language: "python"
+    title: "빈 클래스"
+    description: "가장 단순한 클래스를 정의합니다."
+    content: |-
+      class Dog:
+          pass
+
+      myDog = Dog()
+      type(myDog)
+  - type: "code"
+    language: "python"
+    title: "클래스 확인"
+    description: "인스턴스가 어떤 클래스인지 확인합니다."
+    content: |-
+      class Cat:
+          pass
+
+      myCat = Cat()
+      type(myCat).__name__
+  - type: "tip"
+    content: "클래스는 데이터와 기능을 하나로 묶는 도구입니다."
+
+- id: "init_method"
+  title: "__init__ 메서드"
+  subtitle: "초기화 메서드"
+  blocks:
+  - type: "text"
+    content: "__init__ 메서드는 인스턴스 생성 시 자동으로 호출되는 특별한 메서드입니다. 인스턴스의 초기 속성값을 설정하는 데 사용합니다. 첫 번째 매개변수는 항상 self입니다."
+  - type: "list"
+    items:
+    - "__init__: 초기화 메서드"
+    - "인스턴스 생성 시 자동 호출"
+    - "첫 매개변수는 self"
+    - "속성 초기화"
+  - type: "code"
+    language: "python"
+    title: "속성 초기화"
+    description: "__init__으로 속성을 초기화합니다."
+    content: |-
+      class Employee:
+          def __init__(self, name):
+              self.name = name
+
+      alice = Employee('Alice')
+      alice.name
+  - type: "code"
+    language: "python"
+    title: "여러 속성"
+    description: "여러 속성을 한 번에 초기화합니다."
+    content: |-
+      class Book:
+          def __init__(self, title, author):
+              self.title = title
+              self.author = author
+
+      book1 = Book('Python Guide', 'Kim')
+      book1.title
+  - type: "code"
+    language: "python"
+    title: "기본값 설정"
+    description: "매개변수에 기본값을 설정합니다."
+    content: |-
+      class Product:
+          def __init__(self, name, price=0):
+              self.name = name
+              self.price = price
+
+      item = Product('Notebook')
+      item.price
+  - type: "tip"
+    content: "__init__은 생성자처럼 동작하지만 엄밀히는 초기화 메서드입니다."
+
+- id: "self_parameter"
+  title: "self 이해하기"
+  subtitle: "인스턴스 자신을 가리키는 참조"
+  blocks:
+  - type: "text"
+    content: "self는 인스턴스 자신을 가리키는 참조입니다. 메서드의 첫 번째 매개변수로 self를 받고, self.속성명으로 인스턴스 속성에 접근합니다. 메서드 호출 시 self는 자동으로 전달됩니다."
+  - type: "list"
+    items:
+    - "self: 인스턴스 자신"
+    - "메서드 첫 매개변수"
+    - "self.속성명으로 접근"
+    - "자동으로 전달됨"
+  - type: "code"
+    language: "python"
+    title: "self로 속성 접근"
+    description: "self를 통해 인스턴스 속성에 접근합니다."
+    content: |-
+      class Tracker:
+          def __init__(self):
+              self.count = 0
+
+      cnt = Tracker()
+      cnt.count
+  - type: "code"
+    language: "python"
+    title: "self로 속성 수정"
+    description: "메서드에서 self로 속성을 수정합니다."
+    content: |-
+      class Score:
+          def __init__(self, value):
+              self.value = value
+
+          def double(self):
+              self.value = self.value * 2
+
+      s = Score(10)
+      s.double()
+      s.value
+  - type: "tip"
+    content: "self는 관례적인 이름이지만 다른 이름도 가능합니다. 하지만 self를 사용하는 것이 표준입니다."
+
+- id: "instance_method"
+  title: "인스턴스 메서드"
+  subtitle: "클래스의 함수"
+  blocks:
+  - type: "text"
+    content: "인스턴스 메서드는 클래스 내부에 정의된 함수입니다. 첫 번째 매개변수로 self를 받고, 인스턴스.메서드명()으로 호출합니다. 메서드는 인스턴스의 속성을 사용하거나 수정할 수 있습니다."
+  - type: "list"
+    items:
+    - "클래스 내부 함수"
+    - "첫 매개변수 self"
+    - "인스턴스.메서드명() 호출"
+    - "속성 사용 및 수정"
+  - type: "code"
+    language: "python"
+    title: "기본 메서드"
+    description: "간단한 메서드를 정의합니다."
+    content: |-
+      class Greeter:
+          def __init__(self, name):
+              self.name = name
+
+          def greet(self):
+              return 'Hello, ' + self.name
+
+      g = Greeter('Bob')
+      g.greet()
+  - type: "code"
+    language: "python"
+    title: "매개변수가 있는 메서드"
+    description: "메서드가 추가 매개변수를 받습니다."
+    content: |-
+      class Calculator:
+          def __init__(self, value):
+              self.value = value
+
+          def add(self, num):
+              return self.value + num
+
+      calc = Calculator(10)
+      calc.add(5)
+  - type: "code"
+    language: "python"
+    title: "여러 메서드"
+    description: "하나의 클래스에 여러 메서드를 정의합니다."
+    content: |-
+      class Rectangle:
+          def __init__(self, width, height):
+              self.width = width
+              self.height = height
+
+          def area(self):
+              return self.width * self.height
+
+          def perimeter(self):
+              return 2 * (self.width + self.height)
+
+      rect = Rectangle(5, 3)
+      rect.area()
+  - type: "tip"
+    content: "메서드는 인스턴스의 동작을 정의합니다."
+
+- id: "instance_attribute"
+  title: "인스턴스 속성"
+  subtitle: "인스턴스의 데이터"
+  blocks:
+  - type: "text"
+    content: "인스턴스 속성은 각 인스턴스가 가지는 고유한 데이터입니다. self.속성명으로 정의하고 접근합니다. 각 인스턴스는 독립적인 속성값을 가집니다."
+  - type: "list"
+    items:
+    - "self.속성명으로 정의"
+    - "각 인스턴스마다 독립적"
+    - "외부에서 접근 가능"
+    - "동적으로 추가 가능"
+  - type: "code"
+    language: "python"
+    title: "독립적인 속성"
+    description: "각 인스턴스는 독립적인 속성을 가집니다."
+    content: |-
+      class User:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      user1 = User('Alice', 25)
+      user2 = User('Bob', 30)
+      user1.age, user2.age
+  - type: "code"
+    language: "python"
+    title: "속성 수정"
+    description: "인스턴스 속성을 직접 수정할 수 있습니다."
+    content: |-
+      class Savings:
+          def __init__(self, balance):
+              self.balance = balance
+
+      sav = Savings(1000)
+      sav.balance = sav.balance + 500
+      sav.balance
+  - type: "code"
+    language: "python"
+    title: "동적 속성 추가"
+    description: "인스턴스에 나중에 속성을 추가할 수 있습니다."
+    content: |-
+      class Empty:
+          pass
+
+      obj = Empty()
+      obj.newAttr = 'dynamic'
+      obj.newAttr
+  - type: "tip"
+    content: "속성은 인스턴스의 상태를 나타냅니다."
+
+- id: "multiple_instances"
+  title: "여러 인스턴스"
+  subtitle: "클래스로부터 여러 객체 생성"
+  blocks:
+  - type: "text"
+    content: "하나의 클래스로부터 여러 인스턴스를 생성할 수 있습니다. 각 인스턴스는 같은 구조를 가지지만 독립적인 데이터를 저장합니다. 클래스는 설계도이고 인스턴스는 실제 객체입니다."
+  - type: "list"
+    items:
+    - "하나의 클래스, 여러 인스턴스"
+    - "같은 구조, 다른 데이터"
+    - "독립적으로 동작"
+    - "설계도와 실제 객체"
+  - type: "code"
+    language: "python"
+    title: "여러 객체 생성"
+    description: "같은 클래스로 여러 객체를 만듭니다."
+    content: |-
+      class Car:
+          def __init__(self, model, color):
+              self.model = model
+              self.color = color
+
+      car1 = Car('Tesla', 'red')
+      car2 = Car('BMW', 'blue')
+      car1.model, car2.model
+  - type: "code"
+    language: "python"
+    title: "독립적인 동작"
+    description: "각 인스턴스는 독립적으로 동작합니다."
+    content: |-
+      class BankAccount:
+          def __init__(self, owner):
+              self.owner = owner
+              self.balance = 0
+
+          def deposit(self, amount):
+              self.balance = self.balance + amount
+
+      acc1 = BankAccount('Alice')
+      acc2 = BankAccount('Bob')
+      acc1.deposit(1000)
+      acc2.deposit(500)
+      acc1.balance, acc2.balance
+  - type: "code"
+    language: "python"
+    title: "리스트에 담기"
+    description: "여러 인스턴스를 리스트에 담을 수 있습니다."
+    content: |-
+      class Student:
+          def __init__(self, name, grade):
+              self.name = name
+              self.grade = grade
+
+      students = [
+          Student('Alice', 90),
+          Student('Bob', 85),
+          Student('Charlie', 95)
+      ]
+      students[0].name, students[0].grade
+  - type: "tip"
+    content: "클래스는 재사용 가능한 코드 템플릿입니다."
+
+- id: "practice"
+  title: "Day 22 종합 복습"
+  subtitle: "클래스 기초 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 22에서 배운 클래스 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 빈 클래스"
+    code: |-
+      class Animal:
+          pass
+
+      pet = Animal()
+      type(pet).__name__
+
+  - type: "expansion"
+    title: "🟢 기본2: __init__ 기본"
+    code: |-
+      class Item:
+          def __init__(self, name):
+              self.name = name
+
+      it = Item('Laptop')
+      it.name
+
+  - type: "expansion"
+    title: "🟢 기본3: 여러 속성"
+    code: |-
+      class Phone:
+          def __init__(self, brand, model):
+              self.brand = brand
+              self.model = model
+
+      ph = Phone('Samsung', 'Galaxy')
+      ph.brand
+
+  - type: "expansion"
+    title: "🟢 기본4: 간단한 메서드"
+    code: |-
+      class Box:
+          def __init__(self, content):
+              self.content = content
+
+          def show(self):
+              return self.content
+
+      bx = Box('treasure')
+      bx.show()
+
+  - type: "expansion"
+    title: "🟢 기본5: 속성 수정"
+    code: |-
+      class Temperature:
+          def __init__(self, celsius):
+              self.celsius = celsius
+
+      temp = Temperature(20)
+      temp.celsius = 25
+      temp.celsius
+
+  - type: "expansion"
+    title: "🟡 응용1: 기본값 매개변수"
+    code: |-
+      class Member:
+          def __init__(self, username, level='bronze'):
+              self.username = username
+              self.level = level
+
+      m = Member('john')
+      m.level
+
+  - type: "expansion"
+    title: "🟡 응용2: 계산 메서드"
+    code: |-
+      class Circle:
+          def __init__(self, radius):
+              self.radius = radius
+
+          def area(self):
+              return 3.14 * self.radius ** 2
+
+      cir = Circle(5)
+      cir.area()
+
+  - type: "expansion"
+    title: "🟡 응용3: 매개변수 메서드"
+    code: |-
+      class Point:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+          def move(self, dx, dy):
+              self.x = self.x + dx
+              self.y = self.y + dy
+
+      pt = Point(0, 0)
+      pt.move(3, 4)
+      pt.x, pt.y
+
+  - type: "expansion"
+    title: "🟡 응용4: 여러 메서드"
+    code: |-
+      class Wallet:
+          def __init__(self):
+              self.money = 0
+
+          def addMoney(self, amount):
+              self.money = self.money + amount
+
+          def getMoney(self):
+              return self.money
+
+      wl = Wallet()
+      wl.addMoney(5000)
+      wl.getMoney()
+
+  - type: "expansion"
+    title: "🟡 응용5: 독립적인 인스턴스"
+    code: |-
+      class Counter:
+          def __init__(self):
+              self.count = 0
+
+          def increment(self):
+              self.count = self.count + 1
+
+      c1 = Counter()
+      c2 = Counter()
+      c1.increment()
+      c1.increment()
+      c2.increment()
+      c1.count, c2.count
+
+  - type: "expansion"
+    title: "🔴 심화1-1: 문자열 반환 메서드"
+    code: |-
+      class Person:
+          def __init__(self, firstName, lastName):
+              self.firstName = firstName
+              self.lastName = lastName
+
+          def fullName(self):
+              return self.firstName + ' ' + self.lastName
+
+      p = Person('John', 'Doe')
+      p.fullName()
+
+  - type: "expansion"
+    title: "🔴 심화1-2: 조건부 메서드"
+    code: |-
+      class Grade:
+          def __init__(self, score):
+              self.score = score
+
+          def isPassed(self):
+              return self.score >= 60
+
+      gr = Grade(75)
+      gr.isPassed()
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 상태 변경 메서드"
+    code: |-
+      class Light:
+          def __init__(self):
+              self.isOn = False
+
+          def toggle(self):
+              self.isOn = not self.isOn
+              return self.isOn
+
+      lt = Light()
+      lt.toggle()
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 누적 계산"
+    code: |-
+      class ShoppingCart:
+          def __init__(self):
+              self.total = 0
+
+          def addItem(self, price):
+              self.total = self.total + price
+
+          def getTotal(self):
+              return self.total
+
+      cart = ShoppingCart()
+      cart.addItem(1000)
+      cart.addItem(2000)
+      cart.addItem(1500)
+      cart.getTotal()
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 리스트 속성"
+    code: |-
+      class TodoList:
+          def __init__(self):
+              self.tasks = []
+
+          def addTask(self, task):
+              self.tasks.append(task)
+
+          def getTasks(self):
+              return self.tasks
+
+      todo = TodoList()
+      todo.addTask('Study Python')
+      todo.addTask('Write Code')
+      todo.getTasks()
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 카운팅 메서드"
+    code: |-
+      class Inventory:
+          def __init__(self):
+              self.items = []
+
+          def addItem(self, item):
+              self.items.append(item)
+
+          def count(self):
+              return len(self.items)
+
+      inv = Inventory()
+      inv.addItem('sword')
+      inv.addItem('shield')
+      inv.addItem('potion')
+      inv.count()
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 딕셔너리 속성"
+    code: |-
+      class ContactBook:
+          def __init__(self):
+              self.contacts = {}
+
+          def addContact(self, name, phone):
+              self.contacts[name] = phone
+
+          def getPhone(self, name):
+              return self.contacts.get(name, 'Not found')
+
+      cb = ContactBook()
+      cb.addContact('Alice', '010-1234')
+      cb.getPhone('Alice')
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 메서드 체이닝"
+    code: |-
+      class Builder:
+          def __init__(self):
+              self.text = ''
+
+          def add(self, word):
+              self.text = self.text + word
+              return self
+
+          def build(self):
+              return self.text
+
+      bd = Builder()
+      bd.add('Hello').add(' ').add('World').build()
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 복잡한 계산"
+    code: |-
+      class Statistics:
+          def __init__(self):
+              self.numbers = []
+
+          def addNumber(self, num):
+              self.numbers.append(num)
+
+          def average(self):
+              if not self.numbers:
+                  return 0
+              return sum(self.numbers) / len(self.numbers)
+
+      stats = Statistics()
+      stats.addNumber(10)
+      stats.addNumber(20)
+      stats.addNumber(30)
+      stats.average()
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 조건부 필터링"
+    code: |-
+      class Filter:
+          def __init__(self):
+              self.data = []
+
+          def add(self, value):
+              self.data.append(value)
+
+          def getEvens(self):
+              evens = []
+              for val in self.data:
+                  if val % 2 == 0:
+                      evens.append(val)
+              return evens
+
+      flt = Filter()
+      flt.add(1)
+      flt.add(2)
+      flt.add(3)
+      flt.add(4)
+      flt.add(5)
+      flt.getEvens()

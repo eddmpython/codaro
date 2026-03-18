@@ -1,0 +1,320 @@
+meta:
+  id: pydantic_00
+  title: pydantic소개
+  order: 0
+  category: pydantic
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags: ["pydantic", "데이터검증", "타입힌트", "모델", "직렬화"]
+  seo:
+    title: "Pydantic 입문 - Python 데이터 검증의 표준"
+    description: "Pydantic으로 데이터 검증과 설정 관리를 시작하세요. 타입 힌트 기반의 강력한 데이터 모델링 라이브러리입니다."
+    keywords: ["pydantic", "데이터검증", "타입힌트", "BaseModel", "직렬화"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "✅"
+      title: "Pydantic??"
+      subtitle: "Python 데이터 검증의 표준 라이브러리"
+
+    - type: hero
+      emoji: "🛡️"
+      title: "타입 힌트 기반 데이터 검증"
+      subtitle: "런타임에서 데이터를 안전하게 검증하고 변환"
+      points:
+        - emoji: "✅"
+          title: "자동 검증"
+        - emoji: "🔄"
+          title: "타입 변환"
+        - emoji: "📦"
+          title: "직렬화"
+        - emoji: "⚙️"
+          title: "설정 관리"
+
+- id: what_is_pydantic
+  blocks:
+    - type: sectionHeader
+      title: "🤔 Pydantic이 뭔가요?"
+      subtitle: "데이터 검증과 파싱의 혁명"
+
+    - type: note
+      style: info
+      title: "왜 데이터 검증이 필요한가?"
+      content: |-
+        외부에서 들어오는 데이터는 신뢰할 수 없습니다. API 요청, JSON 파일, 사용자 입력 등은 예상과 다른 형태일 수 있습니다. 직접 검증 코드를 작성하면 반복적이고 오류가 발생하기 쉽습니다. Pydantic은 Python 타입 힌트를 사용하여 데이터 구조를 정의하고, 런타임에 자동으로 검증합니다. 잘못된 데이터가 들어오면 명확한 에러 메시지를 제공합니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "📝"
+          title: "선언적 모델 정의"
+          description: "타입 힌트로 데이터 구조 선언"
+        - emoji: "✅"
+          title: "자동 검증"
+          description: "타입, 범위, 형식 자동 검사"
+        - emoji: "🔄"
+          title: "타입 강제 변환"
+          description: "문자열 → 숫자 자동 변환"
+        - emoji: "📤"
+          title: "직렬화/역직렬화"
+          description: "JSON, dict 변환 지원"
+
+- id: why_pydantic
+  blocks:
+    - type: sectionHeader
+      title: "🌟 왜 Pydantic이 필요한가요?"
+      subtitle: "수동 검증 vs Pydantic"
+
+    - type: note
+      style: info
+      title: "수동 검증의 문제점"
+      content: |-
+        수동으로 데이터를 검증하면 코드가 장황해집니다. if문, isinstance, try-except가 반복됩니다. 검증 로직이 비즈니스 로직과 섞여 가독성이 떨어집니다. 새 필드가 추가되면 검증 코드도 수정해야 합니다. Pydantic은 이 모든 것을 자동화합니다. 모델을 정의하면 검증, 변환, 에러 메시지가 모두 처리됩니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "⚡"
+          title: "개발 속도 향상"
+          description: "검증 코드 자동 생성"
+        - emoji: "🐛"
+          title: "버그 감소"
+          description: "타입 오류 조기 발견"
+        - emoji: "📖"
+          title: "문서화 효과"
+          description: "모델이 곧 API 명세"
+        - emoji: "🔧"
+          title: "IDE 지원"
+          description: "자동완성, 타입 체크"
+
+- id: pydantic_vs_others
+  blocks:
+    - type: sectionHeader
+      title: "🆚 Pydantic vs 다른 도구"
+      subtitle: "언제 무엇을 쓸까?"
+
+    - type: compare
+      left:
+        title: "dataclasses"
+        subtitle: "표준 라이브러리"
+        icon: "📦"
+        color: "blue"
+        items:
+          - "데이터 클래스 정의"
+          - "기본값, frozen 지원"
+          - "검증 기능 없음"
+          - "직렬화 제한적"
+        infoBox: "단순 데이터 컨테이너용"
+      right:
+        title: "Pydantic"
+        subtitle: "검증 + 직렬화"
+        icon: "✅"
+        color: "green"
+        items:
+          - "데이터 클래스 + 검증"
+          - "타입 강제 변환"
+          - "상세한 에러 메시지"
+          - "JSON/dict 직렬화"
+        infoBox: "외부 데이터 처리용"
+
+    - type: compare
+      left:
+        title: "attrs"
+        subtitle: "고급 클래스 도구"
+        icon: "🔧"
+        color: "purple"
+        items:
+          - "유연한 클래스 정의"
+          - "검증자 수동 정의"
+          - "성능 최적화"
+          - "학습 곡선 있음"
+        infoBox: "고도로 커스텀된 클래스용"
+      right:
+        title: "Pydantic"
+        subtitle: "간편한 검증"
+        icon: "✅"
+        color: "green"
+        items:
+          - "타입 힌트 기반 자동 검증"
+          - "FastAPI 네이티브 지원"
+          - "JSON Schema 생성"
+          - "배우기 쉬움"
+        infoBox: "API 개발, 설정 관리용"
+
+    - type: note
+      style: tip
+      title: "선택 가이드"
+      content: |-
+        단순 데이터 컨테이너만 필요하면 dataclasses를 사용하세요. 외부 데이터(API 요청, JSON, 설정 파일)를 다루면 Pydantic이 적합합니다. FastAPI를 사용한다면 Pydantic은 필수입니다. 복잡한 클래스 계층이 필요하면 attrs도 고려하세요.
+
+- id: core_concepts
+  blocks:
+    - type: sectionHeader
+      title: "🧩 핵심 개념"
+      subtitle: "Pydantic으로 무엇을 할 수 있나요?"
+
+    - type: featureCards
+      cards:
+        - emoji: "1️⃣"
+          title: "BaseModel"
+          description: "데이터 모델 정의의 기본 클래스"
+        - emoji: "2️⃣"
+          title: "Field"
+          description: "필드별 제약조건, 기본값 설정"
+        - emoji: "3️⃣"
+          title: "Validator"
+          description: "커스텀 검증 로직 추가"
+        - emoji: "4️⃣"
+          title: "중첩 모델"
+          description: "복잡한 데이터 구조 표현"
+        - emoji: "5️⃣"
+          title: "직렬화"
+          description: "model_dump(), model_dump_json()"
+        - emoji: "6️⃣"
+          title: "설정 관리"
+          description: "환경변수 기반 설정"
+
+- id: basic_example
+  blocks:
+    - type: sectionHeader
+      title: "💡 간단한 예시"
+      subtitle: "Pydantic 맛보기"
+
+    - type: note
+      style: info
+      title: "사용자 모델 정의"
+      content: |-
+        Pydantic 모델은 BaseModel을 상속하고 타입 힌트로 필드를 정의합니다. 인스턴스 생성 시 자동으로 타입을 검증하고 변환합니다. 잘못된 데이터가 들어오면 ValidationError가 발생합니다.
+
+    - type: note
+      style: tip
+      title: "코드 예시"
+      content: |-
+        class User(BaseModel): name: str, age: int, email: str 형태로 정의하면, User(name="Alice", age="25", email="a@b.com") 호출 시 age가 문자열 "25"여도 자동으로 정수 25로 변환됩니다. age에 "invalid"를 넣으면 ValidationError가 발생합니다.
+
+- id: use_cases
+  blocks:
+    - type: sectionHeader
+      title: "💼 실전 활용 사례"
+      subtitle: "Pydantic으로 해결하는 문제들"
+
+    - type: featureCards
+      cards:
+        - emoji: "🌐"
+          title: "API 요청/응답"
+          description: "FastAPI와 함께 API 스키마 정의"
+        - emoji: "📄"
+          title: "JSON 파싱"
+          description: "외부 JSON 데이터 검증 및 변환"
+        - emoji: "⚙️"
+          title: "설정 관리"
+          description: "환경변수, 설정 파일 로딩"
+        - emoji: "🗄️"
+          title: "ORM 통합"
+          description: "SQLAlchemy 모델과 연동"
+        - emoji: "📊"
+          title: "데이터 파이프라인"
+          description: "ETL 과정의 데이터 검증"
+        - emoji: "🧪"
+          title: "테스트 데이터"
+          description: "일관된 테스트 픽스처 생성"
+
+- id: projects_preview
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 앞으로 배울 내용"
+      subtitle: "10개 프로젝트로 마스터하기"
+
+    - type: table
+      headers: ["단계", "프로젝트", "배울 내용", "실용 가치"]
+      rows:
+        - ["입문", "사용자 모델 만들기", "BaseModel, 타입 힌트, 검증", "기본 데이터 구조"]
+        - ["입문", "필드 제약조건", "Field, 범위, 정규표현식", "상세 검증 규칙"]
+        - ["기초", "중첩 모델", "List, Dict, 모델 중첩", "복잡한 데이터"]
+        - ["기초", "커스텀 검증", "validator, field_validator", "비즈니스 로직"]
+        - ["기초", "직렬화 마스터", "model_dump, alias, exclude", "API 응답"]
+        - ["중급", "설정 관리", "BaseSettings, 환경변수", "앱 설정"]
+        - ["중급", "JSON Schema", "스키마 생성, 문서화", "API 문서"]
+        - ["중급", "상속과 Generic", "모델 상속, 재사용", "DRY 원칙"]
+        - ["심화", "고급 타입", "Union, Literal, Annotated", "정밀한 타입"]
+        - ["심화", "종합 프로젝트", "전체 API 모델 설계", "실전 활용"]
+
+    - type: note
+      style: info
+      title: "프로젝트 기반 학습"
+      content: |-
+        각 프로젝트는 실제 시나리오를 다룹니다. 사용자 등록 폼 검증, API 응답 모델링, 설정 파일 관리 등 현실적인 문제를 해결합니다. 10개 프로젝트를 완료하면 Pydantic을 활용한 견고한 데이터 모델을 설계할 수 있습니다.
+
+- id: pyodide_note
+  blocks:
+    - type: sectionHeader
+      title: "⚠️ Pyodide 환경 참고사항"
+      subtitle: "브라우저에서 실행 시 주의점"
+
+    - type: note
+      style: warning
+      title: "제한사항"
+      content: |-
+        Pydantic V2는 Pyodide에서 완벽히 지원됩니다(버전 2.10.6). 모든 핵심 기능이 정상 작동합니다. 다만 일부 고급 기능(pydantic-settings의 파일 시스템 접근)은 브라우저 환경에서 제한될 수 있습니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "✅"
+          title: "정상 작동"
+          description: "BaseModel, Field, validator, 직렬화"
+        - emoji: "⚠️"
+          title: "제한 가능"
+          description: "파일 시스템 기반 설정 로딩"
+        - emoji: "📦"
+          title: "설치 방법"
+          description: "await micropip.install('pydantic')"
+
+- id: installation
+  blocks:
+    - type: sectionHeader
+      title: "📦 설치 및 시작"
+      subtitle: "pyodide 환경에서 바로 사용"
+
+    - type: note
+      style: info
+      title: "브라우저에서 바로 실행"
+      content: |-
+        이 강의는 marimo pyodide 환경에서 실행됩니다. 별도 설치 없이 브라우저에서 바로 코드를 실행할 수 있습니다. micropip.install()로 pydantic을 불러오면 모든 준비가 끝납니다. 로컬 환경에서는 pip install pydantic으로 설치하면 됩니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🌐"
+          title: "pyodide 환경"
+          description: "브라우저에서 Python 실행"
+        - emoji: "📦"
+          title: "micropip 설치"
+          description: "await micropip.install('pydantic')"
+        - emoji: "🚀"
+          title: "바로 시작"
+          description: "from pydantic import BaseModel"
+
+- id: resources
+  blocks:
+    - type: sectionHeader
+      title: "📚 참고 자료"
+      subtitle: "더 깊이 공부하고 싶다면"
+
+    - type: links
+      items:
+        - text: Pydantic 공식 문서
+          url: https://docs.pydantic.dev/
+          icon: "🔗"
+        - text: Pydantic V2 Migration Guide
+          url: https://docs.pydantic.dev/latest/migration/
+          icon: "🔗"
+        - text: Pydantic GitHub
+          url: https://github.com/pydantic/pydantic
+          icon: "🔗"
+
+- id: next
+  blocks:
+    - type: hero
+      emoji: "👉"
+      title: "다음: 사용자 모델 만들기"
+      subtitle: "BaseModel로 첫 번째 데이터 모델을 정의합니다"

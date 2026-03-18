@@ -1,0 +1,735 @@
+meta:
+  title: "inspect - 객체 검사"
+  description: "런타임 객체 검사를 위한 inspect 모듈"
+  keywords: ["inspect", "검사", "introspection", "signature", "메타프로그래밍"]
+
+intro:
+  emoji: "🔍"
+  points:
+  - "객체 정보 추출"
+  - "함수 시그니처 확인"
+  - "소스 코드 조회"
+  - "메타프로그래밍 지원"
+
+sections:
+- id: "module_import"
+  title: "모듈 임포트"
+  subtitle: "inspect 시작하기"
+  blocks:
+  - type: "text"
+    content: "inspect는 파이썬 표준 라이브러리입니다. 런타임에 객체의 정보를 검사하고 추출할 수 있습니다."
+  - type: "list"
+    items:
+    - "getmembers(): 멤버 조회"
+    - "signature(): 함수 시그니처"
+    - "getsource(): 소스 코드"
+    - "isfunction(), isclass(): 타입 확인"
+  - type: "code"
+    language: "python"
+    title: "기본 임포트"
+    description: "inspect 모듈 임포트 및 기본 사용법"
+    content: |-
+      import inspect
+
+      def greet(name):
+          return f"Hello {name}"
+
+      sig = inspect.signature(greet)
+      str(sig)
+  - type: "note"
+    content: "inspect는 디버깅, 문서 자동 생성, 메타프로그래밍에 유용합니다. 객체의 내부 구조를 런타임에 파악할 수 있습니다."
+
+- id: "type_checking"
+  title: "타입 확인"
+  subtitle: "객체 종류 판별"
+  blocks:
+  - type: "text"
+    content: "inspect 모듈은 객체의 타입을 확인하는 다양한 함수를 제공합니다."
+  - type: "list"
+    items:
+    - "isfunction(): 함수 확인"
+    - "ismethod(): 메서드 확인"
+    - "isclass(): 클래스 확인"
+    - "ismodule(): 모듈 확인"
+  - type: "code"
+    language: "python"
+    title: "함수와 클래스 구분"
+    description: "타입 판별"
+    content: |-
+      import inspect
+
+      def myFunc():
+          pass
+
+      class MyClass:
+          pass
+
+      funcCheck = inspect.isfunction(myFunc)
+      classCheck = inspect.isclass(MyClass)
+
+      funcCheck, classCheck
+  - type: "code"
+    language: "python"
+    title: "메서드 확인"
+    description: "바운드 메서드"
+    content: |-
+      import inspect
+
+      class Container:
+          def action(self):
+              pass
+
+      obj = Container()
+
+      unboundCheck = inspect.isfunction(Container.action)
+      boundCheck = inspect.ismethod(obj.action)
+
+      unboundCheck, boundCheck
+  - type: "code"
+    language: "python"
+    title: "여러 타입 확인"
+    description: "다양한 객체 검사"
+    content: |-
+      import inspect
+
+      def testFunc():
+          pass
+
+      class TestClass:
+          pass
+
+      checks = {
+          'is_function': inspect.isfunction(testFunc),
+          'is_class': inspect.isclass(TestClass),
+          'is_builtin': inspect.isbuiltin(len)
+      }
+
+      checks
+  - type: "tip"
+    content: "isinstance()와 달리 inspect의 is* 함수들은 더 구체적인 타입을 확인합니다. 예: 함수 vs 메서드"
+
+- id: "signatures"
+  title: "함수 시그니처"
+  subtitle: "매개변수 정보"
+  blocks:
+  - type: "text"
+    content: "signature()로 함수의 매개변수 정보를 추출할 수 있습니다."
+  - type: "list"
+    items:
+    - "signature(func): 시그니처 객체"
+    - "parameters: 매개변수 딕셔너리"
+    - "return_annotation: 반환 타입"
+    - "Parameter.kind: 매개변수 종류"
+  - type: "code"
+    language: "python"
+    title: "기본 시그니처"
+    description: "함수 매개변수 확인"
+    content: |-
+      import inspect
+
+      def calculate(x, y, z=10):
+          return x + y + z
+
+      sig = inspect.signature(calculate)
+      params = list(sig.parameters.keys())
+
+      params
+  - type: "code"
+    language: "python"
+    title: "매개변수 상세 정보"
+    description: "기본값 확인"
+    content: |-
+      import inspect
+
+      def process(name, age=25, *args, **kwargs):
+          pass
+
+      sig = inspect.signature(process)
+      paramInfo = {}
+
+      for pName, pValue in sig.parameters.items():
+          paramInfo[pName] = {
+              'has_default': pValue.default != inspect.Parameter.empty,
+              'kind': str(pValue.kind)
+          }
+
+      paramInfo
+  - type: "code"
+    language: "python"
+    title: "타입 힌트 확인"
+    description: "어노테이션 추출"
+    content: |-
+      import inspect
+
+      def typed(x: int, y: str) -> bool:
+          return True
+
+      sig = inspect.signature(typed)
+      annotations = {}
+
+      for name, param in sig.parameters.items():
+          if param.annotation != inspect.Parameter.empty:
+              annotations[name] = param.annotation.__name__
+
+      annotations
+  - type: "tip"
+    content: "signature()는 문서 자동 생성이나 함수 래퍼 작성 시 매우 유용합니다. 동적으로 함수 호출 방법을 결정할 수 있습니다."
+
+- id: "members"
+  title: "멤버 조회"
+  subtitle: "getmembers 함수"
+  blocks:
+  - type: "text"
+    content: "getmembers()로 객체의 모든 속성과 메서드를 조회할 수 있습니다."
+  - type: "list"
+    items:
+    - "getmembers(obj): 모든 멤버"
+    - "predicate: 필터 함수"
+    - "(name, value) 튜플 리스트"
+    - "상속된 멤버도 포함"
+  - type: "code"
+    language: "python"
+    title: "클래스 멤버"
+    description: "모든 속성 조회"
+    content: |-
+      import inspect
+
+      class Person:
+          species = 'Human'
+
+          def __init__(self, name):
+              self.name = name
+
+          def greet(self):
+              return f"Hi, I'm {self.name}"
+
+      person = Person('Alice')
+      members = inspect.getmembers(person)
+
+      userDefined = [(n, type(v).__name__) for n, v in members if not n.startswith('_')]
+      userDefined
+  - type: "code"
+    language: "python"
+    title: "메서드만 필터링"
+    description: "predicate 사용"
+    content: |-
+      import inspect
+
+      class Calculator:
+          def add(self, a, b):
+              return a + b
+
+          def subtract(self, a, b):
+              return a - b
+
+      calc = Calculator()
+      methods = inspect.getmembers(calc, predicate=inspect.ismethod)
+
+      methodNames = [name for name, _ in methods if not name.startswith('_')]
+      methodNames
+  - type: "code"
+    language: "python"
+    title: "함수만 조회"
+    description: "클래스 함수 목록"
+    content: |-
+      import inspect
+
+      class Utils:
+          @staticmethod
+          def helper1():
+              pass
+
+          @staticmethod
+          def helper2():
+              pass
+
+          def instance_method(self):
+              pass
+
+      functions = inspect.getmembers(Utils, predicate=inspect.isfunction)
+      functionList = [name for name, _ in functions]
+
+      functionList
+  - type: "tip"
+    content: "getmembers()는 상속된 멤버도 포함하므로, 커스텀 속성만 보려면 __dict__를 사용하거나 이름 필터링을 하세요."
+
+- id: "source_code"
+  title: "소스 코드 조회"
+  subtitle: "getsource 함수"
+  blocks:
+  - type: "text"
+    content: "getsource()로 함수나 클래스의 소스 코드를 문자열로 가져올 수 있습니다."
+  - type: "list"
+    items:
+    - "getsource(obj): 소스 코드 문자열"
+    - "getsourcelines(obj): 줄 단위 리스트"
+    - "getfile(obj): 파일 경로"
+    - "내장 객체는 불가"
+  - type: "code"
+    language: "python"
+    title: "함수 소스 조회"
+    description: "getsource 사용"
+    content: |-
+      import inspect
+
+      def fibonacci(n):
+          if n <= 1:
+              return n
+          return fibonacci(n-1) + fibonacci(n-2)
+
+      source = inspect.getsource(fibonacci)
+      source
+  - type: "code"
+    language: "python"
+    title: "클래스 소스 조회"
+    description: "전체 클래스 코드"
+    content: |-
+      import inspect
+
+      class Counter:
+          def __init__(self):
+              self.count = 0
+
+          def increment(self):
+              self.count += 1
+
+      classSource = inspect.getsource(Counter)
+      classSource
+  - type: "code"
+    language: "python"
+    title: "소스 라인 정보"
+    description: "getsourcelines 사용"
+    content: |-
+      import inspect
+
+      def sample():
+          x = 10
+          return x * 2
+
+      lines, startLine = inspect.getsourcelines(sample)
+      lineCount = len(lines)
+
+      lineCount, startLine
+  - type: "tip"
+    content: "getsource()는 인터랙티브 셸이나 동적으로 생성된 함수에서는 작동하지 않습니다. 파일에 정의된 객체만 가능합니다."
+
+- id: "advanced_inspection"
+  title: "고급 검사"
+  subtitle: "프레임과 스택"
+  blocks:
+  - type: "text"
+    content: "inspect는 현재 실행 중인 코드의 스택 정보도 조회할 수 있습니다."
+  - type: "list"
+    items:
+    - "currentframe(): 현재 프레임"
+    - "stack(): 호출 스택"
+    - "getframeinfo(): 프레임 정보"
+    - "디버깅에 유용"
+  - type: "code"
+    language: "python"
+    title: "현재 함수명"
+    description: "실행 중인 함수 확인"
+    content: |-
+      import inspect
+
+      def currentFunction():
+          frame = inspect.currentframe()
+          return frame.f_code.co_name
+
+      funcName = currentFunction()
+      funcName
+  - type: "code"
+    language: "python"
+    title: "호출 스택"
+    description: "stack 사용"
+    content: |-
+      import inspect
+
+      def level3():
+          frame = inspect.currentframe()
+          return frame.f_code.co_name
+
+      def level2():
+          return level3()
+
+      def level1():
+          return level2()
+
+      result = level1()
+      result
+  - type: "code"
+    language: "python"
+    title: "프레임 정보"
+    description: "getframeinfo 활용"
+    content: |-
+      import inspect
+
+      def traceInfo():
+          frame = inspect.currentframe()
+          info = inspect.getframeinfo(frame)
+          return {
+              'function': info.function,
+              'lineno': info.lineno
+          }
+
+      frameData = traceInfo()
+      frameData
+  - type: "tip"
+    content: "프레임 검사는 디버깅 도구나 로깅 프레임워크에서 호출 위치를 자동으로 기록하는데 사용됩니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "실무 활용 사례"
+  blocks:
+  - type: "text"
+    content: "inspect 모듈을 활용한 실무 패턴들입니다."
+  - type: "code"
+    language: "python"
+    title: "함수 문서화"
+    description: "자동 문서 생성"
+    content: |-
+      import inspect
+
+      def multiply(x: int, y: int) -> int:
+          """두 수를 곱합니다."""
+          return x * y
+
+      sig = inspect.signature(multiply)
+      doc = inspect.getdoc(multiply)
+
+      documentation = {
+          'name': multiply.__name__,
+          'signature': str(sig),
+          'docstring': doc,
+          'parameters': list(sig.parameters.keys())
+      }
+
+      documentation
+  - type: "code"
+    language: "python"
+    title: "클래스 분석"
+    description: "메서드 목록 추출"
+    content: |-
+      import inspect
+
+      class ApiClient:
+          def get(self, url):
+              pass
+
+          def post(self, url, data):
+              pass
+
+          def delete(self, url):
+              pass
+
+      methods = inspect.getmembers(ApiClient, predicate=inspect.isfunction)
+      apiMethods = [name for name, _ in methods if not name.startswith('_')]
+
+      apiAnalysis = {
+          'class_name': 'ApiClient',
+          'public_methods': apiMethods,
+          'method_count': len(apiMethods)
+      }
+
+      apiAnalysis
+  - type: "code"
+    language: "python"
+    title: "파라미터 검증"
+    description: "동적 검증"
+    content: |-
+      import inspect
+
+      def validator(func):
+          sig = inspect.signature(func)
+          paramCount = len(sig.parameters)
+          hasDefaults = any(p.default != inspect.Parameter.empty
+                           for p in sig.parameters.values())
+
+          return {
+              'function': func.__name__,
+              'param_count': paramCount,
+              'has_defaults': hasDefaults,
+              'required_params': [name for name, p in sig.parameters.items()
+                                 if p.default == inspect.Parameter.empty]
+          }
+
+      def register(username, email, age=18):
+          pass
+
+      validation = validator(register)
+      validation
+  - type: "tip"
+    content: "inspect는 프레임워크나 라이브러리 개발 시 매우 유용합니다. 사용자 정의 함수를 분석하여 자동으로 처리할 수 있습니다."
+
+- id: "practice"
+  title: "종합 복습"
+  blocks:
+  - type: "expansion"
+    title: "🟢 기본1: 함수 확인"
+    code: |-
+      import inspect
+
+      def test1():
+          pass
+
+      check1 = inspect.isfunction(test1)
+      check1
+  - type: "expansion"
+    title: "🟢 기본2: 클래스 확인"
+    code: |-
+      import inspect
+
+      class Test2:
+          pass
+
+      check2 = inspect.isclass(Test2)
+      check2
+  - type: "expansion"
+    title: "🟢 기본3: 시그니처 조회"
+    code: |-
+      import inspect
+
+      def add(a, b):
+          return a + b
+
+      sig1 = inspect.signature(add)
+      str(sig1)
+  - type: "expansion"
+    title: "🟢 기본4: 파라미터 목록"
+    code: |-
+      import inspect
+
+      def func1(x, y, z):
+          pass
+
+      sig2 = inspect.signature(func1)
+      params1 = list(sig2.parameters.keys())
+      params1
+  - type: "expansion"
+    title: "🟢 기본5: 소스 코드"
+    code: |-
+      import inspect
+
+      def simple():
+          return 42
+
+      source1 = inspect.getsource(simple)
+      source1
+  - type: "expansion"
+    title: "🟡 응용1: 기본값 확인"
+    code: |-
+      import inspect
+
+      def greet1(name, greeting="Hello"):
+          pass
+
+      sig3 = inspect.signature(greet1)
+      hasDefault = sig3.parameters['greeting'].default != inspect.Parameter.empty
+      hasDefault
+  - type: "expansion"
+    title: "🟡 응용2: 메서드 조회"
+    code: |-
+      import inspect
+
+      class Tool1:
+          def action1(self):
+              pass
+          def action2(self):
+              pass
+
+      methods1 = inspect.getmembers(Tool1, predicate=inspect.isfunction)
+      methodNames1 = [n for n, _ in methods1 if not n.startswith('_')]
+      methodNames1
+  - type: "expansion"
+    title: "🟡 응용3: 타입 힌트"
+    code: |-
+      import inspect
+
+      def typed1(x: int) -> str:
+          return str(x)
+
+      sig4 = inspect.signature(typed1)
+      paramType = sig4.parameters['x'].annotation
+      paramType.__name__
+  - type: "expansion"
+    title: "🟡 응용4: 현재 함수명"
+    code: |-
+      import inspect
+
+      def getCurrentName():
+          frame1 = inspect.currentframe()
+          return frame1.f_code.co_name
+
+      name1 = getCurrentName()
+      name1
+  - type: "expansion"
+    title: "🟡 응용5: docstring 조회"
+    code: |-
+      import inspect
+
+      def documented():
+          """This is a test function."""
+          pass
+
+      doc1 = inspect.getdoc(documented)
+      doc1
+  - type: "expansion"
+    title: "🔴 심화1: 모든 파라미터 분석"
+    code: |-
+      import inspect
+
+      def complex1(a, b=10, *args, **kwargs):
+          pass
+
+      sig5 = inspect.signature(complex1)
+      analysis1 = {}
+      for pName, pObj in sig5.parameters.items():
+          analysis1[pName] = str(pObj.kind)
+
+      analysis1
+  - type: "expansion"
+    title: "🔴 심화2: 클래스 멤버 필터"
+    code: |-
+      import inspect
+
+      class Demo1:
+          value = 100
+          def method1(self):
+              pass
+
+      members1 = inspect.getmembers(Demo1)
+      custom = [(n, type(v).__name__) for n, v in members1
+                if not n.startswith('_')]
+      custom
+  - type: "expansion"
+    title: "🔴 심화3: 소스 라인 수"
+    code: |-
+      import inspect
+
+      def multiline():
+          x = 1
+          y = 2
+          z = 3
+          return x + y + z
+
+      lines1, start1 = inspect.getsourcelines(multiline)
+      lineCount1 = len(lines1)
+      lineCount1
+  - type: "expansion"
+    title: "🔴 심화4: 필수 파라미터"
+    code: |-
+      import inspect
+
+      def process1(required1, required2, optional=None):
+          pass
+
+      sig6 = inspect.signature(process1)
+      required = [n for n, p in sig6.parameters.items()
+                  if p.default == inspect.Parameter.empty]
+      required
+  - type: "expansion"
+    title: "🔴 심화5: 메서드 바인딩 확인"
+    code: |-
+      import inspect
+
+      class Obj1:
+          def method(self):
+              pass
+
+      instance1 = Obj1()
+      boundCheck1 = inspect.ismethod(instance1.method)
+      boundCheck1
+  - type: "expansion"
+    title: "🔴 심화6: 함수 정보 수집"
+    code: |-
+      import inspect
+
+      def target(x: int, y: str = "default"):
+          """Target function"""
+          return f"{x}: {y}"
+
+      info1 = {
+          'name': target.__name__,
+          'params': list(inspect.signature(target).parameters.keys()),
+          'doc': inspect.getdoc(target)
+      }
+      info1
+  - type: "expansion"
+    title: "🔴 심화7: 클래스 분석"
+    code: |-
+      import inspect
+
+      class Service1:
+          def start(self):
+              pass
+          def stop(self):
+              pass
+          def restart(self):
+              pass
+
+      serviceMethods = inspect.getmembers(Service1, inspect.isfunction)
+      publicMethods = [n for n, _ in serviceMethods if not n.startswith('_')]
+
+      {'class': 'Service1', 'methods': publicMethods}
+  - type: "expansion"
+    title: "🔴 심화8: 어노테이션 추출"
+    code: |-
+      import inspect
+
+      def annotated(name: str, age: int, active: bool = True):
+          pass
+
+      sig7 = inspect.signature(annotated)
+      annotations1 = {}
+      for pName, pObj in sig7.parameters.items():
+          if pObj.annotation != inspect.Parameter.empty:
+              annotations1[pName] = pObj.annotation.__name__
+
+      annotations1
+  - type: "expansion"
+    title: "🔴 심화9: 프레임 정보"
+    code: |-
+      import inspect
+
+      def frameTest():
+          frame2 = inspect.currentframe()
+          info2 = inspect.getframeinfo(frame2)
+          return {'func': info2.function, 'line': info2.lineno}
+
+      frameInfo1 = frameTest()
+      frameInfo1
+  - type: "expansion"
+    title: "🔴 심화10: 전체 활용 - API 분석기"
+    code: |-
+      import inspect
+
+      class RestApi:
+          def get(self, endpoint: str):
+              """GET request"""
+              pass
+
+          def post(self, endpoint: str, data: dict):
+              """POST request"""
+              pass
+
+          def put(self, endpoint: str, data: dict):
+              """PUT request"""
+              pass
+
+          def delete(self, endpoint: str):
+              """DELETE request"""
+              pass
+
+      apiMethods1 = inspect.getmembers(RestApi, inspect.isfunction)
+      apiDocs = {}
+
+      for methodName, methodObj in apiMethods1:
+          if not methodName.startswith('_'):
+              sig8 = inspect.signature(methodObj)
+              apiDocs[methodName] = {
+                  'params': list(sig8.parameters.keys())[1:],
+                  'doc': inspect.getdoc(methodObj),
+                  'param_count': len(sig8.parameters) - 1
+              }
+
+      apiDocs

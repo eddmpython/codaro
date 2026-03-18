@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from collections.abc import Awaitable, Callable
 from dataclasses import dataclass, field
-from typing import Any, Protocol, Sequence
+from typing import Any, Literal, Protocol, Sequence
+
+
+InterruptMode = Literal["soft", "hard", "auto"]
 
 
 @dataclass(slots=True)
@@ -10,6 +14,22 @@ class VariableState:
     typeName: str
     repr: str
     size: int | None = None
+
+
+@dataclass(slots=True)
+class VariableDelta:
+    added: list[VariableState] = field(default_factory=list)
+    updated: list[VariableState] = field(default_factory=list)
+    removed: list[str] = field(default_factory=list)
+
+
+@dataclass(slots=True)
+class ExecutionEvent:
+    sequence: int
+    eventType: str
+    blockId: str | None = None
+    executionCount: int = 0
+    payload: Any = None
 
 
 @dataclass(slots=True)
@@ -26,8 +46,20 @@ class ExecutionResult:
     stdout: str = ""
     stderr: str = ""
     variables: list[VariableState] = field(default_factory=list)
+    stateDelta: VariableDelta = field(default_factory=VariableDelta)
+    events: list[ExecutionEvent] = field(default_factory=list)
     executionCount: int = 0
     status: str = "done"
+    interruptMode: str | None = None
+
+
+@dataclass(slots=True)
+class InterruptResult:
+    interrupted: bool
+    requestedMode: InterruptMode = "auto"
+    appliedMode: str = "none"
+    preservedState: bool = True
+    message: str = ""
 
 
 class ExecutionEngine(Protocol):
@@ -39,11 +71,17 @@ class ExecutionEngine(Protocol):
         *,
         blockId: str | None = None,
         injectedVars: list[str] | None = None,
+        eventHandler: Callable[[ExecutionEvent], Awaitable[None]] | None = None,
     ) -> ExecutionResult: ...
 
     async def executeAll(self, blocks: Sequence[ExecutionBlock]) -> list[ExecutionResult]: ...
 
-    def interrupt(self) -> bool: ...
+    def interrupt(
+        self,
+        *,
+        mode: InterruptMode = "auto",
+        graceMs: int = 250,
+    ) -> InterruptResult: ...
 
     def getVariables(self) -> list[VariableState]: ...
 
@@ -59,6 +97,14 @@ class ExecutionEngine(Protocol):
         encoding: str = "utf-8",
         createDirectories: bool = True,
     ) -> str: ...
+
+    async def deleteEntry(self, path: str) -> str: ...
+
+    async def moveEntry(self, sourcePath: str, destinationPath: str) -> str: ...
+
+    async def createDirectory(self, path: str) -> str: ...
+
+    async def fileExists(self, path: str) -> bool: ...
 
     async def listPackages(self) -> Any: ...
 

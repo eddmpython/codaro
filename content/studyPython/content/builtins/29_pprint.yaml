@@ -1,0 +1,628 @@
+meta:
+  title: "pprint - 예쁜 출력"
+  description: "데이터 구조를 읽기 쉽게 출력하는 pprint 모듈"
+  keywords: ["pprint", "출력", "포맷", "디버깅", "pretty print"]
+
+intro:
+  emoji: "🎨"
+  points:
+  - "읽기 쉬운 데이터 출력"
+  - "중첩 구조 들여쓰기"
+  - "폭과 깊이 제어"
+  - "디버깅과 로깅에 유용"
+
+sections:
+- id: "module_import"
+  title: "모듈 임포트"
+  subtitle: "pprint 시작하기"
+  blocks:
+  - type: "text"
+    content: "pprint는 파이썬 표준 라이브러리입니다. 복잡한 데이터 구조를 읽기 쉽게 포맷팅하여 출력합니다."
+  - type: "list"
+    items:
+    - "pprint(): 예쁘게 출력"
+    - "pformat(): 문자열로 반환"
+    - "PrettyPrinter: 커스터마이징 가능한 프린터"
+    - "들여쓰기와 줄바꿈 자동"
+  - type: "code"
+    language: "python"
+    title: "기본 임포트"
+    description: "pprint 모듈 임포트 및 기본 사용법"
+    content: |-
+      import pprint
+
+      data = {'name': 'Alice', 'age': 30, 'skills': ['Python', 'JavaScript', 'SQL']}
+
+      formatted = pprint.pformat(data)
+      formatted
+  - type: "note"
+    content: "Marimo 환경에서는 pformat()을 사용하여 문자열로 반환합니다. 일반 Python에서는 pprint()가 직접 콘솔에 출력합니다."
+
+- id: "basic_pprint"
+  title: "기본 출력"
+  subtitle: "pformat 함수"
+  blocks:
+  - type: "text"
+    content: "pformat()은 데이터 구조를 보기 좋게 포맷팅한 문자열을 반환합니다."
+  - type: "list"
+    items:
+    - "pformat(obj): 포맷팅된 문자열"
+    - "자동 줄바꿈"
+    - "들여쓰기 적용"
+    - "긴 리스트/딕셔너리 정리"
+  - type: "code"
+    language: "python"
+    title: "리스트 포맷팅"
+    description: "긴 리스트 정리"
+    content: |-
+      import pprint
+
+      numbers = list(range(1, 21))
+      prettyList = pprint.pformat(numbers)
+      prettyList
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 포맷팅"
+    description: "중첩 딕셔너리 정리"
+    content: |-
+      import pprint
+
+      user = {
+          'id': 1,
+          'name': 'Alice',
+          'email': 'alice@example.com',
+          'address': {
+              'city': 'Seoul',
+              'country': 'Korea'
+          }
+      }
+
+      prettyDict = pprint.pformat(user)
+      prettyDict
+  - type: "code"
+    language: "python"
+    title: "복잡한 구조"
+    description: "리스트와 딕셔너리 혼합"
+    content: |-
+      import pprint
+
+      complex = {
+          'users': [
+              {'name': 'Alice', 'role': 'admin'},
+              {'name': 'Bob', 'role': 'user'}
+          ],
+          'settings': {
+              'theme': 'dark',
+              'notifications': True
+          }
+      }
+
+      prettyComplex = pprint.pformat(complex)
+      prettyComplex
+  - type: "tip"
+    content: "pformat()은 객체를 수정하지 않고 문자열만 반환하므로, 로그 파일이나 디버그 메시지에 안전하게 사용할 수 있습니다."
+
+- id: "width_depth"
+  title: "폭과 깊이 제어"
+  subtitle: "출력 형식 조정"
+  blocks:
+  - type: "text"
+    content: "width와 depth 파라미터로 출력 형식을 세밀하게 제어할 수 있습니다."
+  - type: "list"
+    items:
+    - "width: 한 줄 최대 길이 (기본 80)"
+    - "depth: 출력 깊이 제한"
+    - "indent: 들여쓰기 크기"
+    - "compact: 간결한 출력"
+  - type: "code"
+    language: "python"
+    title: "width 조정"
+    description: "줄 길이 제어"
+    content: |-
+      import pprint
+
+      items = [f'item_{i}' for i in range(20)]
+
+      narrow = pprint.pformat(items, width=40)
+      wide = pprint.pformat(items, width=120)
+
+      narrow, wide
+  - type: "code"
+    language: "python"
+    title: "depth 제한"
+    description: "중첩 깊이 제한"
+    content: |-
+      import pprint
+
+      nested = {
+          'level1': {
+              'level2': {
+                  'level3': {
+                      'level4': 'deep value'
+                  }
+              }
+          }
+      }
+
+      shallow = pprint.pformat(nested, depth=2)
+      shallow
+  - type: "code"
+    language: "python"
+    title: "indent 조정"
+    description: "들여쓰기 크기"
+    content: |-
+      import pprint
+
+      structure = {
+          'a': [1, 2, 3],
+          'b': [4, 5, 6],
+          'c': [7, 8, 9]
+      }
+
+      smallIndent = pprint.pformat(structure, indent=2)
+      largeIndent = pprint.pformat(structure, indent=4)
+
+      smallIndent, largeIndent
+  - type: "tip"
+    content: "width를 좁게 설정하면 더 많은 줄바꿈이 발생하여 세로로 긴 출력이 됩니다. 터미널 폭에 맞춰 조정하세요."
+
+- id: "prettyprinter"
+  title: "PrettyPrinter 클래스"
+  subtitle: "재사용 가능한 프린터"
+  blocks:
+  - type: "text"
+    content: "PrettyPrinter 객체를 생성하면 동일한 설정으로 여러 번 사용할 수 있습니다."
+  - type: "list"
+    items:
+    - "PrettyPrinter(): 프린터 생성"
+    - "pformat(obj): 포맷팅"
+    - "설정 재사용"
+    - "일관된 출력 형식"
+  - type: "code"
+    language: "python"
+    title: "PrettyPrinter 생성"
+    description: "커스텀 프린터"
+    content: |-
+      import pprint
+
+      printer = pprint.PrettyPrinter(width=60, indent=4)
+
+      data1 = {'a': 1, 'b': 2, 'c': 3}
+      data2 = ['x', 'y', 'z']
+
+      result1 = printer.pformat(data1)
+      result2 = printer.pformat(data2)
+
+      result1, result2
+  - type: "code"
+    language: "python"
+    title: "compact 모드"
+    description: "간결한 출력"
+    content: |-
+      import pprint
+
+      compactPrinter = pprint.PrettyPrinter(compact=True, width=80)
+
+      values = list(range(1, 31))
+
+      compactOutput = compactPrinter.pformat(values)
+      compactOutput
+  - type: "code"
+    language: "python"
+    title: "depth 제한 프린터"
+    description: "깊이 제한"
+    content: |-
+      import pprint
+
+      depthPrinter = pprint.PrettyPrinter(depth=3)
+
+      deepStructure = {
+          'a': {'b': {'c': {'d': {'e': 'too deep'}}}}
+      }
+
+      limitedOutput = depthPrinter.pformat(deepStructure)
+      limitedOutput
+  - type: "tip"
+    content: "PrettyPrinter 객체를 만들면 동일한 포맷 설정을 여러 곳에서 재사용할 수 있어 일관성을 유지하기 좋습니다."
+
+- id: "sorting"
+  title: "정렬과 정리"
+  subtitle: "키 정렬"
+  blocks:
+  - type: "text"
+    content: "딕셔너리 키를 정렬하여 출력하면 일관된 순서로 데이터를 확인할 수 있습니다."
+  - type: "list"
+    items:
+    - "sort_dicts: 딕셔너리 키 정렬 (기본 True)"
+    - "알파벳순 정렬"
+    - "비교 가능한 출력"
+    - "일관성 있는 포맷"
+  - type: "code"
+    language: "python"
+    title: "키 정렬"
+    description: "sort_dicts 사용"
+    content: |-
+      import pprint
+
+      unordered = {'z': 1, 'a': 2, 'm': 3, 'b': 4}
+
+      sorted = pprint.pformat(unordered, sort_dicts=True)
+      unsorted = pprint.pformat(unordered, sort_dicts=False)
+
+      sorted, unsorted
+  - type: "code"
+    language: "python"
+    title: "중첩 딕셔너리 정렬"
+    description: "모든 레벨 정렬"
+    content: |-
+      import pprint
+
+      nestedDict = {
+          'zebra': {'z': 1, 'a': 2},
+          'apple': {'y': 3, 'b': 4}
+      }
+
+      sortedNested = pprint.pformat(nestedDict, sort_dicts=True)
+      sortedNested
+  - type: "code"
+    language: "python"
+    title: "복잡한 데이터 정렬"
+    description: "리스트 내 딕셔너리"
+    content: |-
+      import pprint
+
+      mixedData = [
+          {'name': 'zebra', 'value': 100},
+          {'name': 'apple', 'value': 200}
+      ]
+
+      sortedMixed = pprint.pformat(mixedData, sort_dicts=True)
+      sortedMixed
+  - type: "tip"
+    content: "sort_dicts=True는 딕셔너리 비교나 디버깅 시 유용합니다. 동일한 데이터가 항상 같은 순서로 출력됩니다."
+
+- id: "debugging"
+  title: "디버깅 활용"
+  subtitle: "실무 활용 패턴"
+  blocks:
+  - type: "text"
+    content: "pprint는 복잡한 데이터 구조를 디버깅하고 로그에 기록할 때 매우 유용합니다."
+  - type: "list"
+    items:
+    - "API 응답 확인"
+    - "설정 파일 검증"
+    - "중첩 데이터 탐색"
+    - "로그 메시지 포맷팅"
+  - type: "code"
+    language: "python"
+    title: "API 응답 포맷팅"
+    description: "JSON 응답 확인"
+    content: |-
+      import pprint
+
+      apiResponse = {
+          'status': 200,
+          'data': {
+              'users': [
+                  {'id': 1, 'name': 'Alice', 'active': True},
+                  {'id': 2, 'name': 'Bob', 'active': False}
+              ],
+              'pagination': {'page': 1, 'total': 100}
+          }
+      }
+
+      readable = pprint.pformat(apiResponse, indent=2)
+      readable
+  - type: "code"
+    language: "python"
+    title: "설정 검증"
+    description: "복잡한 설정 확인"
+    content: |-
+      import pprint
+
+      config = {
+          'database': {
+              'host': 'localhost',
+              'port': 5432,
+              'credentials': {'user': 'admin', 'password': '***'}
+          },
+          'cache': {
+              'enabled': True,
+              'ttl': 3600
+          }
+      }
+
+      configView = pprint.pformat(config, width=60)
+      configView
+  - type: "code"
+    language: "python"
+    title: "데이터 탐색"
+    description: "중첩 구조 파악"
+    content: |-
+      import pprint
+
+      dataset = {
+          'metadata': {'version': '1.0', 'author': 'Alice'},
+          'records': [
+              {'id': 1, 'tags': ['python', 'tutorial']},
+              {'id': 2, 'tags': ['javascript', 'web']}
+          ]
+      }
+
+      explorer = pprint.PrettyPrinter(indent=4, width=70)
+      explored = explorer.pformat(dataset)
+      explored
+  - type: "tip"
+    content: "디버깅 시 pformat()을 로깅 메시지에 포함하면 복잡한 객체의 상태를 쉽게 추적할 수 있습니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "실무 사용 사례"
+  blocks:
+  - type: "text"
+    content: "실제 프로젝트에서 pprint를 활용하는 다양한 패턴들입니다."
+  - type: "code"
+    language: "python"
+    title: "환경 변수 덤프"
+    description: "설정 스냅샷"
+    content: |-
+      import pprint
+
+      environment = {
+          'APP_NAME': 'MyApp',
+          'DEBUG': True,
+          'DATABASE_URL': 'postgresql://localhost/mydb',
+          'FEATURES': {
+              'auth': True,
+              'cache': True,
+              'logging': {'level': 'INFO', 'file': 'app.log'}
+          }
+      }
+
+      envDump = pprint.pformat(environment, indent=2, width=70)
+      envDump
+  - type: "code"
+    language: "python"
+    title: "테스트 데이터 출력"
+    description: "예상/실제 비교"
+    content: |-
+      import pprint
+
+      expected = {'status': 'success', 'count': 10, 'items': [1, 2, 3]}
+      actual = {'status': 'success', 'count': 10, 'items': [1, 2, 3]}
+
+      comparison = {
+          'expected': expected,
+          'actual': actual,
+          'match': expected == actual
+      }
+
+      testOutput = pprint.pformat(comparison, indent=2)
+      testOutput
+  - type: "code"
+    language: "python"
+    title: "로그 포맷터"
+    description: "구조화된 로그"
+    content: |-
+      import pprint
+
+      logEntry = {
+          'timestamp': '2025-01-01T00:00:00Z',
+          'level': 'INFO',
+          'message': 'User action',
+          'context': {
+              'user_id': 123,
+              'action': 'login',
+              'metadata': {'ip': '192.168.1.1', 'device': 'mobile'}
+          }
+      }
+
+      logFormatter = pprint.PrettyPrinter(indent=2, width=60)
+      logFormatted = logFormatter.pformat(logEntry)
+      logFormatted
+  - type: "tip"
+    content: "pprint는 JSON과 달리 파이썬 객체 그대로 출력하므로, None, True, False 등이 파이썬 형식으로 표시됩니다."
+
+- id: "practice"
+  title: "종합 복습"
+  blocks:
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 리스트"
+    code: |-
+      import pprint
+
+      nums = [1, 2, 3, 4, 5]
+      output1 = pprint.pformat(nums)
+      output1
+  - type: "expansion"
+    title: "🟢 기본2: 딕셔너리 출력"
+    code: |-
+      import pprint
+
+      person = {'name': 'Alice', 'age': 30}
+      output2 = pprint.pformat(person)
+      output2
+  - type: "expansion"
+    title: "🟢 기본3: 긴 리스트"
+    code: |-
+      import pprint
+
+      longList = list(range(1, 16))
+      output3 = pprint.pformat(longList)
+      output3
+  - type: "expansion"
+    title: "🟢 기본4: 중첩 딕셔너리"
+    code: |-
+      import pprint
+
+      nested1 = {'outer': {'inner': 'value'}}
+      output4 = pprint.pformat(nested1)
+      output4
+  - type: "expansion"
+    title: "🟢 기본5: 리스트 내 딕셔너리"
+    code: |-
+      import pprint
+
+      listDict = [{'id': 1}, {'id': 2}]
+      output5 = pprint.pformat(listDict)
+      output5
+  - type: "expansion"
+    title: "🟡 응용1: width 조정"
+    code: |-
+      import pprint
+
+      items1 = [f'item{i}' for i in range(10)]
+      output6 = pprint.pformat(items1, width=40)
+      output6
+  - type: "expansion"
+    title: "🟡 응용2: indent 변경"
+    code: |-
+      import pprint
+
+      tree = {'a': {'b': {'c': 1}}}
+      output7 = pprint.pformat(tree, indent=4)
+      output7
+  - type: "expansion"
+    title: "🟡 응용3: depth 제한"
+    code: |-
+      import pprint
+
+      deep = {'l1': {'l2': {'l3': {'l4': 'deep'}}}}
+      output8 = pprint.pformat(deep, depth=2)
+      output8
+  - type: "expansion"
+    title: "🟡 응용4: PrettyPrinter 사용"
+    code: |-
+      import pprint
+
+      pp = pprint.PrettyPrinter(width=50)
+      data3 = {'key1': 'value1', 'key2': 'value2'}
+      output9 = pp.pformat(data3)
+      output9
+  - type: "expansion"
+    title: "🟡 응용5: sort_dicts"
+    code: |-
+      import pprint
+
+      unsorted1 = {'z': 1, 'a': 2, 'c': 3}
+      output10 = pprint.pformat(unsorted1, sort_dicts=True)
+      output10
+  - type: "expansion"
+    title: "🔴 심화1: 복잡한 구조"
+    code: |-
+      import pprint
+
+      complex1 = {
+          'users': [{'name': 'Alice', 'roles': ['admin', 'user']}],
+          'config': {'debug': True}
+      }
+      output11 = pprint.pformat(complex1, indent=2)
+      output11
+  - type: "expansion"
+    title: "🔴 심화2: compact 모드"
+    code: |-
+      import pprint
+
+      pp1 = pprint.PrettyPrinter(compact=True, width=60)
+      range1 = list(range(1, 26))
+      output12 = pp1.pformat(range1)
+      output12
+  - type: "expansion"
+    title: "🔴 심화3: 여러 설정 조합"
+    code: |-
+      import pprint
+
+      pp2 = pprint.PrettyPrinter(width=50, indent=4, depth=3)
+      nested2 = {'a': {'b': {'c': {'d': 'value'}}}}
+      output13 = pp2.pformat(nested2)
+      output13
+  - type: "expansion"
+    title: "🔴 심화4: API 응답 포맷"
+    code: |-
+      import pprint
+
+      api1 = {
+          'status': 200,
+          'data': {'id': 1, 'name': 'Test'},
+          'meta': {'version': '1.0'}
+      }
+      output14 = pprint.pformat(api1, indent=2, width=60)
+      output14
+  - type: "expansion"
+    title: "🔴 심화5: 리스트 비교"
+    code: |-
+      import pprint
+
+      list1 = [1, 2, 3]
+      list2 = [1, 2, 4]
+      comparison1 = {'list1': list1, 'list2': list2}
+      output15 = pprint.pformat(comparison1)
+      output15
+  - type: "expansion"
+    title: "🔴 심화6: 설정 덤프"
+    code: |-
+      import pprint
+
+      settings = {
+          'db': {'host': 'localhost', 'port': 5432},
+          'cache': {'enabled': True, 'ttl': 300}
+      }
+      output16 = pprint.pformat(settings, indent=4)
+      output16
+  - type: "expansion"
+    title: "🔴 심화7: 정렬 비교"
+    code: |-
+      import pprint
+
+      dict1 = {'z': 1, 'a': 2, 'm': 3}
+      sorted1 = pprint.pformat(dict1, sort_dicts=True)
+      unsorted2 = pprint.pformat(dict1, sort_dicts=False)
+
+      sorted1, unsorted2
+  - type: "expansion"
+    title: "🔴 심화8: 중첩 리스트"
+    code: |-
+      import pprint
+
+      matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      output17 = pprint.pformat(matrix, width=20)
+      output17
+  - type: "expansion"
+    title: "🔴 심화9: 메타데이터 출력"
+    code: |-
+      import pprint
+
+      metadata = {
+          'file': 'data.csv',
+          'rows': 1000,
+          'columns': ['id', 'name', 'age'],
+          'stats': {'min': 0, 'max': 100}
+      }
+      output18 = pprint.pformat(metadata, indent=2, width=70)
+      output18
+  - type: "expansion"
+    title: "🔴 심화10: 전체 활용 - 진단 리포트"
+    code: |-
+      import pprint
+
+      diagnostics = {
+          'system': {
+              'platform': 'linux',
+              'python_version': '3.11',
+              'packages': ['numpy', 'pandas', 'matplotlib']
+          },
+          'performance': {
+              'memory_mb': 512,
+              'cpu_percent': 45.2,
+              'disk_usage': {'total': 1000, 'used': 600, 'free': 400}
+          },
+          'health_checks': [
+              {'name': 'database', 'status': 'ok', 'latency_ms': 12},
+              {'name': 'cache', 'status': 'ok', 'latency_ms': 3},
+              {'name': 'api', 'status': 'warning', 'latency_ms': 150}
+          ]
+      }
+
+      reporter = pprint.PrettyPrinter(indent=3, width=75, sort_dicts=True)
+      report = reporter.pformat(diagnostics)
+      report

@@ -1,0 +1,456 @@
+meta:
+  id: statsmodels_05
+  title: 고객이탈예측
+  order: 5
+  category: statsmodels
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  dataUrl: https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv
+  tags: ["로지스틱회귀", "Logit", "ROC", "AUC", "고객이탈", "분류"]
+  seo:
+    title: "statsmodels 로지스틱 회귀 - 통신사 고객 이탈 예측"
+    description: "로지스틱 회귀로 고객 이탈 확률을 예측합니다. Logit 모델, ROC 곡선, 혼동 행렬을 배웁니다."
+    keywords: ["statsmodels", "로지스틱회귀", "Logit", "고객이탈", "ROC곡선", "AUC", "분류모델"]
+
+intro:
+  emoji: "📞"
+  goal: 고객의 서비스 이용 패턴으로 이탈 여부를 예측합니다.
+  description: 7,043명의 통신사 고객 데이터로 계약 기간, 요금제, 지원 문의 등으로 이탈 확률을 예측합니다. 고객 유지 전략과 이탈 방지 캠페인에 활용할 수 있습니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: 통신사 고객 이탈 데이터
+  blocks:
+  - type: text
+    content: "Telco Customer Churn 데이터셋은 7,043명의 통신사 고객 정보와 이탈 여부(Churn)를 담은 IBM의 공개 데이터입니다. 21개 특성에는 인구통계(성별, 고령 여부), 계정 정보(가입 기간, 계약 유형, 결제 방식), 서비스 이용 내역(인터넷, 보안, 기술지원 등)이 포함됩니다. Churn이 Yes이면 이탈 고객, No이면 유지 고객으로, 이 데이터로 어떤 요인이 이탈에 영향을 미치는지 분석하면 고객 유지 전략, 이탈 방지 캠페인 대상 선정, 프로모션 설계에 활용할 수 있습니다."
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: CSV 파일 로드
+    content: |-
+      import pandas as pd
+      import numpy as np
+      import statsmodels.api as sm
+      from statsmodels.formula.api import logit
+
+      url = "https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv"
+      churnData = pd.read_csv(url)
+      churnData.shape
+
+- id: step2_head
+  title: 2단계. 데이터 미리보기
+  subtitle: 컬럼 구조 확인
+  blocks:
+  - type: text
+    content: "tenure(가입 기간, 월), MonthlyCharges(월 요금, 달러), Contract(계약 유형: Month-to-month/One year/Two year), TechSupport(기술지원 가입 여부), Churn(이탈 여부: Yes/No) 등이 있습니다. 01-04 프로젝트에서 배운 데이터 탐색 기법을 이탈 예측에 적용합니다. Churn은 Yes/No 문자열 변수로, 로지스틱 회귀를 위해 1/0 숫자로 변환해야 합니다. 이진 분류(binary classification) 문제의 전형적인 데이터 구조입니다."
+  - type: code
+    language: python
+    title: 처음 5행 확인
+    description: 컬럼 타입 파악
+    content: |-
+      churnData.head()
+
+- id: step3_churn_rate
+  title: 3단계. 이탈률 확인
+  subtitle: 클래스 불균형 체크
+  blocks:
+  - type: text
+    content: "전체 고객 중 몇 퍼센트가 이탈했는지 확인합니다. value_counts(normalize=True)로 각 범주의 비율을 계산하면 약 26.5%가 이탈 고객입니다. 이탈률이 너무 낮으면(예: 1%) 모델이 '모두 유지'로 예측해도 99% 정확도가 나오는 클래스 불균형(class imbalance) 문제가 발생합니다. 26.5%는 적절한 수준이지만, 실무에서는 오버샘플링이나 가중치 부여로 불균형을 보정하기도 합니다."
+  - type: code
+    language: python
+    title: 이탈률 확인
+    description: Churn 분포
+    content: |-
+      churnRate = churnData['Churn'].value_counts(normalize=True)
+      churnRate
+      f"이탈률: {churnRate['Yes']:.1%}"
+  - type: tip
+    content: value_counts(normalize=True)는 각 범주의 비율을 반환합니다. False가 아니라 True를 쓰면 개수 대신 비율이 나옵니다. .1%는 소수점 1자리 퍼센트 형식입니다. 예를 들어 0.265는 26.5%로 표시됩니다.
+
+- id: step4_preprocessing
+  title: 4단계. 데이터 전처리
+  subtitle: Churn을 0/1로 변환
+  blocks:
+  - type: text
+    content: "Churn이 Yes/No 문자열이므로 1/0 숫자로 변환합니다. Yes=1(이탈), No=0(유지)으로 매핑하며, 로지스틱 회귀의 종속변수는 반드시 0 또는 1이어야 합니다. (조건식).astype(int) 패턴으로 간단히 변환할 수 있으며, 03 프로젝트의 get_dummies()보다 이진 변수에 효율적입니다. 이 과정은 분류 모델의 필수 전처리 단계입니다."
+  - type: code
+    language: python
+    title: Churn 이진화
+    description: Yes=1, No=0
+    content: |-
+      churnData['ChurnBinary'] = (churnData['Churn'] == 'Yes').astype(int)
+      churnData[['Churn', 'ChurnBinary']].head()
+  - type: tip
+    content: (churnData['Churn'] == 'Yes')는 조건식으로, 각 행의 Churn 값이 'Yes'인지 비교하여 맞으면 True, 틀리면 False를 반환하는 불리언(Boolean) Series를 만듭니다. ==(등호 2개)는 비교 연산자로 "같은지 확인"하며, =(등호 1개)는 할당 연산자로 "값을 저장"하는 것과 다릅니다. astype(int)는 데이터 타입을 정수(integer)로 변환하는 메서드로, True는 1, False는 0으로 변환됩니다. 이 방법은 Yes/No, Male/Female, True/False 같은 이진(binary) 변수를 0/1 숫자로 바꿀 때 매우 유용하며, 03 프로젝트의 get_dummies()보다 간단합니다.
+
+- id: step5_select_features
+  title: 5단계. 주요 변수 선택
+  subtitle: 수치형 변수 우선
+  blocks:
+  - type: text
+    content: "먼저 수치형 변수 3개로 간단한 기본 모델을 만듭니다. tenure(가입 기간, 월), MonthlyCharges(월 요금), TotalCharges(총 요금)를 선택합니다. 수치형 변수는 전처리 없이 바로 회귀에 투입할 수 있어 빠른 프로토타입에 적합합니다. 02 프로젝트에서 배운 특성 선택 개념을 이탈 예측에 적용하며, 기본 모델 성능을 확인한 후 범주형 변수(Contract, TechSupport 등)를 추가하여 개선할 수 있습니다."
+  - type: code
+    language: python
+    title: 수치형 변수 선택
+    description: tenure, MonthlyCharges, TotalCharges
+    content: |-
+      churnNumeric = churnData.copy()
+      churnNumeric['TotalCharges'] = pd.to_numeric(churnNumeric['TotalCharges'], errors='coerce')
+      churnClean = churnNumeric.dropna(subset=['TotalCharges'])
+
+      features = ['tenure', 'MonthlyCharges', 'TotalCharges']
+      X = churnClean[features]
+      y = churnClean['ChurnBinary']
+  - type: tip
+    content: to_numeric()은 문자열이나 다른 타입을 숫자(numeric) 타입으로 변환하는 pandas 함수입니다. TotalCharges 컬럼에 ' '(공백) 같은 숫자가 아닌 값이 섞여 있을 수 있으므로 변환이 필요합니다. errors='coerce'는 변환 실패 시 에러를 발생시키지 않고 NaN(Not a Number, 결측값)으로 처리하는 옵션입니다. 예를 들어 '1000'은 1000으로, ' '는 NaN으로 변환됩니다. dropna()는 NaN이 있는 행을 제거하는 메서드로, subset=['TotalCharges']는 해당 컬럼에 NaN이 있는 행만 제거하고 다른 컬럼의 NaN은 무시합니다. 데이터 품질 관리의 필수 단계입니다.
+
+- id: step6_add_constant
+  title: 6단계. 상수항 추가
+  subtitle: 절편 계산
+  blocks:
+  - type: text
+    content: "01-04 프로젝트에서 배운 것처럼 add_constant()로 절편용 컬럼을 추가합니다. 로지스틱 회귀도 OLS와 마찬가지로 절편이 필요하며, 절편은 모든 독립변수가 0일 때의 기본 이탈 확률(의 로짓 값)을 의미합니다. statsmodels의 모든 회귀 모델(OLS, Logit, ARIMA 등)에 공통으로 적용되는 필수 단계입니다."
+  - type: code
+    language: python
+    title: 상수항 추가
+    description: const 컬럼 추가
+    content: |-
+      XWithConst = sm.add_constant(X)
+
+- id: step7_logit_model
+  title: 7단계. 로지스틱 회귀 모델 학습
+  subtitle: Logit 함수
+  blocks:
+  - type: text
+    content: "Logit()은 로지스틱 회귀(logistic regression) 모델로, 이진 분류(binary classification) 문제를 해결하는 대표적인 통계 기법입니다. OLS는 연속값(예: 매출, 가격)을 예측하지만, Logit은 0/1 확률(예: 이탈/유지, 합격/불합격)을 예측합니다. 로지스틱 회귀는 로짓 함수 logit(p) = log(p/(1-p))를 사용하여 확률 p를 -∞~+∞ 범위로 변환한 후 선형 회귀를 적용하고, 역변환으로 0~1 사이 확률을 얻습니다. fit()으로 학습하는 방법은 01 프로젝트의 OLS와 동일하지만, 최대우도추정(Maximum Likelihood Estimation)을 사용하여 계수를 추정합니다. 예를 들어 이탈 확률 0.7은 70% 확률로 이탈한다는 뜻이며, 임계값 0.5를 기준으로 0/1 분류로 변환할 수 있습니다. 로지스틱 회귀는 해석이 쉽고 계산이 빠르며 확률을 제공하여 비즈니스 의사결정에 매우 유용합니다."
+  - type: code
+    language: python
+    title: 로지스틱 회귀 학습
+    description: Logit 모델 fit
+    content: |-
+      logitModel = sm.Logit(y, XWithConst)
+      logitFit = logitModel.fit()
+      logitFit.summary()
+  - type: tip
+    content: Logit()은 로지스틱 회귀(logistic regression)를 수행하는 statsmodels 클래스입니다. 로짓(logit) 함수는 log(p/(1-p))로 정의되며, 확률 p(0~1)를 -∞~+∞로 변환하여 선형 회귀를 적용 가능하게 만듭니다. 예를 들어 p=0.5이면 logit(0.5)=log(1)=0, p=0.9이면 logit(0.9)=log(9)≈2.2입니다. fit()으로 최대우도추정(Maximum Likelihood)으로 각 변수의 계수를 학습하며, 01 프로젝트의 OLS와 사용법은 같지만 내부 알고리즘이 다릅니다. summary()는 01 프로젝트와 형식이 같지만, Pseudo R²(유사 결정계수)가 나오며 이는 일반 R²와 계산 방식이 다르지만 해석은 비슷합니다(0~1, 높을수록 좋음).
+
+- id: step8_coefficients
+  title: 8단계. 계수 해석
+  subtitle: 승산비(Odds Ratio)
+  blocks:
+  - type: text
+    content: "로지스틱 회귀 계수는 승산비(Odds Ratio, OR)로 해석하며, 이는 일반 회귀와 다른 특수한 해석 방법입니다. 승산(odds)은 확률 p를 p/(1-p)로 변환한 값으로, 예를 들어 이탈 확률 0.6이면 승산은 0.6/0.4 = 1.5입니다. 로지스틱 회귀 계수 β를 exp(β)로 변환하면 승산비가 되며, 이는 해당 변수가 1 증가할 때 승산이 몇 배 변하는지 나타냅니다. tenure 계수가 -0.06이면 exp(-0.06) = 0.94로, 가입 기간 1개월 증가 시 이탈 승산이 0.94배, 즉 6% 감소합니다. OR=1은 영향 없음, OR>1은 양의 영향(이탈 증가), OR<1은 음의 영향(이탈 감소)을 의미합니다. 예를 들어 MonthlyCharges의 OR=1.02면 월 요금 1달러 증가 시 이탈 승산이 1.02배, 즉 2% 증가하며, 이는 고객이 요금에 민감하다는 의미입니다."
+  - type: code
+    language: python
+    title: 승산비 계산
+    description: exp(계수)
+    content: |-
+      oddsRatios = np.exp(logitFit.params)
+      oddsRatios
+  - type: tip
+    content: 승산비(Odds Ratio, OR)는 exp(계수)로 계산하며, 로지스틱 회귀 계수를 해석하는 핵심 방법입니다. exp()는 자연상수 e의 거듭제곱으로, 03 프로젝트에서 배운 로그의 역함수입니다. OR=1은 영향 없음(기준선), OR>1은 양의 영향(이탈 증가), OR<1은 음의 영향(이탈 감소)을 의미합니다. 예를 들어 tenure 계수가 -0.06이면 exp(-0.06)=0.94로, 가입 기간 1개월 증가 시 이탈 승산이 0.94배, 즉 6% 감소합니다. MonthlyCharges 계수가 0.02면 exp(0.02)=1.02로, 월 요금 1달러 증가 시 이탈 승산이 1.02배, 즉 2% 증가합니다. np.exp()는 배열 전체에 exp()를 적용하는 numpy 함수입니다.
+
+- id: step9_predict_prob
+  title: 9단계. 이탈 확률 예측
+  subtitle: predict() 함수
+  blocks:
+  - type: text
+    content: "학습된 모델로 각 고객의 이탈 확률을 예측합니다. 01-04 프로젝트에서 배운 predict()를 로지스틱 회귀에 적용하면, OLS와 달리 0~1 사이 확률이 반환됩니다. 예를 들어 0.73이면 해당 고객이 73% 확률로 이탈할 것으로 예상됩니다. 일반적으로 0.5 이상이면 이탈 예상 고객으로 분류하지만, 비즈니스 상황에 따라 임계값을 조정할 수 있습니다. 확률 출력은 로지스틱 회귀의 큰 장점으로, 위험도에 따른 차등 대응이 가능합니다."
+  - type: code
+    language: python
+    title: 이탈 확률 예측
+    description: 전체 고객 예측
+    content: |-
+      churnProb = logitFit.predict(XWithConst)
+      churnClean = churnClean.copy()
+      churnClean['ChurnProb'] = churnProb
+      churnClean[['tenure', 'MonthlyCharges', 'ChurnBinary', 'ChurnProb']].head(10)
+
+- id: step10_threshold
+  title: 10단계. 임계값 설정
+  subtitle: 0.5 기준 분류
+  blocks:
+  - type: text
+    content: "확률을 0/1 예측(이탈/유지)으로 변환하려면 임계값(threshold)이 필요합니다. 기본적으로 0.5를 사용하며, 확률 ≥ 0.5이면 이탈(1), < 0.5이면 유지(0)로 분류합니다. 그러나 비즈니스 상황에 따라 조정이 가능합니다. 이탈 방지가 매우 중요하면 0.3으로 낮춰서 더 많은 고객을 위험군으로 분류하고, 프로모션 비용을 절약하려면 0.7로 높여서 확실한 이탈 예상 고객만 선별할 수 있습니다. 이 트레이드오프는 ROC 곡선으로 시각화됩니다."
+  - type: code
+    language: python
+    title: 예측 분류
+    description: 확률 0.5 기준
+    content: |-
+      churnClean['ChurnPred'] = (churnProb >= 0.5).astype(int)
+      churnClean[['ChurnBinary', 'ChurnProb', 'ChurnPred']].head(10)
+  - type: tip
+    content: "비교 연산으로 확률이 0.5 이상이면 True, 미만이면 False를 반환합니다. 크거나 같다 연산자는 0.5를 포함합니다. astype(int)로 True는 1(이탈 예측), False는 0(유지 예측)으로 변환합니다. 임계값을 낮추면 더 많은 고객을 이탈로 예측하여 민감도가 높아지지만 정밀도는 낮아지는 트레이드오프가 발생합니다."
+
+- id: step11_confusion_matrix
+  title: 11단계. 혼동 행렬
+  subtitle: 분류 성능 평가
+  blocks:
+  - type: text
+    content: 혼동 행렬(Confusion Matrix)은 분류 모델의 성능을 평가하는 2x2 표로, 실제 값(행)과 예측 값(열)을 교차시켜 4가지 경우를 보여줍니다. TP(True Positive, 실제 1, 예측 1)는 이탈 고객을 이탈로 맞춘 것, TN(True Negative, 실제 0, 예측 0)은 유지 고객을 유지로 맞춘 것, FP(False Positive, 실제 0, 예측 1)는 유지 고객을 이탈로 잘못 예측한 것(1종 오류), FN(False Negative, 실제 1, 예측 0)은 이탈 고객을 유지로 잘못 예측한 것(2종 오류)입니다. 이 4개 값으로 정확도(Accuracy), 정밀도(Precision), 재현율(Recall), F1 점수를 계산하며, 이탈 예측에서는 FN을 줄이는 것(재현율 향상)이 비즈니스적으로 중요합니다.
+  - type: code
+    language: python
+    title: 혼동 행렬
+    description: TP, TN, FP, FN
+    content: |-
+      from sklearn.metrics import confusion_matrix
+
+      cm = confusion_matrix(churnClean['ChurnBinary'], churnClean['ChurnPred'])
+      cm
+      f"TN: {cm[0,0]}, FP: {cm[0,1]}"
+      f"FN: {cm[1,0]}, TP: {cm[1,1]}"
+  - type: tip
+    content: sklearn.metrics에서 confusion_matrix를 import하여 사용합니다. sklearn은 scikit-learn의 약자로, 머신러닝 라이브러리입니다. cm은 2x2 배열(array)로 반환되며, cm[0,0]은 첫 번째 행 첫 번째 열로 TN(True Negative), cm[0,1]은 FP, cm[1,0]은 FN, cm[1,1]은 TP(True Positive)입니다. [행, 열] 순서로 인덱싱하며, 인덱스는 0부터 시작합니다. 대각선(TN, TP)은 정확히 예측한 경우이고, 비대각선(FP, FN)은 오류입니다. 혼동 행렬의 합은 전체 데이터 개수와 같으며, TN+TP+FP+FN = 전체 고객 수입니다.
+
+- id: step12_cm_viz
+  title: 12단계. 혼동 행렬 시각화
+  subtitle: 히트맵
+  blocks:
+  - type: text
+    content: 혼동 행렬을 히트맵으로 시각화하면 분류 성능을 직관적으로 파악할 수 있습니다. 대각선(TN, TP)의 색이 진할수록 정확히 예측한 경우가 많고, 비대각선(FP, FN)이 밝을수록 오류가 적습니다.
+  - type: code
+    language: python
+    title: 혼동 행렬 히트맵
+    description: seaborn heatmap
+    content: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+
+      cmFig, cmAx = plt.subplots(figsize=(6, 5))
+      sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', ax=cmAx,
+                  xticklabels=['Pred: Stay', 'Pred: Churn'],
+                  yticklabels=['Actual: Stay', 'Actual: Churn'])
+      cmAx.set_xlabel('Predicted')
+      cmAx.set_ylabel('Actual')
+      cmAx.set_title('Confusion Matrix')
+      cmFig
+  - type: tip
+    content: annot=True는 각 셀에 숫자를 표시, fmt='d'는 정수 형식, cmap='Blues'는 파란색 계열 색상입니다. 대각선이 진할수록 좋은 모델입니다.
+
+- id: step13_accuracy
+  title: 13단계. 정확도와 재현율
+  subtitle: 평가 지표 계산
+  blocks:
+  - type: text
+    content: 정확도(Accuracy)는 전체 예측 중 맞춘 비율로 (TP+TN) / 전체 = 맞춘 개수 / 전체 고객 수를 의미하며, 가장 직관적인 지표입니다. 정밀도(Precision)는 이탈로 예측한 것 중 실제 이탈의 비율로 TP / (TP+FP) = 실제 이탈 / 이탈 예측으로, "예측이 얼마나 정확한가"를 나타냅니다. 재현율(Recall, Sensitivity, TPR)은 실제 이탈 고객 중 이탈로 예측한 비율로 TP / (TP+FN) = 찾은 이탈 / 실제 이탈로, "이탈 고객을 얼마나 놓치지 않고 찾았는가"를 나타냅니다. 이탈 예측에서는 재현율이 가장 중요한데, 이탈 고객을 놓치면(FN) 고객 손실이 발생하여 비즈니스 손해가 크기 때문입니다. 정밀도와 재현율은 트레이드오프 관계로, 하나를 높이면 다른 하나가 낮아지는 경향이 있습니다.
+  - type: code
+    language: python
+    title: 평가 지표
+    description: Accuracy, Precision, Recall
+    content: |-
+      from sklearn.metrics import accuracy_score, precision_score, recall_score
+
+      accuracy = accuracy_score(churnClean['ChurnBinary'], churnClean['ChurnPred'])
+      precision = precision_score(churnClean['ChurnBinary'], churnClean['ChurnPred'])
+      recall = recall_score(churnClean['ChurnBinary'], churnClean['ChurnPred'])
+
+      f"Accuracy: {accuracy:.3f}"
+      f"Precision: {precision:.3f}"
+      f"Recall: {recall:.3f}"
+  - type: tip
+    content: "sklearn.metrics의 함수들은 혼동 행렬로부터 자동으로 지표를 계산합니다. Accuracy는 맞춘 것을 전체로 나눈 값, Precision은 진짜 이탈을 이탈 예측으로 나눈 값, Recall은 찾은 이탈을 실제 이탈로 나눈 값입니다. Recall이 0.3이면 실제 이탈 고객 10명 중 3명만 찾고 7명을 놓친다는 뜻입니다. f-string은 변수를 문자열에 삽입하는 파이썬 문법입니다."
+
+- id: step14_roc_curve
+  title: 14단계. ROC 곡선
+  subtitle: 임계값별 성능
+  blocks:
+  - type: text
+    content: "ROC(Receiver Operating Characteristic) 곡선은 분류 모델의 성능을 평가하는 핵심 도구로, 임계값을 0부터 1까지 변화시키며 TPR(재현율, True Positive Rate)과 FPR(위양성률, False Positive Rate)을 그린 그래프입니다. X축은 FPR(실제 0인데 1로 잘못 예측한 비율), Y축은 TPR(실제 1을 1로 맞춘 비율)로, 왼쪽 위 모서리에 가까울수록 좋은 모델입니다. 곡선 아래 면적(AUC, Area Under Curve)은 0.5~1.0 사이 값으로, 0.5는 동전 던지기처럼 랜덤한 분류, 1.0은 완벽한 분류를 의미합니다. 실무에서 AUC > 0.8이면 좋은 모델, > 0.9이면 매우 우수한 모델로 평가되며, 이탈 예측에서 AUC 0.84는 비즈니스 활용 가능한 수준입니다. ROC 곡선을 통해 임계값 조정 시 재현율과 정밀도의 트레이드오프를 시각적으로 확인할 수 있습니다."
+  - type: code
+    language: python
+    title: ROC 곡선
+    description: AUC 계산
+    content: |-
+      import plotly.graph_objects as go
+      from sklearn.metrics import roc_curve, roc_auc_score
+
+      fpr, tpr, thresholds = roc_curve(churnClean['ChurnBinary'], churnProb)
+      auc = roc_auc_score(churnClean['ChurnBinary'], churnProb)
+
+      rocFig = go.Figure()
+      rocFig.add_trace(go.Scatter(x=fpr, y=tpr, mode='lines', name=f'ROC Curve (AUC = {auc:.3f})', line=dict(color='blue', width=2)))
+      rocFig.add_trace(go.Scatter(x=[0, 1], y=[0, 1], mode='lines', name='Random', line=dict(color='gray', dash='dash')))
+      rocFig.update_layout(title='ROC Curve',
+                           xaxis_title='False Positive Rate',
+                           yaxis_title='True Positive Rate (Recall)',
+                           showlegend=True)
+      rocFig.show()
+  - type: tip
+    content: roc_curve()는 임계값을 변화시키며 FPR(x축)과 TPR(y축, 재현율)을 계산합니다. roc_auc_score()는 ROC 곡선 아래 면적(AUC)으로, 1.0에 가까울수록 좋습니다. AUC 0.5는 랜덤 추측(회색 대각선), 0.7~0.8은 양호, 0.8~0.9는 우수, 0.9 이상은 매우 우수한 모델입니다. 이탈 방지 캠페인에서 재현율이 중요하면 곡선의 오른쪽 영역(높은 재현율)에서 임계값을 선택하고, 정밀도가 중요하면 왼쪽 영역(낮은 FPR)에서 선택합니다.
+
+- id: step15_odds_ratio_viz
+  title: 15단계. 승산비 시각화
+  subtitle: 변수별 영향력
+  blocks:
+  - type: text
+    content: 승산비를 막대 그래프로 시각화하면 어떤 변수가 이탈에 가장 큰 영향을 미치는지 직관적으로 파악할 수 있습니다. OR > 1은 이탈 증가, OR < 1은 이탈 감소를 의미합니다.
+  - type: code
+    language: python
+    title: 승산비 막대 그래프
+    description: Altair 시각화
+    content: |-
+      import altair as alt
+
+      orData = pd.DataFrame({
+          'variable': oddsRatios.index.drop('const'),
+          'odds_ratio': oddsRatios.drop('const').values
+      })
+      orData['effect'] = orData['odds_ratio'].apply(lambda x: 'Increase' if x > 1 else 'Decrease')
+
+      orChart = alt.Chart(orData).mark_bar().encode(
+          x=alt.X('odds_ratio:Q', title='Odds Ratio', scale=alt.Scale(domain=[0.9, 1.1])),
+          y=alt.Y('variable:N', sort='-x', title='Variable'),
+          color=alt.Color('effect:N', scale=alt.Scale(domain=['Increase', 'Decrease'], range=['#e74c3c', '#2ecc71'])),
+          tooltip=['variable', 'odds_ratio', 'effect']
+      ).properties(width=400, height=200, title='Odds Ratio by Variable')
+
+      refLine = alt.Chart(pd.DataFrame({'x': [1]})).mark_rule(color='black', strokeDash=[3, 3]).encode(x='x:Q')
+      orChart + refLine
+  - type: tip
+    content: 빨간색(OR > 1)은 이탈 위험 증가, 녹색(OR < 1)은 이탈 위험 감소입니다. 검은 점선(OR=1)은 영향 없음을 나타냅니다.
+
+- id: step16_feature_importance
+  title: 16단계. 변수 중요도
+  subtitle: p-value 확인
+  blocks:
+  - type: text
+    content: "summary()에서 각 변수의 p-value를 확인하여 통계적 유의성을 판단합니다. p-value < 0.05이면 해당 변수가 이탈에 통계적으로 유의미한 영향을 미친다는 뜻입니다. 01 프로젝트에서 배운 summary 해석을 로지스틱 회귀에 적용하며, p-value가 작을수록 해당 변수의 영향이 확실합니다. 예를 들어 tenure의 p-value가 0.000이면 가입 기간이 이탈에 미치는 영향은 우연이 아니라 실제로 존재한다는 강력한 증거입니다."
+  - type: code
+    language: python
+    title: 변수 유의성
+    description: p-value 확인
+    content: |-
+      pvalues = logitFit.pvalues.drop('const').sort_values()
+      pvalues
+
+- id: practice
+  title: 실습
+  subtitle: 고객 이탈 예측 프로젝트
+  blocks:
+  - type: text
+    content: 통신사 고객 관리팀이 되어 이탈 위험 고객을 찾아냅니다. 각 미션은 데이터 로딩부터 전처리, Logit 모델링, ROC 분석까지 전체 과정을 독립적으로 수행합니다. 01-04 프로젝트의 회귀 기법과 이번 프로젝트의 로지스틱 회귀를 모두 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: Contract 변수 포함 Logit 모델 구축 및 AIC 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 전처리"
+      content: |-
+        import pandas as pd
+        import numpy as np
+        import statsmodels.api as sm
+
+        ctrUrl = "https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv"
+        ctrData = pd.read_csv(ctrUrl)
+        ctrData['ChurnBinary'] = (ctrData['Churn'] == 'Yes').astype(int)
+        ctrData['TotalCharges'] = pd.to_numeric(ctrData['TotalCharges'], errors='coerce')
+        ctrData = ctrData.dropna(subset=['TotalCharges'])
+        ctrData.shape
+    - type: code
+      title: "기본 모델 vs Contract 추가 모델"
+      content: |-
+        baseX = sm.add_constant(ctrData[['tenure', 'MonthlyCharges', 'TotalCharges']])
+        baseY = ctrData['ChurnBinary']
+        baseModel = sm.Logit(baseY, baseX).fit()
+
+        ctrDummy = pd.get_dummies(ctrData[['tenure', 'MonthlyCharges', 'TotalCharges', 'Contract', 'ChurnBinary']], columns=['Contract'], drop_first=True)
+        ctrX = sm.add_constant(ctrDummy.drop('ChurnBinary', axis=1))
+        ctrY = ctrDummy['ChurnBinary']
+        ctrModel = sm.Logit(ctrY, ctrX).fit()
+
+        aicDf = pd.DataFrame({
+            'Model': ['숫자만', 'Contract 추가'],
+            'AIC': [baseModel.aic, ctrModel.aic],
+            'Pseudo R²': [baseModel.prsquared, ctrModel.prsquared]
+        })
+        aicDf
+    - type: code
+      title: "AUC 비교"
+      content: |-
+        from sklearn.metrics import roc_auc_score
+
+        baseProb = baseModel.predict(baseX)
+        ctrProb = ctrModel.predict(ctrX)
+
+        baseAuc = roc_auc_score(baseY, baseProb)
+        ctrAuc = roc_auc_score(ctrY, ctrProb)
+
+        aucDf = pd.DataFrame({
+            'Model': ['숫자만', 'Contract 추가'],
+            'AUC': [baseAuc, ctrAuc]
+        })
+        aucDf
+  - type: expansion
+    title: "미션2: 임계값 조정 및 재현율 종합 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 모델 학습"
+      content: |-
+        import pandas as pd
+        import numpy as np
+        import statsmodels.api as sm
+
+        thrUrl = "https://raw.githubusercontent.com/IBM/telco-customer-churn-on-icp4d/master/data/Telco-Customer-Churn.csv"
+        thrData = pd.read_csv(thrUrl)
+        thrData['ChurnBinary'] = (thrData['Churn'] == 'Yes').astype(int)
+        thrData['TotalCharges'] = pd.to_numeric(thrData['TotalCharges'], errors='coerce')
+        thrData = thrData.dropna(subset=['TotalCharges'])
+
+        thrX = sm.add_constant(thrData[['tenure', 'MonthlyCharges', 'TotalCharges']])
+        thrY = thrData['ChurnBinary']
+        thrModel = sm.Logit(thrY, thrX).fit()
+        thrProb = thrModel.predict(thrX)
+        thrProb.head()
+    - type: code
+      title: "임계값 0.3 vs 0.5 비교"
+      content: |-
+        from sklearn.metrics import recall_score, precision_score
+
+        pred03 = (thrProb >= 0.3).astype(int)
+        pred05 = (thrProb >= 0.5).astype(int)
+
+        recall03 = recall_score(thrY, pred03)
+        recall05 = recall_score(thrY, pred05)
+        precision03 = precision_score(thrY, pred03)
+        precision05 = precision_score(thrY, pred05)
+
+        cmpDf = pd.DataFrame({
+            'Threshold': [0.3, 0.5],
+            'Recall': [recall03, recall05],
+            'Precision': [precision03, precision05]
+        })
+        cmpDf
+    - type: code
+      title: "혼동행렬 시각화"
+      content: |-
+        from sklearn.metrics import confusion_matrix
+        import plotly.graph_objects as go
+
+        cm03 = confusion_matrix(thrY, pred03)
+
+        thrFig = go.Figure()
+        thrFig.add_trace(go.Heatmap(z=cm03, x=['Pred 0', 'Pred 1'], y=['Actual 0', 'Actual 1'],
+                                    text=cm03, texttemplate='%{text}', colorscale='Blues', showscale=False))
+        thrFig.update_layout(title='Confusion Matrix (Threshold=0.3)', xaxis_title='Predicted', yaxis_title='Actual')
+        thrFig
+
+- id: summary
+  title: 정리
+  subtitle: 다섯 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 통신사 고객 7,043명의 데이터로 이탈 여부를 예측했습니다. Logit 로지스틱 회귀로 가입 기간, 월 요금 등으로 이탈 확률을 계산했고, ROC 곡선으로 AUC 0.84를 달성했습니다. 혼동 행렬로 재현율과 정밀도를 평가하고, 승산비로 각 변수의 영향력을 해석했습니다. 이제 고객 이탈 위험도를 측정하고, 이탈 방지 캠페인 대상을 선정하며, 유지 프로그램의 효과를 예측할 수 있습니다.
+  - type: list
+    items:
+    - "Logit - 로지스틱 회귀 모델 (0/1 분류)"
+    - "승산비 - exp(계수)로 영향력 해석"
+    - "혼동 행렬 - TP, TN, FP, FN으로 성능 평가"
+    - "ROC 곡선 - 임계값별 재현율과 FPR"
+    - "AUC - ROC 곡선 아래 면적 (0.5~1.0)"
+    - "임계값 - 확률을 0/1 분류로 변환"
+    - "재현율 - 실제 이탈 중 맞춘 비율"
+    - "정밀도 - 이탈 예측 중 실제 이탈 비율"
+  - type: text
+    content: 다음 프로젝트에서는 월마트 매출 데이터로 외생변수를 포함한 시계열 회귀를 배웁니다. 실업률, CPI 같은 경제 지표로 주간 매출을 예측해봅니다.

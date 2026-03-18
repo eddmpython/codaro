@@ -1,0 +1,348 @@
+meta:
+  id: sklearn_03
+  title: 당뇨병진행도예측
+  order: 3
+  category: sklearn
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["회귀", "LinearRegression", "MSE", "R²", "당뇨병"]
+  seo:
+    title: "scikit-learn 회귀 입문 - 당뇨병 진행도 예측"
+    description: "LinearRegression으로 당뇨병 진행도를 예측합니다. MSE와 R²로 회귀 모델을 평가합니다."
+    keywords: ["scikit-learn", "회귀", "LinearRegression", "MSE", "R²"]
+
+intro:
+  emoji: "💉"
+  goal: 선형 회귀로 당뇨병 진행도를 예측합니다.
+  description: 분류가 아닌 회귀(regression) 문제를 다룹니다. LinearRegression으로 연속적인 값을 예측하고, MSE와 R²로 모델을 평가합니다. 이전 프로젝트에서 배운 train_test_split, StandardScaler를 복습하고 회귀 평가 지표를 새로 배웁니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: 당뇨병 진행도 예측 모델을 만들기 위해 필요한 라이브러리를 불러옵니다. 회귀 문제이므로 LinearRegression과 회귀 평가 지표를 사용합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sklearn 회귀 모듈 임포트
+    content: |-
+      from sklearn.datasets import load_diabetes
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression
+      from sklearn.metrics import mean_squared_error, r2_score, mean_absolute_error
+      import pandas as pd
+      import numpy as np
+      import matplotlib.pyplot as plt
+
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  subtitle: load_diabetes()
+  blocks:
+  - type: text
+    content: 당뇨병 데이터셋은 442명 환자의 10가지 기준값(나이, 성별, BMI, 혈압 등)과 1년 후 질병 진행도를 담고 있습니다. 진행도는 연속적인 숫자이므로 회귀 문제입니다.
+  - type: code
+    language: python
+    title: 데이터 로드
+    description: 당뇨병 데이터셋 불러오기
+    content: |-
+      diabetes = load_diabetes()
+      X = pd.DataFrame(diabetes.data, columns=diabetes.feature_names)
+      y = diabetes.target
+      X.shape
+  - type: code
+    language: python
+    title: 특성 확인
+    description: 10가지 특성 미리보기
+    content: |-
+      X.head()
+  - type: tip
+    content: 이 데이터셋은 이미 정규화되어 있습니다. 각 특성의 평균이 거의 0이고 표준편차가 비슷합니다. 실제 값이 아닌 표준화된 값임을 참고하세요.
+
+- id: step3_target
+  title: 3단계. 타겟 분석
+  subtitle: 연속값 분포
+  blocks:
+  - type: text
+    content: 회귀 문제의 타겟은 연속적인 숫자입니다. 분류와 달리 클래스가 아닌 값의 분포를 확인합니다. 히스토그램으로 진행도의 분포를 살펴봅니다.
+  - type: code
+    language: python
+    title: 타겟 통계
+    description: 진행도 분포 확인
+    content: |-
+      pd.Series(y).describe()
+  - type: code
+    language: python
+    title: 타겟 분포 시각화
+    description: 히스토그램으로 분포 확인
+    content: |-
+      fig, ax = plt.subplots(figsize=(8, 5))
+      ax.hist(y, bins=30, edgecolor='black')
+      ax.set_xlabel('Disease Progression')
+      ax.set_ylabel('Count')
+      ax.set_title('Distribution of Target Variable')
+      fig
+
+- id: step4_split
+  title: 4단계. 데이터 분할
+  subtitle: train_test_split
+  blocks:
+  - type: text
+    content: 이전 프로젝트와 동일하게 학습/테스트 데이터로 분할합니다. 회귀에서도 동일한 방식으로 분할합니다.
+  - type: code
+    language: python
+    title: 데이터 분할
+    description: 80:20 분할
+    content: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+
+- id: step5_scale
+  title: 5단계. 스케일링
+  subtitle: StandardScaler
+  blocks:
+  - type: text
+    content: 이 데이터셋은 이미 정규화되어 있지만, 실전에서는 항상 스케일링하는 습관을 들이는 것이 좋습니다. LinearRegression은 스케일에 덜 민감하지만, 다른 알고리즘으로 교체할 때를 대비합니다.
+  - type: code
+    language: python
+    title: 스케일링
+    description: 표준화 적용
+    content: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+
+- id: step6_model
+  title: 6단계. 선형 회귀 모델
+  subtitle: LinearRegression
+  blocks:
+  - type: text
+    content: LinearRegression은 가장 기본적인 회귀 알고리즘입니다. 입력 특성과 타겟 사이의 선형 관계를 학습합니다. y = w1*x1 + w2*x2 + ... + b 형태의 식을 찾습니다.
+  - type: code
+    language: python
+    title: 모델 학습
+    description: 선형 회귀 학습
+    content: |-
+      model = LinearRegression()
+      model.fit(xTrainSc, yTrain)
+  - type: code
+    language: python
+    title: 회귀 계수
+    description: 각 특성의 가중치 확인
+    content: |-
+      coefDf = pd.DataFrame({'Feature': diabetes.feature_names, 'Coefficient': model.coef_})
+      coefDf.sort_values('Coefficient', key=abs, ascending=False)
+  - type: tip
+    content: coef_는 각 특성의 가중치(기울기)입니다. 값이 클수록 해당 특성이 타겟에 큰 영향을 미칩니다. intercept_는 절편(bias)입니다.
+
+- id: step7_predict
+  title: 7단계. 예측
+  subtitle: predict
+  blocks:
+  - type: text
+    content: 학습된 모델로 테스트 데이터의 진행도를 예측합니다. 회귀는 연속적인 값을 출력하므로 클래스가 아닌 숫자가 나옵니다.
+  - type: code
+    language: python
+    title: 예측
+    description: 테스트 데이터 예측
+    content: |-
+      yPred = model.predict(xTestSc)
+      yPred[:10]
+  - type: code
+    language: python
+    title: 예측 vs 실제
+    description: 비교 테이블
+    content: |-
+      comparison = pd.DataFrame({'Actual': yTest[:10], 'Predicted': yPred[:10], 'Error': yTest[:10] - yPred[:10]})
+      comparison
+
+- id: step8_mse
+  title: 8단계. MSE 평가
+  subtitle: mean_squared_error
+  blocks:
+  - type: text
+    content: MSE(Mean Squared Error)는 예측 오차의 제곱 평균입니다. 값이 작을수록 좋습니다. RMSE는 MSE의 제곱근으로, 원래 단위로 해석할 수 있습니다.
+  - type: code
+    language: python
+    title: MSE 계산
+    description: 평균 제곱 오차
+    content: |-
+      mse = mean_squared_error(yTest, yPred)
+      rmse = np.sqrt(mse)
+      f"MSE: {mse:.2f}, RMSE: {rmse:.2f}"
+  - type: tip
+    content: MSE = (1/n) * Σ(실제값 - 예측값)². 오차를 제곱하므로 큰 오차에 더 큰 패널티를 줍니다. RMSE는 타겟과 같은 단위이므로 해석이 쉽습니다.
+
+- id: step9_mae
+  title: 9단계. MAE 평가
+  subtitle: mean_absolute_error
+  blocks:
+  - type: text
+    content: MAE(Mean Absolute Error)는 예측 오차의 절대값 평균입니다. MSE보다 이상치에 덜 민감합니다. 평균적으로 얼마나 틀리는지를 나타냅니다.
+  - type: code
+    language: python
+    title: MAE 계산
+    description: 평균 절대 오차
+    content: |-
+      mae = mean_absolute_error(yTest, yPred)
+      f"MAE: {mae:.2f}"
+  - type: tip
+    content: MAE = (1/n) * Σ|실제값 - 예측값|. 절대값을 사용하므로 MSE보다 큰 오차에 덜 민감합니다. 이상치가 많은 데이터에서는 MAE가 더 적합할 수 있습니다.
+
+- id: step10_r2
+  title: 10단계. R² 평가
+  subtitle: 결정계수
+  blocks:
+  - type: text
+    content: R²(결정계수)는 모델이 타겟 변동의 몇 %를 설명하는지 나타냅니다. 1에 가까울수록 좋고, 0이면 평균만큼도 못 맞추는 것입니다. statsmodels에서 배운 R²와 동일한 개념입니다.
+  - type: code
+    language: python
+    title: R² 계산
+    description: 결정계수 확인
+    content: |-
+      r2 = r2_score(yTest, yPred)
+      f"R²: {r2:.4f}"
+  - type: code
+    language: python
+    title: 평가 지표 종합
+    description: 회귀 평가 요약
+    content: |-
+      metrics = pd.DataFrame({
+          'Metric': ['MSE', 'RMSE', 'MAE', 'R²'],
+          'Value': [mse, rmse, mae, r2]
+      })
+      metrics
+  - type: tip
+    content: R² = 1 - (SS_res / SS_tot). SS_res는 잔차 제곱합, SS_tot은 전체 변동입니다. R²=0.5면 모델이 타겟 변동의 50%를 설명합니다. 음수도 가능하며, 이는 평균보다 못한 모델입니다.
+
+- id: step11_visualize
+  title: 11단계. 시각화
+  subtitle: 예측 vs 실제
+  blocks:
+  - type: text
+    content: 예측값과 실제값을 산점도로 비교합니다. 완벽한 모델이라면 점들이 대각선(y=x) 위에 있어야 합니다.
+  - type: code
+    language: python
+    title: 예측 vs 실제 플롯
+    description: 산점도로 비교
+    content: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      ax.scatter(yTest, yPred, alpha=0.6)
+      ax.plot([yTest.min(), yTest.max()], [yTest.min(), yTest.max()], 'r--', lw=2)
+      ax.set_xlabel('Actual')
+      ax.set_ylabel('Predicted')
+      ax.set_title(f'Actual vs Predicted (R² = {r2:.4f})')
+      fig
+  - type: code
+    language: python
+    title: 잔차 분포
+    description: 잔차 히스토그램
+    content: |-
+      residuals = yTest - yPred
+      fig, ax = plt.subplots(figsize=(8, 5))
+      ax.hist(residuals, bins=30, edgecolor='black')
+      ax.axvline(0, color='r', linestyle='--')
+      ax.set_xlabel('Residual')
+      ax.set_ylabel('Count')
+      ax.set_title('Residual Distribution')
+      fig
+  - type: tip
+    content: 잔차가 0 주변에 대칭적으로 분포하면 좋은 모델입니다. 한쪽으로 치우치거나 패턴이 있으면 모델에 문제가 있을 수 있습니다.
+
+- id: step12_summary
+  title: 12단계. 정리
+  subtitle: 회귀 분석 완료
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 당뇨병 진행도 예측 모델을 만들어 회귀 분석을 학습했습니다. LinearRegression으로 연속값을 예측하고, MSE, MAE, R²로 모델을 평가하는 방법을 배웠습니다. statsmodels에서 배운 R² 개념이 sklearn에서도 동일하게 적용됩니다.
+  - type: code
+    language: python
+    title: 최종 요약
+    description: 주요 결과 정리
+    content: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Model', 'Features', 'MSE', 'R²'],
+          'Value': ['Diabetes (442 samples)', 'LinearRegression', '10', f'{mse:.2f}', f'{r2:.4f}']
+      })
+      summary
+
+- id: practice
+  title: 실습
+  subtitle: 당뇨병 예측 프로젝트
+  blocks:
+  - type: text
+    content: 의료 데이터 분석가가 되어 당뇨병 진행도 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LinearRegression, MSE, R²를 모두 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: BMI 단일 특성으로 예측 vs 전체 특성 비교"
+    code: |-
+      from sklearn.datasets import load_diabetes
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression
+      from sklearn.metrics import r2_score, mean_squared_error
+      import pandas as pd
+      import numpy as np
+
+      data = load_diabetes()
+      xAll = pd.DataFrame(data.data, columns=data.feature_names)
+      xBmi = xAll[['bmi']]
+      yData = data.target
+
+      xTr1, xTe1, yTr1, yTe1 = train_test_split(xAll, yData, test_size=0.2, random_state=42)
+      xTr2, xTe2, yTr2, yTe2 = train_test_split(xBmi, yData, test_size=0.2, random_state=42)
+
+      sc1, sc2 = StandardScaler(), StandardScaler()
+
+      model1 = LinearRegression()
+      model1.fit(sc1.fit_transform(xTr1), yTr1)
+      pred1 = model1.predict(sc1.transform(xTe1))
+
+      model2 = LinearRegression()
+      model2.fit(sc2.fit_transform(xTr2), yTr2)
+      pred2 = model2.predict(sc2.transform(xTe2))
+
+      pd.DataFrame({
+          'Model': ['All Features (10)', 'BMI Only (1)'],
+          'R²': [r2_score(yTe1, pred1), r2_score(yTe2, pred2)],
+          'RMSE': [np.sqrt(mean_squared_error(yTe1, pred1)), np.sqrt(mean_squared_error(yTe2, pred2))]
+      })
+  - type: expansion
+    title: "미션2: 특성별 중요도 분석과 상위 5개 특성 모델"
+    code: |-
+      from sklearn.datasets import load_diabetes
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression
+      from sklearn.metrics import r2_score
+      import pandas as pd
+      import numpy as np
+
+      diabetesData = load_diabetes()
+      xFull = pd.DataFrame(diabetesData.data, columns=diabetesData.feature_names)
+      yFull = diabetesData.target
+
+      xTrF, xTeF, yTrF, yTeF = train_test_split(xFull, yFull, test_size=0.2, random_state=42)
+      scF = StandardScaler()
+      modelF = LinearRegression()
+      modelF.fit(scF.fit_transform(xTrF), yTrF)
+
+      coefAbs = pd.Series(np.abs(modelF.coef_), index=diabetesData.feature_names)
+      top5 = coefAbs.nlargest(5).index.tolist()
+
+      xTop5 = xFull[top5]
+      xTr5, xTe5, yTr5, yTe5 = train_test_split(xTop5, yFull, test_size=0.2, random_state=42)
+      sc5 = StandardScaler()
+      model5 = LinearRegression()
+      model5.fit(sc5.fit_transform(xTr5), yTr5)
+      pred5 = model5.predict(sc5.transform(xTe5))
+
+      predF = modelF.predict(scF.transform(xTeF))
+
+      pd.DataFrame({
+          'Model': ['All 10 Features', f'Top 5: {top5}'],
+          'R²': [r2_score(yTeF, predF), r2_score(yTe5, pred5)]
+      })

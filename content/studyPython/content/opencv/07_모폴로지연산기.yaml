@@ -1,0 +1,420 @@
+meta:
+  id: opencv_07
+  title: 모폴로지연산기
+  order: 7
+  category: opencv
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["OpenCV", "erode", "dilate", "morphologyEx", "모폴로지"]
+  seo:
+    title: "OpenCV 중급 - 모폴로지 연산기"
+    description: "OpenCV erode, dilate, morphologyEx로 이진 이미지의 형태를 변형합니다."
+    keywords: ["OpenCV", "erode", "dilate", "morphologyEx", "모폴로지"]
+
+intro:
+  emoji: "🔲"
+  goal: erode, dilate, morphologyEx로 이진 이미지의 노이즈를 제거하고 형태를 개선합니다.
+  description: 모폴로지(morphology)는 형태학이라는 뜻으로, 이진 이미지에서 객체 형태를 변형합니다. 침식, 팽창, 열기, 닫기 연산을 배웁니다.
+
+sections:
+- id: step1_create
+  title: 1단계. 테스트 이미지 생성
+  subtitle: 합성 이미지
+  blocks:
+  - type: text
+    content: 모폴로지 연산 효과를 명확하게 보기 위해 도형이 있는 합성 이미지를 생성합니다. 노이즈도 추가하여 제거 효과를 확인합니다.
+  - type: code
+    language: python
+    title: 라이브러리와 기본 이미지
+    description: 검은 배경에 흰색 도형을 그립니다
+    content: |-
+      import cv2
+      import numpy as np
+      import matplotlib.pyplot as plt
+
+      base = np.zeros((300, 400), dtype=np.uint8)
+      cv2.rectangle(base, (50, 50), (150, 150), 255, -1)
+      cv2.circle(base, (280, 100), 60, 255, -1)
+      cv2.rectangle(base, (100, 180), (300, 250), 255, -1)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(base, cmap='gray')
+      plt.title('Base Image')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 노이즈 추가
+    description: salt-and-pepper 노이즈를 추가합니다
+    content: |-
+      noisy = base.copy()
+      noise = np.random.random(base.shape)
+      noisy[noise < 0.02] = 255
+      noisy[noise > 0.98] = 0
+      plt.figure(figsize=(8, 6))
+      plt.imshow(noisy, cmap='gray')
+      plt.title('Noisy Image')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 기본 이미지 출력
+    description: 원본과 노이즈 이미지입니다
+    content: |-
+      figBase, axBase = plt.subplots(1, 2, figsize=(10, 4))
+      axBase[0].imshow(base, cmap='gray')
+      axBase[0].set_title('Original')
+      axBase[0].axis('off')
+      axBase[1].imshow(noisy, cmap='gray')
+      axBase[1].set_title('Noisy')
+      axBase[1].axis('off')
+      plt.tight_layout()
+
+- id: step2_kernel
+  title: 2단계. 구조 요소
+  subtitle: getStructuringElement()
+  blocks:
+  - type: text
+    content: 모폴로지 연산에는 커널(kernel) 또는 구조 요소(structuring element)가 필요합니다. 구조 요소는 연산이 적용되는 이웃 픽셀의 패턴을 정의합니다. 사각형, 타원형, 십자형 등 다양한 모양이 있으며, 크기와 모양에 따라 연산 결과가 달라집니다.
+  - type: code
+    language: python
+    title: 사각형 커널
+    description: 3x3 사각형 구조 요소입니다
+    content: |-
+      kernelSmall = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
+      kernelSmall
+  - type: code
+    language: python
+    title: 다양한 커널
+    description: 여러 크기와 모양을 생성합니다
+    content: |-
+      kernelRect = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+      kernelEllipse = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+      kernelCross = cv2.getStructuringElement(cv2.MORPH_CROSS, (5, 5))
+      figKern, axKern = plt.subplots(1, 3, figsize=(9, 3))
+      axKern[0].imshow(kernelRect, cmap='gray')
+      axKern[0].set_title('RECT')
+      axKern[0].axis('off')
+      axKern[1].imshow(kernelEllipse, cmap='gray')
+      axKern[1].set_title('ELLIPSE')
+      axKern[1].axis('off')
+      axKern[2].imshow(kernelCross, cmap='gray')
+      axKern[2].set_title('CROSS')
+      axKern[2].axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: MORPH_RECT는 사각형, MORPH_ELLIPSE는 타원형, MORPH_CROSS는 십자 모양입니다. 커널이 클수록 효과가 강해지지만 디테일이 손실됩니다.
+
+- id: step3_erode
+  title: 3단계. 침식 연산
+  subtitle: erode()
+  blocks:
+  - type: text
+    content: erode()는 침식(erosion) 연산으로, 커널 영역 내 최소값으로 중심 픽셀을 대체합니다. 이진 이미지에서 커널 범위 안에 검은 픽셀(0)이 하나라도 있으면 중심이 검은색이 됩니다. 결과적으로 흰색 영역(전경)이 깎여나가며, 객체 경계가 안쪽으로 수축합니다. 작은 흰색 노이즈 제거나 붙어있는 객체 분리에 사용됩니다.
+  - type: code
+    language: python
+    title: 침식 적용
+    description: 흰색 영역이 줄어듭니다
+    content: |-
+      eroded = cv2.erode(noisy, kernelSmall, iterations=1)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(eroded, cmap='gray')
+      plt.title('Eroded')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 반복 침식
+    description: iterations로 반복 횟수를 지정합니다
+    content: |-
+      erodedTwice = cv2.erode(noisy, kernelSmall, iterations=2)
+      erodedThrice = cv2.erode(noisy, kernelSmall, iterations=3)
+      figEr, axEr = plt.subplots(1, 2, figsize=(10, 4))
+      axEr[0].imshow(erodedTwice, cmap='gray')
+      axEr[0].set_title('Erode x2')
+      axEr[0].axis('off')
+      axEr[1].imshow(erodedThrice, cmap='gray')
+      axEr[1].set_title('Erode x3')
+      axEr[1].axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: iterations=2는 침식을 2번 반복합니다. 반복할수록 흰색 영역이 더 많이 축소됩니다. 큰 커널과 적은 반복 또는 작은 커널과 많은 반복을 선택할 수 있습니다.
+  - type: code
+    language: python
+    title: 침식 비교
+    description: 반복 횟수에 따른 차이입니다
+    content: |-
+      figErode, axErode = plt.subplots(1, 4, figsize=(14, 4))
+      axErode[0].imshow(noisy, cmap='gray')
+      axErode[0].set_title('Noisy')
+      axErode[0].axis('off')
+      axErode[1].imshow(eroded, cmap='gray')
+      axErode[1].set_title('Erode x1')
+      axErode[1].axis('off')
+      axErode[2].imshow(erodedTwice, cmap='gray')
+      axErode[2].set_title('Erode x2')
+      axErode[2].axis('off')
+      axErode[3].imshow(erodedThrice, cmap='gray')
+      axErode[3].set_title('Erode x3')
+      axErode[3].axis('off')
+      plt.tight_layout()
+
+- id: step4_dilate
+  title: 4단계. 팽창 연산
+  subtitle: dilate()
+  blocks:
+  - type: text
+    content: dilate()는 팽창(dilation) 연산으로, 커널 영역 내 최대값으로 중심 픽셀을 대체합니다. 이진 이미지에서 커널 범위 안에 흰 픽셀(255)이 하나라도 있으면 중심이 흰색이 됩니다. 결과적으로 흰색 영역(전경)이 바깥으로 확장됩니다. 끊어진 선 연결, 작은 구멍 채우기, 객체 강조에 사용됩니다.
+  - type: code
+    language: python
+    title: 팽창 적용
+    description: 흰색 영역이 늘어납니다
+    content: |-
+      dilated = cv2.dilate(noisy, kernelSmall, iterations=1)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(dilated, cmap='gray')
+      plt.title('Dilated')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 반복 팽창
+    description: iterations로 반복 횟수를 지정합니다
+    content: |-
+      dilatedTwice = cv2.dilate(noisy, kernelSmall, iterations=2)
+      dilatedThrice = cv2.dilate(noisy, kernelSmall, iterations=3)
+      figDil, axDil = plt.subplots(1, 2, figsize=(10, 4))
+      axDil[0].imshow(dilatedTwice, cmap='gray')
+      axDil[0].set_title('Dilate x2')
+      axDil[0].axis('off')
+      axDil[1].imshow(dilatedThrice, cmap='gray')
+      axDil[1].set_title('Dilate x3')
+      axDil[1].axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 팽창 비교
+    description: 반복 횟수에 따른 차이입니다
+    content: |-
+      figDilate, axDilate = plt.subplots(1, 4, figsize=(14, 4))
+      axDilate[0].imshow(noisy, cmap='gray')
+      axDilate[0].set_title('Noisy')
+      axDilate[0].axis('off')
+      axDilate[1].imshow(dilated, cmap='gray')
+      axDilate[1].set_title('Dilate x1')
+      axDilate[1].axis('off')
+      axDilate[2].imshow(dilatedTwice, cmap='gray')
+      axDilate[2].set_title('Dilate x2')
+      axDilate[2].axis('off')
+      axDilate[3].imshow(dilatedThrice, cmap='gray')
+      axDilate[3].set_title('Dilate x3')
+      axDilate[3].axis('off')
+      plt.tight_layout()
+
+- id: step5_open
+  title: 5단계. 열기 연산
+  subtitle: MORPH_OPEN
+  blocks:
+  - type: text
+    content: 열기(Opening)는 침식(erode) 후 팽창(dilate)을 수행하는 연산입니다. 먼저 침식으로 작은 흰색 노이즈를 제거한 후, 팽창으로 원래 객체 크기를 복원합니다. 노이즈는 사라지고 큰 객체는 유지됩니다. 이름의 유래는 연산 후 객체 사이의 좁은 연결이 '열리기(open)' 때문입니다.
+  - type: code
+    language: python
+    title: 열기 연산
+    description: 침식 후 팽창을 수행합니다
+    content: |-
+      opened = cv2.morphologyEx(noisy, cv2.MORPH_OPEN, kernelSmall)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(opened, cmap='gray')
+      plt.title('Opened')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: morphologyEx()는 다양한 모폴로지 연산을 수행합니다. MORPH_OPEN은 erode 후 dilate와 동일합니다. 한 번의 호출로 두 연산을 처리합니다.
+  - type: code
+    language: python
+    title: 열기와 수동 연산 비교
+    description: morphologyEx와 직접 구현을 비교합니다
+    content: |-
+      manualOpen = cv2.dilate(cv2.erode(noisy, kernelSmall), kernelSmall)
+      diff = cv2.absdiff(opened, manualOpen)
+      figDiff, axDiff = plt.subplots(1, 2, figsize=(10, 4))
+      axDiff[0].imshow(opened, cmap='gray')
+      axDiff[0].set_title('morphologyEx OPEN')
+      axDiff[0].axis('off')
+      axDiff[1].imshow(manualOpen, cmap='gray')
+      axDiff[1].set_title(f'Manual (diff max={diff.max()})')
+      axDiff[1].axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 열기 결과
+    description: 흰색 노이즈가 제거됩니다
+    content: |-
+      figOpen, axOpen = plt.subplots(1, 3, figsize=(12, 4))
+      axOpen[0].imshow(noisy, cmap='gray')
+      axOpen[0].set_title('Noisy')
+      axOpen[0].axis('off')
+      axOpen[1].imshow(opened, cmap='gray')
+      axOpen[1].set_title('Opening')
+      axOpen[1].axis('off')
+      axOpen[2].imshow(base, cmap='gray')
+      axOpen[2].set_title('Original')
+      axOpen[2].axis('off')
+      plt.tight_layout()
+
+- id: step6_close
+  title: 6단계. 닫기 연산
+  subtitle: MORPH_CLOSE
+  blocks:
+  - type: text
+    content: 닫기(Closing)는 팽창(dilate) 후 침식(erode)을 수행하는 연산입니다. 먼저 팽창으로 작은 구멍이나 틈을 채운 후, 침식으로 원래 객체 크기를 복원합니다. 객체 내부의 검은 구멍이 사라집니다. 이름의 유래는 연산 후 객체 내부의 작은 구멍이 '닫히기(close)' 때문입니다.
+  - type: code
+    language: python
+    title: 닫기 연산
+    description: 팽창 후 침식을 수행합니다
+    content: |-
+      closed = cv2.morphologyEx(noisy, cv2.MORPH_CLOSE, kernelSmall)
+      plt.figure(figsize=(8, 6))
+      plt.imshow(closed, cmap='gray')
+      plt.title('Closed')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 열기와 닫기 비교
+    description: 두 연산의 효과를 비교합니다
+    content: |-
+      figClose, axClose = plt.subplots(1, 3, figsize=(12, 4))
+      axClose[0].imshow(noisy, cmap='gray')
+      axClose[0].set_title('Noisy')
+      axClose[0].axis('off')
+      axClose[1].imshow(opened, cmap='gray')
+      axClose[1].set_title('Opening')
+      axClose[1].axis('off')
+      axClose[2].imshow(closed, cmap='gray')
+      axClose[2].set_title('Closing')
+      axClose[2].axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 열기 + 닫기 조합
+    description: 두 연산을 순차 적용합니다
+    content: |-
+      cleaned = cv2.morphologyEx(opened, cv2.MORPH_CLOSE, kernelSmall)
+      figClean, axClean = plt.subplots(1, 2, figsize=(10, 4))
+      axClean[0].imshow(noisy, cmap='gray')
+      axClean[0].set_title('Noisy')
+      axClean[0].axis('off')
+      axClean[1].imshow(cleaned, cmap='gray')
+      axClean[1].set_title('Open + Close')
+      axClean[1].axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: 열기로 외부 노이즈를 제거하고 닫기로 내부 구멍을 메우면 깔끔한 결과를 얻습니다. 순서에 따라 결과가 달라질 수 있습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 모폴로지 프로젝트
+  blocks:
+  - type: text
+    content: 실제 이미지에 모폴로지 연산을 적용해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: flower 이진화 후 정제"
+    blocks:
+    - type: code
+      title: "이미지 로드 및 이진화"
+      content: |-
+        import cv2
+        import numpy as np
+        from sklearn.datasets import load_sample_image
+        import matplotlib.pyplot as plt
+
+        flower = load_sample_image('flower.jpg')
+        flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+        flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
+        retF, flowerBin = cv2.threshold(flowerGray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        plt.imshow(flower)
+        plt.axis('off')
+    - type: code
+      title: "모폴로지 적용"
+      content: |-
+        krnl = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        flowerOpen = cv2.morphologyEx(flowerBin, cv2.MORPH_OPEN, krnl)
+        flowerClean = cv2.morphologyEx(flowerOpen, cv2.MORPH_CLOSE, krnl)
+        figFl, axFl = plt.subplots(1, 2, figsize=(10, 4))
+        axFl[0].imshow(flowerOpen, cmap='gray')
+        axFl[0].set_title('After Opening')
+        axFl[0].axis('off')
+        axFl[1].imshow(flowerClean, cmap='gray')
+        axFl[1].set_title('After Closing')
+        axFl[1].axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "결과 비교"
+      content: |-
+        figFlower, axFlower = plt.subplots(1, 3, figsize=(12, 4))
+        axFlower[0].imshow(flowerBin, cmap='gray')
+        axFlower[0].set_title('Binary')
+        axFlower[0].axis('off')
+        axFlower[1].imshow(flowerOpen, cmap='gray')
+        axFlower[1].set_title('After Opening')
+        axFlower[1].axis('off')
+        axFlower[2].imshow(flowerClean, cmap='gray')
+        axFlower[2].set_title('After Closing')
+        axFlower[2].axis('off')
+        plt.tight_layout()
+  - type: expansion
+    title: "미션2: 커널 모양 비교"
+    blocks:
+    - type: code
+      title: "테스트 이미지 생성"
+      content: |-
+        import cv2
+        import numpy as np
+        import matplotlib.pyplot as plt
+
+        testImg = np.zeros((200, 300), dtype=np.uint8)
+        cv2.circle(testImg, (100, 100), 40, 255, -1)
+        cv2.rectangle(testImg, (180, 60), (260, 140), 255, -1)
+        noise = np.random.random(testImg.shape)
+        testImg[noise < 0.03] = 255
+        plt.imshow(testImg, cmap='gray')
+        plt.axis('off')
+    - type: code
+      title: "다른 커널로 열기"
+      content: |-
+        kRect = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+        kEllip = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (5, 5))
+        kCross = cv2.getStructuringElement(cv2.MORPH_CROSS, (5, 5))
+        openRect = cv2.morphologyEx(testImg, cv2.MORPH_OPEN, kRect)
+        openEllip = cv2.morphologyEx(testImg, cv2.MORPH_OPEN, kEllip)
+        openCross = cv2.morphologyEx(testImg, cv2.MORPH_OPEN, kCross)
+        figOp, axOp = plt.subplots(1, 3, figsize=(12, 4))
+        axOp[0].imshow(openRect, cmap='gray')
+        axOp[0].set_title('RECT')
+        axOp[0].axis('off')
+        axOp[1].imshow(openEllip, cmap='gray')
+        axOp[1].set_title('ELLIPSE')
+        axOp[1].axis('off')
+        axOp[2].imshow(openCross, cmap='gray')
+        axOp[2].set_title('CROSS')
+        axOp[2].axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "커널별 비교"
+      content: |-
+        figKernel, axKernel = plt.subplots(2, 2, figsize=(10, 8))
+        axKernel[0, 0].imshow(testImg, cmap='gray')
+        axKernel[0, 0].set_title('Noisy')
+        axKernel[0, 0].axis('off')
+        axKernel[0, 1].imshow(openRect, cmap='gray')
+        axKernel[0, 1].set_title('MORPH_RECT')
+        axKernel[0, 1].axis('off')
+        axKernel[1, 0].imshow(openEllip, cmap='gray')
+        axKernel[1, 0].set_title('MORPH_ELLIPSE')
+        axKernel[1, 0].axis('off')
+        axKernel[1, 1].imshow(openCross, cmap='gray')
+        axKernel[1, 1].set_title('MORPH_CROSS')
+        axKernel[1, 1].axis('off')
+        plt.tight_layout()

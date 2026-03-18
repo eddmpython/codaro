@@ -1,0 +1,444 @@
+meta:
+  id: "17_string"
+  title: "string - 문자열 도구"
+  category: "builtins"
+  tags: ["string", "템플릿", "상수", "검증"]
+  seo:
+    title: "파이썬 string 모듈 완전 정복"
+    description: "string 모듈의 상수, Template, Formatter를 배웁니다."
+    keywords: ["string", "문자열", "Template", "ascii", "digits", "파이썬string"]
+
+intro:
+  emoji: "📝"
+  points:
+  - "문자열 상수 활용"
+  - "Template으로 간편한 치환"
+  - "커스텀 Formatter"
+  - "검증과 생성 패턴"
+
+sections:
+- id: "module_import"
+  title: "string 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "string은 파이썬 표준 라이브러리입니다. 문자열 처리에 유용한 상수와 도구를 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 string 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "string 모듈 불러오기"
+    description: "string 모듈을 불러옵니다."
+    content: |-
+      import string
+
+      'string 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "string_constants"
+  title: "문자열 상수"
+  subtitle: "ascii_letters, digits, punctuation"
+  blocks:
+  - type: "text"
+    content: "string 모듈은 자주 사용하는 문자 집합을 미리 정의한 상수를 제공합니다. ascii_letters는 모든 영문자, digits는 숫자, punctuation은 특수문자를 포함합니다. 입력 검증, 랜덤 문자열 생성, 비밀번호 정책에 활용됩니다."
+  - type: "list"
+    items:
+    - "ascii_letters: 영문 대소문자 (a-z, A-Z)"
+    - "ascii_lowercase: 소문자 (a-z)"
+    - "ascii_uppercase: 대문자 (A-Z)"
+    - "digits: 숫자 (0-9)"
+    - "punctuation: 특수문자"
+    - "whitespace: 공백 문자"
+  - type: "code"
+    language: "python"
+    title: "모든 영문자"
+    description: "대소문자 영문자 전체를 확인합니다."
+    content: |-
+      allLetters = string.ascii_letters
+      allLetters
+  - type: "code"
+    language: "python"
+    title: "숫자 문자"
+    description: "0부터 9까지 숫자 문자를 확인합니다."
+    content: |-
+      digitChars = string.digits
+      digitChars
+  - type: "code"
+    language: "python"
+    title: "특수문자"
+    description: "모든 특수문자를 확인합니다."
+    content: |-
+      specialChars = string.punctuation
+      specialChars
+  - type: "code"
+    language: "python"
+    title: "대문자와 소문자"
+    description: "대문자와 소문자를 각각 확인합니다."
+    content: |-
+      uppercase = string.ascii_uppercase
+      lowercase = string.ascii_lowercase
+      uppercase, lowercase
+  - type: "code"
+    language: "python"
+    title: "공백 문자"
+    description: "모든 공백 문자를 확인합니다."
+    content: |-
+      spaceChars = string.whitespace
+      repr(spaceChars)
+  - type: "tip"
+    content: "이 상수들은 불변 문자열이므로 직접 수정할 수 없습니다. 필요하면 복사해서 사용하세요."
+
+- id: "character_validation"
+  title: "문자 검증"
+  subtitle: "입력 유효성 검사"
+  blocks:
+  - type: "text"
+    content: "string 상수를 활용하여 입력 문자열을 검증할 수 있습니다. 문자열이 특정 문자 집합으로만 구성되어 있는지 확인하거나, 허용되지 않은 문자가 포함되어 있는지 검사합니다. 사용자 입력 검증, 데이터 정제에 필수적입니다."
+  - type: "list"
+    items:
+    - "set 연산으로 포함 여부 확인"
+    - "all()로 모든 문자 검사"
+    - "any()로 하나라도 포함 확인"
+    - "보안과 데이터 품질"
+  - type: "code"
+    language: "python"
+    title: "숫자만 포함"
+    description: "문자열이 숫자로만 구성되어 있는지 확인합니다."
+    content: |-
+      inputText = '12345'
+      isOnlyDigits = all(c in string.digits for c in inputText)
+      isOnlyDigits
+  - type: "code"
+    language: "python"
+    title: "영문자만 포함"
+    description: "문자열이 영문자로만 구성되어 있는지 확인합니다."
+    content: |-
+      userName = 'Alice'
+      isOnlyLetters = all(c in string.ascii_letters for c in userName)
+      isOnlyLetters
+  - type: "code"
+    language: "python"
+    title: "특수문자 포함 여부"
+    description: "문자열에 특수문자가 포함되어 있는지 확인합니다."
+    content: |-
+      password = 'Pass123!'
+      hasSpecial = any(c in string.punctuation for c in password)
+      hasSpecial
+  - type: "tip"
+    content: "보안이 중요한 경우 secrets 모듈로 비밀번호를 생성하세요. random은 예측 가능합니다."
+
+- id: "template_strings"
+  title: "템플릿 문자열"
+  subtitle: "Template으로 치환"
+  blocks:
+  - type: "text"
+    content: "string.Template은 $변수명 형식의 간단한 문자열 템플릿을 제공합니다. substitute()로 값을 치환하고, safe_substitute()는 누락된 변수를 그대로 둡니다. 설정 파일, 이메일 템플릿, 보고서 생성에 유용합니다."
+  - type: "list"
+    items:
+    - "Template('$변수'): 템플릿 생성"
+    - "substitute(변수=값): 치환"
+    - "safe_substitute(): 안전한 치환"
+    - "$$ → $ (이스케이프)"
+  - type: "code"
+    language: "python"
+    title: "기본 템플릿"
+    description: "간단한 변수 치환을 수행합니다."
+    content: |-
+      greetTemplate = string.Template('Hello, $name!')
+      greetMessage = greetTemplate.substitute(name='Alice')
+      greetMessage
+  - type: "code"
+    language: "python"
+    title: "여러 변수 치환"
+    description: "템플릿에서 여러 변수를 치환합니다."
+    content: |-
+      msgTemplate = string.Template('$user님, $count개의 메시지가 있습니다.')
+      userMessage = msgTemplate.substitute(user='김철수', count=5)
+      userMessage
+  - type: "code"
+    language: "python"
+    title: "안전한 치환"
+    description: "누락된 변수가 있어도 에러 없이 처리합니다."
+    content: |-
+      reportTemplate = string.Template('이름: $name, 나이: $age')
+      partialReport = reportTemplate.safe_substitute(name='Bob')
+      partialReport
+  - type: "tip"
+    content: "f-string이나 format()보다 간단하지만 기능이 제한적입니다. 복잡한 포맷팅은 f-string을 사용하세요."
+
+- id: "formatter"
+  title: "커스텀 포매터"
+  subtitle: "Formatter 클래스"
+  blocks:
+  - type: "text"
+    content: "string.Formatter는 format() 메서드의 동작을 커스터마이즈할 수 있습니다. vformat()으로 직접 포맷팅하고, parse()로 포맷 문자열을 분석합니다. 도메인 특화 포맷팅, 다국어 지원, 커스텀 변환에 활용됩니다."
+  - type: "list"
+    items:
+    - "Formatter(): 포매터 인스턴스"
+    - "vformat(포맷, args, kwargs): 포맷팅"
+    - "parse(포맷): 파싱"
+    - "커스텀 변환 가능"
+  - type: "code"
+    language: "python"
+    title: "기본 포매터"
+    description: "Formatter로 문자열을 포맷팅합니다."
+    content: |-
+      formatter = string.Formatter()
+      formattedText = formatter.vformat('{0}님의 점수: {1}', ('Alice', 95), {})
+      formattedText
+  - type: "code"
+    language: "python"
+    title: "키워드 인자"
+    description: "키워드 인자로 포맷팅합니다."
+    content: |-
+      kwFormatter = string.Formatter()
+      kwResult = kwFormatter.vformat('{name}: {score}점', (), {'name': 'Bob', 'score': 88})
+      kwResult
+  - type: "code"
+    language: "python"
+    title: "포맷 파싱"
+    description: "포맷 문자열을 파싱하여 구조를 분석합니다."
+    content: |-
+      parseFormatter = string.Formatter()
+      parsedParts = list(parseFormatter.parse('Hello {name}, you have {count} messages'))
+      len(parsedParts)
+  - type: "tip"
+    content: "대부분의 경우 f-string이나 .format()이 더 편리합니다. Formatter는 고급 커스터마이징이 필요할 때만 사용하세요."
+
+- id: "utilities"
+  title: "유틸리티 함수"
+  subtitle: "capwords 등"
+  blocks:
+  - type: "text"
+    content: "string 모듈은 문자열 처리 유틸리티 함수를 제공합니다. capwords()는 각 단어의 첫 글자를 대문자로 변환합니다. str 메서드와 유사하지만 미묘한 차이가 있어 특정 상황에서 유용합니다."
+  - type: "list"
+    items:
+    - "capwords(text, sep): 단어 첫글자 대문자"
+    - "구분자 커스터마이즈"
+    - "여러 공백 처리"
+    - "제목 포맷팅"
+  - type: "code"
+    language: "python"
+    title: "단어 첫글자 대문자"
+    description: "문장의 각 단어 첫 글자를 대문자로 변환합니다."
+    content: |-
+      sentence = 'hello world from python'
+      titleCased = string.capwords(sentence)
+      titleCased
+  - type: "code"
+    language: "python"
+    title: "여러 공백 처리"
+    description: "여러 공백이 있어도 올바르게 처리합니다."
+    content: |-
+      multiSpace = 'hello   world'
+      normalized = string.capwords(multiSpace)
+      normalized
+  - type: "code"
+    language: "python"
+    title: "커스텀 구분자"
+    description: "공백 외 다른 구분자를 지정할 수 있습니다."
+    content: |-
+      hyphenText = 'hello-world-python'
+      hyphenCapped = string.capwords(hyphenText, sep='-')
+      hyphenCapped
+  - type: "tip"
+    content: "str.title()과 비슷하지만 capwords()는 여러 공백을 하나로 정규화합니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "검증, 생성, 템플릿"
+  blocks:
+  - type: "text"
+    content: "실무에서 자주 사용하는 string 모듈 활용 패턴을 살펴봅니다. 비밀번호 생성, 입력 검증, 이메일 템플릿, 식별자 생성 등 다양한 시나리오에서 string을 효과적으로 사용할 수 있습니다."
+  - type: "list"
+    items:
+    - "랜덤 문자열 생성"
+    - "입력 검증 패턴"
+    - "템플릿 기반 메시지"
+    - "식별자 생성"
+  - type: "code"
+    language: "python"
+    title: "랜덤 문자열 생성"
+    description: "영문자와 숫자로 랜덤 문자열을 만듭니다."
+    content: |-
+      import random
+      charset = string.ascii_letters + string.digits
+      randomString = ''.join(random.choices(charset, k=8))
+      randomString
+  - type: "code"
+    language: "python"
+    title: "비밀번호 정책 검증"
+    description: "비밀번호가 정책을 만족하는지 확인합니다."
+    content: |-
+      passwordInput = 'Pass123!'
+      hasUpper = any(c in string.ascii_uppercase for c in passwordInput)
+      hasLower = any(c in string.ascii_lowercase for c in passwordInput)
+      hasDigit = any(c in string.digits for c in passwordInput)
+      hasSpecial = any(c in string.punctuation for c in passwordInput)
+      isValid = hasUpper and hasLower and hasDigit and hasSpecial
+      isValid
+  - type: "code"
+    language: "python"
+    title: "이메일 템플릿"
+    description: "이메일 본문을 템플릿으로 생성합니다."
+    content: |-
+      emailTemplate = string.Template('''
+      안녕하세요 $name님,
+
+      $product 구매가 완료되었습니다.
+      결제 금액: $price원
+
+      감사합니다.
+      ''')
+      emailBody = emailTemplate.substitute(name='홍길동', product='노트북', price='1,200,000')
+      emailBody
+  - type: "tip"
+    content: "보안이 중요한 비밀번호 생성은 secrets.choice()를 사용하세요."
+
+- id: "practice"
+  title: "string 모듈 종합 복습"
+  subtitle: "문자열 도구 마스터하기"
+  blocks:
+  - type: "text"
+    content: "string 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 영문자 상수"
+    code: |-
+      letters = string.ascii_letters
+      len(letters)
+
+  - type: "expansion"
+    title: "🟢 기본2: 숫자 상수"
+    code: |-
+      nums = string.digits
+      nums
+
+  - type: "expansion"
+    title: "🟢 기본3: 특수문자 상수"
+    code: |-
+      punct = string.punctuation
+      len(punct)
+
+  - type: "expansion"
+    title: "🟢 기본4: 기본 템플릿"
+    code: |-
+      t = string.Template('Hi $name')
+      msg = t.substitute(name='Alice')
+      msg
+
+  - type: "expansion"
+    title: "🟢 기본5: capwords"
+    code: |-
+      text = 'hello world'
+      capped = string.capwords(text)
+      capped
+
+  - type: "expansion"
+    title: "🟡 응용1: 숫자 검증"
+    code: |-
+      inp = '12345'
+      isDigit = all(c in string.digits for c in inp)
+      isDigit
+
+  - type: "expansion"
+    title: "🟡 응용2: 영문자 검증"
+    code: |-
+      word = 'Python'
+      isAlpha = all(c in string.ascii_letters for c in word)
+      isAlpha
+
+  - type: "expansion"
+    title: "🟡 응용3: 특수문자 포함"
+    code: |-
+      pw = 'abc123!'
+      hasSpec = any(c in string.punctuation for c in pw)
+      hasSpec
+
+  - type: "expansion"
+    title: "🟡 응용4: 안전한 템플릿"
+    code: |-
+      tmpl = string.Template('$a and $b')
+      safe = tmpl.safe_substitute(a='X')
+      safe
+
+  - type: "expansion"
+    title: "🟡 응용5: 대소문자 조합"
+    code: |-
+      upper = string.ascii_uppercase
+      lower = string.ascii_lowercase
+      len(upper), len(lower)
+
+  - type: "expansion"
+    title: "🔴 심화1: 랜덤 코드 생성"
+    code: |-
+      import random
+      chars = string.ascii_uppercase + string.digits
+      code = ''.join(random.choices(chars, k=6))
+      len(code)
+
+  - type: "expansion"
+    title: "🔴 심화2: 비밀번호 검증"
+    code: |-
+      testPw = 'Abc123!'
+      chkUpper = any(c in string.ascii_uppercase for c in testPw)
+      chkDigit = any(c in string.digits for c in testPw)
+      chkSpec = any(c in string.punctuation for c in testPw)
+      chkUpper and chkDigit and chkSpec
+
+  - type: "expansion"
+    title: "🔴 심화3: 다중 변수 템플릿"
+    code: |-
+      multiTmpl = string.Template('$x + $y = $z')
+      result = multiTmpl.substitute(x=10, y=20, z=30)
+      result
+
+  - type: "expansion"
+    title: "🔴 심화4: 커스텀 구분자"
+    code: |-
+      dashText = 'hello-world-python'
+      dashCap = string.capwords(dashText, sep='-')
+      dashCap
+
+  - type: "expansion"
+    title: "🔴 심화5: 영숫자 검증"
+    code: |-
+      alphaNum = 'ABC123'
+      validChars = string.ascii_letters + string.digits
+      isAlphaNum = all(c in validChars for c in alphaNum)
+      isAlphaNum
+
+  - type: "expansion"
+    title: "🔴 심화6: Formatter 사용"
+    code: |-
+      fmt = string.Formatter()
+      output = fmt.vformat('{0} is {1}', ('Python', 'awesome'), {})
+      output
+
+  - type: "expansion"
+    title: "🔴 심화7: 공백 정규화"
+    code: |-
+      spaces = 'hello    world'
+      normalized = string.capwords(spaces)
+      normalized
+
+  - type: "expansion"
+    title: "🔴 심화8: 문자 집합 크기"
+    code: |-
+      allPrintable = string.ascii_letters + string.digits + string.punctuation
+      len(allPrintable)
+
+  - type: "expansion"
+    title: "🔴 심화9: 템플릿 이스케이프"
+    code: |-
+      escTmpl = string.Template('Price: $$$amount')
+      escResult = escTmpl.substitute(amount='100')
+      escResult
+
+  - type: "expansion"
+    title: "🔴 심화10: 문자 필터링"
+    code: |-
+      mixedInput = 'Hello123!@#'
+      onlyLetters = ''.join(c for c in mixedInput if c in string.ascii_letters)
+      onlyLetters

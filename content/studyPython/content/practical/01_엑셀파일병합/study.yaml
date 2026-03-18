@@ -1,0 +1,450 @@
+meta:
+  title: 엑셀파일 병합
+  practical: true
+  appPath: 01_엑셀파일병합
+  category: 파일처리
+  tags: [엑셀, 병합, pandas, BytesIO, concat]
+
+intro:
+  emoji: "📁"
+  title: 엑셀파일 병합
+  goal: "여러 엑셀 파일을 하나로 합치는 자동화 도구의 핵심 코드를 이해합니다."
+  description: "매월 여러 부서에서 받는 엑셀 파일을 일일이 복사-붙여넣기 하셨나요? Python pandas의 concat() 함수 하나로 수십 개 파일을 3초 만에 병합할 수 있습니다. 이 학습에서는 실제 동작하는 앱의 코드를 단계별로 분석하며, 여러분의 업무에 바로 적용할 수 있는 자동화 스킬을 익힙니다."
+  prerequisites:
+    - text: "리스트 기초"
+      url: "/study/30days/day07_리스트기초"
+    - text: "조건문"
+      url: "/study/30days/day13_조건문"
+    - text: "반복문"
+      url: "/study/30days/day14_반복문"
+    - text: "예외처리"
+      url: "/study/30days/day20_예외처리"
+
+sections:
+  - id: whatWeWillDo
+    title: 뭘 만들 건가요?
+    subtitle: 엑셀 파일 여러 개를 하나로 합치는 도구
+    blocks:
+    - type: text
+      content: "매월 10개 부서에서 엑셀 파일을 받아서 하나로 합쳐야 한다면? 일일이 복사-붙여넣기 하시나요? Python으로 3초 만에 끝낼 수 있습니다. 이 학습에서 그 코드를 단계별로 만들어봅니다."
+
+    - type: compare
+      left:
+        icon: "😫"
+        title: 수작업
+        subtitle: 매번 반복
+        items:
+          - "파일 열기 → 복사 → 붙여넣기"
+          - "10개 파일이면 30분"
+          - "실수하면 처음부터"
+      right:
+        icon: "🚀"
+        title: Python 자동화
+        subtitle: 한 번 만들면 끝
+        items:
+          - "코드 실행 한 번이면 끝"
+          - "100개 파일도 3초"
+          - "항상 정확한 결과"
+
+  - id: marimoImport
+    title: marimo 임포트
+    subtitle: 노트북 UI를 만드는 라이브러리
+    blocks:
+    - type: text
+      content: "marimo는 Python으로 인터랙티브 웹 애플리케이션을 만드는 노트북 라이브러리입니다. Jupyter와 비슷하지만 셀 간 의존성을 자동으로 관리하고, 웹앱으로 바로 배포할 수 있다는 장점이 있습니다. mo.ui.radio()로 라디오 버튼을, mo.ui.file()로 파일 업로드 UI를 만들 수 있고, 이 앱에서 사용하는 모든 mo. 함수는 marimo 라이브러리에서 제공됩니다."
+
+    - type: code
+      title: marimo 불러오기
+      content: |-
+        import marimo as mo
+
+    - type: tip
+      content: "as mo로 별명을 붙여서 mo.ui.radio() 처럼 짧게 사용합니다."
+
+  - id: pandasImport
+    title: pandas 임포트
+    subtitle: 엑셀을 다루는 라이브러리
+    blocks:
+    - type: text
+      content: "pandas는 Python에서 가장 널리 사용되는 데이터 분석 라이브러리입니다. 엑셀처럼 행과 열로 이루어진 표 형태의 데이터(DataFrame)를 다루는데 특화되어 있습니다. pd.read_excel()로 엑셀 파일을 읽고, pd.concat()으로 여러 데이터를 합치고, to_excel()로 엑셀 파일을 저장할 수 있습니다. 이 앱의 핵심 기능은 모두 pandas가 담당합니다."
+
+    - type: code
+      title: pandas 불러오기
+      content: |-
+        import pandas as pd
+
+    - type: tip
+      content: "as pd로 별명을 붙여서 pd.read_excel() 처럼 짧게 사용합니다."
+
+  - id: bytesioImport
+    title: BytesIO 임포트
+    subtitle: 메모리에서 파일 다루기
+    blocks:
+    - type: text
+      content: "웹 브라우저에서 파일을 업로드하면 실제 파일이 아닌 바이트(bytes) 데이터로 전달됩니다. 문제는 pandas의 read_excel()이 파일 경로나 파일 객체를 받는다는 것인데, BytesIO가 이 문제를 해결합니다. BytesIO는 메모리에 있는 바이트 데이터를 마치 실제 파일처럼 다룰 수 있게 해주는 래퍼입니다. BytesIO(content)로 감싸면 pandas가 파일처럼 읽을 수 있습니다. openpyxl은 pandas가 엑셀 파일을 쓸 때 내부적으로 사용하는 엔진입니다."
+
+    - type: code
+      title: BytesIO와 openpyxl 불러오기
+      content: |-
+        from io import BytesIO
+        import openpyxl
+
+    - type: tip
+      content: "openpyxl은 직접 호출하진 않지만 pandas의 to_excel()이 내부적으로 사용합니다."
+
+  - id: mergeDirectionUI
+    title: 병합 방향 선택
+    subtitle: 라디오 버튼 UI
+    blocks:
+    - type: text
+      content: "엑셀 병합에는 두 가지 방향이 있습니다. 수직 병합(vertical)은 같은 열 구조를 가진 파일들의 행을 아래로 쌓는 방식입니다. 예를 들어 1월 매출, 2월 매출, 3월 매출 파일을 합쳐서 연간 매출 데이터를 만들 때 사용합니다. 수평 병합(horizontal)은 열을 옆으로 붙이는 방식으로, 같은 행을 가진 데이터에 추가 정보를 붙일 때 사용합니다. 나중에 다른 UI와 함께 배치하겠지만, 지금 만든 컴포넌트가 어떻게 생겼는지 먼저 확인해봅시다."
+
+    - type: code
+      title: 라디오 버튼 만들기
+      content: |-
+        mergeDirection = mo.ui.radio(
+            options={"vertical": "📥 수직 병합 (행 추가)", "horizontal": "📤 수평 병합 (열 추가)"},
+            value="vertical",
+            label="🔀 병합 방향 : ",
+            inline=True
+        )
+        mergeDirection
+
+    - type: tip
+      content: "options의 왼쪽(vertical)이 실제 값, 오른쪽이 화면에 보이는 텍스트입니다."
+
+  - id: fileUploadUI
+    title: 파일 업로드 영역
+    subtitle: 드래그 앤 드롭 UI
+    blocks:
+    - type: text
+      content: "사용자가 병합할 엑셀 파일들을 업로드할 수 있는 UI를 만듭니다. mo.ui.file()은 marimo의 파일 업로드 컴포넌트입니다. filetypes로 허용할 파일 확장자를 지정하고, multiple=True로 여러 파일 동시 선택을 허용합니다. kind='area'를 설정하면 드래그 앤 드롭이 가능한 넓은 영역이 생성되어 사용자 경험이 좋아집니다. 마찬가지로 지금 만든 업로드 영역이 어떻게 보이는지 바로 확인해봅시다."
+
+    - type: code
+      title: 파일 업로드 영역 만들기
+      content: |-
+        fileUpload = mo.ui.file(
+            filetypes=[".xlsx", ".xls"],
+            multiple=True,
+            kind="area",
+            label="엑셀 파일들을 여기에 드래그하거나 클릭해서 선택하세요"
+        )
+        fileUpload
+
+    - type: tip
+      content: "filetypes로 엑셀 파일(.xlsx, .xls)만 허용합니다. kind='area'는 드래그 앤 드롭 영역을 생성합니다."
+
+  - id: uiLayout
+    title: UI 배치
+    subtitle: vstack으로 수직 정렬
+    blocks:
+    - type: text
+      content: "앞에서 만든 mergeDirection(병합 방향 선택)과 fileUpload(파일 업로드 영역)를 화면에 배치합니다. mo.vstack()은 전달받은 컴포넌트들을 위에서 아래로 수직 배치합니다. marimo에서 UI를 화면에 표시하려면 반드시 셀의 마지막 줄에 출력해야 합니다. 리스트로 묶어서 vstack에 전달하면 순서대로 렌더링됩니다."
+
+    - type: code
+      title: 수직 배치
+      content: |-
+        mo.vstack([mergeDirection, fileUpload])
+
+    - type: tip
+      content: "vstack은 vertical stack. 수평 배치는 mo.hstack()."
+
+  - id: readAndProcessFiles
+    title: 파일 읽기 및 처리
+    subtitle: 업로드된 파일을 DataFrame으로 변환
+    blocks:
+    - type: text
+      content: "업로드된 파일들을 순회하면서 각각 DataFrame으로 변환하는 과정을 단계별로 살펴봅니다. marimo에서는 이 모든 로직이 하나의 셀에서 처리되어야 변수들이 다음 셀로 전달됩니다."
+
+    - type: text
+      content: "<b>1단계: 결과 저장 리스트 초기화</b><br>dataframes는 성공적으로 읽은 DataFrame들을 저장하고, errorFiles는 읽기 실패한 파일명과 에러 메시지를 저장합니다. 리스트를 먼저 초기화해야 다음 셀에서 변수를 참조할 수 있습니다."
+
+    - type: codeDescription
+      content: |-
+        dataframes = []
+        errorFiles = []
+
+    - type: text
+      content: "<b>2단계: 파일 업로드 체크</b><br>mo.stop()은 조건이 참이면 셀 실행을 중단합니다. fileUpload.value가 없으면(파일이 없으면) 빈 마크다운을 출력하고 중단합니다. 위에서 dataframes를 먼저 정의했으므로 중단되어도 빈 리스트로 존재합니다."
+
+    - type: codeDescription
+      content: |-
+        mo.stop(not fileUpload.value, mo.md(""))
+
+    - type: text
+      content: "<b>3단계: 파일 순회 및 읽기</b><br>fileUpload.value의 길이만큼 반복합니다. contents(i)로 i번째 파일의 바이트 데이터를, name(i)로 파일명을 가져옵니다. BytesIO로 감싸서 pandas가 읽을 수 있게 합니다."
+
+    - type: codeDescription
+      content: |-
+        for i in range(len(fileUpload.value)):
+            content = fileUpload.contents(i)
+            fileName = fileUpload.name(i)
+            df = pd.read_excel(BytesIO(content), header=0)
+
+    - type: text
+      content: "<b>4단계: 출처 열 추가 (수직 병합 시)</b><br>수직 병합에서는 나중에 데이터가 어느 파일에서 왔는지 알 수 있도록 _source_file 열을 추가합니다."
+
+    - type: codeDescription
+      content: |-
+        if mergeDirection.value == "vertical":
+            df["_source_file"] = fileName
+        dataframes.append(df)
+
+    - type: text
+      content: "<b>5단계: 예외 처리</b><br>try-except로 감싸서 한 파일이 실패해도 나머지는 계속 처리합니다. 실패한 파일은 errorFiles에 기록하고, 마지막에 사용자에게 알립니다."
+
+    - type: codeDescription
+      content: |-
+        try:
+            ...
+        except Exception as e:
+            errorFiles.append(f"{fileUpload.name(i)}: {str(e)}")
+
+        if errorFiles:
+            mo.md(f"⚠️ 읽기 실패: {', '.join(errorFiles)}")
+
+    - type: text
+      content: "<b>6단계: 최종 체크</b><br>읽을 수 있는 파일이 하나도 없으면 에러 메시지를 출력하고 중단합니다."
+
+    - type: codeDescription
+      content: |-
+        mo.stop(len(dataframes) == 0, mo.md("❌ 읽을 수 있는 파일이 없습니다"))
+
+    - type: text
+      content: "<b>완성 코드</b><br>위의 모든 단계를 하나의 셀에 합친 코드입니다. marimo에서 실제로 실행할 때는 이 코드를 사용하세요."
+
+    - type: code
+      title: 파일 읽기 및 처리
+      content: |-
+        dataframes = []
+        errorFiles = []
+
+        mo.stop(not fileUpload.value, mo.md(""))
+
+        for i in range(len(fileUpload.value)):
+            try:
+                content = fileUpload.contents(i)
+                fileName = fileUpload.name(i)
+                df = pd.read_excel(BytesIO(content), header=0)
+                if mergeDirection.value == "vertical":
+                    df["_source_file"] = fileName
+                dataframes.append(df)
+            except Exception as e:
+                errorFiles.append(f"{fileUpload.name(i)}: {str(e)}")
+
+        if errorFiles:
+            mo.md(f"⚠️ 읽기 실패: {', '.join(errorFiles)}")
+
+        mo.stop(len(dataframes) == 0, mo.md("❌ 읽을 수 있는 파일이 없습니다"))
+
+    - type: tip
+      content: "try-except로 에러가 발생해도 다른 파일은 계속 처리됩니다. 위 단계별 설명은 이해를 위한 것이고, 실제로는 완성 코드를 하나의 셀에 입력해야 합니다."
+
+  - id: mergeAndPreview
+    title: 병합 및 미리보기
+    subtitle: concat과 테이블 출력
+    blocks:
+    - type: text
+      content: "dataframes 리스트에 담긴 여러 DataFrame을 하나로 합치고 결과를 보여주는 과정을 단계별로 살펴봅니다."
+
+    - type: text
+      content: "<b>1단계: 데이터 체크</b><br>이전 셀에서 dataframes가 정의되지 않았거나 비어있으면 중단합니다. 앞 셀에서 mo.stop()으로 중단되면 dataframes 변수 자체가 없을 수 있으므로 두 가지 모두 체크합니다."
+
+    - type: codeDescription
+      content: |-
+        mo.stop(not dataframes, mo.md(""))
+
+    - type: text
+      content: "<b>2단계: 수직 병합</b><br>pd.concat()의 기본값은 axis=0(수직)입니다. ignore_index=True는 각 DataFrame의 원래 인덱스를 버리고 0부터 새로 부여합니다. 1월(0~99), 2월(0~99) 파일을 합치면 0~199가 됩니다."
+
+    - type: codeDescription
+      content: |-
+        if mergeDirection.value == "vertical":
+            merged = pd.concat(dataframes, ignore_index=True)
+
+    - type: text
+      content: "<b>3단계: 수평 병합</b><br>axis=1은 열을 옆으로 붙입니다. 각 파일에 같은 이름의 열이 있을 수 있어서 열 이름에 파일 번호(_1, _2)를 접미사로 붙여 충돌을 방지합니다."
+
+    - type: codeDescription
+      content: |-
+        else:
+            for idx, frame in enumerate(dataframes):
+                frame.columns = [f"{col}_{idx+1}" for col in frame.columns]
+            merged = pd.concat(dataframes, axis=1)
+
+    - type: text
+      content: "<b>4단계: 결과 출력</b><br>merged.shape는 (행 수, 열 수) 튜플입니다. mo.ui.table()로 DataFrame을 인터랙티브 테이블로 표시하고, head(100)으로 처음 100행만 보여줍니다."
+
+    - type: codeDescription
+      content: |-
+        mo.vstack([
+            mo.md(f"**병합 완료**: {len(dataframes)}개 파일 → {merged.shape[0]}행 × {merged.shape[1]}열"),
+            mo.ui.table(merged.head(100), show_column_summaries=False)
+        ])
+
+    - type: text
+      content: "<b>완성 코드</b><br>위의 모든 단계를 하나의 셀에 합친 코드입니다."
+
+    - type: code
+      title: 병합 및 미리보기
+      content: |-
+        mo.stop(not dataframes, mo.md(""))
+
+        if mergeDirection.value == "vertical":
+            merged = pd.concat(dataframes, ignore_index=True)
+        else:
+            for idx, frame in enumerate(dataframes):
+                frame.columns = [f"{col}_{idx+1}" for col in frame.columns]
+            merged = pd.concat(dataframes, axis=1)
+
+        mo.vstack([
+            mo.md(f"**병합 완료**: {len(dataframes)}개 파일 → {merged.shape[0]}행 × {merged.shape[1]}열"),
+            mo.ui.table(merged.head(100), show_column_summaries=False)
+        ])
+
+    - type: tip
+      content: "axis=0은 수직(행 방향), axis=1은 수평(열 방향) 병합입니다. 단계별 설명은 이해를 위한 것이고, 완성 코드를 하나의 셀에 입력해야 합니다."
+
+  - id: createExcel
+    title: 엑셀 파일 생성
+    subtitle: to_excel로 내보내기
+    blocks:
+    - type: text
+      content: "병합된 DataFrame을 엑셀 파일로 변환하는 과정을 단계별로 살펴봅니다. 웹앱에서는 파일을 디스크에 저장하지 않고 메모리에서 바로 처리합니다."
+
+    - type: text
+      content: "<b>0단계: merged 체크</b><br>이전 셀에서 병합이 완료되지 않았으면 merged 변수가 없을 수 있습니다. outputBuffer를 먼저 초기화하고, merged가 없으면 중단합니다."
+
+    - type: codeDescription
+      content: |-
+        outputBuffer = BytesIO()
+        mo.stop(not 'merged' in dir(), mo.md(""))
+
+    - type: text
+      content: "<b>1단계: 엑셀 쓰기</b><br>to_excel()로 DataFrame을 엑셀 형식으로 버퍼에 씁니다. index=False는 행 번호를 저장하지 않는 옵션이고, engine='openpyxl'은 엑셀 엔진을 지정합니다."
+
+    - type: codeDescription
+      content: |-
+        merged.to_excel(outputBuffer, index=False, engine='openpyxl')
+
+    - type: text
+      content: "<b>2단계: 포인터 되돌리기</b><br>to_excel() 후 파일 포인터가 끝에 있습니다. seek(0)으로 처음으로 되돌려야 이후 getvalue()로 전체 내용을 읽을 수 있습니다."
+
+    - type: codeDescription
+      content: |-
+        outputBuffer.seek(0)
+
+    - type: text
+      content: "<b>완성 코드</b><br>위의 모든 단계를 합친 코드입니다."
+
+    - type: code
+      title: 엑셀 파일 생성
+      content: |-
+        outputBuffer = BytesIO()
+        mo.stop(not 'merged' in dir(), mo.md(""))
+        merged.to_excel(outputBuffer, index=False, engine='openpyxl')
+        outputBuffer.seek(0)
+
+    - type: tip
+      content: "이 셀은 간단하지만, 실제로는 하나의 셀에 작성해야 outputBuffer가 다음 셀로 전달됩니다."
+
+  - id: downloadButton
+    title: 다운로드 버튼
+    subtitle: base64로 인코딩
+    blocks:
+    - type: text
+      content: "웹 브라우저에서 파일을 다운로드하는 방법을 단계별로 살펴봅니다. 서버에 파일을 저장하지 않고 Data URL 기법으로 바로 다운로드합니다."
+
+    - type: text
+      content: "<b>0단계: outputBuffer 체크</b><br>이전 셀에서 엑셀이 생성되지 않았으면 outputBuffer에 데이터가 없습니다. 버퍼가 비어있으면 중단합니다."
+
+    - type: codeDescription
+      content: |-
+        mo.stop(outputBuffer.getvalue() == b'', mo.md(""))
+
+    - type: text
+      content: "<b>1단계: 바이트 데이터 추출</b><br>outputBuffer.getvalue()로 버퍼에 저장된 엑셀 파일의 바이트 데이터를 가져옵니다."
+
+    - type: codeDescription
+      content: |-
+        outputBuffer.getvalue()
+
+    - type: text
+      content: "<b>2단계: base64 인코딩</b><br>바이너리 데이터는 URL에 직접 넣을 수 없습니다. base64로 텍스트로 변환합니다. b64encode()는 bytes를 반환하므로 decode()로 문자열로 변환합니다."
+
+    - type: codeDescription
+      content: |-
+        import base64
+        base64.b64encode(outputBuffer.getvalue()).decode()
+
+    - type: text
+      content: "<b>3단계: Data URL 구성</b><br>data: 스킴으로 시작하고, MIME 타입(엑셀 파일)과 base64 인코딩을 지정합니다. 이 URL을 a 태그의 href에 넣으면 클릭 시 다운로드됩니다."
+
+    - type: codeDescription
+      content: |-
+        data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{base64데이터}
+
+    - type: text
+      content: "<b>4단계: 다운로드 버튼</b><br>a 태그에 download 속성을 추가하면 링크 클릭 시 해당 파일명으로 다운로드됩니다. CSS로 버튼처럼 스타일링하고 SVG 아이콘을 추가합니다."
+
+    - type: text
+      content: "<b>완성 코드</b><br>위의 모든 단계를 합친 코드입니다."
+
+    - type: code
+      title: 다운로드 버튼
+      content: |-
+        mo.stop(outputBuffer.getvalue() == b'', mo.md(""))
+
+        mo.md(f'''
+        <div style="margin-top: 16px; display: flex; justify-content: center;">
+        <a href="data:application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;base64,{__import__('base64').b64encode(outputBuffer.getvalue()).decode()}"
+           download="merged_result.xlsx"
+           style="display: inline-flex; align-items: center; gap: 6px; background: #18181b; color: white; height: 40px; padding: 0 20px; border-radius: 8px; font-weight: 500; text-decoration: none; font-size: 0.9rem;">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" x2="12" y1="15" y2="3"/></svg>
+            병합된 엑셀 다운로드
+        </a>
+        </div>
+        ''')
+
+    - type: tip
+      content: "__import__('base64')는 인라인으로 모듈을 불러오는 방식입니다. 별도로 import base64를 하지 않아도 됩니다."
+
+footer:
+  challenge:
+    title: "🎯 도전해보세요"
+    description: "오늘 배운 코드에 기능을 추가해보세요"
+    items:
+      - "다운로드 전 파일명 입력 UI를 추가해서 원하는 이름으로 저장하기"
+      - "병합 전 각 파일의 행 수를 미리보기로 보여주기"
+      - "특정 열만 선택해서 병합하는 체크박스 UI 추가하기"
+      - "병합 결과를 CSV, JSON 등 다른 형식으로도 내보내기"
+
+  localUsage:
+    title: "💻 로컬에서 활용하기"
+    description: "웹앱이 아닌 내 컴퓨터에서 사용하는 방법"
+    code: |-
+      import pandas as pd
+      from glob import glob
+
+      excelFiles = glob("data/*.xlsx")
+      dfList = [pd.read_excel(f) for f in excelFiles]
+      result = pd.concat(dfList, ignore_index=True)
+      result.to_excel("merged.xlsx", index=False)
+    tip: "6줄이면 끝입니다. data 폴더에 엑셀 파일들을 넣고 실행하면 merged.xlsx가 생성됩니다."
+
+  extensions:
+    title: "🚀 더 배우면 할 수 있는 것들"
+    content: |-
+      지금 배운 건 단순 병합입니다. 진정한 자동화는 처리 로직에서 나옵니다.
+      pandas, duckdb, polars 등으로 데이터 처리를 학습하면 다양한 업무 자동화가 가능해집니다.
+
+      저의 경우 총계정원장을 다운로드받아 이상 여부를 검증하고, 계정분류표를 활용해 재무제표로 집계합니다.
+      총계정원장을 계정별로 분리한 후 거래처별로 집계하면 계정별원장으로 활용할 수 있습니다.
+      이런 작업이 pandas 몇 줄이면 끝납니다.
+    items:
+      - study: "Pandas 데이터분석"
+        studyUrl: "/study/Pandas 데이터분석/00_판다스소개"
+      - study: "DuckDB 데이터분석"
+        studyUrl: "/study/Duckdb 데이터분석/00_DuckDB소개"
+      - study: "Polars 데이터분석"
+        studyUrl: "/study/Polars 데이터분석/00_Polars소개"

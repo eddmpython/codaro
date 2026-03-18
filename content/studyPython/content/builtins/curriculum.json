@@ -1,0 +1,313 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "category": "builtins",
+    "created": "2024-12-29",
+    "updated": "2025-12-30",
+    "description": "파이썬 내장 모듈 완전 정복 - 30개 Pyodide 호환 표준 라이브러리",
+    "pyodide_optimized": true,
+    "excluded_modules": ["http.client", "socket", "threading", "multiprocessing", "subprocess"]
+  },
+  "modules": [
+    {
+      "id": "01_math",
+      "title": "math - 수학 함수",
+      "file": "01_math.yaml",
+      "difficulty": "beginner",
+      "phase": 1,
+      "prerequisites": [],
+      "keywords": ["math", "수학", "계산", "삼각함수", "로그", "지수"],
+      "description": "삼각함수, 로그, 지수, 반올림 등 수학 계산 함수"
+    },
+    {
+      "id": "02_random",
+      "title": "random - 난수 생성",
+      "file": "02_random.yaml",
+      "difficulty": "beginner",
+      "phase": 1,
+      "prerequisites": [],
+      "keywords": ["random", "난수", "무작위", "shuffle", "choice"],
+      "description": "정수/실수 난수, 무작위 선택, 셔플, 샘플링"
+    },
+    {
+      "id": "03_datetime",
+      "title": "datetime - 날짜와 시간",
+      "file": "03_datetime.yaml",
+      "difficulty": "beginner",
+      "phase": 1,
+      "prerequisites": [],
+      "keywords": ["datetime", "날짜", "시간", "date", "time", "timedelta"],
+      "description": "날짜와 시간 처리, 연산, 포매팅"
+    },
+    {
+      "id": "04_time",
+      "title": "time - 시간 측정",
+      "file": "04_time.yaml",
+      "difficulty": "beginner",
+      "phase": 1,
+      "prerequisites": [],
+      "keywords": ["time", "sleep", "타이머", "성능측정"],
+      "description": "시간 측정, sleep, 성능 벤치마크"
+    },
+    {
+      "id": "05_collections",
+      "title": "collections - 특수 컨테이너",
+      "file": "05_collections.yaml",
+      "difficulty": "intermediate",
+      "phase": 1,
+      "prerequisites": [],
+      "keywords": ["collections", "Counter", "defaultdict", "deque", "namedtuple"],
+      "description": "Counter, defaultdict, deque 등 고급 자료구조"
+    },
+    {
+      "id": "06_itertools",
+      "title": "itertools - 이터레이터 도구",
+      "file": "06_itertools.yaml",
+      "difficulty": "intermediate",
+      "phase": 1,
+      "prerequisites": [],
+      "keywords": ["itertools", "combinations", "permutations", "cycle", "chain"],
+      "description": "조합, 순열, 무한 이터레이터 생성"
+    },
+    {
+      "id": "07_functools",
+      "title": "functools - 함수형 프로그래밍",
+      "file": "07_functools.yaml",
+      "difficulty": "intermediate",
+      "phase": 1,
+      "prerequisites": [],
+      "keywords": ["functools", "reduce", "partial", "lru_cache", "wraps"],
+      "description": "reduce, partial, 메모이제이션, 데코레이터"
+    },
+    {
+      "id": "08_os",
+      "title": "os - 운영체제 인터페이스",
+      "file": "08_os.yaml",
+      "difficulty": "beginner",
+      "phase": 2,
+      "prerequisites": [],
+      "keywords": ["os", "파일", "디렉토리", "경로", "환경변수"],
+      "description": "파일/디렉토리 조작, 경로 처리, 환경 변수 (Pyodide 제한적)"
+    },
+    {
+      "id": "09_pathlib",
+      "title": "pathlib - 객체지향 경로",
+      "file": "09_pathlib.yaml",
+      "difficulty": "beginner",
+      "phase": 2,
+      "prerequisites": ["08_os"],
+      "keywords": ["pathlib", "Path", "경로", "파일"],
+      "description": "Path 객체로 파일 경로를 객체지향적으로 처리 (Pyodide 제한적)"
+    },
+    {
+      "id": "10_sys",
+      "title": "sys - 시스템 파라미터",
+      "file": "10_sys.yaml",
+      "difficulty": "beginner",
+      "phase": 2,
+      "prerequisites": [],
+      "keywords": ["sys", "argv", "stdin", "stdout", "path"],
+      "description": "명령줄 인자, 표준 입출력, 시스템 정보"
+    },
+    {
+      "id": "11_glob",
+      "title": "glob - 파일 패턴 매칭",
+      "file": "11_glob.yaml",
+      "difficulty": "beginner",
+      "phase": 2,
+      "prerequisites": ["08_os"],
+      "keywords": ["glob", "와일드카드", "파일검색", "패턴"],
+      "description": "와일드카드로 파일 검색, 재귀 검색 (Pyodide 제한적)"
+    },
+    {
+      "id": "12_shutil",
+      "title": "shutil - 파일 연산",
+      "file": "12_shutil.yaml",
+      "difficulty": "beginner",
+      "phase": 2,
+      "prerequisites": ["08_os"],
+      "keywords": ["shutil", "복사", "이동", "삭제", "압축"],
+      "description": "파일 복사, 이동, 삭제, 압축 파일 처리 (Pyodide 제한적)"
+    },
+    {
+      "id": "13_json",
+      "title": "json - JSON 처리",
+      "file": "13_json.yaml",
+      "difficulty": "beginner",
+      "phase": 3,
+      "prerequisites": [],
+      "keywords": ["json", "dumps", "loads", "API", "데이터"],
+      "description": "JSON 직렬화/역직렬화, 파일 읽기/쓰기"
+    },
+    {
+      "id": "14_csv",
+      "title": "csv - CSV 처리",
+      "file": "14_csv.yaml",
+      "difficulty": "beginner",
+      "phase": 3,
+      "prerequisites": [],
+      "keywords": ["csv", "reader", "writer", "DictReader", "데이터"],
+      "description": "CSV 파일 읽기/쓰기, DictReader/DictWriter"
+    },
+    {
+      "id": "15_pickle",
+      "title": "pickle - 객체 직렬화",
+      "file": "15_pickle.yaml",
+      "difficulty": "intermediate",
+      "phase": 3,
+      "prerequisites": [],
+      "keywords": ["pickle", "직렬화", "dump", "load", "객체저장"],
+      "description": "파이썬 객체 바이너리 저장/불러오기"
+    },
+    {
+      "id": "16_struct",
+      "title": "struct - 바이너리 데이터",
+      "file": "16_struct.yaml",
+      "difficulty": "advanced",
+      "phase": 3,
+      "prerequisites": [],
+      "keywords": ["struct", "pack", "unpack", "바이너리"],
+      "description": "바이너리 데이터 pack/unpack"
+    },
+    {
+      "id": "17_string",
+      "title": "string - 문자열 도구",
+      "file": "17_string.yaml",
+      "difficulty": "beginner",
+      "phase": 4,
+      "prerequisites": [],
+      "keywords": ["string", "Template", "상수", "ascii", "digits"],
+      "description": "문자열 템플릿, 상수, 포매팅"
+    },
+    {
+      "id": "18_textwrap",
+      "title": "textwrap - 텍스트 래핑",
+      "file": "18_textwrap.yaml",
+      "difficulty": "beginner",
+      "phase": 4,
+      "prerequisites": [],
+      "keywords": ["textwrap", "wrap", "fill", "dedent"],
+      "description": "텍스트 줄바꿈, 들여쓰기 제거"
+    },
+    {
+      "id": "19_difflib",
+      "title": "difflib - 차이 비교",
+      "file": "19_difflib.yaml",
+      "difficulty": "intermediate",
+      "phase": 4,
+      "prerequisites": [],
+      "keywords": ["difflib", "diff", "SequenceMatcher", "비교"],
+      "description": "시퀀스 차이 비교, unified_diff"
+    },
+    {
+      "id": "20_base64",
+      "title": "base64 - Base64 인코딩",
+      "file": "20_base64.yaml",
+      "difficulty": "beginner",
+      "phase": 4,
+      "prerequisites": [],
+      "keywords": ["base64", "인코딩", "디코딩", "암호화"],
+      "description": "Base64 인코딩/디코딩"
+    },
+    {
+      "id": "21_urllib",
+      "title": "urllib - URL 처리",
+      "file": "21_urllib.yaml",
+      "difficulty": "intermediate",
+      "phase": 5,
+      "prerequisites": [],
+      "keywords": ["urllib", "URL", "HTTP", "웹", "스크래핑"],
+      "description": "URL 열기, 파싱, HTTP 요청 (Pyodide CORS 제약)"
+    },
+    {
+      "id": "22_email",
+      "title": "email - 이메일 처리",
+      "file": "22_email.yaml",
+      "difficulty": "intermediate",
+      "phase": 5,
+      "prerequisites": [],
+      "keywords": ["email", "MIME", "메시지", "파싱"],
+      "description": "이메일 메시지 생성, 파싱, MIME (Pyodide 생성/파싱만 가능)"
+    },
+    {
+      "id": "23_asyncio",
+      "title": "asyncio - 비동기 I/O",
+      "file": "23_asyncio.yaml",
+      "difficulty": "advanced",
+      "phase": 6,
+      "prerequisites": [],
+      "keywords": ["asyncio", "async", "await", "비동기", "이벤트루프"],
+      "description": "async/await, 이벤트 루프, 비동기 프로그래밍 (Pyodide 완벽 지원)"
+    },
+    {
+      "id": "24_argparse",
+      "title": "argparse - 명령줄 파싱",
+      "file": "24_argparse.yaml",
+      "difficulty": "intermediate",
+      "phase": 7,
+      "prerequisites": ["10_sys"],
+      "keywords": ["argparse", "CLI", "명령줄", "인자", "옵션"],
+      "description": "명령줄 인자 파싱, ArgumentParser"
+    },
+    {
+      "id": "25_logging",
+      "title": "logging - 로깅",
+      "file": "25_logging.yaml",
+      "difficulty": "intermediate",
+      "phase": 7,
+      "prerequisites": [],
+      "keywords": ["logging", "Logger", "Handler", "로그", "디버깅"],
+      "description": "로깅 시스템, Logger, Handler, Formatter"
+    },
+    {
+      "id": "26_unittest",
+      "title": "unittest - 단위 테스트",
+      "file": "26_unittest.yaml",
+      "difficulty": "intermediate",
+      "phase": 7,
+      "prerequisites": [],
+      "keywords": ["unittest", "테스트", "TestCase", "assert"],
+      "description": "단위 테스트, TestCase, assert 메서드"
+    },
+    {
+      "id": "27_timeit",
+      "title": "timeit - 성능 측정",
+      "file": "27_timeit.yaml",
+      "difficulty": "beginner",
+      "phase": 7,
+      "prerequisites": ["04_time"],
+      "keywords": ["timeit", "벤치마크", "성능", "측정"],
+      "description": "코드 실행 시간 측정, 벤치마크"
+    },
+    {
+      "id": "28_copy",
+      "title": "copy - 객체 복사",
+      "file": "28_copy.yaml",
+      "difficulty": "intermediate",
+      "phase": 7,
+      "prerequisites": [],
+      "keywords": ["copy", "deepcopy", "복사", "클론"],
+      "description": "얕은 복사, 깊은 복사"
+    },
+    {
+      "id": "29_pprint",
+      "title": "pprint - 예쁜 출력",
+      "file": "29_pprint.yaml",
+      "difficulty": "beginner",
+      "phase": 7,
+      "prerequisites": [],
+      "keywords": ["pprint", "출력", "디버깅", "포매팅"],
+      "description": "데이터 구조 예쁘게 출력"
+    },
+    {
+      "id": "30_inspect",
+      "title": "inspect - 객체 검사",
+      "file": "30_inspect.yaml",
+      "difficulty": "advanced",
+      "phase": 7,
+      "prerequisites": [],
+      "keywords": ["inspect", "introspection", "메타", "시그니처"],
+      "description": "객체 정보 검사, 함수 시그니처, 소스 코드"
+    }
+  ]
+}

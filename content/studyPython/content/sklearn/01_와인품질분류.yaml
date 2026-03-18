@@ -1,0 +1,316 @@
+meta:
+  id: sklearn_01
+  title: 와인품질분류
+  order: 1
+  category: sklearn
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["분류", "train_test_split", "LogisticRegression", "다중분류", "와인"]
+  seo:
+    title: "scikit-learn 분류 입문 - 와인 품종 분류하기"
+    description: "첫 ML 모델을 만들어봅니다. train_test_split으로 데이터를 나누고 LogisticRegression으로 와인 품종을 분류합니다."
+    keywords: ["scikit-learn", "분류", "LogisticRegression", "와인", "머신러닝"]
+
+intro:
+  emoji: "🍷"
+  goal: 첫 머신러닝 모델을 만들어 와인 품종을 분류합니다.
+  description: scikit-learn의 기본 워크플로우를 배웁니다. train_test_split으로 데이터를 분할하고, StandardScaler로 전처리하고, LogisticRegression으로 분류 모델을 학습합니다. 정확도와 혼동행렬로 모델 성능을 평가합니다.
+
+sections:
+- id: step1_install
+  title: 1단계. scikit-learn 설치
+  subtitle: micropip
+  blocks:
+  - type: text
+    content: scikit-learn은 Python 머신러닝의 표준 라이브러리입니다. pyodide 환경에서는 micropip으로 설치합니다. 처음 설치 시 약간의 시간이 걸릴 수 있습니다.
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: micropip으로 scikit-learn 설치
+    content: |-
+      import micropip
+      await micropip.install('scikit-learn')
+  - type: tip
+    content: scikit-learn 설치 시 약 10-20MB의 데이터를 다운로드합니다. 처음 한 번만 설치하면 세션 동안 유지됩니다.
+
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  subtitle: load_wine()
+  blocks:
+  - type: text
+    content: sklearn.datasets에는 다양한 내장 데이터셋이 있습니다. load_wine()은 이탈리아 한 지역에서 재배한 세 가지 품종의 와인 178개 샘플을 제공합니다. 13가지 화학 성분(알코올, 산도, 마그네슘 등) 측정값이 특성입니다.
+  - type: code
+    language: python
+    title: 와인 데이터 로드
+    description: sklearn 내장 데이터 불러오기
+    content: |-
+      from sklearn.datasets import load_wine
+      import pandas as pd
+
+      wine = load_wine()
+      X = pd.DataFrame(wine.data, columns=wine.feature_names)
+      y = wine.target
+      X.shape
+  - type: tip
+    content: load_wine()은 Bunch 객체를 반환합니다. data는 특성(X), target은 레이블(y), feature_names는 컬럼명, target_names는 클래스명입니다.
+
+- id: step3_explore
+  title: 3단계. 데이터 탐색
+  subtitle: 특성 확인
+  blocks:
+  - type: text
+    content: 데이터의 구조와 분포를 확인합니다. 13개의 특성과 3개의 클래스(0, 1, 2)가 있습니다. 각 특성의 스케일이 다르므로 전처리가 필요합니다.
+  - type: code
+    language: python
+    title: 데이터 미리보기
+    description: 상위 5개 행 확인
+    content: |-
+      X.head()
+  - type: code
+    language: python
+    title: 클래스 분포
+    description: 각 품종별 샘플 수 확인
+    content: |-
+      pd.Series(y).value_counts().sort_index()
+  - type: code
+    language: python
+    title: 기초 통계
+    description: 특성별 평균, 표준편차 확인
+    content: |-
+      X.describe()
+
+- id: step4_split
+  title: 4단계. 데이터 분할
+  subtitle: train_test_split
+  blocks:
+  - type: text
+    content: 머신러닝의 핵심 원칙은 "학습에 사용하지 않은 데이터로 평가"입니다. train_test_split으로 데이터를 학습용(train)과 테스트용(test)으로 나눕니다. 보통 80:20 또는 70:30 비율로 분할합니다.
+  - type: code
+    language: python
+    title: 학습/테스트 분할
+    description: 데이터를 80:20으로 분할
+    content: |-
+      from sklearn.model_selection import train_test_split
+
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+  - type: tip
+    content: test_size=0.2는 20%를 테스트용으로 분리합니다. random_state는 재현성을 위한 시드값으로, 같은 값이면 항상 같은 분할 결과가 나옵니다. 시드를 고정하지 않으면 실행할 때마다 다른 결과가 나옵니다.
+
+- id: step5_scale
+  title: 5단계. 스케일링
+  subtitle: StandardScaler
+  blocks:
+  - type: text
+    content: 특성들의 스케일이 다르면 일부 알고리즘이 제대로 작동하지 않습니다. 예를 들어 알코올 도수(11~14)와 프롤린 함량(278~1680)을 함께 사용하면 프롤린이 모델을 지배합니다. StandardScaler는 각 특성을 평균 0, 표준편차 1로 변환합니다.
+  - type: code
+    language: python
+    title: 표준화
+    description: 평균 0, 표준편차 1로 변환
+    content: |-
+      from sklearn.preprocessing import StandardScaler
+
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+      xTrainSc[:3]
+  - type: tip
+    content: fit_transform()은 학습 데이터로 평균/표준편차를 계산(fit)하고 변환(transform)합니다. 테스트 데이터는 transform()만 사용합니다. 테스트 데이터로 fit하면 데이터 누수(data leakage)가 발생합니다.
+
+- id: step6_model
+  title: 6단계. 모델 학습
+  subtitle: LogisticRegression
+  blocks:
+  - type: text
+    content: LogisticRegression은 분류 문제의 기본 알고리즘입니다. 이름에 "회귀"가 있지만 실제로는 분류에 사용합니다. 각 클래스에 속할 확률을 계산하고, 가장 높은 확률의 클래스를 예측합니다.
+  - type: code
+    language: python
+    title: 모델 학습
+    description: LogisticRegression으로 분류
+    content: |-
+      from sklearn.linear_model import LogisticRegression
+
+      model = LogisticRegression(max_iter=1000)
+      model.fit(xTrainSc, yTrain)
+  - type: tip
+    content: fit(X, y)으로 모델을 학습합니다. max_iter=1000은 최대 반복 횟수입니다. 수렴하지 않으면 경고가 나타나므로 값을 늘려주세요. sklearn의 모든 모델은 fit() 메서드로 학습합니다.
+
+- id: step7_predict
+  title: 7단계. 예측
+  subtitle: predict()
+  blocks:
+  - type: text
+    content: 학습된 모델로 테스트 데이터의 품종을 예측합니다. predict()는 클래스 레이블을, predict_proba()는 각 클래스의 확률을 반환합니다.
+  - type: code
+    language: python
+    title: 예측
+    description: 테스트 데이터 예측
+    content: |-
+      yPred = model.predict(xTestSc)
+      yPred
+  - type: code
+    language: python
+    title: 확률 예측
+    description: 각 클래스 확률 확인
+    content: |-
+      proba = model.predict_proba(xTestSc)
+      pd.DataFrame(proba, columns=wine.target_names).head()
+  - type: tip
+    content: predict_proba()는 각 클래스에 속할 확률을 반환합니다. 3개 클래스이므로 각 샘플마다 3개의 확률값이 나오고, 합은 1입니다. 가장 높은 확률의 클래스가 예측 결과입니다.
+
+- id: step8_accuracy
+  title: 8단계. 정확도 평가
+  subtitle: accuracy_score
+  blocks:
+  - type: text
+    content: 정확도(accuracy)는 전체 샘플 중 올바르게 예측한 비율입니다. 가장 직관적인 평가 지표이지만, 클래스 불균형이 있으면 오해를 줄 수 있습니다.
+  - type: code
+    language: python
+    title: 정확도 계산
+    description: 예측 정확도 확인
+    content: |-
+      from sklearn.metrics import accuracy_score
+
+      acc = accuracy_score(yTest, yPred)
+      f"정확도: {acc:.2%}"
+  - type: tip
+    content: accuracy_score(실제값, 예측값) 순서입니다. 0.97은 97%를 의미합니다. 모델이 테스트 데이터의 97%를 올바르게 분류했습니다.
+
+- id: step9_confusion
+  title: 9단계. 혼동행렬
+  subtitle: confusion_matrix
+  blocks:
+  - type: text
+    content: 혼동행렬(confusion matrix)은 실제 클래스와 예측 클래스의 교차표입니다. 대각선은 올바른 예측, 비대각선은 오분류를 나타냅니다. 어떤 클래스에서 오류가 많은지 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 혼동행렬
+    description: 클래스별 예측 결과 확인
+    content: |-
+      from sklearn.metrics import confusion_matrix
+
+      cm = confusion_matrix(yTest, yPred)
+      pd.DataFrame(cm, index=wine.target_names, columns=wine.target_names)
+  - type: tip
+    content: 혼동행렬의 행은 실제 클래스, 열은 예측 클래스입니다. 대각선 값이 높을수록 좋습니다. 예를 들어 class_0 행에서 class_1 열에 값이 있다면, 실제 class_0을 class_1로 잘못 예측한 것입니다.
+
+- id: step10_report
+  title: 10단계. 상세 평가
+  subtitle: classification_report
+  blocks:
+  - type: text
+    content: classification_report는 클래스별 정밀도(precision), 재현율(recall), F1 점수를 제공합니다. 정밀도는 "양성 예측 중 실제 양성 비율", 재현율은 "실제 양성 중 맞춘 비율"입니다.
+  - type: code
+    language: python
+    title: 분류 리포트
+    description: 클래스별 상세 평가
+    content: |-
+      from sklearn.metrics import classification_report
+
+      report = classification_report(yTest, yPred, target_names=wine.target_names)
+      report
+  - type: tip
+    content: precision(정밀도)은 예측이 얼마나 정확한지, recall(재현율)은 실제 양성을 얼마나 찾아냈는지를 나타냅니다. F1-score는 둘의 조화평균입니다. support는 각 클래스의 샘플 수입니다.
+
+- id: step11_visualize
+  title: 11단계. 시각화
+  subtitle: 혼동행렬 히트맵
+  blocks:
+  - type: text
+    content: 혼동행렬을 히트맵으로 시각화하면 오분류 패턴을 더 직관적으로 파악할 수 있습니다. seaborn의 heatmap을 사용합니다.
+  - type: code
+    language: python
+    title: 히트맵 시각화
+    description: 혼동행렬을 히트맵으로 표시
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=wine.target_names, yticklabels=wine.target_names, ax=ax)
+      ax.set_xlabel('Predicted')
+      ax.set_ylabel('Actual')
+      ax.set_title('Confusion Matrix')
+      fig
+
+- id: step12_summary
+  title: 12단계. 전체 워크플로우
+  subtitle: 정리
+  blocks:
+  - type: text
+    content: sklearn의 기본 워크플로우를 정리합니다. 데이터 분할 → 전처리 → 모델 학습 → 예측 → 평가 순서입니다. 이 패턴은 모든 sklearn 모델에 동일하게 적용됩니다.
+  - type: code
+    language: python
+    title: 전체 흐름 요약
+    description: 핵심 단계 정리
+    content: |-
+      resultDf = pd.DataFrame({
+          'Step': ['Data Split', 'Scaling', 'Model', 'Accuracy'],
+          'Value': [f'{len(xTrain)} train, {len(xTest)} test', 'StandardScaler', 'LogisticRegression', f'{acc:.2%}']
+      })
+      resultDf
+
+- id: practice
+  title: 실습
+  subtitle: 와인 분류 프로젝트
+  blocks:
+  - type: text
+    content: 품질 관리 담당자가 되어 와인 품종 분류 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LogisticRegression, accuracy_score, confusion_matrix를 모두 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 스케일링 유무에 따른 정확도 비교"
+    code: |-
+      from sklearn.datasets import load_wine
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score
+      import pandas as pd
+
+      wineData = load_wine()
+      xData = pd.DataFrame(wineData.data, columns=wineData.feature_names)
+      yData = wineData.target
+
+      xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+
+      modelRaw = LogisticRegression(max_iter=1000)
+      modelRaw.fit(xTr, yTr)
+      accRaw = accuracy_score(yTe, modelRaw.predict(xTe))
+
+      sc = StandardScaler()
+      xTrSc = sc.fit_transform(xTr)
+      xTeSc = sc.transform(xTe)
+
+      modelSc = LogisticRegression(max_iter=1000)
+      modelSc.fit(xTrSc, yTr)
+      accSc = accuracy_score(yTe, modelSc.predict(xTeSc))
+
+      pd.DataFrame({'Model': ['Raw', 'Scaled'], 'Accuracy': [accRaw, accSc]})
+  - type: expansion
+    title: "미션2: 세 품종별 분류 성능 상세 분석"
+    code: |-
+      from sklearn.datasets import load_wine
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import classification_report, confusion_matrix
+      import pandas as pd
+
+      wineReport = load_wine()
+      xRep = pd.DataFrame(wineReport.data, columns=wineReport.feature_names)
+      yRep = wineReport.target
+
+      xTr2, xTe2, yTr2, yTe2 = train_test_split(xRep, yRep, test_size=0.2, random_state=42)
+
+      sc2 = StandardScaler()
+      xTr2Sc = sc2.fit_transform(xTr2)
+      xTe2Sc = sc2.transform(xTe2)
+
+      modelRep = LogisticRegression(max_iter=1000)
+      modelRep.fit(xTr2Sc, yTr2)
+      pred2 = modelRep.predict(xTe2Sc)
+
+      cm2 = confusion_matrix(yTe2, pred2)
+      cmDf = pd.DataFrame(cm2, index=wineReport.target_names, columns=wineReport.target_names)
+      cmDf

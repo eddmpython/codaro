@@ -1,0 +1,210 @@
+meta:
+  id: pillow_04
+  title: 사진필터스튜디오
+  order: 4
+  category: pillow
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["Pillow", "ImageFilter", "BLUR", "SHARPEN", "CONTOUR", "EDGE"]
+  seo:
+    title: "Pillow 기초 - 사진 필터 스튜디오"
+    description: "Pillow ImageFilter로 블러, 샤픈, 윤곽선 등 다양한 필터를 적용합니다. 이미지 효과 처리의 기초를 배웁니다."
+    keywords: ["Pillow", "ImageFilter", "BLUR", "SHARPEN", "필터", "이미지효과"]
+
+intro:
+  emoji: "🎭"
+  goal: ImageFilter 모듈로 다양한 필터 효과를 적용하고 비교합니다.
+  description: BLUR, SHARPEN, CONTOUR, EDGE_ENHANCE 등 Pillow의 내장 필터를 사용해봅니다. filter() 메서드로 간단하게 이미지 효과를 적용합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 이미지 불러오기
+  subtitle: sklearn 샘플 이미지
+  blocks:
+  - type: text
+    content: sklearn에 내장된 샘플 이미지를 사용합니다. 필터 효과를 잘 확인할 수 있도록 꽃 이미지를 사용합니다.
+  - type: code
+    language: python
+    title: 라이브러리와 이미지
+    description: ImageFilter 모듈을 임포트합니다
+    content: |-
+      from PIL import Image, ImageFilter
+      from sklearn.datasets import load_sample_image
+
+      flowerArr = load_sample_image('flower.jpg')
+      canvas = Image.fromarray(flowerArr)
+      canvas.size
+  - type: code
+    language: python
+    title: 원본 이미지
+    description: 필터 적용 전 원본입니다
+    content: |-
+      canvas
+
+- id: step2_blur
+  title: 2단계. 블러 필터
+  subtitle: BLUR, GaussianBlur
+  blocks:
+  - type: text
+    content: 블러 필터는 이미지를 부드럽게 흐리게 만듭니다. BLUR는 기본 블러이고, GaussianBlur는 반경을 조절할 수 있는 가우시안 블러입니다. 블러는 노이즈 제거나 배경 처리에 자주 사용됩니다.
+  - type: code
+    language: python
+    title: 기본 블러
+    description: BLUR 필터를 적용합니다
+    content: |-
+      blurred = canvas.filter(ImageFilter.BLUR)
+      blurred
+  - type: tip
+    content: filter() 메서드는 새 이미지를 반환하고 원본은 유지됩니다. ImageFilter.BLUR는 3x3 커널을 사용하는 기본 블러입니다.
+  - type: code
+    language: python
+    title: 가우시안 블러
+    description: 반경을 조절할 수 있습니다
+    content: |-
+      gaussian = canvas.filter(ImageFilter.GaussianBlur(radius=5))
+      gaussian
+  - type: tip
+    content: GaussianBlur의 radius가 클수록 더 강하게 흐려집니다. radius=2는 약한 블러, radius=10은 강한 블러입니다. 포토샵의 가우시안 블러와 동일한 알고리즘입니다.
+
+- id: step3_sharpen
+  title: 3단계. 샤픈 필터
+  subtitle: SHARPEN, UnsharpMask
+  blocks:
+  - type: text
+    content: 샤픈 필터는 이미지의 경계를 강조하여 선명하게 만듭니다. SHARPEN은 기본 샤프닝이고, UnsharpMask는 더 정교한 조절이 가능합니다. 흐린 사진을 선명하게 보정할 때 사용합니다.
+  - type: code
+    language: python
+    title: 기본 샤픈
+    description: SHARPEN 필터를 적용합니다
+    content: |-
+      sharpened = canvas.filter(ImageFilter.SHARPEN)
+      sharpened
+  - type: code
+    language: python
+    title: 언샵 마스크
+    description: 전문적인 샤프닝 기법입니다
+    content: |-
+      unsharp = canvas.filter(ImageFilter.UnsharpMask(radius=2, percent=150, threshold=3))
+      unsharp
+  - type: tip
+    content: UnsharpMask는 세 가지 파라미터를 가집니다. radius는 효과 범위, percent는 강도(100=보통, 200=2배), threshold는 적용 기준입니다. 사진 보정에서 가장 많이 쓰이는 샤프닝 기법입니다.
+
+- id: step4_edge
+  title: 4단계. 윤곽선 필터
+  subtitle: CONTOUR, FIND_EDGES
+  blocks:
+  - type: text
+    content: 윤곽선 필터는 이미지에서 경계선을 추출합니다. CONTOUR는 윤곽선만 남기고, FIND_EDGES는 에지(가장자리)를 검출합니다. 이미지 분석이나 아트 효과에 활용됩니다.
+  - type: code
+    language: python
+    title: 윤곽선 추출
+    description: CONTOUR 필터를 적용합니다
+    content: |-
+      contour = canvas.filter(ImageFilter.CONTOUR)
+      contour
+  - type: code
+    language: python
+    title: 에지 검출
+    description: FIND_EDGES로 경계선을 찾습니다
+    content: |-
+      edge = canvas.filter(ImageFilter.FIND_EDGES)
+      edge
+  - type: tip
+    content: FIND_EDGES는 소벨(Sobel) 연산자를 사용하여 밝기 변화가 급격한 곳을 검출합니다. 검은 배경에 흰 선으로 경계가 표시됩니다. 컴퓨터 비전에서 객체 검출의 기초가 됩니다.
+
+- id: step5_emboss
+  title: 5단계. 엠보스와 강조
+  subtitle: EMBOSS, EDGE_ENHANCE
+  blocks:
+  - type: text
+    content: EMBOSS는 양각 효과를 주어 입체감을 만듭니다. EDGE_ENHANCE는 경계선을 강조하여 이미지를 더 선명하게 보이게 합니다.
+  - type: code
+    language: python
+    title: 엠보스 효과
+    description: 양각 느낌을 줍니다
+    content: |-
+      emboss = canvas.filter(ImageFilter.EMBOSS)
+      emboss
+  - type: code
+    language: python
+    title: 에지 강조
+    description: 경계를 강조합니다
+    content: |-
+      enhanced = canvas.filter(ImageFilter.EDGE_ENHANCE_MORE)
+      enhanced
+  - type: tip
+    content: EDGE_ENHANCE는 약한 강조, EDGE_ENHANCE_MORE는 강한 강조입니다. 선명도를 높이면서 자연스러움을 유지하고 싶을 때 EDGE_ENHANCE가 적합합니다.
+
+- id: step6_smooth
+  title: 6단계. 스무딩
+  subtitle: SMOOTH, DETAIL
+  blocks:
+  - type: text
+    content: SMOOTH는 노이즈를 줄이고 부드럽게 만듭니다. DETAIL은 세부 사항을 강조합니다. 이 두 필터는 반대 효과를 가집니다.
+  - type: code
+    language: python
+    title: 스무딩
+    description: 노이즈를 줄입니다
+    content: |-
+      smooth = canvas.filter(ImageFilter.SMOOTH_MORE)
+      smooth
+  - type: code
+    language: python
+    title: 디테일 강조
+    description: 세부 사항을 강조합니다
+    content: |-
+      detail = canvas.filter(ImageFilter.DETAIL)
+      detail
+
+- id: practice
+  title: 실습
+  subtitle: 필터 조합
+  blocks:
+  - type: text
+    content: sklearn 이미지에 다양한 필터를 적용해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: flower 블러와 샤픈 비교"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image, ImageFilter
+        from sklearn.datasets import load_sample_image
+
+        bloomArr = load_sample_image('flower.jpg')
+        bloom = Image.fromarray(bloomArr)
+        bloom
+    - type: code
+      title: "블러 적용"
+      content: |-
+        bloomBlur = bloom.filter(ImageFilter.GaussianBlur(radius=3))
+        bloomBlur
+    - type: code
+      title: "샤픈 적용"
+      content: |-
+        bloomSharp = bloom.filter(ImageFilter.UnsharpMask(radius=2, percent=200))
+        bloomSharp
+  - type: expansion
+    title: "미션2: china 에지 검출과 엠보스"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image, ImageFilter
+        from sklearn.datasets import load_sample_image
+
+        chinaArr = load_sample_image('china.jpg')
+        china = Image.fromarray(chinaArr)
+        china
+    - type: code
+      title: "에지 검출"
+      content: |-
+        chinaEdge = china.filter(ImageFilter.FIND_EDGES)
+        chinaEdge
+    - type: code
+      title: "엠보스 효과"
+      content: |-
+        chinaEmboss = china.filter(ImageFilter.EMBOSS)
+        chinaEmboss

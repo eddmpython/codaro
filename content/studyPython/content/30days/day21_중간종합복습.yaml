@@ -1,0 +1,505 @@
+meta:
+  id: "day21"
+  title: "중간 종합 복습"
+  day: 21
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 중간 종합 복습 - Day 1~20 완전 정복"
+    description: "변수, 자료구조, 제어문, 함수, 모듈, 파일, 예외처리를 종합 복습합니다."
+    keywords: ['복습', '종합', '정리', '파이썬기초', '중간점검']
+
+intro:
+  emoji: "🎯"
+  points:
+  - "Day 1~20 핵심 개념 복습"
+  - "자료구조와 제어문 통합"
+  - "함수와 모듈 실전 활용"
+  - "종합 실전 문제"
+
+sections:
+- id: "data_structures_review"
+  title: "자료구조 복습"
+  subtitle: "문자열, 리스트, 튜플, 집합, 딕셔너리"
+  blocks:
+  - type: "text"
+    content: "파이썬의 5가지 핵심 자료구조를 복습합니다. 문자열(str), 리스트(list), 튜플(tuple), 집합(set), 딕셔너리(dict)의 특징과 메서드를 다시 확인합니다."
+  - type: "list"
+    items:
+    - "문자열: 불변, 인덱싱, 슬라이싱, 메서드"
+    - "리스트: 가변, 순서, 중복 허용"
+    - "튜플: 불변, 순서, 중복 허용"
+    - "집합: 가변, 순서 없음, 중복 불가"
+    - "딕셔너리: 가변, key-value 쌍"
+  - type: "code"
+    language: "python"
+    title: "문자열 활용"
+    description: "문자열 메서드와 슬라이싱을 활용합니다."
+    content: |-
+      phrase = "Python Programming"
+      phrase.lower().replace('p', 'J')
+  - type: "code"
+    language: "python"
+    title: "리스트 활용"
+    description: "리스트 메서드를 연속으로 활용합니다."
+    content: |-
+      nums = [5, 2, 8, 1, 9]
+      nums.sort()
+      nums.reverse()
+      nums
+  - type: "code"
+    language: "python"
+    title: "집합 연산"
+    description: "집합의 교집합과 합집합을 구합니다."
+    content: |-
+      teamA = {'Alice', 'Bob', 'Charlie'}
+      teamB = {'Bob', 'David', 'Eve'}
+      teamA & teamB
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 활용"
+    description: "딕셔너리 메서드를 활용합니다."
+    content: |-
+      info = {'name': 'Alice', 'age': 25}
+      info.get('city', 'Unknown')
+
+- id: "control_flow_review"
+  title: "제어문 복습"
+  subtitle: "조건문과 반복문"
+  blocks:
+  - type: "text"
+    content: "조건문(if, elif, else)과 반복문(for, while)을 복습합니다. break, continue, else절을 활용하여 프로그램의 흐름을 제어할 수 있습니다."
+  - type: "list"
+    items:
+    - "if, elif, else: 조건 분기"
+    - "for: 시퀀스 순회"
+    - "while: 조건 반복"
+    - "break, continue: 흐름 제어"
+  - type: "code"
+    language: "python"
+    title: "조건문 활용"
+    description: "점수에 따라 등급을 판정합니다."
+    content: |-
+      score = 85
+      'A' if score >= 90 else 'B' if score >= 80 else 'C'
+  - type: "code"
+    language: "python"
+    title: "for 반복문"
+    description: "리스트의 합계를 계산합니다."
+    content: |-
+      values = [10, 20, 30, 40, 50]
+      valSum = 0
+      for val in values:
+          valSum = valSum + val
+      valSum
+  - type: "code"
+    language: "python"
+    title: "while 반복문"
+    description: "카운트다운을 구현합니다."
+    content: |-
+      countdown = 5
+      countList = []
+      while countdown > 0:
+          countList.append(countdown)
+          countdown = countdown - 1
+      countList
+  - type: "code"
+    language: "python"
+    title: "break 활용"
+    description: "특정 값을 찾으면 반복을 중단합니다."
+    content: |-
+      nums = [1, 3, 5, 7, 9, 2, 4]
+      firstEven = None
+      for n in nums:
+          if n % 2 == 0:
+              firstEven = n
+              break
+      firstEven
+
+- id: "function_review"
+  title: "함수 복습"
+  subtitle: "def, return, 매개변수, 인자"
+  blocks:
+  - type: "text"
+    content: "함수의 정의(def), 반환(return), 매개변수와 인자를 복습합니다. 기본 매개변수, 키워드 인자, *args, **kwargs, lambda까지 다양한 함수 기법을 활용할 수 있습니다."
+  - type: "list"
+    items:
+    - "def: 함수 정의"
+    - "return: 값 반환"
+    - "매개변수: 기본값, *args, **kwargs"
+    - "lambda: 익명 함수"
+  - type: "code"
+    language: "python"
+    title: "기본 함수"
+    description: "두 수를 곱하는 함수를 만듭니다."
+    content: |-
+      def multiply(a, b):
+          return a * b
+
+      multiply(7, 8)
+  - type: "code"
+    language: "python"
+    title: "기본 매개변수"
+    description: "기본값을 가진 함수를 만듭니다."
+    content: |-
+      def greet(name, greeting='Hello'):
+          return greeting + ', ' + name
+
+      greet('Bob')
+  - type: "code"
+    language: "python"
+    title: "*args 활용"
+    description: "가변 인자를 받아 합계를 계산합니다."
+    content: |-
+      def sumAll(*args):
+          acc = 0
+          for num in args:
+              acc = acc + num
+          return acc
+
+      sumAll(1, 2, 3, 4, 5)
+  - type: "code"
+    language: "python"
+    title: "lambda 활용"
+    description: "lambda로 간단한 함수를 만듭니다."
+    content: |-
+      square = lambda x: x ** 2
+      square(9)
+
+- id: "module_file_review"
+  title: "모듈과 파일 복습"
+  subtitle: "import, 파일 입출력"
+  blocks:
+  - type: "text"
+    content: "모듈 가져오기(import, from, as)와 파일 입출력(open, read, write, with)을 복습합니다. math, random, datetime 같은 표준 모듈을 활용할 수 있습니다."
+  - type: "list"
+    items:
+    - "import: 모듈 가져오기"
+    - "from, as: 선택적 가져오기"
+    - "open, with: 파일 다루기"
+    - "표준 모듈 활용"
+  - type: "code"
+    language: "python"
+    title: "math 모듈"
+    description: "제곱근과 원주율을 활용합니다."
+    content: |-
+      from math import sqrt, pi
+
+      radius = 4
+      area = pi * radius ** 2
+      area
+  - type: "code"
+    language: "python"
+    title: "random 모듈"
+    description: "랜덤 정수를 생성합니다."
+    content: |-
+      from random import randint
+
+      dice = randint(1, 6)
+      dice
+  - type: "code"
+    language: "python"
+    title: "datetime 모듈"
+    description: "날짜를 생성하고 계산합니다."
+    content: |-
+      from datetime import date, timedelta
+
+      today = date(2024, 1, 1)
+      nextWeek = today + timedelta(days=7)
+      nextWeek.day
+
+- id: "exception_review"
+  title: "예외 처리 복습"
+  subtitle: "try, except, finally, raise"
+  blocks:
+  - type: "text"
+    content: "예외 처리를 통해 오류를 안전하게 처리하는 방법을 복습합니다. try, except, finally, raise를 활용하여 안정적인 프로그램을 작성할 수 있습니다."
+  - type: "list"
+    items:
+    - "try-except: 예외 포착"
+    - "finally: 정리 작업"
+    - "raise: 예외 발생"
+    - "예외 타입: ValueError, KeyError 등"
+  - type: "code"
+    language: "python"
+    title: "기본 예외 처리"
+    description: "0으로 나누는 오류를 처리합니다."
+    content: |-
+      def safeDivide(a, b):
+          try:
+              return a / b
+          except ZeroDivisionError:
+              return 'Cannot divide by zero'
+
+      safeDivide(10, 0)
+  - type: "code"
+    language: "python"
+    title: "여러 예외 처리"
+    description: "여러 종류의 예외를 처리합니다."
+    content: |-
+      def getItem(data, key):
+          try:
+              return data[key]
+          except KeyError:
+              return 'Key not found'
+          except TypeError:
+              return 'Invalid type'
+
+      getItem({'name': 'Alice'}, 'age')
+
+- id: "integrated_practice"
+  title: "통합 실전 문제"
+  subtitle: "여러 개념을 종합적으로 활용"
+  blocks:
+  - type: "text"
+    content: "여러 개념을 함께 활용하는 실전 문제들입니다. 자료구조, 제어문, 함수, 모듈을 통합적으로 사용하여 문제를 해결합니다."
+  - type: "code"
+    language: "python"
+    title: "단어 빈도수 계산"
+    description: "문자열에서 단어 빈도수를 딕셔너리로 계산합니다."
+    content: |-
+      sentence = "python is fun python is powerful"
+      words = sentence.split()
+      freq = {}
+      for word in words:
+          freq[word] = freq.get(word, 0) + 1
+      freq
+  - type: "code"
+    language: "python"
+    title: "리스트 필터링"
+    description: "조건에 맞는 요소만 필터링합니다."
+    content: |-
+      allNums = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      evens = []
+      for num in allNums:
+          if num % 2 == 0:
+              evens.append(num)
+      evens
+  - type: "code"
+    language: "python"
+    title: "중복 제거"
+    description: "리스트에서 중복을 제거합니다."
+    content: |-
+      rawData = [1, 2, 2, 3, 3, 3, 4, 4, 5]
+      uniqueList = list(set(rawData))
+      uniqueList.sort()
+      uniqueList
+  - type: "code"
+    language: "python"
+    title: "최댓값 찾기"
+    description: "함수로 리스트의 최댓값을 찾습니다."
+    content: |-
+      def findMax(numbers):
+          if not numbers:
+              return None
+          maxVal = numbers[0]
+          for num in numbers:
+              if num > maxVal:
+                  maxVal = num
+          return maxVal
+
+      findMax([3, 7, 2, 9, 4])
+  - type: "tip"
+    content: "여러 개념을 함께 사용하면 더 강력한 프로그램을 만들 수 있습니다."
+
+- id: "practice"
+  title: "Day 21 종합 복습"
+  subtitle: "중간 점검 완전 정복"
+  blocks:
+  - type: "text"
+    content: "Day 1~20까지 배운 모든 개념을 종합적으로 복습합니다. 🟢 기본 미션으로 핵심 개념을 확인하고, 🟡 응용 미션으로 활용 능력을 키우고, 🔴 심화 미션으로 통합 사고력을 키웁니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 문자열 메서드"
+    code: |-
+      text = "  Hello World  "
+      text.strip().upper()
+
+  - type: "expansion"
+    title: "🟢 기본2: 리스트 메서드"
+    code: |-
+      fruits = ['apple', 'banana', 'cherry']
+      fruits.append('date')
+      fruits
+
+  - type: "expansion"
+    title: "🟢 기본3: 딕셔너리 get"
+    code: |-
+      person = {'name': 'Bob', 'age': 30}
+      person.get('city', 'Seoul')
+
+  - type: "expansion"
+    title: "🟢 기본4: for 반복"
+    code: |-
+      vals = [1, 2, 3, 4, 5]
+      doubled = []
+      for v in vals:
+          doubled.append(v * 2)
+      doubled
+
+  - type: "expansion"
+    title: "🟢 기본5: 함수 정의"
+    code: |-
+      def add(x, y):
+          return x + y
+
+      add(15, 25)
+
+  - type: "expansion"
+    title: "🟡 응용1: 리스트 합계"
+    code: |-
+      prices = [1200, 3500, 2800, 4100]
+      priceSum = 0
+      for price in prices:
+          priceSum = priceSum + price
+      priceSum
+
+  - type: "expansion"
+    title: "🟡 응용2: 조건 필터링"
+    code: |-
+      scores = [95, 72, 88, 65, 91]
+      passed = []
+      for s in scores:
+          if s >= 80:
+              passed.append(s)
+      passed
+
+  - type: "expansion"
+    title: "🟡 응용3: 딕셔너리 업데이트"
+    code: |-
+      config = {'host': 'localhost', 'port': 8080}
+      config.update({'port': 9000, 'debug': True})
+      config
+
+  - type: "expansion"
+    title: "🟡 응용4: 집합 연산"
+    code: |-
+      groupA = {1, 2, 3, 4, 5}
+      groupB = {4, 5, 6, 7, 8}
+      groupA - groupB
+
+  - type: "expansion"
+    title: "🟡 응용5: 기본 매개변수"
+    code: |-
+      def power(base, exp=2):
+          return base ** exp
+
+      power(5)
+
+  - type: "expansion"
+    title: "🔴 심화1-1: 최솟값 함수"
+    code: |-
+      def findMin(numbers):
+          if not numbers:
+              return None
+          minNum = numbers[0]
+          for n in numbers:
+              if n < minNum:
+                  minNum = n
+          return minNum
+
+      findMin([8, 3, 9, 1, 5])
+
+  - type: "expansion"
+    title: "🔴 심화1-2: 평균 계산 함수"
+    code: |-
+      def calcAvg(numbers):
+          if not numbers:
+              return 0
+          acc = 0
+          for num in numbers:
+              acc = acc + num
+          return acc / len(numbers)
+
+      calcAvg([10, 20, 30, 40, 50])
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 문자열 뒤집기"
+    code: |-
+      def reverseStr(s):
+          return s[::-1]
+
+      reverseStr('Python')
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 팰린드롬 검사"
+    code: |-
+      def isPalindrome(word):
+          return word == word[::-1]
+
+      isPalindrome('radar')
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 리스트 중복 제거"
+    code: |-
+      def removeDuplicates(lst):
+          unique = []
+          for item in lst:
+              if item not in unique:
+                  unique.append(item)
+          return unique
+
+      removeDuplicates([1, 2, 2, 3, 3, 4])
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 두 리스트 병합"
+    code: |-
+      def mergeLists(list1, list2):
+          merged = []
+          for item in list1:
+              merged.append(item)
+          for item in list2:
+              merged.append(item)
+          return merged
+
+      mergeLists([1, 2], [3, 4])
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 딕셔너리 키 필터링"
+    code: |-
+      def filterKeys(d, keys):
+          filtered = {}
+          for key in keys:
+              if key in d:
+                  filtered[key] = d[key]
+          return filtered
+
+      sampleData = {'a': 1, 'b': 2, 'c': 3}
+      filterKeys(sampleData, ['a', 'c'])
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 딕셔너리 값 변환"
+    code: |-
+      def transformValues(d, func):
+          transformed = {}
+          for key in d:
+              transformed[key] = func(d[key])
+          return transformed
+
+      numDict = {'a': 1, 'b': 2, 'c': 3}
+      transformValues(numDict, lambda x: x * 10)
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 범위 내 숫자 필터링"
+    code: |-
+      def filterRange(nums, minVal, maxVal):
+          filtered = []
+          for num in nums:
+              if minVal <= num <= maxVal:
+                  filtered.append(num)
+          return filtered
+
+      filterRange([1, 5, 10, 15, 20], 5, 15)
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 조건부 카운팅"
+    code: |-
+      def countIf(items, condition):
+          cnt = 0
+          for item in items:
+              if condition(item):
+                  cnt = cnt + 1
+          return cnt
+
+      testNums = [1, 2, 3, 4, 5, 6, 7, 8]
+      countIf(testNums, lambda x: x % 2 == 0)

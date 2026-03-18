@@ -1,127 +1,87 @@
-:root {
-  color-scheme: light;
-  --nb-accent: #d6336c;
-  --nb-accent-soft: rgba(214, 51, 108, 0.06);
-  --nb-accent-hover: rgba(214, 51, 108, 0.1);
-  --nb-pink: #d6336c;
-  --nb-pink-bright: #e8478a;
-  --nb-pink-dim: rgba(214, 51, 108, 0.2);
-  --nb-pink-subtle: rgba(214, 51, 108, 0.06);
-  --nb-bg: #fafafa;
-  --nb-surface: #f3f4f6;
-  --nb-card: #ffffff;
-  --nb-border: #e5e7eb;
-  --nb-border-strong: #d1d5db;
-  --nb-text: #1a1a2e;
-  --nb-text-secondary: #4b5563;
-  --nb-text-muted: #9ca3af;
-  --nb-code-bg: #f8f8fa;
-  --nb-code-text: #1f2937;
-  --nb-success: #16a34a;
-  --nb-success-soft: rgba(22, 163, 74, 0.08);
-  --nb-error: #dc2626;
-  --nb-error-soft: rgba(220, 38, 38, 0.06);
-  --nb-warning: #d97706;
-  --nb-warning-soft: rgba(217, 119, 6, 0.08);
+@import "./lib/codaro/styles/marimo/cells-jmgGt1lS.css";
+@import "./lib/codaro/styles/marimo/markdown-renderer-DdDKmWlR.css";
+@import "./lib/codaro/styles/marimo/JsonOutput-B7vuddcd.css";
+@import "./lib/codaro/styles/marimo/index-CVpJvEAO.css";
+@import "./lib/codaro/styles/marimo/CellStatus-2Psjnl5F.css";
+@import "./lib/codaro/styles/marimo/cell-editor-Iey559K_.css";
+@import "./lib/codaro/styles/marimo/layout-BjXzDXoG.css";
+@import "./lib/codaro/styles/marimo/edit-page-Dstp9NQ5.css";
+@import "./lib/codaro/styles/marimo/Inputs-CuKU-ENz.css";
 
-  --nb-radius-sm: 6px;
-  --nb-radius-md: 10px;
-  --nb-radius-lg: 14px;
-  --nb-radius-xl: 18px;
-  --nb-radius-pill: 999px;
-
-  --nb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --nb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.06);
-  --nb-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.1);
-  --nb-shadow-float: 0 8px 32px rgba(0, 0, 0, 0.1), 0 0 0 1px rgba(0, 0, 0, 0.04);
-
-  --nb-glass: rgba(255, 255, 255, 0.82);
-  --nb-glass-border: rgba(0, 0, 0, 0.06);
-
-  --nb-font-ui: "Pretendard", "Apple SD Gothic Neo", "Segoe UI", system-ui, sans-serif;
-  --nb-font-code: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
-
-  --nb-transition-fast: 0.1s ease;
-  --nb-transition: 0.18s ease;
-
-  font-family: var(--nb-font-ui);
+@font-face {
+  font-family: "Lora";
+  src: url("/marimo/assets/Lora-VariableFont_wght-B2ootaw-.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 100 900;
+  font-display: swap;
 }
 
-[data-theme="dark"] {
-  color-scheme: dark;
-  --nb-accent: #ff2d95;
-  --nb-accent-soft: rgba(255, 45, 149, 0.08);
-  --nb-accent-hover: rgba(255, 45, 149, 0.14);
-  --nb-pink: #ff2d95;
-  --nb-pink-bright: #ff5cb0;
-  --nb-pink-dim: rgba(255, 45, 149, 0.25);
-  --nb-pink-subtle: rgba(255, 45, 149, 0.08);
-  --nb-bg: #0a0a0c;
-  --nb-surface: #111114;
-  --nb-card: #18181b;
-  --nb-border: #27272a;
-  --nb-border-strong: #3f3f46;
-  --nb-text: #e8e8f0;
-  --nb-text-secondary: #a1a1aa;
-  --nb-text-muted: #52525b;
-  --nb-code-bg: #1e1e22;
-  --nb-code-text: #e4e4e7;
-  --nb-success: #22c55e;
-  --nb-success-soft: rgba(34, 197, 94, 0.1);
-  --nb-error: #ff4466;
-  --nb-error-soft: rgba(255, 68, 102, 0.08);
-  --nb-warning: #f59e0b;
-  --nb-warning-soft: rgba(245, 158, 11, 0.1);
+@font-face {
+  font-family: "PT Sans";
+  src: url("/marimo/assets/PTSans-Regular-CxL0S8W7.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
 
-  --nb-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --nb-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.3);
-  --nb-shadow-lg: 0 8px 30px rgba(0, 0, 0, 0.4);
-  --nb-shadow-float: 0 8px 32px rgba(0, 0, 0, 0.4), 0 0 0 1px rgba(255, 255, 255, 0.04);
+@font-face {
+  font-family: "PT Sans";
+  src: url("/marimo/assets/PTSans-Bold-D9fedIX3.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
 
-  --nb-glass: rgba(18, 18, 21, 0.85);
-  --nb-glass-border: rgba(255, 255, 255, 0.06);
+@font-face {
+  font-family: "Fira Mono";
+  src: url("/marimo/assets/FiraMono-Regular-BTCkDNvf.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fira Mono";
+  src: url("/marimo/assets/FiraMono-Medium-DU3aDxX5.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 500;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Fira Mono";
+  src: url("/marimo/assets/FiraMono-Bold-CLVRCuM9.ttf") format("truetype");
+  font-style: normal;
+  font-weight: 700;
+  font-display: swap;
+}
+
+:root {
+  color-scheme: light;
 }
 
 html,
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--nb-bg);
-  color: var(--nb-text);
+  background: var(--background, #fff);
+  color: var(--foreground, #111);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  font-family: inherit;
+  overflow-y: scroll;
 }
 
 * {
   box-sizing: border-box;
 }
 
-*::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
-}
-
-*::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-*::-webkit-scrollbar-thumb {
-  background: var(--nb-border);
-  border-radius: var(--nb-radius-pill);
-}
-
-*::-webkit-scrollbar-thumb:hover {
-  background: var(--nb-text-muted);
-}
-
 button,
 input,
-select,
-textarea {
+textarea,
+select {
   font: inherit;
 }
 
@@ -129,25 +89,17 @@ button {
   appearance: none;
 }
 
-input,
-textarea,
-select {
-  color: inherit;
-}
-
 a {
   color: inherit;
 }
 
-::selection {
-  background: var(--nb-pink-dim);
+#root {
+  min-height: 100vh;
 }
 
-.prose :global(h1),
-.prose :global(h2),
-.prose :global(h3),
-.prose :global(p),
-.prose :global(ul),
-.prose :global(ol) {
-  margin-top: 0;
+.screenState {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }

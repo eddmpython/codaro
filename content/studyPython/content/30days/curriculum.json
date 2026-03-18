@@ -1,0 +1,249 @@
+{
+  "metadata": {
+    "version": "2.0",
+    "created": "2024-12-28",
+    "description": "30days 파이썬 문법 마스터 커리큘럼"
+  },
+  "days": [
+    {
+      "day": 1,
+      "title": "헬로월드",
+      "file": "day01_헬로월드.yaml",
+      "allowedConcepts": [],
+      "newConcepts": ["print", "comment", "string_literal"],
+      "forbidden": ["variable", "function", "list", "dict", "import"]
+    },
+    {
+      "day": 2,
+      "title": "변수와 데이터 타입",
+      "file": "day02_변수와데이터타입.yaml",
+      "allowedConcepts": ["print", "comment", "string_literal"],
+      "newConcepts": ["variable", "int", "float", "str", "bool", "type", "len"],
+      "forbidden": ["list", "dict", "tuple", "set", "function", "class", "import"]
+    },
+    {
+      "day": 3,
+      "title": "연산자",
+      "file": "day03_연산자.yaml",
+      "allowedConcepts": ["variable", "int", "float", "str", "bool", "type", "print"],
+      "newConcepts": ["arithmetic_operator", "comparison_operator", "logical_operator", "membership_operator"],
+      "forbidden": ["list", "dict", "function", "import"]
+    },
+    {
+      "day": 4,
+      "title": "문자열 기초",
+      "file": "day04_문자열기초.yaml",
+      "allowedConcepts": ["variable", "type", "operator", "print", "len"],
+      "newConcepts": ["string_concat", "fstring", "string_escape", "string_multiline", "in_operator"],
+      "forbidden": ["indexing", "slicing", "string_method", "list", "function", "import"]
+    },
+    {
+      "day": 5,
+      "title": "문자열 인덱싱/슬라이싱",
+      "file": "day05_문자열인덱싱슬라이싱.yaml",
+      "allowedConcepts": ["string_basic", "operator"],
+      "newConcepts": ["indexing", "negative_indexing", "slicing", "slice_step"],
+      "forbidden": ["string_method", "list", "function", "import"]
+    },
+    {
+      "day": 6,
+      "title": "문자열 메서드",
+      "file": "day06_문자열메서드.yaml",
+      "allowedConcepts": ["string_basic", "indexing", "slicing"],
+      "newConcepts": ["upper", "lower", "split", "join", "replace", "strip", "find", "count"],
+      "forbidden": ["list_method", "function", "import"]
+    },
+    {
+      "day": 7,
+      "title": "리스트 기초",
+      "file": "day07_리스트기초.yaml",
+      "allowedConcepts": ["string_all", "operator", "indexing", "slicing"],
+      "newConcepts": ["list", "list_create", "list_indexing", "list_slicing", "list_modify"],
+      "forbidden": ["list_method", "tuple", "dict", "set", "function", "import"]
+    },
+    {
+      "day": 8,
+      "title": "리스트 메서드",
+      "file": "day08_리스트메서드.yaml",
+      "allowedConcepts": ["list_basic"],
+      "newConcepts": ["append", "insert", "remove", "pop", "sort", "reverse", "copy", "extend", "clear"],
+      "forbidden": ["tuple", "dict", "set", "function", "import"]
+    },
+    {
+      "day": 9,
+      "title": "튜플",
+      "file": "day09_튜플.yaml",
+      "allowedConcepts": ["list_all", "string_all"],
+      "newConcepts": ["tuple", "tuple_immutable", "tuple_packing", "tuple_unpacking"],
+      "forbidden": ["dict", "set", "function", "import"]
+    },
+    {
+      "day": 10,
+      "title": "집합",
+      "file": "day10_집합.yaml",
+      "allowedConcepts": ["list_all", "tuple"],
+      "newConcepts": ["set", "set_unique", "add", "remove", "discard", "union", "intersection", "difference"],
+      "forbidden": ["dict", "function", "import"]
+    },
+    {
+      "day": 11,
+      "title": "딕셔너리 기초",
+      "file": "day11_딕셔너리기초.yaml",
+      "allowedConcepts": ["list_all", "tuple", "set"],
+      "newConcepts": ["dict", "key_value", "dict_create", "dict_access", "dict_modify"],
+      "forbidden": ["dict_method", "function", "import"]
+    },
+    {
+      "day": 12,
+      "title": "딕셔너리 메서드",
+      "file": "day12_딕셔너리메서드.yaml",
+      "allowedConcepts": ["dict_basic"],
+      "newConcepts": ["get", "keys", "values", "items", "update", "pop", "popitem", "clear"],
+      "forbidden": ["function", "import"]
+    },
+    {
+      "day": 13,
+      "title": "조건문",
+      "file": "day13_조건문.yaml",
+      "allowedConcepts": ["all_data_types", "all_operators"],
+      "newConcepts": ["if", "elif", "else", "ternary_operator", "nested_if"],
+      "forbidden": ["function", "loop", "import"]
+    },
+    {
+      "day": 14,
+      "title": "반복문",
+      "file": "day14_반복문.yaml",
+      "allowedConcepts": ["all_data_types", "conditional"],
+      "newConcepts": ["for", "while", "range", "break", "continue", "else_clause", "nested_loop"],
+      "forbidden": ["function", "import"]
+    },
+    {
+      "day": 15,
+      "title": "함수 기초",
+      "file": "day15_함수기초.yaml",
+      "allowedConcepts": ["all_data_types", "conditional", "loop"],
+      "newConcepts": ["def", "return", "parameter", "argument", "docstring"],
+      "forbidden": ["advanced_function", "import", "class"]
+    },
+    {
+      "day": 16,
+      "title": "함수 고급",
+      "file": "day16_함수고급.yaml",
+      "allowedConcepts": ["function_basic"],
+      "newConcepts": ["default_parameter", "keyword_argument", "args", "kwargs", "lambda"],
+      "forbidden": ["import", "class", "decorator"]
+    },
+    {
+      "day": 17,
+      "title": "스코프와 클로저",
+      "file": "day17_스코프와클로저.yaml",
+      "allowedConcepts": ["function_all"],
+      "newConcepts": ["global", "nonlocal", "closure", "scope"],
+      "forbidden": ["import", "class"]
+    },
+    {
+      "day": 18,
+      "title": "모듈과 import",
+      "file": "day18_모듈과import.yaml",
+      "allowedConcepts": ["function_all"],
+      "newConcepts": ["import", "from_import", "as", "math", "random", "datetime", "os", "sys"],
+      "forbidden": ["class", "external_library"]
+    },
+    {
+      "day": 19,
+      "title": "파일 입출력",
+      "file": "day19_파일입출력.yaml",
+      "allowedConcepts": ["function_all", "import"],
+      "newConcepts": ["open", "read", "write", "with", "close", "file_mode"],
+      "forbidden": ["class", "external_library"]
+    },
+    {
+      "day": 20,
+      "title": "예외 처리",
+      "file": "day20_예외처리.yaml",
+      "allowedConcepts": ["function_all", "import", "file_io"],
+      "newConcepts": ["try", "except", "finally", "raise", "exception_type"],
+      "forbidden": ["class", "custom_exception"]
+    },
+    {
+      "day": 21,
+      "title": "중간 종합 복습",
+      "file": "day21_중간종합복습.yaml",
+      "allowedConcepts": ["everything_before"],
+      "newConcepts": [],
+      "forbidden": ["class"]
+    },
+    {
+      "day": 22,
+      "title": "클래스 기초",
+      "file": "day22_클래스기초.yaml",
+      "allowedConcepts": ["function_all", "import", "exception"],
+      "newConcepts": ["class", "init", "self", "method", "attribute", "instance"],
+      "forbidden": ["inheritance", "special_method", "decorator"]
+    },
+    {
+      "day": 23,
+      "title": "클래스 고급",
+      "file": "day23_클래스고급.yaml",
+      "allowedConcepts": ["class_basic"],
+      "newConcepts": ["inheritance", "super", "override", "multiple_inheritance"],
+      "forbidden": ["special_method", "decorator"]
+    },
+    {
+      "day": 24,
+      "title": "특수 메서드",
+      "file": "day24_특수메서드.yaml",
+      "allowedConcepts": ["class_all"],
+      "newConcepts": ["__str__", "__repr__", "__len__", "__add__", "__eq__", "__getitem__"],
+      "forbidden": ["decorator", "metaclass"]
+    },
+    {
+      "day": 25,
+      "title": "프로퍼티와 데코레이터",
+      "file": "day25_프로퍼티와데코레이터.yaml",
+      "allowedConcepts": ["class_all", "special_method"],
+      "newConcepts": ["property", "setter", "deleter", "staticmethod", "classmethod", "decorator"],
+      "forbidden": ["metaclass", "external_library"]
+    },
+    {
+      "day": 26,
+      "title": "컴프리헨션",
+      "file": "day26_컴프리헨션.yaml",
+      "allowedConcepts": ["all_basic", "loop", "conditional"],
+      "newConcepts": ["list_comprehension", "dict_comprehension", "set_comprehension", "nested_comprehension"],
+      "forbidden": ["generator_expression", "external_library"]
+    },
+    {
+      "day": 27,
+      "title": "제너레이터와 이터레이터",
+      "file": "day27_제너레이터와이터레이터.yaml",
+      "allowedConcepts": ["function_all", "class_all", "comprehension"],
+      "newConcepts": ["yield", "generator", "iter", "next", "iterator_protocol"],
+      "forbidden": ["external_library"]
+    },
+    {
+      "day": 28,
+      "title": "고급 문법 종합",
+      "file": "day28_고급문법종합.yaml",
+      "allowedConcepts": ["everything"],
+      "newConcepts": ["context_manager", "with_statement", "custom_context_manager"],
+      "forbidden": ["external_library"]
+    },
+    {
+      "day": 29,
+      "title": "알고리즘 연습",
+      "file": "day29_알고리즘연습.yaml",
+      "allowedConcepts": ["everything"],
+      "newConcepts": ["sorting", "searching", "recursion"],
+      "forbidden": ["external_library"]
+    },
+    {
+      "day": 30,
+      "title": "최종 프로젝트",
+      "file": "day30_최종프로젝트.yaml",
+      "allowedConcepts": ["everything"],
+      "newConcepts": [],
+      "forbidden": ["external_library"]
+    }
+  ]
+}

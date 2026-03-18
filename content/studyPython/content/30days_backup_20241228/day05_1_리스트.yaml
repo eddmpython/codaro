@@ -1,0 +1,452 @@
+meta:
+  id: day05_1
+  title: 리스트
+  day: 5
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 리스트 - 순서있는 데이터 모음"
+    description: "리스트 생성, 인덱싱, 추가/삭제, 정렬 방법을 배웁니다."
+    keywords: ['리스트', 'list', 'append', 'sort']
+intro:
+  emoji: "📋"
+  points:
+  - 리스트의 기본 개념과 특성
+  - 다양한 리스트 생성 방법
+  - 양수/음수 인덱싱으로 요소 접근
+  - 슬라이싱으로 부분 추출
+  - 리스트 요소 수정
+  - 핵심 메소드 (append, insert, remove, pop)
+  - 검색 메소드 (index, count)
+  - 안전한 리스트 복사 방법
+sections:
+- id: list_introduction
+  title: 리스트 소개
+  subtitle: 순서가 있는 데이터 모음
+  blocks:
+  - type: text
+    content: 리스트(List)는 여러 개의 값을 순서대로 저장할 수 있는 파이썬의 핵심 데이터 타입입니다. 지금까지 배운 문자열, 숫자, 불린은 하나의 값만 저장할 수 있었지만, 리스트는 여러 값을 한 변수에 담을 수 있습니다. 대괄호 []로 만들고, 쉼표로 요소를 구분합니다. 리스트는 변경 가능한(mutable) 특성을 가져서 생성 후에도 요소를 추가, 삭제, 수정할 수 있습니다.
+  - type: list
+    items:
+    - 여러 값을 순서대로 저장
+    - 대괄호 []로 생성
+    - 쉼표로 요소 구분
+    - 변경 가능(mutable)한 객체
+  - type: code
+    language: python
+    title: 리스트 기본
+    description: "리스트를 생성하고 기본 속성을 확인합니다."
+    content: |-
+      emptyList = []
+      print('빈 리스트:', emptyList)
+      print('타입:', type(emptyList))
+      print('길이:', len(emptyList))
+
+      mixedList = ['Banana', 10, False, 9.81]
+      print('혼합 리스트:', mixedList)
+      print('요소 개수:', len(mixedList))
+  - type: tip
+    content: "리스트는 다양한 타입의 값을 함께 저장할 수 있습니다. 문자열, 숫자, 불린 등을 한 리스트에 담을 수 있습니다."
+
+- id: list_creation
+  title: 리스트 생성
+  subtitle: 대괄호와 list() 함수
+  blocks:
+  - type: text
+    content: 리스트를 만드는 방법은 크게 두 가지입니다. 첫째, 대괄호 []를 사용해 직접 값을 나열하는 방법입니다. 둘째, list() 함수를 사용해 다른 데이터를 리스트로 변환하는 방법입니다. list() 함수는 문자열을 문자 하나씩 분리하여 리스트로 만들 수 있어 유용합니다.
+  - type: list
+    items:
+    - "[] : 직접 값을 나열"
+    - "list() : 다른 데이터를 리스트로 변환"
+    - 문자열을 list()로 문자 단위 분리 가능
+    - 빈 리스트도 두 방법 모두 가능
+  - type: code
+    language: python
+    title: 리스트 생성 방법
+    description: "대괄호와 list() 함수로 리스트를 생성합니다."
+    content: |-
+      createFruits = ['banana', 'orange', 'mango', 'lemon']
+      print('과일:', createFruits)
+
+      createNumbers = [0, 1, 2, 3, 4, 5]
+      print('숫자:', createNumbers)
+
+      createEmptyList = list()
+      print('빈 리스트:', createEmptyList)
+
+      createCharList = list('Python')
+      print("'Python'을 리스트로:", createCharList)
+
+- id: list_indexing_positive
+  title: 양수 인덱싱
+  subtitle: 앞에서부터 요소 접근
+  blocks:
+  - type: text
+    content: 리스트의 각 요소는 인덱스(순서 번호)로 접근할 수 있습니다. 파이썬에서 인덱스는 0부터 시작합니다. 첫 번째 요소는 인덱스 0, 두 번째 요소는 인덱스 1입니다. 문자열의 인덱싱과 동일한 방식입니다. 리스트[인덱스] 형태로 특정 위치의 값을 가져옵니다.
+  - type: list
+    items:
+    - 인덱스는 0부터 시작
+    - 첫 번째 요소는 [0]
+    - 마지막 요소는 [len(list) - 1]
+    - 범위를 벗어나면 IndexError 발생
+  - type: code
+    language: python
+    title: 양수 인덱싱
+    description: "인덱스로 리스트 요소에 접근합니다."
+    content: |-
+      indexFruits = ['banana', 'orange', 'mango', 'lemon']
+
+      firstFruit = indexFruits[0]
+      secondFruit = indexFruits[1]
+      lastFruit = indexFruits[3]
+
+      print('첫 번째 과일:', firstFruit)
+      print('두 번째 과일:', secondFruit)
+      print('마지막 과일:', lastFruit)
+
+      indexCountries = ['Finland', 'Estonia', 'Denmark', 'Sweden']
+      print('첫 번째 국가:', indexCountries[0])
+      print('세 번째 국가:', indexCountries[2])
+
+- id: list_indexing_negative
+  title: 음수 인덱싱
+  subtitle: 뒤에서부터 요소 접근
+  blocks:
+  - type: text
+    content: 음수 인덱싱은 리스트의 뒤에서부터 요소에 접근하는 방법입니다. -1은 마지막 요소, -2는 뒤에서 두 번째입니다. 리스트의 길이를 모르더라도 마지막 요소에 쉽게 접근할 수 있어 매우 편리합니다. 문자열 인덱싱과 동일한 방식입니다.
+  - type: list
+    items:
+    - -1은 마지막 요소
+    - -2는 뒤에서 두 번째
+    - 첫 번째 요소는 -len(list)
+    - 리스트 길이 몰라도 뒤에서 접근 가능
+  - type: code
+    language: python
+    title: 음수 인덱싱
+    description: "음수 인덱스로 뒤에서부터 요소에 접근합니다."
+    content: |-
+      negFruits = ['banana', 'orange', 'mango', 'lemon']
+
+      lastFruit = negFruits[-1]
+      secondLast = negFruits[-2]
+
+      print('마지막 과일:', lastFruit)
+      print('뒤에서 두 번째:', secondLast)
+
+      print('negFruits[0]:', negFruits[0])
+      print('negFruits[-4]:', negFruits[-4])
+      print('같은 값인가?', negFruits[0] == negFruits[-4])
+
+- id: list_slicing
+  title: 리스트 슬라이싱
+  subtitle: 부분 리스트 추출
+  blocks:
+  - type: text
+    content: 슬라이싱은 리스트의 일부분을 추출하여 새 리스트를 만드는 기능입니다. [시작:끝] 형식으로 사용하며, 시작 인덱스는 포함되고 끝 인덱스는 포함되지 않습니다. 문자열 슬라이싱과 동일합니다. 시작을 생략하면 처음부터, 끝을 생략하면 마지막까지입니다. [::-1]로 리스트를 뒤집을 수 있습니다.
+  - type: list
+    items:
+    - "[시작:끝] - 시작 포함, 끝 미포함"
+    - "[:끝] - 처음부터 끝 직전까지"
+    - "[시작:] - 시작부터 마지막까지"
+    - "[::-1] - 리스트 뒤집기"
+  - type: code
+    language: python
+    title: 슬라이싱 활용
+    description: "슬라이싱으로 리스트 일부를 추출합니다."
+    content: |-
+      sliceFruits = ['banana', 'orange', 'mango', 'lemon']
+
+      allFruits = sliceFruits[0:4]
+      print('전체:', allFruits)
+
+      someFruits = sliceFruits[1:3]
+      print('1~2번:', someFruits)
+
+      firstTwo = sliceFruits[:2]
+      print('처음 2개:', firstTwo)
+
+      lastTwo = sliceFruits[2:]
+      print('마지막 2개:', lastTwo)
+
+      reversed = sliceFruits[::-1]
+      print('역순:', reversed)
+
+- id: list_modification
+  title: 리스트 요소 수정
+  subtitle: 값 변경하기
+  blocks:
+  - type: text
+    content: 리스트는 변경 가능(mutable)하므로 인덱스를 사용해 특정 요소의 값을 바꿀 수 있습니다. 문자열은 불변(immutable)이라 개별 문자를 수정할 수 없었지만, 리스트는 가능합니다. 리스트[인덱스] = 새값 형태로 수정합니다. 슬라이싱으로 여러 요소를 한 번에 바꿀 수도 있습니다.
+  - type: list
+    items:
+    - 리스트[인덱스] = 새값
+    - 양수/음수 인덱스 모두 가능
+    - 슬라이싱으로 범위 수정 가능
+    - 원본 리스트가 직접 변경됨
+  - type: code
+    language: python
+    title: 요소 수정
+    description: "인덱스로 리스트 요소를 수정합니다."
+    content: |-
+      modifyFruits = ['banana', 'orange', 'mango', 'lemon']
+      print('원본:', modifyFruits)
+
+      modifyFruits[0] = 'avocado'
+      print('첫 번째 변경:', modifyFruits)
+
+      modifyFruits[-1] = 'lime'
+      print('마지막 변경:', modifyFruits)
+
+      modifyFruits[1:3] = ['grape', 'cherry']
+      print('범위 변경:', modifyFruits)
+
+- id: list_append
+  title: append() 메소드
+  subtitle: 끝에 요소 추가
+  blocks:
+  - type: text
+    content: append() 메소드는 리스트의 마지막에 새 요소를 추가합니다. 가장 자주 사용되는 리스트 메소드 중 하나입니다. 한 번에 하나의 요소만 추가할 수 있습니다. 여러 요소를 추가하려면 append()를 여러 번 호출하거나 extend() 메소드를 사용합니다.
+  - type: list
+    items:
+    - 리스트 마지막에 요소 추가
+    - 한 번에 하나만 추가
+    - 원본 리스트가 변경됨
+    - 반환값은 None
+  - type: code
+    language: python
+    title: append() 사용
+    description: "append()로 리스트 끝에 요소를 추가합니다."
+    content: |-
+      appendFruits = ['banana', 'orange', 'mango']
+      print('원본:', appendFruits)
+
+      appendFruits.append('apple')
+      print('apple 추가:', appendFruits)
+
+      appendFruits.append('lime')
+      print('lime 추가:', appendFruits)
+
+      appendNumbers = [1, 2, 3]
+      appendNumbers.append(4)
+      appendNumbers.append(5)
+      print('숫자 추가:', appendNumbers)
+
+- id: list_insert
+  title: insert() 메소드
+  subtitle: 특정 위치에 요소 삽입
+  blocks:
+  - type: text
+    content: insert() 메소드는 원하는 위치에 요소를 삽입합니다. 첫 번째 인자로 삽입할 인덱스, 두 번째 인자로 삽입할 값을 받습니다. 기존 요소들은 뒤로 밀려납니다. insert(0, 값)은 맨 앞에, insert(len(list), 값)은 맨 뒤에 삽입합니다(append와 동일 효과).
+  - type: list
+    items:
+    - "insert(인덱스, 값) 형식"
+    - 지정 위치에 요소 삽입
+    - 기존 요소는 뒤로 이동
+    - insert(0, 값)은 맨 앞 삽입
+  - type: code
+    language: python
+    title: insert() 사용
+    description: "insert()로 특정 위치에 요소를 삽입합니다."
+    content: |-
+      insertFruits = ['banana', 'orange', 'mango']
+      print('원본:', insertFruits)
+
+      insertFruits.insert(1, 'apple')
+      print('1번에 apple 삽입:', insertFruits)
+
+      insertFruits.insert(0, 'grape')
+      print('맨 앞에 grape 삽입:', insertFruits)
+
+      insertNumbers = [1, 3, 5]
+      insertNumbers.insert(1, 2)
+      insertNumbers.insert(3, 4)
+      print('숫자 삽입:', insertNumbers)
+
+- id: list_remove
+  title: remove() 메소드
+  subtitle: 값으로 요소 제거
+  blocks:
+  - type: text
+    content: remove() 메소드는 지정한 값과 일치하는 첫 번째 요소를 제거합니다. 인덱스가 아닌 값을 기준으로 삭제합니다. 같은 값이 여러 개 있으면 첫 번째만 제거됩니다. 값이 존재하지 않으면 ValueError가 발생하므로, 삭제 전에 in 연산자로 확인하는 것이 안전합니다.
+  - type: list
+    items:
+    - 값을 기준으로 요소 제거
+    - 첫 번째로 발견된 요소만 제거
+    - 값이 없으면 ValueError
+    - 원본 리스트가 변경됨
+  - type: code
+    language: python
+    title: remove() 사용
+    description: "remove()로 값을 기준으로 요소를 제거합니다."
+    content: |-
+      removeFruits = ['banana', 'orange', 'mango', 'lemon']
+      print('원본:', removeFruits)
+
+      removeFruits.remove('orange')
+      print('orange 제거:', removeFruits)
+
+      removeNumbers = [1, 2, 3, 2, 1, 4, 1]
+      print('원본 숫자:', removeNumbers)
+
+      removeNumbers.remove(1)
+      print('1 제거 (첫 번째만):', removeNumbers)
+
+      removeNumbers.remove(2)
+      print('2 제거 (첫 번째만):', removeNumbers)
+
+- id: list_pop
+  title: pop() 메소드
+  subtitle: 인덱스로 요소 제거 및 반환
+  blocks:
+  - type: text
+    content: pop() 메소드는 지정한 인덱스의 요소를 제거하고 그 값을 반환합니다. 인덱스를 생략하면 마지막 요소를 제거합니다. remove()와 달리 제거된 값을 돌려받을 수 있어, 꺼낸 값을 활용할 때 유용합니다. 스택(stack) 자료구조를 구현할 때 필수적입니다.
+  - type: list
+    items:
+    - 인덱스 기준으로 요소 제거
+    - 제거된 값을 반환
+    - 인덱스 생략시 마지막 요소 제거
+    - 스택 구현에 활용
+  - type: code
+    language: python
+    title: pop() 사용
+    description: "pop()으로 요소를 제거하고 반환받습니다."
+    content: |-
+      popFruits = ['banana', 'orange', 'mango', 'lemon']
+      print('원본:', popFruits)
+
+      removedFruit = popFruits.pop()
+      print('제거된 과일:', removedFruit)
+      print('남은 과일:', popFruits)
+
+      firstFruit = popFruits.pop(0)
+      print('첫 번째 제거:', firstFruit)
+      print('남은 과일:', popFruits)
+
+      popStack = [1, 2, 3, 4, 5]
+      lastItem = popStack.pop()
+      print('스택에서 꺼냄:', lastItem)
+      print('남은 스택:', popStack)
+
+- id: list_index_count
+  title: index()와 count()
+  subtitle: 검색 메소드
+  blocks:
+  - type: text
+    content: index() 메소드는 값의 첫 번째 위치(인덱스)를 반환합니다. 값이 없으면 ValueError가 발생합니다. count() 메소드는 특정 값이 몇 번 등장하는지 셉니다. count()는 값이 없어도 0을 반환하므로 안전합니다.
+  - type: list
+    items:
+    - "index(값): 첫 번째 인덱스 반환"
+    - index()는 값이 없으면 에러
+    - "count(값): 등장 횟수 반환"
+    - count()는 없으면 0 반환 (안전)
+  - type: code
+    language: python
+    title: 검색 메소드 사용
+    description: "index()와 count()로 값을 검색합니다."
+    content: |-
+      searchFruits = ['banana', 'orange', 'mango', 'lemon']
+
+      bananaIndex = searchFruits.index('banana')
+      mangoIndex = searchFruits.index('mango')
+      print('banana 위치:', bananaIndex)
+      print('mango 위치:', mangoIndex)
+
+      searchNumbers = [1, 2, 3, 2, 1, 4, 1, 5, 1]
+
+      oneCount = searchNumbers.count(1)
+      twoCount = searchNumbers.count(2)
+      grapeCount = searchFruits.count('grape')
+
+      print('1의 개수:', oneCount)
+      print('2의 개수:', twoCount)
+      print('grape 개수:', grapeCount)
+
+- id: list_copy
+  title: 리스트 복사
+  subtitle: 독립적인 복사본 만들기
+  blocks:
+  - type: text
+    content: 리스트를 다른 변수에 할당하면 같은 객체를 참조하게 됩니다. 한쪽을 수정하면 다른 쪽도 바뀝니다. 독립적인 복사본을 만들려면 copy() 메소드, [:] 슬라이싱, 또는 list() 함수를 사용해야 합니다. 이렇게 하면 원본과 별개인 새 리스트가 만들어집니다.
+  - type: list
+    items:
+    - 단순 할당은 같은 객체 참조
+    - copy() 메소드로 복사
+    - "[:] 슬라이싱으로 복사"
+    - list() 함수로 복사
+  - type: code
+    language: python
+    title: 리스트 복사 방법
+    description: "다양한 방법으로 리스트를 복사합니다."
+    content: |-
+      copyFruits = ['banana', 'orange', 'mango']
+      print('원본:', copyFruits)
+
+      copy1 = copyFruits.copy()
+      copy2 = copyFruits[:]
+      copy3 = list(copyFruits)
+
+      print('copy() 복사:', copy1)
+      print('[:] 복사:', copy2)
+      print('list() 복사:', copy3)
+
+      copyFruits[0] = 'avocado'
+      print('원본 수정:', copyFruits)
+      print('복사본은 그대로:', copy1)
+      print('다른 객체인가?', copyFruits is not copy1)
+
+- id: practice
+  title: 5일차 복습
+  subtitle: 리스트 종합 미션
+  blocks:
+  - type: text
+    content: 5일차에서 배운 리스트 생성, 인덱싱, 슬라이싱, 메소드들을 복습하는 미션입니다. 각 미션을 펼쳐서 정답을 확인하기 전에 먼저 직접 작성해보세요.
+  - type: expansion
+    title: "미션1: 리스트 생성과 접근"
+    code: |-
+      colors = ['red', 'green', 'blue', 'yellow']
+      print('첫 번째:', colors[0])
+      print('마지막:', colors[-1])
+      print('길이:', len(colors))
+  - type: expansion
+    title: "미션2: 슬라이싱 활용"
+    code: |-
+      numbers = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9]
+      print('처음 5개:', numbers[:5])
+      print('마지막 3개:', numbers[-3:])
+      print('역순:', numbers[::-1])
+      print('짝수 인덱스:', numbers[::2])
+  - type: expansion
+    title: "미션3: 요소 추가"
+    code: |-
+      animals = ['dog', 'cat']
+      animals.append('bird')
+      animals.insert(0, 'fish')
+      print('동물들:', animals)
+  - type: expansion
+    title: "미션4: 요소 제거"
+    code: |-
+      fruits = ['apple', 'banana', 'cherry', 'banana']
+      fruits.remove('banana')
+      print('remove 후:', fruits)
+      removed = fruits.pop()
+      print('pop 결과:', removed)
+      print('남은 과일:', fruits)
+  - type: expansion
+    title: "미션5: 검색과 수정"
+    code: |-
+      scores = [85, 90, 78, 92, 88]
+      maxIndex = scores.index(92)
+      print('92의 위치:', maxIndex)
+      scores[maxIndex] = 100
+      print('수정 후:', scores)
+  - type: expansion
+    title: "미션6: 리스트 복사와 수정"
+    code: |-
+      original = [1, 2, 3, 4, 5]
+      copied = original.copy()
+      original[0] = 100
+      print('원본:', original)
+      print('복사본:', copied)
+      print('독립적인가?', original[0] != copied[0])

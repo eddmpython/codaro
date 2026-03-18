@@ -1,0 +1,338 @@
+meta:
+  id: duckdb_03
+  title: 팁패턴분석
+  order: 3
+  category: duckdb
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["tips", "CASE WHEN", "ORDER BY", "GROUP BY", "조건분류"]
+  seo:
+    title: "DuckDB CASE WHEN 조건분류 - 팁 패턴 분석"
+    description: "레스토랑 팁 데이터로 조건부 분류를 학습합니다. CASE WHEN으로 팁 등급을 나누고 ORDER BY로 다중 정렬을 수행합니다."
+    keywords: ["DuckDB CASE WHEN", "ORDER BY", "GROUP BY", "팁 분석", "조건부 분류"]
+
+intro:
+  emoji: "💵"
+  goal: 팁을 등급(낮음/중간/높음)으로 분류하고 요일/시간별 패턴을 분석합니다.
+  description: CASE WHEN으로 조건부 값을 만들고, 복합 정렬로 데이터를 정리합니다. 이전에 배운 GROUP BY, AVG, ROUND를 함께 활용합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: tips 데이터 준비
+  blocks:
+  - type: text
+    content: 레스토랑 팁 데이터를 DuckDB에 로드합니다. tips 데이터셋은 고객의 결제 금액, 팁, 요일, 시간대, 파티 크기 등의 정보를 담고 있습니다. 이 데이터로 팁 패턴을 분석하여 매출 증대 인사이트를 얻을 수 있습니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: pandas로 읽어서 DuckDB 테이블로 변환
+    content: |-
+      import pandas as pd
+      import duckdb
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
+      df = pd.read_csv(f"{url}/tips.csv")
+      tips = duckdb.from_df(df)
+      tips
+
+- id: step2_explore
+  title: 2단계. 팁 분포 확인
+  subtitle: 팁 통계 보기
+  blocks:
+  - type: text
+    content: 팁의 최소, 최대, 평균을 확인하여 등급 기준을 설정합니다. MIN, MAX, AVG 함수로 데이터의 범위와 중심 경향을 파악하면 어떤 기준으로 low/mid/high를 나눌지 합리적으로 결정할 수 있습니다. 탐색적 분석의 첫 단계로 데이터의 전체적인 분포를 이해하는 것이 중요합니다.
+  - type: code
+    language: python
+    title: 팁 통계
+    description: MIN, MAX, AVG로 팁 범위 확인
+    content: |-
+      duckdb.sql("""
+          SELECT
+              MIN(tip) AS minTip,
+              MAX(tip) AS maxTip,
+              ROUND(AVG(tip), 2) AS avgTip
+          FROM tips
+      """)
+
+- id: step3_case_when
+  title: 3단계. 팁 등급 분류
+  subtitle: CASE WHEN 사용
+  blocks:
+  - type: text
+    content: CASE WHEN 구문으로 팁을 3등급(low/mid/high)으로 분류합니다. SQL에서 조건부 값을 생성하는 가장 강력한 도구로, 복잡한 비즈니스 로직을 쿼리 안에서 처리할 수 있습니다. 2달러 미만은 low, 4달러 이상은 high, 그 사이는 mid로 분류하여 고객 세그먼트를 만듭니다.
+  - type: code
+    language: python
+    title: 팁 등급 분류
+    description: CASE WHEN으로 조건부 분류
+    content: |-
+      duckdb.sql("""
+          SELECT
+              total_bill,
+              tip,
+              CASE
+                  WHEN tip < 2 THEN 'low'
+                  WHEN tip >= 4 THEN 'high'
+                  ELSE 'mid'
+              END AS tipLevel
+          FROM tips
+          LIMIT 10
+      """)
+  - type: tip
+    content: "CASE WHEN 조건 THEN 값 ELSE 기본값 END 형태로 조건부 값을 만듭니다. 여러 조건은 WHEN을 추가합니다."
+
+- id: step4_count_level
+  title: 4단계. 등급별 건수
+  subtitle: 그룹화 집계
+  blocks:
+  - type: text
+    content: 각 등급에 몇 건이 있는지 세어봅니다. COUNT(*)로 등급별 건수를 집계하면 팁 분포를 한눈에 파악할 수 있습니다. 이를 통해 어떤 등급의 고객이 가장 많은지, 등급 불균형이 있는지 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 등급별 건수
+    description: GROUP BY로 등급별 집계
+    content: |-
+      duckdb.sql("""
+          SELECT
+              CASE
+                  WHEN tip < 2 THEN 'low'
+                  WHEN tip >= 4 THEN 'high'
+                  ELSE 'mid'
+              END AS tipLevel,
+              COUNT(*) AS cnt
+          FROM tips
+          GROUP BY tipLevel
+      """)
+
+- id: step5_order_single
+  title: 5단계. 단일 정렬
+  subtitle: ORDER BY 기본
+  blocks:
+  - type: text
+    content: 팁이 높은 순서대로 정렬합니다. ORDER BY tip DESC를 사용하면 가장 후한 팁을 준 고객부터 확인할 수 있습니다. 내림차순(DESC) 정렬로 최댓값을 먼저 보여줍니다.
+  - type: code
+    language: python
+    title: 팁 높은 순
+    description: ORDER BY DESC로 내림차순 정렬
+    content: |-
+      duckdb.sql("""
+          SELECT total_bill, tip, day, time
+          FROM tips
+          ORDER BY tip DESC
+          LIMIT 10
+      """)
+
+- id: step6_order_multi
+  title: 6단계. 다중 정렬
+  subtitle: 여러 기준 정렬
+  blocks:
+  - type: text
+    content: 다중 컬럼 정렬로 데이터를 더 세밀하게 정리합니다. 먼저 요일로 정렬한 후 같은 요일 내에서 팁이 높은 순으로 정렬하면 요일별로 그룹화된 상태에서 최고 팁을 쉽게 찾을 수 있습니다. 실무에서 리포트 작성 시 이런 다중 정렬이 자주 사용됩니다.
+  - type: code
+    language: python
+    title: 요일 → 팁 순
+    description: 다중 컬럼 정렬
+    content: |-
+      duckdb.sql("""
+          SELECT day, time, total_bill, tip
+          FROM tips
+          ORDER BY day, tip DESC
+          LIMIT 15
+      """)
+  - type: tip
+    content: "ORDER BY col1, col2 DESC는 col1 오름차순 후 col2 내림차순입니다. 각 컬럼마다 ASC/DESC를 지정할 수 있습니다."
+
+- id: step7_day_avg
+  title: 7단계. 요일별 평균 팁
+  subtitle: 요일 패턴 분석
+  blocks:
+  - type: text
+    content: 요일별로 평균 팁을 구하고 높은 순으로 정렬합니다. GROUP BY day로 요일별로 묶은 후 AVG(tip)으로 평균을 계산합니다. 어느 요일에 팁이 가장 많이 나오는지 파악하여 마케팅 전략을 수립할 수 있습니다.
+  - type: code
+    language: python
+    title: 요일별 평균 팁
+    description: GROUP BY + ORDER BY 조합
+    content: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              ROUND(AVG(tip), 2) AS avgTip,
+              COUNT(*) AS cnt
+          FROM tips
+          GROUP BY day
+          ORDER BY avgTip DESC
+      """)
+
+- id: step8_time_pattern
+  title: 8단계. 시간대별 패턴
+  subtitle: 점심 vs 저녁
+  blocks:
+  - type: text
+    content: 점심과 저녁 시간대별 팁 패턴을 비교합니다. time 컬럼으로 그룹화하면 Lunch와 Dinner의 평균 팁과 결제 금액을 비교할 수 있습니다. 이를 통해 시간대별 매출 특성과 고객 성향을 파악합니다.
+  - type: code
+    language: python
+    title: 시간대별 분석
+    description: time 그룹화
+    content: |-
+      duckdb.sql("""
+          SELECT
+              time,
+              ROUND(AVG(tip), 2) AS avgTip,
+              ROUND(AVG(total_bill), 2) AS avgBill,
+              COUNT(*) AS cnt
+          FROM tips
+          GROUP BY time
+          ORDER BY avgTip DESC
+      """)
+
+- id: step9_day_time
+  title: 9단계. 요일+시간대 분석
+  subtitle: 이중 그룹화
+  blocks:
+  - type: text
+    content: 요일과 시간대를 함께 고려해 더 세밀하게 분석합니다. GROUP BY day, time으로 다중 그룹화하면 '목요일 저녁', '토요일 점심' 같은 세부 패턴을 발견할 수 있습니다. 이는 요일만, 시간대만 본 것보다 훨씬 정교한 인사이트를 제공합니다.
+  - type: code
+    language: python
+    title: 요일+시간대 분석
+    description: 다중 GROUP BY
+    content: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              time,
+              ROUND(AVG(tip), 2) AS avgTip,
+              COUNT(*) AS cnt
+          FROM tips
+          GROUP BY day, time
+          ORDER BY day, avgTip DESC
+      """)
+
+- id: step10_level_pattern
+  title: 10단계. 등급별 요일 패턴
+  subtitle: 종합 분석
+  blocks:
+  - type: text
+    content: 팁 등급별로 어느 요일에 많이 나오는지 분석합니다. CASE WHEN으로 만든 등급과 요일을 함께 그룹화하면 '높은 팁은 주말에 많다' 같은 패턴을 발견할 수 있습니다. 등급별 평균 결제 금액도 함께 보면 고객 세그먼트를 이해하는 데 도움이 됩니다.
+  - type: code
+    language: python
+    title: 등급별 요일 분석
+    description: CASE WHEN + GROUP BY 종합
+    content: |-
+      duckdb.sql("""
+          SELECT
+              CASE
+                  WHEN tip < 2 THEN 'low'
+                  WHEN tip >= 4 THEN 'high'
+                  ELSE 'mid'
+              END AS tipLevel,
+              day,
+              COUNT(*) AS cnt,
+              ROUND(AVG(total_bill), 2) AS avgBill
+          FROM tips
+          GROUP BY tipLevel, day
+          ORDER BY tipLevel, cnt DESC
+      """)
+
+- id: step11_final
+  title: 11단계. 최종 결과물
+  subtitle: 팁 패턴 종합 리포트
+  blocks:
+  - type: text
+    content: 요일/시간대별로 팁 등급 분포와 평균을 보여주는 종합 리포트입니다.
+  - type: code
+    language: python
+    title: 팁 패턴 종합 리포트
+    description: 최종 결과물
+    content: |-
+      duckdb.sql("""
+          SELECT
+              day,
+              time,
+              ROUND(AVG(tip), 2) AS avgTip,
+              ROUND(AVG(total_bill), 2) AS avgBill,
+              SUM(CASE WHEN tip < 2 THEN 1 ELSE 0 END) AS lowCnt,
+              SUM(CASE WHEN tip >= 2 AND tip < 4 THEN 1 ELSE 0 END) AS midCnt,
+              SUM(CASE WHEN tip >= 4 THEN 1 ELSE 0 END) AS highCnt,
+              COUNT(*) AS totalCnt
+          FROM tips
+          GROUP BY day, time
+          ORDER BY day, time
+      """)
+
+- id: practice
+  title: 실습
+  subtitle: 팁 패턴 분석 프로젝트
+  blocks:
+  - type: text
+    content: CASE WHEN과 ORDER BY를 활용해 팁 데이터를 분석합니다. 조건부 분류로 복잡한 비즈니스 로직을 구현하고, 정렬로 우선순위를 명확히 합니다. 이 두 개념을 마스터하면 실무에서 대부분의 데이터 분류와 정렬 요구사항을 처리할 수 있습니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 결제 금액 등급별 팁 패턴 분석 (small/medium/large)"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import pandas as pd
+        import duckdb
+        baseUrl1 = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
+        data = pd.read_csv(f"{baseUrl1}/tips.csv")
+        tbl1 = duckdb.from_df(data)
+    - type: code
+      title: "등급 분류 및 집계"
+      content: |-
+        duckdb.sql("""
+            SELECT
+                CASE
+                    WHEN total_bill < 20 THEN 'small'
+                    WHEN total_bill >= 30 THEN 'large'
+                    ELSE 'medium'
+                END AS billLevel,
+                COUNT(*) AS cnt,
+                ROUND(AVG(tip), 2) AS avgTip,
+                ROUND(AVG(tip / total_bill * 100), 2) AS tipPct
+            FROM tbl1
+            GROUP BY billLevel
+            ORDER BY avgTip DESC
+        """)
+  - type: expansion
+    title: "미션2: 요일+시간대별 팁 등급 분포 종합 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import pandas as pd
+        import duckdb
+        baseUrl2 = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
+        frame = pd.read_csv(f"{baseUrl2}/tips.csv")
+        tbl2 = duckdb.from_df(frame)
+    - type: code
+      title: "다중 그룹화 및 등급별 카운트"
+      content: |-
+        duckdb.sql("""
+            SELECT
+                day,
+                time,
+                SUM(CASE WHEN tip < 2 THEN 1 ELSE 0 END) AS lowCnt,
+                SUM(CASE WHEN tip >= 2 AND tip < 4 THEN 1 ELSE 0 END) AS midCnt,
+                SUM(CASE WHEN tip >= 4 THEN 1 ELSE 0 END) AS highCnt,
+                COUNT(*) AS totalCnt,
+                ROUND(AVG(tip), 2) AS avgTip
+            FROM tbl2
+            GROUP BY day, time
+            ORDER BY day, avgTip DESC
+        """)
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 조건부 분류와 복합 정렬을 마스터했습니다.
+  - type: list
+    items:
+    - "CASE WHEN 조건 THEN 값 ELSE 기본값 END - 조건부 값 생성"
+    - "ORDER BY col1, col2 DESC - 다중 컬럼 정렬"
+    - "GROUP BY + CASE WHEN - 조건부 집계"
+    - "SUM(CASE WHEN ...) - 조건별 카운트"
+  - type: text
+    content: 다음 시간에는 WHERE와 HAVING으로 조건 필터링을 배웁니다.

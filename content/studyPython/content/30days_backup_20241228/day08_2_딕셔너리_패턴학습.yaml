@@ -1,0 +1,203 @@
+meta:
+  id: day08_2
+  title: 딕셔너리 패턴학습
+  day: 8
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 딕셔너리 - 키-값 쌍 데이터"
+    description: "딕셔너리로 키-값 쌍 데이터를 다루는 방법을 배웁니다."
+    keywords: ['딕셔너리', 'dictionary', 'key-value']
+intro:
+  title: 딕셔너리 마스터 패턴북
+  emoji: 🔥
+  description: 이것만 외우면 딕셔너리 마스터! 핵심 패턴만 모았습니다.
+  points:
+  - '📝 생성: {키: 값, 키: 값}'
+  - '🔍 접근: 딕셔너리[키] 또는 get()'
+  - '➕ 추가/수정: 딕셔너리[키] = 값'
+  - '➖ 삭제: del, pop(), popitem()'
+  - '🔑 키 목록: keys()'
+  - '📊 값 목록: values()'
+  - '📦 쌍 목록: items()'
+  - '🔍 포함: in (키 존재 확인)'
+  - '🔄 병합: update(), {**a, **b}'
+  summary: 🔥 딕셔너리는 키-값 쌍! 데이터 저장의 핵심!
+sections:
+- id: creation
+  title: 1. 딕셔너리 생성 패턴
+  subtitle: '{key: value}'
+  blocks:
+  - type: code
+    language: python
+    title: 딕셔너리 생성
+    description: 딕셔너리는 키-값 쌍으로 데이터를 저장하는 가장 유연한 자료구조입니다. 중괄호를 사용하거나 dict() 함수로 생성할 수 있습니다.
+    content: |-
+      creationPerson = {"name": "Kim", "age": 25, "city": "Seoul"}
+      print(creationPerson)
+
+      creationStudent = dict(name="Lee", age=20, grade="A")
+      print(creationStudent)
+
+      creationEmpty = {}
+      print(creationEmpty)
+- id: access
+  title: 2. 값 접근 패턴
+  subtitle: dict[key], dict.get()
+  blocks:
+  - type: code
+    language: python
+    title: 안전한 값 접근
+    description: 딕셔너리의 값에 접근하는 방법은 두 가지입니다. 직접 접근은 빠르지만 키가 없으면 에러가 발생하고, get() 메서드는 안전하게 접근할 수 있습니다.
+    content: |-
+      accessPerson = {"name": "Kim", "age": 25}
+
+      print(accessPerson["name"])
+
+      print(accessPerson.get("name"))
+      print(accessPerson.get("job"))
+      print(accessPerson.get("job", "없음"))
+- id: modify
+  title: 3. 추가/수정 패턴
+  subtitle: dict[key] = value
+  blocks:
+  - type: code
+    language: python
+    title: 값 추가와 수정
+    description: 딕셔너리는 동적으로 키-값을 추가하거나 수정할 수 있습니다. 키가 존재하면 수정되고, 없으면 새로 추가됩니다.
+    content: |-
+      modifyPerson = {"name": "Kim", "age": 25}
+
+      modifyPerson["job"] = "Developer"
+      modifyPerson["city"] = "Seoul"
+
+      modifyPerson["age"] = 26
+
+      print(modifyPerson)
+- id: update
+  title: 4. 업데이트 패턴
+  subtitle: dict.update()
+  blocks:
+  - type: code
+    language: python
+    title: 대량 업데이트
+    description: update() 메서드는 여러 키-값을 한 번에 추가하거나 수정하는 패턴입니다. 딕셔너리나 키워드 인수로 전달할 수 있습니다.
+    content: |-
+      updatePerson = {"name": "Kim", "age": 25}
+
+      updatePerson.update({"job": "Developer", "city": "Seoul"})
+
+      updatePerson.update(salary=5000, level="Senior")
+
+      print(updatePerson)
+- id: remove
+  title: 5. 제거 패턴
+  subtitle: del, pop(), clear()
+  blocks:
+  - type: code
+    language: python
+    title: 키-값 제거
+    description: 딕셔너리에서 항목을 제거하는 방법은 여러 가지입니다. del은 직접 삭제, pop()은 값을 반환하며 삭제, clear()는 전체 비우기입니다.
+    content: |-
+      removePerson = {"name": "Kim", "age": 25, "job": "Dev"}
+
+      removeJob = removePerson.pop("job")
+      print(removeJob)
+
+      del removePerson["age"]
+
+      removePerson.clear()
+      print(removePerson)
+- id: keys_values_items
+  title: 6. 추출 패턴
+  subtitle: keys(), values(), items()
+  blocks:
+  - type: code
+    language: python
+    title: 키와 값 추출
+    description: 딕셔너리에서 키, 값, 키-값 쌍을 추출하는 3가지 방법이 있습니다. 각각 dict_keys, dict_values, dict_items 객체를 반환합니다.
+    content: |-
+      extractPerson = {"name": "Kim", "age": 25, "job": "Developer"}
+
+      extractKeys = extractPerson.keys()
+      print(list(extractKeys))
+
+      extractValues = extractPerson.values()
+      print(list(extractValues))
+
+      extractItems = extractPerson.items()
+      print(list(extractItems))
+- id: membership
+  title: 7. 존재 확인 패턴
+  subtitle: in, not in
+  blocks:
+  - type: code
+    language: python
+    title: 키 존재 확인
+    description: 딕셔너리에서 특정 키가 존재하는지 확인하는 패턴입니다. in 연산자는 키의 존재 여부를 True/False로 반환합니다.
+    content: |-
+      memberPerson = {"name": "Kim", "age": 25}
+
+      memberNameExists = "name" in memberPerson
+      print(memberNameExists)
+
+      memberJobExists = "job" in memberPerson
+      print(memberJobExists)
+
+      memberNoJob = "job" not in memberPerson
+      print(memberNoJob)
+- id: setdefault
+  title: 8. setdefault 패턴
+  subtitle: dict.setdefault()
+  blocks:
+  - type: code
+    language: python
+    title: 기본값 설정
+    description: setdefault()는 키가 없을 때만 기본값을 설정하는 패턴입니다. 키가 이미 있으면 기존 값을 유지하고, 없으면 새 값을 설정합니다.
+    content: |-
+      setdefaultPerson = {"name": "Kim", "age": 25}
+
+      setdefaultJob = setdefaultPerson.setdefault("job", "Student")
+      print(setdefaultJob)
+
+      setdefaultName = setdefaultPerson.setdefault("name", "Unknown")
+      print(setdefaultName)
+
+      print(setdefaultPerson)
+- id: copy
+  title: 9. 복사 패턴
+  subtitle: copy(), dict()
+  blocks:
+  - type: code
+    language: python
+    title: 딕셔너리 복사
+    description: 딕셔너리를 복사하는 방법은 여러 가지가 있습니다. 단순 할당은 참조만 복사하므로 실제 복사본을 만들려면 copy()나 dict()를 사용해야 합니다.
+    content: |-
+      copyOriginal = {"name": "Kim", "age": 25}
+
+      copyCopied = copyOriginal.copy()
+      copyCopied["name"] = "Lee"
+      print(copyOriginal["name"])
+      print(copyCopied["name"])
+
+      copyCopied2 = dict(copyOriginal)
+      print(copyCopied2)
+- id: merge
+  title: 10. 병합 패턴
+  subtitle: '| 연산자, **unpacking'
+  blocks:
+  - type: code
+    language: python
+    title: 딕셔너리 병합
+    description: 여러 딕셔너리를 하나로 합치는 패턴입니다. Python 3.9+에서는 | 연산자를, 구버전에서는 **unpacking을 사용할 수 있습니다.
+    content: |-
+      mergeDict1 = {"name": "Kim", "age": 25}
+      mergeDict2 = {"job": "Developer", "city": "Seoul"}
+
+      mergeMerged = {**mergeDict1, **mergeDict2}
+      print(mergeMerged)
+
+      mergeDict1.update(mergeDict2)
+      print(mergeDict1)

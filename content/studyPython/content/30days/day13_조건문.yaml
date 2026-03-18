@@ -1,0 +1,814 @@
+meta:
+  id: "day13"
+  title: "조건문"
+  day: 13
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 조건문 - if, elif, else로 흐름 제어"
+    description: "if, elif, else, 삼항연산자, 중첩 조건문을 배웁니다."
+    keywords: ['조건문', 'if', 'elif', 'else', '삼항연산자']
+
+intro:
+  emoji: "🔀"
+  points:
+  - "if로 조건 분기"
+  - "elif와 else로 다중 분기"
+  - "중첩 조건문과 삼항연산자"
+  - "실전 조건 처리"
+
+sections:
+- id: "if_basic"
+  title: "if 기본"
+  subtitle: "조건이 참일 때 실행"
+  blocks:
+  - type: "text"
+    content: "if문은 조건이 True일 때만 코드를 실행합니다. if 조건: 형식으로 쓰며, 조건 뒤에 콜론(:)을 붙이고 실행할 코드는 들여쓰기합니다. 조건이 False면 if 블록을 건너뜁니다."
+  - type: "list"
+    items:
+    - "if 조건: 형식"
+    - "조건이 True면 실행"
+    - "조건이 False면 건너뜀"
+    - "들여쓰기로 블록 구분"
+  - type: "code"
+    language: "python"
+    title: "if 기본"
+    description: "조건이 참이면 실행됩니다."
+    content: |-
+      age = 20
+      if age >= 18:
+          result = 'adult'
+      result
+  - type: "code"
+    language: "python"
+    title: "if 조건 거짓"
+    description: "조건이 거짓이면 건너뜁니다."
+    content: |-
+      score = 50
+      if score >= 90:
+          grade = 'A'
+      score
+  - type: "code"
+    language: "python"
+    title: "if 변수 수정"
+    description: "조건에 따라 변수를 수정합니다."
+    content: |-
+      cost = 10000
+      if cost > 5000:
+          cost = cost - 1000
+      cost
+  - type: "tip"
+    content: "if문의 조건은 비교 연산자, 논리 연산자, in 연산자 등을 사용할 수 있습니다."
+
+- id: "if_else"
+  title: "if-else"
+  subtitle: "조건에 따른 양방향 분기"
+  blocks:
+  - type: "text"
+    content: "else는 if 조건이 False일 때 실행됩니다. if-else를 사용하면 조건에 따라 둘 중 하나가 반드시 실행됩니다. else 뒤에도 콜론(:)을 붙이고 들여쓰기합니다."
+  - type: "list"
+    items:
+    - "if-else로 양방향 분기"
+    - "조건이 True면 if 블록"
+    - "조건이 False면 else 블록"
+    - "둘 중 하나는 반드시 실행"
+  - type: "code"
+    language: "python"
+    title: "if-else 기본"
+    description: "조건에 따라 다른 값을 할당합니다."
+    content: |-
+      num = 7
+      if num % 2 == 0:
+          parity = 'even'
+      else:
+          parity = 'odd'
+      parity
+  - type: "code"
+    language: "python"
+    title: "성인 판별"
+    description: "나이에 따라 성인 여부를 판별합니다."
+    content: |-
+      years = 16
+      if years >= 18:
+          status = 'adult'
+      else:
+          status = 'minor'
+      status
+  - type: "code"
+    language: "python"
+    title: "할인 적용"
+    description: "가격에 따라 할인을 적용합니다."
+    content: |-
+      amount = 15000
+      if amount >= 10000:
+          final = amount - 2000
+      else:
+          final = amount
+      final
+  - type: "tip"
+    content: "if-else는 둘 중 하나를 반드시 선택해야 할 때 유용합니다."
+
+- id: "if_elif_else"
+  title: "if-elif-else"
+  subtitle: "다중 조건 분기"
+  blocks:
+  - type: "text"
+    content: "elif는 else if의 줄임말로, 여러 조건을 순차적으로 검사합니다. if-elif-else를 사용하면 3개 이상의 경우를 나눌 수 있습니다. 위에서부터 조건을 검사하여 처음 True인 블록만 실행됩니다."
+  - type: "list"
+    items:
+    - "elif로 다중 조건 검사"
+    - "위에서부터 순서대로 검사"
+    - "첫 번째 True 블록만 실행"
+    - "모두 False면 else 실행"
+  - type: "code"
+    language: "python"
+    title: "성적 등급"
+    description: "점수에 따라 등급을 부여합니다."
+    content: |-
+      point = 85
+      if point >= 90:
+          level = 'A'
+      elif point >= 80:
+          level = 'B'
+      elif point >= 70:
+          level = 'C'
+      else:
+          level = 'F'
+      level
+  - type: "code"
+    language: "python"
+    title: "온도 분류"
+    description: "온도에 따라 분류합니다."
+    content: |-
+      temp = 25
+      if temp >= 30:
+          weather = 'hot'
+      elif temp >= 20:
+          weather = 'warm'
+      elif temp >= 10:
+          weather = 'cool'
+      else:
+          weather = 'cold'
+      weather
+  - type: "code"
+    language: "python"
+    title: "요금 계산"
+    description: "거리에 따라 요금을 계산합니다."
+    content: |-
+      distance = 15
+      if distance <= 5:
+          fare = 1000
+      elif distance <= 10:
+          fare = 2000
+      elif distance <= 20:
+          fare = 3000
+      else:
+          fare = 5000
+      fare
+  - type: "tip"
+    content: "elif는 여러 개 사용할 수 있으며, else는 생략 가능합니다."
+
+- id: "condition_compare"
+  title: "비교 연산자와 조건문"
+  subtitle: "크기 비교로 조건 판별"
+  blocks:
+  - type: "text"
+    content: "비교 연산자(==, !=, >, <, >=, <=)는 조건문에서 가장 많이 사용됩니다. 두 값을 비교하여 True/False를 반환하며, 이를 if문의 조건으로 사용합니다."
+  - type: "list"
+    items:
+    - "==: 같음"
+    - "!=: 다름"
+    - ">, <: 크기 비교"
+    - ">=, <=: 이상, 이하"
+  - type: "code"
+    language: "python"
+    title: "같음 비교"
+    description: "값이 같은지 비교합니다."
+    content: |-
+      password = '1234'
+      if password == '1234':
+          access = 'granted'
+      else:
+          access = 'denied'
+      access
+  - type: "code"
+    language: "python"
+    title: "다름 비교"
+    description: "값이 다른지 비교합니다."
+    content: |-
+      stock = 0
+      if stock != 0:
+          available = True
+      else:
+          available = False
+      available
+  - type: "code"
+    language: "python"
+    title: "크기 비교"
+    description: "크기를 비교합니다."
+    content: |-
+      speed = 120
+      if speed > 100:
+          warning = 'overspeed'
+      else:
+          warning = 'normal'
+      warning
+  - type: "tip"
+    content: "문자열도 비교 연산자로 비교할 수 있습니다(사전 순서)."
+
+- id: "condition_and"
+  title: "논리 연산자 and"
+  subtitle: "여러 조건을 모두 만족"
+  blocks:
+  - type: "text"
+    content: "and 연산자는 양쪽 조건이 모두 True일 때만 True를 반환합니다. 여러 조건을 동시에 만족해야 할 때 사용합니다. 조건1 and 조건2 형식입니다."
+  - type: "list"
+    items:
+    - "양쪽 모두 True일 때만 True"
+    - "하나라도 False면 False"
+    - "여러 조건 동시 검사"
+    - "조건1 and 조건2 형식"
+  - type: "code"
+    language: "python"
+    title: "and 기본"
+    description: "두 조건을 모두 만족하는지 검사합니다."
+    content: |-
+      userAge = 25
+      isMember = True
+      if userAge >= 18 and isMember:
+          rate = 0.2
+      else:
+          rate = 0
+      rate
+  - type: "code"
+    language: "python"
+    title: "범위 검사"
+    description: "값이 특정 범위 안에 있는지 검사합니다."
+    content: |-
+      num = 55
+      if num >= 50 and num <= 100:
+          inRange = True
+      else:
+          inRange = False
+      inRange
+  - type: "code"
+    language: "python"
+    title: "자격 검사"
+    description: "여러 조건을 모두 만족하는지 검사합니다."
+    content: |-
+      experience = 3
+      degree = True
+      if experience >= 2 and degree:
+          qualified = 'yes'
+      else:
+          qualified = 'no'
+      qualified
+  - type: "tip"
+    content: "범위 검사는 50 <= value <= 100 형식으로도 가능합니다."
+
+- id: "condition_or"
+  title: "논리 연산자 or"
+  subtitle: "조건 중 하나만 만족"
+  blocks:
+  - type: "text"
+    content: "or 연산자는 양쪽 조건 중 하나라도 True면 True를 반환합니다. 여러 조건 중 하나만 만족해도 될 때 사용합니다. 조건1 or 조건2 형식입니다."
+  - type: "list"
+    items:
+    - "하나라도 True면 True"
+    - "모두 False일 때만 False"
+    - "대안 조건 검사"
+    - "조건1 or 조건2 형식"
+  - type: "code"
+    language: "python"
+    title: "or 기본"
+    description: "두 조건 중 하나만 만족해도 됩니다."
+    content: |-
+      weekend = False
+      holiday = True
+      if weekend or holiday:
+          day = 'off'
+      else:
+          day = 'work'
+      day
+  - type: "code"
+    language: "python"
+    title: "자격 대안"
+    description: "여러 자격 중 하나만 있어도 됩니다."
+    content: |-
+      card = False
+      cash = True
+      if card or cash:
+          pay = True
+      else:
+          pay = False
+      pay
+  - type: "code"
+    language: "python"
+    title: "경고 조건"
+    description: "여러 조건 중 하나라도 위험하면 경고합니다."
+    content: |-
+      battery = 15
+      signal = 80
+      if battery < 20 or signal < 30:
+          alert = 'warning'
+      else:
+          alert = 'normal'
+      alert
+  - type: "tip"
+    content: "or는 첫 번째 True를 만나면 나머지 조건은 검사하지 않습니다."
+
+- id: "condition_not"
+  title: "논리 연산자 not"
+  subtitle: "조건 반대로 뒤집기"
+  blocks:
+  - type: "text"
+    content: "not 연산자는 조건의 결과를 반대로 뒤집습니다. True는 False로, False는 True로 바꿉니다. not 조건 형식으로 사용합니다."
+  - type: "list"
+    items:
+    - "조건 결과 반대로"
+    - "True → False"
+    - "False → True"
+    - "not 조건 형식"
+  - type: "code"
+    language: "python"
+    title: "not 기본"
+    description: "조건의 반대를 검사합니다."
+    content: |-
+      logged = False
+      if not logged:
+          action = 'login required'
+      else:
+          action = 'proceed'
+      action
+  - type: "code"
+    language: "python"
+    title: "not과 비교"
+    description: "not과 비교 연산자를 함께 사용합니다."
+    content: |-
+      count = 5
+      if not count == 0:
+          ready = True
+      else:
+          ready = False
+      ready
+  - type: "code"
+    language: "python"
+    title: "not과 논리 연산"
+    description: "not과 and/or를 함께 사용합니다."
+    content: |-
+      premium = False
+      trial = False
+      if not (premium or trial):
+          plan = 'free'
+      else:
+          plan = 'paid'
+      plan
+  - type: "tip"
+    content: "not count == 0 대신 count != 0을 사용하는 것이 더 읽기 쉽습니다."
+
+- id: "condition_in"
+  title: "in 연산자와 조건문"
+  subtitle: "포함 여부 검사"
+  blocks:
+  - type: "text"
+    content: "in 연산자는 값이 리스트, 튜플, 집합, 딕셔너리, 문자열에 포함되어 있는지 검사합니다. 값 in 컬렉션 형식으로 사용하며, True/False를 반환합니다."
+  - type: "list"
+    items:
+    - "값 in 컬렉션 형식"
+    - "포함되면 True"
+    - "없으면 False"
+    - "리스트, 튜플, 집합, 문자열 등"
+  - type: "code"
+    language: "python"
+    title: "리스트 포함 검사"
+    description: "값이 리스트에 포함되어 있는지 검사합니다."
+    content: |-
+      users = ['admin', 'user1', 'user2']
+      user = 'user1'
+      if user in users:
+          permission = 'granted'
+      else:
+          permission = 'denied'
+      permission
+  - type: "code"
+    language: "python"
+    title: "문자열 포함 검사"
+    description: "문자가 문자열에 포함되어 있는지 검사합니다."
+    content: |-
+      email = 'test@example.com'
+      if '@' in email:
+          ok = True
+      else:
+          ok = False
+      ok
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 키 검사"
+    description: "키가 딕셔너리에 있는지 검사합니다."
+    content: |-
+      config = {'host': 'localhost', 'port': 8080}
+      if 'timeout' in config:
+          timeout = config['timeout']
+      else:
+          timeout = 30
+      timeout
+  - type: "tip"
+    content: "not in 연산자로 포함되지 않은 것을 검사할 수 있습니다."
+
+- id: "nested_if"
+  title: "중첩 조건문"
+  subtitle: "조건 안에 조건"
+  blocks:
+  - type: "text"
+    content: "if문 안에 다시 if문을 넣을 수 있습니다. 이를 중첩 조건문이라고 하며, 복잡한 조건을 단계적으로 검사할 때 사용합니다. 들여쓰기 단계가 늘어납니다."
+  - type: "list"
+    items:
+    - "if 안에 if 중첩"
+    - "단계적 조건 검사"
+    - "들여쓰기 단계 증가"
+    - "복잡한 조건 처리"
+  - type: "code"
+    language: "python"
+    title: "중첩 if 기본"
+    description: "조건을 단계적으로 검사합니다."
+    content: |-
+      driverAge = 25
+      hasLicense = True
+      if driverAge >= 18:
+          if hasLicense:
+              canDrive = 'yes'
+          else:
+              canDrive = 'no license'
+      else:
+          canDrive = 'too young'
+      canDrive
+  - type: "code"
+    language: "python"
+    title: "3단계 검사"
+    description: "여러 단계로 조건을 검사합니다."
+    content: |-
+      wallet = 50000
+      cost = 30000
+      inStock = True
+      if wallet >= cost:
+          if inStock:
+              outcome = 'purchase'
+          else:
+              outcome = 'out of stock'
+      else:
+          outcome = 'insufficient'
+      outcome
+  - type: "code"
+    language: "python"
+    title: "등급과 보너스"
+    description: "등급에 따라 보너스를 차등 지급합니다."
+    content: |-
+      grade = 'gold'
+      purchase = 100000
+      if grade == 'gold':
+          if purchase >= 50000:
+              bonus = 10000
+          else:
+              bonus = 5000
+      else:
+          bonus = 0
+      bonus
+  - type: "tip"
+    content: "중첩이 깊어지면 and 연산자로 단순화할 수 있습니다."
+
+- id: "ternary_operator"
+  title: "삼항 연산자"
+  subtitle: "한 줄로 조건 분기"
+  blocks:
+  - type: "text"
+    content: "삼항 연산자는 if-else를 한 줄로 표현합니다. 값1 if 조건 else 값2 형식으로 쓰며, 조건이 True면 값1, False면 값2를 반환합니다. 간단한 조건 분기에 유용합니다."
+  - type: "list"
+    items:
+    - "값1 if 조건 else 값2 형식"
+    - "조건이 True면 값1"
+    - "조건이 False면 값2"
+    - "한 줄로 간결하게"
+  - type: "code"
+    language: "python"
+    title: "삼항 연산자 기본"
+    description: "간단한 조건을 한 줄로 표현합니다."
+    content: |-
+      n = 10
+      category = 'even' if n % 2 == 0 else 'odd'
+      category
+  - type: "code"
+    language: "python"
+    title: "최소값 적용"
+    description: "조건에 따라 값을 선택합니다."
+    content: |-
+      qty = 3
+      limit = 5
+      final = qty if qty >= limit else limit
+      final
+  - type: "code"
+    language: "python"
+    title: "할인율 결정"
+    description: "금액에 따라 할인율을 결정합니다."
+    content: |-
+      total = 120000
+      rate = 0.1 if total >= 100000 else 0.05
+      discounted = total * (1 - rate)
+      discounted
+  - type: "tip"
+    content: "삼항 연산자는 간단한 조건에만 사용하세요. 복잡하면 일반 if-else가 더 읽기 쉽습니다."
+
+- id: "practice"
+  title: "Day 13 종합 복습"
+  subtitle: "조건문 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 13에서 배운 조건문을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: if 기본"
+    code: |-
+      val = 15
+      if val > 10:
+          msg = 'big'
+      msg
+
+  - type: "expansion"
+    title: "🟢 기본2: if-else"
+    code: |-
+      number = 8
+      if number % 2 == 0:
+          kind = 'even'
+      else:
+          kind = 'odd'
+      kind
+
+  - type: "expansion"
+    title: "🟢 기본3: if-elif-else"
+    code: |-
+      mark = 75
+      if mark >= 90:
+          rank = 'A'
+      elif mark >= 80:
+          rank = 'B'
+      elif mark >= 70:
+          rank = 'C'
+      else:
+          rank = 'F'
+      rank
+
+  - type: "expansion"
+    title: "🟢 기본4: and 연산자"
+    code: |-
+      years = 22
+      enrolled = True
+      if years >= 18 and enrolled:
+          perk = 'available'
+      else:
+          perk = 'unavailable'
+      perk
+
+  - type: "expansion"
+    title: "🟢 기본5: 삼항 연산자"
+    code: |-
+      cnt = 7
+      label = 'many' if cnt >= 5 else 'few'
+      label
+
+  - type: "expansion"
+    title: "🟡 응용1: 회원 등급"
+    code: |-
+      points = 850
+      if points >= 1000:
+          tier = 'platinum'
+      elif points >= 500:
+          tier = 'gold'
+      elif points >= 100:
+          tier = 'silver'
+      else:
+          tier = 'bronze'
+      tier
+
+  - type: "expansion"
+    title: "🟡 응용2: 배송비 계산"
+    code: |-
+      order = 35000
+      region = 'jeju'
+      if order >= 50000:
+          ship = 0
+      elif region == 'jeju':
+          ship = 5000
+      else:
+          ship = 3000
+      ship
+
+  - type: "expansion"
+    title: "🟡 응용3: 입장 가능 여부"
+    code: |-
+      visitor = 17
+      withParent = True
+      if visitor >= 18:
+          entry = 'allowed'
+      elif visitor >= 13 and withParent:
+          entry = 'allowed with guardian'
+      else:
+          entry = 'not allowed'
+      entry
+
+  - type: "expansion"
+    title: "🟡 응용4: 할인 적용"
+    code: |-
+      amount = 80000
+      vip = True
+      newbie = False
+      if vip and newbie:
+          pay = amount * 0.8
+      elif vip:
+          pay = amount * 0.9
+      elif newbie:
+          pay = amount * 0.95
+      else:
+          pay = amount
+      pay
+
+  - type: "expansion"
+    title: "🟡 응용5: 근무 시간 분류"
+    code: |-
+      hour = 14
+      if hour >= 9 and hour < 18:
+          shift = 'day'
+      elif hour >= 18 and hour < 22:
+          shift = 'evening'
+      else:
+          shift = 'night'
+      shift
+
+  - type: "expansion"
+    title: "🔴 심화1-1: 대출 심사"
+    code: |-
+      income = 4000
+      credit = 750
+      employed = True
+      if income >= 3000:
+          if credit >= 700:
+              if employed:
+                  approval = 'approved'
+              else:
+                  approval = 'conditionally approved'
+          else:
+              approval = 'review required'
+      else:
+          approval = 'rejected'
+      approval
+
+  - type: "expansion"
+    title: "🔴 심화1-2: 대출 금액 결정"
+    code: |-
+      salary = 5000
+      score = 800
+      if salary >= 5000 and score >= 800:
+          loan = 50000000
+      elif salary >= 3000 and score >= 700:
+          loan = 30000000
+      elif salary >= 2000:
+          loan = 10000000
+      else:
+          loan = 0
+      loan
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 티켓 가격 계산"
+    code: |-
+      customerAge = 65
+      isWeekday = True
+      isStudent = False
+      if customerAge < 13 or customerAge >= 65:
+          fee = 5000
+      elif isStudent:
+          fee = 7000
+      elif isWeekday:
+          fee = 10000
+      else:
+          fee = 15000
+      fee
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 티켓 추가 혜택"
+    code: |-
+      guest = 25
+      dayName = 'saturday'
+      basePrice = 15000
+      if guest < 13:
+          charged = basePrice * 0.5
+      elif guest >= 65:
+          charged = basePrice * 0.5
+      elif dayName == 'wednesday':
+          charged = basePrice * 0.7
+      else:
+          charged = basePrice
+      charged
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 보험 자격"
+    code: |-
+      applicant = 45
+      smokes = False
+      illness = False
+      if applicant >= 18 and applicant <= 60:
+          if not smokes:
+              if not illness:
+                  coverage = 'eligible'
+              else:
+                  coverage = 'high risk'
+          else:
+              coverage = 'premium required'
+      else:
+          coverage = 'not eligible'
+      coverage
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 보험료 계산"
+    code: |-
+      insured = 35
+      tobacco = False
+      level = 'low'
+      monthly = 100000
+      if insured < 30:
+          ratio = 0.8
+      elif insured < 50:
+          ratio = 1.0
+      else:
+          ratio = 1.5
+      tobaccoMult = 1.5 if tobacco else 1.0
+      riskMult = 1.2 if level == 'high' else 1.0
+      bill = monthly * ratio * tobaccoMult * riskMult
+      bill
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 상품 재고 관리"
+    code: |-
+      warehouse = {'laptop': 5, 'mouse': 20, 'keyboard': 0}
+      product = 'laptop'
+      request = 3
+      if product in warehouse:
+          if warehouse[product] >= request:
+              state = 'confirmed'
+          elif warehouse[product] > 0:
+              state = 'partial'
+          else:
+              state = 'out of stock'
+      else:
+          state = 'not found'
+      state
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 재고 알림"
+    code: |-
+      depot = {'laptop': 2, 'mouse': 25, 'keyboard': 0, 'monitor': 10}
+      item = 'laptop'
+      limit = 5
+      if item in depot:
+          if depot[item] == 0:
+              notice = 'critical'
+          elif depot[item] < limit:
+              notice = 'low'
+          else:
+              notice = 'sufficient'
+      else:
+          notice = 'unknown'
+      notice
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 성적 종합 평가"
+    code: |-
+      mathScore = 85
+      engScore = 90
+      sciScore = 78
+      average = (mathScore + engScore + sciScore) / 3
+      if average >= 90:
+          letter = 'A'
+      elif average >= 80:
+          letter = 'B'
+      elif average >= 70:
+          letter = 'C'
+      else:
+          letter = 'F'
+      letter
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 장학금 결정"
+    code: |-
+      gpa = 3.8
+      attendance = 95
+      activities = 3
+      if gpa >= 4.0:
+          scholarship = 1000000
+      elif gpa >= 3.5 and attendance >= 90:
+          if activities >= 2:
+              scholarship = 500000
+          else:
+              scholarship = 300000
+      elif gpa >= 3.0:
+          scholarship = 100000
+      else:
+          scholarship = 0
+      scholarship

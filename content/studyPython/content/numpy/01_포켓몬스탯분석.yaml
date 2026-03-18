@@ -1,0 +1,305 @@
+meta:
+  id: numpy_01
+  title: 포켓몬스탯분석
+  order: 1
+  category: numpy
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["numpy", "array", "shape", "dtype", "mean", "max", "argmax"]
+  seo:
+    title: "NumPy 배열 기초 - 포켓몬 스탯 분석"
+    description: "NumPy 배열의 기본을 배우며 포켓몬 능력치 데이터를 분석합니다. shape, dtype, mean, max, argmax를 익힙니다."
+    keywords: ["numpy", "array", "shape", "dtype", "mean", "포켓몬", "데이터분석"]
+
+intro:
+  emoji: "🎮"
+  goal: 포켓몬 능력치 데이터로 NumPy 배열의 기본을 익힙니다.
+  description: NumPy 배열을 생성하고 기본 속성을 확인합니다. 통계 함수로 포켓몬들의 능력치 특성을 분석합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NumPy는 파이썬의 수치 연산 핵심 라이브러리입니다. 관례적으로 np라는 별칭을 사용합니다. pandas는 데이터 로딩용으로만 사용하며, pandas 자체는 나중에 Pandas 코스에서 배웁니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: numpy와 pandas를 불러옵니다
+    content: |-
+      import numpy as np
+      import pandas as pd
+  - type: tip
+    content: pandas(pd)는 CSV 파일 로드용으로만 사용합니다. pd.read_csv()로 데이터를 불러온 뒤 .values로 NumPy 배열을 추출합니다. pandas 기능은 Pandas 코스에서 배웁니다.
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: Pokemon 데이터셋
+  blocks:
+  - type: text
+    content: 포켓몬 데이터셋은 1000마리 이상의 포켓몬 능력치를 담고 있습니다. HP, Attack, Defense, Sp.Atk, Sp.Def, Speed 등 6가지 스탯이 있으며, 이를 NumPy 배열로 분석합니다.
+  - type: code
+    language: python
+    title: 포켓몬 데이터 로드
+    description: GitHub에서 포켓몬 데이터를 불러옵니다
+    content: |-
+      url = "https://raw.githubusercontent.com"
+      pokemon = pd.read_csv(f"{url}/lgreski/pokemonData/master/Pokemon.csv")
+      pokemon.head()
+
+- id: step3_extract
+  title: 3단계. NumPy 배열 추출
+  subtitle: .values
+  blocks:
+  - type: text
+    content: "DataFrame에서 NumPy 배열을 추출합니다. pandas의 DataFrame은 엑셀 표와 비슷한 2차원 테이블 형태인데, .values 속성을 사용하면 이 테이블 데이터를 NumPy의 ndarray(N차원 배열) 형태로 꺼낼 수 있습니다. ndarray는 NumPy에서 모든 계산의 기본이 되는 자료구조입니다. 여러 컬럼(열)을 선택하면 행과 열로 이루어진 2차원 배열이 됩니다."
+  - type: code
+    language: python
+    title: 스탯 배열 추출
+    description: 전투 능력치를 NumPy 배열로 추출합니다
+    content: |-
+      cols = ['HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed']
+      stats = pokemon[cols].values
+      stats
+  - type: tip
+    content: DataFrame의 .values 속성은 데이터를 NumPy 배열(ndarray)로 반환합니다. 여러 컬럼을 선택하면 2차원 배열이 됩니다.
+
+- id: step4_shape
+  title: 4단계. 배열 형태 확인
+  subtitle: shape
+  blocks:
+  - type: text
+    content: "shape는 배열의 형태를 튜플(괄호로 묶인 숫자들)로 반환합니다. 예를 들어 (1000, 6)이라면 1000개의 행(포켓몬)과 6개의 열(스탯)이 있다는 뜻입니다. 데이터 분석에서 shape 확인은 가장 먼저 하는 작업입니다. 데이터가 몇 건인지, 특성이 몇 개인지 파악해야 이후 분석 방향을 정할 수 있기 때문입니다."
+  - type: code
+    language: python
+    title: 배열 형태
+    description: 배열의 shape를 확인합니다
+    content: |-
+      stats.shape
+  - type: tip
+    content: shape는 배열의 형태를 튜플로 반환합니다. (행, 열) 형태로 몇 개의 데이터가 몇 개의 특성을 가지는지 알 수 있습니다.
+
+- id: step5_ndim
+  title: 5단계. 차원 수 확인
+  subtitle: ndim
+  blocks:
+  - type: text
+    content: "ndim은 배열의 차원 수를 나타냅니다. 차원이란 데이터를 표현하는 축의 개수입니다. 1차원은 한 줄로 늘어선 숫자들(리스트처럼), 2차원은 행과 열이 있는 표 형태(엑셀처럼), 3차원은 여러 장의 표가 쌓인 형태입니다. 현재 배열은 포켓몬(행) x 스탯(열) 구조이므로 2차원입니다. 수학에서는 1차원을 벡터, 2차원을 행렬, 3차원 이상을 텐서라고 부릅니다."
+  - type: code
+    language: python
+    title: 차원 수
+    description: 배열의 ndim을 확인합니다
+    content: |-
+      stats.ndim
+  - type: tip
+    content: ndim은 배열의 차원 수입니다. 1차원은 벡터, 2차원은 행렬, 3차원 이상은 텐서라고 부릅니다.
+
+- id: step6_dtype
+  title: 6단계. 데이터 타입 확인
+  subtitle: dtype
+  blocks:
+  - type: text
+    content: "dtype은 배열에 저장된 데이터의 종류를 나타냅니다. 파이썬 리스트는 정수, 문자열, 소수점 숫자를 섞어서 담을 수 있지만, NumPy 배열은 모든 요소가 같은 타입이어야 합니다. 이런 제약 덕분에 메모리를 효율적으로 사용하고 계산 속도가 빨라집니다. int64는 64비트 정수(소수점 없는 숫자), float64는 64비트 실수(소수점 있는 숫자)를 의미합니다."
+  - type: code
+    language: python
+    title: 데이터 타입
+    description: 배열의 dtype을 확인합니다
+    content: |-
+      stats.dtype
+  - type: tip
+    content: dtype은 배열 요소의 데이터 타입입니다. int64는 64비트 정수, float64는 64비트 실수를 의미합니다. NumPy 배열은 모든 요소가 같은 타입을 가집니다.
+
+- id: step7_size
+  title: 7단계. 요소 개수 확인
+  subtitle: size
+  blocks:
+  - type: text
+    content: size는 배열의 전체 요소 개수입니다. 2차원 배열의 경우 행 x 열 값과 같습니다.
+  - type: code
+    language: python
+    title: 요소 개수
+    description: 배열의 size를 확인합니다
+    content: |-
+      stats.size
+
+- id: step8_column
+  title: 8단계. 특정 컬럼 추출
+  subtitle: 2D 인덱싱
+  blocks:
+  - type: text
+    content: "2차원 배열에서 특정 열을 추출해봅시다. 인덱싱이란 배열에서 원하는 위치의 값을 꺼내는 것입니다. 프로그래밍에서 순서를 셀 때는 0부터 시작하므로, HP는 첫 번째 열이지만 인덱스는 0입니다. [:, 0]이라는 표현에서 콜론(:)은 '모든 행'을 의미하고, 0은 '첫 번째 열'을 의미합니다. 즉 모든 포켓몬의 HP만 꺼내는 것입니다."
+  - type: code
+    language: python
+    title: HP 컬럼 추출
+    description: HP(첫 번째 열)만 추출합니다
+    content: |-
+      hp = stats[:, 0]
+      hp
+  - type: tip
+    content: "[:, 0]은 모든 행(:)의 첫 번째 열(0)을 선택합니다. 결과는 1차원 배열이 됩니다."
+
+- id: step9_mean
+  title: 9단계. 평균 계산
+  subtitle: np.mean()
+  blocks:
+  - type: text
+    content: "np.mean()은 배열에 들어있는 모든 숫자의 평균을 계산합니다. 평균이란 모든 값을 더한 뒤 개수로 나눈 것입니다. 예를 들어 HP가 [100, 80, 120]이면 평균은 (100+80+120)/3 = 100입니다. 포켓몬 전체의 평균 HP를 알면 특정 포켓몬의 HP가 높은 편인지 낮은 편인지 비교 기준으로 삼을 수 있습니다."
+  - type: code
+    language: python
+    title: HP 평균
+    description: HP의 평균값을 계산합니다
+    content: |-
+      np.mean(hp)
+  - type: tip
+    content: np.mean()은 배열의 평균을 계산합니다. 배열 메서드로 hp.mean()처럼 사용할 수도 있습니다.
+
+- id: step10_maxmin
+  title: 10단계. 최대/최소값
+  subtitle: np.max(), np.min()
+  blocks:
+  - type: text
+    content: np.max()와 np.min()은 배열의 최대값과 최소값을 반환합니다. 가장 HP가 높은/낮은 포켓몬의 수치를 확인해봅시다.
+  - type: code
+    language: python
+    title: HP 최대값
+    description: HP의 최대값을 확인합니다
+    content: |-
+      np.max(hp)
+  - type: code
+    language: python
+    title: HP 최소값
+    description: HP의 최소값을 확인합니다
+    content: |-
+      np.min(hp)
+  - type: tip
+    content: np.max()와 np.min()은 배열의 최대값과 최소값을 반환합니다.
+
+- id: step11_argmax
+  title: 11단계. 최대값 인덱스
+  subtitle: np.argmax()
+  blocks:
+  - type: text
+    content: "np.argmax()는 최대값이 '어디에' 있는지 위치(인덱스)를 알려줍니다. np.max()가 '값 자체'를 알려준다면, np.argmax()는 '몇 번째인지'를 알려주는 것입니다. 예를 들어 [50, 255, 80]에서 max()는 255를, argmax()는 1(두 번째 위치)을 반환합니다. 이 인덱스로 원본 데이터에서 해당 포켓몬의 이름 등 다른 정보를 찾을 수 있습니다."
+  - type: code
+    language: python
+    title: HP 최대값 인덱스
+    description: HP가 가장 높은 포켓몬의 인덱스를 찾습니다
+    content: |-
+      idx = np.argmax(hp)
+      idx
+  - type: tip
+    content: np.argmax()는 최대값이 위치한 인덱스를 반환합니다. np.argmin()은 최소값의 인덱스를 반환합니다.
+
+- id: step12_find
+  title: 12단계. 포켓몬 이름 찾기
+  subtitle: iloc
+  blocks:
+  - type: text
+    content: "앞서 argmax()로 찾은 인덱스를 이용해 원본 DataFrame에서 해당 포켓몬의 이름을 확인합니다. iloc은 'index location'의 줄임말로, 숫자 위치로 데이터를 찾는 방법입니다. iloc[인덱스]로 해당 행 전체를 가져오고, ['Name']으로 이름 컬럼만 선택합니다."
+  - type: code
+    language: python
+    title: HP 최강 포켓몬
+    description: HP가 가장 높은 포켓몬 이름을 확인합니다
+    content: |-
+      pokemon.iloc[idx]['Name']
+
+- id: step13_sum_axis
+  title: 13단계. 축 방향 합계
+  subtitle: axis 파라미터
+  blocks:
+  - type: text
+    content: "axis는 '축' 또는 '방향'을 의미하며, 연산을 어느 방향으로 수행할지 지정합니다. 엑셀로 비유하면 axis=0은 열을 따라 세로로 계산(같은 컬럼의 모든 행을 합산), axis=1은 행을 따라 가로로 계산(같은 행의 모든 컬럼을 합산)합니다. 여기서 axis=1로 설정하면 각 포켓몬의 HP+Attack+Defense+...를 모두 더한 총 스탯이 계산됩니다."
+  - type: code
+    language: python
+    title: 포켓몬별 총 스탯
+    description: 각 포켓몬의 능력치 합계를 계산합니다
+    content: |-
+      total = np.sum(stats, axis=1)
+      total[:10]
+  - type: tip
+    content: axis=1은 행 방향(가로)으로 연산합니다. 각 포켓몬의 능력치 합계가 계산됩니다. axis=0은 열 방향(세로)으로 연산합니다.
+
+- id: step14_mean_axis
+  title: 14단계. 스탯별 평균
+  subtitle: axis=0
+  blocks:
+  - type: text
+    content: axis=0으로 열 방향 평균을 구하면 각 스탯별 평균이 계산됩니다.
+  - type: code
+    language: python
+    title: 스탯별 평균
+    description: 각 능력치의 평균을 계산합니다
+    content: |-
+      avg = np.mean(stats, axis=0)
+      avg
+
+- id: step15_result
+  title: 15단계. 결과 정리
+  subtitle: DataFrame 변환
+  blocks:
+  - type: text
+    content: "계산 결과를 보기 좋게 DataFrame으로 정리합니다. 표준편차(std)는 데이터가 평균에서 얼마나 퍼져있는지를 나타내는 지표입니다. 표준편차가 크면 데이터들이 평균에서 멀리 떨어져 있고(편차가 크고), 작으면 평균 근처에 모여 있다는 뜻입니다. 예를 들어 HP의 표준편차가 크다면 포켓몬들의 HP가 천차만별이라는 의미입니다."
+  - type: code
+    language: python
+    title: 스탯 통계 정리
+    description: 평균과 표준편차를 정리합니다
+    content: |-
+      std = np.std(stats, axis=0)
+      pd.DataFrame({'Stat': cols, 'Mean': np.round(avg, 1), 'Std': np.round(std, 1)})
+  - type: tip
+    content: np.std()는 표준편차를 계산합니다. 표준편차가 크면 데이터가 평균에서 많이 떨어져 있다는 의미입니다. np.round()로 소수점 자릿수를 조절할 수 있습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 포켓몬 능력치 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: Attack이 가장 높은 포켓몬 찾기"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        url = "https://raw.githubusercontent.com"
+        data = pd.read_csv(f"{url}/lgreski/pokemonData/master/Pokemon.csv")
+    - type: code
+      title: "분석 수행"
+      content: |-
+        arr = data['Attack'].values
+        idx = np.argmax(arr)
+        name = data.iloc[idx]['Name']
+        top = np.max(arr)
+        avg = np.mean(arr)
+        f"Attack 최강: {name} ({top}), 평균: {avg:.1f}"
+  - type: expansion
+    title: "미션2: 1세대 포켓몬과 전체 포켓몬 능력치 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        src = "https://raw.githubusercontent.com"
+        df = pd.read_csv(f"{src}/lgreski/pokemonData/master/Pokemon.csv")
+        cols = ['HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed']
+    - type: code
+      title: "비교 분석"
+      content: |-
+        total = df[cols].values
+        gen1 = df[df['Generation'] == 1][cols].values
+        avg1 = np.mean(total, axis=0)
+        avg2 = np.mean(gen1, axis=0)
+        pd.DataFrame({
+            'Stat': cols,
+            'All Mean': np.round(avg1, 1),
+            'Gen1 Mean': np.round(avg2, 1),
+            'Diff': np.round(avg2 - avg1, 1)
+        })

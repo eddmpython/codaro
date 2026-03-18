@@ -1,0 +1,721 @@
+meta:
+  id: "day16"
+  title: "함수고급"
+  day: 16
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 함수 고급 - 기본값, 가변인자, 람다"
+    description: "기본값 매개변수, 키워드 인자, *args, **kwargs, lambda를 배웁니다."
+    keywords: ['함수고급', 'default', 'args', 'kwargs', 'lambda']
+
+intro:
+  emoji: "🎯"
+  points:
+  - "기본값으로 매개변수 유연화"
+  - "*args, **kwargs로 가변 인자"
+  - "lambda로 간단한 함수"
+  - "고급 함수 패턴"
+
+sections:
+- id: "default_parameter"
+  title: "기본값 매개변수"
+  subtitle: "선택적 매개변수"
+  blocks:
+  - type: "text"
+    content: "매개변수에 기본값을 지정하면 인자를 생략할 수 있습니다. def 함수명(매개변수=기본값): 형식으로 쓰며, 호출시 인자를 주지 않으면 기본값이 사용됩니다. 필수 매개변수 뒤에 와야 합니다."
+  - type: "list"
+    items:
+    - "매개변수=기본값 형식"
+    - "인자 생략 가능"
+    - "생략시 기본값 사용"
+    - "필수 매개변수 뒤 배치"
+  - type: "code"
+    language: "python"
+    title: "기본값 기본"
+    description: "기본값이 있는 매개변수를 정의합니다."
+    content: |-
+      def greet(name='Guest'):
+          return 'Hello ' + name
+
+      greet()
+  - type: "code"
+    language: "python"
+    title: "기본값 덮어쓰기"
+    description: "인자를 전달하면 기본값을 덮어씁니다."
+    content: |-
+      def greetUser(name='Guest'):
+          return 'Hello ' + name
+
+      greetUser('Alice')
+  - type: "code"
+    language: "python"
+    title: "여러 기본값"
+    description: "여러 매개변수에 기본값을 설정합니다."
+    content: |-
+      def createProfile(name='Unknown', age=0, city='Seoul'):
+          return name + ' ' + str(age) + ' ' + city
+
+      createProfile('Bob', 25)
+  - type: "tip"
+    content: "기본값이 없는 매개변수는 기본값이 있는 매개변수보다 앞에 와야 합니다."
+
+- id: "keyword_argument"
+  title: "키워드 인자"
+  subtitle: "이름으로 인자 전달"
+  blocks:
+  - type: "text"
+    content: "키워드 인자는 매개변수 이름을 명시하여 값을 전달합니다. 함수명(매개변수=값) 형식으로 쓰며, 순서와 관계없이 전달할 수 있습니다. 코드 가독성이 높아집니다."
+  - type: "list"
+    items:
+    - "매개변수=값 형식"
+    - "이름으로 전달"
+    - "순서 무관"
+    - "가독성 향상"
+  - type: "code"
+    language: "python"
+    title: "키워드 인자"
+    description: "매개변수 이름을 지정하여 호출합니다."
+    content: |-
+      def introduce(name, age, city):
+          return name + ' ' + str(age) + ' ' + city
+
+      introduce(name='Alice', age=25, city='Seoul')
+  - type: "code"
+    language: "python"
+    title: "순서 변경"
+    description: "키워드 인자는 순서가 바뀌어도 됩니다."
+    content: |-
+      def showInfo(name, age, city):
+          return name + ' ' + str(age) + ' ' + city
+
+      showInfo(city='Busan', name='Bob', age=30)
+  - type: "code"
+    language: "python"
+    title: "일부만 키워드"
+    description: "일부 매개변수만 키워드로 전달할 수 있습니다."
+    content: |-
+      def makeText(first, second, third):
+          return first + ' ' + second + ' ' + third
+
+      makeText('A', third='C', second='B')
+  - type: "tip"
+    content: "위치 인자는 키워드 인자보다 앞에 와야 합니다."
+
+- id: "positional_keyword_mix"
+  title: "위치 인자와 키워드 혼용"
+  subtitle: "유연한 호출 방식"
+  blocks:
+  - type: "text"
+    content: "위치 인자와 키워드 인자를 함께 사용할 수 있습니다. 위치 인자를 먼저 쓰고 키워드 인자를 뒤에 씁니다. 필수 매개변수는 위치로, 선택적 매개변수는 키워드로 전달하면 편리합니다."
+  - type: "list"
+    items:
+    - "위치 인자 먼저"
+    - "키워드 인자 뒤"
+    - "필수/선택 구분"
+    - "유연한 호출"
+  - type: "code"
+    language: "python"
+    title: "혼용 기본"
+    description: "위치 인자와 키워드 인자를 함께 사용합니다."
+    content: |-
+      def orderFood(menu, quantity=1, spicy=False):
+          result = menu + ' x' + str(quantity)
+          if spicy:
+              result = result + ' (spicy)'
+          return result
+
+      orderFood('Pizza', quantity=2, spicy=True)
+  - type: "code"
+    language: "python"
+    title: "일부 생략"
+    description: "기본값이 있는 매개변수는 생략할 수 있습니다."
+    content: |-
+      def bookTicket(destination, passengers=1, classType='economy'):
+          return destination + ' ' + str(passengers) + ' ' + classType
+
+      bookTicket('Tokyo', passengers=2)
+  - type: "code"
+    language: "python"
+    title: "선택적 사용"
+    description: "필요한 매개변수만 키워드로 지정합니다."
+    content: |-
+      def setConfig(host, port=8080, debug=False, timeout=30):
+          return host + ':' + str(port) + ' debug=' + str(debug)
+
+      setConfig('localhost', debug=True)
+  - type: "tip"
+    content: "기본값이 있는 매개변수는 키워드로 전달하면 가독성이 좋습니다."
+
+- id: "args_basic"
+  title: "*args 기본"
+  subtitle: "가변 위치 인자"
+  blocks:
+  - type: "text"
+    content: "*args는 임의 개수의 위치 인자를 받습니다. def 함수명(*args): 형식으로 쓰며, args는 튜플로 전달됩니다. 몇 개의 인자가 올지 모를 때 사용합니다."
+  - type: "list"
+    items:
+    - "*args로 가변 인자"
+    - "튜플로 전달됨"
+    - "개수 제한 없음"
+    - "for문으로 순회 가능"
+  - type: "code"
+    language: "python"
+    title: "*args 기본"
+    description: "여러 개의 인자를 받아 처리합니다."
+    content: |-
+      def sumAll(*args):
+          total = 0
+          for num in args:
+              total = total + num
+          return total
+
+      sumAll(1, 2, 3, 4, 5)
+  - type: "code"
+    language: "python"
+    title: "개수 확인"
+    description: "전달된 인자의 개수를 확인합니다."
+    content: |-
+      def countArgs(*args):
+          return len(args)
+
+      countArgs(10, 20, 30)
+  - type: "code"
+    language: "python"
+    title: "첫 번째 인자"
+    description: "args는 튜플이므로 인덱싱이 가능합니다."
+    content: |-
+      def getFirst(*args):
+          if len(args) > 0:
+              return args[0]
+          return None
+
+      getFirst(100, 200, 300)
+  - type: "tip"
+    content: "args는 관례적인 이름이며, 다른 이름을 사용해도 됩니다."
+
+- id: "args_advanced"
+  title: "*args 활용"
+  subtitle: "일반 매개변수와 혼용"
+  blocks:
+  - type: "text"
+    content: "*args는 일반 매개변수와 함께 사용할 수 있습니다. 일반 매개변수를 먼저 쓰고 *args를 뒤에 씁니다. 필수 인자와 선택적 인자를 함께 받을 때 유용합니다."
+  - type: "list"
+    items:
+    - "일반 매개변수 + *args"
+    - "일반 매개변수 먼저"
+    - "*args는 나머지 모두"
+    - "유연한 인자 처리"
+  - type: "code"
+    language: "python"
+    title: "필수 + 가변"
+    description: "필수 매개변수와 *args를 함께 사용합니다."
+    content: |-
+      def makeList(first, *rest):
+          result = [first]
+          for item in rest:
+              result.append(item)
+          return result
+
+      makeList('a', 'b', 'c', 'd')
+  - type: "code"
+    language: "python"
+    title: "연산 적용"
+    description: "첫 번째 인자를 나머지에 적용합니다."
+    content: |-
+      def multiplyAll(multiplier, *numbers):
+          results = []
+          for num in numbers:
+              results.append(num * multiplier)
+          return results
+
+      multiplyAll(3, 1, 2, 3, 4)
+  - type: "code"
+    language: "python"
+    title: "평균 계산"
+    description: "레이블과 함께 평균을 계산합니다."
+    content: |-
+      def average(label, *values):
+          total = 0
+          for val in values:
+              total = total + val
+          avg = total / len(values)
+          return label + ': ' + str(avg)
+
+      average('Score', 80, 90, 85, 88)
+  - type: "tip"
+    content: "*args 뒤에는 키워드 전용 매개변수만 올 수 있습니다."
+
+- id: "kwargs_basic"
+  title: "**kwargs 기본"
+  subtitle: "가변 키워드 인자"
+  blocks:
+  - type: "text"
+    content: "**kwargs는 임의 개수의 키워드 인자를 받습니다. def 함수명(**kwargs): 형식으로 쓰며, kwargs는 딕셔너리로 전달됩니다. 키-값 쌍을 여러 개 받을 때 사용합니다."
+  - type: "list"
+    items:
+    - "**kwargs로 가변 키워드"
+    - "딕셔너리로 전달됨"
+    - "키=값 형식으로 호출"
+    - "개수 제한 없음"
+  - type: "code"
+    language: "python"
+    title: "**kwargs 기본"
+    description: "키워드 인자를 딕셔너리로 받습니다."
+    content: |-
+      def printInfo(**kwargs):
+          result = ''
+          for key in kwargs:
+              result = result + key + '=' + str(kwargs[key]) + ' '
+          return result
+
+      printInfo(name='Alice', age=25, city='Seoul')
+  - type: "code"
+    language: "python"
+    title: "값 추출"
+    description: "딕셔너리처럼 값을 추출합니다."
+    content: |-
+      def getValue(**kwargs):
+          if 'name' in kwargs:
+              return kwargs['name']
+          return 'Unknown'
+
+      getValue(name='Bob', age=30)
+  - type: "code"
+    language: "python"
+    title: "개수 확인"
+    description: "전달된 키워드 인자의 개수를 확인합니다."
+    content: |-
+      def countKwargs(**kwargs):
+          return len(kwargs)
+
+      countKwargs(a=1, b=2, c=3, d=4)
+  - type: "tip"
+    content: "kwargs도 관례적인 이름이며, 다른 이름을 사용해도 됩니다."
+
+- id: "kwargs_advanced"
+  title: "**kwargs 활용"
+  subtitle: "일반 매개변수와 혼용"
+  blocks:
+  - type: "text"
+    content: "**kwargs는 일반 매개변수, *args와 함께 사용할 수 있습니다. 순서는 일반 매개변수, *args, **kwargs입니다. 매우 유연한 함수를 만들 수 있습니다."
+  - type: "list"
+    items:
+    - "일반 + *args + **kwargs"
+    - "순서 지켜야 함"
+    - "매우 유연한 호출"
+    - "옵션 처리에 유용"
+  - type: "code"
+    language: "python"
+    title: "필수 + 키워드"
+    description: "필수 매개변수와 **kwargs를 함께 사용합니다."
+    content: |-
+      def createUser(userId, **options):
+          info = 'User: ' + userId
+          if 'name' in options:
+              info = info + ' Name: ' + options['name']
+          if 'email' in options:
+              info = info + ' Email: ' + options['email']
+          return info
+
+      createUser('user123', name='Alice', email='alice@example.com')
+  - type: "code"
+    language: "python"
+    title: "기본값과 kwargs"
+    description: "기본값 매개변수와 **kwargs를 함께 사용합니다."
+    content: |-
+      def configure(mode='dev', **settings):
+          config = 'Mode: ' + mode
+          for key in settings:
+              config = config + ' ' + key + '=' + str(settings[key])
+          return config
+
+      configure('prod', host='localhost', port=8080, debug=False)
+  - type: "code"
+    language: "python"
+    title: "기본값 적용"
+    description: "kwargs에서 값을 가져오되 없으면 기본값을 사용합니다."
+    content: |-
+      def getConfig(**config):
+          host = config.get('host', 'localhost')
+          port = config.get('port', 8080)
+          return host + ':' + str(port)
+
+      getConfig(host='192.168.1.1')
+  - type: "tip"
+    content: "**kwargs는 설정이나 옵션을 받을 때 매우 유용합니다."
+
+- id: "args_kwargs_together"
+  title: "*args와 **kwargs 함께"
+  subtitle: "모든 인자 받기"
+  blocks:
+  - type: "text"
+    content: "*args와 **kwargs를 함께 사용하면 모든 종류의 인자를 받을 수 있습니다. def 함수명(*args, **kwargs): 형식으로 쓰며, 위치 인자는 args로, 키워드 인자는 kwargs로 전달됩니다."
+  - type: "list"
+    items:
+    - "*args, **kwargs 순서"
+    - "모든 인자 수용"
+    - "위치 인자 → args"
+    - "키워드 인자 → kwargs"
+  - type: "code"
+    language: "python"
+    title: "모든 인자"
+    description: "위치 인자와 키워드 인자를 모두 받습니다."
+    content: |-
+      def flexibleFunc(*args, **kwargs):
+          posCount = len(args)
+          kwCount = len(kwargs)
+          return posCount, kwCount
+
+      flexibleFunc(1, 2, 3, name='Alice', age=25)
+  - type: "code"
+    language: "python"
+    title: "일반 + args + kwargs"
+    description: "일반 매개변수와 함께 사용합니다."
+    content: |-
+      def process(required, *args, **kwargs):
+          result = 'Required: ' + str(required)
+          result = result + ' Args: ' + str(len(args))
+          result = result + ' Kwargs: ' + str(len(kwargs))
+          return result
+
+      process('data', 1, 2, 3, flag=True, mode='fast')
+  - type: "code"
+    language: "python"
+    title: "인자 합치기"
+    description: "모든 인자를 하나의 리스트로 합칩니다."
+    content: |-
+      def combineAll(*args, **kwargs):
+          combined = []
+          for arg in args:
+              combined.append(arg)
+          for key in kwargs:
+              combined.append(kwargs[key])
+          return combined
+
+      combineAll(1, 2, 3, x=10, y=20)
+  - type: "tip"
+    content: "매우 유연하지만 과도한 사용은 코드 가독성을 해칠 수 있습니다."
+
+- id: "lambda_basic"
+  title: "lambda 기본"
+  subtitle: "익명 함수"
+  blocks:
+  - type: "text"
+    content: "lambda는 이름 없는 함수를 만듭니다. lambda 매개변수: 표현식 형식으로 쓰며, 표현식의 결과가 자동으로 반환됩니다. 간단한 함수를 한 줄로 만들 때 사용합니다."
+  - type: "list"
+    items:
+    - "lambda 매개변수: 표현식"
+    - "이름 없는 함수"
+    - "한 줄로 정의"
+    - "자동 반환"
+  - type: "code"
+    language: "python"
+    title: "lambda 기본"
+    description: "간단한 lambda 함수를 만듭니다."
+    content: |-
+      square = lambda x: x * x
+      square(5)
+  - type: "code"
+    language: "python"
+    title: "두 매개변수"
+    description: "여러 매개변수를 받는 lambda입니다."
+    content: |-
+      add = lambda a, b: a + b
+      add(10, 20)
+  - type: "code"
+    language: "python"
+    title: "즉시 호출"
+    description: "lambda를 정의하고 바로 호출합니다."
+    content: |-
+      (lambda x: x * 3)(7)
+  - type: "tip"
+    content: "lambda는 한 줄 표현식만 가능하며, 복잡한 로직에는 일반 함수를 사용하세요."
+
+- id: "lambda_advanced"
+  title: "lambda 활용"
+  subtitle: "조건식과 함께"
+  blocks:
+  - type: "text"
+    content: "lambda에서 조건식(삼항 연산자)을 사용할 수 있습니다. lambda 매개변수: 값1 if 조건 else 값2 형식으로 쓰며, 조건에 따라 다른 값을 반환할 수 있습니다."
+  - type: "list"
+    items:
+    - "조건식 사용 가능"
+    - "값1 if 조건 else 값2"
+    - "간단한 조건 분기"
+    - "리스트와 함께 활용"
+  - type: "code"
+    language: "python"
+    title: "조건식 lambda"
+    description: "조건에 따라 다른 값을 반환합니다."
+    content: |-
+      checkEven = lambda n: 'even' if n % 2 == 0 else 'odd'
+      checkEven(8)
+  - type: "code"
+    language: "python"
+    title: "최대값"
+    description: "두 값 중 큰 값을 반환합니다."
+    content: |-
+      maxVal = lambda a, b: a if a > b else b
+      maxVal(15, 23)
+  - type: "code"
+    language: "python"
+    title: "절대값"
+    description: "숫자의 절대값을 반환합니다."
+    content: |-
+      absVal = lambda x: x if x >= 0 else -x
+      absVal(-42)
+  - type: "tip"
+    content: "복잡한 조건은 lambda보다 일반 함수가 읽기 쉽습니다."
+
+- id: "practice"
+  title: "Day 16 종합 복습"
+  subtitle: "함수 고급 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 16에서 배운 함수 고급을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 기본값"
+    code: |-
+      def greetPerson(name='Guest', greeting='Hello'):
+          return greeting + ' ' + name
+
+      greetPerson()
+
+  - type: "expansion"
+    title: "🟢 기본2: 키워드 인자"
+    code: |-
+      def orderItem(item, quantity, price):
+          return item + ' x' + str(quantity) + ' = ' + str(quantity * price)
+
+      orderItem(price=1000, quantity=3, item='Apple')
+
+  - type: "expansion"
+    title: "🟢 기본3: *args"
+    code: |-
+      def sumNumbers(*nums):
+          total = 0
+          for n in nums:
+              total = total + n
+          return total
+
+      sumNumbers(1, 2, 3, 4, 5)
+
+  - type: "expansion"
+    title: "🟢 기본4: **kwargs"
+    code: |-
+      def buildProfile(**info):
+          result = ''
+          for key in info:
+              result = result + key + ':' + str(info[key]) + ' '
+          return result
+
+      buildProfile(name='Alice', age=25, city='Seoul')
+
+  - type: "expansion"
+    title: "🟢 기본5: lambda"
+    code: |-
+      triple = lambda x: x * 3
+      triple(9)
+
+  - type: "expansion"
+    title: "🟡 응용1: 설정 함수"
+    code: |-
+      def setupServer(host='localhost', port=8080, **options):
+          config = host + ':' + str(port)
+          if 'debug' in options:
+              config = config + ' debug=' + str(options['debug'])
+          if 'timeout' in options:
+              config = config + ' timeout=' + str(options['timeout'])
+          return config
+
+      setupServer('192.168.1.1', debug=True, timeout=30)
+
+  - type: "expansion"
+    title: "🟡 응용2: 가변 평균"
+    code: |-
+      def calculateMean(*values):
+          if len(values) == 0:
+              return 0
+          total = 0
+          for val in values:
+              total = total + val
+          return total / len(values)
+
+      calculateMean(80, 90, 85, 88, 92)
+
+  - type: "expansion"
+    title: "🟡 응용3: 문자열 조합"
+    code: |-
+      def joinStrings(separator=' ', *strings):
+          if len(strings) == 0:
+              return ''
+          result = strings[0]
+          for i in range(1, len(strings)):
+              result = result + separator + strings[i]
+          return result
+
+      joinStrings('-', 'apple', 'banana', 'cherry')
+
+  - type: "expansion"
+    title: "🟡 응용4: lambda 필터"
+    code: |-
+      isPositive = lambda x: x > 0
+      numbers = [-5, 3, -2, 8, -1, 4]
+      filtered = []
+      for num in numbers:
+          if isPositive(num):
+              filtered.append(num)
+      filtered
+
+  - type: "expansion"
+    title: "🟡 응용5: 복합 인자"
+    code: |-
+      def processData(action, *items, **options):
+          result = action + ': '
+          result = result + str(len(items)) + ' items'
+          if 'verbose' in options and options['verbose']:
+              for item in items:
+                  result = result + ' [' + str(item) + ']'
+          return result
+
+      processData('upload', 'file1.txt', 'file2.txt', verbose=True)
+
+  - type: "expansion"
+    title: "🔴 심화1-1: 옵션 병합"
+    code: |-
+      def mergeOptions(defaults, **overrides):
+          merged = {}
+          for key in defaults:
+              merged[key] = defaults[key]
+          for key in overrides:
+              merged[key] = overrides[key]
+          return merged
+
+      defaultOpts = {'host': 'localhost', 'port': 8080, 'debug': False}
+      mergeOptions(defaultOpts, port=3000, debug=True)
+
+  - type: "expansion"
+    title: "🔴 심화1-2: 검증 함수"
+    code: |-
+      def validateConfig(**config):
+          required = ['host', 'port']
+          missing = []
+          for field in required:
+              if field not in config:
+                  missing.append(field)
+          if len(missing) > 0:
+              return False, missing
+          return True, []
+
+      validateConfig(host='localhost', debug=True)
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 최대값 찾기"
+    code: |-
+      def findMaximum(*numbers):
+          if len(numbers) == 0:
+              return None
+          maxNum = numbers[0]
+          for num in numbers:
+              if num > maxNum:
+                  maxNum = num
+          return maxNum
+
+      findMaximum(15, 42, 8, 23, 56, 31)
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 최대값과 최소값"
+    code: |-
+      def findMinMax(*values):
+          if len(values) == 0:
+              return None, None
+          minVal = values[0]
+          maxVal = values[0]
+          for val in values:
+              if val < minVal:
+                  minVal = val
+              if val > maxVal:
+                  maxVal = val
+          return minVal, maxVal
+
+      findMinMax(15, 42, 8, 23, 56, 31)
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 범위 필터"
+    code: |-
+      inRange = lambda x, minVal, maxVal: minVal <= x <= maxVal
+      data = [5, 15, 25, 35, 45]
+      filtered = []
+      for val in data:
+          if inRange(val, 10, 30):
+              filtered.append(val)
+      filtered
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 변환 함수"
+    code: |-
+      def transform(*values, **operations):
+          multiply = operations.get('multiply', 1)
+          add = operations.get('add', 0)
+          results = []
+          for val in values:
+              results.append(val * multiply + add)
+          return results
+
+      transform(1, 2, 3, 4, 5, multiply=2, add=10)
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 딕셔너리 빌더"
+    code: |-
+      def buildDict(*keys, **values):
+          result = {}
+          for key in keys:
+              if key in values:
+                  result[key] = values[key]
+              else:
+                  result[key] = None
+          return result
+
+      buildDict('name', 'age', 'city', name='Alice', age=25)
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 조건부 필터"
+    code: |-
+      def filterBy(data, **conditions):
+          filtered = []
+          for item in data:
+              match = True
+              for key in conditions:
+                  if item.get(key) != conditions[key]:
+                      match = False
+                      break
+              if match:
+                  filtered.append(item)
+          return filtered
+
+      users = [{'name': 'Alice', 'age': 25}, {'name': 'Bob', 'age': 30}, {'name': 'Charlie', 'age': 25}]
+      filterBy(users, age=25)
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 함수 체이닝"
+    code: |-
+      addFive = lambda x: x + 5
+      doubleIt = lambda x: x * 2
+      squareIt = lambda x: x * x
+      result = squareIt(doubleIt(addFive(3)))
+      result
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 함수 리스트"
+    code: |-
+      operations = [
+          lambda x: x + 10,
+          lambda x: x * 2,
+          lambda x: x - 5
+      ]
+      value = 5
+      for op in operations:
+          value = op(value)
+      value

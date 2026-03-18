@@ -1,0 +1,325 @@
+meta:
+  id: numpy_04
+  title: 음악특성분석
+  order: 4
+  category: numpy
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["numpy", "reshape", "normalization", "corrcoef", "broadcasting", "nan"]
+  seo:
+    title: "NumPy 정규화와 상관관계 - Spotify 음악 분석"
+    description: "NumPy의 배열 변형과 정규화를 배우며 Spotify 음악 특성 데이터의 상관관계를 분석합니다."
+    keywords: ["numpy", "정규화", "상관계수", "corrcoef", "spotify", "음악분석"]
+
+intro:
+  emoji: "🎵"
+  goal: Spotify 음악 특성 데이터로 정규화와 상관관계를 익힙니다.
+  description: 32,000곡의 음악 특성 데이터를 분석합니다. reshape으로 배열 형태를 변경하고, 브로드캐스팅으로 정규화를 수행하며, 상관계수를 계산합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: numpy와 pandas를 불러옵니다
+    content: |-
+      import numpy as np
+      import pandas as pd
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: Spotify 데이터셋
+  blocks:
+  - type: text
+    content: "TidyTuesday는 매주 다양한 공개 데이터셋을 제공하는 프로젝트입니다. Spotify 데이터에는 32,000곡의 음악 특성이 담겨 있습니다. danceability(춤추기 좋은 정도), energy(에너지), valence(밝고 긍정적인 정도) 등 Spotify가 자체 알고리즘으로 분석한 0~1 사이의 수치들입니다."
+  - type: code
+    language: python
+    title: Spotify 데이터 로드
+    description: TidyTuesday에서 Spotify 데이터를 불러옵니다
+    content: |-
+      url = "https://raw.githubusercontent.com"
+      df = pd.read_csv(f"{url}/rfordatascience/tidytuesday/main/data/2020/2020-01-21/spotify_songs.csv")
+      df.head()
+
+- id: step3_extract
+  title: 3단계. 특성 배열 추출
+  subtitle: 다중 컬럼
+  blocks:
+  - type: text
+    content: "여러 개의 열(컬럼)을 동시에 선택할 수 있습니다. df[['A', 'B', 'C']]처럼 열 이름 리스트를 전달하면 해당 열들만 추출됩니다. 9개 음악 특성을 선택하면 32,000행 × 9열 크기의 2차원 배열이 만들어집니다. 각 행은 하나의 곡, 각 열은 하나의 특성입니다."
+  - type: code
+    language: python
+    title: 특성 배열 추출
+    description: 9개 음악 특성을 배열로 추출합니다
+    content: |-
+      cols = ['danceability', 'energy', 'loudness', 'speechiness',
+              'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
+      features = df[cols].values
+      features.shape
+
+- id: step4_stats
+  title: 4단계. 기본 통계
+  subtitle: axis=0
+  blocks:
+  - type: text
+    content: 각 특성의 평균과 표준편차를 계산합니다. axis=0으로 열 방향 연산을 수행합니다.
+  - type: code
+    language: python
+    title: 특성별 통계
+    description: 각 특성의 평균과 표준편차를 확인합니다
+    content: |-
+      avg = np.mean(features, axis=0)
+      std = np.std(features, axis=0)
+      pd.DataFrame({'Feature': cols, 'Mean': np.round(avg, 2), 'Std': np.round(std, 2)})
+
+- id: step5_nan_check
+  title: 5단계. 결측값 확인
+  subtitle: np.isnan()
+  blocks:
+  - type: text
+    content: "NaN(Not a Number)은 '값이 없음'을 나타내는 특수한 표시입니다. 엑셀의 빈 셀과 비슷합니다. 실제 데이터에서는 측정 실패, 입력 누락 등으로 결측값이 자주 발생합니다. np.isnan()은 각 값이 NaN인지 확인해서 True/False 배열을 반환합니다. sum()으로 전체 NaN 개수를 셀 수 있습니다."
+  - type: code
+    language: python
+    title: 결측값 개수
+    description: 전체 NaN 개수를 확인합니다
+    content: |-
+      np.sum(np.isnan(features))
+  - type: tip
+    content: np.isnan()은 NaN(결측값) 여부를 불리언 배열로 반환합니다. sum()으로 전체 NaN 개수를 확인할 수 있습니다.
+
+- id: step6_nan_remove
+  title: 6단계. 결측값 제거
+  subtitle: np.any()
+  blocks:
+  - type: text
+    content: "any()는 '하나라도 있으면 True'를 반환합니다. np.any(np.isnan(features), axis=1)은 각 행(axis=1)에서 NaN이 하나라도 있으면 True입니다. 이 True/False 배열 앞에 ~(틸다)를 붙이면 반전되어, NaN이 없는 행만 True가 됩니다. 결과적으로 NaN이 없는 깨끗한 행들만 남습니다."
+  - type: code
+    language: python
+    title: 결측값 행 제거
+    description: NaN이 있는 행을 제거합니다
+    content: |-
+      mask = np.any(np.isnan(features), axis=1)
+      clean = features[~mask]
+      clean.shape
+  - type: tip
+    content: np.any(arr, axis=1)은 각 행에서 하나라도 True가 있으면 True를 반환합니다. ~(틸다)는 불리언 배열을 반전시킵니다.
+
+- id: step7_minmax
+  title: 7단계. Min-Max 정규화
+  subtitle: 0~1 범위
+  blocks:
+  - type: text
+    content: "정규화(Normalization)는 서로 다른 단위의 데이터를 같은 범위로 맞추는 작업입니다. tempo(템포)는 50~200 범위이고 danceability는 0~1 범위라서 직접 비교하기 어렵습니다. Min-Max 정규화는 (값 - 최소) / (최대 - 최소)로 모든 값을 0~1 범위로 변환합니다. 브로드캐스팅 덕분에 for문 없이 한 줄로 전체 배열에 적용됩니다."
+  - type: code
+    language: python
+    title: Min-Max 정규화
+    description: 모든 특성을 0~1 범위로 변환합니다
+    content: |-
+      lo = np.min(clean, axis=0)
+      hi = np.max(clean, axis=0)
+      norm = (clean - lo) / (hi - lo)
+      norm[:5]
+  - type: tip
+    content: Min-Max 정규화는 (값 - 최소) / (최대 - 최소)로 계산합니다. 브로드캐스팅 덕분에 반복문 없이 전체 배열에 연산이 적용됩니다.
+
+- id: step8_norm_verify
+  title: 8단계. 정규화 확인
+  subtitle: 범위 검증
+  blocks:
+  - type: text
+    content: 정규화 후 모든 특성이 0~1 범위에 있는지 확인합니다.
+  - type: code
+    language: python
+    title: 정규화 검증
+    description: 정규화된 특성의 범위를 확인합니다
+    content: |-
+      avg = np.mean(norm, axis=0)
+      mins = np.min(norm, axis=0)
+      maxs = np.max(norm, axis=0)
+      pd.DataFrame({
+          'Feature': cols,
+          'Min': np.round(mins, 2),
+          'Max': np.round(maxs, 2),
+          'Mean': np.round(avg, 2)
+      })
+
+- id: step9_zscore
+  title: 9단계. Z-score 표준화
+  subtitle: 평균 0, 표준편차 1
+  blocks:
+  - type: text
+    content: "Z-score 표준화는 (값 - 평균) / 표준편차로 계산합니다. 결과 값은 '평균에서 표준편차 몇 개 만큼 떨어져 있는가'를 의미합니다. Z=2면 평균보다 표준편차 2개만큼 큰 값이고, Z=-1이면 평균보다 표준편차 1개만큼 작은 값입니다. 표준화 후에는 평균이 0, 표준편차가 1이 됩니다."
+  - type: code
+    language: python
+    title: Z-score 표준화
+    description: 평균 0, 표준편차 1로 변환합니다
+    content: |-
+      mu = np.mean(clean, axis=0)
+      sigma = np.std(clean, axis=0)
+      z = (clean - mu) / sigma
+      z[:5]
+  - type: tip
+    content: Z-score 표준화는 (값 - 평균) / 표준편차로 계산합니다. 결과의 평균은 0, 표준편차는 1이 됩니다.
+
+- id: step10_zscore_verify
+  title: 10단계. 표준화 확인
+  subtitle: 결과 검증
+  blocks:
+  - type: text
+    content: 표준화 후 평균이 0, 표준편차가 1에 가까운지 확인합니다.
+  - type: code
+    language: python
+    title: 표준화 검증
+    description: 표준화 결과를 확인합니다
+    content: |-
+      f"평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
+
+- id: step11_corr_two
+  title: 11단계. 두 변수 상관계수
+  subtitle: np.corrcoef()
+  blocks:
+  - type: text
+    content: "상관계수는 두 변수가 함께 변하는 정도를 -1에서 1 사이 숫자로 나타냅니다. 1에 가까우면 양의 상관(하나가 커지면 다른 것도 커짐), -1에 가까우면 음의 상관(하나가 커지면 다른 것은 작아짐), 0에 가까우면 관계가 없습니다. np.corrcoef()는 상관계수 행렬을 반환하는데, 2x2 행렬의 비대각선 값이 실제 상관계수입니다."
+  - type: code
+    language: python
+    title: 상관계수 행렬
+    description: danceability와 energy의 상관계수를 계산합니다
+    content: |-
+      dance = clean[:, 0]
+      energy = clean[:, 1]
+      corr = np.corrcoef(dance, energy)
+      corr
+  - type: tip
+    content: np.corrcoef(x, y)는 피어슨 상관계수 행렬을 반환합니다. 대각선은 항상 1(자기 자신과의 상관), 비대각선이 두 변수 간 상관계수입니다.
+
+- id: step12_corr_value
+  title: 12단계. 상관계수 추출
+  subtitle: 행렬 인덱싱
+  blocks:
+  - type: text
+    content: 상관계수 행렬에서 두 변수 간 상관계수만 추출합니다.
+  - type: code
+    language: python
+    title: 상관계수 값
+    description: 두 변수 간 상관계수를 추출합니다
+    content: |-
+      r = corr[0, 1]
+      f"danceability-energy 상관계수: {r:.3f}"
+
+- id: step13_corr_all
+  title: 13단계. 전체 상관계수 행렬
+  subtitle: 전치 활용
+  blocks:
+  - type: text
+    content: "9개 특성 간의 모든 상관계수를 한 번에 계산합니다. corrcoef()는 행을 변수로 취급하는데, 현재 데이터는 열이 특성입니다. .T(전치)로 행과 열을 바꿔주면 됩니다. 전치란 행과 열을 서로 뒤집는 것으로, (32000, 9) 배열이 (9, 32000)으로 바뀝니다. 결과는 9x9 상관계수 행렬입니다."
+  - type: code
+    language: python
+    title: 전체 상관계수 행렬
+    description: 모든 특성 간 상관계수를 계산합니다
+    content: |-
+      matrix = np.corrcoef(clean.T)
+      matrix.shape
+  - type: tip
+    content: corrcoef는 행을 변수로 취급합니다. 특성이 열에 있으므로 .T로 전치하여 행과 열을 바꿔줍니다.
+
+- id: step14_corr_display
+  title: 14단계. 상관계수 시각화
+  subtitle: DataFrame 변환
+  blocks:
+  - type: text
+    content: 상관계수 행렬을 DataFrame으로 보기 좋게 표시합니다.
+  - type: code
+    language: python
+    title: 상관계수 테이블
+    description: 상관계수 행렬을 DataFrame으로 표시합니다
+    content: |-
+      result = pd.DataFrame(np.round(matrix, 2), columns=cols, index=cols)
+      result
+
+- id: step15_corr_extreme
+  title: 15단계. 강한 상관관계 찾기
+  subtitle: np.triu(), unravel_index
+  blocks:
+  - type: text
+    content: "상관계수 행렬에서 가장 강한 관계를 찾습니다. 대각선은 자기 자신과의 상관(항상 1)이므로 제외해야 합니다. np.triu(matrix, k=1)은 상삼각 부분만 남깁니다(대각선 위쪽). unravel_index는 1차원 인덱스를 2차원 위치(행, 열)로 변환합니다. 가장 높은 양의 상관과 음의 상관을 가진 특성 쌍을 찾을 수 있습니다."
+  - type: code
+    language: python
+    title: 가장 강한 상관관계
+    description: 양의 상관관계와 음의 상관관계 최대값을 찾습니다
+    content: |-
+      upper = np.triu(matrix, k=1)
+      idx1 = np.unravel_index(np.argmax(upper), upper.shape)
+      temp = matrix.copy()
+      np.fill_diagonal(temp, 0)
+      idx2 = np.unravel_index(np.argmin(temp), temp.shape)
+      f"가장 강한 양의 상관: {cols[idx1[0]]} - {cols[idx1[1]]} ({matrix[idx1]:.3f})"
+  - type: tip
+    content: np.triu(arr, k=1)은 상삼각 행렬을 반환합니다. 대각선(k=0)을 제외하면 자기 자신과의 상관(1.0)이 제거됩니다.
+
+- id: practice
+  title: 실습
+  subtitle: Spotify 음악 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 장르별 음악 특성 평균 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        url = "https://raw.githubusercontent.com"
+        data = pd.read_csv(f"{url}/rfordatascience/tidytuesday/main/data/2020/2020-01-21/spotify_songs.csv")
+        cols = ['danceability', 'energy', 'valence', 'tempo']
+    - type: code
+      title: "장르별 분석"
+      content: |-
+        genres = data['playlist_genre'].unique()
+        rows = []
+        for g in genres:
+            sub = data[data['playlist_genre'] == g]
+            arr = sub[cols].values
+            avg = np.nanmean(arr, axis=0)
+            rows.append([g] + list(np.round(avg, 3)))
+        pd.DataFrame(rows, columns=['Genre'] + cols)
+  - type: expansion
+    title: "미션2: 인기도와 음악 특성 상관관계 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        src = "https://raw.githubusercontent.com"
+        df = pd.read_csv(f"{src}/rfordatascience/tidytuesday/main/data/2020/2020-01-21/spotify_songs.csv")
+        cols = ['danceability', 'energy', 'loudness', 'speechiness',
+                'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
+    - type: code
+      title: "상관관계 분석"
+      content: |-
+        pop = df['track_popularity'].values
+        feat = df[cols].values
+        mask = ~np.isnan(feat).any(axis=1) & ~np.isnan(pop)
+        arr1 = pop[mask]
+        arr2 = feat[mask]
+        corrs = []
+        for i, col in enumerate(cols):
+            r = np.corrcoef(arr1, arr2[:, i])[0, 1]
+            corrs.append(r)
+        result = np.array(corrs)
+        idx = np.argsort(np.abs(result))[::-1]
+        pd.DataFrame({
+            'Feature': [cols[i] for i in idx],
+            'Correlation': np.round(result[idx], 3)
+        })

@@ -1,0 +1,420 @@
+meta:
+  id: scipy_06
+  title: 포트폴리오최적화
+  order: 6
+  category: scipy
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["scipy.optimize", "minimize", "포트폴리오", "최적화", "제약조건"]
+  seo:
+    title: "scipy.optimize minimize - 투자 포트폴리오 최적화"
+    description: "scipy.optimize의 minimize로 포트폴리오 최적화를 수행합니다. 제약조건 하에서 위험 대비 수익을 최대화합니다."
+    keywords: ["scipy", "optimize", "minimize", "포트폴리오", "투자"]
+
+intro:
+  emoji: "💰"
+  goal: scipy.optimize로 위험 대비 수익이 최대인 포트폴리오를 찾습니다.
+  description: 여러 자산에 투자할 때 각 자산의 비중을 어떻게 결정할까요? minimize 함수로 샤프 비율을 최대화하거나 위험을 최소화하는 최적 배분을 계산합니다.
+
+sections:
+- id: load
+  title: 데이터 로드
+  subtitle: 자산 수익률과 공분산
+  blocks:
+  - type: text
+    content: 포트폴리오 최적화는 여러 자산의 투자 비중을 결정하는 문제입니다. 각 자산의 예상 수익률과 자산 간 상관관계(공분산)를 알면 최적의 배분을 찾을 수 있습니다. 이 프로젝트에서는 주식 2종, 채권, 금 4개 자산으로 구성된 포트폴리오를 최적화합니다.
+  - type: code
+    language: python
+    title: 라이브러리 및 데이터
+    description: 자산 정보 설정
+    content: |-
+      import micropip
+      await micropip.install('scipy')
+
+      import numpy as np
+      from scipy import optimize
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      assets = ['Stock A', 'Stock B', 'Bond', 'Gold']
+      returns = np.array([0.12, 0.10, 0.05, 0.07])
+
+      covMatrix = np.array([
+          [0.0225, 0.0135, 0.0020, 0.0010],
+          [0.0135, 0.0196, 0.0015, 0.0005],
+          [0.0020, 0.0015, 0.0025, 0.0002],
+          [0.0010, 0.0005, 0.0002, 0.0100]
+      ])
+
+      assetDf = pd.DataFrame({
+          'Asset': assets,
+          'Return': [f'{r*100:.1f}%' for r in returns],
+          'Volatility': [f'{np.sqrt(covMatrix[i,i])*100:.1f}%' for i in range(len(assets))]
+      })
+      assetDf
+  - type: tip
+    content: 공분산 행렬의 대각원소는 각 자산의 분산(변동성²)입니다. 비대각원소는 자산 간 공분산으로, 양수면 같이 움직이고 음수면 반대로 움직입니다.
+
+- id: metrics
+  title: 포트폴리오 지표
+  subtitle: 수익률, 위험, 샤프비율
+  blocks:
+  - type: text
+    content: 포트폴리오 수익률은 각 자산 수익률의 가중평균입니다. 위험(표준편차)은 공분산을 고려하여 계산합니다. 샤프 비율은 (수익률 - 무위험수익률) / 위험으로, 위험 대비 초과수익을 측정합니다. 샤프 비율이 높을수록 효율적인 투자입니다.
+  - type: code
+    language: python
+    title: 지표 함수 정의
+    description: 수익률, 위험, 샤프비율
+    content: |-
+      def portfolioReturn(weights, rets):
+          return np.dot(weights, rets)
+
+      def portfolioRisk(weights, cov):
+          return np.sqrt(np.dot(weights.T, np.dot(cov, weights)))
+
+      def sharpeRatio(weights, rets, cov, riskFree=0.02):
+          pRet = portfolioReturn(weights, rets)
+          pRisk = portfolioRisk(weights, cov)
+          return (pRet - riskFree) / pRisk
+  - type: code
+    language: python
+    title: 균등배분 테스트
+    description: 각 자산 25%씩
+    content: |-
+      equalWeights = np.array([0.25, 0.25, 0.25, 0.25])
+
+      eqRet = portfolioReturn(equalWeights, returns)
+      eqRisk = portfolioRisk(equalWeights, covMatrix)
+      eqSharpe = sharpeRatio(equalWeights, returns, covMatrix)
+
+      equalDf = pd.DataFrame({
+          'Metric': ['Expected Return', 'Risk (Std)', 'Sharpe Ratio'],
+          'Value': [f'{eqRet*100:.2f}%', f'{eqRisk*100:.2f}%', f'{eqSharpe:.3f}']
+      })
+      equalDf
+
+- id: constraints
+  title: 제약조건 설정
+  subtitle: 합계와 범위 제한
+  blocks:
+  - type: text
+    content: 포트폴리오 최적화에는 제약조건이 필수입니다. 가장 기본적인 제약은 비중 합계가 100%여야 한다는 것과 공매도를 금지하는 비음수 조건입니다. scipy.optimize.minimize는 등식 제약('eq')과 부등식 제약('ineq'), 변수 범위(bounds)를 모두 지원합니다.
+  - type: code
+    language: python
+    title: 제약조건 정의
+    description: 합계 1, 0~100% 범위
+    content: |-
+      constraints = {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
+
+      bounds = tuple((0, 1) for _ in range(len(assets)))
+
+      initWeights = np.array([0.25, 0.25, 0.25, 0.25])
+  - type: tip
+    content: "'eq' 제약은 함수 결과가 0이 되어야 함을 의미합니다. 따라서 sum(w) - 1 = 0, 즉 sum(w) = 1입니다. 'ineq'는 결과가 0 이상이어야 합니다."
+
+- id: minrisk
+  title: 최소위험 포트폴리오
+  subtitle: 변동성 최소화
+  blocks:
+  - type: text
+    content: 가장 보수적인 전략은 위험(변동성)을 최소화하는 것입니다. 수익률과 무관하게 변동성만 최소화합니다. 이 포트폴리오는 효율적 프론티어의 가장 왼쪽 끝에 위치하며, 리스크 회피 투자자에게 적합합니다.
+  - type: code
+    language: python
+    title: 위험 최소화
+    description: minimize 실행
+    content: |-
+      def negRisk(weights):
+          return portfolioRisk(weights, covMatrix)
+
+      minRiskResult = optimize.minimize(
+          negRisk,
+          initWeights,
+          method='SLSQP',
+          bounds=bounds,
+          constraints=constraints
+      )
+
+      minRiskW = minRiskResult.x
+      minRiskRet = portfolioReturn(minRiskW, returns)
+      minRiskVol = portfolioRisk(minRiskW, covMatrix)
+      minRiskSharpe = sharpeRatio(minRiskW, returns, covMatrix)
+
+      minRiskDf = pd.DataFrame({
+          'Asset': assets,
+          'Weight': [f'{w*100:.1f}%' for w in minRiskW]
+      })
+      minRiskDf
+
+- id: maxsharpe
+  title: 최대샤프 포트폴리오
+  subtitle: 위험대비 수익 최대화
+  blocks:
+  - type: text
+    content: 샤프 비율을 최대화하면 위험 대비 가장 효율적인 포트폴리오를 찾습니다. minimize 함수는 최소화만 하므로, 음수 샤프 비율을 최소화하여 최대화 효과를 냅니다. 이 포트폴리오가 일반적으로 가장 추천되는 배분입니다.
+  - type: code
+    language: python
+    title: 샤프비율 최대화
+    description: 음수 최소화 트릭
+    content: |-
+      def negSharpe(weights):
+          return -sharpeRatio(weights, returns, covMatrix)
+
+      maxSharpeResult = optimize.minimize(
+          negSharpe,
+          initWeights,
+          method='SLSQP',
+          bounds=bounds,
+          constraints=constraints
+      )
+
+      maxSharpeW = maxSharpeResult.x
+      maxSharpeRet = portfolioReturn(maxSharpeW, returns)
+      maxSharpeVol = portfolioRisk(maxSharpeW, covMatrix)
+      maxSharpeSharpe = sharpeRatio(maxSharpeW, returns, covMatrix)
+
+      maxSharpeDf = pd.DataFrame({
+          'Asset': assets,
+          'Weight': [f'{w*100:.1f}%' for w in maxSharpeW]
+      })
+      maxSharpeDf
+
+- id: compare
+  title: 전략 비교
+  subtitle: 세 포트폴리오 분석
+  blocks:
+  - type: text
+    content: 균등배분, 최소위험, 최대샤프 세 가지 전략을 비교합니다. 최소위험은 수익률이 낮지만 변동성도 낮고, 최대샤프는 위험 단위당 수익이 가장 높습니다. 투자 목적과 위험 허용도에 따라 적절한 전략을 선택해야 합니다.
+  - type: code
+    language: python
+    title: 전략 비교표
+    description: 수익, 위험, 샤프
+    content: |-
+      compareDf = pd.DataFrame({
+          'Strategy': ['Equal Weight', 'Min Risk', 'Max Sharpe'],
+          'Return': [f'{eqRet*100:.2f}%', f'{minRiskRet*100:.2f}%', f'{maxSharpeRet*100:.2f}%'],
+          'Risk': [f'{eqRisk*100:.2f}%', f'{minRiskVol*100:.2f}%', f'{maxSharpeVol*100:.2f}%'],
+          'Sharpe': [f'{eqSharpe:.3f}', f'{minRiskSharpe:.3f}', f'{maxSharpeSharpe:.3f}']
+      })
+      compareDf
+  - type: code
+    language: python
+    title: 배분 비교 차트
+    description: 전략별 자산 비중
+    content: |-
+      figCompare, axCompare = plt.subplots(figsize=(10, 6))
+
+      x = np.arange(len(assets))
+      width = 0.25
+
+      axCompare.bar(x - width, equalWeights * 100, width, label='Equal', alpha=0.8)
+      axCompare.bar(x, minRiskW * 100, width, label='Min Risk', alpha=0.8)
+      axCompare.bar(x + width, maxSharpeW * 100, width, label='Max Sharpe', alpha=0.8)
+
+      axCompare.set_xlabel('Asset')
+      axCompare.set_ylabel('Weight (%)')
+      axCompare.set_title('Asset Allocation by Strategy')
+      axCompare.set_xticks(x)
+      axCompare.set_xticklabels(assets)
+      axCompare.legend()
+      axCompare.grid(True, alpha=0.3, axis='y')
+      figCompare
+
+- id: frontier
+  title: 효율적 프론티어
+  subtitle: 수익-위험 곡선
+  blocks:
+  - type: text
+    content: 효율적 프론티어는 주어진 위험 수준에서 달성 가능한 최대 수익의 집합입니다. 목표 수익률을 변화시키며 각 수준에서 최소 위험 포트폴리오를 찾으면 프론티어를 그릴 수 있습니다. 프론티어 위의 점만이 효율적인 투자입니다.
+  - type: code
+    language: python
+    title: 프론티어 계산
+    description: 목표수익별 최적화
+    content: |-
+      targetRets = np.linspace(0.05, 0.12, 50)
+      frontierRisks = []
+      frontierWeights = []
+
+      for target in targetRets:
+          cons = [
+              {'type': 'eq', 'fun': lambda w: np.sum(w) - 1},
+              {'type': 'eq', 'fun': lambda w, t=target: portfolioReturn(w, returns) - t}
+          ]
+          res = optimize.minimize(negRisk, initWeights, method='SLSQP', bounds=bounds, constraints=cons)
+          if res.success:
+              frontierRisks.append(portfolioRisk(res.x, covMatrix))
+              frontierWeights.append(res.x)
+          else:
+              frontierRisks.append(np.nan)
+              frontierWeights.append(None)
+  - type: code
+    language: python
+    title: 프론티어 시각화
+    description: 수익-위험 그래프
+    content: |-
+      figFrontier, axFrontier = plt.subplots(figsize=(10, 7))
+
+      axFrontier.plot([r*100 for r in frontierRisks], [r*100 for r in targetRets], 'b-', linewidth=2, label='Efficient Frontier')
+      axFrontier.scatter(eqRisk*100, eqRet*100, s=150, c='gray', marker='o', label='Equal Weight', zorder=5)
+      axFrontier.scatter(minRiskVol*100, minRiskRet*100, s=150, c='green', marker='s', label='Min Risk', zorder=5)
+      axFrontier.scatter(maxSharpeVol*100, maxSharpeRet*100, s=200, c='red', marker='*', label='Max Sharpe', zorder=5)
+
+      for i, asset in enumerate(assets):
+          aRisk = np.sqrt(covMatrix[i, i]) * 100
+          aRet = returns[i] * 100
+          axFrontier.scatter(aRisk, aRet, s=80, marker='^', zorder=5)
+          axFrontier.annotate(asset, (aRisk, aRet), textcoords="offset points", xytext=(5, 5))
+
+      axFrontier.set_xlabel('Risk (Standard Deviation %)')
+      axFrontier.set_ylabel('Expected Return (%)')
+      axFrontier.set_title('Efficient Frontier')
+      axFrontier.legend()
+      axFrontier.grid(True, alpha=0.3)
+      figFrontier
+
+- id: monte
+  title: 몬테카를로 시뮬레이션
+  subtitle: 랜덤 포트폴리오 분포
+  blocks:
+  - type: text
+    content: 수천 개의 랜덤 포트폴리오를 생성하여 가능한 수익-위험 조합을 시각화합니다. 효율적 프론티어가 모든 랜덤 포트폴리오의 상단 경계임을 확인할 수 있습니다. 샤프 비율을 색상으로 표현하면 최대샤프 포트폴리오가 가장 밝게 표시됩니다.
+  - type: code
+    language: python
+    title: 랜덤 포트폴리오 생성
+    description: 10000개 시뮬레이션
+    content: |-
+      np.random.seed(42)
+      nSim = 10000
+      simRets = []
+      simRisks = []
+      simSharpes = []
+
+      for _ in range(nSim):
+          w = np.random.random(len(assets))
+          w /= w.sum()
+          simRets.append(portfolioReturn(w, returns))
+          simRisks.append(portfolioRisk(w, covMatrix))
+          simSharpes.append(sharpeRatio(w, returns, covMatrix))
+  - type: code
+    language: python
+    title: 시뮬레이션 시각화
+    description: 샤프비율 색상맵
+    content: |-
+      figMonte, axMonte = plt.subplots(figsize=(12, 8))
+
+      sc = axMonte.scatter([r*100 for r in simRisks], [r*100 for r in simRets], c=simSharpes, cmap='viridis', s=5, alpha=0.5)
+      plt.colorbar(sc, label='Sharpe Ratio')
+
+      axMonte.plot([r*100 for r in frontierRisks], [r*100 for r in targetRets], 'r-', linewidth=3, label='Efficient Frontier')
+      axMonte.scatter(maxSharpeVol*100, maxSharpeRet*100, s=200, c='red', marker='*', edgecolors='white', linewidths=2, label='Max Sharpe', zorder=10)
+
+      axMonte.set_xlabel('Risk (%)')
+      axMonte.set_ylabel('Return (%)')
+      axMonte.set_title('Monte Carlo Simulation of 10,000 Portfolios')
+      axMonte.legend()
+      axMonte.grid(True, alpha=0.3)
+      figMonte
+
+- id: result
+  title: 최종 추천
+  subtitle: 투자 보고서
+  blocks:
+  - type: text
+    content: 최적화 결과를 종합하면 최대샤프 포트폴리오가 위험 대비 가장 효율적입니다. 그러나 실제 투자에서는 개인의 위험 허용도, 투자 기간, 유동성 필요 등을 고려해야 합니다. 최소위험과 최대샤프 사이에서 본인에게 맞는 지점을 선택하세요.
+  - type: code
+    language: python
+    title: 투자 보고서
+    description: 최종 추천
+    content: |-
+      reportDf = pd.DataFrame({
+          'Portfolio': ['Max Sharpe (Recommended)'],
+          'Stock A': [f'{maxSharpeW[0]*100:.1f}%'],
+          'Stock B': [f'{maxSharpeW[1]*100:.1f}%'],
+          'Bond': [f'{maxSharpeW[2]*100:.1f}%'],
+          'Gold': [f'{maxSharpeW[3]*100:.1f}%'],
+          'Exp Return': [f'{maxSharpeRet*100:.2f}%'],
+          'Risk': [f'{maxSharpeVol*100:.2f}%'],
+          'Sharpe': [f'{maxSharpeSharpe:.3f}']
+      })
+      reportDf
+
+- id: practice
+  title: 실습
+  subtitle: 포트폴리오 프로젝트
+  blocks:
+  - type: tip
+    content: 투자 분석가가 되어 다양한 자산 조합과 제약조건으로 포트폴리오를 최적화해보세요. 자산 수를 늘리거나 특정 자산에 최대 비중 제한을 두는 등 실무적인 조건을 추가해보세요.
+  - type: expansion
+    title: "미션1: 5개 자산 포트폴리오"
+    blocks:
+    - type: code
+      language: python
+      title: 자산 정의
+      description: 5개 섹터
+      content: |-
+        assets5 = ['Tech', 'Healthcare', 'Energy', 'Real Estate', 'Treasury']
+        returns5 = np.array([0.15, 0.11, 0.08, 0.09, 0.03])
+        cov5 = np.array([
+            [0.0400, 0.0180, 0.0100, 0.0120, 0.0010],
+            [0.0180, 0.0289, 0.0080, 0.0100, 0.0005],
+            [0.0100, 0.0080, 0.0324, 0.0150, 0.0002],
+            [0.0120, 0.0100, 0.0150, 0.0256, 0.0008],
+            [0.0010, 0.0005, 0.0002, 0.0008, 0.0009]
+        ])
+    - type: code
+      language: python
+      title: 최적화 실행
+      description: 최대샤프
+      content: |-
+        def pReturn5(w):
+            return np.dot(w, returns5)
+
+        def pRisk5(w):
+            return np.sqrt(np.dot(w.T, np.dot(cov5, w)))
+
+        def negSharpe5(w):
+            return -(pReturn5(w) - 0.02) / pRisk5(w)
+
+        init5 = np.array([0.2] * 5)
+        cons5 = {'type': 'eq', 'fun': lambda w: np.sum(w) - 1}
+        bnds5 = tuple((0, 1) for _ in range(5))
+
+        opt5 = optimize.minimize(negSharpe5, init5, method='SLSQP', bounds=bnds5, constraints=cons5)
+
+        result5Df = pd.DataFrame({
+            'Asset': assets5,
+            'Weight': [f'{w*100:.1f}%' for w in opt5.x],
+            'Return': [f'{r*100:.1f}%' for r in returns5]
+        })
+        result5Df
+  - type: expansion
+    title: "미션2: 목표수익률 달성"
+    blocks:
+    - type: code
+      language: python
+      title: 제약조건 추가
+      description: 수익률 10% 목표
+      content: |-
+        targetGoal = 0.10
+
+        consGoal = [
+            {'type': 'eq', 'fun': lambda w: np.sum(w) - 1},
+            {'type': 'eq', 'fun': lambda w: np.dot(w, returns5) - targetGoal}
+        ]
+    - type: code
+      language: python
+      title: 최소위험 찾기
+      description: 목표수익 유지
+      content: |-
+        def minRisk5(w):
+            return pRisk5(w)
+
+        optGoal = optimize.minimize(minRisk5, init5, method='SLSQP', bounds=bnds5, constraints=consGoal)
+
+        goalRet = pReturn5(optGoal.x)
+        goalRisk = pRisk5(optGoal.x)
+
+        goalDf = pd.DataFrame({
+            'Metric': ['Target Return', 'Achieved Return', 'Minimum Risk'],
+            'Value': [f'{targetGoal*100:.1f}%', f'{goalRet*100:.2f}%', f'{goalRisk*100:.2f}%']
+        })
+        goalDf

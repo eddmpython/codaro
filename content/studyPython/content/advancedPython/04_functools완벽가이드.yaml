@@ -1,0 +1,741 @@
+meta:
+  id: "04"
+  title: "functools 완벽 가이드"
+  day: 4
+  category: "advancedPython"
+  tags: ["functools", "partial", "lru_cache", "singledispatch"]
+  seo:
+    title: "파이썬 functools 완벽 가이드 - partial, lru_cache, singledispatch"
+    description: "functools 모듈의 핵심 함수들을 마스터합니다. partial, wraps, lru_cache, singledispatch, total_ordering 완벽 이해."
+    keywords: ["functools", "partial", "lru_cache", "singledispatch", "total_ordering"]
+
+intro:
+  emoji: "🔧"
+  points:
+  - "partial로 함수 인자 고정하기"
+  - "lru_cache로 결과 캐싱하여 성능 향상"
+  - "singledispatch로 타입 기반 함수 오버로딩"
+  - "total_ordering으로 비교 연산자 자동 생성"
+
+sections:
+- id: "partial_function"
+  title: "functools.partial"
+  subtitle: "함수 인자 고정"
+  blocks:
+  - type: "text"
+    content: "partial은 함수의 일부 인자를 미리 고정하여 새로운 함수를 만드는 도구입니다. 원본 함수와 고정할 인자를 받아 partial 객체를 반환합니다. 이 객체는 함수처럼 호출할 수 있으며, 호출 시 나머지 인자만 전달하면 됩니다. 커링(currying)의 간편한 구현이며, 콜백 함수에 추가 인자를 전달하거나, 설정이 다른 여러 버전의 함수를 만들 때 유용합니다. 키워드 인자도 고정할 수 있어 유연하게 활용됩니다."
+  - type: "list"
+    items:
+    - "partial(함수, *args, **kwargs) 형태"
+    - "위치 인자와 키워드 인자 모두 고정 가능"
+    - "커링의 간편한 구현"
+    - "콜백에 추가 인자 전달에 유용"
+  - type: "code"
+    language: "python"
+    title: "기본 partial 사용"
+    description: "곱셈 함수의 인자를 고정합니다."
+    content: |-
+      from functools import partial
+
+      def multiply(a, b):
+          return a * b
+
+      double = partial(multiply, 2)
+      triple = partial(multiply, 3)
+      double(5), triple(5)
+  - type: "code"
+    language: "python"
+    title: "키워드 인자 고정"
+    description: "키워드 인자를 미리 설정합니다."
+    content: |-
+      from functools import partial
+
+      def greet(name, greeting="Hello", punctuation="!"):
+          return f"{greeting}, {name}{punctuation}"
+
+      casualGreet = partial(greet, greeting="Hey", punctuation="~")
+      casualGreet("Python")
+  - type: "code"
+    language: "python"
+    title: "정렬 키 함수"
+    description: "sorted의 key에 partial을 활용합니다."
+    content: |-
+      from functools import partial
+
+      def getField(item, field):
+          return item.get(field, "")
+
+      users = [
+          {"name": "Alice", "age": 30},
+          {"name": "Bob", "age": 25},
+          {"name": "Charlie", "age": 35}
+      ]
+      byAge = partial(getField, field="age")
+      sorted(users, key=byAge)
+  - type: "tip"
+    content: "partial 객체의 func, args, keywords 속성으로 원본 함수와 고정된 인자를 확인할 수 있습니다."
+
+- id: "wraps_decorator"
+  title: "functools.wraps"
+  subtitle: "데코레이터 메타데이터 보존"
+  blocks:
+  - type: "text"
+    content: "wraps는 데코레이터에서 원본 함수의 메타데이터(__name__, __doc__, __annotations__ 등)를 wrapper 함수로 복사하는 데코레이터입니다. wraps 없이 데코레이터를 만들면 래핑된 함수가 원본 함수의 정보를 잃어버려 디버깅과 문서화에 문제가 됩니다. wraps는 __wrapped__ 속성도 설정하여 원본 함수에 접근할 수 있게 합니다. 데코레이터를 작성할 때 항상 wraps를 사용하는 것이 모범 사례입니다."
+  - type: "list"
+    items:
+    - "@wraps(func)를 wrapper 함수에 적용"
+    - "__name__, __doc__ 등 메타데이터 복사"
+    - "__wrapped__로 원본 함수 접근"
+    - "데코레이터의 필수 관행"
+  - type: "code"
+    language: "python"
+    title: "wraps 기본 사용"
+    description: "데코레이터에서 wraps를 적용합니다."
+    content: |-
+      from functools import wraps
+
+      def myDecorator(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          return wrapper
+
+      @myDecorator
+      def exampleFunc():
+          """Example function docstring"""
+          return 42
+
+      exampleFunc.__name__, exampleFunc.__doc__
+  - type: "code"
+    language: "python"
+    title: "__wrapped__ 활용"
+    description: "원본 함수에 직접 접근합니다."
+    content: |-
+      from functools import wraps
+
+      def addSuffix(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs) + "!"
+          return wrapper
+
+      @addSuffix
+      def sayHi():
+          return "Hi"
+
+      sayHi(), sayHi.__wrapped__()
+  - type: "code"
+    language: "python"
+    title: "annotations 보존"
+    description: "타입 힌트도 함께 보존됩니다."
+    content: |-
+      from functools import wraps
+
+      def logFunc(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          return wrapper
+
+      @logFunc
+      def addNums(a: int, b: int) -> int:
+          return a + b
+
+      addNums.__annotations__
+  - type: "tip"
+    content: "WRAPPER_ASSIGNMENTS와 WRAPPER_UPDATES 상수로 복사할 속성을 커스터마이징할 수 있습니다."
+
+- id: "lru_cache"
+  title: "functools.lru_cache"
+  subtitle: "LRU 캐싱으로 성능 최적화"
+  blocks:
+  - type: "text"
+    content: "lru_cache는 함수의 호출 결과를 캐싱하여 동일한 인자로 다시 호출될 때 계산 없이 캐시된 결과를 반환하는 데코레이터입니다. LRU는 Least Recently Used의 약자로, 캐시가 가득 차면 가장 오래 사용되지 않은 항목을 제거합니다. maxsize 인자로 캐시 크기를 지정하며, None이면 무제한입니다. 피보나치, 팩토리얼 같은 재귀 함수나 비용이 큰 계산에 매우 효과적입니다. Python 3.9+에서는 @cache가 @lru_cache(maxsize=None)의 단축형으로 제공됩니다."
+  - type: "list"
+    items:
+    - "@lru_cache(maxsize=128) 기본값"
+    - "maxsize=None이면 무제한 캐시"
+    - "typed=True면 타입별로 별도 캐싱"
+    - "cache_info(), cache_clear() 메서드 제공"
+  - type: "code"
+    language: "python"
+    title: "기본 lru_cache"
+    description: "피보나치 계산을 캐싱합니다."
+    content: |-
+      from functools import lru_cache
+
+      @lru_cache(maxsize=128)
+      def fib(n):
+          if n < 2:
+              return n
+          return fib(n - 1) + fib(n - 2)
+
+      fib(50), fib.cache_info()
+  - type: "code"
+    language: "python"
+    title: "cache_info 활용"
+    description: "캐시 통계를 확인합니다."
+    content: |-
+      from functools import lru_cache
+
+      @lru_cache(maxsize=10)
+      def slowCompute(x):
+          return x ** 2
+
+      for i in range(15):
+          slowCompute(i % 8)
+
+      slowCompute.cache_info()
+  - type: "code"
+    language: "python"
+    title: "typed 옵션"
+    description: "타입에 따라 다르게 캐싱합니다."
+    content: |-
+      from functools import lru_cache
+
+      @lru_cache(maxsize=32, typed=True)
+      def process(x):
+          return f"type: {type(x).__name__}, value: {x}"
+
+      process(1), process(1.0), process.cache_info()
+  - type: "tip"
+    content: "가변 객체(리스트, 딕셔너리)는 해시할 수 없어 lru_cache와 함께 사용할 수 없습니다."
+
+- id: "cache"
+  title: "functools.cache"
+  subtitle: "Python 3.9+ 무제한 캐시"
+  blocks:
+  - type: "text"
+    content: "Python 3.9에서 추가된 cache는 lru_cache(maxsize=None)의 간편한 별칭입니다. 캐시 크기 제한 없이 모든 호출 결과를 저장합니다. 메모리 사용량에 제한이 없으므로 주의가 필요하지만, 반복 호출이 많고 인자 조합이 제한된 경우에 최적입니다. lru_cache와 마찬가지로 cache_info()와 cache_clear() 메서드를 제공합니다."
+  - type: "list"
+    items:
+    - "Python 3.9에서 추가"
+    - "@lru_cache(maxsize=None)과 동일"
+    - "무제한 캐시, 메모리 주의"
+    - "간결한 문법"
+  - type: "code"
+    language: "python"
+    title: "cache 기본 사용"
+    description: "간단한 무제한 캐싱입니다."
+    content: |-
+      from functools import cache
+
+      @cache
+      def factorial(n):
+          if n <= 1:
+              return 1
+          return n * factorial(n - 1)
+
+      factorial(100), factorial.cache_info()
+  - type: "code"
+    language: "python"
+    title: "cache vs lru_cache"
+    description: "두 데코레이터를 비교합니다."
+    content: |-
+      from functools import cache, lru_cache
+
+      @cache
+      def unlimitedFn(x):
+          return x * 2
+
+      @lru_cache(maxsize=None)
+      def alsoUnlimited(x):
+          return x * 2
+
+      unlimitedFn(5) == alsoUnlimited(5)
+  - type: "code"
+    language: "python"
+    title: "캐시 초기화"
+    description: "캐시를 비우고 다시 시작합니다."
+    content: |-
+      from functools import cache
+
+      @cache
+      def compute(x):
+          return x ** 3
+
+      compute(2), compute(3)
+      before = compute.cache_info().currsize
+      compute.cache_clear()
+      after = compute.cache_info().currsize
+      before, after
+  - type: "tip"
+    content: "메모리가 제한된 환경에서는 maxsize를 지정한 lru_cache를 사용하세요."
+
+- id: "singledispatch"
+  title: "functools.singledispatch"
+  subtitle: "타입 기반 함수 오버로딩"
+  blocks:
+  - type: "text"
+    content: "singledispatch는 첫 번째 인자의 타입에 따라 다른 구현을 호출하는 제네릭 함수를 만드는 데코레이터입니다. 함수 오버로딩을 파이썬에서 구현하는 방법입니다. 기본 함수를 @singledispatch로 데코레이트하고, 각 타입별 구현을 @func.register로 등록합니다. 등록된 타입이 없으면 기본 함수가 호출됩니다. 다형성을 함수 수준에서 구현할 때 유용합니다."
+  - type: "list"
+    items:
+    - "첫 번째 인자 타입으로 디스패치"
+    - "@singledispatch로 기본 함수 정의"
+    - "@func.register로 타입별 구현 등록"
+    - "등록 안 된 타입은 기본 함수 호출"
+  - type: "code"
+    language: "python"
+    title: "기본 singledispatch"
+    description: "타입에 따라 다른 처리를 합니다."
+    content: |-
+      from functools import singledispatch
+
+      @singledispatch
+      def process(arg):
+          return f"Default: {arg}"
+
+      @process.register(int)
+      def _(arg):
+          return f"Integer: {arg * 2}"
+
+      @process.register(str)
+      def _(arg):
+          return f"String: {arg.upper()}"
+
+      process(10), process("hello"), process([1, 2])
+  - type: "code"
+    language: "python"
+    title: "타입 힌트로 등록"
+    description: "Python 3.7+ 스타일입니다."
+    content: |-
+      from functools import singledispatch
+
+      @singledispatch
+      def stringify(obj):
+          return str(obj)
+
+      @stringify.register
+      def _(obj: list):
+          return "[" + ", ".join(stringify(x) for x in obj) + "]"
+
+      @stringify.register
+      def _(obj: dict):
+          return "{" + ", ".join(f"{k}: {v}" for k, v in obj.items()) + "}"
+
+      stringify([1, 2, 3]), stringify({"a": 1})
+  - type: "code"
+    language: "python"
+    title: "여러 타입에 같은 구현"
+    description: "여러 타입에 동일한 처리를 적용합니다."
+    content: |-
+      from functools import singledispatch
+
+      @singledispatch
+      def size(obj):
+          return 1
+
+      @size.register(str)
+      @size.register(list)
+      @size.register(tuple)
+      def _(obj):
+          return len(obj)
+
+      size("hello"), size([1, 2, 3]), size(42)
+  - type: "tip"
+    content: "메서드에는 singledispatchmethod를 사용하세요."
+
+- id: "total_ordering"
+  title: "functools.total_ordering"
+  subtitle: "비교 연산자 자동 생성"
+  blocks:
+  - type: "text"
+    content: "total_ordering은 __eq__와 하나의 순서 비교 메서드(__lt__, __le__, __gt__, __ge__ 중 하나)만 정의하면 나머지 비교 메서드를 자동으로 생성해주는 클래스 데코레이터입니다. 완전한 비교 지원을 위해 6개의 비교 메서드를 모두 작성하는 번거로움을 줄여줍니다. 다만 자동 생성된 메서드는 직접 구현한 것보다 약간 느릴 수 있으니, 성능이 중요하면 직접 구현을 고려하세요."
+  - type: "list"
+    items:
+    - "__eq__와 비교 메서드 하나만 정의"
+    - "나머지 비교 메서드 자동 생성"
+    - "클래스 데코레이터로 적용"
+    - "성능보다 편의성 우선"
+  - type: "code"
+    language: "python"
+    title: "기본 total_ordering"
+    description: "__lt__만 정의하고 나머지는 자동 생성합니다."
+    content: |-
+      from functools import total_ordering
+
+      @total_ordering
+      class Student:
+          def __init__(self, name, grade):
+              self.name = name
+              self.grade = grade
+
+          def __eq__(self, other):
+              return self.grade == other.grade
+
+          def __lt__(self, other):
+              return self.grade < other.grade
+
+      s1 = Student("Alice", 85)
+      s2 = Student("Bob", 90)
+      s1 < s2, s1 <= s2, s1 > s2, s1 >= s2
+  - type: "code"
+    language: "python"
+    title: "정렬과 함께 사용"
+    description: "비교 가능한 객체를 정렬합니다."
+    content: |-
+      from functools import total_ordering
+
+      @total_ordering
+      class Priority:
+          def __init__(self, value, level):
+              self.value = value
+              self.level = level
+
+          def __eq__(self, other):
+              return self.level == other.level
+
+          def __lt__(self, other):
+              return self.level < other.level
+
+          def __repr__(self):
+              return f"Priority({self.value}, {self.level})"
+
+      items = [Priority("A", 3), Priority("B", 1), Priority("C", 2)]
+      sorted(items)
+  - type: "code"
+    language: "python"
+    title: "튜플 비교 활용"
+    description: "복합 키로 비교합니다."
+    content: |-
+      from functools import total_ordering
+
+      @total_ordering
+      class Version:
+          def __init__(self, major, minor, patch):
+              self.major = major
+              self.minor = minor
+              self.patch = patch
+
+          def __eq__(self, other):
+              return (self.major, self.minor, self.patch) == (other.major, other.minor, other.patch)
+
+          def __lt__(self, other):
+              return (self.major, self.minor, self.patch) < (other.major, other.minor, other.patch)
+
+      v1 = Version(1, 2, 3)
+      v2 = Version(1, 2, 4)
+      v1 < v2, v1 == v2
+  - type: "tip"
+    content: "dataclass(order=True)도 비슷한 기능을 제공합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "functools 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 4에서 배운 functools 모듈을 난이도별로 복습합니다. functools는 고차 함수와 함수형 프로그래밍을 지원하는 표준 라이브러리의 핵심 모듈입니다. partial로 부분 적용, lru_cache로 메모이제이션, wraps로 데코레이터 메타데이터 보존, singledispatch로 제네릭 함수를 구현합니다. 🟢 기본 문제로 각 함수의 기본 사용법을 익히고, 🟡 응용 문제로 조합 패턴을 연습하세요. 🔴 심화 문제에서는 reduce 활용, 캐시 전략, 멀티메서드 구현 등 고급 기법을 다룹니다. 이 모듈을 마스터하면 더 간결하고 성능 좋은 함수형 코드를 작성할 수 있습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 partial"
+    code: |-
+      from functools import partial
+
+      def power(base, exp):
+          return base ** exp
+
+      square = partial(power, exp=2)
+      square(5)
+
+  - type: "expansion"
+    title: "🟢 기본2: wraps 사용"
+    code: |-
+      from functools import wraps
+
+      def simple(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          return wrapper
+
+      @simple
+      def hello():
+          """Say hello"""
+          return "Hello"
+
+      hello.__name__, hello.__doc__
+
+  - type: "expansion"
+    title: "🟢 기본3: lru_cache 기본"
+    code: |-
+      from functools import lru_cache
+
+      @lru_cache
+      def expensive(n):
+          return sum(range(n))
+
+      expensive(1000), expensive.cache_info()
+
+  - type: "expansion"
+    title: "🟢 기본4: singledispatch 기본"
+    code: |-
+      from functools import singledispatch
+
+      @singledispatch
+      def double(x):
+          return x * 2
+
+      @double.register(str)
+      def _(x):
+          return x + x
+
+      double(5), double("hi")
+
+  - type: "expansion"
+    title: "🟢 기본5: total_ordering"
+    code: |-
+      from functools import total_ordering
+
+      @total_ordering
+      class Box:
+          def __init__(self, size):
+              self.size = size
+          def __eq__(self, other):
+              return self.size == other.size
+          def __lt__(self, other):
+              return self.size < other.size
+
+      Box(3) < Box(5), Box(3) >= Box(2)
+
+  - type: "expansion"
+    title: "🟡 응용1: partial 체이닝"
+    code: |-
+      from functools import partial
+
+      def compute(a, b, c, d):
+          return a + b * c - d
+
+      step1 = partial(compute, 10)
+      step2 = partial(step1, 5)
+      step3 = partial(step2, 3)
+      step3(2)
+
+  - type: "expansion"
+    title: "🟡 응용2: lru_cache maxsize"
+    code: |-
+      from functools import lru_cache
+
+      @lru_cache(maxsize=3)
+      def lookup(key):
+          return key.upper()
+
+      lookup("a"), lookup("b"), lookup("c"), lookup("d")
+      lookup.cache_info()
+
+  - type: "expansion"
+    title: "🟡 응용3: singledispatch 다중 타입"
+    code: |-
+      from functools import singledispatch
+
+      @singledispatch
+      def format_data(data):
+          return str(data)
+
+      @format_data.register(int)
+      @format_data.register(float)
+      def _(data):
+          return f"{data:,.2f}"
+
+      format_data(1234567), format_data(3.14159)
+
+  - type: "expansion"
+    title: "🟡 응용4: cache clear"
+    code: |-
+      from functools import lru_cache
+
+      @lru_cache
+      def getData(key):
+          return f"data_{key}"
+
+      getData(1), getData(2)
+      sizeBefore = getData.cache_info().currsize
+      getData.cache_clear()
+      sizeAfter = getData.cache_info().currsize
+      sizeBefore, sizeAfter
+
+  - type: "expansion"
+    title: "🟡 응용5: partial과 map"
+    code: |-
+      from functools import partial
+
+      def formatNum(num, prefix, suffix):
+          return f"{prefix}{num}{suffix}"
+
+      dollarFormat = partial(formatNum, prefix="$", suffix=".00")
+      list(map(dollarFormat, [10, 20, 30]))
+
+  - type: "expansion"
+    title: "🔴 심화1: 재귀 최적화"
+    code: |-
+      from functools import lru_cache
+
+      @lru_cache(maxsize=None)
+      def ackermann(m, n):
+          if m == 0:
+              return n + 1
+          if n == 0:
+              return ackermann(m - 1, 1)
+          return ackermann(m - 1, ackermann(m, n - 1))
+
+      ackermann(3, 4), ackermann.cache_info()
+
+  - type: "expansion"
+    title: "🔴 심화2: singledispatch 재귀"
+    code: |-
+      from functools import singledispatch
+
+      @singledispatch
+      def flatten(obj):
+          return [obj]
+
+      @flatten.register(list)
+      def _(obj):
+          result = []
+          for item in obj:
+              result.extend(flatten(item))
+          return result
+
+      flatten([1, [2, 3], [[4, 5], 6]])
+
+  - type: "expansion"
+    title: "🔴 심화3: partial 속성 접근"
+    code: |-
+      from functools import partial
+
+      def original(a, b, c):
+          return a + b + c
+
+      partialFn = partial(original, 1, c=3)
+      partialFn.func.__name__, partialFn.args, partialFn.keywords
+
+  - type: "expansion"
+    title: "🔴 심화4: cached_property 흉내"
+    code: |-
+      from functools import lru_cache
+
+      class Data:
+          def __init__(self, values):
+              self._values = values
+
+          @property
+          @lru_cache(maxsize=1)
+          def stats(self):
+              return {
+                  "sum": sum(self._values),
+                  "avg": sum(self._values) / len(self._values)
+              }
+
+      d = Data([1, 2, 3, 4, 5])
+      d.stats, d.stats is d.stats
+
+  - type: "expansion"
+    title: "🔴 심화5: reduce 활용"
+    code: |-
+      from functools import reduce
+
+      def compose(*funcs):
+          return reduce(lambda f, g: lambda x: f(g(x)), funcs)
+
+      addOne = lambda x: x + 1
+      timesTwo = lambda x: x * 2
+      squared = lambda x: x ** 2
+
+      composed = compose(addOne, timesTwo, squared)
+      composed(3)
+
+  - type: "expansion"
+    title: "🔴 심화6: partialmethod"
+    code: |-
+      from functools import partialmethod
+
+      class Multiplier:
+          def __init__(self, base):
+              self.base = base
+
+          def multiply(self, factor):
+              return self.base * factor
+
+          double = partialmethod(multiply, 2)
+          triple = partialmethod(multiply, 3)
+
+      m = Multiplier(5)
+      m.double(), m.triple()
+
+  - type: "expansion"
+    title: "🔴 심화7: cmp_to_key"
+    code: |-
+      from functools import cmp_to_key
+
+      def compare(a, b):
+          if a < b:
+              return -1
+          elif a > b:
+              return 1
+          return 0
+
+      items = [3, 1, 4, 1, 5, 9, 2, 6]
+      sorted(items, key=cmp_to_key(compare))
+
+  - type: "expansion"
+    title: "🔴 심화8: singledispatchmethod"
+    code: |-
+      from functools import singledispatchmethod
+
+      class Processor:
+          @singledispatchmethod
+          def process(self, arg):
+              return f"Default: {arg}"
+
+          @process.register
+          def _(self, arg: int):
+              return f"Integer: {arg * 2}"
+
+          @process.register
+          def _(self, arg: str):
+              return f"String: {arg.upper()}"
+
+      proc = Processor()
+      proc.process(5), proc.process("hello")
+
+  - type: "expansion"
+    title: "🔴 심화9: 조건부 캐싱"
+    code: |-
+      from functools import wraps
+
+      def conditionalCache(condition):
+          def decorator(func):
+              cache = {}
+              @wraps(func)
+              def wrapper(*args):
+                  if condition(*args):
+                      if args not in cache:
+                          cache[args] = func(*args)
+                      return cache[args]
+                  return func(*args)
+              wrapper.cache = cache
+              return wrapper
+          return decorator
+
+      @conditionalCache(lambda x: x > 0)
+      def compute(x):
+          return x ** 2
+
+      compute(5), compute(-5), compute.cache
+
+  - type: "expansion"
+    title: "🔴 심화10: update_wrapper"
+    code: |-
+      from functools import update_wrapper, WRAPPER_ASSIGNMENTS
+
+      def myDecorator(func):
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          update_wrapper(wrapper, func, assigned=WRAPPER_ASSIGNMENTS)
+          return wrapper
+
+      @myDecorator
+      def sample():
+          """Sample docstring"""
+          return 42
+
+      sample.__name__, sample.__doc__, hasattr(sample, "__wrapped__")

@@ -1,0 +1,324 @@
+meta:
+  id: sympy_09
+  title: 수식시각화
+  order: 9
+  category: sympy
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["sympy", "plot", "시각화", "그래프", "matplotlib"]
+  seo:
+    title: "SymPy 시각화 - plot과 matplotlib 연동"
+    description: "SymPy로 함수 그래프를 그리고 matplotlib과 연동합니다. 2D, 3D 시각화와 미적분 결과를 시각화합니다."
+    keywords: ["sympy", "plot", "시각화", "matplotlib", "그래프"]
+
+intro:
+  emoji: "📊"
+  goal: SymPy의 plot()으로 함수 그래프를 그리고 matplotlib과 연동합니다.
+  description: "수학 수식을 시각화하면 추상적인 개념이 직관적으로 다가옵니다. 2차 함수 x²은 포물선, sin(x)는 파동, e^x는 폭발적 성장 곡선입니다. SymPy의 plot()은 기호 함수를 바로 그래프로 변환합니다. 도함수를 함께 그리면 기울기 변화를 볼 수 있고, 적분 영역을 색칠하면 넓이의 의미를 이해합니다. 접선을 그리면 미분의 기하적 의미가 보입니다. 이 프로젝트를 완료하면 함수 그래프, 미적분 시각화, 3D 곡면까지 다룰 수 있게 됩니다."
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "시각화에 필요한 함수들을 불러옵니다. sympy.plotting의 plot()은 2D 함수 그래프, plot_parametric()은 매개변수 곡선, plot3d()는 3D 곡면을 그립니다. matplotlib.pyplot은 더 세밀한 커스터마이징에 사용합니다. SymPy 플롯은 기호 함수를 직접 받아들이므로 변환 없이 바로 그릴 수 있습니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sympy와 matplotlib을 불러옵니다
+    content: |-
+      from sympy import symbols, sin, cos, exp, log, sqrt, pi
+      from sympy import diff, integrate, solve
+      from sympy.plotting import plot, plot_parametric, plot3d
+      import matplotlib.pyplot as plt
+      from sympy import init_printing
+      init_printing()
+
+- id: step2_basic_plot
+  title: 2단계. 기본 플롯
+  subtitle: plot()
+  blocks:
+  - type: text
+    content: "plot(f, (x, a, b))는 x가 a에서 b까지 변할 때 f(x)의 그래프를 그립니다. title, xlabel, ylabel로 제목과 축 라벨을 지정합니다. show=False로 설정하면 즉시 표시하지 않고 설정을 추가한 후 show()로 표시할 수 있습니다. 2차 함수 x²은 원점을 꼭지점으로 하는 아래로 볼록한 포물선입니다."
+  - type: code
+    language: python
+    title: 기호 정의
+    description: 변수 x를 정의합니다
+    content: |-
+      x = symbols('x')
+  - type: code
+    language: python
+    title: 2차함수 그래프
+    description: y = x²
+    content: |-
+      p1 = plot(x**2, (x, -3, 3), title='y = x^2', xlabel='x', ylabel='y', show=False)
+      p1.show()
+      p1
+  - type: tip
+    content: show=False로 즉시 표시를 막고, 설정 후 show()로 표시합니다. 또는 그냥 plot()만 호출하면 바로 표시됩니다.
+
+- id: step3_multiple
+  title: 3단계. 여러 함수
+  subtitle: 동시 그리기
+  blocks:
+  - type: text
+    content: "여러 함수를 한 그래프에 비교하면 관계가 명확해집니다. plot(f1, f2, f3, (x, a, b))로 여러 함수를 동시에 그립니다. legend=True로 범례를 표시하고, p[0].label로 각 함수에 이름을 붙입니다. sin(x)와 cos(x)를 비교하면 π/2의 위상차를 볼 수 있고, x, x², x³을 비교하면 거듭제곱에 따른 성장 속도 차이를 확인합니다."
+  - type: code
+    language: python
+    title: 삼각함수 비교
+    description: sin과 cos 동시에
+    content: |-
+      p2 = plot(sin(x), cos(x), (x, -2*pi, 2*pi), legend=True, show=False)
+      p2[0].label = 'sin(x)'
+      p2[1].label = 'cos(x)'
+      p2.show()
+      p2
+  - type: code
+    language: python
+    title: 다양한 거듭제곱
+    description: x, x², x³ 비교
+    content: |-
+      p3 = plot(x, x**2, x**3, (x, -2, 2), legend=True, show=False)
+      p3[0].label = 'x'
+      p3[1].label = 'x^2'
+      p3[2].label = 'x^3'
+      p3.show()
+      p3
+
+- id: step4_style
+  title: 4단계. 스타일 지정
+  subtitle: 색상과 선
+  blocks:
+  - type: text
+    content: "그래프의 시각적 스타일을 지정하면 구분이 쉬워집니다. line_color='red'로 색상을 지정합니다. 여러 함수를 그릴 때는 p[0].line_color = 'blue', p[1].line_color = 'orange'처럼 각각 다른 색을 지정합니다. 색상은 이름('red'), hex('#FF0000'), RGB 튜플로 지정할 수 있습니다. 발표 자료나 논문에 사용할 때는 구분이 명확한 색상을 선택합니다."
+  - type: code
+    language: python
+    title: 색상 지정
+    description: 빨간색 그래프
+    content: |-
+      p4 = plot(sin(x), (x, 0, 2*pi), line_color='red', show=False)
+      p4.show()
+      p4
+  - type: code
+    language: python
+    title: 여러 색상
+    description: 각 함수에 다른 색상
+    content: |-
+      p5 = plot(sin(x), cos(x), (x, 0, 2*pi), show=False)
+      p5[0].line_color = 'blue'
+      p5[1].line_color = 'orange'
+      p5.show()
+      p5
+
+- id: step5_matplotlib
+  title: 5단계. Matplotlib 연동
+  subtitle: 더 세밀한 제어
+  blocks:
+  - type: text
+    content: "SymPy 플롯의 기능이 부족할 때는 matplotlib과 연동합니다. backend를 통해 matplotlib의 Figure와 Axes 객체에 접근할 수 있습니다. ax.grid(True)로 격자를 추가하고, ax.annotate()로 주석을 달고, ax.axhline()으로 보조선을 그립니다. matplotlib의 모든 기능을 활용하여 출판 품질의 그래프를 만들 수 있습니다."
+  - type: code
+    language: python
+    title: Figure 추출
+    description: matplotlib 객체로 변환
+    content: |-
+      p6 = plot(x**2, (x, -3, 3), show=False)
+      backend = p6.backend(p6)
+      backend.process_series()
+      fig = backend.fig
+      ax = backend.ax[0]
+      ax.set_title('Parabola with Matplotlib')
+      ax.grid(True)
+      fig
+  - type: tip
+    content: backend를 통해 matplotlib의 Figure와 Axes 객체에 접근할 수 있습니다. grid, annotation 등을 추가할 수 있습니다.
+
+- id: step6_parametric
+  title: 6단계. 매개변수 플롯
+  subtitle: plot_parametric()
+  blocks:
+  - type: text
+    content: "매개변수 곡선은 x(t), y(t)로 정의됩니다. plot_parametric(x(t), y(t), (t, a, b))로 그립니다. 원 x=cos(t), y=sin(t)는 가장 기본적인 예입니다. 리사주 곡선 x=sin(3t), y=sin(2t)은 진동수 비율에 따라 아름다운 패턴을 만듭니다. 매개변수 곡선은 물리학의 운동 궤적, 컴퓨터 그래픽스의 곡선 표현에 널리 사용됩니다."
+  - type: code
+    language: python
+    title: 원
+    description: x=cos(t), y=sin(t)
+    content: |-
+      t = symbols('t')
+      pcircle = plot_parametric(cos(t), sin(t), (t, 0, 2*pi), title='Circle', show=False)
+      pcircle.show()
+      pcircle
+  - type: code
+    language: python
+    title: 리사주 곡선
+    description: x=sin(3t), y=sin(2t)
+    content: |-
+      plissa = plot_parametric(sin(3*t), sin(2*t), (t, 0, 2*pi), title='Lissajous', show=False)
+      plissa.show()
+      plissa
+  - type: tip
+    content: 매개변수 플롯은 시간에 따른 운동 궤적, 복잡한 곡선 등을 표현할 때 유용합니다.
+
+- id: step7_derivative_plot
+  title: 7단계. 도함수 시각화
+  subtitle: 미분 결과
+  blocks:
+  - type: text
+    content: "함수와 도함수를 함께 그리면 미분의 의미가 시각적으로 드러납니다. f(x) = x³-3x의 도함수 f'(x) = 3x²-3입니다. 도함수가 0인 x = ±1에서 원래 함수는 극값을 가집니다. 도함수가 양수인 구간에서 원래 함수는 증가하고, 음수인 구간에서 감소합니다. 그래프에서 이 관계를 직접 확인할 수 있습니다."
+  - type: code
+    language: python
+    title: 함수와 도함수
+    description: f(x)와 f'(x) 비교
+    content: |-
+      func = x**3 - 3*x
+      dfunc = diff(func, x)
+      func, dfunc
+  - type: code
+    language: python
+    title: 함께 그리기
+    description: 원래 함수와 도함수
+    content: |-
+      pd = plot(func, dfunc, (x, -2.5, 2.5), legend=True, show=False)
+      pd[0].label = 'f(x) = x^3 - 3x'
+      pd[1].label = "f'(x) = 3x^2 - 3"
+      pd.show()
+      pd
+  - type: tip
+    content: 도함수가 0인 점에서 원래 함수는 극값을 가집니다. 그래프에서 교차점을 확인해보세요.
+
+- id: step8_integral_plot
+  title: 8단계. 적분 영역
+  subtitle: 넓이 시각화
+  blocks:
+  - type: text
+    content: "정적분 ∫[a,b] f(x)dx는 곡선 y=f(x)와 x축 사이의 넓이입니다. matplotlib의 fill_between()으로 이 영역을 색칠하면 적분의 기하적 의미가 명확해집니다. ∫[0,2] x²dx = 8/3은 포물선 아래 넓이입니다. 시각화와 수치 계산을 비교하면 적분의 개념이 직관적으로 이해됩니다."
+  - type: code
+    language: python
+    title: 적분 영역 표시
+    description: 넓이를 색칠합니다
+    content: |-
+      import numpy as np
+
+      xarr = np.linspace(0, 2, 100)
+      yarr = xarr**2
+
+      fig, ax = plt.subplots(figsize=(8, 5))
+      ax.plot(xarr, yarr, 'b-', linewidth=2, label='y = x^2')
+      ax.fill_between(xarr, yarr, alpha=0.3, color='blue')
+      ax.set_xlabel('x')
+      ax.set_ylabel('y')
+      ax.set_title('Area under y = x^2 from 0 to 2')
+      ax.legend()
+      fig
+  - type: code
+    language: python
+    title: 넓이 계산
+    description: SymPy로 정적분
+    content: |-
+      area = integrate(x**2, (x, 0, 2))
+      area
+
+- id: step9_tangent_plot
+  title: 9단계. 접선 시각화
+  subtitle: 미분의 기하적 의미
+  blocks:
+  - type: text
+    content: "미분값 f'(a)는 점 (a, f(a))에서 접선의 기울기입니다. 접선 방정식은 y - f(a) = f'(a)(x - a)입니다. x=1에서 y=x²의 접선은 기울기 2로, y = 2(x-1) + 1 = 2x - 1입니다. 곡선과 접선을 함께 그리면 접선이 곡선에 '접하는' 모습을 볼 수 있습니다. 이것이 미분의 기하적 의미입니다."
+  - type: code
+    language: python
+    title: 접선 계산
+    description: x=1에서 접선
+    content: |-
+      curve = x**2
+      dcurve = diff(curve, x)
+      pt = 1
+      yval = curve.subs(x, pt)
+      slope = dcurve.subs(x, pt)
+      tangent = slope * (x - pt) + yval
+      curve, tangent
+  - type: code
+    language: python
+    title: 접선 그래프
+    description: 곡선과 접선 함께
+    content: |-
+      ptan = plot(curve, tangent, (x, -1, 3), legend=True, show=False)
+      ptan[0].label = 'y = x^2'
+      ptan[1].label = 'Tangent at x=1'
+      ptan[1].line_color = 'red'
+      ptan.show()
+      ptan
+
+- id: step10_3d
+  title: 10단계. 3D 플롯
+  subtitle: plot3d()
+  blocks:
+  - type: text
+    content: "두 변수 함수 z = f(x, y)는 3D 곡면으로 표현됩니다. plot3d(f, (x, a, b), (y, c, d))로 그립니다. z = x² + y²은 원뿔 모양의 포물면으로 최솟값이 원점에 있습니다. z = x² - y²은 안장면(saddle surface)으로 한 방향에서 극소, 다른 방향에서 극대입니다. 다변수 함수의 극값 분석에서 3D 시각화는 필수적입니다."
+  - type: code
+    language: python
+    title: 두 변수 정의
+    description: x, y를 정의합니다
+    content: |-
+      y = symbols('y')
+  - type: code
+    language: python
+    title: 3D 곡면
+    description: z = x² + y²
+    content: |-
+      p3d = plot3d(x**2 + y**2, (x, -3, 3), (y, -3, 3), title='z = x^2 + y^2', show=False)
+      p3d.show()
+      p3d
+  - type: code
+    language: python
+    title: 안장면
+    description: z = x² - y²
+    content: |-
+      psaddle = plot3d(x**2 - y**2, (x, -3, 3), (y, -3, 3), title='Saddle surface', show=False)
+      psaddle.show()
+      psaddle
+
+- id: practice
+  title: 실습
+  subtitle: 시각화 연습
+  blocks:
+  - type: text
+    content: "이제 다양한 함수의 시각화를 종합적으로 연습합니다. 미션1에서는 지수함수 e^u와 로그함수 ln(u)를 비교합니다. 두 함수는 역함수 관계로 y=x에 대해 대칭입니다. 미션2에서는 sin(v)와 그 도함수들 cos(v), -sin(v)를 함께 그려 미분의 순환 패턴을 확인합니다. 시각화는 수학적 관계를 직관적으로 이해하는 강력한 도구입니다."
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 지수함수와 로그함수"
+    blocks:
+    - type: code
+      title: "지수와 로그 비교"
+      content: |-
+        from sympy import symbols, exp, log, pi
+        from sympy.plotting import plot
+
+        u = symbols('u')
+
+        pExpLog = plot(exp(u), log(u), (u, 0.1, 3), legend=True, show=False)
+        pExpLog[0].label = 'e^u'
+        pExpLog[1].label = 'ln(u)'
+        pExpLog.show()
+        pExpLog
+  - type: expansion
+    title: "미션2: 삼각함수와 미분"
+    blocks:
+    - type: code
+      title: "sin과 도함수들"
+      content: |-
+        from sympy import symbols, sin, diff, pi
+        from sympy.plotting import plot
+
+        v = symbols('v')
+
+        fv = sin(v)
+        dfv = diff(fv, v)
+        d2fv = diff(fv, v, 2)
+
+        pTrig = plot(fv, dfv, d2fv, (v, -2*pi, 2*pi), legend=True, show=False)
+        pTrig[0].label = 'sin(v)'
+        pTrig[1].label = 'cos(v)'
+        pTrig[2].label = '-sin(v)'
+        pTrig.show()
+        pTrig

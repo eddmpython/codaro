@@ -1,0 +1,675 @@
+meta:
+  id: "14_csv"
+  title: "csv - CSV 처리"
+  category: "builtins"
+  tags: ["csv", "데이터", "파일", "임포트"]
+  seo:
+    title: "파이썬 csv 모듈 완전 정복"
+    description: "csv 모듈로 CSV 파일 읽기, 쓰기, DictReader/Writer 활용을 배웁니다."
+    keywords: ["csv", "데이터파일", "reader", "writer", "DictReader", "파이썬CSV"]
+
+intro:
+  emoji: "📊"
+  points:
+  - "CSV 파일 읽기와 쓰기"
+  - "DictReader/Writer로 편리한 처리"
+  - "구분자와 인용 옵션"
+  - "데이터 임포트/익스포트"
+
+sections:
+- id: "module_import"
+  title: "csv 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "csv는 파이썬 표준 라이브러리입니다. CSV(Comma-Separated Values) 파일을 처리하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 csv 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "csv 모듈 불러오기"
+    description: "csv 모듈을 불러옵니다."
+    content: |-
+      import csv
+
+      'csv 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "basic_reading"
+  title: "CSV 파일 읽기"
+  subtitle: "reader로 데이터 읽기"
+  blocks:
+  - type: "text"
+    content: "csv.reader()는 CSV 파일을 한 줄씩 읽어 리스트로 반환합니다. 각 행은 문자열 리스트가 되며, 반복문으로 모든 행을 처리할 수 있습니다. 데이터 분석, 로그 파싱, 스프레드시트 처리에 필수적입니다."
+  - type: "list"
+    items:
+    - "reader(파일): CSV 읽기 객체 생성"
+    - "각 행은 문자열 리스트"
+    - "헤더 행 별도 처리 가능"
+    - "자동 구분자 인식"
+  - type: "code"
+    language: "python"
+    title: "CSV 파일 생성 및 읽기"
+    description: "간단한 CSV 파일을 만들고 읽습니다."
+    content: |-
+      sampleCsv = '/tmp/sample.csv'
+      with open(sampleCsv, 'w') as f:
+          f.write('name,age,city\n')
+          f.write('Alice,30,Seoul\n')
+          f.write('Bob,25,Busan\n')
+
+      with open(sampleCsv, 'r') as f:
+          csvReader = csv.reader(f)
+          rows = list(csvReader)
+      rows
+  - type: "code"
+    language: "python"
+    title: "헤더와 데이터 분리"
+    description: "첫 행을 헤더로, 나머지를 데이터로 분리합니다."
+    content: |-
+      dataCsv = '/tmp/data.csv'
+      with open(dataCsv, 'w') as f:
+          f.write('product,price,stock\n')
+          f.write('laptop,1200,15\n')
+          f.write('mouse,25,50\n')
+
+      with open(dataCsv, 'r') as f:
+          reader = csv.reader(f)
+          headers = next(reader)
+          dataRows = list(reader)
+      headers, dataRows
+  - type: "code"
+    language: "python"
+    title: "특정 컬럼 추출"
+    description: "각 행에서 원하는 컬럼만 추출합니다."
+    content: |-
+      studentCsv = '/tmp/students.csv'
+      with open(studentCsv, 'w') as f:
+          f.write('id,name,score\n')
+          f.write('1,Kim,95\n')
+          f.write('2,Lee,88\n')
+          f.write('3,Park,92\n')
+
+      with open(studentCsv, 'r') as f:
+          csvData = csv.reader(f)
+          next(csvData)
+          names = [row[1] for row in csvData]
+      names
+  - type: "tip"
+    content: "next(reader)를 사용하면 헤더 행을 건너뛰고 데이터만 처리할 수 있습니다."
+
+- id: "basic_writing"
+  title: "CSV 파일 쓰기"
+  subtitle: "writer로 데이터 저장"
+  blocks:
+  - type: "text"
+    content: "csv.writer()는 리스트를 CSV 파일로 저장합니다. writerow()로 한 행씩, writerows()로 여러 행을 한 번에 작성할 수 있습니다. 데이터 내보내기, 리포트 생성, 로그 저장에 활용됩니다."
+  - type: "list"
+    items:
+    - "writer(파일): CSV 쓰기 객체 생성"
+    - "writerow(행): 한 행 작성"
+    - "writerows(행들): 여러 행 작성"
+    - "자동 인용 처리"
+  - type: "code"
+    language: "python"
+    title: "한 행씩 쓰기"
+    description: "writerow()로 한 행씩 CSV에 추가합니다."
+    content: |-
+      outputCsv = '/tmp/output.csv'
+      with open(outputCsv, 'w', newline='') as f:
+          csvWriter = csv.writer(f)
+          csvWriter.writerow(['name', 'age'])
+          csvWriter.writerow(['Alice', 30])
+          csvWriter.writerow(['Bob', 25])
+
+      with open(outputCsv, 'r') as f:
+          written = f.read()
+      written
+  - type: "code"
+    language: "python"
+    title: "여러 행 한번에 쓰기"
+    description: "writerows()로 리스트의 모든 행을 작성합니다."
+    content: |-
+      bulkCsv = '/tmp/bulk.csv'
+      allRows = [
+          ['product', 'price'],
+          ['laptop', '1200'],
+          ['mouse', '25'],
+          ['keyboard', '80']
+      ]
+      with open(bulkCsv, 'w', newline='') as f:
+          bulkWriter = csv.writer(f)
+          bulkWriter.writerows(allRows)
+
+      with open(bulkCsv, 'r') as f:
+          content = f.read()
+      content
+  - type: "code"
+    language: "python"
+    title: "데이터 변환 후 저장"
+    description: "Python 데이터를 처리하여 CSV로 저장합니다."
+    content: |-
+      scores = [
+          {'name': 'Alice', 'math': 95, 'english': 88},
+          {'name': 'Bob', 'math': 82, 'english': 90}
+      ]
+      scoreCsv = '/tmp/scores.csv'
+      with open(scoreCsv, 'w', newline='') as f:
+          writer = csv.writer(f)
+          writer.writerow(['name', 'math', 'english'])
+          for student in scores:
+              writer.writerow([student['name'], student['math'], student['english']])
+
+      with open(scoreCsv, 'r') as f:
+          result = list(csv.reader(f))
+      result
+  - type: "tip"
+    content: "newline=''을 사용하면 불필요한 빈 줄이 생기지 않습니다. Windows에서 특히 중요합니다."
+
+- id: "dict_operations"
+  title: "딕셔너리 기반 처리"
+  subtitle: "DictReader와 DictWriter"
+  blocks:
+  - type: "text"
+    content: "DictReader는 각 행을 딕셔너리로 읽어 컬럼명으로 접근할 수 있습니다. DictWriter는 딕셔너리를 CSV로 저장합니다. 인덱스 대신 키 이름을 사용하여 코드 가독성이 높아지고, 컬럼 순서 변경에도 안전합니다."
+  - type: "list"
+    items:
+    - "DictReader: 행 → 딕셔너리"
+    - "DictWriter: 딕셔너리 → 행"
+    - "fieldnames로 컬럼 지정"
+    - "키 이름으로 접근"
+  - type: "code"
+    language: "python"
+    title: "DictReader 사용"
+    description: "CSV를 딕셔너리로 읽어 처리합니다."
+    content: |-
+      peopleCsv = '/tmp/people.csv'
+      with open(peopleCsv, 'w') as f:
+          f.write('name,age,city\n')
+          f.write('Alice,30,Seoul\n')
+          f.write('Bob,25,Busan\n')
+
+      with open(peopleCsv, 'r') as f:
+          dictReader = csv.DictReader(f)
+          people = list(dictReader)
+      people
+  - type: "code"
+    language: "python"
+    title: "DictWriter로 저장"
+    description: "딕셔너리 리스트를 CSV로 저장합니다."
+    content: |-
+      employees = [
+          {'id': 1, 'name': 'Kim', 'dept': 'IT'},
+          {'id': 2, 'name': 'Lee', 'dept': 'HR'}
+      ]
+      empCsv = '/tmp/employees.csv'
+      with open(empCsv, 'w', newline='') as f:
+          fieldNames = ['id', 'name', 'dept']
+          dictWriter = csv.DictWriter(f, fieldnames=fieldNames)
+          dictWriter.writeheader()
+          dictWriter.writerows(employees)
+
+      with open(empCsv, 'r') as f:
+          saved = f.read()
+      saved
+  - type: "code"
+    language: "python"
+    title: "특정 필드만 추출"
+    description: "DictReader로 원하는 컬럼만 선택합니다."
+    content: |-
+      productCsv = '/tmp/products.csv'
+      with open(productCsv, 'w') as f:
+          f.write('id,name,price,stock\n')
+          f.write('1,laptop,1200,15\n')
+          f.write('2,mouse,25,50\n')
+
+      with open(productCsv, 'r') as f:
+          reader = csv.DictReader(f)
+          productNames = [row['name'] for row in reader]
+      productNames
+  - type: "tip"
+    content: "writeheader()로 fieldnames를 자동으로 첫 행에 작성할 수 있습니다."
+
+- id: "formatting_options"
+  title: "포맷팅 옵션"
+  subtitle: "delimiter, quotechar, quoting"
+  blocks:
+  - type: "text"
+    content: "CSV 파일의 구분자, 인용 문자, 인용 방식을 커스터마이즈할 수 있습니다. delimiter로 쉼표 외 다른 구분자를 사용하고, quotechar로 인용 문자를 지정하며, quoting으로 인용 전략을 설정합니다. TSV, 파이프 구분 등 다양한 형식을 처리할 수 있습니다."
+  - type: "list"
+    items:
+    - "delimiter: 구분자 (기본: ',')"
+    - "quotechar: 인용 문자 (기본: '\"')"
+    - "quoting: 인용 전략"
+    - "escapechar: 이스케이프 문자"
+  - type: "code"
+    language: "python"
+    title: "탭 구분자 (TSV)"
+    description: "탭으로 구분된 파일을 처리합니다."
+    content: |-
+      tsvFile = '/tmp/data.tsv'
+      with open(tsvFile, 'w') as f:
+          f.write('name\tage\tcity\n')
+          f.write('Alice\t30\tSeoul\n')
+          f.write('Bob\t25\tBusan\n')
+
+      with open(tsvFile, 'r') as f:
+          tsvReader = csv.reader(f, delimiter='\t')
+          tsvRows = list(tsvReader)
+      tsvRows
+  - type: "code"
+    language: "python"
+    title: "파이프 구분자"
+    description: "파이프(|)로 구분된 데이터를 작성합니다."
+    content: |-
+      pipeFile = '/tmp/pipe.csv'
+      pipeData = [['id', 'value'], ['1', 'apple'], ['2', 'banana']]
+      with open(pipeFile, 'w', newline='') as f:
+          pipeWriter = csv.writer(f, delimiter='|')
+          pipeWriter.writerows(pipeData)
+
+      with open(pipeFile, 'r') as f:
+          pipeContent = f.read()
+      pipeContent
+  - type: "code"
+    language: "python"
+    title: "인용 전략"
+    description: "모든 필드를 인용 부호로 감쌉니다."
+    content: |-
+      quotedFile = '/tmp/quoted.csv'
+      quotedData = [['name', 'value'], ['test', '123']]
+      with open(quotedFile, 'w', newline='') as f:
+          quotedWriter = csv.writer(f, quoting=csv.QUOTE_ALL)
+          quotedWriter.writerows(quotedData)
+
+      with open(quotedFile, 'r') as f:
+          quotedResult = f.read()
+      quotedResult
+  - type: "tip"
+    content: "QUOTE_MINIMAL은 필요할 때만, QUOTE_ALL은 모든 필드를, QUOTE_NONNUMERIC은 숫자 외 모든 필드를 인용합니다."
+
+- id: "advanced_features"
+  title: "고급 기능"
+  subtitle: "Sniffer, Dialect"
+  blocks:
+  - type: "text"
+    content: "Sniffer는 CSV 파일의 형식을 자동으로 감지합니다. Dialect는 CSV 포맷 설정을 재사용 가능하게 만듭니다. 다양한 형식의 CSV 파일을 자동으로 처리하거나, 일관된 포맷으로 파일을 생성할 때 유용합니다."
+  - type: "list"
+    items:
+    - "Sniffer: 형식 자동 감지"
+    - "Dialect: 포맷 설정 재사용"
+    - "has_header(): 헤더 존재 확인"
+    - "커스텀 dialect 생성"
+  - type: "code"
+    language: "python"
+    title: "형식 자동 감지"
+    description: "CSV 파일의 구분자와 인용 문자를 자동으로 감지합니다."
+    content: |-
+      unknownFile = '/tmp/unknown.csv'
+      with open(unknownFile, 'w') as f:
+          f.write('a;b;c\n')
+          f.write('1;2;3\n')
+
+      with open(unknownFile, 'r') as f:
+          sample = f.read(1024)
+          f.seek(0)
+          sniffer = csv.Sniffer()
+          dialect = sniffer.sniff(sample)
+          detectedReader = csv.reader(f, dialect)
+          detected = list(detectedReader)
+      detected
+  - type: "code"
+    language: "python"
+    title: "헤더 감지"
+    description: "파일에 헤더가 있는지 자동으로 확인합니다."
+    content: |-
+      headerTest = '/tmp/header_test.csv'
+      with open(headerTest, 'w') as f:
+          f.write('name,age\n')
+          f.write('Alice,30\n')
+
+      with open(headerTest, 'r') as f:
+          testSample = f.read(1024)
+          f.seek(0)
+          detector = csv.Sniffer()
+          hasHeader = detector.has_header(testSample)
+      hasHeader
+  - type: "code"
+    language: "python"
+    title: "파일 형식 정보"
+    description: "감지된 형식의 구분자를 확인합니다."
+    content: |-
+      formatFile = '/tmp/format.csv'
+      with open(formatFile, 'w') as f:
+          f.write('x|y|z\n')
+          f.write('1|2|3\n')
+
+      with open(formatFile, 'r') as f:
+          chunk = f.read(100)
+          formatSniffer = csv.Sniffer()
+          foundDialect = formatSniffer.sniff(chunk)
+          delimiterChar = foundDialect.delimiter
+      delimiterChar
+  - type: "tip"
+    content: "Sniffer는 파일의 처음 일부만 읽어 형식을 추론하므로 빠르고 메모리 효율적입니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "데이터 변환과 처리"
+  blocks:
+  - type: "text"
+    content: "실무에서 자주 사용하는 CSV 처리 패턴을 살펴봅니다. 데이터 필터링, 집계, 변환, 병합 등 다양한 작업을 CSV로 수행할 수 있습니다. 스프레드시트 자동화, 리포트 생성, ETL 작업에 활용됩니다."
+  - type: "list"
+    items:
+    - "데이터 필터링"
+    - "집계와 통계"
+    - "파일 병합"
+    - "형식 변환"
+  - type: "code"
+    language: "python"
+    title: "조건 필터링"
+    description: "특정 조건을 만족하는 행만 추출합니다."
+    content: |-
+      salesCsv = '/tmp/sales.csv'
+      with open(salesCsv, 'w') as f:
+          f.write('product,amount\n')
+          f.write('laptop,1200\n')
+          f.write('mouse,25\n')
+          f.write('monitor,300\n')
+
+      with open(salesCsv, 'r') as f:
+          salesReader = csv.DictReader(f)
+          expensive = [row for row in salesReader if int(row['amount']) > 100]
+      expensive
+  - type: "code"
+    language: "python"
+    title: "데이터 집계"
+    description: "CSV 데이터의 합계를 계산합니다."
+    content: |-
+      revenueCsv = '/tmp/revenue.csv'
+      with open(revenueCsv, 'w') as f:
+          f.write('month,revenue\n')
+          f.write('Jan,10000\n')
+          f.write('Feb,15000\n')
+          f.write('Mar,12000\n')
+
+      with open(revenueCsv, 'r') as f:
+          revenueReader = csv.DictReader(f)
+          totalRevenue = sum(int(row['revenue']) for row in revenueReader)
+      totalRevenue
+  - type: "code"
+    language: "python"
+    title: "CSV 변환"
+    description: "CSV를 읽어 다른 형식으로 변환합니다."
+    content: |-
+      sourceCsv = '/tmp/source.csv'
+      with open(sourceCsv, 'w') as f:
+          f.write('id,name\n')
+          f.write('1,Alice\n')
+          f.write('2,Bob\n')
+
+      with open(sourceCsv, 'r') as f:
+          sourceReader = csv.DictReader(f)
+          converted = {row['id']: row['name'] for row in sourceReader}
+      converted
+  - type: "tip"
+    content: "대용량 CSV는 한 번에 메모리에 로드하지 말고 스트리밍 방식으로 처리하세요."
+
+- id: "practice"
+  title: "csv 모듈 종합 복습"
+  subtitle: "CSV 처리 마스터하기"
+  blocks:
+  - type: "text"
+    content: "csv 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: CSV 읽기"
+    code: |-
+      basicCsv = '/tmp/basic.csv'
+      with open(basicCsv, 'w') as f:
+          f.write('a,b,c\n1,2,3\n')
+      with open(basicCsv, 'r') as f:
+          basicReader = csv.reader(f)
+          basicRows = list(basicReader)
+      basicRows
+
+  - type: "expansion"
+    title: "🟢 기본2: CSV 쓰기"
+    code: |-
+      writeCsv = '/tmp/write.csv'
+      with open(writeCsv, 'w', newline='') as f:
+          writeObj = csv.writer(f)
+          writeObj.writerow(['x', 'y'])
+          writeObj.writerow([1, 2])
+      with open(writeCsv, 'r') as f:
+          writeResult = f.read()
+      writeResult
+
+  - type: "expansion"
+    title: "🟢 기본3: 헤더 건너뛰기"
+    code: |-
+      headerCsv = '/tmp/header.csv'
+      with open(headerCsv, 'w') as f:
+          f.write('name,age\nAlice,30\n')
+      with open(headerCsv, 'r') as f:
+          skipReader = csv.reader(f)
+          next(skipReader)
+          dataOnly = list(skipReader)
+      dataOnly
+
+  - type: "expansion"
+    title: "🟢 기본4: DictReader"
+    code: |-
+      dictCsv = '/tmp/dict.csv'
+      with open(dictCsv, 'w') as f:
+          f.write('key,value\na,1\nb,2\n')
+      with open(dictCsv, 'r') as f:
+          dr = csv.DictReader(f)
+          dictList = list(dr)
+      dictList
+
+  - type: "expansion"
+    title: "🟢 기본5: DictWriter"
+    code: |-
+      dwCsv = '/tmp/dw.csv'
+      with open(dwCsv, 'w', newline='') as f:
+          dw = csv.DictWriter(f, fieldnames=['id', 'val'])
+          dw.writeheader()
+          dw.writerow({'id': 1, 'val': 'a'})
+      with open(dwCsv, 'r') as f:
+          dwResult = f.read()
+      dwResult
+
+  - type: "expansion"
+    title: "🟡 응용1: 탭 구분 파일"
+    code: |-
+      tsvPath = '/tmp/app.tsv'
+      with open(tsvPath, 'w') as f:
+          f.write('a\tb\n1\t2\n')
+      with open(tsvPath, 'r') as f:
+          tsvRead = csv.reader(f, delimiter='\t')
+          tsvData = list(tsvRead)
+      tsvData
+
+  - type: "expansion"
+    title: "🟡 응용2: 특정 컬럼 추출"
+    code: |-
+      colCsv = '/tmp/col.csv'
+      with open(colCsv, 'w') as f:
+          f.write('name,age,city\nAlice,30,Seoul\nBob,25,Busan\n')
+      with open(colCsv, 'r') as f:
+          colReader = csv.reader(f)
+          next(colReader)
+          nameCol = [row[0] for row in colReader]
+      nameCol
+
+  - type: "expansion"
+    title: "🟡 응용3: 여러 행 쓰기"
+    code: |-
+      multiCsv = '/tmp/multi.csv'
+      multiRows = [['a', 'b'], [1, 2], [3, 4]]
+      with open(multiCsv, 'w', newline='') as f:
+          multiWriter = csv.writer(f)
+          multiWriter.writerows(multiRows)
+      with open(multiCsv, 'r') as f:
+          multiContent = f.read()
+      multiContent
+
+  - type: "expansion"
+    title: "🟡 응용4: 모든 필드 인용"
+    code: |-
+      quoteCsv = '/tmp/quote.csv'
+      with open(quoteCsv, 'w', newline='') as f:
+          qw = csv.writer(f, quoting=csv.QUOTE_ALL)
+          qw.writerow(['a', 'b'])
+      with open(quoteCsv, 'r') as f:
+          quoteRes = f.read()
+      quoteRes
+
+  - type: "expansion"
+    title: "🟡 응용5: 딕셔너리 필터링"
+    code: |-
+      filterCsv = '/tmp/filter.csv'
+      with open(filterCsv, 'w') as f:
+          f.write('name,score\nAlice,95\nBob,70\n')
+      with open(filterCsv, 'r') as f:
+          filterReader = csv.DictReader(f)
+          highScore = [r for r in filterReader if int(r['score']) > 80]
+      highScore
+
+  - type: "expansion"
+    title: "🔴 심화1: 형식 자동 감지"
+    code: |-
+      autoFile = '/tmp/auto.csv'
+      with open(autoFile, 'w') as f:
+          f.write('x;y\n1;2\n')
+      with open(autoFile, 'r') as f:
+          autoSample = f.read(100)
+          f.seek(0)
+          autoSniffer = csv.Sniffer()
+          autoDialect = autoSniffer.sniff(autoSample)
+          autoReader = csv.reader(f, autoDialect)
+          autoData = list(autoReader)
+      autoData
+
+  - type: "expansion"
+    title: "🔴 심화2: 데이터 집계"
+    code: |-
+      aggCsv = '/tmp/agg.csv'
+      with open(aggCsv, 'w') as f:
+          f.write('item,qty\napple,10\nbanana,5\napple,3\n')
+      with open(aggCsv, 'r') as f:
+          aggReader = csv.DictReader(f)
+          total = sum(int(row['qty']) for row in aggReader)
+      total
+
+  - type: "expansion"
+    title: "🔴 심화3: CSV to JSON"
+    code: |-
+      import json
+      c2jCsv = '/tmp/c2j.csv'
+      with open(c2jCsv, 'w') as f:
+          f.write('id,name\n1,Alice\n2,Bob\n')
+      with open(c2jCsv, 'r') as f:
+          c2jReader = csv.DictReader(f)
+          jsonData = json.dumps(list(c2jReader))
+      jsonData
+
+  - type: "expansion"
+    title: "🔴 심화4: 조건부 쓰기"
+    code: |-
+      condCsv = '/tmp/cond.csv'
+      allData = [{'name': 'A', 'val': 100}, {'name': 'B', 'val': 50}]
+      with open(condCsv, 'w', newline='') as f:
+          condWriter = csv.DictWriter(f, fieldnames=['name', 'val'])
+          condWriter.writeheader()
+          for item in allData:
+              if item['val'] > 60:
+                  condWriter.writerow(item)
+      with open(condCsv, 'r') as f:
+          condResult = list(csv.DictReader(f))
+      condResult
+
+  - type: "expansion"
+    title: "🔴 심화5: 파일 병합"
+    code: |-
+      merge1 = '/tmp/m1.csv'
+      merge2 = '/tmp/m2.csv'
+      with open(merge1, 'w') as f:
+          f.write('a,b\n1,2\n')
+      with open(merge2, 'w') as f:
+          f.write('a,b\n3,4\n')
+      mergedData = []
+      for path in [merge1, merge2]:
+          with open(path, 'r') as f:
+              mr = csv.reader(f)
+              next(mr)
+              mergedData.extend(list(mr))
+      mergedData
+
+  - type: "expansion"
+    title: "🔴 심화6: 컬럼 순서 변경"
+    code: |-
+      reorderCsv = '/tmp/reorder.csv'
+      with open(reorderCsv, 'w') as f:
+          f.write('a,b,c\n1,2,3\n')
+      with open(reorderCsv, 'r') as f:
+          reorderReader = csv.DictReader(f)
+          reordered = [{k: row[k] for k in ['c', 'a', 'b']} for row in reorderReader]
+      reordered
+
+  - type: "expansion"
+    title: "🔴 심화7: 중복 제거"
+    code: |-
+      dupCsv = '/tmp/dup.csv'
+      with open(dupCsv, 'w') as f:
+          f.write('name\nAlice\nBob\nAlice\n')
+      with open(dupCsv, 'r') as f:
+          dupReader = csv.reader(f)
+          next(dupReader)
+          uniqueNames = list(set(row[0] for row in dupReader))
+      uniqueNames
+
+  - type: "expansion"
+    title: "🔴 심화8: 통계 계산"
+    code: |-
+      statCsv = '/tmp/stat.csv'
+      with open(statCsv, 'w') as f:
+          f.write('value\n10\n20\n30\n')
+      with open(statCsv, 'r') as f:
+          statReader = csv.DictReader(f)
+          values = [int(row['value']) for row in statReader]
+          avgValue = sum(values) / len(values)
+      avgValue
+
+  - type: "expansion"
+    title: "🔴 심화9: 파이프 구분 변환"
+    code: |-
+      pipeCsv = '/tmp/pipe2.csv'
+      with open(pipeCsv, 'w') as f:
+          f.write('a,b\n1,2\n')
+      with open(pipeCsv, 'r') as f:
+          pipeReader = csv.reader(f)
+          pipeRows = list(pipeReader)
+      pipeOut = '/tmp/pipe_out.csv'
+      with open(pipeOut, 'w', newline='') as f:
+          pipeWriter = csv.writer(f, delimiter='|')
+          pipeWriter.writerows(pipeRows)
+      with open(pipeOut, 'r') as f:
+          pipeConverted = f.read()
+      pipeConverted
+
+  - type: "expansion"
+    title: "🔴 심화10: 대용량 스트리밍"
+    code: |-
+      largeCsv = '/tmp/large.csv'
+      with open(largeCsv, 'w', newline='') as f:
+          largeWriter = csv.writer(f)
+          largeWriter.writerow(['id', 'value'])
+          for i in range(100):
+              largeWriter.writerow([i, i * 10])
+      with open(largeCsv, 'r') as f:
+          largeReader = csv.DictReader(f)
+          streamSum = sum(int(row['value']) for row in largeReader)
+      streamSum

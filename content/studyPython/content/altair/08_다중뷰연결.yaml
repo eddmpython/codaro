@@ -1,0 +1,383 @@
+meta:
+  id: altair_08
+  title: 다중뷰연결
+  order: 8
+  category: altair
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["hconcat", "vconcat", "repeat", "linked", "iris"]
+  seo:
+    title: "Altair 다중 뷰 - 차트 연결과 조합"
+    description: "Altair로 여러 차트를 연결합니다. hconcat, vconcat, repeat로 다중 뷰 대시보드를 만듭니다."
+    keywords: ["altair concat", "hconcat", "vconcat", "repeat", "linked brush"]
+
+intro:
+  emoji: "🔗"
+  goal: 여러 차트를 가로/세로로 배치하고 브러싱으로 연결해 다중 뷰 대시보드를 만듭니다.
+  description: hconcat(|), vconcat(&), repeat로 차트를 조합하고, 선택을 공유해 차트 간 연동을 구현합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: seaborn-data
+  blocks:
+  - type: text
+    content: |-
+      GitHub에서 iris(붓꽃) 데이터를 불러옵니다. 붓꽃 3가지 품종(setosa, versicolor, virginica)의 꽃잎과 꽃받침 크기를 측정한 유명한 데이터셋입니다.
+
+      sepal은 꽃받침(꽃잎을 감싸는 초록색 부분), petal은 꽃잎(색깔 있는 부분)입니다. length는 길이, width는 너비, species는 품종입니다.
+
+      이 데이터로 여러 차트를 동시에 그리고 서로 연결하는 방법을 배웁니다. 한 차트를 조작하면 다른 차트도 함께 반응합니다.
+  - type: code
+    language: python
+    title: iris 데이터 불러오기
+    description: pandas로 CSV 로드
+    content: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+
+      irisUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+      iris = pd.read_csv(irisUrl)
+      iris.head()
+
+- id: step2_hconcat
+  title: 2단계. 가로 배치
+  subtitle: hconcat (|)
+  blocks:
+  - type: text
+    content: |-
+      지금까지는 차트를 하나씩 그렸습니다. 이번에는 여러 차트를 한 화면에 배치하는 방법을 배웁니다.
+
+      | 연산자(파이프 기호)는 차트를 가로로 나란히 붙이는 역할을 합니다. chart1 | chart2는 "차트1 옆에 차트2를 배치하라"는 뜻입니다. hconcat()도 같은 기능입니다(h는 horizontal, 가로).
+
+      먼저 각 차트를 변수에 저장한 뒤, | 연산자로 연결하면 두 차트가 가로로 나란히 표시됩니다.
+  - type: code
+    language: python
+    title: 가로 배치
+    description: chart1 | chart2
+    content: |-
+      chartPetal = alt.Chart(iris).mark_point().encode(
+          x='petal_length:Q',
+          y='petal_width:Q',
+          color='species:N'
+      ).properties(width=200, height=200, title='꽃잎')
+
+      chartSepal = alt.Chart(iris).mark_point().encode(
+          x='sepal_length:Q',
+          y='sepal_width:Q',
+          color='species:N'
+      ).properties(width=200, height=200, title='꽃받침')
+
+      chartHconcat = chartPetal | chartSepal
+      chartHconcat
+  - type: tip
+    content: |-
+      | 기호는 키보드에서 Shift + ₩(원화 기호) 또는 Shift + \(백슬래시)를 누르면 입력됩니다.
+
+      | 연산자는 alt.hconcat()의 단축 표현입니다. concat은 concatenate(연결하다)의 줄임말입니다. 두 차트를 가로로 연결해 나란히 배치합니다.
+
+- id: step3_vconcat
+  title: 3단계. 세로 배치
+  subtitle: vconcat (&)
+  blocks:
+  - type: text
+    content: |-
+      가로 배치를 배웠으니 이번에는 세로 배치를 해봅니다. & 연산자는 차트를 위아래로 쌓는 역할을 합니다.
+
+      chart1 & chart2는 "차트1 아래에 차트2를 배치하라"는 뜻입니다. vconcat()도 같은 기능입니다(v는 vertical, 세로).
+
+      | 는 옆으로 붙이고, &는 아래로 쌓는다고 기억하면 됩니다.
+  - type: code
+    language: python
+    title: 세로 배치
+    description: chart1 & chart2
+    content: |-
+      chartVconcat = chartPetal & chartSepal
+      chartVconcat
+  - type: tip
+    content: |-
+      & 연산자는 alt.vconcat()의 단축 표현입니다. 차트들이 세로로 쌓입니다.
+
+- id: step4_grid
+  title: 4단계. 그리드 배치
+  subtitle: 가로+세로 조합
+  blocks:
+  - type: text
+    content: |-
+      | 와 & 를 동시에 사용하면 복잡한 레이아웃을 만들 수 있습니다. 괄호로 순서를 정해주면 2x2, 3x3 같은 그리드를 만들 수 있습니다.
+
+      (chart1 | chart2)는 먼저 차트1과 차트2를 가로로 붙입니다. (chart3 | chart4)도 가로로 붙입니다. 그 다음 두 묶음을 & 로 세로로 쌓으면 2행 2열 그리드가 됩니다.
+
+      괄호가 중요합니다. 수학 계산처럼 괄호 안을 먼저 처리합니다.
+  - type: code
+    language: python
+    title: 그리드 레이아웃
+    description: (a | b) & (c | d)
+    content: |-
+      chart1 = alt.Chart(iris).mark_point().encode(
+          x='sepal_length:Q', y='sepal_width:Q', color='species:N'
+      ).properties(width=180, height=180, title='꽃받침 L vs W')
+
+      chart2 = alt.Chart(iris).mark_point().encode(
+          x='petal_length:Q', y='petal_width:Q', color='species:N'
+      ).properties(width=180, height=180, title='꽃잎 L vs W')
+
+      chart3 = alt.Chart(iris).mark_point().encode(
+          x='sepal_length:Q', y='petal_length:Q', color='species:N'
+      ).properties(width=180, height=180, title='길이 비교')
+
+      chart4 = alt.Chart(iris).mark_point().encode(
+          x='sepal_width:Q', y='petal_width:Q', color='species:N'
+      ).properties(width=180, height=180, title='너비 비교')
+
+      chartGrid = (chart1 | chart2) & (chart3 | chart4)
+      chartGrid
+
+- id: step5_linked_brush
+  title: 5단계. 연결된 브러싱
+  subtitle: 선택 공유
+  blocks:
+  - type: text
+    content: |-
+      이제 핵심 기능을 배웁니다. 여러 차트가 서로 연결되어 동시에 반응하게 만드는 방법입니다.
+
+      같은 brush 변수(selection_interval)를 두 차트 모두에 add_params()로 추가하면, 한 차트에서 드래그한 선택이 다른 차트에도 적용됩니다.
+
+      왼쪽 차트에서 영역을 드래그하면, 오른쪽 차트에서도 똑같은 데이터 포인트가 강조됩니다. 마치 두 차트가 대화하는 것처럼 연동됩니다.
+  - type: code
+    language: python
+    title: 연결된 브러싱
+    description: 두 차트 연동
+    content: |-
+      brush = alt.selection_interval()
+
+      linkedPetal = alt.Chart(iris).mark_point().encode(
+          x='petal_length:Q',
+          y='petal_width:Q',
+          color=alt.when(brush).then('species:N').otherwise(alt.value('lightgray'))
+      ).properties(width=250, height=250, title='꽃잎 (드래그로 선택)').add_params(brush)
+
+      linkedSepal = alt.Chart(iris).mark_point().encode(
+          x='sepal_length:Q',
+          y='sepal_width:Q',
+          color=alt.when(brush).then('species:N').otherwise(alt.value('lightgray'))
+      ).properties(width=250, height=250, title='꽃받침 (연동됨)').add_params(brush)
+
+      chartLinked = linkedPetal | linkedSepal
+      chartLinked
+  - type: tip
+    content: |-
+      같은 brush 객체를 add_params()로 두 차트에 추가했습니다. 한 쪽에서 선택하면 다른 쪽에서도 같은 데이터가 강조됩니다.
+
+- id: step6_repeat
+  title: 6단계. repeat 차트
+  subtitle: 변수 조합 자동화
+  blocks:
+  - type: text
+    content: |-
+      지금까지는 차트를 하나하나 만들어서 조합했습니다. repeat()를 사용하면 변수 조합을 자동으로 만들어줍니다.
+
+      repeat()는 "반복하다"라는 뜻입니다. row와 column에 변수 리스트를 지정하면, 모든 조합의 차트를 자동으로 생성합니다.
+
+      alt.repeat('column')은 "column 리스트의 변수를 반복해서 사용하라"는 의미입니다. row에 2개, column에 2개 변수를 주면 2×2=4개 차트가 자동 생성됩니다.
+  - type: code
+    language: python
+    title: repeat 차트
+    description: 변수 조합 그리드
+    content: |-
+      chartRepeat = alt.Chart(iris).mark_point().encode(
+          alt.X(alt.repeat('column'), type='quantitative'),
+          alt.Y(alt.repeat('row'), type='quantitative'),
+          color='species:N'
+      ).properties(
+          width=150,
+          height=150
+      ).repeat(
+          row=['sepal_length', 'sepal_width'],
+          column=['petal_length', 'petal_width']
+      )
+      chartRepeat
+  - type: tip
+    content: |-
+      alt.X(alt.repeat('column'), type='quantitative')는 "X축에 column 리스트의 변수를 반복해서 넣고, 타입은 수량형으로 하라"는 뜻입니다.
+
+      repeat()에 row=['A', 'B'], column=['C', 'D']를 지정하면, A-C, A-D, B-C, B-D 총 4개 조합이 자동으로 만들어집니다. 일일이 차트를 만들 필요가 없어 편리합니다.
+
+- id: step7_repeat_linked
+  title: 7단계. repeat + 연결 브러싱
+  subtitle: 그리드 전체 연동
+  blocks:
+  - type: text
+    content: |-
+      repeat 차트에도 연결된 브러싱을 적용할 수 있습니다. add_params(brush)를 추가하면 모든 패널에서 동일한 선택이 공유됩니다.
+
+      한 패널에서 드래그하면 모든 패널이 동시에 연동되어 해당 데이터가 강조됩니다. 여러 변수 조합을 동시에 탐색할 때 매우 유용합니다.
+  - type: code
+    language: python
+    title: repeat + 브러싱
+    description: 그리드 전체 연동
+    content: |-
+      brushRepeat = alt.selection_interval()
+
+      chartRepeatLinked = alt.Chart(iris).mark_point().encode(
+          alt.X(alt.repeat('column'), type='quantitative'),
+          alt.Y(alt.repeat('row'), type='quantitative'),
+          color=alt.when(brushRepeat).then('species:N').otherwise(alt.value('lightgray'))
+      ).properties(
+          width=140,
+          height=140
+      ).add_params(brushRepeat).repeat(
+          row=['sepal_length', 'petal_length'],
+          column=['sepal_width', 'petal_width']
+      )
+      chartRepeatLinked
+
+- id: step8_scatter_matrix
+  title: 8단계. 산점도 매트릭스
+  subtitle: SPLOM
+  blocks:
+  - type: text
+    content: |-
+      같은 변수 리스트를 row와 column에 지정하면 산점도 매트릭스(SPLOM, Scatterplot Matrix)가 됩니다. 4개 변수를 지정하면 4×4=16개 패널이 생성됩니다.
+
+      대각선은 같은 변수끼리의 조합이므로 점들이 일직선에 놓입니다. 나머지 패널에서는 모든 변수 쌍의 상관관계를 한눈에 파악할 수 있어 탐색적 데이터 분석에 유용합니다.
+  - type: code
+    language: python
+    title: 산점도 매트릭스
+    description: 모든 변수 조합
+    content: |-
+      brushMatrix = alt.selection_interval()
+      variables = ['sepal_length', 'sepal_width', 'petal_length', 'petal_width']
+
+      chartMatrix = alt.Chart(iris).mark_circle(size=30).encode(
+          alt.X(alt.repeat('column'), type='quantitative'),
+          alt.Y(alt.repeat('row'), type='quantitative'),
+          color=alt.when(brushMatrix).then('species:N').otherwise(alt.value('lightgray')),
+          opacity=alt.when(brushMatrix).then(alt.value(0.8)).otherwise(alt.value(0.3))
+      ).properties(
+          width=100,
+          height=100
+      ).add_params(brushMatrix).repeat(
+          row=variables,
+          column=variables
+      )
+      chartMatrix
+
+- id: step9_final
+  title: 9단계. 최종 결과물
+  subtitle: 다중 뷰 대시보드
+  blocks:
+  - type: text
+    content: |-
+      지금까지 배운 모든 개념을 종합해 다중 뷰 대시보드를 완성합니다.
+
+      산점도와 막대 차트를 조합하고 연결된 브러싱을 적용합니다.
+  - type: code
+    language: python
+    title: 최종 다중 뷰 대시보드
+    description: 프로젝트 완성!
+    content: |-
+      brushFinal = alt.selection_interval()
+
+      scatterFinal = alt.Chart(iris).mark_circle(size=60).encode(
+          x=alt.X('petal_length:Q', title='꽃잎 길이'),
+          y=alt.Y('petal_width:Q', title='꽃잎 너비'),
+          color=alt.when(brushFinal).then('species:N').otherwise(alt.value('lightgray')),
+          tooltip=['species', 'petal_length', 'petal_width']
+      ).properties(
+          width=350,
+          height=300,
+          title='꽃잎 특성 (드래그로 선택)'
+      ).add_params(brushFinal)
+
+      barFinal = alt.Chart(iris).mark_bar().encode(
+          x='count()',
+          y=alt.Y('species:N', title='품종'),
+          color=alt.when(brushFinal).then('species:N').otherwise(alt.value('lightgray'))
+      ).properties(
+          width=350,
+          height=100,
+          title='품종별 개수'
+      ).add_params(brushFinal)
+
+      chartFinal = scatterFinal & barFinal
+      chartFinal
+  - type: text
+    content: |-
+      산점도에서 영역을 선택하면 해당 데이터 포인트가 강조되고, 막대 차트에서도 해당 품종이 강조됩니다.
+
+      두 차트가 연동되어 데이터 탐색이 용이합니다.
+
+- id: practice
+  title: 실습
+  subtitle: 다중 뷰 프로젝트
+  blocks:
+  - type: text
+    content: |-
+      이 프로젝트에서 배운 내용을 정리하면: | 연산자로 가로 배치, & 연산자로 세로 배치, 괄호로 그리드 레이아웃, 같은 selection 변수를 공유해 차트 연동, repeat()로 변수 조합 자동화, alt.repeat()로 변수 참조입니다.
+
+      이제 배운 개념들을 조합해 다중 뷰 차트를 만들어봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 꽃받침 vs 꽃잎 (가로 2개, 연결 브러싱)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        flowerUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+        flower = pd.read_csv(flowerUrl)
+        brushLen = alt.selection_interval()
+    - type: code
+      title: "차트 생성"
+      content: |-
+        lenChart = alt.Chart(flower).mark_point().encode(
+            x='sepal_length:Q', y='petal_length:Q',
+            color=alt.when(brushLen).then('species:N').otherwise(alt.value('lightgray'))
+        ).properties(width=200, height=200, title='길이').add_params(brushLen)
+        widChart = alt.Chart(flower).mark_point().encode(
+            x='sepal_width:Q', y='petal_width:Q',
+            color=alt.when(brushLen).then('species:N').otherwise(alt.value('lightgray'))
+        ).properties(width=200, height=200, title='너비').add_params(brushLen)
+        figLink = lenChart | widChart
+        figLink
+  - type: expansion
+    title: "미션2: repeat으로 3x3 그리드"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        bloomUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+        bloom = pd.read_csv(bloomUrl)
+        cols = ['sepal_length', 'petal_length', 'petal_width']
+    - type: code
+      title: "차트 생성"
+      content: |-
+        figGrid = alt.Chart(bloom).mark_circle(size=20).encode(
+            alt.X(alt.repeat('column'), type='quantitative'),
+            alt.Y(alt.repeat('row'), type='quantitative'),
+            color='species:N'
+        ).properties(width=100, height=100).repeat(row=cols, column=cols)
+        figGrid
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair로 다중 뷰 대시보드를 마스터했습니다!
+  - type: list
+    items:
+    - "chart1 | chart2 (hconcat) - 가로 배치"
+    - "chart1 & chart2 (vconcat) - 세로 배치"
+    - "(a | b) & (c | d) - 그리드 레이아웃"
+    - "repeat(row=[...], column=[...]) - 변수 조합 자동화"
+    - "alt.repeat('column'), alt.repeat('row') - repeat 변수 참조"
+    - "같은 selection 공유 - 연결된 브러싱"
+  - type: text
+    content: 다음 프로젝트에서는 고급 데이터 변환 기법을 배웁니다.

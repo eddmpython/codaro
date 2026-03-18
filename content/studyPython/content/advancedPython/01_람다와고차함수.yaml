@@ -1,0 +1,458 @@
+meta:
+  id: "01"
+  title: "람다와 고차 함수"
+  day: 1
+  category: "advancedPython"
+  tags: ["lambda", "map", "filter", "reduce", "고차함수"]
+  seo:
+    title: "파이썬 람다와 고차 함수 - 함수형 프로그래밍 마스터"
+    description: "lambda 표현식과 map, filter, reduce를 완벽히 이해하고 고차 함수의 개념을 마스터합니다."
+    keywords: ["lambda", "map", "filter", "reduce", "고차함수", "함수형프로그래밍"]
+
+intro:
+  emoji: "⚡"
+  points:
+  - "lambda 표현식으로 간결한 익명 함수 작성"
+  - "map()으로 데이터 일괄 변환"
+  - "filter()로 조건에 맞는 데이터 추출"
+  - "reduce()로 데이터를 하나의 값으로 축약"
+
+sections:
+- id: "lambda_basics"
+  title: "람다 표현식 기초"
+  subtitle: "익명 함수의 힘"
+  blocks:
+  - type: "text"
+    content: "람다(lambda)는 이름 없는 함수를 한 줄로 정의하는 파이썬의 강력한 기능입니다. 일반 함수가 def 키워드로 여러 줄에 걸쳐 정의되는 것과 달리, 람다는 lambda 인자: 표현식 형태로 단 한 줄에 작성됩니다. 람다는 단일 표현식만 허용하며, 그 표현식의 결과가 자동으로 반환됩니다. return 키워드를 사용할 수 없고, if문이나 for문 같은 복합문도 사용할 수 없습니다. 람다는 주로 다른 함수의 인자로 전달되는 일회성 함수가 필요할 때 사용합니다. 예를 들어 sorted()의 key 인자나 map(), filter()에 전달하는 함수로 자주 활용됩니다."
+  - type: "list"
+    items:
+    - "문법: lambda 인자: 표현식"
+    - "단일 표현식만 허용, 복합문 불가"
+    - "return 없이 표현식 결과 자동 반환"
+    - "일회성 함수나 콜백에 적합"
+  - type: "code"
+    language: "python"
+    title: "기본 람다 표현식"
+    description: "람다로 간단한 연산 함수를 정의합니다."
+    content: |-
+      add = lambda x, y: x + y
+      add(3, 5)
+  - type: "code"
+    language: "python"
+    title: "람다 vs 일반 함수"
+    description: "같은 동작을 하는 람다와 일반 함수를 비교합니다."
+    content: |-
+      square = lambda n: n ** 2
+      square(7)
+  - type: "code"
+    language: "python"
+    title: "조건 표현식 람다"
+    description: "삼항 연산자를 활용한 조건부 람다입니다."
+    content: |-
+      isEven = lambda n: "짝수" if n % 2 == 0 else "홀수"
+      isEven(4), isEven(7)
+  - type: "tip"
+    content: "람다는 간단한 연산에만 사용하세요. 복잡한 로직은 일반 함수로 정의하는 것이 가독성이 좋습니다."
+
+- id: "map_function"
+  title: "map() 함수"
+  subtitle: "데이터 일괄 변환"
+  blocks:
+  - type: "text"
+    content: "map() 함수는 iterable의 모든 요소에 함수를 적용하여 새로운 map 객체를 반환합니다. map(함수, iterable) 형태로 사용하며, 원본 데이터를 변경하지 않고 각 요소를 변환한 결과를 생성합니다. map은 지연 평가(lazy evaluation)를 수행하여 실제로 값이 필요할 때까지 계산을 미룹니다. 따라서 메모리 효율적이며, 무한 시퀀스에도 적용할 수 있습니다. 결과를 리스트로 얻으려면 list()로 변환해야 합니다. map은 여러 iterable을 동시에 받을 수 있어서 zip과 유사하게 병렬 처리가 가능합니다."
+  - type: "list"
+    items:
+    - "문법: map(함수, iterable)"
+    - "모든 요소에 함수 적용"
+    - "지연 평가로 메모리 효율적"
+    - "여러 iterable 동시 처리 가능"
+  - type: "code"
+    language: "python"
+    title: "기본 map 사용"
+    description: "리스트의 모든 요소를 제곱합니다."
+    content: |-
+      nums = [1, 2, 3, 4, 5]
+      squared = map(lambda x: x ** 2, nums)
+      list(squared)
+  - type: "code"
+    language: "python"
+    title: "문자열 변환"
+    description: "문자열 리스트를 대문자로 변환합니다."
+    content: |-
+      words = ["hello", "world", "python"]
+      upper = map(str.upper, words)
+      list(upper)
+  - type: "code"
+    language: "python"
+    title: "다중 iterable 처리"
+    description: "두 리스트의 요소를 더합니다."
+    content: |-
+      listA = [1, 2, 3]
+      listB = [10, 20, 30]
+      sums = map(lambda a, b: a + b, listA, listB)
+      list(sums)
+  - type: "tip"
+    content: "map 객체는 한 번만 순회할 수 있습니다. 여러 번 사용하려면 list로 변환해두세요."
+
+- id: "filter_function"
+  title: "filter() 함수"
+  subtitle: "조건부 데이터 추출"
+  blocks:
+  - type: "text"
+    content: "filter() 함수는 iterable에서 조건을 만족하는 요소만 걸러내는 함수입니다. filter(함수, iterable) 형태로 사용하며, 함수가 True를 반환하는 요소만 포함하는 filter 객체를 생성합니다. map과 마찬가지로 지연 평가를 수행합니다. 첫 번째 인자로 None을 전달하면 요소 자체의 참/거짓을 기준으로 필터링합니다. 즉, filter(None, iterable)은 falsy 값(0, '', None, [], {} 등)을 제거하고 truthy 값만 남깁니다. 데이터 정제나 조건부 추출에 매우 유용합니다."
+  - type: "list"
+    items:
+    - "문법: filter(함수, iterable)"
+    - "True를 반환하는 요소만 추출"
+    - "None 전달시 truthy 값만 남김"
+    - "지연 평가로 효율적 처리"
+  - type: "code"
+    language: "python"
+    title: "기본 filter 사용"
+    description: "짝수만 필터링합니다."
+    content: |-
+      numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      evens = filter(lambda x: x % 2 == 0, numbers)
+      list(evens)
+  - type: "code"
+    language: "python"
+    title: "문자열 필터링"
+    description: "길이가 5 이상인 단어만 추출합니다."
+    content: |-
+      terms = ["a", "hello", "hi", "python", "go"]
+      longWords = filter(lambda w: len(w) >= 5, terms)
+      list(longWords)
+  - type: "code"
+    language: "python"
+    title: "None으로 falsy 제거"
+    description: "비어있거나 0인 값을 제거합니다."
+    content: |-
+      mixed = [0, 1, "", "hello", None, [], [1, 2], False, True]
+      truthy = filter(None, mixed)
+      list(truthy)
+  - type: "tip"
+    content: "복잡한 조건은 별도의 함수로 분리하면 가독성이 좋아집니다."
+
+- id: "reduce_function"
+  title: "reduce() 함수"
+  subtitle: "데이터 축약"
+  blocks:
+  - type: "text"
+    content: "reduce() 함수는 iterable의 요소들을 누적하여 하나의 값으로 축약합니다. functools 모듈에서 import해야 사용할 수 있습니다. reduce(함수, iterable, 초기값) 형태로 사용하며, 함수는 두 개의 인자(누적값, 현재값)를 받아 새로운 누적값을 반환합니다. 초기값을 지정하지 않으면 iterable의 첫 번째 요소가 초기값이 됩니다. 합계, 곱셈, 최댓값/최솟값 찾기, 문자열 연결 등 다양한 축약 연산에 활용됩니다. 그러나 sum(), max(), min() 같은 내장 함수가 있는 경우에는 그것을 사용하는 것이 더 명확합니다."
+  - type: "list"
+    items:
+    - "functools.reduce(함수, iterable, 초기값)"
+    - "함수는 (누적값, 현재값) → 새 누적값"
+    - "초기값 생략시 첫 요소가 초기값"
+    - "sum, max 등 내장 함수가 있으면 그것을 우선 사용"
+  - type: "code"
+    language: "python"
+    title: "합계 계산"
+    description: "리스트의 모든 요소를 더합니다."
+    content: |-
+      from functools import reduce
+      vals = [1, 2, 3, 4, 5]
+      total = reduce(lambda acc, x: acc + x, vals)
+      total
+  - type: "code"
+    language: "python"
+    title: "곱셈 계산"
+    description: "모든 요소를 곱하여 팩토리얼처럼 계산합니다."
+    content: |-
+      from functools import reduce
+      factors = [1, 2, 3, 4, 5]
+      product = reduce(lambda acc, x: acc * x, factors)
+      product
+  - type: "code"
+    language: "python"
+    title: "초기값 지정"
+    description: "초기값 100에서 시작하여 누적합니다."
+    content: |-
+      from functools import reduce
+      items = [10, 20, 30]
+      result = reduce(lambda acc, x: acc + x, items, 100)
+      result
+  - type: "tip"
+    content: "reduce가 복잡해지면 일반 for 루프가 더 읽기 쉬울 수 있습니다."
+
+- id: "higher_order"
+  title: "고차 함수"
+  subtitle: "함수를 다루는 함수"
+  blocks:
+  - type: "text"
+    content: "고차 함수(Higher-Order Function)는 함수를 인자로 받거나 함수를 반환하는 함수입니다. 파이썬에서 함수는 일급 객체(first-class object)이므로 변수에 할당하거나, 다른 함수에 전달하거나, 함수에서 반환할 수 있습니다. map, filter, reduce, sorted의 key 인자 등이 모두 고차 함수입니다. 고차 함수를 활용하면 코드 재사용성이 높아지고, 함수형 프로그래밍 스타일로 간결하게 로직을 표현할 수 있습니다. 함수를 반환하는 패턴은 팩토리, 데코레이터, 클로저 등에서 핵심적으로 사용됩니다."
+  - type: "list"
+    items:
+    - "함수를 인자로 받는 함수 (map, filter, sorted)"
+    - "함수를 반환하는 함수 (팩토리, 데코레이터)"
+    - "파이썬 함수는 일급 객체"
+    - "코드 재사용성과 유연성 향상"
+  - type: "code"
+    language: "python"
+    title: "함수를 인자로 받기"
+    description: "커스텀 고차 함수를 만듭니다."
+    content: |-
+      def applyTwice(func, x):
+          return func(func(x))
+
+      double = lambda n: n * 2
+      applyTwice(double, 3)
+  - type: "code"
+    language: "python"
+    title: "함수를 반환하기"
+    description: "곱셈기 함수를 생성하는 팩토리입니다."
+    content: |-
+      def makeMultiplier(n):
+          return lambda x: x * n
+
+      triple = makeMultiplier(3)
+      triple(7)
+  - type: "code"
+    language: "python"
+    title: "sorted의 key 인자"
+    description: "고차 함수 패턴으로 정렬 기준을 지정합니다."
+    content: |-
+      students = [("Alice", 85), ("Bob", 92), ("Charlie", 78)]
+      byScore = sorted(students, key=lambda s: s[1], reverse=True)
+      byScore
+  - type: "tip"
+    content: "고차 함수는 데코레이터와 클로저의 기반이 됩니다. 이 개념을 잘 이해하면 이후 학습이 수월해집니다."
+
+- id: "practical_patterns"
+  title: "실전 패턴"
+  subtitle: "함수형 프로그래밍 활용"
+  blocks:
+  - type: "text"
+    content: "함수형 프로그래밍에서는 map, filter, reduce를 조합하여 데이터 처리 파이프라인을 구성합니다. 원본 데이터를 변경하지 않고 변환과 필터링을 연쇄적으로 적용하여 최종 결과를 얻습니다. 이 방식은 부수 효과(side effect)가 없어 코드의 예측 가능성과 테스트 용이성이 높아집니다. 다만 파이썬에서는 리스트 컴프리헨션이나 제너레이터 표현식이 더 파이썬다운(Pythonic) 방식으로 여겨집니다. 상황에 따라 가독성이 좋은 방식을 선택하세요."
+  - type: "list"
+    items:
+    - "map → filter → reduce 파이프라인"
+    - "원본 데이터 불변 유지"
+    - "부수 효과 없는 순수 함수 지향"
+    - "리스트 컴프리헨션도 대안"
+  - type: "code"
+    language: "python"
+    title: "파이프라인 패턴"
+    description: "데이터 변환 → 필터링 → 축약을 연결합니다."
+    content: |-
+      from functools import reduce
+      data = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      step1 = map(lambda x: x ** 2, data)
+      step2 = filter(lambda x: x > 20, step1)
+      step3 = reduce(lambda a, b: a + b, step2)
+      step3
+  - type: "code"
+    language: "python"
+    title: "함수 합성"
+    description: "여러 함수를 하나로 합성합니다."
+    content: |-
+      def compose(f, g):
+          return lambda x: f(g(x))
+
+      addOne = lambda x: x + 1
+      timesTwo = lambda x: x * 2
+      combined = compose(addOne, timesTwo)
+      combined(5)
+  - type: "code"
+    language: "python"
+    title: "리스트 컴프리헨션 비교"
+    description: "같은 결과를 리스트 컴프리헨션으로 표현합니다."
+    content: |-
+      source = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      outcome = sum(x ** 2 for x in source if x ** 2 > 20)
+      outcome
+  - type: "tip"
+    content: "파이썬에서는 map/filter보다 리스트 컴프리헨션이 더 선호됩니다. 하지만 고차 함수 개념을 알아두면 데코레이터, 콜백 등에서 유용합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "람다와 고차 함수 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 1에서 배운 람다, map, filter, reduce, 고차 함수를 난이도별로 복습합니다. 람다 표현식은 간결한 일회성 함수가 필요할 때 강력한 도구이며, map과 filter는 데이터 변환과 필터링의 기본입니다. reduce는 누적 연산에, 고차 함수는 코드 재사용성을 높이는 패턴입니다. 🟢 기본 문제로 각 함수의 기본 사용법을 익히고, 🟡 응용 문제로 조합 패턴을 연습하세요. 🔴 심화 문제에서는 함수 합성, 커링, 파이프라인 등 고급 함수형 패턴을 직접 구현해봅니다. 실무에서는 리스트 컴프리헨션과 적절히 혼용하는 것이 파이썬다운 코드 작성의 핵심입니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 람다"
+    code: |-
+      cube = lambda x: x ** 3
+      cube(4)
+
+  - type: "expansion"
+    title: "🟢 기본2: map으로 변환"
+    code: |-
+      prices = [100, 200, 300]
+      discounted = map(lambda p: p * 0.9, prices)
+      list(discounted)
+
+  - type: "expansion"
+    title: "🟢 기본3: filter로 추출"
+    code: |-
+      scores = [55, 72, 88, 45, 93, 61]
+      passed = filter(lambda s: s >= 60, scores)
+      list(passed)
+
+  - type: "expansion"
+    title: "🟢 기본4: reduce로 합계"
+    code: |-
+      from functools import reduce
+      amounts = [100, 200, 300, 400]
+      totalAmt = reduce(lambda a, b: a + b, amounts)
+      totalAmt
+
+  - type: "expansion"
+    title: "🟢 기본5: 조건부 람다"
+    code: |-
+      classify = lambda n: "양수" if n > 0 else ("음수" if n < 0 else "영")
+      classify(-5), classify(0), classify(10)
+
+  - type: "expansion"
+    title: "🟡 응용1: map과 filter 조합"
+    code: |-
+      rawData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+      sqMap = map(lambda x: x ** 2, rawData)
+      bigSquares = filter(lambda x: x > 30, sqMap)
+      list(bigSquares)
+
+  - type: "expansion"
+    title: "🟡 응용2: 문자열 처리"
+    code: |-
+      names = ["alice", "bob", "charlie", "david"]
+      longUpper = map(str.upper, filter(lambda n: len(n) > 3, names))
+      list(longUpper)
+
+  - type: "expansion"
+    title: "🟡 응용3: reduce로 최댓값"
+    code: |-
+      from functools import reduce
+      values = [34, 67, 23, 89, 12, 56]
+      maxVal = reduce(lambda a, b: a if a > b else b, values)
+      maxVal
+
+  - type: "expansion"
+    title: "🟡 응용4: 함수 반환"
+    code: |-
+      def makeAdder(n):
+          return lambda x: x + n
+
+      addTen = makeAdder(10)
+      addTen(25)
+
+  - type: "expansion"
+    title: "🟡 응용5: 다중 iterable map"
+    code: |-
+      xs = [1, 2, 3, 4]
+      ys = [10, 20, 30, 40]
+      products = map(lambda x, y: x * y, xs, ys)
+      list(products)
+
+  - type: "expansion"
+    title: "🔴 심화1: 파이프라인 함수"
+    code: |-
+      from functools import reduce
+      dataset = range(1, 21)
+      pipeline = reduce(
+          lambda a, b: a + b,
+          filter(lambda x: x % 3 == 0, map(lambda x: x ** 2, dataset))
+      )
+      pipeline
+
+  - type: "expansion"
+    title: "🔴 심화2: compose 구현"
+    code: |-
+      from functools import reduce
+      def compose(*funcs):
+          return reduce(lambda f, g: lambda x: f(g(x)), funcs)
+
+      addTwo = lambda x: x + 2
+      multThree = lambda x: x * 3
+      subOne = lambda x: x - 1
+      composed = compose(addTwo, multThree, subOne)
+      composed(5)
+
+  - type: "expansion"
+    title: "🔴 심화3: pipe 구현"
+    code: |-
+      from functools import reduce
+      def pipe(*funcs):
+          return reduce(lambda f, g: lambda x: g(f(x)), funcs)
+
+      increment = lambda x: x + 1
+      quadruple = lambda x: x * 4
+      halve = lambda x: x // 2
+      piped = pipe(increment, quadruple, halve)
+      piped(5)
+
+  - type: "expansion"
+    title: "🔴 심화4: 커링 흉내"
+    code: |-
+      def curry(func):
+          def inner(a):
+              return lambda b: func(a, b)
+          return inner
+
+      @curry
+      def multiply(a, b):
+          return a * b
+
+      timesFive = multiply(5)
+      timesFive(7)
+
+  - type: "expansion"
+    title: "🔴 심화5: 조건부 적용"
+    code: |-
+      def applyIf(predicate, func):
+          return lambda x: func(x) if predicate(x) else x
+
+      doubleIfEven = applyIf(lambda n: n % 2 == 0, lambda n: n * 2)
+      testData = [1, 2, 3, 4, 5, 6]
+      mapped = list(map(doubleIfEven, testData))
+      mapped
+
+  - type: "expansion"
+    title: "🔴 심화6: 부분 적용 직접 구현"
+    code: |-
+      def partialApply(func, *args):
+          return lambda *more: func(*args, *more)
+
+      def power(base, exp):
+          return base ** exp
+
+      sq = partialApply(power, 2)
+      cb = partialApply(power, 3)
+      sq(5), cb(3)
+
+  - type: "expansion"
+    title: "🔴 심화7: 중첩 map"
+    code: |-
+      matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      doubled = list(map(lambda row: list(map(lambda x: x * 2, row)), matrix))
+      doubled
+
+  - type: "expansion"
+    title: "🔴 심화8: reduce로 딕셔너리 생성"
+    code: |-
+      from functools import reduce
+      pairs = [("a", 1), ("b", 2), ("c", 3)]
+      dictResult = reduce(lambda d, kv: {**d, kv[0]: kv[1]}, pairs, {})
+      dictResult
+
+  - type: "expansion"
+    title: "🔴 심화9: 함수 리스트 순차 적용"
+    code: |-
+      from functools import reduce
+      funcs = [lambda x: x + 1, lambda x: x * 2, lambda x: x ** 2]
+      chained = reduce(lambda acc, f: f(acc), funcs, 3)
+      chained
+
+  - type: "expansion"
+    title: "🔴 심화10: 고차 함수로 검증기"
+    code: |-
+      def makeValidator(*predicates):
+          return lambda x: all(p(x) for p in predicates)
+
+      isPositive = lambda x: x > 0
+      isEvenNum = lambda x: x % 2 == 0
+      isLessThan100 = lambda x: x < 100
+
+      validate = makeValidator(isPositive, isEvenNum, isLessThan100)
+      validate(50), validate(101), validate(-2)

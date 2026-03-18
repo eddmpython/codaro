@@ -1,0 +1,259 @@
+meta:
+  id: seaborn_06
+  title: 항공편승객시계열
+  order: 6
+  category: seaborn
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["seaborn", "heatmap", "lineplot", "pivot", "flights", "시계열"]
+  seo:
+    title: "Seaborn 히트맵과 선그래프 - 항공편 승객 시계열 분석"
+    description: "Seaborn heatmap, lineplot으로 항공편 승객 수의 시계열 패턴을 분석합니다. pivot과 annot 파라미터 활용법을 배웁니다."
+    keywords: ["seaborn", "heatmap", "lineplot", "flights", "시계열분석"]
+
+intro:
+  emoji: "✈️"
+  goal: 연도/월별 항공 승객 수 추이를 히트맵과 선 그래프로 분석합니다.
+  description: flights 데이터셋은 1949년부터 1960년까지 월별 항공 승객 수를 담고 있습니다. lineplot으로 추세를 보고, heatmap으로 2차원 패턴을 시각화합니다. 이전에 배운 barplot, countplot, catplot 개념을 함께 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: seaborn과 matplotlib을 불러옵니다. flights 데이터셋은 1949년부터 1960년까지 월별 항공 승객 수를 담고 있습니다. 총 144행(12년 × 12개월)의 시계열 데이터입니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: seaborn과 matplotlib을 불러옵니다
+    content: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      flights = sns.load_dataset('flights')
+      flights
+
+- id: step2_lineplot
+  title: 2단계. 선 그래프
+  subtitle: sns.lineplot()
+  blocks:
+  - type: text
+    content: 연도별 승객 수 추이를 선 그래프로 확인합니다. 같은 x값에 여러 y값이 있으면 평균과 신뢰구간을 표시합니다.
+  - type: code
+    language: python
+    title: 연도별 추이
+    description: 연도별 승객 수 추이를 확인합니다
+    content: |-
+      figLine, axLine = plt.subplots(figsize=(10, 5))
+      sns.lineplot(data=flights, x='year', y='passengers', ax=axLine)
+      axLine.set_title('Annual Passenger Trend')
+      figLine
+  - type: tip
+    content: sns.lineplot()은 연속적인 데이터의 추세를 표현합니다. 같은 x값에 여러 y값이 있으면 자동으로 평균과 신뢰구간을 계산해 표시합니다.
+
+- id: step3_lineplot_hue
+  title: 3단계. 월별 구분 선그래프
+  subtitle: hue 파라미터
+  blocks:
+  - type: text
+    content: 월별로 구분하여 더 자세한 추이를 확인합니다. hue로 범주를 구분하면 각 그룹별 추세를 비교할 수 있습니다.
+  - type: code
+    language: python
+    title: 월별 추이
+    description: 월별로 구분하여 추이를 확인합니다
+    content: |-
+      figLineHue, axLineHue = plt.subplots(figsize=(12, 6))
+      sns.lineplot(data=flights, x='year', y='passengers', hue='month', palette='tab20', ax=axLineHue)
+      axLineHue.legend(title='Month', bbox_to_anchor=(1.02, 1), loc='upper left')
+      axLineHue.set_title('Monthly Passenger Trend by Year')
+      figLineHue
+
+- id: step4_pivot
+  title: 4단계. 피벗 테이블
+  subtitle: pivot()
+  blocks:
+  - type: text
+    content: 히트맵을 그리기 위해 피벗 테이블로 변환합니다. 피벗은 행-열 형태로 데이터를 재구성합니다.
+  - type: code
+    language: python
+    title: 피벗 변환
+    description: 히트맵용 피벗 테이블을 만듭니다
+    content: |-
+      flightsPivot = flights.pivot(index='month', columns='year', values='passengers')
+      flightsPivot
+  - type: tip
+    content: pivot()은 행-열 형태로 데이터를 재구성합니다. 히트맵은 2차원 행렬 형태의 데이터를 색상으로 표현하므로 피벗 변환이 필요합니다.
+
+- id: step5_heatmap_basic
+  title: 5단계. 기본 히트맵
+  subtitle: sns.heatmap()
+  blocks:
+  - type: text
+    content: 기본 히트맵을 그립니다. 값이 클수록 밝은 색, 작을수록 어두운 색으로 표시됩니다.
+  - type: code
+    language: python
+    title: 기본 히트맵
+    description: 피벗 데이터로 히트맵을 그립니다
+    content: |-
+      figHeat, axHeat = plt.subplots(figsize=(10, 8))
+      sns.heatmap(flightsPivot, ax=axHeat)
+      axHeat.set_title('Flight Passengers Heatmap')
+      figHeat
+  - type: tip
+    content: sns.heatmap()은 2차원 데이터를 색상 강도로 표현합니다. 값이 클수록 밝은 색, 작을수록 어두운 색으로 표시됩니다. 오른쪽 컬러바가 값과 색상의 대응을 보여줍니다.
+
+- id: step6_heatmap_annot
+  title: 6단계. 값 표시 히트맵
+  subtitle: annot, fmt
+  blocks:
+  - type: text
+    content: 각 셀에 값을 표시하여 정확한 숫자를 확인합니다. annot으로 값을 표시하고 fmt로 형식을 지정합니다.
+  - type: code
+    language: python
+    title: 값 표시 히트맵
+    description: 각 셀에 숫자를 표시합니다
+    content: |-
+      figHeatAnnot, axHeatAnnot = plt.subplots(figsize=(12, 8))
+      sns.heatmap(flightsPivot, annot=True, fmt='d', ax=axHeatAnnot)
+      axHeatAnnot.set_title('Flight Passengers with Values')
+      figHeatAnnot
+  - type: tip
+    content: annot=True는 각 셀에 값을 표시합니다. fmt='d'는 정수 형식(decimal)으로 표시하며, fmt='.1f'는 소수점 1자리, fmt='.2%'는 백분율 형식입니다.
+
+- id: step7_heatmap_style
+  title: 7단계. 스타일 지정
+  subtitle: cmap, linewidths
+  blocks:
+  - type: text
+    content: 색상 팔레트를 변경하고 구분선을 추가합니다. cmap으로 색상을 지정하고 linewidths로 셀 구분선을 추가합니다.
+  - type: code
+    language: python
+    title: 스타일 히트맵
+    description: 색상과 구분선을 지정합니다
+    content: |-
+      figHeatStyle, axHeatStyle = plt.subplots(figsize=(12, 8))
+      sns.heatmap(flightsPivot, annot=True, fmt='d', cmap='YlOrRd', linewidths=0.5, ax=axHeatStyle)
+      axHeatStyle.set_title('Styled Heatmap')
+      figHeatStyle
+  - type: tip
+    content: cmap으로 색상 팔레트를 지정합니다. 순차 데이터에는 'Blues', 'YlOrRd', 'viridis' 등이 적합합니다. linewidths는 셀 사이 구분선 두께입니다.
+
+- id: step8_heatmap_range
+  title: 8단계. 색상 범위 지정
+  subtitle: vmin, vmax, center
+  blocks:
+  - type: text
+    content: 색상 범위를 지정하여 특정 구간을 강조합니다. center로 기준점을 설정하면 발산형 팔레트가 효과적입니다.
+  - type: code
+    language: python
+    title: 범위 지정 히트맵
+    description: 색상 범위를 지정합니다
+    content: |-
+      figHeatRange, axHeatRange = plt.subplots(figsize=(12, 8))
+      sns.heatmap(flightsPivot, annot=True, fmt='d', cmap='coolwarm', vmin=100, vmax=500, center=300, linewidths=0.5, ax=axHeatRange)
+      axHeatRange.set_title('Heatmap with Custom Range')
+      figHeatRange
+  - type: tip
+    content: vmin과 vmax로 색상 범위를 지정합니다. center는 중앙 기준값으로, 발산형 팔레트(coolwarm, RdBu)에서 기준점 색상을 지정합니다. 이 값보다 작으면 파랑, 크면 빨강 계열로 표시됩니다.
+
+- id: step9_barplot_year
+  title: 9단계. 연도별 막대그래프
+  subtitle: 집계 후 시각화
+  blocks:
+  - type: text
+    content: 연도별 총 승객 수를 막대 그래프로 비교합니다. groupby로 집계한 후 barplot으로 시각화합니다.
+  - type: code
+    language: python
+    title: 연도별 총 승객
+    description: 연도별 총 승객 수를 막대그래프로 표시합니다
+    content: |-
+      yearlyPassengers = flights.groupby('year')['passengers'].sum().reset_index()
+      figBar, axBar = plt.subplots(figsize=(10, 5))
+      sns.barplot(data=yearlyPassengers, x='year', y='passengers', palette='Blues_d', ax=axBar)
+      axBar.set_title('Total Passengers by Year')
+      figBar
+
+- id: step10_barplot_month
+  title: 10단계. 월별 평균
+  subtitle: 계절성 분석
+  blocks:
+  - type: text
+    content: 월별 평균 승객 수를 비교하여 계절성을 확인합니다. barplot은 기본적으로 평균과 95% 신뢰구간을 표시합니다.
+  - type: code
+    language: python
+    title: 월별 평균 승객
+    description: 월별 평균 승객 수로 계절성을 확인합니다
+    content: |-
+      figMonthly, axMonthly = plt.subplots(figsize=(10, 5))
+      sns.barplot(data=flights, x='month', y='passengers', palette='coolwarm', ax=axMonthly)
+      axMonthly.set_title('Average Passengers by Month')
+      axMonthly.tick_params(axis='x', rotation=45)
+      figMonthly
+  - type: tip
+    content: barplot()은 기본적으로 평균을 계산하고 95% 신뢰구간을 에러바로 표시합니다. 7-8월 여름 휴가철에 승객이 많은 계절성 패턴을 확인할 수 있습니다.
+
+- id: step11_corr_heatmap
+  title: 11단계. 상관관계 히트맵
+  subtitle: corr()
+  blocks:
+  - type: text
+    content: 상관관계 히트맵을 위해 월별 피벗 데이터의 상관계수를 계산합니다. 인접한 달끼리 높은 상관관계를 보입니다.
+  - type: code
+    language: python
+    title: 상관관계 히트맵
+    description: 월간 상관관계를 히트맵으로 표시합니다
+    content: |-
+      monthCorr = flightsPivot.T.corr()
+      figCorr, axCorr = plt.subplots(figsize=(10, 8))
+      sns.heatmap(monthCorr, annot=True, fmt='.2f', cmap='RdYlBu_r', vmin=-1, vmax=1, ax=axCorr)
+      axCorr.set_title('Month Correlation Heatmap')
+      figCorr
+  - type: tip
+    content: 상관계수 히트맵은 변수 간 관계를 한눈에 보여줍니다. 인접한 달끼리 높은 상관관계(1에 가까움)를 보이고, 6개월 차이 나는 달은 낮은 상관관계를 보입니다.
+
+- id: practice
+  title: 실습
+  subtitle: 시계열 시각화
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: tips 데이터 요일별 매출 히트맵"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        data = sns.load_dataset('tips')
+        matrix = data.pivot_table(index='day', columns='time', values='total_bill', aggfunc='mean')
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart, plot = plt.subplots(figsize=(8, 5))
+        sns.heatmap(matrix, annot=True, fmt='.1f', cmap='YlGn', linewidths=1, ax=plot)
+        plot.set_title('Average Bill by Day and Time')
+        chart
+  - type: expansion
+    title: "미션2: exercise 데이터 시간별 심박수 선 그래프"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        df = sns.load_dataset('exercise')
+    - type: code
+      title: "차트 생성"
+      content: |-
+        canvas, panel = plt.subplots(figsize=(10, 5))
+        sns.lineplot(data=df, x='time', y='pulse', hue='kind', style='diet', markers=True, ax=panel)
+        panel.set_title('Pulse Over Time by Exercise Type')
+        panel.legend(bbox_to_anchor=(1.02, 1), loc='upper left')
+        canvas

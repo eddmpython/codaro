@@ -1,0 +1,326 @@
+meta:
+  id: seaborn_02
+  title: 팁데이터분포탐색
+  order: 2
+  category: seaborn
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["seaborn", "histplot", "stripplot", "swarmplot", "multiple", "tips"]
+  seo:
+    title: "Seaborn 분포 시각화 - 팁 데이터 히스토그램과 산점 분포"
+    description: "Seaborn histplot, stripplot, swarmplot으로 팁 데이터의 분포를 탐색합니다. hue와 multiple 파라미터 활용법을 배웁니다."
+    keywords: ["seaborn", "histplot", "stripplot", "swarmplot", "분포", "tips"]
+
+intro:
+  emoji: "💵"
+  goal: 팁 데이터의 분포를 히스토그램과 산점 분포로 탐색합니다.
+  description: histplot으로 히스토그램을, stripplot과 swarmplot으로 개별 데이터 포인트를 시각화합니다. hue로 그룹별 분포를 비교하고, multiple 파라미터로 분포 표시 방식을 조절합니다. 이전에 배운 scatterplot, palette 개념을 함께 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: seaborn과 matplotlib을 불러옵니다. tips 데이터는 레스토랑에서 수집한 결제 정보와 팁 데이터입니다. 결제금액, 팁, 요일, 시간대, 테이블 인원수 등 다양한 변수가 포함되어 있어 분포 분석에 적합합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: seaborn과 matplotlib을 불러옵니다
+    content: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: tips 데이터셋
+  blocks:
+  - type: text
+    content: tips 데이터셋은 244개의 식사 기록을 담고 있습니다. total_bill(결제금액), tip(팁), sex(성별), smoker(흡연여부), day(요일), time(시간대), size(인원수) 컬럼이 있습니다. 이 데이터로 팁에 영향을 미치는 요인을 분석할 수 있습니다.
+  - type: code
+    language: python
+    title: tips 데이터 로드
+    description: 레스토랑 팁 데이터를 불러옵니다
+    content: |-
+      tips = sns.load_dataset('tips')
+      tips.head()
+
+- id: step3_basic_hist
+  title: 3단계. 기본 히스토그램
+  subtitle: histplot()
+  blocks:
+  - type: text
+    content: histplot()은 연속형 변수의 분포를 막대 그래프로 표현합니다. bins 파라미터로 구간 개수를 조절하고, kde=True로 커널 밀도 추정 곡선을 함께 표시할 수 있습니다. 팁 금액의 분포를 확인해봅니다.
+  - type: code
+    language: python
+    title: 기본 히스토그램
+    description: 팁 금액의 분포를 히스토그램으로 표시합니다
+    content: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.histplot(data=tips, x='tip', bins=20, ax=ax)
+      ax.set_title('Tip Distribution')
+      fig
+  - type: tip
+    content: sns.histplot(data, x='컬럼명')으로 히스토그램을 그립니다. bins로 구간 개수를 조절합니다. 구간이 많을수록 세밀하게, 적을수록 전체 추세를 파악하기 좋습니다.
+
+- id: step4_kde
+  title: 4단계. KDE 곡선 추가
+  subtitle: 커널 밀도 추정
+  blocks:
+  - type: text
+    content: kde=True를 설정하면 히스토그램 위에 부드러운 밀도 곡선이 그려집니다. KDE(Kernel Density Estimation)는 데이터의 확률 밀도 함수를 추정하는 방법입니다. 히스토그램의 계단 형태보다 분포의 모양을 더 잘 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: KDE 추가
+    description: 히스토그램에 밀도 곡선을 추가합니다
+    content: |-
+      figKde, axKde = plt.subplots(figsize=(8, 6))
+      sns.histplot(data=tips, x='tip', bins=20, kde=True, ax=axKde)
+      axKde.set_title('Tip Distribution with KDE')
+      figKde
+  - type: tip
+    content: kde=True로 커널 밀도 추정 곡선을 추가합니다. 히스토그램의 막대 높이는 빈도(count)이고, KDE 곡선은 확률 밀도로 스케일이 다릅니다. stat='density'로 맞출 수 있습니다.
+
+- id: step5_hue_hist
+  title: 5단계. 그룹별 히스토그램
+  subtitle: hue 파라미터
+  blocks:
+  - type: text
+    content: hue 파라미터로 범주형 변수에 따라 분포를 분리할 수 있습니다. 시간대(Lunch/Dinner)별로 팁 분포가 어떻게 다른지 비교해봅니다. 기본적으로 겹쳐서(layer) 표시됩니다.
+  - type: code
+    language: python
+    title: 시간대별 분포
+    description: hue로 시간대별 팁 분포를 비교합니다
+    content: |-
+      figHue, axHue = plt.subplots(figsize=(8, 6))
+      sns.histplot(data=tips, x='tip', hue='time', bins=15, ax=axHue)
+      axHue.set_title('Tip by Time')
+      figHue
+
+- id: step6_multiple
+  title: 6단계. multiple 파라미터
+  subtitle: 분포 표시 방식
+  blocks:
+  - type: text
+    content: multiple 파라미터로 여러 그룹의 분포를 어떻게 표시할지 결정합니다. 'layer'는 겹쳐서, 'stack'은 쌓아서, 'fill'은 전체를 100%로 채워서 표시합니다. 각 방식은 다른 관점의 비교를 가능하게 합니다.
+  - type: code
+    language: python
+    title: stack 모드
+    description: 분포를 쌓아서 표시합니다
+    content: |-
+      figStack, axStack = plt.subplots(figsize=(8, 6))
+      sns.histplot(data=tips, x='tip', hue='time', bins=15, multiple='stack', ax=axStack)
+      axStack.set_title('Tip by Time (Stacked)')
+      figStack
+  - type: tip
+    content: "multiple 옵션: 'layer'(겹침, 기본값), 'stack'(쌓기), 'fill'(비율 채우기), 'dodge'(나란히). stack은 전체 빈도를, fill은 비율 비교에 적합합니다."
+
+- id: step7_fill
+  title: 7단계. fill 모드
+  subtitle: 비율 비교
+  blocks:
+  - type: text
+    content: multiple='fill'은 각 구간에서 그룹별 비율을 100%로 채워 표시합니다. 절대적인 빈도보다 상대적인 비율을 비교할 때 유용합니다. 팁 금액대별로 Lunch와 Dinner의 비율이 어떻게 변하는지 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: fill 모드
+    description: 비율로 채워서 표시합니다
+    content: |-
+      figFill, axFill = plt.subplots(figsize=(8, 6))
+      sns.histplot(data=tips, x='tip', hue='time', bins=15, multiple='fill', ax=axFill)
+      axFill.set_title('Tip by Time (Ratio)')
+      axFill.set_ylabel('Proportion')
+      figFill
+
+- id: step8_stripplot
+  title: 8단계. 스트립 플롯
+  subtitle: stripplot()
+  blocks:
+  - type: text
+    content: stripplot()은 범주형 변수와 연속형 변수의 관계를 개별 점으로 표시합니다. 히스토그램이 분포의 모양을 보여준다면, stripplot은 실제 데이터 포인트의 위치를 보여줍니다. 요일별 팁 분포를 점으로 확인해봅니다.
+  - type: code
+    language: python
+    title: 스트립 플롯
+    description: 요일별 팁을 점으로 표시합니다
+    content: |-
+      figStrip, axStrip = plt.subplots(figsize=(8, 6))
+      sns.stripplot(data=tips, x='day', y='tip', ax=axStrip)
+      axStrip.set_title('Tip by Day')
+      figStrip
+  - type: tip
+    content: sns.stripplot(data, x='범주형', y='연속형')으로 범주별 데이터 포인트를 표시합니다. 점이 겹칠 수 있어 데이터가 많으면 jitter(좌우 흔들림)로 분산시킵니다.
+
+- id: step9_swarmplot
+  title: 9단계. 스웜 플롯
+  subtitle: swarmplot()
+  blocks:
+  - type: text
+    content: swarmplot()은 stripplot과 비슷하지만 점이 겹치지 않도록 자동으로 배치합니다. 데이터의 분포 모양과 밀집 정도를 동시에 파악할 수 있습니다. 단, 데이터가 많으면 계산 시간이 오래 걸릴 수 있습니다.
+  - type: code
+    language: python
+    title: 스웜 플롯
+    description: 점이 겹치지 않게 배치합니다
+    content: |-
+      figSwarm, axSwarm = plt.subplots(figsize=(8, 6))
+      sns.swarmplot(data=tips, x='day', y='tip', ax=axSwarm)
+      axSwarm.set_title('Tip by Day (Swarm)')
+      figSwarm
+  - type: tip
+    content: swarmplot()은 점이 겹치지 않아 실제 데이터 분포를 정확히 보여줍니다. 단, 데이터가 1000개 이상이면 느려지므로 stripplot을 권장합니다.
+
+- id: step10_hue_strip
+  title: 10단계. hue로 그룹 구분
+  subtitle: 색상으로 추가 변수
+  blocks:
+  - type: text
+    content: stripplot과 swarmplot에도 hue를 적용할 수 있습니다. 요일별로 점을 배치하면서 시간대(Lunch/Dinner)를 색상으로 구분하면 두 가지 범주를 동시에 비교할 수 있습니다. dodge=True로 그룹을 나란히 배치할 수 있습니다.
+  - type: code
+    language: python
+    title: hue 적용
+    description: 시간대별 색상으로 구분합니다
+    content: |-
+      figDodge, axDodge = plt.subplots(figsize=(10, 6))
+      sns.stripplot(data=tips, x='day', y='tip', hue='time', palette='Set2', dodge=True, alpha=0.7, ax=axDodge)
+      axDodge.set_title('Tip by Day and Time')
+      axDodge.legend(title='Time')
+      figDodge
+
+- id: step11_comparison
+  title: 11단계. 분포 시각화 비교
+  subtitle: 세 가지 방식
+  blocks:
+  - type: text
+    content: 히스토그램, stripplot, swarmplot을 나란히 비교합니다. 같은 데이터를 다른 방식으로 시각화하면 각각 다른 인사이트를 얻을 수 있습니다. 히스토그램은 전체 분포 모양을, stripplot은 개별 데이터와 이상치를, swarmplot은 밀집 정도를 보여줍니다.
+  - type: code
+    language: python
+    title: 세 가지 비교
+    description: 히스토그램, strip, swarm을 비교합니다
+    content: |-
+      figCompare, (axHist, axStripSub, axSwarmSub) = plt.subplots(1, 3, figsize=(15, 5))
+
+      sns.histplot(data=tips, x='tip', hue='time', multiple='stack', ax=axHist)
+      axHist.set_title('Histogram')
+
+      sns.stripplot(data=tips, x='time', y='tip', hue='time', palette='Set2', ax=axStripSub, legend=False)
+      axStripSub.set_title('Strip Plot')
+
+      sns.swarmplot(data=tips, x='time', y='tip', hue='time', palette='Set2', ax=axSwarmSub, legend=False)
+      axSwarmSub.set_title('Swarm Plot')
+
+      plt.tight_layout()
+      figCompare
+
+- id: step12_final
+  title: 12단계. 최종 분석 차트
+  subtitle: 종합 시각화
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 요소를 종합하여 팁 데이터의 분포를 완성도 높게 시각화합니다. 이전 프로젝트에서 배운 scatterplot도 함께 활용하여 다양한 관점에서 데이터를 탐색합니다.
+  - type: code
+    language: python
+    title: 종합 분석
+    description: 네 가지 시각화를 조합합니다
+    content: |-
+      figFinal, axesFinal = plt.subplots(2, 2, figsize=(14, 10))
+
+      sns.histplot(data=tips, x='tip', hue='time', kde=True, palette='Set2', ax=axesFinal[0, 0])
+      axesFinal[0, 0].set_title('Tip Distribution by Time')
+
+      sns.scatterplot(data=tips, x='total_bill', y='tip', hue='time', palette='Set2', alpha=0.7, ax=axesFinal[0, 1])
+      axesFinal[0, 1].set_title('Total Bill vs Tip')
+
+      sns.stripplot(data=tips, x='day', y='tip', hue='time', palette='Set2', dodge=True, alpha=0.7, ax=axesFinal[1, 0])
+      axesFinal[1, 0].set_title('Tip by Day')
+
+      sns.histplot(data=tips, x='total_bill', hue='day', multiple='stack', palette='Set1', ax=axesFinal[1, 1])
+      axesFinal[1, 1].set_title('Bill Distribution by Day')
+
+      plt.tight_layout()
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 분포 탐색 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 histplot, stripplot, swarmplot, hue, multiple을 활용해서 다양한 분포를 탐색해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 펭귄 체중 분포 탐색"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        data = sns.load_dataset('penguins').dropna()
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart, (plot1, plot2) = plt.subplots(1, 2, figsize=(14, 5))
+
+        sns.histplot(data=data, x='body_mass_g', hue='species',
+                    kde=True, palette='husl', ax=plot1)
+        plot1.set_title('Body Mass Distribution by Species')
+        plot1.set_xlabel('Body Mass (g)')
+
+        sns.swarmplot(data=data, x='species', y='body_mass_g',
+                     hue='sex', palette='Set2', dodge=True, ax=plot2)
+        plot2.set_title('Body Mass by Species and Sex')
+        plot2.set_ylabel('Body Mass (g)')
+
+        plt.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: iris 꽃잎 분포 종합 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        df = sns.load_dataset('iris')
+    - type: code
+      title: "히스토그램"
+      content: |-
+        canvas, panels = plt.subplots(2, 2, figsize=(12, 10))
+
+        sns.histplot(data=df, x='petal_length', hue='species',
+                    multiple='stack', palette='Set2', ax=panels[0, 0])
+        panels[0, 0].set_title('Petal Length (Stacked)')
+
+        sns.histplot(data=df, x='petal_length', hue='species',
+                    multiple='fill', palette='Set2', ax=panels[0, 1])
+        panels[0, 1].set_title('Petal Length (Ratio)')
+    - type: code
+      title: "산점도"
+      content: |-
+        sns.stripplot(data=df, x='species', y='petal_length',
+                     palette='Set2', alpha=0.7, ax=panels[1, 0])
+        panels[1, 0].set_title('Strip Plot')
+
+        sns.scatterplot(data=df, x='petal_length', y='petal_width',
+                       hue='species', palette='Set2', ax=panels[1, 1])
+        panels[1, 1].set_title('Petal Length vs Width')
+
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Seaborn으로 팁 데이터의 분포를 다양한 방식으로 탐색했습니다.
+  - type: list
+    items:
+    - "sns.histplot(data, x, bins, kde) - 히스토그램"
+    - "hue로 그룹별 분포 비교"
+    - "multiple='layer'/'stack'/'fill' - 분포 표시 방식"
+    - "sns.stripplot() - 개별 점으로 분포 표시"
+    - "sns.swarmplot() - 겹치지 않는 점 배치"
+    - "dodge=True로 그룹 나란히 배치"
+  - type: text
+    content: 다음 시간에는 boxplot과 violinplot으로 분포를 비교합니다.

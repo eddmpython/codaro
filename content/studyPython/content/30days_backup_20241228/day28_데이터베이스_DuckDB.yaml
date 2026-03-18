@@ -1,0 +1,444 @@
+meta:
+  id: day28
+  title: 데이터베이스 DuckDB
+  day: 28
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 데이터베이스 DuckDB"
+    description: "DuckDB로 데이터를 분석하는 방법."
+    keywords: ['데이터베이스', 'DuckDB', 'SQL']
+intro:
+  emoji: "🦆"
+  points:
+  - DuckDB 소개와 설치
+  - 테이블 생성과 데이터 삽입
+  - SELECT 쿼리와 조건 검색
+  - 집계 함수 (COUNT, AVG, SUM)
+  - GROUP BY와 ORDER BY
+  - 실전 데이터 분석
+sections:
+- id: import_section
+  title: 모듈 불러오기
+  subtitle: DuckDB 라이브러리 준비
+  blocks:
+  - type: text
+    content: DuckDB는 분석 작업에 특화된 데이터베이스 라이브러리입니다. 이 파일에서 사용할 모든 import를 최상단에 작성합니다. day13 모듈에서 배운 import 문법을 사용하여 duckdb 라이브러리를 불러옵니다. 데이터베이스는 Database의 한글 발음으로, 데이터를 체계적으로 저장하고 관리하는 시스템을 의미합니다. SQL은 Structured Query Language의 약자로, 데이터베이스에서 데이터를 조회하고 조작하는 언어입니다.
+  - type: list
+    items:
+    - "import duckdb - DuckDB 라이브러리 가져오기"
+    - 파일 최상단에 import 섹션 하나만 작성
+    - 이후 섹션에서는 import 사용 금지
+    - 한 곳에서 모든 의존성 관리
+  - type: code
+    language: python
+    title: 필요한 모듈 불러오기
+    description: DuckDB 라이브러리를 불러옵니다.
+    content: |-
+      import duckdb
+  - type: tip
+    content: "pip install duckdb 명령으로 먼저 설치하세요."
+
+- id: duckdb_intro
+  title: DuckDB 소개
+  subtitle: 분석에 최적화된 데이터베이스
+  blocks:
+  - type: text
+    content: DuckDB는 분석용 데이터베이스로, 서버 설치 없이 Python에서 바로 사용할 수 있습니다. 일반 데이터베이스는 데이터를 저장하고 조회하는데 최적화되어 있지만, DuckDB는 대량의 데이터를 빠르게 분석하는데 특화되어 있습니다. connect()로 데이터베이스에 연결하고, execute()로 SQL 쿼리를 실행하며, fetchone()으로 결과를 가져옵니다. 쿼리는 Query의 한글 발음으로, 데이터베이스에 데이터를 요청하는 명령문을 의미합니다. 작업이 끝나면 close()로 연결을 닫아야 합니다.
+  - type: list
+    items:
+    - 서버 설치 불필요
+    - Python에서 바로 사용
+    - 분석 쿼리에 최적화
+    - Pandas와 완벽 호환
+  - type: code
+    language: python
+    title: DuckDB 시작하기
+    description: 데이터베이스에 연결하고 간단한 쿼리를 실행합니다.
+    content: |-
+      introConn = duckdb.connect()
+
+      introResult = introConn.execute("SELECT 1 + 1 AS answer").fetchone()
+      print(f"1 + 1 = {introResult[0]}")
+
+      introConn.close()
+  - type: tip
+    content: "connect()에 파일명을 전달하면 파일에 데이터를 저장할 수 있습니다."
+
+- id: create_table
+  title: 테이블 생성
+  subtitle: 데이터 저장소 만들기
+  blocks:
+  - type: text
+    content: CREATE TABLE 문으로 테이블을 생성합니다. 각 컬럼의 이름과 데이터 타입을 정의합니다.
+  - type: list
+    items:
+    - "INTEGER - 정수"
+    - "VARCHAR - 문자열"
+    - "DOUBLE - 실수"
+    - "PRIMARY KEY - 기본키"
+  - type: code
+    language: python
+    title: 테이블 생성
+    description: 학생 정보를 저장할 테이블을 만듭니다.
+    content: |-
+      import duckdb
+
+      conn = duckdb.connect()
+
+      conn.execute("""
+          CREATE TABLE students (
+              id INTEGER PRIMARY KEY,
+              name VARCHAR,
+              age INTEGER,
+              score DOUBLE
+          )
+      """)
+
+      tables = conn.execute("SHOW TABLES").fetchall()
+      print(f"생성된 테이블: {tables[0][0]}")
+
+      conn.close()
+
+- id: insert_data
+  title: 데이터 삽입
+  subtitle: INSERT로 데이터 추가
+  blocks:
+  - type: text
+    content: INSERT INTO 문으로 테이블에 데이터를 추가합니다. VALUES 뒤에 각 컬럼의 값을 순서대로 적습니다.
+  - type: list
+    items:
+    - "INSERT INTO - 데이터 삽입"
+    - "VALUES - 값 지정"
+    - 여러 행을 한 번에 삽입 가능
+    - 문자열은 작은따옴표 사용
+  - type: code
+    language: python
+    title: 데이터 삽입
+    description: 학생 데이터를 테이블에 추가합니다.
+    content: |-
+      import duckdb
+
+      conn = duckdb.connect()
+
+      conn.execute("""
+          CREATE TABLE students (
+              id INTEGER PRIMARY KEY,
+              name VARCHAR,
+              age INTEGER,
+              score DOUBLE
+          )
+      """)
+
+      conn.execute("""
+          INSERT INTO students VALUES
+          (1, '김철수', 20, 85.5),
+          (2, '이영희', 19, 92.0),
+          (3, '박민수', 21, 78.5)
+      """)
+
+      count = conn.execute("SELECT COUNT(*) FROM students").fetchone()
+      print(f"등록된 학생 수: {count[0]}명")
+
+      conn.close()
+
+- id: select_query
+  title: 데이터 조회
+  subtitle: SELECT로 데이터 가져오기
+  blocks:
+  - type: text
+    content: SELECT 문으로 테이블에서 데이터를 조회합니다. WHERE 절로 조건을 지정할 수 있습니다.
+  - type: list
+    items:
+    - "SELECT * - 모든 컬럼"
+    - "WHERE - 조건 지정"
+    - "ORDER BY - 정렬"
+    - "LIMIT - 개수 제한"
+  - type: code
+    language: python
+    title: 데이터 조회
+    description: 조건에 맞는 학생을 조회합니다.
+    content: |-
+      import duckdb
+
+      conn = duckdb.connect()
+
+      conn.execute("""
+          CREATE TABLE students AS
+          SELECT * FROM VALUES
+              (1, '김철수', 20, 85.5),
+              (2, '이영희', 19, 92.0),
+              (3, '박민수', 21, 78.5)
+          AS t(id, name, age, score)
+      """)
+
+      print("전체 학생:")
+      allStudents = conn.execute("SELECT * FROM students").fetchall()
+      for s in allStudents:
+          print(f"  {s[1]}: {s[3]}점")
+
+      print("\n80점 이상:")
+      highScore = conn.execute("SELECT name, score FROM students WHERE score >= 80").fetchall()
+      for s in highScore:
+          print(f"  {s[0]}: {s[1]}점")
+
+      conn.close()
+
+- id: aggregate_functions
+  title: 집계 함수
+  subtitle: COUNT, AVG, SUM, MAX, MIN
+  blocks:
+  - type: text
+    content: 집계 함수로 데이터의 통계를 계산할 수 있습니다. COUNT는 개수, AVG는 평균, SUM은 합계를 구합니다.
+  - type: list
+    items:
+    - "COUNT(*) - 개수"
+    - "AVG(column) - 평균"
+    - "SUM(column) - 합계"
+    - "MAX, MIN - 최대, 최소"
+  - type: code
+    language: python
+    title: 집계 함수 사용
+    description: 학생 점수의 통계를 계산합니다.
+    content: |-
+      import duckdb
+
+      conn = duckdb.connect()
+
+      conn.execute("""
+          CREATE TABLE students AS
+          SELECT * FROM VALUES
+              (1, '김철수', 85.5),
+              (2, '이영희', 92.0),
+              (3, '박민수', 78.5),
+              (4, '최지은', 88.0)
+          AS t(id, name, score)
+      """)
+
+      stats = conn.execute("""
+          SELECT
+              COUNT(*) AS cnt,
+              AVG(score) AS avg,
+              MAX(score) AS max,
+              MIN(score) AS min
+          FROM students
+      """).fetchone()
+
+      print(f"학생 수: {stats[0]}명")
+      print(f"평균 점수: {stats[1]:.1f}점")
+      print(f"최고 점수: {stats[2]}점")
+      print(f"최저 점수: {stats[3]}점")
+
+      conn.close()
+
+- id: group_by
+  title: 그룹별 집계
+  subtitle: GROUP BY로 그룹화
+  blocks:
+  - type: text
+    content: GROUP BY로 데이터를 그룹화하고 각 그룹별 통계를 계산합니다. 학년별 평균 점수 등을 구할 수 있습니다.
+  - type: list
+    items:
+    - "GROUP BY - 그룹화"
+    - "HAVING - 그룹 조건"
+    - 그룹별 집계 함수 적용
+    - 여러 컬럼으로 그룹화 가능
+  - type: code
+    language: python
+    title: 그룹별 통계
+    description: 학년별로 학생 수와 평균 점수를 계산합니다.
+    content: |-
+      import duckdb
+
+      conn = duckdb.connect()
+
+      conn.execute("""
+          CREATE TABLE students AS
+          SELECT * FROM VALUES
+              (1, '김철수', '1학년', 85),
+              (2, '이영희', '1학년', 92),
+              (3, '박민수', '2학년', 78),
+              (4, '최지은', '2학년', 88),
+              (5, '정하영', '3학년', 90)
+          AS t(id, name, grade, score)
+      """)
+
+      gradeStats = conn.execute("""
+          SELECT grade, COUNT(*) AS cnt, AVG(score)::INT AS avg
+          FROM students
+          GROUP BY grade
+          ORDER BY grade
+      """).fetchall()
+
+      print("학년별 통계:")
+      for grade, cnt, avg in gradeStats:
+          print(f"  {grade}: {cnt}명, 평균 {avg}점")
+
+      conn.close()
+
+- id: update_delete
+  title: 수정과 삭제
+  subtitle: UPDATE와 DELETE
+  blocks:
+  - type: text
+    content: UPDATE로 데이터를 수정하고 DELETE로 삭제합니다. WHERE 절로 대상을 지정해야 합니다.
+  - type: list
+    items:
+    - "UPDATE - 데이터 수정"
+    - "DELETE - 데이터 삭제"
+    - WHERE 절 필수
+    - WHERE 없으면 전체 대상
+  - type: code
+    language: python
+    title: 데이터 수정/삭제
+    description: 학생 점수를 수정하고 특정 학생을 삭제합니다.
+    content: |-
+      import duckdb
+
+      conn = duckdb.connect()
+
+      conn.execute("""
+          CREATE TABLE students AS
+          SELECT * FROM VALUES
+              (1, '김철수', 85),
+              (2, '이영희', 92),
+              (3, '박민수', 65)
+          AS t(id, name, score)
+      """)
+
+      conn.execute("UPDATE students SET score = 90 WHERE id = 1")
+      updated = conn.execute("SELECT name, score FROM students WHERE id = 1").fetchone()
+      print(f"수정 후: {updated[0]} - {updated[1]}점")
+
+      conn.execute("DELETE FROM students WHERE score < 70")
+      remaining = conn.execute("SELECT COUNT(*) FROM students").fetchone()
+      print(f"남은 학생 수: {remaining[0]}명")
+
+      conn.close()
+
+- id: practical_example
+  title: 실전 예제
+  subtitle: 매출 분석 시스템
+  blocks:
+  - type: text
+    content: 지금까지 배운 DuckDB를 활용하여 간단한 매출 분석 시스템을 만들어봅니다.
+  - type: list
+    items:
+    - 매출 데이터 저장
+    - 카테고리별 분석
+    - 일별/월별 집계
+    - 상위 상품 조회
+  - type: code
+    language: python
+    title: 매출 분석
+    description: 상품 매출을 분석합니다.
+    content: |-
+      import duckdb
+
+      conn = duckdb.connect()
+
+      conn.execute("""
+          CREATE TABLE sales AS
+          SELECT * FROM VALUES
+              (1, '노트북', '전자', 1500000, '2024-01-15'),
+              (2, '마우스', '전자', 50000, '2024-01-15'),
+              (3, '책상', '가구', 300000, '2024-01-16'),
+              (4, '의자', '가구', 200000, '2024-01-16'),
+              (5, '모니터', '전자', 400000, '2024-01-17')
+          AS t(id, product, category, price, saleDate)
+      """)
+
+      total = conn.execute("SELECT SUM(price) FROM sales").fetchone()
+      print(f"총 매출: {total[0]:,}원")
+
+      catStats = conn.execute("""
+          SELECT category, SUM(price) AS total, COUNT(*) AS cnt
+          FROM sales
+          GROUP BY category
+          ORDER BY total DESC
+      """).fetchall()
+
+      print("\n카테고리별 매출:")
+      for cat, total, cnt in catStats:
+          print(f"  {cat}: {total:,}원 ({cnt}건)")
+
+      conn.close()
+
+- id: practice
+  title: 28일차 복습
+  subtitle: DuckDB 미션
+  blocks:
+  - type: text
+    content: 28일차에서 배운 DuckDB를 복습하는 미션입니다.
+  - type: expansion
+    title: "미션1: 연결"
+    code: |-
+      import duckdb
+
+      conn = duckdb.connect()
+      print("연결 성공!")
+      conn.close()
+  - type: expansion
+    title: "미션2: 테이블 생성"
+    code: |-
+      import duckdb
+
+      conn = duckdb.connect()
+      conn.execute("CREATE TABLE test (id INT, name VARCHAR)")
+      print("테이블 생성!")
+      conn.close()
+  - type: expansion
+    title: "미션3: 데이터 삽입"
+    code: |-
+      import duckdb
+
+      conn = duckdb.connect()
+      conn.execute("CREATE TABLE test AS SELECT 1 AS id, 'A' AS name")
+      print(conn.execute("SELECT * FROM test").fetchall())
+      conn.close()
+  - type: expansion
+    title: "미션4: 조건 검색"
+    code: |-
+      import duckdb
+
+      conn = duckdb.connect()
+      conn.execute("CREATE TABLE nums AS SELECT * FROM range(1, 11) AS t(n)")
+      result = conn.execute("SELECT * FROM nums WHERE n > 5").fetchall()
+      print(result)
+      conn.close()
+  - type: expansion
+    title: "미션5: 집계 함수"
+    code: |-
+      import duckdb
+
+      conn = duckdb.connect()
+      conn.execute("CREATE TABLE nums AS SELECT * FROM range(1, 11) AS t(n)")
+      result = conn.execute("SELECT AVG(n), SUM(n) FROM nums").fetchone()
+      print(f"평균: {result[0]}, 합계: {result[1]}")
+      conn.close()
+  - type: expansion
+    title: "미션6: GROUP BY"
+    code: |-
+      import duckdb
+
+      conn = duckdb.connect()
+      conn.execute("""
+          CREATE TABLE sales AS SELECT * FROM VALUES
+          ('A', 100), ('B', 200), ('A', 150)
+          AS t(cat, price)
+      """)
+      result = conn.execute("SELECT cat, SUM(price) FROM sales GROUP BY cat").fetchall()
+      print(result)
+      conn.close()
+  - type: expansion
+    title: "미션7: 정렬"
+    code: |-
+      import duckdb
+
+      conn = duckdb.connect()
+      conn.execute("CREATE TABLE nums AS SELECT * FROM range(1, 6) AS t(n)")
+      result = conn.execute("SELECT * FROM nums ORDER BY n DESC").fetchall()
+      print(result)
+      conn.close()

@@ -1,0 +1,415 @@
+meta:
+  id: networkx_06
+  title: 연결성분석
+  order: 6
+  category: networkx
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["networkx", "연결성", "컴포넌트", "브릿지", "절단점"]
+  seo:
+    title: "NetworkX 연결성 분석 - 컴포넌트와 취약점"
+    description: "NetworkX로 네트워크의 연결 구조를 분석합니다. 연결 컴포넌트, 브릿지, 절단점을 찾아 취약점을 파악합니다."
+    keywords: ["networkx", "연결성", "component", "bridge", "articulation", "취약점"]
+
+intro:
+  emoji: "🔗"
+  goal: 네트워크의 연결 구조를 분석하고 취약점을 찾습니다.
+  description: 연결성 분석은 네트워크의 구조적 특성을 파악합니다. 연결 컴포넌트는 서로 도달 가능한 노드 그룹입니다. 브릿지와 절단점은 제거 시 네트워크가 분리되는 취약점입니다. 네트워크 안정성 평가에 중요합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NetworkX와 matplotlib을 불러옵니다. 연결성 분석은 네트워크의 구조적 안정성과 취약점을 파악하는 핵심 기법입니다. 통신망, 전력망, 교통망 등 인프라 네트워크에서 어떤 부분이 고장나면 전체 시스템에 영향을 미치는지, 네트워크가 얼마나 견고한지를 분석합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: networkx와 matplotlib을 불러옵니다
+    content: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+- id: step2_connected
+  title: 2단계. 연결 그래프
+  subtitle: is_connected()
+  blocks:
+  - type: text
+    content: 연결 그래프(Connected Graph)는 모든 노드 쌍 사이에 경로가 존재하는 그래프입니다. 어떤 두 노드를 선택해도 연결된 엣지를 따라 도달할 수 있습니다. is_connected()로 그래프가 연결되어 있는지 확인할 수 있으며, 연결되지 않은 그래프에서 경로 관련 함수를 호출하면 에러가 발생하므로 사전 확인이 중요합니다.
+  - type: code
+    language: python
+    title: 연결된 그래프
+    description: 모든 노드가 연결됨
+    content: |-
+      connectedG = nx.Graph()
+      connectedG.add_edges_from([(1, 2), (2, 3), (3, 4), (4, 1)])
+      isConn = nx.is_connected(connectedG)
+      isConn
+  - type: code
+    language: python
+    title: 분리된 그래프
+    description: 두 개의 컴포넌트
+    content: |-
+      disconnectedG = nx.Graph()
+      disconnectedG.add_edges_from([(1, 2), (2, 3)])
+      disconnectedG.add_edges_from([(4, 5), (5, 6)])
+      isDisconn = nx.is_connected(disconnectedG)
+      isDisconn
+  - type: tip
+    content: 연결되지 않은 그래프에서 shortest_path()를 사용하면 에러가 발생합니다. 먼저 is_connected()로 확인하세요.
+
+- id: step3_components
+  title: 3단계. 연결 컴포넌트
+  subtitle: connected_components()
+  blocks:
+  - type: text
+    content: connected_components()는 각 연결 컴포넌트(서로 도달 가능한 노드 그룹)를 반환합니다. 연결 컴포넌트는 내부적으로는 모두 연결되어 있지만 다른 컴포넌트와는 분리된 부분그래프입니다. 소셜 네트워크에서 서로 교류가 없는 독립적인 그룹들, 인터넷에서 연결이 끊어진 네트워크 조각들을 식별하는 데 사용됩니다.
+  - type: code
+    language: python
+    title: 컴포넌트 찾기
+    description: 분리된 그룹 식별
+    content: |-
+      multiCompG = nx.Graph()
+      multiCompG.add_edges_from([(1, 2), (2, 3), (3, 1)])
+      multiCompG.add_edges_from([(4, 5)])
+      multiCompG.add_edges_from([(6, 7), (7, 8)])
+
+      components = list(nx.connected_components(multiCompG))
+      components
+  - type: code
+    language: python
+    title: 컴포넌트 수
+    description: 몇 개로 분리되어 있는가
+    content: |-
+      numComponents = nx.number_connected_components(multiCompG)
+      numComponents
+  - type: code
+    language: python
+    title: 가장 큰 컴포넌트
+    description: 최대 컴포넌트 추출
+    content: |-
+      largestComp = max(nx.connected_components(multiCompG), key=len)
+      largestComp
+  - type: tip
+    content: connected_components()는 집합의 제너레이터를 반환합니다. list()로 변환하거나 max()로 가장 큰 것을 찾습니다.
+
+- id: step4_visualize_comp
+  title: 4단계. 컴포넌트 시각화
+  subtitle: 그룹별 색상
+  blocks:
+  - type: text
+    content: 각 연결 컴포넌트를 다른 색으로 시각화하면 네트워크의 분리된 영역을 쉽게 파악할 수 있습니다. 컴포넌트마다 고유한 색상을 지정하여 그래프를 그리면 어떤 노드들이 같은 그룹에 속하는지, 몇 개의 독립된 네트워크가 존재하는지 한눈에 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 컴포넌트별 색상
+    description: 그룹마다 다른 색
+    content: |-
+      compList = list(nx.connected_components(multiCompG))
+      colorList = ['skyblue', 'salmon', 'lightgreen', 'gold']
+
+      nodeColors = []
+      for n in multiCompG.nodes():
+          for i, comp in enumerate(compList):
+              if n in comp:
+                  nodeColors.append(colorList[i % len(colorList)])
+                  break
+
+      posComp = nx.spring_layout(multiCompG, seed=42)
+      fig1, ax1 = plt.subplots(figsize=(8, 6))
+      nx.draw(multiCompG, pos=posComp, with_labels=True, node_color=nodeColors,
+              node_size=700, font_size=12, ax=ax1)
+      ax1.set_title('Connected Components')
+      fig1
+
+- id: step5_bridges
+  title: 5단계. 브릿지
+  subtitle: bridges()
+  blocks:
+  - type: text
+    content: 브릿지(Bridge)는 제거하면 그래프가 분리되는 엣지입니다. 두 컴포넌트를 연결하는 유일한 경로이므로, 이 연결이 끊어지면 네트워크가 둘로 쪼개집니다. 통신망에서 브릿지는 단일 장애점(Single Point of Failure)으로, 이 회선이 고장나면 일부 지역이 완전히 단절됩니다. 브릿지를 식별하여 백업 경로를 추가하는 것이 네트워크 안정성 향상의 핵심입니다.
+  - type: code
+    language: python
+    title: 브릿지가 있는 그래프
+    description: 취약한 연결 구조
+    content: |-
+      bridgeG = nx.Graph()
+      bridgeG.add_edges_from([(1, 2), (2, 3), (3, 1)])
+      bridgeG.add_edge(3, 4)
+      bridgeG.add_edges_from([(4, 5), (5, 6), (6, 4)])
+      list(bridgeG.edges())
+  - type: code
+    language: python
+    title: 브릿지 찾기
+    description: 제거 시 분리되는 엣지
+    content: |-
+      bridgeEdges = list(nx.bridges(bridgeG))
+      bridgeEdges
+  - type: code
+    language: python
+    title: 브릿지 시각화
+    description: 브릿지를 빨간색으로
+    content: |-
+      posBridge = nx.spring_layout(bridgeG, seed=42)
+      fig2, ax2 = plt.subplots(figsize=(8, 6))
+
+      normalEdges = [e for e in bridgeG.edges() if e not in bridgeEdges and (e[1], e[0]) not in bridgeEdges]
+      nx.draw_networkx_nodes(bridgeG, pos=posBridge, node_color='lightblue',
+                              node_size=700, ax=ax2)
+      nx.draw_networkx_labels(bridgeG, pos=posBridge, ax=ax2)
+      nx.draw_networkx_edges(bridgeG, pos=posBridge, edgelist=normalEdges,
+                              edge_color='gray', width=2, ax=ax2)
+      nx.draw_networkx_edges(bridgeG, pos=posBridge, edgelist=bridgeEdges,
+                              edge_color='red', width=3, ax=ax2)
+      ax2.set_title('Bridge Edge (Red)')
+      fig2
+  - type: tip
+    content: 브릿지는 두 컴포넌트를 연결하는 유일한 경로입니다. 브릿지가 많으면 네트워크가 취약합니다.
+
+- id: step6_articulation
+  title: 6단계. 절단점
+  subtitle: articulation_points()
+  blocks:
+  - type: text
+    content: 절단점(Articulation Point)은 제거하면 그래프가 분리되는 노드입니다. 이 노드가 네트워크에서 사라지면 다른 노드들이 서로 도달할 수 없게 됩니다. 조직에서 특정 사람이 없으면 부서 간 소통이 끊기는 경우, 라우터가 고장나면 네트워크가 분리되는 경우가 이에 해당합니다. 절단점을 파악하면 네트워크의 병목과 취약점을 알 수 있습니다.
+  - type: code
+    language: python
+    title: 절단점 찾기
+    description: 제거 시 분리되는 노드
+    content: |-
+      artPoints = list(nx.articulation_points(bridgeG))
+      artPoints
+  - type: code
+    language: python
+    title: 절단점 시각화
+    description: 절단점을 노란색으로
+    content: |-
+      nodeColorArt = ['yellow' if n in artPoints else 'lightblue' for n in bridgeG.nodes()]
+
+      fig3, ax3 = plt.subplots(figsize=(8, 6))
+      nx.draw(bridgeG, pos=posBridge, with_labels=True, node_color=nodeColorArt,
+              node_size=700, font_size=12, ax=ax3)
+      ax3.set_title('Articulation Points (Yellow)')
+      fig3
+  - type: tip
+    content: 절단점은 네트워크의 병목입니다. 이 노드가 실패하면 네트워크가 분리됩니다.
+
+- id: step7_robustness
+  title: 7단계. 네트워크 견고성
+  subtitle: 노드 제거 시뮬레이션
+  blocks:
+  - type: text
+    content: 노드를 하나씩 제거하며 네트워크 견고성을 테스트합니다. 절단점을 제거하면 네트워크가 분리되지만, 절단점이 아닌 노드를 제거하면 연결성이 유지됩니다. 이런 시뮬레이션을 통해 어떤 노드가 시스템에 중요한지, 노드 장애 시 어떤 영향이 있는지를 사전에 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 초기 네트워크
+    description: 테스트용 그래프
+    content: |-
+      robustG = nx.Graph()
+      robustG.add_edges_from([
+          (1, 2), (1, 3), (2, 3), (2, 4), (3, 4),
+          (4, 5), (5, 6), (5, 7), (6, 7)
+      ])
+      nx.is_connected(robustG)
+  - type: code
+    language: python
+    title: 절단점 제거
+    description: 노드 4 제거 시
+    content: |-
+      robustGcopy = robustG.copy()
+      robustGcopy.remove_node(4)
+      isConnAfter = nx.is_connected(robustGcopy)
+      numCompAfter = nx.number_connected_components(robustGcopy)
+      isConnAfter, numCompAfter
+  - type: code
+    language: python
+    title: 일반 노드 제거
+    description: 노드 1 제거 시
+    content: |-
+      robustGcopy2 = robustG.copy()
+      robustGcopy2.remove_node(1)
+      isConnAfter2 = nx.is_connected(robustGcopy2)
+      isConnAfter2
+  - type: tip
+    content: 절단점이 아닌 노드를 제거해도 연결성이 유지됩니다. 절단점 제거만 네트워크를 분리합니다.
+
+- id: step8_biconnected
+  title: 8단계. 이중연결
+  subtitle: biconnected_components()
+  blocks:
+  - type: text
+    content: 이중연결 컴포넌트(Biconnected Component)는 어떤 한 노드를 제거해도 연결이 유지되는 부분그래프입니다. 절단점이 없는 최대 부분그래프로, 내부적으로 최소 두 개의 독립적인 경로가 존재합니다. 이중연결 그래프는 단일 노드 장애에 강건하므로, 고가용성이 필요한 네트워크 설계의 목표가 됩니다.
+  - type: code
+    language: python
+    title: 이중연결 컴포넌트
+    description: 견고한 부분 찾기
+    content: |-
+      biconnComps = list(nx.biconnected_components(bridgeG))
+      biconnComps
+  - type: code
+    language: python
+    title: 이중연결 여부
+    description: 전체가 이중연결인가
+    content: |-
+      isBiconn = nx.is_biconnected(bridgeG)
+      isBiconn
+  - type: tip
+    content: 이중연결 그래프는 절단점이 없습니다. 어떤 한 노드가 실패해도 나머지가 연결을 유지합니다.
+
+- id: step9_k_connectivity
+  title: 9단계. k-연결성
+  subtitle: node_connectivity()
+  blocks:
+  - type: text
+    content: k-연결성(k-connectivity)은 그래프를 분리하려면 최소 몇 개의 노드(또는 엣지)를 제거해야 하는지를 나타냅니다. 노드 연결도가 k이면 k-1개의 노드가 동시에 장애를 일으켜도 네트워크가 연결을 유지합니다. 엣지 연결도도 마찬가지로 해석됩니다. 연결도가 높을수록 네트워크가 더 견고합니다.
+  - type: code
+    language: python
+    title: 노드 연결도
+    description: 최소 절단 노드 수
+    content: |-
+      nodeConn = nx.node_connectivity(robustG)
+      nodeConn
+  - type: code
+    language: python
+    title: 엣지 연결도
+    description: 최소 절단 엣지 수
+    content: |-
+      edgeConn = nx.edge_connectivity(robustG)
+      edgeConn
+  - type: code
+    language: python
+    title: 완전 그래프 연결도
+    description: 가장 견고한 그래프
+    content: |-
+      completeG = nx.complete_graph(5)
+      nodeConnComplete = nx.node_connectivity(completeG)
+      edgeConnComplete = nx.edge_connectivity(completeG)
+      nodeConnComplete, edgeConnComplete
+  - type: tip
+    content: 연결도가 높을수록 견고합니다. 완전 그래프의 연결도는 n-1입니다 (모든 노드가 연결됨).
+
+- id: step10_practical
+  title: 10단계. 실전 분석
+  subtitle: 네트워크 취약점 진단
+  blocks:
+  - type: text
+    content: 실제 네트워크의 취약점을 종합적으로 분석합니다. 기업의 통신 네트워크, 전력망, 교통망 등을 모델링하고 브릿지와 절단점을 식별합니다. 이 분석 결과를 바탕으로 백업 연결을 추가하거나, 중요 노드에 이중화를 적용하여 네트워크 안정성을 높일 수 있습니다.
+  - type: code
+    language: python
+    title: 분석용 네트워크
+    description: 통신 네트워크 모델
+    content: |-
+      network = nx.Graph()
+      network.add_edges_from([
+          ("HQ", "Branch1"), ("HQ", "Branch2"), ("HQ", "DataCenter"),
+          ("Branch1", "Office1"), ("Branch1", "Office2"),
+          ("Branch2", "Office3"), ("Branch2", "Office4"),
+          ("DataCenter", "Server1"), ("DataCenter", "Server2"),
+          ("Server1", "Server2")
+      ])
+      network.number_of_nodes(), network.number_of_edges()
+  - type: code
+    language: python
+    title: 취약점 분석
+    description: 브릿지와 절단점
+    content: |-
+      netBridges = list(nx.bridges(network))
+      netArtPoints = list(nx.articulation_points(network))
+      netBridges, netArtPoints
+  - type: code
+    language: python
+    title: 취약점 시각화
+    description: 종합 시각화
+    content: |-
+      posNet = nx.spring_layout(network, seed=42)
+
+      nodeColorsNet = ['red' if n in netArtPoints else 'lightblue' for n in network.nodes()]
+      normalEdgesNet = [e for e in network.edges() if e not in netBridges and (e[1], e[0]) not in netBridges]
+
+      fig4, ax4 = plt.subplots(figsize=(10, 8))
+      nx.draw_networkx_nodes(network, pos=posNet, node_color=nodeColorsNet,
+                              node_size=800, ax=ax4)
+      nx.draw_networkx_labels(network, pos=posNet, font_size=9, ax=ax4)
+      nx.draw_networkx_edges(network, pos=posNet, edgelist=normalEdgesNet,
+                              edge_color='gray', width=2, ax=ax4)
+      nx.draw_networkx_edges(network, pos=posNet, edgelist=netBridges,
+                              edge_color='red', width=3, style='dashed', ax=ax4)
+      ax4.set_title('Network Vulnerability Analysis\n(Red nodes: Critical, Dashed: Bridge)')
+      fig4
+
+- id: practice
+  title: 실습
+  subtitle: 연결성 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 연결성 분석 기법을 활용하여 실전 미션을 수행해봅시다. 전력망의 취약점을 분석하고, 소셜 네트워크에서 브릿지 제거 시 어떻게 분리되는지 시뮬레이션합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 전력망 분석"
+    blocks:
+    - type: code
+      title: 전력망 네트워크 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        power = nx.Graph()
+        power.add_edges_from([
+            ("Plant1", "Substation1"), ("Plant1", "Substation2"),
+            ("Substation1", "District1"), ("Substation1", "District2"),
+            ("Substation2", "District3"), ("Substation2", "District4"),
+            ("District1", "District2")
+        ])
+        power.number_of_nodes(), power.number_of_edges()
+    - type: code
+      title: 전력망 취약점 분석
+      content: |-
+        powerBridges = list(nx.bridges(power))
+        powerArtPoints = list(nx.articulation_points(power))
+        powerBridges, powerArtPoints
+    - type: code
+      title: 전력망 취약점 시각화
+      content: |-
+        posPower = nx.spring_layout(power, seed=42)
+        colorsPower = ['red' if n in powerArtPoints else 'lightgreen' for n in power.nodes()]
+
+        figPower, axPower = plt.subplots(figsize=(9, 7))
+        nx.draw(power, pos=posPower, with_labels=True, node_color=colorsPower,
+                node_size=800, font_size=9, ax=axPower)
+        axPower.set_title('Power Grid Vulnerability')
+        figPower
+  - type: expansion
+    title: "미션2: 소셜 네트워크 분리"
+    blocks:
+    - type: code
+      title: 소셜 네트워크 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        socialNet = nx.Graph()
+        socialNet.add_edges_from([
+            ("A", "B"), ("A", "C"), ("B", "C"),
+            ("C", "D"),
+            ("D", "E"), ("D", "F"), ("E", "F"),
+            ("F", "G"),
+            ("G", "H"), ("G", "I"), ("H", "I")
+        ])
+        nx.is_connected(socialNet)
+    - type: code
+      title: 브릿지와 절단점 찾기
+      content: |-
+        socialBridges = list(nx.bridges(socialNet))
+        socialArt = list(nx.articulation_points(socialNet))
+        socialBridges, socialArt
+    - type: code
+      title: 브릿지 제거 후 분리
+      content: |-
+        socialCopy = socialNet.copy()
+        for bridge in socialBridges:
+            socialCopy.remove_edge(*bridge)
+
+        numCompSocial = nx.number_connected_components(socialCopy)
+        compsSocial = list(nx.connected_components(socialCopy))
+        numCompSocial, compsSocial

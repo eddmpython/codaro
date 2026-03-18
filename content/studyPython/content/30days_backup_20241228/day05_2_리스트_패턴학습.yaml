@@ -1,0 +1,174 @@
+meta:
+  id: day05_2
+  title: 리스트 패턴학습
+  day: 5
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 리스트 - 순서있는 데이터 모음"
+    description: "리스트 생성, 인덱싱, 추가/삭제, 정렬 방법을 배웁니다."
+    keywords: ['리스트', 'list', 'append', 'sort']
+intro:
+  title: 리스트 마스터 패턴북
+  emoji: 🔥
+  description: 이것만 외우면 리스트 마스터! 핵심 패턴만 모았습니다.
+  points:
+  - '📝 생성: [값1, 값2, 값3]'
+  - '➕ 추가: append(), insert(), extend()'
+  - '➖ 삭제: remove(), pop(), del'
+  - '🔍 검색: in, index(), count()'
+  - '✂️ 슬라이싱: 리스트[시작:끝]'
+  - '🔄 정렬: sort(), sorted()'
+  - '📏 길이: len(리스트)'
+  - '🔗 연결: + 연산자로 리스트 합치기'
+  - '📊 복사: copy(), 슬라이싱[:]'
+  - '🔢 인덱싱: 리스트[인덱스]'
+  summary: 🔥 생성→추가→삭제→검색 순서로 마스터!
+sections:
+- id: creation
+  title: 1. 리스트 생성 패턴
+  subtitle: '[value1, value2]'
+  blocks:
+  - type: code
+    language: python
+    title: 리스트 생성
+    description: 대괄호나 list() 함수로 리스트를 생성합니다.
+    content: |-
+      numbers = [1, 2, 3]
+      fruits = ["apple", "banana"]
+      chars = list("hello")
+      print(numbers, fruits, chars)
+- id: access
+  title: 2. 접근 패턴
+  subtitle: list[index]
+  blocks:
+  - type: code
+    language: python
+    title: 인덱싱과 슬라이싱
+    description: 인덱스나 슬라이싱으로 리스트 요소에 접근합니다.
+    content: |-
+      data = ["a", "b", "c", "d", "e"]
+      print(data[0])
+      print(data[-1])
+      print(data[1:4])
+      print(data[::-1])
+- id: modification
+  title: 3. 수정 패턴
+  subtitle: list[index] = value
+  blocks:
+  - type: code
+    language: python
+    title: 요소 수정
+    description: 인덱스를 사용해 리스트 요소를 직접 수정합니다.
+    content: |-
+      fruits = ["apple", "banana", "cherry"]
+      fruits[1] = "orange"
+      print(fruits)
+
+      fruits[-1] = "grape"
+      print(fruits)
+- id: append
+  title: 4. 추가 패턴
+  subtitle: append(), insert(), extend()
+  blocks:
+  - type: code
+    language: python
+    title: 요소 추가
+    description: append()는 끝에, insert()는 특정 위치에, extend()는 여러 요소를 추가합니다.
+    content: |-
+      fruits = ["apple"]
+      fruits.append("banana")
+      fruits.insert(0, "cherry")
+      fruits.extend(["grape", "kiwi"])
+      print(fruits)
+- id: removal
+  title: 5. 제거 패턴
+  subtitle: remove(), pop(), del, clear()
+  blocks:
+  - type: code
+    language: python
+    title: 요소 제거
+    description: remove()는 값으로, pop()은 인덱스로 제거하고, clear()는 모든 요소를 제거합니다.
+    content: |-
+      fruits = ["apple", "banana", "cherry"]
+      fruits.remove("banana")
+      removed = fruits.pop(0)
+      print(removed)
+      fruits.clear()
+      print(fruits)
+- id: search
+  title: 6. 검색 패턴
+  subtitle: index(), count(), in
+  blocks:
+  - type: code
+    language: python
+    title: 요소 찾기
+    description: index()는 위치 찾기, count()는 개수 세기, in은 포함 여부 확인입니다.
+    content: |-
+      numbers = [1, 2, 3, 2, 4]
+      print(numbers.index(2))
+      print(numbers.count(2))
+      print(3 in numbers)
+- id: sorting
+  title: 7. 정렬 패턴
+  subtitle: sort(), reverse(), sorted()
+  blocks:
+  - type: code
+    language: python
+    title: 정렬과 뒤집기
+    description: sort()는 원본을 정렬하고, sorted()는 새 리스트를 반환합니다.
+    content: |-
+      numbers = [3, 1, 4, 2]
+      numbers.sort()
+      print(numbers)
+
+      original = [3, 1, 4]
+      newSorted = sorted(original)
+      print(newSorted)
+- id: copy
+  title: 8. 복사 패턴
+  subtitle: copy(), [:], list()
+  blocks:
+  - type: code
+    language: python
+    title: 리스트 복사
+    description: copy(), 슬라이싱[:], list() 생성자로 독립적인 새 리스트를 만듭니다.
+    content: |-
+      original = [1, 2, 3]
+      copy1 = original.copy()
+      copy2 = original[:]
+      copy3 = list(original)
+      copy1.append(4)
+      print(original)
+- id: concatenation
+  title: 9. 연결 패턴
+  subtitle: list1 + list2, list * n
+  blocks:
+  - type: code
+    language: python
+    title: 리스트 연결
+    description: + 연산자로 연결하고 * 연산자로 반복합니다.
+    content: |-
+      list1 = [1, 2, 3]
+      list2 = [4, 5, 6]
+      combined = list1 + list2
+      repeated = list1 * 3
+      zeros = [0] * 5
+      print(combined, repeated, zeros)
+- id: conversion
+  title: 10. 변환 패턴
+  subtitle: list(), str(), tuple()
+  blocks:
+  - type: code
+    language: python
+    title: 자료형 변환
+    description: 리스트와 다른 자료형 간의 상호 변환이 가능합니다.
+    content: |-
+      word = "hello"
+      charList = list(word)
+      letters = ["P", "y", "t", "h", "o", "n"]
+      joined = "".join(letters)
+      fromTuple = list((1, 2, 3))
+      print(charList, joined, fromTuple)

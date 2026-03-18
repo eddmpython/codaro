@@ -1,0 +1,538 @@
+meta:
+  id: matplotlib_07
+  title: 시계열다중축차트
+  order: 7
+  category: matplotlib
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["matplotlib", "twinx", "fill_between", "시계열", "이중축"]
+  seo:
+    title: "Matplotlib 이중 축 차트 - 온도와 강수량 시각화"
+    description: "Matplotlib으로 온도와 강수량을 이중 축 차트로 시각화합니다. twinx, fill_between, 시계열 분석 기법을 배웁니다."
+    keywords: ["matplotlib", "twinx", "이중축", "fill_between", "시계열", "날씨"]
+
+intro:
+  emoji: "🌡️"
+  goal: 온도와 강수량을 이중 축 차트로 시각화합니다.
+  description: 서로 다른 단위의 변수를 한 차트에 표시할 때 이중 축을 사용합니다. twinx()로 y축을 추가하고, fill_between()으로 영역을 채웁니다. 이전에 배운 plot, bar, scatter, subplots, legend 개념을 함께 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: 가상의 월별 날씨 데이터를 생성하여 시계열 분석을 연습합니다. 온도(°C)와 강수량(mm)은 단위와 스케일이 완전히 다르므로, 이중 축을 사용해야 두 변수를 효과적으로 비교할 수 있습니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: matplotlib, numpy, pandas를 불러옵니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import numpy as np
+      import pandas as pd
+  - type: tip
+    content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. numpy는 np로, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  subtitle: Pyodide 환경 폰트
+  blocks:
+  - type: text
+    content: Pyodide(웹 브라우저) 환경에서는 시스템 폰트를 사용할 수 없어 한글이 깨집니다. CDN에서 폰트 파일을 다운로드하여 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+  - type: code
+    language: python
+    title: 한글 폰트 설정
+    description: Pretendard 폰트를 다운로드하여 matplotlib에 등록합니다
+    content: |-
+      import micropip
+      await micropip.install('pyodide-http')
+
+      import pyodide_http
+      pyodide_http.patch_all()
+
+      from matplotlib import font_manager
+      from js import fetch
+      from pathlib import Path
+
+      fontUrl = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Regular.otf"
+      response = await fetch(fontUrl)
+      fontBuffer = await response.arrayBuffer()
+
+      fontPath = Path("/tmp/Pretendard-Regular.otf")
+      fontPath.write_bytes(fontBuffer.to_py())
+
+      font_manager.fontManager.addfont(str(fontPath))
+      plt.rcParams['font.family'] = 'Pretendard'
+      plt.rcParams['axes.unicode_minus'] = False
+  - type: tip
+    content: Pyodide 환경에서는 fetch API로 외부 리소스를 가져옵니다. font_manager.addfont()로 폰트를 등록하고, rcParams로 기본 폰트를 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+
+- id: step2_data
+  title: 2단계. 날씨 데이터 생성
+  subtitle: 시뮬레이션 데이터
+  blocks:
+  - type: text
+    content: 한국의 전형적인 기후 패턴을 반영한 가상 데이터를 생성합니다. 여름(7-8월)에 고온다습하고, 겨울(12-2월)에 건조한 계절 변화를 담습니다. 실제 기상청 데이터와 유사한 패턴입니다.
+  - type: code
+    language: python
+    title: 날씨 데이터 생성
+    description: 12개월 온도와 강수량 데이터를 만듭니다
+    content: |-
+      np.random.seed(42)
+      months = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+
+      temperature = np.array([-2, 1, 7, 14, 19, 24, 27, 28, 23, 16, 8, 1]) + np.random.randn(12) * 1.5
+      rainfall = np.array([20, 25, 45, 65, 100, 135, 380, 320, 145, 50, 45, 25]) + np.random.randn(12) * 15
+
+      weatherData = pd.DataFrame({
+          'month': months,
+          'temp': temperature,
+          'rain': rainfall
+      })
+      weatherData
+
+- id: step3_single
+  title: 3단계. 단일 축의 문제점
+  subtitle: 스케일 차이
+  blocks:
+  - type: text
+    content: 온도와 강수량을 같은 y축에 표시하면 스케일 차이로 인해 제대로 비교할 수 없습니다. 온도는 -5~30 범위인데 강수량은 0~400 범위이므로, 온도 변화가 거의 보이지 않게 됩니다.
+  - type: code
+    language: python
+    title: 단일 축 문제
+    description: 같은 y축에 두 변수를 표시하면 비교가 어렵습니다
+    content: |-
+      figSingle, axSingle = plt.subplots(figsize=(10, 6))
+      axSingle.plot(weatherData['month'], weatherData['temp'], 'o-', label='온도')
+      axSingle.plot(weatherData['month'], weatherData['rain'], 's-', label='강수량')
+      axSingle.set_title('단일 축의 문제점', fontsize=14)
+      axSingle.legend()
+      figSingle
+
+- id: step4_twinx
+  title: 4단계. 이중 축 생성
+  subtitle: ax.twinx()
+  blocks:
+  - type: text
+    content: twinx()는 기존 Axes와 x축을 공유하는 새로운 Axes를 생성합니다. 이 새로운 축은 오른쪽에 y축을 가지며, 독립적인 스케일을 사용합니다. 이제 온도와 강수량을 각각의 적절한 스케일로 표시할 수 있습니다.
+  - type: code
+    language: python
+    title: 왼쪽 y축 (온도)
+    description: Figure를 만들고 온도를 표시합니다
+    content: |-
+      figTwin, ax1 = plt.subplots(figsize=(10, 6))
+
+      ax1.plot(weatherData['month'], weatherData['temp'], 'o-', color='#E74C3C', label='온도')
+      ax1.set_ylabel('온도 (°C)', color='#E74C3C', fontsize=12)
+      ax1.tick_params(axis='y', labelcolor='#E74C3C')
+      figTwin
+  - type: code
+    language: python
+    title: 오른쪽 y축 (강수량)
+    description: twinx()로 이중 축을 추가합니다
+    content: |-
+      ax2 = ax1.twinx()
+      ax2.bar(weatherData['month'], weatherData['rain'], color='#3498DB', alpha=0.6, label='강수량')
+      ax2.set_ylabel('강수량 (mm)', color='#3498DB', fontsize=12)
+      ax2.tick_params(axis='y', labelcolor='#3498DB')
+
+      ax1.set_title('월별 온도와 강수량', fontsize=14)
+      figTwin
+  - type: tip
+    content: ax.twinx()는 x축을 공유하는 새 Axes를 반환합니다. ax.twiny()는 y축을 공유합니다. 두 축의 색상을 다르게 설정하면 어느 축이 어느 데이터인지 쉽게 구분할 수 있습니다. tick_params(labelcolor)로 눈금 라벨 색상을 맞춥니다.
+
+- id: step5_legend
+  title: 5단계. 범례 통합
+  subtitle: 두 축의 범례 합치기
+  blocks:
+  - type: text
+    content: 이중 축 차트에서 두 데이터의 범례를 하나로 합치려면 각 축에서 범례 정보를 가져와 합쳐야 합니다. get_legend_handles_labels()로 핸들과 라벨을 추출한 후 합쳐서 legend()에 전달합니다.
+  - type: code
+    language: python
+    title: 온도 축 설정
+    description: Figure를 만들고 온도를 표시합니다
+    content: |-
+      figLegend, ax1Legend = plt.subplots(figsize=(10, 6))
+
+      line1, = ax1Legend.plot(weatherData['month'], weatherData['temp'], 'o-', color='#E74C3C', label='온도 (°C)')
+      ax1Legend.set_ylabel('온도 (°C)', color='#E74C3C', fontsize=12)
+      ax1Legend.tick_params(axis='y', labelcolor='#E74C3C')
+      figLegend
+  - type: code
+    language: python
+    title: 강수량 축 추가
+    description: twinx로 이중 축을 추가합니다
+    content: |-
+      ax2Legend = ax1Legend.twinx()
+      bar1 = ax2Legend.bar(weatherData['month'], weatherData['rain'], color='#3498DB', alpha=0.6, label='강수량 (mm)')
+      ax2Legend.set_ylabel('강수량 (mm)', color='#3498DB', fontsize=12)
+      ax2Legend.tick_params(axis='y', labelcolor='#3498DB')
+      figLegend
+  - type: code
+    language: python
+    title: 범례 통합
+    description: 두 축의 범례를 하나로 합칩니다
+    content: |-
+      lines1, labels1 = ax1Legend.get_legend_handles_labels()
+      lines2, labels2 = ax2Legend.get_legend_handles_labels()
+      ax1Legend.legend(lines1 + lines2, labels1 + labels2, loc='upper left')
+
+      ax1Legend.set_title('월별 온도와 강수량', fontsize=14)
+      figLegend
+
+- id: step6_fill
+  title: 6단계. 영역 채우기
+  subtitle: fill_between()
+  blocks:
+  - type: text
+    content: fill_between()은 선 그래프 아래 영역을 색상으로 채웁니다. 온도 변화를 영역으로 표시하면 시각적 임팩트가 커집니다. alpha로 투명도를 조절하여 뒤의 막대 그래프가 보이도록 합니다.
+  - type: code
+    language: python
+    title: 온도 영역 채우기
+    description: 온도 선 아래를 색상으로 채웁니다
+    content: |-
+      figFill, ax1Fill = plt.subplots(figsize=(10, 6))
+      xPos = range(len(months))
+
+      ax1Fill.fill_between(xPos, weatherData['temp'], alpha=0.3, color='#E74C3C', label='온도 (°C)')
+      ax1Fill.plot(xPos, weatherData['temp'], 'o-', color='#E74C3C')
+      ax1Fill.set_ylabel('온도 (°C)', color='#E74C3C', fontsize=12)
+      ax1Fill.tick_params(axis='y', labelcolor='#E74C3C')
+      ax1Fill.set_xticks(xPos)
+      ax1Fill.set_xticklabels(months)
+      figFill
+  - type: code
+    language: python
+    title: 강수량 막대 추가
+    description: twinx로 강수량을 추가합니다
+    content: |-
+      ax2Fill = ax1Fill.twinx()
+      ax2Fill.bar(xPos, weatherData['rain'], color='#3498DB', alpha=0.5, width=0.6, label='강수량 (mm)')
+      ax2Fill.set_ylabel('강수량 (mm)', color='#3498DB', fontsize=12)
+      ax2Fill.tick_params(axis='y', labelcolor='#3498DB')
+
+      ax1Fill.set_title('월별 온도와 강수량', fontsize=14)
+      ax1Fill.set_zorder(ax2Fill.get_zorder() + 1)
+      ax1Fill.patch.set_visible(False)
+      figFill
+  - type: tip
+    content: fill_between(x, y)은 y=0부터 y값까지의 영역을 채웁니다. fill_between(x, y1, y2)로 두 선 사이 영역도 채울 수 있습니다. set_zorder()로 레이어 순서를 조절하고, patch.set_visible(False)로 배경을 투명하게 만들어 뒤의 차트가 보이게 합니다.
+
+- id: step7_style
+  title: 7단계. 스타일링
+  subtitle: 색상과 선 스타일
+  blocks:
+  - type: text
+    content: 차트의 가독성을 높이기 위해 스타일을 세밀하게 조정합니다. 그리드, 마커 스타일, 범례 위치 등을 설정하여 전문적인 시각화를 만듭니다.
+  - type: code
+    language: python
+    title: 온도 축 스타일
+    description: Figure와 온도 축을 설정합니다
+    content: |-
+      figStyle, ax1Style = plt.subplots(figsize=(12, 6))
+      xPos = range(len(months))
+
+      ax1Style.fill_between(xPos, weatherData['temp'], alpha=0.2, color='#E74C3C')
+      line1, = ax1Style.plot(xPos, weatherData['temp'], 'o-', color='#E74C3C',
+                            linewidth=2, markersize=8, label='온도 (°C)')
+      ax1Style.set_ylabel('온도 (°C)', color='#E74C3C', fontsize=12)
+      ax1Style.tick_params(axis='y', labelcolor='#E74C3C')
+      ax1Style.set_ylim(-10, 35)
+      ax1Style.set_xticks(xPos)
+      ax1Style.set_xticklabels(months)
+      figStyle
+  - type: code
+    language: python
+    title: 강수량 축 스타일
+    description: 이중 축과 강수량을 추가합니다
+    content: |-
+      ax2Style = ax1Style.twinx()
+      bars = ax2Style.bar(xPos, weatherData['rain'], color='#3498DB', alpha=0.6,
+                         width=0.5, label='강수량 (mm)')
+      ax2Style.set_ylabel('강수량 (mm)', color='#3498DB', fontsize=12)
+      ax2Style.tick_params(axis='y', labelcolor='#3498DB')
+      ax2Style.set_ylim(0, 450)
+      figStyle
+  - type: code
+    language: python
+    title: 레이어와 범례
+    description: zorder, 그리드, 범례를 설정합니다
+    content: |-
+      ax1Style.set_zorder(ax2Style.get_zorder() + 1)
+      ax1Style.patch.set_visible(False)
+      ax1Style.grid(True, alpha=0.3, linestyle='--')
+
+      lines1, labels1 = ax1Style.get_legend_handles_labels()
+      lines2, labels2 = ax2Style.get_legend_handles_labels()
+      ax1Style.legend(lines1 + lines2, labels1 + labels2, loc='upper right')
+
+      ax1Style.set_title('서울 월별 기온과 강수량', fontsize=14, fontweight='bold')
+      figStyle
+
+- id: step8_annotation
+  title: 8단계. 주석 추가
+  subtitle: 최고/최저 표시
+  blocks:
+  - type: text
+    content: 최고 온도, 최대 강수량 등 주요 포인트에 주석을 추가하면 차트의 정보 전달력이 높아집니다. annotate()로 화살표와 함께 텍스트를 배치합니다.
+  - type: code
+    language: python
+    title: 온도 차트와 주석
+    description: 온도를 표시하고 최고점에 주석을 추가합니다
+    content: |-
+      figAnnot, ax1Annot = plt.subplots(figsize=(12, 7))
+      xPos = range(len(months))
+
+      ax1Annot.fill_between(xPos, weatherData['temp'], alpha=0.2, color='#E74C3C')
+      ax1Annot.plot(xPos, weatherData['temp'], 'o-', color='#E74C3C', linewidth=2, markersize=8)
+      ax1Annot.set_ylabel('온도 (°C)', color='#E74C3C', fontsize=12)
+      ax1Annot.tick_params(axis='y', labelcolor='#E74C3C')
+      ax1Annot.set_xticks(xPos)
+      ax1Annot.set_xticklabels(months)
+      figAnnot
+  - type: code
+    language: python
+    title: 온도 최고점 주석
+    description: 최고 온도에 화살표 주석을 추가합니다
+    content: |-
+      maxTempIdx = weatherData['temp'].idxmax()
+      ax1Annot.annotate(f'최고 {weatherData["temp"][maxTempIdx]:.1f}°C',
+                       xy=(maxTempIdx, weatherData['temp'][maxTempIdx]),
+                       xytext=(maxTempIdx - 1.5, weatherData['temp'][maxTempIdx] + 5),
+                       fontsize=10, fontweight='bold',
+                       arrowprops=dict(arrowstyle='->', color='#E74C3C'))
+      figAnnot
+  - type: code
+    language: python
+    title: 강수량 축 추가
+    description: twinx로 강수량 막대를 추가합니다
+    content: |-
+      ax2Annot = ax1Annot.twinx()
+      ax2Annot.bar(xPos, weatherData['rain'], color='#3498DB', alpha=0.6, width=0.5)
+      ax2Annot.set_ylabel('강수량 (mm)', color='#3498DB', fontsize=12)
+      ax2Annot.tick_params(axis='y', labelcolor='#3498DB')
+      figAnnot
+  - type: code
+    language: python
+    title: 강수량 최대점 주석
+    description: 최대 강수량에 화살표 주석을 추가합니다
+    content: |-
+      maxRainIdx = weatherData['rain'].idxmax()
+      ax2Annot.annotate(f'최대 {weatherData["rain"][maxRainIdx]:.0f}mm',
+                       xy=(maxRainIdx, weatherData['rain'][maxRainIdx]),
+                       xytext=(maxRainIdx + 1, weatherData['rain'][maxRainIdx] + 30),
+                       fontsize=10, fontweight='bold',
+                       arrowprops=dict(arrowstyle='->', color='#3498DB'))
+
+      ax1Annot.set_zorder(ax2Annot.get_zorder() + 1)
+      ax1Annot.patch.set_visible(False)
+      ax1Annot.set_title('서울 월별 기온과 강수량', fontsize=14, fontweight='bold')
+      figAnnot
+
+- id: step9_subplots
+  title: 9단계. 서브플롯 비교
+  subtitle: 이중 축 vs 분리
+  blocks:
+  - type: text
+    content: 이중 축 차트와 분리된 서브플롯을 비교합니다. 상황에 따라 어떤 방식이 더 효과적인지 판단할 수 있습니다. 분리된 서브플롯은 각 변수를 더 자세히 볼 수 있고, 이중 축은 관계를 직접 비교할 수 있습니다.
+  - type: code
+    language: python
+    title: 온도 서브플롯
+    description: 상단에 온도 차트를 배치합니다
+    content: |-
+      figCompare, axes = plt.subplots(2, 1, figsize=(12, 10), sharex=True)
+      xPos = range(len(months))
+
+      axes[0].fill_between(xPos, weatherData['temp'], alpha=0.3, color='#E74C3C')
+      axes[0].plot(xPos, weatherData['temp'], 'o-', color='#E74C3C', linewidth=2)
+      axes[0].set_ylabel('온도 (°C)', fontsize=12)
+      axes[0].set_title('월별 기온 변화', fontsize=12)
+      axes[0].grid(True, alpha=0.3, linestyle='--')
+      axes[0].axhline(y=0, color='gray', linestyle='-', alpha=0.5)
+      figCompare
+  - type: code
+    language: python
+    title: 강수량 서브플롯
+    description: 하단에 강수량 차트를 배치합니다
+    content: |-
+      axes[1].bar(xPos, weatherData['rain'], color='#3498DB', alpha=0.7)
+      axes[1].set_ylabel('강수량 (mm)', fontsize=12)
+      axes[1].set_title('월별 강수량', fontsize=12)
+      axes[1].set_xticks(xPos)
+      axes[1].set_xticklabels(months)
+      axes[1].grid(True, alpha=0.3, linestyle='--', axis='y')
+
+      plt.suptitle('서울 월별 기상 데이터', fontsize=14, fontweight='bold')
+      plt.tight_layout()
+      figCompare
+
+- id: step10_final
+  title: 10단계. 최종 시각화
+  subtitle: 완성된 이중 축 차트
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 요소를 종합하여 완성도 높은 시계열 이중 축 차트를 만듭니다. 전문적인 스타일과 명확한 주석으로 기상 분석 보고서에 바로 사용할 수 있는 품질입니다.
+  - type: code
+    language: python
+    title: Figure와 온도 플롯
+    description: Figure를 생성하고 온도를 표시합니다
+    content: |-
+      figFinal, ax1Final = plt.subplots(figsize=(13, 7))
+      xPos = range(len(months))
+
+      ax1Final.fill_between(xPos, weatherData['temp'], alpha=0.15, color='#E74C3C')
+      ax1Final.plot(xPos, weatherData['temp'], 'o-', color='#E74C3C',
+                   linewidth=2.5, markersize=9, label='평균 기온')
+      ax1Final.set_ylabel('기온 (°C)', color='#E74C3C', fontsize=13)
+      ax1Final.tick_params(axis='y', labelcolor='#E74C3C')
+      ax1Final.set_ylim(-10, 40)
+      ax1Final.axhline(y=0, color='gray', linestyle='-', alpha=0.3)
+      ax1Final.set_xticks(xPos)
+      ax1Final.set_xticklabels(months, fontsize=11)
+      figFinal
+  - type: code
+    language: python
+    title: 강수량 이중 축
+    description: twinx로 강수량 막대를 추가합니다
+    content: |-
+      ax2Final = ax1Final.twinx()
+      ax2Final.bar(xPos, weatherData['rain'], color='#3498DB', alpha=0.5,
+                  width=0.55, label='월 강수량')
+      ax2Final.set_ylabel('강수량 (mm)', color='#3498DB', fontsize=13)
+      ax2Final.tick_params(axis='y', labelcolor='#3498DB')
+      ax2Final.set_ylim(0, 500)
+      figFinal
+  - type: code
+    language: python
+    title: 최종 스타일
+    description: zorder, 범례, 제목을 설정합니다
+    content: |-
+      ax1Final.set_zorder(ax2Final.get_zorder() + 1)
+      ax1Final.patch.set_visible(False)
+      ax1Final.grid(True, alpha=0.3, linestyle='--')
+
+      lines1, labels1 = ax1Final.get_legend_handles_labels()
+      lines2, labels2 = ax2Final.get_legend_handles_labels()
+      ax1Final.legend(lines1 + lines2, labels1 + labels2, loc='upper left', fontsize=11)
+
+      ax1Final.set_title('서울 월별 기온과 강수량 (2024년)', fontsize=16, fontweight='bold', pad=15)
+      ax1Final.spines['top'].set_visible(False)
+      plt.tight_layout()
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 시계열 분석 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용해서 다양한 시계열 데이터를 분석해봅시다. twinx, fill_between, annotate 등 모든 개념을 종합적으로 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 주가와 거래량 이중 축 차트"
+    blocks:
+    - type: code
+      title: "데이터 생성"
+      content: |-
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import pandas as pd
+
+        np.random.seed(123)
+        days = 30
+        dates = pd.date_range('2024-01-01', periods=days, freq='D')
+        price = 50000 + np.random.randn(days).cumsum() * 500
+        volume = np.random.randint(100000, 500000, days)
+    - type: code
+      title: "주가 차트"
+      content: |-
+        chart, plot = plt.subplots(figsize=(12, 6))
+
+        plot.plot(dates, price, 'o-', color='#27AE60', linewidth=2, markersize=5, label='주가')
+        plot.fill_between(dates, price.min(), price, alpha=0.1, color='#27AE60')
+        plot.set_ylabel('주가 (원)', color='#27AE60', fontsize=12)
+        plot.tick_params(axis='y', labelcolor='#27AE60')
+    - type: code
+      title: "거래량 이중축"
+      content: |-
+        twin = plot.twinx()
+        twin.bar(dates, volume, color='#95A5A6', alpha=0.5, width=0.8, label='거래량')
+        twin.set_ylabel('거래량', color='#95A5A6', fontsize=12)
+        twin.tick_params(axis='y', labelcolor='#95A5A6')
+
+        plot.set_zorder(twin.get_zorder() + 1)
+        plot.patch.set_visible(False)
+
+        lines1, labels1 = plot.get_legend_handles_labels()
+        lines2, labels2 = twin.get_legend_handles_labels()
+        plot.legend(lines1 + lines2, labels1 + labels2, loc='upper left')
+
+        plot.set_title('2024년 1월 주가와 거래량', fontsize=14, fontweight='bold')
+        plot.grid(True, alpha=0.3, linestyle='--')
+        plt.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: 매출과 방문자 수 분석 (월별)"
+    blocks:
+    - type: code
+      title: "데이터 생성"
+      content: |-
+        import matplotlib.pyplot as plt
+        import numpy as np
+
+        np.random.seed(456)
+        periods = ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월']
+        revenue = np.array([120, 95, 140, 180, 220, 250, 280, 290, 240, 200, 160, 190]) + np.random.randn(12) * 20
+        traffic = np.array([1500, 1200, 1800, 2200, 2800, 3200, 3500, 3600, 3000, 2500, 2000, 2400]) + np.random.randn(12) * 200
+    - type: code
+      title: "매출 막대"
+      content: |-
+        canvas, panel = plt.subplots(figsize=(12, 7))
+
+        xPos = range(len(periods))
+        bars = panel.bar(xPos, revenue, color='#9B59B6', alpha=0.7, width=0.6, label='매출 (백만원)')
+        panel.set_ylabel('매출 (백만원)', color='#9B59B6', fontsize=12)
+        panel.tick_params(axis='y', labelcolor='#9B59B6')
+        panel.set_xticks(xPos)
+        panel.set_xticklabels(periods)
+    - type: code
+      title: "방문자 이중축"
+      content: |-
+        secondary = panel.twinx()
+        secondary.plot(xPos, traffic, 'D-', color='#E67E22', linewidth=2.5, markersize=8, label='방문자 수')
+        secondary.fill_between(xPos, traffic, alpha=0.1, color='#E67E22')
+        secondary.set_ylabel('방문자 수 (명)', color='#E67E22', fontsize=12)
+        secondary.tick_params(axis='y', labelcolor='#E67E22')
+
+        peakIdx = np.argmax(revenue)
+        panel.annotate(f'최고 매출\n{revenue[peakIdx]:.0f}백만원',
+                       xy=(peakIdx, revenue[peakIdx]),
+                       xytext=(peakIdx - 2, revenue[peakIdx] + 40),
+                       fontsize=9, fontweight='bold',
+                       arrowprops=dict(arrowstyle='->', color='#9B59B6'))
+
+        leg1, lbl1 = panel.get_legend_handles_labels()
+        leg2, lbl2 = secondary.get_legend_handles_labels()
+        panel.legend(leg1 + leg2, lbl1 + lbl2, loc='upper left')
+
+        panel.set_title('2024년 월별 매출과 방문자 수', fontsize=14, fontweight='bold')
+        panel.grid(True, alpha=0.3, linestyle='--', axis='y')
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 이중 축 차트로 서로 다른 단위의 시계열 데이터를 시각화했습니다.
+  - type: list
+    items:
+    - "ax.twinx() - x축을 공유하는 오른쪽 y축 생성"
+    - "ax.twiny() - y축을 공유하는 위쪽 x축 생성"
+    - "fill_between(x, y) - 선 아래 영역 채우기"
+    - "get_legend_handles_labels() - 범례 정보 추출"
+    - "set_zorder() - 레이어 순서 조절"
+    - "tick_params(labelcolor) - 축 눈금 색상 설정"
+  - type: text
+    content: 다음 시간에는 GridSpec으로 복잡한 다중 패널 대시보드를 만듭니다.

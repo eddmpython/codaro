@@ -1,0 +1,352 @@
+meta:
+  id: duckdb_02
+  title: 타이타닉생존통계
+  order: 2
+  category: duckdb
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["duckdb", "GROUP BY", "집계함수", "titanic", "생존율"]
+  seo:
+    title: "DuckDB GROUP BY 집계 - 타이타닉 생존 통계 분석"
+    description: "DuckDB로 타이타닉 생존 데이터를 분석합니다. GROUP BY, COUNT, AVG, SUM으로 그룹별 생존율을 집계합니다."
+    keywords: ["DuckDB", "GROUP BY", "집계함수", "타이타닉", "생존율 분석"]
+
+intro:
+  emoji: "🚢"
+  goal: 타이타닉 승객 데이터에서 그룹별 생존율을 집계합니다.
+  description: GROUP BY와 집계 함수로 객실 등급별, 성별, 연령대별 생존율을 분석합니다. SQL 집계의 핵심을 마스터합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: titanic 데이터 준비
+  blocks:
+  - type: text
+    content: 타이타닉 승객 데이터를 불러옵니다. 1912년 침몰한 타이타닉호의 891명 승객 정보가 담겨 있으며, 생존 여부, 객실 등급, 성별, 나이, 요금 등의 변수를 포함합니다. 이 데이터로 "누가 생존했고, 어떤 요인이 생존에 영향을 미쳤는지"를 분석하는 것이 이번 프로젝트의 목표입니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: titanic.csv 로드
+    content: |-
+      import pandas as pd
+      import duckdb
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
+      df = pd.read_csv(f"{url}/titanic.csv")
+      titanic = duckdb.from_df(df)
+      titanic
+
+
+- id: step2_explore
+  title: 2단계. 데이터 구조 파악
+  subtitle: 컬럼 확인
+  blocks:
+  - type: text
+    content: 데이터의 구조와 컬럼을 파악합니다. survived(생존여부, 0/1), pclass(객실등급, 1/2/3등석), sex(성별), age(나이), fare(요금), embarked(승선항) 등의 컬럼이 있습니다. 분석 전에 데이터 구조를 먼저 확인하는 것은 필수적인 단계입니다. 어떤 변수가 있고, 어떤 타입인지 알아야 적절한 분석 방법을 선택할 수 있기 때문입니다.
+  - type: code
+    language: python
+    title: 전체 데이터 확인
+    description: 전체 행 조회
+    content: |-
+      duckdb.sql("SELECT * FROM titanic LIMIT 10")
+
+- id: step3_count_basic
+  title: 3단계. 전체 승객 수 세기
+  subtitle: COUNT(*)
+  blocks:
+  - type: text
+    content: COUNT(*)는 테이블의 전체 행 수를 셉니다. 집계 함수 중 가장 기본이 되는 함수로, 데이터가 몇 건인지 빠르게 파악할 때 사용합니다. 타이타닉 데이터에 몇 명의 승객이 기록되어 있는지 확인해봅시다. 이 정보는 이후 생존율 계산의 분모가 됩니다.
+  - type: code
+    language: python
+    title: 전체 승객 수
+    description: COUNT(*) 사용
+    content: |-
+      duckdb.sql("SELECT COUNT(*) AS totalPassengers FROM titanic")
+  - type: tip
+    content: "COUNT(*)는 NULL 포함 모든 행을 셉니다. COUNT(컬럼명)은 해당 컬럼이 NULL이 아닌 행만 셉니다."
+
+- id: step4_count_column
+  title: 4단계. 특정 컬럼 행 수 세기
+  subtitle: COUNT(col)
+  blocks:
+  - type: text
+    content: COUNT(컬럼명)은 해당 컬럼에서 NULL이 아닌 값만 셉니다. 실제 데이터에는 누락된 값(NULL)이 많으며, 이를 파악하는 것이 데이터 품질 확인의 첫 단계입니다. age 컬럼에는 177명의 승객 나이 정보가 누락되어 있습니다. COUNT(*)와 COUNT(age)를 비교하면 결측치 개수를 알 수 있습니다.
+  - type: code
+    language: python
+    title: 나이 정보 있는 승객 수
+    description: COUNT(age) vs COUNT(*)
+    content: |-
+      duckdb.sql("""
+          SELECT
+              COUNT(*) AS totalRows,
+              COUNT(age) AS ageNotNull
+          FROM titanic
+      """)
+
+- id: step5_distinct
+  title: 5단계. 고유 값 확인
+  subtitle: DISTINCT
+  blocks:
+  - type: text
+    content: DISTINCT는 중복을 제거한 고유 값만 반환합니다. 데이터에 어떤 값들이 존재하는지 파악할 때 유용합니다. 객실 등급(pclass)이 몇 종류인지, 어떤 값들인지 확인해봅시다. 타이타닉에는 1등석, 2등석, 3등석 세 가지 등급이 있으며, 등급에 따라 생존율이 크게 달랐습니다.
+  - type: code
+    language: python
+    title: 객실 등급 종류
+    description: DISTINCT 사용
+    content: |-
+      duckdb.sql("SELECT DISTINCT pclass FROM titanic ORDER BY pclass")
+  - type: tip
+    content: DISTINCT는 SELECT 바로 뒤에 위치합니다. 여러 컬럼을 지정하면 조합의 고유값을 반환합니다.
+
+- id: step6_groupby_basic
+  title: 6단계. GROUP BY 기초
+  subtitle: 그룹별 집계
+  blocks:
+  - type: text
+    content: GROUP BY는 데이터를 특정 컬럼 기준으로 그룹화하여 집계합니다. 엑셀의 피벗 테이블과 비슷한 개념으로, 범주별 통계를 낼 때 필수적입니다. 객실 등급별로 승객이 몇 명인지 세어봅시다. 1등석, 2등석, 3등석 승객 수의 차이를 통해 당시 사회 구조를 엿볼 수 있습니다.
+  - type: code
+    language: python
+    title: 객실 등급별 승객 수
+    description: GROUP BY 기본
+    content: |-
+      duckdb.sql("""
+          SELECT pclass, COUNT(*) AS passengers
+          FROM titanic
+          GROUP BY pclass
+      """)
+  - type: tip
+    content: GROUP BY에 지정한 컬럼은 SELECT에도 포함해야 합니다. 집계함수와 함께 사용합니다.
+
+- id: step7_sum
+  title: 7단계. 합계 구하기
+  subtitle: SUM()
+  blocks:
+  - type: text
+    content: SUM() 함수는 숫자 컬럼의 합계를 계산합니다. survived 컬럼은 생존=1, 사망=0으로 코딩되어 있으므로, SUM(survived)는 곧 생존자 수가 됩니다. 객실 등급별 생존자 수를 계산해봅시다. 이 결과를 보면 1등석 승객의 생존자가 많다는 것을 알 수 있지만, 정확한 비교를 위해서는 생존율(비율)을 계산해야 합니다.
+  - type: code
+    language: python
+    title: 등급별 생존자 수
+    description: SUM(survived)
+    content: |-
+      duckdb.sql("""
+          SELECT pclass, SUM(survived) AS survivors
+          FROM titanic
+          GROUP BY pclass
+      """)
+  - type: tip
+    content: survived 컬럼은 0(사망)과 1(생존)로 구성됩니다. SUM(survived)은 생존자 수와 같습니다.
+
+- id: step8_avg
+  title: 8단계. 평균 구하기
+  subtitle: AVG()
+  blocks:
+  - type: text
+    content: AVG() 함수로 평균을 계산합니다. survived 컬럼이 0과 1로만 이루어져 있으므로, AVG(survived)는 1의 비율, 즉 생존율이 됩니다. 예를 들어 10명 중 6명이 생존했다면 평균은 0.6이고, 이는 60% 생존율을 의미합니다. 100을 곱하면 퍼센트로 표시됩니다. 이 방법은 이진(0/1) 데이터의 비율을 계산하는 표준적인 SQL 패턴입니다.
+  - type: code
+    language: python
+    title: 등급별 생존율
+    description: AVG(survived)
+    content: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          GROUP BY pclass
+      """)
+  - type: tip
+    content: "AVG(survived)는 0과 1의 평균이므로 생존 비율이 됩니다. 100을 곱하면 퍼센트로 표현됩니다."
+
+- id: step9_minmax
+  title: 9단계. 최소/최대 구하기
+  subtitle: MIN(), MAX()
+  blocks:
+  - type: text
+    content: MIN()과 MAX() 함수로 최소값과 최대값을 구합니다. 데이터의 범위를 파악하는 데 유용하며, 이상치를 탐지하는 데도 활용됩니다. 객실 등급별 요금(fare) 범위를 확인해봅시다. 1등석은 최저 0달러부터 최고 500달러가 넘는 요금까지 분포하며, 3등석은 상대적으로 좁은 범위를 가집니다.
+  - type: code
+    language: python
+    title: 등급별 요금 범위
+    description: MIN, MAX 사용
+    content: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              MIN(fare) AS minFare,
+              MAX(fare) AS maxFare,
+              ROUND(AVG(fare), 2) AS avgFare
+          FROM titanic
+          GROUP BY pclass
+      """)
+  - type: tip
+    content: MIN, MAX는 숫자뿐 아니라 문자열, 날짜에도 사용할 수 있습니다.
+
+- id: step10_orderby
+  title: 10단계. 결과 정렬
+  subtitle: ORDER BY
+  blocks:
+  - type: text
+    content: ORDER BY 절은 쿼리 결과를 특정 컬럼 기준으로 정렬합니다. 기본적으로 오름차순(ASC, 작은 값 먼저)으로 정렬되며, 데이터를 보기 좋게 정리하거나 상위/하위 항목을 찾을 때 필수입니다. 생존율이 낮은 순서부터 높은 순서로 정렬해봅시다. 어느 등급의 생존율이 가장 낮았는지 명확하게 볼 수 있습니다.
+  - type: code
+    language: python
+    title: 생존율 순 정렬
+    description: ORDER BY 사용
+    content: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              COUNT(*) AS passengers,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          GROUP BY pclass
+          ORDER BY survivalRate
+      """)
+  - type: tip
+    content: ORDER BY는 기본 오름차순(ASC)입니다. 컬럼명이나 SELECT 절의 별칭을 사용할 수 있습니다.
+
+- id: step11_desc
+  title: 11단계. 내림차순 정렬
+  subtitle: DESC
+  blocks:
+  - type: text
+    content: DESC(descending)를 ORDER BY 뒤에 붙이면 내림차순(큰 값 먼저)으로 정렬됩니다. 실무에서는 "상위 10개", "가장 많이 팔린 상품" 같은 분석에 DESC를 자주 사용합니다. 생존율이 높은 등급부터 표시해봅시다. 1등석 승객의 생존율이 가장 높고, 3등석이 가장 낮다는 것을 명확하게 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 생존율 높은 순
+    description: DESC 사용
+    content: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              COUNT(*) AS passengers,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          GROUP BY pclass
+          ORDER BY survivalRate DESC
+      """)
+  - type: tip
+    content: "DESC는 descending(내림차순)의 약자입니다. ORDER BY 컬럼명 DESC 형태로 사용합니다."
+
+- id: step12_groupby_multi
+  title: 12단계. 다중 그룹화
+  subtitle: 여러 컬럼으로 GROUP BY
+  blocks:
+  - type: text
+    content: GROUP BY에 여러 컬럼을 콤마로 구분하여 나열하면 다중 그룹화가 가능합니다. 등급별 분석만으로는 놓치는 패턴이 있을 수 있습니다. 등급과 성별을 함께 그룹화하면 "1등석 여성", "3등석 남성" 같은 세부 그룹별 통계를 얻을 수 있습니다. 실제로 타이타닉에서 "여성과 아이 먼저" 정책으로 인해 성별에 따른 생존율 차이가 매우 컸습니다.
+  - type: code
+    language: python
+    title: 등급+성별별 생존율
+    description: 다중 GROUP BY
+    content: |-
+      duckdb.sql("""
+          SELECT
+              pclass,
+              sex,
+              COUNT(*) AS passengers,
+              SUM(survived) AS survivors,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate
+          FROM titanic
+          GROUP BY pclass, sex
+          ORDER BY pclass, sex
+      """)
+
+- id: step13_final
+  title: 13단계. 최종 분석
+  subtitle: 종합 생존 통계
+  blocks:
+  - type: text
+    content: 지금까지 배운 COUNT, SUM, AVG, MIN, MAX, GROUP BY, ORDER BY를 모두 활용한 종합 분석입니다. 성별에 따른 생존 통계를 정리하면 타이타닉 생존의 핵심 패턴이 드러납니다. 여성 생존율 74%, 남성 생존율 19%로 큰 차이가 나며, 이는 구명보트 탑승 시 "여성과 아이 먼저" 원칙이 적용되었기 때문입니다.
+  - type: code
+    language: python
+    title: 성별 생존 통계 종합
+    description: 최종 결과물
+    content: |-
+      duckdb.sql("""
+          SELECT
+              sex,
+              COUNT(*) AS totalPassengers,
+              COUNT(age) AS ageKnown,
+              SUM(survived) AS survivors,
+              COUNT(*) - SUM(survived) AS deceased,
+              ROUND(AVG(survived) * 100, 1) AS survivalRate,
+              ROUND(AVG(age), 1) AS avgAge,
+              ROUND(AVG(fare), 2) AS avgFare
+          FROM titanic
+          GROUP BY sex
+          ORDER BY survivalRate DESC
+      """)
+
+- id: practice
+  title: 실습
+  subtitle: 타이타닉 생존 분석 프로젝트
+  blocks:
+  - type: text
+    content: 배운 GROUP BY와 집계 함수를 활용하여 타이타닉 데이터를 다양한 관점에서 분석합니다. COUNT, SUM, AVG, MIN, MAX를 적절히 조합하고 ORDER BY로 결과를 정렬하면 의미 있는 인사이트를 도출할 수 있습니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 승선항별 승객 통계"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import pandas as pd
+        import duckdb
+        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv")
+        tbl = duckdb.from_df(data)
+    - type: code
+      title: "쿼리 실행"
+      content: |-
+        duckdb.sql("""
+            SELECT
+                embark_town,
+                COUNT(*) AS passengers,
+                SUM(survived) AS survivors,
+                ROUND(AVG(survived) * 100, 1) AS survivalRate
+            FROM tbl
+            WHERE embark_town IS NOT NULL
+            GROUP BY embark_town
+            ORDER BY passengers DESC
+        """)
+  - type: expansion
+    title: "미션2: 객실 등급별 나이 통계"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import pandas as pd
+        import duckdb
+        frame = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv")
+        rel = duckdb.from_df(frame)
+    - type: code
+      title: "쿼리 실행"
+      content: |-
+        duckdb.sql("""
+            SELECT
+                pclass,
+                COUNT(age) AS ageKnown,
+                ROUND(MIN(age), 0) AS minAge,
+                ROUND(MAX(age), 0) AS maxAge,
+                ROUND(AVG(age), 1) AS avgAge
+            FROM rel
+            GROUP BY pclass
+            ORDER BY pclass
+        """)
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: GROUP BY와 집계 함수를 마스터했습니다.
+  - type: list
+    items:
+    - "COUNT(*) - 전체 행 수"
+    - "COUNT(col) - NULL 제외 행 수"
+    - "SUM(col) - 합계"
+    - "AVG(col) - 평균"
+    - "MIN(col), MAX(col) - 최소/최대"
+    - "DISTINCT - 중복 제거"
+    - "GROUP BY - 그룹별 집계"
+    - "ORDER BY - 정렬"
+    - "DESC - 내림차순"
+  - type: text
+    content: 다음 시간에는 WHERE 조건과 HAVING으로 필터링을 배웁니다.

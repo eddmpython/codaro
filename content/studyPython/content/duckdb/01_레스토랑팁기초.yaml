@@ -1,0 +1,356 @@
+meta:
+  id: duckdb_01
+  title: 레스토랑팁기초
+  order: 1
+  category: duckdb
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["DuckDB", "SELECT", "WHERE", "SQL기초", "tips"]
+  seo:
+    title: "DuckDB SQL 기초 - 레스토랑 팁 데이터 필터링"
+    description: "DuckDB로 SQL 기초를 배웁니다. SELECT, WHERE, 비교/논리 연산자로 레스토랑 팁 데이터를 조건별로 필터링합니다."
+    keywords: ["DuckDB", "SQL", "SELECT", "WHERE", "데이터 필터링"]
+
+intro:
+  emoji: "🍽️"
+  goal: 레스토랑 팁 데이터에서 조건별로 데이터를 필터링합니다.
+  description: SQL의 기본인 SELECT와 WHERE를 마스터합니다. 비교 연산자, 논리 연산자, BETWEEN, IN을 활용해 원하는 데이터만 추출하는 방법을 배웁니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: pandas와 DuckDB 연동
+  blocks:
+  - type: text
+    content: DuckDB로 SQL 분석을 시작하기 전에 먼저 데이터를 준비해야 합니다. pandas로 CSV 파일을 읽어온 후, duckdb.from_df() 함수를 사용해 DuckDB 테이블로 변환합니다. 이렇게 변환된 테이블에서는 SQL 쿼리를 실행할 수 있습니다. DuckDB는 SQL 기반의 강력한 분석 엔진으로, pandas보다 대용량 데이터 처리가 빠르며 표준 SQL 문법을 그대로 사용할 수 있어 데이터베이스 경험이 있다면 매우 친숙합니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: tips 데이터 로드
+    content: |-
+      import pandas as pd
+      import duckdb
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
+      df = pd.read_csv(f"{url}/tips.csv")
+      tips = duckdb.from_df(df)
+  - type: tip
+    content: "DuckDB는 원래 duckdb.read_csv('파일.csv')나 SQL의 read_csv_auto() 함수로 파일을 직접 읽을 수 있습니다. 하지만 현재 marimo 웹 환경(pyodide)에서는 브라우저 보안 정책으로 인해 파일시스템과 네트워크 접근이 제한됩니다. 그래서 pyodide와 호환성이 좋은 pandas로 먼저 데이터를 불러온 후 duckdb.from_df()로 DuckDB 테이블로 변환하는 방식을 사용합니다. 일반 Python 환경에서는 DuckDB의 직접 읽기 기능을 사용하는 것이 더 빠릅니다."
+
+- id: step2_select_all
+  title: 2단계. 전체 데이터 조회
+  subtitle: SELECT * FROM
+  blocks:
+  - type: text
+    content: SQL의 가장 기본이 되는 SELECT 문을 배워봅니다. SELECT는 '선택하다'라는 뜻으로, 데이터베이스에서 원하는 데이터를 가져오는 명령입니다. *(별표, asterisk)는 '모든 열'을 의미하며, FROM 뒤에는 데이터를 가져올 테이블 이름을 지정합니다. 즉, "tips_table이라는 테이블에서 모든 열을 가져와라"라는 의미입니다. 이 쿼리는 pandas의 df 변수명만 입력하는 것과 비슷한 결과를 보여줍니다.
+  - type: code
+    language: python
+    title: 전체 조회
+    description: SELECT * FROM
+    content: |-
+      tips.query("tips_table", "SELECT * FROM tips_table")
+  - type: tip
+    content: "SELECT * FROM 테이블명은 SQL의 가장 기본 구문입니다. *는 wildcard로 '모든 열'을 의미합니다. 실무에서는 필요한 열만 명시하는 것이 좋지만, 데이터 구조를 파악할 때는 *를 사용하면 편리합니다."
+
+- id: step3_limit
+  title: 3단계. 행 수 제한
+  subtitle: LIMIT
+  blocks:
+  - type: text
+    content: 데이터가 수백만 건일 때 전체를 다 출력하면 시간도 오래 걸리고 화면도 복잡해집니다. LIMIT 절은 출력할 행의 개수를 제한하는 역할을 합니다. 쿼리 끝에 LIMIT 5를 붙이면 상위 5개 행만 보여줍니다. 이는 pandas의 head() 메서드와 비슷한 기능입니다. 대용량 데이터를 다룰 때 데이터 구조를 빠르게 파악하거나, 쿼리가 제대로 작동하는지 테스트할 때 매우 유용합니다.
+  - type: code
+    language: python
+    title: 상위 5개 행
+    description: LIMIT 사용
+    content: |-
+      tips.query("tips_table", "SELECT * FROM tips_table LIMIT 5")
+  - type: tip
+    content: "LIMIT n은 결과의 상위 n개 행만 반환합니다. LIMIT는 쿼리의 가장 마지막에 위치하며, ORDER BY와 함께 사용하면 정렬된 결과에서 상위 n개를 가져올 수 있습니다. 일부 데이터베이스에서는 TOP n 또는 FETCH FIRST n ROWS 문법을 사용하기도 하지만, DuckDB는 LIMIT을 사용합니다."
+
+- id: step4_select_columns
+  title: 4단계. 특정 열 선택
+  subtitle: SELECT col1, col2
+  blocks:
+  - type: text
+    content: 항상 모든 열이 필요한 것은 아닙니다. 분석 목적에 따라 필요한 열만 선택하면 데이터 처리 속도가 빨라지고 결과도 깔끔해집니다. SELECT 뒤에 열 이름을 콤마(,)로 구분해서 나열하면 해당 열만 가져옵니다. 예를 들어 총 결제금액(total_bill)과 팁(tip)만 보고 싶다면 "SELECT total_bill, tip"이라고 작성합니다. 이는 pandas의 df[['total_bill', 'tip']] 문법과 비슷한 기능입니다.
+  - type: code
+    language: python
+    title: 금액과 팁만 선택
+    description: 열 지정
+    content: |-
+      tips.query("tips_table", "SELECT total_bill, tip FROM tips_table LIMIT 5")
+  - type: tip
+    content: "SELECT에서 열 이름을 직접 나열하면 해당 열만 반환됩니다. 열 순서도 나열한 순서대로 출력됩니다. 예를 들어 SELECT tip, total_bill로 순서를 바꾸면 팁 열이 먼저 나옵니다. 실무에서는 *보다 명시적인 열 선택이 권장됩니다."
+
+- id: step5_alias
+  title: 5단계. 별칭 지정
+  subtitle: AS alias
+  blocks:
+  - type: text
+    content: SQL 쿼리 결과를 볼 때 열 이름이 영문이거나 복잡한 수식이면 이해하기 어렵습니다. AS 키워드를 사용하면 열에 별칭(alias)을 붙여 결과를 더 읽기 쉽게 만들 수 있습니다. 예를 들어 total_bill을 '총금액'이라는 한글 별칭으로 바꾸거나, 계산식의 결과에 의미 있는 이름을 붙일 수 있습니다. 별칭은 해당 쿼리 결과에만 적용되며 원본 테이블의 열 이름은 변경되지 않습니다. 이는 pandas의 df.rename()과 비슷하지만, SQL에서는 쿼리마다 동적으로 적용할 수 있어 더 유연합니다.
+  - type: code
+    language: python
+    title: 별칭 사용
+    description: AS로 이름 변경
+    content: |-
+      tips.query("tips_table", """
+          SELECT
+              total_bill AS 총금액,
+              tip AS 팁
+          FROM tips_table
+          LIMIT 5
+      """)
+  - type: tip
+    content: "AS는 열이나 테이블에 임시 이름(별칭)을 부여합니다. 'SELECT total_bill AS 총금액'처럼 사용하며, 결과 컬럼명이 총금액으로 표시됩니다. 계산식에도 사용할 수 있어 'SELECT tip * 2 AS 두배팁'처럼 표현할 수 있습니다. AS는 생략 가능하지만 가독성을 위해 쓰는 것이 좋습니다."
+
+- id: step6_where_basic
+  title: 6단계. 조건 필터링
+  subtitle: WHERE
+  blocks:
+  - type: text
+    content: 실제 분석에서는 전체 데이터가 아닌 특정 조건을 만족하는 데이터만 필요한 경우가 많습니다. WHERE 절은 조건을 지정해서 원하는 행만 필터링하는 역할을 합니다. 예를 들어 "저녁 시간대(Dinner) 데이터만 보고 싶다"면 WHERE time = 'Dinner'라고 조건을 지정합니다. WHERE는 FROM 뒤에 위치하며, 각 행을 하나씩 검사해서 조건이 참(True)인 행만 결과에 포함시킵니다. 이는 pandas의 df[df['time'] == 'Dinner'] 불린 인덱싱과 동일한 개념입니다.
+  - type: code
+    language: python
+    title: 저녁 데이터만
+    description: WHERE 조건
+    content: |-
+      tips.query("tips_table", """
+          SELECT * FROM tips_table
+          WHERE time = 'Dinner'
+          LIMIT 5
+      """)
+  - type: tip
+    content: "WHERE 절은 조건에 맞는 행만 필터링합니다. SQL 실행 순서상 FROM → WHERE → SELECT 순서로 처리되므로, WHERE는 SELECT보다 먼저 실행됩니다. 문자열 조건은 작은따옴표('')로 감싸야 하며, 대소문자를 구분합니다. WHERE time = 'dinner'는 매칭되지 않습니다."
+
+- id: step7_comparison
+  title: 7단계. 비교 연산자
+  subtitle: =, !=, >, <, >=, <=
+  blocks:
+  - type: text
+    content: WHERE 절에서 다양한 비교 연산자를 사용해 조건을 만들 수 있습니다. 숫자 데이터의 경우 크기 비교가 가능하며, 문자열은 같은지 다른지를 비교할 수 있습니다. SQL에서 사용하는 비교 연산자는 =(같다), !=(다르다), >(크다), <(작다), >=(크거나 같다), <=(작거나 같다)입니다. 주의할 점은 Python의 ==가 아닌 =를 사용한다는 것입니다. 팁이 5달러 이상인 고객을 찾으려면 WHERE tip >= 5라고 작성합니다.
+  - type: code
+    language: python
+    title: 팁 5달러 이상
+    description: 비교 연산자
+    content: |-
+      tips.query("tips_table", """
+          SELECT * FROM tips_table
+          WHERE tip >= 5
+      """)
+  - type: tip
+    content: "SQL 비교 연산자는 Python과 약간 다릅니다. Python은 ==를 사용하지만 SQL은 =를 사용합니다. != 대신 <>를 쓸 수도 있으며 둘 다 '같지 않다'를 의미합니다. 숫자 비교는 직관적이지만, 문자열 비교는 사전순으로 처리됩니다. 날짜/시간 타입도 비교 연산자로 범위를 지정할 수 있습니다."
+
+- id: step8_and
+  title: 8단계. AND 연산자
+  subtitle: 여러 조건 모두 만족
+  blocks:
+  - type: text
+    content: 실무에서는 하나의 조건만으로는 부족한 경우가 많습니다. "저녁 시간대이면서 팁이 5달러 이상인 데이터"처럼 여러 조건을 동시에 만족하는 데이터가 필요할 때 AND 연산자를 사용합니다. AND는 논리곱(logical AND)으로, 연결된 모든 조건이 참이어야 해당 행이 결과에 포함됩니다. 조건 1개만 거짓이어도 그 행은 제외됩니다. WHERE 조건1 AND 조건2 AND 조건3 형태로 여러 개를 연결할 수 있습니다. AND를 사용할수록 결과 범위가 좁아집니다.
+  - type: code
+    language: python
+    title: 저녁 + 팁 5달러 이상
+    description: AND 조건
+    content: |-
+      tips.query("tips_table", """
+          SELECT * FROM tips_table
+          WHERE time = 'Dinner' AND tip >= 5
+      """)
+  - type: tip
+    content: "AND는 논리곱 연산자로, 모든 조건이 참(TRUE)일 때만 해당 행을 반환합니다. 조건을 추가할수록 결과 데이터는 줄어듭니다. 예를 들어 WHERE A AND B AND C는 A, B, C가 모두 참인 행만 선택합니다. pandas의 df[(조건1) & (조건2)]와 동일한 개념입니다."
+
+- id: step9_or
+  title: 9단계. OR 연산자
+  subtitle: 조건 중 하나라도 만족
+  blocks:
+  - type: text
+    content: AND와 반대로 OR 연산자는 여러 조건 중 하나라도 만족하면 결과에 포함시킵니다. "토요일이거나 일요일인 데이터"처럼 선택지를 넓힐 때 사용합니다. OR는 논리합(logical OR)으로, 연결된 조건 중 하나만 참이어도 해당 행이 선택됩니다. WHERE day = 'Sat' OR day = 'Sun'은 토요일 또는 일요일 데이터를 모두 가져옵니다. AND는 결과를 좁히고, OR는 결과를 넓힙니다. AND와 OR를 함께 사용할 때는 괄호로 우선순위를 명확히 하는 것이 좋습니다.
+  - type: code
+    language: python
+    title: 토요일 또는 일요일
+    description: OR 조건
+    content: |-
+      tips.query("tips_table", """
+          SELECT * FROM tips_table
+          WHERE day = 'Sat' OR day = 'Sun'
+      """)
+  - type: tip
+    content: "OR는 논리합 연산자로, 조건 중 하나라도 참이면 해당 행을 반환합니다. WHERE A OR B는 A가 참이거나 B가 참인 모든 행을 선택합니다. AND와 OR를 혼합할 때는 괄호를 사용하세요. WHERE (A OR B) AND C는 (A 또는 B)이면서 C인 조건입니다."
+
+- id: step10_between
+  title: 10단계. 범위 조건
+  subtitle: BETWEEN
+  blocks:
+  - type: text
+    content: 숫자 범위를 지정할 때 BETWEEN 키워드를 사용하면 코드가 간결해집니다. "총 결제 금액이 20달러 이상 30달러 이하"라는 조건을 WHERE total_bill >= 20 AND total_bill <= 30으로 쓸 수 있지만, BETWEEN을 사용하면 WHERE total_bill BETWEEN 20 AND 30으로 더 읽기 쉽게 표현할 수 있습니다. 중요한 점은 BETWEEN은 양 끝값을 포함(inclusive)한다는 것입니다. 즉, 20과 30도 결과에 포함됩니다. 날짜 범위 지정에도 자주 사용됩니다.
+  - type: code
+    language: python
+    title: 총금액 20~30달러
+    description: BETWEEN 범위
+    content: |-
+      tips.query("tips_table", """
+          SELECT * FROM tips_table
+          WHERE total_bill BETWEEN 20 AND 30
+      """)
+  - type: tip
+    content: "BETWEEN a AND b는 a 이상(>=) b 이하(<=)를 의미합니다. 양 끝값이 포함되므로 BETWEEN 1 AND 10은 1, 2, ..., 10을 모두 포함합니다. WHERE col >= a AND col <= b와 완전히 동일하지만 BETWEEN이 더 간결합니다. NOT BETWEEN으로 범위 밖 값을 선택할 수도 있습니다."
+
+- id: step11_in
+  title: 11단계. 목록 조건
+  subtitle: IN
+  blocks:
+  - type: text
+    content: 특정 값 목록 중 하나와 일치하는 데이터를 선택할 때 IN 연산자를 사용합니다. 예를 들어 토요일과 일요일 데이터만 필요하다면 WHERE day = 'Sat' OR day = 'Sun'처럼 OR를 반복하는 대신, WHERE day IN ('Sat', 'Sun')으로 간결하게 표현할 수 있습니다. IN 뒤의 괄호 안에 값들을 콤마로 구분해서 나열하면, 컬럼 값이 목록 중 하나와 일치하는 모든 행이 선택됩니다. 값이 3개 이상일 때 특히 유용하며, 가독성이 크게 향상됩니다.
+  - type: code
+    language: python
+    title: 주말 데이터
+    description: IN 목록
+    content: |-
+      tips.query("tips_table", """
+          SELECT * FROM tips_table
+          WHERE day IN ('Sat', 'Sun')
+      """)
+  - type: tip
+    content: "IN (값1, 값2, ...)는 컬럼 값이 괄호 안 목록 중 하나와 일치하면 참입니다. WHERE day IN ('Sat', 'Sun', 'Fri')는 WHERE day = 'Sat' OR day = 'Sun' OR day = 'Fri'와 동일하지만 훨씬 간결합니다. NOT IN으로 목록에 없는 값을 선택할 수도 있습니다."
+
+- id: step12_arithmetic
+  title: 12단계. 산술 연산
+  subtitle: +, -, *, /
+  blocks:
+  - type: text
+    content: SQL은 단순히 데이터를 조회하는 것뿐만 아니라 계산도 수행할 수 있습니다. SELECT 절에서 +, -, *, / 같은 산술 연산자를 사용해 새로운 값을 만들 수 있습니다. 예를 들어 팁이 전체 결제금액의 몇 퍼센트인지 계산하려면 tip / total_bill * 100 같은 수식을 작성합니다. 이렇게 계산된 결과는 새로운 열로 표시되며, AS로 의미 있는 별칭을 붙이면 결과를 이해하기 쉬워집니다. pandas의 df['new_col'] = df['col1'] / df['col2']와 비슷하지만, SQL은 원본 테이블을 변경하지 않고 쿼리 결과에만 나타납니다.
+  - type: code
+    language: python
+    title: 팁 비율 계산
+    description: 산술 연산
+    content: |-
+      tips.query("tips_table", """
+          SELECT
+              total_bill,
+              tip,
+              tip / total_bill * 100 AS tipPct
+          FROM tips_table
+          LIMIT 5
+      """)
+  - type: tip
+    content: "SELECT 절에서 산술 연산자(+, -, *, /)를 사용해 열 간 계산을 수행할 수 있습니다. tip / total_bill * 100은 팁 비율을 퍼센트로 계산합니다. 계산 결과에는 반드시 AS로 별칭을 붙여주세요. 괄호로 연산 우선순위를 명확히 할 수 있습니다: (tip + 5) * 2"
+
+- id: step13_round
+  title: 13단계. 반올림
+  subtitle: ROUND
+  blocks:
+  - type: text
+    content: 산술 연산 결과는 종종 소수점이 너무 길어서 보기 불편합니다. ROUND 함수를 사용하면 소수점 자릿수를 조절해 결과를 깔끔하게 만들 수 있습니다. ROUND(값, 자릿수) 형태로 사용하며, 첫 번째 인자는 반올림할 값(열이나 계산식), 두 번째 인자는 남길 소수점 자릿수입니다. 예를 들어 ROUND(3.14159, 2)는 3.14가 되고, ROUND(15.7, 0)은 16이 됩니다. 팁 비율처럼 퍼센트를 표시할 때는 소수점 1~2자리만 남기는 것이 일반적입니다.
+  - type: code
+    language: python
+    title: 팁 비율 반올림
+    description: ROUND 함수
+    content: |-
+      tips.query("tips_table", """
+          SELECT
+              total_bill,
+              tip,
+              ROUND(tip / total_bill * 100, 1) AS tipPct
+          FROM tips_table
+          LIMIT 5
+      """)
+  - type: tip
+    content: "ROUND(값, 자릿수)는 반올림 함수입니다. 두 번째 인자로 소수점 자릿수를 지정합니다. ROUND(3.14159, 2)는 3.14, ROUND(3.14159, 0)은 3입니다. 자릿수를 음수로 하면 정수 부분을 반올림할 수도 있습니다. ROUND(1234, -2)는 1200입니다."
+
+- id: step14_final
+  title: 14단계. 최종 결과물
+  subtitle: 조건별 팁 데이터 필터링
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 SQL 기초 개념을 종합하여 실전 분석 쿼리를 작성해봅니다. SELECT로 필요한 열을 선택하고, AS로 한글 별칭을 붙이며, WHERE절에 AND, IN, BETWEEN을 조합해 복합 조건을 설정합니다. 산술 연산으로 팁 비율을 계산하고 ROUND로 소수점을 정리합니다. 이런 식으로 여러 개념을 조합하면 복잡한 비즈니스 요구사항도 하나의 SQL 쿼리로 해결할 수 있습니다. "주말 저녁에 20~50달러를 결제하고 5달러 이상 팁을 준 고객"같은 구체적인 분석이 가능합니다.
+  - type: code
+    language: python
+    title: 주말 저녁 고액 팁 분석
+    description: 최종 결과물
+    content: |-
+      tips.query("tips_table", """
+          SELECT
+              day AS 요일,
+              total_bill AS 총금액,
+              tip AS 팁,
+              ROUND(tip / total_bill * 100, 1) AS 팁비율,
+              size AS 인원
+          FROM tips_table
+          WHERE day IN ('Sat', 'Sun')
+            AND time = 'Dinner'
+            AND tip >= 5
+            AND total_bill BETWEEN 20 AND 50
+      """)
+
+- id: practice
+  title: 실습
+  subtitle: 조건별 필터링 프로젝트
+  blocks:
+  - type: text
+    content: 배운 SELECT, WHERE, 연산자를 활용해 다양한 조건으로 데이터를 필터링합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 점심 시간 여성 고객 데이터"
+    blocks:
+    - type: code
+      title: 데이터 로드
+      content: |-
+        import pandas as pd
+        import duckdb
+        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+        tbl = duckdb.from_df(data)
+    - type: code
+      title: 쿼리 실행
+      content: |-
+        tbl.query("t", """
+            SELECT
+                total_bill AS 총금액,
+                tip AS 팁,
+                size AS 인원
+            FROM t
+            WHERE time = 'Lunch' AND sex = 'Female'
+        """)
+  - type: expansion
+    title: "미션2: 2인 이하 소규모 테이블"
+    blocks:
+    - type: code
+      title: 데이터 로드
+      content: |-
+        import pandas as pd
+        import duckdb
+        frame = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+        rel = duckdb.from_df(frame)
+    - type: code
+      title: 쿼리 실행
+      content: |-
+        rel.query("t", """
+            SELECT
+                day AS 요일,
+                time AS 시간,
+                total_bill AS 총금액,
+                tip AS 팁
+            FROM t
+            WHERE size <= 2
+            LIMIT 10
+        """)
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: SQL 기초 쿼리를 마스터했습니다.
+  - type: list
+    items:
+    - "SELECT * FROM - 전체 데이터 조회"
+    - "SELECT col1, col2 - 특정 열 선택"
+    - "AS alias - 별칭 지정"
+    - "WHERE - 조건 필터링"
+    - "LIMIT - 행 수 제한"
+    - "=, !=, >, <, >=, <= - 비교 연산자"
+    - "AND, OR - 논리 연산자"
+    - "BETWEEN - 범위 조건"
+    - "IN - 목록 조건"
+    - "+, -, *, / - 산술 연산"
+    - "ROUND - 반올림"
+  - type: text
+    content: 다음 시간에는 ORDER BY와 집계 함수를 배웁니다.

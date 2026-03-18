@@ -1,0 +1,232 @@
+meta:
+  id: pillow_05
+  title: 밝기대비조절기
+  order: 5
+  category: pillow
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["Pillow", "ImageEnhance", "Brightness", "Contrast", "Color", "Sharpness"]
+  seo:
+    title: "Pillow 기초 - 밝기/대비 조절기"
+    description: "Pillow ImageEnhance로 밝기, 대비, 채도, 선명도를 조절합니다. 사진 보정의 기초를 배웁니다."
+    keywords: ["Pillow", "ImageEnhance", "Brightness", "Contrast", "밝기조절", "대비조절"]
+
+intro:
+  emoji: "☀️"
+  goal: ImageEnhance 모듈로 이미지의 밝기, 대비, 채도, 선명도를 조절합니다.
+  description: Brightness, Contrast, Color, Sharpness 네 가지 조정기를 사용해봅니다. 각 조정기의 enhance() 메서드로 수치를 조절합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 이미지 불러오기
+  subtitle: ImageEnhance 준비
+  blocks:
+  - type: text
+    content: sklearn의 china 이미지를 불러옵니다. ImageEnhance 모듈의 각 클래스는 이미지를 받아 조정기 객체를 생성합니다.
+  - type: code
+    language: python
+    title: 라이브러리와 이미지
+    description: ImageEnhance 모듈을 임포트합니다
+    content: |-
+      from PIL import Image, ImageEnhance
+      from sklearn.datasets import load_sample_image
+
+      chinaArr = load_sample_image('china.jpg')
+      frame = Image.fromarray(chinaArr)
+      frame.size
+  - type: code
+    language: python
+    title: 원본 이미지
+    description: 조절 전 원본입니다
+    content: |-
+      frame
+
+- id: step2_brightness
+  title: 2단계. 밝기 조절
+  subtitle: Brightness
+  blocks:
+  - type: text
+    content: Brightness 클래스는 이미지의 밝기를 조절합니다. enhance(1.0)은 원본, 0.0은 완전히 검은색, 2.0은 두 배 밝습니다. 어두운 사진을 밝게 보정하거나, 과노출 사진을 어둡게 할 때 사용합니다.
+  - type: code
+    language: python
+    title: 밝기 조정기 생성
+    description: Brightness 객체를 만듭니다
+    content: |-
+      brightener = ImageEnhance.Brightness(frame)
+      type(brightener)
+  - type: code
+    language: python
+    title: 어둡게 (0.5)
+    description: 원본의 절반 밝기입니다
+    content: |-
+      dark = brightener.enhance(0.5)
+      dark
+  - type: tip
+    content: enhance()의 factor가 1.0보다 작으면 어두워지고, 크면 밝아집니다. 0.0은 완전한 검정, 1.0은 원본, 2.0은 두 배 밝기입니다. 보통 0.7~1.3 범위에서 자연스러운 조절이 가능합니다.
+  - type: code
+    language: python
+    title: 밝게 (1.5)
+    description: 원본의 1.5배 밝기입니다
+    content: |-
+      bright = brightener.enhance(1.5)
+      bright
+
+- id: step3_contrast
+  title: 3단계. 대비 조절
+  subtitle: Contrast
+  blocks:
+  - type: text
+    content: Contrast 클래스는 이미지의 대비(명암 차이)를 조절합니다. 대비가 높으면 밝은 곳은 더 밝고 어두운 곳은 더 어두워집니다. 대비가 낮으면 전체적으로 회색빛이 됩니다.
+  - type: code
+    language: python
+    title: 대비 조정기 생성
+    description: Contrast 객체를 만듭니다
+    content: |-
+      contraster = ImageEnhance.Contrast(frame)
+      type(contraster)
+  - type: code
+    language: python
+    title: 낮은 대비 (0.5)
+    description: 흐릿한 느낌이 됩니다
+    content: |-
+      lowContrast = contraster.enhance(0.5)
+      lowContrast
+  - type: code
+    language: python
+    title: 높은 대비 (1.5)
+    description: 선명한 느낌이 됩니다
+    content: |-
+      highContrast = contraster.enhance(1.5)
+      highContrast
+  - type: tip
+    content: 대비가 0.0이면 완전한 회색 이미지가 됩니다. 사진 보정에서 대비를 약간 높이면(1.1~1.3) 이미지가 더 선명해 보이는 효과가 있습니다.
+
+- id: step4_color
+  title: 4단계. 채도 조절
+  subtitle: Color
+  blocks:
+  - type: text
+    content: Color 클래스는 이미지의 채도(색상의 선명함)를 조절합니다. 채도가 0이면 흑백, 높으면 색이 더 선명해집니다. 빈티지 효과나 팝아트 효과에 활용됩니다.
+  - type: code
+    language: python
+    title: 채도 조정기 생성
+    description: Color 객체를 만듭니다
+    content: |-
+      saturator = ImageEnhance.Color(frame)
+      type(saturator)
+  - type: code
+    language: python
+    title: 무채색 (0.0)
+    description: 흑백과 동일합니다
+    content: |-
+      desaturated = saturator.enhance(0.0)
+      desaturated
+  - type: code
+    language: python
+    title: 고채도 (2.0)
+    description: 색이 강렬해집니다
+    content: |-
+      saturated = saturator.enhance(2.0)
+      saturated
+  - type: tip
+    content: Color.enhance(0.0)은 convert('L').convert('RGB')와 비슷한 결과를 줍니다. 채도 1.3~1.5 정도로 올리면 사진이 더 생동감 있어 보입니다. SNS 필터에서 자주 쓰이는 기법입니다.
+
+- id: step5_sharpness
+  title: 5단계. 선명도 조절
+  subtitle: Sharpness
+  blocks:
+  - type: text
+    content: Sharpness 클래스는 이미지의 선명도를 조절합니다. 0.0은 블러 효과, 1.0은 원본, 2.0 이상은 샤프 효과입니다. ImageFilter.SHARPEN보다 정교한 조절이 가능합니다.
+  - type: code
+    language: python
+    title: 선명도 조정기 생성
+    description: Sharpness 객체를 만듭니다
+    content: |-
+      sharpener = ImageEnhance.Sharpness(frame)
+      type(sharpener)
+  - type: code
+    language: python
+    title: 블러 효과 (0.0)
+    description: 이미지가 흐려집니다
+    content: |-
+      blurry = sharpener.enhance(0.0)
+      blurry
+  - type: code
+    language: python
+    title: 샤프 효과 (2.0)
+    description: 경계가 선명해집니다
+    content: |-
+      sharp = sharpener.enhance(2.0)
+      sharp
+
+- id: step6_combine
+  title: 6단계. 조합 적용
+  subtitle: 여러 조정 연결
+  blocks:
+  - type: text
+    content: 여러 조정을 순차적으로 적용하여 원하는 효과를 만들 수 있습니다. 각 enhance()가 새 이미지를 반환하므로 체이닝이 가능합니다.
+  - type: code
+    language: python
+    title: 복합 보정
+    description: 밝기 + 대비 + 채도 조합
+    content: |-
+      step1 = ImageEnhance.Brightness(frame).enhance(1.2)
+      step2 = ImageEnhance.Contrast(step1).enhance(1.3)
+      final = ImageEnhance.Color(step2).enhance(1.1)
+      final
+  - type: tip
+    content: 사진 보정의 일반적인 순서는 밝기 → 대비 → 채도 → 선명도입니다. 각 단계에서 작은 값(1.1~1.3)으로 조절하면 자연스러운 결과를 얻을 수 있습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 사진 보정 프로젝트
+  blocks:
+  - type: text
+    content: flower 이미지에 다양한 보정을 적용해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: flower 밝기와 대비 조절"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image, ImageEnhance
+        from sklearn.datasets import load_sample_image
+
+        flowerArr = load_sample_image('flower.jpg')
+        flower = Image.fromarray(flowerArr)
+        flower
+    - type: code
+      title: "밝기 조절"
+      content: |-
+        flowerBright = ImageEnhance.Brightness(flower).enhance(1.3)
+        flowerBright
+    - type: code
+      title: "대비 조절"
+      content: |-
+        flowerContrast = ImageEnhance.Contrast(flowerBright).enhance(1.2)
+        flowerContrast
+  - type: expansion
+    title: "미션2: 빈티지 효과 만들기"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image, ImageEnhance
+        from sklearn.datasets import load_sample_image
+
+        imgArr = load_sample_image('china.jpg')
+        vintage = Image.fromarray(imgArr)
+        vintage
+    - type: code
+      title: "채도 낮추기"
+      content: |-
+        faded = ImageEnhance.Color(vintage).enhance(0.6)
+        faded
+    - type: code
+      title: "대비 낮추고 밝기 올리기"
+      content: |-
+        muted = ImageEnhance.Contrast(faded).enhance(0.9)
+        vintageResult = ImageEnhance.Brightness(muted).enhance(1.1)
+        vintageResult

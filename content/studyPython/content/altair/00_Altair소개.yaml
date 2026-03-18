@@ -1,0 +1,323 @@
+meta:
+  id: altair_00
+  title: Altair소개
+  order: 0
+  category: altair
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags: ["Altair", "Vega-Lite", "선언적시각화", "통계시각화", "인터랙티브", "Marimo"]
+  seo:
+    title: "Altair 입문 - 선언적 통계 시각화 라이브러리"
+    description: "Altair로 간결하고 우아한 시각화를 시작하세요. Vega-Lite 기반의 선언적 문법으로 복잡한 차트도 쉽게 만들 수 있습니다."
+    keywords: ["Altair", "Vega-Lite", "시각화", "데이터시각화", "Python차트", "선언적시각화"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "📊"
+      title: "Altair??"
+      subtitle: "선언적 시각화가 뭐길래?"
+
+    - type: hero
+      emoji: "✨"
+      title: "선언적 통계 시각화 라이브러리"
+      subtitle: "무엇을 그릴지만 말하면, 어떻게는 알아서"
+      points:
+        - emoji: "💡"
+          title: "선언적 문법으로 간결한 코드"
+        - emoji: "📈"
+          title: "통계 시각화에 최적화"
+        - emoji: "🔗"
+          title: "인터랙션 내장"
+        - emoji: "🎯"
+          title: "Marimo에서 자동 인터랙티브"
+
+    - type: image
+      src: "https://raw.githubusercontent.com/altair-viz/altair/main/images/cars_scatter_bar.gif"
+
+- id: what_is_altair
+  blocks:
+    - type: sectionHeader
+      title: "🤔 Altair가 뭔가요?"
+      subtitle: "한마디로 선언적 시각화"
+
+    - type: note
+      style: info
+      title: "선언적(Declarative) 프로그래밍이란?"
+      content: "명령형 프로그래밍이 '이렇게 저렇게 해라'고 단계별로 지시한다면, 선언적 프로그래밍은 '이런 결과를 원한다'고 목표만 말합니다. Altair는 '이 데이터를 x축에, 저 데이터를 y축에 놓고, 색깔은 이걸로'라고 선언하면 나머지는 알아서 처리합니다."
+
+    - type: featureCards
+      cards:
+        - emoji: "📝"
+          title: "선언적 문법"
+          description: "원하는 결과를 기술하면 차트가 생성"
+        - emoji: "🎨"
+          title: "Vega-Lite 기반"
+          description: "표준화된 시각화 문법 사용"
+        - emoji: "📊"
+          title: "통계 특화"
+          description: "집계, 변환을 차트 내에서 처리"
+        - emoji: "🔌"
+          title: "pandas 연동"
+          description: "DataFrame을 바로 시각화"
+
+- id: why_altair
+  blocks:
+    - type: sectionHeader
+      title: "🌟 왜 Altair가 좋을까요?"
+      subtitle: "데이터 과학자들이 선호하는 이유"
+
+    - type: featureCards
+      cards:
+        - emoji: "✂️"
+          title: "코드가 간결함"
+          description: "Matplotlib 대비 1/3~1/5 코드량"
+        - emoji: "🧠"
+          title: "일관된 문법"
+          description: "모든 차트를 같은 방식으로 생성"
+        - emoji: "📊"
+          title: "차트 내 집계"
+          description: "mean(), count() 등을 차트에서 바로"
+        - emoji: "🔗"
+          title: "인터랙션 내장"
+          description: "브러싱, 선택, 링킹 기본 제공"
+        - emoji: "🎯"
+          title: "타입 추론"
+          description: "데이터 타입에 맞게 자동 조정"
+        - emoji: "📤"
+          title: "다양한 출력"
+          description: "HTML, PNG, SVG, JSON 모두 가능"
+
+- id: altair_vs_others
+  blocks:
+    - type: sectionHeader
+      title: "🆚 Altair vs 다른 라이브러리"
+      subtitle: "각각 언제 쓰면 좋을까요?"
+
+    - type: compare
+      left:
+        title: "Matplotlib"
+        subtitle: "명령형, 저수준"
+        icon: "📉"
+        color: "blue"
+        items:
+          - "세밀한 커스터마이징"
+          - "논문/출판용 그래프"
+          - "정적 이미지 출력"
+          - "풍부한 예제와 문서"
+          - "학습 곡선 높음"
+        infoBox: "세밀한 제어가 필요할 때"
+      right:
+        title: "Altair"
+        subtitle: "선언적, 고수준"
+        icon: "✨"
+        color: "green"
+        items:
+          - "간결한 코드"
+          - "탐색적 데이터 분석"
+          - "인터랙티브 기본 지원"
+          - "통계 시각화 특화"
+          - "학습 곡선 낮음"
+        infoBox: "빠른 탐색과 분석에 최적"
+
+    - type: compare
+      left:
+        title: "Plotly"
+        subtitle: "인터랙티브 특화"
+        icon: "🎨"
+        color: "purple"
+        items:
+          - "화려한 인터랙션"
+          - "대시보드 구축"
+          - "3D 차트 강력"
+          - "지도 시각화 우수"
+          - "상대적으로 무거움"
+        infoBox: "프로덕션 대시보드에 적합"
+      right:
+        title: "Altair"
+        subtitle: "분석 친화적"
+        icon: "✨"
+        color: "green"
+        items:
+          - "분석 워크플로우 최적"
+          - "문법이 더 일관적"
+          - "통계 변환 내장"
+          - "가볍고 빠름"
+          - "브러싱/링킹 우수"
+        infoBox: "탐색적 분석에 최적"
+
+    - type: note
+      style: tip
+      title: "용도에 맞게 선택하세요"
+      content: "논문 그래프는 Matplotlib, 대시보드는 Plotly, 데이터 탐색과 분석은 Altair가 좋습니다. 각 도구의 강점을 알고 상황에 맞게 쓰는 게 핵심입니다."
+
+- id: grammar_intro
+  blocks:
+    - type: sectionHeader
+      title: "📐 선언적 문법의 힘"
+      subtitle: "차트 = 데이터 + 인코딩 + 마크"
+
+    - type: note
+      style: info
+      title: "시각화 문법(Grammar of Graphics)"
+      content: "Altair는 'Grammar of Graphics' 철학을 따릅니다. 차트는 데이터(Data), 인코딩(Encoding), 마크(Mark)의 조합입니다. 데이터의 어떤 열을 어떤 시각 요소(위치, 색상, 크기)에 대응시킬지 선언하면 차트가 완성됩니다."
+
+    - type: featureCards
+      cards:
+        - emoji: "📦"
+          title: "Data"
+          description: "시각화할 데이터 (DataFrame)"
+        - emoji: "🎯"
+          title: "Mark"
+          description: "점, 선, 막대 등 시각 요소"
+        - emoji: "🔗"
+          title: "Encoding"
+          description: "데이터와 시각 요소의 매핑"
+        - emoji: "⚙️"
+          title: "Transform"
+          description: "집계, 필터 등 데이터 변환"
+
+    - type: note
+      style: tip
+      title: "생각의 흐름대로 코딩"
+      content: "alt.Chart(data).mark_point().encode(x='컬럼A', y='컬럼B', color='컬럼C') - 이게 전부입니다. '이 데이터로, 점을 찍어서, x는 A, y는 B, 색깔은 C'라고 생각하는 대로 코드를 작성하면 됩니다."
+
+- id: marimo_integration
+  blocks:
+    - type: sectionHeader
+      title: "🚀 Marimo에서 Altair"
+      subtitle: "자동 인터랙티브의 마법"
+
+    - type: note
+      style: info
+      title: "mo.ui.altair_chart란?"
+      content: "Marimo는 Altair 차트를 자동으로 인터랙티브하게 만들어줍니다. 별도 설정 없이 mo.ui.altair_chart()로 감싸기만 하면 브러싱, 선택, 줌 등이 자동 활성화됩니다. 선택한 데이터를 다른 셀에서 바로 사용할 수도 있습니다."
+
+    - type: featureCards
+      cards:
+        - emoji: "🎯"
+          title: "자동 인터랙티브"
+          description: "추가 코드 없이 인터랙션 활성화"
+        - emoji: "🔄"
+          title: "리액티브 연동"
+          description: "차트 선택이 다른 셀에 반영"
+        - emoji: "📊"
+          title: "데이터 추출"
+          description: "브러싱한 데이터를 DataFrame으로"
+        - emoji: "⚡"
+          title: "실시간 업데이트"
+          description: "데이터 변경시 차트 자동 갱신"
+
+    - type: note
+      style: tip
+      title: "분석과 시각화의 통합"
+      content: "Marimo + Altair 조합은 탐색적 데이터 분석(EDA)에 최적입니다. 차트에서 관심 영역을 선택하면 해당 데이터만 필터링되어 다음 분석에 바로 사용할 수 있습니다. 코드와 시각화가 하나로 연결됩니다."
+
+- id: data_types
+  blocks:
+    - type: sectionHeader
+      title: "📋 데이터 타입 (Q, N, O, T)"
+      subtitle: "Altair가 데이터를 이해하는 방식"
+
+    - type: note
+      style: info
+      title: "왜 타입이 중요한가?"
+      content: "Altair는 데이터 타입에 따라 축, 색상, 범례를 자동으로 결정합니다. 숫자형(Q)은 연속 색상, 범주형(N)은 개별 색상을 사용합니다. 타입을 명시하면 원하는 시각화를 정확히 얻을 수 있습니다."
+
+    - type: table
+      headers: ["타입", "이름", "예시", "시각화"]
+      rows:
+        - ["Q", "Quantitative (정량)", "가격, 나이, 온도", "연속 축, 그라데이션 색상"]
+        - ["N", "Nominal (명목)", "국가, 브랜드, 성별", "개별 축, 구분 색상"]
+        - ["O", "Ordinal (순서)", "학년, 등급, 만족도", "순서 있는 축, 순차 색상"]
+        - ["T", "Temporal (시간)", "날짜, 시간", "시간 축, 시계열 형식"]
+
+    - type: note
+      style: tip
+      title: "타입 지정 방법"
+      content: "x='price:Q', color='country:N'처럼 콜론 뒤에 타입을 붙입니다. Altair가 자동 추론하지만, 명시적으로 지정하면 의도대로 시각화됩니다. 숫자인데 범주로 쓰고 싶으면 :N을 붙이면 됩니다."
+
+- id: interaction_intro
+  blocks:
+    - type: sectionHeader
+      title: "🖱️ 인터랙션 기능"
+      subtitle: "클릭, 드래그, 호버로 데이터 탐색"
+
+    - type: featureCards
+      cards:
+        - emoji: "✋"
+          title: "브러싱(Brushing)"
+          description: "드래그로 영역 선택, 다른 차트와 연동"
+        - emoji: "👆"
+          title: "선택(Selection)"
+          description: "클릭으로 특정 데이터 포인트 선택"
+        - emoji: "🔗"
+          title: "링킹(Linking)"
+          description: "여러 차트를 연결해 동시 탐색"
+        - emoji: "🔍"
+          title: "줌/팬"
+          description: "확대, 축소, 이동으로 상세 탐색"
+        - emoji: "💬"
+          title: "툴팁"
+          description: "호버시 상세 정보 표시"
+        - emoji: "🎚️"
+          title: "슬라이더"
+          description: "범위 조절로 동적 필터링"
+
+    - type: note
+      style: info
+      title: "코드 몇 줄로 인터랙션 추가"
+      content: "Matplotlib에서는 수십 줄이 필요한 인터랙션을, Altair는 selection_interval(), selection_point() 한 줄로 추가합니다. Marimo에서는 이마저도 자동입니다. 탐색적 분석에서 이 차이가 생산성을 크게 높입니다."
+
+- id: projects_preview
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 앞으로 배울 내용"
+      subtitle: "Altair로 이런 것들을 해봅니다"
+
+    - type: table
+      headers: ["단계", "프로젝트", "배울 내용"]
+      rows:
+        - ["입문", "기본 차트", "mark_point, mark_bar, mark_line"]
+        - ["입문", "인코딩", "x, y, color, size, shape"]
+        - ["기초", "집계 차트", "mean(), count(), sum() 변환"]
+        - ["기초", "조건부 색상", "condition, alt.value"]
+        - ["중급", "인터랙션", "selection, 브러싱, 링킹"]
+        - ["중급", "복합 차트", "layer, hconcat, vconcat"]
+        - ["심화", "고급 변환", "fold, pivot, window"]
+        - ["심화", "대시보드", "Marimo 연동 분석"]
+
+    - type: note
+      style: info
+      title: "프로젝트 기반 학습"
+      content: "각 프로젝트에서 실제 데이터를 시각화합니다. 산점도, 막대 그래프부터 시작해 인터랙티브 대시보드까지, 난이도를 높여가며 Altair를 마스터합니다."
+
+- id: resources
+  blocks:
+    - type: sectionHeader
+      title: "📚 참고 자료"
+      subtitle: "더 깊이 공부하고 싶다면"
+
+    - type: links
+      items:
+        - text: Altair 공식 문서
+          url: https://altair-viz.github.io/
+          icon: "🔗"
+        - text: Altair 갤러리
+          url: https://altair-viz.github.io/gallery/
+          icon: "🔗"
+        - text: Vega-Lite 문서
+          url: https://vega.github.io/vega-lite/
+          icon: "🔗"
+        - text: Marimo 문서
+          url: https://docs.marimo.io/
+          icon: "🔗"
+
+- id: next
+  blocks:
+    - type: hero
+      emoji: "👉"
+      title: "다음: 기본 차트 만들기"
+      subtitle: "점, 선, 막대로 첫 번째 Altair 차트를 그려봅니다"

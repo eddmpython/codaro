@@ -1,0 +1,437 @@
+meta:
+  id: folium_04
+  title: 지도 스타일 변경
+  order: 4
+  category: folium
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["folium", "tiles", "TileLayer", "스타일", "테마"]
+  seo:
+    title: "Folium 지도 스타일 - 타일 레이어 변경"
+    description: "Folium으로 지도 스타일을 변경합니다. OpenStreetMap, CartoDB, Stamen 등 다양한 타일을 사용합니다."
+    keywords: ["folium", "tiles", "TileLayer", "CartoDB", "Stamen", "지도 스타일"]
+
+intro:
+  emoji: "🎨"
+  goal: 다양한 타일 레이어로 지도 스타일을 변경합니다.
+  description: Folium은 여러 지도 스타일을 지원합니다. 기본 OpenStreetMap 외에 CartoDB, Stamen 등 다양한 타일을 사용할 수 있습니다. 용도에 맞는 스타일을 선택하여 지도를 꾸밉니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: folium과 marimo를 불러옵니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: folium과 marimo 불러오기
+    content: |-
+      import folium
+      import marimo as mo
+
+- id: step2_default_tiles
+  title: 2단계. 기본 타일
+  subtitle: OpenStreetMap
+  blocks:
+  - type: text
+    content: 기본 타일은 OpenStreetMap입니다. tiles 파라미터를 지정하지 않으면 자동 적용됩니다.
+  - type: code
+    language: python
+    title: 기본 OpenStreetMap
+    description: 기본 타일
+    content: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=12)
+      mo.iframe(m1._repr_html_())
+  - type: code
+    language: python
+    title: tiles 명시
+    description: OpenStreetMap 명시
+    content: |-
+      m2 = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="OpenStreetMap"
+      )
+      mo.iframe(m2._repr_html_())
+  - type: tip
+    content: OpenStreetMap은 무료 오픈소스 지도입니다. 상세한 도로, 건물, POI 정보를 제공합니다.
+
+- id: step3_cartodb
+  title: 3단계. CartoDB 타일
+  subtitle: Positron, DarkMatter
+  blocks:
+  - type: text
+    content: CartoDB는 깔끔한 스타일의 타일을 제공합니다. Positron은 밝은 테마, DarkMatter는 어두운 테마입니다.
+  - type: code
+    language: python
+    title: CartoDB Positron
+    description: 밝은 미니멀 스타일
+    content: |-
+      m3 = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="CartoDB Positron"
+      )
+      mo.iframe(m3._repr_html_())
+  - type: code
+    language: python
+    title: CartoDB DarkMatter
+    description: 다크 테마
+    content: |-
+      m4 = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="CartoDB Dark_Matter"
+      )
+      mo.iframe(m4._repr_html_())
+  - type: tip
+    content: Positron은 데이터 시각화 배경으로 적합합니다. 마커와 도형이 잘 보입니다. DarkMatter는 야간 모드나 밝은 색 데이터에 적합합니다.
+
+- id: step4_stamen
+  title: 4단계. Stamen 타일
+  subtitle: Terrain, Toner, Watercolor
+  blocks:
+  - type: text
+    content: Stamen은 예술적인 지도 타일을 제공합니다. Terrain은 지형, Toner는 흑백, Watercolor는 수채화 스타일입니다.
+  - type: code
+    language: python
+    title: Stamen Terrain
+    description: 지형 강조
+    content: |-
+      m5 = folium.Map(
+          location=[37.6608, 126.9933],
+          zoom_start=12,
+          tiles="Stamen Terrain"
+      )
+      mo.iframe(m5._repr_html_())
+  - type: code
+    language: python
+    title: Stamen Toner
+    description: 흑백 스타일
+    content: |-
+      m6 = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="Stamen Toner"
+      )
+      mo.iframe(m6._repr_html_())
+  - type: code
+    language: python
+    title: Stamen Watercolor
+    description: 수채화 스타일
+    content: |-
+      m7 = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="Stamen Watercolor"
+      )
+      mo.iframe(m7._repr_html_())
+  - type: tip
+    content: Terrain은 산악 지역이나 등산 지도에 적합합니다. Watercolor는 인쇄물이나 예술적 표현에 좋습니다.
+
+- id: step5_tile_comparison
+  title: 5단계. 타일 비교
+  subtitle: 같은 위치 다른 스타일
+  blocks:
+  - type: text
+    content: 동일한 위치를 여러 타일 스타일로 비교해봅니다.
+  - type: code
+    language: python
+    title: 타일 목록
+    description: 사용 가능한 타일
+    content: |-
+      tiles = [
+          "OpenStreetMap",
+          "CartoDB Positron",
+          "CartoDB Dark_Matter",
+          "Stamen Terrain",
+          "Stamen Toner"
+      ]
+      tiles
+  - type: code
+    language: python
+    title: 첫 번째 비교
+    description: OSM vs Positron
+    content: |-
+      m8 = folium.Map(location=seoulCenter, zoom_start=13, tiles="OpenStreetMap")
+      folium.Marker(seoulCenter, popup="OpenStreetMap").add_to(m8)
+      mo.iframe(m8._repr_html_())
+  - type: code
+    language: python
+    title: 두 번째 비교
+    description: DarkMatter
+    content: |-
+      m9 = folium.Map(location=seoulCenter, zoom_start=13, tiles="CartoDB Dark_Matter")
+      folium.Marker(
+          seoulCenter,
+          popup="Dark Matter",
+          icon=folium.Icon(color="lightred")
+      ).add_to(m9)
+      mo.iframe(m9._repr_html_())
+  - type: tip
+    content: 어두운 배경에서는 밝은 색 마커(lightred, lightblue, white)가 잘 보입니다.
+
+- id: step6_tilelayer
+  title: 6단계. TileLayer 추가
+  subtitle: TileLayer()
+  blocks:
+  - type: text
+    content: TileLayer()로 지도에 타일 레이어를 추가합니다. 여러 타일을 겹쳐 사용하거나 전환할 수 있습니다.
+  - type: code
+    language: python
+    title: TileLayer 추가
+    description: 레이어 방식
+    content: |-
+      m10 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer("OpenStreetMap").add_to(m10)
+
+      mo.iframe(m10._repr_html_())
+  - type: code
+    language: python
+    title: 여러 TileLayer
+    description: 레이어 컨트롤 준비
+    content: |-
+      m11 = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer("OpenStreetMap", name="기본 지도").add_to(m11)
+      folium.TileLayer("CartoDB Positron", name="심플 지도").add_to(m11)
+      folium.TileLayer("CartoDB Dark_Matter", name="다크 모드").add_to(m11)
+
+      folium.LayerControl().add_to(m11)
+
+      mo.iframe(m11._repr_html_())
+  - type: tip
+    content: tiles=None으로 시작하고 TileLayer를 추가하면 LayerControl과 함께 사용할 수 있습니다.
+
+- id: step7_custom_tile
+  title: 7단계. 커스텀 타일 URL
+  subtitle: 외부 타일 서버
+  blocks:
+  - type: text
+    content: URL 템플릿으로 외부 타일 서버를 사용할 수 있습니다. {z}, {x}, {y}는 줌 레벨과 타일 좌표입니다.
+  - type: code
+    language: python
+    title: OpenTopoMap
+    description: 지형도
+    content: |-
+      m12 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
+
+      folium.TileLayer(
+          tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          attr="OpenTopoMap",
+          name="지형도"
+      ).add_to(m12)
+
+      mo.iframe(m12._repr_html_())
+  - type: tip
+    content: attr은 저작권 표시입니다. 타일 제공자의 이용약관에 따라 표시해야 합니다.
+
+- id: step8_tile_opacity
+  title: 8단계. 타일 투명도
+  subtitle: opacity
+  blocks:
+  - type: text
+    content: 타일의 투명도를 조절하여 여러 타일을 겹쳐 볼 수 있습니다.
+  - type: code
+    language: python
+    title: 투명한 타일 겹치기
+    description: 기본 + 투명 레이어
+    content: |-
+      m13 = folium.Map(location=seoulCenter, zoom_start=12)
+
+      folium.TileLayer(
+          tiles="Stamen Toner",
+          opacity=0.3,
+          name="톤 오버레이"
+      ).add_to(m13)
+
+      mo.iframe(m13._repr_html_())
+  - type: tip
+    content: opacity는 0(투명)~1(불투명)입니다. 0.3 정도면 아래 지도가 비쳐 보입니다.
+
+- id: step9_use_cases
+  title: 9단계. 용도별 추천
+  subtitle: 상황에 맞는 타일
+  blocks:
+  - type: text
+    content: 용도에 따라 적합한 타일을 선택합니다.
+  - type: code
+    language: python
+    title: 데이터 시각화용
+    description: CartoDB Positron
+    content: |-
+      dataMap = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="CartoDB Positron"
+      )
+
+      spots = [
+          [37.5665, 126.9780],
+          [37.4979, 127.0276],
+          [37.5563, 126.9236]
+      ]
+
+      for spot in spots:
+          folium.CircleMarker(
+              location=spot,
+              radius=15,
+              color="blue",
+              fill=True,
+              fill_opacity=0.6
+          ).add_to(dataMap)
+
+      mo.iframe(dataMap._repr_html_())
+  - type: code
+    language: python
+    title: 야간 대시보드용
+    description: CartoDB DarkMatter
+    content: |-
+      nightMap = folium.Map(
+          location=seoulCenter,
+          zoom_start=12,
+          tiles="CartoDB Dark_Matter"
+      )
+
+      hotspots = [
+          {"loc": [37.5665, 126.9780], "value": 100},
+          {"loc": [37.4979, 127.0276], "value": 80},
+          {"loc": [37.5563, 126.9236], "value": 60}
+      ]
+
+      for hs in hotspots:
+          folium.CircleMarker(
+              location=hs["loc"],
+              radius=hs["value"] / 5,
+              color="yellow",
+              fill=True,
+              fill_color="orange",
+              fill_opacity=0.7
+          ).add_to(nightMap)
+
+      mo.iframe(nightMap._repr_html_())
+  - type: tip
+    content: 밝은 배경에는 진한 색(blue, red, green), 어두운 배경에는 밝은 색(yellow, orange, white)을 사용하세요.
+
+- id: step10_complete
+  title: 10단계. 완성 예제
+  subtitle: 낮/밤 모드 지도
+  blocks:
+  - type: text
+    content: LayerControl로 낮/밤 모드를 전환할 수 있는 지도를 만듭니다.
+  - type: code
+    language: python
+    title: 낮/밤 전환 지도
+    description: 종합 예제
+    content: |-
+      places = [
+          {"name": "서울시청", "loc": [37.5665, 126.9780]},
+          {"name": "강남역", "loc": [37.4979, 127.0276]},
+          {"name": "홍대입구", "loc": [37.5563, 126.9236]},
+          {"name": "명동", "loc": [37.5636, 126.9869]}
+      ]
+
+      themeMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      folium.TileLayer(
+          "CartoDB Positron",
+          name="낮 모드"
+      ).add_to(themeMap)
+
+      folium.TileLayer(
+          "CartoDB Dark_Matter",
+          name="밤 모드"
+      ).add_to(themeMap)
+
+      for place in places:
+          folium.Marker(
+              location=place["loc"],
+              popup=place["name"],
+              tooltip=place["name"],
+              icon=folium.Icon(color="red", icon="star")
+          ).add_to(themeMap)
+
+      folium.LayerControl().add_to(themeMap)
+
+      mo.iframe(themeMap._repr_html_())
+  - type: tip
+    content: 우측 상단의 레이어 컨트롤에서 낮 모드/밤 모드를 선택할 수 있습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 타일 스타일
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  - type: expansion
+    title: "미션1: 등산 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        mountains = [
+            {"name": "북한산", "loc": [37.6608, 126.9933]},
+            {"name": "관악산", "loc": [37.4450, 126.9639]},
+            {"name": "도봉산", "loc": [37.6985, 127.0145]}
+        ]
+        mountains
+    - type: code
+      title: 지도 생성
+      content: |-
+        hikingMap = folium.Map(
+            location=[37.58, 127.0],
+            zoom_start=11,
+            tiles="Stamen Terrain"
+        )
+
+        for mt in mountains:
+            folium.Marker(
+                location=mt["loc"],
+                popup=mt["name"],
+                icon=folium.Icon(color="green", icon="tree-conifer")
+            ).add_to(hikingMap)
+
+        mo.iframe(hikingMap._repr_html_())
+  - type: expansion
+    title: "미션2: 프레젠테이션용 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        branches = [
+            {"name": "본사", "loc": [37.5665, 126.9780], "size": 30},
+            {"name": "강남지점", "loc": [37.4979, 127.0276], "size": 20},
+            {"name": "영등포지점", "loc": [37.5167, 126.9076], "size": 15}
+        ]
+        branches
+    - type: code
+      title: 지도 생성
+      content: |-
+        presentMap = folium.Map(
+            location=[37.54, 126.98],
+            zoom_start=12,
+            tiles="CartoDB Positron"
+        )
+
+        for branch in branches:
+            folium.CircleMarker(
+                location=branch["loc"],
+                radius=branch["size"],
+                color="#3186cc",
+                fill=True,
+                fill_color="#3186cc",
+                fill_opacity=0.7,
+                popup=f"<b>{branch['name']}</b>"
+            ).add_to(presentMap)
+
+        mo.iframe(presentMap._repr_html_())

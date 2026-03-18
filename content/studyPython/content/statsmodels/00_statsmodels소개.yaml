@@ -1,0 +1,369 @@
+meta:
+  id: statsmodels_00
+  title: statsmodels소개
+  order: 0
+  category: statsmodels
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags: ["statsmodels", "통계분석", "회귀분석", "시계열", "가설검정"]
+  seo:
+    title: "statsmodels 입문 - Python 통계 분석의 표준"
+    description: "statsmodels로 회귀분석, 시계열, 가설검정을 시작하세요. R 수준의 통계 분석을 Python에서 수행할 수 있습니다."
+    keywords: ["statsmodels", "통계분석", "회귀분석", "시계열", "OLS", "ARIMA"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "📊"
+      title: "statsmodels??"
+      subtitle: "Python 통계 분석의 표준 라이브러리"
+
+    - type: hero
+      emoji: "🔬"
+      title: "통계적 추론을 위한 라이브러리"
+      subtitle: "예측이 아닌 이해를 위한 분석"
+      points:
+        - emoji: "📈"
+          title: "회귀분석에 특화"
+        - emoji: "📉"
+          title: "시계열 모델링"
+        - emoji: "🧪"
+          title: "가설 검정"
+        - emoji: "📊"
+          title: "R 수준의 통계량"
+
+- id: what_is_statsmodels
+  blocks:
+    - type: sectionHeader
+      title: "🤔 statsmodels가 뭔가요?"
+      subtitle: "통계적 추론을 위한 도구"
+
+    - type: note
+      style: info
+      title: "예측 vs 추론"
+      content: |-
+        머신러닝(sklearn)은 "예측"에 집중합니다. 미래 값을 맞추는 것이 목표입니다. 하지만 statsmodels는 "이해"에 집중합니다. "왜 이런 결과가 나왔는가?", "이 변수는 통계적으로 유의미한가?"를 답합니다. p-value, 신뢰구간, R² 같은 통계량으로 데이터의 본질을 파악합니다. 비즈니스 의사결정에서는 예측만큼이나 이해가 중요합니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "📐"
+          title: "OLS 회귀분석"
+          description: "최소제곱법으로 변수 간 관계 분석"
+        - emoji: "🎯"
+          title: "통계적 유의성"
+          description: "p-value, t-검정, F-검정"
+        - emoji: "📊"
+          title: "모델 진단"
+          description: "잔차 분석, 이상치 탐지"
+        - emoji: "⏱️"
+          title: "시계열 분석"
+          description: "ARIMA, 계절성 분해"
+
+- id: why_statsmodels
+  blocks:
+    - type: sectionHeader
+      title: "🌟 왜 statsmodels가 필요한가요?"
+      subtitle: "sklearn과의 차이"
+
+    - type: note
+      style: info
+      title: "sklearn vs statsmodels"
+      content: |-
+        sklearn의 LinearRegression은 계수만 반환합니다. 하지만 statsmodels의 OLS는 p-value, R², 표준오차, 신뢰구간, F-통계량 등 30개 이상의 통계량을 제공합니다. "이 변수가 정말 중요한가?"를 판단할 수 있습니다. 논문, 리포트, 비즈니스 분석에서는 이런 통계적 근거가 필수입니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "📋"
+          title: "상세한 summary"
+          description: "R과 동일한 수준의 통계 리포트"
+        - emoji: "🔍"
+          title: "잔차 진단"
+          description: "정규성, 등분산성, 자기상관 검정"
+        - emoji: "📊"
+          title: "회귀 종류 다양"
+          description: "OLS, Logit, Probit, GLM, Robust"
+        - emoji: "⏰"
+          title: "시계열 특화"
+          description: "ARIMA, SARIMA, VAR, 상태공간"
+        - emoji: "🧮"
+          title: "가설 검정 도구"
+          description: "t-test, ANOVA, chi-square, 정규성 검정"
+        - emoji: "📈"
+          title: "비즈니스 활용"
+          description: "매출 예측, A/B 테스트, 인과 분석"
+
+- id: statsmodels_vs_others
+  blocks:
+    - type: sectionHeader
+      title: "🆚 statsmodels vs 다른 라이브러리"
+      subtitle: "언제 무엇을 쓸까?"
+
+    - type: compare
+      left:
+        title: "sklearn"
+        subtitle: "머신러닝, 예측"
+        icon: "🤖"
+        color: "blue"
+        items:
+          - "예측 정확도 최우선"
+          - "복잡한 모델 (RandomForest, XGBoost)"
+          - "교차검증, 하이퍼파라미터 튜닝"
+          - "통계량 최소"
+          - "프로덕션 배포"
+        infoBox: "미래 값을 맞추는 것이 목표"
+      right:
+        title: "statsmodels"
+        subtitle: "통계 분석, 추론"
+        icon: "📊"
+        color: "green"
+        items:
+          - "통계적 유의성 최우선"
+          - "단순하고 해석 가능한 모델"
+          - "p-value, 신뢰구간, R²"
+          - "통계량 30개 이상"
+          - "리포트, 논문 작성"
+        infoBox: "왜 이런 결과인지 이해하는 것이 목표"
+
+    - type: compare
+      left:
+        title: "scipy.stats"
+        subtitle: "기본 통계"
+        icon: "🔢"
+        color: "purple"
+        items:
+          - "t-test, chi-square 등 개별 검정"
+          - "확률분포 계산"
+          - "기술통계량"
+          - "단순 함수 호출"
+        infoBox: "기본 통계 계산용"
+      right:
+        title: "statsmodels"
+        subtitle: "고급 통계 모델"
+        icon: "📊"
+        color: "green"
+        items:
+          - "회귀 모델 종합 분석"
+          - "시계열 예측"
+          - "모델 진단 도구"
+          - "객체지향 API"
+        infoBox: "복잡한 통계 모델링용"
+
+    - type: note
+      style: tip
+      title: "용도별 선택 가이드"
+      content: |-
+        예측 정확도가 중요하면 sklearn, 통계적 근거가 필요하면 statsmodels를 사용하세요. 비즈니스 리포트에서 "광고비가 매출에 미치는 영향이 통계적으로 유의미한가?"를 증명하려면 statsmodels의 p-value가 필수입니다. 반대로 "내일 매출을 최대한 정확히 예측"하려면 sklearn의 앙상블 모델이 좋습니다.
+
+- id: core_concepts
+  blocks:
+    - type: sectionHeader
+      title: "🧩 핵심 개념"
+      subtitle: "statsmodels로 무엇을 할 수 있나요?"
+
+    - type: featureCards
+      cards:
+        - emoji: "1️⃣"
+          title: "단순선형회귀 (OLS)"
+          description: "한 변수로 다른 변수 예측. y = a + bx"
+        - emoji: "2️⃣"
+          title: "다중회귀"
+          description: "여러 변수로 예측. y = a + b₁x₁ + b₂x₂ + ..."
+        - emoji: "3️⃣"
+          title: "로지스틱 회귀"
+          description: "확률 예측. 이탈/비이탈, 구매/미구매"
+        - emoji: "4️⃣"
+          title: "시계열 분해"
+          description: "추세, 계절성, 잔차로 분리"
+        - emoji: "5️⃣"
+          title: "ARIMA"
+          description: "과거 패턴으로 미래 예측"
+        - emoji: "6️⃣"
+          title: "가설 검정"
+          description: "t-test, ANOVA, chi-square"
+
+- id: workflow
+  blocks:
+    - type: sectionHeader
+      title: "🔄 statsmodels 분석 흐름"
+      subtitle: "데이터에서 인사이트까지"
+
+    - type: note
+      style: info
+      title: "전형적인 분석 단계"
+      content: |-
+        1. 데이터 준비: pandas로 전처리
+        2. 모델 정의: sm.OLS(y, X), sm.Logit(y, X) 등
+        3. 학습: .fit()으로 모델 추정
+        4. 평가: .summary()로 통계량 확인
+        5. 진단: 잔차 분석, 정규성 검정
+        6. 예측: .predict()로 미래 값 계산
+        7. 해석: p-value, 계수로 의사결정
+
+    - type: featureCards
+      cards:
+        - emoji: "📦"
+          title: "1. 데이터 로드"
+          description: "pd.read_csv()로 데이터 불러오기"
+        - emoji: "🔧"
+          title: "2. 전처리"
+          description: "결측치 처리, 더미 변수 생성"
+        - emoji: "📐"
+          title: "3. 모델 정의"
+          description: "sm.OLS(y, X), sm.add_constant(X)"
+        - emoji: "🎯"
+          title: "4. 모델 학습"
+          description: ".fit()으로 계수 추정"
+        - emoji: "📊"
+          title: "5. 결과 확인"
+          description: ".summary() 통계량 분석"
+        - emoji: "🔍"
+          title: "6. 진단"
+          description: "잔차 플롯, 정규성 검정"
+
+- id: key_outputs
+  blocks:
+    - type: sectionHeader
+      title: "📋 주요 출력물"
+      subtitle: "statsmodels가 제공하는 정보"
+
+    - type: table
+      headers: ["통계량", "의미", "해석"]
+      rows:
+        - ["R²", "결정계수, 모델 설명력", "0~1 사이, 1에 가까울수록 좋음"]
+        - ["p-value", "통계적 유의성", "< 0.05면 유의미"]
+        - ["coef", "회귀 계수 (기울기)", "변수 1 증가시 y 변화량"]
+        - ["std err", "표준오차", "계수 추정의 불확실성"]
+        - ["t", "t-통계량", "계수 / 표준오차"]
+        - ["F-statistic", "모델 전체 유의성", "p-value가 낮으면 모델 유의미"]
+        - ["AIC/BIC", "모델 선택 기준", "낮을수록 좋은 모델"]
+
+    - type: note
+      style: tip
+      title: "p-value 해석"
+      content: |-
+        p-value < 0.05는 "이 변수가 우연히 이런 관계를 보일 확률이 5% 미만"이라는 뜻입니다. 즉 통계적으로 유의미한 관계입니다. p-value < 0.01이면 더 강력한 증거입니다. 비즈니스 의사결정에서 "광고비를 늘려야 할까?"를 판단할 때 p-value가 근거가 됩니다.
+
+- id: use_cases
+  blocks:
+    - type: sectionHeader
+      title: "💼 실전 활용 사례"
+      subtitle: "statsmodels로 해결하는 비즈니스 문제"
+
+    - type: featureCards
+      cards:
+        - emoji: "📺"
+          title: "마케팅 ROI 분석"
+          description: "광고비가 매출에 미치는 영향 정량화"
+        - emoji: "🏠"
+          title: "가격 책정 전략"
+          description: "부동산, 보험료 등 가격 결정 요인 분석"
+        - emoji: "👥"
+          title: "고객 이탈 예측"
+          description: "어떤 요인이 이탈에 영향을 미치는지 파악"
+        - emoji: "📈"
+          title: "매출 예측"
+          description: "시계열 데이터로 다음 분기 매출 예상"
+        - emoji: "🧪"
+          title: "A/B 테스트 검정"
+          description: "두 그룹 간 차이가 유의미한지 통계 검정"
+        - emoji: "👔"
+          title: "HR 분석"
+          description: "퇴사 요인, 급여 결정 요인 분석"
+
+- id: projects_preview
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 앞으로 배울 내용"
+      subtitle: "10개 프로젝트로 마스터하기"
+
+    - type: table
+      headers: ["단계", "프로젝트", "배울 내용", "비즈니스 가치"]
+      rows:
+        - ["입문", "광고비 매출 예측", "단순회귀, summary, R²", "마케팅 ROI 최적화"]
+        - ["입문", "부동산 가격 예측", "다중회귀, 잔차분석", "부동산 가격 책정"]
+        - ["기초", "매출 다중요인 분석", "VIF, 다중공선성", "매출 드라이버 파악"]
+        - ["기초", "보험료 가격책정", "더미 변수, 범주형", "보험 상품 가격 책정"]
+        - ["기초", "고객 이탈 예측", "로지스틱 회귀, ROC", "고객 유지 전략"]
+        - ["중급", "항공 수요 시계열", "시계열 분해, 계절성", "항공사 용량 계획"]
+        - ["중급", "월마트 매출 예측", "외생변수, SARIMA", "소매 수요 예측"]
+        - ["중급", "직원 퇴사 예측", "가설 검정, t-test", "인재 유지, 채용 계획"]
+        - ["심화", "자전거 수요 ARIMA", "ARIMA, ACF, PACF", "자전거 배치 최적화"]
+        - ["심화", "경제지표 종합분석", "VAR, 모든 개념 종합", "경제 예측, 정책 분석"]
+
+    - type: note
+      style: info
+      title: "프로젝트 기반 학습"
+      content: |-
+        각 프로젝트는 실제 비즈니스 문제를 해결합니다. 단순히 문법을 배우는 것이 아니라, "광고비를 얼마나 늘려야 할까?", "고객 이탈을 줄이려면 어떤 요인을 개선해야 할까?" 같은 실전 질문에 답합니다. 10개 프로젝트를 완료하면 데이터로 비즈니스 의사결정을 지원할 수 있는 역량을 갖추게 됩니다.
+
+- id: statsmodels_vs_r
+  blocks:
+    - type: sectionHeader
+      title: "🔄 R 사용자를 위한 안내"
+      subtitle: "R에서 Python으로"
+
+    - type: note
+      style: info
+      title: "R과의 호환성"
+      content: |-
+        statsmodels는 R의 통계 모델을 Python에 구현한 것입니다. lm(), glm(), arima()와 유사한 API를 제공하며, summary() 출력도 거의 동일합니다. R 경험자라면 쉽게 적응할 수 있습니다. 차이점은 R은 함수형, statsmodels는 객체지향이라는 점입니다.
+
+    - type: table
+      headers: ["R", "statsmodels", "설명"]
+      rows:
+        - ["lm(y ~ x, data)", "sm.OLS(y, sm.add_constant(X)).fit()", "선형회귀"]
+        - ["glm(..., family=binomial)", "sm.Logit(y, X).fit()", "로지스틱 회귀"]
+        - ["summary(model)", "model.summary()", "모델 요약"]
+        - ["predict(model, newdata)", "model.predict(new_X)", "예측"]
+        - ["arima(y, order=c(1,0,1))", "sm.tsa.ARIMA(y, order=(1,0,1)).fit()", "ARIMA"]
+
+- id: installation
+  blocks:
+    - type: sectionHeader
+      title: "📦 설치 및 시작"
+      subtitle: "pyodide 환경에서 바로 사용"
+
+    - type: note
+      style: info
+      title: "브라우저에서 바로 실행"
+      content: |-
+        이 강의는 marimo pyodide 환경에서 실행됩니다. 별도 설치 없이 브라우저에서 바로 코드를 실행할 수 있습니다. micropip.install()로 statsmodels를 불러오면 모든 준비가 끝납니다. 로컬 환경에서는 pip install statsmodels로 설치하면 됩니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🌐"
+          title: "pyodide 환경"
+          description: "브라우저에서 Python 실행"
+        - emoji: "📦"
+          title: "micropip 설치"
+          description: "await micropip.install('statsmodels')"
+        - emoji: "🚀"
+          title: "바로 시작"
+          description: "import statsmodels.api as sm"
+
+- id: resources
+  blocks:
+    - type: sectionHeader
+      title: "📚 참고 자료"
+      subtitle: "더 깊이 공부하고 싶다면"
+
+    - type: links
+      items:
+        - text: statsmodels 공식 문서
+          url: https://www.statsmodels.org/
+          icon: "🔗"
+        - text: statsmodels API Reference
+          url: https://www.statsmodels.org/stable/api.html
+          icon: "🔗"
+        - text: statsmodels Examples
+          url: https://www.statsmodels.org/stable/examples/index.html
+          icon: "🔗"
+
+- id: next
+  blocks:
+    - type: hero
+      emoji: "👉"
+      title: "다음: 광고비 매출 예측"
+      subtitle: "단순선형회귀로 첫 번째 통계 모델을 만들어봅니다"

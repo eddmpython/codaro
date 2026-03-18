@@ -8,6 +8,9 @@
 - `fileOps.py`
 - `packageOps.py`
 
+서버 API는 이제 이 함수를 직접 호출하기보다 workspace 전용 `LocalEngine` capability를 통해 접근한다.
+즉 `system/`은 router가 아니라 runtime이 사용하는 로컬 시스템 어댑터에 가깝다.
+
 ## fileOps
 
 현재 지원 기능:
@@ -22,11 +25,11 @@
 모든 경로는 `Path(...).expanduser().resolve()`를 거친다.
 
 현재 성격은 로컬 워크스페이스 API에 가깝다.
-별도 샌드박스나 project root 제한은 아직 없다.
+workspace root 바깥 경로는 차단한다.
 
 주의점:
 - 삭제와 이동이 실제 파일 시스템에 바로 반영된다
-- root 제한이 없어서 추후 보안 경계 설계가 필요하다
+- workspace root 경계는 있지만 더 세밀한 권한 모델은 아직 없다
 
 ## packageOps
 
@@ -35,16 +38,11 @@
 - 패키지 설치
 - 패키지 삭제
 
-현재 구현 우선순위:
-1. `uv pip`
-2. 실패 시 `python -m pip`
-
-이 폴백은 현재 코드 현실이고, 프로젝트 원칙과는 맞지 않는다.
-후속 정리 대상이다.
+현재 구현은 프로젝트 `.venv`를 기준으로 `uv pip`를 사용한다.
 
 ## 프론트와의 관계
 
-프론트는 `frontend/src/lib/editor/api.js`를 통해 이 기능을 호출한다.
+프론트는 `/api/fs/*`, `/api/packages/*`를 호출하고, 서버는 이를 workspace engine capability로 전달한다.
 장기적으로는 아래 방향으로 갈 가능성이 높다.
 - 파일 트리 패널
 - 패키지 패널
@@ -52,7 +50,7 @@
 
 ## 다음 작업
 
-- 작업 루트 제한
+- session capability와 workspace capability의 권한 차이 정의
 - 파일 타입 정책 정의
 - 삭제/이동 확인 정책
 - `uv` 전용 패키지 관리로 수렴

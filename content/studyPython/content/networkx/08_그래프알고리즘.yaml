@@ -1,0 +1,425 @@
+meta:
+  id: networkx_08
+  title: 그래프알고리즘
+  order: 8
+  category: networkx
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["networkx", "BFS", "DFS", "최소신장트리", "위상정렬"]
+  seo:
+    title: "NetworkX 그래프 알고리즘 - BFS, DFS, MST"
+    description: "NetworkX로 고전 그래프 알고리즘을 배웁니다. BFS, DFS, 최소신장트리, 위상정렬을 실습합니다."
+    keywords: ["networkx", "BFS", "DFS", "MST", "위상정렬", "그래프알고리즘"]
+
+intro:
+  emoji: "🔍"
+  goal: BFS, DFS, 최소신장트리, 위상정렬 등 고전 그래프 알고리즘을 배웁니다.
+  description: 그래프 알고리즘은 컴퓨터 과학의 핵심입니다. 너비우선탐색(BFS)과 깊이우선탐색(DFS)은 그래프 순회의 기본입니다. 최소신장트리(MST)는 모든 노드를 최소 비용으로 연결합니다. 위상정렬은 의존성 순서를 결정합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NetworkX와 matplotlib을 불러옵니다. 그래프 알고리즘은 컴퓨터 과학의 핵심 분야로, 경로 탐색, 네트워크 최적화, 작업 스케줄링 등 다양한 문제를 해결합니다. 이 장에서는 그래프 순회(BFS, DFS), 최소신장트리(MST), 위상정렬 등 고전적이면서 중요한 알고리즘들을 배웁니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: networkx와 matplotlib을 불러옵니다
+    content: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+- id: step2_bfs
+  title: 2단계. 너비우선탐색
+  subtitle: BFS
+  blocks:
+  - type: text
+    content: 너비우선탐색(Breadth-First Search, BFS)은 시작 노드에서 가까운 노드부터 차례로 방문합니다. 마치 물결이 퍼지듯이 레벨(거리) 순서로 탐색합니다. 큐(Queue) 자료구조를 사용하며, 가중치가 없는 그래프에서 최단 경로를 찾는 데 사용됩니다. 소셜 네트워크에서 '친구의 친구' 찾기, 웹 크롤링 등에 활용됩니다.
+  - type: code
+    language: python
+    title: 샘플 그래프
+    description: BFS 탐색용
+    content: |-
+      G = nx.Graph()
+      G.add_edges_from([
+          (1, 2), (1, 3), (2, 4), (2, 5),
+          (3, 6), (3, 7), (4, 8), (5, 8)
+      ])
+      G.number_of_nodes(), G.number_of_edges()
+  - type: code
+    language: python
+    title: BFS 엣지
+    description: 탐색 순서
+    content: |-
+      bfsEdges = list(nx.bfs_edges(G, source=1))
+      bfsEdges
+  - type: code
+    language: python
+    title: BFS 순서
+    description: 노드 방문 순서
+    content: |-
+      bfsNodes = [1] + [v for u, v in bfsEdges]
+      bfsNodes
+  - type: tip
+    content: BFS는 최단 경로 찾기에 사용됩니다. 가중치가 없는 그래프에서 최단 경로를 보장합니다.
+
+- id: step3_dfs
+  title: 3단계. 깊이우선탐색
+  subtitle: DFS
+  blocks:
+  - type: text
+    content: 깊이우선탐색(Depth-First Search, DFS)은 한 방향으로 가능한 깊이 들어간 후, 막히면 되돌아와서 다른 경로를 탐색합니다. 스택(Stack) 또는 재귀 호출로 구현됩니다. 미로 찾기, 퍼즐 풀이, 사이클 탐지, 위상정렬 등에 사용됩니다. BFS와 달리 최단 경로를 보장하지 않지만, 메모리 사용량이 적습니다.
+  - type: code
+    language: python
+    title: DFS 엣지
+    description: 탐색 순서
+    content: |-
+      dfsEdges = list(nx.dfs_edges(G, source=1))
+      dfsEdges
+  - type: code
+    language: python
+    title: DFS 순서
+    description: 노드 방문 순서
+    content: |-
+      dfsNodes = [1] + [v for u, v in dfsEdges]
+      dfsNodes
+  - type: code
+    language: python
+    title: BFS vs DFS 비교
+    description: 방문 순서 차이
+    content: |-
+      comparison = {
+          'BFS': bfsNodes,
+          'DFS': dfsNodes
+      }
+      comparison
+  - type: tip
+    content: BFS는 레벨 순서(1→2,3→4,5,6,7→8), DFS는 한 가지를 깊이 탐색(1→2→4→8→5→3→6→7)합니다.
+
+- id: step4_visualize_traversal
+  title: 4단계. 탐색 시각화
+  subtitle: 방문 순서 표시
+  blocks:
+  - type: text
+    content: BFS와 DFS 탐색 과정을 시각화하면 두 알고리즘의 차이를 직관적으로 이해할 수 있습니다. 노드에 방문 순서를 표시하고, 탐색에 사용된 엣지를 강조합니다. BFS는 너비 방향으로 균등하게 퍼져나가고, DFS는 한 가지를 따라 깊이 들어가는 패턴을 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: BFS 시각화
+    description: 탐색 트리 표시
+    content: |-
+      posG = nx.spring_layout(G, seed=42)
+
+      fig1, ax1 = plt.subplots(figsize=(8, 6))
+      nx.draw(G, pos=posG, with_labels=False, node_color='lightgray',
+              node_size=500, edge_color='lightgray', ax=ax1)
+      nx.draw_networkx_edges(G, pos=posG, edgelist=bfsEdges,
+                              edge_color='blue', width=2, ax=ax1)
+
+      labels = {n: str(i) for i, n in enumerate(bfsNodes)}
+      nx.draw_networkx_labels(G, pos=posG, labels=labels, font_size=12, ax=ax1)
+      ax1.set_title('BFS Traversal Order')
+      fig1
+  - type: code
+    language: python
+    title: DFS 시각화
+    description: 탐색 트리 표시
+    content: |-
+      fig2, ax2 = plt.subplots(figsize=(8, 6))
+      nx.draw(G, pos=posG, with_labels=False, node_color='lightgray',
+              node_size=500, edge_color='lightgray', ax=ax2)
+      nx.draw_networkx_edges(G, pos=posG, edgelist=dfsEdges,
+                              edge_color='red', width=2, ax=ax2)
+
+      labelsDFS = {n: str(i) for i, n in enumerate(dfsNodes)}
+      nx.draw_networkx_labels(G, pos=posG, labels=labelsDFS, font_size=12, ax=ax2)
+      ax2.set_title('DFS Traversal Order')
+      fig2
+
+- id: step5_mst
+  title: 5단계. 최소신장트리
+  subtitle: minimum_spanning_tree()
+  blocks:
+  - type: text
+    content: 최소신장트리(Minimum Spanning Tree, MST)는 그래프의 모든 노드를 연결하면서 엣지 가중치의 합이 최소인 트리입니다. 도시들을 최소 비용으로 도로로 연결하거나, 컴퓨터들을 최소 케이블로 네트워크에 연결하는 문제에 사용됩니다. 크루스칼(Kruskal) 알고리즘이나 프림(Prim) 알고리즘으로 구할 수 있으며, NetworkX는 기본적으로 크루스칼 알고리즘을 사용합니다.
+  - type: code
+    language: python
+    title: 가중치 그래프
+    description: MST 찾기용
+    content: |-
+      wG = nx.Graph()
+      wG.add_edge("A", "B", weight=4)
+      wG.add_edge("A", "C", weight=2)
+      wG.add_edge("B", "C", weight=1)
+      wG.add_edge("B", "D", weight=5)
+      wG.add_edge("C", "D", weight=8)
+      wG.add_edge("C", "E", weight=10)
+      wG.add_edge("D", "E", weight=2)
+      wG.add_edge("D", "F", weight=6)
+      wG.add_edge("E", "F", weight=3)
+      wG.edges(data=True)
+  - type: code
+    language: python
+    title: MST 계산
+    description: 최소신장트리 추출
+    content: |-
+      mst = nx.minimum_spanning_tree(wG)
+      mstEdges = list(mst.edges(data=True))
+      mstEdges
+  - type: code
+    language: python
+    title: MST 비용
+    description: 총 가중치
+    content: |-
+      mstWeight = sum(d['weight'] for u, v, d in mst.edges(data=True))
+      mstWeight
+  - type: tip
+    content: MST는 n개 노드를 n-1개 엣지로 연결합니다. 크루스칼이나 프림 알고리즘을 사용합니다.
+
+- id: step6_mst_viz
+  title: 6단계. MST 시각화
+  subtitle: 신장트리 강조
+  blocks:
+  - type: text
+    content: 원래 그래프와 최소신장트리를 함께 시각화하면 어떤 엣지가 선택되었는지 직관적으로 확인할 수 있습니다. MST에 포함된 엣지를 다른 색으로 강조하고, 각 엣지의 가중치를 표시합니다. MST는 항상 n-1개의 엣지만 가지며(n은 노드 수), 사이클이 없는 트리 구조입니다.
+  - type: code
+    language: python
+    title: MST 시각화
+    description: 신장트리 강조
+    content: |-
+      posW = nx.spring_layout(wG, seed=42)
+
+      fig3, ax3 = plt.subplots(figsize=(10, 7))
+      nx.draw(wG, pos=posW, with_labels=True, node_color='lightblue',
+              node_size=700, edge_color='lightgray', width=1, ax=ax3)
+
+      mstEdgeList = [(u, v) for u, v, d in mstEdges]
+      nx.draw_networkx_edges(wG, pos=posW, edgelist=mstEdgeList,
+                              edge_color='green', width=3, ax=ax3)
+
+      edgeLabels = nx.get_edge_attributes(wG, 'weight')
+      nx.draw_networkx_edge_labels(wG, pos=posW, edge_labels=edgeLabels,
+                                    font_size=10, ax=ax3)
+      ax3.set_title(f'Minimum Spanning Tree (Total: {mstWeight})')
+      fig3
+
+- id: step7_topological
+  title: 7단계. 위상정렬
+  subtitle: topological_sort()
+  blocks:
+  - type: text
+    content: 위상정렬(Topological Sort)은 방향 비순환 그래프(DAG)에서 모든 엣지가 앞에서 뒤로 향하도록 노드를 일렬로 나열하는 것입니다. '선행 작업이 완료된 후에만 수행 가능'한 의존성 관계를 반영합니다. 소프트웨어 패키지 설치 순서, 대학 수강 순서(선수과목), 빌드 시스템의 컴파일 순서 등에 사용됩니다. 사이클이 있으면 위상정렬이 불가능합니다.
+  - type: code
+    language: python
+    title: DAG 생성
+    description: 의존성 그래프
+    content: |-
+      dag = nx.DiGraph()
+      dag.add_edges_from([
+          ("A", "B"), ("A", "C"),
+          ("B", "D"), ("C", "D"),
+          ("D", "E"), ("C", "E")
+      ])
+      dag.edges()
+  - type: code
+    language: python
+    title: 위상정렬
+    description: 의존성 순서
+    content: |-
+      topoOrder = list(nx.topological_sort(dag))
+      topoOrder
+  - type: code
+    language: python
+    title: 모든 위상정렬
+    description: 가능한 모든 순서
+    content: |-
+      allTopo = list(nx.all_topological_sorts(dag))
+      allTopo
+  - type: tip
+    content: 위상정렬은 "선행 작업이 완료된 후에만 수행"하는 순서입니다. DAG에서만 가능합니다.
+
+- id: step8_dag_viz
+  title: 8단계. DAG 시각화
+  subtitle: 의존성 그래프
+  blocks:
+  - type: text
+    content: DAG(Directed Acyclic Graph, 방향 비순환 그래프)를 시각화하면 의존성 구조를 명확히 볼 수 있습니다. 화살표는 의존성 방향을 나타내며, A→B는 'A가 완료되어야 B를 시작할 수 있음'을 의미합니다. 위상정렬 순서 번호를 노드에 표시하면 작업 순서를 한눈에 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: DAG 시각화
+    description: 의존성 방향 표시
+    content: |-
+      posDAG = nx.spring_layout(dag, seed=42)
+
+      fig4, ax4 = plt.subplots(figsize=(8, 6))
+      nx.draw(dag, pos=posDAG, with_labels=True, node_color='wheat',
+              node_size=800, font_size=12, arrows=True, arrowsize=20, ax=ax4)
+      ax4.set_title('Directed Acyclic Graph (DAG)')
+      fig4
+  - type: code
+    language: python
+    title: 위상 순서 라벨
+    description: 순서 번호 표시
+    content: |-
+      topoLabels = {n: f"{n}({i})" for i, n in enumerate(topoOrder)}
+
+      fig5, ax5 = plt.subplots(figsize=(8, 6))
+      nx.draw(dag, pos=posDAG, labels=topoLabels, node_color='lightgreen',
+              node_size=900, font_size=10, arrows=True, arrowsize=20, ax=ax5)
+      ax5.set_title('Topological Order')
+      fig5
+
+- id: step9_ancestors
+  title: 9단계. 조상과 후손
+  subtitle: ancestors(), descendants()
+  blocks:
+  - type: text
+    content: 방향 그래프에서 ancestors()는 특정 노드에 도달할 수 있는 모든 선행 노드(조상)를, descendants()는 특정 노드에서 출발하여 도달할 수 있는 모든 후행 노드(후손)를 반환합니다. 작업 스케줄링에서 '이 작업을 하려면 어떤 작업들이 먼저 완료되어야 하는가?'(조상), '이 작업이 완료되면 어떤 작업들을 시작할 수 있는가?'(후손)를 분석하는 데 유용합니다.
+  - type: code
+    language: python
+    title: 조상 노드
+    description: E의 선행 노드들
+    content: |-
+      ancestorsE = nx.ancestors(dag, "E")
+      ancestorsE
+  - type: code
+    language: python
+    title: 후손 노드
+    description: A의 후행 노드들
+    content: |-
+      descendantsA = nx.descendants(dag, "A")
+      descendantsA
+  - type: code
+    language: python
+    title: 도달 가능성
+    description: A에서 E로 갈 수 있는가
+    content: |-
+      canReach = nx.has_path(dag, "A", "E")
+      pathAE = nx.shortest_path(dag, "A", "E")
+      canReach, pathAE
+  - type: tip
+    content: DAG에서 조상은 "나보다 먼저 완료되어야 하는 작업", 후손은 "나 이후에 시작할 수 있는 작업"입니다.
+
+- id: step10_practical
+  title: 10단계. 실전 응용
+  subtitle: 작업 스케줄링
+  blocks:
+  - type: text
+    content: 프로젝트 작업 의존성을 DAG로 모델링하고 실행 순서를 결정하는 실전 예제입니다. 소프트웨어 개발 프로젝트에서 설계 → 프론트엔드/백엔드 개발 → API → 통합 → 테스트 → 배포의 의존성을 그래프로 표현합니다. 위상정렬을 통해 작업들의 올바른 실행 순서를 자동으로 도출할 수 있습니다.
+  - type: code
+    language: python
+    title: 프로젝트 그래프
+    description: 작업 의존성
+    content: |-
+      project = nx.DiGraph()
+      project.add_edge("Design", "Frontend")
+      project.add_edge("Design", "Backend")
+      project.add_edge("Backend", "API")
+      project.add_edge("Frontend", "Integration")
+      project.add_edge("API", "Integration")
+      project.add_edge("Integration", "Testing")
+      project.add_edge("Testing", "Deploy")
+      project.edges()
+  - type: code
+    language: python
+    title: 실행 순서
+    description: 위상정렬로 결정
+    content: |-
+      schedule = list(nx.topological_sort(project))
+      schedule
+  - type: code
+    language: python
+    title: 프로젝트 시각화
+    description: 작업 흐름도
+    content: |-
+      posProj = nx.spring_layout(project, seed=42)
+
+      fig6, ax6 = plt.subplots(figsize=(10, 7))
+      nx.draw(project, pos=posProj, with_labels=True, node_color='lightcoral',
+              node_size=1200, font_size=9, arrows=True, arrowsize=15, ax=ax6)
+      ax6.set_title('Project Task Dependencies')
+      fig6
+
+- id: practice
+  title: 실습
+  subtitle: 그래프 알고리즘
+  blocks:
+  - type: text
+    content: 지금까지 배운 그래프 알고리즘을 활용하여 실전 미션을 수행해봅시다. 네트워크 케이블링 비용을 최소화하는 MST 문제와 소프트웨어 빌드 순서를 결정하는 위상정렬 문제를 해결합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 네트워크 케이블링"
+    blocks:
+    - type: code
+      title: 네트워크 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        data = nx.Graph()
+        data.add_edge("Server", "Switch1", weight=10)
+        data.add_edge("Server", "Switch2", weight=15)
+        data.add_edge("Switch1", "Switch2", weight=5)
+        data.add_edge("Switch1", "PC1", weight=3)
+        data.add_edge("Switch1", "PC2", weight=4)
+        data.add_edge("Switch2", "PC3", weight=6)
+        data.add_edge("Switch2", "PC4", weight=7)
+        data.add_edge("PC1", "PC2", weight=2)
+        data.edges(data=True)
+    - type: code
+      title: MST 계산
+      content: |-
+        mstData = nx.minimum_spanning_tree(data)
+        mstCost = sum(d['weight'] for u, v, d in mstData.edges(data=True))
+        list(mstData.edges(data=True)), mstCost
+    - type: code
+      title: 시각화
+      content: |-
+        posData = nx.spring_layout(data, seed=42)
+        mstEdgeList = list(mstData.edges())
+
+        chart, plot = plt.subplots(figsize=(10, 8))
+        nx.draw(data, pos=posData, with_labels=True, node_color='lightblue',
+                node_size=800, edge_color='lightgray', ax=plot)
+        nx.draw_networkx_edges(data, pos=posData, edgelist=mstEdgeList,
+                                edge_color='green', width=3, ax=plot)
+        labels = nx.get_edge_attributes(data, 'weight')
+        nx.draw_networkx_edge_labels(data, pos=posData, edge_labels=labels, ax=plot)
+        plot.set_title(f'Network Cabling MST (Cost: {mstCost})')
+        chart
+  - type: expansion
+    title: "미션2: 빌드 순서"
+    blocks:
+    - type: code
+      title: 의존성 정의
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        df = nx.DiGraph()
+        df.add_edge("utils", "core")
+        df.add_edge("config", "core")
+        df.add_edge("core", "services")
+        df.add_edge("core", "models")
+        df.add_edge("services", "api")
+        df.add_edge("models", "api")
+        df.add_edge("api", "main")
+        df.edges()
+    - type: code
+      title: 빌드 순서
+      content: |-
+        buildOrder = list(nx.topological_sort(df))
+        buildOrder
+    - type: code
+      title: 시각화
+      content: |-
+        posDf = nx.spring_layout(df, seed=42)
+        orderLabels = {n: f"{i+1}.{n}" for i, n in enumerate(buildOrder)}
+
+        canvas, panel = plt.subplots(figsize=(10, 7))
+        nx.draw(df, pos=posDf, labels=orderLabels, node_color='lightyellow',
+                node_size=1000, font_size=9, arrows=True, arrowsize=15, ax=panel)
+        panel.set_title('Build Order (Topological Sort)')
+        canvas

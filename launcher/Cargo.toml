@@ -1,0 +1,3 @@
+[workspace]
+members = ["codaro-launcher"]
+resolver = "2"

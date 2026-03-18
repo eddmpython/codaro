@@ -1,0 +1,603 @@
+meta:
+  id: "13"
+  title: "collections 심화"
+  day: 13
+  category: "advancedPython"
+  tags: ["namedtuple", "defaultdict", "Counter", "deque", "ChainMap"]
+  seo:
+    title: "파이썬 collections 모듈 완벽 가이드 - 특수 자료구조"
+    description: "collections 모듈을 마스터합니다. namedtuple, defaultdict, Counter, deque, OrderedDict, ChainMap 완벽 이해."
+    keywords: ["namedtuple", "defaultdict", "Counter", "deque", "ChainMap"]
+
+intro:
+  emoji: "📚"
+  points:
+  - "namedtuple로 이름 있는 튜플"
+  - "defaultdict로 KeyError 없는 딕셔너리"
+  - "Counter로 빈도 계산"
+  - "deque로 양방향 큐"
+
+sections:
+- id: "namedtuple"
+  title: "namedtuple"
+  subtitle: "이름 있는 튜플"
+  blocks:
+  - type: "text"
+    content: "namedtuple은 인덱스 대신 이름으로 요소에 접근할 수 있는 튜플입니다. 일반 튜플처럼 불변(immutable)이고 해시 가능합니다. 메모리 효율적이며 일반 클래스보다 가볍습니다. _fields, _asdict(), _replace() 등 유용한 메서드를 제공합니다. 간단한 데이터 구조에 적합하며, 더 복잡한 경우 dataclass를 사용합니다. Python 3.6+에서는 typing.NamedTuple로 타입 힌트를 추가할 수 있습니다."
+  - type: "list"
+    items:
+    - "namedtuple(이름, 필드들): 새 타입 생성"
+    - "인덱스와 이름 모두 접근 가능"
+    - "불변, 해시 가능"
+    - "_asdict(), _replace(), _fields"
+  - type: "code"
+    language: "python"
+    title: "namedtuple 기본"
+    description: "이름 있는 튜플을 생성합니다."
+    content: |-
+      from collections import namedtuple
+
+      Point = namedtuple('Point', ['x', 'y'])
+      pt = Point(3, 4)
+      pt.x, pt.y, pt[0], pt[1]
+  - type: "code"
+    language: "python"
+    title: "유용한 메서드"
+    description: "_asdict, _replace, _fields를 활용합니다."
+    content: |-
+      from collections import namedtuple
+
+      Person = namedtuple('Person', 'name age city')
+      alice = Person('Alice', 30, 'Seoul')
+
+      alice._asdict(), alice._replace(age=31), Person._fields
+  - type: "code"
+    language: "python"
+    title: "typing.NamedTuple"
+    description: "타입 힌트가 있는 namedtuple입니다."
+    content: |-
+      from typing import NamedTuple
+
+      class Coordinate(NamedTuple):
+          lat: float
+          lon: float
+          name: str = "Unknown"
+
+      coord = Coordinate(37.5, 127.0, "Seoul")
+      coord.lat, coord.name
+  - type: "tip"
+    content: "namedtuple은 CSV 행이나 데이터베이스 레코드를 표현할 때 유용합니다."
+
+- id: "defaultdict"
+  title: "defaultdict"
+  subtitle: "기본값 딕셔너리"
+  blocks:
+  - type: "text"
+    content: "defaultdict는 존재하지 않는 키에 접근할 때 자동으로 기본값을 생성합니다. 생성자에 팩토리 함수를 전달합니다. list, int, set 등을 팩토리로 자주 사용합니다. 그룹화, 카운팅, 집계 등의 패턴에서 if 키 존재 검사를 제거합니다. 일반 딕셔너리처럼 모든 메서드를 사용할 수 있습니다. 중첩 defaultdict로 다차원 구조도 만들 수 있습니다."
+  - type: "list"
+    items:
+    - "defaultdict(factory): 기본값 팩토리"
+    - "list, int, set 자주 사용"
+    - "KeyError 없이 접근"
+    - "그룹화, 카운팅에 유용"
+  - type: "code"
+    language: "python"
+    title: "그룹화"
+    description: "리스트 팩토리로 그룹화합니다."
+    content: |-
+      from collections import defaultdict
+
+      words = ['apple', 'banana', 'apricot', 'blueberry', 'cherry']
+      grouped = defaultdict(list)
+
+      for word in words:
+          grouped[word[0]].append(word)
+
+      dict(grouped)
+  - type: "code"
+    language: "python"
+    title: "카운팅"
+    description: "int 팩토리로 카운팅합니다."
+    content: |-
+      from collections import defaultdict
+
+      text = "hello world"
+      counts = defaultdict(int)
+
+      for char in text:
+          counts[char] += 1
+
+      dict(counts)
+  - type: "code"
+    language: "python"
+    title: "중첩 defaultdict"
+    description: "다차원 구조를 만듭니다."
+    content: |-
+      from collections import defaultdict
+
+      def nestedDict():
+          return defaultdict(nestedDict)
+
+      data = nestedDict()
+      data['users']['alice']['email'] = 'alice@example.com'
+      data['users']['bob']['email'] = 'bob@example.com'
+
+      data['users']['alice']['email']
+  - type: "tip"
+    content: "defaultdict(lambda: '기본값')처럼 람다로 커스텀 기본값을 만들 수 있습니다."
+
+- id: "counter"
+  title: "Counter"
+  subtitle: "빈도 계산"
+  blocks:
+  - type: "text"
+    content: "Counter는 해시 가능한 객체의 개수를 세는 특수 딕셔너리입니다. iterable을 전달하면 자동으로 빈도를 계산합니다. most_common(n)으로 가장 흔한 n개를 가져옵니다. Counter끼리 +, -, &, | 연산이 가능합니다. elements()로 개수만큼 요소를 반복합니다. 텍스트 분석, 투표 집계 등에 유용합니다."
+  - type: "list"
+    items:
+    - "Counter(iterable): 빈도 딕셔너리"
+    - "most_common(n): 상위 n개"
+    - "+, -, &, |: Counter 연산"
+    - "elements(): 개수만큼 반복"
+  - type: "code"
+    language: "python"
+    title: "기본 사용"
+    description: "문자열의 문자 빈도를 계산합니다."
+    content: |-
+      from collections import Counter
+
+      text = "abracadabra"
+      counts = Counter(text)
+      counts, counts.most_common(3)
+  - type: "code"
+    language: "python"
+    title: "Counter 연산"
+    description: "Counter끼리 연산합니다."
+    content: |-
+      from collections import Counter
+
+      a = Counter(cats=4, dogs=2)
+      b = Counter(cats=1, dogs=5, birds=3)
+
+      a + b, a - b, a & b, a | b
+  - type: "code"
+    language: "python"
+    title: "단어 빈도"
+    description: "텍스트에서 단어 빈도를 계산합니다."
+    content: |-
+      from collections import Counter
+
+      text = "the quick brown fox jumps over the lazy dog the fox"
+      words = text.split()
+      wordCounts = Counter(words)
+
+      wordCounts.most_common(3)
+  - type: "tip"
+    content: "Counter()는 빈 카운터, Counter(a=1, b=2)는 직접 지정도 가능합니다."
+
+- id: "deque"
+  title: "deque"
+  subtitle: "양방향 큐"
+  blocks:
+  - type: "text"
+    content: "deque(double-ended queue)는 양 끝에서 O(1) 시간에 추가/삭제가 가능합니다. 리스트의 왼쪽 삽입/삭제는 O(n)이지만 deque는 O(1)입니다. maxlen을 지정하면 고정 크기 버퍼로 동작합니다. rotate(n)으로 요소를 회전할 수 있습니다. 큐, 스택, 슬라이딩 윈도우 등에 사용합니다. appendleft, popleft, extendleft 등 왼쪽 연산을 지원합니다."
+  - type: "list"
+    items:
+    - "append/appendleft: 양 끝 추가"
+    - "pop/popleft: 양 끝 삭제"
+    - "maxlen: 고정 크기 버퍼"
+    - "rotate(n): 회전"
+  - type: "code"
+    language: "python"
+    title: "기본 사용"
+    description: "양 끝에서 추가/삭제합니다."
+    content: |-
+      from collections import deque
+
+      queue = deque([1, 2, 3])
+      queue.append(4)
+      queue.appendleft(0)
+      queue.pop(), queue.popleft(), list(queue)
+  - type: "code"
+    language: "python"
+    title: "maxlen 버퍼"
+    description: "고정 크기로 오래된 항목을 자동 삭제합니다."
+    content: |-
+      from collections import deque
+
+      history = deque(maxlen=3)
+      for i in range(5):
+          history.append(i)
+
+      list(history)
+  - type: "code"
+    language: "python"
+    title: "rotate"
+    description: "요소를 회전합니다."
+    content: |-
+      from collections import deque
+
+      rotatable = deque([1, 2, 3, 4, 5])
+      rotatable.rotate(2)
+      rotatedRight = list(rotatable)
+
+      rotatable.rotate(-2)
+      rotatedBack = list(rotatable)
+
+      rotatedRight, rotatedBack
+  - type: "tip"
+    content: "deque는 스레드 안전한 append와 popleft를 제공합니다."
+
+- id: "ordereddict"
+  title: "OrderedDict"
+  subtitle: "순서 보장 딕셔너리"
+  blocks:
+  - type: "text"
+    content: "OrderedDict는 삽입 순서를 보장하는 딕셔너리입니다. Python 3.7+에서 일반 dict도 순서를 보장하지만, OrderedDict는 추가 기능이 있습니다. move_to_end()로 요소를 끝으로 이동할 수 있습니다. 순서까지 고려하여 동등성을 비교합니다. popitem(last=False)로 첫 번째 항목을 제거할 수 있습니다. LRU 캐시 구현 등에 유용합니다."
+  - type: "list"
+    items:
+    - "삽입 순서 보장 (Python 3.7+ dict도 보장)"
+    - "move_to_end(key): 끝으로 이동"
+    - "popitem(last=False): 첫 번째 제거"
+    - "순서까지 비교하는 == 연산"
+  - type: "code"
+    language: "python"
+    title: "기본 사용"
+    description: "OrderedDict를 생성합니다."
+    content: |-
+      from collections import OrderedDict
+
+      od = OrderedDict()
+      od['a'] = 1
+      od['b'] = 2
+      od['c'] = 3
+      list(od.items())
+  - type: "code"
+    language: "python"
+    title: "move_to_end"
+    description: "요소를 끝으로 이동합니다."
+    content: |-
+      from collections import OrderedDict
+
+      od = OrderedDict([('a', 1), ('b', 2), ('c', 3)])
+      od.move_to_end('a')
+      toEnd = list(od.keys())
+
+      od.move_to_end('c', last=False)
+      toStart = list(od.keys())
+
+      toEnd, toStart
+  - type: "code"
+    language: "python"
+    title: "순서 비교"
+    description: "OrderedDict는 순서까지 비교합니다."
+    content: |-
+      from collections import OrderedDict
+
+      od1 = OrderedDict([('a', 1), ('b', 2)])
+      od2 = OrderedDict([('b', 2), ('a', 1)])
+      d1 = {'a': 1, 'b': 2}
+      d2 = {'b': 2, 'a': 1}
+
+      od1 == od2, d1 == d2
+  - type: "tip"
+    content: "일반적인 경우 Python 3.7+ dict로 충분하며, 특수 기능이 필요할 때 OrderedDict를 사용합니다."
+
+- id: "chainmap"
+  title: "ChainMap"
+  subtitle: "딕셔너리 체인"
+  blocks:
+  - type: "text"
+    content: "ChainMap은 여러 딕셔너리를 하나처럼 연결합니다. 키 검색은 첫 번째 딕셔너리부터 순서대로 진행됩니다. 쓰기 작업은 첫 번째 딕셔너리에만 적용됩니다. 설정 계층(기본값 → 사용자 설정 → 환경변수)에 유용합니다. new_child()로 새 계층을 추가할 수 있습니다. maps 속성으로 원본 딕셔너리 리스트에 접근합니다."
+  - type: "list"
+    items:
+    - "ChainMap(*dicts): 딕셔너리 체인"
+    - "검색: 첫 번째부터 순서대로"
+    - "쓰기: 첫 번째에만 적용"
+    - "new_child(): 새 계층 추가"
+  - type: "code"
+    language: "python"
+    title: "기본 사용"
+    description: "여러 딕셔너리를 연결합니다."
+    content: |-
+      from collections import ChainMap
+
+      defaults = {'theme': 'light', 'language': 'en'}
+      userSettings = {'theme': 'dark'}
+
+      config = ChainMap(userSettings, defaults)
+      config['theme'], config['language']
+  - type: "code"
+    language: "python"
+    title: "new_child"
+    description: "새 계층을 추가합니다."
+    content: |-
+      from collections import ChainMap
+
+      defaults = {'a': 1, 'b': 2}
+      config = ChainMap(defaults)
+
+      child = config.new_child({'a': 10, 'c': 30})
+      child['a'], child['b'], child['c']
+  - type: "code"
+    language: "python"
+    title: "설정 계층"
+    description: "다중 설정 소스를 관리합니다."
+    content: |-
+      from collections import ChainMap
+
+      defaults = {'debug': False, 'port': 8080}
+      envVars = {'port': 3000}
+      cmdArgs = {'debug': True}
+
+      config = ChainMap(cmdArgs, envVars, defaults)
+      config['debug'], config['port']
+  - type: "tip"
+    content: "ChainMap은 복사 없이 여러 딕셔너리를 논리적으로 합칩니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "collections 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 13에서 배운 collections 모듈을 난이도별로 복습합니다. collections는 내장 자료구조를 확장한 특수 컨테이너를 제공하는 표준 라이브러리입니다. namedtuple로 이름 있는 튜플, defaultdict로 기본값 딕셔너리, Counter로 빈도 계산, deque로 양방향 큐를 구현합니다. 🟢 기본 문제로 각 자료구조의 기본 사용법을 익히고, 🟡 응용 문제로 중첩 defaultdict, Counter 연산을 연습하세요. 🔴 심화 문제에서는 LRU 캐시, 슬라이딩 윈도우, 복합 자료구조 등 실무 패턴을 다룹니다. 적절한 자료구조 선택은 코드 가독성과 성능 모두에 큰 영향을 미칩니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: namedtuple"
+    code: |-
+      from collections import namedtuple
+
+      Color = namedtuple('Color', ['r', 'g', 'b'])
+      red = Color(255, 0, 0)
+      red.r, red.g, red.b
+
+  - type: "expansion"
+    title: "🟢 기본2: defaultdict list"
+    code: |-
+      from collections import defaultdict
+
+      groups = defaultdict(list)
+      groups['a'].append(1)
+      groups['a'].append(2)
+      groups['b'].append(3)
+      dict(groups)
+
+  - type: "expansion"
+    title: "🟢 기본3: Counter"
+    code: |-
+      from collections import Counter
+
+      Counter("mississippi")
+
+  - type: "expansion"
+    title: "🟢 기본4: deque 기본"
+    code: |-
+      from collections import deque
+
+      queue2 = deque([1, 2, 3])
+      queue2.appendleft(0)
+      queue2.append(4)
+      list(queue2)
+
+  - type: "expansion"
+    title: "🟢 기본5: ChainMap"
+    code: |-
+      from collections import ChainMap
+
+      a = {'x': 1}
+      b = {'y': 2}
+      cm = ChainMap(a, b)
+      cm['x'], cm['y']
+
+  - type: "expansion"
+    title: "🟡 응용1: _asdict와 _replace"
+    code: |-
+      from collections import namedtuple
+
+      Point = namedtuple('Point', 'x y')
+      pt2 = Point(3, 4)
+      pt2._asdict(), pt2._replace(x=10)
+
+  - type: "expansion"
+    title: "🟡 응용2: defaultdict 중첩"
+    code: |-
+      from collections import defaultdict
+
+      tree = lambda: defaultdict(tree)
+      data = tree()
+      data['a']['b']['c'] = 'value'
+      data['a']['b']['c']
+
+  - type: "expansion"
+    title: "🟡 응용3: Counter 연산"
+    code: |-
+      from collections import Counter
+
+      votes1 = Counter(A=10, B=5)
+      votes2 = Counter(A=3, B=8, C=2)
+      combined = votes1 + votes2
+      combined.most_common()
+
+  - type: "expansion"
+    title: "🟡 응용4: deque maxlen"
+    code: |-
+      from collections import deque
+
+      recent = deque(maxlen=3)
+      for i in range(5):
+          recent.append(i)
+      list(recent)
+
+  - type: "expansion"
+    title: "🟡 응용5: OrderedDict"
+    code: |-
+      from collections import OrderedDict
+
+      od = OrderedDict([('c', 3), ('a', 1), ('b', 2)])
+      od.move_to_end('c', last=False)
+      list(od.keys())
+
+  - type: "expansion"
+    title: "🔴 심화1: NamedTuple 상속"
+    code: |-
+      from typing import NamedTuple
+
+      class Point(NamedTuple):
+          x: float
+          y: float
+
+          def distance(self) -> float:
+              return (self.x ** 2 + self.y ** 2) ** 0.5
+
+      Point(3, 4).distance()
+
+  - type: "expansion"
+    title: "🔴 심화2: 단어 빈도 분석"
+    code: |-
+      from collections import Counter
+
+      text = "to be or not to be that is the question"
+      words = Counter(text.lower().split())
+      words.most_common(3)
+
+  - type: "expansion"
+    title: "🔴 심화3: deque rotate"
+    code: |-
+      from collections import deque
+
+      def josephus(n, k):
+          circle = deque(range(1, n + 1))
+          order = []
+          while circle:
+              circle.rotate(-(k - 1))
+              order.append(circle.popleft())
+          return order
+
+      josephus(7, 3)
+
+  - type: "expansion"
+    title: "🔴 심화4: LRU 캐시"
+    code: |-
+      from collections import OrderedDict
+
+      class LRUCache:
+          def __init__(self, capacity):
+              self.cache = OrderedDict()
+              self.capacity = capacity
+
+          def get(self, key):
+              if key in self.cache:
+                  self.cache.move_to_end(key)
+                  return self.cache[key]
+              return None
+
+          def put(self, key, value):
+              if key in self.cache:
+                  self.cache.move_to_end(key)
+              self.cache[key] = value
+              if len(self.cache) > self.capacity:
+                  self.cache.popitem(last=False)
+
+      cache = LRUCache(2)
+      cache.put('a', 1)
+      cache.put('b', 2)
+      cache.get('a')
+      cache.put('c', 3)
+      list(cache.cache.keys())
+
+  - type: "expansion"
+    title: "🔴 심화5: 그룹화 패턴"
+    code: |-
+      from collections import defaultdict
+
+      students = [
+          ('Alice', 'Math', 90),
+          ('Bob', 'Math', 85),
+          ('Alice', 'Science', 92),
+          ('Bob', 'Science', 88)
+      ]
+
+      byStudent = defaultdict(dict)
+      for name, subject, score in students:
+          byStudent[name][subject] = score
+
+      dict(byStudent)
+
+  - type: "expansion"
+    title: "🔴 심화6: Counter 차집합"
+    code: |-
+      from collections import Counter
+
+      inventory = Counter(apple=10, banana=5, orange=8)
+      sold = Counter(apple=3, banana=6, orange=2)
+
+      remaining = inventory - sold
+      +remaining
+
+  - type: "expansion"
+    title: "🔴 심화7: 슬라이딩 윈도우"
+    code: |-
+      from collections import deque
+
+      def maxInWindow(nums, k):
+          if not nums:
+              return []
+          dq = deque()
+          result = []
+          for i, num in enumerate(nums):
+              while dq and nums[dq[-1]] < num:
+                  dq.pop()
+              dq.append(i)
+              if dq[0] <= i - k:
+                  dq.popleft()
+              if i >= k - 1:
+                  result.append(nums[dq[0]])
+          return result
+
+      maxInWindow([1, 3, -1, -3, 5, 3, 6, 7], 3)
+
+  - type: "expansion"
+    title: "🔴 심화8: ChainMap 계층"
+    code: |-
+      from collections import ChainMap
+
+      def makeConfig(*layers):
+          return ChainMap(*layers)
+
+      defaults = {'timeout': 30, 'retries': 3}
+      app = {'timeout': 60}
+      user = {'debug': True}
+
+      config = makeConfig(user, app, defaults)
+      config['timeout'], config['retries'], config['debug']
+
+  - type: "expansion"
+    title: "🔴 심화9: 빈도 기반 정렬"
+    code: |-
+      from collections import Counter
+
+      def sortByFrequency(nums):
+          counts = Counter(nums)
+          return sorted(nums, key=lambda x: (-counts[x], x))
+
+      sortByFrequency([1, 1, 2, 2, 2, 3])
+
+  - type: "expansion"
+    title: "🔴 심화10: 복합 자료구조"
+    code: |-
+      from collections import namedtuple, defaultdict, Counter
+
+      Transaction = namedtuple('Transaction', 'user item amount')
+
+      transactions = [
+          Transaction('alice', 'book', 15),
+          Transaction('bob', 'book', 15),
+          Transaction('alice', 'pen', 5),
+          Transaction('alice', 'book', 15),
+      ]
+
+      itemCounts = Counter(t.item for t in transactions)
+      userTotals = defaultdict(float)
+      for t in transactions:
+          userTotals[t.user] += t.amount
+
+      itemCounts.most_common(), dict(userTotals)

@@ -1,0 +1,743 @@
+meta:
+  id: "28"
+  title: "수학 알고리즘"
+  day: 28
+  category: "advancedPython"
+  tags: ["수학", "알고리즘", "정수론", "행렬"]
+  seo:
+    title: "파이썬 수학 알고리즘"
+    description: "소수, GCD, 조합론, 행렬 연산 학습"
+    keywords: ["수학", "소수", "GCD", "조합론"]
+
+intro:
+  emoji: "🔢"
+  points:
+  - "소수 관련 알고리즘"
+  - "정수론 기초"
+  - "조합론과 확률"
+  - "행렬 연산"
+
+sections:
+- id: "prime"
+  title: "소수 알고리즘"
+  subtitle: "소수 판별과 생성"
+  blocks:
+  - type: "text"
+    content: "소수 판별은 √n까지만 확인하면 됩니다. 에라토스테네스의 체로 범위 내 모든 소수를 구합니다."
+  - type: "code"
+    language: "python"
+    title: "소수 판별"
+    description: "기본 소수 판별 O(√n)"
+    content: |-
+      def isPrime(n):
+          if n < 2:
+              return False
+          if n == 2:
+              return True
+          if n % 2 == 0:
+              return False
+          for i in range(3, int(n ** 0.5) + 1, 2):
+              if n % i == 0:
+                  return False
+          return True
+
+      primeCheck = [isPrime(n) for n in [1, 2, 17, 20, 97]]
+      primeResult = primeCheck
+      primeResult
+  - type: "code"
+    language: "python"
+    title: "에라토스테네스의 체"
+    description: "범위 내 모든 소수 생성"
+    content: |-
+      def sieve(limit):
+          if limit < 2:
+              return []
+          isPrime = [True] * (limit + 1)
+          isPrime[0] = isPrime[1] = False
+          for i in range(2, int(limit ** 0.5) + 1):
+              if isPrime[i]:
+                  for j in range(i * i, limit + 1, i):
+                      isPrime[j] = False
+          return [i for i in range(limit + 1) if isPrime[i]]
+
+      sieveResult = sieve(50)
+      sieveResult
+  - type: "code"
+    language: "python"
+    title: "소인수분해"
+    description: "소인수 리스트 반환"
+    content: |-
+      def primeFactors(n):
+          factors = []
+          d = 2
+          while d * d <= n:
+              while n % d == 0:
+                  factors.append(d)
+                  n //= d
+              d += 1
+          if n > 1:
+              factors.append(n)
+          return factors
+
+      pfResult = primeFactors(360)
+      pfResult
+
+- id: "gcd_lcm"
+  title: "GCD와 LCM"
+  subtitle: "유클리드 알고리즘"
+  blocks:
+  - type: "text"
+    content: "유클리드 알고리즘: gcd(a, b) = gcd(b, a % b), b가 0이면 a 반환."
+  - type: "code"
+    language: "python"
+    title: "GCD와 LCM"
+    description: "최대공약수와 최소공배수"
+    content: |-
+      def gcd(a, b):
+          while b:
+              a, b = b, a % b
+          return a
+
+      def lcm(a, b):
+          return a * b // gcd(a, b)
+
+      gcdVal = gcd(48, 18)
+      lcmVal = lcm(12, 18)
+      glResult = (gcdVal, lcmVal)
+      glResult
+  - type: "code"
+    language: "python"
+    title: "확장 유클리드"
+    description: "ax + by = gcd(a,b) 해 구하기"
+    content: |-
+      def extGcd(a, b):
+          if a == 0:
+              return b, 0, 1
+          g, x1, y1 = extGcd(b % a, a)
+          x = y1 - (b // a) * x1
+          y = x1
+          return g, x, y
+
+      def modInverse(a, m):
+          g, x, _ = extGcd(a % m, m)
+          if g != 1:
+              return None
+          return (x % m + m) % m
+
+      egResult = extGcd(35, 15)
+      miResult = modInverse(3, 11)
+      extResult = (egResult, miResult)
+      extResult
+
+- id: "combinatorics"
+  title: "조합론"
+  subtitle: "순열, 조합, 이항계수"
+  blocks:
+  - type: "text"
+    content: "nPr = n!/(n-r)!, nCr = n!/r!(n-r)!"
+  - type: "code"
+    language: "python"
+    title: "팩토리얼과 조합"
+    description: "기본 조합 계산"
+    content: |-
+      def factorial(n):
+          if n <= 1:
+              return 1
+          result = 1
+          for i in range(2, n + 1):
+              result *= i
+          return result
+
+      def perm(n, r):
+          return factorial(n) // factorial(n - r)
+
+      def comb(n, r):
+          return factorial(n) // (factorial(r) * factorial(n - r))
+
+      factVal = factorial(10)
+      permVal = perm(5, 3)
+      combVal = comb(10, 3)
+      combResult = (factVal, permVal, combVal)
+      combResult
+  - type: "code"
+    language: "python"
+    title: "조합 생성"
+    description: "실제 조합 리스트 생성"
+    content: |-
+      def genPerms(arr):
+          if len(arr) <= 1:
+              return [arr]
+          perms = []
+          for i in range(len(arr)):
+              rest = arr[:i] + arr[i + 1:]
+              for p in genPerms(rest):
+                  perms.append([arr[i]] + p)
+          return perms
+
+      def genCombs(arr, r):
+          if r == 0:
+              return [[]]
+          if len(arr) < r:
+              return []
+          if len(arr) == r:
+              return [arr]
+          withFirst = [[arr[0]] + c for c in genCombs(arr[1:], r - 1)]
+          withoutFirst = genCombs(arr[1:], r)
+          return withFirst + withoutFirst
+
+      permsResult = genPerms([1, 2, 3])
+      combsResult = genCombs([1, 2, 3, 4], 2)
+      genResult = (len(permsResult), combsResult)
+      genResult
+
+- id: "modular"
+  title: "모듈러 연산"
+  subtitle: "빠른 거듭제곱"
+  blocks:
+  - type: "text"
+    content: "큰 수의 거듭제곱을 효율적으로 계산. O(log n)."
+  - type: "code"
+    language: "python"
+    title: "모듈러 거듭제곱"
+    description: "분할 정복으로 빠른 계산"
+    content: |-
+      def modPow(base, exp, mod):
+          result = 1
+          base = base % mod
+          while exp > 0:
+              if exp % 2 == 1:
+                  result = (result * base) % mod
+              exp = exp >> 1
+              base = (base * base) % mod
+          return result
+
+      MOD = 1000000007
+      mpResult = modPow(2, 100, MOD)
+      mpResult
+  - type: "code"
+    language: "python"
+    title: "모듈러 조합"
+    description: "큰 수에서 nCr mod p"
+    content: |-
+      def nCrMod(n, r, mod):
+          if r > n:
+              return 0
+          if r == 0 or r == n:
+              return 1
+          num = 1
+          den = 1
+          for i in range(r):
+              num = (num * (n - i)) % mod
+              den = (den * (i + 1)) % mod
+          return (num * modPow(den, mod - 2, mod)) % mod
+
+      MOD = 1000000007
+      ncrResult = nCrMod(1000, 500, MOD)
+      ncrResult
+
+- id: "matrix"
+  title: "행렬 연산"
+  subtitle: "행렬 곱셈과 거듭제곱"
+  blocks:
+  - type: "text"
+    content: "행렬 거듭제곱으로 피보나치를 O(log n)에 계산합니다."
+  - type: "code"
+    language: "python"
+    title: "행렬 곱셈"
+    description: "기본 행렬 곱셈"
+    content: |-
+      def matMul(a, b):
+          rows = len(a)
+          cols = len(b[0])
+          inner = len(b)
+          result = [[0] * cols for _ in range(rows)]
+          for i in range(rows):
+              for j in range(cols):
+                  for k in range(inner):
+                      result[i][j] += a[i][k] * b[k][j]
+          return result
+
+      matA = [[1, 2], [3, 4]]
+      matB = [[5, 6], [7, 8]]
+      matMulResult = matMul(matA, matB)
+      matMulResult
+  - type: "code"
+    language: "python"
+    title: "행렬 거듭제곱"
+    description: "피보나치 O(log n)"
+    content: |-
+      def matPow(matrix, n):
+          size = len(matrix)
+          result = [[1 if i == j else 0 for j in range(size)] for i in range(size)]
+          base = [row[:] for row in matrix]
+          while n > 0:
+              if n % 2 == 1:
+                  result = matMul(result, base)
+              base = matMul(base, base)
+              n //= 2
+          return result
+
+      def fibMatrix(n):
+          if n <= 1:
+              return n
+          base = [[1, 1], [1, 0]]
+          result = matPow(base, n - 1)
+          return result[0][0]
+
+      fib50 = fibMatrix(50)
+      fibMatResult = fib50
+      fibMatResult
+
+- id: "geometry"
+  title: "기하학 기초"
+  subtitle: "거리와 넓이"
+  blocks:
+  - type: "text"
+    content: "좌표 기하의 기본 연산들."
+  - type: "code"
+    language: "python"
+    title: "거리와 넓이"
+    description: "점 사이 거리, 삼각형 넓이"
+    content: |-
+      import math
+
+      def dist(p1, p2):
+          return math.sqrt((p2[0] - p1[0]) ** 2 + (p2[1] - p1[1]) ** 2)
+
+      def triArea(p1, p2, p3):
+          return abs((p1[0] * (p2[1] - p3[1]) + p2[0] * (p3[1] - p1[1]) + p3[0] * (p1[1] - p2[1])) / 2)
+
+      distVal = dist((0, 0), (3, 4))
+      triVal = triArea((0, 0), (4, 0), (2, 3))
+      geoResult = (distVal, triVal)
+      geoResult
+
+- id: "practice"
+  title: "종합 연습"
+  subtitle: "수학 알고리즘 실습"
+  blocks:
+  - type: "text"
+    content: "Day 28에서 배운 수학 알고리즘을 난이도별로 복습합니다. GCD, 소수 판별, 에라토스테네스의 체는 정수론의 기초이며, 모듈러 연산과 빠른 거듭제곱은 암호학의 기반입니다. 조합론과 확률은 경우의 수 문제와 시뮬레이션에 필수적입니다. 🟢 기본 문제로 완전수, 약수 합, 소인수분해 등을 구현하고, 🟡 응용 문제로 확장 유클리드, 중국인의 나머지 정리를 연습하세요. 🔴 심화 문제에서는 밀러-라빈 소수 판별, 폴라드 로 인수분해 등 고급 알고리즘을 직접 구현해봅니다. 수학 알고리즘은 코딩 테스트와 암호학에서 핵심 역할을 합니다."
+  - type: "expansion"
+    title: "기본1: 완전수 판별"
+    code: |-
+      def isPerfect(n):
+          if n < 2:
+              return False
+          divSum = 1
+          i = 2
+          while i * i <= n:
+              if n % i == 0:
+                  divSum += i
+                  if i != n // i:
+                      divSum += n // i
+              i += 1
+          return divSum == n
+
+      ex1Result = [n for n in range(1, 1000) if isPerfect(n)]
+      ex1Result
+  - type: "expansion"
+    title: "기본2: 피보나치"
+    code: |-
+      def fibIter(n):
+          if n <= 1:
+              return n
+          a, b = 0, 1
+          for _ in range(2, n + 1):
+              a, b = b, a + b
+          return b
+
+      ex2Result = [fibIter(i) for i in range(15)]
+      ex2Result
+  - type: "expansion"
+    title: "기본3: 진법 변환"
+    code: |-
+      def toBase(num, base):
+          if num == 0:
+              return "0"
+          digits = "0123456789ABCDEF"
+          result = []
+          while num:
+              result.append(digits[num % base])
+              num //= base
+          return ''.join(reversed(result))
+
+      ex3Bin = toBase(255, 2)
+      ex3Oct = toBase(255, 8)
+      ex3Hex = toBase(255, 16)
+      ex3Result = (ex3Bin, ex3Oct, ex3Hex)
+      ex3Result
+  - type: "expansion"
+    title: "기본4: 제곱근 (뉴턴법)"
+    code: |-
+      def sqrtNewton(n, eps=1e-10):
+          if n < 0:
+              return None
+          if n == 0:
+              return 0
+          x = n
+          while True:
+              nextX = (x + n / x) / 2
+              if abs(x - nextX) < eps:
+                  return nextX
+              x = nextX
+
+      ex4Result = round(sqrtNewton(2), 10)
+      ex4Result
+  - type: "expansion"
+    title: "기본5: 등차/등비 수열"
+    code: |-
+      def arithSum(a, d, n):
+          return n * (2 * a + (n - 1) * d) // 2
+
+      def geoSum(a, r, n):
+          if r == 1:
+              return a * n
+          return a * (1 - r ** n) // (1 - r)
+
+      ex5Arith = arithSum(1, 2, 10)
+      ex5Geo = geoSum(1, 2, 10)
+      ex5Result = (ex5Arith, ex5Geo)
+      ex5Result
+  - type: "expansion"
+    title: "중급6: 오일러 파이 함수"
+    code: |-
+      def eulerPhi(n):
+          result = n
+          p = 2
+          while p * p <= n:
+              if n % p == 0:
+                  while n % p == 0:
+                      n //= p
+                  result -= result // p
+              p += 1
+          if n > 1:
+              result -= result // n
+          return result
+
+      ex6Result = eulerPhi(36)
+      ex6Result
+  - type: "expansion"
+    title: "중급7: 중국인의 나머지 정리"
+    code: |-
+      def extGcdCrt(a, b):
+          if a == 0:
+              return b, 0, 1
+          g, x1, y1 = extGcdCrt(b % a, a)
+          return g, y1 - (b // a) * x1, x1
+
+      def crt(rems, mods):
+          total = 0
+          prod = 1
+          for m in mods:
+              prod *= m
+          for r, m in zip(rems, mods):
+              p = prod // m
+              _, inv, _ = extGcdCrt(p, m)
+              total += r * inv * p
+          return total % prod
+
+      ex7Result = crt([2, 3, 2], [3, 5, 7])
+      ex7Result
+  - type: "expansion"
+    title: "중급8: 밀러-라빈 소수 판정"
+    code: |-
+      import random
+
+      def millerRabin(n, k=10):
+          if n < 2:
+              return False
+          if n == 2 or n == 3:
+              return True
+          if n % 2 == 0:
+              return False
+          r, d = 0, n - 1
+          while d % 2 == 0:
+              r += 1
+              d //= 2
+          for _ in range(k):
+              a = random.randint(2, n - 2)
+              x = pow(a, d, n)
+              if x == 1 or x == n - 1:
+                  continue
+              for _ in range(r - 1):
+                  x = pow(x, 2, n)
+                  if x == n - 1:
+                      break
+              else:
+                  return False
+          return True
+
+      ex8Result = [(n, millerRabin(n)) for n in [7919, 7920, 104729]]
+      ex8Result
+  - type: "expansion"
+    title: "중급9: 이항 계수 DP"
+    code: |-
+      def binomDP(n, k):
+          dp = [[0] * (k + 1) for _ in range(n + 1)]
+          for i in range(n + 1):
+              dp[i][0] = 1
+              for j in range(1, min(i, k) + 1):
+                  dp[i][j] = dp[i - 1][j - 1] + dp[i - 1][j]
+          return dp[n][k]
+
+      ex9Result = binomDP(10, 5)
+      ex9Result
+  - type: "expansion"
+    title: "중급10: 파스칼 삼각형"
+    code: |-
+      def pascal(n):
+          triangle = [[1]]
+          for i in range(1, n):
+              row = [1]
+              for j in range(1, i):
+                  row.append(triangle[i - 1][j - 1] + triangle[i - 1][j])
+              row.append(1)
+              triangle.append(row)
+          return triangle
+
+      ex10Result = pascal(6)
+      ex10Result
+  - type: "expansion"
+    title: "고급11: 행렬식 계산"
+    code: |-
+      def det(matrix):
+          n = len(matrix)
+          if n == 1:
+              return matrix[0][0]
+          if n == 2:
+              return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0]
+          result = 0
+          for c in range(n):
+              minor = [[matrix[i][j] for j in range(n) if j != c] for i in range(1, n)]
+              result += ((-1) ** c) * matrix[0][c] * det(minor)
+          return result
+
+      ex11Mat = [[1, 2, 3], [4, 5, 6], [7, 8, 10]]
+      ex11Result = det(ex11Mat)
+      ex11Result
+  - type: "expansion"
+    title: "고급12: 라그랑주 보간"
+    code: |-
+      def lagrange(points, x):
+          n = len(points)
+          result = 0
+          for i in range(n):
+              xi, yi = points[i]
+              term = yi
+              for j in range(n):
+                  if i != j:
+                      xj = points[j][0]
+                      term *= (x - xj) / (xi - xj)
+              result += term
+          return result
+
+      ex12Points = [(1, 1), (2, 4), (3, 9)]
+      ex12Result = round(lagrange(ex12Points, 4), 2)
+      ex12Result
+  - type: "expansion"
+    title: "고급13: 심슨 적분법"
+    code: |-
+      def simpson(f, a, b, n=1000):
+          if n % 2 == 1:
+              n += 1
+          h = (b - a) / n
+          result = f(a) + f(b)
+          for i in range(1, n):
+              x = a + i * h
+              result += 4 * f(x) if i % 2 == 1 else 2 * f(x)
+          return result * h / 3
+
+      ex13Result = round(simpson(lambda x: x ** 2, 0, 1), 6)
+      ex13Result
+  - type: "expansion"
+    title: "고급14: 뉴턴-랩슨 방법"
+    code: |-
+      def newtonRaphson(f, df, x0, tol=1e-10):
+          x = x0
+          for _ in range(100):
+              fx = f(x)
+              dfx = df(x)
+              if abs(dfx) < 1e-15:
+                  break
+              xNew = x - fx / dfx
+              if abs(xNew - x) < tol:
+                  return xNew
+              x = xNew
+          return x
+
+      cubeRoot2 = newtonRaphson(lambda x: x ** 3 - 2, lambda x: 3 * x ** 2, 1.0)
+      ex14Result = round(cubeRoot2, 10)
+      ex14Result
+  - type: "expansion"
+    title: "고급15: 볼록 껍질"
+    code: |-
+      def crossProd(o, a, b):
+          return (a[0] - o[0]) * (b[1] - o[1]) - (a[1] - o[1]) * (b[0] - o[0])
+
+      def convexHull(points):
+          points = sorted(set(points))
+          if len(points) <= 1:
+              return points
+          lower = []
+          for p in points:
+              while len(lower) >= 2 and crossProd(lower[-2], lower[-1], p) <= 0:
+                  lower.pop()
+              lower.append(p)
+          upper = []
+          for p in reversed(points):
+              while len(upper) >= 2 and crossProd(upper[-2], upper[-1], p) <= 0:
+                  upper.pop()
+              upper.append(p)
+          return lower[:-1] + upper[:-1]
+
+      ex15Points = [(0, 3), (1, 1), (2, 2), (4, 4), (0, 0), (3, 1), (3, 3)]
+      ex15Result = convexHull(ex15Points)
+      ex15Result
+  - type: "expansion"
+    title: "고급16: 카탈란 수"
+    code: |-
+      def catalanDP(n):
+          if n <= 1:
+              return 1
+          dp = [0] * (n + 1)
+          dp[0] = dp[1] = 1
+          for i in range(2, n + 1):
+              for j in range(i):
+                  dp[i] += dp[j] * dp[i - 1 - j]
+          return dp[n]
+
+      def catalanFormula(n):
+          from math import comb
+          return comb(2 * n, n) // (n + 1)
+
+      ex16Result = {
+          "dp": [catalanDP(i) for i in range(10)],
+          "formula": [catalanFormula(i) for i in range(10)]
+      }
+      ex16Result
+  - type: "expansion"
+    title: "고급17: 확장 유클리드"
+    code: |-
+      def extGcd(a, b):
+          if a == 0:
+              return b, 0, 1
+          gcd, x1, y1 = extGcd(b % a, a)
+          x = y1 - (b // a) * x1
+          y = x1
+          return gcd, x, y
+
+      def modInverse(a, m):
+          gcd, x, _ = extGcd(a, m)
+          if gcd != 1:
+              return None
+          return (x % m + m) % m
+
+      ex17A, ex17B = 35, 15
+      ex17Gcd, ex17X, ex17Y = extGcd(ex17A, ex17B)
+      ex17Inv = modInverse(3, 11)
+      ex17Result = {
+          "gcd": ex17Gcd,
+          "coeffs": (ex17X, ex17Y),
+          "verify": ex17A * ex17X + ex17B * ex17Y,
+          "modInverse": ex17Inv,
+          "verifyInv": (3 * ex17Inv) % 11 if ex17Inv else None
+      }
+      ex17Result
+  - type: "expansion"
+    title: "고급18: 중국인의 나머지 정리"
+    code: |-
+      def crt(remainders, moduli):
+          from functools import reduce
+
+          def extGcdCrt(a, b):
+              if a == 0:
+                  return b, 0, 1
+              gcd, x1, y1 = extGcdCrt(b % a, a)
+              return gcd, y1 - (b // a) * x1, x1
+
+          M = reduce(lambda x, y: x * y, moduli)
+          result = 0
+          for ri, mi in zip(remainders, moduli):
+              Mi = M // mi
+              _, x, _ = extGcdCrt(Mi, mi)
+              result += ri * Mi * x
+          return result % M
+
+      ex18Rems = [2, 3, 2]
+      ex18Mods = [3, 5, 7]
+      ex18X = crt(ex18Rems, ex18Mods)
+      ex18Result = {
+          "x": ex18X,
+          "verify": [ex18X % m for m in ex18Mods]
+      }
+      ex18Result
+  - type: "expansion"
+    title: "고급19: FFT 곱셈"
+    code: |-
+      import cmath
+
+      def fft(a, invert=False):
+          n = len(a)
+          if n == 1:
+              return a
+          even = fft(a[0::2], invert)
+          odd = fft(a[1::2], invert)
+          ang = 2 * cmath.pi / n * (-1 if invert else 1)
+          w, wn = 1, cmath.exp(complex(0, ang))
+          result = [0] * n
+          for i in range(n // 2):
+              result[i] = even[i] + w * odd[i]
+              result[i + n // 2] = even[i] - w * odd[i]
+              if invert:
+                  result[i] /= 2
+                  result[i + n // 2] /= 2
+              w *= wn
+          return result
+
+      def polyMul(a, b):
+          n = 1
+          while n < len(a) + len(b):
+              n *= 2
+          a = a + [0] * (n - len(a))
+          b = b + [0] * (n - len(b))
+          fa, fb = fft(a), fft(b)
+          fc = [fa[i] * fb[i] for i in range(n)]
+          c = fft(fc, invert=True)
+          return [round(x.real) for x in c]
+
+      ex19A = [1, 2, 3]
+      ex19B = [1, 2]
+      ex19Result = polyMul(ex19A, ex19B)
+      ex19Result
+  - type: "expansion"
+    title: "고급20: 오일러 피 함수"
+    code: |-
+      def eulerPhi(n):
+          result = n
+          p = 2
+          while p * p <= n:
+              if n % p == 0:
+                  while n % p == 0:
+                      n //= p
+                  result -= result // p
+              p += 1
+          if n > 1:
+              result -= result // n
+          return result
+
+      def phiSieve(limit):
+          phi = list(range(limit + 1))
+          for i in range(2, limit + 1):
+              if phi[i] == i:
+                  for j in range(i, limit + 1, i):
+                      phi[j] -= phi[j] // i
+          return phi
+
+      ex20Single = [eulerPhi(n) for n in [1, 6, 12, 36]]
+      ex20Sieve = phiSieve(20)
+      ex20Result = {
+          "single": ex20Single,
+          "sieve": ex20Sieve[1:]
+      }
+      ex20Result

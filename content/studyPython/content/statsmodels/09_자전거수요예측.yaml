@@ -1,0 +1,494 @@
+meta:
+  id: statsmodels_09
+  title: 자전거수요예측
+  order: 9
+  category: statsmodels
+  difficulty: "⭐⭐⭐⭐⭐"
+  badge: 심화
+  dataUrl: https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-total-female-births.csv
+  tags: ["ARIMA", "ACF", "PACF", "시계열예측", "자전거공유", "수요예측"]
+  seo:
+    title: "statsmodels ARIMA 심화 - ACF/PACF로 시계열 예측하기"
+    description: "ACF, PACF로 ARIMA 파라미터를 선택합니다. 자전거 수요 데이터로 시계열 예측을 마스터합니다."
+    keywords: ["statsmodels", "ARIMA", "ACF", "PACF", "시계열예측", "자전거공유", "수요예측"]
+
+intro:
+  emoji: "🚴"
+  goal: ACF/PACF 분석으로 최적 ARIMA 모델을 구축하고 수요를 예측합니다
+  description: 시계열 데이터의 자기상관 패턴을 분석하여 ARIMA 파라미터를 결정합니다. 04 프로젝트의 ARIMA 기초를 심화하여 실전 수요 예측 능력을 기릅니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: 일별 시계열 데이터
+  blocks:
+  - type: text
+    content: "일별 출생 데이터를 자전거 수요 데이터처럼 활용합니다. 이 데이터는 1959년 1월부터 12월까지 365일간 캘리포니아 여성 출생 수를 기록한 것으로, 실제 자전거 공유 데이터와 유사한 일별 변동 패턴을 가집니다. ARIMA 분석 실습에 최적화된 데이터셋으로, 시계열 예측의 전체 파이프라인을 학습하기에 적합합니다. 실제 비즈니스에서 수요 예측은 재고 관리, 인력 배치, 마케팅 계획 수립에 핵심적인 역할을 합니다."
+  - type: code
+    language: python
+    title: 데이터 로드
+    description: 일별 시계열
+    content: |-
+      import pandas as pd
+      import numpy as np
+      import statsmodels.api as sm
+      from statsmodels.tsa.arima.model import ARIMA
+      from statsmodels.tsa.stattools import adfuller, acf, pacf
+      from statsmodels.graphics.tsaplots import plot_acf, plot_pacf
+      import plotly.express as px
+      import plotly.graph_objects as go
+      from plotly.subplots import make_subplots
+
+      url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-total-female-births.csv"
+      birthData = pd.read_csv(url)
+      birthData['Date'] = pd.to_datetime(birthData['Date'])
+      birthData = birthData.set_index('Date')
+      birthData.columns = ['Demand']
+      birthData.shape
+
+- id: step2_explore
+  title: 2단계. 시계열 탐색
+  subtitle: 데이터 패턴 확인
+  blocks:
+  - type: text
+    content: "시계열의 추세, 계절성, 불규칙성을 시각적으로 확인합니다. 시계열 시각화는 데이터에 숨겨진 패턴을 발견하는 첫 단계입니다. 전체적으로 상승 또는 하락하는 추세가 있는지, 특정 주기로 반복되는 패턴이 있는지, 갑작스러운 급등이나 급락이 있는지 관찰합니다. 일별 데이터는 주말/평일 패턴이나 월말 효과가 나타날 수 있어 이런 특성을 파악해야 적절한 모델을 선택할 수 있습니다."
+  - type: code
+    language: python
+    title: 시계열 시각화
+    description: 전체 추세 확인
+    content: |-
+      demandFig = px.line(birthData, y='Demand',
+                          title='Daily Demand Time Series',
+                          labels={'Date': 'Date', 'Demand': 'Daily Demand'})
+      demandFig.show()
+
+- id: step3_stats
+  title: 3단계. 기술통계량
+  subtitle: 기본 특성 파악
+  blocks:
+  - type: text
+    content: "평균, 표준편차, 최소/최대값으로 시계열의 기본 특성을 파악합니다. 평균은 수요의 일반적인 수준을, 표준편차는 변동성의 크기를 나타냅니다. 최소/최대값의 차이가 크면 극단적인 상황(폭염, 폭우 등)에 대비해야 합니다. 기술통계는 간단하지만 데이터의 전체적인 특성을 빠르게 파악할 수 있어, 이후 모델링 결과를 해석할 때 기준점이 됩니다."
+  - type: code
+    language: python
+    title: 기술통계량
+    description: 평균, 표준편차
+    content: |-
+      statsDf = pd.DataFrame({
+          'Statistic': ['Mean', 'Std', 'Min', 'Max', 'Count'],
+          'Value': [birthData['Demand'].mean(), birthData['Demand'].std(),
+                   birthData['Demand'].min(), birthData['Demand'].max(), len(birthData)]
+      })
+      statsDf
+
+- id: step4_adf_test
+  title: 4단계. 정상성 검정
+  subtitle: ADF 테스트
+  blocks:
+  - type: text
+    content: "ARIMA 모델은 정상(stationary) 시계열을 가정합니다. 정상성이란 시계열의 평균과 분산이 시간에 따라 변하지 않는 성질입니다. 주가처럼 계속 상승하는 데이터는 비정상이고, 그 차이(일별 수익률)는 정상입니다. ADF(Augmented Dickey-Fuller) 검정은 정상성을 통계적으로 검정하며, p-value가 0.05 미만이면 '이 시계열은 정상이다'라고 결론짓습니다. 비정상 시계열에 ARIMA를 적용하면 잘못된 예측이 나올 수 있습니다."
+  - type: code
+    language: python
+    title: ADF 검정
+    description: 정상성 확인
+    content: |-
+      adfResult = adfuller(birthData['Demand'])
+      adfDf = pd.DataFrame({
+          'Metric': ['ADF Statistic', 'p-value', 'Lags Used', 'Observations'],
+          'Value': [adfResult[0], adfResult[1], adfResult[2], adfResult[3]]
+      })
+      adfDf
+  - type: tip
+    content: ADF Statistic이 음수이고 절대값이 클수록 정상성 증거가 강합니다. p-value가 0.05 미만이면 귀무가설(비정상)을 기각하고 정상 시계열로 판단합니다.
+
+- id: step5_diff
+  title: 5단계. 차분
+  subtitle: 비정상성 제거
+  blocks:
+  - type: text
+    content: "정상성을 확보하기 위해 차분(differencing)을 적용합니다. 차분은 현재 값에서 이전 값을 빼는 연산으로, 추세를 제거하여 정상 시계열로 변환합니다. ARIMA(p,d,q)에서 d가 차분 횟수를 나타내며, 1차 차분으로 정상성이 확보되면 d=1을 사용합니다. 대부분의 경제/비즈니스 시계열은 1차 또는 2차 차분으로 정상화됩니다. 차분 후 ADF 검정으로 정상성이 확보되었는지 반드시 확인해야 합니다."
+  - type: code
+    language: python
+    title: 1차 차분
+    description: diff() 적용
+    content: |-
+      demandDiff = birthData['Demand'].diff().dropna()
+
+      diffFig = px.line(x=demandDiff.index, y=demandDiff.values,
+                        title='Differenced Series (d=1)',
+                        labels={'x': 'Date', 'y': 'Differenced Demand'})
+      diffFig.show()
+
+      adfDiffResult = adfuller(demandDiff)
+      f"Differenced ADF p-value: {adfDiffResult[1]:.4f}"
+  - type: tip
+    content: diff()는 현재 값에서 이전 값을 뺍니다. 첫 번째 값은 NaN이 되므로 dropna()로 제거합니다. 차분 후 p-value가 0.05 미만이면 d=1이 적절합니다.
+
+- id: step6_acf_intro
+  title: 6단계. ACF 소개
+  subtitle: 자기상관함수
+  blocks:
+  - type: text
+    content: "ACF(Autocorrelation Function)는 시계열과 자신의 과거 값 간 상관관계를 보여줍니다. 예를 들어 lag=1의 ACF는 오늘 수요와 어제 수요의 상관계수입니다. ACF가 높으면 과거 값이 현재 값을 예측하는 데 유용하다는 의미입니다. ARIMA 모델에서 MA(q)의 q 파라미터는 ACF 패턴을 분석하여 결정합니다. ACF가 특정 lag 이후 급격히 0으로 떨어지면 그 lag가 q 후보가 됩니다."
+  - type: code
+    language: python
+    title: ACF 계산
+    description: 자기상관 계수
+    content: |-
+      acfValues = acf(birthData['Demand'], nlags=20)
+
+      acfDf = pd.DataFrame({
+          'Lag': range(len(acfValues)),
+          'ACF': acfValues
+      })
+      acfDf.head(10)
+
+- id: step7_acf_plot
+  title: 7단계. ACF 시각화
+  subtitle: 상관관계 패턴
+  blocks:
+  - type: text
+    content: "ACF 플롯에서 빨간 점선(95% 신뢰구간)을 벗어나는 막대가 통계적으로 유의미한 자기상관입니다. 신뢰구간은 무작위 데이터에서도 우연히 나타날 수 있는 상관의 범위를 나타냅니다. ACF 패턴 해석이 ARIMA 파라미터 선택의 핵심입니다. ACF가 지수적으로 천천히 감소하면 AR 성분이 있고, 특정 lag에서 급격히 0으로 떨어지면 MA 성분을 나타냅니다."
+  - type: code
+    language: python
+    title: ACF 플롯
+    description: 막대 그래프
+    content: |-
+      confInt = 1.96 / np.sqrt(len(birthData))
+
+      acfFig = go.Figure()
+      acfFig.add_trace(go.Bar(x=list(range(len(acfValues))), y=acfValues, name='ACF'))
+      acfFig.add_hline(y=confInt, line_dash='dash', line_color='red', annotation_text='95% CI')
+      acfFig.add_hline(y=-confInt, line_dash='dash', line_color='red')
+      acfFig.add_hline(y=0, line_color='black')
+      acfFig.update_layout(title='Autocorrelation Function (ACF)',
+                           xaxis_title='Lag', yaxis_title='ACF')
+      acfFig.show()
+  - type: tip
+    content: 신뢰구간(점선)을 벗어나는 막대가 통계적으로 유의미한 자기상관입니다. ACF가 서서히 감소하면 AR 성분이 있고, 급격히 0으로 떨어지면 MA 성분을 나타냅니다.
+
+- id: step8_pacf_intro
+  title: 8단계. PACF 소개
+  subtitle: 편자기상관함수
+  blocks:
+  - type: text
+    content: "PACF(Partial ACF)는 중간 시차의 영향을 제거한 순수 상관관계입니다. 예를 들어 lag=2의 PACF는 lag=1의 영향을 제거한 후 오늘과 그저께의 직접적인 상관만 측정합니다. AR(p)의 p 파라미터는 PACF 패턴으로 결정합니다. PACF가 lag p 이후 급격히 0으로 떨어지면 AR(p)가 적절합니다. ACF와 PACF를 함께 분석하면 AR, MA, 또는 ARMA 중 어떤 모델이 적합한지 판단할 수 있습니다."
+  - type: code
+    language: python
+    title: PACF 계산
+    description: 편자기상관
+    content: |-
+      pacfValues = pacf(birthData['Demand'], nlags=20)
+
+      pacfDf = pd.DataFrame({
+          'Lag': range(len(pacfValues)),
+          'PACF': pacfValues
+      })
+      pacfDf.head(10)
+
+- id: step9_pacf_plot
+  title: 9단계. PACF 시각화
+  subtitle: AR 파라미터 결정
+  blocks:
+  - type: text
+    content: "PACF 플롯에서 신뢰구간을 벗어나는 초기 시차들이 AR(p)의 p 후보입니다. 예를 들어 lag 1, 2만 신뢰구간을 벗어나고 lag 3부터 구간 내에 있으면 AR(2)가 적절합니다. PACF 해석 규칙은 'cut-off' 패턴을 찾는 것으로, 특정 시점 이후 갑자기 0 근처로 떨어지는 패턴을 찾습니다. 이 분석이 시계열 모델링에서 가장 중요한 기술 중 하나입니다."
+  - type: code
+    language: python
+    title: PACF 플롯
+    description: 막대 그래프
+    content: |-
+      pacfFig = go.Figure()
+      pacfFig.add_trace(go.Bar(x=list(range(len(pacfValues))), y=pacfValues, name='PACF'))
+      pacfFig.add_hline(y=confInt, line_dash='dash', line_color='red', annotation_text='95% CI')
+      pacfFig.add_hline(y=-confInt, line_dash='dash', line_color='red')
+      pacfFig.add_hline(y=0, line_color='black')
+      pacfFig.update_layout(title='Partial Autocorrelation Function (PACF)',
+                            xaxis_title='Lag', yaxis_title='PACF')
+      pacfFig.show()
+
+- id: step10_acf_pacf_combined
+  title: 10단계. ACF/PACF 종합
+  subtitle: 파라미터 결정 규칙
+  blocks:
+  - type: text
+    content: "ACF와 PACF 패턴으로 ARIMA(p,d,q)를 결정합니다. 핵심 규칙은 다음과 같습니다. ACF가 지수적으로 감소하고 PACF가 cut-off되면 AR(p) 모델을, PACF가 지수적으로 감소하고 ACF가 cut-off되면 MA(q) 모델을 선택합니다. 둘 다 서서히 감소하면 ARMA(p,q) 모델이 필요합니다. 이 규칙을 외우는 것보다 여러 데이터로 실습하며 패턴 인식 능력을 기르는 것이 중요합니다."
+  - type: code
+    language: python
+    title: ACF/PACF 비교
+    description: 나란히 표시
+    content: |-
+      combinedFig = make_subplots(rows=1, cols=2, subplot_titles=('ACF', 'PACF'))
+
+      combinedFig.add_trace(go.Bar(x=list(range(len(acfValues))), y=acfValues, name='ACF'), row=1, col=1)
+      combinedFig.add_trace(go.Bar(x=list(range(len(pacfValues))), y=pacfValues, name='PACF'), row=1, col=2)
+
+      combinedFig.add_hline(y=confInt, line_dash='dash', line_color='red', row=1, col=1)
+      combinedFig.add_hline(y=-confInt, line_dash='dash', line_color='red', row=1, col=1)
+      combinedFig.add_hline(y=confInt, line_dash='dash', line_color='red', row=1, col=2)
+      combinedFig.add_hline(y=-confInt, line_dash='dash', line_color='red', row=1, col=2)
+
+      combinedFig.update_layout(title='ACF and PACF Comparison', showlegend=False)
+      combinedFig.show()
+  - type: tip
+    content: AR(p) 모델에서는 ACF가 지수적으로 감소하고 PACF가 lag p 이후 급격히 0이 됩니다. MA(q) 모델에서는 PACF가 지수적으로 감소하고 ACF가 lag q 이후 급격히 0이 됩니다.
+
+- id: step11_arima_fit
+  title: 11단계. ARIMA 모델 적합
+  subtitle: 파라미터 적용
+  blocks:
+  - type: text
+    content: "ACF/PACF 분석 결과를 바탕으로 ARIMA 모델을 구축합니다. ACF/PACF에서 얻은 p, q 후보값으로 모델을 적합하고 결과를 확인합니다. ARIMA(1,0,1)은 AR(1)과 MA(1)을 결합한 모델로, 어제 값과 어제의 예측 오차가 오늘 값에 영향을 미친다고 가정합니다. summary()로 계수의 유의성, AIC, BIC 등 모델 품질 지표를 확인합니다."
+  - type: code
+    language: python
+    title: ARIMA(1,0,1) 적합
+    description: 기본 모델
+    content: |-
+      arimaModel = ARIMA(birthData['Demand'], order=(1, 0, 1))
+      arimaFit = arimaModel.fit()
+      arimaFit.summary()
+
+- id: step12_model_comparison
+  title: 12단계. 모델 비교
+  subtitle: AIC로 선택
+  blocks:
+  - type: text
+    content: "여러 ARIMA 파라미터 조합의 AIC를 비교하여 최적 모델을 선택합니다. AIC(Akaike Information Criterion)는 모델의 적합도와 복잡도를 동시에 고려하는 지표로, 낮을수록 좋습니다. 파라미터가 많으면 적합도는 좋지만 과적합 위험이 있어 AIC가 불이익을 줍니다. BIC(Bayesian IC)도 유사한 목적이지만 복잡도에 더 큰 패널티를 부여합니다. 실무에서는 AIC와 BIC가 모두 낮은 모델을 선택합니다."
+  - type: code
+    language: python
+    title: 모델 비교
+    description: AIC 비교
+    content: |-
+      orders = [(1, 0, 0), (0, 0, 1), (1, 0, 1), (2, 0, 1), (1, 0, 2), (2, 0, 2)]
+      aicResults = []
+
+      for order in orders:
+          modelTemp = ARIMA(birthData['Demand'], order=order)
+          fitTemp = modelTemp.fit()
+          aicResults.append({
+              'Order': f"ARIMA{order}",
+              'AIC': fitTemp.aic,
+              'BIC': fitTemp.bic
+          })
+
+      aicDf = pd.DataFrame(aicResults).sort_values('AIC')
+      aicDf
+  - type: tip
+    content: AIC(Akaike Information Criterion)는 모델 복잡도와 적합도의 균형을 평가합니다. 파라미터가 많으면 적합도는 좋지만 과적합 위험이 있습니다. AIC가 가장 낮은 모델을 선택합니다.
+
+- id: step13_best_model
+  title: 13단계. 최적 모델 선택
+  subtitle: 최저 AIC 모델
+  blocks:
+  - type: text
+    content: "AIC가 가장 낮은 모델을 최종 선택합니다. 모델 선택은 단순히 AIC만 보는 것이 아니라, ACF/PACF 분석 결과와의 일관성, 계수의 통계적 유의성, 비즈니스 해석 가능성도 함께 고려해야 합니다. 최적 모델로 예측과 잔차 분석을 수행하여 모델이 데이터의 패턴을 제대로 포착했는지 검증합니다."
+  - type: code
+    language: python
+    title: 최적 모델 적합
+    description: 최저 AIC
+    content: |-
+      bestOrder = (2, 0, 2)
+      bestModel = ARIMA(birthData['Demand'], order=bestOrder)
+      bestFit = bestModel.fit()
+
+      f"Best Model: ARIMA{bestOrder}, AIC: {bestFit.aic:.2f}"
+
+- id: step14_residual_analysis
+  title: 14단계. 잔차 분석
+  subtitle: 모델 진단
+  blocks:
+  - type: text
+    content: "잔차 분석으로 ARIMA 모델의 적합성을 진단합니다. 좋은 모델이라면 잔차가 백색잡음(white noise), 즉 무작위하고 자기상관이 없어야 합니다. 잔차에 패턴이 남아있다면 모델이 시계열의 모든 정보를 포착하지 못한 것입니다. 잔차의 ACF가 모든 시차에서 신뢰구간 내에 있으면 잔차가 백색잡음이라고 판단합니다. 이 조건이 충족되어야 예측값을 신뢰할 수 있습니다."
+  - type: code
+    language: python
+    title: 잔차 ACF
+    description: 잔차 자기상관
+    content: |-
+      residuals = bestFit.resid
+      residAcf = acf(residuals, nlags=20)
+
+      residAcfFig = go.Figure()
+      residAcfFig.add_trace(go.Bar(x=list(range(len(residAcf))), y=residAcf, name='Residual ACF'))
+      residAcfFig.add_hline(y=confInt, line_dash='dash', line_color='red')
+      residAcfFig.add_hline(y=-confInt, line_dash='dash', line_color='red')
+      residAcfFig.add_hline(y=0, line_color='black')
+      residAcfFig.update_layout(title='Residual ACF - Check for White Noise',
+                                xaxis_title='Lag', yaxis_title='ACF')
+      residAcfFig.show()
+  - type: tip
+    content: 잔차의 ACF가 모두 신뢰구간 내에 있으면 잔차가 백색잡음입니다. 이는 모델이 시계열의 모든 패턴을 포착했다는 뜻입니다.
+
+- id: step15_ljung_box
+  title: 15단계. Ljung-Box 검정
+  subtitle: 잔차 자기상관 검정
+  blocks:
+  - type: text
+    content: "Ljung-Box 검정은 잔차에 자기상관이 있는지 공식적으로 검정합니다. ACF 플롯은 시각적 판단이지만, Ljung-Box는 여러 시차를 종합적으로 고려한 통계적 검정입니다. 귀무가설은 '잔차에 자기상관이 없다'이며, p-value가 0.05 이상이면 귀무가설을 채택합니다. 즉 잔차가 백색잡음이라는 가정이 만족됩니다. 모든 검정 lag에서 p-value가 0.05 이상이어야 모델이 적절합니다."
+  - type: code
+    language: python
+    title: Ljung-Box 검정
+    description: 잔차 검정
+    content: |-
+      from statsmodels.stats.diagnostic import acorr_ljungbox
+
+      ljungBox = acorr_ljungbox(residuals, lags=[10, 20], return_df=True)
+      ljungBox
+  - type: tip
+    content: lb_pvalue가 0.05 이상이면 잔차에 자기상관이 없습니다. 모든 lag에서 p-value가 0.05 이상이면 모델이 적절합니다.
+
+- id: step16_forecast
+  title: 16단계. 미래 예측
+  subtitle: 30일 수요 예측
+  blocks:
+  - type: text
+    content: "최종 모델로 미래 30일 수요를 예측합니다. 시계열 예측에서 중요한 점은 예측 불확실성을 함께 제공하는 것입니다. 95% 신뢰구간은 '실제 값이 이 범위 안에 있을 확률이 95%'라는 의미입니다. 예측 기간이 길어질수록 신뢰구간이 넓어지는데, 이는 먼 미래일수록 불확실성이 커진다는 자연스러운 현상입니다. 비즈니스 의사결정에서 예측값뿐 아니라 불확실성 범위도 고려해야 합니다."
+  - type: code
+    language: python
+    title: 30일 예측
+    description: 미래 수요
+    content: |-
+      forecastSteps = 30
+      forecast = bestFit.get_forecast(steps=forecastSteps)
+      forecastMean = forecast.predicted_mean
+      forecastConf = forecast.conf_int()
+
+      forecastIdx = pd.date_range(start=birthData.index[-1] + pd.Timedelta(days=1), periods=forecastSteps)
+
+      forecastFig = go.Figure()
+      forecastFig.add_trace(go.Scatter(x=birthData.index, y=birthData['Demand'], mode='lines', name='Historical'))
+      forecastFig.add_trace(go.Scatter(x=forecastIdx, y=forecastMean, mode='lines', name='Forecast', line=dict(dash='dash')))
+      forecastFig.add_trace(go.Scatter(x=forecastIdx, y=forecastConf.iloc[:, 0], mode='lines', name='Lower CI', line=dict(dash='dot', color='gray')))
+      forecastFig.add_trace(go.Scatter(x=forecastIdx, y=forecastConf.iloc[:, 1], mode='lines', name='Upper CI', line=dict(dash='dot', color='gray')))
+      forecastFig.update_layout(title=f'ARIMA{bestOrder} Forecast - Next {forecastSteps} Days',
+                                xaxis_title='Date', yaxis_title='Demand')
+      forecastFig.show()
+
+- id: practice
+  title: 실습
+  subtitle: 시계열 예측 프로젝트
+  blocks:
+  - type: text
+    content: "데이터 분석가가 되어 수요 예측 시스템을 구축합니다. 실제 수요 예측 프로젝트에서는 정상성 검정, ACF/PACF 분석, 여러 모델 비교, 잔차 진단, 예측 성능 평가까지 체계적인 과정을 거칩니다. 각 미션은 데이터 로딩부터 예측까지 전체 파이프라인을 독립적으로 수행합니다. 본 프로젝트에서 배운 ACF/PACF 해석, AIC 기반 모델 선택, Ljung-Box 검정을 실습을 통해 숙달해봅니다."
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 차분 후 ACF/PACF 분석 및 ARIMA(p,1,q) 모델 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 차분"
+      content: |-
+        import pandas as pd
+        import numpy as np
+        from statsmodels.tsa.arima.model import ARIMA
+        from statsmodels.tsa.stattools import adfuller, acf, pacf
+
+        diffUrl = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-total-female-births.csv"
+        diffData = pd.read_csv(diffUrl)
+        diffData['Date'] = pd.to_datetime(diffData['Date'])
+        diffData = diffData.set_index('Date')
+        diffData.columns = ['Demand']
+
+        diffSeries = diffData['Demand'].diff().dropna()
+        diffSeries.head()
+    - type: code
+      title: "ADF 정상성 비교"
+      content: |-
+        adfOrig = adfuller(diffData['Demand'])
+        adfDiff = adfuller(diffSeries)
+
+        adfCmpDf = pd.DataFrame({
+            'Series': ['Original', 'Differenced'],
+            'ADF Stat': [adfOrig[0], adfDiff[0]],
+            'p-value': [adfOrig[1], adfDiff[1]],
+            'Stationary': ['Yes' if adfOrig[1] < 0.05 else 'No', 'Yes' if adfDiff[1] < 0.05 else 'No']
+        })
+        adfCmpDf
+    - type: code
+      title: "ACF/PACF 시각화 및 모델 비교"
+      content: |-
+        import plotly.graph_objects as go
+        from plotly.subplots import make_subplots
+
+        acfDiff = acf(diffSeries, nlags=15)
+        pacfDiff = pacf(diffSeries, nlags=15)
+        confInt = 1.96 / np.sqrt(len(diffSeries))
+
+        acfPacfFig = make_subplots(rows=1, cols=2, subplot_titles=('Differenced ACF', 'Differenced PACF'))
+        acfPacfFig.add_trace(go.Bar(x=list(range(len(acfDiff))), y=acfDiff), row=1, col=1)
+        acfPacfFig.add_trace(go.Bar(x=list(range(len(pacfDiff))), y=pacfDiff), row=1, col=2)
+        acfPacfFig.add_hline(y=confInt, line_dash='dash', line_color='red', row=1, col=1)
+        acfPacfFig.add_hline(y=-confInt, line_dash='dash', line_color='red', row=1, col=1)
+        acfPacfFig.update_layout(showlegend=False)
+        acfPacfFig
+    - type: code
+      title: "ARIMA 모델 AIC 비교"
+      content: |-
+        orders = [(1, 1, 0), (0, 1, 1), (1, 1, 1), (2, 1, 1)]
+        aicList = []
+        for orderVal in orders:
+            model = ARIMA(diffData['Demand'], order=orderVal).fit()
+            aicList.append({'Order': f"ARIMA{orderVal}", 'AIC': model.aic})
+
+        aicCompDf = pd.DataFrame(aicList).sort_values('AIC')
+        aicCompDf
+  - type: expansion
+    title: "미션2: 롤링 예측으로 모델 성능 평가"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 분할"
+      content: |-
+        import pandas as pd
+        import numpy as np
+        from statsmodels.tsa.arima.model import ARIMA
+
+        evalUrl = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-total-female-births.csv"
+        evalData = pd.read_csv(evalUrl)
+        evalData['Date'] = pd.to_datetime(evalData['Date'])
+        evalData = evalData.set_index('Date')
+        evalData.columns = ['Demand']
+
+        trainSize = int(len(evalData) * 0.8)
+        trainDf = evalData[:trainSize]
+        testDf = evalData[trainSize:]
+        testDf.shape
+    - type: code
+      title: "ARIMA 모델 학습 및 예측"
+      content: |-
+        evalModel = ARIMA(trainDf['Demand'], order=(2, 0, 2)).fit()
+        evalFcast = evalModel.forecast(steps=len(testDf))
+        evalFcast.head()
+    - type: code
+      title: "MAE/RMSE 계산 및 시각화"
+      content: |-
+        from sklearn.metrics import mean_absolute_error, mean_squared_error
+        import plotly.graph_objects as go
+
+        mae = mean_absolute_error(testDf['Demand'], evalFcast)
+        rmse = np.sqrt(mean_squared_error(testDf['Demand'], evalFcast))
+
+        metricsDf = pd.DataFrame({
+            'Metric': ['MAE', 'RMSE', 'Mean Actual'],
+            'Value': [mae, rmse, testDf['Demand'].mean()]
+        })
+
+        evalFig = go.Figure()
+        evalFig.add_trace(go.Scatter(x=trainDf.index, y=trainDf['Demand'], mode='lines', name='Train'))
+        evalFig.add_trace(go.Scatter(x=testDf.index, y=testDf['Demand'], mode='lines', name='Actual'))
+        evalFig.add_trace(go.Scatter(x=testDf.index, y=evalFcast, mode='lines', name='Forecast', line=dict(dash='dash')))
+        evalFig.update_layout(title=f'ARIMA Forecast Evaluation (MAE={mae:.2f})', xaxis_title='Date', yaxis_title='Demand')
+        evalFig
+
+- id: summary
+  title: 정리
+  subtitle: 아홉 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 ACF/PACF 분석으로 ARIMA 파라미터를 결정하는 방법을 배웠습니다. ADF 검정으로 정상성을 확인하고, ACF는 MA(q), PACF는 AR(p) 파라미터를 결정합니다. 여러 모델의 AIC를 비교하여 최적 모델을 선택하고, Ljung-Box 검정으로 잔차를 진단했습니다. 이제 시계열 예측 모델을 체계적으로 구축할 수 있습니다.
+  - type: list
+    items:
+    - "ADF 검정 - 정상성 확인, p-value가 0.05 미만이면 정상"
+    - "ACF - 자기상관함수, MA(q) 파라미터 결정"
+    - "PACF - 편자기상관함수, AR(p) 파라미터 결정"
+    - "AIC - 모델 선택 기준, 낮을수록 좋음"
+    - "Ljung-Box - 잔차 자기상관 검정"
+    - "get_forecast() - 신뢰구간과 함께 예측"
+  - type: text
+    content: 다음 프로젝트에서는 VAR 모델로 여러 시계열을 동시에 예측합니다. 지금까지 배운 모든 개념을 종합하여 경제 지표 분석을 완성합니다.

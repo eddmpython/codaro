@@ -1,0 +1,323 @@
+meta:
+  id: regex_09
+  title: 고급패턴매칭
+  order: 9
+  category: regex
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["lookahead", "lookbehind", "전방탐색", "후방탐색", "고급 패턴"]
+  seo:
+    title: "정규표현식 심화 - Lookahead & Lookbehind"
+    description: "정규표현식의 고급 기능인 lookahead, lookbehind를 마스터합니다. 복잡한 조건 매칭을 배웁니다."
+    keywords: ["정규표현식", "regex", "lookahead", "lookbehind", "전방탐색", "후방탐색"]
+
+intro:
+  emoji: "🔬"
+  goal: Lookahead와 Lookbehind로 복잡한 조건 매칭을 마스터합니다.
+  description: 정규표현식의 최고 난이도 기능입니다. "앞/뒤를 보되 포함하지 않는" 제로폭 단언(zero-width assertion)을 배웁니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: 정규표현식 모듈
+    content: |-
+      import re
+
+- id: step2_problem
+  title: 2단계. 문제 상황
+  subtitle: 일반 패턴의 한계
+  blocks:
+  - type: text
+    content: "가격에서 숫자만 추출하고 싶은 상황을 생각해봅시다. $100, $200처럼 달러 기호 뒤의 숫자를 찾고 싶지만, $ 기호 자체는 결과에 포함하고 싶지 않습니다. 일반 패턴으로는 이런 조건부 매칭이 어렵습니다."
+  - type: code
+    language: python
+    title: 일반 패턴의 문제
+    description: $ 기호가 포함되어 버림
+    content: |-
+      text = "가격: $100, $200, $300"
+
+      pattern = r"\$\d+"
+      re.findall(pattern, text)
+  - type: text
+    content: "결과: ['$100', '$200', '$300'] - $ 기호가 포함되었습니다."
+  - type: text
+    content: "원하는 결과: ['100', '200', '300'] - 숫자만 필요합니다!"
+
+- id: step3_positive_lookbehind
+  title: 3단계. 긍정 후방탐색 (?<=...)
+  subtitle: 뒤를 보되 포함하지 않기
+  blocks:
+  - type: text
+    content: "긍정 후방탐색 (?<=패턴)은 앞에 특정 패턴이 있는 위치를 찾되, 그 패턴 자체는 결과에 포함하지 않습니다. 제로폭 단언(zero-width assertion)이라고도 하며, 위치만 확인하고 문자를 소비하지 않는 특수한 기능입니다."
+  - type: code
+    language: python
+    title: 긍정 후방탐색 사용
+    description: $ 뒤의 숫자만 추출
+    content: |-
+      pattern = r"(?<=\$)\d+"
+
+      prices = re.findall(pattern, text)
+      prices
+  - type: text
+    content: "결과: ['100', '200', '300'] - 완벽합니다!"
+  - type: note
+    style: tip
+    title: "긍정 후방탐색: (?<=...)"
+    content: |-
+      **(?<=패턴)매칭**:
+      - "앞에 패턴이 있는" 매칭을 찾음
+      - 하지만 패턴 자체는 결과에 포함하지 않음
+      - **제로폭 단언**: 위치만 확인, 문자 소비 안 함
+
+      예: `(?<=@)\w+` → @ 뒤의 단어 (@ 제외)
+
+- id: step4_positive_lookahead
+  title: 4단계. 긍정 전방탐색 (?=...)
+  subtitle: 앞을 보되 포함하지 않기
+  blocks:
+  - type: text
+    content: "긍정 전방탐색 (?=패턴)은 뒤에 특정 패턴이 있는 위치를 찾되, 그 패턴은 결과에 포함하지 않습니다. 후방탐색과 반대 방향으로 작동합니다. 예를 들어 퍼센트 기호 앞의 숫자만 추출할 때 유용합니다."
+  - type: code
+    language: python
+    title: 긍정 전방탐색 사용
+    description: "% 앞의 숫자만 추출"
+    content: |-
+      text = "할인율: 10%, 20%, 30%"
+
+      pattern = r"\d+(?=%)"
+
+      discounts = re.findall(pattern, text)
+      discounts
+  - type: text
+    content: "결과: ['10', '20', '30'] - % 기호는 제외!"
+  - type: note
+    style: tip
+    title: "긍정 전방탐색: (?=...)"
+    content: |-
+      **매칭(?=패턴)**:
+      - "뒤에 패턴이 있는" 매칭을 찾음
+      - 패턴은 결과에 포함하지 않음
+
+      예: `\w+(?=@)` → @ 앞의 단어 (@ 제외)
+
+- id: step5_negative_lookbehind
+  title: 5단계. 부정 후방탐색 (?<!...)
+  subtitle: 뒤에 패턴이 없을 때
+  blocks:
+  - type: text
+    content: "부정 후방탐색 (?<!패턴)은 앞에 특정 패턴이 없을 때만 매칭합니다. 긍정 후방탐색의 반대 개념으로, 특정 접두사가 없는 패턴을 찾을 때 사용합니다. 예를 들어 달러 기호가 없는 숫자만 찾을 수 있습니다."
+  - type: code
+    language: python
+    title: 부정 후방탐색 사용
+    description: $ 기호가 없는 숫자만 찾기
+    content: |-
+      text = "금액: $100 또는 200 또는 $300"
+
+      pattern = r"(?<!\$)\b\d+"
+
+      numbers = re.findall(pattern, text)
+      numbers
+  - type: text
+    content: "결과: ['200'] - $ 없는 숫자만 찾았습니다!"
+  - type: note
+    style: tip
+    title: "부정 후방탐색: (?<!...)"
+    content: |-
+      **(?<!패턴)매칭**:
+      - "앞에 패턴이 없는" 매칭만 찾음
+      - 특정 문맥을 제외할 때 유용
+
+      예: `(?<!un)\w+` → un으로 시작하지 않는 단어
+
+- id: step6_negative_lookahead
+  title: 6단계. 부정 전방탐색 (?!...)
+  subtitle: 앞에 패턴이 없을 때
+  blocks:
+  - type: text
+    content: "(?!패턴) : \"뒤에 패턴이 없으면\" 매칭합니다."
+  - type: code
+    language: python
+    title: 부정 전방탐색 사용
+    description: .com이 아닌 이메일만 찾기
+    content: |-
+      text = "이메일: user@site.com, admin@service.org, info@shop.net"
+
+      pattern = r"\S+@\S+\.(?!com)\w+"
+
+      nonComEmails = re.findall(pattern, text)
+      nonComEmails
+  - type: text
+    content: ".com이 아닌 이메일만 추출되었습니다!"
+  - type: note
+    style: tip
+    title: "부정 전방탐색: (?!...)"
+    content: |-
+      **매칭(?!패턴)**:
+      - "뒤에 패턴이 없는" 매칭만 찾음
+      - 특정 경우를 제외할 때 사용
+
+      예: `\d+(?!%)` → % 로 끝나지 않는 숫자
+
+- id: step7_combination
+  title: 7단계. 조합 사용
+  subtitle: Lookaround 여러 개
+  blocks:
+  - type: text
+    content: Lookahead와 Lookbehind를 동시에 사용하여 복잡한 조건을 만듭니다.
+  - type: code
+    language: python
+    title: 전방 + 후방 조합
+    description: $와 % 사이의 숫자만
+    content: |-
+      text = "예산: $100%, 매출: $200, 목표: 300%"
+
+      pattern = r"(?<=\$)\d+(?=%)"
+
+      result = re.findall(pattern, text)
+      result
+  - type: text
+    content: "결과: ['100'] - $ 뒤에 있고 % 앞에 있는 숫자만!"
+
+- id: step8_password_validation
+  title: 8단계. 비밀번호 검증
+  subtitle: 실전 활용
+  blocks:
+  - type: text
+    content: "Lookahead로 \"8자 이상, 대문자 포함, 숫자 포함\" 조건을 동시에 검증합니다."
+  - type: code
+    language: python
+    title: 비밀번호 규칙
+    description: 여러 조건을 모두 만족하는지 확인
+    content: |-
+      def validatePassword(password):
+          pattern = r"^(?=.*[A-Z])(?=.*\d).{8,}$"
+          return re.match(pattern, password) is not None
+
+      passwords = ["weak", "Weak123", "STRONG456", "Good1Pass"]
+
+      results = {pwd: validatePassword(pwd) for pwd in passwords}
+      results
+  - type: note
+    style: tip
+    title: "복수 조건 검증"
+    content: |-
+      `^(?=.*[A-Z])(?=.*\d).{8,}$`:
+      - `(?=.*[A-Z])` : 대문자가 있는지 확인
+      - `(?=.*\d)` : 숫자가 있는지 확인
+      - `.{8,}` : 8자 이상
+
+      각 조건이 독립적으로 검증됩니다!
+
+- id: step9_extract_between
+  title: 9단계. 특정 구간 추출
+  subtitle: 태그 사이의 내용만
+  blocks:
+  - type: text
+    content: HTML 태그 사이의 내용만 추출합니다.
+  - type: code
+    language: python
+    title: 태그 내용 추출
+    description: <p>와 </p> 사이만
+    content: |-
+      html = "<p>첫 단락</p> 외부 <p>둘째 단락</p> 더 외부"
+
+      pattern = r"(?<=<p>).*?(?=</p>)"
+
+      contents = re.findall(pattern, html)
+      contents
+  - type: text
+    content: "결과: ['첫 단락', '둘째 단락'] - 태그는 제외하고 내용만!"
+
+- id: step10_summary
+  title: 10단계. Lookaround 정리
+  subtitle: 4가지 패턴 비교
+  blocks:
+  - type: text
+    content: Lookaround 패턴을 한눈에 정리합니다.
+  - type: code
+    language: python
+    title: 4가지 Lookaround
+    description: 동일한 텍스트로 비교
+    content: |-
+      text = "test123abc"
+
+      patterns = {
+          "긍정 후방 (?<=test)": r"(?<=test)\d+",
+          "부정 후방 (?<!test)": r"(?<!test)\d+",
+          "긍정 전방 (?=abc)": r"\d+(?=abc)",
+          "부정 전방 (?!abc)": r"\d+(?!abc)"
+      }
+
+      {name: re.findall(pattern, text) for name, pattern in patterns.items()}
+  - type: note
+    style: tip
+    title: "Lookaround 4종 정리"
+    content: |-
+      | 이름 | 문법 | 의미 |
+      |------|------|------|
+      | 긍정 후방탐색 | (?<=X)Y | X 뒤의 Y |
+      | 부정 후방탐색 | (?<!X)Y | X가 아닌 것 뒤의 Y |
+      | 긍정 전방탐색 | Y(?=X) | X 앞의 Y |
+      | 부정 전방탐색 | Y(?!X) | X가 아닌 것 앞의 Y |
+
+- id: practice
+  title: 실습
+  subtitle: 고급 패턴 매칭 프로젝트
+  blocks:
+  - type: text
+    content: 정규표현식 전문가가 되어 복잡한 조건 매칭을 수행합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 가격 추출 (만원 제외)"
+    blocks:
+    - type: code
+      title: "가격 패턴 매칭"
+      content: |-
+        import re
+
+        text = "가격: 1000원, 2000원, 만원, 3000원"
+
+        pat = r"(?<!만)\b\d+(?=원)"
+        prices = re.findall(pat, text)
+        prices
+  - type: expansion
+    title: "미션2: 비밀번호 강도 검증"
+    blocks:
+    - type: code
+      title: "검증 함수 정의"
+      content: |-
+        import re
+
+        samples = ["weak", "Weak123", "Strong123!", "GoodPass1@", "short1!"]
+
+        def check(pwd):
+            pat = r"^(?=.*[A-Z])(?=.*\d)(?=.*[!@#$%^&*]).{8,}$"
+            return re.match(pat, pwd) is not None
+
+        check("Strong123!")
+    - type: code
+      title: "전체 검증 결과"
+      content: |-
+        result = {p: check(p) for p in samples}
+        result
+
+- id: summary
+  title: 정리
+  subtitle: 아홉 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 Lookahead와 Lookbehind를 마스터했습니다. 정규표현식의 최고 난이도 기능입니다.
+  - type: list
+    items:
+    - "(?<=X) - 긍정 후방탐색 (X 뒤의)"
+    - "(?<!X) - 부정 후방탐색 (X 아닌 것 뒤의)"
+    - "(?=X) - 긍정 전방탐색 (X 앞의)"
+    - "(?!X) - 부정 전방탐색 (X 아닌 것 앞의)"
+  - type: text
+    content: 마지막 프로젝트에서 실전 LLM 전처리 파이프라인을 구축합니다!

@@ -1,0 +1,393 @@
+meta:
+  id: matplotlib_04
+  title: 대륙별인구비교
+  order: 4
+  category: matplotlib
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["matplotlib", "bar", "barh", "xticks", "annotate", "gapminder"]
+  seo:
+    title: "Matplotlib 막대 그래프 - 대륙별 인구 비교"
+    description: "Matplotlib으로 gapminder 데이터의 대륙별 인구를 막대 그래프로 시각화합니다. bar, barh, xticks, annotate 사용법을 배웁니다."
+    keywords: ["matplotlib", "bar", "막대그래프", "gapminder", "annotate", "인구"]
+
+intro:
+  emoji: "🌍"
+  goal: 대륙별 인구를 막대 그래프로 비교 분석합니다.
+  description: 막대 그래프로 카테고리별 수치를 비교하고, annotate로 주석을 추가합니다. 이전에 배운 plot, hist, scatter, subplots 개념을 함께 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: gapminder 데이터를 사용하여 대륙별 인구를 분석합니다. 이 데이터는 세계 각국의 발전 지표를 담고 있으며, GitHub에서 직접 불러옵니다. pandas의 read_csv로 URL에서 바로 데이터를 로드할 수 있습니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: matplotlib, pandas를 불러옵니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import pandas as pd
+  - type: tip
+    content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  subtitle: Pyodide 환경 폰트
+  blocks:
+  - type: text
+    content: Pyodide(웹 브라우저) 환경에서는 시스템 폰트를 사용할 수 없어 한글이 깨집니다. CDN에서 폰트 파일을 다운로드하여 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+  - type: code
+    language: python
+    title: 한글 폰트 설정
+    description: Pretendard 폰트를 다운로드하여 matplotlib에 등록합니다
+    content: |-
+      import micropip
+      await micropip.install('pyodide-http')
+
+      import pyodide_http
+      pyodide_http.patch_all()
+
+      from matplotlib import font_manager
+      from js import fetch
+      from pathlib import Path
+
+      fontUrl = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Regular.otf"
+      response = await fetch(fontUrl)
+      fontBuffer = await response.arrayBuffer()
+
+      fontPath = Path("/tmp/Pretendard-Regular.otf")
+      fontPath.write_bytes(fontBuffer.to_py())
+
+      font_manager.fontManager.addfont(str(fontPath))
+      plt.rcParams['font.family'] = 'Pretendard'
+      plt.rcParams['axes.unicode_minus'] = False
+  - type: tip
+    content: Pyodide 환경에서는 fetch API로 외부 리소스를 가져옵니다. font_manager.addfont()로 폰트를 등록하고, rcParams로 기본 폰트를 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: GitHub에서 로드
+  blocks:
+  - type: text
+    content: gapminder 데이터를 GitHub raw URL에서 직접 불러옵니다. 이 데이터는 1952년부터 2007년까지 세계 각국의 기대수명, 인구, GDP 정보를 담고 있습니다. plotly datasets 저장소에서 제공하는 공개 데이터입니다.
+  - type: code
+    language: python
+    title: gapminder 데이터 로드
+    description: GitHub에서 CSV 파일을 불러옵니다
+    content: |-
+      baseUrl = "https://raw.githubusercontent.com"
+      gapminder = pd.read_csv(f"{baseUrl}/plotly/datasets/master/gapminder_unfiltered.csv")
+      gapminder.head()
+
+- id: step3_filter
+  title: 3단계. 2007년 데이터 필터링
+  subtitle: 최근 연도 선택
+  blocks:
+  - type: text
+    content: 대륙별 비교를 위해 가장 최근 연도인 2007년 데이터만 추출합니다. 불리언 인덱싱으로 year 컬럼이 2007인 행만 선택합니다.
+  - type: code
+    language: python
+    title: 2007년 필터링
+    description: 2007년 데이터만 추출합니다
+    content: |-
+      data2007 = gapminder[gapminder['year'] == 2007]
+      data2007.shape
+
+- id: step4_groupby
+  title: 4단계. 대륙별 인구 집계
+  subtitle: groupby().sum()
+  blocks:
+  - type: text
+    content: 대륙(continent)별로 인구(pop)를 합산합니다. groupby로 그룹화하고 sum()으로 합계를 구한 후, reset_index()로 DataFrame 형태로 변환합니다. 억 단위로 표시하기 위해 10억으로 나눕니다.
+  - type: code
+    language: python
+    title: 대륙별 인구 합계
+    description: 대륙별로 인구를 집계합니다
+    content: |-
+      popByContinent = data2007.groupby('continent')['pop'].sum().reset_index()
+      popByContinent['popBillion'] = popByContinent['pop'] / 1e9
+      popByContinent
+
+- id: step5_bar
+  title: 5단계. 기본 막대 그래프
+  subtitle: ax.bar()
+  blocks:
+  - type: text
+    content: ax.bar()로 수직 막대 그래프를 그립니다. 첫 번째 인자는 x축 위치(카테고리), 두 번째 인자는 막대 높이(수치)입니다. 대륙별 인구를 한눈에 비교할 수 있습니다.
+  - type: code
+    language: python
+    title: 기본 막대 그래프
+    description: 대륙별 인구를 막대 그래프로 표시합니다
+    content: |-
+      figBar, axBar = plt.subplots(figsize=(10, 6))
+      axBar.bar(popByContinent['continent'], popByContinent['popBillion'])
+      axBar.set_title('2007년 대륙별 인구', fontsize=14)
+      axBar.set_xlabel('대륙', fontsize=12)
+      axBar.set_ylabel('인구 (10억 명)', fontsize=12)
+      figBar
+  - type: tip
+    content: ax.bar(x, height)로 수직 막대 그래프를 그립니다. x는 카테고리(문자열 배열), height는 막대 높이(숫자 배열)입니다. width 파라미터로 막대 너비를 조절할 수 있습니다(기본값 0.8).
+
+- id: step6_color
+  title: 6단계. 색상 설정
+  subtitle: color 파라미터
+  blocks:
+  - type: text
+    content: 각 막대에 다른 색상을 지정하면 시각적 구분이 명확해집니다. color 파라미터에 색상 리스트를 전달하면 각 막대에 순서대로 색상이 적용됩니다.
+  - type: code
+    language: python
+    title: 색상 설정
+    description: 각 대륙에 다른 색상을 적용합니다
+    content: |-
+      figColor, axColor = plt.subplots(figsize=(10, 6))
+      colorsBasic = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
+      axColor.bar(popByContinent['continent'], popByContinent['popBillion'], color=colorsBasic)
+      axColor.set_title('2007년 대륙별 인구', fontsize=14)
+      axColor.set_xlabel('대륙', fontsize=12)
+      axColor.set_ylabel('인구 (10억 명)', fontsize=12)
+      figColor
+
+- id: step7_xticks
+  title: 7단계. x축 눈금 조정
+  subtitle: set_xticks(), rotation
+  blocks:
+  - type: text
+    content: x축 라벨이 길거나 많을 때는 회전시키면 겹침을 방지할 수 있습니다. tick_params의 rotation으로 라벨 각도를 조정합니다. 한글 라벨로 변경하여 가독성을 높입니다.
+  - type: code
+    language: python
+    title: x축 라벨 조정
+    description: x축 라벨을 회전하고 한글로 변경합니다
+    content: |-
+      figTicks, axTicks = plt.subplots(figsize=(10, 6))
+      colorsTicks = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
+      continentKrTicks = ['아프리카', '아메리카', '아시아', '유럽', '오세아니아']
+
+      barsTicks = axTicks.bar(continentKrTicks, popByContinent['popBillion'], color=colorsTicks)
+      axTicks.set_title('2007년 대륙별 인구', fontsize=14)
+      axTicks.set_xlabel('대륙', fontsize=12)
+      axTicks.set_ylabel('인구 (10억 명)', fontsize=12)
+      axTicks.tick_params(axis='x', rotation=0)
+      figTicks
+  - type: tip
+    content: ax.tick_params(axis='x', rotation=45)로 x축 라벨을 45도 회전합니다. labelsize로 글꼴 크기도 조절 가능합니다. set_xticklabels()로 라벨 텍스트를 직접 지정할 수도 있습니다.
+
+- id: step8_annotate
+  title: 8단계. 막대 위에 값 표시
+  subtitle: ax.annotate()
+  blocks:
+  - type: text
+    content: 각 막대 위에 정확한 수치를 표시하면 정보 전달력이 높아집니다. annotate()로 지정한 위치에 텍스트를 추가합니다. 막대의 x좌표와 높이를 이용해 위치를 계산합니다.
+  - type: code
+    language: python
+    title: Figure 및 막대 그리기
+    description: 막대 그래프를 생성합니다
+    content: |-
+      figAnnotate, axAnnotate = plt.subplots(figsize=(10, 6))
+      colorsAnnotate = ['#3498DB', '#E74C3C', '#27AE60', '#F39C12', '#9B59B6']
+      continentKrAnnotate = ['아프리카', '아메리카', '아시아', '유럽', '오세아니아']
+      valuesAnnotate = popByContinent['popBillion'].values
+
+      barsAnnotate = axAnnotate.bar(continentKrAnnotate, valuesAnnotate, color=colorsAnnotate)
+      figAnnotate
+  - type: code
+    language: python
+    title: 값 레이블 추가
+    description: 각 막대 위에 인구 수치를 표시합니다
+    content: |-
+      for bar, val in zip(barsAnnotate, valuesAnnotate):
+          axAnnotate.annotate(f'{val:.2f}',
+                             xy=(bar.get_x() + bar.get_width()/2, bar.get_height()),
+                             ha='center', va='bottom',
+                             fontsize=11, fontweight='bold')
+
+      axAnnotate.set_title('2007년 대륙별 인구', fontsize=14)
+      axAnnotate.set_xlabel('대륙', fontsize=12)
+      axAnnotate.set_ylabel('인구 (10억 명)', fontsize=12)
+      figAnnotate
+  - type: tip
+    content: ax.annotate(text, xy=(x, y))로 텍스트를 추가합니다. xy는 텍스트 위치, ha(horizontal alignment)와 va(vertical alignment)로 정렬을 설정합니다. bar.get_x()와 bar.get_height()로 막대의 좌표와 높이를 얻습니다.
+
+- id: step9_barh
+  title: 9단계. 수평 막대 그래프
+  subtitle: ax.barh()
+  blocks:
+  - type: text
+    content: 카테고리명이 길거나 비교 항목이 많을 때는 수평 막대 그래프가 더 읽기 쉽습니다. barh()를 사용하면 막대가 수평으로 그려집니다. 인구가 많은 순서로 정렬하면 순위를 쉽게 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 데이터 정렬 및 막대 그리기
+    description: 인구 순으로 정렬하고 수평 막대를 그립니다
+    content: |-
+      figBarh, axBarh = plt.subplots(figsize=(10, 6))
+
+      popSortedBarh = popByContinent.sort_values('popBillion', ascending=True)
+      continentKrSorted = ['오세아니아', '유럽', '아프리카', '아메리카', '아시아']
+      colorsSorted = ['#9B59B6', '#F39C12', '#3498DB', '#E74C3C', '#27AE60']
+
+      barsBarh = axBarh.barh(continentKrSorted, popSortedBarh['popBillion'], color=colorsSorted)
+      figBarh
+  - type: code
+    language: python
+    title: 레이블 및 스타일링
+    description: 막대 옆에 값을 표시하고 스타일을 적용합니다
+    content: |-
+      for bar, val in zip(barsBarh, popSortedBarh['popBillion']):
+          axBarh.annotate(f'{val:.2f}',
+                         xy=(val, bar.get_y() + bar.get_height()/2),
+                         ha='left', va='center',
+                         fontsize=10, fontweight='bold')
+
+      axBarh.set_title('2007년 대륙별 인구 (인구 순)', fontsize=14)
+      axBarh.set_xlabel('인구 (10억 명)', fontsize=12)
+      axBarh.set_ylabel('대륙', fontsize=12)
+      figBarh
+  - type: tip
+    content: ax.barh(y, width)로 수평 막대 그래프를 그립니다. y는 카테고리, width는 막대 길이입니다. 데이터를 정렬(sort_values)한 후 그리면 순위를 쉽게 파악할 수 있습니다.
+
+- id: step10_final
+  title: 10단계. 최종 시각화
+  subtitle: 완성된 막대 그래프
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 요소를 종합하여 완성도 높은 대륙별 인구 비교 차트를 만듭니다. 그리드, 스파인 제거, 값 레이블을 모두 적용합니다.
+  - type: code
+    language: python
+    title: 데이터 준비 및 막대 그리기
+    description: 정렬된 데이터로 수평 막대를 그립니다
+    content: |-
+      figFinal, axFinal = plt.subplots(figsize=(11, 7))
+
+      popSortedFinal = popByContinent.sort_values('popBillion', ascending=True)
+      continentKrFinal = ['오세아니아', '유럽', '아프리카', '아메리카', '아시아']
+      colorsFinal = ['#9B59B6', '#F39C12', '#3498DB', '#E74C3C', '#27AE60']
+
+      barsFinal = axFinal.barh(continentKrFinal, popSortedFinal['popBillion'], color=colorsFinal, height=0.6)
+      figFinal
+  - type: code
+    language: python
+    title: 레이블 추가
+    description: 막대 옆에 값을 표시합니다
+    content: |-
+      for bar, val in zip(barsFinal, popSortedFinal['popBillion']):
+          axFinal.annotate(f'{val:.2f}B',
+                          xy=(val + 0.1, bar.get_y() + bar.get_height()/2),
+                          ha='left', va='center',
+                          fontsize=11, fontweight='bold')
+      figFinal
+  - type: code
+    language: python
+    title: 스타일링 적용
+    description: 제목, 그리드, 스파인을 설정합니다
+    content: |-
+      axFinal.set_title('2007년 대륙별 총 인구 비교', fontsize=16, fontweight='bold')
+      axFinal.set_xlabel('인구 (10억 명)', fontsize=12)
+      axFinal.set_xlim(0, 5)
+      axFinal.grid(True, axis='x', alpha=0.3)
+      axFinal.spines['top'].set_visible(False)
+      axFinal.spines['right'].set_visible(False)
+      plt.tight_layout()
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 대륙별 데이터 분석 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용해서 gapminder 데이터를 다양한 관점에서 분석해봅시다. bar, barh, xticks, annotate 등 모든 개념을 종합적으로 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 대륙별 평균 기대수명 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        url = "https://raw.githubusercontent.com"
+        data = pd.read_csv(f"{url}/plotly/datasets/master/gapminder_unfiltered.csv")
+
+        year2007 = data[data['year'] == 2007]
+        lifeByContinent = year2007.groupby('continent')['lifeExp'].mean().reset_index()
+        lifeSorted = lifeByContinent.sort_values('lifeExp', ascending=True)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart, plot = plt.subplots(figsize=(10, 6))
+        palette = ['#E74C3C', '#F39C12', '#3498DB', '#9B59B6', '#27AE60']
+        continents = lifeSorted['continent'].values
+
+        rects = plot.barh(continents, lifeSorted['lifeExp'], color=palette)
+
+        for rect, val in zip(rects, lifeSorted['lifeExp']):
+            plot.annotate(f'{val:.1f}세',
+                          xy=(val + 0.5, rect.get_y() + rect.get_height()/2),
+                          ha='left', va='center', fontsize=10, fontweight='bold')
+
+        plot.set_title('2007년 대륙별 평균 기대수명', fontsize=14, fontweight='bold')
+        plot.set_xlabel('기대수명 (세)', fontsize=12)
+        plot.set_xlim(0, 85)
+        plot.grid(True, axis='x', alpha=0.3)
+        plot.spines['top'].set_visible(False)
+        plot.spines['right'].set_visible(False)
+
+        plt.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: 연도별 아시아 인구 변화"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        source = "https://raw.githubusercontent.com"
+        df = pd.read_csv(f"{source}/plotly/datasets/master/gapminder_unfiltered.csv")
+
+        asia = df[df['continent'] == 'Asia']
+        popByYear = asia.groupby('year')['pop'].sum().reset_index()
+        popByYear['billion'] = popByYear['pop'] / 1e9
+    - type: code
+      title: "차트 생성"
+      content: |-
+        canvas, panel = plt.subplots(figsize=(12, 6))
+        columns = panel.bar(popByYear['year'].astype(str),
+                            popByYear['billion'],
+                            color='#E74C3C', edgecolor='white')
+
+        for idx, (col, val) in enumerate(zip(columns, popByYear['billion'])):
+            if idx % 2 == 0:
+                panel.annotate(f'{val:.1f}',
+                               xy=(col.get_x() + col.get_width()/2, col.get_height()),
+                               ha='center', va='bottom', fontsize=9)
+
+        panel.set_title('아시아 대륙 연도별 총 인구 변화', fontsize=14, fontweight='bold')
+        panel.set_xlabel('연도', fontsize=12)
+        panel.set_ylabel('인구 (10억 명)', fontsize=12)
+        panel.tick_params(axis='x', rotation=45)
+        panel.grid(True, axis='y', alpha=0.3)
+
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 막대 그래프로 대륙별 인구를 비교 분석했습니다.
+  - type: list
+    items:
+    - "ax.bar(x, height) - 수직 막대 그래프"
+    - "ax.barh(y, width) - 수평 막대 그래프"
+    - "color - 막대 색상 지정"
+    - "tick_params(rotation) - 축 라벨 회전"
+    - "ax.annotate(text, xy) - 막대 위에 값 표시"
+    - "sort_values() - 데이터 정렬로 순위 시각화"
+    - "spines[].set_visible(False) - 테두리 제거"
+  - type: text
+    content: 다음 시간에는 펭귄 데이터로 바이올린 플롯과 박스플롯을 비교합니다.

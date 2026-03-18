@@ -1,0 +1,312 @@
+meta:
+  id: scipy_02
+  title: AB테스트분석
+  order: 2
+  category: scipy
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["scipy.stats", "t-test", "가설검정", "p-value", "AB테스트"]
+  seo:
+    title: "scipy.stats t-검정 - A/B 테스트 분석하기"
+    description: "scipy.stats의 ttest_ind로 A/B 테스트를 분석합니다. p-value를 해석하고 통계적 유의성을 판단합니다."
+    keywords: ["scipy", "t-test", "AB테스트", "가설검정", "p-value"]
+
+intro:
+  emoji: "🧪"
+  goal: 이커머스 버튼 색상 A/B 테스트 결과를 분석하여 비즈니스 의사결정을 내립니다.
+  description: "마케팅팀에서 구매 버튼 색상을 파란색에서 녹색으로 바꾸면 매출이 올라갈지 테스트했습니다. Control 그룹(파란 버튼)과 Treatment 그룹(녹색 버튼) 각 1000명의 구매 금액 데이터가 있습니다. 평균 차이가 $3인데, 이것이 우연인지 실제 효과인지 어떻게 판단할까요? scipy.stats의 t-검정으로 통계적 유의성을 판단하고, 효과 크기와 신뢰구간까지 분석하여 최종 권고안을 제시합니다."
+
+sections:
+- id: load
+  title: 라이브러리 및 데이터 로드
+  subtitle: scipy.stats
+  blocks:
+  - type: text
+    content: "A/B 테스트는 두 버전을 무작위로 배정하여 어느 것이 더 효과적인지 비교하는 실험입니다. 웹사이트 버튼 색상, 이메일 제목, 가격 정책 등 다양한 요소를 테스트할 수 있습니다. scipy.stats의 ttest_ind 함수는 두 독립 표본의 평균 차이가 통계적으로 유의미한지 검정합니다. 이 프로젝트에서는 가상의 이커머스 A/B 테스트 데이터를 생성하여 분석합니다."
+  - type: code
+    language: python
+    title: 패키지 설치 및 데이터 생성
+    content: |-
+      import micropip
+      await micropip.install('scipy')
+
+      import numpy as np
+      from scipy import stats
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(42)
+      controlGroup = np.random.normal(loc=50, scale=15, size=1000)
+      treatmentGroup = np.random.normal(loc=53, scale=15, size=1000)
+  - type: tip
+    content: "Control 그룹은 기존 버전(파란 버튼), Treatment 그룹은 새 버전(녹색 버튼)입니다. 평균 차이 $3가 실제 효과인지 우연인지 통계적으로 판단합니다."
+
+- id: explore
+  title: 데이터 탐색
+  subtitle: 분포 시각화
+  blocks:
+  - type: text
+    content: "통계 검정 전에 데이터를 시각화하여 직관적으로 파악합니다. 두 그룹의 히스토그램을 겹쳐 그리면 분포의 중심과 퍼짐을 비교할 수 있습니다. 평균의 차이가 눈에 보이지만, 분포가 많이 겹치므로 통계적 검정이 필요합니다. 기술통계량(평균, 표준편차)도 함께 확인합니다."
+  - type: code
+    language: python
+    title: 기술통계량 확인
+    content: |-
+      summaryDf = pd.DataFrame({
+          'Group': ['Control', 'Treatment'],
+          'Mean': [controlGroup.mean(), treatmentGroup.mean()],
+          'Std': [controlGroup.std(), treatmentGroup.std()],
+          'Min': [controlGroup.min(), treatmentGroup.min()],
+          'Max': [controlGroup.max(), treatmentGroup.max()]
+      })
+      summaryDf
+  - type: code
+    language: python
+    title: 분포 비교 시각화
+    content: |-
+      figHist, axHist = plt.subplots(figsize=(12, 6))
+      axHist.hist(controlGroup, bins=30, alpha=0.6, label=f'Control (μ={controlGroup.mean():.2f})', color='blue')
+      axHist.hist(treatmentGroup, bins=30, alpha=0.6, label=f'Treatment (μ={treatmentGroup.mean():.2f})', color='green')
+      axHist.axvline(controlGroup.mean(), color='blue', linestyle='--', linewidth=2)
+      axHist.axvline(treatmentGroup.mean(), color='green', linestyle='--', linewidth=2)
+      axHist.set_xlabel('Purchase Amount ($)')
+      axHist.set_ylabel('Frequency')
+      axHist.set_title('A/B Test: Control vs Treatment Distribution')
+      axHist.legend()
+      axHist.grid(True, alpha=0.3)
+      figHist
+
+- id: ttest
+  title: t-검정 실행
+  subtitle: ttest_ind
+  blocks:
+  - type: text
+    content: "t-검정은 두 그룹의 평균 차이가 우연으로 발생했을 확률을 계산합니다. 귀무가설(H0)은 '두 그룹에 차이가 없다'입니다. p-value가 유의수준(보통 0.05) 미만이면 귀무가설을 기각하고, 실제 차이가 있다고 결론 내립니다. ttest_ind는 독립표본 t-검정으로, 서로 다른 사람들로 구성된 두 그룹을 비교할 때 사용합니다."
+  - type: code
+    language: python
+    title: t-검정 실행
+    content: |-
+      tStat, pValue = stats.ttest_ind(controlGroup, treatmentGroup)
+      tStat, pValue
+  - type: tip
+    content: "t통계량은 평균 차이를 표준오차로 나눈 값입니다. 절대값이 클수록 차이가 크다는 의미입니다. p-value는 귀무가설이 참일 때 이 정도 차이가 우연히 나올 확률입니다."
+  - type: code
+    language: python
+    title: 결과 해석
+    content: |-
+      alpha = 0.05
+      isSignificant = pValue < alpha
+
+      resultText = "유의미함 (Treatment 효과 있음)" if isSignificant else "유의미하지 않음"
+      testResult = pd.DataFrame({
+          'Metric': ['t-statistic', 'p-value', 'Alpha', 'Result'],
+          'Value': [f'{tStat:.4f}', f'{pValue:.6f}', f'{alpha}', resultText]
+      })
+      testResult
+  - type: tip
+    content: "p < 0.05이면 5% 유의수준에서 통계적으로 유의미합니다. 하지만 p-value는 효과의 '크기'가 아니라 '존재 여부'만 알려줍니다. 효과 크기는 별도로 계산해야 합니다."
+
+- id: effect_size
+  title: 효과 크기 분석
+  subtitle: Cohen's d
+  blocks:
+  - type: text
+    content: "Cohen's d는 두 그룹 평균 차이를 표준편차 단위로 표현합니다. d가 0.2면 작은 효과, 0.5면 중간 효과, 0.8 이상이면 큰 효과로 해석합니다. p-value가 유의미해도 효과 크기가 작으면 실무적 가치가 낮을 수 있습니다. 반대로 효과 크기가 커도 샘플이 작으면 p-value가 유의미하지 않을 수 있습니다. 두 지표를 함께 보는 것이 중요합니다."
+  - type: code
+    language: python
+    title: Cohen's d 계산
+    content: |-
+      pooledStd = np.sqrt((controlGroup.std()**2 + treatmentGroup.std()**2) / 2)
+      cohensD = (treatmentGroup.mean() - controlGroup.mean()) / pooledStd
+
+      def interpretEffect(d):
+          absD = abs(d)
+          if absD < 0.2:
+              return "negligible"
+          elif absD < 0.5:
+              return "small"
+          elif absD < 0.8:
+              return "medium"
+          else:
+              return "large"
+
+      effectInterpret = interpretEffect(cohensD)
+      cohensD, effectInterpret
+  - type: tip
+    content: "실무에서 Cohen's d가 0.2 미만이면 효과가 미미하여 변경 비용 대비 가치가 낮을 수 있습니다. 통계적 유의성과 실무적 유의성은 다른 개념입니다."
+
+- id: confidence
+  title: 신뢰구간 분석
+  subtitle: 95% CI
+  blocks:
+  - type: text
+    content: "95% 신뢰구간은 모집단의 실제 평균 차이가 95% 확률로 포함되는 범위입니다. 신뢰구간이 0을 포함하지 않으면 통계적으로 유의미합니다. 신뢰구간의 너비는 추정의 정밀도를 나타냅니다. 좁을수록 더 정확한 추정입니다. 비즈니스 보고서에서는 p-value보다 신뢰구간이 더 직관적인 경우가 많습니다."
+  - type: code
+    language: python
+    title: 신뢰구간 계산
+    content: |-
+      meanDiff = treatmentGroup.mean() - controlGroup.mean()
+      seDiff = np.sqrt(controlGroup.var()/len(controlGroup) + treatmentGroup.var()/len(treatmentGroup))
+      ciLower = meanDiff - 1.96 * seDiff
+      ciUpper = meanDiff + 1.96 * seDiff
+
+      ciDf = pd.DataFrame({
+          'Metric': ['Mean Difference', '95% CI Lower', '95% CI Upper', 'Contains Zero'],
+          'Value': [f'${meanDiff:.2f}', f'${ciLower:.2f}', f'${ciUpper:.2f}', 'No' if ciLower > 0 or ciUpper < 0 else 'Yes']
+      })
+      ciDf
+  - type: code
+    language: python
+    title: 에러바 차트
+    content: |-
+      figBar, axBar = plt.subplots(figsize=(8, 6))
+      groups = ['Control', 'Treatment']
+      means = [controlGroup.mean(), treatmentGroup.mean()]
+      errors = [1.96 * controlGroup.std() / np.sqrt(len(controlGroup)), 1.96 * treatmentGroup.std() / np.sqrt(len(treatmentGroup))]
+
+      axBar.bar(groups, means, yerr=errors, capsize=10, color=['blue', 'green'], alpha=0.7)
+      axBar.set_ylabel('Mean Purchase Amount ($)')
+      axBar.set_title('Mean Comparison with 95% CI')
+      axBar.grid(True, alpha=0.3, axis='y')
+      figBar
+
+- id: result
+  title: 최종 분석 보고서
+  subtitle: 비즈니스 의사결정
+  blocks:
+  - type: text
+    content: "A/B 테스트 분석 결과를 종합하여 비즈니스 의사결정을 내립니다. 통계적 유의성(p-value), 효과 크기(Cohen's d), 신뢰구간을 모두 고려합니다. 단순히 p < 0.05라고 바로 채택하는 것이 아니라, 효과 크기가 실무적으로 의미 있는지, 구현 비용 대비 가치가 있는지도 함께 판단해야 합니다."
+  - type: code
+    language: python
+    title: 종합 보고서
+    content: |-
+      reportDf = pd.DataFrame({
+          'Metric': [
+              'Control Mean',
+              'Treatment Mean',
+              'Difference',
+              'Effect Size',
+              'p-value',
+              'Significant (α=0.05)',
+              '95% CI',
+              'Recommendation'
+          ],
+          'Value': [
+              f'${controlGroup.mean():.2f}',
+              f'${treatmentGroup.mean():.2f}',
+              f'${meanDiff:.2f} (+{meanDiff/controlGroup.mean()*100:.1f}%)',
+              f'{cohensD:.3f} ({effectInterpret})',
+              f'{pValue:.6f}',
+              'Yes' if pValue < 0.05 else 'No',
+              f'[${ciLower:.2f}, ${ciUpper:.2f}]',
+              'Implement Treatment' if pValue < 0.05 and cohensD > 0.1 else 'Keep Control'
+          ]
+      })
+      reportDf
+  - type: code
+    language: python
+    title: 최종 시각화
+    content: |-
+      figFinal, (axFinal1, axFinal2) = plt.subplots(1, 2, figsize=(14, 5))
+
+      axFinal1.hist(controlGroup, bins=30, alpha=0.6, label='Control', color='blue')
+      axFinal1.hist(treatmentGroup, bins=30, alpha=0.6, label='Treatment', color='green')
+      axFinal1.axvline(controlGroup.mean(), color='blue', linestyle='--', linewidth=2)
+      axFinal1.axvline(treatmentGroup.mean(), color='green', linestyle='--', linewidth=2)
+      axFinal1.set_xlabel('Purchase Amount ($)')
+      axFinal1.set_ylabel('Frequency')
+      axFinal1.set_title('Distribution Comparison')
+      axFinal1.legend()
+      axFinal1.grid(True, alpha=0.3)
+
+      axFinal2.barh(['Difference'], [meanDiff], xerr=[[meanDiff - ciLower], [ciUpper - meanDiff]], capsize=10, color='teal', alpha=0.7)
+      axFinal2.axvline(x=0, color='red', linestyle='--', label='No Effect')
+      axFinal2.set_xlabel('Mean Difference ($)')
+      axFinal2.set_title(f'Treatment Effect: ${meanDiff:.2f} (p={pValue:.4f})')
+      axFinal2.legend()
+      axFinal2.grid(True, alpha=0.3)
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: A/B 테스트 분석 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 t-검정, 효과 크기, 신뢰구간 분석을 활용하여 다양한 A/B 테스트를 분석합니다. 미션1은 랜딩 페이지 전환율 비교로 비율 검정을 사용합니다. 미션2는 앱 사용시간 비교로 Welch's t-검정을 사용합니다. 각 미션은 데이터 생성, 통계 검정, 시각화, 해석을 포함합니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 랜딩 페이지 전환율 비교"
+    blocks:
+    - type: code
+      title: 데이터 생성
+      content: |-
+        import numpy as np
+        from scipy import stats
+        import pandas as pd
+
+        np.random.seed(789)
+        pageA = np.random.binomial(1, 0.12, 5000)
+        pageB = np.random.binomial(1, 0.14, 5000)
+
+        convA = pageA.mean()
+        convB = pageB.mean()
+        convA, convB
+    - type: code
+      title: 비율 검정
+      content: |-
+        successA = pageA.sum()
+        successB = pageB.sum()
+        nA = len(pageA)
+        nB = len(pageB)
+
+        pooledP = (successA + successB) / (nA + nB)
+        se = np.sqrt(pooledP * (1 - pooledP) * (1/nA + 1/nB))
+        zStat = (convB - convA) / se
+        pValueConv = 2 * (1 - stats.norm.cdf(abs(zStat)))
+
+        convDf = pd.DataFrame({
+            'Metric': ['Page A Conversion', 'Page B Conversion', 'Difference', 'z-statistic', 'p-value', 'Significant'],
+            'Value': [f'{convA:.2%}', f'{convB:.2%}', f'+{(convB-convA)*100:.2f}pp', f'{zStat:.4f}', f'{pValueConv:.6f}', pValueConv < 0.05]
+        })
+        convDf
+  - type: expansion
+    title: "미션2: 앱 사용시간 비교"
+    blocks:
+    - type: code
+      title: 데이터 생성
+      content: |-
+        import numpy as np
+        from scipy import stats
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        np.random.seed(321)
+        oldApp = np.random.gamma(shape=5, scale=3, size=200)
+        newApp = np.random.gamma(shape=6, scale=3, size=200)
+    - type: code
+      title: Welch t-검정
+      content: |-
+        tApp, pApp = stats.ttest_ind(oldApp, newApp, equal_var=False)
+
+        pooledStdApp = np.sqrt((oldApp.std()**2 + newApp.std()**2) / 2)
+        cohensApp = (newApp.mean() - oldApp.mean()) / pooledStdApp
+
+        appDf = pd.DataFrame({
+            'Metric': ['Old App Mean', 'New App Mean', 'Improvement', "Cohen's d", 'p-value', 'Significant'],
+            'Value': [f'{oldApp.mean():.1f} min', f'{newApp.mean():.1f} min', f'+{(newApp.mean()-oldApp.mean()):.1f} min', f'{cohensApp:.3f}', f'{pApp:.6f}', pApp < 0.05]
+        })
+        appDf
+    - type: code
+      title: 시각화
+      content: |-
+        figApp, axApp = plt.subplots(figsize=(10, 6))
+        axApp.hist(oldApp, bins=25, alpha=0.6, label=f'Old App (μ={oldApp.mean():.1f}min)', color='coral')
+        axApp.hist(newApp, bins=25, alpha=0.6, label=f'New App (μ={newApp.mean():.1f}min)', color='teal')
+        axApp.axvline(oldApp.mean(), color='coral', linestyle='--', linewidth=2)
+        axApp.axvline(newApp.mean(), color='teal', linestyle='--', linewidth=2)
+        axApp.set_xlabel('Session Duration (minutes)')
+        axApp.set_ylabel('Frequency')
+        axApp.set_title('App Usage Time A/B Test')
+        axApp.legend()
+        axApp.grid(True, alpha=0.3)
+        figApp

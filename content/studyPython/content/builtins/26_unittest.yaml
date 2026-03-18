@@ -1,0 +1,854 @@
+meta:
+  title: "unittest - 단위 테스트"
+  description: "자동화된 테스트를 위한 unittest 모듈"
+  keywords: ["unittest", "테스트", "test", "assert", "TestCase"]
+
+intro:
+  emoji: "✅"
+  points:
+  - "자동화된 단위 테스트"
+  - "다양한 assert 메서드"
+  - "테스트 픽스처 관리"
+  - "테스트 스위트 구성"
+
+sections:
+- id: "module_import"
+  title: "모듈 임포트"
+  subtitle: "unittest 시작하기"
+  blocks:
+  - type: "text"
+    content: "unittest는 파이썬 표준 라이브러리입니다. TestCase 클래스를 상속하여 테스트를 작성합니다."
+  - type: "list"
+    items:
+    - "TestCase: 테스트 케이스 클래스"
+    - "assertEqual(): 값 비교"
+    - "assertTrue(): 참 검증"
+    - "setUp(), tearDown(): 픽스처"
+  - type: "code"
+    language: "python"
+    title: "기본 임포트"
+    description: "unittest 모듈 임포트 및 기본 테스트"
+    content: |-
+      import unittest
+
+      class SimpleTest(unittest.TestCase):
+          def testAddition(self):
+              total = 2 + 2
+              self.assertEqual(total, 4)
+
+      suite = unittest.TestLoader().loadTestsFromTestCase(SimpleTest)
+      runner = unittest.TextTestRunner(verbosity=0)
+      outcome = runner.run(suite)
+
+      outcome.wasSuccessful()
+  - type: "note"
+    content: "Marimo/Pyodide 환경에서는 TestLoader와 TextTestRunner를 사용하여 테스트를 실행합니다. 일반적으로는 python -m unittest 명령으로 실행합니다."
+
+- id: "assert_methods"
+  title: "Assert 메서드"
+  subtitle: "검증 메서드들"
+  blocks:
+  - type: "text"
+    content: "TestCase는 다양한 assert 메서드를 제공하여 값을 검증할 수 있습니다."
+  - type: "list"
+    items:
+    - "assertEqual(a, b): a == b"
+    - "assertTrue(x): x is True"
+    - "assertFalse(x): x is False"
+    - "assertIn(a, b): a in b"
+    - "assertIsNone(x): x is None"
+  - type: "code"
+    language: "python"
+    title: "기본 assert"
+    description: "assertEqual, assertTrue"
+    content: |-
+      import unittest
+
+      class AssertTest(unittest.TestCase):
+          def testEqual(self):
+              self.assertEqual(10, 10)
+
+          def testTrue(self):
+              self.assertTrue(5 > 3)
+
+          def testFalse(self):
+              self.assertFalse(2 > 5)
+
+      loader = unittest.TestLoader().loadTestsFromTestCase(AssertTest)
+      runner1 = unittest.TextTestRunner(verbosity=0)
+      result1 = runner1.run(loader)
+
+      result1.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "컨테이너 assert"
+    description: "In, NotIn"
+    content: |-
+      import unittest
+
+      class ContainerTest(unittest.TestCase):
+          def testIn(self):
+              items = [1, 2, 3]
+              self.assertIn(2, items)
+
+          def testNotIn(self):
+              items = ['a', 'b', 'c']
+              self.assertNotIn('d', items)
+
+      loader2 = unittest.TestLoader().loadTestsFromTestCase(ContainerTest)
+      runner2 = unittest.TextTestRunner(verbosity=0)
+      result2 = runner2.run(loader2)
+
+      result2.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "None과 타입 assert"
+    description: "IsNone, IsInstance"
+    content: |-
+      import unittest
+
+      class TypeTest(unittest.TestCase):
+          def testNone(self):
+              value = None
+              self.assertIsNone(value)
+
+          def testNotNone(self):
+              value = 42
+              self.assertIsNotNone(value)
+
+          def testInstance(self):
+              text = "hello"
+              self.assertIsInstance(text, str)
+
+      loader3 = unittest.TestLoader().loadTestsFromTestCase(TypeTest)
+      runner3 = unittest.TextTestRunner(verbosity=0)
+      result3 = runner3.run(loader3)
+
+      result3.wasSuccessful()
+  - type: "tip"
+    content: "각 assert 메서드는 실패 시 자동으로 상세한 에러 메시지를 생성합니다. msg 파라미터로 커스텀 메시지를 추가할 수 있습니다."
+
+- id: "fixtures"
+  title: "테스트 픽스처"
+  subtitle: "setUp과 tearDown"
+  blocks:
+  - type: "text"
+    content: "setUp()과 tearDown()으로 각 테스트 전후에 실행되는 코드를 정의할 수 있습니다."
+  - type: "list"
+    items:
+    - "setUp(): 각 테스트 전 실행"
+    - "tearDown(): 각 테스트 후 실행"
+    - "setUpClass(): 클래스 시작 시 1회"
+    - "tearDownClass(): 클래스 종료 시 1회"
+  - type: "code"
+    language: "python"
+    title: "setUp/tearDown"
+    description: "각 테스트마다 초기화"
+    content: |-
+      import unittest
+
+      class FixtureTest(unittest.TestCase):
+          def setUp(self):
+              self.data = [1, 2, 3]
+
+          def testLength(self):
+              self.assertEqual(len(self.data), 3)
+
+          def testSum(self):
+              self.assertEqual(sum(self.data), 6)
+
+          def tearDown(self):
+              self.data = None
+
+      loader4 = unittest.TestLoader().loadTestsFromTestCase(FixtureTest)
+      runner4 = unittest.TextTestRunner(verbosity=0)
+      result4 = runner4.run(loader4)
+
+      result4.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "클래스 픽스처"
+    description: "setUpClass 사용"
+    content: |-
+      import unittest
+
+      class ClassFixtureTest(unittest.TestCase):
+          @classmethod
+          def setUpClass(cls):
+              cls.sharedData = {'count': 0}
+
+          def testIncrement1(self):
+              self.sharedData['count'] += 1
+              self.assertGreater(self.sharedData['count'], 0)
+
+          def testIncrement2(self):
+              self.sharedData['count'] += 1
+              self.assertGreater(self.sharedData['count'], 0)
+
+      loader5 = unittest.TestLoader().loadTestsFromTestCase(ClassFixtureTest)
+      runner5 = unittest.TextTestRunner(verbosity=0)
+      result5 = runner5.run(loader5)
+
+      result5.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "복잡한 픽스처"
+    description: "리소스 준비/정리"
+    content: |-
+      import unittest
+
+      class ResourceTest(unittest.TestCase):
+          def setUp(self):
+              self.connection = {'status': 'connected', 'data': []}
+
+          def testAddData(self):
+              self.connection['data'].append('item1')
+              self.assertIn('item1', self.connection['data'])
+
+          def tearDown(self):
+              self.connection['status'] = 'closed'
+              self.connection['data'].clear()
+
+      loader6 = unittest.TestLoader().loadTestsFromTestCase(ResourceTest)
+      runner6 = unittest.TextTestRunner(verbosity=0)
+      result6 = runner6.run(loader6)
+
+      result6.wasSuccessful()
+  - type: "tip"
+    content: "setUp()은 각 테스트 메서드마다 실행되므로, 테스트 간 독립성을 보장합니다. 테스트 순서에 의존하지 않는 코드를 작성하세요."
+
+- id: "exceptions"
+  title: "예외 테스트"
+  subtitle: "에러 발생 검증"
+  blocks:
+  - type: "text"
+    content: "assertRaises()로 특정 예외가 발생하는지 검증할 수 있습니다."
+  - type: "list"
+    items:
+    - "assertRaises(예외, 함수): 예외 발생 확인"
+    - "with assertRaises(예외): 컨텍스트 매니저"
+    - "assertRaisesRegex(): 에러 메시지 패턴 검증"
+    - "assertWarns(): 경고 검증"
+  - type: "code"
+    language: "python"
+    title: "예외 발생 테스트"
+    description: "assertRaises 사용"
+    content: |-
+      import unittest
+
+      class ExceptionTest(unittest.TestCase):
+          def testZeroDivision(self):
+              def divide():
+                  return 10 / 0
+
+              self.assertRaises(ZeroDivisionError, divide)
+
+          def testValueError(self):
+              def convert():
+                  return int('abc')
+
+              self.assertRaises(ValueError, convert)
+
+      loader7 = unittest.TestLoader().loadTestsFromTestCase(ExceptionTest)
+      runner7 = unittest.TextTestRunner(verbosity=0)
+      result7 = runner7.run(loader7)
+
+      result7.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "컨텍스트 매니저"
+    description: "with assertRaises"
+    content: |-
+      import unittest
+
+      class ContextExceptionTest(unittest.TestCase):
+          def testWithContext(self):
+              with self.assertRaises(KeyError):
+                  empty = {}
+                  value = empty['missing']
+
+          def testWithMessage(self):
+              with self.assertRaisesRegex(ValueError, 'invalid'):
+                  raise ValueError('invalid input')
+
+      loader8 = unittest.TestLoader().loadTestsFromTestCase(ContextExceptionTest)
+      runner8 = unittest.TextTestRunner(verbosity=0)
+      result8 = runner8.run(loader8)
+
+      result8.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "예외 메시지 검증"
+    description: "assertRaisesRegex"
+    content: |-
+      import unittest
+
+      class MessageTest(unittest.TestCase):
+          def testErrorMessage(self):
+              def raiseError():
+                  raise RuntimeError('critical error occurred')
+
+              with self.assertRaisesRegex(RuntimeError, 'critical'):
+                  raiseError()
+
+      loader9 = unittest.TestLoader().loadTestsFromTestCase(MessageTest)
+      runner9 = unittest.TextTestRunner(verbosity=0)
+      result9 = runner9.run(loader9)
+
+      result9.wasSuccessful()
+  - type: "tip"
+    content: "assertRaises는 함수를 직접 호출하거나 with 문과 함께 사용할 수 있습니다. with 문이 더 유연하고 읽기 쉽습니다."
+
+- id: "test_organization"
+  title: "테스트 구성"
+  subtitle: "스위트와 스킵"
+  blocks:
+  - type: "text"
+    content: "여러 테스트를 그룹화하거나 조건부로 스킵할 수 있습니다."
+  - type: "list"
+    items:
+    - "TestSuite: 테스트 그룹화"
+    - "@skip(): 테스트 건너뛰기"
+    - "@skipIf(조건): 조건부 스킵"
+    - "subTest(): 서브테스트"
+  - type: "code"
+    language: "python"
+    title: "테스트 스킵"
+    description: "skip 데코레이터"
+    content: |-
+      import unittest
+
+      class SkipTest(unittest.TestCase):
+          def testNormal(self):
+              self.assertTrue(True)
+
+          @unittest.skip("작업 중")
+          def testSkipped(self):
+              self.fail("실행되면 안됨")
+
+          @unittest.skipIf(True, "조건 만족")
+          def testConditional(self):
+              self.fail("실행되면 안됨")
+
+      loader10 = unittest.TestLoader().loadTestsFromTestCase(SkipTest)
+      runner10 = unittest.TextTestRunner(verbosity=0)
+      result10 = runner10.run(loader10)
+
+      result10.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "서브테스트"
+    description: "반복 테스트"
+    content: |-
+      import unittest
+
+      class SubTest(unittest.TestCase):
+          def testMultiple(self):
+              for num in [2, 4, 6, 8]:
+                  with self.subTest(num=num):
+                      self.assertEqual(num % 2, 0)
+
+      loader11 = unittest.TestLoader().loadTestsFromTestCase(SubTest)
+      runner11 = unittest.TextTestRunner(verbosity=0)
+      result11 = runner11.run(loader11)
+
+      result11.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "테스트 스위트"
+    description: "수동으로 테스트 조합"
+    content: |-
+      import unittest
+
+      class SuiteTestA(unittest.TestCase):
+          def testA1(self):
+              self.assertTrue(True)
+
+      class SuiteTestB(unittest.TestCase):
+          def testB1(self):
+              self.assertTrue(True)
+
+      customSuite = unittest.TestSuite()
+      customSuite.addTest(SuiteTestA('testA1'))
+      customSuite.addTest(SuiteTestB('testB1'))
+
+      runner12 = unittest.TextTestRunner(verbosity=0)
+      result12 = runner12.run(customSuite)
+
+      result12.wasSuccessful()
+  - type: "tip"
+    content: "subTest()를 사용하면 반복문에서 일부가 실패해도 나머지 케이스를 계속 테스트할 수 있습니다."
+
+- id: "mocking"
+  title: "Mock 객체"
+  subtitle: "unittest.mock"
+  blocks:
+  - type: "text"
+    content: "unittest.mock으로 테스트 더블(Mock, Patch)을 만들어 의존성을 제어할 수 있습니다."
+  - type: "list"
+    items:
+    - "Mock(): 모의 객체 생성"
+    - "patch(): 객체 임시 교체"
+    - "return_value: 반환값 설정"
+    - "assert_called(): 호출 검증"
+  - type: "code"
+    language: "python"
+    title: "Mock 객체 기본"
+    description: "Mock 생성과 설정"
+    content: |-
+      import unittest
+      from unittest.mock import Mock
+
+      class MockTest(unittest.TestCase):
+          def testMockBasic(self):
+              mockFunc = Mock(return_value=42)
+              output = mockFunc()
+              self.assertEqual(output, 42)
+              mockFunc.assert_called_once()
+
+      loader13 = unittest.TestLoader().loadTestsFromTestCase(MockTest)
+      runner13 = unittest.TextTestRunner(verbosity=0)
+      result13 = runner13.run(loader13)
+
+      result13.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "Mock 호출 검증"
+    description: "assert_called_with"
+    content: |-
+      import unittest
+      from unittest.mock import Mock
+
+      class CallTest(unittest.TestCase):
+          def testCallWith(self):
+              mockMethod = Mock()
+              mockMethod('hello', key='value')
+              mockMethod.assert_called_with('hello', key='value')
+
+      loader14 = unittest.TestLoader().loadTestsFromTestCase(CallTest)
+      runner14 = unittest.TextTestRunner(verbosity=0)
+      result14 = runner14.run(loader14)
+
+      result14.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "side_effect 사용"
+    description: "예외나 시퀀스 반환"
+    content: |-
+      import unittest
+      from unittest.mock import Mock
+
+      class SideEffectTest(unittest.TestCase):
+          def testSequence(self):
+              mockSeq = Mock(side_effect=[1, 2, 3])
+              self.assertEqual(mockSeq(), 1)
+              self.assertEqual(mockSeq(), 2)
+              self.assertEqual(mockSeq(), 3)
+
+      loader15 = unittest.TestLoader().loadTestsFromTestCase(SideEffectTest)
+      runner15 = unittest.TextTestRunner(verbosity=0)
+      result15 = runner15.run(loader15)
+
+      result15.wasSuccessful()
+  - type: "tip"
+    content: "Mock 객체는 호출 횟수, 인자 등을 자동으로 기록하므로 상호작용을 쉽게 검증할 수 있습니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "실무 테스트 패턴"
+  blocks:
+  - type: "text"
+    content: "실제 프로젝트에서 자주 사용되는 테스트 패턴들입니다."
+  - type: "code"
+    language: "python"
+    title: "계산기 테스트"
+    description: "간단한 클래스 테스트"
+    content: |-
+      import unittest
+
+      class Calculator:
+          def add(self, a, b):
+              return a + b
+          def subtract(self, a, b):
+              return a - b
+
+      class CalculatorTest(unittest.TestCase):
+          def setUp(self):
+              self.calc = Calculator()
+
+          def testAdd(self):
+              self.assertEqual(self.calc.add(2, 3), 5)
+
+          def testSubtract(self):
+              self.assertEqual(self.calc.subtract(10, 3), 7)
+
+      loader16 = unittest.TestLoader().loadTestsFromTestCase(CalculatorTest)
+      runner16 = unittest.TextTestRunner(verbosity=0)
+      result16 = runner16.run(loader16)
+
+      result16.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "데이터 검증 테스트"
+    description: "여러 케이스 검증"
+    content: |-
+      import unittest
+
+      def validateEmail(email):
+          return '@' in email and '.' in email
+
+      class ValidationTest(unittest.TestCase):
+          def testValidEmails(self):
+              validCases = ['user@example.com', 'test@mail.org']
+              for email in validCases:
+                  with self.subTest(email=email):
+                      self.assertTrue(validateEmail(email))
+
+          def testInvalidEmails(self):
+              invalidCases = ['notanemail', 'missing@domain']
+              for email in invalidCases:
+                  with self.subTest(email=email):
+                      self.assertFalse(validateEmail(email))
+
+      loader17 = unittest.TestLoader().loadTestsFromTestCase(ValidationTest)
+      runner17 = unittest.TextTestRunner(verbosity=0)
+      result17 = runner17.run(loader17)
+
+      result17.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "API 응답 테스트"
+    description: "Mock으로 외부 의존성 제거"
+    content: |-
+      import unittest
+      from unittest.mock import Mock
+
+      class ApiClient:
+          def __init__(self, fetcher):
+              self.fetcher = fetcher
+
+          def getUser(self, userId):
+              response = self.fetcher(userId)
+              return response
+
+      class ApiTest(unittest.TestCase):
+          def testGetUser(self):
+              mockFetcher = Mock(return_value={'id': 1, 'name': 'Alice'})
+              client = ApiClient(mockFetcher)
+
+              userData = client.getUser(1)
+
+              self.assertEqual(userData['name'], 'Alice')
+              mockFetcher.assert_called_once_with(1)
+
+      loader18 = unittest.TestLoader().loadTestsFromTestCase(ApiTest)
+      runner18 = unittest.TextTestRunner(verbosity=0)
+      result18 = runner18.run(loader18)
+
+      result18.wasSuccessful()
+  - type: "tip"
+    content: "실제 프로젝트에서는 테스트 파일을 tests/ 디렉토리에 분리하고, python -m unittest discover로 자동 실행합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  blocks:
+  - type: "expansion"
+    title: "🟢 기본1: assertEqual"
+    code: |-
+      import unittest
+
+      class Practice1(unittest.TestCase):
+          def testBasic(self):
+              self.assertEqual(5 + 5, 10)
+
+      s1 = unittest.TestLoader().loadTestsFromTestCase(Practice1)
+      r1 = unittest.TextTestRunner(verbosity=0).run(s1)
+      r1.wasSuccessful()
+  - type: "expansion"
+    title: "🟢 기본2: assertTrue"
+    code: |-
+      import unittest
+
+      class Practice2(unittest.TestCase):
+          def testCondition(self):
+              self.assertTrue(10 > 5)
+
+      s2 = unittest.TestLoader().loadTestsFromTestCase(Practice2)
+      r2 = unittest.TextTestRunner(verbosity=0).run(s2)
+      r2.wasSuccessful()
+  - type: "expansion"
+    title: "🟢 기본3: assertIn"
+    code: |-
+      import unittest
+
+      class Practice3(unittest.TestCase):
+          def testMembership(self):
+              self.assertIn('a', ['a', 'b', 'c'])
+
+      s3 = unittest.TestLoader().loadTestsFromTestCase(Practice3)
+      r3 = unittest.TextTestRunner(verbosity=0).run(s3)
+      r3.wasSuccessful()
+  - type: "expansion"
+    title: "🟢 기본4: assertIsNone"
+    code: |-
+      import unittest
+
+      class Practice4(unittest.TestCase):
+          def testNoneValue(self):
+              self.assertIsNone(None)
+
+      s4 = unittest.TestLoader().loadTestsFromTestCase(Practice4)
+      r4 = unittest.TextTestRunner(verbosity=0).run(s4)
+      r4.wasSuccessful()
+  - type: "expansion"
+    title: "🟢 기본5: assertIsInstance"
+    code: |-
+      import unittest
+
+      class Practice5(unittest.TestCase):
+          def testType(self):
+              self.assertIsInstance(42, int)
+
+      s5 = unittest.TestLoader().loadTestsFromTestCase(Practice5)
+      r5 = unittest.TextTestRunner(verbosity=0).run(s5)
+      r5.wasSuccessful()
+  - type: "expansion"
+    title: "🟡 응용1: setUp 사용"
+    code: |-
+      import unittest
+
+      class Practice6(unittest.TestCase):
+          def setUp(self):
+              self.numbers = [1, 2, 3, 4, 5]
+
+          def testListLength(self):
+              self.assertEqual(len(self.numbers), 5)
+
+      s6 = unittest.TestLoader().loadTestsFromTestCase(Practice6)
+      r6 = unittest.TextTestRunner(verbosity=0).run(s6)
+      r6.wasSuccessful()
+  - type: "expansion"
+    title: "🟡 응용2: assertRaises"
+    code: |-
+      import unittest
+
+      class Practice7(unittest.TestCase):
+          def testException(self):
+              with self.assertRaises(ValueError):
+                  int('invalid')
+
+      s7 = unittest.TestLoader().loadTestsFromTestCase(Practice7)
+      r7 = unittest.TextTestRunner(verbosity=0).run(s7)
+      r7.wasSuccessful()
+  - type: "expansion"
+    title: "🟡 응용3: 여러 assert"
+    code: |-
+      import unittest
+
+      class Practice8(unittest.TestCase):
+          def testMultipleAsserts(self):
+              self.assertEqual(2 + 2, 4)
+              self.assertTrue(5 > 3)
+              self.assertIn(2, [1, 2, 3])
+
+      s8 = unittest.TestLoader().loadTestsFromTestCase(Practice8)
+      r8 = unittest.TextTestRunner(verbosity=0).run(s8)
+      r8.wasSuccessful()
+  - type: "expansion"
+    title: "🟡 응용4: subTest"
+    code: |-
+      import unittest
+
+      class Practice9(unittest.TestCase):
+          def testEvenNumbers(self):
+              for n in [2, 4, 6]:
+                  with self.subTest(n=n):
+                      self.assertEqual(n % 2, 0)
+
+      s9 = unittest.TestLoader().loadTestsFromTestCase(Practice9)
+      r9 = unittest.TextTestRunner(verbosity=0).run(s9)
+      r9.wasSuccessful()
+  - type: "expansion"
+    title: "🟡 응용5: assertGreater"
+    code: |-
+      import unittest
+
+      class Practice10(unittest.TestCase):
+          def testComparison(self):
+              self.assertGreater(10, 5)
+              self.assertLess(3, 7)
+
+      s10 = unittest.TestLoader().loadTestsFromTestCase(Practice10)
+      r10 = unittest.TextTestRunner(verbosity=0).run(s10)
+      r10.wasSuccessful()
+  - type: "expansion"
+    title: "🔴 심화1: Mock 기본"
+    code: |-
+      import unittest
+      from unittest.mock import Mock
+
+      class Practice11(unittest.TestCase):
+          def testMock(self):
+              m = Mock(return_value=100)
+              self.assertEqual(m(), 100)
+
+      s11 = unittest.TestLoader().loadTestsFromTestCase(Practice11)
+      r11 = unittest.TextTestRunner(verbosity=0).run(s11)
+      r11.wasSuccessful()
+  - type: "expansion"
+    title: "🔴 심화2: Mock 호출 검증"
+    code: |-
+      import unittest
+      from unittest.mock import Mock
+
+      class Practice12(unittest.TestCase):
+          def testCallVerify(self):
+              m = Mock()
+              m('arg1', 'arg2')
+              m.assert_called_with('arg1', 'arg2')
+
+      s12 = unittest.TestLoader().loadTestsFromTestCase(Practice12)
+      r12 = unittest.TextTestRunner(verbosity=0).run(s12)
+      r12.wasSuccessful()
+  - type: "expansion"
+    title: "🔴 심화3: 클래스 테스트"
+    code: |-
+      import unittest
+
+      class Counter:
+          def __init__(self):
+              self.count = 0
+          def increment(self):
+              self.count += 1
+
+      class Practice13(unittest.TestCase):
+          def testCounter(self):
+              c = Counter()
+              c.increment()
+              self.assertEqual(c.count, 1)
+
+      s13 = unittest.TestLoader().loadTestsFromTestCase(Practice13)
+      r13 = unittest.TextTestRunner(verbosity=0).run(s13)
+      r13.wasSuccessful()
+  - type: "expansion"
+    title: "🔴 심화4: setUp/tearDown"
+    code: |-
+      import unittest
+
+      class Practice14(unittest.TestCase):
+          def setUp(self):
+              self.tempData = {'status': 'ready'}
+
+          def testStatus(self):
+              self.assertEqual(self.tempData['status'], 'ready')
+
+          def tearDown(self):
+              self.tempData = None
+
+      s14 = unittest.TestLoader().loadTestsFromTestCase(Practice14)
+      r14 = unittest.TextTestRunner(verbosity=0).run(s14)
+      r14.wasSuccessful()
+  - type: "expansion"
+    title: "🔴 심화5: assertRaisesRegex"
+    code: |-
+      import unittest
+
+      class Practice15(unittest.TestCase):
+          def testErrorMsg(self):
+              with self.assertRaisesRegex(ValueError, 'invalid'):
+                  raise ValueError('invalid input')
+
+      s15 = unittest.TestLoader().loadTestsFromTestCase(Practice15)
+      r15 = unittest.TextTestRunner(verbosity=0).run(s15)
+      r15.wasSuccessful()
+  - type: "expansion"
+    title: "🔴 심화6: side_effect"
+    code: |-
+      import unittest
+      from unittest.mock import Mock
+
+      class Practice16(unittest.TestCase):
+          def testSideEffect(self):
+              m = Mock(side_effect=[10, 20, 30])
+              self.assertEqual(m(), 10)
+              self.assertEqual(m(), 20)
+
+      s16 = unittest.TestLoader().loadTestsFromTestCase(Practice16)
+      r16 = unittest.TextTestRunner(verbosity=0).run(s16)
+      r16.wasSuccessful()
+  - type: "expansion"
+    title: "🔴 심화7: 리스트 검증"
+    code: |-
+      import unittest
+
+      class Practice17(unittest.TestCase):
+          def testListOps(self):
+              lst = [1, 2, 3]
+              lst.append(4)
+              self.assertEqual(len(lst), 4)
+              self.assertIn(4, lst)
+
+      s17 = unittest.TestLoader().loadTestsFromTestCase(Practice17)
+      r17 = unittest.TextTestRunner(verbosity=0).run(s17)
+      r17.wasSuccessful()
+  - type: "expansion"
+    title: "🔴 심화8: 딕셔너리 검증"
+    code: |-
+      import unittest
+
+      class Practice18(unittest.TestCase):
+          def testDict(self):
+              d = {'name': 'Bob', 'age': 30}
+              self.assertEqual(d['name'], 'Bob')
+              self.assertIn('age', d)
+
+      s18 = unittest.TestLoader().loadTestsFromTestCase(Practice18)
+      r18 = unittest.TextTestRunner(verbosity=0).run(s18)
+      r18.wasSuccessful()
+  - type: "expansion"
+    title: "🔴 심화9: 함수 테스트"
+    code: |-
+      import unittest
+
+      def multiply(a, b):
+          return a * b
+
+      class Practice19(unittest.TestCase):
+          def testMultiply(self):
+              self.assertEqual(multiply(3, 4), 12)
+              self.assertEqual(multiply(0, 5), 0)
+
+      s19 = unittest.TestLoader().loadTestsFromTestCase(Practice19)
+      r19 = unittest.TextTestRunner(verbosity=0).run(s19)
+      r19.wasSuccessful()
+  - type: "expansion"
+    title: "🔴 심화10: 전체 활용 - 사용자 클래스"
+    code: |-
+      import unittest
+      from unittest.mock import Mock
+
+      class User:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+          def isAdult(self):
+              return self.age >= 18
+
+      class Practice20(unittest.TestCase):
+          def setUp(self):
+              self.user1 = User('Alice', 25)
+              self.user2 = User('Bob', 15)
+
+          def testAdult(self):
+              self.assertTrue(self.user1.isAdult())
+
+          def testNotAdult(self):
+              self.assertFalse(self.user2.isAdult())
+
+          def testUserName(self):
+              self.assertEqual(self.user1.name, 'Alice')
+
+      s20 = unittest.TestLoader().loadTestsFromTestCase(Practice20)
+      r20 = unittest.TextTestRunner(verbosity=0).run(s20)
+      r20.wasSuccessful()

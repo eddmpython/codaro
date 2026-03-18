@@ -1,0 +1,383 @@
+meta:
+  id: polars_06
+  title: 부동산가격분석
+  order: 6
+  category: polars
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  dataUrl: https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv
+  tags: ["null처리", "when-then", "n_unique", "std", "join", "조건부변환"]
+  seo:
+    title: "Polars 조건부 변환과 조인 - 부동산 가격 분석"
+    description: "Polars로 주택 가격 데이터를 분석합니다. null 처리, when-then-otherwise 조건부 변환, 표준편차, 조인을 배웁니다."
+    keywords: ["polars null", "when then otherwise", "n_unique", "std", "join"]
+
+intro:
+  emoji: "🏠"
+  goal: 지역별 주택 가격 분포와 가격 결정 요인을 분석합니다.
+  description: null 처리, 조건부 값 변환, 고급 집계 함수, 조인을 활용하여 부동산 데이터를 분석합니다. Polars의 효율적인 데이터 처리로 대용량 부동산 데이터도 빠르게 분석할 수 있습니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: Boston Housing 데이터
+  blocks:
+  - type: text
+    content: Boston 지역 506개 주택의 가격과 특성 정보를 불러옵니다. 이 데이터는 1970년대 보스턴 교외 지역 주택의 중간 가격(medv)과 이에 영향을 미치는 13개의 특성 변수를 포함합니다. 범죄율(crim), 방 개수(rm), 강변 위치 여부(chas), 저소득층 비율(lstat) 등 부동산 가격 결정 요인을 분석할 수 있는 실제 데이터입니다. Polars의 read_csv는 pandas보다 빠른 속도로 CSV 파일을 DataFrame으로 변환하며, 특히 대용량 데이터에서 성능 차이가 두드러집니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: 506개 주택 정보
+    content: |-
+      import polars as pl
+
+      url = "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv"
+      housing = pl.read_csv(url)
+      housing
+  - type: tip
+    content: pl.read_csv()는 CSV 파일을 Polars DataFrame으로 읽습니다. pandas의 pd.read_csv()와 유사하지만, Polars는 내부적으로 Apache Arrow 포맷을 사용하여 메모리 효율성과 속도가 뛰어납니다. URL을 직접 전달하면 웹에서 파일을 다운로드하여 읽어옵니다.
+
+- id: step2_schema
+  title: 2단계. 스키마 확인
+  subtitle: 컬럼별 타입
+  blocks:
+  - type: text
+    content: DataFrame의 스키마(schema)는 각 컬럼의 이름과 데이터 타입을 보여줍니다. Polars는 타입 시스템이 명확하여 Float64, Int64, Utf8(문자열) 등으로 표시됩니다. medv는 주택 중간 가격(1000달러 단위), rm은 평균 방 개수, crim은 범죄율, lstat은 저소득층 비율, chas는 강변 위치 여부(0 또는 1) 등을 의미합니다. 데이터 분석 전에 스키마를 확인하면 어떤 연산이 가능한지 미리 파악하고, 필요시 타입 변환을 계획할 수 있습니다. Polars는 타입에 엄격하여 잘못된 연산을 사전에 방지합니다.
+  - type: code
+    language: python
+    title: 스키마 확인
+    description: 컬럼 타입과 의미
+    content: |-
+      housing.schema
+  - type: tip
+    content: ".schema는 DataFrame의 컬럼명과 타입을 딕셔너리 형태로 반환합니다. pandas의 .dtypes와 비슷하지만, Polars는 타입 정보가 더 명확하고 세분화되어 있습니다. Float64는 64비트 부동소수점, Int64는 64비트 정수를 의미하며, 이 정보로 메모리 사용량도 예측할 수 있습니다."
+
+- id: step3_null_check
+  title: 3단계. null 값 확인
+  subtitle: is_null() 사용
+  blocks:
+  - type: text
+    content: 실제 데이터 분석에서는 결측치(null 값) 처리가 매우 중요합니다. null 값이 있으면 평균, 합계 등의 통계 계산이 왜곡될 수 있고, 일부 연산에서는 에러가 발생합니다. Polars의 is_null() 표현식은 각 값이 null인지 Boolean(True/False)으로 반환하며, sum()과 조합하면 컬럼별 null 개수를 빠르게 계산할 수 있습니다. 이 데이터셋은 완전한 데이터이지만, 실무에서는 대부분의 데이터가 null을 포함하고 있어 적절한 처리 전략이 필수입니다. null 확인은 데이터 품질 점검의 첫 단계입니다.
+  - type: code
+    language: python
+    title: null 값 확인
+    description: 컬럼별 null 개수
+    content: |-
+      housing.select(pl.all().is_null().sum())
+  - type: tip
+    content: "is_null()은 null 여부를 Boolean으로 반환하는 표현식입니다. pl.all()은 모든 컬럼을 선택하므로, pl.all().is_null().sum()은 각 컬럼의 null 개수를 한 번에 계산합니다. True는 1로, False는 0으로 계산되어 sum()으로 개수를 셀 수 있습니다. pandas의 df.isnull().sum()과 동일한 결과를 제공합니다."
+
+- id: step4_null_sample
+  title: 4단계. null 데이터 생성
+  subtitle: 실습을 위한 null 추가
+  blocks:
+  - type: text
+    content: null 처리 기법을 연습하기 위해 일부 데이터에 인위적으로 null을 추가합니다. 방 개수(rm)가 5.5개 미만인 경우를 null로 변환합니다. 실무에서는 센서 오류, 입력 누락, 데이터 수집 실패 등 다양한 이유로 null이 발생합니다. when-then-otherwise 구문을 사용하면 조건에 따라 값을 null로 변환하거나 다른 값으로 대체할 수 있습니다.
+  - type: code
+    language: python
+    title: null 값 추가
+    description: 일부 행에 null 삽입
+    content: |-
+      housingNull = housing.with_columns(
+          pl.when(pl.col("rm") < 5.5)
+          .then(None)
+          .otherwise(pl.col("rm"))
+          .alias("rm")
+      )
+      housingNull.select(pl.col("rm").is_null().sum())
+  - type: tip
+    content: "pl.when().then(None)은 조건에 해당하는 값을 null로 변환합니다. Python의 None은 Polars에서 null로 처리됩니다. with_columns()로 기존 컬럼을 같은 이름(rm)으로 덮어씌울 수 있으며, marimo 환경에서는 새로운 변수명(housingNull)을 사용해야 합니다."
+
+- id: step5_drop_nulls
+  title: 5단계. null 행 제거
+  subtitle: drop_nulls()
+  blocks:
+  - type: text
+    content: null 값을 처리하는 첫 번째 방법은 해당 행을 완전히 제거하는 것입니다. drop_nulls() 메서드는 null이 있는 행을 삭제합니다. subset 파라미터로 특정 컬럼만 검사할 수 있어, 중요한 컬럼에만 null 제거 규칙을 적용할 수 있습니다. 하지만 이 방법은 데이터 손실을 유발하므로, null 비율이 낮을 때만 사용하는 것이 좋습니다. null이 많은 경우 대부분의 데이터를 잃을 수 있습니다.
+  - type: code
+    language: python
+    title: null 행 제거
+    description: rm이 null인 행 제거
+    content: |-
+      housingClean = housingNull.drop_nulls(subset=["rm"])
+      housingClean.shape
+  - type: tip
+    content: "drop_nulls()는 null이 포함된 행을 제거합니다. subset=['컬럼명']으로 특정 컬럼만 검사할 수 있습니다. subset을 생략하면 모든 컬럼을 검사하여, 어느 하나라도 null이 있으면 해당 행이 제거됩니다. shape로 제거 전후 행 개수를 비교하면 얼마나 삭제되었는지 확인할 수 있습니다."
+
+- id: step6_fill_null
+  title: 6단계. null 값 채우기
+  subtitle: fill_null()
+  blocks:
+  - type: text
+    content: null 값을 제거하는 대신 다른 값으로 채우는 방법도 있습니다. 이를 imputation(결측치 대체)이라고 합니다. 평균값, 중앙값, 최빈값, 0, 특정 상수 등으로 채울 수 있습니다. 여기서는 rm 컬럼의 평균값으로 null을 채웁니다. item() 메서드는 단일 값을 스칼라로 추출합니다. fill_null()은 데이터를 보존하면서 분석을 계속할 수 있게 해주지만, 통계적 편향이 발생할 수 있으므로 신중하게 사용해야 합니다.
+  - type: code
+    language: python
+    title: null 값 채우기
+    description: 평균값으로 채우기
+    content: |-
+      rmMean = housing.select(pl.col("rm").mean()).item()
+      housingFilled = housingNull.with_columns(
+          pl.col("rm").fill_null(rmMean)
+      )
+      housingFilled.select(pl.col("rm").is_null().sum())
+  - type: tip
+    content: "fill_null(값)은 null을 지정한 값으로 채웁니다. item()은 DataFrame의 단일 값을 Python 스칼라로 추출하는 메서드입니다. fill_null(pl.col('다른컬럼').mean())처럼 표현식도 사용할 수 있지만, 여기서는 명확성을 위해 먼저 평균을 계산했습니다. forward_fill(), backward_fill()로 앞/뒤 값으로 채울 수도 있습니다."
+
+- id: step7_when_then
+  title: 7단계. 조건부 값 변환
+  subtitle: when-then-otherwise
+  blocks:
+  - type: text
+    content: 가격대별로 등급을 부여하여 데이터를 범주화합니다. when-then-otherwise 구문은 SQL의 CASE WHEN과 동일한 기능으로, 여러 조건을 순차적으로 검사하여 해당하는 값을 반환합니다. medv가 30 이상이면 고가, 20 이상이면 중가, 그 외는 저가로 분류합니다. 이렇게 연속형 변수를 범주형으로 변환하면 그룹별 비교 분석이 쉬워집니다. pl.lit()은 리터럴(상수) 값을 표현식으로 만들어줍니다.
+  - type: code
+    language: python
+    title: 가격 등급 생성
+    description: 조건부 값 변환
+    content: |-
+      housingGrade = housing.with_columns(
+          pl.when(pl.col("medv") >= 30)
+          .then(pl.lit("고가"))
+          .when(pl.col("medv") >= 20)
+          .then(pl.lit("중가"))
+          .otherwise(pl.lit("저가"))
+          .alias("priceGrade")
+      )
+      housingGrade.select(["medv", "priceGrade"]).head(10)
+  - type: tip
+    content: "pl.when(조건).then(값1).when(조건2).then(값2).otherwise(기본값)은 여러 조건을 연결하는 표현식입니다. 조건은 위에서 아래로 순차적으로 평가되므로 순서가 중요합니다. pl.lit()는 상수 값을 표현식으로 변환하며, 문자열, 숫자 모두 사용 가능합니다. SQL의 CASE WHEN, pandas의 np.where()와 유사합니다."
+
+- id: step8_grade_stats
+  title: 8단계. 등급별 통계
+  subtitle: group_by + agg
+  blocks:
+  - type: text
+    content: 새로 만든 가격 등급별로 주택 개수와 평균 가격을 계산합니다. group_by()는 지정한 컬럼의 고유값별로 데이터를 그룹화하고, agg()는 각 그룹에 집계 함수를 적용합니다. 이를 통해 고가, 중가, 저가 등급별로 몇 채의 주택이 있고 평균 가격이 얼마인지 한눈에 파악할 수 있습니다. Polars의 group_by는 pandas보다 월등히 빠른 성능을 제공합니다.
+  - type: code
+    language: python
+    title: 등급별 통계
+    description: 개수와 평균
+    content: |-
+      housingGrade.group_by("priceGrade").agg(
+          pl.col("medv").count().alias("count"),
+          pl.col("medv").mean().alias("avgPrice")
+      )
+
+- id: step9_n_unique
+  title: 9단계. 고유값 개수
+  subtitle: n_unique()
+  blocks:
+  - type: text
+    content: n_unique()는 컬럼의 고유값(중복을 제외한 값) 개수를 반환합니다. 범주형 데이터를 탐색할 때 매우 유용합니다. chas 컬럼은 강변 위치 여부를 나타내는 이진 변수로, 0(내륙)과 1(강변) 두 가지 값만 가집니다. 고유값 개수를 확인하면 해당 컬럼이 범주형인지, 얼마나 많은 카테고리가 있는지 빠르게 파악할 수 있습니다. 카디널리티(cardinality) 확인에 필수적입니다.
+  - type: code
+    language: python
+    title: 고유값 개수
+    description: chas 컬럼의 고유값
+    content: |-
+      housing.select(pl.col("chas").n_unique())
+  - type: tip
+    content: "n_unique()는 중복을 제외한 고유값 개수를 반환합니다. pandas의 nunique()와 동일한 기능입니다. 범주형 데이터의 카테고리 개수를 확인하거나, 컬럼이 고유 식별자(ID)로 사용 가능한지 판단할 때 유용합니다. value_counts()와 함께 사용하면 각 고유값의 빈도도 확인할 수 있습니다."
+
+- id: step10_std
+  title: 10단계. 표준편차 계산
+  subtitle: std()
+  blocks:
+  - type: text
+    content: 표준편차(standard deviation)는 데이터의 산포도, 즉 값들이 평균에서 얼마나 떨어져 있는지를 나타내는 지표입니다. 표준편차가 클수록 값들이 넓게 퍼져있고, 작을수록 평균 근처에 밀집되어 있습니다. 통계학에서 평균 ± 1표준편차 범위에 약 68%의 데이터가, ± 2표준편차 범위에 약 95%의 데이터가 포함됩니다. 주택 가격의 표준편차를 확인하면 가격 변동폭을 이해할 수 있습니다.
+  - type: code
+    language: python
+    title: 표준편차
+    description: 가격의 산포도
+    content: |-
+      housing.select(
+          pl.col("medv").mean().alias("mean"),
+          pl.col("medv").std().alias("std"),
+          pl.col("medv").min().alias("min"),
+          pl.col("medv").max().alias("max")
+      )
+  - type: tip
+    content: "std()는 표준편차를 계산합니다. 기본적으로 표본 표준편차(n-1로 나눔)를 사용하며, ddof=0 파라미터로 모집단 표준편차(n으로 나눔)를 계산할 수 있습니다. 표준편차는 평균과 함께 사용하여 데이터 분포를 이해하는 핵심 지표입니다. var()로 분산(표준편차의 제곱)도 계산할 수 있습니다."
+
+- id: step11_group_std
+  title: 11단계. 그룹별 표준편차
+  subtitle: 등급별 가격 산포
+  blocks:
+  - type: text
+    content: 가격 등급별로 표준편차를 계산하여 어떤 등급의 가격 변동폭이 큰지 비교합니다. 고가 주택이 중가나 저가 주택보다 가격 편차가 클 수 있습니다. 그룹별 통계를 집계하면 각 등급의 특성을 더 깊이 이해할 수 있습니다. count, mean, std, n_unique를 한 번에 계산하여 종합적인 통계 요약을 제공합니다.
+  - type: code
+    language: python
+    title: 등급별 표준편차
+    description: 어떤 등급이 가격 편차가 큰가
+    content: |-
+      housingGrade.group_by("priceGrade").agg(
+          pl.col("medv").count().alias("count"),
+          pl.col("medv").mean().alias("mean"),
+          pl.col("medv").std().alias("std"),
+          pl.col("medv").n_unique().alias("uniquePrices")
+      )
+
+- id: step12_join_data
+  title: 12단계. 조인할 데이터 생성
+  subtitle: 지역 정보 테이블
+  blocks:
+  - type: text
+    content: 실무에서는 여러 테이블에 분산된 데이터를 결합하여 분석하는 경우가 많습니다. 조인(join)을 연습하기 위해 chas 값에 대응하는 지역명과 프리미엄 비율을 담은 작은 테이블을 생성합니다. chas가 0이면 내륙, 1이면 강변이며, 강변 지역은 1.2배의 프리미엄이 있다고 가정합니다. 이 정보를 주택 데이터와 결합하면 지역별 분석이 가능해집니다.
+  - type: code
+    language: python
+    title: 지역 정보 생성
+    description: chas별 지역명
+    content: |-
+      regionInfo = pl.DataFrame({
+          "chas": [0, 1],
+          "regionName": ["내륙", "강변"],
+          "premium": [1.0, 1.2]
+      })
+      regionInfo
+
+- id: step13_join
+  title: 13단계. 데이터 조인
+  subtitle: join()
+  blocks:
+  - type: text
+    content: join()은 두 DataFrame을 공통 키(key) 컬럼을 기준으로 결합합니다. on 파라미터에 공통 컬럼명을 지정하고, how 파라미터로 조인 방식을 선택합니다. left join은 왼쪽(housing) 테이블의 모든 행을 유지하고, 오른쪽(regionInfo) 테이블에서 매칭되는 정보를 가져옵니다. SQL의 JOIN과 동일한 개념으로, inner, left, outer, cross 등 다양한 조인 방식을 지원합니다. 이제 각 주택에 지역명과 프리미엄 정보가 추가됩니다.
+  - type: code
+    language: python
+    title: 조인 실행
+    description: 주택 데이터 + 지역 정보
+    content: |-
+      housingJoined = housing.join(
+          regionInfo,
+          on="chas",
+          how="left"
+      )
+      housingJoined.select(["chas", "regionName", "premium", "medv"]).head(10)
+  - type: tip
+    content: "join(df2, on='key', how='left')는 두 DataFrame을 결합합니다. on은 공통 키 컬럼, how는 조인 방식입니다. 'left'는 왼쪽 테이블 기준, 'inner'는 양쪽 모두 있는 것만, 'outer'는 모든 행 유지, 'cross'는 카티전 곱을 의미합니다. pandas의 merge()와 유사하지만 Polars는 더 빠릅니다."
+
+- id: step14_joined_analysis
+  title: 14단계. 조인 결과 분석
+  subtitle: 지역별 가격 비교
+  blocks:
+  - type: text
+    content: 조인된 데이터를 활용하여 내륙과 강변 지역의 주택 가격을 비교합니다. 강변 지역이 내륙보다 평균 가격이 높은지, 가격 변동폭은 어떤지 확인할 수 있습니다. 이처럼 조인은 분산된 정보를 통합하여 더 풍부한 분석을 가능하게 합니다. group_by로 지역별 집계를 수행하면 지역 특성이 명확히 드러납니다.
+  - type: code
+    language: python
+    title: 지역별 가격 분석
+    description: 강변 vs 내륙
+    content: |-
+      housingJoined.group_by("regionName").agg(
+          pl.col("medv").count().alias("count"),
+          pl.col("medv").mean().alias("avgPrice"),
+          pl.col("medv").std().alias("stdPrice"),
+          pl.col("medv").n_unique().alias("uniquePrices")
+      )
+
+- id: step15_result
+  title: 15단계. 결과물
+  subtitle: 지역별 가격 통계
+  blocks:
+  - type: text
+    content: 최종 결과물로 지역별 주택 가격 통계를 종합적으로 출력합니다. 주택 개수, 총 수익, 평균 가격, 표준편차, 최소 가격, 최대 가격을 한눈에 확인할 수 있습니다. 이 정보를 통해 강변 지역과 내륙 지역의 부동산 시장 특성을 비교하고, 투자 의사결정에 활용할 수 있습니다. 데이터 분석의 최종 목표는 이렇게 인사이트를 제공하는 것입니다.
+  - type: code
+    language: python
+    title: 지역별 가격 통계
+    description: 목표 결과물 완성
+    content: |-
+      housingJoined.group_by("regionName").agg(
+          pl.col("medv").count().alias("count"),
+          pl.col("medv").mean().alias("avgPrice"),
+          pl.col("medv").std().alias("stdPrice"),
+          pl.col("medv").min().alias("minPrice"),
+          pl.col("medv").max().alias("maxPrice")
+      )
+
+- id: practice
+  title: 실습
+  subtitle: 부동산 가격 분석 프로젝트
+  blocks:
+  - type: text
+    content: 부동산 분석가가 되어 배운 모든 개념을 종합적으로 활용해봅시다. null 처리, when-then 조건부 변환, n_unique, std, join을 모두 사용하여 심층 분석을 수행합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 방 수 등급별 가격 통계와 지역 조인 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import polars as pl
+
+        bostonUrl = "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv"
+        housingRaw = pl.read_csv(bostonUrl)
+    - type: code
+      title: "등급 부여 및 지역 정보 조인"
+      content: |-
+        areaInfo = pl.DataFrame({
+            "chas": [0, 1],
+            "regionName": ["내륙", "강변"],
+            "premium": [1.0, 1.2]
+        })
+
+        graded = housingRaw.with_columns(
+            pl.when(pl.col("rm") >= 7).then(pl.lit("대형"))
+            .when(pl.col("rm") >= 5).then(pl.lit("중형"))
+            .otherwise(pl.lit("소형"))
+            .alias("sizeGrade")
+        ).join(areaInfo, on="chas", how="left")
+    - type: code
+      title: "등급×지역 교차 분석"
+      content: |-
+        crossAnalysis = graded.group_by(["sizeGrade", "regionName"]).agg(
+            pl.col("medv").count().alias("count"),
+            pl.col("medv").mean().round(2).alias("avgPrice"),
+            pl.col("medv").std().round(2).alias("stdPrice")
+        ).sort(["sizeGrade", "regionName"])
+        crossAnalysis
+  - type: expansion
+    title: "미션2: null 처리와 가격 등급별 통계 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import polars as pl
+
+        priceUrl = "https://raw.githubusercontent.com/selva86/datasets/master/BostonHousing.csv"
+        priceRaw = pl.read_csv(priceUrl)
+    - type: code
+      title: "null 생성 및 처리"
+      content: |-
+        lstatThreshold = priceRaw.select(pl.col("lstat").quantile(0.8)).item()
+        lstatMean = priceRaw.select(pl.col("lstat").mean()).item()
+        nullFilled = priceRaw.with_columns(
+            pl.when(pl.col("lstat") > lstatThreshold).then(None)
+            .otherwise(pl.col("lstat")).alias("lstat")
+        ).with_columns(pl.col("lstat").fill_null(lstatMean))
+    - type: code
+      title: "가격 등급별 분석"
+      content: |-
+        priceGradeStats = nullFilled.with_columns(
+            pl.when(pl.col("medv") >= 30).then(pl.lit("고가"))
+            .when(pl.col("medv") >= 20).then(pl.lit("중가"))
+            .otherwise(pl.lit("저가")).alias("priceGrade")
+        ).group_by("priceGrade").agg(
+            pl.col("medv").count().alias("count"),
+            pl.col("medv").mean().round(2).alias("avgPrice"),
+            pl.col("rm").n_unique().alias("uniqueRooms"),
+            pl.col("lstat").mean().round(2).alias("avgLstat")
+        )
+        priceGradeStats
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: null 처리, 조건부 변환, 고급 집계, 조인을 마스터했습니다. 이제 실무 부동산 데이터 분석이 가능합니다.
+  - type: list
+    items:
+    - "is_null(), drop_nulls(), fill_null() - null 값 확인, 제거, 채우기"
+    - "pl.when().then().otherwise() - SQL CASE WHEN과 같은 조건부 변환"
+    - "n_unique() - 고유값 개수 계산, 범주형 데이터 탐색"
+    - "std() - 표준편차로 데이터 산포도 측정"
+    - "join(df2, on='key', how='left') - 두 테이블 결합"
+    - "group_by().agg() - 그룹별 다중 집계"
+  - type: text
+    content: 다음 시간에는 FIFA 선수 데이터로 피벗과 수직 결합을 배웁니다.

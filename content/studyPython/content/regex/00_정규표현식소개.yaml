@@ -1,0 +1,343 @@
+meta:
+  id: regex_00
+  title: 정규표현식소개
+  order: 0
+  category: regex
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags: ["정규표현식", "regex", "re", "패턴 매칭", "텍스트 처리", "비정형 데이터"]
+  seo:
+    title: "Python 정규표현식(re) 입문 - 비정형 데이터 마스터"
+    description: "Python re 모듈로 정규표현식을 배우세요. 이메일 추출, 텍스트 정제, LLM 전처리까지 실전 프로젝트로 마스터합니다."
+    keywords: ["정규표현식", "regex", "Python re", "패턴 매칭", "텍스트 처리", "LLM 전처리"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "🔍"
+      title: "정규표현식??"
+      subtitle: "비정형 텍스트를 어떻게 다루지?"
+
+    - type: hero
+      emoji: "🎯"
+      title: "패턴으로 텍스트 정복"
+      subtitle: "비정형 데이터 처리의 핵심 도구"
+      points:
+        - emoji: "📧"
+          title: "이메일 주소 한 번에 추출"
+        - emoji: "📱"
+          title: "전화번호 형식 자동 통일"
+        - emoji: "🔐"
+          title: "개인정보 자동 마스킹"
+        - emoji: "🤖"
+          title: "LLM 토큰 30% 절약"
+
+- id: why_regex
+  blocks:
+    - type: sectionHeader
+      title: "🤔 왜 정규표현식을 배워야 하나요?"
+      subtitle: "실무에서 매일 마주치는 문제들"
+
+    - type: text
+      content: |-
+        데이터는 항상 깔끔하지 않습니다. 실제 현장에서는 비정형 텍스트를 다루는 일이 훨씬 많습니다.
+
+        - 웹 크롤링한 HTML에서 순수 텍스트만 추출하고 싶다면?
+        - 로그 파일에서 에러 메시지만 찾아내고 싶다면?
+        - 수천 개의 문서에서 이메일 주소를 한 번에 추출하고 싶다면?
+        - 다양한 날짜 형식을 통일된 형태로 변환하고 싶다면?
+
+        정규표현식은 이 모든 문제를 한 줄의 패턴으로 해결합니다.
+
+    - type: compare
+      left:
+        title: "수동 처리"
+        subtitle: "전통적인 방식"
+        icon: "✋"
+        color: "gray"
+        items:
+          - "if/else 수십 줄 작성"
+          - "모든 경우의 수 체크"
+          - "새로운 형식마다 코드 수정"
+          - "느리고 에러 발생 쉬움"
+          - "유지보수 어려움"
+        infoBox: "비효율적이고 시간 낭비"
+      right:
+        title: "정규표현식"
+        subtitle: "현대적인 방식"
+        icon: "🎯"
+        color: "green"
+        items:
+          - "패턴 한 줄로 끝"
+          - "다양한 형식 한 번에 처리"
+          - "패턴만 수정하면 됨"
+          - "빠르고 정확함"
+          - "간결하고 재사용 가능"
+        infoBox: "효율적이고 강력한 도구"
+
+- id: llm_era
+  blocks:
+    - type: sectionHeader
+      title: "🤖 LLM 시대의 정규표현식"
+      subtitle: "토큰 비용을 30% 절약하는 비결"
+
+    - type: text
+      content: |-
+        ChatGPT, Claude 같은 LLM API를 사용할 때 토큰 수가 곧 비용입니다. 하지만 대부분의 웹 데이터는 노이즈 투성이죠.
+
+        HTML 태그, 특수문자, 불필요한 공백... 이런 것들이 토큰을 낭비합니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🗑️"
+          title: "노이즈 제거"
+          description: "HTML 태그, 특수문자 제거로 토큰 30% 이상 절감"
+        - emoji: "🎯"
+          title: "정보 추출"
+          description: "필요한 부분만 정확히 추출하여 프롬프트 최소화"
+        - emoji: "🔄"
+          title: "형식 통일"
+          description: "다양한 형식을 정규화하여 LLM 이해도 향상"
+        - emoji: "💰"
+          title: "비용 절감"
+          description: "전처리로 API 호출 비용 크게 감소"
+
+    - type: note
+      style: tip
+      title: "실제 사례"
+      content: |-
+        100KB HTML 문서를 정규표현식으로 전처리하면 20KB 순수 텍스트만 남습니다.
+        토큰 수: 25,000 → 5,000 (80% 절감!)
+        비용: $0.50 → $0.10 (API 비용 5배 절약)
+
+- id: real_world_uses
+  blocks:
+    - type: sectionHeader
+      title: "💼 실무 활용 사례"
+      subtitle: "어디에 쓰이나요?"
+
+    - type: table
+      headers: ["직무", "활용 예시", "효과"]
+      rows:
+        - ["데이터 엔지니어", "로그 파싱, ETL 파이프라인", "처리 시간 90% 단축"]
+        - ["백엔드 개발자", "입력 검증, 포맷 변환", "보안 취약점 사전 차단"]
+        - ["데이터 분석가", "텍스트 정제, 패턴 발견", "분석 품질 향상"]
+        - ["AI/ML 엔지니어", "NLP 전처리, 특성 추출", "모델 성능 개선"]
+        - ["웹 개발자", "폼 검증, URL 파싱", "사용자 경험 개선"]
+
+    - type: note
+      style: info
+      title: "프로그래밍 언어 공통 기술"
+      content: "정규표현식은 Python뿐 아니라 JavaScript, Java, Go, Rust 등 모든 언어에서 사용됩니다. 한 번 배우면 어디서나 활용 가능합니다."
+
+- id: key_concepts
+  blocks:
+    - type: sectionHeader
+      title: "🎯 핵심 개념 미리보기"
+      subtitle: "10개 프로젝트로 배울 내용"
+
+    - type: featureCards
+      cards:
+        - emoji: "🔤"
+          title: "기본 패턴"
+          description: "., ^, $, \\d, \\w, \\s 등 기초 메타문자"
+        - emoji: "🔢"
+          title: "수량자"
+          description: "*, +, ?, {n,m}으로 반복 횟수 지정"
+        - emoji: "📦"
+          title: "그룹과 캡처"
+          description: "(pattern)으로 패턴 묶기, (?P<name>)으로 이름 지정"
+        - emoji: "🔧"
+          title: "re 모듈 함수"
+          description: "search, findall, sub, split 등 핵심 함수"
+        - emoji: "🚩"
+          title: "플래그"
+          description: "re.IGNORECASE, re.MULTILINE 등 옵션"
+        - emoji: "🎓"
+          title: "고급 기능"
+          description: "lookahead, lookbehind로 복잡한 조건 매칭"
+
+- id: projects_preview
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 10개 프로젝트 로드맵"
+      subtitle: "난이도별 개념 누적 학습"
+
+    - type: table
+      headers: ["단계", "프로젝트", "배울 내용", "데이터 소스"]
+      rows:
+        - ["입문", "01 이메일주소추출", "기본 패턴, 문자 클래스, findall", "JSONPlaceholder"]
+        - ["입문", "02 전화번호형식통일", "그룹 캡처, sub, 형식 변환", "JSONPlaceholder"]
+        - ["기초", "03 URL구조분해", "이름 있는 그룹, 복잡한 패턴", "JSONPlaceholder"]
+        - ["기초", "04 HTML태그제거", "비탐욕적 매칭, DOTALL 플래그", "코드 내 샘플"]
+        - ["기초", "05 로그파일분석", "멀티라인, 타임스탬프 파싱", "코드 내 로그"]
+        - ["중급", "06 날짜형식변환", "복잡한 패턴, 다양한 형식 처리", "코드 내 샘플"]
+        - ["중급", "07 개인정보마스킹", "역참조, 부분 치환", "코드 내 샘플"]
+        - ["중급", "08 텍스트정제토큰화", "split, 노이즈 제거, LLM 전처리", "Bacon Ipsum"]
+        - ["심화", "09 고급패턴매칭", "lookahead, lookbehind, 조건부", "코드 내 샘플"]
+        - ["심화", "10 LLM전처리파이프라인", "모든 개념 종합, 실전 자동화", "JSONPlaceholder"]
+
+    - type: note
+      style: info
+      title: "프로젝트 기반 학습"
+      content: "각 프로젝트는 완성된 결과물을 만듭니다. 이전 프로젝트의 개념을 반복 사용하면서 새로운 개념을 추가로 배웁니다."
+
+- id: pattern_examples
+  blocks:
+    - type: sectionHeader
+      title: "✨ 실제 패턴 맛보기"
+      subtitle: "정규표현식의 강력함을 느껴보세요"
+
+    - type: table
+      headers: ["찾고 싶은 것", "패턴", "설명"]
+      rows:
+        - ["이메일", "\\w+@\\w+\\.\\w+", "단어@단어.단어 형식"]
+        - ["전화번호", "\\d{2,3}-\\d{3,4}-\\d{4}", "2~3자리-3~4자리-4자리"]
+        - ["URL", "https?://[\\w.-]+", "http 또는 https로 시작"]
+        - ["날짜", "\\d{4}-\\d{2}-\\d{2}", "YYYY-MM-DD 형식"]
+        - ["주민번호", "\\d{6}-[1-4]\\d{6}", "6자리-1~4로 시작하는 7자리"]
+        - ["HTML 태그", "<[^>]+>", "< 와 > 사이의 모든 문자"]
+
+    - type: note
+      style: tip
+      title: "패턴은 언어입니다"
+      content: "정규표현식은 텍스트 패턴을 표현하는 작은 언어입니다. 처음엔 어렵지만 10개 프로젝트를 완료하면 자유자재로 사용할 수 있습니다."
+
+- id: vs_other_methods
+  blocks:
+    - type: sectionHeader
+      title: "⚖️ 다른 방법과 비교"
+      subtitle: "정규표현식 vs 다른 텍스트 처리 방법"
+
+    - type: table
+      headers: ["방법", "장점", "단점", "추천 상황"]
+      rows:
+        - ["정규표현식", "강력, 간결, 빠름", "학습 곡선 있음", "패턴이 명확한 텍스트"]
+        - ["문자열 메서드", "쉬움, 직관적", "복잡한 패턴 처리 어려움", "단순한 문자열 조작"]
+        - ["파서 라이브러리", "정확, 구조화", "특정 형식만 지원", "HTML, XML, JSON"]
+        - ["LLM API", "유연, 맥락 이해", "비용, 느림", "복잡한 자연어 처리"]
+
+    - type: note
+      style: info
+      title: "조합이 최고"
+      content: "정규표현식으로 전처리 → LLM으로 분석하면 비용은 줄이고 정확도는 높일 수 있습니다."
+
+- id: performance
+  blocks:
+    - type: sectionHeader
+      title: "⚡ 성능 비교"
+      subtitle: "정규표현식은 얼마나 빠를까?"
+
+    - type: featureCards
+      cards:
+        - emoji: "🐢"
+          title: "반복문 + if/else"
+          description: "100만 줄 처리 시간: 15초"
+        - emoji: "🚗"
+          title: "문자열 메서드"
+          description: "100만 줄 처리 시간: 5초"
+        - emoji: "🚀"
+          title: "정규표현식"
+          description: "100만 줄 처리 시간: 0.5초"
+
+    - type: note
+      style: tip
+      title: "C로 구현된 고성능 엔진"
+      content: "Python re 모듈은 C로 작성되어 매우 빠릅니다. 대용량 텍스트 처리에 최적화되어 있습니다."
+
+- id: learning_path
+  blocks:
+    - type: sectionHeader
+      title: "🎓 학습 로드맵"
+      subtitle: "어떻게 배우나요?"
+
+    - type: featureCards
+      cards:
+        - emoji: "1️⃣"
+          title: "입문 (01-02)"
+          description: "기본 패턴, 문자 클래스, 간단한 추출/치환"
+        - emoji: "2️⃣"
+          title: "기초 (03-05)"
+          description: "그룹, 플래그, 복잡한 패턴 조합"
+        - emoji: "3️⃣"
+          title: "중급 (06-08)"
+          description: "고급 패턴, 전처리 파이프라인 구축"
+        - emoji: "4️⃣"
+          title: "심화 (09-10)"
+          description: "lookaround, 실전 프로젝트 자동화"
+
+    - type: note
+      style: info
+      title: "개념 누적 방식"
+      content: "각 프로젝트는 이전 프로젝트의 개념을 반복 사용하면서 새로운 개념을 추가합니다. 10개 프로젝트를 완료하면 정규표현식의 모든 핵심 개념을 마스터하게 됩니다."
+
+- id: tools
+  blocks:
+    - type: sectionHeader
+      title: "🛠️ 유용한 도구"
+      subtitle: "정규표현식 학습과 테스트"
+
+    - type: featureCards
+      cards:
+        - emoji: "🌐"
+          title: "regex101.com"
+          description: "온라인 정규표현식 테스터. 패턴 설명, 매칭 확인"
+        - emoji: "🔍"
+          title: "regexr.com"
+          description: "비주얼 정규표현식 에디터. 실시간 매칭 확인"
+        - emoji: "📚"
+          title: "regexlearn.com"
+          description: "인터랙티브 정규표현식 튜토리얼"
+        - emoji: "🎮"
+          title: "regexcrossword.com"
+          description: "정규표현식 퍼즐 게임으로 재미있게 학습"
+
+- id: common_mistakes
+  blocks:
+    - type: sectionHeader
+      title: "⚠️ 흔한 실수"
+      subtitle: "초보자가 자주 하는 실수들"
+
+    - type: table
+      headers: ["실수", "문제", "해결"]
+      rows:
+        - ["특수문자 이스케이프 안 함", ". 이 모든 문자 매칭", "\\. 으로 이스케이프"]
+        - ["탐욕적 매칭", ".* 가 너무 많이 매칭", ".*? 비탐욕적 사용"]
+        - ["플래그 미사용", "대소문자 구분으로 놓침", "re.IGNORECASE 사용"]
+        - ["그룹 번호 혼동", "\\1, \\2 순서 틀림", "(?P<name>) 이름 사용"]
+        - ["패턴 검증 안 함", "예상치 못한 매칭", "regex101에서 테스트"]
+
+    - type: note
+      style: warning
+      title: "처음엔 어렵습니다"
+      content: "정규표현식은 암호처럼 보일 수 있습니다. 하지만 10개 프로젝트를 따라하다 보면 자연스럽게 익숙해집니다. 포기하지 마세요!"
+
+- id: resources
+  blocks:
+    - type: sectionHeader
+      title: "📚 참고 자료"
+      subtitle: "더 깊이 공부하고 싶다면"
+
+    - type: links
+      items:
+        - text: Python re 공식 문서
+          url: https://docs.python.org/ko/3/library/re.html
+          icon: "🔗"
+        - text: 정규식 HOWTO (한글)
+          url: https://docs.python.org/ko/3/howto/regex.html
+          icon: "🔗"
+        - text: Regular Expressions Info
+          url: https://www.regular-expressions.info/
+          icon: "🔗"
+        - text: regex101 (온라인 테스터)
+          url: https://regex101.com/
+          icon: "🔗"
+
+- id: next
+  blocks:
+    - type: hero
+      emoji: "👉"
+      title: "다음: 이메일 주소 추출"
+      subtitle: "JSONPlaceholder API에서 다양한 형식의 이메일을 추출하는 첫 프로젝트를 시작합니다"

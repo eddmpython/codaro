@@ -1,0 +1,358 @@
+meta:
+  id: day06_1
+  title: 튜플
+  day: 6
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 튜플 - 변경 불가능한 데이터"
+    description: "튜플의 특징과 사용법, 리스트와의 차이점을 배웁니다."
+    keywords: ['튜플', 'tuple', '언패킹', '불변']
+intro:
+  emoji: "🔒"
+  points:
+  - 튜플의 기본 개념과 불변성
+  - 다양한 튜플 생성 방법
+  - 양수/음수 인덱싱으로 요소 접근
+  - 슬라이싱으로 부분 추출
+  - 튜플의 변경 불가능성과 해결책
+  - 튜플 언패킹 (기본, 별표)
+  - 튜플 결합과 반복
+  - count(), index() 메소드
+sections:
+- id: tuple_introduction
+  title: 튜플 소개
+  subtitle: 변경 불가능한 순서 있는 컬렉션
+  blocks:
+  - type: text
+    content: 튜플(Tuple)은 리스트와 비슷하지만 한 번 생성되면 변경할 수 없는 불변(immutable) 객체입니다. 리스트는 대괄호 []를 사용하지만 튜플은 소괄호 ()를 사용합니다. 튜플은 데이터가 변경되어서는 안 되는 상황에서 사용합니다. 예를 들어 좌표값(3, 4), 색상 코드(255, 128, 0), 날짜(2024, 12, 25) 같은 데이터는 실수로 변경되면 문제가 생길 수 있으므로 튜플이 적합합니다.
+  - type: list
+    items:
+    - 순서가 있는(ordered) 컬렉션
+    - 변경 불가능한(immutable) 객체
+    - 소괄호 ()로 생성
+    - 데이터 무결성이 중요할 때 사용
+  - type: code
+    language: python
+    title: 튜플 기본
+    description: "튜플을 생성하고 기본 속성을 확인합니다."
+    content: |-
+      emptyTuple = ()
+      print('빈 튜플:', emptyTuple)
+      print('타입:', type(emptyTuple))
+      print('길이:', len(emptyTuple))
+
+      mixedTuple = ('Asabeneh', 250, True, 3.14)
+      print('혼합 튜플:', mixedTuple)
+      print('요소 개수:', len(mixedTuple))
+  - type: tip
+    content: "튜플과 리스트의 차이: 튜플은 (), 리스트는 []. 튜플은 변경 불가, 리스트는 변경 가능."
+
+- id: tuple_creation
+  title: 튜플 생성
+  subtitle: 소괄호와 tuple() 함수
+  blocks:
+  - type: text
+    content: 튜플을 만드는 방법은 두 가지입니다. 첫째, 소괄호 ()를 사용해 직접 값을 나열합니다. 둘째, tuple() 함수를 사용해 다른 데이터(리스트, 문자열 등)를 튜플로 변환합니다. 주의할 점은 요소가 하나인 튜플을 만들 때는 반드시 쉼표를 붙여야 합니다. (1)은 숫자 1이지만, (1,)은 튜플입니다.
+  - type: list
+    items:
+    - "() : 소괄호로 직접 생성"
+    - "tuple() : 다른 데이터를 튜플로 변환"
+    - 단일 요소는 쉼표 필수 (1,)
+    - 쉼표 없으면 일반 값으로 인식
+  - type: code
+    language: python
+    title: 튜플 생성 방법
+    description: "소괄호와 tuple() 함수로 튜플을 생성합니다."
+    content: |-
+      createFruits = ('banana', 'orange', 'mango', 'lemon')
+      print('과일:', createFruits)
+
+      createCoords = (3, 4)
+      print('좌표:', createCoords)
+
+      createSingle = ('item',)
+      createNotTuple = ('item')
+      print('튜플:', createSingle, type(createSingle))
+      print('문자열:', createNotTuple, type(createNotTuple))
+
+      createCharTuple = tuple('Python')
+      print("'Python' 튜플:", createCharTuple)
+
+- id: tuple_indexing
+  title: 튜플 인덱싱
+  subtitle: 양수와 음수 인덱스
+  blocks:
+  - type: text
+    content: 튜플도 리스트와 마찬가지로 인덱스로 요소에 접근할 수 있습니다. 양수 인덱스는 앞에서부터(0부터), 음수 인덱스는 뒤에서부터(-1부터) 셉니다. 인덱싱 방법은 리스트, 문자열과 완전히 동일합니다. 단, 튜플은 인덱스로 값을 수정할 수 없습니다.
+  - type: list
+    items:
+    - 첫 번째 요소는 [0]
+    - 마지막 요소는 [-1]
+    - 리스트/문자열과 동일한 방식
+    - 읽기만 가능, 수정 불가
+  - type: code
+    language: python
+    title: 인덱싱으로 요소 접근
+    description: "양수와 음수 인덱스로 튜플 요소에 접근합니다."
+    content: |-
+      indexFruits = ('banana', 'orange', 'mango', 'lemon')
+
+      print('첫 번째:', indexFruits[0])
+      print('두 번째:', indexFruits[1])
+      print('마지막:', indexFruits[-1])
+      print('뒤에서 두 번째:', indexFruits[-2])
+
+      print('indexFruits[0] == indexFruits[-4]:', indexFruits[0] == indexFruits[-4])
+
+- id: tuple_slicing
+  title: 튜플 슬라이싱
+  subtitle: 부분 튜플 추출
+  blocks:
+  - type: text
+    content: 슬라이싱으로 튜플의 일부분을 추출하여 새 튜플을 만들 수 있습니다. [시작:끝] 형식으로 사용하며, 시작 인덱스는 포함되고 끝 인덱스는 포함되지 않습니다. 리스트, 문자열 슬라이싱과 동일합니다. [::-1]로 튜플을 뒤집을 수 있습니다.
+  - type: list
+    items:
+    - "[시작:끝] - 시작 포함, 끝 미포함"
+    - "[:끝] - 처음부터"
+    - "[시작:] - 끝까지"
+    - "[::-1] - 뒤집기"
+  - type: code
+    language: python
+    title: 슬라이싱 활용
+    description: "슬라이싱으로 튜플 일부를 추출합니다."
+    content: |-
+      sliceFruits = ('banana', 'orange', 'mango', 'lemon')
+
+      print('전체:', sliceFruits[0:4])
+      print('1~2번:', sliceFruits[1:3])
+      print('처음 2개:', sliceFruits[:2])
+      print('마지막 2개:', sliceFruits[2:])
+      print('역순:', sliceFruits[::-1])
+
+- id: tuple_immutable
+  title: 튜플의 불변성
+  subtitle: 수정 불가능한 특성
+  blocks:
+  - type: text
+    content: 튜플의 가장 중요한 특성은 불변(immutable)입니다. 한 번 생성된 튜플은 요소를 수정, 추가, 삭제할 수 없습니다. 시도하면 TypeError가 발생합니다. 이 특성 때문에 튜플은 데이터의 무결성을 보장합니다. 만약 수정이 필요하다면, 리스트로 변환하고 수정한 뒤 다시 튜플로 변환하는 방법을 사용합니다.
+  - type: list
+    items:
+    - 요소 수정 불가능 (TypeError)
+    - 요소 추가/삭제 불가능
+    - 데이터 무결성 보장
+    - 수정 필요시 리스트로 변환
+  - type: code
+    language: python
+    title: 불변성과 해결책
+    description: "튜플은 수정 불가능하지만, 리스트 변환으로 해결합니다."
+    content: |-
+      immutableFruits = ('banana', 'orange', 'mango', 'lemon')
+      print('원본:', immutableFruits)
+
+      immutableList = list(immutableFruits)
+      immutableList[0] = 'apple'
+      immutableList.append('lime')
+      print('리스트 수정:', immutableList)
+
+      modifiedTuple = tuple(immutableList)
+      print('수정된 튜플:', modifiedTuple)
+      print('원본은 그대로:', immutableFruits)
+  - type: tip
+    content: "튜플 수정이 필요하면: list()로 변환 → 수정 → tuple()로 다시 변환"
+
+- id: tuple_unpacking
+  title: 튜플 언패킹
+  subtitle: 요소를 변수에 분리 할당
+  blocks:
+  - type: text
+    content: 언패킹(Unpacking)은 튜플의 각 요소를 개별 변수에 한 번에 할당하는 기능입니다. 변수 개수와 튜플 요소 개수가 일치해야 합니다. 좌표를 x, y로 분리하거나, 두 변수의 값을 교환할 때 매우 유용합니다. a, b = b, a 형태로 두 변수의 값을 간단히 교환할 수 있는 것도 언패킹 덕분입니다.
+  - type: list
+    items:
+    - 변수 개수 = 요소 개수 일치 필요
+    - 순서대로 할당됨
+    - 변수 교환에 유용 (a, b = b, a)
+    - 좌표, 함수 반환값 처리에 활용
+  - type: code
+    language: python
+    title: 기본 언패킹
+    description: "튜플 요소를 여러 변수에 분리 할당합니다."
+    content: |-
+      unpackFruits = ('banana', 'orange', 'mango', 'lemon')
+      fruitOne, fruitTwo, fruitThree, fruitFour = unpackFruits
+
+      print('첫 번째:', fruitOne)
+      print('두 번째:', fruitTwo)
+      print('세 번째:', fruitThree)
+      print('네 번째:', fruitFour)
+
+      unpackA = 10
+      unpackB = 20
+      print('교환 전:', unpackA, unpackB)
+      unpackA, unpackB = unpackB, unpackA
+      print('교환 후:', unpackA, unpackB)
+
+      unpackCoords = (3, 4)
+      unpackX, unpackY = unpackCoords
+      print('좌표 x:', unpackX, 'y:', unpackY)
+
+- id: tuple_unpacking_asterisk
+  title: 별표(*) 언패킹
+  subtitle: 나머지 요소를 리스트로 수집
+  blocks:
+  - type: text
+    content: 별표(*)를 사용하면 일부 요소는 개별 변수에, 나머지는 리스트로 수집할 수 있습니다. 첫 번째와 마지막만 필요하고 중간은 묶고 싶을 때 유용합니다. *변수명 형태로 사용하며, 결과는 리스트입니다.
+  - type: list
+    items:
+    - "*변수명 형태로 나머지 수집"
+    - 수집된 결과는 리스트
+    - 위치에 따라 유연하게 활용
+    - 가변 개수 요소 처리에 유용
+  - type: code
+    language: python
+    title: 별표 언패킹
+    description: "*를 사용해 나머지 요소를 리스트로 수집합니다."
+    content: |-
+      starFruits = ('banana', 'orange', 'mango', 'lemon', 'lime', 'apple')
+
+      starFirst, *starRest = starFruits
+      print('첫 번째:', starFirst)
+      print('나머지:', starRest)
+
+      starOne, *starMiddle, starLast = starFruits
+      print('첫 번째:', starOne)
+      print('중간:', starMiddle)
+      print('마지막:', starLast)
+
+      starTwo1, starTwo2, *starRestTwo = starFruits
+      print('첫 번째:', starTwo1)
+      print('두 번째:', starTwo2)
+      print('나머지:', starRestTwo)
+
+- id: tuple_joining
+  title: 튜플 결합과 반복
+  subtitle: + 연산자와 * 연산자
+  blocks:
+  - type: text
+    content: 튜플은 불변이지만. + 연산자로 두 튜플을 결합하거나, * 연산자로 반복하여 새 튜플을 만들 수 있습니다. 원본 튜플은 변경되지 않고 완전히 새로운 튜플이 생성됩니다. 리스트의 + 연산, * 연산과 동일합니다.
+  - type: list
+    items:
+    - "+ : 두 튜플 결합"
+    - "* : 튜플 반복"
+    - 새 튜플 생성 (원본 유지)
+    - 리스트와 동일한 방식
+  - type: code
+    language: python
+    title: 튜플 결합과 반복
+    description: "+ 연산자로 결합하고 * 연산자로 반복합니다."
+    content: |-
+      joinFruits = ('banana', 'orange', 'mango')
+      joinVeggies = ('tomato', 'potato', 'cabbage')
+
+      joinCombined = joinFruits + joinVeggies
+      print('결합:', joinCombined)
+
+      joinRepeated = joinFruits * 2
+      print('반복:', joinRepeated)
+
+      joinPattern = ('A', 'B') * 3
+      print('패턴:', joinPattern)
+
+      print('원본 과일:', joinFruits)
+
+- id: tuple_methods
+  title: count()와 index()
+  subtitle: 튜플의 메소드
+  blocks:
+  - type: text
+    content: 튜플은 불변이므로 메소드가 두 개뿐입니다. count()는 특정 값이 몇 번 등장하는지 셉니다. index()는 특정 값의 첫 번째 위치를 반환합니다. 리스트의 count(), index()와 동일하게 작동합니다. index()는 값이 없으면 에러가 발생합니다.
+  - type: list
+    items:
+    - "count(값): 등장 횟수 반환"
+    - "index(값): 첫 번째 위치 반환"
+    - count()는 없으면 0 반환 (안전)
+    - index()는 없으면 에러 발생
+  - type: code
+    language: python
+    title: 튜플 메소드
+    description: "count()와 index()를 사용합니다."
+    content: |-
+      methodFruits = ('banana', 'orange', 'mango', 'lemon')
+
+      bananaCount = methodFruits.count('banana')
+      appleCount = methodFruits.count('apple')
+      print('banana 개수:', bananaCount)
+      print('apple 개수:', appleCount)
+
+      bananaIndex = methodFruits.index('banana')
+      mangoIndex = methodFruits.index('mango')
+      print('banana 위치:', bananaIndex)
+      print('mango 위치:', mangoIndex)
+
+      methodDuplicates = ('a', 'b', 'a', 'c', 'a')
+      print('a 개수:', methodDuplicates.count('a'))
+      print('첫 번째 a 위치:', methodDuplicates.index('a'))
+
+- id: practice
+  title: 6일차 복습
+  subtitle: 튜플 종합 미션
+  blocks:
+  - type: text
+    content: 6일차에서 배운 튜플 생성, 인덱싱, 슬라이싱, 언패킹, 메소드를 복습하는 미션입니다. 각 미션을 펼쳐서 정답을 확인하기 전에 먼저 직접 작성해보세요.
+  - type: expansion
+    title: "미션1: 튜플 생성과 접근"
+    code: |-
+      colors = ('red', 'green', 'blue', 'yellow')
+      print('첫 번째:', colors[0])
+      print('마지막:', colors[-1])
+      print('길이:', len(colors))
+  - type: expansion
+    title: "미션2: 단일 요소 튜플"
+    code: |-
+      singleTuple = (42,)
+      notTuple = (42)
+      print('튜플:', singleTuple, type(singleTuple))
+      print('정수:', notTuple, type(notTuple))
+  - type: expansion
+    title: "미션3: 슬라이싱 활용"
+    code: |-
+      numbers = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+      print('처음 5개:', numbers[:5])
+      print('마지막 3개:', numbers[-3:])
+      print('역순:', numbers[::-1])
+  - type: expansion
+    title: "미션4: 리스트 변환으로 수정"
+    code: |-
+      fruits = ('apple', 'banana', 'cherry')
+      fruitsList = list(fruits)
+      fruitsList[1] = 'blueberry'
+      fruitsNew = tuple(fruitsList)
+      print('원본:', fruits)
+      print('수정:', fruitsNew)
+  - type: expansion
+    title: "미션5: 튜플 언패킹"
+    code: |-
+      person = ('홍길동', 25, '서울')
+      name, age, city = person
+      print('이름:', name)
+      print('나이:', age)
+      print('도시:', city)
+  - type: expansion
+    title: "미션6: 별표 언패킹"
+    code: |-
+      scores = (95, 88, 76, 92, 84)
+      first, *middle, last = scores
+      print('첫 번째:', first)
+      print('중간:', middle)
+      print('마지막:', last)
+  - type: expansion
+    title: "미션7: 튜플 결합"
+    code: |-
+      korean = ('가', '나', '다')
+      english = ('A', 'B', 'C')
+      combined = korean + english
+      print('결합:', combined)
+      repeated = korean * 2
+      print('반복:', repeated)

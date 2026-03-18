@@ -1,0 +1,291 @@
+meta:
+  id: pandas_10
+  title: 실전종합프로젝트
+  order: 10
+  category: pandas
+  difficulty: "⭐⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["실전", "API", "JSON", "프로젝트", "종합"]
+  seo:
+    title: "pandas 실전 프로젝트 - API 데이터 수집부터 분석까지"
+    description: "API에서 JSON 데이터를 수집하고 pandas로 분석하는 전체 과정을 실습합니다. 데이터 수집, 정제, 분석, 저장까지 완전한 파이프라인을 경험합니다."
+    keywords: ["pandas API", "JSON", "데이터 수집", "실전 프로젝트", "데이터 파이프라인"]
+
+intro:
+  emoji: "🚀"
+  goal: API에서 데이터를 수집하고, 정제하고, 분석하는 전체 과정을 경험합니다.
+  description: 지금까지 배운 모든 기술을 총동원합니다. 실제 API에서 JSON 데이터를 가져와 분석하는 실무 워크플로우입니다.
+
+sections:
+- id: step1_api_concept
+  title: 1단계. API 개념
+  subtitle: 데이터를 가져오는 방법
+  blocks:
+  - type: text
+    content: API(Application Programming Interface)는 다른 서비스의 데이터를 가져오는 창구입니다. GitHub API에서 pandas 프로젝트의 이슈 목록을 가져와 분석해봅니다. requests 라이브러리로 HTTP 요청을 보내고, JSON 응답을 받아 DataFrame으로 변환합니다. 실무에서 API로 데이터를 수집하는 전형적인 패턴입니다.
+  - type: code
+    language: python
+    title: API 호출 + DataFrame 변환
+    description: pandas 리포지토리의 최근 이슈 10개를 가져옵니다
+    content: |-
+      import requests
+      import pandas as pd
+
+      url = "https://api.github.com/repos/pandas-dev/pandas/issues"
+      params = {'per_page': 10, 'state': 'all'}
+      response = requests.get(url, params=params, timeout=10)
+
+      if response.status_code == 200:
+          issues = pd.DataFrame(response.json())
+      else:
+          issues = pd.DataFrame([{'number': 1, 'title': '샘플', 'state': 'open'}])
+      issues.shape
+  - type: tip
+    content: requests.get()으로 API를 호출하고, response.json()으로 JSON을 파이썬 딕셔너리/리스트로 변환합니다. pd.DataFrame()에 리스트를 넣으면 자동으로 DataFrame이 됩니다. status_code가 200이면 성공, 그 외는 실패입니다.
+
+- id: step2_preview
+  title: 2단계. 데이터 확인
+  subtitle: 컬럼 목록 확인
+  blocks:
+  - type: text
+    content: API 응답 데이터는 컬럼이 매우 많습니다. GitHub Issues API의 경우 30개 이상의 컬럼이 반환됩니다. 모든 컬럼을 사용하면 복잡하고 분석에 불필요한 정보가 많으므로, 목적에 맞는 컬럼만 선택하는 것이 중요합니다. columns.tolist()로 전체 컬럼 목록을 확인합니다.
+  - type: code
+    language: python
+    title: 컬럼 확인
+    description: 어떤 컬럼이 있는지 확인
+    content: |-
+      issues.columns.tolist()[:10]
+
+- id: step3_select
+  title: 3단계. 필요한 컬럼 선택
+  subtitle: 분석할 데이터만 추출
+  blocks:
+  - type: text
+    content: 분석 목적에 맞는 컬럼만 선택합니다. number(이슈 번호), title(제목), state(상태), created_at(생성일), comments(댓글 수) 5가지를 선택합니다. copy()를 붙여서 원본과 분리된 새 DataFrame을 만듭니다. 이렇게 필요한 데이터만 추출하면 메모리를 절약하고 분석이 명확해집니다.
+  - type: code
+    language: python
+    title: 필요한 컬럼 선택
+    description: 번호, 제목, 상태, 생성일, 댓글 수
+    content: |-
+      clean = issues[['number', 'title', 'state', 'created_at', 'comments']].copy()
+      clean.head()
+
+- id: step4_datetime
+  title: 4단계. 날짜 타입 변환
+  subtitle: pd.to_datetime()
+  blocks:
+  - type: text
+    content: API에서 받은 날짜는 '2024-01-15T09:30:00Z' 같은 ISO 8601 형식의 문자열입니다. pd.to_datetime()으로 datetime 타입으로 변환해야 날짜 계산, 기간 필터링, 시계열 분석이 가능합니다. datetime 타입이어야 .dt 접근자로 연도, 월, 요일 등을 추출할 수 있습니다.
+  - type: code
+    language: python
+    title: 날짜 타입 변환
+    description: 문자열을 datetime으로
+    content: |-
+      dated = clean.copy()
+      dated['created_at'] = pd.to_datetime(dated['created_at'])
+      dated.dtypes
+
+- id: step5_new_column
+  title: 5단계. 새 컬럼 추가
+  subtitle: 제목 길이 계산
+  blocks:
+  - type: text
+    content: str.len()으로 제목 길이를 계산합니다. 긴 제목이 더 복잡한 이슈일까요? 새로운 파생 변수를 만들어 분석의 폭을 넓힙니다.
+  - type: code
+    language: python
+    title: 제목 길이 계산
+    description: 제목이 긴 이슈가 더 복잡할까?
+    content: |-
+      final = dated.copy()
+      final['titleLength'] = final['title'].str.len()
+      final[['title', 'titleLength']].head()
+  - type: tip
+    content: str.len()은 문자열 길이를 반환합니다. Series에 .str을 붙이면 각 행에 문자열 메서드를 적용할 수 있습니다. str.upper(), str.lower(), str.contains() 등 다양한 문자열 처리 메서드를 사용할 수 있습니다.
+
+- id: step6_describe
+  title: 6단계. 기본 통계
+  subtitle: describe()로 분포 확인
+  blocks:
+  - type: text
+    content: 댓글 수와 제목 길이의 분포를 확인합니다. describe()로 평균, 표준편차, 최소/최대값 등을 한눈에 파악합니다.
+  - type: code
+    language: python
+    title: 기본 통계
+    description: 댓글 수 통계
+    content: |-
+      final[['comments', 'titleLength']].describe()
+
+- id: step7_value_counts
+  title: 7단계. 상태별 개수
+  subtitle: open vs closed
+  blocks:
+  - type: text
+    content: 열린 이슈와 닫힌 이슈의 비율을 확인합니다. value_counts()로 범주형 데이터의 분포를 파악합니다.
+  - type: code
+    language: python
+    title: 상태별 개수
+    description: open vs closed
+    content: |-
+      final['state'].value_counts()
+
+- id: step8_top_comments
+  title: 8단계. 댓글 많은 이슈
+  subtitle: nlargest 활용
+  blocks:
+  - type: text
+    content: 댓글이 가장 많은 이슈 5개를 확인합니다. nlargest로 TOP N을 빠르게 찾습니다.
+  - type: code
+    language: python
+    title: 댓글 많은 이슈 TOP 5
+    description: 가장 논의가 활발한 이슈
+    content: |-
+      final.nlargest(5, 'comments')[['number', 'title', 'comments']]
+
+- id: step9_corr
+  title: 9단계. 상관관계 분석
+  subtitle: 제목 길이 vs 댓글 수
+  blocks:
+  - type: text
+    content: 제목이 긴 이슈가 댓글이 많을까요? 상관관계로 두 변수의 관계를 확인합니다.
+  - type: code
+    language: python
+    title: 상관관계
+    description: 긴 제목 = 복잡한 이슈 = 댓글 많음?
+    content: |-
+      final[['titleLength', 'comments']].corr()
+
+- id: step10_groupby
+  title: 10단계. 상태별 평균
+  subtitle: groupby 활용
+  blocks:
+  - type: text
+    content: open 이슈와 closed 이슈의 평균 댓글 수를 비교합니다. groupby로 그룹별 통계를 계산합니다.
+  - type: code
+    language: python
+    title: 상태별 평균 댓글 수
+    description: open 이슈가 댓글이 더 많을까?
+    content: |-
+      final.groupby('state')['comments'].mean()
+
+- id: step11_json_normalize
+  title: 11단계. 중첩 JSON 펼치기
+  subtitle: json_normalize()
+  blocks:
+  - type: text
+    content: |-
+      API 응답에는 중첩된 구조가 많습니다. {'user': {'login': 'name'}} 같은 형태를 user.login처럼 펼쳐서 접근하기 쉽게 만듭니다. json_normalize()가 자동으로 평탄화합니다.
+  - type: code
+    language: python
+    title: 중첩 데이터 펼치기
+    description: json_normalize로 평탄화
+    content: |-
+      flat = pd.json_normalize(response.json(), max_level=1)
+      flat[['number', 'user.login']].head()
+  - type: tip
+    content: pd.json_normalize()는 중첩된 JSON 구조를 평탄화합니다. max_level로 펼칠 깊이를 조절합니다. user.login처럼 점(.)으로 경로를 표시합니다. 복잡한 API 응답을 DataFrame으로 변환할 때 유용합니다.
+
+- id: step12_save
+  title: 12단계. CSV 저장
+  subtitle: to_csv()
+  blocks:
+  - type: text
+    content: 분석 결과를 파일로 저장합니다. encoding='utf-8-sig'는 엑셀에서 한글이 깨지지 않게 하는 BOM(Byte Order Mark)을 추가합니다. index=False로 불필요한 인덱스 컬럼을 제외합니다.
+  - type: code
+    language: python
+    title: CSV로 저장
+    description: index=False로 인덱스 제외
+    content: |-
+      final.to_csv('github_issues.csv', index=False, encoding='utf-8-sig')
+  - type: tip
+    content: to_csv()는 DataFrame을 CSV 파일로 저장합니다. index=False로 인덱스를 제외하고, encoding='utf-8-sig'는 한글이 깨지지 않도록 BOM을 추가합니다. sep 파라미터로 구분자를 변경할 수 있습니다(기본값은 쉼표).
+
+- id: step13_function
+  title: 13단계. 재사용 함수 만들기
+  subtitle: 파이프라인 자동화
+  blocks:
+  - type: text
+    content: 지금까지 한 과정을 함수로 정리하면 다른 리포지토리에도 쉽게 적용할 수 있습니다.
+  - type: code
+    language: python
+    title: 데이터 수집 함수
+    description: API 호출 + DataFrame 변환
+    content: |-
+      def fetchGithubIssues(repo, perPage=10):
+          url = f"https://api.github.com/repos/{repo}/issues"
+          params = {'per_page': perPage, 'state': 'all'}
+          response = requests.get(url, params=params, timeout=10)
+          if response.status_code == 200:
+              return pd.DataFrame(response.json())
+          return None
+
+      fetchGithubIssues('numpy/numpy', 5)
+
+- id: practice
+  title: 실습
+  subtitle: 실전 분석 프로젝트
+  blocks:
+  - type: text
+    content: 다른 리포지토리로 분석해보세요.
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 다른 리포지토리 분석 + 통계"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import requests
+        import pandas as pd
+        def fetchIssues(repo, perPage=10):
+            url = f"https://api.github.com/repos/{repo}/issues"
+            params = {'per_page': perPage, 'state': 'all'}
+            response = requests.get(url, params=params, timeout=10)
+            if response.status_code == 200:
+                return pd.DataFrame(response.json())
+            return None
+    - type: code
+      title: "분석 수행"
+      content: |-
+        data = fetchIssues('scikit-learn/scikit-learn', 20)
+        preview = data[['number', 'title', 'state', 'comments']].head(10)
+        noCommentRatio = (data['comments'] == 0).mean() * 100
+        (preview, noCommentRatio)
+  - type: expansion
+    title: "미션2: 날짜 분석 + 작성자 집계"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import requests
+        import pandas as pd
+        url = "https://api.github.com/repos/pandas-dev/pandas/issues"
+        params = {'per_page': 10, 'state': 'all'}
+        response = requests.get(url, params=params, timeout=10)
+        df = pd.DataFrame(response.json()) if response.status_code == 200 else pd.DataFrame([{'created_at': '2024-01-01', 'user': {'login': 'sample'}}])
+        df['created_at'] = pd.to_datetime(df['created_at'])
+        flatDf = pd.json_normalize(response.json(), max_level=1) if response.status_code == 200 else pd.DataFrame([{'user.login': 'sample'}])
+    - type: code
+      title: "분석 수행"
+      content: |-
+        recentIssues = df.sort_values('created_at', ascending=False).head(5)
+        authorCounts = flatDf['user.login'].value_counts().head(10)
+        (recentIssues, authorCounts)
+
+- id: summary
+  title: 정리
+  subtitle: 전체 커리큘럼 완료!
+  blocks:
+  - type: text
+    content: 실전 API 데이터 파이프라인을 경험했습니다! 수집부터 저장까지 전체 흐름을 익혔습니다.
+  - type: list
+    items:
+    - "requests.get(url, params) - API 호출"
+    - "response.json() - JSON을 파이썬 객체로"
+    - "pd.DataFrame(json) - JSON을 DataFrame으로"
+    - "pd.to_datetime() - 문자열을 datetime으로"
+    - "df['컬럼'].str.len() - 문자열 길이"
+    - "pd.json_normalize() - 중첩 JSON 평탄화"
+    - "df.to_csv() - CSV 파일로 저장"
+    - "def 함수(): - 재사용 가능한 함수 정의"
+  - type: text
+    content: pandas 전체 과정 완료! 입문(01-02) → 기초(03-05) → 중급(06-08) → 심화(09-10)를 모두 마스터했습니다. 이제 실제 데이터를 다룰 준비가 되었습니다. 공공데이터포털, Kaggle 등에서 데이터를 찾아 분석해보세요!

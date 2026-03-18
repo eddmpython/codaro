@@ -1,0 +1,505 @@
+meta:
+  id: day09_1
+  title: 조건문
+  day: 9
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 조건문 if - 분기 처리"
+    description: "if, elif, else로 조건에 따라 다른 코드를 실행하는 방법."
+    keywords: ['조건문', 'if', 'elif', 'else']
+intro:
+  emoji: "🔀"
+  points:
+  - 조건문의 기본 개념과 구조
+  - if 문의 기본 사용법
+  - if-else 문으로 이진 분기 처리
+  - if-elif-else 문으로 다중 조건 처리
+  - 삼항 연산자로 간단한 조건 표현
+  - 중첩 조건문으로 복잡한 논리 구현
+  - 논리 연산자(and, or, not) 활용
+sections:
+- id: conditional_introduction
+  title: 조건문 소개
+  subtitle: 프로그램의 흐름 제어하기
+  blocks:
+  - type: text
+    content: 조건문은 조건에 따라 프로그램의 실행 흐름을 제어하는 파이썬의 핵심 구문입니다. 특정 조건이 참(True)인지 거짓(False)인지에 따라 다른 코드를 실행할 수 있습니다. 예를 들어 "나이가 18세 이상이면 성인입니다"와 같은 판단을 코드로 표현할 수 있습니다. 조건문은 if 키워드로 시작하며, 조건식 뒤에 콜론(:)을 붙이고 다음 줄에 들여쓰기로 실행할 코드를 작성합니다.
+  - type: list
+    items:
+    - if, elif, else 키워드 사용
+    - 불린(Boolean) 표현식으로 조건 판단
+    - 들여쓰기(4칸)로 코드 블록 구분
+    - 조건이 True일 때 해당 블록 실행
+  - type: code
+    language: python
+    title: 조건문 기본 개념
+    description: "조건문의 기본 구조를 이해합니다."
+    content: |-
+      conditionalIntroA = 3
+      if conditionalIntroA > 0:
+          print('A is a positive number')
+
+      conditionalIntroB = -5
+      if conditionalIntroB > 0:
+          print('B is positive')
+
+      print('This line always executes')
+  - type: tip
+    content: "파이썬에서 들여쓰기는 매우 중요합니다. 같은 블록의 코드는 반드시 같은 수준의 들여쓰기를 가져야 합니다."
+
+- id: if_else_statement
+  title: if-else 문
+  subtitle: 두 가지 경우의 완전한 처리
+  blocks:
+  - type: text
+    content: if-else 문은 조건이 참일 때와 거짓일 때 각각 다른 코드를 실행합니다. if 블록은 조건이 True일 때, else 블록은 조건이 False일 때 실행됩니다. 반드시 둘 중 하나는 실행되므로 모든 경우를 처리할 수 있습니다. else는 if와 같은 들여쓰기 레벨에서 작성하고 콜론(:)을 붙입니다.
+  - type: list
+    items:
+    - 조건이 True면 if 블록 실행
+    - 조건이 False면 else 블록 실행
+    - 반드시 둘 중 하나는 실행됨
+    - 모든 경우를 다루는 완전한 분기
+  - type: code
+    language: python
+    title: if-else 문 사용
+    description: "조건에 따라 다른 코드를 실행합니다."
+    content: |-
+      ifElseA = 3
+      if ifElseA > 0:
+          print('A is a positive number')
+      else:
+          print('A is not positive')
+
+      ifElseB = -5
+      if ifElseB > 0:
+          print('B is positive')
+      else:
+          print('B is not positive')
+
+      ifElseNumber = 7
+      if ifElseNumber % 2 == 0:
+          print(ifElseNumber, '는 짝수입니다')
+      else:
+          print(ifElseNumber, '는 홀수입니다')
+
+- id: if_elif_else_statement
+  title: if-elif-else 문
+  subtitle: 다중 조건 처리
+  blocks:
+  - type: text
+    content: if-elif-else 문은 여러 개의 조건을 순차적으로 검사합니다. 맨 위에서부터 조건을 하나씩 확인하여 첫 번째로 참인 조건의 코드만 실행하고 나머지는 모두 건너뜁니다. elif는 필요한 만큼 추가할 수 있고, else는 모든 조건이 거짓일 때 실행됩니다. elif는 "else if"의 줄임말입니다.
+  - type: list
+    items:
+    - 위에서 아래로 순차 검사
+    - 첫 번째 참 조건만 실행
+    - elif는 필요한 만큼 추가 가능
+    - else는 모든 조건이 거짓일 때 실행
+  - type: code
+    language: python
+    title: if-elif-else 문 사용
+    description: "여러 조건을 순차적으로 검사합니다."
+    content: |-
+      ifElifNumber = 0
+      if ifElifNumber > 0:
+          print('양수입니다')
+      elif ifElifNumber < 0:
+          print('음수입니다')
+      else:
+          print('0입니다')
+
+      ifElifScore = 85
+      if ifElifScore >= 90:
+          ifElifGrade = 'A'
+      elif ifElifScore >= 80:
+          ifElifGrade = 'B'
+      elif ifElifScore >= 70:
+          ifElifGrade = 'C'
+      elif ifElifScore >= 60:
+          ifElifGrade = 'D'
+      else:
+          ifElifGrade = 'F'
+      print('점수:', ifElifScore, '등급:', ifElifGrade)
+
+- id: age_classification
+  title: 나이 분류 예제
+  subtitle: 다중 조건문 실습
+  blocks:
+  - type: text
+    content: 나이를 기반으로 한 분류는 실제 소프트웨어에서 자주 사용됩니다. 웹사이트 가입 자격, 서비스 이용 권한, 콘텐츠 접근 제한 등에서 나이 조건을 확인합니다. 여러 연령대를 구분할 때 if-elif-else 문을 사용하면 깔끔하게 구현할 수 있습니다.
+  - type: list
+    items:
+    - 연령대별 세분화된 분류
+    - 경계값 정확한 처리
+    - 유효하지 않은 값 검사
+    - 실무에서 자주 사용되는 패턴
+  - type: code
+    language: python
+    title: 나이별 분류
+    description: "나이에 따라 다른 분류를 합니다."
+    content: |-
+      ageClassifyAge = 25
+
+      if ageClassifyAge < 0:
+          print('나이는 음수가 될 수 없습니다')
+      elif ageClassifyAge < 13:
+          print('어린이입니다')
+      elif ageClassifyAge < 20:
+          print('청소년입니다')
+      elif ageClassifyAge < 65:
+          print('성인입니다')
+      else:
+          print('노인입니다')
+
+      ageClassifyStudent = 16
+      if ageClassifyStudent < 6:
+          print('미취학 아동')
+      elif ageClassifyStudent < 12:
+          print('초등학생')
+      elif ageClassifyStudent < 15:
+          print('중학생')
+      elif ageClassifyStudent < 18:
+          print('고등학생')
+      else:
+          print('성인')
+
+- id: ternary_operator
+  title: 삼항 연산자
+  subtitle: 한 줄로 조건문 작성하기
+  blocks:
+  - type: text
+    content: 삼항 연산자(조건부 표현식)는 if-else 문을 한 줄로 표현할 수 있는 기능입니다. "참일때값 if 조건 else 거짓일때값" 형태로 사용합니다. 변수에 조건에 따른 값을 할당할 때 매우 유용합니다. 간단한 조건문에 사용하고, 복잡한 로직은 일반 if-else를 사용하는 것이 좋습니다.
+  - type: list
+    items:
+    - 한 줄로 if-else 표현
+    - 변수 할당에 직접 사용 가능
+    - 참값 if 조건 else 거짓값 형태
+    - 간단한 조건에 적합
+  - type: code
+    language: python
+    title: 삼항 연산자 사용
+    description: "조건에 따라 다른 값을 할당합니다."
+    content: |-
+      ternaryAge = 20
+      ternaryStatus = '성인' if ternaryAge >= 18 else '미성년자'
+      print(ternaryStatus)
+
+      ternaryNumber = -5
+      ternaryResult = '양수' if ternaryNumber > 0 else '양수 아님'
+      print(ternaryResult)
+
+      ternaryScore = 85
+      ternaryGrade = 'A' if ternaryScore >= 90 else 'B' if ternaryScore >= 80 else 'C'
+      print('등급:', ternaryGrade)
+
+      ternaryTemp = 25
+      ternaryWeather = '더움' if ternaryTemp > 30 else '따뜻함' if ternaryTemp > 20 else '추움'
+      print('날씨:', ternaryWeather)
+
+- id: nested_conditions
+  title: 중첩 조건문
+  subtitle: 조건문 안에 조건문 넣기
+  blocks:
+  - type: text
+    content: 중첩 조건문은 조건문 내부에 또 다른 조건문을 넣는 구조입니다. 복잡한 논리나 여러 조건을 동시에 만족해야 하는 경우에 사용합니다. 들여쓰기 레벨이 깊어지므로 가독성에 주의해야 합니다. 너무 깊은 중첩은 피하고, 논리 연산자(and, or)로 대체할 수 있는지 고려해보세요.
+  - type: list
+    items:
+    - 조건문 내부에 또 다른 조건문
+    - 복잡한 논리 구조 구현
+    - 단계적 조건 검사
+    - 들여쓰기 레벨 주의
+  - type: code
+    language: python
+    title: 중첩 조건문 사용
+    description: "조건문 안에 조건문을 넣어 복잡한 논리를 구현합니다."
+    content: |-
+      nestedNumber = 12
+      if nestedNumber > 0:
+          if nestedNumber % 2 == 0:
+              print('양수이면서 짝수입니다')
+          else:
+              print('양수이면서 홀수입니다')
+      else:
+          print('양수가 아닙니다')
+
+      nestedAge = 25
+      if nestedAge >= 18:
+          if nestedAge >= 65:
+              print('노인')
+          else:
+              print('성인')
+      else:
+          print('미성년자')
+
+- id: logical_operators
+  title: 논리 연산자
+  subtitle: and, or, not 활용
+  blocks:
+  - type: text
+    content: 논리 연산자는 여러 조건을 하나의 표현식으로 결합합니다. and는 모든 조건이 참일 때만 True, or는 하나 이상의 조건이 참이면 True, not은 조건의 반대값을 반환합니다. 논리 연산자를 사용하면 중첩 조건문을 간단하게 만들 수 있습니다.
+  - type: list
+    items:
+    - and - 모든 조건이 참일 때 True
+    - or - 하나 이상 조건이 참일 때 True
+    - not - 조건의 반대값
+    - 중첩 조건문 대체 가능
+  - type: code
+    language: python
+    title: 논리 연산자 사용
+    description: "여러 조건을 결합하여 판단합니다."
+    content: |-
+      logicalAge = 25
+      logicalHasLicense = True
+      if logicalAge >= 18 and logicalHasLicense:
+          print('운전 가능합니다')
+
+      logicalDay = '토요일'
+      if logicalDay == '토요일' or logicalDay == '일요일':
+          print('주말입니다')
+
+      logicalUserLoggedIn = False
+      if not logicalUserLoggedIn:
+          print('로그인이 필요합니다')
+
+      logicalScore = 85
+      logicalAttendance = 90
+      if logicalScore >= 80 and logicalAttendance >= 80:
+          print('수료 가능합니다')
+      else:
+          print('조건 미달입니다')
+  - type: tip
+    content: "and와 or를 함께 사용할 때는 괄호로 우선순위를 명확히 하는 것이 좋습니다."
+
+- id: membership_operators
+  title: 멤버십 연산자
+  subtitle: in, not in 활용
+  blocks:
+  - type: text
+    content: 멤버십 연산자(in, not in)는 특정 값이 컬렉션(리스트, 튜플, 문자열, 집합, 딕셔너리 등)에 포함되어 있는지 확인합니다. in은 포함되어 있으면 True, not in은 포함되어 있지 않으면 True를 반환합니다. 검색이나 필터링, 조건 검증에서 매우 자주 사용됩니다.
+  - type: list
+    items:
+    - in - 포함 여부 확인
+    - not in - 미포함 여부 확인
+    - 리스트, 튜플, 문자열, 집합, 딕셔너리에 사용
+    - 검색과 필터링의 핵심
+  - type: code
+    language: python
+    title: 멤버십 연산자 사용
+    description: "값이 컬렉션에 포함되어 있는지 확인합니다."
+    content: |-
+      membershipFruits = ['apple', 'banana', 'orange']
+      if 'apple' in membershipFruits:
+          print('사과가 있습니다')
+
+      if 'grape' not in membershipFruits:
+          print('포도가 없습니다')
+
+      membershipText = 'Hello Python'
+      if 'Python' in membershipText:
+          print('Python이 포함되어 있습니다')
+
+      membershipUser = {'name': '김개발', 'age': 25}
+      if 'email' in membershipUser:
+          print('이메일 정보가 있습니다')
+      else:
+          print('이메일 정보가 없습니다')
+
+- id: season_classification
+  title: 계절 판별 예제
+  subtitle: in 연산자와 조건문 결합
+  blocks:
+  - type: text
+    content: 월 정보를 바탕으로 계절을 판별하는 것은 in 연산자와 조건문을 함께 사용하는 좋은 예제입니다. 리스트에 특정 월이 포함되어 있는지 확인하여 해당 계절을 출력합니다. 이런 패턴은 카테고리 분류, 그룹화 등에서 자주 활용됩니다.
+  - type: list
+    items:
+    - in 연산자로 월 그룹 확인
+    - 리스트를 활용한 계절 분류
+    - 유효하지 않은 값 처리
+    - 범위 비교와 in 비교
+  - type: code
+    language: python
+    title: 계절 판별
+    description: "월을 입력받아 계절을 판별합니다."
+    content: |-
+      seasonMonth = 7
+
+      if seasonMonth < 1 or seasonMonth > 12:
+          print('월은 1~12 사이여야 합니다')
+      elif seasonMonth in [12, 1, 2]:
+          print(seasonMonth, '월은 겨울입니다')
+      elif seasonMonth in [3, 4, 5]:
+          print(seasonMonth, '월은 봄입니다')
+      elif seasonMonth in [6, 7, 8]:
+          print(seasonMonth, '월은 여름입니다')
+      else:
+          print(seasonMonth, '월은 가을입니다')
+
+      seasonMonth2 = 10
+      if 3 <= seasonMonth2 <= 5:
+          print(seasonMonth2, '월은 봄')
+      elif 6 <= seasonMonth2 <= 8:
+          print(seasonMonth2, '월은 여름')
+      elif 9 <= seasonMonth2 <= 11:
+          print(seasonMonth2, '월은 가을')
+      else:
+          print(seasonMonth2, '월은 겨울')
+
+- id: practical_examples
+  title: 실전 응용 예제
+  subtitle: 실무에서 사용하는 조건문
+  blocks:
+  - type: text
+    content: 실제 프로그래밍에서 조건문은 다양한 상황에서 활용됩니다. 사용자 인증, 할인율 계산, 권한 검사 등 비즈니스 로직의 핵심에 조건문이 사용됩니다. 여러 조건을 조합하여 복잡한 규칙을 구현할 수 있습니다.
+  - type: list
+    items:
+    - 로그인 인증 시스템
+    - 할인율 계산 시스템
+    - 자격 검증 시스템
+    - 복합 조건 처리
+  - type: code
+    language: python
+    title: 실전 응용 예제
+    description: "실무에서 사용하는 조건문 패턴을 익힙니다."
+    content: |-
+      practicalUsername = 'admin'
+      practicalPassword = 'pass123'
+      practicalIsActive = True
+
+      practicalInputUser = 'admin'
+      practicalInputPass = 'pass123'
+
+      if not practicalIsActive:
+          print('계정이 비활성화되었습니다')
+      elif practicalInputUser != practicalUsername:
+          print('사용자명이 올바르지 않습니다')
+      elif practicalInputPass != practicalPassword:
+          print('비밀번호가 올바르지 않습니다')
+      else:
+          print('로그인 성공!')
+
+      practicalPurchase = 150000
+      practicalIsMember = True
+
+      if practicalIsMember and practicalPurchase >= 100000:
+          practicalDiscount = 0.10
+      elif practicalIsMember:
+          practicalDiscount = 0.05
+      elif practicalPurchase >= 200000:
+          practicalDiscount = 0.05
+      else:
+          practicalDiscount = 0
+
+      practicalFinal = practicalPurchase * (1 - practicalDiscount)
+      print('구매금액:', practicalPurchase)
+      print('할인율:', practicalDiscount * 100, '%')
+      print('최종금액:', practicalFinal)
+
+- id: practice
+  title: 9일차 복습
+  subtitle: 조건문 미션
+  blocks:
+  - type: text
+    content: 9일차에서 배운 조건문 개념을 복습하는 미션입니다. if, elif, else, 논리 연산자, 멤버십 연산자 등을 종합적으로 연습해봅시다.
+  - type: expansion
+    title: "미션1: 양수/음수/0 판별"
+    code: |-
+      mission1Number = -7
+      if mission1Number > 0:
+          print('양수입니다')
+      elif mission1Number < 0:
+          print('음수입니다')
+      else:
+          print('0입니다')
+  - type: expansion
+    title: "미션2: 짝수/홀수 판별"
+    code: |-
+      mission2Num = 15
+      if mission2Num % 2 == 0:
+          print(mission2Num, '는 짝수')
+      else:
+          print(mission2Num, '는 홀수')
+  - type: expansion
+    title: "미션3: 성적 등급 판정"
+    code: |-
+      mission3Score = 78
+      if mission3Score >= 90:
+          mission3Grade = 'A'
+      elif mission3Score >= 80:
+          mission3Grade = 'B'
+      elif mission3Score >= 70:
+          mission3Grade = 'C'
+      elif mission3Score >= 60:
+          mission3Grade = 'D'
+      else:
+          mission3Grade = 'F'
+      print('점수:', mission3Score, '등급:', mission3Grade)
+  - type: expansion
+    title: "미션4: 삼항 연산자 활용"
+    code: |-
+      mission4Age = 17
+      mission4Status = '성인' if mission4Age >= 18 else '미성년자'
+      print('나이:', mission4Age, '상태:', mission4Status)
+
+      mission4Temp = 28
+      mission4Feel = '더움' if mission4Temp > 25 else '적당함'
+      print('온도:', mission4Temp, '체감:', mission4Feel)
+  - type: expansion
+    title: "미션5: 논리 연산자 활용"
+    code: |-
+      mission5HasTicket = True
+      mission5Age = 15
+
+      if mission5HasTicket and mission5Age >= 12:
+          print('입장 가능합니다')
+      else:
+          print('입장 불가능합니다')
+
+      mission5Day = '수요일'
+      if mission5Day == '토요일' or mission5Day == '일요일':
+          print('주말입니다')
+      else:
+          print('평일입니다')
+  - type: expansion
+    title: "미션6: 멤버십 연산자 활용"
+    code: |-
+      mission6AllowedUsers = ['admin', 'manager', 'user1']
+      mission6CurrentUser = 'manager'
+
+      if mission6CurrentUser in mission6AllowedUsers:
+          print('접근 권한이 있습니다')
+      else:
+          print('접근이 거부되었습니다')
+
+      mission6BlockedWords = ['spam', 'ad', 'virus']
+      mission6Message = 'Hello World'
+      mission6HasBlocked = False
+      if 'spam' in mission6Message.lower():
+          mission6HasBlocked = True
+      if 'ad' in mission6Message.lower():
+          mission6HasBlocked = True
+      print('차단 단어 포함:', mission6HasBlocked)
+  - type: expansion
+    title: "미션7: 복합 조건 실습"
+    code: |-
+      mission7Applicant = {
+          'age': 28,
+          'experience': 3,
+          'skills': ['Python', 'SQL']
+      }
+
+      mission7AgeOk = mission7Applicant['age'] >= 20
+      mission7ExpOk = mission7Applicant['experience'] >= 2
+      mission7SkillOk = len(mission7Applicant['skills']) >= 2
+
+      if mission7AgeOk and mission7ExpOk and mission7SkillOk:
+          print('지원 자격을 만족합니다')
+      else:
+          print('자격 조건 미달')
+          if not mission7AgeOk:
+              print('- 나이 조건 미달')
+          if not mission7ExpOk:
+              print('- 경력 조건 미달')
+          if not mission7SkillOk:
+              print('- 기술 조건 미달')

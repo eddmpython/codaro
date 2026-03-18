@@ -1,0 +1,691 @@
+meta:
+  id: folium_07
+  title: 단계구분도
+  order: 7
+  category: folium
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["folium", "Choropleth", "단계구분도", "컬러맵", "범례"]
+  seo:
+    title: "Folium Choropleth - 단계구분도 만들기"
+    description: "Folium으로 Choropleth 지도를 만듭니다. 지역별 데이터를 색상으로 시각화합니다."
+    keywords: ["folium", "Choropleth", "단계구분도", "지역통계", "시각화"]
+
+intro:
+  emoji: "🌈"
+  goal: Choropleth 지도로 지역별 데이터를 시각화합니다.
+  description: 단계구분도(Choropleth)는 지역별 수치를 색상 단계로 표현합니다. 인구, 소득, 투표율 등 통계 데이터를 지도에 시각화합니다. GeoJSON과 데이터를 연결하여 자동으로 색상을 매핑합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: folium과 marimo를 불러옵니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: folium과 marimo 불러오기
+    content: |-
+      import folium
+      import marimo as mo
+
+- id: step2_choropleth_basics
+  title: 2단계. Choropleth 기본
+  subtitle: Choropleth()
+  blocks:
+  - type: text
+    content: Choropleth()는 GeoJSON과 데이터를 연결하여 색상을 자동 매핑합니다. key_on으로 GeoJSON 속성을, columns로 데이터 컬럼을 지정합니다.
+  - type: code
+    language: python
+    title: 데이터 준비
+    description: 지역과 값
+    content: |-
+      seoulCenter = [37.5665, 126.9780]
+
+      guGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"id": "jongno", "name": "종로구"},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.57], [127.00, 37.57],
+                          [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                      ]]
+                  }
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "jung", "name": "중구"},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.54], [127.00, 37.54],
+                          [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                      ]]
+                  }
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "yongsan", "name": "용산구"},
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.96, 37.51], [127.00, 37.51],
+                          [127.00, 37.54], [126.96, 37.54], [126.96, 37.51]
+                      ]]
+                  }
+              }
+          ]
+      }
+
+      guData = {
+          "jongno": 150000,
+          "jung": 130000,
+          "yongsan": 230000
+      }
+      guData
+  - type: tip
+    content: GeoJSON의 properties에 있는 id와 데이터의 키를 매칭시킵니다.
+
+- id: step3_simple_choropleth
+  title: 3단계. 간단한 Choropleth
+  subtitle: GeoJson + style_function
+  blocks:
+  - type: text
+    content: Choropleth 클래스 대신 GeoJson에 style_function을 사용하면 더 유연하게 구현할 수 있습니다.
+  - type: code
+    language: python
+    title: 수동 색상 매핑
+    description: style_function 방식
+    content: |-
+      m1 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      def getColor(value):
+          if value >= 200000:
+              return "#e74c3c"
+          elif value >= 150000:
+              return "#f39c12"
+          else:
+              return "#27ae60"
+
+      def choroplethStyle(feature):
+          guId = feature["properties"]["id"]
+          value = guData.get(guId, 0)
+          return {
+              "fillColor": getColor(value),
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guGeo,
+          style_function=choroplethStyle,
+          tooltip=folium.GeoJsonTooltip(fields=["name"])
+      ).add_to(m1)
+
+      mo.iframe(m1._repr_html_())
+  - type: tip
+    content: getColor 함수에서 값에 따라 색상을 반환합니다. 임계값을 조절하여 구간을 설정합니다.
+
+- id: step4_color_scale
+  title: 4단계. 컬러 스케일
+  subtitle: 연속적 색상
+  blocks:
+  - type: text
+    content: branca 라이브러리로 연속적인 컬러 스케일을 만들 수 있습니다. Folium에 포함되어 있습니다.
+  - type: code
+    language: python
+    title: ColorMap 사용
+    description: branca.colormap
+    content: |-
+      import branca.colormap as cm
+
+      m2 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      values = list(guData.values())
+      minVal = min(values)
+      maxVal = max(values)
+
+      colormap = cm.LinearColormap(
+          colors=["green", "yellow", "red"],
+          vmin=minVal,
+          vmax=maxVal
+      )
+
+      def scaleStyle(feature):
+          guId = feature["properties"]["id"]
+          value = guData.get(guId, minVal)
+          return {
+              "fillColor": colormap(value),
+              "color": "black",
+              "weight": 1,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guGeo,
+          style_function=scaleStyle,
+          tooltip=folium.GeoJsonTooltip(fields=["name"])
+      ).add_to(m2)
+
+      mo.iframe(m2._repr_html_())
+  - type: tip
+    content: LinearColormap은 값에 따라 색상을 선형으로 보간합니다. 최소~최대 범위를 자동으로 매핑합니다.
+
+- id: step5_add_legend
+  title: 5단계. 범례 추가
+  subtitle: ColorMap 범례
+  blocks:
+  - type: text
+    content: ColorMap에 caption을 추가하고 지도에 add_to()하면 범례가 표시됩니다.
+  - type: code
+    language: python
+    title: 범례 포함 지도
+    description: 컬러바 표시
+    content: |-
+      m3 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      legendColormap = cm.LinearColormap(
+          colors=["#2ecc71", "#f1c40f", "#e74c3c"],
+          vmin=100000,
+          vmax=250000,
+          caption="인구수"
+      )
+
+      def legendStyle(feature):
+          guId = feature["properties"]["id"]
+          value = guData.get(guId, 100000)
+          return {
+              "fillColor": legendColormap(value),
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guGeo,
+          style_function=legendStyle,
+          tooltip=folium.GeoJsonTooltip(fields=["name"])
+      ).add_to(m3)
+
+      legendColormap.add_to(m3)
+
+      mo.iframe(m3._repr_html_())
+  - type: tip
+    content: caption은 범례 제목입니다. 범례는 지도 우측 하단에 표시됩니다.
+
+- id: step6_step_colormap
+  title: 6단계. 단계별 컬러맵
+  subtitle: StepColormap
+  blocks:
+  - type: text
+    content: StepColormap은 구간별로 색상을 나눕니다. 연속이 아닌 이산적인 범주에 적합합니다.
+  - type: code
+    language: python
+    title: 구간별 색상
+    description: StepColormap
+    content: |-
+      m4 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      stepColormap = cm.StepColormap(
+          colors=["green", "yellow", "orange", "red"],
+          index=[100000, 150000, 200000, 250000],
+          vmin=100000,
+          vmax=250000,
+          caption="인구 구간"
+      )
+
+      def stepStyle(feature):
+          guId = feature["properties"]["id"]
+          value = guData.get(guId, 100000)
+          return {
+              "fillColor": stepColormap(value),
+              "color": "black",
+              "weight": 1,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guGeo,
+          style_function=stepStyle,
+          tooltip=folium.GeoJsonTooltip(fields=["name"])
+      ).add_to(m4)
+
+      stepColormap.add_to(m4)
+
+      mo.iframe(m4._repr_html_())
+  - type: tip
+    content: index는 구간 경계값 리스트입니다. 4개 색상이면 3개 경계가 필요합니다.
+
+- id: step7_tooltip_with_value
+  title: 7단계. 값 표시 툴팁
+  subtitle: 데이터 포함
+  blocks:
+  - type: text
+    content: 툴팁에 지역명과 데이터 값을 함께 표시합니다.
+  - type: code
+    language: python
+    title: 값 포함 GeoJSON
+    description: properties에 값 추가
+    content: |-
+      m5 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      guGeoWithData = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"id": "jongno", "name": "종로구", "population": 150000},
+                  "geometry": guGeo["features"][0]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "jung", "name": "중구", "population": 130000},
+                  "geometry": guGeo["features"][1]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "yongsan", "name": "용산구", "population": 230000},
+                  "geometry": guGeo["features"][2]["geometry"]
+              }
+          ]
+      }
+
+      valueColormap = cm.LinearColormap(
+          colors=["lightblue", "blue", "darkblue"],
+          vmin=100000,
+          vmax=250000,
+          caption="인구"
+      )
+
+      def valueStyle(feature):
+          pop = feature["properties"]["population"]
+          return {
+              "fillColor": valueColormap(pop),
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.7
+          }
+
+      folium.GeoJson(
+          guGeoWithData,
+          style_function=valueStyle,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "population"],
+              aliases=["구:", "인구:"]
+          )
+      ).add_to(m5)
+
+      valueColormap.add_to(m5)
+
+      mo.iframe(m5._repr_html_())
+  - type: tip
+    content: GeoJSON properties에 직접 데이터를 넣으면 tooltip에서 바로 사용할 수 있습니다.
+
+- id: step8_highlight
+  title: 8단계. 하이라이트 효과
+  subtitle: 인터랙션 추가
+  blocks:
+  - type: text
+    content: highlight_function으로 마우스 호버 시 강조 효과를 추가합니다.
+  - type: code
+    language: python
+    title: 호버 강조
+    description: 인터랙티브 Choropleth
+    content: |-
+      m6 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      hoverColormap = cm.LinearColormap(
+          colors=["#ecf0f1", "#3498db", "#2c3e50"],
+          vmin=100000,
+          vmax=250000,
+          caption="인구"
+      )
+
+      def hoverNormalStyle(feature):
+          pop = feature["properties"]["population"]
+          return {
+              "fillColor": hoverColormap(pop),
+              "color": "white",
+              "weight": 1,
+              "fillOpacity": 0.7
+          }
+
+      def hoverHighlightStyle(feature):
+          return {
+              "fillColor": "#f1c40f",
+              "color": "black",
+              "weight": 3,
+              "fillOpacity": 0.9
+          }
+
+      folium.GeoJson(
+          guGeoWithData,
+          style_function=hoverNormalStyle,
+          highlight_function=hoverHighlightStyle,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "population"],
+              aliases=["구:", "인구:"],
+              style="font-size: 14px; font-weight: bold;"
+          )
+      ).add_to(m6)
+
+      hoverColormap.add_to(m6)
+
+      mo.iframe(m6._repr_html_())
+  - type: tip
+    content: 하이라이트로 사용자가 어느 지역을 보고 있는지 명확하게 알 수 있습니다.
+
+- id: step9_multi_data
+  title: 9단계. 다중 데이터 시각화
+  subtitle: 레이어 전환
+  blocks:
+  - type: text
+    content: 여러 종류의 데이터를 레이어로 구분하고 전환할 수 있게 합니다.
+  - type: code
+    language: python
+    title: 인구 vs 면적
+    description: 레이어 전환
+    content: |-
+      m7 = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+      multiGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "종로구", "population": 150000, "area": 23.9},
+                  "geometry": guGeo["features"][0]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "중구", "population": 130000, "area": 9.96},
+                  "geometry": guGeo["features"][1]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "용산구", "population": 230000, "area": 21.87},
+                  "geometry": guGeo["features"][2]["geometry"]
+              }
+          ]
+      }
+
+      popColormap = cm.LinearColormap(
+          colors=["lightgreen", "darkgreen"],
+          vmin=100000,
+          vmax=250000
+      )
+
+      areaColormap = cm.LinearColormap(
+          colors=["lightyellow", "darkorange"],
+          vmin=5,
+          vmax=30
+      )
+
+      popGroup = folium.FeatureGroup(name="인구")
+      areaGroup = folium.FeatureGroup(name="면적", show=False)
+
+      folium.GeoJson(
+          multiGeo,
+          style_function=lambda f: {
+              "fillColor": popColormap(f["properties"]["population"]),
+              "color": "white", "weight": 2, "fillOpacity": 0.7
+          },
+          tooltip=folium.GeoJsonTooltip(fields=["name", "population"])
+      ).add_to(popGroup)
+
+      folium.GeoJson(
+          multiGeo,
+          style_function=lambda f: {
+              "fillColor": areaColormap(f["properties"]["area"]),
+              "color": "white", "weight": 2, "fillOpacity": 0.7
+          },
+          tooltip=folium.GeoJsonTooltip(fields=["name", "area"])
+      ).add_to(areaGroup)
+
+      popGroup.add_to(m7)
+      areaGroup.add_to(m7)
+
+      folium.LayerControl().add_to(m7)
+
+      mo.iframe(m7._repr_html_())
+  - type: tip
+    content: LayerControl로 인구/면적 레이어를 전환할 수 있습니다.
+
+- id: step10_complete
+  title: 10단계. 완성 예제
+  subtitle: 지역 통계 지도
+  blocks:
+  - type: text
+    content: 완성된 단계구분도를 만듭니다. 컬러맵, 범례, 툴팁, 하이라이트를 모두 포함합니다.
+  - type: code
+    language: python
+    title: 지역 통계 지도
+    description: 종합 예제
+    content: |-
+      statMap = folium.Map(
+          location=[37.555, 126.98],
+          zoom_start=12,
+          tiles="CartoDB Positron"
+      )
+
+      statsGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "종로구", "value": 85, "category": "상"},
+                  "geometry": guGeo["features"][0]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "중구", "value": 72, "category": "중"},
+                  "geometry": guGeo["features"][1]["geometry"]
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "용산구", "value": 91, "category": "상"},
+                  "geometry": guGeo["features"][2]["geometry"]
+              }
+          ]
+      }
+
+      finalColormap = cm.StepColormap(
+          colors=["#fee8c8", "#fdbb84", "#e34a33"],
+          index=[60, 75, 90, 100],
+          vmin=60,
+          vmax=100,
+          caption="만족도 점수"
+      )
+
+      def finalStyle(feature):
+          val = feature["properties"]["value"]
+          return {
+              "fillColor": finalColormap(val),
+              "color": "#333",
+              "weight": 2,
+              "fillOpacity": 0.8
+          }
+
+      def finalHighlight(feature):
+          return {
+              "fillColor": "#2ecc71",
+              "color": "black",
+              "weight": 3,
+              "fillOpacity": 0.9
+          }
+
+      folium.GeoJson(
+          statsGeo,
+          style_function=finalStyle,
+          highlight_function=finalHighlight,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "value", "category"],
+              aliases=["구:", "점수:", "등급:"],
+              style="background-color: white; padding: 5px;"
+          ),
+          popup=folium.GeoJsonPopup(
+              fields=["name", "value"],
+              aliases=["지역:", "만족도:"]
+          )
+      ).add_to(statMap)
+
+      finalColormap.add_to(statMap)
+
+      mo.iframe(statMap._repr_html_())
+
+- id: practice
+  title: 실습
+  subtitle: 단계구분도
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  - type: expansion
+    title: "미션1: 매출 지역 분석"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import branca.colormap as cm
+        import marimo as mo
+
+        salesGeo = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {"region": "북부", "sales": 1200},
+                    "geometry": {"type": "Polygon", "coordinates": [[
+                        [126.96, 37.57], [127.00, 37.57],
+                        [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                    ]]}
+                },
+                {
+                    "type": "Feature",
+                    "properties": {"region": "중부", "sales": 800},
+                    "geometry": {"type": "Polygon", "coordinates": [[
+                        [126.96, 37.54], [127.00, 37.54],
+                        [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                    ]]}
+                },
+                {
+                    "type": "Feature",
+                    "properties": {"region": "남부", "sales": 1500},
+                    "geometry": {"type": "Polygon", "coordinates": [[
+                        [126.96, 37.51], [127.00, 37.51],
+                        [127.00, 37.54], [126.96, 37.54], [126.96, 37.51]
+                    ]]}
+                }
+            ]
+        }
+        salesGeo
+    - type: code
+      title: 지도 생성
+      content: |-
+        salesMap = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+        salesColormap = cm.LinearColormap(
+            colors=["#f7fbff", "#2171b5"],
+            vmin=500,
+            vmax=2000,
+            caption="매출(만원)"
+        )
+
+        folium.GeoJson(
+            salesGeo,
+            style_function=lambda f: {
+                "fillColor": salesColormap(f["properties"]["sales"]),
+                "color": "gray",
+                "weight": 2,
+                "fillOpacity": 0.7
+            },
+            tooltip=folium.GeoJsonTooltip(
+                fields=["region", "sales"],
+                aliases=["지역:", "매출:"]
+            )
+        ).add_to(salesMap)
+
+        salesColormap.add_to(salesMap)
+
+        mo.iframe(salesMap._repr_html_())
+  - type: expansion
+    title: "미션2: 투표율 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import branca.colormap as cm
+        import marimo as mo
+
+        voteGeo = {
+            "type": "FeatureCollection",
+            "features": [
+                {
+                    "type": "Feature",
+                    "properties": {"district": "1선거구", "turnout": 68.5},
+                    "geometry": {"type": "Polygon", "coordinates": [[
+                        [126.96, 37.57], [127.00, 37.57],
+                        [127.00, 37.60], [126.96, 37.60], [126.96, 37.57]
+                    ]]}
+                },
+                {
+                    "type": "Feature",
+                    "properties": {"district": "2선거구", "turnout": 72.3},
+                    "geometry": {"type": "Polygon", "coordinates": [[
+                        [126.96, 37.54], [127.00, 37.54],
+                        [127.00, 37.57], [126.96, 37.57], [126.96, 37.54]
+                    ]]}
+                },
+                {
+                    "type": "Feature",
+                    "properties": {"district": "3선거구", "turnout": 58.9},
+                    "geometry": {"type": "Polygon", "coordinates": [[
+                        [126.96, 37.51], [127.00, 37.51],
+                        [127.00, 37.54], [126.96, 37.54], [126.96, 37.51]
+                    ]]}
+                }
+            ]
+        }
+        voteGeo
+    - type: code
+      title: 지도 생성
+      content: |-
+        voteMap = folium.Map(location=[37.555, 126.98], zoom_start=12)
+
+        voteColormap = cm.StepColormap(
+            colors=["#fee5d9", "#fcae91", "#fb6a4a", "#cb181d"],
+            index=[50, 60, 70, 80],
+            vmin=50,
+            vmax=80,
+            caption="투표율(%)"
+        )
+
+        def voteHighlight(feature):
+            return {"fillColor": "yellow", "fillOpacity": 0.9, "weight": 3}
+
+        folium.GeoJson(
+            voteGeo,
+            style_function=lambda f: {
+                "fillColor": voteColormap(f["properties"]["turnout"]),
+                "color": "black",
+                "weight": 1,
+                "fillOpacity": 0.7
+            },
+            highlight_function=voteHighlight,
+            tooltip=folium.GeoJsonTooltip(
+                fields=["district", "turnout"],
+                aliases=["선거구:", "투표율:"]
+            )
+        ).add_to(voteMap)
+
+        voteColormap.add_to(voteMap)
+
+        mo.iframe(voteMap._repr_html_())

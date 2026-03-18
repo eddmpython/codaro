@@ -1,0 +1,337 @@
+meta:
+  id: sklearn_04
+  title: 주택가격예측
+  order: 4
+  category: sklearn
+  difficulty: "⭐⭐⭐"
+  badge: 기초
+  tags: ["회귀", "교차검증", "cross_val_score", "캘리포니아", "주택"]
+  seo:
+    title: "scikit-learn 교차검증 - 캘리포니아 주택 가격 예측"
+    description: "cross_val_score로 교차검증을 수행합니다. 대규모 데이터셋으로 회귀 모델을 평가합니다."
+    keywords: ["scikit-learn", "교차검증", "cross_val_score", "주택가격", "회귀"]
+
+intro:
+  emoji: "🏠"
+  goal: 교차검증으로 모델의 일반화 성능을 평가합니다.
+  description: 캘리포니아 주택 가격 데이터(20,640개)로 대규모 회귀 모델을 학습합니다. 교차검증(cross-validation)으로 모델이 새로운 데이터에도 잘 작동하는지 확인합니다. 이전 프로젝트의 train_test_split, StandardScaler, LinearRegression, R²를 복습하고 cross_val_score를 새로 배웁니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: 캘리포니아 주택 가격 예측에 필요한 라이브러리를 불러옵니다. 교차검증을 위해 cross_val_score를 추가로 임포트합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sklearn 교차검증 모듈 임포트
+    content: |-
+      from sklearn.datasets import fetch_california_housing
+      from sklearn.model_selection import train_test_split, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression, Ridge
+      from sklearn.metrics import mean_squared_error, r2_score
+      import pandas as pd
+      import numpy as np
+      import matplotlib.pyplot as plt
+
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  subtitle: fetch_california_housing()
+  blocks:
+  - type: text
+    content: 캘리포니아 주택 데이터셋은 1990년 인구조사 기반의 20,640개 블록 그룹 데이터입니다. 8가지 특성(소득, 집 나이, 방 수 등)으로 주택 가격(중앙값, $100,000 단위)을 예측합니다.
+  - type: code
+    language: python
+    title: 데이터 로드
+    description: 캘리포니아 주택 데이터 불러오기
+    content: |-
+      housing = fetch_california_housing()
+      X = pd.DataFrame(housing.data, columns=housing.feature_names)
+      y = housing.target
+      X.shape
+  - type: code
+    language: python
+    title: 특성 확인
+    description: 8가지 특성 미리보기
+    content: |-
+      X.head()
+  - type: tip
+    content: MedInc(중위 소득), HouseAge(집 나이), AveRooms(평균 방 수), AveBedrms(평균 침실 수), Population(인구), AveOccup(평균 거주자 수), Latitude(위도), Longitude(경도)입니다. 타겟은 $100,000 단위입니다.
+
+- id: step3_explore
+  title: 3단계. 데이터 탐색
+  subtitle: 분포 확인
+  blocks:
+  - type: text
+    content: 대규모 데이터셋의 특성과 타겟 분포를 확인합니다. 이상치나 스케일 차이를 파악합니다.
+  - type: code
+    language: python
+    title: 기초 통계
+    description: 특성별 분포 확인
+    content: |-
+      X.describe()
+  - type: code
+    language: python
+    title: 타겟 분포
+    description: 주택 가격 분포
+    content: |-
+      fig, ax = plt.subplots(figsize=(8, 5))
+      ax.hist(y, bins=50, edgecolor='black')
+      ax.set_xlabel('Median House Value ($100k)')
+      ax.set_ylabel('Count')
+      ax.set_title('Distribution of House Prices')
+      fig
+
+- id: step4_split
+  title: 4단계. 데이터 분할
+  subtitle: train_test_split
+  blocks:
+  - type: text
+    content: 대규모 데이터셋에서는 테스트 비율을 더 낮춰도 됩니다. 20,640개 중 20%는 4,128개로 충분합니다.
+  - type: code
+    language: python
+    title: 데이터 분할
+    description: 80:20 분할
+    content: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+      xTrain.shape, xTest.shape
+
+- id: step5_scale
+  title: 5단계. 스케일링
+  subtitle: StandardScaler
+  blocks:
+  - type: text
+    content: 특성들의 스케일이 매우 다릅니다. MedInc는 0~15, Population은 0~35,000입니다. StandardScaler로 표준화합니다.
+  - type: code
+    language: python
+    title: 스케일링
+    description: 표준화 적용
+    content: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+
+- id: step6_baseline
+  title: 6단계. 기본 모델
+  subtitle: LinearRegression
+  blocks:
+  - type: text
+    content: 먼저 LinearRegression으로 기본 성능을 확인합니다. 이 성능을 기준(baseline)으로 다른 모델과 비교합니다.
+  - type: code
+    language: python
+    title: 기본 모델 학습
+    description: LinearRegression 학습
+    content: |-
+      modelLr = LinearRegression()
+      modelLr.fit(xTrainSc, yTrain)
+      predLr = modelLr.predict(xTestSc)
+      r2Lr = r2_score(yTest, predLr)
+      f"LinearRegression R²: {r2Lr:.4f}"
+
+- id: step7_cv_intro
+  title: 7단계. 교차검증 소개
+  subtitle: 왜 필요한가?
+  blocks:
+  - type: text
+    content: 단일 train/test 분할은 운에 따라 결과가 달라질 수 있습니다. 교차검증(cross-validation)은 데이터를 K개로 나눠 K번 반복 평가합니다. 모든 데이터가 한 번씩 테스트에 사용되므로 더 신뢰할 수 있는 성능 추정이 가능합니다.
+  - type: code
+    language: python
+    title: 5-fold 교차검증
+    description: cross_val_score 사용
+    content: |-
+      cvScores = cross_val_score(modelLr, xTrainSc, yTrain, cv=5, scoring='r2')
+      cvScores
+  - type: tip
+    content: cv=5는 데이터를 5등분하여 4개로 학습, 1개로 평가를 5번 반복합니다. scoring='r2'는 R²를 평가 지표로 사용합니다. 회귀에서는 'neg_mean_squared_error'도 많이 사용합니다.
+
+- id: step8_cv_analysis
+  title: 8단계. 교차검증 분석
+  subtitle: 평균과 표준편차
+  blocks:
+  - type: text
+    content: 교차검증 결과의 평균과 표준편차를 확인합니다. 표준편차가 작으면 모델이 안정적입니다. 표준편차가 크면 데이터 분할에 따라 성능이 크게 달라지는 것입니다.
+  - type: code
+    language: python
+    title: 교차검증 요약
+    description: 평균과 표준편차
+    content: |-
+      cvMean = cvScores.mean()
+      cvStd = cvScores.std()
+      f"CV R²: {cvMean:.4f} ± {cvStd:.4f}"
+  - type: code
+    language: python
+    title: Fold별 결과
+    description: 각 Fold의 R²
+    content: |-
+      foldDf = pd.DataFrame({'Fold': range(1, 6), 'R²': cvScores})
+      foldDf
+  - type: tip
+    content: "모델 성능 보고 시 '0.60 ± 0.02'처럼 평균 ± 표준편차로 표기합니다. 표준편차가 0.05 이하면 안정적, 0.1 이상이면 불안정한 모델입니다."
+
+- id: step9_ridge
+  title: 9단계. Ridge 회귀
+  subtitle: 정규화
+  blocks:
+  - type: text
+    content: Ridge 회귀는 LinearRegression에 L2 정규화를 추가한 것입니다. 과적합을 방지하고 모델을 더 안정적으로 만듭니다. alpha 파라미터로 정규화 강도를 조절합니다.
+  - type: code
+    language: python
+    title: Ridge 모델
+    description: 정규화된 회귀
+    content: |-
+      modelRidge = Ridge(alpha=1.0)
+      modelRidge.fit(xTrainSc, yTrain)
+      predRidge = modelRidge.predict(xTestSc)
+      r2Ridge = r2_score(yTest, predRidge)
+      f"Ridge R²: {r2Ridge:.4f}"
+  - type: code
+    language: python
+    title: Ridge 교차검증
+    description: 5-fold CV로 Ridge 평가
+    content: |-
+      cvRidge = cross_val_score(modelRidge, xTrainSc, yTrain, cv=5, scoring='r2')
+      f"Ridge CV R²: {cvRidge.mean():.4f} ± {cvRidge.std():.4f}"
+  - type: tip
+    content: Ridge는 계수(가중치)의 크기를 제한하여 과적합을 방지합니다. alpha가 클수록 정규화가 강해집니다. alpha=0이면 LinearRegression과 동일합니다.
+
+- id: step10_compare
+  title: 10단계. 모델 비교
+  subtitle: 성능 비교
+  blocks:
+  - type: text
+    content: LinearRegression과 Ridge의 성능을 비교합니다. 교차검증 결과와 테스트 결과를 함께 확인합니다.
+  - type: code
+    language: python
+    title: 모델 비교
+    description: 테스트 및 CV 성능
+    content: |-
+      comparison = pd.DataFrame({
+          'Model': ['LinearRegression', 'Ridge'],
+          'Test R²': [r2Lr, r2Ridge],
+          'CV R² (mean)': [cvScores.mean(), cvRidge.mean()],
+          'CV R² (std)': [cvScores.std(), cvRidge.std()]
+      })
+      comparison
+
+- id: step11_feature_importance
+  title: 11단계. 특성 중요도
+  subtitle: 회귀 계수 분석
+  blocks:
+  - type: text
+    content: 회귀 계수의 절대값을 비교하여 어떤 특성이 주택 가격에 가장 큰 영향을 미치는지 확인합니다.
+  - type: code
+    language: python
+    title: 특성 중요도
+    description: 계수 크기 비교
+    content: |-
+      importance = pd.DataFrame({
+          'Feature': housing.feature_names,
+          'Coefficient': modelLr.coef_
+      })
+      importance['Abs'] = importance['Coefficient'].abs()
+      importance.sort_values('Abs', ascending=False)
+  - type: code
+    language: python
+    title: 중요도 시각화
+    description: 막대 그래프
+    content: |-
+      fig, ax = plt.subplots(figsize=(10, 5))
+      sortedImp = importance.sort_values('Coefficient')
+      ax.barh(sortedImp['Feature'], sortedImp['Coefficient'])
+      ax.axvline(0, color='black', linewidth=0.5)
+      ax.set_xlabel('Coefficient')
+      ax.set_title('Feature Importance (Linear Regression)')
+      fig
+  - type: tip
+    content: 양수 계수는 특성이 증가할 때 가격도 증가함을 의미합니다. MedInc(소득)이 가장 큰 양의 영향, Latitude(위도)가 큰 음의 영향을 미칩니다.
+
+- id: step12_summary
+  title: 12단계. 정리
+  subtitle: 교차검증 완료
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 캘리포니아 주택 가격 예측 모델을 만들고 교차검증으로 평가했습니다. cross_val_score로 모델의 일반화 성능을 측정하고, Ridge 회귀로 정규화의 효과를 확인했습니다. 대규모 데이터셋에서의 회귀 분석 워크플로우를 익혔습니다.
+  - type: code
+    language: python
+    title: 최종 요약
+    description: 주요 결과 정리
+    content: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Best Model', 'Test R²', 'CV R²', 'Key Feature'],
+          'Value': ['California Housing (20,640)', 'Ridge', f'{r2Ridge:.4f}', f'{cvRidge.mean():.4f}', 'MedInc']
+      })
+      summary
+
+- id: practice
+  title: 실습
+  subtitle: 주택 가격 예측 프로젝트
+  blocks:
+  - type: text
+    content: 부동산 분석가가 되어 주택 가격 예측 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 교차검증까지 전 과정을 독립적으로 수행합니다. train_test_split, StandardScaler, LinearRegression, Ridge, cross_val_score, R²를 모두 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 다양한 alpha 값으로 Ridge 비교"
+    code: |-
+      from sklearn.datasets import fetch_california_housing
+      from sklearn.model_selection import train_test_split, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import Ridge
+      import pandas as pd
+
+      data = fetch_california_housing()
+      xData = pd.DataFrame(data.data, columns=data.feature_names)
+      yData = data.target
+
+      xTr, xTe, yTr, yTe = train_test_split(xData, yData, test_size=0.2, random_state=42)
+      sc = StandardScaler()
+      xTrSc = sc.fit_transform(xTr)
+
+      alphas = [0.01, 0.1, 1.0, 10.0, 100.0]
+      results = []
+
+      for a in alphas:
+          ridge = Ridge(alpha=a)
+          cvScore = cross_val_score(ridge, xTrSc, yTr, cv=5, scoring='r2')
+          results.append({'alpha': a, 'CV R² mean': cvScore.mean(), 'CV R² std': cvScore.std()})
+
+      pd.DataFrame(results)
+  - type: expansion
+    title: "미션2: 상위 3개 특성만으로 모델 성능 비교"
+    code: |-
+      from sklearn.datasets import fetch_california_housing
+      from sklearn.model_selection import train_test_split, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LinearRegression
+      from sklearn.metrics import r2_score
+      import pandas as pd
+      import numpy as np
+
+      housing = fetch_california_housing()
+      xFull = pd.DataFrame(housing.data, columns=housing.feature_names)
+      yFull = housing.target
+
+      xTrF, xTeF, yTrF, yTeF = train_test_split(xFull, yFull, test_size=0.2, random_state=42)
+      scF = StandardScaler()
+      modelF = LinearRegression()
+      modelF.fit(scF.fit_transform(xTrF), yTrF)
+
+      coefAbs = pd.Series(np.abs(modelF.coef_), index=housing.feature_names)
+      top3 = coefAbs.nlargest(3).index.tolist()
+
+      xTop3 = xFull[top3]
+      xTr3, xTe3, yTr3, yTe3 = train_test_split(xTop3, yFull, test_size=0.2, random_state=42)
+      sc3 = StandardScaler()
+      model3 = LinearRegression()
+
+      cvFull = cross_val_score(modelF, scF.fit_transform(xTrF), yTrF, cv=5, scoring='r2')
+      cv3 = cross_val_score(model3, sc3.fit_transform(xTr3), yTr3, cv=5, scoring='r2')
+
+      pd.DataFrame({
+          'Model': ['All 8 Features', f'Top 3: {top3}'],
+          'CV R² mean': [cvFull.mean(), cv3.mean()],
+          'CV R² std': [cvFull.std(), cv3.std()]
+      })

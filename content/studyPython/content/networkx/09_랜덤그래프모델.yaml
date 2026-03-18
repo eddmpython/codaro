@@ -1,0 +1,455 @@
+meta:
+  id: networkx_09
+  title: 랜덤그래프모델
+  order: 9
+  category: networkx
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["networkx", "랜덤그래프", "Erdos-Renyi", "Barabasi-Albert", "스몰월드"]
+  seo:
+    title: "NetworkX 랜덤 그래프 모델 - ER, BA, WS"
+    description: "NetworkX로 다양한 랜덤 그래프를 생성합니다. Erdős-Rényi, Barabási-Albert, Watts-Strogatz 모델을 배웁니다."
+    keywords: ["networkx", "랜덤그래프", "Erdos-Renyi", "Barabasi-Albert", "Watts-Strogatz"]
+
+intro:
+  emoji: "🎲"
+  goal: 다양한 랜덤 그래프 모델을 생성하고 특성을 분석합니다.
+  description: 랜덤 그래프 모델은 실제 네트워크의 특성을 이해하는 도구입니다. Erdős-Rényi는 완전 랜덤, Barabási-Albert는 척도없는 네트워크, Watts-Strogatz는 스몰월드 네트워크를 생성합니다. 각 모델의 차수 분포, 클러스터링, 경로 길이를 비교합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NetworkX와 matplotlib을 불러옵니다. 랜덤 그래프 모델은 실제 네트워크의 형성 메커니즘과 특성을 이해하기 위한 이론적 도구입니다. 왜 어떤 네트워크에는 허브가 존재하는지, 왜 '6단계 분리'가 가능한지 등의 질문에 답할 수 있습니다. 이 장에서는 세 가지 대표적인 랜덤 그래프 모델을 배웁니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: networkx와 matplotlib을 불러옵니다
+    content: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+- id: step2_erdos_renyi
+  title: 2단계. Erdős-Rényi 모델
+  subtitle: erdos_renyi_graph()
+  blocks:
+  - type: text
+    content: Erdős-Rényi(ER) 모델은 1959년 헝가리 수학자 Paul Erdős와 Alfréd Rényi가 제안한 가장 고전적인 랜덤 그래프입니다. n개의 노드가 있을 때, 가능한 모든 노드 쌍이 확률 p로 독립적으로 연결됩니다. 수학적으로 분석이 용이하여 그래프 이론의 기초가 되었지만, 실제 네트워크와는 다른 특성을 보입니다.
+  - type: code
+    language: python
+    title: ER 그래프 생성
+    description: n개 노드, 확률 p
+    content: |-
+      erGraph = nx.erdos_renyi_graph(n=50, p=0.1, seed=42)
+      numNodesER = erGraph.number_of_nodes()
+      numEdgesER = erGraph.number_of_edges()
+      numNodesER, numEdgesER
+  - type: code
+    language: python
+    title: 기본 특성
+    description: 밀도와 평균 차수
+    content: |-
+      densityER = nx.density(erGraph)
+      avgDegER = sum(d for n, d in erGraph.degree()) / erGraph.number_of_nodes()
+      densityER, avgDegER
+  - type: code
+    language: python
+    title: ER 시각화
+    description: 랜덤 그래프 구조
+    content: |-
+      posER = nx.spring_layout(erGraph, seed=42)
+      fig1, ax1 = plt.subplots(figsize=(8, 6))
+      nx.draw(erGraph, pos=posER, node_size=50, node_color='skyblue',
+              edge_color='lightgray', ax=ax1)
+      ax1.set_title(f'Erdős-Rényi Graph (n=50, p=0.1)')
+      fig1
+  - type: tip
+    content: ER 모델의 예상 엣지 수는 n(n-1)/2 × p입니다. p가 1/(n-1)보다 크면 거대 컴포넌트가 형성됩니다.
+
+- id: step3_er_degree
+  title: 3단계. ER 차수 분포
+  subtitle: 포아송 분포
+  blocks:
+  - type: text
+    content: ER 그래프의 차수 분포는 포아송(Poisson) 분포에 가깝습니다. 평균 차수 주변에 대부분의 노드가 모여 있고, 극단적으로 높거나 낮은 차수를 가진 노드는 거의 없습니다. 이는 실제 소셜 네트워크나 웹 그래프와 다른 특성으로, ER 모델이 실제 네트워크를 잘 설명하지 못하는 이유 중 하나입니다.
+  - type: code
+    language: python
+    title: 차수 분포
+    description: 히스토그램
+    content: |-
+      degreesER = [d for n, d in erGraph.degree()]
+
+      fig2, ax2 = plt.subplots(figsize=(8, 5))
+      ax2.hist(degreesER, bins=range(max(degreesER)+2), align='left',
+               color='skyblue', edgecolor='black')
+      ax2.set_xlabel('Degree')
+      ax2.set_ylabel('Count')
+      ax2.set_title('ER Graph Degree Distribution')
+      fig2
+  - type: code
+    language: python
+    title: 차수 통계
+    description: 최소, 최대, 표준편차
+    content: |-
+      import statistics
+      minDegER = min(degreesER)
+      maxDegER = max(degreesER)
+      stdDegER = statistics.stdev(degreesER)
+      minDegER, maxDegER, round(stdDegER, 2)
+
+- id: step4_barabasi_albert
+  title: 4단계. Barabási-Albert 모델
+  subtitle: barabasi_albert_graph()
+  blocks:
+  - type: text
+    content: Barabási-Albert(BA) 모델은 1999년 물리학자 Albert-László Barabási와 Réka Albert가 제안한 모델로, '부익부' 현상을 반영합니다. 네트워크가 성장할 때 새 노드는 이미 연결이 많은 노드에 더 연결되려는 경향이 있습니다(선호적 연결, Preferential Attachment). 이 메커니즘은 월드와이드웹, 인용 네트워크, 소셜 네트워크 등에서 관찰되는 허브의 존재를 설명합니다.
+  - type: code
+    language: python
+    title: BA 그래프 생성
+    description: n개 노드, 새 노드당 m개 엣지
+    content: |-
+      baGraph = nx.barabasi_albert_graph(n=50, m=2, seed=42)
+      numNodesBA = baGraph.number_of_nodes()
+      numEdgesBA = baGraph.number_of_edges()
+      numNodesBA, numEdgesBA
+  - type: code
+    language: python
+    title: BA 시각화
+    description: 허브 구조 확인
+    content: |-
+      posBA = nx.spring_layout(baGraph, seed=42)
+      degreesBA = dict(baGraph.degree())
+      nodeSizesBA = [degreesBA[n] * 30 for n in baGraph.nodes()]
+
+      fig3, ax3 = plt.subplots(figsize=(8, 6))
+      nx.draw(baGraph, pos=posBA, node_size=nodeSizesBA, node_color='salmon',
+              edge_color='lightgray', ax=ax3)
+      ax3.set_title('Barabási-Albert Graph (n=50, m=2)')
+      fig3
+  - type: tip
+    content: BA 모델은 척도없는(scale-free) 네트워크를 생성합니다. 소수의 허브가 많은 연결을 가집니다.
+
+- id: step5_ba_degree
+  title: 5단계. BA 차수 분포
+  subtitle: 멱법칙 분포
+  blocks:
+  - type: text
+    content: BA 그래프의 차수 분포는 멱법칙(Power-law)을 따릅니다. P(k) ∝ k^(-γ) 형태로, 로그-로그 그래프에서 직선으로 나타납니다. 대부분의 노드는 적은 연결을 가지지만, 소수의 허브는 매우 많은 연결을 가집니다. 이러한 '척도없는(Scale-free)' 특성은 네트워크가 특정 규모에 구애받지 않고 자기유사성을 보임을 의미합니다.
+  - type: code
+    language: python
+    title: 차수 분포
+    description: 히스토그램
+    content: |-
+      degListBA = [d for n, d in baGraph.degree()]
+
+      fig4, ax4 = plt.subplots(figsize=(8, 5))
+      ax4.hist(degListBA, bins=range(max(degListBA)+2), align='left',
+               color='salmon', edgecolor='black')
+      ax4.set_xlabel('Degree')
+      ax4.set_ylabel('Count')
+      ax4.set_title('BA Graph Degree Distribution')
+      fig4
+  - type: code
+    language: python
+    title: 허브 노드
+    description: 가장 연결이 많은 노드
+    content: |-
+      sortedDegBA = sorted(degreesBA.items(), key=lambda x: x[1], reverse=True)[:5]
+      sortedDegBA
+  - type: tip
+    content: 멱법칙 분포는 롱테일(long tail)입니다. 대부분은 적은 연결, 극소수가 매우 많은 연결을 가집니다.
+
+- id: step6_watts_strogatz
+  title: 6단계. Watts-Strogatz 모델
+  subtitle: watts_strogatz_graph()
+  blocks:
+  - type: text
+    content: Watts-Strogatz(WS) 모델은 1998년 Duncan Watts와 Steven Strogatz가 제안한 스몰월드 네트워크 모델입니다. 규칙적인 격자에서 시작하여 일부 엣지를 무작위로 재연결합니다. 이렇게 하면 지역적으로는 높은 클러스터링(친구의 친구가 친구)을 유지하면서, 전역적으로는 짧은 평균 경로(소수의 단계로 누구든 도달 가능)를 가지게 됩니다.
+  - type: code
+    language: python
+    title: WS 그래프 생성
+    description: n개 노드, k개 이웃, 재연결 확률 p
+    content: |-
+      wsGraph = nx.watts_strogatz_graph(n=50, k=4, p=0.3, seed=42)
+      numNodesWS = wsGraph.number_of_nodes()
+      numEdgesWS = wsGraph.number_of_edges()
+      numNodesWS, numEdgesWS
+  - type: code
+    language: python
+    title: WS 시각화
+    description: 원형 배치
+    content: |-
+      posWS = nx.circular_layout(wsGraph)
+      fig5, ax5 = plt.subplots(figsize=(8, 8))
+      nx.draw(wsGraph, pos=posWS, node_size=100, node_color='lightgreen',
+              edge_color='lightgray', ax=ax5)
+      ax5.set_title('Watts-Strogatz Graph (n=50, k=4, p=0.3)')
+      fig5
+  - type: tip
+    content: p=0이면 규칙 격자(높은 클러스터링, 긴 경로), p=1이면 랜덤 그래프(낮은 클러스터링, 짧은 경로)입니다.
+
+- id: step7_small_world
+  title: 7단계. 스몰월드 특성
+  subtitle: 클러스터링과 경로 길이
+  blocks:
+  - type: text
+    content: 스몰월드 네트워크는 '6단계 분리(Six Degrees of Separation)' 현상을 설명합니다. 세상 누구나 평균 6단계의 아는 사람 관계로 연결된다는 개념입니다. 스몰월드 네트워크는 높은 클러스터링(지역적 밀집)과 짧은 평균 경로(전역적 연결)를 동시에 가집니다. 이 두 특성의 조합이 실제 소셜 네트워크, 신경망, 전력망 등에서 관찰됩니다.
+  - type: code
+    language: python
+    title: 클러스터링 비교
+    description: 세 모델 비교
+    content: |-
+      clustER = nx.average_clustering(erGraph)
+      clustBA = nx.average_clustering(baGraph)
+      clustWS = nx.average_clustering(wsGraph)
+      round(clustER, 3), round(clustBA, 3), round(clustWS, 3)
+  - type: code
+    language: python
+    title: 평균 경로 길이
+    description: 세 모델 비교
+    content: |-
+      pathER = nx.average_shortest_path_length(erGraph) if nx.is_connected(erGraph) else float('inf')
+      pathBA = nx.average_shortest_path_length(baGraph) if nx.is_connected(baGraph) else float('inf')
+      pathWS = nx.average_shortest_path_length(wsGraph) if nx.is_connected(wsGraph) else float('inf')
+      round(pathER, 2), round(pathBA, 2), round(pathWS, 2)
+  - type: code
+    language: python
+    title: 특성 요약
+    description: 모델별 비교표
+    content: |-
+      comparison = {
+          'ER': {'clustering': round(clustER, 3), 'avg_path': round(pathER, 2)},
+          'BA': {'clustering': round(clustBA, 3), 'avg_path': round(pathBA, 2)},
+          'WS': {'clustering': round(clustWS, 3), 'avg_path': round(pathWS, 2)}
+      }
+      comparison
+  - type: tip
+    content: WS 모델은 높은 클러스터링(지역 연결)과 짧은 경로(전역 도달)를 모두 달성합니다. 실제 소셜 네트워크와 유사합니다.
+
+- id: step8_degree_dist_compare
+  title: 8단계. 차수 분포 비교
+  subtitle: 세 모델 시각화
+  blocks:
+  - type: text
+    content: 세 가지 모델의 차수 분포를 한 그림에서 비교합니다. ER 모델은 포아송 분포(종 모양), BA 모델은 멱법칙 분포(롱테일), WS 모델은 거의 균일한 분포를 보입니다. 차수 분포의 형태만으로도 네트워크가 어떤 메커니즘으로 형성되었는지 추론할 수 있습니다.
+  - type: code
+    language: python
+    title: 차수 분포 비교
+    description: 세 모델 히스토그램
+    content: |-
+      degWS = [d for n, d in wsGraph.degree()]
+
+      fig6, axes = plt.subplots(1, 3, figsize=(14, 4))
+
+      axes[0].hist(degreesER, bins=range(max(degreesER)+2), align='left',
+                   color='skyblue', edgecolor='black')
+      axes[0].set_title('ER')
+      axes[0].set_xlabel('Degree')
+
+      axes[1].hist(degListBA, bins=range(max(degListBA)+2), align='left',
+                   color='salmon', edgecolor='black')
+      axes[1].set_title('BA')
+      axes[1].set_xlabel('Degree')
+
+      axes[2].hist(degWS, bins=range(max(degWS)+2), align='left',
+                   color='lightgreen', edgecolor='black')
+      axes[2].set_title('WS')
+      axes[2].set_xlabel('Degree')
+
+      fig6.suptitle('Degree Distribution Comparison')
+      fig6.tight_layout()
+      fig6
+
+- id: step9_real_world
+  title: 9단계. 실제 네트워크와 비교
+  subtitle: 가라테 클럽
+  blocks:
+  - type: text
+    content: 실제 네트워크(가라테 클럽)의 특성을 랜덤 그래프 모델들과 비교합니다. 동일한 노드 수와 엣지 수를 가진 각 모델의 랜덤 그래프를 생성하고, 클러스터링 계수와 평균 경로 길이를 비교합니다. 어떤 모델이 실제 네트워크와 가장 유사한 특성을 보이는지 확인합니다.
+  - type: code
+    language: python
+    title: 가라테 클럽 특성
+    description: 실제 네트워크
+    content: |-
+      karate = nx.karate_club_graph()
+      nK = karate.number_of_nodes()
+      mK = karate.number_of_edges()
+      clustK = nx.average_clustering(karate)
+      pathK = nx.average_shortest_path_length(karate)
+      nK, mK, round(clustK, 3), round(pathK, 2)
+  - type: code
+    language: python
+    title: 동일 크기 랜덤 그래프
+    description: 비교용 생성
+    content: |-
+      pEst = 2 * mK / (nK * (nK - 1))
+      erKarate = nx.erdos_renyi_graph(n=nK, p=pEst, seed=42)
+      baKarate = nx.barabasi_albert_graph(n=nK, m=2, seed=42)
+      wsKarate = nx.watts_strogatz_graph(n=nK, k=4, p=0.3, seed=42)
+
+      clustERK = nx.average_clustering(erKarate)
+      clustBAK = nx.average_clustering(baKarate)
+      clustWSK = nx.average_clustering(wsKarate)
+      round(clustERK, 3), round(clustBAK, 3), round(clustWSK, 3)
+  - type: code
+    language: python
+    title: 비교 결과
+    description: 어떤 모델이 유사한가
+    content: |-
+      realWorldComp = {
+          'Karate': round(clustK, 3),
+          'ER': round(clustERK, 3),
+          'BA': round(clustBAK, 3),
+          'WS': round(clustWSK, 3)
+      }
+      realWorldComp
+  - type: tip
+    content: 실제 소셜 네트워크는 보통 BA(허브 존재)와 WS(높은 클러스터링)의 특성을 함께 보입니다.
+
+- id: step10_summary
+  title: 10단계. 모델 요약
+  subtitle: 어떤 모델을 사용할까
+  blocks:
+  - type: text
+    content: 각 랜덤 그래프 모델의 특징과 적합한 사용 상황을 정리합니다. ER 모델은 기준선(baseline)으로, BA 모델은 허브가 있는 네트워크(웹, 인용) 시뮬레이션에, WS 모델은 높은 클러스터링의 소셜 네트워크 시뮬레이션에 적합합니다. 실제 네트워크를 분석할 때 이 모델들과 비교하면 네트워크의 특성을 이해하는 데 도움이 됩니다.
+  - type: code
+    language: python
+    title: 모델 특징 요약
+    description: 딕셔너리로 정리
+    content: |-
+      modelSummary = {
+          'Erdős-Rényi': {
+              'degree_dist': 'Poisson',
+              'clustering': 'Low',
+              'use_case': 'Baseline, Random structure'
+          },
+          'Barabási-Albert': {
+              'degree_dist': 'Power-law',
+              'clustering': 'Low-Medium',
+              'use_case': 'Web, Citation, Hub networks'
+          },
+          'Watts-Strogatz': {
+              'degree_dist': 'Regular',
+              'clustering': 'High',
+              'use_case': 'Social networks, Small-world'
+          }
+      }
+      modelSummary
+  - type: code
+    language: python
+    title: 종합 시각화
+    description: 세 모델 나란히
+    content: |-
+      fig7, axes2 = plt.subplots(1, 3, figsize=(15, 5))
+
+      nx.draw(erGraph, pos=posER, node_size=30, node_color='skyblue',
+              edge_color='lightgray', ax=axes2[0])
+      axes2[0].set_title('Erdős-Rényi\n(Random)')
+
+      nx.draw(baGraph, pos=posBA, node_size=nodeSizesBA, node_color='salmon',
+              edge_color='lightgray', ax=axes2[1])
+      axes2[1].set_title('Barabási-Albert\n(Scale-free)')
+
+      nx.draw(wsGraph, pos=posWS, node_size=50, node_color='lightgreen',
+              edge_color='lightgray', ax=axes2[2])
+      axes2[2].set_title('Watts-Strogatz\n(Small-world)')
+
+      fig7.tight_layout()
+      fig7
+
+- id: practice
+  title: 실습
+  subtitle: 랜덤 그래프
+  blocks:
+  - type: text
+    content: 지금까지 배운 랜덤 그래프 모델을 활용하여 실전 미션을 수행해봅시다. 파라미터를 변경하며 그래프 특성의 변화를 관찰하고, 재연결 확률에 따른 스몰월드 특성을 탐구합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 파라미터 실험"
+    blocks:
+    - type: code
+      title: BA 모델 실험
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        ba1 = nx.barabasi_albert_graph(100, 1, seed=42)
+        ba2 = nx.barabasi_albert_graph(100, 3, seed=42)
+        ba3 = nx.barabasi_albert_graph(100, 5, seed=42)
+
+        maxDeg1 = max(d for n, d in ba1.degree())
+        maxDeg2 = max(d for n, d in ba2.degree())
+        maxDeg3 = max(d for n, d in ba3.degree())
+        maxDeg1, maxDeg2, maxDeg3
+    - type: code
+      title: 클러스터링 비교
+      content: |-
+        clust1 = nx.average_clustering(ba1)
+        clust2 = nx.average_clustering(ba2)
+        clust3 = nx.average_clustering(ba3)
+        round(clust1, 3), round(clust2, 3), round(clust3, 3)
+    - type: code
+      title: 시각화
+      content: |-
+        chart, (plot1, plot2, plot3) = plt.subplots(1, 3, figsize=(15, 5))
+
+        pos1 = nx.spring_layout(ba1, seed=42)
+        pos2 = nx.spring_layout(ba2, seed=42)
+        pos3 = nx.spring_layout(ba3, seed=42)
+
+        nx.draw(ba1, pos=pos1, node_size=30, node_color='salmon', ax=plot1)
+        plot1.set_title('BA m=1')
+
+        nx.draw(ba2, pos=pos2, node_size=30, node_color='salmon', ax=plot2)
+        plot2.set_title('BA m=3')
+
+        nx.draw(ba3, pos=pos3, node_size=30, node_color='salmon', ax=plot3)
+        plot3.set_title('BA m=5')
+
+        chart.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: WS 재연결 확률"
+    blocks:
+    - type: code
+      title: p 값 실험
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        ws0 = nx.watts_strogatz_graph(50, 4, 0.0, seed=42)
+        ws3 = nx.watts_strogatz_graph(50, 4, 0.3, seed=42)
+        ws1 = nx.watts_strogatz_graph(50, 4, 1.0, seed=42)
+
+        clustWs0 = nx.average_clustering(ws0)
+        clustWs3 = nx.average_clustering(ws3)
+        clustWs1 = nx.average_clustering(ws1)
+        round(clustWs0, 3), round(clustWs3, 3), round(clustWs1, 3)
+    - type: code
+      title: 경로 길이 비교
+      content: |-
+        pathWs0 = nx.average_shortest_path_length(ws0)
+        pathWs3 = nx.average_shortest_path_length(ws3)
+        pathWs1 = nx.average_shortest_path_length(ws1)
+        round(pathWs0, 2), round(pathWs3, 2), round(pathWs1, 2)
+    - type: code
+      title: 시각화
+      content: |-
+        canvas, (panel1, panel2, panel3) = plt.subplots(1, 3, figsize=(15, 5))
+
+        posCirc = nx.circular_layout(ws0)
+
+        nx.draw(ws0, pos=posCirc, node_size=50, node_color='lightgreen', ax=panel1)
+        panel1.set_title(f'WS p=0\nClust={round(clustWs0, 2)}')
+
+        nx.draw(ws3, pos=posCirc, node_size=50, node_color='lightgreen', ax=panel2)
+        panel2.set_title(f'WS p=0.3\nClust={round(clustWs3, 2)}')
+
+        nx.draw(ws1, pos=posCirc, node_size=50, node_color='lightgreen', ax=panel3)
+        panel3.set_title(f'WS p=1.0\nClust={round(clustWs1, 2)}')
+
+        canvas.tight_layout()
+        canvas

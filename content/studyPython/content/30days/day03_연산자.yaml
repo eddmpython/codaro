@@ -1,0 +1,637 @@
+meta:
+  id: day03
+  title: "연산자"
+  day: 3
+  category: 30days
+  tags: []
+  seo:
+    title: "파이썬 연산자 완벽 가이드"
+    description: "산술, 비교, 논리, 멤버십 연산자를 배우고 연산자 우선순위를 이해합니다."
+    keywords: ['연산자', 'operator', '산술연산', '비교연산', '논리연산']
+
+intro:
+  emoji: "🔢"
+  points:
+  - "산술 연산자로 수학 계산하기"
+  - "비교 연산자로 값 비교하기"
+  - "논리 연산자로 조건 조합하기"
+  - "멤버십 연산자로 포함 여부 확인하기"
+
+sections:
+- id: add_operator
+  title: "덧셈 연산자"
+  subtitle: "+ 기호로 더하기"
+  blocks:
+  - type: text
+    content: "덧셈 연산자(+)는 두 숫자를 더합니다. 정수끼리, 소수끼리, 정수와 소수를 섞어서도 계산할 수 있습니다. 결과는 자동으로 화면에 표시됩니다."
+  - type: list
+    items:
+    - "정수 덧셈 가능"
+    - "소수 덧셈 가능"
+    - "정수 + 소수 = 소수"
+  - type: code
+    language: python
+    title: "덧셈 계산"
+    description: "두 숫자를 더한 결과가 자동 출력됩니다."
+    content: |-
+      itemA = 10
+      itemB = 20
+      itemA + itemB
+  - type: tip
+    content: "결과를 변수에 저장하려면 result = price + qty처럼 사용합니다."
+
+- id: sub_operator
+  title: "뺄셈 연산자"
+  subtitle: "- 기호로 빼기"
+  blocks:
+  - type: text
+    content: "뺄셈 연산자(-)는 앞 숫자에서 뒤 숫자를 뺍니다. 음수 결과도 가능하며, 순서가 중요합니다."
+  - type: list
+    items:
+    - "앞 숫자 - 뒤 숫자"
+    - "음수 결과 가능"
+    - "순서 바뀌면 결과도 바뀜"
+  - type: code
+    language: python
+    title: "뺄셈 계산"
+    description: "100에서 35를 뺀 결과입니다."
+    content: |-
+      budget = 100
+      spent = 35
+      budget - spent
+
+- id: mul_operator
+  title: "곱셈 연산자"
+  subtitle: "* 기호로 곱하기"
+  blocks:
+  - type: text
+    content: "곱셈 연산자(*)는 두 숫자를 곱합니다. 수학에서는 ×를 사용하지만, 프로그래밍에서는 *를 사용합니다."
+  - type: list
+    items:
+    - "* 기호로 곱셈"
+    - "정수와 소수 모두 가능"
+    - "음수 곱셈도 가능"
+  - type: code
+    language: python
+    title: "곱셈 계산"
+    description: "7과 8을 곱한 결과입니다."
+    content: |-
+      width = 7
+      height = 8
+      width * height
+
+- id: div_operator
+  title: "나눗셈 연산자"
+  subtitle: "/ 기호로 나누기"
+  blocks:
+  - type: text
+    content: "나눗셈 연산자(/)는 앞 숫자를 뒤 숫자로 나눕니다. 결과는 항상 소수(float)로 나옵니다. 정수 나누기 정수도 결과는 소수입니다."
+  - type: list
+    items:
+    - "/ 기호로 나눗셈"
+    - "결과는 항상 소수"
+    - "0으로 나누면 에러"
+  - type: code
+    language: python
+    title: "나눗셈 계산"
+    description: "10을 3으로 나눈 결과입니다."
+    content: |-
+      dividend = 10
+      divisor = 3
+      dividend / divisor
+  - type: tip
+    content: "결과가 3.3333...처럼 소수로 나옵니다."
+
+- id: floordiv_operator
+  title: "몫 연산자"
+  subtitle: "// 기호로 몫 구하기"
+  blocks:
+  - type: text
+    content: "몫 연산자(//)는 나눗셈의 몫만 구합니다. 소수점 이하는 버리고 정수 부분만 반환합니다. 10 // 3 = 3 (나머지 1은 버림)"
+  - type: list
+    items:
+    - "// 기호로 몫 계산"
+    - "소수점 이하 버림"
+    - "정수 결과 반환"
+  - type: code
+    language: python
+    title: "몫 계산"
+    description: "17을 5로 나눈 몫을 구합니다."
+    content: |-
+      items = 17
+      boxes = 5
+      items // boxes
+
+- id: mod_operator
+  title: "나머지 연산자"
+  subtitle: "% 기호로 나머지 구하기"
+  blocks:
+  - type: text
+    content: "나머지 연산자(%)는 나눗셈의 나머지를 구합니다. 10 % 3 = 1 (10을 3으로 나누면 몫 3, 나머지 1) 짝수/홀수 판별, 배수 확인 등에 자주 사용됩니다."
+  - type: list
+    items:
+    - "% 기호로 나머지 계산"
+    - "나눗셈 후 남은 값"
+    - "짝수/홀수 판별에 유용"
+  - type: code
+    language: python
+    title: "나머지 계산"
+    description: "17을 5로 나눈 나머지를 구합니다."
+    content: |-
+      coins = 17
+      slots = 5
+      coins % slots
+  - type: tip
+    content: "val % 2가 0이면 짝수, 1이면 홀수입니다."
+
+- id: pow_operator
+  title: "거듭제곱 연산자"
+  subtitle: "** 기호로 제곱 계산"
+  blocks:
+  - type: text
+    content: "거듭제곱 연산자(**)는 앞 숫자를 뒤 숫자만큼 거듭제곱합니다. 2 ** 3 = 8 (2 × 2 × 2) 수학의 2³를 프로그래밍에서는 2 ** 3으로 씁니다."
+  - type: list
+    items:
+    - "** 기호로 거듭제곱"
+    - "2 ** 3 = 2³ = 8"
+    - "제곱근도 가능 (9 ** 0.5 = 3)"
+  - type: code
+    language: python
+    title: "거듭제곱 계산"
+    description: "2의 10승을 계산합니다."
+    content: |-
+      base = 2
+      power = 10
+      base ** power
+
+- id: compare_equal
+  title: "같음 비교 연산자"
+  subtitle: "== 기호로 같은지 확인"
+  blocks:
+  - type: text
+    content: "같음 연산자(==)는 두 값이 같은지 비교합니다. 같으면 True, 다르면 False를 반환합니다. 주의: 대입(=)과 비교(==)는 다릅니다!"
+  - type: list
+    items:
+    - "== 기호로 같은지 비교"
+    - "결과는 True 또는 False"
+    - "= (대입)과 == (비교) 구별"
+  - type: code
+    language: python
+    title: "같음 비교"
+    description: "두 숫자가 같은지 비교합니다."
+    content: |-
+      left = 10
+      right = 10
+      left == right
+  - type: tip
+    content: "= 하나는 대입, == 두 개는 비교입니다."
+
+- id: compare_notequal
+  title: "다름 비교 연산자"
+  subtitle: "!= 기호로 다른지 확인"
+  blocks:
+  - type: text
+    content: "다름 연산자(!=)는 두 값이 다른지 비교합니다. 다르면 True, 같으면 False를 반환합니다."
+  - type: list
+    items:
+    - "!= 기호로 다른지 비교"
+    - "다르면 True"
+    - "같으면 False"
+  - type: code
+    language: python
+    title: "다름 비교"
+    description: "두 숫자가 다른지 비교합니다."
+    content: |-
+      first = 5
+      second = 8
+      first != second
+
+- id: compare_greater
+  title: "크기 비교 연산자"
+  subtitle: "> < >= <= 기호로 크기 비교"
+  blocks:
+  - type: text
+    content: "크기 비교 연산자는 두 값의 대소를 비교합니다. > (크다), < (작다), >= (크거나 같다), <= (작거나 같다) 결과는 True 또는 False입니다."
+  - type: list
+    items:
+    - "> (크다), < (작다)"
+    - ">= (크거나 같다), <= (작거나 같다)"
+    - "결과는 True 또는 False"
+  - type: code
+    language: python
+    title: "크다 (>)"
+    description: "왼쪽이 오른쪽보다 큰지 비교합니다."
+    content: |-
+      val = 15
+      target = 10
+      val > target
+  - type: code
+    language: python
+    title: "작다 (<)"
+    description: "왼쪽이 오른쪽보다 작은지 비교합니다."
+    content: |-
+      num = 15
+      limit = 10
+      num < limit
+  - type: code
+    language: python
+    title: "크거나 같다 (>=)"
+    description: "왼쪽이 오른쪽보다 크거나 같은지 비교합니다."
+    content: |-
+      level = 15
+      min = 10
+      level >= min
+  - type: code
+    language: python
+    title: "작거나 같다 (<=)"
+    description: "왼쪽이 오른쪽보다 작거나 같은지 비교합니다."
+    content: |-
+      stock = 15
+      max = 10
+      stock <= max
+
+- id: logical_and
+  title: "and 논리 연산자"
+  subtitle: "모두 참이어야 참"
+  blocks:
+  - type: text
+    content: "and 연산자는 양쪽 조건이 모두 True일 때만 True를 반환합니다. 하나라도 False면 결과는 False입니다. '그리고'의 의미입니다."
+  - type: list
+    items:
+    - "양쪽 모두 True → True"
+    - "하나라도 False → False"
+    - "'그리고'의 의미"
+  - type: code
+    language: python
+    title: "and 연산"
+    description: "두 조건을 and로 결합합니다."
+    content: |-
+      adult = True
+      valid = True
+      adult and valid
+
+- id: logical_or
+  title: "or 논리 연산자"
+  subtitle: "하나만 참이어도 참"
+  blocks:
+  - type: text
+    content: "or 연산자는 양쪽 조건 중 하나만 True여도 True를 반환합니다. 둘 다 False일 때만 False입니다. '또는'의 의미입니다."
+  - type: list
+    items:
+    - "하나라도 True → True"
+    - "둘 다 False → False"
+    - "'또는'의 의미"
+  - type: code
+    language: python
+    title: "or 연산"
+    description: "두 조건을 or로 결합합니다."
+    content: |-
+      cash = True
+      card = False
+      cash or card
+
+- id: logical_not
+  title: "not 논리 연산자"
+  subtitle: "참과 거짓 반전"
+  blocks:
+  - type: text
+    content: "not 연산자는 True를 False로, False를 True로 바꿉니다. 조건의 반대를 표현할 때 사용합니다. '아니다'의 의미입니다."
+  - type: list
+    items:
+    - "True → False"
+    - "False → True"
+    - "'아니다'의 의미"
+  - type: code
+    language: python
+    title: "not 연산"
+    description: "조건을 반전시킵니다."
+    content: |-
+      rain = True
+      not rain
+
+- id: membership_in
+  title: "in 멤버십 연산자"
+  subtitle: "포함 여부 확인"
+  blocks:
+  - type: text
+    content: "in 연산자는 왼쪽 값이 오른쪽 문자열에 포함되어 있는지 확인합니다. 포함되어 있으면 True, 없으면 False를 반환합니다. 문자열에서 특정 문자나 단어를 찾을 때 사용합니다."
+  - type: list
+    items:
+    - "포함되어 있으면 True"
+    - "없으면 False"
+    - "문자열 검색에 유용"
+  - type: code
+    language: python
+    title: "in 연산"
+    description: "문자열에 특정 문자가 포함되어 있는지 확인합니다."
+    content: |-
+      lang = 'Python'
+      'th' in lang
+  - type: tip
+    content: "'not in'을 사용하면 포함되지 않았는지 확인할 수 있습니다."
+
+- id: compound_assign
+  title: "복합 대입 연산자"
+  subtitle: "연산과 대입을 한번에"
+  blocks:
+  - type: text
+    content: "복합 대입 연산자는 연산과 대입을 동시에 합니다. x += 5는 x = x + 5와 같은 의미입니다. 코드를 더 간결하게 만들어줍니다."
+  - type: list
+    items:
+    - "+= 덧셈 후 대입"
+    - "-= 뺄셈 후 대입"
+    - "*= 곱셈 후 대입"
+    - "/= 나눗셈 후 대입"
+  - type: code
+    language: python
+    title: "복합 대입 연산"
+    description: "숫자에 10을 더한 후 다시 저장합니다."
+    content: |-
+      balance = 50
+      balance += 10
+      balance
+
+- id: operator_priority
+  title: "연산자 우선순위"
+  subtitle: "계산 순서 이해하기"
+  blocks:
+  - type: text
+    content: "여러 연산자가 함께 사용될 때 계산 순서가 정해져 있습니다. 수학처럼 곱셈/나눗셈이 덧셈/뺄셈보다 먼저 계산됩니다. 괄호를 사용하면 우선순위를 변경할 수 있습니다."
+  - type: list
+    items:
+    - "1순위: 괄호 ()"
+    - "2순위: 거듭제곱 **"
+    - "3순위: 곱셈/나눗셈 * / // %"
+    - "4순위: 덧셈/뺄셈 + -"
+    - "5순위: 비교 연산자"
+    - "6순위: 논리 연산자"
+  - type: code
+    language: python
+    title: "연산자 우선순위"
+    description: "우선순위에 따라 계산됩니다."
+    content: |-
+      raw = 2 + 3 * 4
+      grouped = (2 + 3) * 4
+      print('without_paren:', raw)
+      print('with_paren:', grouped)
+  - type: tip
+    content: "헷갈릴 때는 괄호를 사용하면 명확해집니다."
+
+- id: practice
+  title: "Day 3 종합 복습"
+  subtitle: "연산자 마스터하기"
+  blocks:
+  - type: text
+    content: "Day 3에서 배운 연산자들을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: expansion
+    title: "🟢 기본1: 덧셈"
+    code: |-
+      apples = 15
+      oranges = 25
+      apples + oranges
+
+  - type: expansion
+    title: "🟢 기본2: 곱셈"
+    code: |-
+      rows = 6
+      cols = 7
+      rows * cols
+
+  - type: expansion
+    title: "🟢 기본3: 나눗셈"
+    code: |-
+      pizza = 20
+      people = 4
+      pizza / people
+
+  - type: expansion
+    title: "🟢 기본4: 같음 비교"
+    code: |-
+      yours = 100
+      mine = 100
+      yours == mine
+
+  - type: expansion
+    title: "🟢 기본5: 크기 비교"
+    code: |-
+      salary = 50
+      expense = 30
+      salary > expense
+
+  - type: expansion
+    title: "🟡 응용1: 온도 범위 확인"
+    code: |-
+      temp = 25
+      ok = (temp >= 18) and (temp <= 28)
+      ok
+
+  - type: expansion
+    title: "🟡 응용2: 점수 계산 및 비교"
+    blocks:
+    - type: code
+      title: "총점"
+      content: |-
+        math = 85
+        english = 90
+        total = math + english
+        print('total:', total)
+
+    - type: code
+      title: "평균"
+      content: |-
+        korean = 85
+        science = 90
+        added = korean + science
+        average = added / 2
+        print('average:', average)
+
+    - type: code
+      title: "합격 여부"
+      content: |-
+        history = 85
+        art = 90
+        combined = history + art
+        mean = combined / 2
+        passed = mean >= 80
+        print('pass:', passed)
+
+  - type: expansion
+    title: "🟡 응용3: 할인가 계산"
+    code: |-
+      original = 50000
+      rate = 20
+      discount = original * rate / 100
+      final = original - discount
+      final
+
+  - type: expansion
+    title: "🟡 응용4: 자격 조건 확인"
+    code: |-
+      years = 25
+      license = True
+      exp = False
+      ok = (years >= 20) and (license or exp)
+      ok
+
+  - type: expansion
+    title: "🟡 응용5: 이메일 검증"
+    code: |-
+      email = 'user@example.com'
+      at = '@' in email
+      dot = '.' in email
+      valid = at and dot
+      valid
+
+  - type: expansion
+    title: "🔴 심화1: 학점 계산 시스템"
+    blocks:
+    - type: code
+      title: "점수"
+      content: |-
+        grade = 85
+        print('score:', grade)
+
+    - type: code
+      title: "A학점 여부"
+      content: |-
+        point = 85
+        gradeA = point >= 90
+        print('is_A:', gradeA)
+
+    - type: code
+      title: "B학점 여부"
+      content: |-
+        mark = 85
+        gradeB = (mark >= 80) and (mark < 90)
+        print('is_B:', gradeB)
+
+    - type: code
+      title: "C학점 여부"
+      content: |-
+        score = 85
+        gradeC = (score >= 70) and (score < 80)
+        print('is_C:', gradeC)
+
+  - type: expansion
+    title: "🔴 심화2: 쇼핑 총액 계산"
+    blocks:
+    - type: code
+      title: "소계"
+      content: |-
+        unitA = 15000
+        qtyA = 3
+        subtotal = unitA * qtyA
+        print('subtotal:', subtotal)
+
+    - type: code
+      title: "세금"
+      content: |-
+        unitB = 15000
+        qtyB = 3
+        base = unitB * qtyB
+        tax = base * 10 / 100
+        print('tax:', tax)
+
+    - type: code
+      title: "총액"
+      content: |-
+        unitC = 15000
+        qtyC = 3
+        sub = unitC * qtyC
+        fee = sub * 10 / 100
+        amount = sub + fee
+        print('total:', amount)
+
+    - type: code
+      title: "무료배송 여부"
+      content: |-
+        unitD = 15000
+        qtyD = 3
+        subD = unitD * qtyD
+        vat = subD * 10 / 100
+        grand = subD + vat
+        free = grand >= 50000
+        print('free_shipping:', free)
+
+  - type: expansion
+    title: "🔴 심화3: 온도 변환 및 검증"
+    blocks:
+    - type: code
+      title: "섭씨 온도"
+      content: |-
+        celsius = 25
+        print('celsius:', celsius)
+
+    - type: code
+      title: "화씨 온도"
+      content: |-
+        degree = 25
+        fahrenheit = degree * 9 / 5 + 32
+        print('fahrenheit:', fahrenheit)
+
+    - type: code
+      title: "쾌적 여부"
+      content: |-
+        thermal = 25
+        comfort = (thermal >= 20) and (thermal <= 26)
+        print('comfortable:', comfort)
+
+  - type: expansion
+    title: "🔴 심화4: 게임 점수 시스템"
+    blocks:
+    - type: code
+      title: "게임 점수"
+      content: |-
+        kills = 10
+        deaths = 3
+        assists = 5
+        score = kills * 100 - deaths * 50 + assists * 30
+        print('score:', score)
+
+    - type: code
+      title: "KDA 비율"
+      content: |-
+        frags = 10
+        loses = 3
+        helps = 5
+        kda = (frags + helps) / loses
+        print('kda_ratio:', kda)
+
+    - type: code
+      title: "MVP 여부"
+      content: |-
+        hit = 10
+        miss = 3
+        mvp = (hit > 15) or ((hit > 10) and (miss < 5))
+        print('is_mvp:', mvp)
+
+  - type: expansion
+    title: "🔴 심화5: 복잡한 조건 판별"
+    blocks:
+    - type: code
+      title: "조건1 확인"
+      content: |-
+        ageA = 28
+        income = 45000
+        check1 = (ageA >= 25) and (income >= 40000)
+        print('condition1:', check1)
+
+    - type: code
+      title: "조건2 확인"
+      content: |-
+        ageB = 28
+        credit = 720
+        check2 = (credit >= 700) and (ageB >= 20)
+        print('condition2:', check2)
+
+    - type: code
+      title: "최종 승인"
+      content: |-
+        ageC = 28
+        wage = 45000
+        rating = 720
+        rule1 = (ageC >= 25) and (wage >= 40000)
+        rule2 = (rating >= 700) and (ageC >= 20)
+        approved = rule1 or rule2
+        print('approved:', approved)

@@ -1,0 +1,302 @@
+meta:
+  id: altair_02
+  title: 붓꽃품종구분
+  order: 2
+  category: altair
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["mark_point", "mark_circle", "color", "size", "shape", "encoding"]
+  seo:
+    title: "Altair 붓꽃 품종 구분 - 산점도와 인코딩"
+    description: "Altair로 붓꽃 데이터를 시각화합니다. 색상, 크기, 모양 인코딩으로 품종을 구분하는 방법을 배웁니다."
+    keywords: ["altair scatter", "color encoding", "size encoding", "shape encoding", "mark_circle"]
+
+intro:
+  emoji: "🌸"
+  goal: 붓꽃 3품종(setosa, versicolor, virginica)의 특성을 다양한 인코딩으로 비교하는 차트를 만듭니다.
+  description: 이전 프로젝트에서 배운 mark_point, x/y, color를 복습하고, 새로운 size, shape, mark_circle 인코딩을 추가합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: seaborn-data
+  blocks:
+  - type: text
+    content: |-
+      GitHub에서 iris 데이터를 불러옵니다. 붓꽃 3품종(setosa, versicolor, virginica) 각 50송이, 총 150송이의 측정 데이터입니다.
+
+      각 행은 꽃잎(petal)과 꽃받침(sepal)의 길이/너비 측정값을 담고 있습니다. species 컬럼이 품종을 나타냅니다.
+  - type: code
+    language: python
+    title: iris 데이터 불러오기
+    description: pandas로 CSV 로드
+    content: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+
+      irisUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+      iris = pd.read_csv(irisUrl)
+      iris.head()
+
+- id: step2_basic_scatter
+  title: 2단계. 기본 산점도
+  subtitle: 꽃잎 길이 vs 너비
+  blocks:
+  - type: text
+    content: |-
+      이전 프로젝트에서 배운 mark_point()와 encode(x, y)를 활용합니다. 같은 패턴을 다른 데이터에 적용하면서 복습합니다.
+
+      꽃잎 길이(petal_length)와 꽃잎 너비(petal_width)의 관계를 산점도로 그립니다. x축에 길이, y축에 너비를 배치하여 두 변수의 관계를 시각적으로 확인합니다.
+
+      chartBasic이라는 변수에 차트를 저장하고, 마지막 줄에서 변수명을 쓰면 차트가 화면에 표시됩니다.
+  - type: code
+    language: python
+    title: 기본 산점도
+    description: x, y 인코딩 복습
+    content: |-
+      chartBasic = alt.Chart(iris).mark_point().encode(
+          x="petal_length:Q",
+          y="petal_width:Q"
+      )
+      chartBasic
+
+- id: step3_color_encoding
+  title: 3단계. 색상으로 품종 구분
+  subtitle: color 인코딩
+  blocks:
+  - type: text
+    content: |-
+      color 인코딩으로 품종(species)을 색상으로 구분합니다. 이전 프로젝트에서도 사용한 개념입니다.
+
+      품종별로 데이터가 어떻게 분포하는지 한눈에 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 색상 인코딩
+    description: color로 품종 구분
+    content: |-
+      chartColor = alt.Chart(iris).mark_point().encode(
+          x="petal_length:Q",
+          y="petal_width:Q",
+          color="species:N"
+      )
+      chartColor
+  - type: tip
+    content: |-
+      color="species:N"에서 :N은 명목형(Nominal) 데이터 타입입니다. 범주형 데이터에 사용하며, Altair가 자동으로 구분되는 색상을 할당합니다.
+
+- id: step4_size_encoding
+  title: 4단계. 크기 인코딩
+  subtitle: size로 추가 정보
+  blocks:
+  - type: text
+    content: |-
+      size 인코딩으로 점의 크기에 또 다른 변수를 매핑합니다. encode() 괄호 안에 size를 추가하면 됩니다.
+
+      꽃받침 길이(sepal_length)를 크기로 표현하면, x(꽃잎 길이), y(꽃잎 너비), color(품종), size(꽃받침 길이) 총 4개의 변수를 한 차트에 표현할 수 있습니다.
+
+      값이 클수록 점이 커지므로, 꽃받침이 긴 품종이 어느 것인지 쉽게 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 크기 인코딩
+    description: 꽃받침 길이를 크기로
+    content: |-
+      chartSize = alt.Chart(iris).mark_point().encode(
+          x="petal_length:Q",
+          y="petal_width:Q",
+          color="species:N",
+          size="sepal_length:Q"
+      )
+      chartSize
+  - type: tip
+    content: |-
+      size="sepal_length:Q"에서 :Q는 수량형(Quantitative) 데이터입니다. 연속적인 수치 데이터에 사용하며, 값이 클수록 점이 커집니다.
+
+- id: step5_shape_encoding
+  title: 5단계. 모양 인코딩
+  subtitle: shape로 품종 구분
+  blocks:
+  - type: text
+    content: |-
+      shape 인코딩으로 점의 모양을 변경할 수 있습니다. color처럼 encode() 괄호 안에 shape를 추가합니다.
+
+      색상 대신 모양으로 품종을 구분하면, 흑백 인쇄에서도 구분이 가능합니다. Altair는 자동으로 원, 사각형, 삼각형 등 서로 다른 모양을 할당합니다.
+
+      색상과 모양을 함께 사용하면 더 명확해집니다. 같은 컬럼을 color와 shape 둘 다에 지정할 수 있습니다.
+  - type: code
+    language: python
+    title: 모양 인코딩
+    description: shape로 품종 구분
+    content: |-
+      chartShape = alt.Chart(iris).mark_point().encode(
+          x="petal_length:Q",
+          y="petal_width:Q",
+          color="species:N",
+          shape="species:N"
+      )
+      chartShape
+  - type: tip
+    content: |-
+      shape 인코딩은 명목형(:N) 데이터에만 사용할 수 있습니다. 원, 사각형, 삼각형 등 최대 8개 모양을 지원합니다.
+
+- id: step6_mark_circle
+  title: 6단계. 마크 스타일링
+  subtitle: mark_circle(size, opacity)
+  blocks:
+  - type: text
+    content: |-
+      mark_point() 대신 mark_circle()을 사용하면 채워진 원으로 표시됩니다. 둘 다 점을 그리지만, circle이 더 명확하게 보입니다.
+
+      마크 함수 괄호 안에 직접 size, opacity 파라미터를 전달할 수 있습니다. 파라미터는 함수에 전달하는 설정값입니다.
+
+      size=100은 모든 점의 크기를 100으로 고정합니다. opacity=0.7은 투명도를 70%로 설정합니다(0은 완전 투명, 1은 완전 불투명).
+
+      이것은 encode(size=...)와 다릅니다. encode()는 데이터에 따라 크기가 달라지지만, mark_circle(size=100)은 모든 점이 같은 크기입니다.
+  - type: code
+    language: python
+    title: mark_circle 스타일링
+    description: 크기와 투명도 고정
+    content: |-
+      chartCircle = alt.Chart(iris).mark_circle(
+          size=100,
+          opacity=0.7
+      ).encode(
+          x="petal_length:Q",
+          y="petal_width:Q",
+          color="species:N"
+      )
+      chartCircle
+  - type: tip
+    content: |-
+      괄호 안에서 쉼표(,)로 여러 파라미터를 나열할 수 있습니다. size=100, opacity=0.7처럼 쓰면 크기와 투명도를 동시에 설정합니다.
+
+      파라미터 이름(size, opacity)과 값(100, 0.7)을 등호(=)로 연결하는 것을 "키워드 인자"라고 합니다.
+
+- id: step7_sepal_analysis
+  title: 7단계. 꽃받침 특성 분석
+  subtitle: 다른 변수 조합
+  blocks:
+  - type: text
+    content: |-
+      꽃받침(sepal) 특성으로도 품종을 구분할 수 있는지 확인합니다.
+
+      x, y를 꽃받침 변수로 바꾸고, 지금까지 배운 인코딩을 모두 적용합니다.
+  - type: code
+    language: python
+    title: 꽃받침 산점도
+    description: 꽃받침 길이 vs 너비
+    content: |-
+      chartSepal = alt.Chart(iris).mark_circle(
+          opacity=0.8
+      ).encode(
+          x="sepal_length:Q",
+          y="sepal_width:Q",
+          color="species:N",
+          size="petal_length:Q",
+          shape="species:N"
+      )
+      chartSepal
+
+- id: step8_final
+  title: 8단계. 최종 결과물
+  subtitle: 품종별 특성 비교 차트
+  blocks:
+  - type: text
+    content: |-
+      지금까지 배운 모든 개념을 종합해 최종 차트를 완성합니다.
+
+      여기서는 alt.X(), alt.Y(), alt.Color() 같은 방식을 사용합니다. 이렇게 하면 title 파라미터로 축 제목을 한글로 바꿀 수 있습니다.
+
+      properties()는 차트 전체의 속성을 설정하는 함수입니다. title로 차트 제목을, width와 height로 크기를 지정합니다.
+
+      setosa는 왼쪽 아래, virginica는 오른쪽 위에 명확히 분리되어 품종 간 차이가 뚜렷하게 보입니다.
+  - type: code
+    language: python
+    title: 최종 품종 비교 차트
+    description: 프로젝트 완성!
+    content: |-
+      chartFinal = alt.Chart(iris).mark_circle(opacity=0.8).encode(
+          x=alt.X("petal_length:Q", title="꽃잎 길이 (cm)"),
+          y=alt.Y("petal_width:Q", title="꽃잎 너비 (cm)"),
+          color=alt.Color("species:N", title="품종"),
+          size=alt.Size("sepal_length:Q", title="꽃받침 길이"),
+          shape=alt.Shape("species:N", title="품종")
+      ).properties(title="붓꽃 품종별 특성 비교", width=500, height=400)
+      chartFinal
+  - type: tip
+    content: |-
+      alt.X("petal_length:Q", title="꽃잎 길이 (cm)")에서 첫 번째 인자는 데이터 컬럼과 타입, 두 번째 인자(title=)는 축에 표시될 제목입니다.
+
+      properties() 뒤에도 점(.)을 연결할 수 없습니다. properties()는 메서드 체이닝의 마지막에 위치합니다.
+
+- id: practice
+  title: 실습
+  subtitle: 붓꽃 인코딩 프로젝트
+  blocks:
+  - type: text
+    content: |-
+      배운 내용을 정리하면, 이 프로젝트에서는 mark_point와 mark_circle로 점을 그렸습니다. mark_circle은 채워진 원을 그립니다.
+
+      encode()에서 color로 색상, size로 크기, shape로 모양을 지정했습니다. 여러 인코딩을 조합하면 한 차트에 많은 정보를 담을 수 있습니다.
+
+      alt.X(), alt.Color() 등으로 축 제목을 설정하고, properties()로 차트 크기를 조절했습니다. 각 미션에서 이 개념들을 활용해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 꽃받침 길이 vs 꽃잎 길이 산점도 (색상: 품종)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        flowerUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+        flower = pd.read_csv(flowerUrl)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        figLen = alt.Chart(flower).mark_point().encode(
+            x="sepal_length:Q",
+            y="petal_length:Q",
+            color="species:N"
+        )
+        figLen
+  - type: expansion
+    title: "미션2: 꽃잎 너비 vs 꽃받침 너비 (색상+모양: 품종, 크기: 꽃잎 길이)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        bloomUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+        bloom = pd.read_csv(bloomUrl)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        figWidth = alt.Chart(bloom).mark_circle(opacity=0.7).encode(
+            x="petal_width:Q",
+            y="sepal_width:Q",
+            color="species:N",
+            shape="species:N",
+            size="petal_length:Q"
+        )
+        figWidth
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair로 붓꽃 품종을 시각적으로 구분하는 방법을 배웠습니다!
+  - type: list
+    items:
+    - "mark_point() - 점 마크 (이전 프로젝트 복습)"
+    - "mark_circle(size, opacity) - 채워진 원 마크, 스타일 고정값 지정"
+    - "x, y 인코딩 - 위치 매핑 (복습)"
+    - "color 인코딩 - 색상으로 범주 구분 (복습)"
+    - "size 인코딩 - 크기로 수치 표현 (새로 배움)"
+    - "shape 인코딩 - 모양으로 범주 구분 (새로 배움)"
+    - ":Q, :N 타입 - 수량형/명목형 데이터 타입"
+  - type: text
+    content: 다음 프로젝트에서는 팁 데이터로 막대 차트와 집계 함수를 배웁니다.

@@ -1,0 +1,1083 @@
+meta:
+  id: "29"
+  title: "클린 코드"
+  day: 29
+  category: "advancedPython"
+  tags: ["clean-code", "refactoring", "naming", "design-patterns"]
+  seo:
+    title: "파이썬 클린 코드"
+    description: "가독성, 명명법, 함수 설계, 리팩토링 기법 학습"
+    keywords: ["클린코드", "리팩토링", "명명법"]
+
+intro:
+  emoji: "✨"
+  points:
+  - "좋은 명명법"
+  - "함수 설계 원칙"
+  - "코드 구조화"
+  - "리팩토링 기법"
+
+sections:
+- id: "naming"
+  title: "명명법"
+  subtitle: "의미 있고 명확한 이름"
+  blocks:
+  - type: "text"
+    content: "변수명만 보고도 용도를 알 수 있어야 합니다. 매직 넘버를 상수로, 불리언은 is/has/can 접두사로."
+  - type: "code"
+    language: "python"
+    title: "변수 명명법"
+    description: "좋은 변수명 vs 나쁜 변수명"
+    content: |-
+      badData = [1, 2, 3]
+      userAges = [25, 30, 35]
+
+      x = 86400
+      SECONDS_PER_DAY = 86400
+
+      flag = True
+      isUserLoggedIn = True
+      hasPermission = False
+      canEdit = True
+
+      namingResult = {
+          "bad": "d, x, flag",
+          "good": "userAges, SECONDS_PER_DAY, isLoggedIn"
+      }
+      namingResult
+  - type: "code"
+    language: "python"
+    title: "함수와 클래스 명명"
+    description: "동사로 시작하는 함수명"
+    content: |-
+      def proc():
+          pass
+
+      def validateEmail(email):
+          return "@" in email
+
+      def fetchActiveUserCount():
+          return 100
+
+      class Mgr:
+          pass
+
+      class UserAccountManager:
+          pass
+
+      classNaming = {
+          "bad_func": "proc, getX",
+          "good_func": "validateEmail, fetchUserCount",
+          "bad_class": "Mgr",
+          "good_class": "UserAccountManager"
+      }
+      classNaming
+
+- id: "function_design"
+  title: "함수 설계"
+  subtitle: "단일 책임과 작은 함수"
+  blocks:
+  - type: "text"
+    content: "함수는 한 가지 일만 해야 합니다. 큰 함수는 작은 함수로 분리합니다."
+  - type: "code"
+    language: "python"
+    title: "함수 분리"
+    description: "큰 함수를 작은 함수로"
+    content: |-
+      def normalizeEmail(email):
+          return email.lower().strip()
+
+      def normalizeName(name):
+          return name.strip().title()
+
+      def isAdultAge(age):
+          return isinstance(age, int) and age >= 18
+
+      def processUser(user):
+          if user.get("email"):
+              user["email"] = normalizeEmail(user["email"])
+          if user.get("name"):
+              user["name"] = normalizeName(user["name"])
+          if user.get("age"):
+              user["isAdult"] = isAdultAge(user["age"])
+          return user
+
+      testUser = {"email": "  TEST@EMAIL.COM  ", "name": "  john doe  ", "age": 25}
+      processedResult = processUser(testUser.copy())
+      processedResult
+  - type: "code"
+    language: "python"
+    title: "매개변수 줄이기"
+    description: "객체로 그룹화"
+    content: |-
+      class ReportConfig:
+          def __init__(self):
+              self.includeStats = True
+              self.formatType = "html"
+              self.sendEmail = False
+
+      class UserInfo:
+          def __init__(self, userId, name, email):
+              self.userId = userId
+              self.name = name
+              self.email = email
+
+      def createReport(user, config):
+          return {"user": user.name, "format": config.formatType}
+
+      cfg = ReportConfig()
+      cfg.formatType = "pdf"
+      userInfo = UserInfo("1", "Alice", "alice@test.com")
+      paramResult = createReport(userInfo, cfg)
+      paramResult
+
+- id: "conditionals"
+  title: "조건문 단순화"
+  subtitle: "중첩을 평탄화하기"
+  blocks:
+  - type: "text"
+    content: "조기 반환(guard clause)으로 중첩을 줄입니다. 전략 패턴으로 if-else 체인을 제거합니다."
+  - type: "code"
+    language: "python"
+    title: "가드 클로즈"
+    description: "조기 반환으로 중첩 제거"
+    content: |-
+      def isValidUserBad(user):
+          if user is not None:
+              if user.get("email") is not None:
+                  if "@" in user["email"]:
+                      if user.get("age") is not None:
+                          if user["age"] >= 18:
+                              return True
+          return False
+
+      def isValidUser(user):
+          if not user:
+              return False
+          if not user.get("email") or "@" not in user["email"]:
+              return False
+          if not user.get("age") or user["age"] < 18:
+              return False
+          return True
+
+      testValid = {"email": "test@test.com", "age": 25}
+      testInvalid = {"email": "invalid", "age": 15}
+      validResult = (isValidUser(testValid), isValidUser(testInvalid))
+      validResult
+  - type: "code"
+    language: "python"
+    title: "전략 패턴"
+    description: "딕셔너리로 조건문 대체"
+    content: |-
+      def getDiscountBad(userType):
+          if userType == "premium":
+              return 0.2
+          elif userType == "gold":
+              return 0.15
+          elif userType == "silver":
+              return 0.1
+          return 0
+
+      DISCOUNT_RATES = {
+          "premium": 0.2,
+          "gold": 0.15,
+          "silver": 0.1,
+          "bronze": 0.05
+      }
+
+      def getDiscount(userType):
+          return DISCOUNT_RATES.get(userType, 0)
+
+      discountResult = [getDiscount(t) for t in ["premium", "gold", "basic"]]
+      discountResult
+
+- id: "error_handling"
+  title: "에러 처리"
+  subtitle: "의미 있는 예외 처리"
+  blocks:
+  - type: "text"
+    content: "커스텀 예외로 에러 정보를 명확히. Result 패턴으로 예외 대신 반환값 사용."
+  - type: "code"
+    language: "python"
+    title: "커스텀 예외"
+    description: "의미 있는 예외 클래스"
+    content: |-
+      class UserNotFoundError(Exception):
+          def __init__(self, userId):
+              self.userId = userId
+              super().__init__(f"User not found: {userId}")
+
+      class InvalidEmailError(Exception):
+          def __init__(self, email):
+              self.email = email
+              super().__init__(f"Invalid email: {email}")
+
+      def findUser(userId, users):
+          user = users.get(userId)
+          if not user:
+              raise UserNotFoundError(userId)
+          return user
+
+      users = {"user1": {"name": "Alice"}}
+      errorResult = []
+      try:
+          findUser("user1", users)
+          errorResult.append("found")
+      except UserNotFoundError as e:
+          errorResult.append(str(e))
+      errorResult
+  - type: "code"
+    language: "python"
+    title: "Result 패턴"
+    description: "예외 대신 Result 객체"
+    content: |-
+      class Result:
+          def __init__(self, success, value=None, error=None):
+              self.success = success
+              self.value = value
+              self.error = error
+
+          @staticmethod
+          def ok(value):
+              return Result(True, value=value)
+
+          @staticmethod
+          def fail(error):
+              return Result(False, error=error)
+
+      def divideNums(a, b):
+          if b == 0:
+              return Result.fail("Division by zero")
+          return Result.ok(a / b)
+
+      divOk = divideNums(10, 2)
+      divErr = divideNums(10, 0)
+      resultVal = (divOk.value, divErr.error)
+      resultVal
+
+- id: "structure"
+  title: "코드 구조화"
+  subtitle: "의존성 주입과 모듈화"
+  blocks:
+  - type: "text"
+    content: "의존성 주입으로 테스트 용이성 확보. 리포지토리 패턴으로 데이터 접근 추상화."
+  - type: "code"
+    language: "python"
+    title: "의존성 주입"
+    description: "서비스 클래스에 의존성 주입"
+    content: |-
+      class EmailService:
+          def send(self, to, subject, body):
+              return f"Sent to {to}: {subject}"
+
+      class NotificationService:
+          def __init__(self, emailSvc):
+              self.emailSvc = emailSvc
+
+          def notifyByEmail(self, to, subject, body):
+              return self.emailSvc.send(to, subject, body)
+
+      emailSvc = EmailService()
+      notifySvc = NotificationService(emailSvc)
+      notifyResult = notifySvc.notifyByEmail("user@test.com", "Hello", "Welcome!")
+      notifyResult
+  - type: "code"
+    language: "python"
+    title: "리포지토리 패턴"
+    description: "데이터 접근 추상화"
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class DataRepository(ABC):
+          @abstractmethod
+          def find(self, id):
+              pass
+
+          @abstractmethod
+          def save(self, entity):
+              pass
+
+      class InMemoryRepo(DataRepository):
+          def __init__(self):
+              self.data = {}
+
+          def find(self, id):
+              return self.data.get(id)
+
+          def save(self, entity):
+              self.data[entity["id"]] = entity
+              return entity
+
+      class UserSvc:
+          def __init__(self, repo):
+              self.repo = repo
+
+          def getUser(self, userId):
+              return self.repo.find(userId)
+
+          def createUser(self, user):
+              return self.repo.save(user)
+
+      repo = InMemoryRepo()
+      svc = UserSvc(repo)
+      svc.createUser({"id": "1", "name": "Alice"})
+      foundUser = svc.getUser("1")
+      foundUser
+
+- id: "refactoring"
+  title: "리팩토링 기법"
+  subtitle: "코드 품질 개선"
+  blocks:
+  - type: "text"
+    content: "함수 추출, 클래스 분리로 단일 책임 원칙 적용."
+  - type: "code"
+    language: "python"
+    title: "함수 추출"
+    description: "복잡한 함수를 분해"
+    content: |-
+      def calculateSubtotal(items):
+          return sum(item["price"] * item["qty"] for item in items)
+
+      def applyDiscount(amount, percent):
+          return amount * (1 - percent / 100)
+
+      def addTax(amount, rate=0.1):
+          return amount * (1 + rate)
+
+      def calculateOrderTotal(order):
+          subtotal = calculateSubtotal(order["items"])
+          afterDisc = applyDiscount(subtotal, order.get("discountPct", 0))
+          total = addTax(afterDisc)
+          return total
+
+      testOrder = {
+          "items": [{"price": 100, "qty": 2}, {"price": 50, "qty": 1}],
+          "discountPct": 10
+      }
+      orderTotal = calculateOrderTotal(testOrder)
+      orderTotal
+
+- id: "practice"
+  title: "종합 연습"
+  subtitle: "클린 코드 실습"
+  blocks:
+  - type: "text"
+    content: "Day 29에서 배운 클린 코드 원칙을 난이도별로 복습합니다. 명확한 변수명과 함수명은 코드의 의도를 드러내고, 단일 책임 원칙은 유지보수성을 높입니다. SOLID 원칙과 DRY, KISS는 좋은 설계의 기초이며, 리팩토링은 기술 부채를 줄이는 핵심 활동입니다. 🟢 기본 문제로 변수명 개선, 매직 넘버 제거 등 기초 리팩토링을 연습하고, 🟡 응용 문제로 함수 분리, 클래스 추출을 수행합니다. 🔴 심화 문제에서는 레거시 코드를 SOLID 원칙에 맞게 전면 리팩토링해봅니다. 클린 코드는 읽기 쉽고, 테스트하기 쉽고, 변경하기 쉬운 코드를 만드는 기술입니다."
+  - type: "expansion"
+    title: "기본1: 변수명 개선"
+    code: |-
+      d = 7
+      DAYS_IN_WEEK = 7
+
+      l = [1, 2, 3]
+      userScores = [1, 2, 3]
+
+      t = True
+      isEnabled = True
+
+      ex1Result = {"constant": DAYS_IN_WEEK, "list": userScores, "bool": isEnabled}
+      ex1Result
+  - type: "expansion"
+    title: "기본2: 함수 분리"
+    code: |-
+      def sumPrices(items):
+          return sum(item["price"] for item in items)
+
+      def applyBulkDisc(total, threshold=100, rate=0.1):
+          return total * (1 - rate) if total > threshold else total
+
+      def addSalesTax(total, rate=0.1):
+          return total * (1 + rate)
+
+      def processOrderClean(order):
+          subtotal = sumPrices(order["items"])
+          afterDisc = applyBulkDisc(subtotal)
+          return addSalesTax(afterDisc)
+
+      ex2Order = {"items": [{"price": 50}, {"price": 60}]}
+      ex2Result = processOrderClean(ex2Order)
+      ex2Result
+  - type: "expansion"
+    title: "기본3: 조건문 단순화"
+    code: |-
+      def getUserStatus(user):
+          if not user:
+              return "unknown"
+          if not user.get("active"):
+              return "inactive"
+          if not user.get("verified"):
+              return "pending"
+          return "active"
+
+      ex3Users = [None, {"active": False}, {"active": True}, {"active": True, "verified": True}]
+      ex3Result = [getUserStatus(u) for u in ex3Users]
+      ex3Result
+  - type: "expansion"
+    title: "기본4: 매직 넘버 제거"
+    code: |-
+      SHIP_LIGHT = 5
+      SHIP_MEDIUM = 10
+      SHIP_HEAVY = 15
+      WEIGHT_LIGHT = 1
+      WEIGHT_MEDIUM = 5
+
+      def calcShipping(weight):
+          if weight <= WEIGHT_LIGHT:
+              return SHIP_LIGHT
+          if weight <= WEIGHT_MEDIUM:
+              return SHIP_MEDIUM
+          return SHIP_HEAVY
+
+      ex4Result = [calcShipping(w) for w in [0.5, 3, 10]]
+      ex4Result
+  - type: "expansion"
+    title: "기본5: 가드 클로즈"
+    code: |-
+      def processPayment(payment):
+          if not payment:
+              return {"success": False, "error": "No payment"}
+          if payment.get("amount") is None:
+              return {"success": False, "error": "Missing amount"}
+          if payment["amount"] <= 0:
+              return {"success": False, "error": "Invalid amount"}
+          if payment.get("method") not in ["card", "bank"]:
+              return {"success": False, "error": "Invalid method"}
+          return {"success": True, "amount": payment["amount"]}
+
+      ex5Payments = [None, {"method": "card"}, {"amount": 100, "method": "card"}]
+      ex5Result = [processPayment(p) for p in ex5Payments]
+      ex5Result
+  - type: "expansion"
+    title: "중급6: 객체로 그룹화"
+    code: |-
+      class Address:
+          def __init__(self, street, city, zipCode):
+              self.street = street
+              self.city = city
+              self.zipCode = zipCode
+
+          def formatted(self):
+              return f"{self.street}, {self.city} {self.zipCode}"
+
+      class UserProfile:
+          def __init__(self, name, email, address):
+              self.name = name
+              self.email = email
+              self.address = address
+
+      addr = Address("123 Main St", "Seoul", "12345")
+      profile = UserProfile("Alice", "alice@test.com", addr)
+      ex6Result = {"name": profile.name, "addr": profile.address.formatted()}
+      ex6Result
+  - type: "expansion"
+    title: "중급7: 전략 패턴"
+    code: |-
+      TAX_RATES = {
+          "US": 0.07,
+          "UK": 0.2,
+          "JP": 0.1,
+          "KR": 0.1
+      }
+
+      def calcTax(country, amount):
+          rate = TAX_RATES.get(country, 0)
+          return amount * rate
+
+      ex7Result = [calcTax(c, 100) for c in ["US", "UK", "JP", "FR"]]
+      ex7Result
+  - type: "expansion"
+    title: "중급8: 의존성 주입"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class EmailSenderBase(ABC):
+          @abstractmethod
+          def send(self, to, msg):
+              pass
+
+      class MockEmailSender(EmailSenderBase):
+          def __init__(self):
+              self.sent = []
+
+          def send(self, to, msg):
+              self.sent.append({"to": to, "msg": msg})
+
+      class NotifyManager:
+          def __init__(self, sender):
+              self.sender = sender
+
+          def notify(self, user, msg):
+              return self.sender.send(user["email"], msg)
+
+      mock = MockEmailSender()
+      mgr = NotifyManager(mock)
+      mgr.notify({"email": "test@test.com"}, "Hello")
+      ex8Result = mock.sent
+      ex8Result
+  - type: "expansion"
+    title: "중급9: 팩토리 메서드"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Document(ABC):
+          @abstractmethod
+          def open(self):
+              pass
+
+      class PDFDoc(Document):
+          def open(self):
+              return "Opening PDF"
+
+      class WordDoc(Document):
+          def open(self):
+              return "Opening Word"
+
+      class DocFactory:
+          _types = {"pdf": PDFDoc, "doc": WordDoc}
+
+          @classmethod
+          def create(cls, docType):
+              creator = cls._types.get(docType)
+              if not creator:
+                  raise ValueError(f"Unknown: {docType}")
+              return creator()
+
+      docs = [DocFactory.create(t) for t in ["pdf", "doc"]]
+      ex9Result = [d.open() for d in docs]
+      ex9Result
+  - type: "expansion"
+    title: "중급10: 불변 객체"
+    code: |-
+      class ImmutablePoint:
+          def __init__(self, x, y):
+              self._x = x
+              self._y = y
+
+          @property
+          def x(self):
+              return self._x
+
+          @property
+          def y(self):
+              return self._y
+
+          def move(self, dx, dy):
+              return ImmutablePoint(self._x + dx, self._y + dy)
+
+          def __repr__(self):
+              return f"Point({self._x}, {self._y})"
+
+      pt1 = ImmutablePoint(1, 2)
+      pt2 = pt1.move(3, 4)
+      ex10Result = (repr(pt1), repr(pt2), pt1 is not pt2)
+      ex10Result
+  - type: "expansion"
+    title: "고급11: 빌더 패턴"
+    code: |-
+      class QueryBuilder:
+          def __init__(self):
+              self._table = None
+              self._cols = []
+              self._conds = []
+              self._limit = None
+
+          def select(self, *cols):
+              self._cols = list(cols) if cols else ["*"]
+              return self
+
+          def fromTable(self, table):
+              self._table = table
+              return self
+
+          def where(self, cond):
+              self._conds.append(cond)
+              return self
+
+          def limit(self, n):
+              self._limit = n
+              return self
+
+          def build(self):
+              q = f"SELECT {', '.join(self._cols)} FROM {self._table}"
+              if self._conds:
+                  q += " WHERE " + " AND ".join(self._conds)
+              if self._limit:
+                  q += f" LIMIT {self._limit}"
+              return q
+
+      ex11Query = (QueryBuilder()
+                   .select("id", "name")
+                   .fromTable("users")
+                   .where("active = 1")
+                   .limit(10)
+                   .build())
+      ex11Result = ex11Query
+      ex11Result
+  - type: "expansion"
+    title: "고급12: 커맨드 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Command(ABC):
+          @abstractmethod
+          def execute(self):
+              pass
+
+          @abstractmethod
+          def undo(self):
+              pass
+
+      class TextDoc:
+          def __init__(self):
+              self.content = ""
+
+          def append(self, text):
+              self.content += text
+
+          def removeLast(self, length):
+              self.content = self.content[:-length]
+
+      class AppendCmd(Command):
+          def __init__(self, doc, text):
+              self.doc = doc
+              self.text = text
+
+          def execute(self):
+              self.doc.append(self.text)
+
+          def undo(self):
+              self.doc.removeLast(len(self.text))
+
+      class TextEditor:
+          def __init__(self):
+              self.doc = TextDoc()
+              self.history = []
+
+          def append(self, text):
+              cmd = AppendCmd(self.doc, text)
+              cmd.execute()
+              self.history.append(cmd)
+
+          def undo(self):
+              if self.history:
+                  self.history.pop().undo()
+
+          def getContent(self):
+              return self.doc.content
+
+      editor = TextEditor()
+      editor.append("Hello ")
+      editor.append("World")
+      before = editor.getContent()
+      editor.undo()
+      after = editor.getContent()
+      ex12Result = (before, after)
+      ex12Result
+  - type: "expansion"
+    title: "고급13: 옵저버 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Observer(ABC):
+          @abstractmethod
+          def onEvent(self, event):
+              pass
+
+      class EventEmitter:
+          def __init__(self):
+              self._observers = {}
+
+          def subscribe(self, evtType, observer):
+              if evtType not in self._observers:
+                  self._observers[evtType] = []
+              self._observers[evtType].append(observer)
+
+          def emit(self, evtType, data):
+              for obs in self._observers.get(evtType, []):
+                  obs.onEvent(data)
+
+      class LogObserver(Observer):
+          def __init__(self):
+              self.logs = []
+
+          def onEvent(self, event):
+              self.logs.append(f"Logged: {event}")
+
+      emitter = EventEmitter()
+      logObs = LogObserver()
+      emitter.subscribe("user.created", logObs)
+      emitter.emit("user.created", {"id": 1, "name": "Alice"})
+      ex13Result = logObs.logs
+      ex13Result
+  - type: "expansion"
+    title: "고급14: 책임 연쇄 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Handler(ABC):
+          def __init__(self):
+              self._next = None
+
+          def setNext(self, handler):
+              self._next = handler
+              return handler
+
+          def handle(self, req):
+              result = self.process(req)
+              if result is None and self._next:
+                  return self._next.handle(req)
+              return result
+
+          @abstractmethod
+          def process(self, req):
+              pass
+
+      class AuthHandler(Handler):
+          def process(self, req):
+              if not req.get("token"):
+                  return {"error": "Not authenticated"}
+              return None
+
+      class AuthzHandler(Handler):
+          def process(self, req):
+              if req.get("role") != "admin":
+                  return {"error": "Not authorized"}
+              return None
+
+      class DataHandler(Handler):
+          def process(self, req):
+              return {"success": True, "data": req.get("data")}
+
+      auth = AuthHandler()
+      authz = AuthzHandler()
+      data = DataHandler()
+      auth.setNext(authz).setNext(data)
+
+      ex14Reqs = [{}, {"token": "abc"}, {"token": "abc", "role": "admin", "data": "test"}]
+      ex14Result = [auth.handle(r) for r in ex14Reqs]
+      ex14Result
+  - type: "expansion"
+    title: "고급15: 종합 리팩토링"
+    code: |-
+      class UserValidator:
+          def validate(self, data):
+              errors = []
+              if not data.get("email"):
+                  errors.append("Email required")
+              if not data.get("name"):
+                  errors.append("Name required")
+              return {"isValid": len(errors) == 0, "errors": errors}
+
+      class UserNotifier:
+          def __init__(self):
+              self.notifications = []
+
+          def notifyCreated(self, user):
+              self.notifications.append(f"User {user['name']} created")
+
+      class UserSvcFinal:
+          def __init__(self, repo, validator, notifier):
+              self.repo = repo
+              self.validator = validator
+              self.notifier = notifier
+
+          def createUser(self, userData):
+              result = self.validator.validate(userData)
+              if not result["isValid"]:
+                  return {"success": False, "errors": result["errors"]}
+              user = self.repo.save(userData)
+              self.notifier.notifyCreated(user)
+              return {"success": True, "user": user}
+
+      repo2 = InMemoryRepo()
+      validator2 = UserValidator()
+      notifier2 = UserNotifier()
+      svc2 = UserSvcFinal(repo2, validator2, notifier2)
+      ex15Create = svc2.createUser({"id": "1", "email": "t@t.com", "name": "Alice"})
+      ex15Result = {"success": ex15Create["success"], "notifs": notifier2.notifications}
+      ex15Result
+  - type: "expansion"
+    title: "고급16: 데코레이터 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class DataSource(ABC):
+          @abstractmethod
+          def writeData(self, data):
+              pass
+
+          @abstractmethod
+          def readData(self):
+              pass
+
+      class BaseDataSource(DataSource):
+          def __init__(self):
+              self._data = ""
+
+          def writeData(self, data):
+              self._data = data
+
+          def readData(self):
+              return self._data
+
+      class DataSourceDecorator(DataSource):
+          def __init__(self, source):
+              self._wrapped = source
+
+          def writeData(self, data):
+              self._wrapped.writeData(data)
+
+          def readData(self):
+              return self._wrapped.readData()
+
+      class EncryptionDecorator(DataSourceDecorator):
+          def writeData(self, data):
+              encrypted = "".join(chr(ord(c) + 1) for c in data)
+              self._wrapped.writeData(encrypted)
+
+          def readData(self):
+              encrypted = self._wrapped.readData()
+              return "".join(chr(ord(c) - 1) for c in encrypted)
+
+      base = BaseDataSource()
+      encrypted = EncryptionDecorator(base)
+      encrypted.writeData("Hello")
+      ex16Result = {"stored": base._data, "decrypted": encrypted.readData()}
+      ex16Result
+  - type: "expansion"
+    title: "고급17: 스테이트 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class OrderState(ABC):
+          @abstractmethod
+          def next(self, order):
+              pass
+
+          @abstractmethod
+          def prev(self, order):
+              pass
+
+          @abstractmethod
+          def getName(self):
+              pass
+
+      class PendingState(OrderState):
+          def next(self, order):
+              order.setState(ProcessingState())
+
+          def prev(self, order):
+              pass
+
+          def getName(self):
+              return "PENDING"
+
+      class ProcessingState(OrderState):
+          def next(self, order):
+              order.setState(ShippedState())
+
+          def prev(self, order):
+              order.setState(PendingState())
+
+          def getName(self):
+              return "PROCESSING"
+
+      class ShippedState(OrderState):
+          def next(self, order):
+              order.setState(DeliveredState())
+
+          def prev(self, order):
+              order.setState(ProcessingState())
+
+          def getName(self):
+              return "SHIPPED"
+
+      class DeliveredState(OrderState):
+          def next(self, order):
+              pass
+
+          def prev(self, order):
+              pass
+
+          def getName(self):
+              return "DELIVERED"
+
+      class Order:
+          def __init__(self):
+              self._state = PendingState()
+
+          def setState(self, state):
+              self._state = state
+
+          def next(self):
+              self._state.next(self)
+
+          def prev(self):
+              self._state.prev(self)
+
+          def getStatus(self):
+              return self._state.getName()
+
+      order = Order()
+      states = [order.getStatus()]
+      order.next()
+      states.append(order.getStatus())
+      order.next()
+      states.append(order.getStatus())
+      ex17Result = states
+      ex17Result
+  - type: "expansion"
+    title: "고급18: 프록시 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class ImageInterface(ABC):
+          @abstractmethod
+          def display(self):
+              pass
+
+      class RealImage(ImageInterface):
+          def __init__(self, filename):
+              self._filename = filename
+              self._loaded = False
+              self._loadFromDisk()
+
+          def _loadFromDisk(self):
+              self._loaded = True
+
+          def display(self):
+              return f"Displaying {self._filename}"
+
+      class ImageProxy(ImageInterface):
+          def __init__(self, filename):
+              self._filename = filename
+              self._realImage = None
+
+          def display(self):
+              if self._realImage is None:
+                  self._realImage = RealImage(self._filename)
+              return self._realImage.display()
+
+      proxy1 = ImageProxy("photo1.jpg")
+      proxy2 = ImageProxy("photo2.jpg")
+      ex18Result = {
+          "before_load": proxy1._realImage is None,
+          "display": proxy1.display(),
+          "after_load": proxy1._realImage is not None
+      }
+      ex18Result
+  - type: "expansion"
+    title: "고급19: 플라이웨이트 패턴"
+    code: |-
+      class TreeType:
+          def __init__(self, name, color, texture):
+              self.name = name
+              self.color = color
+              self.texture = texture
+
+      class TreeFactory:
+          _types = {}
+
+          @classmethod
+          def getType(cls, name, color, texture):
+              key = f"{name}_{color}_{texture}"
+              if key not in cls._types:
+                  cls._types[key] = TreeType(name, color, texture)
+              return cls._types[key]
+
+          @classmethod
+          def typeCount(cls):
+              return len(cls._types)
+
+      class Tree:
+          def __init__(self, x, y, treeType):
+              self.x = x
+              self.y = y
+              self.type = treeType
+
+      class Forest:
+          def __init__(self):
+              self.trees = []
+
+          def plantTree(self, x, y, name, color, texture):
+              treeType = TreeFactory.getType(name, color, texture)
+              tree = Tree(x, y, treeType)
+              self.trees.append(tree)
+              return tree
+
+      forest = Forest()
+      for i in range(100):
+          forest.plantTree(i, i, "Oak", "green", "rough")
+      for i in range(50):
+          forest.plantTree(i, i, "Pine", "darkgreen", "smooth")
+
+      ex19Result = {
+          "total_trees": len(forest.trees),
+          "unique_types": TreeFactory.typeCount(),
+          "memory_saved": len(forest.trees) > TreeFactory.typeCount()
+      }
+      ex19Result
+  - type: "expansion"
+    title: "고급20: 컴포지트 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class FileComponent(ABC):
+          @abstractmethod
+          def getSize(self):
+              pass
+
+          @abstractmethod
+          def getName(self):
+              pass
+
+      class File(FileComponent):
+          def __init__(self, name, size):
+              self._name = name
+              self._size = size
+
+          def getSize(self):
+              return self._size
+
+          def getName(self):
+              return self._name
+
+      class Folder(FileComponent):
+          def __init__(self, name):
+              self._name = name
+              self._children = []
+
+          def add(self, component):
+              self._children.append(component)
+              return self
+
+          def getSize(self):
+              return sum(child.getSize() for child in self._children)
+
+          def getName(self):
+              return self._name
+
+          def getCount(self):
+              total = len(self._children)
+              for child in self._children:
+                  if isinstance(child, Folder):
+                      total += child.getCount()
+              return total
+
+      root = Folder("root")
+      docs = Folder("docs")
+      docs.add(File("readme.txt", 100))
+      docs.add(File("guide.pdf", 500))
+
+      src = Folder("src")
+      src.add(File("main.py", 200))
+      src.add(File("utils.py", 150))
+
+      root.add(docs).add(src).add(File("config.json", 50))
+
+      ex20Result = {
+          "root_size": root.getSize(),
+          "docs_size": docs.getSize(),
+          "item_count": root.getCount()
+      }
+      ex20Result

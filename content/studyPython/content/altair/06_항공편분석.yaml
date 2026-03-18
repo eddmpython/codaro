@@ -1,0 +1,328 @@
+meta:
+  id: altair_06
+  title: 항공편분석
+  order: 6
+  category: altair
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["mark_rect", "heatmap", "mark_line", "scale", "flights"]
+  seo:
+    title: "Altair 히트맵 - 항공편 승객 분석"
+    description: "Altair로 히트맵을 만들고 색상 스케일을 커스터마이징합니다. mark_rect, scale, scheme을 배웁니다."
+    keywords: ["altair heatmap", "mark_rect", "color scale", "flights"]
+
+intro:
+  emoji: "✈️"
+  goal: 항공편 승객 데이터로 히트맵과 라인 차트를 만들어 시계열 패턴을 분석합니다.
+  description: mark_rect()로 히트맵을 만들고, scale로 색상을 커스터마이징합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: seaborn-data
+  blocks:
+  - type: text
+    content: |-
+      GitHub에서 flights 데이터를 불러옵니다. 1949년부터 1960년까지 12년간 매월 비행기를 탄 사람 수를 기록한 데이터입니다.
+
+      year는 연도(1949~1960), month는 월(Jan, Feb 등), passengers는 승객 수(천 명 단위)를 나타냅니다. 12년 × 12개월 = 총 144개 행이 있습니다.
+
+      import는 라이브러리를 가져오는 명령어입니다. altair는 시각화, pandas는 데이터 처리, warnings는 경고 메시지 관리를 담당합니다.
+  - type: code
+    language: python
+    title: flights 데이터 불러오기
+    description: pandas로 CSV 로드
+    content: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+
+      flightsUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv"
+      flights = pd.read_csv(flightsUrl)
+      flights.head()
+
+- id: step2_line_chart
+  title: 2단계. 라인 차트
+  subtitle: mark_line()
+  blocks:
+  - type: text
+    content: |-
+      먼저 연도별 총 승객 수 추이를 라인 차트로 확인합니다. 라인 차트는 시간에 따른 변화를 선으로 연결해 보여주는 차트입니다.
+
+      mark_line()은 "선 모양으로 그려라"는 뜻입니다. mark는 "표시하다", line은 "선"을 의미합니다. encode() 안에는 x축과 y축에 무엇을 표시할지 지정합니다.
+
+      sum(passengers)는 "승객 수를 모두 더하라"는 의미입니다. 같은 연도의 모든 월 데이터를 합산합니다.
+  - type: code
+    language: python
+    title: 연도별 승객 추이
+    description: 라인 차트
+    content: |-
+      chartLine = alt.Chart(flights).mark_line().encode(
+          x='year:O',
+          y='sum(passengers):Q'
+      )
+      chartLine
+  - type: tip
+    content: |-
+      year:O에서 :O는 "Ordinal(순서형)"이라는 뜻입니다. 연도는 숫자지만 1949, 1950, 1951처럼 순서가 있는 범주로 취급합니다. 콜론(:) 뒤에 데이터 타입을 적어주는 것이 Altair의 규칙입니다. :Q는 수량형, :N은 명목형, :O는 순서형입니다.
+
+- id: step3_multi_line
+  title: 3단계. 다중 라인
+  subtitle: 월별 비교
+  blocks:
+  - type: text
+    content: |-
+      이번에는 여러 개의 라인을 한 차트에 그려봅니다. color 인코딩을 추가하면 카테고리별로 색상을 달리해 여러 라인을 구분할 수 있습니다.
+
+      color='month:N'은 "월(month)마다 다른 색상을 지정하라"는 의미입니다. 1월은 파란색, 2월은 주황색 이런 식으로 자동으로 색이 배정됩니다.
+
+      이렇게 하면 각 월이 연도별로 어떻게 변했는지 한눈에 비교할 수 있습니다. 예를 들어 7월 라인과 1월 라인을 보면 여름철이 겨울철보다 승객이 많다는 것을 알 수 있습니다.
+  - type: code
+    language: python
+    title: 월별 다중 라인
+    description: color로 월 구분
+    content: |-
+      chartMultiLine = alt.Chart(flights).mark_line().encode(
+          x='year:O',
+          y='passengers:Q',
+          color='month:N'
+      )
+      chartMultiLine
+
+- id: step4_heatmap_intro
+  title: 4단계. 히트맵 기초
+  subtitle: mark_rect()
+  blocks:
+  - type: text
+    content: |-
+      히트맵은 2차원 데이터를 색상의 진하기로 표현하는 차트입니다. 숫자가 클수록 진한 색, 작을수록 옅은 색으로 표시됩니다.
+
+      mark_rect()는 "사각형 모양으로 그려라"는 뜻입니다. rect는 rectangle(사각형)의 줄임말입니다. x축에 연도, y축에 월을 배치하고, color에 승객 수를 넣으면 각 칸의 색상이 승객 수에 따라 달라집니다.
+
+      이렇게 하면 어느 연도 어느 달에 승객이 많았는지 색상만으로도 한눈에 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 기본 히트맵
+    description: mark_rect 사용
+    content: |-
+      chartHeatmap = alt.Chart(flights).mark_rect().encode(
+          x='year:O',
+          y='month:O',
+          color='passengers:Q'
+      )
+      chartHeatmap
+  - type: tip
+    content: |-
+      히트맵은 2차원 데이터를 색상으로 표현합니다. 여름철(6-8월) 승객이 많고, 연도가 지날수록 전체 승객이 증가합니다.
+
+- id: step5_month_order
+  title: 5단계. 월 순서 정렬
+  subtitle: sort 파라미터
+  blocks:
+  - type: text
+    content: |-
+      기본 히트맵을 보면 월 순서가 Apr, Aug, Dec... 처럼 알파벳 순서로 되어있습니다. 이것을 1월, 2월, 3월 순으로 정렬해야 읽기 쉽습니다.
+
+      리스트는 여러 값을 순서대로 담는 상자입니다. 대괄호 []로 만들며, 쉼표로 값을 구분합니다. monthOrder 변수에 1월부터 12월까지 순서대로 저장합니다.
+
+      alt.Y()는 y축 설정을 세밀하게 조정할 때 사용합니다. 괄호 안에 첫 번째 인자로 컬럼명('month:O')을, sort 파라미터로 원하는 순서(monthOrder)를 지정하면 그 순서대로 표시됩니다.
+  - type: code
+    language: python
+    title: 월 순서 정렬
+    description: sort로 순서 지정
+    content: |-
+      monthOrder = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+                    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
+      chartOrdered = alt.Chart(flights).mark_rect().encode(
+          x='year:O',
+          y=alt.Y('month:O', sort=monthOrder),
+          color='passengers:Q'
+      )
+      chartOrdered
+
+- id: step6_color_scale
+  title: 6단계. 색상 스케일
+  subtitle: scale(scheme)
+  blocks:
+  - type: text
+    content: |-
+      지금까지는 Altair가 자동으로 색상을 정해줬습니다. 이번에는 원하는 색상 조합(팔레트)을 직접 지정해봅니다.
+
+      alt.Color()는 색상 설정을 세밀하게 조정할 때 사용합니다. 첫 번째 인자로 컬럼명('passengers:Q')을 주고, scale 파라미터에 alt.Scale()을 넣습니다.
+
+      alt.Scale(scheme='viridis')에서 scheme은 "색상 조합"이라는 뜻입니다. viridis는 보라색에서 노란색으로 변하는 색상 조합으로, 데이터 분석에서 많이 사용됩니다.
+  - type: code
+    language: python
+    title: 색상 팔레트 변경
+    description: viridis 스케일
+    content: |-
+      chartScale = alt.Chart(flights).mark_rect().encode(
+          x='year:O',
+          y=alt.Y('month:O', sort=monthOrder),
+          color=alt.Color('passengers:Q', scale=alt.Scale(scheme='viridis'))
+      )
+      chartScale
+  - type: tip
+    content: |-
+      다른 팔레트: 'blues', 'greens', 'oranges', 'reds', 'purples', 'plasma', 'inferno', 'magma' 등이 있습니다.
+
+- id: step7_legend
+  title: 7단계. 범례 커스터마이징
+  subtitle: legend 설정
+  blocks:
+  - type: text
+    content: |-
+      범례는 차트 옆에 나타나는 색상 설명 박스입니다. "이 색은 무엇을 의미하는가"를 알려주는 가이드 역할을 합니다.
+
+      legend 파라미터로 범례를 커스터마이징할 수 있습니다. alt.Legend() 괄호 안에 title로 제목을, orient로 위치를 지정합니다.
+
+      orient='bottom'은 "방향을 아래쪽으로"라는 뜻입니다. 범례가 차트 하단에 가로로 배치됩니다. 'right'로 바꾸면 오른쪽에 세로로 나타납니다.
+  - type: code
+    language: python
+    title: 범례 설정
+    description: 제목, 위치 변경
+    content: |-
+      chartLegend = alt.Chart(flights).mark_rect().encode(
+          x='year:O',
+          y=alt.Y('month:O', sort=monthOrder),
+          color=alt.Color(
+              'passengers:Q',
+              scale=alt.Scale(scheme='blues'),
+              legend=alt.Legend(title='승객 수', orient='bottom')
+          )
+      )
+      chartLegend
+
+- id: step8_tooltip
+  title: 8단계. 툴팁 추가
+  subtitle: 상세 정보
+  blocks:
+  - type: text
+    content: |-
+      tooltip은 "툴팁", 즉 마우스를 올렸을 때 나타나는 작은 정보 상자입니다. 차트 위에 마우스를 가져가면 정확한 숫자를 볼 수 있습니다.
+
+      tooltip에 리스트(대괄호 [])로 컬럼명들을 나열하면, 해당 정보들이 모두 툴팁에 표시됩니다.
+
+      히트맵은 색상으로 대략적인 크기를 보여주지만, 정확한 승객 수는 툴팁으로 확인해야 합니다. 예를 들어 1960년 7월에 정확히 몇 명이 탔는지 알 수 있습니다.
+  - type: code
+    language: python
+    title: 툴팁 추가
+    description: 호버 시 정보 표시
+    content: |-
+      chartTooltip = alt.Chart(flights).mark_rect().encode(
+          x='year:O',
+          y=alt.Y('month:O', sort=monthOrder),
+          color=alt.Color('passengers:Q', scale=alt.Scale(scheme='oranges')),
+          tooltip=['year', 'month', 'passengers']
+      )
+      chartTooltip
+
+- id: step9_final
+  title: 9단계. 최종 결과물
+  subtitle: 항공 승객 히트맵
+  blocks:
+  - type: text
+    content: |-
+      이제 지금까지 배운 모든 개념을 하나로 합쳐 완성도 높은 히트맵을 만듭니다. 월 순서 정렬, 색상 팔레트, 범례, 툴팁이 모두 포함됩니다.
+
+      properties() 메서드는 차트의 전체적인 속성을 설정합니다. title로 제목을, width와 height로 크기를 지정합니다.
+
+      alt.Tooltip()을 사용하면 툴팁에 표시될 이름(title)도 바꿀 수 있습니다. 예를 들어 'year:O' 대신 '연도'라고 표시됩니다.
+  - type: code
+    language: python
+    title: 최종 히트맵
+    description: 프로젝트 완성!
+    content: |-
+      chartFinal = alt.Chart(flights).mark_rect().encode(
+          x=alt.X('year:O', title='연도'),
+          y=alt.Y('month:O', sort=monthOrder, title='월'),
+          color=alt.Color(
+              'passengers:Q',
+              scale=alt.Scale(scheme='viridis'),
+              legend=alt.Legend(title='승객 수 (천명)')
+          ),
+          tooltip=[
+              alt.Tooltip('year:O', title='연도'),
+              alt.Tooltip('month:O', title='월'),
+              alt.Tooltip('passengers:Q', title='승객 수')
+          ]
+      ).properties(
+          title='1949-1960년 월별 항공 승객 수',
+          width=400,
+          height=300
+      )
+      chartFinal
+  - type: text
+    content: |-
+      1950년대 후반으로 갈수록 승객이 급증하고, 여름(7-8월)에 승객이 가장 많습니다.
+
+      항공 산업의 성장과 계절적 패턴이 명확히 보입니다.
+
+- id: practice
+  title: 실습
+  subtitle: 항공 데이터 시각화 프로젝트
+  blocks:
+  - type: text
+    content: |-
+      이 프로젝트에서 배운 내용을 정리하면: mark_rect()로 히트맵 그리기, mark_line()으로 라인 차트 그리기, sort로 순서 정렬, scale로 색상 변경, legend로 범례 설정, tooltip으로 상세 정보 표시입니다.
+
+      이제 배운 개념들을 직접 조합해서 새로운 차트를 만들어봅시다. 미션마다 어떤 개념을 사용하는지 확인하세요.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 월별 평균 승객 막대 차트 (색상: 월)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        airUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv"
+        air = pd.read_csv(airUrl)
+        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+    - type: code
+      title: "차트 생성"
+      content: |-
+        figMonth = alt.Chart(air).mark_bar().encode(
+            x=alt.X('month:O', sort=months, title='월'),
+            y=alt.Y('mean(passengers):Q', title='평균 승객 수'),
+            color='month:O'
+        ).properties(
+            title='월별 평균 항공 승객'
+        )
+        figMonth
+  - type: expansion
+    title: "미션2: 연도별 라인 차트 + 포인트 (layer)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        planeUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv"
+        plane = pd.read_csv(planeUrl)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        lineTrend = alt.Chart(plane).mark_line().encode(x='year:O', y='sum(passengers):Q')
+        dotTrend = alt.Chart(plane).mark_point(size=50, color='red').encode(x='year:O', y='sum(passengers):Q')
+        figTrend = (lineTrend + dotTrend).properties(title='연도별 총 항공 승객 추이')
+        figTrend
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair로 히트맵과 색상 스케일을 마스터했습니다!
+  - type: list
+    items:
+    - "mark_rect() - 사각형 마크로 히트맵 생성"
+    - "mark_line() - 라인 차트로 시계열 표현"
+    - "scale=alt.Scale(scheme='...') - 색상 팔레트 변경"
+    - "legend=alt.Legend(title, orient) - 범례 커스터마이징"
+    - "sort=[...] - 축 순서 지정"
+    - "alt.Tooltip() - 툴팁 상세 설정"
+  - type: text
+    content: 다음 프로젝트에서는 인터랙티브 필터와 선택 기능을 배웁니다.

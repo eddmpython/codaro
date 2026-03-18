@@ -1,0 +1,334 @@
+meta:
+  id: numpy_07
+  title: 대기질시계열
+  order: 7
+  category: numpy
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["numpy", "nan", "isnan", "nanmean", "nanstd", "zeros", "flatten"]
+  seo:
+    title: "NumPy 결측값 처리 - 대기질 시계열 분석"
+    description: "NumPy의 결측값 처리와 시계열 분석을 배우며 대기질 데이터의 추세를 파악합니다."
+    keywords: ["numpy", "결측값", "nan", "nanmean", "대기질", "시계열"]
+
+intro:
+  emoji: "🌫️"
+  goal: 대기질 데이터로 결측값 처리와 시계열 분석을 익힙니다.
+  description: 뉴욕시의 대기질 데이터를 분석합니다. 실제 데이터에는 결측값(NaN)이 많으며, 이를 적절히 처리하면서 시계열 추세를 분석합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: numpy와 pandas를 불러옵니다
+    content: |-
+      import numpy as np
+      import pandas as pd
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: 대기질 데이터셋
+  blocks:
+  - type: text
+    content: "R 프로그래밍 언어에서 유명한 airquality 데이터셋입니다. 1973년 5~9월 뉴욕시의 일일 대기질 측정값으로, Ozone(오존 농도, ppb), Solar.R(태양 복사량), Wind(풍속), Temp(기온, 화씨) 등이 기록되어 있습니다. 실제 측정 데이터라 결측값(측정 실패)이 포함되어 있습니다."
+  - type: code
+    language: python
+    title: 대기질 데이터 로드
+    description: Rdatasets에서 대기질 데이터를 불러옵니다
+    content: |-
+      url = "https://raw.githubusercontent.com"
+      df = pd.read_csv(f"{url}/vincentarelbundock/Rdatasets/master/csv/datasets/airquality.csv")
+      df.head(10)
+
+- id: step3_extract
+  title: 3단계. 배열 추출
+  subtitle: Ozone
+  blocks:
+  - type: text
+    content: 오존 농도 데이터를 NumPy 배열로 추출합니다.
+  - type: code
+    language: python
+    title: 오존 배열 추출
+    description: Ozone 컬럼을 배열로 추출합니다
+    content: |-
+      ozone = df['Ozone'].values
+      ozone[:20]
+
+- id: step4_isnan
+  title: 4단계. 결측값 확인
+  subtitle: np.isnan()
+  blocks:
+  - type: text
+    content: "NaN(Not a Number)은 '숫자가 아님'이라는 뜻으로, 결측값을 나타냅니다. 측정 장비 고장, 데이터 입력 누락 등으로 발생합니다. np.isnan()은 각 값이 NaN인지 확인해서 True/False 배열을 반환합니다. 실제 데이터 분석에서는 결측값 처리가 매우 중요합니다."
+  - type: code
+    language: python
+    title: 결측값 확인
+    description: NaN 여부를 확인합니다
+    content: |-
+      mask = np.isnan(ozone)
+      mask[:20]
+  - type: tip
+    content: np.isnan()은 NaN(Not a Number) 여부를 불리언 배열로 반환합니다. NaN은 결측값을 나타내는 특수한 부동소수점 값입니다.
+
+- id: step5_nan_count
+  title: 5단계. 결측값 개수
+  subtitle: 비율 계산
+  blocks:
+  - type: text
+    content: 결측값의 개수와 비율을 확인합니다.
+  - type: code
+    language: python
+    title: 결측값 비율
+    description: 결측값 개수와 비율을 계산합니다
+    content: |-
+      n = np.sum(mask)
+      ratio = n / len(ozone) * 100
+      f"결측값: {n}개 ({ratio:.1f}%)"
+
+- id: step6_mean_nan
+  title: 6단계. 일반 mean의 문제
+  subtitle: NaN 전파
+  blocks:
+  - type: text
+    content: "NaN은 '전파(propagation)'되는 특성이 있습니다. 어떤 숫자와 NaN을 연산하면 결과도 NaN이 됩니다. 1 + NaN = NaN, NaN × 5 = NaN 입니다. 따라서 배열에 NaN이 하나라도 있으면 np.mean()의 결과도 NaN이 되어버립니다. 이 문제를 해결하려면 NaN을 무시하는 특별한 함수가 필요합니다."
+  - type: code
+    language: python
+    title: 일반 mean
+    description: NaN이 있는 배열의 mean 결과를 확인합니다
+    content: |-
+      avg = np.mean(ozone)
+      f"일반 mean: {avg}"
+
+- id: step7_nanmean
+  title: 7단계. nanmean
+  subtitle: NaN 무시 평균
+  blocks:
+  - type: text
+    content: "np.nanmean()은 NaN 값을 건너뛰고 유효한 값들만으로 평균을 계산합니다. nan이 붙은 함수들(nansum, nanstd, nanmax, nanmin 등)은 모두 NaN을 무시합니다. 결측값이 있는 실제 데이터를 다룰 때 필수적인 함수들입니다."
+  - type: code
+    language: python
+    title: nanmean
+    description: NaN을 무시하고 평균을 계산합니다
+    content: |-
+      clean = np.nanmean(ozone)
+      f"nanmean: {clean:.2f}"
+  - type: tip
+    content: np.nanmean(), np.nansum(), np.nanstd(), np.nanmax(), np.nanmin() 등은 NaN을 무시하고 계산합니다. 결측값이 있는 데이터에서 필수적입니다.
+
+- id: step8_nan_funcs
+  title: 8단계. NaN-safe 함수들
+  subtitle: 비교
+  blocks:
+  - type: text
+    content: 다른 nan 통계 함수들도 확인합니다.
+  - type: code
+    language: python
+    title: NaN-safe 함수 비교
+    description: 일반 함수와 nan-safe 함수를 비교합니다
+    content: |-
+      pd.DataFrame({
+          'Statistic': ['Sum', 'Mean', 'Std', 'Max', 'Min'],
+          'Normal': [np.sum(ozone), np.mean(ozone), np.std(ozone), np.max(ozone), np.min(ozone)],
+          'NaN-safe': [np.nansum(ozone), np.nanmean(ozone), np.nanstd(ozone), np.nanmax(ozone), np.nanmin(ozone)]
+      }).round(2)
+
+- id: step9_where_fill
+  title: 9단계. 결측값 대체
+  subtitle: np.where()
+  blocks:
+  - type: text
+    content: "결측값을 다른 값으로 대체하는 것을 '대체(imputation)'라고 합니다. 가장 간단한 방법은 0으로 대체하는 것입니다. np.where(조건, 참일때 값, 거짓일때 값)을 사용해서 NaN이면 0을, 아니면 원래 값을 선택합니다. 단, 0으로 대체하면 평균이 왜곡될 수 있어서 주의가 필요합니다."
+  - type: code
+    language: python
+    title: 0으로 대체
+    description: NaN을 0으로 대체합니다
+    content: |-
+      filled = np.where(np.isnan(ozone), 0, ozone)
+      filled[:20]
+  - type: tip
+    content: np.where(condition, x, y)로 조건에 따라 값을 선택할 수 있습니다. 여기서는 NaN을 0으로 대체했습니다.
+
+- id: step10_mean_fill
+  title: 10단계. 평균값 대체
+  subtitle: 결측값 보간
+  blocks:
+  - type: text
+    content: "더 나은 대체 방법은 평균값으로 대체하는 것입니다. 먼저 nanmean으로 NaN을 제외한 평균을 구한 뒤, 그 값으로 NaN을 대체합니다. 이렇게 하면 전체 평균이 크게 왜곡되지 않습니다. 단, 이 방법은 데이터의 변동성(표준편차)을 줄이는 부작용이 있습니다."
+  - type: code
+    language: python
+    title: 평균값 대체
+    description: NaN을 평균값으로 대체합니다
+    content: |-
+      mu = np.nanmean(ozone)
+      imputed = np.where(np.isnan(ozone), mu, ozone)
+      f"원본 평균: {np.nanmean(ozone):.2f}, 대체 후 평균: {np.mean(imputed):.2f}"
+
+- id: step11_zeros
+  title: 11단계. zeros로 배열 생성
+  subtitle: 유효 데이터만
+  blocks:
+  - type: text
+    content: "np.zeros(크기)는 지정한 크기만큼 0으로 채워진 배열을 생성합니다. 대체 대신 NaN을 제거하고 유효한 데이터만 남기는 방법도 있습니다. ~mask는 mask의 반대(NaN이 아닌 위치)이므로, ozone[~mask]로 유효한 값들만 추출할 수 있습니다."
+  - type: code
+    language: python
+    title: 유효 데이터 추출
+    description: NaN이 아닌 데이터만 저장합니다
+    content: |-
+      count = np.sum(~mask)
+      valid = np.zeros(count)
+      valid[:] = ozone[~mask]
+      valid[:10]
+  - type: tip
+    content: np.zeros(shape)는 0으로 채워진 배열을 생성합니다. ~(틸다)는 불리언 배열을 반전시켜 NaN이 아닌 위치를 선택합니다.
+
+- id: step12_isinf
+  title: 12단계. 무한대 검사
+  subtitle: np.isinf(), np.isfinite()
+  blocks:
+  - type: text
+    content: "NaN 외에 무한대(infinity)도 특수한 값입니다. 0으로 나누기 등의 연산에서 발생할 수 있습니다. np.isinf()는 무한대(inf, -inf) 여부를 확인하고, np.isfinite()는 값이 '유한한 숫자'인지(NaN도 아니고 무한대도 아닌) 확인합니다. 데이터 품질 검증에 유용합니다."
+  - type: code
+    language: python
+    title: 무한대 검사
+    description: 무한대와 유한값을 검사합니다
+    content: |-
+      solar = df['Solar.R'].values
+      inf = np.any(np.isinf(solar[~np.isnan(solar)]))
+      finite = np.isfinite(solar)
+      f"무한대 존재: {inf}, 유한값 개수: {np.sum(finite)}"
+  - type: tip
+    content: np.isinf()는 무한대(inf, -inf) 여부를, np.isfinite()는 유한한 숫자인지(NaN과 inf가 아닌)를 검사합니다.
+
+- id: step13_monthly
+  title: 13단계. 월별 평균
+  subtitle: flatten
+  blocks:
+  - type: text
+    content: 월별 오존 평균을 계산합니다.
+  - type: code
+    language: python
+    title: 월별 평균
+    description: 월별 평균 오존을 계산합니다
+    content: |-
+      month = df['Month'].values
+      months = np.unique(month)
+      avgs = []
+      for m in months:
+          sub = month == m
+          vals = ozone[sub]
+          avgs.append(np.nanmean(vals))
+      arr = np.array(avgs)
+      arr
+  - type: code
+    language: python
+    title: flatten
+    description: 배열을 1차원으로 평탄화합니다
+    content: |-
+      flat = arr.flatten()
+      flat
+  - type: tip
+    content: flatten()은 다차원 배열을 1차원으로 평탄화합니다. 복잡한 구조의 결과를 단순하게 만들 때 유용합니다.
+
+- id: step14_cumsum
+  title: 14단계. 누적 추세
+  subtitle: 시계열 분석
+  blocks:
+  - type: text
+    content: 일별 오존 누적합으로 추세를 확인합니다.
+  - type: code
+    language: python
+    title: 누적 오존
+    description: 일별 오존 누적합을 계산합니다
+    content: |-
+      zero = np.where(np.isnan(ozone), 0, ozone)
+      cumsum = np.cumsum(zero)
+      cumsum[-10:]
+
+- id: step15_correlation
+  title: 15단계. 상관관계
+  subtitle: 기온과 오존
+  blocks:
+  - type: text
+    content: "기온이 높으면 오존 농도도 높아질까요? 상관계수로 두 변수의 관계를 확인합니다. 중요한 점은 두 변수 모두 유효한 값(NaN이 아닌)인 날만 분석해야 합니다. ~np.isnan(ozone) & ~np.isnan(temp)로 둘 다 유효한 위치를 찾습니다."
+  - type: code
+    language: python
+    title: 오존-기온 상관관계
+    description: 기온과 오존의 상관계수를 계산합니다
+    content: |-
+      temp = df['Temp'].values
+      both = ~np.isnan(ozone) & ~np.isnan(temp)
+      o = ozone[both]
+      t = temp[both]
+      r = np.corrcoef(o, t)[0, 1]
+      f"오존-기온 상관계수: {r:.3f}"
+
+- id: practice
+  title: 실습
+  subtitle: 대기질 데이터 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 월별 결측값 패턴 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        url = "https://raw.githubusercontent.com"
+        data = pd.read_csv(f"{url}/vincentarelbundock/Rdatasets/master/csv/datasets/airquality.csv")
+        ozone = data['Ozone'].values
+        solar = data['Solar.R'].values
+        month = data['Month'].values
+    - type: code
+      title: "월별 결측값 분석"
+      content: |-
+        months = np.unique(month)
+        rows = []
+        for m in months:
+            mask = month == m
+            nan1 = np.sum(np.isnan(ozone[mask]))
+            nan2 = np.sum(np.isnan(solar[mask]))
+            n = np.sum(mask)
+            rows.append([m, n, nan1, nan2, round((nan1 + nan2) / (n * 2) * 100, 1)])
+        pd.DataFrame(rows, columns=['Month', 'Days', 'Ozone NaN', 'Solar NaN', 'NaN Rate (%)'])
+  - type: expansion
+    title: "미션2: 대기질 종합 지표 계산"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        src = "https://raw.githubusercontent.com"
+        df = pd.read_csv(f"{src}/vincentarelbundock/Rdatasets/master/csv/datasets/airquality.csv")
+        ozone = df['Ozone'].values
+        solar = df['Solar.R'].values
+        wind = df['Wind'].values
+        temp = df['Temp'].values
+    - type: code
+      title: "종합 지표 계산"
+      content: |-
+        nO = (ozone - np.nanmin(ozone)) / (np.nanmax(ozone) - np.nanmin(ozone))
+        nS = (solar - np.nanmin(solar)) / (np.nanmax(solar) - np.nanmin(solar))
+        nW = (wind - np.nanmin(wind)) / (np.nanmax(wind) - np.nanmin(wind))
+        nT = (temp - np.nanmin(temp)) / (np.nanmax(temp) - np.nanmin(temp))
+        valid = ~np.isnan(nO) & ~np.isnan(nS)
+        aqi = np.zeros(len(ozone))
+        aqi[valid] = (nO[valid] * 0.4 + (1 - nW[valid]) * 0.3 + nT[valid] * 0.3)
+        aqi[~valid] = np.nan
+        pd.DataFrame({
+            'Metric': ['Valid Days', 'Mean AQI', 'Max AQI', 'Min AQI', 'Std AQI'],
+            'Value': [np.sum(valid), np.nanmean(aqi), np.nanmax(aqi), np.nanmin(aqi), np.nanstd(aqi)]
+        }).round(3)

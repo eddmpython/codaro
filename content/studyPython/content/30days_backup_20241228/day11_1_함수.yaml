@@ -1,0 +1,487 @@
+meta:
+  id: day11_1
+  title: 함수
+  day: 11
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 함수 정의 - 코드 재사용"
+    description: "def로 함수를 정의하고 매개변수, 반환값을 사용하는 방법."
+    keywords: ['함수', 'def', 'return', '매개변수']
+intro:
+  emoji: "⚙️"
+  points:
+  - 함수의 기본 개념과 정의 방법
+  - 매개변수 없는 함수와 값 반환
+  - 단일/다중 매개변수를 가진 함수
+  - 키워드 인수와 기본 매개변수
+  - 가변 인수(*args) 활용
+  - 함수를 매개변수로 전달하기
+sections:
+- id: function_introduction
+  title: 함수 소개
+  subtitle: 재사용 가능한 코드 블록 만들기
+  blocks:
+  - type: text
+    content: 함수(Function)는 특정 작업을 수행하도록 설계된 재사용 가능한 코드 블록입니다. 함수라는 이름은 수학의 함수 개념에서 왔는데, 입력을 받아서 출력을 내보내는 "기계"와 같습니다. 프로그래밍에서 함수를 사용하면 같은 코드를 여러 번 작성하지 않고도 반복적인 작업을 수행할 수 있습니다. 파이썬에서는 def(define의 줄임말) 키워드를 사용하여 함수를 정의합니다. 함수 정의 후에는 함수 이름에 괄호를 붙여 호출해야 실행됩니다.
+  - type: list
+    items:
+    - def 키워드로 함수 정의
+    - 코드의 재사용성과 모듈화
+    - 함수 이름() 형태로 호출
+    - 호출해야만 함수 내부 코드 실행
+  - type: code
+    language: python
+    title: 함수 기본 구조
+    description: "def 키워드로 함수를 정의하고 호출합니다."
+    content: |-
+      def greet():
+          print('Hello, World!')
+
+      greet()
+
+      def generateFullName():
+          introFirstName = 'Asabeneh'
+          introLastName = 'Yetayeh'
+          introFullName = introFirstName + ' ' + introLastName
+          print(introFullName)
+
+      generateFullName()
+  - type: tip
+    content: "함수는 정의만 해서는 실행되지 않습니다. 반드시 함수이름()으로 호출해야 내부 코드가 실행됩니다."
+
+- id: function_returning_value
+  title: 값을 반환하는 함수
+  subtitle: return 문으로 결과 돌려주기
+  blocks:
+  - type: text
+    content: 함수는 return 문을 사용하여 결과 값을 돌려줄 수 있습니다. return은 "반환하다"라는 뜻으로, 함수가 계산하거나 처리한 결과를 함수 바깥으로 전달합니다. print()는 화면에 출력만 하지만, return은 값을 돌려주어 변수에 저장하거나 다른 연산에 사용할 수 있습니다. return 문이 없는 함수는 자동으로 None을 반환합니다. return을 만나면 함수 실행이 즉시 종료됩니다.
+  - type: list
+    items:
+    - return 키워드로 값 반환
+    - 반환값을 변수에 저장 가능
+    - return 없으면 None 반환
+    - return 만나면 함수 즉시 종료
+  - type: code
+    language: python
+    title: return 문 사용
+    description: "return으로 함수 결과를 반환하고 변수에 저장합니다."
+    content: |-
+      def generateFullName():
+          returnFirstName = 'Asabeneh'
+          returnLastName = 'Yetayeh'
+          returnFullName = returnFirstName + ' ' + returnLastName
+          return returnFullName
+
+      returnResult = generateFullName()
+      print(returnResult)
+
+      def addTwoNumbers():
+          returnNumOne = 2
+          returnNumTwo = 3
+          returnTotal = returnNumOne + returnNumTwo
+          return returnTotal
+
+      print(addTwoNumbers())
+  - type: tip
+    content: "print()와 return의 차이: print()는 화면 출력만, return은 값을 돌려줘서 재사용 가능합니다."
+
+- id: function_with_parameter
+  title: 매개변수가 있는 함수
+  subtitle: 외부에서 데이터 받기
+  blocks:
+  - type: text
+    content: 함수는 매개변수(parameter)를 통해 외부에서 데이터를 받을 수 있습니다. 매개변수는 함수 정의 시 괄호 안에 선언하는 변수이고, 함수를 호출할 때 전달하는 실제 값을 인수(argument)라고 합니다. 매개변수를 사용하면 같은 함수로 다양한 입력에 대해 처리할 수 있어 재사용성이 높아집니다.
+  - type: list
+    items:
+    - 매개변수는 함수 정의 시 선언
+    - 인수는 함수 호출 시 전달하는 값
+    - 다양한 입력에 대해 동일한 처리
+    - 함수의 재사용성 향상
+  - type: code
+    language: python
+    title: 단일 매개변수 함수
+    description: "매개변수로 외부 데이터를 받아 처리합니다."
+    content: |-
+      def greetings(name):
+          paramMessage = name + ', welcome to Python!'
+          return paramMessage
+
+      print(greetings('Asabeneh'))
+      print(greetings('Kim'))
+
+      def addTen(num):
+          return num + 10
+
+      print(addTen(90))
+      print(addTen(5))
+
+      def squareNumber(x):
+          return x * x
+
+      print(squareNumber(2))
+      print(squareNumber(10))
+  - type: tip
+    content: "매개변수 이름은 그 역할을 잘 나타내도록 짓는 것이 좋습니다. num, x 보다는 age, price처럼 의미 있는 이름이 좋습니다."
+
+- id: function_with_two_parameters
+  title: 두 개 매개변수 함수
+  subtitle: 여러 값을 받아 처리하기
+  blocks:
+  - type: text
+    content: 함수는 두 개 이상의 매개변수를 가질 수 있습니다. 매개변수들은 쉼표로 구분하며, 함수 호출 시에도 같은 순서로 인수를 전달해야 합니다. 매개변수가 여러 개이면 더 복잡한 계산이나 처리가 가능합니다.
+  - type: list
+    items:
+    - 쉼표로 매개변수 구분
+    - 호출 시 같은 순서로 인수 전달
+    - 더 복잡한 연산 가능
+    - 매개변수 개수 제한 없음
+  - type: code
+    language: python
+    title: 두 매개변수 함수
+    description: "두 개의 매개변수를 받아 처리합니다."
+    content: |-
+      def generateFullName(firstName, lastName):
+          twoParamFullName = firstName + ' ' + lastName
+          return twoParamFullName
+
+      print(generateFullName('Asabeneh', 'Yetayeh'))
+      print(generateFullName('Kim', 'Cheolsu'))
+
+      def sumTwoNumbers(numOne, numTwo):
+          twoParamTotal = numOne + numTwo
+          return twoParamTotal
+
+      print(sumTwoNumbers(1, 9))
+      print(sumTwoNumbers(10, 20))
+
+      def calculateAge(currentYear, birthYear):
+          twoParamAge = currentYear - birthYear
+          return twoParamAge
+
+      print(calculateAge(2024, 1990))
+      print(calculateAge(2024, 2000))
+  - type: tip
+    content: "매개변수 순서를 혼동하기 쉬우니, 키워드 인수를 사용하면 더 명확하게 호출할 수 있습니다."
+
+- id: function_keyword_arguments
+  title: 키워드 인수
+  subtitle: 매개변수 이름으로 값 전달
+  blocks:
+  - type: text
+    content: 함수를 호출할 때 매개변수 이름을 명시하여 값을 전달할 수 있습니다. 이를 키워드 인수(keyword argument)라고 합니다. 키워드 인수를 사용하면 인수의 순서가 중요하지 않으며, 코드의 가독성이 향상됩니다. 어떤 값이 어떤 매개변수에 전달되는지 명확하게 알 수 있습니다.
+  - type: list
+    items:
+    - "매개변수이름=값 형태로 호출"
+    - 인수 순서 무관
+    - 코드 가독성 향상
+    - 실수 방지에 도움
+  - type: code
+    language: python
+    title: 키워드 인수 사용
+    description: "매개변수 이름을 명시하여 값을 전달합니다."
+    content: |-
+      def printFullname(firstname, lastname):
+          kwargFullName = firstname + ' ' + lastname
+          print(kwargFullName)
+
+      printFullname(firstname='Asabeneh', lastname='Yetayeh')
+      printFullname(lastname='Kim', firstname='Cheolsu')
+
+      def addTwoNumbers(num1, num2):
+          kwargTotal = num1 + num2
+          return kwargTotal
+
+      print(addTwoNumbers(num1=2, num2=3))
+      print(addTwoNumbers(num2=10, num1=5))
+  - type: tip
+    content: "위치 인수와 키워드 인수를 혼합할 때는 위치 인수가 먼저 와야 합니다. func(1, name='Kim')은 되지만 func(name='Kim', 1)은 에러입니다."
+
+- id: function_default_parameters
+  title: 기본 매개변수
+  subtitle: 기본값을 가진 매개변수
+  blocks:
+  - type: text
+    content: 매개변수에 기본값(default value)을 설정할 수 있습니다. 함수 호출 시 해당 매개변수에 인수를 전달하지 않으면 기본값이 사용됩니다. 이를 통해 함수 호출을 더 유연하게 만들 수 있습니다. 자주 사용되는 값을 기본값으로 설정하면 편리합니다.
+  - type: list
+    items:
+    - "def func(param=기본값): 형태"
+    - 인수 생략 시 기본값 사용
+    - 선택적 매개변수 구현
+    - 함수 호출의 유연성 제공
+  - type: code
+    language: python
+    title: 기본 매개변수 설정
+    description: "매개변수에 기본값을 설정합니다."
+    content: |-
+      def greetings(name='Guest'):
+          defaultMessage = name + ', welcome to Python!'
+          return defaultMessage
+
+      print(greetings())
+      print(greetings('Asabeneh'))
+
+      def calculateAge(birthYear, currentYear=2024):
+          defaultAge = currentYear - birthYear
+          return defaultAge
+
+      print(calculateAge(1990))
+      print(calculateAge(1990, 2025))
+
+      def weightOfObject(mass, gravity=9.81):
+          defaultWeight = mass * gravity
+          return str(defaultWeight) + ' N'
+
+      print(weightOfObject(100))
+      print(weightOfObject(100, 1.62))
+  - type: tip
+    content: "기본값이 있는 매개변수는 기본값이 없는 매개변수 뒤에 와야 합니다. def func(a, b=10)은 되지만 def func(a=10, b)는 에러입니다."
+
+- id: function_arbitrary_arguments
+  title: 가변 인수 함수
+  subtitle: "*args로 여러 인수 받기"
+  blocks:
+  - type: text
+    content: 함수에 전달할 인수의 개수를 미리 알 수 없을 때 *args를 사용합니다. *args 앞의 별표(*)는 "여러 개"를 의미하며, 전달된 모든 인수를 튜플로 묶어서 받습니다. 이를 통해 인수의 개수에 제한 없이 함수를 호출할 수 있습니다.
+  - type: list
+    items:
+    - "*args로 가변 인수 받기"
+    - 인수들이 튜플로 전달됨
+    - 인수 개수 제한 없음
+    - for 문으로 처리 가능
+  - type: code
+    language: python
+    title: 가변 인수 사용
+    description: "*args로 여러 개의 인수를 받습니다."
+    content: |-
+      def sumAllNums(*nums):
+          argsTotal = 0
+          for num in nums:
+              argsTotal = argsTotal + num
+          return argsTotal
+
+      print(sumAllNums(2, 3, 5))
+      print(sumAllNums(1, 2, 3, 4, 5))
+      print(sumAllNums(10, 20, 30, 40, 50, 60))
+
+      def generateGroups(team, *members):
+          print(team)
+          for member in members:
+              print(member)
+
+      generateGroups('Team-1', 'Asabeneh', 'Brook', 'David')
+  - type: tip
+    content: "*args는 관례적인 이름으로, *numbers, *items 등 다른 이름도 사용 가능합니다. 중요한 것은 별표(*)입니다."
+
+- id: function_as_parameter
+  title: 함수를 매개변수로 전달
+  subtitle: 고차 함수 기본 개념
+  blocks:
+  - type: text
+    content: 파이썬에서 함수도 하나의 값(객체)으로 취급됩니다. 따라서 함수를 변수에 저장하거나, 다른 함수의 매개변수로 전달할 수 있습니다. 함수를 매개변수로 받는 함수를 고차 함수(higher-order function)라고 합니다. 이를 통해 더 유연하고 재사용 가능한 코드를 작성할 수 있습니다.
+  - type: list
+    items:
+    - 함수도 값(객체)으로 취급
+    - 다른 함수의 인수로 전달 가능
+    - 고차 함수 구현
+    - 코드 재사용성 향상
+  - type: code
+    language: python
+    title: 함수를 매개변수로 전달
+    description: "함수를 다른 함수의 인수로 전달합니다."
+    content: |-
+      def squareNumber(n):
+          return n * n
+
+      def cubeNumber(n):
+          return n * n * n
+
+      def doSomething(f, x):
+          return f(x)
+
+      print(doSomething(squareNumber, 3))
+      print(doSomething(cubeNumber, 3))
+
+      def addTen(n):
+          return n + 10
+
+      def applyOperation(operation, number):
+          return operation(number)
+
+      print(applyOperation(addTen, 5))
+      print(applyOperation(squareNumber, 5))
+  - type: tip
+    content: "함수를 인수로 전달할 때는 괄호 없이 함수 이름만 씁니다. squareNumber()가 아니라 squareNumber입니다."
+
+- id: function_return_types
+  title: 다양한 반환 타입
+  subtitle: 숫자, 문자열, 리스트, 불린 반환
+  blocks:
+  - type: text
+    content: 함수는 어떤 데이터 타입이든 반환할 수 있습니다. 숫자, 문자열, 불린, 리스트, 딕셔너리 등 모든 타입이 가능합니다. 상황에 따라 적절한 타입을 반환하도록 함수를 설계하면 됩니다. 조건에 따라 다른 값을 반환하는 것도 가능합니다.
+  - type: list
+    items:
+    - 모든 데이터 타입 반환 가능
+    - 조건부 return 가능
+    - 리스트나 딕셔너리도 반환
+    - return 즉시 함수 종료
+  - type: code
+    language: python
+    title: 다양한 반환 타입
+    description: "숫자, 불린, 리스트 등 다양한 타입을 반환합니다."
+    content: |-
+      def isEven(n):
+          if n % 2 == 0:
+              return True
+          return False
+
+      print(isEven(10))
+      print(isEven(7))
+
+      def findEvenNumbers(n):
+          typeEvens = []
+          for i in range(n + 1):
+              if i % 2 == 0:
+                  typeEvens.append(i)
+          return typeEvens
+
+      print(findEvenNumbers(10))
+
+      def areaOfCircle(r):
+          typePI = 3.14
+          typeArea = typePI * r * r
+          return typeArea
+
+      print(areaOfCircle(10))
+      print(areaOfCircle(5))
+
+- id: function_sum_sequence
+  title: 수열 합계 함수
+  subtitle: 반복문과 함수 결합
+  blocks:
+  - type: text
+    content: 함수 내부에서 반복문을 사용하면 복잡한 계산을 자동화할 수 있습니다. 1부터 n까지의 합, 짝수의 합, 홀수의 합 등 수열 관련 계산을 함수로 만들면 다양한 범위에서 재사용할 수 있습니다.
+  - type: list
+    items:
+    - 반복문과 함수의 조합
+    - 누적 계산 구현
+    - 다양한 범위 처리 가능
+    - 복잡한 연산 단순화
+  - type: code
+    language: python
+    title: 수열 합계 함수
+    description: "1부터 n까지의 합을 계산합니다."
+    content: |-
+      def sumOfNumbers(n):
+          seqTotal = 0
+          for i in range(n + 1):
+              seqTotal = seqTotal + i
+          return seqTotal
+
+      print(sumOfNumbers(10))
+      print(sumOfNumbers(100))
+
+      def sumOfOdds(n):
+          seqOddsTotal = 0
+          for i in range(n + 1):
+              if i % 2 == 1:
+                  seqOddsTotal = seqOddsTotal + i
+          return seqOddsTotal
+
+      print(sumOfOdds(10))
+
+      def sumOfEvens(n):
+          seqEvensTotal = 0
+          for i in range(n + 1):
+              if i % 2 == 0:
+                  seqEvensTotal = seqEvensTotal + i
+          return seqEvensTotal
+
+      print(sumOfEvens(10))
+
+- id: practice
+  title: 11일차 복습
+  subtitle: 함수 미션
+  blocks:
+  - type: text
+    content: 11일차에서 배운 함수를 복습하는 미션입니다. 함수 정의, 매개변수, return, 기본값, 가변 인수 등을 종합적으로 연습해봅시다.
+  - type: expansion
+    title: "미션1: 인사말 함수"
+    code: |-
+      def greet(name):
+          return 'Hello, ' + name + '!'
+
+      print(greet('Python'))
+      print(greet('World'))
+  - type: expansion
+    title: "미션2: 원의 넓이 계산"
+    code: |-
+      def areaOfCircle(radius):
+          mission2PI = 3.14159
+          mission2Area = mission2PI * radius * radius
+          return mission2Area
+
+      print(areaOfCircle(5))
+      print(areaOfCircle(10))
+  - type: expansion
+    title: "미션3: 기본값 활용"
+    code: |-
+      def power(base, exponent=2):
+          mission3Result = base ** exponent
+          return mission3Result
+
+      print(power(3))
+      print(power(2, 10))
+  - type: expansion
+    title: "미션4: 가변 인수 합계"
+    code: |-
+      def sumAll(*numbers):
+          mission4Total = 0
+          for num in numbers:
+              mission4Total = mission4Total + num
+          return mission4Total
+
+      print(sumAll(1, 2, 3))
+      print(sumAll(10, 20, 30, 40, 50))
+  - type: expansion
+    title: "미션5: 팩토리얼 계산"
+    code: |-
+      def factorial(n):
+          mission5Result = 1
+          for i in range(1, n + 1):
+              mission5Result = mission5Result * i
+          return mission5Result
+
+      print(factorial(5))
+      print(factorial(10))
+  - type: expansion
+    title: "미션6: 소수 판별"
+    code: |-
+      def isPrime(n):
+          if n < 2:
+              return False
+          for i in range(2, n):
+              if n % i == 0:
+                  return False
+          return True
+
+      print(isPrime(7))
+      print(isPrime(10))
+      print(isPrime(13))
+  - type: expansion
+    title: "미션7: 온도 변환"
+    code: |-
+      def celsiusToFahrenheit(celsius):
+          mission7Fahrenheit = (celsius * 9 / 5) + 32
+          return mission7Fahrenheit
+
+      def fahrenheitToCelsius(fahrenheit):
+          mission7Celsius = (fahrenheit - 32) * 5 / 9
+          return mission7Celsius
+
+      print(celsiusToFahrenheit(0))
+      print(celsiusToFahrenheit(100))
+      print(fahrenheitToCelsius(32))
+      print(fahrenheitToCelsius(212))

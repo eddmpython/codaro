@@ -1,0 +1,1056 @@
+meta:
+  id: "08"
+  title: "추상 클래스와 프로토콜"
+  day: 8
+  category: "advancedPython"
+  tags: ["abc", "abstractmethod", "Protocol", "duck typing"]
+  seo:
+    title: "파이썬 ABC와 Protocol - 인터페이스 설계 완벽 가이드"
+    description: "추상 클래스와 프로토콜로 인터페이스를 설계합니다. ABC, abstractmethod, 덕 타이핑, typing.Protocol 완벽 이해."
+    keywords: ["ABC", "abstractmethod", "Protocol", "덕타이핑", "interface"]
+
+intro:
+  emoji: "📋"
+  points:
+  - "ABC 모듈로 추상 클래스 정의"
+  - "abstractmethod로 필수 메서드 강제"
+  - "덕 타이핑의 원리와 활용"
+  - "typing.Protocol로 구조적 타이핑"
+
+sections:
+- id: "abc_module"
+  title: "abc 모듈"
+  subtitle: "추상 클래스 기초"
+  blocks:
+  - type: "text"
+    content: "ABC(Abstract Base Class)는 인스턴스화할 수 없는 추상 클래스입니다. abc 모듈의 ABC 클래스를 상속하거나 metaclass=ABCMeta를 지정합니다. @abstractmethod로 데코레이트된 메서드는 서브클래스에서 반드시 구현해야 합니다. 추상 메서드를 구현하지 않으면 서브클래스도 인스턴스화할 수 없습니다. ABC는 인터페이스 계약을 강제하여 API 일관성을 보장합니다. collections.abc에는 Iterable, Mapping 등 유용한 추상 클래스가 정의되어 있습니다."
+  - type: "list"
+    items:
+    - "ABC 상속 또는 metaclass=ABCMeta"
+    - "@abstractmethod: 필수 구현 메서드"
+    - "추상 클래스는 인스턴스화 불가"
+    - "서브클래스에서 모든 추상 메서드 구현 필수"
+  - type: "code"
+    language: "python"
+    title: "기본 ABC"
+    description: "추상 클래스를 정의합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Shape(ABC):
+          @abstractmethod
+          def area(self):
+              pass
+
+          @abstractmethod
+          def perimeter(self):
+              pass
+
+      class Rectangle(Shape):
+          def __init__(self, width, height):
+              self.width = width
+              self.height = height
+
+          def area(self):
+              return self.width * self.height
+
+          def perimeter(self):
+              return 2 * (self.width + self.height)
+
+      Rectangle(3, 4).area()
+  - type: "code"
+    language: "python"
+    title: "추상 메서드 미구현 시 오류"
+    description: "추상 메서드를 구현하지 않으면 에러가 발생합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Animal(ABC):
+          @abstractmethod
+          def speak(self):
+              pass
+
+      class Dog(Animal):
+          def speak(self):
+              return "Woof!"
+
+      class Cat(Animal):
+          def speak(self):
+              return "Meow!"
+
+      Dog().speak(), Cat().speak()
+  - type: "code"
+    language: "python"
+    title: "추상 메서드와 일반 메서드"
+    description: "일반 메서드는 상속됩니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Vehicle(ABC):
+          def __init__(self, brand):
+              self.brand = brand
+
+          @abstractmethod
+          def start(self):
+              pass
+
+          def info(self):
+              return f"{self.brand} vehicle"
+
+      class Car(Vehicle):
+          def start(self):
+              return f"{self.brand} engine started"
+
+      car = Car("Toyota")
+      car.start(), car.info()
+  - type: "tip"
+    content: "ABC 자체를 인스턴스화하려고 하면 TypeError: Can't instantiate abstract class가 발생합니다."
+
+- id: "abstract_property"
+  title: "추상 프로퍼티"
+  subtitle: "@property + @abstractmethod"
+  blocks:
+  - type: "text"
+    content: "추상 프로퍼티는 서브클래스에서 반드시 정의해야 하는 속성입니다. @property와 @abstractmethod를 함께 사용합니다. Python 3.3 이전에는 @abstractproperty가 있었지만 이제는 데코레이터를 조합합니다. @abstractmethod는 가장 안쪽(아래쪽)에 위치해야 합니다. 추상 classmethod와 staticmethod도 같은 방식으로 정의합니다. 추상 프로퍼티는 설정자(setter)나 삭제자(deleter)도 추상화할 수 있습니다."
+  - type: "list"
+    items:
+    - "@property + @abstractmethod 조합"
+    - "@abstractmethod는 가장 안쪽에"
+    - "추상 classmethod: @classmethod + @abstractmethod"
+    - "추상 staticmethod: @staticmethod + @abstractmethod"
+  - type: "code"
+    language: "python"
+    title: "추상 프로퍼티"
+    description: "추상 프로퍼티를 정의합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Sized(ABC):
+          @property
+          @abstractmethod
+          def size(self):
+              pass
+
+      class MyList(Sized):
+          def __init__(self, items):
+              self._items = items
+
+          @property
+          def size(self):
+              return len(self._items)
+
+      MyList([1, 2, 3]).size
+  - type: "code"
+    language: "python"
+    title: "추상 클래스메서드"
+    description: "추상 클래스메서드를 정의합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Factory(ABC):
+          @classmethod
+          @abstractmethod
+          def create(cls, data):
+              pass
+
+      class UserFactory(Factory):
+          @classmethod
+          def create(cls, data):
+              return {"type": "user", "data": data}
+
+      UserFactory.create("alice")
+  - type: "code"
+    language: "python"
+    title: "getter와 setter 모두 추상화"
+    description: "읽기와 쓰기 모두 필수로 만듭니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Configurable(ABC):
+          @property
+          @abstractmethod
+          def setting(self):
+              pass
+
+          @setting.setter
+          @abstractmethod
+          def setting(self, value):
+              pass
+
+      class AppConfig(Configurable):
+          def __init__(self):
+              self._setting = None
+
+          @property
+          def setting(self):
+              return self._setting
+
+          @setting.setter
+          def setting(self, value):
+              self._setting = value
+
+      config = AppConfig()
+      config.setting = "dark mode"
+      config.setting
+  - type: "tip"
+    content: "Python 3.3+에서는 @abstractproperty 대신 @property + @abstractmethod를 사용합니다."
+
+- id: "interface_design"
+  title: "인터페이스 설계"
+  subtitle: "명시적 계약"
+  blocks:
+  - type: "text"
+    content: "ABC를 사용한 인터페이스 설계는 명시적인 계약을 만듭니다. 인터페이스를 상속받는 클래스는 정해진 메서드를 반드시 구현해야 합니다. 이는 팀 협업이나 대규모 프로젝트에서 API 일관성을 보장합니다. 추상 클래스에 docstring을 작성하면 인터페이스 문서화도 됩니다. 기본 구현을 제공하면서 일부만 추상화할 수도 있습니다. 추상 메서드 안에도 코드를 작성할 수 있으며 super()로 호출할 수 있습니다."
+  - type: "list"
+    items:
+    - "명시적인 API 계약"
+    - "문서화된 인터페이스"
+    - "기본 구현 제공 가능"
+    - "super()로 부모 추상 메서드 호출 가능"
+  - type: "code"
+    language: "python"
+    title: "인터페이스 문서화"
+    description: "docstring으로 계약을 문서화합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Repository(ABC):
+          """데이터 저장소 인터페이스."""
+
+          @abstractmethod
+          def find(self, id):
+              """ID로 항목을 찾습니다.
+
+              Args:
+                  id: 검색할 항목의 ID
+
+              Returns:
+                  찾은 항목 또는 None
+              """
+              pass
+
+          @abstractmethod
+          def save(self, item):
+              """항목을 저장합니다."""
+              pass
+
+      class MemoryRepository(Repository):
+          def __init__(self):
+              self._data = {}
+
+          def find(self, id):
+              return self._data.get(id)
+
+          def save(self, item):
+              self._data[item["id"]] = item
+
+      repo = MemoryRepository()
+      repo.save({"id": 1, "name": "test"})
+      repo.find(1)
+  - type: "code"
+    language: "python"
+    title: "부분 추상화"
+    description: "일부 메서드만 추상화합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Logger(ABC):
+          def __init__(self, name):
+              self.name = name
+
+          @abstractmethod
+          def write(self, message):
+              pass
+
+          def info(self, message):
+              self.write(f"[INFO] {self.name}: {message}")
+
+          def error(self, message):
+              self.write(f"[ERROR] {self.name}: {message}")
+
+      class ConsoleLogger(Logger):
+          def __init__(self, name):
+              super().__init__(name)
+              self.messages = []
+
+          def write(self, message):
+              self.messages.append(message)
+
+      logger = ConsoleLogger("app")
+      logger.info("Started")
+      logger.error("Something wrong")
+      logger.messages
+  - type: "code"
+    language: "python"
+    title: "추상 메서드에 기본 구현"
+    description: "추상 메서드도 코드를 가질 수 있습니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Formatter(ABC):
+          @abstractmethod
+          def format(self, data):
+              return str(data)
+
+      class JSONFormatter(Formatter):
+          def format(self, data):
+              base = super().format(data)
+              return f'{{"value": "{base}"}}'
+
+      JSONFormatter().format(42)
+  - type: "tip"
+    content: "register() 메서드로 기존 클래스를 ABC의 가상 서브클래스로 등록할 수 있습니다."
+
+- id: "duck_typing"
+  title: "덕 타이핑"
+  subtitle: "타입보다 행동"
+  blocks:
+  - type: "text"
+    content: "덕 타이핑(duck typing)은 '오리처럼 걷고 꽥꽥거리면 오리다'라는 원칙입니다. 객체의 타입보다 객체가 어떤 메서드를 가지고 있는지가 중요합니다. 파이썬은 동적 타이핑 언어로 덕 타이핑을 자연스럽게 지원합니다. isinstance 검사 대신 hasattr이나 EAFP(허락보다 용서가 쉽다) 스타일을 사용합니다. 덕 타이핑은 유연하지만 런타임에 오류가 발생할 수 있습니다. ABC와 덕 타이핑은 상호 보완적입니다."
+  - type: "list"
+    items:
+    - "타입이 아닌 행동(메서드)으로 판단"
+    - "isinstance 검사 최소화"
+    - "EAFP: 일단 시도하고 예외 처리"
+    - "유연하지만 런타임 오류 가능"
+  - type: "code"
+    language: "python"
+    title: "덕 타이핑 예제"
+    description: "타입이 아닌 메서드로 판단합니다."
+    content: |-
+      class Duck:
+          def quack(self):
+              return "Quack!"
+
+          def walk(self):
+              return "Walking"
+
+      class Person:
+          def quack(self):
+              return "I'm quacking like a duck!"
+
+          def walk(self):
+              return "Walking like a duck"
+
+      def makeQuack(thing):
+          return thing.quack()
+
+      makeQuack(Duck()), makeQuack(Person())
+  - type: "code"
+    language: "python"
+    title: "EAFP 스타일"
+    description: "일단 시도하고 예외를 처리합니다."
+    content: |-
+      def getLength(obj):
+          try:
+              return len(obj)
+          except TypeError:
+              return None
+
+      getLength([1, 2, 3]), getLength("hello"), getLength(42)
+  - type: "code"
+    language: "python"
+    title: "hasattr 사용"
+    description: "메서드 존재 여부를 확인합니다."
+    content: |-
+      class Streamable:
+          def stream(self):
+              return "streaming..."
+
+      class NotStreamable:
+          pass
+
+      def tryStream(obj):
+          if hasattr(obj, "stream"):
+              return obj.stream()
+          return "Not streamable"
+
+      tryStream(Streamable()), tryStream(NotStreamable())
+  - type: "tip"
+    content: "LBYL(Look Before You Leap)보다 EAFP가 파이썬에서 권장됩니다."
+
+- id: "protocol_typing"
+  title: "typing.Protocol"
+  subtitle: "구조적 서브타이핑"
+  blocks:
+  - type: "text"
+    content: "typing.Protocol은 Python 3.8에서 도입된 구조적 서브타이핑입니다. 명시적으로 상속하지 않아도 필요한 메서드를 가지면 타입 검사를 통과합니다. 덕 타이핑을 정적 타입 검사와 결합합니다. runtime_checkable 데코레이터를 추가하면 isinstance로도 검사할 수 있습니다. Protocol은 ABC와 달리 상속이 필요 없어 기존 클래스와의 호환성이 좋습니다."
+  - type: "list"
+    items:
+    - "Python 3.8+ typing.Protocol"
+    - "명시적 상속 없이 타입 매칭"
+    - "@runtime_checkable로 isinstance 지원"
+    - "정적 타입 검사 도구와 호환"
+  - type: "code"
+    language: "python"
+    title: "Protocol 기본"
+    description: "Protocol로 인터페이스를 정의합니다."
+    content: |-
+      from typing import Protocol
+
+      class Drawable(Protocol):
+          def draw(self) -> str:
+              ...
+
+      class Circle:
+          def draw(self) -> str:
+              return "Drawing circle"
+
+      class Square:
+          def draw(self) -> str:
+              return "Drawing square"
+
+      def render(shape: Drawable) -> str:
+          return shape.draw()
+
+      render(Circle()), render(Square())
+  - type: "code"
+    language: "python"
+    title: "runtime_checkable"
+    description: "isinstance로 Protocol을 검사합니다."
+    content: |-
+      from typing import Protocol, runtime_checkable
+
+      @runtime_checkable
+      class Closable(Protocol):
+          def close(self) -> None:
+              ...
+
+      class File:
+          def close(self) -> None:
+              pass
+
+      class Connection:
+          def close(self) -> None:
+              pass
+
+      class Number:
+          pass
+
+      isinstance(File(), Closable), isinstance(Number(), Closable)
+  - type: "code"
+    language: "python"
+    title: "Protocol vs ABC"
+    description: "Protocol과 ABC의 차이를 보여줍니다."
+    content: |-
+      from abc import ABC, abstractmethod
+      from typing import Protocol, runtime_checkable
+
+      class ABCAnimal(ABC):
+          @abstractmethod
+          def speak(self) -> str:
+              pass
+
+      @runtime_checkable
+      class ProtocolAnimal(Protocol):
+          def speak(self) -> str:
+              ...
+
+      class Dog:
+          def speak(self) -> str:
+              return "Woof"
+
+      isinstance(Dog(), ProtocolAnimal)
+  - type: "tip"
+    content: "Protocol은 타입 힌팅용이며, runtime_checkable은 메서드 존재만 확인하고 시그니처는 검사하지 않습니다."
+
+- id: "practical_abc"
+  title: "실전 ABC"
+  subtitle: "플러그인과 전략 패턴"
+  blocks:
+  - type: "text"
+    content: "ABC는 플러그인 시스템이나 전략 패턴 구현에 유용합니다. 플러그인 시스템에서 모든 플러그인이 구현해야 할 인터페이스를 ABC로 정의합니다. 전략 패턴에서 다양한 알고리즘을 같은 인터페이스로 교체할 수 있습니다. 의존성 주입(Dependency Injection)에서도 인터페이스를 ABC로 정의합니다. register 메서드로 기존 클래스를 가상 서브클래스로 등록할 수 있습니다."
+  - type: "list"
+    items:
+    - "플러그인: 확장 가능한 아키텍처"
+    - "전략: 교체 가능한 알고리즘"
+    - "의존성 주입: 추상화에 의존"
+    - "register: 가상 서브클래스 등록"
+  - type: "code"
+    language: "python"
+    title: "플러그인 시스템"
+    description: "ABC로 플러그인 인터페이스를 정의합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Plugin(ABC):
+          @property
+          @abstractmethod
+          def name(self) -> str:
+              pass
+
+          @abstractmethod
+          def execute(self, data: dict) -> dict:
+              pass
+
+      class ValidationPlugin(Plugin):
+          @property
+          def name(self) -> str:
+              return "validator"
+
+          def execute(self, data: dict) -> dict:
+              data["validated"] = True
+              return data
+
+      class LoggingPlugin(Plugin):
+          @property
+          def name(self) -> str:
+              return "logger"
+
+          def execute(self, data: dict) -> dict:
+              data["logged"] = True
+              return data
+
+      plugins = [ValidationPlugin(), LoggingPlugin()]
+      result = {"value": 42}
+      for p in plugins:
+          result = p.execute(result)
+      result
+  - type: "code"
+    language: "python"
+    title: "전략 패턴"
+    description: "교체 가능한 알고리즘을 구현합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class SortStrategy(ABC):
+          @abstractmethod
+          def sort(self, data: list) -> list:
+              pass
+
+      class AscendingSort(SortStrategy):
+          def sort(self, data: list) -> list:
+              return sorted(data)
+
+      class DescendingSort(SortStrategy):
+          def sort(self, data: list) -> list:
+              return sorted(data, reverse=True)
+
+      class Sorter:
+          def __init__(self, strategy: SortStrategy):
+              self.strategy = strategy
+
+          def sortData(self, data: list) -> list:
+              return self.strategy.sort(data)
+
+      data = [3, 1, 4, 1, 5, 9]
+      Sorter(AscendingSort()).sortData(data), Sorter(DescendingSort()).sortData(data)
+  - type: "code"
+    language: "python"
+    title: "가상 서브클래스"
+    description: "register로 기존 클래스를 등록합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Printable(ABC):
+          @abstractmethod
+          def printOut(self):
+              pass
+
+      class ExternalClass:
+          def printOut(self):
+              return "External printing"
+
+      Printable.register(ExternalClass)
+
+      isinstance(ExternalClass(), Printable)
+  - type: "tip"
+    content: "가상 서브클래스는 isinstance를 통과하지만 실제로 추상 메서드 구현을 강제하지는 않습니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "ABC와 Protocol 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 8에서 배운 추상 클래스와 프로토콜을 난이도별로 복습합니다. ABC(Abstract Base Class)는 인터페이스를 강제하는 명목적 서브타이핑을, Protocol은 구조적 서브타이핑(덕 타이핑)을 제공합니다. 둘 다 코드의 타입 안전성과 설계 명확성을 높이는 도구입니다. 🟢 기본 문제로 ABC와 abstractmethod, Protocol 정의를 익히고, 🟡 응용 문제로 추상 프로퍼티, runtime_checkable 패턴을 연습하세요. 🔴 심화 문제에서는 믹스인, 가상 서브클래스, 제네릭 Protocol 등 고급 인터페이스 설계를 다룹니다. 대규모 프로젝트에서 명확한 인터페이스 정의는 유지보수성의 핵심입니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 기본 ABC"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Greeter(ABC):
+          @abstractmethod
+          def greet(self):
+              pass
+
+      class Hello(Greeter):
+          def greet(self):
+              return "Hello!"
+
+      Hello().greet()
+
+  - type: "expansion"
+    title: "🟢 기본2: 여러 추상 메서드"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Calculator(ABC):
+          @abstractmethod
+          def add(self, a, b):
+              pass
+
+          @abstractmethod
+          def multiply(self, a, b):
+              pass
+
+      class SimpleCalc(Calculator):
+          def add(self, a, b):
+              return a + b
+
+          def multiply(self, a, b):
+              return a * b
+
+      calc = SimpleCalc()
+      calc.add(2, 3), calc.multiply(2, 3)
+
+  - type: "expansion"
+    title: "🟢 기본3: 추상 프로퍼티"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Named(ABC):
+          @property
+          @abstractmethod
+          def name(self):
+              pass
+
+      class Person(Named):
+          def __init__(self, n):
+              self._name = n
+
+          @property
+          def name(self):
+              return self._name
+
+      Person("Alice").name
+
+  - type: "expansion"
+    title: "🟢 기본4: Protocol 기본"
+    code: |-
+      from typing import Protocol
+
+      class Speakable(Protocol):
+          def speak(self) -> str:
+              ...
+
+      class Dog:
+          def speak(self) -> str:
+              return "Woof"
+
+      def makeSpeak(obj: Speakable) -> str:
+          return obj.speak()
+
+      makeSpeak(Dog())
+
+  - type: "expansion"
+    title: "🟢 기본5: runtime_checkable"
+    code: |-
+      from typing import Protocol, runtime_checkable
+
+      @runtime_checkable
+      class Runnable(Protocol):
+          def run(self) -> None:
+              ...
+
+      class Task:
+          def run(self) -> None:
+              pass
+
+      isinstance(Task(), Runnable)
+
+  - type: "expansion"
+    title: "🟡 응용1: 일반 메서드와 추상 메서드"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class DataProcessor(ABC):
+          def process(self, data):
+              cleaned = self.clean(data)
+              return self.transform(cleaned)
+
+          def clean(self, data):
+              return [x for x in data if x is not None]
+
+          @abstractmethod
+          def transform(self, data):
+              pass
+
+      class Doubler(DataProcessor):
+          def transform(self, data):
+              return [x * 2 for x in data]
+
+      Doubler().process([1, None, 2, 3])
+
+  - type: "expansion"
+    title: "🟡 응용2: 추상 클래스메서드"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Builder(ABC):
+          @classmethod
+          @abstractmethod
+          def build(cls, config):
+              pass
+
+      class HTMLBuilder(Builder):
+          @classmethod
+          def build(cls, config):
+              return f"<{config['tag']}>{config['content']}</{config['tag']}>"
+
+      HTMLBuilder.build({"tag": "p", "content": "Hello"})
+
+  - type: "expansion"
+    title: "🟡 응용3: Protocol 상속"
+    code: |-
+      from typing import Protocol
+
+      class Readable(Protocol):
+          def read(self) -> str:
+              ...
+
+      class Writable(Protocol):
+          def write(self, data: str) -> None:
+              ...
+
+      class ReadWritable(Readable, Writable, Protocol):
+          pass
+
+      class File:
+          def read(self) -> str:
+              return "content"
+          def write(self, data: str) -> None:
+              pass
+
+      def process(f: ReadWritable):
+          return f.read()
+
+      process(File())
+
+  - type: "expansion"
+    title: "🟡 응용4: 가상 서브클래스"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Serializable(ABC):
+          @abstractmethod
+          def serialize(self):
+              pass
+
+      class ExternalData:
+          def serialize(self):
+              return '{"external": true}'
+
+      Serializable.register(ExternalData)
+      isinstance(ExternalData(), Serializable)
+
+  - type: "expansion"
+    title: "🟡 응용5: 덕 타이핑 활용"
+    code: |-
+      def iterateOver(obj):
+          try:
+              for item in obj:
+                  yield item
+          except TypeError:
+              yield obj
+
+      list(iterateOver([1, 2, 3])), list(iterateOver(42))
+
+  - type: "expansion"
+    title: "🔴 심화1: 전략 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class DiscountStrategy(ABC):
+          @abstractmethod
+          def calculate(self, price: float) -> float:
+              pass
+
+      class NoDiscount(DiscountStrategy):
+          def calculate(self, price: float) -> float:
+              return price
+
+      class PercentDiscount(DiscountStrategy):
+          def __init__(self, percent: float):
+              self.percent = percent
+
+          def calculate(self, price: float) -> float:
+              return price * (1 - self.percent / 100)
+
+      class FixedDiscount(DiscountStrategy):
+          def __init__(self, amount: float):
+              self.amount = amount
+
+          def calculate(self, price: float) -> float:
+              return max(0, price - self.amount)
+
+      strategies = [NoDiscount(), PercentDiscount(10), FixedDiscount(5)]
+      [s.calculate(100) for s in strategies]
+
+  - type: "expansion"
+    title: "🔴 심화2: 플러그인 시스템"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Middleware(ABC):
+          @abstractmethod
+          def process(self, request: dict) -> dict:
+              pass
+
+      class AuthMiddleware(Middleware):
+          def process(self, request: dict) -> dict:
+              request["authenticated"] = True
+              return request
+
+      class LogMiddleware(Middleware):
+          def process(self, request: dict) -> dict:
+              request["logged"] = True
+              return request
+
+      class Pipeline:
+          def __init__(self):
+              self.middlewares = []
+
+          def add(self, m: Middleware):
+              self.middlewares.append(m)
+
+          def run(self, request: dict) -> dict:
+              for m in self.middlewares:
+                  request = m.process(request)
+              return request
+
+      pipe = Pipeline()
+      pipe.add(AuthMiddleware())
+      pipe.add(LogMiddleware())
+      pipe.run({"path": "/api"})
+
+  - type: "expansion"
+    title: "🔴 심화3: 템플릿 메서드 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class DataExporter(ABC):
+          def export(self, data):
+              formatted = self.format(data)
+              validated = self.validate(formatted)
+              return self.output(validated)
+
+          @abstractmethod
+          def format(self, data):
+              pass
+
+          def validate(self, data):
+              return data
+
+          @abstractmethod
+          def output(self, data):
+              pass
+
+      class JSONExporter(DataExporter):
+          def format(self, data):
+              import json
+              return json.dumps(data)
+
+          def output(self, data):
+              return f"JSON: {data}"
+
+      class CSVExporter(DataExporter):
+          def format(self, data):
+              return ",".join(str(x) for x in data)
+
+          def output(self, data):
+              return f"CSV: {data}"
+
+      JSONExporter().export({"a": 1}), CSVExporter().export([1, 2, 3])
+
+  - type: "expansion"
+    title: "🔴 심화4: Protocol with 속성"
+    code: |-
+      from typing import Protocol, runtime_checkable
+
+      @runtime_checkable
+      class Named(Protocol):
+          name: str
+
+      class User:
+          def __init__(self, name: str):
+              self.name = name
+
+      class Product:
+          def __init__(self):
+              self.name = "Widget"
+
+      isinstance(User("Alice"), Named), isinstance(Product(), Named)
+
+  - type: "expansion"
+    title: "🔴 심화5: 다중 인터페이스"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Readable(ABC):
+          @abstractmethod
+          def read(self):
+              pass
+
+      class Writable(ABC):
+          @abstractmethod
+          def write(self, data):
+              pass
+
+      class Closable(ABC):
+          @abstractmethod
+          def close(self):
+              pass
+
+      class File(Readable, Writable, Closable):
+          def __init__(self):
+              self.data = ""
+              self.closed = False
+
+          def read(self):
+              return self.data
+
+          def write(self, data):
+              self.data = data
+
+          def close(self):
+              self.closed = True
+
+      file = File()
+      file.write("Hello")
+      file.read(), file.close(), file.closed
+
+  - type: "expansion"
+    title: "🔴 심화6: ABC __subclasshook__"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Iterable(ABC):
+          @abstractmethod
+          def __iter__(self):
+              pass
+
+          @classmethod
+          def __subclasshook__(cls, C):
+              if cls is Iterable:
+                  if hasattr(C, "__iter__"):
+                      return True
+              return NotImplemented
+
+      class MyCollection:
+          def __iter__(self):
+              return iter([1, 2, 3])
+
+      isinstance(MyCollection(), Iterable)
+
+  - type: "expansion"
+    title: "🔴 심화7: 의존성 주입"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Database(ABC):
+          @abstractmethod
+          def query(self, sql):
+              pass
+
+      class MemoryDB(Database):
+          def query(self, sql):
+              return f"Memory: {sql}"
+
+      class PostgresDB(Database):
+          def query(self, sql):
+              return f"Postgres: {sql}"
+
+      class Service:
+          def __init__(self, db: Database):
+              self.db = db
+
+          def getData(self):
+              return self.db.query("SELECT *")
+
+      Service(MemoryDB()).getData(), Service(PostgresDB()).getData()
+
+  - type: "expansion"
+    title: "🔴 심화8: 콜백 Protocol"
+    code: |-
+      from typing import Protocol, Callable
+
+      class EventHandler(Protocol):
+          def __call__(self, event: dict) -> None:
+              ...
+
+      class EventBus:
+          def __init__(self):
+              self.handlers: list[EventHandler] = []
+
+          def subscribe(self, handler: EventHandler):
+              self.handlers.append(handler)
+
+          def emit(self, event: dict):
+              results = []
+              for h in self.handlers:
+                  h(event)
+                  results.append("handled")
+              return results
+
+      bus = EventBus()
+      bus.subscribe(lambda e: None)
+      bus.emit({"type": "click"})
+
+  - type: "expansion"
+    title: "🔴 심화9: 제네릭 Protocol"
+    code: |-
+      from typing import Protocol, TypeVar
+
+      T = TypeVar("T")
+
+      class Container(Protocol[T]):
+          def get(self) -> T:
+              ...
+
+          def set(self, value: T) -> None:
+              ...
+
+      class Box:
+          def __init__(self):
+              self._value = None
+
+          def get(self):
+              return self._value
+
+          def set(self, value):
+              self._value = value
+
+      box = Box()
+      box.set(42)
+      box.get()
+
+  - type: "expansion"
+    title: "🔴 심화10: 상태 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class State(ABC):
+          @abstractmethod
+          def handle(self, context) -> str:
+              pass
+
+      class IdleState(State):
+          def handle(self, context) -> str:
+              context.state = RunningState()
+              return "Started"
+
+      class RunningState(State):
+          def handle(self, context) -> str:
+              context.state = IdleState()
+              return "Stopped"
+
+      class Machine:
+          def __init__(self):
+              self.state = IdleState()
+
+          def toggle(self):
+              return self.state.handle(self)
+
+      machine = Machine()
+      machine.toggle(), machine.toggle(), machine.toggle()

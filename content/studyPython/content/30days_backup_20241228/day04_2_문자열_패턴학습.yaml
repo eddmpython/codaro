@@ -1,0 +1,266 @@
+meta:
+  id: day04_2
+  title: 문자열 패턴학습
+  day: 4
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 문자열 - 텍스트 다루기"
+    description: "문자열 생성, 인덱싱, 슬라이싱, 메서드 사용법을 배웁니다."
+    keywords: ['문자열', 'string', '인덱싱', '슬라이싱']
+
+intro:
+  title: 문자열 마스터 패턴북
+  emoji: 🔥
+  description: |
+    이것만 외우면 문자열 마스터! 핵심 패턴만 모았습니다.
+    문자열은 프로그래밍에서 가장 많이 다루는 데이터 타입입니다.
+    10개의 패턴만 익히면 텍스트 처리의 90%는 해결할 수 있습니다.
+  points:
+    - '📝 생성: "텍스트" 또는 ''텍스트'''
+    - '🔗 연결: + 연산자로 문자열 합치기'
+    - '📝 포맷팅: f"{variable}" 형식'
+    - '🔢 인덱싱: 문자열[인덱스]'
+    - '✂️ 슬라이싱: 문자열[시작:끝]'
+    - '🔄 변환: upper(), lower(), strip()'
+    - '🔍 검색: find(), count(), in'
+    - '🔀 교체: replace(old, new)'
+    - '📊 분리/결합: split(), join()'
+    - '✅ 확인: isdigit(), isalpha()'
+  summary: 🔥 생성→포맷팅→조작→검색 순서로 마스터!
+
+sections:
+- id: creation
+  title: 1. 문자열 생성 패턴
+  subtitle: "\"text\", 'text', \"\"\"text\"\"\""
+  blocks:
+  - type: text
+    content: 문자열은 작은따옴표, 큰따옴표, 삼중따옴표 세 가지 방법으로 생성할 수 있습니다. 기능상 차이는 없지만, 문자열 안에 따옴표가 포함될 때 다른 종류를 사용하면 편리합니다. 삼중따옴표는 여러 줄 문자열이나 함수 설명(docstring)에 사용됩니다.
+  - type: code
+    language: python
+    title: 문자열 생성
+    description: "세 가지 따옴표 방식으로 문자열을 생성합니다. 상황에 맞게 선택합니다."
+    content: |-
+      name = "Python"
+      message = 'Hello World'
+      longText = """여러 줄
+      문자열"""
+      name, message
+
+- id: concatenation
+  title: 2. 연결 패턴
+  subtitle: str1 + str2
+  blocks:
+  - type: text
+    content: 문자열을 + 연산자로 연결할 수 있습니다. 숫자와 문자열을 연결하려면 str() 함수로 숫자를 먼저 문자열로 변환해야 합니다. 여러 문자열을 연결할 때는 + 연산자를 여러 번 사용하거나, f-string을 활용하는 것이 더 편리합니다.
+  - type: code
+    language: python
+    title: 문자열 연결
+    description: "+ 연산자로 문자열을 연결합니다. 숫자는 str()로 변환 후 연결합니다."
+    content: |-
+      firstWord = "Hello"
+      secondWord = "World"
+      greeting = firstWord + " " + secondWord
+      userAge = 25
+      ageMessage = "나이는 " + str(userAge) + "세"
+      greeting, ageMessage
+
+- id: formatting
+  title: 3. 포맷팅 패턴
+  subtitle: f"{variable}"
+  blocks:
+  - type: text
+    content: f-string(formatted string literal)은 파이썬 3.6부터 도입된 가장 현대적이고 편리한 문자열 포맷팅 방법입니다. 문자열 앞에 f를 붙이고 중괄호 {} 안에 변수나 표현식을 직접 넣을 수 있습니다. str() 변환 없이 숫자도 바로 삽입할 수 있고, 소수점 자릿수나 정렬 등 다양한 포맷 지정이 가능합니다.
+  - type: code
+    language: python
+    title: f-string 기본과 포맷
+    description: "f 접두사와 중괄호로 변수를 직접 문자열에 삽입합니다. 중괄호 안에서 연산이나 포맷 지정이 가능합니다."
+    content: |-
+      userName = "철수"
+      userAge = 25
+      testScore = 85.567
+      basicMsg = f"이름: {userName}, 나이: {userAge}"
+      formatMsg = f"점수: {testScore:.1f}점, 계산: {10 + 20}"
+      basicMsg, formatMsg
+
+  - type: tip
+    content: "f-string 포맷 지정: {값:.2f}는 소수점 2자리, {값:>10}은 오른쪽 정렬 10자리, {값:,}는 천 단위 콤마입니다."
+
+- id: indexing
+  title: 4. 인덱싱 패턴
+  subtitle: string[index]
+  blocks:
+  - type: text
+    content: 문자열은 순서가 있는 시퀀스이므로 인덱스로 각 문자에 접근할 수 있습니다. 인덱스는 0부터 시작하며, 음수 인덱스는 뒤에서부터 셉니다. -1은 마지막 문자, -2는 뒤에서 두 번째입니다. 문자열은 불변(immutable)이므로 개별 문자를 직접 변경할 수는 없습니다.
+  - type: code
+    language: python
+    title: 양수와 음수 인덱싱
+    description: "인덱스는 0부터 시작합니다. 음수 인덱스는 뒤에서부터 셉니다."
+    content: |-
+      language = "Python"
+      firstChar = language[0]
+      secondChar = language[1]
+      lastChar = language[-1]
+      secondLastChar = language[-2]
+      firstChar, secondChar, lastChar, secondLastChar
+
+- id: slicing
+  title: 5. 슬라이싱 패턴
+  subtitle: string[start:end:step]
+  blocks:
+  - type: text
+    content: 슬라이싱은 문자열의 일부분을 추출하는 강력한 기능입니다. [시작:끝] 형식으로 사용하며, 시작 인덱스부터 끝 인덱스 직전까지 추출합니다(끝 인덱스는 포함되지 않음). 시작을 생략하면 처음부터, 끝을 생략하면 마지막까지입니다. step을 사용하면 건너뛰며 추출할 수 있고, -1은 역순을 의미합니다.
+  - type: code
+    language: python
+    title: 기본 슬라이싱과 역순
+    description: "[시작:끝]으로 부분 문자열을 추출합니다. [::-1]은 문자열을 뒤집습니다."
+    content: |-
+      sentence = "Python Programming"
+      firstWord = sentence[0:6]
+      restPart = sentence[7:]
+      codeName = "Python"
+      reversed = codeName[::-1]
+      skipChars = codeName[::2]
+      firstWord, restPart, reversed, skipChars
+
+  - type: tip
+    content: "슬라이싱 공식: [시작:끝:간격]. 시작 생략=처음부터, 끝 생략=마지막까지, 간격 생략=1. 음수 간격은 역순입니다."
+
+- id: methods_case
+  title: 6. 대소문자 변환 패턴
+  subtitle: upper(), lower(), title()
+  blocks:
+  - type: text
+    content: 문자열 메서드를 사용하면 대소문자를 쉽게 변환할 수 있습니다. upper()는 모두 대문자로, lower()는 모두 소문자로, title()은 각 단어의 첫 글자만 대문자로 변환합니다. 원본 문자열은 변경되지 않고 새 문자열이 반환됩니다.
+  - type: code
+    language: python
+    title: 대소문자 변환과 공백 제거
+    description: "upper(), lower(), title() 메서드로 대소문자를 변환하고, strip() 계열로 공백을 제거합니다."
+    content: |-
+      greeting = "Hello World"
+      upperCase = greeting.upper()
+      lowerCase = greeting.lower()
+      titleCase = greeting.title()
+      spacedText = "  Hello World  "
+      trimmed = spacedText.strip()
+      leftTrimmed = spacedText.lstrip()
+      rightTrimmed = spacedText.rstrip()
+      upperCase, lowerCase, titleCase, trimmed, leftTrimmed, rightTrimmed
+
+- id: search
+  title: 7. 검색 패턴
+  subtitle: find(), count(), in
+  blocks:
+  - type: text
+    content: 문자열에서 특정 텍스트를 찾거나 개수를 세는 방법입니다. in 연산자는 포함 여부를 True/False로 반환하고, find()는 찾은 위치의 인덱스를 반환합니다(없으면 -1). count()는 해당 텍스트가 몇 번 등장하는지 셉니다.
+  - type: code
+    language: python
+    title: in 연산자와 find(), count()
+    description: "in은 포함 여부, find()는 위치(없으면 -1), count()는 등장 횟수를 반환합니다."
+    content: |-
+      codeText = "Python Programming"
+      hasPython = "Python" in codeText
+      gramPos = codeText.find("gram")
+      javaPos = codeText.find("Java")
+      fruitName = "banana"
+      countA = fruitName.count("a")
+      countNa = fruitName.count("na")
+      hasPython, gramPos, javaPos, countA, countNa
+
+- id: replace
+  title: 8. 교체 패턴
+  subtitle: replace(old, new)
+  blocks:
+  - type: text
+    content: replace() 메서드는 문자열에서 특정 부분을 다른 문자열로 교체합니다. 원본은 변경되지 않고 새 문자열이 반환됩니다. 세 번째 인자로 교체 횟수를 제한할 수 있습니다. 개인정보 마스킹, 텍스트 치환 등에 자주 사용됩니다.
+  - type: code
+    language: python
+    title: 문자열 교체와 마스킹
+    description: "replace(old, new)로 old를 new로 교체한 새 문자열을 반환합니다."
+    content: |-
+      welcomeMsg = "Hello World"
+      newMsg = welcomeMsg.replace("World", "Python")
+      phoneNumber = "010-1234-5678"
+      maskedPhone = phoneNumber.replace("1234", "****")
+      newMsg, maskedPhone
+
+- id: split_join
+  title: 9. 분할/결합 패턴
+  subtitle: split(), join()
+  blocks:
+  - type: text
+    content: split()은 문자열을 특정 구분자로 나누어 리스트로 반환합니다. 반대로 join()은 리스트의 요소들을 하나의 문자열로 결합합니다. CSV 파싱, 단어 분리, 경로 처리 등 데이터 처리에서 매우 자주 사용됩니다.
+  - type: code
+    language: python
+    title: split()과 join()
+    description: "split()은 구분자로 나누어 리스트로, join()은 리스트를 문자열로 결합합니다."
+    content: |-
+      csvData = "apple,banana,cherry"
+      fruitList = csvData.split(",")
+      wordList = ["Hello", "World", "Python"]
+      spaceJoined = " ".join(wordList)
+      dashJoined = "-".join(wordList)
+      fruitList, spaceJoined, dashJoined
+
+  - type: tip
+    content: "split()의 기본 구분자는 공백입니다. \"Hello World\".split()은 [\"Hello\", \"World\"]를 반환합니다."
+
+- id: check
+  title: 10. 확인 패턴
+  subtitle: isdigit(), isalpha(), startswith()
+  blocks:
+  - type: text
+    content: 문자열의 특성을 확인하는 다양한 is 메서드가 있습니다. isdigit()은 숫자로만 구성되었는지, isalpha()는 문자로만 구성되었는지, isalnum()은 문자와 숫자로만 구성되었는지 확인합니다. startswith()와 endswith()는 특정 문자열로 시작하거나 끝나는지 확인합니다.
+  - type: code
+    language: python
+    title: 문자열 타입 확인과 시작/끝 확인
+    description: "is 메서드로 문자열 조건을 확인하고, startswith/endswith로 시작/끝을 확인합니다."
+    content: |-
+      numStr = "123"
+      charStr = "abc"
+      mixedStr = "abc123"
+      docFile = "report.pdf"
+      isDigit = numStr.isdigit()
+      isAlpha = charStr.isalpha()
+      isAlnum = mixedStr.isalnum()
+      startsReport = docFile.startswith("report")
+      endsPdf = docFile.endswith(".pdf")
+      isDigit, isAlpha, isAlnum, startsReport, endsPdf
+
+- id: practice
+  title: 실습
+  subtitle: 문자열 마스터 미션
+  blocks:
+  - type: text
+    content: 지금까지 배운 문자열 패턴들을 종합적으로 활용하는 미션입니다. 포맷팅, 슬라이싱, 메서드 활용을 연습해봅시다.
+  - type: expansion
+    title: "미션1: 사용자 정보 포맷팅"
+    code: |-
+      name = "홍길동"
+      age = 25
+      score = 88.567
+      f"{name}님({age}세), 점수: {score:.1f}점"
+  - type: expansion
+    title: "미션2: 이메일 파싱"
+    code: |-
+      email = "user@example.com"
+      atIndex = email.find("@")
+      username = email[:atIndex]
+      domain = email[atIndex+1:]
+      username, domain
+  - type: expansion
+    title: "미션3: CSV 데이터 처리"
+    code: |-
+      csv = "apple,100,5"
+      parts = csv.split(",")
+      product, price, qty = parts
+      f"{product}: {price}원 x {qty}개"
+  - type: expansion
+    title: "미션4: 전화번호 마스킹"
+    code: |-
+      phone = "010-1234-5678"
+      parts = phone.split("-")
+      masked = parts[0] + "-****-" + parts[2]
+      masked

@@ -1,0 +1,876 @@
+meta:
+  title: "asyncio - 비동기 I/O"
+  description: "async/await 기반 비동기 프로그래밍을 위한 asyncio 모듈"
+  keywords: ["asyncio", "async", "await", "비동기", "이벤트루프", "coroutine"]
+
+intro:
+  emoji: "⚡"
+  points:
+  - "async/await 문법"
+  - "비동기 작업 동시 실행"
+  - "이벤트 루프 제어"
+  - "Pyodide 완벽 지원"
+
+sections:
+- id: "module_import"
+  title: "모듈 임포트"
+  subtitle: "asyncio 시작하기"
+  blocks:
+  - type: "text"
+    content: "asyncio는 파이썬 표준 라이브러리입니다. async/await 문법을 사용한 비동기 프로그래밍을 지원합니다."
+  - type: "list"
+    items:
+    - "async def: 비동기 함수 정의"
+    - "await: 비동기 작업 대기"
+    - "asyncio.run(): 비동기 함수 실행"
+    - "asyncio.gather(): 여러 작업 동시 실행"
+  - type: "code"
+    language: "python"
+    title: "기본 임포트"
+    description: "asyncio 모듈 임포트 및 기본 사용법"
+    content: |-
+      import asyncio
+
+      async def greet():
+          return "Hello Async"
+
+      result = await greet()
+      result
+  - type: "note"
+    content: "Pyodide 환경에서 asyncio는 JavaScript 이벤트 루프와 완벽하게 통합됩니다. 웹 브라우저에서도 모든 asyncio 기능을 사용할 수 있습니다."
+
+- id: "basic_async"
+  title: "기본 비동기 함수"
+  subtitle: "async/await 문법"
+  blocks:
+  - type: "text"
+    content: "async def로 비동기 함수를 정의하고 await로 비동기 작업을 대기합니다."
+  - type: "list"
+    items:
+    - "async def: 코루틴 함수 정의"
+    - "await: 코루틴 실행 대기"
+    - "asyncio.sleep(): 비동기 대기"
+    - "return: 결과값 반환"
+  - type: "code"
+    language: "python"
+    title: "비동기 함수 정의"
+    description: "간단한 비동기 함수 작성"
+    content: |-
+      import asyncio
+
+      async def fetchData():
+          await asyncio.sleep(0.1)
+          return "Data loaded"
+
+      output = await fetchData()
+      output
+  - type: "code"
+    language: "python"
+    title: "여러 비동기 함수"
+    description: "순차적 비동기 실행"
+    content: |-
+      import asyncio
+
+      async def stepOne():
+          await asyncio.sleep(0.05)
+          return "Step 1"
+
+      async def stepTwo():
+          await asyncio.sleep(0.05)
+          return "Step 2"
+
+      async def runSequence():
+          first = await stepOne()
+          second = await stepTwo()
+          return first, second
+
+      sequenceResult = await runSequence()
+      sequenceResult
+  - type: "tip"
+    content: "await는 async 함수 내부에서만 사용할 수 있습니다. Marimo 환경에서는 최상위 레벨에서도 await를 사용할 수 있습니다."
+
+- id: "concurrent_tasks"
+  title: "동시 실행"
+  subtitle: "여러 작업 병렬 처리"
+  blocks:
+  - type: "text"
+    content: "asyncio.gather()와 asyncio.create_task()로 여러 비동기 작업을 동시에 실행할 수 있습니다."
+  - type: "list"
+    items:
+    - "gather(): 여러 코루틴 동시 실행"
+    - "create_task(): Task 객체 생성"
+    - "wait(): 완료 대기 (다양한 옵션)"
+    - "as_completed(): 완료되는 순서대로 처리"
+  - type: "code"
+    language: "python"
+    title: "gather로 동시 실행"
+    description: "여러 작업 한번에 실행"
+    content: |-
+      import asyncio
+
+      async def taskA():
+          await asyncio.sleep(0.1)
+          return "A done"
+
+      async def taskB():
+          await asyncio.sleep(0.1)
+          return "B done"
+
+      async def taskC():
+          await asyncio.sleep(0.1)
+          return "C done"
+
+      results = await asyncio.gather(taskA(), taskB(), taskC())
+      results
+  - type: "code"
+    language: "python"
+    title: "create_task 사용"
+    description: "Task 객체로 제어"
+    content: |-
+      import asyncio
+
+      async def worker(name, delay):
+          await asyncio.sleep(delay)
+          return f"{name} completed"
+
+      async def runTasks():
+          task1 = asyncio.create_task(worker("Worker1", 0.1))
+          task2 = asyncio.create_task(worker("Worker2", 0.05))
+
+          result1 = await task1
+          result2 = await task2
+          return result1, result2
+
+      taskResults = await runTasks()
+      taskResults
+  - type: "code"
+    language: "python"
+    title: "as_completed 사용"
+    description: "완료 순서대로 처리"
+    content: |-
+      import asyncio
+
+      async def jobTask(jobId, duration):
+          await asyncio.sleep(duration)
+          return f"Job {jobId}"
+
+      async def processJobs():
+          jobs = [
+              jobTask(1, 0.15),
+              jobTask(2, 0.05),
+              jobTask(3, 0.10)
+          ]
+
+          completedJobs = []
+          for coro in asyncio.as_completed(jobs):
+              result = await coro
+              completedJobs.append(result)
+
+          return completedJobs
+
+      jobResults = await processJobs()
+      jobResults
+  - type: "tip"
+    content: "gather()는 모든 작업이 완료될 때까지 기다리고, as_completed()는 완료되는 순서대로 결과를 받을 수 있습니다."
+
+- id: "timeout_cancel"
+  title: "타임아웃과 취소"
+  subtitle: "작업 제어"
+  blocks:
+  - type: "text"
+    content: "asyncio.wait_for()로 타임아웃을 설정하고, task.cancel()로 작업을 취소할 수 있습니다."
+  - type: "list"
+    items:
+    - "wait_for(): 타임아웃 설정"
+    - "cancel(): 작업 취소"
+    - "CancelledError: 취소 예외"
+    - "shield(): 취소로부터 보호"
+  - type: "code"
+    language: "python"
+    title: "타임아웃 설정"
+    description: "일정 시간 내 완료 강제"
+    content: |-
+      import asyncio
+
+      async def slowOperation():
+          await asyncio.sleep(1)
+          return "Done"
+
+      async def withTimeout():
+          try:
+              result = await asyncio.wait_for(slowOperation(), timeout=0.1)
+              return result
+          except asyncio.TimeoutError:
+              return "Timeout occurred"
+
+      timeoutResult = await withTimeout()
+      timeoutResult
+  - type: "code"
+    language: "python"
+    title: "작업 취소"
+    description: "실행 중인 작업 중단"
+    content: |-
+      import asyncio
+
+      async def longTask():
+          try:
+              await asyncio.sleep(1)
+              return "Completed"
+          except asyncio.CancelledError:
+              return "Cancelled"
+
+      async def cancelDemo():
+          task = asyncio.create_task(longTask())
+          await asyncio.sleep(0.05)
+          task.cancel()
+
+          try:
+              result = await task
+          except asyncio.CancelledError:
+              result = "Task was cancelled"
+
+          return result
+
+      cancelResult = await cancelDemo()
+      cancelResult
+  - type: "tip"
+    content: "타임아웃은 네트워크 요청이나 외부 서비스 호출 시 필수적입니다. 무한 대기를 방지할 수 있습니다."
+
+- id: "async_context"
+  title: "비동기 컨텍스트"
+  subtitle: "async with와 async for"
+  blocks:
+  - type: "text"
+    content: "async with로 비동기 컨텍스트 매니저를, async for로 비동기 이터레이터를 사용할 수 있습니다."
+  - type: "list"
+    items:
+    - "async with: 비동기 컨텍스트 매니저"
+    - "async for: 비동기 이터레이터"
+    - "__aenter__, __aexit__: 컨텍스트 매니저 프로토콜"
+    - "__aiter__, __anext__: 이터레이터 프로토콜"
+  - type: "code"
+    language: "python"
+    title: "비동기 컨텍스트 매니저"
+    description: "리소스 자동 관리"
+    content: |-
+      import asyncio
+
+      class AsyncResource:
+          async def __aenter__(self):
+              await asyncio.sleep(0.01)
+              return "Resource acquired"
+
+          async def __aexit__(self, exc_type, exc_val, exc_tb):
+              await asyncio.sleep(0.01)
+              return False
+
+      async def useResource():
+          async with AsyncResource() as res:
+              return res
+
+      resourceResult = await useResource()
+      resourceResult
+  - type: "code"
+    language: "python"
+    title: "비동기 이터레이터"
+    description: "비동기 반복 처리"
+    content: |-
+      import asyncio
+
+      class AsyncCounter:
+          def __init__(self, limit):
+              self.limit = limit
+              self.current = 0
+
+          def __aiter__(self):
+              return self
+
+          async def __anext__(self):
+              if self.current >= self.limit:
+                  raise StopAsyncIteration
+              await asyncio.sleep(0.01)
+              self.current += 1
+              return self.current
+
+      async def iterateAsync():
+          values = []
+          async for num in AsyncCounter(5):
+              values.append(num)
+          return values
+
+      iterResult = await iterateAsync()
+      iterResult
+  - type: "tip"
+    content: "async with와 async for는 파일 I/O, 데이터베이스 연결, 스트리밍 데이터 처리에 유용합니다."
+
+- id: "error_handling"
+  title: "예외 처리"
+  subtitle: "비동기 에러 핸들링"
+  blocks:
+  - type: "text"
+    content: "비동기 함수에서도 일반적인 try-except 문법을 사용하여 예외를 처리할 수 있습니다."
+  - type: "list"
+    items:
+    - "try-except: 일반 예외 처리"
+    - "gather(return_exceptions=True): 예외를 결과로 반환"
+    - "CancelledError: 작업 취소 예외"
+    - "TimeoutError: 타임아웃 예외"
+  - type: "code"
+    language: "python"
+    title: "비동기 예외 처리"
+    description: "try-except 사용"
+    content: |-
+      import asyncio
+
+      async def riskyOperation(shouldFail):
+          await asyncio.sleep(0.01)
+          if shouldFail:
+              raise ValueError("Operation failed")
+          return "Success"
+
+      async def handleError():
+          try:
+              result = await riskyOperation(True)
+              return result
+          except ValueError as e:
+              return f"Error: {e}"
+
+      errorResult = await handleError()
+      errorResult
+  - type: "code"
+    language: "python"
+    title: "gather 예외 처리"
+    description: "여러 작업의 예외 수집"
+    content: |-
+      import asyncio
+
+      async def mayFail(taskId, shouldFail):
+          await asyncio.sleep(0.01)
+          if shouldFail:
+              raise ValueError(f"Task {taskId} failed")
+          return f"Task {taskId} OK"
+
+      async def gatherWithErrors():
+          results = await asyncio.gather(
+              mayFail(1, False),
+              mayFail(2, True),
+              mayFail(3, False),
+              return_exceptions=True
+          )
+          return results
+
+      gatherResults = await gatherWithErrors()
+      gatherResults
+  - type: "tip"
+    content: "return_exceptions=True를 사용하면 예외가 발생해도 다른 작업이 계속 실행되고, 예외는 결과 리스트에 포함됩니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "실무 패턴"
+  blocks:
+  - type: "text"
+    content: "asyncio를 활용한 실전 예제들입니다."
+  - type: "code"
+    language: "python"
+    title: "병렬 API 호출 시뮬레이션"
+    description: "여러 API를 동시에 호출"
+    content: |-
+      import asyncio
+
+      async def fetchApi(apiName, delay):
+          await asyncio.sleep(delay)
+          return {"api": apiName, "data": f"{apiName} response"}
+
+      async def fetchAllApis():
+          apis = [
+              fetchApi("users", 0.1),
+              fetchApi("posts", 0.08),
+              fetchApi("comments", 0.12)
+          ]
+
+          responses = await asyncio.gather(*apis)
+          return responses
+
+      apiResponses = await fetchAllApis()
+      apiResponses
+  - type: "code"
+    language: "python"
+    title: "재시도 로직"
+    description: "실패 시 자동 재시도"
+    content: |-
+      import asyncio
+
+      async def unstableService(attempt):
+          await asyncio.sleep(0.05)
+          if attempt < 3:
+              raise ConnectionError("Service unavailable")
+          return "Service connected"
+
+      async def retryOperation(maxRetries=5):
+          for attempt in range(1, maxRetries + 1):
+              try:
+                  result = await unstableService(attempt)
+                  return {"success": True, "result": result, "attempts": attempt}
+              except ConnectionError:
+                  if attempt == maxRetries:
+                      return {"success": False, "error": "Max retries exceeded"}
+                  await asyncio.sleep(0.02)
+
+      retryResult = await retryOperation()
+      retryResult
+  - type: "code"
+    language: "python"
+    title: "워커 풀 패턴"
+    description: "제한된 수의 워커로 작업 처리"
+    content: |-
+      import asyncio
+
+      async def processItem(itemId):
+          await asyncio.sleep(0.05)
+          return f"Processed item {itemId}"
+
+      async def workerPool(items, maxWorkers=3):
+          semaphore = asyncio.Semaphore(maxWorkers)
+
+          async def boundedTask(item):
+              async with semaphore:
+                  return await processItem(item)
+
+          tasks = [boundedTask(i) for i in items]
+          results = await asyncio.gather(*tasks)
+          return results
+
+      poolResults = await workerPool(range(1, 11), maxWorkers=3)
+      poolResults
+  - type: "tip"
+    content: "Semaphore를 사용하면 동시 실행 작업 수를 제한할 수 있어, 리소스 관리와 부하 조절에 유용합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  blocks:
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 비동기 함수"
+    code: |-
+      import asyncio
+
+      async def sayHello():
+          await asyncio.sleep(0.01)
+          return "Hello"
+
+      greeting = await sayHello()
+      greeting
+  - type: "expansion"
+    title: "🟢 기본2: 두 함수 순차 실행"
+    code: |-
+      import asyncio
+
+      async def getFirst():
+          await asyncio.sleep(0.01)
+          return "First"
+
+      async def getSecond():
+          await asyncio.sleep(0.01)
+          return "Second"
+
+      async def getBoth():
+          a = await getFirst()
+          b = await getSecond()
+          return a, b
+
+      both = await getBoth()
+      both
+  - type: "expansion"
+    title: "🟢 기본3: gather로 동시 실행"
+    code: |-
+      import asyncio
+
+      async def countOne():
+          await asyncio.sleep(0.02)
+          return 1
+
+      async def countTwo():
+          await asyncio.sleep(0.02)
+          return 2
+
+      numbers = await asyncio.gather(countOne(), countTwo())
+      numbers
+  - type: "expansion"
+    title: "🟢 기본4: 리스트 내포로 여러 작업"
+    code: |-
+      import asyncio
+
+      async def square(n):
+          await asyncio.sleep(0.01)
+          return n * n
+
+      squares = await asyncio.gather(*[square(i) for i in range(1, 6)])
+      squares
+  - type: "expansion"
+    title: "🟢 기본5: 타임아웃 처리"
+    code: |-
+      import asyncio
+
+      async def quickTask():
+          await asyncio.sleep(0.01)
+          return "Done"
+
+      try:
+          quickResult = await asyncio.wait_for(quickTask(), timeout=0.1)
+      except asyncio.TimeoutError:
+          quickResult = "Timeout"
+
+      quickResult
+  - type: "expansion"
+    title: "🟡 응용1: 조건부 작업 실행"
+    code: |-
+      import asyncio
+
+      async def conditionalTask(condition):
+          await asyncio.sleep(0.01)
+          if condition:
+              return "Condition met"
+          return "Condition not met"
+
+      async def runConditional():
+          task1 = await conditionalTask(True)
+          task2 = await conditionalTask(False)
+          return task1, task2
+
+      conditionalResults = await runConditional()
+      conditionalResults
+  - type: "expansion"
+    title: "🟡 응용2: 작업 취소"
+    code: |-
+      import asyncio
+
+      async def cancellableTask():
+          try:
+              await asyncio.sleep(1)
+              return "Finished"
+          except asyncio.CancelledError:
+              return "Got cancelled"
+
+      async def cancelExample():
+          task = asyncio.create_task(cancellableTask())
+          await asyncio.sleep(0.01)
+          task.cancel()
+          try:
+              result = await task
+          except asyncio.CancelledError:
+              result = "Cancelled"
+          return result
+
+      cancelledResult = await cancelExample()
+      cancelledResult
+  - type: "expansion"
+    title: "🟡 응용3: as_completed 활용"
+    code: |-
+      import asyncio
+
+      async def delayedValue(val, delay):
+          await asyncio.sleep(delay)
+          return val
+
+      async def firstCompleted():
+          tasks = [
+              delayedValue("slow", 0.15),
+              delayedValue("fast", 0.03),
+              delayedValue("medium", 0.08)
+          ]
+
+          order = []
+          for coro in asyncio.as_completed(tasks):
+              result = await coro
+              order.append(result)
+
+          return order
+
+      completionOrder = await firstCompleted()
+      completionOrder
+  - type: "expansion"
+    title: "🟡 응용4: 예외와 함께 gather"
+    code: |-
+      import asyncio
+
+      async def taskWithError(num):
+          await asyncio.sleep(0.01)
+          if num == 2:
+              raise ValueError("Error at 2")
+          return num
+
+      gatherWithExceptions = await asyncio.gather(
+          taskWithError(1),
+          taskWithError(2),
+          taskWithError(3),
+          return_exceptions=True
+      )
+
+      gatherWithExceptions
+  - type: "expansion"
+    title: "🟡 응용5: 비동기 이터레이터"
+    code: |-
+      import asyncio
+
+      class AsyncRange:
+          def __init__(self, n):
+              self.n = n
+              self.i = 0
+
+          def __aiter__(self):
+              return self
+
+          async def __anext__(self):
+              if self.i >= self.n:
+                  raise StopAsyncIteration
+              await asyncio.sleep(0.01)
+              self.i += 1
+              return self.i
+
+      async def collectAsync():
+          collected = []
+          async for num in AsyncRange(5):
+              collected.append(num)
+          return collected
+
+      asyncNumbers = await collectAsync()
+      asyncNumbers
+  - type: "expansion"
+    title: "🔴 심화1: 동시 실행 제한"
+    code: |-
+      import asyncio
+
+      async def limitedWorker(workId, sem):
+          async with sem:
+              await asyncio.sleep(0.05)
+              return f"Work {workId}"
+
+      async def limitedExecution():
+          semaphore = asyncio.Semaphore(2)
+          tasks = [limitedWorker(i, semaphore) for i in range(1, 7)]
+          results = await asyncio.gather(*tasks)
+          return results
+
+      limitedResults = await limitedExecution()
+      limitedResults
+  - type: "expansion"
+    title: "🔴 심화2: 재시도 메커니즘"
+    code: |-
+      import asyncio
+
+      attemptCount = 0
+
+      async def flaky():
+          global attemptCount
+          attemptCount += 1
+          await asyncio.sleep(0.01)
+          if attemptCount < 3:
+              raise ConnectionError("Failed")
+          return "Success"
+
+      async def retry(maxAttempts=5):
+          for i in range(maxAttempts):
+              try:
+                  result = await flaky()
+                  return {"success": True, "result": result, "attempts": i + 1}
+              except ConnectionError:
+                  if i == maxAttempts - 1:
+                      return {"success": False, "attempts": i + 1}
+                  await asyncio.sleep(0.02)
+
+      retryOutcome = await retry()
+      retryOutcome
+  - type: "expansion"
+    title: "🔴 심화3: 타임아웃과 기본값"
+    code: |-
+      import asyncio
+
+      async def slowFetch():
+          await asyncio.sleep(1)
+          return "Fetched data"
+
+      async def fetchWithDefault():
+          try:
+              data = await asyncio.wait_for(slowFetch(), timeout=0.05)
+          except asyncio.TimeoutError:
+              data = "Default data"
+          return data
+
+      defaultData = await fetchWithDefault()
+      defaultData
+  - type: "expansion"
+    title: "🔴 심화4: 비동기 컨텍스트 매니저"
+    code: |-
+      import asyncio
+
+      class AsyncConnection:
+          async def __aenter__(self):
+              await asyncio.sleep(0.01)
+              self.connected = True
+              return self
+
+          async def __aexit__(self, exc_type, exc_val, exc_tb):
+              await asyncio.sleep(0.01)
+              self.connected = False
+
+          async def query(self):
+              return "Query result" if self.connected else "Not connected"
+
+      async def useConnection():
+          async with AsyncConnection() as conn:
+              result = await conn.query()
+          return result
+
+      queryResult = await useConnection()
+      queryResult
+  - type: "expansion"
+    title: "🔴 심화5: 병렬 다운로드 시뮬레이션"
+    code: |-
+      import asyncio
+
+      async def downloadFile(fileId, size):
+          await asyncio.sleep(size * 0.01)
+          return {"file": fileId, "size": size, "status": "downloaded"}
+
+      async def downloadAll():
+          files = [
+              (1, 5),
+              (2, 3),
+              (3, 8),
+              (4, 2)
+          ]
+
+          downloads = [downloadFile(fid, sz) for fid, sz in files]
+          completed = await asyncio.gather(*downloads)
+          return completed
+
+      downloadResults = await downloadAll()
+      downloadResults
+  - type: "expansion"
+    title: "🔴 심화6: 우선순위 큐 패턴"
+    code: |-
+      import asyncio
+
+      async def processWithPriority(taskId, priority):
+          await asyncio.sleep(0.05 / priority)
+          return {"task": taskId, "priority": priority}
+
+      async def priorityQueue():
+          tasks = [
+              processWithPriority(1, 1),
+              processWithPriority(2, 3),
+              processWithPriority(3, 2)
+          ]
+
+          results = []
+          for coro in asyncio.as_completed(tasks):
+              result = await coro
+              results.append(result)
+
+          return results
+
+      priorityResults = await priorityQueue()
+      priorityResults
+  - type: "expansion"
+    title: "🔴 심화7: 조건 대기"
+    code: |-
+      import asyncio
+
+      sharedData = []
+
+      async def producer():
+          await asyncio.sleep(0.05)
+          sharedData.append("data")
+
+      async def consumer():
+          while not sharedData:
+              await asyncio.sleep(0.01)
+          return sharedData[0]
+
+      async def producerConsumer():
+          consumerTask = asyncio.create_task(consumer())
+          producerTask = asyncio.create_task(producer())
+
+          result = await consumerTask
+          await producerTask
+          return result
+
+      pcResult = await producerConsumer()
+      pcResult
+  - type: "expansion"
+    title: "🔴 심화8: 배치 처리"
+    code: |-
+      import asyncio
+
+      async def processBatch(batchId, items):
+          await asyncio.sleep(len(items) * 0.01)
+          return {"batch": batchId, "processed": len(items)}
+
+      async def batchProcessor():
+          allItems = list(range(1, 16))
+          batchSize = 5
+
+          batches = [allItems[i:i+batchSize] for i in range(0, len(allItems), batchSize)]
+          tasks = [processBatch(i, batch) for i, batch in enumerate(batches)]
+
+          batchResults = await asyncio.gather(*tasks)
+          return batchResults
+
+      batchOutput = await batchProcessor()
+      batchOutput
+  - type: "expansion"
+    title: "🔴 심화9: 이벤트 기반 통신"
+    code: |-
+      import asyncio
+
+      async def waiter(event):
+          await event.wait()
+          return "Event triggered"
+
+      async def setter(event):
+          await asyncio.sleep(0.05)
+          event.set()
+          return "Event set"
+
+      async def eventDemo():
+          evt = asyncio.Event()
+
+          waiterTask = asyncio.create_task(waiter(evt))
+          setterTask = asyncio.create_task(setter(evt))
+
+          results = await asyncio.gather(waiterTask, setterTask)
+          return results
+
+      eventResults = await eventDemo()
+      eventResults
+  - type: "expansion"
+    title: "🔴 심화10: 전체 활용 - API 집계 시스템"
+    code: |-
+      import asyncio
+
+      async def fetchEndpoint(name, delay, shouldFail=False):
+          await asyncio.sleep(delay)
+          if shouldFail:
+              raise ValueError(f"{name} failed")
+          return {"endpoint": name, "data": f"{name} data"}
+
+      async def aggregateApis():
+          endpoints = [
+              fetchEndpoint("users", 0.08),
+              fetchEndpoint("products", 0.06),
+              fetchEndpoint("orders", 0.10),
+              fetchEndpoint("analytics", 0.05, shouldFail=True)
+          ]
+
+          results = await asyncio.gather(*endpoints, return_exceptions=True)
+
+          successful = [r for r in results if isinstance(r, dict)]
+          failed = [r for r in results if isinstance(r, Exception)]
+
+          return {
+              "successful": len(successful),
+              "failed": len(failed),
+              "data": successful
+          }
+
+      aggregation = await aggregateApis()
+      aggregation

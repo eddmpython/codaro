@@ -1,0 +1,374 @@
+meta:
+  id: opencv_06
+  title: 이진화스튜디오
+  order: 6
+  category: opencv
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["OpenCV", "threshold", "adaptiveThreshold", "OTSU", "이진화"]
+  seo:
+    title: "OpenCV 중급 - 이진화 스튜디오"
+    description: "OpenCV threshold, adaptiveThreshold, OTSU로 이미지를 이진화합니다."
+    keywords: ["OpenCV", "threshold", "adaptiveThreshold", "OTSU", "이진화"]
+
+intro:
+  emoji: "⬛"
+  goal: threshold, adaptiveThreshold, OTSU로 이미지를 흑백 이진 이미지로 변환합니다.
+  description: 이진화(binarization)는 임계값 기준으로 픽셀을 흰색(255)과 검은색(0)으로 분류합니다. 전역/적응형/OTSU 방식을 비교합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 이미지 불러오기
+  subtitle: 그레이스케일 준비
+  blocks:
+  - type: text
+    content: sklearn에 내장된 샘플 이미지를 사용합니다. 이진화는 그레이스케일 이미지에서 수행됩니다. 밝기 기준으로 픽셀을 분류합니다.
+  - type: code
+    language: python
+    title: 라이브러리와 이미지 로드
+    description: sklearn에서 이미지를 불러옵니다
+    content: |-
+      import cv2
+      import numpy as np
+      from sklearn.datasets import load_sample_image
+      import matplotlib.pyplot as plt
+
+      chinaArr = load_sample_image('china.jpg')
+      source = cv2.cvtColor(chinaArr, cv2.COLOR_RGB2BGR)
+      mono = cv2.cvtColor(source, cv2.COLOR_BGR2GRAY)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(mono, cmap='gray')
+      plt.title(f'Grayscale: {mono.shape}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 그레이스케일 출력
+    description: 이진화 입력 이미지입니다
+    content: |-
+      plt.figure(figsize=(8, 6))
+      plt.imshow(mono, cmap='gray')
+      plt.title('Grayscale Input')
+      plt.axis('off')
+      plt.tight_layout()
+
+- id: step2_global
+  title: 2단계. 전역 임계값
+  subtitle: threshold()
+  blocks:
+  - type: text
+    content: threshold()는 전역 임계값(global threshold)으로 이진화합니다. 이미지 전체에 하나의 고정된 임계값을 적용하여, 임계값보다 큰 픽셀은 maxval(보통 255)로, 작거나 같으면 0으로 설정합니다. 조명이 균일한 이미지에서 잘 동작하지만, 조명이 고르지 않으면 일부 영역이 너무 밝거나 어둡게 처리될 수 있습니다.
+  - type: code
+    language: python
+    title: 기본 이진화
+    description: 임계값 127로 이진화합니다
+    content: |-
+      ret1, binary = cv2.threshold(mono, 127, 255, cv2.THRESH_BINARY)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(binary, cmap='gray')
+      plt.title(f'Binary (127): ret={ret1}')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: threshold()는 (ret, dst) 튜플을 반환합니다. ret은 사용된 임계값, dst는 이진화된 이미지입니다. THRESH_BINARY는 임계값 초과 시 maxval, 이하 시 0입니다.
+  - type: code
+    language: python
+    title: 임계값 변경
+    description: 다양한 임계값을 비교합니다
+    content: |-
+      ret2, binary80 = cv2.threshold(mono, 80, 255, cv2.THRESH_BINARY)
+      ret3, binary180 = cv2.threshold(mono, 180, 255, cv2.THRESH_BINARY)
+      figBin, axBin = plt.subplots(1, 2, figsize=(12, 5))
+      axBin[0].imshow(binary80, cmap='gray')
+      axBin[0].set_title('Threshold 80')
+      axBin[0].axis('off')
+      axBin[1].imshow(binary180, cmap='gray')
+      axBin[1].set_title('Threshold 180')
+      axBin[1].axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 전역 임계값 비교
+    description: 세 가지 임계값 결과입니다
+    content: |-
+      figThresh, axThresh = plt.subplots(1, 3, figsize=(12, 4))
+      axThresh[0].imshow(binary80, cmap='gray')
+      axThresh[0].set_title('Threshold = 80')
+      axThresh[0].axis('off')
+      axThresh[1].imshow(binary, cmap='gray')
+      axThresh[1].set_title('Threshold = 127')
+      axThresh[1].axis('off')
+      axThresh[2].imshow(binary180, cmap='gray')
+      axThresh[2].set_title('Threshold = 180')
+      axThresh[2].axis('off')
+      plt.tight_layout()
+
+- id: step3_types
+  title: 3단계. 이진화 유형
+  subtitle: BINARY vs BINARY_INV
+  blocks:
+  - type: text
+    content: THRESH_BINARY_INV는 결과를 반전합니다. 임계값보다 작은 픽셀이 maxval이 됩니다. 배경과 전경의 관계에 따라 적절한 방식을 선택합니다.
+  - type: code
+    language: python
+    title: 반전 이진화
+    description: BINARY와 BINARY_INV를 비교합니다
+    content: |-
+      ret4, binaryNorm = cv2.threshold(mono, 127, 255, cv2.THRESH_BINARY)
+      ret5, binaryInv = cv2.threshold(mono, 127, 255, cv2.THRESH_BINARY_INV)
+      figInv, axInv = plt.subplots(1, 2, figsize=(12, 5))
+      axInv[0].imshow(binaryNorm, cmap='gray')
+      axInv[0].set_title('BINARY')
+      axInv[0].axis('off')
+      axInv[1].imshow(binaryInv, cmap='gray')
+      axInv[1].set_title('BINARY_INV')
+      axInv[1].axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: THRESH_BINARY는 밝은 부분이 흰색, THRESH_BINARY_INV는 어두운 부분이 흰색입니다. 검은 배경에 흰 객체를 원하면 상황에 맞게 선택하세요.
+  - type: code
+    language: python
+    title: 유형 비교
+    description: 일반과 반전을 비교합니다
+    content: |-
+      figType, axType = plt.subplots(1, 2, figsize=(10, 5))
+      axType[0].imshow(binaryNorm, cmap='gray')
+      axType[0].set_title('BINARY')
+      axType[0].axis('off')
+      axType[1].imshow(binaryInv, cmap='gray')
+      axType[1].set_title('BINARY_INV')
+      axType[1].axis('off')
+      plt.tight_layout()
+
+- id: step4_otsu
+  title: 4단계. OTSU 자동 임계값
+  subtitle: THRESH_OTSU
+  blocks:
+  - type: text
+    content: OTSU(오츠)는 1979년 오츠 노부유키가 개발한 자동 임계값 결정 알고리즘입니다. 히스토그램을 분석하여 이미지를 두 클래스(전경과 배경)로 나눌 때 클래스 간 분산(between-class variance)을 최대화하는 임계값을 찾습니다. 히스토그램이 두 개의 봉우리(bimodal)를 가질 때 가장 효과적입니다. 사용자가 임계값을 직접 지정하지 않아도 되어 자동화된 처리에 유용합니다.
+  - type: code
+    language: python
+    title: OTSU 이진화
+    description: 자동 임계값을 계산합니다
+    content: |-
+      retOtsu, otsu = cv2.threshold(mono, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(otsu, cmap='gray')
+      plt.title(f'OTSU (thresh={retOtsu:.0f})')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: THRESH_OTSU를 사용할 때 임계값 인자는 무시됩니다(0으로 설정). 반환되는 ret 값이 OTSU가 계산한 최적 임계값입니다. 두 플래그를 + 연산자로 결합합니다.
+  - type: code
+    language: python
+    title: OTSU 결과
+    description: 자동 임계값과 결과를 확인합니다
+    content: |-
+      figOtsu, axOtsu = plt.subplots(1, 2, figsize=(10, 5))
+      axOtsu[0].imshow(mono, cmap='gray')
+      axOtsu[0].set_title('Original')
+      axOtsu[0].axis('off')
+      axOtsu[1].imshow(otsu, cmap='gray')
+      axOtsu[1].set_title(f'OTSU (thresh={retOtsu:.0f})')
+      axOtsu[1].axis('off')
+      plt.tight_layout()
+
+- id: step5_adaptive
+  title: 5단계. 적응형 임계값
+  subtitle: adaptiveThreshold()
+  blocks:
+  - type: text
+    content: adaptiveThreshold()는 적응형 임계값(adaptive threshold)으로, 픽셀마다 다른 임계값을 적용합니다. 각 픽셀 주변의 작은 영역(blockSize)에서 평균(MEAN_C) 또는 가우시안 가중 평균(GAUSSIAN_C)을 계산하고, 거기서 상수 C를 뺀 값을 해당 픽셀의 임계값으로 사용합니다. 조명이 고르지 않거나 그림자가 있는 이미지에서 전역 임계값보다 훨씬 좋은 결과를 얻을 수 있습니다.
+  - type: code
+    language: python
+    title: 평균 적응형
+    description: 주변 영역 평균을 사용합니다
+    content: |-
+      adaptMean = cv2.adaptiveThreshold(mono, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(adaptMean, cmap='gray')
+      plt.title('Adaptive Mean')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 가우시안 적응형
+    description: 가우시안 가중 평균을 사용합니다
+    content: |-
+      adaptGauss = cv2.adaptiveThreshold(mono, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+      plt.figure(figsize=(10, 6))
+      plt.imshow(adaptGauss, cmap='gray')
+      plt.title('Adaptive Gaussian')
+      plt.axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: adaptiveThreshold(src, maxValue, adaptiveMethod, thresholdType, blockSize, C)에서 blockSize는 영역 크기(홀수), C는 평균에서 뺄 상수입니다. blockSize가 클수록 넓은 영역을 고려합니다.
+  - type: code
+    language: python
+    title: 적응형 비교
+    description: 평균과 가우시안을 비교합니다
+    content: |-
+      figAdapt, axAdapt = plt.subplots(1, 3, figsize=(12, 4))
+      axAdapt[0].imshow(otsu, cmap='gray')
+      axAdapt[0].set_title('OTSU (Global)')
+      axAdapt[0].axis('off')
+      axAdapt[1].imshow(adaptMean, cmap='gray')
+      axAdapt[1].set_title('Adaptive Mean')
+      axAdapt[1].axis('off')
+      axAdapt[2].imshow(adaptGauss, cmap='gray')
+      axAdapt[2].set_title('Adaptive Gaussian')
+      axAdapt[2].axis('off')
+      plt.tight_layout()
+
+- id: step6_block
+  title: 6단계. 블록 크기 영향
+  subtitle: blockSize 조절
+  blocks:
+  - type: text
+    content: 적응형 임계값에서 blockSize는 중요한 파라미터입니다. 작으면 세부 디테일을 살리고, 크면 전체적인 구조를 유지합니다.
+  - type: code
+    language: python
+    title: 다양한 블록 크기
+    description: blockSize 효과를 확인합니다
+    content: |-
+      adapt5 = cv2.adaptiveThreshold(mono, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 5, 2)
+      adapt21 = cv2.adaptiveThreshold(mono, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 21, 2)
+      adapt51 = cv2.adaptiveThreshold(mono, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 51, 2)
+      figBlock, axBlock = plt.subplots(1, 3, figsize=(12, 4))
+      axBlock[0].imshow(adapt5, cmap='gray')
+      axBlock[0].set_title('Block 5')
+      axBlock[0].axis('off')
+      axBlock[1].imshow(adapt21, cmap='gray')
+      axBlock[1].set_title('Block 21')
+      axBlock[1].axis('off')
+      axBlock[2].imshow(adapt51, cmap='gray')
+      axBlock[2].set_title('Block 51')
+      axBlock[2].axis('off')
+      plt.tight_layout()
+  - type: code
+    language: python
+    title: 블록 크기 비교
+    description: 세 가지 블록 크기를 비교합니다
+    content: |-
+      figBlock, axBlock = plt.subplots(1, 3, figsize=(12, 4))
+      axBlock[0].imshow(adapt5, cmap='gray')
+      axBlock[0].set_title('Block Size = 5')
+      axBlock[0].axis('off')
+      axBlock[1].imshow(adapt21, cmap='gray')
+      axBlock[1].set_title('Block Size = 21')
+      axBlock[1].axis('off')
+      axBlock[2].imshow(adapt51, cmap='gray')
+      axBlock[2].set_title('Block Size = 51')
+      axBlock[2].axis('off')
+      plt.tight_layout()
+  - type: tip
+    content: blockSize가 작으면 노이즈가 많아질 수 있고, 크면 디테일이 사라집니다. 이미지 특성에 맞게 조절하세요. C 값도 결과에 영향을 줍니다.
+
+- id: practice
+  title: 실습
+  subtitle: 이진화 프로젝트
+  blocks:
+  - type: text
+    content: sklearn 이미지에 다양한 이진화를 적용해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: flower 이진화 비교"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        import cv2
+        import numpy as np
+        from sklearn.datasets import load_sample_image
+        import matplotlib.pyplot as plt
+
+        flower = load_sample_image('flower.jpg')
+        flowerBgr = cv2.cvtColor(flower, cv2.COLOR_RGB2BGR)
+        flowerGray = cv2.cvtColor(flowerBgr, cv2.COLOR_BGR2GRAY)
+        plt.imshow(flower)
+        plt.axis('off')
+    - type: code
+      title: "세 가지 이진화"
+      content: |-
+        retF1, flowerBin = cv2.threshold(flowerGray, 127, 255, cv2.THRESH_BINARY)
+        retF2, flowerOtsu = cv2.threshold(flowerGray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        flowerAdapt = cv2.adaptiveThreshold(flowerGray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 11, 2)
+        figFlo, axFlo = plt.subplots(1, 3, figsize=(12, 4))
+        axFlo[0].imshow(flowerBin, cmap='gray')
+        axFlo[0].set_title('Global (127)')
+        axFlo[0].axis('off')
+        axFlo[1].imshow(flowerOtsu, cmap='gray')
+        axFlo[1].set_title(f'OTSU ({retF2:.0f})')
+        axFlo[1].axis('off')
+        axFlo[2].imshow(flowerAdapt, cmap='gray')
+        axFlo[2].set_title('Adaptive')
+        axFlo[2].axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "비교 시각화"
+      content: |-
+        figFlower, axFlower = plt.subplots(2, 2, figsize=(10, 8))
+        axFlower[0, 0].imshow(flower)
+        axFlower[0, 0].set_title('Original')
+        axFlower[0, 0].axis('off')
+        axFlower[0, 1].imshow(flowerBin, cmap='gray')
+        axFlower[0, 1].set_title('Global (127)')
+        axFlower[0, 1].axis('off')
+        axFlower[1, 0].imshow(flowerOtsu, cmap='gray')
+        axFlower[1, 0].set_title(f'OTSU ({retF2:.0f})')
+        axFlower[1, 0].axis('off')
+        axFlower[1, 1].imshow(flowerAdapt, cmap='gray')
+        axFlower[1, 1].set_title('Adaptive')
+        axFlower[1, 1].axis('off')
+        plt.tight_layout()
+  - type: expansion
+    title: "미션2: china 적응형 파라미터 탐색"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        import cv2
+        import numpy as np
+        from sklearn.datasets import load_sample_image
+        import matplotlib.pyplot as plt
+
+        china = load_sample_image('china.jpg')
+        chinaBgr = cv2.cvtColor(china, cv2.COLOR_RGB2BGR)
+        chinaGray = cv2.cvtColor(chinaBgr, cv2.COLOR_BGR2GRAY)
+        plt.imshow(china)
+        plt.axis('off')
+    - type: code
+      title: "C 파라미터 변경"
+      content: |-
+        chinaC0 = cv2.adaptiveThreshold(chinaGray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 15, 0)
+        chinaC5 = cv2.adaptiveThreshold(chinaGray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 15, 5)
+        chinaC10 = cv2.adaptiveThreshold(chinaGray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C, cv2.THRESH_BINARY, 15, 10)
+        figC, axC = plt.subplots(1, 3, figsize=(12, 4))
+        axC[0].imshow(chinaC0, cmap='gray')
+        axC[0].set_title('C=0')
+        axC[0].axis('off')
+        axC[1].imshow(chinaC5, cmap='gray')
+        axC[1].set_title('C=5')
+        axC[1].axis('off')
+        axC[2].imshow(chinaC10, cmap='gray')
+        axC[2].set_title('C=10')
+        axC[2].axis('off')
+        plt.tight_layout()
+    - type: code
+      title: "C 파라미터 비교"
+      content: |-
+        figScene, axScene = plt.subplots(2, 2, figsize=(10, 8))
+        axScene[0, 0].imshow(china)
+        axScene[0, 0].set_title('Original')
+        axScene[0, 0].axis('off')
+        axScene[0, 1].imshow(chinaC0, cmap='gray')
+        axScene[0, 1].set_title('C = 0')
+        axScene[0, 1].axis('off')
+        axScene[1, 0].imshow(chinaC5, cmap='gray')
+        axScene[1, 0].set_title('C = 5')
+        axScene[1, 0].axis('off')
+        axScene[1, 1].imshow(chinaC10, cmap='gray')
+        axScene[1, 1].set_title('C = 10')
+        axScene[1, 1].axis('off')
+        plt.tight_layout()

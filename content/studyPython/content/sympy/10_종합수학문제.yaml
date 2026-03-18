@@ -1,0 +1,380 @@
+meta:
+  id: sympy_10
+  title: 종합수학문제
+  order: 10
+  category: sympy
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["sympy", "최적화", "미분방정식", "응용수학", "종합"]
+  seo:
+    title: "SymPy 종합 - 실전 수학 문제 풀이"
+    description: "SymPy로 최적화, 넓이/부피 계산, 미분방정식 등 실전 수학 문제를 풉니다. 모든 개념을 종합 활용합니다."
+    keywords: ["sympy", "최적화", "미분방정식", "응용수학", "종합문제"]
+
+intro:
+  emoji: "🎓"
+  goal: 지금까지 배운 모든 개념을 활용하여 실전 수학 문제를 풉니다.
+  description: "이 프로젝트는 SymPy 시리즈의 최종 단계로, 모든 개념을 실전 문제에 적용합니다. 최적화 문제(상자 부피 최대화, 울타리 넓이 최대화)에서는 미분으로 극값을 찾습니다. 회전체 부피, 곡선 길이는 적분의 응용입니다. 미분방정식 dy/dt = ky는 인구 성장, 방사성 붕괴를 모델링합니다. 경제학의 한계비용, 이윤 극대화도 미분 문제입니다. 마르코프 체인은 행렬 거듭제곱으로 미래 상태를 예측합니다. 이 프로젝트를 완료하면 수학이 실제 문제에 어떻게 적용되는지 이해하게 됩니다."
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "종합 문제에는 다양한 SymPy 기능이 필요합니다. diff, integrate는 미적분, solve, Eq는 방정식, limit, series, summation은 해석학, Matrix는 선형대수, dsolve, Function은 미분방정식에 사용됩니다. plot은 결과를 시각화합니다. 이 모든 도구를 조합하여 실전 문제를 해결합니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sympy 함수들을 불러옵니다
+    content: |-
+      from sympy import symbols, solve, Eq, diff, integrate, simplify
+      from sympy import sin, cos, exp, log, sqrt, pi, Rational
+      from sympy import limit, series, summation, oo
+      from sympy import Matrix, dsolve, Function
+      from sympy.plotting import plot
+      from sympy import init_printing
+      init_printing()
+
+- id: step2_optimize
+  title: 2단계. 최적화 문제
+  subtitle: 미분으로 극값
+  blocks:
+  - type: text
+    content: "최적화는 주어진 조건에서 최대/최소를 찾는 문제입니다. 12×12 판에서 모서리를 x씩 잘라 접으면 (12-2x)×(12-2x)×x 상자가 됩니다. 부피 V(x)를 x에 대해 미분하여 V'(x)=0인 임계점을 찾고, V''(x)<0이면 최대입니다. x=2일 때 부피 128이 최대입니다. 이 방법은 공학 설계, 경영 최적화에 널리 사용됩니다."
+  - type: code
+    language: python
+    title: 상자 문제
+    description: 부피 최대 상자
+    content: |-
+      x = symbols('x', positive=True)
+      side = 12 - 2*x
+      vol = x * side**2
+      vol
+  - type: code
+    language: python
+    title: 임계점 찾기
+    description: dV/dx = 0인 x
+    content: |-
+      dvol = diff(vol, x)
+      crit = solve(dvol, x)
+      crit
+  - type: code
+    language: python
+    title: 최대값 확인
+    description: 2차 미분으로 판별
+    content: |-
+      d2vol = diff(vol, x, 2)
+      test = d2vol.subs(x, crit[0])
+      vmax = vol.subs(x, crit[0])
+      test, vmax
+  - type: tip
+    content: 12×12 판에서 모서리를 x씩 잘라 접어 상자를 만들 때, x=2일 때 부피 128이 최대입니다.
+
+- id: step3_fence
+  title: 3단계. 울타리 문제
+  subtitle: 제약 조건 최적화
+  blocks:
+  - type: text
+    content: "제약 조건이 있는 최적화 문제입니다. 둘레 100m의 울타리로 직사각형 목장을 만들 때 최대 넓이를 구합니다. 둘레 2w+2h=100에서 h=(100-2w)/2=50-w이고, 넓이 A=w×h=w(50-w)입니다. dA/dw=0에서 w=25, 따라서 정사각형 25×25=625m²가 최대입니다. 같은 둘레일 때 정사각형이 넓이가 최대라는 기하학적 사실을 미분으로 증명합니다."
+  - type: code
+    language: python
+    title: 문제 설정
+    description: 둘레 100m로 최대 넓이
+    content: |-
+      w = symbols('w', positive=True)
+      perimeter = 100
+      h = (perimeter - 2*w) / 2
+      area = w * h
+      area
+  - type: code
+    language: python
+    title: 최대 넓이
+    description: 미분으로 극값 찾기
+    content: |-
+      darea = diff(area, w)
+      wopt = solve(darea, w)[0]
+      hopt = h.subs(w, wopt)
+      amax = area.subs(w, wopt)
+      wopt, hopt, amax
+  - type: tip
+    content: 둘레가 고정일 때 넓이가 최대인 직사각형은 정사각형입니다. 25×25 = 625m²입니다.
+
+- id: step4_volume
+  title: 4단계. 회전체 부피
+  subtitle: 적분 응용
+  blocks:
+  - type: text
+    content: "곡선을 축 주위로 회전시키면 3D 입체가 됩니다. 원판법은 V = π∫[a,b]f(x)²dx로 얇은 원판들의 합입니다. y=√x를 x축으로 회전하면 V=π∫[0,4]x dx = 8π입니다. 반원 y=√(r²-x²)을 x축으로 회전하면 구가 되어 V = (4/3)πr³입니다. 원통껍질법은 y축 회전에 사용합니다."
+  - type: code
+    language: python
+    title: 원판법
+    description: y=√x를 x축 회전
+    content: |-
+      f = sqrt(x)
+      vdisc = integrate(pi * f**2, (x, 0, 4))
+      vdisc
+  - type: code
+    language: python
+    title: 포물면 부피
+    description: y=x²를 y축 회전 (원통껍질)
+    content: |-
+      vshell = integrate(2*pi*x * x**2, (x, 0, 1))
+      vshell
+  - type: code
+    language: python
+    title: 구의 부피
+    description: 반원을 회전
+    content: |-
+      r = symbols('r', positive=True)
+      semi = sqrt(r**2 - x**2)
+      vsphere = integrate(pi * semi**2, (x, -r, r))
+      simplify(vsphere)
+
+- id: step5_arc
+  title: 5단계. 곡선 길이
+  subtitle: 호의 길이
+  blocks:
+  - type: text
+    content: "곡선의 길이는 미소 구간 ds = √(dx² + dy²)를 적분합니다. y = f(x)일 때 L = ∫[a,b]√(1 + (dy/dx)²) dx입니다. y = x^(3/2)의 0≤x≤4 구간 길이를 구하면 dy/dx = (3/2)x^(1/2)이고, 적분하면 약 9.07입니다. 이 공식은 도로 설계, 케이블 길이 계산에 사용됩니다."
+  - type: code
+    language: python
+    title: 호의 길이 공식
+    description: y = x^(3/2)
+    content: |-
+      y = x**Rational(3, 2)
+      dydx = diff(y, x)
+      arc = integrate(sqrt(1 + dydx**2), (x, 0, 4))
+      arc
+  - type: code
+    language: python
+    title: 수치 계산
+    description: 실수 값으로 변환
+    content: |-
+      arcn = arc.evalf()
+      arcn
+
+- id: step6_diff_eq
+  title: 6단계. 미분방정식
+  subtitle: dsolve()
+  blocks:
+  - type: text
+    content: "미분방정식은 미지 함수와 그 도함수 사이의 관계입니다. dy/dt = y의 해는 y = Ce^t로, 시간에 따라 지수적으로 증가/감소합니다. dy/dt = ky의 해 y = Ce^(kt)는 k>0이면 성장, k<0이면 감쇠입니다. 인구 증가, 방사성 붕괴, 복리 이자가 이 모델입니다. dsolve()는 초기조건 없이 일반해 C를 포함하여 반환합니다."
+  - type: code
+    language: python
+    title: 1차 미분방정식
+    description: dy/dx = y
+    content: |-
+      t = symbols('t')
+      y = Function('y')
+      eq = Eq(y(t).diff(t), y(t))
+      sol = dsolve(eq, y(t))
+      sol
+  - type: code
+    language: python
+    title: 성장 모델
+    description: dy/dt = ky
+    content: |-
+      k = symbols('k')
+      eq2 = Eq(y(t).diff(t), k*y(t))
+      sol2 = dsolve(eq2, y(t))
+      sol2
+  - type: tip
+    content: dy/dt = ky의 해는 y = C×e^(kt)입니다. 이것은 지수적 성장/감쇠 모델로 인구, 방사선 붕괴 등에 적용됩니다.
+
+- id: step7_physics
+  title: 7단계. 물리 문제
+  subtitle: 운동과 일
+  blocks:
+  - type: text
+    content: "물리학에서 미적분은 핵심 도구입니다. 가속도를 적분하면 속도, 속도를 적분하면 위치입니다. 자유낙하에서 a=-g를 적분하면 v=-gt+v₀, 다시 적분하면 s=-(1/2)gt²+v₀t+s₀입니다. 일(Work)은 W=∫F dx로 힘을 거리에 대해 적분합니다. 용수철의 일 W=(1/2)kx²은 탄성 퍼텐셜 에너지입니다."
+  - type: code
+    language: python
+    title: 자유낙하
+    description: 가속도 → 속도 → 위치
+    content: |-
+      g, t, v0, s0 = symbols('g t v0 s0')
+      accel = -g
+      velocity = integrate(accel, t) + v0
+      position = integrate(velocity, t) + s0
+      velocity, position
+  - type: code
+    language: python
+    title: 일(Work) 계산
+    description: W = ∫F dx
+    content: |-
+      F = 10 + 2*x
+      work = integrate(F, (x, 0, 5))
+      work
+  - type: code
+    language: python
+    title: 용수철 일
+    description: 훅의 법칙 F = kx
+    content: |-
+      ks = symbols('k', positive=True)
+      wspring = integrate(ks * x, (x, 0, 1))
+      wspring
+
+- id: step8_economics
+  title: 8단계. 경제학 문제
+  subtitle: 한계비용과 수익
+  blocks:
+  - type: text
+    content: "경제학에서 미분은 '한계(marginal)' 개념입니다. 비용함수 C(q)의 미분 C'(q)는 한계비용으로, 한 단위 더 생산할 때의 추가 비용입니다. 이윤 π = 수익 - 비용 = pq - C(q)를 최대화하려면 dπ/dq = p - C'(q) = 0, 즉 가격 = 한계비용에서 생산합니다. 소비자 잉여는 수요곡선 아래 면적에서 실제 지출을 뺀 값입니다."
+  - type: code
+    language: python
+    title: 한계비용
+    description: 비용함수의 미분
+    content: |-
+      q = symbols('q', positive=True)
+      cost = 100 + 5*q + Rational(1, 100)*q**2
+      mc = diff(cost, q)
+      mc
+  - type: code
+    language: python
+    title: 이윤 최대화
+    description: 수익 - 비용 극대화
+    content: |-
+      price = 20
+      rev = price * q
+      profit = rev - cost
+      dp = diff(profit, q)
+      qopt = solve(dp, q)
+      qopt
+  - type: code
+    language: python
+    title: 소비자 잉여
+    description: 수요곡선 아래 면적
+    content: |-
+      demand = 100 - 2*q
+      qeq = solve(Eq(demand, 40), q)[0]
+      cs = integrate(demand - 40, (q, 0, qeq))
+      cs
+
+- id: step9_series_app
+  title: 9단계. 급수 응용
+  subtitle: 근사 계산
+  blocks:
+  - type: text
+    content: "테일러 급수는 복잡한 함수를 다항식으로 근사합니다. e^x = 1 + x + x²/2! + x³/3! + ...이므로 e^0.1 ≈ 1 + 0.1 + 0.005 + ... ≈ 1.1052입니다. 계산기가 sin, cos, exp를 계산할 때 실제로 테일러 급수를 사용합니다. 항을 많이 포함할수록 정확도가 높아지지만 계산량도 증가합니다. 근사의 오차 분석은 수치해석의 핵심 주제입니다."
+  - type: code
+    language: python
+    title: e 근사
+    description: e^0.1 계산
+    content: |-
+      eser = series(exp(x), x, 0, 5).removeO()
+      eser
+  - type: code
+    language: python
+    title: 근사값 비교
+    description: 실제값과 비교
+    content: |-
+      approx = eser.subs(x, Rational(1, 10))
+      actual = exp(Rational(1, 10)).evalf()
+      approx.evalf(), actual
+  - type: code
+    language: python
+    title: sin 근사
+    description: sin(0.1) 계산
+    content: |-
+      sser = series(sin(x), x, 0, 7).removeO()
+      sapx = sser.subs(x, Rational(1, 10)).evalf()
+      sact = sin(Rational(1, 10)).evalf()
+      sapx, sact
+
+- id: step10_matrix_app
+  title: 10단계. 행렬 응용
+  subtitle: 마르코프 체인
+  blocks:
+  - type: text
+    content: "마르코프 체인은 확률적 상태 전이를 모델링합니다. 전이행렬 P[i,j]는 상태 i에서 j로 갈 확률입니다. 오늘 맑으면 내일 맑을 확률 0.7, 흐릴 확률 0.3입니다. P²은 2일 후 확률, Pⁿ은 n일 후 확률입니다. n이 커지면 정상 상태(stationary distribution)에 수렴하여 초기 상태와 무관하게 같은 확률 분포가 됩니다. 이 모델은 날씨 예측, 주식 가격, 웹 페이지 순위(PageRank)에 사용됩니다."
+  - type: code
+    language: python
+    title: 전이행렬
+    description: 날씨 예측 모델
+    content: |-
+      P = Matrix([[Rational(7, 10), Rational(3, 10)],
+                  [Rational(4, 10), Rational(6, 10)]])
+      P
+  - type: code
+    language: python
+    title: 2일 후 확률
+    description: P² 계산
+    content: |-
+      P2 = P**2
+      P2
+  - type: code
+    language: python
+    title: 정상 상태
+    description: 장기 확률 분포
+    content: |-
+      P10 = P**10
+      P10.evalf(3)
+  - type: tip
+    content: 전이행렬을 여러 번 곱하면 정상 상태(stationary distribution)에 수렴합니다. 초기 상태와 무관하게 같은 확률 분포로 수렴합니다.
+
+- id: practice
+  title: 실습
+  subtitle: 종합 문제
+  blocks:
+  - type: text
+    content: "이제 모든 개념을 종합적으로 연습합니다. 미션1에서는 20×20 판으로 상자 부피를 최대화하고, 원뿔의 부피를 적분으로 계산합니다. 미션2에서는 성장 미분방정식 dM/ds = 0.1M의 해를 구하고, 마르코프 체인의 정상 상태를 확인합니다. 이 연습들은 수학이 실제 문제에 어떻게 적용되는지 보여줍니다. SymPy 시리즈를 완료하신 것을 축하합니다!"
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 최적화와 적분"
+    blocks:
+    - type: code
+      title: "상자 부피 최적화"
+      content: |-
+        from sympy import symbols, solve, diff, integrate, pi, sqrt, Rational
+
+        u = symbols('u', positive=True)
+
+        baseU = 20 - 2*u
+        volU = u * baseU * baseU
+        dvolU = diff(volU, u)
+        critU = solve(dvolU, u)
+        critU
+    - type: code
+      title: "최대 부피 계산"
+      content: |-
+        vmaxU = volU.subs(u, critU[0])
+        vmaxU
+    - type: code
+      title: "원뿔 부피 적분"
+      content: |-
+        coneU = u**2
+        vconeU = integrate(pi * coneU, (u, 0, 3))
+        vconeU
+  - type: expansion
+    title: "미션2: 미분방정식과 행렬"
+    blocks:
+    - type: code
+      title: "성장 미분방정식"
+      content: |-
+        from sympy import symbols, Function, Eq, dsolve, exp, Rational
+
+        s = symbols('s')
+        M = Function('M')
+
+        eqM = Eq(M(s).diff(s), Rational(1, 10)*M(s))
+        solM = dsolve(eqM, M(s))
+        solM
+    - type: code
+      title: "마르코프 정상상태"
+      content: |-
+        from sympy import Matrix, Rational
+
+        trans = Matrix([
+            [Rational(8, 10), Rational(2, 10)],
+            [Rational(3, 10), Rational(7, 10)]
+        ])
+        lterm = trans**20
+        lterm.evalf(3)
+    - type: code
+      title: "5단계 후 확률"
+      content: |-
+        initState = Matrix([1, 0])
+        futState = trans**5 * initState
+        futState.evalf(3)

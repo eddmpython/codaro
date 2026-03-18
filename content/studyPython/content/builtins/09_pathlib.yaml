@@ -1,0 +1,477 @@
+meta:
+  id: "09_pathlib"
+  title: "pathlib - 객체지향 경로"
+  category: "builtins"
+  tags: ["pathlib", "Path", "경로", "파일", "객체지향"]
+  seo:
+    title: "파이썬 pathlib 모듈 완전 정복"
+    description: "pathlib Path 객체로 객체지향 경로 처리를 배웁니다."
+    keywords: ["pathlib", "Path", "경로처리", "파일", "디렉토리", "파이썬경로"]
+
+intro:
+  emoji: "🗂️"
+  points:
+  - "Path 객체 생성과 조작"
+  - "경로 탐색과 검색"
+  - "파일 읽기/쓰기"
+  - "객체지향 경로 처리"
+
+sections:
+- id: "module_import"
+  title: "pathlib 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "pathlib는 파이썬의 객체지향 경로 처리 라이브러리입니다. Path 클래스를 통해 os.path보다 직관적인 API를 제공합니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 Path 클래스를 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "Path 클래스 가져오기"
+    description: "pathlib의 Path 클래스를 불러오고 정상 작동을 확인합니다."
+    content: |-
+      from pathlib import Path
+
+      currentPath = Path('.')
+      currentPath
+  - type: "tip"
+    content: "Pyodide 환경에서는 가상 파일시스템에서만 작동합니다. Path 객체는 경로를 문자열 대신 객체로 관리합니다."
+
+- id: "path_basics"
+  title: "Path 객체 기초"
+  subtitle: "경로 생성과 변환"
+  blocks:
+  - type: "text"
+    content: "Path 객체는 경로를 문자열이 아닌 객체로 다룹니다. 절대 경로 변환, 경로 구성요소 분리, 파일명과 확장자 추출 등 다양한 속성과 메서드를 제공합니다."
+  - type: "list"
+    items:
+    - "Path(): 경로 객체 생성"
+    - "resolve(): 절대 경로 변환"
+    - "parts: 경로 구성요소 분리"
+    - "name, stem, suffix: 파일명 분석"
+  - type: "code"
+    language: "python"
+    title: "절대 경로로 변환"
+    description: "상대 경로를 절대 경로로 변환합니다."
+    content: |-
+      absolutePath = Path('.').resolve()
+      absolutePath
+  - type: "code"
+    language: "python"
+    title: "경로 구성요소 분리"
+    description: "경로를 각 디렉토리와 파일명으로 분리합니다."
+    content: |-
+      samplePath = Path('/home/user/docs/report.txt')
+      samplePath.parts
+  - type: "code"
+    language: "python"
+    title: "파일명과 확장자"
+    description: "파일명, 확장자 제외 이름, 확장자만 추출합니다."
+    content: |-
+      filePath = Path('report.txt')
+      {'name': filePath.name, 'stem': filePath.stem, 'suffix': filePath.suffix}
+  - type: "code"
+    language: "python"
+    title: "부모 디렉토리"
+    description: "바로 위 디렉토리와 모든 상위 디렉토리를 확인합니다."
+    content: |-
+      docPath = Path('/home/user/docs/report.txt')
+      {'parent': docPath.parent, 'parents': list(docPath.parents)}
+  - type: "code"
+    language: "python"
+    title: "경로 나누기"
+    description: "parts, parent, name을 조합하여 경로를 완전히 분해합니다."
+    content: |-
+      fullPath = Path('/var/log/app/debug.log')
+      {'parts': fullPath.parts, 'parent': fullPath.parent, 'name': fullPath.name}
+  - type: "tip"
+    content: "parts는 경로를 튜플로 분리하며, parent는 바로 위 디렉토리, parents는 모든 상위 디렉토리를 반환합니다."
+
+- id: "path_operations"
+  title: "경로 조작"
+  subtitle: "경로 결합과 변경"
+  blocks:
+  - type: "text"
+    content: "Path 객체는 / 연산자로 경로를 결합하고, with_name()과 with_suffix()로 파일명과 확장자를 변경할 수 있습니다. relative_to()로 상대 경로를 계산합니다."
+  - type: "list"
+    items:
+    - "/: 경로 결합 연산자"
+    - "joinpath(): 여러 경로 결합"
+    - "with_name(): 파일명 변경"
+    - "with_suffix(): 확장자 변경"
+  - type: "code"
+    language: "python"
+    title: "경로 결합"
+    description: "/ 연산자로 경로를 직관적으로 결합합니다."
+    content: |-
+      basePath = Path('/home/user')
+      newPath = basePath / 'documents' / 'file.txt'
+      newPath
+  - type: "code"
+    language: "python"
+    title: "joinpath 메서드"
+    description: "여러 경로 요소를 한번에 결합합니다."
+    content: |-
+      rootPath = Path('/var')
+      combinedPath = rootPath.joinpath('log', 'app', 'error.log')
+      combinedPath
+  - type: "code"
+    language: "python"
+    title: "파일명 변경"
+    description: "with_name()으로 파일명만 교체한 새 경로를 생성합니다."
+    content: |-
+      originalPath = Path('/docs/report.txt')
+      renamedPath = originalPath.with_name('summary.txt')
+      renamedPath
+  - type: "code"
+    language: "python"
+    title: "확장자 변경"
+    description: "with_suffix()로 확장자만 교체합니다. 점을 포함해야 합니다."
+    content: |-
+      textFile = Path('/data/report.txt')
+      pdfFile = textFile.with_suffix('.pdf')
+      pdfFile
+  - type: "code"
+    language: "python"
+    title: "상대 경로 계산"
+    description: "relative_to()로 기준 경로로부터의 상대 경로를 계산합니다."
+    content: |-
+      fullPath = Path('/home/user/projects/app/main.py')
+      basePath = Path('/home/user')
+      relativePath = fullPath.relative_to(basePath)
+      relativePath
+  - type: "code"
+    language: "python"
+    title: "확장자 없애기"
+    description: "빈 문자열로 확장자를 제거한 Path 객체를 반환합니다."
+    content: |-
+      configFile = Path('settings.json')
+      noExtension = configFile.with_suffix('')
+      noExtension
+  - type: "tip"
+    content: "/ 연산자와 joinpath()는 동일한 결과를 반환합니다. with_name()과 with_suffix()는 원본을 변경하지 않고 새 Path 객체를 반환합니다."
+
+- id: "path_checking"
+  title: "경로 확인"
+  subtitle: "파일과 디렉토리 검증"
+  blocks:
+  - type: "text"
+    content: "Path 객체는 경로의 존재 여부, 타입(파일/디렉토리), 절대 경로 여부 등을 확인하는 메서드를 제공합니다. 모든 메서드는 True/False를 반환합니다."
+  - type: "list"
+    items:
+    - "exists(): 경로 존재 확인"
+    - "is_dir(): 디렉토리 확인"
+    - "is_file(): 파일 확인"
+    - "is_absolute(): 절대 경로 확인"
+  - type: "code"
+    language: "python"
+    title: "경로 존재 확인"
+    description: "exists()로 파일 또는 디렉토리의 존재 여부를 확인합니다."
+    content: |-
+      checkPath = Path('.')
+      checkPath.exists()
+  - type: "code"
+    language: "python"
+    title: "디렉토리 확인"
+    description: "is_dir()로 디렉토리인지 확인합니다. 파일이면 False입니다."
+    content: |-
+      dirPath = Path('.')
+      dirPath.is_dir()
+  - type: "code"
+    language: "python"
+    title: "파일 확인"
+    description: "is_file()로 일반 파일인지 확인합니다. 디렉토리나 존재하지 않으면 False입니다."
+    content: |-
+      filePath = Path('test.txt')
+      filePath.is_file()
+  - type: "code"
+    language: "python"
+    title: "절대 경로 확인"
+    description: "is_absolute()로 절대 경로 여부를 확인합니다."
+    content: |-
+      relPath = Path('docs/file.txt')
+      absPath = Path('/home/user/file.txt')
+      {'relative': relPath.is_absolute(), 'absolute': absPath.is_absolute()}
+  - type: "code"
+    language: "python"
+    title: "심볼릭 링크 확인"
+    description: "is_symlink()로 심볼릭 링크 여부를 확인합니다."
+    content: |-
+      linkPath = Path('/tmp/link')
+      linkPath.is_symlink()
+  - type: "code"
+    language: "python"
+    title: "경로 타입 종합 확인"
+    description: "여러 확인 메서드를 조합하여 경로 특성을 완전히 파악합니다."
+    content: |-
+      testPath = Path('.')
+      {'exists': testPath.exists(), 'is_dir': testPath.is_dir(), 'is_file': testPath.is_file(), 'is_absolute': testPath.is_absolute()}
+  - type: "tip"
+    content: "Pyodide에서는 가상 파일시스템 범위 내에서만 작동합니다. Windows에서 절대 경로는 C:\\로 시작하고, Unix에서는 /로 시작합니다."
+
+- id: "directory_navigation"
+  title: "디렉토리 탐색"
+  subtitle: "파일 검색과 필터링"
+  blocks:
+  - type: "text"
+    content: "Path 객체는 디렉토리의 내용을 나열하고, 패턴에 맞는 파일을 검색하는 강력한 기능을 제공합니다. iterdir()은 현재 디렉토리를, glob()과 rglob()은 패턴 매칭 검색을 수행합니다."
+  - type: "list"
+    items:
+    - "iterdir(): 디렉토리 내용 나열"
+    - "glob(): 패턴 매칭 검색"
+    - "rglob(): 재귀 패턴 검색"
+    - "필터링: is_file(), is_dir() 조합"
+  - type: "code"
+    language: "python"
+    title: "디렉토리 내용 나열"
+    description: "iterdir()로 모든 하위 항목(파일과 디렉토리)을 반환합니다."
+    content: |-
+      currentDir = Path('.')
+      [item.name for item in currentDir.iterdir()][:10]
+  - type: "code"
+    language: "python"
+    title: "파일만 필터링"
+    description: "is_file()로 파일만 선택하여 리스트를 생성합니다."
+    content: |-
+      currentDir = Path('.')
+      [f.name for f in currentDir.iterdir() if f.is_file()][:10]
+  - type: "code"
+    language: "python"
+    title: "디렉토리만 필터링"
+    description: "is_dir()로 디렉토리만 선택하여 하위 폴더 목록을 확인합니다."
+    content: |-
+      currentDir = Path('.')
+      [d.name for d in currentDir.iterdir() if d.is_dir()][:10]
+  - type: "code"
+    language: "python"
+    title: "glob 패턴 매칭"
+    description: "glob()으로 현재 디렉토리에서 패턴에 맞는 파일을 검색합니다."
+    content: |-
+      currentDir = Path('.')
+      [f.name for f in currentDir.glob('*.py')][:10]
+  - type: "code"
+    language: "python"
+    title: "재귀 glob 검색"
+    description: "rglob()으로 하위 디렉토리까지 재귀적으로 검색합니다."
+    content: |-
+      currentDir = Path('.')
+      [f.name for f in currentDir.rglob('*.yaml')][:10]
+  - type: "code"
+    language: "python"
+    title: "특정 확장자 찾기"
+    description: "rglob()으로 전체 프로젝트에서 특정 파일 타입을 수집합니다."
+    content: |-
+      projectDir = Path('.')
+      yamlFiles = list(projectDir.rglob('*.yaml'))[:5]
+      [f.name for f in yamlFiles]
+  - type: "tip"
+    content: "glob()은 현재 디렉토리만 검색하고, rglob()은 **/ 패턴을 자동으로 적용하여 모든 하위 디렉토리를 검색합니다."
+
+- id: "file_operations"
+  title: "파일 읽기/쓰기"
+  subtitle: "간편한 파일 처리"
+  blocks:
+  - type: "text"
+    content: "Path 객체는 read_text(), write_text()로 텍스트 파일을, read_bytes(), write_bytes()로 바이너리 파일을 간단히 처리합니다. 파일을 자동으로 열고 닫아 안전합니다."
+  - type: "list"
+    items:
+    - "write_text(): 텍스트 쓰기"
+    - "read_text(): 텍스트 읽기"
+    - "write_bytes(): 바이너리 쓰기"
+    - "read_bytes(): 바이너리 읽기"
+  - type: "code"
+    language: "python"
+    title: "텍스트 파일 쓰기"
+    description: "write_text()로 간단히 텍스트를 쓰고, 자동으로 파일을 열고 닫습니다."
+    content: |-
+      textFile = Path('sample.txt')
+      textFile.write_text('Hello from pathlib!')
+      textFile.read_text()
+  - type: "code"
+    language: "python"
+    title: "텍스트 파일 읽기"
+    description: "read_text()로 전체 내용을 문자열로 읽습니다."
+    content: |-
+      sampleFile = Path('sample.txt')
+      contentText = sampleFile.read_text()
+      contentText
+  - type: "code"
+    language: "python"
+    title: "바이트 파일 쓰기"
+    description: "write_bytes()로 바이너리 데이터를 씁니다."
+    content: |-
+      binaryFile = Path('data.bin')
+      binaryFile.write_bytes(b'\x00\x01\x02\x03')
+      binaryFile.read_bytes()
+  - type: "code"
+    language: "python"
+    title: "바이트 파일 읽기"
+    description: "read_bytes()로 바이너리 데이터를 bytes 객체로 읽습니다."
+    content: |-
+      binFile = Path('data.bin')
+      binaryContent = binFile.read_bytes()
+      binaryContent
+  - type: "code"
+    language: "python"
+    title: "여러 줄 쓰기"
+    description: "리스트를 개행 문자로 결합하여 여러 줄을 작성합니다."
+    content: |-
+      linesFile = Path('lines.txt')
+      linesData = ['First line', 'Second line', 'Third line']
+      linesFile.write_text('\n'.join(linesData))
+      linesFile.read_text()
+  - type: "code"
+    language: "python"
+    title: "파일 크기 확인"
+    description: "stat()으로 파일 정보를 가져오고, st_size로 바이트 크기를 확인합니다."
+    content: |-
+      sampleFile = Path('sample.txt')
+      fileSize = sampleFile.stat().st_size
+      fileSize
+  - type: "tip"
+    content: "Pyodide 환경에서는 가상 파일시스템에 저장됩니다. write_text()와 write_bytes()는 기존 파일을 덮어씁니다."
+
+- id: "practice"
+  title: "pathlib 모듈 종합 복습"
+  subtitle: "Path 객체 마스터하기"
+  blocks:
+  - type: "text"
+    content: "pathlib 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 현재 디렉토리 Path 객체 생성"
+    code: |-
+      currentWorkingDir = Path('.')
+      currentWorkingDir
+
+  - type: "expansion"
+    title: "🟢 기본2: 절대 경로 변환"
+    code: |-
+      absoluteCurrentPath = Path('.').resolve()
+      absoluteCurrentPath
+
+  - type: "expansion"
+    title: "🟢 기본3: 파일 경로의 이름과 확장자"
+    code: |-
+      docFile = Path('report.docx')
+      {'name': docFile.name, 'stem': docFile.stem, 'suffix': docFile.suffix}
+
+  - type: "expansion"
+    title: "🟢 기본4: 경로 결합하기"
+    code: |-
+      homeDir = Path('/home')
+      userFile = homeDir / 'user' / 'data.txt'
+      userFile
+
+  - type: "expansion"
+    title: "🟢 기본5: 현재 디렉토리 존재 확인"
+    code: |-
+      checkCurrentDir = Path('.')
+      checkCurrentDir.exists()
+
+  - type: "expansion"
+    title: "🟡 응용1: 여러 경로 한번에 결합"
+    code: |-
+      baseDir = Path('/var')
+      logFilePath = baseDir.joinpath('log', 'app', 'debug.log')
+      logFilePath
+
+  - type: "expansion"
+    title: "🟡 응용2: 파일명 변경한 새 경로"
+    code: |-
+      oldFile = Path('/data/old_name.txt')
+      newFile = oldFile.with_name('new_name.txt')
+      newFile
+
+  - type: "expansion"
+    title: "🟡 응용3: 확장자 변경한 새 경로"
+    code: |-
+      csvFile = Path('data.csv')
+      jsonFile = csvFile.with_suffix('.json')
+      jsonFile
+
+  - type: "expansion"
+    title: "🟡 응용4: 상대 경로 계산"
+    code: |-
+      projectPath = Path('/home/user/projects/myapp/src/main.py')
+      projectBase = Path('/home/user/projects')
+      relativeProjectPath = projectPath.relative_to(projectBase)
+      relativeProjectPath
+
+  - type: "expansion"
+    title: "🟡 응용5: 경로 타입 확인"
+    code: |-
+      pathToCheck = Path('.')
+      {'is_dir': pathToCheck.is_dir(), 'is_file': pathToCheck.is_file(), 'is_absolute': pathToCheck.is_absolute()}
+
+  - type: "expansion"
+    title: "🔴 심화1: 현재 디렉토리의 모든 파일명"
+    code: |-
+      currentDirectory = Path('.')
+      allFiles = [f.name for f in currentDirectory.iterdir() if f.is_file()][:10]
+      allFiles
+
+  - type: "expansion"
+    title: "🔴 심화2: 현재 디렉토리의 모든 디렉토리명"
+    code: |-
+      currentDirectory = Path('.')
+      allDirs = [d.name for d in currentDirectory.iterdir() if d.is_dir()][:10]
+      allDirs
+
+  - type: "expansion"
+    title: "🔴 심화3: 파이썬 파일만 찾기"
+    code: |-
+      currentDirectory = Path('.')
+      pythonFiles = [f.name for f in currentDirectory.glob('*.py')][:10]
+      pythonFiles
+
+  - type: "expansion"
+    title: "🔴 심화4: 재귀적으로 YAML 파일 찾기"
+    code: |-
+      projectRoot = Path('.')
+      yamlFilesRecursive = [f.name for f in projectRoot.rglob('*.yaml')][:10]
+      yamlFilesRecursive
+
+  - type: "expansion"
+    title: "🔴 심화5: 텍스트 파일 쓰고 읽기"
+    code: |-
+      testFile = Path('test_output.txt')
+      testFile.write_text('Pathlib is awesome!')
+      readContent = testFile.read_text()
+      readContent
+
+  - type: "expansion"
+    title: "🔴 심화6: 바이너리 파일 쓰고 읽기"
+    code: |-
+      binaryTestFile = Path('test_binary.bin')
+      binaryTestFile.write_bytes(b'\x48\x65\x6c\x6c\x6f')
+      readBinary = binaryTestFile.read_bytes()
+      readBinary
+
+  - type: "expansion"
+    title: "🔴 심화7: 여러 줄 파일 작성"
+    code: |-
+      multiLineFile = Path('multi_lines.txt')
+      linesToWrite = ['Line 1', 'Line 2', 'Line 3']
+      multiLineFile.write_text('\n'.join(linesToWrite))
+      multiLineFile.read_text()
+
+  - type: "expansion"
+    title: "🔴 심화8: 파일 정보 조회"
+    code: |-
+      infoFile = Path('test_output.txt')
+      fileInfo = infoFile.stat()
+      {'size': fileInfo.st_size, 'is_file': infoFile.is_file()}
+
+  - type: "expansion"
+    title: "🔴 심화9: 경로 구성요소 완전 분해"
+    code: |-
+      complexPath = Path('/home/user/projects/app/src/main.py')
+      {'parts': complexPath.parts, 'parent': complexPath.parent.name, 'stem': complexPath.stem, 'suffix': complexPath.suffix}
+
+  - type: "expansion"
+    title: "🔴 심화10: 부모 디렉토리 모두 나열"
+    code: |-
+      deepPath = Path('/a/b/c/d/e/file.txt')
+      allParents = [p.name for p in deepPath.parents]
+      allParents

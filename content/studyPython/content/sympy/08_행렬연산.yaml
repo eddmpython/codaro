@@ -1,0 +1,366 @@
+meta:
+  id: sympy_08
+  title: 행렬연산
+  order: 8
+  category: sympy
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["sympy", "Matrix", "행렬", "역행렬", "고유값", "선형대수"]
+  seo:
+    title: "SymPy 행렬 연산 - Matrix와 선형대수"
+    description: "SymPy로 행렬을 생성하고 연산합니다. 역행렬, 행렬식, 고유값과 고유벡터, 연립방정식 풀이를 배웁니다."
+    keywords: ["sympy", "Matrix", "행렬", "역행렬", "고유값", "선형대수"]
+
+intro:
+  emoji: "🔢"
+  goal: Matrix()로 행렬을 다루고 선형대수 계산을 수행합니다.
+  description: "행렬은 선형대수의 핵심으로, 데이터 과학, 머신러닝, 컴퓨터 그래픽스의 기초입니다. 2×2 행렬 [[a,b],[c,d]]는 2차원 공간의 선형 변환을 표현하고, 3×3 행렬은 3D 회전과 스케일링에 사용됩니다. 역행렬 A⁻¹은 변환의 취소, 행렬식 det(A)는 변환의 스케일 팩터를 의미합니다. 고유값과 고유벡터는 주성분 분석(PCA)의 기초가 됩니다. 이 프로젝트를 완료하면 행렬 연산, 연립방정식 풀이, 고유값 분석까지 다룰 수 있게 됩니다."
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "행렬 작업에 필요한 함수들을 불러옵니다. Matrix()는 행렬을 생성하는 핵심 클래스입니다. eye(n)은 n×n 단위행렬, zeros(m,n)은 m×n 영행렬, ones(m,n)은 모든 원소가 1인 행렬입니다. diag()는 대각행렬을 생성합니다. 이 함수들은 NumPy와 유사하지만 기호 연산이 가능합니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sympy 함수들을 불러옵니다
+    content: |-
+      from sympy import Matrix, eye, zeros, ones, diag
+      from sympy import symbols, solve, Eq, sqrt, Rational
+      from sympy import init_printing
+      init_printing()
+
+- id: step2_create
+  title: 2단계. 행렬 생성
+  subtitle: Matrix()
+  blocks:
+  - type: text
+    content: "Matrix()는 중첩 리스트로 행렬을 생성합니다. Matrix([[1,2],[3,4]])는 2×2 행렬로, 첫 번째 리스트 [1,2]가 첫 번째 행, [3,4]가 두 번째 행입니다. Matrix([1,2,3])처럼 1차원 리스트를 전달하면 3×1 열벡터가 됩니다. 행렬의 크기는 .shape으로, 개별 원소는 [i,j] 인덱싱으로 접근합니다."
+  - type: code
+    language: python
+    title: 2×2 행렬
+    description: 2행 2열 행렬 생성
+    content: |-
+      mat1 = Matrix([[1, 2], [3, 4]])
+      mat1
+  - type: code
+    language: python
+    title: 3×3 행렬
+    description: 3행 3열 행렬 생성
+    content: |-
+      mat2 = Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+      mat2
+  - type: code
+    language: python
+    title: 열벡터
+    description: 3×1 열벡터
+    content: |-
+      vec = Matrix([1, 2, 3])
+      vec
+  - type: tip
+    content: Matrix([[a, b], [c, d]])는 2×2 행렬입니다. Matrix([a, b, c])는 3×1 열벡터입니다.
+
+- id: step3_special
+  title: 3단계. 특수 행렬
+  subtitle: eye, zeros, ones
+  blocks:
+  - type: text
+    content: "특수 행렬은 선형대수에서 중요한 역할을 합니다. 단위행렬 I = eye(n)은 곱해도 원래 행렬이 변하지 않는 항등원입니다. AI = IA = A입니다. zeros(m,n)은 영행렬로 덧셈의 항등원입니다. diag(1,2,3)은 대각선에만 값이 있는 대각행렬로, 스케일링 변환을 표현합니다. 대각행렬의 행렬식은 대각 원소의 곱입니다."
+  - type: code
+    language: python
+    title: 단위행렬
+    description: 3×3 단위행렬
+    content: |-
+      identity = eye(3)
+      identity
+  - type: code
+    language: python
+    title: 영행렬
+    description: 2×3 영행렬
+    content: |-
+      zero = zeros(2, 3)
+      zero
+  - type: code
+    language: python
+    title: 대각행렬
+    description: 대각 원소 지정
+    content: |-
+      diagonal = diag(1, 2, 3)
+      diagonal
+
+- id: step4_operations
+  title: 4단계. 기본 연산
+  subtitle: 덧셈, 곱셈
+  blocks:
+  - type: text
+    content: "행렬 연산은 원소별이 아닌 선형대수 규칙을 따릅니다. 덧셈 A+B는 같은 크기의 행렬끼리만 가능하고 원소별로 더합니다. 스칼라곱 2A는 모든 원소에 2를 곱합니다. 행렬곱 AB는 A의 열 수와 B의 행 수가 같아야 합니다. 중요한 것은 AB ≠ BA로 교환법칙이 성립하지 않습니다. 이 비교환성이 행렬만의 특성입니다."
+  - type: code
+    language: python
+    title: 두 행렬 정의
+    description: 연산할 행렬 생성
+    content: |-
+      matA = Matrix([[1, 2], [3, 4]])
+      matB = Matrix([[5, 6], [7, 8]])
+      matA, matB
+  - type: code
+    language: python
+    title: 행렬 덧셈
+    description: A + B
+    content: |-
+      msum = matA + matB
+      msum
+  - type: code
+    language: python
+    title: 스칼라 곱
+    description: 2 × A
+    content: |-
+      scaled = 2 * matA
+      scaled
+  - type: code
+    language: python
+    title: 행렬 곱
+    description: A × B
+    content: |-
+      prod = matA * matB
+      prod
+  - type: tip
+    content: 행렬 곱 AB ≠ BA입니다. 행렬 곱은 교환법칙이 성립하지 않습니다. 곱셈 순서에 주의하세요.
+
+- id: step5_transpose
+  title: 5단계. 전치와 거듭제곱
+  subtitle: T, **n
+  blocks:
+  - type: text
+    content: "전치행렬 Aᵀ는 행과 열을 바꾼 행렬입니다. 2×3 행렬의 전치는 3×2가 됩니다. .T 속성으로 접근합니다. (AB)ᵀ = BᵀAᵀ 규칙이 중요합니다. 거듭제곱 A²는 A*A, A³는 A*A*A입니다. 정사각행렬만 거듭제곱이 가능합니다. A⁻¹은 역행렬로 A*A⁻¹ = I입니다."
+  - type: code
+    language: python
+    title: 전치행렬
+    description: 행과 열 교환
+    content: |-
+      mat3 = Matrix([[1, 2, 3], [4, 5, 6]])
+      transposed = mat3.T
+      transposed
+  - type: code
+    language: python
+    title: 행렬 거듭제곱
+    description: A²
+    content: |-
+      squared = matA ** 2
+      squared
+  - type: code
+    language: python
+    title: 세제곱
+    description: A³
+    content: |-
+      cubed = matA ** 3
+      cubed
+
+- id: step6_det_inv
+  title: 6단계. 행렬식과 역행렬
+  subtitle: det(), inv()
+  blocks:
+  - type: text
+    content: "행렬식 det(A)는 행렬이 나타내는 선형 변환의 스케일 팩터입니다. 2×2 행렬 [[a,b],[c,d]]의 행렬식은 ad-bc입니다. det(A)≠0이면 역행렬이 존재하고, det(A)=0이면 특이행렬로 역행렬이 없습니다. 역행렬 A⁻¹은 A*A⁻¹ = A⁻¹*A = I를 만족합니다. 연립방정식 Ax=b의 해는 x=A⁻¹b로 구할 수 있습니다."
+  - type: code
+    language: python
+    title: 행렬식
+    description: det(A) 계산
+    content: |-
+      detA = matA.det()
+      detA
+  - type: code
+    language: python
+    title: 역행렬
+    description: A⁻¹ 계산
+    content: |-
+      invA = matA.inv()
+      invA
+  - type: code
+    language: python
+    title: 검증
+    description: A × A⁻¹ = I
+    content: |-
+      check = matA * invA
+      check
+  - type: tip
+    content: 행렬식이 0이면 역행렬이 존재하지 않습니다(특이행렬). det()가 0이 아니면 inv()로 역행렬을 구할 수 있습니다.
+
+- id: step7_eigenvalue
+  title: 7단계. 고유값과 고유벡터
+  subtitle: eigenvals(), eigenvects()
+  blocks:
+  - type: text
+    content: "고유값 λ와 고유벡터 v는 Av = λv를 만족합니다. 이는 행렬 A가 벡터 v를 λ배로 스케일링만 한다는 의미입니다. 고유값은 특성방정식 det(A-λI)=0을 풀어 구합니다. eigenvals()는 고유값과 중복도를, eigenvects()는 고유벡터까지 반환합니다. diagonalize()는 P⁻¹AP=D 형태로 대각화하여 거듭제곱 계산을 간단하게 합니다. 이 개념은 PCA, 진동 분석에 핵심입니다."
+  - type: code
+    language: python
+    title: 고유값
+    description: 고유값 계산
+    content: |-
+      emat = Matrix([[4, 1], [2, 3]])
+      evals = emat.eigenvals()
+      evals
+  - type: code
+    language: python
+    title: 고유벡터
+    description: 고유값과 고유벡터 함께
+    content: |-
+      evecs = emat.eigenvects()
+      evecs
+  - type: code
+    language: python
+    title: 대각화
+    description: P⁻¹AP = D
+    content: |-
+      P, D = emat.diagonalize()
+      D
+  - type: tip
+    content: "eigenvals()는 {고유값: 중복도} 딕셔너리를 반환합니다. eigenvects()는 (고유값, 중복도, [고유벡터들]) 튜플 리스트입니다."
+
+- id: step8_solve
+  title: 8단계. 연립방정식 풀이
+  subtitle: Ax = b
+  blocks:
+  - type: text
+    content: "연립일차방정식은 행렬로 체계적으로 풀 수 있습니다. 2x+y=5, x+3y=8을 행렬로 표현하면 [[2,1],[1,3]][x,y]ᵀ = [5,8]ᵀ입니다. 해는 x = A⁻¹b로 구합니다. 변수가 많아져도 같은 방법으로 풀 수 있습니다. 역행렬이 존재하면(det≠0) 유일한 해가 있고, 존재하지 않으면 무한히 많거나 해가 없습니다."
+  - type: code
+    language: python
+    title: 연립방정식 설정
+    description: 2x+y=5, x+3y=8
+    content: |-
+      coeff = Matrix([[2, 1], [1, 3]])
+      const = Matrix([5, 8])
+      coeff, const
+  - type: code
+    language: python
+    title: 역행렬로 풀기
+    description: x = A⁻¹b
+    content: |-
+      sol = coeff.inv() * const
+      sol
+  - type: code
+    language: python
+    title: 검증
+    description: A × x = b 확인
+    content: |-
+      verify = coeff * sol
+      verify
+  - type: tip
+    content: 변수가 많은 연립방정식은 행렬로 표현하면 체계적으로 풀 수 있습니다. 계수행렬과 상수벡터로 분리합니다.
+
+- id: step9_symbolic
+  title: 9단계. 기호 행렬
+  subtitle: 변수 포함 행렬
+  blocks:
+  - type: text
+    content: "SymPy의 장점은 숫자 대신 기호를 사용할 수 있다는 것입니다. 2×2 기호 행렬 [[a,b],[c,d]]의 행렬식은 ad-bc, 역행렬은 (1/(ad-bc))[[d,-b],[-c,a]]입니다. 이런 일반 공식은 수치 계산으로는 얻을 수 없습니다. 기호 행렬로 패턴을 파악하고, 실제 값을 대입하여 검증할 수 있습니다."
+  - type: code
+    language: python
+    title: 기호 행렬
+    description: 변수를 포함한 행렬
+    content: |-
+      a, b, c, d = symbols('a b c d')
+      smat = Matrix([[a, b], [c, d]])
+      smat
+  - type: code
+    language: python
+    title: 기호 행렬식
+    description: ad - bc
+    content: |-
+      sdet = smat.det()
+      sdet
+  - type: code
+    language: python
+    title: 기호 역행렬
+    description: 2×2 역행렬 공식
+    content: |-
+      sinv = smat.inv()
+      sinv
+
+- id: step10_rank
+  title: 10단계. 계수와 영공간
+  subtitle: rank(), nullspace()
+  blocks:
+  - type: text
+    content: "행렬의 계수(rank)는 선형 독립인 행(또는 열)의 최대 개수입니다. 3×3 행렬의 rank가 2라면 한 행이 다른 행들의 조합으로 표현됩니다. nullspace()는 Ax=0의 해집합으로, 영벡터가 아닌 해가 있으면 행렬은 특이(singular)합니다. rref()는 기약행사다리꼴로 변환하여 rank와 영공간을 직접 확인할 수 있습니다."
+  - type: code
+    language: python
+    title: 행렬 계수
+    description: 독립인 행/열 개수
+    content: |-
+      mat4 = Matrix([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+      rk = mat4.rank()
+      rk
+  - type: code
+    language: python
+    title: 영공간
+    description: Ax = 0의 해
+    content: |-
+      nullsp = mat4.nullspace()
+      nullsp
+  - type: code
+    language: python
+    title: RREF
+    description: 기약행사다리꼴
+    content: |-
+      rref, pivots = mat4.rref()
+      rref
+
+- id: practice
+  title: 실습
+  subtitle: 행렬 연습
+  blocks:
+  - type: text
+    content: "이제 행렬의 기본 연산과 고급 기능을 종합적으로 연습합니다. 미션1에서는 두 행렬 P, Q의 곱 PQ와 QP가 다름을 확인하고, 행렬식과 역행렬을 계산합니다. 미션2에서는 대칭행렬의 고유값을 구하고, 3×3 연립방정식을 행렬로 풉니다. 이 연습들은 데이터 분석, 머신러닝 알고리즘 이해에 직접 활용됩니다."
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 행렬 기본 연산"
+    blocks:
+    - type: code
+      title: "행렬 곱셈 순서"
+      content: |-
+        from sympy import Matrix, eye
+
+        matP = Matrix([[2, 1], [1, 3]])
+        matQ = Matrix([[1, 2], [0, 1]])
+
+        prodPQ = matP * matQ
+        prodQP = matQ * matP
+        prodPQ, prodQP
+    - type: code
+      title: "행렬식과 역행렬"
+      content: |-
+        detP = matP.det()
+        invP = matP.inv()
+        detP, invP
+    - type: code
+      title: "역행렬 검증"
+      content: |-
+        checkP = matP * invP
+        checkP
+  - type: expansion
+    title: "미션2: 고유값과 연립방정식"
+    blocks:
+    - type: code
+      title: "고유값 계산"
+      content: |-
+        from sympy import Matrix
+
+        matR = Matrix([[3, 1], [1, 3]])
+        eigR = matR.eigenvals()
+        eigvR = matR.eigenvects()
+        eigR
+    - type: code
+      title: "고유벡터 확인"
+      content: |-
+        eigvR
+    - type: code
+      title: "3x3 연립방정식"
+      content: |-
+        coeffS = Matrix([[1, 1, 1], [2, 1, 3], [3, 2, 1]])
+        constS = Matrix([6, 10, 10])
+        solS = coeffS.inv() * constS
+        solS

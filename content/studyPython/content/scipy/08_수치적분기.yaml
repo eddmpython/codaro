@@ -1,0 +1,475 @@
+meta:
+  id: scipy_08
+  title: 수치적분기
+  order: 8
+  category: scipy
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["scipy.integrate", "quad", "적분", "면적계산", "미분방정식"]
+  seo:
+    title: "scipy.integrate 수치적분 - 곡선 아래 면적 계산"
+    description: "scipy.integrate의 quad로 곡선 아래 면적을 계산합니다. 정적분, 이중적분, 미분방정식 풀이를 배웁니다."
+    keywords: ["scipy", "integrate", "quad", "적분", "면적"]
+
+intro:
+  emoji: "📐"
+  goal: scipy.integrate로 수치적분을 수행하고 미분방정식을 풉니다.
+  description: 해석적으로 풀 수 없는 적분을 수치적으로 계산합니다. 곡선 아래 면적, 확률 계산, 물리량 누적 등 다양한 응용에 활용합니다.
+
+sections:
+- id: load
+  title: 데이터 로드
+  subtitle: 적분 환경 설정
+  blocks:
+  - type: text
+    content: 수치적분은 함수 곡선 아래의 면적을 근사적으로 계산합니다. 해석적 적분이 불가능하거나 너무 복잡한 경우에 유용합니다. 이 프로젝트에서는 다양한 적분 기법과 미분방정식 풀이를 실습합니다.
+  - type: code
+    language: python
+    title: 라이브러리 설정
+    description: scipy.integrate import
+    content: |-
+      import micropip
+      await micropip.install('scipy')
+
+      import numpy as np
+      from scipy import integrate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+- id: quad
+  title: 기본 정적분
+  subtitle: integrate.quad
+  blocks:
+  - type: text
+    content: quad 함수는 1차원 정적분을 계산합니다. 적분할 함수, 하한, 상한을 입력하면 적분값과 추정 오차를 반환합니다. 적응형 구적법을 사용하여 함수가 급격히 변하는 곳에서 더 많은 점을 샘플링합니다.
+  - type: code
+    language: python
+    title: 단순 함수 적분
+    description: ∫x² dx from 0 to 1
+    content: |-
+      def f1(x):
+          return x ** 2
+
+      result1, error1 = integrate.quad(f1, 0, 1)
+      analyticalResult = 1/3
+
+      quadDf = pd.DataFrame({
+          'Method': ['Numerical (quad)', 'Analytical'],
+          'Result': [result1, analyticalResult],
+          'Error': [abs(result1 - analyticalResult), 0]
+      })
+      quadDf
+  - type: code
+    language: python
+    title: 면적 시각화
+    description: 색칠된 영역
+    content: |-
+      xPlot = np.linspace(0, 1.5, 100)
+      yPlot = f1(xPlot)
+
+      figArea, axArea = plt.subplots(figsize=(10, 6))
+      axArea.plot(xPlot, yPlot, 'b-', linewidth=2, label='f(x) = x²')
+
+      xFill = np.linspace(0, 1, 100)
+      axArea.fill_between(xFill, f1(xFill), alpha=0.3, color='blue', label=f'Area = {result1:.4f}')
+
+      axArea.axvline(0, color='gray', linestyle='--', alpha=0.5)
+      axArea.axvline(1, color='gray', linestyle='--', alpha=0.5)
+      axArea.set_xlabel('x')
+      axArea.set_ylabel('f(x)')
+      axArea.set_title('Definite Integral: Area Under Curve')
+      axArea.legend()
+      axArea.grid(True, alpha=0.3)
+      figArea
+  - type: tip
+    content: quad는 적응형 Gauss-Kronrod 구적법을 사용합니다. 반환되는 error는 추정 오차이며, 대부분의 경우 매우 작습니다.
+
+- id: trig
+  title: 삼각함수 적분
+  subtitle: 양수/음수 영역
+  blocks:
+  - type: text
+    content: 삼각함수의 적분에서는 양수 영역과 음수 영역이 상쇄될 수 있습니다. 한 주기(0~2π)에 대한 sin 적분은 0이 됩니다. 절대값 적분이 필요한 경우 별도로 처리해야 합니다.
+  - type: code
+    language: python
+    title: sin 적분
+    description: 다양한 범위
+    content: |-
+      sinHalf, _ = integrate.quad(np.sin, 0, np.pi)
+      sinFull, _ = integrate.quad(np.sin, 0, 2 * np.pi)
+
+      sinDf = pd.DataFrame({
+          'Range': ['0 to π', '0 to 2π'],
+          'Integral': [f'{sinHalf:.6f}', f'{sinFull:.6e}'],
+          'Interpretation': ['Positive area only', 'Positive + Negative = 0']
+      })
+      sinDf
+  - type: code
+    language: python
+    title: sin 적분 시각화
+    description: 양수/음수 영역
+    content: |-
+      xSin = np.linspace(0, 2 * np.pi, 200)
+      ySin = np.sin(xSin)
+
+      figSin, axSin = plt.subplots(figsize=(12, 5))
+      axSin.plot(xSin, ySin, 'b-', linewidth=2)
+      axSin.fill_between(xSin[:100], ySin[:100], alpha=0.3, color='green', label='Positive Area')
+      axSin.fill_between(xSin[100:], ySin[100:], alpha=0.3, color='red', label='Negative Area')
+      axSin.axhline(0, color='gray', linestyle='-', alpha=0.5)
+      axSin.set_xlabel('x')
+      axSin.set_ylabel('sin(x)')
+      axSin.set_title('sin(x) Integral: Positive and Negative Areas Cancel')
+      axSin.legend()
+      axSin.grid(True, alpha=0.3)
+      figSin
+
+- id: gaussian
+  title: 가우스 적분
+  subtitle: 정규분포 확률
+  blocks:
+  - type: text
+    content: 정규분포의 확률밀도함수를 적분하면 확률을 계산할 수 있습니다. 68-95-99.7 법칙은 ±1σ, ±2σ, ±3σ 범위에 각각 약 68%, 95%, 99.7%의 데이터가 포함됨을 의미합니다. quad로 이를 직접 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 정규분포 PDF 적분
+    description: 시그마 범위 확률
+    content: |-
+      def normalPdf(x, mu=0, sigma=1):
+          return (1 / (sigma * np.sqrt(2 * np.pi))) * np.exp(-0.5 * ((x - mu) / sigma) ** 2)
+
+      prob1Sig, _ = integrate.quad(normalPdf, -1, 1)
+      prob2Sig, _ = integrate.quad(normalPdf, -2, 2)
+      prob3Sig, _ = integrate.quad(normalPdf, -3, 3)
+
+      probDf = pd.DataFrame({
+          'Range': ['±1σ', '±2σ', '±3σ'],
+          'Probability': [f'{prob1Sig:.4%}', f'{prob2Sig:.4%}', f'{prob3Sig:.4%}'],
+          'Expected': ['~68%', '~95%', '~99.7%']
+      })
+      probDf
+  - type: code
+    language: python
+    title: 확률 시각화
+    description: 68-95-99.7 법칙
+    content: |-
+      xNorm = np.linspace(-4, 4, 200)
+      yNorm = normalPdf(xNorm)
+
+      figNorm, axNorm = plt.subplots(figsize=(12, 6))
+      axNorm.plot(xNorm, yNorm, 'b-', linewidth=2)
+
+      x1s = np.linspace(-1, 1, 100)
+      axNorm.fill_between(x1s, normalPdf(x1s), alpha=0.5, color='green', label=f'±1σ: {prob1Sig:.1%}')
+
+      axNorm.axvline(-1, color='gray', linestyle='--', alpha=0.5)
+      axNorm.axvline(1, color='gray', linestyle='--', alpha=0.5)
+
+      axNorm.set_xlabel('x')
+      axNorm.set_ylabel('Probability Density')
+      axNorm.set_title('Normal Distribution - 68-95-99.7 Rule')
+      axNorm.legend()
+      axNorm.grid(True, alpha=0.3)
+      figNorm
+
+- id: infinite
+  title: 무한 적분
+  subtitle: -∞ to ∞
+  blocks:
+  - type: text
+    content: quad는 무한 구간 적분도 지원합니다. np.inf를 사용하여 양의 무한대, -np.inf를 사용하여 음의 무한대를 지정합니다. 정규분포 전체 적분은 정의에 의해 1이 됩니다.
+  - type: code
+    language: python
+    title: 전체 정규분포
+    description: -∞ to ∞
+    content: |-
+      totalProb, errProb = integrate.quad(normalPdf, -np.inf, np.inf)
+
+      infDf = pd.DataFrame({
+          'Integration': ['Full Normal PDF', 'Tail P(X > 2)'],
+          'Result': [f'{totalProb:.6f}', ''],
+          'Expected': ['1.0', '']
+      })
+  - type: code
+    language: python
+    title: 꼬리 확률
+    description: P(X > 2)
+    content: |-
+      tailProb, _ = integrate.quad(normalPdf, 2, np.inf)
+
+      tailDf = pd.DataFrame({
+          'Calculation': ['P(X > 2)', 'P(|X| > 2)'],
+          'Probability': [f'{tailProb:.4%}', f'{2*tailProb:.4%}']
+      })
+      tailDf
+
+- id: trapz
+  title: 데이터 적분
+  subtitle: 사다리꼴 법칙
+  blocks:
+  - type: text
+    content: 함수 대신 이산 데이터가 있을 때는 trapezoid(사다리꼴 법칙)나 simpson(심프슨 법칙)을 사용합니다. 속도-시간 그래프에서 이동 거리를 계산하거나, 전력-시간에서 총 에너지를 계산할 때 유용합니다.
+  - type: code
+    language: python
+    title: 속도 데이터에서 거리 계산
+    description: ∫v(t)dt = distance
+    content: |-
+      time = np.array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+      velocity = np.array([0, 2, 5, 8, 10, 10, 9, 7, 4, 2, 0])
+
+      distance = integrate.trapezoid(velocity, time)
+
+      figVel, axVel = plt.subplots(figsize=(10, 6))
+      axVel.plot(time, velocity, 'b-o', linewidth=2, markersize=8, label='Velocity')
+      axVel.fill_between(time, velocity, alpha=0.3, color='blue', label=f'Distance = {distance:.1f} m')
+      axVel.set_xlabel('Time (s)')
+      axVel.set_ylabel('Velocity (m/s)')
+      axVel.set_title('Distance from Velocity-Time Graph')
+      axVel.legend()
+      axVel.grid(True, alpha=0.3)
+      figVel
+  - type: tip
+    content: trapezoid(구 trapz)는 사다리꼴로 근사합니다. simpson은 포물선으로 근사하여 더 정확하지만 짝수 개 구간이 필요합니다.
+
+- id: dblquad
+  title: 이중적분
+  subtitle: 2차원 적분
+  blocks:
+  - type: text
+    content: dblquad는 2차원 영역에서 적분을 수행합니다. 부피 계산, 2차원 확률 밀도 적분, 질량 중심 계산 등에 사용됩니다. 적분 순서는 안쪽(y)부터 계산한 후 바깥쪽(x)을 계산합니다.
+  - type: code
+    language: python
+    title: 이중적분 예제
+    description: ∬xy dA over [0,1]×[0,1]
+    content: |-
+      def f2d(y, x):
+          return x * y
+
+      resultDbl, errDbl = integrate.dblquad(f2d, 0, 1, 0, 1)
+
+      dblDf = pd.DataFrame({
+          'Integral': ['∬xy dA', 'Circle Area (r=1)'],
+          'Result': [f'{resultDbl:.6f}', ''],
+          'Analytical': ['1/4 = 0.25', 'π ≈ 3.1416']
+      })
+      dblDf
+  - type: code
+    language: python
+    title: 원 면적 계산
+    description: 적분으로 π 계산
+    content: |-
+      def lowerY(x):
+          return -np.sqrt(1 - x**2) if abs(x) <= 1 else 0
+
+      def upperY(x):
+          return np.sqrt(1 - x**2) if abs(x) <= 1 else 0
+
+      circleArea, _ = integrate.dblquad(lambda y, x: 1, -1, 1, lowerY, upperY)
+
+      circleDf = pd.DataFrame({
+          'Method': ['Double Integral', 'numpy.pi'],
+          'Area': [circleArea, np.pi],
+          'Error': [abs(circleArea - np.pi), 0]
+      })
+      circleDf
+
+- id: ode
+  title: 미분방정식 풀이
+  subtitle: odeint
+  blocks:
+  - type: text
+    content: 미분방정식은 변화율을 정의합니다. odeint로 초기값 문제를 수치적으로 풉니다. 가장 간단한 예는 지수 감쇠 dy/dt = -ky로, 방사성 붕괴나 RC 회로 방전을 모델링합니다.
+  - type: code
+    language: python
+    title: 지수 감쇠
+    description: dy/dt = -ky
+    content: |-
+      def decay(y, tVal, k):
+          return -k * y
+
+      y0 = 100
+      kDecay = 0.3
+      tSpan = np.linspace(0, 20, 100)
+
+      solution = integrate.odeint(decay, y0, tSpan, args=(kDecay,))
+      analyticalSol = y0 * np.exp(-kDecay * tSpan)
+
+      figDecay, axDecay = plt.subplots(figsize=(10, 6))
+      axDecay.plot(tSpan, solution, 'b-', linewidth=2, label='Numerical (odeint)')
+      axDecay.plot(tSpan, analyticalSol, 'r--', linewidth=2, label='Analytical')
+      axDecay.set_xlabel('Time')
+      axDecay.set_ylabel('y')
+      axDecay.set_title("Exponential Decay: dy/dt = -0.3y")
+      axDecay.legend()
+      axDecay.grid(True, alpha=0.3)
+      figDecay
+
+- id: oscillator
+  title: 조화진동자
+  subtitle: 2차 미분방정식
+  blocks:
+  - type: text
+    content: 2차 미분방정식은 1차 연립방정식으로 변환하여 풉니다. 조화진동자(스프링-질량 시스템)는 d²x/dt² = -ω²x로, 위치 x와 속도 v = dx/dt 두 변수의 연립방정식으로 변환합니다.
+  - type: code
+    language: python
+    title: 조화진동자 시뮬레이션
+    description: d²x/dt² = -ω²x
+    content: |-
+      def harmonic(state, tVal, omega):
+          x, v = state
+          dxdt = v
+          dvdt = -omega**2 * x
+          return [dxdt, dvdt]
+
+      omegaH = 2
+      initState = [1, 0]
+      tOsc = np.linspace(0, 10, 500)
+
+      oscSol = integrate.odeint(harmonic, initState, tOsc, args=(omegaH,))
+      xOsc = oscSol[:, 0]
+      vOsc = oscSol[:, 1]
+  - type: code
+    language: python
+    title: 진동 시각화
+    description: 위치와 속도
+    content: |-
+      figOsc, (axOscX, axOscV) = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+
+      axOscX.plot(tOsc, xOsc, 'b-', linewidth=2)
+      axOscX.set_ylabel('Position x')
+      axOscX.set_title('Simple Harmonic Oscillator')
+      axOscX.grid(True, alpha=0.3)
+
+      axOscV.plot(tOsc, vOsc, 'r-', linewidth=2)
+      axOscV.set_xlabel('Time')
+      axOscV.set_ylabel('Velocity v')
+      axOscV.grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figOsc
+
+- id: solveivp
+  title: solve_ivp
+  subtitle: 최신 ODE 솔버
+  blocks:
+  - type: text
+    content: solve_ivp는 odeint보다 현대적인 인터페이스를 제공하며 다양한 솔버를 지원합니다. 감쇠 진동자와 같은 복잡한 시스템을 시뮬레이션할 때 더 유연하게 사용할 수 있습니다.
+  - type: code
+    language: python
+    title: 감쇠 진동자
+    description: solve_ivp 사용
+    content: |-
+      def dampedOsc(tVal, state, omega, gamma):
+          x, v = state
+          dxdt = v
+          dvdt = -omega**2 * x - 2 * gamma * v
+          return [dxdt, dvdt]
+
+      omegaD = 2
+      gammaD = 0.2
+      tSpanIvp = (0, 15)
+      tEvalIvp = np.linspace(0, 15, 300)
+
+      solIvp = integrate.solve_ivp(
+          dampedOsc, tSpanIvp, [1, 0],
+          args=(omegaD, gammaD),
+          t_eval=tEvalIvp,
+          method='RK45'
+      )
+
+      figDamp, axDamp = plt.subplots(figsize=(12, 5))
+      axDamp.plot(solIvp.t, solIvp.y[0], 'b-', linewidth=2, label='Position')
+      axDamp.plot(solIvp.t, np.exp(-gammaD * solIvp.t), 'r--', linewidth=1.5, alpha=0.7, label='Envelope')
+      axDamp.plot(solIvp.t, -np.exp(-gammaD * solIvp.t), 'r--', linewidth=1.5, alpha=0.7)
+      axDamp.set_xlabel('Time')
+      axDamp.set_ylabel('Position')
+      axDamp.set_title('Damped Harmonic Oscillator')
+      axDamp.legend()
+      axDamp.grid(True, alpha=0.3)
+      figDamp
+
+- id: result
+  title: 적분 함수 정리
+  subtitle: 함수 선택 가이드
+  blocks:
+  - type: text
+    content: scipy.integrate는 다양한 적분 상황에 맞는 함수를 제공합니다. 1차원 함수는 quad, 2차원은 dblquad, 이산 데이터는 trapezoid나 simpson, 미분방정식은 odeint나 solve_ivp를 사용하세요.
+  - type: code
+    language: python
+    title: 함수 가이드
+    description: 용도별 정리
+    content: |-
+      intGuideDf = pd.DataFrame({
+          'Function': ['quad', 'dblquad', 'tplquad', 'trapezoid', 'simpson', 'odeint', 'solve_ivp'],
+          'Purpose': ['1D 정적분', '2D 정적분', '3D 정적분', '데이터 적분 (사다리꼴)', '데이터 적분 (심프슨)', 'ODE 풀이 (구 버전)', 'ODE 풀이 (신 버전)'],
+          'Input': ['함수', '함수', '함수', '배열', '배열', '미분방정식', '미분방정식']
+      })
+      intGuideDf
+
+- id: practice
+  title: 실습
+  subtitle: 적분 프로젝트
+  blocks:
+  - type: tip
+    content: 물리/공학 문제를 수치적분으로 해결해보세요. 힘-거리 그래프에서 일(Work)을 계산하거나, 인구 성장을 로지스틱 방정식으로 시뮬레이션해보세요.
+  - type: expansion
+    title: "미션1: 일(Work) 계산"
+    blocks:
+    - type: code
+      language: python
+      title: 가변력 정의
+      description: F(x) = 10 + 5x - 0.5x²
+      content: |-
+        def force(x):
+            return 10 + 5 * x - 0.5 * x**2
+
+        xForce = np.linspace(0, 10, 100)
+        yForce = force(xForce)
+
+        workDone, _ = integrate.quad(force, 0, 10)
+    - type: code
+      language: python
+      title: 일 시각화
+      description: ∫F(x)dx
+      content: |-
+        figWork, axWork = plt.subplots(figsize=(10, 6))
+        axWork.plot(xForce, yForce, 'b-', linewidth=2, label='Force F(x)')
+        axWork.fill_between(xForce, yForce, alpha=0.3, color='blue', label=f'Work = {workDone:.2f} J')
+        axWork.set_xlabel('Distance (m)')
+        axWork.set_ylabel('Force (N)')
+        axWork.set_title('Work = ∫F(x)dx')
+        axWork.legend()
+        axWork.grid(True, alpha=0.3)
+        figWork
+  - type: expansion
+    title: "미션2: 인구 성장 시뮬레이션"
+    blocks:
+    - type: code
+      language: python
+      title: 로지스틱 방정식
+      description: dP/dt = rP(1-P/K)
+      content: |-
+        def logisticGrowth(P, tVal, r, K):
+            return r * P * (1 - P / K)
+
+        P0 = 10
+        rGrowth = 0.5
+        K = 1000
+        tPop = np.linspace(0, 30, 200)
+
+        popSol = integrate.odeint(logisticGrowth, P0, tPop, args=(rGrowth, K))
+    - type: code
+      language: python
+      title: 인구 성장 시각화
+      description: S-curve
+      content: |-
+        figPop, axPop = plt.subplots(figsize=(10, 6))
+        axPop.plot(tPop, popSol, 'b-', linewidth=2, label='Population')
+        axPop.axhline(K, color='red', linestyle='--', label=f'Carrying Capacity K={K}')
+        axPop.axhline(K/2, color='gray', linestyle=':', label=f'K/2 = {K/2}')
+        axPop.set_xlabel('Time')
+        axPop.set_ylabel('Population')
+        axPop.set_title('Logistic Population Growth')
+        axPop.legend()
+        axPop.grid(True, alpha=0.3)
+        figPop

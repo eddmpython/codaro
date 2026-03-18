@@ -1,0 +1,360 @@
+meta:
+  id: day03_1
+  title: 연산자
+  day: 3
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 연산자 - 사칙연산과 비교"
+    description: "파이썬 연산자를 배웁니다. 산술, 비교, 논리연산자 사용법."
+    keywords: ['연산자', '사칙연산', '비교연산', '논리연산']
+intro:
+  emoji: "🧮"
+  points:
+  - 불린(Boolean) 데이터 타입의 이해
+  - 할당 연산자와 복합 할당 연산자
+  - 기본 산술 연산자 (덧셈, 뺄셈, 곱셈, 나눗셈)
+  - 고급 산술 연산자 (나머지, 정수 나눗셈, 거듭제곱)
+  - 비교 연산자 (크다, 작다, 같다)
+  - 논리 연산자 (and, or, not)
+  - 멤버십 연산자 (in, not in)
+sections:
+- id: boolean_introduction
+  title: 불린(Boolean) 소개
+  subtitle: True와 False 값 이해하기
+  blocks:
+  - type: text
+    content: 불린(Boolean)은 참(True) 또는 거짓(False) 두 가지 값만 가지는 데이터 타입입니다. 이름은 영국 수학자 조지 불(George Boole)에서 유래했습니다. 불린은 조건을 표현할 때 사용합니다. 예를 들어 '비가 오는가?'라는 질문의 답은 '예(True)' 또는 '아니오(False)'입니다. 프로그래밍에서 조건문, 반복문 등에서 핵심적인 역할을 합니다. 주의할 점은 True와 False의 첫 글자가 반드시 대문자여야 한다는 것입니다. true나 false로 쓰면 에러가 발생합니다.
+  - type: list
+    items:
+    - "True: 참을 나타내는 값"
+    - "False: 거짓을 나타내는 값"
+    - 첫 글자는 반드시 대문자
+    - 비교 연산의 결과로 자주 생성됨
+  - type: code
+    language: python
+    title: 불린 값 기본 사용법
+    description: "불린 값을 변수에 저장하고 출력합니다."
+    content: |-
+      isPythonFun = True
+      isLearningHard = False
+      result = 5 > 3
+
+      print('파이썬이 재미있나요?', isPythonFun)
+      print('학습이 어려운가요?', isLearningHard)
+      print('5 > 3:', result)
+      print('타입:', type(result))
+  - type: tip
+    content: "True와 False는 파이썬 예약어입니다. 변수명으로 사용할 수 없습니다."
+
+- id: bool_function
+  title: bool() 함수
+  subtitle: 값을 불린으로 변환하기
+  blocks:
+  - type: text
+    content: bool() 함수는 어떤 값이든 True 또는 False로 변환합니다. 파이썬에서는 '비어있거나 없는' 값들은 False로, '무언가 있는' 값들은 True로 변환됩니다. 숫자 0, 빈 문자열(''), 값이 없음을 의미하는 None은 False입니다. 0이 아닌 모든 숫자와 내용이 있는 문자열은 True입니다. 이 규칙을 알면 조건문에서 매우 유용하게 활용할 수 있습니다.
+  - type: list
+    items:
+    - "0, 빈 문자열(''), None은 False"
+    - 0이 아닌 숫자는 True (1, -1, 100 모두 True)
+    - 내용이 있는 문자열은 True
+    - 조건문에서 자주 활용됨
+  - type: code
+    language: python
+    title: bool() 함수 사용
+    description: "다양한 값들이 어떻게 불린으로 변환되는지 확인합니다."
+    content: |-
+      num1 = 1
+      num2 = 0
+      text1 = 'Hello'
+      text2 = ''
+
+      print('1:', bool(num1))
+      print('0:', bool(num2))
+      print('Hello:', bool(text1))
+      print('빈문자열:', bool(text2))
+      print('None:', bool(None))
+  - type: tip
+    content: "False로 변환되는 값들을 'Falsy'라고 부릅니다: 0, 0.0, '', None. 그 외 모든 값은 'Truthy'입니다."
+
+- id: assignment_operators
+  title: 할당 연산자
+  subtitle: 변수에 값을 저장하는 연산자
+  blocks:
+  - type: text
+    content: 할당 연산자(=)는 변수에 값을 저장하는 연산자입니다. 수학에서 =는 '같다'는 의미이지만, 파이썬에서는 '오른쪽 값을 왼쪽 변수에 저장한다'는 의미입니다. 복합 할당 연산자(+=, -=, *=, /=)는 연산과 할당을 한 번에 수행합니다. 예를 들어 x += 5는 x = x + 5와 같습니다. 코드를 더 간결하게 만들 수 있어 자주 사용됩니다.
+  - type: list
+    items:
+    - "= : 기본 할당 (오른쪽 값을 왼쪽에 저장)"
+    - "+= : 더한 후 할당 (x += 5는 x = x + 5)"
+    - "-= : 뺀 후 할당 (x -= 3은 x = x - 3)"
+    - "*= : 곱한 후 할당, /= : 나눈 후 할당"
+  - type: code
+    language: python
+    title: 할당 연산자 실습
+    description: "기본 할당과 복합 할당 연산자를 사용합니다."
+    content: |-
+      x = 10
+      print('x =', x)
+
+      x += 5
+      print('x += 5:', x)
+
+      x -= 3
+      print('x -= 3:', x)
+
+      x *= 2
+      print('x *= 2:', x)
+
+      x /= 4
+      print('x /= 4:', x)
+  - type: tip
+    content: "복합 할당 연산자는 코드를 간결하게 만들어줍니다. total = total + price 대신 total += price로 쓸 수 있습니다."
+
+- id: arithmetic_basic
+  title: 기본 산술 연산자
+  subtitle: 덧셈, 뺄셈, 곱셈, 나눗셈
+  blocks:
+  - type: text
+    content: 산술 연산자는 수학 계산에 사용하는 연산자입니다. 덧셈(+), 뺄셈(-), 곱셈(*), 나눗셈(/)은 가장 기본적인 연산자입니다. 파이썬의 나눗셈(/)은 항상 실수(float) 결과를 반환합니다. 4 / 2의 결과는 2가 아니라 2.0입니다. 이는 정확한 계산 결과를 보장하기 위한 파이썬의 설계입니다.
+  - type: list
+    items:
+    - "+ : 덧셈 (1 + 2 = 3)"
+    - "- : 뺄셈 (5 - 3 = 2)"
+    - "* : 곱셈 (2 * 3 = 6)"
+    - "/ : 나눗셈 (6 / 2 = 3.0, 항상 실수 결과)"
+  - type: code
+    language: python
+    title: 기본 산술 연산
+    description: "덧셈, 뺄셈, 곱셈, 나눗셈을 수행합니다."
+    content: |-
+      a = 10
+      b = 3
+
+      print(a, '+', b, '=', a + b)
+      print(a, '-', b, '=', a - b)
+      print(a, '*', b, '=', a * b)
+      print(a, '/', b, '=', a / b)
+
+- id: arithmetic_advanced
+  title: 고급 산술 연산자
+  subtitle: 나머지, 정수 나눗셈, 거듭제곱
+  blocks:
+  - type: text
+    content: 파이썬에는 세 가지 특별한 산술 연산자가 있습니다. 정수 나눗셈(//)은 나눗셈의 몫만 반환하고 소수점 이하를 버립니다. 나머지 연산자(%)는 나눗셈의 나머지를 반환합니다. 거듭제곱(**)은 지수 계산을 수행합니다. 예를 들어 2 ** 3은 2의 3제곱으로 8입니다. 나머지 연산자는 짝수/홀수 판별, 순환 처리 등에 매우 유용합니다.
+  - type: list
+    items:
+    - "// : 정수 나눗셈 (7 // 2 = 3, 몫만 반환)"
+    - "% : 나머지 (7 % 2 = 1)"
+    - "** : 거듭제곱 (2 ** 3 = 8)"
+    - "나머지 연산은 짝수/홀수 판별에 유용"
+  - type: code
+    language: python
+    title: 고급 산술 연산
+    description: "정수 나눗셈, 나머지, 거듭제곱 연산을 수행합니다."
+    content: |-
+      x = 10
+      y = 3
+
+      print(x, '//', y, '=', x // y)
+      print(x, '%', y, '=', x % y)
+      print(y, '**', 2, '=', y ** 2)
+
+      evenNum = 10
+      oddNum = 7
+      print(evenNum, '은 짝수인가?', evenNum % 2 == 0)
+      print(oddNum, '은 짝수인가?', oddNum % 2 == 0)
+  - type: tip
+    content: "짝수는 2로 나눈 나머지가 0입니다. num % 2 == 0이면 짝수, num % 2 == 1이면 홀수입니다."
+
+- id: practical_calculation
+  title: 실용적인 계산
+  subtitle: 원의 넓이와 무게 계산
+  blocks:
+  - type: text
+    content: 프로그래밍에서 산술 연산자는 실제 문제를 해결하는 데 사용됩니다. 원의 넓이(π × r²), 무게(질량 × 중력가속도) 같은 공식을 코드로 구현하면 복잡한 계산을 자동화할 수 있습니다. 의미 있는 변수명(radius, mass, gravity)을 사용하면 코드가 무엇을 계산하는지 한눈에 알 수 있습니다.
+  - type: list
+    items:
+    - "원의 넓이: 3.14 * radius ** 2"
+    - "무게: mass * gravity"
+    - 의미 있는 변수명으로 가독성 향상
+    - 수학 공식을 코드로 표현
+  - type: code
+    language: python
+    title: 원의 넓이와 무게 계산
+    description: "수학 공식을 파이썬 코드로 구현합니다."
+    content: |-
+      radius = 10
+      areaOfCircle = 3.14 * radius ** 2
+      print('반지름:', radius)
+      print('원의 넓이:', areaOfCircle)
+
+      mass = 75
+      gravity = 9.81
+      weight = mass * gravity
+      print('질량:', mass, 'kg')
+      print('무게:', weight, 'N')
+
+- id: comparison_operators
+  title: 비교 연산자
+  subtitle: 값들을 비교하는 연산자
+  blocks:
+  - type: text
+    content: 비교 연산자는 두 값을 비교하고 그 결과를 불린(True/False)으로 반환합니다. > (크다), < (작다), >= (크거나 같다), <= (작거나 같다), == (같다), != (같지 않다)가 있습니다. 주의할 점은 '같다'를 비교할 때 =가 아니라 ==를 사용해야 한다는 것입니다. =는 할당 연산자이고 ==는 비교 연산자입니다.
+  - type: list
+    items:
+    - "> : 크다 (5 > 3은 True)"
+    - "< : 작다 (5 < 3은 False)"
+    - ">= : 크거나 같다, <= : 작거나 같다"
+    - "== : 같다, != : 같지 않다"
+  - type: code
+    language: python
+    title: 비교 연산자 실습
+    description: "두 값을 비교하고 결과를 확인합니다."
+    content: |-
+      age = 25
+      adultAge = 18
+
+      print('25 > 18:', age > adultAge)
+      print('25 < 18:', age < adultAge)
+      print('25 >= 18:', age >= adultAge)
+      print('25 == 18:', age == adultAge)
+      print('25 != 18:', age != adultAge)
+  - type: tip
+    content: "== 와 = 를 혼동하지 마세요! a = 5는 '변수 a에 5를 저장', a == 5는 'a가 5와 같은가?'입니다."
+
+- id: logical_operators
+  title: 논리 연산자
+  subtitle: and, or, not 연산자
+  blocks:
+  - type: text
+    content: 논리 연산자는 여러 조건을 결합하거나 조건을 반전시킬 때 사용합니다. and는 모든 조건이 참일 때만 True, or는 하나라도 참이면 True, not은 조건을 반대로 바꿉니다. 다른 언어에서 && (and), || (or), ! (not)을 사용하는 것과 달리, 파이썬은 영어 단어를 직접 사용하여 코드가 더 읽기 쉽습니다.
+  - type: list
+    items:
+    - "and: 모든 조건이 참이면 True"
+    - "or: 하나라도 참이면 True"
+    - "not: 조건을 반대로 (True → False)"
+    - 직관적인 영어 키워드 사용
+  - type: code
+    language: python
+    title: 논리 연산자 실습
+    description: "and, or, not 연산자를 사용합니다."
+    content: |-
+      age = 25
+      hasLicense = True
+      hasInsurance = False
+
+      canDrive = age >= 18 and hasLicense
+      needCheck = not hasInsurance or age < 20
+
+      print('운전 가능?', canDrive)
+      print('확인 필요?', needCheck)
+      print('not True:', not True)
+      print('not False:', not False)
+  - type: tip
+    content: "and는 '그리고', or는 '또는', not은 '~가 아닌'으로 읽으면 이해하기 쉽습니다."
+
+- id: membership_operators
+  title: 멤버십 연산자
+  subtitle: in과 not in 연산자
+  blocks:
+  - type: text
+    content: 멤버십 연산자는 특정 값이 문자열에 포함되어 있는지 확인합니다. in 연산자는 포함되어 있으면 True, not in은 포함되어 있지 않으면 True를 반환합니다. 문자열에서 특정 문자나 단어를 찾을 때 매우 유용합니다. 대소문자를 구분하므로 'A'와 'a'는 다르게 취급됩니다.
+  - type: list
+    items:
+    - "in: 포함되어 있으면 True"
+    - "not in: 포함되어 있지 않으면 True"
+    - 문자열에서 특정 문자/단어 검색
+    - 대소문자를 구분함
+  - type: code
+    language: python
+    title: 멤버십 연산자 실습
+    description: "문자열에 특정 문자가 포함되어 있는지 확인합니다."
+    content: |-
+      email = 'user@example.com'
+      text = 'Python Programming'
+
+      print('@ in email:', '@' in email)
+      print('. in email:', '.' in email)
+      print('Python in text:', 'Python' in text)
+      print('Java in text:', 'Java' in text)
+      print('Java not in text:', 'Java' not in text)
+  - type: tip
+    content: "이메일 유효성 검사에 '@' in email과 '.' in email을 활용할 수 있습니다."
+
+- id: practice
+  title: 3일차 복습
+  subtitle: 연산자 종합 미션
+  blocks:
+  - type: text
+    content: 3일차에서 배운 불린, 산술 연산자, 비교 연산자, 논리 연산자를 복습하는 미션입니다. 각 미션을 펼쳐서 정답을 확인하기 전에 먼저 직접 작성해보세요.
+  - type: expansion
+    title: "미션1: 불린 값 활용"
+    code: |-
+      isRaining = False
+      isSunny = True
+      print('비가 오나요?', isRaining)
+      print('화창한가요?', isSunny)
+      print('둘 다 True?', isRaining and isSunny)
+  - type: expansion
+    title: "미션2: bool() 함수 활용"
+    code: |-
+      print(bool(0))
+      print(bool(1))
+      print(bool(''))
+      print(bool('Hello'))
+  - type: expansion
+    title: "미션3: 복합 할당 연산자"
+    code: |-
+      score = 80
+      score += 10
+      print('점수:', score)
+      score -= 5
+      print('점수:', score)
+      score *= 2
+      print('점수:', score)
+  - type: expansion
+    title: "미션4: 산술 연산자 종합"
+    code: |-
+      a = 17
+      b = 5
+      print('덧셈:', a + b)
+      print('뺄셈:', a - b)
+      print('곱셈:', a * b)
+      print('나눗셈:', a / b)
+      print('정수 나눗셈:', a // b)
+      print('나머지:', a % b)
+      print('거듭제곱:', b ** 2)
+  - type: expansion
+    title: "미션5: 원의 넓이 계산"
+    code: |-
+      radius = 7
+      pi = 3.14159
+      area = pi * radius ** 2
+      print('반지름:', radius)
+      print('원의 넓이:', area)
+  - type: expansion
+    title: "미션6: 비교 연산자 활용"
+    code: |-
+      age = 20
+      print('성인인가?', age >= 18)
+      print('10대인가?', age >= 10 and age < 20)
+      print('학생 할인 가능?', age < 25)
+  - type: expansion
+    title: "미션7: 논리 연산자 활용"
+    code: |-
+      isMember = True
+      hasCoupon = False
+      canDiscount = isMember or hasCoupon
+      print('할인 가능?', canDiscount)
+      needPayment = not (isMember and hasCoupon)
+      print('결제 필요?', needPayment)
+  - type: expansion
+    title: "미션8: 멤버십 연산자 활용"
+    code: |-
+      text = 'Python Programming'
+      print('Python 포함?', 'Python' in text)
+      print('Java 포함?', 'Java' in text)
+      print('Java 미포함?', 'Java' not in text)

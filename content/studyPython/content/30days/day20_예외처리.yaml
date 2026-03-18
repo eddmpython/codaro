@@ -1,0 +1,624 @@
+meta:
+  id: "day20"
+  title: "예외처리"
+  day: 20
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 예외 처리 - try, except, finally"
+    description: "try, except, finally, raise로 에러를 처리하는 방법을 배웁니다."
+    keywords: ['예외', 'try', 'except', 'finally', 'raise']
+
+intro:
+  emoji: "🛡️"
+  points:
+  - "try-except로 에러 처리"
+  - "finally로 정리 작업"
+  - "raise로 예외 발생"
+  - "안정적인 프로그램"
+
+sections:
+- id: "try_except_basic"
+  title: "try-except 기본"
+  subtitle: "에러 처리하기"
+  blocks:
+  - type: "text"
+    content: "try-except 문으로 에러를 처리합니다. try 블록에서 에러가 발생하면 except 블록이 실행됩니다. 프로그램이 중단되지 않고 계속 실행됩니다."
+  - type: "list"
+    items:
+    - "try: 실행할 코드"
+    - "except: 에러 처리"
+    - "에러 발생시 except 실행"
+    - "프로그램 중단 방지"
+  - type: "code"
+    language: "python"
+    title: "기본 예외 처리"
+    description: "에러가 발생해도 프로그램이 계속 실행됩니다."
+    content: |-
+      try:
+          result = 10 / 0
+      except:
+          result = 'Error occurred'
+
+      result
+  - type: "code"
+    language: "python"
+    title: "정상 실행"
+    description: "에러가 없으면 except는 실행되지 않습니다."
+    content: |-
+      try:
+          value = 10 / 2
+      except:
+          value = 'Error'
+
+      value
+  - type: "code"
+    language: "python"
+    title: "함수에서 사용"
+    description: "함수 안에서도 예외를 처리할 수 있습니다."
+    content: |-
+      def safeDivide(a, b):
+          try:
+              return a / b
+          except:
+              return 0
+
+      safeDivide(10, 0)
+  - type: "tip"
+    content: "try-except는 예상되는 에러를 처리할 때 사용합니다."
+
+- id: "specific_exception"
+  title: "특정 예외 처리"
+  subtitle: "예외 타입 지정"
+  blocks:
+  - type: "text"
+    content: "except 뒤에 예외 타입을 지정할 수 있습니다. 특정 에러만 처리하고 다른 에러는 그대로 발생시킵니다. 더 정확한 에러 처리가 가능합니다."
+  - type: "list"
+    items:
+    - "except 예외타입:"
+    - "특정 에러만 처리"
+    - "다른 에러는 발생"
+    - "정확한 처리 가능"
+  - type: "code"
+    language: "python"
+    title: "ZeroDivisionError"
+    description: "0으로 나누는 에러만 처리합니다."
+    content: |-
+      try:
+          num = 10 / 0
+      except ZeroDivisionError:
+          num = 'Cannot divide by zero'
+
+      num
+  - type: "code"
+    language: "python"
+    title: "ValueError"
+    description: "잘못된 값 변환 에러를 처리합니다."
+    content: |-
+      try:
+          converted = int('abc')
+      except ValueError:
+          converted = 0
+
+      converted
+  - type: "code"
+    language: "python"
+    title: "IndexError"
+    description: "인덱스 범위 에러를 처리합니다."
+    content: |-
+      try:
+          items = [1, 2, 3]
+          item = items[10]
+      except IndexError:
+          item = 'Index out of range'
+
+      item
+  - type: "tip"
+    content: "예외 타입을 지정하면 의도하지 않은 에러를 놓치지 않습니다."
+
+- id: "multiple_except"
+  title: "여러 예외 처리"
+  subtitle: "다양한 에러 대응"
+  blocks:
+  - type: "text"
+    content: "여러 except 블록으로 다양한 예외를 처리할 수 있습니다. 위에서부터 순서대로 검사하며, 처음 일치하는 except가 실행됩니다."
+  - type: "list"
+    items:
+    - "여러 except 블록"
+    - "위에서부터 검사"
+    - "첫 일치만 실행"
+    - "다양한 에러 처리"
+  - type: "code"
+    language: "python"
+    title: "여러 예외"
+    description: "여러 종류의 에러를 각각 처리합니다."
+    content: |-
+      try:
+          val = int('10')
+          ans = val / 2
+      except ValueError:
+          ans = 'Invalid number'
+      except ZeroDivisionError:
+          ans = 'Cannot divide'
+
+      ans
+  - type: "code"
+    language: "python"
+    title: "튜플로 묶기"
+    description: "여러 예외를 하나의 except로 처리합니다."
+    content: |-
+      try:
+          data = int('5')
+          output = data / 1
+      except (ValueError, ZeroDivisionError):
+          output = 'Error'
+
+      output
+  - type: "code"
+    language: "python"
+    title: "순서 중요"
+    description: "위에서부터 검사하므로 순서가 중요합니다."
+    content: |-
+      try:
+          nums = [1, 2, 3]
+          elem = nums[1]
+      except IndexError:
+          elem = 'Index error'
+      except:
+          elem = 'Other error'
+
+      elem
+  - type: "tip"
+    content: "구체적인 예외를 먼저, 일반적인 예외를 나중에 배치하세요."
+
+- id: "finally_clause"
+  title: "finally 절"
+  subtitle: "항상 실행되는 코드"
+  blocks:
+  - type: "text"
+    content: "finally 블록은 예외 발생 여부와 관계없이 항상 실행됩니다. 파일 닫기, 리소스 해제 등 정리 작업에 사용합니다."
+  - type: "list"
+    items:
+    - "항상 실행됨"
+    - "에러 상관없이"
+    - "정리 작업용"
+    - "try-except-finally"
+  - type: "code"
+    language: "python"
+    title: "finally 기본"
+    description: "finally는 항상 실행됩니다."
+    content: |-
+      try:
+          calc = 10 / 2
+      except:
+          calc = 0
+      finally:
+          status = 'Completed'
+
+      calc, status
+  - type: "code"
+    language: "python"
+    title: "에러시에도 실행"
+    description: "에러가 발생해도 finally는 실행됩니다."
+    content: |-
+      try:
+          res = 10 / 0
+      except ZeroDivisionError:
+          res = 'Error'
+      finally:
+          msg = 'Done'
+
+      res, msg
+  - type: "code"
+    language: "python"
+    title: "리소스 정리"
+    description: "파일 등의 리소스를 정리합니다."
+    content: |-
+      opened = False
+      try:
+          f = open('test.txt', 'w')
+          opened = True
+          f.write('Data')
+      except:
+          content = 'Error'
+      finally:
+          if opened:
+              f.close()
+          content = 'Closed'
+
+      content
+  - type: "tip"
+    content: "with 문을 사용하면 finally 없이도 자동으로 정리됩니다."
+
+- id: "raise_exception"
+  title: "raise로 예외 발생"
+  subtitle: "의도적으로 에러 발생"
+  blocks:
+  - type: "text"
+    content: "raise 키워드로 예외를 발생시킬 수 있습니다. 조건이 맞지 않을 때 강제로 에러를 내어 프로그램을 중단하거나 예외를 전달합니다."
+  - type: "list"
+    items:
+    - "raise 예외타입(메시지)"
+    - "의도적 에러 발생"
+    - "조건 검증"
+    - "예외 전달"
+  - type: "code"
+    language: "python"
+    title: "ValueError 발생"
+    description: "잘못된 값일 때 예외를 발생시킵니다."
+    content: |-
+      def checkAge(age):
+          if age < 0:
+              raise ValueError('Age cannot be negative')
+          return age
+
+      try:
+          valid = checkAge(-5)
+      except ValueError:
+          valid = 'Invalid age'
+
+      valid
+  - type: "code"
+    language: "python"
+    title: "조건 검증"
+    description: "조건을 만족하지 않으면 예외를 발생시킵니다."
+    content: |-
+      def divide(a, b):
+          if b == 0:
+              raise ZeroDivisionError('Divisor cannot be zero')
+          return a / b
+
+      try:
+          quotient = divide(10, 0)
+      except ZeroDivisionError:
+          quotient = 'Error'
+
+      quotient
+  - type: "code"
+    language: "python"
+    title: "범위 검사"
+    description: "범위를 벗어나면 예외를 발생시킵니다."
+    content: |-
+      def setScore(score):
+          if score < 0 or score > 100:
+              raise ValueError('Score out of range')
+          return score
+
+      try:
+          final = setScore(150)
+      except ValueError:
+          final = 0
+
+      final
+  - type: "tip"
+    content: "raise는 함수의 입력값 검증에 유용합니다."
+
+- id: "exception_info"
+  title: "예외 정보"
+  subtitle: "에러 메시지 받기"
+  blocks:
+  - type: "text"
+    content: "except 예외타입 as 변수: 형식으로 예외 객체를 받을 수 있습니다. 예외 객체는 에러 메시지와 정보를 담고 있습니다."
+  - type: "list"
+    items:
+    - "except 타입 as 변수:"
+    - "예외 객체 받기"
+    - "에러 메시지 확인"
+    - "디버깅에 유용"
+  - type: "code"
+    language: "python"
+    title: "예외 객체"
+    description: "예외 객체에서 메시지를 가져옵니다."
+    content: |-
+      try:
+          bad = 10 / 0
+      except ZeroDivisionError as err:
+          bad = str(err)
+
+      bad
+  - type: "code"
+    language: "python"
+    title: "변환 에러"
+    description: "ValueError의 메시지를 확인합니다."
+    content: |-
+      try:
+          num = int('invalid')
+      except ValueError as error:
+          num = str(error)
+
+      num
+  - type: "code"
+    language: "python"
+    title: "함수에서 사용"
+    description: "함수에서 예외 정보를 반환합니다."
+    content: |-
+      def safeConvert(text):
+          try:
+              return int(text)
+          except ValueError as e:
+              return str(e)
+
+      safeConvert('abc')
+  - type: "tip"
+    content: "예외 메시지를 확인하면 문제를 파악하기 쉽습니다."
+
+- id: "practice"
+  title: "Day 20 종합 복습"
+  subtitle: "예외 처리 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 20에서 배운 예외 처리를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: try-except"
+    code: |-
+      try:
+          divResult = 10 / 0
+      except:
+          divResult = 'Error'
+
+      divResult
+
+  - type: "expansion"
+    title: "🟢 기본2: 특정 예외"
+    code: |-
+      try:
+          intVal = int('abc')
+      except ValueError:
+          intVal = 0
+
+      intVal
+
+  - type: "expansion"
+    title: "🟢 기본3: finally"
+    code: |-
+      try:
+          calcRes = 10 / 2
+      except:
+          calcRes = 0
+      finally:
+          state = 'Done'
+
+      calcRes, state
+
+  - type: "expansion"
+    title: "🟢 기본4: raise"
+    code: |-
+      def check(num):
+          if num < 0:
+              raise ValueError('Negative')
+          return num
+
+      try:
+          checked = check(-5)
+      except ValueError:
+          checked = 0
+
+      checked
+
+  - type: "expansion"
+    title: "🟢 기본5: 예외 정보"
+    code: |-
+      try:
+          errVal = int('xyz')
+      except ValueError as err:
+          errVal = str(err)
+
+      errVal
+
+  - type: "expansion"
+    title: "🟡 응용1: 안전한 나눗셈"
+    code: |-
+      def safeDivision(a, b):
+          try:
+              return a / b
+          except ZeroDivisionError:
+              return 0
+
+      safeDivision(10, 0)
+
+  - type: "expansion"
+    title: "🟡 응용2: 리스트 접근"
+    code: |-
+      def getItem(lst, idx):
+          try:
+              return lst[idx]
+          except IndexError:
+              return None
+
+      nums = [1, 2, 3]
+      getItem(nums, 10)
+
+  - type: "expansion"
+    title: "🟡 응용3: 파일 처리"
+    code: |-
+      try:
+          with open('nonexist.txt', 'r') as handle:
+              fileContent = handle.read()
+      except FileNotFoundError:
+          fileContent = 'File not found'
+
+      fileContent
+
+  - type: "expansion"
+    title: "🟡 응용4: 딕셔너리 키"
+    code: |-
+      def getValue(data, key):
+          try:
+              return data[key]
+          except KeyError:
+              return 'Not found'
+
+      info = {'name': 'Alice'}
+      getValue(info, 'age')
+
+  - type: "expansion"
+    title: "🟡 응용5: 숫자 변환"
+    code: |-
+      def toInt(text):
+          try:
+              return int(text)
+          except ValueError:
+              return 0
+
+      toInt('123'), toInt('abc')
+
+  - type: "expansion"
+    title: "🔴 심화1-1: 범위 검증"
+    code: |-
+      def validateScore(score):
+          if score < 0 or score > 100:
+              raise ValueError('Invalid score')
+          return score
+
+      try:
+          scoreResult = validateScore(150)
+      except ValueError as err:
+          scoreResult = str(err)
+
+      scoreResult
+
+  - type: "expansion"
+    title: "🔴 심화1-2: 나이 검증"
+    code: |-
+      def validateAge(age):
+          if age < 0:
+              raise ValueError('Negative age')
+          if age > 150:
+              raise ValueError('Too old')
+          return age
+
+      try:
+          ageResult = validateAge(-5)
+      except ValueError as error:
+          ageResult = str(error)
+
+      ageResult
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 파일 읽기"
+    code: |-
+      def readFile(path):
+          try:
+              with open(path, 'r') as f:
+                  return f.read()
+          except FileNotFoundError:
+              return 'File not found'
+          except:
+              return 'Error'
+
+      readFile('missing.txt')
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 안전한 파일 쓰기"
+    code: |-
+      def writeFile(path, content):
+          try:
+              with open(path, 'w') as writer:
+                  writer.write(content)
+              return 'Success'
+          except:
+              return 'Failed'
+
+      writeFile('output.txt', 'Test')
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 계산기"
+    code: |-
+      def calculate(a, b, op):
+          try:
+              if op == '+':
+                  return a + b
+              elif op == '-':
+                  return a - b
+              elif op == '*':
+                  return a * b
+              elif op == '/':
+                  return a / b
+              else:
+                  raise ValueError('Invalid operator')
+          except ZeroDivisionError:
+              return 'Cannot divide by zero'
+          except ValueError as err:
+              return str(err)
+
+      calculate(10, 0, '/')
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 리스트 평균"
+    code: |-
+      def average(numbers):
+          try:
+              if len(numbers) == 0:
+                  raise ValueError('Empty list')
+              total = 0
+              for num in numbers:
+                  total = total + num
+              return total / len(numbers)
+          except ValueError as err:
+              return str(err)
+
+      average([])
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 딕셔너리 병합"
+    code: |-
+      def merge(dict1, dict2):
+          try:
+              merged = {}
+              for key in dict1:
+                  merged[key] = dict1[key]
+              for key in dict2:
+                  merged[key] = dict2[key]
+              return merged
+          except:
+              return {}
+
+      merge({'a': 1}, {'b': 2})
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 안전한 접근"
+    code: |-
+      def getNestedValue(data, key1, key2):
+          try:
+              return data[key1][key2]
+          except KeyError:
+              return 'Key not found'
+          except TypeError:
+              return 'Type error'
+
+      nested = {'user': {'name': 'Alice'}}
+      getNestedValue(nested, 'user', 'age')
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 재시도 로직"
+    code: |-
+      def tryConvert(values):
+          converted = []
+          for val in values:
+              try:
+                  converted.append(int(val))
+              except ValueError:
+                  converted.append(0)
+          return converted
+
+      tryConvert(['10', 'abc', '20', 'xyz'])
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 종합 검증"
+    code: |-
+      def validate(data):
+          try:
+              if 'name' not in data:
+                  raise KeyError('Name required')
+              if 'age' not in data:
+                  raise KeyError('Age required')
+              if data['age'] < 0:
+                  raise ValueError('Invalid age')
+              return 'Valid'
+          except KeyError as err:
+              return str(err)
+          except ValueError as err:
+              return str(err)
+
+      validate({'name': 'Bob'})

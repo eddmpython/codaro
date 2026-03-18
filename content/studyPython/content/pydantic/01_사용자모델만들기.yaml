@@ -1,0 +1,352 @@
+meta:
+  id: pydantic_01
+  title: 사용자모델만들기
+  order: 1
+  category: pydantic
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["pydantic", "BaseModel", "타입힌트", "검증", "기본값"]
+  seo:
+    title: "Pydantic BaseModel - 첫 번째 데이터 모델 만들기"
+    description: "Pydantic의 BaseModel로 첫 번째 데이터 모델을 정의합니다. 타입 검증, 자동 변환, 에러 메시지를 배웁니다."
+    keywords: ["pydantic", "BaseModel", "데이터모델", "타입검증"]
+
+intro:
+  emoji: "👤"
+  goal: Pydantic의 BaseModel로 사용자 프로필 관리 시스템을 구축합니다.
+  description: "이 프로젝트에서는 실제 서비스에서 사용되는 사용자 프로필 데이터 모델을 만들어봅니다. 타입 힌트로 필드를 선언하면 인스턴스 생성 시 자동으로 검증이 이루어지고, 잘못된 데이터는 명확한 에러 메시지와 함께 거부됩니다. 이 패턴은 API 개발, 데이터 처리, 설정 관리 등 모든 Python 애플리케이션의 기반이 됩니다."
+
+sections:
+- id: load
+  title: 라이브러리 로드
+  subtitle: Pydantic 설치 및 import
+  blocks:
+  - type: text
+    content: "Pydantic은 Python의 타입 힌트를 활용하여 런타임에 데이터를 검증하는 라이브러리입니다. V2 버전은 Rust로 작성된 pydantic-core를 사용하여 V1보다 5~50배 빠른 성능을 자랑합니다. Pyodide 환경에서는 micropip으로 설치하며, BaseModel 클래스를 상속하여 데이터 모델을 정의합니다."
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: micropip으로 pydantic 설치
+    content: |-
+      import micropip
+      await micropip.install('pydantic')
+  - type: code
+    language: python
+    title: BaseModel 가져오기
+    description: 핵심 클래스 import
+    content: |-
+      from pydantic import BaseModel
+      from typing import Optional
+
+- id: define
+  title: 기본 모델 정의
+  subtitle: 첫 번째 사용자 모델
+  blocks:
+  - type: text
+    content: "BaseModel을 상속받고 클래스 변수로 필드를 선언합니다. Python의 타입 힌트가 곧 검증 규칙이 됩니다. 필드에 타입만 지정하면 필수 필드가 되고, 기본값을 함께 지정하면 선택적 필드가 됩니다. 이 간단한 선언만으로 강력한 데이터 검증 시스템이 완성됩니다."
+  - type: code
+    language: python
+    title: User 모델
+    description: 기본 사용자 모델 정의
+    content: |-
+      class User(BaseModel):
+          name: str
+          age: int
+          email: str
+
+      user = User(name="Alice", age=25, email="alice@example.com")
+      user
+  - type: tip
+    content: "인스턴스 생성 시 모든 필수 필드에 값을 제공해야 합니다. 누락되면 ValidationError가 발생하며, 어떤 필드가 누락되었는지 정확히 알려줍니다."
+  - type: code
+    language: python
+    title: 필드 접근
+    description: 속성으로 값 읽기
+    content: |-
+      user.name, user.age, user.email
+
+- id: coercion
+  title: 타입 자동 변환
+  subtitle: 스마트 변환 기능
+  blocks:
+  - type: text
+    content: "Pydantic의 강력한 기능 중 하나는 타입 강제 변환(coercion)입니다. 문자열 \"30\"을 int 필드에 넣으면 자동으로 정수 30으로 변환됩니다. 숫자 123을 str 필드에 넣으면 \"123\"으로 변환됩니다. 이 기능 덕분에 외부 데이터(JSON, CSV 등)를 유연하게 처리할 수 있습니다."
+  - type: code
+    language: python
+    title: 문자열에서 정수로
+    description: 자동 타입 변환
+    content: |-
+      converted = User(name="Bob", age="30", email="bob@test.com")
+      converted.age, type(converted.age)
+  - type: code
+    language: python
+    title: 숫자에서 문자열로
+    description: 역방향 변환
+    content: |-
+      numToStr = User(name=123, age=28, email="test@test.com")
+      numToStr.name, type(numToStr.name)
+  - type: tip
+    content: "변환이 불가능한 경우(예: \"invalid\"를 int로)에는 ValidationError가 발생합니다. Pydantic은 \"스마트\" 변환만 수행합니다."
+
+- id: validation
+  title: 검증 실패 처리
+  subtitle: ValidationError 이해하기
+  blocks:
+  - type: text
+    content: "변환할 수 없는 값이 들어오면 ValidationError가 발생합니다. 이 에러 객체는 어떤 필드에서 어떤 문제가 발생했는지 상세한 정보를 제공합니다. errors() 메서드로 구조화된 에러 정보를 얻을 수 있어 API 응답이나 로깅에 활용하기 좋습니다."
+  - type: code
+    language: python
+    title: 검증 실패 유도
+    description: 잘못된 데이터 처리
+    content: |-
+      from pydantic import ValidationError
+
+      try:
+          invalid = User(name="Charlie", age="not_a_number", email="c@c.com")
+      except ValidationError as e:
+          errorInfo = e.errors()
+          errorInfo
+  - type: code
+    language: python
+    title: 에러 개수 확인
+    description: error_count 메서드
+    content: |-
+      try:
+          multiError = User(name="", age="bad", email="")
+      except ValidationError as e:
+          errorCount = e.error_count()
+          errorCount
+  - type: tip
+    content: "errors() 리스트의 각 항목은 'loc'(필드 위치), 'msg'(메시지), 'type'(에러 타입), 'input'(입력값)을 포함합니다."
+
+- id: default
+  title: 기본값과 Optional
+  subtitle: 선택적 필드 정의
+  blocks:
+  - type: text
+    content: "필드에 기본값을 지정하면 인스턴스 생성 시 해당 필드를 생략할 수 있습니다. Optional[T]는 T 또는 None을 허용하는 타입입니다. 기본값과 Optional을 조합하면 유연한 데이터 모델을 설계할 수 있습니다. 주의할 점은 기본값이 있는 필드는 반드시 기본값이 없는 필드 뒤에 와야 한다는 것입니다."
+  - type: code
+    language: python
+    title: 기본값 있는 모델
+    description: 선택적 필드 정의
+    content: |-
+      class Profile(BaseModel):
+          username: str
+          bio: Optional[str] = None
+          age: int = 18
+          active: bool = True
+
+      minimal = Profile(username="dave")
+      minimal
+  - type: code
+    language: python
+    title: 모든 필드 지정
+    description: 기본값 덮어쓰기
+    content: |-
+      full = Profile(username="eve", bio="Developer", age=25, active=False)
+      full
+
+- id: serialize
+  title: 직렬화와 역직렬화
+  subtitle: dict와 JSON 변환
+  blocks:
+  - type: text
+    content: "Pydantic 모델은 딕셔너리나 JSON으로 쉽게 변환할 수 있습니다. model_dump()는 딕셔너리로, model_dump_json()은 JSON 문자열로 변환합니다. 반대로 model_validate()는 딕셔너리에서, model_validate_json()은 JSON 문자열에서 모델 인스턴스를 생성합니다. API 개발에서 매우 자주 사용되는 패턴입니다."
+  - type: code
+    language: python
+    title: 딕셔너리 변환
+    description: model_dump 메서드
+    content: |-
+      userDict = user.model_dump()
+      userDict
+  - type: code
+    language: python
+    title: JSON 변환
+    description: model_dump_json 메서드
+    content: |-
+      userJson = user.model_dump_json(indent=2)
+      userJson
+  - type: tip
+    content: "Pydantic V2에서는 .dict() → .model_dump(), .json() → .model_dump_json()으로 메서드명이 변경되었습니다."
+  - type: code
+    language: python
+    title: 딕셔너리에서 생성
+    description: model_validate 메서드
+    content: |-
+      data = {"name": "Frank", "age": 32, "email": "frank@mail.com"}
+      fromDict = User.model_validate(data)
+      fromDict
+  - type: code
+    language: python
+    title: JSON에서 생성
+    description: model_validate_json 메서드
+    content: |-
+      jsonStr = '{"name": "Grace", "age": 28, "email": "grace@mail.com"}'
+      fromJson = User.model_validate_json(jsonStr)
+      fromJson
+
+- id: immutable
+  title: 불변 모델
+  subtitle: frozen 설정
+  blocks:
+  - type: text
+    content: "model_config에서 frozen=True를 설정하면 인스턴스 생성 후 필드 값을 수정할 수 없습니다. 이는 함수형 프로그래밍 패러다임에서 중요한 불변성(immutability)을 보장합니다. 실수로 데이터를 변경하는 버그를 방지하고, 해시 가능한 객체로 만들어 딕셔너리 키나 집합 원소로 사용할 수 있습니다."
+  - type: code
+    language: python
+    title: 불변 모델 정의
+    description: frozen=True 설정
+    content: |-
+      class ImmutableUser(BaseModel):
+          model_config = {"frozen": True}
+          name: str
+          age: int
+
+      frozen = ImmutableUser(name="Henry", age=30)
+      frozen
+  - type: code
+    language: python
+    title: 수정 시도
+    description: 에러 발생 확인
+    content: |-
+      try:
+          frozen.name = "Changed"
+      except Exception as e:
+          freezeError = type(e).__name__
+          freezeError
+
+- id: result
+  title: 최종 사용자 시스템
+  subtitle: 종합 프로필 모델
+  blocks:
+  - type: text
+    content: "지금까지 배운 모든 개념을 종합하여 실제 서비스에서 사용할 수 있는 사용자 프로필 시스템을 완성합니다. 필수 필드와 선택적 필드를 적절히 조합하고, model_fields로 스키마 정보를 확인하며, 다양한 직렬화 옵션을 활용합니다."
+  - type: code
+    language: python
+    title: 완성된 프로필 모델
+    description: 종합 사용자 모델
+    content: |-
+      class UserProfile(BaseModel):
+          model_config = {"frozen": False}
+
+          userId: str
+          username: str
+          email: str
+          displayName: Optional[str] = None
+          age: Optional[int] = None
+          isActive: bool = True
+          role: str = "user"
+
+      profile = UserProfile(
+          userId="usr_001",
+          username="alice",
+          email="alice@example.com",
+          displayName="Alice Kim",
+          age=25
+      )
+      profile
+  - type: code
+    language: python
+    title: 모델 정보 확인
+    description: 필드 스키마
+    content: |-
+      fieldInfo = {
+          "fields": list(UserProfile.model_fields.keys()),
+          "required": [k for k, v in UserProfile.model_fields.items() if v.is_required()]
+      }
+      fieldInfo
+  - type: code
+    language: python
+    title: JSON Schema 생성
+    description: API 문서화용
+    content: |-
+      import json
+      schema = UserProfile.model_json_schema()
+      json.dumps(schema, indent=2)[:300]
+
+- id: practice
+  title: 실습
+  subtitle: 모델 정의 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 BaseModel, 타입 검증, 기본값, 직렬화를 활용하여 다양한 도메인의 데이터 모델을 만들어봅니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 상품 모델"
+    blocks:
+    - type: code
+      title: 모델 정의
+      content: |-
+        from pydantic import BaseModel
+        from typing import Optional
+
+        class Product(BaseModel):
+            productId: str
+            name: str
+            price: float
+            quantity: int = 0
+            description: Optional[str] = None
+            isAvailable: bool = True
+
+        laptop = Product(
+            productId="P001",
+            name="MacBook Pro",
+            price=2500000,
+            quantity=10,
+            description="M3 Pro chip"
+        )
+        laptop
+    - type: code
+      title: 검증 및 직렬화
+      content: |-
+        mouse = Product(productId="P002", name="Magic Mouse", price="129000")
+
+        productSummary = {
+            "laptop": laptop.model_dump(),
+            "mouse_price_type": type(mouse.price).__name__,
+            "mouse_quantity": mouse.quantity
+        }
+        productSummary
+  - type: expansion
+    title: "미션2: 주문 시스템"
+    blocks:
+    - type: code
+      title: 주문 모델 정의
+      content: |-
+        from pydantic import BaseModel, ValidationError
+        from typing import Optional
+
+        class Order(BaseModel):
+            model_config = {"frozen": True}
+
+            orderId: str
+            customerId: str
+            amount: float
+            status: str = "pending"
+            note: Optional[str] = None
+
+        order = Order(
+            orderId="ORD-001",
+            customerId="C100",
+            amount=150000
+        )
+        order
+    - type: code
+      title: 불변성 및 직렬화 테스트
+      content: |-
+        orderJson = order.model_dump_json(indent=2)
+
+        try:
+            order.status = "completed"
+            immutableTest = "FAILED"
+        except Exception:
+            immutableTest = "PASSED"
+
+        orderData = Order.model_validate_json('{"orderId": "ORD-002", "customerId": "C200", "amount": "75000"}')
+
+        testResult = {
+            "immutable_test": immutableTest,
+            "amount_converted": type(orderData.amount).__name__,
+            "fields": list(Order.model_fields.keys())
+        }
+        testResult

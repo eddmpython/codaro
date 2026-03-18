@@ -1,0 +1,336 @@
+meta:
+  id: numpy_09
+  title: 전복나이예측
+  order: 9
+  category: numpy
+  difficulty: "⭐⭐⭐"
+  badge: 심화
+  tags: ["numpy", "dot", "matmul", "linalg", "lstsq", "polyfit", "polyval"]
+  seo:
+    title: "NumPy 선형대수 - 전복 나이 예측"
+    description: "NumPy의 선형대수 기능을 배우며 전복의 물리적 특성으로 나이를 예측합니다."
+    keywords: ["numpy", "선형대수", "dot", "lstsq", "polyfit", "전복"]
+
+intro:
+  emoji: "🐚"
+  goal: 전복 데이터로 선형대수 연산과 회귀를 익힙니다.
+  description: 4,177개 전복의 물리적 특성 데이터로 나이를 예측합니다. 행렬 연산, 선형 회귀, 다항 피팅을 NumPy의 선형대수 기능으로 구현합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: numpy와 pandas를 불러옵니다
+    content: |-
+      import numpy as np
+      import pandas as pd
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: 전복 데이터셋
+  blocks:
+  - type: text
+    content: "UCI 전복(Abalone) 데이터셋은 4,177마리의 전복 정보입니다. 전복 나이는 껍질의 고리 수(Rings)를 세어 알 수 있는데, 이 작업은 시간이 많이 걸립니다. 그래서 길이, 지름, 높이, 무게 등 쉽게 측정할 수 있는 특성으로 나이를 예측하려는 것이 이 데이터셋의 목적입니다."
+  - type: code
+    language: python
+    title: 전복 데이터 로드
+    description: UCI에서 전복 데이터를 불러옵니다
+    content: |-
+      baseUrl = "https://raw.githubusercontent.com"
+      colNames = ['Sex', 'Length', 'Diameter', 'Height', 'WholeWeight', 'ShuckedWeight', 'VisceraWeight', 'ShellWeight', 'Rings']
+      abaloneDf = pd.read_csv(f"{baseUrl}/selva86/datasets/master/Abalone.csv", names=colNames, header=0)
+      abaloneDf.head()
+
+- id: step3_extract
+  title: 3단계. 배열 추출
+  subtitle: 특성과 타겟
+  blocks:
+  - type: text
+    content: 예측에 사용할 특성과 타겟(나이)을 추출합니다. 전복의 나이는 고리 수 + 1.5로 계산됩니다.
+  - type: code
+    language: python
+    title: 특성/타겟 추출
+    description: 물리적 특성과 나이를 추출합니다
+    content: |-
+      featureCols = ['Length', 'Diameter', 'Height', 'WholeWeight', 'ShuckedWeight', 'VisceraWeight', 'ShellWeight']
+      X = abaloneDf[featureCols].values
+      rings = abaloneDf['Rings'].values
+      age = rings + 1.5
+      X.shape, age.shape
+
+- id: step4_dot
+  title: 4단계. 내적 계산
+  subtitle: np.dot()
+  blocks:
+  - type: text
+    content: "내적(dot product)은 두 벡터의 각 원소를 곱해서 더한 값입니다. [1,2,3]과 [4,5,6]의 내적은 1×4 + 2×5 + 3×6 = 32입니다. 내적이 크면 두 벡터가 비슷한 방향을 가리키고 있다는 의미입니다. 머신러닝에서 유사도 측정, 행렬 연산의 기초로 자주 사용됩니다."
+  - type: code
+    language: python
+    title: 벡터 내적
+    description: 길이와 지름의 내적을 계산합니다
+    content: |-
+      length = X[:, 0]
+      diameter = X[:, 1]
+      dotProduct = np.dot(length, diameter)
+      f"Length·Diameter 내적: {dotProduct:.2f}"
+  - type: tip
+    content: np.dot(a, b)는 두 벡터의 내적(스칼라곱)을 계산합니다. 결과는 스칼라 값으로, 두 벡터가 얼마나 같은 방향을 가리키는지 나타냅니다.
+
+- id: step5_matmul
+  title: 5단계. 행렬 곱셈
+  subtitle: "@ 연산자"
+  blocks:
+  - type: text
+    content: "행렬 곱셈은 첫 행렬의 각 행과 두 번째 행렬의 각 열을 내적한 결과입니다. A@B에서 A가 (m,n) 크기, B가 (n,k) 크기면 결과는 (m,k) 크기입니다. X.T @ X는 X의 전치행렬과 X를 곱한 것으로, 선형 회귀에서 정규방정식을 풀 때 핵심이 되는 연산입니다."
+  - type: code
+    language: python
+    title: 행렬 곱셈
+    description: X^T X를 계산합니다
+    content: |-
+      XtX = X.T @ X
+      XtX.shape
+  - type: tip
+    content: "@ 연산자는 행렬 곱셈(matmul)을 수행합니다. np.dot()도 2D 배열에서는 같은 결과지만, @가 더 명시적입니다."
+
+- id: step6_linalg_norm
+  title: 6단계. 벡터 노름
+  subtitle: np.linalg.norm()
+  blocks:
+  - type: text
+    content: "노름(norm)은 벡터의 '크기' 또는 '길이'입니다. 피타고라스 정리로 계산합니다. [3,4]의 노름은 √(3²+4²) = 5입니다. np.linalg는 linear algebra(선형대수)의 약자로, 행렬과 벡터 연산에 관한 함수들이 모여 있습니다."
+  - type: code
+    language: python
+    title: 벡터 노름
+    description: 각 특성 벡터의 노름을 계산합니다
+    content: |-
+      featureNorms = np.linalg.norm(X, axis=0)
+      pd.DataFrame({'Feature': featureCols, 'Norm': featureNorms.round(2)})
+  - type: tip
+    content: np.linalg.norm(arr)은 벡터의 유클리드 노름(길이)을 계산합니다. axis 파라미터로 행/열 방향을 지정할 수 있습니다.
+
+- id: step7_normalize
+  title: 7단계. 특성 정규화
+  subtitle: 단위 벡터
+  blocks:
+  - type: text
+    content: 각 특성을 노름으로 나누어 단위 벡터로 정규화합니다.
+  - type: code
+    language: python
+    title: 특성 정규화
+    description: 각 특성을 단위 벡터로 변환합니다
+    content: |-
+      Xnorm = X / featureNorms
+      normCheck = np.linalg.norm(Xnorm, axis=0)
+      f"정규화 후 노름: {normCheck.round(2)}"
+
+- id: step8_lstsq
+  title: 8단계. 최소제곱 회귀
+  subtitle: np.linalg.lstsq()
+  blocks:
+  - type: text
+    content: "선형 회귀는 '특성 × 계수 = 나이' 관계를 찾는 것입니다. lstsq(least squares, 최소제곱)는 예측값과 실제값의 차이(오차)의 제곱합을 최소화하는 계수를 찾습니다. Xbias에 1로 채운 열을 추가하는 이유는 절편(bias, 상수항)을 구하기 위함입니다."
+  - type: code
+    language: python
+    title: 선형 회귀
+    description: 최소제곱법으로 회귀 계수를 구합니다
+    content: |-
+      Xbias = np.column_stack([np.ones(len(X)), X])
+      coeffs, residuals, rank, s = np.linalg.lstsq(Xbias, age, rcond=None)
+      coeffs.round(3)
+  - type: tip
+    content: np.linalg.lstsq(A, b)는 Ax=b의 최소제곱 해를 구합니다. 반환값은 (계수, 잔차, 행렬 랭크, 특이값)입니다.
+
+- id: step9_predict
+  title: 9단계. 예측 수행
+  subtitle: 행렬 연산
+  blocks:
+  - type: text
+    content: 구한 계수로 나이를 예측합니다.
+  - type: code
+    language: python
+    title: 나이 예측
+    description: 회귀 계수로 나이를 예측합니다
+    content: |-
+      agePred = Xbias @ coeffs
+      agePred[:10].round(1)
+
+- id: step10_error
+  title: 10단계. 오차 계산
+  subtitle: MSE, RMSE
+  blocks:
+  - type: text
+    content: "MSE(Mean Squared Error, 평균제곱오차)는 예측 오차의 제곱을 평균한 값입니다. 제곱하는 이유는 양수/음수 오차가 상쇄되지 않게 하고, 큰 오차에 더 큰 페널티를 주기 위함입니다. RMSE(Root MSE)는 MSE에 루트를 씌운 값으로, 원래 단위(년)로 해석할 수 있어 더 직관적입니다."
+  - type: code
+    language: python
+    title: 오차 계산
+    description: MSE와 RMSE를 계산합니다
+    content: |-
+      errors = age - agePred
+      mse = np.mean(errors ** 2)
+      rmse = np.sqrt(mse)
+      f"MSE: {mse:.3f}, RMSE: {rmse:.3f}년"
+
+- id: step11_rsquared
+  title: 11단계. 결정계수
+  subtitle: R²
+  blocks:
+  - type: text
+    content: "R²(결정계수)는 모델이 데이터 변동의 몇 %를 설명하는지 나타냅니다. 0~1 사이 값으로, 1에 가까울수록 모델이 데이터를 잘 설명합니다. R²=0.5면 '나이 변동의 50%를 특성들로 설명할 수 있다'는 의미입니다. 단순히 평균만 예측하는 모델은 R²=0입니다."
+  - type: code
+    language: python
+    title: R² 계산
+    description: 결정계수를 계산합니다
+    content: |-
+      ssTot = np.sum((age - np.mean(age)) ** 2)
+      ssRes = np.sum(errors ** 2)
+      rSquared = 1 - ssRes / ssTot
+      f"R²: {rSquared:.4f}"
+
+- id: step12_polyfit
+  title: 12단계. 다항 피팅
+  subtitle: np.polyfit()
+  blocks:
+  - type: text
+    content: "다항 회귀는 y = ax² + bx + c 같은 곡선 관계를 찾습니다. 선형 회귀(직선)보다 복잡한 패턴을 표현할 수 있습니다. np.polyfit(x, y, deg=2)는 2차 다항식의 계수 [a, b, c]를 찾습니다. 껍질 무게와 나이의 관계가 직선이 아닐 수 있으므로 다항식으로 시도해봅니다."
+  - type: code
+    language: python
+    title: 2차 다항 피팅
+    description: 껍질 무게로 나이를 2차 다항식으로 피팅합니다
+    content: |-
+      shellWeight = X[:, 6]
+      polyCoeffs = np.polyfit(shellWeight, age, deg=2)
+      polyCoeffs.round(3)
+  - type: tip
+    content: np.polyfit(x, y, deg)는 deg차 다항식으로 데이터를 피팅합니다. 반환되는 계수는 최고차항부터 상수항 순서입니다.
+
+- id: step13_polyval
+  title: 13단계. 다항식 평가
+  subtitle: np.polyval()
+  blocks:
+  - type: text
+    content: polyval로 피팅된 다항식을 평가합니다.
+  - type: code
+    language: python
+    title: 다항식 예측
+    description: 다항식으로 나이를 예측합니다
+    content: |-
+      agePolyPred = np.polyval(polyCoeffs, shellWeight)
+      polyErrors = age - agePolyPred
+      polyRmse = np.sqrt(np.mean(polyErrors ** 2))
+      f"다항 회귀 RMSE: {polyRmse:.3f}년"
+  - type: tip
+    content: np.polyval(coeffs, x)는 다항식 계수와 x값으로 다항식을 평가합니다. polyfit과 함께 사용하면 다항 회귀를 쉽게 수행할 수 있습니다.
+
+- id: step14_inv
+  title: 14단계. 역행렬
+  subtitle: np.linalg.inv()
+  blocks:
+  - type: text
+    content: "역행렬은 행렬의 '역수' 같은 개념입니다. A × A⁻¹ = I(단위행렬)입니다. 선형 회귀의 정규 방정식 해는 (X^T X)^(-1) X^T y인데, 이 공식을 직접 계산할 수 있습니다. lstsq와 결과가 같지만, 역행렬 방식은 수치적으로 불안정할 수 있어 lstsq가 더 권장됩니다."
+  - type: code
+    language: python
+    title: 정규 방정식
+    description: 역행렬로 회귀 계수를 구합니다
+    content: |-
+      XtXinv = np.linalg.inv(Xbias.T @ Xbias)
+      coeffsNormal = XtXinv @ Xbias.T @ age
+      f"lstsq와 차이: {np.max(np.abs(coeffs - coeffsNormal)):.10f}"
+  - type: tip
+    content: np.linalg.inv(A)는 정방행렬의 역행렬을 계산합니다. 단, 역행렬이 존재하지 않으면(특이 행렬) 에러가 발생합니다.
+
+- id: step15_feature_importance
+  title: 15단계. 특성 중요도
+  subtitle: 계수 분석
+  blocks:
+  - type: text
+    content: "회귀 계수 크기만으로는 특성 중요도를 비교하기 어렵습니다. 특성마다 단위와 스케일이 다르기 때문입니다. 계수에 해당 특성의 표준편차를 곱하면 '특성이 1 표준편차만큼 변할 때 예측값이 얼마나 변하는가'로 공정하게 비교할 수 있습니다. 껍질 무게가 가장 중요한 예측 변수임을 확인할 수 있습니다."
+  - type: code
+    language: python
+    title: 특성 중요도
+    description: 표준화된 계수로 중요도를 비교합니다
+    content: |-
+      Xstd = np.std(X, axis=0)
+      stdCoeffs = coeffs[1:] * Xstd
+      importanceDf = pd.DataFrame({
+          'Feature': featureCols,
+          'Coefficient': coeffs[1:].round(3),
+          'StdCoeff': stdCoeffs.round(3),
+          'AbsImportance': np.abs(stdCoeffs).round(3)
+      })
+      importanceDf.sort_values('AbsImportance', ascending=False)
+
+- id: practice
+  title: 실습
+  subtitle: 전복 나이 예측
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 성별에 따른 예측 성능 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        url = "https://raw.githubusercontent.com"
+        cols = ['Sex', 'Length', 'Diameter', 'Height', 'WholeWeight', 'ShuckedWeight', 'VisceraWeight', 'ShellWeight', 'Rings']
+        data = pd.read_csv(f"{url}/selva86/datasets/master/Abalone.csv", names=cols, header=0)
+        feat = ['Length', 'Diameter', 'Height', 'WholeWeight', 'ShuckedWeight', 'VisceraWeight', 'ShellWeight']
+        X = data[feat].values
+        age = data['Rings'].values + 1.5
+        sex = data['Sex'].values
+    - type: code
+      title: "성별 성능 비교"
+      content: |-
+        rows = []
+        for s in ['M', 'F', 'I']:
+            mask = sex == s
+            arr = X[mask]
+            y = age[mask]
+            matrix = np.column_stack([np.ones(len(arr)), arr])
+            coef, _, _, _ = np.linalg.lstsq(matrix, y, rcond=None)
+            pred = matrix @ coef
+            mse = np.mean((y - pred) ** 2)
+            tot = np.sum((y - np.mean(y)) ** 2)
+            res = np.sum((y - pred) ** 2)
+            r2 = 1 - res / tot
+            rows.append({'Sex': s, 'Count': len(y), 'RMSE': np.sqrt(mse).round(3), 'R²': r2.round(4)})
+        pd.DataFrame(rows)
+  - type: expansion
+    title: "미션2: 다항 회귀 차수별 성능 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        src = "https://raw.githubusercontent.com"
+        cols = ['Sex', 'Length', 'Diameter', 'Height', 'WholeWeight', 'ShuckedWeight', 'VisceraWeight', 'ShellWeight', 'Rings']
+        df = pd.read_csv(f"{src}/selva86/datasets/master/Abalone.csv", names=cols, header=0)
+        shell = df['ShellWeight'].values
+        age = df['Rings'].values + 1.5
+    - type: code
+      title: "차수별 성능 비교"
+      content: |-
+        rows = []
+        for deg in [1, 2, 3, 4, 5]:
+            coef = np.polyfit(shell, age, deg=deg)
+            pred = np.polyval(coef, shell)
+            err = age - pred
+            mse = np.mean(err ** 2)
+            tot = np.sum((age - np.mean(age)) ** 2)
+            res = np.sum(err ** 2)
+            r2 = 1 - res / tot
+            rows.append({'Degree': deg, 'RMSE': np.sqrt(mse).round(3), 'R²': r2.round(4)})
+        pd.DataFrame(rows)

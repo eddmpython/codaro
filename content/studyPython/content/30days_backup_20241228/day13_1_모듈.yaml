@@ -1,0 +1,515 @@
+meta:
+  id: day13_1
+  title: 모듈
+  day: 13
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 모듈과 import"
+    description: "import로 모듈을 불러오고 사용하는 방법을 배웁니다."
+    keywords: ['모듈', 'import', '라이브러리']
+intro:
+  emoji: "📦"
+  points:
+  - 모듈의 개념과 중요성
+  - 모듈 import 방법 (import, from import)
+  - 별칭(as) 사용법
+  - math, random, string 모듈 활용
+  - os, sys 모듈 기초
+  - statistics 모듈로 통계 계산
+sections:
+- id: import_section
+  title: 13일차 import
+  subtitle: 학습에 필요한 모듈 준비
+  blocks:
+  - type: text
+    content: 이번 학습에서 사용할 모든 모듈을 최상단에서 한번에 가져옵니다. 모듈을 배운 이후부터는 항상 파일 최상단에 import 섹션을 하나만 만들고, 이후 섹션에서는 import를 사용하지 않습니다. 이렇게 하면 코드를 실행할 때 어떤 외부 기능을 사용하는지 한눈에 파악할 수 있고, 중복 import를 방지할 수 있습니다. marimo 환경에서 학생들이 각 섹션을 독립적인 셀에서 실행하기 때문에, import는 최상단에서 한번만 실행하는 것이 중요합니다.
+  - type: list
+    items:
+    - 파일 최상단에 import 섹션 하나만 생성
+    - 학습에 필요한 모든 모듈을 한곳에 모음
+    - 이후 섹션에서는 import 절대 사용 금지
+    - 코드 실행 시 필요한 외부 기능 한눈에 파악
+  - type: code
+    language: python
+    title: 13일차 필요 모듈
+    description: "이번 학습에 사용할 모든 모듈을 가져옵니다."
+    content: |-
+      import math
+      import random
+      import string
+      import os
+      import sys
+      from statistics import mean, median, mode, stdev
+  - type: tip
+    content: "import 섹션은 항상 파일 최상단에 위치하며, 이후 섹션에서는 import를 다시 사용하지 않습니다."
+
+- id: module_introduction
+  title: 모듈 소개
+  subtitle: 코드 재사용과 구조화의 핵심
+  blocks:
+  - type: text
+    content: 모듈(Module)은 함수, 변수, 클래스 등을 모아둔 파이썬 파일(.py)입니다. 모듈이라는 이름은 "구성 요소"를 뜻하는 영어 module에서 왔는데, 레고 블록처럼 조립해서 사용할 수 있는 코드 조각을 의미합니다. 모듈을 사용하면 다른 사람이 만든 기능을 가져다 쓸 수 있고, 자신의 코드도 재사용하기 쉽게 정리할 수 있습니다. 파이썬에는 math, random, os 등 수백 개의 내장 모듈이 있어 설치 없이 바로 사용할 수 있습니다. 이미 앞에서 import 섹션을 통해 여러 모듈을 가져왔으니, 이제부터 자유롭게 사용할 수 있습니다.
+  - type: list
+    items:
+    - 모듈은 .py 확장자를 가진 파이썬 파일
+    - 함수, 변수, 클래스의 집합
+    - 코드의 재사용성과 구조화
+    - import 키워드로 불러와서 사용
+  - type: code
+    language: python
+    title: 모듈 기본 개념
+    description: "import로 가져온 모듈을 사용합니다."
+    content: |-
+      basicSqrt = math.sqrt(16)
+      basicPow = math.pow(2, 3)
+      basicPi = math.pi
+
+      print(basicSqrt)
+      print(basicPow)
+      print(basicPi)
+  - type: tip
+    content: "파이썬에 내장된 모듈 목록은 import 후 dir() 함수로 확인할 수 있습니다. 예: dir(math)"
+
+- id: importing_module
+  title: 모듈 가져오기
+  subtitle: import 문으로 모듈 사용하기
+  blocks:
+  - type: text
+    content: import 키워드를 사용하여 모듈을 가져옵니다. 모듈을 가져온 후에는 "모듈이름.함수이름" 형태로 모듈 내의 함수나 변수에 접근합니다. 이 방식은 네임스페이스(이름 공간)를 분리하여 이름 충돌을 방지합니다. 네임스페이스는 이름을 구분하는 공간이라는 뜻으로, 같은 이름이더라도 다른 공간에 있으면 서로 충돌하지 않습니다. 예를 들어 math.pi와 내가 만든 pi 변수는 서로 다른 공간에 있어서 충돌하지 않습니다. 이미 최상단 import 섹션에서 모든 모듈을 가져왔으므로, 이후 섹션에서는 import를 다시 사용하지 않고 바로 모듈을 사용합니다.
+  - type: list
+    items:
+    - import 모듈이름 형태로 가져오기
+    - 모듈이름.함수이름으로 접근
+    - 네임스페이스 분리로 이름 충돌 방지
+    - 모듈 전체 기능 사용 가능
+  - type: code
+    language: python
+    title: import 문 사용
+    description: "import로 가져온 모듈을 사용합니다."
+    content: |-
+      importPi = math.pi
+      importSqrt = math.sqrt(25)
+      importFloor = math.floor(3.7)
+      importCeil = math.ceil(3.2)
+
+      print(importPi)
+      print(importSqrt)
+      print(importFloor)
+      print(importCeil)
+
+      importRandom = random.random()
+      importRandint = random.randint(1, 10)
+
+      print(importRandom)
+      print(importRandint)
+  - type: tip
+    content: "여러 모듈을 한 줄에 가져올 수도 있습니다: import math, random, os"
+
+- id: from_import
+  title: 특정 함수 가져오기
+  subtitle: from import로 선택적 가져오기
+  blocks:
+  - type: text
+    content: from 모듈이름 import 함수이름 형태로 모듈에서 특정 함수나 변수만 가져올 수 있습니다. 이 방식을 사용하면 모듈 이름 없이 함수를 직접 호출할 수 있어 코드가 간결해집니다. 예를 들어 math.sqrt(16) 대신 sqrt(16)으로 바로 사용할 수 있습니다. 필요한 함수만 골라서 가져오기 때문에 메모리 측면에서도 효율적입니다. 단, 내가 만든 함수 이름과 충돌할 수 있으니 주의해야 합니다. 최상단 import 섹션에서 from statistics import mean, median, mode, stdev 형태로 이미 사용했습니다.
+  - type: list
+    items:
+    - from 모듈 import 함수 형태
+    - 모듈 이름 없이 직접 호출 가능
+    - 필요한 것만 가져와 메모리 효율적
+    - 여러 함수를 쉼표로 구분해 가져오기
+  - type: code
+    language: python
+    title: from import 사용
+    description: "from import로 가져온 함수를 직접 사용합니다."
+    content: |-
+      fromPi = math.pi
+      fromSqrt = math.sqrt(16)
+      fromPow = math.pow(2, 10)
+
+      print(fromPi)
+      print(fromSqrt)
+      print(fromPow)
+
+      fromRandint = random.randint(1, 100)
+      fromColors = ['red', 'blue', 'green']
+      fromChoice = random.choice(fromColors)
+
+      print(fromRandint)
+      print(fromChoice)
+  - type: tip
+    content: "from math import *로 모든 함수를 가져올 수 있지만, 이름 충돌 위험이 있어 권장하지 않습니다."
+
+- id: import_alias
+  title: 별칭으로 가져오기
+  subtitle: as 키워드로 이름 변경
+  blocks:
+  - type: text
+    content: import 시 as 키워드를 사용하여 모듈이나 함수에 별칭(alias)을 지정할 수 있습니다. 별칭은 영어로 "다른 이름"이라는 뜻으로, 원래 이름 대신 사용할 짧은 이름을 지정하는 것입니다. 긴 모듈 이름을 짧게 만들거나, 기존 이름과 충돌을 피할 때 유용합니다. 예를 들어 numpy를 np로, pandas를 pd로 가져오는 것이 파이썬 커뮤니티의 관례입니다. 이렇게 하면 코드를 작성할 때 타이핑이 줄어들고 가독성도 좋아집니다.
+  - type: list
+    items:
+    - as 키워드로 별칭 지정
+    - 긴 이름을 짧게 변경
+    - 이름 충돌 방지
+    - 관례적 별칭 사용 (np, pd 등)
+  - type: code
+    language: python
+    title: 별칭 사용
+    description: "별칭을 지정하여 모듈을 사용합니다."
+    content: |-
+      aliasPi = math.pi
+      aliasSqrt = math.sqrt(100)
+      aliasRandint = random.randint(1, 50)
+
+      print(aliasPi)
+      print(aliasSqrt)
+      print(aliasRandint)
+
+      aliasFact = math.factorial(5)
+      aliasRoundUp = math.ceil(4.1)
+
+      print(aliasFact)
+      print(aliasRoundUp)
+  - type: tip
+    content: "관례적 별칭: numpy → np, pandas → pd, matplotlib.pyplot → plt"
+
+- id: math_module
+  title: math 모듈
+  subtitle: 수학 함수와 상수
+  blocks:
+  - type: text
+    content: math 모듈은 수학 계산에 필요한 함수와 상수를 제공합니다. 원주율(pi), 자연상수(e) 같은 상수와 제곱근(sqrt), 거듭제곱(pow), 반올림(floor, ceil), 삼각함수(sin, cos) 등의 함수를 사용할 수 있습니다. floor는 영어로 "바닥"이라는 뜻으로 소수점을 버리고 내림하는 함수이고, ceil은 "천장"이라는 뜻으로 소수점을 올림하는 함수입니다. factorial은 계승을 계산하는 함수로, 5!는 5 x 4 x 3 x 2 x 1을 의미합니다.
+  - type: list
+    items:
+    - math.pi, math.e - 수학 상수
+    - sqrt(), pow() - 제곱근, 거듭제곱
+    - floor(), ceil() - 내림, 올림
+    - sin(), cos(), tan() - 삼각함수
+  - type: code
+    language: python
+    title: math 모듈 활용
+    description: "다양한 수학 함수와 상수를 사용합니다."
+    content: |-
+      mathPi = math.pi
+      mathE = math.e
+
+      print(mathPi)
+      print(mathE)
+
+      mathSqrt = math.sqrt(144)
+      mathPow = math.pow(2, 8)
+      mathFact = math.factorial(5)
+
+      print(mathSqrt)
+      print(mathPow)
+      print(mathFact)
+
+      mathFloor = math.floor(3.9)
+      mathCeil = math.ceil(3.1)
+
+      print(mathFloor)
+      print(mathCeil)
+
+      mathRadius = 5
+      mathArea = math.pi * mathRadius ** 2
+      print(mathArea)
+
+- id: random_module
+  title: random 모듈
+  subtitle: 난수 생성과 무작위 선택
+  blocks:
+  - type: text
+    content: random 모듈은 난수(무작위 수) 생성과 무작위 선택 기능을 제공합니다. random()은 0과 1 사이의 실수를 무작위로 반환하고, randint()는 지정한 범위의 정수를 무작위로 반환합니다. choice()는 리스트에서 무작위로 하나를 선택하고, shuffle()은 리스트의 순서를 무작위로 섞습니다. sample()은 리스트에서 지정한 개수만큼 중복 없이 무작위로 뽑아냅니다. 이런 기능들은 게임, 추첨, 시뮬레이션 등 다양한 곳에서 활용됩니다.
+  - type: list
+    items:
+    - random() - 0~1 사이 실수
+    - randint(a, b) - a~b 범위 정수
+    - choice() - 리스트에서 무작위 선택
+    - shuffle() - 리스트 순서 섞기
+  - type: code
+    language: python
+    title: random 모듈 활용
+    description: "난수 생성과 무작위 선택을 수행합니다."
+    content: |-
+      randomFloat = random.random()
+      randomInt = random.randint(1, 100)
+
+      print(randomFloat)
+      print(randomInt)
+
+      randomColors = ['red', 'blue', 'green', 'yellow']
+      randomChoiceColor = random.choice(randomColors)
+      print(randomChoiceColor)
+
+      randomNumbers = [1, 2, 3, 4, 5]
+      random.shuffle(randomNumbers)
+      print(randomNumbers)
+
+      randomSample = random.sample(randomColors, 2)
+      print(randomSample)
+
+- id: string_module
+  title: string 모듈
+  subtitle: 문자열 상수 모음
+  blocks:
+  - type: text
+    content: string 모듈은 문자열 처리에 유용한 상수들을 제공합니다. ascii_letters는 모든 알파벳(a-z, A-Z), digits는 숫자 문자(0-9), punctuation은 특수문자(!@# 등)를 포함합니다. ascii는 컴퓨터에서 문자를 표현하는 표준 방식의 이름으로, American Standard Code for Information Interchange의 약자입니다. 이런 상수들은 비밀번호 생성, 유효성 검사, 문자열 필터링 등에 자주 사용됩니다. day10에서 배운 for 반복문과 조합하면 랜덤 비밀번호를 쉽게 만들 수 있습니다.
+  - type: list
+    items:
+    - ascii_letters - 알파벳 전체 (a-z, A-Z)
+    - ascii_lowercase/uppercase - 소문자/대문자
+    - digits - 숫자 문자 (0-9)
+    - punctuation - 특수문자
+  - type: code
+    language: python
+    title: string 모듈 활용
+    description: "문자열 상수를 사용합니다."
+    content: |-
+      stringLetters = string.ascii_letters
+      stringLower = string.ascii_lowercase
+      stringUpper = string.ascii_uppercase
+      stringDigits = string.digits
+      stringPunct = string.punctuation
+
+      print(stringLetters)
+      print(stringLower)
+      print(stringUpper)
+      print(stringDigits)
+      print(stringPunct)
+
+      stringChars = string.ascii_letters + string.digits
+      stringPassword = ''
+      for i in range(8):
+          stringPassword = stringPassword + random.choice(stringChars)
+      print(stringPassword)
+
+- id: os_module
+  title: os 모듈
+  subtitle: 운영체제 기능 활용
+  blocks:
+  - type: text
+    content: os 모듈은 운영체제와 상호작용하는 기능을 제공합니다. os는 Operating System의 약자로 운영체제를 뜻합니다. getcwd()는 현재 작업 중인 디렉토리(폴더)의 경로를 확인하고, listdir()은 지정한 디렉토리의 파일과 폴더 목록을 보여줍니다. os.path.join()은 여러 경로 조각을 운영체제에 맞게 결합해주고, os.path.exists()는 파일이나 폴더가 존재하는지 확인합니다. environ은 환경 변수라고 불리는 시스템 설정값들을 담고 있습니다.
+  - type: list
+    items:
+    - getcwd() - 현재 디렉토리 확인
+    - listdir() - 디렉토리 내용 조회
+    - path.exists() - 파일/폴더 존재 확인
+    - path.join() - 경로 결합
+  - type: code
+    language: python
+    title: os 모듈 활용
+    description: "운영체제 관련 기능을 사용합니다."
+    content: |-
+      osCwd = os.getcwd()
+      print(osCwd)
+
+      osListdir = os.listdir('.')
+      print(osListdir)
+
+      osPath = os.path.join('folder', 'subfolder', 'file.txt')
+      print(osPath)
+
+      osExists = os.path.exists('.')
+      print(osExists)
+
+      osHome = os.environ.get('HOME') or os.environ.get('USERPROFILE')
+      print(osHome)
+
+- id: sys_module
+  title: sys 모듈
+  subtitle: 파이썬 시스템 정보
+  blocks:
+  - type: text
+    content: sys 모듈은 파이썬 인터프리터와 관련된 정보를 제공합니다. sys는 system의 약자로 시스템을 뜻합니다. version은 현재 실행 중인 파이썬의 버전 정보를 보여주고, platform은 운영체제 종류(Windows, Linux, macOS 등)를 알려줍니다. argv는 명령행에서 프로그램을 실행할 때 전달받은 인수들을 담고 있고, path는 파이썬이 모듈을 찾을 때 검색하는 디렉토리 목록입니다. 명령행 프로그램을 만들 때 자주 사용됩니다.
+  - type: list
+    items:
+    - sys.version - 파이썬 버전 정보
+    - sys.argv - 명령행 인수
+    - sys.path - 모듈 검색 경로
+    - sys.platform - 운영체제 정보
+  - type: code
+    language: python
+    title: sys 모듈 활용
+    description: "파이썬 시스템 정보를 확인합니다."
+    content: |-
+      sysVersion = sys.version
+      sysPlatform = sys.platform
+      sysArgv = sys.argv
+
+      print(sysVersion)
+      print(sysPlatform)
+      print(sysArgv)
+
+      sysPathLen = len(sys.path)
+      sysPathFirst = sys.path[0]
+
+      print(sysPathLen)
+      print(sysPathFirst)
+
+- id: statistics_module
+  title: statistics 모듈
+  subtitle: 통계 계산 기능
+  blocks:
+  - type: text
+    content: statistics 모듈은 수치 데이터의 통계 계산 함수를 제공합니다. mean()은 평균을 계산하고, median()은 중앙값(데이터를 크기순으로 나열했을 때 가운데 값)을 구합니다. mode()는 최빈값(가장 많이 나타나는 값)을 찾고, stdev()는 표준편차(데이터가 평균에서 얼마나 흩어져 있는지)를 계산합니다. 이 모듈은 데이터 분석의 기초가 되는 통계량들을 간단하게 계산할 수 있게 해줍니다. 최상단 import 섹션에서 from statistics import로 이미 가져왔으므로, 함수 이름만으로 바로 사용할 수 있습니다.
+  - type: list
+    items:
+    - mean() - 평균
+    - median() - 중앙값
+    - mode() - 최빈값
+    - stdev() - 표준편차
+  - type: code
+    language: python
+    title: statistics 모듈 활용
+    description: "통계 함수를 사용합니다."
+    content: |-
+      statsAges = [20, 20, 4, 24, 25, 22, 26, 20, 23, 22, 26]
+
+      statsMean = mean(statsAges)
+      statsMedian = median(statsAges)
+      statsMode = mode(statsAges)
+      statsStdev = stdev(statsAges)
+
+      print(statsMean)
+      print(statsMedian)
+      print(statsMode)
+      print(statsStdev)
+
+      statsScores = [85, 90, 88, 92, 87, 90, 85]
+      statsScoresMean = mean(statsScores)
+      statsScoresMedian = median(statsScores)
+
+      print(statsScoresMean)
+      print(statsScoresMedian)
+
+- id: practice
+  title: 13일차 복습
+  subtitle: 모듈 미션
+  blocks:
+  - type: text
+    content: 13일차에서 배운 모듈 사용법을 복습하는 미션입니다. import, from import, 별칭, 다양한 내장 모듈을 종합적으로 연습해봅시다. 이전에 배운 변수, 연산자, 문자열, 리스트, 딕셔너리, 조건문, 반복문, 함수 등의 개념과 모듈을 결합하여 다양한 프로그램을 만들어볼 수 있습니다.
+  - type: expansion
+    title: "미션1: math 모듈로 원의 둘레와 넓이"
+    code: |-
+      mission1Radius = 7
+      mission1Circumference = 2 * math.pi * mission1Radius
+      mission1Area = math.pi * mission1Radius ** 2
+
+      print(mission1Circumference)
+      print(mission1Area)
+  - type: expansion
+    title: "미션2: random 모듈로 로또 번호"
+    code: |-
+      mission2Lotto = random.sample(range(1, 46), 6)
+      mission2Lotto.sort()
+      print(mission2Lotto)
+  - type: expansion
+    title: "미션3: 랜덤 비밀번호 생성"
+    code: |-
+      mission3Chars = string.ascii_letters + string.digits + string.punctuation
+      mission3Password = ''
+      for i in range(12):
+          mission3Password = mission3Password + random.choice(mission3Chars)
+      print(mission3Password)
+  - type: expansion
+    title: "미션4: 통계 계산"
+    code: |-
+      mission4Data = [75, 82, 90, 68, 85, 92, 78, 88]
+
+      mission4Mean = mean(mission4Data)
+      mission4Median = median(mission4Data)
+      mission4Stdev = stdev(mission4Data)
+
+      print(mission4Mean)
+      print(mission4Median)
+      print(mission4Stdev)
+  - type: expansion
+    title: "미션5: os 모듈로 파일 확인"
+    code: |-
+      mission5CurrentDir = os.getcwd()
+      print(mission5CurrentDir)
+
+      mission5Files = os.listdir('.')
+      mission5FileCount = len(mission5Files)
+      print(mission5FileCount)
+  - type: expansion
+    title: "미션6: 함수와 random으로 RGB 색상"
+    code: |-
+      def mission6RgbColor():
+          mission6R = random.randint(0, 255)
+          mission6G = random.randint(0, 255)
+          mission6B = random.randint(0, 255)
+          return 'rgb(' + str(mission6R) + ', ' + str(mission6G) + ', ' + str(mission6B) + ')'
+
+      mission6Color1 = mission6RgbColor()
+      mission6Color2 = mission6RgbColor()
+      mission6Color3 = mission6RgbColor()
+
+      print(mission6Color1)
+      print(mission6Color2)
+      print(mission6Color3)
+  - type: expansion
+    title: "미션7: 조건문과 random으로 주사위 게임"
+    code: |-
+      def mission7RollDice():
+          return random.randint(1, 6)
+
+      mission7Player1 = mission7RollDice()
+      mission7Player2 = mission7RollDice()
+
+      print('Player 1: ' + str(mission7Player1))
+      print('Player 2: ' + str(mission7Player2))
+
+      if mission7Player1 > mission7Player2:
+          print('Player 1 wins!')
+      elif mission7Player2 > mission7Player1:
+          print('Player 2 wins!')
+      else:
+          print('Draw!')
+  - type: expansion
+    title: "미션8: math와 반복문으로 제곱근 계산"
+    code: |-
+      mission8Numbers = [4, 9, 16, 25, 36, 49, 64, 81, 100]
+      mission8Sqrts = []
+      for mission8Num in mission8Numbers:
+          mission8Sqrt = math.sqrt(mission8Num)
+          mission8Sqrts.append(mission8Sqrt)
+      print(mission8Sqrts)
+  - type: expansion
+    title: "미션9: string과 조건문으로 비밀번호 강도 검사"
+    code: |-
+      mission9Password = 'Hello123!'
+      mission9HasLower = False
+      mission9HasUpper = False
+      mission9HasDigit = False
+      mission9HasPunct = False
+
+      for mission9Char in mission9Password:
+          if mission9Char in string.ascii_lowercase:
+              mission9HasLower = True
+          elif mission9Char in string.ascii_uppercase:
+              mission9HasUpper = True
+          elif mission9Char in string.digits:
+              mission9HasDigit = True
+          elif mission9Char in string.punctuation:
+              mission9HasPunct = True
+
+      mission9Score = mission9HasLower + mission9HasUpper + mission9HasDigit + mission9HasPunct
+      print(mission9Score)
+  - type: expansion
+    title: "미션10: 리스트와 통계로 성적 분석"
+    code: |-
+      mission10Scores = [88, 92, 78, 95, 85, 90, 87, 93]
+      mission10Mean = mean(mission10Scores)
+      mission10Median = median(mission10Scores)
+      mission10Stdev = stdev(mission10Scores)
+      mission10Max = max(mission10Scores)
+      mission10Min = min(mission10Scores)
+
+      print('평균: ' + str(mission10Mean))
+      print('중앙값: ' + str(mission10Median))
+      print('표준편차: ' + str(mission10Stdev))
+      print('최고점: ' + str(mission10Max))
+      print('최저점: ' + str(mission10Min))

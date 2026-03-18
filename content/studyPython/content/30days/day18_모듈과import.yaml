@@ -1,0 +1,469 @@
+meta:
+  id: "day18"
+  title: "모듈과import"
+  day: 18
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 모듈과 import - 표준 라이브러리 활용"
+    description: "import, from, as와 math, random, datetime 모듈을 배웁니다."
+    keywords: ['모듈', 'import', 'math', 'random', 'datetime']
+
+intro:
+  emoji: "📦"
+  points:
+  - "import로 모듈 가져오기"
+  - "from, as로 유연하게"
+  - "math, random, datetime 활용"
+  - "표준 라이브러리 사용"
+
+sections:
+- id: "import_basic"
+  title: "import 기본"
+  subtitle: "모듈 가져오기"
+  blocks:
+  - type: "text"
+    content: "모듈은 함수와 변수를 담은 파이썬 파일입니다. import 모듈명으로 모듈을 가져오고, 모듈명.함수명()으로 사용합니다. 파이썬은 많은 표준 모듈을 제공합니다."
+  - type: "list"
+    items:
+    - "import 모듈명 형식"
+    - "모듈명.함수명() 사용"
+    - "표준 라이브러리 제공"
+    - "코드 재사용"
+  - type: "code"
+    language: "python"
+    title: "math 모듈"
+    description: "math 모듈을 가져와 사용합니다."
+    content: |-
+      import math
+
+      math.sqrt(16)
+  - type: "code"
+    language: "python"
+    title: "여러 함수 사용"
+    description: "모듈의 여러 함수를 사용할 수 있습니다."
+    content: |-
+      # import math  # 이미 위 셀에서 import한 경우 제거
+
+      radius = 5
+      area = math.pi * radius ** 2
+      area
+  - type: "code"
+    language: "python"
+    title: "여러 모듈"
+    description: "여러 모듈을 가져올 수 있습니다."
+    content: |-
+      # import math  # 이미 위 셀에서 import한 경우 제거
+      import random
+
+      value = math.ceil(3.2)
+      value
+  - type: "tip"
+    content: "marimo에서는 같은 모듈을 여러 셀에서 import하면 'multiple definitions' 에러가 발생합니다. 한 셀에서만 import하세요."
+
+- id: "from_import"
+  title: "from import"
+  subtitle: "특정 함수만 가져오기"
+  blocks:
+  - type: "text"
+    content: "from 모듈명 import 함수명으로 특정 함수만 가져올 수 있습니다. 모듈명 없이 함수명만으로 사용할 수 있습니다. 여러 함수를 쉼표로 구분하여 가져올 수 있습니다."
+  - type: "list"
+    items:
+    - "from 모듈명 import 함수명"
+    - "모듈명 없이 사용"
+    - "쉼표로 여러 함수"
+    - "코드 간결화"
+  - type: "code"
+    language: "python"
+    title: "함수 직접 사용"
+    description: "from import로 함수를 직접 사용합니다."
+    content: |-
+      from math import sqrt
+
+      sqrt(25)
+  - type: "code"
+    language: "python"
+    title: "여러 함수 가져오기"
+    description: "여러 함수를 한 번에 가져옵니다."
+    content: |-
+      from math import pi, ceil, floor
+
+      ceil(3.2), floor(3.8)
+  - type: "code"
+    language: "python"
+    title: "계산에 활용"
+    description: "가져온 함수와 상수를 계산에 사용합니다."
+    content: |-
+      from math import pi, pow
+
+      r = 3
+      volume = 4 / 3 * pi * pow(r, 3)
+      volume
+  - type: "tip"
+    content: "필요한 함수만 가져오면 코드가 깔끔해집니다."
+
+- id: "import_as"
+  title: "as 별칭"
+  subtitle: "모듈/함수 이름 바꾸기"
+  blocks:
+  - type: "text"
+    content: "as 키워드로 모듈이나 함수에 별칭을 붙일 수 있습니다. import 모듈명 as 별칭 또는 from 모듈명 import 함수명 as 별칭 형식입니다. 긴 이름을 짧게 만들거나 충돌을 피할 때 사용합니다."
+  - type: "list"
+    items:
+    - "as 별칭 형식"
+    - "긴 이름 단축"
+    - "이름 충돌 방지"
+    - "관습적 별칭 존재"
+  - type: "code"
+    language: "python"
+    title: "모듈 별칭"
+    description: "모듈에 짧은 별칭을 붙입니다."
+    content: |-
+      import math as m
+
+      m.sqrt(36)
+  - type: "code"
+    language: "python"
+    title: "함수 별칭"
+    description: "함수에 별칭을 붙입니다."
+    content: |-
+      from math import sqrt as sq
+
+      sq(49)
+  - type: "code"
+    language: "python"
+    title: "여러 별칭"
+    description: "여러 함수에 별칭을 붙입니다."
+    content: |-
+      from random import randint as rInt, choice as pick
+
+      rInt(1, 10)
+  - type: "tip"
+    content: "별칭은 짧고 의미있게 지으세요."
+
+- id: "math_module"
+  title: "math 모듈"
+  subtitle: "수학 함수"
+  blocks:
+  - type: "text"
+    content: "math 모듈은 수학 함수를 제공합니다. sqrt(제곱근), ceil(올림), floor(내림), pow(거듭제곱), pi(파이), e(자연상수) 등을 사용할 수 있습니다."
+  - type: "list"
+    items:
+    - "sqrt(): 제곱근"
+    - "ceil(): 올림"
+    - "floor(): 내림"
+    - "pow(): 거듭제곱"
+  - type: "code"
+    language: "python"
+    title: "제곱근"
+    description: "sqrt로 제곱근을 계산합니다."
+    content: |-
+      from math import sqrt
+
+      sqrt(144)
+  - type: "code"
+    language: "python"
+    title: "올림과 내림"
+    description: "ceil과 floor로 올림과 내림을 합니다."
+    content: |-
+      from math import ceil, floor
+
+      num = 5.7
+      ceil(num), floor(num)
+  - type: "code"
+    language: "python"
+    title: "거듭제곱"
+    description: "pow로 거듭제곱을 계산합니다."
+    content: |-
+      from math import pow
+
+      pow(2, 10)
+  - type: "tip"
+    content: "math.pow는 실수를 반환하고, ** 연산자는 정수도 유지합니다."
+
+- id: "random_module"
+  title: "random 모듈"
+  subtitle: "난수 생성"
+  blocks:
+  - type: "text"
+    content: "random 모듈은 난수를 생성합니다. randint(정수 난수), choice(리스트에서 선택), shuffle(리스트 섞기), random(0~1 실수) 등을 제공합니다."
+  - type: "list"
+    items:
+    - "randint(a, b): a~b 정수"
+    - "choice(리스트): 랜덤 선택"
+    - "shuffle(리스트): 섞기"
+    - "random(): 0~1 실수"
+  - type: "code"
+    language: "python"
+    title: "정수 난수"
+    description: "randint로 범위 내 정수를 생성합니다."
+    content: |-
+      from random import randint
+
+      randint(1, 100)
+  - type: "code"
+    language: "python"
+    title: "랜덤 선택"
+    description: "choice로 리스트에서 하나를 선택합니다."
+    content: |-
+      from random import choice
+
+      colors = ['red', 'green', 'blue', 'yellow']
+      choice(colors)
+  - type: "code"
+    language: "python"
+    title: "실수 난수"
+    description: "random()으로 0과 1 사이의 실수를 생성합니다."
+    content: |-
+      from random import random
+
+      random()
+  - type: "tip"
+    content: "난수는 실행할 때마다 다른 값이 나옵니다."
+
+- id: "datetime_module"
+  title: "datetime 모듈"
+  subtitle: "날짜와 시간"
+  blocks:
+  - type: "text"
+    content: "datetime 모듈은 날짜와 시간을 다룹니다. datetime.now(현재 시각), date(날짜), time(시간), timedelta(시간 차이) 등을 제공합니다."
+  - type: "list"
+    items:
+    - "datetime.now(): 현재 시각"
+    - "date(): 날짜 생성"
+    - "time(): 시간 생성"
+    - "timedelta(): 시간 차이"
+  - type: "code"
+    language: "python"
+    title: "현재 시각"
+    description: "datetime.now()로 현재 시각을 가져옵니다."
+    content: |-
+      from datetime import datetime
+
+      now = datetime.now()
+      now.year, now.month, now.day
+  - type: "code"
+    language: "python"
+    title: "날짜 생성"
+    description: "특정 날짜를 생성합니다."
+    content: |-
+      from datetime import date
+
+      birthday = date(2000, 1, 1)
+      birthday.year, birthday.month, birthday.day
+  - type: "code"
+    language: "python"
+    title: "시간 차이"
+    description: "timedelta로 시간 차이를 계산합니다."
+    content: |-
+      from datetime import date, timedelta
+
+      today = date(2024, 1, 1)
+      tomorrow = today + timedelta(days=1)
+      tomorrow.day
+  - type: "tip"
+    content: "datetime 객체는 여러 속성과 메서드를 제공합니다."
+
+- id: "practice"
+  title: "Day 18 종합 복습"
+  subtitle: "모듈과 import 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 18에서 배운 모듈과 import를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: import"
+    code: |-
+      import math  # 첫 번째 셀에서 import
+
+      math.sqrt(81)
+
+  - type: "expansion"
+    title: "🟢 기본2: from import"
+    code: |-
+      from math import pi
+
+      pi
+
+  - type: "expansion"
+    title: "🟢 기본3: as 별칭"
+    code: |-
+      from math import sqrt as sq
+
+      sq(64)
+
+  - type: "expansion"
+    title: "🟢 기본4: random"
+    code: |-
+      from random import randint
+
+      randint(1, 6)
+
+  - type: "expansion"
+    title: "🟢 기본5: datetime"
+    code: |-
+      from datetime import date
+
+      today = date(2024, 12, 25)
+      today.year, today.month
+
+  - type: "expansion"
+    title: "🟡 응용1: 원의 넓이"
+    code: |-
+      from math import pi
+
+      r = 7
+      area = pi * r ** 2
+      area
+
+  - type: "expansion"
+    title: "🟡 응용2: 주사위"
+    code: |-
+      from random import randint
+
+      dice1 = randint(1, 6)
+      dice2 = randint(1, 6)
+      total = dice1 + dice2
+      total
+
+  - type: "expansion"
+    title: "🟡 응용3: 올림과 내림"
+    code: |-
+      from math import ceil, floor
+
+      price = 15750
+      upper = ceil(price / 1000) * 1000
+      lower = floor(price / 1000) * 1000
+      upper, lower
+
+  - type: "expansion"
+    title: "🟡 응용4: 랜덤 선택"
+    code: |-
+      from random import choice
+
+      menu = ['pizza', 'burger', 'pasta', 'salad']
+      selected = choice(menu)
+      selected
+
+  - type: "expansion"
+    title: "🟡 응용5: 날짜 계산"
+    code: |-
+      from datetime import date, timedelta
+
+      start = date(2024, 1, 1)
+      end = start + timedelta(days=100)
+      end.month, end.day
+
+  - type: "expansion"
+    title: "🔴 심화1-1: 피타고라스"
+    code: |-
+      from math import sqrt, pow
+
+      a = 3
+      b = 4
+      c = sqrt(pow(a, 2) + pow(b, 2))
+      c
+
+  - type: "expansion"
+    title: "🔴 심화1-2: 구의 부피"
+    code: |-
+      from math import pi, pow
+
+      radius = 5
+      volume = 4 / 3 * pi * pow(radius, 3)
+      volume
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 로또 번호"
+    code: |-
+      from random import randint
+
+      numbers = []
+      for i in range(6):
+          num = randint(1, 45)
+          numbers.append(num)
+      numbers
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 팀 나누기"
+    code: |-
+      from random import choice
+
+      members = ['Alice', 'Bob', 'Charlie', 'David']
+      teamA = []
+      teamB = []
+      for member in members:
+          team = choice(['A', 'B'])
+          if team == 'A':
+              teamA.append(member)
+          else:
+              teamB.append(member)
+      teamA, teamB
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 나이 계산"
+    code: |-
+      from datetime import date
+
+      birth = date(1990, 5, 15)
+      today = date(2024, 1, 1)
+      age = today.year - birth.year
+      age
+
+  - type: "expansion"
+    title: "🔴 심화3-2: D-Day 계산"
+    code: |-
+      from datetime import date
+
+      today = date(2024, 1, 1)
+      target = date(2024, 12, 31)
+      diff = target - today
+      diff.days
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 거리 계산"
+    code: |-
+      from math import sqrt, pow
+
+      x1, y1 = 0, 0
+      x2, y2 = 3, 4
+      distance = sqrt(pow(x2 - x1, 2) + pow(y2 - y1, 2))
+      distance
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 각도 계산"
+    code: |-
+      from math import pi
+
+      degrees = 180
+      radians = degrees * pi / 180
+      radians
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 랜덤 비밀번호"
+    code: |-
+      from random import randint, choice
+
+      chars = 'abcdefghijklmnopqrstuvwxyz'
+      password = ''
+      for i in range(8):
+          idx = randint(0, len(chars) - 1)
+          password = password + chars[idx]
+      password
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 근무일 계산"
+    code: |-
+      from datetime import date, timedelta
+
+      start = date(2024, 1, 1)
+      end = date(2024, 12, 31)
+      days = (end - start).days + 1
+      weekends = 0
+      current = start
+      while current <= end:
+          if current.weekday() >= 5:
+              weekends = weekends + 1
+          current = current + timedelta(days=1)
+      workdays = days - weekends
+      workdays

@@ -1,0 +1,531 @@
+meta:
+  id: day28_sqlite
+  title: 데이터베이스 SQLite
+  day: 28
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 데이터베이스 SQLite"
+    description: "SQLite로 데이터베이스를 다루는 방법."
+    keywords: ['데이터베이스', 'SQLite', 'SQL']
+intro:
+  emoji: "🗄️"
+  points:
+  - SQLite 소개와 연결
+  - 테이블 생성과 데이터 타입
+  - 데이터 삽입 (INSERT)
+  - 데이터 조회 (SELECT)
+  - 조건 검색 (WHERE)
+  - 정렬과 집계 함수
+  - 수정과 삭제 (UPDATE, DELETE)
+  - GROUP BY와 실전 예제
+sections:
+- id: sqlite_intro
+  title: SQLite 소개
+  subtitle: 파이썬 내장 데이터베이스
+  blocks:
+  - type: text
+    content: SQLite는 Python에 기본으로 포함된 관계형 데이터베이스입니다. 별도 설치 없이 바로 사용할 수 있고, 파일 하나로 데이터가 저장됩니다.
+  - type: list
+    items:
+    - 서버 설치 불필요
+    - .db 파일로 데이터 저장
+    - 20년 이상 검증된 안정성
+    - 모바일 앱, 브라우저에서 사용
+  - type: code
+    language: python
+    title: SQLite 연결하기
+    description: sqlite3 모듈로 데이터베이스에 연결합니다.
+    content: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+
+      cursor.execute("SELECT sqlite_version()")
+      version = cursor.fetchone()
+      print(f"SQLite 버전: {version[0]}")
+
+      conn.close()
+  - type: tip
+    content: ":memory:는 메모리에만 저장됩니다. 파일로 저장하려면 'school.db' 같은 파일명을 사용하세요."
+
+- id: create_table
+  title: 테이블 생성
+  subtitle: 데이터 저장소 만들기
+  blocks:
+  - type: text
+    content: CREATE TABLE 문으로 테이블을 생성합니다. 각 컬럼의 이름과 데이터 타입을 정의합니다.
+  - type: list
+    items:
+    - "INTEGER - 정수"
+    - "TEXT - 문자열"
+    - "REAL - 실수"
+    - "PRIMARY KEY - 기본키"
+  - type: code
+    language: python
+    title: 학생 테이블 생성
+    description: 학생 정보를 저장할 테이블을 만듭니다.
+    content: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+
+      cursor.execute("""
+          CREATE TABLE students (
+              id INTEGER PRIMARY KEY,
+              name TEXT NOT NULL,
+              age INTEGER,
+              score REAL
+          )
+      """)
+
+      cursor.execute("PRAGMA table_info(students)")
+      columns = cursor.fetchall()
+
+      print("테이블 구조:")
+      for col in columns:
+          print(f"  {col[1]}: {col[2]}")
+
+      conn.close()
+
+- id: insert_data
+  title: 데이터 삽입
+  subtitle: INSERT로 데이터 추가
+  blocks:
+  - type: text
+    content: INSERT INTO 문으로 테이블에 데이터를 추가합니다. VALUES 뒤에 각 컬럼의 값을 순서대로 적습니다.
+  - type: list
+    items:
+    - "INSERT INTO - 데이터 삽입"
+    - "VALUES - 값 지정"
+    - "executemany - 여러 행 삽입"
+    - "commit() - 변경사항 저장"
+  - type: code
+    language: python
+    title: 학생 데이터 삽입
+    description: 학생 데이터를 테이블에 추가합니다.
+    content: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+
+      cursor.execute("""
+          CREATE TABLE students (
+              id INTEGER PRIMARY KEY,
+              name TEXT NOT NULL,
+              age INTEGER,
+              score REAL
+          )
+      """)
+
+      studentsData = [
+          ('김철수', 20, 85.5),
+          ('이영희', 19, 92.0),
+          ('박민수', 21, 78.5)
+      ]
+
+      cursor.executemany("""
+          INSERT INTO students (name, age, score)
+          VALUES (?, ?, ?)
+      """, studentsData)
+
+      conn.commit()
+
+      cursor.execute("SELECT COUNT(*) FROM students")
+      count = cursor.fetchone()[0]
+      print(f"등록된 학생 수: {count}명")
+
+      conn.close()
+
+- id: select_query
+  title: 데이터 조회
+  subtitle: SELECT로 데이터 가져오기
+  blocks:
+  - type: text
+    content: SELECT 문으로 테이블에서 데이터를 조회합니다. fetchall()은 모든 결과를, fetchone()은 한 건을 가져옵니다.
+  - type: list
+    items:
+    - "SELECT * - 모든 컬럼"
+    - "SELECT 컬럼명 - 특정 컬럼"
+    - "fetchall() - 모든 결과"
+    - "fetchone() - 한 건"
+  - type: code
+    language: python
+    title: 학생 데이터 조회
+    description: 저장된 학생 데이터를 조회합니다.
+    content: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+
+      cursor.execute("CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT, age INTEGER, score REAL)")
+      cursor.executemany("INSERT INTO students (name, age, score) VALUES (?, ?, ?)",
+          [('김철수', 20, 85.5), ('이영희', 19, 92.0), ('박민수', 21, 78.5)])
+      conn.commit()
+
+      print("전체 학생:")
+      cursor.execute("SELECT * FROM students")
+      allStudents = cursor.fetchall()
+      for s in allStudents:
+          print(f"  {s[1]}: {s[3]}점")
+
+      print("\n이름과 점수만:")
+      cursor.execute("SELECT name, score FROM students")
+      for name, score in cursor.fetchall():
+          print(f"  {name}: {score}점")
+
+      conn.close()
+
+- id: where_clause
+  title: 조건 검색
+  subtitle: WHERE로 필터링
+  blocks:
+  - type: text
+    content: WHERE 절로 조건을 지정하여 원하는 데이터만 가져올 수 있습니다. 비교 연산자와 논리 연산자를 사용합니다.
+  - type: list
+    items:
+    - "= - 같다"
+    - "> < >= <= - 비교"
+    - "AND OR - 논리 연산"
+    - "LIKE - 패턴 매칭"
+  - type: code
+    language: python
+    title: 조건 검색
+    description: 조건에 맞는 학생을 조회합니다.
+    content: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+
+      cursor.execute("CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT, grade TEXT, score REAL)")
+      cursor.executemany("INSERT INTO students (name, grade, score) VALUES (?, ?, ?)",
+          [('김철수', '1학년', 85.5), ('이영희', '1학년', 92.0), ('박민수', '2학년', 78.5), ('최지은', '2학년', 88.0)])
+      conn.commit()
+
+      print("1학년 학생:")
+      cursor.execute("SELECT name, score FROM students WHERE grade = '1학년'")
+      for name, score in cursor.fetchall():
+          print(f"  {name}: {score}점")
+
+      print("\n85점 이상:")
+      cursor.execute("SELECT name, score FROM students WHERE score >= 85")
+      for name, score in cursor.fetchall():
+          print(f"  {name}: {score}점")
+
+      conn.close()
+
+- id: order_by
+  title: 정렬하기
+  subtitle: ORDER BY로 순서 정하기
+  blocks:
+  - type: text
+    content: ORDER BY로 결과를 원하는 순서로 정렬합니다. ASC는 오름차순, DESC는 내림차순입니다.
+  - type: list
+    items:
+    - "ORDER BY 컬럼 - 오름차순"
+    - "ORDER BY 컬럼 DESC - 내림차순"
+    - "LIMIT - 개수 제한"
+    - 여러 컬럼으로 정렬 가능
+  - type: code
+    language: python
+    title: 점수순 정렬
+    description: 점수가 높은 순서로 정렬합니다.
+    content: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+
+      cursor.execute("CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT, score REAL)")
+      cursor.executemany("INSERT INTO students (name, score) VALUES (?, ?)",
+          [('김철수', 85.5), ('이영희', 92.0), ('박민수', 78.5), ('최지은', 88.0)])
+      conn.commit()
+
+      print("점수 높은 순:")
+      cursor.execute("SELECT name, score FROM students ORDER BY score DESC")
+      for rank, (name, score) in enumerate(cursor.fetchall(), 1):
+          print(f"  {rank}등. {name}: {score}점")
+
+      print("\n상위 2명:")
+      cursor.execute("SELECT name, score FROM students ORDER BY score DESC LIMIT 2")
+      for name, score in cursor.fetchall():
+          print(f"  {name}: {score}점")
+
+      conn.close()
+
+- id: aggregate_functions
+  title: 집계 함수
+  subtitle: COUNT, AVG, SUM, MAX, MIN
+  blocks:
+  - type: text
+    content: 집계 함수로 데이터의 통계를 계산합니다. COUNT는 개수, AVG는 평균, SUM은 합계를 구합니다.
+  - type: list
+    items:
+    - "COUNT(*) - 개수"
+    - "AVG(column) - 평균"
+    - "SUM(column) - 합계"
+    - "MAX, MIN - 최대, 최소"
+  - type: code
+    language: python
+    title: 성적 통계
+    description: 학생 점수의 통계를 계산합니다.
+    content: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+
+      cursor.execute("CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT, score REAL)")
+      cursor.executemany("INSERT INTO students (name, score) VALUES (?, ?)",
+          [('김철수', 85.5), ('이영희', 92.0), ('박민수', 78.5), ('최지은', 88.0)])
+      conn.commit()
+
+      cursor.execute("""
+          SELECT COUNT(*), AVG(score), MAX(score), MIN(score)
+          FROM students
+      """)
+      cnt, avg, maxScore, minScore = cursor.fetchone()
+
+      print(f"학생 수: {cnt}명")
+      print(f"평균 점수: {avg:.1f}점")
+      print(f"최고 점수: {maxScore}점")
+      print(f"최저 점수: {minScore}점")
+
+      conn.close()
+
+- id: update_delete
+  title: 수정과 삭제
+  subtitle: UPDATE와 DELETE
+  blocks:
+  - type: text
+    content: UPDATE로 데이터를 수정하고 DELETE로 삭제합니다. WHERE 절로 대상을 지정해야 합니다.
+  - type: list
+    items:
+    - "UPDATE - 데이터 수정"
+    - "DELETE - 데이터 삭제"
+    - WHERE 절 필수
+    - WHERE 없으면 전체 대상
+  - type: code
+    language: python
+    title: 데이터 수정/삭제
+    description: 학생 점수를 수정하고 특정 학생을 삭제합니다.
+    content: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+
+      cursor.execute("CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT, score REAL)")
+      cursor.executemany("INSERT INTO students (name, score) VALUES (?, ?)",
+          [('김철수', 85.5), ('이영희', 92.0), ('박민수', 65.0)])
+      conn.commit()
+
+      cursor.execute("UPDATE students SET score = 90.0 WHERE name = '김철수'")
+      conn.commit()
+      cursor.execute("SELECT name, score FROM students WHERE name = '김철수'")
+      updated = cursor.fetchone()
+      print(f"수정 후: {updated[0]} - {updated[1]}점")
+
+      cursor.execute("DELETE FROM students WHERE score < 70")
+      conn.commit()
+      cursor.execute("SELECT COUNT(*) FROM students")
+      remaining = cursor.fetchone()[0]
+      print(f"남은 학생 수: {remaining}명")
+
+      conn.close()
+  - type: tip
+    content: "WHERE 없이 DELETE하면 모든 데이터가 삭제됩니다. 주의하세요!"
+
+- id: group_by
+  title: 그룹별 집계
+  subtitle: GROUP BY로 그룹화
+  blocks:
+  - type: text
+    content: GROUP BY로 데이터를 그룹화하고 각 그룹별 통계를 계산합니다. 학년별 평균 점수 등을 구할 수 있습니다.
+  - type: list
+    items:
+    - "GROUP BY - 그룹화"
+    - "HAVING - 그룹 조건"
+    - 그룹별 집계 함수 적용
+    - 여러 컬럼으로 그룹화 가능
+  - type: code
+    language: python
+    title: 학년별 통계
+    description: 학년별로 학생 수와 평균 점수를 계산합니다.
+    content: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+
+      cursor.execute("CREATE TABLE students (id INTEGER PRIMARY KEY, name TEXT, grade TEXT, score REAL)")
+      cursor.executemany("INSERT INTO students (name, grade, score) VALUES (?, ?, ?)",
+          [('김철수', '1학년', 85), ('이영희', '1학년', 92), ('박민수', '2학년', 78),
+           ('최지은', '2학년', 88), ('정하영', '3학년', 90)])
+      conn.commit()
+
+      cursor.execute("""
+          SELECT grade, COUNT(*) AS cnt, ROUND(AVG(score), 1) AS avg
+          FROM students
+          GROUP BY grade
+          ORDER BY grade
+      """)
+
+      print("학년별 통계:")
+      for grade, cnt, avg in cursor.fetchall():
+          print(f"  {grade}: {cnt}명, 평균 {avg}점")
+
+      conn.close()
+
+- id: practical_example
+  title: 실전 예제
+  subtitle: 도서관 관리 시스템
+  blocks:
+  - type: text
+    content: 지금까지 배운 SQLite를 활용하여 간단한 도서관 관리 시스템을 만들어봅니다.
+  - type: list
+    items:
+    - 도서 데이터 저장
+    - 카테고리별 분석
+    - 대출 가능 도서 조회
+    - 최신 도서 검색
+  - type: code
+    language: python
+    title: 도서관 시스템
+    description: 도서 정보를 관리합니다.
+    content: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+
+      cursor.execute("""
+          CREATE TABLE books (
+              id INTEGER PRIMARY KEY,
+              title TEXT NOT NULL,
+              author TEXT,
+              category TEXT,
+              year INTEGER,
+              available INTEGER DEFAULT 1
+          )
+      """)
+
+      booksData = [
+          ('파이썬 완전정복', '김프로그래머', 'IT', 2023, 1),
+          ('해리포터', 'J.K.롤링', '소설', 1997, 1),
+          ('코스모스', '칼 세이건', '과학', 1980, 0),
+          ('데이터 사이언스', '박데이터', 'IT', 2022, 1)
+      ]
+
+      cursor.executemany("""
+          INSERT INTO books (title, author, category, year, available)
+          VALUES (?, ?, ?, ?, ?)
+      """, booksData)
+      conn.commit()
+
+      cursor.execute("SELECT SUM(1) FROM books")
+      print(f"총 도서 수: {cursor.fetchone()[0]}권")
+
+      print("\n카테고리별 도서:")
+      cursor.execute("SELECT category, COUNT(*) FROM books GROUP BY category")
+      for cat, cnt in cursor.fetchall():
+          print(f"  {cat}: {cnt}권")
+
+      print("\n대출 가능:")
+      cursor.execute("SELECT title FROM books WHERE available = 1")
+      for (title,) in cursor.fetchall():
+          print(f"  {title}")
+
+      conn.close()
+
+- id: practice
+  title: 28일차 복습
+  subtitle: SQLite 미션
+  blocks:
+  - type: text
+    content: 28일차에서 배운 SQLite를 복습하는 미션입니다.
+  - type: expansion
+    title: "미션1: 연결"
+    code: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      print("연결 성공!")
+      conn.close()
+  - type: expansion
+    title: "미션2: 테이블 생성"
+    code: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+      cursor.execute("CREATE TABLE test (id INTEGER, name TEXT)")
+      print("테이블 생성!")
+      conn.close()
+  - type: expansion
+    title: "미션3: 데이터 삽입"
+    code: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+      cursor.execute("CREATE TABLE test (id INTEGER, name TEXT)")
+      cursor.execute("INSERT INTO test VALUES (1, 'A')")
+      conn.commit()
+      print(cursor.execute("SELECT * FROM test").fetchall())
+      conn.close()
+  - type: expansion
+    title: "미션4: 조건 검색"
+    code: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+      cursor.execute("CREATE TABLE nums (n INTEGER)")
+      cursor.executemany("INSERT INTO nums VALUES (?)", [(i,) for i in range(1, 11)])
+      result = cursor.execute("SELECT * FROM nums WHERE n > 5").fetchall()
+      print(result)
+      conn.close()
+  - type: expansion
+    title: "미션5: 집계 함수"
+    code: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+      cursor.execute("CREATE TABLE nums (n INTEGER)")
+      cursor.executemany("INSERT INTO nums VALUES (?)", [(i,) for i in range(1, 11)])
+      result = cursor.execute("SELECT AVG(n), SUM(n) FROM nums").fetchone()
+      print(f"평균: {result[0]}, 합계: {result[1]}")
+      conn.close()
+  - type: expansion
+    title: "미션6: GROUP BY"
+    code: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+      cursor.execute("CREATE TABLE sales (cat TEXT, price INTEGER)")
+      cursor.executemany("INSERT INTO sales VALUES (?, ?)", [('A', 100), ('B', 200), ('A', 150)])
+      result = cursor.execute("SELECT cat, SUM(price) FROM sales GROUP BY cat").fetchall()
+      print(result)
+      conn.close()
+  - type: expansion
+    title: "미션7: 정렬"
+    code: |-
+      import sqlite3
+
+      conn = sqlite3.connect(':memory:')
+      cursor = conn.cursor()
+      cursor.execute("CREATE TABLE nums (n INTEGER)")
+      cursor.executemany("INSERT INTO nums VALUES (?)", [(i,) for i in range(1, 6)])
+      result = cursor.execute("SELECT * FROM nums ORDER BY n DESC").fetchall()
+      print(result)
+      conn.close()

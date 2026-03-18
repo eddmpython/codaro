@@ -2,103 +2,279 @@
 
 ## 역할
 
-`frontend/`는 SvelteKit 기반 Codaro 편집기와 앱 표면을 담당한다.
+`frontend/`는 Codaro의 editor/app UI를 담당하는 Svelte 프론트엔드다.
 
-현재 두 화면이 있다.
-- `/`
-  - `EditorShell.svelte`
-- `/app`
-  - `AppShell.svelte`
+이 문서는 현재 프론트 재구축의 source of truth다.
+이번 재구축은 감으로 새 UI를 만드는 작업이 아니다.
+먼저 설치된 `marimo`를 기준선으로 정확히 재현하고, 그 다음에 Codaro의 우위를 쌓는다.
 
-## 현재 구조
+## 현재 상태
 
-- `src/routes/+page.svelte`
-  - 편집기 진입점
-- `src/routes/app/+page.svelte`
-  - 앱 모드 진입점
-- `src/lib/editor/`
-  - 셀, 툴바, 사이드바, 실행 클라이언트, API 클라이언트
-- `src/styles.css`
-  - 전역 토큰과 테마
+- `frontend/`는 다시 복구되었고 `src/codaro/webBuild/`로 빌드된다
+- notebook shell은 설치된 `marimo` 정적 자산을 직접 벤더링해서 맞춘다
+- 벤더 경로는 `frontend/src/lib/vendor/marimo/assets/`다
+- 재구축의 기준선은 `eddmlab`이 아니라 프로젝트 `.venv`에 설치된 `marimo`다
 
-## 실행 경로
+## 절대 규칙
 
-편집기 실행은 현재 두 단계다.
+### 1. 기준선은 설치된 marimo다
 
-1. `ServerKernel` 시도
-  - FastAPI `/api/kernel/create`
-  - WebSocket `/ws/kernel/{sessionId}`
-2. 실패 시 `WorkerClient` 폴백
-  - 브라우저 Pyodide worker 실행
+반드시 아래 경로의 실제 코드를 먼저 읽고 따라간다.
 
-즉 현재 편집 표면은 서버 커널 우선, Pyodide 폴백 구조다.
+- `.venv/Lib/site-packages/marimo/_plugins/stateless/flex.py`
+- `.venv/Lib/site-packages/marimo/_plugins/stateless/accordion.py`
+- `.venv/Lib/site-packages/marimo/_plugins/ui/_impl/tabs.py`
+- `.venv/Lib/site-packages/marimo/_plugins/stateless/sidebar.py`
+- `.venv/Lib/site-packages/marimo/_plugins/stateless/callout.py`
+- `.venv/Lib/site-packages/marimo/_output/hypertext.py`
+- `.venv/Lib/site-packages/marimo/_tutorials/layout.py`
+- `.venv/Lib/site-packages/marimo/_static/`
+- `frontend/src/lib/vendor/marimo/assets/`
 
-반면 앱 모드는 아직 `WorkerClient` 기반 순차 실행이다.
+### 2. parity 전에는 개선 금지
 
-## 핵심 파일
+아래 항목은 `marimo parity`가 끝나기 전까지 넣지 않는다.
 
-- `EditorShell.svelte`
-  - 전체 편집기 조립
-  - 문서 로드/저장
-  - 셀 선택
-  - 실행
-  - command palette
-- `Cell.svelte`
-  - 셀 컨테이너
-  - 좌우 액션
-  - drag/drop
-  - output 연결
-- `CodeCell.svelte`
-  - 코드 셀 래퍼
-- `MarkdownCell.svelte`
-  - 마크다운 편집/미리보기
-- `EditorToolbar.svelte`
-  - 상단/하단 플로팅 컨트롤
-- `EditorSidebar.svelte`
-  - 블록, 변수, runtime, document, graph 패널
-- `AddCellButton.svelte`
-  - 셀 삽입 메뉴
-- `CommandPalette.svelte`
-  - 커맨드 팔레트
-- `serverKernel.js`
-  - 서버 커널 클라이언트
-- `workerClient.js`
-  - Pyodide worker 클라이언트
-- `pyodideWorker.js`
-  - 브라우저 실행 worker
-- `api.js`
-  - 문서, 파일, 패키지, 환경 API 래퍼
-- `dataflow.js`
-  - 중복 정의와 순환 참조 계산
+- 임의의 새 header
+- marimo에 없는 toolbar chrome
+- Codaro 감성이라고 주장하는 장식 레이아웃
+- 설명용 문구나 배너
+- eddmlab 전용 UX를 그대로 이식한 요소
 
-## 현재 UX 상태
+### 3. 내부와 표면을 분리한다
 
-이미 들어간 기능:
-- 셀 추가/삭제/이동/복제
-- code/markdown 전환
-- multi-select
-- bulk action
-- command palette
-- drag reorder
-- width mode
-- app launch
+- 표면 UI는 먼저 `marimo`와 최대한 같게 간다
+- 내부 canonical model은 `CodaroDocument`를 유지한다
+- 프론트는 `CodaroDocument -> notebook view model` 어댑터를 통해서만 동작한다
+- `eddmlab`의 `Notebook` JSON과 `/api/notebook/*` 계약은 가져오지 않는다
 
-아직 구조적으로 부족한 부분:
-- 셀 계층이 `marimo` 수준으로 더 잘게 분리돼 있지 않다
-- header, controls, multi-cell toolbar, create-cell button, sortable wrapper를 더 명확히 분리할 필요가 있다
-- app 모드와 edit 모드의 엔진 경로가 아직 통일되지 않았다
+### 4. 엔진 우선순위는 유지한다
 
-## 디자인 방향
+Codaro의 실행 원칙은 그대로 유지한다.
 
-현재 톤은 `eddmlab`에서 가져온 노트북 감각을 바탕으로 조정 중이다.
-다만 source of truth는 Codaro 쪽 구조와 문서다.
+- 기본: 서버 커널
+- 폴백: Pyodide
+- 편집기 UI는 엔진 구현 세부사항을 직접 알지 않는다
 
-즉 참고는 하되 그대로 복제하지 않는다.
-특히 셀 구조는 `marimo`, `eddmlab` 둘 다 메커니즘 단위로 해부해서 Codaro 목적에 맞게 재편해야 한다.
+### 5. 한 번에 한 레이어만 바꾼다
 
-## 다음 작업
+아래를 한 PR 또는 한 작업 단위에서 섞지 않는다.
 
-- 셀 계층을 `cell shell`, `toolbar`, `actions menu`, `sortable wrapper`로 분리
-- 전역 controls와 header 계층 재정리
-- 앱 모드도 서버 커널 capability를 활용하도록 정리
-- block 중심 모델에 맞는 widget/view 브리지 붙이기
+- notebook shell
+- cell chrome
+- output renderer
+- layout renderer
+- engine adapter
+- workspace home
+- app mode
+
+## Codaro 백엔드 경계
+
+프론트는 아래 API를 기준으로 붙는다.
+
+- `/api/bootstrap`
+- `/api/workspace/index`
+- `/api/document/load`
+- `/api/document/save`
+- `/api/document/export`
+- `/api/document/insert-block`
+- `/api/document/remove-block`
+- `/api/document/move-block`
+- `/api/document/update-block`
+- `/api/kernel/create`
+- `/api/kernel/{sessionId}/execute`
+- `/api/kernel/{sessionId}/execute-reactive`
+- `/api/kernel/{sessionId}/variables`
+- `/api/kernel/{sessionId}/interrupt`
+- `/api/fs/*`
+- `/api/packages/*`
+- `/ws/kernel/{sessionId}`
+
+SPA base path는 서버가 주입하는 `<meta name="codaro-base">`를 따른다.
+
+## marimo parity 범위
+
+### 1단계: notebook chrome parity
+
+먼저 맞춰야 하는 것은 notebook의 기본 리듬이다.
+
+- 셀 카드 구조
+- 셀 간 간격
+- 실행 상태 표시
+- 코드 셀과 markdown 셀의 출력 흐름
+- 마지막 expression output 리듬
+- 최소한의 툴바와 액션 위치
+
+### 2단계: layout parity
+
+설치된 marimo 기준으로 아래를 재현한다.
+
+- `mo.hstack`
+- `mo.vstack`
+- `Html.center()`
+- `Html.right()`
+- `Html.left()`
+- `mo.accordion`
+- `mo.ui.tabs`
+- `mo.sidebar`
+- `mo.callout`
+
+### 3단계: Codaro adapter
+
+parity 이후에만 아래를 붙인다.
+
+- block canonical model
+- reactive lineage
+- learning mode
+- app mode
+- AI tool surface
+
+## 컴포넌트 대응표
+
+### Notebook Surface
+
+| 목표 표면 | marimo 기준 | Codaro 구현 원칙 |
+| --- | --- | --- |
+| Notebook shell | `_static/` notebook chrome | 별도 영웅 섹션 없이 notebook 표면부터 시작 |
+| Cell frame | marimo cell rhythm | block id와 execution 상태를 가진 셀 프레임 |
+| Output area | `Html` 출력 흐름 | 서버 커널 결과와 Pyodide 결과를 같은 shape로 렌더 |
+| Sidebar chrome | `mo.sidebar`와 notebook side panels | parity 후 Codaro panel만 추가 |
+
+### Layout / Output
+
+| 기능 | marimo 기준 파일 | Svelte 구현 원칙 |
+| --- | --- | --- |
+| `hstack` / `vstack` | `_plugins/stateless/flex.py` | flex container와 child flex 비율을 그대로 모델링 |
+| `accordion` | `_plugins/stateless/accordion.py` | labels + slotted content 구조 유지 |
+| `tabs` | `_plugins/ui/_impl/tabs.py` | 선택값은 tab key, 렌더 구조는 slotted tab panel 기준으로 맞춤 |
+| `sidebar` | `_plugins/stateless/sidebar.py` | notebook 본문 밖 sidebar layout으로 처리 |
+| `center/right/left` | `_output/hypertext.py` | 별도 장식 없이 justify 래퍼로 구현 |
+| `callout` | `_plugins/stateless/callout.py` | `neutral/warn/success/info/danger` kind 체계를 그대로 유지 |
+
+## Svelte 구조 초안
+
+초기 구조는 아래처럼 간다.
+
+```text
+frontend/
+  DEV.md
+  src/
+    lib/
+      features/
+        notebook/
+          NotebookShell.svelte
+          CellFrame.svelte
+          OutputRenderer.svelte
+          LayoutRenderer.svelte
+          SidebarHost.svelte
+          engine/
+            ServerKernelEngine.ts
+            PyodideEngine.ts
+            ExecutionEngine.ts
+          adapters/
+            documentAdapter.ts
+            outputAdapter.ts
+            layoutAdapter.ts
+          stores/
+            notebookStore.ts
+            sessionStore.ts
+            workspaceStore.ts
+```
+
+## view model 원칙
+
+프론트 내부에서만 notebook view model을 둔다.
+
+- source of truth: `CodaroDocument.blocks`
+- 프론트 view model: 셀처럼 보이는 얇은 projection
+- projection은 reversible 해야 한다
+- 프론트가 임의의 새 문서 포맷을 만들지 않는다
+
+예상 최소 projection:
+
+- `code` block -> code cell
+- `markdown` / `text` / `guide` block -> markdown or guide surface
+- `widget` / `view` block -> layout/output renderer
+
+## 첫 구현 순서
+
+### Phase 0. benchmark 고정
+
+- 설치된 `marimo` 코드 대응표 작성
+- 이 문서를 기준선으로 고정
+
+### Phase 1. shell
+
+- `NotebookShell.svelte`
+- `CellFrame.svelte`
+- `OutputRenderer.svelte`
+- `documentAdapter.ts`
+
+성공 기준:
+
+- `CodaroDocument`를 읽어 셀처럼 보여줄 수 있다
+- 커스텀 header 없이 notebook 화면이 열린다
+
+### Phase 2. server engine
+
+- `ServerKernelEngine.ts`
+- `sessionStore.ts`
+- `/api/kernel/*` 연결
+
+성공 기준:
+
+- 코드 블록 단일 실행
+- 변수 조회
+- reactive execute
+
+### Phase 3. layout parity
+
+- `LayoutRenderer.svelte`
+- `hstack/vstack`
+- `accordion`
+- `tabs`
+- `sidebar`
+- `callout`
+
+성공 기준:
+
+- `marimo` tutorial layout 예제가 같은 의미로 보인다
+
+### Phase 4. pyodide fallback
+
+- `PyodideEngine.ts`
+- 동일 capability shape 유지
+
+성공 기준:
+
+- 서버 커널 부재 시 기본 notebook 흐름이 유지된다
+
+### Phase 5. Codaro advantage
+
+- learning mode
+- app mode
+- widget/view bridge
+- AI editor tools
+
+## 검증 기준
+
+구현 검증은 추상 감상이 아니라 아래 기준으로 한다.
+
+- `marimo` tutorial example이 같은 layout semantics를 가지는가
+- 실행 결과의 정렬과 래핑이 marimo와 어긋나지 않는가
+- 임의 header/chrome이 끼어들지 않았는가
+- `CodaroDocument`와 프론트 view model이 역변환 가능한가
+- 서버 커널과 Pyodide가 같은 capability surface를 노출하는가
+
+## 금지된 해석
+
+아래 해석은 하지 않는다.
+
+- "marimo는 심심하니 헤더를 추가하자"
+- "Codaro니까 landing 같은 hero를 넣자"
+- "학습 제품이니 안내 카드부터 넣자"
+- "eddmlab에 있던 것을 먼저 옮기자"
+
+반드시 순서는 아래다.
+
+`marimo parity -> Codaro adapter -> Codaro advantage`

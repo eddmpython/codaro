@@ -1,0 +1,945 @@
+meta:
+  id: "day10"
+  title: "집합"
+  day: 10
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 집합(Set) - 중복 없는 데이터 관리"
+    description: "집합 자료구조와 합집합, 교집합, 차집합 연산을 배웁니다."
+    keywords: ['집합', 'set', '중복제거', '합집합', '교집합', '차집합']
+
+intro:
+  emoji: "🎯"
+  points:
+  - "집합으로 중복 없는 데이터 관리"
+  - "add/remove로 요소 추가/삭제"
+  - "합집합, 교집합, 차집합 연산"
+  - "수학의 집합 개념을 프로그래밍에"
+
+sections:
+- id: "set_intro"
+  title: "집합이란?"
+  subtitle: "중복 없고 순서 없는 자료구조"
+  blocks:
+  - type: "text"
+    content: "집합(Set)은 중복을 허용하지 않고 순서가 없는 자료구조입니다. 중괄호 {}로 만들고, 쉼표로 값을 구분합니다. 같은 값을 여러 번 넣어도 하나만 저장됩니다. 인덱스가 없어서 특정 위치의 요소에 접근할 수 없습니다. 수학의 집합 개념과 동일하며, 집합 연산을 지원합니다."
+  - type: "list"
+    items:
+    - "중괄호 {}로 생성"
+    - "중복 자동 제거"
+    - "순서가 없음 (인덱싱 불가)"
+    - "수학의 집합 연산 지원"
+  - type: "code"
+    language: "python"
+    title: "집합 만들기"
+    description: "중괄호를 사용하여 집합을 만듭니다."
+    content: |-
+      nums = {1, 2, 3, 4, 5}
+      nums
+  - type: "tip"
+    content: "빈 집합은 {}가 아닌 set()으로 만듭니다. {}는 빈 딕셔너리입니다."
+
+- id: "set_create"
+  title: "집합 생성하기"
+  subtitle: "다양한 방법으로 만들기"
+  blocks:
+  - type: "text"
+    content: "집합은 중괄호로 직접 만들거나 set() 함수를 사용합니다. set() 함수에 리스트, 튜플, 문자열을 넣으면 집합으로 변환됩니다. 빈 집합은 반드시 set()으로 만들어야 합니다. {}는 빈 딕셔너리를 만듭니다."
+  - type: "list"
+    items:
+    - "중괄호 {1, 2, 3}로 생성"
+    - "set(리스트)로 변환"
+    - "빈 집합은 set()"
+    - "{} 는 빈 딕셔너리"
+  - type: "code"
+    language: "python"
+    title: "직접 생성"
+    description: "중괄호로 집합을 직접 만듭니다."
+    content: |-
+      direct = {1, 2, 3, 4, 5}
+      direct
+  - type: "code"
+    language: "python"
+    title: "리스트에서 생성"
+    description: "set() 함수로 리스트를 집합으로 변환합니다."
+    content: |-
+      items = set([1, 2, 3, 3, 4])
+      items
+  - type: "code"
+    language: "python"
+    title: "문자열에서 생성"
+    description: "set() 함수로 문자열을 집합으로 변환합니다."
+    content: |-
+      chars = set('hello')
+      chars
+  - type: "code"
+    language: "python"
+    title: "빈 집합"
+    description: "set()으로 빈 집합을 만듭니다."
+    content: |-
+      empty = set()
+      empty
+  - type: "tip"
+    content: "set('hello')는 {'h', 'e', 'l', 'o'}가 됩니다. 'l'이 하나만 남습니다."
+
+- id: "set_unique"
+  title: "중복 제거 특성"
+  subtitle: "자동으로 중복 삭제"
+  blocks:
+  - type: "text"
+    content: "집합의 가장 큰 특징은 중복을 자동으로 제거한다는 것입니다. 같은 값을 여러 번 넣어도 하나만 유지됩니다. 이 특성을 이용하면 리스트의 중복을 쉽게 제거할 수 있습니다. 리스트를 집합으로 변환했다가 다시 리스트로 바꾸면 중복이 제거됩니다."
+  - type: "list"
+    items:
+    - "중복 값 자동 제거"
+    - "하나의 값만 유지"
+    - "리스트 중복 제거에 유용"
+    - "set(리스트) → list(집합)"
+  - type: "code"
+    language: "python"
+    title: "집합 생성시 중복 제거"
+    description: "집합을 만들 때 중복이 자동으로 제거됩니다."
+    content: |-
+      dups = {1, 2, 2, 3, 3, 3, 4}
+      dups
+  - type: "code"
+    language: "python"
+    title: "리스트 중복 제거"
+    description: "리스트를 집합으로 변환하여 중복을 제거합니다."
+    content: |-
+      raw = [1, 2, 2, 3, 3, 3, 4]
+      set(raw)
+  - type: "code"
+    language: "python"
+    title: "다시 리스트로"
+    description: "중복 제거된 집합을 리스트로 변환합니다."
+    content: |-
+      data = [1, 2, 2, 3, 3, 3, 4]
+      unique = set(data)
+      list(unique)
+  - type: "tip"
+    content: "집합은 순서를 보장하지 않으므로 정렬이 필요하면 sorted()를 사용하세요."
+
+- id: "add_method"
+  title: "add() 메서드"
+  subtitle: "집합에 요소 추가"
+  blocks:
+  - type: "text"
+    content: "add() 메서드는 집합에 새로운 요소를 추가합니다. 이미 있는 값을 추가하려고 해도 에러가 발생하지 않고 무시됩니다. 중복을 허용하지 않기 때문입니다. 원본 집합이 직접 변경됩니다."
+  - type: "list"
+    items:
+    - "set.add(값) 형식"
+    - "새 요소 추가"
+    - "중복 값은 무시됨"
+    - "원본 집합 직접 변경"
+  - type: "code"
+    language: "python"
+    title: "add로 요소 추가"
+    description: "집합에 새로운 요소를 추가합니다."
+    content: |-
+      fruits = {'사과', '바나나'}
+      fruits.add('오렌지')
+      fruits.add('사과')
+      fruits
+  - type: "tip"
+    content: "이미 있는 값을 add()해도 에러 없이 무시됩니다."
+
+- id: "remove_discard"
+  title: "remove()와 discard()"
+  subtitle: "집합에서 요소 삭제"
+  blocks:
+  - type: "text"
+    content: "remove()와 discard() 모두 집합에서 요소를 삭제합니다. 차이점은 remove()는 없는 값을 삭제하려 하면 에러가 발생하지만, discard()는 에러 없이 무시한다는 것입니다. 안전하게 삭제하려면 discard()를 사용하는 것이 좋습니다."
+  - type: "list"
+    items:
+    - "remove(값): 값 삭제, 없으면 에러"
+    - "discard(값): 값 삭제, 없어도 에러 안남"
+    - "둘 다 원본 직접 변경"
+    - "안전한 삭제는 discard() 사용"
+  - type: "code"
+    language: "python"
+    title: "remove 사용"
+    description: "remove()로 값을 삭제합니다."
+    content: |-
+      nums = {1, 2, 3, 4, 5}
+      nums.remove(3)
+      nums
+  - type: "code"
+    language: "python"
+    title: "discard 사용"
+    description: "discard()로 안전하게 삭제합니다."
+    content: |-
+      vals = {1, 2, 3, 4, 5}
+      vals.discard(3)
+      vals.discard(10)
+      vals
+  - type: "tip"
+    content: "존재 여부가 불확실하면 discard()를 사용하세요."
+
+- id: "clear_method"
+  title: "clear() 메서드"
+  subtitle: "모든 요소 삭제"
+  blocks:
+  - type: "text"
+    content: "clear() 메서드는 집합의 모든 요소를 삭제하여 빈 집합으로 만듭니다. 리스트와 동일하게 작동합니다. 집합을 재사용할 때 유용합니다."
+  - type: "list"
+    items:
+    - "set.clear() 형식"
+    - "모든 요소 삭제"
+    - "빈 집합이 됨"
+    - "집합 초기화에 사용"
+  - type: "code"
+    language: "python"
+    title: "clear로 모두 삭제"
+    description: "집합의 모든 요소를 삭제합니다."
+    content: |-
+      items = {1, 2, 3, 4, 5}
+      items.clear()
+      items
+  - type: "tip"
+    content: "clear() 후에는 빈 집합 set()이 됩니다."
+
+- id: "union_method"
+  title: "합집합 (union)"
+  subtitle: "두 집합을 합치기"
+  blocks:
+  - type: "text"
+    content: "합집합은 두 집합의 모든 요소를 포함하는 새 집합을 만듭니다. union() 메서드나 | 연산자를 사용합니다. 중복된 요소는 하나만 포함됩니다. 원본 집합은 변경되지 않고 새로운 집합이 생성됩니다."
+  - type: "list"
+    items:
+    - "set1.union(set2) 또는 set1 | set2"
+    - "두 집합의 모든 요소 포함"
+    - "중복은 하나만"
+    - "새로운 집합 반환"
+  - type: "code"
+    language: "python"
+    title: "union 메서드"
+    description: "union() 메서드로 합집합을 만듭니다."
+    content: |-
+      setA = {1, 2, 3}
+      setB = {3, 4, 5}
+      setA.union(setB)
+  - type: "code"
+    language: "python"
+    title: "| 연산자"
+    description: "| 연산자로 합집합을 만듭니다."
+    content: |-
+      left = {1, 2, 3}
+      right = {3, 4, 5}
+      left | right
+  - type: "tip"
+    content: "합집합은 A ∪ B를 의미하며, 모든 요소를 포함합니다."
+
+- id: "intersection_method"
+  title: "교집합 (intersection)"
+  subtitle: "공통 요소만 추출"
+  blocks:
+  - type: "text"
+    content: "교집합은 두 집합에 모두 있는 요소만 포함하는 새 집합을 만듭니다. intersection() 메서드나 & 연산자를 사용합니다. 두 집합의 공통 부분을 찾을 때 유용합니다. 원본 집합은 변경되지 않습니다."
+  - type: "list"
+    items:
+    - "set1.intersection(set2) 또는 set1 & set2"
+    - "두 집합에 모두 있는 요소"
+    - "공통 부분만 추출"
+    - "새로운 집합 반환"
+  - type: "code"
+    language: "python"
+    title: "intersection 메서드"
+    description: "intersection() 메서드로 교집합을 만듭니다."
+    content: |-
+      setA = {1, 2, 3, 4}
+      setB = {3, 4, 5, 6}
+      setA.intersection(setB)
+  - type: "code"
+    language: "python"
+    title: "& 연산자"
+    description: "& 연산자로 교집합을 만듭니다."
+    content: |-
+      left = {1, 2, 3, 4}
+      right = {3, 4, 5, 6}
+      left & right
+  - type: "tip"
+    content: "교집합은 A ∩ B를 의미하며, 공통 요소만 포함합니다."
+
+- id: "difference_method"
+  title: "차집합 (difference)"
+  subtitle: "한쪽에만 있는 요소"
+  blocks:
+  - type: "text"
+    content: "차집합은 첫 번째 집합에만 있고 두 번째 집합에는 없는 요소들을 포함하는 새 집합을 만듭니다. difference() 메서드나 - 연산자를 사용합니다. 순서가 중요하므로 A - B와 B - A는 다릅니다."
+  - type: "list"
+    items:
+    - "set1.difference(set2) 또는 set1 - set2"
+    - "set1에만 있는 요소"
+    - "순서가 중요 (A-B ≠ B-A)"
+    - "새로운 집합 반환"
+  - type: "code"
+    language: "python"
+    title: "차집합 A-B"
+    description: "첫 번째 집합에서 두 번째 집합을 뺍니다."
+    content: |-
+      setA = {1, 2, 3, 4, 5}
+      setB = {4, 5, 6, 7}
+      setA.difference(setB)
+  - type: "code"
+    language: "python"
+    title: "차집합 B-A"
+    description: "두 번째 집합에서 첫 번째 집합을 뺍니다."
+    content: |-
+      left = {1, 2, 3, 4, 5}
+      right = {4, 5, 6, 7}
+      right.difference(left)
+  - type: "tip"
+    content: "차집합은 A - B를 의미하며, A에만 있는 요소입니다."
+
+- id: "symmetric_difference"
+  title: "대칭차집합 (symmetric_difference)"
+  subtitle: "한쪽에만 있는 모든 요소"
+  blocks:
+  - type: "text"
+    content: "대칭차집합은 두 집합 중 한쪽에만 있는 요소들을 모두 포함하는 새 집합을 만듭니다. symmetric_difference() 메서드나 ^ 연산자를 사용합니다. 교집합을 제외한 나머지 모든 요소입니다. (A - B) ∪ (B - A)와 같습니다."
+  - type: "list"
+    items:
+    - "set1.symmetric_difference(set2) 또는 set1 ^ set2"
+    - "한쪽에만 있는 모든 요소"
+    - "교집합 제외"
+    - "새로운 집합 반환"
+  - type: "code"
+    language: "python"
+    title: "symmetric_difference 메서드"
+    description: "symmetric_difference() 메서드를 사용합니다."
+    content: |-
+      setA = {1, 2, 3, 4}
+      setB = {3, 4, 5, 6}
+      setA.symmetric_difference(setB)
+  - type: "code"
+    language: "python"
+    title: "^ 연산자"
+    description: "^ 연산자로 대칭차집합을 만듭니다."
+    content: |-
+      left = {1, 2, 3, 4}
+      right = {3, 4, 5, 6}
+      left ^ right
+  - type: "tip"
+    content: "대칭차집합은 A △ B를 의미하며, 공통 부분을 제외한 모든 요소입니다."
+
+- id: "membership_method"
+  title: "in/not in 연산자"
+  subtitle: "요소 포함 확인"
+  blocks:
+  - type: "text"
+    content: "in과 not in 연산자로 집합에 특정 값이 있는지 확인할 수 있습니다. 집합은 해시 테이블로 구현되어 있어 리스트보다 훨씬 빠르게 검색됩니다. 대량의 데이터에서 값을 찾을 때 집합을 사용하면 성능이 향상됩니다."
+  - type: "list"
+    items:
+    - "값 in 집합으로 확인"
+    - "값 not in 집합으로 미포함 확인"
+    - "리스트보다 검색 속도 빠름"
+    - "True/False 반환"
+  - type: "code"
+    language: "python"
+    title: "값 포함 확인"
+    description: "in 연산자로 값이 집합에 있는지 확인합니다."
+    content: |-
+      colors = {'빨강', '초록', '파랑'}
+      '초록' in colors
+  - type: "code"
+    language: "python"
+    title: "값 미포함 확인"
+    description: "not in 연산자로 값이 집합에 없는지 확인합니다."
+    content: |-
+      palette = {'빨강', '초록', '파랑'}
+      '검정' not in palette
+  - type: "tip"
+    content: "집합의 in 연산은 O(1) 시간복잡도로 매우 빠릅니다."
+
+- id: "set_length"
+  title: "집합 길이"
+  subtitle: "len() 함수"
+  blocks:
+  - type: "text"
+    content: "len() 함수는 집합의 요소 개수를 반환합니다. 리스트, 튜플과 동일하게 작동합니다. 중복이 제거된 후의 개수를 셉니다."
+  - type: "list"
+    items:
+    - "len(집합)로 길이 확인"
+    - "요소 개수 반환"
+    - "중복 제거 후 개수"
+    - "빈 집합은 0"
+  - type: "code"
+    language: "python"
+    title: "집합 길이"
+    description: "len() 함수로 집합 요소 개수를 확인합니다."
+    content: |-
+      sample = {1, 2, 3, 4, 5}
+      len(sample)
+  - type: "code"
+    language: "python"
+    title: "중복 제거 후 개수"
+    description: "중복이 제거된 후의 개수를 셉니다."
+    content: |-
+      dups = set([1, 2, 2, 3, 3, 3])
+      len(dups)
+  - type: "tip"
+    content: "set([1,2,2,3])의 길이는 3입니다. 중복이 제거되기 때문입니다."
+
+- id: "practice"
+  title: "Day 10 종합 복습"
+  subtitle: "집합 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 10에서 배운 집합을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 집합 생성"
+    code: |-
+      nums = {1, 2, 3, 4, 5}
+      nums
+
+  - type: "expansion"
+    title: "🟢 기본2: 중복 제거"
+    code: |-
+      items = [1, 2, 2, 3, 3, 3, 4]
+      unique = set(items)
+      unique
+
+  - type: "expansion"
+    title: "🟢 기본3: add 사용"
+    code: |-
+      vals = {1, 2, 3}
+      vals.add(4)
+      vals.add(5)
+      vals
+
+  - type: "expansion"
+    title: "🟢 기본4: 합집합"
+    code: |-
+      setA = {1, 2, 3}
+      setB = {3, 4, 5}
+      merged = setA | setB
+      merged
+
+  - type: "expansion"
+    title: "🟢 기본5: 교집합"
+    code: |-
+      left = {1, 2, 3, 4}
+      right = {3, 4, 5, 6}
+      common = left & right
+      common
+
+  - type: "expansion"
+    title: "🟡 응용1: 학생 출석"
+    blocks:
+    - type: "code"
+      title: "월요일 출석"
+      content: |-
+        monday = {'철수', '영희', '민수'}
+        monday
+
+    - type: "code"
+      title: "화요일 출석"
+      content: |-
+        tuesday = {'영희', '민수', '지은'}
+        tuesday
+
+    - type: "code"
+      title: "양일 모두 출석"
+      content: |-
+        mon = {'철수', '영희', '민수'}
+        tue = {'영희', '민수', '지은'}
+        mon & tue
+
+    - type: "code"
+      title: "하루라도 출석"
+      content: |-
+        dayA = {'철수', '영희', '민수'}
+        dayB = {'영희', '민수', '지은'}
+        dayA | dayB
+
+    - type: "code"
+      title: "월요일만 출석"
+      content: |-
+        first = {'철수', '영희', '민수'}
+        second = {'영희', '민수', '지은'}
+        first - second
+
+  - type: "expansion"
+    title: "🟡 응용2: 태그 시스템"
+    blocks:
+    - type: "code"
+      title: "게시글1 태그"
+      content: |-
+        tagA = {'python', 'coding', 'data'}
+        tagA
+
+    - type: "code"
+      title: "게시글2 태그"
+      content: |-
+        tagB = {'python', 'web', 'coding'}
+        tagB
+
+    - type: "code"
+      title: "공통 태그"
+      content: |-
+        tags = {'python', 'coding', 'data'}
+        other = {'python', 'web', 'coding'}
+        tags & other
+
+    - type: "code"
+      title: "모든 태그"
+      content: |-
+        postA = {'python', 'coding', 'data'}
+        postB = {'python', 'web', 'coding'}
+        postA | postB
+
+    - type: "code"
+      title: "게시글1만의 태그"
+      content: |-
+        mine = {'python', 'coding', 'data'}
+        yours = {'python', 'web', 'coding'}
+        mine - yours
+
+    - type: "code"
+      title: "전체 태그 개수"
+      content: |-
+        srcA = {'python', 'coding', 'data'}
+        srcB = {'python', 'web', 'coding'}
+        total = srcA | srcB
+        len(total)
+
+  - type: "expansion"
+    title: "🟡 응용3: 과일 재고"
+    blocks:
+    - type: "code"
+      title: "매장1 재고"
+      content: |-
+        shopA = {'사과', '바나나', '오렌지'}
+        shopA
+
+    - type: "code"
+      title: "매장2 재고"
+      content: |-
+        shopB = {'바나나', '포도', '딸기'}
+        shopB
+
+    - type: "code"
+      title: "양 매장 공통 재고"
+      content: |-
+        store = {'사과', '바나나', '오렌지'}
+        branch = {'바나나', '포도', '딸기'}
+        store & branch
+
+    - type: "code"
+      title: "전체 재고"
+      content: |-
+        main = {'사과', '바나나', '오렌지'}
+        sub = {'바나나', '포도', '딸기'}
+        main | sub
+
+    - type: "code"
+      title: "매장1만의 재고"
+      content: |-
+        local = {'사과', '바나나', '오렌지'}
+        remote = {'바나나', '포도', '딸기'}
+        local - remote
+
+    - type: "code"
+      title: "공통재고에 바나나 포함 여부"
+      content: |-
+        fruits = {'사과', '바나나', '오렌지'}
+        stock = {'바나나', '포도', '딸기'}
+        shared = fruits & stock
+        '바나나' in shared
+
+  - type: "expansion"
+    title: "🟡 응용4: 숫자 분석"
+    blocks:
+    - type: "code"
+      title: "짝수 집합"
+      content: |-
+        evens = {2, 4, 6, 8, 10}
+        evens
+
+    - type: "code"
+      title: "3의 배수 집합"
+      content: |-
+        mults = {3, 6, 9, 12}
+        mults
+
+    - type: "code"
+      title: "교집합 (짝수이면서 3의 배수)"
+      content: |-
+        even = {2, 4, 6, 8, 10}
+        triple = {3, 6, 9, 12}
+        even & triple
+
+    - type: "code"
+      title: "합집합 (짝수 또는 3의 배수)"
+      content: |-
+        twoMult = {2, 4, 6, 8, 10}
+        threeMult = {3, 6, 9, 12}
+        twoMult | threeMult
+
+    - type: "code"
+      title: "짝수만"
+      content: |-
+        pairs = {2, 4, 6, 8, 10}
+        threes = {3, 6, 9, 12}
+        pairs - threes
+
+    - type: "code"
+      title: "대칭차집합"
+      content: |-
+        groupA = {2, 4, 6, 8, 10}
+        groupB = {3, 6, 9, 12}
+        groupA ^ groupB
+
+  - type: "expansion"
+    title: "🟡 응용5: 중복 단어 제거"
+    blocks:
+    - type: "code"
+      title: "원본 리스트"
+      content: |-
+        words = ['hello', 'world', 'hello', 'python', 'world', 'coding']
+        words
+
+    - type: "code"
+      title: "중복 제거"
+      content: |-
+        raw = ['hello', 'world', 'hello', 'python', 'world', 'coding']
+        set(raw)
+
+    - type: "code"
+      title: "고유 단어 개수"
+      content: |-
+        data = ['hello', 'world', 'hello', 'python', 'world', 'coding']
+        uniq = set(data)
+        len(uniq)
+
+    - type: "code"
+      title: "hello 포함 여부"
+      content: |-
+        text = ['hello', 'world', 'hello', 'python', 'world', 'coding']
+        vocab = set(text)
+        'hello' in vocab
+
+  - type: "expansion"
+    title: "🔴 심화1-1: 회원 집합 연산"
+    blocks:
+    - type: "code"
+      title: "활성 회원"
+      content: |-
+        active = {'user1', 'user2', 'user3', 'user4'}
+        active
+
+    - type: "code"
+      title: "프리미엄 회원"
+      content: |-
+        premium = {'user2', 'user4', 'user5'}
+        premium
+
+    - type: "code"
+      title: "신규 회원"
+      content: |-
+        fresh = {'user5', 'user6'}
+        fresh
+
+    - type: "code"
+      title: "활성 프리미엄 회원"
+      content: |-
+        alive = {'user1', 'user2', 'user3', 'user4'}
+        paid = {'user2', 'user4', 'user5'}
+        alive & paid
+
+    - type: "code"
+      title: "전체 회원"
+      content: |-
+        online = {'user1', 'user2', 'user3', 'user4'}
+        pro = {'user2', 'user4', 'user5'}
+        newbie = {'user5', 'user6'}
+        online | pro | newbie
+
+    - type: "code"
+      title: "무료 활성 회원"
+      content: |-
+        users = {'user1', 'user2', 'user3', 'user4'}
+        vip = {'user2', 'user4', 'user5'}
+        users - vip
+
+  - type: "expansion"
+    title: "🔴 심화1-2: 회원 통계"
+    blocks:
+    - type: "code"
+      title: "신규 프리미엄 사용자"
+      content: |-
+        member = {'user1', 'user2', 'user3', 'user4'}
+        gold = {'user2', 'user4', 'user5'}
+        rookie = {'user5', 'user6'}
+        rookie & gold
+
+    - type: "code"
+      title: "전체 사용자 수"
+      content: |-
+        base = {'user1', 'user2', 'user3', 'user4'}
+        tier = {'user2', 'user4', 'user5'}
+        recent = {'user5', 'user6'}
+        merged = base | tier | recent
+        len(merged)
+
+    - type: "code"
+      title: "무료 활성 사용자 수"
+      content: |-
+        regular = {'user1', 'user2', 'user3', 'user4'}
+        paying = {'user2', 'user4', 'user5'}
+        free = regular - paying
+        len(free)
+
+  - type: "expansion"
+    title: "🔴 심화2: 과목 선택"
+    blocks:
+    - type: "code"
+      title: "학생1 과목"
+      content: |-
+        kim = {'수학', '영어', '과학'}
+        kim
+
+    - type: "code"
+      title: "학생2 과목"
+      content: |-
+        lee = {'수학', '국어', '과학'}
+        lee
+
+    - type: "code"
+      title: "학생3 과목"
+      content: |-
+        park = {'영어', '국어', '역사'}
+        park
+
+    - type: "code"
+      title: "학생1과 2의 공통 과목"
+      content: |-
+        pupilA = {'수학', '영어', '과학'}
+        pupilB = {'수학', '국어', '과학'}
+        pupilA & pupilB
+
+    - type: "code"
+      title: "학생2와 3의 공통 과목"
+      content: |-
+        junior = {'수학', '국어', '과학'}
+        senior = {'영어', '국어', '역사'}
+        junior & senior
+
+    - type: "code"
+      title: "전체 과목"
+      content: |-
+        stA = {'수학', '영어', '과학'}
+        stB = {'수학', '국어', '과학'}
+        stC = {'영어', '국어', '역사'}
+        stA | stB | stC
+
+    - type: "code"
+      title: "학생1만의 과목"
+      content: |-
+        one = {'수학', '영어', '과학'}
+        two = {'수학', '국어', '과학'}
+        three = {'영어', '국어', '역사'}
+        one - two - three
+
+    - type: "code"
+      title: "전체 과목 수"
+      content: |-
+        classA = {'수학', '영어', '과학'}
+        classB = {'수학', '국어', '과학'}
+        classC = {'영어', '국어', '역사'}
+        subj = classA | classB | classC
+        len(subj)
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 제품 카테고리 분류"
+    blocks:
+    - type: "code"
+      title: "전자제품"
+      content: |-
+        elec = {'노트북', '마우스', '키보드', '모니터'}
+        elec
+
+    - type: "code"
+      title: "사무용품"
+      content: |-
+        office = {'노트북', '프린터', '종이', '펜'}
+        office
+
+    - type: "code"
+      title: "인기제품"
+      content: |-
+        popular = {'노트북', '마우스', '프린터'}
+        popular
+
+    - type: "code"
+      title: "전자제품이면서 사무용품"
+      content: |-
+        tech = {'노트북', '마우스', '키보드', '모니터'}
+        supply = {'노트북', '프린터', '종이', '펜'}
+        tech & supply
+
+    - type: "code"
+      title: "전자제품이면서 인기제품"
+      content: |-
+        gadget = {'노트북', '마우스', '키보드', '모니터'}
+        hot = {'노트북', '마우스', '프린터'}
+        gadget & hot
+
+    - type: "code"
+      title: "전체 제품"
+      content: |-
+        device = {'노트북', '마우스', '키보드', '모니터'}
+        tools = {'노트북', '프린터', '종이', '펜'}
+        best = {'노트북', '마우스', '프린터'}
+        device | tools | best
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 제품 카테고리 분석"
+    blocks:
+    - type: "code"
+      title: "전자제품만"
+      content: |-
+        electro = {'노트북', '마우스', '키보드', '모니터'}
+        desk = {'노트북', '프린터', '종이', '펜'}
+        electro - desk
+
+    - type: "code"
+      title: "인기 없는 제품"
+      content: |-
+        hardware = {'노트북', '마우스', '키보드', '모니터'}
+        paper = {'노트북', '프린터', '종이', '펜'}
+        trend = {'노트북', '마우스', '프린터'}
+        (hardware | paper) - trend
+
+    - type: "code"
+      title: "노트북이 인기제품인지"
+      content: |-
+        fav = {'노트북', '마우스', '프린터'}
+        '노트북' in fav
+
+  - type: "expansion"
+    title: "🔴 심화4: 언어 스킬"
+    blocks:
+    - type: "code"
+      title: "개발자1 언어"
+      content: |-
+        alice = {'Python', 'JavaScript', 'Java'}
+        alice
+
+    - type: "code"
+      title: "개발자2 언어"
+      content: |-
+        bob = {'Python', 'C++', 'Go'}
+        bob
+
+    - type: "code"
+      title: "개발자3 언어"
+      content: |-
+        carol = {'JavaScript', 'TypeScript', 'Python'}
+        carol
+
+    - type: "code"
+      title: "모든 언어"
+      content: |-
+        coder = {'Python', 'JavaScript', 'Java'}
+        hacker = {'Python', 'C++', 'Go'}
+        maker = {'JavaScript', 'TypeScript', 'Python'}
+        coder | hacker | maker
+
+    - type: "code"
+      title: "모두가 아는 언어"
+      content: |-
+        devA = {'Python', 'JavaScript', 'Java'}
+        devB = {'Python', 'C++', 'Go'}
+        devC = {'JavaScript', 'TypeScript', 'Python'}
+        devA & devB & devC
+
+    - type: "code"
+      title: "개발자1만의 언어"
+      content: |-
+        skill = {'Python', 'JavaScript', 'Java'}
+        other = {'Python', 'C++', 'Go'}
+        rest = {'JavaScript', 'TypeScript', 'Python'}
+        skill - other - rest
+
+    - type: "code"
+      title: "전체 언어 수"
+      content: |-
+        front = {'Python', 'JavaScript', 'Java'}
+        back = {'Python', 'C++', 'Go'}
+        full = {'JavaScript', 'TypeScript', 'Python'}
+        langs = front | back | full
+        len(langs)
+
+  - type: "expansion"
+    title: "🔴 심화5: 이벤트 참석자"
+    blocks:
+    - type: "code"
+      title: "이벤트1 참석자"
+      content: |-
+        conf = {'A', 'B', 'C', 'D'}
+        conf
+
+    - type: "code"
+      title: "이벤트2 참석자"
+      content: |-
+        meet = {'B', 'D', 'E', 'F'}
+        meet
+
+    - type: "code"
+      title: "이벤트3 참석자"
+      content: |-
+        party = {'C', 'D', 'F', 'G'}
+        party
+
+    - type: "code"
+      title: "3개 모두 참석"
+      content: |-
+        evtA = {'A', 'B', 'C', 'D'}
+        evtB = {'B', 'D', 'E', 'F'}
+        evtC = {'C', 'D', 'F', 'G'}
+        evtA & evtB & evtC
+
+    - type: "code"
+      title: "2개 이상 참석"
+      content: |-
+        day1 = {'A', 'B', 'C', 'D'}
+        day2 = {'B', 'D', 'E', 'F'}
+        day3 = {'C', 'D', 'F', 'G'}
+        (day1 & day2) | (day2 & day3) | (day1 & day3)
+
+    - type: "code"
+      title: "이벤트1만 참석"
+      content: |-
+        only = {'A', 'B', 'C', 'D'}
+        skip1 = {'B', 'D', 'E', 'F'}
+        skip2 = {'C', 'D', 'F', 'G'}
+        only - skip1 - skip2
+
+    - type: "code"
+      title: "전체 참석자"
+      content: |-
+        morning = {'A', 'B', 'C', 'D'}
+        noon = {'B', 'D', 'E', 'F'}
+        night = {'C', 'D', 'F', 'G'}
+        morning | noon | night
+
+    - type: "code"
+      title: "이벤트1또는2 참석했지만 3은 불참"
+      content: |-
+        early = {'A', 'B', 'C', 'D'}
+        mid = {'B', 'D', 'E', 'F'}
+        late = {'C', 'D', 'F', 'G'}
+        joined = early | mid
+        joined - late
+
+    - type: "code"
+      title: "전체 참석자 수"
+      content: |-
+        slot1 = {'A', 'B', 'C', 'D'}
+        slot2 = {'B', 'D', 'E', 'F'}
+        slot3 = {'C', 'D', 'F', 'G'}
+        attend = slot1 | slot2 | slot3
+        len(attend)

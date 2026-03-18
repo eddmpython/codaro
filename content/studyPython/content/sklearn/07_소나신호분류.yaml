@@ -1,0 +1,357 @@
+meta:
+  id: sklearn_07
+  title: 소나신호분류
+  order: 7
+  category: sklearn
+  difficulty: "⭐⭐⭐"
+  badge: 심화
+  tags: ["sklearn", "RandomForest", "앙상블", "특성중요도", "소나"]
+  seo:
+    title: "Sklearn RandomForest - 소나 신호 분류"
+    description: "RandomForest로 소나 신호를 분류하고 특성 중요도를 분석합니다. 앙상블 학습과 변수 해석을 배웁니다."
+    keywords: ["sklearn", "RandomForest", "앙상블", "feature importance", "소나"]
+
+intro:
+  emoji: "📡"
+  goal: RandomForest로 소나 신호를 광물/바위로 분류하고 특성 중요도를 분석합니다.
+  description: 소나 데이터는 60개 주파수 대역의 에너지 값으로 구성됩니다. RandomForest는 여러 결정트리를 결합한 앙상블 기법으로, 과적합에 강하고 특성 중요도를 제공합니다.
+
+sections:
+- id: step1_data
+  title: 1단계. 데이터 로딩
+  subtitle: 소나 데이터
+  blocks:
+  - type: text
+    content: 소나 데이터를 로딩합니다. 60개 주파수 대역 에너지와 M(광물)/R(바위) 레이블로 구성됩니다.
+  - type: code
+    language: python
+    title: 데이터 로딩
+    description: 소나 데이터를 불러옵니다
+    content: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler, LabelEncoder
+      from sklearn.ensemble import RandomForestClassifier
+      from sklearn.metrics import accuracy_score, classification_report, confusion_matrix
+      import matplotlib.pyplot as plt
+
+      url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/sonar.csv"
+      cols = [f"f{i}" for i in range(60)] + ["label"]
+      sonar = pd.read_csv(url, header=None, names=cols)
+      sonar
+  - type: tip
+    content: 소나 데이터는 60개 주파수 대역(f0~f59)의 에너지 값을 담고 있습니다. label이 M이면 광물(Mine), R이면 바위(Rock)입니다.
+
+- id: step2_prep
+  title: 2단계. 데이터 준비
+  subtitle: 레이블 인코딩
+  blocks:
+  - type: text
+    content: 문자열 레이블을 숫자로 변환하고 학습/테스트 데이터로 분할합니다.
+  - type: code
+    language: python
+    title: 데이터 분할
+    description: 레이블 인코딩과 분할을 수행합니다
+    content: |-
+      X = sonar.drop("label", axis=1)
+      y = sonar["label"]
+
+      le = LabelEncoder()
+      yEnc = le.fit_transform(y)
+      le.classes_
+  - type: code
+    language: python
+    title: 학습/테스트 분할
+    description: 데이터를 분할합니다
+    content: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, yEnc, test_size=0.2, random_state=42, stratify=yEnc)
+      xTrain.shape, xTest.shape
+  - type: tip
+    content: LabelEncoder는 문자열 레이블을 0, 1 등 정수로 변환합니다. stratify로 클래스 비율을 유지합니다.
+
+- id: step3_scale
+  title: 3단계. 스케일링
+  subtitle: StandardScaler
+  blocks:
+  - type: text
+    content: 60개 특성의 스케일을 맞춥니다. RandomForest는 스케일에 덜 민감하지만 일관성을 위해 적용합니다.
+  - type: code
+    language: python
+    title: 스케일링
+    description: StandardScaler를 적용합니다
+    content: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+      xTrainSc.shape
+
+- id: step4_rf
+  title: 4단계. RandomForest 학습
+  subtitle: 앙상블 학습
+  blocks:
+  - type: text
+    content: RandomForest는 여러 결정트리를 학습하고 투표로 예측합니다. n_estimators로 트리 개수를 지정합니다.
+  - type: code
+    language: python
+    title: RandomForest 학습
+    description: RandomForest를 학습합니다
+    content: |-
+      rf = RandomForestClassifier(n_estimators=100, random_state=42)
+      rf.fit(xTrainSc, yTrain)
+      rf
+  - type: tip
+    content: RandomForest는 Bootstrap Aggregating(Bagging) 기반입니다. 각 트리는 무작위 샘플과 특성 부분집합으로 학습하여 다양성을 확보합니다.
+
+- id: step5_eval
+  title: 5단계. 모델 평가
+  subtitle: 분류 성능
+  blocks:
+  - type: text
+    content: 테스트 데이터로 정확도와 상세 지표를 확인합니다.
+  - type: code
+    language: python
+    title: 예측 및 평가
+    description: 테스트 데이터로 평가합니다
+    content: |-
+      yPred = rf.predict(xTestSc)
+      acc = accuracy_score(yTest, yPred)
+      print(f"Accuracy: {acc:.4f}")
+  - type: code
+    language: python
+    title: 분류 리포트
+    description: precision, recall, f1을 확인합니다
+    content: |-
+      print(classification_report(yTest, yPred, target_names=le.classes_))
+
+- id: step6_cm
+  title: 6단계. 혼동행렬
+  subtitle: 오분류 분석
+  blocks:
+  - type: text
+    content: 혼동행렬로 광물/바위 분류 오류를 확인합니다.
+  - type: code
+    language: python
+    title: 혼동행렬 시각화
+    description: 혼동행렬을 히트맵으로 표시합니다
+    content: |-
+      cm = confusion_matrix(yTest, yPred)
+      figCm, axCm = plt.subplots(figsize=(6, 5))
+      im = axCm.imshow(cm, cmap="Blues")
+      axCm.set_xticks([0, 1])
+      axCm.set_yticks([0, 1])
+      axCm.set_xticklabels(le.classes_)
+      axCm.set_yticklabels(le.classes_)
+      axCm.set_xlabel("Predicted")
+      axCm.set_ylabel("Actual")
+      axCm.set_title("Confusion Matrix")
+      for i in range(2):
+          for j in range(2):
+              axCm.text(j, i, cm[i, j], ha="center", va="center", fontsize=14)
+      plt.colorbar(im, ax=axCm)
+      figCm
+
+- id: step7_importance
+  title: 7단계. 특성 중요도
+  subtitle: feature_importances_
+  blocks:
+  - type: text
+    content: RandomForest는 각 특성의 중요도를 제공합니다. 어떤 주파수 대역이 분류에 중요한지 확인합니다.
+  - type: code
+    language: python
+    title: 특성 중요도 추출
+    description: 상위 20개 특성을 확인합니다
+    content: |-
+      imp = rf.feature_importances_
+      impDf = pd.DataFrame({"feature": X.columns, "importance": imp})
+      impDf = impDf.sort_values("importance", ascending=False).head(20)
+      impDf
+  - type: code
+    language: python
+    title: 특성 중요도 시각화
+    description: 상위 20개 특성을 막대 그래프로 표시합니다
+    content: |-
+      figImp, axImp = plt.subplots(figsize=(10, 6))
+      axImp.barh(impDf["feature"][::-1], impDf["importance"][::-1], color="steelblue")
+      axImp.set_xlabel("Importance")
+      axImp.set_title("Top 20 Feature Importances")
+      figImp
+  - type: tip
+    content: feature_importances_는 각 특성이 불순도 감소에 기여한 정도를 나타냅니다. 값이 클수록 분류에 중요한 특성입니다.
+
+- id: step8_trees
+  title: 8단계. 트리 개수 비교
+  subtitle: n_estimators 튜닝
+  blocks:
+  - type: text
+    content: 트리 개수에 따른 성능 변화를 확인합니다. 트리가 많을수록 안정적이지만 속도는 느려집니다.
+  - type: code
+    language: python
+    title: 트리 개수별 성능
+    description: 트리 개수를 변경하며 정확도를 비교합니다
+    content: |-
+      nTrees = [10, 30, 50, 100, 150]
+      accList = []
+      for n in nTrees:
+          rfTemp = RandomForestClassifier(n_estimators=n, random_state=42)
+          rfTemp.fit(xTrainSc, yTrain)
+          predTemp = rfTemp.predict(xTestSc)
+          accList.append(accuracy_score(yTest, predTemp))
+
+      figTrees, axTrees = plt.subplots(figsize=(8, 5))
+      axTrees.plot(nTrees, accList, "o-", color="steelblue")
+      axTrees.set_xlabel("Number of Trees")
+      axTrees.set_ylabel("Accuracy")
+      axTrees.set_title("Accuracy vs Number of Trees")
+      axTrees.set_xticks(nTrees)
+      figTrees
+  - type: tip
+    content: 트리 개수가 늘어나면 성능이 안정화되지만, 일정 수준 이상에서는 개선폭이 줄어듭니다. 100개 정도가 일반적인 시작점입니다.
+
+- id: step9_depth
+  title: 9단계. 트리 깊이 조절
+  subtitle: max_depth
+  blocks:
+  - type: text
+    content: max_depth로 트리 깊이를 제한하면 과적합을 방지할 수 있습니다.
+  - type: code
+    language: python
+    title: 깊이별 성능
+    description: 트리 깊이를 변경하며 정확도를 비교합니다
+    content: |-
+      depths = [3, 5, 7, 10, 15, None]
+      accDepth = []
+      for d in depths:
+          rfD = RandomForestClassifier(n_estimators=100, max_depth=d, random_state=42)
+          rfD.fit(xTrainSc, yTrain)
+          predD = rfD.predict(xTestSc)
+          accDepth.append(accuracy_score(yTest, predD))
+
+      depthLabels = [str(d) if d else "None" for d in depths]
+      figDepth, axDepth = plt.subplots(figsize=(8, 5))
+      axDepth.bar(depthLabels, accDepth, color="coral")
+      axDepth.set_xlabel("Max Depth")
+      axDepth.set_ylabel("Accuracy")
+      axDepth.set_title("Accuracy vs Max Depth")
+      figDepth
+  - type: tip
+    content: max_depth=None이면 노드가 순수해질 때까지 분할합니다. 깊이를 제한하면 단순한 모델이 되어 과적합을 줄일 수 있습니다.
+
+- id: step10_oob
+  title: 10단계. OOB 스코어
+  subtitle: Out-of-Bag 평가
+  blocks:
+  - type: text
+    content: RandomForest는 OOB(Out-of-Bag) 샘플로 검증이 가능합니다. 별도 검증 세트 없이 성능을 추정합니다.
+  - type: code
+    language: python
+    title: OOB 스코어
+    description: OOB 스코어를 확인합니다
+    content: |-
+      rfOob = RandomForestClassifier(n_estimators=100, oob_score=True, random_state=42)
+      rfOob.fit(xTrainSc, yTrain)
+      print(f"OOB Score: {rfOob.oob_score_:.4f}")
+      print(f"Test Score: {accuracy_score(yTest, rfOob.predict(xTestSc)):.4f}")
+  - type: tip
+    content: 부트스트랩 샘플링에서 제외된 샘플(약 37%)로 평가합니다. 교차검증 없이 모델 성능을 빠르게 추정할 수 있습니다.
+
+- id: step11_compare
+  title: 11단계. 모델 비교
+  subtitle: 단일트리 vs 앙상블
+  blocks:
+  - type: text
+    content: 단일 결정트리와 RandomForest 성능을 비교합니다. 앙상블의 효과를 확인합니다.
+  - type: code
+    language: python
+    title: 단일트리 vs RF
+    description: DecisionTree와 RandomForest를 비교합니다
+    content: |-
+      from sklearn.tree import DecisionTreeClassifier
+
+      dt = DecisionTreeClassifier(random_state=42)
+      dt.fit(xTrainSc, yTrain)
+      dtPred = dt.predict(xTestSc)
+      dtAcc = accuracy_score(yTest, dtPred)
+
+      rfAcc = accuracy_score(yTest, rf.predict(xTestSc))
+
+      figComp, axComp = plt.subplots(figsize=(6, 4))
+      axComp.bar(["DecisionTree", "RandomForest"], [dtAcc, rfAcc], color=["gray", "steelblue"])
+      axComp.set_ylabel("Accuracy")
+      axComp.set_title("Single Tree vs Ensemble")
+      axComp.set_ylim(0.5, 1.0)
+      for i, v in enumerate([dtAcc, rfAcc]):
+          axComp.text(i, v + 0.02, f"{v:.3f}", ha="center")
+      figComp
+  - type: tip
+    content: RandomForest는 여러 트리의 예측을 결합하여 단일 트리보다 안정적이고 일반화 성능이 좋습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 앙상블 분류
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 붓꽃 데이터 RandomForest"
+    code: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_iris
+      from sklearn.model_selection import train_test_split
+      from sklearn.ensemble import RandomForestClassifier
+      from sklearn.metrics import accuracy_score
+      import matplotlib.pyplot as plt
+
+      iris = load_iris()
+      xIris = pd.DataFrame(iris.data, columns=iris.feature_names)
+      yIris = iris.target
+
+      xTr, xTe, yTr, yTe = train_test_split(xIris, yIris, test_size=0.2, random_state=42)
+      rfIris = RandomForestClassifier(n_estimators=100, random_state=42)
+      rfIris.fit(xTr, yTr)
+      predIris = rfIris.predict(xTe)
+      print(f"Accuracy: {accuracy_score(yTe, predIris):.4f}")
+
+      impIris = pd.DataFrame({"feature": xIris.columns, "importance": rfIris.feature_importances_})
+      impIris = impIris.sort_values("importance", ascending=True)
+      figM1, axM1 = plt.subplots(figsize=(8, 4))
+      axM1.barh(impIris["feature"], impIris["importance"], color="forestgreen")
+      axM1.set_xlabel("Importance")
+      axM1.set_title("Iris Feature Importances")
+      figM1
+  - type: expansion
+    title: "미션2: 와인 품질 특성 중요도"
+    code: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_wine
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.ensemble import RandomForestClassifier
+      from sklearn.metrics import classification_report
+      import matplotlib.pyplot as plt
+
+      wine = load_wine()
+      xWine = pd.DataFrame(wine.data, columns=wine.feature_names)
+      yWine = wine.target
+
+      xTrW, xTeW, yTrW, yTeW = train_test_split(xWine, yWine, test_size=0.2, random_state=42)
+      scalerW = StandardScaler()
+      xTrWsc = scalerW.fit_transform(xTrW)
+      xTeWsc = scalerW.transform(xTeW)
+
+      rfWine = RandomForestClassifier(n_estimators=100, random_state=42)
+      rfWine.fit(xTrWsc, yTrW)
+      predW = rfWine.predict(xTeWsc)
+      print(classification_report(yTeW, predW, target_names=wine.target_names))
+
+      impW = pd.DataFrame({"feature": xWine.columns, "importance": rfWine.feature_importances_})
+      impW = impW.sort_values("importance", ascending=False).head(10)
+      figM2, axM2 = plt.subplots(figsize=(10, 5))
+      axM2.barh(impW["feature"][::-1], impW["importance"][::-1], color="purple")
+      axM2.set_xlabel("Importance")
+      axM2.set_title("Wine Top 10 Feature Importances")
+      figM2

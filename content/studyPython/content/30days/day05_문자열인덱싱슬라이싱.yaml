@@ -1,0 +1,444 @@
+meta:
+  id: day05
+  title: "문자열 인덱싱/슬라이싱"
+  day: 5
+  category: 30days
+  tags: []
+  seo:
+    title: "파이썬 문자열 인덱싱과 슬라이싱 완벽 가이드"
+    description: "문자열 인덱싱, 음수 인덱싱, 슬라이싱, 스텝 슬라이싱을 배웁니다."
+    keywords: ['인덱싱', 'indexing', '슬라이싱', 'slicing', '문자열']
+
+intro:
+  emoji: "🔍"
+  points:
+  - "인덱스로 문자열의 특정 위치 접근하기"
+  - "음수 인덱스로 뒤에서부터 접근하기"
+  - "슬라이싱으로 부분 문자열 추출하기"
+  - "스텝을 사용한 다양한 슬라이싱 패턴"
+
+sections:
+- id: index_basic
+  title: "인덱싱 기초"
+  subtitle: "0부터 시작하는 위치 접근"
+  blocks:
+  - type: text
+    content: "문자열의 각 문자는 인덱스(위치 번호)를 가집니다. 인덱스는 0부터 시작하며, 대괄호 []를 사용하여 특정 위치의 문자를 가져올 수 있습니다. 첫 번째 문자는 [0], 두 번째 문자는 [1]입니다."
+  - type: list
+    items:
+    - "인덱스는 0부터 시작"
+    - "대괄호 []로 접근"
+    - "첫 문자는 [0]"
+  - type: code
+    language: python
+    title: "첫 번째 문자"
+    description: "인덱스 0으로 첫 번째 문자를 가져옵니다."
+    content: |-
+      lang = 'Python'
+      lang[0]
+  - type: code
+    language: python
+    title: "두 번째 문자"
+    description: "인덱스 1로 두 번째 문자를 가져옵니다."
+    content: |-
+      code = 'Python'
+      code[1]
+  - type: code
+    language: python
+    title: "세 번째 문자"
+    description: "인덱스 2로 세 번째 문자를 가져옵니다."
+    content: |-
+      name = 'Python'
+      name[2]
+
+- id: index_last
+  title: "마지막 문자 접근"
+  subtitle: "길이를 이용한 마지막 문자"
+  blocks:
+  - type: text
+    content: "마지막 문자의 인덱스는 문자열 길이 - 1입니다. len() 함수를 사용하여 길이를 구한 후 1을 빼면 마지막 인덱스를 얻을 수 있습니다."
+  - type: list
+    items:
+    - "마지막 인덱스 = 길이 - 1"
+    - "len() 함수 활용"
+    - "범위를 벗어나면 에러"
+  - type: code
+    language: python
+    title: "마지막 문자"
+    description: "길이를 이용하여 마지막 문자를 가져옵니다."
+    content: |-
+      greet = 'Hello'
+      greet[len(greet) - 1]
+
+- id: negative_index
+  title: "음수 인덱싱"
+  subtitle: "뒤에서부터 접근하기"
+  blocks:
+  - type: text
+    content: "음수 인덱스를 사용하면 문자열의 뒤에서부터 접근할 수 있습니다. -1은 마지막 문자, -2는 마지막에서 두 번째 문자입니다. 길이를 계산할 필요 없이 편리하게 사용할 수 있습니다."
+  - type: list
+    items:
+    - "-1은 마지막 문자"
+    - "-2는 마지막에서 두 번째"
+    - "뒤에서부터 -1, -2, -3..."
+  - type: code
+    language: python
+    title: "마지막 문자"
+    description: "음수 인덱스 -1로 마지막 문자를 가져옵니다."
+    content: |-
+      word = 'Python'
+      word[-1]
+  - type: code
+    language: python
+    title: "마지막에서 두 번째"
+    description: "음수 인덱스 -2로 마지막에서 두 번째 문자를 가져옵니다."
+    content: |-
+      term = 'Python'
+      term[-2]
+  - type: code
+    language: python
+    title: "마지막에서 세 번째"
+    description: "음수 인덱스 -3으로 마지막에서 세 번째 문자를 가져옵니다."
+    content: |-
+      label = 'Python'
+      label[-3]
+
+- id: slice_basic
+  title: "슬라이싱 기초"
+  subtitle: "[start:end]로 부분 문자열 추출"
+  blocks:
+  - type: text
+    content: "슬라이싱은 문자열의 일부분을 추출합니다. [start:end] 형태로 사용하며, start 인덱스부터 end-1 인덱스까지 가져옵니다. end 위치는 포함되지 않는다는 점에 주의해야 합니다."
+  - type: list
+    items:
+    - "[start:end] 형태"
+    - "start 포함, end 미포함"
+    - "부분 문자열 추출"
+  - type: code
+    language: python
+    title: "슬라이싱 기초"
+    description: "문자열의 일부를 추출합니다."
+    content: |-
+      phrase = 'Python Programming'
+      phrase[0:6]
+  - type: tip
+    content: "[0:6]은 인덱스 0부터 5까지, 총 6개의 문자를 가져옵니다."
+
+- id: slice_omit_start
+  title: "시작 생략 슬라이싱"
+  subtitle: "[:end]는 처음부터"
+  blocks:
+  - type: text
+    content: "시작 인덱스를 생략하면 처음부터 추출합니다. [:end]는 [0:end]와 같은 의미입니다. 문자열의 앞부분을 가져올 때 편리합니다."
+  - type: list
+    items:
+    - "[:end]는 처음부터 end-1까지"
+    - "[0:end]와 동일"
+    - "앞부분 추출에 편리"
+  - type: code
+    language: python
+    title: "시작 생략"
+    description: "처음부터 특정 위치까지 추출합니다."
+    content: |-
+      msg = 'Hello World'
+      msg[:5]
+
+- id: slice_omit_end
+  title: "끝 생략 슬라이싱"
+  subtitle: "[start:]는 끝까지"
+  blocks:
+  - type: text
+    content: "끝 인덱스를 생략하면 마지막까지 추출합니다. [start:]는 start 인덱스부터 문자열 끝까지 가져옵니다. 문자열의 뒷부분을 가져올 때 유용합니다."
+  - type: list
+    items:
+    - "[start:]는 start부터 끝까지"
+    - "마지막까지 추출"
+    - "뒷부분 추출에 유용"
+  - type: code
+    language: python
+    title: "끝 생략"
+    description: "특정 위치부터 끝까지 추출합니다."
+    content: |-
+      text = 'Hello World'
+      text[6:]
+
+- id: slice_both_omit
+  title: "전체 슬라이싱"
+  subtitle: "[:]는 전체 복사"
+  blocks:
+  - type: text
+    content: "시작과 끝을 모두 생략하면 전체 문자열을 복사합니다. [:]는 원본과 같은 내용의 새로운 문자열을 만듭니다. 문자열 전체를 복사할 때 사용합니다."
+  - type: list
+    items:
+    - "[:]는 전체 문자열"
+    - "문자열 복사"
+    - "원본과 동일한 내용"
+  - type: code
+    language: python
+    title: "전체 슬라이싱"
+    description: "전체 문자열을 복사합니다."
+    content: |-
+      source = 'Python'
+      source[:]
+
+- id: slice_negative
+  title: "음수 슬라이싱"
+  subtitle: "음수 인덱스로 슬라이싱"
+  blocks:
+  - type: text
+    content: "슬라이싱에서도 음수 인덱스를 사용할 수 있습니다. 뒤에서부터 계산하여 원하는 부분을 추출할 수 있습니다. [-5:-2]는 뒤에서 5번째부터 뒤에서 3번째까지입니다."
+  - type: list
+    items:
+    - "음수 인덱스 사용 가능"
+    - "뒤에서부터 추출"
+    - "음수와 양수 혼용 가능"
+  - type: code
+    language: python
+    title: "음수 슬라이싱"
+    description: "음수 인덱스로 뒤에서부터 슬라이싱합니다."
+    content: |-
+      sentence = 'Python Programming'
+      sentence[-11:-7]
+
+- id: slice_step
+  title: "스텝 슬라이싱"
+  subtitle: "[start:end:step]으로 간격 지정"
+  blocks:
+  - type: text
+    content: "스텝을 지정하면 일정 간격으로 문자를 추출할 수 있습니다. [start:end:step] 형태로 사용하며, step은 간격을 의미합니다. [::2]는 처음부터 끝까지 2칸씩 건너뛰며 추출합니다."
+  - type: list
+    items:
+    - "[start:end:step] 형태"
+    - "step은 간격"
+    - "문자를 건너뛰며 추출"
+  - type: code
+    language: python
+    title: "스텝 슬라이싱"
+    description: "2칸씩 건너뛰며 문자를 추출합니다."
+    content: |-
+      sample = 'Python Programming'
+      sample[::2]
+
+- id: slice_reverse
+  title: "역순 슬라이싱"
+  subtitle: "[::-1]로 문자열 뒤집기"
+  blocks:
+  - type: text
+    content: "스텝을 -1로 지정하면 문자열을 거꾸로 뒤집을 수 있습니다. [::-1]은 문자열 전체를 역순으로 만듭니다. 회문(palindrome) 확인이나 문자열 반전에 자주 사용됩니다."
+  - type: list
+    items:
+    - "[::-1]로 문자열 뒤집기"
+    - "역순으로 추출"
+    - "회문 확인에 유용"
+  - type: code
+    language: python
+    title: "역순 슬라이싱"
+    description: "문자열을 거꾸로 뒤집습니다."
+    content: |-
+      title = 'Python'
+      title[::-1]
+
+- id: slice_pattern
+  title: "슬라이싱 패턴"
+  subtitle: "다양한 슬라이싱 조합"
+  blocks:
+  - type: text
+    content: "슬라이싱의 start, end, step을 다양하게 조합하여 원하는 패턴을 추출할 수 있습니다. 홀수 번째 문자만, 짝수 번째 문자만, 또는 역순으로 일부만 등 다양한 패턴이 가능합니다."
+  - type: list
+    items:
+    - "start, end, step 자유롭게 조합"
+    - "다양한 패턴 추출 가능"
+    - "음수 스텝도 가능"
+  - type: code
+    language: python
+    title: "짝수 번째 문자"
+    description: "인덱스 1부터 2칸씩 건너뛰어 추출합니다."
+    content: |-
+      alpha = 'abcdefghij'
+      alpha[1::2]
+  - type: code
+    language: python
+    title: "역순 일부"
+    description: "인덱스 7부터 2까지 거꾸로 추출합니다."
+    content: |-
+      seq = 'abcdefghij'
+      seq[7:2:-1]
+  - type: code
+    language: python
+    title: "3칸씩 건너뛰기"
+    description: "처음부터 3칸씩 건너뛰어 추출합니다."
+    content: |-
+      chars = 'abcdefghij'
+      chars[::3]
+
+- id: practice
+  title: "Day 5 종합 복습"
+  subtitle: "인덱싱과 슬라이싱 마스터하기"
+  blocks:
+  - type: text
+    content: "Day 5에서 배운 인덱싱과 슬라이싱을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: expansion
+    title: "🟢 기본1: 첫 문자"
+    code: |-
+      hello = 'Hello'
+      hello[0]
+
+  - type: expansion
+    title: "🟢 기본2: 음수 인덱스"
+    code: |-
+      lang = 'Python'
+      lang[-1]
+
+  - type: expansion
+    title: "🟢 기본3: 앞 3글자"
+    code: |-
+      prog = 'Programming'
+      prog[:3]
+
+  - type: expansion
+    title: "🟢 기본4: 뒤 3글자"
+    code: |-
+      code = 'Python'
+      code[-3:]
+
+  - type: expansion
+    title: "🟢 기본5: 문자열 뒤집기"
+    code: |-
+      hi = 'Hello'
+      hi[::-1]
+
+  - type: expansion
+    title: "🟡 응용1: 중간 부분 추출"
+    code: |-
+      text = 'Hello World'
+      text[2:9]
+
+  - type: expansion
+    title: "🟡 응용2: 홀수 번째 문자"
+    code: |-
+      letters = 'abcdefgh'
+      letters[::2]
+
+  - type: expansion
+    title: "🟡 응용3: 짝수 번째 문자"
+    code: |-
+      abcs = 'abcdefgh'
+      abcs[1::2]
+
+  - type: expansion
+    title: "🟡 응용4: 음수 슬라이싱"
+    code: |-
+      course = 'Python Programming'
+      course[-11:-1]
+
+  - type: expansion
+    title: "🟡 응용5: 거꾸로 일부"
+    code: |-
+      world = 'Hello World'
+      world[9:4:-1]
+
+  - type: expansion
+    title: "🔴 심화1-1: 이메일 사용자명 추출"
+    code: |-
+      email = 'user@example.com'
+      email[:4]
+
+  - type: expansion
+    title: "🔴 심화1-2: 이메일 도메인 추출"
+    blocks:
+    - type: code
+      title: "도메인 부분"
+      content: |-
+        mail1 = 'user@example.com'
+        mail1[5:]
+
+    - type: code
+      title: "확장자 부분"
+      content: |-
+        mail2 = 'user@example.com'
+        mail2[-3:]
+
+  - type: expansion
+    title: "🔴 심화2: 회문 확인"
+    code: |-
+      pali = 'level'
+      pali == pali[::-1]
+
+  - type: expansion
+    title: "🔴 심화3-1: 문자열 분할"
+    blocks:
+    - type: code
+      title: "앞 절반"
+      content: |-
+        nums = '0123456789'
+        nums[:5]
+
+    - type: code
+      title: "뒤 절반"
+      content: |-
+        digits = '0123456789'
+        digits[5:]
+
+  - type: expansion
+    title: "🔴 심화3-2: 패턴 추출"
+    blocks:
+    - type: code
+      title: "3개씩 건너뛰기"
+      content: |-
+        seq = '0123456789'
+        seq[::3]
+
+    - type: code
+      title: "역순으로 2개씩 건너뛰기"
+      content: |-
+        series = '0123456789'
+        series[::-2]
+
+  - type: expansion
+    title: "🔴 심화4-1: 단어 분리"
+    blocks:
+    - type: code
+      title: "첫 단어"
+      content: |-
+        lesson = 'Python Programming'
+        lesson[:6]
+
+    - type: code
+      title: "둘째 단어"
+      content: |-
+        tutorial = 'Python Programming'
+        tutorial[7:]
+
+  - type: expansion
+    title: "🔴 심화4-2: 문자열 재조합"
+    blocks:
+    - type: code
+      title: "이니셜"
+      content: |-
+        learn = 'Python Programming'
+        learn[0] + learn[7]
+
+    - type: code
+      title: "단어 순서 뒤집기"
+      content: |-
+        study = 'Python Programming'
+        study[7:] + ' ' + study[:6]
+
+  - type: expansion
+    title: "🔴 심화5-1: 범위 슬라이싱"
+    code: |-
+      abc = 'abcdefghijklmnop'
+      abc[2:12:3]
+
+  - type: expansion
+    title: "🔴 심화5-2: 역방향 슬라이싱"
+    code: |-
+      alphabet = 'abcdefghijklmnop'
+      alphabet[-5:-15:-2]
+
+  - type: expansion
+    title: "🔴 심화5-3: 간격 슬라이싱"
+    code: |-
+      chars = 'abcdefghijklmnop'
+      chars[1::4]

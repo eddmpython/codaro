@@ -1,0 +1,213 @@
+meta:
+  id: day11_2
+  title: 함수 패턴학습
+  day: 11
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 함수 정의 - 코드 재사용"
+    description: "def로 함수를 정의하고 매개변수, 반환값을 사용하는 방법."
+    keywords: ['함수', 'def', 'return', '매개변수']
+intro:
+  title: 함수 마스터 패턴북
+  emoji: 🔥
+  description: 이것만 외우면 함수 마스터! 핵심 패턴만 모았습니다.
+  points:
+  - '📝 정의: def 함수명():'
+  - '📦 매개변수: def 함수명(a, b):'
+  - '🔄 반환: return 값'
+  - '⚡ 기본값: def 함수명(a=10):'
+  - '📊 가변인자: *args, **kwargs'
+  - '🧠 람다: lambda x: x + 1'
+  - '📦 독스트링: """설명"""'
+  - '🔍 스코프: 지역변수, 전역변수'
+  summary: 🔥 함수는 코드 재사용의 핵심! 모듈화의 시작!
+sections:
+- id: function_basic
+  title: 1. 기본 함수
+  subtitle: 'def 함수명():'
+  blocks:
+  - type: code
+    language: python
+    title: 함수 정의하기
+    description: 가장 기본적인 함수로, 단순히 출력만 수행합니다. sayHello 함수를 실행하면 "Hello World!"가 출력됩니다.
+    content: |-
+      def sayHello():
+          print("Hello World!")
+
+      sayHello()
+- id: function_param
+  title: 2. 매개변수 함수
+  subtitle: 'def 함수명(값):'
+  blocks:
+  - type: code
+    language: python
+    title: 매개변수 함수
+    description: 매개변수는 함수에 전달되는 값으로, 함수의 동작을 유연하게 만들어주는 중요한 요소입니다. 함수를 정의할 때 매개변수를 지정하면, 함수를 호출할 때 다양한 값을 전달하여 다른 결과를 얻을 수 있습니다.
+    content: |-
+      def greetUser(name):
+          print(f"안녕하세요, {name}님!")
+
+      greetUser("주현")
+      greetUser("영희")
+- id: function_return
+  title: 3. 리턴값이 있는 함수
+  subtitle: return 값
+  blocks:
+  - type: code
+    language: python
+    title: 리턴값이 있는 함수
+    description: 함수의 리턴(return)은 함수가 작업을 수행한 후 결과값을 반환하는 기능입니다. 함수의 실행을 즉시 종료하고 값을 반환합니다.
+    content: |-
+      def addNumbers(x, y):
+          returnResult = x + y
+          return returnResult
+
+      returnSumResult = addNumbers(5, 3)
+      print(returnSumResult)
+- id: function_default
+  title: 4. 기본값 매개변수 함수
+  subtitle: def 함수명(값=기본값)
+  blocks:
+  - type: code
+    language: python
+    title: 기본값 매개변수 함수
+    description: 기본값 매개변수 함수는 매개변수에 기본값을 설정하여 함수를 더 유연하게 사용할 수 있게 해주는 기능입니다. 기본값이 설정된 매개변수는 함수 호출 시 값을 전달하지 않아도 됩니다.
+    content: |-
+      def greetWithTitle(name, title="님"):
+          print(f"안녕하세요, {name}{title}")
+
+      greetWithTitle("영희")
+      greetWithTitle("영희", "박사님")
+- id: function_docstring
+  title: 5. 문서화된 함수
+  subtitle: '"""문서화"""'
+  blocks:
+  - type: code
+    language: python
+    title: 문서화된 함수
+    description: Docstrings를 사용하여 함수의 기능을 문서화합니다. help() 함수나 __doc__ 속성을 사용하여 문서를 확인할 수 있습니다.
+    content: |-
+      def multiply(a, b):
+          """
+          두 숫자를 곱하는 함수입니다.
+
+          Args:
+              a (int): 첫 번째 숫자
+              b (int): 두 번째 숫자
+
+          Returns:
+              int: 두 숫자의 곱
+          """
+          return a * b
+
+      help(multiply)
+      print(multiply.__doc__)
+- id: function_scope
+  title: 6. 변수 범위 함수
+  subtitle: 전역/지역 변수
+  blocks:
+  - type: code
+    language: python
+    title: 변수 범위 함수
+    description: 지역변수는 함수 내에서만 사용 가능하고, 전역변수는 프로그램 전체에서 사용 가능한 변수입니다. globalVar는 전역변수이고 localVar는 지역변수입니다.
+    content: |-
+      scopeGlobalVar = 10
+
+      def scopeTest():
+          scopeLocalVar = 20
+          print(f"전역변수: {scopeGlobalVar}")
+          print(f"지역변수: {scopeLocalVar}")
+
+      scopeTest()
+- id: function_recursive
+  title: 7. 재귀 함수
+  subtitle: 자기 자신 호출
+  blocks:
+  - type: code
+    language: python
+    title: 재귀 함수
+    description: 재귀 함수는 자기 자신을 반복적으로 호출하여 문제를 해결하는 함수입니다. 팩토리얼(n!)을 계산하기 위해 n * (n-1)!의 패턴으로 자신을 호출합니다.
+    content: |-
+      def factorial(n):
+          if n <= 1:
+              return 1
+          return n * factorial(n - 1)
+
+      print(factorial(5))
+- id: function_lambda
+  title: 8. 람다 함수
+  subtitle: lambda 익명함수
+  blocks:
+  - type: code
+    language: python
+    title: 람다 함수
+    description: 람다(Lambda) 함수는 간단한 익명 함수를 생성하는 방식입니다. 한 줄로 간단하게 함수를 정의할 수 있으며, 주로 일시적으로 사용할 간단한 함수가 필요할 때 활용됩니다.
+    content: |-
+      lambdaSquare = lambda x: x ** 2
+
+      lambdaNumbers = [1, 2, 3, 4, 5]
+      lambdaSquared = list(map(lambdaSquare, lambdaNumbers))
+      print(lambdaSquared)
+- id: function_decorator
+  title: 9. 데코레이터 함수
+  subtitle: '@데코레이터'
+  blocks:
+  - type: code
+    language: python
+    title: 데코레이터 함수
+    description: 데코레이터는 함수를 감싸서 기능을 확장하거나 수정할 수 있게 해주는 파이썬의 강력한 기능입니다. 기존 함수의 코드를 수정하지 않고도 새로운 기능을 추가할 수 있습니다.
+    content: |-
+      def timerDecorator(func):
+          def wrapper():
+              import time
+              decoratorStart = time.time()
+              func()
+              decoratorEnd = time.time()
+              print(f"실행 시간: {decoratorEnd - decoratorStart}초")
+          return wrapper
+
+      @timerDecorator
+      def slowFunction():
+          import time
+          time.sleep(1)
+          print("작업 완료!")
+
+      slowFunction()
+- id: function_higher_order
+  title: 10. 함수를 인자로 받는 함수
+  subtitle: 고차 함수
+  blocks:
+  - type: code
+    language: python
+    title: 함수를 인자로 받는 함수
+    description: 함수를 다른 함수의 인자로 전달하여 더 유연한 프로그래밍이 가능합니다. 이는 고차 함수(Higher-order function)의 한 예시로, 코드의 재사용성과 유연성을 높여줍니다.
+    content: |-
+      def apply(func, x):
+          return func(x)
+
+      def higherDouble(x):
+          return x * 2
+
+      def higherSquare(x):
+          return x ** 2
+
+      print(apply(higherDouble, 5))
+      print(apply(higherSquare, 5))
+- id: function_kwargs
+  title: 11. kwargs
+  subtitle: '**kwargs'
+  blocks:
+  - type: code
+    language: python
+    title: kwargs
+    description: '**kwargs(키워드 인자)는 함수에 이름이 지정된 인자를 딕셔너리 형태로 전달할 수 있게 해주는 특별한 매개변수입니다. 인자의 개수에 제한이 없어 유연한 함수 설계가 가능합니다.'
+    content: |-
+      def printInfo(**kwargs):
+          for key, value in kwargs.items():
+              print(f"{key}: {value}")
+
+      printInfo(name="으뜸이네", age=25, city="서울")
+      printInfo(title="개발자", company="테크코리아")

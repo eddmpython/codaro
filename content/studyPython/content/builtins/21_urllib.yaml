@@ -1,0 +1,556 @@
+meta:
+  title: "urllib - URL 처리"
+  description: "URL 요청, 파싱, 인코딩을 다루는 urllib 모듈"
+  keywords: ["urllib", "urlopen", "urlparse", "urlencode", "HTTP"]
+
+intro:
+  emoji: "🌐"
+  points:
+  - "URL 요청과 응답"
+  - "URL 파싱과 조작"
+  - "쿼리 문자열 처리"
+  - "HTTP 에러 처리"
+
+sections:
+- id: "module_import"
+  title: "urllib 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "urllib은 파이썬 표준 라이브러리입니다. URL 작업을 위한 여러 하위 모듈을 제공합니다. urllib.request는 URL 열기, urllib.parse는 URL 파싱, urllib.error는 예외 처리를 담당합니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 urllib 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "urllib 모듈 불러오기"
+    description: "urllib의 주요 하위 모듈을 불러옵니다."
+    content: |-
+      import urllib.request
+      import urllib.parse
+      import urllib.error
+
+      # 정상 로드 확인
+      'urllib 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "url_opening"
+  title: "URL 열기"
+  subtitle: "urlopen과 Request"
+  blocks:
+  - type: "text"
+    content: "urllib.request는 URL을 열고 데이터를 읽는 기능을 제공합니다. urlopen()으로 간단한 GET 요청을 보내고, Request 객체로 헤더와 메서드를 커스터마이즈할 수 있습니다. 웹 API 호출, 웹 스크래핑, 데이터 다운로드에 활용됩니다."
+  - type: "list"
+    items:
+    - "urlopen(url): URL 열기"
+    - "read(): 응답 읽기"
+    - "Request(): 요청 객체 생성"
+    - "status, headers: 응답 정보"
+  - type: "code"
+    language: "python"
+    title: "간단한 GET 요청"
+    description: "URL을 열고 응답을 읽습니다."
+    content: |-
+      url = 'https://httpbin.org/get'
+      with urllib.request.urlopen(url) as response:
+          responseData = response.read()
+      len(responseData)
+  - type: "code"
+    language: "python"
+    title: "응답 상태 코드"
+    description: "HTTP 응답 상태 코드를 확인합니다."
+    content: |-
+      url = 'https://httpbin.org/status/200'
+      with urllib.request.urlopen(url) as response:
+          statusCode = response.status
+      statusCode
+  - type: "code"
+    language: "python"
+    title: "응답 헤더"
+    description: "응답 헤더를 확인합니다."
+    content: |-
+      url = 'https://httpbin.org/response-headers?Content-Type=application/json'
+      with urllib.request.urlopen(url) as response:
+          contentType = response.headers.get('Content-Type')
+      contentType
+  - type: "tip"
+    content: "Pyodide 환경에서는 CORS 정책으로 인해 일부 외부 URL 접근이 제한될 수 있습니다."
+
+- id: "url_parsing"
+  title: "URL 파싱"
+  subtitle: "urlparse, urljoin, quote"
+  blocks:
+  - type: "text"
+    content: "urllib.parse는 URL을 구성 요소로 분해하거나 조합하는 기능을 제공합니다. urlparse()로 URL을 파싱하고, urljoin()으로 상대 URL을 절대 URL로 변환하며, quote()와 unquote()로 URL 인코딩을 처리합니다."
+  - type: "list"
+    items:
+    - "urlparse(): URL 분해"
+    - "urlunparse(): URL 조합"
+    - "urljoin(): 상대 URL 결합"
+    - "quote(), unquote(): URL 인코딩"
+  - type: "code"
+    language: "python"
+    title: "URL 파싱"
+    description: "URL을 구성 요소로 분해합니다."
+    content: |-
+      url = 'https://example.com:8080/path/to/page?key=value#section'
+      parsed = urllib.parse.urlparse(url)
+      (parsed.scheme, parsed.netloc, parsed.path)
+  - type: "code"
+    language: "python"
+    title: "상대 URL 결합"
+    description: "기본 URL과 상대 경로를 결합합니다."
+    content: |-
+      baseUrl = 'https://example.com/docs/'
+      relativePath = '../api/users'
+      fullUrl = urllib.parse.urljoin(baseUrl, relativePath)
+      fullUrl
+  - type: "code"
+    language: "python"
+    title: "URL 인코딩"
+    description: "특수 문자를 URL 안전 형식으로 인코딩합니다."
+    content: |-
+      text = 'Hello World! 안녕하세요'
+      encoded = urllib.parse.quote(text)
+      encoded
+  - type: "tip"
+    content: "quote_plus()는 공백을 +로 인코딩합니다. quote()는 %20으로 인코딩합니다."
+
+- id: "query_strings"
+  title: "쿼리 문자열"
+  subtitle: "urlencode와 parse_qs"
+  blocks:
+  - type: "text"
+    content: "쿼리 문자열은 URL에서 데이터를 전달하는 방법입니다. urlencode()로 딕셔너리를 쿼리 문자열로 변환하고, parse_qs()와 parse_qsl()로 쿼리 문자열을 파싱합니다. API 호출, 폼 제출, 검색 요청에 필수적입니다."
+  - type: "list"
+    items:
+    - "urlencode(): 딕셔너리 → 쿼리 문자열"
+    - "parse_qs(): 쿼리 문자열 → 딕셔너리"
+    - "parse_qsl(): 쿼리 문자열 → 리스트"
+  - type: "code"
+    language: "python"
+    title: "쿼리 문자열 생성"
+    description: "딕셔너리를 쿼리 문자열로 변환합니다."
+    content: |-
+      params = {'name': 'John Doe', 'age': 30, 'city': 'Seoul'}
+      queryString = urllib.parse.urlencode(params)
+      queryString
+  - type: "code"
+    language: "python"
+    title: "쿼리 문자열 파싱"
+    description: "쿼리 문자열을 딕셔너리로 변환합니다."
+    content: |-
+      queryStr = 'name=John+Doe&age=30&city=Seoul'
+      parsedParams = urllib.parse.parse_qs(queryStr)
+      parsedParams
+  - type: "code"
+    language: "python"
+    title: "URL에 쿼리 추가"
+    description: "기본 URL에 쿼리 문자열을 추가합니다."
+    content: |-
+      baseUrl = 'https://api.example.com/search'
+      queryParams = {'q': 'python', 'limit': 10}
+      fullUrl = f"{baseUrl}?{urllib.parse.urlencode(queryParams)}"
+      fullUrl
+  - type: "tip"
+    content: "parse_qs()는 값을 리스트로 반환하고, parse_qsl()은 튜플 리스트로 반환합니다."
+
+- id: "error_handling"
+  title: "에러 처리"
+  subtitle: "URLError와 HTTPError"
+  blocks:
+  - type: "text"
+    content: "urllib.error는 URL 작업 중 발생하는 예외를 제공합니다. HTTPError는 HTTP 상태 코드 에러(404, 500 등)를 처리하고, URLError는 네트워크 문제나 잘못된 URL을 처리합니다. 안정적인 웹 클라이언트 구현에 필수적입니다."
+  - type: "list"
+    items:
+    - "HTTPError: HTTP 에러 (4xx, 5xx)"
+    - "URLError: 네트워크 에러"
+    - "code: HTTP 상태 코드"
+    - "reason: 에러 원인"
+  - type: "code"
+    language: "python"
+    title: "404 에러 처리"
+    description: "존재하지 않는 페이지 요청을 처리합니다."
+    content: |-
+      url = 'https://httpbin.org/status/404'
+      try:
+          response = urllib.request.urlopen(url)
+          result = 'Success'
+      except urllib.error.HTTPError as e:
+          result = f'HTTP Error {e.code}'
+      result
+  - type: "code"
+    language: "python"
+    title: "에러 정보 확인"
+    description: "HTTP 에러의 상세 정보를 확인합니다."
+    content: |-
+      url = 'https://httpbin.org/status/500'
+      try:
+          response = urllib.request.urlopen(url)
+          errorInfo = None
+      except urllib.error.HTTPError as e:
+          errorInfo = {'code': e.code, 'reason': e.reason}
+      errorInfo
+  - type: "code"
+    language: "python"
+    title: "URL 에러 처리"
+    description: "잘못된 URL이나 네트워크 에러를 처리합니다."
+    content: |-
+      invalidUrl = 'http://this-domain-does-not-exist-12345.com'
+      try:
+          response = urllib.request.urlopen(invalidUrl, timeout=2)
+          result = 'Connected'
+      except urllib.error.URLError as e:
+          result = f'URL Error: {type(e.reason).__name__}'
+      result
+  - type: "tip"
+    content: "HTTPError는 URLError의 하위 클래스이므로 HTTPError를 먼저 처리해야 합니다."
+
+- id: "advanced_features"
+  title: "고급 기능"
+  subtitle: "헤더, 데이터, 타임아웃"
+  blocks:
+  - type: "text"
+    content: "Request 객체로 요청을 세밀하게 제어할 수 있습니다. 커스텀 헤더를 추가하고, POST 데이터를 전송하며, 타임아웃을 설정할 수 있습니다. User-Agent 설정, API 인증, 폼 제출 등 실전 웹 프로그래밍에 필요합니다."
+  - type: "list"
+    items:
+    - "Request(url, data, headers): 요청 객체"
+    - "add_header(): 헤더 추가"
+    - "timeout: 요청 타임아웃"
+    - "method: HTTP 메서드"
+  - type: "code"
+    language: "python"
+    title: "커스텀 헤더"
+    description: "User-Agent 헤더를 추가합니다."
+    content: |-
+      url = 'https://httpbin.org/headers'
+      headers = {'User-Agent': 'MyApp/1.0'}
+      req = urllib.request.Request(url, headers=headers)
+      with urllib.request.urlopen(req) as response:
+          responseCode = response.status
+      responseCode
+  - type: "code"
+    language: "python"
+    title: "POST 요청"
+    description: "POST 데이터를 전송합니다."
+    content: |-
+      url = 'https://httpbin.org/post'
+      data = urllib.parse.urlencode({'key': 'value'}).encode('utf-8')
+      req = urllib.request.Request(url, data=data, method='POST')
+      with urllib.request.urlopen(req) as response:
+          postStatus = response.status
+      postStatus
+  - type: "code"
+    language: "python"
+    title: "타임아웃 설정"
+    description: "요청 타임아웃을 설정합니다."
+    content: |-
+      url = 'https://httpbin.org/delay/1'
+      try:
+          with urllib.request.urlopen(url, timeout=3) as response:
+              timeoutResult = 'Completed within timeout'
+      except Exception as e:
+          timeoutResult = f'Timeout: {type(e).__name__}'
+      timeoutResult
+  - type: "tip"
+    content: "POST 데이터는 bytes 형식이어야 하므로 encode('utf-8')로 변환해야 합니다."
+
+- id: "practical"
+  title: "실전 활용 예제"
+  subtitle: "실무 URL 작업"
+  blocks:
+  - type: "text"
+    content: "urllib을 활용한 실전 URL 작업 예제를 다룹니다. API 호출, 웹 페이지 다운로드, 검색 URL 생성 등 다양한 시나리오에서 urllib을 사용하는 방법을 배웁니다."
+  - type: "code"
+    language: "python"
+    title: "JSON API 호출"
+    description: "REST API를 호출하고 JSON 응답을 파싱합니다."
+    content: |-
+      import json
+
+      url = 'https://httpbin.org/json'
+      with urllib.request.urlopen(url) as response:
+          jsonData = json.loads(response.read())
+
+      list(jsonData.keys())[:3]
+  - type: "code"
+    language: "python"
+    title: "검색 URL 생성"
+    description: "검색 엔진 URL을 동적으로 생성합니다."
+    content: |-
+      def createSearchUrl(baseUrl, query, **kwargs):
+          params = {'q': query}
+          params.update(kwargs)
+          queryString = urllib.parse.urlencode(params)
+          return f"{baseUrl}?{queryString}"
+
+      searchUrl = createSearchUrl(
+          'https://search.example.com',
+          'python tutorial',
+          lang='ko',
+          page=1
+      )
+      searchUrl
+  - type: "code"
+    language: "python"
+    title: "URL 유효성 검사"
+    description: "URL이 올바른 형식인지 검증합니다."
+    content: |-
+      def isValidUrl(url):
+          try:
+              result = urllib.parse.urlparse(url)
+              return all([result.scheme, result.netloc])
+          except Exception:
+              return False
+
+      urls = [
+          'https://example.com',
+          'example.com',
+          'ftp://files.example.com',
+          'not a url'
+      ]
+
+      {url: isValidUrl(url) for url in urls}
+  - type: "code"
+    language: "python"
+    title: "URL 정규화"
+    description: "URL을 표준 형식으로 정규화합니다."
+    content: |-
+      def normalizeUrl(url):
+          parsed = urllib.parse.urlparse(url)
+          normalized = urllib.parse.urlunparse((
+              parsed.scheme or 'https',
+              parsed.netloc.lower(),
+              parsed.path or '/',
+              parsed.params,
+              parsed.query,
+              ''
+          ))
+          return normalized
+
+      messy = 'HTTPS://Example.COM/Path?key=value#fragment'
+      clean = normalizeUrl(messy)
+      clean
+  - type: "code"
+    language: "python"
+    title: "쿼리 파라미터 수정"
+    description: "URL의 쿼리 파라미터를 추가하거나 수정합니다."
+    content: |-
+      def updateQueryParams(url, **newParams):
+          parsed = urllib.parse.urlparse(url)
+          queryDict = dict(urllib.parse.parse_qsl(parsed.query))
+          queryDict.update(newParams)
+          newQuery = urllib.parse.urlencode(queryDict)
+
+          return urllib.parse.urlunparse((
+              parsed.scheme,
+              parsed.netloc,
+              parsed.path,
+              parsed.params,
+              newQuery,
+              parsed.fragment
+          ))
+
+      original = 'https://api.example.com/data?page=1&limit=10'
+      updated = updateQueryParams(original, page=2, sort='date')
+      updated
+  - type: "code"
+    language: "python"
+    title: "안전한 파일명 생성"
+    description: "URL에서 안전한 파일명을 생성합니다."
+    content: |-
+      def urlToFilename(url):
+          parsed = urllib.parse.urlparse(url)
+          path = parsed.path.strip('/')
+          filename = path.replace('/', '_') or 'index'
+          if not filename.endswith('.html'):
+              filename += '.html'
+          return filename
+
+      urls = [
+          'https://example.com/docs/guide',
+          'https://example.com/',
+          'https://example.com/api/users/123'
+      ]
+
+      {url: urlToFilename(url) for url in urls}
+
+- id: "practice"
+  title: "urllib 모듈 종합 복습"
+  subtitle: "URL 처리 마스터하기"
+  blocks:
+  - type: "text"
+    content: "urllib 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: URL 파싱"
+    code: |-
+      url = 'https://example.com/path?key=value'
+      parsed = urllib.parse.urlparse(url)
+      parsed.scheme
+
+  - type: "expansion"
+    title: "🟢 기본2: 쿼리 인코딩"
+    code: |-
+      params = {'name': 'test', 'value': 123}
+      encoded = urllib.parse.urlencode(params)
+      encoded
+
+  - type: "expansion"
+    title: "🟢 기본3: URL 인코딩"
+    code: |-
+      text = 'Hello World'
+      encoded = urllib.parse.quote(text)
+      encoded
+
+  - type: "expansion"
+    title: "🟢 기본4: URL 디코딩"
+    code: |-
+      encoded = 'Hello%20World'
+      decoded = urllib.parse.unquote(encoded)
+      decoded
+
+  - type: "expansion"
+    title: "🟢 기본5: 상대 URL 결합"
+    code: |-
+      base = 'https://example.com/docs/'
+      relative = '../api'
+      joined = urllib.parse.urljoin(base, relative)
+      joined
+
+  - type: "expansion"
+    title: "🟡 응용1: 쿼리 파싱"
+    code: |-
+      query = 'name=John&age=30&city=Seoul'
+      parsed = urllib.parse.parse_qs(query)
+      parsed['name'][0]
+
+  - type: "expansion"
+    title: "🟡 응용2: URL 구성"
+    code: |-
+      parts = ('https', 'example.com', '/path', '', 'key=value', '')
+      url = urllib.parse.urlunparse(parts)
+      url
+
+  - type: "expansion"
+    title: "🟡 응용3: 쿼리 추가"
+    code: |-
+      baseUrl = 'https://api.example.com/data'
+      params = {'page': 1, 'limit': 10}
+      fullUrl = f"{baseUrl}?{urllib.parse.urlencode(params)}"
+      fullUrl
+
+  - type: "expansion"
+    title: "🟡 응용4: 호스트 추출"
+    code: |-
+      url = 'https://api.example.com:8080/path'
+      parsed = urllib.parse.urlparse(url)
+      parsed.netloc
+
+  - type: "expansion"
+    title: "🟡 응용5: 경로 추출"
+    code: |-
+      url = 'https://example.com/docs/guide.html'
+      parsed = urllib.parse.urlparse(url)
+      parsed.path
+
+  - type: "expansion"
+    title: "🔴 심화1: URL 유효성 검사"
+    code: |-
+      def isValid(url):
+          try:
+              result = urllib.parse.urlparse(url)
+              return bool(result.scheme and result.netloc)
+          except:
+              return False
+
+      isValid('https://example.com')
+
+  - type: "expansion"
+    title: "🔴 심화2: 쿼리 파라미터 업데이트"
+    code: |-
+      url = 'https://example.com?page=1&limit=10'
+      parsed = urllib.parse.urlparse(url)
+      params = dict(urllib.parse.parse_qsl(parsed.query))
+      params['page'] = 2
+      newQuery = urllib.parse.urlencode(params)
+      newUrl = parsed._replace(query=newQuery).geturl()
+      newUrl
+
+  - type: "expansion"
+    title: "🔴 심화3: 안전한 URL 생성"
+    code: |-
+      base = 'https://api.example.com/search'
+      userInput = 'python & javascript'
+      safeQuery = urllib.parse.quote(userInput)
+      searchUrl = f"{base}?q={safeQuery}"
+      searchUrl
+
+  - type: "expansion"
+    title: "🔴 심화4: 다중 값 쿼리"
+    code: |-
+      params = [('tag', 'python'), ('tag', 'tutorial'), ('lang', 'ko')]
+      queryString = urllib.parse.urlencode(params)
+      queryString
+
+  - type: "expansion"
+    title: "🔴 심화5: URL 정규화"
+    code: |-
+      url = 'HTTPS://Example.COM/Path/../Docs'
+      parsed = urllib.parse.urlparse(url.lower())
+      normalized = urllib.parse.urlunparse((
+          parsed.scheme,
+          parsed.netloc,
+          parsed.path,
+          '', '', ''
+      ))
+      normalized
+
+  - type: "expansion"
+    title: "🔴 심화6: 베이스네임 추출"
+    code: |-
+      url = 'https://example.com/docs/guide.html'
+      parsed = urllib.parse.urlparse(url)
+      basename = parsed.path.split('/')[-1]
+      basename
+
+  - type: "expansion"
+    title: "🔴 심화7: 스킴 변경"
+    code: |-
+      url = 'http://example.com/path'
+      parsed = urllib.parse.urlparse(url)
+      httpsUrl = parsed._replace(scheme='https').geturl()
+      httpsUrl
+
+  - type: "expansion"
+    title: "🔴 심화8: 쿼리 필터링"
+    code: |-
+      url = 'https://example.com?a=1&b=2&c=3'
+      parsed = urllib.parse.urlparse(url)
+      params = dict(urllib.parse.parse_qsl(parsed.query))
+      filtered = {k: v for k, v in params.items() if k in ['a', 'c']}
+      newQuery = urllib.parse.urlencode(filtered)
+      newUrl = parsed._replace(query=newQuery).geturl()
+      newUrl
+
+  - type: "expansion"
+    title: "🔴 심화9: 포트 추출"
+    code: |-
+      url = 'https://example.com:8080/api'
+      parsed = urllib.parse.urlparse(url)
+      port = parsed.port or (443 if parsed.scheme == 'https' else 80)
+      port
+
+  - type: "expansion"
+    title: "🔴 심화10: URL 비교"
+    code: |-
+      url1 = 'https://example.com/path?b=2&a=1'
+      url2 = 'https://example.com/path?a=1&b=2'
+
+      def normalizeForCompare(url):
+          parsed = urllib.parse.urlparse(url)
+          params = sorted(urllib.parse.parse_qsl(parsed.query))
+          query = urllib.parse.urlencode(params)
+          return parsed._replace(query=query, fragment='').geturl()
+
+      normalizeForCompare(url1) == normalizeForCompare(url2)

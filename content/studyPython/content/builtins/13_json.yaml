@@ -1,0 +1,527 @@
+meta:
+  id: "13_json"
+  title: "json - JSON 처리"
+  category: "builtins"
+  tags: ["json", "직렬화", "API", "데이터교환"]
+  seo:
+    title: "파이썬 json 모듈 완전 정복"
+    description: "json 모듈로 JSON 데이터 직렬화, 파일 처리, 커스텀 인코딩을 배웁니다."
+    keywords: ["json", "직렬화", "dumps", "loads", "API", "파이썬JSON"]
+
+intro:
+  emoji: "📋"
+  points:
+  - "JSON 직렬화와 역직렬화"
+  - "파일 읽기와 쓰기"
+  - "포맷팅과 정렬 옵션"
+  - "커스텀 인코딩/디코딩"
+
+sections:
+- id: "module_import"
+  title: "json 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "json은 파이썬 표준 라이브러리입니다. JSON(JavaScript Object Notation) 데이터를 처리하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 json 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "json 모듈 불러오기"
+    description: "json 모듈을 불러옵니다."
+    content: |-
+      import json
+
+      'json 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "basic_serialization"
+  title: "기본 직렬화"
+  subtitle: "dumps와 loads"
+  blocks:
+  - type: "text"
+    content: "json 모듈은 Python 객체와 JSON 문자열 간 변환을 제공합니다. dumps()는 Python 객체를 JSON 문자열로 직렬화하고, loads()는 JSON 문자열을 Python 객체로 역직렬화합니다. API 통신, 설정 파일, 데이터 교환에 필수적입니다."
+  - type: "list"
+    items:
+    - "dumps(): Python → JSON 문자열"
+    - "loads(): JSON 문자열 → Python"
+    - "딕셔너리, 리스트, 문자열, 숫자, 불린, None 지원"
+    - "튜플은 리스트로 변환됨"
+  - type: "code"
+    language: "python"
+    title: "딕셔너리를 JSON으로"
+    description: "Python 딕셔너리를 JSON 문자열로 변환합니다."
+    content: |-
+      userData = {'name': 'Alice', 'age': 30, 'city': 'Seoul'}
+      jsonString = json.dumps(userData)
+      jsonString
+  - type: "code"
+    language: "python"
+    title: "JSON을 딕셔너리로"
+    description: "JSON 문자열을 Python 딕셔너리로 변환합니다."
+    content: |-
+      jsonText = '{"product": "laptop", "price": 1200, "available": true}'
+      productData = json.loads(jsonText)
+      productData
+  - type: "code"
+    language: "python"
+    title: "리스트 직렬화"
+    description: "Python 리스트를 JSON 배열로 변환합니다."
+    content: |-
+      numberList = [1, 2, 3, 4, 5]
+      jsonArray = json.dumps(numberList)
+      jsonArray
+  - type: "tip"
+    content: "JSON의 true/false는 Python의 True/False로, null은 None으로 자동 변환됩니다."
+
+- id: "file_operations"
+  title: "파일 읽기와 쓰기"
+  subtitle: "dump와 load"
+  blocks:
+  - type: "text"
+    content: "dump()는 Python 객체를 JSON 파일로 저장하고, load()는 JSON 파일을 Python 객체로 읽어옵니다. 설정 파일, 데이터 캐싱, 영속성 저장에 활용됩니다. 파일 핸들을 직접 전달하여 효율적으로 처리합니다."
+  - type: "list"
+    items:
+    - "dump(obj, file): 객체를 파일로 저장"
+    - "load(file): 파일에서 객체 읽기"
+    - "파일 모드: 'w'(쓰기), 'r'(읽기)"
+    - "자동으로 파일 인코딩 처리"
+  - type: "code"
+    language: "python"
+    title: "JSON 파일로 저장"
+    description: "딕셔너리를 JSON 파일로 저장합니다."
+    content: |-
+      configData = {'theme': 'dark', 'language': 'ko', 'notifications': True}
+      with open('/tmp/config.json', 'w') as f:
+          json.dump(configData, f)
+      'config.json 저장 완료'
+  - type: "code"
+    language: "python"
+    title: "JSON 파일 읽기"
+    description: "JSON 파일을 읽어서 Python 객체로 변환합니다."
+    content: |-
+      with open('/tmp/config.json', 'r') as f:
+          loadedConfig = json.load(f)
+      loadedConfig
+  - type: "code"
+    language: "python"
+    title: "복잡한 데이터 저장"
+    description: "중첩된 딕셔너리와 리스트를 JSON 파일로 저장합니다."
+    content: |-
+      complexData = {
+          'users': [
+              {'id': 1, 'name': 'Alice', 'active': True},
+              {'id': 2, 'name': 'Bob', 'active': False}
+          ],
+          'total': 2
+      }
+      with open('/tmp/users.json', 'w') as f:
+          json.dump(complexData, f)
+      'users.json 저장 완료'
+  - type: "tip"
+    content: "대용량 데이터는 dump/load가 dumps/loads보다 메모리 효율적입니다."
+
+- id: "formatting"
+  title: "포맷팅 옵션"
+  subtitle: "indent, sort_keys, separators"
+  blocks:
+  - type: "text"
+    content: "JSON 출력을 사람이 읽기 쉽게 포맷팅할 수 있습니다. indent는 들여쓰기 수준을 지정하고, sort_keys는 키를 정렬하며, separators는 구분자를 커스터마이즈합니다. 디버깅, 로그, 설정 파일 작성에 유용합니다."
+  - type: "list"
+    items:
+    - "indent=4: 4칸 들여쓰기"
+    - "sort_keys=True: 키 알파벳 정렬"
+    - "separators: 구분자 커스터마이즈"
+    - "ensure_ascii=False: 유니코드 유지"
+  - type: "code"
+    language: "python"
+    title: "들여쓰기 적용"
+    description: "JSON을 읽기 쉽게 들여쓰기합니다."
+    content: |-
+      studentData = {'name': '김철수', 'grade': 'A', 'score': 95}
+      prettyJson = json.dumps(studentData, indent=2, ensure_ascii=False)
+      prettyJson
+  - type: "code"
+    language: "python"
+    title: "키 정렬"
+    description: "딕셔너리 키를 알파벳 순으로 정렬하여 출력합니다."
+    content: |-
+      unsortedData = {'zebra': 1, 'apple': 2, 'mango': 3}
+      sortedJson = json.dumps(unsortedData, sort_keys=True, indent=2)
+      sortedJson
+  - type: "code"
+    language: "python"
+    title: "압축 포맷"
+    description: "공백을 제거하여 최소 크기로 압축합니다."
+    content: |-
+      dataToCompress = {'a': 1, 'b': 2, 'c': 3}
+      compactJson = json.dumps(dataToCompress, separators=(',', ':'))
+      compactJson
+  - type: "tip"
+    content: "ensure_ascii=False를 사용하면 한글, 이모지 등이 \\uXXXX 형태로 변환되지 않습니다."
+
+- id: "data_types"
+  title: "지원 데이터 타입"
+  subtitle: "Python ↔ JSON 변환"
+  blocks:
+  - type: "text"
+    content: "JSON은 제한된 데이터 타입만 지원합니다. Python의 일부 타입은 JSON으로 직렬화할 수 없거나 변환 시 타입이 바뀝니다. 딕셔너리, 리스트, 문자열, 숫자, 불린, None만 직접 지원되며, 날짜나 집합 등은 커스텀 처리가 필요합니다."
+  - type: "list"
+    items:
+    - "dict → object, list → array"
+    - "str → string, int/float → number"
+    - "True/False → true/false, None → null"
+    - "tuple → array (역변환 시 list)"
+  - type: "code"
+    language: "python"
+    title: "기본 타입 변환"
+    description: "다양한 Python 타입을 JSON으로 변환합니다."
+    content: |-
+      mixedData = {
+          'text': 'Hello',
+          'number': 42,
+          'decimal': 3.14,
+          'flag': True,
+          'empty': None,
+          'items': [1, 2, 3]
+      }
+      convertedJson = json.dumps(mixedData, indent=2)
+      convertedJson
+  - type: "code"
+    language: "python"
+    title: "튜플 변환"
+    description: "튜플은 JSON 배열로 변환되고, 역직렬화 시 리스트가 됩니다."
+    content: |-
+      tupleData = {'coordinates': (10, 20, 30)}
+      jsonWithTuple = json.dumps(tupleData)
+      parsedBack = json.loads(jsonWithTuple)
+      type(parsedBack['coordinates'])
+  - type: "code"
+    language: "python"
+    title: "중첩 구조"
+    description: "깊게 중첩된 데이터도 처리할 수 있습니다."
+    content: |-
+      nestedStructure = {
+          'level1': {
+              'level2': {
+                  'level3': [1, 2, {'level4': 'deep'}]
+              }
+          }
+      }
+      deepJson = json.dumps(nestedStructure, indent=2)
+      deepJson
+  - type: "tip"
+    content: "set, datetime, custom 객체는 기본적으로 직렬화할 수 없습니다. 커스텀 인코더가 필요합니다."
+
+- id: "custom_encoding"
+  title: "커스텀 인코딩"
+  subtitle: "default와 object_hook"
+  blocks:
+  - type: "text"
+    content: "기본 지원되지 않는 타입을 JSON으로 변환하려면 default 함수를 사용합니다. 역직렬화 시 커스텀 변환은 object_hook으로 구현합니다. 날짜, 집합, 사용자 정의 클래스 등을 JSON으로 처리할 수 있습니다."
+  - type: "list"
+    items:
+    - "default: 직렬화 불가 객체 처리"
+    - "object_hook: 역직렬화 시 커스텀 변환"
+    - "날짜, 집합, 클래스 처리"
+    - "재사용 가능한 인코더/디코더"
+  - type: "code"
+    language: "python"
+    title: "집합 직렬화"
+    description: "set을 리스트로 변환하여 JSON 직렬화합니다."
+    content: |-
+      def customEncoder(obj):
+          if isinstance(obj, set):
+              return list(obj)
+          raise TypeError(f'{type(obj)} not serializable')
+
+      dataWithSet = {'tags': {'python', 'json', 'tutorial'}}
+      encodedSet = json.dumps(dataWithSet, default=customEncoder)
+      encodedSet
+  - type: "code"
+    language: "python"
+    title: "날짜 직렬화"
+    description: "datetime 객체를 문자열로 변환합니다."
+    content: |-
+      from datetime import datetime
+
+      def dateEncoder(obj):
+          if isinstance(obj, datetime):
+              return obj.isoformat()
+          raise TypeError(f'{type(obj)} not serializable')
+
+      eventData = {'event': 'meeting', 'time': datetime(2024, 6, 15, 14, 30)}
+      encodedDate = json.dumps(eventData, default=dateEncoder)
+      encodedDate
+  - type: "code"
+    language: "python"
+    title: "커스텀 디코딩"
+    description: "JSON을 읽을 때 특정 키를 변환합니다."
+    content: |-
+      def customDecoder(obj):
+          if 'time' in obj:
+              obj['time'] = obj['time'] + ' (parsed)'
+          return obj
+
+      jsonWithTime = '{"event": "meeting", "time": "2024-06-15T14:30:00"}'
+      decodedCustom = json.loads(jsonWithTime, object_hook=customDecoder)
+      decodedCustom
+  - type: "tip"
+    content: "복잡한 객체는 __dict__를 사용하여 딕셔너리로 변환한 후 직렬화할 수 있습니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "API, 설정 파일, 로그"
+  blocks:
+  - type: "text"
+    content: "실무에서 자주 사용하는 JSON 활용 패턴을 살펴봅니다. API 응답 처리, 설정 파일 관리, 로그 저장, 데이터 교환 등 다양한 시나리오에서 JSON을 효과적으로 사용할 수 있습니다."
+  - type: "list"
+    items:
+    - "API 응답 파싱"
+    - "설정 파일 관리"
+    - "데이터 캐싱"
+    - "로그 구조화"
+  - type: "code"
+    language: "python"
+    title: "API 응답 시뮬레이션"
+    description: "API에서 받은 JSON 응답을 처리합니다."
+    content: |-
+      apiResponse = '{"status": "success", "data": {"users": 150, "active": 120}}'
+      parsedResponse = json.loads(apiResponse)
+      totalUsers = parsedResponse['data']['users']
+      totalUsers
+  - type: "code"
+    language: "python"
+    title: "설정 파일 업데이트"
+    description: "기존 설정을 읽고 수정한 후 다시 저장합니다."
+    content: |-
+      settingsPath = '/tmp/settings.json'
+      initialSettings = {'volume': 50, 'brightness': 80}
+      with open(settingsPath, 'w') as f:
+          json.dump(initialSettings, f)
+
+      with open(settingsPath, 'r') as f:
+          currentSettings = json.load(f)
+      currentSettings['volume'] = 70
+
+      with open(settingsPath, 'w') as f:
+          json.dump(currentSettings, f, indent=2)
+
+      currentSettings
+  - type: "code"
+    language: "python"
+    title: "데이터 검증"
+    description: "JSON 문자열이 유효한지 검증합니다."
+    content: |-
+      def isValidJson(text):
+          try:
+              json.loads(text)
+              return True
+          except json.JSONDecodeError:
+              return False
+
+      validText = '{"key": "value"}'
+      invalidText = '{key: value}'
+      isValidJson(validText), isValidJson(invalidText)
+  - type: "tip"
+    content: "JSON 파일은 주석을 지원하지 않습니다. 설명이 필요하면 '_comment' 키를 사용하세요."
+
+- id: "practice"
+  title: "json 모듈 종합 복습"
+  subtitle: "JSON 처리 마스터하기"
+  blocks:
+  - type: "text"
+    content: "json 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 딕셔너리를 JSON으로"
+    code: |-
+      person = {'name': 'John', 'age': 25}
+      jsonStr = json.dumps(person)
+      jsonStr
+
+  - type: "expansion"
+    title: "🟢 기본2: JSON을 딕셔너리로"
+    code: |-
+      jsonData = '{"city": "Seoul", "country": "Korea"}'
+      pythonDict = json.loads(jsonData)
+      pythonDict
+
+  - type: "expansion"
+    title: "🟢 기본3: 리스트 직렬화"
+    code: |-
+      fruits = ['apple', 'banana', 'cherry']
+      jsonList = json.dumps(fruits)
+      jsonList
+
+  - type: "expansion"
+    title: "🟢 기본4: 들여쓰기 적용"
+    code: |-
+      data = {'x': 1, 'y': 2, 'z': 3}
+      formatted = json.dumps(data, indent=4)
+      formatted
+
+  - type: "expansion"
+    title: "🟢 기본5: 파일로 저장"
+    code: |-
+      saveData = {'status': 'ok', 'code': 200}
+      with open('/tmp/response.json', 'w') as f:
+          json.dump(saveData, f)
+      'Saved'
+
+  - type: "expansion"
+    title: "🟡 응용1: 키 정렬"
+    code: |-
+      unordered = {'z': 3, 'a': 1, 'm': 2}
+      ordered = json.dumps(unordered, sort_keys=True)
+      ordered
+
+  - type: "expansion"
+    title: "🟡 응용2: 한글 유지"
+    code: |-
+      korean = {'이름': '홍길동', '나이': 30}
+      preserved = json.dumps(korean, ensure_ascii=False)
+      preserved
+
+  - type: "expansion"
+    title: "🟡 응용3: 중첩 데이터"
+    code: |-
+      nested = {'user': {'name': 'Alice', 'info': {'age': 25, 'city': 'LA'}}}
+      nestedJson = json.dumps(nested, indent=2)
+      nestedJson
+
+  - type: "expansion"
+    title: "🟡 응용4: 파일 읽고 수정"
+    code: |-
+      testPath = '/tmp/test.json'
+      with open(testPath, 'w') as f:
+          json.dump({'count': 10}, f)
+      with open(testPath, 'r') as f:
+          content = json.load(f)
+      content['count'] += 5
+      content
+
+  - type: "expansion"
+    title: "🟡 응용5: 압축 포맷"
+    code: |-
+      toCompress = {'a': 1, 'b': 2, 'c': 3}
+      compact = json.dumps(toCompress, separators=(',', ':'))
+      compact
+
+  - type: "expansion"
+    title: "🔴 심화1: 집합 직렬화"
+    code: |-
+      def encodeSet(obj):
+          if isinstance(obj, set):
+              return list(obj)
+          raise TypeError
+
+      withSet = {'tags': {'python', 'data', 'json'}}
+      result = json.dumps(withSet, default=encodeSet)
+      result
+
+  - type: "expansion"
+    title: "🔴 심화2: JSON 검증"
+    code: |-
+      def validate(text):
+          try:
+              json.loads(text)
+              return 'valid'
+          except json.JSONDecodeError:
+              return 'invalid'
+
+      sample = '{"valid": true}'
+      validate(sample)
+
+  - type: "expansion"
+    title: "🔴 심화3: 다중 파일 병합"
+    code: |-
+      file1Data = {'a': 1}
+      file2Data = {'b': 2}
+      with open('/tmp/f1.json', 'w') as f:
+          json.dump(file1Data, f)
+      with open('/tmp/f2.json', 'w') as f:
+          json.dump(file2Data, f)
+
+      merged = {}
+      for path in ['/tmp/f1.json', '/tmp/f2.json']:
+          with open(path, 'r') as f:
+              merged.update(json.load(f))
+      merged
+
+  - type: "expansion"
+    title: "🔴 심화4: 필드 필터링"
+    code: |-
+      fullData = {'name': 'Alice', 'age': 30, 'password': 'secret', 'email': 'a@b.com'}
+      publicFields = {k: v for k, v in fullData.items() if k != 'password'}
+      safeJson = json.dumps(publicFields)
+      safeJson
+
+  - type: "expansion"
+    title: "🔴 심화5: 배열 데이터 처리"
+    code: |-
+      arrayJson = '[{"id": 1, "value": 10}, {"id": 2, "value": 20}]'
+      items = json.loads(arrayJson)
+      totalValue = sum(item['value'] for item in items)
+      totalValue
+
+  - type: "expansion"
+    title: "🔴 심화6: 깊은 복사"
+    code: |-
+      original = {'a': {'b': {'c': 1}}}
+      serialized = json.dumps(original)
+      deepCopy = json.loads(serialized)
+      deepCopy['a']['b']['c'] = 999
+      original['a']['b']['c'], deepCopy['a']['b']['c']
+
+  - type: "expansion"
+    title: "🔴 심화7: 조건부 직렬화"
+    code: |-
+      def conditionalEncoder(obj):
+          if isinstance(obj, dict):
+              return {k: v for k, v in obj.items() if v is not None}
+          raise TypeError
+
+      dataWithNone = {'a': 1, 'b': None, 'c': 3}
+      cleaned = json.loads(json.dumps(dataWithNone, default=conditionalEncoder))
+      cleaned
+
+  - type: "expansion"
+    title: "🔴 심화8: 대용량 스트림"
+    code: |-
+      bigData = [{'id': i, 'value': i * 10} for i in range(100)]
+      streamPath = '/tmp/stream.json'
+      with open(streamPath, 'w') as f:
+          json.dump(bigData, f)
+      with open(streamPath, 'r') as f:
+          loaded = json.load(f)
+      len(loaded)
+
+  - type: "expansion"
+    title: "🔴 심화9: 타입 변환 체크"
+    code: |-
+      before = {'coords': (1, 2, 3)}
+      afterJson = json.dumps(before)
+      after = json.loads(afterJson)
+      type(before['coords']).__name__, type(after['coords']).__name__
+
+  - type: "expansion"
+    title: "🔴 심화10: 설정 템플릿"
+    code: |-
+      template = {
+          'app': {
+              'name': 'MyApp',
+              'version': '1.0',
+              'settings': {
+                  'theme': 'light',
+                  'lang': 'en'
+              }
+          }
+      }
+      configPath = '/tmp/app_config.json'
+      with open(configPath, 'w') as f:
+          json.dump(template, f, indent=2)
+      with open(configPath, 'r') as f:
+          loadedTemplate = json.load(f)
+      loadedTemplate['app']['version']

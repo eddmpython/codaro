@@ -1,0 +1,364 @@
+meta:
+  id: day14
+  title: 리스트컴프리헨션
+  day: 14
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "리스트 컴프리헨션 - 한 줄로 리스트 만들기"
+    description: "리스트 컴프리헨션으로 간결하게 리스트를 생성합니다."
+    keywords: ['리스트 컴프리헨션', 'comprehension', '람다']
+intro:
+  emoji: "✨"
+  points:
+  - 리스트 컴프리헨션의 개념과 기본 문법
+  - 조건부 필터링과 중첩 컴프리헨션
+  - 람다 함수의 개념과 활용법
+  - 함수 내부에서 람다 사용하기
+sections:
+- id: comprehension_introduction
+  title: 리스트 컴프리헨션 소개
+  subtitle: 간결하고 효율적인 리스트 생성
+  blocks:
+  - type: text
+    content: 리스트 컴프리헨션(List Comprehension)은 기존 리스트나 반복 가능한 객체로부터 새로운 리스트를 한 줄로 생성하는 파이썬의 강력한 기능입니다. Comprehension은 영어로 "이해", "포함"이라는 뜻인데, 프로그래밍에서는 "반복문을 하나의 표현식 안에 포함시킨다"는 의미로 사용됩니다. day10에서 배운 for 루프로 여러 줄 작성해야 할 것을 대괄호 안에 한 줄로 표현할 수 있어 코드가 훨씬 간결해집니다. 파이썬다운 코드(Pythonic)의 대표적인 예시이며, 일반 for 루프보다 실행 속도도 약간 더 빠릅니다.
+  - type: list
+    items:
+    - 대괄호 안에 for 문을 넣어 리스트 생성
+    - for 루프보다 간결하고 빠름
+    - "[표현식 for 변수 in 반복가능객체] 형태"
+    - 읽기 쉽고 파이썬다운 코드
+  - type: code
+    language: python
+    title: 리스트 컴프리헨션 기본
+    description: "대괄호 안에 for 문을 넣어 리스트를 생성합니다."
+    content: |-
+      introLanguage = 'Python'
+      introChars = [char for char in introLanguage]
+      print(introChars)
+
+      introNumbers = [i for i in range(11)]
+      print(introNumbers)
+
+      introSquares = [i * i for i in range(11)]
+      print(introSquares)
+  - type: tip
+    content: "리스트 컴프리헨션은 짧은 표현에 적합합니다. 로직이 복잡하면 일반 for 루프가 더 읽기 좋습니다."
+
+- id: comprehension_with_operation
+  title: 연산을 포함한 컴프리헨션
+  subtitle: 요소를 변환하면서 리스트 생성
+  blocks:
+  - type: text
+    content: 리스트 컴프리헨션에서 for 앞의 표현식에 수학 연산이나 함수 호출을 넣을 수 있습니다. 이렇게 하면 반복하면서 동시에 각 요소를 변환한 새 리스트를 만들 수 있습니다. day03에서 배운 연산자와 day04에서 배운 문자열 메서드를 활용할 수 있고, day06에서 배운 튜플 형태로도 생성할 수 있습니다. 단순히 값을 모으는 것이 아니라 변환까지 한 번에 처리할 수 있어 매우 유용합니다.
+  - type: list
+    items:
+    - for 앞에 변환 표현식 작성
+    - 수학 연산, 함수 호출 가능
+    - 튜플 형태로도 생성 가능
+    - 복잡한 변환도 한 줄로
+  - type: code
+    language: python
+    title: 연산 포함 컴프리헨션
+    description: "요소를 변환하면서 리스트를 생성합니다."
+    content: |-
+      opSquares = [i * i for i in range(11)]
+      print(opSquares)
+
+      opCubes = [i ** 3 for i in range(6)]
+      print(opCubes)
+
+      opTuples = [(i, i * i) for i in range(6)]
+      print(opTuples)
+
+      opWords = ['hello', 'world', 'python']
+      opUppers = [word.upper() for word in opWords]
+      print(opUppers)
+
+- id: conditional_comprehension
+  title: 조건부 리스트 컴프리헨션
+  subtitle: if 표현식으로 필터링
+  blocks:
+  - type: text
+    content: 리스트 컴프리헨션 끝에 if 조건을 추가하면 조건을 만족하는 요소만 포함시킬 수 있습니다. 이를 통해 필터링과 변환을 동시에 수행할 수 있습니다. day09에서 배운 if 조건문을 리스트 컴프리헨션에 결합하여 조건이 True인 요소만 결과 리스트에 들어가게 만듭니다. 필터링(filtering)이란 원하는 조건에 맞는 데이터만 골라내는 것을 의미하며, 데이터 처리에서 매우 자주 사용되는 기법입니다.
+  - type: list
+    items:
+    - "[표현식 for 변수 in 반복 if 조건] 형태"
+    - 조건이 True인 요소만 포함
+    - 짝수/홀수, 양수/음수 필터링
+    - 복합 조건도 가능 (and, or)
+  - type: code
+    language: python
+    title: 조건부 필터링
+    description: "if 조건으로 원하는 요소만 선택합니다."
+    content: |-
+      condEvenNumbers = [i for i in range(21) if i % 2 == 0]
+      print(condEvenNumbers)
+
+      condOddNumbers = [i for i in range(21) if i % 2 != 0]
+      print(condOddNumbers)
+
+      condNumbers = [-4, -3, -2, -1, 0, 1, 2, 3, 4]
+      condPositives = [n for n in condNumbers if n > 0]
+      print(condPositives)
+
+      condPositiveEvens = [n for n in condNumbers if n > 0 and n % 2 == 0]
+      print(condPositiveEvens)
+  - type: tip
+    content: "조건이 여러 개면 and/or로 연결합니다. 예: [n for n in nums if n > 0 and n < 10]"
+
+- id: nested_comprehension
+  title: 중첩 리스트 컴프리헨션
+  subtitle: 다차원 배열 평면화
+  blocks:
+  - type: text
+    content: 중첩된 리스트(2차원, 3차원 등)를 1차원으로 평면화할 때 중첩 for 문을 사용합니다. 평면화(flatten)란 여러 층으로 중첩된 구조를 평평하게 펼치는 것을 의미합니다. 예를 들어 [[1, 2], [3, 4]]를 [1, 2, 3, 4]로 만드는 것입니다. day10에서 배운 중첩 for 문과 순서가 같으며, 바깥 for가 먼저 오고 안쪽 for가 나중에 옵니다. 이 순서를 잘 기억해야 원하는 결과를 얻을 수 있습니다.
+  - type: list
+    items:
+    - 여러 for 문을 순서대로 나열
+    - 바깥 반복문이 먼저, 안쪽이 나중
+    - 2차원 리스트를 1차원으로 변환
+    - 복잡한 중첩 구조도 처리 가능
+  - type: code
+    language: python
+    title: 중첩 리스트 평면화
+    description: "중첩 for 문으로 다차원 리스트를 평면화합니다."
+    content: |-
+      nestedMatrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+      nestedFlattened = [num for row in nestedMatrix for num in row]
+      print(nestedFlattened)
+
+      nestedEvensOnly = [num for row in nestedMatrix for num in row if num % 2 == 0]
+      print(nestedEvensOnly)
+
+      nestedDoubled = [num * 2 for row in nestedMatrix for num in row]
+      print(nestedDoubled)
+  - type: tip
+    content: "중첩 for의 순서: [표현식 for 바깥 in 바깥리스트 for 안쪽 in 바깥]. 일반 for 중첩문 순서와 같습니다."
+
+- id: lambda_introduction
+  title: 람다 함수 소개
+  subtitle: 이름 없는 한 줄 함수
+  blocks:
+  - type: text
+    content: 람다(lambda) 함수는 이름이 없는 익명 함수(anonymous function)입니다. 익명(anonymous)은 영어로 "이름이 없는"이라는 뜻으로, 함수 이름을 정하지 않고 바로 사용할 수 있는 함수를 의미합니다. lambda라는 이름은 수학의 람다 대수(Lambda Calculus)에서 왔으며, 함수형 프로그래밍의 기초 개념입니다. day11에서 배운 def로 함수를 정의하는 대신, lambda 키워드로 한 줄로 간단한 함수를 만들 수 있습니다. 주로 다른 함수의 인수로 전달하거나 일회성 계산에 사용되며, 코드를 더 간결하게 만들어줍니다.
+  - type: list
+    items:
+    - "lambda 매개변수: 표현식 형태"
+    - 이름 없이 바로 사용하는 함수
+    - 한 줄 표현식만 가능
+    - 다른 함수 인수로 자주 사용
+  - type: code
+    language: python
+    title: 람다 함수 기본
+    description: "lambda로 간단한 함수를 만듭니다."
+    content: |-
+      lambdaAddTwo = lambda a, b: a + b
+      print(lambdaAddTwo(2, 3))
+
+      lambdaSquare = lambda x: x ** 2
+      print(lambdaSquare(5))
+
+      lambdaCube = lambda x: x ** 3
+      print(lambdaCube(3))
+
+      lambdaResult = (lambda a, b: a + b)(10, 20)
+      print(lambdaResult)
+  - type: tip
+    content: "람다는 간단한 연산에 적합합니다. 복잡한 로직은 def로 정의하는 것이 좋습니다."
+
+- id: lambda_examples
+  title: 람다 함수 활용
+  subtitle: 다양한 수학 연산
+  blocks:
+  - type: text
+    content: 람다 함수로 다양한 수학 연산을 간결하게 표현할 수 있습니다. 여러 매개변수를 받을 수 있고, day09에서 배운 조건부 표현식(삼항 연산자)도 사용할 수 있습니다. 삼항 연산자는 "값1 if 조건 else 값2" 형태로 한 줄에 if-else를 표현하는 방법입니다. 람다 함수를 변수에 저장하면 일반 함수처럼 재사용할 수 있으며, 복잡한 수학 공식도 간결하게 표현할 수 있습니다.
+  - type: list
+    items:
+    - 여러 매개변수 지원
+    - 삼항 연산자와 조합
+    - 수학 공식 간결하게 표현
+    - 변수에 저장해서 재사용
+  - type: code
+    language: python
+    title: 람다 활용 예제
+    description: "람다로 다양한 연산을 수행합니다."
+    content: |-
+      exMultiply = lambda a, b, c: a * b * c
+      print(exMultiply(2, 3, 4))
+
+      exFormula = lambda a, b, c: a ** 2 - 3 * b + 4 * c
+      print(exFormula(5, 5, 3))
+
+      exMaxTwo = lambda a, b: a if a > b else b
+      print(exMaxTwo(10, 5))
+      print(exMaxTwo(3, 8))
+
+      exIsEven = lambda n: n % 2 == 0
+      print(exIsEven(4))
+      print(exIsEven(7))
+
+- id: lambda_in_function
+  title: 함수 내부의 람다
+  subtitle: 함수가 함수를 반환
+  blocks:
+  - type: text
+    content: 함수 내부에서 람다 함수를 반환할 수 있습니다. 이를 통해 "함수를 만드는 함수"를 구현할 수 있습니다. 이런 방식은 고차 함수(higher-order function)의 핵심 개념입니다. 고차 함수는 함수를 인수로 받거나 함수를 반환하는 함수를 의미하며, 함수형 프로그래밍의 중요한 개념입니다. 클로저(closure)는 함수가 정의될 때의 환경을 기억하는 것으로, 내부 함수가 외부 함수의 변수를 사용할 수 있게 해줍니다. 이를 통해 동적으로 다양한 함수를 생성할 수 있습니다.
+  - type: list
+    items:
+    - 함수가 람다를 반환
+    - 함수를 만드는 함수 (팩토리)
+    - 클로저 개념 활용
+    - 동적 함수 생성
+  - type: code
+    language: python
+    title: 람다 반환 함수
+    description: "함수 내부에서 람다를 반환합니다."
+    content: |-
+      def funcPower(x):
+          return lambda n: x ** n
+
+      funcCube = funcPower(2)(3)
+      print(funcCube)
+
+      funcPowerOfTwo = funcPower(2)
+      print(funcPowerOfTwo(5))
+      print(funcPowerOfTwo(10))
+
+      def funcMultiplier(x):
+          return lambda y: x * y
+
+      funcDouble = funcMultiplier(2)
+      funcTriple = funcMultiplier(3)
+
+      print(funcDouble(5))
+      print(funcTriple(4))
+
+- id: dict_set_comprehension
+  title: 딕셔너리와 집합 컴프리헨션
+  subtitle: 리스트 외 컴프리헨션
+  blocks:
+  - type: text
+    content: 리스트 컴프리헨션과 같은 방식으로 딕셔너리와 집합도 생성할 수 있습니다. day08에서 배운 딕셔너리는 중괄호와 콜론으로 키와 값을 표현하고, day07에서 배운 집합은 중괄호만 사용합니다. 딕셔너리 컴프리헨션은 키-값 쌍을 동적으로 생성할 때 유용하며, 집합 컴프리헨션은 자동으로 중복을 제거하면서 값을 모을 수 있습니다. 조건부 필터링도 동일하게 적용할 수 있어 데이터 구조 변환에 매우 유용합니다.
+  - type: list
+    items:
+    - "{키: 값 for ... } - 딕셔너리 컴프리헨션"
+    - "{값 for ... } - 집합 컴프리헨션"
+    - 조건부 필터링도 동일하게 적용
+    - 데이터 구조 변환에 유용
+  - type: code
+    language: python
+    title: 딕셔너리와 집합 컴프리헨션
+    description: "딕셔너리와 집합도 컴프리헨션으로 생성합니다."
+    content: |-
+      dictSquares = {x: x ** 2 for x in range(6)}
+      print(dictSquares)
+
+      dictWords = ['apple', 'banana', 'cherry']
+      dictLengths = {word: len(word) for word in dictWords}
+      print(dictLengths)
+
+      setNums = [1, 2, 2, 3, 3, 3, 4]
+      setUniqueSquares = {n ** 2 for n in setNums}
+      print(setUniqueSquares)
+
+      setEvenSet = {n for n in range(10) if n % 2 == 0}
+      print(setEvenSet)
+
+- id: practice
+  title: 14일차 복습
+  subtitle: 리스트 컴프리헨션 미션
+  blocks:
+  - type: text
+    content: 14일차에서 배운 리스트 컴프리헨션과 람다 함수를 복습하는 미션입니다. 다양한 상황에서 컴프리헨션을 활용해봅시다. 이전에 배운 모든 개념을 종합적으로 활용하는 연습을 통해 실력을 향상시킬 수 있습니다.
+  - type: expansion
+    title: "미션1: 기본 컴프리헨션 (day14)"
+    code: |-
+      m1Nums = [i * 2 for i in range(10)]
+      print(m1Nums)
+  - type: expansion
+    title: "미션2: 조건부 필터링 (day14)"
+    code: |-
+      m2EvenSquares = [n ** 2 for n in range(1, 21) if n % 2 == 0]
+      print(m2EvenSquares)
+  - type: expansion
+    title: "미션3: 문자열 메서드 활용 (day04 + day14)"
+    code: |-
+      m3Words = ['apple', 'banana', 'cherry', 'date', 'elderberry']
+      m3LongWords = [w.upper() for w in m3Words if len(w) > 5]
+      print(m3LongWords)
+  - type: expansion
+    title: "미션4: 중첩 컴프리헨션 (day14)"
+    code: |-
+      m4Matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+      m4Flat = [num for row in m4Matrix for num in row]
+      print(m4Flat)
+  - type: expansion
+    title: "미션5: 람다 기본 (day14)"
+    code: |-
+      m5Add = lambda a, b: a + b
+      m5Sub = lambda a, b: a - b
+      m5Mul = lambda a, b: a * b
+      m5Div = lambda a, b: a / b
+      print(m5Add(10, 5))
+      print(m5Sub(10, 5))
+      print(m5Mul(10, 5))
+      print(m5Div(10, 5))
+  - type: expansion
+    title: "미션6: 람다 삼항 연산자 (day09 + day14)"
+    code: |-
+      m6MaxTwo = lambda a, b: a if a > b else b
+      m6IsEven = lambda n: "짝수" if n % 2 == 0 else "홀수"
+      print(m6MaxTwo(10, 5))
+      print(m6IsEven(4))
+      print(m6IsEven(7))
+  - type: expansion
+    title: "미션7: 딕셔너리 컴프리헨션 (day08 + day14)"
+    code: |-
+      m7Names = ['Alice', 'Bob', 'Charlie']
+      m7NameLength = {name: len(name) for name in m7Names}
+      print(m7NameLength)
+  - type: expansion
+    title: "미션8: 집합 컴프리헨션 (day07 + day14)"
+    code: |-
+      m8Nums = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+      m8UniqueSquares = {n ** 2 for n in m8Nums}
+      print(m8UniqueSquares)
+  - type: expansion
+    title: "미션9: 튜플 리스트 (day06 + day14)"
+    code: |-
+      m9Pairs = [(x, y) for x in range(3) for y in range(3)]
+      print(m9Pairs)
+      m9Diagonal = [(i, i) for i in range(5)]
+      print(m9Diagonal)
+  - type: expansion
+    title: "미션10: 복합 조건 (day09 + day14)"
+    code: |-
+      m10Numbers = [-3, -2, -1, 0, 1, 2, 3, 4, 5, 6]
+      m10Filtered = [n for n in m10Numbers if n > 0 and n % 2 == 0]
+      print(m10Filtered)
+  - type: expansion
+    title: "미션11: 함수 반환 람다 (day11 + day14)"
+    code: |-
+      def m11Multiplier(x):
+          return lambda y: x * y
+      m11Double = m11Multiplier(2)
+      m11Triple = m11Multiplier(3)
+      print(m11Double(5))
+      print(m11Triple(5))
+  - type: expansion
+    title: "미션12: 종합 활용 (day01~day14)"
+    code: |-
+      m12Data = ['hello', 'world', 'python', 'code', 'ai']
+      m12Result = {
+          word: len(word)
+          for word in m12Data
+          if len(word) > 4
+      }
+      print(m12Result)
+      m12Process = lambda text: text.upper() if len(text) > 4 else text.lower()
+      m12Processed = [m12Process(w) for w in m12Data]
+      print(m12Processed)

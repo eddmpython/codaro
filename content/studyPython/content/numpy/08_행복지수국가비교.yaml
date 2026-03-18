@@ -1,0 +1,340 @@
+meta:
+  id: numpy_08
+  title: 행복지수국가비교
+  order: 8
+  category: numpy
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["numpy", "stack", "split", "tile", "repeat", "meshgrid", "einsum"]
+  seo:
+    title: "NumPy 배열 조작 - 세계 행복지수 국가 비교"
+    description: "NumPy의 고급 배열 조작을 배우며 세계 행복지수 데이터로 국가를 비교 분석합니다."
+    keywords: ["numpy", "stack", "split", "tile", "repeat", "행복지수"]
+
+intro:
+  emoji: "😊"
+  goal: 세계 행복지수 데이터로 고급 배열 조작을 익힙니다.
+  description: 150개국의 행복지수 데이터를 분석합니다. stack, split, tile, repeat 등 고급 배열 조작으로 국가 간 비교와 순위 분석을 수행합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: numpy와 pandas를 불러옵니다
+    content: |-
+      import numpy as np
+      import pandas as pd
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: 행복지수 데이터셋
+  blocks:
+  - type: text
+    content: "유엔(UN)에서 발표하는 World Happiness Report 데이터입니다. 156개국을 대상으로 행복도를 0~10점 척도로 측정했습니다. GDP per capita(1인당 GDP), Social support(사회적 지지), Healthy life expectancy(건강 기대수명), Freedom(자유도) 등 행복에 영향을 주는 요인들도 함께 측정됩니다."
+  - type: code
+    language: python
+    title: 행복지수 데이터 로드
+    description: GitHub에서 행복지수 데이터를 불러옵니다
+    content: |-
+      baseUrl = "https://raw.githubusercontent.com"
+      happyDf = pd.read_csv(f"{baseUrl}/datasets/world-happiness/main/2019.csv")
+      happyDf.head()
+
+- id: step3_extract
+  title: 3단계. 배열 추출
+  subtitle: 주요 지표
+  blocks:
+  - type: text
+    content: 주요 수치형 지표들을 NumPy 배열로 추출합니다.
+  - type: code
+    language: python
+    title: 지표 배열 추출
+    description: 행복점수와 각 요인을 추출합니다
+    content: |-
+      score = happyDf['Score'].values
+      gdp = happyDf['GDP per capita'].values
+      social = happyDf['Social support'].values
+      health = happyDf['Healthy life expectancy'].values
+      freedom = happyDf['Freedom to make life choices'].values
+      country = happyDf['Country or region'].values
+      score.shape
+
+- id: step4_stack
+  title: 4단계. 배열 스택
+  subtitle: np.stack()
+  blocks:
+  - type: text
+    content: "np.stack()은 여러 배열을 새로운 차원을 추가하면서 쌓습니다. 마치 카드를 쌓아 카드 덱을 만드는 것과 같습니다. 4개의 (156,) 배열을 stack하면 (4, 156) 배열이 됩니다. 첫 번째 차원이 '어떤 지표인가'를, 두 번째 차원이 '어느 국가인가'를 나타냅니다."
+  - type: code
+    language: python
+    title: 배열 스택
+    description: 여러 지표를 3차원으로 쌓습니다
+    content: |-
+      indicators = np.stack([gdp, social, health, freedom])
+      indicators.shape
+  - type: tip
+    content: np.stack([a, b, c])은 새로운 축을 추가하여 배열을 쌓습니다. 결과 shape은 (3, 원래길이)가 됩니다. axis 파라미터로 쌓는 방향을 조절할 수 있습니다.
+
+- id: step5_stack_axis
+  title: 5단계. 축 방향 스택
+  subtitle: axis=1
+  blocks:
+  - type: text
+    content: axis=1로 스택하면 열 방향으로 쌓입니다. 결과 shape이 달라집니다.
+  - type: code
+    language: python
+    title: 열 방향 스택
+    description: axis=1로 스택합니다
+    content: |-
+      indicatorsCol = np.stack([gdp, social, health, freedom], axis=1)
+      indicatorsCol.shape
+  - type: tip
+    content: "axis=0(기본): 행 방향으로 쌓아 (4, 156) 형태. axis=1: 열 방향으로 쌓아 (156, 4) 형태가 됩니다."
+
+- id: step6_split
+  title: 6단계. 배열 분할
+  subtitle: np.split()
+  blocks:
+  - type: text
+    content: "np.split()은 배열을 여러 조각으로 나눕니다. 케이크를 N등분하는 것과 같습니다. 먼저 점수순으로 정렬한 뒤, 상위/중위/하위 3개 그룹으로 나눕니다. 주의할 점은 배열 크기가 정확히 나누어 떨어져야 합니다. 156개국을 3으로 나누면 나머지가 생기므로 앞부분만 사용합니다."
+  - type: code
+    language: python
+    title: 3등분
+    description: 배열을 3개 그룹으로 분할합니다
+    content: |-
+      sortIdx = np.argsort(score)[::-1]
+      sortedScore = score[sortIdx]
+      splitSize = len(score) // 3
+      topGroup, midGroup, lowGroup = np.split(sortedScore[:splitSize*3], 3)
+      f"상위: {len(topGroup)}개국, 중위: {len(midGroup)}개국, 하위: {len(lowGroup)}개국"
+  - type: tip
+    content: np.split(arr, n)은 배열을 n개의 동일한 크기로 분할합니다. 정확히 나누어 떨어지지 않으면 에러가 발생합니다.
+
+- id: step7_array_split
+  title: 7단계. 유연한 분할
+  subtitle: np.array_split()
+  blocks:
+  - type: text
+    content: "np.array_split()은 split의 유연한 버전입니다. 156개국을 5개 그룹으로 나누면 정확히 나눠지지 않는데(156÷5=31.2), array_split은 앞쪽 그룹에 하나씩 더 배분하여 32, 32, 31, 31, 30개로 나눕니다. 정확한 등분이 불가능할 때 유용합니다."
+  - type: code
+    language: python
+    title: 5개 그룹 분할
+    description: 5개 그룹으로 유연하게 분할합니다
+    content: |-
+      fiveGroups = np.array_split(sortedScore, 5)
+      groupSizes = [len(g) for g in fiveGroups]
+      f"그룹 크기: {groupSizes}"
+  - type: tip
+    content: np.array_split()은 나머지가 있을 때 앞쪽 그룹에 하나씩 더 배분합니다. split과 달리 항상 성공합니다.
+
+- id: step8_tile
+  title: 8단계. 배열 타일링
+  subtitle: np.tile()
+  blocks:
+  - type: text
+    content: "np.tile()은 배열을 타일처럼 반복해서 붙입니다. 화장실 바닥에 같은 타일을 반복해서 깔듯이, 같은 패턴을 여러 번 복사합니다. 세계 평균값 배열(4개 지표)을 156개 국가만큼 반복하면, 각 국가와 세계 평균을 비교하는 계산이 쉬워집니다."
+  - type: code
+    language: python
+    title: 기준값 타일링
+    description: 세계 평균을 국가 수만큼 반복합니다
+    content: |-
+      worldAvg = np.array([np.mean(gdp), np.mean(social), np.mean(health), np.mean(freedom)])
+      worldAvgTiled = np.tile(worldAvg, (len(score), 1))
+      worldAvgTiled.shape
+  - type: tip
+    content: np.tile(arr, reps)는 배열을 reps 횟수만큼 타일처럼 반복합니다. 2D 배열의 경우 (행 반복, 열 반복) 형태로 지정합니다.
+
+- id: step9_compare_world
+  title: 9단계. 세계 평균 비교
+  subtitle: 브로드캐스팅
+  blocks:
+  - type: text
+    content: 각 국가 지표가 세계 평균 대비 얼마나 높은지 계산합니다.
+  - type: code
+    language: python
+    title: 평균 대비 비율
+    description: 세계 평균 대비 각 국가의 비율을 계산합니다
+    content: |-
+      ratioToWorld = indicatorsCol / worldAvgTiled
+      ratioToWorld[:5]
+
+- id: step10_repeat
+  title: 10단계. 요소 반복
+  subtitle: np.repeat()
+  blocks:
+  - type: text
+    content: "np.repeat()는 각 요소를 개별적으로 반복합니다. tile이 [1,2,3] → [1,2,3,1,2,3]이라면, repeat는 [1,2,3] → [1,1,2,2,3,3]입니다. 각 그룹의 라벨을 해당 그룹 크기만큼 반복해서 '1그룹, 1그룹, ..., 2그룹, 2그룹, ...'처럼 모든 국가에 그룹 번호를 할당할 수 있습니다."
+  - type: code
+    language: python
+    title: 요소 반복
+    description: 각 그룹 라벨을 반복합니다
+    content: |-
+      groupLabels = np.array([1, 2, 3])
+      repeatLabels = np.repeat(groupLabels, [len(topGroup), len(midGroup), len(lowGroup)])
+      repeatLabels.shape
+  - type: tip
+    content: np.repeat(arr, n)은 각 요소를 n번 반복합니다. n이 배열이면 각 요소마다 다른 횟수로 반복할 수 있습니다.
+
+- id: step11_meshgrid
+  title: 11단계. 좌표 그리드
+  subtitle: np.meshgrid()
+  blocks:
+  - type: text
+    content: "np.meshgrid()는 두 배열의 모든 조합을 만듭니다. 체스판의 좌표를 만드는 것과 비슷합니다. x=[1,2], y=[a,b]가 있으면 (1,a), (1,b), (2,a), (2,b) 모든 조합을 생성합니다. 국가 5개의 점수로 meshgrid를 만들면 5×5 = 25개의 모든 국가 쌍을 비교할 수 있습니다."
+  - type: code
+    language: python
+    title: 상위 5개국 비교 그리드
+    description: 상위 5개국 간 모든 조합을 만듭니다
+    content: |-
+      top5Score = score[sortIdx[:5]]
+      top5Country = country[sortIdx[:5]]
+      scoreGrid1, scoreGrid2 = np.meshgrid(top5Score, top5Score)
+      scoreGrid1.shape
+  - type: tip
+    content: np.meshgrid(x, y)는 두 1D 배열로 2D 좌표 그리드를 만듭니다. 모든 (x, y) 조합을 표현할 때 사용합니다.
+
+- id: step12_pairwise_diff
+  title: 12단계. 쌍별 차이
+  subtitle: 행렬 연산
+  blocks:
+  - type: text
+    content: meshgrid로 만든 그리드로 모든 국가 쌍의 점수 차이를 계산합니다.
+  - type: code
+    language: python
+    title: 점수 차이 행렬
+    description: 상위 5개국 간 점수 차이를 계산합니다
+    content: |-
+      scoreDiff = scoreGrid1 - scoreGrid2
+      diffDf = pd.DataFrame(scoreDiff.round(3), columns=top5Country, index=top5Country)
+      diffDf
+
+- id: step13_clip
+  title: 13단계. 값 제한
+  subtitle: np.clip()
+  blocks:
+  - type: text
+    content: "np.clip()은 값의 범위를 제한합니다. 마치 종이를 자르듯이 지정한 최소/최대 범위를 벗어나는 값을 잘라냅니다. np.clip(score, 5, 7)은 5보다 작은 값은 5로, 7보다 큰 값은 7로 바꿉니다. 극단적인 이상치(outlier)가 분석을 왜곡하는 것을 방지할 때 유용합니다."
+  - type: code
+    language: python
+    title: 점수 범위 제한
+    description: 점수를 5~7 범위로 제한합니다
+    content: |-
+      clippedScore = np.clip(score, 5, 7)
+      f"원본 범위: {np.min(score):.2f}~{np.max(score):.2f}, 클리핑 후: {np.min(clippedScore):.2f}~{np.max(clippedScore):.2f}"
+  - type: tip
+    content: np.clip(arr, min, max)는 배열의 값을 min과 max 사이로 제한합니다. min보다 작으면 min으로, max보다 크면 max로 설정됩니다.
+
+- id: step14_searchsorted
+  title: 14단계. 순위 찾기
+  subtitle: np.searchsorted()
+  blocks:
+  - type: text
+    content: "np.searchsorted()는 정렬된 배열에서 특정 값이 들어갈 위치를 찾습니다. 사전에서 단어가 어디에 들어갈지 찾는 것과 같습니다. 오름차순 정렬된 점수 배열에서 각 국가 점수의 위치를 찾으면, 그 위치가 바로 '몇 번째로 낮은가'를 나타내므로 백분위 순위를 계산할 수 있습니다."
+  - type: code
+    language: python
+    title: 백분위 순위
+    description: 각 국가의 백분위 순위를 계산합니다
+    content: |-
+      sortedScoreAsc = np.sort(score)
+      percentileRank = np.searchsorted(sortedScoreAsc, score) / len(score) * 100
+      f"한국(대략 54위): 상위 {100 - percentileRank[53]:.1f}%"
+  - type: tip
+    content: np.searchsorted(sorted_arr, values)는 정렬된 배열에서 values가 삽입될 인덱스를 반환합니다. 이진 탐색을 사용하여 매우 빠릅니다.
+
+- id: step15_composite
+  title: 15단계. 종합 지수 계산
+  subtitle: 가중 평균
+  blocks:
+  - type: text
+    content: "가중 평균은 각 요소에 중요도(가중치)를 곱해서 평균을 구하는 방법입니다. 단순 평균은 모든 요소를 동등하게 취급하지만, 가중 평균은 '더 중요한 요소에 더 큰 비중'을 줍니다. 여기서는 GDP 30%, 사회적 지지 25%, 건강 25%, 자유 20%의 가중치로 종합 점수를 계산합니다."
+  - type: code
+    language: python
+    title: 종합 지수
+    description: 가중 평균으로 종합 지수를 계산합니다
+    content: |-
+      weights = np.array([0.3, 0.25, 0.25, 0.2])
+      compositeScore = np.sum(indicatorsCol * weights, axis=1)
+      compositeRank = np.argsort(compositeScore)[::-1]
+      pd.DataFrame({
+          'Country': country[compositeRank[:10]],
+          'CompositeScore': compositeScore[compositeRank[:10]].round(3),
+          'OriginalScore': score[compositeRank[:10]]
+      })
+
+- id: practice
+  title: 실습
+  subtitle: 행복지수 국가 비교
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 대륙별 행복지수 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        url = "https://raw.githubusercontent.com"
+        data = pd.read_csv(f"{url}/datasets/world-happiness/main/2019.csv")
+        score = data['Score'].values
+        country = data['Country or region'].values
+    - type: code
+      title: "티어별 분석"
+      content: |-
+        idx = np.argsort(score)[::-1]
+        sorted1 = score[idx]
+        sorted2 = country[idx]
+        groups = np.array_split(np.arange(len(score)), 5)
+        rows = []
+        for i, grp in enumerate(groups):
+            arr = sorted1[grp]
+            rows.append({
+                'Tier': f'Tier {i+1}',
+                'Count': len(grp),
+                'MeanScore': np.mean(arr).round(3),
+                'StdScore': np.std(arr).round(3),
+                'MinScore': np.min(arr).round(3),
+                'MaxScore': np.max(arr).round(3)
+            })
+        pd.DataFrame(rows)
+  - type: expansion
+    title: "미션2: 국가 간 유사도 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        src = "https://raw.githubusercontent.com"
+        df = pd.read_csv(f"{src}/datasets/world-happiness/main/2019.csv")
+        gdp = df['GDP per capita'].values
+        social = df['Social support'].values
+        health = df['Healthy life expectancy'].values
+        freedom = df['Freedom to make life choices'].values
+        country = df['Country or region'].values
+    - type: code
+      title: "유사도 분석"
+      content: |-
+        matrix = np.stack([gdp, social, health, freedom], axis=1)
+        avg = np.mean(matrix, axis=0)
+        std = np.std(matrix, axis=0)
+        norm = (matrix - avg) / std
+        top10 = np.argsort(df['Score'].values)[::-1][:10]
+        arr = norm[top10]
+        names = country[top10]
+        dist = np.zeros((10, 10))
+        for i in range(10):
+            for j in range(10):
+                dist[i, j] = np.sqrt(np.sum((arr[i] - arr[j])**2))
+        pd.DataFrame(dist.round(2), columns=names, index=names)

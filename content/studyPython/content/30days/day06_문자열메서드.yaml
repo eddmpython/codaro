@@ -1,0 +1,470 @@
+meta:
+  id: day06
+  title: "문자열 메서드"
+  day: 6
+  category: 30days
+  tags: []
+  seo:
+    title: "파이썬 문자열 메서드 완벽 가이드"
+    description: "upper, lower, split, join, replace, strip, find, count 등 유용한 문자열 메서드를 배웁니다."
+    keywords: ['문자열 메서드', 'string method', 'upper', 'lower', 'split']
+
+intro:
+  emoji: "🛠️"
+  points:
+  - "대소문자 변환 메서드"
+  - "공백 제거와 문자열 정리"
+  - "문자열 치환과 검색"
+  - "문자열 분할과 개수 세기"
+
+sections:
+- id: method_upper
+  title: "대문자 변환"
+  subtitle: "upper()로 모두 대문자로"
+  blocks:
+  - type: text
+    content: "upper() 메서드는 문자열의 모든 문자를 대문자로 변환합니다. 영문자만 영향을 받으며, 숫자나 특수문자는 그대로 유지됩니다. 원본 문자열은 변경되지 않고 새로운 문자열을 반환합니다."
+  - type: list
+    items:
+    - "모든 문자를 대문자로 변환"
+    - "원본은 변경되지 않음"
+    - "새로운 문자열 반환"
+  - type: code
+    language: python
+    title: "대문자 변환"
+    description: "문자열을 모두 대문자로 변환합니다."
+    content: |-
+      text = 'hello python'
+      text.upper()
+
+- id: method_lower
+  title: "소문자 변환"
+  subtitle: "lower()로 모두 소문자로"
+  blocks:
+  - type: text
+    content: "lower() 메서드는 문자열의 모든 문자를 소문자로 변환합니다. 대소문자 구분 없이 비교할 때 자주 사용됩니다. 원본 문자열은 그대로 유지됩니다."
+  - type: list
+    items:
+    - "모든 문자를 소문자로 변환"
+    - "대소문자 구분 없는 비교에 유용"
+    - "원본은 유지됨"
+  - type: code
+    language: python
+    title: "소문자 변환"
+    description: "문자열을 모두 소문자로 변환합니다."
+    content: |-
+      msg = 'HELLO PYTHON'
+      msg.lower()
+
+- id: method_capitalize
+  title: "첫 글자 대문자"
+  subtitle: "capitalize()로 첫 문자만 대문자"
+  blocks:
+  - type: text
+    content: "capitalize() 메서드는 문자열의 첫 번째 문자만 대문자로 만들고 나머지는 모두 소문자로 변환합니다. 문장의 시작을 정리할 때 유용합니다."
+  - type: list
+    items:
+    - "첫 문자만 대문자"
+    - "나머지는 모두 소문자"
+    - "문장 시작 정리에 유용"
+  - type: code
+    language: python
+    title: "첫 글자 대문자"
+    description: "첫 문자만 대문자로 변환합니다."
+    content: |-
+      phrase = 'hello PYTHON'
+      phrase.capitalize()
+
+- id: method_title
+  title: "제목 형식"
+  subtitle: "title()로 각 단어 첫 글자 대문자"
+  blocks:
+  - type: text
+    content: "title() 메서드는 각 단어의 첫 글자를 대문자로 만듭니다. 공백이나 특수문자로 구분된 각 단어마다 적용됩니다. 제목이나 이름을 정리할 때 사용합니다."
+  - type: list
+    items:
+    - "각 단어 첫 글자 대문자"
+    - "나머지는 소문자"
+    - "제목 형식으로 변환"
+  - type: code
+    language: python
+    title: "제목 형식"
+    description: "각 단어의 첫 글자를 대문자로 만듭니다."
+    content: |-
+      sentence = 'hello python programming'
+      sentence.title()
+
+- id: method_strip
+  title: "양쪽 공백 제거"
+  subtitle: "strip()으로 공백 정리"
+  blocks:
+  - type: text
+    content: "strip() 메서드는 문자열 양쪽 끝의 공백을 제거합니다. 사용자 입력을 정리하거나 데이터를 깔끔하게 만들 때 자주 사용됩니다. 문자열 중간의 공백은 제거하지 않습니다."
+  - type: list
+    items:
+    - "양쪽 끝 공백 제거"
+    - "중간 공백은 유지"
+    - "입력 데이터 정리에 유용"
+  - type: code
+    language: python
+    title: "공백 제거"
+    description: "문자열 양쪽의 공백을 제거합니다."
+    content: |-
+      raw = '   hello python   '
+      raw.strip()
+
+- id: method_lstrip_rstrip
+  title: "한쪽 공백 제거"
+  subtitle: "lstrip(), rstrip()으로 한쪽만 제거"
+  blocks:
+  - type: text
+    content: "lstrip()은 왼쪽 공백만, rstrip()은 오른쪽 공백만 제거합니다. l은 left(왼쪽), r은 right(오른쪽)를 의미합니다. 특정 방향의 공백만 제거할 때 사용합니다."
+  - type: list
+    items:
+    - "lstrip(): 왼쪽 공백 제거"
+    - "rstrip(): 오른쪽 공백 제거"
+    - "한쪽만 정리 가능"
+  - type: code
+    language: python
+    title: "왼쪽 공백 제거"
+    description: "lstrip()으로 왼쪽 공백만 제거합니다."
+    content: |-
+      left = '   hello   '
+      left.lstrip()
+  - type: code
+    language: python
+    title: "오른쪽 공백 제거"
+    description: "rstrip()으로 오른쪽 공백만 제거합니다."
+    content: |-
+      right = '   hello   '
+      right.rstrip()
+
+- id: method_replace
+  title: "문자열 치환"
+  subtitle: "replace()로 문자 바꾸기"
+  blocks:
+  - type: text
+    content: "replace() 메서드는 문자열 안의 특정 부분을 다른 문자열로 바꿉니다. replace(찾을문자, 바꿀문자) 형태로 사용하며, 모든 일치하는 부분을 바꿉니다. 원본은 변경되지 않습니다."
+  - type: list
+    items:
+    - "문자열 치환"
+    - "모든 일치 부분 변경"
+    - "replace(old, new) 형태"
+  - type: code
+    language: python
+    title: "문자열 치환"
+    description: "특정 문자를 다른 문자로 바꿉니다."
+    content: |-
+      greeting = 'Hello World'
+      greeting.replace('World', 'Python')
+
+- id: method_replace_all
+  title: "여러 개 치환"
+  subtitle: "모든 일치 항목 바꾸기"
+  blocks:
+  - type: text
+    content: "replace()는 기본적으로 일치하는 모든 부분을 바꿉니다. 같은 문자가 여러 번 나와도 모두 치환됩니다. 공백을 다른 문자로 바꾸거나 특정 패턴을 제거할 때 유용합니다."
+  - type: list
+    items:
+    - "모든 일치 부분 치환"
+    - "여러 번 반복 가능"
+    - "공백 제거/변경에 유용"
+  - type: code
+    language: python
+    title: "여러 개 치환"
+    description: "같은 문자가 여러 번 나올 때 모두 바꿉니다."
+    content: |-
+      allText = 'apple apple orange apple'
+      allText.replace('apple', 'banana')
+
+- id: method_count
+  title: "문자열 개수 세기"
+  subtitle: "count()로 등장 횟수 확인"
+  blocks:
+  - type: text
+    content: "count() 메서드는 문자열에서 특정 문자나 문자열이 몇 번 등장하는지 셉니다. 결과는 정수로 반환되며, 없으면 0을 반환합니다. 대소문자를 구분합니다."
+  - type: list
+    items:
+    - "등장 횟수 세기"
+    - "결과는 정수"
+    - "대소문자 구분"
+  - type: code
+    language: python
+    title: "개수 세기"
+    description: "특정 문자가 몇 번 나오는지 셉니다."
+    content: |-
+      words = 'hello hello world hello'
+      words.count('hello')
+
+- id: method_find
+  title: "문자열 위치 찾기"
+  subtitle: "find()로 첫 등장 위치 확인"
+  blocks:
+  - type: text
+    content: "find() 메서드는 문자열에서 특정 문자나 문자열이 처음 나타나는 위치(인덱스)를 반환합니다. 찾지 못하면 -1을 반환합니다. 문자열의 위치를 확인할 때 사용합니다."
+  - type: list
+    items:
+    - "첫 등장 위치 반환"
+    - "못 찾으면 -1 반환"
+    - "인덱스로 결과 제공"
+  - type: code
+    language: python
+    title: "위치 찾기"
+    description: "특정 문자가 처음 나오는 위치를 찾습니다."
+    content: |-
+      code = 'Hello Python Programming'
+      code.find('Python')
+
+- id: method_find_notfound
+  title: "찾기 실패"
+  subtitle: "없는 문자 찾을 때"
+  blocks:
+  - type: text
+    content: "find() 메서드로 문자열을 찾지 못하면 -1을 반환합니다. 이를 활용하여 특정 문자열의 존재 여부를 확인할 수 있습니다. in 연산자와 비슷하지만 위치 정보도 함께 얻을 수 있습니다."
+  - type: list
+    items:
+    - "못 찾으면 -1 반환"
+    - "존재 여부 확인 가능"
+    - "in 연산자와 유사"
+  - type: code
+    language: python
+    title: "찾기 결과"
+    description: "없는 문자를 찾으면 -1을 반환합니다."
+    content: |-
+      text = 'Hello World'
+      result = text.find('Python')
+      print('found:', result)
+  - type: code
+    language: python
+    title: "존재 여부 확인"
+    description: "find 결과로 존재 여부를 확인합니다."
+    content: |-
+      msg = 'Hello World'
+      exists = msg.find('Python') != -1
+      print('exists:', exists)
+
+- id: method_startswith
+  title: "시작 문자 확인"
+  subtitle: "startswith()로 시작 여부 확인"
+  blocks:
+  - type: text
+    content: "startswith() 메서드는 문자열이 특정 문자로 시작하는지 확인합니다. 결과는 True 또는 False입니다. URL이 http로 시작하는지, 파일명이 특정 문자로 시작하는지 등을 확인할 때 유용합니다."
+  - type: list
+    items:
+    - "시작 문자 확인"
+    - "결과는 True/False"
+    - "URL, 파일명 검증에 유용"
+  - type: code
+    language: python
+    title: "시작 문자 확인"
+    description: "특정 문자로 시작하는지 확인합니다."
+    content: |-
+      title = 'Python Programming'
+      title.startswith('Python')
+
+- id: method_endswith
+  title: "끝 문자 확인"
+  subtitle: "endswith()로 종료 여부 확인"
+  blocks:
+  - type: text
+    content: "endswith() 메서드는 문자열이 특정 문자로 끝나는지 확인합니다. 파일 확장자 확인이나 문장 부호 확인 등에 자주 사용됩니다. 결과는 True 또는 False입니다."
+  - type: list
+    items:
+    - "끝 문자 확인"
+    - "결과는 True/False"
+    - "파일 확장자 검증에 유용"
+  - type: code
+    language: python
+    title: "끝 문자 확인"
+    description: "특정 문자로 끝나는지 확인합니다."
+    content: |-
+      file = 'script.py'
+      file.endswith('.py')
+
+- id: practice
+  title: "Day 6 종합 복습"
+  subtitle: "문자열 메서드 마스터하기"
+  blocks:
+  - type: text
+    content: "Day 6에서 배운 문자열 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: expansion
+    title: "🟢 기본1: 대문자 변환"
+    code: |-
+      greet = 'hello world'
+      greet.upper()
+
+  - type: expansion
+    title: "🟢 기본2: 소문자 변환"
+    code: |-
+      lang = 'PYTHON'
+      lang.lower()
+
+  - type: expansion
+    title: "🟢 기본3: 공백 제거"
+    code: |-
+      raw = '  hello  '
+      raw.strip()
+
+  - type: expansion
+    title: "🟢 기본4: 문자열 치환"
+    code: |-
+      msg = 'Hello Java'
+      msg.replace('Java', 'Python')
+
+  - type: expansion
+    title: "🟢 기본5: 개수 세기"
+    code: |-
+      fruits = 'apple banana apple orange apple'
+      fruits.count('apple')
+
+  - type: expansion
+    title: "🟡 응용1: 이름 정리"
+    code: |-
+      name = '  HONG GIL DONG  '
+      name.strip().title()
+
+  - type: expansion
+    title: "🟡 응용2: 파일 확장자 확인"
+    blocks:
+    - type: code
+      title: "PDF 확인"
+      content: |-
+        file1 = 'document.pdf'
+        isPdf = file1.endswith('.pdf')
+        print('is_pdf:', isPdf)
+    - type: code
+      title: "TXT 확인"
+      content: |-
+        file2 = 'document.pdf'
+        isTxt = file2.endswith('.txt')
+        print('is_txt:', isTxt)
+
+  - type: expansion
+    title: "🟡 응용3: URL 검증"
+    blocks:
+    - type: code
+      title: "HTTPS 확인"
+      content: |-
+        url1 = 'https://www.python.org'
+        isSecure = url1.startswith('https')
+        print('is_secure:', isSecure)
+    - type: code
+      title: "WWW 포함 확인"
+      content: |-
+        url2 = 'https://www.python.org'
+        hasWww = 'www' in url2
+        print('has_www:', hasWww)
+
+  - type: expansion
+    title: "🟡 응용4: 문자 치환"
+    code: |-
+      phone = '010-1234-5678'
+      phone.replace('-', '')
+
+  - type: expansion
+    title: "🟡 응용5: 위치 찾기"
+    blocks:
+    - type: code
+      title: "@ 위치"
+      content: |-
+        email1 = 'user@example.com'
+        atPos = email1.find('@')
+        print('at_position:', atPos)
+    - type: code
+      title: ". 위치"
+      content: |-
+        email2 = 'user@example.com'
+        dotPos = email2.find('.')
+        print('dot_position:', dotPos)
+
+  - type: expansion
+    title: "🔴 심화1: 문자열 정규화"
+    code: |-
+      messy = '  HELLO   WORLD  '
+      messy.strip().lower().replace('  ', ' ')
+
+  - type: expansion
+    title: "🔴 심화2: 비밀번호 검증"
+    blocks:
+    - type: code
+      title: "숫자 포함 여부"
+      content: |-
+        secret = 'MyPass123'
+        hasNum = secret.count('1') > 0 or secret.count('2') > 0 or secret.count('3') > 0
+        print('has_number:', hasNum)
+    - type: code
+      title: "최소 길이 확인"
+      content: |-
+        passKey = 'MyPass123'
+        minLen = len(passKey) >= 8
+        print('min_length:', minLen)
+    - type: code
+      title: "대문자 포함 여부"
+      content: |-
+        credential = 'MyPass123'
+        hasUpper = credential != credential.lower()
+        print('has_upper:', hasUpper)
+
+  - type: expansion
+    title: "🔴 심화3: 문자열 분석"
+    blocks:
+    - type: code
+      title: "Hello 개수"
+      content: |-
+        sample = 'Hello World! Hello Python!'
+        helloCount = sample.count('Hello')
+        print('hello_count:', helloCount)
+    - type: code
+      title: "느낌표 위치"
+      content: |-
+        sentence = 'Hello World! Hello Python!'
+        exclaimPos = sentence.find('!')
+        print('exclaim_pos:', exclaimPos)
+    - type: code
+      title: "대문자 버전"
+      content: |-
+        phrase = 'Hello World! Hello Python!'
+        upperVer = phrase.upper()
+        print('upper_version:', upperVer)
+    - type: code
+      title: "느낌표 제거"
+      content: |-
+        origin = 'Hello World! Hello Python!'
+        noExclaim = origin.replace('!', '')
+        print('no_exclaim:', noExclaim)
+
+  - type: expansion
+    title: "🔴 심화4: 데이터 정제"
+    code: |-
+      data = '  Product: APPLE  '
+      clean = data.strip().replace('Product:', '').strip().title()
+      clean
+
+  - type: expansion
+    title: "🔴 심화5: 여러 메서드 조합"
+    blocks:
+    - type: code
+      title: "소문자 변환"
+      content: |-
+        hyphen = 'HELLO-WORLD-PYTHON'
+        lower = hyphen.lower()
+        print('lowercase:', lower)
+    - type: code
+      title: "대시를 공백으로"
+      content: |-
+        dashed = 'HELLO-WORLD-PYTHON'
+        noDash = dashed.replace('-', ' ')
+        print('replace_dash:', noDash)
+    - type: code
+      title: "제목 형식 변환"
+      content: |-
+        kebab = 'HELLO-WORLD-PYTHON'
+        titled = kebab.replace('-', ' ').title()
+        print('title_no_dash:', titled)
+    - type: code
+      title: "대시 개수"
+      content: |-
+        chain = 'HELLO-WORLD-PYTHON'
+        dashCount = chain.count('-')
+        print('count_dash:', dashCount)

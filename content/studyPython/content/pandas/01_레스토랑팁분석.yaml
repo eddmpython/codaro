@@ -1,0 +1,224 @@
+meta:
+  id: pandas_01
+  title: 레스토랑팁분석
+  order: 1
+  category: pandas
+  difficulty: "⭐"
+  badge: 입문
+  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv
+  tags: ["tips", "기초", "read_csv", "describe"]
+  seo:
+    title: "pandas 팁 데이터 분석 - read_csv, describe 기초"
+    description: "레스토랑 팁 데이터로 pandas 기초를 배웁니다. CSV 불러오기, DataFrame 구조, 컬럼 선택, 평균/최대/최소 통계를 실습합니다."
+    keywords: ["pandas read_csv", "DataFrame", "describe", "mean", "팁 데이터분석"]
+
+intro:
+  emoji: "🍽️"
+  goal: 레스토랑 팁 데이터에서 "평균 팁은 얼마일까?"를 알아봅니다.
+  description: pandas는 엑셀처럼 표 데이터를 다루는 도구입니다. 불러오기 → 구조 파악 → 컬럼 선택 → 통계의 흐름을 익힙니다.
+
+sections:
+- id: step1_import
+  title: 1단계. pandas 불러오기
+  subtitle: import pandas as pd
+  blocks:
+  - type: text
+    content: pandas는 파이썬에서 표(DataFrame) 형태의 데이터를 다루는 강력한 도구입니다. 엑셀의 시트와 비슷하게 행과 열로 구성된 데이터를 쉽게 분석할 수 있습니다. 데이터 과학과 분석 작업의 핵심 라이브러리로, CSV, 엑셀, 데이터베이스 등 다양한 형식의 데이터를 불러오고 처리할 수 있습니다.
+  - type: code
+    language: python
+    title: pandas 불러오기
+    description: import로 pandas를 가져오고 pd라는 별명을 붙입니다
+    content: |-
+      import pandas as pd
+
+  - type: tip
+    content: "import pandas as pd는 pandas 라이브러리를 pd라는 짧은 이름으로 불러오는 관례입니다. pd.read_csv()처럼 매번 pandas.read_csv()라고 쓰지 않고 짧게 pd로 사용할 수 있습니다. 거의 모든 pandas 코드에서 이렇게 시작합니다. 참고로 as pd를 붙이지 않고 import pandas 상태에서는 pandas.read_csv같이 사용할 수 있습니다. 이때 pandas.read_csv가 너무 길어지니 줄여서 pd로 사용하겠단 의미로 import pandas as pd를 합니다."
+
+- id: step2_load
+  title: 2단계. CSV 불러오기
+  subtitle: pd.read_csv()
+  blocks:
+  - type: text
+    content: CSV(Comma-Separated Values) 파일을 pandas의 DataFrame으로 불러옵니다. CSV는 콤마로 구분된 텍스트 파일로, 가장 흔하게 사용되는 데이터 형식입니다. pandas는 로컬 파일뿐만 아니라 인터넷 URL에서도 직접 데이터를 읽어올 수 있어 매우 편리합니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: URL에서 CSV 파일을 가져와서 tips 변수에 저장
+    content: |-
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+      tips = pd.read_csv(url)
+
+  - type: tip
+    content: "pd.read_csv()는 CSV 파일을 DataFrame으로 변환합니다. 로컬 경로('data.csv')나 URL 모두 사용 가능합니다. DataFrame은 pandas의 핵심 데이터 구조로, 행과 열로 구성된 2차원 표입니다."
+
+- id: step3_preview
+  title: 3단계. 표 확인하기
+  subtitle: 변수명만 입력
+  blocks:
+  - type: text
+    content: Jupyter나 marimo 같은 노트북 환경에서는 변수명만 입력하면 자동으로 표 형태로 예쁘게 출력됩니다. 이 데이터는 244명의 레스토랑 손님 정보로, 각 손님의 결제 금액, 팁, 성별, 흡연 여부, 요일, 시간대, 일행 수 등 7가지 정보가 담겨 있습니다.
+  - type: code
+    language: python
+    title: 표 확인하기
+    description: 변수명만 입력하면 표가 보입니다
+    content: |-
+      tips
+
+- id: step4_shape
+  title: 4단계. 크기 확인
+  subtitle: .shape
+  blocks:
+  - type: text
+    content: shape 속성은 DataFrame의 크기를 (행 수, 열 수) 튜플 형태로 반환합니다. 이 데이터는 (244, 7)로, 244개의 행(레코드)과 7개의 열(컬럼)을 가지고 있습니다. 데이터 분석을 시작할 때 전체 데이터의 규모를 파악하는 것이 중요합니다.
+  - type: code
+    language: python
+    title: 크기 확인
+    description: .shape는 (행, 열) 형태로 크기를 보여줍니다
+    content: |-
+      tips.shape
+
+  - type: tip
+    content: ".shape는 함수가 아니라 속성이므로 괄호 ()를 붙이지 않습니다. tips.shape()라고 쓰면 에러가 발생합니다. 속성은 값을 저장하고 있고, 메서드(함수)는 어떤 동작을 수행합니다."
+
+- id: step5_head
+  title: 5단계. 처음 5행 보기
+  subtitle: .head()
+  blocks:
+  - type: text
+    content: head() 메서드는 DataFrame의 처음 5행만 보여줍니다. 전체 데이터를 다 출력하면 화면이 너무 길어지므로, 데이터의 구조와 형태를 빠르게 파악할 때 매우 유용합니다. 괄호 안에 숫자를 넣으면 원하는 개수만큼 볼 수 있습니다. 예를 들어 head(10)은 처음 10행을 출력합니다.
+  - type: code
+    language: python
+    title: 처음 5행 보기
+    description: .head()는 처음 5행만 보여줍니다
+    content: |-
+      tips.head()
+
+- id: step6_columns
+  title: 6단계. 컬럼 목록
+  subtitle: .columns
+  blocks:
+  - type: text
+    content: columns 속성은 DataFrame에 어떤 컬럼(열)들이 있는지 이름 목록을 보여줍니다. 데이터를 분석하기 전에 어떤 정보들이 포함되어 있는지 확인하는 것이 중요합니다. 이 데이터에는 total_bill(총 결제 금액), tip(팁), sex(성별), smoker(흡연 여부), day(요일), time(시간대), size(일행 수) 등이 있습니다.
+  - type: code
+    language: python
+    title: 컬럼 목록
+    description: .columns는 컬럼 이름들을 보여줍니다
+    content: |-
+      tips.columns
+
+- id: step7_select
+  title: 7단계. tip 컬럼 선택
+  subtitle: 대괄호로 선택
+  blocks:
+  - type: text
+    content: DataFrame에서 특정 컬럼만 선택하려면 대괄호 []를 사용합니다. DataFrame['컬럼명'] 형태로 작성하면 해당 컬럼의 모든 값들을 Series 형태로 가져올 수 있습니다. Series는 pandas의 1차원 데이터 구조로, 하나의 열을 나타냅니다. 여기서는 244명 손님의 팁 금액만 선택합니다.
+  - type: code
+    language: python
+    title: tip 컬럼 선택
+    description: 대괄호와 따옴표로 컬럼을 선택합니다
+    content: |-
+      tips['tip']
+
+  - type: tip
+    content: "컬럼 선택 시 컬럼명은 반드시 따옴표로 감싸야 합니다. tips['tip']처럼 작은따옴표나 큰따옴표 모두 사용 가능합니다. 공백이나 특수문자가 포함된 컬럼명도 동일하게 선택할 수 있습니다."
+
+- id: step8_mean
+  title: 8단계. 평균 팁 구하기
+  subtitle: .mean()
+  blocks:
+  - type: text
+    content: Series나 DataFrame의 숫자 컬럼에 .mean() 메서드를 붙이면 평균값을 계산합니다. 이 프로젝트의 목표인 "평균 팁은 얼마일까?"의 답을 드디어 구할 수 있습니다! 244명의 팁을 모두 더해서 개수로 나눈 값이 자동으로 계산됩니다. 평균 팁은 약 $3.00입니다.
+  - type: code
+    language: python
+    title: 평균 팁 구하기
+    description: .mean()은 평균을 계산합니다
+    content: |-
+      tips['tip'].mean()
+
+- id: step9_maxmin
+  title: 9단계. 최대/최소 팁
+  subtitle: .max(), .min()
+  blocks:
+  - type: text
+    content: mean()과 마찬가지로 max()는 최대값, min()은 최소값을 구하는 메서드입니다. 평균뿐만 아니라 데이터의 범위(최소~최대)를 파악하면 데이터를 더 잘 이해할 수 있습니다. 이 데이터에서 가장 많이 준 팁은 $10.00, 가장 적게 준 팁은 $1.00입니다. 두 값을 콤마로 연결하면 한 번에 볼 수 있습니다.
+  - type: code
+    language: python
+    title: 최대/최소 팁
+    description: .max()는 최대값, .min()은 최소값
+    content: |-
+      tips['tip'].max(), tips['tip'].min()
+
+- id: step10_describe
+  title: 10단계. 한번에 통계 보기
+  subtitle: .describe()
+  blocks:
+  - type: text
+    content: describe() 메서드는 숫자 컬럼들의 주요 통계량을 한 번에 보여주는 매우 유용한 함수입니다. count(개수), mean(평균), std(표준편차), min(최소), 25%(1사분위수), 50%(중앙값), 75%(3사분위수), max(최대)가 자동으로 계산됩니다. 데이터 분석의 첫 단계에서 전체적인 데이터 분포를 파악하는 데 필수적입니다.
+  - type: code
+    language: python
+    title: 전체 통계
+    description: .describe()는 숫자 컬럼의 통계를 요약합니다
+    content: |-
+      tips.describe()
+
+  - type: tip
+    content: "describe()는 숫자형 컬럼만 자동으로 선택해서 통계를 보여줍니다. 문자형 컬럼(sex, day 등)은 제외됩니다. 만약 문자형 컬럼의 통계를 보고 싶다면 describe(include='object')를 사용하면 됩니다."
+
+- id: practice
+  title: 실습
+  subtitle: 팁 데이터 분석 프로젝트
+  blocks:
+  - type: text
+    content: 레스토랑 매니저가 되어 배운 모든 개념을 활용해서 팁 데이터를 분석해봅시다. 데이터 불러오기, 컬럼 선택, 통계 계산(mean, max, min, describe) 등 지금까지 배운 내용을 모두 사용합니다.
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 평균 결제 금액과 팁 비율 계산"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+    - type: code
+      title: "분석 수행"
+      content: |-
+        avgBill = data['total_bill'].mean()
+        avgTip = data['tip'].mean()
+        tipRatio = (avgTip / avgBill * 100)
+        (avgBill, avgTip, tipRatio)
+  - type: expansion
+    title: "미션2: 여러 컬럼 통계 종합 분석 (max, min, describe)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+    - type: code
+      title: "분석 수행"
+      content: |-
+        maxBill = df['total_bill'].max()
+        minBill = df['total_bill'].min()
+        sizeStats = df['size'].describe()
+        (maxBill, minBill, sizeStats)
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 데이터 분석의 기본 흐름을 익혔습니다.
+  - type: list
+    items:
+    - "import pandas as pd - pandas 불러오기"
+    - "pd.read_csv(url) - CSV를 DataFrame으로"
+    - "df.shape - 크기 (행, 열)"
+    - "df.head() - 처음 5행"
+    - "df.columns - 컬럼 목록"
+    - "df['컬럼명'] - 특정 컬럼 선택"
+    - "df['컬럼명'].mean() - 평균"
+    - "df['컬럼명'].max() - 최대값"
+    - "df['컬럼명'].min() - 최소값"
+    - "df.describe() - 전체 통계 요약"
+  - type: text
+    content: 다음 시간에는 타이타닉 데이터로 조건 필터링을 배웁니다.

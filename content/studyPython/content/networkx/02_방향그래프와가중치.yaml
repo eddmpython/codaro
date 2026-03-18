@@ -1,0 +1,377 @@
+meta:
+  id: networkx_02
+  title: 방향그래프와가중치
+  order: 2
+  category: networkx
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["networkx", "DiGraph", "방향그래프", "가중치", "속성"]
+  seo:
+    title: "NetworkX 방향 그래프와 가중치"
+    description: "DiGraph로 방향 그래프를 만들고, 엣지에 가중치를 추가합니다. 노드와 엣지 속성을 관리하는 방법을 배웁니다."
+    keywords: ["networkx", "DiGraph", "방향그래프", "가중치", "속성", "weight"]
+
+intro:
+  emoji: "➡️"
+  goal: 방향 그래프와 가중치 그래프를 만들고 속성을 관리합니다.
+  description: 방향 그래프(DiGraph)는 엣지에 방향이 있습니다. A→B와 B→A는 다른 연결입니다. 가중치 그래프는 엣지에 수치가 있어 거리, 비용 등을 표현합니다. 노드와 엣지에 다양한 속성을 추가하는 방법도 배웁니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: "이전 프로젝트와 마찬가지로 NetworkX와 matplotlib을 불러옵니다. 이번 프로젝트에서는 무방향 그래프(Graph) 외에 방향 그래프(DiGraph)를 다룹니다. DiGraph는 Directed Graph의 줄임말로, 엣지에 방향이 있는 그래프입니다. 트위터 팔로우, 웹 링크, 인용 관계 등 비대칭적인 관계를 표현할 때 사용합니다."
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: networkx와 matplotlib을 불러옵니다
+    content: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+- id: step2_digraph
+  title: 2단계. 방향 그래프 생성
+  subtitle: DiGraph()
+  blocks:
+  - type: text
+    content: "nx.DiGraph()로 방향 그래프를 생성합니다. add_edge(u, v)를 호출하면 u에서 v로 향하는 화살표가 생깁니다. 무방향 그래프와 달리 add_edge('A', 'B')와 add_edge('B', 'A')는 서로 다른 두 개의 엣지입니다. 양방향 연결이 필요하면 두 엣지를 모두 추가해야 합니다. has_edge()로 특정 방향의 엣지가 있는지 확인할 수 있습니다."
+  - type: code
+    language: python
+    title: 방향 그래프 생성
+    description: DiGraph 객체 생성
+    content: |-
+      dg = nx.DiGraph()
+      dg.add_edge("A", "B")
+      dg.add_edge("B", "C")
+      dg.add_edge("A", "C")
+      list(dg.edges())
+  - type: code
+    language: python
+    title: 방향 확인
+    description: A→B는 있지만 B→A는 없음
+    content: |-
+      hasAB = dg.has_edge("A", "B")
+      hasBA = dg.has_edge("B", "A")
+      hasAB, hasBA
+  - type: tip
+    content: DiGraph에서 (A, B) 엣지와 (B, A) 엣지는 다릅니다. 무방향 그래프와 달리 방향이 중요합니다.
+
+- id: step3_in_out
+  title: 3단계. 진입/진출 차수
+  subtitle: in_degree(), out_degree()
+  blocks:
+  - type: text
+    content: "방향 그래프에서는 차수(degree)가 두 가지로 나뉩니다. 진입 차수(in-degree)는 해당 노드로 들어오는 화살표의 개수입니다. 트위터에서 팔로워 수에 해당합니다. 진출 차수(out-degree)는 해당 노드에서 나가는 화살표의 개수입니다. 트위터에서 팔로잉 수에 해당합니다. 인기 있는 인플루언서는 진입 차수가 높고, 활동적인 사용자는 진출 차수가 높습니다."
+  - type: code
+    language: python
+    title: 방향 그래프 확장
+    description: 더 많은 엣지 추가
+    content: |-
+      dg2 = nx.DiGraph()
+      dg2.add_edges_from([("A", "B"), ("A", "C"), ("B", "C"), ("C", "D"), ("D", "A")])
+      list(dg2.edges())
+  - type: code
+    language: python
+    title: 진입 차수
+    description: 들어오는 엣지 수
+    content: |-
+      inA = dg2.in_degree("A")
+      inC = dg2.in_degree("C")
+      inA, inC
+  - type: code
+    language: python
+    title: 진출 차수
+    description: 나가는 엣지 수
+    content: |-
+      outA = dg2.out_degree("A")
+      outC = dg2.out_degree("C")
+      outA, outC
+  - type: tip
+    content: in_degree()는 들어오는 화살표 수, out_degree()는 나가는 화살표 수입니다. 일반 degree()는 둘의 합입니다.
+
+- id: step4_visualize_directed
+  title: 4단계. 방향 그래프 시각화
+  subtitle: 화살표 표시
+  blocks:
+  - type: text
+    content: "방향 그래프를 시각화하면 엣지가 화살표로 표시됩니다. nx.draw() 함수는 DiGraph를 감지하면 자동으로 화살표를 그립니다. arrows=True를 명시적으로 지정해도 됩니다. arrowsize 파라미터로 화살표 크기를 조절할 수 있습니다. 노드가 많거나 엣지가 복잡하면 화살표가 겹쳐 보이기 어려울 수 있으므로, 적절한 레이아웃과 크기 조절이 중요합니다."
+  - type: code
+    language: python
+    title: 방향 그래프 그리기
+    description: 화살표가 있는 그래프
+    content: |-
+      posDg = nx.spring_layout(dg2, seed=42)
+      fig1, ax1 = plt.subplots(figsize=(7, 5))
+      nx.draw(dg2, pos=posDg, with_labels=True, node_color='lightcoral',
+              node_size=800, font_size=12, arrows=True,
+              arrowsize=20, edge_color='gray', ax=ax1)
+      ax1.set_title('Directed Graph')
+      fig1
+  - type: tip
+    content: arrowsize로 화살표 크기를 조절합니다. connectionstyle 파라미터로 곡선 화살표도 가능합니다.
+
+- id: step5_weighted
+  title: 5단계. 가중치 그래프
+  subtitle: weight 속성
+  blocks:
+  - type: text
+    content: "엣지에 가중치(weight)를 추가하면 연결의 강도나 비용을 표현할 수 있습니다. add_edge(u, v, weight=값)처럼 키워드 인자로 전달합니다. 도시 간 거리, 운송 비용, 친밀도 점수 등이 가중치가 됩니다. 가중치가 있으면 단순히 연결 여부만 보는 것이 아니라, 어떤 경로가 더 짧은지 또는 비용이 적은지 계산할 수 있습니다. edges(data=True)로 엣지와 가중치를 함께 조회합니다."
+  - type: code
+    language: python
+    title: 가중치 추가
+    description: 엣지에 weight 속성
+    content: |-
+      wg = nx.Graph()
+      wg.add_edge("Seoul", "Busan", weight=325)
+      wg.add_edge("Seoul", "Daejeon", weight=140)
+      wg.add_edge("Daejeon", "Busan", weight=200)
+      wg.add_edge("Seoul", "Gwangju", weight=270)
+      list(wg.edges(data=True))
+  - type: code
+    language: python
+    title: 가중치 조회
+    description: 특정 엣지의 가중치
+    content: |-
+      weightSB = wg["Seoul"]["Busan"]["weight"]
+      weightSD = wg["Seoul"]["Daejeon"]["weight"]
+      weightSB, weightSD
+  - type: tip
+    content: edges(data=True)로 엣지와 속성을 함께 조회합니다. G[u][v]로 특정 엣지의 속성 딕셔너리에 접근합니다.
+
+- id: step6_weighted_visual
+  title: 6단계. 가중치 시각화
+  subtitle: 엣지 라벨
+  blocks:
+  - type: text
+    content: "가중치 정보를 시각화에 표시하면 네트워크를 더 직관적으로 이해할 수 있습니다. nx.draw_networkx_edge_labels() 함수를 사용하면 엣지 위에 텍스트를 표시할 수 있습니다. get_edge_attributes(G, 'weight')로 모든 엣지의 가중치를 딕셔너리로 추출하고, 이를 edge_labels 파라미터에 전달합니다. 도시 간 거리, 비용, 시간 등을 엣지 위에 표시하면 한눈에 네트워크 특성을 파악할 수 있습니다."
+  - type: code
+    language: python
+    title: 가중치 표시
+    description: 엣지에 숫자 표시
+    content: |-
+      posW = nx.spring_layout(wg, seed=42)
+      fig2, ax2 = plt.subplots(figsize=(8, 6))
+      nx.draw(wg, pos=posW, with_labels=True, node_color='lightgreen',
+              node_size=1000, font_size=11, ax=ax2)
+
+      edgeLabels = nx.get_edge_attributes(wg, 'weight')
+      nx.draw_networkx_edge_labels(wg, pos=posW, edge_labels=edgeLabels,
+                                    font_size=10, ax=ax2)
+      ax2.set_title('City Distance Network (km)')
+      fig2
+  - type: tip
+    content: get_edge_attributes()로 특정 속성만 추출하여 라벨로 표시합니다.
+
+- id: step7_node_attr
+  title: 7단계. 노드 속성
+  subtitle: 노드에 정보 추가
+  blocks:
+  - type: text
+    content: "노드에도 다양한 속성을 추가할 수 있습니다. add_node(노드, 속성=값)처럼 키워드 인자로 전달합니다. 사람 노드에 나이, 성별, 도시 정보를 저장하거나, 도시 노드에 인구, 면적, 위도/경도를 저장할 수 있습니다. nodes(data=True)로 모든 노드와 속성을 조회하고, G.nodes[노드][속성]으로 특정 노드의 특정 속성에 접근합니다. 속성을 활용하면 특정 조건의 노드만 필터링하는 것도 가능합니다."
+  - type: code
+    language: python
+    title: 노드 속성 추가
+    description: add_node()에 속성 전달
+    content: |-
+      social = nx.Graph()
+      social.add_node("Alice", age=25, city="Seoul")
+      social.add_node("Bob", age=30, city="Busan")
+      social.add_node("Carol", age=28, city="Seoul")
+      social.add_edge("Alice", "Bob")
+      social.add_edge("Alice", "Carol")
+      social.nodes(data=True)
+  - type: code
+    language: python
+    title: 노드 속성 조회
+    description: 특정 노드의 속성
+    content: |-
+      aliceAge = social.nodes["Alice"]["age"]
+      aliceCity = social.nodes["Alice"]["city"]
+      aliceAge, aliceCity
+  - type: code
+    language: python
+    title: 속성으로 필터링
+    description: 서울에 사는 사람들
+    content: |-
+      seoulPeople = [n for n, d in social.nodes(data=True) if d.get("city") == "Seoul"]
+      seoulPeople
+  - type: tip
+    content: nodes(data=True)는 (노드, 속성딕셔너리) 튜플의 뷰를 반환합니다.
+
+- id: step8_edge_attr
+  title: 8단계. 엣지 속성
+  subtitle: 다양한 엣지 정보
+  blocks:
+  - type: text
+    content: "엣지에는 weight 외에도 원하는 만큼 많은 속성을 추가할 수 있습니다. 관계 유형(친구, 동료, 가족), 관계 시작 연도, 상호작용 빈도 등 다양한 정보를 저장합니다. add_edge(u, v, 속성1=값1, 속성2=값2)처럼 여러 속성을 동시에 추가할 수 있습니다. G[u][v]로 엣지 속성 딕셔너리에 접근하고, 값을 읽거나 수정할 수 있습니다. 속성은 나중에 분석이나 시각화에 활용됩니다."
+  - type: code
+    language: python
+    title: 엣지 속성 추가
+    description: 여러 속성을 가진 엣지
+    content: |-
+      relations = nx.Graph()
+      relations.add_edge("A", "B", relation="friend", since=2020)
+      relations.add_edge("A", "C", relation="colleague", since=2021)
+      relations.add_edge("B", "C", relation="family", since=2015)
+      relations.edges(data=True)
+  - type: code
+    language: python
+    title: 엣지 속성 수정
+    description: 속성 값 변경
+    content: |-
+      relations["A"]["B"]["relation"] = "best_friend"
+      relations["A"]["B"]
+  - type: tip
+    content: G[u][v]로 엣지 속성 딕셔너리에 접근하고 수정할 수 있습니다.
+
+- id: step9_color_by_attr
+  title: 9단계. 속성으로 색상 지정
+  subtitle: 시각화 활용
+  blocks:
+  - type: text
+    content: "노드 속성에 따라 색상을 다르게 지정하면 시각화가 더 의미 있어집니다. 예를 들어 서울에 사는 사람은 파란색, 부산에 사는 사람은 빨간색으로 표시할 수 있습니다. 리스트 컴프리헨션을 사용해 각 노드의 속성값에 해당하는 색상 리스트를 만들고, 이를 node_color 파라미터에 전달합니다. 같은 방식으로 노드 크기(node_size)도 속성값에 비례하게 설정할 수 있습니다."
+  - type: code
+    language: python
+    title: 노드 색상 매핑
+    description: 도시별 다른 색상
+    content: |-
+      cityColors = {"Seoul": "skyblue", "Busan": "salmon"}
+      nodeColors = [cityColors.get(social.nodes[n].get("city", "Seoul"), "gray")
+                    for n in social.nodes()]
+
+      posSocial = nx.spring_layout(social, seed=42)
+      fig3, ax3 = plt.subplots(figsize=(7, 5))
+      nx.draw(social, pos=posSocial, with_labels=True, node_color=nodeColors,
+              node_size=1000, font_size=11, ax=ax3)
+      ax3.set_title('Social Network by City')
+      fig3
+  - type: tip
+    content: 리스트 컴프리헨션으로 각 노드의 속성에 따른 색상 리스트를 만들어 node_color에 전달합니다.
+
+- id: step10_road
+  title: 10단계. 도로 네트워크 예제
+  subtitle: 종합 실습
+  blocks:
+  - type: text
+    content: "지금까지 배운 방향 그래프와 가중치를 모두 활용하여 도로 네트워크를 모델링합니다. 실제 도로망에는 일방통행(단방향)과 양방향 도로가 섞여 있습니다. 각 도로에는 거리(distance)와 차선 수(lanes) 같은 속성이 있습니다. 양방향 도로는 양쪽 방향으로 엣지를 모두 추가해야 합니다. 완성된 도로 네트워크를 시각화하고, 각 교차로의 진입/진출 차수를 분석합니다."
+  - type: code
+    language: python
+    title: 도로 네트워크 생성
+    description: 일방통행과 양방향 도로
+    content: |-
+      road = nx.DiGraph()
+      road.add_edge("A", "B", distance=5, lanes=2)
+      road.add_edge("B", "A", distance=5, lanes=2)
+      road.add_edge("B", "C", distance=3, lanes=1)
+      road.add_edge("A", "C", distance=10, lanes=3)
+      road.add_edge("C", "D", distance=4, lanes=2)
+      road.add_edge("D", "B", distance=6, lanes=1)
+      road.edges(data=True)
+  - type: code
+    language: python
+    title: 도로 네트워크 시각화
+    description: 거리와 차선 표시
+    content: |-
+      posRoad = nx.spring_layout(road, seed=42)
+      fig4, ax4 = plt.subplots(figsize=(8, 6))
+      nx.draw(road, pos=posRoad, with_labels=True, node_color='wheat',
+              node_size=900, font_size=12, arrows=True, arrowsize=15, ax=ax4)
+
+      distLabels = nx.get_edge_attributes(road, 'distance')
+      nx.draw_networkx_edge_labels(road, pos=posRoad, edge_labels=distLabels,
+                                    font_size=9, ax=ax4)
+      ax4.set_title('Road Network')
+      fig4
+  - type: code
+    language: python
+    title: 도로 분석
+    description: 진출입 차수 확인
+    content: |-
+      inDegRoad = dict(road.in_degree())
+      outDegRoad = dict(road.out_degree())
+      inDegRoad, outDegRoad
+
+- id: practice
+  title: 실습
+  subtitle: 방향과 가중치
+  blocks:
+  - type: text
+    content: "이번 프로젝트에서 배운 방향 그래프(DiGraph), 진입/진출 차수, 가중치, 노드/엣지 속성을 활용하여 미션을 수행합니다. 미션1에서는 소셜 미디어의 팔로우 관계를 방향 그래프로 모델링하고, 미션2에서는 물류 네트워크의 운송 비용을 가중치 그래프로 분석합니다. 각 미션은 독립적으로 실행 가능합니다."
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 팔로우 네트워크"
+    blocks:
+    - type: code
+      title: 팔로우 네트워크 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        follow = nx.DiGraph()
+        users = ["User1", "User2", "User3", "User4", "User5"]
+        follow.add_nodes_from(users)
+
+        followEdges = [
+            ("User1", "User2"),
+            ("User1", "User3"),
+            ("User2", "User3"),
+            ("User3", "User1"),
+            ("User4", "User1"),
+            ("User4", "User2"),
+            ("User5", "User1"),
+            ("User5", "User2"),
+            ("User5", "User3")
+        ]
+        follow.add_edges_from(followEdges)
+        list(follow.edges())
+    - type: code
+      title: 팔로워/팔로잉 분석
+      content: |-
+        followers = dict(follow.in_degree())
+        following = dict(follow.out_degree())
+        followers, following
+    - type: code
+      title: 팔로우 네트워크 시각화
+      content: |-
+        posFollow = nx.spring_layout(follow, seed=42)
+        figFollow, axFollow = plt.subplots(figsize=(8, 6))
+        nx.draw(follow, pos=posFollow, with_labels=True, node_color='lavender',
+                node_size=1000, font_size=10, arrows=True, arrowsize=15, ax=axFollow)
+        axFollow.set_title('Follow Network')
+        figFollow
+  - type: expansion
+    title: "미션2: 비용 네트워크"
+    blocks:
+    - type: code
+      title: 물류 네트워크 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        cost = nx.Graph()
+        cost.add_edge("Factory", "Warehouse", cost=100, time=2)
+        cost.add_edge("Warehouse", "Store1", cost=50, time=1)
+        cost.add_edge("Warehouse", "Store2", cost=70, time=1.5)
+        cost.add_edge("Factory", "Store1", cost=120, time=3)
+        cost.edges(data=True)
+    - type: code
+      title: 총 비용 계산
+      content: |-
+        totalCost = sum(d['cost'] for u, v, d in cost.edges(data=True))
+        totalTime = sum(d['time'] for u, v, d in cost.edges(data=True))
+        totalCost, totalTime
+    - type: code
+      title: 물류 네트워크 시각화
+      content: |-
+        posCost = nx.spring_layout(cost, seed=42)
+        figCost, axCost = plt.subplots(figsize=(8, 6))
+        nx.draw(cost, pos=posCost, with_labels=True, node_color='lightblue',
+                node_size=1200, font_size=10, ax=axCost)
+        costLabels = {(u, v): f"${d['cost']}" for u, v, d in cost.edges(data=True)}
+        nx.draw_networkx_edge_labels(cost, pos=posCost, edge_labels=costLabels,
+                                      font_size=9, ax=axCost)
+        axCost.set_title('Supply Chain Cost Network')
+        figCost

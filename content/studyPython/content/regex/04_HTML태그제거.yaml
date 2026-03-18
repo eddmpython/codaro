@@ -1,0 +1,344 @@
+meta:
+  id: regex_04
+  title: HTML태그제거
+  order: 4
+  category: regex
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["HTML", "비탐욕적", "DOTALL", "태그 제거", "텍스트 정제"]
+  seo:
+    title: "정규표현식 기초 - HTML 태그 제거"
+    description: "정규표현식으로 HTML에서 순수 텍스트만 추출합니다. 비탐욕적 매칭, re.DOTALL 플래그를 배웁니다."
+    keywords: ["정규표현식", "regex", "HTML 파싱", "태그 제거", "비탐욕적 매칭"]
+
+intro:
+  emoji: "🏷️"
+  goal: HTML 문서에서 모든 태그를 제거하고 순수 텍스트만 추출합니다.
+  description: 웹 크롤링 후 가장 많이 하는 작업입니다. 탐욕적 vs 비탐욕적 매칭의 차이를 배우고, LLM 전처리의 첫 단계를 경험합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: 정규표현식 모듈
+    content: |-
+      import re
+      import json
+      from pyodide.http import open_url
+
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  subtitle: JSONPlaceholder posts
+  blocks:
+  - type: text
+    content: JSONPlaceholder의 게시글 데이터를 가져와서 HTML 태그를 추가합니다. 실제 웹 크롤링에서 가져온 데이터에는 다양한 HTML 태그가 포함되어 있습니다. LLM에 텍스트를 입력하거나 분석하기 전에 이런 태그들을 제거하는 전처리가 필수적입니다.
+  - type: code
+    language: python
+    title: 게시글 데이터 로드
+    description: posts 데이터를 가져옵니다
+    content: |-
+      postsData = json.loads(
+          open_url("https://jsonplaceholder.typicode.com/posts").read()
+      )
+      postsData[0]['body']
+  - type: code
+    language: python
+    title: HTML 태그 추가
+    description: 실습을 위해 텍스트에 HTML 태그를 추가합니다
+    content: |-
+      htmlText = f"""
+      <html>
+      <head><title>게시글</title></head>
+      <body>
+          <h1>제목: {postsData[0]['title']}</h1>
+          <p class="content">{postsData[0]['body']}</p>
+          <div>
+              <span>작성자 ID: {postsData[0]['userId']}</span>
+          </div>
+      </body>
+      </html>
+      """
+      htmlText
+
+- id: step3_wrong_pattern
+  title: 3단계. 잘못된 패턴 (탐욕적 매칭)
+  subtitle: .* 의 함정
+  blocks:
+  - type: text
+    content: 직관적으로 생각하면 < 와 > 사이의 모든 문자를 찾으면 될 것 같습니다. 하지만 정규표현식의 기본 동작은 우리의 예상과 다를 수 있습니다. 이 문제를 통해 탐욕적 매칭이라는 중요한 개념을 배워봅시다.
+  - type: code
+    language: python
+    title: 탐욕적 패턴
+    description: < 와 > 사이를 찾아봅니다
+    content: |-
+      wrongPattern = r"<.*>"
+
+      testHtml = "<div>안녕</div><span>하세요</span>"
+      re.findall(wrongPattern, testHtml)
+  - type: text
+    content: "결과: ['<div>안녕</div><span>하세요</span>'] - 전체가 하나로 매칭되었습니다!"
+  - type: note
+    style: warning
+    title: "탐욕적 매칭의 문제"
+    content: |-
+      `.*`는 **탐욕적(greedy)**입니다. 가능한 한 많이 매칭하려고 합니다.
+
+      `<.*>` 는:
+      1. 첫 번째 `<` 를 찾고
+      2. 마지막 `>` 까지 최대한 많이 매칭
+      3. 중간의 모든 것을 다 포함
+
+      우리가 원하는 건 각 태그를 개별적으로 찾는 것입니다!
+
+- id: step4_non_greedy
+  title: 4단계. 올바른 패턴 (비탐욕적 매칭)
+  subtitle: .*? 사용
+  blocks:
+  - type: text
+    content: "탐욕적 매칭을 비탐욕적으로 만들려면 ? 를 붙입니다: .*?"
+  - type: code
+    language: python
+    title: 비탐욕적 패턴
+    description: .*? 로 최소 매칭합니다
+    content: |-
+      correctPattern = r"<.*?>"
+
+      testHtml = "<div>안녕</div><span>하세요</span>"
+      re.findall(correctPattern, testHtml)
+  - type: text
+    content: "결과: ['<div>', '</div>', '<span>', '</span>'] - 각 태그가 개별적으로 찾아졌습니다!"
+  - type: note
+    style: tip
+    title: "비탐욕적 매칭: *?"
+    content: |-
+      - `*` : 0개 이상 (탐욕적)
+      - `*?` : 0개 이상 (비탐욕적) **(신규)**
+      - `+?` : 1개 이상 (비탐욕적) **(신규)**
+      - `??` : 0 또는 1개 (비탐욕적) **(신규)**
+
+      비탐욕적은 조건을 만족하는 최소한만 매칭합니다.
+
+- id: step5_remove_tags
+  title: 5단계. HTML 태그 제거
+  subtitle: re.sub로 치환
+  blocks:
+  - type: text
+    content: 이제 모든 HTML 태그를 빈 문자열로 치환하여 제거합니다.
+  - type: code
+    language: python
+    title: 태그 제거
+    description: 모든 HTML 태그를 제거합니다
+    content: |-
+      pattern = r"<.*?>"
+
+      cleanText = re.sub(pattern, "", htmlText)
+      cleanText
+  - type: text
+    content: 태그는 사라졌지만 여러 줄의 공백이 남아있네요. 추가 정제가 필요합니다.
+
+- id: step6_clean_whitespace
+  title: 6단계. 공백 정리
+  subtitle: 연속된 공백 제거
+  blocks:
+  - type: text
+    content: 연속된 공백, 탭, 개행을 하나의 공백으로 통일합니다.
+  - type: code
+    language: python
+    title: 공백 정리
+    description: 연속된 공백을 하나로 만듭니다
+    content: |-
+      cleanText = re.sub(r"\s+", " ", cleanText)
+      cleanText = cleanText.strip()
+      cleanText
+  - type: note
+    style: tip
+    title: 공백 패턴
+    content: |-
+      **패턴: \\s+**
+      - `\s` : 공백 문자 (스페이스, 탭, 개행 등)
+      - `\s+` : 공백 문자 1개 이상
+      - `.strip()` : 양 끝 공백 제거
+
+      LLM 전처리에서 매우 자주 사용하는 패턴입니다!
+
+- id: step7_dotall_flag
+  title: 7단계. re.DOTALL 플래그
+  subtitle: . 이 개행 포함하기
+  blocks:
+  - type: text
+    content: 기본적으로 . 은 개행(\n)을 매칭하지 않습니다. 여러 줄에 걸친 태그를 처리하려면 플래그가 필요합니다.
+  - type: code
+    language: python
+    title: 여러 줄 태그 테스트
+    description: 개행이 포함된 태그
+    content: |-
+      multilineHtml = """
+      <div
+          class="container"
+          id="main">
+      내용
+      </div>
+      """
+  - type: code
+    language: python
+    title: re.DOTALL 플래그 사용
+    description: . 이 개행도 매칭하도록 설정
+    content: |-
+      pattern = r"<.*?>"
+
+      withoutFlag = re.sub(pattern, "", multilineHtml)
+      withFlag = re.sub(pattern, "", multilineHtml, flags=re.DOTALL)
+
+      f"플래그 없음:\n{withoutFlag}\n\n플래그 있음:\n{withFlag}"
+  - type: note
+    style: tip
+    title: "re.DOTALL (re.S)"
+    content: |-
+      **re.DOTALL** 또는 **re.S** 플래그:
+      - `.` 이 개행 문자도 매칭하게 만듭니다
+      - 여러 줄에 걸친 패턴을 찾을 때 필수
+      - `flags=re.DOTALL` 또는 `flags=re.S` 로 사용
+
+- id: step8_complete_function
+  title: 8단계. 완성된 HTML 정제 함수
+  subtitle: 재사용 가능한 함수
+  blocks:
+  - type: text
+    content: 배운 내용을 모두 합쳐 완성된 함수를 만듭니다.
+  - type: code
+    language: python
+    title: HTML 정제 함수
+    description: HTML에서 순수 텍스트만 추출하는 함수
+    content: |-
+      def stripHtml(html):
+          noTags = re.sub(r"<.*?>", "", html, flags=re.DOTALL)
+          cleaned = re.sub(r"\s+", " ", noTags)
+          return cleaned.strip()
+  - type: code
+    language: python
+    title: 실제 데이터 적용
+    description: 여러 게시글에 적용
+    content: |-
+      samplePosts = [
+          f"<h1>{post['title']}</h1><p>{post['body']}</p>"
+          for post in postsData[:3]
+      ]
+
+      cleanedPosts = [stripHtml(post) for post in samplePosts]
+      cleanedPosts[0]
+
+- id: step9_token_comparison
+  title: 9단계. LLM 토큰 절약 효과
+  subtitle: 전처리 전후 비교
+  blocks:
+  - type: text
+    content: HTML 태그 제거가 LLM 토큰에 얼마나 영향을 주는지 확인해봅시다.
+  - type: code
+    language: python
+    title: 길이 비교
+    description: 문자 수로 토큰 절약 추정
+    content: |-
+      original = htmlText
+      cleaned = stripHtml(htmlText)
+
+      originalLen = len(original)
+      cleanedLen = len(cleaned)
+      saved = ((originalLen - cleanedLen) / originalLen) * 100
+
+      f"원본: {originalLen}자\n정제: {cleanedLen}자\n절약: {saved:.1f}%"
+  - type: note
+    style: tip
+    title: "실제 토큰 절약"
+    content: |-
+      HTML 태그 제거로 평균 30~50% 토큰 절약!
+
+      - 원본 1000자 → 정제 후 500자
+      - 토큰 수: ~250 → ~125
+      - API 비용: 50% 절감
+
+      웹 크롤링 후 필수 전처리 단계입니다.
+
+- id: practice
+  title: 실습
+  subtitle: HTML 정제 프로젝트
+  blocks:
+  - type: text
+    content: 웹 개발자가 되어 다양한 HTML 문서를 정제합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: style과 script 태그 제거"
+    blocks:
+    - type: code
+      title: "고급 HTML 정제 함수"
+      content: |-
+        import re
+
+        raw = """
+        <html>
+        <head>
+            <style>.red { color: red; }</style>
+            <script>console.log('test');</script>
+        </head>
+        <body>
+            <p>실제 내용입니다</p>
+        </body>
+        </html>
+        """
+
+        def strip(html):
+            out = re.sub(r"<script.*?</script>", "", html, flags=re.DOTALL)
+            out = re.sub(r"<style.*?</style>", "", out, flags=re.DOTALL)
+            out = re.sub(r"<.*?>", "", out, flags=re.DOTALL)
+            out = re.sub(r"\s+", " ", out)
+            return out.strip()
+
+        strip(raw)
+  - type: expansion
+    title: "미션2: JSONPlaceholder 게시글 텍스트 추출"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 HTML 생성"
+      content: |-
+        import re
+        import json
+        from pyodide.http import open_url
+
+        posts = json.loads(
+            open_url("https://jsonplaceholder.typicode.com/posts").read()
+        )
+
+        content = [
+            f"<h1>{p['title']}</h1><p>{p['body']}</p>"
+            for p in posts[:3]
+        ]
+        content[0]
+    - type: code
+      title: "태그 제거 및 결과"
+      content: |-
+        def clean(html):
+            out = re.sub(r"<.*?>", "", html, flags=re.DOTALL)
+            out = re.sub(r"\s+", " ", out)
+            return out.strip()
+
+        result = [clean(c) for c in content]
+        result
+
+- id: summary
+  title: 정리
+  subtitle: 네 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 비탐욕적 매칭과 re.DOTALL 플래그를 배웠습니다. HTML 태그를 제거하고 순수 텍스트만 추출할 수 있습니다.
+  - type: list
+    items:
+    - ".*? - 비탐욕적 매칭 (최소 매칭)"
+    - "re.DOTALL - . 이 개행도 매칭"
+    - "\\s+ - 공백 1개 이상"
+    - "re.sub() - 패턴 치환"
+  - type: text
+    content: 다음 프로젝트에서는 로그 파일을 파싱하는 방법을 배웁니다!

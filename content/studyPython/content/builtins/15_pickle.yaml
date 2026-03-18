@@ -1,0 +1,537 @@
+meta:
+  id: "15_pickle"
+  title: "pickle - 객체 직렬화"
+  category: "builtins"
+  tags: ["pickle", "직렬화", "캐싱", "저장"]
+  seo:
+    title: "파이썬 pickle 모듈 완전 정복"
+    description: "pickle 모듈로 Python 객체 직렬화, 바이너리 저장, 캐싱을 배웁니다."
+    keywords: ["pickle", "직렬화", "dump", "load", "캐싱", "파이썬pickle"]
+
+intro:
+  emoji: "🥒"
+  points:
+  - "Python 객체 직렬화"
+  - "바이너리 파일 저장"
+  - "복잡한 객체 저장"
+  - "캐싱과 세션 관리"
+
+sections:
+- id: "module_import"
+  title: "pickle 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "pickle은 파이썬 표준 라이브러리입니다. Python 객체를 바이너리 형태로 직렬화하고 역직렬화하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 pickle 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "pickle 모듈 불러오기"
+    description: "pickle 모듈을 불러옵니다."
+    content: |-
+      import pickle
+
+      'pickle 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "basic_serialization"
+  title: "기본 직렬화"
+  subtitle: "dump와 load"
+  blocks:
+  - type: "text"
+    content: "pickle.dump()는 Python 객체를 바이너리 파일로 저장하고, pickle.load()는 바이너리 파일에서 객체를 복원합니다. 딕셔너리, 리스트, 클래스 인스턴스 등 거의 모든 Python 객체를 저장할 수 있습니다. 머신러닝 모델 저장, 게임 세이브, 데이터 캐싱에 필수적입니다."
+  - type: "list"
+    items:
+    - "dump(obj, file): 객체를 파일로 저장"
+    - "load(file): 파일에서 객체 복원"
+    - "바이너리 모드('wb', 'rb') 필수"
+    - "JSON보다 빠르고 모든 타입 지원"
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 저장"
+    description: "딕셔너리를 pickle 파일로 저장합니다."
+    content: |-
+      userData = {'name': 'Alice', 'age': 30, 'scores': [95, 88, 92]}
+      with open('/tmp/user.pkl', 'wb') as f:
+          pickle.dump(userData, f)
+      'user.pkl 저장 완료'
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 불러오기"
+    description: "pickle 파일에서 딕셔너리를 복원합니다."
+    content: |-
+      with open('/tmp/user.pkl', 'rb') as f:
+          loadedUser = pickle.load(f)
+      loadedUser
+  - type: "code"
+    language: "python"
+    title: "리스트 저장 및 복원"
+    description: "복잡한 리스트를 저장하고 불러옵니다."
+    content: |-
+      complexList = [1, 'text', {'key': 'value'}, [2, 3, 4]]
+      with open('/tmp/complex.pkl', 'wb') as f:
+          pickle.dump(complexList, f)
+      with open('/tmp/complex.pkl', 'rb') as f:
+          restoredList = pickle.load(f)
+      restoredList
+  - type: "tip"
+    content: "pickle은 바이너리 형식이므로 사람이 읽을 수 없습니다. 디버깅이 필요하면 JSON을 사용하세요."
+
+- id: "bytes_operations"
+  title: "바이트 직렬화"
+  subtitle: "dumps와 loads"
+  blocks:
+  - type: "text"
+    content: "pickle.dumps()는 객체를 바이트 문자열로 변환하고, pickle.loads()는 바이트에서 객체를 복원합니다. 파일이 아닌 메모리나 네트워크로 객체를 전송할 때 유용합니다. 데이터베이스 저장, 메시지 큐, 분산 시스템에 활용됩니다."
+  - type: "list"
+    items:
+    - "dumps(obj): 객체 → 바이트"
+    - "loads(바이트): 바이트 → 객체"
+    - "파일 없이 메모리에서 처리"
+    - "네트워크 전송 가능"
+  - type: "code"
+    language: "python"
+    title: "바이트로 직렬화"
+    description: "딕셔너리를 바이트 문자열로 변환합니다."
+    content: |-
+      dataDict = {'x': 10, 'y': 20, 'z': 30}
+      serializedBytes = pickle.dumps(dataDict)
+      type(serializedBytes).__name__
+  - type: "code"
+    language: "python"
+    title: "바이트에서 복원"
+    description: "바이트 문자열을 다시 객체로 변환합니다."
+    content: |-
+      sampleData = {'a': 1, 'b': 2}
+      bytesData = pickle.dumps(sampleData)
+      restoredData = pickle.loads(bytesData)
+      restoredData
+  - type: "code"
+    language: "python"
+    title: "바이트 크기 확인"
+    description: "직렬화된 데이터의 크기를 확인합니다."
+    content: |-
+      largeList = list(range(1000))
+      pickledData = pickle.dumps(largeList)
+      dataSize = len(pickledData)
+      dataSize
+  - type: "tip"
+    content: "dumps/loads는 파일 I/O 없이 빠르게 직렬화할 수 있어 메모리 캐싱에 적합합니다."
+
+- id: "supported_types"
+  title: "지원 타입"
+  subtitle: "직렬화 가능한 객체들"
+  blocks:
+  - type: "text"
+    content: "pickle은 거의 모든 Python 객체를 직렬화할 수 있습니다. 기본 타입, 컬렉션, 클래스 인스턴스, 함수까지 저장 가능합니다. JSON과 달리 set, datetime, 사용자 정의 클래스도 바로 저장할 수 있어 매우 강력합니다."
+  - type: "list"
+    items:
+    - "기본 타입: int, float, str, bool, None"
+    - "컬렉션: list, tuple, dict, set"
+    - "날짜: datetime, timedelta"
+    - "사용자 정의 클래스 인스턴스"
+  - type: "code"
+    language: "python"
+    title: "집합 저장"
+    description: "set을 pickle로 저장하고 복원합니다."
+    content: |-
+      tagSet = {'python', 'pickle', 'tutorial'}
+      with open('/tmp/tags.pkl', 'wb') as f:
+          pickle.dump(tagSet, f)
+      with open('/tmp/tags.pkl', 'rb') as f:
+          loadedTags = pickle.load(f)
+      loadedTags
+  - type: "code"
+    language: "python"
+    title: "날짜 객체 저장"
+    description: "datetime 객체를 직렬화합니다."
+    content: |-
+      from datetime import datetime
+      eventTime = datetime(2024, 6, 15, 14, 30)
+      timeBytes = pickle.dumps(eventTime)
+      restoredTime = pickle.loads(timeBytes)
+      restoredTime
+  - type: "code"
+    language: "python"
+    title: "클래스 인스턴스 저장"
+    description: "사용자 정의 클래스 객체를 저장합니다."
+    content: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      alice = Person('Alice', 30)
+      with open('/tmp/person.pkl', 'wb') as f:
+          pickle.dump(alice, f)
+      with open('/tmp/person.pkl', 'rb') as f:
+          loadedPerson = pickle.load(f)
+      loadedPerson.name, loadedPerson.age
+  - type: "tip"
+    content: "pickle은 신뢰할 수 없는 소스의 데이터를 로드하면 위험합니다. 악의적인 코드가 실행될 수 있습니다."
+
+- id: "protocol_versions"
+  title: "프로토콜 버전"
+  subtitle: "호환성과 성능"
+  blocks:
+  - type: "text"
+    content: "pickle은 여러 프로토콜 버전을 지원합니다. 높은 버전일수록 효율적이지만 하위 Python 버전과 호환되지 않을 수 있습니다. protocol 파라미터로 버전을 지정하며, HIGHEST_PROTOCOL을 사용하면 최신 버전을 자동 선택합니다."
+  - type: "list"
+    items:
+    - "protocol=0: ASCII, 가장 느림, 가장 호환"
+    - "protocol=4: Python 3.4+ (기본)"
+    - "protocol=5: Python 3.8+, 대용량 데이터"
+    - "HIGHEST_PROTOCOL: 최신 버전"
+  - type: "code"
+    language: "python"
+    title: "기본 프로토콜"
+    description: "기본 프로토콜로 직렬화합니다."
+    content: |-
+      simpleData = {'key': 'value'}
+      defaultBytes = pickle.dumps(simpleData)
+      len(defaultBytes)
+  - type: "code"
+    language: "python"
+    title: "최신 프로토콜"
+    description: "HIGHEST_PROTOCOL로 최적화된 직렬화를 합니다."
+    content: |-
+      largeData = list(range(100))
+      highestBytes = pickle.dumps(largeData, protocol=pickle.HIGHEST_PROTOCOL)
+      len(highestBytes)
+  - type: "code"
+    language: "python"
+    title: "프로토콜 버전 확인"
+    description: "현재 사용 가능한 최고 프로토콜 버전을 확인합니다."
+    content: |-
+      maxProtocol = pickle.HIGHEST_PROTOCOL
+      maxProtocol
+  - type: "tip"
+    content: "대용량 데이터는 HIGHEST_PROTOCOL을 사용하면 크기와 속도가 최적화됩니다."
+
+- id: "multiple_objects"
+  title: "다중 객체 처리"
+  subtitle: "여러 객체 저장과 복원"
+  blocks:
+  - type: "text"
+    content: "하나의 파일에 여러 객체를 순차적으로 저장하고 복원할 수 있습니다. dump()를 여러 번 호출하여 저장하고, load()를 반복하여 순서대로 불러옵니다. 관련된 여러 데이터를 한 파일에 묶어 관리할 때 유용합니다."
+  - type: "list"
+    items:
+    - "여러 번 dump() 호출로 저장"
+    - "순서대로 load() 호출로 복원"
+    - "각 객체는 독립적"
+    - "스트림 처리 가능"
+  - type: "code"
+    language: "python"
+    title: "여러 객체 저장"
+    description: "세 개의 다른 객체를 한 파일에 저장합니다."
+    content: |-
+      obj1 = {'type': 'config', 'value': 100}
+      obj2 = ['item1', 'item2', 'item3']
+      obj3 = (1, 2, 3)
+      with open('/tmp/multi.pkl', 'wb') as f:
+          pickle.dump(obj1, f)
+          pickle.dump(obj2, f)
+          pickle.dump(obj3, f)
+      'multi.pkl 저장 완료'
+  - type: "code"
+    language: "python"
+    title: "여러 객체 복원"
+    description: "저장된 순서대로 객체를 복원합니다."
+    content: |-
+      with open('/tmp/multi.pkl', 'rb') as f:
+          first = pickle.load(f)
+          second = pickle.load(f)
+          third = pickle.load(f)
+      first, second, third
+  - type: "code"
+    language: "python"
+    title: "리스트로 일괄 저장"
+    description: "여러 객체를 리스트에 담아 한 번에 저장합니다."
+    content: |-
+      allObjects = [
+          {'id': 1, 'data': 'first'},
+          {'id': 2, 'data': 'second'},
+          {'id': 3, 'data': 'third'}
+      ]
+      with open('/tmp/batch.pkl', 'wb') as f:
+          pickle.dump(allObjects, f)
+      with open('/tmp/batch.pkl', 'rb') as f:
+          loadedAll = pickle.load(f)
+      len(loadedAll)
+  - type: "tip"
+    content: "관련된 여러 객체는 리스트나 딕셔너리로 묶어서 한 번에 저장하는 것이 더 편리합니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "캐싱, 세션, 체크포인트"
+  blocks:
+  - type: "text"
+    content: "실무에서 자주 사용하는 pickle 활용 패턴을 살펴봅니다. 계산 결과 캐싱, 사용자 세션 저장, 머신러닝 모델 체크포인트, 게임 세이브 등 다양한 시나리오에서 pickle을 효과적으로 사용할 수 있습니다."
+  - type: "list"
+    items:
+    - "계산 결과 캐싱"
+    - "세션 데이터 저장"
+    - "설정과 상태 저장"
+    - "임시 데이터 백업"
+  - type: "code"
+    language: "python"
+    title: "결과 캐싱"
+    description: "비용이 큰 계산 결과를 캐시합니다."
+    content: |-
+      import os
+      cachePath = '/tmp/cache.pkl'
+      if os.path.exists(cachePath):
+          with open(cachePath, 'rb') as f:
+              cachedResult = pickle.load(f)
+      else:
+          cachedResult = sum(range(10000))
+          with open(cachePath, 'wb') as f:
+              pickle.dump(cachedResult, f)
+      cachedResult
+  - type: "code"
+    language: "python"
+    title: "세션 저장"
+    description: "사용자 세션 데이터를 저장합니다."
+    content: |-
+      sessionData = {
+          'user_id': 12345,
+          'login_time': '2024-06-15 14:30',
+          'preferences': {'theme': 'dark', 'lang': 'ko'}
+      }
+      with open('/tmp/session.pkl', 'wb') as f:
+          pickle.dump(sessionData, f)
+      with open('/tmp/session.pkl', 'rb') as f:
+          loadedSession = pickle.load(f)
+      loadedSession['user_id']
+  - type: "code"
+    language: "python"
+    title: "체크포인트 저장"
+    description: "진행 상태를 주기적으로 저장합니다."
+    content: |-
+      checkpoint = {
+          'epoch': 10,
+          'accuracy': 0.95,
+          'weights': [0.1, 0.2, 0.3]
+      }
+      checkpointPath = '/tmp/checkpoint.pkl'
+      with open(checkpointPath, 'wb') as f:
+          pickle.dump(checkpoint, f)
+      with open(checkpointPath, 'rb') as f:
+          restored = pickle.load(f)
+      restored['epoch'], restored['accuracy']
+  - type: "tip"
+    content: "pickle 파일은 Python 버전이 다르면 호환되지 않을 수 있습니다. 장기 저장은 JSON이나 데이터베이스를 고려하세요."
+
+- id: "practice"
+  title: "pickle 모듈 종합 복습"
+  subtitle: "객체 직렬화 마스터하기"
+  blocks:
+  - type: "text"
+    content: "pickle 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 딕셔너리 저장"
+    code: |-
+      saveDict = {'a': 1, 'b': 2}
+      with open('/tmp/d1.pkl', 'wb') as f:
+          pickle.dump(saveDict, f)
+      'Saved'
+
+  - type: "expansion"
+    title: "🟢 기본2: 딕셔너리 복원"
+    code: |-
+      testDict = {'x': 10}
+      with open('/tmp/d2.pkl', 'wb') as f:
+          pickle.dump(testDict, f)
+      with open('/tmp/d2.pkl', 'rb') as f:
+          loadDict = pickle.load(f)
+      loadDict
+
+  - type: "expansion"
+    title: "🟢 기본3: 리스트 저장"
+    code: |-
+      myList = [1, 2, 3, 4, 5]
+      listBytes = pickle.dumps(myList)
+      type(listBytes).__name__
+
+  - type: "expansion"
+    title: "🟢 기본4: 바이트 복원"
+    code: |-
+      origList = ['a', 'b', 'c']
+      bytesForm = pickle.dumps(origList)
+      restored = pickle.loads(bytesForm)
+      restored
+
+  - type: "expansion"
+    title: "🟢 기본5: 집합 저장"
+    code: |-
+      mySet = {1, 2, 3}
+      with open('/tmp/s1.pkl', 'wb') as f:
+          pickle.dump(mySet, f)
+      with open('/tmp/s1.pkl', 'rb') as f:
+          loadSet = pickle.load(f)
+      loadSet
+
+  - type: "expansion"
+    title: "🟡 응용1: 날짜 직렬화"
+    code: |-
+      from datetime import date
+      today = date.today()
+      dateBytes = pickle.dumps(today)
+      restoredDate = pickle.loads(dateBytes)
+      type(restoredDate).__name__
+
+  - type: "expansion"
+    title: "🟡 응용2: 튜플 저장"
+    code: |-
+      coords = (10, 20, 30)
+      with open('/tmp/coords.pkl', 'wb') as f:
+          pickle.dump(coords, f)
+      with open('/tmp/coords.pkl', 'rb') as f:
+          loadCoords = pickle.load(f)
+      loadCoords
+
+  - type: "expansion"
+    title: "🟡 응용3: 중첩 구조"
+    code: |-
+      nested = {'a': [1, 2, {'b': 3}]}
+      nestedBytes = pickle.dumps(nested)
+      unNested = pickle.loads(nestedBytes)
+      unNested
+
+  - type: "expansion"
+    title: "🟡 응용4: 최신 프로토콜"
+    code: |-
+      data = list(range(50))
+      highBytes = pickle.dumps(data, protocol=pickle.HIGHEST_PROTOCOL)
+      len(highBytes)
+
+  - type: "expansion"
+    title: "🟡 응용5: 바이트 크기"
+    code: |-
+      bigList = [i * 2 for i in range(100)]
+      pickled = pickle.dumps(bigList)
+      byteSize = len(pickled)
+      byteSize
+
+  - type: "expansion"
+    title: "🔴 심화1: 여러 객체 저장"
+    code: |-
+      obj1 = {'first': 1}
+      obj2 = ['second']
+      with open('/tmp/multi2.pkl', 'wb') as f:
+          pickle.dump(obj1, f)
+          pickle.dump(obj2, f)
+      with open('/tmp/multi2.pkl', 'rb') as f:
+          r1 = pickle.load(f)
+          r2 = pickle.load(f)
+      r1, r2
+
+  - type: "expansion"
+    title: "🔴 심화2: 클래스 인스턴스"
+    code: |-
+      class Point:
+          def __init__(self, x, y):
+              self.x = x
+              self.y = y
+
+      p = Point(5, 10)
+      pBytes = pickle.dumps(p)
+      pRestored = pickle.loads(pBytes)
+      pRestored.x, pRestored.y
+
+  - type: "expansion"
+    title: "🔴 심화3: 캐시 구현"
+    code: |-
+      import os
+      cPath = '/tmp/c1.pkl'
+      if os.path.exists(cPath):
+          with open(cPath, 'rb') as f:
+              cached = pickle.load(f)
+      else:
+          cached = sum(range(100))
+          with open(cPath, 'wb') as f:
+              pickle.dump(cached, f)
+      cached
+
+  - type: "expansion"
+    title: "🔴 심화4: 리스트 일괄 저장"
+    code: |-
+      items = [{'id': i, 'val': i * 10} for i in range(5)]
+      with open('/tmp/batch2.pkl', 'wb') as f:
+          pickle.dump(items, f)
+      with open('/tmp/batch2.pkl', 'rb') as f:
+          allItems = pickle.load(f)
+      len(allItems)
+
+  - type: "expansion"
+    title: "🔴 심화5: 세션 데이터"
+    code: |-
+      session = {'user': 'alice', 'score': 95, 'level': 3}
+      with open('/tmp/sess.pkl', 'wb') as f:
+          pickle.dump(session, f)
+      with open('/tmp/sess.pkl', 'rb') as f:
+          loadSess = pickle.load(f)
+      loadSess['score']
+
+  - type: "expansion"
+    title: "🔴 심화6: 상태 체크포인트"
+    code: |-
+      state = {'step': 100, 'loss': 0.5}
+      stateFile = '/tmp/state.pkl'
+      with open(stateFile, 'wb') as f:
+          pickle.dump(state, f)
+      with open(stateFile, 'rb') as f:
+          restoredState = pickle.load(f)
+      restoredState['step']
+
+  - type: "expansion"
+    title: "🔴 심화7: 설정 저장"
+    code: |-
+      config = {
+          'theme': 'dark',
+          'fontSize': 14,
+          'enableNotif': True
+      }
+      with open('/tmp/cfg.pkl', 'wb') as f:
+          pickle.dump(config, f)
+      with open('/tmp/cfg.pkl', 'rb') as f:
+          loadCfg = pickle.load(f)
+      loadCfg['theme']
+
+  - type: "expansion"
+    title: "🔴 심화8: 복잡한 객체"
+    code: |-
+      complex = {
+          'data': [1, 2, 3],
+          'meta': {'created': '2024-01-01'},
+          'tags': {'python', 'pickle'}
+      }
+      cBytes = pickle.dumps(complex)
+      cRestored = pickle.loads(cBytes)
+      len(cRestored['data'])
+
+  - type: "expansion"
+    title: "🔴 심화9: 프로토콜 비교"
+    code: |-
+      sample = list(range(20))
+      p0 = pickle.dumps(sample, protocol=0)
+      p4 = pickle.dumps(sample, protocol=4)
+      len(p0) > len(p4)
+
+  - type: "expansion"
+    title: "🔴 심화10: 파일 존재 확인"
+    code: |-
+      import os
+      dataFile = '/tmp/exist.pkl'
+      defaultData = {'count': 0}
+      if os.path.exists(dataFile):
+          with open(dataFile, 'rb') as f:
+              existing = pickle.load(f)
+      else:
+          existing = defaultData
+          with open(dataFile, 'wb') as f:
+              pickle.dump(existing, f)
+      existing['count']

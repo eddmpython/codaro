@@ -1,0 +1,336 @@
+meta:
+  id: folium_01
+  title: 첫지도만들기
+  order: 1
+  category: folium
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["folium", "Map", "Marker", "지도", "마커"]
+  seo:
+    title: "Folium 첫걸음 - 지도 생성과 마커 추가"
+    description: "Folium으로 첫 지도를 만듭니다. Map()으로 지도를 생성하고 Marker()로 위치를 표시합니다."
+    keywords: ["folium", "Map", "Marker", "지도", "마커", "popup"]
+
+intro:
+  emoji: "📍"
+  goal: 기본 지도를 생성하고 마커를 추가합니다.
+  description: Folium의 기본인 지도 생성을 배웁니다. Map()으로 지도를 만들고 location과 zoom_start로 초기 화면을 설정합니다. Marker()로 특정 위치에 점을 찍고 popup으로 정보를 표시합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: folium과 marimo를 불러옵니다. marimo는 지도를 화면에 표시할 때 사용합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: folium과 marimo를 불러옵니다
+    content: |-
+      import folium
+      import marimo as mo
+
+- id: step2_basic_map
+  title: 2단계. 기본 지도 생성
+  subtitle: Map()
+  blocks:
+  - type: text
+    content: Map()으로 지도를 생성합니다. location은 지도 중심 좌표[위도, 경도]이고, zoom_start는 초기 확대 레벨입니다.
+  - type: code
+    language: python
+    title: 서울 중심 지도
+    description: 서울시청 좌표로 지도 생성
+    content: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=12)
+      mo.iframe(m1._repr_html_())
+  - type: tip
+    content: zoom_start는 1(세계)~18(건물) 범위입니다. 도시는 12, 동네는 15, 건물은 17 정도가 적당합니다.
+
+- id: step3_zoom_levels
+  title: 3단계. 줌 레벨 이해
+  subtitle: zoom_start 설정
+  blocks:
+  - type: text
+    content: 줌 레벨에 따라 지도의 상세도가 달라집니다. 용도에 맞는 줌 레벨을 선택하세요.
+  - type: code
+    language: python
+    title: 줌 레벨 10 (광역)
+    description: 서울 전체가 보이는 레벨
+    content: |-
+      m2 = folium.Map(location=seoulCenter, zoom_start=10)
+      mo.iframe(m2._repr_html_())
+  - type: code
+    language: python
+    title: 줌 레벨 15 (동네)
+    description: 동네 수준 상세도
+    content: |-
+      m3 = folium.Map(location=seoulCenter, zoom_start=15)
+      mo.iframe(m3._repr_html_())
+  - type: tip
+    content: 마우스 휠이나 +/- 버튼으로 줌을 조절할 수 있습니다. zoom_start는 초기값일 뿐입니다.
+
+- id: step4_marker
+  title: 4단계. 마커 추가
+  subtitle: Marker()
+  blocks:
+  - type: text
+    content: Marker()로 특정 위치에 마커를 추가합니다. add_to(지도)로 지도에 붙입니다.
+  - type: code
+    language: python
+    title: 마커 하나 추가
+    description: 서울시청에 마커 표시
+    content: |-
+      m4 = folium.Map(location=seoulCenter, zoom_start=14)
+      folium.Marker(location=seoulCenter).add_to(m4)
+      mo.iframe(m4._repr_html_())
+  - type: code
+    language: python
+    title: 팝업 추가
+    description: 마커 클릭 시 텍스트 표시
+    content: |-
+      m5 = folium.Map(location=seoulCenter, zoom_start=14)
+      folium.Marker(
+          location=seoulCenter,
+          popup="서울시청"
+      ).add_to(m5)
+      mo.iframe(m5._repr_html_())
+  - type: tip
+    content: popup은 마커를 클릭하면 나타나는 말풍선입니다. 문자열이나 HTML을 넣을 수 있습니다.
+
+- id: step5_multiple_markers
+  title: 5단계. 여러 마커 추가
+  subtitle: 반복문 활용
+  blocks:
+  - type: text
+    content: 여러 위치에 마커를 추가합니다. 좌표와 이름 리스트를 만들고 반복문으로 추가합니다.
+  - type: code
+    language: python
+    title: 서울 주요 장소
+    description: 여러 마커 한번에 추가
+    content: |-
+      places = [
+          {"name": "서울시청", "loc": [37.5665, 126.9780]},
+          {"name": "강남역", "loc": [37.4979, 127.0276]},
+          {"name": "홍대입구", "loc": [37.5563, 126.9236]},
+          {"name": "명동", "loc": [37.5636, 126.9869]},
+          {"name": "여의도", "loc": [37.5219, 126.9245]}
+      ]
+
+      m6 = folium.Map(location=seoulCenter, zoom_start=12)
+      for place in places:
+          folium.Marker(
+              location=place["loc"],
+              popup=place["name"]
+          ).add_to(m6)
+      mo.iframe(m6._repr_html_())
+  - type: tip
+    content: 딕셔너리 리스트로 데이터를 관리하면 확장하기 쉽습니다. 나중에 주소, 카테고리 등을 추가할 수 있습니다.
+
+- id: step6_tooltip
+  title: 6단계. 툴팁 추가
+  subtitle: tooltip vs popup
+  blocks:
+  - type: text
+    content: tooltip은 마우스를 올리면 나타나고, popup은 클릭해야 나타납니다. 둘 다 사용할 수 있습니다.
+  - type: code
+    language: python
+    title: 툴팁 추가
+    description: 마우스 호버 시 표시
+    content: |-
+      m7 = folium.Map(location=seoulCenter, zoom_start=14)
+      folium.Marker(
+          location=seoulCenter,
+          popup="클릭하면 보여요",
+          tooltip="마우스 올리면 보여요"
+      ).add_to(m7)
+      mo.iframe(m7._repr_html_())
+  - type: tip
+    content: tooltip은 빠른 미리보기, popup은 상세 정보에 적합합니다. 보통 tooltip에 이름, popup에 상세 정보를 넣습니다.
+
+- id: step7_marker_color
+  title: 7단계. 마커 색상 변경
+  subtitle: icon 파라미터
+  blocks:
+  - type: text
+    content: Icon()으로 마커 색상과 아이콘을 변경합니다. 기본 색상은 blue입니다.
+  - type: code
+    language: python
+    title: 색상 지정
+    description: 다양한 색상 마커
+    content: |-
+      m8 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      colors = ["red", "blue", "green", "purple", "orange"]
+      for i, place in enumerate(places):
+          folium.Marker(
+              location=place["loc"],
+              popup=place["name"],
+              icon=folium.Icon(color=colors[i % len(colors)])
+          ).add_to(m8)
+      mo.iframe(m8._repr_html_())
+  - type: tip
+    content: 사용 가능한 색상은 red, blue, green, purple, orange, darkred, lightred, beige, darkblue, darkgreen, cadetblue, darkpurple, white, pink, lightblue, lightgreen, gray, black, lightgray 입니다.
+
+- id: step8_icon_type
+  title: 8단계. 아이콘 모양 변경
+  subtitle: icon 파라미터
+  blocks:
+  - type: text
+    content: Icon()의 icon 파라미터로 마커 안의 아이콘을 변경합니다. Font Awesome과 Glyphicon 아이콘을 사용할 수 있습니다.
+  - type: code
+    language: python
+    title: 아이콘 지정
+    description: 다양한 아이콘
+    content: |-
+      m9 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      folium.Marker(
+          location=[37.5665, 126.9780],
+          popup="시청",
+          icon=folium.Icon(color="red", icon="info-sign")
+      ).add_to(m9)
+
+      folium.Marker(
+          location=[37.4979, 127.0276],
+          popup="강남역",
+          icon=folium.Icon(color="blue", icon="star")
+      ).add_to(m9)
+
+      folium.Marker(
+          location=[37.5563, 126.9236],
+          popup="홍대",
+          icon=folium.Icon(color="green", icon="music")
+      ).add_to(m9)
+
+      mo.iframe(m9._repr_html_())
+  - type: tip
+    content: 자주 쓰는 아이콘은 home, star, heart, cloud, info-sign, music, camera, user 등입니다.
+
+- id: step9_fit_bounds
+  title: 9단계. 자동 줌 맞추기
+  subtitle: fit_bounds()
+  blocks:
+  - type: text
+    content: 모든 마커가 보이도록 자동으로 줌을 조절합니다. fit_bounds()에 좌표 범위를 전달합니다.
+  - type: code
+    language: python
+    title: 모든 마커 보이기
+    description: 자동 줌 조절
+    content: |-
+      m10 = folium.Map(location=seoulCenter, zoom_start=12)
+
+      allLocs = [place["loc"] for place in places]
+      for place in places:
+          folium.Marker(
+              location=place["loc"],
+              popup=place["name"]
+          ).add_to(m10)
+
+      m10.fit_bounds(allLocs)
+      mo.iframe(m10._repr_html_())
+  - type: tip
+    content: fit_bounds()는 [[남서 좌표], [북동 좌표]] 또는 좌표 리스트를 받습니다. 모든 마커가 화면에 들어오도록 줌을 조절합니다.
+
+- id: step10_complete
+  title: 10단계. 완성 예제
+  subtitle: 서울 관광지 지도
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 종합하여 서울 관광지 지도를 완성합니다.
+  - type: code
+    language: python
+    title: 서울 관광지 지도
+    description: 종합 예제
+    content: |-
+      tourSpots = [
+          {"name": "경복궁", "loc": [37.5796, 126.9770], "color": "red"},
+          {"name": "남산타워", "loc": [37.5512, 126.9882], "color": "orange"},
+          {"name": "명동", "loc": [37.5636, 126.9869], "color": "blue"},
+          {"name": "동대문", "loc": [37.5711, 127.0095], "color": "green"},
+          {"name": "이태원", "loc": [37.5340, 126.9948], "color": "purple"}
+      ]
+
+      tourMap = folium.Map(location=[37.56, 126.99], zoom_start=13)
+
+      for spot in tourSpots:
+          folium.Marker(
+              location=spot["loc"],
+              popup=f"<b>{spot['name']}</b>",
+              tooltip=spot["name"],
+              icon=folium.Icon(color=spot["color"], icon="star")
+          ).add_to(tourMap)
+
+      mo.iframe(tourMap._repr_html_())
+
+- id: practice
+  title: 실습
+  subtitle: 지도 만들기
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 카페 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        cafes = [
+            {"name": "스타벅스 시청점", "loc": [37.5660, 126.9785]},
+            {"name": "투썸플레이스 광화문", "loc": [37.5710, 126.9769]},
+            {"name": "이디야 을지로", "loc": [37.5660, 126.9910]},
+            {"name": "커피빈 명동", "loc": [37.5630, 126.9860]}
+        ]
+        cafes
+    - type: code
+      title: 지도 생성
+      content: |-
+        cafeMap = folium.Map(location=[37.567, 126.985], zoom_start=14)
+
+        for cafe in cafes:
+            folium.Marker(
+                location=cafe["loc"],
+                popup=cafe["name"],
+                tooltip="카페",
+                icon=folium.Icon(color="cadetblue", icon="cloud")
+            ).add_to(cafeMap)
+
+        mo.iframe(cafeMap._repr_html_())
+  - type: expansion
+    title: "미션2: 전국 도시 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        cities = [
+            {"name": "서울", "loc": [37.5665, 126.9780], "color": "red"},
+            {"name": "부산", "loc": [35.1796, 129.0756], "color": "blue"},
+            {"name": "대전", "loc": [36.3504, 127.3845], "color": "green"},
+            {"name": "대구", "loc": [35.8714, 128.6014], "color": "purple"},
+            {"name": "광주", "loc": [35.1595, 126.8526], "color": "orange"},
+            {"name": "제주", "loc": [33.4996, 126.5312], "color": "pink"}
+        ]
+        cities
+    - type: code
+      title: 지도 생성
+      content: |-
+        koreaMap = folium.Map(location=[36.5, 127.5], zoom_start=7)
+
+        for city in cities:
+            folium.Marker(
+                location=city["loc"],
+                popup=f"<b>{city['name']}</b>",
+                tooltip=city["name"],
+                icon=folium.Icon(color=city["color"], icon="star")
+            ).add_to(koreaMap)
+
+        mo.iframe(koreaMap._repr_html_())

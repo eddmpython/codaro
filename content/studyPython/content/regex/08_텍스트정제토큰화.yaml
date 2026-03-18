@@ -1,0 +1,335 @@
+meta:
+  id: regex_08
+  title: 텍스트정제토큰화
+  order: 8
+  category: regex
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["텍스트 정제", "토큰화", "split", "LLM", "전처리"]
+  seo:
+    title: "정규표현식 중급 - 텍스트 정제와 토큰화"
+    description: "정규표현식으로 텍스트를 정제하고 토큰화합니다. re.split, 노이즈 제거, LLM 전처리를 배웁니다."
+    keywords: ["정규표현식", "regex", "텍스트 정제", "토큰화", "LLM 전처리"]
+
+intro:
+  emoji: "🧹"
+  goal: Bacon Ipsum 텍스트를 정제하고 토큰화하여 LLM 입력 준비합니다.
+  description: LLM 전처리의 핵심 단계입니다. 노이즈 제거, 정규화, 토큰화를 통해 토큰 수를 최소화하고 품질을 높입니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: 정규표현식과 데이터 로드
+    content: |-
+      import re
+      import json
+      from pyodide.http import open_url
+
+- id: step2_load_text
+  title: 2단계. 텍스트 데이터 로드
+  subtitle: Bacon Ipsum API
+  blocks:
+  - type: text
+    content: Bacon Ipsum API에서 더미 텍스트를 가져옵니다. Bacon Ipsum은 Lorem Ipsum의 재미있는 대안으로, 고기 관련 단어로 구성된 가짜 텍스트를 생성합니다. 실제 웹 콘텐츠처럼 다양한 형태의 노이즈가 포함되어 있어 텍스트 정제 실습에 적합합니다.
+  - type: code
+    language: python
+    title: Bacon Ipsum 로드
+    description: 5개 문단의 텍스트 생성
+    content: |-
+      textData = json.loads(
+          open_url("https://baconipsum.com/api/?type=all-meat&paras=5").read()
+      )
+      rawText = " ".join(textData)
+      rawText[:300]
+  - type: text
+    content: 특수문자, 불필요한 공백, 대소문자 혼재 등 노이즈가 많습니다. 이런 노이즈는 LLM API 호출 시 토큰 수를 증가시키고, 분석 품질을 저하시킵니다. 정제 과정을 통해 불필요한 토큰을 줄이면 API 비용을 절감하고 응답 품질을 높일 수 있습니다.
+
+- id: step3_remove_special_chars
+  title: 3단계. 특수문자 제거
+  subtitle: 알파벳과 공백만 남기기
+  blocks:
+  - type: text
+    content: LLM 입력에 불필요한 특수문자를 제거합니다. 쉼표, 마침표, 느낌표 등의 구두점과 특수 기호는 대부분의 분석에서 불필요합니다. 부정 문자 클래스 [^...]를 사용하면 유지할 문자만 지정하고 나머지는 모두 제거할 수 있습니다.
+  - type: code
+    language: python
+    title: 특수문자 제거
+    description: 알파벳과 공백만 유지
+    content: |-
+      cleanedText = re.sub(r"[^a-zA-Z\s]", "", rawText)
+      cleanedText[:200]
+  - type: note
+    style: tip
+    title: "[^...] 부정 문자 클래스"
+    content: |-
+      - `[a-zA-Z\s]` : 알파벳과 공백만
+      - `[^a-zA-Z\s]` : 알파벳과 공백이 **아닌** 모든 것
+      - `^` 가 [ ] 안에 있으면 부정의 의미!
+
+- id: step4_normalize_whitespace
+  title: 4단계. 공백 정규화
+  subtitle: 연속 공백을 하나로
+  blocks:
+  - type: text
+    content: 연속된 공백을 하나로 통일하여 토큰 낭비를 줄입니다. 웹에서 수집한 텍스트에는 종종 탭, 줄바꿈, 연속 공백 등이 포함됩니다. \\s+ 패턴으로 모든 종류의 공백 문자를 하나의 공백으로 정규화하면 깔끔한 텍스트를 얻을 수 있습니다.
+  - type: code
+    language: python
+    title: 공백 정규화
+    description: 여러 공백을 하나로
+    content: |-
+      normalizedText = re.sub(r"\s+", " ", cleanedText)
+      normalizedText = normalizedText.strip()
+      normalizedText[:200]
+  - type: text
+    content: |-
+      **토큰 절약 효과:**
+      - "word    word" (4개 공백) : 약 5 토큰
+      - "word word" (1개 공백) : 약 2 토큰
+      - **60% 절약!**
+
+- id: step5_lowercase
+  title: 5단계. 소문자 변환
+  subtitle: 대소문자 통일
+  blocks:
+  - type: text
+    content: 대소문자를 통일하여 일관성을 높이고 토큰 수를 줄입니다. LLM의 토크나이저는 대소문자를 구분하여 Hello와 hello를 다른 토큰으로 처리합니다. 소문자로 통일하면 어휘 크기가 줄어 효율성이 높아지고, 검색이나 비교도 쉬워집니다.
+  - type: code
+    language: python
+    title: 소문자 변환
+    description: 모든 텍스트를 소문자로
+    content: |-
+      lowercaseText = normalizedText.lower()
+      lowercaseText[:200]
+  - type: note
+    style: tip
+    title: "대소문자와 토큰"
+    content: |-
+      LLM 토크나이저는 대소문자를 다른 토큰으로 인식:
+      - "Bacon" : 1 토큰
+      - "bacon" : 1 토큰
+      - "BACON" : 1 토큰
+
+      소문자로 통일하면 어휘 크기 감소!
+
+- id: step6_tokenization
+  title: 6단계. 토큰화
+  subtitle: re.split()으로 단어 분리
+  blocks:
+  - type: text
+    content: 텍스트를 단어 단위로 분리합니다.
+  - type: code
+    language: python
+    title: 공백 기준 분리
+    description: split()으로 단어 나누기
+    content: |-
+      tokens = lowercaseText.split()
+      tokens[:20]
+  - type: code
+    language: python
+    title: re.split() 사용
+    description: 정규표현식으로 더 유연하게
+    content: |-
+      pattern = r"\s+"
+      tokensRegex = re.split(pattern, lowercaseText.strip())
+      tokensRegex[:20]
+  - type: note
+    style: tip
+    title: "re.split(패턴, 텍스트)"
+    content: |-
+      **re.split()**:
+      - 패턴을 구분자로 텍스트 분리
+      - str.split()보다 유연함
+      - 여러 구분자 동시 사용 가능
+
+      예: `re.split(r"[,;\s]+", text)` → 쉼표, 세미콜론, 공백으로 분리
+
+- id: step7_advanced_tokenization
+  title: 7단계. 고급 토큰화
+  subtitle: 여러 구분자 동시 처리
+  blocks:
+  - type: text
+    content: 실제 텍스트는 공백 외에도 쉼표, 마침표 등으로 구분됩니다.
+  - type: code
+    language: python
+    title: 구두점 포함 분리
+    description: 공백, 쉼표, 마침표 등으로 분리
+    content: |-
+      testText = "Hello, world! How are you? Fine, thanks."
+
+      tokens = re.split(r"[\s,!?.;]+", testText)
+      tokens = [t for t in tokens if t]
+      tokens
+  - type: text
+    content: "결과: ['Hello', 'world', 'How', 'are', 'you', 'Fine', 'thanks']"
+
+- id: step8_ngrams
+  title: 8단계. N-gram 추출
+  subtitle: 연속된 단어 조합
+  blocks:
+  - type: text
+    content: 문맥 분석을 위해 연속된 2~3개 단어를 추출합니다.
+  - type: code
+    language: python
+    title: Bigram 추출
+    description: 연속된 2개 단어 조합
+    content: |-
+      words = lowercaseText.split()[:50]
+
+      bigrams = [f"{words[i]} {words[i+1]}" for i in range(len(words)-1)]
+      bigrams[:10]
+  - type: code
+    language: python
+    title: 정규표현식으로 구문 추출
+    description: 특정 패턴의 구문 찾기
+    content: |-
+      pattern = r"\b\w{5,}\s+\w{5,}\b"
+
+      longBigrams = re.findall(pattern, lowercaseText)
+      longBigrams[:10]
+  - type: note
+    style: tip
+    title: "N-gram의 활용"
+    content: |-
+      N-gram은 문맥을 유지하면서 텍스트를 분석할 때 사용:
+      - Bigram (2-gram): 연속된 2개 단어
+      - Trigram (3-gram): 연속된 3개 단어
+
+      검색, 추천, 자동 완성 등에 활용
+
+- id: step9_complete_pipeline
+  title: 9단계. 완성된 전처리 파이프라인
+  subtitle: 모든 단계 통합
+  blocks:
+  - type: text
+    content: 배운 모든 기법을 합쳐 완성된 파이프라인을 만듭니다.
+  - type: code
+    language: python
+    title: 텍스트 전처리 파이프라인
+    description: 정제 → 정규화 → 토큰화
+    content: |-
+      def preprocessText(text):
+          text = re.sub(r"[^a-zA-Z\s]", "", text)
+
+          text = re.sub(r"\s+", " ", text)
+          text = text.strip()
+
+          text = text.lower()
+
+          tokens = re.split(r"\s+", text)
+
+          return {
+              "clean_text": text,
+              "tokens": tokens,
+              "token_count": len(tokens)
+          }
+
+      result = preprocessText(rawText)
+      f"토큰 수: {result['token_count']}\n처음 10개 토큰: {result['tokens'][:10]}"
+
+- id: step10_comparison
+  title: 10단계. 전처리 전후 비교
+  subtitle: 토큰 절약 효과
+  blocks:
+  - type: text
+    content: 전처리 전후의 토큰 수를 비교합니다.
+  - type: code
+    language: python
+    title: 토큰 수 비교
+    description: 전처리로 얼마나 절약되는지 확인
+    content: |-
+      original = preprocessText(rawText)
+      originalLen = len(rawText)
+      cleanedLen = len(original['clean_text'])
+      saved = ((originalLen - cleanedLen) / originalLen) * 100
+
+      f"원본 길이: {originalLen}자\n정제 후: {cleanedLen}자\n절약: {saved:.1f}%\n\n원본 토큰 수 (추정): {originalLen // 4}\n정제 후 토큰: {original['token_count']}"
+  - type: note
+    style: tip
+    title: "LLM API 비용 절감"
+    content: |-
+      평균 20~40% 토큰 절약:
+      - 특수문자 제거: 10%
+      - 공백 정규화: 5%
+      - 소문자 변환: 5~10%
+      - 불필요한 반복 제거: 10%
+
+      **실제 효과**: 10,000 토큰 → 6,000 토큰 = API 비용 40% 절감!
+
+- id: practice
+  title: 실습
+  subtitle: 텍스트 정제 프로젝트
+  blocks:
+  - type: text
+    content: 데이터 엔지니어가 되어 텍스트를 정제하고 분석합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 이메일 도메인별 통계"
+    blocks:
+    - type: code
+      title: "이메일 추출"
+      content: |-
+        import re
+
+        text = """
+        Contact us: support@company.com, sales@company.com
+        Partners: partner@service.org, info@service.org
+        Admin: admin@shop.io
+        """
+
+        emails = re.findall(r"[\w.]+@[\w.]+\.\w+", text)
+        emails
+    - type: code
+      title: "도메인별 통계"
+      content: |-
+        domains = [e.split('@')[1] for e in emails]
+        stats = {}
+        for d in domains:
+            stats[d] = stats.get(d, 0) + 1
+        stats
+  - type: expansion
+    title: "미션2: Bacon Ipsum 전처리 파이프라인"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import re
+        import json
+        from pyodide.http import open_url
+
+        data = json.loads(
+            open_url("https://baconipsum.com/api/?type=all-meat&paras=3").read()
+        )
+        raw = " ".join(data)
+        raw[:100]
+    - type: code
+      title: "전처리 및 토큰화"
+      content: |-
+        def process(text):
+            text = re.sub(r"[^a-zA-Z\s]", "", text)
+            text = re.sub(r"\s+", " ", text)
+            text = text.strip().lower()
+            tokens = re.split(r"\s+", text)
+            return {"clean_text": text, "tokens": tokens, "token_count": len(tokens)}
+
+        out = process(raw)
+        f"토큰 수: {out['token_count']}, 처음 10개: {out['tokens'][:10]}"
+
+- id: summary
+  title: 정리
+  subtitle: 여덟 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 텍스트 정제와 토큰화를 배웠습니다. LLM 전처리의 핵심 단계입니다.
+  - type: list
+    items:
+    - "[^...] - 부정 문자 클래스"
+    - "re.split() - 패턴으로 분리"
+    - "\\s+ - 공백 정규화"
+    - "토큰화 - 단어 단위 분리"
+  - type: text
+    content: 다음은 심화 단계입니다! lookahead와 lookbehind를 배웁니다.

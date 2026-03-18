@@ -1,0 +1,275 @@
+meta:
+  id: sympy_00
+  title: SymPy소개
+  order: 0
+  category: sympy
+  badge: 소개
+  tags: ["sympy", "기호수학", "symbolic", "대수학", "미적분"]
+  seo:
+    title: "SymPy 소개 - 파이썬 기호 수학 라이브러리"
+    description: "SymPy로 수식을 기호로 다루고 미분, 적분, 방정식 풀이를 배웁니다. 수학 문제를 파이썬으로 해결하는 방법을 소개합니다."
+    keywords: ["sympy", "기호수학", "symbolic math", "미분", "적분", "방정식"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "🔢"
+      title: "SymPy"
+      subtitle: "파이썬 기호 수학 라이브러리"
+
+    - type: hero
+      emoji: "∫"
+      title: "수식을 기호로 다루는 수학"
+      subtitle: "정확한 수학적 계산과 수식 조작"
+      points:
+        - emoji: "📐"
+          title: "미분과 적분"
+        - emoji: "🎯"
+          title: "방정식 풀이"
+        - emoji: "📊"
+          title: "행렬 연산"
+        - emoji: "∞"
+          title: "극한과 급수"
+
+- id: sympy_history
+  blocks:
+    - type: sectionHeader
+      title: "🏛️ SymPy란?"
+      subtitle: "기호 수학의 세계"
+
+    - type: text
+      content: |-
+        SymPy(Symbolic Python)는 2006년 Ondřej Čertík가 개발한 파이썬 기호 수학 라이브러리입니다. 일반 계산기가 3+5=8처럼 숫자 결과를 주는 것과 달리, SymPy는 x+y 같은 수식 자체를 다룹니다. (x+1)²을 전개하면 x²+2x+1이 되고, 이를 다시 인수분해할 수 있습니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "🔣"
+          title: "기호 계산"
+          description: "x, y 같은 변수를 값 없이 수식으로 조작합니다"
+        - emoji: "✨"
+          title: "정확한 결과"
+          description: "√2를 1.414...가 아닌 정확한 기호로 유지합니다"
+        - emoji: "🐍"
+          title: "순수 파이썬"
+          description: "외부 의존성 없이 어디서나 실행됩니다"
+
+- id: numeric_vs_symbolic
+  blocks:
+    - type: sectionHeader
+      title: "⚖️ 숫자 vs 기호"
+      subtitle: "근본적인 차이"
+
+    - type: text
+      content: |-
+        숫자 계산(Numeric)은 구체적인 값으로 결과를 얻습니다. sqrt(2)를 계산하면 1.4142...라는 근삿값이 나옵니다. 반면 기호 계산(Symbolic)은 √2 그 자체를 유지하며, 정확한 값을 보존합니다.
+
+    - type: table
+      headers:
+        - 구분
+        - 숫자 계산
+        - 기호 계산
+      rows:
+        - - √2
+          - "1.41421356..."
+          - "√2"
+        - - π
+          - "3.14159265..."
+          - "π"
+        - - (x+1)²
+          - x 값 필요
+          - "x² + 2x + 1"
+        - - 미분
+          - 수치 근사
+          - 정확한 도함수
+
+    - type: note
+      title: "왜 기호 계산이 필요한가?"
+      content: "수치 계산은 반올림 오차가 누적됩니다. 기호 계산은 정확한 수식을 유지하므로 오차가 없습니다. 미분, 적분 같은 수학적 조작은 기호로 해야 정확한 결과를 얻습니다."
+
+- id: features
+  blocks:
+    - type: sectionHeader
+      title: "🛠️ SymPy 주요 기능"
+      subtitle: "대학 수학의 모든 것"
+
+    - type: text
+      content: |-
+        SymPy는 대학 수학 과정의 거의 모든 내용을 다룰 수 있습니다. 기초 대수부터 고급 미적분, 선형대수, 미분방정식까지 폭넓게 지원합니다.
+
+    - type: table
+      headers:
+        - 분야
+        - 기능
+        - 예시
+      rows:
+        - - 대수학
+          - 전개, 인수분해, 방정식
+          - "factor(x²-1) → (x+1)(x-1)"
+        - - 미적분
+          - 미분, 적분, 극한
+          - "diff(x³) → 3x²"
+        - - 급수
+          - 테일러 급수, 합
+          - "series(sin(x)) → x - x³/6 + ..."
+        - - 선형대수
+          - 행렬, 역행렬, 고유값
+          - "Matrix([[1,2],[3,4]]).det()"
+        - - 삼각함수
+          - 항등식, 변환
+          - "trigsimp(sin²+cos²) → 1"
+
+- id: comparison
+  blocks:
+    - type: sectionHeader
+      title: "🔄 SymPy vs 다른 도구"
+      subtitle: "적재적소에 맞는 선택"
+
+    - type: table
+      headers:
+        - 도구
+        - 특징
+        - 적합한 용도
+      rows:
+        - - SymPy
+          - 무료, 파이썬 통합, 기호 계산
+          - 수학 학습, 공식 유도
+        - - NumPy/SciPy
+          - 빠른 수치 계산
+          - 대용량 데이터 연산
+        - - Mathematica
+          - 상용, 강력한 기호 계산
+          - 전문 연구
+        - - WolframAlpha
+          - 웹 서비스, 편리
+          - 빠른 검색
+
+- id: use_cases
+  blocks:
+    - type: sectionHeader
+      title: "💡 활용 분야"
+      subtitle: "SymPy가 사용되는 곳"
+
+    - type: text
+      content: |-
+        SymPy는 수학 학습, 과학 연구, 공학 계산 등 다양한 분야에서 활용됩니다.
+
+    - type: table
+      headers:
+        - 분야
+        - 활용 예시
+      rows:
+        - - 수학 학습
+          - 미적분 풀이 검증, 복잡한 계산 확인
+        - - 물리학
+          - 운동 방정식 풀이, 라그랑지안 계산
+        - - 공학
+          - 제어 시스템, 신호 처리, 회로 해석
+        - - 교육
+          - 문제 자동 생성, 단계별 풀이 제공
+
+- id: core_concepts
+  blocks:
+    - type: sectionHeader
+      title: "📌 핵심 개념"
+      subtitle: "알아야 할 것들"
+
+    - type: featureCards
+      cards:
+        - emoji: "🔤"
+          title: "기호 (Symbol)"
+          description: "x, y, z 같은 수학 변수를 정의합니다"
+        - emoji: "📝"
+          title: "표현식 (Expression)"
+          description: "x² + 2x + 1 같은 수식입니다"
+        - emoji: "⚖️"
+          title: "방정식 (Equation)"
+          description: "Eq(x², 4)처럼 등호를 포함한 수식입니다"
+        - emoji: "📈"
+          title: "함수 (Function)"
+          description: "sin, cos, exp, log 같은 수학 함수입니다"
+
+- id: workflow
+  blocks:
+    - type: sectionHeader
+      title: "🔄 작업 흐름"
+      subtitle: "SymPy 사용 순서"
+
+    - type: table
+      headers:
+        - 단계
+        - 설명
+        - 예시
+      rows:
+        - - "1. 기호 정의"
+          - 변수 생성
+          - "x, y = symbols('x y')"
+        - - "2. 수식 생성"
+          - 표현식 작성
+          - "expr = x**2 + 2*x + 1"
+        - - "3. 수식 조작"
+          - 전개, 인수분해
+          - "factor(expr)"
+        - - "4. 계산 수행"
+          - 미분, 적분, 풀이
+          - "diff(expr, x)"
+        - - "5. 결과 확인"
+          - 값 대입, 수치화
+          - "expr.subs(x, 2).evalf()"
+
+- id: curriculum
+  blocks:
+    - type: sectionHeader
+      title: "📚 커리큘럼"
+      subtitle: "10개 프로젝트로 마스터"
+
+    - type: text
+      content: |-
+        이 카테고리에서는 10개의 프로젝트를 통해 SymPy의 핵심 기능을 배웁니다.
+
+    - type: table
+      headers:
+        - 프로젝트
+        - 주제
+        - 핵심 개념
+      rows:
+        - - "01. 기초 수식 계산"
+          - 대수학 입문
+          - 기호, 전개, 인수분해
+        - - "02. 대입과 계산"
+          - 수식 평가
+          - subs, evalf, simplify
+        - - "03. 방정식 풀이"
+          - 대수 방정식
+          - solve, Eq, 연립방정식
+        - - "04. 미분 기초"
+          - 미분법
+          - diff, 고차미분, 편미분
+        - - "05. 적분 기초"
+          - 적분법
+          - integrate, 정적분
+        - - "06. 극한과 급수"
+          - 해석학
+          - limit, series, summation
+        - - "07. 삼각함수 활용"
+          - 삼각법
+          - trigsimp, 항등식
+        - - "08. 행렬 연산"
+          - 선형대수
+          - Matrix, 역행렬, 고유값
+        - - "09. 수식 시각화"
+          - 그래프
+          - plot, matplotlib 연동
+        - - "10. 종합 수학 문제"
+          - 응용
+          - 최적화, 미분방정식
+
+- id: start
+  blocks:
+    - type: sectionHeader
+      title: "🎯 시작하기"
+      subtitle: "첫 번째 프로젝트로"
+
+    - type: text
+      content: |-
+        SymPy를 배우면 파이썬으로 수학 문제를 정확하게 풀 수 있습니다. 손으로 푸는 것과 병행하며 검증하고, 복잡한 계산은 SymPy에게 맡기세요. 첫 번째 프로젝트에서 기호를 정의하고 수식을 전개하는 것부터 시작합니다.

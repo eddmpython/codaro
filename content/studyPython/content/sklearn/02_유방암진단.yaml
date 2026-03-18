@@ -1,0 +1,325 @@
+meta:
+  id: sklearn_02
+  title: 유방암진단
+  order: 2
+  category: sklearn
+  difficulty: "⭐⭐"
+  badge: 입문
+  tags: ["이진분류", "precision", "recall", "F1", "유방암"]
+  seo:
+    title: "scikit-learn 이진 분류 - 유방암 진단 모델"
+    description: "이진 분류 모델로 유방암 양성/악성을 판별합니다. 정밀도, 재현율, F1 점수로 모델을 평가합니다."
+    keywords: ["scikit-learn", "이진분류", "유방암", "precision", "recall"]
+
+intro:
+  emoji: "🏥"
+  goal: 이진 분류 모델로 유방암 양성/악성을 판별합니다.
+  description: 의료 진단에서 중요한 이진 분류를 배웁니다. 정밀도(precision)와 재현율(recall)의 차이를 이해하고, 상황에 맞는 평가 지표를 선택하는 방법을 익힙니다. 이전 프로젝트에서 배운 train_test_split, StandardScaler, LogisticRegression을 복습합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: 유방암 진단 모델을 만들기 위해 필요한 라이브러리를 불러옵니다. sklearn의 breast_cancer 데이터셋은 569개의 세포 샘플과 30개의 특성을 제공합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: sklearn과 pandas 임포트
+    content: |-
+      from sklearn.datasets import load_breast_cancer
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+      from sklearn.metrics import confusion_matrix, classification_report
+      import pandas as pd
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  subtitle: load_breast_cancer()
+  blocks:
+  - type: text
+    content: 유방암 데이터셋을 불러옵니다. 세포핵의 반지름, 질감, 둘레, 면적 등 30개의 특성으로 양성(benign)과 악성(malignant)을 구분합니다. 타겟 0은 악성, 1은 양성입니다.
+  - type: code
+    language: python
+    title: 데이터 로드
+    description: 유방암 데이터셋 불러오기
+    content: |-
+      cancer = load_breast_cancer()
+      X = pd.DataFrame(cancer.data, columns=cancer.feature_names)
+      y = cancer.target
+      X.shape
+  - type: code
+    language: python
+    title: 클래스 확인
+    description: 양성/악성 분포
+    content: |-
+      classCounts = pd.Series(y).value_counts()
+      pd.DataFrame({'class': cancer.target_names, 'count': [classCounts[0], classCounts[1]]})
+  - type: tip
+    content: target=0은 malignant(악성), target=1은 benign(양성)입니다. 의료에서는 악성을 "양성(positive)"으로 취급합니다. 혼란을 방지하기 위해 0/1 숫자로 작업하는 것이 좋습니다.
+
+- id: step3_split_scale
+  title: 3단계. 분할과 스케일링
+  subtitle: 전처리
+  blocks:
+  - type: text
+    content: 이전 프로젝트에서 배운 대로 데이터를 분할하고 스케일링합니다. 30개의 특성이 모두 다른 스케일이므로 StandardScaler가 필수입니다.
+  - type: code
+    language: python
+    title: 분할과 스케일링
+    description: train/test 분할 후 표준화
+    content: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42)
+
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+      xTrainSc.shape
+
+- id: step4_train
+  title: 4단계. 모델 학습
+  subtitle: LogisticRegression
+  blocks:
+  - type: text
+    content: 이진 분류에서도 LogisticRegression을 사용합니다. 출력이 0 또는 1의 두 클래스이므로 이진 분류(binary classification)라고 합니다.
+  - type: code
+    language: python
+    title: 모델 학습
+    description: 이진 분류 모델 학습
+    content: |-
+      model = LogisticRegression(max_iter=1000)
+      model.fit(xTrainSc, yTrain)
+
+- id: step5_predict
+  title: 5단계. 예측
+  subtitle: predict
+  blocks:
+  - type: text
+    content: 테스트 데이터로 예측을 수행합니다. 의료 진단에서는 악성(0)을 놓치지 않는 것이 중요합니다.
+  - type: code
+    language: python
+    title: 예측 수행
+    description: 테스트 데이터 예측
+    content: |-
+      yPred = model.predict(xTestSc)
+      yPred[:10]
+
+- id: step6_accuracy
+  title: 6단계. 정확도
+  subtitle: accuracy_score
+  blocks:
+  - type: text
+    content: 전체 정확도를 확인합니다. 하지만 의료 진단에서는 정확도만으로는 부족합니다. 악성을 양성으로 잘못 판단하면 치명적이기 때문입니다.
+  - type: code
+    language: python
+    title: 정확도
+    description: 전체 정확도 확인
+    content: |-
+      acc = accuracy_score(yTest, yPred)
+      f"정확도: {acc:.2%}"
+
+- id: step7_precision_recall
+  title: 7단계. 정밀도와 재현율
+  subtitle: precision, recall
+  blocks:
+  - type: text
+    content: 정밀도(precision)는 "양성 예측 중 실제 양성 비율"입니다. 재현율(recall)은 "실제 양성 중 맞춘 비율"입니다. 의료에서는 악성(0)을 놓치지 않는 것이 중요하므로 재현율이 더 중요합니다.
+  - type: code
+    language: python
+    title: 정밀도
+    description: 양성 예측의 정확도
+    content: |-
+      prec = precision_score(yTest, yPred)
+      f"정밀도: {prec:.2%}"
+  - type: code
+    language: python
+    title: 재현율
+    description: 실제 양성 중 맞춘 비율
+    content: |-
+      rec = recall_score(yTest, yPred)
+      f"재현율: {rec:.2%}"
+  - type: tip
+    content: 암 진단에서 악성(0)을 놓치면(False Negative) 환자가 치료 시기를 놓칩니다. 따라서 재현율이 높아야 합니다. 반대로 스팸 필터에서는 정상 메일을 스팸으로 오분류(False Positive)하면 안 되므로 정밀도가 더 중요합니다.
+
+- id: step8_f1
+  title: 8단계. F1 점수
+  subtitle: 조화평균
+  blocks:
+  - type: text
+    content: F1 점수는 정밀도와 재현율의 조화평균입니다. 두 지표 중 하나만 높으면 F1이 낮아집니다. 정밀도와 재현율의 균형을 평가할 때 사용합니다.
+  - type: code
+    language: python
+    title: F1 점수
+    description: 정밀도와 재현율의 조화평균
+    content: |-
+      f1 = f1_score(yTest, yPred)
+      f"F1 점수: {f1:.2%}"
+  - type: code
+    language: python
+    title: 평가 지표 종합
+    description: 모든 지표 한눈에 보기
+    content: |-
+      metrics = pd.DataFrame({
+          'Metric': ['Accuracy', 'Precision', 'Recall', 'F1'],
+          'Score': [acc, prec, rec, f1]
+      })
+      metrics
+  - type: tip
+    content: F1 = 2 * (precision * recall) / (precision + recall). 조화평균이므로 두 값이 비슷해야 높은 F1이 나옵니다. 예를 들어 precision=0.9, recall=0.1이면 F1은 0.18에 불과합니다.
+
+- id: step9_confusion
+  title: 9단계. 혼동행렬 분석
+  subtitle: TP, TN, FP, FN
+  blocks:
+  - type: text
+    content: 혼동행렬을 통해 True Positive(TP), True Negative(TN), False Positive(FP), False Negative(FN)를 확인합니다. 의료에서 FN(실제 악성을 양성으로 예측)이 가장 위험합니다.
+  - type: code
+    language: python
+    title: 혼동행렬
+    description: TP, TN, FP, FN 확인
+    content: |-
+      cm = confusion_matrix(yTest, yPred)
+      cmDf = pd.DataFrame(cm, index=['Actual Malignant', 'Actual Benign'], columns=['Pred Malignant', 'Pred Benign'])
+      cmDf
+  - type: code
+    language: python
+    title: 히트맵
+    description: 혼동행렬 시각화
+    content: |-
+      fig, ax = plt.subplots(figsize=(8, 6))
+      sns.heatmap(cm, annot=True, fmt='d', cmap='Blues', xticklabels=['Malignant', 'Benign'], yticklabels=['Malignant', 'Benign'], ax=ax)
+      ax.set_xlabel('Predicted')
+      ax.set_ylabel('Actual')
+      ax.set_title('Confusion Matrix - Breast Cancer')
+      fig
+  - type: tip
+    content: "혼동행렬 해석: TN(좌상) - 악성을 악성으로 정확히 예측. FP(우상) - 악성을 양성으로 잘못 예측. FN(좌하) - 양성을 악성으로 잘못 예측. TP(우하) - 양성을 양성으로 정확히 예측."
+
+- id: step10_report
+  title: 10단계. 상세 리포트
+  subtitle: classification_report
+  blocks:
+  - type: text
+    content: classification_report로 클래스별 상세 평가를 확인합니다. 악성(0)과 양성(1) 각각의 precision, recall, f1을 비교합니다.
+  - type: code
+    language: python
+    title: 분류 리포트
+    description: 클래스별 상세 평가
+    content: |-
+      report = classification_report(yTest, yPred, target_names=['malignant', 'benign'])
+      report
+
+- id: step11_proba
+  title: 11단계. 확률 예측
+  subtitle: predict_proba
+  blocks:
+  - type: text
+    content: predict_proba()로 각 클래스의 확률을 얻을 수 있습니다. 의료에서는 확률값을 활용하여 위험도를 세분화하거나, 임계값을 조정할 수 있습니다.
+  - type: code
+    language: python
+    title: 확률 예측
+    description: 악성/양성 확률 확인
+    content: |-
+      proba = model.predict_proba(xTestSc)
+      probaDf = pd.DataFrame(proba, columns=['Malignant Prob', 'Benign Prob'])
+      probaDf.head(10)
+  - type: tip
+    content: 기본 임계값은 0.5입니다. 악성 확률이 0.5 이상이면 악성으로 예측합니다. 재현율을 높이려면 임계값을 낮춰서 더 많은 케이스를 악성으로 분류할 수 있습니다.
+
+- id: step12_summary
+  title: 12단계. 정리
+  subtitle: 이진 분류 완료
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 유방암 진단 모델을 만들어 이진 분류를 학습했습니다. 정확도뿐 아니라 정밀도, 재현율, F1 점수로 모델을 다각도로 평가하는 방법을 배웠습니다. 의료처럼 오분류 비용이 다른 경우 상황에 맞는 지표를 선택해야 합니다.
+  - type: code
+    language: python
+    title: 최종 요약
+    description: 주요 결과 정리
+    content: |-
+      summary = pd.DataFrame({
+          'Item': ['Dataset', 'Model', 'Accuracy', 'Precision', 'Recall', 'F1'],
+          'Value': ['Breast Cancer (569 samples)', 'LogisticRegression', f'{acc:.2%}', f'{prec:.2%}', f'{rec:.2%}', f'{f1:.2%}']
+      })
+      summary
+
+- id: practice
+  title: 실습
+  subtitle: 유방암 진단 프로젝트
+  blocks:
+  - type: text
+    content: 의료 AI 개발자가 되어 진단 시스템을 구축합니다. 각 미션은 데이터 로딩부터 모델 학습, 평가까지 전 과정을 독립적으로 수행합니다. 이전 프로젝트의 train_test_split, StandardScaler와 이번 프로젝트의 precision, recall, F1을 모두 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 특성 10개만 사용하여 분류 성능 비교"
+    code: |-
+      from sklearn.datasets import load_breast_cancer
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+      import pandas as pd
+
+      data = load_breast_cancer()
+      xFull = pd.DataFrame(data.data, columns=data.feature_names)
+      yFull = data.target
+
+      top10 = ['mean radius', 'mean texture', 'mean perimeter', 'mean area', 'mean smoothness', 'mean compactness', 'mean concavity', 'mean concave points', 'mean symmetry', 'mean fractal dimension']
+      xTop10 = xFull[top10]
+
+      xTr1, xTe1, yTr1, yTe1 = train_test_split(xFull, yFull, test_size=0.2, random_state=42)
+      xTr2, xTe2, yTr2, yTe2 = train_test_split(xTop10, yFull, test_size=0.2, random_state=42)
+
+      sc1 = StandardScaler()
+      sc2 = StandardScaler()
+
+      model1 = LogisticRegression(max_iter=1000)
+      model1.fit(sc1.fit_transform(xTr1), yTr1)
+      pred1 = model1.predict(sc1.transform(xTe1))
+
+      model2 = LogisticRegression(max_iter=1000)
+      model2.fit(sc2.fit_transform(xTr2), yTr2)
+      pred2 = model2.predict(sc2.transform(xTe2))
+
+      pd.DataFrame({
+          'Features': ['All 30', 'Top 10'],
+          'Accuracy': [accuracy_score(yTe1, pred1), accuracy_score(yTe2, pred2)],
+          'F1': [f1_score(yTe1, pred1), f1_score(yTe2, pred2)]
+      })
+  - type: expansion
+    title: "미션2: 악성 클래스 재현율 집중 분석"
+    code: |-
+      from sklearn.datasets import load_breast_cancer
+      from sklearn.model_selection import train_test_split
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import confusion_matrix, classification_report
+      import pandas as pd
+
+      cancerData = load_breast_cancer()
+      xMission = pd.DataFrame(cancerData.data, columns=cancerData.feature_names)
+      yMission = cancerData.target
+
+      xTrM, xTeM, yTrM, yTeM = train_test_split(xMission, yMission, test_size=0.2, random_state=42)
+
+      scM = StandardScaler()
+      xTrMSc = scM.fit_transform(xTrM)
+      xTeMSc = scM.transform(xTeM)
+
+      modelM = LogisticRegression(max_iter=1000)
+      modelM.fit(xTrMSc, yTrM)
+      predM = modelM.predict(xTeMSc)
+
+      cmM = confusion_matrix(yTeM, predM)
+      tn, fp, fn, tp = cmM.ravel()
+
+      pd.DataFrame({
+          'Metric': ['True Negative (악성→악성)', 'False Positive (악성→양성)', 'False Negative (양성→악성)', 'True Positive (양성→양성)', 'Malignant Recall'],
+          'Value': [tn, fp, fn, tp, tn / (tn + fp)]
+      })

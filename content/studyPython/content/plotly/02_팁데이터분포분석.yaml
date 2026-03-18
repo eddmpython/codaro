@@ -1,0 +1,329 @@
+meta:
+  id: plotly_02
+  title: 팁데이터분포분석
+  order: 2
+  category: plotly
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["histogram", "box", "facet", "tips", "분포분석"]
+  seo:
+    title: "Plotly 히스토그램 박스플롯 - 팁 데이터 분포 분석"
+    description: "레스토랑 팁 데이터로 분포를 시각화합니다. 히스토그램, 박스플롯, facet으로 요일/시간별 패턴을 분석합니다."
+    keywords: ["Plotly histogram", "box plot", "facet", "팁 분포", "데이터 시각화"]
+
+intro:
+  emoji: "💵"
+  goal: 레스토랑 팁 데이터에서 요일/시간별 팁 분포를 시각화합니다.
+  description: 팁 데이터의 분포를 다양한 차트로 탐색합니다. 히스토그램으로 전체 분포를, 박스플롯으로 그룹별 비교를, facet으로 다차원 분석을 수행합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: tips 데이터 준비
+  blocks:
+  - type: text
+    content: 레스토랑 팁 데이터는 실제 식당에서 수집된 244건의 식사 기록을 담고 있습니다. 각 행은 한 건의 식사를 나타내며, 총 결제 금액(total_bill), 팁(tip), 성별(sex), 흡연 여부(smoker), 요일(day), 시간대(time), 일행 수(size) 등의 정보가 포함되어 있습니다. 이 데이터를 통해 어떤 조건에서 팁을 많이 주는지, 팁의 분포는 어떤 패턴을 보이는지 분석할 수 있습니다. 실무에서는 이런 분석으로 레스토랑 운영 전략을 수립하거나 직원 배치를 최적화할 수 있습니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: tips.csv 로드
+    content: |-
+      import plotly.express as px
+      import pandas as pd
+
+      baseUrl = "https://raw.githubusercontent.com"
+      tips = pd.read_csv(f"{baseUrl}/mwaskom/seaborn-data/master/tips.csv")
+      tips.head()
+
+- id: step2_explore
+  title: 2단계. 데이터 구조 파악
+  subtitle: 컬럼 확인
+  blocks:
+  - type: text
+    content: 데이터 분석을 시작하기 전에 어떤 컬럼이 사용 가능한지 파악하는 것이 중요합니다. tips 데이터셋에는 total_bill(총금액), tip(팁), sex(성별), smoker(흡연), day(요일), time(시간대), size(인원수) 등 7개의 컬럼이 있습니다. 각 컬럼은 식사 한 건에 대한 서로 다른 측면을 나타내며, 이들의 조합으로 팁 패턴을 다각도로 분석할 수 있습니다. info() 메서드를 사용하면 각 컬럼의 데이터 타입과 결측치 여부까지 한 번에 확인할 수 있어 데이터 품질 점검에 유용합니다.
+  - type: code
+    language: python
+    title: 컬럼 정보
+    description: 데이터 구조 확인
+    content: |-
+      tips.info()
+
+- id: step3_histogram_basic
+  title: 3단계. 히스토그램 기초
+  subtitle: 팁 분포 확인
+  blocks:
+  - type: text
+    content: 히스토그램은 연속형 데이터(숫자)의 분포를 시각적으로 보여주는 가장 기본적인 차트입니다. 데이터를 여러 구간(bin)으로 나누고, 각 구간에 속하는 데이터의 개수를 막대 높이로 표현합니다. 팁 데이터의 히스토그램을 보면 대부분의 팁이 2~3달러 구간에 몰려있고, 5달러 이상은 드물다는 것을 한눈에 알 수 있습니다. 이런 분포 패턴을 파악하면 평균값만으로는 알 수 없는 데이터의 특성을 이해할 수 있습니다. 예를 들어 평균 팁이 3달러라는 정보만으로는 대부분이 3달러 근처인지, 아니면 1달러와 5달러로 양극화되어 있는지 알 수 없습니다. 히스토그램은 이런 분포의 형태(정규분포, 왜도, 첨도)를 시각적으로 보여줍니다. 실무에서는 가격 책정, 재고 관리, 고객 행동 분석, 품질 관리 등에 활용됩니다.
+  - type: code
+    language: python
+    title: 팁 분포 히스토그램
+    description: px.histogram 기본
+    content: |-
+      figHist = px.histogram(tips, x="tip", title="팁 분포")
+      figHist
+  - type: tip
+    content: px.histogram(데이터, x='컬럼명')이 기본 형태입니다. x에 지정한 컬럼의 값을 자동으로 구간(bins)으로 나누고, 각 구간의 빈도를 막대로 표현합니다. 막대 높이가 높을수록 해당 구간에 데이터가 많이 몰려있다는 의미입니다. 히스토그램과 막대그래프(bar chart)의 차이는 히스토그램은 연속형 데이터를 구간으로 나눈 것이고, 막대그래프는 범주형 데이터를 표현한다는 점입니다. 히스토그램은 평균, 중앙값, 표준편차와 함께 사용하면 데이터의 전체 모습을 파악하는 데 매우 유용합니다. 통계학에서 기술통계의 핵심 도구입니다.
+
+- id: step4_histogram_bins
+  title: 4단계. 히스토그램 구간 조정
+  subtitle: nbins 파라미터
+  blocks:
+  - type: text
+    content: 히스토그램의 구간 개수(bins)는 데이터 이해에 큰 영향을 미칩니다. nbins 파라미터로 막대 개수를 조정할 수 있습니다. 구간이 너무 많으면 세밀한 변화를 볼 수 있지만 전체 패턴이 흐려지고 노이즈가 많아 보입니다. 반대로 너무 적으면 큰 흐름만 보이고 중요한 디테일을 놓칠 수 있습니다. 일반적으로 데이터 개수의 제곱근 정도를 구간 수로 사용하는 Sturges 규칙이 있습니다. 팁 데이터는 244개 행이므로 sqrt(244) ≈ 15개 정도가 적절하지만, 여러 개를 시도해서 가장 의미 있는 패턴이 보이는 것을 선택하는 것이 실무적입니다. 데이터 탐색 초기에는 여러 nbins 값을 실험해보는 것이 좋습니다.
+  - type: code
+    language: python
+    title: 구간 조정
+    description: nbins로 막대 개수 변경
+    content: |-
+      figBins = px.histogram(tips, x="tip", nbins=20, title="팁 분포 (20구간)")
+      figBins
+  - type: tip
+    content: nbins 파라미터는 히스토그램의 막대(구간) 개수를 지정합니다. nbins=20이면 데이터 범위를 20개 구간으로 나눕니다. 기본값은 Plotly가 자동으로 계산하지만(보통 Freedman-Diaconis 규칙 사용), 데이터 특성에 따라 직접 조정하는 것이 좋습니다. nbins=10(큰 패턴 파악), nbins=30(세밀한 분포 분석)처럼 목적에 맞게 조절합니다. 너무 많으면 과적합(overfitting)처럼 보이고, 너무 적으면 과소적합(underfitting)처럼 정보가 뭉뚱그려집니다. 데이터 분석가는 적절한 균형점을 찾는 것이 중요합니다.
+
+- id: step5_histogram_color
+  title: 5단계. 히스토그램에 색상 추가
+  subtitle: color로 그룹 구분
+  blocks:
+  - type: text
+    content: color 파라미터로 그룹별 분포를 비교할 수 있습니다. 점심(Lunch)과 저녁(Dinner) 시간대별로 팁 분포가 어떻게 다른지 한 차트에서 비교합니다. 색상을 추가하면 히스토그램이 겹쳐서(overlay) 또는 쌓여서(stacked) 표시됩니다. 이를 통해 두 그룹의 분포 형태를 직접 비교할 수 있어, 저녁 시간대에 고액 팁이 더 많은지, 점심 시간대 팁이 더 집중적인지 등을 파악할 수 있습니다. 실무에서는 A/B 테스트 결과 비교, 실험군과 대조군 비교, 시즌별 판매 패턴 비교 등에 활용됩니다.
+  - type: code
+    language: python
+    title: 시간대별 팁 분포
+    description: color로 Lunch/Dinner 구분
+    content: |-
+      figTimeColor = px.histogram(
+          tips,
+          x="tip",
+          color="time",
+          title="시간대별 팁 분포"
+      )
+      figTimeColor
+
+- id: step6_box_basic
+  title: 6단계. 박스플롯 기초
+  subtitle: 분포 요약
+  blocks:
+  - type: text
+    content: 박스플롯(Box Plot)은 데이터의 분포를 5가지 핵심 통계량으로 요약해서 보여주는 차트입니다. 히스토그램이 전체 분포 형태를 보여준다면, 박스플롯은 중앙값, 사분위수, 이상치를 한눈에 파악할 수 있게 해줍니다. 상자 안의 가운데 선은 중앙값(50% 지점), 상자의 아래쪽 경계는 25% 지점(1사분위수), 위쪽 경계는 75% 지점(3사분위수)입니다. 상자에서 뻗어나온 수염은 정상 범위를 나타내고, 수염 밖의 점들은 이상치(outlier)입니다. 여러 그룹을 비교할 때 매우 효과적입니다.
+  - type: code
+    language: python
+    title: 팁 박스플롯
+    description: px.box 기본
+    content: |-
+      figBox = px.box(tips, y="tip", title="팁 분포 박스플롯")
+      figBox
+  - type: tip
+    content: |-
+      px.box(데이터, y='컬럼명')으로 세로 방향 박스플롯을 만듭니다. x='컬럼명'을 사용하면 가로 방향이 됩니다. 박스플롯 읽는 법은 다음과 같습니다. 1) 상자 가운데 선: 중앙값(median), 2) 상자 범위: 25%~75%(IQR, 데이터의 중간 50%), 3) 수염: 정상 범위(보통 IQR의 1.5배), 4) 개별 점: 이상치(outlier). 박스가 넓을수록 데이터 분산이 크고, 중앙값 위치로 비대칭 정도를 파악할 수 있습니다.
+
+- id: step7_box_category
+  title: 7단계. 카테고리별 박스플롯
+  subtitle: x축에 그룹 지정
+  blocks:
+  - type: text
+    content: 박스플롯에서 x축에 카테고리 변수를 지정하면 여러 그룹의 분포를 나란히 비교할 수 있습니다. 요일별 팁 분포를 비교하면 어느 요일에 팁이 많은지, 어느 요일에 팁의 변동성이 큰지 한눈에 파악할 수 있습니다. 예를 들어 주말에는 고액 팁이 많고 평일에는 팁이 일정하다면, 이는 주말 고객층과 평일 고객층이 다르다는 인사이트를 제공합니다. 이런 패턴을 발견하면 요일별 마케팅 전략이나 직원 배치를 최적화할 수 있습니다.
+  - type: code
+    language: python
+    title: 요일별 팁 분포
+    description: x에 day 지정
+    content: |-
+      px.box(
+          tips,
+          x="day",
+          y="tip",
+          title="요일별 팁 분포"
+      )
+
+- id: step8_box_color
+  title: 8단계. 박스플롯에 색상 추가
+  subtitle: 이중 비교
+  blocks:
+  - type: text
+    content: |-
+      박스플롯에 color 파라미터를 추가하면 한 그래프에서 두 가지 범주형 변수를 동시에 비교할 수 있어 분석의 깊이가 한층 깊어집니다. 예를 들어 요일(x축)과 시간대(color)를 조합하면 목요일 점심, 목요일 저녁, 금요일 점심, 금요일 저녁처럼 세분화된 조건별 팁 분포를 한 번에 비교할 수 있습니다. 이렇게 다차원 비교를 통해 복잡한 패턴(예: 주말 저녁에만 팁이 급증)을 발견할 수 있습니다. 실무에서는 이런 세밀한 분석이 타겟 마케팅이나 운영 최적화의 핵심 근거가 됩니다.
+  - type: code
+    language: python
+    title: 요일+시간대별 비교
+    description: color로 time 추가
+    content: |-
+      px.box(
+          tips,
+          x="day",
+          y="tip",
+          color="time",
+          title="요일/시간대별 팁 분포"
+      )
+
+- id: step9_facet_intro
+  title: 9단계. 패싯(Facet) 소개
+  subtitle: 그래프 분할
+  blocks:
+  - type: text
+    content: 패싯(Facet)은 하나의 큰 차트를 여러 개의 작은 차트로 분할하는 강력한 기능입니다. 같은 종류의 차트를 여러 그룹별로 나란히 배치해서 비교할 수 있습니다. 예를 들어 요일별 팁 분포를 한 차트에 색상으로 구분하는 것보다, 요일마다 별도의 히스토그램을 만들면 각 요일의 패턴을 더 명확하게 파악할 수 있습니다. facet_col은 가로 방향으로, facet_row는 세로 방향으로 차트를 나눕니다. 실무에서는 시계열 데이터를 월별로 나누거나, 제품을 카테고리별로 비교할 때 매우 유용합니다.
+  - type: code
+    language: python
+    title: 요일별 히스토그램
+    description: facet_col로 분할
+    content: |-
+      figFacetCol = px.histogram(
+          tips,
+          x="tip",
+          facet_col="day",
+          title="요일별 팁 분포"
+      )
+      figFacetCol
+  - type: tip
+    content: |-
+      facet_col='컬럼명'은 해당 컬럼의 고유값마다 가로로 차트를 나눕니다. facet_row='컬럼명'은 세로로 나눕니다. 두 개를 동시에 사용하면 격자 형태가 됩니다. 각 서브플롯은 동일한 축 범위를 공유하므로 직접 비교가 쉽습니다. category_orders={'day': ['Thur', 'Fri', 'Sat', 'Sun']}처럼 순서를 지정할 수도 있습니다.
+
+- id: step10_facet_row
+  title: 10단계. 세로 패싯
+  subtitle: facet_row
+  blocks:
+  - type: text
+    content: facet_row는 차트를 세로 방향으로 분할합니다. 가로 분할(facet_col)과 달리 위아래로 차트가 나열되어, 같은 x축 범위를 공유하므로 수평 비교가 쉽습니다. 시간대별 팁 분포를 세로로 나열하면 Lunch와 Dinner의 분포 차이를 한눈에 비교할 수 있습니다.
+  - type: code
+    language: python
+    title: 시간대별 세로 분할
+    description: facet_row로 분할
+    content: |-
+      figFacetRow = px.histogram(
+          tips,
+          x="tip",
+          facet_row="time",
+          title="시간대별 팁 분포"
+      )
+      figFacetRow
+
+- id: step11_facet_both
+  title: 11단계. 가로+세로 패싯
+  subtitle: 격자형 비교
+  blocks:
+  - type: text
+    content: facet_col과 facet_row를 동시에 사용하면 2차원 격자형 레이아웃이 만들어집니다. 행(row)과 열(column)을 조합해서 두 가지 범주를 동시에 비교할 수 있습니다. 요일(가로)과 시간대(세로)를 조합하면 총 8개의 서브플롯(4개 요일 x 2개 시간대)이 생성되어, 각 조건별 팁 분포 패턴을 세밀하게 분석할 수 있습니다. 실무에서는 지역별/제품별, 연도별/분기별 등 복잡한 다차원 비교에 활용됩니다.
+  - type: code
+    language: python
+    title: 요일x시간대 격자
+    description: 2차원 패싯
+    content: |-
+      figFacetBoth = px.histogram(
+          tips,
+          x="tip",
+          facet_col="day",
+          facet_row="time",
+          title="요일/시간대별 팁 분포"
+      )
+      figFacetBoth
+
+- id: step12_box_facet
+  title: 12단계. 박스플롯 패싯
+  subtitle: 그룹 비교
+  blocks:
+  - type: text
+    content: 히스토그램뿐만 아니라 박스플롯에도 패싯을 적용할 수 있어 데이터 탐색의 폭이 넓어집니다. 성별에 따른 팁 분포를 요일별로 나누어 비교하면 성별과 요일의 상호작용 효과를 파악할 수 있습니다. 예를 들어 남성은 주말에 팁을 많이 주고 여성은 평일에 팁을 많이 준다면 이는 성별에 따른 외식 패턴 차이를 시사합니다. 이런 다차원 분석은 고객 세분화와 맞춤형 서비스 전략 수립에 매우 유용합니다.
+  - type: code
+    language: python
+    title: 성별x요일 박스플롯
+    description: 박스플롯 패싯
+    content: |-
+      px.box(
+          tips,
+          x="sex",
+          y="tip",
+          facet_col="day",
+          title="성별/요일별 팁 분포"
+      )
+
+- id: step13_final
+  title: 13단계. 최종 결과물
+  subtitle: 종합 시각화
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 기술을 종합하여 완성도 높은 시각화를 만듭니다. 박스플롯으로 분포 요약을 보여주고, color로 성별을 구분하며, facet_col로 시간대별로 나누고, labels로 한글화합니다. 이렇게 하나의 차트에 여러 차원의 정보(요일, 시간대, 성별, 팁 분포)를 담을 수 있습니다. 이 차트를 통해 어느 요일, 어느 시간대에, 어느 성별 고객이 팁을 많이 주는지 한눈에 파악할 수 있습니다. 실무에서는 이런 다차원 분석으로 마케팅 전략이나 운영 의사결정을 내립니다.
+  - type: code
+    language: python
+    title: 요일/시간별 팁 분포 종합
+    description: 최종 결과물
+    content: |-
+      figFinal = px.box(
+          tips,
+          x="day",
+          y="tip",
+          color="sex",
+          facet_col="time",
+          title="요일/시간/성별에 따른 팁 분포",
+          labels={"day": "요일", "tip": "팁 ($)", "sex": "성별", "time": "시간대"}
+      )
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 팁 분포 분석 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 내용을 활용해서 팁 데이터를 심층 분석해봅시다. 히스토그램, 박스플롯, color, facet, labels, nbins 등 모든 기능을 종합적으로 사용합니다. 데이터 전처리(파생 변수 생성)도 포함됩니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 시간대별 총금액 분포 히스토그램"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import plotly.express as px
+        import pandas as pd
+
+        tipUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+        data = pd.read_csv(tipUrl)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart = px.histogram(
+            data,
+            x="total_bill",
+            color="time",
+            nbins=25,
+            title="시간대별 총금액 분포",
+            labels={"total_bill": "총금액 ($)", "time": "시간대"}
+        )
+        chart
+  - type: expansion
+    title: "미션2: 팁 비율 분포 분석"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import plotly.express as px
+        import pandas as pd
+
+        srcUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+        tipDf = pd.read_csv(srcUrl)
+        tipDf["tipPct"] = tipDf["tip"] / tipDf["total_bill"] * 100
+    - type: code
+      title: "차트 생성"
+      content: |-
+        canvas = px.box(
+            tipDf,
+            x="day",
+            y="tipPct",
+            color="time",
+            facet_col="sex",
+            title="요일/시간/성별에 따른 팁 비율",
+            labels={"day": "요일", "tipPct": "팁 비율 (%)", "time": "시간대", "sex": "성별"}
+        )
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 분포 시각화 기법을 마스터했습니다.
+  - type: list
+    items:
+    - "px.histogram() - 연속형 데이터 분포 시각화"
+    - "px.box() - 분포 요약 (중앙값, 사분위수, 이상치)"
+    - "color - 그룹별 색상 구분"
+    - "title, labels - 제목과 라벨 지정"
+    - "facet_col, facet_row - 그래프 분할 비교"
+  - type: text
+    content: 다음 시간에는 세계 인구 데이터로 지도 시각화를 배웁니다.

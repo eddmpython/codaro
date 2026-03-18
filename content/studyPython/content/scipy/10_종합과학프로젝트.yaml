@@ -1,0 +1,535 @@
+meta:
+  id: scipy_10
+  title: 종합과학프로젝트
+  order: 10
+  category: scipy
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["scipy", "종합프로젝트", "데이터분석", "과학계산", "실전"]
+  seo:
+    title: "SciPy 종합 프로젝트 - 모든 모듈 통합 활용"
+    description: "SciPy의 모든 모듈을 통합하여 실전 과학 계산 문제를 해결합니다. 센서 데이터 분석 파이프라인을 구축합니다."
+    keywords: ["scipy", "종합프로젝트", "데이터분석", "과학계산"]
+
+intro:
+  emoji: "🔬"
+  goal: SciPy의 모든 모듈을 통합하여 실전 데이터 분석 파이프라인을 구축합니다.
+  description: 센서 데이터를 필터링하고, 주파수 분석하고, 통계 검정하고, 모델을 피팅하는 전체 워크플로우를 경험합니다. 이 과정에서 scipy.signal, scipy.fft, scipy.stats, scipy.optimize, scipy.integrate를 모두 활용합니다.
+
+sections:
+- id: load
+  title: 데이터 로드
+  subtitle: 진동 센서 시뮬레이션
+  blocks:
+  - type: text
+    content: 산업용 기계에서 수집한 진동 센서 데이터를 분석합니다. 정상 진동(50Hz 회전 주파수), 베어링 결함 신호(120Hz), 전력선 간섭(60Hz), 랜덤 노이즈가 합성된 현실적인 센서 데이터를 생성합니다. 이런 데이터에서 결함을 감지하고 상태를 진단하는 것이 산업 현장의 핵심 과제입니다.
+  - type: code
+    language: python
+    title: 라이브러리 및 데이터 생성
+    description: 복합 진동 신호
+    content: |-
+      import micropip
+      await micropip.install('scipy')
+
+      import numpy as np
+      from scipy import signal, fft, stats, optimize, integrate
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(42)
+      fs = 1000
+      duration = 10
+      t = np.linspace(0, duration, fs * duration, endpoint=False)
+      n = len(t)
+
+      rotationFreq = 50
+      normalVib = 1.0 * np.sin(2 * np.pi * rotationFreq * t)
+      normalVib += 0.3 * np.sin(2 * np.pi * 2 * rotationFreq * t)
+
+      defectFreq = 120
+      defectVib = 0.4 * np.sin(2 * np.pi * defectFreq * t)
+
+      powerNoise = 0.2 * np.sin(2 * np.pi * 60 * t)
+      randomNoise = 0.3 * np.random.randn(n)
+
+      rawSignal = normalVib + defectVib + powerNoise + randomNoise
+  - type: code
+    language: python
+    title: 원본 데이터 시각화
+    description: 시간 영역
+    content: |-
+      figRaw, axRaw = plt.subplots(figsize=(14, 4))
+      axRaw.plot(t[:1000], rawSignal[:1000], 'b-', linewidth=0.5)
+      axRaw.set_xlabel('Time (s)')
+      axRaw.set_ylabel('Acceleration')
+      axRaw.set_title('Raw Vibration Sensor Data')
+      axRaw.grid(True, alpha=0.3)
+      figRaw
+
+- id: filter
+  title: 신호 필터링
+  subtitle: scipy.signal
+  blocks:
+  - type: text
+    content: 전력선 간섭(60Hz)을 노치 필터로 제거하고, 관심 대역 외의 고주파 노이즈를 저역통과 필터로 줄입니다. 필터 순서가 중요합니다. 먼저 노치로 특정 간섭을 제거한 후, 저역통과로 전체 대역을 정리합니다.
+  - type: code
+    language: python
+    title: 필터링 적용
+    description: 노치 + 저역통과
+    content: |-
+      bNotch, aNotch = signal.iirnotch(60 / (fs/2), 30)
+      afterNotch = signal.filtfilt(bNotch, aNotch, rawSignal)
+
+      sosLow = signal.butter(4, 200 / (fs/2), btype='low', output='sos')
+      filteredSignal = signal.sosfiltfilt(sosLow, afterNotch)
+  - type: code
+    language: python
+    title: 필터링 결과
+    description: 전후 비교
+    content: |-
+      figFilter, (axFilterR, axFilterF) = plt.subplots(2, 1, figsize=(14, 6), sharex=True)
+
+      axFilterR.plot(t[:1000], rawSignal[:1000], 'r-', linewidth=0.5, alpha=0.7, label='Raw')
+      axFilterR.set_ylabel('Amplitude')
+      axFilterR.set_title('Before Filtering')
+      axFilterR.legend()
+      axFilterR.grid(True, alpha=0.3)
+
+      axFilterF.plot(t[:1000], filteredSignal[:1000], 'b-', linewidth=0.5, label='Filtered')
+      axFilterF.set_xlabel('Time (s)')
+      axFilterF.set_ylabel('Amplitude')
+      axFilterF.set_title('After Filtering (Notch + Lowpass)')
+      axFilterF.legend()
+      axFilterF.grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figFilter
+
+- id: spectrum
+  title: 주파수 분석
+  subtitle: scipy.fft
+  blocks:
+  - type: text
+    content: FFT로 신호의 주파수 성분을 분석하여 회전 주파수(50Hz)와 결함 주파수(120Hz)를 검출합니다. 정상 기계는 회전 주파수와 그 고조파만 나타나야 합니다. 결함이 있으면 베어링 결함 주파수 등 비정상적인 피크가 나타납니다.
+  - type: code
+    language: python
+    title: FFT 스펙트럼
+    description: 주파수 성분 분석
+    content: |-
+      fftResult = fft.fft(filteredSignal)
+      freqs = fft.fftfreq(n, 1/fs)
+      posFreqs = freqs[:n//2]
+      magnitude = 2 * np.abs(fftResult[:n//2]) / n
+
+      figFft, axFft = plt.subplots(figsize=(12, 5))
+      axFft.plot(posFreqs, magnitude, 'b-', linewidth=1)
+      axFft.axvline(50, color='green', linestyle='--', alpha=0.7, label='Rotation (50Hz)')
+      axFft.axvline(100, color='green', linestyle=':', alpha=0.5, label='2x Rotation (100Hz)')
+      axFft.axvline(120, color='red', linestyle='--', alpha=0.7, label='Defect (120Hz)')
+      axFft.set_xlim(0, 200)
+      axFft.set_xlabel('Frequency (Hz)')
+      axFft.set_ylabel('Magnitude')
+      axFft.set_title('Frequency Spectrum of Filtered Signal')
+      axFft.legend()
+      axFft.grid(True, alpha=0.3)
+      figFft
+  - type: code
+    language: python
+    title: 피크 검출
+    description: 주요 주파수 식별
+    content: |-
+      peakIdx, _ = signal.find_peaks(magnitude, height=0.1, distance=10)
+      peakFreqs = posFreqs[peakIdx]
+      peakMags = magnitude[peakIdx]
+
+      spectrumDf = pd.DataFrame({
+          'Frequency (Hz)': peakFreqs[:5],
+          'Magnitude': peakMags[:5]
+      }).sort_values('Magnitude', ascending=False)
+      spectrumDf
+
+- id: statistics
+  title: 통계 분석
+  subtitle: scipy.stats
+  blocks:
+  - type: text
+    content: 진동 신호의 통계적 특성을 분석합니다. RMS(Root Mean Square)는 에너지 수준, 왜도(skewness)는 비대칭성, 첨도(kurtosis)는 충격성을 나타냅니다. 결함이 있으면 첨도가 높아지고 RMS가 증가하는 경향이 있습니다.
+  - type: code
+    language: python
+    title: 기술 통계
+    description: RMS, 왜도, 첨도
+    content: |-
+      rmsValue = np.sqrt(np.mean(filteredSignal**2))
+      skewValue = stats.skew(filteredSignal)
+      kurtValue = stats.kurtosis(filteredSignal)
+      peakValue = np.max(np.abs(filteredSignal))
+      crestFactor = peakValue / rmsValue
+
+      statsDf = pd.DataFrame({
+          'Metric': ['RMS', 'Peak', 'Crest Factor', 'Skewness', 'Kurtosis'],
+          'Value': [f'{rmsValue:.4f}', f'{peakValue:.4f}', f'{crestFactor:.4f}', f'{skewValue:.4f}', f'{kurtValue:.4f}']
+      })
+      statsDf
+  - type: code
+    language: python
+    title: 정규성 검정
+    description: 분포 확인
+    content: |-
+      shapiroStat, shapiroP = stats.shapiro(filteredSignal[:500])
+
+      normalDf = pd.DataFrame({
+          'Test': ['Shapiro-Wilk'],
+          'Statistic': [f'{shapiroStat:.4f}'],
+          'p-value': [f'{shapiroP:.6f}'],
+          'Normal': ['Yes' if shapiroP > 0.05 else 'No']
+      })
+      normalDf
+  - type: tip
+    content: 정상 기계의 진동은 보통 정규분포에 가깝습니다. 결함이 발생하면 충격 성분이 추가되어 분포가 뾰족해지고(높은 첨도) 정규성이 감소합니다.
+
+- id: trend
+  title: 시간 추이 분석
+  subtitle: 상태 변화 모니터링
+  blocks:
+  - type: text
+    content: 신호를 세그먼트로 나누어 시간에 따른 특성 변화를 분석합니다. 결함이 진행되면 RMS와 첨도가 점진적으로 증가하는 경향을 보입니다. 이 추이를 모니터링하면 고장을 예측할 수 있습니다.
+  - type: code
+    language: python
+    title: 세그먼트 분석
+    description: RMS 추이
+    content: |-
+      segmentLen = 1000
+      nSegments = n // segmentLen
+      segmentRms = []
+      segmentKurt = []
+
+      for i in range(nSegments):
+          seg = filteredSignal[i*segmentLen:(i+1)*segmentLen]
+          segmentRms.append(np.sqrt(np.mean(seg**2)))
+          segmentKurt.append(stats.kurtosis(seg))
+
+      segmentTime = np.arange(nSegments) * (segmentLen / fs)
+  - type: code
+    language: python
+    title: 추이 시각화
+    description: RMS와 첨도
+    content: |-
+      figTrend, (axTrendR, axTrendK) = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+
+      axTrendR.plot(segmentTime, segmentRms, 'b-o', markersize=4)
+      axTrendR.axhline(np.mean(segmentRms), color='r', linestyle='--', label='Mean')
+      axTrendR.set_ylabel('RMS')
+      axTrendR.set_title('RMS Trend Over Time')
+      axTrendR.legend()
+      axTrendR.grid(True, alpha=0.3)
+
+      axTrendK.plot(segmentTime, segmentKurt, 'g-o', markersize=4)
+      axTrendK.axhline(0, color='gray', linestyle='--')
+      axTrendK.set_xlabel('Time (s)')
+      axTrendK.set_ylabel('Kurtosis')
+      axTrendK.set_title('Kurtosis Trend Over Time')
+      axTrendK.grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figTrend
+
+- id: fitting
+  title: 진폭 피팅
+  subtitle: scipy.optimize
+  blocks:
+  - type: text
+    content: RMS 값의 시간 변화에 지수함수를 피팅하여 결함 진행 속도를 추정합니다. 지수적 성장 모델은 베어링 결함의 전형적인 진행 패턴입니다. 피팅된 파라미터로 남은 수명을 예측할 수 있습니다.
+  - type: code
+    language: python
+    title: 지수 피팅
+    description: 결함 진행 모델
+    content: |-
+      def expGrowth(tVal, a, b, c):
+          return a * np.exp(b * tVal) + c
+
+      try:
+          fitParams, fitCov = optimize.curve_fit(
+              expGrowth, segmentTime, segmentRms,
+              p0=[0.01, 0.1, np.mean(segmentRms)],
+              maxfev=5000
+          )
+          aFit, bFit, cFit = fitParams
+          rmsFit = expGrowth(segmentTime, aFit, bFit, cFit)
+          fitSuccess = True
+      except:
+          fitSuccess = False
+          rmsFit = np.ones_like(segmentTime) * np.mean(segmentRms)
+
+      figFit, axFit = plt.subplots(figsize=(10, 5))
+      axFit.scatter(segmentTime, segmentRms, s=50, c='blue', label='Measured RMS')
+      axFit.plot(segmentTime, rmsFit, 'r-', linewidth=2, label='Fitted Trend')
+      axFit.set_xlabel('Time (s)')
+      axFit.set_ylabel('RMS')
+      axFit.set_title('RMS Trend with Exponential Fit')
+      axFit.legend()
+      axFit.grid(True, alpha=0.3)
+      figFit
+
+- id: energy
+  title: 에너지 계산
+  subtitle: scipy.integrate
+  blocks:
+  - type: text
+    content: 진동 에너지(신호 제곱의 적분)는 피로 손상과 관련됩니다. 누적 에너지를 계산하면 기계가 받은 총 스트레스를 추정할 수 있습니다. 이 값이 임계치를 넘으면 부품 교체가 필요합니다.
+  - type: code
+    language: python
+    title: 에너지 계산
+    description: 누적 에너지
+    content: |-
+      signalSquared = filteredSignal ** 2
+      cumulativeEnergy = integrate.cumulative_trapezoid(signalSquared, t, initial=0)
+      totalEnergy = cumulativeEnergy[-1]
+
+      figEnergy, (axEnergyS, axEnergyC) = plt.subplots(2, 1, figsize=(12, 6), sharex=True)
+
+      axEnergyS.plot(t, signalSquared, 'b-', linewidth=0.3, alpha=0.5)
+      axEnergyS.set_ylabel('Signal²')
+      axEnergyS.set_title('Squared Vibration Signal')
+      axEnergyS.grid(True, alpha=0.3)
+
+      axEnergyC.plot(t, cumulativeEnergy, 'r-', linewidth=2)
+      axEnergyC.set_xlabel('Time (s)')
+      axEnergyC.set_ylabel('Cumulative Energy')
+      axEnergyC.set_title(f'Cumulative Vibration Energy (Total: {totalEnergy:.2f})')
+      axEnergyC.grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figEnergy
+
+- id: comparison
+  title: 정상 vs 결함 비교
+  subtitle: 통계 검정
+  blocks:
+  - type: text
+    content: 정상 상태(결함 없음)와 결함 상태의 진동 특성을 비교합니다. t-검정으로 두 상태의 RMS 값에 유의미한 차이가 있는지 확인합니다. 이런 통계 검정은 자동 이상 탐지 알고리즘의 기반이 됩니다.
+  - type: code
+    language: python
+    title: 비교 데이터 생성 및 검정
+    description: 정상 vs 결함
+    content: |-
+      np.random.seed(123)
+      tComp = np.linspace(0, 5, 5000)
+
+      normalSig = np.sin(2 * np.pi * 50 * tComp) + 0.2 * np.random.randn(5000)
+      defectSig = np.sin(2 * np.pi * 50 * tComp) + 0.5 * np.sin(2 * np.pi * 120 * tComp) + 0.3 * np.random.randn(5000)
+
+      segRmsNormal = [np.sqrt(np.mean(normalSig[i*500:(i+1)*500]**2)) for i in range(10)]
+      segRmsDefect = [np.sqrt(np.mean(defectSig[i*500:(i+1)*500]**2)) for i in range(10)]
+
+      tStat, pValue = stats.ttest_ind(segRmsNormal, segRmsDefect)
+
+      testDf = pd.DataFrame({
+          'Condition': ['Normal', 'Defect'],
+          'Mean RMS': [f'{np.mean(segRmsNormal):.4f}', f'{np.mean(segRmsDefect):.4f}'],
+          'Std RMS': [f'{np.std(segRmsNormal):.4f}', f'{np.std(segRmsDefect):.4f}'],
+          't-statistic': [f'{tStat:.4f}', ''],
+          'p-value': [f'{pValue:.6f}', '']
+      })
+      testDf
+
+- id: result
+  title: 분석 대시보드
+  subtitle: 종합 시각화
+  blocks:
+  - type: text
+    content: 모든 분석 결과를 하나의 대시보드로 시각화합니다. 필터링된 신호, 주파수 스펙트럼, RMS 추이, 누적 에너지를 한눈에 볼 수 있습니다. 이런 대시보드는 기계 상태 모니터링 시스템의 핵심입니다.
+  - type: code
+    language: python
+    title: 분석 대시보드
+    description: 4패널 요약
+    content: |-
+      figDash, axesDash = plt.subplots(2, 2, figsize=(14, 10))
+
+      axesDash[0, 0].plot(t[:1000], filteredSignal[:1000], 'b-', linewidth=0.5)
+      axesDash[0, 0].set_xlabel('Time (s)')
+      axesDash[0, 0].set_ylabel('Amplitude')
+      axesDash[0, 0].set_title('Filtered Vibration Signal')
+      axesDash[0, 0].grid(True, alpha=0.3)
+
+      axesDash[0, 1].plot(posFreqs, magnitude, 'b-', linewidth=1)
+      axesDash[0, 1].axvline(50, color='green', linestyle='--', alpha=0.7, label='50Hz')
+      axesDash[0, 1].axvline(120, color='red', linestyle='--', alpha=0.7, label='120Hz (Defect)')
+      axesDash[0, 1].set_xlim(0, 200)
+      axesDash[0, 1].set_xlabel('Frequency (Hz)')
+      axesDash[0, 1].set_ylabel('Magnitude')
+      axesDash[0, 1].set_title('Frequency Spectrum')
+      axesDash[0, 1].legend()
+      axesDash[0, 1].grid(True, alpha=0.3)
+
+      axesDash[1, 0].scatter(segmentTime, segmentRms, s=50, c='blue', label='RMS')
+      axesDash[1, 0].plot(segmentTime, rmsFit, 'r-', linewidth=2, label='Trend')
+      axesDash[1, 0].set_xlabel('Time (s)')
+      axesDash[1, 0].set_ylabel('RMS')
+      axesDash[1, 0].set_title('RMS Trend')
+      axesDash[1, 0].legend()
+      axesDash[1, 0].grid(True, alpha=0.3)
+
+      axesDash[1, 1].plot(t, cumulativeEnergy, 'purple', linewidth=2)
+      axesDash[1, 1].set_xlabel('Time (s)')
+      axesDash[1, 1].set_ylabel('Cumulative Energy')
+      axesDash[1, 1].set_title(f'Cumulative Energy (Total: {totalEnergy:.1f})')
+      axesDash[1, 1].grid(True, alpha=0.3)
+
+      plt.suptitle('Vibration Analysis Dashboard', fontsize=14, fontweight='bold')
+      plt.tight_layout()
+      figDash
+  - type: code
+    language: python
+    title: 종합 보고서
+    description: 상태 진단
+    content: |-
+      reportDf = pd.DataFrame({
+          'Analysis': ['Signal Preprocessing', 'Frequency Analysis', 'Statistical Features', 'Trend Analysis', 'Energy Calculation', 'Status'],
+          'Method': ['Notch (60Hz) + Lowpass (200Hz)', 'FFT + Peak Detection', 'RMS, Kurtosis, Crest Factor', 'Exponential Fitting', 'Cumulative Integration', 'Defect Detected'],
+          'Finding': ['60Hz noise removed', 'Defect peak at 120Hz', f'RMS = {rmsValue:.3f}', 'RMS trend analyzed', f'Total Energy = {totalEnergy:.2f}', 'Bearing defect suspected']
+      })
+      reportDf
+
+- id: practice
+  title: 실습
+  subtitle: 종합 프로젝트
+  blocks:
+  - type: tip
+    content: 데이터 과학자가 되어 전체 분석 파이프라인을 직접 구축해보세요. 심전도(ECG) 분석이나 기상 데이터 분석처럼 다른 도메인의 데이터에 같은 기법을 적용해보세요.
+  - type: expansion
+    title: "미션1: 심전도(ECG) 분석 파이프라인"
+    blocks:
+    - type: code
+      language: python
+      title: ECG 신호 생성 및 필터링
+      description: 노이즈 포함
+      content: |-
+        np.random.seed(456)
+        fsEcg = 360
+        durEcg = 10
+        tEcg = np.linspace(0, durEcg, fsEcg * durEcg, endpoint=False)
+
+        def ecgWave(tVal, hr):
+            period = 60 / hr
+            phase = (tVal % period) / period
+            p = 0.1 * np.exp(-((phase - 0.1) ** 2) / 0.001)
+            qrs = np.exp(-((phase - 0.2) ** 2) / 0.0003) - 0.2 * np.exp(-((phase - 0.18) ** 2) / 0.0001)
+            tW = 0.3 * np.exp(-((phase - 0.35) ** 2) / 0.002)
+            return p + qrs + tW
+
+        ecgClean = ecgWave(tEcg, 72)
+        ecgNoisy = ecgClean + 0.1 * np.random.randn(len(tEcg)) + 0.05 * np.sin(2 * np.pi * 60 * tEcg)
+
+        bNotchEcg, aNotchEcg = signal.iirnotch(60 / (fsEcg/2), 30)
+        ecgFiltered = signal.filtfilt(bNotchEcg, aNotchEcg, ecgNoisy)
+
+        sosEcg = signal.butter(4, [0.5 / (fsEcg/2), 40 / (fsEcg/2)], btype='band', output='sos')
+        ecgFinal = signal.sosfiltfilt(sosEcg, ecgFiltered)
+    - type: code
+      language: python
+      title: 심박수 계산 및 시각화
+      description: R-피크 검출
+      content: |-
+        peaksEcg, _ = signal.find_peaks(ecgFinal, height=0.5, distance=fsEcg*0.5)
+        rrIntervals = np.diff(peaksEcg) / fsEcg
+        heartRateCalc = 60 / np.mean(rrIntervals)
+        hrv = np.std(rrIntervals) * 1000
+
+        figEcg, axesEcg = plt.subplots(2, 1, figsize=(14, 8))
+
+        axesEcg[0].plot(tEcg[:1800], ecgNoisy[:1800], 'r-', alpha=0.5, linewidth=0.5, label='Noisy')
+        axesEcg[0].plot(tEcg[:1800], ecgFinal[:1800], 'b-', linewidth=1, label='Filtered')
+        axesEcg[0].set_xlabel('Time (s)')
+        axesEcg[0].set_ylabel('Amplitude')
+        axesEcg[0].set_title(f'ECG Signal (HR: {heartRateCalc:.1f} BPM, HRV: {hrv:.1f} ms)')
+        axesEcg[0].legend()
+        axesEcg[0].grid(True, alpha=0.3)
+
+        nEcg = len(ecgFinal)
+        fftEcg = fft.fft(ecgFinal)
+        freqsEcg = fft.fftfreq(nEcg, 1/fsEcg)[:nEcg//2]
+        magEcg = 2 * np.abs(fftEcg[:nEcg//2]) / nEcg
+
+        axesEcg[1].plot(freqsEcg, magEcg, 'b-')
+        axesEcg[1].set_xlim(0, 50)
+        axesEcg[1].set_xlabel('Frequency (Hz)')
+        axesEcg[1].set_ylabel('Magnitude')
+        axesEcg[1].set_title('ECG Frequency Spectrum')
+        axesEcg[1].grid(True, alpha=0.3)
+
+        plt.tight_layout()
+        figEcg
+  - type: expansion
+    title: "미션2: 기상 데이터 분석"
+    blocks:
+    - type: code
+      language: python
+      title: 기온 데이터 생성 및 피팅
+      description: 계절 패턴
+      content: |-
+        np.random.seed(789)
+        days = np.arange(365)
+
+        seasonalTemp = 15 + 10 * np.sin(2 * np.pi * days / 365 - np.pi/2)
+        dailyVar = 3 * np.random.randn(365)
+        tempData = seasonalTemp + dailyVar
+
+        def cosModel(d, a, b, phi):
+            return a + b * np.cos(2 * np.pi * d / 365 + phi)
+
+        tempParams, _ = optimize.curve_fit(cosModel, days, tempData, p0=[15, 10, -np.pi/2])
+        tempFitCurve = cosModel(days, *tempParams)
+
+        tempResid = tempData - tempFitCurve
+        shapWTemp, shapPTemp = stats.shapiro(tempResid[:50])
+    - type: code
+      language: python
+      title: 기상 분석 대시보드
+      description: 4패널 요약
+      content: |-
+        months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+        monthlyMeans = [np.mean(tempData[i*30:(i+1)*30]) for i in range(12)]
+        fStatTemp, anovaPTemp = stats.f_oneway(*[tempData[i*30:(i+1)*30] for i in range(12)])
+
+        heatingDays = np.maximum(18 - tempData, 0)
+        coolingDays = np.maximum(tempData - 22, 0)
+        cumHeating = integrate.cumulative_trapezoid(heatingDays, days, initial=0)
+        cumCooling = integrate.cumulative_trapezoid(coolingDays, days, initial=0)
+
+        figWeather, axesW = plt.subplots(2, 2, figsize=(14, 10))
+
+        axesW[0, 0].scatter(days, tempData, s=10, alpha=0.5, label='Daily Temp')
+        axesW[0, 0].plot(days, tempFitCurve, 'r-', linewidth=2, label='Seasonal Fit')
+        axesW[0, 0].set_xlabel('Day of Year')
+        axesW[0, 0].set_ylabel('Temperature (°C)')
+        axesW[0, 0].set_title('Annual Temperature with Seasonal Fit')
+        axesW[0, 0].legend()
+        axesW[0, 0].grid(True, alpha=0.3)
+
+        axesW[0, 1].bar(months, monthlyMeans, color='steelblue', alpha=0.7)
+        axesW[0, 1].axhline(np.mean(tempData), color='red', linestyle='--', label='Annual Mean')
+        axesW[0, 1].set_xlabel('Month')
+        axesW[0, 1].set_ylabel('Mean Temperature (°C)')
+        axesW[0, 1].set_title(f'Monthly Averages (ANOVA p={anovaPTemp:.2e})')
+        axesW[0, 1].tick_params(axis='x', rotation=45)
+        axesW[0, 1].legend()
+        axesW[0, 1].grid(True, alpha=0.3)
+
+        axesW[1, 0].hist(tempResid, bins=30, density=True, alpha=0.7, color='steelblue', edgecolor='white')
+        xResidTemp = np.linspace(tempResid.min(), tempResid.max(), 100)
+        axesW[1, 0].plot(xResidTemp, stats.norm.pdf(xResidTemp, 0, np.std(tempResid)), 'r-', linewidth=2)
+        axesW[1, 0].set_xlabel('Residual (°C)')
+        axesW[1, 0].set_ylabel('Density')
+        axesW[1, 0].set_title(f'Residual Distribution (Shapiro p={shapPTemp:.4f})')
+        axesW[1, 0].grid(True, alpha=0.3)
+
+        axesW[1, 1].plot(days, cumHeating, 'b-', linewidth=2, label=f'Heating ({cumHeating[-1]:.0f}°C·days)')
+        axesW[1, 1].plot(days, cumCooling, 'r-', linewidth=2, label=f'Cooling ({cumCooling[-1]:.0f}°C·days)')
+        axesW[1, 1].set_xlabel('Day of Year')
+        axesW[1, 1].set_ylabel('Degree Days')
+        axesW[1, 1].set_title('Cumulative Heating/Cooling Degree Days')
+        axesW[1, 1].legend()
+        axesW[1, 1].grid(True, alpha=0.3)
+
+        plt.tight_layout()
+        figWeather

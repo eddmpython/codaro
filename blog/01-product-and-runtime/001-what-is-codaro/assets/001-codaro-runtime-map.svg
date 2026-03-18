@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="720" viewBox="0 0 1200 720" fill="none">
+  <rect width="1200" height="720" rx="40" fill="#FAFAFA"/>
+  <rect x="88" y="92" width="1024" height="536" rx="28" fill="white" stroke="#E4E4E7" stroke-width="2"/>
+  <rect x="152" y="152" width="262" height="144" rx="24" fill="#F4F4F5" stroke="#D4D4D8" stroke-width="2"/>
+  <rect x="470" y="152" width="262" height="144" rx="24" fill="#EEF2FF" stroke="#C7D2FE" stroke-width="2"/>
+  <rect x="788" y="152" width="262" height="144" rx="24" fill="#F4F4F5" stroke="#D4D4D8" stroke-width="2"/>
+  <rect x="312" y="380" width="576" height="140" rx="28" fill="#18181B"/>
+  <text x="194" y="208" fill="#18181B" font-size="34" font-family="Segoe UI, Arial">Docs</text>
+  <text x="194" y="248" fill="#52525B" font-size="24" font-family="Segoe UI, Arial">Concepts and guides</text>
+  <text x="512" y="208" fill="#3730A3" font-size="34" font-family="Segoe UI, Arial">Runtime</text>
+  <text x="512" y="248" fill="#52525B" font-size="24" font-family="Segoe UI, Arial">Execution and dataflow</text>
+  <text x="830" y="208" fill="#18181B" font-size="34" font-family="Segoe UI, Arial">Blog</text>
+  <text x="830" y="248" fill="#52525B" font-size="24" font-family="Segoe UI, Arial">Product writing</text>
+  <text x="446" y="446" fill="#FAFAFA" font-size="38" font-family="Segoe UI, Arial">Codaro public surface</text>
+  <text x="386" y="490" fill="#A1A1AA" font-size="24" font-family="Segoe UI, Arial">One repo, separate editor and static site layers</text>
+</svg>

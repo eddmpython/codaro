@@ -1,0 +1,336 @@
+meta:
+  id: regex_03
+  title: URL구조분해
+  order: 3
+  category: regex
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["URL", "이름 있는 그룹", "search", "파싱", "JSONPlaceholder"]
+  seo:
+    title: "정규표현식 기초 - URL 구조 분해"
+    description: "정규표현식으로 URL을 프로토콜, 도메인, 경로, 쿼리로 분해합니다. 이름 있는 그룹, re.search를 배웁니다."
+    keywords: ["정규표현식", "regex", "URL 파싱", "이름 있는 그룹", "re.search"]
+
+intro:
+  emoji: "🔗"
+  goal: URL을 프로토콜, 도메인, 경로, 쿼리스트링으로 분해합니다.
+  description: 이전 프로젝트에서 배운 그룹에 이름을 붙여 더 명확하게 사용하는 방법을 배웁니다. URL 파싱으로 웹 데이터 처리의 기초를 다집니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: 이전과 동일하게 필요한 모듈을 불러옵니다. 이번 프로젝트에서는 이름 있는 그룹(named group)이라는 새로운 개념을 배웁니다. 숫자 대신 이름으로 그룹을 참조하면 코드 가독성이 높아지고, 복잡한 패턴도 쉽게 관리할 수 있습니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: 정규표현식과 데이터 로드 모듈
+    content: |-
+      import re
+      import json
+      from pyodide.http import open_url
+
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  subtitle: 사용자 웹사이트 확인
+  blocks:
+  - type: text
+    content: JSONPlaceholder 사용자 데이터에서 웹사이트 주소를 가져옵니다. URL 파싱은 웹 크롤링, 링크 분석, SEO 최적화 등 웹 개발의 다양한 분야에서 사용됩니다. 정규표현식으로 URL 구조를 이해하면 외부 라이브러리 없이도 URL을 효과적으로 처리할 수 있습니다.
+  - type: code
+    language: python
+    title: 데이터 로드
+    description: 사용자 데이터를 가져옵니다
+    content: |-
+      usersData = json.loads(
+          open_url("https://jsonplaceholder.typicode.com/users").read()
+      )
+  - type: code
+    language: python
+    title: 웹사이트 확인
+    description: 첫 5명의 웹사이트를 확인합니다
+    content: |-
+      websites = [user['website'] for user in usersData[:5]]
+      websites
+  - type: text
+    content: |-
+      확인된 웹사이트들:
+      - hildegard.org
+      - anastasia.net
+      - ramiro.info
+      - kale.biz
+      - demarco.info
+
+      프로토콜이 없는 도메인만 있네요. 실습을 위해 완전한 URL을 만들어봅시다.
+
+- id: step3_create_full_url
+  title: 3단계. 완전한 URL 만들기
+  subtitle: 테스트 데이터 준비
+  blocks:
+  - type: text
+    content: URL의 모든 구성 요소를 보기 위해 완전한 형태의 URL들을 만들어봅시다. JSONPlaceholder의 website 필드에는 도메인만 있어서, 프로토콜, 경로, 쿼리스트링을 포함한 실제 URL을 별도로 준비합니다. 이렇게 다양한 형태의 URL로 테스트해야 패턴의 범용성을 검증할 수 있습니다.
+  - type: code
+    language: python
+    title: 테스트 URL 준비
+    description: 다양한 URL 형식을 준비합니다
+    content: |-
+      testUrls = [
+          "https://www.example.com/path/to/page",
+          "http://blog.site.org/posts/123",
+          "https://api.service.io/v1/users?id=5&name=john",
+          "http://shop.example.com/products/item-456?category=books",
+          "https://subdomain.site.co.kr/search?q=python&page=2"
+      ]
+      testUrls[0]
+  - type: text
+    content: |-
+      URL 구조:
+      - **프로토콜**: https:// 또는 http://
+      - **도메인**: www.example.com
+      - **경로**: /path/to/page
+      - **쿼리스트링**: ?id=5&name=john (선택적)
+
+- id: step4_basic_pattern
+  title: 4단계. 기본 URL 패턴
+  subtitle: 프로토콜과 도메인 추출
+  blocks:
+  - type: text
+    content: 먼저 간단한 패턴으로 프로토콜과 도메인을 추출해봅시다. URL의 각 부분을 그룹으로 캡처하면 나중에 개별적으로 접근할 수 있습니다. http:// 또는 https://로 시작하고, 도메인이 이어지는 기본 구조부터 파악합니다.
+  - type: code
+    language: python
+    title: 기본 패턴
+    description: 프로토콜과 도메인을 그룹으로 캡처
+    content: |-
+      pattern = r"(https?)://([\w.-]+)"
+
+      match = re.search(pattern, testUrls[0])
+      match.groups()
+  - type: note
+    style: tip
+    title: 패턴 해석
+    content: |-
+      **패턴: (https?)://([\w.-]+)**
+      - `(https?)` : **그룹 1** - http 또는 https (s는 선택적)
+      - `://` : :// 리터럴
+      - `([\w.-]+)` : **그룹 2** - 도메인 (단어문자, 마침표, 하이픈 1개 이상)
+  - type: text
+    content: groups()는 튜플로 반환합니다. ('https', 'www.example.com')
+
+- id: step5_named_groups
+  title: 5단계. 이름 있는 그룹
+  subtitle: (?P<name>) 문법
+  blocks:
+  - type: text
+    content: 그룹에 번호 대신 이름을 붙이면 더 명확합니다. (?P<이름>패턴) 형식으로 작성합니다.
+  - type: code
+    language: python
+    title: 이름 있는 그룹으로 개선
+    description: 프로토콜과 도메인에 이름을 붙입니다
+    content: |-
+      pattern = r"(?P<protocol>https?)://(?P<domain>[\w.-]+)"
+
+      match = re.search(pattern, testUrls[0])
+      match.groupdict()
+  - type: note
+    style: tip
+    title: "이름 있는 그룹: (?P<name>패턴)"
+    content: |-
+      - `(?P<protocol>https?)` : protocol이라는 이름의 그룹
+      - `(?P<domain>[\w.-]+)` : domain이라는 이름의 그룹
+      - `match.groupdict()` : 딕셔너리로 반환 {'protocol': 'https', 'domain': '...'}
+      - `match.group('protocol')` : 이름으로 접근 가능
+  - type: text
+    content: 숫자보다 이름이 훨씬 읽기 쉽죠!
+
+- id: step6_complete_pattern
+  title: 6단계. 완전한 URL 패턴
+  subtitle: 경로와 쿼리스트링 추가
+  blocks:
+  - type: text
+    content: 이제 경로와 쿼리스트링까지 포함한 완전한 패턴을 만들어봅시다.
+  - type: code
+    language: python
+    title: 완전한 URL 패턴
+    description: 모든 구성 요소를 이름 있는 그룹으로 분해
+    content: |-
+      pattern = r"(?P<protocol>https?)://(?P<domain>[\w.-]+)(?P<path>/[\w/-]*)(?P<query>\?[\w=&-]*)?"
+
+      testUrl = testUrls[2]
+      match = re.search(pattern, testUrl)
+      match.groupdict()
+  - type: note
+    style: tip
+    title: "패턴 해석: 경로와 쿼리"
+    content: |-
+      - `(?P<path>/[\w/-]*)` : 경로 (/ 로 시작, 단어/하이픈/슬래시 0개 이상)
+      - `(?P<query>\?[\w=&-]*)?` : 쿼리 (? 로 시작, 선택적)
+      - 마지막 `?` : 쿼리스트링 전체가 선택적 (없을 수도 있음)
+  - type: code
+    language: python
+    title: 각 부분 접근
+    description: 이름으로 각 구성 요소에 접근합니다
+    content: |-
+      f"프로토콜: {match.group('protocol')}\n도메인: {match.group('domain')}\n경로: {match.group('path')}\n쿼리: {match.group('query')}"
+
+- id: step7_re_search_vs_findall
+  title: 7단계. re.search() 이해하기
+  subtitle: findall과의 차이
+  blocks:
+  - type: text
+    content: 지금까지 사용한 re.search는 findall과 어떻게 다를까요?
+  - type: code
+    language: python
+    title: re.search 특징
+    description: 첫 번째 매칭만 반환하고 Match 객체를 돌려줍니다
+    content: |-
+      multiUrl = "방문: https://site1.com/page 그리고 http://site2.org/other"
+
+      searchResult = re.search(r"(https?)://([\w.]+)", multiUrl)
+      findallResult = re.findall(r"(https?)://([\w.]+)", multiUrl)
+
+      f"search: {searchResult.groups() if searchResult else None}\nfindall: {findallResult}"
+  - type: note
+    style: tip
+    title: "re.search() vs re.findall()"
+    content: |-
+      **re.search(패턴, 텍스트)**:
+      - 첫 번째 매칭만 찾음
+      - Match 객체 반환
+      - .group(), .groupdict() 사용 가능
+
+      **re.findall(패턴, 텍스트)**:
+      - 모든 매칭 찾음
+      - 리스트 반환
+      - 그룹이 있으면 튜플 리스트
+
+      URL 파싱처럼 구조를 분해할 때는 search가 적합합니다.
+
+- id: step8_parse_all
+  title: 8단계. 모든 URL 파싱
+  subtitle: 함수로 만들기
+  blocks:
+  - type: text
+    content: 배운 패턴을 함수로 만들어 여러 URL을 파싱해봅시다.
+  - type: code
+    language: python
+    title: URL 파싱 함수
+    description: URL을 분해하는 함수를 정의합니다
+    content: |-
+      def parseUrl(url):
+          pattern = r"(?P<protocol>https?)://(?P<domain>[\w.-]+)(?P<path>/[\w/-]*)(?P<query>\?[\w=&-]*)?"
+          match = re.search(pattern, url)
+          return match.groupdict() if match else None
+  - type: code
+    language: python
+    title: 전체 URL 파싱
+    description: 테스트 URL들을 모두 파싱합니다
+    content: |-
+      parsedUrls = [parseUrl(url) for url in testUrls]
+      parsedUrls[:3]
+  - type: text
+    content: 모든 URL이 깔끔하게 구조화되었습니다!
+
+- id: step9_real_data
+  title: 9단계. 실제 데이터 적용
+  subtitle: JSONPlaceholder 웹사이트 파싱
+  blocks:
+  - type: text
+    content: 실제 사용자 데이터의 웹사이트에 프로토콜을 추가하여 파싱해봅시다.
+  - type: code
+    language: python
+    title: 프로토콜 추가
+    description: 도메인만 있는 웹사이트에 https:// 를 붙입니다
+    content: |-
+      fullUrls = [f"https://{user['website']}/about" for user in usersData[:5]]
+      fullUrls[:3]
+  - type: code
+    language: python
+    title: 파싱 결과
+    description: 완성된 URL들을 파싱합니다
+    content: |-
+      realParsed = [parseUrl(url) for url in fullUrls]
+      realParsed[:3]
+  - type: text
+    content: |-
+      **이번 프로젝트 핵심:**
+      - `(?P<name>패턴)` : 이름 있는 그룹 **(신규)**
+      - `.groupdict()` : 딕셔너리로 변환 **(신규)**
+      - `re.search()` : 첫 매칭만 **(신규)**
+      - `|` : or (http|https) **(신규)**
+      - `( )` : 그룹 (02에서 배움)
+
+- id: practice
+  title: 실습
+  subtitle: URL 파싱 프로젝트
+  blocks:
+  - type: text
+    content: 웹 분석가가 되어 URL 구조를 분석합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 이메일 주소 구조 분해"
+    blocks:
+    - type: code
+      title: "이메일 파싱 함수"
+      content: |-
+        import re
+
+        samples = [
+            "john.doe@company.com",
+            "admin_user@service.org",
+            "contact@shop.co.kr"
+        ]
+
+        def parse(email):
+            pat = r"(?P<username>[\w.]+)@(?P<domain>[\w.]+)\.(?P<tld>\w+)"
+            match = re.search(pat, email)
+            return match.groupdict() if match else None
+
+        parse(samples[0])
+    - type: code
+      title: "전체 이메일 파싱"
+      content: |-
+        parsed = [parse(e) for e in samples]
+        parsed
+  - type: expansion
+    title: "미션2: JSONPlaceholder 웹사이트 URL 파싱"
+    blocks:
+    - type: code
+      title: "데이터 로드 및 파싱 함수"
+      content: |-
+        import re
+        import json
+        from pyodide.http import open_url
+
+        data = json.loads(
+            open_url("https://jsonplaceholder.typicode.com/users").read()
+        )
+
+        def extract(url):
+            pat = r"(?P<protocol>https?)://(?P<domain>[\w.-]+)(?P<path>/[\w/-]*)?"
+            match = re.search(pat, url)
+            return match.groupdict() if match else None
+
+        extract("https://example.com/about")
+    - type: code
+      title: "웹사이트 URL 파싱 결과"
+      content: |-
+        urls = [f"https://{u['website']}/about" for u in data[:5]]
+        result = [extract(url) for url in urls]
+        result
+
+- id: summary
+  title: 정리
+  subtitle: 세 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 이름 있는 그룹과 re.search()를 배웠습니다. 복잡한 텍스트 구조를 딕셔너리로 분해할 수 있습니다.
+  - type: list
+    items:
+    - "(?P<name>패턴) - 이름 있는 그룹"
+    - ".groupdict() - 딕셔너리로 변환"
+    - "re.search() - 첫 매칭만 찾기"
+    - "| - or 연산자 (http|https)"
+  - type: text
+    content: 다음 프로젝트에서는 HTML 태그를 제거하는 방법을 배웁니다!

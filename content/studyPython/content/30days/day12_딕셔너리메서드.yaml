@@ -1,0 +1,555 @@
+meta:
+  id: "day12"
+  title: "딕셔너리메서드"
+  day: 12
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 딕셔너리 메서드 - 효율적인 데이터 관리"
+    description: "get, keys, values, items, update, pop, popitem, clear 메서드를 배웁니다."
+    keywords: ['딕셔너리메서드', 'get', 'keys', 'values', 'items', 'update']
+
+intro:
+  emoji: "🔧"
+  points:
+  - "안전한 값 접근 get()"
+  - "키, 값, 아이템 순회"
+  - "딕셔너리 병합과 삭제"
+  - "실전 데이터 처리"
+
+sections:
+- id: "method_get"
+  title: "get() 메서드"
+  subtitle: "안전한 값 접근"
+  blocks:
+  - type: "text"
+    content: "get() 메서드는 대괄호[] 접근의 안전한 대안입니다. 키가 없어도 에러 없이 None을 반환하며, 기본값을 지정할 수도 있습니다. dict.get(key) 또는 dict.get(key, default) 형식으로 사용합니다."
+  - type: "list"
+    items:
+    - "dict.get(key) 형식"
+    - "없는 키는 None 반환"
+    - "기본값 지정 가능"
+    - "에러 없이 안전"
+  - type: "code"
+    language: "python"
+    title: "기본 get()"
+    description: "존재하는 키로 값을 가져옵니다."
+    content: |-
+      config = {'host': 'localhost', 'port': 8080}
+      config.get('host')
+  - type: "code"
+    language: "python"
+    title: "없는 키 get()"
+    description: "없는 키는 None을 반환합니다."
+    content: |-
+      server = {'host': 'localhost', 'port': 8080}
+      server.get('user')
+  - type: "code"
+    language: "python"
+    title: "기본값 지정"
+    description: "두 번째 인자로 기본값을 지정합니다."
+    content: |-
+      db = {'host': 'localhost', 'port': 5432}
+      db.get('user', 'admin')
+  - type: "tip"
+    content: "get()은 설정값이나 옵션 처리에 매우 유용합니다."
+
+- id: "method_keys"
+  title: "keys() 메서드"
+  subtitle: "모든 키 가져오기"
+  blocks:
+  - type: "text"
+    content: "keys() 메서드는 딕셔너리의 모든 키를 dict_keys 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 키만 필요할 때 유용합니다."
+  - type: "list"
+    items:
+    - "dict.keys() 형식"
+    - "dict_keys 객체 반환"
+    - "list()로 변환 가능"
+    - "키 목록 확인용"
+  - type: "code"
+    language: "python"
+    title: "keys() 기본"
+    description: "딕셔너리의 모든 키를 가져옵니다."
+    content: |-
+      grade = {'math': 85, 'english': 90, 'science': 88}
+      grade.keys()
+  - type: "code"
+    language: "python"
+    title: "리스트 변환"
+    description: "list()로 변환하여 리스트로 만듭니다."
+    content: |-
+      score = {'math': 85, 'english': 90, 'science': 88}
+      list(score.keys())
+  - type: "code"
+    language: "python"
+    title: "키 개수 확인"
+    description: "len()과 함께 사용합니다."
+    content: |-
+      point = {'math': 85, 'english': 90, 'science': 88}
+      len(point.keys())
+  - type: "tip"
+    content: "keys()는 딕셔너리 순회나 키 확인에 사용됩니다."
+
+- id: "method_values"
+  title: "values() 메서드"
+  subtitle: "모든 값 가져오기"
+  blocks:
+  - type: "text"
+    content: "values() 메서드는 딕셔너리의 모든 값을 dict_values 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 값만 필요할 때 유용합니다."
+  - type: "list"
+    items:
+    - "dict.values() 형식"
+    - "dict_values 객체 반환"
+    - "list()로 변환 가능"
+    - "값 목록 확인용"
+  - type: "code"
+    language: "python"
+    title: "values() 기본"
+    description: "딕셔너리의 모든 값을 가져옵니다."
+    content: |-
+      exam = {'math': 85, 'english': 90, 'science': 88}
+      exam.values()
+  - type: "code"
+    language: "python"
+    title: "리스트 변환"
+    description: "list()로 변환하여 리스트로 만듭니다."
+    content: |-
+      test = {'math': 85, 'english': 90, 'science': 88}
+      list(test.values())
+  - type: "code"
+    language: "python"
+    title: "값 확인"
+    description: "특정 값이 있는지 in으로 확인합니다."
+    content: |-
+      result = {'math': 85, 'english': 90, 'science': 88}
+      85 in result.values()
+  - type: "tip"
+    content: "values()는 값의 존재 확인이나 통계 계산에 유용합니다."
+
+- id: "method_items"
+  title: "items() 메서드"
+  subtitle: "키-값 쌍 가져오기"
+  blocks:
+  - type: "text"
+    content: "items() 메서드는 딕셔너리의 모든 키-값 쌍을 dict_items 객체로 반환합니다. 각 항목은 (키, 값) 튜플 형태입니다. list()로 변환하면 튜플의 리스트가 됩니다."
+  - type: "list"
+    items:
+    - "dict.items() 형식"
+    - "dict_items 객체 반환"
+    - "(키, 값) 튜플로 반환"
+    - "순회와 변환에 유용"
+  - type: "code"
+    language: "python"
+    title: "items() 기본"
+    description: "딕셔너리의 모든 키-값 쌍을 가져옵니다."
+    content: |-
+      product = {'name': '노트북', 'price': 1200000, 'stock': 5}
+      product.items()
+  - type: "code"
+    language: "python"
+    title: "리스트 변환"
+    description: "list()로 변환하여 튜플 리스트로 만듭니다."
+    content: |-
+      item = {'name': '노트북', 'price': 1200000, 'stock': 5}
+      list(item.items())
+  - type: "code"
+    language: "python"
+    title: "첫 번째 아이템"
+    description: "리스트로 변환 후 인덱싱합니다."
+    content: |-
+      goods = {'name': '노트북', 'price': 1200000, 'stock': 5}
+      pairs = list(goods.items())
+      pairs[0]
+  - type: "tip"
+    content: "items()는 딕셔너리 전체를 순회하거나 변환할 때 사용됩니다."
+
+- id: "method_update"
+  title: "update() 메서드"
+  subtitle: "딕셔너리 병합"
+  blocks:
+  - type: "text"
+    content: "update() 메서드는 다른 딕셔너리의 키-값 쌍을 현재 딕셔너리에 추가하거나 업데이트합니다. dict1.update(dict2) 형식으로 사용하며, dict2의 내용이 dict1에 병합됩니다. 같은 키가 있으면 값이 덮어씌워집니다."
+  - type: "list"
+    items:
+    - "dict1.update(dict2) 형식"
+    - "dict2의 내용을 dict1에 병합"
+    - "같은 키는 값 덮어쓰기"
+    - "원본 딕셔너리 직접 변경"
+  - type: "code"
+    language: "python"
+    title: "새 키 추가"
+    description: "다른 딕셔너리의 새 키를 추가합니다."
+    content: |-
+      user = {'name': '김철수', 'age': 30}
+      extra = {'city': '서울', 'job': 'developer'}
+      user.update(extra)
+      user
+  - type: "code"
+    language: "python"
+    title: "값 덮어쓰기"
+    description: "같은 키가 있으면 값이 업데이트됩니다."
+    content: |-
+      account = {'name': '이영희', 'age': 25, 'city': '부산'}
+      change = {'age': 26, 'job': 'designer'}
+      account.update(change)
+      account
+  - type: "code"
+    language: "python"
+    title: "여러 번 병합"
+    description: "여러 딕셔너리를 순차적으로 병합합니다."
+    content: |-
+      base = {'name': '박민수'}
+      info1 = {'age': 35, 'city': '대구'}
+      info2 = {'job': 'teacher', 'hobby': 'reading'}
+      base.update(info1)
+      base.update(info2)
+      base
+  - type: "tip"
+    content: "update()는 설정 병합이나 데이터 통합에 매우 유용합니다."
+
+- id: "method_pop"
+  title: "pop() 메서드"
+  subtitle: "키로 값 제거하고 반환"
+  blocks:
+  - type: "text"
+    content: "pop() 메서드는 지정한 키의 값을 제거하고 그 값을 반환합니다. dict.pop(key) 형식으로 사용하며, 없는 키를 pop하면 에러가 발생합니다. dict.pop(key, default)로 기본값을 지정할 수 있습니다."
+  - type: "list"
+    items:
+    - "dict.pop(key) 형식"
+    - "키 제거하고 값 반환"
+    - "없는 키는 에러 발생"
+    - "기본값 지정 가능"
+  - type: "code"
+    language: "python"
+    title: "pop() 기본"
+    description: "키를 제거하고 값을 반환합니다."
+    content: |-
+      stock = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
+      stock.pop('mouse')
+  - type: "code"
+    language: "python"
+    title: "기본값 지정"
+    description: "없는 키를 pop할 때 기본값을 반환합니다."
+    content: |-
+      inventory = {'laptop': 10, 'keyboard': 30}
+      inventory.pop('monitor', 0)
+  - type: "code"
+    language: "python"
+    title: "여러 키 제거"
+    description: "여러 키를 순차적으로 제거합니다."
+    content: |-
+      data = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+      data.pop('b')
+      data.pop('d')
+      data
+  - type: "tip"
+    content: "pop()은 값을 꺼내면서 동시에 제거할 때 유용합니다."
+
+- id: "method_popitem"
+  title: "popitem() 메서드"
+  subtitle: "마지막 키-값 쌍 제거"
+  blocks:
+  - type: "text"
+    content: "popitem() 메서드는 딕셔너리의 마지막 키-값 쌍을 제거하고 (키, 값) 튜플로 반환합니다. dict.popitem() 형식으로 사용하며, 빈 딕셔너리에 사용하면 에러가 발생합니다."
+  - type: "list"
+    items:
+    - "dict.popitem() 형식"
+    - "마지막 키-값 쌍 제거"
+    - "(키, 값) 튜플 반환"
+    - "빈 딕셔너리는 에러"
+  - type: "code"
+    language: "python"
+    title: "popitem() 기본"
+    description: "마지막 키-값 쌍을 제거하고 반환합니다."
+    content: |-
+      queue = {'first': 1, 'second': 2, 'third': 3}
+      queue.popitem()
+  - type: "code"
+    language: "python"
+    title: "연속 제거"
+    description: "popitem()을 여러 번 호출하여 제거합니다."
+    content: |-
+      stack = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+      stack.popitem()
+      stack.popitem()
+      stack
+  - type: "code"
+    language: "python"
+    title: "키와 값 분리"
+    description: "반환된 튜플에서 키와 값을 인덱싱으로 가져옵니다."
+    content: |-
+      record = {'name': '김철수', 'age': 30, 'city': '서울'}
+      pair = record.popitem()
+      pair[0]
+  - type: "tip"
+    content: "popitem()은 LIFO(후입선출) 스택 구현에 유용합니다."
+
+- id: "method_clear"
+  title: "clear() 메서드"
+  subtitle: "모든 항목 제거"
+  blocks:
+  - type: "text"
+    content: "clear() 메서드는 딕셔너리의 모든 키-값 쌍을 제거하여 빈 딕셔너리로 만듭니다. dict.clear() 형식으로 사용하며, 반환값은 None입니다. 리스트의 clear()와 동일하게 작동합니다."
+  - type: "list"
+    items:
+    - "dict.clear() 형식"
+    - "모든 키-값 쌍 제거"
+    - "빈 딕셔너리로 만듦"
+    - "반환값 없음(None)"
+  - type: "code"
+    language: "python"
+    title: "clear() 기본"
+    description: "딕셔너리의 모든 항목을 제거합니다."
+    content: |-
+      temp = {'a': 1, 'b': 2, 'c': 3}
+      temp.clear()
+      temp
+  - type: "code"
+    language: "python"
+    title: "초기화 비교"
+    description: "clear()와 빈 딕셔너리 할당은 다릅니다."
+    content: |-
+      data1 = {'x': 1, 'y': 2}
+      data2 = {'x': 1, 'y': 2}
+      data1.clear()
+      data2 = {}
+      data1 == data2
+  - type: "tip"
+    content: "clear()는 원본 딕셔너리를 유지하면서 내용만 비웁니다."
+
+- id: "method_setdefault"
+  title: "setdefault() 메서드"
+  subtitle: "키가 없으면 추가"
+  blocks:
+  - type: "text"
+    content: "setdefault() 메서드는 키가 있으면 그 값을 반환하고, 없으면 지정한 기본값으로 키를 추가하고 그 값을 반환합니다. dict.setdefault(key, default) 형식으로 사용합니다."
+  - type: "list"
+    items:
+    - "dict.setdefault(key, default) 형식"
+    - "키 있으면 값 반환"
+    - "키 없으면 추가하고 반환"
+    - "카운팅에 유용"
+  - type: "code"
+    language: "python"
+    title: "키 있을 때"
+    description: "이미 있는 키는 기존 값을 반환합니다."
+    content: |-
+      cache = {'name': '김철수', 'age': 30}
+      cache.setdefault('name', '이영희')
+  - type: "code"
+    language: "python"
+    title: "키 없을 때"
+    description: "없는 키는 기본값으로 추가됩니다."
+    content: |-
+      session = {'user': 'admin'}
+      session.setdefault('timeout', 3600)
+      session
+  - type: "code"
+    language: "python"
+    title: "빈 리스트 초기화"
+    description: "빈 리스트를 기본값으로 사용합니다."
+    content: |-
+      groups = {'admin': ['user1', 'user2']}
+      groups.setdefault('guest', [])
+      groups
+  - type: "tip"
+    content: "setdefault()는 딕셔너리 카운팅이나 그룹화에 매우 유용합니다."
+
+- id: "method_comparison"
+  title: "메서드 비교"
+  subtitle: "언제 어떤 메서드를 사용할까?"
+  blocks:
+  - type: "text"
+    content: "딕셔너리 메서드는 각각 특정 상황에 최적화되어 있습니다. get()은 안전한 접근, keys/values/items는 순회, update는 병합, pop/popitem/clear는 제거 작업에 사용됩니다."
+  - type: "list"
+    items:
+    - "get(): 안전한 값 접근"
+    - "keys/values/items: 순회"
+    - "update(): 딕셔너리 병합"
+    - "pop/popitem/clear: 제거"
+  - type: "code"
+    language: "python"
+    title: "종합 예제"
+    description: "여러 메서드를 조합하여 사용합니다."
+    content: |-
+      setting = {'host': 'localhost', 'port': 8080}
+      setting.update({'user': 'admin', 'timeout': 30})
+      setting.pop('port')
+      setting
+  - type: "tip"
+    content: "상황에 맞는 메서드를 선택하면 코드가 간결해집니다."
+
+- id: "practice"
+  title: "Day 12 종합 복습"
+  subtitle: "딕셔너리 메서드 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 12에서 배운 딕셔너리 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: get() 메서드"
+    code: |-
+      cfg = {'host': 'localhost', 'port': 8080}
+      cfg.get('user', 'admin')
+
+  - type: "expansion"
+    title: "🟢 기본2: keys() 메서드"
+    code: |-
+      sample = {'a': 1, 'b': 2, 'c': 3}
+      list(sample.keys())
+
+  - type: "expansion"
+    title: "🟢 기본3: values() 메서드"
+    code: |-
+      nums = {'x': 10, 'y': 20, 'z': 30}
+      list(nums.values())
+
+  - type: "expansion"
+    title: "🟢 기본4: items() 메서드"
+    code: |-
+      pair = {'name': '홍길동', 'age': 25}
+      list(pair.items())
+
+  - type: "expansion"
+    title: "🟢 기본5: update() 메서드"
+    code: |-
+      person = {'name': '김철수'}
+      extra = {'age': 30, 'city': '서울'}
+      person.update(extra)
+      person
+
+  - type: "expansion"
+    title: "🟡 응용1: 설정 관리"
+    code: |-
+      defaults = {'timeout': 30, 'retries': 3, 'debug': False}
+      custom = {'timeout': 60, 'port': 8080}
+      final = {'host': 'localhost'}
+      final.update(defaults)
+      final.update(custom)
+      final
+
+  - type: "expansion"
+    title: "🟡 응용2: 재고 관리"
+    code: |-
+      warehouse = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
+      warehouse.pop('mouse')
+      warehouse.setdefault('monitor', 20)
+      warehouse
+
+  - type: "expansion"
+    title: "🟡 응용3: 성적 분석"
+    code: |-
+      scores = {'math': 85, 'english': 90, 'science': 88}
+      vals = list(scores.values())
+      avg = (vals[0] + vals[1] + vals[2]) / len(vals)
+      scores.update({'history': 92})
+      avg
+
+  - type: "expansion"
+    title: "🟡 응용4: 사용자 프로필"
+    code: |-
+      profile = {'username': 'developer', 'email': 'dev@example.com'}
+      profile.update({'age': 28, 'city': '부산'})
+      profile.pop('email')
+      profile
+
+  - type: "expansion"
+    title: "🟡 응용5: 주문 처리"
+    code: |-
+      cart = {'product1': 2, 'product2': 1, 'product3': 3}
+      qty = list(cart.values())
+      total = qty[0] + qty[1] + qty[2]
+      cart.popitem()
+      total
+
+  - type: "expansion"
+    title: "🔴 심화1-1: 멀티 설정 병합"
+    code: |-
+      base = {'host': 'localhost'}
+      dev = {'port': 3000, 'debug': True}
+      prod = {'port': 8080, 'debug': False, 'workers': 4}
+      merged = {}
+      merged.update(base)
+      merged.update(dev)
+      merged.update(prod)
+      merged
+
+  - type: "expansion"
+    title: "🔴 심화1-2: 설정 분석"
+    code: |-
+      settings = {'host': 'localhost', 'port': 8080, 'debug': False, 'workers': 4}
+      port = settings.get('port')
+      debug = settings.get('debug', True)
+      timeout = settings.get('timeout', 30)
+      port, debug, timeout
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 캐시 구현"
+    code: |-
+      cache = {'key1': 'value1', 'key2': 'value2', 'key3': 'value3'}
+      cache.get('key1', 'miss')
+      cache.get('key4', 'miss')
+      cache.pop('key2')
+      cache.setdefault('key4', 'value4')
+      cache
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 캐시 통계"
+    code: |-
+      store = {'key1': 'value1', 'key3': 'value3', 'key4': 'value4'}
+      keys = list(store.keys())
+      items = list(store.items())
+      len(keys), keys[0], items[len(items) - 1]
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 주문 시스템"
+    code: |-
+      order = {'orderId': 'ORD001', 'customer': '김철수'}
+      order.update({'product': '노트북', 'quantity': 2, 'price': 2400000})
+      order
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 주문 처리"
+    code: |-
+      purchase = {'orderId': 'ORD001', 'customer': '김철수', 'product': '노트북', 'quantity': 2, 'price': 2400000}
+      count = purchase.get('quantity')
+      unit = purchase.get('price') / count
+      purchase.pop('price')
+      purchase.setdefault('status', 'pending')
+      unit
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 팀 관리"
+    code: |-
+      team = {}
+      team.update({'member1': {'name': '김개발', 'role': 'developer'}})
+      team.update({'member2': {'name': '이디자인', 'role': 'designer'}})
+      team.update({'member3': {'name': '박기획', 'role': 'planner'}})
+      team
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 팀 재구성"
+    code: |-
+      org = {'member1': {'name': '김개발', 'role': 'developer'}, 'member2': {'name': '이디자인', 'role': 'designer'}, 'member3': {'name': '박기획', 'role': 'planner'}}
+      org.popitem()
+      dev = org.get('member1')
+      dev.get('name')
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 통계 계산"
+    code: |-
+      sales = {'jan': 1000000, 'feb': 1200000, 'mar': 1500000, 'apr': 1300000}
+      revenues = list(sales.values())
+      total = revenues[0] + revenues[1] + revenues[2] + revenues[3]
+      avg = total / len(revenues)
+      avg
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 통계 분석"
+    code: |-
+      report = {'jan': 1000000, 'feb': 1200000, 'mar': 1500000, 'apr': 1300000}
+      jan = report.get('jan')
+      mar = report.get('mar')
+      growth = mar - jan
+      report.setdefault('may', 1400000)
+      growth

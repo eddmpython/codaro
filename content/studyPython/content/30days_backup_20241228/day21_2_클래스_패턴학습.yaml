@@ -1,0 +1,274 @@
+meta:
+  id: day21_2
+  title: 클래스 패턴학습
+  day: 21
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 클래스와 객체지향"
+    description: "class로 클래스를 정의하고 객체를 생성하는 방법."
+    keywords: ['클래스', 'class', '객체', 'OOP']
+intro:
+  title: 클래스 마스터 패턴북
+  emoji: 🔥
+  description: 이것만 외우면 클래스 마스터!
+  points:
+  - '📝 정의: class 클래스명:'
+  - '📦 생성자: def __init__(self):'
+  - '🔄 인스턴스: 객체 = 클래스()'
+  - '📊 속성: self.속성 = 값'
+  - '🧠 메서드: def 메서드(self):'
+  - '🔗 상속: class 자식(부모):'
+  - '🔍 super(): 부모 클래스 호출'
+  summary: 🔥 클래스는 객체지향의 핵심!
+sections:
+- id: class_basic
+  title: 1. 기본 클래스
+  subtitle: 'class 클래스명:'
+  blocks:
+  - type: text
+    content: 클래스는 객체를 만들기 위한 설계도입니다. class 키워드로 정의하고, 클래스명()으로 인스턴스를 생성합니다.
+  - type: code
+    language: python
+    title: 기본 클래스 정의하기
+    description: 클래스 정의와 인스턴스 생성 패턴입니다.
+    content: |-
+      class Car:
+          pass
+
+      pattern1Car = Car()
+      print(type(pattern1Car))
+  - type: tip
+    content: "클래스명은 PascalCase를 사용하여 첫 글자를 대문자로 작성합니다."
+- id: class_init
+  title: 2. 생성자
+  subtitle: '__init__(self):'
+  blocks:
+  - type: text
+    content: __init__ 메서드는 객체 생성 시 자동으로 호출되어 인스턴스 속성을 초기화합니다.
+  - type: code
+    language: python
+    title: 생성자로 초기화하기
+    description: 생성자로 인스턴스 속성을 초기화하는 패턴입니다.
+    content: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+      pattern2Person = Person("영희", 25)
+      print(f"{pattern2Person.name}는 {pattern2Person.age}살입니다.")
+  - type: tip
+    content: "self는 생성되는 인스턴스 자신을 가리키며, 모든 인스턴스 메서드의 첫 번째 매개변수입니다."
+- id: class_method
+  title: 3. 인스턴스 메서드
+  subtitle: 'def 메서드명(self):'
+  blocks:
+  - type: text
+    content: 인스턴스 메서드는 각 인스턴스가 수행할 수 있는 행동을 정의합니다.
+  - type: code
+    language: python
+    title: 인스턴스 메서드 만들기
+    description: 인스턴스 메서드로 객체의 행동을 정의하는 패턴입니다.
+    content: |-
+      class Dog:
+          def __init__(self, name):
+              self.name = name
+
+          def bark(self):
+              return f"{self.name}가 멍멍!"
+
+      pattern3Dog = Dog("멍멍이")
+      print(pattern3Dog.bark())
+  - type: tip
+    content: "메서드는 인스턴스명.메서드명() 형태로 호출하며, self는 자동으로 전달됩니다."
+- id: class_variable
+  title: 4. 클래스 속성
+  subtitle: 공유하는 변수
+  blocks:
+  - type: text
+    content: 클래스 속성은 모든 인스턴스가 공유하는 변수입니다.
+  - type: code
+    language: python
+    title: 클래스 속성 사용하기
+    description: 모든 인스턴스가 공유하는 클래스 속성 패턴입니다.
+    content: |-
+      class Student:
+          school = "파이썬고등학교"
+
+          def __init__(self, name):
+              self.name = name
+
+      pattern4Student1 = Student("김철수")
+      pattern4Student2 = Student("이영희")
+
+      print(pattern4Student1.school)
+      print(Student.school)
+  - type: tip
+    content: "클래스 속성은 클래스명.속성명 또는 인스턴스명.속성명으로 접근할 수 있습니다."
+- id: class_staticmethod
+  title: 5. 정적 메서드
+  subtitle: '@staticmethod'
+  blocks:
+  - type: text
+    content: 정적 메서드는 클래스나 인스턴스의 상태와 독립적으로 동작하는 메서드입니다.
+  - type: code
+    language: python
+    title: 정적 메서드 사용하기
+    description: 독립적인 유틸리티 함수를 클래스에 포함하는 패턴입니다.
+    content: |-
+      class Calculator:
+          @staticmethod
+          def add(x, y):
+              return x + y
+
+      pattern5Result = Calculator.add(5, 3)
+      print(pattern5Result)
+  - type: tip
+    content: "정적 메서드는 self나 cls 매개변수를 받지 않으며, 인스턴스 없이 바로 호출할 수 있습니다."
+- id: class_classmethod
+  title: 6. 클래스 메서드
+  subtitle: '@classmethod'
+  blocks:
+  - type: text
+    content: 클래스 메서드는 클래스 자체를 첫 번째 매개변수(cls)로 받는 메서드입니다.
+  - type: code
+    language: python
+    title: 클래스 메서드 사용하기
+    description: 대안 생성자를 만드는 클래스 메서드 패턴입니다.
+    content: |-
+      class Person:
+          def __init__(self, name, age):
+              self.name = name
+              self.age = age
+
+          @classmethod
+          def fromString(cls, personStr):
+              name, age = personStr.split("-")
+              return cls(name, int(age))
+
+      pattern6Person = Person.fromString("홍길동-30")
+      print(f"{pattern6Person.name}, {pattern6Person.age}살")
+  - type: tip
+    content: "클래스 메서드는 cls를 통해 클래스 자체에 접근하거나 새로운 인스턴스를 생성할 수 있습니다."
+- id: class_inheritance
+  title: 7. 상속
+  subtitle: 'class 자식(부모):'
+  blocks:
+  - type: text
+    content: 상속은 기존 클래스의 속성과 메서드를 물려받아 새로운 클래스를 만드는 기능입니다.
+  - type: code
+    language: python
+    title: 클래스 상속하기
+    description: 부모 클래스를 상속받아 자식 클래스를 만드는 패턴입니다.
+    content: |-
+      class Animal:
+          def __init__(self, name):
+              self.name = name
+
+          def speak(self):
+              pass
+
+      class Cat(Animal):
+          def speak(self):
+              return f"{self.name}가 야옹!"
+
+      pattern7Cat = Cat("나비")
+      print(pattern7Cat.speak())
+  - type: tip
+    content: "자식 클래스는 부모 클래스의 모든 속성과 메서드를 물려받으며, 필요에 따라 재정의할 수 있습니다."
+- id: class_override
+  title: 8. 메서드 오버라이딩
+  subtitle: 부모 메서드 재정의
+  blocks:
+  - type: text
+    content: 오버라이딩은 자식 클래스에서 부모 클래스의 메서드를 다시 정의하여 다른 동작을 구현하는 것입니다.
+  - type: code
+    language: python
+    title: 메서드 오버라이딩하기
+    description: 부모 클래스의 메서드를 자식 클래스에서 재정의하는 패턴입니다.
+    content: |-
+      class Vehicle:
+          def start(self):
+              return "차량이 출발합니다"
+
+      class Car(Vehicle):
+          def start(self):
+              return "자동차가 부릉부릉 시동을 걸어요"
+
+      pattern8Car = Car()
+      print(pattern8Car.start())
+  - type: tip
+    content: "같은 이름의 메서드를 자식 클래스에서 정의하면 부모 클래스의 메서드를 덮어씁니다."
+- id: class_super
+  title: 9. super() 사용
+  subtitle: 부모 클래스 호출
+  blocks:
+  - type: text
+    content: super()는 자식 클래스에서 부모 클래스의 메서드를 호출할 때 사용합니다.
+  - type: code
+    language: python
+    title: super()로 부모 클래스 호출
+    description: 부모 클래스의 생성자를 호출하는 패턴입니다.
+    content: |-
+      class Rectangle:
+          def __init__(self, width, height):
+              self.width = width
+              self.height = height
+
+      class Square(Rectangle):
+          def __init__(self, side):
+              super().__init__(side, side)
+
+      pattern9Square = Square(5)
+      print(f"정사각형: {pattern9Square.width}x{pattern9Square.height}")
+  - type: tip
+    content: "super()를 사용하면 부모 클래스의 코드를 재사용하면서 확장할 수 있습니다."
+- id: class_property
+  title: 10. 프로퍼티
+  subtitle: '@property'
+  blocks:
+  - type: text
+    content: 프로퍼티는 메서드를 속성처럼 사용할 수 있게 해주는 데코레이터입니다.
+  - type: code
+    language: python
+    title: 프로퍼티 사용하기
+    description: 계산된 값을 속성처럼 제공하는 프로퍼티 패턴입니다.
+    content: |-
+      class Circle:
+          def __init__(self, radius):
+              self._radius = radius
+
+          @property
+          def area(self):
+              return 3.14 * self._radius ** 2
+
+      pattern10Circle = Circle(5)
+      print(f"원의 넓이: {pattern10Circle.area}")
+  - type: tip
+    content: "프로퍼티를 사용하면 메서드를 ()없이 속성처럼 접근할 수 있습니다."
+- id: class_magic
+  title: 11. 매직 메서드
+  subtitle: __str__, __repr__
+  blocks:
+  - type: text
+    content: 매직 메서드는 특별한 상황에서 파이썬이 자동으로 호출하는 메서드입니다.
+  - type: code
+    language: python
+    title: 매직 메서드 활용하기
+    description: 객체를 문자열로 표현하는 __str__ 매직 메서드 패턴입니다.
+    content: |-
+      class Book:
+          def __init__(self, title, author):
+              self.title = title
+              self.author = author
+
+          def __str__(self):
+              return f"《{self.title}》 - {self.author}"
+
+      pattern11Book = Book("파이썬 입문", "김개발")
+      print(pattern11Book)
+  - type: tip
+    content: "__str__은 print()로 객체를 출력할 때 자동으로 호출되어 사람이 읽기 쉬운 문자열을 반환합니다."

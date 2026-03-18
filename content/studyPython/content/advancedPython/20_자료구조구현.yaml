@@ -1,0 +1,1524 @@
+meta:
+  id: "20"
+  title: "자료구조 구현"
+  day: 20
+  category: "advancedPython"
+  tags: ["stack", "queue", "linkedlist", "tree", "heap", "hashtable"]
+  seo:
+    title: "파이썬 자료구조 구현 - 스택, 큐, 연결 리스트, 트리, 힙"
+    description: "핵심 자료구조를 직접 구현하여 내부 동작을 이해합니다. 스택, 큐, 연결 리스트, 이진 트리, 힙, 해시 테이블을 직접 만들어봅니다."
+    keywords: ["자료구조", "스택", "큐", "연결 리스트", "이진 트리", "힙", "해시 테이블"]
+
+intro:
+  emoji: "🏗️"
+  points:
+  - "스택과 큐 구현: LIFO/FIFO 구조"
+  - "연결 리스트: 단일/이중 연결"
+  - "이진 트리와 BST 구현"
+  - "힙과 해시 테이블 구현"
+
+sections:
+- id: "stack"
+  title: "스택 구현"
+  subtitle: "LIFO 구조"
+  blocks:
+  - type: "text"
+    content: "스택은 후입선출(LIFO) 구조입니다. push로 삽입하고 pop으로 제거합니다. 함수 호출 스택, 괄호 검사, Undo 기능 등에 사용됩니다. O(1) 시간에 삽입/삭제가 가능합니다."
+  - type: "list"
+    items:
+    - "후입선출(LIFO) 구조"
+    - "push, pop, peek 연산"
+    - "시간 복잡도: O(1)"
+    - "함수 호출, 괄호 검사에 활용"
+  - type: "code"
+    language: "python"
+    title: "기본 스택"
+    description: "리스트 기반 스택을 구현합니다."
+    content: |-
+      class Stack:
+          def __init__(self):
+              self.items = []
+
+          def push(self, item):
+              self.items.append(item)
+
+          def pop(self):
+              if not self.isEmpty():
+                  return self.items.pop()
+              return None
+
+          def peek(self):
+              if not self.isEmpty():
+                  return self.items[-1]
+              return None
+
+          def isEmpty(self):
+              return len(self.items) == 0
+
+          def size(self):
+              return len(self.items)
+
+      stk = Stack()
+      stk.push(10)
+      stk.push(20)
+      stk.push(30)
+      stkPeek = stk.peek()
+      stkPop = stk.pop()
+      stkSize = stk.size()
+      (stkPeek, stkPop, stkSize)
+  - type: "code"
+    language: "python"
+    title: "최소값 스택"
+    description: "O(1)에 최소값을 반환하는 스택입니다."
+    content: |-
+      class MinStack:
+          def __init__(self):
+              self.data = []
+              self.minVals = []
+
+          def push(self, val):
+              self.data.append(val)
+              if not self.minVals or val <= self.minVals[-1]:
+                  self.minVals.append(val)
+
+          def pop(self):
+              if self.data:
+                  popped = self.data.pop()
+                  if popped == self.minVals[-1]:
+                      self.minVals.pop()
+                  return popped
+              return None
+
+          def getMin(self):
+              return self.minVals[-1] if self.minVals else None
+
+      minStk = MinStack()
+      minStk.push(5)
+      minStk.push(2)
+      minStk.push(7)
+      minStk.push(1)
+      minStkMin = minStk.getMin()
+      minStk.pop()
+      minStkMinAfter = minStk.getMin()
+      (minStkMin, minStkMinAfter)
+  - type: "tip"
+    content: "MinStack은 보조 스택을 사용해 최소값을 추적합니다."
+
+- id: "queue"
+  title: "큐 구현"
+  subtitle: "FIFO 구조"
+  blocks:
+  - type: "text"
+    content: "큐는 선입선출(FIFO) 구조입니다. enqueue로 삽입하고 dequeue로 제거합니다. BFS, 작업 스케줄링, 버퍼 등에 사용됩니다. 덱(Deque)은 양쪽 끝에서 삽입/삭제가 가능합니다."
+  - type: "list"
+    items:
+    - "선입선출(FIFO) 구조"
+    - "enqueue, dequeue, front 연산"
+    - "BFS, 스케줄링에 활용"
+    - "덱은 양방향 연산 지원"
+  - type: "code"
+    language: "python"
+    title: "기본 큐"
+    description: "리스트 기반 큐를 구현합니다."
+    content: |-
+      class Queue:
+          def __init__(self):
+              self.items = []
+
+          def enqueue(self, item):
+              self.items.append(item)
+
+          def dequeue(self):
+              if not self.isEmpty():
+                  return self.items.pop(0)
+              return None
+
+          def front(self):
+              if not self.isEmpty():
+                  return self.items[0]
+              return None
+
+          def isEmpty(self):
+              return len(self.items) == 0
+
+          def size(self):
+              return len(self.items)
+
+      que = Queue()
+      que.enqueue('A')
+      que.enqueue('B')
+      que.enqueue('C')
+      queFront = que.front()
+      queDeq = que.dequeue()
+      queSize = que.size()
+      (queFront, queDeq, queSize)
+  - type: "code"
+    language: "python"
+    title: "덱(Deque)"
+    description: "양쪽 끝에서 연산이 가능한 덱입니다."
+    content: |-
+      class Deque:
+          def __init__(self):
+              self.items = []
+
+          def addFront(self, item):
+              self.items.insert(0, item)
+
+          def addRear(self, item):
+              self.items.append(item)
+
+          def removeFront(self):
+              if self.items:
+                  return self.items.pop(0)
+              return None
+
+          def removeRear(self):
+              if self.items:
+                  return self.items.pop()
+              return None
+
+          def peekFront(self):
+              return self.items[0] if self.items else None
+
+          def peekRear(self):
+              return self.items[-1] if self.items else None
+
+      deq = Deque()
+      deq.addFront(1)
+      deq.addRear(2)
+      deq.addFront(0)
+      deqFront = deq.peekFront()
+      deqRear = deq.peekRear()
+      (deqFront, deqRear)
+  - type: "tip"
+    content: "collections.deque는 O(1) 양방향 연산을 제공합니다."
+
+- id: "linkedlist"
+  title: "연결 리스트"
+  subtitle: "노드 기반 구조"
+  blocks:
+  - type: "text"
+    content: "연결 리스트는 노드들이 포인터로 연결된 구조입니다. 삽입/삭제가 O(1)이지만 탐색은 O(n)입니다. 단일 연결 리스트는 다음 노드만, 이중 연결 리스트는 이전/다음 노드를 모두 참조합니다."
+  - type: "list"
+    items:
+    - "노드가 포인터로 연결"
+    - "삽입/삭제: O(1)"
+    - "탐색: O(n)"
+    - "단일/이중 연결 리스트"
+  - type: "code"
+    language: "python"
+    title: "단일 연결 리스트"
+    description: "단일 연결 리스트를 구현합니다."
+    content: |-
+      class ListNode:
+          def __init__(self, val):
+              self.val = val
+              self.next = None
+
+      class LinkedList:
+          def __init__(self):
+              self.head = None
+
+          def append(self, val):
+              newNode = ListNode(val)
+              if not self.head:
+                  self.head = newNode
+                  return
+              curr = self.head
+              while curr.next:
+                  curr = curr.next
+              curr.next = newNode
+
+          def prepend(self, val):
+              newNode = ListNode(val)
+              newNode.next = self.head
+              self.head = newNode
+
+          def delete(self, val):
+              if not self.head:
+                  return
+              if self.head.val == val:
+                  self.head = self.head.next
+                  return
+              curr = self.head
+              while curr.next and curr.next.val != val:
+                  curr = curr.next
+              if curr.next:
+                  curr.next = curr.next.next
+
+          def toList(self):
+              result = []
+              curr = self.head
+              while curr:
+                  result.append(curr.val)
+                  curr = curr.next
+              return result
+
+      llist = LinkedList()
+      llist.append(1)
+      llist.append(2)
+      llist.append(3)
+      llist.prepend(0)
+      llist.delete(2)
+      llistResult = llist.toList()
+      llistResult
+  - type: "code"
+    language: "python"
+    title: "이중 연결 리스트"
+    description: "이전/다음 노드를 모두 참조하는 리스트입니다."
+    content: |-
+      class DoublyNode:
+          def __init__(self, val):
+              self.val = val
+              self.prev = None
+              self.next = None
+
+      class DoublyLinkedList:
+          def __init__(self):
+              self.head = None
+              self.tail = None
+
+          def append(self, val):
+              newNode = DoublyNode(val)
+              if not self.head:
+                  self.head = self.tail = newNode
+                  return
+              self.tail.next = newNode
+              newNode.prev = self.tail
+              self.tail = newNode
+
+          def prepend(self, val):
+              newNode = DoublyNode(val)
+              if not self.head:
+                  self.head = self.tail = newNode
+                  return
+              newNode.next = self.head
+              self.head.prev = newNode
+              self.head = newNode
+
+          def toListForward(self):
+              result = []
+              curr = self.head
+              while curr:
+                  result.append(curr.val)
+                  curr = curr.next
+              return result
+
+          def toListBackward(self):
+              result = []
+              curr = self.tail
+              while curr:
+                  result.append(curr.val)
+                  curr = curr.prev
+              return result
+
+      dlist = DoublyLinkedList()
+      dlist.append(1)
+      dlist.append(2)
+      dlist.prepend(0)
+      dlistFwd = dlist.toListForward()
+      dlistBwd = dlist.toListBackward()
+      (dlistFwd, dlistBwd)
+  - type: "tip"
+    content: "이중 연결 리스트는 LRU 캐시 구현에 자주 사용됩니다."
+
+- id: "binarytree"
+  title: "이진 트리"
+  subtitle: "트리 구조의 기본"
+  blocks:
+  - type: "text"
+    content: "이진 트리는 각 노드가 최대 2개의 자식을 가지는 구조입니다. 전위/중위/후위 순회로 트리를 탐색합니다. 이진 탐색 트리(BST)는 왼쪽 < 부모 < 오른쪽 규칙을 따릅니다. BST에서 탐색/삽입은 평균 O(log n)입니다."
+  - type: "list"
+    items:
+    - "각 노드 최대 2개 자식"
+    - "전위/중위/후위 순회"
+    - "BST: 왼쪽 < 부모 < 오른쪽"
+    - "탐색/삽입: O(log n) 평균"
+  - type: "code"
+    language: "python"
+    title: "이진 트리 순회"
+    description: "전위/중위/후위 순회를 구현합니다."
+    content: |-
+      class TreeNode:
+          def __init__(self, val):
+              self.val = val
+              self.left = None
+              self.right = None
+
+      class BinaryTree:
+          def __init__(self):
+              self.root = None
+
+          def inorder(self, node, result):
+              if node:
+                  self.inorder(node.left, result)
+                  result.append(node.val)
+                  self.inorder(node.right, result)
+              return result
+
+          def preorder(self, node, result):
+              if node:
+                  result.append(node.val)
+                  self.preorder(node.left, result)
+                  self.preorder(node.right, result)
+              return result
+
+          def postorder(self, node, result):
+              if node:
+                  self.postorder(node.left, result)
+                  self.postorder(node.right, result)
+                  result.append(node.val)
+              return result
+
+      btree = BinaryTree()
+      btree.root = TreeNode(1)
+      btree.root.left = TreeNode(2)
+      btree.root.right = TreeNode(3)
+      btree.root.left.left = TreeNode(4)
+      btree.root.left.right = TreeNode(5)
+      btInorder = btree.inorder(btree.root, [])
+      btPreorder = btree.preorder(btree.root, [])
+      btPostorder = btree.postorder(btree.root, [])
+      (btInorder, btPreorder, btPostorder)
+  - type: "code"
+    language: "python"
+    title: "이진 탐색 트리"
+    description: "BST의 삽입과 탐색을 구현합니다."
+    content: |-
+      class BSTNode:
+          def __init__(self, val):
+              self.val = val
+              self.left = None
+              self.right = None
+
+      class BST:
+          def __init__(self):
+              self.root = None
+
+          def insert(self, val):
+              if not self.root:
+                  self.root = BSTNode(val)
+                  return
+              self._insertRec(self.root, val)
+
+          def _insertRec(self, node, val):
+              if val < node.val:
+                  if node.left:
+                      self._insertRec(node.left, val)
+                  else:
+                      node.left = BSTNode(val)
+              else:
+                  if node.right:
+                      self._insertRec(node.right, val)
+                  else:
+                      node.right = BSTNode(val)
+
+          def search(self, val):
+              return self._searchRec(self.root, val)
+
+          def _searchRec(self, node, val):
+              if not node or node.val == val:
+                  return node is not None
+              if val < node.val:
+                  return self._searchRec(node.left, val)
+              return self._searchRec(node.right, val)
+
+          def inorderList(self):
+              result = []
+              self._inorderRec(self.root, result)
+              return result
+
+          def _inorderRec(self, node, result):
+              if node:
+                  self._inorderRec(node.left, result)
+                  result.append(node.val)
+                  self._inorderRec(node.right, result)
+
+      bst = BST()
+      for v in [5, 3, 7, 1, 4, 6, 8]:
+          bst.insert(v)
+      bstInorder = bst.inorderList()
+      bstSearch = bst.search(4)
+      (bstInorder, bstSearch)
+  - type: "tip"
+    content: "BST의 중위 순회는 정렬된 순서로 값을 반환합니다."
+
+- id: "heap"
+  title: "힙 구현"
+  subtitle: "우선순위 기반 구조"
+  blocks:
+  - type: "text"
+    content: "힙은 완전 이진 트리 기반의 우선순위 구조입니다. 최소 힙은 부모가 자식보다 작고, 최대 힙은 부모가 자식보다 큽니다. 삽입과 삭제는 O(log n), 최솟값/최댓값 조회는 O(1)입니다. 우선순위 큐, 힙 정렬에 사용됩니다."
+  - type: "list"
+    items:
+    - "완전 이진 트리 기반"
+    - "최소 힙: 부모 <= 자식"
+    - "삽입/삭제: O(log n)"
+    - "최솟값/최댓값 조회: O(1)"
+  - type: "code"
+    language: "python"
+    title: "최소 힙"
+    description: "최소 힙을 구현합니다."
+    content: |-
+      class MinHeap:
+          def __init__(self):
+              self.heap = []
+
+          def parent(self, i):
+              return (i - 1) // 2
+
+          def leftChild(self, i):
+              return 2 * i + 1
+
+          def rightChild(self, i):
+              return 2 * i + 2
+
+          def swap(self, i, j):
+              self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
+
+          def insert(self, val):
+              self.heap.append(val)
+              self._heapifyUp(len(self.heap) - 1)
+
+          def _heapifyUp(self, i):
+              while i > 0 and self.heap[self.parent(i)] > self.heap[i]:
+                  self.swap(i, self.parent(i))
+                  i = self.parent(i)
+
+          def extractMin(self):
+              if not self.heap:
+                  return None
+              if len(self.heap) == 1:
+                  return self.heap.pop()
+              minVal = self.heap[0]
+              self.heap[0] = self.heap.pop()
+              self._heapifyDown(0)
+              return minVal
+
+          def _heapifyDown(self, i):
+              smallest = i
+              left = self.leftChild(i)
+              right = self.rightChild(i)
+              if left < len(self.heap) and self.heap[left] < self.heap[smallest]:
+                  smallest = left
+              if right < len(self.heap) and self.heap[right] < self.heap[smallest]:
+                  smallest = right
+              if smallest != i:
+                  self.swap(i, smallest)
+                  self._heapifyDown(smallest)
+
+          def peek(self):
+              return self.heap[0] if self.heap else None
+
+      minHeap = MinHeap()
+      for val in [5, 3, 8, 1, 2, 9]:
+          minHeap.insert(val)
+      heapMin = minHeap.peek()
+      heapExtract = minHeap.extractMin()
+      heapMinAfter = minHeap.peek()
+      (heapMin, heapExtract, heapMinAfter)
+  - type: "code"
+    language: "python"
+    title: "최대 힙"
+    description: "최대 힙을 구현합니다."
+    content: |-
+      class MaxHeap:
+          def __init__(self):
+              self.heap = []
+
+          def parent(self, i):
+              return (i - 1) // 2
+
+          def leftChild(self, i):
+              return 2 * i + 1
+
+          def rightChild(self, i):
+              return 2 * i + 2
+
+          def swap(self, i, j):
+              self.heap[i], self.heap[j] = self.heap[j], self.heap[i]
+
+          def insert(self, val):
+              self.heap.append(val)
+              self._heapifyUp(len(self.heap) - 1)
+
+          def _heapifyUp(self, i):
+              while i > 0 and self.heap[self.parent(i)] < self.heap[i]:
+                  self.swap(i, self.parent(i))
+                  i = self.parent(i)
+
+          def extractMax(self):
+              if not self.heap:
+                  return None
+              if len(self.heap) == 1:
+                  return self.heap.pop()
+              maxVal = self.heap[0]
+              self.heap[0] = self.heap.pop()
+              self._heapifyDown(0)
+              return maxVal
+
+          def _heapifyDown(self, i):
+              largest = i
+              left = self.leftChild(i)
+              right = self.rightChild(i)
+              if left < len(self.heap) and self.heap[left] > self.heap[largest]:
+                  largest = left
+              if right < len(self.heap) and self.heap[right] > self.heap[largest]:
+                  largest = right
+              if largest != i:
+                  self.swap(i, largest)
+                  self._heapifyDown(largest)
+
+          def peek(self):
+              return self.heap[0] if self.heap else None
+
+      maxHeap = MaxHeap()
+      for val in [5, 3, 8, 1, 2, 9]:
+          maxHeap.insert(val)
+      heapMax = maxHeap.peek()
+      heapExtractMax = maxHeap.extractMax()
+      heapMaxAfter = maxHeap.peek()
+      (heapMax, heapExtractMax, heapMaxAfter)
+  - type: "tip"
+    content: "파이썬 heapq 모듈은 최소 힙을 제공합니다. 최대 힙은 값을 음수로 변환하여 사용합니다."
+
+- id: "hashtable"
+  title: "해시 테이블"
+  subtitle: "키-값 저장소"
+  blocks:
+  - type: "text"
+    content: "해시 테이블은 키를 해시 함수로 변환하여 값을 저장합니다. 평균 O(1) 시간에 조회/삽입/삭제가 가능합니다. 충돌은 체이닝 또는 개방 주소법으로 해결합니다. LRU 캐시는 해시 테이블과 연결 리스트를 조합합니다."
+  - type: "list"
+    items:
+    - "키를 해시 함수로 변환"
+    - "평균 O(1) 조회/삽입/삭제"
+    - "충돌 해결: 체이닝, 개방 주소법"
+    - "파이썬 dict가 해시 테이블"
+  - type: "code"
+    language: "python"
+    title: "체이닝 해시 테이블"
+    description: "체이닝 방식으로 충돌을 해결합니다."
+    content: |-
+      class HashTable:
+          def __init__(self, size=10):
+              self.size = size
+              self.buckets = [[] for _ in range(size)]
+
+          def _hash(self, key):
+              return hash(key) % self.size
+
+          def put(self, key, value):
+              idx = self._hash(key)
+              for i, (k, v) in enumerate(self.buckets[idx]):
+                  if k == key:
+                      self.buckets[idx][i] = (key, value)
+                      return
+              self.buckets[idx].append((key, value))
+
+          def get(self, key):
+              idx = self._hash(key)
+              for k, v in self.buckets[idx]:
+                  if k == key:
+                      return v
+              return None
+
+          def remove(self, key):
+              idx = self._hash(key)
+              for i, (k, v) in enumerate(self.buckets[idx]):
+                  if k == key:
+                      del self.buckets[idx][i]
+                      return True
+              return False
+
+      htable = HashTable()
+      htable.put("name", "Alice")
+      htable.put("age", 30)
+      htable.put("city", "Seoul")
+      htGet1 = htable.get("name")
+      htGet2 = htable.get("age")
+      htable.remove("age")
+      htGet3 = htable.get("age")
+      (htGet1, htGet2, htGet3)
+  - type: "code"
+    language: "python"
+    title: "LRU 캐시"
+    description: "최근 사용 항목을 유지하는 캐시입니다."
+    content: |-
+      class LRUCache:
+          def __init__(self, capacity):
+              self.capacity = capacity
+              self.cache = {}
+              self.order = []
+
+          def get(self, key):
+              if key in self.cache:
+                  self.order.remove(key)
+                  self.order.append(key)
+                  return self.cache[key]
+              return -1
+
+          def put(self, key, value):
+              if key in self.cache:
+                  self.order.remove(key)
+              elif len(self.cache) >= self.capacity:
+                  oldest = self.order.pop(0)
+                  del self.cache[oldest]
+              self.cache[key] = value
+              self.order.append(key)
+
+      lru = LRUCache(2)
+      lru.put(1, 1)
+      lru.put(2, 2)
+      lruGet1 = lru.get(1)
+      lru.put(3, 3)
+      lruGet2 = lru.get(2)
+      lru.put(4, 4)
+      lruGet3 = lru.get(1)
+      lruGet4 = lru.get(3)
+      (lruGet1, lruGet2, lruGet3, lruGet4)
+  - type: "tip"
+    content: "functools.lru_cache 데코레이터로 함수 결과를 캐싱할 수 있습니다."
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "자료구조 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 20에서 배운 자료구조를 난이도별로 복습합니다. 자료구조는 데이터를 효율적으로 저장하고 접근하기 위한 구조로, 알고리즘 성능의 핵심 요소입니다. 스택(LIFO), 큐(FIFO), 힙(우선순위), 트리(계층), 그래프(관계)는 각각 다른 문제 유형에 최적화되어 있습니다. 🟢 기본 문제로 스택과 큐를 구현하고 괄호 검사, BFS 등에 적용해보세요. 🟡 응용 문제로 힙 정렬, 이진 탐색 트리를 연습하세요. 🔴 심화 문제에서는 트라이, 그래프 알고리즘 등 고급 자료구조를 다룹니다. 적절한 자료구조 선택이 알고리즘 효율성을 결정하므로 각 자료구조의 시간복잡도를 숙지하세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 괄호 검사"
+    code: |-
+      class ParenStack:
+          def __init__(self):
+              self.items = []
+
+          def push(self, item):
+              self.items.append(item)
+
+          def pop(self):
+              return self.items.pop() if self.items else None
+
+          def isEmpty(self):
+              return len(self.items) == 0
+
+      def isValidParens(s):
+          pstack = ParenStack()
+          pairs = {')': '(', '}': '{', ']': '['}
+          for ch in s:
+              if ch in '({[':
+                  pstack.push(ch)
+              elif ch in ')}]':
+                  if pstack.pop() != pairs[ch]:
+                      return False
+          return pstack.isEmpty()
+
+      ex1Result = isValidParens("({[]})")
+      ex1Result
+
+  - type: "expansion"
+    title: "🟢 기본2: 큐로 스택 구현"
+    code: |-
+      class QueueStack:
+          def __init__(self):
+              self.q1 = []
+              self.q2 = []
+
+          def push(self, x):
+              self.q1.append(x)
+
+          def pop(self):
+              while len(self.q1) > 1:
+                  self.q2.append(self.q1.pop(0))
+              result = self.q1.pop(0) if self.q1 else None
+              self.q1, self.q2 = self.q2, self.q1
+              return result
+
+          def top(self):
+              while len(self.q1) > 1:
+                  self.q2.append(self.q1.pop(0))
+              result = self.q1[0] if self.q1 else None
+              self.q2.append(self.q1.pop(0))
+              self.q1, self.q2 = self.q2, self.q1
+              return result
+
+      qstk = QueueStack()
+      qstk.push(1)
+      qstk.push(2)
+      qstk.push(3)
+      ex2Top = qstk.top()
+      ex2Pop = qstk.pop()
+      ex2Result = (ex2Top, ex2Pop)
+      ex2Result
+
+  - type: "expansion"
+    title: "🟢 기본3: 스택으로 큐 구현"
+    code: |-
+      class StackQueue:
+          def __init__(self):
+              self.inStack = []
+              self.outStack = []
+
+          def enqueue(self, x):
+              self.inStack.append(x)
+
+          def dequeue(self):
+              if not self.outStack:
+                  while self.inStack:
+                      self.outStack.append(self.inStack.pop())
+              return self.outStack.pop() if self.outStack else None
+
+          def peek(self):
+              if not self.outStack:
+                  while self.inStack:
+                      self.outStack.append(self.inStack.pop())
+              return self.outStack[-1] if self.outStack else None
+
+      sqQueue = StackQueue()
+      sqQueue.enqueue(1)
+      sqQueue.enqueue(2)
+      sqQueue.enqueue(3)
+      ex3Peek = sqQueue.peek()
+      ex3Deq = sqQueue.dequeue()
+      ex3Result = (ex3Peek, ex3Deq)
+      ex3Result
+
+  - type: "expansion"
+    title: "🟢 기본4: 연결 리스트 뒤집기"
+    code: |-
+      class RevNode:
+          def __init__(self, val):
+              self.val = val
+              self.next = None
+
+      def reverseList(head):
+          prev = None
+          curr = head
+          while curr:
+              nxt = curr.next
+              curr.next = prev
+              prev = curr
+              curr = nxt
+          return prev
+
+      def toListFromHead(head):
+          result = []
+          while head:
+              result.append(head.val)
+              head = head.next
+          return result
+
+      revHead = RevNode(1)
+      revHead.next = RevNode(2)
+      revHead.next.next = RevNode(3)
+      revReversed = reverseList(revHead)
+      ex4Result = toListFromHead(revReversed)
+      ex4Result
+
+  - type: "expansion"
+    title: "🟢 기본5: 순환 큐"
+    code: |-
+      class CircularQueue:
+          def __init__(self, k):
+              self.size = k
+              self.queue = [None] * k
+              self.head = 0
+              self.tail = 0
+              self.count = 0
+
+          def enQueue(self, value):
+              if self.isFull():
+                  return False
+              self.queue[self.tail] = value
+              self.tail = (self.tail + 1) % self.size
+              self.count += 1
+              return True
+
+          def deQueue(self):
+              if self.isEmpty():
+                  return False
+              self.head = (self.head + 1) % self.size
+              self.count -= 1
+              return True
+
+          def Front(self):
+              return self.queue[self.head] if not self.isEmpty() else -1
+
+          def Rear(self):
+              return self.queue[(self.tail - 1) % self.size] if not self.isEmpty() else -1
+
+          def isEmpty(self):
+              return self.count == 0
+
+          def isFull(self):
+              return self.count == self.size
+
+      circQ = CircularQueue(3)
+      circQ.enQueue(1)
+      circQ.enQueue(2)
+      circQ.enQueue(3)
+      ex5Full = circQ.isFull()
+      circQ.deQueue()
+      circQ.enQueue(4)
+      ex5Rear = circQ.Rear()
+      ex5Result = (ex5Full, ex5Rear)
+      ex5Result
+
+  - type: "expansion"
+    title: "🟡 응용1: 트라이 구현"
+    code: |-
+      class TrieNode:
+          def __init__(self):
+              self.children = {}
+              self.isEnd = False
+
+      class Trie:
+          def __init__(self):
+              self.root = TrieNode()
+
+          def insert(self, word):
+              node = self.root
+              for ch in word:
+                  if ch not in node.children:
+                      node.children[ch] = TrieNode()
+                  node = node.children[ch]
+              node.isEnd = True
+
+          def search(self, word):
+              node = self.root
+              for ch in word:
+                  if ch not in node.children:
+                      return False
+                  node = node.children[ch]
+              return node.isEnd
+
+          def startsWith(self, prefix):
+              node = self.root
+              for ch in prefix:
+                  if ch not in node.children:
+                      return False
+                  node = node.children[ch]
+              return True
+
+      trie = Trie()
+      trie.insert("apple")
+      trie.insert("app")
+      ex6Search = trie.search("apple")
+      ex6Prefix = trie.startsWith("app")
+      ex6NotFound = trie.search("ap")
+      ex6Result = (ex6Search, ex6Prefix, ex6NotFound)
+      ex6Result
+
+  - type: "expansion"
+    title: "🟡 응용2: 우선순위 큐"
+    code: |-
+      class PriorityQueue:
+          def __init__(self):
+              self.heap = []
+
+          def push(self, priority, item):
+              self.heap.append((priority, item))
+              self._siftUp(len(self.heap) - 1)
+
+          def pop(self):
+              if not self.heap:
+                  return None
+              if len(self.heap) == 1:
+                  return self.heap.pop()[1]
+              result = self.heap[0][1]
+              self.heap[0] = self.heap.pop()
+              self._siftDown(0)
+              return result
+
+          def _siftUp(self, i):
+              parent = (i - 1) // 2
+              while i > 0 and self.heap[i][0] < self.heap[parent][0]:
+                  self.heap[i], self.heap[parent] = self.heap[parent], self.heap[i]
+                  i = parent
+                  parent = (i - 1) // 2
+
+          def _siftDown(self, i):
+              smallest = i
+              left = 2 * i + 1
+              right = 2 * i + 2
+              if left < len(self.heap) and self.heap[left][0] < self.heap[smallest][0]:
+                  smallest = left
+              if right < len(self.heap) and self.heap[right][0] < self.heap[smallest][0]:
+                  smallest = right
+              if smallest != i:
+                  self.heap[i], self.heap[smallest] = self.heap[smallest], self.heap[i]
+                  self._siftDown(smallest)
+
+      pq = PriorityQueue()
+      pq.push(3, "low")
+      pq.push(1, "high")
+      pq.push(2, "medium")
+      ex7Pop1 = pq.pop()
+      ex7Pop2 = pq.pop()
+      ex7Result = (ex7Pop1, ex7Pop2)
+      ex7Result
+
+  - type: "expansion"
+    title: "🟡 응용3: 이진 탐색 트리 삭제"
+    code: |-
+      class BSTDelNode:
+          def __init__(self, val):
+              self.val = val
+              self.left = None
+              self.right = None
+
+      def findMin(node):
+          while node.left:
+              node = node.left
+          return node
+
+      def deleteNode(root, key):
+          if not root:
+              return None
+          if key < root.val:
+              root.left = deleteNode(root.left, key)
+          elif key > root.val:
+              root.right = deleteNode(root.right, key)
+          else:
+              if not root.left:
+                  return root.right
+              if not root.right:
+                  return root.left
+              minNode = findMin(root.right)
+              root.val = minNode.val
+              root.right = deleteNode(root.right, minNode.val)
+          return root
+
+      def inorderTraverse(node, result):
+          if node:
+              inorderTraverse(node.left, result)
+              result.append(node.val)
+              inorderTraverse(node.right, result)
+          return result
+
+      delRoot = BSTDelNode(5)
+      delRoot.left = BSTDelNode(3)
+      delRoot.right = BSTDelNode(7)
+      delRoot.left.left = BSTDelNode(2)
+      delRoot.left.right = BSTDelNode(4)
+      delRoot = deleteNode(delRoot, 3)
+      ex8Result = inorderTraverse(delRoot, [])
+      ex8Result
+
+  - type: "expansion"
+    title: "🟡 응용4: 단조 스택"
+    code: |-
+      def nextGreaterElement(nums):
+          result = [-1] * len(nums)
+          monoStack = []
+          for i in range(len(nums)):
+              while monoStack and nums[i] > nums[monoStack[-1]]:
+                  idx = monoStack.pop()
+                  result[idx] = nums[i]
+              monoStack.append(i)
+          return result
+
+      ngeNums = [2, 1, 2, 4, 3]
+      ex9Result = nextGreaterElement(ngeNums)
+      ex9Result
+
+  - type: "expansion"
+    title: "🟡 응용5: 서로소 집합 (Union-Find)"
+    code: |-
+      class UnionFind:
+          def __init__(self, n):
+              self.parent = list(range(n))
+              self.rank = [0] * n
+
+          def find(self, x):
+              if self.parent[x] != x:
+                  self.parent[x] = self.find(self.parent[x])
+              return self.parent[x]
+
+          def union(self, x, y):
+              px, py = self.find(x), self.find(y)
+              if px == py:
+                  return False
+              if self.rank[px] < self.rank[py]:
+                  px, py = py, px
+              self.parent[py] = px
+              if self.rank[px] == self.rank[py]:
+                  self.rank[px] += 1
+              return True
+
+          def connected(self, x, y):
+              return self.find(x) == self.find(y)
+
+      uf = UnionFind(5)
+      uf.union(0, 1)
+      uf.union(2, 3)
+      uf.union(1, 2)
+      ex10Conn1 = uf.connected(0, 3)
+      ex10Conn2 = uf.connected(0, 4)
+      ex10Result = (ex10Conn1, ex10Conn2)
+      ex10Result
+
+  - type: "expansion"
+    title: "🔴 심화1: 세그먼트 트리"
+    code: |-
+      class SegmentTree:
+          def __init__(self, arr):
+              self.n = len(arr)
+              self.tree = [0] * (4 * self.n)
+              self._build(arr, 0, 0, self.n - 1)
+
+          def _build(self, arr, node, start, end):
+              if start == end:
+                  self.tree[node] = arr[start]
+              else:
+                  mid = (start + end) // 2
+                  self._build(arr, 2 * node + 1, start, mid)
+                  self._build(arr, 2 * node + 2, mid + 1, end)
+                  self.tree[node] = self.tree[2 * node + 1] + self.tree[2 * node + 2]
+
+          def query(self, l, r):
+              return self._query(0, 0, self.n - 1, l, r)
+
+          def _query(self, node, start, end, l, r):
+              if r < start or end < l:
+                  return 0
+              if l <= start and end <= r:
+                  return self.tree[node]
+              mid = (start + end) // 2
+              leftSum = self._query(2 * node + 1, start, mid, l, r)
+              rightSum = self._query(2 * node + 2, mid + 1, end, l, r)
+              return leftSum + rightSum
+
+          def update(self, idx, val):
+              self._update(0, 0, self.n - 1, idx, val)
+
+          def _update(self, node, start, end, idx, val):
+              if start == end:
+                  self.tree[node] = val
+              else:
+                  mid = (start + end) // 2
+                  if idx <= mid:
+                      self._update(2 * node + 1, start, mid, idx, val)
+                  else:
+                      self._update(2 * node + 2, mid + 1, end, idx, val)
+                  self.tree[node] = self.tree[2 * node + 1] + self.tree[2 * node + 2]
+
+      segArr = [1, 3, 5, 7, 9, 11]
+      segTree = SegmentTree(segArr)
+      ex11Query1 = segTree.query(1, 3)
+      segTree.update(2, 10)
+      ex11Query2 = segTree.query(1, 3)
+      ex11Result = (ex11Query1, ex11Query2)
+      ex11Result
+
+  - type: "expansion"
+    title: "🔴 심화2: 펜윅 트리"
+    code: |-
+      class FenwickTree:
+          def __init__(self, n):
+              self.n = n
+              self.tree = [0] * (n + 1)
+
+          def update(self, i, delta):
+              i += 1
+              while i <= self.n:
+                  self.tree[i] += delta
+                  i += i & (-i)
+
+          def prefixSum(self, i):
+              i += 1
+              total = 0
+              while i > 0:
+                  total += self.tree[i]
+                  i -= i & (-i)
+              return total
+
+          def rangeSum(self, l, r):
+              return self.prefixSum(r) - (self.prefixSum(l - 1) if l > 0 else 0)
+
+      fenwick = FenwickTree(6)
+      fenwickArr = [1, 3, 5, 7, 9, 11]
+      for i, v in enumerate(fenwickArr):
+          fenwick.update(i, v)
+      ex12Sum1 = fenwick.rangeSum(1, 3)
+      fenwick.update(2, 5)
+      ex12Sum2 = fenwick.rangeSum(1, 3)
+      ex12Result = (ex12Sum1, ex12Sum2)
+      ex12Result
+
+  - type: "expansion"
+    title: "🔴 심화3: AVL 트리"
+    code: |-
+      class AVLNode:
+          def __init__(self, val):
+              self.val = val
+              self.left = None
+              self.right = None
+              self.height = 1
+
+      class AVLTree:
+          def getHeight(self, node):
+              return node.height if node else 0
+
+          def getBalance(self, node):
+              return self.getHeight(node.left) - self.getHeight(node.right) if node else 0
+
+          def rightRotate(self, y):
+              x = y.left
+              T2 = x.right
+              x.right = y
+              y.left = T2
+              y.height = 1 + max(self.getHeight(y.left), self.getHeight(y.right))
+              x.height = 1 + max(self.getHeight(x.left), self.getHeight(x.right))
+              return x
+
+          def leftRotate(self, x):
+              y = x.right
+              T2 = y.left
+              y.left = x
+              x.right = T2
+              x.height = 1 + max(self.getHeight(x.left), self.getHeight(x.right))
+              y.height = 1 + max(self.getHeight(y.left), self.getHeight(y.right))
+              return y
+
+          def insert(self, root, val):
+              if not root:
+                  return AVLNode(val)
+              if val < root.val:
+                  root.left = self.insert(root.left, val)
+              else:
+                  root.right = self.insert(root.right, val)
+              root.height = 1 + max(self.getHeight(root.left), self.getHeight(root.right))
+              balance = self.getBalance(root)
+              if balance > 1 and val < root.left.val:
+                  return self.rightRotate(root)
+              if balance < -1 and val > root.right.val:
+                  return self.leftRotate(root)
+              if balance > 1 and val > root.left.val:
+                  root.left = self.leftRotate(root.left)
+                  return self.rightRotate(root)
+              if balance < -1 and val < root.right.val:
+                  root.right = self.rightRotate(root.right)
+                  return self.leftRotate(root)
+              return root
+
+      avl = AVLTree()
+      avlRoot = None
+      for v in [10, 20, 30, 40, 50, 25]:
+          avlRoot = avl.insert(avlRoot, v)
+      ex13Height = avl.getHeight(avlRoot)
+      ex13Balance = avl.getBalance(avlRoot)
+      ex13Result = (ex13Height, ex13Balance, avlRoot.val)
+      ex13Result
+
+  - type: "expansion"
+    title: "🔴 심화4: 스킵 리스트"
+    code: |-
+      import random
+
+      class SkipNode:
+          def __init__(self, val, level):
+              self.val = val
+              self.forward = [None] * (level + 1)
+
+      class SkipList:
+          def __init__(self, maxLevel=4, p=0.5):
+              self.maxLevel = maxLevel
+              self.p = p
+              self.header = SkipNode(-1, maxLevel)
+              self.level = 0
+
+          def randomLevel(self):
+              lvl = 0
+              while random.random() < self.p and lvl < self.maxLevel:
+                  lvl += 1
+              return lvl
+
+          def insert(self, val):
+              update = [None] * (self.maxLevel + 1)
+              current = self.header
+              for i in range(self.level, -1, -1):
+                  while current.forward[i] and current.forward[i].val < val:
+                      current = current.forward[i]
+                  update[i] = current
+              lvl = self.randomLevel()
+              if lvl > self.level:
+                  for i in range(self.level + 1, lvl + 1):
+                      update[i] = self.header
+                  self.level = lvl
+              newNode = SkipNode(val, lvl)
+              for i in range(lvl + 1):
+                  newNode.forward[i] = update[i].forward[i]
+                  update[i].forward[i] = newNode
+
+          def search(self, val):
+              current = self.header
+              for i in range(self.level, -1, -1):
+                  while current.forward[i] and current.forward[i].val < val:
+                      current = current.forward[i]
+              current = current.forward[0]
+              return current and current.val == val
+
+      random.seed(42)
+      skipList = SkipList()
+      for v in [3, 6, 7, 9, 12, 19, 17]:
+          skipList.insert(v)
+      ex14Found = skipList.search(7)
+      ex14NotFound = skipList.search(8)
+      ex14Result = (ex14Found, ex14NotFound)
+      ex14Result
+
+  - type: "expansion"
+    title: "🔴 심화5: 블룸 필터"
+    code: |-
+      class BloomFilter:
+          def __init__(self, size, hashCount):
+              self.size = size
+              self.hashCount = hashCount
+              self.bitArray = [False] * size
+
+          def _hashes(self, item):
+              hashes = []
+              for i in range(self.hashCount):
+                  h = hash(str(item) + str(i)) % self.size
+                  hashes.append(h)
+              return hashes
+
+          def add(self, item):
+              for h in self._hashes(item):
+                  self.bitArray[h] = True
+
+          def contains(self, item):
+              return all(self.bitArray[h] for h in self._hashes(item))
+
+      bloom = BloomFilter(100, 3)
+      bloom.add("apple")
+      bloom.add("banana")
+      bloom.add("cherry")
+      ex15Contains1 = bloom.contains("apple")
+      ex15Contains2 = bloom.contains("grape")
+      ex15Result = (ex15Contains1, ex15Contains2)
+      ex15Result
+
+  - type: "expansion"
+    title: "🔴 심화6: 중위수 찾기"
+    code: |-
+      class MedianFinder:
+          def __init__(self):
+              self.small = []
+              self.large = []
+
+          def addNum(self, num):
+              from heapq import heappush, heappop
+              heappush(self.small, -num)
+              heappush(self.large, -heappop(self.small))
+              if len(self.large) > len(self.small):
+                  heappush(self.small, -heappop(self.large))
+
+          def findMedian(self):
+              if len(self.small) > len(self.large):
+                  return -self.small[0]
+              return (-self.small[0] + self.large[0]) / 2
+
+      medFinder = MedianFinder()
+      medFinder.addNum(1)
+      medFinder.addNum(2)
+      ex16Med1 = medFinder.findMedian()
+      medFinder.addNum(3)
+      ex16Med2 = medFinder.findMedian()
+      ex16Result = (ex16Med1, ex16Med2)
+      ex16Result
+
+  - type: "expansion"
+    title: "🔴 심화7: 구간 트리"
+    code: |-
+      class IntervalNode:
+          def __init__(self, low, high):
+              self.low = low
+              self.high = high
+              self.maxHigh = high
+              self.left = None
+              self.right = None
+
+      class IntervalTree:
+          def __init__(self):
+              self.root = None
+
+          def insert(self, low, high):
+              self.root = self._insert(self.root, low, high)
+
+          def _insert(self, node, low, high):
+              if not node:
+                  return IntervalNode(low, high)
+              if low < node.low:
+                  node.left = self._insert(node.left, low, high)
+              else:
+                  node.right = self._insert(node.right, low, high)
+              node.maxHigh = max(node.maxHigh, high)
+              return node
+
+          def search(self, low, high):
+              return self._search(self.root, low, high)
+
+          def _search(self, node, low, high):
+              if not node:
+                  return None
+              if node.low <= high and low <= node.high:
+                  return (node.low, node.high)
+              if node.left and node.left.maxHigh >= low:
+                  return self._search(node.left, low, high)
+              return self._search(node.right, low, high)
+
+      intTree = IntervalTree()
+      intTree.insert(15, 20)
+      intTree.insert(10, 30)
+      intTree.insert(5, 20)
+      intTree.insert(12, 15)
+      ex17Found = intTree.search(14, 16)
+      ex17NotFound = intTree.search(31, 35)
+      ex17Result = (ex17Found, ex17NotFound)
+      ex17Result
+
+  - type: "expansion"
+    title: "🔴 심화8: 이중 연결 리스트 LRU"
+    code: |-
+      class DLLNode:
+          def __init__(self, key=0, val=0):
+              self.key = key
+              self.val = val
+              self.prev = None
+              self.next = None
+
+      class LRUCacheDLL:
+          def __init__(self, capacity):
+              self.capacity = capacity
+              self.cache = {}
+              self.head = DLLNode()
+              self.tail = DLLNode()
+              self.head.next = self.tail
+              self.tail.prev = self.head
+
+          def _remove(self, node):
+              node.prev.next = node.next
+              node.next.prev = node.prev
+
+          def _addToFront(self, node):
+              node.next = self.head.next
+              node.prev = self.head
+              self.head.next.prev = node
+              self.head.next = node
+
+          def get(self, key):
+              if key in self.cache:
+                  node = self.cache[key]
+                  self._remove(node)
+                  self._addToFront(node)
+                  return node.val
+              return -1
+
+          def put(self, key, value):
+              if key in self.cache:
+                  self._remove(self.cache[key])
+              node = DLLNode(key, value)
+              self.cache[key] = node
+              self._addToFront(node)
+              if len(self.cache) > self.capacity:
+                  lruNode = self.tail.prev
+                  self._remove(lruNode)
+                  del self.cache[lruNode.key]
+
+      lruDLL = LRUCacheDLL(2)
+      lruDLL.put(1, 1)
+      lruDLL.put(2, 2)
+      ex18Get1 = lruDLL.get(1)
+      lruDLL.put(3, 3)
+      ex18Get2 = lruDLL.get(2)
+      ex18Result = (ex18Get1, ex18Get2)
+      ex18Result
+
+  - type: "expansion"
+    title: "🔴 심화9: 접미사 배열"
+    code: |-
+      def buildSuffixArray(text):
+          suffixes = [(text[i:], i) for i in range(len(text))]
+          suffixes.sort()
+          return [idx for _, idx in suffixes]
+
+      def searchPattern(text, pattern, sa):
+          left, right = 0, len(sa) - 1
+          while left <= right:
+              mid = (left + right) // 2
+              suffix = text[sa[mid]:]
+              if suffix.startswith(pattern):
+                  return sa[mid]
+              if suffix < pattern:
+                  left = mid + 1
+              else:
+                  right = mid - 1
+          return -1
+
+      saText = "banana"
+      suffixArr = buildSuffixArray(saText)
+      ex19Search = searchPattern(saText, "ana", suffixArr)
+      ex19Result = (suffixArr, ex19Search)
+      ex19Result
+
+  - type: "expansion"
+    title: "🔴 심화10: 트리맵 구현"
+    code: |-
+      class TreeMapNode:
+          def __init__(self, key, val):
+              self.key = key
+              self.val = val
+              self.left = None
+              self.right = None
+
+      class TreeMap:
+          def __init__(self):
+              self.root = None
+
+          def put(self, key, val):
+              self.root = self._put(self.root, key, val)
+
+          def _put(self, node, key, val):
+              if not node:
+                  return TreeMapNode(key, val)
+              if key < node.key:
+                  node.left = self._put(node.left, key, val)
+              elif key > node.key:
+                  node.right = self._put(node.right, key, val)
+              else:
+                  node.val = val
+              return node
+
+          def get(self, key):
+              node = self.root
+              while node:
+                  if key < node.key:
+                      node = node.left
+                  elif key > node.key:
+                      node = node.right
+                  else:
+                      return node.val
+              return None
+
+          def keys(self):
+              result = []
+              self._inorder(self.root, result)
+              return result
+
+          def _inorder(self, node, result):
+              if node:
+                  self._inorder(node.left, result)
+                  result.append(node.key)
+                  self._inorder(node.right, result)
+
+      tmap = TreeMap()
+      tmap.put(3, "three")
+      tmap.put(1, "one")
+      tmap.put(2, "two")
+      tmap.put(5, "five")
+      ex20Get = tmap.get(2)
+      ex20Keys = tmap.keys()
+      ex20Result = (ex20Get, ex20Keys)
+      ex20Result

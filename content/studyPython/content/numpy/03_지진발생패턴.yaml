@@ -1,0 +1,317 @@
+meta:
+  id: numpy_03
+  title: 지진발생패턴
+  order: 3
+  category: numpy
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["numpy", "boolean indexing", "where", "unique", "percentile", "argsort"]
+  seo:
+    title: "NumPy 불리언 인덱싱 - 지진 데이터 분석"
+    description: "NumPy의 불리언 인덱싱과 조건 선택을 배우며 전 세계 지진 발생 데이터를 분석합니다."
+    keywords: ["numpy", "boolean indexing", "where", "unique", "지진데이터"]
+
+intro:
+  emoji: "🌍"
+  goal: 지진 데이터로 불리언 인덱싱과 조건 선택을 익힙니다.
+  description: 23,000건 이상의 지진 데이터를 분석합니다. 불리언 인덱싱으로 조건에 맞는 데이터를 필터링하고, where와 unique 함수로 데이터를 탐색합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: numpy와 pandas를 불러옵니다
+    content: |-
+      import numpy as np
+      import pandas as pd
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: 지진 데이터셋
+  blocks:
+  - type: text
+    content: 23,000건 이상의 전 세계 지진 데이터를 로드합니다. Magnitude(규모), Latitude(위도), Longitude(경도) 등의 정보가 있습니다.
+  - type: code
+    language: python
+    title: 지진 데이터 로드
+    description: Plotly 데이터셋에서 지진 데이터를 불러옵니다
+    content: |-
+      url = "https://raw.githubusercontent.com"
+      df = pd.read_csv(f"{url}/plotly/datasets/master/earthquakes-23k.csv")
+      df.head()
+
+- id: step3_extract
+  title: 3단계. 배열 추출
+  subtitle: Magnitude
+  blocks:
+  - type: text
+    content: "Magnitude는 지진의 '규모'를 나타내는 수치입니다. 리히터 규모라고도 불리며, 숫자가 1 증가할 때마다 에너지는 약 32배 커집니다. 예를 들어 규모 6.0 지진은 규모 5.0 지진보다 32배나 강합니다. df['Magnitude']로 해당 열을 선택하고 .values로 NumPy 배열로 변환합니다."
+  - type: code
+    language: python
+    title: 규모 배열 추출
+    description: Magnitude 컬럼을 배열로 추출합니다
+    content: |-
+      mag = df['Magnitude'].values
+      mag.shape
+
+- id: step4_stats
+  title: 4단계. 기본 통계
+  subtitle: 규모 분포
+  blocks:
+  - type: text
+    content: 기본 통계로 지진 규모 분포를 파악합니다.
+  - type: code
+    language: python
+    title: 규모 통계
+    description: 평균, 최소, 최대 규모를 확인합니다
+    content: |-
+      f"평균: {np.mean(mag):.2f}, 최소: {np.min(mag):.1f}, 최대: {np.max(mag):.1f}"
+
+- id: step5_boolean
+  title: 5단계. 불리언 배열 생성
+  subtitle: 비교 연산
+  blocks:
+  - type: text
+    content: "불리언(Boolean)은 '참(True) 또는 거짓(False)' 두 가지 값만 가지는 데이터 타입입니다. mag >= 6.0이라고 쓰면 NumPy는 23,000개 모든 지진에 대해 '규모가 6.0 이상인가?'를 확인하고, 각각 True 또는 False로 답한 배열을 만들어 줍니다. 이렇게 만든 True/False 배열을 불리언 배열이라 하며, 이것으로 원하는 데이터만 골라낼 수 있습니다."
+  - type: code
+    language: python
+    title: 불리언 배열
+    description: 규모 6.0 이상 조건의 불리언 배열을 생성합니다
+    content: |-
+      strong = mag >= 6.0
+      strong[:10]
+  - type: tip
+    content: NumPy 배열에 비교 연산을 적용하면 각 요소에 대한 True/False 불리언 배열이 반환됩니다. 이 배열을 인덱싱에 사용할 수 있습니다.
+
+- id: step6_boolean_index
+  title: 6단계. 불리언 인덱싱
+  subtitle: 조건 필터링
+  blocks:
+  - type: text
+    content: "불리언 인덱싱은 True/False 배열을 '체크리스트'처럼 사용해서 True인 항목만 골라내는 기법입니다. mag[strong]이라고 쓰면 strong 배열이 True인 위치의 규모 값만 추출됩니다. 23,000개 중 규모 6.0 이상인 지진만 깔끔하게 걸러낼 수 있습니다. 엑셀의 필터 기능을 코드 한 줄로 구현하는 것입니다."
+  - type: code
+    language: python
+    title: 강진만 추출
+    description: 규모 6.0 이상 지진만 추출합니다
+    content: |-
+      filtered = mag[strong]
+      filtered.shape
+  - type: tip
+    content: 불리언 배열을 인덱스로 사용하면 True인 위치의 요소만 선택됩니다. mag[mag >= 6.0]처럼 한 줄로 쓸 수도 있습니다.
+
+- id: step7_ratio
+  title: 7단계. 비율 계산
+  subtitle: sum으로 개수 세기
+  blocks:
+  - type: text
+    content: 불리언 배열에 sum()을 적용하면 True의 개수가 계산됩니다. 강진 비율을 구해봅시다.
+  - type: code
+    language: python
+    title: 강진 비율
+    description: 규모 6.0 이상 지진의 비율을 계산합니다
+    content: |-
+      ratio = np.sum(strong) / len(mag) * 100
+      f"규모 6.0 이상 비율: {ratio:.2f}%"
+  - type: tip
+    content: 불리언 배열에 sum()을 적용하면 True의 개수가 계산됩니다. True는 1, False는 0으로 취급되기 때문입니다.
+
+- id: step8_multiple
+  title: 8단계. 여러 조건 결합
+  subtitle: "& (and), | (or)"
+  blocks:
+  - type: text
+    content: "두 개 이상의 조건을 동시에 적용할 수 있습니다. &는 '그리고(AND)'로 두 조건을 모두 만족해야 하고, |는 '또는(OR)'로 둘 중 하나만 만족해도 됩니다. (mag >= 5.0) & (mag < 6.0)은 '5.0 이상이면서 동시에 6.0 미만'인 중규모 지진을 찾습니다. 각 조건을 괄호로 감싸는 것이 중요합니다."
+  - type: code
+    language: python
+    title: 중규모 지진
+    description: 규모 5.0~6.0 지진의 개수를 확인합니다
+    content: |-
+      medium = (mag >= 5.0) & (mag < 6.0)
+      count = np.sum(medium)
+      f"규모 5.0~6.0 지진 수: {count}"
+  - type: tip
+    content: "NumPy에서 여러 조건을 결합할 때는 & (and), | (or), ~ (not)을 사용합니다. 각 조건은 반드시 괄호로 감싸야 합니다."
+
+- id: step9_percentile
+  title: 9단계. 백분위수
+  subtitle: np.percentile()
+  blocks:
+  - type: text
+    content: "백분위수(percentile)는 '전체 중 몇 %가 이 값보다 작은가'를 나타냅니다. 예를 들어 75번째 백분위수가 5.5라면, 전체 지진의 75%가 규모 5.5 미만이라는 뜻입니다. 25%, 50%, 75% 백분위수를 보면 데이터가 어떻게 분포되어 있는지 한눈에 파악할 수 있습니다. 50번째 백분위수는 중앙값(median)과 같습니다."
+  - type: code
+    language: python
+    title: 백분위수
+    description: 규모 분포의 25%, 50%, 75% 지점을 확인합니다
+    content: |-
+      q1 = np.percentile(mag, 25)
+      q2 = np.percentile(mag, 50)
+      q3 = np.percentile(mag, 75)
+      f"25%: {q1:.2f}, 50%(중앙값): {q2:.2f}, 75%: {q3:.2f}"
+  - type: tip
+    content: np.percentile(arr, q)는 q번째 백분위수를 반환합니다. 50번째 백분위수는 중앙값과 같습니다.
+
+- id: step10_where
+  title: 10단계. where로 조건 선택
+  subtitle: np.where()
+  blocks:
+  - type: text
+    content: "np.where()는 조건에 따라 다른 값을 지정하는 함수입니다. np.where(조건, 참일때 값, 거짓일때 값) 형태로 씁니다. 엑셀의 IF 함수와 똑같이 작동합니다. mag >= 6.0 조건이 True면 'Strong', False면 'Normal'을 할당해서 23,000개 지진 전체를 한 번에 분류할 수 있습니다."
+  - type: code
+    language: python
+    title: 강진 분류
+    description: 규모 6.0 기준으로 Strong/Normal을 분류합니다
+    content: |-
+      category = np.where(mag >= 6.0, 'Strong', 'Normal')
+      category[:10]
+  - type: tip
+    content: np.where(condition, x, y)는 조건이 True인 곳은 x, False인 곳은 y를 반환합니다. 엑셀의 IF 함수와 비슷합니다.
+
+- id: step11_nested_where
+  title: 11단계. 중첩 where
+  subtitle: 여러 카테고리
+  blocks:
+  - type: text
+    content: "where 안에 또 다른 where를 넣어 3개 이상의 카테고리로 분류할 수 있습니다. 엑셀에서 IF 안에 IF를 넣는 중첩 IF와 같습니다. 규모 7.0 이상은 Major, 6.0 이상은 Strong, 5.0 이상은 Moderate, 나머지는 Light로 4단계 분류가 가능합니다."
+  - type: code
+    language: python
+    title: 세부 분류
+    description: Major/Strong/Moderate/Light로 세분화합니다
+    content: |-
+      level = np.where(mag >= 7.0, 'Major',
+              np.where(mag >= 6.0, 'Strong',
+              np.where(mag >= 5.0, 'Moderate', 'Light')))
+      level[:20]
+
+- id: step12_unique
+  title: 12단계. 고유값과 빈도
+  subtitle: np.unique()
+  blocks:
+  - type: text
+    content: "np.unique()는 배열에서 '중복을 제거한 고유한 값들'을 찾아줍니다. 예를 들어 ['A', 'B', 'A', 'C', 'B']에서 unique를 적용하면 ['A', 'B', 'C']가 됩니다. return_counts=True를 추가하면 각 값이 몇 번 나타났는지도 함께 알려줍니다. 분류 결과별 지진 수를 세는 데 유용합니다."
+  - type: code
+    language: python
+    title: 카테고리별 빈도
+    description: 각 카테고리의 지진 수를 확인합니다
+    content: |-
+      labels, counts = np.unique(level, return_counts=True)
+      pd.DataFrame({'Category': labels, 'Count': counts})
+  - type: tip
+    content: np.unique()는 배열의 고유한 값들을 반환합니다. return_counts=True를 추가하면 각 값의 빈도도 함께 반환됩니다.
+
+- id: step13_location
+  title: 13단계. 위치 데이터 추출
+  subtitle: 위도/경도
+  blocks:
+  - type: text
+    content: "위도(Latitude)는 적도를 기준으로 남북 위치를, 경도(Longitude)는 영국 그리니치를 기준으로 동서 위치를 나타냅니다. 서울은 약 위도 37°, 경도 127°입니다. argmax로 최대 규모 지진의 인덱스를 찾고, 그 인덱스로 위도와 경도 배열에서 해당 위치를 꺼내면 가장 강한 지진이 어디서 발생했는지 알 수 있습니다."
+  - type: code
+    language: python
+    title: 최대 규모 위치
+    description: 가장 강한 지진의 위치를 찾습니다
+    content: |-
+      lat = df['Latitude'].values
+      lon = df['Longitude'].values
+      idx = np.argmax(mag)
+      peak = mag[idx]
+      y = lat[idx]
+      x = lon[idx]
+      f"최대 규모: {peak}, 위치: ({y:.2f}, {x:.2f})"
+
+- id: step14_region
+  title: 14단계. 지역 필터링
+  subtitle: 태평양 불의 고리
+  blocks:
+  - type: text
+    content: "태평양 불의 고리(Ring of Fire)는 태평양을 둘러싼 지역으로, 전 세계 지진과 화산의 약 75%가 이곳에서 발생합니다. 한국, 일본, 인도네시아, 칠레, 미국 서부 등이 포함됩니다. 경도가 120° 이상이거나 -60° 이하이고(|로 연결), 위도가 60° 이내인 조건을 &로 결합해 이 지역의 지진을 필터링합니다."
+  - type: code
+    language: python
+    title: 태평양 불의 고리
+    description: 해당 지역의 지진 비율을 확인합니다
+    content: |-
+      pacific = ((lon >= 120) | (lon <= -60)) & (np.abs(lat) <= 60)
+      n = np.sum(pacific)
+      f"태평양 불의 고리 지진 수: {n} ({n/len(mag)*100:.1f}%)"
+
+- id: step15_argsort
+  title: 15단계. 정렬 인덱스
+  subtitle: np.argsort()
+  blocks:
+  - type: text
+    content: "argsort()는 '정렬하면 각 값이 몇 번째에 위치할지'를 알려주는 인덱스 배열을 반환합니다. 예를 들어 [3, 1, 2]를 argsort하면 [1, 2, 0]이 나오는데, 이는 '1번 위치 값(1)이 가장 작고, 다음은 2번 위치(2), 그 다음은 0번 위치(3)'라는 뜻입니다. [::-1]로 역순으로 만들면 내림차순 정렬 인덱스가 되어 상위 10개 강진을 쉽게 찾을 수 있습니다."
+  - type: code
+    language: python
+    title: 상위 10개 강진
+    description: 규모가 큰 순서로 상위 10개를 확인합니다
+    content: |-
+      order = np.argsort(mag)[::-1]
+      top = mag[order[:10]]
+      top
+  - type: tip
+    content: np.argsort()는 정렬된 인덱스를 반환합니다. [::-1]로 역순으로 만들어 내림차순 정렬 인덱스를 얻습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 지진 데이터 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 규모별 지진 통계 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        url = "https://raw.githubusercontent.com"
+        data = pd.read_csv(f"{url}/plotly/datasets/master/earthquakes-23k.csv")
+        mag = data['Magnitude'].values
+    - type: code
+      title: "규모별 분석"
+      content: |-
+        ranges = [(4.0, 5.0), (5.0, 6.0), (6.0, 7.0), (7.0, 8.0), (8.0, 10.0)]
+        rows = []
+        for low, high in ranges:
+            mask = (mag >= low) & (mag < high)
+            n = np.sum(mask)
+            avg = np.mean(mag[mask]) if n > 0 else 0
+            rows.append({'Range': f"{low}-{high}", 'Count': n, 'Mean': round(avg, 2)})
+        pd.DataFrame(rows)
+  - type: expansion
+    title: "미션2: 반구별 지진 분포 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        src = "https://raw.githubusercontent.com"
+        df = pd.read_csv(f"{src}/plotly/datasets/master/earthquakes-23k.csv")
+        mag = df['Magnitude'].values
+        lat = df['Latitude'].values
+    - type: code
+      title: "반구별 비교"
+      content: |-
+        north = lat >= 0
+        south = lat < 0
+        arr1 = mag[north]
+        arr2 = mag[south]
+        cnt1 = np.sum(arr1 >= 6.0)
+        cnt2 = np.sum(arr2 >= 6.0)
+        pd.DataFrame({
+            'Hemisphere': ['Northern', 'Southern'],
+            'Total': [len(arr1), len(arr2)],
+            'Mean Mag': [np.mean(arr1).round(2), np.mean(arr2).round(2)],
+            'Strong (>=6.0)': [cnt1, cnt2],
+            'Max': [np.max(arr1), np.max(arr2)]
+        })

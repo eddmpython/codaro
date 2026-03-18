@@ -1,0 +1,389 @@
+meta:
+  id: sklearn_09
+  title: 신호탐지최적화
+  order: 9
+  category: sklearn
+  difficulty: "⭐⭐⭐⭐"
+  badge: 고급
+  tags: ["sklearn", "GridSearchCV", "하이퍼파라미터", "교차검증", "최적화"]
+  seo:
+    title: "Sklearn GridSearchCV - 하이퍼파라미터 최적화"
+    description: "GridSearchCV로 하이퍼파라미터를 체계적으로 탐색합니다. 교차검증 기반 모델 최적화를 배웁니다."
+    keywords: ["sklearn", "GridSearchCV", "hyperparameter", "cross validation", "tuning"]
+
+intro:
+  emoji: "🎯"
+  goal: GridSearchCV로 하이퍼파라미터를 체계적으로 탐색하고 최적의 모델을 찾습니다.
+  description: 하이퍼파라미터는 학습 전에 설정하는 값으로 모델 성능에 큰 영향을 줍니다. GridSearchCV는 지정한 파라미터 조합을 모두 시도하여 최적의 조합을 찾습니다. 교차검증으로 과적합을 방지합니다.
+
+sections:
+- id: step1_data
+  title: 1단계. 데이터 로딩
+  subtitle: 와인 데이터
+  blocks:
+  - type: text
+    content: 와인 품질 데이터로 하이퍼파라미터 튜닝을 실습합니다. 3개 클래스 분류 문제입니다.
+  - type: code
+    language: python
+    title: 데이터 로딩
+    description: 와인 데이터를 불러옵니다
+    content: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_wine
+      from sklearn.model_selection import train_test_split, GridSearchCV, cross_val_score
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.svm import SVC
+      from sklearn.ensemble import RandomForestClassifier
+      from sklearn.metrics import accuracy_score, classification_report
+      import matplotlib.pyplot as plt
+
+      wine = load_wine()
+      X = pd.DataFrame(wine.data, columns=wine.feature_names)
+      y = wine.target
+      X.shape, np.unique(y)
+  - type: tip
+    content: 와인 데이터는 13개 화학 성분으로 3종류 와인을 분류합니다. 하이퍼파라미터 튜닝 실습에 적합한 크기입니다.
+
+- id: step2_prep
+  title: 2단계. 데이터 준비
+  subtitle: 분할 및 스케일링
+  blocks:
+  - type: text
+    content: 학습/테스트 분할 후 스케일링합니다. SVM은 스케일에 민감하므로 반드시 스케일링합니다.
+  - type: code
+    language: python
+    title: 데이터 분할
+    description: 학습/테스트 데이터로 분할합니다
+    content: |-
+      xTrain, xTest, yTrain, yTest = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+      xTrain.shape, xTest.shape
+  - type: code
+    language: python
+    title: 스케일링
+    description: StandardScaler를 적용합니다
+    content: |-
+      scaler = StandardScaler()
+      xTrainSc = scaler.fit_transform(xTrain)
+      xTestSc = scaler.transform(xTest)
+      xTrainSc.shape
+
+- id: step3_baseline
+  title: 3단계. 기본 모델
+  subtitle: 기본 SVM
+  blocks:
+  - type: text
+    content: 기본 파라미터로 SVM을 학습하여 기준선 성능을 확인합니다.
+  - type: code
+    language: python
+    title: 기본 SVM
+    description: 기본 파라미터로 SVM을 학습합니다
+    content: |-
+      svcBase = SVC(random_state=42)
+      svcBase.fit(xTrainSc, yTrain)
+      yPredBase = svcBase.predict(xTestSc)
+      accBase = accuracy_score(yTest, yPredBase)
+      print(f"Baseline Accuracy: {accBase:.4f}")
+  - type: tip
+    content: SVM 기본값은 C=1.0, kernel='rbf', gamma='scale'입니다. 튜닝으로 더 나은 성능을 얻을 수 있습니다.
+
+- id: step4_params
+  title: 4단계. 파라미터 그리드
+  subtitle: 탐색 범위
+  blocks:
+  - type: text
+    content: 탐색할 파라미터와 값 범위를 딕셔너리로 정의합니다. C는 규제 강도, gamma는 RBF 커널 폭입니다.
+  - type: code
+    language: python
+    title: 파라미터 그리드
+    description: 탐색할 파라미터 범위를 정의합니다
+    content: |-
+      paramGrid = {
+          "C": [0.1, 1, 10, 100],
+          "gamma": [0.001, 0.01, 0.1, 1],
+          "kernel": ["rbf", "linear"]
+      }
+      totalComb = len(paramGrid["C"]) * len(paramGrid["gamma"]) * len(paramGrid["kernel"])
+      print(f"Total combinations: {totalComb}")
+  - type: tip
+    content: C가 클수록 오분류 페널티가 커집니다. gamma가 클수록 결정 경계가 복잡해집니다. 둘 다 너무 크면 과적합됩니다.
+
+- id: step5_gridsearch
+  title: 5단계. GridSearchCV 실행
+  subtitle: 체계적 탐색
+  blocks:
+  - type: text
+    content: GridSearchCV로 모든 파라미터 조합을 교차검증합니다. cv=5로 5-폴드 교차검증을 수행합니다.
+  - type: code
+    language: python
+    title: GridSearchCV
+    description: 그리드 서치를 실행합니다
+    content: |-
+      gridSearch = GridSearchCV(SVC(random_state=42), paramGrid, cv=5, scoring="accuracy", return_train_score=True)
+      gridSearch.fit(xTrainSc, yTrain)
+      gridSearch
+  - type: code
+    language: python
+    title: 최적 파라미터
+    description: 최적의 파라미터 조합을 확인합니다
+    content: |-
+      print(f"Best Parameters: {gridSearch.best_params_}")
+      print(f"Best CV Score: {gridSearch.best_score_:.4f}")
+  - type: tip
+    content: GridSearchCV는 모든 조합을 시도하므로 파라미터가 많으면 시간이 오래 걸립니다. 범위를 좁히거나 RandomizedSearchCV를 고려하세요.
+
+- id: step6_results
+  title: 6단계. 결과 분석
+  subtitle: cv_results_
+  blocks:
+  - type: text
+    content: cv_results_에서 모든 조합의 성능을 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 결과 데이터프레임
+    description: 모든 조합의 결과를 확인합니다
+    content: |-
+      resultsDf = pd.DataFrame(gridSearch.cv_results_)
+      cols = ["param_C", "param_gamma", "param_kernel", "mean_test_score", "std_test_score", "rank_test_score"]
+      resultsDf[cols].sort_values("rank_test_score").head(10)
+  - type: code
+    language: python
+    title: 상위 조합 시각화
+    description: 상위 10개 조합을 막대 그래프로 표시합니다
+    content: |-
+      top10 = resultsDf.nsmallest(10, "rank_test_score")
+      labels = [f"C={r['param_C']}, g={r['param_gamma']}" for _, r in top10.iterrows()]
+
+      figTop, axTop = plt.subplots(figsize=(10, 5))
+      axTop.barh(labels[::-1], top10["mean_test_score"].values[::-1], xerr=top10["std_test_score"].values[::-1], color="steelblue")
+      axTop.set_xlabel("Mean CV Accuracy")
+      axTop.set_title("Top 10 Parameter Combinations")
+      figTop
+
+- id: step7_best
+  title: 7단계. 최적 모델 평가
+  subtitle: best_estimator_
+  blocks:
+  - type: text
+    content: GridSearchCV는 최적 파라미터로 전체 학습 데이터에 다시 학습한 모델을 best_estimator_에 저장합니다.
+  - type: code
+    language: python
+    title: 최적 모델 평가
+    description: 테스트 데이터로 최적 모델을 평가합니다
+    content: |-
+      bestModel = gridSearch.best_estimator_
+      yPredBest = bestModel.predict(xTestSc)
+      accBest = accuracy_score(yTest, yPredBest)
+      print(f"Baseline Accuracy: {accBase:.4f}")
+      print(f"Tuned Accuracy: {accBest:.4f}")
+      print(f"Improvement: {(accBest - accBase) * 100:.2f}%")
+  - type: code
+    language: python
+    title: 분류 리포트
+    description: 최적 모델의 상세 성능을 확인합니다
+    content: |-
+      print(classification_report(yTest, yPredBest, target_names=wine.target_names))
+
+- id: step8_heatmap
+  title: 8단계. 파라미터 히트맵
+  subtitle: C vs gamma
+  blocks:
+  - type: text
+    content: RBF 커널에서 C와 gamma 조합별 성능을 히트맵으로 시각화합니다.
+  - type: code
+    language: python
+    title: 파라미터 히트맵
+    description: C와 gamma 조합별 성능을 히트맵으로 표시합니다
+    content: |-
+      rbfResults = resultsDf[resultsDf["param_kernel"] == "rbf"].copy()
+      pivot = rbfResults.pivot_table(values="mean_test_score", index="param_gamma", columns="param_C")
+
+      figHeat, axHeat = plt.subplots(figsize=(8, 6))
+      im = axHeat.imshow(pivot.values, cmap="YlGn", aspect="auto")
+      axHeat.set_xticks(range(len(pivot.columns)))
+      axHeat.set_yticks(range(len(pivot.index)))
+      axHeat.set_xticklabels(pivot.columns)
+      axHeat.set_yticklabels(pivot.index)
+      axHeat.set_xlabel("C")
+      axHeat.set_ylabel("gamma")
+      axHeat.set_title("CV Accuracy: C vs gamma (RBF kernel)")
+      for i in range(len(pivot.index)):
+          for j in range(len(pivot.columns)):
+              axHeat.text(j, i, f"{pivot.values[i, j]:.3f}", ha="center", va="center")
+      plt.colorbar(im, ax=axHeat)
+      figHeat
+
+- id: step9_rf
+  title: 9단계. RandomForest 튜닝
+  subtitle: 다른 모델 적용
+  blocks:
+  - type: text
+    content: RandomForest에도 GridSearchCV를 적용합니다. n_estimators, max_depth, min_samples_split을 튜닝합니다.
+  - type: code
+    language: python
+    title: RF 파라미터 그리드
+    description: RandomForest 파라미터를 정의합니다
+    content: |-
+      rfParamGrid = {
+          "n_estimators": [50, 100, 150],
+          "max_depth": [3, 5, 7, None],
+          "min_samples_split": [2, 5, 10]
+      }
+      rfTotalComb = 3 * 4 * 3
+      print(f"Total combinations: {rfTotalComb}")
+  - type: code
+    language: python
+    title: RF GridSearchCV
+    description: RandomForest 그리드 서치를 실행합니다
+    content: |-
+      rfGridSearch = GridSearchCV(RandomForestClassifier(random_state=42), rfParamGrid, cv=5, scoring="accuracy")
+      rfGridSearch.fit(xTrainSc, yTrain)
+      print(f"Best Parameters: {rfGridSearch.best_params_}")
+      print(f"Best CV Score: {rfGridSearch.best_score_:.4f}")
+
+- id: step10_compare
+  title: 10단계. 모델 비교
+  subtitle: SVM vs RF
+  blocks:
+  - type: text
+    content: 튜닝된 SVM과 RandomForest의 성능을 비교합니다.
+  - type: code
+    language: python
+    title: 모델 비교
+    description: 두 모델의 테스트 성능을 비교합니다
+    content: |-
+      rfBest = rfGridSearch.best_estimator_
+      rfPred = rfBest.predict(xTestSc)
+      rfAcc = accuracy_score(yTest, rfPred)
+
+      figComp, axComp = plt.subplots(figsize=(7, 5))
+      models = ["SVM (baseline)", "SVM (tuned)", "RF (tuned)"]
+      accs = [accBase, accBest, rfAcc]
+      colors = ["gray", "steelblue", "coral"]
+      axComp.bar(models, accs, color=colors)
+      axComp.set_ylabel("Accuracy")
+      axComp.set_title("Model Comparison")
+      axComp.set_ylim(0.8, 1.0)
+      for i, v in enumerate(accs):
+          axComp.text(i, v + 0.01, f"{v:.3f}", ha="center")
+      figComp
+
+- id: step11_cv
+  title: 11단계. 교차검증 상세
+  subtitle: cv별 점수
+  blocks:
+  - type: text
+    content: 최적 모델의 각 폴드별 점수를 확인합니다. 점수 분산이 크면 데이터 의존성이 높습니다.
+  - type: code
+    language: python
+    title: 폴드별 점수
+    description: 교차검증 각 폴드의 점수를 확인합니다
+    content: |-
+      cvScores = cross_val_score(bestModel, xTrainSc, yTrain, cv=5)
+      print(f"CV Scores: {cvScores}")
+      print(f"Mean: {cvScores.mean():.4f} (+/- {cvScores.std() * 2:.4f})")
+  - type: code
+    language: python
+    title: 폴드별 시각화
+    description: 각 폴드의 점수를 막대 그래프로 표시합니다
+    content: |-
+      figCv, axCv = plt.subplots(figsize=(8, 4))
+      folds = [f"Fold {i+1}" for i in range(5)]
+      axCv.bar(folds, cvScores, color="steelblue")
+      axCv.axhline(cvScores.mean(), color="red", linestyle="--", label=f"Mean: {cvScores.mean():.3f}")
+      axCv.set_ylabel("Accuracy")
+      axCv.set_title("Cross-Validation Scores by Fold")
+      axCv.legend()
+      figCv
+  - type: tip
+    content: 교차검증 점수의 표준편차가 작을수록 모델이 안정적입니다. 큰 분산은 특정 데이터 분할에 민감함을 의미합니다.
+
+- id: step12_time
+  title: 12단계. 학습 시간
+  subtitle: 시간 비용
+  blocks:
+  - type: text
+    content: 그리드 서치의 총 학습 시간과 조합당 시간을 확인합니다. 파라미터가 많을수록 시간이 기하급수적으로 증가합니다.
+  - type: code
+    language: python
+    title: 학습 시간
+    description: 그리드 서치 소요 시간을 확인합니다
+    content: |-
+      totalTime = resultsDf["mean_fit_time"].sum()
+      meanTime = resultsDf["mean_fit_time"].mean()
+      print(f"Total combinations: {len(resultsDf)}")
+      print(f"Total fit time: {totalTime:.2f}s")
+      print(f"Mean time per combination: {meanTime:.4f}s")
+  - type: tip
+    content: "시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(pyodide에서는 불가), 4) 조기 종료(early stopping)"
+
+- id: practice
+  title: 실습
+  subtitle: 하이퍼파라미터 튜닝
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 유방암 SVM 튜닝"
+    code: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_breast_cancer
+      from sklearn.model_selection import train_test_split, GridSearchCV
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.svm import SVC
+      from sklearn.metrics import accuracy_score
+      import matplotlib.pyplot as plt
+
+      cancer = load_breast_cancer()
+      xC = cancer.data
+      yC = cancer.target
+      xTrC, xTeC, yTrC, yTeC = train_test_split(xC, yC, test_size=0.2, random_state=42)
+      scalerC = StandardScaler()
+      xTrCsc = scalerC.fit_transform(xTrC)
+      xTeCsc = scalerC.transform(xTeC)
+
+      paramC = {"C": [0.1, 1, 10], "gamma": [0.01, 0.1, 1]}
+      gridC = GridSearchCV(SVC(random_state=42), paramC, cv=5)
+      gridC.fit(xTrCsc, yTrC)
+      print(f"Best Params: {gridC.best_params_}")
+      print(f"Best CV Score: {gridC.best_score_:.4f}")
+
+      predC = gridC.predict(xTeCsc)
+      print(f"Test Accuracy: {accuracy_score(yTeC, predC):.4f}")
+  - type: expansion
+    title: "미션2: digits KNN 튜닝"
+    code: |-
+      import pandas as pd
+      import numpy as np
+      from sklearn.datasets import load_digits
+      from sklearn.model_selection import train_test_split, GridSearchCV
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.neighbors import KNeighborsClassifier
+      from sklearn.metrics import accuracy_score
+      import matplotlib.pyplot as plt
+
+      digits = load_digits()
+      xD = digits.data
+      yD = digits.target
+      xTrD, xTeD, yTrD, yTeD = train_test_split(xD, yD, test_size=0.2, random_state=42)
+      scalerD = StandardScaler()
+      xTrDsc = scalerD.fit_transform(xTrD)
+      xTeDsc = scalerD.transform(xTeD)
+
+      paramD = {"n_neighbors": [3, 5, 7, 9], "weights": ["uniform", "distance"], "metric": ["euclidean", "manhattan"]}
+      gridD = GridSearchCV(KNeighborsClassifier(), paramD, cv=5)
+      gridD.fit(xTrDsc, yTrD)
+      print(f"Best Params: {gridD.best_params_}")
+      print(f"Best CV Score: {gridD.best_score_:.4f}")
+
+      resD = pd.DataFrame(gridD.cv_results_)
+      top5 = resD.nsmallest(5, "rank_test_score")
+      figM2, axM2 = plt.subplots(figsize=(10, 4))
+      labels = [f"k={r['param_n_neighbors']}, {r['param_weights']}" for _, r in top5.iterrows()]
+      axM2.barh(labels[::-1], top5["mean_test_score"].values[::-1], color="teal")
+      axM2.set_xlabel("Mean CV Accuracy")
+      axM2.set_title("Top 5 KNN Configurations")
+      figM2

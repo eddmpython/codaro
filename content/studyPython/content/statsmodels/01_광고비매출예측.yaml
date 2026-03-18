@@ -1,0 +1,382 @@
+meta:
+  id: statsmodels_01
+  title: 광고비매출예측
+  order: 1
+  category: statsmodels
+  difficulty: "⭐"
+  badge: 입문
+  dataUrl: https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv
+  tags: ["회귀분석", "OLS", "summary", "마케팅ROI", "매출예측"]
+  seo:
+    title: "statsmodels 단순선형회귀 - 광고비로 매출 예측하기"
+    description: "TV 광고비로 매출을 예측하는 단순선형회귀 모델을 statsmodels로 구축합니다. OLS와 summary 해석을 배웁니다."
+    keywords: ["statsmodels", "OLS", "단순선형회귀", "광고비", "매출예측", "R²", "p-value"]
+
+intro:
+  emoji: "📺"
+  goal: TV 광고비로 매출을 예측하는 회귀 모델을 만듭니다.
+  description: 200개 시장의 광고비와 매출 데이터로 "TV 광고비를 늘리면 매출이 얼마나 증가할까?"를 분석합니다. 마케팅 ROI를 계산할 수 있습니다.
+
+sections:
+- id: step1_install
+  title: 1단계. statsmodels 설치
+  subtitle: 통계 분석 라이브러리
+  blocks:
+  - type: text
+    content: statsmodels는 통계 분석을 위한 파이썬 라이브러리로, R 언어의 통계 기능을 파이썬으로 가져온 것입니다. 회귀분석은 변수 간의 인과관계를 수식으로 표현하여 예측 모델을 만드는 기법으로, 광고비를 투입하면 매출이 얼마나 증가할지 정량적으로 계산할 수 있습니다. 시계열 예측은 과거 데이터의 패턴을 학습하여 미래 값을 추정하고, 가설 검정은 두 집단의 차이가 우연인지 의미있는 차이인지 통계적으로 판단합니다. 브라우저 환경에서는 micropip으로 설치하며, 일반 파이썬에서는 pip install statsmodels로 설치합니다. 이 라이브러리는 학술 연구와 비즈니스 분석 모두에서 널리 사용되며, 특히 경제학, 금융, 마케팅 분야에서 필수적인 도구입니다.
+  - type: code
+    language: python
+    title: statsmodels 설치
+    description: micropip으로 패키지 설치
+    content: |-
+      import micropip
+      await micropip.install('statsmodels')
+  - type: tip
+    content: micropip은 pyodide(브라우저 파이썬) 환경에서 패키지를 설치하는 도구입니다. await는 설치가 완료될 때까지 기다리는 키워드입니다. 일반 파이썬에서는 pip install statsmodels로 설치합니다. 마리모에서는 micropip없이 자동으로 설치되지만 연습으로 해보겠습니다.
+
+- id: step2_load
+  title: 2단계. 데이터 불러오기
+  subtitle: 200개 시장 광고비 데이터
+  blocks:
+  - type: text
+    content: Advertising 데이터셋은 200개 서로 다른 시장의 TV, 라디오, 신문 광고비와 매출을 담고 있는 실제 마케팅 데이터입니다. 각 시장은 도시나 지역을 의미하며, 동일한 제품을 판매하지만 광고비 투입 전략을 달리했을 때 매출이 어떻게 변했는지 기록되어 있습니다. 예를 들어 A 시장은 TV 광고에 230,000달러, B 시장은 150,000달러를 썼고, 그 결과 매출이 각각 22,000개와 15,000개로 나타났습니다. 이 데이터로 광고비와 매출의 인과관계를 분석하여 마케팅 예산 배분의 최적 전략을 수립할 수 있으며, 실제 기업에서는 이런 분석으로 광고 ROI(투자 대비 수익)를 계산하고 예산을 효율적으로 배분합니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: CSV 파일을 pandas로 읽기
+    content: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv"
+      adData = pd.read_csv(url, index_col=0)
+      adData.shape
+  - type: tip
+    content: index_col=0은 첫 번째 컬럼을 인덱스로 사용한다는 의미입니다. 이 데이터는 첫 컬럼이 단순 행 번호이므로 인덱스로 설정합니다. shape은 (행 수, 열 수)를 반환합니다.
+
+- id: step3_head
+  title: 3단계. 데이터 미리보기
+  subtitle: 컬럼 구조 파악
+  blocks:
+  - type: text
+    content: "데이터의 처음 몇 행을 보면 어떤 컬럼이 있는지 파악할 수 있습니다. TV, Radio, Newspaper는 각 매체의 광고비(천 달러 단위)이고, Sales는 해당 시장의 매출(천 개 단위)입니다. 예를 들어 첫 번째 행의 TV=230.1은 TV 광고에 230,100달러를 투입했다는 뜻입니다. 우리는 이 중 TV 광고비로 매출을 예측하는 단순선형회귀 모델을 만들 것이며, 나중에 다중회귀로 확장하면 세 매체의 시너지 효과도 분석할 수 있습니다."
+  - type: code
+    language: python
+    title: 처음 5행 확인
+    description: 컬럼명과 값 확인
+    content: |-
+      adData.head()
+
+- id: step4_describe
+  title: 4단계. 기초 통계량
+  subtitle: 데이터 범위 이해
+  blocks:
+  - type: text
+    content: "describe()는 각 컬럼의 평균, 표준편차, 최소/최대값을 보여주는 판다스 함수입니다. TV 광고비는 평균 147천 달러(최소 0.7, 최대 296.4), 매출은 평균 14천 개(최소 1.6, 최대 27)입니다. 표준편차(std)는 데이터가 평균에서 얼마나 흩어져 있는지를 나타내며, TV의 std 85.8은 광고비 투입 전략이 시장마다 크게 다르다는 것을 보여줍니다. 이상치나 스케일 차이를 미리 확인하면 회귀분석 결과 해석이 더 정확해집니다."
+  - type: code
+    language: python
+    title: 기초 통계량
+    description: 평균, 표준편차, 최소/최대
+    content: |-
+      adData.describe()
+
+- id: step5_scatter
+  title: 5단계. 산점도 그리기
+  subtitle: 관계 시각화
+  blocks:
+  - type: text
+    content: 데이터 분석의 첫 단계는 항상 시각화입니다. 산점도(scatter plot)는 두 변수 간의 관계를 점으로 표현한 그래프로, 각 점은 하나의 시장을 나타냅니다. X축은 TV 광고비, Y축은 매출을 의미하며, 광고비가 증가할 때 매출이 어떻게 변하는지 한눈에 파악할 수 있습니다. 만약 점들이 우상향 직선 패턴을 보이면 양의 상관관계(광고비 증가 → 매출 증가), 우하향이면 음의 상관관계, 무작위로 흩어져 있으면 상관관계가 없다는 뜻입니다. 예를 들어 이 데이터에서 TV 광고비를 100만원 더 쓸 때마다 매출이 평균적으로 얼마나 늘어나는지 패턴을 확인할 수 있어, 마케팅 예산을 효율적으로 배분하는 데 도움이 됩니다.
+  - type: code
+    language: python
+    title: TV vs Sales 산점도
+    description: 광고비와 매출의 관계
+    content: |-
+      import plotly.express as px
+
+      scatterFig = px.scatter(adData, x='TV', y='Sales',
+                              labels={'TV': 'TV Advertising ($1000)',
+                                      'Sales': 'Sales (1000 units)'},
+                              title='TV Advertising vs Sales',
+                              opacity=0.6)
+      scatterFig.show()
+  - type: tip
+    content: plotly.express는 px로 줄여서 사용하며, 인터랙티브한 그래프를 쉽게 만듭니다. px.scatter()는 산점도를 그리는 함수로, x와 y에 컬럼명을 지정합니다. labels는 축 이름을 사용자 정의하고, opacity는 점의 투명도(0~1)로 겹치는 점을 확인할 수 있습니다. plotly 그래프는 마우스를 올리면 정확한 값을 볼 수 있고, 확대/축소가 가능하여 matplotlib보다 분석이 편리합니다.
+
+- id: step6_ols_import
+  title: 6단계. OLS 모델 준비
+  subtitle: statsmodels 불러오기
+  blocks:
+  - type: text
+    content: "statsmodels.api는 회귀분석, 시계열, 가설검정 등 통계 모델을 제공하는 핵심 모듈입니다. OLS는 Ordinary Least Squares(최소제곱법)의 약자로, 가장 기본적이면서도 강력한 회귀분석 방법입니다. 관례적으로 sm이라는 짧은 이름으로 불러오며, sm.OLS(), sm.Logit() 등 다양한 모델에 접근할 수 있습니다. sklearn의 LinearRegression과 달리 p-value, 신뢰구간 등 상세한 통계량을 제공하여 학술 연구와 비즈니스 보고서에 적합합니다."
+  - type: code
+    language: python
+    title: statsmodels 불러오기
+    description: api 모듈 import
+    content: |-
+      import statsmodels.api as sm
+  - type: tip
+    content: import ... as ...는 모듈을 다른 이름으로 불러오는 방법입니다. statsmodels.api.OLS() 대신 sm.OLS()로 짧게 쓸 수 있습니다. pandas as pd, numpy as np도 같은 방식입니다.
+
+- id: step7_xy_split
+  title: 7단계. X와 y 분리 및 상수항 추가
+  subtitle: 독립변수와 종속변수
+  blocks:
+  - type: text
+    content: 회귀분석은 X(독립변수)로 y(종속변수)를 예측합니다. TV 광고비가 X, 매출이 y입니다. statsmodels는 절편을 자동으로 추가하지 않으므로 add_constant()로 절편용 컬럼을 직접 추가해야 합니다.
+  - type: code
+    language: python
+    title: X와 y 준비
+    description: TV → Sales 예측
+    content: |-
+      XRaw = adData[['TV']]
+      y = adData['Sales']
+      X = sm.add_constant(XRaw)
+      X.head()
+  - type: tip
+    content: adData[['TV']]는 대괄호가 2개입니다. [](대괄호)는 리스트를 만드는 기호이며, 대괄호 1개 ['TV']는 Series(1차원 배열), 대괄호 2개 [['TV']]는 DataFrame(2차원 표)을 반환합니다. OLS는 DataFrame 형태를 요구하므로 2개를 사용합니다. add_constant()는 값이 모두 1인 'const' 컬럼을 추가하여 절편 계산에 사용되며, 절편(intercept, β₀)은 X=0일 때 y의 기본값으로 광고비가 0원일 때 기본 매출을 의미합니다. =(등호)는 할당 연산자로 왼쪽 변수에 오른쪽 값을 저장합니다. marimo 환경에서는 변수 재할당이 불가하므로 XRaw → X로 새 변수를 만듭니다.
+
+- id: step8_fit_model
+  title: 8단계. 모델 학습
+  subtitle: OLS 회귀 실행
+  blocks:
+  - type: text
+    content: OLS(Ordinary Least Squares, 최소제곱법)는 회귀분석의 가장 기본적인 방법으로, 데이터 점들과 회귀선 사이의 수직 거리 제곱의 합을 최소화하는 직선을 찾습니다. sm.OLS(y, X)는 "y를 X로 예측하는 모델 객체를 만든다"는 뜻이고, .fit()은 "실제로 계산을 수행하여 최적의 절편과 기울기를 찾는다"는 의미입니다. fit() 후에야 params(계수), summary(통계량) 등을 확인할 수 있습니다. 이 과정은 건물을 짓는 것에 비유하면, OLS()는 설계도 작성, fit()은 실제 건축에 해당합니다.
+  - type: code
+    language: python
+    title: OLS 회귀 모델 학습
+    description: 최소제곱법으로 계수 계산
+    content: |-
+      model = sm.OLS(y, X).fit()
+  - type: tip
+    content: sm.OLS()는 모델의 "설계도"를 만드는 것이고, .fit()은 실제 "건물을 짓는" 과정입니다. OLS(y, X)에서 y는 종속변수(예측하려는 값), X는 독립변수(원인)입니다. statsmodels는 sklearn과 달리 y를 먼저 쓰는 것에 주의하세요. fit()은 내부적으로 수학 공식 β = (X'X)⁻¹X'y을 계산하여 최적의 계수를 찾습니다. =(등호)는 오른쪽 값을 왼쪽 변수에 저장하는 할당 연산자입니다.
+
+- id: step9_summary
+  title: 9단계. 결과 요약
+  subtitle: summary() 해석
+  blocks:
+  - type: text
+    content: summary()는 회귀분석의 모든 통계량을 한 화면에 보여주는 핵심 함수입니다. R²(결정계수)는 모델이 데이터를 얼마나 잘 설명하는지 0~1 사이 값으로 나타내며, 0.61이면 TV 광고비가 매출 변동의 61%를 설명한다는 뜻입니다. p-value(유의확률)는 변수가 실제로 영향을 미치는지 확인하는 지표로, 0.05보다 작으면 통계적으로 유의미합니다(우연이 아님). 회귀 계수(coefficient)는 독립변수가 1 증가할 때 종속변수가 얼마나 변하는지 나타내는 기울기 값입니다. 이 표를 읽는 법을 배우면 모델의 성능과 통계적 유의성을 정확히 판단할 수 있으며, 학술 논문이나 비즈니스 보고서에서 분석 결과를 전문적으로 제시할 수 있습니다.
+  - type: code
+    language: python
+    title: 회귀 결과 요약
+    description: 전체 통계량 확인
+    content: |-
+      model.summary()
+  - type: tip
+    content: "summary()의 주요 지표를 상세히 설명하면 다음과 같습니다. (1) R² (R-squared, 결정계수): 0~1 사이 값으로 모델의 설명력을 나타냅니다. 0.61이면 TV 광고비가 매출 변동의 61%를 설명한다는 뜻이며, 나머지 39%는 다른 요인(경쟁사, 계절성, 경제 상황 등)의 영향입니다. (2) p-value (P>|t| 컬럼): 0.05보다 작으면 통계적으로 유의미하며, 0.000이면 거의 확실히 영향을 미친다는 뜻입니다. (3) coef (계수, coefficient): TV의 계수가 0.048이면 TV 광고비 1천 달러 증가 시 매출이 48개(0.048 × 1000 단위) 증가합니다. const(절편)는 광고비가 0일 때 기본 매출을 의미합니다."
+
+- id: step11_rsquared
+  title: 11단계. R² 확인
+  subtitle: 모델 설명력
+  blocks:
+  - type: text
+    content: R²(결정계수, coefficient of determination)는 모델이 데이터의 변동성을 얼마나 잘 설명하는지 나타내는 0~1 사이의 지표입니다. 0.61이면 TV 광고비가 매출 변동의 61%를 설명한다는 뜻으로, 100개 시장의 매출 차이 중 61개는 TV 광고비 차이로 설명되고 39개는 다른 요인 때문이라는 의미입니다. 나머지 39%는 라디오 광고, 신문 광고, 경쟁사 프로모션, 계절적 요인, 지역 경제 상황 등 모델에 포함되지 않은 변수들의 영향입니다. R²가 1.0이면 완벽한 예측(모든 점이 회귀선 위에 있음), 0.0이면 전혀 설명하지 못하는 모델입니다. 실무에서 R² 0.6 이상이면 비즈니스 의사결정에 충분히 활용할 수 있는 좋은 모델로 평가됩니다.
+  - type: code
+    language: python
+    title: R² 값 확인
+    description: 결정계수 추출
+    content: |-
+      model.rsquared
+
+- id: step12_params
+  title: 12단계. 회귀 계수
+  subtitle: 절편과 기울기
+  blocks:
+  - type: text
+    content: params는 회귀식 y = β₀ + β₁X의 계수를 담고 있는 Series입니다. const는 절편(intercept, β₀)으로 X가 0일 때 y의 기본값을 의미하고, TV는 기울기(slope, β₁)로 X가 1 증가할 때 y의 변화량입니다. TV 계수가 0.0475이면 TV 광고비 1천 달러 증가 시 매출이 47.5개 증가한다는 뜻입니다. 예를 들어 TV 광고비를 100에서 150으로 50 증가시키면 매출은 0.0475 × 50 = 2.375천 개, 즉 2,375개 증가합니다. 이 계수는 마케팅 ROI 계산에 직접 사용되며, TV 광고 1달러당 약 0.048개 판매를 창출한다는 의미로 해석할 수 있습니다.
+  - type: code
+    language: python
+    title: 회귀 계수 확인
+    description: 절편과 기울기
+    content: |-
+      model.params
+
+- id: step13_predict
+  title: 13단계. 예측하기
+  subtitle: 새로운 광고비 입력
+  blocks:
+  - type: text
+    content: "학습된 모델로 새로운 TV 광고비에 대한 예상 매출을 예측할 수 있습니다. 예를 들어 새로운 시장에 TV 광고비 150천 달러를 투입할 계획이라면 예상 매출을 미리 계산할 수 있습니다. predict() 함수는 학습 시 사용한 X와 동일한 형태(const, TV 컬럼)의 DataFrame을 입력받아야 합니다. 이 예측 기능은 마케팅 예산 계획 수립, 광고비 증액 시 기대 매출 계산, ROI 시뮬레이션 등 실무에서 매우 유용합니다."
+  - type: code
+    language: python
+    title: TV 광고비 150일 때 매출 예측
+    description: predict() 사용
+    content: |-
+      newData = pd.DataFrame({'const': [1], 'TV': [150]})
+      model.predict(newData)
+  - type: tip
+    content: "predict()는 학습된 계수로 y = β₀ + β₁X 수식을 계산합니다. newData는 X와 같은 컬럼(const, TV)을 가져야 하며, 컬럼 순서와 이름이 정확히 일치해야 합니다. DataFrame()으로 표를 만들 때 중괄호는 딕셔너리(키와 값 쌍), 대괄호는 리스트(값 목록)입니다. 점(.)은 메서드 호출로 객체에 연결된 함수를 실행하는 문법입니다."
+
+- id: step14_visualize
+  title: 14단계. 회귀선 그리기
+  subtitle: 예측 결과 시각화
+  blocks:
+  - type: text
+    content: 산점도에 회귀선을 추가하면 모델이 데이터를 얼마나 잘 설명하는지 시각적으로 확인할 수 있습니다. 회귀선은 y = β₀ + β₁X 수식을 그래프로 표현한 것으로, 모든 점과의 수직 거리 제곱의 합이 최소가 되도록 최적화된 직선입니다. 대부분의 점이 선 주변에 분포하면 모델이 데이터를 잘 맞추는 것이고, 점들이 선에서 멀리 떨어져 있으면 모델의 설명력이 낮다는 뜻입니다. 예를 들어 TV 광고비 200 지점을 보면 실제 매출은 조금 차이가 있지만, 회귀선은 평균적인 예상 매출을 보여줍니다. 이 시각화는 고객이나 경영진에게 분석 결과를 설명할 때 매우 효과적입니다.
+  - type: code
+    language: python
+    title: 산점도와 회귀선
+    description: 원본 데이터와 예측선
+    content: |-
+      import plotly.graph_objects as go
+
+      lineFig = go.Figure()
+      lineFig.add_trace(go.Scatter(x=adData['TV'], y=adData['Sales'],
+                                    mode='markers', name='Actual',
+                                    marker=dict(size=8, opacity=0.6)))
+      lineFig.add_trace(go.Scatter(x=adData['TV'], y=model.predict(X),
+                                    mode='lines', name='Fitted line',
+                                    line=dict(color='red', width=2)))
+      lineFig.update_layout(title='TV Advertising vs Sales with Regression Line',
+                            xaxis_title='TV Advertising ($1000)',
+                            yaxis_title='Sales (1000 units)')
+      lineFig.show()
+  - type: tip
+    content: plotly.graph_objects는 go로 줄여서 사용하며, 더 세밀한 커스터마이징이 가능합니다. go.Figure()로 빈 캔버스를 만들고, add_trace()로 레이어를 추가합니다. mode='markers'는 점, mode='lines'는 선을 의미합니다. marker=dict()와 line=dict()로 색상, 크기, 투명도를 설정합니다. update_layout()으로 제목과 축 이름을 지정하며, 그래프를 마우스로 확대하면 특정 구간의 패턴을 자세히 분석할 수 있습니다.
+
+- id: step15_residual
+  title: 15단계. 잔차 분석
+  subtitle: 모델 진단
+  blocks:
+  - type: text
+    content: 잔차(residual)는 실제값과 예측값의 차이입니다. 잔차 플롯은 회귀 모델의 가정을 검증하는 핵심 진단 도구로, 잔차가 무작위로 흩어져 있으면 모델이 적합하고, 패턴이 보이면 모델에 문제가 있습니다. 예측값(fitted)을 X축에, 잔차를 Y축에 그려서 등분산성과 선형성 가정을 확인합니다. 만약 깔때기 모양이면 이분산성(heteroscedasticity), 곡선 패턴이면 비선형 관계를 나타냅니다.
+  - type: code
+    language: python
+    title: 잔차 플롯
+    description: 예측값 vs 잔차
+    content: |-
+      import altair as alt
+
+      residualDf = pd.DataFrame({
+          'fitted': model.fittedvalues,
+          'residual': model.resid
+      })
+      residualChart = alt.Chart(residualDf).mark_circle(size=60, opacity=0.6).encode(
+          x=alt.X('fitted:Q', title='Fitted Values'),
+          y=alt.Y('residual:Q', title='Residuals'),
+          tooltip=['fitted', 'residual']
+      ).properties(width=500, height=300, title='Residual Plot')
+
+      zeroLine = alt.Chart(pd.DataFrame({'y': [0]})).mark_rule(color='red', strokeDash=[5, 5]).encode(y='y:Q')
+      residualChart + zeroLine
+  - type: tip
+    content: model.fittedvalues는 학습 데이터에 대한 예측값이고, model.resid는 잔차입니다. 빨간 점선은 잔차=0인 기준선입니다. 이상적으로는 점들이 기준선 위아래로 무작위하게 분포해야 합니다.
+
+- id: step16_qq
+  title: 16단계. QQ 플롯
+  subtitle: 정규성 검정
+  blocks:
+  - type: text
+    content: QQ 플롯(Quantile-Quantile Plot)은 잔차가 정규분포를 따르는지 검사하는 그래프입니다. 회귀분석의 가정 중 하나가 오차의 정규성인데, 점들이 대각선에 가까우면 정규분포를 따르고, 대각선에서 벗어나면 정규성 가정이 위배됩니다. 양 끝에서 벗어나면 꼬리가 두꺼운 분포, S자 형태면 왜도가 있다는 뜻입니다.
+  - type: code
+    language: python
+    title: QQ 플롯
+    description: 정규분포 검정
+    content: |-
+      import numpy as np
+      from scipy import stats
+
+      residuals = model.resid
+      sortedResid = np.sort(residuals)
+      theoreticalQ = stats.norm.ppf(np.linspace(0.01, 0.99, len(sortedResid)))
+
+      qqDf = pd.DataFrame({'theoretical': theoreticalQ, 'sample': sortedResid})
+      qqChart = alt.Chart(qqDf).mark_circle(size=50, opacity=0.6).encode(
+          x=alt.X('theoretical:Q', title='Theoretical Quantiles'),
+          y=alt.Y('sample:Q', title='Sample Quantiles'),
+          tooltip=['theoretical', 'sample']
+      ).properties(width=400, height=400, title='QQ Plot of Residuals')
+
+      minVal = min(theoreticalQ.min(), sortedResid.min())
+      maxVal = max(theoreticalQ.max(), sortedResid.max())
+      diagLine = alt.Chart(pd.DataFrame({'x': [minVal, maxVal], 'y': [minVal, maxVal]})).mark_line(color='red', strokeDash=[5,5]).encode(x='x:Q', y='y:Q')
+      qqChart + diagLine
+  - type: tip
+    content: scipy.stats.norm.ppf()는 표준정규분포의 분위수를 계산합니다. 빨간 대각선은 완벽한 정규분포일 때 점들이 위치해야 하는 선입니다. 대부분의 점이 대각선 근처에 있으면 정규성 가정이 만족됩니다.
+
+- id: practice
+  title: 실습
+  subtitle: 광고비 매출 예측 프로젝트
+  blocks:
+  - type: text
+    content: 마케팅 분석가가 되어 다양한 광고 매체의 효과를 분석해봅시다. 각 미션은 데이터 로딩부터 모델 학습, 평가, 시각화까지 전 과정을 독립적으로 수행합니다. 01 프로젝트에서 배운 OLS, add_constant(), summary(), R², params, predict(), plotly 시각화를 모두 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: Radio 광고비 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import pandas as pd
+        import statsmodels.api as sm
+
+        radioUrl = "https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv"
+        radioData = pd.read_csv(radioUrl, index_col=0)
+        radioData.head()
+    - type: code
+      title: "모델 학습"
+      content: |-
+        radioX = sm.add_constant(radioData[['Radio']])
+        radioY = radioData['Sales']
+        radioModel = sm.OLS(radioY, radioX).fit()
+        radioModel.summary()
+    - type: code
+      title: "시각화"
+      content: |-
+        import plotly.graph_objects as go
+
+        radioFig = go.Figure()
+        radioFig.add_trace(go.Scatter(x=radioData['Radio'], y=radioData['Sales'], mode='markers', name='Actual', marker=dict(size=8, opacity=0.6)))
+        radioFig.add_trace(go.Scatter(x=radioData['Radio'], y=radioModel.predict(radioX), mode='lines', name='Fitted', line=dict(color='green', width=2)))
+        radioFig.update_layout(title='Radio vs Sales', xaxis_title='Radio ($1000)', yaxis_title='Sales')
+        radioFig
+  - type: expansion
+    title: "미션2: 세 매체 비교"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import pandas as pd
+        import statsmodels.api as sm
+
+        adUrl = "https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv"
+        adDf = pd.read_csv(adUrl, index_col=0)
+        adDf.shape
+    - type: code
+      title: "3개 모델 학습"
+      content: |-
+        sales = adDf['Sales']
+        tvX = sm.add_constant(adDf[['TV']])
+        rdX = sm.add_constant(adDf[['Radio']])
+        npX = sm.add_constant(adDf[['Newspaper']])
+
+        tvModel = sm.OLS(sales, tvX).fit()
+        rdModel = sm.OLS(sales, rdX).fit()
+        npModel = sm.OLS(sales, npX).fit()
+    - type: code
+      title: "비교표 생성"
+      content: |-
+        compareTable = pd.DataFrame({
+            'Media': ['TV', 'Radio', 'Newspaper'],
+            'R²': [tvModel.rsquared, rdModel.rsquared, npModel.rsquared],
+            'Coef': [tvModel.params['TV'], rdModel.params['Radio'], npModel.params['Newspaper']],
+            'p-value': [tvModel.pvalues['TV'], rdModel.pvalues['Radio'], npModel.pvalues['Newspaper']]
+        })
+        compareTable.sort_values('R²', ascending=False)
+
+- id: summary
+  title: 정리
+  subtitle: 첫 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 Advertising 데이터로 TV 광고비와 매출의 관계를 분석했습니다. OLS 단순선형회귀로 TV 광고비 1천 달러 증가 시 매출이 약 48개 증가한다는 것을 확인했고, R² 0.61로 광고비가 매출 변동의 61%를 설명한다는 것을 알았습니다. 이 모델로 마케팅 예산을 최적화하고 광고 ROI를 계산할 수 있습니다.
+  - type: list
+    items:
+    - "OLS - 최소제곱법 단순선형회귀"
+    - "add_constant() - 절편 계산을 위한 상수항 추가"
+    - "summary() - R², p-value, 계수 등 전체 통계량"
+    - "R² - 모델 설명력 (0~1, 높을수록 좋음)"
+    - "params - 회귀 계수 (절편과 기울기)"
+    - "predict() - 새로운 값으로 예측"
+  - type: text
+    content: 다음 프로젝트에서는 부동산 가격 데이터로 여러 변수를 동시에 사용하는 다중선형회귀를 배웁니다. 방 개수, 범죄율 등 여러 요인으로 집값을 예측해봅니다.

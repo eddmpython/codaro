@@ -1,0 +1,595 @@
+meta:
+  id: day07_1
+  title: 집합
+  day: 7
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 집합(Set) - 중복 제거"
+    description: "집합 자료형으로 중복을 제거하고 집합 연산을 배웁니다."
+    keywords: ['집합', 'set', '중복제거', '합집합']
+intro:
+  emoji: "🔗"
+  points:
+  - 집합 생성과 기본 개념 (직접 생성, set() 함수)
+  - 집합 길이 확인과 요소 접근 (멤버십 테스트)
+  - 요소 추가와 제거 (add, update, remove, discard, pop)
+  - 집합 삭제와 타입 변환 (clear, del, list/tuple 변환)
+  - 집합 연산 (합집합, 교집합, 차집합, 대칭차집합)
+  - 집합 관계 확인 (부분집합, 상위집합, 서로소)
+sections:
+- id: set_introduction
+  title: 집합 소개
+  subtitle: 중복 없는 순서 없는 컬렉션
+  blocks:
+  - type: text
+    content: 집합(Set)은 중복되지 않은 요소들의 모음으로, 수학의 집합 개념을 파이썬에서 구현한 데이터 타입입니다. 집합은 중괄호 {}를 사용하여 만들고, 같은 값이 여러 번 들어가도 자동으로 하나만 남습니다. 순서가 없기 때문에 인덱스로 접근할 수 없고, 리스트나 튜플과 다르게 요소의 순서가 보장되지 않습니다. 데이터에서 중복을 제거하거나, 두 그룹 간의 공통점/차이점을 찾을 때 매우 유용합니다.
+  - type: list
+    items:
+    - 중복 요소 자동 제거
+    - 순서가 없는(unordered) 컬렉션
+    - 변경 가능한(mutable) 객체
+    - 중괄호 {}로 생성
+  - type: code
+    language: python
+    title: 집합의 기본 특성
+    description: "집합을 생성하고 중복 제거를 확인합니다."
+    content: |-
+      introFruits = {'apple', 'banana', 'orange', 'apple', 'banana'}
+      print(introFruits)
+
+      print(type(introFruits))
+      print(len(introFruits))
+
+      introNumbers = {1, 2, 3, 2, 1, 4, 5, 4}
+      print(introNumbers)
+  - type: tip
+    content: "집합은 중복을 자동으로 제거하기 때문에, 고유한 값들만 필요할 때 매우 편리합니다."
+
+- id: set_creation_direct
+  title: 직접 집합 생성
+  subtitle: 중괄호로 집합 만들기
+  blocks:
+  - type: text
+    content: 중괄호 {}를 사용하여 집합을 직접 생성할 수 있습니다. 요소들을 쉼표로 구분하여 나열하면 됩니다. 문자열, 숫자, 불린 등 다양한 타입의 데이터를 담을 수 있으며, 서로 다른 타입을 섞어서 넣을 수도 있습니다. 단, 리스트나 딕셔너리처럼 변경 가능한(mutable) 객체는 집합의 요소로 넣을 수 없습니다.
+  - type: list
+    items:
+    - 중괄호 {} 사용
+    - 쉼표로 요소 구분
+    - 자동 중복 제거
+    - 다양한 데이터 타입 혼합 가능
+  - type: code
+    language: python
+    title: 다양한 집합 직접 생성
+    description: "여러 종류의 데이터로 집합을 만들어봅니다."
+    content: |-
+      createColors = {'red', 'green', 'blue'}
+      print('색상 집합:', createColors)
+
+      createNumbers = {10, 20, 30, 40, 50}
+      print('숫자 집합:', createNumbers)
+
+      createMixed = {'hello', 42, True, 3.14}
+      print('혼합 집합:', createMixed)
+
+      print('색상 개수:', len(createColors))
+
+- id: set_empty_vs_dict
+  title: 빈 집합 만들기
+  subtitle: set() 함수 사용
+  blocks:
+  - type: text
+    content: 빈 집합을 만들 때는 주의가 필요합니다. 빈 중괄호 {}는 파이썬에서 빈 딕셔너리로 인식됩니다. 따라서 빈 집합을 만들려면 반드시 set() 함수를 사용해야 합니다. set() 함수는 빈 집합을 만들 수 있을 뿐만 아니라, 리스트나 튜플, 문자열 같은 다른 데이터를 집합으로 변환할 때도 사용됩니다.
+  - type: list
+    items:
+    - '{} 는 빈 딕셔너리'
+    - set()으로 빈 집합 생성
+    - set()으로 다른 타입을 집합으로 변환
+    - 리스트, 튜플, 문자열 모두 변환 가능
+  - type: code
+    language: python
+    title: 빈 집합과 set() 함수
+    description: "빈 집합을 올바르게 만드는 방법을 배웁니다."
+    content: |-
+      emptyDict = {}
+      print('빈 중괄호:', type(emptyDict))
+
+      emptySet = set()
+      print('set() 함수:', type(emptySet))
+
+      convertNumList = [1, 2, 3, 2, 1]
+      convertNumSet = set(convertNumList)
+      print('리스트 → 집합:', convertNumSet)
+
+      convertWord = 'hello'
+      convertCharSet = set(convertWord)
+      print('문자열 → 집합:', convertCharSet)
+  - type: tip
+    content: "리스트에서 중복을 제거하고 싶을 때 set()을 사용하면 매우 간편합니다."
+
+- id: set_length_check
+  title: 집합 길이 확인
+  subtitle: len() 함수로 요소 개수 세기
+  blocks:
+  - type: text
+    content: len() 함수를 사용하여 집합에 들어있는 요소의 개수를 확인할 수 있습니다. 집합은 중복을 허용하지 않으므로, 중복이 있는 데이터에서 집합을 만들면 고유한 요소의 개수만 셉니다. 빈 집합의 길이는 0입니다.
+  - type: list
+    items:
+    - len() 함수로 요소 개수 확인
+    - 중복 제거 후의 실제 개수
+    - 빈 집합은 길이가 0
+    - 고유값 개수 파악에 유용
+  - type: code
+    language: python
+    title: 집합 길이 확인
+    description: "집합의 요소 개수를 확인합니다."
+    content: |-
+      lenFruits = {'apple', 'banana', 'orange', 'mango'}
+      print('과일 개수:', len(lenFruits))
+
+      lenNumbers = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+      lenUniqueNumbers = set(lenNumbers)
+      print('원본 리스트 길이:', len(lenNumbers))
+      print('집합 길이:', len(lenUniqueNumbers))
+
+      lenEmptySet = set()
+      print('빈 집합 길이:', len(lenEmptySet))
+
+- id: set_membership_test
+  title: 멤버십 테스트
+  subtitle: in과 not in 연산자
+  blocks:
+  - type: text
+    content: 집합에서 특정 요소가 있는지 확인하는 것을 멤버십 테스트라고 합니다. in 연산자는 요소가 집합에 포함되어 있으면 True를, 없으면 False를 반환합니다. not in 연산자는 반대로 포함되어 있지 않으면 True를 반환합니다. 집합의 멤버십 테스트는 리스트보다 훨씬 빠릅니다.
+  - type: list
+    items:
+    - in 연산자로 포함 여부 확인
+    - not in 연산자로 미포함 확인
+    - True/False 불린값 반환
+    - 리스트보다 빠른 검색
+  - type: code
+    language: python
+    title: 멤버십 테스트
+    description: "집합에서 요소의 존재 여부를 확인합니다."
+    content: |-
+      memberFruits = {'apple', 'banana', 'orange', 'mango'}
+
+      print('apple' in memberFruits)
+      print('grape' in memberFruits)
+
+      print('kiwi' not in memberFruits)
+      print('banana' not in memberFruits)
+
+      hasApple = 'apple' in memberFruits
+      print('사과가 있나요?', hasApple)
+
+- id: set_add_single
+  title: 단일 요소 추가
+  subtitle: add() 메서드 사용
+  blocks:
+  - type: text
+    content: add() 메서드는 집합에 하나의 요소를 추가합니다. 이미 존재하는 요소를 추가하려고 하면 아무 일도 일어나지 않습니다. 에러가 발생하지 않고 조용히 무시됩니다. 이것이 집합의 특성인 중복 허용 안함을 보여줍니다. add()는 원본 집합을 직접 수정합니다.
+  - type: list
+    items:
+    - add() 메서드로 단일 요소 추가
+    - 중복 요소는 자동 무시
+    - 에러 발생하지 않음
+    - 원본 집합이 직접 수정됨
+  - type: code
+    language: python
+    title: 단일 요소 추가
+    description: "add() 메서드로 집합에 요소를 추가합니다."
+    content: |-
+      addFruits = {'apple', 'banana', 'orange'}
+      print('원본:', addFruits)
+
+      addFruits.add('mango')
+      print('mango 추가 후:', addFruits)
+
+      addFruits.add('apple')
+      print('apple 다시 추가 후:', addFruits)
+
+      print('최종 개수:', len(addFruits))
+
+- id: set_add_multiple
+  title: 여러 요소 추가
+  subtitle: update() 메서드 사용
+  blocks:
+  - type: text
+    content: update() 메서드는 여러 요소를 한 번에 집합에 추가합니다. 리스트, 튜플, 문자열, 다른 집합 등 반복 가능한(iterable) 객체를 인자로 받아서 그 안의 모든 요소를 추가합니다. 문자열을 update()에 넣으면 각 문자가 개별 요소로 추가됩니다.
+  - type: list
+    items:
+    - update() 메서드로 여러 요소 추가
+    - 리스트, 튜플, 집합 등 사용 가능
+    - 문자열은 각 문자가 개별 추가됨
+    - 중복은 자동 무시됨
+  - type: code
+    language: python
+    title: 여러 요소 추가
+    description: "update() 메서드로 여러 요소를 한 번에 추가합니다."
+    content: |-
+      updateFruits = {'apple', 'banana'}
+      print('원본:', updateFruits)
+
+      updateFruits.update(['orange', 'mango'])
+      print('리스트 추가 후:', updateFruits)
+
+      updateFruits.update(('kiwi', 'grape'))
+      print('튜플 추가 후:', updateFruits)
+
+      updateLetters = set()
+      updateLetters.update('abc')
+      print('문자열 추가:', updateLetters)
+
+- id: set_remove_method
+  title: 요소 제거 - remove()
+  subtitle: 존재하지 않으면 에러 발생
+  blocks:
+  - type: text
+    content: remove() 메서드는 집합에서 지정된 요소를 제거합니다. 만약 제거하려는 요소가 집합에 없으면 KeyError가 발생합니다. 따라서 remove()를 사용할 때는 요소가 확실히 존재하는지 미리 확인하거나, 요소가 확실히 있다고 보장될 때 사용하는 것이 좋습니다.
+  - type: list
+    items:
+    - remove() 메서드로 요소 제거
+    - 존재하지 않으면 KeyError 발생
+    - 확실한 요소 제거에 사용
+    - 원본 집합이 직접 수정됨
+  - type: code
+    language: python
+    title: remove() 메서드
+    description: "remove()로 집합에서 요소를 제거합니다."
+    content: |-
+      removeFruits = {'apple', 'banana', 'orange', 'mango'}
+      print('원본:', removeFruits)
+
+      removeFruits.remove('banana')
+      print('banana 제거 후:', removeFruits)
+
+      removeFruits.remove('orange')
+      print('orange 제거 후:', removeFruits)
+
+      print('최종:', removeFruits)
+  - type: tip
+    content: "존재하지 않는 요소를 remove()하면 에러가 발생합니다. 안전하게 제거하려면 discard()를 사용하세요."
+
+- id: set_discard_method
+  title: 요소 제거 - discard()
+  subtitle: 존재하지 않아도 에러 없음
+  blocks:
+  - type: text
+    content: discard() 메서드는 remove()와 같은 기능을 하지만, 제거하려는 요소가 존재하지 않아도 에러가 발생하지 않습니다. 요소가 없으면 아무 일도 일어나지 않고 조용히 넘어갑니다. 따라서 요소의 존재 여부가 불확실할 때 더 안전하게 사용할 수 있습니다.
+  - type: list
+    items:
+    - discard() 메서드로 안전한 제거
+    - 존재하지 않아도 에러 없음
+    - 불확실한 요소 제거에 적합
+    - 더 안전한 방법
+  - type: code
+    language: python
+    title: discard() 메서드
+    description: "discard()로 안전하게 요소를 제거합니다."
+    content: |-
+      discardFruits = {'apple', 'banana', 'orange'}
+      print('원본:', discardFruits)
+
+      discardFruits.discard('banana')
+      print('banana 제거 후:', discardFruits)
+
+      discardFruits.discard('grape')
+      print('grape 제거 시도 후:', discardFruits)
+
+      discardFruits.discard('kiwi')
+      print('kiwi 제거 시도 후:', discardFruits)
+
+- id: set_pop_method
+  title: 임의 요소 제거
+  subtitle: pop() 메서드 사용
+  blocks:
+  - type: text
+    content: pop() 메서드는 집합에서 임의의 요소를 하나 제거하고 그 값을 반환합니다. 집합은 순서가 없기 때문에 어떤 요소가 제거될지 예측할 수 없습니다. 빈 집합에서 pop()을 호출하면 KeyError가 발생합니다. 어떤 요소든 하나를 꺼내서 처리하고 싶을 때 사용합니다.
+  - type: list
+    items:
+    - pop() 메서드로 임의 요소 제거
+    - 제거된 값을 반환
+    - 어떤 요소가 제거될지 예측 불가
+    - 빈 집합에서는 에러 발생
+  - type: code
+    language: python
+    title: pop() 메서드
+    description: "pop()으로 임의의 요소를 제거하고 값을 받습니다."
+    content: |-
+      popFruits = {'apple', 'banana', 'orange', 'mango'}
+      print('원본:', popFruits)
+
+      popRemoved = popFruits.pop()
+      print('제거된 요소:', popRemoved)
+      print('남은 집합:', popFruits)
+
+      popRemoved2 = popFruits.pop()
+      print('제거된 요소:', popRemoved2)
+      print('남은 집합:', popFruits)
+
+- id: set_clear_del
+  title: 집합 비우기와 삭제
+  subtitle: clear()와 del 사용
+  blocks:
+  - type: text
+    content: clear() 메서드는 집합의 모든 요소를 제거하여 빈 집합으로 만듭니다. 집합 객체 자체는 남아있습니다. 반면 del 키워드는 집합 변수 자체를 완전히 삭제합니다. 삭제 후에는 해당 변수에 접근할 수 없습니다. clear()는 집합을 재사용할 때, del은 더 이상 필요 없을 때 사용합니다.
+  - type: list
+    items:
+    - clear() - 모든 요소 제거, 빈 집합 유지
+    - del - 변수 자체를 삭제
+    - clear() 후 집합 재사용 가능
+    - del 후 변수 접근 불가
+  - type: code
+    language: python
+    title: clear()와 del
+    description: "집합을 비우거나 삭제합니다."
+    content: |-
+      clearFruits = {'apple', 'banana', 'orange'}
+      print('원본:', clearFruits)
+
+      clearFruits.clear()
+      print('clear() 후:', clearFruits)
+      print('타입:', type(clearFruits))
+
+      clearFruits.add('mango')
+      print('재사용:', clearFruits)
+
+      delNumbers = {1, 2, 3}
+      del delNumbers
+      print('numbers 삭제됨')
+
+- id: set_type_conversion
+  title: 집합 타입 변환
+  subtitle: list(), tuple() 함수 사용
+  blocks:
+  - type: text
+    content: 집합을 리스트나 튜플로 변환할 수 있습니다. list() 함수는 집합을 리스트로, tuple() 함수는 튜플로 변환합니다. 이렇게 변환하면 인덱스로 요소에 접근하거나 순서가 필요한 작업을 할 수 있습니다. 단, 집합은 순서가 없으므로 변환된 리스트나 튜플의 순서는 예측할 수 없습니다.
+  - type: list
+    items:
+    - list() 함수로 리스트 변환
+    - tuple() 함수로 튜플 변환
+    - 순서는 보장되지 않음
+    - 인덱스 접근이 필요할 때 활용
+  - type: code
+    language: python
+    title: 집합 타입 변환
+    description: "집합을 리스트와 튜플로 변환합니다."
+    content: |-
+      convertFruits = {'apple', 'banana', 'orange'}
+
+      convertFruitsList = list(convertFruits)
+      print('리스트:', convertFruitsList)
+      print('리스트 타입:', type(convertFruitsList))
+
+      convertFruitsTuple = tuple(convertFruits)
+      print('튜플:', convertFruitsTuple)
+      print('튜플 타입:', type(convertFruitsTuple))
+
+      print('첫 번째 요소:', convertFruitsList[0])
+
+- id: set_union_operation
+  title: 합집합 연산
+  subtitle: union()과 | 연산자
+  blocks:
+  - type: text
+    content: 합집합은 두 개 이상의 집합에 속한 모든 요소를 포함하는 새로운 집합을 만드는 연산입니다. union() 메서드나 | (파이프) 연산자를 사용할 수 있습니다. 양쪽 집합의 모든 요소가 포함되고, 중복 요소는 자동으로 하나만 남습니다. 원본 집합은 변경되지 않고 새로운 집합이 반환됩니다.
+  - type: list
+    items:
+    - union() 메서드 사용
+    - '| 연산자 사용 가능'
+    - 중복 요소는 하나만 포함
+    - 새로운 집합 반환 (원본 유지)
+  - type: code
+    language: python
+    title: 합집합 연산
+    description: "두 집합의 합집합을 구합니다."
+    content: |-
+      unionSetA = {1, 2, 3, 4}
+      unionSetB = {3, 4, 5, 6}
+
+      unionResult1 = unionSetA.union(unionSetB)
+      print('union() 결과:', unionResult1)
+
+      unionResult2 = unionSetA | unionSetB
+      print('| 연산자 결과:', unionResult2)
+
+      print('원본 setA:', unionSetA)
+      print('원본 setB:', unionSetB)
+
+- id: set_intersection_operation
+  title: 교집합 연산
+  subtitle: intersection()과 & 연산자
+  blocks:
+  - type: text
+    content: 교집합은 두 개 이상의 집합에 공통으로 포함된 요소들만 모은 새로운 집합을 만드는 연산입니다. intersection() 메서드나 & (앰퍼샌드) 연산자를 사용할 수 있습니다. 양쪽 집합 모두에 있는 요소만 포함됩니다. 원본 집합은 변경되지 않고 새로운 집합이 반환됩니다.
+  - type: list
+    items:
+    - intersection() 메서드 사용
+    - '& 연산자 사용 가능'
+    - 공통 요소만 포함
+    - 새로운 집합 반환 (원본 유지)
+  - type: code
+    language: python
+    title: 교집합 연산
+    description: "두 집합의 교집합을 구합니다."
+    content: |-
+      interSetA = {1, 2, 3, 4}
+      interSetB = {3, 4, 5, 6}
+
+      interResult1 = interSetA.intersection(interSetB)
+      print('intersection() 결과:', interResult1)
+
+      interResult2 = interSetA & interSetB
+      print('& 연산자 결과:', interResult2)
+
+      interPython = set('python')
+      interDragon = set('dragon')
+      interCommon = interPython & interDragon
+      print('공통 문자:', interCommon)
+
+- id: set_difference_operation
+  title: 차집합 연산
+  subtitle: difference()와 - 연산자
+  blocks:
+  - type: text
+    content: 차집합은 첫 번째 집합에는 있지만 두 번째 집합에는 없는 요소들로 구성된 새로운 집합을 만드는 연산입니다. difference() 메서드나 - (마이너스) 연산자를 사용할 수 있습니다. 중요한 점은 A - B와 B - A의 결과가 다르다는 것입니다. 순서에 따라 결과가 달라집니다.
+  - type: list
+    items:
+    - difference() 메서드 사용
+    - '- 연산자 사용 가능'
+    - 연산 순서가 중요함
+    - 새로운 집합 반환 (원본 유지)
+  - type: code
+    language: python
+    title: 차집합 연산
+    description: "두 집합의 차집합을 구합니다."
+    content: |-
+      diffSetA = {1, 2, 3, 4}
+      diffSetB = {3, 4, 5, 6}
+
+      diffResult1 = diffSetA.difference(diffSetB)
+      print('A - B:', diffResult1)
+
+      diffResult2 = diffSetA - diffSetB
+      print('- 연산자 결과:', diffResult2)
+
+      diffResult3 = diffSetB - diffSetA
+      print('B - A:', diffResult3)
+
+- id: set_symmetric_difference
+  title: 대칭차집합 연산
+  subtitle: symmetric_difference()와 ^ 연산자
+  blocks:
+  - type: text
+    content: 대칭차집합은 두 집합 중 어느 하나에만 속하는 요소들로 구성된 새로운 집합을 만드는 연산입니다. 즉, 합집합에서 교집합을 뺀 결과와 같습니다. symmetric_difference() 메서드나 ^ (캐럿) 연산자를 사용할 수 있습니다. 두 그룹에서 서로 다른 부분만 찾고 싶을 때 유용합니다.
+  - type: list
+    items:
+    - symmetric_difference() 메서드 사용
+    - ^ 연산자 사용 가능
+    - 공통 요소는 제외됨
+    - 합집합 - 교집합과 같은 결과
+  - type: code
+    language: python
+    title: 대칭차집합 연산
+    description: "두 집합의 대칭차집합을 구합니다."
+    content: |-
+      symSetA = {1, 2, 3, 4}
+      symSetB = {3, 4, 5, 6}
+
+      symResult1 = symSetA.symmetric_difference(symSetB)
+      print('symmetric_difference():', symResult1)
+
+      symResult2 = symSetA ^ symSetB
+      print('^ 연산자 결과:', symResult2)
+
+      symUnion = symSetA | symSetB
+      symInter = symSetA & symSetB
+      symManual = symUnion - symInter
+      print('합집합 - 교집합:', symManual)
+
+- id: set_subset_superset
+  title: 부분집합과 상위집합
+  subtitle: issubset()과 issuperset() 메서드
+  blocks:
+  - type: text
+    content: 부분집합은 한 집합의 모든 요소가 다른 집합에 포함되는 관계입니다. issubset() 메서드는 현재 집합이 다른 집합의 부분집합인지 확인합니다. issuperset() 메서드는 반대로 현재 집합이 다른 집합을 포함하는 상위집합인지 확인합니다. 두 집합이 겹치는 부분이 없으면 서로소(disjoint)라고 하며, isdisjoint() 메서드로 확인합니다.
+  - type: list
+    items:
+    - issubset() - 부분집합 여부 확인
+    - issuperset() - 상위집합 여부 확인
+    - isdisjoint() - 서로소 여부 확인
+    - True/False 불린 값 반환
+  - type: code
+    language: python
+    title: 부분집합과 상위집합
+    description: "집합 간의 관계를 확인합니다."
+    content: |-
+      subSetA = {1, 2, 3, 4, 5}
+      subSetB = {2, 3, 4}
+      subSetC = {10, 20, 30}
+
+      print('B는 A의 부분집합?', subSetB.issubset(subSetA))
+      print('A는 B의 부분집합?', subSetA.issubset(subSetB))
+
+      print('A는 B의 상위집합?', subSetA.issuperset(subSetB))
+
+      print('A와 C는 서로소?', subSetA.isdisjoint(subSetC))
+      print('A와 B는 서로소?', subSetA.isdisjoint(subSetB))
+
+- id: practice
+  title: 7일차 복습
+  subtitle: 집합 기초 미션
+  blocks:
+  - type: text
+    content: 7일차에서 배운 집합 개념을 복습하는 미션입니다. 집합 생성, 요소 추가/제거, 집합 연산 등을 종합적으로 연습해봅시다.
+  - type: expansion
+    title: "미션1: 집합 생성과 중복 제거"
+    code: |-
+      numbers = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+      uniqueNumbers = set(numbers)
+      print('원본 리스트:', numbers)
+      print('중복 제거:', uniqueNumbers)
+      print('고유 개수:', len(uniqueNumbers))
+  - type: expansion
+    title: "미션2: 빈 집합과 요소 추가"
+    code: |-
+      mySet = set()
+      mySet.add('apple')
+      mySet.add('banana')
+      mySet.add('orange')
+      print('집합:', mySet)
+      mySet.update(['grape', 'kiwi'])
+      print('추가 후:', mySet)
+  - type: expansion
+    title: "미션3: 요소 제거 연습"
+    code: |-
+      fruits = {'apple', 'banana', 'orange', 'mango', 'kiwi'}
+      print('원본:', fruits)
+      fruits.remove('banana')
+      print('remove 후:', fruits)
+      fruits.discard('grape')
+      print('discard 후:', fruits)
+      removed = fruits.pop()
+      print('pop 결과:', removed)
+      print('최종:', fruits)
+  - type: expansion
+    title: "미션4: 멤버십 테스트"
+    code: |-
+      colors = {'red', 'green', 'blue', 'yellow'}
+      print('red' in colors)
+      print('purple' in colors)
+      print('black' not in colors)
+      hasGreen = 'green' in colors
+      print('초록색 있음:', hasGreen)
+  - type: expansion
+    title: "미션5: 합집합과 교집합"
+    code: |-
+      team1 = {'Alice', 'Bob', 'Charlie'}
+      team2 = {'Bob', 'David', 'Eve'}
+      allMembers = team1 | team2
+      print('전체 멤버:', allMembers)
+      bothTeams = team1 & team2
+      print('양팀 소속:', bothTeams)
+  - type: expansion
+    title: "미션6: 차집합과 대칭차집합"
+    code: |-
+      groupA = {1, 2, 3, 4, 5}
+      groupB = {4, 5, 6, 7, 8}
+      onlyA = groupA - groupB
+      print('A에만 있음:', onlyA)
+      onlyB = groupB - groupA
+      print('B에만 있음:', onlyB)
+      exclusive = groupA ^ groupB
+      print('한쪽에만 있음:', exclusive)
+  - type: expansion
+    title: "미션7: 타입 변환과 관계 확인"
+    code: |-
+      parent = {'a', 'b', 'c', 'd', 'e'}
+      child = {'b', 'c', 'd'}
+      print('child는 부분집합?', child.issubset(parent))
+      print('parent는 상위집합?', parent.issuperset(child))
+      childList = list(child)
+      print('리스트로 변환:', childList)

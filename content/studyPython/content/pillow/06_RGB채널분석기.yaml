@@ -1,0 +1,246 @@
+meta:
+  id: pillow_06
+  title: RGB채널분석기
+  order: 6
+  category: pillow
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["Pillow", "split", "merge", "histogram", "RGB", "채널"]
+  seo:
+    title: "Pillow 중급 - RGB 채널 분석기"
+    description: "Pillow로 이미지의 R, G, B 채널을 분리하고 히스토그램을 분석합니다. 색상 구조를 깊이 이해합니다."
+    keywords: ["Pillow", "split", "merge", "histogram", "RGB채널", "색상분석"]
+
+intro:
+  emoji: "🔴🟢🔵"
+  goal: 이미지의 RGB 채널을 분리하고 히스토그램으로 색상 분포를 분석합니다.
+  description: split()으로 채널을 분리하고, merge()로 합성합니다. histogram()으로 픽셀 값 분포를 확인합니다. 이미지의 색상 구조를 깊이 이해합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 이미지 불러오기
+  subtitle: sklearn 샘플 이미지
+  blocks:
+  - type: text
+    content: sklearn에 내장된 샘플 이미지를 사용합니다. RGB 채널 분석에는 색상이 풍부한 china 이미지가 적합합니다.
+  - type: code
+    language: python
+    title: 라이브러리와 이미지
+    description: 분석용 이미지를 로드합니다
+    content: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      chinaArr = load_sample_image('china.jpg')
+      source = Image.fromarray(chinaArr)
+      source.size, source.mode
+  - type: code
+    language: python
+    title: 원본 이미지
+    description: RGB 이미지입니다
+    content: |-
+      source
+
+- id: step2_split
+  title: 2단계. 채널 분리
+  subtitle: split()
+  blocks:
+  - type: text
+    content: split() 메서드는 RGB 이미지를 세 개의 단일 채널(L 모드) 이미지로 분리합니다. 각 채널은 해당 색상의 밝기만 담고 있습니다. R 채널이 밝으면 그 부분에 빨간색이 많다는 의미입니다.
+  - type: code
+    language: python
+    title: RGB 채널 분리
+    description: 세 개의 L 모드 이미지를 얻습니다
+    content: |-
+      red, green, blue = source.split()
+      red.mode, green.mode, blue.mode
+  - type: tip
+    content: split()이 반환하는 각 이미지는 L 모드(그레이스케일)입니다. 밝은 부분은 해당 색상이 강한 곳, 어두운 부분은 해당 색상이 약한 곳입니다.
+  - type: code
+    language: python
+    title: R 채널
+    description: 빨간색 성분만 표시합니다
+    content: |-
+      red
+  - type: code
+    language: python
+    title: G 채널
+    description: 초록색 성분만 표시합니다
+    content: |-
+      green
+  - type: code
+    language: python
+    title: B 채널
+    description: 파란색 성분만 표시합니다
+    content: |-
+      blue
+
+- id: step3_visualize
+  title: 3단계. 채널 시각화
+  subtitle: 색상으로 채널 표현
+  blocks:
+  - type: text
+    content: 분리된 채널을 해당 색상으로 시각화하려면 다른 채널을 0으로 채운 이미지를 만들어야 합니다. Image.new()로 검은 이미지를 만들고 merge()로 합성합니다.
+  - type: code
+    language: python
+    title: 빈 채널 생성
+    description: 검은색(0) 채널을 만듭니다
+    content: |-
+      empty = Image.new('L', source.size, 0)
+      empty.mode, empty.size
+  - type: code
+    language: python
+    title: 빨간색 채널만 표시
+    description: R 채널을 빨간색으로 시각화합니다
+    content: |-
+      redOnly = Image.merge('RGB', (red, empty, empty))
+      redOnly
+  - type: code
+    language: python
+    title: 초록색 채널만 표시
+    description: G 채널을 초록색으로 시각화합니다
+    content: |-
+      greenOnly = Image.merge('RGB', (empty, green, empty))
+      greenOnly
+  - type: code
+    language: python
+    title: 파란색 채널만 표시
+    description: B 채널을 파란색으로 시각화합니다
+    content: |-
+      blueOnly = Image.merge('RGB', (empty, empty, blue))
+      blueOnly
+  - type: tip
+    content: merge('RGB', (r, g, b))는 세 개의 L 모드 이미지를 하나의 RGB 이미지로 합칩니다. 순서가 중요하며 반드시 R, G, B 순서로 전달해야 합니다.
+
+- id: step4_histogram
+  title: 4단계. 히스토그램 분석
+  subtitle: histogram()
+  blocks:
+  - type: text
+    content: histogram() 메서드는 각 밝기 값(0-255)에 해당하는 픽셀 수를 반환합니다. RGB 이미지는 768개(256×3) 값을 반환하며, 처음 256개가 R, 다음 256개가 G, 마지막 256개가 B입니다.
+  - type: code
+    language: python
+    title: 전체 히스토그램
+    description: RGB 이미지의 히스토그램입니다
+    content: |-
+      hist = source.histogram()
+      len(hist)
+  - type: code
+    language: python
+    title: 채널별 히스토그램
+    description: R, G, B 히스토그램을 분리합니다
+    content: |-
+      histR = hist[0:256]
+      histG = hist[256:512]
+      histB = hist[512:768]
+      max(histR), max(histG), max(histB)
+  - type: tip
+    content: 히스토그램에서 높은 값이 있는 위치는 해당 밝기의 픽셀이 많다는 의미입니다. 0 근처에 집중되면 어두운 이미지, 255 근처에 집중되면 밝은 이미지입니다.
+  - type: code
+    language: python
+    title: 단일 채널 히스토그램
+    description: R 채널만의 히스토그램입니다
+    content: |-
+      redHist = red.histogram()
+      len(redHist)
+
+- id: step5_analysis
+  title: 5단계. 색상 분포 분석
+  subtitle: 통계 추출
+  blocks:
+  - type: text
+    content: 히스토그램에서 평균 밝기, 가장 많은 픽셀의 밝기 등을 계산할 수 있습니다. 이를 통해 이미지의 전반적인 색조를 파악합니다.
+  - type: code
+    language: python
+    title: 평균 밝기 계산
+    description: 각 채널의 평균값을 구합니다
+    content: |-
+      totalPixels = source.size[0] * source.size[1]
+      avgR = sum(i * histR[i] for i in range(256)) / totalPixels
+      avgG = sum(i * histG[i] for i in range(256)) / totalPixels
+      avgB = sum(i * histB[i] for i in range(256)) / totalPixels
+      round(avgR, 1), round(avgG, 1), round(avgB, 1)
+  - type: code
+    language: python
+    title: 지배적 채널 확인
+    description: 어떤 색상이 강한지 판단합니다
+    content: |-
+      dominant = 'Red' if avgR >= avgG and avgR >= avgB else ('Green' if avgG >= avgB else 'Blue')
+      dominant
+  - type: tip
+    content: 평균값이 가장 높은 채널이 이미지의 전체적인 색조를 결정합니다. 풍경 사진은 보통 G와 B가 높고, 일몰 사진은 R이 높습니다.
+
+- id: step6_swap
+  title: 6단계. 채널 교환
+  subtitle: 색상 효과
+  blocks:
+  - type: text
+    content: 채널 순서를 바꿔 독특한 색상 효과를 만들 수 있습니다. R↔B를 교환하면 파란 하늘이 주황색으로 바뀌는 등의 효과가 나타납니다.
+  - type: code
+    language: python
+    title: R과 B 교환
+    description: 빨강과 파랑을 바꿉니다
+    content: |-
+      swapped = Image.merge('RGB', (blue, green, red))
+      swapped
+  - type: code
+    language: python
+    title: 회전 교환
+    description: R→G, G→B, B→R 순환
+    content: |-
+      rotated = Image.merge('RGB', (green, blue, red))
+      rotated
+
+- id: practice
+  title: 실습
+  subtitle: 채널 분석 프로젝트
+  blocks:
+  - type: text
+    content: sklearn 이미지의 채널을 분석하고 조작해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: flower 채널 분리 및 시각화"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image
+        from sklearn.datasets import load_sample_image
+
+        flowerArr = load_sample_image('flower.jpg')
+        flower = Image.fromarray(flowerArr)
+        flower
+    - type: code
+      title: "채널 분리"
+      content: |-
+        fRed, fGreen, fBlue = flower.split()
+        fRed.mode
+    - type: code
+      title: "빨간색만 시각화"
+      content: |-
+        fEmpty = Image.new('L', flower.size, 0)
+        fRedVis = Image.merge('RGB', (fRed, fEmpty, fEmpty))
+        fRedVis
+  - type: expansion
+    title: "미션2: china 채널 교환 효과"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image
+        from sklearn.datasets import load_sample_image
+
+        sceneArr = load_sample_image('china.jpg')
+        scene = Image.fromarray(sceneArr)
+        scene
+    - type: code
+      title: "채널 분리"
+      content: |-
+        sRed, sGreen, sBlue = scene.split()
+        sRed.mode
+    - type: code
+      title: "G와 B 교환"
+      content: |-
+        sceneSwap = Image.merge('RGB', (sRed, sBlue, sGreen))
+        sceneSwap

@@ -1,0 +1,393 @@
+meta:
+  id: networkx_04
+  title: 중심성분석
+  order: 4
+  category: networkx
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["networkx", "중심성", "degree", "betweenness", "closeness", "pagerank"]
+  seo:
+    title: "NetworkX 중심성 분석 - 중요 노드 찾기"
+    description: "NetworkX로 네트워크에서 중요한 노드를 찾습니다. 연결, 매개, 근접, 고유벡터 중심성과 PageRank를 배웁니다."
+    keywords: ["networkx", "중심성", "centrality", "degree", "betweenness", "pagerank"]
+
+intro:
+  emoji: "🎯"
+  goal: 네트워크에서 중요한 노드를 찾는 다양한 중심성 지표를 학습합니다.
+  description: 중심성(Centrality)은 네트워크에서 노드의 중요도를 측정합니다. 연결 중심성은 연결 수, 매개 중심성은 다리 역할, 근접 중심성은 접근성을 측정합니다. PageRank는 구글 검색의 기반이 된 알고리즘입니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NetworkX와 matplotlib을 불러옵니다. 중심성(Centrality) 분석은 네트워크에서 '중요한' 노드를 찾는 핵심 기법입니다. 소셜 네트워크의 인플루언서, 교통망의 허브 역, 조직의 핵심 인물 등을 식별하는 데 사용됩니다. 중심성에는 여러 종류가 있으며, 각각 '중요함'을 다른 관점에서 정의합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: networkx와 matplotlib을 불러옵니다
+    content: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+- id: step2_sample_graph
+  title: 2단계. 샘플 그래프
+  subtitle: 분석용 네트워크
+  blocks:
+  - type: text
+    content: 중심성 분석을 위한 샘플 네트워크를 생성합니다. 이 그래프는 두 개의 밀집된 영역이 브릿지 노드로 연결된 구조입니다. 왼쪽에는 A를 중심으로 한 허브 구조가, 오른쪽에는 F, G, H, I로 이루어진 클러스터가 있습니다. E와 F가 두 영역을 연결하는 브릿지 역할을 합니다. 이 구조에서 각 중심성 지표가 어떤 노드를 '중요'하다고 평가하는지 비교해봅니다.
+  - type: code
+    language: python
+    title: 샘플 그래프 생성
+    description: 분석용 네트워크
+    content: |-
+      G = nx.Graph()
+      G.add_edges_from([
+          ("A", "B"), ("A", "C"), ("A", "D"), ("A", "E"),
+          ("B", "C"), ("D", "E"),
+          ("E", "F"), ("F", "G"), ("F", "H"),
+          ("G", "H"), ("G", "I"), ("H", "I")
+      ])
+      G.number_of_nodes(), G.number_of_edges()
+  - type: code
+    language: python
+    title: 그래프 시각화
+    description: 네트워크 구조 확인
+    content: |-
+      pos = nx.spring_layout(G, seed=42)
+      fig1, ax1 = plt.subplots(figsize=(8, 6))
+      nx.draw(G, pos=pos, with_labels=True, node_color='lightblue',
+              node_size=800, font_size=12, ax=ax1)
+      ax1.set_title('Sample Network')
+      fig1
+
+- id: step3_degree
+  title: 3단계. 연결 중심성
+  subtitle: degree_centrality()
+  blocks:
+  - type: text
+    content: 연결 중심성(Degree Centrality)은 가장 직관적인 중심성 지표입니다. 노드의 연결 수(degree)를 전체 노드 수 - 1로 나누어 0~1 사이로 정규화합니다. 많은 이웃과 직접 연결된 노드가 높은 값을 가집니다. 소셜 네트워크에서 '친구가 많은 사람', 공항 네트워크에서 '노선이 많은 공항'을 찾을 때 유용합니다.
+  - type: code
+    language: python
+    title: 연결 중심성 계산
+    description: 각 노드의 연결 중심성
+    content: |-
+      degCent = nx.degree_centrality(G)
+      degCent
+  - type: code
+    language: python
+    title: 상위 노드
+    description: 연결 중심성 순위
+    content: |-
+      sortedDeg = sorted(degCent.items(), key=lambda x: x[1], reverse=True)
+      sortedDeg
+  - type: tip
+    content: 연결 중심성 = (연결 수) / (노드 수 - 1)입니다. 0과 1 사이 값으로 정규화됩니다.
+
+- id: step4_betweenness
+  title: 4단계. 매개 중심성
+  subtitle: betweenness_centrality()
+  blocks:
+  - type: text
+    content: 매개 중심성(Betweenness Centrality)은 노드가 네트워크의 '정보 흐름'에서 얼마나 중요한 위치에 있는지를 측정합니다. 모든 노드 쌍 사이의 최단 경로를 계산하고, 해당 노드가 그 경로에 얼마나 자주 포함되는지를 집계합니다. 서로 다른 그룹을 연결하는 브릿지 역할의 노드가 높은 값을 가집니다. 조직에서 부서 간 소통을 담당하는 사람, 네트워크의 병목점을 찾을 때 유용합니다.
+  - type: code
+    language: python
+    title: 매개 중심성 계산
+    description: 각 노드의 매개 중심성
+    content: |-
+      betCent = nx.betweenness_centrality(G)
+      betCent
+  - type: code
+    language: python
+    title: 상위 노드
+    description: 매개 중심성 순위
+    content: |-
+      sortedBet = sorted(betCent.items(), key=lambda x: x[1], reverse=True)
+      sortedBet
+  - type: tip
+    content: 매개 중심성이 높은 노드를 제거하면 네트워크가 분리될 수 있습니다. 정보 흐름의 병목점입니다.
+
+- id: step5_closeness
+  title: 5단계. 근접 중심성
+  subtitle: closeness_centrality()
+  blocks:
+  - type: text
+    content: 근접 중심성(Closeness Centrality)은 한 노드에서 네트워크의 다른 모든 노드에 얼마나 빠르게 도달할 수 있는지를 측정합니다. (노드 수 - 1)을 모든 최단 거리의 합으로 나눈 값입니다. 네트워크의 지리적 중심에 위치한 노드가 높은 값을 가집니다. 정보를 빠르게 전파하거나 받을 수 있는 위치, 물류 센터의 최적 위치를 찾을 때 유용합니다.
+  - type: code
+    language: python
+    title: 근접 중심성 계산
+    description: 각 노드의 근접 중심성
+    content: |-
+      closeCent = nx.closeness_centrality(G)
+      closeCent
+  - type: code
+    language: python
+    title: 상위 노드
+    description: 근접 중심성 순위
+    content: |-
+      sortedClose = sorted(closeCent.items(), key=lambda x: x[1], reverse=True)
+      sortedClose
+  - type: tip
+    content: 근접 중심성 = (노드 수 - 1) / (모든 최단 거리의 합)입니다. 네트워크의 중앙에 위치한 노드가 높습니다.
+
+- id: step6_eigenvector
+  title: 6단계. 고유벡터 중심성
+  subtitle: eigenvector_centrality()
+  blocks:
+  - type: text
+    content: 고유벡터 중심성(Eigenvector Centrality)은 '누구와 연결되어 있는가'를 중시합니다. 단순히 연결 수가 많은 것이 아니라, 중요한 노드들과 연결되어 있을수록 높은 값을 가집니다. 인접행렬의 주요 고유벡터에서 계산되며, 반복적으로 이웃의 중심성을 합산하는 방식으로 수렴합니다. 학계에서 저명한 학자들에게 인용받는 논문, VIP 고객과 연결된 서비스 담당자를 찾을 때 유용합니다.
+  - type: code
+    language: python
+    title: 고유벡터 중심성
+    description: 영향력 기반 중심성
+    content: |-
+      eigCent = nx.eigenvector_centrality(G)
+      eigCent
+  - type: code
+    language: python
+    title: 상위 노드
+    description: 고유벡터 중심성 순위
+    content: |-
+      sortedEig = sorted(eigCent.items(), key=lambda x: x[1], reverse=True)
+      sortedEig
+  - type: tip
+    content: 고유벡터 중심성은 인접행렬의 고유벡터에서 계산됩니다. 많이 연결된 노드와 연결되면 중심성이 높아집니다.
+
+- id: step7_pagerank
+  title: 7단계. PageRank
+  subtitle: pagerank()
+  blocks:
+  - type: text
+    content: PageRank는 1998년 래리 페이지와 세르게이 브린이 구글 검색 엔진의 기초로 개발한 알고리즘입니다. 랜덤 서퍼 모델에 기반하며, 임의의 사용자가 링크를 따라 웹을 탐색할 때 각 페이지에 도달할 확률을 계산합니다. 중요한 페이지에서 링크를 많이 받을수록 PageRank가 높아집니다. 주로 방향 그래프에서 사용하지만, 무방향 그래프에도 적용 가능합니다.
+  - type: code
+    language: python
+    title: PageRank 계산
+    description: 무방향 그래프에서도 가능
+    content: |-
+      pr = nx.pagerank(G)
+      pr
+  - type: code
+    language: python
+    title: 상위 노드
+    description: PageRank 순위
+    content: |-
+      sortedPR = sorted(pr.items(), key=lambda x: x[1], reverse=True)
+      sortedPR
+  - type: code
+    language: python
+    title: 방향 그래프 PageRank
+    description: 웹 링크 모델
+    content: |-
+      web = nx.DiGraph()
+      web.add_edges_from([
+          ("Home", "About"), ("Home", "Products"),
+          ("About", "Home"), ("Products", "Home"),
+          ("Products", "Item1"), ("Products", "Item2"),
+          ("Item1", "Products"), ("Item2", "Products"),
+          ("Item2", "Item1")
+      ])
+      prWeb = nx.pagerank(web)
+      sorted(prWeb.items(), key=lambda x: x[1], reverse=True)
+  - type: tip
+    content: PageRank는 random surfer model 기반입니다. 임의의 웹서퍼가 각 페이지에 도달할 확률을 계산합니다.
+
+- id: step8_visualize_centrality
+  title: 8단계. 중심성 시각화
+  subtitle: 노드 크기/색상 매핑
+  blocks:
+  - type: text
+    content: 중심성 값을 노드의 크기나 색상에 매핑하면 결과를 직관적으로 파악할 수 있습니다. 노드 크기로 연결 중심성을 표현하면 허브가 크게 보이고, 색상 그라디언트로 매개 중심성을 표현하면 브릿지 노드가 강조됩니다. matplotlib의 컬러맵과 결합하여 다양한 시각화가 가능합니다.
+  - type: code
+    language: python
+    title: 연결 중심성 시각화
+    description: 크기로 표현
+    content: |-
+      nodeSizes = [3000 * degCent[n] for n in G.nodes()]
+
+      fig2, ax2 = plt.subplots(figsize=(8, 6))
+      nx.draw(G, pos=pos, with_labels=True, node_color='lightblue',
+              node_size=nodeSizes, font_size=10, ax=ax2)
+      ax2.set_title('Node Size by Degree Centrality')
+      fig2
+  - type: code
+    language: python
+    title: 매개 중심성 시각화
+    description: 색상으로 표현
+    content: |-
+      nodeColors = [betCent[n] for n in G.nodes()]
+
+      fig3, ax3 = plt.subplots(figsize=(8, 6))
+      nodes = nx.draw_networkx_nodes(G, pos=pos, node_color=nodeColors,
+                                      cmap=plt.cm.Reds, node_size=800, ax=ax3)
+      nx.draw_networkx_edges(G, pos=pos, ax=ax3)
+      nx.draw_networkx_labels(G, pos=pos, ax=ax3)
+      plt.colorbar(nodes, ax=ax3, label='Betweenness')
+      ax3.set_title('Betweenness Centrality')
+      fig3
+
+- id: step9_compare
+  title: 9단계. 중심성 비교
+  subtitle: 다양한 관점
+  blocks:
+  - type: text
+    content: 각 중심성 지표는 서로 다른 관점에서 '중요함'을 정의합니다. 연결 중심성은 직접적인 영향력, 매개 중심성은 정보 흐름 통제력, 근접 중심성은 접근성, 고유벡터 중심성은 연결의 질, PageRank는 추천받는 정도를 측정합니다. 같은 노드라도 중심성 종류에 따라 순위가 달라질 수 있으므로, 분석 목적에 맞는 지표를 선택하는 것이 중요합니다.
+  - type: code
+    language: python
+    title: 중심성 비교표
+    description: 모든 중심성 한눈에
+    content: |-
+      comparison = {}
+      for n in G.nodes():
+          comparison[n] = {
+              'degree': round(degCent[n], 3),
+              'betweenness': round(betCent[n], 3),
+              'closeness': round(closeCent[n], 3),
+              'eigenvector': round(eigCent[n], 3),
+              'pagerank': round(pr[n], 3)
+          }
+      comparison
+  - type: code
+    language: python
+    title: 각 중심성 1위
+    description: 어떤 노드가 1위인가
+    content: |-
+      topDeg = max(degCent, key=degCent.get)
+      topBet = max(betCent, key=betCent.get)
+      topClose = max(closeCent, key=closeCent.get)
+      topEig = max(eigCent, key=eigCent.get)
+      topPR = max(pr, key=pr.get)
+      topDeg, topBet, topClose, topEig, topPR
+  - type: tip
+    content: 연결 중심성 1위는 허브, 매개 중심성 1위는 브릿지, 근접 중심성 1위는 중앙에 위치한 노드입니다.
+
+- id: step10_influence
+  title: 10단계. 영향력 분석
+  subtitle: 실제 응용
+  blocks:
+  - type: text
+    content: 소셜 네트워크에서 영향력 있는 인플루언서를 찾는 실제 응용 예제입니다. 바이럴 마케팅에서는 연결 중심성이 높은 사람에게 제품을 홍보하면 많은 사람에게 직접 전달됩니다. 정보 확산 속도를 최대화하려면 근접 중심성이 높은 사람을, 서로 다른 커뮤니티에 메시지를 전파하려면 매개 중심성이 높은 사람을 타겟팅합니다.
+  - type: code
+    language: python
+    title: 소셜 네트워크
+    description: 인플루언서 찾기
+    content: |-
+      social = nx.Graph()
+      social.add_edges_from([
+          ("Influencer", "User1"), ("Influencer", "User2"),
+          ("Influencer", "User3"), ("Influencer", "User4"),
+          ("User1", "User5"), ("User1", "User6"),
+          ("User2", "User7"), ("User3", "User8"),
+          ("User4", "User9"), ("User4", "User10"),
+          ("User5", "User6"), ("User9", "User10")
+      ])
+      social.number_of_nodes(), social.number_of_edges()
+  - type: code
+    language: python
+    title: 영향력 측정
+    description: 중심성으로 인플루언서 확인
+    content: |-
+      socialDeg = nx.degree_centrality(social)
+      socialBet = nx.betweenness_centrality(social)
+
+      topInfluencer = max(socialDeg, key=socialDeg.get)
+      topBridge = max(socialBet, key=socialBet.get)
+      topInfluencer, topBridge
+  - type: code
+    language: python
+    title: 영향력 시각화
+    description: 인플루언서 강조
+    content: |-
+      posSocial = nx.spring_layout(social, seed=42)
+      socialSizes = [2000 * socialDeg[n] for n in social.nodes()]
+
+      fig4, ax4 = plt.subplots(figsize=(10, 8))
+      nx.draw(social, pos=posSocial, with_labels=True, node_size=socialSizes,
+              node_color='lightgreen', font_size=9, ax=ax4)
+      ax4.set_title('Social Network - Influencer Analysis')
+      fig4
+
+- id: practice
+  title: 실습
+  subtitle: 중심성 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 중심성 분석 기법을 활용하여 실전 미션을 수행해봅시다. 학교 친구 네트워크에서 인기 있는 학생과 그룹 간 연결자를 찾고, 웹 페이지에 PageRank를 적용하여 중요도 순위를 매겨봅니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 학교 친구 네트워크"
+    blocks:
+    - type: code
+      title: 학교 친구 네트워크 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        school = nx.Graph()
+        school.add_edges_from([
+            ("Kim", "Lee"), ("Kim", "Park"), ("Kim", "Choi"),
+            ("Lee", "Park"), ("Lee", "Jung"),
+            ("Park", "Choi"), ("Park", "Kang"),
+            ("Choi", "Kang"), ("Jung", "Kang"),
+            ("Kang", "Oh"), ("Oh", "Yoon")
+        ])
+        school.number_of_nodes(), school.number_of_edges()
+    - type: code
+      title: 인기학생과 연결자 찾기
+      content: |-
+        schoolDeg = nx.degree_centrality(school)
+        schoolBet = nx.betweenness_centrality(school)
+        schoolClose = nx.closeness_centrality(school)
+
+        topPopular = max(schoolDeg, key=schoolDeg.get)
+        topConnector = max(schoolBet, key=schoolBet.get)
+        topPopular, topConnector
+    - type: code
+      title: 친구 네트워크 시각화
+      content: |-
+        posSchool = nx.spring_layout(school, seed=42)
+        schoolSizes = [2500 * schoolDeg[n] for n in school.nodes()]
+
+        figSchool, axSchool = plt.subplots(figsize=(9, 7))
+        nx.draw(school, pos=posSchool, with_labels=True, node_size=schoolSizes,
+                node_color='lightyellow', font_size=10, ax=axSchool)
+        axSchool.set_title('School Friend Network')
+        figSchool
+  - type: expansion
+    title: "미션2: 웹 페이지 랭킹"
+    blocks:
+    - type: code
+      title: 웹 페이지 네트워크 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        webPages = nx.DiGraph()
+        webPages.add_edges_from([
+            ("Main", "News"), ("Main", "Shop"), ("Main", "Blog"),
+            ("News", "Main"), ("News", "Article1"), ("News", "Article2"),
+            ("Shop", "Main"), ("Shop", "Product1"), ("Shop", "Product2"),
+            ("Blog", "Main"), ("Blog", "Post1"),
+            ("Article1", "News"), ("Article2", "News"),
+            ("Product1", "Shop"), ("Product2", "Product1"),
+            ("Post1", "Blog"), ("Post1", "Shop")
+        ])
+        webPages.number_of_nodes(), webPages.number_of_edges()
+    - type: code
+      title: PageRank 계산
+      content: |-
+        webPR = nx.pagerank(webPages)
+        sortedWebPR = sorted(webPR.items(), key=lambda x: x[1], reverse=True)
+        sortedWebPR
+    - type: code
+      title: PageRank 시각화
+      content: |-
+        posWeb = nx.spring_layout(webPages, seed=42)
+        webSizes = [5000 * webPR[n] for n in webPages.nodes()]
+
+        figWeb, axWeb = plt.subplots(figsize=(10, 8))
+        nx.draw(webPages, pos=posWeb, with_labels=True, node_size=webSizes,
+                node_color='lightcoral', font_size=9, arrows=True, arrowsize=15, ax=axWeb)
+        axWeb.set_title('Web Page Ranking (PageRank)')
+        figWeb

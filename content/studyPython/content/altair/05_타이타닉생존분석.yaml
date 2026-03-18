@@ -1,0 +1,327 @@
+meta:
+  id: altair_05
+  title: 타이타닉생존분석
+  order: 5
+  category: altair
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["row", "column", "facet", "transform_filter", "titanic"]
+  seo:
+    title: "Altair 패싯 차트 - 타이타닉 생존 분석"
+    description: "Altair로 패싯 차트를 만들고 데이터를 필터링합니다. row/column, facet, transform_filter를 배웁니다."
+    keywords: ["altair facet", "row column", "transform_filter", "titanic"]
+
+intro:
+  emoji: "🚢"
+  goal: 타이타닉 승객 데이터를 패싯 차트로 분할하고 생존율을 분석합니다.
+  description: row/column 인코딩으로 차트를 분할하고, transform_filter로 데이터를 필터링합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: seaborn-data
+  blocks:
+  - type: text
+    content: |-
+      GitHub에서 titanic 데이터를 불러옵니다. 타이타닉호 승객 891명의 생존 여부와 정보가 담긴 데이터입니다.
+
+      survived(생존여부), pclass(객실등급), sex(성별), age(나이), fare(요금), embarked(승선항) 등 컬럼이 있습니다.
+  - type: code
+    language: python
+    title: titanic 데이터 불러오기
+    description: pandas로 CSV 로드
+    content: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+
+      titanicUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv"
+      titanic = pd.read_csv(titanicUrl)
+      titanic.head()
+
+- id: step2_basic_bar
+  title: 2단계. 기본 막대 차트
+  subtitle: 생존자 수 집계
+  blocks:
+  - type: text
+    content: |-
+      survived 컬럼은 0(사망)과 1(생존)로 구성됩니다.
+
+      생존 여부별 승객 수를 막대 차트로 표현합니다.
+  - type: code
+    language: python
+    title: 생존 여부별 집계
+    description: count()로 개수
+    content: |-
+      chartSurvived = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N',
+          y='count()',
+          color='survived:N'
+      )
+      chartSurvived
+  - type: tip
+    content: |-
+      survived:N에서 :N은 명목형입니다. 0, 1 숫자지만 범주로 취급합니다.
+
+- id: step3_row_encoding
+  title: 3단계. 행 분할
+  subtitle: row 인코딩
+  blocks:
+  - type: text
+    content: |-
+      row 인코딩으로 차트를 여러 행으로 분할합니다. encode() 괄호 안에 row='sex:N'을 추가하면 됩니다.
+
+      성별(sex)로 분할하면 남녀 생존율을 각각 따로 차트로 보여줍니다. 위아래로 두 개의 차트가 나열됩니다.
+
+      같은 차트를 여러 조건별로 나누어 보여주는 것을 "패싯(facet)"이라고 합니다.
+  - type: code
+    language: python
+    title: 성별로 행 분할
+    description: row='sex:N'
+    content: |-
+      chartRow = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N',
+          y='count()',
+          color='survived:N',
+          row='sex:N'
+      )
+      chartRow
+  - type: tip
+    content: |-
+      row는 "행"을 의미합니다. row='sex:N'은 성별 값(male, female)마다 행을 하나씩 만들어 차트를 위아래로 배치합니다.
+
+      column은 "열"을 의미하며, 차트를 좌우로 배치합니다. row와 column을 함께 사용하면 2차원 그리드를 만들 수 있습니다.
+
+- id: step4_column_encoding
+  title: 4단계. 열 분할
+  subtitle: column 인코딩
+  blocks:
+  - type: text
+    content: |-
+      column 인코딩으로 차트를 가로로 분할합니다.
+
+      객실 등급(pclass)으로 분할해봅니다.
+  - type: code
+    language: python
+    title: 등급별 열 분할
+    description: column='pclass:O'
+    content: |-
+      chartColumn = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N',
+          y='count()',
+          color='survived:N',
+          column='pclass:O'
+      )
+      chartColumn
+  - type: tip
+    content: |-
+      pclass는 1, 2, 3등급으로 순서가 있어 :O(순서형)를 사용합니다. 1등급 생존율이 가장 높습니다.
+
+- id: step5_row_column
+  title: 5단계. 행+열 분할
+  subtitle: 2차원 패싯
+  blocks:
+  - type: text
+    content: |-
+      row와 column을 함께 사용하면 2차원 그리드로 분할됩니다.
+
+      성별(row)과 등급(column)의 조합별 생존율을 비교합니다.
+  - type: code
+    language: python
+    title: 성별 x 등급 그리드
+    description: row + column 조합
+    content: |-
+      chartGrid = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N', y='count()', color='survived:N',
+          row='sex:N', column='pclass:O'
+      ).properties(width=120, height=100)
+      chartGrid
+
+- id: step6_transform_filter
+  title: 6단계. 데이터 필터링
+  subtitle: transform_filter
+  blocks:
+  - type: text
+    content: |-
+      transform_filter()로 특정 조건의 데이터만 시각화합니다. 필터는 "걸러낸다"는 의미로, 원하는 데이터만 선택합니다.
+
+      1등급 승객만 필터링해봅니다. encode() 뒤에 .transform_filter()를 연결합니다.
+
+      alt.datum.pclass == 1은 "pclass 컬럼 값이 1인 것만"이라는 조건입니다. alt.datum은 "각 데이터 행"을 의미하고, 점(.)으로 컬럼명을 연결합니다.
+
+      ==는 "같다"를 의미하는 비교 연산자입니다. =(할당)과 다릅니다.
+  - type: code
+    language: python
+    title: 1등급 필터
+    description: pclass == 1
+    content: |-
+      chartFilter = alt.Chart(titanic).mark_bar().encode(
+          x='sex:N',
+          y='count()',
+          color='survived:N'
+      ).transform_filter(
+          alt.datum.pclass == 1
+      ).properties(
+          title='1등급 승객 생존율'
+      )
+      chartFilter
+  - type: tip
+    content: |-
+      비교 연산자: == (같다), != (다르다), < (작다), > (크다), <= (작거나 같다), >= (크거나 같다)
+
+      논리 연산자: & (AND, 그리고), | (OR, 또는). 여러 조건을 결합할 때 사용합니다. 괄호로 각 조건을 감싸야 합니다.
+
+- id: step7_multi_filter
+  title: 7단계. 복합 필터
+  subtitle: 다중 조건
+  blocks:
+  - type: text
+    content: |-
+      여러 조건을 결합해 필터링할 수 있습니다. & 연산자로 "그리고" 조건을 만듭니다.
+
+      성인(age >= 18) 여성(sex == 'female') 승객만 필터링합니다. (조건1) & (조건2) 형태로 씁니다.
+
+      각 조건을 괄호로 감싸야 합니다. 괄호 없이 쓰면 에러가 발생합니다. 문자열(female)은 작은따옴표로 감쌉니다.
+  - type: code
+    language: python
+    title: 다중 조건 필터
+    description: age >= 18 AND sex == female
+    content: |-
+      chartMultiFilter = alt.Chart(titanic).mark_bar().encode(
+          x='pclass:O',
+          y='count()',
+          color='survived:N'
+      ).transform_filter(
+          (alt.datum.age >= 18) & (alt.datum.sex == 'female')
+      ).properties(
+          title='성인 여성 등급별 생존율'
+      )
+      chartMultiFilter
+
+- id: step8_facet
+  title: 8단계. facet 메서드
+  subtitle: 유연한 분할
+  blocks:
+  - type: text
+    content: |-
+      facet() 메서드는 row/column 인코딩보다 유연합니다. properties() 뒤에 .facet()을 연결합니다.
+
+      facet('embarked:N')은 승선 항구별로 차트를 나눕니다. columns=3은 한 줄에 3개씩 배치하라는 의미입니다.
+
+      row/column은 encode() 안에 쓰지만, facet()은 메서드로 마지막에 연결합니다. facet()이 더 유연하게 레이아웃을 조정할 수 있습니다.
+  - type: code
+    language: python
+    title: facet 사용
+    description: columns=3
+    content: |-
+      chartFacet = alt.Chart(titanic).mark_bar().encode(
+          x='survived:N', y='count()', color='survived:N'
+      ).properties(width=100, height=80).facet('embarked:N', columns=3)
+      chartFacet
+  - type: tip
+    content: |-
+      메서드 체이닝 순서: mark_bar() → encode() → properties() → facet() 순으로 연결합니다.
+
+      각 단계는 점(.)으로 연결되며, 순서를 바꾸면 에러가 발생할 수 있습니다.
+
+- id: step9_final
+  title: 9단계. 최종 결과물
+  subtitle: 타이타닉 생존 분석
+  blocks:
+  - type: text
+    content: |-
+      지금까지 배운 개념을 종합해 타이타닉 생존 분석 차트를 완성합니다.
+
+      성별, 등급별 생존율을 한눈에 비교합니다.
+  - type: code
+    language: python
+    title: 최종 생존 분석 차트
+    description: 프로젝트 완성!
+    content: |-
+      chartFinal = alt.Chart(titanic).mark_bar().encode(
+          x=alt.X('survived:N', title='생존 여부', axis=alt.Axis(labelExpr="datum.value == 1 ? '생존' : '사망'")),
+          y=alt.Y('count()', title='승객 수'),
+          color=alt.Color('survived:N', title='생존', legend=None),
+          row=alt.Row('sex:N', title='성별'), column=alt.Column('pclass:O', title='객실 등급')
+      ).properties(width=100, height=80)
+      chartFinal
+  - type: text
+    content: |-
+      여성과 1등급 승객의 생존율이 높습니다.
+
+      "여성과 어린이 먼저"라는 당시 관행이 데이터에 반영되어 있습니다.
+
+- id: practice
+  title: 실습
+  subtitle: 타이타닉 패싯 프로젝트
+  blocks:
+  - type: text
+    content: |-
+      이 프로젝트에서 배운 내용을 정리합니다. row와 column으로 차트를 행과 열로 분할했습니다. 2차원 그리드를 만들 수 있습니다.
+
+      transform_filter()로 조건에 맞는 데이터만 필터링했습니다. alt.datum.컬럼명으로 조건을 지정하고, ==, &, | 연산자를 사용합니다.
+
+      facet() 메서드로 유연하게 패싯 차트를 만들었습니다. columns로 레이아웃을 조정할 수 있습니다. 각 미션에서 이 개념들을 활용해봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 승선 항구별 평균 요금 (막대 차트)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        shipUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv"
+        ship = pd.read_csv(shipUrl)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        figPort = alt.Chart(ship).mark_bar().encode(
+            x='embarked:N',
+            y='mean(fare):Q',
+            color='embarked:N'
+        ).properties(
+            title='승선 항구별 평균 요금'
+        )
+        figPort
+  - type: expansion
+    title: "미션2: 생존자만 필터링, 등급별 나이 분포 (산점도)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        voyageUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/titanic.csv"
+        voyage = pd.read_csv(voyageUrl)
+    - type: code
+      title: "차트 생성"
+      content: |-
+        figAlive = alt.Chart(voyage).mark_circle(opacity=0.6).encode(
+            x='pclass:O',
+            y='age:Q',
+            color='sex:N'
+        ).transform_filter(
+            alt.datum.survived == 1
+        ).properties(
+            title='생존자 등급별 나이 분포'
+        )
+        figAlive
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair로 패싯 차트와 필터링을 마스터했습니다!
+  - type: list
+    items:
+    - "row='컬럼:N' - 행 방향으로 차트 분할"
+    - "column='컬럼:N' - 열 방향으로 차트 분할"
+    - "row + column - 2차원 그리드 분할"
+    - "transform_filter(alt.datum.컬럼 == 값) - 데이터 필터링"
+    - "&, | 연산자 - 다중 조건 결합"
+    - ".facet('컬럼:N', columns=n) - 유연한 패싯"
+  - type: text
+    content: 다음 프로젝트에서는 항공편 데이터로 히트맵과 박스플롯을 배웁니다.

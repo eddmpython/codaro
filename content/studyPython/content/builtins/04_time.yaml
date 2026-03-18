@@ -1,0 +1,483 @@
+meta:
+  id: "04_time"
+  title: "time - 시간 측정과 제어"
+  category: "builtins"
+  tags: ["time", "시간", "측정", "sleep", "performance"]
+  seo:
+    title: "파이썬 time 모듈 완전 정복"
+    description: "time 모듈로 시간 측정, 지연 처리, 성능 분석을 배웁니다."
+    keywords: ["time", "시간", "타임스탬프", "sleep", "성능측정", "파이썬시간"]
+
+intro:
+  emoji: "⏱️"
+  points:
+  - "시간 측정과 타임스탬프"
+  - "프로그램 지연과 대기"
+  - "성능 측정과 벤치마크"
+  - "시간대와 형식 변환"
+
+sections:
+- id: "module_import"
+  title: "time 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "time은 파이썬 표준 라이브러리입니다. 시간 측정과 제어를 담당하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 time 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "time 모듈 불러오기"
+    description: "time 모듈을 불러옵니다."
+    content: |-
+      import time
+
+      # 모듈 로드 확인
+      'time 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "basic_time"
+  title: "기본 시간 함수"
+  subtitle: "time(), sleep(), perf_counter()"
+  blocks:
+  - type: "text"
+    content: "time 모듈은 시간 측정과 제어를 담당합니다. time()은 1970년 1월 1일 이후의 초를 반환하고, sleep()은 프로그램을 일시 정지하며, perf_counter()는 고정밀 시간 측정에 사용됩니다. 성능 분석, 타이머, 주기적 작업에 필수적입니다."
+  - type: "list"
+    items:
+    - "time(): Unix 타임스탬프 (초)"
+    - "sleep(초): 프로그램 일시 정지"
+    - "perf_counter(): 고정밀 시간 측정"
+    - "monotonic(): 단조 증가 시계"
+  - type: "code"
+    language: "python"
+    title: "현재 타임스탬프"
+    description: "1970년 1월 1일부터 현재까지의 초를 가져옵니다."
+    content: |-
+      timestamp = time.time()
+      timestamp
+  - type: "code"
+    language: "python"
+    title: "프로그램 지연"
+    description: "2초 동안 프로그램을 일시 정지합니다."
+    content: |-
+      before = time.time()
+      time.sleep(2)
+      after = time.time()
+      elapsed = after - before
+      elapsed
+  - type: "code"
+    language: "python"
+    title: "정밀 시간 측정"
+    description: "고정밀 타이머로 작은 시간도 정확히 측정합니다."
+    content: |-
+      startTime = time.perf_counter()
+      total = sum(range(1000000))
+      stopTime = time.perf_counter()
+      duration = stopTime - startTime
+      duration
+  - type: "tip"
+    content: "perf_counter()는 sleep()과 시스템 시간 변경에 영향받지 않아 성능 측정에 이상적입니다."
+
+- id: "time_formats"
+  title: "시간 형식 변환"
+  subtitle: "struct_time과 포맷팅"
+  blocks:
+  - type: "text"
+    content: "타임스탬프를 읽기 쉬운 형식으로 변환할 수 있습니다. localtime()은 타임스탬프를 구조화된 시간으로 변환하고, strftime()은 원하는 형식의 문자열을 만듭니다. gmtime()은 UTC 시간을 반환합니다."
+  - type: "list"
+    items:
+    - "localtime(): 타임스탬프 → struct_time"
+    - "strftime(): struct_time → 문자열"
+    - "gmtime(): UTC 시간 구조체"
+    - "mktime(): struct_time → 타임스탬프"
+  - type: "code"
+    language: "python"
+    title: "타임스탬프 분해"
+    description: "타임스탬프를 년월일시분초로 분해합니다."
+    content: |-
+      current = time.time()
+      timeStruct = time.localtime(current)
+      timeStruct.tm_year, timeStruct.tm_mon, timeStruct.tm_mday
+  - type: "code"
+    language: "python"
+    title: "시간 포맷팅"
+    description: "현재 시간을 원하는 형식의 문자열로 변환합니다."
+    content: |-
+      currentTime = time.localtime()
+      formatted = time.strftime('%Y-%m-%d %H:%M:%S', currentTime)
+      formatted
+  - type: "code"
+    language: "python"
+    title: "UTC 시간"
+    description: "협정 세계시(UTC) 기준 시간을 가져옵니다."
+    content: |-
+      utcTime = time.gmtime()
+      utcString = time.strftime('%Y-%m-%d %H:%M:%S UTC', utcTime)
+      utcString
+  - type: "tip"
+    content: "로컬 시간과 UTC 시간의 차이는 time.timezone 변수로 확인할 수 있습니다."
+
+- id: "performance_measurement"
+  title: "성능 측정"
+  subtitle: "코드 실행 시간 분석"
+  blocks:
+  - type: "text"
+    content: "프로그램의 성능을 측정하려면 perf_counter()를 사용합니다. 시작 시점과 종료 시점의 차이로 실행 시간을 계산할 수 있습니다. 알고리즘 비교, 병목 지점 발견, 최적화 효과 검증에 활용됩니다."
+  - type: "list"
+    items:
+    - "perf_counter(): 가장 정확한 측정"
+    - "시작/종료 시점 차이 계산"
+    - "밀리초, 마이크로초 단위 측정"
+    - "여러 번 측정하여 평균 내기"
+  - type: "code"
+    language: "python"
+    title: "함수 실행 시간"
+    description: "특정 작업의 실행 시간을 측정합니다."
+    content: |-
+      start = time.perf_counter()
+      result = [i * i for i in range(10000)]
+      finish = time.perf_counter()
+      executionTime = finish - start
+      executionTime
+  - type: "code"
+    language: "python"
+    title: "밀리초 단위 측정"
+    description: "실행 시간을 밀리초로 변환합니다."
+    content: |-
+      beginning = time.perf_counter()
+      numbers = list(range(100000))
+      ending = time.perf_counter()
+      milliseconds = (ending - beginning) * 1000
+      milliseconds
+  - type: "code"
+    language: "python"
+    title: "평균 실행 시간"
+    description: "여러 번 측정하여 평균을 계산합니다."
+    content: |-
+      measurements = []
+      for _ in range(5):
+          startPoint = time.perf_counter()
+          items = sorted([3, 1, 4, 1, 5, 9, 2, 6])
+          endPoint = time.perf_counter()
+          measurements.append(endPoint - startPoint)
+      averageTime = sum(measurements) / len(measurements)
+      averageTime
+  - type: "tip"
+    content: "timeit 모듈은 더 정확한 벤치마크를 제공하지만 간단한 측정은 perf_counter()로 충분합니다."
+
+- id: "timing_control"
+  title: "시간 제어와 대기"
+  subtitle: "sleep과 주기적 실행"
+  blocks:
+  - type: "text"
+    content: "sleep()은 지정된 시간만큼 프로그램을 일시 정지합니다. 초 단위로 지정하며 소수점으로 밀리초 단위도 가능합니다. API 호출 간격 조절, 폴링, 애니메이션 프레임 제어에 사용됩니다."
+  - type: "list"
+    items:
+    - "sleep(초): 정수 또는 실수"
+    - "0.001초 = 1밀리초"
+    - "주기적 작업 구현"
+    - "CPU 사용량 감소"
+  - type: "code"
+    language: "python"
+    title: "초 단위 대기"
+    description: "1초 대기 후 메시지를 반환합니다."
+    content: |-
+      time.sleep(1)
+      'Done'
+  - type: "code"
+    language: "python"
+    title: "밀리초 대기"
+    description: "100밀리초(0.1초) 동안 대기합니다."
+    content: |-
+      time.sleep(0.1)
+      'Completed'
+  - type: "code"
+    language: "python"
+    title: "반복 대기"
+    description: "여러 번 짧은 대기를 반복합니다."
+    content: |-
+      iterations = 3
+      for i in range(iterations):
+          time.sleep(0.5)
+      iterations
+  - type: "tip"
+    content: "정확한 주기를 원한다면 sleep 후 시간 오차를 보정해야 합니다."
+
+- id: "clock_types"
+  title: "다양한 시계"
+  subtitle: "monotonic, process_time"
+  blocks:
+  - type: "text"
+    content: "Python은 여러 종류의 시계를 제공합니다. monotonic()은 항상 증가하는 시간, process_time()은 CPU 사용 시간, thread_time()은 스레드별 시간을 측정합니다. 각 시계는 특정 목적에 최적화되어 있습니다."
+  - type: "list"
+    items:
+    - "monotonic(): 단조 증가, 시스템 시간 무관"
+    - "process_time(): CPU 사용 시간만"
+    - "perf_counter(): 가장 정밀한 측정"
+    - "time(): 실제 벽시계 시간"
+  - type: "code"
+    language: "python"
+    title: "단조 시계"
+    description: "시스템 시간 변경에 영향받지 않는 시계입니다."
+    content: |-
+      tick = time.monotonic()
+      time.sleep(1)
+      tock = time.monotonic()
+      interval = tock - tick
+      interval
+  - type: "code"
+    language: "python"
+    title: "CPU 시간"
+    description: "실제 CPU 사용 시간만 측정합니다."
+    content: |-
+      cpuStart = time.process_time()
+      calculation = sum(i * i for i in range(1000000))
+      cpuEnd = time.process_time()
+      cpuUsed = cpuEnd - cpuStart
+      cpuUsed
+  - type: "code"
+    language: "python"
+    title: "시계 비교"
+    description: "다양한 시계의 해상도를 비교합니다."
+    content: |-
+      perfResolution = time.get_clock_info('perf_counter').resolution
+      timeResolution = time.get_clock_info('time').resolution
+      perfResolution, timeResolution
+  - type: "tip"
+    content: "sleep()은 process_time()에 포함되지 않습니다. CPU를 실제로 사용한 시간만 측정합니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "시간 측정 실무 패턴"
+  blocks:
+  - type: "text"
+    content: "실무에서 자주 사용하는 시간 측정 패턴을 살펴봅니다. 타임아웃 구현, 진행률 표시, 재시도 로직, 성능 프로파일링 등 실생활 문제를 time 모듈로 해결할 수 있습니다."
+  - type: "list"
+    items:
+    - "타임아웃 체크"
+    - "재시도 간격 제어"
+    - "성능 비교 테스트"
+    - "타임스탬프 로깅"
+  - type: "code"
+    language: "python"
+    title: "타임아웃 구현"
+    description: "제한 시간 내에 작업을 완료했는지 확인합니다."
+    content: |-
+      limitSeconds = 3
+      deadline = time.time() + limitSeconds
+      finished = True if time.time() < deadline else False
+      if finished:
+          time.sleep(0.5)
+      finished
+  - type: "code"
+    language: "python"
+    title: "재시도 로직"
+    description: "실패 시 일정 간격으로 재시도합니다."
+    content: |-
+      maxRetries = 3
+      for retry in range(maxRetries):
+          time.sleep(0.5 * retry)
+      maxRetries
+  - type: "code"
+    language: "python"
+    title: "성능 비교"
+    description: "두 방식의 실행 속도를 비교합니다."
+    content: |-
+      first1 = time.perf_counter()
+      method1 = [x for x in range(10000)]
+      time1 = time.perf_counter() - first1
+
+      first2 = time.perf_counter()
+      method2 = list(range(10000))
+      time2 = time.perf_counter() - first2
+
+      time1, time2
+  - type: "tip"
+    content: "로그 파일에는 time.strftime()으로 읽기 쉬운 형식의 타임스탬프를 기록하세요."
+
+- id: "practice"
+  title: "time 모듈 종합 복습"
+  subtitle: "시간 측정 마스터하기"
+  blocks:
+  - type: "text"
+    content: "time 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 현재 타임스탬프"
+    code: |-
+      currentTimestamp = time.time()
+      currentTimestamp
+
+  - type: "expansion"
+    title: "🟢 기본2: 1초 대기"
+    code: |-
+      time.sleep(1)
+      'Finished'
+
+  - type: "expansion"
+    title: "🟢 기본3: 시간 포맷팅"
+    code: |-
+      nowStruct = time.localtime()
+      timeString = time.strftime('%H:%M:%S', nowStruct)
+      timeString
+
+  - type: "expansion"
+    title: "🟢 기본4: 년월일 추출"
+    code: |-
+      structTime = time.localtime()
+      year = structTime.tm_year
+      month = structTime.tm_mon
+      year, month
+
+  - type: "expansion"
+    title: "🟢 기본5: 실행 시간 측정"
+    code: |-
+      start1 = time.perf_counter()
+      nums = list(range(1000))
+      start2 = time.perf_counter()
+      timeElapsed = start2 - start1
+      timeElapsed
+
+  - type: "expansion"
+    title: "🟡 응용1: 밀리초 변환"
+    code: |-
+      startMs = time.perf_counter()
+      values = [i * 2 for i in range(5000)]
+      endMs = time.perf_counter()
+      msElapsed = (endMs - startMs) * 1000
+      msElapsed
+
+  - type: "expansion"
+    title: "🟡 응용2: UTC 시간 문자열"
+    code: |-
+      utcNow = time.gmtime()
+      utcFormatted = time.strftime('%Y-%m-%d %H:%M:%S', utcNow)
+      utcFormatted
+
+  - type: "expansion"
+    title: "🟡 응용3: 타임스탬프 차이"
+    code: |-
+      timestamp1 = time.time()
+      time.sleep(0.5)
+      timestamp2 = time.time()
+      diff = timestamp2 - timestamp1
+      diff
+
+  - type: "expansion"
+    title: "🟡 응용4: CPU 시간 측정"
+    code: |-
+      cpuBefore = time.process_time()
+      compute = sum(x * x for x in range(100000))
+      cpuAfter = time.process_time()
+      cpuTime = cpuAfter - cpuBefore
+      cpuTime
+
+  - type: "expansion"
+    title: "🟡 응용5: 요일 확인"
+    code: |-
+      localTime = time.localtime()
+      weekdayNum = localTime.tm_wday
+      daysOfWeek = ['월', '화', '수', '목', '금', '토', '일']
+      daysOfWeek[weekdayNum]
+
+  - type: "expansion"
+    title: "🔴 심화1: 타이머 구현"
+    code: |-
+      seconds = 3
+      startTimer = time.time()
+      while time.time() - startTimer < seconds:
+          pass
+      'Timer ended'
+
+  - type: "expansion"
+    title: "🔴 심화2: 성능 벤치마크"
+    code: |-
+      cycles = 10
+      times = []
+      for _ in range(cycles):
+          begin = time.perf_counter()
+          data = sorted([5, 2, 8, 1, 9])
+          end = time.perf_counter()
+          times.append(end - begin)
+      avgDuration = sum(times) / len(times)
+      avgDuration
+
+  - type: "expansion"
+    title: "🔴 심화3: 타임아웃 체크"
+    code: |-
+      timeout = 2
+      expiry = time.time() + timeout
+      hasTime = time.time() < expiry
+      if hasTime:
+          time.sleep(0.3)
+      hasTime
+
+  - type: "expansion"
+    title: "🔴 심화4: 재시도 간격 증가"
+    code: |-
+      retries = []
+      for attempt in range(4):
+          waitTime = 0.2 * (2 ** attempt)
+          time.sleep(waitTime)
+          retries.append(waitTime)
+      retries
+
+  - type: "expansion"
+    title: "🔴 심화5: 타임스탬프 변환"
+    code: |-
+      ts = 1704067200
+      converted = time.localtime(ts)
+      readable = time.strftime('%Y-%m-%d %H:%M:%S', converted)
+      readable
+
+  - type: "expansion"
+    title: "🔴 심화6: 일주일 후 타임스탬프"
+    code: |-
+      now = time.time()
+      oneWeek = 7 * 24 * 60 * 60
+      future = now + oneWeek
+      futureTime = time.localtime(future)
+      time.strftime('%Y-%m-%d', futureTime)
+
+  - type: "expansion"
+    title: "🔴 심화7: 시간대 오프셋"
+    code: |-
+      offset = -time.timezone
+      offsetHours = offset / 3600
+      offsetHours
+
+  - type: "expansion"
+    title: "🔴 심화8: 반복 작업 스케줄"
+    code: |-
+      intervalSec = 0.3
+      totalTime = 1
+      endTime = time.time() + totalTime
+      runs = 0
+      while time.time() < endTime:
+          runs += 1
+          time.sleep(intervalSec)
+      runs
+
+  - type: "expansion"
+    title: "🔴 심화9: 성능 비교 - 리스트 vs 제너레이터"
+    code: |-
+      t1 = time.perf_counter()
+      listComp = sum([x for x in range(100000)])
+      listTime = time.perf_counter() - t1
+
+      t2 = time.perf_counter()
+      genExp = sum(x for x in range(100000))
+      genTime = time.perf_counter() - t2
+
+      listTime, genTime
+
+  - type: "expansion"
+    title: "🔴 심화10: 로그 타임스탬프 생성"
+    code: |-
+      def getLogTimestamp():
+          localNow = time.localtime()
+          return time.strftime('[%Y-%m-%d %H:%M:%S]', localNow)
+
+      logEntry = getLogTimestamp()
+      logEntry

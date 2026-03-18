@@ -1,0 +1,667 @@
+meta:
+  title: "argparse - 명령줄 인자 파싱"
+  description: "명령줄 인터페이스를 위한 argparse 모듈"
+  keywords: ["argparse", "CLI", "명령줄", "argument", "parser"]
+
+intro:
+  emoji: "🖥️"
+  points:
+  - "명령줄 인자 파싱"
+  - "타입 변환과 검증"
+  - "도움말 자동 생성"
+  - "서브커맨드 지원"
+
+sections:
+- id: "module_import"
+  title: "모듈 임포트"
+  subtitle: "argparse 시작하기"
+  blocks:
+  - type: "text"
+    content: "argparse는 파이썬 표준 라이브러리입니다. 명령줄 인터페이스를 쉽게 만들 수 있습니다."
+  - type: "list"
+    items:
+    - "ArgumentParser: 파서 객체 생성"
+    - "add_argument(): 인자 추가"
+    - "parse_args(): 인자 파싱"
+    - "자동 도움말 생성"
+  - type: "code"
+    language: "python"
+    title: "기본 임포트"
+    description: "argparse 모듈 임포트 및 기본 사용법"
+    content: |-
+      import argparse
+
+      parser = argparse.ArgumentParser(description='간단한 파서')
+      parser.add_argument('name', help='이름 입력')
+
+      args = parser.parse_args(['홍길동'])
+      args.name
+  - type: "note"
+    content: "Marimo/Pyodide 환경에서는 parse_args()에 직접 인자 리스트를 전달합니다. 실제 CLI 프로그램에서는 sys.argv에서 자동으로 읽어옵니다."
+
+- id: "positional_args"
+  title: "위치 인자"
+  subtitle: "필수 인자 정의"
+  blocks:
+  - type: "text"
+    content: "위치 인자는 순서대로 입력되어야 하는 필수 인자입니다."
+  - type: "list"
+    items:
+    - "순서대로 입력"
+    - "필수 인자"
+    - "type으로 타입 지정"
+    - "help로 설명 추가"
+  - type: "code"
+    language: "python"
+    title: "단일 위치 인자"
+    description: "하나의 위치 인자 받기"
+    content: |-
+      import argparse
+
+      simpleParser = argparse.ArgumentParser()
+      simpleParser.add_argument('filename', help='파일명')
+
+      simpleArgs = simpleParser.parse_args(['data.txt'])
+      simpleArgs.filename
+  - type: "code"
+    language: "python"
+    title: "여러 위치 인자"
+    description: "여러 개의 위치 인자"
+    content: |-
+      import argparse
+
+      multiParser = argparse.ArgumentParser()
+      multiParser.add_argument('source', help='원본 파일')
+      multiParser.add_argument('dest', help='대상 파일')
+
+      multiArgs = multiParser.parse_args(['input.txt', 'output.txt'])
+      multiArgs.source, multiArgs.dest
+  - type: "code"
+    language: "python"
+    title: "타입 변환"
+    description: "자동 타입 변환"
+    content: |-
+      import argparse
+
+      typeParser = argparse.ArgumentParser()
+      typeParser.add_argument('count', type=int, help='개수')
+      typeParser.add_argument('ratio', type=float, help='비율')
+
+      typeArgs = typeParser.parse_args(['10', '3.14'])
+      typeArgs.count, typeArgs.ratio
+  - type: "tip"
+    content: "type 파라미터로 int, float, str 등을 지정하면 자동으로 타입 변환을 수행하고, 변환 실패 시 에러 메시지를 출력합니다."
+
+- id: "optional_args"
+  title: "옵션 인자"
+  subtitle: "선택적 플래그와 옵션"
+  blocks:
+  - type: "text"
+    content: "옵션 인자는 --나 -로 시작하는 선택적 인자입니다."
+  - type: "list"
+    items:
+    - "--long-name: 긴 옵션명"
+    - "-s: 짧은 옵션명"
+    - "default: 기본값 설정"
+    - "action: 동작 방식 지정"
+  - type: "code"
+    language: "python"
+    title: "기본 옵션"
+    description: "옵션 인자와 기본값"
+    content: |-
+      import argparse
+
+      optParser = argparse.ArgumentParser()
+      optParser.add_argument('--verbose', '-v', action='store_true', help='상세 출력')
+      optParser.add_argument('--output', '-o', default='result.txt', help='출력 파일')
+
+      optArgs = optParser.parse_args(['-v', '--output', 'custom.txt'])
+      optArgs.verbose, optArgs.output
+  - type: "code"
+    language: "python"
+    title: "숫자 옵션"
+    description: "타입 지정과 기본값"
+    content: |-
+      import argparse
+
+      numParser = argparse.ArgumentParser()
+      numParser.add_argument('--port', type=int, default=8080, help='포트 번호')
+      numParser.add_argument('--timeout', type=float, default=30.0, help='타임아웃(초)')
+
+      numArgs = numParser.parse_args(['--port', '3000'])
+      numArgs.port, numArgs.timeout
+  - type: "code"
+    language: "python"
+    title: "action 타입"
+    description: "다양한 action 활용"
+    content: |-
+      import argparse
+
+      actionParser = argparse.ArgumentParser()
+      actionParser.add_argument('--debug', action='store_true')
+      actionParser.add_argument('--quiet', action='store_false')
+      actionParser.add_argument('--count', action='count', default=0)
+
+      actionArgs = actionParser.parse_args(['--debug', '--count', '--count'])
+      actionArgs.debug, actionArgs.quiet, actionArgs.count
+  - type: "tip"
+    content: "store_true는 플래그가 있으면 True, store_false는 False, count는 플래그 개수를 세어줍니다."
+
+- id: "choices_validation"
+  title: "선택과 검증"
+  subtitle: "입력값 제한과 검증"
+  blocks:
+  - type: "text"
+    content: "choices로 허용된 값만 입력받고, 커스텀 함수로 검증할 수 있습니다."
+  - type: "list"
+    items:
+    - "choices: 허용된 값 목록"
+    - "type=함수: 커스텀 검증"
+    - "nargs: 인자 개수 지정"
+    - "required: 필수 옵션 지정"
+  - type: "code"
+    language: "python"
+    title: "choices 사용"
+    description: "허용된 값만 입력"
+    content: |-
+      import argparse
+
+      choiceParser = argparse.ArgumentParser()
+      choiceParser.add_argument('--format', choices=['json', 'xml', 'csv'], default='json')
+      choiceParser.add_argument('--level', choices=[1, 2, 3], type=int, default=1)
+
+      choiceArgs = choiceParser.parse_args(['--format', 'xml', '--level', '2'])
+      choiceArgs.format, choiceArgs.level
+  - type: "code"
+    language: "python"
+    title: "nargs 사용"
+    description: "여러 값 받기"
+    content: |-
+      import argparse
+
+      nargsParser = argparse.ArgumentParser()
+      nargsParser.add_argument('--files', nargs='+', help='파일 목록')
+      nargsParser.add_argument('--coords', nargs=2, type=float, help='좌표 (x, y)')
+
+      nargsArgs = nargsParser.parse_args(['--files', 'a.txt', 'b.txt', '--coords', '10.5', '20.3'])
+      nargsArgs.files, nargsArgs.coords
+  - type: "code"
+    language: "python"
+    title: "커스텀 검증"
+    description: "검증 함수 정의"
+    content: |-
+      import argparse
+
+      def positiveInt(value):
+          intValue = int(value)
+          if intValue <= 0:
+              raise argparse.ArgumentTypeError(f"{value}는 양수여야 합니다")
+          return intValue
+
+      validParser = argparse.ArgumentParser()
+      validParser.add_argument('--workers', type=positiveInt, default=1)
+
+      validArgs = validParser.parse_args(['--workers', '4'])
+      validArgs.workers
+  - type: "tip"
+    content: "nargs='+'는 1개 이상, '*'는 0개 이상, '?'는 0개 또는 1개, 숫자는 정확한 개수를 의미합니다."
+
+- id: "subparsers"
+  title: "서브커맨드"
+  subtitle: "git-style 명령어"
+  blocks:
+  - type: "text"
+    content: "add_subparsers()로 git add, git commit 같은 서브커맨드를 만들 수 있습니다."
+  - type: "list"
+    items:
+    - "add_subparsers(): 서브파서 생성"
+    - "add_parser(): 서브커맨드 추가"
+    - "각 서브커맨드마다 독립적 인자"
+    - "dest로 선택된 커맨드 확인"
+  - type: "code"
+    language: "python"
+    title: "기본 서브커맨드"
+    description: "두 개의 서브커맨드"
+    content: |-
+      import argparse
+
+      mainParser = argparse.ArgumentParser()
+      subparsers = mainParser.add_subparsers(dest='command')
+
+      addParser = subparsers.add_parser('add', help='파일 추가')
+      addParser.add_argument('files', nargs='+')
+
+      removeParser = subparsers.add_parser('remove', help='파일 제거')
+      removeParser.add_argument('files', nargs='+')
+
+      cmdArgs = mainParser.parse_args(['add', 'file1.txt', 'file2.txt'])
+      cmdArgs.command, cmdArgs.files
+  - type: "code"
+    language: "python"
+    title: "서브커맨드별 옵션"
+    description: "각 커맨드의 독립적 옵션"
+    content: |-
+      import argparse
+
+      toolParser = argparse.ArgumentParser()
+      toolSubs = toolParser.add_subparsers(dest='action')
+
+      createSub = toolSubs.add_parser('create')
+      createSub.add_argument('name')
+      createSub.add_argument('--template', default='basic')
+
+      deleteSub = toolSubs.add_parser('delete')
+      deleteSub.add_argument('name')
+      deleteSub.add_argument('--force', action='store_true')
+
+      toolArgs = toolParser.parse_args(['create', 'myproject', '--template', 'advanced'])
+      toolArgs.action, toolArgs.name, toolArgs.template
+  - type: "tip"
+    content: "서브커맨드는 복잡한 CLI 도구를 체계적으로 구성하는데 유용합니다. git, docker 등이 이 패턴을 사용합니다."
+
+- id: "advanced_features"
+  title: "고급 기능"
+  subtitle: "그룹, 상호배타, 커스터마이징"
+  blocks:
+  - type: "text"
+    content: "인자 그룹, 상호배타 그룹, 커스텀 도움말 등 고급 기능을 활용할 수 있습니다."
+  - type: "list"
+    items:
+    - "add_argument_group(): 인자 그룹화"
+    - "add_mutually_exclusive_group(): 상호배타 그룹"
+    - "formatter_class: 도움말 포맷"
+    - "epilog: 하단 설명 추가"
+  - type: "code"
+    language: "python"
+    title: "상호배타 그룹"
+    description: "둘 중 하나만 선택"
+    content: |-
+      import argparse
+
+      exclusiveParser = argparse.ArgumentParser()
+      group = exclusiveParser.add_mutually_exclusive_group()
+      group.add_argument('--json', action='store_true')
+      group.add_argument('--xml', action='store_true')
+
+      exclusiveArgs = exclusiveParser.parse_args(['--json'])
+      exclusiveArgs.json, exclusiveArgs.xml
+  - type: "code"
+    language: "python"
+    title: "인자 그룹"
+    description: "관련 인자 그룹화"
+    content: |-
+      import argparse
+
+      groupParser = argparse.ArgumentParser()
+
+      inputGroup = groupParser.add_argument_group('입력 옵션')
+      inputGroup.add_argument('--input', '-i', required=True)
+      inputGroup.add_argument('--format', choices=['json', 'csv'])
+
+      outputGroup = groupParser.add_argument_group('출력 옵션')
+      outputGroup.add_argument('--output', '-o', required=True)
+      outputGroup.add_argument('--compress', action='store_true')
+
+      groupArgs = groupParser.parse_args(['-i', 'data.json', '-o', 'result.txt'])
+      groupArgs.input, groupArgs.output
+  - type: "code"
+    language: "python"
+    title: "커스텀 도움말"
+    description: "설명과 에필로그 추가"
+    content: |-
+      import argparse
+
+      helpParser = argparse.ArgumentParser(
+          description='데이터 처리 도구',
+          epilog='자세한 정보: https://example.com'
+      )
+      helpParser.add_argument('file', help='처리할 파일')
+      helpParser.add_argument('--verbose', '-v', action='store_true', help='상세 출력')
+
+      helpArgs = helpParser.parse_args(['data.txt', '-v'])
+      helpArgs.file, helpArgs.verbose
+  - type: "tip"
+    content: "add_mutually_exclusive_group()은 --json과 --xml처럼 동시에 사용할 수 없는 옵션을 정의할 때 유용합니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "실무 CLI 도구"
+  blocks:
+  - type: "text"
+    content: "실제 CLI 프로그램에서 자주 사용되는 패턴들입니다."
+  - type: "code"
+    language: "python"
+    title: "파일 처리 도구"
+    description: "파일 변환 CLI"
+    content: |-
+      import argparse
+
+      converterParser = argparse.ArgumentParser(description='파일 변환 도구')
+      converterParser.add_argument('input_file', help='입력 파일')
+      converterParser.add_argument('output_file', help='출력 파일')
+      converterParser.add_argument('--format', choices=['json', 'csv', 'xml'], default='json')
+      converterParser.add_argument('--encoding', default='utf-8')
+
+      converterArgs = converterParser.parse_args(['input.txt', 'output.json', '--format', 'json'])
+      {
+          'input': converterArgs.input_file,
+          'output': converterArgs.output_file,
+          'format': converterArgs.format,
+          'encoding': converterArgs.encoding
+      }
+  - type: "code"
+    language: "python"
+    title: "서버 시작 도구"
+    description: "서버 설정 CLI"
+    content: |-
+      import argparse
+
+      serverParser = argparse.ArgumentParser(description='웹 서버')
+      serverParser.add_argument('--host', default='localhost', help='호스트 주소')
+      serverParser.add_argument('--port', type=int, default=8080, help='포트 번호')
+      serverParser.add_argument('--workers', type=int, default=4, help='워커 수')
+      serverParser.add_argument('--debug', action='store_true', help='디버그 모드')
+
+      serverArgs = serverParser.parse_args(['--host', '0.0.0.0', '--port', '3000', '--debug'])
+      {
+          'host': serverArgs.host,
+          'port': serverArgs.port,
+          'workers': serverArgs.workers,
+          'debug': serverArgs.debug
+      }
+  - type: "code"
+    language: "python"
+    title: "데이터베이스 마이그레이션"
+    description: "서브커맨드 활용"
+    content: |-
+      import argparse
+
+      dbParser = argparse.ArgumentParser(description='DB 마이그레이션')
+      dbSubs = dbParser.add_subparsers(dest='command')
+
+      migrateSub = dbSubs.add_parser('migrate', help='마이그레이션 실행')
+      migrateSub.add_argument('--target', help='대상 버전')
+
+      rollbackSub = dbSubs.add_parser('rollback', help='롤백')
+      rollbackSub.add_argument('--steps', type=int, default=1)
+
+      statusSub = dbSubs.add_parser('status', help='상태 확인')
+
+      dbArgs = dbParser.parse_args(['migrate', '--target', 'v2.0'])
+      {'command': dbArgs.command, 'target': dbArgs.target}
+  - type: "tip"
+    content: "실제 CLI 프로그램에서는 parse_args()에 인자를 전달하지 않으면 sys.argv에서 자동으로 읽어옵니다."
+
+- id: "practice"
+  title: "종합 복습"
+  blocks:
+  - type: "expansion"
+    title: "🟢 기본1: 단순 파서"
+    code: |-
+      import argparse
+
+      parser1 = argparse.ArgumentParser()
+      parser1.add_argument('username')
+
+      args1 = parser1.parse_args(['alice'])
+      args1.username
+  - type: "expansion"
+    title: "🟢 기본2: 타입 지정"
+    code: |-
+      import argparse
+
+      parser2 = argparse.ArgumentParser()
+      parser2.add_argument('age', type=int)
+
+      args2 = parser2.parse_args(['25'])
+      args2.age
+  - type: "expansion"
+    title: "🟢 기본3: 기본값 있는 옵션"
+    code: |-
+      import argparse
+
+      parser3 = argparse.ArgumentParser()
+      parser3.add_argument('--name', default='Guest')
+
+      args3 = parser3.parse_args([])
+      args3.name
+  - type: "expansion"
+    title: "🟢 기본4: 불린 플래그"
+    code: |-
+      import argparse
+
+      parser4 = argparse.ArgumentParser()
+      parser4.add_argument('--verbose', action='store_true')
+
+      args4 = parser4.parse_args(['--verbose'])
+      args4.verbose
+  - type: "expansion"
+    title: "🟢 기본5: 두 개의 위치 인자"
+    code: |-
+      import argparse
+
+      parser5 = argparse.ArgumentParser()
+      parser5.add_argument('first')
+      parser5.add_argument('second')
+
+      args5 = parser5.parse_args(['hello', 'world'])
+      args5.first, args5.second
+  - type: "expansion"
+    title: "🟡 응용1: choices 제약"
+    code: |-
+      import argparse
+
+      parser6 = argparse.ArgumentParser()
+      parser6.add_argument('--color', choices=['red', 'green', 'blue'])
+
+      args6 = parser6.parse_args(['--color', 'red'])
+      args6.color
+  - type: "expansion"
+    title: "🟡 응용2: nargs로 리스트"
+    code: |-
+      import argparse
+
+      parser7 = argparse.ArgumentParser()
+      parser7.add_argument('--tags', nargs='+')
+
+      args7 = parser7.parse_args(['--tags', 'python', 'coding', 'tutorial'])
+      args7.tags
+  - type: "expansion"
+    title: "🟡 응용3: 짧은/긴 옵션"
+    code: |-
+      import argparse
+
+      parser8 = argparse.ArgumentParser()
+      parser8.add_argument('--output', '-o', default='out.txt')
+
+      args8 = parser8.parse_args(['-o', 'result.txt'])
+      args8.output
+  - type: "expansion"
+    title: "🟡 응용4: count action"
+    code: |-
+      import argparse
+
+      parser9 = argparse.ArgumentParser()
+      parser9.add_argument('-v', '--verbose', action='count', default=0)
+
+      args9 = parser9.parse_args(['-vvv'])
+      args9.verbose
+  - type: "expansion"
+    title: "🟡 응용5: 여러 타입 조합"
+    code: |-
+      import argparse
+
+      parser10 = argparse.ArgumentParser()
+      parser10.add_argument('file')
+      parser10.add_argument('--lines', type=int, default=10)
+      parser10.add_argument('--reverse', action='store_true')
+
+      args10 = parser10.parse_args(['data.txt', '--lines', '20', '--reverse'])
+      args10.file, args10.lines, args10.reverse
+  - type: "expansion"
+    title: "🔴 심화1: 서브커맨드 기본"
+    code: |-
+      import argparse
+
+      parser11 = argparse.ArgumentParser()
+      subs11 = parser11.add_subparsers(dest='cmd')
+
+      start = subs11.add_parser('start')
+      stop = subs11.add_parser('stop')
+
+      args11 = parser11.parse_args(['start'])
+      args11.cmd
+  - type: "expansion"
+    title: "🔴 심화2: 서브커맨드와 인자"
+    code: |-
+      import argparse
+
+      parser12 = argparse.ArgumentParser()
+      subs12 = parser12.add_subparsers(dest='action')
+
+      add = subs12.add_parser('add')
+      add.add_argument('item')
+
+      remove = subs12.add_parser('remove')
+      remove.add_argument('item')
+
+      args12 = parser12.parse_args(['add', 'task1'])
+      args12.action, args12.item
+  - type: "expansion"
+    title: "🔴 심화3: 상호배타 그룹"
+    code: |-
+      import argparse
+
+      parser13 = argparse.ArgumentParser()
+      group13 = parser13.add_mutually_exclusive_group()
+      group13.add_argument('--create', action='store_true')
+      group13.add_argument('--delete', action='store_true')
+
+      args13 = parser13.parse_args(['--create'])
+      args13.create, args13.delete
+  - type: "expansion"
+    title: "🔴 심화4: 커스텀 타입 검증"
+    code: |-
+      import argparse
+
+      def evenNumber(val):
+          num = int(val)
+          if num % 2 != 0:
+              raise argparse.ArgumentTypeError(f'{val}은 짝수가 아닙니다')
+          return num
+
+      parser14 = argparse.ArgumentParser()
+      parser14.add_argument('--even', type=evenNumber)
+
+      args14 = parser14.parse_args(['--even', '4'])
+      args14.even
+  - type: "expansion"
+    title: "🔴 심화5: nargs 정확한 개수"
+    code: |-
+      import argparse
+
+      parser15 = argparse.ArgumentParser()
+      parser15.add_argument('--point', nargs=2, type=float)
+
+      args15 = parser15.parse_args(['--point', '10.5', '20.3'])
+      args15.point
+  - type: "expansion"
+    title: "🔴 심화6: required 옵션"
+    code: |-
+      import argparse
+
+      parser16 = argparse.ArgumentParser()
+      parser16.add_argument('--config', required=True)
+
+      args16 = parser16.parse_args(['--config', 'settings.json'])
+      args16.config
+  - type: "expansion"
+    title: "🔴 심화7: 복합 서버 설정"
+    code: |-
+      import argparse
+
+      parser17 = argparse.ArgumentParser(description='서버 설정')
+      parser17.add_argument('--host', default='localhost')
+      parser17.add_argument('--port', type=int, default=8080)
+      parser17.add_argument('--ssl', action='store_true')
+      parser17.add_argument('--workers', type=int, default=4)
+
+      args17 = parser17.parse_args(['--host', '0.0.0.0', '--port', '443', '--ssl'])
+      {
+          'host': args17.host,
+          'port': args17.port,
+          'ssl': args17.ssl,
+          'workers': args17.workers
+      }
+  - type: "expansion"
+    title: "🔴 심화8: 파일 처리 CLI"
+    code: |-
+      import argparse
+
+      parser18 = argparse.ArgumentParser()
+      parser18.add_argument('input_file')
+      parser18.add_argument('output_file')
+      parser18.add_argument('--encoding', default='utf-8')
+      parser18.add_argument('--overwrite', action='store_true')
+
+      args18 = parser18.parse_args(['in.txt', 'out.txt', '--overwrite'])
+      {
+          'input': args18.input_file,
+          'output': args18.output_file,
+          'encoding': args18.encoding,
+          'overwrite': args18.overwrite
+      }
+  - type: "expansion"
+    title: "🔴 심화9: 다중 서브커맨드"
+    code: |-
+      import argparse
+
+      parser19 = argparse.ArgumentParser()
+      subs19 = parser19.add_subparsers(dest='cmd')
+
+      init = subs19.add_parser('init')
+      init.add_argument('--name', required=True)
+
+      build = subs19.add_parser('build')
+      build.add_argument('--release', action='store_true')
+
+      deploy = subs19.add_parser('deploy')
+      deploy.add_argument('--env', choices=['dev', 'prod'])
+
+      args19 = parser19.parse_args(['build', '--release'])
+      {'command': args19.cmd, 'release': args19.release}
+  - type: "expansion"
+    title: "🔴 심화10: 전체 활용 - 데이터 처리 도구"
+    code: |-
+      import argparse
+
+      parser20 = argparse.ArgumentParser(description='데이터 처리 도구')
+
+      parser20.add_argument('source', help='원본 파일')
+      parser20.add_argument('--output', '-o', required=True, help='출력 파일')
+      parser20.add_argument('--format', choices=['json', 'csv', 'xml'], default='json')
+
+      formatGroup = parser20.add_mutually_exclusive_group()
+      formatGroup.add_argument('--pretty', action='store_true')
+      formatGroup.add_argument('--compact', action='store_true')
+
+      parser20.add_argument('--filter', nargs='+', help='필터링 키워드')
+      parser20.add_argument('--limit', type=int, help='결과 개수 제한')
+
+      args20 = parser20.parse_args([
+          'data.txt',
+          '-o', 'result.json',
+          '--format', 'json',
+          '--pretty',
+          '--filter', 'active', 'verified',
+          '--limit', '100'
+      ])
+
+      {
+          'source': args20.source,
+          'output': args20.output,
+          'format': args20.format,
+          'pretty': args20.pretty,
+          'filter': args20.filter,
+          'limit': args20.limit
+      }

@@ -1,0 +1,753 @@
+meta:
+  title: "logging - 로깅"
+  description: "애플리케이션 로그 기록을 위한 logging 모듈"
+  keywords: ["logging", "로그", "logger", "debug", "handler"]
+
+intro:
+  emoji: "📝"
+  points:
+  - "로그 레벨 관리"
+  - "파일/콘솔 출력"
+  - "포맷 커스터마이징"
+  - "구조화된 로깅"
+
+sections:
+- id: "module_import"
+  title: "모듈 임포트"
+  subtitle: "logging 시작하기"
+  blocks:
+  - type: "text"
+    content: "logging은 파이썬 표준 라이브러리입니다. 애플리케이션의 실행 기록을 체계적으로 관리할 수 있습니다."
+  - type: "list"
+    items:
+    - "debug(), info(), warning(), error(), critical()"
+    - "Logger: 로거 객체"
+    - "Handler: 출력 대상 설정"
+    - "Formatter: 출력 형식 지정"
+  - type: "code"
+    language: "python"
+    title: "기본 임포트"
+    description: "logging 모듈 임포트 및 기본 사용법"
+    content: |-
+      import logging
+
+      logging.warning('경고 메시지')
+      logging.error('에러 발생')
+
+      "Logged messages"
+  - type: "note"
+    content: "기본 로그 레벨은 WARNING입니다. DEBUG와 INFO는 출력되지 않으므로 basicConfig()로 레벨을 설정해야 합니다."
+
+- id: "log_levels"
+  title: "로그 레벨"
+  subtitle: "심각도 단계"
+  blocks:
+  - type: "text"
+    content: "로그는 5가지 심각도 레벨로 구분됩니다. 레벨을 설정하여 출력할 로그를 필터링할 수 있습니다."
+  - type: "list"
+    items:
+    - "DEBUG(10): 디버깅 정보"
+    - "INFO(20): 일반 정보"
+    - "WARNING(30): 경고 (기본)"
+    - "ERROR(40): 에러"
+    - "CRITICAL(50): 치명적 에러"
+  - type: "code"
+    language: "python"
+    title: "모든 레벨 사용"
+    description: "5가지 로그 레벨"
+    content: |-
+      import logging
+
+      logging.basicConfig(level=logging.DEBUG)
+
+      logging.debug('디버그 메시지')
+      logging.info('정보 메시지')
+      logging.warning('경고 메시지')
+      logging.error('에러 메시지')
+      logging.critical('치명적 에러')
+
+      "All levels logged"
+  - type: "code"
+    language: "python"
+    title: "레벨 필터링"
+    description: "WARNING 이상만 출력"
+    content: |-
+      import logging
+
+      logging.basicConfig(level=logging.WARNING)
+
+      logging.debug('보이지 않음')
+      logging.info('보이지 않음')
+      logging.warning('보임')
+      logging.error('보임')
+
+      "Only WARNING and above"
+  - type: "code"
+    language: "python"
+    title: "레벨 확인"
+    description: "현재 레벨 조회"
+    content: |-
+      import logging
+
+      logger = logging.getLogger()
+      currentLevel = logger.level
+
+      levelName = logging.getLevelName(currentLevel)
+      levelName
+  - type: "tip"
+    content: "개발 시에는 DEBUG, 운영 환경에서는 INFO나 WARNING 레벨을 사용하는 것이 일반적입니다."
+
+- id: "formatters"
+  title: "포맷터"
+  subtitle: "로그 형식 지정"
+  blocks:
+  - type: "text"
+    content: "Formatter로 로그 메시지의 출력 형식을 자유롭게 설정할 수 있습니다."
+  - type: "list"
+    items:
+    - "%(asctime)s: 시간"
+    - "%(levelname)s: 레벨명"
+    - "%(message)s: 메시지"
+    - "%(name)s: 로거 이름"
+  - type: "code"
+    language: "python"
+    title: "기본 포맷"
+    description: "시간과 레벨 포함"
+    content: |-
+      import logging
+
+      logging.basicConfig(
+          level=logging.INFO,
+          format='%(asctime)s - %(levelname)s - %(message)s',
+          datefmt='%Y-%m-%d %H:%M:%S'
+      )
+
+      logging.info('포맷된 로그')
+
+      "Formatted log"
+  - type: "code"
+    language: "python"
+    title: "상세 포맷"
+    description: "파일명과 줄번호 포함"
+    content: |-
+      import logging
+
+      detailedFormat = '%(asctime)s [%(levelname)s] %(name)s:%(lineno)d - %(message)s'
+
+      logging.basicConfig(
+          level=logging.DEBUG,
+          format=detailedFormat
+      )
+
+      logging.debug('상세 로그')
+
+      "Detailed format"
+  - type: "code"
+    language: "python"
+    title: "커스텀 포맷"
+    description: "원하는 형식으로"
+    content: |-
+      import logging
+
+      customFormat = '[%(levelname)s] %(message)s'
+
+      logging.basicConfig(
+          level=logging.INFO,
+          format=customFormat
+      )
+
+      logging.info('간단한 포맷')
+      logging.warning('경고 포맷')
+
+      "Custom format"
+  - type: "tip"
+    content: "datefmt으로 시간 형식을 지정할 수 있습니다. strftime 형식을 사용합니다."
+
+- id: "handlers"
+  title: "핸들러"
+  subtitle: "출력 대상 설정"
+  blocks:
+  - type: "text"
+    content: "Handler로 로그를 파일, 콘솔, 네트워크 등 다양한 대상으로 출력할 수 있습니다."
+  - type: "list"
+    items:
+    - "StreamHandler: 콘솔 출력"
+    - "FileHandler: 파일 출력"
+    - "RotatingFileHandler: 크기 기반 로테이션"
+    - "TimedRotatingFileHandler: 시간 기반 로테이션"
+  - type: "code"
+    language: "python"
+    title: "콘솔 핸들러"
+    description: "StreamHandler 사용"
+    content: |-
+      import logging
+
+      consoleLogger = logging.getLogger('console')
+      consoleLogger.setLevel(logging.INFO)
+
+      handler = logging.StreamHandler()
+      handler.setLevel(logging.INFO)
+
+      formatter = logging.Formatter('%(levelname)s: %(message)s')
+      handler.setFormatter(formatter)
+
+      consoleLogger.addHandler(handler)
+
+      consoleLogger.info('콘솔 출력')
+
+      "Console handler configured"
+  - type: "code"
+    language: "python"
+    title: "여러 핸들러"
+    description: "콘솔과 파일 동시 출력"
+    content: |-
+      import logging
+
+      multiLogger = logging.getLogger('multi')
+      multiLogger.setLevel(logging.DEBUG)
+
+      consoleH = logging.StreamHandler()
+      consoleH.setLevel(logging.INFO)
+      consoleH.setFormatter(logging.Formatter('CONSOLE: %(message)s'))
+
+      multiLogger.addHandler(consoleH)
+
+      multiLogger.info('여러 핸들러 테스트')
+
+      "Multiple handlers"
+  - type: "code"
+    language: "python"
+    title: "레벨별 핸들러"
+    description: "에러는 별도 처리"
+    content: |-
+      import logging
+
+      levelLogger = logging.getLogger('levels')
+      levelLogger.setLevel(logging.DEBUG)
+
+      infoHandler = logging.StreamHandler()
+      infoHandler.setLevel(logging.INFO)
+      infoHandler.setFormatter(logging.Formatter('INFO: %(message)s'))
+
+      errorHandler = logging.StreamHandler()
+      errorHandler.setLevel(logging.ERROR)
+      errorHandler.setFormatter(logging.Formatter('ERROR: %(message)s'))
+
+      levelLogger.addHandler(infoHandler)
+      levelLogger.addHandler(errorHandler)
+
+      levelLogger.info('일반 정보')
+      levelLogger.error('에러 발생')
+
+      "Level-based handlers"
+  - type: "tip"
+    content: "여러 핸들러를 추가하면 동일한 로그를 여러 대상으로 출력할 수 있습니다. 예: 콘솔 + 파일 + 네트워크"
+
+- id: "loggers"
+  title: "로거 계층"
+  subtitle: "모듈별 로거 관리"
+  blocks:
+  - type: "text"
+    content: "getLogger()로 이름별 로거를 생성하여 모듈이나 기능별로 로그를 분리 관리할 수 있습니다."
+  - type: "list"
+    items:
+    - "getLogger(name): 로거 생성/조회"
+    - "점(.)으로 계층 구조"
+    - "부모 로거로 전파"
+    - "propagate=False로 전파 차단"
+  - type: "code"
+    language: "python"
+    title: "이름 있는 로거"
+    description: "모듈별 로거"
+    content: |-
+      import logging
+
+      appLogger = logging.getLogger('app')
+      appLogger.setLevel(logging.INFO)
+
+      handler1 = logging.StreamHandler()
+      handler1.setFormatter(logging.Formatter('APP: %(message)s'))
+      appLogger.addHandler(handler1)
+
+      appLogger.info('애플리케이션 로그')
+
+      "Named logger"
+  - type: "code"
+    language: "python"
+    title: "계층 구조"
+    description: "부모-자식 로거"
+    content: |-
+      import logging
+
+      parentLogger = logging.getLogger('parent')
+      parentLogger.setLevel(logging.INFO)
+
+      childLogger = logging.getLogger('parent.child')
+      childLogger.setLevel(logging.DEBUG)
+
+      handler2 = logging.StreamHandler()
+      handler2.setFormatter(logging.Formatter('%(name)s: %(message)s'))
+      parentLogger.addHandler(handler2)
+
+      childLogger.info('자식 로거')
+
+      "Hierarchical loggers"
+  - type: "code"
+    language: "python"
+    title: "전파 차단"
+    description: "propagate 설정"
+    content: |-
+      import logging
+
+      isolatedLogger = logging.getLogger('isolated')
+      isolatedLogger.setLevel(logging.INFO)
+      isolatedLogger.propagate = False
+
+      handler3 = logging.StreamHandler()
+      handler3.setFormatter(logging.Formatter('ISOLATED: %(message)s'))
+      isolatedLogger.addHandler(handler3)
+
+      isolatedLogger.info('전파 차단 로그')
+
+      "Propagation disabled"
+  - type: "tip"
+    content: "로거 이름은 보통 __name__을 사용하여 모듈명을 자동으로 설정합니다: logging.getLogger(__name__)"
+
+- id: "advanced_patterns"
+  title: "고급 패턴"
+  subtitle: "실전 로깅 기법"
+  blocks:
+  - type: "text"
+    content: "실무에서 자주 사용되는 로깅 패턴과 기법들입니다."
+  - type: "list"
+    items:
+    - "extra: 추가 컨텍스트 정보"
+    - "exc_info: 예외 정보 자동 기록"
+    - "Filter: 커스텀 필터링"
+    - "dictConfig: 설정 기반 로깅"
+  - type: "code"
+    language: "python"
+    title: "예외 로깅"
+    description: "스택 트레이스 포함"
+    content: |-
+      import logging
+
+      exceptionLogger = logging.getLogger('exception')
+      exceptionLogger.setLevel(logging.ERROR)
+
+      handler4 = logging.StreamHandler()
+      handler4.setFormatter(logging.Formatter('%(levelname)s: %(message)s'))
+      exceptionLogger.addHandler(handler4)
+
+      try:
+          result = 10 / 0
+      except ZeroDivisionError:
+          exceptionLogger.error('나누기 에러', exc_info=True)
+
+      "Exception logged"
+  - type: "code"
+    language: "python"
+    title: "컨텍스트 정보"
+    description: "extra로 추가 정보"
+    content: |-
+      import logging
+
+      contextLogger = logging.getLogger('context')
+      contextLogger.setLevel(logging.INFO)
+
+      handler5 = logging.StreamHandler()
+      handler5.setFormatter(logging.Formatter('%(user)s - %(message)s'))
+      contextLogger.addHandler(handler5)
+
+      contextLogger.info('사용자 활동', extra={'user': 'alice'})
+
+      "Context logging"
+  - type: "code"
+    language: "python"
+    title: "조건부 로깅"
+    description: "isEnabledFor 사용"
+    content: |-
+      import logging
+
+      conditionalLogger = logging.getLogger('conditional')
+      conditionalLogger.setLevel(logging.WARNING)
+
+      if conditionalLogger.isEnabledFor(logging.DEBUG):
+          conditionalLogger.debug('디버그 활성화')
+      else:
+          message = 'DEBUG 비활성화'
+
+      message
+  - type: "tip"
+    content: "exc_info=True를 사용하면 예외의 전체 스택 트레이스가 자동으로 로그에 기록됩니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "실무 로깅 시나리오"
+  blocks:
+  - type: "text"
+    content: "실제 애플리케이션에서 사용되는 로깅 패턴들입니다."
+  - type: "code"
+    language: "python"
+    title: "API 요청 로깅"
+    description: "요청/응답 기록"
+    content: |-
+      import logging
+
+      apiLogger = logging.getLogger('api')
+      apiLogger.setLevel(logging.INFO)
+
+      handler6 = logging.StreamHandler()
+      handler6.setFormatter(logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s'))
+      apiLogger.addHandler(handler6)
+
+      def apiCall(endpoint, method='GET'):
+          apiLogger.info(f'{method} {endpoint}')
+          apiLogger.debug(f'Headers: {{"Authorization": "Bearer xxx"}}')
+          return {'status': 200}
+
+      response = apiCall('/users', 'GET')
+      response
+  - type: "code"
+    language: "python"
+    title: "성능 로깅"
+    description: "실행 시간 측정"
+    content: |-
+      import logging
+      import time
+
+      perfLogger = logging.getLogger('perf')
+      perfLogger.setLevel(logging.INFO)
+
+      handler7 = logging.StreamHandler()
+      handler7.setFormatter(logging.Formatter('%(message)s'))
+      perfLogger.addHandler(handler7)
+
+      def slowOperation():
+          start = time.time()
+          time.sleep(0.01)
+          elapsed = time.time() - start
+          perfLogger.info(f'Operation took {elapsed:.4f}s')
+          return 'Done'
+
+      result = slowOperation()
+      result
+  - type: "code"
+    language: "python"
+    title: "구조화된 로깅"
+    description: "JSON 형식 로그"
+    content: |-
+      import logging
+      import json
+
+      structuredLogger = logging.getLogger('structured')
+      structuredLogger.setLevel(logging.INFO)
+
+      class JsonFormatter(logging.Formatter):
+          def format(self, record):
+              logData = {
+                  'timestamp': self.formatTime(record),
+                  'level': record.levelname,
+                  'message': record.getMessage()
+              }
+              return json.dumps(logData)
+
+      handler8 = logging.StreamHandler()
+      handler8.setFormatter(JsonFormatter())
+      structuredLogger.addHandler(handler8)
+
+      structuredLogger.info('구조화된 로그')
+
+      "Structured logging"
+  - type: "tip"
+    content: "구조화된 로그(JSON)는 로그 분석 도구에서 파싱하기 쉽고, 검색과 집계가 용이합니다."
+
+- id: "practice"
+  title: "종합 복습"
+  blocks:
+  - type: "expansion"
+    title: "🟢 기본1: 경고 로그"
+    code: |-
+      import logging
+
+      logging.warning('기본 경고')
+
+      "Warning logged"
+  - type: "expansion"
+    title: "🟢 기본2: 에러 로그"
+    code: |-
+      import logging
+
+      logging.error('에러 발생')
+
+      "Error logged"
+  - type: "expansion"
+    title: "🟢 기본3: 레벨 설정"
+    code: |-
+      import logging
+
+      logging.basicConfig(level=logging.DEBUG)
+      logging.debug('디버그 메시지')
+
+      "Debug enabled"
+  - type: "expansion"
+    title: "🟢 기본4: 정보 로그"
+    code: |-
+      import logging
+
+      logging.basicConfig(level=logging.INFO)
+      logging.info('정보 메시지')
+
+      "Info logged"
+  - type: "expansion"
+    title: "🟢 기본5: 치명적 로그"
+    code: |-
+      import logging
+
+      logging.critical('치명적 에러')
+
+      "Critical logged"
+  - type: "expansion"
+    title: "🟡 응용1: 포맷 지정"
+    code: |-
+      import logging
+
+      logging.basicConfig(
+          level=logging.INFO,
+          format='%(levelname)s - %(message)s'
+      )
+
+      logging.info('포맷 테스트')
+
+      "Format applied"
+  - type: "expansion"
+    title: "🟡 응용2: 시간 포함"
+    code: |-
+      import logging
+
+      logging.basicConfig(
+          level=logging.INFO,
+          format='%(asctime)s %(message)s',
+          datefmt='%H:%M:%S'
+      )
+
+      logging.info('시간 포함')
+
+      "Timestamp added"
+  - type: "expansion"
+    title: "🟡 응용3: 이름 있는 로거"
+    code: |-
+      import logging
+
+      myLogger = logging.getLogger('myapp')
+      myLogger.setLevel(logging.INFO)
+
+      h = logging.StreamHandler()
+      h.setFormatter(logging.Formatter('%(name)s: %(message)s'))
+      myLogger.addHandler(h)
+
+      myLogger.info('앱 로그')
+
+      "Named logger"
+  - type: "expansion"
+    title: "🟡 응용4: 변수 포함"
+    code: |-
+      import logging
+
+      userName = 'Alice'
+      userAge = 25
+
+      logging.warning(f'사용자 {userName}, 나이 {userAge}')
+
+      "Variables logged"
+  - type: "expansion"
+    title: "🟡 응용5: 레벨 확인"
+    code: |-
+      import logging
+
+      checkLogger = logging.getLogger('check')
+      checkLogger.setLevel(logging.WARNING)
+
+      isDebug = checkLogger.isEnabledFor(logging.DEBUG)
+      isWarning = checkLogger.isEnabledFor(logging.WARNING)
+
+      isDebug, isWarning
+  - type: "expansion"
+    title: "🔴 심화1: 예외 로깅"
+    code: |-
+      import logging
+
+      logging.basicConfig(level=logging.ERROR)
+
+      try:
+          value = 1 / 0
+      except ZeroDivisionError:
+          logging.error('Division error', exc_info=True)
+
+      "Exception logged"
+  - type: "expansion"
+    title: "🔴 심화2: 계층 로거"
+    code: |-
+      import logging
+
+      rootLog = logging.getLogger('app')
+      childLog = logging.getLogger('app.module')
+
+      rootLog.setLevel(logging.INFO)
+
+      h1 = logging.StreamHandler()
+      h1.setFormatter(logging.Formatter('%(name)s: %(message)s'))
+      rootLog.addHandler(h1)
+
+      childLog.info('모듈 로그')
+
+      "Hierarchical logging"
+  - type: "expansion"
+    title: "🔴 심화3: 전파 차단"
+    code: |-
+      import logging
+
+      noPropagate = logging.getLogger('isolated')
+      noPropagate.setLevel(logging.INFO)
+      noPropagate.propagate = False
+
+      h2 = logging.StreamHandler()
+      h2.setFormatter(logging.Formatter('ISOLATED: %(message)s'))
+      noPropagate.addHandler(h2)
+
+      noPropagate.info('전파 안됨')
+
+      "Propagation disabled"
+  - type: "expansion"
+    title: "🔴 심화4: 컨텍스트 정보"
+    code: |-
+      import logging
+
+      ctxLogger = logging.getLogger('context')
+      ctxLogger.setLevel(logging.INFO)
+
+      h3 = logging.StreamHandler()
+      h3.setFormatter(logging.Formatter('%(user)s: %(message)s'))
+      ctxLogger.addHandler(h3)
+
+      ctxLogger.info('로그인', extra={'user': 'bob'})
+
+      "Context added"
+  - type: "expansion"
+    title: "🔴 심화5: 여러 레벨"
+    code: |-
+      import logging
+
+      logging.basicConfig(level=logging.DEBUG)
+
+      logging.debug('디버그')
+      logging.info('정보')
+      logging.warning('경고')
+      logging.error('에러')
+
+      "All levels"
+  - type: "expansion"
+    title: "🔴 심화6: 커스텀 포맷"
+    code: |-
+      import logging
+
+      logging.basicConfig(
+          level=logging.INFO,
+          format='[%(levelname)s] %(asctime)s - %(message)s',
+          datefmt='%Y-%m-%d %H:%M:%S'
+      )
+
+      logging.info('커스텀 포맷')
+
+      "Custom format"
+  - type: "expansion"
+    title: "🔴 심화7: 함수 로깅"
+    code: |-
+      import logging
+
+      funcLogger = logging.getLogger('func')
+      funcLogger.setLevel(logging.INFO)
+
+      h4 = logging.StreamHandler()
+      h4.setFormatter(logging.Formatter('%(funcName)s: %(message)s'))
+      funcLogger.addHandler(h4)
+
+      def processData():
+          funcLogger.info('데이터 처리 중')
+          return 'Done'
+
+      result1 = processData()
+      result1
+  - type: "expansion"
+    title: "🔴 심화8: 조건부 로깅"
+    code: |-
+      import logging
+
+      condLogger = logging.getLogger('cond')
+      condLogger.setLevel(logging.WARNING)
+
+      def logIfEnabled():
+          if condLogger.isEnabledFor(logging.INFO):
+              return 'INFO enabled'
+          else:
+              return 'INFO disabled'
+
+      status = logIfEnabled()
+      status
+  - type: "expansion"
+    title: "🔴 심화9: 성능 측정 로깅"
+    code: |-
+      import logging
+      import time
+
+      perfLog = logging.getLogger('perf')
+      perfLog.setLevel(logging.INFO)
+
+      h5 = logging.StreamHandler()
+      h5.setFormatter(logging.Formatter('%(message)s'))
+      perfLog.addHandler(h5)
+
+      start = time.time()
+      time.sleep(0.01)
+      elapsed = time.time() - start
+
+      perfLog.info(f'Elapsed: {elapsed:.4f}s')
+
+      "Performance logged"
+  - type: "expansion"
+    title: "🔴 심화10: 전체 활용 - 애플리케이션 로거"
+    code: |-
+      import logging
+      import time
+
+      appLog = logging.getLogger('application')
+      appLog.setLevel(logging.DEBUG)
+
+      consoleHandler = logging.StreamHandler()
+      consoleHandler.setLevel(logging.INFO)
+      consoleHandler.setFormatter(
+          logging.Formatter('[%(asctime)s] %(levelname)s: %(message)s',
+                          datefmt='%H:%M:%S')
+      )
+
+      appLog.addHandler(consoleHandler)
+
+      def processRequest(userId, action):
+          appLog.info(f'User {userId} - {action}')
+
+          start = time.time()
+          time.sleep(0.01)
+          elapsed = time.time() - start
+
+          appLog.debug(f'Processing time: {elapsed:.4f}s')
+
+          try:
+              if action == 'error':
+                  raise ValueError('Test error')
+              return {'status': 'success', 'user': userId}
+          except ValueError as e:
+              appLog.error(f'Error for user {userId}', exc_info=True)
+              return {'status': 'error', 'user': userId}
+
+      result2 = processRequest('user123', 'login')
+      result2

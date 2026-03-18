@@ -1,0 +1,1109 @@
+meta:
+  id: "23"
+  title: "함수형 패턴"
+  day: 23
+  category: "advancedPython"
+  tags: ["functional", "currying", "monad", "composition", "pure-function"]
+  seo:
+    title: "파이썬 함수형 패턴 - 커링, 합성, 모나드"
+    description: "순수 함수, 고차 함수, 커링, 함수 합성, 모나드 패턴을 학습합니다."
+    keywords: ["함수형", "currying", "monad", "composition", "pure function"]
+
+intro:
+  emoji: "🔗"
+  points:
+  - "순수 함수와 불변성으로 부작용 최소화"
+  - "고차 함수와 클로저로 함수 팩토리 생성"
+  - "커링과 부분 적용으로 함수 재사용성 향상"
+  - "함수 합성과 파이프라인으로 데이터 변환"
+
+sections:
+- id: "pure_function"
+  title: "순수 함수와 불변성"
+  subtitle: "부작용 없는 함수"
+  blocks:
+  - type: "text"
+    content: "순수 함수는 동일한 입력에 항상 동일한 출력을 반환하고 외부 상태를 변경하지 않습니다. 불변성은 데이터를 변경하지 않고 새로운 데이터를 생성합니다. 순수 함수는 테스트가 쉽고 병렬 처리에 안전합니다. 디버깅이 쉽고 예측 가능한 코드를 작성할 수 있습니다. 파이썬에서는 deepcopy를 활용하여 불변성을 구현합니다."
+  - type: "list"
+    items:
+    - "동일 입력 → 동일 출력"
+    - "외부 상태 변경 없음"
+    - "테스트 용이"
+    - "병렬 처리 안전"
+  - type: "code"
+    language: "python"
+    title: "순수 함수 예제"
+    description: "부작용 없는 순수 함수를 구현합니다."
+    content: |-
+      def pureAdd(a, b):
+          return a + b
+
+      def pureMultiply(nums, factor):
+          return [n * factor for n in nums]
+
+      def pureFilter(nums, predicate):
+          return [n for n in nums if predicate(n)]
+
+      addResult = pureAdd(3, 5)
+      mulResult = pureMultiply([1, 2, 3], 2)
+      filterResult = pureFilter([1, 2, 3, 4, 5], lambda x: x % 2 == 0)
+      pureResults = (addResult, mulResult, filterResult)
+      pureResults
+  - type: "code"
+    language: "python"
+    title: "불변성 유지"
+    description: "원본 데이터를 변경하지 않고 새 객체를 생성합니다."
+    content: |-
+      from copy import deepcopy
+
+      def immutableUpdate(data, key, value):
+          newData = deepcopy(data)
+          newData[key] = value
+          return newData
+
+      def immutableAppend(lst, item):
+          return lst + [item]
+
+      def immutableRemove(lst, item):
+          return [x for x in lst if x != item]
+
+      original = {"name": "Alice", "age": 30}
+      updated = immutableUpdate(original, "age", 31)
+      originalList = [1, 2, 3]
+      appendedList = immutableAppend(originalList, 4)
+      removedList = immutableRemove(originalList, 2)
+      immutableResults = (original["age"], updated["age"], originalList, appendedList, removedList)
+      immutableResults
+  - type: "tip"
+    content: "불변성을 유지하면 버그를 줄이고 상태 추적이 쉬워집니다."
+
+- id: "higher_order"
+  title: "고차 함수"
+  subtitle: "함수를 다루는 함수"
+  blocks:
+  - type: "text"
+    content: "고차 함수는 함수를 인자로 받거나 함수를 반환하는 함수입니다. map, filter, reduce가 대표적인 고차 함수입니다. 함수 합성과 파이프라인을 구성할 수 있습니다. 클로저를 활용하여 함수 팩토리를 만들 수 있습니다. 코드 재사용성과 추상화 수준을 높입니다."
+  - type: "code"
+    language: "python"
+    title: "함수 합성"
+    description: "여러 함수를 조합하여 새로운 함수를 만듭니다."
+    content: |-
+      def applyTwice(fn, x):
+          return fn(fn(x))
+
+      def compose(f, g):
+          return lambda x: f(g(x))
+
+      def pipe(*functions):
+          def piped(value):
+              result = value
+              for fn in functions:
+                  result = fn(result)
+              return result
+          return piped
+
+      double = lambda x: x * 2
+      addOne = lambda x: x + 1
+
+      twiceResult = applyTwice(double, 3)
+      composed = compose(double, addOne)
+      composeResult = composed(5)
+      piped = pipe(addOne, double, addOne)
+      pipeResult = piped(3)
+      higherOrderResults = (twiceResult, composeResult, pipeResult)
+      higherOrderResults
+  - type: "code"
+    language: "python"
+    title: "함수 팩토리"
+    description: "클로저를 활용하여 함수를 생성합니다."
+    content: |-
+      def createMultiplier(factor):
+          def multiplier(x):
+              return x * factor
+          return multiplier
+
+      def createValidator(minVal, maxVal):
+          def validator(x):
+              return minVal <= x <= maxVal
+          return validator
+
+      def createFormatter(template):
+          def formatter(**kwargs):
+              return template.format(**kwargs)
+          return formatter
+
+      times3 = createMultiplier(3)
+      times5 = createMultiplier(5)
+      isValid = createValidator(0, 100)
+      greet = createFormatter("Hello, {name}!")
+
+      mul3Result = times3(4)
+      mul5Result = times5(4)
+      validResult = (isValid(50), isValid(150))
+      greetResult = greet(name="World")
+      closureResults = (mul3Result, mul5Result, validResult, greetResult)
+      closureResults
+
+- id: "currying"
+  title: "커링과 부분 적용"
+  subtitle: "함수 인자 분리"
+  blocks:
+  - type: "text"
+    content: "커링은 여러 인자를 받는 함수를 단일 인자 함수들의 체인으로 변환합니다. 부분 적용은 일부 인자를 미리 고정한 새 함수를 만듭니다. functools.partial로 쉽게 부분 적용을 구현합니다. 함수 재사용성을 높이고 특화된 함수를 쉽게 생성합니다. 함수형 프로그래밍의 핵심 기법입니다."
+  - type: "code"
+    language: "python"
+    title: "커링 구현"
+    description: "다중 인자 함수를 단일 인자 함수 체인으로 변환합니다."
+    content: |-
+      def curry2(fn):
+          def curried(a):
+              def inner(b):
+                  return fn(a, b)
+              return inner
+          return curried
+
+      def curry3(fn):
+          def curried(a):
+              def inner1(b):
+                  def inner2(c):
+                      return fn(a, b, c)
+                  return inner2
+              return inner1
+          return curried
+
+      @curry2
+      def addTwo(a, b):
+          return a + b
+
+      @curry3
+      def addThree(a, b, c):
+          return a + b + c
+
+      add5 = addTwo(5)
+      curryResult1 = add5(3)
+      curryResult2 = addThree(1)(2)(3)
+      curryResults = (curryResult1, curryResult2)
+      curryResults
+  - type: "code"
+    language: "python"
+    title: "부분 적용"
+    description: "functools.partial로 인자를 미리 고정합니다."
+    content: |-
+      from functools import partial
+
+      def greetPerson(greeting, name, punctuation):
+          return f"{greeting}, {name}{punctuation}"
+
+      sayHello = partial(greetPerson, "Hello")
+      sayHelloExcited = partial(sayHello, punctuation="!")
+      sayHelloCalm = partial(sayHello, punctuation=".")
+
+      partialResult1 = sayHelloExcited("Alice")
+      partialResult2 = sayHelloCalm("Bob")
+
+      def powerOf(base, exp):
+          return base ** exp
+
+      square = partial(powerOf, exp=2)
+      cube = partial(powerOf, exp=3)
+      squareResult = square(4)
+      cubeResult = cube(3)
+      partialResults = (partialResult1, partialResult2, squareResult, cubeResult)
+      partialResults
+
+- id: "composition"
+  title: "함수 합성"
+  subtitle: "함수 조합"
+  blocks:
+  - type: "text"
+    content: "함수 합성은 여러 함수를 조합하여 새로운 함수를 생성합니다. compose는 오른쪽에서 왼쪽으로, pipe는 왼쪽에서 오른쪽으로 실행합니다. reduce를 활용하여 함수 체인을 구현합니다. 데이터 변환 파이프라인을 선언적으로 표현합니다. 코드 가독성과 재사용성이 향상됩니다."
+  - type: "code"
+    language: "python"
+    title: "함수 합성 유틸리티"
+    description: "compose와 pipe 함수를 구현합니다."
+    content: |-
+      from functools import reduce
+
+      def composeAll(*funcs):
+          def composed(x):
+              return reduce(lambda acc, fn: fn(acc), reversed(funcs), x)
+          return composed
+
+      def pipeAll(*funcs):
+          def piped(x):
+              return reduce(lambda acc, fn: fn(acc), funcs, x)
+          return piped
+
+      trim = str.strip
+      upper = str.upper
+      addExclaim = lambda s: s + "!"
+
+      processText = pipeAll(trim, upper, addExclaim)
+      processResult = processText("  hello world  ")
+
+      negate = lambda x: -x
+      absolute = abs
+      doubleNum = lambda x: x * 2
+
+      processNum = composeAll(doubleNum, absolute, negate)
+      numResult = processNum(-5)
+      composeAllResults = (processResult, numResult)
+      composeAllResults
+  - type: "code"
+    language: "python"
+    title: "함수형 데이터 처리"
+    description: "map, filter, reduce를 함수로 래핑합니다."
+    content: |-
+      def mapFn(fn):
+          def mapper(lst):
+              return [fn(x) for x in lst]
+          return mapper
+
+      def filterFn(predicate):
+          def filterer(lst):
+              return [x for x in lst if predicate(x)]
+          return filterer
+
+      def reduceFn(fn, initial):
+          def reducer(lst):
+              acc = initial
+              for x in lst:
+                  acc = fn(acc, x)
+              return acc
+          return reducer
+
+      numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+      sumOfSquaresOfEvens = pipeAll(
+          filterFn(lambda x: x % 2 == 0),
+          mapFn(lambda x: x ** 2),
+          reduceFn(lambda a, b: a + b, 0)
+      )
+
+      chainResult = sumOfSquaresOfEvens(numbers)
+      chainResult
+
+- id: "monad"
+  title: "펑터와 모나드"
+  subtitle: "컨텍스트 내 값 변환"
+  blocks:
+  - type: "text"
+    content: "모나드는 값을 감싸고 변환하는 컨테이너 패턴입니다. Maybe 모나드는 null 안전한 연산을 제공합니다. Either 모나드는 성공/실패를 명시적으로 표현합니다. map은 값을 변환하고, flatMap은 중첩된 모나드를 평탄화합니다. 에러 처리를 우아하게 체이닝할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "Maybe 모나드"
+    description: "null 안전한 연산을 체이닝합니다."
+    content: |-
+      class Maybe:
+          def __init__(self, value):
+              self._value = value
+
+          @staticmethod
+          def just(value):
+              return Maybe(value)
+
+          @staticmethod
+          def nothing():
+              return Maybe(None)
+
+          def isNothing(self):
+              return self._value is None
+
+          def map(self, fn):
+              if self.isNothing():
+                  return Maybe.nothing()
+              return Maybe.just(fn(self._value))
+
+          def flatMap(self, fn):
+              if self.isNothing():
+                  return Maybe.nothing()
+              return fn(self._value)
+
+          def getOrElse(self, default):
+              return default if self.isNothing() else self._value
+
+      def safeDivide(a, b):
+          if b == 0:
+              return Maybe.nothing()
+          return Maybe.just(a / b)
+
+      maybeResult1 = Maybe.just(10).map(lambda x: x * 2).map(lambda x: x + 5)
+      maybeResult2 = Maybe.nothing().map(lambda x: x * 2)
+      maybeResult3 = Maybe.just(10).flatMap(lambda x: safeDivide(x, 2))
+      maybeResult4 = Maybe.just(10).flatMap(lambda x: safeDivide(x, 0))
+      maybeResults = (maybeResult1.getOrElse(0), maybeResult2.getOrElse(0), maybeResult3.getOrElse(0), maybeResult4.getOrElse(0))
+      maybeResults
+  - type: "code"
+    language: "python"
+    title: "Either 모나드"
+    description: "성공/실패를 명시적으로 처리합니다."
+    content: |-
+      class Either:
+          def __init__(self, value, isRight):
+              self._value = value
+              self._isRight = isRight
+
+          @staticmethod
+          def right(value):
+              return Either(value, True)
+
+          @staticmethod
+          def left(value):
+              return Either(value, False)
+
+          def isRight(self):
+              return self._isRight
+
+          def isLeft(self):
+              return not self._isRight
+
+          def map(self, fn):
+              if self.isLeft():
+                  return self
+              return Either.right(fn(self._value))
+
+          def flatMap(self, fn):
+              if self.isLeft():
+                  return self
+              return fn(self._value)
+
+          def fold(self, leftFn, rightFn):
+              if self.isLeft():
+                  return leftFn(self._value)
+              return rightFn(self._value)
+
+      def parseNumber(s):
+          if s.isdigit():
+              return Either.right(int(s))
+          return Either.left(f"Cannot parse '{s}'")
+
+      eitherResult1 = parseNumber("42").map(lambda x: x * 2)
+      eitherResult2 = parseNumber("abc").map(lambda x: x * 2)
+      folded1 = eitherResult1.fold(lambda e: f"Error: {e}", lambda v: f"Success: {v}")
+      folded2 = eitherResult2.fold(lambda e: f"Error: {e}", lambda v: f"Success: {v}")
+      eitherResults = (folded1, folded2)
+      eitherResults
+
+- id: "utilities"
+  title: "함수형 유틸리티"
+  subtitle: "실용적 헬퍼"
+  blocks:
+  - type: "text"
+    content: "함수형 프로그래밍에서 자주 사용하는 유틸리티 함수들입니다. identity는 입력을 그대로 반환합니다. constant는 항상 같은 값을 반환하는 함수를 만듭니다. memoize는 함수 결과를 캐싱합니다. head, tail, take, drop 등 리스트 유틸리티도 유용합니다."
+  - type: "code"
+    language: "python"
+    title: "기본 유틸리티"
+    description: "자주 사용하는 함수형 헬퍼입니다."
+    content: |-
+      def identity(x):
+          return x
+
+      def constant(x):
+          return lambda _: x
+
+      def flip(fn):
+          return lambda a, b: fn(b, a)
+
+      def memoize(fn):
+          cache = {}
+          def memoized(*args):
+              if args not in cache:
+                  cache[args] = fn(*args)
+              return cache[args]
+          return memoized
+
+      @memoize
+      def fibonacci(n):
+          if n <= 1:
+              return n
+          return fibonacci(n - 1) + fibonacci(n - 2)
+
+      identityResult = identity(42)
+      alwaysFive = constant(5)
+      constantResult = alwaysFive("anything")
+      subtract = lambda a, b: a - b
+      flippedSub = flip(subtract)
+      flipResult = (subtract(10, 3), flippedSub(10, 3))
+      fibResult = fibonacci(30)
+      utilResults = (identityResult, constantResult, flipResult, fibResult)
+      utilResults
+  - type: "code"
+    language: "python"
+    title: "리스트 유틸리티"
+    description: "함수형 리스트 처리 함수들입니다."
+    content: |-
+      def head(lst):
+          return lst[0] if lst else None
+
+      def tail(lst):
+          return lst[1:] if lst else []
+
+      def init(lst):
+          return lst[:-1] if lst else []
+
+      def last(lst):
+          return lst[-1] if lst else None
+
+      def take(n, lst):
+          return lst[:n]
+
+      def drop(n, lst):
+          return lst[n:]
+
+      def takeWhile(predicate, lst):
+          result = []
+          for x in lst:
+              if predicate(x):
+                  result.append(x)
+              else:
+                  break
+          return result
+
+      def dropWhile(predicate, lst):
+          idx = 0
+          for x in lst:
+              if predicate(x):
+                  idx += 1
+              else:
+                  break
+          return lst[idx:]
+
+      sampleList = [1, 2, 3, 4, 5]
+      headResult = head(sampleList)
+      tailResult = tail(sampleList)
+      takeResult = take(3, sampleList)
+      dropResult = drop(2, sampleList)
+      takeWhileResult = takeWhile(lambda x: x < 4, sampleList)
+      dropWhileResult = dropWhile(lambda x: x < 3, sampleList)
+      listUtilResults = (headResult, tailResult, takeResult, dropResult, takeWhileResult, dropWhileResult)
+      listUtilResults
+
+- id: "practice"
+  title: "종합 연습"
+  subtitle: "함수형 패턴 마스터"
+  blocks:
+  - type: "text"
+    content: "Day 23에서 배운 함수형 프로그래밍 패턴을 종합적으로 연습합니다. 순수 함수와 불변성은 부작용을 최소화하고, 커링과 부분 적용은 함수 재사용성을 극대화합니다. 함수 합성과 파이프라인은 데이터 변환을 선언적으로 표현하는 강력한 도구입니다. 🟢 기본 문제로 map/filter/reduce와 고차 함수의 직접 구현을 익히고, 🟡 응용 문제로 커링, 합성 패턴을 연습하세요. 🔴 심화 문제에서는 Maybe, Either 모나드와 함수형 에러 처리를 직접 구현해봅니다. 함수형 패턴은 React, Redux 등 현대 프레임워크의 기반이므로 반드시 숙달해야 합니다."
+  - type: "expansion"
+    title: "🟢 기본1: map/filter/reduce 구현"
+    code: |-
+      def myMap(fn, iterable):
+          return [fn(x) for x in iterable]
+
+      def myFilter(predicate, iterable):
+          return [x for x in iterable if predicate(x)]
+
+      def myReduce(fn, iterable, initial):
+          acc = initial
+          for x in iterable:
+              acc = fn(acc, x)
+          return acc
+
+      mapTest = myMap(lambda x: x ** 2, [1, 2, 3, 4])
+      filterTest = myFilter(lambda x: x > 2, [1, 2, 3, 4])
+      reduceTest = myReduce(lambda a, b: a + b, [1, 2, 3, 4], 0)
+      ex1Result = (mapTest, filterTest, reduceTest)
+      ex1Result
+  - type: "expansion"
+    title: "🟢 기본2: 함수 체이닝 클래스"
+    code: |-
+      class Chain:
+          def __init__(self, value):
+              self._value = value
+
+          def map(self, fn):
+              return Chain(fn(self._value))
+
+          def filter(self, predicate):
+              if isinstance(self._value, list):
+                  return Chain([x for x in self._value if predicate(x)])
+              return self
+
+          def value(self):
+              return self._value
+
+      chainedResult = (
+          Chain([1, 2, 3, 4, 5])
+          .filter(lambda x: x % 2 == 0)
+          .map(lambda lst: [x ** 2 for x in lst])
+          .map(lambda lst: sum(lst))
+          .value()
+      )
+      ex2Result = chainedResult
+      ex2Result
+  - type: "expansion"
+    title: "🟢 기본3: 포인트 프리 스타일"
+    code: |-
+      def pointFreeAdd(a):
+          return lambda b: a + b
+
+      def pointFreeMul(a):
+          return lambda b: a * b
+
+      add10 = pointFreeAdd(10)
+      mul2 = pointFreeMul(2)
+
+      def pointFreeCompose(f, g):
+          return lambda x: f(g(x))
+
+      add10ThenMul2 = pointFreeCompose(mul2, add10)
+      pfResult = add10ThenMul2(5)
+      ex3Result = pfResult
+      ex3Result
+  - type: "expansion"
+    title: "🟢 기본4: 불변 리스트 연산"
+    code: |-
+      def immutablePush(lst, item):
+          return lst + [item]
+
+      def immutablePop(lst):
+          return lst[:-1] if lst else []
+
+      def immutableSet(lst, idx, value):
+          return lst[:idx] + [value] + lst[idx + 1:]
+
+      def immutableInsert(lst, idx, value):
+          return lst[:idx] + [value] + lst[idx:]
+
+      origList = [1, 2, 3]
+      pushed = immutablePush(origList, 4)
+      popped = immutablePop(origList)
+      setted = immutableSet(origList, 1, 10)
+      inserted = immutableInsert(origList, 1, 5)
+      ex4Result = (origList, pushed, popped, setted, inserted)
+      ex4Result
+  - type: "expansion"
+    title: "🟢 기본5: 조건부 함수 실행"
+    code: |-
+      def when(predicate, fn):
+          def conditional(x):
+              if predicate(x):
+                  return fn(x)
+              return x
+          return conditional
+
+      def unless(predicate, fn):
+          def conditional(x):
+              if not predicate(x):
+                  return fn(x)
+              return x
+          return conditional
+
+      isPositive = lambda x: x > 0
+      doubleIfPositive = when(isPositive, lambda x: x * 2)
+      negateIfNotPositive = unless(isPositive, lambda x: -x)
+
+      whenResult = (doubleIfPositive(5), doubleIfPositive(-5))
+      unlessResult = (negateIfNotPositive(5), negateIfNotPositive(-5))
+      ex5Result = (whenResult, unlessResult)
+      ex5Result
+  - type: "expansion"
+    title: "🟡 응용1: 렌즈 패턴"
+    code: |-
+      def lens(getter, setter):
+          return {"get": getter, "set": setter}
+
+      def view(lensObj, obj):
+          return lensObj["get"](obj)
+
+      def setLens(lensObj, obj, value):
+          return lensObj["set"](obj, value)
+
+      def over(lensObj, obj, fn):
+          return setLens(lensObj, obj, fn(view(lensObj, obj)))
+
+      nameLens = lens(
+          lambda obj: obj.get("name"),
+          lambda obj, val: {**obj, "name": val}
+      )
+
+      person = {"name": "Alice", "age": 30}
+      viewedName = view(nameLens, person)
+      updatedPerson = setLens(nameLens, person, "Bob")
+      upperedPerson = over(nameLens, person, str.upper)
+      ex6Result = (viewedName, updatedPerson["name"], upperedPerson["name"])
+      ex6Result
+  - type: "expansion"
+    title: "🟡 응용2: Applicative 패턴"
+    code: |-
+      class Applicative:
+          def __init__(self, value):
+              self._value = value
+
+          @staticmethod
+          def of(value):
+              return Applicative(value)
+
+          def map(self, fn):
+              return Applicative(fn(self._value))
+
+          def ap(self, other):
+              return other.map(self._value)
+
+          def getValue(self):
+              return self._value
+
+      curriedAdd = lambda a: lambda b: a + b
+      curriedMul = lambda a: lambda b: lambda c: a * b * c
+
+      apResult1 = Applicative.of(curriedAdd).ap(Applicative.of(3)).ap(Applicative.of(4)).getValue()
+      apResult2 = Applicative.of(curriedMul).ap(Applicative.of(2)).ap(Applicative.of(3)).ap(Applicative.of(4)).getValue()
+      ex7Result = (apResult1, apResult2)
+      ex7Result
+  - type: "expansion"
+    title: "🟡 응용3: 트램폴린"
+    code: |-
+      class Trampoline:
+          def __init__(self, fn):
+              self.fn = fn
+
+          @staticmethod
+          def done(value):
+              return {"done": True, "value": value}
+
+          @staticmethod
+          def more(fn):
+              return {"done": False, "fn": fn}
+
+          @staticmethod
+          def run(result):
+              while not result["done"]:
+                  result = result["fn"]()
+              return result["value"]
+
+      def trampolineFactorial(n, acc=1):
+          if n <= 1:
+              return Trampoline.done(acc)
+          return Trampoline.more(lambda: trampolineFactorial(n - 1, n * acc))
+
+      factResult = Trampoline.run(trampolineFactorial(100))
+      ex8Result = factResult
+      ex8Result
+  - type: "expansion"
+    title: "🟡 응용4: Reader 모나드"
+    code: |-
+      class Reader:
+          def __init__(self, fn):
+              self._fn = fn
+
+          @staticmethod
+          def of(value):
+              return Reader(lambda _: value)
+
+          def run(self, env):
+              return self._fn(env)
+
+          def map(self, fn):
+              return Reader(lambda env: fn(self._fn(env)))
+
+          def flatMap(self, fn):
+              return Reader(lambda env: fn(self._fn(env)).run(env))
+
+          @staticmethod
+          def ask():
+              return Reader(lambda env: env)
+
+      def greetReader(name):
+          return Reader.ask().map(lambda env: f"{env['greeting']}, {name}!")
+
+      env = {"greeting": "Hello", "lang": "en"}
+      readerResult = greetReader("World").run(env)
+      ex9Result = readerResult
+      ex9Result
+  - type: "expansion"
+    title: "🟡 응용5: Writer 모나드"
+    code: |-
+      class Writer:
+          def __init__(self, value, log):
+              self._value = value
+              self._log = log
+
+          @staticmethod
+          def of(value):
+              return Writer(value, [])
+
+          def map(self, fn):
+              return Writer(fn(self._value), self._log)
+
+          def flatMap(self, fn):
+              result = fn(self._value)
+              return Writer(result._value, self._log + result._log)
+
+          def tell(self, message):
+              return Writer(self._value, self._log + [message])
+
+          def run(self):
+              return {"value": self._value, "log": self._log}
+
+      def writerAdd(a, b):
+          return Writer(a + b, [f"Added {a} + {b}"])
+
+      def writerMul(a, b):
+          return Writer(a * b, [f"Multiplied {a} * {b}"])
+
+      writerResult = Writer.of(5).flatMap(lambda x: writerAdd(x, 3)).flatMap(lambda x: writerMul(x, 2)).run()
+      ex10Result = writerResult
+      ex10Result
+  - type: "expansion"
+    title: "🔴 심화1: State 모나드"
+    code: |-
+      class State:
+          def __init__(self, runState):
+              self._runState = runState
+
+          @staticmethod
+          def of(value):
+              return State(lambda s: (value, s))
+
+          def run(self, initialState):
+              return self._runState(initialState)
+
+          def map(self, fn):
+              def newRun(s):
+                  value, newState = self._runState(s)
+                  return (fn(value), newState)
+              return State(newRun)
+
+          def flatMap(self, fn):
+              def newRun(s):
+                  value, newState = self._runState(s)
+                  return fn(value).run(newState)
+              return State(newRun)
+
+          @staticmethod
+          def modify(fn):
+              return State(lambda s: (None, fn(s)))
+
+      def push(item):
+          return State.modify(lambda stack: stack + [item])
+
+      def pop():
+          return State(lambda stack: (stack[-1], stack[:-1]) if stack else (None, []))
+
+      stackOps = push(1).flatMap(lambda _: push(2)).flatMap(lambda _: push(3)).flatMap(lambda _: pop())
+      stateResult = stackOps.run([])
+      ex11Result = stateResult
+      ex11Result
+  - type: "expansion"
+    title: "🔴 심화2: Free 모나드 시뮬레이션"
+    code: |-
+      class Free:
+          pass
+
+      class Pure(Free):
+          def __init__(self, value):
+              self.value = value
+
+      class Suspend(Free):
+          def __init__(self, functor):
+              self.functor = functor
+
+      def freeOf(value):
+          return Pure(value)
+
+      def suspend(functor):
+          return Suspend(functor)
+
+      def interpret(free, interpreter):
+          while isinstance(free, Suspend):
+              free = interpreter(free.functor)
+          return free.value
+
+      class Print:
+          def __init__(self, message, next):
+              self.message = message
+              self.next = next
+
+      printLogs = []
+      def consoleInterpreter(functor):
+          if isinstance(functor, Print):
+              printLogs.append(functor.message)
+              return functor.next
+          return Pure(None)
+
+      program = suspend(Print("Hello", suspend(Print("World", Pure("Done")))))
+      freeResult = interpret(program, consoleInterpreter)
+      ex12Result = (printLogs, freeResult)
+      ex12Result
+  - type: "expansion"
+    title: "🔴 심화3: 트랜스듀서"
+    code: |-
+      def mappingTransducer(fn):
+          def transducer(reducer):
+              def newReducer(acc, x):
+                  return reducer(acc, fn(x))
+              return newReducer
+          return transducer
+
+      def filteringTransducer(predicate):
+          def transducer(reducer):
+              def newReducer(acc, x):
+                  if predicate(x):
+                      return reducer(acc, x)
+                  return acc
+              return newReducer
+          return transducer
+
+      def composeTransducers(*transducers):
+          def composed(reducer):
+              for t in reversed(transducers):
+                  reducer = t(reducer)
+              return reducer
+          return composed
+
+      def transduce(transducer, reducer, initial, iterable):
+          xf = transducer(reducer)
+          acc = initial
+          for x in iterable:
+              acc = xf(acc, x)
+          return acc
+
+      appendReducer = lambda acc, x: acc + [x]
+      xform = composeTransducers(
+          filteringTransducer(lambda x: x % 2 == 0),
+          mappingTransducer(lambda x: x ** 2)
+      )
+      transducerResult = transduce(xform, appendReducer, [], range(1, 11))
+      ex13Result = transducerResult
+      ex13Result
+  - type: "expansion"
+    title: "🔴 심화4: 지연 평가"
+    code: |-
+      class LazySeq:
+          def __init__(self, thunk):
+              self._thunk = thunk
+              self._cache = None
+              self._evaluated = False
+
+          def force(self):
+              if not self._evaluated:
+                  self._cache = self._thunk()
+                  self._evaluated = True
+              return self._cache
+
+          def map(self, fn):
+              return LazySeq(lambda: fn(self.force()))
+
+      def lazyRange(start, end):
+          def generate():
+              return list(range(start, end))
+          return LazySeq(generate)
+
+      def lazyMap(fn, lazySeq):
+          return LazySeq(lambda: [fn(x) for x in lazySeq.force()])
+
+      def lazyFilter(predicate, lazySeq):
+          return LazySeq(lambda: [x for x in lazySeq.force() if predicate(x)])
+
+      lazyNums = lazyRange(1, 1001)
+      lazyFiltered = lazyFilter(lambda x: x % 2 == 0, lazyNums)
+      lazyMapped = lazyMap(lambda x: x ** 2, lazyFiltered)
+      lazyTake5 = LazySeq(lambda: lazyMapped.force()[:5])
+      ex14Result = lazyTake5.force()
+      ex14Result
+  - type: "expansion"
+    title: "🔴 심화5: 렌즈 합성"
+    code: |-
+      def propLens(key):
+          return {
+              "get": lambda obj: obj.get(key),
+              "set": lambda obj, val: {**obj, key: val}
+          }
+
+      def composeLens(outer, inner):
+          return {
+              "get": lambda obj: inner["get"](outer["get"](obj)),
+              "set": lambda obj, val: outer["set"](obj, inner["set"](outer["get"](obj), val))
+          }
+
+      addressLens = propLens("address")
+      cityLens = propLens("city")
+      addressCityLens = composeLens(addressLens, cityLens)
+
+      personData = {"name": "Alice", "address": {"city": "Seoul", "zip": "12345"}}
+      viewedCity = addressCityLens["get"](personData)
+      updatedData = addressCityLens["set"](personData, "Busan")
+      ex15Result = (viewedCity, updatedData["address"]["city"])
+      ex15Result
+  - type: "expansion"
+    title: "🔴 심화6: 컨티뉴에이션 패턴"
+    code: |-
+      class Cont:
+          def __init__(self, runCont):
+              self._runCont = runCont
+
+          def run(self, k):
+              return self._runCont(k)
+
+          @staticmethod
+          def of(value):
+              return Cont(lambda k: k(value))
+
+          def map(self, fn):
+              return Cont(lambda k: self._runCont(lambda a: k(fn(a))))
+
+          def flatMap(self, fn):
+              return Cont(lambda k: self._runCont(lambda a: fn(a).run(k)))
+
+      def addCont(a, b):
+          return Cont.of(a + b)
+
+      def mulCont(a, b):
+          return Cont.of(a * b)
+
+      contProgram = addCont(2, 3).flatMap(lambda sum: mulCont(sum, 4))
+      contResult = contProgram.run(lambda x: x)
+      ex16Result = contResult
+      ex16Result
+  - type: "expansion"
+    title: "🔴 심화7: 카타모피즘"
+    code: |-
+      def cata(algebra, tree):
+          if tree is None:
+              return algebra(None)
+          if isinstance(tree, dict):
+              left = cata(algebra, tree.get("left"))
+              right = cata(algebra, tree.get("right"))
+              return algebra({"value": tree["value"], "left": left, "right": right})
+          return algebra(tree)
+
+      def sumAlgebra(node):
+          if node is None:
+              return 0
+          if isinstance(node, dict):
+              return node["value"] + node["left"] + node["right"]
+          return node
+
+      def countAlgebra(node):
+          if node is None:
+              return 0
+          if isinstance(node, dict):
+              return 1 + node["left"] + node["right"]
+          return 1
+
+      tree = {
+          "value": 1,
+          "left": {"value": 2, "left": None, "right": None},
+          "right": {"value": 3, "left": None, "right": None}
+      }
+      sumResult = cata(sumAlgebra, tree)
+      countResult = cata(countAlgebra, tree)
+      ex17Result = (sumResult, countResult)
+      ex17Result
+  - type: "expansion"
+    title: "🔴 심화8: 함수형 유효성 검사"
+    code: |-
+      class Validation:
+          def __init__(self, value, errors):
+              self._value = value
+              self._errors = errors
+
+          @staticmethod
+          def success(value):
+              return Validation(value, [])
+
+          @staticmethod
+          def failure(error):
+              return Validation(None, [error])
+
+          def isSuccess(self):
+              return len(self._errors) == 0
+
+          def ap(self, other):
+              if self.isSuccess() and other.isSuccess():
+                  return Validation.success(self._value(other._value))
+              return Validation(None, self._errors + other._errors)
+
+          def fold(self, failureFn, successFn):
+              if self.isSuccess():
+                  return successFn(self._value)
+              return failureFn(self._errors)
+
+      def validateName(name):
+          if len(name) < 2:
+              return Validation.failure("Name too short")
+          return Validation.success(name)
+
+      def validateAge(age):
+          if age < 0 or age > 150:
+              return Validation.failure("Invalid age")
+          return Validation.success(age)
+
+      def createPerson(name):
+          return lambda age: {"name": name, "age": age}
+
+      validResult = Validation.success(createPerson).ap(validateName("Alice")).ap(validateAge(30))
+      invalidResult = Validation.success(createPerson).ap(validateName("A")).ap(validateAge(200))
+      ex18Result = (validResult.fold(lambda e: e, lambda v: v), invalidResult.fold(lambda e: e, lambda v: v))
+      ex18Result
+  - type: "expansion"
+    title: "🔴 심화9: IO 모나드"
+    code: |-
+      class IO:
+          def __init__(self, effect):
+              self._effect = effect
+
+          @staticmethod
+          def of(value):
+              return IO(lambda: value)
+
+          def run(self):
+              return self._effect()
+
+          def map(self, fn):
+              return IO(lambda: fn(self._effect()))
+
+          def flatMap(self, fn):
+              return IO(lambda: fn(self._effect()).run())
+
+      def readEnv(key):
+          return IO(lambda: {"USER": "admin", "HOME": "/home/admin"}.get(key, ""))
+
+      ioProgram = readEnv("USER").flatMap(lambda user: IO.of(f"Hello, {user}!"))
+      ioResult = ioProgram.run()
+      ex19Result = ioResult
+      ex19Result
+  - type: "expansion"
+    title: "🔴 심화10: 함수형 파이프라인"
+    code: |-
+      class PipelineClass:
+          def __init__(self, value):
+              self._value = value
+              self._steps = []
+
+          def pipe(self, fn):
+              newPipeline = PipelineClass(self._value)
+              newPipeline._steps = self._steps + [fn]
+              return newPipeline
+
+          def run(self):
+              result = self._value
+              for step in self._steps:
+                  result = step(result)
+              return result
+
+          def tap(self, fn):
+              def tapper(x):
+                  fn(x)
+                  return x
+              return self.pipe(tapper)
+
+          def branch(self, condition, trueFn, falseFn):
+              def brancher(x):
+                  if condition(x):
+                      return trueFn(x)
+                  return falseFn(x)
+              return self.pipe(brancher)
+
+      tappedValues = []
+      pipelineResult = (
+          PipelineClass([1, 2, 3, 4, 5, 6, 7, 8, 9, 10])
+          .pipe(lambda lst: [x for x in lst if x % 2 == 0])
+          .tap(lambda lst: tappedValues.extend(lst))
+          .pipe(lambda lst: [x ** 2 for x in lst])
+          .pipe(lambda lst: sum(lst))
+          .branch(lambda x: x > 100, lambda x: f"Large: {x}", lambda x: f"Small: {x}")
+          .run()
+      )
+      ex20Result = (pipelineResult, tappedValues)
+      ex20Result

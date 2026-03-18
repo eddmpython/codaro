@@ -1,0 +1,746 @@
+meta:
+  id: "day15"
+  title: "함수기초"
+  day: 15
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 함수 기초 - def, return으로 코드 재사용"
+    description: "def, return, parameter, argument를 배웁니다."
+    keywords: ['함수', 'def', 'return', 'parameter', 'argument']
+
+intro:
+  emoji: "⚙️"
+  points:
+  - "def로 함수 정의"
+  - "return으로 값 반환"
+  - "매개변수로 값 전달"
+  - "함수로 코드 재사용"
+
+sections:
+- id: "def_basic"
+  title: "함수 정의"
+  subtitle: "def로 함수 만들기"
+  blocks:
+  - type: "text"
+    content: "함수는 특정 작업을 수행하는 코드 블록입니다. def 함수명(): 형식으로 정의하며, 들여쓰기로 함수 본문을 작성합니다. 함수를 정의한 후 함수명()으로 호출하여 실행합니다."
+  - type: "list"
+    items:
+    - "def 함수명(): 형식"
+    - "들여쓰기로 본문 작성"
+    - "함수명()으로 호출"
+    - "코드 재사용 가능"
+  - type: "code"
+    language: "python"
+    title: "함수 정의"
+    description: "간단한 함수를 정의합니다."
+    content: |-
+      def greet():
+          msg = 'Hello'
+          return msg
+
+      greet()
+  - type: "code"
+    language: "python"
+    title: "함수 호출"
+    description: "함수를 여러 번 호출할 수 있습니다."
+    content: |-
+      def getMessage():
+          return 'Welcome'
+
+      first = getMessage()
+      second = getMessage()
+      first, second
+  - type: "code"
+    language: "python"
+    title: "함수 결과 사용"
+    description: "함수 결과를 변수에 저장하고 사용합니다."
+    content: |-
+      def getNumber():
+          return 42
+
+      num = getNumber()
+      twice = num * 2
+      twice
+  - type: "tip"
+    content: "함수명은 소문자와 언더스코어를 사용하거나 카멜케이스를 사용합니다."
+
+- id: "return_statement"
+  title: "return 문"
+  subtitle: "값 반환하기"
+  blocks:
+  - type: "text"
+    content: "return은 함수의 결과값을 반환합니다. return 값 형식으로 사용하며, 함수 실행을 즉시 종료하고 값을 호출한 곳으로 돌려줍니다. return이 없으면 None을 반환합니다."
+  - type: "list"
+    items:
+    - "return 값 형식"
+    - "함수 결과 반환"
+    - "함수 즉시 종료"
+    - "return 없으면 None"
+  - type: "code"
+    language: "python"
+    title: "return 기본"
+    description: "계산 결과를 반환합니다."
+    content: |-
+      def add():
+          answer = 10 + 20
+          return answer
+
+      add()
+  - type: "code"
+    language: "python"
+    title: "return 즉시"
+    description: "계산식을 바로 반환합니다."
+    content: |-
+      def multiply():
+          return 5 * 6
+
+      multiply()
+  - type: "code"
+    language: "python"
+    title: "조건부 return"
+    description: "조건에 따라 다른 값을 반환합니다."
+    content: |-
+      def checkValue():
+          value = 15
+          if value > 10:
+              return 'big'
+          else:
+              return 'small'
+
+      checkValue()
+  - type: "tip"
+    content: "return을 만나면 함수가 즉시 종료되므로 위치에 주의하세요."
+
+- id: "parameter_one"
+  title: "매개변수 1개"
+  subtitle: "값을 받는 함수"
+  blocks:
+  - type: "text"
+    content: "매개변수는 함수가 받는 입력값입니다. def 함수명(매개변수): 형식으로 정의하며, 호출시 전달하는 값을 인자라고 합니다. 매개변수를 사용하면 함수를 더 유연하게 만들 수 있습니다."
+  - type: "list"
+    items:
+    - "def 함수명(매개변수): 형식"
+    - "매개변수: 함수가 받는 변수"
+    - "인자: 호출시 전달하는 값"
+    - "함수 유연성 증가"
+  - type: "code"
+    language: "python"
+    title: "매개변수 기본"
+    description: "매개변수를 받아 처리합니다."
+    content: |-
+      def double(num):
+          return num * 2
+
+      double(5)
+  - type: "code"
+    language: "python"
+    title: "문자열 매개변수"
+    description: "문자열을 받아 처리합니다."
+    content: |-
+      def sayHi(name):
+          return 'Hello ' + name
+
+      sayHi('Alice')
+  - type: "code"
+    language: "python"
+    title: "조건과 매개변수"
+    description: "매개변수를 조건문에서 사용합니다."
+    content: |-
+      def isAdult(age):
+          if age >= 18:
+              return True
+          else:
+              return False
+
+      isAdult(25)
+  - type: "tip"
+    content: "매개변수명은 함수 안에서만 유효한 지역 변수입니다."
+
+- id: "parameter_multiple"
+  title: "매개변수 여러 개"
+  subtitle: "여러 값 받기"
+  blocks:
+  - type: "text"
+    content: "함수는 여러 개의 매개변수를 받을 수 있습니다. 쉼표로 구분하여 나열하며, 호출시에도 같은 순서로 인자를 전달해야 합니다."
+  - type: "list"
+    items:
+    - "def 함수명(매개변수1, 매개변수2): 형식"
+    - "쉼표로 구분"
+    - "순서대로 전달"
+    - "여러 값 조합 가능"
+  - type: "code"
+    language: "python"
+    title: "두 개 매개변수"
+    description: "두 개의 매개변수를 받아 계산합니다."
+    content: |-
+      def addTwo(a, b):
+          return a + b
+
+      addTwo(10, 20)
+  - type: "code"
+    language: "python"
+    title: "세 개 매개변수"
+    description: "세 개의 매개변수를 받아 계산합니다."
+    content: |-
+      def average(x, y, z):
+          return (x + y + z) / 3
+
+      average(80, 90, 85)
+  - type: "code"
+    language: "python"
+    title: "문자열 조합"
+    description: "여러 문자열을 조합합니다."
+    content: |-
+      def fullName(first, last):
+          return first + ' ' + last
+
+      fullName('John', 'Doe')
+  - type: "tip"
+    content: "매개변수 개수와 인자 개수가 일치해야 합니다."
+
+- id: "return_multiple"
+  title: "여러 값 반환"
+  subtitle: "튜플로 반환"
+  blocks:
+  - type: "text"
+    content: "함수는 여러 값을 반환할 수 있습니다. 쉼표로 구분하여 반환하면 튜플로 묶여서 반환됩니다. 호출한 곳에서 여러 변수로 받을 수 있습니다."
+  - type: "list"
+    items:
+    - "return 값1, 값2 형식"
+    - "튜플로 반환됨"
+    - "여러 변수로 받기 가능"
+    - "관련된 값 함께 반환"
+  - type: "code"
+    language: "python"
+    title: "두 값 반환"
+    description: "두 개의 값을 반환합니다."
+    content: |-
+      def minMax(a, b):
+          if a < b:
+              return a, b
+          else:
+              return b, a
+
+      minMax(10, 5)
+  - type: "code"
+    language: "python"
+    title: "계산 결과들"
+    description: "여러 계산 결과를 반환합니다."
+    content: |-
+      def calculate(num):
+          double = num * 2
+          triple = num * 3
+          return double, triple
+
+      calculate(5)
+  - type: "code"
+    language: "python"
+    title: "분리해서 받기"
+    description: "반환된 값을 각각 변수에 저장합니다."
+    content: |-
+      def getInfo():
+          name = 'Python'
+          version = 3.9
+          return name, version
+
+      lang, ver = getInfo()
+      lang
+  - type: "tip"
+    content: "여러 값을 반환하면 자동으로 튜플이 됩니다."
+
+- id: "no_parameter"
+  title: "매개변수 없는 함수"
+  subtitle: "입력 없이 실행"
+  blocks:
+  - type: "text"
+    content: "함수는 매개변수가 없어도 됩니다. 항상 같은 값을 반환하거나 내부 로직만 실행하는 함수에 사용합니다. 호출시에도 괄호만 씁니다."
+  - type: "list"
+    items:
+    - "def 함수명(): 형식"
+    - "매개변수 없음"
+    - "고정된 동작 수행"
+    - "함수명()로 호출"
+  - type: "code"
+    language: "python"
+    title: "고정값 반환"
+    description: "항상 같은 값을 반환합니다."
+    content: |-
+      def getPi():
+          return 3.14159
+
+      getPi()
+  - type: "code"
+    language: "python"
+    title: "내부 계산"
+    description: "함수 내부에서만 계산합니다."
+    content: |-
+      def getDefault():
+          base = 100
+          bonus = 50
+          return base + bonus
+
+      getDefault()
+  - type: "code"
+    language: "python"
+    title: "리스트 생성"
+    description: "고정된 리스트를 반환합니다."
+    content: |-
+      def getColors():
+          return ['red', 'green', 'blue']
+
+      getColors()
+  - type: "tip"
+    content: "상수값이나 기본 설정을 반환할 때 유용합니다."
+
+- id: "no_return"
+  title: "return 없는 함수"
+  subtitle: "작업만 수행"
+  blocks:
+  - type: "text"
+    content: "함수는 return이 없어도 됩니다. return이 없으면 None을 반환합니다. 주로 작업만 수행하고 결과가 필요없을 때 사용합니다."
+  - type: "list"
+    items:
+    - "return 생략 가능"
+    - "None 자동 반환"
+    - "작업 수행용"
+    - "부수 효과만 목적"
+  - type: "code"
+    language: "python"
+    title: "return 없음"
+    description: "return이 없으면 None을 반환합니다."
+    content: |-
+      def doSomething():
+          x = 10 + 20
+
+      output = doSomething()
+      output
+  - type: "code"
+    language: "python"
+    title: "조건부 return"
+    description: "조건에 따라 return이 없을 수도 있습니다."
+    content: |-
+      def checkPositive(num):
+          if num > 0:
+              return 'positive'
+
+      checkPositive(-5)
+  - type: "code"
+    language: "python"
+    title: "명시적 None"
+    description: "명시적으로 None을 반환할 수도 있습니다."
+    content: |-
+      def getValue(flag):
+          if flag:
+              return 100
+          return None
+
+      getValue(False)
+  - type: "tip"
+    content: "반환값이 필요한 함수는 항상 return을 명시하는 것이 좋습니다."
+
+- id: "function_conditional"
+  title: "함수와 조건문"
+  subtitle: "조건에 따른 처리"
+  blocks:
+  - type: "text"
+    content: "함수 안에서 조건문을 사용하여 매개변수에 따라 다른 결과를 반환할 수 있습니다. 함수의 유연성이 크게 증가합니다."
+  - type: "list"
+    items:
+    - "함수 내부에 조건문"
+    - "매개변수 기반 분기"
+    - "다양한 경우 처리"
+    - "유연한 함수 구현"
+  - type: "code"
+    language: "python"
+    title: "등급 판정"
+    description: "점수에 따라 등급을 반환합니다."
+    content: |-
+      def getGrade(score):
+          if score >= 90:
+              return 'A'
+          elif score >= 80:
+              return 'B'
+          elif score >= 70:
+              return 'C'
+          else:
+              return 'F'
+
+      getGrade(85)
+  - type: "code"
+    language: "python"
+    title: "절대값"
+    description: "숫자의 절대값을 반환합니다."
+    content: |-
+      def absolute(num):
+          if num >= 0:
+              return num
+          else:
+              return -num
+
+      absolute(-15)
+  - type: "code"
+    language: "python"
+    title: "할인 계산"
+    description: "금액에 따라 할인을 적용합니다."
+    content: |-
+      def applyDiscount(price):
+          if price >= 100000:
+              return price * 0.9
+          elif price >= 50000:
+              return price * 0.95
+          else:
+              return price
+
+      applyDiscount(80000)
+  - type: "tip"
+    content: "조건문으로 다양한 입력에 대응할 수 있습니다."
+
+- id: "function_loop"
+  title: "함수와 반복문"
+  subtitle: "반복 처리 함수"
+  blocks:
+  - type: "text"
+    content: "함수 안에서 반복문을 사용하여 리스트나 문자열을 처리할 수 있습니다. 반복 로직을 함수로 만들면 재사용이 쉬워집니다."
+  - type: "list"
+    items:
+    - "함수 내부에 반복문"
+    - "리스트/문자열 처리"
+    - "반복 로직 재사용"
+    - "코드 간결화"
+  - type: "code"
+    language: "python"
+    title: "리스트 합계"
+    description: "리스트의 모든 요소를 더합니다."
+    content: |-
+      def sumList(numbers):
+          acc = 0
+          for num in numbers:
+              acc = acc + num
+          return acc
+
+      sumList([1, 2, 3, 4, 5])
+  - type: "code"
+    language: "python"
+    title: "문자 개수"
+    description: "문자열에서 특정 문자의 개수를 셉니다."
+    content: |-
+      def countChar(text, target):
+          cnt = 0
+          for char in text:
+              if char == target:
+                  cnt = cnt + 1
+          return cnt
+
+      countChar('hello world', 'o')
+  - type: "code"
+    language: "python"
+    title: "최대값 찾기"
+    description: "리스트에서 최대값을 찾습니다."
+    content: |-
+      def findMax(values):
+          biggest = values[0]
+          for item in values:
+              if item > biggest:
+                  biggest = item
+          return biggest
+
+      findMax([15, 42, 8, 23, 56])
+  - type: "tip"
+    content: "복잡한 반복 로직을 함수로 만들면 코드가 깔끔해집니다."
+
+- id: "function_reuse"
+  title: "함수 재사용"
+  subtitle: "같은 함수 여러 번 사용"
+  blocks:
+  - type: "text"
+    content: "함수의 가장 큰 장점은 재사용입니다. 한 번 정의한 함수를 여러 곳에서 다른 인자로 호출할 수 있습니다. 코드 중복을 줄이고 유지보수가 쉬워집니다."
+  - type: "list"
+    items:
+    - "한 번 정의, 여러 번 사용"
+    - "다른 인자로 호출"
+    - "코드 중복 감소"
+    - "유지보수 용이"
+  - type: "code"
+    language: "python"
+    title: "여러 번 호출"
+    description: "같은 함수를 다른 인자로 호출합니다."
+    content: |-
+      def square(n):
+          return n * n
+
+      sq3 = square(3)
+      sq5 = square(5)
+      sq7 = square(7)
+      sq3, sq5, sq7
+  - type: "code"
+    language: "python"
+    title: "함수 조합"
+    description: "함수 결과를 다시 함수에 전달합니다."
+    content: |-
+      def addTen(num):
+          return num + 10
+
+      chained = addTen(5)
+      chained = addTen(chained)
+      chained
+  - type: "code"
+    language: "python"
+    title: "반복문에서 호출"
+    description: "반복문 안에서 함수를 호출합니다."
+    content: |-
+      def triple(x):
+          return x * 3
+
+      results = []
+      for i in range(1, 5):
+          results.append(triple(i))
+      results
+  - type: "tip"
+    content: "자주 사용하는 로직은 함수로 만들어 재사용하세요."
+
+- id: "practice"
+  title: "Day 15 종합 복습"
+  subtitle: "함수 기초 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 15에서 배운 함수 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 함수 정의"
+    code: |-
+      def sayHello():
+          return 'Hello'
+
+      sayHello()
+
+  - type: "expansion"
+    title: "🟢 기본2: 매개변수 1개"
+    code: |-
+      def tripleNum(n):
+          return n * 3
+
+      tripleNum(7)
+
+  - type: "expansion"
+    title: "🟢 기본3: 매개변수 2개"
+    code: |-
+      def subtract(a, b):
+          return a - b
+
+      subtract(20, 8)
+
+  - type: "expansion"
+    title: "🟢 기본4: 조건문 활용"
+    code: |-
+      def isEven(num):
+          if num % 2 == 0:
+              return True
+          else:
+              return False
+
+      isEven(10)
+
+  - type: "expansion"
+    title: "🟢 기본5: 여러 값 반환"
+    code: |-
+      def divide(a, b):
+          quotient = a // b
+          remainder = a % b
+          return quotient, remainder
+
+      divide(17, 5)
+
+  - type: "expansion"
+    title: "🟡 응용1: 온도 변환"
+    code: |-
+      def celsiusToFahrenheit(celsius):
+          return celsius * 9 / 5 + 32
+
+      celsiusToFahrenheit(25)
+
+  - type: "expansion"
+    title: "🟡 응용2: 문자열 처리"
+    code: |-
+      def reverseString(text):
+          revStr = ''
+          for char in text:
+              revStr = char + revStr
+          return revStr
+
+      reverseString('python')
+
+  - type: "expansion"
+    title: "🟡 응용3: 리스트 평균"
+    code: |-
+      def calculateAverage(numbers):
+          total = 0
+          for num in numbers:
+              total = total + num
+          return total / len(numbers)
+
+      calculateAverage([80, 90, 85, 88])
+
+  - type: "expansion"
+    title: "🟡 응용4: 범위 검사"
+    code: |-
+      def inRange(value, minVal, maxVal):
+          if value >= minVal and value <= maxVal:
+              return True
+          else:
+              return False
+
+      inRange(75, 60, 100)
+
+  - type: "expansion"
+    title: "🟡 응용5: 짝수 개수"
+    code: |-
+      def countEven(numbers):
+          count = 0
+          for num in numbers:
+              if num % 2 == 0:
+                  count = count + 1
+          return count
+
+      countEven([1, 2, 3, 4, 5, 6, 7, 8])
+
+  - type: "expansion"
+    title: "🔴 심화1-1: BMI 계산"
+    code: |-
+      def calculateBMI(weight, height):
+          bmi = weight / (height * height)
+          return bmi
+
+      calculateBMI(70, 1.75)
+
+  - type: "expansion"
+    title: "🔴 심화1-2: BMI 판정"
+    code: |-
+      def getBMICategory(weight, height):
+          bmi = weight / (height * height)
+          if bmi >= 25:
+              return 'overweight'
+          elif bmi >= 18.5:
+              return 'normal'
+          else:
+              return 'underweight'
+
+      getBMICategory(70, 1.75)
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 팩토리얼"
+    code: |-
+      def factorial(n):
+          product = 1
+          for i in range(1, n + 1):
+              product = product * i
+          return product
+
+      factorial(5)
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 순열"
+    code: |-
+      def permutation(n, r):
+          nFact = 1
+          for i in range(1, n + 1):
+              nFact = nFact * i
+          nrFact = 1
+          for i in range(1, n - r + 1):
+              nrFact = nrFact * i
+          return nFact // nrFact
+
+      permutation(5, 3)
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 소수 판별"
+    code: |-
+      def isPrime(num):
+          if num < 2:
+              return False
+          for i in range(2, num):
+              if num % i == 0:
+                  return False
+          return True
+
+      isPrime(17)
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 소수 목록"
+    code: |-
+      def getPrimes(maxNum):
+          primes = []
+          for candidate in range(2, maxNum + 1):
+              isPrime = True
+              for div in range(2, candidate):
+                  if candidate % div == 0:
+                      isPrime = False
+                      break
+              if isPrime:
+                  primes.append(candidate)
+          return primes
+
+      getPrimes(20)
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 최대공약수"
+    code: |-
+      def gcd(a, b):
+          while b != 0:
+              remainder = a % b
+              a = b
+              b = remainder
+          return a
+
+      gcd(48, 18)
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 최소공배수"
+    code: |-
+      def lcm(a, b):
+          gcdVal = a
+          divisor = b
+          while divisor != 0:
+              mod = gcdVal % divisor
+              gcdVal = divisor
+              divisor = mod
+          return (a * b) // gcdVal
+
+      lcm(12, 18)
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 피보나치"
+    code: |-
+      def fibonacci(n):
+          if n <= 1:
+              return n
+          prev = 0
+          curr = 1
+          for i in range(2, n + 1):
+              nextVal = prev + curr
+              prev = curr
+              curr = nextVal
+          return curr
+
+      fibonacci(10)
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 피보나치 수열"
+    code: |-
+      def fibonacciSequence(count):
+          sequence = []
+          prev = 0
+          curr = 1
+          for i in range(count):
+              if i == 0:
+                  sequence.append(0)
+              elif i == 1:
+                  sequence.append(1)
+              else:
+                  nextVal = prev + curr
+                  sequence.append(nextVal)
+                  prev = curr
+                  curr = nextVal
+          return sequence
+
+      fibonacciSequence(10)

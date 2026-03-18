@@ -1,0 +1,279 @@
+meta:
+  id: seaborn_09
+  title: 자동차연비종합분석
+  order: 9
+  category: seaborn
+  difficulty: "⭐⭐⭐"
+  badge: 심화
+  tags: ["seaborn", "pairplot", "jointplot", "lmplot", "mpg", "다변량분석"]
+  seo:
+    title: "Seaborn 다변량 분석 - 자동차 연비 종합 분석"
+    description: "Seaborn pairplot, jointplot, lmplot으로 자동차 연비 데이터의 다변량 관계를 분석합니다. 변수 간 상관관계와 회귀 분석을 배웁니다."
+    keywords: ["seaborn", "pairplot", "jointplot", "lmplot", "mpg", "다변량분석"]
+
+intro:
+  emoji: "🚗"
+  goal: mpg 데이터로 연비에 영향을 주는 변수들의 관계를 pairplot, jointplot, lmplot으로 분석합니다.
+  description: mpg 데이터셋은 자동차의 연비(mpg), 실린더 수, 배기량, 마력, 무게, 출시 연도, 원산지 정보를 담고 있습니다. 다변량 분석 도구로 연비에 영향을 주는 요인을 탐색합니다. 이전에 배운 displot, relplot, heatmap 개념을 함께 활용합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: seaborn과 matplotlib을 불러옵니다. mpg 데이터는 cylinders(실린더), displacement(배기량), horsepower(마력), weight(무게), acceleration(가속), model_year(연식), origin(원산지) 컬럼을 포함합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: seaborn과 matplotlib을 불러옵니다
+    content: |-
+      import seaborn as sns
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      mpg = sns.load_dataset('mpg').dropna()
+      mpg
+  - type: tip
+    content: mpg 데이터는 cylinders(실린더), displacement(배기량), horsepower(마력), weight(무게), acceleration(가속), model_year(연식), origin(원산지) 컬럼을 포함합니다.
+
+- id: step2_pairplot_basic
+  title: 2단계. 기본 pairplot
+  subtitle: sns.pairplot()
+  blocks:
+  - type: text
+    content: pairplot으로 모든 수치 변수 간 관계를 한눈에 확인합니다. 대각선은 분포, 비대각선은 산점도를 표시합니다.
+  - type: code
+    language: python
+    title: 변수 쌍 시각화
+    description: 모든 변수 쌍의 관계를 확인합니다
+    content: |-
+      mpgNumeric = mpg[['mpg', 'displacement', 'horsepower', 'weight', 'acceleration']]
+      gPair = sns.pairplot(mpgNumeric, height=2)
+      gPair.figure.suptitle('MPG Variables Pairplot', y=1.02)
+      gPair.figure
+  - type: tip
+    content: pairplot()은 모든 변수 쌍에 대해 산점도(비대각선)와 분포(대각선)를 자동 생성합니다. 변수 간 상관관계와 각 변수의 분포를 한눈에 파악할 수 있습니다. 변수가 많으면 시간이 오래 걸릴 수 있습니다.
+
+- id: step3_pairplot_hue
+  title: 3단계. 그룹별 pairplot
+  subtitle: hue, vars
+  blocks:
+  - type: text
+    content: 원산지별로 색상을 구분합니다. vars로 특정 변수만 선택하여 분석 범위를 좁힐 수 있습니다.
+  - type: code
+    language: python
+    title: 원산지별 pairplot
+    description: 원산지별로 색상을 구분합니다
+    content: |-
+      gPairHue = sns.pairplot(mpg, vars=['mpg', 'horsepower', 'weight'], hue='origin', palette='Set1', height=2.5)
+      gPairHue.figure.suptitle('Pairplot by Origin', y=1.02)
+      gPairHue.figure
+  - type: tip
+    content: vars로 특정 변수만 선택할 수 있습니다. hue로 그룹별 색상을 구분하면 그룹 간 패턴 차이를 비교할 수 있습니다. 대각선에는 그룹별 분포가 표시됩니다.
+
+- id: step4_pairplot_reg
+  title: 4단계. 회귀선 추가
+  subtitle: diag_kind, kind
+  blocks:
+  - type: text
+    content: 대각선에 KDE를 사용하고 회귀선을 추가합니다. 변수 간 선형 관계의 방향과 강도를 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 회귀선 pairplot
+    description: 회귀선과 KDE를 추가합니다
+    content: |-
+      gPairKde = sns.pairplot(mpg, vars=['mpg', 'horsepower', 'weight'], hue='origin', diag_kind='kde', kind='reg', palette='Set1', height=2.5)
+      gPairKde.figure.suptitle('Pairplot with Regression', y=1.02)
+      gPairKde.figure
+  - type: tip
+    content: "diag_kind='kde'는 대각선에 KDE 곡선을 그립니다. kind='reg'는 산점도에 회귀선을 추가합니다. 이를 통해 변수 간 선형 관계의 방향과 강도를 파악할 수 있습니다."
+
+- id: step5_jointplot_basic
+  title: 5단계. 기본 jointplot
+  subtitle: sns.jointplot()
+  blocks:
+  - type: text
+    content: jointplot()으로 두 변수의 관계와 분포를 상세히 분석합니다. 중앙에 산점도, 양 축에 분포를 표시합니다.
+  - type: code
+    language: python
+    title: jointplot
+    description: 두 변수의 관계와 분포를 함께 봅니다
+    content: |-
+      gJoint = sns.jointplot(data=mpg, x='weight', y='mpg', height=7)
+      gJoint.figure.suptitle('Weight vs MPG', y=1.02)
+      gJoint.figure
+  - type: tip
+    content: jointplot()은 두 변수의 산점도와 각 축의 주변 분포를 함께 보여줍니다. 변수 간 관계와 각 변수의 분포를 동시에 파악할 수 있어 탐색적 분석에 유용합니다.
+
+- id: step6_jointplot_reg
+  title: 6단계. jointplot 회귀
+  subtitle: "kind='reg'"
+  blocks:
+  - type: text
+    content: jointplot에 회귀선과 KDE를 추가합니다. kind 옵션으로 다양한 표시 방식을 선택할 수 있습니다.
+  - type: code
+    language: python
+    title: 회귀 jointplot
+    description: 회귀선을 추가합니다
+    content: |-
+      gJointReg = sns.jointplot(data=mpg, x='weight', y='mpg', kind='reg', height=7)
+      gJointReg.figure.suptitle('Weight vs MPG with Regression', y=1.02)
+      gJointReg.figure
+  - type: tip
+    content: "jointplot의 kind 옵션으로 표시 방식을 선택합니다. 'scatter'(기본), 'reg'(회귀선), 'hex'(육각형 밀도), 'kde'(등고선), 'hist'(2D 히스토그램) 중 선택 가능합니다."
+
+- id: step7_jointplot_kde
+  title: 7단계. KDE jointplot
+  subtitle: "kind='kde'"
+  blocks:
+  - type: text
+    content: KDE 등고선으로 밀집 영역을 확인합니다. fill=True로 영역을 채워 더 명확하게 표시합니다.
+  - type: code
+    language: python
+    title: KDE jointplot
+    description: KDE 등고선으로 밀집 영역을 확인합니다
+    content: |-
+      gJointKde = sns.jointplot(data=mpg, x='horsepower', y='mpg', kind='kde', fill=True, height=7)
+      gJointKde.figure.suptitle('Horsepower vs MPG (KDE)', y=1.02)
+      gJointKde.figure
+
+- id: step8_jointplot_hue
+  title: 8단계. 그룹별 jointplot
+  subtitle: hue 파라미터
+  blocks:
+  - type: text
+    content: hue로 그룹별 jointplot을 그립니다. 그룹 간 관계 패턴의 차이를 비교할 수 있습니다.
+  - type: code
+    language: python
+    title: 원산지별 jointplot
+    description: 원산지별로 구분합니다
+    content: |-
+      gJointHue = sns.jointplot(data=mpg, x='weight', y='mpg', hue='origin', palette='Set1', height=7)
+      gJointHue.figure.suptitle('Weight vs MPG by Origin', y=1.02)
+      gJointHue.figure
+
+- id: step9_lmplot_basic
+  title: 9단계. 기본 lmplot
+  subtitle: sns.lmplot()
+  blocks:
+  - type: text
+    content: lmplot()으로 그룹별 회귀 분석을 수행합니다. 각 그룹마다 독립적인 회귀선과 신뢰구간이 표시됩니다.
+  - type: code
+    language: python
+    title: 그룹별 회귀
+    description: 원산지별 회귀 분석을 수행합니다
+    content: |-
+      gLm = sns.lmplot(data=mpg, x='weight', y='mpg', hue='origin', palette='Set1', height=5, aspect=1.3)
+      gLm.figure.suptitle('Regression by Origin', y=1.02)
+      gLm.figure
+  - type: tip
+    content: lmplot()은 Figure-level 회귀 분석 함수입니다. regplot()과 달리 hue, col, row로 그룹별 회귀를 비교할 수 있습니다. 각 그룹마다 독립적인 회귀선과 신뢰구간이 표시됩니다.
+
+- id: step10_lmplot_col
+  title: 10단계. 패널별 회귀
+  subtitle: col 파라미터
+  blocks:
+  - type: text
+    content: 열 분할로 원산지별 패널을 만듭니다. 각 패널에서 독립적인 회귀 분석을 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 원산지별 패널
+    description: 원산지별로 패널을 분리합니다
+    content: |-
+      gLmCol = sns.lmplot(data=mpg, x='weight', y='mpg', col='origin', palette='Set1', height=4)
+      gLmCol.figure.suptitle('Weight vs MPG by Origin', y=1.02)
+      gLmCol.figure
+
+- id: step11_lmplot_poly
+  title: 11단계. 다항 회귀
+  subtitle: order 파라미터
+  blocks:
+  - type: text
+    content: 다항 회귀로 비선형 관계를 모델링합니다. order로 다항식 차수를 지정합니다.
+  - type: code
+    language: python
+    title: 2차 다항 회귀
+    description: 다항 회귀로 비선형 관계를 모델링합니다
+    content: |-
+      gLmOrder = sns.lmplot(data=mpg, x='horsepower', y='mpg', order=2, height=5, aspect=1.3)
+      gLmOrder.figure.suptitle('Polynomial Regression (order=2)', y=1.02)
+      gLmOrder.figure
+  - type: tip
+    content: order 파라미터로 다항 회귀 차수를 지정합니다. order=1이 기본(선형), order=2는 2차 곡선, order=3은 3차 곡선입니다. 비선형 관계에서 더 나은 적합도를 얻을 수 있습니다.
+
+- id: step12_lmplot_grid
+  title: 12단계. 다중 조건 회귀
+  subtitle: col과 hue
+  blocks:
+  - type: text
+    content: 실린더 수별로 행과 열을 분할합니다. 여러 조건을 조합하여 세분화된 분석이 가능합니다.
+  - type: code
+    language: python
+    title: 실린더/원산지별 회귀
+    description: 실린더와 원산지별로 분석합니다
+    content: |-
+      mpgFiltered = mpg[mpg['cylinders'].isin([4, 6, 8])].copy()
+      gLmGrid = sns.lmplot(data=mpgFiltered, x='weight', y='mpg', col='cylinders', hue='origin', palette='Set1', height=4)
+      gLmGrid.figure.suptitle('Weight vs MPG by Cylinders and Origin', y=1.02)
+      gLmGrid.figure
+
+- id: step13_corr_heatmap
+  title: 13단계. 상관계수 히트맵
+  subtitle: corr()
+  blocks:
+  - type: text
+    content: 상관계수 히트맵으로 변수 간 관계를 요약합니다. mpg는 weight, displacement와 강한 음의 상관을 보입니다.
+  - type: code
+    language: python
+    title: 상관계수 히트맵
+    description: 변수 간 상관관계를 요약합니다
+    content: |-
+      mpgCorr = mpg[['mpg', 'cylinders', 'displacement', 'horsepower', 'weight', 'acceleration']].corr()
+      figCorr, axCorr = plt.subplots(figsize=(8, 6))
+      sns.heatmap(mpgCorr, annot=True, fmt='.2f', cmap='RdBu_r', vmin=-1, vmax=1, center=0, ax=axCorr)
+      axCorr.set_title('MPG Variables Correlation')
+      figCorr
+  - type: tip
+    content: 상관계수 히트맵은 모든 변수 쌍의 상관관계를 한눈에 보여줍니다. 양의 상관은 파란색, 음의 상관은 빨간색으로 표시됩니다. mpg는 weight, displacement와 강한 음의 상관을 보입니다.
+
+- id: practice
+  title: 실습
+  subtitle: 다변량 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: penguins 신체 측정값 pairplot"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        data = sns.load_dataset('penguins').dropna()
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart = sns.pairplot(data, vars=['bill_length_mm', 'bill_depth_mm', 'flipper_length_mm', 'body_mass_g'], hue='species', diag_kind='kde', palette='Set2', height=2)
+        chart.figure.suptitle('Penguin Measurements Pairplot', y=1.02)
+        chart.figure
+  - type: expansion
+    title: "미션2: tips 총액과 팁 관계 lmplot"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import seaborn as sns
+        import matplotlib.pyplot as plt
+
+        df = sns.load_dataset('tips')
+    - type: code
+      title: "차트 생성"
+      content: |-
+        canvas = sns.lmplot(data=df, x='total_bill', y='tip', col='time', hue='smoker', palette='Set1', height=4)
+        canvas.figure.suptitle('Total Bill vs Tip by Time and Smoker', y=1.02)
+        canvas.figure

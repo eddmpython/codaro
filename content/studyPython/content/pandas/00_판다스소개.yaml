@@ -1,0 +1,259 @@
+meta:
+  id: pandas_00
+  title: 판다스소개
+  order: 0
+  category: pandas
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags: ["판다스", "데이터분석", "입문"]
+  seo:
+    title: "판다스(Pandas) 입문 - 파이썬 데이터분석 시작하기"
+    description: "파이썬 pandas 라이브러리로 데이터분석을 시작하세요. 실제 데이터(tips, titanic, penguins)로 바로 실습하며 배웁니다."
+    keywords: ["pandas", "판다스", "파이썬 데이터분석", "DataFrame", "데이터프레임"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "🐼"
+      title: "판다스?? 파이썬 아니고??"
+      subtitle: "분명 파이썬 배우러 왔는데..."
+
+    - type: hero
+      emoji: "🎯"
+      title: "실제 데이터로 바로 실습합니다"
+      subtitle: "이론 설명 없이, 목표를 정하고 직접 분석해봅니다"
+      points:
+        - emoji: "📊"
+          title: "실제 데이터 사용"
+        - emoji: "🎯"
+          title: "목표 중심 학습"
+        - emoji: "🚫"
+          title: "이론 설명 없음"
+        - emoji: "✋"
+          title: "직접 해보기"
+
+- id: use_cases
+  blocks:
+    - type: sectionHeader
+      title: "🎯 판다스로 뭘 할 수 있나요?"
+      subtitle: "실제로 이런 곳에서 씁니다"
+
+    - type: featureCards
+      cards:
+        - emoji: "📊"
+          title: "데이터 분석"
+          description: "매출 데이터, 설문조사 결과, 실험 데이터 등을 분석하고 인사이트 도출"
+        - emoji: "🧹"
+          title: "데이터 정제"
+          description: "결측치 처리, 이상치 제거, 데이터 형식 변환 등 전처리 작업"
+        - emoji: "📈"
+          title: "시각화 준비"
+          description: "matplotlib, seaborn 등과 연동해서 차트/그래프 생성"
+        - emoji: "🤖"
+          title: "머신러닝 전처리"
+          description: "scikit-learn, tensorflow 등에 넣기 전 데이터 준비"
+        - emoji: "💼"
+          title: "업무 자동화"
+          description: "엑셀 보고서 자동 생성, 데이터 병합, 정기 리포트"
+        - emoji: "🌐"
+          title: "웹 데이터 수집"
+          description: "CSV, JSON, HTML 테이블 등 다양한 소스에서 데이터 로드"
+
+- id: python_vs_pandas
+  blocks:
+    - type: sectionHeader
+      title: "🤔 파이썬 문법 다 배우고 판다스?"
+      subtitle: "그건 너무 멀고 험한 길입니다..."
+
+    - type: compare
+      left:
+        title: "파이썬 문법 마스터 후 판다스"
+        subtitle: "전통적인 방식"
+        icon: "😵"
+        color: "orange"
+        items:
+          - "변수 배우고..."
+          - "조건문 배우고..."
+          - "반복문 배우고..."
+          - "함수 배우고..."
+          - "클래스 배우고..."
+          - "모듈 배우고..."
+          - "드디어 판다스??"
+        infoBox: "😭 몇 달이 걸릴지 모릅니다"
+      right:
+        title: "바로 판다스 시작!"
+        subtitle: "실용적인 방식"
+        icon: "🚀"
+        color: "green"
+        items:
+          - "변수 = 값 (5분)"
+          - "바로 데이터 분석!"
+          - "점(.) 찍으면 끝"
+          - "결과 바로 확인"
+          - "필요한 문법은 그때 학습"
+        infoBox: "🎉 오늘 바로 시작합시다!"
+
+- id: excel_connection
+  blocks:
+    - type: hero
+      emoji: "📊"
+      title: "엑셀 스프레드시트 = DataFrame"
+      subtitle: "판다스는 엑셀 개념과 거의 같습니다"
+      points:
+        - emoji: "📋"
+          title: "시트 = DataFrame"
+        - emoji: "🔤"
+          title: "열(A,B,C) = Column"
+        - emoji: "🔢"
+          title: "행(1,2,3) = Row"
+        - emoji: "📦"
+          title: "셀 = 값"
+
+    - type: table
+      headers: ["이름", "나이", "점수"]
+      rows:
+        - ["철수", "25", "85"]
+        - ["영희", "23", "92"]
+        - ["민수", "27", "78"]
+
+    - type: note
+      title: "위 표가 바로 DataFrame입니다"
+      content: "pandas에서 데이터는 이런 표 형태로 저장됩니다. 엑셀 시트와 똑같이 생겼죠?"
+
+- id: excel_vs_pandas
+  blocks:
+    - type: sectionHeader
+      title: "🆚 엑셀 vs 판다스"
+      subtitle: "엑셀도 좋지만, 한계가 있습니다"
+
+    - type: table
+      headers: ["비교 항목", "엑셀", "판다스"]
+      rows:
+        - ["대용량 처리", "❌ 100만 행 한계", "✅ 수천만 행 가능"]
+        - ["반복 작업", "❌ 매번 수동 클릭", "✅ 코드 한 번으로 자동화"]
+        - ["웹 데이터", "❌ 다운로드 → 열기", "✅ URL 한 줄로 바로"]
+        - ["데이터 탐색", "❌ 스크롤하며 확인", "✅ df.describe() 한 줄"]
+        - ["가격", "💰 Microsoft 365 구독", "🆓 완전 무료"]
+        - ["재현성", "❌ 수동 작업 기록 안됨", "✅ 코드로 기록됨"]
+
+    - type: note
+      style: info
+      title: "매일 같은 리포트 만드시나요?"
+      content: "엑셀로 30분 걸리던 작업, 판다스 코드 한 번 짜면 앞으로 1초면 끝납니다. 그렇게 판다스로 만든 결과를 엑셀로 옮기면 이게 바로 엑셀 자동화입니다."
+
+    - type: video
+      platform: local
+      url: "python/excel/xlwings_sample.webm"
+
+- id: alternatives
+  blocks:
+    - type: sectionHeader
+      title: "🤷 Polars? Modin? 그건 뭔가요?"
+      subtitle: "판다스 대안들도 있지만..."
+
+    - type: note
+      style: info
+      title: "왜 대안이 나왔을까?"
+      content: "판다스는 훌륭하지만, 수천만~수억 행의 대용량 데이터를 다루면 느려집니다. 최근 빅데이터 시대에 맞춰 더 빠른 대안들이 등장하고 있어요."
+
+    - type: table
+      headers: ["비교", "Pandas", "Polars", "Modin"]
+      rows:
+        - ["속도", "기준", "약 57배 빠름", "약 4배 빠름"]
+        - ["학습 난이도", "✅ 쉬움", "⚠️ 새 API 학습", "✅ 판다스와 동일"]
+        - ["ML 호환성", "✅ 완벽", "❌ 제한적", "✅ 완벽"]
+        - ["커뮤니티", "✅ 가장 큼", "⚠️ 성장중", "⚠️ 작음"]
+        - ["생태계", "✅ 가장 풍부", "⚠️ 제한적", "✅ 판다스 그대로"]
+
+    - type: compare
+      left:
+        title: "Polars"
+        subtitle: "속도의 왕"
+        icon: "⚡"
+        color: "blue"
+        items:
+          - "Rust로 만들어서 엄청 빠름"
+          - "대용량 데이터에 최적화"
+          - "하지만 새로운 API 학습 필요"
+          - "scikit-learn 등과 호환 안됨"
+        infoBox: "속도가 필요할 때 나중에 배우세요"
+      right:
+        title: "Modin"
+        subtitle: "판다스의 분신"
+        icon: "👯"
+        color: "purple"
+        items:
+          - "판다스 API 그대로 사용"
+          - "내부적으로 병렬 처리"
+          - "코드 한 줄도 안 바꿔도 됨"
+          - "대용량에서 최대 4배 빠름"
+        infoBox: "기존 코드 그대로 쓰고 싶을 때"
+
+    - type: note
+      style: tip
+      title: "결론: 판다스로 시작 → 확장"
+      content: "판다스가 가장 직관적이고, 자료도 가장 많고, 대부분의 라이브러리와 호환됩니다. 판다스로 기본기 익힌 후, 필요하면 Polars나 Modin으로 확장하세요!"
+
+- id: roadmap
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 판다스 학습 로드맵"
+      subtitle: "이 순서대로 배우면 됩니다"
+
+    - type: table
+      headers: ["단계", "배울 내용", "목표"]
+      rows:
+        - ["1단계", "DataFrame 생성/조회", "데이터 불러오고 살펴보기"]
+        - ["2단계", "데이터 선택/필터링", "원하는 데이터만 뽑아내기"]
+        - ["3단계", "데이터 정제", "결측치, 중복 처리하기"]
+        - ["4단계", "데이터 변환", "컬럼 추가, 타입 변환"]
+        - ["5단계", "그룹화/집계", "통계 내고 요약하기"]
+        - ["6단계", "데이터 병합", "여러 데이터 합치기"]
+
+    - type: note
+      style: info
+      title: "실습은 우측 Marimo에서!"
+      content: "설치 없이 바로 실습할 수 있습니다. 코드를 직접 써보면서 배워보세요!"
+
+- id: cheat_sheet
+  blocks:
+    - type: sectionHeader
+      title: "📋 판다스 치트시트"
+      subtitle: "자주 쓰는 함수/메서드 빠른 참조표"
+
+    - type: note
+      style: info
+      title: "치트시트(Cheat Sheet)란?"
+      content: "시험 볼 때 몰래 보는 컨닝페이퍼처럼, 자주 쓰는 명령어를 정리한 참조표입니다. 자주 볼 수 있는 곳에 두면 도움됩니다."
+
+    - type: pdf
+      url: https://pandas.pydata.org/Pandas_Cheat_Sheet.pdf
+      title: Pandas 공식 Cheat Sheet
+      height: 800px
+
+- id: official_docs
+  blocks:
+    - type: sectionHeader
+      title: "📚 체계적으로 공부하고 싶다면"
+      subtitle: "순서대로 차근차근 배우고 싶은 분들을 위해"
+
+    - type: note
+      style: info
+      title: "이 커리큘럼의 방식"
+      content: "아무것도 모르는 상태에서 실제 데이터로 바로 실습합니다. 목표를 정하고 분석하면서 배우는 게 훨씬 효과적이거든요. 그래서 이론 설명은 따로 하지 않습니다. 만약 체계적으로 공부하고 싶다면 Pandas공식문서를 우선 공부하면 도움됩니다."
+
+
+    - type: links
+      items:
+        - text: pandas 공식 문서
+          url: https://pandas.pydata.org/docs/getting_started/index.html
+          icon: "🔗"
+
+- id: next
+  blocks:
+    - type: hero
+      emoji: "👉"
+      title: "다음: DataFrame 완전 정복"
+      subtitle: "엑셀 시트처럼 생긴 DataFrame, 직접 만들고 다뤄봅시다!"

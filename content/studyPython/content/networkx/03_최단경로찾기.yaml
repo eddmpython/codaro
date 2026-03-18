@@ -1,0 +1,388 @@
+meta:
+  id: networkx_03
+  title: 최단경로찾기
+  order: 3
+  category: networkx
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["networkx", "최단경로", "shortest_path", "다익스트라", "경로탐색"]
+  seo:
+    title: "NetworkX 최단 경로 - shortest_path와 다익스트라"
+    description: "NetworkX로 두 노드 사이 최단 경로를 찾습니다. 가중치 없는 경로와 다익스트라 알고리즘을 배웁니다."
+    keywords: ["networkx", "최단경로", "shortest_path", "다익스트라", "dijkstra", "경로"]
+
+intro:
+  emoji: "🛤️"
+  goal: 두 노드 사이 최단 경로를 찾고 경로 관련 함수를 활용합니다.
+  description: 최단 경로는 네트워크 분석의 핵심입니다. shortest_path()로 경로를 찾고, has_path()로 연결 여부를 확인합니다. 가중치가 있으면 다익스트라 알고리즘이 적용됩니다. 지하철 노선도 예제로 실습합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NetworkX와 matplotlib을 불러옵니다. NetworkX는 그래프 알고리즘을 제공하고, matplotlib은 경로 시각화에 사용됩니다. 최단 경로 알고리즘은 네트워크 분석의 핵심으로, 내비게이션, 소셜 네트워크의 관계 거리, 통신망 라우팅 등 다양한 분야에서 활용됩니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: networkx와 matplotlib을 불러옵니다
+    content: |-
+      import networkx as nx
+      import matplotlib.pyplot as plt
+
+- id: step2_simple_path
+  title: 2단계. 기본 최단 경로
+  subtitle: shortest_path()
+  blocks:
+  - type: text
+    content: shortest_path(G, source, target)로 두 노드 사이 최단 경로를 찾습니다. 가중치가 없으면 BFS(너비 우선 탐색)를 사용하여 엣지 수가 가장 적은 경로를 반환합니다. 최단 경로는 출발 노드부터 도착 노드까지 거쳐가는 노드들의 리스트로 반환됩니다. shortest_path_length()는 경로의 길이(엣지 수)만 반환하여 메모리를 절약할 수 있습니다.
+  - type: code
+    language: python
+    title: 그래프 생성
+    description: 경로 탐색용 그래프
+    content: |-
+      G = nx.Graph()
+      G.add_edges_from([
+          (1, 2), (1, 3), (2, 3), (2, 4),
+          (3, 4), (3, 5), (4, 5), (4, 6), (5, 6)
+      ])
+      list(G.edges())
+  - type: code
+    language: python
+    title: 최단 경로 찾기
+    description: 1에서 6까지
+    content: |-
+      path1to6 = nx.shortest_path(G, source=1, target=6)
+      path1to6
+  - type: code
+    language: python
+    title: 경로 길이
+    description: 최단 경로의 엣지 수
+    content: |-
+      length1to6 = nx.shortest_path_length(G, source=1, target=6)
+      length1to6
+  - type: tip
+    content: 경로 길이는 경로에 포함된 엣지의 수입니다. 노드 수 - 1과 같습니다.
+
+- id: step3_has_path
+  title: 3단계. 연결 확인
+  subtitle: has_path()
+  blocks:
+  - type: text
+    content: has_path()로 두 노드가 연결되어 있는지 확인합니다. 그래프가 여러 컴포넌트로 분리된 경우, 서로 다른 컴포넌트에 속한 노드 사이에는 경로가 존재하지 않습니다. shortest_path()를 호출하기 전에 has_path()로 연결 여부를 먼저 확인하면 NetworkXNoPath 예외를 방지할 수 있습니다. 대규모 네트워크에서는 이 확인이 중요합니다.
+  - type: code
+    language: python
+    title: 분리된 그래프
+    description: 두 개의 컴포넌트
+    content: |-
+      G2 = nx.Graph()
+      G2.add_edges_from([(1, 2), (2, 3)])
+      G2.add_edges_from([(4, 5), (5, 6)])
+      list(G2.edges())
+  - type: code
+    language: python
+    title: 연결 확인
+    description: has_path()로 확인
+    content: |-
+      connected1to3 = nx.has_path(G2, 1, 3)
+      connected1to4 = nx.has_path(G2, 1, 4)
+      connected1to3, connected1to4
+  - type: tip
+    content: 연결되지 않은 노드 사이에 shortest_path()를 호출하면 NetworkXNoPath 예외가 발생합니다.
+
+- id: step4_all_paths
+  title: 4단계. 모든 경로 찾기
+  subtitle: all_simple_paths()
+  blocks:
+  - type: text
+    content: all_simple_paths()로 두 노드 사이의 모든 단순 경로를 찾습니다. 단순 경로(simple path)는 같은 노드를 두 번 방문하지 않는 경로입니다. 이 함수는 제너레이터를 반환하므로 메모리 효율적입니다. 큰 그래프에서는 경로 수가 기하급수적으로 증가할 수 있어 cutoff 파라미터로 최대 경로 길이를 제한하는 것이 권장됩니다.
+  - type: code
+    language: python
+    title: 모든 경로
+    description: 1에서 6까지 모든 경로
+    content: |-
+      allPaths = list(nx.all_simple_paths(G, source=1, target=6))
+      allPaths
+  - type: code
+    language: python
+    title: 경로 개수
+    description: 가능한 경로 수
+    content: |-
+      numPaths = len(allPaths)
+      numPaths
+  - type: tip
+    content: 큰 그래프에서는 경로 수가 폭발적으로 증가합니다. cutoff 파라미터로 최대 길이를 제한하세요.
+
+- id: step5_weighted
+  title: 5단계. 가중치 최단 경로
+  subtitle: 다익스트라 알고리즘
+  blocks:
+  - type: text
+    content: 가중치 그래프에서는 엣지 수가 아닌 가중치 합이 최소인 경로를 찾습니다. weight 파라미터로 엣지 속성 이름을 지정하면 다익스트라(Dijkstra) 알고리즘이 자동으로 적용됩니다. 다익스트라 알고리즘은 1956년 에츠허르 다익스트라가 개발한 알고리즘으로, 음수가 아닌 가중치를 가진 그래프에서 최적의 경로를 보장합니다. GPS 내비게이션, 네트워크 라우팅 프로토콜(OSPF) 등에서 핵심적으로 사용됩니다.
+  - type: code
+    language: python
+    title: 가중치 그래프
+    description: 도시 간 거리
+    content: |-
+      cities = nx.Graph()
+      cities.add_edge("Seoul", "Daejeon", weight=140)
+      cities.add_edge("Seoul", "Wonju", weight=120)
+      cities.add_edge("Daejeon", "Daegu", weight=120)
+      cities.add_edge("Wonju", "Daegu", weight=180)
+      cities.add_edge("Daegu", "Busan", weight=90)
+      cities.add_edge("Daejeon", "Gwangju", weight=150)
+      cities.edges(data=True)
+  - type: code
+    language: python
+    title: 가중치 최단 경로
+    description: 서울에서 부산까지
+    content: |-
+      pathSB = nx.shortest_path(cities, "Seoul", "Busan", weight="weight")
+      pathSB
+  - type: code
+    language: python
+    title: 가중치 경로 길이
+    description: 총 거리 계산
+    content: |-
+      distSB = nx.shortest_path_length(cities, "Seoul", "Busan", weight="weight")
+      distSB
+  - type: tip
+    content: weight="weight"를 지정하면 다익스트라 알고리즘이 적용됩니다. 가중치 합이 최소인 경로를 찾습니다.
+
+- id: step6_visualize_path
+  title: 6단계. 경로 시각화
+  subtitle: 경로 강조 표시
+  blocks:
+  - type: text
+    content: 최단 경로를 시각화에서 강조하면 결과를 직관적으로 이해할 수 있습니다. 노드 리스트로 된 경로를 엣지 리스트로 변환한 뒤, draw_networkx_edges()로 해당 엣지만 다른 색상이나 두께로 그립니다. 배경 그래프는 연한 색으로, 경로는 눈에 띄는 색으로 표현하는 것이 효과적입니다.
+  - type: code
+    language: python
+    title: 경로 엣지 추출
+    description: 경로를 엣지 리스트로 변환
+    content: |-
+      pathEdges = list(zip(pathSB[:-1], pathSB[1:]))
+      pathEdges
+  - type: code
+    language: python
+    title: 경로 시각화
+    description: 최단 경로 강조
+    content: |-
+      posCities = nx.spring_layout(cities, seed=42)
+      fig1, ax1 = plt.subplots(figsize=(10, 7))
+
+      nx.draw(cities, pos=posCities, with_labels=True, node_color='lightgray',
+              node_size=1500, font_size=10, edge_color='lightgray', width=2, ax=ax1)
+
+      nx.draw_networkx_edges(cities, pos=posCities, edgelist=pathEdges,
+                              edge_color='red', width=3, ax=ax1)
+
+      nx.draw_networkx_nodes(cities, pos=posCities, nodelist=pathSB,
+                              node_color='salmon', node_size=1500, ax=ax1)
+
+      ax1.set_title('Shortest Path: Seoul to Busan')
+      fig1
+  - type: tip
+    content: draw_networkx_edges()와 draw_networkx_nodes()로 특정 엣지나 노드만 다르게 그릴 수 있습니다.
+
+- id: step7_all_shortest
+  title: 7단계. 모든 최단 경로
+  subtitle: 한 노드에서 모든 노드로
+  blocks:
+  - type: text
+    content: source만 지정하고 target을 생략하면 해당 노드에서 도달 가능한 모든 노드까지의 최단 경로를 한 번에 계산합니다. 결과는 딕셔너리 형태로 반환되어 각 목적지별 경로를 쉽게 조회할 수 있습니다. 이 방식은 개별적으로 여러 번 호출하는 것보다 효율적이며, 한 지점에서 전체 네트워크로의 접근성을 분석할 때 유용합니다.
+  - type: code
+    language: python
+    title: 서울에서 모든 도시
+    description: 딕셔너리로 반환
+    content: |-
+      allFromSeoul = nx.shortest_path(cities, source="Seoul", weight="weight")
+      allFromSeoul
+  - type: code
+    language: python
+    title: 모든 거리
+    description: 서울에서 각 도시까지 거리
+    content: |-
+      distFromSeoul = nx.shortest_path_length(cities, source="Seoul", weight="weight")
+      dict(distFromSeoul)
+  - type: tip
+    content: target을 생략하면 source에서 도달 가능한 모든 노드까지의 경로/거리를 반환합니다.
+
+- id: step8_subway
+  title: 8단계. 지하철 노선도
+  subtitle: 실제 예제
+  blocks:
+  - type: text
+    content: 지하철 노선도를 그래프로 모델링합니다. 각 역은 노드로, 역 사이 구간은 엣지로, 이동 소요시간은 엣지의 가중치로 표현합니다. 이런 모델링을 통해 최단 시간 경로, 최소 환승 경로 등 다양한 경로 탐색 문제를 해결할 수 있습니다. 실제 지하철 앱들도 이와 유사한 그래프 알고리즘을 사용하여 경로를 추천합니다.
+  - type: code
+    language: python
+    title: 지하철 네트워크
+    description: 간단한 노선도
+    content: |-
+      subway = nx.Graph()
+      subwayEdges = [
+          ("Gangnam", "Yeoksam", 2),
+          ("Yeoksam", "Seolleung", 2),
+          ("Seolleung", "Samsung", 3),
+          ("Samsung", "Jamsil", 5),
+          ("Gangnam", "Express", 3),
+          ("Express", "Sinnonhyeon", 2),
+          ("Sinnonhyeon", "Nonhyeon", 2),
+          ("Nonhyeon", "Hakdong", 2),
+          ("Hakdong", "Samsung", 4)
+      ]
+      for u, v, t in subwayEdges:
+          subway.add_edge(u, v, time=t)
+      subway.edges(data=True)
+  - type: code
+    language: python
+    title: 최단 경로 찾기
+    description: 강남에서 잠실까지
+    content: |-
+      pathGJ = nx.shortest_path(subway, "Gangnam", "Jamsil", weight="time")
+      timeGJ = nx.shortest_path_length(subway, "Gangnam", "Jamsil", weight="time")
+      pathGJ, timeGJ
+  - type: code
+    language: python
+    title: 지하철 시각화
+    description: 경로 강조
+    content: |-
+      posSubway = nx.spring_layout(subway, seed=42)
+      fig2, ax2 = plt.subplots(figsize=(10, 7))
+
+      nx.draw(subway, pos=posSubway, with_labels=True, node_color='lightblue',
+              node_size=1000, font_size=9, ax=ax2)
+
+      pathEdgesSubway = list(zip(pathGJ[:-1], pathGJ[1:]))
+      nx.draw_networkx_edges(subway, pos=posSubway, edgelist=pathEdgesSubway,
+                              edge_color='red', width=3, ax=ax2)
+
+      ax2.set_title(f'Gangnam to Jamsil: {timeGJ} min')
+      fig2
+
+- id: step9_diameter
+  title: 9단계. 그래프 지름
+  subtitle: 가장 먼 두 노드
+  blocks:
+  - type: text
+    content: 그래프의 지름(diameter)은 모든 노드 쌍 중 최단 경로가 가장 긴 것의 길이입니다. 네트워크의 '최대 거리'를 나타내며, 두 노드가 최악의 경우에도 몇 단계 내에 연결되는지를 의미합니다. 반지름(radius)은 중심 노드에서 가장 먼 노드까지의 거리입니다. 중심(center)은 이심률이 반지름과 같은 노드들로, 네트워크에서 가장 접근성이 좋은 위치입니다.
+  - type: code
+    language: python
+    title: 지름 계산
+    description: 가장 먼 두 노드 거리
+    content: |-
+      diameter = nx.diameter(G)
+      diameter
+  - type: code
+    language: python
+    title: 반지름과 중심
+    description: 그래프의 중심 노드
+    content: |-
+      radius = nx.radius(G)
+      center = nx.center(G)
+      radius, center
+  - type: tip
+    content: 중심(center)은 모든 노드까지의 최대 거리가 최소인 노드입니다. 네트워크에서 가장 접근성이 좋은 위치입니다.
+
+- id: step10_eccentricity
+  title: 10단계. 이심률
+  subtitle: eccentricity
+  blocks:
+  - type: text
+    content: 이심률(eccentricity)은 한 노드에서 가장 먼 노드까지의 최단 경로 길이입니다. 각 노드가 네트워크에서 얼마나 중심에 있는지 또는 외곽에 있는지를 나타냅니다. 모든 노드의 이심률 중 최대가 지름(diameter), 최소가 반지름(radius)입니다. periphery(주변부)는 이심률이 지름과 같은 노드들로, 네트워크의 가장 바깥에 위치합니다.
+  - type: code
+    language: python
+    title: 이심률 계산
+    description: 각 노드의 이심률
+    content: |-
+      ecc = nx.eccentricity(G)
+      ecc
+  - type: code
+    language: python
+    title: 주변 노드
+    description: 이심률이 지름인 노드들
+    content: |-
+      periphery = nx.periphery(G)
+      periphery
+  - type: tip
+    content: periphery는 이심률이 지름과 같은 노드들입니다. 네트워크의 가장 바깥에 위치합니다.
+
+- id: practice
+  title: 실습
+  subtitle: 경로 탐색
+  blocks:
+  - type: text
+    content: 지금까지 배운 최단 경로 알고리즘을 활용하여 실전 미션을 수행해봅시다. 항공 네트워크에서 최적 경로를 찾고, 게임 맵에서 보스까지의 경로를 탐색합니다. 실제 응용에서 어떻게 활용되는지 경험해보세요.
+  - type: tip
+    content: 각 미션은 import문부터 시작합니다. 위 예제를 실행했다면 import는 생략해도 됩니다.
+  - type: expansion
+    title: "미션1: 항공 네트워크"
+    blocks:
+    - type: code
+      title: 항공 네트워크 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        flight = nx.Graph()
+        flightRoutes = [
+            ("ICN", "NRT", 2),
+            ("ICN", "PEK", 2),
+            ("ICN", "HKG", 3),
+            ("NRT", "LAX", 11),
+            ("PEK", "LAX", 12),
+            ("HKG", "SIN", 4),
+            ("SIN", "SYD", 8),
+            ("LAX", "JFK", 5),
+            ("LAX", "SYD", 15)
+        ]
+        for u, v, h in flightRoutes:
+            flight.add_edge(u, v, hours=h)
+        flight.edges(data=True)
+    - type: code
+      title: 인천-뉴욕 최단 경로
+      content: |-
+        pathICNtoJFK = nx.shortest_path(flight, "ICN", "JFK", weight="hours")
+        timeICNtoJFK = nx.shortest_path_length(flight, "ICN", "JFK", weight="hours")
+        pathICNtoJFK, timeICNtoJFK
+    - type: code
+      title: 인천-시드니 최단 경로
+      content: |-
+        pathICNtoSYD = nx.shortest_path(flight, "ICN", "SYD", weight="hours")
+        timeICNtoSYD = nx.shortest_path_length(flight, "ICN", "SYD", weight="hours")
+        pathICNtoSYD, timeICNtoSYD
+  - type: expansion
+    title: "미션2: 게임 맵 탐색"
+    blocks:
+    - type: code
+      title: 게임 맵 생성
+      content: |-
+        import networkx as nx
+        import matplotlib.pyplot as plt
+
+        gameMap = nx.Graph()
+        rooms = ["Start", "Hall", "Library", "Kitchen", "Garden", "Tower", "Boss"]
+        gameMap.add_nodes_from(rooms)
+
+        passages = [
+            ("Start", "Hall"),
+            ("Hall", "Library"),
+            ("Hall", "Kitchen"),
+            ("Library", "Tower"),
+            ("Kitchen", "Garden"),
+            ("Garden", "Tower"),
+            ("Tower", "Boss")
+        ]
+        gameMap.add_edges_from(passages)
+        list(gameMap.edges())
+    - type: code
+      title: 보스까지 최단 경로
+      content: |-
+        pathToBoss = nx.shortest_path(gameMap, "Start", "Boss")
+        stepsToBoss = nx.shortest_path_length(gameMap, "Start", "Boss")
+        pathToBoss, stepsToBoss
+    - type: code
+      title: 보스까지 모든 경로
+      content: |-
+        allPathsToBoss = list(nx.all_simple_paths(gameMap, "Start", "Boss"))
+        allPathsToBoss

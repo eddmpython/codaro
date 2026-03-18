@@ -1,0 +1,332 @@
+meta:
+  id: day23
+  title: 웹스크래핑
+  day: 23
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 웹 데이터 수집"
+    description: "Pandas로 웹 데이터를 수집하고 분석하는 방법."
+    keywords: ['웹데이터', 'pandas', 'read_csv', 'read_json']
+intro:
+  emoji: "🌐"
+  points:
+  - Pyodide 환경의 네트워크 제약 이해
+  - Pandas로 웹 CSV/JSON 데이터 읽기
+  - 공개 데이터셋 활용하기
+  - 데이터 전처리와 분석
+  - 실전 데이터 분석 프로젝트
+sections:
+- id: pyodide_limitation
+  title: Pyodide 환경 제약
+  subtitle: 브라우저 환경에서의 제한사항
+  blocks:
+  - type: text
+    content: 이 학습 환경은 브라우저에서 실행되는 Pyodide를 사용합니다. Pyodide는 WebAssembly로 컴파일된 파이썬으로, 웹 브라우저에서 직접 파이썬 코드를 실행할 수 있게 해줍니다. 그러나 브라우저 보안 정책인 CORS(Cross-Origin Resource Sharing) 때문에 모든 웹사이트에서 데이터를 가져올 수는 없습니다. requests, urllib 같은 전통적인 HTTP 라이브러리는 사용할 수 없지만, Pandas의 read_csv와 read_json 함수는 CORS가 허용된 URL에서 데이터를 직접 읽을 수 있어 많은 공개 데이터셋을 활용할 수 있습니다.
+  - type: list
+    items:
+    - "requests, urllib 라이브러리 사용 불가"
+    - "BeautifulSoup으로 직접 웹페이지 크롤링 불가"
+    - "Pandas read_csv, read_json은 CORS 허용 URL에서 가능"
+    - "GitHub Raw, 공개 API 등 CORS 허용 소스 활용"
+  - type: code
+    language: python
+    title: Pyodide 환경 확인
+    description: Pyodide 환경에서 가능한 데이터 수집 방법을 확인합니다.
+    content: |-
+      import pandas as pd
+
+      print("Pyodide 환경에서 가능한 데이터 수집:")
+      print("1. pd.read_csv(url) - CSV 파일 직접 읽기")
+      print("2. pd.read_json(url) - JSON 데이터 직접 읽기")
+      print("3. pd.read_html(url) - HTML 테이블 추출")
+      print("")
+      print("사용 불가:")
+      print("- requests.get()")
+      print("- urllib.request")
+      print("- BeautifulSoup 웹 크롤링")
+  - type: tip
+    content: "로컬 Python 환경에서는 requests와 BeautifulSoup을 자유롭게 사용할 수 있습니다. 이 과정에서는 Pyodide에서도 동작하는 Pandas 방식을 학습합니다."
+
+- id: read_csv_web
+  title: 웹에서 CSV 읽기
+  subtitle: pd.read_csv로 URL에서 직접 읽기
+  blocks:
+  - type: text
+    content: Pandas의 read_csv 함수는 로컬 파일뿐만 아니라 URL에서도 직접 CSV 데이터를 읽을 수 있습니다. CSV(Comma-Separated Values)는 데이터를 쉼표로 구분한 텍스트 파일 형식으로, 엑셀이나 데이터베이스에서 많이 사용합니다. GitHub Raw URL은 GitHub에 올라온 파일의 원본 주소로, 이를 read_csv에 넣으면 파일을 다운로드하지 않고도 바로 분석할 수 있습니다. 공개 데이터 포털에서도 CSV 파일을 제공하므로 다양한 실제 데이터를 활용할 수 있습니다.
+  - type: list
+    items:
+    - "pd.read_csv(url) - URL에서 CSV 직접 읽기"
+    - "GitHub Raw URL 활용"
+    - "공개 데이터셋 활용"
+    - "인코딩 옵션 지정 가능"
+  - type: code
+    language: python
+    title: 웹 CSV 읽기
+    description: URL에서 CSV 파일을 직접 읽어옵니다.
+    content: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+      df = pd.read_csv(url)
+
+      print(f"데이터 크기: {df.shape}")
+      print(f"컬럼: {list(df.columns)}")
+      print(df.head())
+
+- id: read_json_web
+  title: 웹에서 JSON 읽기
+  subtitle: pd.read_json으로 API 데이터 읽기
+  blocks:
+  - type: text
+    content: Pandas의 read_json 함수로 웹 API에서 JSON 데이터를 직접 읽을 수 있습니다. JSON(JavaScript Object Notation)은 데이터를 저장하고 전송하는 경량 텍스트 형식으로, 웹 API에서 가장 많이 사용됩니다. REST API는 HTTP를 통해 데이터를 주고받는 웹 서비스 방식으로, 보통 JSON 형태로 데이터를 반환합니다. read_json은 이러한 JSON 배열을 자동으로 DataFrame으로 변환해주어 즉시 분석을 시작할 수 있습니다.
+  - type: list
+    items:
+    - "pd.read_json(url) - JSON 데이터 읽기"
+    - "API 응답 데이터 처리"
+    - "중첩 JSON은 추가 처리 필요"
+    - "orient 옵션으로 형식 지정"
+  - type: code
+    language: python
+    title: 웹 JSON 읽기
+    description: URL에서 JSON 데이터를 읽어옵니다.
+    content: |-
+      import pandas as pd
+
+      url = "https://jsonplaceholder.typicode.com/posts"
+      df = pd.read_json(url)
+
+      print(f"게시글 수: {len(df)}")
+      print(df[['id', 'title']].head())
+
+- id: public_datasets
+  title: 공개 데이터셋 활용
+  subtitle: 다양한 공개 데이터 소스
+  blocks:
+  - type: text
+    content: 인터넷에는 학습과 분석에 활용할 수 있는 다양한 공개 데이터셋이 있습니다. GitHub에는 오픈소스 데이터셋들이 많고, Kaggle은 데이터 과학 경진대회 플랫폼으로 수천 개의 데이터셋을 무료로 제공합니다. 한국의 공공데이터 포털은 정부와 공공기관이 보유한 데이터를 개방하여 누구나 사용할 수 있게 합니다. 이러한 데이터셋들은 CSV, JSON 등 표준 형식으로 제공되어 Pandas로 쉽게 불러올 수 있고, 실제 데이터로 분석 실력을 키울 수 있습니다.
+  - type: list
+    items:
+    - "GitHub Raw - 오픈소스 데이터셋"
+    - "공공데이터 포털 - 정부 데이터"
+    - "Kaggle Datasets - 분석용 데이터"
+    - "UCI ML Repository - 머신러닝 데이터"
+  - type: code
+    language: python
+    title: 다양한 공개 데이터셋
+    description: 여러 공개 데이터셋을 읽어봅니다.
+    content: |-
+      import pandas as pd
+
+      irisUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+      iris = pd.read_csv(irisUrl)
+      print("붓꽃 데이터:")
+      print(iris.head(3))
+
+      tipsUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+      tips = pd.read_csv(tipsUrl)
+      print("\n팁 데이터:")
+      print(tips.head(3))
+
+- id: data_exploration
+  title: 수집 데이터 탐색
+  subtitle: 기본 통계와 구조 파악
+  blocks:
+  - type: text
+    content: 웹에서 수집한 데이터는 먼저 구조와 내용을 파악해야 합니다. 데이터 분석의 첫 단계는 항상 탐색(EDA, Exploratory Data Analysis)입니다. 컬럼 정보로 어떤 변수들이 있는지, 데이터 타입으로 숫자인지 문자인지, 결측치로 빠진 값이 얼마나 있는지 확인합니다. 기본 통계량(평균, 중앙값, 최대 최소값 등)으로 데이터의 대략적인 분포를 파악하여 이상한 값이 없는지 품질을 평가합니다. 이 과정을 거쳐야 올바른 분석 방향을 설정할 수 있습니다.
+  - type: list
+    items:
+    - "df.info() - 데이터 타입 확인"
+    - "df.describe() - 기본 통계량"
+    - "df.isnull().sum() - 결측치 확인"
+    - "df.value_counts() - 범주형 분포"
+  - type: code
+    language: python
+    title: 데이터 탐색
+    description: 수집한 데이터의 구조를 파악합니다.
+    content: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+      df = pd.read_csv(url)
+
+      print("데이터 정보:")
+      print(f"행: {len(df)}, 열: {len(df.columns)}")
+      print(f"\n컬럼별 결측치:")
+      print(df.isnull().sum())
+      print(f"\n생존 분포:")
+      print(df['Survived'].value_counts())
+
+- id: data_cleaning
+  title: 데이터 정제
+  subtitle: 결측치 처리와 변환
+  blocks:
+  - type: text
+    content: 웹에서 수집한 데이터는 결측치, 이상치, 잘못된 형식 등이 포함될 수 있습니다. 결측치는 데이터가 빠져있는 것으로 NaN(Not a Number)으로 표시되며, fillna로 평균값이나 중앙값으로 채우거나 dropna로 해당 행을 제거할 수 있습니다. 이상치는 정상 범위를 벗어난 비정상적인 값으로, 통계 분석 결과를 왜곡시킬 수 있어 처리가 필요합니다. 데이터 정제는 분석 전 필수 과정으로, 정제 품질이 분석 결과의 신뢰도를 결정합니다. "쓰레기가 들어가면 쓰레기가 나온다"는 말처럼 데이터 품질이 매우 중요합니다.
+  - type: list
+    items:
+    - "결측치 제거 또는 대체"
+    - "데이터 타입 변환"
+    - "중복 데이터 제거"
+    - "이상치 처리"
+  - type: code
+    language: python
+    title: 데이터 정제
+    description: 결측치를 처리하고 데이터를 정제합니다.
+    content: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+      df = pd.read_csv(url)
+
+      print(f"원본 행 수: {len(df)}")
+
+      df['Age'] = df['Age'].fillna(df['Age'].median())
+      print(f"Age 결측치 처리 완료")
+
+      df = df.drop(columns=['Cabin'])
+      print("Cabin 컬럼 제거 완료")
+
+      df = df.dropna(subset=['Embarked'])
+      print(f"정제 후 행 수: {len(df)}")
+
+- id: data_analysis
+  title: 데이터 분석
+  subtitle: 그룹별 집계와 통계
+  blocks:
+  - type: text
+    content: 정제된 데이터로 다양한 분석을 수행합니다. groupby는 특정 기준으로 데이터를 그룹화하여 그룹별 통계를 계산하는 강력한 기능입니다. pivot_table은 엑셀의 피벗 테이블처럼 데이터를 재구성하여 요약 통계를 만듭니다. 상관관계 분석(corr)은 두 변수 간 관계를 -1부터 1까지의 수치로 나타내어 어떤 요인이 결과에 영향을 미치는지 파악합니다. 이러한 분석을 통해 데이터에 숨겨진 패턴과 인사이트를 발견하고, 데이터 기반 의사결정을 내릴 수 있습니다.
+  - type: list
+    items:
+    - "groupby() - 그룹별 집계"
+    - "pivot_table() - 피벗 테이블"
+    - "corr() - 상관관계 분석"
+    - "조건별 필터링과 분석"
+  - type: code
+    language: python
+    title: 그룹별 분석
+    description: 타이타닉 데이터로 생존율을 분석합니다.
+    content: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+      df = pd.read_csv(url)
+
+      survivalByClass = df.groupby('Pclass')['Survived'].mean()
+      print("객실 등급별 생존율:")
+      print(survivalByClass)
+
+      survivalBySex = df.groupby('Sex')['Survived'].mean()
+      print("\n성별 생존율:")
+      print(survivalBySex)
+
+      avgFare = df.groupby('Pclass')['Fare'].mean()
+      print("\n등급별 평균 요금:")
+      print(avgFare.round(2))
+
+- id: practical_project
+  title: 실전 프로젝트
+  subtitle: 웹 데이터 분석 종합
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 종합하여 웹에서 데이터를 수집하고 분석하는 프로젝트를 진행합니다. 실제 데이터 분석가의 업무는 이러한 파이프라인으로 이루어집니다. 먼저 웹에서 데이터를 수집하고, 탐색을 통해 데이터를 이해하고, 정제로 품질을 높이고, 분석과 시각화로 인사이트를 도출합니다. 마지막으로 인사이트를 바탕으로 의사결정을 내립니다. 붓꽃 데이터셋은 머신러닝 학습에 자주 사용되는 유명한 데이터로, 꽃잎과 꽃받침의 크기로 붓꽃 품종을 분류하는 문제입니다.
+  - type: list
+    items:
+    - 웹에서 데이터 수집
+    - 데이터 탐색 및 정제
+    - 분석 및 시각화
+    - 인사이트 도출
+  - type: code
+    language: python
+    title: 붓꽃 데이터 분석
+    description: 웹에서 데이터를 수집하고 종별 특성을 분석합니다.
+    content: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+      df = pd.read_csv(url)
+
+      print("붓꽃 데이터 분석")
+      print(f"총 샘플: {len(df)}개")
+      print(f"\n품종 분포:")
+      print(df['species'].value_counts())
+
+      stats = df.groupby('species').agg({
+          'sepal_length': 'mean',
+          'sepal_width': 'mean',
+          'petal_length': 'mean',
+          'petal_width': 'mean'
+      }).round(2)
+      print("\n품종별 평균:")
+      print(stats)
+
+- id: practice
+  title: 23일차 복습
+  subtitle: 웹 데이터 수집 미션
+  blocks:
+  - type: text
+    content: 23일차에서 배운 웹 데이터 수집을 복습하는 미션입니다.
+  - type: expansion
+    title: "미션1: CSV 읽기"
+    code: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+      df = pd.read_csv(url)
+      print(df.head())
+  - type: expansion
+    title: "미션2: 데이터 크기 확인"
+    code: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+      df = pd.read_csv(url)
+      print(f"행: {len(df)}, 열: {len(df.columns)}")
+  - type: expansion
+    title: "미션3: 결측치 확인"
+    code: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/datasciencedojo/datasets/master/titanic.csv"
+      df = pd.read_csv(url)
+      print(df.isnull().sum())
+  - type: expansion
+    title: "미션4: 그룹별 집계"
+    code: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+      df = pd.read_csv(url)
+      print(df.groupby('day')['total_bill'].mean())
+  - type: expansion
+    title: "미션5: 조건 필터링"
+    code: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+      df = pd.read_csv(url)
+      setosa = df[df['species'] == 'setosa']
+      print(f"setosa 샘플: {len(setosa)}개")
+  - type: expansion
+    title: "미션6: 기본 통계"
+    code: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+      df = pd.read_csv(url)
+      print(df.describe())
+  - type: expansion
+    title: "미션7: 종합 분석"
+    code: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
+      df = pd.read_csv(url)
+
+      print("요일별 팁 분석:")
+      stats = df.groupby('day').agg({
+          'tip': ['mean', 'sum', 'count']
+      }).round(2)
+      print(stats)

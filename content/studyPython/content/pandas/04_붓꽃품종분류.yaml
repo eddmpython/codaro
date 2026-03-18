@@ -1,0 +1,315 @@
+meta:
+  id: pandas_04
+  title: 붓꽃품종분류
+  order: 4
+  category: pandas
+  difficulty: "⭐⭐⭐"
+  badge: 기초
+  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv
+  tags: ["iris", "결측치", "apply", "map", "새컬럼"]
+  seo:
+    title: "pandas 결측치 처리와 새 컬럼 만들기 - 붓꽃 데이터"
+    description: "붓꽃 데이터로 결측치 처리(dropna, fillna)와 새 컬럼 추가(assign, apply, map)를 배웁니다. 꽃잎 면적 계산 실습."
+    keywords: ["pandas 결측치", "dropna fillna", "apply map", "assign", "iris 데이터"]
+
+intro:
+  emoji: "🌸"
+  goal: 붓꽃 데이터에서 "품종별 꽃잎 면적"을 계산하고 비교합니다.
+  description: 결측치 처리와 새로운 컬럼을 만드는 방법을 배웁니다. 기존에 없던 값을 계산해서 추가합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: 붓꽃 데이터
+  blocks:
+  - type: text
+    content: 150송이 붓꽃, 3품종(setosa, versicolor, virginica) 각 50송이씩입니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: 붓꽃 데이터를 불러옵니다
+    content: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
+      iris = pd.read_csv(url)
+      iris.shape
+
+- id: step2_head
+  title: 2단계. 미리보기
+  subtitle: 데이터 구조 파악
+  blocks:
+  - type: text
+    content: petal_length(꽃잎 길이)와 petal_width(꽃잎 너비)로 면적을 계산할 수 있습니다.
+  - type: code
+    language: python
+    title: 미리보기
+    description: 데이터가 어떻게 생겼는지
+    content: |-
+      iris.head()
+
+- id: step3_isna
+  title: 3단계. 결측치 확인
+  subtitle: isna().sum()
+  blocks:
+  - type: text
+    content: 실제 데이터에는 종종 결측치(Missing Value, NaN)가 포함되어 있습니다. 결측치는 측정 실패, 입력 누락 등 다양한 이유로 발생합니다. isna()는 각 값이 결측치인지 True/False로 반환하고, sum()을 붙이면 컬럼별로 결측치 개수를 세어줍니다. 데이터 분석 전에 반드시 확인해야 하는 중요한 단계입니다.
+  - type: code
+    language: python
+    title: 결측치 개수 확인
+    description: 컬럼별로 결측치가 몇 개인지
+    content: |-
+      iris.isna().sum()
+
+  - type: tip
+    content: "isna()와 isnull()은 같은 기능입니다. 둘 다 사용 가능하며, 결측치를 True로 표시합니다. 반대로 notna()나 notnull()은 결측치가 아닌 값을 True로 표시합니다."
+
+- id: step4_info
+  title: 4단계. 전체 정보
+  subtitle: info()로 확인
+  blocks:
+  - type: text
+    content: info()의 Non-Null Count가 150이면 결측치가 없다는 뜻입니다.
+  - type: code
+    language: python
+    title: 전체 정보
+    description: info()로 결측치 포함 확인
+    content: |-
+      iris.info()
+
+- id: step5_dropna
+  title: 5단계. 결측치 삭제
+  subtitle: dropna()
+  blocks:
+  - type: text
+    content: dropna() 메서드는 결측치가 있는 행을 삭제합니다. 기본적으로 한 행에 하나라도 결측치가 있으면 그 행 전체를 제거합니다. 이 데이터는 결측치가 없어서 삭제되는 행이 없지만, 실제 데이터에서는 자주 사용하는 전처리 방법입니다. 원본은 유지되고 새로운 DataFrame을 반환합니다.
+  - type: code
+    language: python
+    title: 결측치 있는 행 삭제
+    description: dropna()는 결측치가 있는 행을 제거합니다
+    content: |-
+      clean = iris.dropna()
+      len(iris), len(clean)
+
+  - type: tip
+    content: "dropna()는 기본적으로 행(row)을 삭제하지만, axis=1을 추가하면 열(column)을 삭제합니다. 또한 subset=['컬럼명']을 지정하면 특정 컬럼의 결측치만 기준으로 삼을 수 있습니다."
+
+- id: step6_fillna
+  title: 6단계. 결측치 채우기
+  subtitle: fillna()
+  blocks:
+  - type: text
+    content: fillna() 메서드는 결측치를 특정 값으로 대체합니다. 삭제하는 대신 채우는 방식으로 처리할 수 있습니다. 0으로 채우거나, 평균값(fillna(df.mean())), 중앙값(fillna(df.median())), 최빈값 등 다양한 전략을 사용할 수 있습니다. 데이터의 특성에 맞는 방법을 선택하는 것이 중요합니다.
+  - type: code
+    language: python
+    title: 결측치 채우기
+    description: fillna(값)은 결측치를 특정 값으로 채웁니다
+    content: |-
+      filled = iris.fillna(0)
+      filled.isna().sum()
+
+- id: step7_assign
+  title: 7단계. 새 컬럼 추가
+  subtitle: assign()
+  blocks:
+  - type: text
+    content: assign() 메서드는 기존 DataFrame에 새로운 컬럼을 추가한 DataFrame을 반환합니다. 원본은 변경하지 않고 새로운 DataFrame을 만들기 때문에 marimo 환경에서 안전하게 사용할 수 있습니다. 꽃잎 길이와 너비를 곱해서 면적을 계산하는 것처럼, 기존 컬럼들을 조합해서 새로운 의미 있는 데이터를 만들 수 있습니다.
+  - type: code
+    language: python
+    title: 꽃잎 면적 컬럼 추가
+    description: 길이 × 너비로 면적 계산
+    content: |-
+      withArea = iris.assign(petalArea=iris['petal_length'] * iris['petal_width'])
+      withArea.head()
+
+  - type: tip
+    content: "assign()은 여러 컬럼을 동시에 추가할 수 있습니다. iris.assign(petalArea=..., sepalArea=...) 형태로 작성하면 됩니다. df['새컬럼'] = 값 방식도 가능하지만, marimo에서는 변수 재할당 문제가 발생할 수 있어 assign()을 권장합니다."
+
+- id: step8_groupby_area
+  title: 8단계. 품종별 평균 면적
+  subtitle: 목표 달성!
+  blocks:
+  - type: text
+    content: 이제 품종별 평균 면적을 구할 수 있습니다! virginica가 가장 큽니다.
+  - type: code
+    language: python
+    title: 품종별 평균 면적
+    description: 목표 달성!
+    content: |-
+      withArea.groupby('species')['petalArea'].mean()
+
+- id: step8_5_filter_species
+  title: 8.5단계. 조건 필터링 복습
+  subtitle: 특정 품종만 분석
+  blocks:
+  - type: text
+    content: 이전에 배운 조건 필터링을 복습합니다. virginica 품종만 선택해서 꽃잎 면적의 통계를 확인해봅니다. DataFrame[조건] 형태로 필터링하는 방법은 이전 프로젝트(02번)에서 배웠습니다. 필터링 후 describe()로 통계를 보면 해당 품종의 분포를 상세히 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: virginica만 필터링
+    description: 조건 필터링 복습
+    content: |-
+      virginica = withArea[withArea['species'] == 'virginica']
+      virginica['petalArea'].describe()
+  - type: tip
+    content: "필터링은 데이터 분석의 핵심입니다. 전체 데이터 중 원하는 부분만 선택해서 집중 분석할 수 있습니다. 여러 조건을 조합할 때는 괄호로 감싸고 &(and), |(or)로 연결합니다."
+
+- id: step9_apply
+  title: 9단계. apply 기본
+  subtitle: 모든 값에 함수 적용
+  blocks:
+  - type: text
+    content: |-
+      apply() 메서드는 Series나 DataFrame의 모든 값에 특정 함수를 적용합니다. 복잡한 계산이나 변환이 필요할 때 매우 유용합니다. lambda는 이름 없는 익명 함수를 한 줄로 정의하는 방법으로, apply()와 자주 함께 사용됩니다. lambda x: x * 2는 "x를 받아서 x * 2를 반환하는 함수"라는 뜻입니다.
+  - type: code
+    language: python
+    title: 2배로 변환
+    description: 모든 값에 2를 곱합니다
+    content: |-
+      iris['sepal_length'].apply(lambda x: x * 2).head()
+
+  - type: tip
+    content: "lambda x: 표현식은 def 함수의 간단 버전입니다. 'lambda x: x * 2'는 'def double(x): return x * 2'와 같습니다. 간단한 변환에는 lambda가 편리하지만, 복잡한 로직에는 def로 함수를 정의하는 것이 좋습니다."
+
+- id: step10_apply_condition
+  title: 10단계. 조건 분류
+  subtitle: if-else 적용
+  blocks:
+  - type: text
+    content: "'large' if x > 3 else 'small'은 x가 3보다 크면 large, 아니면 small입니다."
+  - type: code
+    language: python
+    title: 조건 분류
+    description: 꽃잎 길이로 대/소 분류
+    content: |-
+      iris['petal_length'].apply(lambda x: 'large' if x > 3 else 'small').value_counts()
+
+- id: step11_map
+  title: 11단계. map 값 치환
+  subtitle: 딕셔너리로 변환
+  blocks:
+  - type: text
+    content: map() 메서드는 값을 다른 값으로 매핑(치환)합니다. 딕셔너리를 넣으면 키를 찾아서 대응하는 값으로 바꿔줍니다. 코드 값을 의미 있는 이름으로 바꾸거나, 영어를 한글로 변환하는 등 다양하게 활용할 수 있습니다. apply보다 간단하고 빠르게 값을 변환할 수 있습니다.
+  - type: code
+    language: python
+    title: 품종명 한글로
+    description: 영어 → 한글로 치환
+    content: |-
+      nameMap = {'setosa': '세토사', 'versicolor': '버시컬러', 'virginica': '버지니카'}
+      iris['species'].map(nameMap).head()
+
+  - type: tip
+    content: "map()과 apply()의 차이: map()은 딕셔너리나 Series로 1:1 매핑만 가능하지만 빠릅니다. apply()는 복잡한 로직도 처리할 수 있지만 느립니다. 단순 치환은 map(), 조건문/계산은 apply()를 사용하세요."
+
+- id: step12_str_upper
+  title: 12단계. 문자열 대문자
+  subtitle: str.upper()
+  blocks:
+  - type: text
+    content: pandas에서 문자열 컬럼을 다룰 때는 .str 접근자를 사용합니다. .str을 붙이면 파이썬의 모든 문자열 메서드를 사용할 수 있습니다. upper()는 대문자로, lower()는 소문자로 변환합니다. 그 외에도 split(), replace(), strip() 등 다양한 문자열 처리 기능을 제공합니다.
+  - type: code
+    language: python
+    title: 품종명 대문자로
+    description: str.upper()로 대문자 변환
+    content: |-
+      iris['species'].str.upper().head()
+
+- id: step13_str_contains
+  title: 13단계. 포함 여부
+  subtitle: str.contains()
+  blocks:
+  - type: text
+    content: str.contains()는 특정 문자가 포함되어 있는지 True/False로 반환합니다.
+  - type: code
+    language: python
+    title: 특정 문자 포함 여부
+    description: a가 포함된 품종 찾기
+    content: |-
+      iris['species'].str.contains('a').value_counts()
+
+- id: step14_duplicated
+  title: 14단계. 중복 확인
+  subtitle: duplicated()
+  blocks:
+  - type: text
+    content: duplicated()는 중복 행을 True로 표시합니다. sum()으로 개수를 셉니다.
+  - type: code
+    language: python
+    title: 중복 행 개수
+    description: duplicated()는 중복 여부를 True/False로
+    content: |-
+      iris.duplicated().sum()
+
+- id: step15_drop_duplicates
+  title: 15단계. 중복 제거
+  subtitle: drop_duplicates()
+  blocks:
+  - type: text
+    content: drop_duplicates()로 중복 행을 제거합니다.
+  - type: code
+    language: python
+    title: 중복 제거
+    description: drop_duplicates()로 중복 삭제
+    content: |-
+      unique = iris.drop_duplicates()
+      len(iris), len(unique)
+
+- id: practice
+  title: 실습
+  subtitle: 붓꽃 분석 프로젝트
+  blocks:
+  - type: text
+    content: 배운 내용으로 붓꽃 데이터를 분석해봅시다.
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 꽃받침 면적 계산 + apply 분류"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv")
+    - type: code
+      title: "분석 수행"
+      content: |-
+        dataWithArea = data.assign(sepalArea=data['sepal_length'] * data['sepal_width'])
+        sepalAvg = dataWithArea.groupby('species')['sepalArea'].mean()
+        dataWithSize = data.assign(sizeCategory=data['petal_length'].apply(lambda x: 'large' if x >= 3 else 'small'))
+        sizeCounts = dataWithSize.groupby(['species', 'sizeCategory']).size()
+        (sepalAvg, sizeCounts)
+  - type: expansion
+    title: "미션2: idxmax 활용 + 품종별 전체 평균"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv")
+    - type: code
+      title: "분석 수행"
+      content: |-
+        maxIdx = df['petal_width'].idxmax()
+        widestFlower = df.loc[maxIdx, ['species', 'petal_width']]
+        speciesAvg = df.groupby('species').mean(numeric_only=True)
+        (widestFlower, speciesAvg)
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 데이터 정제와 새 컬럼 만들기를 배웠습니다.
+  - type: list
+    items:
+    - "df.isna().sum() - 결측치 개수 확인"
+    - "df.info() - 전체 정보 (타입, 결측치 포함)"
+    - "df.dropna() - 결측치 있는 행 삭제"
+    - "df.fillna(값) - 결측치 채우기"
+    - "df.assign(새컬럼=계산) - 새 컬럼 추가"
+    - "df['컬럼'].apply(lambda x: 변환) - 모든 값에 함수 적용"
+    - "df['컬럼'].map({a: b}) - 값 치환"
+    - "df['컬럼'].str.메서드() - 문자열 처리"
+    - "df.duplicated() - 중복 행 확인"
+    - "df.drop_duplicates() - 중복 제거"
+  - type: text
+    content: 다음 시간에는 자동차 연비 데이터로 정렬과 피벗테이블을 배웁니다.

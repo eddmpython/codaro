@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import time
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -32,8 +33,17 @@ from .serverLog import configureServerLogging, formatLogFields, isVerboseLogging
 PACKAGE_ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = PACKAGE_ROOT.parent.parent.parent
 FRONTEND_ROOT = PROJECT_ROOT / "frontend"
-WEB_BUILD_ROOT = PACKAGE_ROOT / "webBuild"
 CONTENT_ROOT = PROJECT_ROOT / "content" / "studyPython" / "content"
+
+
+def resolveWebBuildRoot() -> Path:
+    configuredPath = os.environ.get("CODARO_WEB_BUILD_ROOT")
+    if configuredPath:
+        return Path(configuredPath).expanduser().resolve()
+    return PACKAGE_ROOT / "webBuild"
+
+
+WEB_BUILD_ROOT = resolveWebBuildRoot()
 
 
 @dataclass(slots=True)
@@ -130,6 +140,7 @@ def createServerApp(
     @asynccontextmanager
     async def lifespan(application: FastAPI):
         del application
+        await state.workspaceEngine.initialize()
         logger.info(
             "lifespan %s",
             formatLogFields(
@@ -144,6 +155,7 @@ def createServerApp(
             "lifespan %s",
             formatLogFields(status="shutdown", activeSessions=state.sessionManager.sessionCount),
         )
+        state.workspaceEngine.dispose()
         state.sessionManager.destroyAll()
 
     app = FastAPI(title="Codaro", lifespan=lifespan)

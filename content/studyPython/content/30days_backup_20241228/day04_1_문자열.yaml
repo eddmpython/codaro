@@ -1,0 +1,231 @@
+meta:
+  id: day04_1
+  title: 문자열
+  day: 4
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 문자열 - 텍스트 다루기"
+    description: "문자열 생성, 연결, 이스케이프 문자 사용법을 배웁니다."
+    keywords: ['문자열', 'string', '이스케이프', '연결']
+intro:
+  emoji: "📝"
+  points:
+  - 문자열의 기본 개념과 생성 방법
+  - 여러 줄 문자열 만들기
+  - 문자열 연결하기 (+)
+  - 이스케이프 시퀀스 (\n, \t)
+  - 문자열과 숫자 함께 출력하기
+  - 기본적인 문자열 확인 방법 (in)
+sections:
+- id: string_introduction
+  title: 문자열 소개
+  subtitle: 문자열의 기본 개념
+  blocks:
+  - type: text
+    content: 문자열(String)은 문자들이 순서대로 나열된 데이터 타입입니다. 하나의 글자('a')든 긴 문장("Hello, World!")이든 모두 문자열입니다. 파이썬에서 문자열은 작은따옴표('')나 큰따옴표("")로 감싸서 만들며, 두 가지를 섞어 쓸 수는 없습니다. 문자열은 프로그래밍에서 가장 많이 사용되는 데이터 타입 중 하나로, 사용자 입력, 파일 내용, 웹 데이터 등 대부분의 텍스트 처리에 사용됩니다.
+  - type: list
+    items:
+    - 문자들이 순서대로 나열된 데이터 타입
+    - 작은따옴표('') 또는 큰따옴표("") 사용
+    - 한 글자도 문자열 ("P"도 문자열)
+    - 빈 문자열("")도 유효한 문자열
+  - type: code
+    language: python
+    title: 기본 문자열 만들기
+    description: "작은따옴표나 큰따옴표로 문자열을 생성합니다."
+    content: |-
+      letter = 'P'
+      greeting = 'Hello, World!'
+      name = '파이썬'
+      empty = ''
+
+      print(letter)
+      print(greeting)
+      print(name)
+      print('빈 문자열 길이:', len(empty))
+  - type: tip
+    content: "작은따옴표와 큰따옴표는 기능상 차이가 없습니다. 다만 문자열 안에 따옴표가 포함될 때 유용합니다. 예: \"It's good\" 또는 'He said \"Hi\"'"
+
+- id: multiline_strings
+  title: 여러 줄 문자열
+  subtitle: 긴 텍스트 만들기
+  blocks:
+  - type: text
+    content: 여러 줄에 걸친 긴 텍스트를 만들 때는 삼중 따옴표(''' 또는 """)를 사용합니다. 일반 따옴표로는 한 줄에만 문자열을 쓸 수 있지만, 삼중 따옴표를 사용하면 엔터를 눌러 여러 줄로 작성할 수 있고, 줄바꿈이 그대로 유지됩니다. 시, 긴 설명문, 코드 문서화(docstring) 등에 자주 사용됩니다.
+  - type: list
+    items:
+    - 삼중 따옴표(''' 또는 """)로 여러 줄 작성
+    - 줄바꿈이 그대로 유지됨
+    - 시, 설명문, 문서화에 활용
+    - 작은/큰 삼중 따옴표 모두 사용 가능
+  - type: code
+    language: python
+    title: 여러 줄 문자열 만들기
+    description: "삼중 따옴표 안에서는 여러 줄에 걸쳐 자유롭게 작성할 수 있습니다."
+    content: |-
+      poem = '''장미는 빨갛고
+      하늘은 파랗고
+      파이썬은 재미있어요!'''
+
+      print(poem)
+      print('총 길이:', len(poem))
+
+- id: string_concatenation
+  title: 문자열 연결하기
+  subtitle: 여러 문자열을 하나로 합치기
+  blocks:
+  - type: text
+    content: 두 개 이상의 문자열을 + 연산자로 연결하여 새로운 문자열을 만들 수 있습니다. 이를 문자열 연결(concatenation)이라고 합니다. 숫자의 덧셈과 비슷하게 보이지만, 문자열에서는 "이어 붙이기"를 의미합니다. 주의할 점은 공백은 자동으로 추가되지 않으므로, 필요하면 직접 추가해야 한다는 것입니다.
+  - type: list
+    items:
+    - "+ 연산자로 문자열 연결"
+    - 공백은 자동 추가되지 않음
+    - 필요한 곳에 공백 문자 직접 추가
+    - 연결 결과는 새 문자열
+  - type: code
+    language: python
+    title: 문자열 연결
+    description: "+ 연산자로 문자열을 이어 붙입니다."
+    content: |-
+      greeting = '안녕하세요'
+      target = '파이썬'
+      message = greeting + ', ' + target + '!'
+
+      print(message)
+      print('길이:', len(message))
+  - type: tip
+    content: "많은 문자열을 연결할 때는 f-string이나 join() 메서드가 더 효율적입니다. 패턴학습에서 자세히 배웁니다."
+
+- id: escape_sequences
+  title: 이스케이프 문자
+  subtitle: 특별한 문자 표현하기
+  blocks:
+  - type: text
+    content: 문자열에서 줄바꿈, 탭, 따옴표 같은 특수한 문자를 표현할 때 백슬래시(\)와 특정 문자를 조합한 이스케이프 시퀀스를 사용합니다. 백슬래시는 "다음 문자를 특별하게 해석하라"는 신호입니다. \n은 줄바꿈, \t는 탭, \\는 백슬래시 자체, \'와 \"는 각각 따옴표를 표현합니다.
+  - type: list
+    items:
+    - "\\n: 줄바꿈 (새 줄로 이동)"
+    - "\\t: 탭 (보통 4~8칸 공백)"
+    - "\\\\: 백슬래시 자체"
+    - "\\' \\\" : 따옴표 표현"
+  - type: code
+    language: python
+    title: 이스케이프 문자 사용
+    description: "\\n, \\t 등 특수 문자를 표현합니다."
+    content: |-
+      table = '이름\t나이\t성별\n김철수\t25\t남\n이영희\t23\t여'
+      print(table)
+
+      quote = '그는 \"안녕하세요\"라고 말했습니다.'
+      print(quote)
+  - type: tip
+    content: "Raw 문자열(r'...')을 사용하면 백슬래시를 이스케이프 없이 그대로 표현합니다. 파일 경로에서 유용합니다. 예: r'C:\\Users\\Documents'"
+
+- id: string_with_numbers
+  title: 문자열과 숫자 함께 쓰기
+  subtitle: 숫자를 문자열로 바꿔서 출력하기
+  blocks:
+  - type: text
+    content: 문자열과 숫자를 + 연산자로 직접 연결할 수 없습니다. 파이썬은 타입이 다른 값의 연산을 허용하지 않기 때문입니다. 숫자를 문자열과 연결하려면 str() 함수로 숫자를 문자열로 변환해야 합니다. 또는 print() 함수에서 쉼표로 구분하면 자동으로 공백을 넣어 출력됩니다.
+  - type: list
+    items:
+    - 문자열 + 숫자는 에러 발생
+    - str() 함수로 숫자를 문자열로 변환
+    - print()에서 쉼표로 구분하면 자동 공백 추가
+    - f-string으로 더 간편하게 가능 (패턴학습에서)
+  - type: code
+    language: python
+    title: 문자열과 숫자 연결
+    description: "str() 함수로 숫자를 문자열로 변환 후 연결합니다."
+    content: |-
+      playerName = '김철수'
+      playerLevel = 25
+      playerScore = 1500
+
+      info = '플레이어: ' + playerName + ', 레벨: ' + str(playerLevel) + ', 점수: ' + str(playerScore)
+      print(info)
+  - type: tip
+    content: "f-string을 사용하면 변환 없이 더 깔끔합니다. f'이름: {name}, 나이: {age}' 형태로 중괄호 안에 변수를 바로 넣을 수 있습니다."
+
+- id: string_basic_check
+  title: 문자열 확인하기
+  subtitle: 문자열 안에 특정 글자가 있는지 보기
+  blocks:
+  - type: text
+    content: 문자열 안에 특정 문자나 단어가 포함되어 있는지 확인하려면 in 연산자를 사용합니다. 포함되어 있으면 True, 없으면 False를 반환합니다. not in은 반대로 포함되어 있지 않은지 확인합니다. 이 연산자는 대소문자를 구분하므로 'Python'과 'python'은 다르게 취급됩니다.
+  - type: list
+    items:
+    - "in: 포함되어 있으면 True"
+    - "not in: 포함되어 있지 않으면 True"
+    - 대소문자를 구분함
+    - 이메일 검증 등에 활용
+  - type: code
+    language: python
+    title: in 연산자 활용
+    description: "문자열에 특정 텍스트가 포함되어 있는지 확인합니다."
+    content: |-
+      email = 'user@example.com'
+      text = '파이썬 프로그래밍'
+
+      hasAt = '@' in email
+      hasDot = '.' in email
+      hasPython = '파이썬' in text
+      hasJava = '자바' not in text
+
+      print('이메일 유효?', hasAt and hasDot)
+      print('파이썬 포함?', hasPython)
+      print('자바 미포함?', hasJava)
+
+- id: practice
+  title: 4일차 복습
+  subtitle: 문자열 기초 미션
+  blocks:
+  - type: text
+    content: 4일차에서 배운 문자열 기초를 복습하는 미션입니다. 문자열 생성, 연결, 이스케이프 문자, 타입 변환을 종합적으로 연습해봅시다.
+  - type: expansion
+    title: "미션1: 자기소개 문자열 만들기"
+    code: |-
+      name = '홍길동'
+      age = 20
+      city = '서울'
+      intro = name + '(' + str(age) + '세)님은 ' + city + '에 삽니다.'
+      print(intro)
+  - type: expansion
+    title: "미션2: 여러 줄 문자열"
+    code: |-
+      poem = """봄이 오면
+      꽃이 피고
+      새가 노래하네
+      - 파이썬 시인"""
+      print(poem)
+  - type: expansion
+    title: "미션3: 표 형식 출력"
+    code: |-
+      table = '상품명\t가격\t수량\n사과\t1000\t5\n바나나\t500\t10'
+      print(table)
+  - type: expansion
+    title: "미션4: 이메일 유효성 검사"
+    code: |-
+      email = 'test@gmail.com'
+      isValid = '@' in email and '.' in email
+      print('이메일:', email)
+      print('유효한가?', isValid)
+  - type: expansion
+    title: "미션5: 문자열과 숫자 결합"
+    code: |-
+      product = '노트북'
+      price = 1500000
+      qty = 2
+      total = price * qty
+      message = product + ' ' + str(qty) + '대, 총 ' + str(total) + '원'
+      print(message)
+  - type: expansion
+    title: "미션6: 경로 문자열"
+    code: |-
+      path1 = 'C:\\Users\\Documents\\file.txt'
+      path2 = r'C:\Users\Documents\file.txt'
+      print(path1)
+      print(path2)

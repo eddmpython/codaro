@@ -1,0 +1,651 @@
+meta:
+  id: "day19"
+  title: "파일입출력"
+  day: 19
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 파일 입출력 - 파일 읽고 쓰기"
+    description: "open, read, write, with문으로 파일을 다루는 방법을 배웁니다."
+    keywords: ['파일', 'open', 'read', 'write', 'with']
+
+intro:
+  emoji: "📄"
+  points:
+  - "파일 열기와 닫기"
+  - "파일 읽고 쓰기"
+  - "with문으로 안전하게"
+  - "파일 모드 이해"
+
+sections:
+- id: "open_file"
+  title: "파일 열기"
+  subtitle: "open() 함수"
+  blocks:
+  - type: "text"
+    content: "open() 함수로 파일을 엽니다. open(파일경로, 모드) 형식으로 쓰며, 파일 객체를 반환합니다. 사용 후에는 close()로 닫아야 합니다. 기본 모드는 읽기('r')입니다."
+  - type: "list"
+    items:
+    - "open(경로, 모드)"
+    - "파일 객체 반환"
+    - "close()로 닫기"
+    - "기본은 읽기 모드"
+  - type: "code"
+    language: "python"
+    title: "파일 열기"
+    description: "텍스트 파일을 열어봅니다."
+    content: |-
+      f = open('test.txt', 'w')
+      f.write('Hello World')
+      f.close()
+      'File created'
+  - type: "code"
+    language: "python"
+    title: "파일 읽기"
+    description: "파일을 읽기 모드로 엽니다."
+    content: |-
+      handle = open('test.txt', 'r')
+      content = handle.read()
+      handle.close()
+      content
+  - type: "code"
+    language: "python"
+    title: "파일 존재 확인"
+    description: "파일이 없으면 에러가 발생합니다."
+    content: |-
+      file = open('test.txt', 'w')
+      file.write('Python')
+      file.close()
+      'File written'
+  - type: "tip"
+    content: "파일은 반드시 close()로 닫아야 리소스가 해제됩니다. marimo에서는 좌측 상단의 Files 아이콘을 클릭하면 실제로 생성된 txt 파일을 확인할 수 있습니다."
+
+- id: "read_file"
+  title: "파일 읽기"
+  subtitle: "read() 메서드"
+  blocks:
+  - type: "text"
+    content: "read() 메서드로 파일 내용을 읽습니다. 전체 내용을 문자열로 반환합니다. readline()은 한 줄씩, readlines()는 모든 줄을 리스트로 반환합니다."
+  - type: "list"
+    items:
+    - "read(): 전체 읽기"
+    - "readline(): 한 줄 읽기"
+    - "readlines(): 리스트로"
+    - "문자열로 반환"
+  - type: "code"
+    language: "python"
+    title: "전체 읽기"
+    description: "read()로 파일 전체를 읽습니다."
+    content: |-
+      writer = open('data.txt', 'w')
+      writer.write('Line 1\nLine 2\nLine 3')
+      writer.close()
+
+      reader = open('data.txt', 'r')
+      text = reader.read()
+      reader.close()
+      text
+  - type: "code"
+    language: "python"
+    title: "한 줄 읽기"
+    description: "readline()으로 첫 줄만 읽습니다."
+    content: |-
+      output = open('sample.txt', 'w')
+      output.write('First\nSecond\nThird')
+      output.close()
+
+      input = open('sample.txt', 'r')
+      line = input.readline()
+      input.close()
+      line
+  - type: "code"
+    language: "python"
+    title: "모든 줄 읽기"
+    description: "readlines()로 모든 줄을 리스트로 읽습니다."
+    content: |-
+      fw = open('lines.txt', 'w')
+      fw.write('A\nB\nC')
+      fw.close()
+
+      fr = open('lines.txt', 'r')
+      lines = fr.readlines()
+      fr.close()
+      lines
+  - type: "tip"
+    content: "readlines()는 각 줄에 줄바꿈 문자(\\n)를 포함합니다."
+
+- id: "write_file"
+  title: "파일 쓰기"
+  subtitle: "write() 메서드"
+  blocks:
+  - type: "text"
+    content: "write() 메서드로 파일에 문자열을 씁니다. 'w' 모드는 기존 내용을 지우고, 'a' 모드는 끝에 추가합니다. write()는 쓴 문자 수를 반환합니다."
+  - type: "list"
+    items:
+    - "write(문자열)"
+    - "'w': 덮어쓰기"
+    - "'a': 추가하기"
+    - "쓴 문자 수 반환"
+  - type: "code"
+    language: "python"
+    title: "새로 쓰기"
+    description: "'w' 모드로 새로 씁니다."
+    content: |-
+      fileObj = open('message.txt', 'w')
+      count = fileObj.write('Hello Python')
+      fileObj.close()
+      count
+  - type: "code"
+    language: "python"
+    title: "추가하기"
+    description: "'a' 모드로 끝에 추가합니다."
+    content: |-
+      obj = open('log.txt', 'w')
+      obj.write('Start\n')
+      obj.close()
+
+      obj2 = open('log.txt', 'a')
+      obj2.write('End\n')
+      obj2.close()
+
+      obj3 = open('log.txt', 'r')
+      result = obj3.read()
+      obj3.close()
+      result
+  - type: "code"
+    language: "python"
+    title: "여러 줄 쓰기"
+    description: "여러 줄을 순서대로 씁니다."
+    content: |-
+      target = open('multi.txt', 'w')
+      target.write('Line 1\n')
+      target.write('Line 2\n')
+      target.write('Line 3\n')
+      target.close()
+
+      source = open('multi.txt', 'r')
+      multiText = source.read()
+      source.close()
+      multiText
+  - type: "tip"
+    content: "'w' 모드는 기존 파일을 완전히 지우므로 주의하세요."
+
+- id: "with_statement"
+  title: "with 문"
+  subtitle: "자동으로 닫기"
+  blocks:
+  - type: "text"
+    content: "with 문을 사용하면 파일을 자동으로 닫아줍니다. with open(경로, 모드) as 변수: 형식으로 쓰며, 블록이 끝나면 자동으로 close()가 호출됩니다. 안전하고 권장되는 방법입니다."
+  - type: "list"
+    items:
+    - "with open() as 변수:"
+    - "자동으로 닫힘"
+    - "예외 발생해도 안전"
+    - "권장되는 방법"
+  - type: "code"
+    language: "python"
+    title: "with로 읽기"
+    description: "with 문으로 파일을 읽습니다."
+    content: |-
+      with open('test.txt', 'w') as outFile:
+          outFile.write('With statement')
+
+      with open('test.txt', 'r') as inFile:
+          data = inFile.read()
+
+      data
+  - type: "code"
+    language: "python"
+    title: "with로 쓰기"
+    description: "with 문으로 파일을 씁니다."
+    content: |-
+      with open('output.txt', 'w') as stream:
+          stream.write('Easy and safe')
+
+      with open('output.txt', 'r') as stream:
+          output = stream.read()
+
+      output
+  - type: "code"
+    language: "python"
+    title: "여러 줄 처리"
+    description: "with 문 안에서 여러 작업을 합니다."
+    content: |-
+      with open('numbers.txt', 'w') as dest:
+          for i in range(1, 4):
+              dest.write(str(i) + '\n')
+
+      with open('numbers.txt', 'r') as src:
+          numLines = src.readlines()
+
+      numLines
+  - type: "tip"
+    content: "with 문은 close()를 잊어버릴 걱정이 없어 안전합니다."
+
+- id: "file_modes"
+  title: "파일 모드"
+  subtitle: "읽기/쓰기/추가"
+  blocks:
+  - type: "text"
+    content: "파일 모드는 파일을 어떻게 열지 결정합니다. 'r'(읽기), 'w'(쓰기), 'a'(추가), 'r+'(읽기/쓰기) 등이 있습니다. 텍스트 모드가 기본이며, 'b'를 붙이면 바이너리 모드입니다."
+  - type: "list"
+    items:
+    - "'r': 읽기 (기본)"
+    - "'w': 쓰기 (덮어쓰기)"
+    - "'a': 추가"
+    - "'r+': 읽기와 쓰기"
+  - type: "code"
+    language: "python"
+    title: "읽기 모드"
+    description: "'r' 모드로 읽기만 합니다."
+    content: |-
+      with open('test.txt', 'w') as wf:
+          wf.write('Read mode test')
+
+      with open('test.txt', 'r') as rf:
+          readData = rf.read()
+
+      readData
+  - type: "code"
+    language: "python"
+    title: "추가 모드"
+    description: "'a' 모드로 기존 내용에 추가합니다."
+    content: |-
+      with open('append.txt', 'w') as initial:
+          initial.write('First\n')
+
+      with open('append.txt', 'a') as appender:
+          appender.write('Second\n')
+
+      with open('append.txt', 'r') as checker:
+          appended = checker.read()
+
+      appended
+  - type: "code"
+    language: "python"
+    title: "모드 확인"
+    description: "파일 객체의 모드를 확인할 수 있습니다."
+    content: |-
+      with open('test.txt', 'w') as item:
+          mode = item.mode
+
+      mode
+  - type: "tip"
+    content: "파일이 없을 때 'r'은 에러, 'w'와 'a'는 파일을 생성합니다."
+
+- id: "line_iteration"
+  title: "줄 단위 순회"
+  subtitle: "for문으로 읽기"
+  blocks:
+  - type: "text"
+    content: "파일 객체는 for문으로 순회할 수 있습니다. 각 줄을 하나씩 가져오므로 메모리 효율적입니다. 큰 파일을 처리할 때 유용합니다."
+  - type: "list"
+    items:
+    - "for 줄 in 파일:"
+    - "한 줄씩 순회"
+    - "메모리 효율적"
+    - "큰 파일 처리 가능"
+  - type: "code"
+    language: "python"
+    title: "줄 순회"
+    description: "for문으로 각 줄을 읽습니다."
+    content: |-
+      with open('items.txt', 'w') as creator:
+          creator.write('Apple\nBanana\nCherry')
+
+      with open('items.txt', 'r') as processor:
+          lineCount = 0
+          for line in processor:
+              lineCount = lineCount + 1
+
+      lineCount
+  - type: "code"
+    language: "python"
+    title: "줄 처리"
+    description: "각 줄을 처리하여 리스트로 만듭니다."
+    content: |-
+      with open('words.txt', 'w') as gen:
+          gen.write('hello\nworld\npython')
+
+      with open('words.txt', 'r') as scan:
+          uppered = []
+          for word in scan:
+              uppered.append(word.strip().upper())
+
+      uppered
+  - type: "code"
+    language: "python"
+    title: "조건부 처리"
+    description: "조건에 맞는 줄만 처리합니다."
+    content: |-
+      with open('scores.txt', 'w') as maker:
+          maker.write('80\n90\n70\n95')
+
+      with open('scores.txt', 'r') as reader:
+          passCount = 0
+          for score in reader:
+              if int(score) >= 80:
+                  passCount = passCount + 1
+
+      passCount
+  - type: "tip"
+    content: "strip()으로 줄바꿈 문자를 제거할 수 있습니다."
+
+- id: "practice"
+  title: "Day 19 종합 복습"
+  subtitle: "파일 입출력 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 19에서 배운 파일 입출력을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 파일 쓰기"
+    code: |-
+      with open('hello.txt', 'w') as dest:
+          dest.write('Hello World')
+
+      'File created'
+
+  - type: "expansion"
+    title: "🟢 기본2: 파일 읽기"
+    code: |-
+      with open('hello.txt', 'w') as prep:
+          prep.write('Python')
+
+      with open('hello.txt', 'r') as src:
+          helloText = src.read()
+
+      helloText
+
+  - type: "expansion"
+    title: "🟢 기본3: 추가 모드"
+    code: |-
+      with open('log.txt', 'w') as init:
+          init.write('Start\n')
+
+      with open('log.txt', 'a') as add:
+          add.write('End\n')
+
+      with open('log.txt', 'r') as check:
+          logContent = check.read()
+
+      logContent
+
+  - type: "expansion"
+    title: "🟢 기본4: 줄 읽기"
+    code: |-
+      with open('lines.txt', 'w') as setup:
+          setup.write('A\nB\nC')
+
+      with open('lines.txt', 'r') as fetch:
+          allLines = fetch.readlines()
+
+      allLines
+
+  - type: "expansion"
+    title: "🟢 기본5: 줄 순회"
+    code: |-
+      with open('nums.txt', 'w') as build:
+          build.write('1\n2\n3')
+
+      with open('nums.txt', 'r') as parse:
+          numSum = 0
+          for num in parse:
+              numSum = numSum + int(num)
+
+      numSum
+
+  - type: "expansion"
+    title: "🟡 응용1: 카운터"
+    code: |-
+      with open('words.txt', 'w') as create:
+          create.write('apple banana apple cherry banana apple')
+
+      with open('words.txt', 'r') as load:
+          wordText = load.read()
+          wordList = wordText.split()
+          appleCount = 0
+          for word in wordList:
+              if word == 'apple':
+                  appleCount = appleCount + 1
+
+      appleCount
+
+  - type: "expansion"
+    title: "🟡 응용2: 숫자 합계"
+    code: |-
+      with open('values.txt', 'w') as gen:
+          gen.write('10\n20\n30\n40\n50')
+
+      with open('values.txt', 'r') as calc:
+          valSum = 0
+          for val in calc:
+              valSum = valSum + int(val)
+
+      valSum
+
+  - type: "expansion"
+    title: "🟡 응용3: 필터링"
+    code: |-
+      with open('grades.txt', 'w') as set:
+          set.write('85\n92\n78\n95\n88')
+
+      with open('grades.txt', 'r') as filter:
+          passing = []
+          for grade in filter:
+              score = int(grade)
+              if score >= 80:
+                  passing.append(score)
+
+      passing
+
+  - type: "expansion"
+    title: "🟡 응용4: 변환"
+    code: |-
+      with open('lower.txt', 'w') as write:
+          write.write('hello\nworld\npython')
+
+      with open('lower.txt', 'r') as read:
+          upperedList = []
+          for line in read:
+              upperedList.append(line.strip().upper())
+
+      upperedList
+
+  - type: "expansion"
+    title: "🟡 응용5: 로그 작성"
+    code: |-
+      with open('events.txt', 'w') as logger:
+          events = ['start', 'process', 'end']
+          for event in events:
+              logger.write(event + '\n')
+
+      with open('events.txt', 'r') as viewer:
+          log = viewer.read()
+
+      log
+
+  - type: "expansion"
+    title: "🔴 심화1-1: CSV 읽기"
+    code: |-
+      with open('data.csv', 'w') as writer:
+          writer.write('name,age\nAlice,25\nBob,30')
+
+      with open('data.csv', 'r') as reader:
+          csvLines = reader.readlines()
+          rows = []
+          for line in csvLines:
+              rows.append(line.strip().split(','))
+
+      rows
+
+  - type: "expansion"
+    title: "🔴 심화1-2: CSV 분석"
+    code: |-
+      with open('users.csv', 'w') as prep:
+          prep.write('name,age\nAlice,25\nBob,30\nCharlie,35')
+
+      with open('users.csv', 'r') as proc:
+          userLines = proc.readlines()
+          totalAge = 0
+          userCount = 0
+          for i in range(1, len(userLines)):
+              parts = userLines[i].strip().split(',')
+              totalAge = totalAge + int(parts[1])
+              userCount = userCount + 1
+
+      totalAge / userCount
+
+  - type: "expansion"
+    title: "🔴 심화2-1: 파일 복사"
+    code: |-
+      with open('source.txt', 'w') as orig:
+          orig.write('Original content')
+
+      with open('source.txt', 'r') as inp:
+          srcContent = inp.read()
+
+      with open('copy.txt', 'w') as out:
+          out.write(srcContent)
+
+      with open('copy.txt', 'r') as verify:
+          copied = verify.read()
+
+      copied
+
+  - type: "expansion"
+    title: "🔴 심화2-2: 파일 병합"
+    code: |-
+      with open('file1.txt', 'w') as f1:
+          f1.write('Part 1\n')
+
+      with open('file2.txt', 'w') as f2:
+          f2.write('Part 2\n')
+
+      with open('merged.txt', 'w') as merge:
+          with open('file1.txt', 'r') as r1:
+              merge.write(r1.read())
+          with open('file2.txt', 'r') as r2:
+              merge.write(r2.read())
+
+      with open('merged.txt', 'r') as final:
+          merged = final.read()
+
+      merged
+
+  - type: "expansion"
+    title: "🔴 심화3-1: 단어 빈도"
+    code: |-
+      with open('text.txt', 'w') as make:
+          make.write('apple banana apple cherry banana apple')
+
+      with open('text.txt', 'r') as analyze:
+          rawText = analyze.read()
+          tokens = rawText.split()
+          freq = {}
+          for word in tokens:
+              if word in freq:
+                  freq[word] = freq[word] + 1
+              else:
+                  freq[word] = 1
+
+      freq
+
+  - type: "expansion"
+    title: "🔴 심화3-2: 최빈 단어"
+    code: |-
+      with open('doc.txt', 'w') as creator:
+          creator.write('python is great python is easy python')
+
+      with open('doc.txt', 'r') as counter:
+          docText = counter.read()
+          docTokens = docText.split()
+          counts = {}
+          for token in docTokens:
+              counts[token] = counts.get(token, 0) + 1
+
+      maxCount = 0
+      maxWord = ''
+      for word in counts:
+          if counts[word] > maxCount:
+              maxCount = counts[word]
+              maxWord = word
+
+      maxWord, maxCount
+
+  - type: "expansion"
+    title: "🔴 심화4-1: 성적 통계"
+    code: |-
+      with open('scores.txt', 'w') as writer:
+          writer.write('85\n90\n78\n92\n88')
+
+      with open('scores.txt', 'r') as reader:
+          scoreList = []
+          for line in reader:
+              scoreList.append(int(line))
+
+      scoreSum = 0
+      for score in scoreList:
+          scoreSum = scoreSum + score
+      avg = scoreSum / len(scoreList)
+
+      avg
+
+  - type: "expansion"
+    title: "🔴 심화4-2: 성적 등급"
+    code: |-
+      with open('marks.txt', 'w') as setter:
+          setter.write('85\n92\n78\n95\n88')
+
+      with open('marks.txt', 'r') as getter:
+          grades = []
+          for mark in getter:
+              score = int(mark)
+              if score >= 90:
+                  grades.append('A')
+              elif score >= 80:
+                  grades.append('B')
+              else:
+                  grades.append('C')
+
+      grades
+
+  - type: "expansion"
+    title: "🔴 심화5-1: 필터 저장"
+    code: |-
+      with open('all.txt', 'w') as all:
+          all.write('10\n25\n30\n15\n40')
+
+      with open('all.txt', 'r') as inp:
+          filtered = []
+          for num in inp:
+              val = int(num)
+              if val >= 20:
+                  filtered.append(val)
+
+      with open('filtered.txt', 'w') as out:
+          for val in filtered:
+              out.write(str(val) + '\n')
+
+      with open('filtered.txt', 'r') as check:
+          filteredText = check.read()
+
+      filteredText
+
+  - type: "expansion"
+    title: "🔴 심화5-2: 데이터 변환"
+    code: |-
+      with open('input.txt', 'w') as inp:
+          inp.write('hello\nworld\npython')
+
+      with open('input.txt', 'r') as reader:
+          inputLines = reader.readlines()
+
+      with open('output.txt', 'w') as writer:
+          for line in inputLines:
+              writer.write(line.strip().upper() + '\n')
+
+      with open('output.txt', 'r') as viewer:
+          transformed = viewer.read()
+
+      transformed

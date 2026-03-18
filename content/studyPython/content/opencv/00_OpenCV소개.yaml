@@ -1,0 +1,387 @@
+meta:
+  id: opencv_00
+  title: OpenCV소개
+  order: 0
+  category: opencv
+  badge: 소개
+  tags: ["OpenCV", "cv2", "컴퓨터비전", "이미지처리", "에지검출", "컨투어"]
+  seo:
+    title: "OpenCV 소개 - 파이썬 컴퓨터 비전 라이브러리"
+    description: "OpenCV로 이미지 분석, 에지 검출, 컨투어 추출 등 컴퓨터 비전의 기초를 배웁니다."
+    keywords: ["OpenCV", "cv2", "컴퓨터비전", "에지검출", "Canny", "컨투어"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "👁️"
+      title: "OpenCV"
+      subtitle: "파이썬 컴퓨터 비전 라이브러리"
+
+    - type: hero
+      emoji: "🔍"
+      title: "이미지를 분석하고 이해하다"
+      subtitle: "에지 검출부터 객체 인식까지"
+      points:
+        - emoji: "📐"
+          title: "에지 검출"
+        - emoji: "🔲"
+          title: "컨투어 추출"
+        - emoji: "🎨"
+          title: "색공간 변환"
+        - emoji: "⚙️"
+          title: "형태학적 연산"
+
+- id: opencv_history
+  blocks:
+    - type: sectionHeader
+      title: "🏛️ OpenCV란?"
+      subtitle: "컴퓨터 비전의 표준"
+
+    - type: text
+      content: |-
+        OpenCV(Open Source Computer Vision Library)는 2000년 인텔에서 시작된 오픈소스 컴퓨터 비전 라이브러리입니다. 현재 2500개 이상의 최적화된 알고리즘을 제공하며, 얼굴 인식, 객체 추적, 의료 영상 분석 등 다양한 분야에서 활용됩니다. C++로 작성되어 매우 빠르고, Python 바인딩(cv2)으로 쉽게 사용할 수 있습니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "⚡"
+          title: "고성능"
+          description: "C++로 작성되어 실시간 영상 처리가 가능한 속도를 제공합니다"
+        - emoji: "🔬"
+          title: "풍부한 알고리즘"
+          description: "에지 검출, 특징점 추출, 객체 인식 등 2500+ 알고리즘을 제공합니다"
+        - emoji: "🌐"
+          title: "크로스 플랫폼"
+          description: "Windows, Linux, macOS, Android, iOS 등 다양한 플랫폼을 지원합니다"
+
+- id: why_opencv
+  blocks:
+    - type: sectionHeader
+      title: "🚀 왜 OpenCV인가?"
+      subtitle: "이미지 처리를 넘어 비전으로"
+
+    - type: text
+      content: |-
+        Pillow가 이미지 편집에 특화되어 있다면, OpenCV는 이미지 분석과 컴퓨터 비전에 특화되어 있습니다. 이미지에서 경계선을 찾고, 물체의 윤곽을 추출하고, 특정 색상 영역을 분리하는 등 '이미지를 이해'하는 작업에 강점이 있습니다.
+
+    - type: note
+      title: "컴퓨터 비전이란?"
+      content: "컴퓨터가 디지털 이미지나 비디오를 '보고' 이해하도록 하는 기술입니다. 단순히 픽셀 값을 조작하는 것을 넘어, 이미지에서 의미 있는 정보를 추출합니다. 예를 들어 사진에서 얼굴 위치를 찾거나, 자동차 번호판 문자를 인식하거나, 불량품을 검출하는 것이 컴퓨터 비전입니다."
+
+- id: bgr_order
+  blocks:
+    - type: sectionHeader
+      title: "🔴🟢🔵 BGR 색순서"
+      subtitle: "OpenCV의 특징"
+
+    - type: text
+      content: |-
+        OpenCV는 역사적 이유로 RGB가 아닌 BGR 순서를 사용합니다. 이미지를 읽으면 Blue, Green, Red 순서로 채널이 배치됩니다. matplotlib이나 다른 라이브러리와 함께 사용할 때는 cvtColor()로 RGB로 변환해야 올바른 색상이 표시됩니다.
+
+    - type: table
+      headers:
+        - 라이브러리
+        - 색순서
+        - 변환 필요
+      rows:
+        - - OpenCV (cv2)
+          - BGR
+          - matplotlib 출력 시 RGB로 변환
+        - - Pillow
+          - RGB
+          - 변환 불필요
+        - - matplotlib
+          - RGB
+          - 변환 불필요
+        - - NumPy (sklearn 이미지)
+          - RGB
+          - cv2 사용 시 BGR로 변환
+
+    - type: note
+      title: "왜 BGR인가?"
+      content: "OpenCV가 처음 개발될 당시(2000년경) 널리 사용되던 카메라와 비디오 장치들이 BGR 순서를 사용했기 때문입니다. 호환성을 위해 이 순서가 유지되고 있습니다."
+
+- id: ndarray
+  blocks:
+    - type: sectionHeader
+      title: "📦 이미지 = NumPy 배열"
+      subtitle: "OpenCV의 데이터 구조"
+
+    - type: text
+      content: |-
+        OpenCV에서 이미지는 NumPy의 ndarray입니다. Pillow의 Image 객체와 달리, NumPy 배열이므로 배열 연산을 직접 적용할 수 있습니다. shape은 (높이, 너비, 채널) 순서이고, dtype은 보통 uint8(0-255)입니다.
+
+    - type: table
+      headers:
+        - 속성
+        - 의미
+        - 예시
+      rows:
+        - - shape
+          - "(높이, 너비, 채널)"
+          - "(480, 640, 3)"
+        - - dtype
+          - 데이터 타입
+          - uint8
+        - - size
+          - 전체 픽셀 수
+          - "921600 (480×640×3)"
+        - - ndim
+          - 차원 수
+          - 3 (컬러), 2 (흑백)
+
+- id: features
+  blocks:
+    - type: sectionHeader
+      title: "🛠️ OpenCV 주요 기능"
+      subtitle: "컴퓨터 비전의 모든 것"
+
+    - type: text
+      content: |-
+        OpenCV가 제공하는 주요 기능을 살펴봅시다. 기본적인 이미지 처리부터 고급 컴퓨터 비전까지 폭넓게 지원합니다.
+
+    - type: table
+      headers:
+        - 기능
+        - 설명
+        - 함수
+      rows:
+        - - 색공간 변환
+          - BGR, RGB, Gray, HSV 등 변환
+          - cvtColor()
+        - - 기하학적 변환
+          - 크기 조절, 회전, 뒤집기
+          - "resize(), rotate(), flip()"
+        - - 필터링
+          - 블러, 샤프닝, 노이즈 제거
+          - "blur(), GaussianBlur(), medianBlur()"
+        - - 에지 검출
+          - 경계선 찾기
+          - "Canny(), Sobel(), Laplacian()"
+        - - 임계값 처리
+          - 이진화, 적응형 임계값
+          - "threshold(), adaptiveThreshold()"
+        - - 모폴로지
+          - 침식, 팽창, 열기, 닫기
+          - "erode(), dilate(), morphologyEx()"
+        - - 컨투어
+          - 윤곽선 검출 및 분석
+          - "findContours(), drawContours()"
+        - - 히스토그램
+          - 밝기 분포 분석
+          - "calcHist(), equalizeHist()"
+
+- id: edge_detection
+  blocks:
+    - type: sectionHeader
+      title: "📐 에지 검출"
+      subtitle: "경계를 찾아내다"
+
+    - type: text
+      content: |-
+        에지(edge)는 이미지에서 밝기가 급격히 변하는 곳입니다. 물체의 경계, 텍스처의 변화 등이 에지로 나타납니다. 에지 검출은 컴퓨터 비전의 가장 기본적인 작업 중 하나이며, 객체 인식의 첫 단계로 자주 사용됩니다.
+
+    - type: table
+      headers:
+        - 알고리즘
+        - 특징
+        - 용도
+      rows:
+        - - Canny
+          - 가장 널리 사용, 두 개의 임계값 사용
+          - 범용 에지 검출
+        - - Sobel
+          - X 또는 Y 방향 미분
+          - 방향성 에지 검출
+        - - Laplacian
+          - 2차 미분, 모든 방향
+          - 세밀한 에지 검출
+
+- id: contour
+  blocks:
+    - type: sectionHeader
+      title: "🔲 컨투어"
+      subtitle: "물체의 윤곽"
+
+    - type: text
+      content: |-
+        컨투어(contour)는 같은 색이나 밝기를 가진 연속적인 점들의 곡선입니다. 이진화된 이미지에서 물체의 외곽선을 추출할 때 사용합니다. 컨투어를 분석하면 물체의 면적, 둘레, 무게중심 등을 계산할 수 있습니다.
+
+    - type: table
+      headers:
+        - 함수
+        - 기능
+      rows:
+        - - findContours()
+          - 이진 이미지에서 컨투어 검출
+        - - drawContours()
+          - 컨투어를 이미지에 그리기
+        - - contourArea()
+          - 컨투어 면적 계산
+        - - arcLength()
+          - 컨투어 둘레 계산
+        - - boundingRect()
+          - 컨투어를 감싸는 사각형
+        - - minEnclosingCircle()
+          - 컨투어를 감싸는 최소 원
+
+- id: morphology
+  blocks:
+    - type: sectionHeader
+      title: "⚙️ 모폴로지 연산"
+      subtitle: "형태학적 변환"
+
+    - type: text
+      content: |-
+        모폴로지(morphology) 연산은 이진 이미지의 형태를 변형하는 연산입니다. 노이즈 제거, 물체 분리, 구멍 채우기 등에 사용됩니다. 기본 연산인 침식과 팽창을 조합하여 열기, 닫기 등의 연산을 수행합니다.
+
+    - type: table
+      headers:
+        - 연산
+        - 효과
+        - 용도
+      rows:
+        - - 침식 (Erosion)
+          - 물체 경계를 깎아냄
+          - 노이즈 제거, 물체 분리
+        - - 팽창 (Dilation)
+          - 물체 경계를 확장
+          - 구멍 채우기, 연결
+        - - 열기 (Opening)
+          - 침식 후 팽창
+          - 작은 돌출부 제거
+        - - 닫기 (Closing)
+          - 팽창 후 침식
+          - 작은 구멍 채우기
+
+- id: comparison
+  blocks:
+    - type: sectionHeader
+      title: "⚖️ OpenCV vs Pillow"
+      subtitle: "목적에 맞는 선택"
+
+    - type: table
+      headers:
+        - 항목
+        - OpenCV
+        - Pillow
+      rows:
+        - - 주요 용도
+          - 컴퓨터 비전, 분석
+          - 이미지 편집
+        - - 색순서
+          - BGR
+          - RGB
+        - - 자료형
+          - numpy.ndarray
+          - PIL.Image
+        - - 에지 검출
+          - "Canny, Sobel, Laplacian"
+          - FIND_EDGES (기본만)
+        - - 컨투어
+          - findContours (강력)
+          - 미지원
+        - - 모폴로지
+          - "erode, dilate, morphologyEx"
+          - 미지원
+        - - 텍스트 삽입
+          - putText (기본 폰트)
+          - ImageDraw (폰트 지원)
+        - - 학습 난이도
+          - 중간
+          - 쉬움
+
+- id: usecases
+  blocks:
+    - type: sectionHeader
+      title: "💡 활용 분야"
+      subtitle: "OpenCV가 사용되는 곳"
+
+    - type: text
+      content: |-
+        OpenCV는 산업, 의료, 보안, 자율주행 등 다양한 분야에서 활용됩니다.
+
+    - type: table
+      headers:
+        - 분야
+        - 활용 예시
+      rows:
+        - - 제조업
+          - 불량품 검출, 부품 검사, 치수 측정
+        - - 의료
+          - X-ray 분석, 세포 계수, 종양 검출
+        - - 보안
+          - 얼굴 인식, 움직임 감지, 번호판 인식
+        - - 자율주행
+          - 차선 인식, 표지판 인식, 장애물 감지
+        - - 농업
+          - 작물 상태 분석, 수확 시기 판단
+        - - 문서 처리
+          - OCR 전처리, 문서 스캔 보정
+
+- id: pyodide_note
+  blocks:
+    - type: sectionHeader
+      title: "📋 시각화 안내"
+      subtitle: "Pyodide 환경에서의 출력"
+
+    - type: note
+      title: "matplotlib으로 출력"
+      content: "이 커리큘럼은 Pyodide(브라우저 파이썬) 환경에서 실행됩니다. cv2.imshow()는 GUI 창을 필요로 하므로 사용할 수 없습니다. 대신 matplotlib의 plt.imshow()로 이미지를 출력합니다. 이때 BGR을 RGB로 변환해야 올바른 색상이 표시됩니다."
+
+- id: curriculum
+  blocks:
+    - type: sectionHeader
+      title: "📚 커리큘럼"
+      subtitle: "10개 프로젝트로 마스터"
+
+    - type: text
+      content: |-
+        이 커리큘럼에서는 10개의 프로젝트를 통해 OpenCV를 배웁니다.
+
+    - type: table
+      headers:
+        - 프로젝트
+        - 데이터
+        - 핵심 개념
+      rows:
+        - - "01. 이미지 구조 탐색기"
+          - sklearn flower
+          - "shape, dtype, BGR/RGB"
+        - - "02. 색공간 변환기"
+          - sklearn china
+          - "cvtColor, Gray, HSV"
+        - - "03. 기하학적 변환기"
+          - Lorem Picsum
+          - "resize, rotate, flip"
+        - - "04. 이미지 필터 랩"
+          - Lorem Picsum
+          - "blur, GaussianBlur"
+        - - "05. 에지 검출기"
+          - sklearn china
+          - "Canny, Sobel, Laplacian"
+        - - "06. 이진화 스튜디오"
+          - Lorem Picsum
+          - "threshold, adaptiveThreshold"
+        - - "07. 모폴로지 연산기"
+          - 합성 이미지
+          - "erode, dilate, morphologyEx"
+        - - "08. 히스토그램 분석기"
+          - sklearn flower
+          - "calcHist, equalizeHist"
+        - - "09. 컨투어 탐지기"
+          - 합성 이미지
+          - "findContours, drawContours"
+        - - "10. 종합 비전 프로젝트"
+          - 복합
+          - 전체 개념 종합
+
+- id: start
+  blocks:
+    - type: sectionHeader
+      title: "🎯 시작하기"
+      subtitle: "첫 번째 프로젝트로"
+
+    - type: text
+      content: |-
+        OpenCV를 배우면 이미지를 단순히 보는 것을 넘어 분석하고 이해할 수 있습니다. 에지 검출로 물체의 경계를 찾고, 컨투어로 윤곽을 추출하고, 색상 필터링으로 특정 영역을 분리하는 등 컴퓨터 비전의 핵심 기술을 익힐 수 있습니다. 첫 번째 프로젝트에서 이미지가 NumPy 배열로 어떻게 표현되는지 알아봅시다.

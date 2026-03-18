@@ -1,0 +1,365 @@
+meta:
+  id: numpy_10
+  title: 당뇨병종합분석
+  order: 10
+  category: numpy
+  difficulty: "⭐⭐⭐"
+  badge: 심화
+  tags: ["numpy", "종합", "random", "bincount", "histogram", "cov", "eig", "apply_along_axis"]
+  seo:
+    title: "NumPy 종합 프로젝트 - 당뇨병 데이터 분석"
+    description: "NumPy의 모든 핵심 기능을 종합하여 당뇨병 데이터를 심층 분석합니다."
+    keywords: ["numpy", "종합분석", "당뇨병", "random", "histogram", "cov"]
+
+intro:
+  emoji: "🩺"
+  goal: NumPy의 모든 핵심 기능을 종합하여 당뇨병 데이터를 분석합니다.
+  description: Pima 인디언 당뇨병 데이터셋으로 지금까지 배운 모든 NumPy 개념을 종합 활용합니다. 배열 생성, 인덱싱, 통계, 선형대수, 결측값 처리, 상관분석을 모두 다룹니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: numpy와 pandas를 불러옵니다
+    content: |-
+      import numpy as np
+      import pandas as pd
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: 당뇨병 데이터셋
+  blocks:
+  - type: text
+    content: "Pima 인디언은 미국 애리조나 원주민으로, 세계에서 가장 높은 당뇨병 발병률을 보입니다. 이 데이터셋은 768명의 21세 이상 여성에 대한 의료 검사 결과입니다. Glucose(혈당), BloodPressure(혈압), BMI(체질량지수), Insulin(인슐린 수치) 등과 Outcome(당뇨병 유무, 1이면 당뇨)이 기록되어 있습니다."
+  - type: code
+    language: python
+    title: 당뇨병 데이터 로드
+    description: GitHub에서 당뇨병 데이터를 불러옵니다
+    content: |-
+      url = "https://raw.githubusercontent.com"
+      df = pd.read_csv(f"{url}/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv", header=None)
+      df.columns = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age', 'Outcome']
+      df.head()
+
+- id: step3_extract
+  title: 3단계. 배열 추출
+  subtitle: 전체 특성
+  blocks:
+  - type: text
+    content: 모든 특성과 타겟을 NumPy 배열로 추출합니다.
+  - type: code
+    language: python
+    title: 특성/타겟 추출
+    description: 모든 특성과 당뇨병 유무를 추출합니다
+    content: |-
+      cols = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age']
+      X = df[cols].values
+      y = df['Outcome'].values
+      X.shape, y.shape
+
+- id: step4_zero_check
+  title: 4단계. 결측값 확인
+  subtitle: 0값 처리
+  blocks:
+  - type: text
+    content: "이 데이터셋의 특이점은 결측값이 NaN 대신 0으로 기록되어 있다는 것입니다. 하지만 혈당(Glucose)이나 혈압(BloodPressure)이 0이라는 것은 생물학적으로 불가능합니다. 살아있는 사람의 혈당이 0일 수는 없죠. 따라서 이런 0값들은 실제로는 '측정하지 못함'을 의미하는 결측값입니다."
+  - type: code
+    language: python
+    title: 0값 개수
+    description: 각 특성의 0값 개수를 확인합니다
+    content: |-
+      zeros = np.sum(X == 0, axis=0)
+      ratio = zeros / len(X) * 100
+      pd.DataFrame({'Feature': cols, 'ZeroCount': zeros, 'ZeroRatio': ratio.round(1)})
+
+- id: step5_replace_nan
+  title: 5단계. 0을 NaN으로
+  subtitle: np.where()
+  blocks:
+  - type: text
+    content: Glucose, BloodPressure, SkinThickness, Insulin, BMI의 0값은 결측값이므로 NaN으로 변환합니다.
+  - type: code
+    language: python
+    title: NaN 변환
+    description: 0값을 NaN으로 변환합니다
+    content: |-
+      idx = [1, 2, 3, 4, 5]
+      clean = X.astype(float).copy()
+      for i in idx:
+          clean[:, i] = np.where(clean[:, i] == 0, np.nan, clean[:, i])
+      np.sum(np.isnan(clean), axis=0)
+
+- id: step6_impute
+  title: 6단계. 결측값 대체
+  subtitle: nanmean
+  blocks:
+  - type: text
+    content: 결측값을 각 컬럼의 평균으로 대체합니다.
+  - type: code
+    language: python
+    title: 평균 대체
+    description: NaN을 열 평균으로 대체합니다
+    content: |-
+      avg = np.nanmean(clean, axis=0)
+      mask = np.isnan(clean)
+      ci = np.where(mask)[1]
+      clean[mask] = avg[ci]
+      np.sum(np.isnan(clean))
+
+- id: step7_histogram
+  title: 7단계. 히스토그램
+  subtitle: np.histogram()
+  blocks:
+  - type: text
+    content: "히스토그램은 데이터를 구간(bin)으로 나누어 각 구간에 몇 개의 값이 있는지 세는 것입니다. 예를 들어 혈당 80~100에 몇 명, 100~120에 몇 명 이런 식으로요. np.histogram()은 그래프 없이 숫자만 반환하므로, 분포를 빠르게 파악하거나 추가 계산에 활용할 수 있습니다."
+  - type: code
+    language: python
+    title: 혈당 분포
+    description: 혈당 히스토그램을 계산합니다
+    content: |-
+      glucose = clean[:, 1]
+      hist, edges = np.histogram(glucose, bins=10)
+      pd.DataFrame({'BinStart': edges[:-1].round(1), 'BinEnd': edges[1:].round(1), 'Count': hist})
+  - type: tip
+    content: np.histogram(arr, bins)은 히스토그램 데이터를 반환합니다. 반환값은 (빈도, 구간 경계)입니다. 시각화 없이 분포를 분석할 때 유용합니다.
+
+- id: step8_bincount
+  title: 8단계. 빈도 계산
+  subtitle: np.bincount()
+  blocks:
+  - type: text
+    content: "np.bincount()는 정수 배열에서 각 숫자가 몇 번 나오는지 세줍니다. [0,1,1,0,1,0]이 있으면 0이 3번, 1이 3번입니다. 당뇨병 유무(0 또는 1)의 빈도를 세면 데이터에 클래스 불균형(한쪽이 너무 많음)이 있는지 확인할 수 있습니다."
+  - type: code
+    language: python
+    title: 당뇨병 빈도
+    description: 당뇨병 유무 빈도를 계산합니다
+    content: |-
+      counts = np.bincount(y)
+      f"정상: {counts[0]}명, 당뇨: {counts[1]}명, 비율: {counts[1]/len(y)*100:.1f}%"
+  - type: tip
+    content: np.bincount(arr)은 음이 아닌 정수 배열의 각 값 빈도를 계산합니다. 클래스 불균형 확인에 유용합니다.
+
+- id: step9_cov
+  title: 9단계. 공분산 행렬
+  subtitle: np.cov()
+  blocks:
+  - type: text
+    content: "공분산(covariance)은 두 변수가 함께 변하는 정도를 나타냅니다. 양수면 함께 증가하고, 음수면 하나가 증가할 때 다른 것은 감소합니다. 상관계수와 비슷하지만, 공분산은 원래 단위를 유지합니다. np.cov()는 모든 변수 쌍의 공분산을 행렬로 반환합니다."
+  - type: code
+    language: python
+    title: 공분산 행렬
+    description: 특성 간 공분산을 계산합니다
+    content: |-
+      cov = np.cov(clean.T)
+      cov.shape
+  - type: tip
+    content: np.cov(arr)은 공분산 행렬을 계산합니다. 행이 변수, 열이 관측치여야 하므로 .T로 전치합니다.
+
+- id: step10_corr_target
+  title: 10단계. 타겟 상관관계
+  subtitle: corrcoef
+  blocks:
+  - type: text
+    content: 각 특성과 당뇨병 유무의 상관계수를 계산합니다.
+  - type: code
+    language: python
+    title: 당뇨병 상관
+    description: 각 특성과 당뇨병 유무의 상관계수를 계산합니다
+    content: |-
+      corrs = []
+      for i in range(clean.shape[1]):
+          r = np.corrcoef(clean[:, i], y)[0, 1]
+          corrs.append(r)
+      corrs = np.array(corrs)
+      result = pd.DataFrame({'Feature': cols, 'Correlation': corrs.round(3)})
+      result.sort_values('Correlation', ascending=False)
+
+- id: step11_group_stats
+  title: 11단계. 그룹별 통계
+  subtitle: 당뇨/비당뇨
+  blocks:
+  - type: text
+    content: 당뇨병 유무에 따른 각 특성의 평균을 비교합니다.
+  - type: code
+    language: python
+    title: 그룹별 평균
+    description: 당뇨/비당뇨 그룹의 특성 평균을 비교합니다
+    content: |-
+      sick = y == 1
+      well = y == 0
+      avg1 = np.mean(clean[sick], axis=0)
+      avg2 = np.mean(clean[well], axis=0)
+      diff = (avg1 - avg2) / avg2 * 100
+      pd.DataFrame({
+          'Feature': cols,
+          'Normal': avg2.round(2),
+          'Diabetic': avg1.round(2),
+          'Diff(%)': diff.round(1)
+      })
+
+- id: step12_standardize
+  title: 12단계. 표준화
+  subtitle: Z-score
+  blocks:
+  - type: text
+    content: 모든 특성을 Z-score로 표준화합니다.
+  - type: code
+    language: python
+    title: 특성 표준화
+    description: Z-score 표준화를 수행합니다
+    content: |-
+      mu = np.mean(clean, axis=0)
+      sigma = np.std(clean, axis=0)
+      z = (clean - mu) / sigma
+      f"표준화 후 평균: {np.mean(z, axis=0).round(5)}, 표준편차: {np.std(z, axis=0).round(2)}"
+
+- id: step13_eig
+  title: 13단계. 고유값 분해
+  subtitle: np.linalg.eig()
+  blocks:
+  - type: text
+    content: "고유값 분해(eigenvalue decomposition)는 행렬을 분석하는 핵심 기법입니다. 공분산 행렬의 고유값은 각 방향으로의 데이터 분산(퍼짐) 정도를 나타냅니다. 가장 큰 고유값의 방향이 데이터가 가장 많이 퍼진 방향입니다. 이것이 PCA(주성분 분석)의 수학적 기초입니다."
+  - type: code
+    language: python
+    title: 고유값 분해
+    description: 공분산 행렬의 고유값을 계산합니다
+    content: |-
+      c = np.cov(z.T)
+      eig, vec = np.linalg.eig(c)
+      order = np.argsort(eig)[::-1]
+      eig = eig[order]
+      var = eig / np.sum(eig) * 100
+      pd.DataFrame({'PC': [f'PC{i+1}' for i in range(8)], 'EigenValue': eig.round(3), 'ExplainedVar(%)': var.round(1)})
+  - type: tip
+    content: np.linalg.eig(A)는 정방행렬의 고유값과 고유벡터를 반환합니다. 공분산 행렬의 고유값은 각 주성분이 설명하는 분산량입니다.
+
+- id: step14_apply_along
+  title: 14단계. 축 따라 적용
+  subtitle: np.apply_along_axis()
+  blocks:
+  - type: text
+    content: "np.apply_along_axis()는 직접 만든 함수를 배열의 특정 축을 따라 적용합니다. 예를 들어 IQR(사분위수 범위)을 계산하는 함수를 만들어, 모든 열에 한 번에 적용할 수 있습니다. IQR은 75% 백분위수에서 25% 백분위수를 뺀 값으로, 데이터의 퍼짐 정도를 나타냅니다."
+  - type: code
+    language: python
+    title: 커스텀 함수 적용
+    description: 각 특성의 IQR을 계산합니다
+    content: |-
+      def iqr(x):
+          return np.percentile(x, 75) - np.percentile(x, 25)
+
+      vals = np.apply_along_axis(iqr, axis=0, arr=clean)
+      pd.DataFrame({'Feature': cols, 'IQR': vals.round(2)})
+  - type: tip
+    content: np.apply_along_axis(func, axis, arr)는 배열의 특정 축을 따라 함수를 적용합니다. 커스텀 통계 함수를 적용할 때 유용합니다.
+
+- id: step15_risk_score
+  title: 15단계. 위험 점수 계산
+  subtitle: 종합 분석
+  blocks:
+  - type: text
+    content: "위험 점수(Risk Score)는 여러 특성을 종합하여 하나의 숫자로 나타낸 것입니다. 여기서는 각 특성의 상관계수를 가중치로 사용합니다. 당뇨와 상관관계가 높은 특성일수록 가중치가 크고, 그 특성값이 높으면 위험 점수도 올라갑니다. 마치 건강검진 결과를 종합하여 '건강점수'를 매기는 것과 같습니다."
+  - type: code
+    language: python
+    title: 위험 점수
+    description: 가중 합계로 위험 점수를 계산합니다
+    content: |-
+      w = np.abs(corrs) / np.sum(np.abs(corrs))
+      score = np.sum(z * w, axis=1)
+      pct = np.percentile(score, [25, 50, 75, 90])
+      pd.DataFrame({
+          'RiskGroup': ['Low (Q1)', 'Medium (Q2)', 'High (Q3)', 'VeryHigh (90%)', 'Actual'],
+          'Threshold': list(pct.round(2)) + ['-'],
+          'DiabeticRate': [
+              np.mean(y[score < pct[0]]) * 100,
+              np.mean(y[(score >= pct[0]) & (score < pct[1])]) * 100,
+              np.mean(y[(score >= pct[1]) & (score < pct[2])]) * 100,
+              np.mean(y[score >= pct[3]]) * 100,
+              np.mean(y) * 100
+          ]
+      }).round(1)
+
+- id: practice
+  title: 실습
+  subtitle: 당뇨병 종합 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 나이 그룹별 당뇨 위험 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        url = "https://raw.githubusercontent.com"
+        data = pd.read_csv(f"{url}/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv", header=None)
+        data.columns = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age', 'Outcome']
+        age = data['Age'].values
+        target = data['Outcome'].values
+        glucose = data['Glucose'].values
+        bmi = data['BMI'].values
+    - type: code
+      title: "나이 그룹별 분석"
+      content: |-
+        bins = np.array([20, 30, 40, 50, 60, 100])
+        groups = np.digitize(age, bins)
+        rows = []
+        for i in range(1, len(bins)):
+            mask = groups == i
+            if np.sum(mask) > 0:
+                rows.append({
+                    'AgeRange': f'{bins[i-1]}-{bins[i]-1}',
+                    'Count': np.sum(mask),
+                    'DiabeticRate': np.mean(target[mask]) * 100,
+                    'AvgGlucose': np.mean(glucose[mask]),
+                    'AvgBMI': np.mean(bmi[mask])
+                })
+        pd.DataFrame(rows).round(1)
+  - type: expansion
+    title: "미션2: 다중 위험 요인 조합 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        src = "https://raw.githubusercontent.com"
+        df = pd.read_csv(f"{src}/jbrownlee/Datasets/master/pima-indians-diabetes.data.csv", header=None)
+        df.columns = ['Pregnancies', 'Glucose', 'BloodPressure', 'SkinThickness', 'Insulin', 'BMI', 'DiabetesPedigree', 'Age', 'Outcome']
+        glucose = df['Glucose'].values
+        bmi = df['BMI'].values
+        age = df['Age'].values
+        bp = df['BloodPressure'].values
+        target = df['Outcome'].values
+    - type: code
+      title: "위험 조합 분석"
+      content: |-
+        gHigh = glucose > np.percentile(glucose[glucose > 0], 75)
+        bHigh = bmi > np.percentile(bmi[bmi > 0], 75)
+        aHigh = age > np.percentile(age, 75)
+        pHigh = bp > np.percentile(bp[bp > 0], 75)
+        matrix = np.column_stack([gHigh, bHigh, aHigh, pHigh])
+        score = np.sum(matrix, axis=1)
+        rows = []
+        for r in range(5):
+            mask = score == r
+            if np.sum(mask) > 0:
+                rows.append({
+                    'RiskFactors': r,
+                    'Count': np.sum(mask),
+                    'DiabeticRate': np.mean(target[mask]) * 100,
+                    'AvgGlucose': np.mean(glucose[mask]),
+                    'AvgBMI': np.mean(bmi[mask])
+                })
+        pd.DataFrame(rows).round(1)

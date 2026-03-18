@@ -1,0 +1,454 @@
+meta:
+  id: pydantic_02
+  title: 필드검증기
+  order: 2
+  category: pydantic
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["pydantic", "Field", "validator", "제약조건", "커스텀검증"]
+  seo:
+    title: "Pydantic Field 검증 - 필드 제약조건과 커스텀 검증"
+    description: "Pydantic Field로 필드에 제약조건을 설정합니다. 최소/최대값, 문자열 길이, 정규식 패턴, 커스텀 검증기를 배웁니다."
+    keywords: ["pydantic", "Field", "validator", "제약조건", "검증"]
+
+intro:
+  emoji: "✅"
+  goal: Field와 validator로 회원가입 폼 검증 시스템을 구축합니다.
+  description: "이 프로젝트에서는 실제 웹 서비스의 회원가입 폼처럼 다양한 검증 규칙을 적용합니다. 숫자 범위 제한, 문자열 길이 검사, 정규식 패턴 매칭, 그리고 비즈니스 로직에 맞는 커스텀 검증까지. 이런 검증 시스템이 있으면 잘못된 데이터가 데이터베이스에 들어가는 것을 원천 차단할 수 있습니다."
+
+sections:
+- id: load
+  title: 라이브러리 로드
+  subtitle: Field와 validator import
+  blocks:
+  - type: text
+    content: "Field 함수는 필드에 메타데이터와 제약조건을 추가합니다. field_validator 데코레이터는 커스텀 검증 로직을 구현하고, model_validator는 여러 필드를 동시에 검증합니다. 이들을 조합하면 복잡한 비즈니스 규칙도 우아하게 표현할 수 있습니다."
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: micropip으로 pydantic 설치
+    content: |-
+      import micropip
+      await micropip.install('pydantic')
+  - type: code
+    language: python
+    title: 핵심 모듈 import
+    description: Field와 validator
+    content: |-
+      from pydantic import BaseModel, Field, field_validator, model_validator, ValidationError
+      from typing import Optional
+
+- id: numeric
+  title: 숫자 제약조건
+  subtitle: gt, ge, lt, le
+  blocks:
+  - type: text
+    content: "숫자 필드에는 gt(초과), ge(이상), lt(미만), le(이하)로 범위를 제한할 수 있습니다. 예를 들어 나이는 0 이상 150 이하, 점수는 0 이상 100 이하로 제한하는 것이 일반적입니다. 이런 제약조건은 Field 함수의 파라미터로 간단히 지정합니다."
+  - type: code
+    language: python
+    title: 학생 점수 모델
+    description: 숫자 범위 제한
+    content: |-
+      class Student(BaseModel):
+          name: str
+          age: int = Field(ge=1, le=150)
+          score: float = Field(ge=0, le=100)
+
+      student = Student(name="Alice", age=20, score=85.5)
+      student
+  - type: tip
+    content: "gt=0은 0 초과(양수만), ge=0은 0 이상을 의미합니다. lt, le도 마찬가지로 미만과 이하를 구분합니다."
+  - type: code
+    language: python
+    title: 범위 초과 테스트
+    description: ValidationError 확인
+    content: |-
+      try:
+          invalid = Student(name="Bob", age=-5, score=150)
+      except ValidationError as e:
+          rangeErr = e.errors()
+          rangeErr
+
+- id: string
+  title: 문자열 제약조건
+  subtitle: min_length, max_length, pattern
+  blocks:
+  - type: text
+    content: "문자열 필드에는 min_length와 max_length로 길이를 제한하고, pattern으로 정규식 패턴을 지정할 수 있습니다. 사용자명 3~20자, 비밀번호 8자 이상, 전화번호 형식 검사 등 웹 서비스에서 흔히 필요한 검증을 간단히 구현할 수 있습니다."
+  - type: code
+    language: python
+    title: 계정 모델
+    description: 문자열 길이 제한
+    content: |-
+      class Account(BaseModel):
+          username: str = Field(min_length=3, max_length=20)
+          password: str = Field(min_length=8)
+
+      account = Account(username="alice", password="secure123")
+      account
+  - type: code
+    language: python
+    title: 연락처 모델
+    description: 정규식 패턴 검증
+    content: |-
+      class Contact(BaseModel):
+          phone: str = Field(pattern=r'^\d{3}-\d{4}-\d{4}$')
+          email: str = Field(pattern=r'^[\w.-]+@[\w.-]+\.\w+$')
+
+      contact = Contact(phone="010-1234-5678", email="test@example.com")
+      contact
+  - type: tip
+    content: "정규식 패턴은 re 모듈의 문법을 따릅니다. ^는 시작, $는 끝, \\d는 숫자를 의미합니다."
+  - type: code
+    language: python
+    title: 패턴 불일치 테스트
+    description: 잘못된 형식
+    content: |-
+      try:
+          badContact = Contact(phone="01012345678", email="invalid")
+      except ValidationError as e:
+          patternErr = e.errors()
+          patternErr
+
+- id: description
+  title: 필드 설명과 기본값
+  subtitle: description, default
+  blocks:
+  - type: text
+    content: "Field의 description 파라미터로 필드에 설명을 추가할 수 있습니다. 이 설명은 JSON Schema에 포함되어 API 문서화에 활용됩니다. default로 기본값을 지정하면서 동시에 제약조건도 적용할 수 있어, 유연하면서도 안전한 모델을 설계할 수 있습니다."
+  - type: code
+    language: python
+    title: 서버 설정 모델
+    description: 설명과 기본값
+    content: |-
+      class ServerConfig(BaseModel):
+          host: str = Field(default="localhost", description="서버 호스트 주소")
+          port: int = Field(default=8080, ge=1, le=65535, description="포트 번호")
+          debug: bool = Field(default=False, description="디버그 모드")
+
+      config = ServerConfig()
+      config
+  - type: code
+    language: python
+    title: 스키마 확인
+    description: JSON Schema에 설명 포함
+    content: |-
+      import json
+      configSchema = ServerConfig.model_json_schema()
+      json.dumps(configSchema, indent=2, ensure_ascii=False)[:400]
+
+- id: alias
+  title: 필드 별칭
+  subtitle: alias와 validation_alias
+  blocks:
+  - type: text
+    content: "외부 API나 데이터베이스에서 snake_case를 사용하고 Python 코드에서는 camelCase를 사용하고 싶을 때 alias가 유용합니다. alias로 외부 이름을 지정하면 입력 시 alias로, Python 코드에서는 원래 필드명으로 접근할 수 있습니다."
+  - type: code
+    language: python
+    title: API 응답 모델
+    description: snake_case → camelCase
+    content: |-
+      class ApiResponse(BaseModel):
+          userId: int = Field(alias="user_id")
+          userName: str = Field(alias="user_name")
+          createdAt: str = Field(alias="created_at")
+
+      responseData = {"user_id": 1, "user_name": "Alice", "created_at": "2024-01-01"}
+      apiResp = ApiResponse.model_validate(responseData)
+      apiResp
+  - type: code
+    language: python
+    title: Python 속성명으로 접근
+    description: 원래 필드명 사용
+    content: |-
+      apiResp.userId, apiResp.userName, apiResp.createdAt
+
+- id: fieldvalidator
+  title: 커스텀 필드 검증기
+  subtitle: field_validator 데코레이터
+  blocks:
+  - type: text
+    content: "field_validator 데코레이터로 커스텀 검증 로직을 구현합니다. 값을 정규화(소문자 변환, 공백 제거 등)하거나, 비즈니스 규칙에 맞지 않으면 ValueError를 발생시켜 검증을 실패시킬 수 있습니다. 하나의 검증기를 여러 필드에 적용하는 것도 가능합니다."
+  - type: code
+    language: python
+    title: 이름 정규화 검증기
+    description: 값 변환
+    content: |-
+      class Person(BaseModel):
+          name: str
+          email: str
+
+          @field_validator('name')
+          @classmethod
+          def normalizeName(cls, v):
+              return v.strip().title()
+
+          @field_validator('email')
+          @classmethod
+          def lowercaseEmail(cls, v):
+              return v.lower()
+
+      person = Person(name="  alice smith  ", email="ALICE@EXAMPLE.COM")
+      person.name, person.email
+  - type: tip
+    content: "field_validator는 반드시 @classmethod와 함께 사용해야 합니다. 첫 번째 인자는 cls, 두 번째가 검증할 값 v입니다."
+  - type: code
+    language: python
+    title: 금지어 검사
+    description: ValueError 발생
+    content: |-
+      class Comment(BaseModel):
+          content: str
+
+          @field_validator('content')
+          @classmethod
+          def checkBanned(cls, v):
+              banned = ['spam', 'ad', 'advertisement']
+              for word in banned:
+                  if word in v.lower():
+                      raise ValueError(f"금지어 포함: {word}")
+              return v
+
+      try:
+          badComment = Comment(content="This is spam content")
+      except ValidationError as e:
+          bannedErr = e.errors()
+          bannedErr
+
+- id: modelvalidator
+  title: 모델 검증기
+  subtitle: model_validator 데코레이터
+  blocks:
+  - type: text
+    content: "model_validator는 여러 필드를 동시에 검증합니다. 비밀번호와 비밀번호 확인이 일치하는지, 시작일이 종료일보다 앞서는지 등 필드 간 관계를 검사할 때 사용합니다. mode='after'는 개별 필드 검증이 완료된 후 실행됩니다."
+  - type: code
+    language: python
+    title: 비밀번호 확인 검증
+    description: 필드 간 관계 검사
+    content: |-
+      class Registration(BaseModel):
+          email: str
+          password: str = Field(min_length=8)
+          confirmPassword: str
+
+          @model_validator(mode='after')
+          def checkPasswords(self):
+              if self.password != self.confirmPassword:
+                  raise ValueError("비밀번호가 일치하지 않습니다")
+              return self
+
+      reg = Registration(email="test@test.com", password="secure123", confirmPassword="secure123")
+      reg
+  - type: code
+    language: python
+    title: 불일치 테스트
+    description: 비밀번호 다름
+    content: |-
+      try:
+          badReg = Registration(email="test@test.com", password="secure123", confirmPassword="different")
+      except ValidationError as e:
+          mismatchErr = e.errors()
+          mismatchErr
+
+- id: computed
+  title: 계산된 필드
+  subtitle: computed_field 데코레이터
+  blocks:
+  - type: text
+    content: "computed_field는 다른 필드 값을 기반으로 계산되는 읽기 전용 필드입니다. 예를 들어 firstName과 lastName에서 fullName을 자동 생성하거나, 가격과 수량에서 총액을 계산할 수 있습니다. 이 필드는 직렬화 시 자동으로 포함됩니다."
+  - type: code
+    language: python
+    title: 전체 이름 계산
+    description: computed_field 사용
+    content: |-
+      from pydantic import computed_field
+
+      class FullName(BaseModel):
+          firstName: str
+          lastName: str
+
+          @computed_field
+          @property
+          def fullName(self) -> str:
+              return f"{self.firstName} {self.lastName}"
+
+      nameObj = FullName(firstName="John", lastName="Doe")
+      nameObj.fullName
+  - type: code
+    language: python
+    title: 직렬화에 포함
+    description: model_dump 확인
+    content: |-
+      nameObj.model_dump()
+
+- id: result
+  title: 종합 회원가입 시스템
+  subtitle: 모든 검증 기법 통합
+  blocks:
+  - type: text
+    content: "지금까지 배운 모든 검증 기법을 종합하여 실제 서비스에서 사용할 수 있는 회원가입 폼 검증 시스템을 완성합니다. 숫자 범위, 문자열 패턴, 커스텀 검증, 필드 간 관계 검사, 계산 필드까지 모두 활용합니다."
+  - type: code
+    language: python
+    title: 완성된 회원가입 모델
+    description: 종합 검증 시스템
+    content: |-
+      class SignupForm(BaseModel):
+          username: str = Field(min_length=4, max_length=20, description="영문 숫자만")
+          email: str = Field(pattern=r'^[\w.-]+@[\w.-]+\.\w+$')
+          password: str = Field(min_length=8)
+          confirmPw: str
+          age: int = Field(ge=14, description="14세 이상만 가입 가능")
+
+          @field_validator('username')
+          @classmethod
+          def alphanumeric(cls, v):
+              if not v.isalnum():
+                  raise ValueError("영문과 숫자만 허용")
+              return v.lower()
+
+          @model_validator(mode='after')
+          def passwordMatch(self):
+              if self.password != self.confirmPw:
+                  raise ValueError("비밀번호 불일치")
+              return self
+
+      signup = SignupForm(
+          username="Alice123",
+          email="alice@mail.com",
+          password="secure123",
+          confirmPw="secure123",
+          age=25
+      )
+      signup
+  - type: code
+    language: python
+    title: 검증 결과 확인
+    description: 정규화된 값
+    content: |-
+      signupResult = {
+          "username": signup.username,
+          "email": signup.email,
+          "age": signup.age,
+          "fields": list(SignupForm.model_fields.keys())
+      }
+      signupResult
+
+- id: practice
+  title: 실습
+  subtitle: 검증 시스템 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 Field 제약조건, field_validator, model_validator, computed_field를 활용하여 다양한 도메인의 검증 시스템을 구축합니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 상품 등록 폼"
+    blocks:
+    - type: code
+      title: 상품 모델 정의
+      content: |-
+        from pydantic import BaseModel, Field, field_validator, computed_field, ValidationError
+        from typing import Optional
+
+        class ProductForm(BaseModel):
+            productName: str = Field(min_length=2, max_length=100)
+            basePrice: float = Field(gt=0)
+            discountRate: float = Field(ge=0, le=100, default=0)
+            stock: int = Field(ge=0, default=0)
+            category: str
+
+            @field_validator('category')
+            @classmethod
+            def validCategory(cls, v):
+                allowed = ['electronics', 'clothing', 'food', 'books']
+                if v.lower() not in allowed:
+                    raise ValueError(f"허용 카테고리: {allowed}")
+                return v.lower()
+
+            @computed_field
+            @property
+            def finalPrice(self) -> float:
+                return self.basePrice * (1 - self.discountRate / 100)
+
+            @computed_field
+            @property
+            def inStock(self) -> bool:
+                return self.stock > 0
+
+        product = ProductForm(
+            productName="노트북",
+            basePrice=1000000,
+            discountRate=10,
+            stock=50,
+            category="Electronics"
+        )
+        product
+    - type: code
+      title: 계산 필드 확인
+      content: |-
+        productInfo = {
+            "name": product.productName,
+            "base": product.basePrice,
+            "discount": product.discountRate,
+            "final": product.finalPrice,
+            "inStock": product.inStock,
+            "category": product.category
+        }
+        productInfo
+  - type: expansion
+    title: "미션2: 예약 시스템"
+    blocks:
+    - type: code
+      title: 예약 모델 정의
+      content: |-
+        from pydantic import BaseModel, Field, field_validator, model_validator, ValidationError
+        from datetime import date
+
+        class Reservation(BaseModel):
+            guestName: str = Field(min_length=2)
+            email: str = Field(pattern=r'^[\w.-]+@[\w.-]+\.\w+$')
+            phone: str = Field(pattern=r'^\d{3}-\d{4}-\d{4}$')
+            checkIn: date
+            checkOut: date
+            guests: int = Field(ge=1, le=10)
+            roomType: str
+
+            @field_validator('guestName')
+            @classmethod
+            def normalizeName(cls, v):
+                return v.strip().title()
+
+            @field_validator('roomType')
+            @classmethod
+            def validRoom(cls, v):
+                rooms = ['standard', 'deluxe', 'suite']
+                if v.lower() not in rooms:
+                    raise ValueError(f"허용 객실: {rooms}")
+                return v.lower()
+
+            @model_validator(mode='after')
+            def validDates(self):
+                if self.checkOut <= self.checkIn:
+                    raise ValueError("체크아웃은 체크인 이후여야 합니다")
+                return self
+
+        reservation = Reservation(
+            guestName="  kim minsu  ",
+            email="kim@hotel.com",
+            phone="010-1234-5678",
+            checkIn="2024-06-15",
+            checkOut="2024-06-18",
+            guests=2,
+            roomType="Deluxe"
+        )
+        reservation
+    - type: code
+      title: 검증 및 정규화 확인
+      content: |-
+        reserveInfo = {
+            "guest": reservation.guestName,
+            "room": reservation.roomType,
+            "nights": (reservation.checkOut - reservation.checkIn).days,
+            "guests": reservation.guests
+        }
+        reserveInfo

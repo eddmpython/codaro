@@ -1,0 +1,430 @@
+meta:
+  id: scipy_09
+  title: 스펙트럼분석기
+  order: 9
+  category: scipy
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["scipy.fft", "FFT", "스펙트럼", "주파수분석", "스펙트로그램"]
+  seo:
+    title: "scipy.fft 스펙트럼 분석 - 주파수 성분 분석하기"
+    description: "scipy.fft로 신호의 주파수 성분을 분석합니다. FFT, 파워 스펙트럼, 스펙트로그램을 배웁니다."
+    keywords: ["scipy", "fft", "스펙트럼", "주파수분석", "푸리에변환"]
+
+intro:
+  emoji: "📊"
+  goal: scipy.fft로 신호를 주파수 영역에서 분석합니다.
+  description: 시간 영역 신호를 주파수 영역으로 변환하여 어떤 주파수 성분으로 구성되어 있는지 분석합니다. 오디오, 진동, 심장박동 등 다양한 신호 분석에 활용합니다.
+
+sections:
+- id: load
+  title: 데이터 로드
+  subtitle: 복합 신호 생성
+  blocks:
+  - type: text
+    content: 푸리에 변환(FFT)은 시간 영역 신호를 주파수 영역으로 변환합니다. 복잡한 신호가 어떤 주파수 성분들의 합으로 구성되어 있는지 분해할 수 있습니다. 이 프로젝트에서는 여러 주파수가 합성된 신호를 생성하고 FFT로 각 주파수를 검출합니다.
+  - type: code
+    language: python
+    title: 라이브러리 및 신호 생성
+    description: 3개 주파수 합성
+    content: |-
+      import micropip
+      await micropip.install('scipy')
+
+      import numpy as np
+      from scipy import fft
+      from scipy import signal
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      fs = 500
+      duration = 2
+      t = np.linspace(0, duration, fs * duration, endpoint=False)
+
+      freq1, amp1 = 5, 1.0
+      freq2, amp2 = 15, 0.5
+      freq3, amp3 = 30, 0.3
+
+      sig1 = amp1 * np.sin(2 * np.pi * freq1 * t)
+      sig2 = amp2 * np.sin(2 * np.pi * freq2 * t)
+      sig3 = amp3 * np.sin(2 * np.pi * freq3 * t)
+
+      compositeSignal = sig1 + sig2 + sig3
+  - type: code
+    language: python
+    title: 시간 영역 시각화
+    description: 개별 성분과 합성 신호
+    content: |-
+      figTime, axesTime = plt.subplots(4, 1, figsize=(12, 10), sharex=True)
+
+      axesTime[0].plot(t[:200], sig1[:200], 'b-', linewidth=1.5)
+      axesTime[0].set_ylabel(f'{freq1} Hz')
+      axesTime[0].set_title('Individual Frequency Components')
+      axesTime[0].grid(True, alpha=0.3)
+
+      axesTime[1].plot(t[:200], sig2[:200], 'g-', linewidth=1.5)
+      axesTime[1].set_ylabel(f'{freq2} Hz')
+      axesTime[1].grid(True, alpha=0.3)
+
+      axesTime[2].plot(t[:200], sig3[:200], 'r-', linewidth=1.5)
+      axesTime[2].set_ylabel(f'{freq3} Hz')
+      axesTime[2].grid(True, alpha=0.3)
+
+      axesTime[3].plot(t[:200], compositeSignal[:200], 'purple', linewidth=1.5)
+      axesTime[3].set_xlabel('Time (s)')
+      axesTime[3].set_ylabel('Composite')
+      axesTime[3].set_title('Sum of All Components')
+      axesTime[3].grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figTime
+
+- id: fftcalc
+  title: FFT 수행
+  subtitle: fft.fft
+  blocks:
+  - type: text
+    content: fft.fft는 시간 영역 신호를 주파수 영역으로 변환합니다. 결과는 복소수이며, 크기(절대값)가 각 주파수의 진폭을 나타냅니다. fftfreq로 각 빈에 해당하는 주파수를 계산합니다.
+  - type: code
+    language: python
+    title: FFT 계산
+    description: 주파수 성분 추출
+    content: |-
+      n = len(compositeSignal)
+      fftResult = fft.fft(compositeSignal)
+      freqs = fft.fftfreq(n, 1/fs)
+
+      magnitude = np.abs(fftResult) / n
+  - type: tip
+    content: fftfreq는 각 FFT 빈에 해당하는 주파수를 반환합니다. 결과는 양수와 음수 주파수를 모두 포함하며, 실수 신호에서는 보통 양수 부분만 사용합니다.
+
+- id: spectrum
+  title: 주파수 스펙트럼
+  subtitle: 양수 주파수만
+  blocks:
+  - type: text
+    content: 실수 신호의 FFT는 대칭이므로 양수 주파수만 사용합니다. DC 성분을 제외한 나머지 진폭을 2배하여 전체 에너지를 표현합니다. 스펙트럼에서 5Hz, 15Hz, 30Hz에 피크가 나타나야 합니다.
+  - type: code
+    language: python
+    title: 스펙트럼 계산 및 시각화
+    description: 양수 주파수만
+    content: |-
+      positiveFreqs = freqs[:n//2]
+      positiveMag = 2 * magnitude[:n//2]
+      positiveMag[0] = magnitude[0]
+
+      figSpectrum, axSpectrum = plt.subplots(figsize=(12, 6))
+      axSpectrum.plot(positiveFreqs, positiveMag, 'b-', linewidth=1.5)
+      axSpectrum.axvline(freq1, color='r', linestyle='--', alpha=0.7, label=f'{freq1} Hz')
+      axSpectrum.axvline(freq2, color='g', linestyle='--', alpha=0.7, label=f'{freq2} Hz')
+      axSpectrum.axvline(freq3, color='orange', linestyle='--', alpha=0.7, label=f'{freq3} Hz')
+      axSpectrum.set_xlabel('Frequency (Hz)')
+      axSpectrum.set_ylabel('Magnitude')
+      axSpectrum.set_title('Frequency Spectrum (FFT)')
+      axSpectrum.set_xlim(0, 50)
+      axSpectrum.legend()
+      axSpectrum.grid(True, alpha=0.3)
+      figSpectrum
+
+- id: peaks
+  title: 피크 검출
+  subtitle: 주요 주파수 찾기
+  blocks:
+  - type: text
+    content: signal.find_peaks로 스펙트럼에서 피크를 자동으로 찾아 주요 주파수를 식별합니다. height 파라미터로 최소 진폭 임계값을 설정하여 노이즈로 인한 작은 피크를 무시합니다.
+  - type: code
+    language: python
+    title: 피크 검출
+    description: 주요 주파수
+    content: |-
+      peakIdx, peakProps = signal.find_peaks(positiveMag, height=0.1)
+      peakFreqs = positiveFreqs[peakIdx]
+      peakMags = positiveMag[peakIdx]
+
+      peakDf = pd.DataFrame({
+          'Frequency (Hz)': peakFreqs,
+          'Magnitude': peakMags
+      }).sort_values('Magnitude', ascending=False)
+      peakDf
+  - type: code
+    language: python
+    title: 피크 표시
+    description: 검출된 주파수
+    content: |-
+      figPeaks, axPeaks = plt.subplots(figsize=(12, 6))
+      axPeaks.plot(positiveFreqs, positiveMag, 'b-', linewidth=1.5, label='Spectrum')
+      axPeaks.scatter(peakFreqs, peakMags, s=100, c='red', zorder=5, label='Detected Peaks')
+
+      for pf, pm in zip(peakFreqs, peakMags):
+          axPeaks.annotate(f'{pf:.1f} Hz', (pf, pm), textcoords="offset points", xytext=(0, 10), ha='center')
+
+      axPeaks.set_xlabel('Frequency (Hz)')
+      axPeaks.set_ylabel('Magnitude')
+      axPeaks.set_title('Peak Detection in Frequency Spectrum')
+      axPeaks.set_xlim(0, 50)
+      axPeaks.legend()
+      axPeaks.grid(True, alpha=0.3)
+      figPeaks
+
+- id: psd
+  title: 파워 스펙트럼 밀도
+  subtitle: Welch 방법
+  blocks:
+  - type: text
+    content: 파워 스펙트럼 밀도(PSD)는 주파수별 에너지 분포를 나타냅니다. signal.welch는 신호를 여러 세그먼트로 나누어 평균함으로써 더 안정적인 추정을 제공합니다. 노이즈가 있는 실제 신호 분석에 적합합니다.
+  - type: code
+    language: python
+    title: Welch PSD
+    description: 파워 스펙트럼 밀도
+    content: |-
+      freqsWelch, psdWelch = signal.welch(compositeSignal, fs, nperseg=256)
+
+      figPsd, axPsd = plt.subplots(figsize=(12, 6))
+      axPsd.semilogy(freqsWelch, psdWelch, 'b-', linewidth=2)
+      axPsd.set_xlabel('Frequency (Hz)')
+      axPsd.set_ylabel('Power Spectral Density')
+      axPsd.set_title('Power Spectrum (Welch Method)')
+      axPsd.set_xlim(0, 50)
+      axPsd.grid(True, alpha=0.3)
+      figPsd
+  - type: tip
+    content: semilogy는 y축을 로그 스케일로 표시합니다. 파워가 큰 주파수와 작은 주파수를 함께 볼 수 있습니다. nperseg는 각 세그먼트 길이로, 주파수 해상도와 분산 사이의 트레이드오프가 있습니다.
+
+- id: spectrogram
+  title: 스펙트로그램
+  subtitle: 시간-주파수 분석
+  blocks:
+  - type: text
+    content: 스펙트로그램은 시간에 따라 주파수 성분이 어떻게 변하는지 보여줍니다. 음성, 음악, 비정상 신호 분석에 필수적입니다. STFT(Short-Time Fourier Transform)를 기반으로 합니다.
+  - type: code
+    language: python
+    title: 시변 신호 생성
+    description: 주파수가 변하는 신호
+    content: |-
+      tChirp = np.linspace(0, 5, 5000)
+      chirpSignal = signal.chirp(tChirp, f0=5, f1=50, t1=5, method='linear')
+  - type: code
+    language: python
+    title: 스펙트로그램 계산
+    description: STFT 기반
+    content: |-
+      freqsSpec, timeSpec, Sxx = signal.spectrogram(chirpSignal, fs=1000, nperseg=256)
+
+      figSpec, (axSpecT, axSpecF) = plt.subplots(2, 1, figsize=(12, 8))
+
+      axSpecT.plot(tChirp, chirpSignal, 'b-', linewidth=0.5)
+      axSpecT.set_xlabel('Time (s)')
+      axSpecT.set_ylabel('Amplitude')
+      axSpecT.set_title('Chirp Signal (Frequency 5→50 Hz)')
+      axSpecT.grid(True, alpha=0.3)
+
+      pcm = axSpecF.pcolormesh(timeSpec, freqsSpec, 10 * np.log10(Sxx + 1e-10), shading='gouraud', cmap='viridis')
+      axSpecF.set_xlabel('Time (s)')
+      axSpecF.set_ylabel('Frequency (Hz)')
+      axSpecF.set_title('Spectrogram')
+      axSpecF.set_ylim(0, 60)
+      plt.colorbar(pcm, ax=axSpecF, label='Power (dB)')
+
+      plt.tight_layout()
+      figSpec
+
+- id: fftfilter
+  title: FFT 필터링
+  subtitle: 주파수 영역에서 필터링
+  blocks:
+  - type: text
+    content: FFT 영역에서 특정 주파수를 제거하고 역변환(IFFT)하면 필터링 효과를 얻습니다. 정확한 주파수 제어가 가능하지만, 급격한 차단은 링잉 현상을 일으킬 수 있습니다.
+  - type: code
+    language: python
+    title: FFT 필터링
+    description: 15Hz 성분 제거
+    content: |-
+      fftFiltered = fftResult.copy()
+
+      freqMask = (np.abs(freqs) > 12) & (np.abs(freqs) < 18)
+      fftFiltered[freqMask] = 0
+
+      filteredSignalFft = np.real(fft.ifft(fftFiltered))
+  - type: code
+    language: python
+    title: 필터링 결과
+    description: 전후 비교
+    content: |-
+      figFftFilt, axesFftFilt = plt.subplots(2, 2, figsize=(14, 8))
+
+      axesFftFilt[0, 0].plot(t[:200], compositeSignal[:200], 'b-')
+      axesFftFilt[0, 0].set_title('Original Signal (Time)')
+      axesFftFilt[0, 0].grid(True, alpha=0.3)
+
+      axesFftFilt[0, 1].plot(positiveFreqs, positiveMag, 'b-')
+      axesFftFilt[0, 1].axvspan(12, 18, alpha=0.3, color='red', label='Removed')
+      axesFftFilt[0, 1].set_xlim(0, 50)
+      axesFftFilt[0, 1].set_title('Original Spectrum')
+      axesFftFilt[0, 1].legend()
+      axesFftFilt[0, 1].grid(True, alpha=0.3)
+
+      axesFftFilt[1, 0].plot(t[:200], filteredSignalFft[:200], 'g-')
+      axesFftFilt[1, 0].set_title('Filtered Signal (Time)')
+      axesFftFilt[1, 0].grid(True, alpha=0.3)
+
+      filteredMag = 2 * np.abs(fftFiltered[:n//2]) / n
+      axesFftFilt[1, 1].plot(positiveFreqs, filteredMag, 'g-')
+      axesFftFilt[1, 1].set_xlim(0, 50)
+      axesFftFilt[1, 1].set_title('Filtered Spectrum')
+      axesFftFilt[1, 1].grid(True, alpha=0.3)
+
+      plt.tight_layout()
+      figFftFilt
+
+- id: window
+  title: 윈도우 함수
+  subtitle: 스펙트럼 누설 방지
+  blocks:
+  - type: text
+    content: 유한 길이 신호의 FFT는 스펙트럼 누설(spectral leakage)이 발생합니다. 신호 끝부분의 불연속성이 원인입니다. Hann, Hamming 등의 윈도우 함수를 적용하면 양끝을 0으로 부드럽게 줄여 누설을 감소시킵니다.
+  - type: code
+    language: python
+    title: 윈도우 비교
+    description: rectangular vs hann
+    content: |-
+      testFreq = 10.5
+      testSig = np.sin(2 * np.pi * testFreq * t)
+
+      hannWindow = signal.windows.hann(len(testSig))
+      testSigWindowed = testSig * hannWindow
+
+      fftRect = fft.fft(testSig)
+      fftHann = fft.fft(testSigWindowed)
+
+      magRect = 20 * np.log10(np.abs(fftRect[:n//2]) / n + 1e-10)
+      magHann = 20 * np.log10(np.abs(fftHann[:n//2]) / n + 1e-10)
+
+      figWindow, axWindow = plt.subplots(figsize=(12, 6))
+      axWindow.plot(positiveFreqs, magRect, 'r-', alpha=0.7, label='Rectangular (no window)')
+      axWindow.plot(positiveFreqs, magHann, 'b-', label='Hann window')
+      axWindow.set_xlim(0, 30)
+      axWindow.set_ylim(-80, 0)
+      axWindow.set_xlabel('Frequency (Hz)')
+      axWindow.set_ylabel('Magnitude (dB)')
+      axWindow.set_title('Effect of Window Function on Spectral Leakage')
+      axWindow.legend()
+      axWindow.grid(True, alpha=0.3)
+      figWindow
+  - type: tip
+    content: 10.5Hz처럼 FFT 빈 중심에서 벗어난 주파수는 누설이 심합니다. Hann 윈도우를 적용하면 사이드로브가 크게 감소합니다. 메인로브가 약간 넓어지는 트레이드오프가 있습니다.
+
+- id: result
+  title: FFT 분석 가이드
+  subtitle: 실무 팁
+  blocks:
+  - type: text
+    content: 주파수 분석 시 샘플링 주파수, 데이터 길이, 윈도우 선택이 결과에 큰 영향을 줍니다. 주파수 해상도는 fs/N으로 결정되며, 나이퀴스트 정리에 따라 fs/2까지만 분석 가능합니다.
+  - type: code
+    language: python
+    title: FFT 가이드
+    description: 핵심 팁
+    content: |-
+      fftGuideDf = pd.DataFrame({
+          'Topic': ['주파수 해상도', '주파수 범위', '윈도우', '평균화', '제로 패딩'],
+          'Formula': ['Δf = fs/N', '0 ~ fs/2', 'Hann, Hamming', 'Welch, Bartlett', 'N을 늘림'],
+          'Effect': ['샘플 수 늘리면 해상도 증가', '나이퀴스트 한계', '스펙트럼 누설 감소', '노이즈 감소', '주파수 보간 효과']
+      })
+      fftGuideDf
+
+- id: practice
+  title: 실습
+  subtitle: 주파수 분석 프로젝트
+  blocks:
+  - type: tip
+    content: 신호처리 엔지니어가 되어 다양한 신호의 주파수 특성을 분석해보세요. 심박 신호에서 심박수를 추출하거나, 합성 음성의 스펙트로그램을 시각화해보세요.
+  - type: expansion
+    title: "미션1: 심박 주파수 분석"
+    blocks:
+    - type: code
+      language: python
+      title: 심박 신호 생성
+      description: 72 BPM
+      content: |-
+        fsHr = 250
+        durHr = 10
+        tHr = np.linspace(0, durHr, fsHr * durHr, endpoint=False)
+
+        heartRate = 72
+        heartFreq = heartRate / 60
+        hrSignal = np.sin(2 * np.pi * heartFreq * tHr)
+        hrSignal += 0.3 * np.sin(2 * np.pi * 2 * heartFreq * tHr)
+        hrSignal += 0.1 * np.random.randn(len(tHr))
+    - type: code
+      language: python
+      title: 심박수 검출
+      description: FFT 분석
+      content: |-
+        nHr = len(hrSignal)
+        fftHr = fft.fft(hrSignal)
+        freqsHr = fft.fftfreq(nHr, 1/fsHr)[:nHr//2]
+        magHr = 2 * np.abs(fftHr[:nHr//2]) / nHr
+
+        figHr, (axHr1, axHr2) = plt.subplots(2, 1, figsize=(12, 8))
+
+        axHr1.plot(tHr[:500], hrSignal[:500], 'b-')
+        axHr1.set_xlabel('Time (s)')
+        axHr1.set_ylabel('Amplitude')
+        axHr1.set_title('Simulated Heart Rate Signal')
+        axHr1.grid(True, alpha=0.3)
+
+        axHr2.plot(freqsHr, magHr, 'r-')
+        axHr2.axvline(heartFreq, color='green', linestyle='--', label=f'Heart Rate: {heartRate} BPM ({heartFreq:.2f} Hz)')
+        axHr2.set_xlim(0, 5)
+        axHr2.set_xlabel('Frequency (Hz)')
+        axHr2.set_ylabel('Magnitude')
+        axHr2.set_title('Heart Rate Frequency Spectrum')
+        axHr2.legend()
+        axHr2.grid(True, alpha=0.3)
+
+        plt.tight_layout()
+        figHr
+  - type: expansion
+    title: "미션2: 음성 스펙트로그램"
+    blocks:
+    - type: code
+      language: python
+      title: 합성 음성 생성
+      description: 기본 주파수 + 포먼트
+      content: |-
+        fsVoice = 8000
+        durVoice = 2
+        tVoice = np.linspace(0, durVoice, fsVoice * durVoice, endpoint=False)
+
+        f0Voice = 150
+        voiceBase = signal.sawtooth(2 * np.pi * f0Voice * tVoice)
+
+        formant1 = 0.5 * np.sin(2 * np.pi * 500 * tVoice)
+        formant2 = 0.3 * np.sin(2 * np.pi * 1500 * tVoice)
+        formant3 = 0.2 * np.sin(2 * np.pi * 2500 * tVoice)
+
+        voiceSignal = voiceBase + formant1 + formant2 + formant3
+        voiceSignal += 0.1 * np.random.randn(len(tVoice))
+    - type: code
+      language: python
+      title: 스펙트로그램 시각화
+      description: 시간-주파수 분석
+      content: |-
+        freqsVoice, timeVoice, SxxVoice = signal.spectrogram(voiceSignal, fs=fsVoice, nperseg=512)
+
+        figVoice, (axV1, axV2) = plt.subplots(2, 1, figsize=(12, 8))
+
+        axV1.plot(tVoice[:1600], voiceSignal[:1600], 'b-', linewidth=0.5)
+        axV1.set_xlabel('Time (s)')
+        axV1.set_ylabel('Amplitude')
+        axV1.set_title('Simulated Voice Signal')
+        axV1.grid(True, alpha=0.3)
+
+        pcmV = axV2.pcolormesh(timeVoice, freqsVoice, 10 * np.log10(SxxVoice + 1e-10), shading='gouraud', cmap='magma')
+        axV2.set_xlabel('Time (s)')
+        axV2.set_ylabel('Frequency (Hz)')
+        axV2.set_title('Voice Spectrogram')
+        axV2.set_ylim(0, 4000)
+        plt.colorbar(pcmV, ax=axV2, label='Power (dB)')
+
+        plt.tight_layout()
+        figVoice

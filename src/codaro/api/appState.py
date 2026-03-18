@@ -6,6 +6,7 @@ from pathlib import Path
 from ..curriculum.contentLoader import ContentLoader
 from ..curriculum.progress import ProgressTracker
 from ..kernel.manager import SessionManager
+from ..runtime import ExecutionEngine, LocalEngine
 
 
 @dataclass(slots=True)
@@ -18,6 +19,7 @@ class ServerState:
     frontendRoot: Path
     webBuildRoot: Path
     sessionManager: SessionManager
+    workspaceEngine: ExecutionEngine
     curriculumLoader: ContentLoader | None
     progressTracker: ProgressTracker
 
@@ -41,6 +43,10 @@ def createServerState(
         frontendRoot=frontendRoot,
         webBuildRoot=webBuildRoot,
         sessionManager=SessionManager(workspaceRoot=workspaceRoot),
+        workspaceEngine=LocalEngine(
+            workingDirectory=workspaceRoot,
+            workspaceRoot=workspaceRoot,
+        ),
         curriculumLoader=curriculumLoader,
         progressTracker=ProgressTracker(),
     )

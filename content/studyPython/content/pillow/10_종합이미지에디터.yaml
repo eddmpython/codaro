@@ -1,0 +1,291 @@
+meta:
+  id: pillow_10
+  title: 종합이미지에디터
+  order: 10
+  category: pillow
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["Pillow", "종합", "에디터", "필터", "텍스트", "합성"]
+  seo:
+    title: "Pillow 심화 - 종합 이미지 에디터"
+    description: "Pillow의 모든 기능을 활용하여 종합 이미지 에디터를 만듭니다. 필터, 조정, 텍스트, 합성을 종합합니다."
+    keywords: ["Pillow", "이미지에디터", "종합", "필터", "합성", "텍스트"]
+
+intro:
+  emoji: "🎬"
+  goal: 지금까지 배운 모든 Pillow 기능을 종합하여 이미지 에디터를 만듭니다.
+  description: 이미지 로드, 크기 조절, 필터, 색상 조정, 텍스트 삽입, 합성까지 전체 편집 파이프라인을 구현합니다. 모든 개념을 실전에서 활용합니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 이미지 로드
+  subtitle: 편집할 원본 준비
+  blocks:
+  - type: text
+    content: sklearn의 china 이미지를 원본으로 사용합니다. 편집 과정에서 원본을 보존하기 위해 copy()로 작업 이미지를 생성합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: 모든 필요한 모듈을 임포트합니다
+    content: |-
+      from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
+      from sklearn.datasets import load_sample_image
+
+      originalArr = load_sample_image('china.jpg')
+      original = Image.fromarray(originalArr)
+      original.size, original.mode
+  - type: code
+    language: python
+    title: 작업 이미지 생성
+    description: 원본을 복사하여 편집합니다
+    content: |-
+      working = original.copy()
+      working.size
+  - type: code
+    language: python
+    title: 원본 확인
+    description: 편집 전 상태입니다
+    content: |-
+      working
+
+- id: step2_crop_resize
+  title: 2단계. 크기 편집
+  subtitle: 자르기와 리사이즈
+  blocks:
+  - type: text
+    content: 이미지의 특정 영역을 추출하고 원하는 크기로 조절합니다. 이전 프로젝트에서 배운 crop()과 resize()를 활용합니다.
+  - type: code
+    language: python
+    title: 중앙 영역 추출
+    description: 가로 80%, 세로 80% 영역을 자릅니다
+    content: |-
+      w, h = working.size
+      marginW = int(w * 0.1)
+      marginH = int(h * 0.1)
+      cropped = working.crop((marginW, marginH, w - marginW, h - marginH))
+      cropped.size
+  - type: code
+    language: python
+    title: 표준 크기로 리사이즈
+    description: 800x600 크기로 조절합니다
+    content: |-
+      resized = cropped.resize((800, 600))
+      resized.size
+  - type: code
+    language: python
+    title: 편집 결과
+    description: 자르기와 리사이즈가 적용되었습니다
+    content: |-
+      resized
+
+- id: step3_filter
+  title: 3단계. 필터 적용
+  subtitle: ImageFilter 활용
+  blocks:
+  - type: text
+    content: 이미지에 필터를 적용하여 분위기를 바꿉니다. 여러 필터를 순차적으로 적용할 수도 있습니다.
+  - type: code
+    language: python
+    title: 샤프닝 적용
+    description: 이미지를 선명하게 만듭니다
+    content: |-
+      filtered = resized.filter(ImageFilter.UnsharpMask(radius=2, percent=120))
+      filtered
+  - type: code
+    language: python
+    title: 엣지 강조 추가
+    description: 경계를 더 뚜렷하게 합니다
+    content: |-
+      enhanced = filtered.filter(ImageFilter.EDGE_ENHANCE)
+      enhanced
+
+- id: step4_color
+  title: 4단계. 색상 조정
+  subtitle: ImageEnhance 활용
+  blocks:
+  - type: text
+    content: 밝기, 대비, 채도를 조절하여 이미지를 보정합니다. 각 조정은 순차적으로 적용됩니다.
+  - type: code
+    language: python
+    title: 밝기 조정
+    description: 약간 밝게 합니다
+    content: |-
+      brighter = ImageEnhance.Brightness(enhanced).enhance(1.1)
+      brighter
+  - type: code
+    language: python
+    title: 대비 조정
+    description: 대비를 높입니다
+    content: |-
+      contrasted = ImageEnhance.Contrast(brighter).enhance(1.15)
+      contrasted
+  - type: code
+    language: python
+    title: 채도 조정
+    description: 색을 더 선명하게 합니다
+    content: |-
+      saturated = ImageEnhance.Color(contrasted).enhance(1.2)
+      saturated
+
+- id: step5_text
+  title: 5단계. 텍스트 추가
+  subtitle: ImageDraw 활용
+  blocks:
+  - type: text
+    content: 이미지에 제목이나 설명 텍스트를 추가합니다. RGBA 모드로 변환하여 반투명 배경을 적용합니다.
+  - type: code
+    language: python
+    title: RGBA 변환
+    description: 투명도 지원을 위해 변환합니다
+    content: |-
+      textReady = saturated.convert('RGBA')
+      textReady.mode
+  - type: code
+    language: python
+    title: 텍스트 배경 레이어
+    description: 반투명 배경을 만듭니다
+    content: |-
+      textLayer = Image.new('RGBA', textReady.size, (0, 0, 0, 0))
+      textDraw = ImageDraw.Draw(textLayer)
+      textDraw.rectangle([0, 550, 800, 600], fill=(0, 0, 0, 128))
+      textLayer
+  - type: code
+    language: python
+    title: 텍스트 삽입
+    description: 하단에 제목을 추가합니다
+    content: |-
+      textDraw.text((20, 565), "China Landscape - Edited with Pillow", fill=(255, 255, 255, 230))
+      textLayer
+  - type: code
+    language: python
+    title: 텍스트 합성
+    description: 텍스트 레이어를 합칩니다
+    content: |-
+      withText = Image.alpha_composite(textReady, textLayer)
+      withText
+
+- id: step6_overlay
+  title: 6단계. 로고/워터마크 추가
+  subtitle: 이미지 합성
+  blocks:
+  - type: text
+    content: 작은 로고나 워터마크를 추가합니다. 직접 도형으로 간단한 로고를 만들어봅니다.
+  - type: code
+    language: python
+    title: 로고 생성
+    description: 원형 로고를 만듭니다
+    content: |-
+      logo = Image.new('RGBA', (50, 50), (0, 0, 0, 0))
+      logoDraw = ImageDraw.Draw(logo)
+      logoDraw.ellipse([5, 5, 45, 45], fill=(255, 100, 100, 200))
+      logoDraw.text((15, 18), "PY", fill=(255, 255, 255, 255))
+      logo
+  - type: code
+    language: python
+    title: 로고 배치
+    description: 오른쪽 상단에 붙입니다
+    content: |-
+      logoLayer = Image.new('RGBA', withText.size, (0, 0, 0, 0))
+      logoLayer.paste(logo, (740, 10))
+      final = Image.alpha_composite(withText, logoLayer)
+      final
+
+- id: step7_compare
+  title: 7단계. 결과 비교
+  subtitle: 원본과 편집본
+  blocks:
+  - type: text
+    content: 원본 이미지와 최종 편집 결과를 비교합니다. 여러 단계의 편집이 적용된 결과를 확인합니다.
+  - type: code
+    language: python
+    title: 편집 요약
+    description: 적용된 편집 항목입니다
+    content: |-
+      edits = [
+          "1. 10% 마진 자르기",
+          "2. 800x600 리사이즈",
+          "3. UnsharpMask + EdgeEnhance 필터",
+          "4. 밝기 1.1x, 대비 1.15x, 채도 1.2x",
+          "5. 하단 텍스트 배너",
+          "6. 로고 워터마크"
+      ]
+      edits
+  - type: code
+    language: python
+    title: 최종 결과
+    description: 모든 편집이 적용된 이미지입니다
+    content: |-
+      final
+
+- id: practice
+  title: 실습
+  subtitle: 종합 에디터 프로젝트
+  blocks:
+  - type: text
+    content: flower 이미지에 전체 편집 파이프라인을 적용해봅시다. 위에서 배운 크기 조절, 필터, 색상 보정, 텍스트, 합성을 종합하여 완성도 높은 이미지를 만듭니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: flower 빈티지 에디터"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
+        from sklearn.datasets import load_sample_image
+
+        vintageArr = load_sample_image('flower.jpg')
+        vintageBase = Image.fromarray(vintageArr)
+        vintageBase
+    - type: code
+      title: "리사이즈 및 필터"
+      content: |-
+        vintageResized = vintageBase.resize((600, 400))
+        vintageBlur = vintageResized.filter(ImageFilter.GaussianBlur(radius=0.5))
+        vintageBlur
+    - type: code
+      title: "빈티지 색상 조정"
+      content: |-
+        vintageColor = ImageEnhance.Color(vintageBlur).enhance(0.7)
+        vintageContrast = ImageEnhance.Contrast(vintageColor).enhance(0.9)
+        vintageBright = ImageEnhance.Brightness(vintageContrast).enhance(1.1)
+        vintageBright
+    - type: code
+      title: "텍스트 추가"
+      content: |-
+        vintageRgba = vintageBright.convert('RGBA')
+        vintageLayer = Image.new('RGBA', vintageRgba.size, (0, 0, 0, 0))
+        vintagePen = ImageDraw.Draw(vintageLayer)
+        vintagePen.text((20, 370), "Vintage Flower", fill=(255, 255, 255, 180))
+        vintageResult = Image.alpha_composite(vintageRgba, vintageLayer)
+        vintageResult
+  - type: expansion
+    title: "미션2: 포스터 스타일 에디터"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image, ImageFilter, ImageEnhance, ImageDraw
+        from sklearn.datasets import load_sample_image
+
+        posterArr = load_sample_image('china.jpg')
+        posterBase = Image.fromarray(posterArr)
+        posterBase
+    - type: code
+      title: "크기 조절 및 고대비"
+      content: |-
+        posterCrop = posterBase.crop((50, 30, 550, 350))
+        posterResized = posterCrop.resize((500, 320))
+        posterContrast = ImageEnhance.Contrast(posterResized).enhance(1.5)
+        posterSat = ImageEnhance.Color(posterContrast).enhance(1.4)
+        posterSat
+    - type: code
+      title: "테두리와 제목"
+      content: |-
+        posterCanvas = Image.new('RGB', (540, 400), 'black')
+        posterCanvas.paste(posterSat, (20, 20))
+        posterDraw = ImageDraw.Draw(posterCanvas)
+        posterDraw.rectangle([18, 18, 522, 342], outline='white', width=2)
+        posterDraw.text((20, 360), "CHINA LANDSCAPE", fill='white')
+        posterDraw.text((400, 360), "2024", fill='gray')
+        posterCanvas

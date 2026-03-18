@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en"><head><style id="react-aria-pressable-style">@layer {
+  [data-react-aria-pressable] {
+    touch-action: pan-x pan-y pinch-zoom;
+  }
+}</style><style id="vega-tooltip-style">#vg-tooltip-element {
+  visibility: hidden;
+  padding: 8px;
+  position: fixed;
+  z-index: 1000;
+  font-family: sans-serif;
+  font-size: 11px;
+  border-radius: 3px;
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+  white-space: pre-line;
+}
+#vg-tooltip-element.visible {
+  visibility: visible;
+}
+#vg-tooltip-element h2 {
+  margin-top: 0;
+  margin-bottom: 10px;
+  font-size: 13px;
+}
+#vg-tooltip-element table {
+  border-spacing: 0;
+}
+#vg-tooltip-element table tr {
+  border: none;
+}
+#vg-tooltip-element table tr td {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding-top: 2px;
+  padding-bottom: 2px;
+  vertical-align: text-top;
+}
+#vg-tooltip-element table tr td.key {
+  color: #808080;
+  max-width: 150px;
+  text-align: right;
+  padding-right: 4px;
+}
+#vg-tooltip-element table tr td.value {
+  display: block;
+  max-width: 300px;
+  max-height: 7em;
+  text-align: left;
+}
+#vg-tooltip-element {
+  /* The default theme is the light theme. */
+  background-color: rgba(255, 255, 255, 0.95);
+  border: 1px solid #d9d9d9;
+  color: black;
+}
+#vg-tooltip-element.dark-theme {
+  background-color: rgba(32, 32, 32, 0.9);
+  border: 1px solid #f5f5f5;
+  color: white;
+}
+#vg-tooltip-element.dark-theme td.key {
+  color: #bfbfbf;
+}
+</style>
+    <meta charset="utf-8">
+    <link rel="icon" href="./favicon.ico">
+    <!-- Preload is necessary because we show these images when we disconnect from the server,
+    but at that point we cannot load these images from the server -->
+    <link rel="preload" href="./assets/gradient-yHQUC_QB.png" as="image">
+    <link rel="preload" href="./assets/noise-60BoTA8O.png" as="image">
+    <!-- Preload the fonts -->
+    <link rel="preload" href="./assets/Lora-VariableFont_wght-B2ootaw-.ttf" as="font" crossorigin="anonymous">
+    <link rel="preload" href="./assets/PTSans-Regular-CxL0S8W7.ttf" as="font" crossorigin="anonymous">
+    <link rel="preload" href="./assets/PTSans-Bold-D9fedIX3.ttf" as="font" crossorigin="anonymous">
+    <link rel="preload" href="./assets/FiraMono-Regular-BTCkDNvf.ttf" as="font" crossorigin="anonymous">
+    <link rel="preload" href="./assets/FiraMono-Medium-DU3aDxX5.ttf" as="font" crossorigin="anonymous">
+    <link rel="preload" href="./assets/FiraMono-Bold-CLVRCuM9.ttf" as="font" crossorigin="anonymous">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="a marimo app">
+    <link rel="apple-touch-icon" href="./apple-touch-icon.png">
+    <link rel="manifest" href="./manifest.json">
+
+    <script data-marimo="true">
+      function __resizeIframe(obj) {
+        const scrollbarHeight = 20; // Max between windows, mac, and linux
+
+        function setHeight() {
+          // Guard against race condition where iframe isn't ready
+          if (!obj.contentWindow?.document?.documentElement) {
+            return;
+          }
+          const element = obj.contentWindow.document.documentElement;
+          // If there is no vertical scrollbar, we don't need to resize the iframe
+          if (element.scrollHeight === element.clientHeight) {
+            return;
+          }
+
+          // Create a new height that includes the scrollbar height if it's visible
+          const hasHorizontalScrollbar = element.scrollWidth > element.clientWidth;
+          const newHeight = element.scrollHeight + (hasHorizontalScrollbar ? scrollbarHeight : 0);
+
+          // Only update the height if it's different from the current height
+          if (obj.style.height !== `${newHeight}px`) {
+            obj.style.height = `${newHeight}px`;
+          }
+        }
+
+        // Resize the iframe to the height of the content and bottom scrollbar height
+        setHeight();
+
+        // Resize the iframe when the content changes
+        const resizeObserver = new ResizeObserver((_entries) => {
+          setHeight();
+        });
+        // Only observe if iframe content is ready
+        if (obj.contentWindow?.document?.body) {
+          resizeObserver.observe(obj.contentWindow.document.body);
+        }
+      }
+    </script>
+    <link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/edit-page-CTVRcSta.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/loro_wasm_bg-C5qfEYzW.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/panels-BfLG6GHU.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/layout-BOEBdVW9.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/name-cell-input-BhRgpz9L.js"><link rel="stylesheet" crossorigin="" href="http://127.0.0.1:2718/assets/name-cell-input-ujOhus_y.css"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/esm-YHLEEu76.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-BxbVYUpB.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-BCD52ijJ.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-CazeD6DS.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-Ba1GjgCU.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-CXKsxFgm.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-Cq-hSY2t.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-OYpQaA59.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-BUnAm6Ws.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-CASixOSV.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-DRZEZXzR.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-DzY1sWU4.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-CSqc_Sgb.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-BpWg9Ixw.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-D7ZgydNg.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/apl-BgFiXauj.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/asciiarmor-Bb9bgVRL.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/asn1-BJZ-nDrD.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/brainfuck-JEXXY-xb.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/clike-BqlNPeeg.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/clojure-DJJhEwde.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/cmake-B0lAo26D.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/cobol-CPAdfgtV.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/coffeescript-BOB8gS0Z.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/commonlisp-ju8ecBeu.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/crystal-rVZgODG1.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/css-mQmF00YG.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/cypher-BKJJTP3h.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/d-Bo-m8D8s.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/diff-BxRzIQ-d.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dtd-9_JVIcTk.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dylan-BnCJT9rR.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/ecl-EHfGJ0nT.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/eiffel-B1ya3rXn.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/elm-DTYW1E0x.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/erlang-Ef5NK4Qi.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/factor-CgxtRDfw.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/simple-mode-XUC_EnZg.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/forth-DlkCTYcI.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/fortran-DwMj_oVI.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/gas-JJhY92kb.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/gherkin-DLEuOFao.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/groovy-C89Qk13G.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/haskell-C_CbCt6A.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/haxe-CrpzcVEI.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/idl-B6_fc1en.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/javascript-BaaG-Hd6.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/julia-DNoFsn7V.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/livescript-DiAZOLn0.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/lua-CvOqni3z.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/mathematica-CFRE5rVx.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/mbox-B9UqFU9M.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/mirc-CLMssi9M.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/mllike-8SMJwcaT.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/modelica-yzbXhFaT.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/mscgen-2jiNYYYD.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/mumps-Bf7RyXk9.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/nsis-nZ2JXCy5.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/ntriples-CHdvKQK4.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/octave-pHgy7YQ1.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/oz-B2RGFHuF.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/pascal-CwbVUvc1.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/perl-qu-5ZkuC.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/pig-iG5hc5m3.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/powershell-DVD15WIk.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/properties-xtMba4e4.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/protobuf-Dpg2VGRe.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/pug-D86EG76d.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/puppet-Dzxmyijv.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/python-zk1sCR2K.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/q-kox9cJcs.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/r-DyYzVzIO.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/rpm-alFc50xb.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/ruby-DkQm_WRq.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/sas-DGSI29of.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/scheme-rBV9lbLs.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/shell-cLHcJFI_.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/sieve-DqVMcV-u.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/smalltalk-C-I-W4Ke.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/sparql-kL9tmY4H.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/stylus-Bhdrsm25.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/swift-BnlacIgv.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/tcl-B27COR2l.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/textile-B6TglpCZ.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/toml-BsWxQYgm.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/troff-BWLanNR_.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/ttcn-cfg-CjyOoZVj.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/ttcn-D0YGDh5r.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/turtle-Cvp2UT5f.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/vb-BhVsVWuo.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/vbscript-DuoiXXmR.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/velocity-BKH9W8hw.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/verilog-CZQD9eTL.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/vhdl-D4SaV93K.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/webidl-CNBgKfWl.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/xquery-BvBQzy0q.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/yacas-C9IPX04z.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/z80-BZqsoEqX.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/ellipsis-0_zJdF6H.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/trash-BZMAQneW.js"><link rel="stylesheet" crossorigin="" href="http://127.0.0.1:2718/assets/layout-BjXzDXoG.css"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/types-DBNA0l6L.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/requests-C_ra5-07.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/runs-COLNzLMC.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/request-registry-C4HbFS_V.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/state-CQzPalvd.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/ws-IPvpFhTG.js"><link rel="stylesheet" crossorigin="" href="http://127.0.0.1:2718/assets/panels-B4E3DsXP.css"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/app-config-button-zy3OAtTs.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/Inputs-BBPHhEky.js"><link rel="stylesheet" crossorigin="" href="http://127.0.0.1:2718/assets/Inputs-CuKU-ENz.css"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/cell-editor-CSaoLcvI.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/useSplitCell-CZQNZZ7B.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/hooks-BOa-vQTI.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/useInterval-dbfNrGBa.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/dist-Dxx6LCxI.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/circle-check-gLIOLu8x.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/save-8fSvKYJT.js"><link rel="stylesheet" crossorigin="" href="http://127.0.0.1:2718/assets/cell-editor-Iey559K_.css"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/useNotebookActions-CtiT4Mzf.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/add-connection-dialog-CIHDuGfD.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/write-secret-modal-s2JWi0j9.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/_createAggregator-zT4tQxzT.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/_baseEach-Bana0PPI.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/circle-plus-CGG-gArM.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/github-BVtI-3F1.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/useCellActionButton-DFS0hpsU.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/multi-icon-DpydcgWs.js"><link rel="stylesheet" crossorigin="" href="http://127.0.0.1:2718/assets/multi-icon-pwGWVz3d.css"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/link-Cf10mh3t.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/links-XdsYEk97.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/file-plus-corner-lLQw9OnR.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/youtube-DE-Ej6FR.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/CellStatus-D0IfrfUM.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/workflow-BmeqNuSH.js"><link rel="stylesheet" crossorigin="" href="http://127.0.0.1:2718/assets/CellStatus-2Psjnl5F.css"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/useDependencyPanelTab-Dakjo7fJ.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/panel-context-UZhylPLI.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/kiosk-mode-DWLXbf9i.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/clipboard-paste-DoYSN8Sv.js"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/rotate-ccw-hLlF_82X.js"><link rel="stylesheet" crossorigin="" href="http://127.0.0.1:2718/assets/edit-page-Dstp9NQ5.css"><link rel="modulepreload" as="script" crossorigin="" href="http://127.0.0.1:2718/assets/command-palette-CQFQWyFs.js"><base href="http://127.0.0.1:2718/"></head><body class="light light-theme" data-theme="light"><marimo-filename hidden="">C:\Users\MSI\OneDrive\Desktop\sideProject\codaro\.venv\Lib\site-packages\marimo\_tutorials\layout.py</marimo-filename>
+    <!-- TODO(Trevor): Legacy, required by VS Code plugin. Remove when plugin is updated (see marimo/server/_templates/template.py) -->
+    <marimo-version data-version="0.21.0" hidden=""></marimo-version>
+    <marimo-user-config data-config="{&quot;language_servers&quot;: {&quot;basedpyright&quot;: {}, &quot;ruff&quot;: {&quot;enabled&quot;: false}, &quot;ty&quot;: {}, &quot;pylsp&quot;: {&quot;enable_flake8&quot;: false, &quot;enabled&quot;: false, &quot;enable_pylint&quot;: false, &quot;enable_mypy&quot;: true, &quot;enable_pyflakes&quot;: false, &quot;enable_pydocstyle&quot;: false, &quot;enable_ruff&quot;: true}, &quot;pyright&quot;: {&quot;enabled&quot;: false}}, &quot;save&quot;: {&quot;format_on_save&quot;: false, &quot;autosave_delay&quot;: 1000, &quot;autosave&quot;: &quot;after_delay&quot;}, &quot;formatting&quot;: {&quot;line_length&quot;: 79}, &quot;package_management&quot;: {&quot;manager&quot;: &quot;uv&quot;}, &quot;completion&quot;: {&quot;activate_on_typing&quot;: false, &quot;signature_hint_on_typing&quot;: false, &quot;copilot&quot;: false}, &quot;display&quot;: {&quot;default_table_max_columns&quot;: 50, &quot;code_editor_font_size&quot;: 14, &quot;default_width&quot;: &quot;medium&quot;, &quot;cell_output&quot;: &quot;below&quot;, &quot;default_table_page_size&quot;: 10, &quot;dataframes&quot;: &quot;rich&quot;, &quot;reference_highlighting&quot;: false, &quot;theme&quot;: &quot;light&quot;}, &quot;keymap&quot;: {&quot;preset&quot;: &quot;default&quot;, &quot;overrides&quot;: {}, &quot;destructive_delete&quot;: true}, &quot;diagnostics&quot;: {&quot;sql_linter&quot;: true}, &quot;ai&quot;: {&quot;rules&quot;: &quot;&quot;, &quot;custom_providers&quot;: {}, &quot;mode&quot;: &quot;manual&quot;, &quot;inline_tooltip&quot;: false, &quot;models&quot;: {&quot;custom_models&quot;: [], &quot;displayed_models&quot;: []}}, &quot;datasources&quot;: {}, &quot;mcp&quot;: {&quot;mcpServers&quot;: {}, &quot;presets&quot;: []}, &quot;snippets&quot;: {&quot;include_default_snippets&quot;: true, &quot;custom_paths&quot;: []}, &quot;runtime&quot;: {&quot;std_stream_max_bytes&quot;: 1000000, &quot;reactive_tests&quot;: true, &quot;watcher_on_save&quot;: &quot;lazy&quot;, &quot;default_sql_output&quot;: &quot;auto&quot;, &quot;dotenv&quot;: [], &quot;output_max_bytes&quot;: 8000000, &quot;default_auto_download&quot;: [], &quot;default_csv_encoding&quot;: &quot;utf-8&quot;, &quot;auto_instantiate&quot;: true, &quot;auto_reload&quot;: &quot;off&quot;, &quot;on_cell_change&quot;: &quot;autorun&quot;}, &quot;server&quot;: {&quot;browser&quot;: &quot;default&quot;, &quot;follow_symlink&quot;: false}, &quot;experimental&quot;: {}}" hidden=""></marimo-user-config>
+    <marimo-server-token data-token="u-qoU_inUKLLWA4BLomibg" hidden=""></marimo-server-token>
+    <!-- /TODO -->
+    <title>layout.py</title>
+    <script type="module" crossorigin="" src="./assets/index-CV-Vv3LK.js"></script>
+    <link rel="modulepreload" crossorigin="" href="./assets/preload-helper-BW0IMuFq.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/clsx-BDxNtGmi.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/cn-BoaCR37F.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/chunk-LvLJmgfZ.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/react-Bj1aDYRI.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/compiler-runtime-B3qBwwSJ.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/jsx-runtime-icT_Ltz2.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/badge-hTpPIsMT.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useEventListener-BGihH8bs.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/button-BZAv3veu.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/react-dom-CSu739Rf.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/Combination-CBJmtdux.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/menu-items-Z4F08mfP.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-D98wU_Qc.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/createLucideIcon-Cm-Z7dYr.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/check-BE0hEwVo.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/x-BI1M8X_v.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/select-Ch6m1k2G.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/tooltip-CNmaER6z.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/use-toast-Hc8CXlvz.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/_Uint8Array-C0aUZfE0.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/_baseIsEqual-EYp9AUJI.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useEvent-O0nX5vok.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/invariant-CQUIhlu2.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/isArrayLikeObject-Dx6-QZGQ.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/merge-CfcLlFFp.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/zod-H_cgTO0M.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/utils-BvPM6Bro.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/Deferred-BMfCOLaw.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/uuid-ClFZlR7U.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/DeferredRequestRegistry-O6RDJKs0.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/constants-Rz_lD4HK.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/session-CXChHxAw.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/config-DeEqZTX7.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/requests-Bgjtqo_1.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/isSymbol-CiGN2w5X.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/toString-lmrYznmk.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/_baseSlice-39dTX4Wi.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/_hasUnicode-QS_pSfjY.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/assertNever-CTRGz-ul.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/_arrayReduce-BKEr35uH.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useLifecycle-CWjBWFMI.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useNonce-BtW-rR_1.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useTheme-CM9j8dgy.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/once-CJOnx12W.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/capabilities-B1-dYWS8.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/createReducer-DgaMD0B6.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/paths-D2lG83Oh.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-B_cxg-E4.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-D0Vj4Kqc.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-CtXb4bUU.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-CQqv2gQL.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-8UD0A5sU.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-CXLJUPFl.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-BNC_tnlW.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-apDpadc4.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-CEeVCRd_.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/stex-0ac7Aukl.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/toDate-BqKH-Jd9.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/purify.es-BBn8CPhf.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/cjs-BU2qXMKx.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/toNumber-OnFQK5Wu.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/now-8AYn-wiF.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/debounce-DS_VtWMt.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/toInteger-CO3ppIfA.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/database-zap-DTWCDKdn.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/main-DrBRErTM.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/cells-wT6clfi5.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/spinner-C5JoisA7.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/chevron-right-D0GQBpTb.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dropdown-menu-CJ-Wwa2I.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/kbd-wfpi3NfU.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/renderShortcut-C3rk7kIN.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/multi-map-x_GQgXMS.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/alert-DkRmN0_B.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/card-zDTDna9R.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/alert-dialog-DbQ_TZC7.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dialog-DCGn-_Ip.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dist-CWEZ0LAs.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/label-BuJDtc39.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useDebounce-DwTO_rGp.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/azure-Dy9N467C.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/numbers-BWhcwX6S.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/SSRProvider-CwqN9FWV.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/context-CRmPPhx9.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useNumberFormatter-BXZcbTzH.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/usePress-alQ5Crny.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/input-C5eatTLl.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/links-CoGM-Inf.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/popover-JNsSzROl.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/switch-BHXOZNHf.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/table-CKtrITeZ.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useAsyncData-a8f2Q_nk.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/errors-0IrrdfSG.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/error-banner-CAuK5DPN.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/copy-BvFGCBvy.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/memoize-Bw1ifb7c.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/get-DBdMgUNq.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/capitalize-DcpkQwJe.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/copy-CkudG0Ej.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/plus-dVmh0yTy.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/refresh-cw-CHAHPgkx.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/trash-2-CAoNMkjq.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/triangle-alert-qZo1ox6x.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/ai-model-dropdown-DxpOlTBW.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/defaultLocale-CuYNS33t.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/precisionRound-CCOoIlcP.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/defaultLocale-CGfP-Ye3.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/vega-loader.browser-BJ9oKrvH.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/tooltip-WkrsrB6k.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/ErrorBoundary-H5EQrcAX.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useInstallPackage-CO3hLMle.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/ImperativeModal-b5nJtLod.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/cell-link-CL9widoN.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/datasource-DIETDMi4.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/state-BN6sGgkm.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/MarimoErrorOutput-CimwFZPP.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/copy-icon-HTFh4odu.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/html-to-image-DBFAQbWm.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/focus-q8oYkLV6.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/LazyAnyLanguageCodeMirror-Cqo8_z2X.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/chunk-5FQGJX7Z-DEi7JZeU.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/katex-0Z75JF53.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/markdown-renderer-DwRjZSV8.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/command-DGKK2-4P.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/download-RVcmZh1N.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/RenderHTML-ncKzTdNN.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useIframeCapabilities-DG-6GyGn.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/formats-DEgTLsde.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/en-US-BO8E69bZ.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/isValid-BGe7pJXT.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/dates-BcvJrESI.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/maps-CqKCrVZ8.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/extends-B9D0JO9U.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/emotion-is-prop-valid.esm-lG8j6oqk.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useDateFormatter-DOoVZUts.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/range-CJeRXUtp.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/table-BCnp9gKC.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/JsonOutput-DjokO226.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useDeleteCell-CmX8_XRr.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/icons-T5yQRjuT.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/process-output-BXIvuDcK.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/blob-DgooIGjS.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/objectWithoutPropertiesLoose-CboCOq4o.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/esm-BjfXuxxx.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/file-DzHkbIdO.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/image-DXfkah9d.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/play-DKSqmedg.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/add-cell-with-ai-Bl1TJ3Bp.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/isEmpty-CfmnKtgL.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/bot-message-square-CK6eoGWy.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/chat-display-CWCYGDhk.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/chart-no-axes-column-DV8gdCvH.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/square-function-B006EYFX.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/spec-CYMZZDXr.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/ellipsis-vertical-CAB7tdza.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/components-U5Mj1xiO.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/column-preview-UqRUB1pJ.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/toggle-AwCCScbH.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/globals-Bh7qAnqa.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/share-DdWa0mV7.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/_baseSet-D5BgdrnX.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/react-resizable-panels.browser.esm-DTuXFbj-.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/context-aware-panel-DScGcWey.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/floating-outline-jCvD7_Ne.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useAddCell-ErFmQedu.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/eye-off-vwi9L975.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/readonly-python-code-Cyn1aSna.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/file-headphone-B5q2Ow55.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/file-icons-Br3viuqL.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/refresh-ccw-DLpfIr8v.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/form-BEIQJWib.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/field-9GctqEPJ.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useBoolean-COWWzCBr.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/useDeepCompareMemoize-BEmJ3M7I.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/types-C1RN112u.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/prop-types-C638SUfx.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/es-2S6JXj4o.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/hasIn-Bx4-SO9M.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/_baseFlatten-Be7p_si8.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/_basePickBy-Ck7z0-tq.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/pick-BYA9UDHe.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/code-xml-DwHPF_nL.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/download-DBW9RXtT.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/square-CxAsQQ77.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/settings-CzQUw9rV.js">
+    <link rel="modulepreload" crossorigin="" href="./assets/bundle.esm-cfPbrCwe.js">
+    <link rel="stylesheet" crossorigin="" href="./assets/cells-jmgGt1lS.css">
+    <link rel="stylesheet" crossorigin="" href="./assets/markdown-renderer-DdDKmWlR.css">
+    <link rel="stylesheet" crossorigin="" href="./assets/JsonOutput-B7vuddcd.css">
+    <link rel="stylesheet" crossorigin="" href="./assets/index-CVpJvEAO.css">
+  <meta property="og:title" content="Layout">
+<meta property="og:image" content="/og/thumbnail">
+<meta name="twitter:card" content="summary_large_image">
+
+  
+    <div id="root"><div class="contents" style="--marimo-code-editor-font-size: 0.875rem;"><div class="flex flex-col flex-1 overflow-hidden absolute inset-0 print:relative"><div class="" data-panel-group="" data-panel-group-direction="horizontal" data-panel-group-id="_r_0_" style="display: flex; flex-direction: row; height: 100%; overflow: hidden; width: 100%;"><div class="h-full pt-4 pb-1 px-1 flex flex-col items-start text-muted-foreground text-md select-none text-sm z-50 dark:bg-background print:hidden hide-on-fullscreen"><template></template><span data-focus-scope-start="true" hidden=""></span><div data-state="closed" class="flex flex-col gap-0" data-rac="" aria-label="Sidebar panels" role="listbox" id="react-aria5973933491-_r_6_" tabindex="0" data-collection="react-aria5973933491-_r_1_" data-layout="stack" data-orientation="vertical"><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_1_" data-key="files" data-react-aria-pressable="true" id="react-aria5973933491-_r_6_-option-files" draggable="true" data-allows-dragging="true"><div class="flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded hover:bg-(--sage-3)" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-folder-tree h-5 w-5" aria-hidden="true"><path d="M20 10a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1h-2.5a1 1 0 0 1-.8-.4l-.9-1.2A1 1 0 0 0 15 3h-2a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"></path><path d="M20 21a1 1 0 0 0 1-1v-3a1 1 0 0 0-1-1h-2.9a1 1 0 0 1-.88-.55l-.42-.85a1 1 0 0 0-.92-.6H13a1 1 0 0 0-1 1v5a1 1 0 0 0 1 1Z"></path><path d="M3 5a2 2 0 0 0 2 2h3"></path><path d="M3 3v13a2 2 0 0 0 2 2h3"></path></svg></div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_1_" data-key="variables" data-react-aria-pressable="true" id="react-aria5973933491-_r_6_-option-variables" draggable="true" data-allows-dragging="true"><div class="flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded hover:bg-(--sage-3)" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-variable h-5 w-5" aria-hidden="true"><path d="M8 21s-4-3-4-9 4-9 4-9"></path><path d="M16 3s4 3 4 9-4 9-4 9"></path><line x1="15" x2="9" y1="9" y2="15"></line><line x1="9" x2="15" y1="9" y2="15"></line></svg></div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_1_" data-key="packages" data-react-aria-pressable="true" id="react-aria5973933491-_r_6_-option-packages" draggable="true" data-allows-dragging="true"><div class="flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded hover:bg-(--sage-3)" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-box h-5 w-5" aria-hidden="true"><path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path><path d="m3.3 7 8.7 5 8.7-5"></path><path d="M12 22V12"></path></svg></div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_1_" data-key="ai" data-react-aria-pressable="true" id="react-aria5973933491-_r_6_-option-ai" draggable="true" data-allows-dragging="true"><div class="flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded hover:bg-(--sage-3)" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-bot h-5 w-5" aria-hidden="true"><path d="M12 8V4H8"></path><rect width="16" height="12" x="4" y="8" rx="2"></rect><path d="M2 14h2"></path><path d="M20 14h2"></path><path d="M15 13v2"></path><path d="M9 13v2"></path></svg></div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_1_" data-key="outline" data-react-aria-pressable="true" id="react-aria5973933491-_r_6_-option-outline" draggable="true" data-allows-dragging="true"><div class="flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded hover:bg-(--sage-3)" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-scroll-text h-5 w-5" aria-hidden="true"><path d="M15 12h-5"></path><path d="M15 8h-5"></path><path d="M19 17V5a2 2 0 0 0-2-2H4"></path><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"></path></svg></div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_1_" data-key="documentation" data-react-aria-pressable="true" id="react-aria5973933491-_r_6_-option-documentation" draggable="true" data-allows-dragging="true"><div class="flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded hover:bg-(--sage-3)" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-text-search h-5 w-5" aria-hidden="true"><path d="M21 5H3"></path><path d="M10 12H3"></path><path d="M10 19H3"></path><circle cx="17" cy="15" r="3"></circle><path d="m21 19-1.9-1.9"></path></svg></div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_1_" data-key="dependencies" data-react-aria-pressable="true" id="react-aria5973933491-_r_6_-option-dependencies" draggable="true" data-allows-dragging="true"><div class="flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded hover:bg-(--sage-3)" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-network h-5 w-5" aria-hidden="true"><rect x="16" y="16" width="6" height="6" rx="1"></rect><rect x="2" y="16" width="6" height="6" rx="1"></rect><rect x="9" y="2" width="6" height="6" rx="1"></rect><path d="M5 16v-3a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3"></path><path d="M12 12V8"></path></svg></div></div></div><span data-focus-scope-end="true" hidden=""></span><button class="flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded hover:bg-(--sage-3)" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-message-circle-question-mark h-5 w-5" aria-hidden="true"><path d="M2.992 16.342a2 2 0 0 1 .094 1.167l-1.065 3.29a1 1 0 0 0 1.236 1.168l3.413-.998a2 2 0 0 1 1.099.092 10 10 0 1 0-4.777-4.719"></path><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></svg></button><div class="flex-1"></div><div class="flex flex-col-reverse gap-px overflow-hidden" data-state="closed"></div></div><div data-testid="helper" class="dark:bg-(--slate-1) print:hidden hide-on-fullscreen" id="app-chrome-sidebar" data-panel-group-id="_r_0_" data-panel="" data-panel-collapsible="true" data-panel-id="app-chrome-sidebar" data-panel-size="0.0" style="flex: 0 1 0px; overflow: hidden;"><span class="flex flex-row h-full"><div class="flex flex-col h-full flex-1 overflow-hidden mr-[-4px]"><div class="p-3 border-b flex justify-between items-center"><span class="text-sm text-(--slate-11) uppercase tracking-wide font-semibold flex-1"></span><button class="disabled:opacity-50 disabled:pointer-events-none inline-flex items-center justify-center font-medium focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background opacity-80 hover:opacity-100 active:opacity-100 h-7 px-2 rounded-md text-xs m-0" data-testid="close-helper-pane"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x w-4 h-4" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div></div> <div class="border-border print:hidden z-10 resize-handle-collapsed vertical" role="separator" tabindex="0" data-panel-group-direction="horizontal" data-panel-group-id="_r_0_" data-resize-handle="" data-panel-resize-handle-enabled="false" data-panel-resize-handle-id="_r_a_" data-resize-handle-state="inactive" aria-controls="app-chrome-sidebar" aria-valuemax="75" aria-valuemin="10" aria-valuenow="0" style="touch-action: none; user-select: none;"></div></span></div><div class="" id="app-chrome-body" data-panel-group-id="_r_0_" data-panel="" data-panel-id="app-chrome-body" data-panel-size="100.0" style="flex: 100 1 0px; overflow: hidden;"><div class="" data-panel-group="" data-panel-group-direction="vertical" data-panel-group-id="_r_c_" style="display: flex; flex-direction: column; height: 100%; overflow: hidden; width: 100%;"><div class="relative h-full" id="app" data-panel-group-id="_r_c_" data-panel="" data-panel-id="app" data-panel-size="100.0" style="flex: 100 1 0px; overflow: hidden;"><div class="noise"></div><div class="disconnected-gradient"></div><div class="z-50 top-4 left-4 absolute"><div class="print:hidden pointer-events-auto hover:cursor-pointer" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-unlink w-[25px] h-[25px] text-(--red-11)" aria-hidden="true"><path d="m18.84 12.25 1.72-1.71h-.02a5.004 5.004 0 0 0-.12-7.07 5.006 5.006 0 0 0-6.95 0l-1.72 1.71"></path><path d="m5.17 11.75-1.71 1.71a5.004 5.004 0 0 0 .12 7.07 5.006 5.006 0 0 0 6.95 0l1.71-1.71"></path><line x1="8" x2="8" y1="2" y2="5"></line><line x1="2" x2="5" y1="8" y2="8"></line><line x1="16" x2="16" y1="19" y2="22"></line><line x1="19" x2="22" y1="16" y2="16"></line></svg></div></div><div id="App" data-config-width="compact" data-connection-state="CLOSED" class="mathjax_ignore disconnected bg-background w-full h-full text-textColor flex flex-col overflow-y-auto overflow-x-hidden print:height-fit"><div class="pt-4 sm:pt-12 pb-2 mb-4 print:hidden z-50 sticky left-0"><div class="flex items-center justify-center container"><div tabindex="-1" class="flex h-full w-full flex-col overflow-hidden rounded-md text-popover-foreground bg-transparent group filename-input" id="filename-input" cmdk-root=""><label cmdk-label="" for="radix-_r_2v_" id="radix-_r_2u_" style="position: absolute; width: 1px; height: 1px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"></label><div class="max-h-[300px] overflow-y-auto overflow-x-hidden" cmdk-list="" role="listbox" tabindex="-1" aria-label="Suggestions" id="radix-_r_2t_" style="--cmdk-list-height: 40.0px;"><div cmdk-list-sizer=""><div><div class="flex items-center border-b border-none justify-center px-1" cmdk-input-wrapper=""><input class="placeholder:text-foreground-muted flex rounded-md bg-transparent text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50 filename w-full px-4 py-1 my-1 h-9 font-mono text-foreground/60" data-testid="dir-completion-input" tabindex="-1" spellcheck="false" placeholder="layout.py" autocomplete="off" cmdk-input="" autocorrect="off" aria-autocomplete="list" role="combobox" aria-expanded="true" aria-controls="radix-_r_2t_" aria-labelledby="radix-_r_2u_" id="radix-_r_2v_" type="text" value="C:\Users\MSI\OneDrive\Desktop\sideProject\codaro\.venv\Lib\site-packages\marimo\_tutorials\layout.py" style="max-width: 1000px;"></div></div><div class="marimo" style="display: contents;"></div></div></div></div></div><div class="font-mono text-center text-base text-(--red-11)"><p>kernel not found</p></div></div></div><div class="absolute bottom-5 right-5 flex flex-col gap-2 items-center print:hidden pointer-events-auto z-30"><button class="flex items-center justify-center m-0 leading-none font-medium border border-foreground/10 shadow-xs-solid active:shadow-none dark:border-border text-sm mo-button gray rounded px-3 py-2 rectangle" id="save-button" aria-label="Save" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-save" aria-hidden="true"><path d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"></path><path d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"></path><path d="M7 3v4a1 1 0 0 0 1 1h7"></path></svg></button><button class="flex items-center justify-center m-0 leading-none font-medium border border-foreground/10 shadow-xs-solid active:shadow-none dark:border-border text-sm mo-button hint-green rounded px-3 py-2" data-testid="hide-code-button" id="preview-button" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-layout-template" aria-hidden="true"><rect width="18" height="7" x="3" y="3" rx="1"></rect><rect width="9" height="7" x="3" y="14" rx="1"></rect><rect width="5" height="7" x="16" y="14" rx="1"></rect></svg></button><button class="flex items-center justify-center m-0 leading-none font-medium border border-foreground/10 shadow-xs-solid active:shadow-none dark:border-border text-sm mo-button hint-green rounded px-3 py-2" data-testid="command-palette-button" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-command" aria-hidden="true"><path d="M15 6v12a3 3 0 1 0 3-3H6a3 3 0 1 0 3 3V6a3 3 0 1 0-3 3h12a3 3 0 1 0-3-3"></path></svg></button><div></div><div class="flex flex-col gap-2 items-center"></div></div></div><div data-testid="panel" class="dark:bg-(--slate-1) print:hidden hide-on-fullscreen" id="app-chrome-panel" data-panel-group-id="_r_c_" data-panel="" data-panel-collapsible="true" data-panel-id="app-chrome-panel" data-panel-size="0.0" style="flex: 0 1 0px; overflow: hidden;"><div class="border-border print:hidden z-20 resize-handle-collapsed horizontal" role="separator" tabindex="0" data-panel-group-direction="vertical" data-panel-group-id="_r_c_" data-resize-handle="" data-panel-resize-handle-enabled="false" data-panel-resize-handle-id="_r_11_" data-resize-handle-state="inactive" aria-controls="app" aria-valuemax="90" aria-valuemin="25" aria-valuenow="100" style="touch-action: none; user-select: none;"></div><div class="flex flex-col h-full"><div class="flex items-center justify-between border-b px-2 h-8 bg-background shrink-0"><template></template><span data-focus-scope-start="true" hidden=""></span><div data-state="closed" class="flex flex-row gap-1" data-rac="" aria-label="Developer panel tabs" role="listbox" id="react-aria5973933491-_r_17_" tabindex="0" data-collection="react-aria5973933491-_r_12_" data-layout="stack" data-orientation="vertical"><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_12_" data-key="errors" data-react-aria-pressable="true" id="react-aria5973933491-_r_17_-option-errors" draggable="true" data-allows-dragging="true"><div class="text-sm flex gap-2 px-2 pt-1 pb-0.5 items-center leading-none rounded-sm cursor-pointer bg-muted"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x w-4 h-4" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg>Errors</div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_12_" data-key="scratchpad" data-react-aria-pressable="true" id="react-aria5973933491-_r_17_-option-scratchpad" draggable="true" data-allows-dragging="true"><div class="text-sm flex gap-2 px-2 pt-1 pb-0.5 items-center leading-none rounded-sm cursor-pointer hover:bg-muted/50"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-notebook-pen w-4 h-4" aria-hidden="true"><path d="M13.4 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7.4"></path><path d="M2 6h4"></path><path d="M2 10h4"></path><path d="M2 14h4"></path><path d="M2 18h4"></path><path d="M21.378 5.626a1 1 0 1 0-3.004-3.004l-5.01 5.012a2 2 0 0 0-.506.854l-.837 2.87a.5.5 0 0 0 .62.62l2.87-.837a2 2 0 0 0 .854-.506z"></path></svg>Scratchpad</div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_12_" data-key="tracing" data-react-aria-pressable="true" id="react-aria5973933491-_r_17_-option-tracing" draggable="true" data-allows-dragging="true"><div class="text-sm flex gap-2 px-2 pt-1 pb-0.5 items-center leading-none rounded-sm cursor-pointer hover:bg-muted/50"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-activity w-4 h-4" aria-hidden="true"><path d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"></path></svg>Tracing</div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_12_" data-key="secrets" data-react-aria-pressable="true" id="react-aria5973933491-_r_17_-option-secrets" draggable="true" data-allows-dragging="true"><div class="text-sm flex gap-2 px-2 pt-1 pb-0.5 items-center leading-none rounded-sm cursor-pointer hover:bg-muted/50"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-key-round w-4 h-4" aria-hidden="true"><path d="M2.586 17.414A2 2 0 0 0 2 18.828V21a1 1 0 0 0 1 1h3a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h1a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1h.172a2 2 0 0 0 1.414-.586l.814-.814a6.5 6.5 0 1 0-4-4z"></path><circle cx="16.5" cy="7.5" r=".5" fill="currentColor"></circle></svg>Secrets</div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_12_" data-key="logs" data-react-aria-pressable="true" id="react-aria5973933491-_r_17_-option-logs" draggable="true" data-allows-dragging="true"><div class="text-sm flex gap-2 px-2 pt-1 pb-0.5 items-center leading-none rounded-sm cursor-pointer hover:bg-muted/50"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-file-text w-4 h-4" aria-hidden="true"><path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"></path><path d="M14 2v5a1 1 0 0 0 1 1h5"></path><path d="M10 9H8"></path><path d="M16 13H8"></path><path d="M16 17H8"></path></svg>Logs</div></div><div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" data-rac="" role="option" aria-describedby="react-aria-description-0" tabindex="-1" data-collection="react-aria5973933491-_r_12_" data-key="snippets" data-react-aria-pressable="true" id="react-aria5973933491-_r_17_-option-snippets" draggable="true" data-allows-dragging="true"><div class="text-sm flex gap-2 px-2 pt-1 pb-0.5 items-center leading-none rounded-sm cursor-pointer hover:bg-muted/50"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-square-dashed-bottom-code w-4 h-4" aria-hidden="true"><path d="M10 9.5 8 12l2 2.5"></path><path d="M14 21h1"></path><path d="m14 9.5 2 2.5-2 2.5"></path><path d="M5 21a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2"></path><path d="M9 21h1"></path></svg>Snippets</div></div></div><span data-focus-scope-end="true" hidden=""></span><div class="border-l border-border h-4 mx-1"></div><button type="button" class="p-1 hover:bg-accent rounded flex items-center gap-1.5 text-xs text-muted-foreground" data-testid="backend-status" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-power-off w-4 h-4 text-red-500" aria-hidden="true"><path d="M18.36 6.64A9 9 0 0 1 20.77 15"></path><path d="M6.16 6.16a9 9 0 1 0 12.68 12.68"></path><path d="M12 2v4"></path><path d="m2 2 20 20"></path></svg><span>Kernel</span></button><div class="flex-1"></div><button class="disabled:opacity-50 disabled:pointer-events-none inline-flex items-center justify-center font-medium focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background opacity-80 hover:opacity-100 active:opacity-100 h-7 px-2 rounded-md text-xs"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x w-4 h-4" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></button></div><div class="flex-1 overflow-hidden"></div></div></div></div></div></div><footer class="h-10 py-1 gap-1 bg-background flex items-center text-muted-foreground text-md pl-2 pr-1 border-t border-border select-none print:hidden text-sm z-50 hide-on-fullscreen overflow-x-auto overflow-y-hidden scrollbar-thin"><div class="flex items-center p-2 text-sm shadow-inset font-mono cursor-pointer rounded hover:bg-(--sage-3) h-full" data-testid="footer-panel" data-state="closed"><div class="flex items-center gap-1 h-full"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-circle-x w-4 h-4 text-destructive" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="m15 9-6 6"></path><path d="m9 9 6 6"></path></svg><span>1</span><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-triangle-alert w-4 h-4 ml-1" aria-hidden="true"><path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"></path><path d="M12 9v4"></path><path d="M12 17h.01"></path></svg><span>0</span></div></div><div class="h-full flex items-center p-2 text-sm shadow-inset font-mono cursor-pointer rounded hover:bg-(--sage-3)" data-testid="footer-runtime-settings" type="button" id="radix-_r_1a_" aria-haspopup="menu" aria-expanded="false" data-state="closed"><div class="flex items-center gap-1"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-zap text-amber-500" aria-hidden="true"><path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down" aria-hidden="true"><path d="m6 9 6 6 6-6"></path></svg></div></div><div class="mx-auto"></div><div class="flex items-center shrink-0 min-w-0"><div class="flex gap-2 items-center px-1"></div><div class="h-full flex items-center p-2 text-sm shadow-inset font-mono cursor-pointer rounded hover:bg-(--sage-3)" data-testid="footer-ai-disabled" data-state="closed"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sparkles h-4 w-4 opacity-60" aria-hidden="true"><path d="M11.017 2.814a1 1 0 0 1 1.966 0l1.051 5.558a2 2 0 0 0 1.594 1.594l5.558 1.051a1 1 0 0 1 0 1.966l-5.558 1.051a2 2 0 0 0-1.594 1.594l-1.051 5.558a1 1 0 0 1-1.966 0l-1.051-5.558a2 2 0 0 0-1.594-1.594l-5.558-1.051a1 1 0 0 1 0-1.966l5.558-1.051a2 2 0 0 0 1.594-1.594z"></path><path d="M20 2v4"></path><path d="M22 4h-4"></path><circle cx="4" cy="20" r="2"></circle></svg></div></div></footer></div></div><div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;"><ol tabindex="-1" class="fixed top-0 z-100 flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:w-fit md:max-w-[420px]"></ol></div></div>
+    <!-- This is a portal for the data editor to render in -->
+    <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999"></div>
+    <script data-marimo="true">
+      window.__MARIMO_MOUNT_CONFIG__ = {
+            "filename": "C:\\Users\\MSI\\OneDrive\\Desktop\\sideProject\\codaro\\.venv\\Lib\\site-packages\\marimo\\_tutorials\\layout.py",
+            "cwd": "C:\\Users\\MSI\\OneDrive\\Desktop\\sideProject\\codaro\\.venv\\Lib\\site-packages\\marimo\\_tutorials",
+            "mode": "edit",
+            "version": "0.21.0",
+            "serverToken": "u-qoU_inUKLLWA4BLomibg",
+            "config": {"ai": {"custom_providers": {}, "inline_tooltip": false, "mode": "manual", "models": {"custom_models": [], "displayed_models": []}, "rules": ""}, "completion": {"activate_on_typing": false, "copilot": false, "signature_hint_on_typing": false}, "datasources": {}, "diagnostics": {"sql_linter": true}, "display": {"cell_output": "below", "code_editor_font_size": 14, "dataframes": "rich", "default_table_max_columns": 50, "default_table_page_size": 10, "default_width": "medium", "reference_highlighting": false, "theme": "light"}, "experimental": {}, "formatting": {"line_length": 79}, "keymap": {"destructive_delete": true, "overrides": {}, "preset": "default"}, "language_servers": {"basedpyright": {}, "pylsp": {"enable_flake8": false, "enable_mypy": true, "enable_pydocstyle": false, "enable_pyflakes": false, "enable_pylint": false, "enable_ruff": true, "enabled": false}, "pyright": {"enabled": false}, "ruff": {"enabled": false}, "ty": {}}, "mcp": {"mcpServers": {}, "presets": []}, "package_management": {"manager": "uv"}, "runtime": {"auto_instantiate": true, "auto_reload": "off", "default_auto_download": [], "default_csv_encoding": "utf-8", "default_sql_output": "auto", "dotenv": [], "on_cell_change": "autorun", "output_max_bytes": 8000000, "reactive_tests": true, "std_stream_max_bytes": 1000000, "watcher_on_save": "lazy"}, "save": {"autosave": "after_delay", "autosave_delay": 1000, "format_on_save": false}, "server": {"browser": "default", "follow_symlink": false}, "snippets": {"custom_paths": [], "include_default_snippets": true}},
+            "configOverrides": {"runtime": {"dotenv": []}},
+            "appConfig": {"sql_output": "auto", "width": "compact"},
+            "view": {"showAppCode": true},
+            "notebook": null,
+            "session": null,
+            "runtimeConfig": null,
+        };
+    </script>
+  <script>
+            if ('serviceWorker' in navigator) {
+                const notebookId = 'C%3A%5CUsers%5CMSI%5COneDrive%5CDesktop%5CsideProject%5Ccodaro%5C.venv%5CLib%5Csite-packages%5Cmarimo%5C_tutorials%5Clayout.py';
+                function sendNotebookId(registration) {
+                    if (registration.active) {
+                        registration.active.postMessage({ notebookId });
+                        return;
+                    }
+                    const worker = registration.installing || registration.waiting;
+                    if (worker) {
+                        worker.addEventListener('statechange', function() {
+                            if (worker.state === 'activated') {
+                                registration.active.postMessage({ notebookId });
+                            }
+                        });
+                    }
+                }
+                navigator.serviceWorker.register('./public-files-sw.js?v=2')
+                    .then(function(registration) {
+                        sendNotebookId(registration);
+                    })
+                    .catch(function(error) {
+                        console.error('Error registering service worker:', error);
+                    });
+                navigator.serviceWorker.ready
+                    .then(function(registration) {
+                        registration.update().then(function() { sendNotebookId(registration); });
+                    })
+                    .catch(function(error) {
+                        console.error('Error updating service worker:', error);
+                    });
+            } else {
+                console.warn(
+                    '[marimo] Service workers are not supported at this URL. Displaying files from the /public/ directory may be disabled. ' +
+                    'To fix this, enable service workers by using a secure connection (https) or localhost.'
+                );
+            }
+            </script>
+
+<div id="react-aria-description-0" style="display: none;">드래그를 시작하려면 클릭하세요.</div></body></html>

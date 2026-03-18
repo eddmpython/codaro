@@ -1,0 +1,353 @@
+meta:
+  id: matplotlib_01
+  title: 주가추세분석
+  order: 1
+  category: matplotlib
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["matplotlib", "plot", "figure", "legend", "grid", "주가"]
+  seo:
+    title: "Matplotlib 선 그래프 - 일별 주가 변동 시각화"
+    description: "Matplotlib으로 주가 추세를 선 그래프로 시각화합니다. plot, figure, title, legend, grid 사용법을 배웁니다."
+    keywords: ["matplotlib", "plt.plot", "선그래프", "주가", "시계열"]
+
+intro:
+  emoji: "📈"
+  goal: 일별 주가 변동을 선 그래프로 시각화합니다.
+  description: Matplotlib의 기본 워크플로우를 익힙니다. 데이터 생성 → Figure 생성 → 차트 그리기 → 스타일링의 흐름을 배웁니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: Matplotlib은 파이썬에서 가장 오래되고 널리 사용되는 시각화 라이브러리입니다. pyplot 모듈은 MATLAB 스타일의 인터페이스를 제공하여 간단한 명령으로 차트를 만들 수 있습니다. numpy는 수치 계산을 위한 라이브러리로, 주가 데이터를 생성하는 데 사용합니다. pandas는 데이터프레임을 다루기 위해 함께 불러옵니다. 이 세 라이브러리는 데이터 분석의 기본 조합으로, 대부분의 프로젝트에서 함께 사용됩니다. ⚠️ 처음 실행 시 "Matplotlib is building the font cache"라는 메시지가 나올 수 있습니다. 폰트 캐시를 만드는 정상 동작이며, 한 번만 발생하니 당황하지 마세요!
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: matplotlib.pyplot을 plt로, numpy를 np로 불러옵니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import numpy as np
+      import pandas as pd
+  - type: tip
+    content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. plt.plot(), plt.figure()처럼 간결하게 사용할 수 있습니다. numpy는 np, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
+
+- id: step1_font
+  title: 1-1단계. 한글 폰트 설정
+  subtitle: Pyodide 환경 폰트
+  blocks:
+  - type: text
+    content: Pyodide(웹 브라우저) 환경에서는 시스템 폰트를 사용할 수 없어 한글이 깨집니다. CDN에서 폰트 파일을 다운로드하여 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+  - type: code
+    language: python
+    title: 한글 폰트 설정
+    description: Pretendard 폰트를 다운로드하여 matplotlib에 등록합니다
+    content: |-
+      import micropip
+      await micropip.install('pyodide-http')
+
+      import pyodide_http
+      pyodide_http.patch_all()
+
+      from matplotlib import font_manager
+      from js import fetch
+      from pathlib import Path
+
+      fontUrl = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard/packages/pretendard/dist/public/static/Pretendard-Regular.otf"
+      response = await fetch(fontUrl)
+      fontBuffer = await response.arrayBuffer()
+
+      fontPath = Path("/tmp/Pretendard-Regular.otf")
+      fontPath.write_bytes(fontBuffer.to_py())
+
+      font_manager.fontManager.addfont(str(fontPath))
+      plt.rcParams['font.family'] = 'Pretendard'
+      plt.rcParams['axes.unicode_minus'] = False
+  - type: tip
+    content: Pyodide 환경에서는 fetch API로 외부 리소스를 가져옵니다. font_manager.addfont()로 폰트를 등록하고, rcParams로 기본 폰트를 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+
+- id: step2_data
+  title: 2단계. 주가 데이터 생성
+  subtitle: 시뮬레이션 데이터
+  blocks:
+  - type: text
+    content: 실제 주식 API를 사용하지 않고, 학습 목적으로 가상의 주가 데이터를 생성합니다. 랜덤 워크(Random Walk)는 주가 변동을 시뮬레이션하는 대표적인 방법입니다. 누적합(cumsum)을 사용하면 매일 랜덤한 변화가 누적되어 실제 주가처럼 움직이는 시계열을 만들 수 있습니다. 시드(seed)를 고정하면 매번 같은 결과가 나와서 학습에 유리합니다.
+  - type: code
+    language: python
+    title: 주가 데이터 생성
+    description: 60일간의 가상 주가 데이터를 만듭니다
+    content: |-
+      np.random.seed(42)
+      days = 60
+      dateRange = pd.date_range('2024-01-01', periods=days, freq='D')
+      priceA = 100 + np.random.randn(days).cumsum()
+      priceB = 120 + np.random.randn(days).cumsum() * 1.2
+      priceC = 80 + np.random.randn(days).cumsum() * 0.8
+  - type: tip
+    content: np.random.seed(42)는 난수 생성기의 시드를 고정하여 매번 같은 난수가 생성되도록 합니다. 42는 관례적으로 많이 사용하는 숫자입니다. cumsum()은 누적합을 계산하는 함수로, [1, 2, 3]이면 [1, 3, 6]을 반환합니다.
+
+- id: step3_dataframe
+  title: 3단계. DataFrame 생성
+  subtitle: 데이터 정리
+  blocks:
+  - type: text
+    content: 생성한 주가 데이터를 pandas DataFrame으로 정리합니다. 날짜를 인덱스로 설정하면 시계열 분석에 편리합니다. 세 종목(A사, B사, C사)의 주가를 각 컬럼에 저장합니다.
+  - type: code
+    language: python
+    title: DataFrame 생성
+    description: 주가 데이터를 DataFrame으로 정리합니다
+    content: |-
+      stockData = pd.DataFrame({
+          'A사': priceA,
+          'B사': priceB,
+          'C사': priceC
+      }, index=dateRange)
+      stockData.head()
+
+- id: step4_figure
+  title: 4단계. Figure 생성
+  subtitle: plt.figure()
+  blocks:
+  - type: text
+    content: "Matplotlib에서 Figure는 전체 그림판입니다. figsize로 크기를 지정할 수 있으며, 단위는 인치입니다. (10, 6)은 가로 10인치, 세로 6인치를 의미합니다. Figure를 먼저 생성하고 그 위에 차트를 그리는 것이 Matplotlib의 기본 워크플로우입니다. ⚠️ 주의 : 아무것도 없는 그림판입니다. 당황하지 마세요!"
+  - type: code
+    language: python
+    title: Figure 생성
+    description: 10x6 인치 크기의 그림판을 만듭니다
+    content: |-
+      fig = plt.figure(figsize=(10, 6))
+      fig
+  - type: tip
+    content: plt.figure(figsize=(가로, 세로))로 Figure의 크기를 설정합니다. 기본값은 (6.4, 4.8)입니다. 프레젠테이션용은 (12, 8), 논문용은 (8, 6) 정도가 적당합니다. dpi 파라미터로 해상도도 설정할 수 있습니다.
+
+- id: step5_plot
+  title: 5단계. 선 그래프 그리기
+  subtitle: plt.plot()
+  blocks:
+  - type: text
+    content: plt.plot()은 가장 기본적인 선 그래프 함수입니다. x축에 날짜, y축에 주가를 배치합니다. label 파라미터를 지정하면 나중에 범례에 표시됩니다. 여러 선을 그릴 때는 plt.plot()을 여러 번 호출하면 됩니다. 각 선은 자동으로 다른 색상이 지정됩니다.
+  - type: code
+    language: python
+    title: 선 그래프 그리기
+    description: 세 종목의 주가를 선 그래프로 표시합니다
+    content: |-
+      fig1, ax1 = plt.subplots(figsize=(10, 6))
+      ax1.plot(stockData.index, stockData['A사'], label='A사')
+      ax1.plot(stockData.index, stockData['B사'], label='B사')
+      ax1.plot(stockData.index, stockData['C사'], label='C사')
+      fig1
+  - type: tip
+    content: plt.subplots()는 Figure와 Axes를 동시에 생성합니다. fig는 전체 그림판, ax는 실제 차트가 그려지는 영역입니다. ax.plot(x, y, label='이름')으로 선을 추가합니다. label은 범례에 표시될 이름입니다.
+
+- id: step6_title
+  title: 6단계. 제목과 축 라벨 추가
+  subtitle: set_title(), set_xlabel(), set_ylabel()
+  blocks:
+  - type: text
+    content: 차트에 제목과 축 라벨을 추가하면 무엇을 보여주는지 명확해집니다. set_title()은 차트 제목, set_xlabel()은 x축 라벨, set_ylabel()은 y축 라벨을 설정합니다. fontsize로 글꼴 크기를 조정할 수 있습니다.
+  - type: code
+    language: python
+    title: 제목과 라벨 추가
+    description: 차트에 제목과 축 라벨을 설정합니다
+    content: |-
+      fig2, ax2 = plt.subplots(figsize=(10, 6))
+      ax2.plot(stockData.index, stockData['A사'], label='A사')
+      ax2.plot(stockData.index, stockData['B사'], label='B사')
+      ax2.plot(stockData.index, stockData['C사'], label='C사')
+      ax2.set_title('2024년 1분기 주가 추세', fontsize=14)
+      ax2.set_xlabel('날짜', fontsize=12)
+      ax2.set_ylabel('주가 (원)', fontsize=12)
+      fig2
+  - type: tip
+    content: set_title(), set_xlabel(), set_ylabel()은 Axes 객체의 메서드입니다. fontsize로 글꼴 크기를, fontweight='bold'로 굵기를 설정할 수 있습니다. pad 파라미터로 제목과 차트 사이의 간격을 조정할 수 있습니다.
+
+- id: step7_legend
+  title: 7단계. 범례 추가
+  subtitle: legend()
+  blocks:
+  - type: text
+    content: 여러 선이 있을 때 범례(legend)는 각 선이 무엇을 나타내는지 설명합니다. legend() 메서드를 호출하면 label로 지정한 이름이 범례에 표시됩니다. loc 파라미터로 범례 위치를 지정할 수 있습니다.
+  - type: code
+    language: python
+    title: 범례 추가
+    description: 범례를 우측 상단에 배치합니다
+    content: |-
+      fig3, ax3 = plt.subplots(figsize=(10, 6))
+      ax3.plot(stockData.index, stockData['A사'], label='A사')
+      ax3.plot(stockData.index, stockData['B사'], label='B사')
+      ax3.plot(stockData.index, stockData['C사'], label='C사')
+      ax3.set_title('2024년 1분기 주가 추세', fontsize=14)
+      ax3.set_xlabel('날짜', fontsize=12)
+      ax3.set_ylabel('주가 (원)', fontsize=12)
+      ax3.legend(loc='upper right')
+      fig3
+  - type: tip
+    content: legend(loc='위치')로 범례 위치를 지정합니다. 'upper right', 'upper left', 'lower right', 'lower left', 'center', 'best' 등을 사용할 수 있습니다. 'best'는 데이터와 겹치지 않는 최적 위치를 자동으로 찾습니다.
+
+- id: step8_linestyle
+  title: 8단계. 선 스타일 변경
+  subtitle: linestyle, linewidth
+  blocks:
+  - type: text
+    content: 선의 스타일과 굵기를 변경하면 더 풍부한 시각적 표현이 가능합니다. linestyle(또는 ls)로 실선, 점선, 파선 등을 지정하고, linewidth(또는 lw)로 선의 굵기를 조정합니다. 색상은 color 파라미터로 직접 지정할 수도 있습니다.
+  - type: code
+    language: python
+    title: 선 스타일 변경
+    description: 각 선마다 다른 스타일을 적용합니다
+    content: |-
+      fig4, ax4 = plt.subplots(figsize=(10, 6))
+      ax4.plot(stockData.index, stockData['A사'], label='A사', linestyle='-', linewidth=2)
+      ax4.plot(stockData.index, stockData['B사'], label='B사', linestyle='--', linewidth=2)
+      ax4.plot(stockData.index, stockData['C사'], label='C사', linestyle='-.', linewidth=2)
+      ax4.set_title('2024년 1분기 주가 추세', fontsize=14)
+      ax4.set_xlabel('날짜', fontsize=12)
+      ax4.set_ylabel('주가 (원)', fontsize=12)
+      ax4.legend(loc='upper right')
+      fig4
+  - type: tip
+    content: "linestyle 옵션: '-'(실선), '--'(파선), '-.'(점파선), ':'(점선). linewidth는 선의 굵기로, 기본값은 1.5입니다. color로 색상을 직접 지정할 수 있으며, 'red', 'blue', '#FF5733', 'C0'(기본 색상 순서) 등을 사용합니다."
+
+- id: step9_grid
+  title: 9단계. 그리드 추가
+  subtitle: grid()
+  blocks:
+  - type: text
+    content: 그리드(격자선)를 추가하면 데이터 값을 더 정확하게 읽을 수 있습니다. 특히 주가처럼 정확한 수치가 중요한 차트에서 유용합니다. alpha로 투명도를 조절하면 그리드가 데이터를 방해하지 않습니다.
+  - type: code
+    language: python
+    title: 그리드 추가
+    description: 격자선을 추가합니다
+    content: |-
+      fig5, ax5 = plt.subplots(figsize=(10, 6))
+      ax5.plot(stockData.index, stockData['A사'], label='A사', linestyle='-', linewidth=2)
+      ax5.plot(stockData.index, stockData['B사'], label='B사', linestyle='--', linewidth=2)
+      ax5.plot(stockData.index, stockData['C사'], label='C사', linestyle='-.', linewidth=2)
+      ax5.set_title('2024년 1분기 주가 추세', fontsize=14)
+      ax5.set_xlabel('날짜', fontsize=12)
+      ax5.set_ylabel('주가 (원)', fontsize=12)
+      ax5.legend(loc='upper right')
+      ax5.grid(True, alpha=0.3)
+      fig5
+  - type: tip
+    content: grid(True)로 그리드를 표시합니다. alpha는 투명도로 0(완전투명)~1(불투명) 사이 값입니다. linestyle, color로 그리드 스타일을 변경할 수 있습니다. axis='x' 또는 'y'로 한 방향만 표시할 수도 있습니다.
+
+- id: step10_final
+  title: 10단계. 최종 시각화
+  subtitle: 완성된 차트
+  blocks:
+  - type: text
+    content: 지금까지 배운 모든 요소를 조합하여 완성도 높은 주가 추세 차트를 만듭니다. tight_layout()을 호출하면 요소들이 겹치지 않도록 자동으로 간격을 조정합니다. 이제 논문이나 보고서에 바로 사용할 수 있는 품질의 차트가 완성되었습니다.
+  - type: code
+    language: python
+    title: Figure 생성 및 선 그리기
+    description: 세 종목의 주가를 각각 다른 스타일로 표시합니다
+    content: |-
+      figFinal, axFinal = plt.subplots(figsize=(10, 6))
+      axFinal.plot(stockData.index, stockData['A사'], label='A사', linestyle='-', linewidth=2, color='#2E86AB')
+      axFinal.plot(stockData.index, stockData['B사'], label='B사', linestyle='--', linewidth=2, color='#A23B72')
+      axFinal.plot(stockData.index, stockData['C사'], label='C사', linestyle='-.', linewidth=2, color='#F18F01')
+      figFinal
+  - type: code
+    language: python
+    title: 스타일링 적용
+    description: 제목, 라벨, 범례, 그리드를 추가합니다
+    content: |-
+      axFinal.set_title('2024년 1분기 주가 추세 비교', fontsize=14, fontweight='bold')
+      axFinal.set_xlabel('날짜', fontsize=12)
+      axFinal.set_ylabel('주가 (원)', fontsize=12)
+      axFinal.legend(loc='upper left', frameon=True)
+      axFinal.grid(True, alpha=0.3, linestyle='--')
+      plt.tight_layout()
+      figFinal
+
+- id: practice
+  title: 실습
+  subtitle: 주가 데이터 분석 프로젝트
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용해서 주가 데이터를 다양한 방식으로 시각화해봅시다. plot, figure, title, legend, grid, linestyle 등 모든 개념을 종합적으로 활용합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 단일 종목 상세 분석"
+    blocks:
+    - type: code
+      title: "데이터 생성"
+      content: |-
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import pandas as pd
+
+        np.random.seed(42)
+        period = 90
+        dates = pd.date_range('2024-01-01', periods=period, freq='D')
+        price = 150 + np.random.randn(period).cumsum() * 1.5
+    - type: code
+      title: "차트 생성"
+      content: |-
+        chart, plot = plt.subplots(figsize=(12, 6))
+
+        plot.plot(dates, price, label='Tech Corp', linestyle='-', linewidth=2.5, color='#1E88E5')
+
+        plot.set_title('Tech Corp 90일 주가 추세', fontsize=16, fontweight='bold')
+        plot.set_xlabel('날짜', fontsize=12)
+        plot.set_ylabel('주가 ($)', fontsize=12)
+        plot.legend(loc='upper left')
+        plot.grid(True, alpha=0.3, linestyle='--')
+
+        plt.tight_layout()
+        chart
+  - type: expansion
+    title: "미션2: 4개 종목 비교 분석"
+    blocks:
+    - type: code
+      title: "데이터 생성"
+      content: |-
+        import matplotlib.pyplot as plt
+        import numpy as np
+        import pandas as pd
+
+        np.random.seed(123)
+        span = 60
+        timeline = pd.date_range('2024-01-01', periods=span, freq='D')
+        alpha = 100 + np.random.randn(span).cumsum()
+        beta = 110 + np.random.randn(span).cumsum() * 1.1
+        gamma = 95 + np.random.randn(span).cumsum() * 0.9
+        delta = 105 + np.random.randn(span).cumsum() * 1.3
+    - type: code
+      title: "차트 생성"
+      content: |-
+        canvas, panel = plt.subplots(figsize=(12, 7))
+
+        panel.plot(timeline, alpha, label='Alpha', linestyle='-', linewidth=2, color='#E53935')
+        panel.plot(timeline, beta, label='Beta', linestyle='--', linewidth=2, color='#43A047')
+        panel.plot(timeline, gamma, label='Gamma', linestyle='-.', linewidth=2, color='#1E88E5')
+        panel.plot(timeline, delta, label='Delta', linestyle=':', linewidth=2, color='#8E24AA')
+
+        panel.set_title('2024년 1분기 4개 종목 주가 비교', fontsize=16, fontweight='bold')
+        panel.set_xlabel('날짜', fontsize=12)
+        panel.set_ylabel('주가 (원)', fontsize=12)
+        panel.legend(loc='best', frameon=True)
+        panel.grid(True, alpha=0.3)
+
+        plt.tight_layout()
+        canvas
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Matplotlib으로 첫 번째 선 그래프를 완성했습니다.
+  - type: list
+    items:
+    - "import matplotlib.pyplot as plt - Matplotlib 불러오기"
+    - "plt.subplots(figsize=(w, h)) - Figure와 Axes 생성"
+    - "ax.plot(x, y, label) - 선 그래프 그리기"
+    - "ax.set_title(), set_xlabel(), set_ylabel() - 제목과 라벨"
+    - "ax.legend(loc) - 범례 추가"
+    - "linestyle, linewidth - 선 스타일"
+    - "ax.grid(True, alpha) - 그리드 추가"
+  - type: text
+    content: 다음 시간에는 팁 데이터로 히스토그램과 박스플롯을 배웁니다.

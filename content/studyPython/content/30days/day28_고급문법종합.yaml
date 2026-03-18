@@ -1,0 +1,828 @@
+meta:
+  id: "day28"
+  title: "고급 문법 종합"
+  day: 28
+  category: "30days"
+  tags: []
+  seo:
+    title: "파이썬 고급 문법 종합 - 컨텍스트 매니저"
+    description: "with 문, context manager, __enter__, __exit__을 배웁니다."
+    keywords: ['컨텍스트매니저', 'with', '__enter__', '__exit__', '리소스관리']
+
+intro:
+  emoji: "🎯"
+  points:
+  - "with 문으로 리소스 관리"
+  - "컨텍스트 매니저 프로토콜"
+  - "자동 정리 메커니즘"
+  - "커스텀 컨텍스트 매니저"
+
+sections:
+- id: "with_basic"
+  title: "with 문 기초"
+  subtitle: "자동 리소스 관리"
+  blocks:
+  - type: "text"
+    content: "with 문은 리소스를 자동으로 정리하는 파이썬의 강력한 기능입니다. 파일을 열고 닫거나, 데이터베이스 연결을 관리할 때 사용합니다. with 블록이 끝나면 자동으로 정리 작업이 수행되므로 close()를 직접 호출할 필요가 없습니다."
+  - type: "list"
+    items:
+    - "with 문: 자동 정리"
+    - "블록 종료시 자동 close"
+    - "예외 발생시에도 정리 보장"
+    - "코드 간결성 향상"
+  - type: "code"
+    language: "python"
+    title: "기본 with 문"
+    description: "with를 사용하여 파일을 안전하게 처리합니다."
+    content: |-
+      content = ''
+      with open('test.txt', 'w') as f:
+          f.write('Hello World')
+          content = 'written'
+      content
+  - type: "code"
+    language: "python"
+    title: "with 없이 사용"
+    description: "수동으로 파일을 닫아야 합니다."
+    content: |-
+      fileHandle = open('manual.txt', 'w')
+      fileHandle.write('Manual close')
+      fileHandle.close()
+      'closed manually'
+  - type: "code"
+    language: "python"
+    title: "with와 읽기"
+    description: "파일을 읽고 자동으로 닫습니다."
+    content: |-
+      with open('test.txt', 'r') as reader:
+          textData = reader.read()
+      textData
+  - type: "tip"
+    content: "with 문을 사용하면 예외가 발생해도 리소스가 자동으로 정리됩니다."
+
+- id: "context_manager_protocol"
+  title: "컨텍스트 매니저 프로토콜"
+  subtitle: "__enter__와 __exit__"
+  blocks:
+  - type: "text"
+    content: "컨텍스트 매니저는 __enter__와 __exit__ 메서드를 구현한 객체입니다. __enter__는 with 블록 진입시 호출되고, __exit__는 블록 종료시 호출됩니다. __exit__는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다."
+  - type: "list"
+    items:
+    - "__enter__: 진입시 호출"
+    - "__exit__: 종료시 호출"
+    - "예외 정보 처리 가능"
+    - "자동 정리 보장"
+  - type: "code"
+    language: "python"
+    title: "기본 컨텍스트 매니저"
+    description: "간단한 컨텍스트 매니저를 만듭니다."
+    content: |-
+      class SimpleContext:
+          def __enter__(self):
+              return 'entered'
+
+          def __exit__(self, excType, excVal, excTb):
+              return False
+
+      with SimpleContext() as sc:
+          result = sc
+      result
+  - type: "code"
+    language: "python"
+    title: "상태 추적 컨텍스트"
+    description: "진입과 종료를 추적합니다."
+    content: |-
+      class StateTracker:
+          def __init__(self):
+              self.status = 'init'
+
+          def __enter__(self):
+              self.status = 'active'
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              self.status = 'closed'
+              return False
+
+      tracker = StateTracker()
+      with tracker:
+          pass
+      tracker.status
+  - type: "code"
+    language: "python"
+    title: "값 반환 컨텍스트"
+    description: "__enter__에서 반환한 값을 사용합니다."
+    content: |-
+      class ValueProvider:
+          def __enter__(self):
+              return [1, 2, 3, 4, 5]
+
+          def __exit__(self, excType, excVal, excTb):
+              return False
+
+      with ValueProvider() as vals:
+          total = sum(vals)
+      total
+  - type: "tip"
+    content: "__exit__의 세 매개변수는 예외 타입, 예외 값, 트레이스백입니다."
+
+- id: "resource_management"
+  title: "리소스 관리"
+  subtitle: "파일과 연결 관리"
+  blocks:
+  - type: "text"
+    content: "컨텍스트 매니저의 주요 용도는 리소스 관리입니다. 파일, 네트워크 연결, 데이터베이스 커넥션 등 사용 후 반드시 정리해야 하는 리소스를 안전하게 처리합니다. with 문을 사용하면 예외 발생 여부와 관계없이 리소스가 정리됩니다."
+  - type: "list"
+    items:
+    - "파일 자동 닫기"
+    - "연결 자동 종료"
+    - "예외 안전성"
+    - "메모리 누수 방지"
+  - type: "code"
+    language: "python"
+    title: "파일 컨텍스트"
+    description: "파일을 안전하게 읽고 씁니다."
+    content: |-
+      class FileManager:
+          def __init__(self, filename, mode):
+              self.filename = filename
+              self.mode = mode
+              self.fileObj = None
+
+          def __enter__(self):
+              self.fileObj = open(self.filename, self.mode)
+              return self.fileObj
+
+          def __exit__(self, excType, excVal, excTb):
+              if self.fileObj:
+                  self.fileObj.close()
+              return False
+
+      with FileManager('resource.txt', 'w') as fm:
+          fm.write('Resource managed')
+      'completed'
+  - type: "code"
+    language: "python"
+    title: "연결 컨텍스트"
+    description: "연결을 자동으로 정리합니다."
+    content: |-
+      class Connection:
+          def __init__(self, host):
+              self.host = host
+              self.connected = False
+
+          def __enter__(self):
+              self.connected = True
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              self.connected = False
+              return False
+
+      conn = Connection('localhost')
+      with conn:
+          status = conn.connected
+      conn.connected, status
+  - type: "code"
+    language: "python"
+    title: "리소스 카운터"
+    description: "리소스 사용을 추적합니다."
+    content: |-
+      class ResourceCounter:
+          count = 0
+
+          def __enter__(self):
+              ResourceCounter.count = ResourceCounter.count + 1
+              return ResourceCounter.count
+
+          def __exit__(self, excType, excVal, excTb):
+              ResourceCounter.count = ResourceCounter.count - 1
+              return False
+
+      with ResourceCounter() as rc1:
+          with ResourceCounter() as rc2:
+              peak = ResourceCounter.count
+      ResourceCounter.count, peak
+  - type: "tip"
+    content: "with 블록이 중첩되면 안쪽 블록부터 바깥쪽 순서로 __exit__가 호출됩니다."
+
+- id: "exception_handling"
+  title: "예외 처리"
+  subtitle: "컨텍스트 매니저와 예외"
+  blocks:
+  - type: "text"
+    content: "컨텍스트 매니저는 예외 처리에 강력합니다. __exit__ 메서드는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다. 이를 통해 정리 작업은 수행하되 예외 전파를 제어할 수 있습니다."
+  - type: "list"
+    items:
+    - "예외 정보 수신"
+    - "예외 억제 가능"
+    - "정리 작업 보장"
+    - "예외 전파 제어"
+  - type: "code"
+    language: "python"
+    title: "예외 억제"
+    description: "예외를 잡아서 억제합니다."
+    content: |-
+      class ExceptionSuppressor:
+          def __enter__(self):
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              if excType is ZeroDivisionError:
+                  return True
+              return False
+
+      outcome = 'no error'
+      with ExceptionSuppressor():
+          outcome = 10 / 0
+      outcome
+  - type: "code"
+    language: "python"
+    title: "예외 로깅"
+    description: "예외 정보를 기록하고 전파합니다."
+    content: |-
+      class ExceptionLogger:
+          def __init__(self):
+              self.errors = []
+
+          def __enter__(self):
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              if excType:
+                  self.errors.append(str(excType.__name__))
+              return False
+
+      logger = ExceptionLogger()
+      try:
+          with logger:
+              raise ValueError('test error')
+      except ValueError:
+          pass
+      logger.errors
+  - type: "code"
+    language: "python"
+    title: "조건부 억제"
+    description: "특정 예외만 억제합니다."
+    content: |-
+      class SelectiveSuppressor:
+          def __init__(self, suppress):
+              self.suppress = suppress
+
+          def __enter__(self):
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              return excType in self.suppress
+
+      msg = 'success'
+      with SelectiveSuppressor([TypeError]):
+          msg = 'error' + 5
+      msg
+  - type: "tip"
+    content: "__exit__가 True를 반환하면 예외가 억제되고, False나 None을 반환하면 예외가 전파됩니다."
+
+- id: "multiple_context"
+  title: "다중 컨텍스트"
+  subtitle: "여러 컨텍스트 매니저 사용"
+  blocks:
+  - type: "text"
+    content: "하나의 with 문에서 여러 컨텍스트 매니저를 사용할 수 있습니다. 콤마로 구분하여 나열하며, 왼쪽부터 오른쪽 순서로 __enter__가 호출되고, 오른쪽부터 왼쪽 순서로 __exit__가 호출됩니다."
+  - type: "list"
+    items:
+    - "여러 리소스 동시 관리"
+    - "콤마로 구분"
+    - "진입: 왼쪽→오른쪽"
+    - "종료: 오른쪽→왼쪽"
+  - type: "code"
+    language: "python"
+    title: "다중 파일"
+    description: "여러 파일을 동시에 관리합니다."
+    content: |-
+      with open('source.txt', 'w') as src, open('dest.txt', 'w') as dst:
+          src.write('source')
+          dst.write('destination')
+          combined = 'both written'
+      combined
+  - type: "code"
+    language: "python"
+    title: "순서 추적"
+    description: "진입과 종료 순서를 확인합니다."
+    content: |-
+      class OrderTracker:
+          def __init__(self, name):
+              self.name = name
+
+          def __enter__(self):
+              return self.name
+
+          def __exit__(self, excType, excVal, excTb):
+              return False
+
+      with OrderTracker('first') as f, OrderTracker('second') as s:
+          order = f, s
+      order
+  - type: "code"
+    language: "python"
+    title: "리소스 체인"
+    description: "여러 리소스를 체인으로 연결합니다."
+    content: |-
+      class ChainResource:
+          def __init__(self, value):
+              self.value = value
+
+          def __enter__(self):
+              return self.value
+
+          def __exit__(self, excType, excVal, excTb):
+              return False
+
+      with ChainResource(10) as a, ChainResource(20) as b, ChainResource(30) as c:
+          sumTotal = a + b + c
+      sumTotal
+  - type: "tip"
+    content: "다중 컨텍스트는 with a, b, c: 형태로 작성하며, 중첩 with와 동일하게 동작합니다."
+
+- id: "practical_patterns"
+  title: "실전 패턴"
+  subtitle: "컨텍스트 매니저 활용"
+  blocks:
+  - type: "text"
+    content: "컨텍스트 매니저는 실무에서 다양하게 활용됩니다. 타이머, 디렉토리 변경, 설정 임시 변경, 트랜잭션 관리 등 시작과 종료가 명확한 작업에 유용합니다. 코드의 안전성과 가독성을 동시에 향상시킵니다."
+  - type: "list"
+    items:
+    - "타이머 측정"
+    - "임시 상태 변경"
+    - "트랜잭션 관리"
+    - "코드 블록 래핑"
+  - type: "code"
+    language: "python"
+    title: "타이머 컨텍스트"
+    description: "코드 실행 시간을 측정합니다."
+    content: |-
+      import time
+
+      class Timer:
+          def __enter__(self):
+              self.start = time.time()
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              self.elapsed = time.time() - self.start
+              return False
+
+      timer = Timer()
+      with timer:
+          total = sum(range(1000))
+      timer.elapsed > 0
+  - type: "code"
+    language: "python"
+    title: "상태 백업"
+    description: "상태를 임시로 변경하고 복원합니다."
+    content: |-
+      class StateBackup:
+          def __init__(self, obj, attr, newVal):
+              self.obj = obj
+              self.attr = attr
+              self.newVal = newVal
+              self.oldVal = None
+
+          def __enter__(self):
+              self.oldVal = getattr(self.obj, self.attr)
+              setattr(self.obj, self.attr, self.newVal)
+              return self
+
+          def __exit__(self, excType, excVal, excTb):
+              setattr(self.obj, self.attr, self.oldVal)
+              return False
+
+      class Config:
+          debug = False
+
+      cfg = Config()
+      with StateBackup(cfg, 'debug', True):
+          insideVal = cfg.debug
+      cfg.debug, insideVal
+  - type: "code"
+    language: "python"
+    title: "리스트 보호"
+    description: "리스트를 임시로 사용하고 복원합니다."
+    content: |-
+      class ListGuard:
+          def __init__(self, lst):
+              self.lst = lst
+              self.backup = None
+
+          def __enter__(self):
+              self.backup = self.lst[:]
+              return self.lst
+
+          def __exit__(self, excType, excVal, excTb):
+              self.lst[:] = self.backup
+              return False
+
+      myList = [1, 2, 3]
+      with ListGuard(myList) as ml:
+          ml.append(4)
+          ml.append(5)
+          modified = len(ml)
+      len(myList), modified
+  - type: "tip"
+    content: "컨텍스트 매니저는 '설정-작업-복원' 패턴에 이상적입니다."
+
+- id: "practice"
+  title: "Day 28 종합 복습"
+  subtitle: "컨텍스트 매니저 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 28에서 배운 컨텍스트 매니저를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 with"
+    code: |-
+      with open('basic.txt', 'w') as f:
+          f.write('test')
+          written = True
+      written
+
+  - type: "expansion"
+    title: "🟢 기본2: 기본 컨텍스트"
+    code: |-
+      class BasicCtx:
+          def __enter__(self):
+              return 'hello'
+
+          def __exit__(self, t, v, tb):
+              return False
+
+      with BasicCtx() as bc:
+          msg = bc
+      msg
+
+  - type: "expansion"
+    title: "🟢 기본3: 상태 변경"
+    code: |-
+      class StateSetter:
+          def __init__(self):
+              self.state = 'off'
+
+          def __enter__(self):
+              self.state = 'on'
+              return self
+
+          def __exit__(self, t, v, tb):
+              self.state = 'off'
+              return False
+
+      ss = StateSetter()
+      with ss:
+          active = ss.state
+      ss.state, active
+
+  - type: "expansion"
+    title: "🟢 기본4: 값 반환"
+    code: |-
+      class NumberProvider:
+          def __enter__(self):
+              return 42
+
+          def __exit__(self, t, v, tb):
+              return False
+
+      with NumberProvider() as num:
+          doubled = num * 2
+      doubled
+
+  - type: "expansion"
+    title: "🟢 기본5: 리스트 제공"
+    code: |-
+      class ListProvider:
+          def __enter__(self):
+              return [1, 2, 3]
+
+          def __exit__(self, t, v, tb):
+              return False
+
+      with ListProvider() as lp:
+          length = len(lp)
+      length
+
+  - type: "expansion"
+    title: "🟡 응용1: 카운터 컨텍스트"
+    code: |-
+      class Counter:
+          def __init__(self):
+              self.count = 0
+
+          def __enter__(self):
+              self.count = self.count + 1
+              return self.count
+
+          def __exit__(self, t, v, tb):
+              self.count = self.count - 1
+              return False
+
+      counter = Counter()
+      with counter as c:
+          value = c
+      counter.count, value
+
+  - type: "expansion"
+    title: "🟡 응용2: 예외 억제"
+    code: |-
+      class ErrorSuppressor:
+          def __enter__(self):
+              return self
+
+          def __exit__(self, t, v, tb):
+              return t is ValueError
+
+      errorMsg = 'ok'
+      with ErrorSuppressor():
+          errorMsg = int('abc')
+      errorMsg
+
+  - type: "expansion"
+    title: "🟡 응용3: 다중 컨텍스트"
+    code: |-
+      class ValueCtx:
+          def __init__(self, val):
+              self.val = val
+
+          def __enter__(self):
+              return self.val
+
+          def __exit__(self, t, v, tb):
+              return False
+
+      with ValueCtx(10) as v1, ValueCtx(20) as v2:
+          sumVal = v1 + v2
+      sumVal
+
+  - type: "expansion"
+    title: "🟡 응용4: 속성 추적"
+    code: |-
+      class AttrTracker:
+          def __init__(self):
+              self.attrs = []
+
+          def __enter__(self):
+              self.attrs.append('entered')
+              return self
+
+          def __exit__(self, t, v, tb):
+              self.attrs.append('exited')
+              return False
+
+      at = AttrTracker()
+      with at:
+          pass
+      at.attrs
+
+  - type: "expansion"
+    title: "🟡 응용5: 조건부 실행"
+    code: |-
+      class ConditionalCtx:
+          def __init__(self, enabled):
+              self.enabled = enabled
+
+          def __enter__(self):
+              if self.enabled:
+                  return 'active'
+              return 'inactive'
+
+          def __exit__(self, t, v, tb):
+              return False
+
+      with ConditionalCtx(True) as cc:
+          status = cc
+      status
+
+  - type: "expansion"
+    title: "🔴 심화1: 중첩 카운터"
+    code: |-
+      class NestCounter:
+          depth = 0
+
+          def __enter__(self):
+              NestCounter.depth = NestCounter.depth + 1
+              return NestCounter.depth
+
+          def __exit__(self, t, v, tb):
+              NestCounter.depth = NestCounter.depth - 1
+              return False
+
+      with NestCounter() as d1:
+          with NestCounter() as d2:
+              maxDepth = d2
+      NestCounter.depth, maxDepth
+
+  - type: "expansion"
+    title: "🔴 심화2: 리소스 풀"
+    code: |-
+      class ResourcePool:
+          def __init__(self, size):
+              self.available = size
+              self.allocated = 0
+
+          def __enter__(self):
+              if self.available > 0:
+                  self.available = self.available - 1
+                  self.allocated = self.allocated + 1
+              return self.allocated
+
+          def __exit__(self, t, v, tb):
+              self.available = self.available + 1
+              self.allocated = self.allocated - 1
+              return False
+
+      pool = ResourcePool(3)
+      with pool as p1:
+          with pool as p2:
+              used = pool.allocated
+      pool.available, used
+
+  - type: "expansion"
+    title: "🔴 심화3: 예외 분류"
+    code: |-
+      class ExceptionClassifier:
+          def __init__(self):
+              self.exceptions = []
+
+          def __enter__(self):
+              return self
+
+          def __exit__(self, t, v, tb):
+              if t:
+                  self.exceptions.append(t.__name__)
+                  return True
+              return False
+
+      ec = ExceptionClassifier()
+      with ec:
+          x = 1 / 0
+      ec.exceptions
+
+  - type: "expansion"
+    title: "🔴 심화4: 값 누적"
+    code: |-
+      class Accumulator:
+          def __init__(self):
+              self.values = []
+
+          def __enter__(self):
+              return self
+
+          def add(self, val):
+              self.values.append(val)
+
+          def __exit__(self, t, v, tb):
+              return False
+
+      acc = Accumulator()
+      with acc:
+          acc.add(1)
+          acc.add(2)
+          acc.add(3)
+      sum(acc.values)
+
+  - type: "expansion"
+    title: "🔴 심화5: 상태 머신"
+    code: |-
+      class StateMachine:
+          def __init__(self):
+              self.history = []
+
+          def __enter__(self):
+              self.history.append('start')
+              return self
+
+          def transition(self, state):
+              self.history.append(state)
+
+          def __exit__(self, t, v, tb):
+              self.history.append('end')
+              return False
+
+      sm = StateMachine()
+      with sm:
+          sm.transition('working')
+          sm.transition('done')
+      sm.history
+
+  - type: "expansion"
+    title: "🔴 심화6: 시간 제한"
+    code: |-
+      import time
+
+      class TimeLimit:
+          def __init__(self, seconds):
+              self.limit = seconds
+              self.exceeded = False
+
+          def __enter__(self):
+              self.startTime = time.time()
+              return self
+
+          def __exit__(self, t, v, tb):
+              elapsed = time.time() - self.startTime
+              self.exceeded = elapsed > self.limit
+              return False
+
+      tl = TimeLimit(1)
+      with tl:
+          pass
+      tl.exceeded
+
+  - type: "expansion"
+    title: "🔴 심화7: 조건부 롤백"
+    code: |-
+      class Transaction:
+          def __init__(self, initialData):
+              self.data = initialData
+              self.snapshot = None
+
+          def __enter__(self):
+              self.snapshot = self.data[:]
+              return self.data
+
+          def __exit__(self, t, v, tb):
+              if t:
+                  self.data[:] = self.snapshot
+                  return True
+              return False
+
+      txn = Transaction([1, 2, 3])
+      try:
+          with txn.data as td:
+              td.append(4)
+              raise ValueError()
+      except:
+          pass
+      txn.data
+
+  - type: "expansion"
+    title: "🔴 심화8: 멀티 상태"
+    code: |-
+      class MultiState:
+          def __init__(self):
+              self.states = {}
+
+          def __enter__(self):
+              self.states['before'] = True
+              return self
+
+          def set(self, key, val):
+              self.states[key] = val
+
+          def __exit__(self, t, v, tb):
+              self.states['after'] = True
+              return False
+
+      ms = MultiState()
+      with ms:
+          ms.set('middle', True)
+      len(ms.states)
+
+  - type: "expansion"
+    title: "🔴 심화9: 체인 컨텍스트"
+    code: |-
+      class ChainCtx:
+          def __init__(self, value):
+              self.value = value
+              self.processed = None
+
+          def __enter__(self):
+              self.processed = self.value * 2
+              return self.processed
+
+          def __exit__(self, t, v, tb):
+              return False
+
+      with ChainCtx(5) as c1:
+          with ChainCtx(c1) as c2:
+              finalVal = c2
+      finalVal
+
+  - type: "expansion"
+    title: "🔴 심화10: 컨텍스트 팩토리"
+    code: |-
+      class ContextFactory:
+          def __init__(self, ctxType):
+              self.ctxType = ctxType
+
+          def __enter__(self):
+              if self.ctxType == 'list':
+                  return []
+              elif self.ctxType == 'dict':
+                  return {}
+              return None
+
+          def __exit__(self, t, v, tb):
+              return False
+
+      with ContextFactory('list') as cf:
+          cf.append(1)
+          cf.append(2)
+          count = len(cf)
+      count

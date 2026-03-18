@@ -1,0 +1,186 @@
+meta:
+  id: pillow_01
+  title: 꽃사진탐색기
+  order: 1
+  category: pillow
+  difficulty: "⭐"
+  badge: 입문
+  tags: ["Pillow", "Image", "open", "size", "mode", "thumbnail"]
+  seo:
+    title: "Pillow 입문 - 꽃 사진 탐색기"
+    description: "Pillow로 이미지를 열고 기본 정보를 확인합니다. 크기, 모드, 포맷을 파악하고 썸네일을 생성합니다."
+    keywords: ["Pillow", "Image.open", "size", "mode", "thumbnail", "이미지처리"]
+
+intro:
+  emoji: "🌸"
+  goal: sklearn의 꽃 이미지를 열어 기본 정보를 확인하고 썸네일을 생성합니다.
+  description: 이미지 파일을 열고, 크기(size), 색상 모드(mode), 포맷(format)을 확인합니다. 또한 thumbnail() 메서드로 작은 미리보기 이미지를 만들어봅니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리와 이미지 불러오기
+  subtitle: sklearn 내장 이미지
+  blocks:
+  - type: text
+    content: sklearn에는 학습용 샘플 이미지가 내장되어 있습니다. load_sample_image() 함수로 china.jpg와 flower.jpg를 불러올 수 있습니다. 이 이미지는 NumPy 배열로 반환되므로 Pillow의 Image.fromarray()로 변환합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: PIL과 sklearn에서 필요한 모듈을 임포트합니다
+    content: |-
+      from PIL import Image
+      from sklearn.datasets import load_sample_image
+
+      flowerArr = load_sample_image('flower.jpg')
+      flowerArr.shape
+  - type: tip
+    content: load_sample_image()는 NumPy 배열(height, width, 3)을 반환합니다. shape은 (427, 640, 3)으로 높이 427, 너비 640, RGB 3채널입니다.
+  - type: code
+    language: python
+    title: NumPy 배열을 Pillow 이미지로
+    description: Image.fromarray()로 변환합니다
+    content: |-
+      img = Image.fromarray(flowerArr)
+      img
+  - type: tip
+    content: Image.fromarray()는 NumPy 배열을 Pillow Image 객체로 변환합니다. Jupyter/marimo에서 Image 객체를 마지막 라인에 두면 이미지가 출력됩니다.
+
+- id: step2_info
+  title: 2단계. 이미지 정보 확인
+  subtitle: size, mode, format
+  blocks:
+  - type: text
+    content: Pillow Image 객체는 여러 속성을 제공합니다. size는 (너비, 높이) 튜플, mode는 색상 모드(RGB, L 등), format은 파일 포맷입니다. 배열에서 변환한 이미지는 format이 None입니다.
+  - type: code
+    language: python
+    title: 이미지 크기
+    description: width와 height를 확인합니다
+    content: |-
+      width, height = img.size
+      width, height
+  - type: code
+    language: python
+    title: 색상 모드
+    description: RGB, L, RGBA 등을 확인합니다
+    content: |-
+      img.mode
+  - type: code
+    language: python
+    title: 이미지 포맷
+    description: 파일에서 읽으면 JPEG, PNG 등이 표시됩니다
+    content: |-
+      img.format
+
+- id: step3_thumbnail
+  title: 3단계. 썸네일 생성
+  subtitle: thumbnail()
+  blocks:
+  - type: text
+    content: thumbnail() 메서드는 이미지를 지정한 크기 내에 맞게 축소합니다. 원본 비율을 유지하면서 최대 크기를 제한합니다. 주의할 점은 thumbnail()이 원본 이미지를 직접 수정한다는 것입니다. 원본을 보존하려면 copy()로 복사본을 만들어야 합니다.
+  - type: code
+    language: python
+    title: 복사본 생성
+    description: 원본 보존을 위해 copy()합니다
+    content: |-
+      thumb = img.copy()
+      thumb.size
+  - type: code
+    language: python
+    title: 썸네일 만들기
+    description: 최대 150x150 내로 축소합니다
+    content: |-
+      thumb.thumbnail((150, 150))
+      thumb.size
+  - type: tip
+    content: thumbnail()은 비율을 유지합니다. (150, 150)을 지정해도 원본이 640x427이면 결과는 150x100 정도가 됩니다. 정확한 크기가 필요하면 resize()를 사용하세요.
+  - type: code
+    language: python
+    title: 썸네일 확인
+    description: 축소된 이미지를 출력합니다
+    content: |-
+      thumb
+
+- id: step4_resize
+  title: 4단계. 리사이즈
+  subtitle: resize()
+  blocks:
+  - type: text
+    content: resize()는 정확한 크기로 이미지를 변환합니다. thumbnail()과 달리 비율을 무시하고 지정한 크기로 변환합니다. resize()는 새 이미지를 반환하고 원본은 유지됩니다.
+  - type: code
+    language: python
+    title: 정사각형으로 리사이즈
+    description: 200x200으로 변환합니다
+    content: |-
+      square = img.resize((200, 200))
+      square.size
+  - type: code
+    language: python
+    title: 리사이즈 결과
+    description: 비율이 변경된 이미지입니다
+    content: |-
+      square
+  - type: tip
+    content: resize()는 원본 비율을 무시합니다. 원본이 640x427인데 200x200으로 변환하면 가로가 압축되어 찌그러집니다. 비율 유지가 필요하면 thumbnail()이나 비율 계산 후 resize()를 사용하세요.
+
+- id: step5_display
+  title: 5단계. 나란히 비교
+  subtitle: 원본과 썸네일
+  blocks:
+  - type: text
+    content: 원본 이미지와 생성한 썸네일, 리사이즈 이미지를 비교해봅시다. 각각의 크기 차이를 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 크기 비교
+    description: 세 이미지의 크기를 확인합니다
+    content: |-
+      original = img.size
+      thumbSize = thumb.size
+      squareSize = square.size
+      original, thumbSize, squareSize
+
+- id: practice
+  title: 실습
+  subtitle: china 이미지 탐색
+  blocks:
+  - type: text
+    content: sklearn의 china.jpg 이미지를 불러와 정보를 확인하고 썸네일을 생성해봅시다. 위에서 배운 size, mode 속성 확인과 thumbnail(), resize() 메서드를 직접 적용해봅니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: china 이미지 정보"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image
+        from sklearn.datasets import load_sample_image
+
+        chinaArr = load_sample_image('china.jpg')
+        china = Image.fromarray(chinaArr)
+        china.size, china.mode
+    - type: code
+      title: "이미지 출력"
+      content: |-
+        china
+  - type: expansion
+    title: "미션2: china 썸네일 생성"
+    blocks:
+    - type: code
+      title: "이미지 로드"
+      content: |-
+        from PIL import Image
+        from sklearn.datasets import load_sample_image
+
+        landscapeArr = load_sample_image('china.jpg')
+        landscape = Image.fromarray(landscapeArr)
+        landscape.size
+    - type: code
+      title: "썸네일 생성"
+      content: |-
+        preview = landscape.copy()
+        preview.thumbnail((100, 100))
+        preview.size
+    - type: code
+      title: "썸네일 출력"
+      content: |-
+        preview

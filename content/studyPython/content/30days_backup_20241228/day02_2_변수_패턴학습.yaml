@@ -1,0 +1,199 @@
+meta:
+  id: day02_2
+  title: 변수 패턴학습
+  day: 2
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 변수와 내장함수 - 데이터 저장하기"
+    description: "변수에 데이터를 저장하고 내장함수를 사용하는 방법을 배웁니다."
+    keywords: ['변수', '내장함수', 'type', 'len', 'input']
+intro:
+  title: 변수 마스터 패턴북
+  emoji: "🔥"
+  description: |
+    이것만 외우면 변수 마스터!
+    복잡한 설명은 빼고 변수의 핵심 패턴만 모았습니다. 10개 패턴만 외우면 변수는 완전히 끝!
+  points:
+    - "📦 생성: 변수명 = 값"
+    - "📝 이름규칙: 문자로 시작, 문자/숫자/_만"
+    - "🏷️ 타입: str, int, float, bool"
+    - "🔄 수정: 언제든 새 값 할당 가능"
+    - "🔗 다중할당: a,b,c = 1,2,3"
+    - "🔀 교환: a,b = b,a (마법!)"
+    - "🔄 변환: int(), float(), str()"
+    - "⌨️ 입력: input() (항상 문자열)"
+    - "🖨️ 출력: print() (여러 값 가능)"
+    - "🔍 확인: type(), len()"
+  summary: "🔥 생성→수정→교환 패턴만 알면 변수 80% 완성! 프로그래밍의 시작!"
+sections:
+- id: creation
+  title: 1. 변수 생성 패턴
+  subtitle: 변수명 = 값
+  color: blue
+  emoji: "📦"
+  blocks:
+  - type: code
+    language: python
+    title: 변수 생성
+    description: 변수명에 값을 할당하여 변수를 생성합니다.
+    content: |-
+      language = "Python"
+      level = 25
+      score = 85.5
+      print(language,level,score)
+- id: naming
+  title: 2. 변수명 규칙 패턴
+  subtitle: 문자, 숫자, _
+  color: green
+  emoji: "📝"
+  blocks:
+  - type: code
+    language: python
+    title: 올바른 변수명
+    description: 문자로 시작하고, 문자/숫자/언더스코어만 사용 가능합니다.
+    content: |-
+      userName = "Kim"
+      age1 = 25
+      myConst = 3.14
+      firstName = "Hong"
+      print(userName, age1)
+- id: data_types
+  title: 3. 데이터 타입 패턴
+  subtitle: str, int, float, bool
+  color: purple
+  emoji: "🏷️"
+  blocks:
+  - type: code
+    language: python
+    title: 기본 데이터 타입
+    description: Python의 4가지 기본 데이터 타입입니다.
+    content: |-
+      text = "Hello"
+      number = 42
+      decimal = 3.14
+      print(type(text), type(number), type(decimal))
+- id: assignment
+  title: 4. 변수 수정 패턴
+  subtitle: 언제든 변경 가능
+  color: orange
+  emoji: "🔄"
+  blocks:
+  - type: code
+    language: python
+    title: 변수 값 수정
+    description: 변수는 언제든지 새로운 값으로 변경할 수 있습니다.
+    content: |-
+      counter = 25
+      print(counter)
+
+      counter = 26
+      print(counter)
+
+      counter = "스물여섯"
+      print(counter)
+- id: multiple
+  title: 5. 다중 할당 패턴
+  subtitle: a, b, c = 1, 2, 3
+  color: teal
+  emoji: "🔗"
+  blocks:
+  - type: code
+    language: python
+    title: 여러 변수 동시 할당
+    description: 한 줄로 여러 변수에 값을 할당할 수 있습니다.
+    content: |-
+      userName, userAge, userCity = "Kim", 25, "Seoul"
+      print(userName, userAge, userCity)
+
+      x = y = z = 0
+      print(x, y, z)
+- id: swap
+  title: 6. 변수 교환 패턴
+  subtitle: a, b = b, a
+  color: red
+  emoji: "🔀"
+  blocks:
+  - type: code
+    language: python
+    title: 변수값 교환
+    description: Python에서는 간단하게 두 변수의 값을 교환할 수 있습니다.
+    content: |-
+      a = 10
+      b = 20
+      print(a, b)
+
+      a, b = b, a
+      print(a, b)
+- id: conversion
+  title: 7. 타입 변환 패턴
+  subtitle: int(), float(), str()
+  color: yellow
+  emoji: "🔄"
+  blocks:
+  - type: code
+    language: python
+    title: 타입 변환
+    description: 내장 함수로 데이터 타입을 변환할 수 있습니다.
+    content: |-
+      textNum = "123"
+      number = int(textNum)
+      print(number)
+
+      floatNum = float("3.14")
+      text = str(42)
+      print(floatNum, text)
+- id: input
+  title: 8. 입력 받기 패턴
+  subtitle: input(message)
+  color: indigo
+  emoji: "⌨️"
+  blocks:
+  - type: code
+    language: python
+    title: 사용자 입력
+    description: input() 함수로 사용자에게 입력을 받습니다. 항상 문자열로 반환됩니다.
+    content: |-
+      inputName = input("이름을 입력하세요: ")
+      print(f"안녕하세요, {inputName}님!")
+
+      ageStr = input("나이를 입력하세요: ")
+      inputAge = int(ageStr)
+      print(f"당신은 {inputAge}세입니다")
+- id: output
+  title: 9. 출력 패턴
+  subtitle: print(값)
+  color: cyan
+  emoji: "🖨️"
+  blocks:
+  - type: code
+    language: python
+    title: 값 출력
+    description: print() 함수로 값을 출력합니다. 여러 값을 쉼표로 구분하여 출력 가능합니다.
+    content: |-
+      displayName = "Python"
+      displayAge = 30
+
+      print(displayName)
+      print(displayName, displayAge)
+      print("이름:", displayName)
+      print(displayName, displayAge, sep="-")
+- id: check
+  title: 10. 확인 패턴
+  subtitle: type(), len()
+  color: pink
+  emoji: "🔍"
+  blocks:
+  - type: code
+    language: python
+    title: 타입과 길이 확인
+    description: type()으로 데이터 타입을, len()으로 길이를 확인할 수 있습니다.
+    content: |-
+      checkName = "Python"
+      checkAge = 25
+
+      print(type(checkName))
+      print(type(checkAge))
+      print(len(checkName))

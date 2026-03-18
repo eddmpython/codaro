@@ -1,0 +1,759 @@
+meta:
+  id: pydantic_10
+  title: 종합데이터파이프라인
+  order: 10
+  category: pydantic
+  difficulty: "⭐⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["pydantic", "데이터파이프라인", "ETL", "검증", "변환"]
+  seo:
+    title: "Pydantic 종합 프로젝트 - 데이터 파이프라인 구축"
+    description: "Pydantic으로 완전한 데이터 파이프라인을 구축합니다. ETL, 검증, 변환, 보고서 생성을 배웁니다."
+    keywords: ["pydantic", "데이터파이프라인", "ETL", "프로젝트"]
+
+intro:
+  emoji: "🚀"
+  goal: Pydantic으로 완전한 데이터 처리 파이프라인을 구축합니다.
+  description: 데이터 수집, 검증, 변환, 집계, 보고서 생성까지 전체 ETL 과정을 Pydantic 모델로 구현합니다.
+
+project:
+  name: 전자상거래 거래 분석 파이프라인
+  scenario: 매일 수만 건의 거래 데이터가 다양한 형식으로 유입됩니다. 원본 데이터를 검증하고, 분석 가능한 형태로 변환한 뒤, 일별/사용자별 통계와 품질 리포트를 자동 생성하는 ETL 파이프라인을 구축합니다.
+
+sections:
+- id: load
+  title: 환경 설정
+  subtitle: 패키지 로드
+  blocks:
+  - type: text
+    content: 데이터 파이프라인에 필요한 pydantic과 보조 모듈을 로드합니다. ETL 파이프라인은 Extract(추출), Transform(변환), Load(적재)의 세 단계로 구성되며, Pydantic은 각 단계에서 데이터 구조와 유효성을 보장하는 핵심 역할을 담당합니다. 특히 외부 시스템에서 들어오는 비정형 데이터를 정형화하고, 변환 과정의 타입 안전성을 확보하는 데 Pydantic의 강점이 발휘됩니다.
+  - type: code
+    language: python
+    title: 패키지 설치
+    description: pydantic 설치
+    content: |-
+      import micropip
+      await micropip.install('pydantic')
+
+- id: source
+  title: 소스 데이터 모델
+  subtitle: 원본 구조 정의
+  blocks:
+  - type: text
+    content: 외부 시스템에서 수집되는 원본 데이터의 구조를 정의합니다. 원본 데이터는 타입이 모두 문자열이거나 불확실한 경우가 많으므로, 먼저 느슨한 모델로 수신한 뒤 검증 단계에서 정확한 타입으로 변환합니다. 이 패턴은 실무에서 CSV, JSON API, 레거시 시스템 등 다양한 소스를 다룰 때 필수적입니다. RawTransaction은 거래 데이터, RawUserEvent는 사용자 행동 로그를 담는 모델입니다.
+  - type: code
+    language: python
+    title: 원본 데이터 모델
+    description: 느슨한 타입
+    content: |-
+      from pydantic import BaseModel, Field
+      from typing import Optional
+      from datetime import datetime, date
+      from enum import Enum
+
+      class RawTransaction(BaseModel):
+          transactionId: str
+          userId: str
+          productId: str
+          amount: str
+          currency: str
+          timestamp: str
+          status: str
+          metadata: Optional[dict] = None
+
+      class RawUserEvent(BaseModel):
+          eventId: str
+          userId: str
+          eventType: str
+          eventData: dict
+          occurredAt: str
+          deviceInfo: Optional[dict] = None
+
+      rawTx = RawTransaction(
+          transactionId="TX001",
+          userId="U100",
+          productId="P001",
+          amount="15000.50",
+          currency="KRW",
+          timestamp="2024-03-15 10:30:00",
+          status="completed"
+      )
+      rawTx
+
+- id: validated
+  title: 검증 모델
+  subtitle: 타입 변환과 검증
+  blocks:
+  - type: text
+    content: 원본 데이터를 검증하고 올바른 타입으로 변환하는 모델입니다. field_validator의 mode='before'를 사용해 입력값이 모델에 할당되기 전에 전처리합니다. 금액은 쉼표가 포함된 문자열일 수 있고, 날짜는 다양한 포맷으로 들어올 수 있으므로 유연하게 파싱합니다. TransactionStatus Enum으로 상태값을 제한하면 잘못된 상태가 시스템에 유입되는 것을 원천 차단할 수 있습니다.
+  - type: code
+    language: python
+    title: 검증 모델
+    description: 타입 변환 포함
+    content: |-
+      from pydantic import field_validator
+      from typing import Literal
+
+      class TransactionStatus(str, Enum):
+          PENDING = "pending"
+          COMPLETED = "completed"
+          FAILED = "failed"
+          REFUNDED = "refunded"
+
+      class ValidatedTransaction(BaseModel):
+          transactionId: str = Field(min_length=1)
+          userId: str = Field(min_length=1)
+          productId: str = Field(min_length=1)
+          amount: float = Field(gt=0)
+          currency: Literal["KRW", "USD", "EUR"] = "KRW"
+          timestamp: datetime
+          status: TransactionStatus
+          metadata: dict = Field(default_factory=dict)
+
+          @field_validator('amount', mode='before')
+          @classmethod
+          def parseAmount(cls, v):
+              if isinstance(v, str):
+                  return float(v.replace(",", ""))
+              return v
+
+          @field_validator('timestamp', mode='before')
+          @classmethod
+          def parseTimestamp(cls, v):
+              if isinstance(v, str):
+                  formats = ["%Y-%m-%d %H:%M:%S", "%Y-%m-%dT%H:%M:%S", "%Y/%m/%d %H:%M:%S"]
+                  for fmt in formats:
+                      try:
+                          return datetime.strptime(v, fmt)
+                      except ValueError:
+                          continue
+              return v
+
+      validated = ValidatedTransaction(
+          transactionId=rawTx.transactionId,
+          userId=rawTx.userId,
+          productId=rawTx.productId,
+          amount=rawTx.amount,
+          currency=rawTx.currency,
+          timestamp=rawTx.timestamp,
+          status=rawTx.status
+      )
+      validated
+
+- id: enriched
+  title: 데이터 변환
+  subtitle: ETL Transform
+  blocks:
+  - type: text
+    content: 검증된 데이터를 분석에 적합한 형태로 변환합니다. 원본 통화를 KRW로 환산하고, 날짜에서 요일과 시간대 정보를 추출하며, 성공 여부를 불리언으로 표현합니다. fromValidated 클래스 메서드 패턴을 사용하면 변환 로직을 모델 내부에 캡슐화하여 재사용성을 높일 수 있습니다. 이렇게 풍부해진 데이터는 일별 매출 분석, 요일별 패턴 분석, 주말/평일 비교 등 다양한 분석에 활용됩니다.
+  - type: code
+    language: python
+    title: 변환 모델
+    description: 분석용 데이터
+    content: |-
+      class EnrichedTransaction(BaseModel):
+          transactionId: str
+          userId: str
+          productId: str
+          amountKRW: float
+          originalCurrency: str
+          originalAmount: float
+          transactionDate: date
+          transactionHour: int
+          dayOfWeek: int
+          isWeekend: bool
+          status: TransactionStatus
+          isSuccessful: bool
+
+          @classmethod
+          def fromValidated(cls, tx: ValidatedTransaction) -> "EnrichedTransaction":
+              exchangeRates = {"KRW": 1, "USD": 1300, "EUR": 1400}
+              rate = exchangeRates.get(tx.currency, 1)
+
+              return cls(
+                  transactionId=tx.transactionId,
+                  userId=tx.userId,
+                  productId=tx.productId,
+                  amountKRW=tx.amount * rate,
+                  originalCurrency=tx.currency,
+                  originalAmount=tx.amount,
+                  transactionDate=tx.timestamp.date(),
+                  transactionHour=tx.timestamp.hour,
+                  dayOfWeek=tx.timestamp.weekday(),
+                  isWeekend=tx.timestamp.weekday() >= 5,
+                  status=tx.status,
+                  isSuccessful=tx.status == TransactionStatus.COMPLETED
+              )
+
+      enriched = EnrichedTransaction.fromValidated(validated)
+      enriched
+
+- id: aggregate
+  title: 집계 모델
+  subtitle: 통계 계산
+  blocks:
+  - type: text
+    content: 변환된 데이터를 집계하여 일별, 사용자별 통계를 생성합니다. DailySummary는 하루 동안의 거래 현황을 요약하고, UserSummary는 고객별 구매 패턴을 분석합니다. computed_field를 사용해 성공률이나 고객 생애 일수 같은 파생 지표를 자동 계산하면, 지표 산출 로직이 모델에 응집되어 일관성을 유지할 수 있습니다. 이런 집계 모델은 대시보드나 리포트의 기반 데이터가 됩니다.
+  - type: code
+    language: python
+    title: 집계 모델
+    description: 통계 구조
+    content: |-
+      from pydantic import computed_field
+
+      class DailySummary(BaseModel):
+          summaryDate: date
+          totalTransactions: int
+          successfulTransactions: int
+          failedTransactions: int
+          totalAmountKRW: float
+          averageAmountKRW: float
+          uniqueUsers: int
+          uniqueProducts: int
+
+          @computed_field
+          @property
+          def successRate(self) -> float:
+              if self.totalTransactions == 0:
+                  return 0.0
+              return round(self.successfulTransactions / self.totalTransactions * 100, 2)
+
+      class UserSummary(BaseModel):
+          userId: str
+          totalTransactions: int
+          totalSpentKRW: float
+          averageOrderKRW: float
+          firstTransactionDate: date
+          lastTransactionDate: date
+          favoriteProductId: Optional[str] = None
+
+          @computed_field
+          @property
+          def customerLifetimeDays(self) -> int:
+              return (self.lastTransactionDate - self.firstTransactionDate).days
+
+- id: pipeline
+  title: 파이프라인 클래스
+  subtitle: ETL 구현
+  blocks:
+  - type: text
+    content: 데이터 수집부터 집계까지 전체 파이프라인을 클래스로 구현합니다. DataPipeline 클래스는 extract와 transform 메서드로 ETL의 E와 T를 담당하며, 각 단계에서 발생한 오류를 별도로 수집합니다. 이 패턴은 파이프라인 실행 중 일부 레코드가 실패해도 나머지는 계속 처리할 수 있게 하고, 오류 분석을 위한 정보를 보존합니다. PipelineResult 모델로 처리 결과를 구조화하면 후속 모니터링과 알림 시스템 연동이 용이해집니다.
+  - type: code
+    language: python
+    title: 파이프라인 클래스
+    description: ETL 구현
+    content: |-
+      from pydantic import ValidationError
+
+      class PipelineResult(BaseModel):
+          processedCount: int
+          successCount: int
+          errorCount: int
+          errors: list[dict] = []
+          enrichedData: list[dict] = []
+
+      class DataPipeline:
+          def __init__(self):
+              self.rawData = []
+              self.validatedData = []
+              self.enrichedData = []
+              self.errors = []
+
+          def extract(self, rawRecords: list[dict]) -> int:
+              self.rawData = []
+              for record in rawRecords:
+                  try:
+                      raw = RawTransaction.model_validate(record)
+                      self.rawData.append(raw)
+                  except ValidationError as e:
+                      self.errors.append({"stage": "extract", "data": record, "error": str(e)})
+              return len(self.rawData)
+
+          def transform(self) -> int:
+              self.validatedData = []
+              self.enrichedData = []
+              for raw in self.rawData:
+                  try:
+                      validatedItem = ValidatedTransaction(
+                          transactionId=raw.transactionId,
+                          userId=raw.userId,
+                          productId=raw.productId,
+                          amount=raw.amount,
+                          currency=raw.currency,
+                          timestamp=raw.timestamp,
+                          status=raw.status,
+                          metadata=raw.metadata or {}
+                      )
+                      self.validatedData.append(validatedItem)
+                      enrichedItem = EnrichedTransaction.fromValidated(validatedItem)
+                      self.enrichedData.append(enrichedItem)
+                  except ValidationError as e:
+                      self.errors.append({"stage": "transform", "data": raw.model_dump(), "error": str(e)})
+              return len(self.enrichedData)
+
+          def getResult(self) -> PipelineResult:
+              return PipelineResult(
+                  processedCount=len(self.rawData),
+                  successCount=len(self.enrichedData),
+                  errorCount=len(self.errors),
+                  errors=self.errors,
+                  enrichedData=[e.model_dump() for e in self.enrichedData]
+              )
+
+      pipeline = DataPipeline()
+
+- id: execute
+  title: 파이프라인 실행
+  subtitle: 샘플 데이터 처리
+  blocks:
+  - type: text
+    content: 샘플 거래 데이터로 파이프라인을 실행합니다. 테스트 데이터에는 정상 케이스와 함께 "invalid" 금액처럼 의도적으로 오류를 유발하는 데이터를 포함시켜 오류 처리가 제대로 동작하는지 확인합니다. USD 거래는 환율 변환이 적용되고, pending/failed 상태는 isSuccessful이 false가 됩니다. 이렇게 다양한 시나리오를 테스트하면 실제 운영 환경에서 발생할 수 있는 상황에 대비할 수 있습니다.
+  - type: code
+    language: python
+    title: 샘플 데이터
+    description: 테스트 데이터
+    content: |-
+      sampleData = [
+          {"transactionId": "TX001", "userId": "U100", "productId": "P001", "amount": "15000", "currency": "KRW", "timestamp": "2024-03-15 10:30:00", "status": "completed"},
+          {"transactionId": "TX002", "userId": "U101", "productId": "P002", "amount": "25000.50", "currency": "KRW", "timestamp": "2024-03-15 11:00:00", "status": "completed"},
+          {"transactionId": "TX003", "userId": "U100", "productId": "P003", "amount": "invalid", "currency": "KRW", "timestamp": "2024-03-15 12:00:00", "status": "completed"},
+          {"transactionId": "TX004", "userId": "U102", "productId": "P001", "amount": "100", "currency": "USD", "timestamp": "2024-03-15 14:30:00", "status": "pending"},
+          {"transactionId": "TX005", "userId": "U101", "productId": "P004", "amount": "50000", "currency": "KRW", "timestamp": "2024-03-15 15:00:00", "status": "failed"},
+          {"transactionId": "TX006", "userId": "U103", "productId": "P002", "amount": "30000", "currency": "KRW", "timestamp": "2024-03-16 09:00:00", "status": "completed"}
+      ]
+
+      extractedCount = pipeline.extract(sampleData)
+      transformedCount = pipeline.transform()
+      extractedCount, transformedCount
+  - type: code
+    language: python
+    title: 결과 확인
+    description: 파이프라인 결과
+    content: |-
+      pipelineResult = pipeline.getResult()
+      resultSummary = {
+          "processed": pipelineResult.processedCount,
+          "success": pipelineResult.successCount,
+          "errors": pipelineResult.errorCount
+      }
+      resultSummary
+
+- id: aggregation
+  title: 데이터 집계
+  subtitle: 통계 생성
+  blocks:
+  - type: text
+    content: 처리된 데이터를 집계하여 일별 통계를 생성합니다. aggregateDaily 함수는 거래를 날짜별로 그룹화한 뒤 각 그룹에 대해 DailySummary를 생성합니다. 성공 거래 수, 총 거래액, 평균 거래액, 고유 사용자 수 등 핵심 지표를 계산합니다. 이 집계 결과는 경영진 대시보드, 일일 리포트, 이상 탐지 시스템 등에 활용됩니다. computed_field로 정의한 successRate는 자동으로 계산되어 직렬화에 포함됩니다.
+  - type: code
+    language: python
+    title: 집계 함수
+    description: 통계 계산
+    content: |-
+      from collections import defaultdict
+
+      def aggregateDaily(transactions: list[EnrichedTransaction]) -> list[DailySummary]:
+          byDate = defaultdict(list)
+          for tx in transactions:
+              byDate[tx.transactionDate].append(tx)
+
+          summaries = []
+          for txDate, txList in sorted(byDate.items()):
+              successful = [tx for tx in txList if tx.isSuccessful]
+              amounts = [tx.amountKRW for tx in txList]
+              summaries.append(DailySummary(
+                  summaryDate=txDate,
+                  totalTransactions=len(txList),
+                  successfulTransactions=len(successful),
+                  failedTransactions=len(txList) - len(successful),
+                  totalAmountKRW=sum(amounts),
+                  averageAmountKRW=sum(amounts) / len(amounts) if amounts else 0,
+                  uniqueUsers=len(set(tx.userId for tx in txList)),
+                  uniqueProducts=len(set(tx.productId for tx in txList))
+              ))
+          return summaries
+
+      dailySummaries = aggregateDaily(pipeline.enrichedData)
+      dailySummaries[0].model_dump() if dailySummaries else {}
+
+- id: report
+  title: 보고서 모델
+  subtitle: 종합 리포트
+  blocks:
+  - type: text
+    content: 집계 결과를 종합한 최종 보고서 모델을 정의합니다. PipelineReport는 파이프라인 실행 메타데이터, 일별 요약, 상위 상품/사용자 랭킹을 하나의 구조로 통합합니다. generateReport 함수는 파이프라인과 집계 결과를 받아 리포트를 생성합니다. 리포트 ID에 타임스탬프를 포함시키면 버전 관리가 용이하고, periodDays computed_field로 분석 기간을 자동 계산합니다. 이 리포트는 JSON으로 직렬화되어 API 응답이나 파일 저장에 활용됩니다.
+  - type: code
+    language: python
+    title: 보고서 모델
+    description: 종합 리포트
+    content: |-
+      class PipelineReport(BaseModel):
+          reportId: str
+          generatedAt: datetime
+          periodStart: date
+          periodEnd: date
+          pipelineStats: dict
+          dailySummaries: list[DailySummary]
+          topProducts: list[dict]
+          topUsers: list[dict]
+
+          @computed_field
+          @property
+          def periodDays(self) -> int:
+              return (self.periodEnd - self.periodStart).days + 1
+
+      def generateReport(pipelineObj: DataPipeline, summaries: list[DailySummary]) -> PipelineReport:
+          transactions = pipelineObj.enrichedData
+
+          productCounts = defaultdict(int)
+          userSpending = defaultdict(float)
+          for tx in transactions:
+              productCounts[tx.productId] += 1
+              userSpending[tx.userId] += tx.amountKRW
+
+          topProducts = [{"productId": k, "count": v} for k, v in sorted(productCounts.items(), key=lambda x: -x[1])[:5]]
+          topUsers = [{"userId": k, "totalSpent": v} for k, v in sorted(userSpending.items(), key=lambda x: -x[1])[:5]]
+
+          dates = [tx.transactionDate for tx in transactions]
+          return PipelineReport(
+              reportId=f"RPT-{datetime.now().strftime('%Y%m%d%H%M%S')}",
+              generatedAt=datetime.now(),
+              periodStart=min(dates) if dates else date.today(),
+              periodEnd=max(dates) if dates else date.today(),
+              pipelineStats=pipelineObj.getResult().model_dump(exclude={"enrichedData"}),
+              dailySummaries=summaries,
+              topProducts=topProducts,
+              topUsers=topUsers
+          )
+
+      report = generateReport(pipeline, dailySummaries)
+      report.model_dump(exclude={"dailySummaries"})
+
+- id: export
+  title: 데이터 내보내기
+  subtitle: JSON/CSV 출력
+  blocks:
+  - type: text
+    content: 처리된 데이터와 보고서를 다양한 형식으로 내보냅니다. model_dump(mode='json')을 사용하면 datetime, date, Enum 등이 JSON 호환 형식으로 자동 변환됩니다. CSV 형식은 스프레드시트나 BI 도구에서 활용하기 좋고, JSON은 API 응답이나 NoSQL 저장소에 적합합니다. toCsvRows 함수처럼 필요한 필드만 선택적으로 추출하면 출력 용량을 줄이고 보안에 민감한 필드를 제외할 수 있습니다.
+  - type: code
+    language: python
+    title: JSON 내보내기
+    description: 직렬화
+    content: |-
+      import json
+
+      exportJson = {
+          "report": report.model_dump(mode='json'),
+          "transactions": [tx.model_dump(mode='json') for tx in pipeline.enrichedData[:3]]
+      }
+      jsonOutput = json.dumps(exportJson, indent=2, ensure_ascii=False, default=str)
+      jsonOutput[:500]
+  - type: code
+    language: python
+    title: CSV 형식
+    description: 테이블 형태
+    content: |-
+      def toCsvRows(transactions: list[EnrichedTransaction]) -> list[dict]:
+          return [
+              {
+                  "transactionId": tx.transactionId,
+                  "userId": tx.userId,
+                  "productId": tx.productId,
+                  "amountKRW": tx.amountKRW,
+                  "date": tx.transactionDate.isoformat(),
+                  "status": tx.status.value
+              }
+              for tx in transactions
+          ]
+
+      csvRows = toCsvRows(pipeline.enrichedData)
+      csvRows
+
+- id: quality
+  title: 품질 보고서
+  subtitle: 검증 통계
+  blocks:
+  - type: text
+    content: 데이터 품질 검증 결과를 상세히 보고합니다. DataQualityReport는 전체 레코드 중 유효한 레코드의 비율, 오류 유형별/단계별 분포, 샘플 오류 메시지를 포함합니다. validationRate는 데이터 품질의 핵심 지표로, 이 값이 특정 임계치 이하로 떨어지면 소스 시스템에 문제가 있음을 의미합니다. 품질 보고서를 모니터링 시스템과 연동하면 데이터 품질 저하를 조기에 탐지하고 대응할 수 있습니다.
+  - type: code
+    language: python
+    title: 품질 보고서
+    description: 검증 통계
+    content: |-
+      class DataQualityReport(BaseModel):
+          totalRecords: int
+          validRecords: int
+          invalidRecords: int
+          validationRate: float
+          errorsByField: dict[str, int]
+          errorsByType: dict[str, int]
+          sampleErrors: list[dict]
+
+          @classmethod
+          def fromPipeline(cls, pipelineObj: DataPipeline) -> "DataQualityReport":
+              errorsByField = defaultdict(int)
+              errorsByType = defaultdict(int)
+
+              for err in pipelineObj.errors:
+                  errorsByType[err.get("stage", "unknown")] += 1
+                  if "field" in err:
+                      errorsByField[err["field"]] += 1
+
+              total = len(pipelineObj.rawData) + len(pipelineObj.errors)
+              valid = len(pipelineObj.enrichedData)
+
+              return cls(
+                  totalRecords=total,
+                  validRecords=valid,
+                  invalidRecords=total - valid,
+                  validationRate=round(valid / total * 100, 2) if total > 0 else 0,
+                  errorsByField=dict(errorsByField),
+                  errorsByType=dict(errorsByType),
+                  sampleErrors=pipelineObj.errors[:5]
+              )
+
+      qualityReport = DataQualityReport.fromPipeline(pipeline)
+      qualityReport.model_dump(exclude={"sampleErrors"})
+
+- id: result
+  title: 통합 파이프라인
+  subtitle: 전체 실행
+  blocks:
+  - type: text
+    content: 모든 구성 요소를 통합한 완성된 파이프라인입니다. CompletePipeline 클래스는 단일 run 메서드로 전체 ETL 과정과 집계, 리포트 생성을 수행합니다. 반환값은 처리 상태, 요약 통계, 상세 리포트, 품질 보고서를 포함하는 딕셔너리입니다. 이 패턴은 배치 작업 스케줄러, API 엔드포인트, CLI 도구 등 다양한 실행 환경에서 동일한 파이프라인 로직을 재사용할 수 있게 합니다. 실무에서는 여기에 로깅, 알림, 재시도 로직을 추가합니다.
+  - type: code
+    language: python
+    title: 통합 파이프라인
+    description: 전체 실행
+    content: |-
+      class CompletePipeline:
+          def __init__(self):
+              self.pipelineInstance = DataPipeline()
+
+          def run(self, rawData: list[dict]) -> dict:
+              self.pipelineInstance.extract(rawData)
+              self.pipelineInstance.transform()
+
+              summaries = aggregateDaily(self.pipelineInstance.enrichedData)
+              reportObj = generateReport(self.pipelineInstance, summaries)
+              qualityObj = DataQualityReport.fromPipeline(self.pipelineInstance)
+
+              return {
+                  "status": "completed",
+                  "summary": {
+                      "processed": reportObj.pipelineStats["processedCount"],
+                      "successful": reportObj.pipelineStats["successCount"],
+                      "failed": reportObj.pipelineStats["errorCount"],
+                      "validationRate": qualityObj.validationRate
+                  },
+                  "report": reportObj,
+                  "quality": qualityObj
+              }
+
+      completePipeline = CompletePipeline()
+      finalResult = completePipeline.run(sampleData)
+      finalResult["summary"]
+
+- id: practice
+  title: 실습
+  subtitle: 데이터 파이프라인 확장
+  blocks:
+  - type: text
+    content: 다양한 도메인에 맞는 데이터 파이프라인을 구축해봅니다. 각 미션은 실무에서 자주 접하는 시나리오를 다룹니다. 로그 분석 파이프라인은 서버 모니터링과 장애 탐지에, 센서 데이터 파이프라인은 IoT와 제조 시스템에 활용됩니다. 핵심은 Raw → Validated → Enriched → Aggregated의 단계별 변환과, 각 단계에서 Pydantic 모델을 활용한 타입 안전성 확보입니다.
+  - type: tip
+    content: 파이프라인 설계 시 각 단계의 모델을 명확히 분리하고, 변환 로직은 클래스 메서드로 캡슐화하세요. 오류는 무시하지 말고 별도로 수집하여 품질 모니터링에 활용합니다. computed_field로 파생 지표를 자동 계산하면 일관성을 유지할 수 있습니다.
+  - type: expansion
+    title: "미션1: 로그 분석 파이프라인 - 시스템 모니터링"
+    blocks:
+    - type: code
+      language: python
+      title: 로그 분석 파이프라인
+      description: 시스템 모니터링
+      content: |-
+        from pydantic import BaseModel, Field, field_validator
+        from typing import Optional, Literal
+        from datetime import datetime
+        from collections import defaultdict
+
+        class RawLogEntry(BaseModel):
+            timestamp: str
+            level: str
+            service: str
+            message: str
+            traceId: Optional[str] = None
+
+        class ParsedLogEntry(BaseModel):
+            timestamp: datetime
+            level: Literal["DEBUG", "INFO", "WARN", "ERROR", "FATAL"]
+            service: str
+            message: str
+            traceId: Optional[str] = None
+
+            @field_validator('level', mode='before')
+            @classmethod
+            def normalizeLevel(cls, v):
+                return v.upper()
+
+            @field_validator('timestamp', mode='before')
+            @classmethod
+            def parseTs(cls, v):
+                if isinstance(v, str):
+                    return datetime.fromisoformat(v.replace("Z", "+00:00").replace(" ", "T"))
+                return v
+
+        class LogAnalytics(BaseModel):
+            totalLogs: int
+            byLevel: dict[str, int]
+            byService: dict[str, int]
+            errorRate: float
+            timeRange: dict
+
+        def analyzeLogs(rawLogs: list[dict]) -> LogAnalytics:
+            parsed = []
+            for raw in rawLogs:
+                try:
+                    entry = ParsedLogEntry.model_validate(raw)
+                    parsed.append(entry)
+                except Exception:
+                    pass
+
+            byLevel = defaultdict(int)
+            byService = defaultdict(int)
+            for log in parsed:
+                byLevel[log.level] += 1
+                byService[log.service] += 1
+
+            errorCount = byLevel.get("ERROR", 0) + byLevel.get("FATAL", 0)
+            timestamps = [log.timestamp for log in parsed]
+
+            return LogAnalytics(
+                totalLogs=len(parsed),
+                byLevel=dict(byLevel),
+                byService=dict(byService),
+                errorRate=round(errorCount / len(parsed) * 100, 2) if parsed else 0,
+                timeRange={
+                    "start": min(timestamps).isoformat() if timestamps else None,
+                    "end": max(timestamps).isoformat() if timestamps else None
+                }
+            )
+
+        testLogs = [
+            {"timestamp": "2024-03-15T10:00:00", "level": "info", "service": "api", "message": "Request received"},
+            {"timestamp": "2024-03-15T10:01:00", "level": "error", "service": "db", "message": "Connection failed"},
+            {"timestamp": "2024-03-15T10:02:00", "level": "info", "service": "api", "message": "Request completed"},
+            {"timestamp": "2024-03-15T10:03:00", "level": "warn", "service": "cache", "message": "Cache miss"}
+        ]
+
+        logAnalyticsResult = analyzeLogs(testLogs)
+        logAnalyticsResult.model_dump()
+  - type: expansion
+    title: "미션2: 센서 데이터 파이프라인 - IoT 대시보드"
+    blocks:
+    - type: code
+      language: python
+      title: 센서 데이터 파이프라인
+      description: IoT 대시보드
+      content: |-
+        from pydantic import BaseModel, Field, field_validator, computed_field
+        from typing import Optional, Literal
+        from datetime import datetime
+        from collections import defaultdict
+
+        class SensorReading(BaseModel):
+            sensorId: str
+            readingType: Literal["temperature", "humidity", "pressure"]
+            value: float
+            unit: str
+            timestamp: datetime
+            quality: Literal["good", "fair", "poor"] = "good"
+
+            @field_validator('timestamp', mode='before')
+            @classmethod
+            def parseTime(cls, v):
+                if isinstance(v, str):
+                    return datetime.fromisoformat(v)
+                return v
+
+        class SensorAlert(BaseModel):
+            sensorId: str
+            alertType: str
+            severity: Literal["low", "medium", "high", "critical"]
+            message: str
+            triggeredAt: datetime
+            reading: SensorReading
+
+        class SensorDashboard(BaseModel):
+            lastUpdated: datetime
+            sensorCount: int
+            readingCount: int
+            alertCount: int
+            averages: dict[str, float]
+            alerts: list[SensorAlert]
+
+        def processSensorData(readings: list[dict]) -> SensorDashboard:
+            parsed = []
+            sensorAlerts = []
+
+            thresholds = {
+                "temperature": {"min": -10, "max": 50},
+                "humidity": {"min": 20, "max": 80},
+                "pressure": {"min": 900, "max": 1100}
+            }
+
+            for raw in readings:
+                try:
+                    reading = SensorReading.model_validate(raw)
+                    parsed.append(reading)
+
+                    limits = thresholds.get(reading.readingType, {})
+                    if reading.value < limits.get("min", float("-inf")):
+                        sensorAlerts.append(SensorAlert(
+                            sensorId=reading.sensorId,
+                            alertType="below_threshold",
+                            severity="high",
+                            message=f"{reading.readingType} below minimum",
+                            triggeredAt=reading.timestamp,
+                            reading=reading
+                        ))
+                    elif reading.value > limits.get("max", float("inf")):
+                        sensorAlerts.append(SensorAlert(
+                            sensorId=reading.sensorId,
+                            alertType="above_threshold",
+                            severity="high",
+                            message=f"{reading.readingType} above maximum",
+                            triggeredAt=reading.timestamp,
+                            reading=reading
+                        ))
+                except Exception:
+                    pass
+
+            averageValues = {}
+            byType = defaultdict(list)
+            for r in parsed:
+                byType[r.readingType].append(r.value)
+            for rType, values in byType.items():
+                averageValues[rType] = round(sum(values) / len(values), 2)
+
+            return SensorDashboard(
+                lastUpdated=datetime.now(),
+                sensorCount=len(set(r.sensorId for r in parsed)),
+                readingCount=len(parsed),
+                alertCount=len(sensorAlerts),
+                averages=averageValues,
+                alerts=sensorAlerts[:5]
+            )
+
+        testReadings = [
+            {"sensorId": "S001", "readingType": "temperature", "value": 25.5, "unit": "C", "timestamp": "2024-03-15T10:00:00"},
+            {"sensorId": "S002", "readingType": "humidity", "value": 85, "unit": "%", "timestamp": "2024-03-15T10:00:00"},
+            {"sensorId": "S003", "readingType": "pressure", "value": 1013, "unit": "hPa", "timestamp": "2024-03-15T10:00:00"},
+            {"sensorId": "S001", "readingType": "temperature", "value": 55, "unit": "C", "timestamp": "2024-03-15T10:05:00"}
+        ]
+
+        sensorDashboard = processSensorData(testReadings)
+        sensorDashboardSummary = {
+            "sensors": sensorDashboard.sensorCount,
+            "readings": sensorDashboard.readingCount,
+            "alerts": sensorDashboard.alertCount,
+            "averages": sensorDashboard.averages
+        }
+        sensorDashboardSummary

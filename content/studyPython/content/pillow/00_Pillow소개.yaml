@@ -1,0 +1,357 @@
+meta:
+  id: pillow_00
+  title: Pillow소개
+  order: 0
+  category: pillow
+  badge: 소개
+  tags: ["Pillow", "PIL", "이미지처리", "Image", "필터", "합성"]
+  seo:
+    title: "Pillow 소개 - 파이썬 이미지 처리 라이브러리"
+    description: "Pillow로 이미지를 열고, 편집하고, 저장하는 방법을 배웁니다. 크기 조절, 필터, 텍스트 삽입 등 이미지 처리의 기초를 익힙니다."
+    keywords: ["Pillow", "PIL", "이미지처리", "Python Image", "필터", "리사이즈"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "🖼️"
+      title: "Pillow"
+      subtitle: "파이썬 이미지 처리 라이브러리"
+
+    - type: hero
+      emoji: "🎨"
+      title: "이미지를 코드로 다루다"
+      subtitle: "열기, 편집, 저장까지 한 번에"
+      points:
+        - emoji: "📷"
+          title: "이미지 열기/저장"
+        - emoji: "✂️"
+          title: "자르기/회전"
+        - emoji: "🎭"
+          title: "필터/효과"
+        - emoji: "✏️"
+          title: "텍스트/도형"
+
+- id: pillow_history
+  blocks:
+    - type: sectionHeader
+      title: "🏛️ Pillow란?"
+      subtitle: "PIL의 현대적 계승자"
+
+    - type: text
+      content: |-
+        Pillow는 PIL(Python Imaging Library)의 친화적인 포크(fork)입니다. 원본 PIL은 2009년 이후 업데이트가 중단되었지만, Pillow가 이를 이어받아 현재까지 활발히 개발되고 있습니다. 파이썬에서 이미지를 다룰 때 가장 널리 사용되는 라이브러리이며, 설치도 간단하고 사용법도 직관적입니다.
+
+    - type: featureCards
+      cards:
+        - emoji: "📂"
+          title: "다양한 포맷"
+          description: "JPEG, PNG, GIF, BMP, TIFF 등 30개 이상의 이미지 포맷을 지원합니다"
+        - emoji: "⚡"
+          title: "간단한 API"
+          description: "직관적인 메서드로 복잡한 이미지 처리를 몇 줄로 해결합니다"
+        - emoji: "🔗"
+          title: "NumPy 연동"
+          description: "NumPy 배열과 상호 변환이 가능해 과학 계산과 연계됩니다"
+
+- id: why_pillow
+  blocks:
+    - type: sectionHeader
+      title: "🚀 왜 Pillow인가?"
+      subtitle: "이미지 처리의 시작점"
+
+    - type: text
+      content: |-
+        이미지는 본질적으로 픽셀의 2차원 배열입니다. Pillow는 이 픽셀 데이터에 쉽게 접근하고 조작할 수 있게 해줍니다. 웹 개발에서 썸네일 생성, 데이터 분석에서 이미지 전처리, 자동화 스크립트에서 일괄 변환 등 다양한 곳에서 활용됩니다.
+
+    - type: note
+      title: "OpenCV와의 차이"
+      content: "OpenCV는 컴퓨터 비전과 실시간 영상 처리에 특화되어 있고, Pillow는 정적 이미지 편집에 최적화되어 있습니다. 썸네일 생성, 필터 적용, 텍스트 삽입 같은 작업은 Pillow가 더 간단합니다. 얼굴 인식, 객체 추적 같은 작업은 OpenCV가 적합합니다."
+
+- id: image_basics
+  blocks:
+    - type: sectionHeader
+      title: "📦 이미지의 구조"
+      subtitle: "픽셀과 채널"
+
+    - type: text
+      content: |-
+        디지털 이미지는 픽셀(pixel)의 격자입니다. 각 픽셀은 색상 값을 가지며, 이 값의 구성 방식을 색상 모드(mode)라고 합니다. RGB 모드는 빨강, 초록, 파랑 세 채널로 색을 표현하고, L 모드는 밝기 하나로 흑백을 표현합니다.
+
+    - type: table
+      headers:
+        - 모드
+        - 채널 수
+        - 설명
+        - 용도
+      rows:
+        - - L
+          - 1
+          - 그레이스케일 (0-255)
+          - 흑백 이미지
+        - - RGB
+          - 3
+          - 빨강, 초록, 파랑
+          - 일반 컬러 이미지
+        - - RGBA
+          - 4
+          - RGB + 알파(투명도)
+          - 투명 배경이 필요할 때
+        - - CMYK
+          - 4
+          - 시안, 마젠타, 옐로, 블랙
+          - 인쇄용
+
+    - type: note
+      title: "픽셀 좌표계"
+      content: "Pillow에서 좌표 (0, 0)은 이미지의 왼쪽 상단입니다. x는 오른쪽으로, y는 아래쪽으로 증가합니다. (100, 50)은 왼쪽에서 100픽셀, 위에서 50픽셀 떨어진 위치입니다."
+
+- id: features
+  blocks:
+    - type: sectionHeader
+      title: "🛠️ Pillow 주요 기능"
+      subtitle: "이미지 처리의 모든 것"
+
+    - type: text
+      content: |-
+        Pillow가 제공하는 주요 기능을 살펴봅시다. 기본적인 열기/저장부터 고급 합성까지 다양한 작업을 지원합니다.
+
+    - type: table
+      headers:
+        - 기능
+        - 설명
+        - 메서드/모듈
+      rows:
+        - - 열기/저장
+          - 이미지 파일 읽기와 저장
+          - "Image.open(), save()"
+        - - 크기 조절
+          - 리사이즈, 썸네일 생성
+          - "resize(), thumbnail()"
+        - - 자르기/회전
+          - 영역 추출, 각도 회전
+          - "crop(), rotate(), transpose()"
+        - - 색상 변환
+          - 모드 변경, 채널 분리
+          - "convert(), split(), merge()"
+        - - 필터 적용
+          - 블러, 샤픈, 엣지 검출
+          - ImageFilter
+        - - 색상 조정
+          - 밝기, 대비, 채도
+          - ImageEnhance
+        - - 그리기
+          - 도형, 텍스트 삽입
+          - ImageDraw
+        - - 합성
+          - 이미지 붙이기, 블렌딩
+          - "paste(), blend(), alpha_composite()"
+
+- id: imagefilter
+  blocks:
+    - type: sectionHeader
+      title: "🎭 ImageFilter"
+      subtitle: "다양한 필터 효과"
+
+    - type: text
+      content: |-
+        ImageFilter 모듈은 미리 정의된 필터들을 제공합니다. filter() 메서드에 전달하면 해당 효과가 적용된 새 이미지를 반환합니다.
+
+    - type: table
+      headers:
+        - 필터
+        - 효과
+      rows:
+        - - BLUR
+          - 이미지를 부드럽게 흐리게
+        - - SHARPEN
+          - 경계를 선명하게
+        - - CONTOUR
+          - 윤곽선 추출
+        - - EDGE_ENHANCE
+          - 가장자리 강조
+        - - EMBOSS
+          - 양각 효과
+        - - FIND_EDGES
+          - 에지 검출
+        - - SMOOTH
+          - 노이즈 감소
+
+- id: imageenhance
+  blocks:
+    - type: sectionHeader
+      title: "✨ ImageEnhance"
+      subtitle: "색상 조정"
+
+    - type: text
+      content: |-
+        ImageEnhance 모듈은 밝기, 대비, 색상, 선명도를 조절합니다. 각 조정기의 enhance() 메서드에 배율을 전달합니다. 1.0은 원본, 0.0은 최소, 2.0은 두 배입니다.
+
+    - type: table
+      headers:
+        - 조정기
+        - 효과
+        - "예시 (factor)"
+      rows:
+        - - Brightness
+          - 밝기 조절
+          - "0.5=어둡게, 1.5=밝게"
+        - - Contrast
+          - 대비 조절
+          - "0.5=흐릿, 1.5=선명"
+        - - Color
+          - 채도 조절
+          - "0.0=흑백, 2.0=채도↑"
+        - - Sharpness
+          - 선명도 조절
+          - "0.0=블러, 2.0=샤픈"
+
+- id: imagedraw
+  blocks:
+    - type: sectionHeader
+      title: "✏️ ImageDraw"
+      subtitle: "도형과 텍스트"
+
+    - type: text
+      content: |-
+        ImageDraw 모듈로 이미지 위에 도형과 텍스트를 그릴 수 있습니다. Draw 객체를 생성한 뒤 메서드를 호출하면 원본 이미지에 직접 그려집니다.
+
+    - type: table
+      headers:
+        - 메서드
+        - 기능
+        - 주요 파라미터
+      rows:
+        - - line()
+          - 선 그리기
+          - "xy, fill, width"
+        - - rectangle()
+          - 사각형
+          - "xy, fill, outline"
+        - - ellipse()
+          - 타원/원
+          - "xy, fill, outline"
+        - - polygon()
+          - 다각형
+          - "xy, fill, outline"
+        - - text()
+          - 텍스트
+          - "xy, text, fill, font"
+
+- id: comparison
+  blocks:
+    - type: sectionHeader
+      title: "⚖️ Pillow vs 다른 도구"
+      subtitle: "적재적소에 맞는 선택"
+
+    - type: table
+      headers:
+        - 도구
+        - 특징
+        - 적합한 용도
+      rows:
+        - - Pillow
+          - 간단한 API, 정적 이미지
+          - 썸네일, 필터, 텍스트 삽입
+        - - OpenCV
+          - 실시간 영상, 컴퓨터 비전
+          - 얼굴 인식, 객체 추적
+        - - scikit-image
+          - 과학적 이미지 분석
+          - 분할, 측정, 복원
+        - - ImageMagick
+          - 명령줄 도구, 일괄 처리
+          - 대량 변환 자동화
+
+- id: usecases
+  blocks:
+    - type: sectionHeader
+      title: "💡 활용 분야"
+      subtitle: "Pillow가 사용되는 곳"
+
+    - type: text
+      content: |-
+        Pillow는 다양한 분야에서 활용됩니다. 웹 서비스부터 데이터 과학까지 이미지를 다루는 거의 모든 곳에서 만날 수 있습니다.
+
+    - type: table
+      headers:
+        - 분야
+        - 활용 예시
+      rows:
+        - - 웹 개발
+          - 업로드 이미지 리사이즈, 썸네일 생성, 워터마크
+        - - 데이터 전처리
+          - ML 모델용 이미지 정규화, 증강
+        - - 자동화
+          - 대량 이미지 변환, 포맷 통일
+        - - 문서 처리
+          - 스캔 이미지 보정, 텍스트 영역 추출
+        - - 디자인
+          - 배너 생성, 텍스트 오버레이
+
+- id: pyodide_note
+  blocks:
+    - type: sectionHeader
+      title: "📋 이미지 소스 안내"
+      subtitle: "Pyodide 환경에서의 이미지"
+
+    - type: note
+      title: "이미지 데이터 소스"
+      content: "이 커리큘럼은 Pyodide(브라우저 파이썬) 환경에서 실행됩니다. 외부 이미지 URL은 CORS 제약이 있어, sklearn 내장 이미지(china.jpg, flower.jpg)와 CORS를 지원하는 Lorem Picsum 서비스를 활용합니다. 일부 프로젝트에서는 Image.new()로 합성 이미지를 직접 생성합니다."
+
+- id: curriculum
+  blocks:
+    - type: sectionHeader
+      title: "📚 커리큘럼"
+      subtitle: "10개 프로젝트로 마스터"
+
+    - type: text
+      content: |-
+        이 커리큘럼에서는 실제 이미지를 활용한 10개의 프로젝트를 통해 Pillow를 배웁니다.
+
+    - type: table
+      headers:
+        - 프로젝트
+        - 데이터
+        - 핵심 개념
+      rows:
+        - - "01. 꽃 사진 탐색기"
+          - sklearn flower
+          - 이미지 열기, 정보, 썸네일
+        - - "02. 중국 풍경 편집기"
+          - sklearn china
+          - 자르기, 회전, 리사이즈
+        - - "03. 흑백 사진 변환기"
+          - Lorem Picsum
+          - 색상 모드, 픽셀 연산
+        - - "04. 사진 필터 스튜디오"
+          - Lorem Picsum
+          - ImageFilter 활용
+        - - "05. 밝기/대비 조절기"
+          - sklearn china
+          - ImageEnhance 활용
+        - - "06. RGB 채널 분석기"
+          - Lorem Picsum
+          - 채널 분리, 히스토그램
+        - - "07. 워터마크 생성기"
+          - sklearn flower
+          - ImageDraw, 투명도
+        - - "08. 도형 아트 생성기"
+          - 합성 이미지
+          - ImageDraw 도형
+        - - "09. 포토 콜라주 메이커"
+          - Lorem Picsum
+          - paste, 좌표 계산
+        - - "10. 종합 이미지 에디터"
+          - 복합
+          - 전체 개념 종합
+
+- id: start
+  blocks:
+    - type: sectionHeader
+      title: "🎯 시작하기"
+      subtitle: "첫 번째 프로젝트로"
+
+    - type: text
+      content: |-
+        Pillow를 배우면 파이썬으로 이미지를 자유롭게 다룰 수 있습니다. 썸네일 생성, 필터 적용, 워터마크 삽입 등 실용적인 작업을 코드 몇 줄로 해결할 수 있게 됩니다. 첫 번째 프로젝트에서 sklearn의 꽃 이미지를 열어보며 Pillow의 기본을 익혀봅시다.

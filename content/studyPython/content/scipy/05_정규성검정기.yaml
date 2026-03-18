@@ -1,0 +1,353 @@
+meta:
+  id: scipy_05
+  title: 정규성검정기
+  order: 5
+  category: scipy
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["scipy.stats", "정규성검정", "shapiro", "normaltest", "QQ플롯"]
+  seo:
+    title: "scipy.stats 정규성 검정 - 데이터가 정규분포인지 확인하기"
+    description: "scipy.stats로 데이터의 정규성을 검정합니다. Shapiro-Wilk, D'Agostino, QQ 플롯을 배웁니다."
+    keywords: ["scipy", "정규성검정", "shapiro", "normaltest", "가설검정"]
+
+intro:
+  emoji: "🔔"
+  goal: 고객 구매액 데이터가 정규분포를 따르는지 검정하고, 적절한 분석 방법을 선택합니다.
+  description: "t-검정, ANOVA, 회귀분석 등 많은 통계 기법은 데이터가 정규분포를 따른다고 가정합니다. 가정이 충족되지 않으면 결과의 신뢰성이 떨어집니다. 이 프로젝트에서는 고객 구매액 데이터의 정규성을 다양한 방법으로 검정합니다. Shapiro-Wilk 검정, D'Agostino-Pearson 검정, QQ 플롯, 왜도/첨도 분석을 수행하고, 정규성이 충족되지 않으면 로그 변환이나 Box-Cox 변환으로 정규화하는 방법을 배웁니다."
+
+sections:
+- id: load
+  title: 라이브러리 및 데이터 로드
+  subtitle: scipy.stats
+  blocks:
+  - type: text
+    content: "정규성 검정은 데이터가 정규분포(종 모양 곡선)를 따르는지 확인하는 통계적 절차입니다. scipy.stats는 여러 정규성 검정 함수를 제공합니다. Shapiro-Wilk는 소표본에 강력하고, D'Agostino-Pearson은 왜도와 첨도를 기반으로 합니다. 실제 비즈니스 데이터는 정규분포를 따르지 않는 경우가 많으므로, 검정과 변환 기법을 모두 익혀야 합니다."
+  - type: code
+    language: python
+    title: 패키지 설치 및 데이터 생성
+    content: |-
+      import micropip
+      await micropip.install('scipy')
+
+      import numpy as np
+      from scipy import stats
+      import matplotlib.pyplot as plt
+      import pandas as pd
+
+      np.random.seed(42)
+      normalData = np.random.normal(loc=50, scale=10, size=100)
+      purchaseData = np.random.lognormal(mean=4, sigma=1, size=150)
+  - type: tip
+    content: "normalData는 정규분포에서 생성, purchaseData는 로그정규분포에서 생성했습니다. 로그정규분포는 금액, 소득, 도시 인구 등 오른쪽으로 치우친 데이터에서 흔히 나타납니다."
+
+- id: explore
+  title: 데이터 탐색
+  subtitle: 분포 시각화
+  blocks:
+  - type: text
+    content: "정규성 검정 전에 히스토그램과 기술통계량으로 분포 형태를 파악합니다. 정규분포는 종 모양으로 대칭이고, 평균 주위에 데이터가 집중됩니다. 비정규분포는 한쪽으로 치우치거나 여러 개의 봉우리가 있을 수 있습니다. 시각적 탐색은 검정 결과를 해석하는 데 도움이 됩니다."
+  - type: code
+    language: python
+    title: 분포 비교 시각화
+    content: |-
+      figExplore, (axExplore1, axExplore2) = plt.subplots(1, 2, figsize=(14, 5))
+
+      axExplore1.hist(normalData, bins=20, color='steelblue', edgecolor='white', alpha=0.7)
+      axExplore1.set_xlabel('Value')
+      axExplore1.set_ylabel('Frequency')
+      axExplore1.set_title(f'Normal Data (n={len(normalData)})')
+      axExplore1.grid(True, alpha=0.3)
+
+      axExplore2.hist(purchaseData, bins=30, color='coral', edgecolor='white', alpha=0.7)
+      axExplore2.set_xlabel('Purchase Amount ($)')
+      axExplore2.set_ylabel('Frequency')
+      axExplore2.set_title(f'Purchase Data (n={len(purchaseData)})')
+      axExplore2.grid(True, alpha=0.3)
+      figExplore
+  - type: code
+    language: python
+    title: 기술통계량 비교
+    content: |-
+      descDf = pd.DataFrame({
+          'Statistic': ['Mean', 'Median', 'Std', 'Skewness', 'Kurtosis'],
+          'Normal Data': [normalData.mean(), np.median(normalData), normalData.std(), stats.skew(normalData), stats.kurtosis(normalData)],
+          'Purchase Data': [purchaseData.mean(), np.median(purchaseData), purchaseData.std(), stats.skew(purchaseData), stats.kurtosis(purchaseData)]
+      })
+      descDf
+  - type: tip
+    content: "정규분포는 평균 ≈ 중앙값, 왜도 ≈ 0, 첨도 ≈ 0입니다. 구매액 데이터는 평균 > 중앙값이고 왜도가 양수로, 오른쪽으로 치우쳐 있습니다."
+
+- id: shapiro
+  title: Shapiro-Wilk 검정
+  subtitle: stats.shapiro
+  blocks:
+  - type: text
+    content: "Shapiro-Wilk 검정은 가장 강력한 정규성 검정 중 하나입니다. 5000개 이하의 샘플에 적합하며, W 통계량과 p-value를 반환합니다. 귀무가설은 '데이터가 정규분포를 따른다'입니다. p-value가 0.05보다 크면 귀무가설을 기각하지 않으므로 정규분포를 따른다고 판단합니다."
+  - type: code
+    language: python
+    title: Shapiro-Wilk 검정 실행
+    content: |-
+      statNormal, pNormal = stats.shapiro(normalData)
+      statPurchase, pPurchase = stats.shapiro(purchaseData[:50])
+
+      shapiroDf = pd.DataFrame({
+          'Data': ['Normal Data', 'Purchase Data'],
+          'W-statistic': [statNormal, statPurchase],
+          'p-value': [pNormal, pPurchase],
+          'Is Normal (p>0.05)': [pNormal > 0.05, pPurchase > 0.05]
+      })
+      shapiroDf
+  - type: tip
+    content: "W 통계량은 0~1 사이 값으로, 1에 가까울수록 정규분포에 가깝습니다. p > 0.05면 '정규분포를 따르지 않는다'는 증거가 불충분하므로 정규분포로 간주합니다."
+
+- id: qqplot
+  title: QQ 플롯 분석
+  subtitle: 시각적 정규성 확인
+  blocks:
+  - type: text
+    content: "QQ 플롯(Quantile-Quantile Plot)은 데이터의 분위수와 이론적 정규분포의 분위수를 비교합니다. 점들이 대각선에 가까우면 정규분포입니다. S자 형태는 꼬리가 두껍거나 얇음을 의미하고, 위로 휘면 오른쪽 꼬리가 깁니다. 대규모 데이터에서는 통계 검정보다 QQ 플롯이 더 실용적입니다."
+  - type: code
+    language: python
+    title: QQ 플롯 함수 정의
+    content: |-
+      def qqPlot(data, ax, title):
+          sortedData = np.sort(data)
+          n = len(data)
+          theoreticalQ = stats.norm.ppf(np.linspace(0.01, 0.99, n))
+
+          ax.scatter(theoreticalQ, sortedData, alpha=0.7, s=30)
+
+          slope = data.std()
+          intercept = data.mean()
+          ax.plot(theoreticalQ, slope * theoreticalQ + intercept, 'r--', linewidth=2)
+
+          ax.set_xlabel('Theoretical Quantiles')
+          ax.set_ylabel('Sample Quantiles')
+          ax.set_title(title)
+          ax.grid(True, alpha=0.3)
+  - type: code
+    language: python
+    title: QQ 플롯 비교
+    content: |-
+      figQQ, (axQQ1, axQQ2) = plt.subplots(1, 2, figsize=(14, 5))
+
+      qqPlot(normalData, axQQ1, 'QQ Plot: Normal Data')
+      qqPlot(purchaseData, axQQ2, 'QQ Plot: Purchase Data')
+      figQQ
+  - type: tip
+    content: "Normal Data의 점들은 대각선에 가깝게 분포합니다. Purchase Data는 오른쪽 끝에서 위로 휘어 있어 오른쪽 꼬리가 긴 분포(양의 왜도)임을 보여줍니다."
+
+- id: transform
+  title: 정규성 달성을 위한 변환
+  subtitle: 로그 변환
+  blocks:
+  - type: text
+    content: "오른쪽으로 치우친 데이터는 로그 변환으로 정규분포에 가깝게 만들 수 있습니다. 금액, 소득, 인구 등 양수이면서 범위가 넓은 데이터에 효과적입니다. 변환 후 통계 분석을 수행하고, 결과 해석 시 원래 스케일로 역변환합니다."
+  - type: code
+    language: python
+    title: 로그 변환 적용
+    content: |-
+      logPurchase = np.log(purchaseData)
+
+      figTransform, axes = plt.subplots(2, 2, figsize=(12, 8))
+
+      axes[0, 0].hist(purchaseData, bins=30, color='coral', edgecolor='white', alpha=0.7)
+      axes[0, 0].set_title('Original Purchase Data')
+
+      axes[0, 1].hist(logPurchase, bins=25, color='steelblue', edgecolor='white', alpha=0.7)
+      axes[0, 1].set_title('Log-Transformed Data')
+
+      qqPlot(purchaseData, axes[1, 0], 'QQ: Original')
+      qqPlot(logPurchase, axes[1, 1], 'QQ: Log-Transformed')
+
+      plt.tight_layout()
+      figTransform
+  - type: code
+    language: python
+    title: 변환 후 정규성 검정
+    content: |-
+      statLog, pLog = stats.shapiro(logPurchase[:50])
+
+      transformDf = pd.DataFrame({
+          'Data': ['Original', 'Log-Transformed'],
+          'Skewness': [stats.skew(purchaseData), stats.skew(logPurchase)],
+          'Shapiro p-value': [pPurchase, pLog],
+          'Is Normal': [pPurchase > 0.05, pLog > 0.05]
+      })
+      transformDf
+  - type: tip
+    content: "로그 변환 후 왜도가 0에 가까워지고, Shapiro 검정 p-value가 크게 증가했습니다. 이제 t-검정, 회귀분석 등 정규성을 가정하는 분석을 적용할 수 있습니다."
+
+- id: boxcox
+  title: Box-Cox 변환
+  subtitle: 최적 변환 자동 탐색
+  blocks:
+  - type: text
+    content: "Box-Cox 변환은 데이터를 정규분포에 가장 가깝게 만드는 최적의 λ(람다) 값을 자동으로 찾습니다. λ=0이면 로그 변환, λ=1이면 변환 없음, λ=0.5면 제곱근 변환과 동일합니다. 양수 데이터에만 적용 가능합니다."
+  - type: code
+    language: python
+    title: Box-Cox 변환 실행
+    content: |-
+      boxcoxData, lambdaOpt = stats.boxcox(purchaseData)
+
+      figBoxcox, (axBox1, axBox2) = plt.subplots(1, 2, figsize=(12, 5))
+
+      axBox1.hist(boxcoxData, bins=25, color='seagreen', edgecolor='white', alpha=0.7)
+      axBox1.set_title(f'Box-Cox Transformed (λ = {lambdaOpt:.4f})')
+
+      qqPlot(boxcoxData, axBox2, 'QQ: Box-Cox Transformed')
+      figBoxcox
+  - type: code
+    language: python
+    title: 변환 방법 비교
+    content: |-
+      statBox, pBox = stats.shapiro(boxcoxData[:50])
+
+      compareDf = pd.DataFrame({
+          'Transformation': ['None', 'Log', 'Box-Cox'],
+          'Lambda': ['-', '0 (log)', f'{lambdaOpt:.4f}'],
+          'Skewness': [stats.skew(purchaseData), stats.skew(logPurchase), stats.skew(boxcoxData)],
+          'p-value': [pPurchase, pLog, pBox]
+      })
+      compareDf
+  - type: tip
+    content: "Box-Cox가 최적 λ를 자동으로 찾아주므로 로그 변환보다 정규성이 더 좋아질 수 있습니다. 단, 해석의 직관성은 로그 변환이 더 좋습니다."
+
+- id: result
+  title: 정규성 검정 종합 보고서
+  subtitle: 분석 방법 선택 가이드
+  blocks:
+  - type: text
+    content: "정규성 검정 결과를 종합하여 적절한 분석 방법을 선택합니다. 정규분포를 따르면 모수적 검정(t-test, ANOVA)을, 따르지 않으면 비모수적 검정(Mann-Whitney, Kruskal-Wallis)이나 변환 후 분석을 사용합니다. 표본 크기가 30 이상이면 중심극한정리에 의해 평균의 분포는 정규분포에 가까워집니다."
+  - type: code
+    language: python
+    title: 종합 검정 결과
+    content: |-
+      dagK, dagP = stats.normaltest(normalData)
+      dagKp, dagPp = stats.normaltest(purchaseData)
+
+      normalStd = (normalData - normalData.mean()) / normalData.std()
+      purchaseStd = (purchaseData - purchaseData.mean()) / purchaseData.std()
+      ksN, ksPn = stats.kstest(normalStd, 'norm')
+      ksP, ksPp = stats.kstest(purchaseStd, 'norm')
+
+      resultDf = pd.DataFrame({
+          'Test': ['Shapiro-Wilk', "D'Agostino", 'Kolmogorov-Smirnov'],
+          'Normal Data p': [pNormal, dagP, ksPn],
+          'Purchase Data p': [pPurchase, dagPp, ksPp],
+          'Normal Verdict': ['Normal' if pNormal > 0.05 else 'Non-normal', 'Normal' if dagP > 0.05 else 'Non-normal', 'Normal' if ksPn > 0.05 else 'Non-normal'],
+          'Purchase Verdict': ['Normal' if pPurchase > 0.05 else 'Non-normal', 'Normal' if dagPp > 0.05 else 'Non-normal', 'Normal' if ksPp > 0.05 else 'Non-normal']
+      })
+      resultDf
+  - type: code
+    language: python
+    title: 분석 방법 권장
+    content: |-
+      guideDf = pd.DataFrame({
+          'Situation': ['Data is normal', 'Non-normal, n > 30', 'Non-normal, n ≤ 30', 'Transformable to normal'],
+          'Recommended Analysis': ['Parametric (t-test, ANOVA, linear regression)', 'Parametric OK (CLT applies for means)', 'Non-parametric (Mann-Whitney, Kruskal-Wallis)', 'Transform (log, Box-Cox) then parametric']
+      })
+      guideDf
+
+- id: practice
+  title: 실습
+  subtitle: 정규성 검정 프로젝트
+  blocks:
+  - type: text
+    content: "지금까지 배운 Shapiro-Wilk 검정, QQ 플롯, 로그/Box-Cox 변환을 활용하여 실제 데이터의 정규성을 평가합니다. 미션1은 직원 급여 데이터 분석, 미션2는 종합 정규성 리포트 작성입니다."
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 직원 급여 분포 분석"
+    blocks:
+    - type: code
+      title: 데이터 생성
+      content: |-
+        import numpy as np
+        from scipy import stats
+        import matplotlib.pyplot as plt
+        import pandas as pd
+
+        np.random.seed(456)
+        salaries = np.random.lognormal(mean=11, sigma=0.5, size=150)
+    - type: code
+      title: 정규성 검정 및 변환
+      content: |-
+        statSal, pSal = stats.shapiro(salaries[:50])
+
+        logSalary = np.log(salaries)
+        statLogSal, pLogSal = stats.shapiro(logSalary[:50])
+
+        salaryDf = pd.DataFrame({
+            'Data': ['Original Salary', 'Log(Salary)'],
+            'Mean': [salaries.mean(), logSalary.mean()],
+            'Skewness': [stats.skew(salaries), stats.skew(logSalary)],
+            'Shapiro p': [pSal, pLogSal],
+            'Normal': [pSal > 0.05, pLogSal > 0.05]
+        })
+        salaryDf
+    - type: code
+      title: 시각화
+      content: |-
+        figSal, axes = plt.subplots(2, 2, figsize=(12, 8))
+
+        axes[0, 0].hist(salaries, bins=25, color='steelblue', edgecolor='white', alpha=0.7)
+        axes[0, 0].set_title('Salary Distribution')
+        axes[0, 0].set_xlabel('Salary ($)')
+
+        axes[0, 1].hist(logSalary, bins=25, color='seagreen', edgecolor='white', alpha=0.7)
+        axes[0, 1].set_title('Log(Salary) Distribution')
+
+        sortedSal = np.sort(salaries)
+        theorQ = stats.norm.ppf(np.linspace(0.01, 0.99, len(salaries)))
+        axes[1, 0].scatter(theorQ, sortedSal, alpha=0.6, s=20)
+        axes[1, 0].set_title('QQ: Original')
+        axes[1, 0].grid(True, alpha=0.3)
+
+        sortedLog = np.sort(logSalary)
+        axes[1, 1].scatter(theorQ, sortedLog, alpha=0.6, s=20)
+        axes[1, 1].set_title('QQ: Log-Transformed')
+        axes[1, 1].grid(True, alpha=0.3)
+
+        plt.tight_layout()
+        figSal
+  - type: expansion
+    title: "미션2: 종합 정규성 리포트"
+    blocks:
+    - type: code
+      title: 테스트 데이터
+      content: |-
+        import numpy as np
+        from scipy import stats
+        import pandas as pd
+
+        np.random.seed(789)
+        testData = np.random.normal(100, 15, 80) + np.random.uniform(-2, 2, 80)
+    - type: code
+      title: 다중 검정
+      content: |-
+        shapW, shapP = stats.shapiro(testData)
+        dagK, dagP = stats.normaltest(testData)
+
+        stdData = (testData - testData.mean()) / testData.std()
+        ksD, ksP = stats.kstest(stdData, 'norm')
+
+        skewVal = stats.skew(testData)
+        kurtVal = stats.kurtosis(testData)
+    - type: code
+      title: 종합 리포트
+      content: |-
+        reportDf = pd.DataFrame({
+            'Test': ['Shapiro-Wilk', "D'Agostino-Pearson", 'Kolmogorov-Smirnov', 'Skewness', 'Kurtosis'],
+            'Statistic': [shapW, dagK, ksD, skewVal, kurtVal],
+            'p-value': [f'{shapP:.4f}', f'{dagP:.4f}', f'{ksP:.4f}', '-', '-'],
+            'Interpretation': [
+                'Normal' if shapP > 0.05 else 'Non-normal',
+                'Normal' if dagP > 0.05 else 'Non-normal',
+                'Normal' if ksP > 0.05 else 'Non-normal',
+                'Symmetric' if abs(skewVal) < 0.5 else 'Skewed',
+                'Normal-like' if abs(kurtVal) < 1 else 'Heavy/Light tails'
+            ]
+        })
+        reportDf

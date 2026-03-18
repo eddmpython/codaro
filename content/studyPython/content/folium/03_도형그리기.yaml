@@ -1,0 +1,576 @@
+meta:
+  id: folium_03
+  title: 도형 그리기
+  order: 3
+  category: folium
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["folium", "Circle", "Rectangle", "PolyLine", "Polygon", "도형"]
+  seo:
+    title: "Folium 도형 그리기 - 원, 사각형, 경로 표시"
+    description: "Folium으로 원, 사각형, 폴리라인, 폴리곤을 그립니다. 영역과 경로를 지도에 표시합니다."
+    keywords: ["folium", "Circle", "Rectangle", "PolyLine", "Polygon", "지도", "도형"]
+
+intro:
+  emoji: "🔷"
+  goal: 지도에 원, 사각형, 경로, 다각형을 그립니다.
+  description: Folium으로 다양한 도형을 지도에 그립니다. Circle()과 CircleMarker()로 원을 그리고, Rectangle()로 사각형 영역을 표시합니다. PolyLine()으로 경로를, Polygon()으로 다각형 영역을 표현합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: folium과 marimo를 불러옵니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: folium과 marimo 불러오기
+    content: |-
+      import folium
+      import marimo as mo
+
+- id: step2_circle
+  title: 2단계. Circle 그리기
+  subtitle: Circle()
+  blocks:
+  - type: text
+    content: Circle()은 실제 거리(미터) 기준으로 원을 그립니다. radius는 미터 단위입니다.
+  - type: code
+    language: python
+    title: 기본 원 그리기
+    description: 반경 500m 원
+    content: |-
+      seoulCenter = [37.5665, 126.9780]
+      m1 = folium.Map(location=seoulCenter, zoom_start=14)
+
+      folium.Circle(
+          location=seoulCenter,
+          radius=500,
+          color="blue",
+          fill=True,
+          fill_opacity=0.3
+      ).add_to(m1)
+
+      mo.iframe(m1._repr_html_())
+  - type: tip
+    content: Circle의 radius는 미터 단위입니다. 500이면 반경 500m입니다. 줌 레벨을 바꿔도 실제 크기는 동일합니다.
+
+- id: step3_circle_marker
+  title: 3단계. CircleMarker 그리기
+  subtitle: CircleMarker()
+  blocks:
+  - type: text
+    content: CircleMarker()는 픽셀 기준으로 원을 그립니다. 줌 레벨이 바뀌어도 화면상 크기가 동일합니다.
+  - type: code
+    language: python
+    title: CircleMarker
+    description: 픽셀 기준 원
+    content: |-
+      m2 = folium.Map(location=seoulCenter, zoom_start=14)
+
+      folium.CircleMarker(
+          location=seoulCenter,
+          radius=30,
+          color="red",
+          fill=True,
+          fill_color="red",
+          fill_opacity=0.5,
+          popup="시청"
+      ).add_to(m2)
+
+      mo.iframe(m2._repr_html_())
+  - type: code
+    language: python
+    title: Circle vs CircleMarker
+    description: 두 원 비교
+    content: |-
+      m3 = folium.Map(location=seoulCenter, zoom_start=14)
+
+      folium.Circle(
+          location=[37.5665, 126.9750],
+          radius=300,
+          color="blue",
+          fill=True,
+          popup="Circle (300m)"
+      ).add_to(m3)
+
+      folium.CircleMarker(
+          location=[37.5665, 126.9810],
+          radius=30,
+          color="red",
+          fill=True,
+          popup="CircleMarker (30px)"
+      ).add_to(m3)
+
+      mo.iframe(m3._repr_html_())
+  - type: tip
+    content: Circle은 실제 영역 표시(반경 1km 배달 범위)에, CircleMarker는 데이터 포인트 크기 표시(인구수 비례)에 적합합니다.
+
+- id: step4_circle_style
+  title: 4단계. 원 스타일링
+  subtitle: color, fill, weight
+  blocks:
+  - type: text
+    content: 원의 외곽선과 채우기 색상, 투명도, 두께를 설정합니다.
+  - type: code
+    language: python
+    title: 스타일 옵션
+    description: 다양한 스타일
+    content: |-
+      m4 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      folium.Circle(
+          location=[37.5665, 126.9700],
+          radius=400,
+          color="green",
+          weight=2,
+          fill=True,
+          fill_color="lightgreen",
+          fill_opacity=0.4,
+          popup="녹지 영역"
+      ).add_to(m4)
+
+      folium.Circle(
+          location=[37.5665, 126.9860],
+          radius=300,
+          color="red",
+          weight=5,
+          fill=False,
+          popup="경계만 표시"
+      ).add_to(m4)
+
+      mo.iframe(m4._repr_html_())
+  - type: tip
+    content: weight는 외곽선 두께(픽셀)입니다. fill=False면 테두리만 그립니다.
+
+- id: step5_rectangle
+  title: 5단계. Rectangle 그리기
+  subtitle: Rectangle()
+  blocks:
+  - type: text
+    content: Rectangle()은 두 모서리 좌표로 사각형을 그립니다. bounds에 [[남서], [북동]] 좌표를 전달합니다.
+  - type: code
+    language: python
+    title: 사각형 영역
+    description: 광화문 광장 영역
+    content: |-
+      m5 = folium.Map(location=[37.5725, 126.9768], zoom_start=16)
+
+      bounds = [[37.5700, 126.9755], [37.5750, 126.9785]]
+
+      folium.Rectangle(
+          bounds=bounds,
+          color="purple",
+          weight=3,
+          fill=True,
+          fill_color="purple",
+          fill_opacity=0.2,
+          popup="광화문 광장"
+      ).add_to(m5)
+
+      mo.iframe(m5._repr_html_())
+  - type: code
+    language: python
+    title: 여러 사각형
+    description: 구역 표시
+    content: |-
+      m6 = folium.Map(location=seoulCenter, zoom_start=14)
+
+      zones = [
+          {"name": "A구역", "bounds": [[37.5630, 126.9730], [37.5680, 126.9780]], "color": "blue"},
+          {"name": "B구역", "bounds": [[37.5630, 126.9780], [37.5680, 126.9830]], "color": "green"},
+          {"name": "C구역", "bounds": [[37.5680, 126.9730], [37.5730, 126.9780]], "color": "red"}
+      ]
+
+      for zone in zones:
+          folium.Rectangle(
+              bounds=zone["bounds"],
+              color=zone["color"],
+              fill=True,
+              fill_opacity=0.3,
+              popup=zone["name"]
+          ).add_to(m6)
+
+      mo.iframe(m6._repr_html_())
+  - type: tip
+    content: bounds는 [[남서쪽 위도, 경도], [북동쪽 위도, 경도]] 순서입니다. 좌하단과 우상단 좌표입니다.
+
+- id: step6_polyline
+  title: 6단계. PolyLine 그리기
+  subtitle: PolyLine()
+  blocks:
+  - type: text
+    content: PolyLine()은 좌표 리스트를 연결한 선을 그립니다. 경로, 도로, 노선 표시에 사용합니다.
+  - type: code
+    language: python
+    title: 경로 그리기
+    description: 산책로 표시
+    content: |-
+      m7 = folium.Map(location=[37.5283, 126.9340], zoom_start=14)
+
+      walkRoute = [
+          [37.5283, 126.9240],
+          [37.5300, 126.9300],
+          [37.5320, 126.9350],
+          [37.5310, 126.9400],
+          [37.5280, 126.9440]
+      ]
+
+      folium.PolyLine(
+          locations=walkRoute,
+          color="blue",
+          weight=4,
+          opacity=0.8,
+          popup="한강 산책로"
+      ).add_to(m7)
+
+      mo.iframe(m7._repr_html_())
+  - type: code
+    language: python
+    title: 시작/끝 마커 추가
+    description: 경로와 마커 조합
+    content: |-
+      m8 = folium.Map(location=[37.5283, 126.9340], zoom_start=14)
+
+      route = [
+          [37.5283, 126.9240],
+          [37.5300, 126.9300],
+          [37.5320, 126.9350],
+          [37.5310, 126.9400],
+          [37.5280, 126.9440]
+      ]
+
+      folium.PolyLine(
+          locations=route,
+          color="green",
+          weight=5
+      ).add_to(m8)
+
+      folium.Marker(
+          location=route[0],
+          popup="출발",
+          icon=folium.Icon(color="green", icon="play")
+      ).add_to(m8)
+
+      folium.Marker(
+          location=route[-1],
+          popup="도착",
+          icon=folium.Icon(color="red", icon="stop")
+      ).add_to(m8)
+
+      mo.iframe(m8._repr_html_())
+  - type: tip
+    content: locations는 [위도, 경도] 좌표의 리스트입니다. 순서대로 선이 연결됩니다.
+
+- id: step7_polyline_style
+  title: 7단계. PolyLine 스타일
+  subtitle: dash_array, weight
+  blocks:
+  - type: text
+    content: 선의 스타일을 다양하게 변경합니다. dash_array로 점선을 만들 수 있습니다.
+  - type: code
+    language: python
+    title: 점선 경로
+    description: 다양한 선 스타일
+    content: |-
+      m9 = folium.Map(location=seoulCenter, zoom_start=13)
+
+      route1 = [[37.5665, 126.9680], [37.5700, 126.9780], [37.5665, 126.9880]]
+      route2 = [[37.5600, 126.9680], [37.5635, 126.9780], [37.5600, 126.9880]]
+      route3 = [[37.5535, 126.9680], [37.5570, 126.9780], [37.5535, 126.9880]]
+
+      folium.PolyLine(
+          locations=route1,
+          color="blue",
+          weight=4,
+          popup="실선"
+      ).add_to(m9)
+
+      folium.PolyLine(
+          locations=route2,
+          color="red",
+          weight=4,
+          dash_array="10",
+          popup="점선"
+      ).add_to(m9)
+
+      folium.PolyLine(
+          locations=route3,
+          color="green",
+          weight=4,
+          dash_array="10, 20",
+          popup="긴 점선"
+      ).add_to(m9)
+
+      mo.iframe(m9._repr_html_())
+  - type: tip
+    content: dash_array="10"은 10픽셀 선, 10픽셀 공백입니다. "10, 20"은 10픽셀 선, 20픽셀 공백입니다.
+
+- id: step8_polygon
+  title: 8단계. Polygon 그리기
+  subtitle: Polygon()
+  blocks:
+  - type: text
+    content: Polygon()은 좌표 리스트로 닫힌 다각형을 그립니다. 시작점과 끝점이 자동으로 연결됩니다.
+  - type: code
+    language: python
+    title: 삼각형 영역
+    description: 기본 폴리곤
+    content: |-
+      m10 = folium.Map(location=seoulCenter, zoom_start=14)
+
+      triangle = [
+          [37.5700, 126.9780],
+          [37.5630, 126.9700],
+          [37.5630, 126.9860]
+      ]
+
+      folium.Polygon(
+          locations=triangle,
+          color="orange",
+          weight=3,
+          fill=True,
+          fill_color="orange",
+          fill_opacity=0.4,
+          popup="삼각 구역"
+      ).add_to(m10)
+
+      mo.iframe(m10._repr_html_())
+  - type: code
+    language: python
+    title: 복잡한 다각형
+    description: 오각형 영역
+    content: |-
+      m11 = folium.Map(location=seoulCenter, zoom_start=14)
+
+      pentagon = [
+          [37.5730, 126.9780],
+          [37.5690, 126.9850],
+          [37.5630, 126.9820],
+          [37.5630, 126.9740],
+          [37.5690, 126.9710]
+      ]
+
+      folium.Polygon(
+          locations=pentagon,
+          color="purple",
+          weight=2,
+          fill=True,
+          fill_color="purple",
+          fill_opacity=0.3,
+          popup="특별 구역"
+      ).add_to(m11)
+
+      mo.iframe(m11._repr_html_())
+  - type: tip
+    content: Polygon은 자동으로 첫 점과 마지막 점을 연결합니다. PolyLine처럼 열린 선이 아닙니다.
+
+- id: step9_multiple_shapes
+  title: 9단계. 여러 도형 조합
+  subtitle: 도형 혼합 사용
+  blocks:
+  - type: text
+    content: 원, 사각형, 선, 다각형을 조합하여 복잡한 지도를 만듭니다.
+  - type: code
+    language: python
+    title: 배달 범위 지도
+    description: 도형 조합 예제
+    content: |-
+      storeLocation = [37.5665, 126.9780]
+      m12 = folium.Map(location=storeLocation, zoom_start=14)
+
+      folium.Marker(
+          location=storeLocation,
+          popup="매장",
+          icon=folium.Icon(color="red", icon="home")
+      ).add_to(m12)
+
+      folium.Circle(
+          location=storeLocation,
+          radius=1000,
+          color="green",
+          fill=True,
+          fill_opacity=0.1,
+          popup="1km 배달 가능"
+      ).add_to(m12)
+
+      folium.Circle(
+          location=storeLocation,
+          radius=2000,
+          color="orange",
+          fill=True,
+          fill_opacity=0.1,
+          popup="2km 배달 가능 (추가요금)"
+      ).add_to(m12)
+
+      folium.Circle(
+          location=storeLocation,
+          radius=3000,
+          color="red",
+          fill=False,
+          popup="3km 배달 불가"
+      ).add_to(m12)
+
+      mo.iframe(m12._repr_html_())
+  - type: tip
+    content: 여러 도형을 겹쳐 그릴 때 투명도를 적절히 조절하세요. fill_opacity가 너무 높으면 겹친 부분이 안 보입니다.
+
+- id: step10_complete
+  title: 10단계. 완성 예제
+  subtitle: 조깅 코스 지도
+  blocks:
+  - type: text
+    content: 조깅 코스를 경로와 구간별 정보로 표시하는 지도를 만듭니다.
+  - type: code
+    language: python
+    title: 조깅 코스 지도
+    description: 종합 예제
+    content: |-
+      startPoint = [37.5283, 126.9200]
+      jogMap = folium.Map(location=[37.5300, 126.9350], zoom_start=14)
+
+      jogRoute = [
+          [37.5283, 126.9200],
+          [37.5300, 126.9280],
+          [37.5320, 126.9360],
+          [37.5310, 126.9440],
+          [37.5280, 126.9500]
+      ]
+
+      folium.PolyLine(
+          locations=jogRoute,
+          color="blue",
+          weight=5,
+          opacity=0.8
+      ).add_to(jogMap)
+
+      folium.Marker(
+          location=jogRoute[0],
+          popup="<b>출발점</b><br>준비운동",
+          icon=folium.Icon(color="green", icon="play")
+      ).add_to(jogMap)
+
+      folium.Marker(
+          location=jogRoute[-1],
+          popup="<b>도착점</b><br>스트레칭",
+          icon=folium.Icon(color="red", icon="stop")
+      ).add_to(jogMap)
+
+      folium.CircleMarker(
+          location=jogRoute[2],
+          radius=10,
+          color="orange",
+          fill=True,
+          popup="중간 지점 (1.5km)"
+      ).add_to(jogMap)
+
+      restArea = [
+          [37.5305, 126.9350],
+          [37.5335, 126.9350],
+          [37.5335, 126.9380],
+          [37.5305, 126.9380]
+      ]
+
+      folium.Polygon(
+          locations=restArea,
+          color="green",
+          fill=True,
+          fill_opacity=0.3,
+          popup="휴식 공간"
+      ).add_to(jogMap)
+
+      mo.iframe(jogMap._repr_html_())
+
+- id: practice
+  title: 실습
+  subtitle: 도형 그리기
+  blocks:
+  - type: text
+    content: 지금까지 배운 내용을 활용하여 미션을 수행해봅시다.
+  - type: expansion
+    title: "미션1: 공원 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        parkCenter = [37.5512, 126.9882]
+        parkBoundary = [
+            [37.5480, 126.9850],
+            [37.5540, 126.9850],
+            [37.5540, 126.9920],
+            [37.5480, 126.9920]
+        ]
+        facilities = [
+            {"name": "화장실", "loc": [37.5500, 126.9870]},
+            {"name": "매점", "loc": [37.5520, 126.9900]},
+            {"name": "놀이터", "loc": [37.5510, 126.9880]}
+        ]
+        facilities
+    - type: code
+      title: 지도 생성
+      content: |-
+        parkMap = folium.Map(location=parkCenter, zoom_start=16)
+
+        folium.Polygon(
+            locations=parkBoundary,
+            color="green",
+            fill=True,
+            fill_color="lightgreen",
+            fill_opacity=0.3,
+            popup="공원 경계"
+        ).add_to(parkMap)
+
+        for fac in facilities:
+            folium.CircleMarker(
+                location=fac["loc"],
+                radius=8,
+                color="blue",
+                fill=True,
+                popup=fac["name"]
+            ).add_to(parkMap)
+
+        mo.iframe(parkMap._repr_html_())
+  - type: expansion
+    title: "미션2: 배달 구역 지도"
+    blocks:
+    - type: code
+      title: 데이터 준비
+      content: |-
+        import folium
+        import marimo as mo
+
+        stores = [
+            {"name": "치킨집", "loc": [37.5665, 126.9780], "radius": 2000},
+            {"name": "피자집", "loc": [37.5500, 126.9900], "radius": 1500},
+            {"name": "중국집", "loc": [37.5750, 126.9700], "radius": 2500}
+        ]
+        stores
+    - type: code
+      title: 지도 생성
+      content: |-
+        deliveryMap = folium.Map(location=[37.5620, 126.9780], zoom_start=13)
+
+        colors = ["red", "blue", "green"]
+
+        for i, store in enumerate(stores):
+            folium.Marker(
+                location=store["loc"],
+                popup=store["name"],
+                icon=folium.Icon(color=colors[i])
+            ).add_to(deliveryMap)
+
+            folium.Circle(
+                location=store["loc"],
+                radius=store["radius"],
+                color=colors[i],
+                fill=True,
+                fill_opacity=0.1,
+                popup=f"{store['name']} 배달 범위"
+            ).add_to(deliveryMap)
+
+        mo.iframe(deliveryMap._repr_html_())

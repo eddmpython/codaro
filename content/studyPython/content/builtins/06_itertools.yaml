@@ -1,0 +1,451 @@
+meta:
+  id: "06_itertools"
+  title: "itertools - 이터레이터 도구"
+  category: "builtins"
+  tags: ["itertools", "iterator", "combinations", "permutations", "cycle"]
+  seo:
+    title: "파이썬 itertools 모듈 완전 정복"
+    description: "itertools 모듈의 무한 이터레이터, 조합, 순열, 그룹화 등을 배웁니다."
+    keywords: ["itertools", "이터레이터", "조합", "순열", "permutations", "combinations"]
+
+intro:
+  emoji: "🔄"
+  points:
+  - "무한 이터레이터 생성"
+  - "조합과 순열 계산"
+  - "이터레이터 체이닝과 병합"
+  - "그룹화와 필터링"
+
+sections:
+- id: "module_import"
+  title: "itertools 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "itertools은 파이썬 표준 라이브러리입니다. 효율적인 반복과 조합을 위한 이터레이터 도구를 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 itertools 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "itertools 모듈 불러오기"
+    description: "itertools 모듈을 불러옵니다."
+    content: |-
+      from itertools import count, cycle, repeat, islice, combinations, permutations, product, chain, zip_longest, tee, filterfalse, takewhile, dropwhile, groupby, accumulate, combinations_with_replacement
+
+      # 모듈 로드 확인
+      'itertools 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "infinite_iterators"
+  title: "무한 이터레이터"
+  subtitle: "count, cycle, repeat"
+  blocks:
+  - type: "text"
+    content: "itertools는 메모리 효율적인 이터레이터를 제공합니다. count()는 무한 카운터, cycle()은 순환 반복, repeat()는 값 반복을 생성합니다. 무한 시퀀스를 다룰 때는 반드시 종료 조건이나 제한이 필요합니다."
+  - type: "list"
+    items:
+    - "count(시작, 간격): 무한 숫자 생성"
+    - "cycle(반복가능): 순환 반복"
+    - "repeat(값, 횟수): 값 반복"
+    - "islice()로 제한 가능"
+  - type: "code"
+    language: "python"
+    title: "count 이터레이터"
+    description: "0부터 시작하는 무한 카운터를 생성합니다."
+    content: |-
+      counter = count(0)
+      first5 = list(islice(counter, 5))
+      first5
+  - type: "code"
+    language: "python"
+    title: "cycle 이터레이터"
+    description: "리스트를 무한히 순환합니다."
+    content: |-
+      colors = cycle(['red', 'green', 'blue'])
+      first6 = list(islice(colors, 6))
+      first6
+  - type: "code"
+    language: "python"
+    title: "repeat 이터레이터"
+    description: "같은 값을 3번 반복합니다."
+    content: |-
+      repeated = list(repeat('hello', 3))
+      repeated
+  - type: "tip"
+    content: "무한 이터레이터는 for 루프에서 break 없이 사용하면 무한 루프가 됩니다."
+
+- id: "combinatorics"
+  title: "조합과 순열"
+  subtitle: "combinations, permutations, product"
+  blocks:
+  - type: "text"
+    content: "조합론 함수로 모든 가능한 조합과 순열을 생성합니다. combinations()는 순서 무관 조합, permutations()는 순서 있는 순열, product()는 데카르트 곱을 반환합니다. 경우의 수 계산, 완전 탐색에 활용됩니다."
+  - type: "list"
+    items:
+    - "combinations(반복가능, r): 조합 (순서 무관)"
+    - "permutations(반복가능, r): 순열 (순서 중요)"
+    - "product(*반복가능들): 데카르트 곱"
+    - "combinations_with_replacement: 중복 조합"
+  - type: "code"
+    language: "python"
+    title: "조합 생성"
+    description: "3개 중 2개를 선택하는 모든 조합을 생성합니다."
+    content: |-
+      choices = ['A', 'B', 'C']
+      pairs = list(combinations(choices, 2))
+      pairs
+  - type: "code"
+    language: "python"
+    title: "순열 생성"
+    description: "3개 중 2개를 뽑아 순서있게 배열합니다."
+    content: |-
+      elements = ['X', 'Y', 'Z']
+      arrangements = list(permutations(elements, 2))
+      arrangements
+  - type: "code"
+    language: "python"
+    title: "데카르트 곱"
+    description: "두 리스트의 모든 쌍을 생성합니다."
+    content: |-
+      letters = ['A', 'B']
+      digits = [1, 2]
+      cartesian = list(product(letters, digits))
+      cartesian
+  - type: "tip"
+    content: "조합과 순열의 차이: combinations([1,2,3], 2)는 (1,2)만, permutations는 (1,2)와 (2,1) 모두 포함."
+
+- id: "chaining"
+  title: "이터레이터 연결"
+  subtitle: "chain, zip_longest, tee"
+  blocks:
+  - type: "text"
+    content: "여러 이터레이터를 연결하거나 복제할 수 있습니다. chain()은 여러 이터레이터를 순차 연결하고, zip_longest()는 길이가 다른 이터레이터를 짝짓습니다. tee()는 하나의 이터레이터를 여러 개로 복제합니다."
+  - type: "list"
+    items:
+    - "chain(*반복가능들): 순차 연결"
+    - "zip_longest(*반복가능들): 긴 쪽 기준 zip"
+    - "tee(반복가능, n): n개 복제"
+    - "chain.from_iterable(): 중첩 리스트 펼치기"
+  - type: "code"
+    language: "python"
+    title: "chain으로 연결"
+    description: "여러 리스트를 하나의 이터레이터로 연결합니다."
+    content: |-
+      list1 = [1, 2, 3]
+      list2 = [4, 5, 6]
+      combined = list(chain(list1, list2))
+      combined
+  - type: "code"
+    language: "python"
+    title: "zip_longest"
+    description: "길이가 다른 리스트를 짝지어 빈 칸은 None으로 채웁니다."
+    content: |-
+      short = [1, 2]
+      long = ['a', 'b', 'c', 'd']
+      zipped = list(zip_longest(short, long))
+      zipped
+  - type: "code"
+    language: "python"
+    title: "이터레이터 복제"
+    description: "하나의 이터레이터를 2개로 복제합니다."
+    content: |-
+      original = iter([1, 2, 3])
+      iter1, iter2 = tee(original, 2)
+      list(iter1), list(iter2)
+  - type: "tip"
+    content: "tee로 복제한 이터레이터는 독립적이므로 하나를 소진해도 다른 것에 영향을 주지 않습니다."
+
+- id: "filtering"
+  title: "필터링과 슬라이싱"
+  subtitle: "islice, filterfalse, takewhile, dropwhile"
+  blocks:
+  - type: "text"
+    content: "이터레이터를 조건에 따라 필터링하거나 슬라이싱할 수 있습니다. islice()는 인덱스 범위로 자르고, filterfalse()는 조건을 만족하지 않는 것만, takewhile()은 조건이 참인 동안만 가져옵니다."
+  - type: "list"
+    items:
+    - "islice(반복가능, 시작, 끝): 슬라이싱"
+    - "filterfalse(함수, 반복가능): 거짓인 것만"
+    - "takewhile(함수, 반복가능): 참인 동안"
+    - "dropwhile(함수, 반복가능): 참인 동안 버림"
+  - type: "code"
+    language: "python"
+    title: "islice로 슬라이싱"
+    description: "인덱스 2부터 5까지 추출합니다."
+    content: |-
+      numbers = range(10)
+      sliced = list(islice(numbers, 2, 6))
+      sliced
+  - type: "code"
+    language: "python"
+    title: "filterfalse"
+    description: "조건을 만족하지 않는 요소만 필터링합니다."
+    content: |-
+      items = [1, 2, 3, 4, 5]
+      oddOnly = list(filterfalse(lambda x: x % 2 == 0, items))
+      oddOnly
+  - type: "code"
+    language: "python"
+    title: "takewhile"
+    description: "5보다 작은 동안만 요소를 가져옵니다."
+    content: |-
+      sequence = [1, 3, 5, 7, 2, 4]
+      taken = list(takewhile(lambda x: x < 5, sequence))
+      taken
+  - type: "tip"
+    content: "takewhile과 filter의 차이: takewhile은 조건이 거짓이 되면 즉시 중단하지만 filter는 끝까지 검사합니다."
+
+- id: "grouping"
+  title: "그룹화와 누적"
+  subtitle: "groupby, accumulate"
+  blocks:
+  - type: "text"
+    content: "연속된 동일 요소를 그룹화하거나 누적값을 계산합니다. groupby()는 정렬된 데이터에서 연속된 같은 값을 묶고, accumulate()는 누적 합계나 누적 연산을 수행합니다. 데이터 집계, 통계 분석에 유용합니다."
+  - type: "list"
+    items:
+    - "groupby(반복가능, 키함수): 연속 그룹화"
+    - "accumulate(반복가능, 함수): 누적 연산"
+    - "groupby는 정렬 필요"
+    - "accumulate 기본값은 누적 합"
+  - type: "code"
+    language: "python"
+    title: "groupby 그룹화"
+    description: "연속된 같은 값을 그룹화합니다."
+    content: |-
+      data = [1, 1, 2, 2, 2, 3, 1]
+      grouped = [(k, len(list(g))) for k, g in groupby(data)]
+      grouped
+  - type: "code"
+    language: "python"
+    title: "키 함수로 그룹화"
+    description: "홀짝을 기준으로 그룹화합니다."
+    content: |-
+      nums = [1, 3, 2, 4, 5]
+      sortedNums = sorted(nums, key=lambda x: x % 2)
+      evenOdd = [(k, list(g)) for k, g in groupby(sortedNums, lambda x: x % 2)]
+      evenOdd
+  - type: "code"
+    language: "python"
+    title: "accumulate 누적"
+    description: "누적 합계를 계산합니다."
+    content: |-
+      values = [1, 2, 3, 4, 5]
+      cumSum = list(accumulate(values))
+      cumSum
+  - type: "tip"
+    content: "groupby는 반드시 정렬된 데이터에 사용해야 합니다. 정렬되지 않으면 같은 값이 여러 그룹으로 나뉩니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "itertools 실무 패턴"
+  blocks:
+  - type: "text"
+    content: "실무에서 자주 사용하는 itertools 활용 패턴을 살펴봅니다. 배치 처리, 윈도우 슬라이딩, 페이지네이션, 조합 탐색 등 다양한 문제를 itertools로 효율적으로 해결할 수 있습니다."
+  - type: "list"
+    items:
+    - "배치 처리 (chunk)"
+    - "슬라이딩 윈도우"
+    - "모든 경우의 수 탐색"
+    - "연속 데이터 집계"
+  - type: "code"
+    language: "python"
+    title: "배치 처리"
+    description: "데이터를 3개씩 묶어 처리합니다."
+    content: |-
+      def chunk(iterable, size):
+          iterator = iter(iterable)
+          while True:
+              batch = list(islice(iterator, size))
+              if not batch:
+                  break
+              yield batch
+
+      dataset = range(10)
+      batches = list(chunk(dataset, 3))
+      batches
+  - type: "code"
+    language: "python"
+    title: "슬라이딩 윈도우"
+    description: "크기 3의 윈도우를 슬라이딩합니다."
+    content: |-
+      def sliding(iterable, size):
+          iterators = [iter(iterable) for _ in range(size)]
+          for i, it in enumerate(iterators):
+              for _ in range(i):
+                  next(it, None)
+          return zip(*iterators)
+
+      stream = [1, 2, 3, 4, 5]
+      windows = list(sliding(stream, 3))
+      windows
+  - type: "code"
+    language: "python"
+    title: "모든 조합 탐색"
+    description: "비밀번호 가능한 모든 조합을 생성합니다."
+    content: |-
+      bits = '01'
+      allCombos = [''.join(combo) for combo in product(bits, repeat=3)]
+      allCombos
+  - type: "tip"
+    content: "itertools 함수들은 제너레이터를 반환하므로 메모리를 절약합니다. 필요한 만큼만 소비하세요."
+
+- id: "practice"
+  title: "itertools 모듈 종합 복습"
+  subtitle: "이터레이터 도구 마스터하기"
+  blocks:
+  - type: "text"
+    content: "itertools 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: count 사용"
+    code: |-
+      countUp = count(1)
+      first3 = list(islice(countUp, 3))
+      first3
+
+  - type: "expansion"
+    title: "🟢 기본2: repeat 사용"
+    code: |-
+      fives = list(repeat(5, 4))
+      fives
+
+  - type: "expansion"
+    title: "🟢 기본3: chain 사용"
+    code: |-
+      a = [1, 2]
+      b = [3, 4]
+      merged = list(chain(a, b))
+      merged
+
+  - type: "expansion"
+    title: "🟢 기본4: combinations 사용"
+    code: |-
+      chars = ['a', 'b', 'c']
+      combos = list(combinations(chars, 2))
+      combos
+
+  - type: "expansion"
+    title: "🟢 기본5: islice 사용"
+    code: |-
+      bigRange = range(100)
+      subset = list(islice(bigRange, 5, 10))
+      subset
+
+  - type: "expansion"
+    title: "🟡 응용1: cycle 사용"
+    code: |-
+      pattern = cycle([1, 2, 3])
+      first9 = list(islice(pattern, 9))
+      first9
+
+  - type: "expansion"
+    title: "🟡 응용2: permutations 사용"
+    code: |-
+      symbols = ['x', 'y']
+      perms = list(permutations(symbols))
+      perms
+
+  - type: "expansion"
+    title: "🟡 응용3: product 사용"
+    code: |-
+      hues = ['R', 'G']
+      sizes = ['S', 'M']
+      options = list(product(hues, sizes))
+      options
+
+  - type: "expansion"
+    title: "🟡 응용4: accumulate 사용"
+    code: |-
+      prices = [10, 20, 30]
+      totals = list(accumulate(prices))
+      totals
+
+  - type: "expansion"
+    title: "🟡 응용5: zip_longest 사용"
+    code: |-
+      x = [1, 2, 3]
+      y = ['a', 'b']
+      paired = list(zip_longest(x, y, fillvalue='-'))
+      paired
+
+  - type: "expansion"
+    title: "🔴 심화1: groupby 사용"
+    code: |-
+      scores = [1, 1, 2, 3, 3, 3]
+      groups = [(key, len(list(group))) for key, group in groupby(scores)]
+      groups
+
+  - type: "expansion"
+    title: "🔴 심화2: filterfalse 사용"
+    code: |-
+      mixed = [1, 2, 3, 4, 5, 6]
+      evens = list(filterfalse(lambda n: n % 2 == 1, mixed))
+      evens
+
+  - type: "expansion"
+    title: "🔴 심화3: takewhile 사용"
+    code: |-
+      ascending = [1, 2, 3, 4, 2, 1]
+      beforeDrop = list(takewhile(lambda n: n < 4, ascending))
+      beforeDrop
+
+  - type: "expansion"
+    title: "🔴 심화4: 중복 조합"
+    code: |-
+      coins = ['A', 'B']
+      withRepeat = list(combinations_with_replacement(coins, 2))
+      withRepeat
+
+  - type: "expansion"
+    title: "🔴 심화5: 데카르트 곱 3개"
+    code: |-
+      abc = ['a', 'b']
+      xyz = [1, 2]
+      pqr = ['x', 'y']
+      triples = list(product(abc, xyz, pqr))
+      triples[:4]
+
+  - type: "expansion"
+    title: "🔴 심화6: dropwhile 사용"
+    code: |-
+      series = [1, 2, 3, 4, 5]
+      afterDrop = list(dropwhile(lambda n: n < 3, series))
+      afterDrop
+
+  - type: "expansion"
+    title: "🔴 심화7: accumulate 곱셈"
+    code: |-
+      import operator
+      factors = [1, 2, 3, 4]
+      products = list(accumulate(factors, operator.mul))
+      products
+
+  - type: "expansion"
+    title: "🔴 심화8: chain.from_iterable"
+    code: |-
+      nested = [[1, 2], [3, 4], [5]]
+      flattened = list(chain.from_iterable(nested))
+      flattened
+
+  - type: "expansion"
+    title: "🔴 심화9: 로또 번호 조합"
+    code: |-
+      lotto = range(1, 46)
+      picks = list(combinations(lotto, 6))
+      len(picks)
+
+  - type: "expansion"
+    title: "🔴 심화10: 이동 평균"
+    code: |-
+      from collections import deque
+      def movingAvg(data, window):
+          it = iter(data)
+          buf = deque(islice(it, window), maxlen=window)
+          yield sum(buf) / window
+          for val in it:
+              buf.append(val)
+              yield sum(buf) / window
+
+      temps = [10, 12, 13, 11, 14, 15]
+      avgList = list(movingAvg(temps, 3))
+      avgList

@@ -1,0 +1,275 @@
+meta:
+  id: pandas_06
+  title: 항공편시계열분석
+  order: 6
+  category: pandas
+  difficulty: "⭐⭐⭐⭐"
+  badge: 중급
+  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv
+  tags: ["flights", "시계열", "datetime", "rolling", "resample"]
+  seo:
+    title: "pandas 시계열 분석 - 항공 승객 데이터로 배우는 datetime"
+    description: "항공 승객 데이터로 시계열 분석을 배웁니다. datetime 변환, 월별 패턴, 이동평균(rolling), 연도별 추이 분석을 실습합니다."
+    keywords: ["pandas 시계열", "datetime", "rolling", "resample", "flights 데이터"]
+
+intro:
+  emoji: "✈️"
+  goal: 항공 승객 데이터에서 "언제 가장 붐빌까?"를 시계열로 분석합니다.
+  description: 시간 축이 있는 데이터를 다루는 방법을 배웁니다. 월별 패턴, 연도별 추이, 이동평균 등 시계열 분석의 기초를 익힙니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: 1949~1960년 월별 항공 승객 수
+  blocks:
+  - type: text
+    content: 항공편 데이터는 1949년부터 1960년까지 12년간의 월별 항공 승객 수를 기록한 시계열 데이터입니다. 총 144개의 행(12년 × 12개월)과 3개의 컬럼(year, month, passengers)으로 구성되어 있습니다. 시계열 데이터는 시간의 흐름에 따라 기록된 데이터로, 추세(장기적 방향), 계절성(주기적 패턴), 순환(불규칙한 반복) 등의 특성을 분석할 수 있습니다. 이번 프로젝트에서는 연도별 증가 추세와 월별 계절 패턴을 파악하는 방법을 배웁니다.
+  - type: code
+    language: python
+    title: 데이터 불러오기
+    description: 1949~1960년 월별 항공 승객 수 데이터입니다
+    content: |-
+      import pandas as pd
+
+      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv"
+      flights = pd.read_csv(url)
+      flights.shape
+
+  - type: tip
+    content: "시계열 데이터는 시간 순서가 중요한 데이터입니다. 일반 데이터와 달리 행의 순서를 바꾸면 의미가 달라집니다. 주가, 기온, 매출, 트래픽 등 시간에 따라 변하는 모든 데이터가 시계열입니다. pandas는 datetime 인덱스를 활용해 시계열 분석에 특화된 기능들을 제공합니다."
+
+- id: step2_head
+  title: 2단계. 미리보기
+  subtitle: 데이터 구조 파악
+  blocks:
+  - type: text
+    content: 데이터의 구조를 먼저 파악해야 합니다. year(연도)는 숫자형, month(월)는 문자형(January, February 등), passengers(승객수)는 숫자형입니다. month가 문자열로 저장되어 있어서 시계열 분석을 하려면 datetime 타입으로 변환이 필요합니다. head(10)으로 처음 10개 행을 보면 1949년 1월부터 10월까지의 데이터가 시간 순서대로 정렬되어 있음을 확인할 수 있습니다. 데이터가 시간 순서대로 정렬되어 있는 것이 시계열 분석의 첫 번째 조건입니다.
+  - type: code
+    language: python
+    title: 미리보기
+    description: 데이터가 어떻게 생겼는지
+    content: |-
+      flights.head(10)
+
+- id: step3_dtypes
+  title: 3단계. 데이터 타입 확인
+  subtitle: 날짜가 아직 문자열
+  blocks:
+  - type: text
+    content: dtypes 속성으로 각 컬럼의 데이터 타입을 확인합니다. year는 int64(정수), month는 object(문자열), passengers는 int64입니다. pandas에서 object 타입은 대부분 문자열을 의미합니다. 시계열 분석을 하려면 year와 month를 합쳐서 datetime64 타입으로 변환해야 합니다. datetime 타입이어야 날짜 계산, 기간 선택, 리샘플링 등 시계열 전용 기능을 사용할 수 있습니다. 지금은 연도와 월이 분리되어 있어서 시간의 연속성을 인식할 수 없는 상태입니다.
+  - type: code
+    language: python
+    title: 현재 데이터 타입 확인
+    description: year는 int, month는 object(문자)입니다
+    content: |-
+      flights.dtypes
+
+  - type: tip
+    content: "dtypes는 각 컬럼의 데이터 타입을 보여줍니다. int64(정수), float64(실수), object(문자열), datetime64(날짜), bool(참/거짓) 등이 있습니다. 데이터 타입이 올바르지 않으면 연산이 안 되거나 잘못된 결과가 나옵니다. 예를 들어 숫자가 문자열로 저장되면 평균을 구할 수 없습니다."
+
+- id: step4_datetime
+  title: 4단계. 날짜 컬럼 만들기
+  subtitle: pd.to_datetime()
+  blocks:
+  - type: text
+    content: year와 month를 합쳐서 하나의 날짜 컬럼을 만듭니다. 먼저 year를 astype(str)로 문자열로 변환하고, +로 month와 연결해서 '1949-January' 같은 형태를 만듭니다. 그 다음 pd.to_datetime()으로 이 문자열을 datetime 타입으로 변환합니다. format='%Y-%B' 파라미터는 입력 문자열의 형식을 지정하는데, %Y는 4자리 연도(1949), %B는 월의 전체 이름(January)을 의미합니다. 이렇게 만든 date 컬럼은 datetime64 타입이 되어 시계열 분석이 가능해집니다. copy()를 사용하는 이유는 원본 데이터를 보존하고 새로운 DataFrame을 만들기 위함입니다.
+  - type: code
+    language: python
+    title: 날짜 컬럼 만들기
+    description: year와 month를 합쳐서 날짜로 변환합니다
+    content: |-
+      dated = flights.copy()
+      dated['date'] = pd.to_datetime(dated['year'].astype(str) + '-' + dated['month'], format='%Y-%B')
+      dated.head()
+
+  - type: tip
+    content: "pd.to_datetime()은 다양한 형식의 문자열을 datetime 타입으로 변환합니다. format 파라미터로 입력 형식을 명시하면 변환 속도가 빠르고 정확합니다. 주요 포맷 코드는 %Y(4자리 연도), %m(2자리 월), %d(2자리 일), %B(월 이름), %H(시간), %M(분), %S(초)입니다. '2024-01-15'는 format='%Y-%m-%d', '15/01/2024'는 format='%d/%m/%Y'입니다."
+
+- id: step5_set_index
+  title: 5단계. 날짜를 인덱스로 설정
+  subtitle: set_index()
+  blocks:
+  - type: text
+    content: 시계열 분석의 핵심은 날짜를 인덱스로 설정하는 것입니다. set_index('date')로 date 컬럼을 인덱스로 만들면 pandas가 이 DataFrame을 시계열 데이터로 인식합니다. 인덱스가 datetime 타입이 되면 '2023-01-01':'2023-12-31' 같은 날짜 범위 선택, rolling() 이동평균, resample() 리샘플링 등 시계열 전용 기능들을 사용할 수 있게 됩니다. 또한 인덱스가 시간 순서대로 정렬되어 있으면 시간 흐름에 따른 패턴 분석이 용이합니다. 기존의 0, 1, 2... 숫자 인덱스 대신 1949-01-01, 1949-02-01 같은 날짜가 인덱스가 되면 데이터의 시간적 맥락을 직관적으로 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 날짜를 인덱스로 설정
+    description: 시계열 분석의 기본, 날짜를 인덱스로 설정합니다
+    content: |-
+      ts = dated.set_index('date')
+      ts.head()
+
+  - type: tip
+    content: "set_index()는 특정 컬럼을 DataFrame의 인덱스로 설정합니다. 날짜 컬럼을 인덱스로 설정하면 시계열 데이터의 강력한 기능들을 활용할 수 있습니다. 예를 들어 df['2023']처럼 연도로 필터링, df['2023-01':'2023-03']처럼 기간 슬라이싱, rolling(), resample(), shift() 같은 시계열 메서드 사용이 가능합니다. drop=False 파라미터를 추가하면 원본 컬럼을 유지하면서 인덱스로도 설정할 수 있습니다."
+
+- id: step6_month_pattern
+  title: 6단계. 월별 평균 승객수
+  subtitle: 계절성 확인
+  blocks:
+  - type: text
+    content: 시계열 데이터의 중요한 특성 중 하나는 계절성(seasonality)입니다. 계절성이란 특정 시기에 반복적으로 나타나는 패턴을 말합니다. 항공 승객 데이터에서는 여름 휴가철에 승객이 증가하는 패턴이 예상됩니다. month별로 groupby해서 12년간의 평균 승객수를 구하면 어느 달에 가장 붐비는지 알 수 있습니다. sort_values(ascending=False)로 내림차순 정렬하면 승객이 많은 달부터 차례대로 볼 수 있습니다. 결과를 보면 7월과 8월이 가장 높게 나타나는데, 이는 여름 휴가 시즌의 영향입니다. 이런 계절 패턴을 파악하면 항공사는 성수기에 운항 편수를 늘리는 등의 계획을 세울 수 있습니다.
+  - type: code
+    language: python
+    title: 월별 평균 승객수
+    description: 어느 달에 가장 붐빌까요?
+    content: |-
+      flights.groupby('month')['passengers'].mean().sort_values(ascending=False)
+
+  - type: tip
+    content: "계절성(seasonality)은 일정 주기로 반복되는 패턴입니다. 월별 패턴(아이스크림 판매는 여름에 증가), 요일별 패턴(주말 교통량 감소), 시간별 패턴(출퇴근 시간 혼잡) 등이 있습니다. 계절성을 파악하면 미래 수요 예측, 재고 관리, 인력 배치 등 실무 의사결정에 활용할 수 있습니다."
+
+- id: step7_year_pattern
+  title: 7단계. 연도별 총 승객수
+  subtitle: 추세 확인
+  blocks:
+  - type: text
+    content: 계절성과 함께 시계열의 또 다른 중요한 특성은 추세(trend)입니다. 추세는 데이터의 장기적인 방향성을 의미합니다. year별로 groupby하고 sum()으로 연간 총 승객수를 구하면 시간이 지날수록 승객이 증가하는지, 감소하는지, 정체되어 있는지 파악할 수 있습니다. 1949년부터 1960년까지 연도별 총계를 보면 지속적으로 증가하는 상승 추세를 확인할 수 있습니다. 이는 1950년대 항공 산업의 성장과 경제 발전을 반영합니다. 추세를 파악하면 장기 계획 수립, 투자 결정, 용량 확대 등의 전략적 의사결정에 활용할 수 있습니다.
+  - type: code
+    language: python
+    title: 연도별 총 승객수
+    description: 해마다 승객이 늘어나고 있을까요?
+    content: |-
+      flights.groupby('year')['passengers'].sum()
+
+  - type: tip
+    content: "추세(trend)는 데이터의 장기적 방향성입니다. 상승 추세(매출 증가), 하락 추세(인구 감소), 수평 추세(정체) 등이 있습니다. 시계열 분석의 핵심은 추세와 계절성을 분리하는 것입니다. 추세는 장기 전략에, 계절성은 단기 운영에 활용됩니다."
+
+- id: step8_pct_change
+  title: 8단계. 연도별 증가율
+  subtitle: pct_change()
+  blocks:
+  - type: text
+    content: 절대값의 증가도 중요하지만, 증가율(성장률)을 보면 더 정확한 인사이트를 얻을 수 있습니다. pct_change()는 이전 값 대비 변화율을 계산하는 메서드입니다. (현재값 - 이전값) / 이전값 공식으로 계산되며, 0.15는 15% 증가를 의미합니다. 100을 곱하면 퍼센트 단위로 표시할 수 있습니다. 첫 번째 행(1949년)은 비교할 이전 값이 없어서 NaN으로 나타납니다. 연도별 증가율을 보면 어느 시기에 급성장했는지, 성장세가 둔화되고 있는지 파악할 수 있습니다. 이는 절대값만 볼 때는 놓칠 수 있는 중요한 정보입니다.
+  - type: code
+    language: python
+    title: 연도별 증가율
+    description: 전년 대비 몇 % 증가했는지 계산합니다
+    content: |-
+      yearly = flights.groupby('year')['passengers'].sum()
+      yearly.pct_change() * 100
+
+  - type: tip
+    content: "pct_change()는 이전 행 대비 변화율을 자동 계산합니다. (현재값 - 이전값) / 이전값 공식을 사용합니다. periods 파라미터로 비교 간격을 조절할 수 있는데, pct_change(12)는 12행 전과 비교(전년 동월 대비)합니다. 주가 분석에서 전일 대비 등락률, 매출 분석에서 전년 대비 성장률 계산 등에 활용됩니다."
+
+- id: step9_rolling
+  title: 9단계. 이동평균 계산
+  subtitle: rolling()
+  blocks:
+  - type: text
+    content: 시계열 데이터에는 단기 변동(노이즈)과 장기 추세가 섞여 있습니다. 이동평균(moving average)은 단기 변동을 제거하고 전반적인 추세를 부드럽게 보여주는 강력한 도구입니다. rolling(window=12)는 12개월 이동평균을 의미하며, 최근 12개월의 평균을 계산한 뒤 한 달씩 앞으로 이동하면서 반복합니다. 예를 들어 1월~12월 평균, 2월~익년1월 평균, 3월~익년2월 평균... 이런 식입니다. 월별 승객 수는 계절에 따라 급등락하지만, 12개월 이동평균을 보면 계절 변동이 제거되고 완만한 상승 추세만 남습니다. 이는 주가 차트에서 200일 이동평균선을 보는 것과 같은 원리입니다.
+  - type: code
+    language: python
+    title: 12개월 이동평균
+    description: 1년 단위로 평균을 내서 계절 변동을 제거합니다
+    content: |-
+      rolled = ts.copy()
+      rolled['rolling12'] = rolled['passengers'].rolling(window=12).mean()
+      rolled[['passengers', 'rolling12']].tail(15)
+
+  - type: tip
+    content: "rolling(window=N)은 이동 창(sliding window) 방식으로 N개 행의 평균을 계산합니다. window=12면 최근 12개 행, window=7이면 최근 7개 행입니다. mean() 대신 sum(), std(), max(), min() 등 다양한 집계 함수를 사용할 수 있습니다. 처음 N-1개 행은 창을 채울 데이터가 부족해서 NaN이 됩니다. min_periods 파라미터로 최소 필요 개수를 조절할 수 있습니다."
+
+- id: step10_pivot
+  title: 10단계. 월×연도 피벗 테이블
+  subtitle: 2차원 요약
+  blocks:
+  - type: text
+    content: 지금까지는 1차원 분석(월별 또는 연도별)을 했습니다. pivot_table()을 사용하면 2차원 교차표를 만들어서 더 풍부한 인사이트를 얻을 수 있습니다. index='month'로 행을 월로, columns='year'로 열을 연도로 설정하면 12개 월 × 12개 연도 = 144개 셀의 테이블이 만들어집니다. 이 테이블을 보면 각 월이 연도별로 어떻게 변화하는지 한눈에 비교할 수 있습니다. 예를 들어 7월 행을 가로로 보면 1949년부터 1960년까지 7월 승객이 어떻게 증가했는지 추세를 볼 수 있고, 1950년 열을 세로로 보면 그 해의 계절 패턴을 확인할 수 있습니다. 엑셀의 피벗 테이블과 같은 기능으로, 데이터를 다양한 관점에서 요약하는 강력한 도구입니다.
+  - type: code
+    language: python
+    title: 월×연도 피벗 테이블
+    description: 행은 월, 열은 연도, 값은 승객수
+    content: |-
+      flights.pivot_table(index='month', columns='year', values='passengers')
+
+  - type: tip
+    content: "pivot_table()은 데이터를 2차원 크로스탭(교차표)으로 재구성합니다. index는 행 라벨, columns는 열 라벨, values는 셀에 채울 값, aggfunc는 집계 함수(기본값 mean)를 지정합니다. 여러 컬럼을 리스트로 넘기면 다층 인덱스를 만들 수 있습니다. margins=True로 총계 행/열을 추가할 수 있습니다. 엑셀 피벗보다 훨씬 강력하고 유연합니다."
+
+- id: step11_compare_years
+  title: 11단계. 특정 연도 비교
+  subtitle: 1949년 vs 1960년
+  blocks:
+  - type: text
+    content: 피벗 테이블을 만든 후에는 DataFrame의 컬럼 선택 기능을 그대로 사용할 수 있습니다. 대괄호 안에 리스트로 연도를 넘기면 해당 연도의 데이터만 선택됩니다. 첫 해인 1949년과 마지막 해인 1960년을 비교하면 12년간의 성장을 명확하게 볼 수 있습니다. 각 월별로 얼마나 승객이 증가했는지 나란히 비교할 수 있어 매우 직관적입니다. 예를 들어 7월을 보면 1949년에는 148명이었지만 1960년에는 465명으로 3배 이상 증가했음을 한눈에 파악할 수 있습니다.
+  - type: code
+    language: python
+    title: 특정 연도 비교
+    description: 1949년과 1960년의 월별 승객수 비교
+    content: |-
+      pivot = flights.pivot_table(index='month', columns='year', values='passengers')
+      pivot[[1949, 1960]]
+
+- id: step12_monthly_max
+  title: 12단계. 월별 최대 승객수
+  subtitle: 역대 최고 기록
+  blocks:
+  - type: text
+    content: pandas의 집계 함수는 axis 파라미터로 방향을 지정할 수 있습니다. axis=0은 열 방향(세로, 컬럼별), axis=1은 행 방향(가로, 행별) 집계입니다. max(axis=1)은 각 행에서 가로로 최대값을 찾습니다. 피벗 테이블에서 각 월(행)의 12개 연도 중 최대 승객수를 구하면, 그 달의 역대 최고 기록을 알 수 있습니다. 대부분 최근 연도(1960년)에 최대값이 나타날 것으로 예상되지만, 특정 달은 다를 수도 있습니다. 이렇게 차원을 따라 집계하는 방식은 pandas의 핵심 개념입니다.
+  - type: code
+    language: python
+    title: 월별 최대 승객수
+    description: 각 월에 가장 많았던 승객수(어느 연도든)
+    content: |-
+      pivot.max(axis=1)
+
+  - type: tip
+    content: "axis 파라미터는 집계 방향을 지정합니다. axis=0(기본값)은 열 방향 집계(각 컬럼의 합계/평균), axis=1은 행 방향 집계(각 행의 합계/평균)입니다. sum(), mean(), max(), min() 등 모든 집계 함수에서 사용할 수 있습니다. 헷갈리면 '0은 세로, 1은 가로'로 기억하세요."
+
+- id: practice
+  title: 실습
+  subtitle: 항공 승객 분석 프로젝트
+  blocks:
+  - type: text
+    content: 항공사 데이터 분석가가 되어 지금까지 배운 모든 시계열 기법을 활용해봅시다. 날짜 변환, 시계열 인덱스 설정, groupby 집계, pct_change 증가율, rolling 이동평균, pivot_table 교차표 등 모든 개념을 종합적으로 사용합니다. 실무에서 시계열 데이터를 분석할 때 이런 단계들을 거쳐 인사이트를 도출합니다.
+  - type: tip
+    content: "각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다."
+  - type: expansion
+    title: "미션1: 시계열 기초 분석 (groupby + rolling)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv")
+        data['date'] = pd.to_datetime(data['year'].astype(str) + '-' + data['month'], format='%Y-%B')
+        dataTs = data.set_index('date')
+    - type: code
+      title: "분석 수행"
+      content: |-
+        minMonth = data.groupby('month')['passengers'].mean().idxmin()
+        total1955 = data[data['year'] == 1955]['passengers'].sum()
+        rolling6 = dataTs['passengers'].rolling(window=6).mean().tail(10)
+        (minMonth, total1955, rolling6)
+  - type: expansion
+    title: "미션2: 고급 시계열 분석 (pivot + pct_change)"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import pandas as pd
+        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv")
+    - type: code
+      title: "분석 수행"
+      content: |-
+        peakMonths = df.loc[df.groupby('year')['passengers'].idxmax(), ['year', 'month', 'passengers']]
+        df['decade'] = (df['year'] // 10) * 10
+        decadePivot = df.pivot_table(values='passengers', index='month', columns='decade', aggfunc='mean')
+        growthDf = df.sort_values(['month', 'year'])
+        growthDf['yoy'] = growthDf.groupby('month')['passengers'].pct_change()
+        maxGrowth = growthDf.loc[growthDf['yoy'].idxmax(), ['year', 'month', 'passengers', 'yoy']]
+        (peakMonths, decadePivot, maxGrowth)
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: 시계열 분석 기초를 배웠습니다.
+  - type: list
+    items:
+    - "pd.to_datetime() - 문자열을 날짜로 변환"
+    - "set_index() - 날짜를 인덱스로 설정"
+    - "rolling() - 이동평균 계산"
+    - "pct_change() - 증가율 계산"
+    - "pivot_table() - 2차원 요약표 생성"
+  - type: text
+    content: 다음 시간에는 대용량 데이터(5만 행)를 다루는 방법을 배웁니다.

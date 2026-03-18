@@ -1,0 +1,984 @@
+meta:
+  title: "difflib - 시퀀스 비교"
+  description: "텍스트와 시퀀스 간의 차이점을 찾고 비교하는 difflib 모듈"
+  keywords: ["difflib", "SequenceMatcher", "unified_diff", "get_close_matches", "Differ"]
+
+intro:
+  - type: "content"
+    title: "difflib 모듈이란?"
+    content: |-
+      difflib 모듈은 시퀀스(특히 텍스트)를 비교하고 차이점을 찾는 기능을 제공합니다.
+      버전 관리, 텍스트 비교, 유사도 측정 등에 유용하게 사용됩니다.
+
+sections:
+  - name: "module_import"
+    title: "⚠️ difflib 모듈 임포트"
+    blocks:
+      - type: "content"
+        title: "표준 라이브러리 임포트"
+        content: |-
+          difflib는 Python 표준 라이브러리이므로 별도 설치 없이 사용할 수 있습니다.
+
+      - type: "code"
+        language: "python"
+        title: "difflib 임포트"
+        description: "difflib 모듈을 임포트합니다."
+        content: |-
+          import difflib
+
+  - name: "sequence_matcher"
+    title: "SequenceMatcher 기본"
+    blocks:
+      - type: "content"
+        title: "SequenceMatcher 클래스"
+        content: |-
+          SequenceMatcher는 두 시퀀스를 비교하고 유사도를 계산하는 클래스입니다.
+
+      - type: "code"
+        language: "python"
+        title: "기본 비교"
+        description: "두 문자열의 유사도를 계산합니다."
+        content: |-
+          text1 = "hello world"
+          text2 = "hello Python"
+
+          matcher = difflib.SequenceMatcher(None, text1, text2)
+          similarity = matcher.ratio()
+          similarity
+
+      - type: "tip"
+        title: "ratio() 반환값"
+        content: "ratio()는 0.0~1.0 사이의 값을 반환하며, 1.0은 완전히 동일함을 의미합니다."
+
+      - type: "code"
+        language: "python"
+        title: "일치하는 블록 찾기"
+        description: "두 시퀀스에서 일치하는 부분을 찾습니다."
+        content: |-
+          text1 = "abcdefgh"
+          text2 = "abcxyzgh"
+
+          matcher = difflib.SequenceMatcher(None, text1, text2)
+          matchingBlocks = matcher.get_matching_blocks()
+          matchingBlocks
+
+      - type: "tip"
+        title: "matching blocks 구조"
+        content: "각 블록은 (a_index, b_index, size) 튜플로 표현됩니다."
+
+      - type: "code"
+        language: "python"
+        title: "변경 작업 찾기"
+        description: "두 시퀀스 간의 차이를 작업으로 표현합니다."
+        content: |-
+          text1 = "qabxcd"
+          text2 = "abycdf"
+
+          matcher = difflib.SequenceMatcher(None, text1, text2)
+          opcodes = matcher.get_opcodes()
+
+          operations = [
+              {
+                  "operation": tag,
+                  "text1_range": f"{i1}:{i2}",
+                  "text2_range": f"{j1}:{j2}",
+                  "text1_part": text1[i1:i2],
+                  "text2_part": text2[j1:j2]
+              }
+              for tag, i1, i2, j1, j2 in opcodes
+          ]
+
+          operations
+
+      - type: "code"
+        language: "python"
+        title: "리스트 비교"
+        description: "리스트 간의 유사도를 계산합니다."
+        content: |-
+          list1 = [1, 2, 3, 4, 5]
+          list2 = [1, 2, 4, 5, 6]
+
+          matcher = difflib.SequenceMatcher(None, list1, list2)
+
+          {
+              "ratio": matcher.ratio(),
+              "matching_blocks": matcher.get_matching_blocks()
+          }
+
+      - type: "code"
+        language: "python"
+        title: "무시할 문자 설정"
+        description: "특정 문자를 무시하고 비교합니다."
+        content: |-
+          text1 = "a b c d"
+          text2 = "abcd"
+
+          matcher = difflib.SequenceMatcher(lambda x: x == " ", text1, text2)
+          ratio = matcher.ratio()
+          ratio
+
+      - type: "tip"
+        title: "isjunk 파라미터"
+        content: "첫 번째 파라미터로 함수를 전달하면 특정 요소를 무시할 수 있습니다."
+
+  - name: "text_comparison"
+    title: "텍스트 비교 함수"
+    blocks:
+      - type: "content"
+        title: "diff 형식 출력"
+        content: |-
+          difflib는 다양한 형식의 diff 출력을 제공합니다.
+
+      - type: "code"
+        language: "python"
+        title: "unified_diff"
+        description: "unified 형식의 diff를 생성합니다."
+        content: |-
+          text1 = ["line 1\n", "line 2\n", "line 3\n"]
+          text2 = ["line 1\n", "modified line 2\n", "line 3\n", "line 4\n"]
+
+          diff = difflib.unified_diff(
+              text1,
+              text2,
+              fromfile="original.txt",
+              tofile="modified.txt",
+              lineterm=""
+          )
+
+          diffOutput = "\n".join(diff)
+          diffOutput
+
+      - type: "tip"
+        title: "unified_diff 용도"
+        content: "Git과 같은 버전 관리 시스템에서 사용하는 표준 diff 형식입니다."
+
+      - type: "code"
+        language: "python"
+        title: "context_diff"
+        description: "context 형식의 diff를 생성합니다."
+        content: |-
+          text1 = ["apple\n", "banana\n", "cherry\n"]
+          text2 = ["apple\n", "blueberry\n", "cherry\n"]
+
+          diff = difflib.context_diff(
+              text1,
+              text2,
+              fromfile="fruits1.txt",
+              tofile="fruits2.txt",
+              lineterm=""
+          )
+
+          diffOutput = "\n".join(diff)
+          diffOutput
+
+      - type: "code"
+        language: "python"
+        title: "ndiff"
+        description: "상세한 줄 단위 비교를 수행합니다."
+        content: |-
+          text1 = ["one\n", "two\n", "three\n"]
+          text2 = ["ore\n", "two\n", "three\n", "four\n"]
+
+          diff = difflib.ndiff(text1, text2)
+          diffOutput = "".join(diff)
+          diffOutput
+
+      - type: "tip"
+        title: "ndiff 출력 기호"
+        content: "- 는 삭제, + 는 추가, ? 는 변경된 부분의 상세 정보를 나타냅니다."
+
+      - type: "code"
+        language: "python"
+        title: "Differ 클래스"
+        description: "Differ 클래스로 더 세밀한 제어가 가능합니다."
+        content: |-
+          text1 = ["cat\n", "dog\n", "bird\n"]
+          text2 = ["cat\n", "dig\n", "bird\n"]
+
+          differ = difflib.Differ()
+          diff = differ.compare(text1, text2)
+          diffOutput = "".join(diff)
+          diffOutput
+
+      - type: "code"
+        language: "python"
+        title: "문자 단위 비교"
+        description: "문자열을 문자 단위로 비교합니다."
+        content: |-
+          str1 = "hello"
+          str2 = "hallo"
+
+          differ = difflib.Differ()
+          diff = list(differ.compare(str1, str2))
+          diff
+
+  - name: "close_matches"
+    title: "유사 문자열 찾기"
+    blocks:
+      - type: "content"
+        title: "get_close_matches 함수"
+        content: |-
+          get_close_matches는 주어진 문자열과 유사한 문자열을 찾습니다.
+
+      - type: "code"
+        language: "python"
+        title: "기본 사용"
+        description: "유사한 문자열을 찾습니다."
+        content: |-
+          word = "appel"
+          possibilities = ["apple", "apply", "application", "appreciate", "banana"]
+
+          matches = difflib.get_close_matches(word, possibilities)
+          matches
+
+      - type: "tip"
+        title: "자동 완성 기능"
+        content: "검색 엔진, 자동 완성, 철자 검사 등에 유용합니다."
+
+      - type: "code"
+        language: "python"
+        title: "매개변수 조정"
+        description: "결과 개수와 유사도 임계값을 조정합니다."
+        content: |-
+          word = "python"
+          possibilities = ["pythn", "pithon", "jython", "cython", "java", "ruby"]
+
+          defaultMatches = difflib.get_close_matches(word, possibilities)
+          moreMatches = difflib.get_close_matches(word, possibilities, n=4, cutoff=0.5)
+
+          {
+              "default": defaultMatches,
+              "more_matches": moreMatches
+          }
+
+      - type: "tip"
+        title: "매개변수 설명"
+        content: "n은 최대 결과 수, cutoff은 최소 유사도(0.0~1.0)입니다."
+
+      - type: "code"
+        language: "python"
+        title: "철자 검사"
+        description: "사전에서 올바른 철자를 제안합니다."
+        content: |-
+          dictionary = ["hello", "world", "python", "programming", "computer"]
+          misspelled = "progaming"
+
+          suggestions = difflib.get_close_matches(misspelled, dictionary, n=3, cutoff=0.6)
+          suggestions
+
+      - type: "code"
+        language: "python"
+        title: "명령어 추천"
+        description: "잘못된 명령어에 대한 추천을 제공합니다."
+        content: |-
+          validCommands = ["start", "stop", "restart", "status", "reload"]
+          userInput = "strat"
+
+          recommendations = difflib.get_close_matches(userInput, validCommands, n=3)
+
+          {
+              "input": userInput,
+              "did_you_mean": recommendations
+          }
+
+  - name: "html_diff"
+    title: "HTML 형식 비교"
+    blocks:
+      - type: "content"
+        title: "HtmlDiff 클래스"
+        content: |-
+          HtmlDiff는 두 텍스트의 차이를 HTML 테이블 형식으로 생성합니다.
+
+      - type: "code"
+        language: "python"
+        title: "HTML diff 생성"
+        description: "두 텍스트를 HTML 테이블로 비교합니다."
+        content: |-
+          text1 = ["Line 1\n", "Line 2\n", "Line 3\n"]
+          text2 = ["Line 1\n", "Modified Line 2\n", "Line 3\n", "Line 4\n"]
+
+          htmlDiff = difflib.HtmlDiff()
+          htmlTable = htmlDiff.make_table(text1, text2, fromdesc="Original", todesc="Modified")
+
+          htmlTable[:200]
+
+      - type: "tip"
+        title: "HTML 출력"
+        content: "웹 기반 비교 도구나 리포트 생성에 유용합니다."
+
+      - type: "code"
+        language: "python"
+        title: "전체 HTML 파일"
+        description: "완전한 HTML 문서를 생성합니다."
+        content: |-
+          text1 = ["First version\n", "Some content\n"]
+          text2 = ["Second version\n", "Modified content\n"]
+
+          htmlDiff = difflib.HtmlDiff()
+          htmlFile = htmlDiff.make_file(
+              text1,
+              text2,
+              fromdesc="Version 1",
+              todesc="Version 2",
+              context=True,
+              numlines=2
+          )
+
+          htmlFile[:300]
+
+      - type: "code"
+        language: "python"
+        title: "컨텍스트 모드"
+        description: "변경된 부분 주변만 표시합니다."
+        content: |-
+          text1 = [f"Line {i}\n" for i in range(1, 11)]
+          text2 = text1[:4] + ["Modified line 5\n"] + text1[5:]
+
+          htmlDiff = difflib.HtmlDiff()
+          htmlOutput = htmlDiff.make_table(
+              text1,
+              text2,
+              context=True,
+              numlines=2
+          )
+
+          len(htmlOutput)
+
+      - type: "tip"
+        title: "context 매개변수"
+        content: "context=True로 설정하면 변경된 부분 주변만 표시합니다."
+
+  - name: "advanced_usage"
+    title: "고급 기능"
+    blocks:
+      - type: "content"
+        title: "유사도 계산 방법"
+        content: |-
+          SequenceMatcher는 여러 유사도 계산 방법을 제공합니다.
+
+      - type: "code"
+        language: "python"
+        title: "ratio와 quick_ratio"
+        description: "정확한 비율과 빠른 근사값을 비교합니다."
+        content: |-
+          text1 = "The quick brown fox jumps over the lazy dog"
+          text2 = "The quick brown cat jumps over the lazy dog"
+
+          matcher = difflib.SequenceMatcher(None, text1, text2)
+
+          {
+              "ratio": matcher.ratio(),
+              "quick_ratio": matcher.quick_ratio(),
+              "real_quick_ratio": matcher.real_quick_ratio()
+          }
+
+      - type: "tip"
+        title: "성능 vs 정확도"
+        content: "quick_ratio < real_quick_ratio이며, 빠르지만 덜 정확합니다."
+
+      - type: "code"
+        language: "python"
+        title: "longest common substring"
+        description: "가장 긴 공통 부분 문자열을 찾습니다."
+        content: |-
+          text1 = "ABCDEFGHIJ"
+          text2 = "XYZABCPQRS"
+
+          matcher = difflib.SequenceMatcher(None, text1, text2)
+          longestMatch = matcher.find_longest_match(0, len(text1), 0, len(text2))
+
+          {
+              "match": longestMatch,
+              "substring": text1[longestMatch.a:longestMatch.a + longestMatch.size]
+          }
+
+      - type: "code"
+        language: "python"
+        title: "세밀한 비교"
+        description: "get_grouped_opcodes로 변경 부분을 그룹화합니다."
+        content: |-
+          text1 = list("abcdefghijklmnop")
+          text2 = list("abcdefxyijklmnop")
+
+          matcher = difflib.SequenceMatcher(None, text1, text2)
+          groupedOps = list(matcher.get_grouped_opcodes(n=2))
+
+          [{
+              "group": i,
+              "operations": [
+                  {
+                      "tag": tag,
+                      "change": f"{''.join(text1[i1:i2])} -> {''.join(text2[j1:j2])}"
+                  }
+                  for tag, i1, i2, j1, j2 in group
+              ]
+          } for i, group in enumerate(groupedOps)]
+
+      - type: "code"
+        language: "python"
+        title: "시퀀스 재사용"
+        description: "set_seqs로 시퀀스를 변경하여 재사용합니다."
+        content: |-
+          matcher = difflib.SequenceMatcher()
+
+          texts = [
+              ("hello", "hallo"),
+              ("world", "word"),
+              ("python", "jython")
+          ]
+
+          results = []
+          for text1, text2 in texts:
+              matcher.set_seqs(text1, text2)
+              results.append({
+                  "pair": f"{text1} vs {text2}",
+                  "ratio": matcher.ratio()
+              })
+
+          results
+
+      - type: "code"
+        language: "python"
+        title: "대소문자 무시 비교"
+        description: "대소문자를 무시하고 비교합니다."
+        content: |-
+          text1 = "Hello World"
+          text2 = "hello WORLD"
+
+          normalRatio = difflib.SequenceMatcher(None, text1, text2).ratio()
+          caseInsensitiveRatio = difflib.SequenceMatcher(None, text1.lower(), text2.lower()).ratio()
+
+          {
+              "normal": normalRatio,
+              "case_insensitive": caseInsensitiveRatio
+          }
+
+  - name: "practical"
+    title: "실전 활용 예제"
+    blocks:
+      - type: "content"
+        title: "실무 시나리오"
+        content: |-
+          difflib를 활용한 실전 텍스트 비교 예제를 다룹니다.
+
+      - type: "code"
+        language: "python"
+        title: "파일 변경 내역"
+        description: "두 파일 버전의 변경 내역을 표시합니다."
+        content: |-
+          oldVersion = [
+              "import os\n",
+              "def process():\n",
+              "    print('Processing')\n",
+              "    return True\n"
+          ]
+
+          newVersion = [
+              "import os\n",
+              "import sys\n",
+              "def process():\n",
+              "    print('Processing data')\n",
+              "    return True\n"
+          ]
+
+          diff = difflib.unified_diff(
+              oldVersion,
+              newVersion,
+              fromfile="script_v1.py",
+              tofile="script_v2.py",
+              lineterm=""
+          )
+
+          changeLog = "\n".join(diff)
+          changeLog
+
+      - type: "code"
+        language: "python"
+        title: "자동 완성 시스템"
+        description: "사용자 입력에 대한 자동 완성 제안을 제공합니다."
+        content: |-
+          def autoComplete(userInput, database, maxSuggestions=5):
+              matches = difflib.get_close_matches(
+                  userInput,
+                  database,
+                  n=maxSuggestions,
+                  cutoff=0.4
+              )
+              return matches
+
+          cities = [
+              "Seoul", "Busan", "Incheon", "Daegu", "Daejeon",
+              "Gwangju", "Suwon", "Ulsan", "Changwon", "Seongnam"
+          ]
+
+          userTyped = "seo"
+          suggestions = autoComplete(userTyped, cities)
+
+          {
+              "input": userTyped,
+              "suggestions": suggestions
+          }
+
+      - type: "code"
+        language: "python"
+        title: "코드 리뷰 도구"
+        description: "코드 변경사항을 분석합니다."
+        content: |-
+          def analyzeCodeChanges(oldCode, newCode):
+              oldLines = oldCode.split("\n")
+              newLines = newCode.split("\n")
+
+              matcher = difflib.SequenceMatcher(None, oldLines, newLines)
+
+              stats = {
+                  "similarity": matcher.ratio(),
+                  "changes": []
+              }
+
+              for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+                  if tag != "equal":
+                      stats["changes"].append({
+                          "type": tag,
+                          "old_lines": f"{i1+1}-{i2}",
+                          "new_lines": f"{j1+1}-{j2}"
+                      })
+
+              return stats
+
+          oldCode = "def add(a, b):\n    return a + b"
+          newCode = "def add(a, b):\n    result = a + b\n    return result"
+
+          analysis = analyzeCodeChanges(oldCode, newCode)
+          analysis
+
+      - type: "code"
+        language: "python"
+        title: "중복 검사"
+        description: "텍스트의 중복 여부를 검사합니다."
+        content: |-
+          def checkDuplicates(texts, threshold=0.8):
+              duplicates = []
+
+              for i in range(len(texts)):
+                  for j in range(i + 1, len(texts)):
+                      ratio = difflib.SequenceMatcher(None, texts[i], texts[j]).ratio()
+                      if ratio >= threshold:
+                          duplicates.append({
+                              "text1_index": i,
+                              "text2_index": j,
+                              "similarity": ratio
+                          })
+
+              return duplicates
+
+          documents = [
+              "The quick brown fox",
+              "The quick brown dog",
+              "A completely different text",
+              "The quick brown fox jumps"
+          ]
+
+          duplicateResults = checkDuplicates(documents, threshold=0.6)
+          duplicateResults
+
+      - type: "code"
+        language: "python"
+        title: "버전 비교 리포트"
+        description: "여러 버전의 변경사항을 요약합니다."
+        content: |-
+          def createVersionReport(versions):
+              report = []
+
+              for i in range(len(versions) - 1):
+                  current = versions[i]
+                  next_ver = versions[i + 1]
+
+                  matcher = difflib.SequenceMatcher(None, current["content"], next_ver["content"])
+
+                  report.append({
+                      "from_version": current["version"],
+                      "to_version": next_ver["version"],
+                      "similarity": matcher.ratio(),
+                      "change_count": len([op for op in matcher.get_opcodes() if op[0] != "equal"])
+                  })
+
+              return report
+
+          fileVersions = [
+              {"version": "1.0", "content": "Initial content"},
+              {"version": "1.1", "content": "Initial content with updates"},
+              {"version": "2.0", "content": "Completely rewritten content"}
+          ]
+
+          versionReport = createVersionReport(fileVersions)
+          versionReport
+
+      - type: "code"
+        language: "python"
+        title: "명령어 오타 수정"
+        description: "잘못된 명령어를 자동으로 수정합니다."
+        content: |-
+          def suggestCommand(userCommand, validCommands):
+              matches = difflib.get_close_matches(userCommand, validCommands, n=1, cutoff=0.6)
+
+              if matches:
+                  return {
+                      "input": userCommand,
+                      "suggestion": matches[0],
+                      "execute": matches[0]
+                  }
+              else:
+                  return {
+                      "input": userCommand,
+                      "error": "Unknown command",
+                      "available": validCommands
+                  }
+
+          commands = ["install", "uninstall", "update", "search", "list", "info"]
+          userInput = "instal"
+
+          result = suggestCommand(userInput, commands)
+          result
+
+  - name: "practice"
+    title: "연습 문제"
+    blocks:
+      - type: "expansion"
+        title: "🟢 유사도 계산"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "두 문자열의 유사도를 계산하세요"
+            content: |-
+              text1 = "hello world"
+              text2 = "hello python"
+              matcher = difflib.SequenceMatcher(None, text1, text2)
+              result = matcher.ratio()
+              result
+
+      - type: "expansion"
+        title: "🟢 유사 단어 찾기"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "단어 리스트에서 유사한 단어를 찾으세요"
+            content: |-
+              word = "appel"
+              words = ["apple", "banana", "orange", "grape"]
+              matches = difflib.get_close_matches(word, words)
+              matches
+
+      - type: "expansion"
+        title: "🟢 일치 블록 찾기"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "두 문자열에서 일치하는 블록을 찾으세요"
+            content: |-
+              text1 = "abcdef"
+              text2 = "abxdef"
+              matcher = difflib.SequenceMatcher(None, text1, text2)
+              blocks = matcher.get_matching_blocks()
+              blocks
+
+      - type: "expansion"
+        title: "🟢 unified diff"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "두 텍스트의 unified diff를 생성하세요"
+            content: |-
+              text1 = ["line 1\n", "line 2\n"]
+              text2 = ["line 1\n", "modified line 2\n"]
+              diff = list(difflib.unified_diff(text1, text2, lineterm=""))
+              diff
+
+      - type: "expansion"
+        title: "🟢 문자 비교"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "두 문자열을 문자 단위로 비교하세요"
+            content: |-
+              str1 = "hello"
+              str2 = "hallo"
+              differ = difflib.Differ()
+              diff = list(differ.compare(str1, str2))
+              diff
+
+      - type: "expansion"
+        title: "🟡 변경 작업 분석"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "opcodes를 사용하여 변경 작업을 분석하세요"
+            content: |-
+              text1 = "abc"
+              text2 = "adc"
+              matcher = difflib.SequenceMatcher(None, text1, text2)
+              ops = matcher.get_opcodes()
+              result = [(tag, text1[i1:i2], text2[j1:j2]) for tag, i1, i2, j1, j2 in ops]
+              result
+
+      - type: "expansion"
+        title: "🟡 긴 공통 부분 찾기"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "가장 긴 공통 부분 문자열을 찾으세요"
+            content: |-
+              text1 = "ABCDEFGH"
+              text2 = "XYZABCPQ"
+              matcher = difflib.SequenceMatcher(None, text1, text2)
+              match = matcher.find_longest_match(0, len(text1), 0, len(text2))
+              longest = text1[match.a:match.a + match.size]
+              longest
+
+      - type: "expansion"
+        title: "🟡 컨텍스트 diff"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "context_diff를 생성하세요"
+            content: |-
+              text1 = ["apple\n", "banana\n"]
+              text2 = ["apple\n", "cherry\n"]
+              diff = list(difflib.context_diff(text1, text2, lineterm=""))
+              diff
+
+      - type: "expansion"
+        title: "🟡 리스트 비교"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "두 리스트의 유사도를 계산하세요"
+            content: |-
+              list1 = [1, 2, 3, 4, 5]
+              list2 = [1, 2, 4, 5, 6]
+              matcher = difflib.SequenceMatcher(None, list1, list2)
+              ratio = matcher.ratio()
+              ratio
+
+      - type: "expansion"
+        title: "🟡 ndiff 비교"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "ndiff를 사용하여 상세 비교를 수행하세요"
+            content: |-
+              text1 = ["one\n", "two\n"]
+              text2 = ["ore\n", "two\n"]
+              diff = list(difflib.ndiff(text1, text2))
+              diff
+
+      - type: "expansion"
+        title: "🔴 철자 검사 시스템"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "철자가 틀린 단어를 검사하고 제안하세요"
+            content: |-
+              def spellCheck(word, dictionary):
+                  suggestions = difflib.get_close_matches(word, dictionary, n=3, cutoff=0.6)
+                  return suggestions if suggestions else ["No suggestions"]
+
+              dictionary = ["hello", "world", "python", "programming"]
+              misspelled = "progaming"
+              result = spellCheck(misspelled, dictionary)
+              result
+
+      - type: "expansion"
+        title: "🔴 변경 통계"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "변경된 줄 수, 추가된 줄 수, 삭제된 줄 수를 계산하세요"
+            content: |-
+              text1 = ["a\n", "b\n", "c\n"]
+              text2 = ["a\n", "d\n", "c\n", "e\n"]
+
+              matcher = difflib.SequenceMatcher(None, text1, text2)
+              stats = {"replaced": 0, "inserted": 0, "deleted": 0}
+
+              for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+                  if tag == "replace":
+                      stats["replaced"] += 1
+                  elif tag == "insert":
+                      stats["inserted"] += 1
+                  elif tag == "delete":
+                      stats["deleted"] += 1
+
+              stats
+
+      - type: "expansion"
+        title: "🔴 파일 버전 비교"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "두 파일 버전의 diff를 생성하고 요약하세요"
+            content: |-
+              oldFile = ["import os\n", "print('v1')\n"]
+              newFile = ["import os\n", "import sys\n", "print('v2')\n"]
+
+              diff = list(difflib.unified_diff(oldFile, newFile, lineterm=""))
+              summary = {
+                  "lines": len(diff),
+                  "preview": diff[:5]
+              }
+              summary
+
+      - type: "expansion"
+        title: "🔴 중복 문서 검출"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "문서 리스트에서 중복을 검출하세요 (유사도 0.8 이상)"
+            content: |-
+              docs = ["text one", "text two", "text one modified"]
+              duplicates = []
+
+              for i in range(len(docs)):
+                  for j in range(i + 1, len(docs)):
+                      ratio = difflib.SequenceMatcher(None, docs[i], docs[j]).ratio()
+                      if ratio >= 0.8:
+                          duplicates.append((i, j, ratio))
+
+              duplicates
+
+      - type: "expansion"
+        title: "🔴 명령어 제안 시스템"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "잘못된 명령어에 대한 제안을 제공하세요"
+            content: |-
+              def suggestCmd(cmd, validCmds):
+                  matches = difflib.get_close_matches(cmd, validCmds, n=1, cutoff=0.5)
+                  if matches:
+                      return f"Did you mean '{matches[0]}'?"
+                  return "Unknown command"
+
+              commands = ["start", "stop", "restart", "status"]
+              userCmd = "stat"
+              result = suggestCmd(userCmd, commands)
+              result
+
+      - type: "expansion"
+        title: "🔴 코드 변경 분석"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "코드 변경의 유형과 위치를 분석하세요"
+            content: |-
+              oldCode = ["def foo():\n", "    pass\n"]
+              newCode = ["def foo():\n", "    return True\n"]
+
+              matcher = difflib.SequenceMatcher(None, oldCode, newCode)
+              changes = []
+
+              for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+                  if tag != "equal":
+                      changes.append({
+                          "type": tag,
+                          "line": i1 + 1
+                      })
+
+              changes
+
+      - type: "expansion"
+        title: "🔴 유사도 매트릭스"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "여러 텍스트 간의 유사도 매트릭스를 생성하세요"
+            content: |-
+              texts = ["abc", "abd", "xyz"]
+              matrix = []
+
+              for text1 in texts:
+                  row = []
+                  for text2 in texts:
+                      ratio = difflib.SequenceMatcher(None, text1, text2).ratio()
+                      row.append(round(ratio, 2))
+                  matrix.append(row)
+
+              matrix
+
+      - type: "expansion"
+        title: "🔴 대소문자 무시 비교"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "대소문자를 무시하고 텍스트를 비교하세요"
+            content: |-
+              text1 = "Hello World"
+              text2 = "HELLO WORLD"
+
+              normalRatio = difflib.SequenceMatcher(None, text1, text2).ratio()
+              caseInsensitive = difflib.SequenceMatcher(None, text1.lower(), text2.lower()).ratio()
+
+              {
+                  "normal": normalRatio,
+                  "case_insensitive": caseInsensitive
+              }
+
+      - type: "expansion"
+        title: "🔴 변경 요약 리포트"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "변경사항을 요약한 리포트를 생성하세요"
+            content: |-
+              old = ["line1\n", "line2\n", "line3\n"]
+              new = ["line1\n", "modified2\n", "line3\n", "line4\n"]
+
+              matcher = difflib.SequenceMatcher(None, old, new)
+
+              report = {
+                  "similarity": round(matcher.ratio(), 2),
+                  "total_changes": len([op for op in matcher.get_opcodes() if op[0] != "equal"]),
+                  "old_lines": len(old),
+                  "new_lines": len(new)
+              }
+
+              report
+
+      - type: "expansion"
+        title: "🔴 자동 완성 순위"
+        blocks:
+          - type: "code"
+            language: "python"
+            title: "문제"
+            description: "자동 완성 결과에 유사도 점수를 포함하세요"
+            content: |-
+              def rankedComplete(input_text, candidates):
+                  results = []
+                  for candidate in candidates:
+                      ratio = difflib.SequenceMatcher(None, input_text, candidate).ratio()
+                      if ratio > 0.3:
+                          results.append({"text": candidate, "score": round(ratio, 2)})
+                  return sorted(results, key=lambda x: x["score"], reverse=True)
+
+              candidates = ["python", "java", "javascript", "ruby"]
+              userInput = "py"
+              ranked = rankedComplete(userInput, candidates)
+              ranked

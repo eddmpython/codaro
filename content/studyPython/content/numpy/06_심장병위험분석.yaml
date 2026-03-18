@@ -1,0 +1,349 @@
+meta:
+  id: numpy_06
+  title: 심장병위험분석
+  order: 6
+  category: numpy
+  difficulty: "⭐⭐⭐"
+  badge: 중급
+  tags: ["numpy", "concatenate", "vstack", "any", "all", "sort", "argsort", "cumsum"]
+  seo:
+    title: "NumPy 배열 결합과 정렬 - 심장병 위험 분석"
+    description: "NumPy의 배열 결합과 정렬을 배우며 심장병 위험 요인 데이터를 분석합니다."
+    keywords: ["numpy", "concatenate", "sort", "argsort", "cumsum", "심장병"]
+
+intro:
+  emoji: "❤️"
+  goal: 심장병 환자 데이터로 배열 결합과 정렬을 익힙니다.
+  description: 303명의 심장병 환자 데이터를 분석합니다. 배열 결합(concatenate)으로 데이터를 병합하고, 정렬과 누적합으로 위험 요인을 분석합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: text
+    content: NumPy와 pandas를 불러옵니다. pandas는 CSV 로딩용으로만 사용합니다.
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: numpy와 pandas를 불러옵니다
+    content: |-
+      import numpy as np
+      import pandas as pd
+
+- id: step2_data
+  title: 2단계. 데이터 로드
+  subtitle: 심장병 데이터셋
+  blocks:
+  - type: text
+    content: "UCI(캘리포니아 대학교)에서 제공하는 유명한 심장병 데이터셋입니다. 303명의 환자 데이터가 있으며, 콜레스테롤(chol, 혈중 지방 수치), 안정 시 혈압(trestbps), 최대 심박수(thalach) 등 건강 지표와 함께 심장병 유무(target, 1이면 심장병 있음)가 기록되어 있습니다."
+  - type: code
+    language: python
+    title: 심장병 데이터 로드
+    description: GitHub에서 심장병 데이터를 불러옵니다
+    content: |-
+      url = "https://raw.githubusercontent.com"
+      df = pd.read_csv(f"{url}/sharmaroshan/Heart-UCI-Dataset/master/heart.csv")
+      df.head()
+
+- id: step3_columns
+  title: 3단계. 컬럼 확인
+  subtitle: 데이터 구조
+  blocks:
+  - type: text
+    content: 데이터의 컬럼을 확인합니다.
+  - type: code
+    language: python
+    title: 컬럼 목록
+    description: 데이터 컬럼을 확인합니다
+    content: |-
+      df.columns.tolist()
+
+- id: step4_extract
+  title: 4단계. 배열 추출
+  subtitle: 주요 변수
+  blocks:
+  - type: text
+    content: 주요 수치형 변수들을 NumPy 배열로 추출합니다.
+  - type: code
+    language: python
+    title: 변수 추출
+    description: 나이, 콜레스테롤, 혈압 등을 추출합니다
+    content: |-
+      age = df['age'].values
+      chol = df['chol'].values
+      bp = df['trestbps'].values
+      hr = df['thalach'].values
+      target = df['target'].values
+      age.shape
+
+- id: step5_concat_1d
+  title: 5단계. 1차원 배열 결합
+  subtitle: np.concatenate()
+  blocks:
+  - type: text
+    content: "concatenate(연결하다)는 여러 배열을 하나로 이어붙이는 함수입니다. 기차 객차를 연결하듯이 배열들을 순서대로 붙입니다. 예를 들어 [1,2,3]과 [4,5]를 concatenate하면 [1,2,3,4,5]가 됩니다. 여러 소스의 데이터를 하나로 합칠 때 유용합니다."
+  - type: code
+    language: python
+    title: 1D 결합
+    description: 두 배열을 이어붙입니다
+    content: |-
+      concat = np.concatenate([age, chol])
+      concat.shape
+  - type: tip
+    content: np.concatenate([arr1, arr2])는 배열들을 순서대로 이어붙입니다. 기본적으로 axis=0(첫 번째 축)을 따라 결합합니다.
+
+- id: step6_concat_2d
+  title: 6단계. 2차원 열 결합
+  subtitle: axis=1
+  blocks:
+  - type: text
+    content: "여러 변수를 열로 나란히 붙여 2차원 테이블을 만듭니다. 각 1차원 배열을 reshape(-1, 1)로 열 벡터로 바꾼 뒤, axis=1(열 방향)로 결합합니다. -1은 '나머지 크기는 자동 계산해줘'라는 의미입니다. 결과적으로 303명 × 3개 변수의 테이블이 만들어집니다."
+  - type: code
+    language: python
+    title: 2D 열 결합
+    description: 세 변수를 열로 결합합니다
+    content: |-
+      c1 = age.reshape(-1, 1)
+      c2 = chol.reshape(-1, 1)
+      c3 = bp.reshape(-1, 1)
+      features = np.concatenate([c1, c2, c3], axis=1)
+      features.shape
+  - type: tip
+    content: axis=1로 지정하면 열 방향으로 결합합니다. reshape(-1, 1)은 1D 배열을 열 벡터로 변환합니다. -1은 자동 계산을 의미합니다.
+
+- id: step7_vstack_hstack
+  title: 7단계. vstack과 column_stack
+  subtitle: 편리한 결합
+  blocks:
+  - type: text
+    content: "vstack, hstack, column_stack은 concatenate보다 직관적인 결합 함수입니다. vstack은 vertical(수직) stack으로 배열들을 위아래로 쌓고, hstack은 horizontal(수평) stack으로 좌우로 붙입니다. column_stack은 1차원 배열들을 각각 하나의 열로 만들어 옆으로 붙여줍니다."
+  - type: code
+    language: python
+    title: vstack
+    description: 수직으로 쌓습니다
+    content: |-
+      v = np.vstack([age, chol, bp])
+      v.shape
+  - type: code
+    language: python
+    title: column_stack
+    description: 열로 쌓습니다
+    content: |-
+      h = np.column_stack([age, chol, bp])
+      h.shape
+  - type: tip
+    content: np.vstack()은 수직(행)으로, np.hstack()은 수평(열)으로 쌓습니다. np.column_stack()은 1D 배열들을 열로 쌓아 2D 배열을 만듭니다.
+
+- id: step8_group_compare
+  title: 8단계. 그룹별 비교
+  subtitle: 심장병 유무
+  blocks:
+  - type: text
+    content: 심장병 유무(target)에 따른 평균 나이를 비교합니다.
+  - type: code
+    language: python
+    title: 그룹별 평균
+    description: 심장병 유무에 따른 평균 나이를 비교합니다
+    content: |-
+      sick = target == 1
+      well = target == 0
+      f"심장병 있음: {np.mean(age[sick]):.1f}세, 없음: {np.mean(age[well]):.1f}세"
+
+- id: step9_any_all
+  title: 9단계. any와 all
+  subtitle: 조건 검사
+  blocks:
+  - type: text
+    content: "any()는 '하나라도 있으면 True', all()은 '전부 다 그래야 True'입니다. 예를 들어 np.any(chol > 240)은 콜레스테롤 240 초과인 환자가 한 명이라도 있는지 확인합니다. np.all(bp < 180)은 모든 환자의 혈압이 180 미만인지 검사합니다. 데이터 전체에 대한 조건 검증에 유용합니다."
+  - type: code
+    language: python
+    title: any/all 조건 검사
+    description: 고위험 요인 존재 여부를 확인합니다
+    content: |-
+      hi1 = chol > 240
+      hi2 = bp > 140
+      any1 = np.any(hi1)
+      all1 = np.all(bp < 180)
+      f"고콜레스테롤 환자 존재: {any1}, 모든 환자 정상 혈압(<180): {all1}"
+  - type: tip
+    content: np.any()는 하나라도 True면 True, np.all()은 모두 True여야 True를 반환합니다. 데이터 검증에 유용합니다.
+
+- id: step10_any_axis
+  title: 10단계. 행별 any/all
+  subtitle: axis=1
+  blocks:
+  - type: text
+    content: 각 환자별로 위험 요인이 있는지 확인합니다.
+  - type: code
+    language: python
+    title: 환자별 위험 요인
+    description: 각 환자의 위험 요인 보유 여부를 확인합니다
+    content: |-
+      risks = np.column_stack([hi1, hi2, age > 60])
+      any2 = np.any(risks, axis=1)
+      all2 = np.all(risks, axis=1)
+      f"위험요인 1개 이상: {np.sum(any2)}명, 모든 위험요인: {np.sum(all2)}명"
+  - type: tip
+    content: axis=1로 지정하면 각 행(환자)별로 any/all을 계산합니다. axis=0은 각 열(위험요인)별로 계산합니다.
+
+- id: step11_sort
+  title: 11단계. 정렬
+  subtitle: np.sort()
+  blocks:
+  - type: text
+    content: 나이순으로 데이터를 정렬합니다.
+  - type: code
+    language: python
+    title: 나이 정렬
+    description: 나이를 오름차순 정렬합니다
+    content: |-
+      sorted_ = np.sort(age)
+      sorted_[:10]
+  - type: tip
+    content: np.sort()는 정렬된 새 배열을 반환합니다. 원본 배열은 변경되지 않습니다.
+
+- id: step12_argsort
+  title: 12단계. 정렬 인덱스
+  subtitle: np.argsort()
+  blocks:
+  - type: text
+    content: argsort로 정렬 인덱스를 얻어 다른 배열도 같이 정렬합니다.
+  - type: code
+    language: python
+    title: 연동 정렬
+    description: 나이순으로 다른 변수도 정렬합니다
+    content: |-
+      order = np.argsort(age)
+      arr1 = age[order]
+      arr2 = chol[order]
+      pd.DataFrame({'Age': arr1[:10], 'Cholesterol': arr2[:10]})
+  - type: tip
+    content: np.argsort()는 정렬 후 인덱스를 반환합니다. 이 인덱스로 여러 배열을 동일한 순서로 정렬할 수 있습니다.
+
+- id: step13_top10
+  title: 13단계. 상위 N개 추출
+  subtitle: 내림차순
+  blocks:
+  - type: text
+    content: 콜레스테롤 기준 상위 10명을 찾습니다.
+  - type: code
+    language: python
+    title: 상위 10명
+    description: 콜레스테롤이 높은 상위 10명을 확인합니다
+    content: |-
+      idx = np.argsort(chol)[::-1]
+      top = idx[:10]
+      pd.DataFrame({
+          'Age': age[top],
+          'Cholesterol': chol[top],
+          'HeartDisease': target[top]
+      })
+
+- id: step14_cumsum
+  title: 14단계. 누적합
+  subtitle: np.cumsum()
+  blocks:
+  - type: text
+    content: "cumsum(cumulative sum, 누적합)은 배열의 값을 순서대로 더해가는 함수입니다. [1,2,3]의 cumsum은 [1, 1+2, 1+2+3] = [1, 3, 6]입니다. 나이순 정렬된 심장병 유무(1 또는 0) 데이터에 cumsum을 적용하면, 각 나이까지 심장병 환자가 몇 명인지 누적 수를 볼 수 있습니다."
+  - type: code
+    language: python
+    title: 누적 환자 수
+    description: 나이순 심장병 환자 누적 수를 계산합니다
+    content: |-
+      t = target[order]
+      cumsum = np.cumsum(t)
+      cumsum[:20]
+  - type: tip
+    content: np.cumsum()은 누적합을 계산합니다. 시계열 분석이나 누적 분포를 볼 때 유용합니다.
+
+- id: step15_risk_score
+  title: 15단계. 위험 점수 분석
+  subtitle: 종합 분석
+  blocks:
+  - type: text
+    content: "여러 위험 요인을 종합한 점수를 만들어 분석합니다. 불리언 배열에 .astype(int)를 적용하면 True는 1, False는 0으로 변환됩니다. 콜레스테롤 > 200, 혈압 > 130, 나이 > 55 세 가지 조건을 더하면 0~3점의 위험 점수가 됩니다. 점수가 높을수록 심장병 발생률이 높아지는지 확인할 수 있습니다."
+  - type: code
+    language: python
+    title: 위험 그룹별 발생률
+    description: 위험 점수별 심장병 비율을 확인합니다
+    content: |-
+      score = (chol > 200).astype(int) + (bp > 130).astype(int) + (age > 55).astype(int)
+      levels, counts = np.unique(score, return_counts=True)
+      rows = []
+      for r in levels:
+          mask = score == r
+          rate = np.mean(target[mask])
+          rows.append([r, np.sum(mask), round(rate * 100, 1)])
+      pd.DataFrame(rows, columns=['RiskScore', 'Count', 'DiseaseRate(%)'])
+
+- id: practice
+  title: 실습
+  subtitle: 심장병 위험 분석
+  blocks:
+  - type: text
+    content: 지금까지 배운 개념을 활용하여 미션을 수행해봅시다. 각 미션은 독립적으로 실행 가능합니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 최대 심박수 기준 위험군 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        url = "https://raw.githubusercontent.com"
+        data = pd.read_csv(f"{url}/sharmaroshan/Heart-UCI-Dataset/master/heart.csv")
+        age = data['age'].values
+        hr = data['thalach'].values
+        target = data['target'].values
+    - type: code
+      title: "위험군 분석"
+      content: |-
+        limit = 220 - age
+        ratio = hr / limit
+        low = ratio < 0.7
+        mid = (ratio >= 0.7) & (ratio < 0.85)
+        high = ratio >= 0.85
+        rows = []
+        for name, mask in [('Low (<70%)', low), ('Normal (70-85%)', mid), ('High (>=85%)', high)]:
+            n = np.sum(mask)
+            rate = np.mean(target[mask]) * 100 if n > 0 else 0
+            rows.append([name, n, round(rate, 1)])
+        pd.DataFrame(rows, columns=['HR Category', 'Count', 'Disease Rate (%)'])
+  - type: expansion
+    title: "미션2: 복합 위험 요인 누적 분석"
+    blocks:
+    - type: code
+      title: "데이터 로드"
+      content: |-
+        import numpy as np
+        import pandas as pd
+
+        src = "https://raw.githubusercontent.com"
+        df = pd.read_csv(f"{src}/sharmaroshan/Heart-UCI-Dataset/master/heart.csv")
+        age = df['age'].values
+        chol = df['chol'].values
+        bp = df['trestbps'].values
+        target = df['target'].values
+    - type: code
+      title: "누적 분석"
+      content: |-
+        old = (age > 55).astype(int)
+        hi = (chol > 240).astype(int)
+        hyp = (bp > 140).astype(int)
+        matrix = np.column_stack([old, hi, hyp])
+        score = np.sum(matrix, axis=1)
+        idx = np.argsort(score)[::-1]
+        sorted1 = score[idx]
+        sorted2 = target[idx]
+        cumsum = np.cumsum(sorted2)
+        pts = [10, 30, 50, 100, 150, 200, 250, 302]
+        pd.DataFrame({
+            'TopN': pts,
+            'MinRiskScore': sorted1[np.array(pts) - 1],
+            'CumDisease': cumsum[np.array(pts) - 1],
+            'CumRate': np.round(cumsum[np.array(pts) - 1] / np.array(pts), 3)
+        })

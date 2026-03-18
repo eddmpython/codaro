@@ -1,0 +1,1695 @@
+meta:
+  id: "22"
+  title: "디자인 패턴 2"
+  day: 22
+  category: "advancedPython"
+  tags: ["design-pattern", "observer", "strategy", "command", "state", "template-method"]
+  seo:
+    title: "파이썬 디자인 패턴 2 - 행동 패턴"
+    description: "옵저버, 전략, 커맨드, 상태, 템플릿 메서드, 책임 연쇄 패턴을 학습합니다."
+    keywords: ["디자인 패턴", "행동 패턴", "옵저버", "전략", "커맨드", "상태"]
+
+intro:
+  emoji: "🎭"
+  points:
+  - "옵저버 패턴으로 이벤트 기반 통신"
+  - "전략 패턴으로 알고리즘 교체"
+  - "커맨드 패턴으로 요청 캡슐화"
+  - "상태 패턴으로 행동 변경"
+
+sections:
+- id: "observer_pattern"
+  title: "옵저버 패턴"
+  subtitle: "상태 변화 통지"
+  blocks:
+  - type: "text"
+    content: "객체 상태 변화를 다른 객체에 통지하는 패턴"
+  - type: "code"
+    language: "python"
+    title: "기본 옵저버 패턴"
+    description: "Subject와 Observer를 구현합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Observer(ABC):
+          @abstractmethod
+          def update(self, message):
+              pass
+
+      class Subject:
+          def __init__(self):
+              self._observers = []
+
+          def attach(self, observer):
+              self._observers.append(observer)
+
+          def detach(self, observer):
+              self._observers.remove(observer)
+
+          def notify(self, message):
+              for observer in self._observers:
+                  observer.update(message)
+
+      class EmailSubscriber(Observer):
+          def __init__(self, name):
+              self.name = name
+              self.messages = []
+
+          def update(self, message):
+              self.messages.append(message)
+
+      class SMSSubscriber(Observer):
+          def __init__(self, phone):
+              self.phone = phone
+              self.messages = []
+
+          def update(self, message):
+              self.messages.append(f"SMS: {message}")
+
+      newsPublisher = Subject()
+      emailSub = EmailSubscriber("Alice")
+      smsSub = SMSSubscriber("123-456")
+      newsPublisher.attach(emailSub)
+      newsPublisher.attach(smsSub)
+      newsPublisher.notify("Breaking News!")
+      observerResult = (emailSub.messages, smsSub.messages)
+      observerResult
+  - type: "code"
+    language: "python"
+    title: "이벤트 이미터"
+    description: "이벤트 기반 옵저버 패턴입니다."
+    content: |-
+      class EventEmitter:
+          def __init__(self):
+              self._events = {}
+
+          def on(self, event, callback):
+              if event not in self._events:
+                  self._events[event] = []
+              self._events[event].append(callback)
+
+          def off(self, event, callback):
+              if event in self._events:
+                  self._events[event].remove(callback)
+
+          def emit(self, event, *args):
+              results = []
+              if event in self._events:
+                  for callback in self._events[event]:
+                      results.append(callback(*args))
+              return results
+
+      emitter = EventEmitter()
+      clickResults = []
+      hoverResults = []
+      emitter.on("click", lambda x, y: clickResults.append(f"Clicked at ({x}, {y})"))
+      emitter.on("hover", lambda x, y: hoverResults.append(f"Hovered at ({x}, {y})"))
+      emitter.emit("click", 100, 200)
+      emitter.emit("hover", 50, 75)
+      emitterResult = (clickResults, hoverResults)
+      emitterResult
+
+- id: "strategy_pattern"
+  title: "전략 패턴"
+  subtitle: "알고리즘 캡슐화"
+  blocks:
+  - type: "text"
+    content: "알고리즘을 캡슐화하여 교체 가능하게 하는 패턴"
+  - type: "code"
+    language: "python"
+    title: "결제 전략"
+    description: "다양한 결제 방식을 전략으로 구현합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class PaymentStrategy(ABC):
+          @abstractmethod
+          def pay(self, amount):
+              pass
+
+      class CreditCardPayment(PaymentStrategy):
+          def __init__(self, cardNumber):
+              self.cardNumber = cardNumber
+
+          def pay(self, amount):
+              return f"Paid ${amount} with card ending {self.cardNumber[-4:]}"
+
+      class PayPalPayment(PaymentStrategy):
+          def __init__(self, email):
+              self.email = email
+
+          def pay(self, amount):
+              return f"Paid ${amount} via PayPal ({self.email})"
+
+      class CryptoPayment(PaymentStrategy):
+          def __init__(self, wallet):
+              self.wallet = wallet
+
+          def pay(self, amount):
+              return f"Paid ${amount} in crypto to {self.wallet[:8]}..."
+
+      class ShoppingCart:
+          def __init__(self):
+              self.items = []
+              self.paymentStrategy = None
+
+          def addItem(self, item, price):
+              self.items.append((item, price))
+
+          def setPaymentStrategy(self, strategy):
+              self.paymentStrategy = strategy
+
+          def checkout(self):
+              total = sum(price for _, price in self.items)
+              return self.paymentStrategy.pay(total)
+
+      cart = ShoppingCart()
+      cart.addItem("Book", 20)
+      cart.addItem("Pen", 5)
+      cart.setPaymentStrategy(CreditCardPayment("1234567890123456"))
+      payResult1 = cart.checkout()
+      cart.setPaymentStrategy(PayPalPayment("user@email.com"))
+      payResult2 = cart.checkout()
+      strategyResult = (payResult1, payResult2)
+      strategyResult
+  - type: "code"
+    language: "python"
+    title: "정렬 전략"
+    description: "다양한 정렬 알고리즘을 전략으로 구현합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class SortStrategy(ABC):
+          @abstractmethod
+          def sort(self, data):
+              pass
+
+      class BubbleSort(SortStrategy):
+          def sort(self, data):
+              arr = data.copy()
+              n = len(arr)
+              for i in range(n):
+                  for j in range(0, n - i - 1):
+                      if arr[j] > arr[j + 1]:
+                          arr[j], arr[j + 1] = arr[j + 1], arr[j]
+              return arr
+
+      class QuickSortStrategy(SortStrategy):
+          def sort(self, data):
+              if len(data) <= 1:
+                  return data
+              pivot = data[len(data) // 2]
+              left = [x for x in data if x < pivot]
+              middle = [x for x in data if x == pivot]
+              right = [x for x in data if x > pivot]
+              return self.sort(left) + middle + self.sort(right)
+
+      class Sorter:
+          def __init__(self, strategy):
+              self.strategy = strategy
+
+          def setStrategy(self, strategy):
+              self.strategy = strategy
+
+          def sort(self, data):
+              return self.strategy.sort(data)
+
+      testData = [64, 34, 25, 12, 22, 11, 90]
+      sorter = Sorter(BubbleSort())
+      bubbleResult = sorter.sort(testData)
+      sorter.setStrategy(QuickSortStrategy())
+      quickResult = sorter.sort(testData)
+      sortResult = (bubbleResult, quickResult)
+      sortResult
+
+- id: "command_pattern"
+  title: "커맨드 패턴"
+  subtitle: "요청 캡슐화"
+  blocks:
+  - type: "text"
+    content: "요청을 객체로 캡슐화하여 매개변수화하는 패턴"
+  - type: "code"
+    language: "python"
+    title: "조명 제어 커맨드"
+    description: "커맨드 패턴으로 조명을 제어합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Command(ABC):
+          @abstractmethod
+          def execute(self):
+              pass
+
+          @abstractmethod
+          def undo(self):
+              pass
+
+      class Light:
+          def __init__(self):
+              self.isOn = False
+
+          def turnOn(self):
+              self.isOn = True
+              return "Light is ON"
+
+          def turnOff(self):
+              self.isOn = False
+              return "Light is OFF"
+
+      class LightOnCommand(Command):
+          def __init__(self, light):
+              self.light = light
+
+          def execute(self):
+              return self.light.turnOn()
+
+          def undo(self):
+              return self.light.turnOff()
+
+      class LightOffCommand(Command):
+          def __init__(self, light):
+              self.light = light
+
+          def execute(self):
+              return self.light.turnOff()
+
+          def undo(self):
+              return self.light.turnOn()
+
+      class RemoteControl:
+          def __init__(self):
+              self.history = []
+
+          def submit(self, command):
+              result = command.execute()
+              self.history.append(command)
+              return result
+
+          def undoLast(self):
+              if self.history:
+                  return self.history.pop().undo()
+              return "Nothing to undo"
+
+      light = Light()
+      remote = RemoteControl()
+      cmdResult1 = remote.submit(LightOnCommand(light))
+      cmdResult2 = remote.submit(LightOffCommand(light))
+      cmdResult3 = remote.undoLast()
+      commandResult = (cmdResult1, cmdResult2, cmdResult3, light.isOn)
+      commandResult
+  - type: "code"
+    language: "python"
+    title: "텍스트 에디터 커맨드"
+    description: "Undo/Redo 기능을 구현합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class TextCommand(ABC):
+          @abstractmethod
+          def execute(self):
+              pass
+
+          @abstractmethod
+          def undo(self):
+              pass
+
+      class TextEditor:
+          def __init__(self):
+              self.content = ""
+
+          def write(self, text):
+              self.content += text
+
+          def delete(self, count):
+              deleted = self.content[-count:]
+              self.content = self.content[:-count]
+              return deleted
+
+          def getContent(self):
+              return self.content
+
+      class WriteCommand(TextCommand):
+          def __init__(self, editor, text):
+              self.editor = editor
+              self.text = text
+
+          def execute(self):
+              self.editor.write(self.text)
+
+          def undo(self):
+              self.editor.delete(len(self.text))
+
+      class DeleteCommand(TextCommand):
+          def __init__(self, editor, count):
+              self.editor = editor
+              self.count = count
+              self.deleted = ""
+
+          def execute(self):
+              self.deleted = self.editor.delete(self.count)
+
+          def undo(self):
+              self.editor.write(self.deleted)
+
+      class CommandManager:
+          def __init__(self):
+              self.undoStack = []
+              self.redoStack = []
+
+          def execute(self, command):
+              command.execute()
+              self.undoStack.append(command)
+              self.redoStack.clear()
+
+          def undo(self):
+              if self.undoStack:
+                  command = self.undoStack.pop()
+                  command.undo()
+                  self.redoStack.append(command)
+
+          def redo(self):
+              if self.redoStack:
+                  command = self.redoStack.pop()
+                  command.execute()
+                  self.undoStack.append(command)
+
+      textEditor = TextEditor()
+      cmdManager = CommandManager()
+      cmdManager.execute(WriteCommand(textEditor, "Hello "))
+      cmdManager.execute(WriteCommand(textEditor, "World"))
+      contentAfterWrite = textEditor.getContent()
+      cmdManager.undo()
+      contentAfterUndo = textEditor.getContent()
+      cmdManager.redo()
+      contentAfterRedo = textEditor.getContent()
+      textCmdResult = (contentAfterWrite, contentAfterUndo, contentAfterRedo)
+      textCmdResult
+
+- id: "state_pattern"
+  title: "상태 패턴"
+  subtitle: "상태에 따른 행동 변경"
+  blocks:
+  - type: "text"
+    content: "객체의 상태에 따라 행동을 변경하는 패턴"
+  - type: "code"
+    language: "python"
+    title: "자판기 상태"
+    description: "자판기의 상태 변화를 구현합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class State(ABC):
+          @abstractmethod
+          def insertCoin(self):
+              pass
+
+          @abstractmethod
+          def ejectCoin(self):
+              pass
+
+          @abstractmethod
+          def dispense(self):
+              pass
+
+      class NoCoinState(State):
+          def __init__(self, machine):
+              self.machine = machine
+
+          def insertCoin(self):
+              self.machine.setState(self.machine.hasCoinState)
+              return "Coin inserted"
+
+          def ejectCoin(self):
+              return "No coin to eject"
+
+          def dispense(self):
+              return "Insert coin first"
+
+      class HasCoinState(State):
+          def __init__(self, machine):
+              self.machine = machine
+
+          def insertCoin(self):
+              return "Coin already inserted"
+
+          def ejectCoin(self):
+              self.machine.setState(self.machine.noCoinState)
+              return "Coin ejected"
+
+          def dispense(self):
+              self.machine.setState(self.machine.noCoinState)
+              return "Item dispensed"
+
+      class VendingMachine:
+          def __init__(self):
+              self.noCoinState = NoCoinState(self)
+              self.hasCoinState = HasCoinState(self)
+              self.state = self.noCoinState
+
+          def setState(self, state):
+              self.state = state
+
+          def insertCoin(self):
+              return self.state.insertCoin()
+
+          def ejectCoin(self):
+              return self.state.ejectCoin()
+
+          def dispense(self):
+              return self.state.dispense()
+
+      vendingMachine = VendingMachine()
+      vmResult1 = vendingMachine.dispense()
+      vmResult2 = vendingMachine.insertCoin()
+      vmResult3 = vendingMachine.dispense()
+      stateResult = (vmResult1, vmResult2, vmResult3)
+      stateResult
+  - type: "code"
+    language: "python"
+    title: "주문 상태"
+    description: "주문의 상태 전이를 구현합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class OrderState(ABC):
+          @abstractmethod
+          def next(self, order):
+              pass
+
+          @abstractmethod
+          def prev(self, order):
+              pass
+
+          @abstractmethod
+          def getStatus(self):
+              pass
+
+      class PendingState(OrderState):
+          def next(self, order):
+              order.setState(ProcessingState())
+
+          def prev(self, order):
+              pass
+
+          def getStatus(self):
+              return "Pending"
+
+      class ProcessingState(OrderState):
+          def next(self, order):
+              order.setState(ShippedState())
+
+          def prev(self, order):
+              order.setState(PendingState())
+
+          def getStatus(self):
+              return "Processing"
+
+      class ShippedState(OrderState):
+          def next(self, order):
+              order.setState(DeliveredState())
+
+          def prev(self, order):
+              order.setState(ProcessingState())
+
+          def getStatus(self):
+              return "Shipped"
+
+      class DeliveredState(OrderState):
+          def next(self, order):
+              pass
+
+          def prev(self, order):
+              pass
+
+          def getStatus(self):
+              return "Delivered"
+
+      class Order:
+          def __init__(self):
+              self.state = PendingState()
+
+          def setState(self, state):
+              self.state = state
+
+          def nextState(self):
+              self.state.next(self)
+
+          def prevState(self):
+              self.state.prev(self)
+
+          def getStatus(self):
+              return self.state.getStatus()
+
+      order = Order()
+      orderStatus1 = order.getStatus()
+      order.nextState()
+      orderStatus2 = order.getStatus()
+      order.nextState()
+      orderStatus3 = order.getStatus()
+      order.prevState()
+      orderStatus4 = order.getStatus()
+      orderResult = (orderStatus1, orderStatus2, orderStatus3, orderStatus4)
+      orderResult
+
+- id: "template_method_pattern"
+  title: "템플릿 메서드 패턴"
+  subtitle: "알고리즘 골격 정의"
+  blocks:
+  - type: "text"
+    content: "알고리즘 골격을 정의하고 일부 단계를 서브클래스에 위임"
+  - type: "code"
+    language: "python"
+    title: "데이터 마이너"
+    description: "데이터 처리 템플릿을 구현합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class DataMiner(ABC):
+          def mine(self, path):
+              file = self.openFile(path)
+              rawData = self.extractData(file)
+              data = self.parseData(rawData)
+              analysis = self.analyzeData(data)
+              return self.sendReport(analysis)
+
+          @abstractmethod
+          def openFile(self, path):
+              pass
+
+          @abstractmethod
+          def extractData(self, file):
+              pass
+
+          def parseData(self, rawData):
+              return rawData.split(",")
+
+          def analyzeData(self, data):
+              return f"Analyzed {len(data)} items"
+
+          def sendReport(self, analysis):
+              return f"Report: {analysis}"
+
+      class PDFMiner(DataMiner):
+          def openFile(self, path):
+              return f"PDF:{path}"
+
+          def extractData(self, file):
+              return "pdf,data,extracted"
+
+      class CSVMiner(DataMiner):
+          def openFile(self, path):
+              return f"CSV:{path}"
+
+          def extractData(self, file):
+              return "csv,data,extracted,more"
+
+      pdfMiner = PDFMiner()
+      csvMiner = CSVMiner()
+      pdfReport = pdfMiner.mine("doc.pdf")
+      csvReport = csvMiner.mine("data.csv")
+      templateResult = (pdfReport, csvReport)
+      templateResult
+  - type: "code"
+    language: "python"
+    title: "게임 AI"
+    description: "게임 AI의 턴 처리 템플릿입니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class GameAI(ABC):
+          def turn(self):
+              resources = self.collectResources()
+              units = self.buildUnits(resources)
+              structures = self.buildStructures(resources)
+              attack = self.attack(units)
+              return {"resources": resources, "units": units, "structures": structures, "attack": attack}
+
+          def collectResources(self):
+              return 100
+
+          @abstractmethod
+          def buildUnits(self, resources):
+              pass
+
+          @abstractmethod
+          def buildStructures(self, resources):
+              pass
+
+          def attack(self, units):
+              return f"Attacking with {units}"
+
+      class OrcsAI(GameAI):
+          def buildUnits(self, resources):
+              return f"Built {resources // 10} Orcs"
+
+          def buildStructures(self, resources):
+              return "Built Barracks"
+
+      class MonstersAI(GameAI):
+          def collectResources(self):
+              return 50
+
+          def buildUnits(self, resources):
+              return f"Spawned {resources // 5} Monsters"
+
+          def buildStructures(self, resources):
+              return "Built Lair"
+
+      orcsAI = OrcsAI()
+      monstersAI = MonstersAI()
+      orcsTurn = orcsAI.turn()
+      monstersTurn = monstersAI.turn()
+      gameResult = (orcsTurn["units"], monstersTurn["units"])
+      gameResult
+
+- id: "chain_of_responsibility"
+  title: "책임 연쇄 패턴"
+  subtitle: "핸들러 체인"
+  blocks:
+  - type: "text"
+    content: "요청을 처리할 수 있는 핸들러를 연쇄적으로 연결"
+  - type: "code"
+    language: "python"
+    title: "인증 핸들러 체인"
+    description: "인증 및 권한 검사 체인입니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class Handler(ABC):
+          def __init__(self):
+              self._next = None
+
+          def setNext(self, handler):
+              self._next = handler
+              return handler
+
+          @abstractmethod
+          def handle(self, request):
+              pass
+
+      class AuthHandler(Handler):
+          def handle(self, request):
+              if request.get("authenticated"):
+                  if self._next:
+                      return self._next.handle(request)
+                  return "Authorized"
+              return "Authentication failed"
+
+      class RoleHandler(Handler):
+          def handle(self, request):
+              if request.get("role") == "admin":
+                  if self._next:
+                      return self._next.handle(request)
+                  return "Admin access granted"
+              return "Insufficient permissions"
+
+      class LogHandler(Handler):
+          def handle(self, request):
+              result = f"Logged: {request.get('action')}"
+              if self._next:
+                  return result + " -> " + self._next.handle(request)
+              return result
+
+      authHandler = AuthHandler()
+      roleHandler = RoleHandler()
+      logHandler = LogHandler()
+      authHandler.setNext(roleHandler).setNext(logHandler)
+      chainReq1 = {"authenticated": True, "role": "admin", "action": "delete"}
+      chainReq2 = {"authenticated": True, "role": "user", "action": "read"}
+      chainReq3 = {"authenticated": False, "role": "admin", "action": "create"}
+      chainResult1 = authHandler.handle(chainReq1)
+      chainResult2 = authHandler.handle(chainReq2)
+      chainResult3 = authHandler.handle(chainReq3)
+      chainResult = (chainResult1, chainResult2, chainResult3)
+      chainResult
+  - type: "code"
+    language: "python"
+    title: "기술 지원 체인"
+    description: "티켓 우선순위에 따른 처리 체인입니다."
+    content: |-
+      from abc import ABC, abstractmethod
+
+      class SupportHandler(ABC):
+          def __init__(self):
+              self._next = None
+              self.level = 0
+
+          def setNext(self, handler):
+              self._next = handler
+              return handler
+
+          def handle(self, ticket):
+              if ticket["priority"] <= self.level:
+                  return self.resolve(ticket)
+              elif self._next:
+                  return self._next.handle(ticket)
+              return "Ticket escalated to management"
+
+          @abstractmethod
+          def resolve(self, ticket):
+              pass
+
+      class FrontDesk(SupportHandler):
+          def __init__(self):
+              super().__init__()
+              self.level = 1
+
+          def resolve(self, ticket):
+              return f"Front desk resolved: {ticket['issue']}"
+
+      class TechSupport(SupportHandler):
+          def __init__(self):
+              super().__init__()
+              self.level = 2
+
+          def resolve(self, ticket):
+              return f"Tech support resolved: {ticket['issue']}"
+
+      class Engineer(SupportHandler):
+          def __init__(self):
+              super().__init__()
+              self.level = 3
+
+          def resolve(self, ticket):
+              return f"Engineer resolved: {ticket['issue']}"
+
+      frontDesk = FrontDesk()
+      techSupport = TechSupport()
+      engineer = Engineer()
+      frontDesk.setNext(techSupport).setNext(engineer)
+      ticket1 = {"issue": "Password reset", "priority": 1}
+      ticket2 = {"issue": "Software bug", "priority": 2}
+      ticket3 = {"issue": "System crash", "priority": 3}
+      ticket4 = {"issue": "Critical failure", "priority": 4}
+      supportResult = (frontDesk.handle(ticket1), frontDesk.handle(ticket2), frontDesk.handle(ticket3), frontDesk.handle(ticket4))
+      supportResult
+
+- id: "practice"
+  title: "종합 복습"
+  subtitle: "행동 패턴 마스터하기"
+  blocks:
+  - type: "text"
+    content: "Day 22에서 배운 행동 디자인 패턴을 난이도별로 복습합니다. 옵저버 패턴은 이벤트 시스템, 전략 패턴은 알고리즘 교체, 커맨드 패턴은 실행 취소/재실행에 핵심입니다. 상태 패턴은 복잡한 상태 전이를 객체로 캡슐화하고, 템플릿 메서드는 알고리즘의 골격을 정의합니다. 🟢 기본 문제로 각 패턴의 핵심 인터페이스를 구현하고, 🟡 응용 문제로 여러 패턴을 조합해봅니다. 🔴 심화 문제에서는 GUI 프레임워크, 게임 엔진 등에서 사용되는 복합 행동 패턴을 직접 설계합니다. 행동 패턴은 객체 간 책임 분배와 통신 방식을 결정하는 핵심 도구입니다."
+
+  - type: "expansion"
+    title: "🟢 기본1: 간단한 옵저버"
+    code: |-
+      class NewsAgency:
+          def __init__(self):
+              self.subscribers = []
+              self.latestNews = None
+
+          def subscribe(self, subscriber):
+              self.subscribers.append(subscriber)
+
+          def unsubscribe(self, subscriber):
+              self.subscribers.remove(subscriber)
+
+          def publish(self, news):
+              self.latestNews = news
+              for subscriber in self.subscribers:
+                  subscriber.receive(news)
+
+      class NewsReader:
+          def __init__(self, name):
+              self.name = name
+              self.news = []
+
+          def receive(self, news):
+              self.news.append(news)
+
+      agency = NewsAgency()
+      reader1 = NewsReader("Alice")
+      reader2 = NewsReader("Bob")
+      agency.subscribe(reader1)
+      agency.subscribe(reader2)
+      agency.publish("Breaking: New discovery!")
+      ex1Result = (reader1.news, reader2.news)
+      ex1Result
+
+  - type: "expansion"
+    title: "🟢 기본2: 간단한 전략"
+    code: |-
+      class Calculator:
+          def __init__(self, strategy):
+              self.strategy = strategy
+
+          def setStrategy(self, strategy):
+              self.strategy = strategy
+
+          def calculate(self, a, b):
+              return self.strategy(a, b)
+
+      addStrategy = lambda a, b: a + b
+      subStrategy = lambda a, b: a - b
+      mulStrategy = lambda a, b: a * b
+      divStrategy = lambda a, b: a / b if b != 0 else 0
+
+      calc = Calculator(addStrategy)
+      addResult = calc.calculate(10, 5)
+      calc.setStrategy(mulStrategy)
+      mulResult = calc.calculate(10, 5)
+      ex2Result = (addResult, mulResult)
+      ex2Result
+
+  - type: "expansion"
+    title: "🟢 기본3: 간단한 커맨드"
+    code: |-
+      class BankAccount:
+          def __init__(self, balance=0):
+              self.balance = balance
+
+          def deposit(self, amount):
+              self.balance += amount
+
+          def withdraw(self, amount):
+              if amount <= self.balance:
+                  self.balance -= amount
+                  return True
+              return False
+
+      class DepositCommand:
+          def __init__(self, account, amount):
+              self.account = account
+              self.amount = amount
+
+          def execute(self):
+              self.account.deposit(self.amount)
+
+          def undo(self):
+              self.account.withdraw(self.amount)
+
+      class WithdrawCommand:
+          def __init__(self, account, amount):
+              self.account = account
+              self.amount = amount
+              self.success = False
+
+          def execute(self):
+              self.success = self.account.withdraw(self.amount)
+
+          def undo(self):
+              if self.success:
+                  self.account.deposit(self.amount)
+
+      bankAccount = BankAccount(100)
+      depositCmd = DepositCommand(bankAccount, 50)
+      depositCmd.execute()
+      balanceAfterDeposit = bankAccount.balance
+      depositCmd.undo()
+      balanceAfterUndo = bankAccount.balance
+      ex3Result = (balanceAfterDeposit, balanceAfterUndo)
+      ex3Result
+
+  - type: "expansion"
+    title: "🟢 기본4: 간단한 상태"
+    code: |-
+      class TrafficLight:
+          def __init__(self):
+              self.states = ["Red", "Yellow", "Green"]
+              self.current = 0
+
+          def next(self):
+              self.current = (self.current + 1) % len(self.states)
+
+          def getState(self):
+              return self.states[self.current]
+
+      trafficLight = TrafficLight()
+      light1 = trafficLight.getState()
+      trafficLight.next()
+      light2 = trafficLight.getState()
+      trafficLight.next()
+      light3 = trafficLight.getState()
+      trafficLight.next()
+      light4 = trafficLight.getState()
+      ex4Result = (light1, light2, light3, light4)
+      ex4Result
+
+  - type: "expansion"
+    title: "🟢 기본5: 간단한 템플릿 메서드"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Beverage(ABC):
+          def prepare(self):
+              steps = []
+              steps.append(self.boilWater())
+              steps.append(self.brew())
+              steps.append(self.pourInCup())
+              steps.append(self.addCondiments())
+              return steps
+
+          def boilWater(self):
+              return "Boiling water"
+
+          def pourInCup(self):
+              return "Pouring into cup"
+
+          @abstractmethod
+          def brew(self):
+              pass
+
+          @abstractmethod
+          def addCondiments(self):
+              pass
+
+      class Tea(Beverage):
+          def brew(self):
+              return "Steeping tea"
+
+          def addCondiments(self):
+              return "Adding lemon"
+
+      class Coffee(Beverage):
+          def brew(self):
+              return "Dripping coffee"
+
+          def addCondiments(self):
+              return "Adding sugar and milk"
+
+      teaBeverage = Tea()
+      coffeeBeverage = Coffee()
+      ex5Result = (teaBeverage.prepare()[1], coffeeBeverage.prepare()[1])
+      ex5Result
+
+  - type: "expansion"
+    title: "🟡 응용1: 이터레이터 패턴"
+    code: |-
+      class AlphabetIterator:
+          def __init__(self, start='a', end='z'):
+              self.current = ord(start)
+              self.end = ord(end)
+
+          def __iter__(self):
+              return self
+
+          def __next__(self):
+              if self.current > self.end:
+                  raise StopIteration
+              char = chr(self.current)
+              self.current += 1
+              return char
+
+      class AlphabetCollection:
+          def __init__(self, start='a', end='z'):
+              self.start = start
+              self.end = end
+
+          def __iter__(self):
+              return AlphabetIterator(self.start, self.end)
+
+      alphabetCol = AlphabetCollection('a', 'e')
+      ex6Letters = [letter for letter in alphabetCol]
+      ex6Result = ex6Letters
+      ex6Result
+
+  - type: "expansion"
+    title: "🟡 응용2: 중재자 패턴"
+    code: |-
+      class ChatRoom:
+          def __init__(self):
+              self.users = {}
+              self.messages = []
+
+          def register(self, user):
+              self.users[user.name] = user
+              user.chatRoom = self
+
+          def send(self, message, sender, receiver=None):
+              if receiver:
+                  if receiver in self.users:
+                      self.users[receiver].receive(message, sender)
+              else:
+                  for name, user in self.users.items():
+                      if name != sender:
+                          user.receive(message, sender)
+              self.messages.append(f"{sender}: {message}")
+
+      class ChatUser:
+          def __init__(self, name):
+              self.name = name
+              self.chatRoom = None
+              self.inbox = []
+
+          def send(self, message, receiver=None):
+              self.chatRoom.send(message, self.name, receiver)
+
+          def receive(self, message, sender):
+              self.inbox.append(f"From {sender}: {message}")
+
+      chatRoom = ChatRoom()
+      userAlice = ChatUser("Alice")
+      userBob = ChatUser("Bob")
+      userCharlie = ChatUser("Charlie")
+      chatRoom.register(userAlice)
+      chatRoom.register(userBob)
+      chatRoom.register(userCharlie)
+      userAlice.send("Hello everyone!")
+      userBob.send("Hi Alice!", "Alice")
+      ex7Result = (userBob.inbox, userAlice.inbox)
+      ex7Result
+
+  - type: "expansion"
+    title: "🟡 응용3: 메멘토 패턴"
+    code: |-
+      class EditorMemento:
+          def __init__(self, content):
+              self._content = content
+
+          def getContent(self):
+              return self._content
+
+      class TextEditorMem:
+          def __init__(self):
+              self._content = ""
+
+          def type(self, text):
+              self._content += text
+
+          def getContent(self):
+              return self._content
+
+          def save(self):
+              return EditorMemento(self._content)
+
+          def restore(self, memento):
+              self._content = memento.getContent()
+
+      class History:
+          def __init__(self):
+              self._mementos = []
+
+          def push(self, memento):
+              self._mementos.append(memento)
+
+          def pop(self):
+              if self._mementos:
+                  return self._mementos.pop()
+              return None
+
+      textEditorMem = TextEditorMem()
+      editorHistory = History()
+      textEditorMem.type("Hello ")
+      editorHistory.push(textEditorMem.save())
+      textEditorMem.type("World")
+      editorHistory.push(textEditorMem.save())
+      textEditorMem.type("!")
+      contentBefore = textEditorMem.getContent()
+      textEditorMem.restore(editorHistory.pop())
+      contentAfter = textEditorMem.getContent()
+      ex8Result = (contentBefore, contentAfter)
+      ex8Result
+
+  - type: "expansion"
+    title: "🟡 응용4: 방문자 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class ShapeVisitor(ABC):
+          @abstractmethod
+          def visitCircle(self, circle):
+              pass
+
+          @abstractmethod
+          def visitRectangle(self, rectangle):
+              pass
+
+      class ShapeElement(ABC):
+          @abstractmethod
+          def accept(self, visitor):
+              pass
+
+      class CircleElement(ShapeElement):
+          def __init__(self, radius):
+              self.radius = radius
+
+          def accept(self, visitor):
+              return visitor.visitCircle(self)
+
+      class RectangleElement(ShapeElement):
+          def __init__(self, width, height):
+              self.width = width
+              self.height = height
+
+          def accept(self, visitor):
+              return visitor.visitRectangle(self)
+
+      class AreaCalculator(ShapeVisitor):
+          def visitCircle(self, circle):
+              return 3.14159 * circle.radius ** 2
+
+          def visitRectangle(self, rectangle):
+              return rectangle.width * rectangle.height
+
+      class PerimeterCalculator(ShapeVisitor):
+          def visitCircle(self, circle):
+              return 2 * 3.14159 * circle.radius
+
+          def visitRectangle(self, rectangle):
+              return 2 * (rectangle.width + rectangle.height)
+
+      circleShape = CircleElement(5)
+      rectangleShape = RectangleElement(4, 6)
+      areaCalc = AreaCalculator()
+      perimeterCalc = PerimeterCalculator()
+      circleArea = circleShape.accept(areaCalc)
+      rectPerimeter = rectangleShape.accept(perimeterCalc)
+      ex9Result = (round(circleArea, 2), rectPerimeter)
+      ex9Result
+
+  - type: "expansion"
+    title: "🟡 응용5: 인터프리터 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class Expression(ABC):
+          @abstractmethod
+          def interpret(self, context):
+              pass
+
+      class NumberExpression(Expression):
+          def __init__(self, number):
+              self.number = number
+
+          def interpret(self, context):
+              return self.number
+
+      class VariableExpression(Expression):
+          def __init__(self, name):
+              self.name = name
+
+          def interpret(self, context):
+              return context.get(self.name, 0)
+
+      class AddExpression(Expression):
+          def __init__(self, left, right):
+              self.left = left
+              self.right = right
+
+          def interpret(self, context):
+              return self.left.interpret(context) + self.right.interpret(context)
+
+      class MultiplyExpression(Expression):
+          def __init__(self, left, right):
+              self.left = left
+              self.right = right
+
+          def interpret(self, context):
+              return self.left.interpret(context) * self.right.interpret(context)
+
+      exprContext = {"x": 5, "y": 3}
+      expr = AddExpression(
+          MultiplyExpression(VariableExpression("x"), NumberExpression(2)),
+          VariableExpression("y")
+      )
+      ex10Result = expr.interpret(exprContext)
+      ex10Result
+
+  - type: "expansion"
+    title: "🔴 심화1: 옵저버 + 이벤트 시스템"
+    code: |-
+      class EventSystem:
+          def __init__(self):
+              self.listeners = {}
+
+          def subscribe(self, eventType, listener, priority=0):
+              if eventType not in self.listeners:
+                  self.listeners[eventType] = []
+              self.listeners[eventType].append((priority, listener))
+              self.listeners[eventType].sort(key=lambda x: -x[0])
+
+          def unsubscribe(self, eventType, listener):
+              if eventType in self.listeners:
+                  self.listeners[eventType] = [(p, l) for p, l in self.listeners[eventType] if l != listener]
+
+          def emit(self, eventType, data):
+              results = []
+              if eventType in self.listeners:
+                  for _, listener in self.listeners[eventType]:
+                      results.append(listener(data))
+              return results
+
+      eventSys = EventSystem()
+      logResults = []
+      eventSys.subscribe("user.login", lambda d: logResults.append(f"Low: {d['user']}"), 1)
+      eventSys.subscribe("user.login", lambda d: logResults.append(f"High: {d['user']}"), 10)
+      eventSys.emit("user.login", {"user": "Alice"})
+      ex11Result = logResults
+      ex11Result
+
+  - type: "expansion"
+    title: "🔴 심화2: 전략 + 팩토리"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class DiscountStrategy(ABC):
+          @abstractmethod
+          def calculate(self, price):
+              pass
+
+      class NoDiscount(DiscountStrategy):
+          def calculate(self, price):
+              return price
+
+      class PercentDiscount(DiscountStrategy):
+          def __init__(self, percent):
+              self.percent = percent
+
+          def calculate(self, price):
+              return price * (1 - self.percent / 100)
+
+      class FixedDiscount(DiscountStrategy):
+          def __init__(self, amount):
+              self.amount = amount
+
+          def calculate(self, price):
+              return max(0, price - self.amount)
+
+      class DiscountFactory:
+          @staticmethod
+          def create(discountType, value=0):
+              if discountType == "none":
+                  return NoDiscount()
+              elif discountType == "percent":
+                  return PercentDiscount(value)
+              elif discountType == "fixed":
+                  return FixedDiscount(value)
+              return NoDiscount()
+
+      originalPrice = 100
+      noDiscStrategy = DiscountFactory.create("none")
+      percentStrategy = DiscountFactory.create("percent", 20)
+      fixedStrategy = DiscountFactory.create("fixed", 15)
+      ex12Result = (noDiscStrategy.calculate(originalPrice), percentStrategy.calculate(originalPrice), fixedStrategy.calculate(originalPrice))
+      ex12Result
+
+  - type: "expansion"
+    title: "🔴 심화3: 커맨드 + 매크로"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class MacroCommand(ABC):
+          @abstractmethod
+          def execute(self):
+              pass
+
+      class PrintCommand(MacroCommand):
+          def __init__(self, message):
+              self.message = message
+
+          def execute(self):
+              return f"Print: {self.message}"
+
+      class SaveCommand(MacroCommand):
+          def __init__(self, filename):
+              self.filename = filename
+
+          def execute(self):
+              return f"Save: {self.filename}"
+
+      class EmailCommand(MacroCommand):
+          def __init__(self, recipient):
+              self.recipient = recipient
+
+          def execute(self):
+              return f"Email to: {self.recipient}"
+
+      class MacroExecutor:
+          def __init__(self):
+              self.commands = []
+
+          def add(self, command):
+              self.commands.append(command)
+              return self
+
+          def execute(self):
+              return [cmd.execute() for cmd in self.commands]
+
+          def clear(self):
+              self.commands = []
+
+      macro = MacroExecutor()
+      macro.add(PrintCommand("Report")).add(SaveCommand("report.pdf")).add(EmailCommand("boss@company.com"))
+      ex13Result = macro.execute()
+      ex13Result
+
+  - type: "expansion"
+    title: "🔴 심화4: 상태 + 전이 테이블"
+    code: |-
+      class StateMachine:
+          def __init__(self, initialState, transitions):
+              self.state = initialState
+              self.transitions = transitions
+              self.history = [initialState]
+
+          def trigger(self, event):
+              key = (self.state, event)
+              if key in self.transitions:
+                  self.state = self.transitions[key]
+                  self.history.append(self.state)
+                  return True
+              return False
+
+          def getState(self):
+              return self.state
+
+          def getHistory(self):
+              return self.history
+
+      transitionTable = {
+          ("idle", "start"): "running",
+          ("running", "pause"): "paused",
+          ("paused", "resume"): "running",
+          ("running", "stop"): "idle",
+          ("paused", "stop"): "idle"
+      }
+
+      machine = StateMachine("idle", transitionTable)
+      machine.trigger("start")
+      machine.trigger("pause")
+      machine.trigger("resume")
+      machine.trigger("stop")
+      ex14Result = (machine.getState(), machine.getHistory())
+      ex14Result
+
+  - type: "expansion"
+    title: "🔴 심화5: 책임 연쇄 + 미들웨어"
+    code: |-
+      class Middleware:
+          def __init__(self):
+              self._next = None
+
+          def setNext(self, middleware):
+              self._next = middleware
+              return middleware
+
+          def handle(self, request):
+              if self._next:
+                  return self._next.handle(request)
+              return request
+
+      class LoggingMiddleware(Middleware):
+          def handle(self, request):
+              request["logs"] = request.get("logs", [])
+              request["logs"].append("Logged request")
+              return super().handle(request)
+
+      class AuthMiddleware(Middleware):
+          def handle(self, request):
+              if not request.get("token"):
+                  request["error"] = "Unauthorized"
+                  return request
+              request["authenticated"] = True
+              return super().handle(request)
+
+      class ValidationMiddleware(Middleware):
+          def handle(self, request):
+              if not request.get("data"):
+                  request["error"] = "No data provided"
+                  return request
+              request["validated"] = True
+              return super().handle(request)
+
+      logging = LoggingMiddleware()
+      auth = AuthMiddleware()
+      validation = ValidationMiddleware()
+      logging.setNext(auth).setNext(validation)
+      validReq = {"token": "abc123", "data": {"name": "test"}}
+      invalidReq = {"data": {"name": "test"}}
+      ex15Valid = logging.handle(validReq.copy())
+      ex15Invalid = logging.handle(invalidReq.copy())
+      ex15Result = (ex15Valid.get("validated"), ex15Invalid.get("error"))
+      ex15Result
+
+  - type: "expansion"
+    title: "🔴 심화6: 템플릿 + 훅"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class ReportGenerator(ABC):
+          def generate(self, data):
+              self.beforeGenerate(data)
+              header = self.createHeader(data)
+              body = self.createBody(data)
+              footer = self.createFooter(data)
+              self.afterGenerate(data)
+              return {"header": header, "body": body, "footer": footer}
+
+          def beforeGenerate(self, data):
+              pass
+
+          def afterGenerate(self, data):
+              pass
+
+          @abstractmethod
+          def createHeader(self, data):
+              pass
+
+          @abstractmethod
+          def createBody(self, data):
+              pass
+
+          def createFooter(self, data):
+              return "Generated automatically"
+
+      class SalesReport(ReportGenerator):
+          def __init__(self):
+              self.logs = []
+
+          def beforeGenerate(self, data):
+              self.logs.append("Starting sales report")
+
+          def afterGenerate(self, data):
+              self.logs.append("Finished sales report")
+
+          def createHeader(self, data):
+              return f"Sales Report: {data.get('period')}"
+
+          def createBody(self, data):
+              return f"Total: ${data.get('total', 0)}"
+
+      salesReport = SalesReport()
+      reportData = {"period": "Q1 2024", "total": 50000}
+      generatedReport = salesReport.generate(reportData)
+      ex16Result = (generatedReport["header"], salesReport.logs)
+      ex16Result
+
+  - type: "expansion"
+    title: "🔴 심화7: 옵저버 + 비동기 시뮬레이션"
+    code: |-
+      class AsyncEventEmitter:
+          def __init__(self):
+              self.handlers = {}
+              self.pending = []
+
+          def on(self, event, handler):
+              if event not in self.handlers:
+                  self.handlers[event] = []
+              self.handlers[event].append(handler)
+
+          def emit(self, event, data):
+              if event in self.handlers:
+                  for handler in self.handlers[event]:
+                      self.pending.append((handler, data))
+
+          def process(self):
+              results = []
+              while self.pending:
+                  handler, data = self.pending.pop(0)
+                  results.append(handler(data))
+              return results
+
+      asyncEmitter = AsyncEventEmitter()
+      processedItems = []
+      asyncEmitter.on("data", lambda d: processedItems.append(f"Processed: {d}"))
+      asyncEmitter.on("data", lambda d: processedItems.append(f"Logged: {d}"))
+      asyncEmitter.emit("data", "Item1")
+      asyncEmitter.emit("data", "Item2")
+      asyncEmitter.process()
+      ex17Result = processedItems
+      ex17Result
+
+  - type: "expansion"
+    title: "🔴 심화8: 전략 + 컨텍스트 인식"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class CompressionStrategy(ABC):
+          @abstractmethod
+          def compress(self, data):
+              pass
+
+          @abstractmethod
+          def getExtension(self):
+              pass
+
+      class ZipCompression(CompressionStrategy):
+          def compress(self, data):
+              return f"ZIP[{len(data)} bytes]"
+
+          def getExtension(self):
+              return ".zip"
+
+      class GzipCompression(CompressionStrategy):
+          def compress(self, data):
+              return f"GZIP[{len(data)} bytes]"
+
+          def getExtension(self):
+              return ".gz"
+
+      class CompressionContext:
+          def __init__(self):
+              self.strategies = {
+                  "small": ZipCompression(),
+                  "large": GzipCompression()
+              }
+
+          def compress(self, data):
+              size = len(data)
+              strategy = self.strategies["large"] if size > 100 else self.strategies["small"]
+              return {"result": strategy.compress(data), "extension": strategy.getExtension()}
+
+      compressor = CompressionContext()
+      smallData = "Hello"
+      largeData = "x" * 200
+      ex18Small = compressor.compress(smallData)
+      ex18Large = compressor.compress(largeData)
+      ex18Result = (ex18Small["extension"], ex18Large["extension"])
+      ex18Result
+
+  - type: "expansion"
+    title: "🔴 심화9: 커맨드 + 트랜잭션"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class TransactionCommand(ABC):
+          @abstractmethod
+          def execute(self):
+              pass
+
+          @abstractmethod
+          def rollback(self):
+              pass
+
+      class TransferCommand(TransactionCommand):
+          def __init__(self, fromAcc, toAcc, amount):
+              self.fromAcc = fromAcc
+              self.toAcc = toAcc
+              self.amount = amount
+              self.executed = False
+
+          def execute(self):
+              if self.fromAcc["balance"] >= self.amount:
+                  self.fromAcc["balance"] -= self.amount
+                  self.toAcc["balance"] += self.amount
+                  self.executed = True
+                  return True
+              return False
+
+          def rollback(self):
+              if self.executed:
+                  self.fromAcc["balance"] += self.amount
+                  self.toAcc["balance"] -= self.amount
+                  self.executed = False
+
+      class Transaction:
+          def __init__(self):
+              self.commands = []
+
+          def add(self, command):
+              self.commands.append(command)
+
+          def execute(self):
+              executed = []
+              for cmd in self.commands:
+                  if cmd.execute():
+                      executed.append(cmd)
+                  else:
+                      for c in reversed(executed):
+                          c.rollback()
+                      return False
+              return True
+
+      account1 = {"balance": 100}
+      account2 = {"balance": 50}
+      transaction = Transaction()
+      transaction.add(TransferCommand(account1, account2, 30))
+      transaction.add(TransferCommand(account2, account1, 20))
+      transactionSuccess = transaction.execute()
+      ex19Result = (transactionSuccess, account1["balance"], account2["balance"])
+      ex19Result
+
+  - type: "expansion"
+    title: "🔴 심화10: 복합 행동 패턴"
+    code: |-
+      from abc import ABC, abstractmethod
+
+      class GameState(ABC):
+          @abstractmethod
+          def enter(self):
+              pass
+
+          @abstractmethod
+          def update(self):
+              pass
+
+          @abstractmethod
+          def exit(self):
+              pass
+
+      class MenuState(GameState):
+          def enter(self):
+              return "Entering menu"
+
+          def update(self):
+              return "Menu active"
+
+          def exit(self):
+              return "Leaving menu"
+
+      class PlayState(GameState):
+          def __init__(self):
+              self.score = 0
+
+          def enter(self):
+              self.score = 0
+              return "Game started"
+
+          def update(self):
+              self.score += 10
+              return f"Playing, score: {self.score}"
+
+          def exit(self):
+              return f"Game over, final score: {self.score}"
+
+      class GameStateMachine:
+          def __init__(self):
+              self.states = {}
+              self.current = None
+              self.logs = []
+
+          def addState(self, name, state):
+              self.states[name] = state
+
+          def setState(self, name):
+              if self.current:
+                  self.logs.append(self.states[self.current].exit())
+              self.current = name
+              self.logs.append(self.states[name].enter())
+
+          def update(self):
+              if self.current:
+                  self.logs.append(self.states[self.current].update())
+
+      gameMachine = GameStateMachine()
+      gameMachine.addState("menu", MenuState())
+      gameMachine.addState("play", PlayState())
+      gameMachine.setState("menu")
+      gameMachine.update()
+      gameMachine.setState("play")
+      gameMachine.update()
+      gameMachine.update()
+      gameMachine.setState("menu")
+      ex20Result = gameMachine.logs
+      ex20Result

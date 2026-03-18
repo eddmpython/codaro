@@ -1,0 +1,305 @@
+meta:
+  id: regex_05
+  title: 로그파일분석
+  order: 5
+  category: regex
+  difficulty: "⭐⭐"
+  badge: 기초
+  tags: ["로그", "멀티라인", "MULTILINE", "타임스탬프", "에러 파싱"]
+  seo:
+    title: "정규표현식 기초 - 로그 파일 분석"
+    description: "정규표현식으로 서버 로그를 파싱합니다. 멀티라인 모드, ^$ 앵커, 타임스탬프 추출을 배웁니다."
+    keywords: ["정규표현식", "regex", "로그 파싱", "re.MULTILINE", "타임스탬프"]
+
+intro:
+  emoji: "📋"
+  goal: 서버 로그에서 에러 메시지, 타임스탬프, IP 주소를 추출합니다.
+  description: 실무에서 가장 많이 사용하는 정규표현식 활용 사례입니다. 멀티라인 모드와 앵커(^$)를 배워 로그 분석을 마스터합니다.
+
+sections:
+- id: step1_import
+  title: 1단계. 라이브러리 불러오기
+  subtitle: import
+  blocks:
+  - type: code
+    language: python
+    title: 라이브러리 불러오기
+    description: 정규표현식 모듈
+    content: |-
+      import re
+
+- id: step2_prepare_log
+  title: 2단계. 로그 데이터 준비
+  subtitle: 실제 서버 로그 형식
+  blocks:
+  - type: text
+    content: 실제 서버 로그 형식을 재현한 샘플 데이터를 만듭니다. 서버 로그는 날짜, 시간, 로그 레벨, IP 주소, 메시지 등 정형화된 구조를 가지고 있어 정규표현식 파싱에 적합합니다. 시스템 관리자와 DevOps 엔지니어가 가장 많이 사용하는 정규표현식 활용 사례입니다.
+  - type: code
+    language: python
+    title: 서버 로그 샘플
+    description: 다양한 로그 레벨과 메시지를 포함한 로그
+    content: |-
+      serverLog = """
+      2025-12-26 10:15:30 INFO [192.168.1.100] User login successful
+      2025-12-26 10:16:45 ERROR [192.168.1.101] Database connection failed: timeout
+      2025-12-26 10:17:12 WARNING [192.168.1.102] High memory usage: 85%
+      2025-12-26 10:18:03 INFO [192.168.1.100] User logout
+      2025-12-26 10:19:55 ERROR [192.168.1.103] File not found: /var/log/app.log
+      2025-12-26 10:20:30 ERROR [192.168.1.101] Connection reset by peer
+      2025-12-26 10:21:15 INFO [192.168.1.104] Request completed in 120ms
+      """
+      serverLog
+  - type: text
+    content: |-
+      로그 형식:
+      - 타임스탬프: YYYY-MM-DD HH:MM:SS
+      - 로그 레벨: INFO, WARNING, ERROR
+      - IP 주소: [192.168.1.xxx]
+      - 메시지: 실제 로그 내용
+
+- id: step3_extract_errors
+  title: 3단계. 에러 로그만 추출
+  subtitle: ERROR 레벨 필터링
+  blocks:
+  - type: text
+    content: 먼저 ERROR 레벨의 로그만 찾아봅시다. 에러 로그는 시스템 문제를 진단하는 데 가장 중요한 정보입니다. 수천 줄의 로그에서 에러만 빠르게 필터링하면 문제 해결 시간을 크게 단축할 수 있습니다.
+  - type: code
+    language: python
+    title: 에러 로그 추출
+    description: ERROR 키워드가 포함된 줄 찾기
+    content: |-
+      pattern = r".*ERROR.*"
+
+      errors = re.findall(pattern, serverLog)
+      errors
+  - type: text
+    content: 잘 작동합니다! 하지만 줄 단위로 더 정확하게 찾는 방법이 있습니다. 앵커(anchor)를 사용하면 줄의 시작과 끝을 명시적으로 지정할 수 있어, 부분 매칭이 아닌 전체 줄을 정확하게 추출할 수 있습니다.
+
+- id: step4_line_anchors
+  title: 4단계. 줄 앵커 사용하기
+  subtitle: ^ 와 $ 메타문자
+  blocks:
+  - type: text
+    content: "^ 는 줄의 시작, $ 는 줄의 끝을 나타내는 앵커(anchor) 메타문자입니다. 하지만 기본적으로는 전체 문자열의 시작과 끝만 매칭합니다. re.MULTILINE 플래그를 사용해야 각 줄마다 ^와 $가 작동합니다."
+  - type: code
+    language: python
+    title: 앵커 없이
+    description: 줄 구분 없이 전체에서 찾기
+    content: |-
+      pattern = r"ERROR.*"
+      re.findall(pattern, serverLog)
+  - type: code
+    language: python
+    title: re.MULTILINE 플래그
+    description: 각 줄마다 ^$를 적용
+    content: |-
+      pattern = r"^.*ERROR.*$"
+
+      errors = re.findall(pattern, serverLog, flags=re.MULTILINE)
+      errors
+  - type: note
+    style: tip
+    title: "re.MULTILINE (re.M)"
+    content: |-
+      **re.MULTILINE** 또는 **re.M** 플래그:
+      - `^` 가 각 줄의 시작을 매칭
+      - `$` 가 각 줄의 끝을 매칭
+      - 기본값은 전체 문자열의 시작/끝만
+
+      로그 파일처럼 여러 줄 텍스트를 다룰 때 필수!
+
+- id: step5_parse_timestamp
+  title: 5단계. 타임스탬프 추출
+  subtitle: 날짜/시간 패턴
+  blocks:
+  - type: text
+    content: 각 에러 로그의 타임스탬프를 추출합니다.
+  - type: code
+    language: python
+    title: 타임스탬프 패턴
+    description: YYYY-MM-DD HH:MM:SS 형식 추출
+    content: |-
+      pattern = r"(\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2})"
+
+      timestamps = re.findall(pattern, serverLog)
+      timestamps
+  - type: note
+    style: tip
+    title: "타임스탬프 패턴 해석"
+    content: |-
+      - `\d{4}` : 연도 4자리
+      - `-` : 하이픈 리터럴
+      - `\d{2}` : 월/일 2자리
+      - ` ` : 공백
+      - `\d{2}:\d{2}:\d{2}` : 시:분:초
+
+- id: step6_structured_parsing
+  title: 6단계. 구조화된 로그 파싱
+  subtitle: 모든 정보를 한 번에
+  blocks:
+  - type: text
+    content: 타임스탬프, 레벨, IP, 메시지를 모두 추출하는 완전한 패턴을 만듭니다.
+  - type: code
+    language: python
+    title: 완전한 로그 파싱 패턴
+    description: 이름 있는 그룹으로 모든 정보 추출
+    content: |-
+      pattern = r"^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) (?P<level>\w+) \[(?P<ip>[\d.]+)\] (?P<message>.+)$"
+
+      matches = re.finditer(pattern, serverLog, flags=re.MULTILINE)
+
+      parsedLogs = [match.groupdict() for match in matches]
+      parsedLogs[:3]
+  - type: note
+    style: tip
+    title: "re.finditer() 사용"
+    content: |-
+      **re.finditer(패턴, 텍스트)**:
+      - findall과 비슷하지만 Match 객체들을 반환
+      - 각 Match에서 .groupdict() 사용 가능
+      - 메모리 효율적 (제너레이터)
+
+- id: step7_filter_errors
+  title: 7단계. 에러만 필터링
+  subtitle: 조건부 추출
+  blocks:
+  - type: text
+    content: 파싱한 로그에서 ERROR 레벨만 필터링합니다.
+  - type: code
+    language: python
+    title: 에러 로그만 추출
+    description: level이 ERROR인 것만 필터
+    content: |-
+      matches = re.finditer(pattern, serverLog, flags=re.MULTILINE)
+      parsedLogs = [match.groupdict() for match in matches]
+
+      errorLogs = [log for log in parsedLogs if log['level'] == 'ERROR']
+      errorLogs
+  - type: code
+    language: python
+    title: 에러 메시지만 출력
+    description: 타임스탬프와 메시지만 표시
+    content: |-
+      for error in errorLogs:
+          f"{error['timestamp']}: {error['message']}"
+
+- id: step8_ip_analysis
+  title: 8단계. IP 주소 분석
+  subtitle: 에러 발생 IP 통계
+  blocks:
+  - type: text
+    content: 어느 IP에서 에러가 가장 많이 발생했는지 확인합니다.
+  - type: code
+    language: python
+    title: IP별 에러 횟수
+    description: 에러가 발생한 IP 주소별로 카운트
+    content: |-
+      ipCount = {}
+      for error in errorLogs:
+          ip = error['ip']
+          ipCount[ip] = ipCount.get(ip, 0) + 1
+
+      ipCount
+  - type: text
+    content: "192.168.1.101에서 에러가 2번 발생했네요. 이 서버를 점검해야겠습니다!"
+
+- id: step9_advanced_pattern
+  title: 9단계. 특정 에러 검색
+  subtitle: 메시지 내용 기반 필터링
+  blocks:
+  - type: text
+    content: 특정 키워드가 포함된 에러만 찾아봅시다. 예를 들어 "connection" 관련 에러.
+  - type: code
+    language: python
+    title: 연결 관련 에러만 추출
+    description: 메시지에 connection이 포함된 에러
+    content: |-
+      pattern = r"^(?P<timestamp>[\d\-: ]+) ERROR .* (?P<message>.*connection.*)$"
+
+      matches = re.finditer(pattern, serverLog, flags=re.MULTILINE | re.IGNORECASE)
+
+      connectionErrors = [match.groupdict() for match in matches]
+      connectionErrors
+  - type: note
+    style: tip
+    title: "re.IGNORECASE (re.I)"
+    content: |-
+      **re.IGNORECASE** 또는 **re.I** 플래그:
+      - 대소문자 구분 안 함
+      - connection, Connection, CONNECTION 모두 매칭
+
+      **플래그 조합**: `re.MULTILINE | re.IGNORECASE`
+
+- id: practice
+  title: 실습
+  subtitle: 로그 분석 프로젝트
+  blocks:
+  - type: text
+    content: 서버 관리자가 되어 로그 파일을 분석합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: WARNING 로그 메모리 사용률 추출"
+    blocks:
+    - type: code
+      title: "메모리 경고 로그 파싱"
+      content: |-
+        import re
+
+        log = """
+        2025-12-26 10:17:12 WARNING [192.168.1.102] High memory usage: 85%
+        2025-12-26 10:25:30 WARNING [192.168.1.105] High CPU usage: 92%
+        2025-12-26 10:30:45 WARNING [192.168.1.102] High memory usage: 91%
+        """
+
+        pat = r"^(?P<timestamp>[\d\-: ]+) WARNING .* memory usage: (?P<percent>\d+)%"
+        matches = re.finditer(pat, log, flags=re.MULTILINE | re.IGNORECASE)
+
+        result = [
+            {"시간": m.group('timestamp'), "사용률": m.group('percent') + "%"}
+            for m in matches
+        ]
+        result
+  - type: expansion
+    title: "미션2: IP별 에러 횟수 분석"
+    blocks:
+    - type: code
+      title: "에러 로그 파싱"
+      content: |-
+        import re
+
+        text = """
+        2025-12-26 10:16:45 ERROR [192.168.1.101] Database connection failed
+        2025-12-26 10:19:55 ERROR [192.168.1.103] File not found
+        2025-12-26 10:20:30 ERROR [192.168.1.101] Connection reset
+        2025-12-26 10:22:15 ERROR [192.168.1.101] Timeout error
+        2025-12-26 10:23:45 ERROR [192.168.1.103] Permission denied
+        """
+
+        pat = r"^(?P<timestamp>[\d\-: ]+) ERROR \[(?P<ip>[\d.]+)\] (?P<message>.+)$"
+        matches = re.finditer(pat, text, flags=re.MULTILINE)
+        parsed = [m.groupdict() for m in matches]
+        parsed
+    - type: code
+      title: "IP별 에러 통계"
+      content: |-
+        stats = {}
+        for item in parsed:
+            ip = item['ip']
+            stats[ip] = stats.get(ip, 0) + 1
+        stats
+
+- id: summary
+  title: 정리
+  subtitle: 다섯 번째 프로젝트 완료!
+  blocks:
+  - type: text
+    content: 이번 프로젝트에서는 멀티라인 모드와 줄 앵커를 배웠습니다. 서버 로그를 파싱하고 분석할 수 있습니다.
+  - type: list
+    items:
+    - "^, $ - 줄 시작/끝 앵커"
+    - "re.MULTILINE - 줄마다 앵커 적용"
+    - "re.IGNORECASE - 대소문자 무시"
+    - "re.finditer() - Match 객체 반환"
+  - type: text
+    content: 이제 기초 단계를 완료했습니다! 다음부터는 중급 프로젝트가 시작됩니다!

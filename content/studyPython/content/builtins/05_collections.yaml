@@ -1,0 +1,464 @@
+meta:
+  id: "05_collections"
+  title: "collections - 특수 컨테이너"
+  category: "builtins"
+  tags: ["collections", "Counter", "defaultdict", "deque", "namedtuple"]
+  seo:
+    title: "파이썬 collections 모듈 완전 정복"
+    description: "collections 모듈의 Counter, defaultdict, deque, namedtuple 등 특수 컨테이너를 배웁니다."
+    keywords: ["collections", "Counter", "defaultdict", "deque", "namedtuple", "파이썬컬렉션"]
+
+intro:
+  emoji: "📦"
+  points:
+  - "Counter로 빈도 계산"
+  - "defaultdict로 기본값 처리"
+  - "deque로 양방향 큐 구현"
+  - "namedtuple로 가독성 향상"
+
+sections:
+- id: "module_import"
+  title: "collections 모듈 불러오기"
+  subtitle: "⚠️ 가장 먼저 실행하세요"
+  blocks:
+  - type: "text"
+    content: "collections은 파이썬 표준 라이브러리입니다. Counter, deque, defaultdict 등 특수 컨테이너를 제공하는 모듈입니다. 별도 설치 없이 import만으로 사용할 수 있습니다."
+  - type: "note"
+    content: "이 섹션을 먼저 실행하면 아래 모든 예제에서 collections 모듈을 사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "collections 모듈 불러오기"
+    description: "collections 모듈을 불러옵니다."
+    content: |-
+      from collections import Counter, defaultdict, deque, namedtuple, ChainMap
+
+      # 모듈 로드 확인
+      'collections 모듈이 정상적으로 로드되었습니다'
+  - type: "tip"
+    content: "Marimo에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
+
+- id: "counter"
+  title: "Counter - 빈도 계산기"
+  subtitle: "요소의 개수 세기"
+  blocks:
+  - type: "text"
+    content: "Counter는 요소의 등장 횟수를 세는 특수 딕셔너리입니다. most_common()으로 가장 많이 등장한 요소를 찾고, 산술 연산으로 카운터를 합치거나 뺄 수 있습니다. 투표 집계, 단어 빈도 분석, 통계 처리에 필수적입니다."
+  - type: "list"
+    items:
+    - "Counter(리스트): 빈도 딕셔너리 생성"
+    - "most_common(n): 상위 n개"
+    - "산술 연산: +, -, &, |"
+    - "elements(): 원소 반복자"
+  - type: "code"
+    language: "python"
+    title: "기본 카운팅"
+    description: "리스트의 각 요소가 몇 번 등장하는지 셉니다."
+    content: |-
+      fruits = ['apple', 'banana', 'apple', 'cherry', 'banana', 'apple']
+      fruitCount = Counter(fruits)
+      fruitCount
+  - type: "code"
+    language: "python"
+    title: "가장 많이 등장한 요소"
+    description: "가장 빈도가 높은 상위 2개를 찾습니다."
+    content: |-
+      letters = ['a', 'b', 'c', 'a', 'b', 'a']
+      letterCount = Counter(letters)
+      topTwo = letterCount.most_common(2)
+      topTwo
+  - type: "code"
+    language: "python"
+    title: "문자열 카운팅"
+    description: "문자열의 각 문자 빈도를 셉니다."
+    content: |-
+      text = 'hello world'
+      charFreq = Counter(text)
+      charFreq
+  - type: "tip"
+    content: "Counter는 존재하지 않는 키에 대해 0을 반환합니다. KeyError가 발생하지 않습니다."
+
+- id: "defaultdict"
+  title: "defaultdict - 기본값 딕셔너리"
+  subtitle: "KeyError 없는 딕셔너리"
+  blocks:
+  - type: "text"
+    content: "defaultdict는 존재하지 않는 키에 접근할 때 기본값을 자동으로 생성합니다. int, list, set 등을 기본 팩토리로 지정하면 초기화 없이 바로 사용할 수 있습니다. 그룹화, 집계, 인덱싱 작업을 간결하게 만듭니다."
+  - type: "list"
+    items:
+    - "defaultdict(int): 기본값 0"
+    - "defaultdict(list): 기본값 빈 리스트"
+    - "defaultdict(set): 기본값 빈 집합"
+    - "자동 초기화로 코드 간소화"
+  - type: "code"
+    language: "python"
+    title: "int 기본값"
+    description: "존재하지 않는 키는 자동으로 0으로 초기화됩니다."
+    content: |-
+      scores = defaultdict(int)
+      scores['alice'] += 10
+      scores['bob'] += 5
+      scores['alice'] += 3
+      dict(scores)
+  - type: "code"
+    language: "python"
+    title: "list 기본값"
+    description: "키마다 빈 리스트가 자동 생성되어 append 가능합니다."
+    content: |-
+      groups = defaultdict(list)
+      groups['fruits'].append('apple')
+      groups['fruits'].append('banana')
+      groups['vegetables'].append('carrot')
+      dict(groups)
+  - type: "code"
+    language: "python"
+    title: "단어 길이별 그룹화"
+    description: "단어를 길이별로 분류합니다."
+    content: |-
+      words = ['cat', 'dog', 'elephant', 'ant']
+      byLength = defaultdict(list)
+      for word in words:
+          byLength[len(word)].append(word)
+      dict(byLength)
+  - type: "tip"
+    content: "defaultdict(lambda: 값)으로 커스텀 기본값을 설정할 수 있습니다."
+
+- id: "deque"
+  title: "deque - 양방향 큐"
+  subtitle: "빠른 양쪽 끝 삽입/삭제"
+  blocks:
+  - type: "text"
+    content: "deque는 양쪽 끝에서 빠르게 삽입과 삭제가 가능한 자료구조입니다. append()/pop()은 오른쪽, appendleft()/popleft()는 왼쪽에서 작동합니다. 리스트보다 양 끝 연산이 훨씬 빠르며, 큐, 스택, 슬라이딩 윈도우에 활용됩니다."
+  - type: "list"
+    items:
+    - "append(x): 오른쪽에 추가"
+    - "appendleft(x): 왼쪽에 추가"
+    - "pop(): 오른쪽에서 제거"
+    - "popleft(): 왼쪽에서 제거"
+  - type: "code"
+    language: "python"
+    title: "양방향 추가"
+    description: "양쪽 끝에서 요소를 추가합니다."
+    content: |-
+      dq = deque([1, 2, 3])
+      dq.append(4)
+      dq.appendleft(0)
+      list(dq)
+  - type: "code"
+    language: "python"
+    title: "양방향 제거"
+    description: "양쪽 끝에서 요소를 제거합니다."
+    content: |-
+      queue = deque([1, 2, 3, 4, 5])
+      rightItem = queue.pop()
+      leftItem = queue.popleft()
+      rightItem, leftItem, list(queue)
+  - type: "code"
+    language: "python"
+    title: "회전"
+    description: "요소를 오른쪽으로 회전시킵니다."
+    content: |-
+      rotated = deque([1, 2, 3, 4, 5])
+      rotated.rotate(2)
+      list(rotated)
+  - type: "tip"
+    content: "deque(maxlen=n)으로 크기 제한 큐를 만들면 자동으로 오래된 요소가 제거됩니다."
+
+- id: "namedtuple"
+  title: "namedtuple - 이름있는 튜플"
+  subtitle: "가독성 높은 불변 데이터"
+  blocks:
+  - type: "text"
+    content: "namedtuple은 필드 이름으로 접근할 수 있는 튜플입니다. 인덱스 대신 속성명을 사용하여 코드 가독성을 높이고, 불변성으로 안전성을 보장합니다. 경량 데이터 클래스, 설정 객체, 반환값 구조화에 적합합니다."
+  - type: "list"
+    items:
+    - "namedtuple('이름', '필드들')"
+    - "점 표기법으로 접근: obj.field"
+    - "언패킹과 인덱싱 가능"
+    - "불변 객체"
+  - type: "code"
+    language: "python"
+    title: "좌표 타입"
+    description: "x, y 필드를 가진 Point 타입을 정의합니다."
+    content: |-
+      Point = namedtuple('Point', ['x', 'y'])
+      p = Point(3, 4)
+      p.x, p.y
+  - type: "code"
+    language: "python"
+    title: "학생 정보"
+    description: "이름과 나이를 가진 Student 타입입니다."
+    content: |-
+      Student = namedtuple('Student', ['name', 'age'])
+      alice = Student('Alice', 20)
+      alice.name, alice.age
+  - type: "code"
+    language: "python"
+    title: "튜플 변환"
+    description: "namedtuple을 일반 튜플로 변환합니다."
+    content: |-
+      Person = namedtuple('Person', 'name city')
+      bob = Person('Bob', 'NYC')
+      asTuple = tuple(bob)
+      asTuple
+  - type: "tip"
+    content: "_asdict()로 namedtuple을 OrderedDict로 변환할 수 있습니다."
+
+- id: "chainmap"
+  title: "ChainMap - 딕셔너리 체인"
+  subtitle: "여러 딕셔너리 통합 조회"
+  blocks:
+  - type: "text"
+    content: "ChainMap은 여러 딕셔너리를 하나의 뷰로 묶습니다. 조회 시 첫 번째 딕셔너리부터 순서대로 검색하며, 설정 우선순위나 변수 스코프 구현에 유용합니다. 실제 병합 없이 논리적으로 합치므로 메모리 효율적입니다."
+  - type: "list"
+    items:
+    - "ChainMap(dict1, dict2, ...)"
+    - "첫 번째부터 순차 검색"
+    - "새로운 딕셔너리 추가 가능"
+    - "원본 딕셔너리 변경 반영"
+  - type: "code"
+    language: "python"
+    title: "딕셔너리 체인"
+    description: "두 딕셔너리를 체인으로 묶어 조회합니다."
+    content: |-
+      defaults = {'color': 'red', 'size': 10}
+      custom = {'size': 20}
+      combined = ChainMap(custom, defaults)
+      combined['color'], combined['size']
+  - type: "code"
+    language: "python"
+    title: "설정 우선순위"
+    description: "사용자 설정이 기본 설정보다 우선합니다."
+    content: |-
+      baseConfig = {'timeout': 30, 'retry': 3}
+      userConfig = {'timeout': 60}
+      finalConfig = ChainMap(userConfig, baseConfig)
+      finalConfig['timeout'], finalConfig['retry']
+  - type: "code"
+    language: "python"
+    title: "새 체인 추가"
+    description: "새로운 딕셔너리를 체인 앞에 추가합니다."
+    content: |-
+      global_vars = {'x': 10}
+      local_vars = {'y': 20}
+      scope = ChainMap(local_vars, global_vars)
+      newScope = scope.new_child({'z': 30})
+      newScope['x'], newScope['y'], newScope['z']
+  - type: "tip"
+    content: "ChainMap.maps로 내부 딕셔너리 리스트에 접근할 수 있습니다."
+
+- id: "practical"
+  title: "실전 활용"
+  subtitle: "collections 실무 패턴"
+  blocks:
+  - type: "text"
+    content: "실무에서 자주 사용하는 collections 활용 패턴을 살펴봅니다. 투표 집계, 로그 분석, 최근 항목 관리, 데이터 구조화 등 다양한 문제를 collections로 효율적으로 해결할 수 있습니다."
+  - type: "list"
+    items:
+    - "투표 집계 및 순위"
+    - "로그 빈도 분석"
+    - "최근 항목 캐시"
+    - "계층적 설정 관리"
+  - type: "code"
+    language: "python"
+    title: "투표 집계"
+    description: "투표 결과를 집계하고 득표 순으로 정렬합니다."
+    content: |-
+      votes = ['Alice', 'Bob', 'Alice', 'Charlie', 'Bob', 'Alice']
+      voteCount = Counter(votes)
+      winner = voteCount.most_common(1)[0]
+      winner
+  - type: "code"
+    language: "python"
+    title: "단어 빈도 분석"
+    description: "텍스트에서 가장 많이 사용된 단어를 찾습니다."
+    content: |-
+      sentence = 'the quick brown fox jumps over the lazy dog the fox'
+      wordList = sentence.split()
+      wordFreq = Counter(wordList)
+      mostCommon = wordFreq.most_common(3)
+      mostCommon
+  - type: "code"
+    language: "python"
+    title: "최근 항목 관리"
+    description: "최대 3개까지만 유지하는 최근 항목 큐입니다."
+    content: |-
+      recentItems = deque(maxlen=3)
+      recentItems.append('item1')
+      recentItems.append('item2')
+      recentItems.append('item3')
+      recentItems.append('item4')
+      list(recentItems)
+  - type: "tip"
+    content: "OrderedDict는 Python 3.7+에서는 일반 dict도 순서를 유지하므로 특별한 경우를 제외하면 dict 사용을 권장합니다."
+
+- id: "practice"
+  title: "collections 모듈 종합 복습"
+  subtitle: "특수 컨테이너 마스터하기"
+  blocks:
+  - type: "text"
+    content: "collections 모듈의 다양한 기능을 활용하는 연습 문제입니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요."
+
+  - type: "expansion"
+    title: "🟢 기본1: Counter 생성"
+    code: |-
+      items = ['a', 'b', 'a', 'c', 'b', 'a']
+      itemCount = Counter(items)
+      itemCount
+
+  - type: "expansion"
+    title: "🟢 기본2: most_common"
+    code: |-
+      numbers = [1, 2, 1, 3, 2, 1]
+      numCount = Counter(numbers)
+      topOne = numCount.most_common(1)
+      topOne
+
+  - type: "expansion"
+    title: "🟢 기본3: defaultdict 사용"
+    code: |-
+      grades = defaultdict(int)
+      grades['math'] += 90
+      grades['english'] += 85
+      dict(grades)
+
+  - type: "expansion"
+    title: "🟢 기본4: deque 생성"
+    code: |-
+      myQueue = deque([1, 2, 3])
+      myQueue.append(4)
+      list(myQueue)
+
+  - type: "expansion"
+    title: "🟢 기본5: namedtuple 생성"
+    code: |-
+      Car = namedtuple('Car', ['brand', 'year'])
+      myCar = Car('Toyota', 2020)
+      myCar.brand
+
+  - type: "expansion"
+    title: "🟡 응용1: 문자 빈도"
+    code: |-
+      message = 'hello'
+      charCount = Counter(message)
+      charCount['l']
+
+  - type: "expansion"
+    title: "🟡 응용2: 리스트 그룹화"
+    code: |-
+      animals = [('dog', 4), ('cat', 4), ('bird', 2), ('fish', 0)]
+      byLegs = defaultdict(list)
+      for animal, legs in animals:
+          byLegs[legs].append(animal)
+      dict(byLegs)
+
+  - type: "expansion"
+    title: "🟡 응용3: deque 양방향 제거"
+    code: |-
+      stack = deque([1, 2, 3, 4])
+      first = stack.popleft()
+      last = stack.pop()
+      first, last
+
+  - type: "expansion"
+    title: "🟡 응용4: namedtuple 언패킹"
+    code: |-
+      Coordinate = namedtuple('Coordinate', ['x', 'y'])
+      point = Coordinate(5, 10)
+      x, y = point
+      x + y
+
+  - type: "expansion"
+    title: "🟡 응용5: ChainMap 조회"
+    code: |-
+      dict1 = {'a': 1, 'b': 2}
+      dict2 = {'b': 3, 'c': 4}
+      chained = ChainMap(dict1, dict2)
+      chained['b'], chained['c']
+
+  - type: "expansion"
+    title: "🔴 심화1: 가장 흔한 단어 3개"
+    code: |-
+      phrase = 'apple banana apple cherry banana apple'
+      tokens = phrase.split()
+      wordCounter = Counter(tokens)
+      top3 = wordCounter.most_common(3)
+      top3
+
+  - type: "expansion"
+    title: "🔴 심화2: 학생별 성적 관리"
+    code: |-
+      records = [('Alice', 90), ('Bob', 85), ('Alice', 88), ('Bob', 92)]
+      studentScores = defaultdict(list)
+      for student, score in records:
+          studentScores[student].append(score)
+      dict(studentScores)
+
+  - type: "expansion"
+    title: "🔴 심화3: 회전 큐"
+    code: |-
+      circular = deque([1, 2, 3, 4, 5])
+      circular.rotate(2)
+      circular.rotate(-1)
+      list(circular)
+
+  - type: "expansion"
+    title: "🔴 심화4: 복잡한 namedtuple"
+    code: |-
+      Book = namedtuple('Book', ['title', 'author', 'year'])
+      book1 = Book('1984', 'Orwell', 1949)
+      bookDict = book1._asdict()
+      bookDict
+
+  - type: "expansion"
+    title: "🔴 심화5: Counter 산술 연산"
+    code: |-
+      c1 = Counter(['a', 'b', 'c', 'a'])
+      c2 = Counter(['a', 'b', 'd'])
+      merged = c1 + c2
+      merged
+
+  - type: "expansion"
+    title: "🔴 심화6: defaultdict 중첩"
+    code: |-
+      nested = defaultdict(lambda: defaultdict(int))
+      nested['group1']['item1'] += 1
+      nested['group1']['item2'] += 2
+      nested['group2']['item1'] += 3
+      dict(nested)
+
+  - type: "expansion"
+    title: "🔴 심화7: 슬라이딩 윈도우"
+    code: |-
+      window = deque(maxlen=3)
+      data = [1, 2, 3, 4, 5]
+      results = []
+      for num in data:
+          window.append(num)
+          if len(window) == 3:
+              results.append(sum(window))
+      results
+
+  - type: "expansion"
+    title: "🔴 심화8: namedtuple 기본값"
+    code: |-
+      Config = namedtuple('Config', ['host', 'port'], defaults=['localhost', 8080])
+      cfg1 = Config()
+      cfg2 = Config('192.168.1.1', 9000)
+      cfg1.port, cfg2.host
+
+  - type: "expansion"
+    title: "🔴 심화9: 다중 ChainMap"
+    code: |-
+      layer1 = {'x': 1}
+      layer2 = {'x': 2, 'y': 2}
+      layer3 = {'x': 3, 'y': 3, 'z': 3}
+      layers = ChainMap(layer1, layer2, layer3)
+      layers['x'], layers['y'], layers['z']
+
+  - type: "expansion"
+    title: "🔴 심화10: 빈도 기반 필터링"
+    code: |-
+      elements = ['a', 'b', 'a', 'c', 'b', 'a', 'd']
+      freq = Counter(elements)
+      filtered = [item for item in elements if freq[item] >= 2]
+      filtered

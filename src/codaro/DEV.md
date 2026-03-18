@@ -20,9 +20,11 @@
   - Python 실행 세션
   - 세션 관리자
   - REST/WebSocket 프로토콜 모델
+  - 세션 기준 fs/packages capability
 - `system/`
   - 파일 시스템 CRUD
   - 패키지 설치/삭제/조회
+  - runtime capability가 호출하는 workspace 시스템 어댑터
   - workspace notebook index 스캔
 - `../scripts/buildBrandAssets.py`
   - 투명 배경 브랜드 자산 생성 스크립트
@@ -31,6 +33,10 @@
   - docs/blog/search route와 static build
 - `../blog/`
   - public blog markdown source
+- `../launcher/`
+  - 로컬 배포 계층
+  - Rust launcher, embedded Python, install/update/rollback PRD
+  - package artifact, PyPI, bundle 분리 전략
 - `runtime/`
   - 실행 엔진 인터페이스
   - `LocalEngine` 실제 구현
@@ -68,8 +74,9 @@
 1. 편집기는 먼저 서버 커널 세션을 생성한다
 2. 현재 편집기는 HTTP `/api/kernel/...` 경로로 실행/리액티브/변수 요청을 보낸다
 3. WebSocket `/ws/kernel/{sessionId}`는 별도 통합 채널로 유지하며, 입력 payload 검증을 거친다
-4. `KernelSession`이 단일 스레드 실행기로 Python 코드를 돌린다
-5. stdout, stderr, 마지막 표현식 값, 변수 목록을 응답으로 돌려준다
+4. `KernelSession`은 `LocalEngine` child process worker를 통해 코드를 실행한다
+5. 실행 중 `stdout`, `stderr`, `display`, `stateDelta`, `finished` 이벤트를 전파한다
+6. 최종 응답에는 stdout, stderr, 마지막 표현식 값, 변수 목록, 변수 delta, 이벤트 기록이 담긴다
 
 ### 앱 모드
 
@@ -88,6 +95,7 @@
 - editor는 `path` 또는 `new=1` query가 있을 때만 열린다
 - system 파일 API는 현재 workspace root 내부 경로만 허용한다
 - package install/list/uninstall은 프로젝트 루트 `.venv`를 기준으로 동작한다
+- 제품 배포 기준 source of truth는 장기적으로 `launcher/PRD.md`가 맡는다
 - public docs/blog/search는 `landing/` static build로 배포한다
 - 서버 시작 시 frontend 자산 준비 상태, workspace root, content root, document path를 터미널에 출력한다
 - CLI 로그는 명령 정규화 결과, 모드, URL, 브라우저 오픈 여부를 기록한다
@@ -117,6 +125,19 @@
   - `.venv`가 없으면 명시적 에러를 반환한다
 - `runtime/`은 이제 서버 커널 실행의 실제 엔진 계층으로 쓰이기 시작했다
   - `KernelSession`은 `LocalEngine` 어댑터 위에 있다
+  - `LocalEngine`은 child process worker 기반으로 동작한다
+- worker IPC는 단순 최종 응답 외에 실행 이벤트 스트림도 전달한다
+- HTTP와 WebSocket kernel API는 변수 delta와 이벤트를 함께 노출한다
+- `systemRouter`도 workspace 전용 `LocalEngine` capability를 사용한다
+- launcher PRD는 embedded Python, GitHub manifest, PyPI wheel, rollback 구조를 기준으로 한다
+- `launcher/codaro-launcher` Rust workspace가 생성됐고 path resolution, manifest/state 모델, backend health check 최소 경로가 있다
+- launcher는 exact artifact download, sha256 검증, staged release layout, archive unpack, exact wheel install, active release activation까지 지원한다
+- launcher는 `last-known-good`와 `rollback-marker` 상태를 관리하고 backend health failure 시 자동 rollback supervisor를 수행한다
+- launcher는 `update check/apply` CLI로 manifest compatibility 판정과 health-gated release switch를 수행한다
+- launcher는 persisted `update-config`와 GitHub Releases manifest discovery를 지원한다
+- launcher는 `update sync`와 `autoUpdateOnLaunch`를 통해 startup 전 update apply까지 수행할 수 있다
+- launcher는 healthy 이후 backend crash를 자동 재시작하고 repeated crash 시 `crash-state` freeze 후 rollback supervisor로 넘긴다
+- package 분리와 PyPI publish 정책은 `launcher/PACKAGING.md`를 source of truth로 둔다
 - 프론트 기본 실행 경로는 아직 WebSocket이 아니라 HTTP kernel route 중심이다
 - source checkout에서는 frontend build가 선행되어야 하며, 서버는 빌드를 수행하지 않는다
 
@@ -125,4 +146,7 @@
 - `api/` 아래 router와 dependency 계층을 더 명확히 분리
 - block 조작을 서버 API 우선으로 재정리
 - 서버 커널과 Pyodide의 capability 표면 통일
+- soft interrupt / hard interrupt 분리
+- 실행 이벤트를 AI tool, diagnostics, audit log가 재사용할 수 있는 공통 표면으로 승격
+- launcher runtime cache/dedupe와 signed artifact 검증 마무리
 - AI 편집 조작을 위한 문서 API 확장

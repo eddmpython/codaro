@@ -1,0 +1,265 @@
+meta:
+  id: day03_2
+  title: 연산자 패턴학습
+  day: 3
+  category: 30days
+  source: 30-Days-Of-Python
+  sourceUrl: https://github.com/Asabeneh/30-Days-Of-Python
+  tags: []
+  seo:
+    title: "파이썬 연산자 - 사칙연산과 비교"
+    description: "파이썬 연산자를 배웁니다. 산술, 비교, 논리연산자 사용법."
+    keywords: ['연산자', '사칙연산', '비교연산', '논리연산']
+
+intro:
+  title: 연산자 마스터 패턴북
+  emoji: 🔥
+  description: |
+    이것만 외우면 연산자 마스터! 복잡한 설명은 빼고 연산자의 핵심 패턴만 모았습니다.
+    프로그래밍에서 연산자는 데이터를 가공하고, 조건을 판단하고, 값을 비교하는 모든 작업의 기초입니다.
+    10개의 핵심 패턴만 익히면 어떤 복잡한 계산도 자유롭게 구현할 수 있습니다.
+  points:
+    - '📝 할당: = 기본 할당'
+    - '🔄 복합할당: +=, -=, *=, /='
+    - '➕ 산술: +, -, *, / (사칙연산)'
+    - '🔢 고급산술: //, %, ** (몫,나머지,제곱)'
+    - '⚖️ 비교: ==, !=, >, < (크기비교)'
+    - '🧠 논리: and, or, not'
+    - '🔍 멤버십: in, not in (포함확인)'
+    - '🆔 신원: is, is not (객체동일성)'
+    - '📊 우선순위: (), **, *, /, +, - 순서'
+    - '🧮 복합표현식: 여러 연산자 조합'
+  summary: 🔥 산술→비교→논리 순서로 마스터! 프로그래밍의 기본 도구!
+
+sections:
+- id: assignment
+  title: 1. 할당 연산자 패턴
+  subtitle: = 값 할당
+  blocks:
+  - type: text
+    content: 할당 연산자(=)는 프로그래밍에서 가장 기본이 되는 연산자입니다. 수학에서 등호는 "같다"를 의미하지만, 프로그래밍에서는 "오른쪽 값을 왼쪽 변수에 저장한다"는 의미입니다. 예를 들어 x = 10은 "x가 10과 같다"가 아니라 "10이라는 값을 x라는 상자에 넣어라"라는 명령입니다. 이 차이를 이해하는 것이 프로그래밍의 첫걸음입니다.
+  - type: code
+    language: python
+    title: 기본 할당
+    description: "= 연산자로 변수에 값을 할당합니다. 오른쪽의 값이 왼쪽 변수에 저장됩니다."
+    content: |-
+      x = 10
+      name = "Python"
+      isStudent = True
+      x, name
+
+- id: compound
+  title: 2. 복합 할당 패턴
+  subtitle: +=, -=, *=, /=
+  blocks:
+  - type: text
+    content: 복합 할당 연산자는 연산과 할당을 한 번에 수행하는 편리한 단축 표기법입니다. x = x + 5처럼 변수 자신의 값을 이용해 연산한 후 다시 저장하는 패턴이 매우 자주 사용되기 때문에, 파이썬은 이를 x += 5로 줄여 쓸 수 있게 해줍니다. 코드가 짧아지고 가독성이 좋아지며, 실수로 변수명을 잘못 쓰는 오류도 줄일 수 있습니다.
+  - type: code
+    language: python
+    title: 복합 할당
+    description: "연산과 할당을 동시에 수행합니다. x += 5는 x = x + 5와 동일한 결과를 만듭니다."
+    content: |-
+      total = 100
+      total += 50
+      total -= 20
+      total *= 2
+      total /= 4
+      total
+
+  - type: tip
+    content: "복합 할당 연산자는 +=, -=, *=, /=, //=, %=, **= 등이 있습니다. 특히 카운터 증가(count += 1)나 누적 합계(total += value)에서 자주 사용됩니다."
+
+- id: arithmetic_basic
+  title: 3. 기본 산술 연산자 패턴
+  subtitle: +, -, *, /
+  blocks:
+  - type: text
+    content: 산술 연산자는 숫자를 계산하는 가장 기본적인 도구입니다. 덧셈(+), 뺄셈(-), 곱셈(*), 나눗셈(/)은 우리가 일상에서 사용하는 사칙연산과 동일합니다. 단, 파이썬에서 나눗셈(/)은 항상 실수(float) 결과를 반환합니다. 10 / 2의 결과는 5가 아니라 5.0입니다. 정수 결과가 필요하면 // 연산자를 사용해야 합니다.
+  - type: code
+    language: python
+    title: 기본 사칙연산
+    description: "덧셈, 뺄셈, 곱셈, 나눗셈의 기본 산술 연산입니다. 나눗셈은 항상 실수를 반환합니다."
+    content: |-
+      a, b = 10, 3
+      a + b, a - b, a * b, a / b
+
+- id: arithmetic_advanced
+  title: 4. 고급 산술 연산자 패턴
+  subtitle: //, %, **
+  blocks:
+  - type: text
+    content: 파이썬은 기본 사칙연산 외에도 실용적인 고급 산술 연산자를 제공합니다. 정수 나눗셈(//)은 나눗셈의 몫만 정수로 반환하고, 나머지 연산(%)은 나눗셈 후 남는 나머지를 계산합니다. 거듭제곱(**)은 어떤 수를 여러 번 곱하는 연산입니다. 이 세 가지 연산자는 시간 변환, 짝수/홀수 판별, 자릿수 계산 등 다양한 실무 상황에서 활용됩니다.
+  - type: code
+    language: python
+    title: 고급 산술 연산
+    description: "정수 나눗셈(//), 나머지(%), 거듭제곱(**)을 사용합니다."
+    content: |-
+      x = 10
+      y = 3
+      quotient = x // y
+      remainder = x % y
+      power = 2 ** y
+      quotient, remainder, power
+
+  - type: tip
+    content: "나머지 연산(%)은 숫자 % 2 == 0이면 짝수, != 0이면 홀수입니다. 또한 100초를 분:초로 변환할 때 100 // 60 = 1분, 100 % 60 = 40초로 활용할 수 있습니다."
+
+- id: comparison
+  title: 5. 비교 연산자 패턴
+  subtitle: ==, !=, >, <, >=, <=
+  blocks:
+  - type: text
+    content: 비교 연산자는 두 값을 비교하여 그 결과를 True 또는 False로 반환합니다. 조건문(if)에서 분기를 결정하거나, 반복문(while)에서 종료 조건을 판단할 때 핵심적으로 사용됩니다. 주의할 점은 같다를 비교할 때 = 하나가 아닌 == 두 개를 사용한다는 것입니다. =는 할당, ==는 비교입니다. 이 둘을 혼동하면 버그가 발생합니다.
+  - type: code
+    language: python
+    title: 비교 연산
+    description: "동등성과 크기를 비교하는 연산자들입니다."
+    content: |-
+      score = 85
+      passScore = 60
+      perfectScore = 100
+
+      score == perfectScore, score != perfectScore, score > passScore, score >= 60
+
+- id: logical
+  title: 6. 논리 연산자 패턴
+  subtitle: and, or, not
+  blocks:
+  - type: text
+    content: 논리 연산자는 여러 조건을 조합하거나 조건의 반대를 표현할 때 사용합니다. and는 양쪽 조건이 모두 True일 때만 True를 반환하고, or는 하나라도 True면 True를 반환합니다. not은 조건의 결과를 뒤집어서 True를 False로, False를 True로 만듭니다. 복잡한 조건을 표현하려면 이 세 가지 논리 연산자를 조합해서 사용합니다.
+  - type: code
+    language: python
+    title: 논리 연산
+    description: "and, or, not 연산자를 사용합니다."
+    content: |-
+      userAge = 25
+      hasDriverLicense = True
+      hasCarInsurance = False
+
+      canDrive = userAge >= 18 and hasDriverLicense
+      needsCheck = not hasCarInsurance or userAge < 20
+      eligible = canDrive and (hasCarInsurance or userAge > 30)
+
+      canDrive, needsCheck, eligible
+
+  - type: tip
+    content: "논리 연산자 우선순위는 not > and > or 순서입니다. 복잡한 조건에서는 괄호를 사용해 의도를 명확하게 표현하는 것이 좋습니다. 예: (age >= 18) and (hasLicense or hasPermit)"
+
+- id: membership
+  title: 7. 멤버십 연산자 패턴
+  subtitle: in, not in
+  blocks:
+  - type: text
+    content: 멤버십 연산자는 어떤 값이 리스트, 문자열, 튜플 등의 시퀀스에 포함되어 있는지 확인합니다. in 연산자는 값이 포함되어 있으면 True를, not in은 포함되어 있지 않으면 True를 반환합니다. 리스트에서 특정 항목을 찾거나, 문자열에서 특정 단어가 포함되어 있는지 검사할 때 매우 유용합니다.
+  - type: code
+    language: python
+    title: 멤버십 확인
+    description: "in 연산자로 리스트와 문자열에서 값의 포함 여부를 확인합니다."
+    content: |-
+      fruits = ["apple", "banana", "cherry"]
+      message = "Hello World"
+
+      "apple" in fruits, "grape" not in fruits, "Hello" in message, "hello" in message
+
+  - type: tip
+    content: "문자열의 in 연산자는 대소문자를 구분합니다. 'Hello'와 'hello'는 다르게 취급됩니다. 대소문자 무시 검색이 필요하면 text.lower()로 변환 후 비교하세요."
+
+- id: identity
+  title: 8. 신원 연산자 패턴
+  subtitle: is, is not
+  blocks:
+  - type: text
+    content: 신원(identity) 연산자는 두 변수가 메모리상에서 동일한 객체를 가리키는지 확인합니다. ==는 두 값이 같은지를 비교하지만, is는 두 변수가 실제로 같은 객체인지를 비교합니다. 예를 들어 두 리스트가 같은 내용을 가지고 있어도, 별도로 생성되었다면 is로 비교하면 False가 됩니다. 주로 None과의 비교에서 is를 사용합니다.
+  - type: code
+    language: python
+    title: 신원 연산
+    description: "is는 두 변수가 같은 객체를 참조하는지 확인합니다. ==와 다릅니다."
+    content: |-
+      listA = [1, 2, 3]
+      listB = [1, 2, 3]
+      listC = listA
+      emptyValue = None
+
+      listA is listC, listA is listB, listA == listB, emptyValue is None
+
+  - type: tip
+    content: "파이썬 스타일 가이드(PEP 8)에 따르면 None과의 비교는 항상 is 또는 is not을 사용해야 합니다. value == None 대신 value is None을 사용하세요."
+
+- id: precedence
+  title: 9. 연산자 우선순위 패턴
+  subtitle: (), **, *, /, +, -
+  blocks:
+  - type: text
+    content: 여러 연산자가 함께 사용될 때는 우선순위에 따라 계산 순서가 결정됩니다. 가장 높은 우선순위는 괄호()이고, 그 다음이 거듭제곱(**), 그 다음이 곱셈/나눗셈(*, /, //, %), 마지막이 덧셈/뺄셈(+, -)입니다. 우선순위가 헷갈리면 괄호를 사용해 명확하게 표현하는 것이 좋습니다. 특이하게 거듭제곱(**)은 오른쪽에서 왼쪽으로 계산됩니다.
+  - type: code
+    language: python
+    title: 연산자 우선순위
+    description: "곱셈이 덧셈보다 먼저 계산되고, 거듭제곱은 오른쪽에서 왼쪽으로 계산됩니다."
+    content: |-
+      result1 = 2 + 3 * 4
+      result2 = (2 + 3) * 4
+      power1 = 2 ** 3 ** 2
+      power2 = (2 ** 3) ** 2
+
+      result1, result2, power1, power2
+
+  - type: tip
+    content: "연산자 우선순위: () > ** > +x, -x (부호) > *, /, //, % > +, - > 비교연산자 > not > and > or. 확실하지 않으면 괄호로 묶으세요!"
+
+- id: expression
+  title: 10. 복합 표현식 패턴
+  subtitle: 여러 연산자 조합
+  blocks:
+  - type: text
+    content: 실제 프로그래밍에서는 여러 연산자를 조합하여 복잡한 조건을 표현하는 경우가 많습니다. 산술 연산의 결과를 비교하고, 여러 비교 결과를 논리 연산자로 조합하는 방식입니다. 예를 들어 "성인이면서 면허가 있는 사람" 같은 조건은 age >= 18 and hasLicense처럼 표현합니다. 복잡한 조건일수록 중간 변수를 활용하면 가독성이 좋아집니다.
+  - type: code
+    language: python
+    title: 복합 조건 표현
+    description: "비교 결과를 변수에 저장하고 논리 연산자로 조합하면 가독성이 좋아집니다."
+    content: |-
+      age = 25
+      score = 85
+      name = "Kim"
+      isAdult = age >= 18
+      isPass = score >= 60
+      isValid = isAdult and isPass and len(name) > 0
+      isValid
+
+- id: practice
+  title: 실습
+  subtitle: 연산자 마스터 미션
+  blocks:
+  - type: text
+    content: 지금까지 배운 연산자들을 종합적으로 활용하는 미션입니다. 산술, 비교, 논리, 멤버십 연산자를 모두 사용해보며 연산자의 동작을 완전히 이해해봅시다.
+  - type: expansion
+    title: "미션1: 시간 변환 계산"
+    code: |-
+      totalSeconds = 3725
+      hours = totalSeconds // 3600
+      minutes = (totalSeconds % 3600) // 60
+      seconds = totalSeconds % 60
+      hours, minutes, seconds
+  - type: expansion
+    title: "미션2: 짝수/홀수 판별"
+    code: |-
+      num = 17
+      isEven = num % 2 == 0
+      isOdd = num % 2 != 0
+      num, isEven, isOdd
+  - type: expansion
+    title: "미션3: 자격 조건 검사"
+    code: |-
+      age = 25
+      hasLicense = True
+      hasCar = False
+      canDrive = age >= 18 and hasLicense
+      needRental = canDrive and not hasCar
+      canDrive, needRental
+  - type: expansion
+    title: "미션4: 점수 등급 판정"
+    code: |-
+      score = 85
+      isA = score >= 90
+      isB = score >= 80 and score < 90
+      isC = score >= 70 and score < 80
+      isA, isB, isC

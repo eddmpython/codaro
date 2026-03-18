@@ -1,0 +1,216 @@
+meta:
+  id: plotly_00
+  title: Plotly소개
+  order: 0
+  category: plotly
+  badge: 소개
+  source: eddmpython
+  sourceUrl: https://eddmpython.com
+  tags: ["Plotly", "Plotly Express", "시각화", "대화형 차트", "인터랙티브"]
+  seo:
+    title: "Plotly Express 입문 - 대화형 데이터 시각화"
+    description: "Plotly Express로 대화형 차트를 만들어보세요. 마우스 호버, 줌, 필터링이 가능한 인터랙티브 시각화를 경험합니다."
+    keywords: ["Plotly", "Plotly Express", "대화형 차트", "인터랙티브", "데이터 시각화"]
+
+sections:
+- id: intro
+  blocks:
+    - type: mainHeader
+      emoji: "📊"
+      title: "Plotly Express??"
+      subtitle: "matplotlib 말고 뭐가 더 있어?"
+
+    - type: hero
+      emoji: "✨"
+      title: "대화형 차트의 세계"
+      subtitle: "마우스로 탐색하는 시각화"
+      points:
+        - emoji: "🖱️"
+          title: "마우스 호버로 상세 정보"
+        - emoji: "🔍"
+          title: "줌인/줌아웃 자유자재"
+        - emoji: "📸"
+          title: "이미지로 바로 저장"
+        - emoji: "🎬"
+          title: "애니메이션 차트"
+
+    - type: image
+      src: "https://images.plot.ly/plotly-documentation/thumbnail/plotly-express.png"
+
+- id: why_plotly
+  blocks:
+    - type: sectionHeader
+      title: "🤔 matplotlib으로 충분하지 않나요?"
+      subtitle: "정적 차트 vs 대화형 차트"
+
+    - type: compare
+      left:
+        title: "matplotlib"
+        subtitle: "전통적인 방식"
+        icon: "📄"
+        color: "gray"
+        items:
+          - "이미지로 저장"
+          - "보는 것만 가능"
+          - "확대하면 깨짐"
+          - "세부 정보 확인 어려움"
+          - "코드가 길어짐"
+        infoBox: "논문, 보고서에 적합"
+      right:
+        title: "Plotly Express"
+        subtitle: "현대적인 방식"
+        icon: "✨"
+        color: "green"
+        items:
+          - "웹에서 바로 상호작용"
+          - "마우스 호버로 정보 확인"
+          - "확대/축소 자유자재"
+          - "클릭으로 필터링"
+          - "한 줄로 완성"
+        infoBox: "웹, 대시보드에 적합"
+
+- id: plotly_express
+  blocks:
+    - type: sectionHeader
+      title: "🚀 Plotly Express란?"
+      subtitle: "Plotly를 쉽게 쓰는 방법"
+
+    - type: note
+      style: info
+      title: "Plotly vs Plotly Express"
+      content: "Plotly는 저수준 라이브러리이고, Plotly Express는 고수준 래퍼입니다. seaborn이 matplotlib을 쉽게 만들어준 것처럼, Plotly Express가 Plotly를 쉽게 만들어줍니다."
+
+    - type: featureCards
+      cards:
+        - emoji: "🎯"
+          title: "한 줄 코드"
+          description: "px.scatter(df, x='col1', y='col2')처럼 한 줄로 차트 완성"
+        - emoji: "📊"
+          title: "30+ 차트 종류"
+          description: "산점도, 막대, 선, 히트맵, 지도, 3D까지 모두 지원"
+        - emoji: "🎨"
+          title: "자동 스타일링"
+          description: "색상, 범례, 축 라벨을 자동으로 설정"
+        - emoji: "🔗"
+          title: "DataFrame 친화적"
+          description: "pandas DataFrame을 바로 넣으면 됨"
+
+- id: builtin_data
+  blocks:
+    - type: sectionHeader
+      title: "📦 px.data 내장 데이터"
+      subtitle: "설치 없이 바로 사용하는 연습용 데이터"
+
+    - type: table
+      headers: ["데이터", "설명", "행 수", "주요 컬럼"]
+      rows:
+        - ["gapminder()", "세계 발전 지표", "1,704", "country, year, lifeExp, pop, gdpPercap"]
+        - ["iris()", "붓꽃 품종", "150", "sepal_length, petal_width, species"]
+        - ["tips()", "레스토랑 팁", "244", "total_bill, tip, day, time, size"]
+        - ["stocks()", "주식 시세", "505", "date, GOOG, AAPL, AMZN, FB, NFLX, MSFT"]
+        - ["carshare()", "카쉐어링", "249", "centroid_lat, centroid_lon, peak_hour"]
+        - ["wind()", "풍향/풍속", "128", "direction, strength, frequency"]
+        - ["election()", "선거 결과", "58", "district, winner, result"]
+        - ["medals_long()", "올림픽 메달", "9", "nation, medal, count"]
+
+    - type: note
+      style: tip
+      title: "인터넷 연결 필요 없음"
+      content: "px.data 데이터는 라이브러리에 내장되어 있어서 인터넷 연결 없이도 사용할 수 있습니다. 학습용으로 완벽합니다."
+
+- id: projects_preview
+  blocks:
+    - type: sectionHeader
+      title: "🗺️ 10개 프로젝트 미리보기"
+      subtitle: "이 순서대로 배웁니다"
+
+    - type: table
+      headers: ["단계", "프로젝트", "배울 내용"]
+      rows:
+        - ["입문", "01 기본차트입문", "scatter, line, bar, histogram 기초"]
+        - ["초급", "02 팁데이터분석", "box, violin, facet으로 분포 비교"]
+        - ["초급", "03 세계인구분석", "color, size, hover로 다차원 표현"]
+        - ["중급", "04 애니메이션차트", "animation_frame으로 시간 변화"]
+        - ["중급", "05 붓꽃상관분석", "trendline, 산점도 매트릭스"]
+        - ["중급", "06 설문조사분석", "pie, 누적 bar, 비율 시각화"]
+        - ["고급", "07 센서데이터분석", "line, area, 시계열 패턴"]
+        - ["고급", "08 마케팅퍼널분석", "funnel, treemap, sunburst"]
+        - ["고급", "09 주가차트분석", "candlestick, OHLC, 금융 차트"]
+        - ["종합", "10 대시보드프로젝트", "subplots로 종합 대시보드"]
+
+    - type: note
+      style: info
+      title: "프로젝트 기반 학습"
+      content: "각 프로젝트는 완성된 결과물을 만듭니다. 개념만 배우는 게 아니라 실제 분석을 수행합니다."
+
+- id: interactive_features
+  blocks:
+    - type: sectionHeader
+      title: "🖱️ 대화형 차트의 기능"
+      subtitle: "Plotly 차트에서 할 수 있는 것들"
+
+    - type: featureCards
+      cards:
+        - emoji: "🔍"
+          title: "줌"
+          description: "드래그해서 특정 영역 확대. 더블클릭하면 원래대로"
+        - emoji: "🖱️"
+          title: "호버"
+          description: "마우스를 올리면 데이터 포인트 상세 정보 표시"
+        - emoji: "📷"
+          title: "다운로드"
+          description: "차트 우측 상단 카메라 아이콘으로 PNG 저장"
+        - emoji: "🔲"
+          title: "범례 필터"
+          description: "범례 클릭으로 특정 카테고리 숨기기/표시"
+        - emoji: "✋"
+          title: "팬"
+          description: "확대 상태에서 드래그로 이동"
+        - emoji: "📦"
+          title: "선택"
+          description: "박스/올가미로 데이터 포인트 선택"
+
+- id: comparison_chart
+  blocks:
+    - type: sectionHeader
+      title: "📊 Python 시각화 라이브러리 비교"
+      subtitle: "어떤 상황에 어떤 도구?"
+
+    - type: table
+      headers: ["라이브러리", "특징", "추천 상황"]
+      rows:
+        - ["matplotlib", "가장 기본, 세밀한 커스텀", "논문, 출판물, 완전한 제어"]
+        - ["seaborn", "통계 시각화, 예쁜 기본값", "EDA, 통계 분석"]
+        - ["Plotly Express", "대화형, 웹 친화적", "대시보드, 웹앱, 탐색적 분석"]
+        - ["Altair", "선언적 문법, 간결함", "빠른 프로토타이핑"]
+        - ["Bokeh", "대용량 대화형", "실시간 스트리밍"]
+
+    - type: note
+      style: tip
+      title: "정답은 없습니다"
+      content: "상황에 맞는 도구를 선택하세요. 이 과정에서는 Plotly Express로 대화형 시각화의 매력을 경험합니다."
+
+- id: resources
+  blocks:
+    - type: sectionHeader
+      title: "📚 참고 자료"
+      subtitle: "더 깊이 공부하고 싶다면"
+
+    - type: links
+      items:
+        - text: Plotly Express 공식 문서
+          url: https://plotly.com/python/plotly-express/
+          icon: "🔗"
+        - text: px.data 내장 데이터셋
+          url: https://plotly.com/python-api-reference/generated/plotly.express.data.html
+          icon: "🔗"
+        - text: Plotly Express Cheat Sheet
+          url: https://www.datacamp.com/cheat-sheet/plotly-express-cheat-sheet
+          icon: "🔗"
+
+- id: next
+  blocks:
+    - type: hero
+      emoji: "👉"
+      title: "다음: 기본 차트 입문"
+      subtitle: "산점도, 선 그래프, 막대 그래프, 히스토그램을 한 번에 배웁니다"

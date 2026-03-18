@@ -1,0 +1,332 @@
+meta:
+  id: "main01"
+  title: "파이썬 10분 완성"
+  order: 1
+  category: "main"
+  tags: ["파이썬", "입문", "10분", "기초문법"]
+
+intro:
+  emoji: "⚡"
+  title: "파이썬 10분 완성"
+  description: |
+    파이썬의 핵심 문법 5가지만 알면 바로 시작할 수 있습니다!
+    print, 변수, 자료형, 조건문, 반복문, 함수 — 이것만 알면 끝!
+  goal: "10분 안에 파이썬 기초 문법을 마스터하세요"
+  points:
+    - emoji: "📢"
+      title: "print()"
+    - emoji: "📦"
+      title: "변수"
+    - emoji: "🏷️"
+      title: "자료형"
+    - emoji: "🤔"
+      title: "조건문"
+    - emoji: "🔄"
+      title: "반복문"
+    - emoji: "⚙️"
+      title: "함수"
+
+sections:
+  - id: "printFunction"
+    title: ""
+    blocks:
+      - type: sectionTitle
+        emoji: "📢"
+        title: "print() 함수 - 파이썬에서 첫번째로 하는것"
+
+      - type: centerText
+        emoji: "🤔"
+        text: '몇년째 print("hello world")만 해본사람 있다? 없다?'
+        endEmoji: "😅"
+
+      - type: threeColumnCards
+        cards:
+          - title: "print() 함수란?"
+            content: "화면에 텍스트나 값을 출력하는 가장 기본적인 함수입니다."
+            points:
+              - "파이썬을 배우면 제일 먼저 만나는 친구"
+              - "컴퓨터와 대화할 때 꼭 필요한 도구"
+              - "사용법이 정말 간단해요!"
+          - title: "기본 사용법"
+            content: "print() 함수의 다양한 사용 예시를 확인해보세요."
+            code: |
+              print("Hello, World!")
+              print(42+52)
+              print(0.01+0.05)
+          - title: "직접 실습해보세요!"
+            content: "아래 에디터에서 print() 함수를 사용해보세요."
+            footer:
+              icon: "keyboard"
+              text: "실행 방법: Ctrl + Enter 또는 Shift + Enter"
+
+      - type: video
+        url: "study/print.mp4"
+
+      - type: marimoIDE
+
+  - id: "variable"
+    title: ""
+    blocks:
+      - type: sectionTitle
+        emoji: "📦"
+        title: "변수 - 데이터 또는 데이터 더미 들의 이름표!"
+
+      - type: centerText
+        emoji: "🤷‍♂️"
+        text: "변수가 뭔지 모르겠다고? 그냥 내맘대로 붙이는 이름표!!"
+        endEmoji: "📝"
+
+      - type: threeColumnCards
+        cards:
+          - title: "변수란?"
+            content: "데이터에 붙여주는 이름표입니다. 데이터는 그냥 있고, 우리가 이름을 붙여서 나중에 찾아 쓸 수 있어요."
+            points:
+              - '숫자 25에 "나이"라는 이름표를 붙이는 거예요'
+              - "이름표만 부르면 그 데이터를 가져올 수 있어요"
+              - "같은 데이터에 여러 이름표도 붙일 수 있어요!"
+          - title: "변수 만들기"
+            content: "변수를 만드는 방법은 정말 간단해요!"
+            code: |
+              name = "홍길동"
+              age = 25
+              height = 175.5
+              print(name, age, height)
+          - title: "직접 만들어보세요!"
+            content: "아래 에디터에서 나만의 변수를 만들어보세요."
+            footer:
+              icon: "keyboard"
+              text: "실행 방법: Ctrl + Enter 또는 Shift + Enter"
+
+      - type: video
+        url: "study/variable.mp4"
+
+      - type: marimoIDE
+
+  - id: "dataType"
+    title: ""
+    blocks:
+      - type: sectionTitle
+        emoji: "🏷️"
+        title: "자료형 - 데이터의 종류와 성질"
+
+      - type: centerText
+        emoji: "🔍"
+        text: "모든 데이터는 고유한 자료형을 가져요! 파이썬은 다양한 자료형을 제공합니다"
+        endEmoji: "📊"
+
+      - type: threeColumnCards
+        minWidth: "350px"
+        cards:
+          - title: "자료형이란?"
+            content: "데이터를 분류하는 기준이에요! 파이썬에서는 모든 데이터가 고유한 자료형을 가지고 있습니다."
+            points:
+              - "기본 자료형: 정수(int), 실수(float), 문자열(str), 불린(bool)"
+              - "컬렉션 자료형: 리스트(list), 딕셔너리(dict), 튜플(tuple), 세트(set)"
+              - "고급 자료형: 함수(function), 클래스(class), 모듈(module) 등"
+              - "자료형마다 고유한 특성과 사용 가능한 기능들이 달라요"
+              - "파이썬은 자동으로 자료형을 판단해서 할당해줘요 (동적 타이핑)"
+              - "같은 변수에 다른 자료형의 데이터를 다시 저장할 수 있어요"
+          - title: "주요 자료형들"
+            content: "파이썬에서 자주 사용하는 자료형들과 그 특징을 알아보세요."
+            code: |
+              age = 25           # int - 정수, 사칙연산 가능
+              height = 175.5     # float - 실수, 소수점 계산
+              name = "김철수"     # str - 문자열, 텍스트 처리
+              is_student = True  # bool - 논리값, 조건문에 활용
+              scores = [85, 90, 78]  # list - 순서있는 목록
+              info = {"이름": "김철수", "나이": 25}  # dict - 키-값 쌍
+          - title: "자료형 확인하기"
+            content: "type() 함수를 사용해서 데이터의 자료형을 확인할 수 있어요."
+            code: |
+              print(type(42))        # <class 'int'>
+              print(type(3.14))      # <class 'float'>
+              print(type("안녕"))     # <class 'str'>
+              print(type([1,2,3]))   # <class 'list'>
+
+      - type: practiceCard
+        icon: "code"
+        title: "자료형을 만들어 봅시다!"
+        content: "이제 직접 다양한 자료형을 사용해보고, 각각의 특성을 확인해보세요. 아래 코드 에디터에서 실습할 수 있어요!"
+        footer:
+          icon: "play_arrow"
+          text: "변수를 만들고 type()으로 자료형을 확인해보세요"
+
+      - type: video
+        url: "study/dataType.mp4"
+
+      - type: marimoIDE
+
+  - id: "conditional"
+    title: ""
+    blocks:
+      - type: sectionTitle
+        emoji: "🤔"
+        title: "조건문 - 상황에 따라 다르게 행동하기"
+
+      - type: centerText
+        emoji: "🚦"
+        text: "빨간불이면 멈추고, 초록불이면 가고! 컴퓨터도 상황을 판단할 수 있어요"
+        endEmoji: "⚡"
+
+      - type: threeColumnCards
+        cards:
+          - title: "조건문이란?"
+            content: "상황에 따라 다른 행동을 하도록 하는 문법이에요. 만약 ~라면 이렇게 하고, 아니면 저렇게 해!"
+            points:
+              - "if: 만약 조건이 참이면 실행"
+              - "elif: 다른 조건을 추가로 확인"
+              - "else: 모든 조건이 거짓일 때 실행"
+              - "일상생활의 판단과 똑같아요!"
+          - title: "조건문 사용하기"
+            content: "실생활 예시로 조건문을 이해해보세요!"
+            code: |
+              score = 85
+              if score >= 90:
+                  print("A학점! 훌륭해요!")
+              elif score >= 80:
+                  print("B학점! 잘했어요!")
+              else:
+                  print("더 열심히 해봐요!")
+          - title: "비교 연산자"
+            content: "조건을 만들 때 사용하는 기호들이에요."
+            code: |
+              ==  # 같다
+              !=  # 다르다
+              >   # 크다
+              <   # 작다
+              >=  # 크거나 같다
+              <=  # 작거나 같다
+
+      - type: practiceCard
+        icon: "psychology"
+        title: "조건문으로 똑똑한 프로그램 만들기!"
+        content: "이제 상황에 따라 다르게 반응하는 프로그램을 만들어보세요. 아래 에디터에서 다양한 조건문을 실험해보세요!"
+        footer:
+          icon: "lightbulb"
+          text: "나이, 점수, 날씨 등 다양한 조건으로 실습해보세요"
+
+      - type: video
+        url: "study/conditional.mp4"
+
+      - type: marimoIDE
+
+  - id: "loop"
+    title: ""
+    blocks:
+      - type: sectionTitle
+        emoji: "🔄"
+        title: "반복문 - 같은 일을 여러 번 자동으로!"
+
+      - type: centerText
+        emoji: "🏃‍♂️"
+        text: "운동장 10바퀴 뛰기! 하나하나 세지 말고 컴퓨터가 알아서 반복하게 하자"
+        endEmoji: "💪"
+
+      - type: threeColumnCards
+        cards:
+          - title: "반복문이란?"
+            content: "같은 작업을 여러 번 반복해서 실행하는 문법이에요. 손으로 하나하나 쓰지 말고 컴퓨터가 알아서!"
+            points:
+              - "for문: 정해진 횟수만큼 반복 (가장 많이 사용)"
+              - "while문: 조건이 참인 동안 계속 반복"
+              - "리스트, 문자열 등을 하나씩 처리할 때 유용"
+              - "반복 작업의 효율성을 극대화!"
+          - title: "for문 사용하기"
+            content: "가장 자주 사용하는 for문으로 반복을 마스터해보세요!"
+            code: |
+              # 1부터 5까지 출력
+              for i in range(1, 6):
+                  print(f"{i}번째 반복")
+
+              # 리스트의 각 항목 처리
+              fruits = ["사과", "바나나", "오렌지"]
+              for fruit in fruits:
+                  print(f"맛있는 {fruit}")
+          - title: "range() 함수"
+            content: "숫자 범위를 만들어주는 유용한 함수예요."
+            code: |
+              range(5)        # 0, 1, 2, 3, 4
+              range(1, 6)     # 1, 2, 3, 4, 5
+              range(0, 10, 2) # 0, 2, 4, 6, 8
+
+              # while문도 있어요!
+              count = 0
+              while count < 3:
+                  print(count)
+                  count += 1
+
+      - type: practiceCard
+        icon: "repeat"
+        title: "반복의 마법을 경험해보세요!"
+        content: "이제 반복문으로 효율적인 프로그램을 만들어보세요. 구구단, 별 찍기, 리스트 처리 등 다양한 실습을 해보세요!"
+        footer:
+          icon: "auto_awesome"
+          text: "for문으로 시작해서 while문도 도전해보세요"
+
+      - type: video
+        url: "study/loop.mp4"
+
+      - type: marimoIDE
+
+  - id: "function"
+    title: ""
+    blocks:
+      - type: sectionTitle
+        emoji: "⚙️"
+        title: "함수 - 코드를 재사용 가능한 블록으로!"
+
+      - type: centerText
+        emoji: "🔧"
+        text: "같은 코드를 계속 쓰기 귀찮다고? 함수로 만들어서 언제든 꺼내 쓰자!"
+        endEmoji: "✨"
+
+      - type: threeColumnCards
+        cards:
+          - title: "함수란?"
+            content: "특정 작업을 수행하는 코드 블록에 이름을 붙여서 언제든 호출할 수 있게 만든 것이에요."
+            points:
+              - "def 키워드로 함수를 정의"
+              - "매개변수로 데이터를 받을 수 있음"
+              - "return으로 결과를 돌려줄 수 있음"
+              - "코드 재사용성과 가독성 향상!"
+          - title: "함수 만들고 사용하기"
+            content: "간단한 함수부터 매개변수가 있는 함수까지!"
+            code: |
+              # 간단한 함수
+              def sayHello():
+                  print("안녕하세요!")
+
+              # 매개변수가 있는 함수
+              def greet(name):
+                  print(f"안녕하세요, {name}님!")
+
+              # 함수 호출
+              sayHello()
+              greet("김철수")
+          - title: "return으로 값 반환하기"
+            content: "함수가 계산한 결과를 돌려받을 수 있어요."
+            code: |
+              def add(a, b):
+                  result = a + b
+                  return result
+
+              def multiply(x, y):
+                  return x * y
+
+              # 함수 사용
+              sum_result = add(5, 3)
+              print(sum_result)  # 8
+              print(multiply(4, 7))  # 28
+
+      - type: practiceCard
+        icon: "functions"
+        title: "나만의 함수를 만들어보세요!"
+        content: "이제 함수를 만들어서 코드를 더 깔끔하고 재사용 가능하게 만들어보세요. 계산기, 인사말, 게임 등 다양한 함수를 만들어보세요!"
+        footer:
+          icon: "build"
+          text: "간단한 함수부터 시작해서 복잡한 기능까지 도전해보세요"
+
+      - type: video
+        url: "study/function.mp4"
+
+      - type: marimoIDE

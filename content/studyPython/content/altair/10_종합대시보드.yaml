@@ -1,0 +1,356 @@
+meta:
+  id: altair_10
+  title: 종합대시보드
+  order: 10
+  category: altair
+  difficulty: "⭐⭐⭐⭐"
+  badge: 심화
+  tags: ["dashboard", "interactive", "concat", "layer", "transform"]
+  seo:
+    title: "Altair 종합 대시보드 - 전체 기능 통합"
+    description: "Altair로 완성된 인터랙티브 대시보드를 만듭니다. 모든 기능을 통합해 종합 분석 도구를 구현합니다."
+    keywords: ["altair dashboard", "interactive", "concat", "layer", "comprehensive"]
+
+intro:
+  emoji: "🎯"
+  goal: 지금까지 배운 모든 Altair 기능을 종합해 완성된 인터랙티브 대시보드를 만듭니다.
+  description: 마크, 인코딩, 변환, 선택, 레이어, 연결을 모두 활용한 종합 프로젝트입니다.
+
+sections:
+- id: step1_load
+  title: 1단계. 데이터 불러오기
+  subtitle: seaborn-data
+  blocks:
+  - type: text
+    content: |-
+      GitHub에서 mpg 데이터를 불러옵니다. 이 프로젝트는 Altair 과정의 최종 종합 프로젝트입니다.
+
+      지금까지 배운 모든 개념을 하나로 합칩니다: 마크(mark), 인코딩(encode), 인터랙션(selection), 차트 조합(|, &), 데이터 변환(transform), 레이어(layer) 등 모든 기능을 사용합니다.
+
+      완성된 대시보드에는 여러 차트가 동시에 표시되고, 사용자가 드롭다운과 브러싱으로 데이터를 필터링하며, 모든 차트가 서로 연동됩니다.
+  - type: code
+    language: python
+    title: mpg 데이터 불러오기
+    description: pandas로 CSV 로드
+    content: |-
+      import altair as alt
+      import pandas as pd
+      import warnings
+      warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+
+      mpgUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
+      mpg = pd.read_csv(mpgUrl)
+      mpg.head()
+
+- id: step2_overview
+  title: 2단계. 대시보드 구조
+  subtitle: 컴포넌트 설계
+  blocks:
+  - type: text
+    content: |-
+      대시보드를 만들기 전에 먼저 전체 구조를 설계합니다. 4개의 차트를 배치할 것입니다:
+
+      1. 산점도: 마력 vs 연비 (중심 차트, 가장 크게)
+      2. 막대 차트: 생산국별 평균 연비 (비교용)
+      3. 라인 차트: 연도별 추이 (시간 흐름 보기)
+      4. 히스토그램: 연비 분포 (전체 분포 파악)
+
+      공통 selection을 먼저 만들어둡니다. brush는 드래그 선택, dropdown은 생산국 필터입니다. 이 두 가지를 모든 차트에서 공유하면 차트들이 연동됩니다.
+  - type: code
+    language: python
+    title: 공통 선택 정의
+    description: 브러싱과 드롭다운
+    content: |-
+      brush = alt.selection_interval()
+
+      origins = ['usa', 'europe', 'japan']
+      dropdown = alt.binding_select(options=[None] + origins, labels=['전체'] + origins, name='생산국: ')
+      originSelect = alt.param(name='origin_filter', bind=dropdown)
+
+- id: step3_scatter
+  title: 3단계. 메인 산점도
+  subtitle: 마력 vs 연비
+  blocks:
+  - type: text
+    content: |-
+      메인 차트로 마력과 연비의 관계를 산점도로 표현합니다.
+
+      브러싱과 드롭다운 필터가 모두 적용됩니다.
+  - type: code
+    language: python
+    title: 메인 산점도
+    description: 브러싱 + 드롭다운
+    content: |-
+      scatterMain = alt.Chart(mpg).mark_circle(size=60).encode(
+          x=alt.X('horsepower:Q', title='마력'),
+          y=alt.Y('mpg:Q', title='연비 (MPG)'),
+          color=alt.when(brush).then('origin:N').otherwise(alt.value('lightgray')),
+          opacity=alt.when(
+              (originSelect == None) | (alt.datum.origin == originSelect)
+          ).then(alt.value(0.8)).otherwise(alt.value(0.1)),
+          tooltip=['name', 'origin', 'horsepower', 'mpg', 'cylinders', 'model_year']
+      ).add_params(brush, originSelect).properties(
+          width=400,
+          height=300,
+          title='마력 vs 연비 (드래그로 선택)'
+      )
+      scatterMain
+
+- id: step4_bar
+  title: 4단계. 생산국별 막대 차트
+  subtitle: 평균 연비 비교
+  blocks:
+  - type: text
+    content: |-
+      생산국별 평균 연비를 막대 차트로 표현합니다.
+
+      산점도의 브러싱에 연동됩니다.
+  - type: code
+    language: python
+    title: 생산국별 막대
+    description: 평균 연비
+    content: |-
+      barOrigin = alt.Chart(mpg).mark_bar().encode(
+          x=alt.X('origin:N', title='생산국'),
+          y=alt.Y('mean(mpg):Q', title='평균 연비'),
+          color=alt.when(brush).then('origin:N').otherwise(alt.value('lightgray'))
+      ).add_params(brush).properties(
+          width=150,
+          height=200,
+          title='생산국별 평균 연비'
+      )
+      barOrigin
+
+- id: step5_line
+  title: 5단계. 연도별 라인 차트
+  subtitle: 연비 추이
+  blocks:
+  - type: text
+    content: |-
+      연도별 평균 연비 추이를 라인 차트로 표현합니다.
+
+      시간에 따른 연비 개선 추세를 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 연도별 라인
+    description: 연비 추이
+    content: |-
+      lineYear = alt.Chart(mpg).mark_line(point=True).encode(
+          x=alt.X('model_year:O', title='연도'),
+          y=alt.Y('mean(mpg):Q', title='평균 연비'),
+          color='origin:N',
+          opacity=alt.when(
+              (originSelect == None) | (alt.datum.origin == originSelect)
+          ).then(alt.value(1)).otherwise(alt.value(0.2))
+      ).add_params(originSelect).properties(
+          width=350,
+          height=200,
+          title='연도별 평균 연비 추이'
+      )
+      lineYear
+
+- id: step6_histogram
+  title: 6단계. 연비 히스토그램
+  subtitle: 분포 확인
+  blocks:
+  - type: text
+    content: |-
+      연비 분포를 히스토그램으로 표현합니다.
+
+      브러싱으로 선택된 데이터의 분포를 확인할 수 있습니다.
+  - type: code
+    language: python
+    title: 연비 히스토그램
+    description: 분포 차트
+    content: |-
+      histMpg = alt.Chart(mpg).mark_bar().encode(
+          x=alt.X('mpg:Q', bin=alt.Bin(maxbins=20), title='연비'),
+          y=alt.Y('count()', title='개수'),
+          color=alt.when(brush).then('origin:N').otherwise(alt.value('lightgray'))
+      ).add_params(brush).properties(
+          width=200,
+          height=150,
+          title='연비 분포'
+      )
+      histMpg
+
+- id: step7_layer
+  title: 7단계. 레이어 추가
+  subtitle: 평균선 표시
+  blocks:
+  - type: text
+    content: |-
+      차트에 추가 정보를 겹쳐서 표시하는 방법을 배웁니다. 레이어(layer)는 "층"이라는 뜻으로, 여러 차트를 겹쳐 그립니다.
+
+      mark_rule()은 기준선(수평선 또는 수직선)을 그리는 마크입니다. strokeDash=[5, 5]는 점선 스타일(5픽셀 그리고 5픽셀 비우기 반복)입니다.
+
+      + 연산자로 두 차트를 겹칩니다. scatterMain + avgLine은 "산점도 위에 평균선을 겹쳐서 그려라"는 뜻입니다. 기준선이 있으면 데이터가 평균보다 높은지 낮은지 쉽게 비교할 수 있습니다.
+  - type: code
+    language: python
+    title: 산점도 + 평균선
+    description: 레이어 결합
+    content: |-
+      avgLine = alt.Chart(mpg).mark_rule(color='red', strokeDash=[5, 5]).encode(
+          y='mean(mpg):Q'
+      )
+
+      scatterWithLine = scatterMain + avgLine
+      scatterWithLine
+
+- id: step8_compose
+  title: 8단계. 대시보드 조합
+  subtitle: hconcat + vconcat
+  blocks:
+  - type: text
+    content: |-
+      이제 만든 차트들을 모두 조합해서 최종 레이아웃을 만듭니다. | 와 & 연산자를 사용합니다.
+
+      topRow는 윗줄입니다. scatterWithLine(산점도+평균선)을 왼쪽에, barOrigin과 histMpg를 세로로 쌓아(&) 오른쪽에 배치합니다. 괄호 안을 먼저 계산하므로 막대와 히스토그램이 먼저 세로로 쌓이고, 그것이 산점도 옆에 붙습니다.
+
+      bottomRow는 아랫줄로 lineYear(라인 차트)를 배치합니다. topRow & bottomRow로 윗줄과 아랫줄을 세로로 쌓으면 완성입니다.
+  - type: code
+    language: python
+    title: 레이아웃 구성
+    description: 2x2 그리드
+    content: |-
+      topRow = scatterWithLine | (barOrigin & histMpg)
+      bottomRow = lineYear
+
+      dashboard = topRow & bottomRow
+      dashboard
+
+- id: step9_final
+  title: 9단계. 최종 결과물
+  subtitle: 완성된 대시보드
+  blocks:
+  - type: text
+    content: |-
+      모든 기능을 통합한 최종 대시보드를 완성합니다.
+
+      드롭다운, 브러싱, 레이어, 다중 차트가 모두 연동됩니다.
+  - type: code
+    language: python
+    title: 인터랙션 정의
+    description: 브러싱과 드롭다운 설정
+    content: |-
+      brushFinal = alt.selection_interval()
+      originsFinal = ['usa', 'europe', 'japan']
+      dropdownFinal = alt.binding_select(options=[None] + originsFinal, labels=['전체'] + originsFinal, name='생산국: ')
+      originFinal = alt.param(name='origin', bind=dropdownFinal)
+  - type: code
+    language: python
+    title: 메인 산점도
+    description: 마력 vs 연비
+    content: |-
+      scatterFinal = alt.Chart(mpg).mark_circle(size=50).encode(
+          x=alt.X('horsepower:Q', title='마력'), y=alt.Y('mpg:Q', title='연비'),
+          color=alt.when(brushFinal).then('origin:N').otherwise(alt.value('lightgray')),
+          opacity=alt.when((originFinal == None) | (alt.datum.origin == originFinal)).then(alt.value(0.8)).otherwise(alt.value(0.1)),
+          tooltip=['name', 'origin', 'horsepower', 'mpg', 'model_year']
+      ).add_params(brushFinal, originFinal).properties(width=350, height=250, title='마력 vs 연비')
+      avgLineFinal = alt.Chart(mpg).mark_rule(color='red', strokeDash=[5,5]).encode(y='mean(mpg):Q')
+  - type: code
+    language: python
+    title: 보조 차트 생성
+    description: 막대, 히스토그램, 라인
+    content: |-
+      barFinal = alt.Chart(mpg).mark_bar().encode(
+          x='origin:N', y='mean(mpg):Q',
+          color=alt.when(brushFinal).then('origin:N').otherwise(alt.value('lightgray'))
+      ).add_params(brushFinal).properties(width=120, height=150, title='생산국별')
+      histFinal = alt.Chart(mpg).mark_bar().encode(
+          x=alt.X('mpg:Q', bin=True), y='count()',
+          color=alt.when(brushFinal).then('origin:N').otherwise(alt.value('lightgray'))
+      ).add_params(brushFinal).properties(width=120, height=100, title='연비 분포')
+  - type: code
+    language: python
+    title: 대시보드 조합
+    description: 프로젝트 완성!
+    content: |-
+      lineFinal = alt.Chart(mpg).mark_line(point=True).encode(
+          x='model_year:O', y='mean(mpg):Q', color='origin:N',
+          opacity=alt.when((originFinal == None) | (alt.datum.origin == originFinal)).then(alt.value(1)).otherwise(alt.value(0.2))
+      ).add_params(originFinal).properties(width=480, height=150, title='연도별 추이')
+      dashboardFinal = ((scatterFinal + avgLineFinal) | (barFinal & histFinal)) & lineFinal
+      dashboardFinal
+  - type: text
+    content: |-
+      완성된 대시보드에서:
+
+      - 드롭다운으로 생산국 필터링
+      - 산점도 드래그로 영역 선택
+      - 선택된 데이터가 모든 차트에 연동
+      - 빨간 점선은 전체 평균 연비
+      - 연도별 추이로 개선 트렌드 확인
+
+- id: practice
+  title: 실습
+  subtitle: 대시보드 확장 프로젝트
+  blocks:
+  - type: text
+    content: |-
+      이 프로젝트에서 배운 내용을 정리하면: selection_interval/binding_select로 인터랙션, when().then().otherwise()로 조건부 스타일, + 연산자로 레이어 겹치기, | 와 & 로 차트 배치, add_params()로 여러 파라미터 추가, 공통 selection을 공유해 차트 연동입니다.
+
+      이제 Altair의 모든 기능을 마스터했습니다. 배운 개념들을 자유롭게 조합해 나만의 대시보드를 만들어봅시다.
+  - type: tip
+    content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
+  - type: expansion
+    title: "미션1: 실린더별 막대 차트 추가"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        carUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
+        car = pd.read_csv(carUrl)
+        drag = alt.selection_interval()
+    - type: code
+      title: "차트 생성"
+      content: |-
+        dotHp = alt.Chart(car).mark_circle().encode(x='horsepower:Q', y='mpg:Q', color=alt.when(drag).then('origin:N').otherwise(alt.value('lightgray'))).add_params(drag).properties(width=250, height=200)
+        ruleMean = alt.Chart(car).mark_rule(color='red').encode(y='mean(mpg):Q').add_params(drag)
+        barNation = alt.Chart(car).mark_bar().encode(x='origin:N', y='count()', color=alt.when(drag).then('origin:N').otherwise(alt.value('lightgray'))).add_params(drag).properties(width=150, height=100)
+        barCyl = alt.Chart(car).mark_bar().encode(x='cylinders:O', y='count()', color=alt.when(drag).then('origin:N').otherwise(alt.value('lightgray'))).add_params(drag).properties(width=150, height=100, title='실린더별')
+        lineYr = alt.Chart(car).mark_line(point=True).encode(x='model_year:O', y='mean(mpg):Q', color='origin:N').properties(width=500, height=150)
+        figCyl = ((dotHp + ruleMean) | (barNation & barCyl)) & lineYr
+        figCyl
+  - type: expansion
+    title: "미션2: 무게 vs 연비 추가 산점도"
+    blocks:
+    - type: code
+      title: "데이터 준비"
+      content: |-
+        import altair as alt
+        import pandas as pd
+        autoUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
+        auto = pd.read_csv(autoUrl)
+        sweep = alt.selection_interval()
+    - type: code
+      title: "차트 생성"
+      content: |-
+        dotPower = alt.Chart(auto).mark_circle().encode(x='horsepower:Q', y='mpg:Q', color=alt.when(sweep).then('origin:N').otherwise(alt.value('lightgray'))).add_params(sweep).properties(width=250, height=200)
+        lineTrend = alt.Chart(auto).mark_line(point=True).encode(x='model_year:O', y='mean(mpg):Q', color='origin:N').properties(width=500, height=150)
+        dotWeight = alt.Chart(auto).mark_circle(size=40).encode(x='weight:Q', y='mpg:Q', color=alt.when(sweep).then('origin:N').otherwise(alt.value('lightgray'))).add_params(sweep).properties(width=250, height=200, title='무게 vs 연비')
+        figWeight = (dotPower | dotWeight) & lineTrend
+        figWeight
+
+- id: summary
+  title: 정리
+  blocks:
+  - type: text
+    content: Altair 전체 과정을 마스터했습니다!
+  - type: list
+    items:
+    - "마크: mark_point, mark_bar, mark_line, mark_area, mark_rect, mark_circle, mark_rule, mark_text"
+    - "인코딩: x, y, color, size, shape, opacity, tooltip, row, column"
+    - "데이터 타입: :Q(수량형), :N(명목형), :O(순서형), :T(시계열)"
+    - "변환: transform_calculate, transform_aggregate, transform_window, transform_fold, transform_filter"
+    - "선택: selection_interval, selection_point, when().then().otherwise()"
+    - "바인딩: binding_range, binding_select"
+    - "조합: layer(+), hconcat(|), vconcat(&), repeat, facet"
+  - type: text
+    content: |-
+      이제 Altair로 다양한 데이터 시각화와 인터랙티브 대시보드를 만들 수 있습니다.
+
+      실제 프로젝트에서 이 기술들을 활용해보세요!
