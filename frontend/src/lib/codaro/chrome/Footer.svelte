@@ -30,7 +30,7 @@
     onExport
   }: Props = $props();
 
-  const itemBase = "flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded";
+  const itemBase = "flex items-center p-2 text-sm shadow-inset font-mono rounded h-full cursor-pointer";
 
   let devPanelOpen = $derived(getIsDeveloperPanelOpen());
 </script>

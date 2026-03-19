@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Braces } from "lucide-svelte";
+  import { Github } from "lucide-svelte";
 
   interface Props {
     enabled?: boolean;
@@ -14,9 +14,9 @@
 
 <button
   class="flex items-center gap-1 p-2 text-sm font-mono rounded hover:bg-(--sage-3)"
-  data-testid="footer-copilot"
+  data-testid="footer-copilot-status"
   onclick={onToggle}
   title={enabled ? "Copilot enabled" : "Copilot disabled"}
 >
-  <Braces class="h-3.5 w-3.5 {enabled ? 'text-foreground' : 'opacity-40'}" />
+  <Github class="w-4 h-4 {enabled ? 'text-foreground' : 'opacity-40'}" />
 </button>

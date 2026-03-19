@@ -24,7 +24,7 @@
 
 <div
   data-testid="helper"
-  class="dark:bg-(--slate-1) print:hidden hide-on-fullscreen {isOpen ? 'border-r border-l border-(--slate-7)' : ''}"
+  class="bg-background print:hidden hide-on-fullscreen {isOpen ? 'border-r border-l border-(--slate-7)' : ''}"
   id="app-chrome-sidebar"
   data-panel-group-id="marimo:chrome:v1:l2"
   data-panel=""

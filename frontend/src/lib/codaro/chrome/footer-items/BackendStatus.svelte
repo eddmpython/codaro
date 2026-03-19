@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Wifi, WifiOff, Loader } from "lucide-svelte";
+  import { CheckCircle2, PowerOff, Loader } from "lucide-svelte";
 
   interface Props {
     connectionState?: string;
@@ -25,16 +25,16 @@
 </script>
 
 <div
-  class="flex items-center gap-1 p-2 text-sm font-mono rounded hover:bg-(--sage-3)"
+  class="flex items-center gap-1.5 p-2 text-xs font-mono rounded hover:bg-(--sage-3)"
   data-testid="footer-backend-status"
   title={statusText}
 >
   {#if connectionState !== "OPEN"}
-    <WifiOff class="h-3.5 w-3.5 {statusColor}" />
+    <PowerOff class="w-4 h-4 {statusColor}" />
   {:else if engineStatus === "running"}
-    <Loader class="h-3.5 w-3.5 {statusColor} animate-spin" />
+    <Loader class="w-4 h-4 {statusColor} animate-spin" />
   {:else}
-    <Wifi class="h-3.5 w-3.5 {statusColor}" />
+    <CheckCircle2 class="w-4 h-4 {statusColor}" />
   {/if}
-  <span class="text-xs {statusColor}">{statusText}</span>
+  <span class="text-xs {statusColor}">Kernel</span>
 </div>

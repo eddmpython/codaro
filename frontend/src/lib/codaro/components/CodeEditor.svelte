@@ -38,7 +38,6 @@
       outline: "none"
     },
     ".cm-content": {
-      minHeight: "48px",
       padding: "4px 0",
       fontFamily: "var(--monospace-font), ui-monospace, monospace",
       fontSize: "var(--marimo-code-editor-font-size, 0.9rem)"
@@ -160,6 +159,5 @@
 
 <style>
   .cm {
-    min-height: 48px;
   }
 </style>
