@@ -19,9 +19,6 @@
   data-panel=""
   data-panel-id="app"
 >
-  <div class="noise"></div>
-  <div class="disconnected-gradient"></div>
-
   {#if isDisconnected}
     <div class="z-50 top-4 left-4 absolute">
       <div class="print:hidden pointer-events-auto hover:cursor-pointer" data-state="closed">
@@ -36,6 +33,8 @@
     data-connection-state={connectionState}
     class="mathjax_ignore bg-background w-full h-full text-textColor flex flex-col overflow-y-auto overflow-x-hidden print:height-fit {isDisconnected ? 'disconnected' : ''}"
   >
+    <div class="noise"></div>
+    <div class="disconnected-gradient"></div>
     {@render children()}
   </div>
 </div>
