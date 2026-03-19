@@ -12,13 +12,35 @@
     readOnly?: boolean;
     onChange?: (nextValue: string) => void;
     onRun?: () => void;
+    onRunAndNewBelow?: () => void;
+    onRunAll?: () => void;
+    onCreateAbove?: () => void;
+    onCreateBelow?: () => void;
+    onDeleteCell?: () => void;
+    onMoveUp?: () => void;
+    onMoveDown?: () => void;
+    onToggleType?: () => void;
+    onFocusUp?: () => void;
+    onFocusDown?: () => void;
+    onHideCode?: () => void;
   }
 
   let {
     value = "",
     readOnly = false,
     onChange = () => {},
-    onRun = () => {}
+    onRun = () => {},
+    onRunAndNewBelow = () => {},
+    onRunAll = () => {},
+    onCreateAbove = () => {},
+    onCreateBelow = () => {},
+    onDeleteCell = () => {},
+    onMoveUp = () => {},
+    onMoveDown = () => {},
+    onToggleType = () => {},
+    onFocusUp = () => {},
+    onFocusDown = () => {},
+    onHideCode = () => {}
   }: Props = $props();
 
   let host: HTMLDivElement | undefined = $state();
@@ -115,11 +137,44 @@
         }),
         keymap.of([
           {
+            key: "Ctrl-Enter",
+            run: () => { onRun(); return true; }
+          },
+          {
             key: "Shift-Enter",
-            run: () => {
-              onRun();
-              return true;
-            }
+            run: () => { onRunAndNewBelow(); return true; }
+          },
+          {
+            key: "Ctrl-Shift-Enter",
+            run: () => { onRunAll(); return true; }
+          },
+          {
+            key: "Ctrl-Shift-a",
+            run: () => { onCreateAbove(); return true; }
+          },
+          {
+            key: "Ctrl-Shift-b",
+            run: () => { onCreateBelow(); return true; }
+          },
+          {
+            key: "Ctrl-Shift-Delete",
+            run: () => { onDeleteCell(); return true; }
+          },
+          {
+            key: "Alt-Shift-ArrowUp",
+            run: () => { onMoveUp(); return true; }
+          },
+          {
+            key: "Alt-Shift-ArrowDown",
+            run: () => { onMoveDown(); return true; }
+          },
+          {
+            key: "Ctrl-Shift-m",
+            run: () => { onToggleType(); return true; }
+          },
+          {
+            key: "Ctrl-Shift-h",
+            run: () => { onHideCode(); return true; }
           },
           indentWithTab,
           ...defaultKeymap,

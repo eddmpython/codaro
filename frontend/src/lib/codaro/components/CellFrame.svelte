@@ -48,6 +48,14 @@
     onDuplicate?: () => void;
     onAddBelow?: () => void;
     onAddAbove?: () => void;
+    onRunAndNewBelow?: () => void;
+    onRunAll?: () => void;
+    onFocusUp?: () => void;
+    onFocusDown?: () => void;
+    onHideCode?: () => void;
+    onClearOutput?: () => void;
+    onSendToTop?: () => void;
+    onSendToBottom?: () => void;
   }
 
   let {
@@ -63,7 +71,15 @@
     onMoveDown = () => {},
     onDuplicate = () => {},
     onAddBelow = () => {},
-    onAddAbove = () => {}
+    onAddAbove = () => {},
+    onRunAndNewBelow = () => {},
+    onRunAll = () => {},
+    onFocusUp = () => {},
+    onFocusDown = () => {},
+    onHideCode = () => {},
+    onClearOutput = () => {},
+    onSendToTop = () => {},
+    onSendToBottom = () => {}
   }: Props = $props();
 
   let status = $derived(block.execution?.status || "idle");
@@ -95,16 +111,16 @@
   let cellActions = $derived([
     { label: "Run cell", icon: Play, group: "Code & Execution", handle: onRun },
     { label: "Format cell", icon: Code2, group: "Code & Execution", handle: () => {} },
-    { label: "Hide code", icon: EyeOff, group: "Code & Execution", handle: () => {} },
+    { label: "Hide code", icon: EyeOff, group: "Code & Execution", handle: onHideCode },
     { label: "View as Markdown", icon: Type, group: "View As", handle: onToggleType },
     { label: "Create cell above", icon: PlusCircle, group: "Movement", handle: onAddAbove },
     { label: "Create cell below", icon: PlusCircle, group: "Movement", handle: onAddBelow },
     { label: "Move up", icon: ChevronUp, group: "Movement", handle: onMoveUp },
     { label: "Move down", icon: ChevronDown, group: "Movement", handle: onMoveDown },
-    { label: "Send to top", icon: ChevronsUp, group: "Movement", handle: () => {} },
-    { label: "Send to bottom", icon: ChevronsDown, group: "Movement", handle: () => {} },
+    { label: "Send to top", icon: ChevronsUp, group: "Movement", handle: onSendToTop },
+    { label: "Send to bottom", icon: ChevronsDown, group: "Movement", handle: onSendToBottom },
     { label: "Duplicate", icon: Scissors, group: "Movement", handle: onDuplicate },
-    { label: "Clear output", icon: XCircle, group: "Output", handle: () => {} },
+    { label: "Clear output", icon: XCircle, group: "Output", handle: onClearOutput },
     { label: "Delete", icon: Trash2, group: "Danger", handle: onDelete }
   ] as CellAction[]);
 
@@ -266,9 +282,24 @@
 
       <!-- Code Editor -->
       {#if block.type === "code"}
-        <CodeEditor value={block.content} onChange={onChange} onRun={onRun} />
+        <CodeEditor
+          value={block.content}
+          {onChange}
+          {onRun}
+          {onRunAndNewBelow}
+          {onRunAll}
+          onCreateAbove={onAddAbove}
+          onCreateBelow={onAddBelow}
+          onDeleteCell={onDelete}
+          {onMoveUp}
+          {onMoveDown}
+          {onToggleType}
+          {onFocusUp}
+          {onFocusDown}
+          {onHideCode}
+        />
       {:else}
-        <CodeEditor value={block.content} onChange={onChange} />
+        <CodeEditor value={block.content} {onChange} />
         <div class="markdown-divider"></div>
         <div class="markdown-preview-shell">
           <MarkdownBlock value={block.content} active={active} onChange={onChange} />

@@ -115,6 +115,31 @@
       findReplaceOpen = !findReplaceOpen;
       return;
     }
+    if (isModKey && event.shiftKey && event.key.toLowerCase() === "h") {
+      event.preventDefault();
+      keyboardShortcutsOpen = !keyboardShortcutsOpen;
+      return;
+    }
+    if (isModKey && event.key.toLowerCase() === "b") {
+      event.preventDefault();
+      const current = getIsSidebarOpen();
+      if (current) {
+        setSelectedPanel("");
+      } else {
+        setSelectedPanel("files");
+      }
+      return;
+    }
+    if (isModKey && event.key.toLowerCase() === "i") {
+      event.preventDefault();
+      void interruptExecution();
+      return;
+    }
+    if (isModKey && event.shiftKey && event.key === "Enter") {
+      event.preventDefault();
+      void runAll();
+      return;
+    }
     if (event.key === "F1") {
       event.preventDefault();
       setSelectedPanel("documentation");
@@ -226,14 +251,106 @@
     markDirty(replaceBlockContent(documentState, blockId, content));
   }
 
-  function addBlock(type: "code" | "markdown", anchorBlockId?: string): void {
+  function addBlock(type: "code" | "markdown", anchorBlockId?: string, direction: "before" | "after" = "after"): void {
     if (!documentState) {
       startNewDocument();
       return;
     }
-    const nextDocument = insertBlock(documentState, type, anchorBlockId || activeBlockId || null, "after");
+    const nextDocument = insertBlock(documentState, type, anchorBlockId || activeBlockId || null, direction);
     activeBlockId = nextDocument.blocks.find((block) => !documentState?.blocks.some((entry) => entry.id === block.id))?.id || activeBlockId;
     markDirty(nextDocument);
+  }
+
+  function addBlockAbove(anchorBlockId?: string): void {
+    addBlock("code", anchorBlockId, "before");
+  }
+
+  async function runBlockAndNewBelow(blockId: string): Promise<void> {
+    await runBlock(blockId);
+    addBlock("code", blockId, "after");
+  }
+
+  async function interruptExecution(): Promise<void> {
+    if (engine && typeof engine.interrupt === "function") {
+      await engine.interrupt();
+    }
+    engineStatus = "ready";
+  }
+
+  function sendBlockToTop(blockId: string): void {
+    if (!documentState) {
+      return;
+    }
+    const idx = documentState.blocks.findIndex((b) => b.id === blockId);
+    if (idx <= 0) {
+      return;
+    }
+    for (let i = 0; i < idx; i++) {
+      moveBlock(blockId, -1);
+    }
+  }
+
+  function sendBlockToBottom(blockId: string): void {
+    if (!documentState) {
+      return;
+    }
+    const idx = documentState.blocks.findIndex((b) => b.id === blockId);
+    if (idx < 0 || idx >= documentState.blocks.length - 1) {
+      return;
+    }
+    for (let i = idx; i < documentState.blocks.length - 1; i++) {
+      moveBlock(blockId, 1);
+    }
+  }
+
+  function clearBlockOutput(blockId: string): void {
+    if (!documentState) {
+      return;
+    }
+    documentState = {
+      ...documentState,
+      blocks: documentState.blocks.map((block) => {
+        if (block.id !== blockId) {
+          return block;
+        }
+        return {
+          ...block,
+          execution: {
+            ...block.execution,
+            lastOutput: null,
+            status: "idle"
+          }
+        };
+      })
+    };
+  }
+
+  function focusCellUp(blockId: string): void {
+    if (!documentState) {
+      return;
+    }
+    const idx = documentState.blocks.findIndex((b) => b.id === blockId);
+    if (idx > 0) {
+      activeBlockId = documentState.blocks[idx - 1].id;
+      const el = document.querySelector(`#cell-${activeBlockId} .cm-content`);
+      if (el instanceof HTMLElement) {
+        el.focus();
+      }
+    }
+  }
+
+  function focusCellDown(blockId: string): void {
+    if (!documentState) {
+      return;
+    }
+    const idx = documentState.blocks.findIndex((b) => b.id === blockId);
+    if (idx < documentState.blocks.length - 1) {
+      activeBlockId = documentState.blocks[idx + 1].id;
+      const el = document.querySelector(`#cell-${activeBlockId} .cm-content`);
+      if (el instanceof HTMLElement) {
+        el.focus();
+      }
+    }
   }
 
   async function removeBlock(blockId: string): Promise<void> {
@@ -511,6 +628,30 @@
     { label: "AI Panel", group: "Panels", handle: () => setSelectedPanel("ai"), keywords: ["ai", "chat"] }
   ]);
 
+  const shortcutEntries = [
+    { action: "cell.run", name: "Run cell", key: "Ctrl+Enter", group: "Running Cells" },
+    { action: "cell.runAndNewBelow", name: "Run and create below", key: "Shift+Enter", group: "Running Cells" },
+    { action: "global.runAll", name: "Run all cells", key: "Ctrl+Shift+Enter", group: "Running Cells" },
+    { action: "global.interrupt", name: "Interrupt", key: "Ctrl+I", group: "Running Cells" },
+    { action: "cell.createAbove", name: "Create cell above", key: "Ctrl+Shift+A", group: "Cell Actions" },
+    { action: "cell.createBelow", name: "Create cell below", key: "Ctrl+Shift+B", group: "Cell Actions" },
+    { action: "cell.delete", name: "Delete cell", key: "Ctrl+Shift+Delete", group: "Cell Actions" },
+    { action: "cell.moveUp", name: "Move cell up", key: "Alt+Shift+ArrowUp", group: "Cell Actions" },
+    { action: "cell.moveDown", name: "Move cell down", key: "Alt+Shift+ArrowDown", group: "Cell Actions" },
+    { action: "cell.toggleMarkdown", name: "Toggle markdown", key: "Ctrl+Shift+M", group: "Cell Actions" },
+    { action: "cell.hideCode", name: "Hide code", key: "Ctrl+Shift+H", group: "Cell Actions" },
+    { action: "global.save", name: "Save", key: "Ctrl+S", group: "Navigation" },
+    { action: "global.commandPalette", name: "Command palette", key: "Ctrl+K", group: "Navigation" },
+    { action: "global.findReplace", name: "Find & replace", key: "Ctrl+F", group: "Navigation" },
+    { action: "global.toggleSidebar", name: "Toggle sidebar", key: "Ctrl+B", group: "Navigation" },
+    { action: "global.shortcuts", name: "Keyboard shortcuts", key: "Ctrl+Shift+H", group: "Navigation" },
+    { action: "global.contextHelp", name: "Context help", key: "F1", group: "Navigation" },
+    { action: "editor.indent", name: "Indent", key: "Tab", group: "Editing" },
+    { action: "editor.dedent", name: "Dedent", key: "Shift+Tab", group: "Editing" },
+    { action: "editor.undo", name: "Undo", key: "Ctrl+Z", group: "Editing" },
+    { action: "editor.redo", name: "Redo", key: "Ctrl+Y", group: "Editing" }
+  ];
+
   onMount(() => {
     void initialize();
     window.addEventListener("keydown", handleWindowKeydown);
@@ -646,6 +787,15 @@
                   onMoveDown={() => moveBlock(block.id, 1)}
                   onDuplicate={() => duplicateBlock(block.id)}
                   onAddBelow={() => addBlock("code", block.id)}
+                  onAddAbove={() => addBlockAbove(block.id)}
+                  onRunAndNewBelow={() => void runBlockAndNewBelow(block.id)}
+                  onRunAll={runAll}
+                  onFocusUp={() => focusCellUp(block.id)}
+                  onFocusDown={() => focusCellDown(block.id)}
+                  onHideCode={() => {}}
+                  onClearOutput={() => clearBlockOutput(block.id)}
+                  onSendToTop={() => sendBlockToTop(block.id)}
+                  onSendToBottom={() => sendBlockToBottom(block.id)}
                 />
               {/each}
             </div>
@@ -666,6 +816,7 @@
       />
       <KeyboardShortcuts
         open={keyboardShortcutsOpen}
+        shortcuts={shortcutEntries}
         onClose={() => { keyboardShortcutsOpen = false; }}
       />
       <FindReplace
