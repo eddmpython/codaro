@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 
-from ..curriculum.contentLoader import ContentLoader
+from ..curriculum.studyLoader import StudyLoader
 from ..curriculum.progress import ProgressTracker
 from ..kernel.manager import SessionManager
 from ..runtime import ExecutionEngine, LocalEngine
@@ -14,13 +14,13 @@ class ServerState:
     mode: str
     documentPath: Path | None
     workspaceRoot: Path
-    contentRoot: Path
+    studyRoot: Path
     packageRoot: Path
     frontendRoot: Path
     webBuildRoot: Path
     sessionManager: SessionManager
     workspaceEngine: ExecutionEngine
-    curriculumLoader: ContentLoader | None
+    studyLoader: StudyLoader | None
     progressTracker: ProgressTracker
 
 
@@ -28,17 +28,17 @@ def createServerState(
     mode: str,
     documentPath: Path | None,
     workspaceRoot: Path,
-    contentRoot: Path,
+    studyRoot: Path,
     packageRoot: Path,
     frontendRoot: Path,
     webBuildRoot: Path,
 ) -> ServerState:
-    curriculumLoader = ContentLoader(str(contentRoot)) if contentRoot.exists() else None
+    studyLoader = StudyLoader(str(studyRoot)) if studyRoot.exists() else None
     return ServerState(
         mode=mode,
         documentPath=documentPath,
         workspaceRoot=workspaceRoot,
-        contentRoot=contentRoot,
+        studyRoot=studyRoot,
         packageRoot=packageRoot,
         frontendRoot=frontendRoot,
         webBuildRoot=webBuildRoot,
@@ -47,6 +47,6 @@ def createServerState(
             workingDirectory=workspaceRoot,
             workspaceRoot=workspaceRoot,
         ),
-        curriculumLoader=curriculumLoader,
+        studyLoader=studyLoader,
         progressTracker=ProgressTracker(),
     )

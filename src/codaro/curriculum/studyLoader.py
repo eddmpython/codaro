@@ -16,14 +16,14 @@ class CategoryInfo(BaseModel):
     count: int = 0
 
 
-class ContentSummary(BaseModel):
+class StudySummary(BaseModel):
     contentId: str
     title: str
     category: str
     sortKey: tuple = (0, "")
 
 
-class ContentData(BaseModel):
+class StudyData(BaseModel):
     model_config = {"arbitrary_types_allowed": True}
 
     meta: dict = Field(default_factory=dict)
@@ -80,24 +80,24 @@ LEARNING_PATHS = {
 }
 
 
-class ContentLoader:
-    def __init__(self, contentDir: str | Path):
-        self._contentDir = Path(contentDir).resolve()
+class StudyLoader:
+    def __init__(self, studyDir: str | Path):
+        self._studyDir = Path(studyDir).resolve()
         self._cache: dict[str, dict] = {}
         self._contentIdCache: dict[str, list[str]] = {}
         self._metaCache: dict[str, dict] = {}
         self._categoryIndexCache: dict[str, list[dict] | None] = {}
-        self._summaryCache: dict[str, list[ContentSummary]] = {}
+        self._summaryCache: dict[str, list[StudySummary]] = {}
         self._prevNextCache: dict[str, dict] = {}
 
     @property
-    def contentDir(self) -> Path:
-        return self._contentDir
+    def studyDir(self) -> Path:
+        return self._studyDir
 
     def listCategories(self) -> list[CategoryInfo]:
         result: list[CategoryInfo] = []
         for key, name in CATEGORY_MAPPING.items():
-            categoryDir = self._contentDir / key
+            categoryDir = self._studyDir / key
             if not categoryDir.exists():
                 continue
             count = len(self._listContentIds(key))
@@ -110,17 +110,17 @@ class ContentLoader:
             ))
         return result
 
-    def listContents(self, category: str) -> list[ContentSummary]:
+    def listContents(self, category: str) -> list[StudySummary]:
         if category in self._summaryCache:
             return list(self._summaryCache[category])
-        summaries: list[ContentSummary] = []
+        summaries: list[StudySummary] = []
         categoryIndex = self._loadCategoryIndex(category)
         if categoryIndex:
             for item in categoryIndex:
                 contentId = item["contentId"]
                 title = item["title"]
                 sortKey = _extractSortKey(contentId)
-                summaries.append(ContentSummary(
+                summaries.append(StudySummary(
                     contentId=contentId,
                     title=_buildMenuTitle(contentId, title),
                     category=category,
@@ -132,7 +132,7 @@ class ContentLoader:
                 meta = self._loadMetaOnly(category, contentId)
                 title = meta.get("title", contentId)
                 sortKey = _extractSortKey(contentId)
-                summaries.append(ContentSummary(
+                summaries.append(StudySummary(
                     contentId=contentId,
                     title=_buildMenuTitle(contentId, title),
                     category=category,
@@ -141,13 +141,13 @@ class ContentLoader:
         self._summaryCache[category] = sorted(summaries, key=lambda s: s.sortKey)
         return list(self._summaryCache[category])
 
-    def loadContent(self, category: str, contentId: str) -> dict:
+    def loadStudy(self, category: str, contentId: str) -> dict:
         cacheKey = f"{category}/{contentId}"
         if cacheKey in self._cache:
             return self._cache[cacheKey]
-        filePath = self._getContentPath(category, contentId)
+        filePath = self._getStudyPath(category, contentId)
         if not filePath.exists():
-            raise FileNotFoundError(f"Content not found: {filePath}")
+            raise FileNotFoundError(f"Study not found: {filePath}")
         with open(filePath, "r", encoding="utf-8") as f:
             content = yaml.safe_load(f)
         self._cache[cacheKey] = content
@@ -175,7 +175,7 @@ class ContentLoader:
             ids = [item["contentId"] for item in categoryIndex]
             self._contentIdCache[category] = ids
             return list(ids)
-        categoryDir = self._contentDir / category
+        categoryDir = self._studyDir / category
         if not categoryDir.exists():
             return []
         ids: list[str] = []
@@ -189,12 +189,12 @@ class ContentLoader:
         self._contentIdCache[category] = ids
         return list(ids)
 
-    def _getContentPath(self, category: str, contentId: str) -> Path:
+    def _getStudyPath(self, category: str, contentId: str) -> Path:
         if category == "practical":
-            subPath = self._contentDir / category / contentId / "study.yaml"
+            subPath = self._studyDir / category / contentId / "study.yaml"
             if subPath.exists():
                 return subPath
-        return self._contentDir / category / f"{contentId}.yaml"
+        return self._studyDir / category / f"{contentId}.yaml"
 
     def _loadMetaOnly(self, category: str, contentId: str) -> dict:
         cacheKey = f"{category}/{contentId}"
@@ -208,7 +208,7 @@ class ContentLoader:
                     self._metaCache[cacheKey] = meta
                     return dict(meta)
         try:
-            filePath = self._getContentPath(category, contentId)
+            filePath = self._getStudyPath(category, contentId)
             meta = _readMetaHeader(filePath)
             self._metaCache[cacheKey] = meta
             return dict(meta)
@@ -219,7 +219,7 @@ class ContentLoader:
         if category in self._categoryIndexCache:
             cached = self._categoryIndexCache[category]
             return list(cached) if cached else None
-        indexPath = self._contentDir / category / "curriculum.json"
+        indexPath = self._studyDir / category / "curriculum.json"
         if not indexPath.exists():
             self._categoryIndexCache[category] = None
             return None

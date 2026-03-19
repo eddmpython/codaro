@@ -1,15 +1,31 @@
 <script lang="ts">
-  export let workspaceRoot = "";
-  export let index: {
-    recentDocuments?: Array<{ name: string; path: string; notebookType: string; relativePath: string }>;
-    compatibleDocuments?: Array<{ name: string; path: string; notebookType: string; relativePath: string }>;
+  interface DocumentEntry {
+    name: string;
+    path: string;
+    notebookType: string;
+    relativePath: string;
+  }
+
+  interface WorkspaceIndex {
+    recentDocuments?: DocumentEntry[];
+    compatibleDocuments?: DocumentEntry[];
     totalCodaroDocuments?: number;
     totalCompatibleDocuments?: number;
-  } | null = null;
-  export let onOpenPath = (path: string): void => {
-    void path;
-  };
-  export let onCreateNew = (): void => {};
+  }
+
+  interface Props {
+    workspaceRoot?: string;
+    index?: WorkspaceIndex | null;
+    onOpenPath?: (path: string) => void;
+    onCreateNew?: () => void;
+  }
+
+  let {
+    workspaceRoot = "",
+    index = null,
+    onOpenPath = () => {},
+    onCreateNew = () => {}
+  }: Props = $props();
 </script>
 
 <section class="home">
@@ -19,7 +35,7 @@
       <h1>Open a notebook or start a new one.</h1>
       <p class="copy">{workspaceRoot}</p>
     </div>
-    <button class="primary" on:click={onCreateNew}>New notebook</button>
+    <button class="primary" onclick={onCreateNew}>New notebook</button>
   </div>
 
   <div class="grid">
@@ -31,7 +47,7 @@
       {#if index?.recentDocuments && index.recentDocuments.length > 0}
         <div class="list">
           {#each index.recentDocuments as document}
-            <button class="row" on:click={() => onOpenPath(document.path)}>
+            <button class="row" onclick={() => onOpenPath(document.path)}>
               <strong>{document.name}</strong>
               <span>{document.relativePath}</span>
             </button>
@@ -50,7 +66,7 @@
       {#if index?.compatibleDocuments && index.compatibleDocuments.length > 0}
         <div class="list">
           {#each index.compatibleDocuments.slice(0, 8) as document}
-            <button class="row" on:click={() => onOpenPath(document.path)}>
+            <button class="row" onclick={() => onOpenPath(document.path)}>
               <strong>{document.name}</strong>
               <span>{document.notebookType}</span>
             </button>

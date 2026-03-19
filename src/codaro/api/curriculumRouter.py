@@ -3,7 +3,7 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from ..curriculum.checker import checkByOutput, checkByVariable, checkContains, checkNoError
-from ..curriculum.contentLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS
+from ..curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS
 from ..curriculum.converter import yamlToDocument
 from ..curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, LESSON_STRUCTURE, PHILOSOPHY
 from ..serverLog import formatLogFields, getServerLogger
@@ -15,13 +15,13 @@ from .requestModels import CheckExerciseRequest, CurriculumProgressRequest
 def createCurriculumRouter(state: ServerState) -> APIRouter:
     router = APIRouter()
     logger = getServerLogger()
-    convertedContentCache: dict[str, dict[str, object]] = {}
+    convertedStudyCache: dict[str, dict[str, object]] = {}
 
     @router.get("/api/curriculum/categories")
     def apiCurriculumCategories() -> dict[str, object]:
-        if state.curriculumLoader is None:
+        if state.studyLoader is None:
             return {"categories": [], "groups": {}, "learningPaths": {}}
-        categories = state.curriculumLoader.listCategories()
+        categories = state.studyLoader.listCategories()
         logger.debug(
             "curriculum %s",
             formatLogFields(action="categories", categoryCount=len(categories)),
@@ -34,9 +34,9 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
     @router.get("/api/curriculum/contents/{category}")
     def apiCurriculumContents(category: str) -> dict[str, object]:
-        if state.curriculumLoader is None:
+        if state.studyLoader is None:
             fail(404, "curriculum_unavailable", "Curriculum content not available.")
-        contents = state.curriculumLoader.listContents(category)
+        contents = state.studyLoader.listContents(category)
         logger.debug(
             "curriculum %s",
             formatLogFields(action="contents", category=category, contentCount=len(contents)),
@@ -49,23 +49,23 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
 
     @router.get("/api/curriculum/content/{category}/{contentId}")
     def apiCurriculumContent(category: str, contentId: str) -> dict[str, object]:
-        if state.curriculumLoader is None:
+        if state.studyLoader is None:
             fail(404, "curriculum_unavailable", "Curriculum content not available.")
         cacheKey = f"{category}/{contentId}"
-        cachedPayload = convertedContentCache.get(cacheKey)
+        cachedPayload = convertedStudyCache.get(cacheKey)
         if cachedPayload is None:
             try:
-                yamlContent = state.curriculumLoader.loadContent(category, contentId)
+                yamlContent = state.studyLoader.loadStudy(category, contentId)
             except FileNotFoundError:
                 fail(404, "curriculum_content_not_found", "Content not found.")
             document, solutions = yamlToDocument(yamlContent, category, contentId)
-            prevNext = state.curriculumLoader.getPrevNext(category, contentId)
+            prevNext = state.studyLoader.getPrevNext(category, contentId)
             cachedPayload = {
                 "document": document,
                 "solutions": dict(solutions),
                 "prevNext": dict(prevNext),
             }
-            convertedContentCache[cacheKey] = cachedPayload
+            convertedStudyCache[cacheKey] = cachedPayload
         state.progressTracker.markAccessed(category, contentId)
         document = cachedPayload["document"].model_copy(deep=True)
         solutions = dict(cachedPayload["solutions"])

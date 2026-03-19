@@ -1,31 +1,21 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import {
-    Bot,
-    Box,
-    ChevronDown,
-    CircleX,
-    Command,
-    ExternalLink,
-    FileText,
-    FolderTree,
-    KeyRound,
-    LayoutTemplate,
-    MessageCircleQuestionMark,
-    Network,
-    NotebookPen,
-    PowerOff,
-    Save,
-    ScrollText,
-    SquareDashedBottomCode,
-    Sparkles,
-    TriangleAlert,
-    Unlink,
-    Variable,
-    X,
-    Zap
-  } from "lucide-svelte";
+  import { ExternalLink } from "lucide-svelte";
   import CellFrame from "./CellFrame.svelte";
+  import EditPage from "../app/EditPage.svelte";
+  import TopRightControls from "../controls/TopRightControls.svelte";
+  import BottomRightControls from "../controls/BottomRightControls.svelte";
+  import CommandPalette from "../controls/CommandPalette.svelte";
+  import KeyboardShortcuts from "../controls/KeyboardShortcuts.svelte";
+  import FindReplace from "../controls/FindReplace.svelte";
+  import FileExplorerPanel from "../panels/FileExplorerPanel.svelte";
+  import VariablesPanel from "../panels/VariablesPanel.svelte";
+  import DependencyGraphPanel from "../panels/DependencyGraphPanel.svelte";
+  import DocumentationPanel from "../panels/DocumentationPanel.svelte";
+  import OutlinePanel from "../panels/OutlinePanel.svelte";
+  import PackagesPanel from "../panels/PackagesPanel.svelte";
+  import SnippetsPanel from "../panels/SnippetsPanel.svelte";
+  import AIChatPanel from "../panels/AIChatPanel.svelte";
   import { getBasePath } from "../basePath";
   import {
     addBlock as insertBlock,
@@ -44,6 +34,11 @@
   import { PyodideEngine } from "../engines/pyodideEngine";
   import type { ExecutionEngine } from "../engines/executionEngine";
   import { ServerKernelEngine } from "../engines/serverKernelEngine";
+  import {
+    getSelectedPanel,
+    setSelectedPanel,
+    getIsSidebarOpen
+  } from "../stores/panels.svelte";
   import type {
     CodaroDocument,
     ContextHelpEntry,
@@ -52,48 +47,43 @@
     VariableInfo
   } from "../types";
 
-  export let initialPath = "";
+  interface Props {
+    initialPath?: string;
+  }
 
-  let bootstrap: { workspaceRoot?: string; documentPath?: string | null } | null = null;
-  let documentState: CodaroDocument | null = null;
-  let activeBlockId = "";
-  let currentPath = "";
-  let engine: ExecutionEngine | null = null;
-  let engineName = "none";
-  let engineStatus = "idle";
-  let engineError = "";
-  let variables: VariableInfo[] = [];
-  let duplicateDefinitions = new Map<string, string[]>();
-  let loading = true;
-  let pageError = "";
-  let saveState = "idle";
-  let dirty = false;
-  let selectedPanel = "";
-  let helpContextPanel = "editor";
-  let contextHelpEntry: ContextHelpEntry;
+  let { initialPath = "" }: Props = $props();
+
+  let bootstrap: { workspaceRoot?: string; documentPath?: string | null } | null = $state(null);
+  let documentState: CodaroDocument | null = $state(null);
+  let activeBlockId = $state("");
+  let currentPath = $state("");
+  let engine: ExecutionEngine | null = $state(null);
+  let engineName = $state("none");
+  let engineStatus = $state("idle");
+  let engineError = $state("");
+  let variables: VariableInfo[] = $state([]);
+  let duplicateDefinitions = $state(new Map<string, string[]>());
+  let loading = $state(true);
+  let pageError = $state("");
+  let saveState = $state("idle");
+  let dirty = $state(false);
+  let helpContextPanel = $state("editor");
+  let commandPaletteOpen = $state(false);
+  let keyboardShortcutsOpen = $state(false);
+  let findReplaceOpen = $state(false);
+
   const marimoVersion = "0.21.0";
   const marimoStaticBase = `${getBasePath()}/marimo`;
-  const filenameInputClass =
-    "placeholder:text-foreground-muted flex rounded-md bg-transparent text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50 filename w-full px-4 py-1 my-1 h-9 font-mono text-foreground/60";
-  const floatingButtonClass =
-    "flex items-center justify-center m-0 leading-none font-medium border border-foreground/10 shadow-xs-solid active:shadow-none dark:border-border text-sm mo-button rounded px-3 py-2";
-  const sidebarButtonClass = "flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded hover:bg-(--sage-3)";
+
   const chromePanels = [
-    { key: "files", label: "Files", icon: FolderTree },
-    { key: "variables", label: "Variables", icon: Variable },
-    { key: "packages", label: "Packages", icon: Box },
-    { key: "ai", label: "AI", icon: Bot },
-    { key: "outline", label: "Outline", icon: ScrollText },
-    { key: "help", label: "Context Help", icon: MessageCircleQuestionMark },
-    { key: "dependencies", label: "Dependencies", icon: Network }
-  ];
-  const developerTabs = [
-    { key: "errors", label: "Errors", icon: CircleX },
-    { key: "scratchpad", label: "Scratchpad", icon: NotebookPen },
-    { key: "tracing", label: "Tracing", icon: Network },
-    { key: "secrets", label: "Secrets", icon: KeyRound },
-    { key: "logs", label: "Logs", icon: FileText },
-    { key: "snippets", label: "Snippets", icon: SquareDashedBottomCode }
+    { key: "files", label: "Files" },
+    { key: "variables", label: "Variables" },
+    { key: "dependencies", label: "Dependencies" },
+    { key: "packages", label: "Packages" },
+    { key: "outline", label: "Outline" },
+    { key: "documentation", label: "Context Help" },
+    { key: "snippets", label: "Snippets" },
+    { key: "ai", label: "AI" }
   ];
 
   function blockPayloads(document: CodaroDocument | null = documentState): ReactiveBlockPayload[] {
@@ -108,17 +98,6 @@
     duplicateDefinitions = detectMultipleDefinitions(blockPayloads());
   }
 
-  function togglePanel(panelKey: string): void {
-    if (panelKey !== "help") {
-      helpContextPanel = panelKey;
-    }
-    selectedPanel = selectedPanel === panelKey ? "" : panelKey;
-  }
-
-  function openHelpPanel(): void {
-    selectedPanel = "help";
-  }
-
   function handleWindowKeydown(event: KeyboardEvent): void {
     const isModKey = event.metaKey || event.ctrlKey;
     if (isModKey && event.key.toLowerCase() === "s") {
@@ -126,9 +105,19 @@
       void saveDocument();
       return;
     }
+    if (isModKey && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      commandPaletteOpen = !commandPaletteOpen;
+      return;
+    }
+    if (isModKey && event.key.toLowerCase() === "f") {
+      event.preventDefault();
+      findReplaceOpen = !findReplaceOpen;
+      return;
+    }
     if (event.key === "F1") {
       event.preventDefault();
-      openHelpPanel();
+      setSelectedPanel("documentation");
     }
   }
 
@@ -475,22 +464,52 @@
     window.open(url.toString(), "_blank", "noopener");
   }
 
-  $: documentBlocks = documentState?.blocks || [];
-  $: activeBlock = documentState?.blocks.find((block) => block.id === activeBlockId) || null;
-  $: documentLocation = currentPath || documentState?.title || "Untitled.py";
-  $: connectionState = engineStatus === "error" ? "CLOSED" : "OPEN";
-  $: shellError = engineStatus === "error" ? engineError : pageError;
-  $: contextHelpEntry = createContextHelpEntry({
+  let documentBlocks = $derived(documentState?.blocks || []);
+  let activeBlock = $derived(documentState?.blocks.find((block) => block.id === activeBlockId) || null);
+  let documentLocation = $derived(currentPath || documentState?.title || "Untitled.py");
+  let connectionState = $derived(engineStatus === "error" ? "CLOSED" : "OPEN");
+  let shellError = $derived(engineStatus === "error" ? engineError : pageError);
+  let issueCount = $derived(engineStatus === "error" ? 1 : 0);
+  let warningCount = $derived(duplicateDefinitions.size);
+  let contextHelpEntry = $derived(createContextHelpEntry({
     route: "editor",
     panelKey: helpContextPanel,
     blockType: activeBlock?.type || null,
     engineName,
     engineStatus,
     errorState: shellError
-  });
-  $: panelTitle = chromePanels.find((panel) => panel.key === selectedPanel)?.label || selectedPanel;
-  $: helperPanelSize = selectedPanel ? "30.0" : "0.0";
-  $: saveButtonColor = dirty ? "yellow" : connectionState === "CLOSED" ? "gray" : "hint-green";
+  }));
+  let panelTitle = $derived(
+    chromePanels.find((panel) => panel.key === getSelectedPanel())?.label || getSelectedPanel()
+  );
+  let saveButtonColor = $derived(dirty ? "yellow" : connectionState === "CLOSED" ? "gray" : "hint-green");
+
+  let variableEntries = $derived(variables.map((v) => ({
+    name: v.name,
+    type: v.typeName || "",
+    value: v.value || "",
+    declaredBy: v.declaredBy || "",
+    usedBy: v.usedBy || []
+  })));
+
+  let commandPaletteItems = $derived([
+    { label: "Save", group: "Commands", shortcut: "Ctrl+S", handle: () => void saveDocument(), keywords: ["save"] },
+    { label: "Run All", group: "Commands", shortcut: "Ctrl+Shift+Enter", handle: () => void runAll(), keywords: ["run", "execute"] },
+    { label: "Export", group: "Commands", handle: () => void exportDocument(), keywords: ["export"] },
+    { label: "Open App Mode", group: "Commands", handle: () => void launchApp(), keywords: ["app", "preview"] },
+    { label: "New Code Cell", group: "Cell Actions", handle: () => addBlock("code"), keywords: ["add", "cell", "code"] },
+    { label: "New Markdown Cell", group: "Cell Actions", handle: () => addBlock("markdown"), keywords: ["add", "cell", "markdown"] },
+    { label: "Toggle Keyboard Shortcuts", group: "Commands", shortcut: "F1", handle: () => { keyboardShortcutsOpen = !keyboardShortcutsOpen; }, keywords: ["shortcuts", "help"] },
+    { label: "Toggle Find & Replace", group: "Commands", shortcut: "Ctrl+F", handle: () => { findReplaceOpen = !findReplaceOpen; }, keywords: ["find", "replace", "search"] },
+    { label: "Files Panel", group: "Panels", handle: () => setSelectedPanel("files"), keywords: ["files", "explorer"] },
+    { label: "Variables Panel", group: "Panels", handle: () => setSelectedPanel("variables"), keywords: ["variables"] },
+    { label: "Dependencies Panel", group: "Panels", handle: () => setSelectedPanel("dependencies"), keywords: ["dependencies", "graph"] },
+    { label: "Context Help", group: "Panels", handle: () => setSelectedPanel("documentation"), keywords: ["help", "docs"] },
+    { label: "Packages Panel", group: "Panels", handle: () => setSelectedPanel("packages"), keywords: ["packages", "pip"] },
+    { label: "Outline Panel", group: "Panels", handle: () => setSelectedPanel("outline"), keywords: ["outline", "toc"] },
+    { label: "Snippets Panel", group: "Panels", handle: () => setSelectedPanel("snippets"), keywords: ["snippets"] },
+    { label: "AI Panel", group: "Panels", handle: () => setSelectedPanel("ai"), keywords: ["ai", "chat"] }
+  ]);
 
   onMount(() => {
     void initialize();
@@ -559,390 +578,100 @@
     <div class="screenState">{pageError}</div>
   {:else if documentState}
     <div class="contents" style="--marimo-code-editor-font-size: 0.875rem;">
-      <div class="flex flex-col flex-1 overflow-hidden absolute inset-0 print:relative">
-        <div
-          class=""
-          data-panel-group=""
-          data-panel-group-direction="horizontal"
-          data-panel-group-id="codaro-horizontal-shell"
-          style="display: flex; flex-direction: row; height: 100%; overflow: hidden; width: 100%;"
-        >
-          <div class="h-full pt-4 pb-1 px-1 flex flex-col items-start text-muted-foreground text-md select-none text-sm z-50 dark:bg-background print:hidden hide-on-fullscreen">
-            <template></template>
-            <span data-focus-scope-start="true" hidden=""></span>
-            <div
-              data-state="closed"
-              class="flex flex-col gap-0"
-              aria-label="Sidebar panels"
-              role="listbox"
-              tabindex="0"
-              data-layout="stack"
-              data-orientation="vertical"
-            >
-              {#each chromePanels as panel}
-                <div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" role="option" aria-selected="false" tabindex="-1" data-key={panel.key}>
-                  <button type="button" class={sidebarButtonClass} data-state={selectedPanel === panel.key ? "open" : "closed"} on:click={() => togglePanel(panel.key)}>
-                    <svelte:component this={panel.icon} class="h-5 w-5" />
-                  </button>
-                </div>
+      <EditPage
+        {connectionState}
+        {documentLocation}
+        documentTitle={documentState.title || "untitled marimo notebook"}
+        hasPath={!!currentPath}
+        {shellError}
+        {engineName}
+        {engineStatus}
+        errorCount={issueCount}
+        {warningCount}
+        {issueCount}
+        {panelTitle}
+        onExport={exportDocument}
+      >
+        {#snippet helperPanelContent()}
+          {#if getSelectedPanel() === "files"}
+            <FileExplorerPanel />
+          {:else if getSelectedPanel() === "variables"}
+            <VariablesPanel variables={variableEntries} />
+          {:else if getSelectedPanel() === "dependencies"}
+            <DependencyGraphPanel />
+          {:else if getSelectedPanel() === "documentation"}
+            <DocumentationPanel
+              title="Context Help"
+              content={contextHelpEntry.summary}
+            />
+          {:else if getSelectedPanel() === "outline"}
+            <OutlinePanel />
+          {:else if getSelectedPanel() === "packages"}
+            <PackagesPanel />
+          {:else if getSelectedPanel() === "snippets"}
+            <SnippetsPanel />
+          {:else if getSelectedPanel() === "ai"}
+            <AIChatPanel />
+          {/if}
+        {/snippet}
+
+        {#snippet floatingControls()}
+          <TopRightControls {connectionState} />
+          <BottomRightControls
+            {connectionState}
+            {engineStatus}
+            {dirty}
+            {saveButtonColor}
+            onSave={saveDocument}
+            onLaunchApp={launchApp}
+            onRunAll={runAll}
+            onOpenCommandPalette={() => { commandPaletteOpen = true; }}
+            onOpenKeyboardShortcuts={() => { keyboardShortcutsOpen = true; }}
+          />
+        {/snippet}
+
+        <div class="px-1 sm:px-16 md:px-20 xl:px-24 pb-24 sm:pb-12">
+          <div class="m-auto pr-4 min-w-[400px] pb-24 sm:pb-12" style="max-width: var(--content-width, 776px)">
+            <div data-testid="cell-column" class="flex flex-col gap-5">
+              {#each documentBlocks as block (block.id)}
+                <CellFrame
+                  {block}
+                  active={block.id === activeBlockId}
+                  onSelect={() => (activeBlockId = block.id)}
+                  onRun={() => void runBlock(block.id)}
+                  onChange={(content) => updateBlockContent(block.id, content)}
+                  onToggleType={() => void toggleBlockType(block.id)}
+                  onDelete={() => void removeBlock(block.id)}
+                  onMoveUp={() => moveBlock(block.id, -1)}
+                  onMoveDown={() => moveBlock(block.id, 1)}
+                  onDuplicate={() => duplicateBlock(block.id)}
+                  onAddBelow={() => addBlock("code", block.id)}
+                />
               {/each}
-            </div>
-            <span data-focus-scope-end="true" hidden=""></span>
-            <button
-              class={sidebarButtonClass}
-              data-state="closed"
-              type="button"
-              aria-label="Open public docs"
-              on:click={() => openPublicDoc("/docs")}
-            >
-              <ExternalLink class="h-5 w-5" />
-            </button>
-            <div class="flex-1"></div>
-            <div class="flex flex-col-reverse gap-px overflow-hidden" data-state="closed"></div>
-          </div>
-
-          <div
-            data-testid="helper"
-            class="dark:bg-(--slate-1) print:hidden hide-on-fullscreen"
-            id="app-chrome-sidebar"
-            data-panel-group-id="codaro-horizontal-shell"
-            data-panel=""
-            data-panel-collapsible="true"
-            data-panel-id="app-chrome-sidebar"
-            data-panel-size={helperPanelSize}
-            style={`flex: ${selectedPanel ? "30" : "0"} 1 0px; overflow: hidden;`}
-          >
-            <span class="flex flex-row h-full">
-              <div class="flex flex-col h-full flex-1 overflow-hidden mr-[-4px]">
-                <div class="p-3 border-b flex justify-between items-center">
-                  <span class="text-sm text-(--slate-11) uppercase tracking-wide font-semibold flex-1">{panelTitle}</span>
-                  <button
-                    type="button"
-                    class="disabled:opacity-50 disabled:pointer-events-none inline-flex items-center justify-center font-medium focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background opacity-80 hover:opacity-100 active:opacity-100 h-7 px-2 rounded-md text-xs m-0"
-                    data-testid="close-helper-pane"
-                    on:click={() => (selectedPanel = "")}
-                  >
-                    <X class="w-4 h-4" />
-                  </button>
-                </div>
-                <div class="flex-1 overflow-auto px-3 py-2">
-                  {#if selectedPanel === "variables"}
-                    <div class="flex flex-col gap-2 text-xs font-mono">
-                      {#if variables.length === 0}
-                        <span class="text-muted-foreground">No variables</span>
-                      {:else}
-                        {#each variables as variable}
-                          <div class="rounded border border-border px-2 py-1">
-                            <div>{variable.name}</div>
-                            <div class="text-muted-foreground">{variable.typeName}</div>
-                          </div>
-                        {/each}
-                      {/if}
-                    </div>
-                  {:else if selectedPanel === "help"}
-                    <div class="flex flex-col gap-4 text-sm">
-                      <div class="rounded-lg border border-border bg-background/70 p-3">
-                        <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{contextHelpEntry.when}</div>
-                        <p class="mt-3 text-sm leading-6 text-(--slate-11)">{contextHelpEntry.summary}</p>
-                      </div>
-
-                      <div class="rounded-lg border border-border bg-background/70 p-3">
-                        <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Focused actions</div>
-                        <div class="mt-3 flex flex-col gap-2">
-                          {#each contextHelpEntry.actions as action}
-                            <div class="rounded-md border border-border/70 px-3 py-2">
-                              <div class="flex items-center justify-between gap-3">
-                                <span class="text-sm font-medium text-(--slate-12)">{action.label}</span>
-                                {#if action.shortcut}
-                                  <span class="rounded bg-(--slate-3) px-2 py-0.5 font-mono text-[11px] text-muted-foreground">{action.shortcut}</span>
-                                {/if}
-                              </div>
-                              <p class="mt-1 text-xs leading-5 text-muted-foreground">{action.description}</p>
-                            </div>
-                          {/each}
-                        </div>
-                      </div>
-
-                      <div class="rounded-lg border border-border bg-background/70 p-3">
-                        <div class="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Public docs</div>
-                        <div class="mt-3 flex flex-col gap-2">
-                          {#each contextHelpEntry.docLinks as docLink}
-                            <a
-                              class="flex items-center justify-between rounded-md border border-border/70 px-3 py-2 text-sm text-(--slate-12) hover:bg-(--slate-2)"
-                              href={docLink.href}
-                              target="_blank"
-                              rel="noreferrer"
-                            >
-                              <span>{docLink.label}</span>
-                              <ExternalLink class="h-4 w-4 text-muted-foreground" />
-                            </a>
-                          {/each}
-                        </div>
-                      </div>
-                    </div>
-                  {:else if selectedPanel}
-                    <div class="flex flex-col gap-2">
-                      <div class="text-xs text-muted-foreground uppercase tracking-wide font-semibold">{panelTitle}</div>
-                      <div class="text-xs leading-5 text-muted-foreground">
-                        This panel stays inside the editor surface. Open Context Help for task-focused guidance or use the public docs button for long-form documentation.
-                      </div>
-                    </div>
-                  {/if}
-                </div>
-              </div>
-              <div
-                class="border-border print:hidden z-10 resize-handle-collapsed vertical"
-                role="separator"
-                data-panel-group-direction="horizontal"
-                data-panel-group-id="codaro-horizontal-shell"
-                data-resize-handle=""
-                data-panel-resize-handle-enabled="false"
-                data-panel-resize-handle-id="codaro-horizontal-helper"
-                data-resize-handle-state="inactive"
-                aria-controls="app-chrome-sidebar"
-                aria-valuemax="75"
-                aria-valuemin="10"
-                aria-valuenow={selectedPanel ? "30" : "0"}
-                style="touch-action: none; user-select: none;"
-              ></div>
-            </span>
-          </div>
-
-          <div
-            class=""
-            id="app-chrome-body"
-            data-panel-group-id="codaro-horizontal-shell"
-            data-panel=""
-            data-panel-id="app-chrome-body"
-            data-panel-size="100.0"
-            style="flex: 100 1 0px; overflow: hidden;"
-          >
-            <div
-              class=""
-              data-panel-group=""
-              data-panel-group-direction="vertical"
-              data-panel-group-id="codaro-vertical-shell"
-              style="display: flex; flex-direction: column; height: 100%; overflow: hidden; width: 100%;"
-            >
-              <div
-                class="relative h-full"
-                id="app"
-                data-panel-group-id="codaro-vertical-shell"
-                data-panel=""
-                data-panel-id="app"
-                data-panel-size="100.0"
-                style="flex: 100 1 0px; overflow: hidden;"
-              >
-                <div class="noise"></div>
-                <div class="disconnected-gradient"></div>
-
-                {#if connectionState === "CLOSED"}
-                  <div class="z-50 top-4 left-4 absolute">
-                    <div class="print:hidden pointer-events-auto hover:cursor-pointer" data-state="closed">
-                      <Unlink class="w-[25px] h-[25px] text-(--red-11)" />
-                    </div>
-                  </div>
-                {/if}
-
-                <div
-                  id="App"
-                  data-config-width="compact"
-                  data-connection-state={connectionState}
-                  class={`mathjax_ignore bg-background w-full h-full text-textColor flex flex-col overflow-y-auto overflow-x-hidden print:height-fit ${connectionState === "CLOSED" ? "disconnected" : ""}`}
-                >
-                  <div class="pt-4 sm:pt-12 pb-2 mb-4 print:hidden z-50 sticky left-0">
-                    <div class="flex items-center justify-center container">
-                      <div
-                        tabindex="-1"
-                        class="flex h-full w-full flex-col overflow-hidden rounded-md text-popover-foreground bg-transparent group filename-input"
-                        id="filename-input"
-                        cmdk-root=""
-                      >
-                        <label
-                          cmdk-label=""
-                          for="codaro-filename-input"
-                          id="codaro-filename-label"
-                          style="position: absolute; width: 1px; height: 1px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
-                        ></label>
-                        <div
-                          class="max-h-[300px] overflow-y-auto overflow-x-hidden"
-                          cmdk-list=""
-                          role="listbox"
-                          tabindex="-1"
-                          aria-label="Suggestions"
-                          id="codaro-filename-list"
-                          style="--cmdk-list-height: 40px;"
-                        >
-                          <div cmdk-list-sizer="">
-                            <div>
-                              <div class="flex items-center border-b border-none justify-center px-1" cmdk-input-wrapper="">
-                                <input
-                                  class={filenameInputClass}
-                                  data-testid="dir-completion-input"
-                                  tabindex="-1"
-                                  spellcheck="false"
-                                  placeholder={documentState.title || "Untitled.py"}
-                                  autocomplete="off"
-                                  cmdk-input=""
-                                  autocorrect="off"
-                                  aria-autocomplete="list"
-                                  role="combobox"
-                                  aria-expanded="true"
-                                  aria-controls="codaro-filename-list"
-                                  aria-labelledby="codaro-filename-label"
-                                  id="codaro-filename-input"
-                                  type="text"
-                                  readonly
-                                  value={documentLocation}
-                                  style="max-width: 1000px;"
-                                />
-                              </div>
-                              <div class="marimo" style="display: contents;"></div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {#if shellError}
-                      <div class="font-mono text-center text-base text-(--red-11)">
-                        <p>{shellError}</p>
-                      </div>
-                    {/if}
-                  </div>
-
-                  <div class="container flex flex-col gap-3 pb-24">
-                    <section class="flex flex-col gap-3">
-                      {#each documentBlocks as block (block.id)}
-                        <CellFrame
-                          {block}
-                          active={block.id === activeBlockId}
-                          onSelect={() => (activeBlockId = block.id)}
-                          onRun={() => void runBlock(block.id)}
-                          onChange={(content) => updateBlockContent(block.id, content)}
-                          onToggleType={() => void toggleBlockType(block.id)}
-                        />
-                      {/each}
-                    </section>
-
-                  </div>
-                </div>
-
-                <div class="absolute bottom-5 right-5 flex flex-col gap-2 items-center print:hidden pointer-events-auto z-30">
-                  <button class={`${floatingButtonClass} ${saveButtonColor} rectangle`} id="save-button" aria-label="Save" data-state="closed" on:click={saveDocument}>
-                    <Save size={18} strokeWidth={1.5} />
-                  </button>
-                  <button class={`${floatingButtonClass} hint-green`} data-testid="hide-code-button" id="preview-button" data-state="closed" on:click={launchApp}>
-                    <LayoutTemplate size={18} strokeWidth={1.5} />
-                  </button>
-                  <button class={`${floatingButtonClass} hint-green`} data-testid="command-palette-button" data-state="closed" on:click={runAll}>
-                    <Command size={18} strokeWidth={1.5} />
-                  </button>
-                  <div></div>
-                  <div class="flex flex-col gap-2 items-center"></div>
-                </div>
-              </div>
-
-              <div
-                data-testid="panel"
-                class="dark:bg-(--slate-1) print:hidden hide-on-fullscreen"
-                id="app-chrome-panel"
-                data-panel-group-id="codaro-vertical-shell"
-                data-panel=""
-                data-panel-collapsible="true"
-                data-panel-id="app-chrome-panel"
-                data-panel-size="0.0"
-                style="flex: 0 1 0px; overflow: hidden;"
-              >
-                <div
-                  class="border-border print:hidden z-20 resize-handle-collapsed horizontal"
-                  role="separator"
-                  data-panel-group-direction="vertical"
-                  data-panel-group-id="codaro-vertical-shell"
-                  data-resize-handle=""
-                  data-panel-resize-handle-enabled="false"
-                  data-panel-resize-handle-id="codaro-vertical-panel"
-                  data-resize-handle-state="inactive"
-                  aria-controls="app"
-                  aria-valuemax="90"
-                  aria-valuemin="25"
-                  aria-valuenow="100"
-                  style="touch-action: none; user-select: none;"
-                ></div>
-                <div class="flex flex-col h-full">
-                  <div class="flex items-center justify-between border-b px-2 h-8 bg-background shrink-0">
-                    <template></template>
-                    <div
-                      data-state="closed"
-                      class="flex flex-row gap-1"
-                      aria-label="Developer panel tabs"
-                      role="listbox"
-                      tabindex="0"
-                      data-layout="stack"
-                      data-orientation="vertical"
-                    >
-                      {#each developerTabs as tab}
-                        <div class="active:cursor-grabbing data-[dragging]:opacity-60 outline-none" role="option" aria-selected="false" tabindex="-1" data-key={tab.key}>
-                          <div class="text-sm flex gap-2 px-2 pt-1 pb-0.5 items-center leading-none rounded-sm cursor-pointer hover:bg-muted/50">
-                            <svelte:component this={tab.icon} class="w-4 h-4" />
-                            {tab.label}
-                          </div>
-                        </div>
-                      {/each}
-                    </div>
-                    <div class="border-l border-border h-4 mx-1"></div>
-                    <button type="button" class="p-1 hover:bg-accent rounded flex items-center gap-1.5 text-xs text-muted-foreground" data-testid="backend-status" data-state="closed">
-                      <PowerOff class={`w-4 h-4 ${engineStatus === "error" ? "text-red-500" : "text-emerald-500"}`} />
-                      <span>{engineStatus === "error" ? "Kernel" : engineName}</span>
-                    </button>
-                    <div class="flex-1"></div>
-                    <button
-                      type="button"
-                      class="disabled:opacity-50 disabled:pointer-events-none inline-flex items-center justify-center font-medium focus-visible:outline-hidden focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-2 ring-offset-background opacity-80 hover:opacity-100 active:opacity-100 h-7 px-2 rounded-md text-xs"
-                    >
-                      <X class="w-4 h-4" />
-                    </button>
-                  </div>
-                  <div class="flex-1 overflow-hidden"></div>
-                </div>
-              </div>
             </div>
           </div>
         </div>
-
-        <footer class="h-10 py-1 gap-1 bg-background flex items-center text-muted-foreground text-md pl-2 pr-1 border-t border-border select-none print:hidden text-sm z-50 hide-on-fullscreen overflow-x-auto overflow-y-hidden scrollbar-thin">
-          <div class="flex items-center p-2 text-sm shadow-inset font-mono cursor-pointer rounded hover:bg-(--sage-3) h-full" data-testid="footer-panel" data-state="closed">
-            <div class="flex items-center gap-1 h-full">
-              <CircleX class="w-4 h-4 text-destructive" />
-              <span>{engineStatus === "error" ? 1 : 0}</span>
-              <TriangleAlert class="w-4 h-4 ml-1" />
-              <span>{duplicateDefinitions.size}</span>
-            </div>
-          </div>
-
-          <button class="h-full flex items-center p-2 text-sm shadow-inset font-mono cursor-pointer rounded hover:bg-(--sage-3)" data-testid="footer-runtime-settings" data-state="closed" on:click={exportDocument}>
-            <div class="flex items-center gap-1">
-              <Zap size={16} class="text-amber-500" />
-              <ChevronDown size={14} />
-            </div>
-          </button>
-
-          <div class="mx-auto"></div>
-
-          <div class="flex items-center shrink-0 min-w-0">
-            <div class="flex gap-2 items-center px-1"></div>
-
-            <div class="h-full flex items-center p-2 text-sm shadow-inset font-mono cursor-pointer rounded hover:bg-(--sage-3)" data-testid="footer-ai-disabled" data-state="closed">
-              <Sparkles class="h-4 w-4 opacity-60" />
-            </div>
-          </div>
-        </footer>
-      </div>
+      </EditPage>
     </div>
 
     <div role="region" aria-label="Notifications (F8)" tabindex="-1" style="pointer-events: none;">
       <ol tabindex="-1" class="fixed top-0 z-100 flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:w-fit md:max-w-[420px]"></ol>
     </div>
-    <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999"></div>
+
+    <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999">
+      <CommandPalette
+        open={commandPaletteOpen}
+        items={commandPaletteItems}
+        onClose={() => { commandPaletteOpen = false; }}
+      />
+      <KeyboardShortcuts
+        open={keyboardShortcutsOpen}
+        onClose={() => { keyboardShortcutsOpen = false; }}
+      />
+      <FindReplace
+        open={findReplaceOpen}
+        onClose={() => { findReplaceOpen = false; }}
+      />
+    </div>
   {/if}
 </div>

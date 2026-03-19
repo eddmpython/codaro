@@ -2,10 +2,14 @@
   import { marked } from "marked";
   import WidgetRenderer from "./WidgetRenderer.svelte";
 
-  export let value: unknown = null;
+  interface Props {
+    value?: unknown;
+  }
 
-  let activeTab = 0;
-  let openAccordion: number[] = [];
+  let { value = null }: Props = $props();
+
+  let activeTab = $state(0);
+  let openAccordion: number[] = $state([]);
 
   function descriptorType(payload: unknown): string {
     if (!payload || typeof payload !== "object") {
@@ -26,8 +30,8 @@
       return [];
     }
     const record = payload as Record<string, unknown>;
-    const items = record.items || record.children || record.tabs || record.sections;
-    return Array.isArray(items) ? (items as Record<string, unknown>[]) : [];
+    const itemsValue = record.items || record.children || record.tabs || record.sections;
+    return Array.isArray(itemsValue) ? (itemsValue as Record<string, unknown>[]) : [];
   }
 
   function getRecord(payload: unknown): Record<string, unknown> {
@@ -142,11 +146,14 @@
     openAccordion = [index];
   }
 
-  $: type = descriptorType(value);
-  $: items = getItems(value);
-  $: if (type === "tabs" && (activeTab < 0 || activeTab >= items.length)) {
-    activeTab = currentTabIndex();
-  }
+  let type = $derived(descriptorType(value));
+  let items = $derived(getItems(value));
+
+  $effect(() => {
+    if (type === "tabs" && (activeTab < 0 || activeTab >= items.length)) {
+      activeTab = currentTabIndex();
+    }
+  });
 </script>
 
 {#if value == null}
@@ -192,7 +199,7 @@
   <section class="tabs">
     <div class="tabList">
       {#each items as item, index}
-        <button class:active={index === activeTab} on:click={() => (activeTab = index)}>
+        <button class:active={index === activeTab} onclick={() => (activeTab = index)}>
           {getLabel(item, `Tab ${index + 1}`)}
         </button>
       {/each}
@@ -207,7 +214,7 @@
   <section class="accordion">
     {#each items as item, index}
       <div class="accordionItem">
-        <button class="accordionButton" on:click={() => toggleAccordion(index)}>
+        <button class="accordionButton" onclick={() => toggleAccordion(index)}>
           <span>{getLabel(item, `Section ${index + 1}`)}</span>
           <span>{openAccordion.includes(index) ? "−" : "+"}</span>
         </button>

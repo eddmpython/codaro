@@ -40,7 +40,7 @@
 - `runtime/`
   - 실행 엔진 인터페이스
   - `LocalEngine` 실제 구현
-- `../content/studyPython/content/`
+- `../../study/python/`
   - 학습 커리큘럼 YAML source of truth
 - `server.py`
   - FastAPI 앱 조립기

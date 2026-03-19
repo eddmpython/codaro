@@ -7,18 +7,25 @@
     children?: TreeNode[];
   }
 
-  export let nodes: TreeNode[] = [];
-  export let activePath = "";
-  export let onOpenPath = (path: string): void => {
-    void path;
-  };
-  export let level = 0;
+  interface Props {
+    nodes?: TreeNode[];
+    activePath?: string;
+    onOpenPath?: (path: string) => void;
+    level?: number;
+  }
 
-  let expandedPaths = new Set(
+  let {
+    nodes = [],
+    activePath = "",
+    onOpenPath = () => {},
+    level = 0
+  }: Props = $props();
+
+  let expandedPaths = $state(new Set(
     nodes
       .filter((node) => node.isDirectory)
       .map((node) => node.path)
-  );
+  ));
 
   function isExpanded(path: string): boolean {
     return expandedPaths.has(path);
@@ -37,7 +44,7 @@
   {#each nodes as node}
     {#if node.isDirectory}
       <div class="branch">
-        <button class="folder" on:click={() => toggle(node.path)}>
+        <button class="folder" onclick={() => toggle(node.path)}>
           <span>{isExpanded(node.path) ? "▾" : "▸"}</span>
           <span>{node.name}</span>
         </button>
@@ -51,7 +58,7 @@
         {/if}
       </div>
     {:else}
-      <button class:selected={activePath === node.path} class="file" on:click={() => onOpenPath(node.path)}>
+      <button class:selected={activePath === node.path} class="file" onclick={() => onOpenPath(node.path)}>
         <span>{node.name}</span>
         <small>{node.notebookType}</small>
       </button>

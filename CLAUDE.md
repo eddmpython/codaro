@@ -202,7 +202,7 @@
 - `src/codaro/server.py` : FastAPI 앱 조립기, middleware, 프론트 빌드 stale 감지, SPA 서빙 진입점
 - `src/codaro/cli.py` : `codaro edit`, `codaro run`, `codaro export`
 - `src/codaro/appRuntime.py` : native `.py` 문서에서 사용하는 `App`, `md`
-- `content/studyPython/content/` : Codaro 로컬 학습 커리큘럼 YAML
+- `study/python/` : Codaro 로컬 학습 커리큘럼 YAML
 - `frontend/` : SvelteKit + Tailwind v4 편집기, shadcn 패턴 공용 UI, marimo 기준 notebook chrome, 학습 브라우저, 미션 체크 UI, 서버 커널 우선 + Pyodide 폴백
 - `landing/` : SvelteKit static public site, docs/blog/search, GitHub Pages build
 - `blog/` : public blog source (`category/post/index.md + assets/`)
@@ -264,8 +264,8 @@
 ## Marimo 1:1 체크리스트
 
 - 이 체크리스트는 `frontend`가 marimo와 **정말 1:1인지** 판정하는 기준이다.
-- 세부 source branch, DOM 계약, class 계약, 상태 분기는 반드시 `frontend/PRD.md`를 따른다.
-- 이 문서는 상위 게이트이고, 구현 상세는 `frontend/PRD.md`가 source of truth다.
+- 세부 source branch, DOM 계약, class 계약, 상태 분기는 반드시 `frontend/PRD.md` 인덱스와 `frontend/prd/*.md` 분할 문서를 따른다.
+- `frontend/PRD.md`는 상위 인덱스 게이트이고, 구현 상세 source of truth는 `frontend/prd/*.md`다.
 - source of truth는 추측이 아니라 로컬 설치본 marimo 정적 자산이다.
   - `.venv/Lib/site-packages/marimo/_static/index.html`
   - `.venv/Lib/site-packages/marimo/_static/assets/*.js`
@@ -354,6 +354,16 @@
 - 배포는 GitHub Actions trusted publishing 기준을 유지한다.
 - 버전 릴리즈는 `git tag vX.Y.Z && git push origin vX.Y.Z` 흐름을 기준으로 한다.
 
+## 로컬 배포 bundle 원칙
+
+- 최종 사용자 배포는 `CodaroLauncher.exe` 하나를 기준으로 한다.
+- launcher는 embedded Python runtime과 manifest가 지정한 exact wheel 기반 curated bundle만 설치한다.
+- launcher는 index에서 arbitrary latest package를 해석하거나 무제한 `pip install` 경로를 제품 기본으로 삼지 않는다.
+- `codaro-excel` 같은 automation bundle은 Python package, helper runtime, capability probe, bootstrap을 launcher가 관리한다.
+- 외부 앱과 드라이버 의존성은 별도 경계로 둔다.
+  - 예: `xlwings` 기반 Excel app automation은 launcher가 Python 쪽 의존성과 bootstrap을 관리하지만, Microsoft Excel 자체는 사용자가 설치해야 한다.
+- 세부 배포 설계의 source of truth는 `launcher/PRD.md`, `launcher/PACKAGING.md`다.
+
 ## 문서 유지보수 원칙
 
 - 세션 시작 시 `CLAUDE.md`와 실제 코드 구조를 대조하고, 낡은 내용이 있으면 즉시 갱신한다.
@@ -368,8 +378,8 @@
 - 다음 세션은 먼저 프로젝트 메모리, 그다음 관련 기능 문서, 마지막으로 직전 수정 파일을 읽고 시작한다.
 - 채팅 기록만 믿고 이어가지 않는다. 설계 결정과 남은 작업은 반드시 저장소 안 문서로 고정한다.
 - 코드 변경이 있었는데 문서가 업데이트되지 않았다면 세션 종료 전에 문서를 먼저 맞춘다.
-- marimo 1:1 작업은 `frontend/PRD.md`를 상세 source of truth로 유지한다.
-- `frontend/PRD.md`에는 마지막으로 확인한 source branch 또는 asset, 완료한 UI 영역, 아직 미완료인 체크리스트 항목, 알려진 diff 또는 blocker, 다음 비교 포인트를 항상 남긴다.
+- marimo 1:1 작업은 `frontend/PRD.md` 인덱스와 `frontend/prd/*.md` 분할 문서를 함께 source of truth로 유지한다.
+- `frontend/PRD.md`는 짧은 인덱스와 진입점으로 유지하고, 마지막으로 확인한 source branch 또는 asset, 완료한 UI 영역, 아직 미완료인 체크리스트 항목, 알려진 diff 또는 blocker, 다음 비교 포인트는 `frontend/prd/10-summary-acceptance-and-copy-plan.md`를 우선 갱신한다.
 
 ## 현재 우선순위
 

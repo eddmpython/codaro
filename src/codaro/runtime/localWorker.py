@@ -24,70 +24,82 @@ def runLocalWorker(connection, *, workingDirectory: str | None, workspaceRoot: s
     while True:
         try:
             command = connection.recv()
-        except EOFError:
+        except (EOFError, OSError):
             break
 
-        action = command.get("action")
-        if action == "shutdown":
-            connection.send({"ok": True})
-            break
+        try:
+            action = command.get("action")
+            if action == "shutdown":
+                _workerSend(connection, {"ok": True})
+                break
 
-        if action == "execute":
-            executionCount += 1
-            blockId = command.get("blockId")
-            sequence = 0
+            if action == "execute":
+                executionCount += 1
+                blockId = command.get("blockId")
+                sequence = 0
 
-            def emitEvent(eventType: str, payload: Any = None) -> None:
-                nonlocal sequence
-                sequence += 1
-                connection.send(
-                    {
-                        "kind": "event",
-                        "event": {
-                            "sequence": sequence,
-                            "eventType": eventType,
-                            "blockId": blockId,
-                            "executionCount": executionCount,
-                            "payload": payload,
+                def emitEvent(eventType: str, payload: Any = None) -> None:
+                    nonlocal sequence
+                    sequence += 1
+                    _workerSend(
+                        connection,
+                        {
+                            "kind": "event",
+                            "event": {
+                                "sequence": sequence,
+                                "eventType": eventType,
+                                "blockId": blockId,
+                                "executionCount": executionCount,
+                                "payload": payload,
+                            },
                         },
-                    }
+                    )
+
+                response = _executeCommand(
+                    code=command["code"],
+                    blockId=blockId,
+                    injectedVars=command.get("injectedVars"),
+                    registry=registry,
+                    cellDefinitions=cellDefinitions,
+                    executionCount=executionCount,
+                    targetCwd=targetCwd,
+                    emitEvent=emitEvent,
                 )
+                _workerSend(connection, {"kind": "response", "response": response})
+                continue
 
-            response = _executeCommand(
-                code=command["code"],
-                blockId=blockId,
-                injectedVars=command.get("injectedVars"),
-                registry=registry,
-                cellDefinitions=cellDefinitions,
-                executionCount=executionCount,
-                targetCwd=targetCwd,
-                emitEvent=emitEvent,
-            )
-            connection.send({"kind": "response", "response": response})
-            continue
+            if action == "removeDefinitions":
+                _removeBlockDefinitions(command["blockId"], registry, cellDefinitions)
+                _workerSend(connection, _buildStateResponse(registry, cellDefinitions, executionCount))
+                continue
 
-        if action == "removeDefinitions":
-            _removeBlockDefinitions(command["blockId"], registry, cellDefinitions)
-            connection.send(_buildStateResponse(registry, cellDefinitions, executionCount))
-            continue
+            if action == "reset":
+                registry.clear()
+                cellDefinitions.clear()
+                executionCount = 0
+                _workerSend(connection, _buildStateResponse(registry, cellDefinitions, executionCount))
+                continue
 
-        if action == "reset":
-            registry.clear()
-            cellDefinitions.clear()
-            executionCount = 0
-            connection.send(_buildStateResponse(registry, cellDefinitions, executionCount))
-            continue
+            if action == "getVariables":
+                _workerSend(
+                    connection,
+                    {
+                        "variables": _collectVariables(registry),
+                        "executionCount": executionCount,
+                    },
+                )
+                continue
 
-        if action == "getVariables":
-            connection.send(
-                {
-                    "variables": _collectVariables(registry),
-                    "executionCount": executionCount,
-                }
-            )
-            continue
+            _workerSend(connection, {"error": f"Unsupported worker action: {action}"})
+        except (BrokenPipeError, EOFError, OSError):
+            break
 
-        connection.send({"error": f"Unsupported worker action: {action}"})
+
+def _workerSend(connection, data: Any) -> None:
+    try:
+        connection.send(data)
+    except (BrokenPipeError, EOFError, OSError):
+        raise
 
 
 def _executeCommand(

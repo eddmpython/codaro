@@ -1,12 +1,18 @@
 <script lang="ts">
-  export let dataframe: {
+  interface DataFrame {
     columns: string[];
     rows: Record<string, unknown>[];
     index: string[];
     totalRows: number;
     truncated: boolean;
     typeName: string;
-  } | null = null;
+  }
+
+  interface Props {
+    dataframe?: DataFrame | null;
+  }
+
+  let { dataframe = null }: Props = $props();
 
   function cellValue(value: unknown): string {
     if (value == null) {

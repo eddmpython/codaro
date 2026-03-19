@@ -77,8 +77,10 @@ Codaro의 실행 원칙은 그대로 유지한다.
 
 ### 6. parity와 제품 fork point를 같이 기록한다
 
-- `frontend/PRD.md`는 marimo source trace를 계속 유지한다
-- Codaro shipped product가 의도적으로 갈라지는 지점도 같은 문서에 함께 적는다
+- `frontend/PRD.md`는 짧은 인덱스와 세션 진입점으로 유지한다
+- 실제 marimo source trace와 UI 계약은 `frontend/prd/*.md` 분할 문서에 기록한다
+- 세션 재개 시에는 먼저 `frontend/prd/10-summary-acceptance-and-copy-plan.md`를 읽는다
+- Codaro shipped product가 의도적으로 갈라지는 지점도 같은 PRD 체계 안에 함께 적는다
 - 현재 확정 fork point는 문서 surface다
   - marimo source의 `documentation` panel trace는 남긴다
   - Codaro 구현은 `Context Help`만 싣고 public docs는 외부로 연다
@@ -166,35 +168,9 @@ parity 이후에만 아래를 붙인다.
 | `center/right/left` | `_output/hypertext.py` | 별도 장식 없이 justify 래퍼로 구현 |
 | `callout` | `_plugins/stateless/callout.py` | `neutral/warn/success/info/danger` kind 체계를 그대로 유지 |
 
-## Svelte 구조 초안
+## Svelte 구조
 
-초기 구조는 아래처럼 간다.
-
-```text
-frontend/
-  DEV.md
-  src/
-    lib/
-      features/
-        notebook/
-          NotebookShell.svelte
-          CellFrame.svelte
-          OutputRenderer.svelte
-          LayoutRenderer.svelte
-          SidebarHost.svelte
-          engine/
-            ServerKernelEngine.ts
-            PyodideEngine.ts
-            ExecutionEngine.ts
-          adapters/
-            documentAdapter.ts
-            outputAdapter.ts
-            layoutAdapter.ts
-          stores/
-            notebookStore.ts
-            sessionStore.ts
-            workspaceStore.ts
-```
+현재 구현된 구조는 위 "컴포넌트 디렉토리 구조" 섹션 참고. 56개 컴포넌트가 10개 디렉토리에 분산되어 있다.
 
 ## view model 원칙
 
@@ -216,7 +192,7 @@ frontend/
 ### Phase 0. benchmark 고정
 
 - 설치된 `marimo` 코드 대응표 작성
-- 이 문서를 기준선으로 고정
+- `frontend/PRD.md` 인덱스와 `frontend/prd/*.md` 분할 문서를 기준선으로 고정
 
 ### Phase 1. shell
 
@@ -296,20 +272,121 @@ frontend/
 
 ## Current State
 
-- helper sidebar의 `documentation` slot은 shipped product에서 `Context Help`로 대체됐다
-- `Context Help` 데이터는 프론트 로컬 registry `frontend/src/lib/codaro/contextHelp.ts`가 만든다
-- IDE 안의 docs 링크는 in-app viewer가 아니라 public `landing` URL을 연다
-- `F1`은 `Context Help`, `Ctrl/Cmd+S`는 저장으로 연결됐다
-- curriculum/runtime surface는 그대로 유지되고 generic docs backend API는 추가하지 않았다
+- PRD 10개 파일(01-10) 모두 marimo upstream 소스와 1:1 검증 완료
+- **Phase 0-9 완료** — 전체 56개 컴포넌트 구현, 빌드 성공
+- 모든 컴포넌트 Svelte 5 runes 전환 완료 (`export let` 잔존 0개)
+- 개발 계획서: `C:\Users\MSI\.claude\plans\idempotent-mapping-aho.md` (11 Phase, 56 컴포넌트)
+- helper sidebar의 `documentation` slot은 shipped product에서 `Context Help`로 대체
+- `Context Help` 데이터는 `frontend/src/lib/codaro/contextHelp.ts`가 관리
+
+### 완료된 Phase 목록
+
+| Phase | 내용 | 상태 |
+| --- | --- | --- |
+| 0 | 기반 구축 (의존성, 프리미티브, 상태 스토어) | 완료 |
+| 1 | 셸 분해 (EditPage, AppChrome, PanelGroup, Sidebar, HelperSidebar, DeveloperPanel, Footer, AppContainer, FilenameForm) | 완료 |
+| 2 | 셀 표면 (CellFrame Svelte 5 전환) | 완료 |
+| 3 | 플로팅 컨트롤 (TopRightControls, BottomRightControls) | 완료 |
+| 4 | 출력 표면 + Svelte 5 전환 (OutputRenderer, CodeEditor, MarkdownBlock, DataFrameTable, LayoutRenderer, WidgetRenderer, WorkspaceHome, WorkspaceTree, AppShell) | 완료 |
+| 5 | 커맨드 팔레트 + Find/Replace + 키보드 단축키 | 완료 |
+| 6 | 헬퍼 사이드바 패널 바디 (FileExplorer, Variables, DependencyGraph, Documentation, Outline, Packages, Snippets, AIChat) | 완료 |
+| 7 | 개발자 패널 바디 (Errors, Scratchpad, Tracing, Secrets, Logs, Terminal, Cache) | 완료 |
+| 8 | 푸터 아이템 + 상태 위젯 (BackendStatus, RuntimeSettings, CopilotStatus, AIStatus, MachineStats, RTCStatus) | 완료 |
+| 9 | 멀티셀 선택 + DnD + 다이얼로그 (MultiCellToolbar, PendingDeleteBar, SortableCell, CreateCellButton, SaveDialog, RecoveryDialog, ShutdownButton) | 완료 |
+
+### 컴포넌트 디렉토리 구조
+
+```text
+src/lib/codaro/
+  stores/                    -- Svelte 5 runes 상태
+    connection.svelte.ts
+    panels.svelte.ts
+    config.svelte.ts
+  primitives/                -- 재사용 기본 요소
+    ActionButton.svelte
+    Banner.svelte
+    FooterItem.svelte
+    SidebarItem.svelte
+  chrome/                    -- 워크스페이스 크롬
+    AppChrome.svelte
+    PanelGroup.svelte
+    Panel.svelte
+    PanelResizeHandle.svelte
+    Sidebar.svelte
+    HelperSidebar.svelte
+    DeveloperPanel.svelte
+    Footer.svelte
+    footer-items/
+      BackendStatus.svelte
+      RuntimeSettings.svelte
+      CopilotStatus.svelte
+      AIStatus.svelte
+      MachineStats.svelte
+      RTCStatus.svelte
+  app/                       -- 앱 진입점
+    EditPage.svelte
+    AppContainer.svelte
+  header/
+    FilenameForm.svelte
+  editor/                    -- 셀 표면
+    SortableCell.svelte
+    CreateCellButton.svelte
+    MultiCellToolbar.svelte
+    PendingDeleteBar.svelte
+  controls/                  -- 플로팅 컨트롤
+    TopRightControls.svelte
+    BottomRightControls.svelte
+    CommandPalette.svelte
+    KeyboardShortcuts.svelte
+    FindReplace.svelte
+  components/                -- 코어 노트북 컴포넌트
+    NotebookShell.svelte
+    CellFrame.svelte
+    CodeEditor.svelte
+    OutputRenderer.svelte
+    MarkdownBlock.svelte
+    LayoutRenderer.svelte
+    WidgetRenderer.svelte
+    DataFrameTable.svelte
+    AppShell.svelte
+    WorkspaceHome.svelte
+    WorkspaceTree.svelte
+  panels/                    -- 헬퍼/개발자 패널 바디
+    FileExplorerPanel.svelte
+    VariablesPanel.svelte
+    DependencyGraphPanel.svelte
+    DocumentationPanel.svelte
+    OutlinePanel.svelte
+    PackagesPanel.svelte
+    SnippetsPanel.svelte
+    AIChatPanel.svelte
+    ErrorsPanel.svelte
+    ScratchpadPanel.svelte
+    TracingPanel.svelte
+    SecretsPanel.svelte
+    LogsPanel.svelte
+    TerminalPanel.svelte
+    CachePanel.svelte
+  dialogs/                   -- 모달/다이얼로그
+    SaveDialog.svelte
+    RecoveryDialog.svelte
+    ShutdownButton.svelte
+```
 
 ## Next Action
 
-- `Context Help`를 현재 block type, runtime error, selected tool 기준으로 더 세밀하게 확장한다
-- command palette나 future toolbar help 액션이 생기면 전부 public `landing` 링크로만 연결한다
-- marimo parity 작업에서는 문서 slot을 계속 fork point로 명시한다
+- **Phase 10: 검증 + 아카이브**
+  - 브라우저에서 marimo와 나란히 비교
+  - PRD 14 검증 체크리스트 전수 확인
+  - 모든 data-testid, class 토큰, 분기 검증
+  - `git tag marimo-parity-v1`으로 아카이브
+  - Codaro 고유 색깔 브랜치 시작
 
 ## Verification Left
 
-- editor 실사용에서 `Context Help` 문구 밀도와 링크 구성이 과하거나 부족하지 않은지 본다
-- future helper panels가 추가될 때 full docs viewer가 다시 들어오지 않게 panel registry를 계속 점검한다
-- command palette/help affordance가 들어오면 embedded docs browser가 아니라 external docs open으로 유지되는지 확인한다
+- 브라우저 렌더 비교 (marimo 나란히)
+- hover 버튼 위치, sidebar width, footer height, cell padding 실측
+- 빌드 경고/에러 0 확인
+- a11y 검증
+- 패널 바디들이 HelperSidebar/DeveloperPanel에 올바르게 연결되는지 검증
+- 커맨드 팔레트 Cmd+K 동작 검증

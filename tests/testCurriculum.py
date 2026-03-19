@@ -2,18 +2,18 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from codaro.curriculum.contentLoader import ContentLoader
+from codaro.curriculum.studyLoader import StudyLoader
 from codaro.curriculum.converter import yamlToDocument
 from codaro.curriculum.progress import ProgressTracker
 
 
-CONTENT_DIR = Path(__file__).resolve().parent.parent / "content" / "studyPython" / "content"
+STUDY_DIR = Path(__file__).resolve().parent.parent / "study" / "python"
 
 
 def testListCategories() -> None:
-    if not CONTENT_DIR.exists():
+    if not STUDY_DIR.exists():
         return
-    loader = ContentLoader(str(CONTENT_DIR))
+    loader = StudyLoader(str(STUDY_DIR))
     categories = loader.listCategories()
 
     assert len(categories) > 0
@@ -22,9 +22,9 @@ def testListCategories() -> None:
 
 
 def testListContents() -> None:
-    if not CONTENT_DIR.exists():
+    if not STUDY_DIR.exists():
         return
-    loader = ContentLoader(str(CONTENT_DIR))
+    loader = StudyLoader(str(STUDY_DIR))
     contents = loader.listContents("30days")
 
     assert len(contents) >= 20
@@ -32,11 +32,11 @@ def testListContents() -> None:
     assert any("day01" in cid for cid in ids)
 
 
-def testLoadContent() -> None:
-    if not CONTENT_DIR.exists():
+def testLoadStudy() -> None:
+    if not STUDY_DIR.exists():
         return
-    loader = ContentLoader(str(CONTENT_DIR))
-    content = loader.loadContent("30days", "day01_헬로월드")
+    loader = StudyLoader(str(STUDY_DIR))
+    content = loader.loadStudy("30days", "day01_헬로월드")
 
     assert "meta" in content
     assert "sections" in content
@@ -44,10 +44,10 @@ def testLoadContent() -> None:
 
 
 def testYamlToDocument() -> None:
-    if not CONTENT_DIR.exists():
+    if not STUDY_DIR.exists():
         return
-    loader = ContentLoader(str(CONTENT_DIR))
-    content = loader.loadContent("30days", "day01_헬로월드")
+    loader = StudyLoader(str(STUDY_DIR))
+    content = loader.loadStudy("30days", "day01_헬로월드")
     document, solutions = yamlToDocument(content, "30days", "day01_헬로월드")
 
     assert document.title == "헬로월드"
@@ -61,10 +61,10 @@ def testYamlToDocument() -> None:
 
 
 def testDocumentHasMissions() -> None:
-    if not CONTENT_DIR.exists():
+    if not STUDY_DIR.exists():
         return
-    loader = ContentLoader(str(CONTENT_DIR))
-    content = loader.loadContent("30days", "day01_헬로월드")
+    loader = StudyLoader(str(STUDY_DIR))
+    content = loader.loadStudy("30days", "day01_헬로월드")
     document, solutions = yamlToDocument(content, "30days", "day01_헬로월드")
 
     markdownBlocks = [b for b in document.blocks if b.type == "markdown"]
@@ -77,9 +77,9 @@ def testDocumentHasMissions() -> None:
 
 
 def testPrevNext() -> None:
-    if not CONTENT_DIR.exists():
+    if not STUDY_DIR.exists():
         return
-    loader = ContentLoader(str(CONTENT_DIR))
+    loader = StudyLoader(str(STUDY_DIR))
     prevNext = loader.getPrevNext("30days", "day01_헬로월드")
 
     assert prevNext["prev"] is None

@@ -1,5 +1,9 @@
 <script lang="ts">
-  export let value: Record<string, unknown> = {};
+  interface Props {
+    value?: Record<string, unknown>;
+  }
+
+  let { value = {} }: Props = $props();
 
   function component(): string {
     return typeof value.component === "string" ? value.component : "text";

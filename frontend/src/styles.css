@@ -1,3 +1,7 @@
+@import "tailwindcss";
+@source "./**/*.svelte";
+@source "./**/*.ts";
+
 @import "./lib/codaro/styles/marimo/cells-jmgGt1lS.css";
 @import "./lib/codaro/styles/marimo/markdown-renderer-DdDKmWlR.css";
 @import "./lib/codaro/styles/marimo/JsonOutput-B7vuddcd.css";
@@ -58,6 +62,126 @@
 
 :root {
   color-scheme: light;
+  --csstools-color-scheme--light: initial;
+
+  --sage-1: #fbfdfc;
+  --sage-2: #f7f9f8;
+  --sage-3: #eef1f0;
+  --sage-4: #e6e9e8;
+  --sage-5: #dfe2e0;
+  --sage-6: #d7dad9;
+  --sage-7: #cbcfcd;
+  --sage-8: #b8bcba;
+  --sage-9: #868e8b;
+  --sage-10: #7c8480;
+  --sage-11: #5f6563;
+  --sage-12: #1a211e;
+
+  --slate-1: #fcfcfd;
+  --slate-2: #f9f9fb;
+  --slate-3: #f0f0f3;
+  --slate-4: #e8e8ec;
+  --slate-5: #e0e1e6;
+  --slate-6: #d9d9e0;
+  --slate-7: #cdced6;
+  --slate-8: #b9bbc6;
+  --slate-9: #8b8d98;
+  --slate-10: #80838d;
+  --slate-11: #60646c;
+  --slate-12: #1c2024;
+
+  --gray-1: #fcfcfc;
+  --gray-2: #f9f9f9;
+  --gray-3: #f0f0f0;
+  --gray-4: #e8e8e8;
+  --gray-5: #e0e0e0;
+  --gray-6: #d9d9d9;
+  --gray-7: #cecece;
+  --gray-8: #bbbbbb;
+  --gray-9: #8d8d8d;
+  --gray-10: #838383;
+  --gray-11: #646464;
+  --gray-12: #202020;
+
+  --red-1: #fffcfc;
+  --red-2: #fff7f7;
+  --red-3: #feebec;
+  --red-4: #ffdbdc;
+  --red-5: #ffcdce;
+  --red-6: #fdbdbe;
+  --red-7: #f4a9aa;
+  --red-8: #eb8e90;
+  --red-9: #e5484d;
+  --red-10: #dc3e42;
+  --red-11: #cd2b31;
+  --red-12: #381316;
+
+  --yellow-1: #fdfdf9;
+  --yellow-2: #fefce9;
+  --yellow-3: #fffab8;
+  --yellow-4: #fff394;
+  --yellow-5: #ffe770;
+  --yellow-6: #f3d768;
+  --yellow-7: #e4c767;
+  --yellow-8: #d5ae39;
+  --yellow-9: #ffe629;
+  --yellow-10: #ffdc00;
+  --yellow-11: #9e6c00;
+  --yellow-12: #473b1f;
+
+  --grass-1: #fbfefb;
+  --grass-2: #f5fbf5;
+  --grass-3: #e9f6e9;
+  --grass-4: #daf1db;
+  --grass-5: #c9e8ca;
+  --grass-6: #b2ddb5;
+  --grass-7: #94ce9a;
+  --grass-8: #65ba74;
+  --grass-9: #46a758;
+  --grass-10: #3e9b4f;
+  --grass-11: #2a7e3b;
+  --grass-12: #203c25;
+
+  --blue-1: #fbfdff;
+  --blue-2: #f4faff;
+  --blue-3: #e6f4fe;
+  --blue-4: #d5efff;
+  --blue-5: #c2e5ff;
+  --blue-6: #acd8fc;
+  --blue-7: #8ec8f6;
+  --blue-8: #5eb1ef;
+  --blue-9: #0090ff;
+  --blue-10: #0588f0;
+  --blue-11: #0d74ce;
+  --blue-12: #113264;
+
+  --cyan-9: #00c2d7;
+
+  --background: #fff;
+  --foreground: #1a211e;
+  --border: #e8e8ec;
+  --muted: #f1f5f9;
+  --muted-foreground: #60646c;
+  --accent: #f0f0f3;
+  --accent-foreground: #1c2024;
+  --popover: #fff;
+  --ring: #0090ff;
+  --destructive: #e5484d;
+  --error: #e5484d;
+  --stale: #e5a417;
+  --action-foreground: #946800;
+
+  --monospace-font: "Fira Mono", ui-monospace, monospace;
+  --text-font: "PT Sans", sans-serif;
+  --heading-font: "Lora", serif;
+
+  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-md-solid: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --shadow-shade: rgba(0, 0, 0, 0.1);
+
+  --content-width: 776px;
+  --content-width-medium: 1100px;
+  --gutter-width: 100px;
 }
 
 html,
@@ -102,4 +226,24 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+/* CM editor padding: upstream Cell.css exact values */
+.marimo-cell .cm-editor {
+  border: 1px solid transparent;
+  padding: 3px;
+  padding-right: 24px;
+}
+
+.marimo-cell .cm-editor .cm-content {
+  font-size: var(--marimo-code-editor-font-size, 0.9rem);
+  font-family: var(--monospace-font);
+}
+
+.marimo-cell .cm-editor.cm-focused .cm-activeLineGutter {
+  background: #e2f2ff;
+}
+
+.marimo-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
+  background: hsl(210deg 100% 50% / 3%);
 }

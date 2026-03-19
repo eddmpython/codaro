@@ -9,17 +9,21 @@
   import { ServerKernelEngine } from "../engines/serverKernelEngine";
   import type { CodaroDocument, EngineExecutionResult } from "../types";
 
-  export let initialPath = "";
+  interface Props {
+    initialPath?: string;
+  }
 
-  let bootstrap: { documentPath?: string | null } | null = null;
-  let documentState: CodaroDocument | null = null;
-  let currentPath = "";
-  let engine: ExecutionEngine | null = null;
-  let engineName = "none";
-  let engineStatus = "idle";
-  let engineError = "";
-  let outputs = new Map<string, EngineExecutionResult>();
-  let loading = true;
+  let { initialPath = "" }: Props = $props();
+
+  let bootstrap: { documentPath?: string | null } | null = $state(null);
+  let documentState: CodaroDocument | null = $state(null);
+  let currentPath = $state("");
+  let engine: ExecutionEngine | null = $state(null);
+  let engineName = $state("none");
+  let engineStatus = $state("idle");
+  let engineError = $state("");
+  let outputs = $state(new Map<string, EngineExecutionResult>());
+  let loading = $state(true);
 
   function renderMarkdown(content: string): string {
     return String(marked.parse(content || ""));
@@ -134,7 +138,7 @@
       <p class="pathText">{currentPath || "No document"}</p>
     </div>
     <div class="actions">
-      <button on:click={() => void runDocument()} disabled={!documentState || engineStatus === "running"}>
+      <button onclick={() => void runDocument()} disabled={!documentState || engineStatus === "running"}>
         <Play size={14} />
         <span>Run again</span>
       </button>

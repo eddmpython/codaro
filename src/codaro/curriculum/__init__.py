@@ -1,11 +1,11 @@
 from .checker import CheckResult, checkByOutput, checkByVariable, checkContains, checkNoError
-from .contentLoader import (
+from .studyLoader import (
     CATEGORY_GROUPS,
     CATEGORY_MAPPING,
     LEARNING_PATHS,
     CategoryInfo,
-    ContentLoader,
-    ContentSummary,
+    StudyLoader,
+    StudySummary,
 )
 from .converter import yamlToDocument
 from .learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, PHILOSOPHY
@@ -17,8 +17,8 @@ __all__ = [
     "CATEGORY_MAPPING",
     "CategoryInfo",
     "CheckResult",
-    "ContentLoader",
-    "ContentSummary",
+    "StudyLoader",
+    "StudySummary",
     "EXERCISE_TYPES",
     "HINT_STRATEGY",
     "LEARNING_PATHS",

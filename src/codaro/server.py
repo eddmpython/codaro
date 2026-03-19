@@ -33,7 +33,7 @@ from .serverLog import configureServerLogging, formatLogFields, isVerboseLogging
 PACKAGE_ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = PACKAGE_ROOT.parent.parent.parent
 FRONTEND_ROOT = PROJECT_ROOT / "frontend"
-CONTENT_ROOT = PROJECT_ROOT / "content" / "studyPython" / "content"
+STUDY_ROOT = PROJECT_ROOT / "study" / "python"
 
 
 def resolveWebBuildRoot() -> Path:
@@ -123,7 +123,7 @@ def requireFrontendBuildReady(
 def createServerApp(
     mode: str = "edit",
     documentPath: Path | None = None,
-    contentDir: Path | None = None,
+    studyDir: Path | None = None,
     workspaceRoot: Path | None = None,
 ) -> FastAPI:
     logger = configureServerLogging()
@@ -131,7 +131,7 @@ def createServerApp(
         mode=mode,
         documentPath=documentPath,
         workspaceRoot=workspaceRoot or Path.cwd().resolve(),
-        contentRoot=contentDir or CONTENT_ROOT,
+        studyRoot=studyDir or STUDY_ROOT,
         packageRoot=PACKAGE_ROOT,
         frontendRoot=FRONTEND_ROOT,
         webBuildRoot=WEB_BUILD_ROOT,
@@ -140,14 +140,21 @@ def createServerApp(
     @asynccontextmanager
     async def lifespan(application: FastAPI):
         del application
-        await state.workspaceEngine.initialize()
+        try:
+            await state.workspaceEngine.initialize()
+        except Exception as startupError:
+            logger.error(
+                "lifespan %s",
+                formatLogFields(status="startup-failed", error=str(startupError)),
+            )
+            raise
         logger.info(
             "lifespan %s",
             formatLogFields(
                 status="startup",
                 mode=state.mode,
                 workspaceRoot=state.workspaceRoot,
-                contentRoot=state.contentRoot if state.contentRoot.exists() else None,
+                studyRoot=state.studyRoot if state.studyRoot.exists() else None,
             ),
         )
         yield
@@ -155,8 +162,14 @@ def createServerApp(
             "lifespan %s",
             formatLogFields(status="shutdown", activeSessions=state.sessionManager.sessionCount),
         )
-        state.workspaceEngine.dispose()
-        state.sessionManager.destroyAll()
+        try:
+            state.workspaceEngine.dispose()
+        except Exception as disposeError:
+            logger.error("lifespan %s", formatLogFields(status="dispose-failed", error=str(disposeError)))
+        try:
+            state.sessionManager.destroyAll()
+        except Exception as destroyError:
+            logger.error("lifespan %s", formatLogFields(status="destroy-failed", error=str(destroyError)))
 
     app = FastAPI(title="Codaro", lifespan=lifespan)
     app.add_middleware(
@@ -238,7 +251,7 @@ def runServer(
             verbose=verbose,
         ),
     )
-    logger.info("workspace %s", formatLogFields(root=workspaceRoot, contentRoot=CONTENT_ROOT if CONTENT_ROOT.exists() else None))
+    logger.info("workspace %s", formatLogFields(root=workspaceRoot, studyRoot=STUDY_ROOT if STUDY_ROOT.exists() else None))
     if documentPath is not None:
         logger.info("document %s", formatLogFields(path=documentPath))
     logger.info(

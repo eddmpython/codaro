@@ -3,7 +3,11 @@
   import LayoutRenderer from "./LayoutRenderer.svelte";
   import { normalizeOutput } from "../outputAdapter";
 
-  export let result: unknown = null;
+  interface Props {
+    result?: unknown;
+  }
+
+  let { result = null }: Props = $props();
 
   function isStructuredDescriptor(value: unknown): boolean {
     if (!value || typeof value !== "object" || Array.isArray(value)) {
@@ -40,10 +44,12 @@
     return `data:image/png;base64,${value}`;
   }
 
-  $: output = normalizeOutput(result);
-  $: payload = result && typeof result === "object" && "data" in (result as Record<string, unknown>)
-    ? (result as Record<string, unknown>).data
-    : null;
+  let output = $derived(normalizeOutput(result));
+  let payload = $derived(
+    result && typeof result === "object" && "data" in (result as Record<string, unknown>)
+      ? (result as Record<string, unknown>).data
+      : null
+  );
 </script>
 
 {#if output.type !== "empty" || output.stdout || output.stderr}

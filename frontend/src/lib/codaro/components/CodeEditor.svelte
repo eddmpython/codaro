@@ -7,15 +7,22 @@
   import { lineNumbers, EditorView, highlightActiveLine, keymap } from "@codemirror/view";
   import { tags } from "@lezer/highlight";
 
-  export let value = "";
-  export let readOnly = false;
-  export let onChange = (nextValue: string): void => {
-    void nextValue;
-  };
-  export let onRun = (): void => {};
+  interface Props {
+    value?: string;
+    readOnly?: boolean;
+    onChange?: (nextValue: string) => void;
+    onRun?: () => void;
+  }
 
-  let host: HTMLDivElement;
-  let view: EditorView | null = null;
+  let {
+    value = "",
+    readOnly = false,
+    onChange = () => {},
+    onRun = () => {}
+  }: Props = $props();
+
+  let host: HTMLDivElement | undefined = $state();
+  let view: EditorView | null = $state(null);
 
   const editorTheme = EditorView.theme({
     ".cm-scroller": {
@@ -32,11 +39,12 @@
     },
     ".cm-content": {
       minHeight: "48px",
-      padding: "10px 0 10px",
-      fontFamily: "var(--monospace-font), ui-monospace, monospace"
+      padding: "4px 0",
+      fontFamily: "var(--monospace-font), ui-monospace, monospace",
+      fontSize: "var(--marimo-code-editor-font-size, 0.9rem)"
     },
     ".cm-line": {
-      padding: "0 16px 0 0"
+      padding: "0 2px"
     },
     ".cm-gutters": {
       minWidth: "32px",
@@ -123,25 +131,29 @@
   }
 
   onMount(() => {
-    view = new EditorView({
-      state: createState(value),
-      parent: host
-    });
+    if (host) {
+      view = new EditorView({
+        state: createState(value),
+        parent: host
+      });
+    }
   });
 
   onDestroy(() => {
     view?.destroy();
   });
 
-  $: if (view && value !== view.state.doc.toString()) {
-    view.dispatch({
-      changes: {
-        from: 0,
-        to: view.state.doc.length,
-        insert: value
-      }
-    });
-  }
+  $effect(() => {
+    if (view && value !== view.state.doc.toString()) {
+      view.dispatch({
+        changes: {
+          from: 0,
+          to: view.state.doc.length,
+          insert: value
+        }
+      });
+    }
+  });
 </script>
 
 <div class="cm mathjax_ignore" data-testid="cell-editor" bind:this={host}></div>

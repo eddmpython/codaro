@@ -373,6 +373,29 @@ Excel 관련 capability는 둘로 나눈다.
 
 launcher는 capability availability를 진단해서 backend에 전달해야 한다.
 
+## 로컬 배포 bundle 경계
+
+launcher가 관리하는 것:
+
+- embedded Python runtime
+- exact backend wheel과 exact bundle wheel install
+- bundle bootstrap, capability probe, diagnostics
+- add-in 또는 helper init이 필요한 경우 release 단위 설치와 복구
+
+사용자가 직접 준비해야 하는 것:
+
+- Microsoft Excel 같은 외부 앱
+- 브라우저 프로필, DB 서버, OS 권한 같은 외부 시스템 전제
+- bundle이 기대하는 계정, 로그인, 라이선스
+
+`codaro-excel` bundle 계획:
+
+- `openpyxl`, `xlsxwriter`, `xlwings` 같은 Python 계층은 launcher-managed bundle로 제공한다
+- workbook automation은 Excel 앱 없이도 활성화할 수 있다
+- Excel app automation은 Windows Excel 설치가 감지된 경우에만 capability를 연다
+- add-in 또는 bootstrap 단계가 필요하면 launcher가 managed release 아래에서 설치, 업데이트, 복구를 담당한다
+- product UI는 "launcher가 설치한 것"과 "사용자가 직접 설치해야 하는 것"을 capability diagnostics로 분리해서 보여준다
+
 ## 보안과 무결성
 
 - manifest 자체 해시 또는 서명 검증
@@ -475,12 +498,14 @@ launcher는 최소 아래 로그를 남긴다.
 - `autoUpdateOnLaunch`가 켜지면 `launch-active`는 active release를 읽기 전에 먼저 update sync를 수행한다
 - backend는 `CODARO_WEB_BUILD_ROOT` 환경변수로 managed frontend build root를 받을 수 있다
 - package distribution과 bundle 분리 정책은 `launcher/PACKAGING.md`에 정리됐다
+- launcher-managed Python/bundle과 user-managed external app 경계가 문서로 고정됐다
 - 배포와 runtime provision 전체는 아직 개발 환경 기준으로 남아 있다
 - backend는 이제 child process worker, execution event stream, session capability까지 올라와 있으므로 launcher가 붙을 표면은 준비되기 시작했다
 - source of truth 문서는 현재 이 `launcher/PRD.md`다
 
 ## Next Action
 
+- `codaro-excel` bundle skeleton과 capability probe 표면을 정의한다
 - runtime cache와 release-local runtime dedupe 정책을 정한다
 - launcher update와 backend update의 서명/무결성 검증 레이어를 분리한다
 - background update loop와 foreground startup sync의 역할을 분리한다
@@ -488,6 +513,8 @@ launcher는 최소 아래 로그를 남긴다.
 
 ## Verification Left
 
+- Excel 설치 감지와 `xlwings` bootstrap 경로 검증
+- bundle capability diagnostics가 product UI와 연결되는지 검증
 - launcher artifact 서명 정책
 - Windows installer 형식 선택
 - embedded Python 배포 방식

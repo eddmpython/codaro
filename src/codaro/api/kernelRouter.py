@@ -349,7 +349,7 @@ def createKernelRouter(state: ServerState) -> APIRouter:
                     session.interrupt()
                     logger.debug("kernel-interrupt %s", formatLogFields(transport="ws", sessionId=sessionId))
                 elif isinstance(parsedMessage, WsGetVariablesMessage):
-                    await websocket.send_json({
+                    await _safeSendJson(websocket, {
                         "type": "variables",
                         "variables": [variable.model_dump() for variable in session.getVariables()],
                     })
@@ -358,7 +358,7 @@ def createKernelRouter(state: ServerState) -> APIRouter:
                     await handleReactiveMessage(websocket, session, parsedMessage, logger)
                 elif isinstance(parsedMessage, WsResetMessage):
                     session.reset()
-                    await websocket.send_json(WsStatusMessage(type="status", engineStatus="ready").model_dump())
+                    await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="ready").model_dump())
                     logger.debug("kernel-reset %s", formatLogFields(transport="ws", sessionId=sessionId))
         except WebSocketDisconnect:
             logger.debug("kernel-ws %s", formatLogFields(action="disconnect", sessionId=sessionId))
@@ -409,7 +409,8 @@ async def handleExecuteMessage(websocket: WebSocket, session, message: WsExecute
     blockId = message.blockId
 
     startedAt = time.perf_counter()
-    await websocket.send_json(WsStatusMessage(type="status", engineStatus="busy").model_dump())
+    if not await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="busy").model_dump()):
+        return
     result = await session.execute(
         code,
         blockId=blockId,
@@ -427,7 +428,8 @@ async def handleExecuteMessage(websocket: WebSocket, session, message: WsExecute
             executionCount=result.executionCount,
         ),
     )
-    await websocket.send_json(
+    if not await _safeSendJson(
+        websocket,
         WsResultMessage(
             type="result",
             requestId=requestId,
@@ -439,9 +441,10 @@ async def handleExecuteMessage(websocket: WebSocket, session, message: WsExecute
             variables=result.variables,
             stateDelta=result.stateDelta,
             executionCount=result.executionCount,
-        ).model_dump()
-    )
-    await websocket.send_json(WsStatusMessage(type="status", engineStatus="ready").model_dump())
+        ).model_dump(),
+    ):
+        return
+    await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="ready").model_dump())
 
 
 async def handleReactiveMessage(
@@ -455,7 +458,8 @@ async def handleReactiveMessage(
     blocks = [block.model_dump() for block in message.blocks]
 
     startedAt = time.perf_counter()
-    await websocket.send_json(WsStatusMessage(type="status", engineStatus="busy").model_dump())
+    if not await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="busy").model_dump()):
+        return
     reactiveEvents: list[dict[str, Any]] = []
 
     async def eventHandler(event) -> None:
@@ -482,7 +486,8 @@ async def handleReactiveMessage(
         ),
     )
     for result in results:
-        await websocket.send_json(
+        if not await _safeSendJson(
+            websocket,
             WsResultMessage(
                 type="result",
                 requestId=requestId,
@@ -494,18 +499,21 @@ async def handleReactiveMessage(
                 variables=result.variables,
                 stateDelta=result.stateDelta,
                 executionCount=result.executionCount,
-            ).model_dump()
-        )
-    await websocket.send_json({
+            ).model_dump(),
+        ):
+            return
+    if not await _safeSendJson(websocket, {
         "type": "reactiveComplete",
         "requestId": requestId,
         "executionOrder": executionOrder,
-    })
-    await websocket.send_json(WsStatusMessage(type="status", engineStatus="ready").model_dump())
+    }):
+        return
+    await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="ready").model_dump())
 
 
 async def sendExecutionEvent(websocket: WebSocket, requestId: str, event) -> None:
-    await websocket.send_json(
+    await _safeSendJson(
+        websocket,
         WsExecutionEventMessage(
             requestId=requestId,
             blockId=event.blockId,
@@ -513,5 +521,13 @@ async def sendExecutionEvent(websocket: WebSocket, requestId: str, event) -> Non
             eventType=event.eventType,
             executionCount=event.executionCount,
             payload=event.payload,
-        ).model_dump()
+        ).model_dump(),
     )
+
+
+async def _safeSendJson(websocket: WebSocket, data: dict[str, Any]) -> bool:
+    try:
+        await websocket.send_json(data)
+        return True
+    except (WebSocketDisconnect, RuntimeError, ConnectionError, OSError):
+        return False

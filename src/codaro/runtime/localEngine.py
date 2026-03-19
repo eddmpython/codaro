@@ -185,13 +185,24 @@ class LocalEngine(ExecutionEngine):
             self._cellDefinitions.pop(blockId, None)
             return
 
-        response = self._sendCommand({"action": "removeDefinitions", "blockId": blockId})
-        self._applyWorkerState(response)
+        try:
+            response = self._sendCommand({"action": "removeDefinitions", "blockId": blockId})
+            self._applyWorkerState(response)
+        except (BrokenPipeError, EOFError, OSError):
+            self._replaceWorker()
+            self._cellDefinitions.pop(blockId, None)
 
     def reset(self) -> None:
         if self._hasLiveWorker():
-            response = self._sendCommand({"action": "reset"})
-            self._applyWorkerState(response)
+            try:
+                response = self._sendCommand({"action": "reset"})
+                self._applyWorkerState(response)
+            except (BrokenPipeError, EOFError, OSError):
+                self._replaceWorker()
+                self._registry.clear()
+                self._cellDefinitions.clear()
+                self._variableStates = []
+                self.executionCount = 0
         else:
             self._registry.clear()
             self._cellDefinitions.clear()

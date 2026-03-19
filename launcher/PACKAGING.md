@@ -53,8 +53,10 @@
 
 - `codaro-excel`
   - workbook read/write
+  - `xlwings` 포함 Excel Python bridge
   - optional Excel COM automation
-  - capability probe
+  - capability probe and diagnostics
+  - optional add-in/bootstrap helper
 
 - `codaro-browser`
   - browser automation
@@ -78,6 +80,18 @@
 
 - 현재 단계에서는 core wheel 하나가 더 빠르고 단순하다
 - premature split은 import 경로와 release coordination만 복잡하게 만든다
+
+## External Dependency Boundary
+
+- launcher는 embedded Python runtime과 exact wheel bundle을 설치하고 관리한다
+- launcher는 arbitrary latest package install을 제품 기본 동작으로 허용하지 않는다
+- bundle이 기대하는 외부 앱, 드라이버, 계정, OS 권한은 사용자 환경 전제로 분리한다
+- package metadata와 public docs는 이 전제를 capability별로 명시해야 한다
+
+예:
+
+- `codaro-excel`은 `xlwings`와 bootstrap helper를 bundle에 포함할 수 있다
+- Microsoft Excel 앱 자체는 bundle에 포함하지 않으며 사용자 설치 전제로 둔다
 
 ## Extras 정책
 
@@ -413,9 +427,11 @@ core repo + bundle repos
 - launcher는 staged release의 release-local Python runtime으로 exact backend wheel과 bundle wheel을 `backend/site-packages`에 실제 설치한다
 - bundle package는 아직 구현되지 않았다
 - `extras`는 아직 정리되지 않았지만 제품 capability용으로 쓰지 않는 것이 확정 방향이다
+- launcher-managed bundle과 user-managed external dependency 경계가 문서로 고정됐다
 
 ## Next Action
 
+- `codaro-excel` package skeleton과 bootstrap metadata shape를 정의한다
 - package 분리 시점에 대비해 capability registry 방식을 정한다
 - 이후 `pyproject`를 monorepo multi-package 구조로 옮길 시점을 정한다
 - PyPI trusted publishing workflow 초안을 만든다
@@ -423,6 +439,7 @@ core repo + bundle repos
 
 ## Verification Left
 
+- bundle metadata에 external prerequisite를 어디까지 강제할지 검증
 - multi-package monorepo 도입 시점
 - bundle entrypoint registry 표면
 - core/bundle dependency pin을 manifest와 wheel metadata 중 어디까지 중복 표현할지
