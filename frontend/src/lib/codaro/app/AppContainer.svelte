@@ -27,14 +27,15 @@
     </div>
   {/if}
 
+  <div class="noise"></div>
+  <div class="disconnected-gradient"></div>
+
   <div
     id="App"
     data-config-width="compact"
     data-connection-state={connectionState}
     class="mathjax_ignore bg-background w-full h-full text-textColor flex flex-col overflow-y-auto overflow-x-hidden print:height-fit {isDisconnected ? 'disconnected' : ''}"
   >
-    <div class="noise"></div>
-    <div class="disconnected-gradient"></div>
     {@render children()}
   </div>
 </div>

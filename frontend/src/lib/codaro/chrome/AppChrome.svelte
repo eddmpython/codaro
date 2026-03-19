@@ -41,7 +41,7 @@
   let mainPanelFlex = $derived(isDeveloperOpen ? 75 : 100);
 </script>
 
-<div class="flex flex-col flex-1 overflow-hidden absolute inset-0 print:relative">
+<div class="flex flex-col flex-1 overflow-hidden absolute inset-0 print:relative bg-background">
   <PanelGroup id="marimo:chrome:v1:l2" direction="horizontal">
     <Sidebar {errorCount} />
 
