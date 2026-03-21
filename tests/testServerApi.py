@@ -226,6 +226,22 @@ def testEnvironmentInfo() -> None:
     assert "platform" in info
 
 
+def testSystemHealth() -> None:
+    client = TestClient(createServerApp())
+
+    response = client.get("/api/system/health")
+    assert response.status_code == 200
+    data = response.json()
+    assert data["status"] == "ok"
+    assert "python" in data
+    assert "pid" in data
+    assert "sessions" in data
+    assert "conversations" in data
+    assert "engine" in data
+    assert data["sessions"]["active"] >= 0
+    assert data["conversations"]["active"] >= 0
+
+
 def testStructuredErrorEnvelope() -> None:
     client = TestClient(createServerApp())
 

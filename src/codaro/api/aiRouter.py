@@ -394,20 +394,44 @@ def createAiRouter(state: Any) -> APIRouter:
         if sessionId:
             executor.setActiveSession(sessionId)
 
+        async def _yieldTokenStream(messages):
+            loop = asyncio.get_running_loop()
+            queue: asyncio.Queue[str | None] = asyncio.Queue()
+
+            def _runStream():
+                try:
+                    for token in llmProvider.stream(messages):
+                        loop.call_soon_threadsafe(queue.put_nowait, token)
+                finally:
+                    loop.call_soon_threadsafe(queue.put_nowait, None)
+
+            thread = threading.Thread(target=_runStream, daemon=True)
+            thread.start()
+
+            accumulated = ""
+            while True:
+                token = await queue.get()
+                if token is None:
+                    break
+                accumulated += token
+                yield f"data: {json.dumps({'type': 'token', 'content': accumulated}, ensure_ascii=False)}\n\n"
+
+            convManager.addAssistantMessage(conversationId, accumulated)
+            yield f"data: {json.dumps({'type': 'done', 'answer': accumulated, 'provider': llmProvider.config.provider, 'model': llmProvider.resolvedModel, 'usage': None, 'toolCalls': []}, ensure_ascii=False)}\n\n"
+            thread.join(timeout=2)
+
         async def _streamGenerate():
             nonlocal msgs, conversationId
             yield f"data: {json.dumps({'type': 'start', 'conversationId': conversationId}, ensure_ascii=False)}\n\n"
 
+            if not (llmProvider.supportsNativeTools and tools):
+                async for chunk in _yieldTokenStream(msgs):
+                    yield chunk
+                return
+
             maxToolRounds = 10
             for _round in range(maxToolRounds):
-                if llmProvider.supportsNativeTools and tools:
-                    response = llmProvider.completeWithTools(msgs, tools)
-                else:
-                    response = llmProvider.complete(msgs)
-                    convManager.addAssistantMessage(conversationId, response.answer)
-                    yield f"data: {json.dumps({'type': 'token', 'content': response.answer}, ensure_ascii=False)}\n\n"
-                    yield f"data: {json.dumps({'type': 'done', 'answer': response.answer, 'provider': response.provider, 'model': response.model, 'usage': response.usage, 'toolCalls': []}, ensure_ascii=False)}\n\n"
-                    return
+                response = llmProvider.completeWithTools(msgs, tools)
 
                 if not response.toolCalls:
                     convManager.addAssistantMessage(conversationId, response.answer)
@@ -435,10 +459,8 @@ def createAiRouter(state: Any) -> APIRouter:
 
                 yield f"data: {json.dumps({'type': 'tool_results', 'toolCalls': toolResults}, ensure_ascii=False)}\n\n"
 
-            finalResponse = llmProvider.complete(msgs)
-            convManager.addAssistantMessage(conversationId, finalResponse.answer)
-            yield f"data: {json.dumps({'type': 'token', 'content': finalResponse.answer}, ensure_ascii=False)}\n\n"
-            yield f"data: {json.dumps({'type': 'done', 'answer': finalResponse.answer, 'provider': finalResponse.provider, 'model': finalResponse.model, 'usage': finalResponse.usage, 'toolCalls': []}, ensure_ascii=False)}\n\n"
+            async for chunk in _yieldTokenStream(msgs):
+                yield chunk
 
         return StreamingResponse(_streamGenerate(), media_type="text/event-stream")
 

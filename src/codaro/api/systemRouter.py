@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import os
+import sys
 from typing import Any
 
 from fastapi import APIRouter
@@ -136,5 +138,41 @@ def createSystemRouter(state: ServerState) -> APIRouter:
             formatLogFields(action="uninstall", name=request.name, success=result.success, message=result.message),
         )
         return result.model_dump()
+
+    @router.get("/api/system/health")
+    async def apiSystemHealth() -> dict[str, Any]:
+        processMemoryMb: float | None = None
+        try:
+            import resource as _resource
+            processMemoryMb = round(_resource.getrusage(_resource.RUSAGE_SELF).ru_maxrss / 1024, 1)
+        except (ImportError, AttributeError):
+            pass
+        if processMemoryMb is None:
+            try:
+                import psutil
+                processMemoryMb = round(psutil.Process(os.getpid()).memory_info().rss / (1024 * 1024), 1)
+            except (ImportError, AttributeError):
+                pass
+
+        from .aiRouter import _getConversationManager
+        convManager = _getConversationManager()
+
+        return {
+            "status": "ok",
+            "python": sys.version,
+            "pid": os.getpid(),
+            "processMemoryMb": processMemoryMb,
+            "sessions": {
+                "active": state.sessionManager.sessionCount,
+            },
+            "conversations": {
+                "active": convManager.conversationCount,
+            },
+            "engine": {
+                "status": workspaceEngine.status,
+                "executionCount": workspaceEngine.executionCount,
+                "variableCount": len(workspaceEngine.getVariables()),
+            },
+        }
 
     return router
