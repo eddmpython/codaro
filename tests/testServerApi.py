@@ -248,7 +248,7 @@ def testValidationErrorEnvelope() -> None:
     assert "Field required" in payload["error"]["message"]
 
 
-def testRootDisablesFrontendCache() -> None:
+def testRootDisablesEditorCache() -> None:
     client = TestClient(createServerApp())
 
     response = client.get("/")
@@ -257,14 +257,14 @@ def testRootDisablesFrontendCache() -> None:
     assert response.headers["cache-control"] == "no-store, no-cache, must-revalidate"
 
 
-def testMissingFrontendBuildFallbackResponse(monkeypatch, tmp_path: Path) -> None:
+def testMissingEditorBuildFallbackResponse(monkeypatch, tmp_path: Path) -> None:
     monkeypatch.setattr(serverModule, "WEB_BUILD_ROOT", tmp_path)
     client = TestClient(serverModule.createServerApp())
 
     response = client.get("/")
 
     assert response.status_code == 200
-    assert "Codaro frontend build not found" in response.json()["detail"]
+    assert "Codaro editor build not found" in response.json()["detail"]
 
 
 def testWorkspaceIndexClassifiesNotebookTypes(tmp_path: Path) -> None:

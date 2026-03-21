@@ -17,7 +17,7 @@ Source of truth:
 Rules:
 - public UI language is English only
 - public tone is zinc-based and calm
-- `landing/` must stay separate from the local editor `frontend/`
+- `landing/` must stay separate from the local editor `editor/`
 - blog asset URLs are flattened to `/blog/assets/*` during build
 - `landing/` is the only shipped public docs surface
 - long-form docs, blog posts, and search must not be embedded back into the IDE as a full docs browser

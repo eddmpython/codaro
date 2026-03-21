@@ -24,7 +24,7 @@
   import SnippetsPanel from "../panels/SnippetsPanel.svelte";
   import AIChatPanel from "../panels/AIChatPanel.svelte";
   import { getBasePath } from "../basePath";
-  import { getKioskMode } from "../stores/config.svelte";
+  import { getKioskMode, getUserConfig } from "../stores/config.svelte";
   import {
     addBlock as insertBlock,
     applyExecutionResult,
@@ -667,6 +667,26 @@
     { action: "editor.redo", name: "Redo", key: "Ctrl+Y", group: "Editing" }
   ];
 
+  let prefersDark = $state(
+    typeof window !== "undefined"
+      ? window.matchMedia("(prefers-color-scheme: dark)").matches
+      : true
+  );
+
+  let effectiveTheme = $derived.by(() => {
+    const t = getUserConfig().display.theme;
+    if (t === "system") return prefersDark ? "dark" : "light";
+    return t;
+  });
+
+  $effect(() => {
+    if (typeof window === "undefined") return;
+    const mq = window.matchMedia("(prefers-color-scheme: dark)");
+    const handler = (e: MediaQueryListEvent) => { prefersDark = e.matches; };
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  });
+
   onMount(() => {
     void initialize();
     window.addEventListener("keydown", handleWindowKeydown);
@@ -727,7 +747,7 @@
   <title>{documentLocation}</title>
 </svelte:head>
 
-<div id="root" class="light light-theme" data-theme="light">
+<div id="root" class="{effectiveTheme} {effectiveTheme}-theme" data-theme={effectiveTheme}>
   {#if loading}
     <div class="screenState">Loading workspace…</div>
   {:else if pageError && !documentState}

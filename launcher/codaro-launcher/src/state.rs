@@ -16,7 +16,7 @@ pub struct ActiveReleaseState {
     pub backend_version: String,
     pub backend_entry_module: String,
     pub backend_console_script: String,
-    pub frontend_version: String,
+    pub editor_version: String,
     pub installed_at_unix_seconds: u64,
 }
 
@@ -30,7 +30,7 @@ impl ActiveReleaseState {
             backend_version: manifest.backend.version.clone(),
             backend_entry_module: manifest.backend.entry_module.clone(),
             backend_console_script: manifest.backend.console_script.clone(),
-            frontend_version: manifest.frontend.version.clone(),
+            editor_version: manifest.editor.version.clone(),
             installed_at_unix_seconds: current_unix_seconds(),
         }
     }
@@ -279,7 +279,7 @@ mod tests {
             backend_version: "0.3.0".into(),
             backend_entry_module: "codaro.cli".into(),
             backend_console_script: "codaro".into(),
-            frontend_version: "0.3.0".into(),
+            editor_version: "0.3.0".into(),
             installed_at_unix_seconds: 1234,
         };
 
@@ -306,7 +306,7 @@ mod tests {
             backend_version: "0.3.0".into(),
             backend_entry_module: "codaro.cli".into(),
             backend_console_script: "codaro".into(),
-            frontend_version: "0.3.0".into(),
+            editor_version: "0.3.0".into(),
             installed_at_unix_seconds: 1234,
         };
 

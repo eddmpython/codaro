@@ -62,8 +62,8 @@
 }
 
 :root {
-  color-scheme: light;
-  --csstools-color-scheme--light: initial;
+  color-scheme: dark;
+  --csstools-color-scheme--dark: initial;
 
   --sage-1:  #fafafa;
   --sage-2:  #f4f4f5;
@@ -172,8 +172,8 @@
   --secondary-foreground: #18181b;
   --muted: #f4f4f5;
   --muted-foreground: #71717a;
-  --accent: #f4f4f5;
-  --accent-foreground: #18181b;
+  --accent: #f97316;
+  --accent-foreground: #ffffff;
   --ring: #a1a1aa;
   --destructive: #e5484d;
   --destructive-foreground: #fafafa;

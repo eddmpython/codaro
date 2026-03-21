@@ -11,7 +11,7 @@ draft: false
 ## 현재 결정
 
 - 마스코트 원본은 `assets/brand/`
-- 실제 서비스 반영 파일은 `frontend/static/brand/`
+- 실제 서비스 반영 파일은 `editor/static/brand/`
 - public site 반영 파일은 `landing/static/brand/`
 - GitHub에 같이 올려서 브랜딩 자산도 저장소 이력으로 관리한다
 
@@ -32,5 +32,5 @@ draft: false
 1. 원본 이미지 사용권 확인
 2. `assets/brand/mascot/source/`에 원본 저장
 3. `assets/brand/mascot/work/`에서 아바타용 크롭과 파비콘용 단순화 시안 제작
-4. 확정본만 `frontend/static/brand/`, `landing/static/brand/`로 export
+4. 확정본만 `editor/static/brand/`, `landing/static/brand/`로 export
 5. 파비콘과 헤더 아바타에 적용

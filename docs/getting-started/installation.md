@@ -17,7 +17,7 @@ The long-term product path is a managed launcher:
 - `CodaroLauncher.exe`
 - embedded Python runtime
 - managed backend wheel install
-- managed frontend assets
+- managed editor assets
 - automatic update and rollback
 
 ## Developer install
@@ -33,7 +33,7 @@ Today, local development uses `uv` for Python environment and execution.
 ## Core commands
 
 ```bash
-cd frontend
+cd editor
 npm install
 npm run build
 
@@ -42,10 +42,10 @@ uv run codaro path.py
 uv run pytest tests/ -v
 ```
 
-If you are iterating on the frontend, keep the same runtime model and rebuild into `src/codaro/webBuild/`:
+If you are iterating on the editor, keep the same runtime model and rebuild into `src/codaro/webBuild/`:
 
 ```bash
-cd frontend
+cd editor
 npm run build:watch
 ```
 

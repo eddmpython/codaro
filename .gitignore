@@ -27,7 +27,7 @@ _backup/
 
 # Node modules (all locations)
 node_modules/
-frontend/.svelte-kit/
+editor/.svelte-kit/
 src/codaro/webBuild/
 launcher/target/
 launcher/cargo-test.log

@@ -20,7 +20,7 @@ pub struct CommandPreview {
 pub struct BackendLaunchConfig {
     python_executable: PathBuf,
     backend_python_path: PathBuf,
-    frontend_root: PathBuf,
+    editor_root: PathBuf,
     workspace_root: PathBuf,
     entry_module: String,
     host: String,
@@ -40,7 +40,7 @@ impl BackendLaunchConfig {
         Ok(Self {
             python_executable: LauncherPaths::resolve_python_executable(&python_runtime_dir)?,
             backend_python_path: release_dir.join("backend").join("site-packages"),
-            frontend_root: paths.release_frontend_dir(&state.release_id),
+            editor_root: paths.release_editor_dir(&state.release_id),
             workspace_root,
             entry_module: state.backend_entry_module.clone(),
             host,
@@ -54,7 +54,7 @@ impl BackendLaunchConfig {
         command.args(&preview.args);
         command.current_dir(&self.workspace_root);
         command.env("PYTHONPATH", &self.backend_python_path);
-        command.env("CODARO_WEB_BUILD_ROOT", &self.frontend_root);
+        command.env("CODARO_WEB_BUILD_ROOT", &self.editor_root);
         command.stdin(Stdio::null());
         command.stdout(Stdio::inherit());
         command.stderr(Stdio::inherit());
@@ -182,7 +182,7 @@ mod tests {
             backend_version: "0.3.0".into(),
             backend_entry_module: "codaro.cli".into(),
             backend_console_script: "codaro".into(),
-            frontend_version: "0.3.0".into(),
+            editor_version: "0.3.0".into(),
             installed_at_unix_seconds: 1234,
         };
         let config = BackendLaunchConfig::from_active_release(

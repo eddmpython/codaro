@@ -17,6 +17,6 @@ uv run codaro
 The public site and the local editor are separate surfaces.
 
 - `landing/` builds a static public site
-- `frontend/` serves the editor runtime
+- `editor/` serves the editor runtime
 
 That split keeps public docs and interactive editing independent.

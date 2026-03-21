@@ -63,7 +63,7 @@ const defaultEditor: EditorConfig = {
 
 const defaultDisplay: DisplayConfig = {
   width: "normal",
-  theme: "system",
+  theme: "dark",
   fontSize: 14,
   cellOutputPosition: "below"
 };

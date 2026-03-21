@@ -28,18 +28,18 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: editor/package-lock.json
 
-      - name: Build frontend
-        working-directory: frontend
+      - name: Build editor
+        working-directory: editor
         run: |
           npm ci
           npm run build
 
-      - name: Copy frontend build to package
+      - name: Copy editor build to package
         run: |
           rm -rf src/codaro/webBuild
-          cp -r frontend/build src/codaro/webBuild
+          cp -r editor/build src/codaro/webBuild
 
       - name: Run tests
         run: uv run pytest tests/ -v --tb=short

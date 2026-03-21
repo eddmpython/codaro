@@ -21,8 +21,8 @@ pub struct StagedReleaseSummary {
     pub release_id: String,
     pub manifest_path: PathBuf,
     pub backend_wheel_path: PathBuf,
-    pub frontend_archive_path: PathBuf,
-    pub frontend_root_path: PathBuf,
+    pub editor_archive_path: PathBuf,
+    pub editor_root_path: PathBuf,
     pub python_runtime_archive_path: PathBuf,
     pub python_executable_path: PathBuf,
     pub backend_site_packages_path: PathBuf,
@@ -34,7 +34,7 @@ pub struct StagedReleaseSummary {
 pub struct InstallRecord {
     pub release_id: String,
     pub backend: InstalledArtifact,
-    pub frontend: InstalledArtifact,
+    pub editor: InstalledArtifact,
     pub python_runtime: InstalledArtifact,
     pub bundles: Vec<InstalledArtifact>,
 }
@@ -80,8 +80,8 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
 
     let backend_site_packages_path = release_dir.join("backend").join("site-packages");
     let backend_wheels_dir = release_dir.join("backend").join("wheels");
-    let frontend_archive_dir = release_dir.join("frontend").join("archive");
-    let frontend_root_path = paths.release_frontend_dir(&manifest.release_id);
+    let editor_archive_dir = release_dir.join("editor").join("archive");
+    let editor_root_path = paths.release_editor_dir(&manifest.release_id);
     let runtime_archive_dir = release_dir.join("runtime").join("archive");
     let python_runtime_dir = paths.release_python_runtime_dir(&manifest.release_id);
     let bundle_wheels_dir = release_dir.join("bundles").join("wheels");
@@ -89,8 +89,8 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
     for directory in [
         backend_site_packages_path.clone(),
         backend_wheels_dir.clone(),
-        frontend_archive_dir.clone(),
-        frontend_root_path.clone(),
+        editor_archive_dir.clone(),
+        editor_root_path.clone(),
         runtime_archive_dir.clone(),
         python_runtime_dir.clone(),
         bundle_wheels_dir.clone(),
@@ -110,11 +110,11 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
         &manifest.backend.wheel_url,
         &manifest.backend.sha256,
     )?;
-    let frontend_archive_path = stage_artifact(
-        &downloads_dir.join("frontend"),
-        &frontend_archive_dir,
-        &manifest.frontend.url,
-        &manifest.frontend.sha256,
+    let editor_archive_path = stage_artifact(
+        &downloads_dir.join("editor"),
+        &editor_archive_dir,
+        &manifest.editor.url,
+        &manifest.editor.sha256,
     )?;
     let python_runtime_archive_path = stage_artifact(
         &downloads_dir.join("runtime"),
@@ -122,7 +122,7 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
         &manifest.python_runtime.url,
         &manifest.python_runtime.sha256,
     )?;
-    extract_zip_archive(&frontend_archive_path, &frontend_root_path)?;
+    extract_zip_archive(&editor_archive_path, &editor_root_path)?;
     extract_zip_archive(&python_runtime_archive_path, &python_runtime_dir)?;
     let python_executable_path = LauncherPaths::resolve_python_executable(&python_runtime_dir)?;
 
@@ -164,12 +164,12 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
             source: manifest.backend.wheel_url.clone(),
             staged_path: backend_wheel_path.clone(),
         },
-        frontend: InstalledArtifact {
-            name: "frontend".into(),
-            version: manifest.frontend.version.clone(),
-            sha256: manifest.frontend.sha256.clone(),
-            source: manifest.frontend.url.clone(),
-            staged_path: frontend_archive_path.clone(),
+        editor: InstalledArtifact {
+            name: "editor".into(),
+            version: manifest.editor.version.clone(),
+            sha256: manifest.editor.sha256.clone(),
+            source: manifest.editor.url.clone(),
+            staged_path: editor_archive_path.clone(),
         },
         python_runtime: InstalledArtifact {
             name: "python-runtime".into(),
@@ -196,8 +196,8 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
         release_id: manifest.release_id,
         manifest_path,
         backend_wheel_path,
-        frontend_archive_path,
-        frontend_root_path,
+        editor_archive_path,
+        editor_root_path,
         python_runtime_archive_path,
         python_executable_path,
         backend_site_packages_path,
@@ -627,7 +627,7 @@ mod tests {
                 "2026.03.18-1",
                 "https://example.com/python.zip",
                 "a".repeat(64),
-                "https://example.com/frontend.zip",
+                "https://example.com/editor.zip",
                 "b".repeat(64),
                 "https://example.com/codaro.whl",
                 "c".repeat(64),
@@ -648,7 +648,7 @@ mod tests {
         fs::create_dir_all(&source_dir).unwrap();
 
         let python_path = write_runtime_archive(&source_dir, "python-runtime.zip");
-        let frontend_path = write_frontend_archive(&source_dir, "frontend.zip");
+        let editor_path = write_editor_archive(&source_dir, "editor.zip");
         let backend_path = write_wheel_archive(
             &source_dir,
             "codaro-0.3.0-py3-none-any.whl",
@@ -683,8 +683,8 @@ mod tests {
                 "2026.03.18-1",
                 &Url::from_file_path(&python_path).unwrap().to_string(),
                 sha256_hex(&fs::read(&python_path).unwrap()),
-                &Url::from_file_path(&frontend_path).unwrap().to_string(),
-                sha256_hex(&fs::read(&frontend_path).unwrap()),
+                &Url::from_file_path(&editor_path).unwrap().to_string(),
+                sha256_hex(&fs::read(&editor_path).unwrap()),
                 &Url::from_file_path(&backend_path).unwrap().to_string(),
                 sha256_hex(&fs::read(&backend_path).unwrap()),
                 vec![(
@@ -714,9 +714,9 @@ mod tests {
 
         assert!(summary.manifest_path.is_file());
         assert!(summary.backend_wheel_path.is_file());
-        assert!(summary.frontend_archive_path.is_file());
+        assert!(summary.editor_archive_path.is_file());
         assert!(summary.python_runtime_archive_path.is_file());
-        assert!(summary.frontend_root_path.join("index.html").is_file());
+        assert!(summary.editor_root_path.join("index.html").is_file());
         assert!(
             summary
                 .backend_site_packages_path
@@ -745,7 +745,7 @@ mod tests {
         fs::create_dir_all(&source_dir).unwrap();
 
         let python_path = write_runtime_archive(&source_dir, "python-runtime.zip");
-        let frontend_path = write_frontend_archive(&source_dir, "frontend.zip");
+        let editor_path = write_editor_archive(&source_dir, "editor.zip");
         let backend_path = write_wheel_archive(
             &source_dir,
             "codaro-0.3.0-py3-none-any.whl",
@@ -764,8 +764,8 @@ mod tests {
                 "2026.03.18-1",
                 &Url::from_file_path(&python_path).unwrap().to_string(),
                 sha256_hex(&fs::read(&python_path).unwrap()),
-                &Url::from_file_path(&frontend_path).unwrap().to_string(),
-                sha256_hex(&fs::read(&frontend_path).unwrap()),
+                &Url::from_file_path(&editor_path).unwrap().to_string(),
+                sha256_hex(&fs::read(&editor_path).unwrap()),
                 &Url::from_file_path(&backend_path).unwrap().to_string(),
                 sha256_hex(&fs::read(&backend_path).unwrap()),
                 vec![],
@@ -815,12 +815,12 @@ mod tests {
         archive_path
     }
 
-    fn write_frontend_archive(directory: &Path, file_name: &str) -> PathBuf {
+    fn write_editor_archive(directory: &Path, file_name: &str) -> PathBuf {
         let archive_path = directory.join(file_name);
         write_zip_archive(
             &archive_path,
             vec![(
-                "frontend/index.html".into(),
+                "editor/index.html".into(),
                 "<!doctype html><title>Codaro</title>".as_bytes().to_vec(),
             )],
         );
@@ -904,8 +904,8 @@ mod tests {
         release_id: &str,
         python_url: &str,
         python_sha256: String,
-        frontend_url: &str,
-        frontend_sha256: String,
+        editor_url: &str,
+        editor_sha256: String,
         backend_url: &str,
         backend_sha256: String,
         bundles: Vec<(String, String, String, String)>,
@@ -935,10 +935,10 @@ mod tests {
                 "url": python_url,
                 "sha256": python_sha256,
             },
-            "frontend": {
+            "editor": {
                 "version": "0.3.0",
-                "url": frontend_url,
-                "sha256": frontend_sha256,
+                "url": editor_url,
+                "sha256": editor_sha256,
             },
             "backend": {
                 "name": "codaro",

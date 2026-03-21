@@ -33,7 +33,7 @@ jobs:
       - name: Run tests
         run: uv run pytest tests/ -v --tb=short
 
-  frontend:
+  editor:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -43,14 +43,14 @@ jobs:
         with:
           node-version: "22"
           cache: "npm"
-          cache-dependency-path: frontend/package-lock.json
+          cache-dependency-path: editor/package-lock.json
 
       - name: Install
-        working-directory: frontend
+        working-directory: editor
         run: npm ci
 
       - name: Build
-        working-directory: frontend
+        working-directory: editor
         run: npm run build
 
   landing:

@@ -1,36 +1,36 @@
 :root {
-  color-scheme: light dark;
-  --background: #fafafa;
-  --surface: #ffffff;
-  --surface-muted: #f4f4f5;
-  --border: #e4e4e7;
-  --border-strong: #d4d4d8;
-  --text: #18181b;
-  --text-muted: #52525b;
+  color-scheme: dark light;
+  --background: #09090b;
+  --surface: #18181b;
+  --surface-muted: #27272a;
+  --border: #3f3f46;
+  --border-strong: #52525b;
+  --text: #fafafa;
+  --text-muted: #a1a1aa;
   --text-soft: #71717a;
-  --accent: #4338ca;
-  --accent-soft: rgba(67, 56, 202, 0.08);
-  --shadow: 0 16px 40px rgba(17, 24, 39, 0.06);
-  --shadow-sm: 0 2px 8px rgba(17, 24, 39, 0.04);
+  --accent: #fb923c;
+  --accent-soft: rgba(251, 146, 60, 0.1);
+  --shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
   --radius: 16px;
   --radius-sm: 10px;
   font-family: "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
 }
 
-@media (prefers-color-scheme: dark) {
+@media (prefers-color-scheme: light) {
   :root {
-    --background: #09090b;
-    --surface: #18181b;
-    --surface-muted: #27272a;
-    --border: #3f3f46;
-    --border-strong: #52525b;
-    --text: #fafafa;
-    --text-muted: #a1a1aa;
+    --background: #fafafa;
+    --surface: #ffffff;
+    --surface-muted: #f4f4f5;
+    --border: #e4e4e7;
+    --border-strong: #d4d4d8;
+    --text: #18181b;
+    --text-muted: #52525b;
     --text-soft: #71717a;
-    --accent: #818cf8;
-    --accent-soft: rgba(129, 140, 248, 0.1);
-    --shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
-    --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+    --accent: #f97316;
+    --accent-soft: rgba(249, 115, 22, 0.08);
+    --shadow: 0 16px 40px rgba(17, 24, 39, 0.06);
+    --shadow-sm: 0 2px 8px rgba(17, 24, 39, 0.04);
   }
 }
 
@@ -251,10 +251,10 @@ input {
 }
 
 .heroMascot {
-  width: 320px;
-  height: 320px;
+  width: 400px;
+  height: 400px;
   object-fit: contain;
-  filter: drop-shadow(0 20px 40px rgba(67, 56, 202, 0.12));
+  filter: drop-shadow(0 24px 48px rgba(249, 115, 22, 0.2));
   animation: heroFloat 4s ease-in-out infinite;
 }
 
@@ -285,11 +285,11 @@ input {
 .primaryButton {
   background: var(--accent);
   color: white;
-  box-shadow: 0 4px 14px rgba(67, 56, 202, 0.25);
+  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
 }
 
 .primaryButton:hover {
-  box-shadow: 0 6px 20px rgba(67, 56, 202, 0.35);
+  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
   transform: translateY(-1px);
 }
 
@@ -379,7 +379,9 @@ input {
 .surfaceCard,
 .rowCard,
 .contentCard {
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
@@ -417,7 +419,9 @@ input {
 
 .pillarCard {
   padding: 24px;
-  background: var(--surface);
+  background: color-mix(in srgb, var(--surface) 80%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   border: 1px solid var(--border);
   border-radius: var(--radius);
   box-shadow: var(--shadow-sm);
@@ -520,9 +524,9 @@ input {
   gap: 6px;
   padding: 5px 10px;
   border-radius: 999px;
-  background: var(--surface-muted);
-  color: var(--text-muted);
-  border: 1px solid var(--border);
+  background: var(--accent-soft);
+  color: var(--accent);
+  border: 1px solid transparent;
   font-size: 0.78rem;
   font-weight: 500;
 }
@@ -780,8 +784,8 @@ input {
   }
 
   .heroMascot {
-    width: 220px;
-    height: 220px;
+    width: 280px;
+    height: 280px;
   }
 
   .docsLayout {
@@ -830,8 +834,8 @@ input {
   }
 
   .heroMascot {
-    width: 180px;
-    height: 180px;
+    width: 200px;
+    height: 200px;
   }
 
   .footerGrid {

@@ -4,7 +4,7 @@ import pytest
 
 import codaro.cli as cliModule
 from codaro.cli import normalizeArgs
-from codaro.server import FrontendBuildError
+from codaro.server import EditorBuildError
 
 
 def testNormalizeArgsDefaultsToEdit() -> None:
@@ -48,12 +48,12 @@ def testMainFailsBeforeOpeningBrowserWhenFrontendBuildMissing(monkeypatch, capsy
 
     def fakeRequireFrontendBuildReady(*args, **kwargs) -> None:
         del args, kwargs
-        raise FrontendBuildError("npm run build\nnpm run build:watch")
+        raise EditorBuildError("npm run build\nnpm run build:watch")
 
     monkeypatch.setattr(cliModule.sys, "argv", ["codaro"])
     monkeypatch.setattr(cliModule, "openBrowser", fakeOpenBrowser)
     monkeypatch.setattr(cliModule, "runServer", fakeRunServer)
-    monkeypatch.setattr(cliModule, "requireFrontendBuildReady", fakeRequireFrontendBuildReady)
+    monkeypatch.setattr(cliModule, "requireEditorBuildReady", fakeRequireFrontendBuildReady)
 
     with pytest.raises(SystemExit) as excInfo:
         cliModule.main()

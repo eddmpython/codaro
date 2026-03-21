@@ -60,7 +60,6 @@ version = "0.1.0"
 source = { editable = "." }
 dependencies = [
     { name = "fastapi" },
-    { name = "httpx" },
     { name = "pydantic" },
     { name = "pyyaml" },
     { name = "uvicorn", extra = ["standard"] },
@@ -68,13 +67,14 @@ dependencies = [
 
 [package.optional-dependencies]
 dev = [
+    { name = "httpx" },
     { name = "pytest" },
 ]
 
 [package.metadata]
 requires-dist = [
     { name = "fastapi", specifier = ">=0.135.1" },
-    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "httpx", marker = "extra == 'dev'", specifier = ">=0.28.1" },
     { name = "pydantic", specifier = ">=2.12.5" },
     { name = "pytest", marker = "extra == 'dev'", specifier = ">=9.0.2" },
     { name = "pyyaml", specifier = ">=6.0" },

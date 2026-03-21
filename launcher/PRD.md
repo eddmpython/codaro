@@ -10,7 +10,7 @@ package artifact 분리와 publish 정책의 상세 source of truth는 `launcher
 최종 사용자 약속은 단순하다.
 
 - 사용자는 `CodaroLauncher.exe`만 설치한다
-- 런처가 Python runtime, Codaro backend, frontend 자산, automation bundle, 업데이트를 관리한다
+- 런처가 Python runtime, Codaro backend, editor 자산, automation bundle, 업데이트를 관리한다
 - 사용자는 Python 설치 여부를 신경 쓰지 않는다
 - Codaro는 desktop, mobile, web이 같은 문서 모델과 같은 제품 정체성을 유지한다
 
@@ -66,7 +66,7 @@ launcher가 들어오면 아래가 가능해진다.
 - Windows launcher
 - embedded Python runtime
 - Codaro backend managed install
-- frontend asset managed install
+- editor asset managed install
 - GitHub manifest 기반 업데이트
 - PyPI wheel 기반 backend 배포
 - rollback
@@ -90,7 +90,7 @@ launcher가 들어오면 아래가 가능해진다.
 
 - mobile에서 desktop 자동화 capability를 그대로 재현하지 않는다
 - PyInstaller 같은 통짜 단일 exe를 최종 구조로 채택하지 않는다
-- frontend는 launcher를 몰라야 한다
+- editor는 launcher를 몰라야 한다
 - backend runtime contract를 launcher 사정에 맞게 뒤틀지 않는다
 
 ## 타깃 사용자 경험
@@ -131,7 +131,7 @@ launcher가 들어오면 아래가 가능해진다.
   - launcher가 관리하는 앱 전용 Python
 - backend runtime
   - PyPI wheel 또는 signed artifact로 설치되는 Codaro backend
-- frontend assets
+- editor assets
   - build된 web asset
 - automation bundles
   - Excel, browser, db, AI 같은 선택 bundle
@@ -152,7 +152,7 @@ launcher가 들어오면 아래가 가능해진다.
   - `backend/`
     - `site-packages/`
     - `wheels/`
-  - `frontend/`
+  - `editor/`
     - `archive/`
     - `app/`
   - `runtime/`
@@ -205,9 +205,9 @@ launcher는 먼저 manifest만 읽고, 그 다음 manifest가 가리키는 artif
     "url": "https://github.com/eddmpython/codaro/releases/download/v0.3.0/python-runtime-win-x64.zip",
     "sha256": "..."
   },
-  "frontend": {
+  "editor": {
     "version": "0.3.0",
-    "url": "https://github.com/eddmpython/codaro/releases/download/v0.3.0/frontend-web.zip",
+    "url": "https://github.com/eddmpython/codaro/releases/download/v0.3.0/editor-web.zip",
     "sha256": "..."
   },
   "backend": {
@@ -344,7 +344,7 @@ base install에는 가능한 한 최소 구성만 넣는다.
 - launcher
 - embedded Python
 - codaro backend
-- frontend assets
+- editor assets
 - base curriculum
 
 선택 bundle:
@@ -457,7 +457,7 @@ launcher는 최소 아래 로그를 남긴다.
 ### M3
 
 - PyPI wheel install into managed runtime
-- frontend asset staging
+- editor asset staging
 - crash recovery
 - health check and restart policy
 
@@ -478,10 +478,10 @@ launcher는 최소 아래 로그를 남긴다.
 - `launcher/` Rust workspace와 `codaro-launcher` crate가 생성됐다
 - install root path resolution, active release state 저장, release manifest 파싱, backend command preview, backend health check 최소 경로가 구현됐다
 - launcher는 이제 manifest source에서 artifact를 내려받고 sha256 검증 후 release 디렉터리에 stage할 수 있다
-- staged release는 `manifest.json`, backend wheel cache, frontend archive, python runtime archive, bundle wheel, `install-record.json`을 가진다
-- runtime zip과 frontend zip은 stage 중 실제 install layout으로 풀린다
+- staged release는 `manifest.json`, backend wheel cache, editor archive, python runtime archive, bundle wheel, `install-record.json`을 가진다
+- runtime zip과 editor zip은 stage 중 실제 install layout으로 풀린다
 - launcher는 release-local `runtime/python`을 해석해서 exact backend wheel과 bundle wheel을 `backend/site-packages`에 설치한다
-- active backend spawn은 이제 active release 아래의 Python runtime과 frontend build root를 직접 사용한다
+- active backend spawn은 이제 active release 아래의 Python runtime과 editor build root를 직접 사용한다
 - staged release를 active release로 승격하는 `activate` 경로가 구현됐다
 - launcher는 `active-release`, `last-known-good-release`, `rollback-marker` 상태 파일을 분리해서 관리한다
 - active backend health check가 실패하면 launcher는 last-known-good release를 우선 시도하고, 없으면 manifest `rollbackTo`를 사용해 자동 복귀한다
@@ -496,7 +496,7 @@ launcher는 최소 아래 로그를 남긴다.
 - `update config show/set`으로 channel, direct manifest source, GitHub repo, manifest asset name을 저장할 수 있다
 - `update sync`는 check와 apply를 한 번에 수행하고, update config가 허용하면 launcher startup에서도 같은 경로를 재사용한다
 - `autoUpdateOnLaunch`가 켜지면 `launch-active`는 active release를 읽기 전에 먼저 update sync를 수행한다
-- backend는 `CODARO_WEB_BUILD_ROOT` 환경변수로 managed frontend build root를 받을 수 있다
+- backend는 `CODARO_WEB_BUILD_ROOT` 환경변수로 managed editor build root를 받을 수 있다
 - package distribution과 bundle 분리 정책은 `launcher/PACKAGING.md`에 정리됐다
 - launcher-managed Python/bundle과 user-managed external app 경계가 문서로 고정됐다
 - 배포와 runtime provision 전체는 아직 개발 환경 기준으로 남아 있다
@@ -526,5 +526,5 @@ launcher는 최소 아래 로그를 남긴다.
 - real backend 기준 crash restart/freeze window 검증
 - real GitHub release source와 large artifact download 검증
 - channel별 prerelease selection 정책이 실제 릴리즈 태그 전략과 맞는지 검증
-- startup auto-update가 실제 frontend open/runtime boot UX와 충돌하지 않는지 검증
+- startup auto-update가 실제 editor open/runtime boot UX와 충돌하지 않는지 검증
 - mobile runtime artifact 구조

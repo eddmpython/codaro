@@ -16,10 +16,10 @@ AVATAR_SOURCE_KEY = "sheet-01"
 AVATAR_SOURCE_INDEX = 0
 WORK_ROOT = PROJECT_ROOT / "assets" / "brand" / "mascot" / "work"
 WORK_POSE_ROOT = WORK_ROOT / "poses"
-FRONTEND_BRAND_ROOT = PROJECT_ROOT / "frontend" / "static" / "brand"
-FRONTEND_POSE_ROOT = FRONTEND_BRAND_ROOT / "mascot-poses"
-FRONTEND_FAVICON_PATH = PROJECT_ROOT / "frontend" / "static" / "favicon.png"
-FRONTEND_APPLE_TOUCH_PATH = FRONTEND_BRAND_ROOT / "apple-touch-icon.png"
+EDITOR_BRAND_ROOT = PROJECT_ROOT / "editor" / "static" / "brand"
+EDITOR_POSE_ROOT = EDITOR_BRAND_ROOT / "mascot-poses"
+EDITOR_FAVICON_PATH = PROJECT_ROOT / "editor" / "static" / "favicon.png"
+EDITOR_APPLE_TOUCH_PATH = EDITOR_BRAND_ROOT / "apple-touch-icon.png"
 SEED_COMPONENT_COUNT = 8
 SEED_MIN_AREA = 20000
 DECORATION_MIN_AREA = 120
@@ -296,22 +296,22 @@ def main() -> None:
     for sheetKey, poses in poseSheets.items():
         savePoseAssets(WORK_POSE_ROOT, sheetKey, poses)
 
-    savePng(avatarFull, FRONTEND_BRAND_ROOT / "avatar-full.png")
-    savePng(avatarSmall, FRONTEND_BRAND_ROOT / "avatar-small.png")
-    savePng(avatarFace, FRONTEND_BRAND_ROOT / "avatar-face.png")
-    savePng(favicon, FRONTEND_FAVICON_PATH)
-    savePng(appleTouch, FRONTEND_APPLE_TOUCH_PATH)
+    savePng(avatarFull, EDITOR_BRAND_ROOT / "avatar-full.png")
+    savePng(avatarSmall, EDITOR_BRAND_ROOT / "avatar-small.png")
+    savePng(avatarFace, EDITOR_BRAND_ROOT / "avatar-face.png")
+    savePng(favicon, EDITOR_FAVICON_PATH)
+    savePng(appleTouch, EDITOR_APPLE_TOUCH_PATH)
     for sheetKey, poses in poseSheets.items():
-        savePoseAssets(FRONTEND_POSE_ROOT, sheetKey, poses)
+        savePoseAssets(EDITOR_POSE_ROOT, sheetKey, poses)
 
     print(f"[brand] avatarSource={dict(SOURCE_SHEETS)[AVATAR_SOURCE_KEY]}")
     for sheetKey, sourcePath in SOURCE_SHEETS:
         print(f"[brand] poseSheet.{sheetKey}={sourcePath}")
-    print(f"[brand] avatar-full={FRONTEND_BRAND_ROOT / 'avatar-full.png'}")
-    print(f"[brand] avatar-small={FRONTEND_BRAND_ROOT / 'avatar-small.png'}")
-    print(f"[brand] avatar-face={FRONTEND_BRAND_ROOT / 'avatar-face.png'}")
-    print(f"[brand] favicon={FRONTEND_FAVICON_PATH}")
-    print(f"[brand] apple-touch={FRONTEND_APPLE_TOUCH_PATH}")
+    print(f"[brand] avatar-full={EDITOR_BRAND_ROOT / 'avatar-full.png'}")
+    print(f"[brand] avatar-small={EDITOR_BRAND_ROOT / 'avatar-small.png'}")
+    print(f"[brand] avatar-face={EDITOR_BRAND_ROOT / 'avatar-face.png'}")
+    print(f"[brand] favicon={EDITOR_FAVICON_PATH}")
+    print(f"[brand] apple-touch={EDITOR_APPLE_TOUCH_PATH}")
 
 
 if __name__ == "__main__":

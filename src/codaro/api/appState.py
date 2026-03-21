@@ -16,7 +16,7 @@ class ServerState:
     workspaceRoot: Path
     studyRoot: Path
     packageRoot: Path
-    frontendRoot: Path
+    editorRoot: Path
     webBuildRoot: Path
     sessionManager: SessionManager
     workspaceEngine: ExecutionEngine
@@ -30,7 +30,7 @@ def createServerState(
     workspaceRoot: Path,
     studyRoot: Path,
     packageRoot: Path,
-    frontendRoot: Path,
+    editorRoot: Path,
     webBuildRoot: Path,
 ) -> ServerState:
     studyLoader = StudyLoader(str(studyRoot)) if studyRoot.exists() else None
@@ -40,7 +40,7 @@ def createServerState(
         workspaceRoot=workspaceRoot,
         studyRoot=studyRoot,
         packageRoot=packageRoot,
-        frontendRoot=frontendRoot,
+        editorRoot=editorRoot,
         webBuildRoot=webBuildRoot,
         sessionManager=SessionManager(workspaceRoot=workspaceRoot),
         workspaceEngine=LocalEngine(

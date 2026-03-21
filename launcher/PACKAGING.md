@@ -237,7 +237,7 @@ package 쪽 상세 규칙은 아래를 따른다.
 3. tests
 4. publish to PyPI
 5. release manifest 생성
-6. GitHub Release에 manifest와 launcher/frontend/python runtime asset 업로드
+6. GitHub Release에 manifest와 launcher/editor/python runtime asset 업로드
 
 ### Bundle package
 
@@ -350,7 +350,7 @@ launcher channel과 version 정책은 아래를 따른다.
 
 - `uv sync`
 - `uv run codaro`
-- frontend build 필요
+- editor build 필요
 
 문서와 README는 이 둘을 명확히 구분해야 한다.
 
@@ -359,7 +359,7 @@ launcher channel과 version 정책은 아래를 따른다.
 release 하나는 보통 아래 asset을 가진다.
 
 - launcher binary or installer
-- frontend zip
+- editor zip
 - embedded python zip
 - manifest json
 - optional release notes
@@ -384,7 +384,7 @@ wheel은 원칙적으로 PyPI에 두고, manifest가 PyPI wheel URL을 가리킨
 
 - `launcher-release.yml`
   - build launcher
-  - package frontend
+  - package editor
   - package embedded python
   - generate manifest
   - create GitHub Release

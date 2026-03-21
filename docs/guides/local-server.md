@@ -16,5 +16,5 @@ uv run codaro
 
 That server is separate from the GitHub Pages build.
 
-- local editor: `src/codaro/server.py` + `frontend/`
+- local editor: `src/codaro/server.py` + `editor/`
 - public site: `landing/`

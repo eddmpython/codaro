@@ -101,13 +101,13 @@
   - IDE 안에는 `Context Help`만 둔다
   - 장문 docs/blog/search는 항상 `landing/` public site로 연다
 - `curriculum`과 `learning-spec`은 학습 runtime 계약이지 generic docs browsing API가 아니다
-- 서버 시작 시 frontend 자산 준비 상태, workspace root, content root, document path를 터미널에 출력한다
+- 서버 시작 시 editor 자산 준비 상태, workspace root, content root, document path를 터미널에 출력한다
 - CLI 로그는 명령 정규화 결과, 모드, URL, 브라우저 오픈 여부를 기록한다
 - 기본 로그는 제품 모드 기준으로 조용해야 한다
   - startup, ready, save/export, package install/uninstall, interrupt, error 중심
   - 성공 request/fs/curriculum/document-load 같은 상세 흐름은 `--verbose` 또는 `CODARO_VERBOSE_LOGS=1`에서만 본다
 - 요청 로그는 기본적으로 4xx/5xx만 기록하고, verbose일 때 `/`, `/app`, `/api/*` 성공 요청까지 method/path/status/duration/client를 기록한다
-- frontend 로그는 ready|missing 상태와 build entry path를 기록한다
+- editor 로그는 ready|missing 상태와 build entry path를 기록한다
 - document 로그는 load/save/export와 block insert/remove/move/update/run을 기록한다
 - system 로그는 fs list/read/write/delete/move/mkdir/exists와 packages list/install/uninstall을 기록한다
 - curriculum 로그는 categories, contents, content load, progress, exercise check를 기록한다
@@ -115,7 +115,7 @@
 - 에러 로그는 structured error envelope와 같은 기준으로 code/message를 함께 기록한다
 - 터미널 로그는 event, level, field key/value에 ANSI 색상을 사용한다
 - 경로는 기본적으로 `.` 또는 `./...`, `~/...` 형태로 축약해서 표시한다
-- 프론트 시각 원칙과 UI 톤의 source of truth는 `frontend/DEV.md`에 둔다
+- 프론트 시각 원칙과 UI 톤의 source of truth는 `editor/DEV.md`에 둔다
   - 색상, radius, shadow, 학습 모드 chrome 밀도는 구현 전에 그 문서를 먼저 따른다
   - 학습 모드 툴바 축소와 셀 contextual menu 기준도 그 문서에 함께 묶는다
   - 공용 chrome은 `shadcn` 패턴, 편집기 셀 리듬은 `marimo` 기준이라는 현재 결정도 그 문서가 source of truth다
@@ -143,7 +143,7 @@
 - launcher는 healthy 이후 backend crash를 자동 재시작하고 repeated crash 시 `crash-state` freeze 후 rollback supervisor로 넘긴다
 - package 분리와 PyPI publish 정책은 `launcher/PACKAGING.md`를 source of truth로 둔다
 - 프론트 기본 실행 경로는 아직 WebSocket이 아니라 HTTP kernel route 중심이다
-- source checkout에서는 frontend build가 선행되어야 하며, 서버는 빌드를 수행하지 않는다
+- source checkout에서는 editor build가 선행되어야 하며, 서버는 빌드를 수행하지 않는다
 
 ## 다음 정리 방향
 

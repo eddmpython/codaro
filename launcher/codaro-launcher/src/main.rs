@@ -1643,7 +1643,7 @@ mod tests {
             backend_version: "0.3.0".into(),
             backend_entry_module: "fakebackend".into(),
             backend_console_script: "codaro".into(),
-            frontend_version: "0.3.0".into(),
+            editor_version: "0.3.0".into(),
             installed_at_unix_seconds: 1234,
         }
     }
@@ -1658,12 +1658,12 @@ mod tests {
         let release_dir = paths.release_dir(&state.release_id);
         let runtime_dir = paths.release_python_runtime_dir(&state.release_id);
         let site_packages_dir = release_dir.join("backend").join("site-packages");
-        let frontend_dir = paths.release_frontend_dir(&state.release_id);
+        let editor_dir = paths.release_editor_dir(&state.release_id);
 
         fs::create_dir_all(&runtime_dir).unwrap();
         fs::create_dir_all(&site_packages_dir).unwrap();
-        fs::create_dir_all(&frontend_dir).unwrap();
-        fs::write(frontend_dir.join("index.html"), "<!doctype html>").unwrap();
+        fs::create_dir_all(&editor_dir).unwrap();
+        fs::write(editor_dir.join("index.html"), "<!doctype html>").unwrap();
         write_python_wrapper(&runtime_dir, &python);
         write_fake_backend_module(&site_packages_dir, behavior);
         write_release_manifest(paths, &state.release_id, rollback_to);
@@ -1903,9 +1903,9 @@ raise SystemExit(1)
                 "url": "file:///python-runtime.zip",
                 "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
             },
-            "frontend": {
+            "editor": {
                 "version": "0.3.0",
-                "url": "file:///frontend.zip",
+                "url": "file:///editor.zip",
                 "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
             },
             "backend": {
@@ -1938,9 +1938,9 @@ raise SystemExit(1)
                 "url": "file:///python-runtime.zip",
                 "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
             },
-            "frontend": {
+            "editor": {
                 "version": "0.3.0",
-                "url": "file:///frontend.zip",
+                "url": "file:///editor.zip",
                 "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
             },
             "backend": {

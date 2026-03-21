@@ -12,7 +12,7 @@ pub struct ReleaseManifest {
     pub launcher_version: String,
     pub min_launcher_version: String,
     pub python_runtime: RuntimeArtifact,
-    pub frontend: RuntimeArtifact,
+    pub editor: RuntimeArtifact,
     pub backend: BackendArtifact,
     #[serde(default)]
     pub bundles: Vec<BundleArtifact>,
@@ -59,7 +59,7 @@ impl ReleaseManifest {
         ensure_present("launcherVersion", &self.launcher_version)?;
         ensure_present("minLauncherVersion", &self.min_launcher_version)?;
         self.python_runtime.validate("pythonRuntime")?;
-        self.frontend.validate("frontend")?;
+        self.editor.validate("editor")?;
         self.backend.validate()?;
         for bundle in &self.bundles {
             bundle.validate()?;
@@ -160,9 +160,9 @@ mod tests {
                     "url": "https://example.com/python.zip",
                     "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                 },
-                "frontend": {
+                "editor": {
                     "version": "0.3.0",
-                    "url": "https://example.com/frontend.zip",
+                    "url": "https://example.com/editor.zip",
                     "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
                 },
                 "backend": {
@@ -205,9 +205,9 @@ mod tests {
                     "url": "https://example.com/python.zip",
                     "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
                 },
-                "frontend": {
+                "editor": {
                     "version": "0.3.0",
-                    "url": "https://example.com/frontend.zip",
+                    "url": "https://example.com/editor.zip",
                     "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
                 },
                 "backend": {

@@ -38,7 +38,7 @@ def createSpaRouter(state: ServerState) -> APIRouter:
     def missingBuild(fullPath: str) -> dict[str, str]:
         del fullPath
         return {
-            "detail": "Codaro frontend build not found. Run `npm install` and `npm run build` in frontend/."
+            "detail": "Codaro editor build not found. Run `npm install` and `npm run build` in editor/."
         }
 
     return router

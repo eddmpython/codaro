@@ -34,7 +34,7 @@ from .serverLog import configureServerLogging, formatLogFields, isVerboseLogging
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
 PROJECT_ROOT = PACKAGE_ROOT.parent.parent.parent
-FRONTEND_ROOT = PROJECT_ROOT / "frontend"
+EDITOR_ROOT = PROJECT_ROOT / "editor"
 STUDY_ROOT = PROJECT_ROOT / "study" / "python"
 
 
@@ -49,14 +49,14 @@ WEB_BUILD_ROOT = resolveWebBuildRoot()
 
 
 @dataclass(slots=True)
-class FrontendBuildStatus:
+class EditorBuildStatus:
     status: str
     indexPath: Path
     assetsPath: Path
     missingPaths: tuple[Path, ...]
 
 
-class FrontendBuildError(RuntimeError):
+class EditorBuildError(RuntimeError):
     pass
 
 
@@ -67,7 +67,7 @@ def _displayPath(path: Path) -> str:
         return path.as_posix()
 
 
-def getFrontendBuildStatus(webBuildRoot: Path | None = None) -> FrontendBuildStatus:
+def getEditorBuildStatus(webBuildRoot: Path | None = None) -> EditorBuildStatus:
     buildRoot = webBuildRoot or WEB_BUILD_ROOT
     indexPath = buildRoot / "index.html"
     assetsPath = buildRoot / "_app"
@@ -79,7 +79,7 @@ def getFrontendBuildStatus(webBuildRoot: Path | None = None) -> FrontendBuildSta
         )
         if not exists
     )
-    return FrontendBuildStatus(
+    return EditorBuildStatus(
         status="ready" if not missingPaths else "missing",
         indexPath=indexPath,
         assetsPath=assetsPath,
@@ -87,39 +87,39 @@ def getFrontendBuildStatus(webBuildRoot: Path | None = None) -> FrontendBuildSta
     )
 
 
-def buildFrontendInstructions(status: FrontendBuildStatus) -> str:
+def buildEditorInstructions(status: EditorBuildStatus) -> str:
     missing = ", ".join(_displayPath(path) for path in status.missingPaths) or _displayPath(status.indexPath)
     return "\n".join(
         [
-            f"Codaro frontend build is missing: {missing}",
+            f"Codaro editor build is missing: {missing}",
             "Run:",
-            "  cd frontend",
+            "  cd editor",
             "  npm install",
             "  npm run build",
-            "For iterative frontend work:",
+            "For iterative editor work:",
             "  npm run build:watch",
         ]
     )
 
 
-def requireFrontendBuildReady(
+def requireEditorBuildReady(
     logger=None,
     webBuildRoot: Path | None = None,
-) -> FrontendBuildStatus:
-    status = getFrontendBuildStatus(webBuildRoot)
+) -> EditorBuildStatus:
+    status = getEditorBuildStatus(webBuildRoot)
     if status.status == "ready":
         return status
 
     if logger is not None:
         logger.error(
-            "frontend %s",
+            "editor %s",
             formatLogFields(
                 status="missing",
                 indexPath=_displayPath(status.indexPath),
                 assetsPath=_displayPath(status.assetsPath),
             ),
         )
-    raise FrontendBuildError(buildFrontendInstructions(status))
+    raise EditorBuildError(buildEditorInstructions(status))
 
 
 def createServerApp(
@@ -135,7 +135,7 @@ def createServerApp(
         workspaceRoot=workspaceRoot or Path.cwd().resolve(),
         studyRoot=studyDir or STUDY_ROOT,
         packageRoot=PACKAGE_ROOT,
-        frontendRoot=FRONTEND_ROOT,
+        editorRoot=EDITOR_ROOT,
         webBuildRoot=WEB_BUILD_ROOT,
     )
 
@@ -187,7 +187,7 @@ def createServerApp(
     app.add_exception_handler(Exception, unhandledExceptionHandler)
 
     @app.middleware("http")
-    async def disableFrontendCache(request: Request, callNext) -> Response:
+    async def disableEditorCache(request: Request, callNext) -> Response:
         startedAt = time.perf_counter()
         response = await callNext(request)
         if request.url.path == "/" or request.url.path.startswith("/_app"):
@@ -233,16 +233,16 @@ def runServer(
     verbose: bool = False,
 ) -> None:
     logger = setVerboseLogging(verbose)
-    frontendStatus = requireFrontendBuildReady(logger=logger)
+    editorStatus = requireEditorBuildReady(logger=logger)
     workspaceRoot = Path.cwd().resolve()
     app = createServerApp(mode=mode, documentPath=documentPath, workspaceRoot=workspaceRoot)
     routePath = "/app" if mode == "app" else "/"
     baseUrl = f"http://{host}:{port}{routePath}"
     logger.info(
-        "frontend %s",
+        "editor %s",
         formatLogFields(
-            status=frontendStatus.status,
-            indexPath=_displayPath(frontendStatus.indexPath),
+            status=editorStatus.status,
+            indexPath=_displayPath(editorStatus.indexPath),
         ),
     )
     logger.info(
@@ -263,7 +263,7 @@ def runServer(
         formatLogFields(
             status="serving",
             url=baseUrl,
-            frontend=frontendStatus.status,
+            editor=editorStatus.status,
             document=documentPath.name if documentPath else None,
         ),
     )
@@ -274,10 +274,10 @@ def runServer(
                 host=host,
                 port=port,
                 route=routePath,
-                frontendRoot=FRONTEND_ROOT,
+                editorRoot=EDITOR_ROOT,
                 webBuildRoot=WEB_BUILD_ROOT,
                 workspaceRoot=workspaceRoot,
-                frontendIndexPath=_displayPath(frontendStatus.indexPath),
+                editorIndexPath=_displayPath(editorStatus.indexPath),
             ),
         )
     uvicorn.run(app, host=host, port=port, log_level="warning")

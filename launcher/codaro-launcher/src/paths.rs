@@ -75,8 +75,8 @@ impl LauncherPaths {
         self.release_runtime_dir(release_id).join("python")
     }
 
-    pub fn release_frontend_dir(&self, release_id: &str) -> PathBuf {
-        self.release_dir(release_id).join("frontend").join("app")
+    pub fn release_editor_dir(&self, release_id: &str) -> PathBuf {
+        self.release_dir(release_id).join("editor").join("app")
     }
 
     pub fn resolve_python_executable(runtime_root: &Path) -> Result<PathBuf> {

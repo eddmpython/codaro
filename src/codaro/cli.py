@@ -7,7 +7,7 @@ import webbrowser
 
 from .document.service import exportDocument
 from .serverLog import formatLogFields, setVerboseLogging
-from .server import FrontendBuildError, requireFrontendBuildReady, runServer
+from .server import EditorBuildError, requireEditorBuildReady, runServer
 
 
 def buildParser() -> argparse.ArgumentParser:
@@ -113,8 +113,8 @@ def main() -> None:
     )
 
     try:
-        requireFrontendBuildReady(logger=logger)
-    except FrontendBuildError as error:
+        requireEditorBuildReady(logger=logger)
+    except EditorBuildError as error:
         print(str(error), file=sys.stderr)
         raise SystemExit(1) from error
 

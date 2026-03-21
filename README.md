@@ -1,167 +1,105 @@
 # Codaro
 
-Codaro는 Python 중심의 interactive editor runtime이다.
+Interactive editor runtime for Python — code, learning, and automation in one surface.
 
-현재 프로젝트는 세 개의 표면을 제공한다.
-- `Edit`: 코드와 마크다운 블록을 작성, 실행, 저장하는 편집기
-- `App`: 같은 문서를 코드 숨김 런타임으로 여는 앱 모드
-- `Public`: docs, blog, search를 제공하는 GitHub Pages 표면
+## Overview
 
-중요한 제품 결정도 하나 고정한다.
-- IDE는 full docs 브라우저가 아니다
-- IDE 안에는 현재 맥락에 붙는 `Context Help`만 둔다
-- 장문 docs, blog, search는 항상 `landing/` public site로 보낸다
-- 학습 콘텐츠는 문서가 아니라 실행형 runtime surface로 남긴다
+Codaro is a programmable studio that combines an editor, execution runtime, learning system, and automation builder into a single cohesive environment. It provides three surfaces:
 
-Codaro는 단순 노트북 클론이 아니라 아래 성격을 같이 가져가려 한다.
-- 편집기
-- 실행기
-- 학습기
-- 자동화 앱 빌더
-- 다른 도메인 앱이 올라가는 범용 작업면
+- **Edit** — Write, execute, and save code and markdown blocks with reactive dataflow
+- **App** — Run the same document as a hidden-code application
+- **Public** — Docs, blog, and search via GitHub Pages
 
-## 현재 구조
+## Background
 
-백엔드와 프론트는 아래 단위로 나뉜다.
-- `src/codaro/api/`: FastAPI router 계층, 서버 상태, 요청 모델
-- `src/codaro/document/`: Codaro native 문서 모델과 codaro/marimo/ipynb 변환
-- `src/codaro/kernel/`: 서버 사이드 Python 실행 세션과 WebSocket 프로토콜
-- `src/codaro/system/`: 파일 시스템과 패키지 관리 API
-- `src/codaro/runtime/`: 엔진 인터페이스와 LocalEngine placeholder
-- `src/codaro/server.py`: FastAPI 앱 조립과 SPA 서빙 진입점
-- `src/codaro/cli.py`: `codaro edit`, `codaro run`, `codaro export`
-- `src/codaro/appRuntime.py`: Codaro native `.py` 문서 런타임
-- `frontend/`: SvelteKit 편집기와 앱 모드
-- `landing/`: SvelteKit public site, docs, blog, search, GitHub Pages build
-- `blog/`: public blog source (`category/post/index.md + assets/`)
-- `frontend/static/brand/`: 실제 서비스에 쓰는 브랜드 자산
-- `assets/brand/`: 브랜드 원본 자산과 작업본
-- `study/python/`: 학습 커리큘럼 YAML
-- `tests/`: 문서, 커널, 시스템, 서버 테스트
+Codaro started by studying [marimo](https://github.com/marimo-team/marimo)'s reactive cell model as an architectural benchmark. The editor chrome was initially built to match marimo's DOM structure as a reference implementation exercise. Codaro diverges in its execution model (transparent scope isolation), default format (percent format `.py`), execution environment (Pyodide-first with local fallback), and scope (integrated learning system, automation, widget bridge).
 
-## 설치 경로
+Codaro is not a fork of marimo and shares no source code. It is an independent project that supports marimo format import/export for compatibility.
 
-현재는 두 경로를 구분한다.
+## Architecture
 
-- Product install
-  - 장기적으로 `CodaroLauncher.exe`가 Python runtime, backend wheel, frontend asset, update를 자동 관리한다
-  - 상세 설계는 `launcher/PRD.md`, `launcher/PACKAGING.md`
-- Developer install
-  - 지금 바로 개발 환경에서 쓰는 방식
-  - `uv`와 frontend build를 직접 관리한다
+```
+src/codaro/         Python backend (FastAPI, document model, kernel, reactive runtime)
+  api/              Router layer, server state, request models
+  document/         Document model, percent/codaro/marimo/ipynb parsers
+  kernel/           Server-side execution sessions, WebSocket protocol
+  runtime/          Engine interface, LocalEngine
+  system/           File system and package management API
+  curriculum/       YAML content loader, progress tracking, learning spec
+  server.py         FastAPI app assembly, middleware, SPA serving
+  cli.py            codaro edit | run | export
+  appRuntime.py     Native .py document runtime (App, md)
+editor/             SvelteKit editor and app mode (Tailwind v4, shadcn)
+landing/            Public site — docs, blog, search (GitHub Pages)
+launcher/           Rust desktop launcher (embedded Python, manifest provisioning)
+study/python/       Learning curriculum (YAML, 130+ lessons)
+tests/              Document, kernel, system, server, curriculum tests
+```
 
-## 실행
-
-기본 실행:
+## Quick Start
 
 ```bash
+# Run the editor (opens workspace home)
 uv run codaro
-```
 
-기본 진입은 편집기가 아니라 workspace home이다.
-여기서 최근 노트북과 파일 트리를 보고 문서를 연다.
-
-특정 문서 열기:
-
-```bash
+# Open a specific notebook
 uv run codaro path.py
-```
 
-앱 모드:
-
-```bash
+# App mode
 uv run codaro app path.py
-```
 
-내보내기:
-
-```bash
+# Export
 uv run codaro export path.py --format codaro
 uv run codaro export path.py --format marimo
 uv run codaro export path.py --format ipynb
 ```
 
-기존 서브커맨드도 그대로 된다.
+## Development
 
 ```bash
-uv run codaro edit path.py
-uv run codaro run path.py
-```
+# Install dependencies
+uv sync --extra dev
 
-## 개발
-
-테스트:
-
-```bash
+# Run tests
 uv run pytest tests/ -v
-```
 
-Python 컴파일 확인:
+# Build editor
+cd editor && npm install && npm run build
 
-```bash
-uv run python -X utf8 -m compileall src/codaro
-```
+# Watch mode for editor iteration
+cd editor && npm run build:watch
 
-프론트 개발:
+# Build public site
+cd landing && npm install && npm run build
 
-```bash
-cd frontend
-npm install
-npm run build
-npm run build:watch
-```
-
-Public site 개발:
-
-```bash
-cd landing
-npm install
-npm run build
-```
-
-브랜드 자산 생성:
-
-```bash
+# Brand asset generation
 uv run --with pillow python -X utf8 scripts/buildBrandAssets.py
 ```
 
-프론트 정적 빌드는 `src/codaro/webBuild/`로 들어간다.
-source checkout에서 `uv run codaro`를 실행하기 전 프론트 빌드가 한 번은 있어야 한다.
-런타임은 항상 같은 Python 서버이고, 빠른 프론트 반복은 `npm run build:watch`로 같은 `src/codaro/webBuild/`를 계속 갱신하는 방식으로 한다.
+The editor builds to `src/codaro/webBuild/`. A build is required before `uv run codaro` works from source checkout. Use `npm run build:watch` for fast iteration — it continuously updates the same output directory.
 
-## 문서 위치
+## Key Decisions
 
-루트 README는 프로젝트 개요만 다룬다.
-세부 구현 문서는 아래 파일을 본다.
+- **Execution model**: Transparent scope isolation — users write plain Python (no function wrapping, no return). The engine isolates each cell's namespace internally via AST analysis.
+- **Reactive execution**: Running a cell automatically re-executes downstream dependents based on AST-inferred variable dependencies.
+- **File format**: Percent format (`.py`) as default — `# %% [code]` cell boundaries, runnable with `python file.py`, compatible with VS Code/Jupytext.
+- **Runtime**: Pyodide (browser) as the default platform; local server kernel extends with file I/O, package management, and ML workloads.
+- **Learning system**: Three pillars — notebook mechanics, YAML curriculum (130+ lessons), and a codified teaching philosophy (fill-in-the-blank, predict-then-verify, 3-stage hints).
+- **AI integration**: Optional — AI uses existing editor APIs as tools (`insert-block`, `execute-reactive`, `GET variables`). Works without AI.
+- **Mounting**: `createServerApp()` can be mounted into FastAPI, Django (ASGI), or Flask (WSGI) hosts.
 
-이 내부 문서들은 개발용 source of truth일 뿐이며 제품 UI에서 직접 노출하지 않는다.
+## Documentation
 
-- `src/codaro/DEV.md`
-- `src/codaro/document/DEV.md`
-- `src/codaro/kernel/DEV.md`
-- `src/codaro/system/DEV.md`
-- `src/codaro/runtime/DEV.md`
-- `launcher/PRD.md`
-- `launcher/PACKAGING.md`
-- `frontend/DEV.md`
-- `frontend/PRD.md`
-- `frontend/prd/`
-- `landing/DEV.md`
+Internal development docs live alongside the code they describe:
 
-## 현재 상태
+- `src/codaro/DEV.md` — Backend architecture
+- `src/codaro/document/DEV.md` — Document model
+- `src/codaro/kernel/DEV.md` — Kernel design
+- `src/codaro/runtime/DEV.md` — Engine interface
+- `editor/DEV.md` — Editor development
+- `landing/DEV.md` — Public site
+- `launcher/PRD.md` — Desktop launcher design
 
-지금 구현된 핵심은 이렇다.
-- Codaro native `.py` 문서 로드/저장
-- marimo/ipynb import/export
-- FastAPI 기반 로컬 편집기 서버
-- 공통 에러 envelope 기반 API 응답
-- 서버 커널 우선, Pyodide 폴백 실행 구조
-- Edit/App 두 표면
-- 파일 시스템과 패키지 관리 API
+## License
 
-아직 후속 작업이 필요한 영역도 분명하다.
-- 프론트 셀 계층 재정리
-- block 중심 문서 모델 확장
-- reactive dataflow 고도화
-- LocalEngine 실제 구현
-- AI가 편집기 조작을 API로 수행하는 구조 확장
+See [LICENSE](LICENSE).

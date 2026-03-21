@@ -64,8 +64,8 @@
   --secondary-foreground: #18181b;
   --muted: #f4f4f5;
   --muted-foreground: #71717a;
-  --accent: #f4f4f5;
-  --accent-foreground: #18181b;
+  --accent: #f97316;
+  --accent-foreground: #ffffff;
   --ring: #a1a1aa;
 
   /* --- Shadows → softer ------------------------------------ */
@@ -131,8 +131,8 @@
   --secondary-foreground: #fafafa;
   --muted: #27272a;
   --muted-foreground: #a1a1aa;
-  --accent: #27272a;
-  --accent-foreground: #fafafa;
+  --accent: #fb923c;
+  --accent-foreground: #18181b;
   --ring: #52525b;
 
   --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.2);

@@ -31,7 +31,7 @@ EVENT_COLORS = {
     "ready": "\x1b[38;5;153m",
     "workspace": "\x1b[38;5;110m",
     "workspace-scan": "\x1b[38;5;117m",
-    "frontend": "\x1b[38;5;141m",
+    "editor": "\x1b[38;5;141m",
     "cli": "\x1b[38;5;75m",
     "browser": "\x1b[38;5;110m",
     "request": "\x1b[38;5;250m",

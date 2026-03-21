@@ -5,12 +5,12 @@ from pathlib import Path
 import pytest
 
 import codaro.server as serverModule
-from codaro.server import FrontendBuildError, getFrontendBuildStatus, requireFrontendBuildReady, runServer
+from codaro.server import EditorBuildError, getEditorBuildStatus, requireEditorBuildReady, runServer
 from codaro.server import resolveWebBuildRoot
 
 
-def testGetFrontendBuildStatusReportsMissingPaths(tmp_path: Path) -> None:
-    status = getFrontendBuildStatus(tmp_path)
+def testGetEditorBuildStatusReportsMissingPaths(tmp_path: Path) -> None:
+    status = getEditorBuildStatus(tmp_path)
 
     assert status.status == "missing"
     assert status.indexPath == tmp_path / "index.html"
@@ -21,9 +21,9 @@ def testGetFrontendBuildStatusReportsMissingPaths(tmp_path: Path) -> None:
     )
 
 
-def testRequireFrontendBuildReadyIncludesBuildInstructions(tmp_path: Path) -> None:
-    with pytest.raises(FrontendBuildError) as excInfo:
-        requireFrontendBuildReady(webBuildRoot=tmp_path)
+def testRequireEditorBuildReadyIncludesBuildInstructions(tmp_path: Path) -> None:
+    with pytest.raises(EditorBuildError) as excInfo:
+        requireEditorBuildReady(webBuildRoot=tmp_path)
 
     message = str(excInfo.value)
     assert "npm run build" in message
@@ -31,7 +31,7 @@ def testRequireFrontendBuildReadyIncludesBuildInstructions(tmp_path: Path) -> No
     assert "index.html" in message
 
 
-def testRunServerRaisesWhenFrontendBuildIsMissing(monkeypatch, tmp_path: Path) -> None:
+def testRunServerRaisesWhenEditorBuildIsMissing(monkeypatch, tmp_path: Path) -> None:
     uvicornCalled = False
 
     def fakeUvicornRun(*args, **kwargs) -> None:
@@ -42,13 +42,13 @@ def testRunServerRaisesWhenFrontendBuildIsMissing(monkeypatch, tmp_path: Path) -
     monkeypatch.setattr(serverModule, "WEB_BUILD_ROOT", tmp_path)
     monkeypatch.setattr(serverModule.uvicorn, "run", fakeUvicornRun)
 
-    with pytest.raises(FrontendBuildError):
+    with pytest.raises(EditorBuildError):
         runServer()
 
     assert uvicornCalled is False
 
 
-def testRunServerStartsWithExistingFrontendBuild(monkeypatch, tmp_path: Path) -> None:
+def testRunServerStartsWithExistingEditorBuild(monkeypatch, tmp_path: Path) -> None:
     (tmp_path / "_app").mkdir()
     (tmp_path / "index.html").write_text("<html></html>", encoding="utf-8")
 

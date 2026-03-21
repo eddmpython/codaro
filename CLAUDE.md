@@ -164,7 +164,7 @@
 - 참고 경로:
   - `C:\Users\MSI\OneDrive\Desktop\sideProject\nicegui\eddmpython`
 - 우선 참고할 영역:
-  - `frontend/src/lib/features/notebook/`
+  - `editor/src/lib/features/notebook/`
   - `core/notebook/`
 - 그대로 복제하지 않는다.
 - 먼저 메커니즘을 해부하고, Codaro 목적에 맞는 계층으로 재설계한 뒤 가져온다.
@@ -187,6 +187,7 @@
   - `src/codaro/runtime/DEV.md`
   - `launcher/PRD.md`
   - `launcher/PACKAGING.md`
+  - `editor/DEV.md`
   - `landing/DEV.md`
 
 ## 현재 코드 레이아웃
@@ -202,7 +203,7 @@
 - `src/codaro/cli.py` : `codaro edit`, `codaro run`, `codaro export`
 - `src/codaro/appRuntime.py` : native `.py` 문서에서 사용하는 `App`, `md`
 - `study/python/` : Codaro 로컬 학습 커리큘럼 YAML
-- `frontend/` : SvelteKit + Tailwind v4 편집기, shadcn 패턴 공용 UI, notebook chrome, 학습 브라우저, 미션 체크 UI, 서버 커널 우선 + Pyodide 폴백
+- `editor/` : SvelteKit + Tailwind v4 편집기, shadcn 패턴 공용 UI, notebook chrome, 학습 브라우저, 미션 체크 UI, 서버 커널 우선 + Pyodide 폴백
 - `landing/` : SvelteKit static public site, docs/blog/search, GitHub Pages build
 - `blog/` : public blog source (`category/post/index.md + assets/`)
 - `tests/` : 커널, 리액티브, 시스템, 문서, 커리큘럼, 체커, 서버 API, 서버 런타임 테스트 (119개)
@@ -269,8 +270,8 @@
 - 기본 avatar와 favicon source는 `assets/brand/mascot/source/codaro-sheet-01.png`의 첫 번째 왼쪽 pose다.
 - pose sheet source는 `assets/brand/mascot/source/codaro-sheet-01.png`, `assets/brand/mascot/source/codaro-sheet-02.png`다.
 - 아바타는 항상 배경 제거 후 캐릭터만 사용한다.
-- 브랜드 자산 경로 source of truth는 `frontend/src/lib/theme/appBrand.ts`다.
-- 색상/반지름/그림자 source of truth는 `frontend/src/lib/theme/brandTheme.ts`다.
+- 브랜드 자산 경로 source of truth는 `editor/src/lib/theme/appBrand.ts`다.
+- 색상/반지름/그림자 source of truth는 `editor/src/lib/theme/brandTheme.ts`다.
 - GitHub Pages는 Svelte로 운영한다.
   - 문서와 블로그도 같은 Svelte 기반, 같은 브랜드 톤으로 운영한다.
 
