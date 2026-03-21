@@ -174,12 +174,19 @@ def createServerApp(
             logger.error("lifespan %s", formatLogFields(status="destroy-failed", error=str(destroyError)))
 
     app = FastAPI(title="Codaro", lifespan=lifespan)
+    serverPort = os.environ.get("CODARO_PORT", "8765")
+    allowedOrigins = [
+        f"http://localhost:{serverPort}",
+        f"http://127.0.0.1:{serverPort}",
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+    ]
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=["*"],
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_origins=allowedOrigins,
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
+        allow_headers=["Content-Type", "Authorization"],
     )
     app.add_exception_handler(ApiError, apiErrorHandler)
     app.add_exception_handler(HTTPException, httpExceptionHandler)
@@ -190,6 +197,18 @@ def createServerApp(
     async def disableEditorCache(request: Request, callNext) -> Response:
         startedAt = time.perf_counter()
         response = await callNext(request)
+        response.headers["X-Content-Type-Options"] = "nosniff"
+        response.headers["X-Frame-Options"] = "DENY"
+        response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
+        response.headers["Content-Security-Policy"] = (
+            "default-src 'self'; "
+            "script-src 'self' 'wasm-unsafe-eval'; "
+            "style-src 'self' 'unsafe-inline'; "
+            "img-src 'self' data: blob:; "
+            "connect-src 'self' ws: wss:; "
+            "font-src 'self' data:; "
+            "frame-ancestors 'none'"
+        )
         if request.url.path == "/" or request.url.path.startswith("/_app"):
             response.headers["Cache-Control"] = "no-store, no-cache, must-revalidate"
             response.headers["Pragma"] = "no-cache"

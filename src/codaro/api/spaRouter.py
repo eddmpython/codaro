@@ -24,6 +24,8 @@ def createSpaRouter(state: ServerState) -> APIRouter:
         def spa(fullPath: str, request: Request) -> FileResponse | HTMLResponse:
             filePath = state.webBuildRoot / fullPath
             if fullPath and filePath.exists() and filePath.is_file():
+                if not filePath.resolve().is_relative_to(state.webBuildRoot.resolve()):
+                    return HTMLResponse(indexHtml)
                 return FileResponse(filePath)
             rootPath = request.scope.get("root_path", "")
             injected = indexHtml.replace(

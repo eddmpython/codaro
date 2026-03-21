@@ -1,5 +1,6 @@
 <script lang="ts">
   import { marked } from "marked";
+  import { sanitizeHtml } from "../utils/sanitize";
   import LayoutRendererSelf from "./LayoutRenderer.svelte";
   import WidgetRenderer from "./WidgetRenderer.svelte";
 
@@ -160,7 +161,7 @@
 {#if value == null}
   <div class="plain"></div>
 {:else if typeof value === "string"}
-  <div class="plain markdown">{@html String(marked.parse(value))}</div>
+  <div class="plain markdown">{@html sanitizeHtml(String(marked.parse(value)))}</div>
 {:else if Array.isArray(value)}
   <div class="stack vertical">
     {#each value as item}
@@ -168,7 +169,7 @@
     {/each}
   </div>
 {:else if type === "markdown"}
-  <div class="plain markdown">{@html String(marked.parse(currentContentHtml()))}</div>
+  <div class="plain markdown">{@html sanitizeHtml(String(marked.parse(currentContentHtml())))}</div>
 {:else if type === "text" || type === "plain"}
   <div class="plain textual">{currentContentHtml()}</div>
 {:else if type === "vstack" || type === "stack" || type === "column"}
@@ -200,7 +201,13 @@
   <section class="tabs">
     <div class="tabList">
       {#each items as item, index}
-        <button class:active={index === activeTab} onclick={() => (activeTab = index)}>
+        <button
+          class:active={index === activeTab}
+          onclick={() => (activeTab = index)}
+          role="tab"
+          aria-selected={index === activeTab}
+          aria-label={getLabel(item, `Tab ${index + 1}`)}
+        >
           {getLabel(item, `Tab ${index + 1}`)}
         </button>
       {/each}
@@ -215,7 +222,12 @@
   <section class="accordion">
     {#each items as item, index}
       <div class="accordionItem">
-        <button class="accordionButton" onclick={() => toggleAccordion(index)}>
+        <button
+          class="accordionButton"
+          onclick={() => toggleAccordion(index)}
+          aria-expanded={openAccordion.includes(index)}
+          aria-label={getLabel(item, `Section ${index + 1}`)}
+        >
           <span>{getLabel(item, `Section ${index + 1}`)}</span>
           <span>{openAccordion.includes(index) ? "−" : "+"}</span>
         </button>
@@ -252,9 +264,9 @@
 {:else if type === "ui"}
   <WidgetRenderer value={currentRecord()} />
 {:else if type === "html"}
-  <div class="plain">{@html currentContentHtml()}</div>
+  <div class="plain">{@html sanitizeHtml(currentContentHtml())}</div>
 {:else}
-  <div class="plain markdown">{@html fallbackMarkdown()}</div>
+  <div class="plain markdown">{@html sanitizeHtml(fallbackMarkdown())}</div>
 {/if}
 
 <style>

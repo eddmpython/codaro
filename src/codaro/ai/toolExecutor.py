@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import uuid
+from pathlib import Path
 from typing import Any
 
 from .tools import getTool, ToolDef
@@ -179,9 +180,21 @@ class ToolExecutor:
             ]
         }
 
+    def _validatePath(self, rawPath: str) -> str:
+        if self._workspaceRoot is None:
+            return rawPath
+        root = Path(self._workspaceRoot).resolve()
+        target = Path(rawPath).expanduser()
+        if not target.is_absolute():
+            target = root / target
+        target = target.resolve()
+        if not target.is_relative_to(root):
+            raise ToolExecutionError("Path must stay within the active workspace.")
+        return str(target)
+
     async def _handle_fsWrite(self, args: dict[str, Any]) -> dict[str, Any]:
         session = self._getSession()
-        path = args["path"]
+        path = self._validatePath(args["path"])
         content = args["content"]
         result = await session.writeFile(path, content)
         return {"path": result, "written": True}

@@ -1,6 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import { marked } from "marked";
+  import { sanitizeHtml } from "../utils/sanitize";
   import { Play } from "lucide-svelte";
   import OutputRenderer from "./OutputRenderer.svelte";
   import { getBootstrap, loadDocumentAtPath } from "../api";
@@ -159,7 +160,7 @@
 
       {#each documentState.blocks as block (block.id)}
         {#if block.type === "markdown"}
-          <section class="card prose">{@html renderMarkdown(block.content)}</section>
+          <section class="card prose">{@html sanitizeHtml(renderMarkdown(block.content))}</section>
         {:else if shouldRenderCode(block.id)}
           <section class="card">
             {#if !documentState.app.hideCode}

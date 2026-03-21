@@ -1,5 +1,6 @@
 <script lang="ts">
   import { marked } from "marked";
+  import { sanitizeHtml } from "../utils/sanitize";
 
   interface Props {
     value?: string;
@@ -20,7 +21,7 @@
 
 <div class="preview markdown mo-markdown-renderer" role="document">
   {#if value.trim()}
-    {@html renderedHtml}
+    {@html sanitizeHtml(renderedHtml)}
   {:else}
     <p class="text-muted-foreground italic">Write markdown</p>
   {/if}

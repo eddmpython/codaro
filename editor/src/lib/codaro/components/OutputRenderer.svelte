@@ -2,6 +2,7 @@
   import DataFrameTable from "./DataFrameTable.svelte";
   import LayoutRenderer from "./LayoutRenderer.svelte";
   import { normalizeOutput } from "../outputAdapter";
+  import { sanitizeHtml } from "../utils/sanitize";
   import {
     ChevronDown,
     ChevronUp,
@@ -119,7 +120,7 @@
   {#if output.type === "error"}
     <pre class="codaro-error">{output.stderr || output.text}</pre>
   {:else if output.type === "html"}
-    <div class="output htmlOutput">{@html output.html}</div>
+    <div class="output htmlOutput">{@html sanitizeHtml(output.html)}</div>
   {:else if output.type === "image"}
     <div class="output media">
       <img class="imageOutput" src={imageSource(output.image)} alt="Cell output" />
@@ -228,6 +229,7 @@
       <button
         class="expand-toggle"
         onclick={() => { expanded = true; }}
+        aria-label="Show more output"
       >
         <ChevronDown size={14} />
         Show more
@@ -238,6 +240,7 @@
       <button
         class="expand-toggle"
         onclick={() => { expanded = false; }}
+        aria-label="Show less output"
       >
         <ChevronUp size={14} />
         Show less

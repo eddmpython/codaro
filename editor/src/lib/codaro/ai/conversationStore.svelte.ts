@@ -45,7 +45,8 @@ export async function loadConversations(): Promise<void> {
       title: `${c.role} conversation`,
       updatedAt: Date.now(),
     }));
-  } catch {
+  } catch (e) {
+    console.warn("[conversationStore] failed to load conversations:", e);
     conversations = [];
   }
 }
@@ -57,7 +58,7 @@ export async function removeConversation(id: string): Promise<void> {
     if (activeId === id) {
       activeId = null;
     }
-  } catch {
-    /* ignore */
+  } catch (e) {
+    console.warn("[conversationStore] failed to remove conversation:", e);
   }
 }

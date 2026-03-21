@@ -1,5 +1,6 @@
 <script lang="ts">
   import { marked } from "marked";
+  import { sanitizeHtml } from "../utils/sanitize";
 
   interface Props {
     content: string;
@@ -28,7 +29,7 @@
 </script>
 
 <div class="chat-markdown">
-  {@html rendered}
+  {@html sanitizeHtml(rendered)}
 </div>
 
 <style>

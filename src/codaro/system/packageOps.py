@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import re
 import subprocess
 from pathlib import Path
 
@@ -109,7 +110,26 @@ print(json.dumps(sorted(seen.values(), key=lambda item: item["name"].lower())))
     return [PackageInfo.model_validate(item) for item in payload]
 
 
+_VALID_PACKAGE_NAME = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?(\[.*\])?(([<>=!~]+)[\d.*]+)?$")
+
+
+def validatePackageName(name: str) -> None:
+    if not name or not _VALID_PACKAGE_NAME.match(name):
+        raise PackageEnvironmentError(
+            "package_name_invalid",
+            f"Invalid package name: {name!r}. Names must match PEP 508.",
+            statusCode=400,
+        )
+    if ".." in name or "/" in name or "\\" in name:
+        raise PackageEnvironmentError(
+            "package_name_invalid",
+            f"Suspicious package name: {name!r}.",
+            statusCode=400,
+        )
+
+
 async def installPackage(name: str) -> InstallResult:
+    validatePackageName(name)
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, _installSync, name)
 

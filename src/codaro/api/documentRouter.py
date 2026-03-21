@@ -10,6 +10,7 @@ from fastapi import APIRouter
 from ..document.models import BlockConfig, CodaroDocument, ExportRequest, ExportResponse, LoadRequest, SaveRequest
 from ..document.service import createEmptyDocument, exportDocument, loadDocument, saveDocument
 from ..serverLog import formatLogFields, getServerLogger
+from ..system.fileOps import WorkspacePathError, resolvePath
 from .appState import ServerState
 from .errors import fail
 from .requestModels import InsertBlockRequest, MoveBlockRequest, RemoveBlockRequest, RunBlockRequest, UpdateBlockRequest
@@ -19,9 +20,15 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
     router = APIRouter()
     logger = getServerLogger()
 
+    def safeResolvePath(rawPath: str) -> Path:
+        try:
+            return resolvePath(rawPath, state.workspaceRoot)
+        except WorkspacePathError:
+            fail(403, "document_path_outside_workspace", "Path must stay within the active workspace.")
+
     @router.post("/api/document/load")
     def apiLoadDocument(request: LoadRequest) -> dict[str, Any]:
-        path = Path(request.path).expanduser()
+        path = safeResolvePath(request.path)
         if not path.exists():
             payload = {
                 "path": str(path.resolve()),
@@ -44,6 +51,7 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
     def apiSaveDocument(request: SaveRequest) -> dict[str, str]:
         if not request.path:
             fail(400, "document_path_required", "Path is required for save.")
+        safeResolvePath(request.path)
         savedPath = saveDocument(request.path, request.document)
         logger.info(
             "document-save %s",
@@ -53,6 +61,7 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
 
     @router.post("/api/document/export", response_model=ExportResponse)
     def apiExportDocument(request: ExportRequest) -> ExportResponse:
+        safeResolvePath(request.path)
         try:
             outputPath = exportDocument(request.path, request.format, request.outputPath)
         except ValueError as error:
@@ -65,7 +74,7 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
 
     @router.post("/api/document/insert-block")
     def apiInsertBlock(request: InsertBlockRequest) -> dict[str, Any]:
-        path = Path(request.path).expanduser().resolve()
+        path = safeResolvePath(request.path)
         if not path.exists():
             fail(404, "document_not_found", "Document not found.")
         document = loadDocument(str(path))
@@ -97,7 +106,7 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
 
     @router.post("/api/document/remove-block")
     def apiRemoveBlock(request: RemoveBlockRequest) -> dict[str, Any]:
-        path = Path(request.path).expanduser().resolve()
+        path = safeResolvePath(request.path)
         if not path.exists():
             fail(404, "document_not_found", "Document not found.")
         document = loadDocument(str(path))
@@ -116,7 +125,7 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
 
     @router.post("/api/document/move-block")
     def apiMoveBlock(request: MoveBlockRequest) -> dict[str, Any]:
-        path = Path(request.path).expanduser().resolve()
+        path = safeResolvePath(request.path)
         if not path.exists():
             fail(404, "document_not_found", "Document not found.")
         if request.offset == 0:
@@ -144,7 +153,7 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
 
     @router.post("/api/document/update-block")
     def apiUpdateBlock(request: UpdateBlockRequest) -> dict[str, Any]:
-        path = Path(request.path).expanduser().resolve()
+        path = safeResolvePath(request.path)
         if not path.exists():
             fail(404, "document_not_found", "Document not found.")
         if request.content is None and request.type is None:
@@ -175,7 +184,7 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
         session = state.sessionManager.getSession(request.sessionId)
         if session is None:
             fail(404, "session_not_found", "Session not found.")
-        path = Path(request.path).expanduser().resolve()
+        path = safeResolvePath(request.path)
         if not path.exists():
             fail(404, "document_not_found", "Document not found.")
         document = loadDocument(str(path))

@@ -22,7 +22,8 @@
     try {
       const data = await getModels(providerId);
       modelList = data.models;
-    } catch {
+    } catch (e) {
+      console.warn("[ModelSelector] failed to fetch models:", e);
       modelList = [];
     } finally {
       loadingModels = false;
@@ -39,8 +40,8 @@
   async function selectModel(modelId: string) {
     try {
       await updateProfile({ model: modelId });
-    } catch {
-      /* ignore */
+    } catch (e) {
+      console.warn("[ModelSelector] failed to update model:", e);
     }
     isOpen = false;
   }
@@ -49,8 +50,8 @@
     try {
       await updateProfile({ provider: providerId });
       await fetchModels(providerId);
-    } catch {
-      /* ignore */
+    } catch (e) {
+      console.warn("[ModelSelector] failed to update provider:", e);
     }
   }
 </script>

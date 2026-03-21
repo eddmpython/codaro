@@ -189,6 +189,9 @@ export interface StreamEvent {
   toolCalls?: AiToolCallResult[];
 }
 
+const STREAM_TIMEOUT_MS = 30_000;
+const STREAM_MAX_BUFFER = 1_048_576;
+
 export async function streamChatMessage(
   payload: {
     conversationId?: string;
@@ -198,42 +201,65 @@ export async function streamChatMessage(
     role?: string;
   },
   onEvent: (event: StreamEvent) => void,
+  signal?: AbortSignal,
 ): Promise<void> {
-  const res = await fetch(apiUrl("/api/ai/chat/stream"), {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  if (!res.ok) {
-    const errPayload = await res.json().catch(() => ({}));
-    throw new Error((errPayload as Record<string, string>)?.detail ?? "Stream request failed");
+  const controller = new AbortController();
+  const linkedSignal = signal;
+  if (linkedSignal) {
+    linkedSignal.addEventListener("abort", () => controller.abort(), { once: true });
   }
 
-  const reader = res.body?.getReader();
-  if (!reader) throw new Error("No response body");
+  let timeoutId: ReturnType<typeof setTimeout> | undefined;
+  const resetTimeout = () => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => controller.abort(), STREAM_TIMEOUT_MS);
+  };
+  resetTimeout();
 
-  const decoder = new TextDecoder();
-  let buffer = "";
+  try {
+    const res = await fetch(apiUrl("/api/ai/chat/stream"), {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+      signal: controller.signal,
+    });
 
-  while (true) {
-    const { done, value } = await reader.read();
-    if (done) break;
+    if (!res.ok) {
+      const errPayload = await res.json().catch(() => ({}));
+      throw new Error((errPayload as Record<string, string>)?.detail ?? "Stream request failed");
+    }
 
-    buffer += decoder.decode(value, { stream: true });
-    const lines = buffer.split("\n");
-    buffer = lines.pop() ?? "";
+    const reader = res.body?.getReader();
+    if (!reader) throw new Error("No response body");
 
-    for (const line of lines) {
-      if (line.startsWith("data: ")) {
-        try {
-          const event = JSON.parse(line.slice(6)) as StreamEvent;
-          onEvent(event);
-        } catch {
-          /* ignore parse error */
+    const decoder = new TextDecoder();
+    let buffer = "";
+
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      resetTimeout();
+
+      buffer += decoder.decode(value, { stream: true });
+      if (buffer.length > STREAM_MAX_BUFFER) {
+        buffer = buffer.slice(-STREAM_MAX_BUFFER);
+      }
+      const lines = buffer.split("\n");
+      buffer = lines.pop() ?? "";
+
+      for (const line of lines) {
+        if (line.startsWith("data: ")) {
+          try {
+            const event = JSON.parse(line.slice(6)) as StreamEvent;
+            onEvent(event);
+          } catch {
+            console.warn("[aiApi] failed to parse SSE line:", line.slice(0, 120));
+          }
         }
       }
     }
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
 
@@ -253,14 +279,34 @@ export async function oauthLogout(): Promise<{ ok: boolean }> {
 }
 
 export function subscribeProfileEvents(onUpdate: (profile: AiProfilePayload) => void): () => void {
-  const es = new EventSource(apiUrl("/api/ai/profile/events"));
-  es.addEventListener("profile_changed", (e) => {
-    try {
-      const data = JSON.parse(e.data) as AiProfilePayload;
-      onUpdate(data);
-    } catch {
-      /* ignore parse error */
-    }
-  });
-  return () => es.close();
+  let es: EventSource | null = null;
+  let retryMs = 1000;
+  let disposed = false;
+
+  function connect() {
+    if (disposed) return;
+    es = new EventSource(apiUrl("/api/ai/profile/events"));
+    es.addEventListener("profile_changed", (e) => {
+      retryMs = 1000;
+      try {
+        const data = JSON.parse(e.data) as AiProfilePayload;
+        onUpdate(data);
+      } catch {
+        console.warn("[aiApi] failed to parse profile event");
+      }
+    });
+    es.onerror = () => {
+      es?.close();
+      if (!disposed) {
+        setTimeout(connect, retryMs);
+        retryMs = Math.min(retryMs * 2, 30_000);
+      }
+    };
+  }
+
+  connect();
+  return () => {
+    disposed = true;
+    es?.close();
+  };
 }

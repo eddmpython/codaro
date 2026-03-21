@@ -72,7 +72,9 @@ class LocalEngine(ExecutionEngine):
             try:
                 future = asyncio.run_coroutine_threadsafe(eventHandler(event), loop)
                 future.result()
-            except Exception:
+            except Exception as exc:
+                import logging
+                logging.getLogger("codaro.runtime").warning("Event handler failed: %s", exc)
                 return
 
         try:
@@ -335,7 +337,7 @@ class LocalEngine(ExecutionEngine):
             if connection is not None and process.is_alive():
                 connection.send({"action": "shutdown"})
                 connection.recv()
-        except Exception:
+        except (OSError, EOFError, BrokenPipeError):
             pass
         finally:
             self._terminateWorkerLocked()
@@ -350,7 +352,7 @@ class LocalEngine(ExecutionEngine):
         if connection is not None:
             try:
                 connection.close()
-            except Exception:
+            except OSError:
                 pass
 
         if process is None:

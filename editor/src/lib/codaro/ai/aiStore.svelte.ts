@@ -155,8 +155,8 @@ export async function endConversation(): Promise<void> {
   if (conversationId) {
     try {
       await deleteConversation(conversationId);
-    } catch {
-      /* ignore */
+    } catch (e) {
+      console.warn("[aiStore] failed to delete conversation:", e);
     }
   }
   conversationId = null;
@@ -238,7 +238,11 @@ export async function sendMessageStreaming(
     isStreaming: true,
   };
   messages = [...messages, assistantMsg];
-  const assistantIdx = messages.length - 1;
+  const assistantId = assistantMsg.id;
+
+  function findAssistant(): number {
+    return messages.findIndex((m) => m.id === assistantId);
+  }
 
   try {
     await streamChatMessage(
@@ -249,6 +253,8 @@ export async function sendMessageStreaming(
         role: conversationRole,
       },
       (event: StreamEvent) => {
+        const idx = findAssistant();
+        if (idx < 0) return;
         switch (event.type) {
           case "start":
             if (event.conversationId && !conversationId) {
@@ -258,8 +264,8 @@ export async function sendMessageStreaming(
           case "token":
             if (event.content) {
               const updated = [...messages];
-              updated[assistantIdx] = {
-                ...updated[assistantIdx],
+              updated[idx] = {
+                ...updated[idx],
                 content: event.content,
               };
               messages = updated;
@@ -268,9 +274,9 @@ export async function sendMessageStreaming(
           case "tool_results":
             if (event.toolCalls && event.toolCalls.length > 0) {
               const updated = [...messages];
-              const existing = updated[assistantIdx].toolCalls ?? [];
-              updated[assistantIdx] = {
-                ...updated[assistantIdx],
+              const existing = updated[idx].toolCalls ?? [];
+              updated[idx] = {
+                ...updated[idx],
                 toolCalls: [...existing, ...event.toolCalls],
               };
               messages = updated;
@@ -279,9 +285,9 @@ export async function sendMessageStreaming(
             break;
           case "done": {
             const updated = [...messages];
-            updated[assistantIdx] = {
-              ...updated[assistantIdx],
-              content: event.answer ?? updated[assistantIdx].content,
+            updated[idx] = {
+              ...updated[idx],
+              content: event.answer ?? updated[idx].content,
               isStreaming: false,
             };
             messages = updated;
@@ -292,9 +298,12 @@ export async function sendMessageStreaming(
     );
   } catch (e) {
     error = e instanceof Error ? e.message : "Stream failed";
-    const updated = [...messages];
-    updated[assistantIdx] = { ...updated[assistantIdx], isStreaming: false };
-    messages = updated;
+    const idx = findAssistant();
+    if (idx >= 0) {
+      const updated = [...messages];
+      updated[idx] = { ...updated[idx], isStreaming: false };
+      messages = updated;
+    }
   } finally {
     isLoading = false;
   }

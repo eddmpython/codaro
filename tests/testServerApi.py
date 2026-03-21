@@ -12,7 +12,7 @@ from codaro.system import packageOps
 
 
 def testLoadMissingDocument(tmp_path: Path) -> None:
-    client = TestClient(createServerApp())
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
     path = tmp_path / "newDocument.py"
 
     response = client.post("/api/document/load", json={"path": str(path)})
@@ -24,7 +24,7 @@ def testLoadMissingDocument(tmp_path: Path) -> None:
 
 
 def testSaveDocument(tmp_path: Path) -> None:
-    client = TestClient(createServerApp())
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
     path = tmp_path / "saved.py"
     document = createEmptyDocument("Saved")
     document.blocks[0].content = "value = 42"
@@ -310,7 +310,7 @@ def testBootstrapIncludesWorkspaceRoot(tmp_path: Path) -> None:
 
 
 def testDocumentBlockOperations(tmp_path: Path) -> None:
-    client = TestClient(createServerApp())
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
     path = tmp_path / "ops_test.py"
     document = createEmptyDocument("OpsTest")
     document.blocks[0].content = "original = True"
@@ -380,7 +380,7 @@ def testWorkspaceBoundaryBlocksMoveOutsideWorkspace(tmp_path: Path) -> None:
 
 
 def testDocumentMoveBlockRejectsZeroOffset(tmp_path: Path) -> None:
-    client = TestClient(createServerApp())
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
     path = tmp_path / "move_test.py"
     document = createEmptyDocument("MoveTest")
     client.post("/api/document/save", json={"path": str(path), "document": document.model_dump()})
@@ -395,7 +395,7 @@ def testDocumentMoveBlockRejectsZeroOffset(tmp_path: Path) -> None:
 
 
 def testDocumentUpdateBlockRejectsEmptyUpdate(tmp_path: Path) -> None:
-    client = TestClient(createServerApp())
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
     path = tmp_path / "update_test.py"
     document = createEmptyDocument("UpdateTest")
     client.post("/api/document/save", json={"path": str(path), "document": document.model_dump()})

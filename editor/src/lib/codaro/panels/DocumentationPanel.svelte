@@ -1,5 +1,6 @@
 <script lang="ts">
   import { marked } from "marked";
+  import { sanitizeHtml } from "../utils/sanitize";
 
   interface Props {
     content?: string;
@@ -17,7 +18,7 @@
 <div class="docs-panel" data-testid="documentation-panel">
   {#if content}
     <div class="docsContent mo-markdown-renderer">
-      {@html rendered}
+      {@html sanitizeHtml(rendered)}
     </div>
   {:else}
     <div class="empty">

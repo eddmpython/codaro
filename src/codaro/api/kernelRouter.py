@@ -370,7 +370,7 @@ def createKernelRouter(state: ServerState) -> APIRouter:
             )
             try:
                 await websocket.send_json(WsErrorMessage(type="error", message=str(error)).model_dump())
-            except Exception:
+            except (RuntimeError, ConnectionError):
                 return
 
     return router
