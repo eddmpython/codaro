@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import json
 import re
 import uuid
 from pathlib import Path
 
-from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, RuntimeConfig
+from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, GuideConfig, RuntimeConfig
 
 
 _CELL_MARKER = re.compile(r"^# %%\s*\[(\w+)\]\s*(.*)$")
@@ -79,6 +80,10 @@ def writePercentDocument(document: CodaroDocument) -> str:
             for line in (block.content or "").splitlines():
                 parts.append(f"# {line}" if line else "#")
             parts.append("")
+        elif block.type == "guide":
+            parts.append(f'# %% [guide] id={block.id}')
+            parts.append(block.content or "")
+            parts.append("")
         else:
             parts.append(f'# %% [code] id={block.id}')
             parts.append(block.content or "")
@@ -101,6 +106,15 @@ def isPercentFormat(source: str) -> bool:
 def _buildBlock(blockType: str, blockId: str | None, lines: list[str]) -> BlockConfig:
     if blockType == "markdown":
         content = _stripMarkdownComments(lines)
+    elif blockType == "guide":
+        content = _stripTrailingBlanks("\n".join(lines))
+        guide = _parseGuideContent(content)
+        return BlockConfig(
+            id=blockId or _blockId(),
+            type="guide",
+            content=content,
+            guide=guide,
+        )
     else:
         content = _stripTrailingBlanks("\n".join(lines))
     return BlockConfig(
@@ -138,3 +152,19 @@ def _parseKeyValues(text: str) -> dict[str, str]:
 
 def _blockId() -> str:
     return f"block-{uuid.uuid4().hex[:8]}"
+
+
+def _parseGuideContent(content: str) -> GuideConfig:
+    try:
+        data = json.loads(content)
+        return GuideConfig(
+            exerciseType=data.get("exerciseType", "fillBlank"),
+            hints=data.get("hints", []),
+            checkConfig=data.get("checkConfig", {}),
+            difficulty=data.get("difficulty", "easy"),
+            solution=data.get("solution", ""),
+            description=data.get("description", ""),
+            studentAnswer=data.get("studentAnswer", ""),
+        )
+    except (json.JSONDecodeError, TypeError):
+        return GuideConfig()

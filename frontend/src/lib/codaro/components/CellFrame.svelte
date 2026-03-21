@@ -20,6 +20,7 @@
     XCircle
   } from "lucide-svelte";
   import CodeEditor from "./CodeEditor.svelte";
+  import GuideBlock from "./GuideBlock.svelte";
   import MarkdownBlock from "./MarkdownBlock.svelte";
   import OutputRenderer from "./OutputRenderer.svelte";
 
@@ -313,8 +314,15 @@
           {/if}
         </button>
 
+        <!-- Guide Block -->
+        {#if block.type === "guide"}
+          <GuideBlock
+            content={block.content}
+            guide={null}
+            onRun={onRun}
+          />
         <!-- Code Editor -->
-        {#if block.type === "code"}
+        {:else if block.type === "code"}
           {#if codeHidden}
             <div class="code-hidden-bar">
               <span class="text-[10px] font-mono text-muted-foreground px-2 py-1">{block.type === "code" ? "Py" : "Md"}</span>

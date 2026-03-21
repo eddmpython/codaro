@@ -5,12 +5,23 @@ export interface BlockExecution {
   lastOutput: unknown;
 }
 
+export interface GuideConfig {
+  exerciseType: string;
+  hints: string[];
+  checkConfig: Record<string, string>;
+  difficulty: string;
+  solution: string;
+  description: string;
+  studentAnswer: string;
+}
+
 export interface CodaroBlock {
   id: string;
   type: string;
   content: string;
   collapsed?: boolean;
   execution: BlockExecution;
+  guide?: GuideConfig | null;
 }
 
 export interface DocumentMetadata {

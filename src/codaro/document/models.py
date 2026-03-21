@@ -15,12 +15,23 @@ class BlockExecution(BaseModel):
     lastOutput: str | None = None
 
 
+class GuideConfig(BaseModel):
+    exerciseType: str = "fillBlank"
+    hints: list[str] = Field(default_factory=list)
+    checkConfig: dict[str, str] = Field(default_factory=dict)
+    difficulty: str = "easy"
+    solution: str = ""
+    description: str = ""
+    studentAnswer: str = ""
+
+
 class BlockConfig(BaseModel):
     id: str
     type: str
     content: str
     collapsed: bool = False
     execution: BlockExecution = Field(default_factory=BlockExecution)
+    guide: GuideConfig | None = None
 
 
 class DocumentMetadata(BaseModel):
