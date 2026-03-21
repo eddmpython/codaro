@@ -496,6 +496,40 @@ TOOL_GENERATE_NOTEBOOK = ToolDef(
 )
 
 
+TOOL_HTTP_REQUEST = ToolDef(
+    name="http-request",
+    description="Make an HTTP request to an external API and return the response.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "method": {
+                "type": "string",
+                "enum": ["GET", "POST", "PUT", "PATCH", "DELETE"],
+                "description": "HTTP method.",
+            },
+            "url": {
+                "type": "string",
+                "description": "Target URL.",
+            },
+            "headers": {
+                "type": "object",
+                "description": "Request headers as key-value pairs.",
+            },
+            "body": {
+                "type": "string",
+                "description": "Request body (for POST/PUT/PATCH).",
+            },
+            "timeout": {
+                "type": "integer",
+                "description": "Timeout in seconds (default 30).",
+            },
+        },
+        "required": ["method", "url"],
+    },
+    handler="httpRequest",
+)
+
+
 def _registerDefaultTools() -> None:
     for tool in [
         TOOL_INSERT_BLOCK,
@@ -514,6 +548,7 @@ def _registerDefaultTools() -> None:
         TOOL_TRACK_ACHIEVEMENT,
         TOOL_SPLIT_NOTEBOOK,
         TOOL_GENERATE_NOTEBOOK,
+        TOOL_HTTP_REQUEST,
     ]:
         registerTool(tool)
 

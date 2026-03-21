@@ -600,3 +600,39 @@ class ToolExecutor:
             "saved": False,
             "loadedInEditor": self._documentSetter is not None,
         }
+
+    async def _handle_httpRequest(self, args: dict[str, Any]) -> dict[str, Any]:
+        import urllib.request
+        import urllib.error
+
+        method = args["method"]
+        url = args["url"]
+        headers = args.get("headers", {})
+        body = args.get("body")
+        timeout = min(args.get("timeout", 30), 60)
+
+        BLOCKED_PREFIXES = ("file://", "ftp://", "data:")
+        if any(url.lower().startswith(p) for p in BLOCKED_PREFIXES):
+            return {"error": f"URL scheme not allowed: {url.split(':')[0]}"}
+
+        try:
+            data = body.encode("utf-8") if body else None
+            req = urllib.request.Request(url, data=data, headers=headers, method=method)
+            with urllib.request.urlopen(req, timeout=timeout) as resp:
+                respBody = resp.read(1024 * 512).decode("utf-8", errors="replace")
+                return {
+                    "status": resp.status,
+                    "headers": dict(resp.headers),
+                    "body": respBody,
+                    "url": resp.url,
+                }
+        except urllib.error.HTTPError as exc:
+            return {
+                "status": exc.code,
+                "error": str(exc.reason),
+                "body": exc.read(1024 * 64).decode("utf-8", errors="replace"),
+            }
+        except urllib.error.URLError as exc:
+            return {"error": f"Connection failed: {exc.reason}"}
+        except TimeoutError:
+            return {"error": f"Request timed out after {timeout}s"}

@@ -316,6 +316,47 @@
   transition: border-color 0.15s, box-shadow 0.15s;
 }
 
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .codaro-cell {
+    border-radius: 0 !important;
+    border-left: none !important;
+    border-right: none !important;
+  }
+
+  .codaro-cell .cm-editor {
+    font-size: 13px;
+  }
+
+  .shoulder-right {
+    right: 4px !important;
+    gap: 2px !important;
+  }
+
+  .shoulder-bottom {
+    padding: 4px 8px !important;
+  }
+
+  .toolbar-pill {
+    padding: 4px 8px !important;
+    font-size: 11px;
+  }
+
+  .cell-actions-popover {
+    min-width: auto !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .codaro-cell .cm-editor {
+    font-size: 12px;
+  }
+
+  .shoulder-right {
+    display: none !important;
+  }
+}
+
 /* Print styles */
 @media print {
   .codaro-cell {

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 from typing import Any
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ..automation.taskModel import TaskDefinition
@@ -162,6 +162,31 @@ def createAutomationRouter(state: Any) -> APIRouter:
         return {
             "activeJobs": scheduler.listScheduled(),
             "jobCount": scheduler.jobCount,
+        }
+
+    @router.post("/api/webhooks/trigger/{taskId}")
+    async def apiWebhookTrigger(taskId: str, request: Request):
+        registry = getTaskRegistry()
+        task = registry.get(taskId)
+        if task is None:
+            raise HTTPException(status_code=404, detail="Task not found")
+        if not task.enabled:
+            raise HTTPException(status_code=403, detail="Task is disabled")
+
+        try:
+            payload = await request.json()
+        except Exception:
+            payload = {}
+
+        workspaceRoot = str(getattr(state, "workspaceRoot", "."))
+        runner = TaskRunner(workspaceRoot=workspaceRoot)
+        run = await runner.run(task)
+        registry.addRun(run)
+        return {
+            "triggered": True,
+            "taskId": taskId,
+            "runId": run.id,
+            "status": run.status.value,
         }
 
     @router.get("/api/workflows")

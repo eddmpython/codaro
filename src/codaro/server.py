@@ -21,6 +21,7 @@ from .api import (
     createBootstrapRouter,
     createCurriculumRouter,
     createDocumentRouter,
+    createExtensionRouter,
     createKernelRouter,
     createServerState,
     createSpaRouter,
@@ -268,6 +269,7 @@ def createServerApp(
     app.include_router(createAutomationRouter(state))
     app.include_router(createBootstrapRouter(state))
     app.include_router(createDocumentRouter(state))
+    app.include_router(createExtensionRouter(state))
     app.include_router(createKernelRouter(state))
     app.include_router(createSystemRouter(state))
     app.include_router(createWorkspaceRouter(state))

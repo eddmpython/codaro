@@ -1,5 +1,6 @@
 from .aiRouter import createAiRouter
 from .automationRouter import createAutomationRouter
+from .extensionRouter import createExtensionRouter
 from .appState import ServerState, createServerState
 from .bootstrapRouter import createBootstrapRouter
 from .curriculumRouter import createCurriculumRouter
@@ -43,6 +44,7 @@ __all__ = [
     "createBootstrapRouter",
     "createCurriculumRouter",
     "createDocumentRouter",
+    "createExtensionRouter",
     "createKernelRouter",
     "createServerState",
     "createSpaRouter",

@@ -208,6 +208,17 @@
     50% { opacity: 0.4; }
   }
 
+  @media (max-width: 768px) {
+    .sidebar {
+      position: fixed;
+      z-index: 50;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      box-shadow: 4px 0 20px rgba(0, 0, 0, 0.2);
+    }
+  }
+
   @media print {
     .sidebar {
       display: none;
