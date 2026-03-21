@@ -53,21 +53,21 @@ class TaskRunner:
                 if not block.content.strip():
                     continue
 
-                result = session.execute(block.content)
-                if result.get("stdout"):
-                    allStdout.append(result["stdout"])
-                if result.get("error"):
+                result = await session.execute(block.content)
+                if result.stdout:
+                    allStdout.append(result.stdout)
+                if result.status == "error":
                     raise RuntimeError(
-                        f"Block {block.id} failed: {result['error']}"
+                        f"Block {block.id} failed: {result.stderr}"
                     )
 
             variables = session.getVariables()
             lastVariables = {
-                v["name"]: v.get("repr", "")
+                v.name: v.repr
                 for v in variables
             }
         finally:
-            manager.removeSession(session.sessionId)
+            manager.destroySession(session.sessionId)
 
         return {
             "stdout": "\n".join(allStdout),

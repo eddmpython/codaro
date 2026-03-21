@@ -10,6 +10,7 @@ import pytest
 from codaro.automation.taskModel import TaskDefinition, TaskRun, TaskStatus
 from codaro.automation.taskRegistry import TaskRegistry
 from codaro.automation.scheduler import parseScheduleSeconds, TaskScheduler
+from codaro.automation.workflow import Workflow, WorkflowStep, WorkflowEngine
 
 
 class TestTaskDefinition:
@@ -197,3 +198,35 @@ class TestScheduler:
             scheduler.cancelAll()
 
         asyncio.run(_test())
+
+
+class TestWorkflow:
+
+    def test_create_workflow(self):
+        engine = WorkflowEngine()
+        wf = engine.create(
+            name="Test WF",
+            steps=[{"taskId": "t1"}, {"taskId": "t2", "dependsOn": ["t1"]}],
+        )
+        assert wf.name == "Test WF"
+        assert len(wf.steps) == 2
+        assert wf.steps[1].dependsOn == ["t1"]
+
+    def test_list_and_delete(self):
+        engine = WorkflowEngine()
+        wf = engine.create(name="WF1", steps=[{"taskId": "t1"}])
+        assert len(engine.listWorkflows()) == 1
+        assert engine.delete(wf.id)
+        assert len(engine.listWorkflows()) == 0
+
+    def test_delete_nonexistent(self):
+        engine = WorkflowEngine()
+        assert engine.delete("nonexistent") is False
+
+    def test_serialize(self):
+        engine = WorkflowEngine()
+        wf = engine.create(name="S", steps=[{"taskId": "x"}])
+        data = wf.serialize()
+        assert data["name"] == "S"
+        assert len(data["steps"]) == 1
+        assert data["steps"][0]["taskId"] == "x"

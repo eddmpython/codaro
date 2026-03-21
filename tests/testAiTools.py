@@ -283,6 +283,66 @@ class TestNotebookExercise:
         assert json.loads(guides[-1].content)["exerciseType"] == "writeCode"
 
 
+class TestGenerateNotebook:
+
+    def test_generate_with_output_path(self, tmp_path):
+        executor, _ = _makeExecutor(workspaceRoot=str(tmp_path))
+        result = asyncio.run(executor.execute("generate-notebook", {
+            "title": "My Notebook",
+            "blocks": [
+                {"type": "markdown", "content": "# Hello"},
+                {"type": "code", "content": "x = 1"},
+            ],
+            "outputPath": "generated.py",
+        }))
+        assert result["saved"] is True
+        assert result["blockCount"] == 2
+        assert (tmp_path / "generated.py").exists()
+
+    def test_generate_without_output_loads_in_editor(self):
+        captured = {}
+        doc = _makeDoc()
+        executor = ToolExecutor(
+            sessionManager=_MockSessionManager(),
+            documentGetter=lambda: doc,
+            documentSetter=lambda d: captured.update(doc=d),
+        )
+        result = asyncio.run(executor.execute("generate-notebook", {
+            "title": "Inline",
+            "blocks": [{"type": "code", "content": "y = 2"}],
+        }))
+        assert result["saved"] is False
+        assert result["loadedInEditor"] is True
+        assert "doc" in captured
+
+
+class TestSplitNotebook:
+
+    def test_split_creates_files(self, tmp_path):
+        doc = _makeDoc()
+        executor, _ = _makeExecutor(doc=doc, workspaceRoot=str(tmp_path))
+        result = asyncio.run(executor.execute("split-notebook", {
+            "splits": [
+                {"title": "Part A", "blockIds": ["b1"]},
+                {"title": "Part B", "blockIds": ["b2", "b3"]},
+            ],
+            "outputDir": ".",
+        }))
+        assert result["splitCount"] == 2
+        assert (tmp_path / "Part_A.py").exists()
+        assert (tmp_path / "Part_B.py").exists()
+
+    def test_split_missing_blocks_returns_error(self, tmp_path):
+        doc = _makeDoc()
+        executor, _ = _makeExecutor(doc=doc, workspaceRoot=str(tmp_path))
+        result = asyncio.run(executor.execute("split-notebook", {
+            "splits": [
+                {"title": "Empty", "blockIds": ["nonexistent"]},
+            ],
+        }))
+        assert result["notebooks"][0]["error"] == "No matching blocks"
+
+
 class TestTrackAchievement:
 
     def test_records_to_file(self, tmp_path):

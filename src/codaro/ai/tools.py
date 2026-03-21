@@ -421,6 +421,81 @@ TOOL_TRACK_ACHIEVEMENT = ToolDef(
 )
 
 
+TOOL_SPLIT_NOTEBOOK = ToolDef(
+    name="split-notebook",
+    description="Split the current document into multiple notebooks by topic groupings.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "splits": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "title": {
+                            "type": "string",
+                            "description": "Title for the new notebook.",
+                        },
+                        "blockIds": {
+                            "type": "array",
+                            "items": {"type": "string"},
+                            "description": "IDs of blocks to include in this notebook.",
+                        },
+                    },
+                    "required": ["title", "blockIds"],
+                },
+                "description": "List of split groups, each with a title and block IDs.",
+            },
+            "outputDir": {
+                "type": "string",
+                "description": "Directory to save split notebooks (relative to workspace root).",
+            },
+        },
+        "required": ["splits"],
+    },
+    handler="splitNotebook",
+)
+
+TOOL_GENERATE_NOTEBOOK = ToolDef(
+    name="generate-notebook",
+    description="Generate a new notebook with code and markdown blocks for a given topic or task.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "title": {
+                "type": "string",
+                "description": "Title for the generated notebook.",
+            },
+            "blocks": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "type": {
+                            "type": "string",
+                            "enum": ["code", "markdown", "guide"],
+                            "description": "Block type.",
+                        },
+                        "content": {
+                            "type": "string",
+                            "description": "Block content.",
+                        },
+                    },
+                    "required": ["type", "content"],
+                },
+                "description": "Ordered list of blocks for the notebook.",
+            },
+            "outputPath": {
+                "type": "string",
+                "description": "File path for the notebook (relative to workspace root).",
+            },
+        },
+        "required": ["title", "blocks"],
+    },
+    handler="generateNotebook",
+)
+
+
 def _registerDefaultTools() -> None:
     for tool in [
         TOOL_INSERT_BLOCK,
@@ -437,6 +512,8 @@ def _registerDefaultTools() -> None:
         TOOL_CREATE_QUIZ,
         TOOL_CREATE_NOTEBOOK_EXERCISE,
         TOOL_TRACK_ACHIEVEMENT,
+        TOOL_SPLIT_NOTEBOOK,
+        TOOL_GENERATE_NOTEBOOK,
     ]:
         registerTool(tool)
 

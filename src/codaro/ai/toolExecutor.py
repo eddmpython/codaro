@@ -521,3 +521,82 @@ class ToolExecutor:
             "exerciseType": exerciseType,
             "position": position,
         }
+
+    async def _handle_splitNotebook(self, args: dict[str, Any]) -> dict[str, Any]:
+        doc = self._getDocument()
+        splits = args["splits"]
+        outputDir = args.get("outputDir", ".")
+
+        from codaro.document.models import BlockConfig, CodaroDocument
+        from codaro.document.service import saveDocument
+
+        if not self._workspaceRoot:
+            return {"error": "No workspace root configured"}
+
+        blockMap = {b.id: b for b in doc.blocks}
+        results = []
+
+        for split in splits:
+            title = split["title"]
+            blockIds = split["blockIds"]
+            blocks = [blockMap[bid] for bid in blockIds if bid in blockMap]
+
+            if not blocks:
+                results.append({"title": title, "error": "No matching blocks"})
+                continue
+
+            newDoc = CodaroDocument(
+                id=f"doc-{uuid.uuid4().hex[:10]}",
+                title=title,
+                blocks=[
+                    BlockConfig(id=b.id, type=b.type, content=b.content)
+                    for b in blocks
+                ],
+            )
+
+            safeName = "".join(c if c.isalnum() or c in "-_ " else "" for c in title)
+            safeName = safeName.strip().replace(" ", "_")[:60] or "untitled"
+            filePath = self._validatePath(f"{outputDir}/{safeName}.py")
+            saveDocument(filePath, newDoc)
+            results.append({"title": title, "path": filePath, "blockCount": len(blocks)})
+
+        return {"notebooks": results, "splitCount": len(results)}
+
+    async def _handle_generateNotebook(self, args: dict[str, Any]) -> dict[str, Any]:
+        title = args["title"]
+        blocks = args["blocks"]
+        outputPath = args.get("outputPath")
+
+        from codaro.document.models import BlockConfig, CodaroDocument
+        from codaro.document.service import saveDocument
+
+        docBlocks = []
+        for i, b in enumerate(blocks):
+            blockId = f"gen-{uuid.uuid4().hex[:8]}"
+            docBlocks.append(BlockConfig(id=blockId, type=b["type"], content=b["content"]))
+
+        newDoc = CodaroDocument(
+            id=f"doc-{uuid.uuid4().hex[:10]}",
+            title=title,
+            blocks=docBlocks,
+        )
+
+        if outputPath and self._workspaceRoot:
+            filePath = self._validatePath(outputPath)
+            saveDocument(filePath, newDoc)
+            return {
+                "title": title,
+                "blockCount": len(docBlocks),
+                "path": filePath,
+                "saved": True,
+            }
+
+        if self._documentSetter is not None:
+            self._documentSetter(newDoc)
+
+        return {
+            "title": title,
+            "blockCount": len(docBlocks),
+            "saved": False,
+            "loadedInEditor": self._documentSetter is not None,
+        }
