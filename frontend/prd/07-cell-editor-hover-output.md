@@ -4,9 +4,30 @@
 
 [Resume from Summary](./10-summary-acceptance-and-copy-plan.md#121-current-state)
 
+Installed asset evidence for this file:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/cell-editor-CSaoLcvI.js`
+- `./assets/readonly-python-code-Cyn1aSna.js`
+- `./assets/CellStatus-D0IfrfUM.js`
+- `./assets/MarimoErrorOutput-CimwFZPP.js`
+- `./assets/JsonOutput-DjokO226.js`
+- `./assets/cells-jmgGt1lS.css`
+- `./assets/cell-editor-Iey559K_.css`
+- `./assets/CellStatus-2Psjnl5F.css`
+- `./assets/JsonOutput-B7vuddcd.css`
+- `./assets/index-CVpJvEAO.css`
+
 #### 9.1 Cell Root
 
 Source:
+
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/cell-editor-CSaoLcvI.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/notebook-cell.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/common.ts`
@@ -57,6 +78,13 @@ Selection ring (from navigation props):
 #### 9.1.1 SortableCell Wrapper Contract
 
 Source:
+
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/cells-jmgGt1lS.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/SortableCell.tsx`
 
@@ -118,6 +146,12 @@ TooltipProvider
 
 Source:
 
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/notebook-cell.tsx` (CellLeftSideActions)
 
 Root wrapper:
@@ -151,6 +185,12 @@ Below button props:
 #### 9.1.3 CreateCellButton Contract
 
 Source:
+
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/cell/CreateCellButton.tsx`
 
@@ -199,6 +239,12 @@ Dropdown content:
 
 Source:
 
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/notebook-cell.tsx` (CellToolbar)
 - `.__marimo_upstream/frontend/src/components/editor/cell/toolbar.tsx`
 
@@ -239,6 +285,12 @@ ToolbarItem tooltip:
 
 Source:
 
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/notebook-cell.tsx` (CellRightSideActions)
 
 Root:
@@ -259,6 +311,13 @@ Children order:
 #### 9.1.6 Shoulder and Delete Button Contract
 
 Source:
+
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/cells-jmgGt1lS.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/css/app/Cell.css`
 - `.__marimo_upstream/frontend/src/components/editor/notebook-cell.tsx`
@@ -289,6 +348,12 @@ Delete button location:
 #### 9.1.7 Cell CSS Full Contract
 
 Source:
+
+Installed assets:
+
+- `./assets/cells-jmgGt1lS.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/css/app/Cell.css`
 
@@ -427,6 +492,19 @@ AI-deleted cell:
 
 #### 9.2 Cell Render Branches
 
+Source:
+
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/readonly-python-code-Cyn1aSna.js`
+
+Readable source:
+
+- `.__marimo_upstream/frontend/src/components/editor/notebook-cell.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/renderers/vertical-layout/vertical-layout.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/code/readonly-python-code.tsx`
+
 Read or kiosk branch condition:
 
 - `(mode === "read" && showCode) || (kiosk && mode !== "present")`
@@ -514,6 +592,13 @@ Edit branch output props:
 #### 9.2.1 Readonly Code Contract
 
 Source:
+
+Installed assets:
+
+- `./assets/readonly-python-code-Cyn1aSna.js`
+- `./assets/cells-jmgGt1lS.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/code/readonly-python-code.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/renderers/vertical-layout/vertical-layout.tsx`
@@ -643,6 +728,13 @@ Readonly CodeMirror contract:
 #### 9.3 Editor Contract
 
 Source:
+
+Installed assets:
+
+- `./assets/cell-editor-CSaoLcvI.js`
+- `./assets/cell-editor-Iey559K_.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/cell/code/cell-editor.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/cell/code/language-toggle.tsx`
@@ -997,6 +1089,12 @@ Shared completion action buttons:
 
 Source:
 
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/actions/useCellActionButton.tsx`
 - hook `useCellActionButtons`
 
@@ -1171,6 +1269,12 @@ Group 6 item rules:
 
 Source:
 
+Installed assets:
+
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/css/common.css`
 
 Hover behavior is CSS contract only.
@@ -1200,6 +1304,13 @@ Additional common.css tokens:
 #### 9.5 Status Rail
 
 Source:
+
+Installed assets:
+
+- `./assets/CellStatus-D0IfrfUM.js`
+- `./assets/CellStatus-2Psjnl5F.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/cell/CellStatus.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/cell/cell-status.css`
@@ -1337,6 +1448,13 @@ Last-run time contract:
 #### 9.6 Console Output Contract
 
 Source:
+
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/cells-jmgGt1lS.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/output/console/ConsoleOutput.tsx`
 
@@ -1501,6 +1619,16 @@ Stdin response shell:
 #### 9.7 Output Surface Contract
 
 Source:
+
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/MarimoErrorOutput-CimwFZPP.js`
+- `./assets/JsonOutput-DjokO226.js`
+- `./assets/cells-jmgGt1lS.css`
+- `./assets/JsonOutput-B7vuddcd.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/Output.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/output/Outputs.css`
@@ -1702,6 +1830,14 @@ Unsupported-widget banner:
 
 Source:
 
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/JsonOutput-DjokO226.js`
+- `./assets/JsonOutput-B7vuddcd.css`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/output/TextOutput.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/output/HtmlOutput.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/output/JsonOutput.tsx`
@@ -1830,6 +1966,13 @@ Collapsible text leaf contract:
 #### 9.7.2 Traceback and Marimo Error Output
 
 Source:
+
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/MarimoErrorOutput-CimwFZPP.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/output/MarimoTracebackOutput.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/output/MarimoErrorOutput.tsx`

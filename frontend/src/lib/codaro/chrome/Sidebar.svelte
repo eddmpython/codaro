@@ -6,6 +6,7 @@
     ExternalLink,
     FolderTree,
     MessageCircleQuestionMark,
+    MessageSquareHeart,
     Network,
     ScrollText,
     SquareDashedBottomCode,
@@ -39,9 +40,10 @@
   interface Props {
     errorCount?: number;
     queuedOrRunningCount?: number;
+    onFeedback?: () => void;
   }
 
-  let { errorCount = 0, queuedOrRunningCount = 0 }: Props = $props();
+  let { errorCount = 0, queuedOrRunningCount = 0, onFeedback }: Props = $props();
 
   const itemBase = "flex items-center p-2 text-sm mx-px shadow-inset font-mono rounded";
 
@@ -90,6 +92,16 @@
     onclick={() => openPublicDoc("/docs")}
   >
     <ExternalLink class="h-5 w-5" />
+  </button>
+
+  <button
+    class="{itemBase} hover:bg-(--sage-3)"
+    data-state="closed"
+    type="button"
+    aria-label="Send feedback"
+    onclick={() => onFeedback?.()}
+  >
+    <MessageSquareHeart class="h-5 w-5" />
   </button>
 
   <div class="flex-1"></div>

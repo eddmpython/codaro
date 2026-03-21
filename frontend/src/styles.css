@@ -11,6 +11,7 @@
 @import "./lib/codaro/styles/marimo/layout-BjXzDXoG.css";
 @import "./lib/codaro/styles/marimo/edit-page-Dstp9NQ5.css";
 @import "./lib/codaro/styles/marimo/Inputs-CuKU-ENz.css";
+@import "./lib/codaro/styles/codaro-skin.css";
 
 @font-face {
   font-family: "Lora";
@@ -64,44 +65,44 @@
   color-scheme: light;
   --csstools-color-scheme--light: initial;
 
-  --sage-1: #fbfdfc;
-  --sage-2: #f7f9f8;
-  --sage-3: #eef1f0;
-  --sage-4: #e6e9e8;
-  --sage-5: #dfe2e0;
-  --sage-6: #d7dad9;
-  --sage-7: #cbcfcd;
-  --sage-8: #b8bcba;
-  --sage-9: #868e8b;
-  --sage-10: #7c8480;
-  --sage-11: #5f6563;
-  --sage-12: #1a211e;
+  --sage-1:  #fafafa;
+  --sage-2:  #f4f4f5;
+  --sage-3:  #e4e4e7;
+  --sage-4:  #d4d4d8;
+  --sage-5:  #a1a1aa;
+  --sage-6:  #a1a1aa;
+  --sage-7:  #71717a;
+  --sage-8:  #52525b;
+  --sage-9:  #3f3f46;
+  --sage-10: #27272a;
+  --sage-11: #27272a;
+  --sage-12: #18181b;
 
-  --slate-1: #fcfcfd;
-  --slate-2: #f9f9fb;
-  --slate-3: #f0f0f3;
-  --slate-4: #e8e8ec;
-  --slate-5: #e0e1e6;
-  --slate-6: #d9d9e0;
-  --slate-7: #cdced6;
-  --slate-8: #b9bbc6;
-  --slate-9: #8b8d98;
-  --slate-10: #80838d;
-  --slate-11: #60646c;
-  --slate-12: #1c2024;
+  --slate-1:  #fafafa;
+  --slate-2:  #f4f4f5;
+  --slate-3:  #e4e4e7;
+  --slate-4:  #d4d4d8;
+  --slate-5:  #a1a1aa;
+  --slate-6:  #a1a1aa;
+  --slate-7:  #71717a;
+  --slate-8:  #52525b;
+  --slate-9:  #3f3f46;
+  --slate-10: #27272a;
+  --slate-11: #27272a;
+  --slate-12: #18181b;
 
-  --gray-1: #fcfcfc;
-  --gray-2: #f9f9f9;
-  --gray-3: #f0f0f0;
-  --gray-4: #e8e8e8;
-  --gray-5: #e0e0e0;
-  --gray-6: #d9d9d9;
-  --gray-7: #cecece;
-  --gray-8: #bbbbbb;
-  --gray-9: #8d8d8d;
-  --gray-10: #838383;
-  --gray-11: #646464;
-  --gray-12: #202020;
+  --gray-1:  #fafafa;
+  --gray-2:  #f4f4f5;
+  --gray-3:  #e4e4e7;
+  --gray-4:  #d4d4d8;
+  --gray-5:  #a1a1aa;
+  --gray-6:  #a1a1aa;
+  --gray-7:  #71717a;
+  --gray-8:  #52525b;
+  --gray-9:  #3f3f46;
+  --gray-10: #27272a;
+  --gray-11: #27272a;
+  --gray-12: #18181b;
 
   --red-1: #fffcfc;
   --red-2: #fff7f7;
@@ -157,25 +158,25 @@
 
   --cyan-9: #00c2d7;
 
-  --background: #fff;
-  --foreground: #1a211e;
-  --border: #e2e8f0;
-  --input: #a3a3a3;
-  --card: #fff;
-  --card-foreground: #0f172a;
-  --popover: #fff;
-  --popover-foreground: #0f172a;
-  --primary: #0880ea;
-  --primary-foreground: #f8fafc;
-  --secondary: #f1f5f9;
-  --secondary-foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --accent: #edf6ff;
-  --accent-foreground: #0b68cb;
-  --ring: #0090ff;
+  --background: #fafafa;
+  --foreground: #18181b;
+  --border: #e4e4e7;
+  --input: #a1a1aa;
+  --card: #ffffff;
+  --card-foreground: #18181b;
+  --popover: #ffffff;
+  --popover-foreground: #18181b;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #18181b;
+  --muted: #f4f4f5;
+  --muted-foreground: #71717a;
+  --accent: #f4f4f5;
+  --accent-foreground: #18181b;
+  --ring: #a1a1aa;
   --destructive: #e5484d;
-  --destructive-foreground: #f8fafc;
+  --destructive-foreground: #fafafa;
   --error: #e5484d;
   --stale: #e5a417;
   --action-foreground: #946800;
@@ -184,9 +185,9 @@
   --text-font: "PT Sans", sans-serif;
   --heading-font: "Lora", serif;
 
-  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md-solid: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --shadow-shade: rgba(0, 0, 0, 0.1);
+  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  --shadow-md-solid: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
+  --shadow-shade: rgba(0, 0, 0, 0.06);
 
   --content-width: 776px;
   --content-width-medium: 1100px;
@@ -247,12 +248,4 @@ a {
 .marimo-cell .cm-editor .cm-content {
   font-size: var(--marimo-code-editor-font-size, 0.9rem);
   font-family: var(--monospace-font);
-}
-
-.marimo-cell .cm-editor.cm-focused .cm-activeLineGutter {
-  background: #e2f2ff;
-}
-
-.marimo-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
-  background: hsl(210deg 100% 50% / 3%);
 }

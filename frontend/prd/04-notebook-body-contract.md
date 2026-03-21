@@ -4,9 +4,25 @@
 
 [Resume from Summary](./10-summary-acceptance-and-copy-plan.md#121-current-state)
 
+Installed asset evidence for this file:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/cells-wT6clfi5.js`
+- `./assets/floating-outline-jCvD7_Ne.js`
+- `./assets/add-cell-with-ai-Bl1TJ3Bp.js`
+- `./assets/error-banner-CAuK5DPN.js`
+- `./assets/index-CVpJvEAO.css`
+
 #### 6.1 Filename Bar
 
 Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/header/filename-form.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/header/filename-input.tsx`
@@ -78,6 +94,13 @@ Filename styling contract from `filename-input.css`:
 #### 6.2 Width Wrapper and Notebook Layout
 
 Width wrapper source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/cells-wT6clfi5.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/renderers/vertical-layout/vertical-layout-wrapper.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/renderers/vertical-layout/vertical-layout.tsx`
@@ -153,6 +176,13 @@ Column layout branch:
 #### 6.2.1 Floating Outline Contract
 
 Source:
+
+Installed assets:
+
+- `./assets/floating-outline-jCvD7_Ne.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/outline/floating-outline.tsx`
 
@@ -240,6 +270,13 @@ MiniMap marker contract:
 #### 6.2.2 Column Container And Column Chrome
 
 Source:
+
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/edit-page-CTVRcSta.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/renderers/cell-array.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/columns/sortable-column.tsx`
@@ -426,6 +463,14 @@ Read-mode cell hiding helper:
 
 Source:
 
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/error-banner-CAuK5DPN.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/alerts/connecting-alert.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/alerts/floating-alert.tsx`
 - `.__marimo_upstream/frontend/src/plugins/impl/common/error-banner.tsx`
@@ -574,6 +619,13 @@ Blocking stdin banner:
 #### 6.4 Column Footer Add-Cell Strip
 
 Source branch:
+
+Installed assets:
+
+- `./assets/cells-wT6clfi5.js`
+- `./assets/add-cell-with-ai-Bl1TJ3Bp.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/renderers/cell-array.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/ai/add-cell-with-ai.tsx`

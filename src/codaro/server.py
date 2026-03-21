@@ -15,6 +15,7 @@ import uvicorn
 from .api import (
     ApiError,
     apiErrorHandler,
+    createAiRouter,
     createBootstrapRouter,
     createCurriculumRouter,
     createDocumentRouter,
@@ -211,6 +212,7 @@ def createServerApp(
             )
         return response
 
+    app.include_router(createAiRouter(state))
     app.include_router(createBootstrapRouter(state))
     app.include_router(createDocumentRouter(state))
     app.include_router(createKernelRouter(state))

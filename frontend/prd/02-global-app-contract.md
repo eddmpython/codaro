@@ -4,7 +4,26 @@
 
 [Resume from Summary](./10-summary-acceptance-and-copy-plan.md#121-current-state)
 
+Installed asset evidence for this file:
+
+- `.venv/Lib/site-packages/marimo/_static/index.html`
+- `./assets/index-CV-Vv3LK.js`
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/context-aware-panel-DScGcWey.js`
+- `./assets/index-CVpJvEAO.css`
+
 #### 4.1 Head, Hidden Mount Tags, and Portal
+
+Source:
+
+Installed assets:
+
+- `.venv/Lib/site-packages/marimo/_static/index.html`
+- `./assets/index-CV-Vv3LK.js`
+
+Readable source:
+
+- `.__marimo_upstream/frontend/index.html`
 
 `index.html` requires these tags:
 
@@ -64,6 +83,21 @@ Global CSS contract:
 
 #### 4.2 Root DOM Hierarchy
 
+Source:
+
+Installed assets:
+
+- `.venv/Lib/site-packages/marimo/_static/index.html`
+- `./assets/index-CV-Vv3LK.js`
+- `./assets/edit-page-CTVRcSta.js`
+
+Readable source:
+
+- `.__marimo_upstream/frontend/index.html`
+- `.__marimo_upstream/frontend/src/components/pages/edit-page.tsx`
+- `.__marimo_upstream/frontend/src/core/edit-app.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/app-chrome.tsx`
+
 `experiments/marimo-layout.dom.html` fixes the root shell:
 
 ```text
@@ -97,6 +131,13 @@ body.light.light-theme[data-theme="light"]
 #### 4.2.1 Top-Level Render Branches
 
 Source:
+
+Installed assets:
+
+- `./assets/index-CV-Vv3LK.js`
+- `./assets/edit-page-CTVRcSta.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/pages/edit-page.tsx`
 - `.__marimo_upstream/frontend/src/core/edit-app.tsx`
@@ -139,6 +180,13 @@ Default chrome branch:
 #### 4.2.2 EditApp Composition
 
 Source:
+
+Installed assets:
+
+- `./assets/index-CV-Vv3LK.js`
+- `./assets/edit-page-CTVRcSta.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/core/edit-app.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/app-container.tsx`
@@ -459,6 +507,15 @@ Kiosk visibility helpers:
 
 Source:
 
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/panels-BfLG6GHU.js`
+- `./assets/context-aware-panel-DScGcWey.js`
+- `./assets/panels-B4E3DsXP.css`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/app-chrome.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/panels.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/context-aware-panel/context-aware-panel.tsx`
@@ -574,6 +631,17 @@ Overlay `ResizableComponent` contract:
   - `div` with `ref={resizableDivRef}` and inline `style`
 
 #### 4.3 Utility Token Resolution
+
+Source:
+
+Installed assets:
+
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
+
+- `.__marimo_upstream/frontend/src/css/app/App.css`
+- `.__marimo_upstream/frontend/src/css/globals.css`
 
 These utility tokens are fixed by `index-CVpJvEAO.css`.
 

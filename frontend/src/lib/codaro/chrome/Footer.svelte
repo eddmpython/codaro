@@ -13,6 +13,7 @@
   import AIStatus from "./footer-items/AIStatus.svelte";
   import MachineStats from "./footer-items/MachineStats.svelte";
   import RTCStatus from "./footer-items/RTCStatus.svelte";
+  import LspStatus from "./footer-items/LspStatus.svelte";
 
   interface Props {
     issueCount?: number;
@@ -52,6 +53,7 @@
 
   <RuntimeSettings onToggle={onExport} />
   <BackendStatus {connectionState} {engineStatus} />
+  <LspStatus />
 
   <div class="mx-auto"></div>
 

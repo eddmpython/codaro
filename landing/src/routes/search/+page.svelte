@@ -1,21 +1,22 @@
 <script>
   import { searchEntries } from "$lib/generated/searchIndex";
 
-  let query = "";
+  let query = $state("");
 
-  $: normalized = query.trim().toLowerCase();
-  $: filtered = normalized
-    ? searchEntries
-        .filter((entry) => `${entry.title} ${entry.description} ${entry.text}`.toLowerCase().includes(normalized))
-        .slice(0, 40)
-    : searchEntries.slice(0, 20);
+  let filtered = $derived.by(() => {
+    const normalized = query.trim().toLowerCase();
+    if (!normalized) return searchEntries.slice(0, 20);
+    return searchEntries
+      .filter((entry) => `${entry.title} ${entry.description} ${entry.text}`.toLowerCase().includes(normalized))
+      .slice(0, 40);
+  });
 </script>
 
 <div class="siteShell">
   <section class="pageHero">
     <div class="badge">Search</div>
-    <h1>Search docs and blog</h1>
-    <p>Static search over generated docs and blog content.</p>
+    <h1>Search</h1>
+    <p>Find docs and blog posts from one place.</p>
   </section>
 
   <section class="pageSection">

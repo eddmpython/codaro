@@ -13,8 +13,25 @@ export interface AppConfig {
   autoDownload: string[];
 }
 
+export interface EditorConfig {
+  autosave: boolean;
+  formatOnSave: boolean;
+  lineLength: number;
+  autocomplete: boolean;
+  keymap: "default" | "vim" | "emacs";
+}
+
+export interface DisplayConfig {
+  width: string;
+  theme: "light" | "dark" | "system";
+  fontSize: number;
+  cellOutputPosition: "above" | "below";
+}
+
 export interface UserConfig {
   runtime: RuntimeConfig;
+  editor: EditorConfig;
+  display: DisplayConfig;
   packageManager: string;
   completionEnabled: boolean;
   chatModel: string | null;
@@ -36,8 +53,25 @@ const defaultAppConfig: AppConfig = {
   autoDownload: []
 };
 
+const defaultEditor: EditorConfig = {
+  autosave: true,
+  formatOnSave: true,
+  lineLength: 79,
+  autocomplete: true,
+  keymap: "default"
+};
+
+const defaultDisplay: DisplayConfig = {
+  width: "normal",
+  theme: "system",
+  fontSize: 14,
+  cellOutputPosition: "below"
+};
+
 const defaultUserConfig: UserConfig = {
   runtime: { ...defaultRuntime },
+  editor: { ...defaultEditor },
+  display: { ...defaultDisplay },
   packageManager: "pip",
   completionEnabled: false,
   chatModel: null,

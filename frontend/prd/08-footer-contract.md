@@ -4,9 +4,22 @@
 
 [Resume from Summary](./10-summary-acceptance-and-copy-plan.md#121-current-state)
 
+Installed asset evidence for this file:
+
+- `./assets/index-CV-Vv3LK.js`
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
 #### 10.0 Footer Item Primitive
 
 Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-item.tsx`
 
@@ -42,6 +55,14 @@ Tooltip contract:
 #### 10.1 Footer Shell
 
 Source:
+
+Installed assets:
+
+- `./assets/index-CV-Vv3LK.js`
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-item.tsx`
@@ -97,6 +118,17 @@ Connecting-kernel gate:
 
 #### 10.2 Footer Developer Panel Button
 
+Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
+
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer.tsx`
+
 Required testid:
 
 - `data-testid="footer-panel"`
@@ -130,6 +162,18 @@ Inner content contract from `footer.tsx`:
   - constant `0`
 
 #### 10.3 Footer Runtime Settings
+
+Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
+
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-items/runtime-settings.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-item.tsx`
 
 Required testid:
 
@@ -248,6 +292,21 @@ Setting rows:
     - `setUserConfig(prev => ({ ...prev, runtime: { ...prev.runtime, auto_reload: option } }))`
 
 #### 10.4 Footer Middle and Right Cluster
+
+Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
+
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-items/machine-stats.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-items/ai-status.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-items/copilot-status.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-items/rtc-status.tsx`
 
 Kiosk label:
 

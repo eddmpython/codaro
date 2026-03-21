@@ -4,9 +4,24 @@
 
 [Resume from Summary](./10-summary-acceptance-and-copy-plan.md#121-current-state)
 
+Installed asset evidence for this file:
+
+- `./assets/error-banner-CAuK5DPN.js`
+- `./assets/share-DdWa0mV7.js`
+- `./assets/useInstallPackage-CO3hLMle.js`
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
 #### 11.0 Shared Banner And Error Primitive
 
 Source:
+
+Installed assets:
+
+- `./assets/error-banner-CAuK5DPN.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/plugins/impl/common/error-banner.tsx`
 
@@ -55,6 +70,13 @@ Source:
 #### 11.1 Feedback Dialog
 
 Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/components/feedback-button.tsx`
 
@@ -125,6 +147,12 @@ Success toast:
 #### 11.2 Backend Health and LSP Health
 
 Backend health source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-items/backend-status.tsx`
 
@@ -203,6 +231,12 @@ Backend health contract:
 
 LSP health source:
 
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-items/lsp-status.tsx`
 
 LSP health contract:
@@ -261,6 +295,13 @@ LSP health contract:
 #### 11.3 Share Static Notebook Dialog
 
 Source:
+
+Installed assets:
+
+- `./assets/share-DdWa0mV7.js`
+- `./assets/edit-page-CTVRcSta.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/actions/useNotebookActions.tsx`
 - `.__marimo_upstream/frontend/src/components/static-html/share-modal.tsx`
@@ -376,6 +417,14 @@ Toast contract:
 #### 11.4 Package Alerts and Install Widgets
 
 Source:
+
+Installed assets:
+
+- `./assets/useInstallPackage-CO3hLMle.js`
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/package-alert.tsx`
 

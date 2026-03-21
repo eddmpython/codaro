@@ -5,6 +5,7 @@
     ChevronsDown,
     ChevronsUp,
     Code2,
+    Eye,
     EyeOff,
     GripVertical,
     MoreHorizontal,
@@ -87,6 +88,7 @@
   let elapsedTimeMs = $derived(block.execution?.elapsedTimeMs ?? null);
   let cellClasses = $derived(
     [
+      "group",
       "marimo-cell",
       "hover-actions-parent",
       "interactive",
@@ -94,12 +96,15 @@
       needsRun ? "needs-run" : "",
       status === "error" ? "has-error" : "",
       status === "stopped" ? "stopped" : "",
-      block.type === "markdown" && !block.content.trim() ? "borderless" : ""
+      block.type === "markdown" && !block.content.trim() ? "borderless" : "",
+      active && status !== "error" ? "ring-2 ring-primary/50" : "",
+      status === "error" ? "ring-2 ring-destructive/50" : ""
     ].filter(Boolean).join(" ")
   );
 
   let actionsOpen = $state(false);
   let actionsSearch = $state("");
+  let codeHidden = $state(false);
 
   interface CellAction {
     label: string;
@@ -280,31 +285,72 @@
         </div>
       </div>
 
-      <!-- Code Editor -->
-      {#if block.type === "code"}
-        <CodeEditor
-          value={block.content}
-          {onChange}
-          {onRun}
-          {onRunAndNewBelow}
-          {onRunAll}
-          onCreateAbove={onAddAbove}
-          onCreateBelow={onAddBelow}
-          onDeleteCell={onDelete}
-          {onMoveUp}
-          {onMoveDown}
-          {onToggleType}
-          {onFocusUp}
-          {onFocusDown}
-          {onHideCode}
-        />
-      {:else}
-        <CodeEditor value={block.content} {onChange} />
-        <div class="markdown-divider"></div>
-        <div class="markdown-preview-shell">
-          <MarkdownBlock value={block.content} active={active} onChange={onChange} />
-        </div>
-      {/if}
+      <!-- Editor overlay buttons (language toggle + hide code) -->
+      <div class="relative">
+        <!-- Language Toggle Button -->
+        <button
+          type="button"
+          data-testid="language-toggle-button"
+          class="absolute top-1 left-1 z-10 px-1.5 py-0.5 text-[10px] font-mono rounded opacity-0 group-hover:opacity-70 hover:!opacity-100 transition-opacity bg-background border border-border cursor-pointer"
+          onclick={(e) => { e.stopPropagation(); onToggleType(); }}
+          aria-label="Toggle cell type"
+        >
+          {block.type === "code" ? "Py" : "Md"}
+        </button>
+
+        <!-- Hide Code Button -->
+        <button
+          type="button"
+          data-testid="cell-hide-code-button"
+          class="absolute top-1 right-8 z-10 opacity-0 group-hover:opacity-70 hover:!opacity-100 transition-opacity p-0.5 rounded bg-background border border-border cursor-pointer"
+          onclick={(e) => { e.stopPropagation(); codeHidden = !codeHidden; }}
+          aria-label={codeHidden ? "Show code" : "Hide code"}
+        >
+          {#if codeHidden}
+            <Eye class="size-3" />
+          {:else}
+            <EyeOff class="size-3" />
+          {/if}
+        </button>
+
+        <!-- Code Editor -->
+        {#if block.type === "code"}
+          {#if codeHidden}
+            <div class="code-hidden-bar">
+              <span class="text-[10px] font-mono text-muted-foreground px-2 py-1">{block.type === "code" ? "Py" : "Md"}</span>
+            </div>
+          {:else}
+            <CodeEditor
+              value={block.content}
+              {onChange}
+              {onRun}
+              {onRunAndNewBelow}
+              {onRunAll}
+              onCreateAbove={onAddAbove}
+              onCreateBelow={onAddBelow}
+              onDeleteCell={onDelete}
+              {onMoveUp}
+              {onMoveDown}
+              {onToggleType}
+              {onFocusUp}
+              {onFocusDown}
+              {onHideCode}
+            />
+          {/if}
+        {:else}
+          {#if codeHidden}
+            <div class="code-hidden-bar">
+              <span class="text-[10px] font-mono text-muted-foreground px-2 py-1">Md</span>
+            </div>
+          {:else}
+            <CodeEditor value={block.content} {onChange} />
+          {/if}
+          <div class="markdown-divider"></div>
+          <div class="markdown-preview-shell">
+            <MarkdownBlock value={block.content} active={active} onChange={onChange} />
+          </div>
+        {/if}
+      </div>
 
       <!-- shoulder-right: status + drag handle -->
       <div class="shoulder-right z-20">
@@ -726,6 +772,15 @@
     text-align: center;
     font-size: 0.8125rem;
     color: var(--muted-foreground);
+  }
+
+  .code-hidden-bar {
+    display: flex;
+    align-items: center;
+    height: 24px;
+    background: var(--muted, var(--gray-2, #f5f5f5));
+    border-radius: 8px;
+    margin: 2px;
   }
 
   :global(#App.disconnected) .marimo-cell,

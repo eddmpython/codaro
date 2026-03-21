@@ -9,6 +9,7 @@ const projectRoot = resolve(__dirname, "..", "..");
 const blogRoot = resolve(projectRoot, "blog");
 const docsRoot = resolve(projectRoot, "docs");
 const generatedRoot = resolve(projectRoot, "landing", "src", "lib", "generated");
+const basePath = process.env.NODE_ENV === "development" ? "" : "/codaro";
 
 const blogCategoryMeta = new Map([
   ["01-product-and-runtime", { slug: "product-and-runtime", label: "Product and Runtime" }],
@@ -77,7 +78,7 @@ function collectBlogPosts() {
       }
       const previewValue = String(fileMeta.cardPreview);
       const cardPreview = previewValue.startsWith("./assets/")
-        ? `/blog/assets/${previewValue.split("/").pop()}`
+        ? `${basePath}/blog/assets/${previewValue.split("/").pop()}`
         : previewValue;
       posts.push({
         slug,
@@ -87,13 +88,13 @@ function collectBlogPosts() {
         category: String(fileMeta.category),
         categoryLabel: categoryMeta.label,
         categoryFolder: categoryEntry.name,
-        categoryPath: `/blog/category/${String(fileMeta.category)}`,
+        categoryPath: `${basePath}/blog/category/${String(fileMeta.category)}`,
         series: String(fileMeta.series),
         seriesOrder: Number(fileMeta.seriesOrder),
-        thumbnail: String(fileMeta.thumbnail),
+        thumbnail: `${basePath}${String(fileMeta.thumbnail)}`,
         cardPreview,
         draft: Boolean(fileMeta.draft),
-        url: `/blog/${slug}`,
+        url: `${basePath}/blog/${slug}`,
         html: marked.parse(parsed.content),
         text: stripMarkdown(parsed.content),
       });
@@ -155,7 +156,7 @@ function collectDocsPages() {
       sectionLabel: docsSectionMeta.get(String(fileMeta.section)) || String(fileMeta.section),
       order: Number(fileMeta.order),
       draft: Boolean(fileMeta.draft),
-      url: path ? `/docs/${path}` : "/docs",
+      url: path ? `${basePath}/docs/${path}` : `${basePath}/docs`,
       html: marked.parse(parsed.content),
       text: stripMarkdown(parsed.content),
     });

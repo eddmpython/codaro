@@ -4,9 +4,29 @@
 
 [Resume from Summary](./10-summary-acceptance-and-copy-plan.md#121-current-state)
 
+Installed asset evidence for this file:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/panels-BfLG6GHU.js`
+- `./assets/file-explorer-panel-DclnBp04.js`
+- `./assets/dependency-graph-panel-Cg4IqU-y.js`
+- `./assets/chat-panel-CYOmGmIc.js`
+- `./assets/agent-panel-DFVcMxMV.js`
+- `./assets/terminal-D7RRO5NO.js`
+- `./assets/panels-B4E3DsXP.css`
+- `./assets/dependency-graph-panel-DZccg5W0.css`
+- `./assets/terminal-ByuMlBP_.css`
+
 #### 5.1 Left Chrome Rail
 
 Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/sidebar.tsx`
 - `.__marimo_upstream/frontend/src/components/ui/reorderable-list.tsx`
@@ -138,6 +158,14 @@ Running indicator contract:
 
 Source:
 
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/panels-BfLG6GHU.js`
+- `./assets/panels-B4E3DsXP.css`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/app-chrome.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/sidebar/sidebar.css`
 
@@ -201,6 +229,13 @@ Header title branch:
 
 Source:
 
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+- `./assets/panels-B4E3DsXP.css`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/components.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/empty-state.tsx`
 
@@ -257,6 +292,13 @@ Source:
 #### 5.2.1 Files Panel Body
 
 Source:
+
+Installed assets:
+
+- `./assets/file-explorer-panel-DclnBp04.js`
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/file-explorer-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/file-tree/file-explorer.tsx`
@@ -718,6 +760,12 @@ Local upload and drop contract:
 
 Source:
 
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/datasources-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/app-chrome.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/session-panel.tsx`
@@ -932,6 +980,13 @@ Declared and used-by cell affordances:
 #### 5.2.3 Dependencies Panel Body
 
 Source:
+
+Installed assets:
+
+- `./assets/dependency-graph-panel-Cg4IqU-y.js`
+- `./assets/dependency-graph-panel-DZccg5W0.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/dependency-graph-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/dependency-graph/dependency-graph.tsx`
@@ -1280,6 +1335,12 @@ Graph interaction contract:
 
 Source:
 
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/documentation-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/empty-state.tsx`
 - `.__marimo_upstream/frontend/src/documentation.css`
@@ -1316,6 +1377,12 @@ Non-empty body:
 #### 5.2.5 Outline Panel Body
 
 Source:
+
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/outline-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/outline/floating-outline.tsx`
@@ -1415,6 +1482,12 @@ Active-outline hook contract:
 #### 5.2.6 Packages Panel Body
 
 Source:
+
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/packages-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/packages-utils.ts`
@@ -1572,6 +1645,12 @@ Tree branch:
 
 Source:
 
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/snippets-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/components/contribute-snippet-button.tsx`
 
@@ -1666,6 +1745,13 @@ Snippet insertion controls:
 #### 5.2.8 AI Chat Panel Body
 
 Source:
+
+Installed assets:
+
+- `./assets/chat-panel-CYOmGmIc.js`
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/chat/chat-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/chat-history-popover.tsx`
@@ -2007,6 +2093,13 @@ Footer button primitives from `chat-components.tsx`:
 #### 5.2.9 AI Agent Panel Body
 
 Source:
+
+Installed assets:
+
+- `./assets/agent-panel-DFVcMxMV.js`
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/chat/acp/agent-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/chat/acp/agent-selector.tsx`
@@ -2572,6 +2665,20 @@ Tool call accordion:
 
 #### 5.3 Developer Panel
 
+Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/panels-B4E3DsXP.css`
+
+Readable source:
+
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/app-chrome.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/app-chrome.css`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-items/backend-status.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/footer-items/lsp-status.tsx`
+
 Panel identity:
 
 - `id="app-chrome-panel"`
@@ -2675,6 +2782,12 @@ Panel body wrapper:
 
 Source:
 
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/error-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/empty-state.tsx`
 
@@ -2704,6 +2817,12 @@ Per-cell error block:
 #### 5.3.2 Scratchpad Panel Body
 
 Source:
+
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/scratchpad-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/scratchpad/scratchpad.tsx`
@@ -2839,6 +2958,12 @@ Main split layout:
 #### 5.3.3 Tracing Panel Body
 
 Source:
+
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/tracing-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/tracing/tracing.tsx`
@@ -2995,6 +3120,12 @@ Hovered cell detail list:
 
 Source:
 
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/secrets-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/write-secret-modal.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/empty-state.tsx`
@@ -3110,6 +3241,12 @@ Add Secret modal:
 
 Source:
 
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/logs-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/empty-state.tsx`
 
@@ -3176,6 +3313,13 @@ Rendered log fragment order:
 #### 5.3.6 Terminal Panel Body
 
 Source:
+
+Installed assets:
+
+- `./assets/terminal-D7RRO5NO.js`
+- `./assets/terminal-ByuMlBP_.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/terminal/terminal.tsx`
 - `.__marimo_upstream/frontend/src/components/terminal/state.ts`
@@ -3304,6 +3448,12 @@ WebSocket and lifecycle:
 #### 5.3.7 Cache Panel Body
 
 Source:
+
+Installed assets:
+
+- `./assets/panels-BfLG6GHU.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/cache-panel.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/panels/empty-state.tsx`
@@ -3449,6 +3599,14 @@ Purge flow:
 #### 5.4 Chrome Layout Persistence and Panel Architecture
 
 Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/panels-BfLG6GHU.js`
+- `./assets/panels-B4E3DsXP.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/app-chrome.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/app-chrome.css`

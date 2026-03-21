@@ -1,32 +1,40 @@
 <script lang="ts">
-  import { PowerOff, Settings } from "lucide-svelte";
+  import AppConfigButton from "../dialogs/AppConfigButton.svelte";
+  import NotebookMenuDropdown from "./NotebookMenuDropdown.svelte";
+  import ShutdownButton from "../dialogs/ShutdownButton.svelte";
 
   interface Props {
     connectionState: string;
+    onExport?: () => void;
+    onNewNotebook?: () => void;
+    onDuplicate?: () => void;
+    onShareStatic?: () => void;
+    onSettings?: () => void;
+    version?: string;
   }
 
-  let { connectionState }: Props = $props();
-
-  const floatingButtonBase =
-    "flex items-center justify-center m-0 leading-none font-medium border border-foreground/10 shadow-xs-solid active:shadow-none dark:border-border text-sm mo-button";
-  const floatingCircle = `${floatingButtonBase} rounded-full px-2 py-2`;
+  let {
+    connectionState,
+    onExport,
+    onNewNotebook,
+    onDuplicate,
+    onShareStatic,
+    onSettings,
+    version = "0.21.0"
+  }: Props = $props();
 </script>
 
 {#if connectionState !== "CLOSED"}
   <div class="absolute top-3 right-5 m-0 flex items-center gap-2 min-h-[28px] print:hidden pointer-events-auto z-30">
-    <button
-      class="{floatingCircle} gray"
-      data-state="closed"
-      aria-label="App config"
-    >
-      <Settings size={14} strokeWidth={1.5} />
-    </button>
-    <button
-      class="{floatingCircle} gray"
-      data-state="closed"
-      aria-label="Shutdown"
-    >
-      <PowerOff size={14} strokeWidth={1.5} />
-    </button>
+    <NotebookMenuDropdown
+      {onExport}
+      {onNewNotebook}
+      {onDuplicate}
+      {onShareStatic}
+      {onSettings}
+      {version}
+    />
+    <AppConfigButton />
+    <ShutdownButton {connectionState} />
   </div>
 {/if}

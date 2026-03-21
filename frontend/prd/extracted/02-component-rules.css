@@ -1,0 +1,1784 @@
+/* ============================================================
+   02-component-rules.css
+   Extracted from marimo index-CVpJvEAO.css (361 KB)
+   Non-tailwind, non-theme component/custom CSS rules
+   ============================================================ */
+
+/* ============================================================
+   1. marimo- selectors
+   (95 rules)
+   ============================================================ */
+
+.marimo-cell {
+  border:1px solid var(--gray-4);
+  max-width:inherit;
+  border-radius:10px;
+  width:100%;
+  position:relative;
+}
+
+:where(.marimo-cell>:not(:last-child)) {
+  --tw-divide-y-reverse:0;
+  border-bottom-style:var(--tw-border-style);
+  border-bottom-width:calc(1px*(1 - var(--tw-divide-y-reverse)));
+  border-color:var(--gray-5);
+  border-top-style:var(--tw-border-style);
+  border-top-width:calc(1px*var(--tw-divide-y-reverse));
+}
+
+.marimo-cell:hover {
+  border-color:var(--gray-6);
+}
+
+.marimo-cell:focus-visible {
+  outline:none;
+}
+
+.marimo-cell:has(.mo-ai-generated-cell):before {
+  box-shadow:0 0 10px 0 var(--cyan-9);
+  content:"";
+  opacity:.5;
+  pointer-events:none;
+  z-index:1;
+  border-radius:10px;
+  position:absolute;
+  inset:0;
+}
+
+.marimo-cell:has(.mo-ai-generated-cell.mo-ai-setup-cell):before {
+  border-radius:2px;
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell) {
+  opacity:.7;
+  position:relative;
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell) .cm,.marimo-cell:has(.mo-ai-deleted-cell) .cm-gutters,.marimo-cell:has(.mo-ai-deleted-cell) .output-area {
+  background-color:var(--red-2);
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell):before {
+  box-shadow:0 0 10px 0 var(--red-9);
+  content:"";
+  opacity:.6;
+  pointer-events:none;
+  z-index:1;
+  border-radius:10px;
+  position:absolute;
+  inset:0;
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell) .cm-content {
+  text-decoration:line-through;
+  -webkit-text-decoration-color:var(--red-9);
+  text-decoration-color:var(--red-9);
+  text-decoration-thickness:1px;
+}
+
+.marimo-cell:focus-within {
+  z-index:20;
+}
+
+.marimo-cell:hover {
+  z-index:30;
+}
+
+.marimo-cell.interactive .console-output-area,.marimo-cell.interactive .output-area {
+  max-height:610px;
+  overflow:auto;
+}
+
+.marimo-cell.interactive .output-area:has(>.output>marimo-ui-element>marimo-table) {
+  max-height:none;
+  overflow:hidden;
+}
+
+.marimo-cell.interactive>:first-child {
+  border-top-left-radius:9px;
+  border-top-right-radius:9px;
+}
+
+.marimo-cell.interactive>:last-child {
+  border-bottom-right-radius:9px;
+  border-bottom-left-radius:9px;
+}
+
+.marimo-cell.interactive:focus-within {
+  --tw-shadow:4px 4px 0px 0px var(--tw-shadow-color,var(--base-shadow-darker)),0 0px 2px 0px var(--tw-shadow-color,#99999980);
+  box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);
+  --tw-shadow-color:var(--base-shadow);
+}
+
+.marimo-cell.interactive:focus-within {
+  --tw-shadow-color:color-mix(in oklab,var(--base-shadow)var(--tw-shadow-alpha),transparent);
+}
+
+.marimo-cell.interactive .cm {
+  border-radius:8px;
+}
+
+.marimo-cell>*~[data-hidden=true],.marimo-cell>[data-hidden=true]~* {
+  border-top:none;
+}
+
+:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .cm,:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .cm-gutters,:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .output-area {
+  background-color:var(--gray-2);
+  opacity:.5;
+}
+
+:is(.marimo-cell.disabled,.marimo-cell.disabled.has-error,.marimo-cell.disabled:hover,.marimo-cell.disabled.has-error:hover) .cm,:is(.marimo-cell.disabled,.marimo-cell.disabled.has-error,.marimo-cell.disabled:hover,.marimo-cell.disabled.has-error:hover) .cm-gutters,:is(.marimo-cell.disabled,.marimo-cell.disabled.has-error,.marimo-cell.disabled:hover,.marimo-cell.disabled.has-error:hover) .output-area {
+  background-color:var(--gray-1);
+  opacity:.5;
+}
+
+.marimo-cell.disabled:hover {
+  border-color:var(--gray-6);
+}
+
+:where(:is(.marimo-cell.has-error:not(.needs-run),.marimo-cell.error-outline)>:not(:last-child)) {
+  border-color:var(--error);
+}
+
+:where(:is(.marimo-cell.has-error:not(.needs-run),.marimo-cell.error-outline)>:not(:last-child)) {
+  border-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)20%,transparent);
+}
+
+.marimo-cell.error-outline,.marimo-cell.has-error:not(.needs-run) {
+  border-color:var(--error);
+  border-style:var(--tw-border-style);
+  border-width:1px;
+}
+
+.marimo-cell.error-outline,.marimo-cell.has-error:not(.needs-run) {
+  border-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)20%,transparent);
+}
+
+.marimo-cell.error-outline,.marimo-cell.has-error:not(.needs-run) {
+  outline-color:var(--error);
+  outline-style:var(--tw-outline-style);
+  outline-width:1px;
+}
+
+.marimo-cell.error-outline,.marimo-cell.has-error:not(.needs-run) {
+  outline-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)20%,transparent);
+}
+
+.marimo-cell.has-error:not(.needs-run):hover {
+  border-color:var(--error);
+}
+
+.marimo-cell.has-error:not(.needs-run):hover {
+  border-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)30%,transparent);
+}
+
+.marimo-cell.has-error:not(.needs-run):hover {
+  outline-color:var(--error);
+}
+
+.marimo-cell.has-error:not(.needs-run):hover {
+  outline-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)30%,transparent);
+}
+
+:where(.marimo-cell.has-error:not(.needs-run):focus-within>:not(:last-child)) {
+  border-color:var(--error);
+}
+
+:where(.marimo-cell.has-error:not(.needs-run):focus-within>:not(:last-child)) {
+  border-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)20%,transparent);
+}
+
+.marimo-cell.has-error:not(.needs-run):focus-within {
+  border-style:var(--tw-border-style);
+  --tw-shadow:4px 4px 0px 0px var(--tw-shadow-color,var(--base-shadow-darker)),0 0px 2px 0px var(--tw-shadow-color,#99999980);
+  box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);
+  --tw-shadow-color:var(--error);
+  border-width:1px;
+}
+
+.marimo-cell.has-error:not(.needs-run):focus-within {
+  --tw-shadow-color:color-mix(in oklab,color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)20%,transparent)var(--tw-shadow-alpha),transparent);
+}
+
+.marimo-cell.has-error:not(.needs-run):focus-within {
+  outline-style:var(--tw-outline-style);
+  outline-width:0;
+}
+
+.marimo-cell.error-outline,.marimo-cell.error-outline:focus-within {
+  box-shadow:8px 8px 0 0 var(--error);
+}
+
+.marimo-cell.error-outline,.marimo-cell.error-outline:focus-within {
+  box-shadow:8px 8px 0 0 color-mix(in srgb,var(--error),transparent 80%);
+}
+
+.marimo-cell.error-outline,.marimo-cell.error-outline:focus-within {
+  background-color:var(--red-2);
+}
+
+:where(.marimo-cell.needs-run>:not(:last-child)) {
+  border-color:var(--stale);
+}
+
+.marimo-cell.needs-run {
+  border-color:var(--stale);
+  border-style:var(--tw-border-style);
+  outline-color:var(--stale);
+  outline-style:var(--tw-outline-style);
+  border-width:1px;
+  outline-width:1px;
+}
+
+.marimo-cell.needs-run:hover {
+  border-color:var(--action-foreground);
+}
+
+.marimo-cell.needs-run:hover {
+  border-color:color-mix(in oklab,color-mix(in srgb,var(--action-foreground),transparent 0%)30%,transparent);
+}
+
+.marimo-cell.needs-run:hover {
+  outline-color:var(--action-foreground);
+}
+
+.marimo-cell.needs-run:hover {
+  outline-color:color-mix(in oklab,color-mix(in srgb,var(--action-foreground),transparent 0%)30%,transparent);
+}
+
+:where(.marimo-cell.needs-run:focus-within>:not(:last-child)) {
+  border-color:var(--stale);
+}
+
+.marimo-cell.needs-run:focus-within {
+  border-style:var(--tw-border-style);
+  --tw-shadow:4px 4px 0px 0px var(--tw-shadow-color,var(--base-shadow-darker)),0 0px 2px 0px var(--tw-shadow-color,#99999980);
+  box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);
+  --tw-shadow-color:var(--stale);
+  border-width:1px;
+}
+
+.marimo-cell.needs-run:focus-within {
+  --tw-shadow-color:color-mix(in oklab,var(--stale)var(--tw-shadow-alpha),transparent);
+}
+
+.marimo-cell.needs-run:focus-within {
+  outline-style:var(--tw-outline-style);
+  outline-width:0;
+}
+
+.marimo-cell.needs-run:focus-within .cm-editor {
+  border:1px solid #0000;
+}
+
+.marimo-cell.needs-run .RunButton {
+  visibility:visible;
+}
+
+.marimo-cell.focus-outline {
+  --tw-shadow:5px 6px 4px 0px var(--tw-shadow-color,var(--base-shadow)),0 0px 4px 0px var(--tw-shadow-color,hsl(0 0% 75%/var(--base-shadow-opacity)));
+  box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);
+  transition:all .6s;
+  border-color:var(--blue-8)!important;
+}
+
+.marimo-cell.published {
+  box-shadow:none;
+  border:none;
+}
+
+.marimo-cell.published .output-area {
+  box-shadow:none;
+  border:none;
+  padding-top:0;
+  padding-bottom:0;
+  display:block;
+  overflow:visible;
+}
+
+.marimo-cell.published:hover {
+  box-shadow:none;
+  border:none;
+}
+
+.marimo-cell.published:focus-within {
+  transform:none;
+}
+
+.marimo-cell.borderless {
+  border-color:#0000;
+}
+
+.marimo-cell.borderless>* {
+  border-bottom:none;
+}
+
+.marimo-cell.borderless:focus {
+  border:1px solid var(--gray-4);
+}
+
+.marimo-cell .shoulder-right {
+  flex-direction:column;
+  justify-content:flex-end;
+  gap:4px;
+  width:fit-content;
+  height:100%;
+  display:inline-flex;
+  position:absolute;
+  left:calc(100% + 12px);
+}
+
+.marimo-cell .shoulder-bottom {
+  position:absolute;
+  bottom:-2px;
+  right:2px;
+}
+
+.marimo-cell {
+  background-color:var(--background);
+}
+
+.marimo-cell {
+  background-color:color-mix(in srgb,var(--background),transparent 0%);
+}
+
+.dark .marimo-cell {
+  border-color:var(--border);
+}
+
+.dark .marimo-cell {
+  border-color:color-mix(in srgb,var(--border),transparent 0%);
+}
+
+.dark .marimo-cell:hover {
+  border:1px solid var(--gray-9);
+}
+
+.dark .marimo-cell.needs-run:hover {
+  border-color:var(--action-foreground);
+}
+
+.dark .marimo-cell.needs-run:hover {
+  border-color:color-mix(in oklab,color-mix(in srgb,var(--action-foreground),transparent 0%)30%,transparent);
+}
+
+.dark .marimo-cell.needs-run:hover {
+  outline-color:var(--action-foreground);
+}
+
+.dark .marimo-cell.needs-run:hover {
+  outline-color:color-mix(in oklab,color-mix(in srgb,var(--action-foreground),transparent 0%)30%,transparent);
+}
+
+.dark .marimo-cell.has-error:hover {
+  border-color:var(--error);
+}
+
+.dark .marimo-cell.has-error:hover {
+  border-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)30%,transparent);
+}
+
+.dark .marimo-cell.has-error:hover {
+  outline-color:var(--error);
+}
+
+.dark .marimo-cell.has-error:hover {
+  outline-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)30%,transparent);
+}
+
+.dark .marimo-cell.borderless {
+  border-color:#0000;
+}
+
+.dark .marimo-cell.borderless>* {
+  border-bottom:none;
+}
+
+.dark .marimo-cell.borderless:hover {
+  border:1px solid var(--gray-4);
+}
+
+.dark .marimo-cell.published {
+  border:none;
+}
+
+.dark .marimo-cell.published:hover {
+  box-shadow:none;
+  border:none;
+}
+
+#App.disconnected .cm .cm-gutters,#App.disconnected .console-output-area,#App.disconnected .marimo-cell,#App.disconnected .marimo-cell .cm-editor.cm-focused .cm-activeLine,#App.disconnected .marimo-cell .cm-editor.cm-focused .cm-activeLineGutter,#App.disconnected .marimo-cell .shoulder-button {
+  background-color:#0000;
+}
+
+.marimo-cell.is-moving .tray:after,.marimo-cell.is-moving .tray:before {
+  display:none;
+}
+
+.marimo-cell .cm-editor {
+  border:1px solid #0000;
+  padding:3px 24px 3px 3px;
+}
+
+.marimo-cell .cm-editor.cm-focused .cm-activeLineGutter {
+  background:#e2f2ff;
+}
+
+.marimo-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
+  background:#0080ff08;
+}
+
+.marimo-cell .cm-editor .cm-activeLine:not(.cm-error-line) {
+  background:0 0;
+  border-radius:2px;
+}
+
+.marimo-cell .cm-editor .cm-activeLineGutter {
+  background:0 0;
+}
+
+.marimo-cell .cm-editor .cm-content {
+  font-family:var(--monospace-font);
+  font-size:var(--marimo-code-editor-font-size,.9rem);
+}
+
+.dark .marimo-cell .cm-editor.cm-focused .cm-activeLineGutter {
+  background:#0e1e25;
+}
+
+.dark .marimo-cell .cm-editor.cm-focused .cm-activeLine {
+  background:#00050a33;
+}
+
+.marimo-cell.stale .console-output-area.marimo-output-stale,.marimo-cell.stale .output-area.marimo-output-stale,.marimo-output-stale {
+  filter:grayscale(50%);
+  opacity:.8;
+  transition:all .3s .2s;
+}
+
+.marimo-cell.stale .console-output-area.marimo-output-stale.marimo-output-loading,.marimo-cell.stale .output-area.marimo-output-stale.marimo-output-loading,.marimo-output-stale.marimo-output-loading {
+  filter:grayscale(50%);
+  opacity:.4;
+  transition:all .3s .2s;
+}
+
+.marimo-cell .cm-scroller {
+  overflow:visible;
+}
+
+marimo-ui-element {
+  display:contents;
+  &>* {
+    display:contents;
+  }
+}
+
+/* ============================================================
+   2. cell- selectors
+   (2 rules)
+   ============================================================ */
+
+#cell-setup,#cell-setup .cm-editor,#cell-setup .cm-gutter {
+  background-color:var(--gray-2);
+}
+
+#App.disconnected .cell-queued-icon,#App.disconnected .cell-running-icon,#App.disconnected .elapsed-time {
+  visibility:hidden;
+  animation:none;
+}
+
+/* ============================================================
+   3. tray / shoulder / hover-action
+   (12 rules)
+   ============================================================ */
+
+.hover-action:focus,.hover-action:hover,.hover-actions-parent:focus .hover-action,.hover-actions-parent:has([data-state=open]) .hover-action,.hover-actions-parent:hover .hover-action {
+  display:inline-flex!important;
+}
+
+.marimo-cell .shoulder-right {
+  flex-direction:column;
+  justify-content:flex-end;
+  gap:4px;
+  width:fit-content;
+  height:100%;
+  display:inline-flex;
+  position:absolute;
+  left:calc(100% + 12px);
+}
+
+.marimo-cell .shoulder-bottom {
+  position:absolute;
+  bottom:-2px;
+  right:2px;
+}
+
+#App.disconnected .cm .cm-gutters,#App.disconnected .console-output-area,#App.disconnected .marimo-cell,#App.disconnected .marimo-cell .cm-editor.cm-focused .cm-activeLine,#App.disconnected .marimo-cell .cm-editor.cm-focused .cm-activeLineGutter,#App.disconnected .marimo-cell .shoulder-button {
+  background-color:#0000;
+}
+
+.tray {
+  z-index:1;
+  display:flex;
+  position:relative;
+}
+
+.tray[data-has-output-above=false] .cm-editor {
+  border-top-left-radius:9px;
+  border-top-right-radius:9px;
+}
+
+.tray div[data-ai-input-open=true] .cm-editor {
+  border-top-left-radius:0;
+  border-top-right-radius:0;
+}
+
+.tray:last-child .cm-editor {
+  border-bottom-right-radius:9px;
+  border-bottom-left-radius:9px;
+}
+
+.tray:after,.tray:before {
+  content:"";
+  height:100%;
+  max-width:var(--gutter-width);
+  width:var(--gutter-width);
+  position:absolute;
+}
+
+.tray:before {
+  left:calc(var(--gutter-width)*-1);
+}
+
+.tray:after {
+  right:calc(var(--gutter-width)*-1);
+}
+
+.marimo-cell.is-moving .tray:after,.marimo-cell.is-moving .tray:before {
+  display:none;
+}
+
+/* ============================================================
+   4. output-area / output / stdout / stderr / return / console
+   (20 rules)
+   ============================================================ */
+
+.stderr .codehilite .highlight {
+  color:var(--error);
+}
+
+.stderr .codehilite .highlight {
+  color:color-mix(in srgb,var(--error),transparent calc((1 - var(--tw-text-opacity))*100%));
+}
+
+.stderr .codehilite .gt {
+  color:var(--error);
+}
+
+.stderr .codehilite .gt {
+  color:color-mix(in srgb,var(--error),transparent calc((1 - var(--tw-text-opacity))*100%));
+}
+
+.stderr .codehilite .nb {
+  color:var(--sky-8);
+}
+
+.stderr .codehilite .m {
+  color:var(--sky-11);
+}
+
+.stderr .codehilite .bp,.stderr .codehilite .k,.stderr .codehilite .n,.stderr .codehilite .o,.stderr .codehilite .p,.stderr .codehilite .pm,.stderr .codehilite .w {
+  color:var(--slate-10);
+}
+
+.stderr .codehilite .x {
+  color:var(--red-9);
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell) .cm,.marimo-cell:has(.mo-ai-deleted-cell) .cm-gutters,.marimo-cell:has(.mo-ai-deleted-cell) .output-area {
+  background-color:var(--red-2);
+}
+
+.marimo-cell.interactive .console-output-area,.marimo-cell.interactive .output-area {
+  max-height:610px;
+  overflow:auto;
+}
+
+.marimo-cell.interactive .output-area:has(>.output>marimo-ui-element>marimo-table) {
+  max-height:none;
+  overflow:hidden;
+}
+
+:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .cm,:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .cm-gutters,:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .output-area {
+  background-color:var(--gray-2);
+  opacity:.5;
+}
+
+:is(.marimo-cell.disabled,.marimo-cell.disabled.has-error,.marimo-cell.disabled:hover,.marimo-cell.disabled.has-error:hover) .cm,:is(.marimo-cell.disabled,.marimo-cell.disabled.has-error,.marimo-cell.disabled:hover,.marimo-cell.disabled.has-error:hover) .cm-gutters,:is(.marimo-cell.disabled,.marimo-cell.disabled.has-error,.marimo-cell.disabled:hover,.marimo-cell.disabled.has-error:hover) .output-area {
+  background-color:var(--gray-1);
+  opacity:.5;
+}
+
+.marimo-cell.published .output-area {
+  box-shadow:none;
+  border:none;
+  padding-top:0;
+  padding-bottom:0;
+  display:block;
+  overflow:visible;
+}
+
+#App.disconnected .cm .cm-gutters,#App.disconnected .console-output-area,#App.disconnected .marimo-cell,#App.disconnected .marimo-cell .cm-editor.cm-focused .cm-activeLine,#App.disconnected .marimo-cell .cm-editor.cm-focused .cm-activeLineGutter,#App.disconnected .marimo-cell .shoulder-button {
+  background-color:#0000;
+}
+
+#App.disconnected .console-output-area {
+  border-color:#0000;
+}
+
+.output-area {
+  clear:both;
+  max-width:inherit;
+  width:100%;
+  padding:1rem;
+  display:flow-root;
+  overflow:auto;
+}
+
+.marimo-cell.stale .console-output-area.marimo-output-stale,.marimo-cell.stale .output-area.marimo-output-stale,.marimo-output-stale {
+  filter:grayscale(50%);
+  opacity:.8;
+  transition:all .3s .2s;
+}
+
+.marimo-cell.stale .console-output-area.marimo-output-stale.marimo-output-loading,.marimo-cell.stale .output-area.marimo-output-stale.marimo-output-loading,.marimo-output-stale.marimo-output-loading {
+  filter:grayscale(50%);
+  opacity:.4;
+  transition:all .3s .2s;
+}
+
+.console-output-area {
+  background-color:var(--gray-1);
+}
+
+/* ============================================================
+   5. cm-panels / resize-handle
+   (3 rules)
+   ============================================================ */
+
+.\[\&_\.cm-panels\]\:hidden .cm-panels {
+  display:none;
+}
+
+.cm .cm-panels {
+  background-color:var(--cm-background);
+  color:var(--sky-11);
+  font-size:var(--text-xs,.75rem);
+  font-weight:700;
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+  margin-right:30px;
+}
+
+.cm .cm-panels.cm-panels-bottom {
+  border-top:1px solid var(--border);
+}
+
+/* ============================================================
+   6. notebook / app-scroll / app-width / shell
+   (0 rules)
+   ============================================================ */
+
+/* ============================================================
+   7. CodeMirror overrides
+   (157 rules)
+   ============================================================ */
+
+.\[\&\>\.cm-editor\]\:pr-0>.cm-editor {
+  padding-right:calc(var(--spacing,.25rem)*0);
+}
+
+.\[\&\>div\.cm-editor\]\:h-full>div.cm-editor {
+  height:100%;
+}
+
+.\[\&\>div\.cm-editor\]\:overflow-hidden>div.cm-editor {
+  overflow:hidden;
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell) .cm,.marimo-cell:has(.mo-ai-deleted-cell) .cm-gutters,.marimo-cell:has(.mo-ai-deleted-cell) .output-area {
+  background-color:var(--red-2);
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell) .cm-content {
+  text-decoration:line-through;
+  -webkit-text-decoration-color:var(--red-9);
+  text-decoration-color:var(--red-9);
+  text-decoration-thickness:1px;
+}
+
+:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .cm,:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .cm-gutters,:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .output-area {
+  background-color:var(--gray-2);
+  opacity:.5;
+}
+
+:is(.marimo-cell.disabled,.marimo-cell.disabled.has-error,.marimo-cell.disabled:hover,.marimo-cell.disabled.has-error:hover) .cm,:is(.marimo-cell.disabled,.marimo-cell.disabled.has-error,.marimo-cell.disabled:hover,.marimo-cell.disabled.has-error:hover) .cm-gutters,:is(.marimo-cell.disabled,.marimo-cell.disabled.has-error,.marimo-cell.disabled:hover,.marimo-cell.disabled.has-error:hover) .output-area {
+  background-color:var(--gray-1);
+  opacity:.5;
+}
+
+.marimo-cell.needs-run:focus-within .cm-editor {
+  border:1px solid #0000;
+}
+
+#cell-setup,#cell-setup .cm-editor,#cell-setup .cm-gutter {
+  background-color:var(--gray-2);
+}
+
+#App.disconnected .cm .cm-gutters,#App.disconnected .console-output-area,#App.disconnected .marimo-cell,#App.disconnected .marimo-cell .cm-editor.cm-focused .cm-activeLine,#App.disconnected .marimo-cell .cm-editor.cm-focused .cm-activeLineGutter,#App.disconnected .marimo-cell .shoulder-button {
+  background-color:#0000;
+}
+
+.tray[data-has-output-above=false] .cm-editor {
+  border-top-left-radius:9px;
+  border-top-right-radius:9px;
+}
+
+.tray div[data-ai-input-open=true] .cm-editor {
+  border-top-left-radius:0;
+  border-top-right-radius:0;
+}
+
+.tray:last-child .cm-editor {
+  border-bottom-right-radius:9px;
+  border-bottom-left-radius:9px;
+}
+
+.cm {
+  width:100%;
+}
+
+.cm-editor,.cm-lineNumbers {
+  font-size:var(--marimo-code-editor-font-size,.9rem);
+}
+
+.marimo-cell .cm-editor {
+  border:1px solid #0000;
+  padding:3px 24px 3px 3px;
+}
+
+.marimo-cell .cm-editor.cm-focused .cm-activeLineGutter {
+  background:#e2f2ff;
+}
+
+.marimo-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
+  background:#0080ff08;
+}
+
+.marimo-cell .cm-editor .cm-activeLine:not(.cm-error-line) {
+  background:0 0;
+  border-radius:2px;
+}
+
+.marimo-cell .cm-editor .cm-activeLineGutter {
+  background:0 0;
+}
+
+.marimo-cell .cm-editor .cm-content {
+  font-family:var(--monospace-font);
+  font-size:var(--marimo-code-editor-font-size,.9rem);
+}
+
+.dark .marimo-cell .cm-editor.cm-focused .cm-activeLineGutter {
+  background:#0e1e25;
+}
+
+.dark .marimo-cell .cm-editor.cm-focused .cm-activeLine {
+  background:#00050a33;
+}
+
+.light .cm-selectionBackground {
+  background-color:#d7d4f0!important;
+}
+
+.dark .cm-selectionBackground {
+  background-color:#1177cc80!important;
+}
+
+.cm-focused.cm-focused {
+  outline:none;
+}
+
+.cm .cm-gutters {
+  background-color:var(--background);
+}
+
+.cm .cm-gutters {
+  background-color:color-mix(in srgb,var(--background),transparent 0%);
+}
+
+.cm .cm-gutters {
+  color:var(--gray-10);
+  font-size:.75rem;
+}
+
+.dark .cm .cm-gutters {
+  background-color:#0000;
+}
+
+.marimo-cell .cm-scroller {
+  overflow:visible;
+}
+
+#root .cm-tooltip {
+  border-color:var(--border);
+  z-index:1000;
+  border-radius:4px;
+}
+
+#root .cm-tooltip {
+  border-color:color-mix(in srgb,var(--border),transparent 0%);
+}
+
+#root .cm-tooltip {
+  background-color:var(--popover);
+}
+
+#root .cm-tooltip {
+  background-color:color-mix(in srgb,var(--popover),transparent 0%);
+}
+
+#root .cm-tooltip {
+  --tw-shadow:2px 2px 2px 0px var(--tw-shadow-color,var(--base-shadow)),0px 0px 2px 0px var(--tw-shadow-color,hsl(0 0% 25%/var(--base-shadow-opacity)));
+  box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);
+  --tw-shadow-color:var(--base-shadow);
+}
+
+#root .cm-tooltip {
+  --tw-shadow-color:color-mix(in oklab,var(--base-shadow)var(--tw-shadow-alpha),transparent);
+}
+
+#root .cm-tooltip.cm-completionInfo,#root .cm-tooltip.cm-tooltip-hover,#root .cm-tooltip.mo-cm-tooltip {
+  scrollbar-width:thin;
+  border-radius:4px;
+  max-width:40vw;
+  max-height:45vh;
+  overflow:auto;
+}
+
+#root .cm-tooltip.cm-tooltip-hover {
+  z-index:1000;
+}
+
+.cm .cm-panels {
+  background-color:var(--cm-background);
+  color:var(--sky-11);
+  font-size:var(--text-xs,.75rem);
+  font-weight:700;
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+  margin-right:30px;
+}
+
+.cm .cm-panels.cm-panels-bottom {
+  border-top:1px solid var(--border);
+}
+
+.cm-tooltip-lint {
+  font-size:var(--text-sm,.875rem);
+  line-height:var(--tw-leading,var(--text-sm--line-height,1.42857));
+}
+
+.cm-tooltip-lint code {
+  border-color:var(--border);
+  border-radius:calc(var(--radius) - 2px);
+  border-style:var(--tw-border-style);
+  border-width:1px;
+}
+
+.cm-tooltip-lint code {
+  border-color:color-mix(in srgb,var(--border),transparent 0%);
+}
+
+.cm-tooltip-lint code {
+  background-color:var(--muted);
+}
+
+.cm-tooltip-lint code {
+  background-color:color-mix(in srgb,var(--muted),transparent 0%);
+}
+
+.cm-tooltip-lint code {
+  padding-inline:calc(var(--spacing,.25rem)*1);
+}
+
+.cm-tooltip-lint .cm-diagnosticText>div {
+  display:inline-flex;
+}
+
+.cm-ghostText,.cm-ghostText * {
+  cursor:pointer;
+  filter:grayscale(20%);
+  opacity:.6;
+}
+
+.cm-ghostText:hover {
+  background:var(--gray-3);
+}
+
+.cm-codeium-cycle {
+  background-color:var(--sky-3);
+  border-radius:2px;
+}
+
+.cm-codeium-cycle,.cm-codeium-cycle-key {
+  padding:2px;
+  font-size:9px;
+  display:inline-block;
+}
+
+.cm-codeium-cycle-key {
+  background-color:var(--sky-7);
+  border:none;
+  border-radius:2px;
+  margin-left:5px;
+  font-family:monospace;
+}
+
+.cm-codeium-cycle-key:hover {
+  background-color:var(--sky-9);
+}
+
+.cm-codeium-cycle-explanation {
+  padding:2px;
+  font-family:monospace;
+  display:inline-block;
+}
+
+#root .cm-tooltip-autocomplete {
+  border-color:var(--border);
+  border-style:var(--tw-border-style);
+  border-width:1px;
+  max-width:250px;
+}
+
+#root .cm-tooltip-autocomplete {
+  border-color:color-mix(in srgb,var(--border),transparent 0%);
+}
+
+#root .cm-tooltip-autocomplete {
+  background-color:var(--popover);
+}
+
+#root .cm-tooltip-autocomplete {
+  background-color:color-mix(in srgb,var(--popover),transparent 0%);
+}
+
+#root .cm-tooltip-autocomplete {
+  --tw-shadow:4px 4px 4px 0px var(--tw-shadow-color,var(--base-shadow)),0 0px 4px 0px var(--tw-shadow-color,hsl(0 0% 60%/var(--base-shadow-opacity)));
+  box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);
+}
+
+#root .cm-tooltip-autocomplete>ul {
+  max-height:300px;
+  min-width:unset;
+  scrollbar-width:thin;
+  overflow-y:auto;
+}
+
+#root .cm-tooltip-autocomplete>ul>li {
+  cursor:pointer;
+  align-items:center;
+  gap:calc(var(--spacing,.25rem)*2);
+  min-width:60px;
+  height:18px;
+  padding:0 6px 0 0;
+  display:flex;
+}
+
+#root .cm-completionLabel {
+  font-family:var(--monospace-font),ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size:var(--text-xs,.75rem);
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+  padding-top:1px;
+  padding-bottom:1px;
+  padding-right:12px;
+}
+
+#root .cm-completionDetail {
+  text-align:right;
+  flex-grow:1;
+}
+
+#root .cm-tooltip-autocomplete>ul>completion-section {
+  border-block-style:var(--tw-border-style);
+  border-block-width:1px;
+  border-color:var(--border);
+}
+
+#root .cm-tooltip-autocomplete>ul>completion-section {
+  border-color:color-mix(in srgb,var(--border),transparent 0%);
+}
+
+#root .cm-tooltip-autocomplete>ul>completion-section {
+  background-color:var(--muted-foreground);
+}
+
+#root .cm-tooltip-autocomplete>ul>completion-section {
+  background-color:color-mix(in oklab,color-mix(in srgb,var(--muted-foreground),transparent 0%)10%,transparent);
+}
+
+#root .cm-tooltip-autocomplete>ul>completion-section {
+  font-size:var(--text-xs,.75rem);
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+}
+
+#root .cm-tooltip-autocomplete>ul>li:hover {
+  background-color:var(--blue-3);
+}
+
+#root .cm-tooltip-autocomplete>ul>li[aria-selected] {
+  background-color:var(--blue-4);
+  color:var(--blue-12);
+}
+
+#root .cm-completionIcon {
+  background-color:var(--gray-3);
+  color:var(--gray-11);
+  opacity:.9;
+  --tw-font-weight:var(--font-weight-medium,500);
+  width:1rem;
+  height:100%;
+  font-weight:700;
+  font-weight:var(--font-weight-medium,500);
+  flex-shrink:0;
+  justify-content:center;
+  align-items:center;
+  padding:0 1px;
+  line-height:18px;
+  display:flex;
+}
+
+#root .cm-completionIcon:after {
+  content:"•";
+}
+
+#root .cm-completionIcon-variable {
+  background-color:var(--blue-3);
+  color:var(--blue-11);
+}
+
+#root .cm-completionIcon-variable:after {
+  content:"𝑣";
+}
+
+#root .cm-completionIcon-property {
+  background-color:var(--lime-3);
+  color:var(--lime-11);
+}
+
+#root .cm-completionIcon-property:after {
+  content:"≡";
+}
+
+#root .cm-completionIcon-method {
+  background-color:var(--amber-3);
+  color:var(--amber-11);
+}
+
+#root .cm-completionIcon-method:after {
+  content:"⚙";
+}
+
+#root .cm-completionIcon-function {
+  background-color:var(--purple-3);
+  color:var(--purple-11);
+}
+
+#root .cm-completionIcon-function:after {
+  content:"ƒ";
+}
+
+#root .cm-completionIcon-class {
+  background-color:var(--orange-3);
+  color:var(--orange-11);
+}
+
+#root .cm-completionIcon-class:after {
+  content:"C";
+}
+
+#root .cm-completionIcon-module {
+  background-color:var(--grass-3);
+  color:var(--grass-11);
+}
+
+#root .cm-completionIcon-module:after {
+  content:"⧉";
+}
+
+#root .cm-completionIcon-statement {
+  background-color:var(--red-3);
+  color:var(--red-11);
+}
+
+#root .cm-completionIcon-statement:after {
+  content:"§";
+}
+
+#root .cm-completionIcon-keyword {
+  background-color:var(--cyan-3);
+  color:var(--cyan-11);
+}
+
+#root .cm-completionIcon-keyword:after {
+  content:"⌘";
+}
+
+#root .cm-completionIcon-reference {
+  background-color:var(--gray-3);
+  color:var(--gray-11);
+}
+
+#root .cm-completionIcon-reference:after {
+  content:"→";
+}
+
+#root .cm-completionIcon-file {
+  background-color:var(--crimson-3);
+  color:var(--crimson-11);
+}
+
+#root .cm-completionIcon-file:after {
+  content:"𝌆";
+}
+
+#root .cm-completionIcon-table {
+  background-color:var(--gray-3);
+  color:var(--gray-11);
+}
+
+#root .cm-completionIcon-table:after {
+  content:url(data:image/svg+xml;
+  base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMCIgaGVpZ2h0PSIxMCIgZmlsbD0ibm9uZSIgc3Ryb2tlPSIjNjY2IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiIHN0cm9rZS13aWR0aD0iMiIgY2xhc3M9Imx1Y2lkZSBsdWNpZGUtZGF0YWJhc2UtaWNvbiBsdWNpZGUtZGF0YWJhc2UiIHZpZXdCb3g9IjAgMCAyNCAyNCI+PGVsbGlwc2UgY3g9IjEyIiBjeT0iNSIgcng9IjkiIHJ5PSIzIi8+PHBhdGggZD0iTTMgNXYxNGE5IDMgMCAwIDAgMTggMFY1Ii8+PHBhdGggZD0iTTMgMTJhOSAzIDAgMCAwIDE4IDAiLz48L3N2Zz4=);
+}
+
+#root .cm-completionIcon-dataframe {
+  background-color:var(--gray-3);
+  color:var(--gray-11);
+}
+
+#root .cm-completionIcon-dataframe:after {
+  content:"𝌆";
+}
+
+#root .cm-completionIcon-error {
+  background-color:var(--red-3);
+  color:var(--red-11);
+}
+
+#root .cm-completionIcon-error:after {
+  content:"𝑒";
+}
+
+#root .cm-completionIcon-datasource {
+  background-color:var(--purple-3);
+  color:var(--purple-11);
+}
+
+#root .cm-completionIcon-datasource:after {
+  content:"⚙";
+}
+
+#root .cm-completionInfo {
+  border-color:var(--border);
+  border-left-style:var(--tw-border-style);
+  max-width:var(--container-md,28rem);
+  border-left-width:1px;
+}
+
+#root .cm-completionInfo {
+  border-color:color-mix(in srgb,var(--border),transparent 0%);
+}
+
+#root .cm-completionDetail {
+  color:var(--muted-foreground);
+  font-size:var(--text-xs,.75rem);
+  font-style:normal;
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+}
+
+#root .cm-completionDetail {
+  color:color-mix(in srgb,var(--muted-foreground),transparent 0%);
+}
+
+#root .cm-completionMatchedText {
+  --tw-font-weight:var(--font-weight-medium,500);
+  color:var(--accent-foreground);
+  font-weight:var(--font-weight-medium,500);
+}
+
+#root .cm-completionMatchedText {
+  color:color-mix(in srgb,var(--accent-foreground),transparent 0%);
+}
+
+#root .cm-completionMatchedText {
+  text-underline-offset:2px;
+  text-decoration-line:underline;
+}
+
+#root .cm-tooltip-autocomplete>ul::-webkit-scrollbar {
+  width:6px;
+}
+
+#root .cm-tooltip-autocomplete>ul::-webkit-scrollbar-track {
+  background-color:#0000;
+}
+
+#root .cm-tooltip-autocomplete>ul::-webkit-scrollbar-thumb {
+  background-color:var(--muted-foreground);
+  border-radius:3.40282e38px;
+}
+
+#root .cm-tooltip-autocomplete>ul::-webkit-scrollbar-thumb {
+  background-color:color-mix(in oklab,color-mix(in srgb,var(--muted-foreground),transparent 0%)30%,transparent);
+}
+
+#root .cm-tooltip-autocomplete>ul::-webkit-scrollbar-thumb:hover {
+  background-color:var(--muted-foreground);
+}
+
+#root .cm-tooltip-autocomplete>ul::-webkit-scrollbar-thumb:hover {
+  background-color:color-mix(in oklab,color-mix(in srgb,var(--muted-foreground),transparent 0%)50%,transparent);
+}
+
+#root .cm-tooltip-autocomplete>ul>li.cm-ai-completion {
+  border-color:var(--color-green-500,oklch(72.3% .219 149.579));
+  border-left-style:var(--tw-border-style);
+  border-left-width:2px;
+}
+
+#root .cm-tooltip.cm-completionInfo {
+  max-width:36rem!important;
+  top:-1px!important;
+}
+
+#root .cm-completionInfo.cm-completionInfo-right-narrow {
+  left:100%;
+}
+
+#root .cm-tooltip.cm-completionInfo-right,#root .cm-tooltip:has(.cm-completionInfo-left) {
+  border-top-left-radius:0;
+}
+
+#root .cm-tooltip.cm-completionInfo-left,#root .cm-tooltip:has(.cm-completionInfo-right) {
+  border-top-right-radius:0;
+}
+
+.cm-signature-help {
+  border-color:var(--border);
+  border-radius:calc(var(--radius) - 2px);
+  border-style:var(--tw-border-style);
+  scrollbar-width:thin;
+  border-width:1px;
+  max-height:330px;
+  line-height:normal;
+  overflow-y:auto;
+  max-width:550px!important;
+  margin-right:16px!important;
+  padding:.5rem!important;
+}
+
+.cm-signature-help {
+  border-color:color-mix(in srgb,var(--border),transparent 0%);
+}
+
+.cm-signature-help {
+  background-color:var(--popover);
+}
+
+.cm-signature-help {
+  background-color:color-mix(in srgb,var(--popover),transparent 0%);
+}
+
+.cm-signature-help {
+  font-family:var(--text-font),ui-sans-serif,system-ui,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+  font-size:var(--text-sm,.875rem);
+  line-height:var(--tw-leading,var(--text-sm--line-height,1.42857));
+  padding-block:calc(var(--spacing,.25rem)*1);
+  padding-inline:calc(var(--spacing,.25rem)*2);
+  --tw-shadow:4px 4px 4px 0px var(--tw-shadow-color,var(--base-shadow)),0 0px 4px 0px var(--tw-shadow-color,hsl(0 0% 60%/var(--base-shadow-opacity)));
+  box-shadow:var(--tw-inset-shadow),var(--tw-inset-ring-shadow),var(--tw-ring-offset-shadow),var(--tw-ring-shadow),var(--tw-shadow);
+}
+
+.cm-signature-help p {
+  white-space:pre-wrap;
+  padding:.4rem 0;
+}
+
+.cm-signature-help li,.cm-signature-help ol,.cm-signature-help ul {
+  white-space:normal;
+}
+
+.cm-signature-help ol {
+  padding-left:1.5rem;
+  list-style-type:decimal;
+}
+
+.cm-signature-help ul {
+  padding-left:1.5rem;
+  list-style-type:disc;
+}
+
+.cm-signature-help h1,.cm-signature-help h2 {
+  border-bottom-style:var(--tw-border-style);
+  color:var(--primary);
+  font-size:var(--text-base,1rem);
+  font-weight:600;
+  line-height:var(--tw-leading,var(--text-base--line-height,1.5));
+  margin-bottom:calc(var(--spacing,.25rem)*1);
+  padding-bottom:calc(var(--spacing,.25rem)*1);
+  border-bottom-width:1px;
+}
+
+.cm-signature-help h1,.cm-signature-help h2 {
+  color:color-mix(in srgb,var(--primary),transparent 0%);
+}
+
+.cm-signature-help h3,.cm-signature-help h4 {
+  font-size:var(--text-sm,.875rem);
+  line-height:var(--tw-leading,var(--text-sm--line-height,1.42857));
+  margin-bottom:calc(var(--spacing,.25rem)*1);
+  margin-top:calc(var(--spacing,.25rem)*2);
+  --tw-font-weight:var(--font-weight-semibold,600);
+  font-weight:var(--font-weight-semibold,600);
+}
+
+.cm-signature-help dt {
+  --tw-font-weight:var(--font-weight-bold,700);
+  font-weight:var(--font-weight-bold,700);
+}
+
+.cm-signature-help dt span {
+  --tw-font-weight:var(--font-weight-normal,400);
+  font-weight:var(--font-weight-normal,400);
+}
+
+.cm-signature-help code {
+  background-color:var(--slate-2);
+  border-style:var(--tw-border-style);
+  font-family:var(--monospace-font),ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size:var(--text-xs,.75rem);
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+  padding-inline:calc(var(--spacing,.25rem)*1);
+  border-width:1px;
+  border-radius:.25rem;
+}
+
+.cm-signature-help code:empty {
+  display:none;
+}
+
+.cm-signature-help pre>code {
+  margin-bottom:calc(var(--spacing,.25rem)*1);
+  padding:calc(var(--spacing,.25rem)*2);
+  width:100%;
+  display:inline-block;
+}
+
+.cm-signature-help table {
+  border-style:var(--tw-border-style);
+  font-size:var(--text-sm,.875rem);
+  line-height:var(--tw-leading,var(--text-sm--line-height,1.42857));
+  margin-block:calc(var(--spacing,.25rem)*2);
+  border-width:1px;
+  border-radius:.25rem;
+}
+
+.cm-signature-help table td,.cm-signature-help table th {
+  border-style:var(--tw-border-style);
+  padding:calc(var(--spacing,.25rem)*2);
+  border-width:1px;
+}
+
+.cm-signature-help table th {
+  background-color:var(--slate-2);
+}
+
+.cm-signature-help table tr:nth-child(2n) {
+  background-color:var(--slate-1);
+}
+
+.cm-signature-help blockquote {
+  margin-left:calc(var(--spacing,.25rem)*2);
+  padding-left:calc(var(--spacing,.25rem)*2);
+  white-space:pre-wrap;
+}
+
+.cm-signature-help blockquote p {
+  font-family:var(--monospace-font),ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size:var(--text-xs,.75rem);
+  font-weight:400;
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+  white-space:normal;
+  padding:0;
+}
+
+.cm-signature-help .cm-signature {
+  background-color:var(--muted);
+  border-radius:calc(var(--radius) - 4px);
+}
+
+.cm-signature-help .cm-signature {
+  background-color:color-mix(in srgb,var(--muted),transparent 0%);
+}
+
+.cm-signature-help .cm-signature {
+  font-family:var(--monospace-font),ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size:var(--text-xs,.75rem);
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+  padding:calc(var(--spacing,.25rem)*2);
+}
+
+.cm-signature-help .cm-signature-active-param {
+  --tw-font-weight:var(--font-weight-bold,700);
+  color:var(--primary);
+  font-weight:var(--font-weight-bold,700);
+}
+
+.cm-signature-help .cm-signature-active-param {
+  color:color-mix(in srgb,var(--primary),transparent 0%);
+}
+
+.cm-signature-help .section {
+  line-height:normal;
+}
+
+.cm-signature-help .docutils dd,.cm-signature-help .docutils p,.cm-signature-help .paragraph {
+  white-space:normal;
+}
+
+.cm-signature-help .docutils dd {
+  white-space:pre-wrap;
+  padding-left:1rem;
+}
+
+.cm-signature-help .docutils.literal {
+  background-color:var(--slate-2);
+  border-radius:calc(var(--radius) - 2px);
+  border-style:var(--tw-border-style);
+  font-family:var(--monospace-font),ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+  font-size:var(--text-xs,.75rem);
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+  padding-inline:calc(var(--spacing,.25rem)*1);
+  border-width:1px;
+}
+
+.cm-signature-help .doctest-block,.cm-signature-help .literal-block {
+  border-radius:.25rem;
+}
+
+.cm-signature-help .codehilite code,.cm-signature-help .doctest-block,.cm-signature-help .literal-block {
+  background-color:var(--slate-2);
+  font-size:var(--text-xs,.75rem);
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+  padding:calc(var(--spacing,.25rem)*2);
+  white-space:pre-wrap;
+}
+
+.cm-signature-help .codehilite code {
+  border-radius:calc(var(--radius) - 2px);
+  border-style:var(--tw-border-style);
+  border-width:1px;
+  width:100%;
+  display:inline-block;
+}
+
+.cm-signature-help .codehilite code,.cm-signature-help blockquote .docutils dt,.cm-signature-help blockquote dl.docutils {
+  font-family:var(--monospace-font),ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+}
+
+.cm-signature-help blockquote .docutils dt,.cm-signature-help blockquote dl.docutils {
+  font-size:var(--text-xs,.75rem);
+  font-weight:400;
+  line-height:var(--tw-leading,var(--text-xs--line-height,1.33333));
+  white-space:normal;
+  padding:0;
+}
+
+.cm-signature-docs {
+  color:#000!important;
+}
+
+/* ============================================================
+   8. filename / code-editor / editor-wrapper
+   (0 rules)
+   ============================================================ */
+
+/* ============================================================
+   9. fullscreen / print (non-tailwind only)
+   (7 rules)
+   ============================================================ */
+
+.fullscreen\:flex:fullscreen {
+  display:flex;
+}
+
+.fullscreen\:items-center:fullscreen {
+  align-items:center;
+}
+
+.fullscreen\:items-center-safe:fullscreen {
+  align-items:safe center;
+}
+
+.fullscreen\:justify-center:fullscreen {
+  justify-content:center;
+}
+
+.fullscreen\:bg-background:fullscreen {
+  background-color:var(--background);
+}
+
+.fullscreen\:bg-background:fullscreen {
+  background-color:color-mix(in srgb,var(--background),transparent 0%);
+}
+
+:root:has(:fullscreen) .hide-on-fullscreen {
+  display:none!important;
+}
+
+/* ============================================================
+   10. mo- (marimo output/widget) selectors
+   (12 rules)
+   ============================================================ */
+
+.mo-dropdown-icon {
+  color:var(--muted-foreground);
+  height:calc(var(--spacing,.25rem)*3.5);
+  margin-right:calc(var(--spacing,.25rem)*2);
+  width:calc(var(--spacing,.25rem)*3.5);
+}
+
+.mo-dropdown-icon {
+  color:color-mix(in oklab,color-mix(in srgb,var(--muted-foreground),transparent 0%)70%,transparent);
+}
+
+.mo-label .markdown .paragraph,.mo-label .markdown p,.mo-label-block .markdown .paragraph,.mo-label-block .markdown p {
+  margin:0;
+  padding:0;
+}
+
+.marimo-cell:has(.mo-ai-generated-cell):before {
+  box-shadow:0 0 10px 0 var(--cyan-9);
+  content:"";
+  opacity:.5;
+  pointer-events:none;
+  z-index:1;
+  border-radius:10px;
+  position:absolute;
+  inset:0;
+}
+
+.marimo-cell:has(.mo-ai-generated-cell.mo-ai-setup-cell):before {
+  border-radius:2px;
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell) {
+  opacity:.7;
+  position:relative;
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell) .cm,.marimo-cell:has(.mo-ai-deleted-cell) .cm-gutters,.marimo-cell:has(.mo-ai-deleted-cell) .output-area {
+  background-color:var(--red-2);
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell):before {
+  box-shadow:0 0 10px 0 var(--red-9);
+  content:"";
+  opacity:.6;
+  pointer-events:none;
+  z-index:1;
+  border-radius:10px;
+  position:absolute;
+  inset:0;
+}
+
+.marimo-cell:has(.mo-ai-deleted-cell) .cm-content {
+  text-decoration:line-through;
+  -webkit-text-decoration-color:var(--red-9);
+  text-decoration-color:var(--red-9);
+  text-decoration-thickness:1px;
+}
+
+.marimo-cell.stale .console-output-area.marimo-output-stale,.marimo-cell.stale .output-area.marimo-output-stale,.marimo-output-stale {
+  filter:grayscale(50%);
+  opacity:.8;
+  transition:all .3s .2s;
+}
+
+.marimo-cell.stale .console-output-area.marimo-output-stale.marimo-output-loading,.marimo-cell.stale .output-area.marimo-output-stale.marimo-output-loading,.marimo-output-stale.marimo-output-loading {
+  filter:grayscale(50%);
+  opacity:.4;
+  transition:all .3s .2s;
+}
+
+#root .cm-tooltip.cm-completionInfo,#root .cm-tooltip.cm-tooltip-hover,#root .cm-tooltip.mo-cm-tooltip {
+  scrollbar-width:thin;
+  border-radius:4px;
+  max-width:40vw;
+  max-height:45vh;
+  overflow:auto;
+}
+
+/* ============================================================
+   11. disconnected / stale / running / status states
+   (23 rules)
+   ============================================================ */
+
+.running {
+  animation-play-state:running;
+}
+
+.markdown details.caution,.markdown details.danger,.markdown details.error {
+  border-left-color:var(--red-8);
+}
+
+.admonition.caution,.admonition.danger,.admonition.error {
+  --admonition-bg:var(--red-2);
+  --admonition-border:var(--red-8);
+  --admonition-heading-color:var(--red-11);
+}
+
+:is(.admonition.danger,.admonition.caution,.admonition.error):before {
+  --csstools-light-dark-toggle--87:var(--csstools-color-scheme--light)url("data:image/svg+xml;
+  utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" opacity=\"60%\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-octagon-alert\"><polygon points=\"7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2\"/><line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"12\"/><line x1=\"12\" x2=\"12.01\" y1=\"16\" y2=\"16\"/></svg>");
+  content:var(--csstools-light-dark-toggle--87,url("data:image/svg+xml;
+  utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" opacity=\"60%\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-octagon-alert\"><polygon points=\"7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2\"/><line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"12\"/><line x1=\"12\" x2=\"12.01\" y1=\"16\" y2=\"16\"/></svg>"));
+  content:light-dark(url("data:image/svg+xml;
+  utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" opacity=\"60%\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-octagon-alert\"><polygon points=\"7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2\"/><line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"12\"/><line x1=\"12\" x2=\"12.01\" y1=\"16\" y2=\"16\"/></svg>"),url("data:image/svg+xml;
+  utf8,<svg xmlns=\"http://www.w3.org/2000/svg\" opacity=\"60%\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"white\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" class=\"lucide lucide-octagon-alert\"><polygon points=\"7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2\"/><line x1=\"12\" x2=\"12\" y1=\"8\" y2=\"12\"/><line x1=\"12\" x2=\"12.01\" y1=\"16\" y2=\"16\"/></svg>"));
+}
+
+:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .cm,:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .cm-gutters,:is(.marimo-cell.stale,.marimo-cell.disabled.stale) .output-area {
+  background-color:var(--gray-2);
+  opacity:.5;
+}
+
+:where(:is(.marimo-cell.has-error:not(.needs-run),.marimo-cell.error-outline)>:not(:last-child)) {
+  border-color:var(--error);
+}
+
+:where(:is(.marimo-cell.has-error:not(.needs-run),.marimo-cell.error-outline)>:not(:last-child)) {
+  border-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)20%,transparent);
+}
+
+.marimo-cell.error-outline,.marimo-cell.has-error:not(.needs-run) {
+  border-color:var(--error);
+  border-style:var(--tw-border-style);
+  border-width:1px;
+}
+
+.marimo-cell.error-outline,.marimo-cell.has-error:not(.needs-run) {
+  border-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)20%,transparent);
+}
+
+.marimo-cell.error-outline,.marimo-cell.has-error:not(.needs-run) {
+  outline-color:var(--error);
+  outline-style:var(--tw-outline-style);
+  outline-width:1px;
+}
+
+.marimo-cell.error-outline,.marimo-cell.has-error:not(.needs-run) {
+  outline-color:color-mix(in oklab,color-mix(in srgb,var(--error),transparent 0%)20%,transparent);
+}
+
+.marimo-cell.error-outline,.marimo-cell.error-outline:focus-within {
+  box-shadow:8px 8px 0 0 var(--error);
+}
+
+.marimo-cell.error-outline,.marimo-cell.error-outline:focus-within {
+  box-shadow:8px 8px 0 0 color-mix(in srgb,var(--error),transparent 80%);
+}
+
+.marimo-cell.error-outline,.marimo-cell.error-outline:focus-within {
+  background-color:var(--red-2);
+}
+
+#App.disconnected .cm .cm-gutters,#App.disconnected .console-output-area,#App.disconnected .marimo-cell,#App.disconnected .marimo-cell .cm-editor.cm-focused .cm-activeLine,#App.disconnected .marimo-cell .cm-editor.cm-focused .cm-activeLineGutter,#App.disconnected .marimo-cell .shoulder-button {
+  background-color:#0000;
+}
+
+#App.disconnected .cell-queued-icon,#App.disconnected .cell-running-icon,#App.disconnected .elapsed-time {
+  visibility:hidden;
+  animation:none;
+}
+
+#App.disconnected .console-output-area {
+  border-color:#0000;
+}
+
+.marimo-cell.stale .console-output-area.marimo-output-stale,.marimo-cell.stale .output-area.marimo-output-stale,.marimo-output-stale {
+  filter:grayscale(50%);
+  opacity:.8;
+  transition:all .3s .2s;
+}
+
+.marimo-cell.stale .console-output-area.marimo-output-stale.marimo-output-loading,.marimo-cell.stale .output-area.marimo-output-stale.marimo-output-loading,.marimo-output-stale.marimo-output-loading {
+  filter:grayscale(50%);
+  opacity:.4;
+  transition:all .3s .2s;
+}
+
+.running-app-icon {
+  visibility:hidden;
+  width:45px;
+  animation:2s cubic-bezier(.61,-.01,.47,.99) 1s infinite running-app-animation;
+}
+
+.disconnected-gradient {
+  z-index:-2;
+  background-image:url(./gradient-yHQUC_QB.png);
+  background-repeat:no-repeat;
+  background-size:cover;
+}
+
+.disconnected-gradient,.noise {
+  width:100vw;
+  height:100vh;
+  position:fixed;
+  top:0;
+  left:0;
+}
+
+.light #App.disconnected,.light #App.disconnected .transparent-when-disconnected {
+  background:0 0;
+}
+
+/* ============================================================
+   12. hover / focus / transition on component elements
+   (5 rules)
+   ============================================================ */
+
+.markdown [data-tooltip]:hover:after,.markdown [data-tooltip]:hover:before {
+  opacity:1;
+  visibility:visible;
+}
+
+.markdown [data-tooltip]:hover:before {
+  transform:translate(-50%)translateY(10px);
+}
+
+.inactive-button,.inactive-button svg,.inactive-button:hover {
+  color:var(--gray-7);
+  cursor:default;
+}
+
+.js-plotly-plot .plotly button:focus,.js-plotly-plot .plotly input:focus {
+  outline:none;
+}
+
+.js-plotly-plot .plotly [data-title]:hover:after,.js-plotly-plot .plotly [data-title]:hover:before {
+  opacity:1;
+  display:block;
+}
+
+/* Total extracted rules: 336 */

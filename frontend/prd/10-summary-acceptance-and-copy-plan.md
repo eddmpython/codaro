@@ -2,7 +2,7 @@
 
 # 12. UI Inventory Summary
 
-This file is the session-resume entry for the split frontend parity PRD.
+This file is the session-resume entry for the split frontend parity PRD archive.
 Update `12.1 Current State`, `12.2 Next Action`, and `12.3 Verification Left` first when handing work off across sessions.
 
 The marimo edit UI exposed by the traced sources is composed of these visible regions:
@@ -36,84 +36,66 @@ The marimo edit UI exposed by the traced sources is composed of these visible re
 
 #### 12.1 Current State
 
-- split PRD navigation is now explicit: `frontend/PRD.md` is the short index, `10-summary-acceptance-and-copy-plan.md` is the session-resume entry, and the section files link back into that resume path
-- root shell, left rail, helper sidebar, developer panel, filename bar, footer, column chrome, banner stack, cell root, editor overlay, hover CSS, status rail, and output contracts have source-backed entries in this PRD
-- `PanelsWrapper` and `ContextAwarePanel` now document top-level mount order, state atoms, pinned vs overlay branch, resize behavior, and slot ownership from upstream source
-- find/replace overlay now documents its state atom, open/close gate, panel shell, replace/undo flow, and global search highlight wiring from upstream source
-- `StatusOverlay` and `WrappedWithSidebar` now document top-left icon branches, noise/disconnected background, slot gate, desktop sidebar shell, and mobile sheet trigger from upstream source
-- `Disconnected`, connection alerts, `FloatingAlert` or `Banner`, `PyodideLoader`, `LargeSpinner`, and `DynamicFavicon` now document their actual source branches instead of being left as parent-level inventory names
-- `HideInKioskMode` and `ShowInKioskMode` now document their actual `kioskModeAtom` gate instead of only being mentioned as ownership notes
-- shared `ErrorBanner` is now documented as a common primitive instead of being repeated as an unexplained error branch across panel sections
-- the PRD source of truth has been shifted from installed `_static` chunks to upstream React or TS source under `.__marimo_upstream/frontend/src/...` wherever those files are now traced
-- button primitives, button color variants, resize-handle CSS, filename hover and missing-filename shadows, bottom-right stack order, notebook menu inventory, and cell action dropdown group order are fixed from source
-- app config popover, notebook settings form fields, user settings package manager field, share static notebook dialog, notebook menu footer, duplicate prompt, save or recovery filename flows, package install alert widgets, usage stats widgets, backend or LSP health, Copilot or AI or RTC footer states, footer item primitive, and console hover or stdin shell are now documented from upstream source instead of bundle reconstruction
-- reorderable rail primitive, feedback modal shell, backend health button class, exact backend or LSP status strings, floating pending AI cells bar, and command palette overlay shell are now documented from source instead of inferred from screenshots
-- helper sidebar `files`, `variables or data sources`, `dependencies`, `documentation`, `outline`, `packages`, `snippets`, and `AI chat or agents` panel bodies are now documented from source instead of inferred from screenshots
-- developer panel `errors`, `scratchpad`, `tracing`, `secrets`, `logs`, `terminal`, and `cache` panel bodies are now documented from source instead of inferred from screenshots
-- `write-secret-modal`, AI chat message-row and attachment shells, agent notification block registry, connection-change and error cards, plan or thought blocks, resource popovers, and tool-call accordions are now documented from source instead of inferred from screenshots
-- dependency graph toolbar, settings popover, node or edge selection panel, minimap relation glyphs, file explorer prompts or delete dialog, duplicate naming, upload toasts, and remote preview metadata shell are now documented from source instead of inferred from screenshots
-- selected local file detail lazy body, draft-cache behavior, running-notebook warning banner, local file save hotkey, dependency graph layout atoms, dagre layout config, graph node creation filters, custom node shell, and focused minimap path geometry are now documented from source instead of inferred from screenshots
-- visible panel source blocks that still pointed at installed bundle chunks have now been switched to upstream `.__marimo_upstream/frontend/src/...` files across the traced visible edit UI
-- recent cleanup also replaced many short bundle helper names in `file explorer`, `remote storage`, `notebook menu`, `controls`, `app config`, `cell action dropdown`, `console output`, `status rail`, and `machine stats` sections with upstream component or helper names
-- top-level `EditPage -> AppChrome/EditApp -> LazyCommandPalette` branching, `EditApp` composition, `AppContainer` shell, `AppHeader` disconnected branch, and `CellsRenderer` layout override path are now documented from upstream source instead of bundle aliases
-- command palette overlay is now documented beyond shell level, including recents sourcing, hotkey and notebook action flattening, group order, and per-item select behavior
-- command palette supporting primitives now also document `smartMatchFilter`, `cmdk-input-wrapper`, list/group/item class tokens, disabled-token replacement, HTML-escaped values, and notebook-menu label-row child order from upstream source
-- multi-cell selection toolbar and its pending-delete confirmation bar are now documented from upstream source, including action group order, disabled rules, overflow dropdown, and selection-clear behavior
-- column footer `AddCellButtons` is now documented at branch level, including `createNewCell` payloads for Python or Markdown or SQL, the `maybeAddMarimoImport` pre-create side effect, and the AI-disabled redirect path to `handleClick("ai", "ai-providers")`
-- notebook body contract now also documents `vertical-layout.tsx` read-mode action dropdown, empty-notebook alert, `groupCellsByColumn`, `showCode/canShowCode` gates, `shouldHideCode`, `FloatingOutline` hover-slide shell, and `ReadonlyCode` overlay buttons from source
-- footer shell now documents `ConnectingKernelIndicatorItem`, issue-count derivation, `getCopilotClient -> initializePromise -> signedIn()` flow, and RTC username popover structure from upstream source rather than bundle aliases
-- feedback dialog now documents its current source reality: informational prose only, fire-and-forget submit transport, and no rendered rating or message controls despite the submit handler reading both keys
-- share static notebook dialog now documents URL derivation, copy-button tooltip lifecycle, and the source fallthrough where an upload error toast is followed by the success toast in the same handler
-- shutdown and save or recovery flows now document `isWasm()` shutdown hiding, destructive confirm action wiring, delayed `window.close()`, `beforeunload` protection, `format_on_save`, empty-notebook save guard, and the exact serialized save payload keys
-- variables panel mount ownership is now documented, including the fact that visible chrome mounts `session-panel.tsx` rather than the standalone `variable-panel.tsx`
-- AI chat and agent sections now document nested visible widgets such as history popover rows, reasoning accordion, footer action buttons, session tabs, agent selector dropdown branches, model selector, agent docs cards, scroll-to-bottom button, and tool-call accordion status branches
-- AI chat header/footer controls now also document `MCPStatusIndicator` and the nested `AIModelDropdown` provider/model menu branches from source
-- AI message rendering and agent common primitives now also document `renderUIMessage` part mapping, `ConnectionStatus` badge branches, `PermissionRequest`, shared accordion shell, and `ReadyToChatBlock`
-- helper sidebar panel primitives are now documented centrally, including `PanelAccordionItem`, `PanelAccordionTrigger`, `PanelAccordionContent`, `PanelBadge`, and `PanelEmptyState`
-- documentation and outline panels now document `documentationAtom` render flow, `OutlineList` row classes, floating outline slide-in shell, minimap glyph sizing, and active-header observer behavior
-- packages and logs panels now document install-form atom handoff, package action buttons, dependency-tree keyboard/aria behavior, and log row fragment formatting from source
-- scratchpad history atoms, scratchpad action paths, tracing panel branch layout, Vega hover bridge, terminal websocket lifecycle, terminal command queue state, layout-select gate and icon mapping, package-alert missing/installing branches, cache-panel statistics/purge flow, backend-health connection-status atom, and menu-item primitive tokens are now documented from upstream source instead of inferred behavior
-- bottom-right `KeyboardShortcuts` now documents its dialog portal ownership, duplicate-shortcut banner, editable-row capture rules, optimistic config save, and reset flows from upstream source
-- editor contract now also documents `AiCompletionEditor`, RTC wait gate, completion banner and prompt row shells, and `LanguageAdapters.sql/markdown` source names instead of stale aliases
-- shared AI completion handlers now document `Mod+Enter` accept, `Mod+Shift+Delete` decline, and the exact accept/reject button class tokens used by both editor and pending-AI surfaces
-- output contract now also documents `OutputArea` null gates, `ExpandableOutput` fullscreen/expand buttons, mimebundle tab layout, console clear debounce, stdin response rows, `TextOutput`, `HtmlOutput`, `JsonOutput`, `MarimoTracebackOutput`, `MarimoErrorOutput`, and additional output CSS tokens directly from upstream source
-- Codaro shipped product now treats the documentation slot as an explicit fork point: shell parity remains, but the rendered product panel is `Context Help` and external landing links rather than a full in-app docs viewer
-
-- PRD 07 now documents: SortableCell wrapper (outline-hidden rounded-lg, drag handle, is-moving), CellLeftSideActions (TWO CreateCellButton at left-[-26px]), CreateCellButton dropdown (Python/Markdown/SQL/Setup with modifier-key trigger), CellToolbar (absolute right-2 -top-4 z-10, hover-action when !needsRun, RunButton + StopButton + CellActionsDropdown), CellRightSideActions (shoulder-right z-20, CellDragHandle, CellStatusComponent inline logic), shoulder-bottom DeleteButton, full Cell.css contract (border-radius 10px, divide-y, tray pseudo-elements, interactive/stale/disabled/needs-run/published/borderless states, CM editor padding with NO minHeight), hover contract corrected (display:none inside media query, show conditions OUTSIDE media query)
-- PRD 02 corrected: LazyCommandPalette is CHILD of AppChrome (not sibling), EditApp structure shows AppHeader and CellsRenderer as children of AppContainer
-- PRD 03 updated: sidebar explicitly states NO background color in light mode, full PanelGroup nested hierarchy documented (horizontal outer with vertical inner), ContextAwarePanel documented, resize handle hitAreaMargins/disabled/z-index differences, developer panel contract added
-- PRD 04 updated: inner container m-auto and duplicated pb-24 documented, column resize handle pseudo-element hover area expansion and hover/column color states documented
-- PRD 08 updated: AlertTriangleIcon warning count conditional text-yellow-500 class documented
-- PRD 07 ToolbarItem CVA variants fully documented: default/stale/green/disabled/danger with exact class tokens from toolbar.tsx
-
-- PRD 01 source list corrected: `sidebar.css` path fixed from `chrome/wrapper/sidebar/sidebar.css` to `renderers/vertical-layout/sidebar/sidebar.css`, 19 missing component files added (SortableCell, CreateCellButton, toolbar, cell-actions, footer-item, 6 footer-items status components, keyboard-shortcuts, cell-array, vertical-layout-wrapper, wrapped-with-sidebar, Inputs.styles.ts, button.tsx, edit-app.tsx), 22 missing CSS files added (Cell.css, App.css, common.css, globals.css, index.css, and 17 others), 6 file-tree internal files added, 11 output component files added
-- PRD 03 files panel corrected: Refresh tooltip added as 5th of 7 toolbar buttons, MoreActionsButton `opacity-0 group-hover:opacity-100 transition-opacity` documented, drag-drop highlight `bg-accent/80` documented
-- PRD 03 variables panel corrected: column structure changed from 5 flat columns to 3 columns with nested vertical sub-headers (Name | Type+Value | Declared By+Used By), each nested pair uses `div.flex.flex-col.gap-1`
-- PRD 03 dependencies corrected: `hideReusableFunctions` description rewritten from nonsensical "lowercases to valid" to `runtime.serialization?.toLowerCase() === "valid"` with `&& !hasEdge` condition, edge dedup key documented as `${fromId}-${toId}` without direction (but final edge ID includes direction for VerticalElementsBuilder), Handle ID sharing documented (all nodes share `INPUTS_HANDLE_ID = "inputs"` and `OUTPUTS_HANDLE_ID = "outputs"`)
-- PRD 03 tree contract expanded: Tree component props increased from 6 to 21 props matching react-arborist API
-- packages, snippets, AI, developer panels, documentation, outline panels all verified 100% accurate against upstream source — no fixes needed
-
-- PRD 05 corrected: RecoveryButton `className="rectangle"` vs `shape="rectangle"` source bug documented — source passes rectangle as literal className string instead of CVA shape variant
-- PRD 06 corrected: `data-testid="install-package-manager-select"` fixed to actual `"package-manager-select"`, shared setting primitives added (`SettingTitle` with `text-md font-semibold text-muted-foreground uppercase tracking-wide mb-1`, `SettingSubtitle` with `text-base font-semibold underline-offset-2 text-accent-foreground uppercase tracking-wide`, `SettingGroup` vs `SettingSection` difference), `FormLabel className="shrink-0"` on Custom CSS and HTML Head fields, section 8.4 added documenting UserConfigForm tab-based layout structure with sidebar navigation and 7 tab categories
-- PRD 09 verified 100% accurate against upstream source — all error banner, feedback dialog, backend/LSP health, share modal, package alerts, kiosk mode, StatusOverlay, PyodideLoader, DynamicFavicon, LargeSpinner, FloatingAlert contracts match exactly — no fixes needed
-
-- all 10 PRD files (01-10) have now been verified against marimo upstream source
+- on `2026-03-20`, the current marimo-matched `frontend/` state was frozen to `_backup/frontend/marimo-parity-baseline-2026-03-20/`
+- this split PRD is now the reference archive for that frozen baseline, not an active claim that parity work is still open on the main path
+- browser side-by-side verification and some deeper source-proof items were not closed before freeze, so this archive is a baseline reference, not a certified `marimo 1:1` completion
+- split PRD navigation is explicit: `frontend/PRD.md` is the short index, `10-summary-acceptance-and-copy-plan.md` is the session-resume entry, and the section files link back into that resume path
+- the PRD now explicitly locks to the installed `marimo==0.21.0` build and its `_static/index.html` entry, CSS load order, and key edit-surface bundle filenames recorded in `01-goal-rules-and-sources.md`
+- file-level installed asset evidence blocks now exist at the top of `02` through `09`, so each split contract points to concrete `_static` bundles before dropping into readable source details
+- every current `Source:`/`Width wrapper source:`/`Source branch:`/health-source block in the split PRD now places `Installed assets` before `Readable source`, so the readable mirror is no longer cited without a build-backed asset pointer
+- section-level installed asset evidence now covers the major sections in `02-global-app-contract.md`, `03-workspace-chrome-contract.md`, `04-notebook-body-contract.md`, `05-floating-actions-save-recovery.md`, `06-settings-and-app-config.md`, `07-cell-editor-hover-output.md`, `08-footer-contract.md`, and `09-feedback-health-and-auxiliary-ui.md`, and lower-level subsection evidence is started in the deeper `03` and `07` contracts too
+- a heuristic scan across `02` through `09` currently finds no visible `####` section heading left without a nearby source block, so the remaining gap is now the quality of proof, not the absence of source sections
+- root shell, left rail, helper sidebar, developer panel, filename bar, footer, notebook body, floating controls, cell root, editor overlay, hover CSS, status rail, console, and output contracts all have split PRD sections with concrete DOM/class/testid coverage
+- root/head evidence is already captured in the split docs, including `<marimo-filename hidden>`, hidden config tags, `#root`, `#portal[data-testid="glide-portal"]`, `window.__MARIMO_MOUNT_CONFIG__`, `#app-chrome-sidebar`, `#app-chrome-panel`, `cmdk-root`, `#save-button`, dialog testids, and `language-toggle-button`
+- `PanelsWrapper`, `ContextAwarePanel`, find/replace, `StatusOverlay`, `WrappedWithSidebar`, `Disconnected`, floating alerts, kiosk gates, and shared `ErrorBanner` all have branch-level writeups rather than only inventory mentions
+- helper sidebar and developer panel bodies have broad coverage for files, variables/data sources, dependencies, documentation, outline, packages, snippets, AI, errors, scratchpad, tracing, secrets, logs, terminal, and cache
+- floating controls, notebook menu, save/recovery/shutdown flows, settings/app-config surfaces, footer widgets, AI chat/agent surfaces, and output subtype branches are all materially expanded compared with the earlier inventory-only pass
+- many sections were written with readable support from `.__marimo_upstream/frontend/src/...`, but that tree is now treated as a secondary mirror rather than the primary source of truth
+- `.__marimo_upstream/frontend/package.json` still carries the workspace placeholder version `0.0.0-placeholder`, so the readable mirror does not by itself prove equivalence to the installed `marimo==0.21.0` build
+- recent PRD fixes that remain important are still preserved in the split docs, including the corrected `LazyCommandPalette` mount order, `ToolbarItem` variants, files-panel toolbar order, variables/dependencies table and graph contracts, save/recovery button details, and user settings testids
+- Codaro shipped product documents one explicit fork point: the documentation slot keeps shell parity but renders `Context Help` and external landing links instead of an embedded docs browser
+- **2026-03-20 implementation sweep**: 15 new components created to close previously missing marimo surfaces; total component count is now 71 `.svelte` files
+- newly implemented surfaces since last PRD update:
+  - `AppConfigButton` + `AppConfigForm` + `UserConfigDialog` — notebook and user settings with popover/dialog matching marimo's app-config-button, app-config-form, and user-config-form contracts; includes 7-tab vertical layout, `data-testid` on key controls
+  - `NotebookMenuDropdown` — Actions menu with nested export submenu, version footer, `data-testid="notebook-menu-dropdown-${label}"` pattern
+  - `FeedbackDialog` — survey/GitHub/Discord links in prose dialog
+  - `ShareStaticDialog` — slug input, derived URL preview, copy-to-clipboard, `data-testid="slug-input"` and related testids
+  - `PackageAlert` — fixed top-left banner with missing/installing/installed branches, per-package status icons, expandable logs
+  - `PendingAICellsBar` — fixed bottom-center float with cell navigation, accept/reject all, cyan glow shadow
+  - `StatusOverlay` — top-left engine/connection status (running/disconnected/kiosk priority logic)
+  - `ErrorBanner` — reusable error/warning/info banner with expandable details
+  - `DisconnectedOverlay` — full-screen disconnected state with noise/gradient background
+  - `KioskModeGate` — conditional hide/show based on kiosk mode
+  - `LayoutSelect` — layout view dropdown (vertical/grid/slides) with WASM feature gate
+  - `LspStatus` — footer LSP connection indicator
+  - Sidebar `Feedback` button wired through `onFeedback` prop chain (NotebookShell -> EditPage -> AppChrome -> Sidebar)
+- existing components enhanced:
+  - `CellFrame` — language toggle overlay (`data-testid="language-toggle-button"`), hide code toggle (`data-testid="cell-hide-code-button"`), selection ring (active: `ring-2 ring-primary/50`, error: `ring-2 ring-destructive/50`)
+  - `OutputRenderer` — expandable output with show more/less + fullscreen portal, console output section (stdout/stderr with hover toolbar, wrap toggle, collapse), stdin prompt row, marimo class contracts (`.output-area`, `.stdout`, `.stderr`, `.return`, `.output`, `.marimo-error`)
+  - `TopRightControls` — now renders `NotebookMenuDropdown` + `AppConfigButton` + `ShutdownButton` instead of disabled placeholder icons
+  - `NotebookShell` — integrates `StatusOverlay`, `DisconnectedOverlay`, `PendingAICellsBar`, `FeedbackDialog`, `ShareStaticDialog`, `PackageAlert`; passes `queuedOrRunningCount` through full chain
+  - `Footer` — added `LspStatus` between `BackendStatus` and spacer
+  - `Sidebar` — added Feedback button with `onFeedback` callback
+- `data-testid` coverage now includes 75+ unique testid values across all components
+- frontend build passes cleanly (client + server + adapter-static) with only a chunk-size warning on the main page bundle (517 kB)
+- the current PRD still cannot honestly claim finished `marimo 1:1` because browser render side-by-side checks have not been completed and some panel bodies remain stubs rather than full branch-level implementations
 
 #### 12.2 Next Action
 
-- continue sweeping for any remaining terse helper or icon aliases that survived in prose outside the latest source-backed sections, especially any visible widget still described at shell level instead of branch level
-- continue filling the remaining low-depth visible areas that still read like inventory rather than branch contracts, especially small modal/popover support surfaces, footer micro-widgets, and any remaining read-only notebook support primitive not yet expanded
-- continue checking top-level import graphs so any visible companion surface mounted by `EditApp`, `AppChrome`, `Footer`, or the layout renderers is either source-documented or explicitly marked non-visual
+- do not rewrite the archive in place; use `_backup/frontend/marimo-parity-baseline-2026-03-20/` as the frozen baseline
+- use this split PRD to explain which parts of Codaro intentionally diverge from that baseline
+- if parity work is ever reopened, resume from this archive and then run browser side-by-side verification plus the remaining source-proof checklist
 - keep the split PRD structure stable: add detailed contracts in `frontend/prd/*.md`, and keep `frontend/PRD.md` as the short index and session entrypoint
-- continue turning modal shells, popover content, and block-level renderer branches into upstream-file-backed PRD entries until no visible marimo surface remains only inventory-level documented
-- keep the PRD source-backed and docs-only for now; implementation port starts only after visible marimo frontend coverage is complete
-- after PRD completion, port each contract into Codaro Svelte without vendor import fallback
-- keep documenting Codaro fork points explicitly whenever shipped product behavior intentionally diverges from marimo source, starting with the documentation slot -> `Context Help`
+- keep documenting Codaro fork points explicitly whenever shipped product behavior intentionally diverges from marimo source
 
 #### 12.3 Verification Left
 
+- the items below were still open when the archive was frozen; they matter if parity work is reopened or if Codaro changes need to be checked against the archived baseline
+- confirm the installed build lock still is `marimo==0.21.0`, and that the recorded `_static/index.html`, entry module, and CSS filenames still match the actual installed build
+- confirm each PRD section source block still records installed asset evidence first and readable mirror paths second after any further edits
+- confirm the local `.__marimo_upstream` readable mirror really matches the installed build for every section where it is cited; if not, rewrite from `_static` evidence
+- confirm actual browser render side-by-side, not just DOM/file reading, for the acceptance-critical surfaces
 - confirm the `showChrome=false` branch still mounts the notebook page and command palette in the documented order
-- confirm each PRD section source block points to upstream React or TS files when upstream exists, not to installed bundle chunks
 - confirm Codaro implementation uses the same split between notebook action buttons and text buttons
 - confirm filename bar hover, stale shadow, and rounded radius match these tokens exactly
 - confirm find/replace overlay matches source panel shell, hotkey/open gate, toggle row, replace/undo flow, and match counter strings
@@ -161,6 +143,7 @@ The marimo edit UI exposed by the traced sources is composed of these visible re
 
 The implementation can only be called `marimo 1:1` when all of the following are true:
 
+- the installed marimo version and exact `_static` asset filenames recorded in `01-goal-rules-and-sources.md` match the build being copied, and any readable source mirror references remain subordinate to that lock.
 - root head tags, preload links, hidden mount tags, and portal structure match source.
 - `#root`, `#app`, `#App`, `#portal`, `#app-chrome-sidebar`, and `#app-chrome-panel` match source hierarchy.
 - left rail, helper sidebar, developer panel, filename bar, floating controls, footer, and cell wrapper all use source-backed class tokens and IDs.
@@ -179,6 +162,8 @@ The implementation can only be called `marimo 1:1` when all of the following are
 
 ### 14. Verification Checklist
 
+- [ ] installed `marimo==0.21.0` build lock, `_static/index.html`, entry module, and CSS load order still match the actual local install.
+- [ ] every split PRD source block lists installed asset evidence before readable mirror paths.
 - [ ] `index.html` meta tags, preload assets, hidden mount tags, mount config, and portal have been reproduced exactly.
 - [ ] `body -> #root -> .contents -> chrome -> #app -> #App` hierarchy matches the captured DOM.
 - [ ] top-level `showChrome=false` branch reproduces `EditApp(hideControls=true)` plus `LazyCommandPalette` sibling mounting without the chrome wrapper.
@@ -233,7 +218,8 @@ The implementation can only be called `marimo 1:1` when all of the following are
 
 #### 15.1 Source Lock
 
-- freeze parity work to the traced marimo assets listed in section `3`
+- freeze parity work to the installed `marimo==0.21.0` assets listed in section `3` of `01-goal-rules-and-sources.md`
+- treat `.__marimo_upstream/frontend/src/...` as readable support only after the section is mapped back to installed bundle evidence
 - do not import marimo runtime or CSS into Codaro as implementation
 - only recreate wrappers, class tokens, strings, ids, `data-testid`, and branch gates that are confirmed in those assets
 - if a token or wrapper is not found in source, it is excluded until traced

@@ -5,22 +5,21 @@
 <div class="siteShell">
   <section class="pageHero">
     <div class="badge">Blog</div>
-    <h1>Codaro writing surface</h1>
-    <p>Posts on editor runtime, notebook mechanics, learning flows, and app automation.</p>
+    <h1>Blog</h1>
+    <p>Notes on editor runtime, notebook mechanics, learning flows, and app automation.</p>
   </section>
 
   <section class="pageSection">
     <div class="sectionHeader">
       <div>
         <h2>Categories</h2>
-        <p>Fixed public categories for build and archive pages.</p>
       </div>
     </div>
     <div class="cardGrid">
       {#each data.postCategories as category}
-        <a class="surfaceCard" href={`/blog/category/${category.slug}`}>
+        <a class="surfaceCard" href={category.path || data.posts.find(p => p.category === category.slug)?.categoryPath}>
           <h3>{category.label}</h3>
-          <p>Archive for {category.slug}.</p>
+          <p>{data.posts.filter(p => p.category === category.slug).length} posts</p>
         </a>
       {/each}
     </div>

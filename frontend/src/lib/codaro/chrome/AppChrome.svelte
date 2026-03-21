@@ -18,9 +18,11 @@
     errorCount?: number;
     warningCount?: number;
     issueCount?: number;
+    queuedOrRunningCount?: number;
     panelTitle?: string;
     helperPanelContent?: Snippet;
     onExport?: () => void;
+    onFeedback?: () => void;
     children: Snippet;
   }
 
@@ -31,9 +33,11 @@
     errorCount = 0,
     warningCount = 0,
     issueCount = 0,
+    queuedOrRunningCount = 0,
     panelTitle = "",
     helperPanelContent,
     onExport,
+    onFeedback,
     children
   }: Props = $props();
 
@@ -43,7 +47,7 @@
 
 <div class="flex flex-col flex-1 overflow-hidden absolute inset-0 print:relative bg-background">
   <PanelGroup id="marimo:chrome:v1:l2" direction="horizontal">
-    <Sidebar {errorCount} />
+    <Sidebar {errorCount} {queuedOrRunningCount} {onFeedback} />
 
     <HelperSidebar {panelTitle}>
       {#if helperPanelContent}

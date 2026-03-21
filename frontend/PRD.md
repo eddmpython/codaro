@@ -1,10 +1,11 @@
 # Frontend PRD
 
-## Marimo Frontend 1:1 Spec Index
+## Archived Marimo Baseline Index
 
-This file is the entrypoint for the marimo frontend copy spec.
+This file is the entrypoint for the archived marimo-parity frontend baseline.
 
 - Detailed source-backed contracts now live under `frontend/prd/`.
+- The frozen snapshot was copied to `_backup/frontend/marimo-parity-baseline-2026-03-20/`.
 - Keep this file short and stable for session handoff.
 - Add or refine actual UI contracts in the split files, not here.
 - `frontend/PRD.md` remains the top-level source-of-truth pointer that `AGENTS.md` and `CLAUDE.md` can reference safely.
@@ -24,19 +25,26 @@ This file is the entrypoint for the marimo frontend copy spec.
 
 ### Update Rules
 
-- Source of truth is upstream marimo source under `.__marimo_upstream/frontend/src/...` when available.
-- Installed `_static` assets are fallback references only when upstream source is absent.
+- Source of truth is the installed marimo static build under `.venv/Lib/site-packages/marimo/_static/`.
+- The current build lock is `marimo==0.21.0`; exact entry asset filenames live in `frontend/prd/01-goal-rules-and-sources.md`.
+- `.__marimo_upstream/frontend/src/...` is a readable companion only after the documented surface is mapped back to installed `_static` asset(s).
 - No guessed DOM, CSS, spacing, hover, or branch behavior is allowed.
-- When a visible surface is documented, write the source file path and the actual branch or token contract.
+- When a visible surface is documented, write the installed asset(s), the readable source path if used, and the actual branch or token contract.
 - When a surface is non-visual, record that explicitly instead of forcing it into the UI inventory.
+
+### Current Truth
+
+- The current marimo-matched Codaro frontend state was frozen as an archive at `_backup/frontend/marimo-parity-baseline-2026-03-20/`.
+- The split PRD now serves as the reference archive for that baseline and for future Codaro deltas.
+- This archive is not allowed to claim finished `marimo 1:1` parity because the remaining browser-backed verification items in `frontend/prd/10-summary-acceptance-and-copy-plan.md` were not closed before freeze.
 
 ### Session Resume
 
-When resuming the marimo parity sweep:
+When resuming from the archived baseline:
 
 1. Start from [10 Summary, Acceptance, and Copy Plan](./prd/10-summary-acceptance-and-copy-plan.md).
-2. Read `12.1 Current State`, `12.2 Next Action`, and `12.3 Verification Left`.
-3. Then jump into the specific split file for the visible surface being traced.
+2. Read `12.1 Current State`, `12.2 Next Action`, and `12.3 Verification Left` to see what was frozen and what remained open.
+3. Then jump into the specific split file for the visible surface being referenced or intentionally changed by Codaro.
 
 ### Current File Map
 

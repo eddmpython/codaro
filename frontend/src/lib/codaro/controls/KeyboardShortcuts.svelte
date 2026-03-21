@@ -19,6 +19,7 @@
     shortcuts = [],
     onClose = () => {}
   }: Props = $props();
+  let dialogEl: HTMLDivElement | undefined = $state();
 
   let groups = $derived(() => {
     const map = new Map<string, ShortcutEntry[]>();
@@ -47,6 +48,12 @@
     onClose();
   }
 
+  $effect(() => {
+    if (open) {
+      requestAnimationFrame(() => dialogEl?.focus());
+    }
+  });
+
   function renderKey(key: string): string {
     return key
       .replace("Cmd", "\u2318")
@@ -69,10 +76,11 @@
 {#if open}
   <div class="shortcutsOverlay" role="presentation" onclick={handleBackdropClick}>
     <div
+      bind:this={dialogEl}
       class="shortcutsDialog"
       role="dialog"
       aria-label="Keyboard shortcuts"
-      onclick={(e) => e.stopPropagation()}
+      tabindex="-1"
     >
       <div class="dialogHeader">
         <h2 class="text-lg font-semibold">Shortcuts</h2>

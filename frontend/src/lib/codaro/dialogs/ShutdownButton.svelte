@@ -24,6 +24,19 @@
     showConfirm = false;
     onShutdown();
   }
+
+  function handleOverlayClick(e: MouseEvent): void {
+    if (e.target === e.currentTarget) {
+      showConfirm = false;
+    }
+  }
+
+  function handleDialogKeydown(e: KeyboardEvent): void {
+    if (e.key === "Escape") {
+      e.preventDefault();
+      showConfirm = false;
+    }
+  }
 </script>
 
 {#if !isWasm}
@@ -38,8 +51,8 @@
 {/if}
 
 {#if showConfirm}
-  <div class="overlay" role="presentation" onclick={() => { showConfirm = false; }}>
-    <div class="confirmDialog" onclick={(e) => e.stopPropagation()} role="alertdialog">
+  <div class="overlay" role="presentation" onclick={handleOverlayClick}>
+    <div class="confirmDialog" role="alertdialog" tabindex="-1" onkeydown={handleDialogKeydown}>
       <h4>Shutdown server?</h4>
       <p>This will stop the running kernel and close all connections.</p>
       <div class="confirmActions">

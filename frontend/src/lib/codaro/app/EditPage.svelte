@@ -15,11 +15,13 @@
     errorCount?: number;
     warningCount?: number;
     issueCount?: number;
+    queuedOrRunningCount?: number;
     panelTitle?: string;
     hideControls?: boolean;
     helperPanelContent?: Snippet;
     floatingControls?: Snippet;
     onExport?: () => void;
+    onFeedback?: () => void;
     children: Snippet;
   }
 
@@ -34,11 +36,13 @@
     errorCount = 0,
     warningCount = 0,
     issueCount = 0,
+    queuedOrRunningCount = 0,
     panelTitle = "",
     hideControls = false,
     helperPanelContent,
     floatingControls,
     onExport,
+    onFeedback,
     children
   }: Props = $props();
 </script>
@@ -50,9 +54,11 @@
   {errorCount}
   {warningCount}
   {issueCount}
+  {queuedOrRunningCount}
   {panelTitle}
   {helperPanelContent}
   {onExport}
+  {onFeedback}
 >
   <AppContainer {connectionState}>
     <FilenameForm {documentLocation} {documentTitle} {hasPath} />

@@ -76,6 +76,13 @@
   });
 
   function handleKeydown(e: KeyboardEvent): void {
+    if (!flatItems.length) {
+      if (e.key === "Escape") {
+        e.preventDefault();
+        onClose();
+      }
+      return;
+    }
     if (e.key === "ArrowDown") {
       e.preventDefault();
       selectedIndex = (selectedIndex + 1) % flatItems.length;
@@ -98,6 +105,16 @@
   function selectItem(item: CommandItem): void {
     onClose();
     requestAnimationFrame(() => item.handle());
+  }
+
+  function handleItemKeydown(e: KeyboardEvent, item: CommandItem): void {
+    if (item.disabled) {
+      return;
+    }
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      selectItem(item);
+    }
   }
 
   function handleBackdropClick(): void {
@@ -158,7 +175,9 @@
                   data-disabled={item.disabled || false}
                   role="option"
                   aria-selected={itemIndex === selectedIndex}
+                  tabindex={item.disabled ? -1 : itemIndex === selectedIndex ? 0 : -1}
                   onclick={() => !item.disabled && selectItem(item)}
+                  onkeydown={(e) => handleItemKeydown(e, item)}
                   onmouseenter={() => { if (!item.disabled) selectedIndex = itemIndex; }}
                 >
                   <span>{item.label}</span>

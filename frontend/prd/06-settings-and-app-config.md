@@ -4,9 +4,24 @@
 
 [Resume from Summary](./10-summary-acceptance-and-copy-plan.md#121-current-state)
 
+Installed asset evidence for this file:
+
+- `./assets/app-config-button-zy3OAtTs.js`
+- `./assets/form-BEIQJWib.js`
+- `./assets/field-9GctqEPJ.js`
+- `./assets/select-Ch6m1k2G.js`
+- `./assets/index-CVpJvEAO.css`
+
 #### 8.1 App Config Trigger Modes
 
 Source:
+
+Installed assets:
+
+- `./assets/app-config-button-zy3OAtTs.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/app-config/app-config-button.tsx`
 
@@ -115,6 +130,20 @@ Popover footer link:
   - `onClick: () => setOpen(true)`
 
 #### 8.2 Notebook Settings Form
+
+Source:
+
+Installed assets:
+
+- `./assets/app-config-button-zy3OAtTs.js`
+- `./assets/form-BEIQJWib.js`
+- `./assets/field-9GctqEPJ.js`
+- `./assets/select-Ch6m1k2G.js`
+
+Readable source:
+
+- `.__marimo_upstream/frontend/src/components/app-config/app-config-form.tsx`
+- `.__marimo_upstream/frontend/src/components/app-config/common.tsx`
 
 The form auto-saves through debounced submit:
 
@@ -225,6 +254,15 @@ SQL output change toast:
 
 Source:
 
+Installed assets:
+
+- `./assets/app-config-button-zy3OAtTs.js`
+- `./assets/form-BEIQJWib.js`
+- `./assets/field-9GctqEPJ.js`
+- `./assets/select-Ch6m1k2G.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/app-config/user-config-form.tsx`
 
 Form behavior:
@@ -265,6 +303,16 @@ Package management description:
 #### 8.4 User Settings Form Structure
 
 Source:
+
+Installed assets:
+
+- `./assets/app-config-button-zy3OAtTs.js`
+- `./assets/form-BEIQJWib.js`
+- `./assets/field-9GctqEPJ.js`
+- `./assets/select-Ch6m1k2G.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/app-config/user-config-form.tsx`
 - `.__marimo_upstream/frontend/src/components/app-config/common.tsx`

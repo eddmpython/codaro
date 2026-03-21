@@ -59,7 +59,7 @@
 </script>
 
 {#if open}
-  <div class="findReplace" onkeydown={handleKeydown}>
+  <div class="findReplace" role="dialog" aria-label="Find and replace" tabindex="-1" onkeydown={handleKeydown}>
     <div class="findRow">
       <input
         bind:this={findInput}

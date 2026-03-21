@@ -8,6 +8,13 @@
   import CommandPalette from "../controls/CommandPalette.svelte";
   import KeyboardShortcuts from "../controls/KeyboardShortcuts.svelte";
   import FindReplace from "../controls/FindReplace.svelte";
+  import StatusOverlay from "../controls/StatusOverlay.svelte";
+  import ErrorBanner from "../controls/ErrorBanner.svelte";
+  import PackageAlert from "../controls/PackageAlert.svelte";
+  import PendingAICellsBar from "../controls/PendingAICellsBar.svelte";
+  import DisconnectedOverlay from "../controls/DisconnectedOverlay.svelte";
+  import FeedbackDialog from "../dialogs/FeedbackDialog.svelte";
+  import ShareStaticDialog from "../dialogs/ShareStaticDialog.svelte";
   import FileExplorerPanel from "../panels/FileExplorerPanel.svelte";
   import VariablesPanel from "../panels/VariablesPanel.svelte";
   import DependencyGraphPanel from "../panels/DependencyGraphPanel.svelte";
@@ -17,6 +24,7 @@
   import SnippetsPanel from "../panels/SnippetsPanel.svelte";
   import AIChatPanel from "../panels/AIChatPanel.svelte";
   import { getBasePath } from "../basePath";
+  import { getKioskMode } from "../stores/config.svelte";
   import {
     addBlock as insertBlock,
     applyExecutionResult,
@@ -71,6 +79,10 @@
   let commandPaletteOpen = $state(false);
   let keyboardShortcutsOpen = $state(false);
   let findReplaceOpen = $state(false);
+  let feedbackDialogOpen = $state(false);
+  let shareStaticDialogOpen = $state(false);
+  let pendingAICells: string[] = $state([]);
+  let pendingAIIndex: number | null = $state(null);
 
   const marimoVersion = "0.21.0";
   const marimoStaticBase = `${getBasePath()}/marimo`;
@@ -600,6 +612,9 @@
     chromePanels.find((panel) => panel.key === getSelectedPanel())?.label || getSelectedPanel()
   );
   let saveButtonColor = $derived(dirty ? "yellow" : connectionState === "CLOSED" ? "gray" : "hint-green");
+  let queuedOrRunningCount = $derived(
+    documentState?.blocks.filter((b) => b.execution.status === "running" || b.execution.status === "queued").length || 0
+  );
 
   let variableEntries = $derived(variables.map((v) => ({
     name: v.name,
@@ -730,8 +745,10 @@
         errorCount={issueCount}
         {warningCount}
         {issueCount}
+        {queuedOrRunningCount}
         {panelTitle}
         onExport={exportDocument}
+        onFeedback={() => { feedbackDialogOpen = true; }}
       >
         {#snippet helperPanelContent()}
           {#if getSelectedPanel() === "files"}
@@ -757,7 +774,23 @@
         {/snippet}
 
         {#snippet floatingControls()}
-          <TopRightControls {connectionState} />
+          <StatusOverlay
+            {engineStatus}
+            {connectionState}
+            kioskMode={getKioskMode()}
+            onJumpToRunning={() => {
+              const runningBlock = documentState?.blocks.find((b) => b.execution.status === "running");
+              if (runningBlock) {
+                activeBlockId = runningBlock.id;
+                document.querySelector(`#cell-${runningBlock.id}`)?.scrollIntoView({ behavior: "smooth", block: "center" });
+              }
+            }}
+          />
+          <TopRightControls
+            {connectionState}
+            onExport={exportDocument}
+            onShareStatic={() => { shareStaticDialogOpen = true; }}
+          />
           <BottomRightControls
             {connectionState}
             {engineStatus}
@@ -808,6 +841,24 @@
       <ol tabindex="-1" class="fixed top-0 z-100 flex max-h-screen w-full flex-col-reverse p-4 sm:bottom-0 sm:right-0 sm:top-auto sm:flex-col md:w-fit md:max-w-[420px]"></ol>
     </div>
 
+    {#if connectionState === "CLOSED" && engineStatus === "error"}
+      <DisconnectedOverlay reason={engineError || "Connection lost"} />
+    {/if}
+
+    <PendingAICellsBar
+      pendingCount={pendingAICells.length}
+      currentIndex={pendingAIIndex}
+      onNavigate={(dir) => {
+        if (pendingAICells.length === 0) return;
+        if (pendingAIIndex === null) { pendingAIIndex = 0; return; }
+        pendingAIIndex = dir === "up"
+          ? (pendingAIIndex - 1 + pendingAICells.length) % pendingAICells.length
+          : (pendingAIIndex + 1) % pendingAICells.length;
+      }}
+      onAcceptAll={() => { pendingAICells = []; pendingAIIndex = null; }}
+      onRejectAll={() => { pendingAICells = []; pendingAIIndex = null; }}
+    />
+
     <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999">
       <CommandPalette
         open={commandPaletteOpen}
@@ -822,6 +873,14 @@
       <FindReplace
         open={findReplaceOpen}
         onClose={() => { findReplaceOpen = false; }}
+      />
+      <FeedbackDialog
+        open={feedbackDialogOpen}
+        onClose={() => { feedbackDialogOpen = false; }}
+      />
+      <ShareStaticDialog
+        open={shareStaticDialogOpen}
+        onClose={() => { shareStaticDialogOpen = false; }}
       />
     </div>
   {/if}

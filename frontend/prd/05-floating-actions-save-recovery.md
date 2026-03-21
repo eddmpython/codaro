@@ -4,9 +4,26 @@
 
 [Resume from Summary](./10-summary-acceptance-and-copy-plan.md#121-current-state)
 
+Installed asset evidence for this file:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/command-palette-CQFQWyFs.js`
+- `./assets/app-config-button-zy3OAtTs.js`
+- `./assets/cell-editor-CSaoLcvI.js`
+- `./assets/index-CVpJvEAO.css`
+
 #### 7.0 Action Button and Text Button Primitives
 
 Source:
+
+Installed assets:
+
+- `./assets/Inputs-BBPHhEky.js`
+- `./assets/button-BZAv3veu.js`
+- `./assets/menu-items-Z4F08mfP.js`
+- `./assets/Inputs-CuKU-ENz.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/inputs/Inputs.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/inputs/Inputs.styles.ts`
@@ -148,6 +165,15 @@ Menu primitive tokens from `components/ui/menu-items.tsx`:
 
 Source branch:
 
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/app-config-button-zy3OAtTs.js`
+- `./assets/command-palette-CQFQWyFs.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/editor/controls/Controls.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/controls/notebook-menu-dropdown.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/controls/command-palette-button.tsx`
@@ -285,6 +311,13 @@ Notebook menu dropdown contract:
 #### 7.1.1 Notebook Menu Item Inventory
 
 Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/actions/useNotebookActions.tsx`
 
@@ -537,6 +570,22 @@ Remaining direct notebook menu items:
   - hidden when `!location.search.includes("file")`
 
 #### 7.2 Bottom-Right Floating Stack
+
+Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/command-palette-CQFQWyFs.js`
+- `./assets/cell-editor-CSaoLcvI.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
+
+- `.__marimo_upstream/frontend/src/components/editor/controls/Controls.tsx`
+- `.__marimo_upstream/frontend/src/core/saving/save-component.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/controls/command-palette-button.tsx`
+- `.__marimo_upstream/frontend/src/components/editor/controls/keyboard-shortcuts.tsx`
 
 Wrapper class:
 
@@ -804,6 +853,13 @@ Interrupt button:
 
 Source:
 
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/find-replace/find-replace.tsx`
 - `.__marimo_upstream/frontend/src/core/codemirror/find-replace/state.ts`
 - `.__marimo_upstream/frontend/src/core/codemirror/find-replace/search-highlight.ts`
@@ -990,6 +1046,13 @@ Highlight and match-state contract:
 
 Source:
 
+Installed assets:
+
+- `./assets/app-config-button-zy3OAtTs.js`
+- `./assets/edit-page-CTVRcSta.js`
+
+Readable source:
+
 - `.__marimo_upstream/frontend/src/components/app-config/app-config-button.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/controls/shutdown-button.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/actions/useConfigActions.tsx`
@@ -1044,7 +1107,14 @@ Shutdown button contract:
 
 #### 7.4 Save Dialog and Recovery Dialog
 
-Save dialog source:
+Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/index-CVpJvEAO.css`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/core/saving/save-component.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/RecoveryButton.tsx`
@@ -1150,6 +1220,13 @@ Recovery dialog strings and hooks:
 #### 7.5 Floating Pending AI Cells Bar
 
 Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+- `./assets/cell-editor-CSaoLcvI.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/chrome/wrapper/pending-ai-cells.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/ai/completion-handlers.tsx`
@@ -1288,6 +1365,12 @@ Reject control branch:
 #### 7.5.1 Multi-Cell Selection Toolbar
 
 Source:
+
+Installed assets:
+
+- `./assets/edit-page-CTVRcSta.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/navigation/multi-cell-action-toolbar.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/navigation/selection.ts`
@@ -1450,6 +1533,13 @@ Pending delete confirmation bar:
 #### 7.6 Command Palette Overlay
 
 Source:
+
+Installed assets:
+
+- `./assets/command-palette-CQFQWyFs.js`
+- `./assets/command-DGKK2-4P.js`
+
+Readable source:
 
 - `.__marimo_upstream/frontend/src/components/editor/controls/command-palette.tsx`
 - `.__marimo_upstream/frontend/src/components/ui/command.tsx`

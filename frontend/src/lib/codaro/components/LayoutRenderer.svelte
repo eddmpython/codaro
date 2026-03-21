@@ -1,5 +1,6 @@
 <script lang="ts">
   import { marked } from "marked";
+  import LayoutRendererSelf from "./LayoutRenderer.svelte";
   import WidgetRenderer from "./WidgetRenderer.svelte";
 
   interface Props {
@@ -163,7 +164,7 @@
 {:else if Array.isArray(value)}
   <div class="stack vertical">
     {#each value as item}
-      <svelte:self value={item} />
+      <LayoutRendererSelf value={item} />
     {/each}
   </div>
 {:else if type === "markdown"}
@@ -174,7 +175,7 @@
   <div class="stack vertical" style={stackStyle("column")}>
     {#each items as item, index}
       <div class="stackItem" style={itemStyle(index)}>
-        <svelte:self value={getContent(item)} />
+        <LayoutRendererSelf value={getContent(item)} />
       </div>
     {/each}
   </div>
@@ -182,7 +183,7 @@
   <div class="stack horizontal" style={stackStyle("row")}>
     {#each items as item, index}
       <div class="stackItem" style={itemStyle(index)}>
-        <svelte:self value={getContent(item)} />
+        <LayoutRendererSelf value={getContent(item)} />
       </div>
     {/each}
   </div>
@@ -192,7 +193,7 @@
       <h4>{currentTitle()}</h4>
     {/if}
     <div class="calloutBody">
-      <svelte:self value={getContent(currentRecord())} />
+      <LayoutRendererSelf value={getContent(currentRecord())} />
     </div>
   </section>
 {:else if type === "tabs"}
@@ -206,7 +207,7 @@
     </div>
     {#if items[activeTab]}
       <div class="tabPanel">
-        <svelte:self value={getContent(items[activeTab])} />
+        <LayoutRendererSelf value={getContent(items[activeTab])} />
       </div>
     {/if}
   </section>
@@ -220,7 +221,7 @@
         </button>
         {#if openAccordion.includes(index)}
           <div class="accordionPanel">
-            <svelte:self value={getContent(item)} />
+            <LayoutRendererSelf value={getContent(item)} />
           </div>
         {/if}
       </div>
@@ -229,10 +230,10 @@
 {:else if type === "sidebar"}
   <section class="sidebarLayout">
     <aside style={sidebarStyle()}>
-      <svelte:self value={currentRecord().content} />
+      <LayoutRendererSelf value={currentRecord().content} />
       {#if currentRecord().footer}
         <div class="sidebarFooter">
-          <svelte:self value={currentRecord().footer} />
+          <LayoutRendererSelf value={currentRecord().footer} />
         </div>
       {/if}
     </aside>

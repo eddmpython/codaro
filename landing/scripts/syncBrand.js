@@ -15,7 +15,18 @@ const brandFiles = [
   ["favicon.png", "favicon.png"],
 ];
 
-for (const [sourceName, targetRelative] of brandFiles) {
+const poseFiles = [
+  ["poses/sheet-01/pose-01.png", "brand/poses/hello.png"],
+  ["poses/sheet-01/pose-02.png", "brand/poses/coding.png"],
+  ["poses/sheet-01/pose-03.png", "brand/poses/working.png"],
+  ["poses/sheet-01/pose-04.png", "brand/poses/success.png"],
+  ["poses/sheet-01/pose-05.png", "brand/poses/thinking.png"],
+  ["poses/sheet-01/pose-06.png", "brand/poses/search.png"],
+  ["poses/sheet-01/pose-07.png", "brand/poses/building.png"],
+  ["poses/sheet-01/pose-08.png", "brand/poses/reading.png"],
+];
+
+for (const [sourceName, targetRelative] of [...brandFiles, ...poseFiles]) {
   const sourcePath = resolve(workRoot, sourceName);
   if (!existsSync(sourcePath)) {
     throw new Error(`Missing brand asset: ${sourcePath}`);

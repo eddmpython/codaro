@@ -6,7 +6,9 @@
 
 이 문서는 현재 프론트 재구축의 source of truth다.
 이번 재구축은 감으로 새 UI를 만드는 작업이 아니다.
-먼저 설치된 `marimo`를 기준선으로 정확히 재현하고, 그 다음에 Codaro의 우위를 쌓는다.
+설치된 `marimo`를 기준선으로 맞춘 상태를 먼저 고정했고, 그 위에서 Codaro의 우위를 쌓는다.
+
+2026-03-20 기준 `marimo-parity` baseline은 `_backup/frontend/marimo-parity-baseline-2026-03-20/`에 그대로 동결했다.
 
 단, 문서 surface는 Codaro 제품 의도로 분기한다.
 - notebook chrome parity는 계속 유지한다
@@ -21,6 +23,14 @@
 - 벤더 경로는 `frontend/src/lib/vendor/marimo/assets/`다
 - 재구축의 기준선은 `eddmlab`이 아니라 프로젝트 `.venv`에 설치된 `marimo`다
 - IDE 안의 문서 surface는 full docs viewer가 아니라 compact `Context Help`로 고정한다
+- 현재 marimo-parity 기준 상태는 `_backup/frontend/marimo-parity-baseline-2026-03-20/`에 snapshot으로 보존되어 있다
+
+## 아카이브 규칙
+
+- `marimo-parity`로 맞춘 현재 프론트 상태는 archive baseline으로 취급한다
+- archive는 보존본이다. parity 기준을 다시 읽을 때는 `_backup/frontend/marimo-parity-baseline-2026-03-20/`와 `frontend/prd/*.md`를 먼저 본다
+- 이후 제품 개발은 archive를 덮어쓰는 방식이 아니라, archive 대비 Codaro 의도적 차이를 쌓는 방식으로 진행한다
+- 나중에 다시 `marimo 1:1` 판정을 열고 싶으면 archive 기준에서 새 검증 라운드를 시작한다
 
 ## 절대 규칙
 
@@ -268,18 +278,24 @@ parity 이후에만 아래를 붙인다.
 
 반드시 순서는 아래다.
 
-`marimo parity -> Codaro adapter -> Codaro advantage`
+`marimo parity baseline -> Codaro adapter -> Codaro advantage`
 
 ## Current State
 
-- PRD 10개 파일(01-10) 모두 marimo upstream 소스와 1:1 검증 완료
-- **Phase 0-9 완료** — 전체 56개 컴포넌트 구현, 빌드 성공
+- frontend PRD는 설치본 `marimo==0.21.0` `_static` 자산 기준으로 잠겨 있고, split PRD의 현재 `Source:` 블록들은 모두 `Installed assets -> Readable source` 순서를 갖는다
+- 현재 `frontend/`의 marimo-matched 작업 상태는 `_backup/frontend/marimo-parity-baseline-2026-03-20/`에 그대로 snapshot됐다
+- 구현 쪽은 전체 notebook chrome/component inventory가 Svelte로 존재하고, `frontend/` production build는 성공한다
+- 이번 패스에서 dialog/overlay a11y 경고, Svelte runes `state_referenced_locally` 경고, `svelte:self` deprecation, marimo font unresolved 경고를 제거했다
+- 현재 남은 빌드 경고는 large client chunk warning 하나다
 - 모든 컴포넌트 Svelte 5 runes 전환 완료 (`export let` 잔존 0개)
 - 개발 계획서: `C:\Users\MSI\.claude\plans\idempotent-mapping-aho.md` (11 Phase, 56 컴포넌트)
 - helper sidebar의 `documentation` slot은 shipped product에서 `Context Help`로 대체
 - `Context Help` 데이터는 `frontend/src/lib/codaro/contextHelp.ts`가 관리
+- 이 archive baseline은 `marimo 1:1 완료` 선언이 아니다. browser side-by-side 검증과 일부 정밀 proof는 남은 상태로 얼려 두었다
 
 ### 완료된 Phase 목록
+
+아래 Phase는 archive baseline에 반영된 구현 범위다.
 
 | Phase | 내용 | 상태 |
 | --- | --- | --- |
@@ -375,18 +391,17 @@ src/lib/codaro/
 
 ## Next Action
 
-- **Phase 10: 검증 + 아카이브**
-  - 브라우저에서 marimo와 나란히 비교
-  - PRD 14 검증 체크리스트 전수 확인
-  - 모든 data-testid, class 토큰, 분기 검증
-  - `git tag marimo-parity-v1`으로 아카이브
-  - Codaro 고유 색깔 브랜치 시작
+- archive baseline은 그대로 둔다
+- active `frontend/`에서는 archive를 기준점으로 삼아 Codaro 전용 변화만 쌓는다
+- 다음 실제 개발은 Codaro 서버 커널/file/package/session API 연결과 제품용 UX 분기로 옮긴다
+- parity를 다시 열 필요가 생기면 archive 기준에서 browser side-by-side 검증과 asset proof 정밀화를 별도 라운드로 진행한다
 
 ## Verification Left
 
-- 브라우저 렌더 비교 (marimo 나란히)
-- hover 버튼 위치, sidebar width, footer height, cell padding 실측
-- 빌드 경고/에러 0 확인
-- a11y 검증
-- 패널 바디들이 HelperSidebar/DeveloperPanel에 올바르게 연결되는지 검증
-- 커맨드 팔레트 Cmd+K 동작 검증
+- archive snapshot과 현재 `frontend/` 작업 트리가 freeze 시점에 같은 기준 상태였는지 필요 시 diff로 다시 확인
+- Codaro 제품 변화가 archive baseline을 우발적으로 깨지 않았는지 주요 shell/cell surface 기준으로 확인
+- Svelte/a11y/font unresolved 경고 재발 없는지 확인
+- large client chunk warning 해소 또는 의도적 허용 여부 결정
+- save/recovery/share/settings/feedback/shutdown 흐름이 실제 backend state와 이어지는지 검증
+- server kernel, websocket, variables, packages, fs 흐름이 Codaro 런타임 기대치에 맞게 이어지는지 검증
+- 만약 `marimo 1:1` 판정을 다시 열면, 브라우저 렌더 비교와 spacing/testid 실측은 별도로 다시 수행

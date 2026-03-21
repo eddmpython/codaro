@@ -1,3 +1,4 @@
+from .aiRouter import createAiRouter
 from .appState import ServerState, createServerState
 from .bootstrapRouter import createBootstrapRouter
 from .curriculumRouter import createCurriculumRouter
@@ -36,6 +37,7 @@ __all__ = [
     "UpdateBlockRequest",
     "ApiError",
     "apiErrorHandler",
+    "createAiRouter",
     "createBootstrapRouter",
     "createCurriculumRouter",
     "createDocumentRouter",

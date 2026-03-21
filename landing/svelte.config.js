@@ -1,6 +1,8 @@
 import adapter from "@sveltejs/adapter-static";
 import { vitePreprocess } from "@sveltejs/vite-plugin-svelte";
 
+const dev = process.env.NODE_ENV === "development";
+
 const config = {
   preprocess: vitePreprocess(),
   kit: {
@@ -10,6 +12,9 @@ const config = {
       fallback: "404.html",
       strict: false,
     }),
+    paths: {
+      base: dev ? "" : "/codaro",
+    },
     prerender: {
       handleHttpError: "warn",
     },

@@ -17,7 +17,8 @@ Codaro `frontend/` must reproduce the marimo edit frontend with `Svelte + CSS` a
 - The target includes `head`, `root`, `workspace chrome`, `left rail`, `helper sidebar`, `developer panel`, `filename bar`, `floating controls`, `footer`, `settings`, `save dialogs`, `feedback dialog`, `cell wrapper`, `editor`, `hover overlay`, `status rail`, `console output`, and `output surface`.
 - Parity means identical source-backed branch behavior, DOM hierarchy, class tokens, state splits, IDs, and `data-testid` hooks.
 - Implementation must stay in Codaro Svelte and CSS. Vendor import is not the parity target.
-- Guesses are forbidden. Every wrapper, token, and branch in this document is taken from marimo source or local DOM capture.
+- Guesses are forbidden. Every wrapper, token, and branch in this document must be traceable to the installed marimo build, supplemented by local DOM capture and a readable source mirror when needed.
+- The current lock is the installed `marimo==0.21.0` build. Until a section is tied back to that build, it is not allowed to claim finished `1:1` parity.
 
 ### 2. Working Rules
 
@@ -27,21 +28,55 @@ Codaro `frontend/` must reproduce the marimo edit frontend with `Svelte + CSS` a
 - `data-testid`, `id`, and ARIA labels are part of the contract.
 - Hover behavior must come from source CSS selectors, not custom JS emulation.
 - When source branches differ by mode, Codaro must mirror the same branch boundaries instead of flattening them into one custom layout.
+- Installed `_static` assets win over every other reference whenever there is any discrepancy.
+- `.__marimo_upstream/frontend/src/...` is a readable mirror, not a higher source of truth.
+- A section is only considered closed when the PRD records the installed asset evidence and the resolved branch or token contract.
 
 ### 3. Source Of Truth
 
-#### 3.1 Static Entry
+#### 3.1 Installed Build Lock
 
-- `.venv/Lib/site-packages/marimo/_static/index.html`
+- package version: `marimo==0.21.0`
+- static root: `.venv/Lib/site-packages/marimo/_static/`
+- entry HTML: `.venv/Lib/site-packages/marimo/_static/index.html`
+- entry module: `.venv/Lib/site-packages/marimo/_static/assets/index-CV-Vv3LK.js`
+- CSS load order from `index.html`:
+  - `./assets/cells-jmgGt1lS.css`
+  - `./assets/markdown-renderer-DdDKmWlR.css`
+  - `./assets/JsonOutput-B7vuddcd.css`
+  - `./assets/index-CVpJvEAO.css`
+- hidden mount and root contracts from `index.html`:
+  - `<marimo-filename hidden>`
+  - `<marimo-version data-version="{{ version }}" hidden>`
+  - `<marimo-user-config data-config="{{ user_config }}" hidden>`
+  - `<marimo-server-token data-token="{{ server_token }}" hidden>`
+  - `<div id="root"></div>`
+  - `<div id="portal" data-testid="glide-portal" ...></div>`
+  - `window.__MARIMO_MOUNT_CONFIG__ = '{{ mount_config }}'`
+- key visible-surface bundles already referenced across this PRD:
+  - `./assets/edit-page-CTVRcSta.js`
+  - `./assets/cells-wT6clfi5.js`
+  - `./assets/cell-editor-CSaoLcvI.js`
+  - `./assets/panels-BfLG6GHU.js`
+  - `./assets/command-palette-CQFQWyFs.js`
+  - `./assets/context-aware-panel-DScGcWey.js`
+  - `./assets/file-explorer-panel-DclnBp04.js`
+  - `./assets/dependency-graph-panel-Cg4IqU-y.js`
+  - `./assets/app-config-button-zy3OAtTs.js`
+  - `./assets/agent-panel-DFVcMxMV.js`
+  - `./assets/terminal-D7RRO5NO.js`
+- if any of these filenames change, the parity lock must be re-verified before this PRD can be called current again
 
-#### 3.2 Upstream Frontend Root
+#### 3.2 DOM Capture
+
+- `experiments/marimo-layout.dom.html`
+- this capture is supplemental: it helps verify real DOM order, style injection, and portal placement, but it does not override the installed build lock
+
+#### 3.3 Readable Source Mirror Root
 
 - `.__marimo_upstream/frontend/src/components/pages/edit-page.tsx`
 - `.__marimo_upstream/frontend/src/components/editor/app-container.tsx`
-
-#### 3.3 DOM Capture
-
-- `experiments/marimo-layout.dom.html`
+- `.__marimo_upstream/frontend/package.json` uses workspace placeholder version `0.0.0-placeholder`; this tree is readable support, not proof that it matches the installed `0.21.0` build
 
 #### 3.4 Shell, Chrome, Layout, Header, and Controls
 

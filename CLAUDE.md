@@ -187,6 +187,8 @@
   - `src/codaro/runtime/DEV.md`
   - `launcher/PRD.md`
   - `launcher/PACKAGING.md`
+  - `backend/PRD.md` (marimo 백엔드 1:1 분석 인덱스)
+  - `backend/prd/*.md` (백엔드 분할 문서 01~12)
   - `frontend/DEV.md`
   - `landing/DEV.md`
 
@@ -206,6 +208,7 @@
 - `frontend/` : SvelteKit + Tailwind v4 편집기, shadcn 패턴 공용 UI, marimo 기준 notebook chrome, 학습 브라우저, 미션 체크 UI, 서버 커널 우선 + Pyodide 폴백
 - `landing/` : SvelteKit static public site, docs/blog/search, GitHub Pages build
 - `blog/` : public blog source (`category/post/index.md + assets/`)
+- `backend/` : marimo 백엔드 1:1 분석 PRD (12개 분할 문서), `backend/PRD.md` 인덱스
 - `tests/` : 커널, 리액티브, 시스템, 문서, 커리큘럼, 체커, 서버 API, 서버 런타임 테스트 (119개)
 
 ## 실행 환경 규칙
