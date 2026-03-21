@@ -43,6 +43,16 @@ def buildParser() -> argparse.ArgumentParser:
     exportParser.add_argument("--format", required=True, choices=["codaro", "marimo", "ipynb"])
     exportParser.add_argument("--output", help="Output file path.")
 
+    taskParser = subparsers.add_parser("task", help="Manage automation tasks.")
+    taskSubparsers = taskParser.add_subparsers(dest="task_command", required=True)
+
+    taskRunParser = taskSubparsers.add_parser("run", help="Run a document as a task.")
+    taskRunParser.add_argument("path", help="Document path to execute.")
+    taskRunParser.add_argument("--verbose", action="store_true")
+
+    taskListParser = taskSubparsers.add_parser("list", help="List registered tasks.")
+    taskListParser.add_argument("--verbose", action="store_true")
+
     parser.add_argument("--host", default="127.0.0.1")
     parser.add_argument("--port", type=int, default=8765)
     parser.add_argument("--no-browser", action="store_true")
@@ -64,6 +74,10 @@ def main() -> None:
             command=command,
         ),
     )
+
+    if command == "task":
+        _handleTask(args, logger)
+        return
 
     if command == "export":
         outputPath = exportDocument(args.path, args.format, args.output)
@@ -118,12 +132,51 @@ def _buildUrl(host: str, port: int, mode: str, documentPath: Path | None) -> str
     return f"http://{host}:{port}{basePath}?path={documentPath.as_posix()}"
 
 
+def _handleTask(args, logger) -> None:
+    import asyncio
+    from .automation.taskModel import TaskDefinition
+    from .automation.taskRunner import TaskRunner
+    from .automation.taskRegistry import getTaskRegistry
+
+    if args.task_command == "run":
+        docPath = Path(args.path).expanduser().resolve()
+        if not docPath.exists():
+            print(f"Document not found: {docPath}", file=sys.stderr)
+            raise SystemExit(1)
+
+        task = TaskDefinition(
+            name=docPath.stem,
+            documentPath=str(docPath),
+        )
+        runner = TaskRunner(workspaceRoot=str(docPath.parent))
+        run = asyncio.run(runner.run(task))
+
+        if run.output:
+            print(run.output)
+        if run.error:
+            print(f"Error: {run.error}", file=sys.stderr)
+            raise SystemExit(1)
+
+        print(f"Task completed: {run.status.value} ({run.durationMs}ms)")
+
+    elif args.task_command == "list":
+        registry = getTaskRegistry()
+        tasks = registry.listTasks()
+        if not tasks:
+            print("No registered tasks.")
+            return
+        for t in tasks:
+            status = "enabled" if t.enabled else "disabled"
+            schedule = t.schedule or "manual"
+            print(f"  {t.id}  {t.name}  [{status}]  schedule={schedule}")
+
+
 def normalizeArgs(rawArgs: list[str]) -> list[str]:
     if not rawArgs:
         return ["edit"]
 
     command = rawArgs[0].lower()
-    knownCommands = {"edit", "run", "app", "export"}
+    knownCommands = {"edit", "run", "app", "export", "task"}
 
     if command == "app":
         return ["run", *rawArgs[1:]]
