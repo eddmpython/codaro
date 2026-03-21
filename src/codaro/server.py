@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import os
 import time
 from contextlib import asynccontextmanager
@@ -159,7 +160,38 @@ def createServerApp(
                 studyRoot=state.studyRoot if state.studyRoot.exists() else None,
             ),
         )
+
+        async def reapSessionsPeriodically() -> None:
+            from .api.aiRouter import _getConversationManager
+            while True:
+                await asyncio.sleep(300)
+                try:
+                    sessionReaped = state.sessionManager.reapExpired()
+                    convManager = _getConversationManager()
+                    convReaped = convManager.reapExpired()
+                    if sessionReaped > 0 or convReaped > 0:
+                        logger.info(
+                            "reaper %s",
+                            formatLogFields(
+                                status="reaped",
+                                sessions=sessionReaped,
+                                conversations=convReaped,
+                                remainingSessions=state.sessionManager.sessionCount,
+                                remainingConversations=convManager.conversationCount,
+                            ),
+                        )
+                except Exception as reapError:
+                    logger.warning("reaper %s", formatLogFields(status="error", error=str(reapError)))
+
+        reapTask = asyncio.create_task(reapSessionsPeriodically())
+
         yield
+
+        reapTask.cancel()
+        try:
+            await reapTask
+        except asyncio.CancelledError:
+            pass
         logger.info(
             "lifespan %s",
             formatLogFields(status="shutdown", activeSessions=state.sessionManager.sessionCount),

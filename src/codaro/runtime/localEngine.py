@@ -20,6 +20,8 @@ from .executionEngine import (
 )
 from .localWorker import runLocalWorker
 
+EXECUTION_TIMEOUT_SECONDS = 300
+
 
 class LocalEngine(ExecutionEngine):
     def __init__(
@@ -78,15 +80,32 @@ class LocalEngine(ExecutionEngine):
                 return
 
         try:
-            response = await loop.run_in_executor(
-                self._ipcExecutor,
-                self._executeBlocking,
-                code,
-                blockId,
-                injectedVars,
-                startInterruptCount,
-                emitEvent,
+            response = await asyncio.wait_for(
+                loop.run_in_executor(
+                    self._ipcExecutor,
+                    self._executeBlocking,
+                    code,
+                    blockId,
+                    injectedVars,
+                    startInterruptCount,
+                    emitEvent,
+                ),
+                timeout=EXECUTION_TIMEOUT_SECONDS,
             )
+        except asyncio.TimeoutError:
+            self.interrupt()
+            response = {
+                "type": "error",
+                "data": f"Execution timed out after {EXECUTION_TIMEOUT_SECONDS} seconds.",
+                "stdout": "",
+                "stderr": "",
+                "status": "error",
+                "variables": [],
+                "stateDelta": {"added": [], "updated": [], "removed": []},
+                "registryMirror": {},
+                "cellDefinitions": {},
+                "executionCount": self.executionCount,
+            }
         finally:
             self.status = "idle"
             self._workerBusy.clear()

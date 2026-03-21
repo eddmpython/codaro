@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import time
 import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
 from .tools import toolSchemas
+
+MAX_CONVERSATIONS = 50
+CONVERSATION_MAX_IDLE_SECONDS = 3600
 
 _ROLE_PROMPTS: dict[str, str] = {
     "teacher": (
@@ -67,6 +71,7 @@ class ConversationManager:
 
     def __init__(self) -> None:
         self._conversations: dict[str, ConversationState] = {}
+        self._lastAccessed: dict[str, float] = {}
 
     def create(
         self,
@@ -76,6 +81,7 @@ class ConversationManager:
         curriculumContext: str | None = None,
         documentContext: str | None = None,
     ) -> ConversationState:
+        self._evictIfFull()
         state = ConversationState(
             role=role,
             systemPrompt=systemPrompt,
@@ -83,10 +89,14 @@ class ConversationManager:
             documentContext=documentContext,
         )
         self._conversations[state.conversationId] = state
+        self._lastAccessed[state.conversationId] = time.monotonic()
         return state
 
     def get(self, conversationId: str) -> ConversationState | None:
-        return self._conversations.get(conversationId)
+        state = self._conversations.get(conversationId)
+        if state is not None:
+            self._lastAccessed[conversationId] = time.monotonic()
+        return state
 
     def addUserMessage(self, conversationId: str, content: str) -> ConversationState | None:
         state = self._conversations.get(conversationId)
@@ -121,7 +131,29 @@ class ConversationManager:
         return state
 
     def delete(self, conversationId: str) -> bool:
+        self._lastAccessed.pop(conversationId, None)
         return self._conversations.pop(conversationId, None) is not None
+
+    def reapExpired(self, maxIdleSeconds: float = CONVERSATION_MAX_IDLE_SECONDS) -> int:
+        now = time.monotonic()
+        expired = [
+            cid for cid, lastActive in self._lastAccessed.items()
+            if (now - lastActive) > maxIdleSeconds
+        ]
+        for cid in expired:
+            self.delete(cid)
+        return len(expired)
+
+    def _evictIfFull(self) -> None:
+        if len(self._conversations) < MAX_CONVERSATIONS:
+            return
+        oldest = min(self._lastAccessed, key=self._lastAccessed.get, default=None)
+        if oldest is not None:
+            self.delete(oldest)
+
+    @property
+    def conversationCount(self) -> int:
+        return len(self._conversations)
 
     def listConversations(self) -> list[dict[str, Any]]:
         return [

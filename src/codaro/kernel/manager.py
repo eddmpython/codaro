@@ -7,6 +7,7 @@ from .protocol import SessionInfo
 from .session import KernelSession
 
 SESSION_MAX_IDLE_SECONDS = 3600
+MAX_SESSIONS = 10
 
 
 class SessionManager:
@@ -16,6 +17,12 @@ class SessionManager:
         self._workspaceRoot = Path(workspaceRoot).expanduser().resolve() if workspaceRoot is not None else None
 
     def createSession(self, workingDirectory: str | None = None) -> KernelSession:
+        if len(self._sessions) >= MAX_SESSIONS:
+            self.reapExpired()
+        if len(self._sessions) >= MAX_SESSIONS:
+            oldest = min(self._lastActivity, key=self._lastActivity.get, default=None)
+            if oldest is not None:
+                self.destroySession(oldest)
         sessionWorkingDirectory = workingDirectory or (str(self._workspaceRoot) if self._workspaceRoot is not None else None)
         session = KernelSession(
             workingDirectory=sessionWorkingDirectory,

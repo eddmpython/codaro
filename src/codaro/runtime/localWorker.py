@@ -6,8 +6,8 @@ from contextlib import redirect_stderr, redirect_stdout
 import inspect
 import io
 import os
-import pickle
 from pathlib import Path
+import sys
 import traceback
 from typing import Any
 
@@ -232,18 +232,28 @@ def _buildStateResponse(
 def _buildRegistryMirror(registry: dict[str, object]) -> dict[str, object]:
     snapshot: dict[str, object] = {}
     for name, value in registry.items():
-        if not _isPickleable(value):
+        if not _isSerializable(value):
             continue
         snapshot[name] = value
     return snapshot
 
 
-def _isPickleable(value: object) -> bool:
-    try:
-        pickle.dumps(value)
-    except Exception:
+_SERIALIZABLE_PRIMITIVES = (int, float, str, bool, bytes, type(None), complex)
+
+
+def _isSerializable(value: object) -> bool:
+    if isinstance(value, _SERIALIZABLE_PRIMITIVES):
+        return True
+    if isinstance(value, (list, tuple, set, frozenset, dict)):
+        return True
+    if inspect.ismodule(value) or inspect.isfunction(value) or inspect.isclass(value):
         return False
-    return True
+    moduleName = type(value).__module__
+    if moduleName.startswith("pandas") or moduleName.startswith("numpy"):
+        return True
+    if hasattr(value, "__dict__") or hasattr(value, "__slots__"):
+        return True
+    return False
 
 
 def _removeBlockDefinitions(
@@ -310,11 +320,7 @@ def _collectVariables(registry: dict[str, object]) -> list[dict[str, object]]:
         except Exception:
             valueRepr = f"<{type(value).__name__}>"
 
-        size = None
-        try:
-            size = len(value)
-        except TypeError:
-            pass
+        size = _estimateSize(value)
 
         variables.append(
             {
@@ -325,6 +331,24 @@ def _collectVariables(registry: dict[str, object]) -> list[dict[str, object]]:
             }
         )
     return variables
+
+
+def _estimateSize(value: object) -> int | None:
+    moduleName = type(value).__module__
+    typeName = type(value).__name__
+    if moduleName.startswith("numpy") and hasattr(value, "nbytes"):
+        return int(value.nbytes)
+    if moduleName.startswith("pandas"):
+        if hasattr(value, "memory_usage"):
+            try:
+                usage = value.memory_usage(deep=True)
+                return int(usage.sum()) if hasattr(usage, "sum") else int(usage)
+            except Exception:
+                pass
+    try:
+        return len(value)
+    except TypeError:
+        return None
 
 
 def _mapVariablesByName(variables: list[dict[str, object]]) -> dict[str, dict[str, object]]:
@@ -486,14 +510,26 @@ def _sanitizeDescriptor(value: object) -> object:
     return value
 
 
+STREAM_BUFFER_MAX_BYTES = 5 * 1024 * 1024
+
+
 class _StreamingTextBuffer(io.StringIO):
     def __init__(self, eventType: str, emitEvent) -> None:
         super().__init__()
         self._eventType = eventType
         self._emitEvent = emitEvent
+        self._totalBytes = 0
 
     def write(self, text: str) -> int:
         content = str(text)
+        contentBytes = len(content.encode("utf-8", errors="replace"))
+        if self._totalBytes + contentBytes > STREAM_BUFFER_MAX_BYTES:
+            remaining = STREAM_BUFFER_MAX_BYTES - self._totalBytes
+            if remaining <= 0:
+                return len(content)
+            content = content[:remaining]
+            contentBytes = remaining
+        self._totalBytes += contentBytes
         written = super().write(content)
         if content:
             self._emitEvent(self._eventType, {"text": content})

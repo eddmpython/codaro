@@ -237,11 +237,10 @@ export async function sendMessageStreaming(
     timestamp: Date.now(),
     isStreaming: true,
   };
-  messages = [...messages, assistantMsg];
-  const assistantId = assistantMsg.id;
+  messages.push(assistantMsg);
 
-  function findAssistant(): number {
-    return messages.findIndex((m) => m.id === assistantId);
+  function findAssistant(): ChatMessage | undefined {
+    return messages.find((m) => m.id === assistantMsg.id);
   }
 
   try {
@@ -253,8 +252,8 @@ export async function sendMessageStreaming(
         role: conversationRole,
       },
       (event: StreamEvent) => {
-        const idx = findAssistant();
-        if (idx < 0) return;
+        const msg = findAssistant();
+        if (!msg) return;
         switch (event.type) {
           case "start":
             if (event.conversationId && !conversationId) {
@@ -263,46 +262,27 @@ export async function sendMessageStreaming(
             break;
           case "token":
             if (event.content) {
-              const updated = [...messages];
-              updated[idx] = {
-                ...updated[idx],
-                content: event.content,
-              };
-              messages = updated;
+              msg.content = event.content;
             }
             break;
           case "tool_results":
             if (event.toolCalls && event.toolCalls.length > 0) {
-              const updated = [...messages];
-              const existing = updated[idx].toolCalls ?? [];
-              updated[idx] = {
-                ...updated[idx],
-                toolCalls: [...existing, ...event.toolCalls],
-              };
-              messages = updated;
+              msg.toolCalls = [...(msg.toolCalls ?? []), ...event.toolCalls];
               processToolResults(event.toolCalls);
             }
             break;
-          case "done": {
-            const updated = [...messages];
-            updated[idx] = {
-              ...updated[idx],
-              content: event.answer ?? updated[idx].content,
-              isStreaming: false,
-            };
-            messages = updated;
+          case "done":
+            msg.content = event.answer ?? msg.content;
+            msg.isStreaming = false;
             break;
-          }
         }
       },
     );
   } catch (e) {
     error = e instanceof Error ? e.message : "Stream failed";
-    const idx = findAssistant();
-    if (idx >= 0) {
-      const updated = [...messages];
-      updated[idx] = { ...updated[idx], isStreaming: false };
-      messages = updated;
+    const msg = findAssistant();
+    if (msg) {
+      msg.isStreaming = false;
     }
   } finally {
     isLoading = false;
