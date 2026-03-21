@@ -163,7 +163,7 @@ def createAiRouter(state: Any) -> APIRouter:
 
     @router.get("/api/ai/profile/events")
     async def apiAiProfileEvents(request: Request):
-        from sse_starlette.sse import EventSourceResponse
+        from starlette.responses import StreamingResponse
 
         manager = getProfileManager()
 
@@ -176,13 +176,10 @@ def createAiRouter(state: Any) -> APIRouter:
                 fingerprint = manager.fingerprint()
                 if fingerprint != lastFingerprint:
                     lastFingerprint = fingerprint
-                    yield {
-                        "event": "profile_changed",
-                        "data": json.dumps(payload, ensure_ascii=False),
-                    }
+                    yield f"event: profile_changed\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
                 await asyncio.sleep(1.0)
 
-        return EventSourceResponse(_generate())
+        return StreamingResponse(_generate(), media_type="text/event-stream")
 
     @router.get("/api/oauth/authorize")
     def apiOauthAuthorize():

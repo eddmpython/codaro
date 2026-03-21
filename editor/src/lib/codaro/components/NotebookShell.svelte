@@ -25,6 +25,7 @@
   import AIChatPanel from "../panels/AIChatPanel.svelte";
   import { getBasePath } from "../basePath";
   import { getKioskMode, getUserConfig } from "../stores/config.svelte";
+  import { setActiveSurface } from "../stores/surface.svelte";
   import {
     addBlock as insertBlock,
     applyExecutionResult,
@@ -155,6 +156,12 @@
     if (event.key === "F1") {
       event.preventDefault();
       setSelectedPanel("documentation");
+      return;
+    }
+    if (isModKey && event.shiftKey && event.key.toLowerCase() === "c") {
+      event.preventDefault();
+      setActiveSurface("chat");
+      return;
     }
   }
 
@@ -664,7 +671,8 @@
     { action: "editor.indent", name: "Indent", key: "Tab", group: "Editing" },
     { action: "editor.dedent", name: "Dedent", key: "Shift+Tab", group: "Editing" },
     { action: "editor.undo", name: "Undo", key: "Ctrl+Z", group: "Editing" },
-    { action: "editor.redo", name: "Redo", key: "Ctrl+Y", group: "Editing" }
+    { action: "editor.redo", name: "Redo", key: "Ctrl+Y", group: "Editing" },
+    { action: "surface.chat", name: "Switch to Chat", key: "Ctrl+Shift+C", group: "Navigation" }
   ];
 
   let prefersDark = $state(
