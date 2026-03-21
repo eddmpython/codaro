@@ -58,6 +58,7 @@
     onClearOutput?: () => void;
     onSendToTop?: () => void;
     onSendToBottom?: () => void;
+    reportMode?: boolean;
   }
 
   let {
@@ -81,7 +82,8 @@
     onHideCode = () => {},
     onClearOutput = () => {},
     onSendToTop = () => {},
-    onSendToBottom = () => {}
+    onSendToBottom = () => {},
+    reportMode = false
   }: Props = $props();
 
   let status = $derived(block.execution?.status || "idle");
@@ -157,6 +159,19 @@
   }
 </script>
 
+{#if reportMode}
+  <div class="report-cell">
+    {#if block.type === "markdown"}
+      <div class="report-markdown">
+        <MarkdownBlock value={block.content} active={false} onChange={() => {}} />
+      </div>
+    {:else if block.type === "code" && hasOutput}
+      <div class="report-output">
+        <OutputRenderer result={block.execution?.lastOutput} />
+      </div>
+    {/if}
+  </div>
+{:else}
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
   class="outline-hidden rounded-lg"
@@ -410,6 +425,7 @@
   </div>
 </codaro-cell>
 </div>
+{/if}
 
 <style>
   codaro-cell {
@@ -804,5 +820,26 @@
   :global(#App.disconnected) .elapsed-time {
     visibility: hidden;
     animation: none;
+  }
+
+  .report-cell {
+    max-width: 100%;
+  }
+
+  .report-markdown {
+    padding: 0.5rem 0;
+    font-family: "PT Sans", system-ui, sans-serif;
+    line-height: 1.7;
+  }
+
+  .report-markdown :global(h1),
+  .report-markdown :global(h2),
+  .report-markdown :global(h3) {
+    font-family: "Lora", serif;
+    font-weight: 600;
+  }
+
+  .report-output {
+    padding: 0.5rem 0;
   }
 </style>

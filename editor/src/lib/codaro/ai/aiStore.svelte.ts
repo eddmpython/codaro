@@ -3,11 +3,13 @@ import type {
   AiChatResponse,
   AiToolCallResult,
   AiProviderEntry,
+  StreamEvent,
 } from "./aiApi";
 import {
   getProfile,
   getProviders,
   sendChatMessage,
+  streamChatMessage,
   createConversation,
   deleteConversation,
   subscribeProfileEvents,
@@ -207,6 +209,92 @@ export async function sendMessage(
   } catch (e) {
     error = e instanceof Error ? e.message : "Failed to send message";
     return null;
+  } finally {
+    isLoading = false;
+  }
+}
+
+export async function sendMessageStreaming(
+  content: string,
+  sessionId?: string,
+): Promise<void> {
+  if (!content.trim()) return;
+
+  const userMsg: ChatMessage = {
+    id: generateId(),
+    role: "user",
+    content: content.trim(),
+    timestamp: Date.now(),
+  };
+  messages = [...messages, userMsg];
+  isLoading = true;
+  error = null;
+
+  const assistantMsg: ChatMessage = {
+    id: generateId(),
+    role: "assistant",
+    content: "",
+    timestamp: Date.now(),
+    isStreaming: true,
+  };
+  messages = [...messages, assistantMsg];
+  const assistantIdx = messages.length - 1;
+
+  try {
+    await streamChatMessage(
+      {
+        conversationId: conversationId ?? undefined,
+        message: content.trim(),
+        sessionId,
+        role: conversationRole,
+      },
+      (event: StreamEvent) => {
+        switch (event.type) {
+          case "start":
+            if (event.conversationId && !conversationId) {
+              conversationId = event.conversationId;
+            }
+            break;
+          case "token":
+            if (event.content) {
+              const updated = [...messages];
+              updated[assistantIdx] = {
+                ...updated[assistantIdx],
+                content: event.content,
+              };
+              messages = updated;
+            }
+            break;
+          case "tool_results":
+            if (event.toolCalls && event.toolCalls.length > 0) {
+              const updated = [...messages];
+              const existing = updated[assistantIdx].toolCalls ?? [];
+              updated[assistantIdx] = {
+                ...updated[assistantIdx],
+                toolCalls: [...existing, ...event.toolCalls],
+              };
+              messages = updated;
+              processToolResults(event.toolCalls);
+            }
+            break;
+          case "done": {
+            const updated = [...messages];
+            updated[assistantIdx] = {
+              ...updated[assistantIdx],
+              content: event.answer ?? updated[assistantIdx].content,
+              isStreaming: false,
+            };
+            messages = updated;
+            break;
+          }
+        }
+      },
+    );
+  } catch (e) {
+    error = e instanceof Error ? e.message : "Stream failed";
+    const updated = [...messages];
+    updated[assistantIdx] = { ...updated[assistantIdx], isStreaming: false };
+    messages = updated;
   } finally {
     isLoading = false;
   }

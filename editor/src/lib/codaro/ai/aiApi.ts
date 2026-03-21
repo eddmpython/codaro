@@ -178,6 +178,65 @@ export async function sendChatMessage(payload: {
   return parseJson(res, "Failed to send chat message.");
 }
 
+export interface StreamEvent {
+  type: "start" | "token" | "tool_results" | "done";
+  conversationId?: string;
+  content?: string;
+  answer?: string;
+  provider?: string;
+  model?: string;
+  usage?: Record<string, number> | null;
+  toolCalls?: AiToolCallResult[];
+}
+
+export async function streamChatMessage(
+  payload: {
+    conversationId?: string;
+    message: string;
+    sessionId?: string;
+    provider?: string;
+    role?: string;
+  },
+  onEvent: (event: StreamEvent) => void,
+): Promise<void> {
+  const res = await fetch(apiUrl("/api/ai/chat/stream"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+
+  if (!res.ok) {
+    const errPayload = await res.json().catch(() => ({}));
+    throw new Error((errPayload as Record<string, string>)?.detail ?? "Stream request failed");
+  }
+
+  const reader = res.body?.getReader();
+  if (!reader) throw new Error("No response body");
+
+  const decoder = new TextDecoder();
+  let buffer = "";
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+    const lines = buffer.split("\n");
+    buffer = lines.pop() ?? "";
+
+    for (const line of lines) {
+      if (line.startsWith("data: ")) {
+        try {
+          const event = JSON.parse(line.slice(6)) as StreamEvent;
+          onEvent(event);
+        } catch {
+          /* ignore parse error */
+        }
+      }
+    }
+  }
+}
+
 export async function oauthAuthorize(): Promise<OAuthAuthorizeResponse> {
   const res = await fetch(apiUrl("/api/oauth/authorize"));
   return parseJson(res, "Failed to start OAuth flow.");

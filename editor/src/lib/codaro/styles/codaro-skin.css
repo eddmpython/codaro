@@ -272,3 +272,62 @@
 .dark .codaro-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
   background: rgba(161, 161, 170, 0.06);
 }
+
+/* --- Codaro dark mode polish -------------------------------- */
+
+/* Active cell accent glow */
+.dark .codaro-cell.ring-2 {
+  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
+  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 15%, transparent);
+}
+
+/* Glass effect for popovers */
+.dark .cell-actions-popover {
+  background: rgba(24, 24, 27, 0.9);
+  backdrop-filter: blur(12px);
+  border-color: rgba(255, 255, 255, 0.06);
+}
+
+/* Toolbar pill glass */
+.dark .toolbar-pill {
+  background: rgba(24, 24, 27, 0.85);
+  backdrop-filter: blur(8px);
+}
+
+/* Running cell shimmer */
+@keyframes cellShimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.dark .codaro-cell[data-status="running"] {
+  border-image: linear-gradient(
+    90deg,
+    var(--border) 0%,
+    var(--accent) 50%,
+    var(--border) 100%
+  ) 1;
+  background-size: 200% 100%;
+  animation: cellShimmer 2s linear infinite;
+}
+
+/* Smooth transitions */
+.codaro-cell {
+  transition: border-color 0.15s, box-shadow 0.15s;
+}
+
+/* Print styles */
+@media print {
+  .codaro-cell {
+    border: none !important;
+    box-shadow: none !important;
+    page-break-inside: avoid;
+  }
+
+  .hover-action,
+  .toolbar-pill,
+  .shoulder-right,
+  .shoulder-bottom {
+    display: none !important;
+  }
+}

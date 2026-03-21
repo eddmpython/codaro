@@ -341,6 +341,107 @@ def createAiRouter(state: Any) -> APIRouter:
             "toolCalls": [],
         }
 
+    @router.post("/api/ai/chat/stream")
+    async def apiChatStream(request: Request):
+        from starlette.responses import StreamingResponse
+
+        body = await request.json()
+        conversationId = body.get("conversationId")
+        message = body.get("message", "")
+        sessionId = body.get("sessionId")
+        providerOverride = body.get("provider")
+        roleOverride = body.get("role")
+
+        from ..ai.factory import createProvider
+        from ..ai.toolExecutor import ToolExecutor
+        from ..ai.tools import toolSchemas
+        from ..ai.types import LLMConfig
+
+        convManager = _getConversationManager()
+
+        if not conversationId:
+            role = roleOverride or "copilot"
+            conv = convManager.create(role=role)
+            conversationId = conv.conversationId
+        else:
+            conv = convManager.get(conversationId)
+            if conv is None:
+                raise HTTPException(status_code=404, detail="Conversation not found")
+
+        convManager.addUserMessage(conversationId, message)
+
+        profileManager = getProfileManager()
+        role = conv.role if conv else "copilot"
+        resolved = profileManager.resolve(provider=providerOverride, role=role)
+
+        config = LLMConfig(
+            provider=resolved["provider"],
+            model=resolved.get("model"),
+            apiKey=resolved.get("apiKey"),
+            baseUrl=resolved.get("baseUrl"),
+            temperature=resolved.get("temperature", 0.3),
+            maxTokens=resolved.get("maxTokens", 4096),
+        )
+
+        llmProvider = createProvider(config)
+        msgs = convManager.buildMessages(conversationId)
+        tools = toolSchemas()
+
+        executor = ToolExecutor(
+            sessionManager=state.sessionManager,
+            workspaceRoot=str(state.workspaceRoot),
+        )
+        if sessionId:
+            executor.setActiveSession(sessionId)
+
+        async def _streamGenerate():
+            nonlocal msgs, conversationId
+            yield f"data: {json.dumps({'type': 'start', 'conversationId': conversationId}, ensure_ascii=False)}\n\n"
+
+            maxToolRounds = 10
+            for _round in range(maxToolRounds):
+                if llmProvider.supportsNativeTools and tools:
+                    response = llmProvider.completeWithTools(msgs, tools)
+                else:
+                    response = llmProvider.complete(msgs)
+                    convManager.addAssistantMessage(conversationId, response.answer)
+                    yield f"data: {json.dumps({'type': 'token', 'content': response.answer}, ensure_ascii=False)}\n\n"
+                    yield f"data: {json.dumps({'type': 'done', 'answer': response.answer, 'provider': response.provider, 'model': response.model, 'usage': response.usage, 'toolCalls': []}, ensure_ascii=False)}\n\n"
+                    return
+
+                if not response.toolCalls:
+                    convManager.addAssistantMessage(conversationId, response.answer)
+                    yield f"data: {json.dumps({'type': 'token', 'content': response.answer}, ensure_ascii=False)}\n\n"
+                    yield f"data: {json.dumps({'type': 'done', 'answer': response.answer, 'provider': response.provider, 'model': response.model, 'usage': response.usage, 'toolCalls': []}, ensure_ascii=False)}\n\n"
+                    return
+
+                toolCallsData = [
+                    {"id": tc.id, "type": "function", "function": {"name": tc.name, "arguments": json.dumps(tc.arguments, ensure_ascii=False)}}
+                    for tc in response.toolCalls
+                ]
+                convManager.addAssistantMessage(conversationId, response.answer or "", toolCalls=toolCallsData)
+                msgs.append({"role": "assistant", "content": response.answer or "", "tool_calls": toolCallsData})
+
+                if response.answer:
+                    yield f"data: {json.dumps({'type': 'token', 'content': response.answer}, ensure_ascii=False)}\n\n"
+
+                toolResults = []
+                for tc in response.toolCalls:
+                    result = await executor.execute(tc.name, tc.arguments)
+                    resultStr = json.dumps(result, ensure_ascii=False)
+                    convManager.addToolResult(conversationId, tc.id, resultStr)
+                    msgs.append({"role": "tool", "tool_call_id": tc.id, "content": resultStr})
+                    toolResults.append({"toolCallId": tc.id, "name": tc.name, "result": result})
+
+                yield f"data: {json.dumps({'type': 'tool_results', 'toolCalls': toolResults}, ensure_ascii=False)}\n\n"
+
+            finalResponse = llmProvider.complete(msgs)
+            convManager.addAssistantMessage(conversationId, finalResponse.answer)
+            yield f"data: {json.dumps({'type': 'token', 'content': finalResponse.answer}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({'type': 'done', 'answer': finalResponse.answer, 'provider': finalResponse.provider, 'model': finalResponse.model, 'usage': finalResponse.usage, 'toolCalls': []}, ensure_ascii=False)}\n\n"
+
+        return StreamingResponse(_streamGenerate(), media_type="text/event-stream")
+
     return router
 
 

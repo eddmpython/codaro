@@ -7,6 +7,7 @@
   import Footer from "./Footer.svelte";
   import ChatBar from "../components/ChatBar.svelte";
   import ArtifactPanel from "../panels/ArtifactPanel.svelte";
+  import Toast from "../primitives/Toast.svelte";
   import {
     getSelectedPanel,
     getIsSidebarOpen,
@@ -51,9 +52,11 @@
   let mainPanelFlex = $derived(isDeveloperOpen ? 75 : 100);
 </script>
 
-<div class="flex flex-col flex-1 overflow-hidden absolute inset-0 print:relative bg-background">
+<div class="chrome-root">
   <PanelGroup id="codaro:chrome:v1:l2" direction="horizontal">
-    <Sidebar {errorCount} {queuedOrRunningCount} {onFeedback} />
+    <div class="chrome-sidebar">
+      <Sidebar {errorCount} {queuedOrRunningCount} {onFeedback} />
+    </div>
 
     <HelperSidebar {panelTitle}>
       {#if helperPanelContent}
@@ -93,4 +96,33 @@
 
   <ChatBar />
   <Footer {connectionState} {engineStatus} {issueCount} {warningCount} {onExport} />
+  <Toast />
 </div>
+
+<style>
+  .chrome-root {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    overflow: hidden;
+    position: absolute;
+    inset: 0;
+    background: var(--background);
+  }
+
+  .chrome-sidebar {
+    display: block;
+  }
+
+  @media (max-width: 640px) {
+    .chrome-sidebar {
+      display: none;
+    }
+  }
+
+  @media print {
+    .chrome-root {
+      position: relative;
+    }
+  }
+</style>

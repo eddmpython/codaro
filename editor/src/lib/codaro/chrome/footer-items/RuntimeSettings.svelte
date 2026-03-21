@@ -1,19 +1,30 @@
 <script lang="ts">
   import { Zap, ChevronDown } from "lucide-svelte";
+  import { getRuntimeConfig, setRuntimeConfig } from "../../stores/config.svelte";
 
   interface Props {
     onToggle?: () => void;
-    isAutorun?: boolean;
-    onCellChangeMode?: string;
-    autoReload?: string;
   }
 
   let {
-    onToggle = () => {},
-    isAutorun = true,
-    onCellChangeMode = "autorun",
-    autoReload = "off"
+    onToggle = () => {}
   }: Props = $props();
+
+  let rt = $derived(getRuntimeConfig());
+  let isAutorun = $derived(rt.autoInstantiate);
+  let onCellChangeMode = $derived(rt.onCellChange);
+  let autoReloadMode = $derived(rt.autoReload);
+
+  function cycleOnCellChange() {
+    const next = onCellChangeMode === "autorun" ? "lazy" : "autorun";
+    setRuntimeConfig({ onCellChange: next });
+  }
+
+  function cycleAutoReload() {
+    const order: Array<"off" | "lazy" | "autorun"> = ["off", "lazy", "autorun"];
+    const idx = order.indexOf(autoReloadMode);
+    setRuntimeConfig({ autoReload: order[(idx + 1) % order.length] });
+  }
 
   let menuOpen = $state(false);
 </script>
@@ -48,17 +59,17 @@
         </button>
         <button
           class="flex items-center justify-between w-full px-2 py-1.5 text-sm rounded hover:bg-(--accent) hover:text-(--accent-foreground)"
-          onclick={() => {}}
+          onclick={cycleOnCellChange}
         >
           <span>On cell change</span>
           <span class="text-xs text-muted-foreground">{onCellChangeMode}</span>
         </button>
         <button
           class="flex items-center justify-between w-full px-2 py-1.5 text-sm rounded hover:bg-(--accent) hover:text-(--accent-foreground)"
-          onclick={() => {}}
+          onclick={cycleAutoReload}
         >
           <span>Module autoreload</span>
-          <span class="text-xs text-muted-foreground">{autoReload}</span>
+          <span class="text-xs text-muted-foreground">{autoReloadMode}</span>
         </button>
       </div>
     </div>
