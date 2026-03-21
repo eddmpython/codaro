@@ -1,0 +1,41 @@
+name: Launcher Release
+
+on:
+  push:
+    tags:
+      - "v*-launcher"
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust toolchain
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Build release
+        working-directory: launcher/codaro-launcher
+        run: cargo build --release
+
+      - name: Compute SHA256
+        shell: pwsh
+        run: |
+          $hash = (Get-FileHash "launcher/codaro-launcher/target/release/codaro-launcher.exe" -Algorithm SHA256).Hash.ToLower()
+          "$hash  CodaroLauncher.exe" | Out-File -FilePath "launcher/codaro-launcher/target/release/CodaroLauncher.exe.sha256" -Encoding utf8
+
+      - name: Rename binary
+        shell: pwsh
+        run: |
+          Copy-Item "launcher/codaro-launcher/target/release/codaro-launcher.exe" "launcher/codaro-launcher/target/release/CodaroLauncher.exe"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            launcher/codaro-launcher/target/release/CodaroLauncher.exe
+            launcher/codaro-launcher/target/release/CodaroLauncher.exe.sha256
+          generate_release_notes: true

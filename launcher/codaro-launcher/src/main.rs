@@ -1,9 +1,12 @@
 mod backend;
 mod github;
+mod ipc;
 mod manifest;
 mod paths;
 mod provision;
+mod self_update;
 mod state;
+mod webview;
 
 use anyhow::{Context, Result, bail};
 use backend::{BackendLaunchConfig, wait_for_backend_ready, wait_for_health};
@@ -40,11 +43,25 @@ struct Cli {
 #[derive(Subcommand, Debug)]
 enum Command {
     Doctor,
+    Launch(LaunchArgs),
     Manifest(ManifestCommand),
     State(StateCommand),
     Release(ReleaseCommand),
     Update(UpdateCommand),
     Backend(BackendCommand),
+}
+
+#[derive(Args, Debug)]
+struct LaunchArgs {
+    #[arg(long, default_value = "127.0.0.1")]
+    host: String,
+    #[arg(long, default_value_t = 0)]
+    port: u16,
+    #[arg(long)]
+    no_webview: bool,
+    #[arg(long)]
+    workspace_root: Option<PathBuf>,
+    path: Option<PathBuf>,
 }
 
 #[derive(Args, Debug)]
@@ -267,6 +284,7 @@ fn main() -> Result<()> {
 
     match cli.command {
         Command::Doctor => run_doctor(&paths)?,
+        Command::Launch(args) => run_launch(&paths, args)?,
         Command::Manifest(command) => run_manifest(command)?,
         Command::State(command) => run_state(&paths, command)?,
         Command::Release(command) => run_release(&paths, command)?,
@@ -274,6 +292,123 @@ fn main() -> Result<()> {
         Command::Backend(command) => run_backend(&paths, command)?,
     }
 
+    Ok(())
+}
+
+fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
+    use ipc::{IpcMessage, StatusPayload, LaunchStatus, ProgressPayload, ErrorPayload, encode_ipc};
+    use webview::{detect_webview_backend, WebviewBackend, open_in_system_browser};
+
+    let stores = LauncherStateStores::new(paths);
+    let active = stores.active_release.load_optional()?;
+
+    println!("{}", encode_ipc(&IpcMessage::SetStatus(StatusPayload {
+        status: LaunchStatus::Initializing,
+        url: None,
+    })));
+
+    if active.is_none() {
+        println!("{}", encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+            stage: "provision".into(),
+            message: "No active release. Checking for updates...".into(),
+            percent: None,
+        })));
+        let update_config = load_update_config(&stores)?;
+        let source = update_config
+            .manifest_source
+            .as_deref()
+            .map(|s| s.to_string());
+
+        if source.is_none() {
+            println!("{}", encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                stage: "provision".into(),
+                message: "Discovering release from GitHub...".into(),
+                percent: Some(10.0),
+            })));
+            let discovery = discover_manifest_for_repo(
+                &update_config.github_repo,
+                &update_config.github_manifest_asset_name,
+                update_config.channel == "beta",
+            )?;
+            match discovery {
+                Some(found) => {
+                    println!("{}", encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                        stage: "provision".into(),
+                        message: format!("Staging release {}...", found.release_id),
+                        percent: Some(30.0),
+                    })));
+                    let summary = stage_release(paths, &found.manifest_download_url)?;
+                    activate_release(paths, &summary.release_id)?;
+                }
+                None => {
+                    println!("{}", encode_ipc(&IpcMessage::SetError(ErrorPayload {
+                        code: "NO_RELEASE".into(),
+                        message: "No release found on GitHub.".into(),
+                        detail: None,
+                        recoverable: false,
+                    })));
+                    bail!("No release available to provision");
+                }
+            }
+        } else if let Some(manifest_source) = source {
+            let summary = stage_release(paths, &manifest_source)?;
+            activate_release(paths, &summary.release_id)?;
+        }
+    }
+
+    let active = stores
+        .active_release
+        .load_optional()?
+        .context("no active release after provision")?;
+
+    let port = if args.port == 0 {
+        let listener = TcpListener::bind("127.0.0.1:0")?;
+        listener.local_addr()?.port()
+    } else {
+        args.port
+    };
+
+    println!("{}", encode_ipc(&IpcMessage::SetStatus(StatusPayload {
+        status: LaunchStatus::Starting,
+        url: None,
+    })));
+
+    let config = BackendLaunchConfig::from_release_state(
+        paths,
+        &active,
+        &args.host,
+        port,
+        args.workspace_root.as_deref(),
+    )?;
+
+    let mut child = config.spawn()?;
+    let url = format!("http://{}:{}", args.host, port);
+
+    match wait_for_health(&url, Duration::from_secs(30), Duration::from_millis(200)) {
+        Ok(()) => {
+            println!("{}", encode_ipc(&IpcMessage::SetStatus(StatusPayload {
+                status: LaunchStatus::Healthy,
+                url: Some(url.clone()),
+            })));
+        }
+        Err(err) => {
+            let _ = child.kill();
+            println!("{}", encode_ipc(&IpcMessage::SetError(ErrorPayload {
+                code: "HEALTH_TIMEOUT".into(),
+                message: "Backend failed to become healthy.".into(),
+                detail: Some(format!("{}", err)),
+                recoverable: false,
+            })));
+            bail!("Backend health check failed: {}", err);
+        }
+    }
+
+    let backend = detect_webview_backend();
+    if args.no_webview || backend == WebviewBackend::SystemBrowser {
+        open_in_system_browser(&url)?;
+    }
+
+    let _ = child.wait();
     Ok(())
 }
 

@@ -3,6 +3,7 @@
   import { base } from "$app/paths";
   import "../app.css";
   import { brand } from "$lib/brand";
+  import { buildWebsiteJsonLd, buildSoftwareJsonLd } from "$lib/seo";
 
   let { children } = $props();
 
@@ -22,6 +23,9 @@
   function toggleMobile() {
     mobileOpen = !mobileOpen;
   }
+
+  const websiteJsonLd = JSON.stringify(buildWebsiteJsonLd());
+  const softwareJsonLd = JSON.stringify(buildSoftwareJsonLd());
 </script>
 
 <svelte:head>
@@ -32,13 +36,18 @@
   <meta property="og:description" content={brand.description} />
   <meta property="og:url" content={brand.siteUrl} />
   <meta property="og:image" content="{brand.siteUrl}/brand/avatar-full.png" />
+  <meta property="og:site_name" content={brand.name} />
+  <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary" />
   <meta name="twitter:title" content="{brand.name} — {brand.tagline}" />
   <meta name="twitter:description" content={brand.description} />
   <meta name="twitter:image" content="{brand.siteUrl}/brand/avatar-full.png" />
   <link rel="alternate" type="application/atom+xml" title="Codaro Blog" href="{base}/feed.xml" />
+  <link rel="canonical" href="{brand.siteUrl}{pathname}" />
   <meta name="theme-color" content="#18181b" media="(prefers-color-scheme: dark)" />
   <meta name="theme-color" content="#fafafa" media="(prefers-color-scheme: light)" />
+  {@html `<script type="application/ld+json">${websiteJsonLd}</script>`}
+  {@html `<script type="application/ld+json">${softwareJsonLd}</script>`}
 </svelte:head>
 
 <div class="siteShell">

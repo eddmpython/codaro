@@ -13,6 +13,7 @@
     getIsDeveloperPanelOpen
   } from "../stores/panels.svelte";
   import { getIsArtifactPanelOpen } from "../ai/aiStore.svelte";
+  import { getActiveModeConfig } from "../modes/modeStore.svelte";
 
   interface Props {
     connectionState?: string;
@@ -46,6 +47,7 @@
 
   let isDeveloperOpen = $derived(getIsDeveloperPanelOpen());
   let artifactOpen = $derived(getIsArtifactPanelOpen());
+  let modeConfig = $derived(getActiveModeConfig());
   let mainPanelFlex = $derived(isDeveloperOpen ? 75 : 100);
 </script>
 
