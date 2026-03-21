@@ -244,6 +244,9 @@ def createAiRouter(state: Any) -> APIRouter:
         sessionId = body.get("sessionId")
         providerOverride = body.get("provider")
         roleOverride = body.get("role")
+        context = body.get("context")
+        if context:
+            message = _injectContext(message, context)
 
         from ..ai.conversation import ConversationManager
         from ..ai.factory import createProvider
@@ -351,6 +354,9 @@ def createAiRouter(state: Any) -> APIRouter:
         sessionId = body.get("sessionId")
         providerOverride = body.get("provider")
         roleOverride = body.get("role")
+        context = body.get("context")
+        if context:
+            message = _injectContext(message, context)
 
         from ..ai.factory import createProvider
         from ..ai.toolExecutor import ToolExecutor
@@ -465,6 +471,25 @@ def createAiRouter(state: Any) -> APIRouter:
         return StreamingResponse(_streamGenerate(), media_type="text/event-stream")
 
     return router
+
+
+def _injectContext(message: str, context: dict[str, Any]) -> str:
+    parts: list[str] = []
+    if context.get("selectedCell"):
+        cell = context["selectedCell"]
+        parts.append(f"[Selected cell ({cell.get('type', 'code')})]\n```\n{cell.get('content', '')}\n```")
+    if context.get("variables"):
+        varLines = [f"  {v['name']}: {v['type']} = {v.get('repr', '?')}" for v in context["variables"][:20]]
+        parts.append(f"[Variables]\n" + "\n".join(varLines))
+    if context.get("blocks"):
+        blockLines = [f"  [{b['type']}] {b['id']}: {b.get('content', '')[:80]}" for b in context["blocks"][:15]]
+        parts.append(f"[Document blocks]\n" + "\n".join(blockLines))
+    if context.get("fileName"):
+        parts.append(f"[File: {context['fileName']}]")
+    if not parts:
+        return message
+    contextStr = "\n\n".join(parts)
+    return f"{message}\n\n---\nContext:\n{contextStr}"
 
 
 _conversationManager = None

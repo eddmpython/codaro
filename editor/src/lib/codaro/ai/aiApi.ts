@@ -163,12 +163,20 @@ export async function deleteConversation(conversationId: string): Promise<{ ok: 
   return parseJson(res, "Failed to delete conversation.");
 }
 
+export interface ChatContext {
+  selectedCell?: { id: string; type: string; content: string };
+  variables?: Array<{ name: string; type: string; repr?: string }>;
+  blocks?: Array<{ id: string; type: string; content: string }>;
+  fileName?: string;
+}
+
 export async function sendChatMessage(payload: {
   conversationId?: string;
   message: string;
   sessionId?: string;
   provider?: string;
   role?: string;
+  context?: ChatContext;
 }): Promise<AiChatResponse> {
   const res = await fetch(apiUrl("/api/ai/chat"), {
     method: "POST",
@@ -199,6 +207,7 @@ export async function streamChatMessage(
     sessionId?: string;
     provider?: string;
     role?: string;
+    context?: ChatContext;
   },
   onEvent: (event: StreamEvent) => void,
   signal?: AbortSignal,

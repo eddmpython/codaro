@@ -1,5 +1,20 @@
 <script lang="ts">
-  import { Send, Loader2 } from "lucide-svelte";
+  import { Send, Loader2, Slash } from "lucide-svelte";
+
+  interface SlashCommand {
+    name: string;
+    description: string;
+    prefix: string;
+  }
+
+  const slashCommands: SlashCommand[] = [
+    { name: "learn", description: "Start a learning session on a topic", prefix: "/learn " },
+    { name: "quiz", description: "Generate a quiz on the current topic", prefix: "/quiz " },
+    { name: "explain", description: "Explain a concept or code block", prefix: "/explain " },
+    { name: "debug", description: "Debug the current code or error", prefix: "/debug " },
+    { name: "review", description: "Review code for improvements", prefix: "/review " },
+    { name: "report", description: "Generate a report from results", prefix: "/report " },
+  ];
 
   interface Props {
     ready?: boolean;
@@ -19,6 +34,9 @@
 
   let inputValue = $state("");
   let textareaEl: HTMLTextAreaElement | undefined = $state();
+  let showSlashMenu = $state(false);
+  let filteredCommands = $state<SlashCommand[]>([]);
+  let selectedCommandIdx = $state(0);
 
   let maxHeight = $derived(compact ? 120 : 200);
 
@@ -29,15 +47,57 @@
     }
   }
 
+  function handleInput() {
+    adjustTextarea();
+    if (inputValue.startsWith("/") && !inputValue.includes(" ")) {
+      const query = inputValue.slice(1).toLowerCase();
+      filteredCommands = slashCommands.filter(c => c.name.startsWith(query));
+      showSlashMenu = filteredCommands.length > 0;
+      selectedCommandIdx = 0;
+    } else {
+      showSlashMenu = false;
+    }
+  }
+
+  function selectCommand(cmd: SlashCommand) {
+    inputValue = cmd.prefix;
+    showSlashMenu = false;
+    textareaEl?.focus();
+  }
+
   function handleSend() {
     const text = inputValue.trim();
     if (!text || loading) return;
     inputValue = "";
+    showSlashMenu = false;
     if (textareaEl) textareaEl.style.height = "auto";
     onSend(text);
   }
 
   function handleKeydown(e: KeyboardEvent) {
+    if (showSlashMenu) {
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        selectedCommandIdx = Math.min(selectedCommandIdx + 1, filteredCommands.length - 1);
+        return;
+      }
+      if (e.key === "ArrowUp") {
+        e.preventDefault();
+        selectedCommandIdx = Math.max(selectedCommandIdx - 1, 0);
+        return;
+      }
+      if (e.key === "Tab" || (e.key === "Enter" && !e.shiftKey)) {
+        e.preventDefault();
+        if (filteredCommands[selectedCommandIdx]) {
+          selectCommand(filteredCommands[selectedCommandIdx]);
+        }
+        return;
+      }
+      if (e.key === "Escape") {
+        showSlashMenu = false;
+        return;
+      }
+    }
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSend();
@@ -50,6 +110,22 @@
 </script>
 
 <div class="chat-input-wrap" class:compact>
+  {#if showSlashMenu}
+    <div class="slash-menu">
+      {#each filteredCommands as cmd, idx}
+        <button
+          class="slash-item"
+          class:active={idx === selectedCommandIdx}
+          onclick={() => selectCommand(cmd)}
+        >
+          <Slash size={12} />
+          <span class="slash-name">{cmd.name}</span>
+          <span class="slash-desc">{cmd.description}</span>
+        </button>
+      {/each}
+    </div>
+  {/if}
+
   <div class="input-container">
     <textarea
       bind:this={textareaEl}
@@ -58,7 +134,7 @@
       {placeholder}
       disabled={!ready || loading}
       rows="1"
-      oninput={adjustTextarea}
+      oninput={handleInput}
       onkeydown={handleKeydown}
     ></textarea>
     <button
@@ -68,15 +144,15 @@
       aria-label="Send message"
     >
       {#if loading}
-        <Loader2 class="h-{compact ? '4' : '5'} w-{compact ? '4' : '5'} animate-spin" />
+        <Loader2 size={compact ? 16 : 20} class="animate-spin" />
       {:else}
-        <Send class="h-{compact ? '4' : '5'} w-{compact ? '4' : '5'}" />
+        <Send size={compact ? 16 : 20} />
       {/if}
     </button>
   </div>
   {#if !compact}
     <p class="input-hint">
-      Codaro may produce inaccurate responses. Verify important information.
+      Type <kbd>/</kbd> for commands. Shift+Enter for new line.
     </p>
   {/if}
 </div>
@@ -85,10 +161,62 @@
   .chat-input-wrap {
     flex-shrink: 0;
     padding: 12px 24px 16px;
+    position: relative;
   }
 
   .chat-input-wrap.compact {
     padding: 8px;
+  }
+
+  .slash-menu {
+    position: absolute;
+    bottom: 100%;
+    left: 24px;
+    right: 24px;
+    max-width: 768px;
+    margin: 0 auto 4px;
+    background: var(--background);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 4px;
+    box-shadow: 0 4px 12px color-mix(in srgb, var(--foreground) 10%, transparent);
+    z-index: 10;
+  }
+
+  .compact .slash-menu {
+    left: 8px;
+    right: 8px;
+    border-radius: 8px;
+  }
+
+  .slash-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    padding: 8px 10px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--foreground);
+    font-size: 0.85rem;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.1s;
+  }
+
+  .slash-item:hover,
+  .slash-item.active {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+  }
+
+  .slash-name {
+    font-weight: 600;
+    color: var(--accent);
+  }
+
+  .slash-desc {
+    color: color-mix(in srgb, var(--foreground) 50%, transparent);
   }
 
   .input-container {
@@ -180,5 +308,15 @@
     text-align: center;
     font-size: 0.72rem;
     color: color-mix(in srgb, var(--foreground) 30%, transparent);
+  }
+
+  .input-hint kbd {
+    display: inline-block;
+    padding: 1px 4px;
+    font-size: 0.7rem;
+    font-family: inherit;
+    border: 1px solid color-mix(in srgb, var(--border) 60%, transparent);
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--foreground) 5%, transparent);
   }
 </style>

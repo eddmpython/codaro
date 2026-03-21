@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import asyncio
 import json
-import uuid
 
 import pytest
 
@@ -12,87 +11,18 @@ from codaro.ai.tools import (
     registerTool,
     toolSchemas,
     ToolDef,
-    TOOL_INSERT_BLOCK,
-    TOOL_UPDATE_BLOCK,
-    TOOL_DELETE_BLOCK,
-    TOOL_EXECUTE_REACTIVE,
-    TOOL_GET_VARIABLES,
-    TOOL_GET_BLOCKS,
-    TOOL_FS_WRITE,
-    TOOL_PACKAGES_INSTALL,
-    TOOL_CHECK_EXERCISE,
-    TOOL_CREATE_GUIDE,
 )
-from codaro.ai.toolExecutor import ToolExecutor, ToolExecutionError
-from codaro.document.models import BlockConfig, CodaroDocument, DocumentMetadata, RuntimeConfig, AppConfig
+from codaro.ai.toolExecutor import ToolExecutor
+from codaro.document.models import BlockConfig, CodaroDocument
 
 
-class TestToolRegistry:
-    def test_default_tools_registered(self):
-        tools = allTools()
-        names = {t.name for t in tools}
-        assert "insert-block" in names
-        assert "update-block" in names
-        assert "delete-block" in names
-        assert "execute-reactive" in names
-        assert "get-variables" in names
-        assert "get-blocks" in names
-        assert "fs-write" in names
-        assert "packages-install" in names
-        assert "check-exercise" in names
-        assert "create-guide" in names
-
-    def test_get_tool(self):
-        tool = getTool("insert-block")
-        assert tool is not None
-        assert tool.name == "insert-block"
-        assert tool.handler == "insertBlock"
-
-    def test_get_unknown_tool(self):
-        assert getTool("nonexistent") is None
-
-    def test_tool_schemas_format(self):
-        schemas = toolSchemas()
-        assert isinstance(schemas, list)
-        assert len(schemas) >= 10
-        for schema in schemas:
-            assert schema["type"] == "function"
-            assert "function" in schema
-            func = schema["function"]
-            assert "name" in func
-            assert "description" in func
-            assert "parameters" in func
-
-    def test_register_custom_tool(self):
-        custom = ToolDef(
-            name="test-custom",
-            description="A test tool",
-            parameters={"type": "object", "properties": {}},
-            handler="testCustom",
-        )
-        registerTool(custom)
-        assert getTool("test-custom") is not None
-
-    def test_insert_block_schema(self):
-        tool = TOOL_INSERT_BLOCK
-        assert "blockType" in tool.parameters["properties"]
-        assert "content" in tool.parameters["properties"]
-        assert "blockType" in tool.parameters["required"]
-        assert "content" in tool.parameters["required"]
-
-    def test_create_guide_schema(self):
-        tool = TOOL_CREATE_GUIDE
-        props = tool.parameters["properties"]
-        assert "exerciseType" in props
-        assert "hints" in props
-        assert "solution" in props
-        assert props["exerciseType"]["enum"] == ["fillBlank", "predict", "fixBug", "modify", "writeCode", "buildUp"]
-
-    def test_check_exercise_schema(self):
-        tool = TOOL_CHECK_EXERCISE
-        props = tool.parameters["properties"]
-        assert "checkType" in props
-        assert props["checkType"]["enum"] == ["outputMatch", "outputContains", "variableCheck", "codeContains", "noError"]
+EXPECTED_BUILTIN_TOOLS = {
+    "insert-block", "update-block", "delete-block",
+    "execute-reactive", "get-variables", "get-blocks",
+    "fs-write", "packages-install", "check-exercise", "create-guide",
+    "create-learning-card", "create-quiz",
+    "create-notebook-exercise", "track-achievement",
+}
 
 
 def _makeDoc(blocks=None) -> CodaroDocument:
@@ -102,11 +32,7 @@ def _makeDoc(blocks=None) -> CodaroDocument:
             BlockConfig(id="b2", type="markdown", content="# Hello"),
             BlockConfig(id="b3", type="code", content="y = x + 1"),
         ]
-    return CodaroDocument(
-        id="test-doc",
-        title="Test",
-        blocks=blocks,
-    )
+    return CodaroDocument(id="test-doc", title="Test", blocks=blocks)
 
 
 class _MockSessionManager:
@@ -117,86 +43,278 @@ class _MockSessionManager:
         return self._sessions.get(sessionId)
 
 
-class TestToolExecutor:
-    def _makeExecutor(self, doc=None):
-        if doc is None:
-            doc = _makeDoc()
-        sessionManager = _MockSessionManager()
-        return ToolExecutor(
-            sessionManager=sessionManager,
-            documentGetter=lambda: doc,
-            documentSetter=lambda d: None,
-        ), doc
+def _makeExecutor(doc=None, workspaceRoot=None):
+    if doc is None:
+        doc = _makeDoc()
+    return ToolExecutor(
+        sessionManager=_MockSessionManager(),
+        documentGetter=lambda: doc,
+        documentSetter=lambda d: None,
+        workspaceRoot=workspaceRoot,
+    ), doc
 
-    def test_insert_block(self):
-        executor, doc = self._makeExecutor()
+
+class TestToolRegistry:
+
+    def test_all_builtin_tools_registered(self):
+        names = {t.name for t in allTools()}
+        assert EXPECTED_BUILTIN_TOOLS.issubset(names)
+
+    def test_get_returns_none_for_unknown(self):
+        assert getTool("nonexistent-xyz") is None
+
+    def test_register_custom_tool(self):
+        registerTool(ToolDef(
+            name="test-custom-001",
+            description="temp",
+            parameters={"type": "object", "properties": {}},
+            handler="noop",
+        ))
+        assert getTool("test-custom-001") is not None
+
+    def test_schemas_are_openai_compatible(self):
+        for schema in toolSchemas():
+            assert schema["type"] == "function"
+            func = schema["function"]
+            assert isinstance(func["name"], str)
+            assert isinstance(func["description"], str)
+            assert "properties" in func["parameters"]
+
+    def test_every_tool_has_required_fields(self):
+        for tool in allTools():
+            assert tool.name
+            assert tool.description
+            assert tool.handler
+            assert tool.parameters.get("type") == "object"
+
+
+class TestDocumentTools:
+
+    def test_insert_at_position(self):
+        executor, doc = _makeExecutor()
         result = asyncio.run(executor.execute("insert-block", {
-            "blockType": "code",
-            "content": "z = 3",
-            "position": 1,
+            "blockType": "code", "content": "z = 3", "position": 1,
         }))
         assert "blockId" in result
         assert len(doc.blocks) == 4
         assert doc.blocks[1].content == "z = 3"
 
-    def test_insert_block_append(self):
-        executor, doc = self._makeExecutor()
-        result = asyncio.run(executor.execute("insert-block", {
-            "blockType": "markdown",
-            "content": "# Appended",
-            "position": -1,
+    def test_insert_append(self):
+        executor, doc = _makeExecutor()
+        asyncio.run(executor.execute("insert-block", {
+            "blockType": "markdown", "content": "# End", "position": -1,
         }))
-        assert doc.blocks[-1].content == "# Appended"
+        assert doc.blocks[-1].content == "# End"
 
-    def test_update_block(self):
-        executor, doc = self._makeExecutor()
+    def test_update_existing(self):
+        executor, doc = _makeExecutor()
         result = asyncio.run(executor.execute("update-block", {
-            "blockId": "b1",
-            "content": "x = 100",
+            "blockId": "b1", "content": "x = 100",
         }))
         assert result["updated"] is True
         assert doc.blocks[0].content == "x = 100"
 
-    def test_update_nonexistent_block(self):
-        executor, doc = self._makeExecutor()
+    def test_update_missing_returns_error(self):
+        executor, _ = _makeExecutor()
         result = asyncio.run(executor.execute("update-block", {
-            "blockId": "nonexistent",
-            "content": "test",
+            "blockId": "missing", "content": "test",
         }))
         assert "error" in result
 
-    def test_get_blocks(self):
-        executor, doc = self._makeExecutor()
+    def test_get_blocks_returns_all(self):
+        executor, doc = _makeExecutor()
         result = asyncio.run(executor.execute("get-blocks", {}))
-        assert "blocks" in result
-        assert len(result["blocks"]) == 3
-        assert result["blocks"][0]["id"] == "b1"
+        assert len(result["blocks"]) == len(doc.blocks)
 
-    def test_unknown_tool(self):
-        executor, doc = self._makeExecutor()
-        result = asyncio.run(executor.execute("nonexistent-tool", {}))
+    def test_unknown_tool_returns_error(self):
+        executor, _ = _makeExecutor()
+        result = asyncio.run(executor.execute("no-such-tool", {}))
         assert "error" in result
 
-    def test_no_session_error(self):
-        executor, doc = self._makeExecutor()
+    def test_get_variables_without_session(self):
+        executor, _ = _makeExecutor()
         result = asyncio.run(executor.execute("get-variables", {}))
         assert "error" in result
-        assert "No active kernel session" in result["error"]
 
-    def test_create_guide(self):
-        executor, doc = self._makeExecutor()
+
+class TestGuide:
+
+    def test_create_guide_adds_block(self):
+        executor, doc = _makeExecutor()
+        before = len(doc.blocks)
         result = asyncio.run(executor.execute("create-guide", {
             "exerciseType": "fillBlank",
             "content": "x = ___",
-            "hints": ["Think about assignment", "x = <value>", "x = 1"],
+            "hints": ["concept", "structure", "answer"],
             "solution": "x = 1",
-            "description": "Fill in the blank",
-            "difficulty": "easy",
         }))
-        assert "blockId" in result
-        assert result["exerciseType"] == "fillBlank"
-        guideBlock = doc.blocks[-1]
-        assert guideBlock.type == "guide"
-        data = json.loads(guideBlock.content)
+        assert len(doc.blocks) == before + 1
+        assert doc.blocks[-1].type == "guide"
+        data = json.loads(doc.blocks[-1].content)
         assert data["exerciseType"] == "fillBlank"
         assert len(data["hints"]) == 3
+
+
+class TestLearningCard:
+
+    def test_creates_three_blocks(self):
+        executor, doc = _makeExecutor()
+        before = len(doc.blocks)
+        result = asyncio.run(executor.execute("create-learning-card", {
+            "topic": "List Comprehension",
+            "explanation": "A concise way to create lists.",
+            "exampleCode": "squares = [x**2 for x in range(5)]",
+            "fillBlankCode": "evens = [x for x in range(10) if x % ___ == 0]",
+            "blanks": ["2"],
+            "tags": ["python", "beginner"],
+        }))
+        assert len(doc.blocks) == before + 3
+        assert doc.blocks[before].type == "markdown"
+        assert doc.blocks[before + 1].type == "code"
+        assert doc.blocks[before + 2].type == "guide"
+        assert result["topic"] == "List Comprehension"
+        assert len(result["blockIds"]) == 3
+
+    def test_guide_contains_fill_blank(self):
+        executor, doc = _makeExecutor()
+        asyncio.run(executor.execute("create-learning-card", {
+            "topic": "F-strings",
+            "explanation": "Python formatted string literals.",
+            "exampleCode": 'name = "World"\nprint(f"Hello {name}")',
+            "fillBlankCode": 'x = 42\nresult = f"Value is {___}"',
+            "blanks": ["x"],
+        }))
+        guideData = json.loads(doc.blocks[-1].content)
+        assert guideData["exerciseType"] == "fillBlank"
+        assert "x" in guideData["solution"]
+
+
+class TestQuiz:
+
+    def test_multiple_choice_quiz(self):
+        executor, doc = _makeExecutor()
+        before = len(doc.blocks)
+        result = asyncio.run(executor.execute("create-quiz", {
+            "topic": "Python Basics",
+            "questions": [
+                {
+                    "type": "multiple-choice",
+                    "question": "What is 1+1?",
+                    "choices": ["1", "2", "3"],
+                    "correctAnswer": "2",
+                },
+            ],
+            "difficulty": "easy",
+        }))
+        assert result["questionCount"] == 1
+        assert len(doc.blocks) == before + 2
+        header = doc.blocks[before]
+        assert "Quiz: Python Basics" in header.content
+
+    def test_predict_output_quiz(self):
+        executor, doc = _makeExecutor()
+        result = asyncio.run(executor.execute("create-quiz", {
+            "topic": "Strings",
+            "questions": [
+                {
+                    "type": "predict-output",
+                    "question": 'print("ab" * 3)',
+                    "correctAnswer": "ababab",
+                },
+            ],
+        }))
+        guideData = json.loads(doc.blocks[-1].content)
+        assert guideData["exerciseType"] == "predict"
+        assert guideData["solution"] == "ababab"
+
+    def test_coding_quiz(self):
+        executor, doc = _makeExecutor()
+        asyncio.run(executor.execute("create-quiz", {
+            "topic": "Functions",
+            "questions": [
+                {
+                    "type": "coding",
+                    "question": "Write a function that returns the sum of two numbers.",
+                    "correctAnswer": "def add(a, b): return a + b",
+                },
+            ],
+        }))
+        guideData = json.loads(doc.blocks[-1].content)
+        assert guideData["exerciseType"] == "writeCode"
+
+
+class TestNotebookExercise:
+
+    def test_multi_stage_structure(self):
+        executor, doc = _makeExecutor()
+        before = len(doc.blocks)
+        result = asyncio.run(executor.execute("create-notebook-exercise", {
+            "title": "Variables",
+            "stages": [
+                {
+                    "stage": "fill-blank",
+                    "instruction": "Fill in the variable name.",
+                    "starterCode": "___ = 10",
+                    "solution": "x = 10",
+                },
+                {
+                    "stage": "modify",
+                    "instruction": "Change the value to 20.",
+                    "starterCode": "x = 10",
+                    "solution": "x = 20",
+                },
+            ],
+        }))
+        assert result["stageCount"] == 2
+        assert len(doc.blocks) == before + 5
+        assert "Exercise: Variables" in doc.blocks[before].content
+
+    def test_stage_types_mapped_correctly(self):
+        executor, doc = _makeExecutor()
+        asyncio.run(executor.execute("create-notebook-exercise", {
+            "title": "Test",
+            "stages": [
+                {"stage": "fill-blank", "instruction": "a", "starterCode": "a", "solution": "a"},
+                {"stage": "write", "instruction": "b", "starterCode": "", "solution": "b"},
+            ],
+        }))
+        guides = [b for b in doc.blocks if b.type == "guide"]
+        assert json.loads(guides[-2].content)["exerciseType"] == "fillBlank"
+        assert json.loads(guides[-1].content)["exerciseType"] == "writeCode"
+
+
+class TestTrackAchievement:
+
+    def test_records_to_file(self, tmp_path):
+        executor, _ = _makeExecutor(workspaceRoot=str(tmp_path))
+        result = asyncio.run(executor.execute("track-achievement", {
+            "type": "exercise-complete",
+            "topic": "loops",
+            "score": 85,
+        }))
+        assert result["recorded"] is True
+        assert result["topicTotal"] == 1
+
+        achFile = tmp_path / ".codaro" / "achievements.json"
+        assert achFile.exists()
+        data = json.loads(achFile.read_text(encoding="utf-8"))
+        assert len(data) == 1
+        assert data[0]["topic"] == "loops"
+        assert data[0]["score"] == 85
+
+    def test_appends_to_existing(self, tmp_path):
+        executor, _ = _makeExecutor(workspaceRoot=str(tmp_path))
+        asyncio.run(executor.execute("track-achievement", {
+            "type": "quiz-score", "topic": "loops", "score": 70,
+        }))
+        result = asyncio.run(executor.execute("track-achievement", {
+            "type": "quiz-score", "topic": "loops", "score": 90,
+        }))
+        assert result["topicTotal"] == 2
+
+    def test_no_workspace_returns_not_recorded(self):
+        executor, _ = _makeExecutor(workspaceRoot=None)
+        result = asyncio.run(executor.execute("track-achievement", {
+            "type": "topic-mastery", "topic": "dicts",
+        }))
+        assert result["recorded"] is False

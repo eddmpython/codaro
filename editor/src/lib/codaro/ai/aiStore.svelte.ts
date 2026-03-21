@@ -4,6 +4,7 @@ import type {
   AiToolCallResult,
   AiProviderEntry,
   StreamEvent,
+  ChatContext,
 } from "./aiApi";
 import {
   getProfile,
@@ -44,6 +45,18 @@ let error = $state<string | null>(null);
 let isChatBarOpen = $state(false);
 let isArtifactPanelOpen = $state(false);
 let unsubscribeProfile: (() => void) | null = null;
+let contextProvider: (() => ChatContext | null) | null = null;
+
+export function registerContextProvider(provider: () => ChatContext | null): () => void {
+  contextProvider = provider;
+  return () => { contextProvider = null; };
+}
+
+function collectContext(): ChatContext | undefined {
+  if (!contextProvider) return undefined;
+  const ctx = contextProvider();
+  return ctx ?? undefined;
+}
 
 function generateId(): string {
   return `msg-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
@@ -186,6 +199,7 @@ export async function sendMessage(
       message: content.trim(),
       sessionId,
       role: conversationRole,
+      context: collectContext(),
     });
 
     if (!conversationId) {
@@ -250,6 +264,7 @@ export async function sendMessageStreaming(
         message: content.trim(),
         sessionId,
         role: conversationRole,
+        context: collectContext(),
       },
       (event: StreamEvent) => {
         const msg = findAssistant();
@@ -329,6 +344,42 @@ function toolCallToArtifact(tc: AiToolCallResult): ArtifactEntry | null {
         id: generateId(),
         type: "code",
         title: "Execution result",
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "create-learning-card":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `Card: ${(result as Record<string, unknown>).topic ?? "concept"}`,
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "create-quiz":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `Quiz: ${(result as Record<string, unknown>).topic ?? "quiz"}`,
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "create-notebook-exercise":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `Exercise: ${(result as Record<string, unknown>).title ?? "exercise"}`,
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "track-achievement":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `Achievement: ${(result as Record<string, unknown>).topic ?? ""}`,
         content: JSON.stringify(result, null, 2),
         toolName: tc.name,
         timestamp: Date.now(),
