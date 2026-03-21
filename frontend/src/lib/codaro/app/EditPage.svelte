@@ -1,8 +1,10 @@
 <script lang="ts">
+  import { onMount, onDestroy } from "svelte";
   import type { Snippet } from "svelte";
   import AppChrome from "../chrome/AppChrome.svelte";
   import AppContainer from "./AppContainer.svelte";
   import FilenameForm from "../header/FilenameForm.svelte";
+  import { initAiStore, destroyAiStore } from "../ai/aiStore.svelte";
 
   interface Props {
     connectionState: string;
@@ -45,6 +47,14 @@
     onFeedback,
     children
   }: Props = $props();
+
+  onMount(() => {
+    initAiStore();
+  });
+
+  onDestroy(() => {
+    destroyAiStore();
+  });
 </script>
 
 <AppChrome

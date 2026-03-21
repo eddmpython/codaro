@@ -5,11 +5,14 @@
   import HelperSidebar from "./HelperSidebar.svelte";
   import DeveloperPanel from "./DeveloperPanel.svelte";
   import Footer from "./Footer.svelte";
+  import ChatBar from "../components/ChatBar.svelte";
+  import ArtifactPanel from "../panels/ArtifactPanel.svelte";
   import {
     getSelectedPanel,
     getIsSidebarOpen,
     getIsDeveloperPanelOpen
   } from "../stores/panels.svelte";
+  import { getIsArtifactPanelOpen } from "../ai/aiStore.svelte";
 
   interface Props {
     connectionState?: string;
@@ -42,6 +45,7 @@
   }: Props = $props();
 
   let isDeveloperOpen = $derived(getIsDeveloperPanelOpen());
+  let artifactOpen = $derived(getIsArtifactPanelOpen());
   let mainPanelFlex = $derived(isDeveloperOpen ? 75 : 100);
 </script>
 
@@ -61,23 +65,30 @@
       data-panel=""
       data-panel-id="app-chrome-body"
       data-panel-size="100.0"
-      style="flex: 100 1 0px; overflow: hidden;"
+      style="flex: 100 1 0px; overflow: hidden; display: flex;"
     >
-      <PanelGroup id="marimo:chrome:v1:l1" direction="vertical">
-        <div
-          data-panel-group-id="marimo:chrome:v1:l1"
-          data-panel=""
-          data-panel-id="app"
-          data-panel-size={mainPanelFlex.toFixed(1)}
-          style="flex: {mainPanelFlex} 1 0px; overflow: hidden;"
-        >
-          {@render children()}
-        </div>
+      <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
+        <PanelGroup id="marimo:chrome:v1:l1" direction="vertical">
+          <div
+            data-panel-group-id="marimo:chrome:v1:l1"
+            data-panel=""
+            data-panel-id="app"
+            data-panel-size={mainPanelFlex.toFixed(1)}
+            style="flex: {mainPanelFlex} 1 0px; overflow: hidden;"
+          >
+            {@render children()}
+          </div>
 
-        <DeveloperPanel {engineName} {engineStatus} {errorCount} />
-      </PanelGroup>
+          <DeveloperPanel {engineName} {engineStatus} {errorCount} />
+        </PanelGroup>
+      </div>
+
+      {#if artifactOpen}
+        <ArtifactPanel />
+      {/if}
     </div>
   </PanelGroup>
 
+  <ChatBar />
   <Footer {connectionState} {engineStatus} {issueCount} {warningCount} {onExport} />
 </div>
