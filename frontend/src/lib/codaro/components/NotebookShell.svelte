@@ -84,8 +84,8 @@
   let pendingAICells: string[] = $state([]);
   let pendingAIIndex: number | null = $state(null);
 
-  const marimoVersion = "0.21.0";
-  const marimoStaticBase = `${getBasePath()}/marimo`;
+  const codaroVersion = "0.1.0";
+  const staticBase = `${getBasePath()}/assets`;
 
   const chromePanels = [
     { key: "files", label: "Files" },
@@ -679,21 +679,21 @@
 </script>
 
 <svelte:head>
-  <link rel="icon" href={`${marimoStaticBase}/favicon.ico`} />
-  <link rel="preload" href={`${marimoStaticBase}/assets/gradient-yHQUC_QB.png`} as="image" />
-  <link rel="preload" href={`${marimoStaticBase}/assets/noise-60BoTA8O.png`} as="image" />
-  <link rel="preload" href={`${marimoStaticBase}/assets/Lora-VariableFont_wght-B2ootaw-.ttf`} as="font" crossorigin="anonymous" />
-  <link rel="preload" href={`${marimoStaticBase}/assets/PTSans-Regular-CxL0S8W7.ttf`} as="font" crossorigin="anonymous" />
-  <link rel="preload" href={`${marimoStaticBase}/assets/PTSans-Bold-D9fedIX3.ttf`} as="font" crossorigin="anonymous" />
-  <link rel="preload" href={`${marimoStaticBase}/assets/FiraMono-Regular-BTCkDNvf.ttf`} as="font" crossorigin="anonymous" />
-  <link rel="preload" href={`${marimoStaticBase}/assets/FiraMono-Medium-DU3aDxX5.ttf`} as="font" crossorigin="anonymous" />
-  <link rel="preload" href={`${marimoStaticBase}/assets/FiraMono-Bold-CLVRCuM9.ttf`} as="font" crossorigin="anonymous" />
+  <link rel="icon" href={`${staticBase}/favicon.ico`} />
+  <link rel="preload" href={`${staticBase}/gradient-yHQUC_QB.png`} as="image" />
+  <link rel="preload" href={`${staticBase}/noise-60BoTA8O.png`} as="image" />
+  <link rel="preload" href={`${staticBase}/Lora-VariableFont_wght-B2ootaw-.ttf`} as="font" crossorigin="anonymous" />
+  <link rel="preload" href={`${staticBase}/PTSans-Regular-CxL0S8W7.ttf`} as="font" crossorigin="anonymous" />
+  <link rel="preload" href={`${staticBase}/PTSans-Bold-D9fedIX3.ttf`} as="font" crossorigin="anonymous" />
+  <link rel="preload" href={`${staticBase}/FiraMono-Regular-BTCkDNvf.ttf`} as="font" crossorigin="anonymous" />
+  <link rel="preload" href={`${staticBase}/FiraMono-Medium-DU3aDxX5.ttf`} as="font" crossorigin="anonymous" />
+  <link rel="preload" href={`${staticBase}/FiraMono-Bold-CLVRCuM9.ttf`} as="font" crossorigin="anonymous" />
   <meta name="theme-color" content="#000000" />
-  <meta name="description" content="a marimo app" />
-  <link rel="apple-touch-icon" href={`${marimoStaticBase}/apple-touch-icon.png`} />
-  <link rel="manifest" href={`${marimoStaticBase}/manifest.json`} />
+  <meta name="description" content="a Codaro notebook" />
+  <link rel="apple-touch-icon" href={`${staticBase}/apple-touch-icon.png`} />
+  <link rel="manifest" href={`${staticBase}/manifest.json`} />
 
-  <script data-marimo="true">
+  <script data-codaro="true">
     function __resizeIframe(obj) {
       const scrollbarHeight = 20;
       function setHeight() {
@@ -720,10 +720,10 @@
     }
   </script>
 
-  <marimo-filename hidden>{documentLocation}</marimo-filename>
-  <marimo-version data-version={marimoVersion} hidden></marimo-version>
-  <marimo-user-config data-config={"{}"} hidden></marimo-user-config>
-  <marimo-server-token data-token="" hidden></marimo-server-token>
+  <codaro-filename hidden>{documentLocation}</codaro-filename>
+  <codaro-version data-version={codaroVersion} hidden></codaro-version>
+  <codaro-user-config data-config={"{}"} hidden></codaro-user-config>
+  <codaro-server-token data-token="" hidden></codaro-server-token>
   <title>{documentLocation}</title>
 </svelte:head>
 
@@ -733,11 +733,11 @@
   {:else if pageError && !documentState}
     <div class="screenState">{pageError}</div>
   {:else if documentState}
-    <div class="contents" style="--marimo-code-editor-font-size: 0.875rem;">
+    <div class="contents" style="--codaro-code-editor-font-size: 0.875rem;">
       <EditPage
         {connectionState}
         {documentLocation}
-        documentTitle={documentState.title || "untitled marimo notebook"}
+        documentTitle={documentState.title || "untitled notebook"}
         hasPath={!!currentPath}
         {shellError}
         {engineName}

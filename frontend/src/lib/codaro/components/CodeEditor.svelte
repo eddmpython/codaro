@@ -54,7 +54,7 @@
     "&": {
       backgroundColor: "#ffffff",
       color: "#000000",
-      fontSize: "var(--marimo-code-editor-font-size, var(--text-sm, 0.875rem))"
+      fontSize: "var(--codaro-code-editor-font-size, var(--text-sm, 0.875rem))"
     },
     "&.cm-focused": {
       outline: "none"
@@ -62,7 +62,7 @@
     ".cm-content": {
       padding: "4px 0",
       fontFamily: "var(--monospace-font), ui-monospace, monospace",
-      fontSize: "var(--marimo-code-editor-font-size, 0.9rem)"
+      fontSize: "var(--codaro-code-editor-font-size, 0.9rem)"
     },
     ".cm-line": {
       padding: "0 2px"

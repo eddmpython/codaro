@@ -7,7 +7,7 @@
 
   let {
     documentLocation,
-    documentTitle = "untitled marimo notebook",
+    documentTitle = "untitled notebook",
     hasPath
   }: Props = $props();
 
@@ -63,7 +63,7 @@
                 style="max-width: 1000px;"
               />
             </div>
-            <div class="marimo" style="display: contents;"></div>
+            <div class="codaro" style="display: contents;"></div>
           </div>
         </div>
       </div>

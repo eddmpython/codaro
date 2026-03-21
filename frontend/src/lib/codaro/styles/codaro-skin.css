@@ -1,8 +1,8 @@
 /* ============================================================
-   Codaro Skin — zinc tone override on marimo skeleton
+   Codaro Skin — zinc tone overrides
 
    Overrides CSS variables only. Does NOT change DOM, spacing,
-   font-size, border-radius, or layout. marimo CSS stays loaded
+   font-size, border-radius, or layout. Base CSS stays loaded
    underneath; this file sits on top.
    ============================================================ */
 
@@ -259,16 +259,16 @@
 }
 
 /* --- CodeMirror active line → zinc tint -------------------- */
-.marimo-cell .cm-editor.cm-focused .cm-activeLineGutter {
+.codaro-cell .cm-editor.cm-focused .cm-activeLineGutter {
   background: #f4f4f5;
 }
-.marimo-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
+.codaro-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
   background: rgba(113, 113, 122, 0.04);
 }
 
-.dark .marimo-cell .cm-editor.cm-focused .cm-activeLineGutter {
+.dark .codaro-cell .cm-editor.cm-focused .cm-activeLineGutter {
   background: #27272a;
 }
-.dark .marimo-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
+.dark .codaro-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
   background: rgba(161, 161, 170, 0.06);
 }

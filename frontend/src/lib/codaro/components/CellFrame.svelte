@@ -90,7 +90,7 @@
   let cellClasses = $derived(
     [
       "group",
-      "marimo-cell",
+      "codaro-cell",
       "hover-actions-parent",
       "interactive",
       "z-10",
@@ -163,7 +163,7 @@
   style="position: relative;"
   tabindex="-1"
 >
-<marimo-cell
+<codaro-cell
   class="block"
   data-cell-id={block.id}
   data-cell-name=""
@@ -408,16 +408,16 @@
       </div>
     {/if}
   </div>
-</marimo-cell>
+</codaro-cell>
 </div>
 
 <style>
-  marimo-cell {
+  codaro-cell {
     display: block;
     position: relative;
   }
 
-  .marimo-cell {
+  .codaro-cell {
     position: relative;
     border-radius: 10px;
     max-width: inherit;
@@ -426,96 +426,96 @@
     background: var(--background);
   }
 
-  .marimo-cell:hover {
+  .codaro-cell:hover {
     border-color: var(--gray-6, var(--border));
     z-index: 30;
   }
 
-  .marimo-cell:focus-within {
+  .codaro-cell:focus-within {
     z-index: 20;
   }
 
-  .marimo-cell:focus-visible {
+  .codaro-cell:focus-visible {
     outline: none;
   }
 
-  .marimo-cell.interactive > :first-child {
+  .codaro-cell.interactive > :first-child {
     border-top-left-radius: 9px;
     border-top-right-radius: 9px;
   }
 
-  .marimo-cell.interactive > :last-child {
+  .codaro-cell.interactive > :last-child {
     border-bottom-left-radius: 9px;
     border-bottom-right-radius: 9px;
   }
 
-  .marimo-cell.interactive:focus-within {
+  .codaro-cell.interactive:focus-within {
     box-shadow: var(--shadow-md-solid, 0 4px 6px -1px rgba(0,0,0,.1));
   }
 
-  .marimo-cell.interactive :global(.cm) {
+  .codaro-cell.interactive :global(.cm) {
     border-radius: 8px;
   }
 
-  .marimo-cell.interactive .output-area {
+  .codaro-cell.interactive .output-area {
     max-height: 610px;
     overflow: auto;
   }
 
-  .marimo-cell.needs-run {
+  .codaro-cell.needs-run {
     border-color: var(--stale, var(--yellow-8, #e5a417));
     outline: 1px solid var(--stale, var(--yellow-8, #e5a417));
   }
 
-  .marimo-cell.needs-run:hover {
+  .codaro-cell.needs-run:hover {
     border-color: color-mix(in srgb, var(--action-foreground, var(--yellow-11, #946800)), transparent 70%);
     outline-color: color-mix(in srgb, var(--action-foreground, var(--yellow-11, #946800)), transparent 70%);
   }
 
-  .marimo-cell.needs-run:focus-within {
+  .codaro-cell.needs-run:focus-within {
     outline: none;
     box-shadow: var(--shadow-md-solid, 0 4px 6px -1px rgba(0,0,0,.1));
   }
 
-  .marimo-cell.has-error:not(.needs-run) {
+  .codaro-cell.has-error:not(.needs-run) {
     border-color: color-mix(in srgb, var(--error, var(--red-8, #e5484d)), transparent 80%);
     outline: 1px solid color-mix(in srgb, var(--error, var(--red-8, #e5484d)), transparent 80%);
   }
 
-  .marimo-cell.has-error:not(.needs-run):hover {
+  .codaro-cell.has-error:not(.needs-run):hover {
     border-color: color-mix(in srgb, var(--error, var(--red-8, #e5484d)), transparent 70%);
     outline-color: color-mix(in srgb, var(--error, var(--red-8, #e5484d)), transparent 70%);
   }
 
-  .marimo-cell.has-error:not(.needs-run):focus-within {
+  .codaro-cell.has-error:not(.needs-run):focus-within {
     outline: none;
     box-shadow: var(--shadow-md-solid, 0 4px 6px -1px rgba(0,0,0,.1));
   }
 
-  .marimo-cell.stale .output-area,
-  .marimo-cell.stale :global(.cm-gutters),
-  .marimo-cell.stale :global(.cm) {
+  .codaro-cell.stale .output-area,
+  .codaro-cell.stale :global(.cm-gutters),
+  .codaro-cell.stale :global(.cm) {
     background-color: var(--gray-2, #f9f9f9);
     opacity: 0.5;
   }
 
-  .marimo-cell.borderless {
+  .codaro-cell.borderless {
     border-color: transparent;
   }
 
-  .marimo-cell.borderless > :global(*) {
+  .codaro-cell.borderless > :global(*) {
     border-bottom: none;
   }
 
-  .marimo-cell.borderless:focus {
+  .codaro-cell.borderless:focus {
     border: 1px solid var(--gray-4, var(--border));
   }
 
-  :global(.dark) .marimo-cell {
+  :global(.dark) .codaro-cell {
     border-color: var(--border);
   }
 
-  :global(.dark) .marimo-cell:hover {
+  :global(.dark) .codaro-cell:hover {
     border: 1px solid var(--gray-9);
   }
 
@@ -612,8 +612,8 @@
     display: inline-flex !important;
   }
 
-  marimo-cell:hover .hover-action,
-  marimo-cell:focus-within .hover-action {
+  codaro-cell:hover .hover-action,
+  codaro-cell:focus-within .hover-action {
     display: inline-flex !important;
   }
 
@@ -791,7 +791,7 @@
     margin: 2px;
   }
 
-  :global(#App.disconnected) .marimo-cell,
+  :global(#App.disconnected) .codaro-cell,
   :global(#App.disconnected) :global(.cm .cm-gutters),
   :global(#App.disconnected) :global(.cm-editor.cm-focused .cm-activeLineGutter),
   :global(#App.disconnected) :global(.cm-editor.cm-focused .cm-activeLine),

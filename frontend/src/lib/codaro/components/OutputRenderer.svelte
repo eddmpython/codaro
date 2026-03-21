@@ -117,7 +117,7 @@
 
 {#snippet outputContent()}
   {#if output.type === "error"}
-    <pre class="marimo-error">{output.stderr || output.text}</pre>
+    <pre class="codaro-error">{output.stderr || output.text}</pre>
   {:else if output.type === "html"}
     <div class="output htmlOutput">{@html output.html}</div>
   {:else if output.type === "image"}
@@ -285,7 +285,7 @@
   .return,
   .stderr,
   .stdout,
-  .marimo-error {
+  .codaro-error {
     margin: 0;
     white-space: pre-wrap;
     word-break: break-word;

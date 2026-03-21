@@ -67,7 +67,7 @@
   class="border-border print:hidden z-20 resize-handle-collapsed horizontal"
   role="separator"
   data-panel-group-direction="vertical"
-  data-panel-group-id="marimo:chrome:v1:l1"
+  data-panel-group-id="codaro:chrome:v1:l1"
   data-resize-handle=""
   data-panel-resize-handle-enabled={isOpen ? "true" : "false"}
   data-panel-resize-handle-id="developer-resize"
@@ -83,7 +83,7 @@
   data-testid="panel"
   class="dark:bg-(--slate-1) print:hidden hide-on-fullscreen"
   id="app-chrome-panel"
-  data-panel-group-id="marimo:chrome:v1:l1"
+  data-panel-group-id="codaro:chrome:v1:l1"
   data-panel=""
   data-panel-collapsible="true"
   data-panel-id="app-chrome-panel"

@@ -52,7 +52,7 @@
 </script>
 
 <div class="flex flex-col flex-1 overflow-hidden absolute inset-0 print:relative bg-background">
-  <PanelGroup id="marimo:chrome:v1:l2" direction="horizontal">
+  <PanelGroup id="codaro:chrome:v1:l2" direction="horizontal">
     <Sidebar {errorCount} {queuedOrRunningCount} {onFeedback} />
 
     <HelperSidebar {panelTitle}>
@@ -63,16 +63,16 @@
 
     <div
       id="app-chrome-body"
-      data-panel-group-id="marimo:chrome:v1:l2"
+      data-panel-group-id="codaro:chrome:v1:l2"
       data-panel=""
       data-panel-id="app-chrome-body"
       data-panel-size="100.0"
       style="flex: 100 1 0px; overflow: hidden; display: flex;"
     >
       <div style="flex: 1; display: flex; flex-direction: column; overflow: hidden;">
-        <PanelGroup id="marimo:chrome:v1:l1" direction="vertical">
+        <PanelGroup id="codaro:chrome:v1:l1" direction="vertical">
           <div
-            data-panel-group-id="marimo:chrome:v1:l1"
+            data-panel-group-id="codaro:chrome:v1:l1"
             data-panel=""
             data-panel-id="app"
             data-panel-size={mainPanelFlex.toFixed(1)}

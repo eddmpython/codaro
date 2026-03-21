@@ -15,7 +15,7 @@
 <div
   class="relative h-full"
   id="app"
-  data-panel-group-id="marimo:chrome:v1:l1"
+  data-panel-group-id="codaro:chrome:v1:l1"
   data-panel=""
   data-panel-id="app"
 >

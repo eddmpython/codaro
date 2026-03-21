@@ -2,20 +2,20 @@
 @source "./**/*.svelte";
 @source "./**/*.ts";
 
-@import "./lib/codaro/styles/marimo/cells-jmgGt1lS.css";
-@import "./lib/codaro/styles/marimo/markdown-renderer-DdDKmWlR.css";
-@import "./lib/codaro/styles/marimo/JsonOutput-B7vuddcd.css";
-@import "./lib/codaro/styles/marimo/index-CVpJvEAO.css";
-@import "./lib/codaro/styles/marimo/CellStatus-2Psjnl5F.css";
-@import "./lib/codaro/styles/marimo/cell-editor-Iey559K_.css";
-@import "./lib/codaro/styles/marimo/layout-BjXzDXoG.css";
-@import "./lib/codaro/styles/marimo/edit-page-Dstp9NQ5.css";
-@import "./lib/codaro/styles/marimo/Inputs-CuKU-ENz.css";
+@import "./lib/codaro/styles/base/cells-jmgGt1lS.css";
+@import "./lib/codaro/styles/base/markdown-renderer-DdDKmWlR.css";
+@import "./lib/codaro/styles/base/JsonOutput-B7vuddcd.css";
+@import "./lib/codaro/styles/base/index-CVpJvEAO.css";
+@import "./lib/codaro/styles/base/CellStatus-2Psjnl5F.css";
+@import "./lib/codaro/styles/base/cell-editor-Iey559K_.css";
+@import "./lib/codaro/styles/base/layout-BjXzDXoG.css";
+@import "./lib/codaro/styles/base/edit-page-Dstp9NQ5.css";
+@import "./lib/codaro/styles/base/Inputs-CuKU-ENz.css";
 @import "./lib/codaro/styles/codaro-skin.css";
 
 @font-face {
   font-family: "Lora";
-  src: url("/marimo/assets/Lora-VariableFont_wght-B2ootaw-.ttf") format("truetype");
+  src: url("/assets/Lora-VariableFont_wght-B2ootaw-.ttf") format("truetype");
   font-style: normal;
   font-weight: 100 900;
   font-display: swap;
@@ -23,7 +23,7 @@
 
 @font-face {
   font-family: "PT Sans";
-  src: url("/marimo/assets/PTSans-Regular-CxL0S8W7.ttf") format("truetype");
+  src: url("/assets/PTSans-Regular-CxL0S8W7.ttf") format("truetype");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -31,7 +31,7 @@
 
 @font-face {
   font-family: "PT Sans";
-  src: url("/marimo/assets/PTSans-Bold-D9fedIX3.ttf") format("truetype");
+  src: url("/assets/PTSans-Bold-D9fedIX3.ttf") format("truetype");
   font-style: normal;
   font-weight: 700;
   font-display: swap;
@@ -39,7 +39,7 @@
 
 @font-face {
   font-family: "Fira Mono";
-  src: url("/marimo/assets/FiraMono-Regular-BTCkDNvf.ttf") format("truetype");
+  src: url("/assets/FiraMono-Regular-BTCkDNvf.ttf") format("truetype");
   font-style: normal;
   font-weight: 400;
   font-display: swap;
@@ -47,7 +47,7 @@
 
 @font-face {
   font-family: "Fira Mono";
-  src: url("/marimo/assets/FiraMono-Medium-DU3aDxX5.ttf") format("truetype");
+  src: url("/assets/FiraMono-Medium-DU3aDxX5.ttf") format("truetype");
   font-style: normal;
   font-weight: 500;
   font-display: swap;
@@ -55,7 +55,7 @@
 
 @font-face {
   font-family: "Fira Mono";
-  src: url("/marimo/assets/FiraMono-Bold-CLVRCuM9.ttf") format("truetype");
+  src: url("/assets/FiraMono-Bold-CLVRCuM9.ttf") format("truetype");
   font-style: normal;
   font-weight: 700;
   font-display: swap;
@@ -239,13 +239,13 @@ a {
 }
 
 /* CM editor padding: upstream Cell.css exact values */
-.marimo-cell .cm-editor {
+.codaro-cell .cm-editor {
   border: 1px solid transparent;
   padding: 3px;
   padding-right: 24px;
 }
 
-.marimo-cell .cm-editor .cm-content {
-  font-size: var(--marimo-code-editor-font-size, 0.9rem);
+.codaro-cell .cm-editor .cm-content {
+  font-size: var(--codaro-code-editor-font-size, 0.9rem);
   font-family: var(--monospace-font);
 }

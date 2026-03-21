@@ -1,1 +1,0 @@
-import{i as r}from"./useEvent-O0nX5vok.js";import{l as o}from"./switch-BHXOZNHf.js";const m=()=>r.get(o),n=()=>{let e=document.querySelector("marimo-code");if(!e)return;let t=e.innerHTML;return decodeURIComponent(t).trim()};export{m as n,n as t};

@@ -61,7 +61,7 @@
     transition: opacity 0.15s;
   }
 
-  :global(.marimo-cell:hover) .createCellBtn,
+  :global(.codaro-cell:hover) .createCellBtn,
   .createCellBtn:focus-within {
     opacity: 1;
   }
