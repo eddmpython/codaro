@@ -65,16 +65,35 @@ def runLocalWorker(
                         },
                     )
 
-                response = _executeCommand(
-                    code=command["code"],
-                    blockId=blockId,
-                    injectedVars=command.get("injectedVars"),
-                    registry=registry,
-                    cellDefinitions=cellDefinitions,
-                    executionCount=executionCount,
-                    targetCwd=targetCwd,
-                    emitEvent=emitEvent,
-                )
+                try:
+                    response = _executeCommand(
+                        code=command["code"],
+                        blockId=blockId,
+                        injectedVars=command.get("injectedVars"),
+                        registry=registry,
+                        cellDefinitions=cellDefinitions,
+                        executionCount=executionCount,
+                        targetCwd=targetCwd,
+                        emitEvent=emitEvent,
+                    )
+                except KeyboardInterrupt:
+                    if interruptFlag is not None:
+                        interruptFlag.clear()
+                    response = _buildInterruptedResponse(registry, cellDefinitions, executionCount)
+                    emitEvent(
+                        "display",
+                        {
+                            "outputType": "error",
+                            "data": response["data"],
+                        },
+                    )
+                    emitEvent(
+                        "finished",
+                        {
+                            "status": response["status"],
+                            "outputType": response["type"],
+                        },
+                    )
                 _workerSend(connection, {"kind": "response", "response": response})
                 continue
 
@@ -237,6 +256,29 @@ def _buildStateResponse(
         "cellDefinitions": {blockId: sorted(defines) for blockId, defines in cellDefinitions.items()},
         "executionCount": executionCount,
     }
+
+
+def _buildInterruptedResponse(
+    registry: dict[str, object],
+    cellDefinitions: dict[str, set[str]],
+    executionCount: int,
+) -> dict[str, Any]:
+    response = _buildStateResponse(registry, cellDefinitions, executionCount)
+    response["stateDelta"] = {
+        "added": [],
+        "updated": [],
+        "removed": [],
+    }
+    response.update(
+        {
+            "type": "error",
+            "data": "Execution interrupted.",
+            "stdout": "",
+            "stderr": "",
+            "status": "error",
+        }
+    )
+    return response
 
 
 def _buildRegistryMirror(registry: dict[str, object]) -> dict[str, object]:
@@ -517,7 +559,7 @@ def _sanitizeDescriptor(value: object) -> object:
 
 def _installInterruptTrace(interruptFlag) -> None:
     def traceCallback(frame, event, arg):
-        if interruptFlag.is_set():
+        if interruptFlag.is_set() and frame.f_code.co_filename == "<codaro>":
             raise KeyboardInterrupt("Soft interrupt requested")
         return traceCallback
     sys.settrace(traceCallback)
