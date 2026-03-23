@@ -28,7 +28,7 @@
 - Reduced false positives in document dependency analysis for nested scopes and comprehension variables.
 - Improved engine/runtime behavior around worker management, variables, and process lifecycle.
 - Cleaned frontend warning sources in dialog, toast, mode switcher, hint, guide, and widget surfaces.
-- Corrected the PyPI workflow to validate the adapter-static editor output in `src/codaro/webBuild`.
+- Corrected the PyPI workflow to validate the adapter-static editor output in `src/codaro/webBuild` and run tests with the `dev` extra installed.
 
 ### Verification
 

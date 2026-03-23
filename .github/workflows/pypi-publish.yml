@@ -42,7 +42,7 @@ jobs:
           test -d src/codaro/webBuild/_app
 
       - name: Run tests
-        run: uv run pytest tests/ -v --tb=short
+        run: uv run --extra dev pytest tests/ -v --tb=short
 
       - name: Build wheel
         run: uv build
