@@ -36,10 +36,10 @@ jobs:
           npm ci
           npm run build
 
-      - name: Copy editor build to package
+      - name: Verify packaged editor build
         run: |
-          rm -rf src/codaro/webBuild
-          cp -r editor/build src/codaro/webBuild
+          test -f src/codaro/webBuild/index.html
+          test -d src/codaro/webBuild/_app
 
       - name: Run tests
         run: uv run pytest tests/ -v --tb=short
