@@ -428,17 +428,22 @@ core repo + bundle repos
 - bundle package는 아직 구현되지 않았다
 - `extras`는 아직 정리되지 않았지만 제품 capability용으로 쓰지 않는 것이 확정 방향이다
 - launcher-managed bundle과 user-managed external dependency 경계가 문서로 고정됐다
+- 2026-03-24 기준 `v0.1.0` GitHub Actions build/test는 통과했고, PyPI publish는 `invalid-publisher`로 막혀 있다
+- 현재 실패 클레임은 `repo:eddmpython/codaro:environment:pypi`, workflow `.github/workflows/pypi-publish.yml`, ref `refs/tags/v0.1.0` 조합이다
 
 ## Next Action
 
 - `codaro-excel` package skeleton과 bootstrap metadata shape를 정의한다
 - package 분리 시점에 대비해 capability registry 방식을 정한다
 - 이후 `pyproject`를 monorepo multi-package 구조로 옮길 시점을 정한다
-- PyPI trusted publishing workflow 초안을 만든다
+- PyPI 프로젝트 설정에서 `eddmpython/codaro` -> `.github/workflows/pypi-publish.yml` -> environment `pypi` trusted publisher를 등록한다
+- trusted publisher 등록 후 `v0.1.0` 태그를 다시 push해서 publish workflow를 재실행한다
 - compiled dependency wheel과 platform tag 조합 정책을 정한다
 
 ## Verification Left
 
+- trusted publisher 등록 뒤 `Publish to PyPI` workflow가 token exchange 없이 성공하는지 확인
+- `https://pypi.org/project/codaro/`에 `0.1.0`이 실제로 노출되는지 확인
 - bundle metadata에 external prerequisite를 어디까지 강제할지 검증
 - multi-package monorepo 도입 시점
 - bundle entrypoint registry 표면
