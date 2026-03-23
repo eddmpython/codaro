@@ -30,6 +30,7 @@
 - Stabilized soft interrupt handling so worker resets do not surface as connection-reset crashes in CI.
 - Cleaned frontend warning sources in dialog, toast, mode switcher, hint, guide, and widget surfaces.
 - Corrected the PyPI workflow to validate the adapter-static editor output in `src/codaro/webBuild` and run tests with the `dev` extra installed.
+- Fixed main CI drift by syncing launcher call sites with the current Rust APIs and installing backend test dependencies in GitHub Actions.
 
 ### Verification
 

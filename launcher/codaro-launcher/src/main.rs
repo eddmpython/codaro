@@ -325,31 +325,19 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
                 message: "Discovering release from GitHub...".into(),
                 percent: Some(10.0),
             })));
-            let discovery = discover_manifest_for_repo(
+            let found = discover_manifest_for_repo(
                 &update_config.github_repo,
                 &update_config.github_manifest_asset_name,
-                update_config.channel == "beta",
+                update_config.allows_prerelease(),
+                LAUNCHER_VERSION,
             )?;
-            match discovery {
-                Some(found) => {
-                    println!("{}", encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
-                        stage: "provision".into(),
-                        message: format!("Staging release {}...", found.release_id),
-                        percent: Some(30.0),
-                    })));
-                    let summary = stage_release(paths, &found.manifest_download_url)?;
-                    activate_release(paths, &summary.release_id)?;
-                }
-                None => {
-                    println!("{}", encode_ipc(&IpcMessage::SetError(ErrorPayload {
-                        code: "NO_RELEASE".into(),
-                        message: "No release found on GitHub.".into(),
-                        detail: None,
-                        recoverable: false,
-                    })));
-                    bail!("No release available to provision");
-                }
-            }
+            println!("{}", encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                stage: "provision".into(),
+                message: format!("Staging release {}...", found.release_tag),
+                percent: Some(30.0),
+            })));
+            let summary = stage_release(paths, &found.manifest_source)?;
+            activate_release(paths, &summary.release_id)?;
         } else if let Some(manifest_source) = source {
             let summary = stage_release(paths, &manifest_source)?;
             activate_release(paths, &summary.release_id)?;
@@ -373,18 +361,22 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
         url: None,
     })));
 
-    let config = BackendLaunchConfig::from_release_state(
+    let workspace_root = args
+        .workspace_root
+        .unwrap_or(std::env::current_dir().context("Failed to resolve current directory.")?);
+    let config = BackendLaunchConfig::from_active_release(
         paths,
         &active,
-        &args.host,
+        args.host.clone(),
         port,
-        args.workspace_root.as_deref(),
+        workspace_root,
     )?;
 
     let mut child = config.spawn()?;
-    let url = format!("http://{}:{}", args.host, port);
+    let url = config.app_url();
+    let health_url = config.health_url();
 
-    match wait_for_health(&url, Duration::from_secs(30), Duration::from_millis(200)) {
+    match wait_for_backend_ready(&mut child, &health_url, Duration::from_secs(30)) {
         Ok(()) => {
             println!("{}", encode_ipc(&IpcMessage::SetStatus(StatusPayload {
                 status: LaunchStatus::Healthy,
