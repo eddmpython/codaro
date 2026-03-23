@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+import json
 import logging
 from typing import Any
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
+from ..automation.audit import getAuditTrail
+from ..automation.eStop import getEmergencyStop
 from ..automation.taskModel import TaskDefinition
 from ..automation.taskRegistry import getTaskRegistry
 from ..automation.taskRunner import TaskRunner
@@ -175,7 +178,8 @@ def createAutomationRouter(state: Any) -> APIRouter:
 
         try:
             payload = await request.json()
-        except Exception:
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.warning("webhook body parse failed for task %s: %s", taskId, exc)
             payload = {}
 
         workspaceRoot = str(getattr(state, "workspaceRoot", "."))
@@ -188,6 +192,276 @@ def createAutomationRouter(state: Any) -> APIRouter:
             "runId": run.id,
             "status": run.status.value,
         }
+
+    @router.get("/api/automation/e-stop")
+    def apiGetEStop():
+        return getEmergencyStop().serialize()
+
+    @router.post("/api/automation/e-stop")
+    async def apiTriggerEStop(request: Request):
+        body = {}
+        try:
+            body = await request.json()
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.debug("e-stop body parse: %s", exc)
+        reason = body.get("reason", "Manual trigger via API")
+        eStop = getEmergencyStop()
+        triggered = eStop.trigger(reason)
+        if not triggered:
+            raise HTTPException(status_code=409, detail="E-Stop already active")
+
+        scheduler = _getScheduler()
+        scheduler.cancelAll()
+
+        return eStop.serialize()
+
+    @router.delete("/api/automation/e-stop")
+    def apiClearEStop():
+        eStop = getEmergencyStop()
+        cleared = eStop.clear()
+        if not cleared:
+            raise HTTPException(status_code=409, detail="E-Stop is not active")
+        return eStop.serialize()
+
+    @router.get("/api/automation/resource-usage")
+    def apiResourceUsage():
+        sessionMgr = getattr(state, "sessionManager", None)
+        if sessionMgr is None:
+            return {"sessions": []}
+        snapshots = []
+        for session in sessionMgr.listSessions():
+            engine = getattr(session, "engine", None)
+            if engine is not None and hasattr(engine, "getResourceUsage"):
+                snap = engine.getResourceUsage()
+                snapshots.append({
+                    "sessionId": session.id,
+                    "memoryMb": round(snap.memoryMb, 1),
+                    "cpuPercent": round(snap.cpuPercent, 1),
+                    "uptime": round(snap.uptime, 1),
+                    "alive": snap.alive,
+                })
+        return {"sessions": snapshots}
+
+    @router.get("/api/automation/audit")
+    def apiGetAuditLog(
+        actionType: str | None = Query(None),
+        date: str | None = Query(None),
+        limit: int = Query(100),
+    ):
+        trail = getAuditTrail()
+        if date:
+            entries = trail.queryFromDisk(date=date, actionType=actionType, limit=limit)
+        else:
+            entries = [e.serialize() for e in trail.query(actionType=actionType, limit=limit)]
+        return {"entries": entries, "count": len(entries)}
+
+    @router.get("/api/automation/input-policy")
+    def apiGetInputPolicy():
+        guard = _getInputGuard()
+        return guard.policy.serialize()
+
+    @router.put("/api/automation/input-policy")
+    async def apiUpdateInputPolicy(request: Request):
+        body = await request.json()
+        guard = _getInputGuard()
+        policy = guard.policy
+        if "maxActionsPerSecond" in body:
+            policy.maxActionsPerSecond = int(body["maxActionsPerSecond"])
+        if "maxActionsPerMinute" in body:
+            policy.maxActionsPerMinute = int(body["maxActionsPerMinute"])
+        if "humanDelay" in body:
+            policy.humanDelay = bool(body["humanDelay"])
+        if "enabled" in body:
+            policy.enabled = bool(body["enabled"])
+        if "allowedScreenRegion" in body:
+            r = body["allowedScreenRegion"]
+            if r is None:
+                policy.allowedScreenRegion = None
+            else:
+                from ..automation.vision.capture import Region
+                policy.allowedScreenRegion = Region(x=r["x"], y=r["y"], width=r["width"], height=r["height"])
+        return policy.serialize()
+
+    @router.post("/api/automation/recording/start")
+    def apiStartRecording():
+        recorder = _getRecorder()
+        recordingId = recorder.start()
+        return {"recordingId": recordingId, "status": "recording"}
+
+    @router.post("/api/automation/recording/stop")
+    async def apiStopRecording(request: Request):
+        from ..automation.recorder.recipeGenerator import RecipeGenerator
+        body = {}
+        try:
+            body = await request.json()
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.debug("recording stop body: %s", exc)
+        recorder = _getRecorder()
+        actions = recorder.stop()
+        title = body.get("title", "Recorded Automation")
+
+        generator = RecipeGenerator()
+        recipe = generator.generate(actions, title=title)
+        summary = generator.generateDict(actions, title=title)
+        recorder.reset()
+        return {"recipe": recipe, "summary": summary}
+
+    @router.get("/api/automation/recording/status")
+    def apiRecordingStatus():
+        recorder = _getRecorder()
+        return recorder.serialize()
+
+    @router.post("/api/automation/plan/execute")
+    async def apiExecutePlan(request: Request):
+        from ..automation.loop.automationLoop import AutomationLoop, LoopConfig
+        body = await request.json()
+        steps = body.get("steps", [])
+
+        if not steps:
+            raise HTTPException(status_code=400, detail="No steps provided")
+
+        config = LoopConfig(
+            maxConsecutiveFailures=body.get("maxConsecutiveFailures", 3),
+        )
+
+        async def actionHandler(action: str, params: dict[str, Any]) -> dict[str, Any]:
+            return {"status": "simulated", "action": action}
+
+        loop = AutomationLoop(actionHandler=actionHandler, config=config)
+        loop.addSteps(steps)
+        _activePlans[loop.planId] = loop
+
+        result = await loop.run()
+        return result
+
+    @router.get("/api/automation/plan/{planId}/status")
+    def apiGetPlanStatus(planId: str):
+        loop = _activePlans.get(planId)
+        if loop is None:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        return loop.serialize()
+
+    @router.post("/api/automation/plan/{planId}/pause")
+    def apiPausePlan(planId: str):
+        loop = _activePlans.get(planId)
+        if loop is None:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        paused = loop.pause()
+        if not paused:
+            raise HTTPException(status_code=409, detail="Cannot pause plan in current state")
+        return loop.progress
+
+    @router.post("/api/automation/plan/{planId}/resume")
+    def apiResumePlan(planId: str):
+        loop = _activePlans.get(planId)
+        if loop is None:
+            raise HTTPException(status_code=404, detail="Plan not found")
+        resumed = loop.resume()
+        if not resumed:
+            raise HTTPException(status_code=409, detail="Cannot resume plan in current state")
+        return loop.progress
+
+    @router.post("/api/automation/voice/listen")
+    async def apiVoiceListen(request: Request):
+        import asyncio
+        body = {}
+        try:
+            body = await request.json()
+        except (json.JSONDecodeError, ValueError) as exc:
+            logger.debug("voice body: %s", exc)
+        duration = min(body.get("duration", 5), 30)
+        language = body.get("language", "en")
+
+        from ..automation.voice.whisperEngine import WhisperEngine
+        engine = WhisperEngine()
+        try:
+            engine.startListening(language=language)
+            await asyncio.sleep(duration)
+            result = engine.stopListening()
+        except ImportError as exc:
+            return {"error": f"Voice dependencies not installed: {exc}"}
+        finally:
+            engine.dispose()
+
+        if result is None:
+            return {"error": "No audio captured"}
+        return result.serialize()
+
+    @router.post("/api/automation/voice/speak")
+    async def apiVoiceSpeak(request: Request):
+        body = await request.json()
+        text = body.get("text", "")
+        rate = body.get("rate", 150)
+
+        from ..automation.voice.pyttsx3Speaker import Pyttsx3Speaker
+        speaker = Pyttsx3Speaker()
+        try:
+            speaker.speak(text, rate=rate)
+        except ImportError as exc:
+            return {"error": f"Voice dependencies not installed: {exc}"}
+        finally:
+            speaker.dispose()
+
+        return {"spoken": True, "text": text}
+
+    @router.post("/api/automation/voice/command")
+    async def apiVoiceCommand(request: Request):
+        body = await request.json()
+        text = body.get("text", "")
+
+        from ..automation.voice.commandParser import CommandParser
+        parser = CommandParser()
+        cmd = parser.parse(text)
+        if cmd is None:
+            return {"error": "Empty text"}
+
+        action = parser.parseToAction(text)
+        return {
+            "command": cmd.serialize(),
+            "action": action,
+        }
+
+    @router.get("/api/automation/channels")
+    def apiListChannels():
+        bridge = _getMessageBridgeApi()
+        channels = bridge.listChannels()
+        return {"channels": [c.serialize() for c in channels]}
+
+    @router.post("/api/automation/channels")
+    async def apiAddChannel(request: Request):
+        body = await request.json()
+        from ..automation.integrations.messageBridge import MessageChannel
+        channel = MessageChannel(
+            name=body["name"],
+            channelType=body["channelType"],
+            webhookUrl=body["webhookUrl"],
+            enabled=body.get("enabled", True),
+        )
+        bridge = _getMessageBridgeApi()
+        bridge.addChannel(channel)
+        return channel.serialize()
+
+    @router.delete("/api/automation/channels/{channelName}")
+    def apiRemoveChannel(channelName: str):
+        bridge = _getMessageBridgeApi()
+        removed = bridge.removeChannel(channelName)
+        if not removed:
+            raise HTTPException(status_code=404, detail="Channel not found")
+        return {"ok": True}
+
+    @router.post("/api/automation/notify")
+    async def apiSendNotification(request: Request):
+        body = await request.json()
+        channel = body.get("channel", "all")
+        message = body.get("message", "")
+
+        bridge = _getMessageBridgeApi()
+        if channel == "all":
+            results = bridge.broadcast(message)
+            return {"results": [r.serialize() for r in results]}
+
+        result = bridge.send(channel, message)
+        return result.serialize()
 
     @router.get("/api/workflows")
     def apiListWorkflows():
@@ -236,6 +510,22 @@ def createAutomationRouter(state: Any) -> APIRouter:
 
 
 _scheduler = None
+_activePlans: dict[str, Any] = {}
+
+
+def _getMessageBridgeApi():
+    from ..automation.shared import getSharedMessageBridge
+    return getSharedMessageBridge()
+
+
+def _getRecorder():
+    from ..automation.shared import getSharedRecorder
+    return getSharedRecorder()
+
+
+def _getInputGuard():
+    from ..automation.shared import getSharedInputGuard
+    return getSharedInputGuard()
 
 
 def _getScheduler():

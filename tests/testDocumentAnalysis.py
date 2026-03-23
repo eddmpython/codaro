@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from codaro.document import createEmptyDocument, writeMarimoDocument
+from codaro.document import createEmptyDocument, writeReactiveAppDocument
 from codaro.document.analysis import analyzeCode
 
 
@@ -40,7 +40,7 @@ def testAnalyzeCodeKeepsComprehensionLocalsScoped() -> None:
     assert uses == ["scale"]
 
 
-def testWriteMarimoDocumentDoesNotExposeFunctionParameterDependency() -> None:
+def testWriteReactiveAppDocumentDoesNotExposeFunctionParameterDependency() -> None:
     document = createEmptyDocument("Notebook")
     document.blocks[0] = document.blocks[0].model_copy(
         update={
@@ -54,12 +54,12 @@ y = f(1)
         }
     )
 
-    payload = writeMarimoDocument(document)
+    payload = writeReactiveAppDocument(document)
 
     assert "def _(x):" not in payload
 
 
-def testWriteMarimoDocumentIncludesNestedFreeVariableDependency() -> None:
+def testWriteReactiveAppDocumentIncludesNestedFreeVariableDependency() -> None:
     document = createEmptyDocument("Notebook")
     document.blocks[0] = document.blocks[0].model_copy(
         update={
@@ -72,6 +72,6 @@ y = f()
         }
     )
 
-    payload = writeMarimoDocument(document)
+    payload = writeReactiveAppDocument(document)
 
     assert "def _(offset):" in payload

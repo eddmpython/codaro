@@ -20,6 +20,7 @@
     description: string;
     studentAnswer: string;
     checkConfig: Record<string, string>;
+    content: string;
   }
 
   interface Props {
@@ -39,7 +40,8 @@
   }: Props = $props();
 
   let parsed = $derived(guide ?? parseGuideContent(content));
-  let studentCode = $state(parsed.studentAnswer || parsed.content || "");
+  let initialStudentCode = $derived(parsed.studentAnswer || parsed.content || "");
+  let studentCode = $state("");
 
   function parseGuideContent(raw: string): GuideData {
     try {
@@ -53,7 +55,7 @@
         studentAnswer: data.studentAnswer ?? "",
         checkConfig: data.checkConfig ?? {},
         content: data.content ?? "",
-      } as GuideData & { content: string };
+      } as GuideData;
     } catch {
       return {
         exerciseType: "fillBlank",
@@ -63,9 +65,14 @@
         description: raw,
         studentAnswer: "",
         checkConfig: {},
+        content: "",
       };
     }
   }
+
+  $effect(() => {
+    studentCode = initialStudentCode;
+  });
 
   function handleSubmit() {
     onSubmit?.(studentCode);
@@ -136,7 +143,7 @@
     <ExerciseFeedback
       passed={checkResult.passed}
       feedback={checkResult.feedback}
-      onRetry={() => { studentCode = parsed.studentAnswer || ""; }}
+      onRetry={() => { studentCode = initialStudentCode; }}
     />
   {/if}
 

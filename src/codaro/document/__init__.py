@@ -1,6 +1,6 @@
 from .codaroFormat import parseCodaroDocument, writeCodaroDocument
 from .jupyterFormat import parseJupyterDocument, writeJupyterDocument
-from .marimoFormat import parseMarimoDocument, writeMarimoDocument
+from .reactiveAppFormat import parseReactiveAppDocument, writeReactiveAppDocument
 from .percentFormat import isPercentFormat, parsePercentDocument, writePercentDocument
 from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, RuntimeConfig
 from .service import createEmptyDocument, exportDocument, loadDocument, saveDocument
@@ -17,11 +17,11 @@ __all__ = [
     "loadDocument",
     "parseCodaroDocument",
     "parseJupyterDocument",
-    "parseMarimoDocument",
+    "parseReactiveAppDocument",
     "parsePercentDocument",
     "saveDocument",
     "writeCodaroDocument",
     "writeJupyterDocument",
-    "writeMarimoDocument",
+    "writeReactiveAppDocument",
     "writePercentDocument",
 ]

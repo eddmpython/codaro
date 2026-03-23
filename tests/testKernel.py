@@ -271,7 +271,8 @@ codaro.tabs(
 def testInterruptReturnsFalseWhenIdle() -> None:
     session = KernelSession()
 
-    assert session.interrupt() is False
+    result = session.interrupt()
+    assert result.interrupted is False
 
     session.dispose()
 

@@ -14,14 +14,14 @@ Codaro is a programmable studio that combines an editor, execution runtime, lear
 
 Codaro started by studying [marimo](https://github.com/marimo-team/marimo)'s reactive cell model as an architectural benchmark. The editor chrome was initially built to match marimo's DOM structure as a reference implementation exercise. Codaro diverges in its execution model (transparent scope isolation), default format (percent format `.py`), execution environment (Pyodide-first with local fallback), and scope (integrated learning system, automation, widget bridge).
 
-Codaro is not a fork of marimo and shares no source code. It is an independent project that supports marimo format import/export for compatibility.
+Codaro is not a fork of marimo and shares no source code. It is an independent project that supports reactive-app format import/export for marimo compatibility.
 
 ## Architecture
 
 ```
 src/codaro/         Python backend (FastAPI, document model, kernel, reactive runtime)
   api/              Router layer, server state, request models
-  document/         Document model, percent/codaro/marimo/ipynb parsers
+  document/         Document model, percent/codaro/reactive-app/ipynb parsers
   kernel/           Server-side execution sessions, WebSocket protocol
   runtime/          Engine interface, LocalEngine
   system/           File system and package management API
@@ -50,7 +50,7 @@ uv run codaro app path.py
 
 # Export
 uv run codaro export path.py --format codaro
-uv run codaro export path.py --format marimo
+uv run codaro export path.py --format reactive-app
 uv run codaro export path.py --format ipynb
 ```
 

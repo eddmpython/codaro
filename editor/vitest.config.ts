@@ -9,6 +9,7 @@ export default defineConfig({
     globals: true,
   },
   resolve: {
+    conditions: ["browser"],
     alias: {
       $lib: new URL("./src/lib", import.meta.url).pathname,
     },

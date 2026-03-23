@@ -68,7 +68,7 @@ class KernelSession:
     def removeCellDefinitions(self, blockId: str) -> None:
         self._engine.removeBlockDefinitions(blockId)
 
-    def interrupt(self) -> bool:
+    def interrupt(self):
         return self._engine.interrupt()
 
     async def getFiles(self, path: str = ".") -> DirectoryListing:

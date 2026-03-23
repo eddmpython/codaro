@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount, onDestroy } from "svelte";
   import {
-    Bot,
     Plus,
     X,
     Code2,
@@ -10,6 +9,7 @@
     Workflow,
     PanelRight,
     Menu,
+    Settings,
   } from "lucide-svelte";
   import {
     getMessages,
@@ -23,6 +23,7 @@
     getActiveProvider,
     getActiveModel,
     clearError,
+    setError,
     initAiStore,
     destroyAiStore,
   } from "../ai/aiStore.svelte";
@@ -33,8 +34,8 @@
   import ConversationHistory from "../ai/ConversationHistory.svelte";
   import { toggleHistory } from "../ai/conversationStore.svelte";
   import { setActiveSurface } from "../stores/surface.svelte";
-  import { getUserConfig } from "../stores/config.svelte";
   import { APP_NAME } from "../theme/appBrand";
+  import UserConfigDialog from "../dialogs/UserConfigDialog.svelte";
 
   let msgs = $derived(getMessages());
   let loading = $derived(getIsLoading());
@@ -44,17 +45,7 @@
   let model = $derived(getActiveModel());
   let hasMessages = $derived(msgs.length > 0);
 
-  let prefersDark = $state(
-    typeof window !== "undefined"
-      ? window.matchMedia("(prefers-color-scheme: dark)").matches
-      : true
-  );
-
-  let effectiveTheme = $derived.by(() => {
-    const t = getUserConfig().display.theme;
-    if (t === "system") return prefersDark ? "dark" : "light";
-    return t;
-  });
+  let effectiveTheme = "dark";
 
   const suggestions = [
     { icon: Code2, label: "Write Python code", prompt: "Help me write a Python script that " },
@@ -65,8 +56,13 @@
 
   let chatInputRef: ChatInput | undefined = $state();
   let suggestionPrompt = $state("");
+  let settingsOpen = $state(false);
 
   async function handleSend(text: string) {
+    if (!ready) {
+      settingsOpen = true;
+      return;
+    }
     try {
       await sendMessageStreaming(text);
     } catch {
@@ -136,15 +132,15 @@
       <div class="chat-container">
         {#if !hasMessages}
           <div class="empty-hero">
-            <div class="hero-icon">
-              <Bot class="h-10 w-10" />
+            <div class="hero-mascot">
+              <img src="/assets/codaro-mascot.png" alt="Codaro" class="mascot-img" />
             </div>
             <h1 class="hero-title">How can I help?</h1>
             <p class="hero-sub">
               {#if ready}
                 Write code, learn Python, or build automations.
               {:else}
-                Configure an AI provider in settings to get started.
+                Connect an AI provider to start chatting.
               {/if}
             </p>
             {#if ready}
@@ -156,6 +152,11 @@
                   </button>
                 {/each}
               </div>
+            {:else}
+              <button class="setup-btn" onclick={() => settingsOpen = true}>
+                <Settings class="h-4 w-4" />
+                <span>Open Settings</span>
+              </button>
             {/if}
           </div>
         {:else}
@@ -185,11 +186,13 @@
       bind:this={chatInputRef}
       {ready}
       {loading}
-      placeholder={ready ? "Message Codaro..." : "No AI provider configured"}
+      placeholder={ready ? "Message Codaro..." : "Click to configure AI provider..."}
       onSend={handleSend}
     />
   </div>
 </div>
+
+<UserConfigDialog open={settingsOpen} onClose={() => settingsOpen = false} />
 
 <style>
   #chat-surface {
@@ -325,17 +328,15 @@
     text-align: center;
   }
 
-  .hero-icon {
-    width: 72px;
-    height: 72px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border-radius: 18px;
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
-    color: var(--accent);
+  .hero-mascot {
     margin-bottom: 24px;
-    box-shadow: 0 0 32px color-mix(in srgb, var(--accent) 15%, transparent);
+    filter: drop-shadow(0 0 24px color-mix(in srgb, var(--accent) 20%, transparent));
+  }
+
+  .mascot-img {
+    width: 160px;
+    height: auto;
+    border-radius: 16px;
   }
 
   .hero-title {
@@ -389,6 +390,28 @@
   :global(.suggestion-icon) {
     color: var(--accent);
     flex-shrink: 0;
+  }
+
+  /* ── Setup button ── */
+  .setup-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 10px 24px;
+    border: 1px solid var(--accent);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+    color: var(--accent);
+    font-size: 0.9rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .setup-btn:hover {
+    background: color-mix(in srgb, var(--accent) 20%, transparent);
+    box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 15%, transparent);
   }
 
   /* ── Messages ── */

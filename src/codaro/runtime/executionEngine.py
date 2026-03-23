@@ -62,8 +62,18 @@ class InterruptResult:
     message: str = ""
 
 
+@dataclass(slots=True)
+class ResourceSnapshot:
+    memoryMb: float = 0.0
+    cpuPercent: float = 0.0
+    uptime: float = 0.0
+    alive: bool = False
+
+
 class ExecutionEngine(Protocol):
     async def initialize(self) -> None: ...
+
+    def getResourceUsage(self) -> ResourceSnapshot: ...
 
     async def executeBlock(
         self,

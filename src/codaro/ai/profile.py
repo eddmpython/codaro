@@ -1,12 +1,15 @@
 from __future__ import annotations
 
 import json
+import logging
 import os
 import tempfile
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
+
+logger = logging.getLogger(__name__)
 
 from .providerSpec import (
     apiKeySecretName,
@@ -84,7 +87,8 @@ class AiProfileManager:
         raw = self.path.read_text(encoding="utf-8")
         try:
             data = json.loads(raw)
-        except json.JSONDecodeError:
+        except json.JSONDecodeError as exc:
+            logger.warning("profile corrupted at %s, bootstrapping: %s", self.path, exc)
             return self._bootstrap()
 
         providersRaw = data.get("providers", {})
@@ -329,7 +333,25 @@ class AiProfileManager:
                 "baseUrl": settings.baseUrl,
                 "secretConfigured": secretConfigured,
             }
+        activeProvider = profile.defaultProvider
+        activeModel = (profile.providers.get(activeProvider) or ProviderProfile()).model
+
+        activeSpec = getProviderSpec(activeProvider)
+        if activeSpec is None:
+            ready = False
+        elif activeSpec.authKind == "none":
+            ready = True
+        elif activeSpec.authKind == "oauth":
+            ready = self.secretStore.has(oauthSecretName(activeProvider))
+        elif activeSpec.authKind == "api_key":
+            ready = self.secretStore.has(apiKeySecretName(activeProvider))
+            if not ready and activeSpec.envKey:
+                ready = bool(os.environ.get(activeSpec.envKey))
+        else:
+            ready = False
+
         return {
+            "version": profile.version,
             "defaultProvider": profile.defaultProvider,
             "temperature": profile.temperature,
             "maxTokens": profile.maxTokens,
@@ -346,6 +368,9 @@ class AiProfileManager:
                 for role, binding in profile.roles.items()
             },
             "catalog": buildProviderCatalog(),
+            "ready": ready,
+            "activeProvider": activeProvider,
+            "activeModel": activeModel,
         }
 
     def fingerprint(self) -> str:

@@ -18,7 +18,7 @@ def buildParser() -> argparse.ArgumentParser:
             "  codaro\n"
             "  codaro notebook.py\n"
             "  codaro app notebook.py\n"
-            "  codaro export notebook.py --format marimo"
+            "  codaro export notebook.py --format reactive-app"
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -40,7 +40,7 @@ def buildParser() -> argparse.ArgumentParser:
 
     exportParser = subparsers.add_parser("export", help="Export document.")
     exportParser.add_argument("path", help="Source document path.")
-    exportParser.add_argument("--format", required=True, choices=["codaro", "marimo", "ipynb"])
+    exportParser.add_argument("--format", required=True, choices=["codaro", "reactive-app", "ipynb"])
     exportParser.add_argument("--output", help="Output file path.")
 
     taskParser = subparsers.add_parser("task", help="Manage automation tasks.")
@@ -118,11 +118,10 @@ def main() -> None:
         print(str(error), file=sys.stderr)
         raise SystemExit(1) from error
 
-    if not args.no_browser:
-        openBrowser(url, logger)
-    else:
+    browserUrl = url if not args.no_browser else None
+    if args.no_browser:
         logger.info("browser %s", formatLogFields(action="skip", reason="no-browser", url=url))
-    runServer(host=host, port=port, mode=mode, documentPath=path, verbose=args.verbose)
+    runServer(host=host, port=port, mode=mode, documentPath=path, verbose=args.verbose, browserUrl=browserUrl)
 
 
 def _buildUrl(host: str, port: int, mode: str, documentPath: Path | None) -> str:
@@ -193,8 +192,8 @@ def normalizeArgs(rawArgs: list[str]) -> list[str]:
 def openBrowser(url: str, logger) -> None:
     try:
         opened = webbrowser.open(url)
-    except Exception as error:
-        logger.error("browser %s", formatLogFields(action="error", url=url, message=str(error)))
+    except Exception as error:  # noqa: BLE001 — browser open is best-effort
+        logger.exception("browser %s", formatLogFields(action="error", url=url, message=str(error)))
         return
     status = "opened" if opened else "not-confirmed"
     logger.info("browser %s", formatLogFields(action="open", status=status, url=url))

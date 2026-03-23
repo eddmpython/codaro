@@ -23,7 +23,7 @@ export interface EditorConfig {
 
 export interface DisplayConfig {
   width: string;
-  theme: "light" | "dark" | "system";
+  theme: "dark";
   fontSize: number;
   cellOutputPosition: "above" | "below";
 }

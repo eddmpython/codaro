@@ -39,6 +39,7 @@
     report: FileText,
     automation: Cog,
   };
+  let ActiveModeIcon = $derived(modeIcons[getActiveMode()]);
 
   function selectMode(mode: AppMode) {
     setActiveMode(mode);
@@ -55,13 +56,14 @@
         aria-haspopup="listbox"
         aria-expanded={modeMenuOpen}
       >
-        <svelte:component this={modeIcons[getActiveMode()]} size={14} />
+        <ActiveModeIcon size={14} />
         <span>{getModeLabel(getActiveMode())}</span>
         <ChevronDown size={12} />
       </button>
       {#if modeMenuOpen}
         <div class="mode-select-dropdown" role="listbox">
           {#each getAllModes() as mode}
+            {@const ModeIcon = modeIcons[mode]}
             <button
               class="mode-select-option"
               class:active={getActiveMode() === mode}
@@ -69,7 +71,7 @@
               aria-selected={getActiveMode() === mode}
               onclick={() => selectMode(mode)}
             >
-              <svelte:component this={modeIcons[mode]} size={14} />
+              <ModeIcon size={14} />
               <span>{getModeLabel(mode)}</span>
             </button>
           {/each}

@@ -1,5 +1,5 @@
 /* ============================================================
-   Codaro Skin — zinc tone overrides
+   Codaro Skin — DartPad blue-gray tone overrides
 
    Overrides CSS variables only. Does NOT change DOM, spacing,
    font-size, border-radius, or layout. Base CSS stays loaded
@@ -7,290 +7,227 @@
    ============================================================ */
 
 :root {
-  /* --- Sage palette → Zinc (Tailwind zinc scale) ----------- */
-  --sage-1:  #fafafa;   /* zinc-50  */
-  --sage-2:  #f4f4f5;   /* zinc-100 */
-  --sage-3:  #e4e4e7;   /* zinc-200 */
-  --sage-4:  #d4d4d8;   /* zinc-300 */
-  --sage-5:  #a1a1aa;   /* zinc-400 */
-  --sage-6:  #a1a1aa;   /* zinc-400 */
-  --sage-7:  #71717a;   /* zinc-500 */
-  --sage-8:  #52525b;   /* zinc-600 */
-  --sage-9:  #3f3f46;   /* zinc-700 */
-  --sage-10: #27272a;   /* zinc-800 */
-  --sage-11: #27272a;   /* zinc-800 */
-  --sage-12: #18181b;   /* zinc-900 */
+  /* --- DartPad blue-gray scale ------------------------------- */
+  --sage-1:  #131D28;
+  --sage-2:  #1C2834;
+  --sage-3:  #243242;
+  --sage-4:  #2B3B4F;
+  --sage-5:  #3A4D63;
+  --sage-6:  #4A5F78;
+  --sage-7:  #6B7F96;
+  --sage-8:  #8FA3B8;
+  --sage-9:  #B4C5D5;
+  --sage-10: #D0DCE6;
+  --sage-11: #D0DCE6;
+  --sage-12: #F0F4F8;
 
-  /* --- Slate palette → Zinc -------------------------------- */
-  --slate-1:  #fafafa;
-  --slate-2:  #f4f4f5;
-  --slate-3:  #e4e4e7;
-  --slate-4:  #d4d4d8;
-  --slate-5:  #a1a1aa;
-  --slate-6:  #a1a1aa;
-  --slate-7:  #71717a;
-  --slate-8:  #52525b;
-  --slate-9:  #3f3f46;
-  --slate-10: #27272a;
-  --slate-11: #27272a;
-  --slate-12: #18181b;
+  --slate-1:  #131D28;
+  --slate-2:  #1C2834;
+  --slate-3:  #243242;
+  --slate-4:  #2B3B4F;
+  --slate-5:  #3A4D63;
+  --slate-6:  #4A5F78;
+  --slate-7:  #6B7F96;
+  --slate-8:  #8FA3B8;
+  --slate-9:  #B4C5D5;
+  --slate-10: #D0DCE6;
+  --slate-11: #D0DCE6;
+  --slate-12: #F0F4F8;
 
-  /* --- Gray palette → Zinc --------------------------------- */
-  --gray-1:  #fafafa;
-  --gray-2:  #f4f4f5;
-  --gray-3:  #e4e4e7;
-  --gray-4:  #d4d4d8;
-  --gray-5:  #a1a1aa;
-  --gray-6:  #a1a1aa;
-  --gray-7:  #71717a;
-  --gray-8:  #52525b;
-  --gray-9:  #3f3f46;
-  --gray-10: #27272a;
-  --gray-11: #27272a;
-  --gray-12: #18181b;
+  --gray-1:  #131D28;
+  --gray-2:  #1C2834;
+  --gray-3:  #243242;
+  --gray-4:  #2B3B4F;
+  --gray-5:  #3A4D63;
+  --gray-6:  #4A5F78;
+  --gray-7:  #6B7F96;
+  --gray-8:  #8FA3B8;
+  --gray-9:  #B4C5D5;
+  --gray-10: #D0DCE6;
+  --gray-11: #D0DCE6;
+  --gray-12: #F0F4F8;
 
-  /* --- Semantic tokens → cleaner zinc ---------------------- */
-  --background: #fafafa;
-  --foreground: #18181b;
-  --border: #e4e4e7;
-  --input: #a1a1aa;
-  --card: #ffffff;
-  --card-foreground: #18181b;
-  --popover: #ffffff;
-  --popover-foreground: #18181b;
-  --primary: #18181b;
-  --primary-foreground: #fafafa;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #f97316;
-  --accent-foreground: #ffffff;
-  --ring: #a1a1aa;
+  /* --- Semantic tokens (DartPad) ----------------------------- */
+  --background: #0C141D;
+  --foreground: #F0F4F8;
+  --border: #243242;
+  --input: #243242;
+  --card: #1C2834;
+  --card-foreground: #F0F4F8;
+  --popover: #1C2834;
+  --popover-foreground: #F0F4F8;
+  --primary: #F0F4F8;
+  --primary-foreground: #1C2834;
+  --secondary: #243242;
+  --secondary-foreground: #F0F4F8;
+  --muted: #243242;
+  --muted-foreground: #8FA3B8;
+  --accent: #168afd;
+  --accent-foreground: #FFFFFF;
+  --ring: #3A4D63;
 
-  /* --- Shadows → softer ------------------------------------ */
-  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  --shadow-md-solid: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
-  --shadow-shade: rgba(0, 0, 0, 0.06);
+  /* --- Shadows ------------------------------------------------ */
+  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-md-solid: 0 2px 4px -1px rgba(0, 0, 0, 0.35), 0 1px 2px -1px rgba(0, 0, 0, 0.25);
+  --shadow-shade: rgba(0, 0, 0, 0.35);
 }
 
-/* --- Dark mode --------------------------------------------- */
+/* --- Dark class (same values, safety net) -------------------- */
 .dark {
   color-scheme: dark;
 
-  --sage-1:  #18181b;
-  --sage-2:  #1e1e22;
-  --sage-3:  #27272a;
-  --sage-4:  #3f3f46;
-  --sage-5:  #52525b;
-  --sage-6:  #52525b;
-  --sage-7:  #71717a;
-  --sage-8:  #a1a1aa;
-  --sage-9:  #d4d4d8;
-  --sage-10: #e4e4e7;
-  --sage-11: #e4e4e7;
-  --sage-12: #fafafa;
+  --sage-1:  #131D28;
+  --sage-2:  #1C2834;
+  --sage-3:  #243242;
+  --sage-4:  #2B3B4F;
+  --sage-5:  #3A4D63;
+  --sage-6:  #4A5F78;
+  --sage-7:  #6B7F96;
+  --sage-8:  #8FA3B8;
+  --sage-9:  #B4C5D5;
+  --sage-10: #D0DCE6;
+  --sage-11: #D0DCE6;
+  --sage-12: #F0F4F8;
 
-  --slate-1:  #18181b;
-  --slate-2:  #1e1e22;
-  --slate-3:  #27272a;
-  --slate-4:  #3f3f46;
-  --slate-5:  #52525b;
-  --slate-6:  #52525b;
-  --slate-7:  #71717a;
-  --slate-8:  #a1a1aa;
-  --slate-9:  #d4d4d8;
-  --slate-10: #e4e4e7;
-  --slate-11: #e4e4e7;
-  --slate-12: #fafafa;
+  --slate-1:  #131D28;
+  --slate-2:  #1C2834;
+  --slate-3:  #243242;
+  --slate-4:  #2B3B4F;
+  --slate-5:  #3A4D63;
+  --slate-6:  #4A5F78;
+  --slate-7:  #6B7F96;
+  --slate-8:  #8FA3B8;
+  --slate-9:  #B4C5D5;
+  --slate-10: #D0DCE6;
+  --slate-11: #D0DCE6;
+  --slate-12: #F0F4F8;
 
-  --gray-1:  #18181b;
-  --gray-2:  #1e1e22;
-  --gray-3:  #27272a;
-  --gray-4:  #3f3f46;
-  --gray-5:  #52525b;
-  --gray-6:  #52525b;
-  --gray-7:  #71717a;
-  --gray-8:  #a1a1aa;
-  --gray-9:  #d4d4d8;
-  --gray-10: #e4e4e7;
-  --gray-11: #e4e4e7;
-  --gray-12: #fafafa;
+  --gray-1:  #131D28;
+  --gray-2:  #1C2834;
+  --gray-3:  #243242;
+  --gray-4:  #2B3B4F;
+  --gray-5:  #3A4D63;
+  --gray-6:  #4A5F78;
+  --gray-7:  #6B7F96;
+  --gray-8:  #8FA3B8;
+  --gray-9:  #B4C5D5;
+  --gray-10: #D0DCE6;
+  --gray-11: #D0DCE6;
+  --gray-12: #F0F4F8;
 
-  --background: #09090b;
-  --foreground: #fafafa;
-  --border: #27272a;
-  --input: #27272a;
-  --card: #18181b;
-  --card-foreground: #fafafa;
-  --popover: #18181b;
-  --popover-foreground: #fafafa;
-  --primary: #fafafa;
-  --primary-foreground: #18181b;
-  --secondary: #27272a;
-  --secondary-foreground: #fafafa;
-  --muted: #27272a;
-  --muted-foreground: #a1a1aa;
-  --accent: #fb923c;
-  --accent-foreground: #18181b;
-  --ring: #52525b;
+  --background: #0C141D;
+  --foreground: #F0F4F8;
+  --border: #243242;
+  --input: #243242;
+  --card: #1C2834;
+  --card-foreground: #F0F4F8;
+  --popover: #1C2834;
+  --popover-foreground: #F0F4F8;
+  --primary: #F0F4F8;
+  --primary-foreground: #1C2834;
+  --secondary: #243242;
+  --secondary-foreground: #F0F4F8;
+  --muted: #243242;
+  --muted-foreground: #8FA3B8;
+  --accent: #168afd;
+  --accent-foreground: #FFFFFF;
+  --ring: #3A4D63;
 
-  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
-  --shadow-md-solid: 0 2px 4px -1px rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.2);
-  --shadow-shade: rgba(0, 0, 0, 0.3);
+  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-md-solid: 0 2px 4px -1px rgba(0, 0, 0, 0.35), 0 1px 2px -1px rgba(0, 0, 0, 0.25);
+  --shadow-shade: rgba(0, 0, 0, 0.35);
 }
 
-/* --- mo-button overrides (tone only, keep sizes) ----------- */
+/* --- mo-button overrides (subtle surface tones) -------------- */
 .mo-button.gray {
-  background-color: #fafafa;
-  color: #3f3f46;
-  border-color: #e4e4e7;
+  background-color: #243242;
+  color: #B4C5D5;
+  border-color: #2B3B4F;
 }
 .mo-button.gray:hover {
-  background-color: #f4f4f5;
-  color: #18181b;
+  background-color: #2B3B4F;
+  color: #F0F4F8;
 }
 
 .mo-button.white {
-  background-color: #ffffff;
-  color: #3f3f46;
-  border-color: #e4e4e7;
+  background-color: #1C2834;
+  color: #B4C5D5;
+  border-color: #2B3B4F;
 }
 .mo-button.white:hover {
-  background-color: #fafafa;
+  background-color: #243242;
 }
 
-/* Green, red, yellow keep their hue — just soften */
 .mo-button.green {
-  background-color: #f0fdf4;
-  color: #166534;
-  border-color: #bbf7d0;
+  background-color: #142820;
+  color: #7CBFA0;
+  border-color: #1C3D2E;
 }
 .mo-button.green:hover {
-  background-color: #dcfce7;
+  background-color: #1C3D2E;
 }
 
 .mo-button.red {
-  background-color: #fef2f2;
-  color: #991b1b;
-  border-color: #fecaca;
+  background-color: #281418;
+  color: #D89098;
+  border-color: #3D1C24;
 }
 .mo-button.red:hover {
-  background-color: #fee2e2;
+  background-color: #3D1C24;
 }
 
 .mo-button.yellow {
-  background-color: #fefce8;
-  color: #854d0e;
-  border-color: #fef08a;
+  background-color: #28231A;
+  color: #C9B880;
+  border-color: #3D3820;
 }
 .mo-button.yellow:hover {
-  background-color: #fef9c3;
+  background-color: #3D3820;
 }
 
 .mo-button.hint-green {
-  background-color: #f0fdf4;
-  color: #166534;
-  border-color: #bbf7d0;
+  background-color: #142820;
+  color: #7CBFA0;
+  border-color: #1C3D2E;
 }
 .mo-button.hint-green:hover {
-  background-color: #dcfce7;
+  background-color: #1C3D2E;
 }
 
 .mo-button.disabled {
-  background-color: #f4f4f5;
-  color: #a1a1aa;
-  border-color: #e4e4e7;
+  background-color: #243242;
+  color: #4A5F78;
+  border-color: #2B3B4F;
   cursor: not-allowed;
   opacity: 0.6;
 }
 
-/* --- Dark mo-button --------------------------------------- */
-.dark .mo-button.gray {
-  background-color: #27272a;
-  color: #d4d4d8;
-  border-color: #3f3f46;
-}
-.dark .mo-button.gray:hover {
-  background-color: #3f3f46;
-  color: #fafafa;
-}
-
-.dark .mo-button.white {
-  background-color: #18181b;
-  color: #d4d4d8;
-  border-color: #3f3f46;
-}
-.dark .mo-button.white:hover {
-  background-color: #27272a;
-}
-
-.dark .mo-button.green {
-  background-color: #052e16;
-  color: #86efac;
-  border-color: #166534;
-}
-.dark .mo-button.green:hover {
-  background-color: #14532d;
-}
-
-.dark .mo-button.red {
-  background-color: #450a0a;
-  color: #fca5a5;
-  border-color: #991b1b;
-}
-.dark .mo-button.red:hover {
-  background-color: #7f1d1d;
-}
-
-.dark .mo-button.yellow {
-  background-color: #422006;
-  color: #fde68a;
-  border-color: #854d0e;
-}
-.dark .mo-button.yellow:hover {
-  background-color: #713f12;
-}
-
-.dark .mo-button.disabled {
-  background-color: #27272a;
-  color: #52525b;
-  border-color: #3f3f46;
-}
-
-/* --- CodeMirror active line → zinc tint -------------------- */
+/* --- CodeMirror active line ---------------------------------- */
 .codaro-cell .cm-editor.cm-focused .cm-activeLineGutter {
-  background: #f4f4f5;
+  background: #1C2834;
 }
 .codaro-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
-  background: rgba(113, 113, 122, 0.04);
+  background: rgba(22, 138, 253, 0.04);
 }
 
-.dark .codaro-cell .cm-editor.cm-focused .cm-activeLineGutter {
-  background: #27272a;
-}
-.dark .codaro-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
-  background: rgba(161, 161, 170, 0.06);
-}
-
-/* --- Codaro dark mode polish -------------------------------- */
+/* --- Codaro polish ------------------------------------------- */
 
 /* Active cell accent glow */
-.dark .codaro-cell.ring-2 {
+.codaro-cell.ring-2 {
   border-color: color-mix(in srgb, var(--accent) 40%, transparent);
   box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 15%, transparent);
 }
 
 /* Glass effect for popovers */
-.dark .cell-actions-popover {
-  background: rgba(24, 24, 27, 0.9);
+.cell-actions-popover {
+  background: rgba(28, 40, 52, 0.92);
   backdrop-filter: blur(12px);
   border-color: rgba(255, 255, 255, 0.06);
 }
 
 /* Toolbar pill glass */
-.dark .toolbar-pill {
-  background: rgba(24, 24, 27, 0.85);
+.toolbar-pill {
+  background: rgba(28, 40, 52, 0.88);
   backdrop-filter: blur(8px);
 }
 
@@ -300,7 +237,7 @@
   100% { background-position: 200% 0; }
 }
 
-.dark .codaro-cell[data-status="running"] {
+.codaro-cell[data-status="running"] {
   border-image: linear-gradient(
     90deg,
     var(--border) 0%,

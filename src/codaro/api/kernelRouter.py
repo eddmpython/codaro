@@ -76,14 +76,15 @@ def createKernelRouter(state: ServerState) -> APIRouter:
         return result.model_dump()
 
     @router.post("/api/kernel/{sessionId}/interrupt")
-    def apiInterrupt(sessionId: str) -> dict[str, bool]:
+    def apiInterrupt(sessionId: str) -> dict[str, Any]:
         session = requireSession(state, sessionId)
-        success = session.interrupt()
+        result = session.interrupt()
+        interrupted = result.interrupted if hasattr(result, "interrupted") else bool(result)
         logger.info(
             "kernel-interrupt %s",
-            formatLogFields(sessionId=sessionId, interrupted=success),
+            formatLogFields(sessionId=sessionId, interrupted=interrupted),
         )
-        return {"interrupted": success}
+        return {"interrupted": interrupted}
 
     @router.get("/api/kernel/{sessionId}/variables")
     def apiGetVariables(sessionId: str) -> list[dict[str, Any]]:

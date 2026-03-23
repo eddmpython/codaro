@@ -13,10 +13,10 @@ export const colors = {
   muted: "var(--muted)",
   mutedForeground: "var(--muted-foreground)",
 
-  glassBg: "rgba(24, 24, 27, 0.7)",
-  glassStroke: "rgba(255, 255, 255, 0.06)",
-  glassBgLight: "rgba(250, 250, 250, 0.8)",
-  glassStrokeLight: "rgba(0, 0, 0, 0.06)",
+  glassBg: "rgba(28, 40, 52, 0.7)",
+  glassStroke: "rgba(255, 255, 255, 0.08)",
+  glassBgLight: "rgba(28, 40, 52, 0.7)",
+  glassStrokeLight: "rgba(255, 255, 255, 0.08)",
 
   destructive: "var(--destructive)",
   success: "var(--grass-9)",

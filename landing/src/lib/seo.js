@@ -21,7 +21,7 @@ export function buildOrganizationJsonLd() {
     "@type": "Organization",
     name: brand.name,
     url: brand.siteUrl,
-    logo: `${brand.siteUrl}/brand/avatar-full.png`,
+    logo: `${brand.siteUrl}/brand/codaro-character.png`,
     sameAs: [brand.repoUrl],
   };
 }
@@ -34,7 +34,7 @@ export function buildBlogPostJsonLd(post) {
     description: post.description || "",
     datePublished: post.date ? new Date(post.date).toISOString() : undefined,
     url: `${brand.siteUrl}${post.url || ""}`,
-    image: post.thumbnail ? `${brand.siteUrl}${post.thumbnail}` : `${brand.siteUrl}/brand/avatar-full.png`,
+    image: post.thumbnail ? `${brand.siteUrl}${post.thumbnail}` : `${brand.siteUrl}/brand/codaro-character.png`,
     author: buildOrganizationJsonLd(),
     publisher: buildOrganizationJsonLd(),
     mainEntityOfPage: {
@@ -96,7 +96,7 @@ export function buildMeta({ title, description, url, image, type }) {
   const resolvedTitle = title ? `${title} — ${brand.name}` : brand.name;
   const resolvedDescription = description || brand.description;
   const resolvedUrl = url ? `${brand.siteUrl}${url}` : brand.siteUrl;
-  const resolvedImage = image || `${brand.siteUrl}/brand/avatar-full.png`;
+  const resolvedImage = image || `${brand.siteUrl}/brand/codaro-character.png`;
   const resolvedType = type || "website";
 
   return {

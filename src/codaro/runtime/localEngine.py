@@ -15,10 +15,13 @@ from .executionEngine import (
     ExecutionEngine,
     ExecutionEvent,
     ExecutionResult,
+    InterruptResult,
+    ResourceSnapshot,
     VariableDelta,
     VariableState,
 )
 from .localWorker import runLocalWorker
+from .processSupervisor import ProcessSupervisor, ResourceLimits
 
 EXECUTION_TIMEOUT_SECONDS = 300
 
@@ -30,6 +33,7 @@ class LocalEngine(ExecutionEngine):
         workingDirectory: str | Path | None = None,
         workspaceRoot: str | Path | None = None,
         engineId: str | None = None,
+        resourceLimits: ResourceLimits | None = None,
     ) -> None:
         self.engineId = engineId or f"engine-{uuid.uuid4().hex[:10]}"
         self.executionCount = 0
@@ -40,10 +44,13 @@ class LocalEngine(ExecutionEngine):
         self._processContext = mp.get_context("spawn")
         self._process: mp.Process | None = None
         self._connection: Connection | None = None
+        self._interruptFlag: mp.Event | None = None
         self._processLock = threading.RLock()
         self._commandLock = threading.Lock()
         self._workerBusy = threading.Event()
         self._interruptCount = 0
+        self._resourceLimits = resourceLimits or ResourceLimits()
+        self._supervisor = ProcessSupervisor(self._resourceLimits)
 
         self._registry: dict[str, object] = {}
         self._cellDefinitions: dict[str, set[str]] = {}
@@ -74,7 +81,7 @@ class LocalEngine(ExecutionEngine):
             try:
                 future = asyncio.run_coroutine_threadsafe(eventHandler(event), loop)
                 future.result()
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 — event handler must not crash worker
                 import logging
                 logging.getLogger("codaro.runtime").warning("Event handler failed: %s", exc)
                 return
@@ -137,14 +144,49 @@ class LocalEngine(ExecutionEngine):
                 break
         return results
 
-    def interrupt(self) -> bool:
+    def interrupt(
+        self,
+        *,
+        mode: str = "auto",
+        graceMs: int = 250,
+    ) -> InterruptResult:
         if not self._workerBusy.is_set():
-            return False
+            return InterruptResult(
+                interrupted=False,
+                requestedMode=mode,
+                appliedMode="none",
+                message="No execution in progress.",
+            )
+
+        if mode == "soft" or mode == "auto":
+            softSuccess = self._trySoftInterrupt(graceMs)
+            if softSuccess:
+                self.status = "idle"
+                return InterruptResult(
+                    interrupted=True,
+                    requestedMode=mode,
+                    appliedMode="soft",
+                    preservedState=True,
+                    message="Execution interrupted gracefully. State preserved.",
+                )
+            if mode == "soft":
+                return InterruptResult(
+                    interrupted=False,
+                    requestedMode=mode,
+                    appliedMode="none",
+                    message="Soft interrupt timed out but hard kill not requested.",
+                )
 
         with self._processLock:
             if self._process is None or not self._process.is_alive():
-                return False
+                return InterruptResult(
+                    interrupted=False,
+                    requestedMode=mode,
+                    appliedMode="none",
+                    message="Worker already stopped.",
+                )
             self._interruptCount += 1
+            self._supervisor.detach()
             self._terminateWorkerLocked()
             self._startWorkerLocked()
 
@@ -153,7 +195,34 @@ class LocalEngine(ExecutionEngine):
         self._variableStates = []
         self.executionCount = 0
         self.status = "idle"
-        return True
+        return InterruptResult(
+            interrupted=True,
+            requestedMode=mode,
+            appliedMode="hard",
+            preservedState=False,
+            message="Execution killed. All state lost.",
+        )
+
+    def _trySoftInterrupt(self, graceMs: int) -> bool:
+        flag = self._interruptFlag
+        if flag is None:
+            return False
+        flag.set()
+        deadline = graceMs / 1000.0
+        waited = 0.0
+        step = 0.05
+        while waited < deadline:
+            if not self._workerBusy.is_set():
+                flag.clear()
+                return True
+            import time
+            time.sleep(step)
+            waited += step
+        flag.clear()
+        return not self._workerBusy.is_set()
+
+    def getResourceUsage(self) -> ResourceSnapshot:
+        return self._supervisor.snapshot()
 
     def getVariables(self) -> list[VariableState]:
         return list(self._variableStates)
@@ -232,6 +301,7 @@ class LocalEngine(ExecutionEngine):
         self.status = "idle"
 
     def dispose(self) -> None:
+        self._supervisor.detach()
         with self._processLock:
             self._shutdownWorkerLocked()
         self._registry.clear()
@@ -331,12 +401,14 @@ class LocalEngine(ExecutionEngine):
 
     def _startWorkerLocked(self) -> None:
         parentConnection, childConnection = self._processContext.Pipe()
+        interruptFlag = self._processContext.Event()
         process = self._processContext.Process(
             target=runLocalWorker,
             kwargs={
                 "connection": childConnection,
                 "workingDirectory": str(self._workingDirectory) if self._workingDirectory is not None else None,
                 "workspaceRoot": str(self._workspaceRoot),
+                "interruptFlag": interruptFlag,
             },
             daemon=True,
         )
@@ -344,6 +416,8 @@ class LocalEngine(ExecutionEngine):
         childConnection.close()
         self._connection = parentConnection
         self._process = process
+        self._interruptFlag = interruptFlag
+        self._supervisor.attach(process)
 
     def _shutdownWorkerLocked(self) -> None:
         if self._process is None:

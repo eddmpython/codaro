@@ -140,7 +140,8 @@ def createAiRouter(state: Any) -> APIRouter:
                 prov = createProvider(config)
                 installed = prov.getInstalledModels()
                 return {"models": installed}
-            except _HANDLED_ERRORS:
+            except _HANDLED_ERRORS as exc:
+                logger.info("ollama models unavailable: %s", exc)
                 return {"models": []}
 
         if normalized == "openai":
@@ -284,12 +285,7 @@ def createAiRouter(state: Any) -> APIRouter:
         messages = convManager.buildMessages(conversationId)
         tools = toolSchemas()
 
-        executor = ToolExecutor(
-            sessionManager=state.sessionManager,
-            workspaceRoot=str(state.workspaceRoot),
-        )
-        if sessionId:
-            executor.setActiveSession(sessionId)
+        executor = _createToolExecutor(state, sessionId)
 
         maxToolRounds = 10
         for _round in range(maxToolRounds):
@@ -393,12 +389,7 @@ def createAiRouter(state: Any) -> APIRouter:
         msgs = convManager.buildMessages(conversationId)
         tools = toolSchemas()
 
-        executor = ToolExecutor(
-            sessionManager=state.sessionManager,
-            workspaceRoot=str(state.workspaceRoot),
-        )
-        if sessionId:
-            executor.setActiveSession(sessionId)
+        executor = _createToolExecutor(state, sessionId)
 
         async def _yieldTokenStream(messages):
             loop = asyncio.get_running_loop()
@@ -420,7 +411,7 @@ def createAiRouter(state: Any) -> APIRouter:
                 if token is None:
                     break
                 accumulated += token
-                yield f"data: {json.dumps({'type': 'token', 'content': accumulated}, ensure_ascii=False)}\n\n"
+                yield f"data: {json.dumps({'type': 'delta', 'delta': token, 'content': accumulated}, ensure_ascii=False)}\n\n"
 
             convManager.addAssistantMessage(conversationId, accumulated)
             yield f"data: {json.dumps({'type': 'done', 'answer': accumulated, 'provider': llmProvider.config.provider, 'model': llmProvider.resolvedModel, 'usage': None, 'toolCalls': []}, ensure_ascii=False)}\n\n"
@@ -470,6 +461,80 @@ def createAiRouter(state: Any) -> APIRouter:
 
         return StreamingResponse(_streamGenerate(), media_type="text/event-stream")
 
+    @router.post("/api/ai/complete")
+    async def apiComplete(request: Request):
+        body = await request.json()
+        prefix = body.get("prefix", "")
+        suffix = body.get("suffix", "")
+        blockId = body.get("blockId", "")
+        providerOverride = body.get("provider")
+        context = body.get("context")
+
+        if not prefix.strip():
+            return {"completions": [], "provider": "", "model": ""}
+
+        from ..ai.factory import createProvider
+        from ..ai.types import LLMConfig
+
+        profileManager = getProfileManager()
+        resolved = profileManager.resolve(provider=providerOverride, role="copilot")
+
+        config = LLMConfig(
+            provider=resolved["provider"],
+            model=resolved.get("model"),
+            apiKey=resolved.get("apiKey"),
+            baseUrl=resolved.get("baseUrl"),
+            temperature=0,
+            maxTokens=120,
+        )
+
+        contextParts: list[str] = []
+        if context:
+            if context.get("variables"):
+                varLines = [f"  {v['name']}: {v['type']}" for v in context["variables"][:20]]
+                contextParts.append("Available variables:\n" + "\n".join(varLines))
+            if context.get("blocks"):
+                blockLines = [f"  [{b['type']}] {b.get('content', '')[:100]}" for b in context["blocks"][:10]]
+                contextParts.append("Other cells:\n" + "\n".join(blockLines))
+
+        systemPrompt = (
+            "You are a Python code completion engine.\n"
+            "Given a code prefix and optional suffix, return ONLY the code that should be inserted at the cursor.\n"
+            "Do NOT include the prefix or suffix in your response.\n"
+            "Do NOT include any explanation, markdown, or code fences.\n"
+            "Return exactly the completion text, nothing else.\n"
+            "If no completion is appropriate, return an empty string."
+        )
+        if contextParts:
+            systemPrompt += "\n\n" + "\n\n".join(contextParts)
+
+        userMessage = f"Complete this Python code:\n```\n{prefix}█{suffix}\n```\nReturn only the text that replaces █."
+
+        messages = [
+            {"role": "system", "content": systemPrompt},
+            {"role": "user", "content": userMessage},
+        ]
+
+        try:
+            provider = createProvider(config)
+            response = provider.complete(messages)
+            completion = response.answer.strip()
+            if completion.startswith("```"):
+                lines = completion.split("\n")
+                if len(lines) > 2:
+                    completion = "\n".join(lines[1:-1]).strip()
+                else:
+                    completion = ""
+            completions = [completion] if completion else []
+            return {
+                "completions": completions,
+                "provider": response.provider,
+                "model": response.model,
+            }
+        except _HANDLED_ERRORS as exc:
+            logger.info("completion failed: %s", exc)
+            return {"completions": [], "provider": "", "model": ""}
+
     return router
 
 
@@ -486,10 +551,45 @@ def _injectContext(message: str, context: dict[str, Any]) -> str:
         parts.append(f"[Document blocks]\n" + "\n".join(blockLines))
     if context.get("fileName"):
         parts.append(f"[File: {context['fileName']}]")
+    if context.get("workspaceFiles"):
+        fileLines = [f"  {f}" for f in context["workspaceFiles"][:30]]
+        parts.append("[Workspace files]\n" + "\n".join(fileLines))
+    if context.get("errorHistory"):
+        errLines = [f"  [{e.get('blockId', '?')}] {e.get('error', '')[:200]}" for e in context["errorHistory"][:5]]
+        parts.append("[Recent errors]\n" + "\n".join(errLines))
     if not parts:
         return message
     contextStr = "\n\n".join(parts)
     return f"{message}\n\n---\nContext:\n{contextStr}"
+
+
+def _createToolExecutor(state: Any, sessionId: str | None = None):
+    from ..ai.toolExecutor import ToolExecutor
+    from ..document.service import loadDocument, saveDocument
+
+    docPath = state.documentPath
+
+    def documentGetter():
+        if docPath is None:
+            return None
+        try:
+            return loadDocument(str(docPath))
+        except (FileNotFoundError, OSError):
+            return None
+
+    def documentSetter(doc):
+        if docPath is not None:
+            saveDocument(str(docPath), doc)
+
+    executor = ToolExecutor(
+        sessionManager=state.sessionManager,
+        documentGetter=documentGetter if docPath else None,
+        documentSetter=documentSetter if docPath else None,
+        workspaceRoot=str(state.workspaceRoot),
+    )
+    if sessionId:
+        executor.setActiveSession(sessionId)
+    return executor
 
 
 _conversationManager = None
@@ -542,7 +642,7 @@ def _startOauthCallbackServer(port: int):
                 getProfileManager().update(provider="oauth-chatgpt", updatedBy="ui")
                 _oauthState["done"] = True
                 self._respondHtml("Authentication Successful", "Codaro authentication complete. You may close this window.")
-            except Exception as exc:
+            except Exception as exc:  # noqa: BLE001 — browser callback must not crash
                 _oauthState["error"] = str(exc)
                 _oauthState["done"] = True
                 self._respondHtml("Authentication Failed", f"Token exchange failed: {exc}")
@@ -621,5 +721,6 @@ def _fetchOpenaiModels() -> list[str]:
 
         models.sort(key=sortKey)
         return models
-    except (ImportError, OSError, RuntimeError, ValueError):
+    except (ImportError, OSError, RuntimeError, ValueError) as exc:
+        logger.info("openai models fetch failed: %s", exc)
         return []

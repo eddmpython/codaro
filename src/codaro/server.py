@@ -129,6 +129,7 @@ def createServerApp(
     documentPath: Path | None = None,
     studyDir: Path | None = None,
     workspaceRoot: Path | None = None,
+    browserUrl: str | None = None,
 ) -> FastAPI:
     logger = configureServerLogging()
     state = createServerState(
@@ -146,8 +147,8 @@ def createServerApp(
         del application
         try:
             await state.workspaceEngine.initialize()
-        except Exception as startupError:
-            logger.error(
+        except Exception as startupError:  # noqa: BLE001 — lifespan boundary
+            logger.exception(
                 "lifespan %s",
                 formatLogFields(status="startup-failed", error=str(startupError)),
             )
@@ -181,10 +182,25 @@ def createServerApp(
                                 remainingConversations=convManager.conversationCount,
                             ),
                         )
-                except Exception as reapError:
+                except Exception as reapError:  # noqa: BLE001 — reaper must not crash
                     logger.warning("reaper %s", formatLogFields(status="error", error=str(reapError)))
 
+        def _onBackgroundTaskDone(task: asyncio.Task) -> None:
+            if task.cancelled():
+                return
+            exc = task.exception()
+            if exc:
+                logger.exception("background task failed: %s", exc)
+
         reapTask = asyncio.create_task(reapSessionsPeriodically())
+        reapTask.add_done_callback(_onBackgroundTaskDone)
+
+        if browserUrl:
+            import webbrowser
+            try:
+                webbrowser.open(browserUrl)
+            except Exception as browserError:  # noqa: BLE001 — browser open is best-effort
+                logger.warning("browser %s", formatLogFields(action="error", url=browserUrl, message=str(browserError)))
 
         yield
 
@@ -199,12 +215,12 @@ def createServerApp(
         )
         try:
             state.workspaceEngine.dispose()
-        except Exception as disposeError:
-            logger.error("lifespan %s", formatLogFields(status="dispose-failed", error=str(disposeError)))
+        except Exception as disposeError:  # noqa: BLE001 — shutdown must continue
+            logger.exception("lifespan %s", formatLogFields(status="dispose-failed", error=str(disposeError)))
         try:
             state.sessionManager.destroyAll()
-        except Exception as destroyError:
-            logger.error("lifespan %s", formatLogFields(status="destroy-failed", error=str(destroyError)))
+        except Exception as destroyError:  # noqa: BLE001 — shutdown must continue
+            logger.exception("lifespan %s", formatLogFields(status="destroy-failed", error=str(destroyError)))
 
     app = FastAPI(title="Codaro", lifespan=lifespan)
     serverPort = os.environ.get("CODARO_PORT", "8765")
@@ -235,7 +251,7 @@ def createServerApp(
         response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
         response.headers["Content-Security-Policy"] = (
             "default-src 'self'; "
-            "script-src 'self' 'wasm-unsafe-eval'; "
+            "script-src 'self' 'unsafe-inline' 'wasm-unsafe-eval'; "
             "style-src 'self' 'unsafe-inline'; "
             "img-src 'self' data: blob:; "
             "connect-src 'self' ws: wss:; "
@@ -270,6 +286,8 @@ def createServerApp(
     app.include_router(createBootstrapRouter(state))
     app.include_router(createDocumentRouter(state))
     app.include_router(createExtensionRouter(state))
+    from .api.integrationRouter import createIntegrationRouter
+    app.include_router(createIntegrationRouter(state))
     app.include_router(createKernelRouter(state))
     app.include_router(createSystemRouter(state))
     app.include_router(createWorkspaceRouter(state))
@@ -284,11 +302,12 @@ def runServer(
     mode: str = "edit",
     documentPath: Path | None = None,
     verbose: bool = False,
+    browserUrl: str | None = None,
 ) -> None:
     logger = setVerboseLogging(verbose)
     editorStatus = requireEditorBuildReady(logger=logger)
     workspaceRoot = Path.cwd().resolve()
-    app = createServerApp(mode=mode, documentPath=documentPath, workspaceRoot=workspaceRoot)
+    app = createServerApp(mode=mode, documentPath=documentPath, workspaceRoot=workspaceRoot, browserUrl=browserUrl)
     routePath = "/app" if mode == "app" else "/"
     baseUrl = f"http://{host}:{port}{routePath}"
     logger.info(

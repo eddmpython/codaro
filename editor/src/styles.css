@@ -4,10 +4,7 @@
 
 @import "./lib/codaro/styles/base/cells-jmgGt1lS.css";
 @import "./lib/codaro/styles/base/markdown-renderer-DdDKmWlR.css";
-@import "./lib/codaro/styles/base/JsonOutput-B7vuddcd.css";
-@import "./lib/codaro/styles/base/index-CVpJvEAO.css";
 @import "./lib/codaro/styles/base/CellStatus-2Psjnl5F.css";
-@import "./lib/codaro/styles/base/cell-editor-Iey559K_.css";
 @import "./lib/codaro/styles/base/layout-BjXzDXoG.css";
 @import "./lib/codaro/styles/base/edit-page-Dstp9NQ5.css";
 @import "./lib/codaro/styles/base/Inputs-CuKU-ENz.css";
@@ -65,129 +62,131 @@
   color-scheme: dark;
   --csstools-color-scheme--dark: initial;
 
-  --sage-1:  #fafafa;
-  --sage-2:  #f4f4f5;
-  --sage-3:  #e4e4e7;
-  --sage-4:  #d4d4d8;
-  --sage-5:  #a1a1aa;
-  --sage-6:  #a1a1aa;
-  --sage-7:  #71717a;
-  --sage-8:  #52525b;
-  --sage-9:  #3f3f46;
-  --sage-10: #27272a;
-  --sage-11: #27272a;
-  --sage-12: #18181b;
+  /* --- DartPad blue-gray scale ------------------------------- */
+  --sage-1:  #131D28;
+  --sage-2:  #1C2834;
+  --sage-3:  #243242;
+  --sage-4:  #2B3B4F;
+  --sage-5:  #3A4D63;
+  --sage-6:  #4A5F78;
+  --sage-7:  #6B7F96;
+  --sage-8:  #8FA3B8;
+  --sage-9:  #B4C5D5;
+  --sage-10: #D0DCE6;
+  --sage-11: #D0DCE6;
+  --sage-12: #F0F4F8;
 
-  --slate-1:  #fafafa;
-  --slate-2:  #f4f4f5;
-  --slate-3:  #e4e4e7;
-  --slate-4:  #d4d4d8;
-  --slate-5:  #a1a1aa;
-  --slate-6:  #a1a1aa;
-  --slate-7:  #71717a;
-  --slate-8:  #52525b;
-  --slate-9:  #3f3f46;
-  --slate-10: #27272a;
-  --slate-11: #27272a;
-  --slate-12: #18181b;
+  --slate-1:  #131D28;
+  --slate-2:  #1C2834;
+  --slate-3:  #243242;
+  --slate-4:  #2B3B4F;
+  --slate-5:  #3A4D63;
+  --slate-6:  #4A5F78;
+  --slate-7:  #6B7F96;
+  --slate-8:  #8FA3B8;
+  --slate-9:  #B4C5D5;
+  --slate-10: #D0DCE6;
+  --slate-11: #D0DCE6;
+  --slate-12: #F0F4F8;
 
-  --gray-1:  #fafafa;
-  --gray-2:  #f4f4f5;
-  --gray-3:  #e4e4e7;
-  --gray-4:  #d4d4d8;
-  --gray-5:  #a1a1aa;
-  --gray-6:  #a1a1aa;
-  --gray-7:  #71717a;
-  --gray-8:  #52525b;
-  --gray-9:  #3f3f46;
-  --gray-10: #27272a;
-  --gray-11: #27272a;
-  --gray-12: #18181b;
+  --gray-1:  #131D28;
+  --gray-2:  #1C2834;
+  --gray-3:  #243242;
+  --gray-4:  #2B3B4F;
+  --gray-5:  #3A4D63;
+  --gray-6:  #4A5F78;
+  --gray-7:  #6B7F96;
+  --gray-8:  #8FA3B8;
+  --gray-9:  #B4C5D5;
+  --gray-10: #D0DCE6;
+  --gray-11: #D0DCE6;
+  --gray-12: #F0F4F8;
 
-  --red-1: #fffcfc;
-  --red-2: #fff7f7;
-  --red-3: #feebec;
-  --red-4: #ffdbdc;
-  --red-5: #ffcdce;
-  --red-6: #fdbdbe;
-  --red-7: #f4a9aa;
-  --red-8: #eb8e90;
-  --red-9: #e5484d;
-  --red-10: #dc3e42;
-  --red-11: #cd2b31;
-  --red-12: #381316;
+  --red-1: #1D1520;
+  --red-2: #2D1720;
+  --red-3: #3D1C24;
+  --red-4: #52222A;
+  --red-5: #6B2A33;
+  --red-6: #88353F;
+  --red-7: #A8424D;
+  --red-8: #C9525C;
+  --red-9: #E5484D;
+  --red-10: #EB6064;
+  --red-11: #F4A9AA;
+  --red-12: #FFF5F5;
 
-  --yellow-1: #fdfdf9;
-  --yellow-2: #fefce9;
-  --yellow-3: #fffab8;
-  --yellow-4: #fff394;
-  --yellow-5: #ffe770;
-  --yellow-6: #f3d768;
-  --yellow-7: #e4c767;
-  --yellow-8: #d5ae39;
-  --yellow-9: #ffe629;
-  --yellow-10: #ffdc00;
-  --yellow-11: #9e6c00;
-  --yellow-12: #473b1f;
+  --yellow-1: #1D1B14;
+  --yellow-2: #2D2918;
+  --yellow-3: #3D381E;
+  --yellow-4: #524B24;
+  --yellow-5: #6B612C;
+  --yellow-6: #887A38;
+  --yellow-7: #A89548;
+  --yellow-8: #C9B158;
+  --yellow-9: #E5C842;
+  --yellow-10: #EBD260;
+  --yellow-11: #F0DC88;
+  --yellow-12: #FDFCF5;
 
-  --grass-1: #fbfefb;
-  --grass-2: #f5fbf5;
-  --grass-3: #e9f6e9;
-  --grass-4: #daf1db;
-  --grass-5: #c9e8ca;
-  --grass-6: #b2ddb5;
-  --grass-7: #94ce9a;
-  --grass-8: #65ba74;
-  --grass-9: #46a758;
-  --grass-10: #3e9b4f;
-  --grass-11: #2a7e3b;
-  --grass-12: #203c25;
+  --grass-1: #141D18;
+  --grass-2: #172D1E;
+  --grass-3: #1C3D26;
+  --grass-4: #215230;
+  --grass-5: #296B3D;
+  --grass-6: #35884E;
+  --grass-7: #42A85E;
+  --grass-8: #5CC970;
+  --grass-9: #46A758;
+  --grass-10: #65BA74;
+  --grass-11: #94CE9A;
+  --grass-12: #F5FFF7;
 
-  --blue-1: #fbfdff;
-  --blue-2: #f4faff;
-  --blue-3: #e6f4fe;
-  --blue-4: #d5efff;
-  --blue-5: #c2e5ff;
-  --blue-6: #acd8fc;
-  --blue-7: #8ec8f6;
-  --blue-8: #5eb1ef;
-  --blue-9: #0090ff;
-  --blue-10: #0588f0;
-  --blue-11: #0d74ce;
-  --blue-12: #113264;
+  --blue-1: #0C1A2D;
+  --blue-2: #0E2440;
+  --blue-3: #103058;
+  --blue-4: #123E72;
+  --blue-5: #144D8E;
+  --blue-6: #165EAC;
+  --blue-7: #168AFD;
+  --blue-8: #5EAAEF;
+  --blue-9: #168AFD;
+  --blue-10: #5EAAEF;
+  --blue-11: #8EC4F6;
+  --blue-12: #F0F8FF;
 
-  --cyan-9: #00c2d7;
+  --cyan-9: #00B8CC;
 
-  --background: #fafafa;
-  --foreground: #18181b;
-  --border: #e4e4e7;
-  --input: #a1a1aa;
-  --card: #ffffff;
-  --card-foreground: #18181b;
-  --popover: #ffffff;
-  --popover-foreground: #18181b;
-  --primary: #18181b;
-  --primary-foreground: #fafafa;
-  --secondary: #f4f4f5;
-  --secondary-foreground: #18181b;
-  --muted: #f4f4f5;
-  --muted-foreground: #71717a;
-  --accent: #f97316;
-  --accent-foreground: #ffffff;
-  --ring: #a1a1aa;
-  --destructive: #e5484d;
-  --destructive-foreground: #fafafa;
-  --error: #e5484d;
-  --stale: #e5a417;
-  --action-foreground: #946800;
+  /* --- Semantic tokens (DartPad) ----------------------------- */
+  --background: #0C141D;
+  --foreground: #F0F4F8;
+  --border: #243242;
+  --input: #243242;
+  --card: #1C2834;
+  --card-foreground: #F0F4F8;
+  --popover: #1C2834;
+  --popover-foreground: #F0F4F8;
+  --primary: #F0F4F8;
+  --primary-foreground: #1C2834;
+  --secondary: #243242;
+  --secondary-foreground: #F0F4F8;
+  --muted: #243242;
+  --muted-foreground: #8FA3B8;
+  --accent: #168afd;
+  --accent-foreground: #FFFFFF;
+  --ring: #3A4D63;
+  --destructive: #E5484D;
+  --destructive-foreground: #F0F4F8;
+  --error: #E5484D;
+  --stale: #C9B158;
+  --action-foreground: #F0DC88;
 
   --monospace-font: "Fira Mono", ui-monospace, monospace;
   --text-font: "PT Sans", sans-serif;
   --heading-font: "Lora", serif;
 
-  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  --shadow-md-solid: 0 2px 4px -1px rgba(0, 0, 0, 0.06), 0 1px 2px -1px rgba(0, 0, 0, 0.04);
-  --shadow-shade: rgba(0, 0, 0, 0.06);
+  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
+  --shadow-md-solid: 0 2px 4px -1px rgba(0, 0, 0, 0.35), 0 1px 2px -1px rgba(0, 0, 0, 0.25);
+  --shadow-shade: rgba(0, 0, 0, 0.35);
 
   --content-width: 776px;
   --content-width-medium: 1100px;
@@ -198,8 +197,8 @@ html,
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--background, #fff);
-  color: var(--foreground, #111);
+  background: var(--background, #0C141D);
+  color: var(--foreground, #F0F4F8);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
@@ -248,4 +247,86 @@ a {
 .codaro-cell .cm-editor .cm-content {
   font-size: var(--codaro-code-editor-font-size, 0.9rem);
   font-family: var(--monospace-font);
+}
+
+@media (max-width: 768px) {
+  .codaro-mobile-bottom-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 6px 0;
+    padding-bottom: max(6px, env(safe-area-inset-bottom));
+    background: var(--background);
+    border-top: 1px solid var(--border);
+  }
+
+  .codaro-mobile-bottom-bar button {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 6px 12px;
+    border: none;
+    border-radius: 6px;
+    background: transparent;
+    color: var(--muted-foreground);
+    font-size: 10px;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .codaro-mobile-bottom-bar button.active {
+    color: var(--foreground);
+  }
+
+  .codaro-desktop-sidebar {
+    display: none !important;
+  }
+
+  .codaro-helper-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 56px;
+    z-index: 45;
+  }
+
+  .codaro-main-content {
+    padding-bottom: 64px;
+  }
+}
+
+@media (min-width: 769px) {
+  .codaro-mobile-bottom-bar {
+    display: none !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .codaro-main-content {
+    padding-left: 4px !important;
+    padding-right: 4px !important;
+  }
+
+  .codaro-cell .cm-editor .cm-content {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 768px) and (orientation: landscape) {
+  .codaro-mobile-bottom-bar {
+    padding: 4px 0;
+  }
+}
+
+@media print {
+  .codaro-mobile-bottom-bar {
+    display: none !important;
+  }
 }

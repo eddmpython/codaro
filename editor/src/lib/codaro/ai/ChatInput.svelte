@@ -132,7 +132,7 @@
       bind:value={inputValue}
       class="input-field"
       {placeholder}
-      disabled={!ready || loading}
+      disabled={loading}
       rows="1"
       oninput={handleInput}
       onkeydown={handleKeydown}
@@ -140,7 +140,7 @@
     <button
       class="send-btn"
       onclick={handleSend}
-      disabled={!ready || loading || !inputValue.trim()}
+      disabled={loading || !inputValue.trim()}
       aria-label="Send message"
     >
       {#if loading}

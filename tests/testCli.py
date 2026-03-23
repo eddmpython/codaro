@@ -24,11 +24,11 @@ def testNormalizeArgsMapsAppAliasToRun() -> None:
 
 
 def testNormalizeArgsLeavesExportUntouched() -> None:
-    assert normalizeArgs(["export", "notebook.py", "--format", "marimo"]) == [
+    assert normalizeArgs(["export", "notebook.py", "--format", "reactive-app"]) == [
         "export",
         "notebook.py",
         "--format",
-        "marimo",
+        "reactive-app",
     ]
 
 

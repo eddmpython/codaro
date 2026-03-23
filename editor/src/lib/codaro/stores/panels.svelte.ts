@@ -7,6 +7,7 @@ export type SidebarPanel =
   | "packages"
   | "snippets"
   | "ai"
+  | "curriculum"
   | "";
 
 export type DeveloperTab =

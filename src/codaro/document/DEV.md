@@ -6,7 +6,7 @@
 
 현재 지원 포맷:
 - Codaro native `.py`
-- marimo `.py`
+- reactive-app `.py` (marimo 호환)
 - Jupyter `.ipynb`
 
 ## 파일 구성
@@ -24,8 +24,8 @@
   - export
 - `codaroFormat.py`
   - Codaro native Python 파서/writer
-- `marimoFormat.py`
-  - marimo import/export
+- `reactiveAppFormat.py`
+  - reactive-app (marimo 호환) import/export
 - `jupyterFormat.py`
   - Jupyter import/export
 - `analysis.py`
@@ -56,7 +56,7 @@
 `service.loadDocument()`는 아래 순서로 포맷을 판별한다.
 
 1. `.ipynb` 확장자면 Jupyter로 처리
-2. 소스에 `marimo.App` 또는 `@app.cell`이 있으면 marimo로 처리
+2. 소스에 `marimo.App` 또는 `@app.cell`이 있으면 reactive-app으로 처리
 3. 나머지는 Codaro native `.py`로 처리
 
 즉 현재는 파일 메타데이터보다 파일 내용 기반 판별도 같이 사용한다.
@@ -89,7 +89,7 @@
 
 - 블록 타입이 아직 `code`, `markdown` 위주다
 - 장기 목표인 `guide`, `widget`, `view`, `file`은 아직 모델에 본격 반영되지 않았다
-- Jupyter와 marimo는 완전 보존이 아니라 편집 가능한 핵심 구조 보존을 목표로 한다
+- Jupyter와 reactive-app(marimo 호환)은 완전 보존이 아니라 편집 가능한 핵심 구조 보존을 목표로 한다
 - 실행 결과 캐시는 문서 저장 포맷에 포함되지 않는다
 
 ## 다음 작업
@@ -102,7 +102,7 @@
 ## Current State
 
 - `analysis.py`는 이제 scope-aware defines/uses 분석을 수행한다
-- marimo export와 reactive graph가 함수 파라미터나 comprehension loop 변수를 잘못 dependency로 잡던 문제를 줄였다
+- reactive-app export와 reactive graph가 함수 파라미터나 comprehension loop 변수를 잘못 dependency로 잡던 문제를 줄였다
 - nested free variable은 use로 유지해서 이후 reactive rerun과 engine dependency 계산에 활용할 수 있다
 
 ## Next Action
@@ -115,4 +115,4 @@
 
 - class body, pattern matching, assignment expression 같은 Python edge case를 더 늘려야 한다
 - reactive rerun이 실제 문서 시나리오에서 과소/과대 실행되지 않는지 통합 테스트를 추가해야 한다
-- marimo export에서 복합 dependency가 파라미터로 안정적으로 직렬화되는지 케이스를 더 보강해야 한다
+- reactive-app export에서 복합 dependency가 파라미터로 안정적으로 직렬화되는지 케이스를 더 보강해야 한다

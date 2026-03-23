@@ -6,6 +6,8 @@
   import { bracketMatching, HighlightStyle, syntaxHighlighting } from "@codemirror/language";
   import { lineNumbers, EditorView, highlightActiveLine, keymap } from "@codemirror/view";
   import { tags } from "@lezer/highlight";
+  import { inlineCompletionExtension } from "../editor/inlineCompletion";
+  import { isAiReady } from "../ai/aiStore.svelte";
 
   interface Props {
     value?: string;
@@ -179,7 +181,8 @@
           indentWithTab,
           ...defaultKeymap,
           ...historyKeymap
-        ])
+        ]),
+        ...(isAiReady() ? [inlineCompletionExtension()] : []),
       ]
     });
   }

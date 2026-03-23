@@ -66,7 +66,9 @@
         Select model
       {/if}
     </span>
-    <ChevronDown class="h-3 w-3 chevron {isOpen ? 'rotated' : ''}" />
+    <span class="chevron" class:rotated={isOpen}>
+      <ChevronDown class="h-3 w-3" />
+    </span>
   </button>
 
   {#if isOpen}

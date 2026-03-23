@@ -25,9 +25,12 @@ UI_COMPONENTS = {
     "code_editor",
     "dropdown",
     "number",
+    "progress",
     "slider",
+    "table",
     "text",
     "textarea",
+    "toggle",
 }
 
 
@@ -311,6 +314,81 @@ class _UiNamespace:
             language=language,
         )
 
+    def table(
+        self,
+        data: Any,
+        *,
+        label: str = "",
+        columns: Sequence[str] | None = None,
+        pageSize: int = 25,
+    ) -> dict[str, Any]:
+        rows: list[list[Any]] = []
+        cols: list[str] = []
+
+        if hasattr(data, "to_dict") and hasattr(data, "columns"):
+            cols = list(data.columns) if columns is None else list(columns)
+            for _, row in data.iterrows():
+                rows.append([row.get(c) for c in cols])
+        elif isinstance(data, list):
+            if data and isinstance(data[0], dict):
+                cols = list(data[0].keys()) if columns is None else list(columns)
+                for item in data:
+                    rows.append([item.get(c) for c in cols])
+            elif data and isinstance(data[0], (list, tuple)):
+                cols = columns or [f"col_{i}" for i in range(len(data[0]))]
+                rows = [list(row) for row in data]
+        elif isinstance(data, dict):
+            cols = columns or list(data.keys())
+            maxLen = max((len(v) if isinstance(v, (list, tuple)) else 1) for v in data.values()) if data else 0
+            for i in range(maxLen):
+                row = []
+                for c in cols:
+                    v = data.get(c)
+                    if isinstance(v, (list, tuple)):
+                        row.append(v[i] if i < len(v) else None)
+                    else:
+                        row.append(v if i == 0 else None)
+                rows.append(row)
+
+        serializedRows = []
+        for row in rows:
+            serializedRows.append([_serializeCell(cell) for cell in row])
+
+        return _uiDescriptor(
+            "table",
+            label=label,
+            columns=cols,
+            rows=serializedRows,
+            pageSize=pageSize,
+            totalRows=len(serializedRows),
+        )
+
+    def toggle(
+        self,
+        value: bool = False,
+        *,
+        label: str = "",
+    ) -> dict[str, Any]:
+        return _uiDescriptor(
+            "toggle",
+            value=bool(value),
+            label=label,
+        )
+
+    def progress(
+        self,
+        value: int | float = 0,
+        *,
+        max: int | float = 100,
+        label: str = "",
+    ) -> dict[str, Any]:
+        return _uiDescriptor(
+            "progress",
+            value=value,
+            max=max,
+            label=label,
+        )
+
 
 ui = _UiNamespace()
 
@@ -340,11 +418,17 @@ def toDescriptor(value: object) -> object:
     if hasattr(value, "_repr_html_"):
         try:
             htmlValue = value._repr_html_()
-        except Exception:
+        except Exception:  # noqa: BLE001 — user object method
             return plain(repr(value))
         if htmlValue:
             return html(str(htmlValue))
     return plain(repr(value))
+
+
+def _serializeCell(value: Any) -> Any:
+    if value is None or isinstance(value, (str, int, float, bool)):
+        return value
+    return str(value)
 
 
 def _uiDescriptor(component: str, **props: object) -> dict[str, Any]:

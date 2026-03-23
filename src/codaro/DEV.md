@@ -14,7 +14,7 @@
   - 공통 에러 envelope와 예외 처리
 - `document/`
   - 문서 모델
-  - codaro/marimo/ipynb 파서와 writer
+  - codaro/reactive-app/ipynb 파서와 writer
   - 문서 서비스
 - `kernel/`
   - Python 실행 세션
@@ -59,14 +59,14 @@
 1. 프론트가 `/api/document/load`로 문서를 읽는다
 2. 편집 중 변경은 현재 프론트 메모리 상태에서 우선 처리한다
 3. 저장 시 `/api/document/save`로 Codaro native `.py`로 직렬화한다
-4. 내보내기는 `/api/document/export`에서 marimo/ipynb writer를 사용한다
+4. 내보내기는 `/api/document/export`에서 reactive-app/ipynb writer를 사용한다
 
 ### 워크스페이스 홈
 
 1. `uv run codaro`는 `/` 홈 인덱스로 진입한다
 2. `/api/workspace/index`가 현재 workspace root를 스캔한다
 3. `.py`, `.ipynb` 중 실제 노트북 문서만 추려서 tree와 recent 목록을 만든다
-4. Python 문서는 `codaro`, `marimo`, `jupyter` 타입으로 분류해서 프론트 홈에 전달한다
+4. Python 문서는 `codaro`, `reactive-app`, `jupyter` 타입으로 분류해서 프론트 홈에 전달한다
 5. 서버는 workspace scan 시작/완료를 터미널에 기록한다
 
 ### 코드 실행
@@ -118,7 +118,7 @@
 - 프론트 시각 원칙과 UI 톤의 source of truth는 `editor/DEV.md`에 둔다
   - 색상, radius, shadow, 학습 모드 chrome 밀도는 구현 전에 그 문서를 먼저 따른다
   - 학습 모드 툴바 축소와 셀 contextual menu 기준도 그 문서에 함께 묶는다
-  - 공용 chrome은 `shadcn` 패턴, 편집기 셀 리듬은 `marimo` 기준이라는 현재 결정도 그 문서가 source of truth다
+  - 공용 chrome은 `shadcn` 패턴, 편집기 셀 리듬은 reactive-app 참조 기준이라는 현재 결정도 그 문서가 source of truth다
 
 ## 현재 기술 부채
 

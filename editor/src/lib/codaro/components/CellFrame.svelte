@@ -17,12 +17,20 @@
     Square,
     Trash2,
     Type,
-    XCircle
+    Wand2,
+    XCircle,
+    BookOpen,
+    FileText,
+    Gauge,
+    TestTube2
   } from "lucide-svelte";
   import CodeEditor from "./CodeEditor.svelte";
+  import DiffPreview from "./DiffPreview.svelte";
   import GuideBlock from "./GuideBlock.svelte";
   import MarkdownBlock from "./MarkdownBlock.svelte";
   import OutputRenderer from "./OutputRenderer.svelte";
+  import StatusBadge from "../primitives/StatusBadge.svelte";
+  import { getDiffForBlock, acceptDiff, rejectDiff } from "../stores/diffStore.svelte";
 
   interface BlockData {
     id: string;
@@ -58,6 +66,9 @@
     onClearOutput?: () => void;
     onSendToTop?: () => void;
     onSendToBottom?: () => void;
+    onFixWithAI?: (blockId: string, code: string, errorText: string) => void;
+    onAcceptDiff?: (blockId: string, newContent: string) => void;
+    onSmartAction?: (blockId: string, code: string, action: string) => void;
     reportMode?: boolean;
   }
 
@@ -83,6 +94,9 @@
     onClearOutput = () => {},
     onSendToTop = () => {},
     onSendToBottom = () => {},
+    onFixWithAI,
+    onAcceptDiff,
+    onSmartAction,
     reportMode = false
   }: Props = $props();
 
@@ -108,6 +122,34 @@
   let actionsOpen = $state(false);
   let actionsSearch = $state("");
   let codeHidden = $state(false);
+  let blockDiff = $derived(getDiffForBlock(block.id));
+
+  function extractErrorText(): string {
+    const output = block.execution?.lastOutput;
+    if (!output || typeof output !== "object") return "";
+    const o = output as Record<string, unknown>;
+    if (o.stderr && typeof o.stderr === "string") return o.stderr;
+    if (o.status === "error" && o.data && typeof o.data === "string") return o.data;
+    return "";
+  }
+
+  function handleFixWithAI(): void {
+    const errorText = extractErrorText();
+    if (errorText && onFixWithAI) {
+      onFixWithAI(block.id, block.content, errorText);
+    }
+  }
+
+  function handleAcceptDiff(): void {
+    const diff = acceptDiff(block.id);
+    if (diff && onAcceptDiff) {
+      onAcceptDiff(block.id, diff.proposedContent);
+    }
+  }
+
+  function handleRejectDiff(): void {
+    rejectDiff(block.id);
+  }
 
   interface CellAction {
     label: string;
@@ -129,6 +171,12 @@
     { label: "Send to bottom", icon: ChevronsDown, group: "Movement", handle: onSendToBottom },
     { label: "Duplicate", icon: Scissors, group: "Movement", handle: onDuplicate },
     { label: "Clear output", icon: XCircle, group: "Output", handle: onClearOutput },
+    ...(onSmartAction && block.type === "code" ? [
+      { label: "Explain", icon: BookOpen, group: "AI", handle: () => onSmartAction!(block.id, block.content, "explain") },
+      { label: "Document", icon: FileText, group: "AI", handle: () => onSmartAction!(block.id, block.content, "document") },
+      { label: "Optimize", icon: Gauge, group: "AI", handle: () => onSmartAction!(block.id, block.content, "optimize") },
+      { label: "Add Tests", icon: TestTube2, group: "AI", handle: () => onSmartAction!(block.id, block.content, "add-tests") },
+    ] : []),
     { label: "Delete", icon: Trash2, group: "Danger", handle: onDelete }
   ] as CellAction[]);
 
@@ -375,25 +423,11 @@
         {/if}
       </div>
 
-      <!-- shoulder-right: status + drag handle -->
+      <!-- shoulder-right: status badge + drag handle -->
       <div class="shoulder-right z-20">
-        {#if status === "running"}
-          <div class="cell-status-icon elapsed-time running" data-testid="cell-status" data-status="running">
-            <span>...</span>
-          </div>
-        {:else if status === "queued"}
-          <div class="cell-status-icon cell-status-queued" data-testid="cell-status" data-status="queued">
-            <MoreHorizontal class="h-5 w-5" strokeWidth={1.5} />
-          </div>
-        {:else if needsRun}
-          <div class="cell-status-icon cell-status-stale" data-testid="cell-status" data-status="outdated">
-            <RefreshCw class="h-5 w-5" strokeWidth={1.5} />
-          </div>
-        {:else if elapsedTimeMs !== null}
-          <div class="cell-status-icon elapsed-time hover-action" data-testid="cell-status" data-status="idle">
-            <span>{formatElapsedTime(elapsedTimeMs)}</span>
-          </div>
-        {/if}
+        <div class="cell-status-badge-wrap" data-testid="cell-status" data-status={status}>
+          <StatusBadge {status} {needsRun} {elapsedTimeMs} />
+        </div>
 
         <div
           class="py-px cursor-grab opacity-50 hover:opacity-100 hover-action hover:bg-muted rounded border border-transparent hover:border-border active:bg-accent"
@@ -416,10 +450,32 @@
       </div>
     </div>
 
+    <!-- Diff Preview -->
+    {#if blockDiff}
+      <div class="diff-area">
+        <DiffPreview
+          originalContent={blockDiff.originalContent}
+          proposedContent={blockDiff.proposedContent}
+          onAccept={handleAcceptDiff}
+          onReject={handleRejectDiff}
+        />
+      </div>
+    {/if}
+
     <!-- Output below -->
     {#if block.type === "code" && hasOutput}
       <div class="output-area">
         <OutputRenderer result={block.execution?.lastOutput} />
+        {#if status === "error" && onFixWithAI}
+          <button
+            type="button"
+            class="fix-with-ai-btn"
+            onclick={handleFixWithAI}
+          >
+            <Wand2 size={13} />
+            <span>Fix with AI</span>
+          </button>
+        {/if}
       </div>
     {/if}
   </div>
@@ -511,7 +567,7 @@
   .codaro-cell.stale .output-area,
   .codaro-cell.stale :global(.cm-gutters),
   .codaro-cell.stale :global(.cm) {
-    background-color: var(--gray-2, #f9f9f9);
+    background-color: var(--gray-2, #1C2834);
     opacity: 0.5;
   }
 
@@ -669,23 +725,23 @@
   }
 
   .toolbar-item.variant-stale {
-    background: var(--yellow-3, #fff3cd);
-    color: var(--yellow-11, #946800);
+    background: var(--yellow-3, #3D381E);
+    color: var(--yellow-11, #F0DC88);
   }
 
   .toolbar-item.variant-stale:hover {
-    background: var(--yellow-4, #ffe69c);
+    background: var(--yellow-4, #524B24);
   }
 
   .toolbar-item.variant-green:hover {
-    background: var(--grass-2, #e9f9ee);
-    color: var(--grass-11, #2b7c3e);
-    border-color: var(--grass-7, #65ba74);
+    background: var(--grass-2, #172D1E);
+    color: var(--grass-11, #94CE9A);
+    border-color: var(--grass-7, #42A85E);
   }
 
   .toolbar-item.variant-danger:hover {
-    background: var(--red-3, #ffe0e0);
-    color: var(--red-11, #cd2b31);
+    background: var(--red-3, #3D1C24);
+    color: var(--red-11, #F4A9AA);
   }
 
   .cell-status-icon {
@@ -697,12 +753,12 @@
   :global(.elapsed-time) {
     font-family: var(--monospace-font, ui-monospace, monospace);
     font-size: 0.75rem;
-    color: var(--gray-11, #6f6f6f);
+    color: var(--gray-11, #D0DCE6);
   }
 
   .cell-status-queued,
   .cell-status-stale {
-    color: var(--gray-10, #888);
+    color: var(--gray-10, #D0DCE6);
   }
 
   .running {
@@ -802,7 +858,7 @@
     display: flex;
     align-items: center;
     height: 24px;
-    background: var(--muted, var(--gray-2, #f5f5f5));
+    background: var(--muted, var(--gray-2, #1C2834));
     border-radius: 8px;
     margin: 2px;
   }
@@ -841,5 +897,30 @@
 
   .report-output {
     padding: 0.5rem 0;
+  }
+
+  .diff-area {
+    padding: 0 0.5rem;
+  }
+
+  .fix-with-ai-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    padding: 4px 10px;
+    font-size: 0.75rem;
+    font-family: inherit;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: var(--codaro-surface-2, var(--muted, #1a1a1a));
+    color: var(--codaro-accent, #a78bfa);
+    cursor: pointer;
+    transition: background 150ms, border-color 150ms;
+  }
+
+  .fix-with-ai-btn:hover {
+    background: var(--accent);
+    border-color: var(--codaro-accent, #a78bfa);
   }
 </style>

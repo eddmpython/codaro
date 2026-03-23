@@ -15,6 +15,9 @@ import {
   deleteConversation,
   subscribeProfileEvents,
 } from "./aiApi";
+import { processToolCalls } from "./cellBridge.svelte";
+import { pushAgentAction, setActivePlan } from "../stores/automationStore.svelte";
+import type { AgentAction, PlanStatus } from "../automationApi";
 
 export interface ChatMessage {
   id: string;
@@ -275,6 +278,11 @@ export async function sendMessageStreaming(
               conversationId = event.conversationId;
             }
             break;
+          case "delta":
+            if (event.delta) {
+              msg.content += event.delta;
+            }
+            break;
           case "token":
             if (event.content) {
               msg.content = event.content;
@@ -304,6 +312,33 @@ export async function sendMessageStreaming(
   }
 }
 
+const AGENT_ACTION_TOOLS = new Set([
+  "capture-screen", "click-element", "type-text", "hotkey",
+  "mouse-move", "mouse-drag", "scroll", "detect-elements",
+  "ocr-screen", "voice-listen", "voice-speak", "execute-plan",
+]);
+
+function extractAgentAction(tc: AiToolCallResult): AgentAction | null {
+  if (!AGENT_ACTION_TOOLS.has(tc.name)) return null;
+  const r = (tc.result ?? {}) as Record<string, unknown>;
+  const args = (tc.arguments ?? {}) as Record<string, unknown>;
+  return {
+    id: generateId(),
+    timestamp: new Date().toISOString(),
+    actionType: tc.name,
+    description: (args.description as string) ?? tc.name,
+    screenshot: (r.screenshot as string) ?? null,
+    ocrText: (r.ocrText as string) ?? (r.text as string) ?? null,
+    clickPosition: args.x != null && args.y != null
+      ? { x: args.x as number, y: args.y as number }
+      : null,
+    inputText: (args.text as string) ?? null,
+    result: r.error ? "failed" : "success",
+    planId: (r.planId as string) ?? null,
+    stepIndex: (r.stepIndex as number) ?? null,
+  };
+}
+
 function processToolResults(toolCalls: AiToolCallResult[]): void {
   for (const tc of toolCalls) {
     const artifact = toolCallToArtifact(tc);
@@ -313,7 +348,20 @@ function processToolResults(toolCalls: AiToolCallResult[]): void {
         isArtifactPanelOpen = true;
       }
     }
+
+    const agentAction = extractAgentAction(tc);
+    if (agentAction) {
+      pushAgentAction(agentAction);
+    }
+
+    if (tc.name === "execute-plan" && tc.result) {
+      const r = tc.result as Record<string, unknown>;
+      if (r.planId) {
+        setActivePlan(r as unknown as PlanStatus);
+      }
+    }
   }
+  processToolCalls(toolCalls);
 }
 
 function toolCallToArtifact(tc: AiToolCallResult): ArtifactEntry | null {
@@ -384,13 +432,167 @@ function toolCallToArtifact(tc: AiToolCallResult): ArtifactEntry | null {
         toolName: tc.name,
         timestamp: Date.now(),
       };
+    case "capture-screen":
+      return {
+        id: generateId(),
+        type: "code",
+        title: "Screen capture",
+        content: `Captured ${(result as Record<string, unknown>).width}x${(result as Record<string, unknown>).height} (${(result as Record<string, unknown>).format})`,
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "read-screen-text":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `OCR: ${(result as Record<string, unknown>).regionCount ?? 0} regions`,
+        content: (result as Record<string, unknown>).fullText as string ?? "",
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "click-element":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `Clicked (${(result as Record<string, unknown>).x}, ${(result as Record<string, unknown>).y})`,
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "type-text":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `Typed ${(result as Record<string, unknown>).length ?? 0} chars`,
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "press-hotkey":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `Hotkey: ${((result as Record<string, unknown>).keys as string[])?.join("+")}`,
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "find-element":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `Found ${(result as Record<string, unknown>).matchCount ?? 0} elements`,
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "wait-for":
+      return {
+        id: generateId(),
+        type: "text",
+        title: (result as Record<string, unknown>).found ? "Wait: found" : "Wait: timeout",
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "detect-elements":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `Detected ${(result as Record<string, unknown>).elementCount ?? 0} UI elements`,
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "run-automation":
+      return {
+        id: generateId(),
+        type: "code",
+        title: `Automation: ${(result as Record<string, unknown>).status}`,
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "start-recording":
+    case "stop-recording":
+      return {
+        id: generateId(),
+        type: "text",
+        title: tc.name === "start-recording" ? "Recording started" : "Recording stopped",
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "voice-listen":
+      return {
+        id: generateId(),
+        type: "text",
+        title: "Voice input",
+        content: (result as Record<string, unknown>).text as string ?? "",
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "voice-speak":
+      return {
+        id: generateId(),
+        type: "text",
+        title: "Voice output",
+        content: (result as Record<string, unknown>).text as string ?? "",
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "send-notification":
+      return {
+        id: generateId(),
+        type: "text",
+        title: `Notification: ${(result as Record<string, unknown>).channel ?? "sent"}`,
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
+    case "emergency-stop":
+      return {
+        id: generateId(),
+        type: "text",
+        title: "EMERGENCY STOP",
+        content: JSON.stringify(result, null, 2),
+        toolName: tc.name,
+        timestamp: Date.now(),
+      };
     default:
       return null;
   }
 }
 
+export async function sendErrorFix(
+  blockId: string,
+  code: string,
+  errorText: string,
+  sessionId?: string,
+): Promise<void> {
+  const prompt = `The following code in block "${blockId}" produced an error. Fix the code and use the update-block tool to apply the fix.
+
+Code:
+\`\`\`python
+${code}
+\`\`\`
+
+Error:
+\`\`\`
+${errorText}
+\`\`\`
+
+Analyze the error and fix the code. Use the update-block tool with blockId "${blockId}" to apply your fix.`;
+
+  await sendMessageStreaming(prompt, sessionId);
+}
+
 export function clearError(): void {
   error = null;
+}
+
+export function setError(message: string): void {
+  error = message;
 }
 
 export function clearArtifacts(): void {

@@ -14,6 +14,7 @@
   import MachineStats from "./footer-items/MachineStats.svelte";
   import RTCStatus from "./footer-items/RTCStatus.svelte";
   import LspStatus from "./footer-items/LspStatus.svelte";
+  import ModeSwitcher from "../controls/ModeSwitcher.svelte";
 
   interface Props {
     issueCount?: number;
@@ -51,6 +52,7 @@
     </div>
   </button>
 
+  <ModeSwitcher />
   <RuntimeSettings onToggle={onExport} />
   <BackendStatus {connectionState} {engineStatus} />
   <LspStatus />

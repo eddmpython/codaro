@@ -122,7 +122,8 @@ def testLocalEngineInterruptRespawnsWorker() -> None:
         future = executor.submit(_run, engine.executeBlock("while True:\n    pass", blockId="loop"))
         time.sleep(0.2)
 
-        assert engine.interrupt() is True
+        result = engine.interrupt()
+        assert result.interrupted is True
 
         interruptedResult = future.result(timeout=10)
 

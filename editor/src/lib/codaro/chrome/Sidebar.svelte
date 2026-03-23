@@ -5,6 +5,7 @@
     CircleX,
     ExternalLink,
     FolderTree,
+    GraduationCap,
     MessageCircleQuestionMark,
     MessageSquareHeart,
     Network,
@@ -34,7 +35,8 @@
     { key: "outline", label: "Outline", icon: ScrollText },
     { key: "documentation", label: "Context Help", icon: MessageCircleQuestionMark },
     { key: "snippets", label: "Snippets", icon: SquareDashedBottomCode },
-    { key: "ai", label: "AI", icon: Bot }
+    { key: "ai", label: "AI", icon: Bot },
+    { key: "curriculum", label: "Curriculum", icon: GraduationCap }
   ];
 
   interface Props {

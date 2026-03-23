@@ -344,7 +344,7 @@ def analyzeCode(code: str) -> tuple[list[str], list[str]]:
     try:
         tree = ast.parse(code)
     except SyntaxError:
-        return [], []
+        return [], []  # noqa: BLE001 — incomplete user code is expected
 
     moduleBindings = collectScopeBindings(tree.body)
     moduleScope = ScopeState(

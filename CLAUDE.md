@@ -21,12 +21,15 @@
 
 - Codaro는 단순 노트북 클론이 아니다.
 - Codaro는 Python 중심의 `웹 + 모바일 + 로컬` 공통 편집기 런타임을 목표로 한다.
-- 핵심 성격:
-  - 편집기
-  - 실행기
-  - 학습기
-  - 자동화 앱 빌더
-  - 다른 도메인 앱이 올라가는 범용 작업면
+- Codaro는 **코드가 인터페이스가 되는 개인 자동화 스튜디오**다.
+- 5가지 성격이 하나의 런타임 위에 합쳐진다:
+  - **편집기** — 코드를 쓰고 실행하는 작업면
+  - **학습기** — AI와 대화하며 프로그래밍을 배우는 교실
+  - **자동화 빌더** — 태스크/워크플로우/스케줄을 만들고 실행하는 자동화 허브
+  - **리포트 뷰어** — 코드 없이 결과만 보는 대시보드
+  - **AI 에이전트 플랫폼** — AI에게 눈(vision), 귀(voice), 손(input)을 달아주는 감각계
+- 이 다섯 가지가 **하나의 연속된 흐름**으로 동작한다:
+  - 대화로 학습 → 에디터에서 코드 작성 → 태스크로 등록 → 스케줄 자동 실행 → 외부 채널로 결과 전달 → 폰에서 확인/조작
 - `eddmpython`의 notebook/eddmlab은 참고 구현일 뿐이며, Codaro의 source of truth는 Codaro 코드와 문서다.
 
 ## Codaro 확정 사상 (절대 흔들리지 않는 원칙)
@@ -54,7 +57,7 @@
 - 코드는 모듈 레벨 (들여쓰기 0칸). 함수로 감싸지 않는다.
 - `python file.py`로 그대로 실행 가능하다.
 - VS Code, Spyder, Jupytext가 동일한 `# %%` 포맷을 인식한다.
-- marimo/ipynb 호환 import/export는 유지한다.
+- reactive-app/ipynb 호환 import/export는 유지한다.
 
 ### 4. 실행 환경: Pyodide 기본, 로컬 확장
 
@@ -101,6 +104,44 @@
 - Flask: WSGIMiddleware 래핑
 - 프론트엔드는 `<meta name="codaro-base">` 태그에서 root_path를 자동 감지한다.
 - GUI에서 되는 모든 것은 API로도 된다 (시스템적 수정 가능).
+
+### 8. 자동화 + 태스크 + 리포트
+
+- 사용자가 작성하거나 AI가 생성한 Python 문서(.py)는 그 자체가 **실행 가능한 태스크**가 된다.
+- 태스크는 스케줄(@every_5m, @daily 등)에 자동 실행되거나, 웹훅으로 외부 트리거되거나, 수동 실행할 수 있다.
+- 여러 태스크를 의존성(DAG)으로 묶은 **워크플로우**가 가능하다.
+- 모든 자동화 액션은 **감사 로그**(audit trail, JSONL)에 기록된다.
+- 태스크 실행 결과(변수, stdout, 에러)는 리포트로 조회 가능하다.
+- **비상 정지(E-Stop)**가 모든 자동화를 즉시 중단시킨다.
+
+### 9. 다중 에디터 모드
+
+- Codaro는 하나의 런타임 위에 **여러 얼굴**을 가진다.
+  - **코드 에디터**: 셀 편집 + 실행 + 리액티브 데이터플로우. 개발자의 작업 공간.
+  - **학습 에디터**: 커리큘럼 브라우저 + 가이드 카드 + 퀴즈 + 성취 추적. 학습자의 교실.
+  - **리포트/앱 에디터**: 코드는 숨기고 출력만 표시. 대시보드, 프레젠테이션, 자동화 결과 뷰어.
+- 세 모드 모두 같은 문서 모델, 같은 실행 엔진, 같은 API 위에서 동작한다.
+- 사용자는 대화로 학습 → 에디터에서 코드 작성 → 태스크로 등록 → 스케줄 자동 실행 → 결과 리포트 확인의 **연속 워크플로우**를 가진다.
+
+### 10. AI 감각계 — 눈, 귀, 손
+
+- AI에게 데스크톱을 보고, 듣고, 조작할 수 있는 능력을 준다.
+- **눈(Vision)**: OpenCV + dxcam/mss 화면 캡처, PaddleOCR/EasyOCR 텍스트 인식, 템플릿 매칭/윤곽선 분석 요소 탐지.
+- **귀(Voice)**: Whisper 음성 인식 → CommandParser로 구조화된 명령 변환.
+- **손(Input)**: PyAutoGUI/DirectInput/Accessibility API로 마우스 클릭, 키보드 입력, 드래그, 핫키. InputGuard가 속도/영역 제한으로 안전 보장.
+- **녹화 → 코드**: 사용자의 동작을 녹화 → 실행 가능한 Python 코드(Percent Format)로 자동 생성.
+- **자동화 루프**: 다단계 액션 + 검증(화면 텍스트 확인) + 재시도 + 상태 머신.
+- 이 모든 감각은 AI tool_use로 노출되어 AI가 "보고 → 판단하고 → 행동하는" 에이전트로 동작한다.
+- xlwings 같은 도메인 특화 라이브러리로 Excel/Office 자동화도 같은 구조에 탑재 가능.
+
+### 11. 외부 채널 + 모바일 조작
+
+- Codaro는 사용자가 항상 데스크톱 앞에 있지 않아도 동작한다.
+- **MessageBridge**: Slack, Discord, 커스텀 Webhook으로 태스크 결과/알림 전송.
+- **Webhook 트리거**: 외부에서 HTTP 호출로 태스크를 실행 가능.
+- 사용자는 폰에서 Slack/Discord 알림을 받고, 웹훅으로 태스크를 트리거하고, 결과를 확인할 수 있다.
+- 향후 모바일 반응형 UI + PWA로 직접 에디터 접근도 가능.
+- Codaro가 로컬 머신에서 돌면서 외부 세계와 양방향 소통하는 **개인 자동화 허브** 역할.
 
 ## 기본 기술 규칙
 
@@ -193,7 +234,7 @@
 ## 현재 코드 레이아웃
 
 - `src/codaro/api/` : FastAPI router 계층, 서버 상태, 요청 모델, bootstrap/document/kernel/system/curriculum/spa 조립
-- `src/codaro/document/` : 문서 모델, percent/codaro/marimo/ipynb 파서와 writer, AST 의존 분석
+- `src/codaro/document/` : 문서 모델, percent/codaro/reactive-app/ipynb 파서와 writer, AST 의존 분석
 - `src/codaro/kernel/` : 투명 스코프 격리 커널, 리액티브 실행, SessionManager, WebSocket
 - `src/codaro/curriculum/` : YAML 콘텐츠 로더, 노트북 변환기, 진행 추적, 학습 사상, 연습 체커
 - `src/codaro/system/` : 파일 시스템 CRUD (`fileOps`) 및 패키지 관리 (`packageOps`)
@@ -227,11 +268,16 @@
 - 파일/폴더/함수/변수는 `camelCase`, 클래스는 `PascalCase`, 상수는 `UPPER_CASE`를 사용한다.
 - 파일 삭제는 금지하고, 정리가 필요하면 `_backup/`으로 이동하는 방식을 우선한다.
 - 인라인 주석은 넣지 않는다.
-- bare except 금지
-- `except Exception:` 남발 금지
-- try-except를 구조 대용으로 쓰지 않는다.
+- bare except (`except:`) 절대 금지
+- `except Exception: pass`는 금지. 로깅 없는 삼킴은 허용하지 않는다.
+- `except Exception:` 사용 시 반드시: (1) 예외 변수 바인딩 (`as exc`), (2) 최소 logger.debug 이상 로깅, (3) 좁힐 수 없는 사유가 명확해야 한다.
+- 예외 타입은 가능한 한 좁힌다 (json.JSONDecodeError, OSError 등 구체 타입 우선).
+- try-except를 if-else 대용으로 쓰지 않는다.
+- asyncio.create_task()에는 done_callback을 붙여 예외를 수면 위로 올린다.
+- dispose/cleanup 패턴은 `errorGuard.safeDispose()`를 사용한다.
+- raise 시 원본 예외 체인을 유지한다 (`raise ... from exc`).
 - 사용자 입력 검증은 가능하면 early return으로 처리한다.
-- 에러를 삼키지 않는다.
+- ruff 린트 규칙 BLE001, S110, S112, TRY400이 pyproject.toml에 설정되어 있다. 정당한 면제는 `# noqa:` 주석으로 처리한다.
 - 초기 단계일수록 "대충 동작"보다 "계층이 맞는가"를 우선한다.
 
 ## AI 투명성 원칙

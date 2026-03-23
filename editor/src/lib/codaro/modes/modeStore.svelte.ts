@@ -1,4 +1,5 @@
 export type AppMode = "learning" | "notebook" | "report" | "automation";
+export type ReportLayout = "full" | "two-column" | "presentation";
 
 export interface ModeConfig {
   label: string;
@@ -65,6 +66,7 @@ const modeConfigs: Record<AppMode, ModeConfig> = {
 };
 
 let activeMode = $state<AppMode>("notebook");
+let reportLayout = $state<ReportLayout>("full");
 
 export function getActiveMode(): AppMode {
   return activeMode;
@@ -88,4 +90,12 @@ export function getAllModes(): AppMode[] {
 
 export function getModeLabel(mode: AppMode): string {
   return modeConfigs[mode].label;
+}
+
+export function getReportLayout(): ReportLayout {
+  return reportLayout;
+}
+
+export function setReportLayout(layout: ReportLayout): void {
+  reportLayout = layout;
 }

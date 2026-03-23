@@ -1,21 +1,35 @@
 <script lang="ts">
+  import { fly } from "svelte/transition";
   import { X, CheckCircle2, AlertCircle, Info } from "lucide-svelte";
   import { getToasts, dismissToast } from "../stores/toast.svelte";
 
   let toasts = $derived(getToasts());
+  let reducedMotion = $state(false);
+
+  import { onMount } from "svelte";
+  onMount(() => {
+    reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
 
   const icons = {
     info: Info,
     success: CheckCircle2,
     error: AlertCircle,
   };
+
+  const flyParams = { y: 20, duration: 200 };
 </script>
 
 {#if toasts.length > 0}
   <div class="toast-container" aria-live="polite">
     {#each toasts as toast (toast.id)}
-      <div class="toast-item {toast.type}">
-        <svelte:component this={icons[toast.type]} class="h-4 w-4" />
+      {@const ToastIcon = icons[toast.type]}
+      <div
+        class="toast-item {toast.type}"
+        in:fly={reducedMotion ? { duration: 0 } : flyParams}
+        out:fly={reducedMotion ? { duration: 0 } : { ...flyParams, duration: 150 }}
+      >
+        <ToastIcon class="h-4 w-4" />
         <span class="toast-message">{toast.message}</span>
         <button class="toast-close" onclick={() => dismissToast(toast.id)} aria-label="Dismiss">
           <X class="h-3.5 w-3.5" />
@@ -48,18 +62,6 @@
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     font-size: 0.85rem;
     color: var(--foreground);
-    animation: toastIn 0.2s ease-out;
-  }
-
-  @keyframes toastIn {
-    from {
-      opacity: 0;
-      transform: translateY(8px) scale(0.96);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
   }
 
   .toast-item.success {

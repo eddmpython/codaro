@@ -15,7 +15,7 @@ uv run codaro
 uv run codaro path.py
 uv run codaro app path.py
 uv run codaro export path.py --format codaro
-uv run codaro export path.py --format marimo
+uv run codaro export path.py --format reactive-app
 uv run codaro export path.py --format ipynb
 ```
 

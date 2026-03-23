@@ -84,6 +84,10 @@ def writePercentDocument(document: CodaroDocument) -> str:
             parts.append(f'# %% [guide] id={block.id}')
             parts.append(block.content or "")
             parts.append("")
+        elif block.type == "automation":
+            parts.append(f'# %% [automation] id={block.id}')
+            parts.append(block.content or "")
+            parts.append("")
         else:
             parts.append(f'# %% [code] id={block.id}')
             parts.append(block.content or "")
@@ -114,6 +118,13 @@ def _buildBlock(blockType: str, blockId: str | None, lines: list[str]) -> BlockC
             type="guide",
             content=content,
             guide=guide,
+        )
+    elif blockType == "automation":
+        content = _stripTrailingBlanks("\n".join(lines))
+        return BlockConfig(
+            id=blockId or _blockId(),
+            type="automation",
+            content=content,
         )
     else:
         content = _stripTrailingBlanks("\n".join(lines))

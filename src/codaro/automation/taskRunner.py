@@ -23,7 +23,7 @@ class TaskRunner:
             run.status = TaskStatus.SUCCESS
             run.output = result.get("stdout", "")
             run.variables = result.get("variables", {})
-        except Exception as exc:
+        except Exception as exc:  # noqa: BLE001 — task execution boundary
             run.status = TaskStatus.FAILED
             run.error = str(exc)
         finally:

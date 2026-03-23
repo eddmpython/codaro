@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { slide } from "svelte/transition";
+  import { onMount } from "svelte";
   import { X } from "lucide-svelte";
   import type { Snippet } from "svelte";
   import {
@@ -16,6 +18,13 @@
 
   let isOpen = $derived(getIsSidebarOpen());
   let panelSize = $derived(isOpen ? 30 : 0);
+  let reducedMotion = $state(false);
+
+  onMount(() => {
+    reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
+
+  const slideParams = { duration: 150, axis: "x" as const };
 
   function closePanel() {
     setSelectedPanel("");
@@ -34,7 +43,11 @@
   style="flex: {panelSize} 1 0px; overflow: hidden;"
 >
   <div class="flex flex-row h-full">
-    <div class="flex flex-col h-full flex-1 overflow-hidden mr-[-4px]">
+    {#if isOpen}
+    <div
+      class="flex flex-col h-full flex-1 overflow-hidden mr-[-4px]"
+      transition:slide={reducedMotion ? { duration: 0 } : slideParams}
+    >
       <div class="p-3 border-b flex justify-between items-center">
         <span class="text-sm text-(--slate-11) uppercase tracking-wide font-semibold flex-1">
           {panelTitle}
@@ -55,6 +68,7 @@
         {/if}
       </div>
     </div>
+    {/if}
 
     <div
       class="border-border print:hidden z-10 resize-handle-collapsed vertical"

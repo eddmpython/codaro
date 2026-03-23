@@ -12,14 +12,24 @@ import traceback
 from typing import Any
 
 from ..document.analysis import analyzeCode
+from ..errorGuard import safeRepr
 from ..outputDescriptor import isDescriptorPayload
 
 
-def runLocalWorker(connection, *, workingDirectory: str | None, workspaceRoot: str | None) -> None:
+def runLocalWorker(
+    connection,
+    *,
+    workingDirectory: str | None,
+    workspaceRoot: str | None,
+    interruptFlag=None,
+) -> None:
     registry: dict[str, object] = {}
     cellDefinitions: dict[str, set[str]] = {}
     executionCount = 0
     targetCwd = _resolveTargetCwd(workingDirectory, workspaceRoot)
+
+    if interruptFlag is not None:
+        _installInterruptTrace(interruptFlag)
 
     while True:
         try:
@@ -167,7 +177,7 @@ def _executeCommand(
         resultType = "error"
         resultData = _formatSyntaxError(syntaxError)
         hasDisplay = True
-    except Exception:
+    except Exception:  # noqa: BLE001 — user code execution
         resultStatus = "error"
         resultType = "error"
         resultData = traceback.format_exc()
@@ -313,12 +323,7 @@ def _collectVariables(registry: dict[str, object]) -> list[dict[str, object]]:
         if inspect.ismodule(value):
             continue
 
-        try:
-            valueRepr = repr(value)
-            if len(valueRepr) > 300:
-                valueRepr = valueRepr[:300] + "..."
-        except Exception:
-            valueRepr = f"<{type(value).__name__}>"
+        valueRepr = safeRepr(value)
 
         size = _estimateSize(value)
 
@@ -343,7 +348,7 @@ def _estimateSize(value: object) -> int | None:
             try:
                 usage = value.memory_usage(deep=True)
                 return int(usage.sum()) if hasattr(usage, "sum") else int(usage)
-            except Exception:
+            except Exception:  # noqa: BLE001 — user object method
                 pass
     try:
         return len(value)
@@ -425,7 +430,7 @@ def _normalizeResult(value: object) -> tuple[str, object]:
     if hasattr(value, "_repr_html_"):
         try:
             return "html", value._repr_html_()
-        except Exception:
+        except Exception:  # noqa: BLE001 — user object method
             return "text", repr(value)
 
     return "text", repr(value)
@@ -437,7 +442,7 @@ def _serializePng(value: object) -> str | None:
 
     try:
         pngData = value._repr_png_()
-    except Exception:
+    except Exception:  # noqa: BLE001 — user object method
         return None
 
     if pngData is None:
@@ -467,7 +472,7 @@ def _serializeDataFrame(value: object) -> dict[str, object] | None:
     if typeName == "Series" and hasattr(value, "to_frame"):
         try:
             frame = value.to_frame()
-        except Exception:
+        except Exception:  # noqa: BLE001 — user object method
             return None
 
     if not hasattr(frame, "to_dict") or not hasattr(frame, "columns") or not hasattr(frame, "index"):
@@ -479,7 +484,7 @@ def _serializeDataFrame(value: object) -> dict[str, object] | None:
         columns = [str(column) for column in list(frame.columns)]
         visibleRows = records[:200]
         indexValues = [str(indexValue) for indexValue in list(frame.index)[: len(visibleRows)]]
-    except Exception:
+    except Exception:  # noqa: BLE001 — user object method
         return None
 
     return {
@@ -508,6 +513,14 @@ def _sanitizeDescriptor(value: object) -> object:
     if isinstance(value, set):
         return [_sanitizeDescriptor(item) for item in sorted(value, key=str)]
     return value
+
+
+def _installInterruptTrace(interruptFlag) -> None:
+    def traceCallback(frame, event, arg):
+        if interruptFlag.is_set():
+            raise KeyboardInterrupt("Soft interrupt requested")
+        return traceCallback
+    sys.settrace(traceCallback)
 
 
 STREAM_BUFFER_MAX_BYTES = 5 * 1024 * 1024

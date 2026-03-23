@@ -301,7 +301,7 @@ def testWorkspaceIndexClassifiesNotebookTypes(tmp_path: Path) -> None:
     assert payload["workspaceRoot"] == str(tmp_path.resolve())
     assert len(payload["recentDocuments"]) == 3
     recentTypes = {entry["notebookType"] for entry in payload["recentDocuments"]}
-    assert recentTypes <= {"codaro", "marimo", "jupyter"}
+    assert recentTypes <= {"codaro", "reactive-app", "jupyter"}
     assert payload["totalCodaroDocuments"] == 2
     assert payload["totalCompatibleDocuments"] == 2
 

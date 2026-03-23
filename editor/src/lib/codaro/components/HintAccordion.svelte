@@ -8,7 +8,11 @@
 
   let { hints, revealedCount = 0 }: Props = $props();
 
-  let revealed = $state(revealedCount);
+  let revealed = $state(0);
+
+  $effect(() => {
+    revealed = revealedCount;
+  });
 
   function revealNext() {
     if (revealed < hints.length) {

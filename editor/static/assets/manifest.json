@@ -1,25 +1,25 @@
 {
-  "short_name": "Marimo",
-  "name": "A Marimo App",
+  "short_name": "Codaro",
+  "name": "Codaro — Programmable Studio",
+  "description": "Code, learn, automate — all in one editor runtime",
   "icons": [
     {
       "src": "favicon.ico",
-      "sizes": "48x48",
+      "sizes": "16x16 32x32 48x48",
       "type": "image/x-icon"
     },
     {
-      "src": "android-chrome-192x192.png",
+      "src": "apple-touch-icon.png",
       "type": "image/png",
-      "sizes": "192x192"
-    },
-    {
-      "src": "android-chrome-512x512.png",
-      "type": "image/png",
-      "sizes": "512x512"
+      "sizes": "192x192",
+      "purpose": "any maskable"
     }
   ],
-  "start_url": ".",
+  "start_url": "/",
+  "scope": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#ffffff"
+  "orientation": "any",
+  "theme_color": "#09090b",
+  "background_color": "#09090b",
+  "categories": ["developer tools", "education", "productivity"]
 }

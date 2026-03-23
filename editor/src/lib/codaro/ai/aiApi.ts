@@ -168,6 +168,8 @@ export interface ChatContext {
   variables?: Array<{ name: string; type: string; repr?: string }>;
   blocks?: Array<{ id: string; type: string; content: string }>;
   fileName?: string;
+  workspaceFiles?: string[];
+  errorHistory?: Array<{ blockId: string; error: string; timestamp: number }>;
 }
 
 export async function sendChatMessage(payload: {
@@ -187,8 +189,9 @@ export async function sendChatMessage(payload: {
 }
 
 export interface StreamEvent {
-  type: "start" | "token" | "tool_results" | "done";
+  type: "start" | "token" | "delta" | "tool_results" | "done";
   conversationId?: string;
+  delta?: string;
   content?: string;
   answer?: string;
   provider?: string;
@@ -318,4 +321,27 @@ export function subscribeProfileEvents(onUpdate: (profile: AiProfilePayload) => 
     disposed = true;
     es?.close();
   };
+}
+
+export interface CompletionRequest {
+  prefix: string;
+  suffix: string;
+  blockId?: string;
+  provider?: string;
+  context?: ChatContext;
+}
+
+export interface CompletionResponse {
+  completions: string[];
+  provider: string;
+  model: string;
+}
+
+export async function requestCompletion(payload: CompletionRequest): Promise<CompletionResponse> {
+  const res = await fetch(apiUrl("/api/ai/complete"), {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  return parseJson(res, "Failed to request completion.");
 }

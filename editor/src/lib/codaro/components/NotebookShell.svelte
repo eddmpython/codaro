@@ -2,6 +2,7 @@
   import { onMount } from "svelte";
   import { ExternalLink } from "lucide-svelte";
   import CellFrame from "./CellFrame.svelte";
+  import VirtualCellList from "./VirtualCellList.svelte";
   import EditPage from "../app/EditPage.svelte";
   import TopRightControls from "../controls/TopRightControls.svelte";
   import BottomRightControls from "../controls/BottomRightControls.svelte";
@@ -15,14 +16,7 @@
   import DisconnectedOverlay from "../controls/DisconnectedOverlay.svelte";
   import FeedbackDialog from "../dialogs/FeedbackDialog.svelte";
   import ShareStaticDialog from "../dialogs/ShareStaticDialog.svelte";
-  import FileExplorerPanel from "../panels/FileExplorerPanel.svelte";
-  import VariablesPanel from "../panels/VariablesPanel.svelte";
-  import DependencyGraphPanel from "../panels/DependencyGraphPanel.svelte";
-  import DocumentationPanel from "../panels/DocumentationPanel.svelte";
-  import OutlinePanel from "../panels/OutlinePanel.svelte";
-  import PackagesPanel from "../panels/PackagesPanel.svelte";
-  import SnippetsPanel from "../panels/SnippetsPanel.svelte";
-  import AIChatPanel from "../panels/AIChatPanel.svelte";
+  import LazyPanel from "./LazyPanel.svelte";
   import { getBasePath } from "../basePath";
   import { getKioskMode, getUserConfig } from "../stores/config.svelte";
   import { setActiveSurface } from "../stores/surface.svelte";
@@ -40,14 +34,29 @@
   import { detectMultipleDefinitions } from "../dataflow";
   import { exportDocumentAtPath, getBootstrap, loadDocumentAtPath, saveDocumentAtPath } from "../api";
   import { createContextHelpEntry, openPublicDoc } from "../contextHelp";
-  import { PyodideEngine } from "../engines/pyodideEngine";
-  import type { ExecutionEngine } from "../engines/executionEngine";
-  import { ServerKernelEngine } from "../engines/serverKernelEngine";
   import {
     getSelectedPanel,
     setSelectedPanel,
     getIsSidebarOpen
   } from "../stores/panels.svelte";
+  import { getActiveMode, getActiveModeConfig } from "../modes/modeStore.svelte";
+  import { getActiveLesson } from "../stores/curriculum.svelte";
+  import { onDocumentMutation, processToolCalls, type DocumentMutation } from "../ai/cellBridge.svelte";
+  import { addPendingDiff, getPendingDiffCount, acceptAllDiffs, rejectAllDiffs } from "../stores/diffStore.svelte";
+  import { sendErrorFix, sendMessageStreaming } from "../ai/aiStore.svelte";
+  import {
+    getEngine,
+    getEngineName,
+    getEngineStatus,
+    setEngineStatus,
+    getEngineError,
+    setEngineError,
+    getVariables as getEngineVariables,
+    setVariables as setEngineVariables,
+    createEngine,
+    destroyEngine,
+    interruptEngine
+  } from "../stores/engineStore.svelte";
   import type {
     CodaroDocument,
     ContextHelpEntry,
@@ -66,12 +75,13 @@
   let documentState: CodaroDocument | null = $state(null);
   let activeBlockId = $state("");
   let currentPath = $state("");
-  let engine: ExecutionEngine | null = $state(null);
-  let engineName = $state("none");
-  let engineStatus = $state("idle");
-  let engineError = $state("");
-  let variables: VariableInfo[] = $state([]);
   let duplicateDefinitions = $state(new Map<string, string[]>());
+
+  let engine = $derived(getEngine());
+  let engineName = $derived(getEngineName());
+  let engineStatus = $derived(getEngineStatus());
+  let engineError = $derived(getEngineError());
+  let variables = $derived(getEngineVariables());
   let loading = $state(true);
   let pageError = $state("");
   let saveState = $state("idle");
@@ -87,6 +97,10 @@
 
   const codaroVersion = "0.1.0";
   const staticBase = `${getBasePath()}/assets`;
+  const loadAutomationMode = () => import("../modes/AutomationMode.svelte");
+
+  let modeConfig = $derived(getActiveModeConfig());
+  let activeMode = $derived(getActiveMode());
 
   const chromePanels = [
     { key: "files", label: "Files" },
@@ -96,7 +110,8 @@
     { key: "outline", label: "Outline" },
     { key: "documentation", label: "Context Help" },
     { key: "snippets", label: "Snippets" },
-    { key: "ai", label: "AI" }
+    { key: "ai", label: "AI" },
+    { key: "curriculum", label: "Curriculum" }
   ];
 
   function blockPayloads(document: CodaroDocument | null = documentState): ReactiveBlockPayload[] {
@@ -165,36 +180,8 @@
     }
   }
 
-  async function createEngine(): Promise<void> {
-    engine?.destroy();
-    engine = null;
-    engineName = "none";
-    engineStatus = "loading";
-    engineError = "";
-    variables = [];
-
-    try {
-      const serverEngine = new ServerKernelEngine();
-      await serverEngine.initialize();
-      engine = serverEngine;
-      engineName = serverEngine.name;
-      engineStatus = "ready";
-      return;
-    } catch (serverError) {
-      try {
-        const pyodideEngine = new PyodideEngine();
-        await pyodideEngine.initialize();
-        engine = pyodideEngine;
-        engineName = pyodideEngine.name;
-        engineStatus = "ready";
-        engineError = serverError instanceof Error ? serverError.message : String(serverError);
-      } catch (fallbackError) {
-        engine = null;
-        engineName = "none";
-        engineStatus = "error";
-        engineError = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
-      }
-    }
+  async function initEngine(): Promise<void> {
+    await createEngine();
   }
 
   async function initialize(): Promise<void> {
@@ -204,7 +191,7 @@
     try {
       bootstrap = await getBootstrap();
       currentPath = initialPath || bootstrap.documentPath || "";
-      await createEngine();
+      await initEngine();
       if (currentPath) {
         await openDocument(currentPath, false);
       } else {
@@ -226,7 +213,7 @@
 
     try {
       if (recreateEngine) {
-        await createEngine();
+        await initEngine();
       }
       const payload = await loadDocumentAtPath(path);
       documentState = payload.document;
@@ -235,7 +222,7 @@
       dirty = !payload.exists;
       saveState = dirty ? "dirty" : "idle";
       refreshWarnings();
-      variables = engine ? await engine.getVariables().catch(() => []) : [];
+      setEngineVariables(engine ? await engine.getVariables().catch(() => []) : []);
     } catch (error) {
       pageError = error instanceof Error ? error.message : String(error);
     } finally {
@@ -252,7 +239,7 @@
     pageError = "";
     refreshWarnings();
     if (recreateEngine) {
-      void createEngine();
+      void initEngine();
     }
   }
 
@@ -290,10 +277,7 @@
   }
 
   async function interruptExecution(): Promise<void> {
-    if (engine && typeof engine.interrupt === "function") {
-      await engine.interrupt();
-    }
-    engineStatus = "ready";
+    await interruptEngine();
   }
 
   function sendBlockToTop(blockId: string): void {
@@ -463,8 +447,8 @@
       return;
     }
 
-    engineStatus = "running";
-    engineError = "";
+    setEngineStatus("running");
+    setEngineError("");
     setRunning(blockId);
 
     try {
@@ -478,12 +462,13 @@
       }
       documentState = nextDocument;
       const lastResult = reactiveResult.results[reactiveResult.results.length - 1];
-      variables = lastResult?.variables || await engine.getVariables();
-      engineStatus = "ready";
+      setEngineVariables(lastResult?.variables || await engine.getVariables());
+      setEngineStatus("ready");
     } catch (error) {
-      engineStatus = "error";
-      engineError = error instanceof Error ? error.message : String(error);
-      applyError(blockId, engineError);
+      setEngineStatus("error");
+      const msg = error instanceof Error ? error.message : String(error);
+      setEngineError(msg);
+      applyError(blockId, msg);
     }
   }
 
@@ -491,13 +476,13 @@
     if (!documentState) {
       return;
     }
-    await createEngine();
+    await initEngine();
     if (!engine) {
       return;
     }
 
-    engineStatus = "running";
-    engineError = "";
+    setEngineStatus("running");
+    setEngineError("");
     let nextDocument = documentState;
 
     for (const block of documentState.blocks.filter((entry) => entry.type === "code")) {
@@ -506,21 +491,22 @@
         const result = await engine.execute(block.content, block.id);
         nextDocument = applyExecutionResult(nextDocument, block.id, result);
         documentState = nextDocument;
-        variables = result.variables;
+        setEngineVariables(result.variables);
         if (result.status === "error") {
-          engineStatus = "error";
-          engineError = result.stderr || "Execution failed.";
+          setEngineStatus("error");
+          setEngineError(result.stderr || "Execution failed.");
           return;
         }
       } catch (error) {
-        engineStatus = "error";
-        engineError = error instanceof Error ? error.message : String(error);
-        applyError(block.id, engineError);
+        setEngineStatus("error");
+        const msg = error instanceof Error ? error.message : String(error);
+        setEngineError(msg);
+        applyError(block.id, msg);
         return;
       }
     }
 
-    engineStatus = "ready";
+    setEngineStatus("ready");
   }
 
   async function saveDocument(): Promise<void> {
@@ -566,7 +552,7 @@
       }
     }
 
-    const format = window.prompt("Export format: percent | marimo | ipynb", "ipynb") || "";
+    const format = window.prompt("Export format: percent | reactive-app | ipynb", "ipynb") || "";
     if (!format) {
       return;
     }
@@ -647,7 +633,8 @@
     { label: "Packages Panel", group: "Panels", handle: () => setSelectedPanel("packages"), keywords: ["packages", "pip"] },
     { label: "Outline Panel", group: "Panels", handle: () => setSelectedPanel("outline"), keywords: ["outline", "toc"] },
     { label: "Snippets Panel", group: "Panels", handle: () => setSelectedPanel("snippets"), keywords: ["snippets"] },
-    { label: "AI Panel", group: "Panels", handle: () => setSelectedPanel("ai"), keywords: ["ai", "chat"] }
+    { label: "AI Panel", group: "Panels", handle: () => setSelectedPanel("ai"), keywords: ["ai", "chat"] },
+    { label: "Curriculum Panel", group: "Panels", handle: () => setSelectedPanel("curriculum"), keywords: ["curriculum", "learn", "study"] }
   ]);
 
   const shortcutEntries = [
@@ -675,33 +662,112 @@
     { action: "surface.chat", name: "Switch to Chat", key: "Ctrl+Shift+C", group: "Navigation" }
   ];
 
-  let prefersDark = $state(
-    typeof window !== "undefined"
-      ? window.matchMedia("(prefers-color-scheme: dark)").matches
-      : true
-  );
+  function handleCurriculumLessonLoad(): void {
+    const lesson = getActiveLesson();
+    if (lesson?.document) {
+      documentState = lesson.document;
+      activeBlockId = lesson.document.blocks[0]?.id || "";
+      dirty = false;
+      saveState = "idle";
+      refreshWarnings();
+    }
+  }
 
-  let effectiveTheme = $derived.by(() => {
-    const t = getUserConfig().display.theme;
-    if (t === "system") return prefersDark ? "dark" : "light";
-    return t;
-  });
+  let effectiveTheme = "dark";
 
-  $effect(() => {
-    if (typeof window === "undefined") return;
-    const mq = window.matchMedia("(prefers-color-scheme: dark)");
-    const handler = (e: MediaQueryListEvent) => { prefersDark = e.matches; };
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  });
+  function handleMutation(mutation: DocumentMutation): void {
+    if (!documentState) return;
+
+    switch (mutation.type) {
+      case "insert": {
+        const blockId = mutation.blockId;
+        if (blockId && !documentState.blocks.some(b => b.id === blockId)) {
+          pendingAICells = [...pendingAICells, blockId];
+        }
+        break;
+      }
+
+      case "update": {
+        const targetBlock = documentState.blocks.find(b => b.id === mutation.blockId);
+        if (targetBlock && mutation.content !== undefined) {
+          addPendingDiff({
+            blockId: mutation.blockId,
+            originalContent: targetBlock.content,
+            proposedContent: mutation.content,
+            toolCallId: mutation.toolCallId,
+            timestamp: mutation.timestamp,
+          });
+          pendingAICells = [...pendingAICells, mutation.blockId];
+        }
+        break;
+      }
+
+      case "delete": {
+        pendingAICells = [...pendingAICells, mutation.blockId];
+        break;
+      }
+
+      case "execute":
+        break;
+    }
+  }
+
+  function handleFixWithAI(blockId: string, code: string, errorText: string): void {
+    void sendErrorFix(blockId, code, errorText);
+  }
+
+  const smartActionPrompts: Record<string, string> = {
+    "explain": 'Explain what this code does in a clear, concise markdown block. Use insert-block with blockType "markdown" to add the explanation right after the code block.',
+    "document": 'Add a docstring and type hints to this code. Use update-block to replace the code with the documented version.',
+    "optimize": 'Optimize this code for performance and readability. Use update-block to apply the improved version. Explain what you changed.',
+    "add-tests": 'Generate unit tests for this code using pytest. Use insert-block with blockType "code" to add the test code after the original block.',
+  };
+
+  function handleInsertRecipe(code: string): void {
+    if (!documentState) return;
+    addBlock("code");
+    const newBlock = documentState.blocks[documentState.blocks.length - 1];
+    if (newBlock) {
+      updateBlockContent(newBlock.id, code);
+    }
+  }
+
+  function handleSmartAction(blockId: string, code: string, action: string): void {
+    const prompt = smartActionPrompts[action];
+    if (!prompt) return;
+    const message = `${prompt}\n\nBlock ID: "${blockId}"\nCode:\n\`\`\`python\n${code}\n\`\`\``;
+    void sendMessageStreaming(message);
+  }
+
+  function handleAcceptDiff(blockId: string, newContent: string): void {
+    updateBlockContent(blockId, newContent);
+    pendingAICells = pendingAICells.filter(id => id !== blockId);
+  }
+
+  function handleAcceptAllPending(): void {
+    const accepted = acceptAllDiffs();
+    for (const diff of accepted) {
+      updateBlockContent(diff.blockId, diff.proposedContent);
+    }
+    pendingAICells = [];
+    pendingAIIndex = null;
+  }
+
+  function handleRejectAllPending(): void {
+    rejectAllDiffs();
+    pendingAICells = [];
+    pendingAIIndex = null;
+  }
 
   onMount(() => {
     void initialize();
     window.addEventListener("keydown", handleWindowKeydown);
+    const unsubMutations = onDocumentMutation(handleMutation);
 
     return () => {
       window.removeEventListener("keydown", handleWindowKeydown);
-      engine?.destroy();
+      unsubMutations();
+      destroyEngine();
     };
   });
 </script>
@@ -780,24 +846,23 @@
       >
         {#snippet helperPanelContent()}
           {#if getSelectedPanel() === "files"}
-            <FileExplorerPanel />
+            <LazyPanel loader={() => import("../panels/FileExplorerPanel.svelte")} />
           {:else if getSelectedPanel() === "variables"}
-            <VariablesPanel variables={variableEntries} />
+            <LazyPanel loader={() => import("../panels/VariablesPanel.svelte")} props={{ variables: variableEntries }} />
           {:else if getSelectedPanel() === "dependencies"}
-            <DependencyGraphPanel />
+            <LazyPanel loader={() => import("../panels/DependencyGraphPanel.svelte")} />
           {:else if getSelectedPanel() === "documentation"}
-            <DocumentationPanel
-              title="Context Help"
-              content={contextHelpEntry.summary}
-            />
+            <LazyPanel loader={() => import("../panels/DocumentationPanel.svelte")} props={{ title: "Context Help", content: contextHelpEntry.summary }} />
           {:else if getSelectedPanel() === "outline"}
-            <OutlinePanel />
+            <LazyPanel loader={() => import("../panels/OutlinePanel.svelte")} />
           {:else if getSelectedPanel() === "packages"}
-            <PackagesPanel />
+            <LazyPanel loader={() => import("../panels/PackagesPanel.svelte")} />
           {:else if getSelectedPanel() === "snippets"}
-            <SnippetsPanel />
+            <LazyPanel loader={() => import("../panels/SnippetsPanel.svelte")} />
           {:else if getSelectedPanel() === "ai"}
-            <AIChatPanel />
+            <LazyPanel loader={() => import("../panels/AIChatPanel.svelte")} />
+          {:else if getSelectedPanel() === "curriculum"}
+            <LazyPanel loader={() => import("../panels/CurriculumPanel.svelte")} props={{ onLoadLesson: handleCurriculumLessonLoad }} />
           {/if}
         {/snippet}
 
@@ -832,36 +897,52 @@
           />
         {/snippet}
 
-        <div class="px-1 sm:px-16 md:px-20 xl:px-24 pb-24 sm:pb-12">
-          <div class="m-auto pr-4 min-w-[400px] pb-24 sm:pb-12" style="max-width: var(--content-width, 776px)">
-            <div data-testid="cell-column" class="flex flex-col gap-5">
-              {#each documentBlocks as block (block.id)}
-                <CellFrame
-                  {block}
-                  active={block.id === activeBlockId}
-                  onSelect={() => (activeBlockId = block.id)}
-                  onRun={() => void runBlock(block.id)}
-                  onChange={(content) => updateBlockContent(block.id, content)}
-                  onToggleType={() => void toggleBlockType(block.id)}
-                  onDelete={() => void removeBlock(block.id)}
-                  onMoveUp={() => moveBlock(block.id, -1)}
-                  onMoveDown={() => moveBlock(block.id, 1)}
-                  onDuplicate={() => duplicateBlock(block.id)}
-                  onAddBelow={() => addBlock("code", block.id)}
-                  onAddAbove={() => addBlockAbove(block.id)}
-                  onRunAndNewBelow={() => void runBlockAndNewBelow(block.id)}
-                  onRunAll={runAll}
-                  onFocusUp={() => focusCellUp(block.id)}
-                  onFocusDown={() => focusCellDown(block.id)}
-                  onHideCode={() => {}}
-                  onClearOutput={() => clearBlockOutput(block.id)}
-                  onSendToTop={() => sendBlockToTop(block.id)}
-                  onSendToBottom={() => sendBlockToBottom(block.id)}
-                />
-              {/each}
+        {#if activeMode === "automation"}
+          <LazyPanel
+            loader={loadAutomationMode}
+            props={{ documentPath: currentPath, onInsertRecipe: handleInsertRecipe }}
+          />
+        {:else}
+          <div class="px-1 sm:px-16 md:px-20 xl:px-24 pb-24 sm:pb-12">
+            <div class="m-auto pr-4 min-w-[400px] pb-24 sm:pb-12" style="max-width: var(--content-width, 776px)">
+              <div data-testid="cell-column">
+                <VirtualCellList blockIds={documentBlocks.map((b) => b.id)}>
+                  {#snippet children({ blockId })}
+                    {@const block = documentBlocks.find((b) => b.id === blockId)}
+                    {#if block}
+                      <CellFrame
+                        {block}
+                        active={block.id === activeBlockId}
+                        reportMode={!modeConfig.showCodeCells}
+                        onSelect={() => (activeBlockId = block.id)}
+                        onRun={() => void runBlock(block.id)}
+                        onChange={(content) => updateBlockContent(block.id, content)}
+                        onToggleType={() => void toggleBlockType(block.id)}
+                        onDelete={() => void removeBlock(block.id)}
+                        onMoveUp={() => moveBlock(block.id, -1)}
+                        onMoveDown={() => moveBlock(block.id, 1)}
+                        onDuplicate={() => duplicateBlock(block.id)}
+                        onAddBelow={() => addBlock("code", block.id)}
+                        onAddAbove={() => addBlockAbove(block.id)}
+                        onRunAndNewBelow={() => void runBlockAndNewBelow(block.id)}
+                        onRunAll={runAll}
+                        onFocusUp={() => focusCellUp(block.id)}
+                        onFocusDown={() => focusCellDown(block.id)}
+                        onHideCode={() => {}}
+                        onClearOutput={() => clearBlockOutput(block.id)}
+                        onSendToTop={() => sendBlockToTop(block.id)}
+                        onSendToBottom={() => sendBlockToBottom(block.id)}
+                        onFixWithAI={handleFixWithAI}
+                        onAcceptDiff={handleAcceptDiff}
+                        onSmartAction={handleSmartAction}
+                      />
+                    {/if}
+                  {/snippet}
+                </VirtualCellList>
+              </div>
             </div>
           </div>
-        </div>
+        {/if}
       </EditPage>
     </div>
 
@@ -883,8 +964,8 @@
           ? (pendingAIIndex - 1 + pendingAICells.length) % pendingAICells.length
           : (pendingAIIndex + 1) % pendingAICells.length;
       }}
-      onAcceptAll={() => { pendingAICells = []; pendingAIIndex = null; }}
-      onRejectAll={() => { pendingAICells = []; pendingAIIndex = null; }}
+      onAcceptAll={handleAcceptAllPending}
+      onRejectAll={handleRejectAllPending}
     />
 
     <div id="portal" data-testid="glide-portal" style="position: fixed; left: 0; top: 0; z-index: 9999">

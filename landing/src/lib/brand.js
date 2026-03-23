@@ -7,22 +7,8 @@ export const brand = {
     "A programmable studio where notebooks, guided learning, and automation share one document model.",
   siteUrl: "https://eddmpython.github.io/codaro",
   repoUrl: "https://github.com/eddmpython/codaro",
-  get avatarUrl() { return `${base}/brand/avatar-full.png`; },
-  get avatarSmallUrl() { return `${base}/brand/avatar-small.png`; },
-  get avatarFaceUrl() { return `${base}/brand/avatar-face.png`; },
+  get mascotUrl() { return `${base}/brand/codaro-character.png`; },
   get faviconUrl() { return `${base}/favicon.png`; },
-  get poses() {
-    return {
-      hello: `${base}/brand/poses/hello.png`,
-      coding: `${base}/brand/poses/coding.png`,
-      working: `${base}/brand/poses/working.png`,
-      success: `${base}/brand/poses/success.png`,
-      thinking: `${base}/brand/poses/thinking.png`,
-      search: `${base}/brand/poses/search.png`,
-      building: `${base}/brand/poses/building.png`,
-      reading: `${base}/brand/poses/reading.png`,
-    };
-  },
   get resources() {
     return [
       {

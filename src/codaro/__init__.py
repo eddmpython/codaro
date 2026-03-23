@@ -15,6 +15,7 @@ from .appRuntime import (
     vstack,
 )
 from .cli import main
+from .customTool import tool
 
 __all__ = [
     "accordion",
@@ -30,6 +31,7 @@ __all__ = [
     "stat",
     "tabs",
     "text",
+    "tool",
     "ui",
     "vstack",
 ]

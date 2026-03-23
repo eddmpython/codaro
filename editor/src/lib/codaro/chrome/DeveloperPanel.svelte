@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { slide } from "svelte/transition";
+  import { onMount } from "svelte";
   import {
     CircleX,
     Database,
@@ -57,6 +59,13 @@
   let isOpen = $derived(getIsDeveloperPanelOpen());
   let selectedTab = $derived(getSelectedDeveloperTab());
   let panelSize = $derived(isOpen ? 25 : 0);
+  let reducedMotion = $state(false);
+
+  onMount(() => {
+    reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  });
+
+  const slideParams = { duration: 150, axis: "y" as const };
 
   function closePanel() {
     setIsDeveloperPanelOpen(false);
@@ -90,7 +99,11 @@
   data-panel-size={panelSize.toFixed(1)}
   style="flex: {panelSize} 1 0px; overflow: hidden;"
 >
-  <div class="flex flex-col h-full">
+{#if isOpen}
+<div
+  class="flex flex-col h-full"
+  transition:slide={reducedMotion ? { duration: 0 } : slideParams}
+>
     <div class="flex items-center justify-between border-b px-2 h-8 bg-background shrink-0">
       <div
         data-state="closed"
@@ -161,5 +174,6 @@
         <CachePanel />
       {/if}
     </div>
-  </div>
+</div>
+{/if}
 </div>
