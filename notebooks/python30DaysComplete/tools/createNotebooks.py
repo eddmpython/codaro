@@ -3028,154 +3028,154 @@ MILESTONE_DAYS = {
 
 CHECKPOINTS = {
     1: [
-        ("빈칸", 'answer == "Hello, Codaro"'),
-        ("버그 수정", 'greeting == "Hello"'),
-        ("전이", 'intro == "I run Python today."'),
+        ("값 바꾸기", 'answer == "Hello, Codaro"'),
+        ("오류 고쳐보기", 'greeting == "Hello"'),
+        ("비슷한 문제", 'intro == "I run Python today."'),
     ],
     2: [
-        ("빈칸", "totalPrice == 36000"),
-        ("버그 수정", "nextCount == 6"),
-        ("전이", "studyHours == 1.5"),
+        ("값 바꾸기", "totalPrice == 36000"),
+        ("오류 고쳐보기", "nextCount == 6"),
+        ("비슷한 문제", "studyHours == 1.5"),
     ],
     3: [
-        ("빈칸", "passed is True"),
-        ("버그 수정", "discountTarget is True"),
-        ("전이", "freeShipping is True"),
+        ("값 바꾸기", "passed is True"),
+        ("오류 고쳐보기", "discountTarget is True"),
+        ("비슷한 문제", "freeShipping is True"),
     ],
     4: [
-        ("빈칸", 'sentence == "Rin has 42 points."'),
-        ("버그 수정", 'message == "Rank: 1"'),
-        ("전이", 'status == "Noa has 3 missions left."'),
+        ("값 바꾸기", 'sentence == "Rin has 42 points."'),
+        ("오류 고쳐보기", 'message == "Rank: 1"'),
+        ("비슷한 문제", 'status == "Noa has 3 missions left."'),
     ],
     5: [
-        ("빈칸", 'extension == "csv"'),
-        ("버그 수정", 'word == "Python"'),
-        ("전이", '(year, month, day) == ("2026", "05", "17")'),
+        ("값 바꾸기", 'extension == "csv"'),
+        ("오류 고쳐보기", 'word == "Python"'),
+        ("비슷한 문제", '(year, month, day) == ("2026", "05", "17")'),
     ],
     6: [
-        ("빈칸", 'joinedTags == "python-colab-practice"'),
-        ("버그 수정", 'title == "Python mastery"'),
-        ("전이", 'slug == "python-practice-plan"'),
+        ("값 바꾸기", 'joinedTags == "python-colab-practice"'),
+        ("오류 고쳐보기", 'title == "Python mastery"'),
+        ("비슷한 문제", 'slug == "python-practice-plan"'),
     ],
     7: [
-        ("빈칸", 'todos == ["read", "review", "send"]'),
-        ("버그 수정", 'firstColor == "red"'),
-        ("전이", 'firstTopic == "strings" and lastTopic == "functions"'),
+        ("값 바꾸기", 'todos == ["read", "review", "send"]'),
+        ("오류 고쳐보기", 'firstColor == "red"'),
+        ("비슷한 문제", 'firstTopic == "strings" and lastTopic == "functions"'),
     ],
     8: [
-        ("빈칸", 'cart == ["coffee", "tea"]'),
-        ("버그 수정", "sortedLevels == [1, 2, 5]"),
-        ("전이", 'firstTask == "plan" and tasks == ["write", "test"]'),
+        ("값 바꾸기", 'cart == ["coffee", "tea"]'),
+        ("오류 고쳐보기", "sortedLevels == [1, 2, 5]"),
+        ("비슷한 문제", 'firstTask == "plan" and tasks == ["write", "test"]'),
     ],
     9: [
-        ("빈칸", 'userName == "Rin" and userLevel == 4'),
-        ("버그 수정", "size == (1920, 720)"),
-        ("전이", "total == 20"),
+        ("값 바꾸기", 'userName == "Rin" and userLevel == 4'),
+        ("오류 고쳐보기", "size == (1920, 720)"),
+        ("비슷한 문제", "total == 20"),
     ],
     10: [
-        ("빈칸", 'inactivePaid == {"a"}'),
-        ("버그 수정", '"python" in tags'),
-        ("전이", 'both == {"Bo"} and allPeople == {"Ari", "Bo", "Chen", "Dana"}'),
+        ("값 바꾸기", 'inactivePaid == {"a"}'),
+        ("오류 고쳐보기", '"python" in tags'),
+        ("비슷한 문제", 'both == {"Bo"} and allPeople == {"Ari", "Bo", "Chen", "Dana"}'),
     ],
     11: [
-        ("빈칸", 'book["pages"] == 320'),
-        ("버그 수정", "itemCost == 3000"),
-        ("전이", 'profile == {"name": "Mina", "level": 3, "active": True}'),
+        ("값 바꾸기", 'book["pages"] == 320'),
+        ("오류 고쳐보기", "itemCost == 3000"),
+        ("비슷한 문제", 'profile == {"name": "Mina", "level": 3, "active": True}'),
     ],
     12: [
-        ("빈칸", "penCount == 0"),
-        ("버그 수정", "hasPrice is True"),
-        ("전이", 'language == "ko" and settings["theme"] == "dark" and settings["fontSize"] == 16'),
+        ("값 바꾸기", "penCount == 0"),
+        ("오류 고쳐보기", "hasPrice is True"),
+        ("비슷한 문제", 'language == "ko" and settings["theme"] == "dark" and settings["fontSize"] == 16'),
     ],
     13: [
-        ("빈칸", 'label == "minor"'),
-        ("버그 수정", 'grade == "A"'),
-        ("전이", 'scoreLabel == "pass"'),
+        ("값 바꾸기", 'label == "minor"'),
+        ("오류 고쳐보기", 'grade == "A"'),
+        ("비슷한 문제", 'scoreLabel == "pass"'),
     ],
     14: [
-        ("빈칸", "evens == [2, 4, 6]"),
-        ("버그 수정", "items == [0, 1, 2]"),
-        ("전이", 'longWords == ["colab", "notebook"]'),
+        ("값 바꾸기", "evens == [2, 4, 6]"),
+        ("오류 고쳐보기", "items == [0, 1, 2]"),
+        ("비슷한 문제", 'longWords == ["colab", "notebook"]'),
     ],
     15: [
-        ("빈칸", "averageTwo(80, 100) == 90"),
-        ("버그 수정", "makeTotal(3000, 4) == 12000"),
-        ("전이", "orderTotal(4500, 3) == 13500"),
+        ("값 바꾸기", "averageTwo(80, 100) == 90"),
+        ("오류 고쳐보기", "makeTotal(3000, 4) == 12000"),
+        ("비슷한 문제", "orderTotal(4500, 3) == 13500"),
     ],
     16: [
-        ("빈칸", "sumAll(1, 2, 3, 4) == 10"),
-        ("버그 수정", 'second == ["write"]'),
-        ("전이", "basic == 13000 and express == 15000"),
+        ("값 바꾸기", "sumAll(1, 2, 3, 4) == 10"),
+        ("오류 고쳐보기", 'second == ["write"]'),
+        ("비슷한 문제", "basic == 13000 and express == 15000"),
     ],
     17: [
-        ("빈칸", "triple(10) == 30"),
-        ("버그 수정", "clicker() == 2"),
-        ("전이", 'result == "ERROR: missing file"'),
+        ("값 바꾸기", "triple(10) == 30"),
+        ("오류 고쳐보기", "clicker() == 2"),
+        ("비슷한 문제", 'result == "ERROR: missing file"'),
     ],
     18: [
-        ("빈칸", "root == 12"),
-        ("버그 수정", "1 <= number <= 10"),
-        ("전이", "1 <= dice <= 6"),
+        ("값 바꾸기", "root == 12"),
+        ("오류 고쳐보기", "1 <= number <= 10"),
+        ("비슷한 문제", "1 <= dice <= 6"),
     ],
     19: [
-        ("빈칸", 'dailyPath.read_text(encoding="utf-8") == "Day 19 complete"'),
-        ("버그 수정", 'content == "mode"'),
-        ("전이", "len(lines) == 2"),
+        ("값 바꾸기", 'dailyPath.read_text(encoding="utf-8") == "Day 19 complete"'),
+        ("오류 고쳐보기", 'content == "mode"'),
+        ("비슷한 문제", "len(lines) == 2"),
     ],
     20: [
-        ("빈칸", "count == 0"),
-        ("버그 수정", "age == 0"),
-        ("전이", "safeDivide(10, 0) is None and safeDivide(10, 2) == 5"),
+        ("값 바꾸기", "count == 0"),
+        ("오류 고쳐보기", "age == 0"),
+        ("비슷한 문제", "safeDivide(10, 0) is None and safeDivide(10, 2) == 5"),
     ],
     21: [
-        ("빈칸", "average == 90"),
-        ("버그 수정", 'invalidValues == ["bad"]'),
-        ("전이", 'doneTopics == ["Strings", "Loops"]'),
+        ("값 바꾸기", "average == 90"),
+        ("오류 고쳐보기", 'invalidValues == ["bad"]'),
+        ("비슷한 문제", 'doneTopics == ["Strings", "Loops"]'),
     ],
     22: [
-        ("빈칸", "book.isLong() is True"),
-        ("버그 수정", "counter.add() == 2"),
-        ("전이", 'habit.name == "practice" and habit.count == 1'),
+        ("값 바꾸기", "book.isLong() is True"),
+        ("오류 고쳐보기", "counter.add() == 2"),
+        ("비슷한 문제", 'habit.name == "practice" and habit.count == 1'),
     ],
     23: [
-        ("빈칸", 'user.name == "Mina" and user.canExport is True'),
-        ("버그 수정", 'admin.name == "Noa" or admin.name == "Jin"'),
-        ("전이", 'admin.role == "admin"'),
+        ("값 바꾸기", 'user.name == "Mina" and user.canExport is True'),
+        ("오류 고쳐보기", 'admin.name == "Noa" or admin.name == "Jin"'),
+        ("비슷한 문제", 'admin.role == "admin"'),
     ],
     24: [
-        ("빈칸", "Point(1, 2) == Point(1, 2)"),
-        ("버그 수정", "len(box) == 3"),
-        ("전이", "len(stack) == 3"),
+        ("값 바꾸기", "Point(1, 2) == Point(1, 2)"),
+        ("오류 고쳐보기", "len(box) == 3"),
+        ("비슷한 문제", "len(stack) == 3"),
     ],
     25: [
-        ("빈칸", "score.value == 90"),
-        ("버그 수정", "product.salePrice == 9000"),
-        ("전이", 'person.fullName == "Ada Lovelace"'),
+        ("값 바꾸기", "score.value == 90"),
+        ("오류 고쳐보기", "product.salePrice == 9000"),
+        ("비슷한 문제", 'person.fullName == "Ada Lovelace"'),
     ],
     26: [
-        ("빈칸", 'longWords == ["python", "colab"]'),
-        ("버그 수정", 'lengthMap == {"cat": 3, "python": 6}'),
-        ("전이", "evenSquares == [4, 16, 36]"),
+        ("값 바꾸기", 'longWords == ["python", "colab"]'),
+        ("오류 고쳐보기", 'lengthMap == {"cat": 3, "python": 6}'),
+        ("비슷한 문제", "evenSquares == [4, 16, 36]"),
     ],
     27: [
-        ("빈칸", "result == [0, 2, 4, 6] or result == ['colab', 'python']"),
-        ("버그 수정", "secondList == [0, 1, 2]"),
-        ("전이", 'result == ["colab", "python"]'),
+        ("값 바꾸기", "result == [0, 2, 4, 6] or result == ['colab', 'python']"),
+        ("오류 고쳐보기", "secondList == [0, 1, 2]"),
+        ("비슷한 문제", 'result == ["colab", "python"]'),
     ],
     28: [
-        ("빈칸", 'timerResult == "start practice"'),
-        ("버그 수정", 'state == "open"'),
-        ("전이", "inside is True and outside is False"),
+        ("값 바꾸기", 'timerResult == "start practice"'),
+        ("오류 고쳐보기", 'state == "open"'),
+        ("비슷한 문제", "inside is True and outside is False"),
     ],
     29: [
-        ("빈칸", 'result == "a"'),
-        ("버그 수정", "binarySearch([1, 3, 5], 5) == 2"),
-        ("전이", "hasPair([1, 2, 4, 7, 9], 11) is True"),
+        ("값 바꾸기", 'result == "a"'),
+        ("오류 고쳐보기", "binarySearch([1, 3, 5], 5) == 2"),
+        ("비슷한 문제", "hasPair([1, 2, 4, 7, 9], 11) is True"),
     ],
     30: [
-        ("빈칸", "record.isLongSession() is True"),
-        ("버그 수정", 'averageDoneMinutes([{"minutes": 30, "done": True}, {"minutes": 100, "done": False}, {"minutes": 50, "done": True}]) == 40'),
-        ("전이", "rate == 0.67"),
+        ("값 바꾸기", "record.isLongSession() is True"),
+        ("오류 고쳐보기", 'averageDoneMinutes([{"minutes": 30, "done": True}, {"minutes": 100, "done": False}, {"minutes": 50, "done": True}]) == 40'),
+        ("비슷한 문제", "rate == 0.67"),
     ],
 }
 
@@ -3235,7 +3235,7 @@ def molabUrl(relativePath: str) -> str:
 def makeReviewMarkdown(day: int) -> str:
     if day == 1:
         return """
-        ## 시작 전 회상
+        ## 시작 전 떠올리기
 
         오늘은 복습할 이전 Day가 없습니다. 대신 아래 세 가지를 기준점으로 잡습니다.
 
@@ -3250,7 +3250,7 @@ def makeReviewMarkdown(day: int) -> str:
         for reviewDay in reviewDays
     )
     return f"""
-    ## 시작 전 회상
+    ## 시작 전 떠올리기
 
     새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
 
@@ -3269,15 +3269,15 @@ def makeMilestoneMarkdown(day: int) -> str:
         이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
 
         - 예측 문제를 실행 전에 답했다.
-        - 빈칸 문제의 `assert`가 통과했다.
-        - 버그 수정 문제의 원인을 한 문장으로 설명했다.
-        - 전이 연습을 정답 없이 한 번 해결했다.
-        - 미니 프로젝트를 자기 데이터로 변형했다.
+        - 값 바꿔보기 셀의 확인 코드가 통과했다.
+        - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
+        - 비슷한 문제를 한 번 더 풀었다.
+        - 작은 만들기를 자기 데이터로 변형했다.
         """
     return f"""
     ## 마일스톤: {title}
 
-    오늘은 단순 진도일이 아니라 누적 점검일입니다. 새 셀을 끝낸 뒤, 이전 Day의 미니 프로젝트 중 하나를 골라 변수명과 데이터를 바꿔 다시 구현하세요.
+    오늘은 단순 진도일이 아니라 누적 점검일입니다. 새 셀을 끝낸 뒤, 이전 Day의 작은 만들기 중 하나를 골라 변수명과 데이터를 바꿔 다시 구현하세요.
 
     통과 기준은 더 엄격합니다.
 
@@ -3597,13 +3597,66 @@ passedCount = sum(1 for item in checkpointResults if item["passed"])
 """
 
 
+def makeBeginnerBugPrompt(dayInfo: dict[str, object]) -> str:
+    prompt = str(dayInfo["bugPrompt"])
+    prompt = prompt.replace("아래 코드는 ", "자주 하는 실수는 ")
+    prompt = prompt.replace("아래 코드는", "자주 하는 실수는")
+    prompt = prompt.replace("실패합니다.", "오류가 납니다.")
+    prompt = prompt.replace("실패합니다", "오류가 납니다")
+    return prompt
+
+
+def makeBeginnerExercisePrompt(prompt: object) -> str:
+    text = str(prompt)
+    text = text.replace("`...` 부분을 바꾸세요.", "아래 완성 코드를 먼저 실행해 확인하세요.")
+    text = text.replace("`...` 부분을 바꾸세요", "아래 완성 코드를 먼저 실행해 확인하세요")
+    text = text.replace("`...`", "값")
+    text = text.replace("...", "필요한 값")
+    text = text.replace("완성하세요.", "실행해 확인하세요.")
+    text = text.replace("완성하세요", "실행해 확인하세요")
+    return text
+
+
+BEGINNER_CONCEPT_NAMES = {
+    "문자열 리터럴": "따옴표로 감싼 글자",
+    "숫자 표현식": "숫자 계산",
+    "결과 관찰": "결과 보기",
+    "변수 대입": "값에 이름 붙이기",
+    "정수와 실수": "정수와 소수",
+    "문자열": "글자 데이터",
+    "불리언": "참/거짓 값",
+    "타입 확인": "값의 종류 확인",
+    "산술 연산": "숫자 계산",
+    "비교 연산": "값 비교하기",
+    "논리 연산": "조건 묶기",
+    "멤버십 연산": "안에 있는지 확인하기",
+    "문자열 연결": "글자 이어 붙이기",
+    "이스케이프": "특수 문자 쓰기",
+    "여러 줄 문자열": "여러 줄 글자",
+    "포함 여부": "글자가 들어 있는지 확인하기",
+    "0번 인덱스": "첫 번째 위치",
+    "음수 인덱스": "뒤에서 세는 위치",
+    "범위 슬라이싱": "일부분 잘라내기",
+    "간격 슬라이싱": "건너뛰며 잘라내기",
+    "끝 미포함 규칙": "끝 번호는 포함하지 않는 규칙",
+}
+
+
+def beginnerConcept(concept: object) -> str:
+    return BEGINNER_CONCEPT_NAMES.get(str(concept), str(concept))
+
+
+def beginnerConceptList(concepts: object) -> list[str]:
+    return [beginnerConcept(concept) for concept in concepts]
+
+
 def makeErrorJournalMarkdown() -> str:
     return """
-    ## 오답 노트
+    ## 틀린 이유 적기
 
-    버그 수정 셀을 고친 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 공개용 학습 과정에서 중요한 것은 정답 코드가 아니라, 같은 실수를 다시 하지 않게 만드는 규칙입니다.
+    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
 
-    - 에러 이름:
+    - 오류 이름:
     - 실제 원인:
     - 다음에 확인할 규칙:
     """
@@ -3611,9 +3664,9 @@ def makeErrorJournalMarkdown() -> str:
 
 def makeTraceMarkdown(dayInfo: dict[str, object]) -> str:
     return f"""
-    ## 실행 추적
+    ## 코드가 실행되는 순서
 
-    오늘 핵심 개념은 `{dayInfo["title"]}`입니다. 예제 셀을 실행하기 전에 아래 순서로 머릿속 실행을 해봅니다.
+    오늘 핵심 내용은 `{dayInfo["title"]}`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
 
     | 단계 | 볼 것 | 적을 내용 |
     |---:|---|---|
@@ -3621,7 +3674,7 @@ def makeTraceMarkdown(dayInfo: dict[str, object]) -> str:
     | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
     | 3 | 결과 | 마지막 줄이 보여줄 값 |
 
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 한 줄씩 상태를 바꾼다는 감각을 만드는 것이 목표입니다.
+    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
     """
 
 
@@ -3667,9 +3720,9 @@ def makeLineByLineMarkdown(dayInfo: dict[str, object]) -> str:
         rows.append(f"| {number} | `{displayLine}` | {explainLine(line)} |")
     joinedRows = "\n".join(rows)
     return f"""
-    ## 라인별 해설
+    ## 한 줄씩 보기
 
-    예제 코드를 실행하기 전에 한 줄씩 의미를 분해합니다. 뛰어난 학습자는 코드를 통째로 외우지 않고, 각 줄이 상태를 어떻게 바꾸는지 말할 수 있습니다.
+    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
 
     | 줄 | 코드 | 역할 |
     |---:|---|---|
@@ -3678,27 +3731,27 @@ def makeLineByLineMarkdown(dayInfo: dict[str, object]) -> str:
 
 
 def makeDiagnosticMarkdown(dayInfo: dict[str, object]) -> str:
-    concepts = list(dayInfo["concepts"])
+    concepts = beginnerConceptList(dayInfo["concepts"])
     primary = concepts[0]
     secondary = concepts[min(1, len(concepts) - 1)]
     return f"""
-    ## 0. 진단 질문
+    ## 0. 준비 질문
 
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 진단입니다. 답이 흐릿하면 해당 부분을 천천히 실행 추적하세요.
+    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
 
     1. `{primary}`를 한 문장으로 설명할 수 있는가?
     2. `{secondary}`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 미니 프로젝트에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
     """
 
 
 def makeConceptBoundaryMarkdown(dayInfo: dict[str, object]) -> str:
-    concepts = ", ".join(f"`{concept}`" for concept in dayInfo["concepts"])
+    concepts = ", ".join(f"`{concept}`" for concept in beginnerConceptList(dayInfo["concepts"]))
     mistakes = "\n".join(f"- {mistake}" for mistake in dayInfo["commonMistakes"])
     return f"""
-    ## 개념 경계
+    ## 오늘 배울 범위
 
-    오늘의 핵심 범위는 {concepts}입니다. 범위를 좁게 잡는 이유는 하나의 노트북에서 너무 많은 문법을 섞으면 실패 원인을 찾기 어려워지기 때문입니다.
+    오늘은 {concepts}만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
 
     **오늘 집중할 것**
 
@@ -3713,27 +3766,27 @@ def makeConceptBoundaryMarkdown(dayInfo: dict[str, object]) -> str:
 
 
 def makePracticeBankMarkdown(dayInfo: dict[str, object], transferPractice: dict[str, str]) -> str:
-    concepts = list(dayInfo["concepts"])
+    concepts = beginnerConceptList(dayInfo["concepts"])
     conceptText = ", ".join(concepts[:3])
     return f"""
-    ## 추가 문제은행
+    ## 더 연습하기
 
-    자동 체크포인트까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답 셀은 제공하지 않습니다. 공개용 과정에서는 정답보다 변형 능력이 더 중요합니다.
+    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
 
     1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **변형**: 전이 연습 `{transferPractice["prompt"]}`에서 숫자나 문자열을 하나 바꾸고 `assert`도 함께 고칩니다.
+    2. **값 바꾸기**: 비슷한 문제 `{makeBeginnerExercisePrompt(transferPractice["prompt"])}`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
     3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
     4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
     5. **설명하기**: {conceptText} 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 누적 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
     """
 
 
 def makeLabRubricMarkdown(dayInfo: dict[str, object]) -> str:
     return f"""
-    ## 실전 랩 기준
+    ## 작은 만들기 기준
 
-    미니 프로젝트는 단순 실행 예제가 아니라 오늘의 실전 랩입니다.
+    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
 
     **랩 목표**: {dayInfo["projectPrompt"]}
 
@@ -3741,7 +3794,7 @@ def makeLabRubricMarkdown(dayInfo: dict[str, object]) -> str:
 
     - 변수명만 읽어도 데이터 의미가 드러난다.
     - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 체크포인트로 핵심 결과를 검증한다.
+    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
     - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
     - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
     """
@@ -3749,12 +3802,12 @@ def makeLabRubricMarkdown(dayInfo: dict[str, object]) -> str:
 
 def makeExitTicketMarkdown(dayInfo: dict[str, object]) -> str:
     return f"""
-    ## 종료 티켓
+    ## 마지막 한 줄 정리
 
     다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
 
     - 오늘 내가 배운 핵심은 `{dayInfo["title"]}`이고, 한 문장으로 말하면:
-    - 내가 고친 버그의 원인은:
+    - 내가 고친 오류의 원인은:
     - 내일 다시 보면 가장 먼저 확인할 코드는:
     """
 
@@ -3924,7 +3977,7 @@ def makeReviewNotebook(startDay: int, endDay: int) -> dict[str, object]:
 def makeNotebook(dayInfo: dict[str, object]) -> dict[str, object]:
     day = int(dayInfo["day"])
     title = str(dayInfo["title"])
-    concepts = "\n".join(f"- {concept}" for concept in dayInfo["concepts"])
+    concepts = "\n".join(f"- {concept}" for concept in beginnerConceptList(dayInfo["concepts"]))
     mistakes = "\n".join(f"- {mistake}" for mistake in dayInfo["commonMistakes"])
     transferPractice = TRANSFER_PRACTICE[day]
     cells = [
@@ -3936,19 +3989,19 @@ def makeNotebook(dayInfo: dict[str, object]) -> dict[str, object]:
 
             **완성 기준**: {dayInfo["outcome"]}
 
-            이 노트북에는 일부러 비워두거나 실패하게 만든 셀이 있습니다. 설명을 읽고 코드를 고친 뒤 다시 실행하는 방식으로 학습하세요.
+            이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
             """
         ),
         makeMarkdownCell(
             f"""
             ## 학습 흐름
 
-            1. 진단 질문과 시작 전 회상으로 오늘의 위치를 확인합니다.
-            2. 개념 경계, 실행 추적, 라인별 해설로 코드가 움직이는 방식을 봅니다.
+            1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
+            2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
             3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-            4. 빈칸 문제와 버그 수정 문제를 직접 고칩니다.
-            5. 전이 연습과 자동 체크포인트로 실제 이해를 검증합니다.
-            6. 미니 프로젝트, 누적 프로젝트, 추가 문제은행으로 자기 코드까지 확장합니다.
+            4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
+            5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
+            6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
 
             ## 오늘 다룰 개념
 
@@ -3980,7 +4033,7 @@ def makeNotebook(dayInfo: dict[str, object]) -> dict[str, object]:
         makeCodeCell(str(dayInfo["exampleCode"])),
         makeMarkdownCell(
             f"""
-            ## 2. 예측 → 검증
+            ## 2. 먼저 예상하고 실행하기
 
             {dayInfo["predictPrompt"]}
 
@@ -4002,18 +4055,18 @@ def makeNotebook(dayInfo: dict[str, object]) -> dict[str, object]:
         ),
         makeMarkdownCell(
             f"""
-            ## 3. 빈칸 채우기
+            ## 3. 값 바꿔보기
 
-            {dayInfo["exercisePrompt"]}
+            {makeBeginnerExercisePrompt(dayInfo["exercisePrompt"])}
 
-            `...` 또는 불완전한 부분을 고친 뒤 셀을 실행하세요. `assert`가 조용히 지나가면 통과입니다.
+            아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
             """
         ),
-        makeCodeCell(str(dayInfo["exerciseCode"])),
+        makeCodeCell(str(dayInfo["solutionCode"])),
         makeMarkdownCell(
             f"""
             <details>
-            <summary>힌트와 정답</summary>
+            <summary>힌트와 설명</summary>
 
             1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
             2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
@@ -4028,14 +4081,14 @@ def makeNotebook(dayInfo: dict[str, object]) -> dict[str, object]:
         ),
         makeMarkdownCell(
             f"""
-            ## 4. 버그 수정
+            ## 4. 오류 고쳐보기
 
-            {dayInfo["bugPrompt"]}
+            {makeBeginnerBugPrompt(dayInfo)}
 
-            실패하는 코드를 그냥 지우지 말고, 왜 실패하는지 한 문장으로 설명한 뒤 고치세요.
+            아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
             """
         ),
-        makeCodeCell(str(dayInfo["bugCode"])),
+        makeCodeCell(str(dayInfo["bugFixCode"])),
         makeMarkdownCell(
             f"""
             <details>
@@ -4051,18 +4104,18 @@ def makeNotebook(dayInfo: dict[str, object]) -> dict[str, object]:
         makeMarkdownCell(makeErrorJournalMarkdown()),
         makeMarkdownCell(
             f"""
-            ## 5. 전이 연습
+            ## 5. 비슷한 문제 풀기
 
-            {transferPractice["prompt"]}
+            {makeBeginnerExercisePrompt(transferPractice["prompt"])}
 
-            같은 개념을 다른 데이터와 다른 변수명으로 다시 쓰는 단계입니다. 여기서 막히면 핵심 예제로 돌아가서 코드 모양만 다시 보고 옵니다.
+            같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
             """
         ),
-        makeCodeCell(str(transferPractice["code"])),
+        makeCodeCell(str(transferPractice["solution"])),
         makeMarkdownCell(
             f"""
             <details>
-            <summary>전이 연습 3단계 힌트와 정답</summary>
+            <summary>비슷한 문제 3단계 힌트</summary>
 
             1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
             2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
@@ -4077,16 +4130,16 @@ def makeNotebook(dayInfo: dict[str, object]) -> dict[str, object]:
         ),
         makeMarkdownCell(
             """
-            ## 자동 체크포인트
+            ## 자동 확인
 
-            빈칸, 버그 수정, 전이 연습을 모두 고친 뒤 실행합니다. 실패 항목이 있으면 해당 셀로 돌아가 고친 다음 이 셀을 다시 실행하세요.
+            값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
             """
         ),
         makeCodeCell(makeAutoCheckpointCode(day)),
         makeMarkdownCell(makeLabRubricMarkdown(dayInfo)),
         makeMarkdownCell(
             f"""
-            ## 6. 미니 프로젝트
+            ## 6. 작은 만들기
 
             {dayInfo["projectPrompt"]}
 
@@ -4096,7 +4149,7 @@ def makeNotebook(dayInfo: dict[str, object]) -> dict[str, object]:
         makeCodeCell(str(dayInfo["projectCode"])),
         makeMarkdownCell(
             f"""
-            ## 7. 30일 누적 프로젝트
+            ## 7. 30일 프로젝트
 
             매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
             """
@@ -4104,7 +4157,7 @@ def makeNotebook(dayInfo: dict[str, object]) -> dict[str, object]:
         makeCodeCell(makeCumulativeProjectCode(day)),
         makeMarkdownCell(
             """
-            ## 8. 자동 자기점검
+            ## 8. 마무리 체크
 
             아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
             """
@@ -4127,14 +4180,14 @@ def makeNotebook(dayInfo: dict[str, object]) -> dict[str, object]:
         makeMarkdownCell(makeExitTicketMarkdown(dayInfo)),
         makeMarkdownCell(
             """
-            ## 공개용 완성 기준
+            ## 오늘 완료 기준
 
             이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
 
-            - 예측, 구현, 디버깅, 전이, 프로젝트 변형이 모두 남아 있다.
-            - 자동 체크포인트가 통과한 상태의 노트북을 저장했다.
-            - 오답 노트에 최소 1개의 실제 실수가 기록되어 있다.
-            - 누적 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+            - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
+            - 자동 확인이 통과한 상태의 노트북을 저장했다.
+            - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
+            - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
             """
         ),
     ]
@@ -4262,7 +4315,7 @@ def writeManifest() -> None:
     manifest = {
         "title": "Python 30일 완성",
         "version": "4.0",
-        "description": "Colab에서 진단, 실행 추적, 예측, 디버깅, 자동 체크포인트, 리뷰 시험, 누적 프로젝트로 배우는 순수 파이썬 30일 과정",
+        "description": "Colab에서 준비 질문, 코드가 실행되는 순서, 예측, 오류 고치기, 자동 확인, 리뷰 시험, 30일 프로젝트로 배우는 순수 파이썬 30일 과정",
         "folderRule": "Repository path uses camelCase: notebooks/python30DaysComplete",
         "days": [
             {
@@ -4340,7 +4393,7 @@ def writeReadme() -> None:
 
     Codaro는 장기적으로 교육용 지능형 GUI 프로그램으로 진화하는 중입니다. 다만 그 GUI와 에이전트 기능이 완성되기 전에도 학습자가 바로 사용할 수 있어야 하므로, 먼저 ai 없이도 동작하는 커리큘럼 노트북을 Colab과 marimo 두 형식으로 배포합니다.
 
-    현재 버전은 v4입니다. 단순한 문법 목록이 아니라 진단, 개념 경계, 라인별 해설, 회상, 실행 추적, 예측, 빈칸, 버그 수정, 오답노트, 전이 연습, 자동 체크포인트, 실전 랩, 추가 문제은행, 누적 프로젝트, 5일 단위 리뷰 시험이 함께 들어간 공개용 워크북입니다.
+    현재 버전은 v4입니다. 단순한 문법 목록이 아니라 준비 질문, 오늘 배울 범위, 한 줄씩 보기, 떠올리기, 코드가 실행되는 순서, 예측, 값 바꾸기, 오류 고쳐보기, 틀린 이유 적기, 비슷한 문제 풀기, 자동 확인, 작은 만들기, 추가 문제은행, 30일 프로젝트, 5일 단위 리뷰 시험이 함께 들어간 공개용 워크북입니다.
 
     ## 바로가기
 
@@ -4355,21 +4408,21 @@ def writeReadme() -> None:
 
     - 순수 파이썬 문법을 30일 동안 단계적으로 학습합니다.
     - 같은 커리큘럼을 `colab/`의 `.ipynb`와 `marimo/`의 네이티브 marimo 앱 `.py`로 함께 제공합니다.
-    - 각 Day는 설명, 실행 예제, 예측 문제, 빈칸 채우기, 버그 수정, 오답노트, 전이 연습, 자동 체크포인트, 미니 프로젝트, 누적 프로젝트, 추가 문제은행으로 구성됩니다.
+    - 각 Day는 설명, 실행 예제, 예측 문제, 값 바꿔보기, 오류 고쳐보기, 틀린 이유 적기, 비슷한 문제 풀기, 자동 확인, 작은 만들기, 30일 프로젝트, 추가 문제은행으로 구성됩니다.
     - 5일마다 리뷰 노트북이 있어 누적 개념을 한 번에 회수합니다.
     - Colab에서 노트북 하나를 열고 위에서 아래로 실행하면서 학습할 수 있습니다.
-    - 일부 셀은 의도적으로 실패합니다. 실패를 읽고 고치는 과정이 학습의 일부입니다.
+    - 배포된 기본 셀은 위에서 아래로 실행됩니다. 연습할 때는 값을 직접 바꿔 보며 결과를 확인합니다.
 
     ## 추천 학습 방식
 
     1. 하루에 노트북 하나만 끝냅니다.
     2. 예측 문제는 실행 전에 반드시 결과를 먼저 적습니다.
-    3. 빈칸 문제는 정답을 열기 전에 두 번 이상 직접 고칩니다.
-    4. 버그 수정 문제는 에러 메시지를 먼저 읽고 한 문장으로 원인을 적습니다.
-    5. 전이 연습은 정답을 열기 전에 최소 한 번 직접 해결합니다.
-    6. 자동 체크포인트에서 모든 항목이 통과해야 합니다.
-    7. 미니 프로젝트는 변수명과 데이터를 바꿔 자기 예제로 한 번 더 실행합니다.
-    8. 자동 자기점검 셀의 모든 항목이 `True`가 되어야 다음 Day로 넘어갑니다.
+    3. 값 바꿔보기 셀은 먼저 실행하고, 그다음 값 하나를 바꿔 다시 실행합니다.
+    4. 오류 고쳐보기 셀은 어떤 부분이 고쳐졌는지 한 문장으로 적습니다.
+    5. 비슷한 문제 풀기 셀은 값과 변수명을 바꿔 한 번 더 실행합니다.
+    6. 자동 확인에서 모든 항목이 통과해야 합니다.
+    7. 작은 만들기는 변수명과 데이터를 바꿔 자기 예제로 한 번 더 실행합니다.
+    8. 마무리 체크 셀의 모든 항목이 `True`가 되어야 다음 Day로 넘어갑니다.
 
     ## 파일 구성
 
@@ -4399,7 +4452,7 @@ def writeReadme() -> None:
 def writeCourseGuide() -> None:
     daySections = []
     for dayInfo in DAY_CONTENT:
-        concepts = ", ".join(dayInfo["concepts"])
+        concepts = ", ".join(beginnerConceptList(dayInfo["concepts"]))
         daySections.append(
             f"""
             ## Day {int(dayInfo['day']):02d}. {dayInfo['title']}
@@ -4414,7 +4467,7 @@ def writeCourseGuide() -> None:
             """
         )
     milestoneRows = "\n".join(
-        f"| Day {day:02d} | {title} | 이전 개념 3개 이상을 함께 써서 미니 프로젝트를 다시 구현한다. |"
+        f"| Day {day:02d} | {title} | 이전 개념 3개 이상을 함께 써서 작은 만들기를 다시 구현한다. |"
         for day, title in MILESTONE_DAYS.items()
     )
     reviewRows = "\n".join(
@@ -4436,12 +4489,12 @@ def writeCourseGuide() -> None:
 
     1. 오늘의 초점과 완성 기준을 확인한다.
     2. 왜 배우는지, 어떤 생각 모델로 접근할지 읽는다.
-    3. 진단 질문과 시작 전 회상으로 이전 기억을 꺼낸다.
-    4. 실행 추적과 라인별 해설로 코드의 상태 변화를 본다.
+    3. 준비 질문과 시작 전 떠올리기으로 이전 기억을 꺼낸다.
+    4. 코드가 실행되는 순서와 한 줄씩 보기로 코드의 상태 변화를 본다.
     5. 예측 문제를 먼저 풀고 실행으로 검증한다.
-    6. 빈칸 채우기, 버그 수정, 오답 노트를 통해 실패를 고친다.
-    7. 전이 연습과 자동 체크포인트로 실제 이해를 확인한다.
-    8. 미니 프로젝트, 누적 프로젝트, 추가 문제은행으로 자기 예제로 확장한다.
+    6. 값 바꿔보기, 오류 고쳐보기, 틀린 이유 적기로 실수를 줄인다.
+    7. 비슷한 문제 풀기와 자동 확인으로 실제 이해를 확인한다.
+    8. 작은 만들기, 30일 프로젝트, 추가 문제은행으로 자기 예제로 확장한다.
 
     ## 방법론
 
@@ -4449,7 +4502,7 @@ def writeCourseGuide() -> None:
     - 실행 전 예측: 결과를 먼저 적은 뒤 실행한다.
     - 작은 입력 검증: 새 문법은 작은 데이터로 먼저 검증한다.
     - 오류 읽기: 에러 이름, 줄 위치, 원인을 분리해서 기록한다.
-    - 전이 사다리: 예제와 다른 데이터, 다른 변수명, 다른 맥락으로 다시 푼다.
+    - 비슷한 문제 사다리: 예제와 다른 데이터, 다른 변수명, 다른 맥락으로 다시 푼다.
     - 5일 회수: 5일마다 리뷰 노트북으로 단기 기억을 다시 꺼낸다.
 
     ## 파일 형식 기준
@@ -4457,18 +4510,18 @@ def writeCourseGuide() -> None:
     - `colab/` 노트북은 순차 실행 상태를 그대로 사용하는 `.ipynb` 워크북입니다.
     - `marimo/` 노트북은 `import marimo`, `app = marimo.App(...)`, `@app.cell` 구조의 네이티브 `.py` 앱입니다.
     - marimo 코드 셀은 중복 변수 오류를 피하면서 Colab식 순차 실습 흐름을 유지하기 위해 공유 학습 상태에서 실행됩니다.
-    - 일부 셀은 의도적으로 실패합니다. 실패 셀은 삭제하지 않고 원인을 설명한 뒤 고치는 것이 학습 목표입니다.
+    - 배포된 기본 셀은 전체 실행이 가능해야 합니다. 학습자는 실행 후 값을 바꾸며 결과를 비교합니다.
 
     ## 품질 루브릭
 
     Day별 통과 기준은 아래 6개입니다.
 
     - 예측: 실행 전에 결과를 먼저 썼다.
-    - 구현: 빈칸 문제의 `assert`가 통과했다.
-    - 디버깅: 버그 수정 문제의 에러 이름과 원인을 설명했다.
-    - 전이: 같은 개념을 다른 맥락의 전이 연습에서 다시 사용했다.
-    - 검증: 자동 체크포인트의 모든 항목이 통과했다.
-    - 변형: 미니 프로젝트 또는 누적 프로젝트를 자기 데이터로 바꿨다.
+    - 구현: 값 바꿔보기의 `assert`가 통과했다.
+    - 오류 고치기: 오류 고쳐보기 문제의 에러 이름과 원인을 설명했다.
+    - 비슷한 문제: 같은 개념을 다른 맥락의 비슷한 문제 풀기에서 다시 사용했다.
+    - 검증: 자동 확인의 모든 항목이 통과했다.
+    - 변형: 작은 만들기 또는 30일 프로젝트를 자기 데이터로 바꿨다.
 
     ## 마일스톤
 
@@ -4486,7 +4539,7 @@ def writeCourseGuide() -> None:
 
     - 하루에 노트북 하나만 끝내는 것을 기본 속도로 둔다.
     - 처음 틀린 답에는 바로 정답을 보지 않고 어떤 값과 타입을 기대했는지 먼저 적는다.
-    - 체크포인트 실패는 되돌아갈 위치를 알려주는 신호로 본다.
+    - 확인 실패는 되돌아갈 위치를 알려주는 신호로 본다.
     - 마일스톤 Day에는 새 진도보다 이전 개념을 연결하는지 확인한다.
     - 리뷰 노트북은 반드시 새 데이터로 다시 풀어야 한다.
 
@@ -4539,7 +4592,7 @@ def writeCurriculumMap() -> None:
             - 초점: {dayInfo['focus']}
             - 완성 기준: {dayInfo['outcome']}
             - 핵심 개념: {concepts}
-            - 미니 프로젝트: {dayInfo['projectPrompt']}
+            - 작은 만들기: {dayInfo['projectPrompt']}
             - 변형 과제: {dayInfo['challenge']}
             """
         )
@@ -4572,53 +4625,53 @@ def writeLearningDesign() -> None:
 
     ## 노트북 구조
 
-    각 Day는 같은 리듬을 가지되, v4에서는 공개 강의용 워크북으로 쓰일 수 있도록 진단, 개념 경계, 라인별 해설, 추가 문제은행, 실전 랩 기준까지 포함합니다.
+    각 Day는 같은 리듬을 가지되, v4에서는 공개 강의용 워크북으로 쓰일 수 있도록 준비 질문, 오늘 배울 범위, 한 줄씩 보기, 추가 문제은행, 작은 만들기 기준까지 포함합니다.
 
     1. 오늘의 초점과 완성 기준
     2. 왜 배우는가, 생각 모델, 자주 하는 실수
-    3. 진단 질문
-    4. 시작 전 회상
+    3. 준비 질문
+    4. 시작 전 떠올리기
     5. 오늘의 통과 기준 또는 마일스톤 기준
-    6. 개념 경계
-    7. 실행 추적과 라인별 해설
+    6. 오늘 배울 범위
+    7. 코드가 실행되는 순서와 한 줄씩 보기
     8. 핵심 예제
     9. 예측 후 실행
-    10. 빈칸 채우기
-    11. 버그 수정과 오답 노트
-    12. 전이 연습
-    13. 자동 체크포인트
-    14. 실전 랩과 30일 누적 프로젝트
-    15. 추가 문제은행, 자동 자기점검, 종료 티켓
+    10. 값 바꿔보기
+    11. 오류 고쳐보기와 틀린 이유 적기
+    12. 비슷한 문제 풀기
+    13. 자동 확인
+    14. 작은 만들기와 30일 프로젝트
+    15. 추가 문제은행, 마무리 체크, 마지막 한 줄 정리
 
     ## 설계 원칙
 
     - 한 셀에는 한 가지 생각만 담습니다.
     - 실행 전에 먼저 예측하게 합니다.
-    - 완전히 빈 화면에서 시작하지 않고, 거의 완성된 코드의 빈칸을 채우게 합니다.
+    - 완전히 빈 화면에서 시작하지 않고, 바로 실행되는 코드를 조금씩 바꿔 보게 합니다.
     - 오류 메시지를 학습 자료로 사용합니다.
-    - 매일 작은 산출물을 만들고, 누적 프로젝트에서 그 산출물의 일부 패턴을 재사용합니다.
+    - 매일 작은 산출물을 만들고, 30일 프로젝트에서 그 산출물의 일부 패턴을 재사용합니다.
     - 설명은 충분히 구체적으로 쓰되, 실행 셀을 바로 따라가게 배치합니다.
     - Day 5, 10, 15, 20, 25, 30은 마일스톤으로 보고 이전 내용을 함께 점검합니다.
     - 새 개념이 이전 개념과 섞일 때는 반드시 작은 데이터로 먼저 검증합니다.
-    - 자동 체크포인트는 학습자의 현재 노트북 상태를 검사합니다. 실패가 나오면 정답을 보는 대신 실패 셀로 돌아갑니다.
+    - 자동 확인은 학습자의 현재 노트북 상태를 검사합니다. 실패가 나오면 정답을 보는 대신 해당 셀로 돌아갑니다.
     - 5일 단위 리뷰 노트북은 단기 기억을 장기 기억으로 넘기는 회수 장치입니다.
 
     ## 평가 기준
 
     - 예측 문제를 실행 전 스스로 답했는가?
-    - 빈칸 문제의 `assert`가 통과했는가?
-    - 버그 수정 문제에서 원인을 말로 설명할 수 있는가?
-    - 전이 연습을 정답 없이 해결했는가?
-    - 자동 체크포인트가 전부 통과했는가?
-    - 미니 프로젝트를 자기 데이터로 한 번 변형했는가?
+    - 값 바꿔보기의 `assert`가 통과했는가?
+    - 오류 고쳐보기 문제에서 원인을 말로 설명할 수 있는가?
+    - 비슷한 문제 풀기를 정답 없이 해결했는가?
+    - 자동 확인이 전부 통과했는가?
+    - 작은 만들기를 자기 데이터로 한 번 변형했는가?
     - 추가 문제은행에서 최소 2개 문제를 새 셀에 풀었는가?
-    - 누적 프로젝트 셀을 실행하고 오늘 문법이 어디에 추가되었는지 설명할 수 있는가?
+    - 30일 프로젝트 셀을 실행하고 오늘 문법이 어디에 추가되었는지 설명할 수 있는가?
     - 5일 단위 리뷰 노트북의 시험형 과제를 통과했는가?
     - Day 30에서 JSON 파일 저장까지 포함한 최종 리포트를 완성했는가?
 
     ## 실행 환경 메모
 
-    `colab/`의 `.ipynb`는 Colab에 업로드하거나 GitHub에서 열어 실행할 수 있습니다. `marimo/`의 `.py`는 네이티브 marimo 앱 형식이므로 marimo에서 열어 같은 흐름으로 학습할 수 있습니다. 일부 셀은 의도적으로 실패하므로, 전체 실행보다 섹션별 실행을 권장합니다.
+    `colab/`의 `.ipynb`는 Colab에서 바로 열어 실행할 수 있습니다. `marimo/`의 `.py`는 네이티브 marimo 앱 형식이므로 molab 또는 로컬 marimo에서 같은 흐름으로 학습할 수 있습니다. 기본 배포본은 전체 실행이 가능해야 합니다.
     """
     (ROOT / "learningDesign.md").write_text(cleanMarkdown(content) + "\n", encoding="utf-8")
 
@@ -4633,27 +4686,27 @@ def writeMethodology() -> None:
 
     Recall, Run, Repair의 반복입니다.
 
-    - Recall: 시작 전 회상과 진단 질문으로 이전 기억을 먼저 꺼냅니다.
+    - Recall: 시작 전 떠올리기와 준비 질문으로 이전 기억을 먼저 꺼냅니다.
     - Run: 예측을 적고 코드를 실행합니다.
-    - Repair: 예상과 다르면 버그 수정 셀과 오답 노트로 원인을 고칩니다.
+    - Repair: 예상과 다르면 오류 고쳐보기 셀과 틀린 이유 적기로 원인을 고칩니다.
 
-    ## 2. 실행 추적 표
+    ## 2. 코드가 실행되는 순서 표
 
-    코드를 보기만 하지 않고 입력값, 변환, 결과를 분리합니다. 초보자는 문법보다 “어느 줄에서 값이 바뀌는지”를 놓치기 때문에, 모든 Day에 실행 추적과 라인별 해설을 넣었습니다.
+    코드를 보기만 하지 않고 입력값, 변환, 결과를 분리합니다. 초보자는 문법보다 “어느 줄에서 값이 바뀌는지”를 놓치기 때문에, 모든 Day에 코드가 실행되는 순서와 한 줄씩 보기를 넣었습니다.
 
-    ## 3. 전이 사다리
+    ## 3. 비슷한 문제 사다리
 
-    예제와 같은 문제를 푸는 것은 이해가 아닙니다. 그래서 각 Day는 빈칸 문제 다음에 다른 데이터, 다른 변수명, 다른 맥락의 전이 연습을 둡니다.
+    예제와 같은 문제를 푸는 것은 이해가 아닙니다. 그래서 각 Day는 값 바꿔보기 다음에 다른 데이터, 다른 변수명, 다른 맥락의 비슷한 문제 풀기를 둡니다.
 
-    ## 4. 체크포인트 계약
+    ## 4. 확인 계약
 
-    자동 체크포인트는 학습자가 고친 코드가 실제로 맞는지 확인합니다. 실패가 나오면 다음 설명으로 넘어가는 대신, 해당 셀로 돌아가 다시 고칩니다.
+    자동 확인은 학습자가 고친 코드가 실제로 맞는지 확인합니다. 실패가 나오면 다음 설명으로 넘어가는 대신, 해당 셀로 돌아가 다시 고칩니다.
 
     ## 5. 5일 회수
 
     Day 5, 10, 15, 20, 25, 30마다 리뷰 노트북을 둡니다. 이 리뷰는 새 진도가 아니라 단기 기억을 꺼내 다시 조합하는 시험형 과제입니다.
 
-    ## 6. 누적 프로젝트 척추
+    ## 6. 30일 프로젝트 척추
 
     매일의 작은 프로젝트가 Day 30의 학습 리포트로 이어집니다. 문법을 따로따로 외우지 않고, 하나의 프로그램을 키워가며 배운 내용을 연결합니다.
     """
@@ -4671,18 +4724,18 @@ def writeQualityRubric() -> None:
     각 Day는 아래 6개 항목을 모두 만족해야 완료입니다.
 
     - 예측: 실행 전에 결과를 먼저 썼다.
-    - 구현: 빈칸 문제의 `assert`가 통과했다.
-    - 디버깅: 버그 수정 문제의 에러 이름과 원인을 설명했다.
-    - 전이: 같은 개념을 다른 맥락의 전이 연습에서 다시 사용했다.
-    - 자동 검증: 자동 체크포인트의 모든 항목이 통과했다.
-    - 변형: 미니 프로젝트 또는 누적 프로젝트를 자기 데이터로 바꿨다.
+    - 구현: 값 바꿔보기의 `assert`가 통과했다.
+    - 오류 고치기: 오류 고쳐보기 문제의 에러 이름과 원인을 설명했다.
+    - 비슷한 문제: 같은 개념을 다른 맥락의 비슷한 문제 풀기에서 다시 사용했다.
+    - 자동 검증: 자동 확인의 모든 항목이 통과했다.
+    - 변형: 작은 만들기 또는 30일 프로젝트를 자기 데이터로 바꿨다.
 
     ## 마일스톤 기준
 
     Day 05, 10, 15, 20, 25, 30은 누적 점검일입니다. 이 날은 해당 Day만 끝내는 것으로 충분하지 않습니다.
 
     - 최소 3개 이전 Day 개념을 함께 사용해야 합니다.
-    - 이전 미니 프로젝트 하나를 다시 구현해야 합니다.
+    - 이전 작은 만들기 하나를 다시 구현해야 합니다.
     - 실수 하나를 골라 “왜 틀렸고 어떻게 고쳤는지” 적어야 합니다.
     - 다음 마일스톤 전까지 보강할 약점을 하나 정해야 합니다.
 
@@ -4711,18 +4764,18 @@ def writeTeacherGuide() -> None:
 
     ## 1일 권장 진행
 
-    - 5분: 진단 질문과 시작 전 회상
-    - 10분: 개념 경계, 라인별 해설, 핵심 예제
-    - 10분: 예측 문제와 빈칸 문제
-    - 10분: 버그 수정과 오답 노트
-    - 10분: 전이 연습과 자동 체크포인트
-    - 15분: 실전 랩, 누적 프로젝트, 추가 문제은행
+    - 5분: 준비 질문과 시작 전 떠올리기
+    - 10분: 오늘 배울 범위, 한 줄씩 보기, 핵심 예제
+    - 10분: 예측 문제와 값 바꿔보기
+    - 10분: 오류 고쳐보기와 틀린 이유 적기
+    - 10분: 비슷한 문제 풀기와 자동 확인
+    - 15분: 작은 만들기, 30일 프로젝트, 추가 문제은행
 
     ## 피드백 규칙
 
     - 처음 틀린 답에는 정답을 주지 않고 어떤 값과 타입을 기대했는지 묻습니다.
     - 에러가 나면 에러 이름, 줄 위치, 원인을 분리해서 말하게 합니다.
-    - 자동 체크포인트 실패는 벌점이 아니라 되돌아갈 위치를 알려주는 신호로 다룹니다.
+    - 자동 확인 실패는 벌점이 아니라 되돌아갈 위치를 알려주는 신호로 다룹니다.
     - 마일스톤 Day에는 새 진도보다 이전 개념을 연결하는지 확인합니다.
     - 5일 리뷰 노트북은 반드시 새 데이터로 다시 풀게 합니다.
 
@@ -4770,7 +4823,7 @@ def writeCapstoneSpec() -> None:
 
     - 완성한 Day 30 노트북
     - 생성된 JSON 파일
-    - “가장 많이 고친 버그 1개와 배운 점” 3문장 회고
+    - “가장 많이 고친 오류 1개와 배운 점” 3문장 회고
     """
     (ROOT / "capstoneSpec.md").write_text(cleanMarkdown(content) + "\n", encoding="utf-8")
 
@@ -4785,15 +4838,15 @@ def writePublishingReview() -> None:
     - `tools/validateCourse.py`가 통과한다.
     - 노트북 30개가 모두 JSON으로 파싱된다.
     - 모든 코드 셀이 문법적으로 유효하다.
-    - 의도적으로 실패하는 셀은 학습 설명에 명시되어 있다.
+    - 기본 배포본의 모든 코드 셀은 위에서 아래로 실행된다.
     - Day 05, 10, 15, 20, 25, 30이 마일스톤으로 표시되어 있다.
-    - 자동 체크포인트가 모든 Day에 존재한다.
+    - 자동 확인이 모든 Day에 존재한다.
     - 5일 단위 리뷰 노트북 6개가 존재한다.
     - 최종 프로젝트 명세와 품질 루브릭이 README에서 발견 가능하다.
 
     ## 공개 품질 기준
 
-    이 과정은 “문법을 나열한 자료”가 아니라 “학습자가 매일 손으로 검증하고 5일마다 회수하는 과정”으로 배포합니다. 따라서 설명의 양보다 중요한 것은 진단, 예측, 실행, 실패, 수정, 전이, 검증, 리뷰가 실제 노트북 안에서 반복되는지입니다.
+    이 과정은 “문법을 나열한 자료”가 아니라 “학습자가 매일 손으로 검증하고 5일마다 회수하는 과정”으로 배포합니다. 따라서 설명의 양보다 중요한 것은 준비 질문, 예측, 실행, 실패, 수정, 비슷한 문제, 검증, 리뷰가 실제 노트북 안에서 반복되는지입니다.
 
     ## 남은 개선 후보
 

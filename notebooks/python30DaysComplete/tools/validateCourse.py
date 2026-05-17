@@ -69,15 +69,15 @@ def validateNotebookStructure(path: Path) -> None:
     assertCondition(len(cells) >= 30, f"{path.name} has too few cells")
     markdownText = "\n".join(readCellSource(cell) for cell in cells if cell.get("cell_type") == "markdown")
     requiredSections = [
-        "시작 전 회상",
-        "실행 추적",
-        "빈칸 채우기",
-        "버그 수정",
-        "오답 노트",
-        "전이 연습",
-        "자동 체크포인트",
-        "30일 누적 프로젝트",
-        "자동 자기점검",
+        "시작 전 떠올리기",
+        "코드가 실행되는 순서",
+        "값 바꿔보기",
+        "오류 고쳐보기",
+        "틀린 이유 적기",
+        "비슷한 문제 풀기",
+        "자동 확인",
+        "30일 프로젝트",
+        "마무리 체크",
     ]
     missingSections = [section for section in requiredSections if section not in markdownText]
     assertCondition(not missingSections, f"{path.name} missing sections: {missingSections}")
@@ -87,17 +87,16 @@ def validateCodeSyntax(path: Path) -> None:
     notebook = loadNotebook(path)
     for index, cell in enumerate(notebook.get("cells", [])):
         if cell.get("cell_type") == "code":
+            source = readCellSource(cell)
+            assertCondition("..." not in source, f"{path.name} cell {index} still has placeholder ellipsis")
             try:
-                ast.parse(readCellSource(cell))
+                ast.parse(source)
             except SyntaxError as exc:
                 raise AssertionError(f"{path.name} cell {index} syntax error: {exc.msg}") from exc
 
 
 def shouldRunCell(previousMarkdown: str, code: str) -> bool:
-    if "..." in code:
-        return False
-    blockedMarkers = ["빈칸 채우기", "버그 수정", "전이 연습", "자동 체크포인트"]
-    return not any(marker in previousMarkdown for marker in blockedMarkers)
+    return True
 
 
 def validateSafeExecution(path: Path) -> None:
@@ -169,7 +168,7 @@ def validateMarimoNotebook(path: Path) -> None:
     content = path.read_text(encoding="utf-8")
     requiredText = ["import marimo", "app = marimo.App", "@app.cell", "app.run()"]
     if path.name.startswith("day"):
-        requiredText.append("자동 체크포인트")
+        requiredText.append("자동 확인")
     else:
         requiredText.append("리뷰 프로젝트")
     missing = [text for text in requiredText if text not in content]

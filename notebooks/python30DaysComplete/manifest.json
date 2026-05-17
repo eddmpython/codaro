@@ -1,7 +1,7 @@
 {
   "title": "Python 30일 완성",
   "version": "4.0",
-  "description": "Colab에서 진단, 실행 추적, 예측, 디버깅, 자동 체크포인트, 리뷰 시험, 누적 프로젝트로 배우는 순수 파이썬 30일 과정",
+  "description": "Colab에서 준비 질문, 코드가 실행되는 순서, 예측, 오류 고치기, 자동 확인, 리뷰 시험, 30일 프로젝트로 배우는 순수 파이썬 30일 과정",
   "folderRule": "Repository path uses camelCase: notebooks/python30DaysComplete",
   "days": [
     {
