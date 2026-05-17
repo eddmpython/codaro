@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev",
-    "prebuild": "node scripts/syncBrand.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js",
+    "prebuild": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js",
     "build": "vite build",
     "postbuild": "node scripts/postbuild.js",
     "prepare": "svelte-kit sync || echo ''",
-    "check": "node scripts/syncBrand.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
+    "check": "node scripts/syncBrand.js && node scripts/syncPdfWorker.js && node scripts/syncBlogAssets.js prepare && node scripts/generateContent.js && svelte-kit sync && svelte-check --tsconfig ./jsconfig.json",
     "preview": "vite preview"
   },
   "devDependencies": {
@@ -21,8 +21,12 @@
     "vite": "^7.3.1"
   },
   "dependencies": {
+    "fflate": "^0.8.2",
     "gray-matter": "^4.0.3",
     "lucide-svelte": "^0.575.0",
-    "marked": "^16.4.1"
+    "marked": "^16.4.1",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^4.7.76",
+    "xlsx": "^0.18.5"
   }
 }

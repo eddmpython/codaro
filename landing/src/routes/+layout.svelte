@@ -11,6 +11,7 @@
 
   const navDefs = [
     { path: "/", label: "Home" },
+    { path: "/tools", label: "Tools" },
     { path: "/blog", label: "Blog" },
     { path: "/docs", label: "Docs" },
     { path: "/search", label: "Search" },
