@@ -4,6 +4,7 @@ import ast
 import json
 import logging
 import os
+import re
 import tempfile
 from pathlib import Path
 
@@ -24,10 +25,19 @@ SAFE_EXEC_ERRORS = (
     TypeError,
     ValueError,
 )
+PYTHON_FENCE_RE = re.compile(r"```python\n(?P<source>[\s\S]*?)\n```")
+MARIMO_CELL_RE = re.compile(r"(?P<kind>mo\.md|runCell)\(\s*r\"\"\"(?P<source>[\s\S]*?)\"\"\"\s*\)")
 
 
 def loadNotebook(path: Path) -> dict[str, object]:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def readCellSource(cell: dict[str, object]) -> str:
+    source = cell.get("source", "")
+    if isinstance(source, list):
+        return "".join(str(part) for part in source)
+    return str(source)
 
 
 def assertCondition(condition: bool, message: str) -> None:
@@ -57,7 +67,7 @@ def validateNotebookStructure(path: Path) -> None:
     notebook = loadNotebook(path)
     cells = notebook.get("cells", [])
     assertCondition(len(cells) >= 30, f"{path.name} has too few cells")
-    markdownText = "\n".join(str(cell.get("source", "")) for cell in cells if cell.get("cell_type") == "markdown")
+    markdownText = "\n".join(readCellSource(cell) for cell in cells if cell.get("cell_type") == "markdown")
     requiredSections = [
         "시작 전 회상",
         "실행 추적",
@@ -78,7 +88,7 @@ def validateCodeSyntax(path: Path) -> None:
     for index, cell in enumerate(notebook.get("cells", [])):
         if cell.get("cell_type") == "code":
             try:
-                ast.parse(str(cell.get("source", "")))
+                ast.parse(readCellSource(cell))
             except SyntaxError as exc:
                 raise AssertionError(f"{path.name} cell {index} syntax error: {exc.msg}") from exc
 
@@ -100,7 +110,7 @@ def validateSafeExecution(path: Path) -> None:
         try:
             for index, cell in enumerate(notebook.get("cells", [])):
                 cellType = cell.get("cell_type")
-                source = str(cell.get("source", ""))
+                source = readCellSource(cell)
                 if cellType == "markdown":
                     previousMarkdown = source
                 elif cellType == "code" and shouldRunCell(previousMarkdown, source):
@@ -113,6 +123,36 @@ def validateSafeExecution(path: Path) -> None:
                         ) from exc
         finally:
             os.chdir(currentDir)
+
+
+def validateMarkdownPythonBlocks(path: Path) -> None:
+    notebook = loadNotebook(path)
+    for cellIndex, cell in enumerate(notebook.get("cells", [])):
+        if cell.get("cell_type") != "markdown":
+            continue
+        markdown = readCellSource(cell)
+        for blockIndex, match in enumerate(PYTHON_FENCE_RE.finditer(markdown)):
+            source = match.group("source").strip()
+            if not source:
+                continue
+            try:
+                ast.parse(source)
+            except SyntaxError as exc:
+                raise AssertionError(
+                    f"{path.name} markdown cell {cellIndex} python block {blockIndex} syntax error: {exc.msg}"
+                ) from exc
+            with tempfile.TemporaryDirectory() as tempDir:
+                currentDir = os.getcwd()
+                os.chdir(tempDir)
+                try:
+                    exec(source, {})
+                except SAFE_EXEC_ERRORS as exc:
+                    raise AssertionError(
+                        f"{path.name} markdown cell {cellIndex} python block {blockIndex} "
+                        f"raised {type(exc).__name__}: {exc}"
+                    ) from exc
+                finally:
+                    os.chdir(currentDir)
 
 
 def validateDocs() -> None:
@@ -142,6 +182,35 @@ def validateMarimoNotebook(path: Path) -> None:
         ast.parse(content)
     except SyntaxError as exc:
         raise AssertionError(f"{path.name} syntax error: {exc.msg}") from exc
+    validateMarimoEmbeddedCode(path, content)
+
+
+def validateMarimoEmbeddedCode(path: Path, content: str) -> None:
+    previousMarkdown = ""
+    namespace: dict[str, object] = {}
+    with tempfile.TemporaryDirectory() as tempDir:
+        currentDir = os.getcwd()
+        os.chdir(tempDir)
+        try:
+            for index, match in enumerate(MARIMO_CELL_RE.finditer(content)):
+                source = match.group("source")
+                if match.group("kind") == "mo.md":
+                    previousMarkdown = source
+                    continue
+                try:
+                    ast.parse(source)
+                except SyntaxError as exc:
+                    raise AssertionError(f"{path.name} embedded cell {index} syntax error: {exc.msg}") from exc
+                if shouldRunCell(previousMarkdown, source):
+                    try:
+                        exec(source, namespace)
+                    except SAFE_EXEC_ERRORS as exc:
+                        raise AssertionError(
+                            f"{path.name} embedded cell {index} should run safely but raised "
+                            f"{type(exc).__name__}: {exc}"
+                        ) from exc
+        finally:
+            os.chdir(currentDir)
 
 
 def main() -> None:
@@ -153,11 +222,13 @@ def main() -> None:
     for path in notebooks:
         validateNotebookStructure(path)
         validateCodeSyntax(path)
+        validateMarkdownPythonBlocks(path)
         validateSafeExecution(path)
     reviewNotebooks = sorted(COLAB_DIR.glob("review*.ipynb"))
     assertCondition(len(reviewNotebooks) == 6, "notebooks directory must contain exactly 6 review notebooks")
     for path in reviewNotebooks:
         validateCodeSyntax(path)
+        validateMarkdownPythonBlocks(path)
         validateSafeExecution(path)
     marimoNotebooks = sorted(MARIMO_DIR.glob("day*.py"))
     assertCondition(len(marimoNotebooks) == 30, "marimo directory must contain exactly 30 day notebooks")
