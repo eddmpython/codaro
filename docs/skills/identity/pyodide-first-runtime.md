@@ -1,7 +1,10 @@
 ---
 id: pyodide-first-runtime
 title: 실행 환경 — Pyodide 기본, 로컬 확장
+description: Runtime policy for Pyodide-first execution with optional local expansion.
 category: identity
+section: concepts
+order: 104
 purpose: Pyodide(브라우저)가 기본 실행 플랫폼. 로컬 서버 커널은 Pyodide 슈퍼셋(파일 I/O, 패키지 자동 설치, 무거운 ML).
 whenToUse: 새 capability 추가, 엔진 분기 결정, 학습 콘텐츠 호환성 검증할 때.
 ---

@@ -1,7 +1,10 @@
 ---
 id: execution-engine
 title: 실행 엔진 원칙
+description: Execution engine responsibilities for kernels, runtimes, and reruns.
 category: architecture
+section: reference
+order: 203
 purpose: 엔진은 교체 가능 인터페이스. PyodideEngine / SandboxEngine / LocalEngine. 편집기는 capability만 호출.
 whenToUse: 새 엔진 구현, capability 추가 (execute/interrupt/variables/files/packages/docs), 엔진 분기 결정할 때.
 ---

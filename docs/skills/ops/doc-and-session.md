@@ -1,7 +1,10 @@
 ---
 id: doc-and-session
 title: 문서 유지보수 + 세션 이어가기
+description: Documentation and session rules for keeping project context aligned.
 category: ops
+section: guides
+order: 307
 purpose: CLAUDE.md/AGENTS.md와 코드 구조가 어긋나면 즉시 갱신. 세션 종료 전 가장 가까운 docs/skills/.../README.md에 Current State / Next Action / Verification Left 갱신.
 whenToUse: 세션 종료 직전, 폴더 구조 변경 후, 죽은 참조 발견 시.
 ---

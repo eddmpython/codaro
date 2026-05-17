@@ -1,7 +1,10 @@
 ---
 id: automation-tasks-reports
 title: 자동화 + 태스크 + 리포트
+description: Automation, task, and report concepts for Codaro workflows.
 category: identity
+section: concepts
+order: 108
 purpose: 사용자/AI가 작성한 .py 문서가 그 자체로 실행 가능 태스크. 스케줄/웹훅/수동 트리거 + 워크플로우 DAG + 감사 로그 + E-Stop.
 whenToUse: 스케줄러 설계, 워크플로우 DAG 구현, audit trail 포맷 결정, E-Stop 로직 구현할 때.
 ---

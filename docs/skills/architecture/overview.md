@@ -1,7 +1,10 @@
 ---
 id: architecture-overview
 title: 아키텍처 방향 — 5층 구조
+description: Five-layer architecture overview for the Codaro runtime.
 category: architecture
+section: reference
+order: 201
 purpose: 편집기 메커니즘 독립이 1차 목표. document model / execution runtime / reactive dataflow / ui·widget bridge / workspace shell 5층.
 whenToUse: 새 모듈 어느 레이어에 속할지 결정, 레이어 간 의존 방향 검토할 때.
 ---

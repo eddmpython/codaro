@@ -1,7 +1,10 @@
 ---
 id: experiment
 title: 실험 규칙
+description: Experiment policy for prototypes, validation, and production boundaries.
 category: ops
+section: guides
+order: 304
 purpose: 실험은 `experiments/` 아래에서만. 숫자 접두사 폴더 + STATUS.md. 실패 실험도 결론과 함께 보존.
 whenToUse: 새 메커니즘 검증, PoC 작성, 실패한 실험 정리할 때.
 ---

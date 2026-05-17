@@ -1,7 +1,10 @@
 ---
 id: multi-editor-modes
 title: 다중 에디터 모드
+description: Multi-editor mode principles for notebook, app, and automation surfaces.
 category: identity
+section: concepts
+order: 109
 purpose: 같은 런타임 위에 코드/학습/리포트 세 얼굴. 같은 문서 모델, 같은 엔진, 같은 API.
 whenToUse: 새 모드 추가, 모드 간 전환 UX, 모드별 chrome 설계할 때.
 ---

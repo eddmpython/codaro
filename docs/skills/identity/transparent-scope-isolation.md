@@ -1,7 +1,10 @@
 ---
 id: transparent-scope-isolation
 title: 실행 모델 — 투명 스코프 격리
+description: Python-native scope isolation principles for Codaro block execution.
 category: identity
+section: concepts
+order: 101
 purpose: 사용자는 평범한 Python을 쓰고, 엔진이 셀별 네임스페이스 격리와 변수 라이프사이클을 자동 처리한다.
 whenToUse: 셀 실행 의미론, 변수 주입, 네임스페이스 격리 설계할 때.
 ---

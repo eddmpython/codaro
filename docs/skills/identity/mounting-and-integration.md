@@ -1,7 +1,10 @@
 ---
 id: mounting-and-integration
 title: 마운팅과 통합
+description: Mounting and integration principles for apps, APIs, and GUI flows.
 category: identity
+section: concepts
+order: 107
 purpose: createServerApp()은 단독 실행과 다른 서버 마운팅을 모두 지원. GUI에서 되는 모든 것은 API로도 된다.
 whenToUse: 외부 프레임워크(FastAPI/Django/Flask) 통합, root_path 처리, API surface 설계할 때.
 ---

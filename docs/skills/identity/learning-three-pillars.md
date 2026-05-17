@@ -1,7 +1,10 @@
 ---
 id: learning-three-pillars
 title: 학습 시스템 3기둥
+description: Notebook, curriculum, and learning philosophy pillars for Codaro education.
 category: identity
+section: concepts
+order: 105
 purpose: 노트북 기능 + 뼈대 커리큘럼(YAML 130+ 레슨) + 학습 사상(코드로 정의된 교육 철학) 세 기둥 위에 학습이 동작.
 whenToUse: 새 레슨 추가, 학습 UX 디자인, AI 교사 행동 설계, 진행 추적 모델 변경할 때.
 ---

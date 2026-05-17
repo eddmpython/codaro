@@ -1,7 +1,10 @@
 ---
 id: environment
 title: 실행 환경 + 인코딩
+description: Environment requirements for Python, uv, and local execution.
 category: ops
+section: guides
+order: 301
 purpose: PowerShell `.venv` (root), WSL은 `.venv-wsl` 분리. 모든 실행은 `uv run python -X utf8`. 텍스트 파일 UTF-8 기본.
 whenToUse: 새 머신 셋업, 인코딩 깨짐 디버그, WSL/PowerShell 동시 작업할 때.
 ---

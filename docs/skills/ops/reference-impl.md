@@ -1,7 +1,10 @@
 ---
 id: reference-impl
 title: 참고 구현 사용 원칙
+description: Reference implementation rules for borrowing patterns without coupling.
 category: ops
+section: guides
+order: 308
 purpose: eddmpython의 notebook/eddmlab은 참고만. 메커니즘 해부 후 Codaro 계층에 맞게 재설계. 그대로 복제 금지.
 whenToUse: eddmpython 코드를 보러 갈 때, 새 메커니즘 가져오기 전에.
 ---

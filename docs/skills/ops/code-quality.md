@@ -1,7 +1,10 @@
 ---
 id: code-quality
 title: 코드 품질 원칙
+description: Code quality rules for naming, exceptions, and maintainable changes.
 category: ops
+section: guides
+order: 302
 purpose: camelCase / 파일 삭제 금지 / 인라인 주석 금지 / bare except 금지 / 좁힌 예외 + 로깅 + from exc 체인 / ruff BLE001·S110·S112·TRY400.
 whenToUse: 새 코드 작성, 예외 처리 결정, 코드 리뷰, ruff lint 결과 해석할 때.
 ---

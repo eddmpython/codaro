@@ -1,7 +1,10 @@
 ---
 id: ai-integration
 title: AI 통합 원칙
+description: Optional teacher integration rules that keep assistance transparent and inspectable.
 category: identity
+section: concepts
+order: 106
 purpose: AI 없이도 모든 학습이 동작. AI가 붙으면 편집기 API를 tool_use로 호출해 가르친다. Provider 교체 가능.
 whenToUse: AI Provider 추가/교체, 새 tool_use 추가, AI 교사 시스템 프롬프트 정의할 때.
 ---

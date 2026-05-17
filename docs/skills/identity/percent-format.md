@@ -1,7 +1,10 @@
 ---
 id: percent-format
 title: 파일 포맷 — Percent Format (.py)
+description: Percent-format notebook conventions that keep files executable as Python.
 category: identity
+section: concepts
+order: 103
 purpose: Codaro의 기본 저장 포맷. 모듈 레벨 코드 + `# %%` 셀 경계. python file.py로 그대로 실행 가능.
 whenToUse: 문서 파서/writer, ipynb/reactive-app 변환, 외부 에디터 호환성 다룰 때.
 ---

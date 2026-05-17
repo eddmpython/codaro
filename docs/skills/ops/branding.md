@@ -1,7 +1,10 @@
 ---
 id: branding
 title: 브랜딩 + 프론트 톤
+description: Branding rules for Codaro identity, assets, and product language.
 category: ops
+section: branding
+order: 10
 purpose: programmable studio 포지션. 제품 UI 영어 only. zinc + shadcn-svelte. 마스코트 source는 codaro-sheet-01/02.png.
 whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/문서 톤 결정할 때.
 ---

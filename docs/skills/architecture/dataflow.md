@@ -1,7 +1,10 @@
 ---
 id: dataflow
 title: 데이터흐름 원칙
+description: Dataflow rules for block dependency graphs and variable lineage.
 category: architecture
+section: reference
+order: 204
 purpose: Codaro는 상태 가진 편집기. block dependency graph + variable lineage + rerun scope + side effect boundary 초기 고려.
 whenToUse: 의존 그래프 변경, rerun 범위 알고리즘 수정, side effect 추적 추가할 때.
 ---

@@ -1,7 +1,10 @@
 ---
 id: ai-sensory-system
 title: AI 감각계 — 눈, 귀, 손
+description: Vision, hearing, and action channel concepts for assisted workflows.
 category: identity
+section: concepts
+order: 110
 purpose: AI에게 데스크톱을 보고(Vision), 듣고(Voice), 조작할(Input) 능력을 줘서 보고-판단-행동 에이전트로 만든다.
 whenToUse: 자동화 모듈 새 기능, 화면 캡처/OCR/PyAutoGUI 통합, 녹화→코드 변환, InputGuard 정책 결정할 때.
 ---

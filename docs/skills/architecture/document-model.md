@@ -1,7 +1,10 @@
 ---
 id: document-model
 title: 문서 모델 원칙
+description: Document model boundaries for cells, files, and notebook state.
 category: architecture
+section: reference
+order: 202
 purpose: 장기적으로 cell보다 block 중심 모델. code/text/guide/widget/view/file 6 블록. 외부 노트북 포맷에 종속되지 않는다.
 whenToUse: 새 블록 타입 추가, 파서/writer 변경, 외부 포맷 호환 변경할 때.
 ---

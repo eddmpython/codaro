@@ -1,3 +1,10 @@
+---
+title: Codaro Skills
+description: Codaro project rules and shared skill documents for humans and maintainers.
+section: getting-started
+order: 20
+---
+
 # Codaro Skills
 
 Codaro의 사람 + AI 공용 SSOT. 한 마크다운 파일이 두 청중을 동시에 섬긴다 — 사람은 직접 읽고, AI는 같은 파일을 컨텍스트로 받는다.

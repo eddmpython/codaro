@@ -1,7 +1,10 @@
 ---
 id: external-channels-mobile
 title: 외부 채널 + 모바일 조작
+description: External channel and mobile principles for future Codaro access patterns.
 category: identity
+section: concepts
+order: 111
 purpose: 데스크톱 앞에 없을 때도 동작. MessageBridge(Slack/Discord/Webhook) + 외부 HTTP 트리거 + 향후 모바일 PWA.
 whenToUse: 알림 채널 추가, Webhook 트리거 설계, 모바일 반응형 UI 구현할 때.
 ---
