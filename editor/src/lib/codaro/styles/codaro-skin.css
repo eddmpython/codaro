@@ -1,256 +1,104 @@
 /* ============================================================
-   Codaro Skin — DartPad blue-gray tone overrides
+   Codaro Skin — component-level overrides only.
 
-   Overrides CSS variables only. Does NOT change DOM, spacing,
-   font-size, border-radius, or layout. Base CSS stays loaded
-   underneath; this file sits on top.
+   All design tokens live in lib/theme/tokens.css.
+   This file holds skin-specific component rules
+   (mo-button legacy, CodeMirror, cell shimmer, mobile, print).
    ============================================================ */
 
-:root {
-  /* --- DartPad blue-gray scale ------------------------------- */
-  --sage-1:  #131D28;
-  --sage-2:  #1C2834;
-  --sage-3:  #243242;
-  --sage-4:  #2B3B4F;
-  --sage-5:  #3A4D63;
-  --sage-6:  #4A5F78;
-  --sage-7:  #6B7F96;
-  --sage-8:  #8FA3B8;
-  --sage-9:  #B4C5D5;
-  --sage-10: #D0DCE6;
-  --sage-11: #D0DCE6;
-  --sage-12: #F0F4F8;
-
-  --slate-1:  #131D28;
-  --slate-2:  #1C2834;
-  --slate-3:  #243242;
-  --slate-4:  #2B3B4F;
-  --slate-5:  #3A4D63;
-  --slate-6:  #4A5F78;
-  --slate-7:  #6B7F96;
-  --slate-8:  #8FA3B8;
-  --slate-9:  #B4C5D5;
-  --slate-10: #D0DCE6;
-  --slate-11: #D0DCE6;
-  --slate-12: #F0F4F8;
-
-  --gray-1:  #131D28;
-  --gray-2:  #1C2834;
-  --gray-3:  #243242;
-  --gray-4:  #2B3B4F;
-  --gray-5:  #3A4D63;
-  --gray-6:  #4A5F78;
-  --gray-7:  #6B7F96;
-  --gray-8:  #8FA3B8;
-  --gray-9:  #B4C5D5;
-  --gray-10: #D0DCE6;
-  --gray-11: #D0DCE6;
-  --gray-12: #F0F4F8;
-
-  /* --- Semantic tokens (DartPad) ----------------------------- */
-  --background: #0C141D;
-  --foreground: #F0F4F8;
-  --border: #243242;
-  --input: #243242;
-  --card: #1C2834;
-  --card-foreground: #F0F4F8;
-  --popover: #1C2834;
-  --popover-foreground: #F0F4F8;
-  --primary: #F0F4F8;
-  --primary-foreground: #1C2834;
-  --secondary: #243242;
-  --secondary-foreground: #F0F4F8;
-  --muted: #243242;
-  --muted-foreground: #8FA3B8;
-  --accent: #168afd;
-  --accent-foreground: #FFFFFF;
-  --ring: #3A4D63;
-
-  /* --- Shadows ------------------------------------------------ */
-  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
-  --shadow-md-solid: 0 2px 4px -1px rgba(0, 0, 0, 0.35), 0 1px 2px -1px rgba(0, 0, 0, 0.25);
-  --shadow-shade: rgba(0, 0, 0, 0.35);
-}
-
-/* --- Dark class (same values, safety net) -------------------- */
-.dark {
-  color-scheme: dark;
-
-  --sage-1:  #131D28;
-  --sage-2:  #1C2834;
-  --sage-3:  #243242;
-  --sage-4:  #2B3B4F;
-  --sage-5:  #3A4D63;
-  --sage-6:  #4A5F78;
-  --sage-7:  #6B7F96;
-  --sage-8:  #8FA3B8;
-  --sage-9:  #B4C5D5;
-  --sage-10: #D0DCE6;
-  --sage-11: #D0DCE6;
-  --sage-12: #F0F4F8;
-
-  --slate-1:  #131D28;
-  --slate-2:  #1C2834;
-  --slate-3:  #243242;
-  --slate-4:  #2B3B4F;
-  --slate-5:  #3A4D63;
-  --slate-6:  #4A5F78;
-  --slate-7:  #6B7F96;
-  --slate-8:  #8FA3B8;
-  --slate-9:  #B4C5D5;
-  --slate-10: #D0DCE6;
-  --slate-11: #D0DCE6;
-  --slate-12: #F0F4F8;
-
-  --gray-1:  #131D28;
-  --gray-2:  #1C2834;
-  --gray-3:  #243242;
-  --gray-4:  #2B3B4F;
-  --gray-5:  #3A4D63;
-  --gray-6:  #4A5F78;
-  --gray-7:  #6B7F96;
-  --gray-8:  #8FA3B8;
-  --gray-9:  #B4C5D5;
-  --gray-10: #D0DCE6;
-  --gray-11: #D0DCE6;
-  --gray-12: #F0F4F8;
-
-  --background: #0C141D;
-  --foreground: #F0F4F8;
-  --border: #243242;
-  --input: #243242;
-  --card: #1C2834;
-  --card-foreground: #F0F4F8;
-  --popover: #1C2834;
-  --popover-foreground: #F0F4F8;
-  --primary: #F0F4F8;
-  --primary-foreground: #1C2834;
-  --secondary: #243242;
-  --secondary-foreground: #F0F4F8;
-  --muted: #243242;
-  --muted-foreground: #8FA3B8;
-  --accent: #168afd;
-  --accent-foreground: #FFFFFF;
-  --ring: #3A4D63;
-
-  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
-  --shadow-md-solid: 0 2px 4px -1px rgba(0, 0, 0, 0.35), 0 1px 2px -1px rgba(0, 0, 0, 0.25);
-  --shadow-shade: rgba(0, 0, 0, 0.35);
-}
-
-/* --- mo-button overrides (subtle surface tones) -------------- */
+/* --- mo-button overrides (legacy — replaced by Button in PR2) -- */
 .mo-button.gray {
-  background-color: #243242;
-  color: #B4C5D5;
-  border-color: #2B3B4F;
+  background-color: var(--surface-2);
+  color: var(--text-secondary);
+  border-color: var(--border);
 }
 .mo-button.gray:hover {
-  background-color: #2B3B4F;
-  color: #F0F4F8;
+  background-color: var(--surface-3);
+  color: var(--text-primary);
 }
 
 .mo-button.white {
-  background-color: #1C2834;
-  color: #B4C5D5;
-  border-color: #2B3B4F;
+  background-color: var(--surface-1);
+  color: var(--text-secondary);
+  border-color: var(--border);
 }
 .mo-button.white:hover {
-  background-color: #243242;
+  background-color: var(--surface-2);
 }
 
 .mo-button.green {
-  background-color: #142820;
-  color: #7CBFA0;
-  border-color: #1C3D2E;
+  background-color: var(--state-success-soft);
+  color: var(--state-success-fg);
+  border-color: var(--state-success-border);
 }
 .mo-button.green:hover {
-  background-color: #1C3D2E;
+  background-color: color-mix(in oklab, var(--state-success-base) 22%, transparent);
 }
 
 .mo-button.red {
-  background-color: #281418;
-  color: #D89098;
-  border-color: #3D1C24;
+  background-color: var(--state-destructive-soft);
+  color: var(--state-destructive-fg);
+  border-color: var(--state-destructive-border);
 }
 .mo-button.red:hover {
-  background-color: #3D1C24;
+  background-color: color-mix(in oklab, var(--state-destructive-base) 22%, transparent);
 }
 
 .mo-button.yellow {
-  background-color: #28231A;
-  color: #C9B880;
-  border-color: #3D3820;
+  background-color: var(--state-warning-soft);
+  color: var(--state-warning-fg);
+  border-color: var(--state-warning-border);
 }
 .mo-button.yellow:hover {
-  background-color: #3D3820;
+  background-color: color-mix(in oklab, var(--state-warning-base) 22%, transparent);
 }
 
 .mo-button.hint-green {
-  background-color: #142820;
-  color: #7CBFA0;
-  border-color: #1C3D2E;
+  background-color: var(--state-success-soft);
+  color: var(--state-success-fg);
+  border-color: var(--state-success-border);
 }
 .mo-button.hint-green:hover {
-  background-color: #1C3D2E;
+  background-color: color-mix(in oklab, var(--state-success-base) 22%, transparent);
 }
 
 .mo-button.disabled {
-  background-color: #243242;
-  color: #4A5F78;
-  border-color: #2B3B4F;
+  background-color: var(--surface-2);
+  color: var(--text-muted);
+  border-color: var(--border);
   cursor: not-allowed;
   opacity: 0.6;
 }
 
 /* --- CodeMirror active line ---------------------------------- */
 .codaro-cell .cm-editor.cm-focused .cm-activeLineGutter {
-  background: #1C2834;
+  background: var(--surface-2);
 }
 .codaro-cell .cm-editor.cm-focused .cm-activeLine:not(.cm-error-line) {
-  background: rgba(22, 138, 253, 0.04);
+  background: color-mix(in oklab, var(--state-accent-base) 6%, transparent);
 }
 
 /* --- Codaro polish ------------------------------------------- */
 
 /* Active cell accent glow */
 .codaro-cell.ring-2 {
-  border-color: color-mix(in srgb, var(--accent) 40%, transparent);
-  box-shadow: 0 0 12px color-mix(in srgb, var(--accent) 15%, transparent);
+  border-color: var(--state-accent-border);
+  box-shadow: 0 0 12px var(--state-accent-soft);
 }
 
 /* Glass effect for popovers */
 .cell-actions-popover {
-  background: rgba(28, 40, 52, 0.92);
-  backdrop-filter: blur(12px);
-  border-color: rgba(255, 255, 255, 0.06);
+  background: var(--surface-overlay);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
+  border-color: var(--border-subtle);
 }
 
 /* Toolbar pill glass */
 .toolbar-pill {
-  background: rgba(28, 40, 52, 0.88);
-  backdrop-filter: blur(8px);
-}
-
-/* Running cell shimmer */
-@keyframes cellShimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
-}
-
-.codaro-cell[data-status="running"] {
-  border-image: linear-gradient(
-    90deg,
-    var(--border) 0%,
-    var(--accent) 50%,
-    var(--border) 100%
-  ) 1;
-  background-size: 200% 100%;
-  animation: cellShimmer 2s linear infinite;
-}
-
-/* Smooth transitions */
-.codaro-cell {
-  transition: border-color 0.15s, box-shadow 0.15s;
+  background: var(--surface-overlay);
+  backdrop-filter: blur(20px) saturate(1.4);
+  -webkit-backdrop-filter: blur(20px) saturate(1.4);
 }
 
 /* Mobile responsive */

@@ -1,6 +1,7 @@
 <script lang="ts">
   import type { Snippet } from "svelte";
   import type { HTMLAttributes } from "svelte/elements";
+  import { cn } from "$lib/codaro/ui";
 
   interface Props extends HTMLAttributes<HTMLDivElement> {
     selected?: boolean;
@@ -13,26 +14,22 @@
     tooltip,
     class: className = "",
     children,
-    ...restProps
+    ...rest
   }: Props = $props();
 
-  const baseClass = "h-full flex items-center p-2 text-sm shadow-inset font-mono cursor-pointer rounded";
-  const stateClass = selected ? "bg-(--sage-4)" : "hover:bg-(--sage-3)";
+  const baseClass =
+    "inline-flex items-center gap-1.5 h-5 px-2 rounded-full text-[11px] font-mono leading-none cursor-pointer outline-none transition-[background,color] duration-quick ease-standard focus-visible:ring-2 focus-visible:ring-accent-ring focus-visible:ring-offset-1 focus-visible:ring-offset-surface-base";
+  const stateClass = $derived(
+    selected
+      ? "bg-surface-3 text-fg"
+      : "bg-surface-2/60 text-fg-secondary hover:bg-surface-2 hover:text-fg",
+  );
 </script>
 
-{#if tooltip}
-  <div
-    class="{baseClass} {stateClass} {className}"
-    title={tooltip}
-    {...restProps}
-  >
-    {@render children()}
-  </div>
-{:else}
-  <div
-    class="{baseClass} {stateClass} {className}"
-    {...restProps}
-  >
-    {@render children()}
-  </div>
-{/if}
+<div
+  class={cn(baseClass, stateClass, className)}
+  title={tooltip}
+  {...rest}
+>
+  {@render children()}
+</div>

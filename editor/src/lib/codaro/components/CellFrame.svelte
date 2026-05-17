@@ -494,12 +494,32 @@
     border-radius: 10px;
     max-width: inherit;
     width: 100%;
-    border: 1px solid var(--gray-4, var(--border));
-    background: var(--background);
+    border: 1px solid var(--border-subtle);
+    background: var(--surface-1);
+    transition:
+      border-color var(--motion-base) var(--ease-standard),
+      background-color var(--motion-base) var(--ease-standard),
+      box-shadow var(--motion-base) var(--ease-standard);
+  }
+
+  /* Status stripe: left 4px bar */
+  .codaro-cell::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 6px;
+    bottom: 6px;
+    width: 3px;
+    border-radius: 0 2px 2px 0;
+    background: transparent;
+    transition: background var(--motion-base) var(--ease-standard), box-shadow var(--motion-base) var(--ease-standard);
+    pointer-events: none;
+    z-index: 1;
   }
 
   .codaro-cell:hover {
-    border-color: var(--gray-6, var(--border));
+    border-color: var(--border);
+    box-shadow: var(--elevation-sm);
     z-index: 30;
   }
 
@@ -522,7 +542,8 @@
   }
 
   .codaro-cell.interactive:focus-within {
-    box-shadow: var(--shadow-md-solid, 0 4px 6px -1px rgba(0,0,0,.1));
+    border-color: var(--border-strong);
+    box-shadow: 0 0 0 1px var(--state-accent-soft), var(--elevation-md);
   }
 
   .codaro-cell.interactive :global(.cm) {
@@ -534,45 +555,69 @@
     overflow: auto;
   }
 
-  .codaro-cell.needs-run {
-    border-color: var(--stale, var(--yellow-8, #e5a417));
-    outline: 1px solid var(--stale, var(--yellow-8, #e5a417));
+  /* needs-run / stale: amber stripe */
+  .codaro-cell.needs-run::before {
+    background: var(--stripe-stale);
   }
 
-  .codaro-cell.needs-run:hover {
-    border-color: color-mix(in srgb, var(--action-foreground, var(--yellow-11, #946800)), transparent 70%);
-    outline-color: color-mix(in srgb, var(--action-foreground, var(--yellow-11, #946800)), transparent 70%);
-  }
-
-  .codaro-cell.needs-run:focus-within {
-    outline: none;
-    box-shadow: var(--shadow-md-solid, 0 4px 6px -1px rgba(0,0,0,.1));
-  }
-
+  /* has-error: rose stripe + faint left wash */
   .codaro-cell.has-error:not(.needs-run) {
-    border-color: color-mix(in srgb, var(--error, var(--red-8, #e5484d)), transparent 80%);
-    outline: 1px solid color-mix(in srgb, var(--error, var(--red-8, #e5484d)), transparent 80%);
+    background: linear-gradient(90deg, color-mix(in oklab, var(--state-destructive-base) 5%, transparent) 0%, transparent 12%), var(--surface-1);
   }
 
-  .codaro-cell.has-error:not(.needs-run):hover {
-    border-color: color-mix(in srgb, var(--error, var(--red-8, #e5484d)), transparent 70%);
-    outline-color: color-mix(in srgb, var(--error, var(--red-8, #e5484d)), transparent 70%);
+  .codaro-cell.has-error:not(.needs-run)::before {
+    background: var(--stripe-error);
+    box-shadow: 0 0 8px color-mix(in oklab, var(--state-destructive-base) 30%, transparent);
   }
 
-  .codaro-cell.has-error:not(.needs-run):focus-within {
-    outline: none;
-    box-shadow: var(--shadow-md-solid, 0 4px 6px -1px rgba(0,0,0,.1));
+  /* running: shimmering accent stripe + faint left wash */
+  .codaro-cell[data-status="running"] {
+    background: linear-gradient(90deg, color-mix(in oklab, var(--state-accent-base) 4%, transparent) 0%, transparent 12%), var(--surface-1);
+  }
+
+  .codaro-cell[data-status="running"]::before {
+    background: linear-gradient(
+      180deg,
+      var(--stripe-running) 0%,
+      color-mix(in oklab, var(--stripe-running) 60%, white) 50%,
+      var(--stripe-running) 100%
+    );
+    background-size: 100% 200%;
+    animation: stripe-shimmer 1.4s linear infinite;
+    box-shadow: 0 0 8px color-mix(in oklab, var(--stripe-running) 30%, transparent);
+  }
+
+  /* queued: zinc stripe with slow pulse */
+  .codaro-cell[data-status="queued"]::before {
+    background: var(--stripe-queued);
+    animation: stripe-pulse 2s ease-in-out infinite;
+  }
+
+  /* success: emerald stripe (briefly) */
+  .codaro-cell[data-status="success"]::before {
+    background: var(--stripe-success);
+  }
+
+  @keyframes stripe-shimmer {
+    0% { background-position: 0 -40px; }
+    100% { background-position: 0 100%; }
+  }
+
+  @keyframes stripe-pulse {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 1; }
   }
 
   .codaro-cell.stale .output-area,
   .codaro-cell.stale :global(.cm-gutters),
   .codaro-cell.stale :global(.cm) {
-    background-color: var(--gray-2, #1C2834);
-    opacity: 0.5;
+    background-color: var(--surface-sunken);
+    opacity: 0.6;
   }
 
   .codaro-cell.borderless {
     border-color: transparent;
+    background: transparent;
   }
 
   .codaro-cell.borderless > :global(*) {
@@ -580,15 +625,7 @@
   }
 
   .codaro-cell.borderless:focus {
-    border: 1px solid var(--gray-4, var(--border));
-  }
-
-  :global(.dark) .codaro-cell {
-    border-color: var(--border);
-  }
-
-  :global(.dark) .codaro-cell:hover {
-    border: 1px solid var(--gray-9);
+    border: 1px solid var(--border);
   }
 
   .tray {

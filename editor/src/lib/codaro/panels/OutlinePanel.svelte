@@ -55,18 +55,25 @@
   .outlineItem {
     display: block;
     width: 100%;
-    padding: 5px 12px;
+    padding: 6px 12px;
     border: none;
     background: transparent;
-    color: var(--foreground);
+    color: var(--text-primary);
     font-size: 13px;
     text-align: left;
     cursor: pointer;
     border-radius: 0;
+    transition: background-color var(--motion-quick) var(--ease-standard);
   }
 
   .outlineItem:hover {
-    background: var(--accent);
+    background: var(--surface-2);
+  }
+
+  .outlineItem:focus-visible {
+    outline: none;
+    background: var(--surface-3);
+    box-shadow: inset 2px 0 0 0 var(--state-accent-base);
   }
 
   .empty {

@@ -1,5 +1,7 @@
 <script lang="ts">
   import { Unlink } from "lucide-svelte";
+  import { Button } from "$lib/codaro/ui";
+  import EmptyState from "$lib/codaro/primitives/EmptyState.svelte";
 
   interface Props {
     reason?: string;
@@ -14,21 +16,26 @@
   }: Props = $props();
 </script>
 
-<div class="fixed inset-0 z-40 flex items-center justify-center pointer-events-none">
-  <div class="absolute inset-0 opacity-50" style="background-image: url('/assets/noise.png'), url('/assets/gradient.png'); background-size: cover;"></div>
-
-  <div class="relative bg-background/95 backdrop-blur-sm border rounded-lg p-8 text-center shadow-lg pointer-events-auto max-w-md">
-    <Unlink class="h-12 w-12 mx-auto mb-4 text-destructive" />
-    <h2 class="text-xl font-semibold">Disconnected</h2>
-    <p class="text-sm text-muted-foreground mt-2">{reason}</p>
-
-    {#if canTakeover}
-      <button
-        class="mt-4 px-4 py-2 rounded-md bg-primary text-primary-foreground text-sm hover:bg-primary/90"
-        onclick={onTakeover}
-      >
-        Take over session
-      </button>
-    {/if}
+<div
+  class="fixed inset-0 z-40 flex items-center justify-center bg-zinc-950/80 backdrop-blur-md pointer-events-auto"
+  role="dialog"
+  aria-modal="true"
+  aria-label="Disconnected"
+>
+  <div class="rounded-2xl bg-surface-overlay backdrop-blur-xl backdrop-saturate-150 ring-1 ring-white/5 border border-border-subtle shadow-elev-overlay p-8 max-w-md mx-4">
+    <EmptyState
+      title="Disconnected"
+      body={reason}
+      compact
+    >
+      {#snippet icon()}
+        <Unlink />
+      {/snippet}
+      {#snippet actions()}
+        {#if canTakeover}
+          <Button variant="accent" onclick={onTakeover}>Take over session</Button>
+        {/if}
+      {/snippet}
+    </EmptyState>
   </div>
 </div>

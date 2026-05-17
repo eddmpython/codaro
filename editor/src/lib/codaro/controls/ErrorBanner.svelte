@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AlertTriangle, X, ChevronDown, ChevronRight } from "lucide-svelte";
+  import { AlertTriangle, AlertCircle, Info, X, ChevronDown, ChevronRight } from "lucide-svelte";
 
   interface Props {
     title?: string;
@@ -23,30 +23,41 @@
 
   let expanded = $state(false);
 
-  let rootClass = $derived(
-    "rounded-md border px-4 py-3 text-sm " +
-      (kind === "error"
-        ? "bg-destructive/10 border-destructive/30 text-destructive"
-        : kind === "warning"
-          ? "bg-yellow-500/10 border-yellow-500/30 text-yellow-700"
-          : "bg-primary/10 border-primary/30 text-primary"),
+  const toneClass = $derived(
+    kind === "error"
+      ? "bg-destructive-soft border-destructive-border text-destructive-fg"
+      : kind === "warning"
+        ? "bg-warning-soft border-warning-border text-warning-fg"
+        : "bg-info-soft border-info-border text-info-fg",
   );
 </script>
 
-<div class={rootClass} role="alert">
-  <div class="flex items-start gap-2">
-    <AlertTriangle class="h-4 w-4 mt-0.5 shrink-0" />
-
-    <div class="flex-1 min-w-0">
-      {#if title}
-        <div class="font-semibold">{title}</div>
+<div
+  class="relative rounded-md border px-4 py-3 text-[13px] flex flex-col gap-2 {toneClass}"
+  role="alert"
+>
+  <div class="flex items-start gap-2.5">
+    <span class="mt-0.5 shrink-0">
+      {#if kind === "error"}
+        <AlertTriangle class="h-4 w-4" />
+      {:else if kind === "warning"}
+        <AlertCircle class="h-4 w-4" />
+      {:else}
+        <Info class="h-4 w-4" />
       {/if}
-      <div class="text-sm">{message}</div>
+    </span>
+
+    <div class="flex-1 min-w-0 leading-relaxed">
+      {#if title}
+        <div class="font-semibold mb-0.5">{title}</div>
+      {/if}
+      <div>{message}</div>
     </div>
 
     {#if expandable && details}
       <button
-        class="shrink-0 p-0.5 hover:bg-current/10 rounded"
+        type="button"
+        class="shrink-0 p-1 rounded hover:bg-current/10 transition-colors duration-quick outline-none focus-visible:ring-2 focus-visible:ring-current focus-visible:ring-offset-1 focus-visible:ring-offset-transparent"
         aria-label={expanded ? "Collapse details" : "Expand details"}
         onclick={() => (expanded = !expanded)}
       >
@@ -60,7 +71,8 @@
 
     {#if dismissible}
       <button
-        class="shrink-0 p-0.5 hover:bg-current/10 rounded"
+        type="button"
+        class="shrink-0 p-1 rounded hover:bg-current/10 transition-colors duration-quick outline-none focus-visible:ring-2 focus-visible:ring-current"
         aria-label="Dismiss"
         onclick={onDismiss}
       >
@@ -70,8 +82,8 @@
   </div>
 
   {#if expanded && details}
-    <div class="mt-2 pt-2 border-t border-current/20">
-      <pre class="text-xs font-mono whitespace-pre-wrap max-h-48 overflow-auto">{details}</pre>
+    <div class="pt-2 border-t border-current/20">
+      <pre class="text-[11.5px] font-mono whitespace-pre-wrap max-h-48 overflow-auto opacity-90">{details}</pre>
     </div>
   {/if}
 </div>

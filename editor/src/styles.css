@@ -2,6 +2,7 @@
 @source "./**/*.svelte";
 @source "./**/*.ts";
 
+@import "./lib/theme/tokens.css";
 @import "./lib/codaro/styles/base/cells-jmgGt1lS.css";
 @import "./lib/codaro/styles/base/markdown-renderer-DdDKmWlR.css";
 @import "./lib/codaro/styles/base/CellStatus-2Psjnl5F.css";
@@ -9,6 +10,75 @@
 @import "./lib/codaro/styles/base/edit-page-Dstp9NQ5.css";
 @import "./lib/codaro/styles/base/Inputs-CuKU-ENz.css";
 @import "./lib/codaro/styles/codaro-skin.css";
+
+@theme inline {
+  --color-surface-sunken:  var(--surface-sunken);
+  --color-surface-base:    var(--surface-base);
+  --color-surface-1:       var(--surface-1);
+  --color-surface-2:       var(--surface-2);
+  --color-surface-3:       var(--surface-3);
+  --color-surface-overlay: var(--surface-overlay);
+
+  --color-fg:           var(--text-primary);
+  --color-fg-secondary: var(--text-secondary);
+  --color-fg-muted:     var(--text-muted);
+
+  --color-border-subtle: var(--border-subtle);
+  --color-border:        var(--border);
+  --color-border-strong: var(--border-strong);
+
+  --color-accent-base:   var(--state-accent-base);
+  --color-accent-soft:   var(--state-accent-soft);
+  --color-accent-border: var(--state-accent-border);
+  --color-accent-ring:   var(--state-accent-ring);
+  --color-accent-fg:     var(--state-accent-fg);
+
+  --color-success-base:   var(--state-success-base);
+  --color-success-soft:   var(--state-success-soft);
+  --color-success-border: var(--state-success-border);
+  --color-success-fg:     var(--state-success-fg);
+
+  --color-warning-base:   var(--state-warning-base);
+  --color-warning-soft:   var(--state-warning-soft);
+  --color-warning-border: var(--state-warning-border);
+  --color-warning-fg:     var(--state-warning-fg);
+
+  --color-destructive-base:   var(--state-destructive-base);
+  --color-destructive-soft:   var(--state-destructive-soft);
+  --color-destructive-border: var(--state-destructive-border);
+  --color-destructive-fg:     var(--state-destructive-fg);
+
+  --color-info-base:   var(--state-info-base);
+  --color-info-soft:   var(--state-info-soft);
+  --color-info-border: var(--state-info-border);
+  --color-info-fg:     var(--state-info-fg);
+
+  --radius-sm:   var(--radius-sm);
+  --radius-md:   var(--radius-md);
+  --radius-lg:   var(--radius-lg);
+  --radius-xl:   var(--radius-xl);
+  --radius-pill: var(--radius-pill);
+
+  --shadow-elev-sm:      var(--elevation-sm);
+  --shadow-elev-md:      var(--elevation-md);
+  --shadow-elev-lg:      var(--elevation-lg);
+  --shadow-elev-overlay: var(--elevation-overlay);
+  --shadow-elev-glass:   var(--elevation-glass);
+
+  --duration-instant: var(--motion-instant);
+  --duration-quick:   var(--motion-quick);
+  --duration-base:    var(--motion-base);
+  --duration-slow:    var(--motion-slow);
+
+  --ease-standard: var(--ease-standard);
+  --ease-decel:    var(--ease-decel);
+  --ease-accel:    var(--ease-accel);
+  --ease-spring:   var(--ease-spring);
+
+  --font-mono:    var(--font-mono);
+  --font-sans:    var(--font-sans);
+  --font-heading: var(--font-heading);
+}
 
 @font-face {
   font-family: "Lora";
@@ -59,146 +129,18 @@
 }
 
 :root {
-  color-scheme: dark;
-  --csstools-color-scheme--dark: initial;
-
-  /* --- DartPad blue-gray scale ------------------------------- */
-  --sage-1:  #131D28;
-  --sage-2:  #1C2834;
-  --sage-3:  #243242;
-  --sage-4:  #2B3B4F;
-  --sage-5:  #3A4D63;
-  --sage-6:  #4A5F78;
-  --sage-7:  #6B7F96;
-  --sage-8:  #8FA3B8;
-  --sage-9:  #B4C5D5;
-  --sage-10: #D0DCE6;
-  --sage-11: #D0DCE6;
-  --sage-12: #F0F4F8;
-
-  --slate-1:  #131D28;
-  --slate-2:  #1C2834;
-  --slate-3:  #243242;
-  --slate-4:  #2B3B4F;
-  --slate-5:  #3A4D63;
-  --slate-6:  #4A5F78;
-  --slate-7:  #6B7F96;
-  --slate-8:  #8FA3B8;
-  --slate-9:  #B4C5D5;
-  --slate-10: #D0DCE6;
-  --slate-11: #D0DCE6;
-  --slate-12: #F0F4F8;
-
-  --gray-1:  #131D28;
-  --gray-2:  #1C2834;
-  --gray-3:  #243242;
-  --gray-4:  #2B3B4F;
-  --gray-5:  #3A4D63;
-  --gray-6:  #4A5F78;
-  --gray-7:  #6B7F96;
-  --gray-8:  #8FA3B8;
-  --gray-9:  #B4C5D5;
-  --gray-10: #D0DCE6;
-  --gray-11: #D0DCE6;
-  --gray-12: #F0F4F8;
-
-  --red-1: #1D1520;
-  --red-2: #2D1720;
-  --red-3: #3D1C24;
-  --red-4: #52222A;
-  --red-5: #6B2A33;
-  --red-6: #88353F;
-  --red-7: #A8424D;
-  --red-8: #C9525C;
-  --red-9: #E5484D;
-  --red-10: #EB6064;
-  --red-11: #F4A9AA;
-  --red-12: #FFF5F5;
-
-  --yellow-1: #1D1B14;
-  --yellow-2: #2D2918;
-  --yellow-3: #3D381E;
-  --yellow-4: #524B24;
-  --yellow-5: #6B612C;
-  --yellow-6: #887A38;
-  --yellow-7: #A89548;
-  --yellow-8: #C9B158;
-  --yellow-9: #E5C842;
-  --yellow-10: #EBD260;
-  --yellow-11: #F0DC88;
-  --yellow-12: #FDFCF5;
-
-  --grass-1: #141D18;
-  --grass-2: #172D1E;
-  --grass-3: #1C3D26;
-  --grass-4: #215230;
-  --grass-5: #296B3D;
-  --grass-6: #35884E;
-  --grass-7: #42A85E;
-  --grass-8: #5CC970;
-  --grass-9: #46A758;
-  --grass-10: #65BA74;
-  --grass-11: #94CE9A;
-  --grass-12: #F5FFF7;
-
-  --blue-1: #0C1A2D;
-  --blue-2: #0E2440;
-  --blue-3: #103058;
-  --blue-4: #123E72;
-  --blue-5: #144D8E;
-  --blue-6: #165EAC;
-  --blue-7: #168AFD;
-  --blue-8: #5EAAEF;
-  --blue-9: #168AFD;
-  --blue-10: #5EAAEF;
-  --blue-11: #8EC4F6;
-  --blue-12: #F0F8FF;
-
-  --cyan-9: #00B8CC;
-
-  /* --- Semantic tokens (DartPad) ----------------------------- */
-  --background: #0C141D;
-  --foreground: #F0F4F8;
-  --border: #243242;
-  --input: #243242;
-  --card: #1C2834;
-  --card-foreground: #F0F4F8;
-  --popover: #1C2834;
-  --popover-foreground: #F0F4F8;
-  --primary: #F0F4F8;
-  --primary-foreground: #1C2834;
-  --secondary: #243242;
-  --secondary-foreground: #F0F4F8;
-  --muted: #243242;
-  --muted-foreground: #8FA3B8;
-  --accent: #168afd;
-  --accent-foreground: #FFFFFF;
-  --ring: #3A4D63;
-  --destructive: #E5484D;
-  --destructive-foreground: #F0F4F8;
-  --error: #E5484D;
-  --stale: #C9B158;
-  --action-foreground: #F0DC88;
-
-  --monospace-font: "Fira Mono", ui-monospace, monospace;
-  --text-font: "PT Sans", sans-serif;
-  --heading-font: "Lora", serif;
-
-  --shadow-xs-solid: 0 1px 2px 0 rgba(0, 0, 0, 0.25);
-  --shadow-md-solid: 0 2px 4px -1px rgba(0, 0, 0, 0.35), 0 1px 2px -1px rgba(0, 0, 0, 0.25);
-  --shadow-shade: rgba(0, 0, 0, 0.35);
-
-  --content-width: 776px;
-  --content-width-medium: 1100px;
-  --gutter-width: 100px;
+  --monospace-font: var(--font-mono);
+  --text-font:      var(--font-sans);
+  --heading-font:   var(--font-heading);
 }
 
 html,
 body {
   margin: 0;
   min-height: 100%;
-  background: var(--background, #0C141D);
-  color: var(--foreground, #F0F4F8);
+  background: var(--surface-base);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }

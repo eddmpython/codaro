@@ -1,52 +1,16 @@
 <script lang="ts">
-  import { cva, type VariantProps } from "class-variance-authority";
   import type { Snippet } from "svelte";
   import type { HTMLButtonAttributes } from "svelte/elements";
+  import { Button, type ButtonVariant, type ButtonSize } from "$lib/codaro/ui";
 
-  const buttonVariants = cva(
-    "flex items-center justify-center m-0 leading-none font-medium border border-foreground/10 shadow-xs-solid active:shadow-none dark:border-border text-sm",
-    {
-      variants: {
-        color: {
-          gray: "mo-button gray",
-          white: "mo-button white",
-          green: "mo-button green",
-          red: "mo-button red",
-          yellow: "mo-button yellow",
-          "hint-green": "mo-button hint-green",
-          disabled: "mo-button disabled active:shadow-xs-solid"
-        },
-        shape: {
-          rectangle: "rounded",
-          circle: "rounded-full"
-        },
-        size: {
-          small: "",
-          medium: ""
-        }
-      },
-      compoundVariants: [
-        { size: "small", shape: "circle", class: "h-[24px] w-[24px] px-[5.5px] py-[5.5px]" },
-        { size: "medium", shape: "circle", class: "px-2 py-2" },
-        { size: "small", shape: "rectangle", class: "px-1 py-1 h-[24px] w-[24px]" },
-        { size: "medium", shape: "rectangle", class: "px-3 py-2" }
-      ],
-      defaultVariants: {
-        color: "gray",
-        shape: "rectangle",
-        size: "medium"
-      }
-    }
-  );
-
-  type ButtonColor = NonNullable<VariantProps<typeof buttonVariants>["color"]>;
-  type ButtonShape = NonNullable<VariantProps<typeof buttonVariants>["shape"]>;
-  type ButtonSize = NonNullable<VariantProps<typeof buttonVariants>["size"]>;
+  type LegacyColor = "gray" | "white" | "green" | "red" | "yellow" | "hint-green" | "disabled";
+  type LegacyShape = "rectangle" | "circle";
+  type LegacySize = "small" | "medium";
 
   interface Props extends HTMLButtonAttributes {
-    color?: ButtonColor;
-    shape?: ButtonShape;
-    size?: ButtonSize;
+    color?: LegacyColor;
+    shape?: LegacyShape;
+    size?: LegacySize;
     children: Snippet;
   }
 
@@ -55,14 +19,48 @@
     shape = "rectangle",
     size = "medium",
     class: className = "",
+    disabled,
     children,
-    ...restProps
+    ...rest
   }: Props = $props();
+
+  const variantMap: Record<LegacyColor, ButtonVariant> = {
+    gray: "secondary",
+    white: "outline",
+    green: "secondary",
+    red: "destructive",
+    yellow: "secondary",
+    "hint-green": "secondary",
+    disabled: "secondary",
+  };
+
+  const colorClassMap: Record<LegacyColor, string> = {
+    gray: "",
+    white: "",
+    green: "bg-success-soft text-success-fg border-success-border hover:bg-success-soft hover:border-success-base",
+    red: "",
+    yellow: "bg-warning-soft text-warning-fg border-warning-border hover:bg-warning-soft hover:border-warning-base",
+    "hint-green": "bg-success-soft text-success-fg border-success-border",
+    disabled: "opacity-50 cursor-not-allowed",
+  };
+
+  const sizeMap: Record<LegacySize, Record<LegacyShape, ButtonSize>> = {
+    small: { rectangle: "icon-xs", circle: "icon-xs" },
+    medium: { rectangle: "sm", circle: "icon-sm" },
+  };
+
+  const variant = $derived(variantMap[color]);
+  const buttonSize = $derived(sizeMap[size][shape]);
+  const shapeClass = $derived(shape === "circle" ? "rounded-full" : "");
+  const isDisabled = $derived(disabled || color === "disabled");
 </script>
 
-<button
-  class="{buttonVariants({ color, shape, size })} {className}"
-  {...restProps}
+<Button
+  variant={variant}
+  size={buttonSize}
+  disabled={isDisabled}
+  class={`${shapeClass} ${colorClassMap[color]} ${className}`}
+  {...rest}
 >
   {@render children()}
-</button>
+</Button>

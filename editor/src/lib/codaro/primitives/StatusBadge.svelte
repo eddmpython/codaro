@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { Loader2, Check, AlertTriangle, Clock, Circle, CircleDashed } from "lucide-svelte";
+
   interface Props {
     status: string;
     needsRun?: boolean;
@@ -7,15 +9,25 @@
 
   let { status, needsRun = false, elapsedTimeMs = null }: Props = $props();
 
-  let badgeColor = $derived(
-    status === "running" ? "badge-running"
-    : status === "queued" ? "badge-queued"
-    : status === "error" ? "badge-error"
-    : status === "stopped" ? "badge-error"
-    : status === "success" ? "badge-success"
-    : needsRun ? "badge-stale"
-    : "badge-idle"
+  type Tone = "idle" | "stale" | "queued" | "running" | "success" | "error";
+
+  const tone: Tone = $derived(
+    status === "running" ? "running"
+      : status === "queued" ? "queued"
+      : status === "error" || status === "stopped" ? "error"
+      : status === "success" ? "success"
+      : needsRun ? "stale"
+      : "idle",
   );
+
+  const toneClass: Record<Tone, string> = {
+    idle: "text-fg-muted",
+    stale: "bg-warning-soft text-warning-fg ring-1 ring-warning-border",
+    queued: "bg-zinc-700/30 text-fg-secondary ring-1 ring-border-subtle",
+    running: "bg-accent-soft text-accent-base ring-1 ring-accent-border",
+    success: "bg-success-soft text-success-fg ring-1 ring-success-border",
+    error: "bg-destructive-soft text-destructive-fg ring-1 ring-destructive-border",
+  };
 
   function formatTime(ms: number | null): string {
     if (ms === null) return "";
@@ -25,81 +37,51 @@
       const remaining = Math.floor(seconds % 60);
       return `${minutes}m${remaining}s`;
     }
-    if (seconds >= 1) return `${seconds.toFixed(1)}s`;
+    if (seconds >= 1) return `${seconds.toFixed(2)}s`;
     return `${ms.toFixed(0)}ms`;
   }
 
-  let timeLabel = $derived(
-    (status === "success" || status === "error") ? formatTime(elapsedTimeMs) : ""
+  const timeLabel = $derived(
+    (tone === "success" || tone === "error" || tone === "running" || tone === "stale")
+      ? formatTime(elapsedTimeMs)
+      : "",
   );
 </script>
 
-<span class="status-badge {badgeColor}" aria-label="Cell status: {status}">
-  <span class="status-dot"></span>
+<span
+  class="status-badge inline-flex items-center gap-1 h-5 px-1.5 rounded-md font-mono text-[10.5px] leading-none tabular-nums select-none transition-[background-color,color,box-shadow] duration-quick ease-standard {toneClass[tone]}"
+  data-tone={tone}
+  aria-label="Cell status: {status}"
+>
+  {#if tone === "running"}
+    <Loader2 class="h-3 w-3 animate-spin" />
+  {:else if tone === "success"}
+    <Check class="h-3 w-3" />
+  {:else if tone === "error"}
+    <AlertTriangle class="h-3 w-3 status-shake" />
+  {:else if tone === "queued"}
+    <Clock class="h-3 w-3 animate-pulse" />
+  {:else if tone === "stale"}
+    <Circle class="h-3 w-3" />
+  {:else}
+    <CircleDashed class="h-3 w-3 opacity-40" />
+  {/if}
   {#if timeLabel}
-    <span class="status-time">{timeLabel}</span>
+    <span>{timeLabel}</span>
+  {:else if tone === "queued"}
+    <span class="opacity-80">queued</span>
   {/if}
 </span>
 
 <style>
-  .status-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-size: 0.7rem;
-    font-family: var(--monospace-font);
-    line-height: 1;
-    user-select: none;
+  @keyframes status-shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-1.5px); }
+    75% { transform: translateX(1.5px); }
   }
 
-  .status-dot {
-    width: 7px;
-    height: 7px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-
-  .badge-idle .status-dot {
-    background: var(--sage-6);
-  }
-
-  .badge-stale .status-dot {
-    background: #e5a000;
-    box-shadow: 0 0 4px rgba(229, 160, 0, 0.4);
-  }
-
-  .badge-queued .status-dot {
-    background: #f59e0b;
-    animation: pulse-badge 1.5s ease-in-out infinite;
-  }
-
-  .badge-running .status-dot {
-    background: var(--accent);
-    animation: pulse-badge 1.2s ease-in-out infinite;
-  }
-
-  .badge-success .status-dot {
-    background: #22c55e;
-  }
-
-  .badge-error .status-dot {
-    background: var(--destructive);
-  }
-
-  .status-time {
-    color: var(--sage-8);
-  }
-
-  .badge-error .status-time {
-    color: var(--destructive);
-  }
-
-  .badge-success .status-time {
-    color: #22c55e;
-  }
-
-  @keyframes pulse-badge {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.3); }
+  .status-shake {
+    animation: status-shake 240ms var(--ease-standard);
+    animation-iteration-count: 3;
   }
 </style>

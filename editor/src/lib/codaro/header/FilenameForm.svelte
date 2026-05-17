@@ -8,18 +8,18 @@
   let {
     documentLocation,
     documentTitle = "untitled notebook",
-    hasPath
+    hasPath,
   }: Props = $props();
 
   const inputClass =
-    "placeholder:text-foreground-muted flex rounded-md bg-transparent text-sm outline-hidden disabled:cursor-not-allowed disabled:opacity-50 filename w-full px-4 py-1 my-1 h-9 font-mono text-foreground/60";
+    "filename w-full h-9 my-1 px-4 py-1 rounded-md bg-transparent font-mono text-[13px] text-fg/75 placeholder:text-fg-muted outline-none transition-[background,box-shadow,color] duration-quick ease-standard hover:bg-surface-2/60 focus-visible:bg-surface-2 focus-visible:text-fg focus-visible:ring-1 focus-visible:ring-accent-ring/60 disabled:cursor-not-allowed disabled:opacity-50";
 </script>
 
-<div class="pt-4 sm:pt-12 pb-2 mb-4 print:hidden z-50 sticky left-0">
+<div class="pt-4 sm:pt-8 pb-2 mb-4 print:hidden z-50 sticky left-0">
   <div class="flex items-center justify-center container">
     <div
       tabindex="-1"
-      class="flex h-full w-full flex-col overflow-hidden rounded-md text-popover-foreground bg-transparent group filename-input"
+      class="flex h-full w-full flex-col overflow-hidden rounded-md text-fg bg-transparent group filename-input"
       id="filename-input"
       data-testid="filename-input"
       cmdk-root=""
@@ -28,8 +28,8 @@
         cmdk-label=""
         for="codaro-filename-input"
         id="codaro-filename-label"
-        style="position: absolute; width: 1px; height: 1px; padding: 0px; margin: -1px; overflow: hidden; clip: rect(0px, 0px, 0px, 0px); white-space: nowrap; border-width: 0px;"
-      ></label>
+        class="sr-only"
+      >Filename</label>
       <div
         class="max-h-[300px] overflow-y-auto overflow-x-hidden"
         cmdk-list=""
@@ -41,7 +41,7 @@
       >
         <div cmdk-list-sizer="">
           <div>
-            <div class="flex items-center border-b border-none justify-center px-1" cmdk-input-wrapper="">
+            <div class="flex items-center justify-center px-1" cmdk-input-wrapper="">
               <input
                 class="{inputClass} {hasPath ? 'filename' : 'missing-filename'}"
                 data-testid="dir-completion-input"
