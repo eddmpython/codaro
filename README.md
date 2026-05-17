@@ -6,8 +6,8 @@
 
 <p align="center">
   <a href="notebooks/python30DaysComplete/readme.md"><img alt="Python 30 Days" src="https://img.shields.io/badge/Python_30_Days-open-2563eb" /></a>
-  <a href="notebooks/python30DaysComplete/colab/"><img alt="Colab notebooks" src="https://img.shields.io/badge/Colab_notebooks-36-F9AB00?logo=googlecolab" /></a>
-  <a href="notebooks/python30DaysComplete/marimo/"><img alt="marimo notebooks" src="https://img.shields.io/badge/marimo_notebooks-36-111827" /></a>
+  <a href="https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb"><img alt="Open Day 01 in Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
+  <a href="https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day01Helloworld.py"><img alt="Open Day 01 in molab" src="https://img.shields.io/badge/Day_01-open_in_molab-ff5a5f" /></a>
 </p>
 
 Codaro는 Python 코드가 곧 인터페이스가 되는 개인 자동화 스튜디오입니다.
@@ -22,6 +22,7 @@ Codaro는 Python 코드가 곧 인터페이스가 되는 개인 자동화 스튜
 |---|---|
 | [Python 30일 완성](notebooks/python30DaysComplete/readme.md) | 전체 커리큘럼, Day 목록, Colab, marimo 진입점 |
 | [Day 01 Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb) | 브라우저에서 바로 실행하는 첫 노트북 |
+| [Day 01 marimo 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day01Helloworld.py) | molab에서 바로 실행하는 첫 marimo 노트북 |
 | [코스 가이드](notebooks/python30DaysComplete/courseGuide.md) | 학습 방법, 평가 기준, 최종 프로젝트 설명 |
 
 ## 현재 배포 중
@@ -32,8 +33,8 @@ Codaro는 Python 코드가 곧 인터페이스가 되는 개인 자동화 스튜
 
 | 형식 | 링크 | 용도 |
 |---|---|---|
-| Colab | [전체 노트북](notebooks/python30DaysComplete/colab/) | 설치 없이 브라우저에서 학습 |
-| marimo | [전체 노트북](notebooks/python30DaysComplete/marimo/) | 네이티브 `marimo.App` 형식으로 학습 |
+| Colab | [Day 01 바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb) | Colab에서 노트북 즉시 실행 |
+| marimo | [Day 01 바로 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day01Helloworld.py) | molab에서 노트북 즉시 실행 |
 | 진행표 | [progressTracker.csv](notebooks/python30DaysComplete/progressTracker.csv) | 30일 학습 진행 기록 |
 
 ## 30일 흐름

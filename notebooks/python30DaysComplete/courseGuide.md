@@ -61,12 +61,12 @@ Day별 통과 기준은 아래 6개입니다.
 
 | 범위 | Colab | marimo |
 |---|---|---|
-| Day 01-05 | `colab/reviewDay01To05.ipynb` | `marimo/reviewDay01To05.py` |
-| Day 06-10 | `colab/reviewDay06To10.ipynb` | `marimo/reviewDay06To10.py` |
-| Day 11-15 | `colab/reviewDay11To15.ipynb` | `marimo/reviewDay11To15.py` |
-| Day 16-20 | `colab/reviewDay16To20.ipynb` | `marimo/reviewDay16To20.py` |
-| Day 21-25 | `colab/reviewDay21To25.ipynb` | `marimo/reviewDay21To25.py` |
-| Day 26-30 | `colab/reviewDay26To30.ipynb` | `marimo/reviewDay26To30.py` |
+| Day 01-05 | [Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/reviewDay01To05.ipynb) | [molab 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/reviewDay01To05.py) |
+| Day 06-10 | [Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/reviewDay06To10.ipynb) | [molab 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/reviewDay06To10.py) |
+| Day 11-15 | [Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/reviewDay11To15.ipynb) | [molab 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/reviewDay11To15.py) |
+| Day 16-20 | [Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/reviewDay16To20.ipynb) | [molab 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/reviewDay16To20.py) |
+| Day 21-25 | [Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/reviewDay21To25.ipynb) | [molab 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/reviewDay21To25.py) |
+| Day 26-30 | [Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/reviewDay26To30.ipynb) | [molab 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/reviewDay26To30.py) |
 
 ## 운영 가이드
 
@@ -115,8 +115,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 코드 셀 실행, 문자열 리터럴, 숫자 표현식, 결과 관찰
 - 산출물: 오늘의 작은 결과물은 자기소개 한 줄입니다. 이름, 오늘 배운 것, 내일 목표를 각각 변수에 담고 하나의 문장으로 합치세요.
 - 변형: 문장의 마침표를 느낌표로 바꾸고 다시 실행해보세요.
-- Colab: `colab/day01Helloworld.ipynb`
-- marimo: `marimo/day01Helloworld.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day01Helloworld.py)
 
 ## Day 02. 변수와 데이터 타입
 
@@ -125,8 +125,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 변수 대입, 정수와 실수, 문자열, 불리언, 타입 확인
 - 산출물: 간단한 영수증 데이터를 변수로 만들고, 최종 결제 금액을 계산하세요.
 - 변형: `payment`가 10000 이상인지 `isBigOrder` 변수에 저장해보세요.
-- Colab: `colab/day02Variablestypes.ipynb`
-- marimo: `marimo/day02Variablestypes.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day02Variablestypes.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day02Variablestypes.py)
 
 ## Day 03. 연산자
 
@@ -135,8 +135,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 산술 연산, 나머지, 비교 연산, 논리 연산, 멤버십 연산
 - 산출물: 간단한 입장 조건을 만드세요. 나이가 13 이상이고 티켓을 가진 사람만 입장할 수 있습니다.
 - 변형: 나이가 65 이상이면 티켓이 없어도 입장 가능하도록 조건을 확장해보세요.
-- Colab: `colab/day03Operators.ipynb`
-- marimo: `marimo/day03Operators.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day03Operators.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day03Operators.py)
 
 ## Day 04. 문자열 기초
 
@@ -145,8 +145,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 문자열 연결, f-string, 이스케이프, 여러 줄 문자열, 포함 여부
 - 산출물: 짧은 주문 확인 문장을 만드세요. 메뉴명, 수량, 결제 금액이 모두 들어가야 합니다.
 - 변형: 문장 안에 줄바꿈 `\n`을 넣어 영수증처럼 두 줄로 출력해보세요.
-- Colab: `colab/day04Stringbasics.ipynb`
-- marimo: `marimo/day04Stringbasics.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day04Stringbasics.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day04Stringbasics.py)
 
 ## Day 05. 문자열 인덱싱과 슬라이싱
 
@@ -155,8 +155,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 0번 인덱스, 음수 인덱스, 범위 슬라이싱, 간격 슬라이싱, 끝 미포함 규칙
 - 산출물: 주민번호처럼 생긴 예시 문자열에서 생년월일 부분과 뒤 첫 숫자를 분리하세요. 실제 개인정보를 사용하지 마세요.
 - 변형: `sampleId`에서 하이픈을 기준으로 앞부분과 뒷부분을 각각 슬라이스해보세요.
-- Colab: `colab/day05Stringindexingslicing.ipynb`
-- marimo: `marimo/day05Stringindexingslicing.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day05Stringindexingslicing.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day05Stringindexingslicing.py)
 
 ## Day 06. 문자열 메서드
 
@@ -165,8 +165,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 공백 제거, 대소문자 변환, 분리, 결합, 치환, 검색
 - 산출물: 사용자가 입력한 문장처럼 보이는 텍스트를 정리해 검색 키워드로 바꾸세요.
 - 변형: `keyword.count('-')`로 단어 사이 구분자가 몇 개인지 확인해보세요.
-- Colab: `colab/day06Stringmethods.ipynb`
-- marimo: `marimo/day06Stringmethods.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day06Stringmethods.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day06Stringmethods.py)
 
 ## Day 07. 리스트 기초
 
@@ -175,8 +175,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 리스트 생성, 리스트 인덱싱, 리스트 슬라이싱, 값 변경, 길이 확인
 - 산출물: 이번 주 학습 항목 리스트를 만들고, 앞의 3개 항목만 `weekStart`로 꺼내세요.
 - 변형: 마지막 항목을 다른 주제로 바꾼 뒤 다시 출력해보세요.
-- Colab: `colab/day07Listbasics.ipynb`
-- marimo: `marimo/day07Listbasics.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day07Listbasics.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day07Listbasics.py)
 
 ## Day 08. 리스트 메서드
 
@@ -185,8 +185,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 추가, 삽입, 삭제, 정렬, 복사, 확장
 - 산출물: 대기열을 만들고 한 명을 앞에 추가한 뒤, 첫 번째 사람을 처리하세요.
 - 변형: `copy()`를 사용해 원본 대기열과 백업 대기열을 분리해보세요.
-- Colab: `colab/day08Listmethods.ipynb`
-- marimo: `marimo/day08Listmethods.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day08Listmethods.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day08Listmethods.py)
 
 ## Day 09. 튜플
 
@@ -195,8 +195,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 튜플 생성, 불변성, 패킹, 언패킹, 반환값 묶음
 - 산출물: 좌표 두 개를 튜플로 만들고, x/y 차이를 계산하세요.
 - 변형: 언패킹을 사용해 `startX`, `startY`, `endX`, `endY`로 바꿔 계산해보세요.
-- Colab: `colab/day09Tuples.ipynb`
-- marimo: `marimo/day09Tuples.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day09Tuples.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day09Tuples.py)
 
 ## Day 10. 집합
 
@@ -205,8 +205,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 중복 제거, 소속 검사, add, discard, 합집합, 교집합, 차집합
 - 산출물: 이벤트 참가자와 설문 응답자의 교집합, 전체 고유 인원을 구하세요.
 - 변형: 참가했지만 설문에 응답하지 않은 사람을 찾아보세요.
-- Colab: `colab/day10Sets.ipynb`
-- marimo: `marimo/day10Sets.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day10Sets.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day10Sets.py)
 
 ## Day 11. 딕셔너리 기초
 
@@ -215,8 +215,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 키와 값, 값 읽기, 값 수정, 새 키 추가, 중첩 데이터의 시작
 - 산출물: 학생 한 명의 성적표를 딕셔너리로 만들고 평균 점수를 계산하세요.
 - 변형: `report`에 `passed` 키를 추가하고 평균이 80 이상인지 저장해보세요.
-- Colab: `colab/day11Dictbasics.ipynb`
-- marimo: `marimo/day11Dictbasics.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day11Dictbasics.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day11Dictbasics.py)
 
 ## Day 12. 딕셔너리 메서드
 
@@ -225,8 +225,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 안전한 읽기, 키 목록, 값 목록, 키-값 순회, 갱신, 삭제
 - 산출물: 상품 가격 딕셔너리를 안전하게 읽고, 품절 상품을 제거한 뒤, 새 상품 가격을 한 번에 추가하세요.
 - 변형: `pop`으로 품절 상품을 제거한 뒤 남은 딕셔너리를 확인해보세요.
-- Colab: `colab/day12Dictmethods.ipynb`
-- marimo: `marimo/day12Dictmethods.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day12Dictmethods.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day12Dictmethods.py)
 
 ## Day 13. 조건문
 
@@ -235,8 +235,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: if, elif, else, 중첩 조건, 조건 표현식, 블록 들여쓰기
 - 산출물: 배송비 정책을 조건문으로 구현하세요. 50000원 이상은 무료, 30000원 이상은 2000원, 그 외는 3000원입니다.
 - 변형: 쿠폰 보유 여부까지 반영해 최종 결제 금액을 계산해보세요.
-- Colab: `colab/day13Conditionals.ipynb`
-- marimo: `marimo/day13Conditionals.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day13Conditionals.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day13Conditionals.py)
 
 ## Day 14. 반복문
 
@@ -245,8 +245,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: for, while, range, 누적, break, continue, 중첩 반복
 - 산출물: 구매 금액 리스트에서 10000원 이상인 주문만 골라 총합을 구하세요.
 - 변형: `continue`를 사용해 10000원 미만 주문을 건너뛰는 형태로 바꿔보세요.
-- Colab: `colab/day14Loops.ipynb`
-- marimo: `marimo/day14Loops.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day14Loops.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day14Loops.py)
 
 ## Day 15. 함수 기초
 
@@ -255,8 +255,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: def, 매개변수, 인자, return, docstring, 재사용
 - 산출물: 금액과 할인율을 받아 할인 후 금액을 반환하는 함수를 만드세요.
 - 변형: 할인 후 금액이 0보다 작아지지 않도록 함수를 보강해보세요.
-- Colab: `colab/day15Functionbasics.ipynb`
-- marimo: `marimo/day15Functionbasics.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day15Functionbasics.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day15Functionbasics.py)
 
 ## Day 16. 함수 고급
 
@@ -265,8 +265,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 기본 매개변수, 키워드 인자, *args, **kwargs, lambda
 - 산출물: 금액 리스트와 할인율을 받아 할인 금액 리스트를 반환하는 함수를 만드세요.
 - 변형: `lambda price: price >= 20000`를 만들어 고가 상품만 필터링해보세요.
-- Colab: `colab/day16Functionadvanced.ipynb`
-- marimo: `marimo/day16Functionadvanced.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day16Functionadvanced.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day16Functionadvanced.py)
 
 ## Day 17. 스코프와 클로저
 
@@ -275,8 +275,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 지역 스코프, 전역 스코프, nonlocal, global, 클로저, 상태 캡슐화
 - 산출물: 누적 합계를 기억하는 `makeAccumulator`를 만들고 여러 번 호출해보세요.
 - 변형: 누적 합계가 음수가 되지 않도록 `add` 내부에 조건문을 추가해보세요.
-- Colab: `colab/day17Scopeclosure.ipynb`
-- marimo: `marimo/day17Scopeclosure.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day17Scopeclosure.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day17Scopeclosure.py)
 
 ## Day 18. 모듈과 import
 
@@ -285,8 +285,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: import, from import, as 별칭, 표준 라이브러리, 모듈 네임스페이스
 - 산출물: 오늘 날짜와 임의의 학습 점수를 조합해 학습 기록 딕셔너리를 만드세요.
 - 변형: `random.seed(7)`을 추가하면 임의 결과가 어떻게 바뀌는지 확인해보세요.
-- Colab: `colab/day18Modulesimport.ipynb`
-- marimo: `marimo/day18Modulesimport.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day18Modulesimport.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day18Modulesimport.py)
 
 ## Day 19. 파일 입출력
 
@@ -295,8 +295,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: open, with, read, write, 파일 모드, pathlib, JSON 저장
 - 산출물: 학습 기록 딕셔너리를 JSON 파일로 저장하고 다시 읽어오세요.
 - 변형: `indent=2` 옵션을 넣어 JSON 파일을 사람이 읽기 좋게 저장해보세요.
-- Colab: `colab/day19Fileio.ipynb`
-- marimo: `marimo/day19Fileio.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day19Fileio.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day19Fileio.py)
 
 ## Day 20. 예외 처리
 
@@ -305,8 +305,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: try, except, 구체 예외, else, finally, raise, 예외 메시지
 - 산출물: 점수 문자열 리스트를 정수로 바꾸고, 잘못된 값은 `invalidValues`에 모으세요.
 - 변형: 잘못된 값이 하나라도 있으면 `ValueError`를 직접 발생시키는 검증 함수를 만들어보세요.
-- Colab: `colab/day20Exceptionhandling.ipynb`
-- marimo: `marimo/day20Exceptionhandling.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day20Exceptionhandling.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day20Exceptionhandling.py)
 
 ## Day 21. 중간 종합 복습
 
@@ -315,8 +315,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 데이터 파이프라인, 검증 함수, 반복 처리, 요약, 작은 설계
 - 산출물: 간단한 학습 기록 목록에서 완료한 항목 수, 평균 점수, 미완료 항목을 요약하세요.
 - 변형: 요약 결과를 JSON 파일로 저장하고 다시 읽어오세요.
-- Colab: `colab/day21Midreview.ipynb`
-- marimo: `marimo/day21Midreview.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day21Midreview.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day21Midreview.py)
 
 ## Day 22. 클래스 기초
 
@@ -325,8 +325,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: class, __init__, self, 인스턴스, 속성, 메서드
 - 산출물: 할 일 하나를 표현하는 `Task` 클래스를 만들고 완료 처리 메서드를 작성하세요.
 - 변형: `rename` 메서드를 추가해 제목을 바꿀 수 있게 해보세요.
-- Colab: `colab/day22Classbasics.ipynb`
-- marimo: `marimo/day22Classbasics.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day22Classbasics.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day22Classbasics.py)
 
 ## Day 23. 클래스 고급
 
@@ -335,8 +335,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 상속, super, 오버라이드, 다형성, 상속보다 합성 판단
 - 산출물: 알림 기본 클래스와 이메일/문자 알림 클래스를 만들고 같은 `send` 메서드 이름으로 다르게 동작하게 하세요.
 - 변형: 새로운 `PushNotification` 클래스를 추가해 같은 리스트에서 동작하게 해보세요.
-- Colab: `colab/day23Classadvanced.ipynb`
-- marimo: `marimo/day23Classadvanced.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day23Classadvanced.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day23Classadvanced.py)
 
 ## Day 24. 특수 메서드
 
@@ -345,8 +345,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: __str__, __repr__, __len__, __eq__, __add__, __getitem__
 - 산출물: 장바구니 클래스를 만들고 `len(cart)`, `cart[0]`, `str(cart)`가 동작하게 하세요.
 - 변형: `__add__`를 추가해 장바구니끼리 합칠 수 있게 해보세요.
-- Colab: `colab/day24Specialmethods.ipynb`
-- marimo: `marimo/day24Specialmethods.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day24Specialmethods.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day24Specialmethods.py)
 
 ## Day 25. 프로퍼티와 데코레이터
 
@@ -355,8 +355,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: @property, setter, staticmethod, classmethod, 함수 데코레이터
 - 산출물: 상품 클래스에 할인 가격 프로퍼티와 문자열에서 상품을 만드는 클래스 메서드를 추가하세요.
 - 변형: `@staticmethod`으로 가격이 양수인지 검사하는 함수를 추가해보세요.
-- Colab: `colab/day25Propertydecorator.ipynb`
-- marimo: `marimo/day25Propertydecorator.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day25Propertydecorator.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day25Propertydecorator.py)
 
 ## Day 26. 컴프리헨션
 
@@ -365,8 +365,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 리스트 컴프리헨션, 조건 필터, 딕셔너리 컴프리헨션, 집합 컴프리헨션, 중첩 컴프리헨션
 - 산출물: 주문 목록에서 결제 완료된 주문만 골라 상품명과 할인 금액 딕셔너리를 만드세요.
 - 변형: 같은 로직을 일반 for문으로 다시 작성해 가독성을 비교해보세요.
-- Colab: `colab/day26Comprehensions.ipynb`
-- marimo: `marimo/day26Comprehensions.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day26Comprehensions.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day26Comprehensions.py)
 
 ## Day 27. 제너레이터와 이터레이터
 
@@ -375,8 +375,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: yield, 제너레이터, next, iter, 이터레이터 프로토콜, 지연 평가
 - 산출물: 로그 문자열 리스트에서 `ERROR`가 들어간 줄만 하나씩 내보내는 제너레이터를 만드세요.
 - 변형: `next`와 `try/except StopIteration`으로 직접 하나씩 꺼내보세요.
-- Colab: `colab/day27Generatorsiterators.ipynb`
-- marimo: `marimo/day27Generatorsiterators.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day27Generatorsiterators.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day27Generatorsiterators.py)
 
 ## Day 28. 고급 문법 종합
 
@@ -385,8 +385,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: with 문, __enter__, __exit__, contextlib, 정리 보장, 고급 문법 연결
 - 산출물: 임시 설정을 켰다가 블록이 끝나면 원래 값으로 되돌리는 컨텍스트 매니저를 만드세요.
 - 변형: 블록 안에서 예외가 발생해도 `outside`가 복구되는지 실험해보세요.
-- Colab: `colab/day28Advancedsyntaxreview.ipynb`
-- marimo: `marimo/day28Advancedsyntaxreview.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day28Advancedsyntaxreview.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day28Advancedsyntaxreview.py)
 
 ## Day 29. 알고리즘 연습
 
@@ -395,8 +395,8 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 문제 분석, 정렬, 선형 탐색, 딕셔너리 빈도, 재귀, 복잡도 감각
 - 산출물: 주문 금액 리스트에서 기준 금액 이상인 주문의 개수와 총액을 반환하는 함수를 만드세요.
 - 변형: 같은 함수를 컴프리헨션과 `sum`으로 다시 작성해보세요.
-- Colab: `colab/day29Algorithmpractice.ipynb`
-- marimo: `marimo/day29Algorithmpractice.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day29Algorithmpractice.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day29Algorithmpractice.py)
 
 ## Day 30. 최종 프로젝트
 
@@ -405,5 +405,5 @@ Day 30의 최종 산출물은 30일 학습 리포트 프로그램입니다.
 - 핵심 개념: 요구사항 분해, 데이터 모델, 함수 분리, 클래스, 파일 저장, 최종 점검
 - 산출물: 최종 프로젝트: 30일 학습 기록을 요약하는 리포트 프로그램을 완성하세요. 아래 시작 코드를 확장해 JSON 저장까지 수행합니다.
 - 변형: 미완료 항목, 최장 학습일, 다음 복습 추천 주제를 리포트에 추가하세요.
-- Colab: `colab/day30Finalproject.ipynb`
-- marimo: `marimo/day30Finalproject.py`
+- Colab: [바로 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day30Finalproject.ipynb)
+- marimo: [molab에서 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day30Finalproject.py)

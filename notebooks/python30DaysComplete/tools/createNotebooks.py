@@ -10,6 +10,9 @@ ROOT = Path(__file__).resolve().parents[1]
 COLAB_DIR = ROOT / "colab"
 MARIMO_DIR = ROOT / "marimo"
 REVIEW_RANGES = [(1, 5), (6, 10), (11, 15), (16, 20), (21, 25), (26, 30)]
+REPOSITORY = "eddmpython/codaro"
+BRANCH = "main"
+COURSE_PATH = "notebooks/python30DaysComplete"
 
 
 DAY_CONTENT = [
@@ -3221,6 +3224,14 @@ def makeCodeCell(source: str) -> dict[str, object]:
     }
 
 
+def colabUrl(relativePath: str) -> str:
+    return f"https://colab.research.google.com/github/{REPOSITORY}/blob/{BRANCH}/{COURSE_PATH}/{relativePath}"
+
+
+def molabUrl(relativePath: str) -> str:
+    return f"https://molab.marimo.io/github/{REPOSITORY}/blob/{BRANCH}/{COURSE_PATH}/{relativePath}"
+
+
 def makeReviewMarkdown(day: int) -> str:
     if day == 1:
         return """
@@ -4315,11 +4326,11 @@ def writeProgressCsv() -> None:
 
 def writeReadme() -> None:
     rows = "\n".join(
-        f"| {int(dayInfo['day']):02d} | {dayInfo['title']} | {dayInfo['focus']} | [Colab](colab/{notebookName(dayInfo)}) | [marimo](marimo/{marimoName(dayInfo)}) |"
+        f"| {int(dayInfo['day']):02d} | {dayInfo['title']} | {dayInfo['focus']} | [Colab 열기]({colabUrl('colab/' + notebookName(dayInfo))}) | [molab 열기]({molabUrl('marimo/' + marimoName(dayInfo))}) |"
         for dayInfo in DAY_CONTENT
     )
     reviewRows = "\n".join(
-        f"| Day {startDay:02d}-{endDay:02d} | 5일 누적 리뷰와 시험형 과제 | [Colab](colab/{reviewNotebookName(startDay, endDay)}) | [marimo](marimo/{reviewNotebookName(startDay, endDay).replace('.ipynb', '.py')}) |"
+        f"| Day {startDay:02d}-{endDay:02d} | 5일 누적 리뷰와 시험형 과제 | [Colab 열기]({colabUrl('colab/' + reviewNotebookName(startDay, endDay))}) | [molab 열기]({molabUrl('marimo/' + reviewNotebookName(startDay, endDay).replace('.ipynb', '.py'))}) |"
         for startDay, endDay in REVIEW_RANGES
     )
     readme = f"""
@@ -4334,13 +4345,11 @@ def writeReadme() -> None:
     ## 바로가기
 
     [![Course Guide](https://img.shields.io/badge/Course_Guide-open-2563eb)](courseGuide.md)
-    [![All Colab Notebooks](https://img.shields.io/badge/Colab_all_notebooks-browse-F9AB00?logo=googlecolab)](colab/)
-    [![Open Day 01 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb)
-    [![All marimo Notebooks](https://img.shields.io/badge/marimo_all_notebooks-browse-111827)](marimo/)
-    [![Open Day 01 marimo](https://img.shields.io/badge/Day_01-marimo-ff5a5f)](marimo/day01Helloworld.py)
+    [![Open Day 01 in Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colabUrl("colab/day01Helloworld.ipynb")})
+    [![Open Day 01 in molab](https://img.shields.io/badge/Day_01-open_in_molab-ff5a5f)]({molabUrl("marimo/day01Helloworld.py")})
     [![Progress Tracker](https://img.shields.io/badge/Progress_Tracker-csv-16a34a)](progressTracker.csv)
 
-    처음 시작한다면 Day 01을 Colab에서 열어 위에서 아래로 실행하세요. marimo로 학습하려면 이 저장소를 받은 뒤 `uvx --from marimo marimo edit notebooks/python30DaysComplete/marimo/day01Helloworld.py`로 시작할 수 있습니다.
+    처음 시작한다면 Day 01을 Colab에서 열어 위에서 아래로 실행하세요. marimo로 학습하려면 molab 링크로 바로 열거나, 이 저장소를 받은 뒤 `uvx --from marimo marimo edit notebooks/python30DaysComplete/marimo/day01Helloworld.py`로 시작할 수 있습니다.
 
     ## 목표
 
@@ -4400,8 +4409,8 @@ def writeCourseGuide() -> None:
             - 핵심 개념: {concepts}
             - 산출물: {dayInfo['projectPrompt']}
             - 변형: {dayInfo['challenge']}
-            - Colab: `colab/{notebookName(dayInfo)}`
-            - marimo: `marimo/{marimoName(dayInfo)}`
+            - Colab: [바로 열기]({colabUrl('colab/' + notebookName(dayInfo))})
+            - marimo: [molab에서 열기]({molabUrl('marimo/' + marimoName(dayInfo))})
             """
         )
     milestoneRows = "\n".join(
@@ -4409,7 +4418,7 @@ def writeCourseGuide() -> None:
         for day, title in MILESTONE_DAYS.items()
     )
     reviewRows = "\n".join(
-        f"| Day {startDay:02d}-{endDay:02d} | `colab/{reviewNotebookName(startDay, endDay)}` | `marimo/{reviewNotebookName(startDay, endDay).replace('.ipynb', '.py')}` |"
+        f"| Day {startDay:02d}-{endDay:02d} | [Colab 열기]({colabUrl('colab/' + reviewNotebookName(startDay, endDay))}) | [molab 열기]({molabUrl('marimo/' + reviewNotebookName(startDay, endDay).replace('.ipynb', '.py'))}) |"
         for startDay, endDay in REVIEW_RANGES
     )
     content = f"""
