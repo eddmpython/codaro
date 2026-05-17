@@ -10,26 +10,33 @@
   <a href="notebooks/python30DaysComplete/marimo/"><img alt="marimo notebooks" src="https://img.shields.io/badge/marimo_notebooks-36-111827" /></a>
 </p>
 
-Codaro는 Python 코드가 곧 인터페이스가 되는 개인 자동화 스튜디오입니다. 현재는 교육용 지능형 GUI 프로그램으로 진화하기 전 단계로, 먼저 독립 실행 가능한 학습 노트북 커리큘럼을 배포합니다.
+Codaro는 Python 코드가 곧 인터페이스가 되는 개인 자동화 스튜디오입니다.
 
-## 학습 시작
+장기적으로는 학습, 자동화, 리포트, 앱 실행을 하나의 GUI에서 다루는 교육용 프로그램으로 발전시키고 있습니다. 지금은 그 전에 먼저, 누구나 바로 실행할 수 있는 Python 학습 노트북을 배포합니다.
 
-처음 온 학습자는 아래 30일 과정 문서에서 시작하면 됩니다. 과정 문서 안에서 전체 Colab 노트북, 전체 marimo 노트북, 진행표, 코스 가이드로 이동할 수 있습니다.
+## 지금 바로 시작
 
-| 바로가기 | 설명 |
+처음 온 학습자는 여기서 시작하면 됩니다.
+
+| 시작점 | 설명 |
 |---|---|
-| [Python 30일 완성 열기](notebooks/python30DaysComplete/readme.md) | 30일 커리큘럼의 메인 진입점 |
-| [Colab 노트북 모아보기](notebooks/python30DaysComplete/colab/) | 브라우저에서 실행할 `.ipynb` 워크북 |
-| [marimo 노트북 모아보기](notebooks/python30DaysComplete/marimo/) | 네이티브 `marimo.App` 형식의 `.py` 워크북 |
-| [코스 가이드](notebooks/python30DaysComplete/courseGuide.md) | 학습 방법론, 루브릭, 최종 프로젝트 기준 |
+| [Python 30일 완성](notebooks/python30DaysComplete/readme.md) | 전체 커리큘럼, Day 목록, Colab, marimo 진입점 |
+| [Day 01 Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb) | 브라우저에서 바로 실행하는 첫 노트북 |
+| [코스 가이드](notebooks/python30DaysComplete/courseGuide.md) | 학습 방법, 평가 기준, 최종 프로젝트 설명 |
 
-### 현재 배포 중
+## 현재 배포 중
 
-| 커리큘럼 | 수준 | 완성 목표 | 진입점 | Colab | marimo |
-|---|---|---|---|---|---|
-| Python 30일 완성 | 입문자부터 작은 프로젝트까지 | 순수 Python 기본기, 디버깅 습관, 5일 리뷰, 최종 학습 리포트 | [과정 문서](notebooks/python30DaysComplete/readme.md) | [전체 보기](notebooks/python30DaysComplete/colab/) | [전체 보기](notebooks/python30DaysComplete/marimo/) |
+### Python 30일 완성
 
-### 30일 커리큘럼
+순수 Python 기본기를 30일 동안 익히는 공개용 학습 과정입니다. 단순 문법 목록이 아니라, 매일 예측, 실행, 빈칸 채우기, 버그 수정, 오답 노트, 전이 연습, 자동 체크포인트, 미니 프로젝트를 반복합니다.
+
+| 형식 | 링크 | 용도 |
+|---|---|---|
+| Colab | [전체 노트북](notebooks/python30DaysComplete/colab/) | 설치 없이 브라우저에서 학습 |
+| marimo | [전체 노트북](notebooks/python30DaysComplete/marimo/) | 네이티브 `marimo.App` 형식으로 학습 |
+| 진행표 | [progressTracker.csv](notebooks/python30DaysComplete/progressTracker.csv) | 30일 학습 진행 기록 |
+
+## 30일 흐름
 
 | 범위 | 주제 | 학습 결과 |
 |---|---|---|
@@ -40,117 +47,44 @@ Codaro는 Python 코드가 곧 인터페이스가 되는 개인 자동화 스튜
 | Day 21-25 | 프로그램 설계 | 누적 복습과 객체지향 모델링 시작하기 |
 | Day 26-30 | Python 응용 | 컴프리헨션, 제너레이터, 컨텍스트 매니저, 알고리즘, 최종 프로젝트 완성하기 |
 
-### 이후 추가 예정
+## 다음 커리큘럼
 
 | 커리큘럼 | 상태 | 목적 |
 |---|---|---|
-| Python Automation 30 Days | 예정 | 파일, 브라우저, 스케줄링 기반 개인 자동화 |
-| Data Analysis Starter | 예정 | CSV, 표, 시각화, 리포트 노트북 |
-| Web App Runtime Basics | 예정 | Python 문서를 앱 화면으로 전환하는 흐름 |
-| Task Builder Recipes | 예정 | 재사용 가능한 자동화 태스크와 리포트 패턴 |
+| Python 자동화 30일 | 예정 | 파일, 브라우저, 스케줄링 기반 개인 자동화 |
+| 데이터 분석 입문 | 예정 | CSV, 표, 시각화, 리포트 노트북 |
+| 웹 앱 런타임 기초 | 예정 | Python 문서를 앱 화면으로 전환하는 흐름 |
+| 태스크 빌더 레시피 | 예정 | 재사용 가능한 자동화 태스크와 리포트 패턴 |
 
-## Overview
+## Codaro의 방향
 
-Codaro is a programmable studio that combines an editor, execution runtime, learning system, automation builder, and report viewer into a single environment. It provides five connected surfaces:
+Codaro는 하나의 런타임 위에서 다섯 가지 흐름을 연결하려고 합니다.
 
-- **Edit**: write, execute, and save code and markdown blocks with reactive dataflow
-- **Learn**: study notebook curricula with progress, feedback, and structured practice
-- **Automate**: build personal workflows and scheduled tasks
-- **Report**: turn executed documents into readable outputs
-- **App**: run the same document as a hidden-code application
+- **편집**: 코드와 마크다운을 셀 단위로 작성하고 실행합니다.
+- **학습**: 노트북 커리큘럼으로 학습 과정을 구조화합니다.
+- **자동화**: 개인 자동화 작업을 만들고 반복 실행합니다.
+- **리포트**: 실행 결과를 읽기 쉬운 문서로 정리합니다.
+- **앱 실행**: 같은 문서를 코드가 숨겨진 앱 화면으로 실행합니다.
 
-## Background
+현재 공개된 것은 이 중 학습 노트북 배포판입니다. GUI, 학습 피드백, 자동화 빌더, 리포트 뷰어는 단계적으로 합쳐갈 예정입니다.
 
-Codaro started by studying [marimo](https://github.com/marimo-team/marimo)'s reactive cell model as an architectural benchmark. The editor chrome was initially built to match marimo's DOM structure as a reference implementation exercise. Codaro diverges in its execution model, default file format, execution environment, and broader scope.
+## 개발자용 메모
 
-Codaro is not a fork of marimo and shares no source code. It is an independent project that supports reactive-app format import/export for marimo compatibility.
+일반 학습자는 위의 노트북 링크만 보면 됩니다. 개발자는 아래 문서를 기준으로 구조를 확인합니다.
 
-## Architecture
+- [프로젝트 규칙과 설계 원칙](docs/skills/)
+- [Python 30일 완성 검증 스크립트](notebooks/python30DaysComplete/tools/validateCourse.py)
+- [브랜드 자산 생성 스크립트](assets/brand/tools/buildBrandAssets.py)
 
-```text
-src/codaro/         Python backend: FastAPI, document model, kernel, runtime
-  api/              Router layer, server state, request models
-  document/         Percent, Codaro, reactive-app, and ipynb parsers
-  kernel/           Server-side execution sessions and WebSocket protocol
-  runtime/          Engine interface and local worker execution
-  system/           File system and package management API
-  curriculum/       YAML content loader, progress tracking, learning spec
-  ai/               Optional assistant providers and tool execution
-  automation/       Task, scheduler, recorder, input, vision, and integrations
-  server.py         FastAPI app assembly, middleware, SPA serving
-  cli.py            codaro edit | run | export
-editor/             SvelteKit editor and app mode
-landing/            Public site, docs, blog, and search
-launcher/           Rust desktop launcher
-notebooks/          Standalone learning notebook distributions
-study/python/       Internal YAML learning curriculum
-tests/              Backend, document, kernel, system, server, curriculum tests
-```
-
-## Quick Start
+주요 검증 명령입니다.
 
 ```bash
-# Run the editor
-uv run codaro
-
-# Open a specific notebook
-uv run codaro path.py
-
-# App mode
-uv run codaro app path.py
-
-# Export
-uv run codaro export path.py --format codaro
-uv run codaro export path.py --format reactive-app
-uv run codaro export path.py --format ipynb
-```
-
-## Development
-
-```bash
-# Install dependencies
-uv sync --extra dev
-
-# Run tests
+uv run python -X utf8 notebooks/python30DaysComplete/tools/validateCourse.py
+uvx --from marimo marimo check --strict notebooks/python30DaysComplete/marimo
 uv run pytest tests/ -v
-
-# Build editor
-cd editor && npm install && npm run build
-
-# Watch mode for editor iteration
-cd editor && npm run build:watch
-
-# Build public site
-cd landing && npm install && npm run build
-
-# Brand asset generation
 uv run --with pillow python -X utf8 assets/brand/tools/buildBrandAssets.py
 ```
 
-The editor builds to `src/codaro/webBuild/`. A build is required before `uv run codaro` works from source checkout. Use `npm run build:watch` for fast iteration; it continuously updates the same output directory.
+## 라이선스
 
-## Key Decisions
-
-- **Transparent scope isolation**: users write plain Python while the engine isolates cell scope internally.
-- **Reactive execution**: running a cell automatically re-executes downstream dependents based on AST-inferred variables.
-- **Percent format default**: `# %%` cell boundaries remain runnable with `python file.py` and compatible with editor tooling.
-- **Pyodide-first runtime**: the browser runtime is primary, with a local server kernel for file I/O and heavier workloads.
-- **Learning system**: notebook mechanics, YAML curriculum, and codified teaching methods stay connected.
-- **Mounting**: `createServerApp()` can be mounted into FastAPI, Django ASGI, or Flask WSGI hosts.
-
-## Documentation
-
-Internal development docs live alongside the code they describe:
-
-- `docs/skills/` — project rules, architecture, identity, and operating principles
-- `src/codaro/DEV.md` — backend architecture
-- `src/codaro/document/DEV.md` — document model
-- `src/codaro/kernel/DEV.md` — kernel design
-- `src/codaro/runtime/DEV.md` — engine interface
-- `editor/DEV.md` — editor development
-- `landing/DEV.md` — public site
-- `launcher/PRD.md` — desktop launcher design
-
-## License
-
-See [LICENSE](LICENSE).
+[LICENSE](LICENSE)를 확인하세요.
