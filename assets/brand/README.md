@@ -14,8 +14,10 @@
 
 ## 권장 구조
 
+- `assets/brand/mascot/`
+  - 현재 메인 아바타 원본
 - `assets/brand/mascot/source/`
-  - 원본 참고 이미지
+  - 선택 pose sheet 원본
   - 라이선스 확인이 필요한 외부 레퍼런스
 - `assets/brand/mascot/work/`
   - 크롭 실험본
@@ -35,7 +37,7 @@
 - 외부 생성 이미지라면 사용권을 먼저 확인한 뒤 source로 저장한다
 - 사용권이 불명확하면 source에는 두되, 실제 서비스 경로로 승격하지 않는다
 - 서비스용 자산은 투명 배경 PNG만 사용한다
-- 생성 파이프라인은 `scripts/buildBrandAssets.py`를 source of truth로 본다
+- 생성 파이프라인은 `assets/brand/tools/buildBrandAssets.py`를 source of truth로 본다
 - 기본 avatar/favicon source는 `codaro-sheet-01.png`의 첫 번째 왼쪽 pose다
 - pose sheet source는 `codaro-sheet-01.png`, `codaro-sheet-02.png`다
 - `dartlab` 자산은 참고 이미지로만 둘 수 있고, Codaro active asset로 승격하면 안 된다
@@ -43,14 +45,15 @@
 ## 자산 생성 명령
 
 ```bash
-uv run --no-project --with pillow python -X utf8 scripts/buildBrandAssets.py
+uv run --no-project --with pillow python -X utf8 assets/brand/tools/buildBrandAssets.py
 ```
 
 ## 현재 마스코트 자산
 
 - source 원본
-  - `assets/brand/mascot/source/codaro-sheet-01.png`
-  - `assets/brand/mascot/source/codaro-sheet-02.png`
+  - `assets/brand/mascot/codaro-character.png`
+  - 선택 pose sheet: `assets/brand/mascot/source/codaro-sheet-01.png`
+  - 선택 pose sheet: `assets/brand/mascot/source/codaro-sheet-02.png`
 - 현재 서비스용 export
   - `assets/brand/mascot/work/avatar-full.png`
   - `assets/brand/mascot/work/avatar-small.png`

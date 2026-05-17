@@ -6,12 +6,13 @@ from pathlib import Path
 from PIL import Image, ImageFilter
 
 
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parents[3]
 SOURCE_ROOT = PROJECT_ROOT / "assets" / "brand" / "mascot" / "source"
 SOURCE_SHEETS = (
     ("sheet-01", SOURCE_ROOT / "codaro-sheet-01.png"),
     ("sheet-02", SOURCE_ROOT / "codaro-sheet-02.png"),
 )
+CHARACTER_SOURCE = PROJECT_ROOT / "assets" / "brand" / "mascot" / "codaro-character.png"
 AVATAR_SOURCE_KEY = "sheet-01"
 AVATAR_SOURCE_INDEX = 0
 WORK_ROOT = PROJECT_ROOT / "assets" / "brand" / "mascot" / "work"
@@ -272,12 +273,24 @@ def savePoseAssets(targetRoot: Path, sheetKey: str, poses: list[Image.Image]) ->
 
 def main() -> None:
     poseSheets: dict[str, list[Image.Image]] = {}
+    missingSheets: list[Path] = []
     for sheetKey, sourcePath in SOURCE_SHEETS:
-        if not sourcePath.exists():
-            raise FileNotFoundError(f"Brand source not found: {sourcePath}")
-        poseSheets[sheetKey] = splitPoseSheet(Image.open(sourcePath))
+        if sourcePath.exists():
+            poseSheets[sheetKey] = splitPoseSheet(Image.open(sourcePath).convert("RGBA"))
+        else:
+            missingSheets.append(sourcePath)
 
-    avatarBase = poseSheets[AVATAR_SOURCE_KEY][AVATAR_SOURCE_INDEX]
+    if AVATAR_SOURCE_KEY in poseSheets:
+        avatarBase = poseSheets[AVATAR_SOURCE_KEY][AVATAR_SOURCE_INDEX]
+        avatarSource = dict(SOURCE_SHEETS)[AVATAR_SOURCE_KEY]
+    else:
+        if not CHARACTER_SOURCE.exists():
+            missingText = ", ".join(str(path) for path in missingSheets)
+            raise FileNotFoundError(
+                f"Brand source not found. Missing sheets: {missingText}; missing avatar: {CHARACTER_SOURCE}"
+            )
+        avatarBase = Image.open(CHARACTER_SOURCE).convert("RGBA")
+        avatarSource = CHARACTER_SOURCE
     avatarFull = makeSquareAsset(avatarBase, size=512, paddingRatio=0.06)
     sidebarCrop = createSidebarCrop(avatarBase)
     avatarSmall = makeSquareAsset(sidebarCrop, size=256, paddingRatio=0.12)
@@ -304,7 +317,9 @@ def main() -> None:
     for sheetKey, poses in poseSheets.items():
         savePoseAssets(EDITOR_POSE_ROOT, sheetKey, poses)
 
-    print(f"[brand] avatarSource={dict(SOURCE_SHEETS)[AVATAR_SOURCE_KEY]}")
+    print(f"[brand] avatarSource={avatarSource}")
+    if missingSheets:
+        print(f"[brand] skippedMissingSheets={len(missingSheets)}")
     for sheetKey, sourcePath in SOURCE_SHEETS:
         print(f"[brand] poseSheet.{sheetKey}={sourcePath}")
     print(f"[brand] avatar-full={EDITOR_BRAND_ROOT / 'avatar-full.png'}")
