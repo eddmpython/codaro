@@ -17,7 +17,8 @@
     </div>
     <div class="cardGrid">
       {#each data.postCategories as category}
-        <a class="surfaceCard" href={category.path || data.posts.find(p => p.category === category.slug)?.categoryPath}>
+        {@const categoryPost = data.posts.find((post) => post.category === category.slug)}
+        <a class="surfaceCard" href={categoryPost?.categoryPath || "/blog"}>
           <h3>{category.label}</h3>
           <p>{data.posts.filter(p => p.category === category.slug).length} posts</p>
         </a>

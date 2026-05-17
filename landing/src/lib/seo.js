@@ -1,5 +1,34 @@
 import { brand } from "./brand";
 
+/**
+ * @typedef {{
+ *   title?: string;
+ *   description?: string;
+ *   date?: string;
+ *   url?: string;
+ *   thumbnail?: string;
+ * }} BlogPostLike
+ *
+ * @typedef {{
+ *   title?: string;
+ *   description?: string;
+ *   url?: string;
+ * }} DocsPageLike
+ *
+ * @typedef {{
+ *   name: string;
+ *   url?: string;
+ * }} BreadcrumbItem
+ *
+ * @typedef {{
+ *   title?: string;
+ *   description?: string;
+ *   url?: string;
+ *   image?: string;
+ *   type?: string;
+ * }} MetaInput
+ */
+
 export function buildWebsiteJsonLd() {
   return {
     "@context": "https://schema.org",
@@ -26,6 +55,9 @@ export function buildOrganizationJsonLd() {
   };
 }
 
+/**
+ * @param {BlogPostLike} post
+ */
 export function buildBlogPostJsonLd(post) {
   return {
     "@context": "https://schema.org",
@@ -44,6 +76,9 @@ export function buildBlogPostJsonLd(post) {
   };
 }
 
+/**
+ * @param {DocsPageLike} page
+ */
 export function buildDocsPageJsonLd(page) {
   return {
     "@context": "https://schema.org",
@@ -60,6 +95,9 @@ export function buildDocsPageJsonLd(page) {
   };
 }
 
+/**
+ * @param {BreadcrumbItem[]} items
+ */
 export function buildBreadcrumbJsonLd(items) {
   return {
     "@context": "https://schema.org",
@@ -92,6 +130,9 @@ export function buildSoftwareJsonLd() {
   };
 }
 
+/**
+ * @param {MetaInput} input
+ */
 export function buildMeta({ title, description, url, image, type }) {
   const resolvedTitle = title ? `${title} — ${brand.name}` : brand.name;
   const resolvedDescription = description || brand.description;
@@ -118,6 +159,9 @@ export function buildMeta({ title, description, url, image, type }) {
   };
 }
 
+/**
+ * @param {unknown} data
+ */
 export function jsonLdScript(data) {
   return `<script type="application/ld+json">${JSON.stringify(data)}</script>`;
 }

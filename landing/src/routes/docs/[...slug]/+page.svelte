@@ -15,7 +15,7 @@
   let breadcrumbJsonLd = $derived(JSON.stringify(buildBreadcrumbJsonLd([
     { name: "Home", url: "/" },
     { name: "Docs", url: "/docs" },
-    { name: data.page.sectionLabel, url: null },
+    { name: data.page.sectionLabel },
     { name: data.page.title, url: data.page.url },
   ])));
 </script>
