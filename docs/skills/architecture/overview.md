@@ -5,7 +5,7 @@ description: Five-layer architecture overview for the Codaro runtime.
 category: architecture
 section: reference
 order: 201
-purpose: 편집기 메커니즘 독립이 1차 목표. document model / execution runtime / reactive dataflow / ui·widget bridge / workspace shell 5층.
+purpose: 편집기 메커니즘 독립이 1차 목표. document model / execution runtime / reactive dataflow / ui·widget bridge / app shell 5층.
 whenToUse: 새 모듈 어느 레이어에 속할지 결정, 레이어 간 의존 방향 검토할 때.
 ---
 
@@ -17,7 +17,7 @@ whenToUse: 새 모듈 어느 레이어에 속할지 결정, 레이어 간 의존
   - `execution runtime`
   - `reactive dataflow`
   - `ui/widget bridge`
-  - `workspace shell`
+  - `app shell`
 - UI가 실행기 구현 세부사항에 직접 묶이면 안 된다.
 - 웹, 모바일, 로컬은 가능한 한 같은 문서 모델과 같은 실행 인터페이스를 공유해야 한다.
 
@@ -29,7 +29,7 @@ src/codaro/
 ├── engine/       # document model + execution runtime + reactive dataflow
 │   ├── document/ kernel/ runtime/ system/
 ├── domain/       # business — curriculum, ai, automation
-├── transport/    # ui/widget bridge + workspace shell — api, webBuild
+├── transport/    # ui/widget bridge + app shell — api, webBuild
 ├── extensions/   # plugin hooks
 ├── server.py     # entry
 └── cli.py        # entry

@@ -17,6 +17,9 @@ whenToUse: 세션 종료 직전, 폴더 구조 변경 후, 죽은 참조 발견 
 - GitHub Pages 공개 문서는 `docs/`를 기준으로 한다.
 - 제품 운영 문서, 아키텍처 결정, API 성격의 설명은 별도 API 문서 트리를 만들지 않고 `docs/skills/`의 identity/architecture/ops 문서로 관리한다.
 - 공개 글쓰기와 블로그성 콘텐츠는 루트 `blog/`가 아니라 `docs/blog/`에 둔다. 공개 URL도 `/docs/blog/...`를 기준으로 한다.
+- `docs/` 하위의 장기 유지 폴더는 `docs/skills/`와 `docs/blog/` 두 개만 둔다.
+- `concepts`, `guides`, `reference`, `getting-started`, `branding` 같은 폴더가 필요해지면 새 폴더를 만들기 전에 `docs/skills/`에 흡수한다.
+- 기존 문서를 제거해야 할 때는 먼저 `docs/skills/` 또는 `docs/blog/`에 흡수됐는지 확인하고, 사용자가 보관을 요구하지 않으면 삭제한다.
 
 # 세션 이어가기 원칙
 

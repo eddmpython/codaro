@@ -1,0 +1,122 @@
+# Codaro local curriculum schema
+# This file documents the YAML shape used by curricula/python.
+
+# ============================================
+# Metadata
+# ============================================
+# meta:
+#   id: "day02"                    # unique content id
+#   title: "변수와 내장함수"         # lesson title
+#   day: 2                         # optional day number
+#   category: "30days"             # folder/category key
+#   source: "30-Days-Of-Python"    # optional source
+#   sourceUrl: "https://..."       # optional source URL
+#   tags: ["변수", "함수", "기초"]   # search tags
+
+# ============================================
+# Sections
+# ============================================
+# sections:
+#   - id: "section_id"
+#     title: "섹션 제목"
+#     subtitle: "부제목"            # optional
+#     blocks:
+#       - type: "text"
+#         content: "..."
+
+# ============================================
+# Block Types
+# ============================================
+
+# prose blocks
+# - type: text | content | centerText
+#   title: "제목"                   # optional
+#   subtitle: "부제목"              # optional
+#   content: |
+#     Markdown content.
+
+# title blocks
+# - type: mainHeader | sectionHeader | sectionTitle
+#   title: "제목"
+#   subtitle: "부제목"              # optional
+
+# local workbench block
+# - type: localWorkbench
+#   title: "Codaro Local Workbench" # optional
+#   description: "Run the adjacent Python cells with the local Codaro kernel."
+
+# list blocks
+# - type: list
+#   style: "bullet" | "number" | "check"
+#   items:
+#     - "항목 1"
+#     - "항목 2"
+
+# code blocks
+# - type: code
+#   language: "python"             # python, shell, browser, task, skill
+#   title: "코드 제목"              # optional
+#   description: "코드 설명"        # optional
+#   content: |
+#     print("Hello")
+#   output: |                      # optional expected output
+#     Hello
+
+# practice blocks
+# - type: expansion
+#   title: "실습"
+#   description: "문제 설명"
+#   code: |                        # optional solution stored separately
+#     print("solution")
+#   blocks:                        # optional starter cells
+#     - type: code
+#       content: |
+#         # write your code
+
+# callout blocks
+# - type: note | tip | tipCard | warning | info | codeDescription
+#   title: "참고"                  # optional
+#   content: "참고 내용"
+
+# table blocks
+# - type: table
+#   headers: ["컬럼1", "컬럼2"]
+#   rows:
+#     - ["값1", "값2"]
+#     - ["값3", "값4"]
+
+# visual/media blocks
+# - type: hero | image | video | youtube | videoCarousel | pdf | MIME | tiobeIndex
+#   title: "제목"
+#   src: "path-or-url"             # image/pdf/video
+#   items: []                      # carousel/resource entries
+
+# cards and comparison blocks
+# - type: featureCards | choiceCards | resourceCards | threeColumnCards | stepCard | practiceCard
+#   cards:
+#     - title: "카드 제목"
+#       description: "카드 설명"
+#
+# - type: compare | fullWidthComparison
+#   left:
+#     title: "왼쪽"
+#     items: []
+#   right:
+#     title: "오른쪽"
+#     items: []
+
+# resource blocks
+# - type: link | links | linkButtons
+#   title: "자료"
+#   url: "https://..."             # for link
+#   links: []                      # for links
+#   buttons: []                    # for linkButtons
+
+# quiz blocks
+# - type: quiz
+#   question: "질문"
+#   options:
+#     - "선택지 1"
+#     - "선택지 2"
+#   answer: 0
+#   explanation: "해설"

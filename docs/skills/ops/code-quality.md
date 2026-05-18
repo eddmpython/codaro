@@ -5,14 +5,14 @@ description: Code quality rules for naming, exceptions, and maintainable changes
 category: ops
 section: guides
 order: 302
-purpose: camelCase / 파일 삭제 금지 / 인라인 주석 금지 / bare except 금지 / 좁힌 예외 + 로깅 + from exc 체인 / ruff BLE001·S110·S112·TRY400.
+purpose: camelCase / 불필요 파일 정리 / 인라인 주석 금지 / bare except 금지 / 좁힌 예외 + 로깅 + from exc 체인 / ruff BLE001·S110·S112·TRY400.
 whenToUse: 새 코드 작성, 예외 처리 결정, 코드 리뷰, ruff lint 결과 해석할 때.
 ---
 
 # 코드 품질 원칙
 
 - 파일/폴더/함수/변수는 `camelCase`, 클래스는 `PascalCase`, 상수는 `UPPER_CASE`를 사용한다.
-- 파일 삭제는 금지하고, 정리가 필요하면 `_backup/`으로 이동하는 방식을 우선한다.
+- 불필요한 캐시, 산출물, 백업성 폴더는 삭제한다. 보존이 필요한 자료만 명확한 제품 자산 위치로 옮긴다.
 - 인라인 주석은 넣지 않는다.
 - bare except (`except:`) 절대 금지
 - `except Exception: pass`는 금지. 로깅 없는 삼킴은 허용하지 않는다.

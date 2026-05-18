@@ -13,7 +13,7 @@ https://creativecommons.org/licenses/by-nc-sa/4.0/legalcode.en
 Covered content includes:
 
 - notebooks and generated learning notebooks under notebooks/;
-- curriculum files and learning material under study/;
+- curriculum files and learning material under curricula/;
 - public documentation, guides, and writing under docs/;
 - course guides, README learning sections, examples, diagrams, and lesson text.
 
