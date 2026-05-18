@@ -38,17 +38,27 @@ type ProductSidebarProps = {
   categories: CurriculumCategory[];
   contentsLoading: boolean;
   contents: CurriculumContentSummary[];
+  customCurricula: SidebarCustomCurriculum[];
   query: string;
   referenceLoading: boolean;
   surface: SurfaceMode;
   selectedCategory: string;
+  selectedCustomCurriculumId: string;
   selectedContentId: string;
   themeMode: ThemeMode;
   onQueryChange: (value: string) => void;
   onSelectCategory: (key: string) => void;
   onSelectContent: (contentId: string) => void;
+  onSelectCustomCurriculum: (id: string) => void;
   onSurfaceChange: (surface: SurfaceMode) => void;
   onToggleTheme: () => void;
+};
+
+export type SidebarCustomCurriculum = {
+  id: string;
+  title: string;
+  blockCount: number;
+  createdAt: number;
 };
 
 const navItems: Array<{ value: SurfaceMode; label: string; Icon: React.ComponentType<{ className?: string }> }> = [
@@ -62,15 +72,18 @@ export function ProductSidebar({
   categories,
   contentsLoading,
   contents,
+  customCurricula,
   query,
   referenceLoading,
   surface,
   selectedCategory,
+  selectedCustomCurriculumId,
   selectedContentId,
   themeMode,
   onQueryChange,
   onSelectCategory,
   onSelectContent,
+  onSelectCustomCurriculum,
   onSurfaceChange,
   onToggleTheme,
 }: ProductSidebarProps) {
@@ -141,11 +154,15 @@ export function ProductSidebar({
                 categories={categories}
                 contents={contents}
                 contentsLoading={contentsLoading}
+                customCurricula={customCurricula}
                 referenceLoading={referenceLoading}
+                query={query}
                 selectedCategory={selectedCategory}
+                selectedCustomCurriculumId={selectedCustomCurriculumId}
                 selectedContentId={selectedContentId}
                 onSelectCategory={onSelectCategory}
                 onSelectContent={onSelectContent}
+                onSelectCustomCurriculum={onSelectCustomCurriculum}
               />
             </div>
           ) : null}
@@ -163,21 +180,35 @@ function CurriculumTree({
   categories,
   contents,
   contentsLoading,
+  customCurricula,
+  query,
   referenceLoading,
   selectedCategory,
+  selectedCustomCurriculumId,
   selectedContentId,
   onSelectCategory,
   onSelectContent,
+  onSelectCustomCurriculum,
 }: {
   categories: CurriculumCategory[];
   contents: CurriculumContentSummary[];
   contentsLoading: boolean;
+  customCurricula: SidebarCustomCurriculum[];
+  query: string;
   referenceLoading: boolean;
   selectedCategory: string;
+  selectedCustomCurriculumId: string;
   selectedContentId: string;
   onSelectCategory: (key: string) => void;
   onSelectContent: (contentId: string) => void;
+  onSelectCustomCurriculum: (id: string) => void;
 }) {
+  const customItems = customCurricula.filter((item) => {
+    const trimmed = query.trim().toLowerCase();
+    if (!trimmed) return true;
+    return item.title.toLowerCase().includes(trimmed);
+  });
+
   return (
     <>
       <SidebarGroup className="py-0.5">
@@ -241,11 +272,26 @@ function CurriculumTree({
         <SidebarGroupLabel className="h-6 px-2 text-[11px]">나만의 커리큘럼</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
-            <SidebarMenuItem>
-              <div className="px-2 py-2 text-xs leading-5 text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
-                채팅에서 만든 커리큘럼이 여기에 쌓입니다.
-              </div>
-            </SidebarMenuItem>
+            {customItems.length ? customItems.map((item) => (
+              <SidebarMenuItem key={item.id}>
+                <SidebarMenuButton
+                  className="h-7 px-2 text-[13px] [&>svg]:size-3.5"
+                  isActive={item.id === selectedCustomCurriculumId}
+                  tooltip={item.title}
+                  onClick={() => onSelectCustomCurriculum(item.id)}
+                >
+                  <GraduationCap />
+                  <span>{item.title}</span>
+                </SidebarMenuButton>
+                <SidebarMenuBadge>{item.blockCount}</SidebarMenuBadge>
+              </SidebarMenuItem>
+            )) : (
+              <SidebarMenuItem>
+                <div className="px-2 py-2 text-xs leading-5 text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
+                  채팅에서 만든 커리큘럼이 여기에 쌓입니다.
+                </div>
+              </SidebarMenuItem>
+            )}
           </SidebarMenu>
         </SidebarGroupContent>
       </SidebarGroup>

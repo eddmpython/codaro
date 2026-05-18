@@ -32,7 +32,7 @@ import {
 } from "@/components/app/appPrimitives";
 import { CellAiActions } from "@/components/app/cellAiActions";
 import { TopBar } from "@/components/app/topBar";
-import { ProductSidebar } from "@/components/app/productSidebar";
+import { ProductSidebar, type SidebarCustomCurriculum } from "@/components/app/productSidebar";
 import {
   CollapsedAssistantButton,
   CurriculumCellToc,
@@ -92,6 +92,14 @@ import type {
 
 type ResultMap = Record<string, ExecutionResult>;
 type TeacherScope = "cell" | "lesson" | "curriculum";
+type PendingTarget = "notebook" | "curriculum";
+
+type CustomCurriculumEntry = {
+  id: string;
+  title: string;
+  document: CodaroDocument;
+  createdAt: number;
+};
 
 type AssistantMessage = {
   id: string;
@@ -161,6 +169,9 @@ const emptyToolCatalog: AiToolCatalogPayload = {
   byLane: {},
 };
 
+const CUSTOM_CURRICULUM_CATEGORY = "__custom__";
+const customCurriculaStorageKey = "codaro-custom-curricula";
+
 const starterDocument: CodaroDocument = {
   id: "new-notebook",
   title: "새 노트북",
@@ -181,6 +192,56 @@ const starterDocument: CodaroDocument = {
     packages: [],
   },
 };
+
+function loadCustomCurricula(): CustomCurriculumEntry[] {
+  try {
+    const raw = window.localStorage.getItem(customCurriculaStorageKey);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw) as unknown;
+    if (!Array.isArray(parsed)) return [];
+    return parsed
+      .filter(isRecord)
+      .map((item) => {
+        const document = normalizeStoredDocument(item.document);
+        if (!document) return null;
+        return {
+          id: String(item.id ?? document.id),
+          title: String(item.title ?? document.title),
+          document,
+          createdAt: Number(item.createdAt ?? Date.now()),
+        };
+      })
+      .filter((item): item is CustomCurriculumEntry => item !== null);
+  } catch {
+    return [];
+  }
+}
+
+function normalizeStoredDocument(raw: unknown): CodaroDocument | null {
+  if (!isRecord(raw) || !Array.isArray(raw.blocks)) return null;
+  const blocks = raw.blocks
+    .filter(isRecord)
+    .map((block, index) => normalizeBlockPayload(block, index))
+    .filter((block): block is BlockConfig => block !== null);
+  if (!blocks.length) return null;
+  return {
+    ...starterDocument,
+    id: String(raw.id ?? `custom-${Date.now()}`),
+    title: String(raw.title ?? "나만의 커리큘럼"),
+    blocks,
+    metadata: isRecord(raw.metadata) ? (raw.metadata as CodaroDocument["metadata"]) : {
+      sourceFormat: "custom-curriculum",
+      tags: ["custom"],
+    },
+    runtime: isRecord(raw.runtime) ? (raw.runtime as CodaroDocument["runtime"]) : starterDocument.runtime,
+    app: isRecord(raw.app) ? (raw.app as CodaroDocument["app"]) : {
+      title: String(raw.title ?? "나만의 커리큘럼"),
+      layout: "learning",
+      hideCode: false,
+      entryBlockIds: [],
+    },
+  };
+}
 
 const builtInCurriculumCategories = registryCategories();
 const defaultCurriculumSelection = defaultRegistrySelection();
@@ -218,6 +279,9 @@ function App() {
     draftsFromDocument(starterDocument),
   );
   const [pendingBlocks, setPendingBlocks] = useState<BlockConfig[]>([]);
+  const [pendingTarget, setPendingTarget] = useState<PendingTarget>("notebook");
+  const [customCurricula, setCustomCurricula] = useState<CustomCurriculumEntry[]>(() => loadCustomCurricula());
+  const [selectedCustomCurriculumId, setSelectedCustomCurriculumId] = useState("");
   const [selectedBlockId, setSelectedBlockId] = useState(starterDocument.blocks[1]?.id ?? starterDocument.blocks[0]?.id ?? "");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [variables, setVariables] = useState<VariableInfo[]>([]);
@@ -254,6 +318,7 @@ function App() {
     setResults({});
     setVariables([]);
     setPendingBlocks([]);
+    setPendingTarget("notebook");
   }, []);
 
   const addNotebookCell = useCallback((type: "code" | "markdown") => {
@@ -272,6 +337,18 @@ function App() {
     window.document.documentElement.classList.toggle("dark", themeMode === "dark");
     window.localStorage.setItem("codaro-theme", themeMode);
   }, [themeMode]);
+
+  useEffect(() => {
+    try {
+      window.localStorage.setItem(customCurriculaStorageKey, JSON.stringify(customCurricula));
+    } catch {
+      setNotice({
+        tone: "warning",
+        title: "커리큘럼 저장 제한",
+        detail: "브라우저 저장소에 나만의 커리큘럼을 기록하지 못했습니다.",
+      });
+    }
+  }, [customCurricula]);
 
   useEffect(() => {
     setSidebarOpen(surface !== "chat");
@@ -398,6 +475,11 @@ function App() {
 
     async function loadContents() {
       if (!selectedCategory) return;
+      if (selectedCategory === CUSTOM_CURRICULUM_CATEGORY) {
+        setContents([]);
+        setContentsLoading(false);
+        return;
+      }
       setContentsLoading(true);
       try {
         const registryFallback = registryContents(selectedCategory);
@@ -431,6 +513,10 @@ function App() {
 
     async function loadReferenceLesson() {
       if (!selectedCategory || !selectedContentId) return;
+      if (selectedCategory === CUSTOM_CURRICULUM_CATEGORY) {
+        setReferenceLoading(false);
+        return;
+      }
       setReferenceLoading(true);
       try {
         const registryFallback = registryLesson(selectedCategory, selectedContentId);
@@ -478,6 +564,14 @@ function App() {
       return label.toLowerCase().includes(trimmed);
     });
   }, [categories, query]);
+  const sidebarCustomCurricula = useMemo<SidebarCustomCurriculum[]>(() => {
+    return customCurricula.map((entry) => ({
+      id: entry.id,
+      title: entry.title,
+      blockCount: entry.document.blocks.length,
+      createdAt: entry.createdAt,
+    }));
+  }, [customCurricula]);
 
   const activeDocument = surface === "curriculum" && curriculumDocument ? curriculumDocument : document;
   const activeSelectedBlockId = surface === "curriculum" ? selectedCurriculumBlockId : selectedBlockId;
@@ -675,6 +769,7 @@ function App() {
     if (!apiOnline) {
       const generatedBlocks = activeScope === "cell" ? [] : previewBlocksFromPrompt(message, activeScope);
       if (generatedBlocks.length) {
+        setPendingTarget("curriculum");
         setPendingBlocks((current) => {
           const knownIds = new Set(current.map((block) => block.id));
           return [...current, ...generatedBlocks.filter((block) => !knownIds.has(block.id))];
@@ -692,8 +787,8 @@ function App() {
       ]);
       setNotice({
         tone: generatedBlocks.length ? "success" : "default",
-        title: generatedBlocks.length ? "노트북 변경 준비됨" : "어시스턴트 답변 완료",
-        detail: generatedBlocks.length ? `${generatedBlocks.length}개 블록을 생성했습니다.` : "셀 안내가 준비됐습니다.",
+        title: generatedBlocks.length ? "커리큘럼 초안 준비됨" : "어시스턴트 답변 완료",
+        detail: generatedBlocks.length ? `${generatedBlocks.length}개 학습 셀을 생성했습니다.` : "셀 안내가 준비됐습니다.",
       });
       setAssistantLoading(false);
       return;
@@ -746,15 +841,21 @@ function App() {
         role: "teacher",
         context,
       });
+      let savedCurriculumTitle = "";
       setConversationId(response.conversationId);
       if (response.toolCalls.length) {
         const generatedDocument = documentFromToolCalls(response.toolCalls);
         if (generatedDocument) {
-          applyDocument(generatedDocument);
-          setSurface("editor");
+          if (activeScope === "lesson" || activeScope === "curriculum") {
+            savedCurriculumTitle = saveCustomCurriculum(generatedDocument.blocks, generatedDocument.title)?.title ?? generatedDocument.title;
+          } else {
+            applyDocument(generatedDocument);
+            setSurface("editor");
+          }
         } else {
           const generatedBlocks = collectBlocksFromToolCalls(response.toolCalls);
           if (generatedBlocks.length) {
+            setPendingTarget(activeScope === "cell" ? "notebook" : "curriculum");
             setPendingBlocks((current) => {
               const knownIds = new Set(current.map((block) => block.id));
               return [...current, ...generatedBlocks.filter((block) => !knownIds.has(block.id))];
@@ -775,8 +876,12 @@ function App() {
       ]);
       setNotice({
         tone: response.toolCalls.length ? "success" : "default",
-        title: response.toolCalls.length ? "노트북 변경 준비됨" : "어시스턴트 답변 완료",
-        detail: response.toolCalls.length ? "검토할 노트북 변경이 생성됐습니다." : response.provider,
+        title: response.toolCalls.length
+          ? savedCurriculumTitle ? "나만의 커리큘럼 저장됨" : activeScope === "cell" ? "노트북 변경 준비됨" : "커리큘럼 초안 준비됨"
+          : "어시스턴트 답변 완료",
+        detail: response.toolCalls.length
+          ? savedCurriculumTitle || (activeScope === "cell" ? "검토할 노트북 변경이 생성됐습니다." : "나만의 커리큘럼으로 저장할 초안이 생성됐습니다.")
+          : response.provider,
       });
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
@@ -856,15 +961,47 @@ function App() {
     }
   }
 
+  function saveCustomCurriculum(blocks: BlockConfig[], title?: string) {
+    if (!blocks.length) return null;
+    const entry = createCustomCurriculumEntry(blocks, title);
+    setCustomCurricula((current) => [entry, ...current.filter((item) => item.id !== entry.id)]);
+    setCurriculumDocument(entry.document);
+    setDrafts((current) => ({
+      ...current,
+      ...Object.fromEntries(
+        entry.document.blocks
+          .filter((block) => block.type === "code")
+          .map((block) => [block.id, block.role === "snippet" ? "" : block.content]),
+      ),
+    }));
+    setSelectedCategory(CUSTOM_CURRICULUM_CATEGORY);
+    setSelectedContentId(entry.id);
+    setSelectedCustomCurriculumId(entry.id);
+    setSelectedCurriculumBlockId(entry.document.blocks[0]?.id ?? "");
+    setSurface("curriculum");
+    setNotice({
+      tone: "success",
+      title: "나만의 커리큘럼 저장됨",
+      detail: entry.title,
+    });
+    return entry;
+  }
+
   function acceptPendingBlocks() {
     if (!pendingBlocks.length) return;
+    if (pendingTarget === "curriculum") {
+      saveCustomCurriculum(pendingBlocks);
+      setPendingBlocks([]);
+      setPendingTarget("notebook");
+      return;
+    }
     setDocument((current) => {
       const existingIds = new Set(current.blocks.map((block) => block.id));
       const nextBlocks = pendingBlocks.filter((block) => !existingIds.has(block.id));
       if (!nextBlocks.length) return current;
       return {
         ...current,
-        title: current.title === "새 노트북" || current.title === "AI 노트북" ? "생성된 노트북" : current.title,
+        title: current.title === "새 노트북" || current.title === "생성 노트북" ? "생성된 노트북" : current.title,
         blocks: [...current.blocks, ...nextBlocks],
       };
     });
@@ -881,6 +1018,7 @@ function App() {
       setSelectedBlockId(firstCodeBlock.id);
     }
     setPendingBlocks([]);
+    setPendingTarget("notebook");
     setSurface("editor");
     setNotice({
       tone: "success",
@@ -892,9 +1030,10 @@ function App() {
   function rejectPendingBlocks() {
     if (!pendingBlocks.length) return;
     setPendingBlocks([]);
+    setPendingTarget("notebook");
     setNotice({
       tone: "default",
-      title: "노트북 변경 버림",
+      title: "생성 항목 버림",
       detail: "현재 문서는 변경하지 않았습니다.",
     });
   }
@@ -913,11 +1052,32 @@ function App() {
     const firstContentId = registryContents(key).contents[0]?.contentId ?? "";
     setSelectedCategory(key);
     setSelectedContentId(firstContentId);
+    setSelectedCustomCurriculumId("");
     setSurface("curriculum");
   }
 
   function selectCurriculumContent(contentId: string) {
+    setSelectedCustomCurriculumId("");
     setSelectedContentId(contentId);
+    setSurface("curriculum");
+  }
+
+  function selectCustomCurriculum(id: string) {
+    const entry = customCurricula.find((item) => item.id === id);
+    if (!entry) return;
+    setSelectedCategory(CUSTOM_CURRICULUM_CATEGORY);
+    setSelectedContentId(id);
+    setSelectedCustomCurriculumId(id);
+    setCurriculumDocument(entry.document);
+    setDrafts((current) => ({
+      ...current,
+      ...Object.fromEntries(
+        entry.document.blocks
+          .filter((block) => block.type === "code")
+          .map((block) => [block.id, block.role === "snippet" ? "" : block.content]),
+      ),
+    }));
+    setSelectedCurriculumBlockId(entry.document.blocks[0]?.id ?? "");
     setSurface("curriculum");
   }
 
@@ -927,15 +1087,18 @@ function App() {
         categories={filteredCategories}
         contentsLoading={contentsLoading}
         contents={contents}
+        customCurricula={sidebarCustomCurricula}
         query={query}
         referenceLoading={referenceLoading}
         surface={surface}
         selectedCategory={selectedCategory}
+        selectedCustomCurriculumId={selectedCustomCurriculumId}
         selectedContentId={selectedContentId}
         themeMode={themeMode}
         onQueryChange={setQuery}
         onSelectCategory={selectCurriculumCategory}
         onSelectContent={selectCurriculumContent}
+        onSelectCustomCurriculum={selectCustomCurriculum}
         onSurfaceChange={setSurface}
         onToggleTheme={() => setThemeMode((current) => (current === "dark" ? "light" : "dark"))}
       />
@@ -1143,10 +1306,15 @@ function MainSurface(props: MainSurfaceProps) {
 
   if (props.surface === "curriculum") {
     const curriculumDoc = props.curriculumDocument ?? props.document;
+    const isCustomCurriculum = props.selectedCategory === CUSTOM_CURRICULUM_CATEGORY;
     const selectedCategoryLabel =
-      props.categories.find((category) => category.key === props.selectedCategory)?.name ?? props.selectedCategory;
+      isCustomCurriculum
+        ? "나만의 커리큘럼"
+        : props.categories.find((category) => category.key === props.selectedCategory)?.name ?? props.selectedCategory;
     const selectedContentLabel =
-      props.contents.find((content) => content.contentId === props.selectedContentId)?.title ?? props.selectedContentId;
+      isCustomCurriculum
+        ? curriculumDoc.title
+        : props.contents.find((content) => content.contentId === props.selectedContentId)?.title ?? props.selectedContentId;
     return (
       <div
         className={cn(
@@ -2111,6 +2279,53 @@ function assistantStatusText(apiOnline: boolean, profile: AiProfile | null) {
   return "대화로 셀, 레슨, 커리큘럼을 다룹니다.";
 }
 
+function createCustomCurriculumEntry(blocks: BlockConfig[], title?: string): CustomCurriculumEntry {
+  const createdAt = Date.now();
+  const resolvedTitle = title?.trim() || titleFromBlocks(blocks) || "나만의 커리큘럼";
+  const id = `custom-${createdAt}-${slugifyText(resolvedTitle)}`;
+  const normalizedBlocks = blocks.map((block, index) => ({
+    ...block,
+    id: `${id}-${block.id || index}`.replace(/[^a-zA-Z0-9_-]/g, "-"),
+  }));
+  const document: CodaroDocument = {
+    ...starterDocument,
+    id: `curriculum-${id}`,
+    title: resolvedTitle,
+    blocks: normalizedBlocks,
+    metadata: {
+      sourceFormat: "custom-curriculum",
+      tags: ["custom", slugifyText(resolvedTitle)],
+      createdAt: new Date(createdAt).toISOString(),
+    },
+    runtime: {
+      defaultEngine: "local",
+      reactiveMode: "hybrid",
+      packages: [],
+    },
+    app: {
+      title: resolvedTitle,
+      layout: "learning",
+      hideCode: false,
+      entryBlockIds: [],
+    },
+  };
+  return {
+    id,
+    title: resolvedTitle,
+    document,
+    createdAt,
+  };
+}
+
+function titleFromBlocks(blocks: BlockConfig[]) {
+  const first = blocks.find((block) => block.title || block.content.trim());
+  if (!first) return "";
+  if (first.title) return first.title;
+  const heading = first.content.split("\n").find((line) => line.trim().startsWith("#"));
+  if (heading) return heading.replace(/^#+\s*/, "").trim();
+  return blockLabel(first);
+}
+
 function previewBlocksFromPrompt(message: string, scope: TeacherScope): BlockConfig[] {
   const topic = inferPreviewTopic(message);
   const seed = `${Date.now()}-${slugifyText(topic)}`;
@@ -2125,16 +2340,45 @@ function previewBlocksFromPrompt(message: string, scope: TeacherScope): BlockCon
       id: `preview-${seed}-goal`,
       type: "markdown",
       content: `# ${topic}\n\n${scopeLine}\n\nCodaro는 먼저 커리큘럼 YAML을 만들고, 검토 가능한 학습 셀로 전개합니다.`,
+      displayKind: "hero",
+      role: "title",
+      sourceType: "intro",
+      title: topic,
+      payload: {
+        title: topic,
+        description: scopeLine,
+        points: [
+          "학습 목표를 먼저 잡습니다.",
+          "실행 가능한 실습 셀을 만듭니다.",
+          "검증 셀로 답을 확인합니다.",
+        ],
+      },
     },
     {
       id: `preview-${seed}-concept`,
       type: "markdown",
       content: `## 개념\n\n- 학습자 목표를 정의합니다.\n- 실행 가능한 예제 하나를 만듭니다.\n- 학습자가 답을 확인할 수 있도록 검증 셀을 추가합니다.`,
+      displayKind: "cardGrid",
+      role: "learning",
+      sourceType: "featureCards",
+      title: "학습 흐름",
+      payload: {
+        title: "학습 흐름",
+        cards: [
+          { title: "목표", description: "무엇을 익힐지 한 문장으로 고정합니다." },
+          { title: "실습", description: "작은 코드를 직접 수정하고 실행합니다." },
+          { title: "검증", description: "출력과 상태를 기준으로 답을 확인합니다." },
+        ],
+      },
     },
     {
       id: `preview-${seed}-practice`,
       type: "code",
       content: `topic = "${topic}"\nprint(f"실습: {topic}")\n# 이 줄을 바꾼 뒤 셀을 다시 실행하세요.`,
+      displayKind: "code",
+      role: "exercise",
+      sourceType: "expansion",
+      title: "직접 실습",
       guide: {
         exerciseType: "practice",
         hints: ["먼저 셀을 실행하세요.", "topic 텍스트를 바꿔 보세요.", "수정 후 검증 셀을 사용하세요."],
@@ -2149,6 +2393,10 @@ function previewBlocksFromPrompt(message: string, scope: TeacherScope): BlockCon
       id: `preview-${seed}-check`,
       type: "code",
       content: `assert topic\nprint("검증 통과")`,
+      displayKind: "code",
+      role: "check",
+      sourceType: "quiz",
+      title: "답 확인",
       guide: {
         exerciseType: "check",
         hints: ["topic 변수는 비어 있으면 안 됩니다."],
@@ -2177,7 +2425,7 @@ function previewAssistantAnswer(message: string, scope: TeacherScope, blockCount
   return [
     "LLM 미연결 상태라 기본 커리큘럼 초안만 표시합니다.",
     `${topic}용 ${scopeLabel} 노트북을 초안화했습니다.`,
-    `${blockCount}개 셀을 검토할 수 있습니다. 변경을 적용하면 에디터에서 열립니다.`,
+    `${blockCount}개 학습 셀을 검토할 수 있습니다. 적용하면 나만의 커리큘럼에 저장되고 커리큘럼 화면에서 열립니다.`,
     "제공자를 연결하면 커리큘럼 초안을 대화로 조정하고, 필요한 셀만 읽고 고치며 학습 흐름을 이어갑니다.",
   ].join("\n\n");
 }
@@ -2320,6 +2568,13 @@ function normalizeBlockPayload(raw: Record<string, unknown>, index: number): Blo
     id: String(raw.id ?? `ai-cell-${index}-${Date.now()}`),
     type: normalizeBlockType(String(raw.type ?? "markdown")),
     content: String(content),
+    role: typeof raw.role === "string" ? (raw.role as BlockConfig["role"]) : undefined,
+    executionKind: typeof raw.executionKind === "string" ? (raw.executionKind as BlockConfig["executionKind"]) : undefined,
+    displayKind: typeof raw.displayKind === "string" ? (raw.displayKind as BlockConfig["displayKind"]) : undefined,
+    sourceType: typeof raw.sourceType === "string" ? raw.sourceType : undefined,
+    payload: raw.payload,
+    title: typeof raw.title === "string" ? raw.title : undefined,
+    description: typeof raw.description === "string" ? raw.description : undefined,
     collapsed: Boolean(raw.collapsed),
     execution: isRecord(raw.execution) ? (raw.execution as BlockConfig["execution"]) : undefined,
     guide: isRecord(raw.guide) ? (raw.guide as BlockConfig["guide"]) : null,

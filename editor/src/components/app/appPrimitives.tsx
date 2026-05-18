@@ -117,15 +117,15 @@ export function PendingNotebookBar({
       <CardContent className="flex flex-wrap items-center gap-3 p-3">
         <Sparkles className="size-4 text-muted-foreground" />
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium">대기 중인 노트북 변경</div>
+          <div className="text-sm font-medium">대기 중인 생성 항목</div>
           <div className="truncate text-xs text-muted-foreground">
-            생성된 블록 {pendingBlocks.length}개: {pendingBlocks.slice(0, 3).map(blockLabel).join(", ")}
+            생성된 셀 {pendingBlocks.length}개: {pendingBlocks.slice(0, 3).map(blockLabel).join(", ")}
           </div>
         </div>
-        <IconButton label="변경 적용" variant="default" onClick={onAccept}>
+        <IconButton label="적용" variant="default" onClick={onAccept}>
           <CheckCircle2 />
         </IconButton>
-        <IconButton label="변경 버리기" variant="ghost" onClick={onReject}>
+        <IconButton label="버리기" variant="ghost" onClick={onReject}>
           <XCircle />
         </IconButton>
       </CardContent>
