@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: context_manager, with_statement, custom_context_manager
-    - 이미 써도 되는 개념: everything
-    - 오늘은 일부러 쓰지 않는 개념: external_library
+    - 오늘 새로 배우는 개념: 컨텍스트 매니저, with 문, 직접 만드는 컨텍스트 매니저
+    - 이미 써도 되는 개념: 전체 문법
+    - 오늘은 일부러 쓰지 않는 개념: 외부 라이브러리
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    content = ''
+    with open('test.txt', 'w') as f:
+    f.write('Hello World')
+    content = 'written'
+    content
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         content = ''
@@ -121,6 +134,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    fileHandle = open('manual.txt', 'w')
+    fileHandle.write('Manual close')
+    fileHandle.close()
+    'closed manually'
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0009():
         fileHandle = open('manual.txt', 'w')
@@ -140,6 +165,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('test.txt', 'r') as reader:
+    textData = reader.read()
+    textData
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0011():
         with open('test.txt', 'r') as reader:
@@ -193,6 +229,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class SimpleContext:
+    def __enter__(self):
+    return 'entered'
+
+    def __exit__(self, excType, excVal, excTb):
+    return False
+
+    with SimpleContext() as sc:
+    result = sc
+    result
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         class SimpleContext:
@@ -218,6 +272,30 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class StateTracker:
+    def __init__(self):
+    self.status = 'init'
+
+    def __enter__(self):
+    self.status = 'active'
+    return self
+
+    def __exit__(self, excType, excVal, excTb):
+    self.status = 'closed'
+    return False
+
+    tracker = StateTracker()
+    with tracker:
+    pass
+    tracker.status
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         class StateTracker:
@@ -249,6 +327,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class ValueProvider:
+    def __enter__(self):
+    return [1, 2, 3, 4, 5]
+
+    def __exit__(self, excType, excVal, excTb):
+    return False
+
+    with ValueProvider() as vals:
+    total = sum(vals)
+    total
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0021():
         class ValueProvider:
@@ -309,6 +405,32 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class FileManager:
+    def __init__(self, filename, mode):
+    self.filename = filename
+    self.mode = mode
+    self.fileObj = None
+
+    def __enter__(self):
+    self.fileObj = open(self.filename, self.mode)
+    return self.fileObj
+
+    def __exit__(self, excType, excVal, excTb):
+    if self.fileObj:
+    self.fileObj.close()
+    return False
+
+    with FileManager('resource.txt', 'w') as fm:
+    fm.write('Resource managed')
+    'completed'
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         class FileManager:
@@ -342,6 +464,31 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Connection:
+    def __init__(self, host):
+    self.host = host
+    self.connected = False
+
+    def __enter__(self):
+    self.connected = True
+    return self
+
+    def __exit__(self, excType, excVal, excTb):
+    self.connected = False
+    return False
+
+    conn = Connection('localhost')
+    with conn:
+    status = conn.connected
+    conn.connected, status
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         class Connection:
@@ -374,6 +521,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class ResourceCounter:
+    count = 0
+
+    def __enter__(self):
+    ResourceCounter.count = ResourceCounter.count + 1
+    return ResourceCounter.count
+
+    def __exit__(self, excType, excVal, excTb):
+    ResourceCounter.count = ResourceCounter.count - 1
+    return False
+
+    with ResourceCounter() as rc1:
+    with ResourceCounter() as rc2:
+    peak = ResourceCounter.count
+    ResourceCounter.count, peak
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0031():
         class ResourceCounter:
@@ -439,6 +609,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class ExceptionSuppressor:
+    def __enter__(self):
+    return self
+
+    def __exit__(self, excType, excVal, excTb):
+    if excType is ZeroDivisionError:
+    return True
+    return False
+
+    outcome = 'no error'
+    with ExceptionSuppressor():
+    outcome = 10 / 0
+    outcome
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         class ExceptionSuppressor:
@@ -467,6 +658,33 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class ExceptionLogger:
+    def __init__(self):
+    self.errors = []
+
+    def __enter__(self):
+    return self
+
+    def __exit__(self, excType, excVal, excTb):
+    if excType:
+    self.errors.append(str(excType.__name__))
+    return False
+
+    logger = ExceptionLogger()
+    try:
+    with logger:
+    raise ValueError('test error')
+    except ValueError:
+    pass
+    logger.errors
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         class ExceptionLogger:
@@ -501,6 +719,28 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class SelectiveSuppressor:
+    def __init__(self, suppress):
+    self.suppress = suppress
+
+    def __enter__(self):
+    return self
+
+    def __exit__(self, excType, excVal, excTb):
+    return excType in self.suppress
+
+    msg = 'success'
+    with SelectiveSuppressor([TypeError]):
+    msg = 'error' + 5
+    msg
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0041():
         class SelectiveSuppressor:
@@ -565,6 +805,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('source.txt', 'w') as src, open('dest.txt', 'w') as dst:
+    src.write('source')
+    dst.write('destination')
+    combined = 'both written'
+    combined
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0047():
         with open('source.txt', 'w') as src, open('dest.txt', 'w') as dst:
@@ -585,6 +838,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class OrderTracker:
+    def __init__(self, name):
+    self.name = name
+
+    def __enter__(self):
+    return self.name
+
+    def __exit__(self, excType, excVal, excTb):
+    return False
+
+    with OrderTracker('first') as f, OrderTracker('second') as s:
+    order = f, s
+    order
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         class OrderTracker:
@@ -613,6 +887,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class ChainResource:
+    def __init__(self, value):
+    self.value = value
+
+    def __enter__(self):
+    return self.value
+
+    def __exit__(self, excType, excVal, excTb):
+    return False
+
+    with ChainResource(10) as a, ChainResource(20) as b, ChainResource(30) as c:
+    sumTotal = a + b + c
+    sumTotal
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         class ChainResource:
@@ -676,6 +971,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    import time
+
+    class Timer:
+    def __enter__(self):
+    self.start = time.time()
+    return self
+
+    def __exit__(self, excType, excVal, excTb):
+    self.elapsed = time.time() - self.start
+    return False
+
+    timer = Timer()
+    with timer:
+    total = sum(range(1000))
+    timer.elapsed > 0
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0057():
         import time
@@ -706,6 +1024,37 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class StateBackup:
+    def __init__(self, obj, attr, newVal):
+    self.obj = obj
+    self.attr = attr
+    self.newVal = newVal
+    self.oldVal = None
+
+    def __enter__(self):
+    self.oldVal = getattr(self.obj, self.attr)
+    setattr(self.obj, self.attr, self.newVal)
+    return self
+
+    def __exit__(self, excType, excVal, excTb):
+    setattr(self.obj, self.attr, self.oldVal)
+    return False
+
+    class Config:
+    debug = False
+
+    cfg = Config()
+    with StateBackup(cfg, 'debug', True):
+    insideVal = cfg.debug
+    cfg.debug, insideVal
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         class StateBackup:
@@ -744,6 +1093,33 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class ListGuard:
+    def __init__(self, lst):
+    self.lst = lst
+    self.backup = None
+
+    def __enter__(self):
+    self.backup = self.lst[:]
+    return self.lst
+
+    def __exit__(self, excType, excVal, excTb):
+    self.lst[:] = self.backup
+    return False
+
+    myList = [1, 2, 3]
+    with ListGuard(myList) as ml:
+    ml.append(4)
+    ml.append(5)
+    modified = len(ml)
+    len(myList), modified
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         class ListGuard:
@@ -803,12 +1179,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 기본 컨텍스트
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -821,12 +1211,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: 값 반환
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -839,12 +1243,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 카운터 컨텍스트
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -857,12 +1275,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 다중 컨텍스트
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -875,12 +1307,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 조건부 실행
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -893,12 +1339,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2: 리소스 풀
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -911,12 +1371,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4: 값 누적
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -929,12 +1403,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화6: 시간 제한
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -947,12 +1435,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화8: 멀티 상태
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -965,12 +1467,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화10: 컨텍스트 팩토리
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: tuple, tuple_immutable, tuple_packing, tuple_unpacking
-    - 이미 써도 되는 개념: list_all, string_all
-    - 오늘은 일부러 쓰지 않는 개념: dict, set, function, import
+    - 오늘 새로 배우는 개념: 튜플, 바꿀 수 없는 튜플, 튜플 패킹, 튜플 언패킹
+    - 이미 써도 되는 개념: 리스트 전체, 문자열 전체
+    - 오늘은 일부러 쓰지 않는 개념: 딕셔너리, 집합, 함수, import
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    nums = (1, 2, 3, 4, 5)
+    nums
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         nums = (1, 2, 3, 4, 5)
@@ -153,6 +163,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    digits = (10, 20, 30)
+    digits
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0013():
         digits = (10, 20, 30)
@@ -170,6 +190,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    fruits = ('사과', '바나나', '오렌지')
+    fruits
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0015():
         fruits = ('사과', '바나나', '오렌지')
@@ -187,6 +217,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    mixed = (1, 'hello', True, 3.14)
+    mixed
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         mixed = (1, 'hello', True, 3.14)
@@ -204,6 +244,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    single = (42,)
+    single
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         single = (42,)
@@ -221,6 +271,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    packed = 1, 2, 3
+    packed
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0021():
         packed = 1, 2, 3
@@ -273,6 +333,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    palette = ('빨강', '초록', '파랑', '노랑')
+    palette[0]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         palette = ('빨강', '초록', '파랑', '노랑')
@@ -290,6 +360,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    hues = ('빨강', '초록', '파랑', '노랑')
+    hues[-1]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         hues = ('빨강', '초록', '파랑', '노랑')
@@ -307,6 +387,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    tones = ('빨강', '초록', '파랑', '노랑')
+    tones[1]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0031():
         tones = ('빨강', '초록', '파랑', '노랑')
@@ -359,6 +449,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    digits = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+    digits[:5]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         digits = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -376,6 +476,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    sequence = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+    sequence[-5:]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         sequence = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -393,6 +503,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    range10 = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+    range10[::2]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0041():
         range10 = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -410,6 +530,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    series = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+    series[::-1]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0043():
         series = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
@@ -462,6 +592,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    fixed = (1, 2, 3)
+    flex = [1, 2, 3]
+    flex[0] = 10
+    print('tuple:', fixed)
+    print('list_before:', [1, 2, 3])
+    print('list_after:', flex)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         fixed = (1, 2, 3)
@@ -518,6 +662,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    left = (1, 2, 3)
+    right = (4, 5, 6)
+    left + right
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0055():
         left = (1, 2, 3)
@@ -536,6 +691,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    repeated = (0,) * 5
+    repeated
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0057():
         repeated = (0,) * 5
@@ -588,6 +753,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    weekdays = ('월', '화', '수', '목', '금')
+    '수' in weekdays
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0063():
         weekdays = ('월', '화', '수', '목', '금')
@@ -605,6 +780,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    workdays = ('월', '화', '수', '목', '금')
+    '일' not in workdays
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0065():
         workdays = ('월', '화', '수', '목', '금')
@@ -657,6 +842,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    coords = 10, 20
+    coords
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0071():
         coords = 10, 20
@@ -674,6 +869,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    person = '홍길동', 25, '서울'
+    person
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0073():
         person = '홍길동', 25, '서울'
@@ -726,6 +931,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    point = (100, 200)
+    px, py = point
+    px, py
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0079():
         point = (100, 200)
@@ -744,6 +960,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    name, age, city = '김철수', 30, '부산'
+    name, age, city
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0081():
         name, age, city = '김철수', 30, '부산'
@@ -796,6 +1022,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    items = [1, 2, 3, 4, 5]
+    tuple(items)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0087():
         items = [1, 2, 3, 4, 5]
@@ -813,6 +1049,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    chars = ('a', 'b', 'c')
+    list(chars)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0089():
         chars = ('a', 'b', 'c')
@@ -865,6 +1111,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    sample = (1, 2, 3, 2, 4, 2, 5)
+    sample.count(2)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0095():
         sample = (1, 2, 3, 2, 4, 2, 5)
@@ -882,6 +1138,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    items = (1, 2, 3, 2, 4, 2, 5)
+    items.index(4)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0097():
         items = (1, 2, 3, 2, 4, 2, 5)
@@ -934,6 +1200,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    week = ('월', '화', '수', '목', '금', '토', '일')
+    len(week)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0103():
         week = ('월', '화', '수', '목', '금', '토', '일')
@@ -951,6 +1227,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    empty = ()
+    len(empty)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0105():
         empty = ()
@@ -993,12 +1279,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 튜플 인덱싱
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1011,6 +1311,13 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: 튜플 패킹
@@ -1020,12 +1327,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본5: 튜플 언패킹
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1045,10 +1366,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 좌표2
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1059,10 +1394,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### Y 거리
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1082,10 +1431,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 이름
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1096,10 +1459,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 튜플 길이
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1119,6 +1496,13 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 초록
@@ -1126,10 +1510,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 노랑 합성
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1149,10 +1547,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 시
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1163,10 +1575,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 총 초
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1186,10 +1612,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 연도
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1200,10 +1640,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 날짜 문자열
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1223,10 +1677,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 과목
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1237,10 +1705,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 평균
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1260,10 +1742,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 국어 인덱스
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1283,6 +1779,13 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 첫 좌표
@@ -1290,10 +1793,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 마지막 좌표
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1313,6 +1830,13 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 높이
@@ -1320,10 +1844,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 중심점
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1343,6 +1881,13 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 상품2
@@ -1350,10 +1895,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 상품3
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1373,10 +1932,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 전체 재고 가치
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1396,10 +1969,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 정렬
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1410,10 +1997,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 최소값
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1433,10 +2034,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 20의 개수
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1447,10 +2062,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 길이
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1470,6 +2099,13 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 마지막 3개
@@ -1477,10 +2113,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 역순
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1500,10 +2150,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 60 포함 여부
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

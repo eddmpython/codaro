@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: dict, key_value, dict_create, dict_access, dict_modify
-    - 이미 써도 되는 개념: list_all, tuple, set
-    - 오늘은 일부러 쓰지 않는 개념: dict_method, function, import
+    - 오늘 새로 배우는 개념: 딕셔너리, 키와 값, 딕셔너리 만들기, 딕셔너리 값 읽기, 딕셔너리 값 바꾸기
+    - 이미 써도 되는 개념: 리스트 전체, 튜플, 집합
+    - 오늘은 일부러 쓰지 않는 개념: 딕셔너리 메서드, 함수, import
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    lang = {'name': 'Python', 'type': 'Language', 'year': 1991}
+    lang
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         lang = {'name': 'Python', 'type': 'Language', 'year': 1991}
@@ -153,6 +163,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    person = {'name': '홍길동', 'age': 25, 'city': '서울'}
+    person
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0013():
         person = {'name': '홍길동', 'age': 25, 'city': '서울'}
@@ -170,6 +190,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    empty = {}
+    empty
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0015():
         empty = {}
@@ -187,6 +217,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    numbers = {1: 'one', 2: 'two', 3: 'three'}
+    numbers
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         numbers = {1: 'one', 2: 'two', 3: 'three'}
@@ -204,6 +244,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    mixed = {'count': 10, 'active': True, 'price': 19.99}
+    mixed
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         mixed = {'count': 10, 'active': True, 'price': 19.99}
@@ -256,6 +306,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    dev = {'name': '김철수', 'age': 30, 'job': 'developer'}
+    dev['name']
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0025():
         dev = {'name': '김철수', 'age': 30, 'job': 'developer'}
@@ -273,6 +333,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    worker = {'name': '김철수', 'age': 30, 'job': 'developer'}
+    worker['age']
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         worker = {'name': '김철수', 'age': 30, 'job': 'developer'}
@@ -290,6 +360,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    staff = {'name': '김철수', 'age': 30, 'job': 'developer'}
+    staff['job']
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         staff = {'name': '김철수', 'age': 30, 'job': 'developer'}
@@ -342,6 +422,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    laptop = {'name': '노트북', 'price': 1000000, 'stock': 5}
+    laptop['price'] = 1200000
+    laptop
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0035():
         laptop = {'name': '노트북', 'price': 1000000, 'stock': 5}
@@ -360,6 +451,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    device = {'name': '노트북', 'price': 1000000, 'stock': 5}
+    device['stock'] = 3
+    device
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         device = {'name': '노트북', 'price': 1000000, 'stock': 5}
@@ -413,6 +515,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    member = {'name': '이영희', 'age': 28}
+    member['city'] = '부산'
+    member
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0043():
         member = {'name': '이영희', 'age': 28}
@@ -431,6 +544,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    user = {'name': '이영희', 'age': 28}
+    user['job'] = 'designer'
+    user
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0045():
         user = {'name': '이영희', 'age': 28}
@@ -484,6 +608,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    alpha = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+    del alpha['b']
+    alpha
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         alpha = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
@@ -502,6 +637,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    keys = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+    del keys['d']
+    keys
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0053():
         keys = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
@@ -555,6 +701,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    grades = {'math': 85, 'english': 90, 'science': 88}
+    'math' in grades
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         grades = {'math': 85, 'english': 90, 'science': 88}
@@ -572,6 +728,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    scores = {'math': 85, 'english': 90, 'science': 88}
+    'history' not in scores
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         scores = {'math': 85, 'english': 90, 'science': 88}
@@ -624,6 +790,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    profile = {'name': '박민수', 'age': 35, 'city': '대구', 'job': 'teacher'}
+    len(profile)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0067():
         profile = {'name': '박민수', 'age': 35, 'city': '대구', 'job': 'teacher'}
@@ -641,6 +817,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    blank = {}
+    len(blank)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0069():
         blank = {}
@@ -693,6 +879,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    full = {'name': '정지은', 'age': 27, 'city': '인천', 'job': 'engineer', 'hobby': 'reading'}
+    basic = {'name': full['name'], 'age': full['age']}
+    basic
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0075():
         full = {'name': '정지은', 'age': 27, 'city': '인천', 'job': 'engineer', 'hobby': 'reading'}
@@ -711,6 +908,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    detail = {'name': '정지은', 'age': 27, 'city': '인천', 'job': 'engineer', 'hobby': 'reading'}
+    detail['city'], detail['job']
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0077():
         detail = {'name': '정지은', 'age': 27, 'city': '인천', 'job': 'engineer', 'hobby': 'reading'}
@@ -763,6 +970,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    team = {
+    'user1': {'name': '김개발', 'age': 28},
+    'user2': {'name': '이디자인', 'age': 25}
+    }
+    team['user1']
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0083():
         team = {
@@ -783,6 +1003,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    group = {
+    'user1': {'name': '김개발', 'age': 28},
+    'user2': {'name': '이디자인', 'age': 25}
+    }
+    group['user1']['name']
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0085():
         group = {
@@ -838,6 +1071,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    config = {'name': 'Python', 'version': '3.9'}
+    config
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0091():
         config = {'name': 'Python', 'version': '3.9'}
@@ -855,6 +1098,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    ordinal = {1: 'first', 2: 'second', 3: 'third'}
+    ordinal
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0093():
         ordinal = {1: 'first', 2: 'second', 3: 'third'}
@@ -872,6 +1125,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    coords = {(0, 0): 'origin', (10, 20): 'point1', (30, 40): 'point2'}
+    coords[(0, 0)]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0095():
         coords = {(0, 0): 'origin', (10, 20): 'point1', (30, 40): 'point2'}
@@ -914,12 +1177,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 값 접근
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -932,12 +1209,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: 항목 추가
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -950,12 +1241,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 사용자 프로필
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -968,12 +1273,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 성적 관리
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -986,12 +1305,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 좌표 시스템
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1004,12 +1337,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화1-2: 학생 데이터 분석
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1022,12 +1369,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2-2: 주문 금액 계산
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1040,12 +1401,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화3-2: 캐릭터 스탯 분석
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1058,12 +1433,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4-2: 조직도 분석
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1076,12 +1465,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화5-2: 성장률 계산
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

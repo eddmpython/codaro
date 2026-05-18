@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: upper, lower, split, join, replace, strip, find, count
-    - 이미 써도 되는 개념: string_basic, indexing, slicing
-    - 오늘은 일부러 쓰지 않는 개념: list_method, function, import
+    - 오늘 새로 배우는 개념: upper(), lower(), split(), join(), replace(), strip(), find(), count()
+    - 이미 써도 되는 개념: 문자열 기초, 인덱싱, 슬라이싱
+    - 오늘은 일부러 쓰지 않는 개념: 리스트 메서드, 함수, import
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -100,6 +100,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    text = 'hello python'
+    text.upper()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         text = 'hello python'
@@ -142,6 +152,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    msg = 'HELLO PYTHON'
+    msg.lower()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0012():
         msg = 'HELLO PYTHON'
@@ -184,6 +204,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    phrase = 'hello PYTHON'
+    phrase.capitalize()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         phrase = 'hello PYTHON'
@@ -226,6 +256,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    sentence = 'hello python programming'
+    sentence.title()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0022():
         sentence = 'hello python programming'
@@ -268,6 +308,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    raw = '   hello python   '
+    raw.strip()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         raw = '   hello python   '
@@ -310,6 +360,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    left = '   hello   '
+    left.lstrip()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0032():
         left = '   hello   '
@@ -327,6 +387,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    right = '   hello   '
+    right.rstrip()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0034():
         right = '   hello   '
@@ -369,6 +439,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    greeting = 'Hello World'
+    greeting.replace('World', 'Python')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         greeting = 'Hello World'
@@ -411,6 +491,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    allText = 'apple apple orange apple'
+    allText.replace('apple', 'banana')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0044():
         allText = 'apple apple orange apple'
@@ -453,6 +543,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    words = 'hello hello world hello'
+    words.count('hello')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         words = 'hello hello world hello'
@@ -495,6 +595,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    code = 'Hello Python Programming'
+    code.find('Python')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0054():
         code = 'Hello Python Programming'
@@ -537,6 +647,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    text = 'Hello World'
+    result = text.find('Python')
+    print('found:', result)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         text = 'Hello World'
@@ -555,6 +676,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    msg = 'Hello World'
+    exists = msg.find('Python') != -1
+    print('exists:', exists)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         msg = 'Hello World'
@@ -598,6 +730,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    title = 'Python Programming'
+    title.startswith('Python')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0066():
         title = 'Python Programming'
@@ -640,6 +782,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    file = 'script.py'
+    file.endswith('.py')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0071():
         file = 'script.py'
@@ -673,12 +825,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 소문자 변환
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -691,12 +857,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: 문자열 치환
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -709,12 +889,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 이름 정리
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -734,10 +928,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### TXT 확인
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -757,10 +965,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### WWW 포함 확인
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -770,6 +992,13 @@ def _(mo):
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -789,10 +1018,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### . 위치
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -802,6 +1045,13 @@ def _(mo):
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -821,6 +1071,13 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 최소 길이 확인
@@ -828,10 +1085,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 대문자 포함 여부
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -851,10 +1122,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 느낌표 위치
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -865,10 +1150,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 느낌표 제거
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -878,6 +1177,13 @@ def _(mo):
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -897,10 +1203,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 대시를 공백으로
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -911,10 +1231,24 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     #### 대시 개수
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

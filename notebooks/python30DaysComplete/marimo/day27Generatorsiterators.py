@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: yield, generator, iter, next, iterator_protocol
-    - 이미 써도 되는 개념: function_all, class_all, comprehension
-    - 오늘은 일부러 쓰지 않는 개념: external_library
+    - 오늘 새로 배우는 개념: yield, 제너레이터, iter(), next(), 이터레이터 규약
+    - 이미 써도 되는 개념: 함수 전체, 클래스 전체, 컴프리헨션
+    - 오늘은 일부러 쓰지 않는 개념: 외부 라이브러리
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def simpleGen():
+    yield 1
+    yield 2
+    yield 3
+
+    gen = simpleGen()
+    next(gen), next(gen), next(gen)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         def simpleGen():
@@ -123,6 +138,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def rangeGen(n):
+    i = 0
+    while i < n:
+    yield i
+    i = i + 1
+
+    g = rangeGen(5)
+    list(g)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0009():
         def rangeGen(n):
@@ -146,6 +177,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def countdown(n):
+    while n > 0:
+    yield n
+    n = n - 1
+
+    output = []
+    for val in countdown(5):
+    output.append(val)
+    output
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0011():
         def countdown(n):
@@ -205,6 +253,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    squares = (x ** 2 for x in range(5))
+    list(squares)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         squares = (x ** 2 for x in range(5))
@@ -222,6 +280,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    evens = (n for n in range(10) if n % 2 == 0)
+    list(evens)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         evens = (n for n in range(10) if n % 2 == 0)
@@ -239,6 +307,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    words = ['hello', 'world', 'python']
+    upper = (w.upper() for w in words)
+    list(upper)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0021():
         words = ['hello', 'world', 'python']
@@ -292,6 +371,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    nums = [1, 2, 3]
+    it = iter(nums)
+    next(it), next(it), next(it)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         nums = [1, 2, 3]
@@ -310,6 +400,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    text = 'abc'
+    textIter = iter(text)
+    next(textIter), next(textIter)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         text = 'abc'
@@ -328,6 +429,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    items = [10, 20, 30]
+    iterator = iter(items)
+    collected = []
+    try:
+    while True:
+    collected.append(next(iterator))
+    except StopIteration:
+    pass
+    collected
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0031():
         items = [10, 20, 30]
@@ -387,6 +505,30 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Counter:
+    def __init__(self, max):
+    self.max = max
+    self.current = 0
+
+    def __iter__(self):
+    return self
+
+    def __next__(self):
+    if self.current < self.max:
+    self.current = self.current + 1
+    return self.current
+    raise StopIteration
+
+    c = Counter(3)
+    list(c)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         class Counter:
@@ -418,6 +560,31 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Range:
+    def __init__(self, start, end):
+    self.current = start
+    self.end = end
+
+    def __iter__(self):
+    return self
+
+    def __next__(self):
+    if self.current < self.end:
+    val = self.current
+    self.current = self.current + 1
+    return val
+    raise StopIteration
+
+    r = Range(5, 10)
+    list(r)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         class Range:
@@ -450,6 +617,32 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Infinite:
+    def __init__(self):
+    self.num = 0
+
+    def __iter__(self):
+    return self
+
+    def __next__(self):
+    self.num = self.num + 1
+    return self.num
+
+    inf = Infinite()
+    values = []
+    for val in inf:
+    values.append(val)
+    if val >= 5:
+    break
+    values
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0041():
         class Infinite:
@@ -518,6 +711,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def fibonacci():
+    a = 0
+    b = 1
+    while True:
+    yield a
+    a, b = b, a + b
+
+    fib = fibonacci()
+    sequence = []
+    for i in range(10):
+    sequence.append(next(fib))
+    sequence
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0047():
         def fibonacci():
@@ -545,6 +758,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def filterPositive(numbers):
+    for n in numbers:
+    if n > 0:
+    yield n
+
+    dataset = [-2, -1, 0, 1, 2, 3]
+    filtered = filterPositive(dataset)
+    list(filtered)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         def filterPositive(numbers):
@@ -568,6 +797,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def doubleValues(nums):
+    for n in nums:
+    yield n * 2
+
+    source = [1, 2, 3, 4, 5]
+    doubled = doubleValues(source)
+    list(doubled)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         def doubleValues(nums):
@@ -625,6 +869,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def batchGen(elements, size):
+    chunk = []
+    for item in elements:
+    chunk.append(item)
+    if len(chunk) == size:
+    yield chunk
+    chunk = []
+    if chunk:
+    yield chunk
+
+    collection = [1, 2, 3, 4, 5, 6, 7]
+    batches = list(batchGen(collection, 3))
+    batches
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0057():
         def batchGen(elements, size):
@@ -653,6 +918,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def square(values):
+    for n in values:
+    yield n ** 2
+
+    def addTen(integers):
+    for n in integers:
+    yield n + 10
+
+    original = [1, 2, 3, 4, 5]
+    pipeline = addTen(square(original))
+    list(pipeline)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         def square(values):
@@ -679,6 +963,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def complexFilter(entries):
+    for item in entries:
+    if item > 0 and item % 2 == 0:
+    yield item * 3
+
+    integers = [-2, -1, 0, 1, 2, 3, 4, 5, 6]
+    outcomes = list(complexFilter(integers))
+    outcomes
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         def complexFilter(entries):
@@ -727,12 +1027,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 범위 생성
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -745,12 +1059,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: iter와 next
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -763,12 +1091,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 조건부 제너레이터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -781,12 +1123,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 변환 제너레이터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -799,12 +1155,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 무한 카운터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -817,12 +1187,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2: 제곱수 필터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -835,12 +1219,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4: 파이프라인
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -853,12 +1251,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화6: 커스텀 범위
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -871,12 +1283,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화8: 윈도우 생성
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -889,12 +1315,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화10: 중첩 제너레이터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -45,11 +45,11 @@ def _(mo):
 
     | Day | 제목 | 핵심 개념 |
     |---|---|---|
-    | Day 01 | 헬로월드 | print, comment, string_literal |
-    | Day 02 | 변수와 데이터 타입 | variable, int, float, str, bool, type, len |
-    | Day 03 | 연산자 | arithmetic_operator, comparison_operator, logical_operator, membership_operator |
-    | Day 04 | 문자열 기초 | string_concat, fstring, string_escape, string_multiline, in_operator |
-    | Day 05 | 문자열 인덱싱/슬라이싱 | indexing, negative_indexing, slicing, slice_step |
+    | Day 01 | 헬로월드 | print() 출력, 주석, 문자열 값 |
+    | Day 02 | 변수와 데이터 타입 | 변수, 정수(int), 실수(float), 문자열(str), 참/거짓(bool), type() 타입 확인, len() 길이 확인 |
+    | Day 03 | 연산자 | 산술 연산자, 비교 연산자, 논리 연산자, 포함 여부 연산자 |
+    | Day 04 | 문자열 기초 | 문자열 연결, f-string, 이스케이프 문자, 여러 줄 문자열, in 연산자 |
+    | Day 05 | 문자열 인덱싱/슬라이싱 | 인덱싱, 음수 인덱싱, 슬라이싱, 간격 슬라이싱 |
     """)
     return
 
@@ -60,6 +60,13 @@ def _(mo):
 
     아래 셀에 이번 범위에서 기억나는 예제를 3개 이상 다시 작성하세요.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

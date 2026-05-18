@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -45,11 +45,11 @@ def _(mo):
 
     | Day | 제목 | 핵심 개념 |
     |---|---|---|
-    | Day 16 | 함수 고급 | default_parameter, keyword_argument, args, kwargs, lambda |
-    | Day 17 | 스코프와 클로저 | global, nonlocal, closure, scope |
-    | Day 18 | 모듈과 import | import, from_import, as, math, random, datetime, os, sys |
-    | Day 19 | 파일 입출력 | open, read, write, with, close, file_mode |
-    | Day 20 | 예외 처리 | try, except, finally, raise, exception_type |
+    | Day 16 | 함수 고급 | 기본값 매개변수, 키워드 인자, *args, **kwargs, lambda |
+    | Day 17 | 스코프와 클로저 | global, nonlocal, 클로저, 스코프 |
+    | Day 18 | 모듈과 import | import, from import, as 별칭, math 모듈, random 모듈, datetime 모듈, os 모듈, sys 모듈 |
+    | Day 19 | 파일 입출력 | open(), read(), write(), with, close(), 파일 모드 |
+    | Day 20 | 예외 처리 | try, except, finally, raise, 예외 종류 |
     """)
     return
 
@@ -60,6 +60,13 @@ def _(mo):
 
     아래 셀에 이번 범위에서 기억나는 예제를 3개 이상 다시 작성하세요.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

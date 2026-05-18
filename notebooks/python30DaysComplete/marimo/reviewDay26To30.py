@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -45,10 +45,10 @@ def _(mo):
 
     | Day | 제목 | 핵심 개념 |
     |---|---|---|
-    | Day 26 | 컴프리헨션 | list_comprehension, dict_comprehension, set_comprehension, nested_comprehension |
-    | Day 27 | 제너레이터와 이터레이터 | yield, generator, iter, next, iterator_protocol |
-    | Day 28 | 고급 문법 종합 | context_manager, with_statement, custom_context_manager |
-    | Day 29 | 알고리즘 연습 | sorting, searching, recursion |
+    | Day 26 | 컴프리헨션 | 리스트 컴프리헨션, 딕셔너리 컴프리헨션, 집합 컴프리헨션, 중첩 컴프리헨션 |
+    | Day 27 | 제너레이터와 이터레이터 | yield, 제너레이터, iter(), next(), 이터레이터 규약 |
+    | Day 28 | 고급 문법 종합 | 컨텍스트 매니저, with 문, 직접 만드는 컨텍스트 매니저 |
+    | Day 29 | 알고리즘 연습 | 정렬, 탐색, 재귀 |
     | Day 30 | 최종 프로젝트 | 복습 |
     """)
     return
@@ -60,6 +60,13 @@ def _(mo):
 
     아래 셀에 이번 범위에서 기억나는 예제를 3개 이상 다시 작성하세요.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

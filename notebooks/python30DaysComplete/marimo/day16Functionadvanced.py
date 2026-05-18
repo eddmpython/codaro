@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: default_parameter, keyword_argument, args, kwargs, lambda
-    - 이미 써도 되는 개념: function_basic
-    - 오늘은 일부러 쓰지 않는 개념: import, class, decorator
+    - 오늘 새로 배우는 개념: 기본값 매개변수, 키워드 인자, *args, **kwargs, lambda
+    - 이미 써도 되는 개념: 함수 기초
+    - 오늘은 일부러 쓰지 않는 개념: import, 클래스, 데코레이터
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def greet(name='Guest'):
+    return 'Hello ' + name
+
+    greet()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         def greet(name='Guest'):
@@ -120,6 +132,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def greetUser(name='Guest'):
+    return 'Hello ' + name
+
+    greetUser('Alice')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0009():
         def greetUser(name='Guest'):
@@ -139,6 +163,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def createProfile(name='Unknown', age=0, city='Seoul'):
+    return name + ' ' + str(age) + ' ' + city
+
+    createProfile('Bob', 25)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0011():
         def createProfile(name='Unknown', age=0, city='Seoul'):
@@ -193,6 +229,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def introduce(name, age, city):
+    return name + ' ' + str(age) + ' ' + city
+
+    introduce(name='Alice', age=25, city='Seoul')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         def introduce(name, age, city):
@@ -212,6 +260,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def showInfo(name, age, city):
+    return name + ' ' + str(age) + ' ' + city
+
+    showInfo(city='Busan', name='Bob', age=30)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         def showInfo(name, age, city):
@@ -231,6 +291,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def makeText(first, second, third):
+    return first + ' ' + second + ' ' + third
+
+    makeText('A', third='C', second='B')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0021():
         def makeText(first, second, third):
@@ -285,6 +357,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def orderFood(menu, quantity=1, spicy=False):
+    result = menu + ' x' + str(quantity)
+    if spicy:
+    result = result + ' (spicy)'
+    return result
+
+    orderFood('Pizza', quantity=2, spicy=True)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         def orderFood(menu, quantity=1, spicy=False):
@@ -307,6 +394,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def bookTicket(destination, passengers=1, classType='economy'):
+    return destination + ' ' + str(passengers) + ' ' + classType
+
+    bookTicket('Tokyo', passengers=2)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         def bookTicket(destination, passengers=1, classType='economy'):
@@ -326,6 +425,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def setConfig(host, port=8080, debug=False, timeout=30):
+    return host + ':' + str(port) + ' debug=' + str(debug)
+
+    setConfig('localhost', debug=True)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0031():
         def setConfig(host, port=8080, debug=False, timeout=30):
@@ -380,6 +491,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def sumAll(*args):
+    total = 0
+    for num in args:
+    total = total + num
+    return total
+
+    sumAll(1, 2, 3, 4, 5)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         def sumAll(*args):
@@ -402,6 +528,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def countArgs(*args):
+    return len(args)
+
+    countArgs(10, 20, 30)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         def countArgs(*args):
@@ -421,6 +559,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def getFirst(*args):
+    if len(args) > 0:
+    return args[0]
+    return None
+
+    getFirst(100, 200, 300)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0041():
         def getFirst(*args):
@@ -477,6 +629,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def makeList(first, *rest):
+    result = [first]
+    for item in rest:
+    result.append(item)
+    return result
+
+    makeList('a', 'b', 'c', 'd')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0047():
         def makeList(first, *rest):
@@ -499,6 +666,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def multiplyAll(multiplier, *numbers):
+    results = []
+    for num in numbers:
+    results.append(num * multiplier)
+    return results
+
+    multiplyAll(3, 1, 2, 3, 4)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         def multiplyAll(multiplier, *numbers):
@@ -521,6 +703,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def average(label, *values):
+    total = 0
+    for val in values:
+    total = total + val
+    avg = total / len(values)
+    return label + ': ' + str(avg)
+
+    average('Score', 80, 90, 85, 88)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         def average(label, *values):
@@ -579,6 +777,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def printInfo(**kwargs):
+    result = ''
+    for key in kwargs:
+    result = result + key + '=' + str(kwargs[key]) + ' '
+    return result
+
+    printInfo(name='Alice', age=25, city='Seoul')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0057():
         def printInfo(**kwargs):
@@ -601,6 +814,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def getValue(**kwargs):
+    if 'name' in kwargs:
+    return kwargs['name']
+    return 'Unknown'
+
+    getValue(name='Bob', age=30)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         def getValue(**kwargs):
@@ -622,6 +849,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def countKwargs(**kwargs):
+    return len(kwargs)
+
+    countKwargs(a=1, b=2, c=3, d=4)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         def countKwargs(**kwargs):
@@ -676,6 +915,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def createUser(userId, **options):
+    info = 'User: ' + userId
+    if 'name' in options:
+    info = info + ' Name: ' + options['name']
+    if 'email' in options:
+    info = info + ' Email: ' + options['email']
+    return info
+
+    createUser('user123', name='Alice', email='alice@example.com')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0067():
         def createUser(userId, **options):
@@ -700,6 +956,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def configure(mode='dev', **settings):
+    config = 'Mode: ' + mode
+    for key in settings:
+    config = config + ' ' + key + '=' + str(settings[key])
+    return config
+
+    configure('prod', host='localhost', port=8080, debug=False)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0069():
         def configure(mode='dev', **settings):
@@ -722,6 +993,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def getConfig(**config):
+    host = config.get('host', 'localhost')
+    port = config.get('port', 8080)
+    return host + ':' + str(port)
+
+    getConfig(host='192.168.1.1')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0071():
         def getConfig(**config):
@@ -778,6 +1063,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def flexibleFunc(*args, **kwargs):
+    posCount = len(args)
+    kwCount = len(kwargs)
+    return posCount, kwCount
+
+    flexibleFunc(1, 2, 3, name='Alice', age=25)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0077():
         def flexibleFunc(*args, **kwargs):
@@ -799,6 +1098,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def process(required, *args, **kwargs):
+    result = 'Required: ' + str(required)
+    result = result + ' Args: ' + str(len(args))
+    result = result + ' Kwargs: ' + str(len(kwargs))
+    return result
+
+    process('data', 1, 2, 3, flag=True, mode='fast')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0079():
         def process(required, *args, **kwargs):
@@ -821,6 +1135,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def combineAll(*args, **kwargs):
+    combined = []
+    for arg in args:
+    combined.append(arg)
+    for key in kwargs:
+    combined.append(kwargs[key])
+    return combined
+
+    combineAll(1, 2, 3, x=10, y=20)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0081():
         def combineAll(*args, **kwargs):
@@ -880,6 +1211,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    square = lambda x: x * x
+    square(5)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0087():
         square = lambda x: x * x
@@ -897,6 +1238,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    add = lambda a, b: a + b
+    add(10, 20)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0089():
         add = lambda a, b: a + b
@@ -914,6 +1265,15 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    (lambda x: x * 3)(7)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0091():
         return (lambda x: x * 3)(7)
@@ -965,6 +1325,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    checkEven = lambda n: 'even' if n % 2 == 0 else 'odd'
+    checkEven(8)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0097():
         checkEven = lambda n: 'even' if n % 2 == 0 else 'odd'
@@ -982,6 +1352,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    maxVal = lambda a, b: a if a > b else b
+    maxVal(15, 23)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0099():
         maxVal = lambda a, b: a if a > b else b
@@ -999,6 +1379,16 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    absVal = lambda x: x if x >= 0 else -x
+    absVal(-42)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0101():
         absVal = lambda x: x if x >= 0 else -x
@@ -1041,12 +1431,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 키워드 인자
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1059,12 +1463,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: **kwargs
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1077,12 +1495,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 설정 함수
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1095,12 +1527,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 문자열 조합
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1113,12 +1559,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 복합 인자
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1131,12 +1591,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화1-2: 검증 함수
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1149,12 +1623,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2-2: 최대값과 최소값
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1167,12 +1655,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화3-2: 변환 함수
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1185,12 +1687,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4-2: 조건부 필터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1203,12 +1719,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화5-2: 함수 리스트
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

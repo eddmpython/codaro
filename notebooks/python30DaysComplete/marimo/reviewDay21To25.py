@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -46,10 +46,10 @@ def _(mo):
     | Day | 제목 | 핵심 개념 |
     |---|---|---|
     | Day 21 | 중간 종합 복습 | 복습 |
-    | Day 22 | 클래스 기초 | class, init, self, method, attribute, instance |
-    | Day 23 | 클래스 고급 | inheritance, super, override, multiple_inheritance |
+    | Day 22 | 클래스 기초 | 클래스, __init__, self, 메서드, 속성, 인스턴스 |
+    | Day 23 | 클래스 고급 | 상속, super(), 오버라이드, 다중 상속 |
     | Day 24 | 특수 메서드 | __str__, __repr__, __len__, __add__, __eq__, __getitem__ |
-    | Day 25 | 프로퍼티와 데코레이터 | property, setter, deleter, staticmethod, classmethod, decorator |
+    | Day 25 | 프로퍼티와 데코레이터 | property, setter, deleter, staticmethod, classmethod, 데코레이터 |
     """)
     return
 
@@ -60,6 +60,13 @@ def _(mo):
 
     아래 셀에 이번 범위에서 기억나는 예제를 3개 이상 다시 작성하세요.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

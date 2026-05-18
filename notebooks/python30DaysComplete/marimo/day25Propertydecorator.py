@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: property, setter, deleter, staticmethod, classmethod, decorator
-    - 이미 써도 되는 개념: class_all, special_method
-    - 오늘은 일부러 쓰지 않는 개념: metaclass, external_library
+    - 오늘 새로 배우는 개념: property, setter, deleter, staticmethod, classmethod, 데코레이터
+    - 이미 써도 되는 개념: 클래스 전체, 특수 메서드
+    - 오늘은 일부러 쓰지 않는 개념: 메타클래스, 외부 라이브러리
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Circle:
+    def __init__(self, radius):
+    self.radius = radius
+
+    @property
+    def area(self):
+    return 3.14 * self.radius ** 2
+
+    cir = Circle(5)
+    cir.area
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         class Circle:
@@ -126,6 +144,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Rectangle:
+    def __init__(self, width, height):
+    self.width = width
+    self.height = height
+
+    @property
+    def area(self):
+    return self.width * self.height
+
+    @property
+    def perimeter(self):
+    return 2 * (self.width + self.height)
+
+    rect = Rectangle(4, 6)
+    rect.area, rect.perimeter
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0009():
         class Rectangle:
@@ -156,6 +197,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Account:
+    def __init__(self, balance):
+    self.balance = balance
+
+    @property
+    def status(self):
+    if self.balance >= 0:
+    return 'positive'
+    else:
+    return 'negative'
+
+    acc = Account(-100)
+    acc.status
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0011():
         class Account:
@@ -219,6 +281,32 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Temperature:
+    def __init__(self):
+    self._celsius = 0
+
+    @property
+    def celsius(self):
+    return self._celsius
+
+    @celsius.setter
+    def celsius(self, value):
+    if value < -273:
+    self._celsius = -273
+    else:
+    self._celsius = value
+
+    temp = Temperature()
+    temp.celsius = -300
+    temp.celsius
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         class Temperature:
@@ -252,6 +340,30 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Product:
+    def __init__(self, price):
+    self._price = price
+
+    @property
+    def price(self):
+    return self._price
+
+    @price.setter
+    def price(self, value):
+    self._price = value
+    self._tax = value * 0.1
+
+    prod = Product(1000)
+    prod.price = 2000
+    prod._tax
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         class Product:
@@ -283,6 +395,30 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Cache:
+    def __init__(self):
+    self._data = {}
+
+    @property
+    def data(self):
+    return self._data
+
+    @data.deleter
+    def data(self):
+    self._data = {}
+
+    cache = Cache()
+    cache._data['key'] = 'value'
+    del cache.data
+    len(cache._data)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0021():
         class Cache:
@@ -349,6 +485,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Math:
+    @staticmethod
+    def add(a, b):
+    return a + b
+
+    @staticmethod
+    def multiply(a, b):
+    return a * b
+
+    Math.add(3, 4)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         class Math:
@@ -374,6 +528,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Validator:
+    @staticmethod
+    def isPositive(num):
+    return num > 0
+
+    @staticmethod
+    def isEmail(text):
+    return '@' in text
+
+    Validator.isPositive(10)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         class Validator:
@@ -399,6 +571,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Converter:
+    @staticmethod
+    def celsiusToFahrenheit(c):
+    return c * 9 / 5 + 32
+
+    @staticmethod
+    def fahrenheitToCelsius(f):
+    return (f - 32) * 5 / 9
+
+    Converter.celsiusToFahrenheit(25)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0031():
         class Converter:
@@ -459,6 +649,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Person:
+    def __init__(self, name, age):
+    self.name = name
+    self.age = age
+
+    @classmethod
+    def fromBirthYear(cls, name, birthYear):
+    age = 2024 - birthYear
+    return cls(name, age)
+
+    p = Person.fromBirthYear('Alice', 2000)
+    p.age
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         class Person:
@@ -486,6 +696,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Point:
+    def __init__(self, x, y):
+    self.x = x
+    self.y = y
+
+    @classmethod
+    def origin(cls):
+    return cls(0, 0)
+
+    @classmethod
+    def unit(cls):
+    return cls(1, 1)
+
+    pt = Point.origin()
+    pt.x, pt.y
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         class Point:
@@ -516,6 +749,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class RGB:
+    def __init__(self, r, g, b):
+    self.r = r
+    self.g = g
+    self.b = b
+
+    @classmethod
+    def fromHex(cls, hexCode):
+    r = int(hexCode[0:2], 16)
+    g = int(hexCode[2:4], 16)
+    b = int(hexCode[4:6], 16)
+    return cls(r, g, b)
+
+    color = RGB.fromHex('FF8800')
+    color.r, color.g
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0041():
         class RGB:
@@ -581,6 +837,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def logger(func):
+    def wrapper():
+    msg = 'Calling ' + func.__name__
+    result = func()
+    return msg + ' -> ' + str(result)
+    return wrapper
+
+    @logger
+    def greet():
+    return 'Hello'
+
+    greet()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0047():
         def logger(func):
@@ -608,6 +884,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def double(func):
+    def wrapper(x):
+    result = func(x)
+    return result * 2
+    return wrapper
+
+    @double
+    def square(n):
+    return n * n
+
+    square(5)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         def double(func):
@@ -634,6 +929,30 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def addOne(func):
+    def wrapper(x):
+    return func(x) + 1
+    return wrapper
+
+    def triple(func):
+    def wrapper(x):
+    return func(x) * 3
+    return wrapper
+
+    @addOne
+    @triple
+    def getValue(n):
+    return n
+
+    getValue(10)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         def addOne(func):
@@ -700,6 +1019,31 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Fibonacci:
+    def __init__(self):
+    self._cache = {}
+
+    @property
+    def tenth(self):
+    if 10 not in self._cache:
+    self._cache[10] = self._fib(10)
+    return self._cache[10]
+
+    def _fib(self, n):
+    if n <= 1:
+    return n
+    return self._fib(n - 1) + self._fib(n - 2)
+
+    fib = Fibonacci()
+    fib.tenth
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0057():
         class Fibonacci:
@@ -732,6 +1076,31 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class User:
+    def __init__(self, name, age):
+    self._name = name
+    self._age = age
+
+    @property
+    def age(self):
+    return self._age
+
+    @age.setter
+    def age(self, value):
+    if 0 <= value <= 150:
+    self._age = value
+
+    user = User('Bob', 25)
+    user.age = 200
+    user.age
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         class User:
@@ -764,6 +1133,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Config:
+    def __init__(self, host, port):
+    self.host = host
+    self.port = port
+
+    @classmethod
+    def development(cls):
+    return cls('localhost', 8000)
+
+    @classmethod
+    def production(cls):
+    return cls('server.com', 80)
+
+    cfg = Config.development()
+    cfg.host, cfg.port
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         class Config:
@@ -819,12 +1211,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 정적 메서드
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -837,12 +1243,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: setter 사용
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -855,12 +1275,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 여러 프로퍼티
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -873,12 +1307,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 팩토리 메서드
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -891,12 +1339,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 데코레이터 체이닝
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -909,12 +1371,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2: 범위 검증
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -927,12 +1403,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4: 유틸리티 클래스
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -945,12 +1435,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화6: 캐싱 프로퍼티
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -963,12 +1467,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화8: 로깅 데코레이터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -981,12 +1499,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화10: 체인 데코레이터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

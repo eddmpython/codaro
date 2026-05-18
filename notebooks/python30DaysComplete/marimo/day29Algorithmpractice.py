@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: sorting, searching, recursion
-    - 이미 써도 되는 개념: everything
-    - 오늘은 일부러 쓰지 않는 개념: external_library
+    - 오늘 새로 배우는 개념: 정렬, 탐색, 재귀
+    - 이미 써도 되는 개념: 전체 문법
+    - 오늘은 일부러 쓰지 않는 개념: 외부 라이브러리
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def bubbleSort(arr):
+    n = len(arr)
+    for i in range(n):
+    for j in range(n - i - 1):
+    if arr[j] > arr[j + 1]:
+    arr[j], arr[j + 1] = arr[j + 1], arr[j]
+    return arr
+
+    unsorted = [64, 34, 25, 12, 22, 11, 90]
+    bubbleSort(unsorted[:])
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         def bubbleSort(arr):
@@ -126,6 +144,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def selectionSort(arr):
+    n = len(arr)
+    for i in range(n):
+    minIdx = i
+    for j in range(i + 1, n):
+    if arr[j] < arr[minIdx]:
+    minIdx = j
+    arr[i], arr[minIdx] = arr[minIdx], arr[i]
+    return arr
+
+    numbers = [64, 25, 12, 22, 11]
+    selectionSort(numbers[:])
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0009():
         def selectionSort(arr):
@@ -153,6 +191,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def insertionSort(arr):
+    for i in range(1, len(arr)):
+    key = arr[i]
+    j = i - 1
+    while j >= 0 and arr[j] > key:
+    arr[j + 1] = arr[j]
+    j = j - 1
+    arr[j + 1] = key
+    return arr
+
+    dataset = [12, 11, 13, 5, 6]
+    insertionSort(dataset[:])
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0011():
         def insertionSort(arr):
@@ -215,6 +273,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def linearSearch(arr, target):
+    for i in range(len(arr)):
+    if arr[i] == target:
+    return i
+    return -1
+
+    elements = [10, 23, 45, 70, 11, 15]
+    linearSearch(elements, 70)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         def linearSearch(arr, target):
@@ -238,6 +312,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def binarySearch(arr, target):
+    left = 0
+    right = len(arr) - 1
+    while left <= right:
+    mid = (left + right) // 2
+    if arr[mid] == target:
+    return mid
+    elif arr[mid] < target:
+    left = mid + 1
+    else:
+    right = mid - 1
+    return -1
+
+    sortedArr = [2, 5, 8, 12, 16, 23, 38, 56, 72, 91]
+    binarySearch(sortedArr, 23)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         def binarySearch(arr, target):
@@ -268,6 +365,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def contains(arr, value):
+    for item in arr:
+    if item == value:
+    return True
+    return False
+
+    collection = [1, 2, 3, 4, 5]
+    contains(collection, 3), contains(collection, 10)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0021():
         def contains(arr, value):
@@ -326,6 +439,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def factorial(n):
+    if n <= 1:
+    return 1
+    return n * factorial(n - 1)
+
+    factorial(5)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         def factorial(n):
@@ -347,6 +474,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def fibonacci(n):
+    if n <= 1:
+    return n
+    return fibonacci(n - 1) + fibonacci(n - 2)
+
+    fibonacci(7)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         def fibonacci(n):
@@ -368,6 +509,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def power(base, exp):
+    if exp == 0:
+    return 1
+    return base * power(base, exp - 1)
+
+    power(2, 10)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0031():
         def power(base, exp):
@@ -424,6 +579,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def sumList(lst):
+    if not lst:
+    return 0
+    return lst[0] + sumList(lst[1:])
+
+    values = [1, 2, 3, 4, 5]
+    sumList(values)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         def sumList(lst):
@@ -446,6 +616,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def reverseStr(s):
+    if len(s) <= 1:
+    return s
+    return reverseStr(s[1:]) + s[0]
+
+    reverseStr('hello')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         def reverseStr(s):
@@ -467,6 +651,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def findMax(lst):
+    if len(lst) == 1:
+    return lst[0]
+    maxRest = findMax(lst[1:])
+    return lst[0] if lst[0] > maxRest else maxRest
+
+    nums = [3, 7, 2, 9, 4, 1]
+    findMax(nums)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0041():
         def findMax(lst):
@@ -525,6 +725,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def isPalindrome(s):
+    left = 0
+    right = len(s) - 1
+    while left < right:
+    if s[left] != s[right]:
+    return False
+    left = left + 1
+    right = right - 1
+    return True
+
+    isPalindrome('radar')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0047():
         def isPalindrome(s):
@@ -551,6 +770,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def maxSlidingWindow(arr, k):
+    if len(arr) < k:
+    return []
+    maxVals = []
+    for i in range(len(arr) - k + 1):
+    window = arr[i:i + k]
+    maxVals.append(max(window))
+    return maxVals
+
+    sequence = [1, 3, 2, 5, 8, 1, 4]
+    maxSlidingWindow(sequence, 3)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         def maxSlidingWindow(arr, k):
@@ -577,6 +815,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def countFrequency(arr):
+    freq = {}
+    for item in arr:
+    if item in freq:
+    freq[item] = freq[item] + 1
+    else:
+    freq[item] = 1
+    return freq
+
+    items = [1, 2, 2, 3, 3, 3, 4, 4, 4, 4]
+    countFrequency(items)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         def countFrequency(arr):
@@ -638,6 +895,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def removeDuplicates(arr):
+    seen = []
+    for item in arr:
+    if item not in seen:
+    seen.append(item)
+    return sorted(seen)
+
+    duplicated = [4, 2, 4, 1, 3, 2, 5, 3]
+    removeDuplicates(duplicated)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0057():
         def removeDuplicates(arr):
@@ -662,6 +936,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def findMode(arr):
+    freq = {}
+    for item in arr:
+    freq[item] = freq.get(item, 0) + 1
+    maxCount = max(freq.values())
+    for key, val in freq.items():
+    if val == maxCount:
+    return key
+    return None
+
+    data = [1, 2, 2, 3, 3, 3, 4, 4]
+    findMode(data)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         def findMode(arr):
@@ -689,6 +983,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def maxSubarraySum(arr, k):
+    if len(arr) < k:
+    return 0
+    maxSum = sum(arr[:k])
+    currentSum = maxSum
+    for i in range(k, len(arr)):
+    currentSum = currentSum - arr[i - k] + arr[i]
+    if currentSum > maxSum:
+    maxSum = currentSum
+    return maxSum
+
+    scores = [2, 1, 5, 1, 3, 2]
+    maxSubarraySum(scores, 3)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         def maxSubarraySum(arr, k):
@@ -742,12 +1057,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 최솟값 찾기
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -760,12 +1089,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: 짝수만 필터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -778,12 +1121,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 정렬 확인
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -796,12 +1153,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 이진 검색 재귀
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -814,12 +1185,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 회문 재귀
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -832,12 +1217,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2: 퀵 정렬
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -850,12 +1249,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4: 순열 생성
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -868,12 +1281,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화6: 부분집합 합
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -886,12 +1313,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화8: 배낭 문제
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -904,12 +1345,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화10: 동전 교환
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

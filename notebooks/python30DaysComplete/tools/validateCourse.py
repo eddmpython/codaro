@@ -37,6 +37,9 @@ LEGACY_TEXT = [
     "오류 고쳐보기",
     "틀린 이유 적기",
     "비슷한 문제 3단계",
+    "Marimo 환경",
+    "Marimo에서 자동 출력",
+    "Marimo로 계산",
     "assert ",
 ]
 
@@ -73,8 +76,36 @@ def loadYaml(path: Path) -> dict[str, object]:
 
 
 def validateDocs() -> None:
-    for name in ["readme.md", "courseGuide.md", "manifest.json", "progressTracker.csv"]:
+    for name in ["readme.md", "courseGuide.md", "manifest.json"]:
         assertCondition((ROOT / name).exists(), f"missing doc: {name}")
+
+
+def collectConcepts(curriculum: dict[str, object]) -> set[str]:
+    concepts: set[str] = set()
+    dayEntries = curriculum.get("days", [])
+    assertCondition(isinstance(dayEntries, list), "curriculum days must be a list")
+    for dayEntry in dayEntries:
+        assertCondition(isinstance(dayEntry, dict), "curriculum day must be an object")
+        for key in ["allowedConcepts", "newConcepts", "forbidden"]:
+            values = dayEntry.get(key, [])
+            assertCondition(isinstance(values, list), f"{key} must be a list")
+            concepts.update(str(item) for item in values)
+    return concepts
+
+
+def validateConceptLabels(curriculum: dict[str, object]) -> None:
+    labels = curriculum.get("conceptLabels", {})
+    assertCondition(isinstance(labels, dict), "curriculum conceptLabels must be an object")
+    missing = sorted(concept for concept in collectConcepts(curriculum) if concept not in labels)
+    assertCondition(not missing, f"missing concept labels: {missing}")
+    docsText = "\n".join((ROOT / name).read_text(encoding="utf-8") for name in ["readme.md", "courseGuide.md"])
+    internalConcepts = [
+        concept
+        for concept in collectConcepts(curriculum)
+        if "_" in concept and not (concept.startswith("__") and concept.endswith("__"))
+    ]
+    leaked = sorted(concept for concept in internalConcepts if concept in docsText)
+    assertCondition(not leaked, f"learner docs expose internal concept tokens: {leaked}")
 
 
 def validateManifest(curriculum: dict[str, object]) -> None:
@@ -174,10 +205,36 @@ def validateMarimoNotebook(path: Path, sourceYaml: Path | None) -> None:
     if sourceYaml is not None:
         sourceText = str(sourceYaml.relative_to(REPO_ROOT)).replace("\\", "/")
         assertCondition(sourceText in content, f"{path.name} missing YAML source")
+        yamlContent = loadYaml(sourceYaml)
+        codeBlockCount = countBlocks(yamlContent, "code")
+        expansionCount = countBlocks(yamlContent, "expansion")
+        assertCondition(content.count("```python") >= codeBlockCount, f"{path.name} missing visible code previews")
+        if expansionCount:
+            assertCondition(
+                content.count("직접 작성하세요.") >= expansionCount,
+                f"{path.name} missing editable learner cells",
+            )
+        assertCondition("@app.cell(hide_code=True)" in content, f"{path.name} must hide generated runner cells")
     try:
         ast.parse(content)
     except SyntaxError as exc:
         raise AssertionError(f"{path.name} syntax error: {exc.msg}") from exc
+
+
+def countBlocks(yamlContent: dict[str, object], blockType: str) -> int:
+    count = 0
+    sections = yamlContent.get("sections", [])
+    assertCondition(isinstance(sections, list), "YAML sections must be a list")
+    for section in sections:
+        if not isinstance(section, dict):
+            continue
+        blocks = section.get("blocks", [])
+        if not isinstance(blocks, list):
+            continue
+        for block in blocks:
+            if isinstance(block, dict) and block.get("type") == blockType:
+                count += 1
+    return count
 
 
 def main() -> None:
@@ -187,6 +244,7 @@ def main() -> None:
     assertCondition(isinstance(dayEntries, list), "curriculum days must be a list")
     assertCondition(len(dayEntries) == 30, "curriculum must list exactly 30 days")
     validateDocs()
+    validateConceptLabels(curriculum)
     validateManifest(curriculum)
     for dayEntry in dayEntries:
         day = int(dayEntry["day"])

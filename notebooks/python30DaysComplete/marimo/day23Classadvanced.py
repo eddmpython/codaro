@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: inheritance, super, override, multiple_inheritance
-    - 이미 써도 되는 개념: class_basic
-    - 오늘은 일부러 쓰지 않는 개념: special_method, decorator
+    - 오늘 새로 배우는 개념: 상속, super(), 오버라이드, 다중 상속
+    - 이미 써도 되는 개념: 클래스 기초
+    - 오늘은 일부러 쓰지 않는 개념: 특수 메서드, 데코레이터
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Animal:
+    def __init__(self, name):
+    self.name = name
+
+    def speak(self):
+    return 'Some sound'
+
+    class Dog(Animal):
+    pass
+
+    myDog = Dog('Buddy')
+    myDog.name
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         class Animal:
@@ -128,6 +148,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Vehicle:
+    def __init__(self, brand):
+    self.brand = brand
+
+    def start(self):
+    return self.brand + ' starting'
+
+    class Car(Vehicle):
+    pass
+
+    myCar = Car('Tesla')
+    myCar.start()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0009():
         class Vehicle:
@@ -190,6 +230,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Shape:
+    def __init__(self, color):
+    self.color = color
+
+    class Square(Shape):
+    pass
+
+    sq = Square('red')
+    sq.color
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0015():
         class Shape:
@@ -214,6 +271,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Person:
+    def __init__(self, name):
+    self.name = name
+
+    class Student(Person):
+    def __init__(self, name, grade):
+    Person.__init__(self, name)
+    self.grade = grade
+
+    alice = Student('Alice', 90)
+    alice.name, alice.grade
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         class Person:
@@ -240,6 +316,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Device:
+    def __init__(self, brand):
+    self.brand = brand
+
+    class Phone(Device):
+    def __init__(self, brand, model):
+    Device.__init__(self, brand)
+    self.model = model
+
+    ph = Phone('Samsung', 'Galaxy')
+    ph.brand, ph.model
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         class Device:
@@ -301,6 +396,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Employee:
+    def __init__(self, name):
+    self.name = name
+
+    class Manager(Employee):
+    def __init__(self, name, department):
+    super().__init__(name)
+    self.department = department
+
+    mgr = Manager('Bob', 'IT')
+    mgr.name, mgr.department
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0025():
         class Employee:
@@ -327,6 +441,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Base:
+    def greet(self):
+    return 'Hello'
+
+    class Derived(Base):
+    def greet(self):
+    parentGreet = super().greet()
+    return parentGreet + ' from Derived'
+
+    derived = Derived()
+    derived.greet()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         class Base:
@@ -353,6 +486,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Product:
+    def __init__(self, name, price):
+    self.name = name
+    self.price = price
+
+    class Book(Product):
+    def __init__(self, name, price, author):
+    super().__init__(name, price)
+    self.author = author
+
+    bk = Book('Python Guide', 30000, 'Kim')
+    bk.name, bk.price, bk.author
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         class Product:
@@ -415,6 +568,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Bird:
+    def sound(self):
+    return 'chirp'
+
+    class Parrot(Bird):
+    def sound(self):
+    return 'squawk'
+
+    myBird = Parrot()
+    myBird.sound()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0035():
         class Bird:
@@ -440,6 +611,33 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Rectangle:
+    def __init__(self, width, height):
+    self.width = width
+    self.height = height
+
+    def area(self):
+    return self.width * self.height
+
+    class ColoredRectangle(Rectangle):
+    def __init__(self, width, height, color):
+    super().__init__(width, height)
+    self.color = color
+
+    def area(self):
+    baseArea = super().area()
+    return baseArea
+
+    cr = ColoredRectangle(5, 3, 'blue')
+    cr.area()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         class Rectangle:
@@ -474,6 +672,31 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Account:
+    def __init__(self):
+    self.balance = 0
+
+    def withdraw(self, amount):
+    self.balance = self.balance - amount
+    return self.balance
+
+    class SafeAccount(Account):
+    def withdraw(self, amount):
+    if self.balance >= amount:
+    self.balance = self.balance - amount
+    return self.balance
+
+    safe = SafeAccount()
+    safe.balance = 1000
+    safe.withdraw(1500)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         class Account:
@@ -541,6 +764,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Flyer:
+    def fly(self):
+    return 'flying'
+
+    class Swimmer:
+    def swim(self):
+    return 'swimming'
+
+    class Duck(Flyer, Swimmer):
+    pass
+
+    myDuck = Duck()
+    myDuck.fly(), myDuck.swim()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0045():
         class Flyer:
@@ -569,6 +813,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class First:
+    def action(self):
+    return 'first'
+
+    class Second:
+    def action(self):
+    return 'second'
+
+    class Child(First, Second):
+    pass
+
+    childObj = Child()
+    childObj.action()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0047():
         class First:
@@ -597,6 +862,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Left:
+    def method(self):
+    return 'left'
+
+    class Right:
+    def method(self):
+    return 'right'
+
+    class Combined(Right, Left):
+    pass
+
+    combined = Combined()
+    combined.method()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         class Left:
@@ -625,6 +911,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Named:
+    def __init__(self, name):
+    self.name = name
+
+    class Aged:
+    def __init__(self, age):
+    self.age = age
+
+    class Human(Named):
+    def __init__(self, name, age):
+    super().__init__(name)
+    self.age = age
+
+    john = Human('John', 30)
+    john.name, john.age
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         class Named:
@@ -680,6 +989,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Polygon:
+    def __init__(self, sides):
+    self.sides = sides
+
+    class Triangle(Polygon):
+    def __init__(self):
+    super().__init__(3)
+
+    tri = Triangle()
+    tri.sides
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0056():
         class Polygon:
@@ -705,6 +1032,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Worker:
+    def __init__(self, name, salary):
+    self.name = name
+    self.salary = salary
+
+    def getSalary(self):
+    return self.salary
+
+    class Developer(Worker):
+    def __init__(self, name, salary, language):
+    super().__init__(name, salary)
+    self.language = language
+
+    dev = Developer('Alice', 5000, 'Python')
+    dev.getSalary()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0058():
         class Worker:
@@ -735,6 +1085,28 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Staff:
+    def __init__(self, basePay):
+    self.basePay = basePay
+
+    def bonus(self):
+    return self.basePay * 0.1
+
+    class SeniorStaff(Staff):
+    def bonus(self):
+    return self.basePay * 0.2
+
+    junior = Staff(3000)
+    senior = SeniorStaff(3000)
+    junior.bonus(), senior.bonus()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0060():
         class Staff:
@@ -789,12 +1161,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 부모 메서드 사용
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -807,12 +1193,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: 부모 __init__ 직접 호출
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -825,12 +1225,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 메서드 오버라이딩
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -843,12 +1257,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 속성 추가
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -861,12 +1289,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 우선순위 확인
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -879,12 +1321,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2: 체인 상속
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -897,12 +1353,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4: 다중 상속 __init__
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -915,12 +1385,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화6: 복합 계층 1
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -933,12 +1417,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화8: 메서드 조합
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -951,12 +1449,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화10: 복잡한 다중 상속
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

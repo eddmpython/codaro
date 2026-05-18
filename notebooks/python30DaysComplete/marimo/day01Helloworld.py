@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -40,7 +40,7 @@ def _(mo):
 
     - 파이썬 프로그램 실행 방법
     - print() 함수로 텍스트 출력하기
-    - 한 줄 주석과 여러 줄 주석
+    - 한 줄 주석과 여러 줄 설명 메모
     - 코드 작성 시 주석의 중요성
 
     ## 학습 방법
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: print, comment, string_literal
+    - 오늘 새로 배우는 개념: print() 출력, 주석, 문자열 값
     - 이미 써도 되는 개념: 없음
-    - 오늘은 일부러 쓰지 않는 개념: variable, function, list, dict, import
+    - 오늘은 일부러 쓰지 않는 개념: 변수, 함수, 리스트, 딕셔너리, import
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -100,6 +100,15 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    print('Hello World')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         return print('Hello World')
@@ -150,6 +159,15 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    print('안녕하세요, 파이썬!')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0013():
         return print('안녕하세요, 파이썬!')
@@ -200,6 +218,17 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    print('첫 번째 줄')
+    print('두 번째 줄')
+    print('세 번째 줄')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         print('첫 번째 줄')
@@ -243,6 +272,15 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    print('첫 번째 줄\n두 번째 줄\n세 번째 줄')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0024():
         return print('첫 번째 줄\n두 번째 줄\n세 번째 줄')
@@ -294,6 +332,15 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    print('실행됩니다')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0030():
         return print('실행됩니다')
@@ -312,41 +359,59 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 여러 줄 주석
+    ## 여러 줄 설명 메모
 
-    *긴 설명 작성하기*
+    *삼중 따옴표를 조심해서 보기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    여러 줄에 걸친 긴 주석을 작성할 때는 삼중 따옴표(''' 또는 \"\"\")를 사용합니다. 삼중 따옴표로 감싸진 부분은 프로그램이 무시하므로 여러 줄의 설명을 자유롭게 작성할 수 있습니다.
+    파이썬의 정식 주석은 #으로 시작하는 한 줄 주석입니다. 다만 삼중 따옴표(''' 또는 \"\"\")로 여러 줄 문자열을 만들어 설명 메모처럼 두는 코드도 자주 보입니다. 처음에는 '긴 설명을 여러 줄로 적는 방법' 정도로만 이해하면 됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    - 삼중 따옴표(''' 또는 \"\"\")로 여러 줄 주석
-    - 긴 설명이나 문서화에 사용
-    - 프로그램 설명, 라이센스 정보 등에 활용
+    - #은 정식 주석
+    - 삼중 따옴표는 여러 줄 문자열
+    - 파일이나 함수 맨 위 설명에 자주 사용
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ### 여러 줄 주석 사용
+    ### 여러 줄 설명 메모 보기
 
-    삼중 따옴표로 여러 줄 주석을 작성합니다.
+    삼중 따옴표로 여러 줄 설명을 적어봅니다.
     """)
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    print('주석 전')
+    '''
+    이 부분은 여러 줄 설명 메모처럼 볼 수 있습니다.
+    지금은 실행 결과에 보이지 않습니다.
+    '''
+    print('주석 후')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0036():
         print('주석 전')
+        '''
+        이 부분은 여러 줄 설명 메모처럼 볼 수 있습니다.
+        지금은 실행 결과에 보이지 않습니다.
+        '''
         return print('주석 후')
     _snippet_0036()
     return
@@ -356,7 +421,7 @@ def _(mo):
     mo.md(r"""
     > **팁**
     >
-    > 작은따옴표 3개(''')와 큰따옴표 3개(\"\"\")는 동일하게 작동합니다.
+    > 삼중 따옴표는 엄밀히 말하면 문자열입니다. 초보 단계에서는 일반 주석은 #으로 쓴다고 기억하세요.
     """)
     return
 
@@ -395,6 +460,15 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    print(123)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0042():
         return print(123)
@@ -445,6 +519,15 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    print(10 + 20)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0048():
         return print(10 + 20)
@@ -454,7 +537,7 @@ def _():
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## Marimo에서 자동 출력
+    ## 마지막 줄 값 확인하기
 
     *print 없이 표현식만 쓰기*
     """)
@@ -463,32 +546,41 @@ def _(mo):
 @app.cell
 def _(mo):
     mo.md(r"""
-    Marimo 환경에서는 셀의 마지막 표현식이 자동으로 출력됩니다. 표현식(Expression)이란 값을 만들어내는 코드 조각입니다. print()를 쓰지 않아도 마지막 줄에 값을 쓰면 자동으로 화면에 보입니다.
+    Colab과 marimo 같은 노트북 환경에서는 셀의 마지막 줄에 값이 있으면 화면에 자동으로 보입니다. 표현식(Expression)이란 값을 만들어내는 코드 조각입니다. 처음에는 print()를 주로 쓰되, 마지막 줄 값도 확인해보세요.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    - Marimo에서는 마지막 표현식 자동 출력
+    - 노트북에서는 마지막 줄 값이 자동으로 보일 수 있음
     - print() 없이도 값이 화면에 표시
-    - 더 간결한 코드 작성 가능
+    - 초보 단계에서는 print()와 함께 비교해보기
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ### 자동 출력
+    ### 마지막 줄 값
 
     마지막 줄의 값이 자동으로 출력됩니다.
     """)
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    'Hello Notebook'
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0053():
-        return 'Hello Marimo'
+        return 'Hello Notebook'
     _snippet_0053()
     return
 
@@ -518,12 +610,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 한글 출력
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -536,12 +642,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: 계산 결과
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -554,12 +674,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 줄바꿈으로 인사말
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -572,12 +706,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 이모지와 메시지
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -590,12 +738,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
-    ### 연습: 🟡 응용5: Marimo로 계산
+    ### 연습: 🟡 응용5: 마지막 줄 계산
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -608,12 +770,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2: 계산기 출력
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -626,6 +802,13 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4: 메뉴판 출력
@@ -635,12 +818,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화5: 복합 정보 카드
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

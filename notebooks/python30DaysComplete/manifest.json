@@ -8,16 +8,29 @@
       "title": "헬로월드",
       "sourceYaml": "study/python/30days/day01_헬로월드.yaml",
       "allowedConcepts": [],
+      "allowedConceptLabels": [],
       "newConcepts": [
         "print",
         "comment",
         "string_literal"
+      ],
+      "newConceptLabels": [
+        "print() 출력",
+        "주석",
+        "문자열 값"
       ],
       "forbidden": [
         "variable",
         "function",
         "list",
         "dict",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "변수",
+        "함수",
+        "리스트",
+        "딕셔너리",
         "import"
       ],
       "colab": "colab/day01Helloworld.ipynb",
@@ -32,6 +45,11 @@
         "comment",
         "string_literal"
       ],
+      "allowedConceptLabels": [
+        "print() 출력",
+        "주석",
+        "문자열 값"
+      ],
       "newConcepts": [
         "variable",
         "int",
@@ -41,6 +59,15 @@
         "type",
         "len"
       ],
+      "newConceptLabels": [
+        "변수",
+        "정수(int)",
+        "실수(float)",
+        "문자열(str)",
+        "참/거짓(bool)",
+        "type() 타입 확인",
+        "len() 길이 확인"
+      ],
       "forbidden": [
         "list",
         "dict",
@@ -48,6 +75,15 @@
         "set",
         "function",
         "class",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "리스트",
+        "딕셔너리",
+        "튜플",
+        "집합",
+        "함수",
+        "클래스",
         "import"
       ],
       "colab": "colab/day02Variablestypes.ipynb",
@@ -66,16 +102,37 @@
         "type",
         "print"
       ],
+      "allowedConceptLabels": [
+        "변수",
+        "정수(int)",
+        "실수(float)",
+        "문자열(str)",
+        "참/거짓(bool)",
+        "type() 타입 확인",
+        "print() 출력"
+      ],
       "newConcepts": [
         "arithmetic_operator",
         "comparison_operator",
         "logical_operator",
         "membership_operator"
       ],
+      "newConceptLabels": [
+        "산술 연산자",
+        "비교 연산자",
+        "논리 연산자",
+        "포함 여부 연산자"
+      ],
       "forbidden": [
         "list",
         "dict",
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "리스트",
+        "딕셔너리",
+        "함수",
         "import"
       ],
       "colab": "colab/day03Operators.ipynb",
@@ -92,6 +149,13 @@
         "print",
         "len"
       ],
+      "allowedConceptLabels": [
+        "변수",
+        "type() 타입 확인",
+        "연산자",
+        "print() 출력",
+        "len() 길이 확인"
+      ],
       "newConcepts": [
         "string_concat",
         "fstring",
@@ -99,12 +163,27 @@
         "string_multiline",
         "in_operator"
       ],
+      "newConceptLabels": [
+        "문자열 연결",
+        "f-string",
+        "이스케이프 문자",
+        "여러 줄 문자열",
+        "in 연산자"
+      ],
       "forbidden": [
         "indexing",
         "slicing",
         "string_method",
         "list",
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "인덱싱",
+        "슬라이싱",
+        "문자열 메서드",
+        "리스트",
+        "함수",
         "import"
       ],
       "colab": "colab/day04Stringbasics.ipynb",
@@ -118,16 +197,32 @@
         "string_basic",
         "operator"
       ],
+      "allowedConceptLabels": [
+        "문자열 기초",
+        "연산자"
+      ],
       "newConcepts": [
         "indexing",
         "negative_indexing",
         "slicing",
         "slice_step"
       ],
+      "newConceptLabels": [
+        "인덱싱",
+        "음수 인덱싱",
+        "슬라이싱",
+        "간격 슬라이싱"
+      ],
       "forbidden": [
         "string_method",
         "list",
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "문자열 메서드",
+        "리스트",
+        "함수",
         "import"
       ],
       "colab": "colab/day05Stringindexingslicing.ipynb",
@@ -142,6 +237,11 @@
         "indexing",
         "slicing"
       ],
+      "allowedConceptLabels": [
+        "문자열 기초",
+        "인덱싱",
+        "슬라이싱"
+      ],
       "newConcepts": [
         "upper",
         "lower",
@@ -152,9 +252,24 @@
         "find",
         "count"
       ],
+      "newConceptLabels": [
+        "upper()",
+        "lower()",
+        "split()",
+        "join()",
+        "replace()",
+        "strip()",
+        "find()",
+        "count()"
+      ],
       "forbidden": [
         "list_method",
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "리스트 메서드",
+        "함수",
         "import"
       ],
       "colab": "colab/day06Stringmethods.ipynb",
@@ -170,6 +285,12 @@
         "indexing",
         "slicing"
       ],
+      "allowedConceptLabels": [
+        "문자열 전체",
+        "연산자",
+        "인덱싱",
+        "슬라이싱"
+      ],
       "newConcepts": [
         "list",
         "list_create",
@@ -177,12 +298,27 @@
         "list_slicing",
         "list_modify"
       ],
+      "newConceptLabels": [
+        "리스트",
+        "리스트 만들기",
+        "리스트 인덱싱",
+        "리스트 슬라이싱",
+        "리스트 값 바꾸기"
+      ],
       "forbidden": [
         "list_method",
         "tuple",
         "dict",
         "set",
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "리스트 메서드",
+        "튜플",
+        "딕셔너리",
+        "집합",
+        "함수",
         "import"
       ],
       "colab": "colab/day07Listbasics.ipynb",
@@ -195,6 +331,9 @@
       "allowedConcepts": [
         "list_basic"
       ],
+      "allowedConceptLabels": [
+        "리스트 기초"
+      ],
       "newConcepts": [
         "append",
         "insert",
@@ -206,11 +345,29 @@
         "extend",
         "clear"
       ],
+      "newConceptLabels": [
+        "append()",
+        "insert()",
+        "remove()",
+        "pop()",
+        "sort()",
+        "reverse()",
+        "copy()",
+        "extend()",
+        "clear()"
+      ],
       "forbidden": [
         "tuple",
         "dict",
         "set",
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "튜플",
+        "딕셔너리",
+        "집합",
+        "함수",
         "import"
       ],
       "colab": "colab/day08Listmethods.ipynb",
@@ -224,16 +381,32 @@
         "list_all",
         "string_all"
       ],
+      "allowedConceptLabels": [
+        "리스트 전체",
+        "문자열 전체"
+      ],
       "newConcepts": [
         "tuple",
         "tuple_immutable",
         "tuple_packing",
         "tuple_unpacking"
       ],
+      "newConceptLabels": [
+        "튜플",
+        "바꿀 수 없는 튜플",
+        "튜플 패킹",
+        "튜플 언패킹"
+      ],
       "forbidden": [
         "dict",
         "set",
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "딕셔너리",
+        "집합",
+        "함수",
         "import"
       ],
       "colab": "colab/day09Tuples.ipynb",
@@ -247,6 +420,10 @@
         "list_all",
         "tuple"
       ],
+      "allowedConceptLabels": [
+        "리스트 전체",
+        "튜플"
+      ],
       "newConcepts": [
         "set",
         "set_unique",
@@ -257,9 +434,24 @@
         "intersection",
         "difference"
       ],
+      "newConceptLabels": [
+        "집합",
+        "중복 제거",
+        "add()",
+        "remove()",
+        "discard()",
+        "합집합",
+        "교집합",
+        "차집합"
+      ],
       "forbidden": [
         "dict",
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "딕셔너리",
+        "함수",
         "import"
       ],
       "colab": "colab/day10Sets.ipynb",
@@ -274,6 +466,11 @@
         "tuple",
         "set"
       ],
+      "allowedConceptLabels": [
+        "리스트 전체",
+        "튜플",
+        "집합"
+      ],
       "newConcepts": [
         "dict",
         "key_value",
@@ -281,9 +478,21 @@
         "dict_access",
         "dict_modify"
       ],
+      "newConceptLabels": [
+        "딕셔너리",
+        "키와 값",
+        "딕셔너리 만들기",
+        "딕셔너리 값 읽기",
+        "딕셔너리 값 바꾸기"
+      ],
       "forbidden": [
         "dict_method",
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "딕셔너리 메서드",
+        "함수",
         "import"
       ],
       "colab": "colab/day11Dictbasics.ipynb",
@@ -296,6 +505,9 @@
       "allowedConcepts": [
         "dict_basic"
       ],
+      "allowedConceptLabels": [
+        "딕셔너리 기초"
+      ],
       "newConcepts": [
         "get",
         "keys",
@@ -306,8 +518,22 @@
         "popitem",
         "clear"
       ],
+      "newConceptLabels": [
+        "get()",
+        "keys()",
+        "values()",
+        "items()",
+        "update()",
+        "pop()",
+        "popitem()",
+        "clear()"
+      ],
       "forbidden": [
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "함수",
         "import"
       ],
       "colab": "colab/day12Dictmethods.ipynb",
@@ -321,6 +547,10 @@
         "all_data_types",
         "all_operators"
       ],
+      "allowedConceptLabels": [
+        "지금까지 배운 자료형",
+        "지금까지 배운 연산자"
+      ],
       "newConcepts": [
         "if",
         "elif",
@@ -328,9 +558,21 @@
         "ternary_operator",
         "nested_if"
       ],
+      "newConceptLabels": [
+        "if",
+        "elif",
+        "else",
+        "한 줄 조건식",
+        "중첩 if"
+      ],
       "forbidden": [
         "function",
         "loop",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "함수",
+        "반복문",
         "import"
       ],
       "colab": "colab/day13Conditionals.ipynb",
@@ -344,6 +586,10 @@
         "all_data_types",
         "conditional"
       ],
+      "allowedConceptLabels": [
+        "지금까지 배운 자료형",
+        "조건문"
+      ],
       "newConcepts": [
         "for",
         "while",
@@ -353,8 +599,21 @@
         "else_clause",
         "nested_loop"
       ],
+      "newConceptLabels": [
+        "for 반복문",
+        "while 반복문",
+        "range()",
+        "break",
+        "continue",
+        "반복문 else",
+        "중첩 반복문"
+      ],
       "forbidden": [
         "function",
+        "import"
+      ],
+      "forbiddenLabels": [
+        "함수",
         "import"
       ],
       "colab": "colab/day14Loops.ipynb",
@@ -369,6 +628,11 @@
         "conditional",
         "loop"
       ],
+      "allowedConceptLabels": [
+        "지금까지 배운 자료형",
+        "조건문",
+        "반복문"
+      ],
       "newConcepts": [
         "def",
         "return",
@@ -376,10 +640,22 @@
         "argument",
         "docstring"
       ],
+      "newConceptLabels": [
+        "def 함수 정의",
+        "return",
+        "매개변수",
+        "인자",
+        "문서 문자열"
+      ],
       "forbidden": [
         "advanced_function",
         "import",
         "class"
+      ],
+      "forbiddenLabels": [
+        "고급 함수 문법",
+        "import",
+        "클래스"
       ],
       "colab": "colab/day15Functionbasics.ipynb",
       "marimo": "marimo/day15Functionbasics.py"
@@ -391,6 +667,9 @@
       "allowedConcepts": [
         "function_basic"
       ],
+      "allowedConceptLabels": [
+        "함수 기초"
+      ],
       "newConcepts": [
         "default_parameter",
         "keyword_argument",
@@ -398,10 +677,22 @@
         "kwargs",
         "lambda"
       ],
+      "newConceptLabels": [
+        "기본값 매개변수",
+        "키워드 인자",
+        "*args",
+        "**kwargs",
+        "lambda"
+      ],
       "forbidden": [
         "import",
         "class",
         "decorator"
+      ],
+      "forbiddenLabels": [
+        "import",
+        "클래스",
+        "데코레이터"
       ],
       "colab": "colab/day16Functionadvanced.ipynb",
       "marimo": "marimo/day16Functionadvanced.py"
@@ -413,15 +704,28 @@
       "allowedConcepts": [
         "function_all"
       ],
+      "allowedConceptLabels": [
+        "함수 전체"
+      ],
       "newConcepts": [
         "global",
         "nonlocal",
         "closure",
         "scope"
       ],
+      "newConceptLabels": [
+        "global",
+        "nonlocal",
+        "클로저",
+        "스코프"
+      ],
       "forbidden": [
         "import",
         "class"
+      ],
+      "forbiddenLabels": [
+        "import",
+        "클래스"
       ],
       "colab": "colab/day17Scopeclosure.ipynb",
       "marimo": "marimo/day17Scopeclosure.py"
@@ -433,6 +737,9 @@
       "allowedConcepts": [
         "function_all"
       ],
+      "allowedConceptLabels": [
+        "함수 전체"
+      ],
       "newConcepts": [
         "import",
         "from_import",
@@ -443,9 +750,23 @@
         "os",
         "sys"
       ],
+      "newConceptLabels": [
+        "import",
+        "from import",
+        "as 별칭",
+        "math 모듈",
+        "random 모듈",
+        "datetime 모듈",
+        "os 모듈",
+        "sys 모듈"
+      ],
       "forbidden": [
         "class",
         "external_library"
+      ],
+      "forbiddenLabels": [
+        "클래스",
+        "외부 라이브러리"
       ],
       "colab": "colab/day18Modulesimport.ipynb",
       "marimo": "marimo/day18Modulesimport.py"
@@ -458,6 +779,10 @@
         "function_all",
         "import"
       ],
+      "allowedConceptLabels": [
+        "함수 전체",
+        "import"
+      ],
       "newConcepts": [
         "open",
         "read",
@@ -466,9 +791,21 @@
         "close",
         "file_mode"
       ],
+      "newConceptLabels": [
+        "open()",
+        "read()",
+        "write()",
+        "with",
+        "close()",
+        "파일 모드"
+      ],
       "forbidden": [
         "class",
         "external_library"
+      ],
+      "forbiddenLabels": [
+        "클래스",
+        "외부 라이브러리"
       ],
       "colab": "colab/day19Fileio.ipynb",
       "marimo": "marimo/day19Fileio.py"
@@ -482,6 +819,11 @@
         "import",
         "file_io"
       ],
+      "allowedConceptLabels": [
+        "함수 전체",
+        "import",
+        "파일 입출력"
+      ],
       "newConcepts": [
         "try",
         "except",
@@ -489,9 +831,20 @@
         "raise",
         "exception_type"
       ],
+      "newConceptLabels": [
+        "try",
+        "except",
+        "finally",
+        "raise",
+        "예외 종류"
+      ],
       "forbidden": [
         "class",
         "custom_exception"
+      ],
+      "forbiddenLabels": [
+        "클래스",
+        "사용자 정의 예외"
       ],
       "colab": "colab/day20Exceptionhandling.ipynb",
       "marimo": "marimo/day20Exceptionhandling.py"
@@ -503,9 +856,16 @@
       "allowedConcepts": [
         "everything_before"
       ],
+      "allowedConceptLabels": [
+        "이전 Day 전체"
+      ],
       "newConcepts": [],
+      "newConceptLabels": [],
       "forbidden": [
         "class"
+      ],
+      "forbiddenLabels": [
+        "클래스"
       ],
       "colab": "colab/day21Midreview.ipynb",
       "marimo": "marimo/day21Midreview.py"
@@ -519,6 +879,11 @@
         "import",
         "exception"
       ],
+      "allowedConceptLabels": [
+        "함수 전체",
+        "import",
+        "예외"
+      ],
       "newConcepts": [
         "class",
         "init",
@@ -527,10 +892,23 @@
         "attribute",
         "instance"
       ],
+      "newConceptLabels": [
+        "클래스",
+        "__init__",
+        "self",
+        "메서드",
+        "속성",
+        "인스턴스"
+      ],
       "forbidden": [
         "inheritance",
         "special_method",
         "decorator"
+      ],
+      "forbiddenLabels": [
+        "상속",
+        "특수 메서드",
+        "데코레이터"
       ],
       "colab": "colab/day22Classbasics.ipynb",
       "marimo": "marimo/day22Classbasics.py"
@@ -542,15 +920,28 @@
       "allowedConcepts": [
         "class_basic"
       ],
+      "allowedConceptLabels": [
+        "클래스 기초"
+      ],
       "newConcepts": [
         "inheritance",
         "super",
         "override",
         "multiple_inheritance"
       ],
+      "newConceptLabels": [
+        "상속",
+        "super()",
+        "오버라이드",
+        "다중 상속"
+      ],
       "forbidden": [
         "special_method",
         "decorator"
+      ],
+      "forbiddenLabels": [
+        "특수 메서드",
+        "데코레이터"
       ],
       "colab": "colab/day23Classadvanced.ipynb",
       "marimo": "marimo/day23Classadvanced.py"
@@ -562,7 +953,18 @@
       "allowedConcepts": [
         "class_all"
       ],
+      "allowedConceptLabels": [
+        "클래스 전체"
+      ],
       "newConcepts": [
+        "__str__",
+        "__repr__",
+        "__len__",
+        "__add__",
+        "__eq__",
+        "__getitem__"
+      ],
+      "newConceptLabels": [
         "__str__",
         "__repr__",
         "__len__",
@@ -573,6 +975,10 @@
       "forbidden": [
         "decorator",
         "metaclass"
+      ],
+      "forbiddenLabels": [
+        "데코레이터",
+        "메타클래스"
       ],
       "colab": "colab/day24Specialmethods.ipynb",
       "marimo": "marimo/day24Specialmethods.py"
@@ -585,6 +991,10 @@
         "class_all",
         "special_method"
       ],
+      "allowedConceptLabels": [
+        "클래스 전체",
+        "특수 메서드"
+      ],
       "newConcepts": [
         "property",
         "setter",
@@ -593,9 +1003,21 @@
         "classmethod",
         "decorator"
       ],
+      "newConceptLabels": [
+        "property",
+        "setter",
+        "deleter",
+        "staticmethod",
+        "classmethod",
+        "데코레이터"
+      ],
       "forbidden": [
         "metaclass",
         "external_library"
+      ],
+      "forbiddenLabels": [
+        "메타클래스",
+        "외부 라이브러리"
       ],
       "colab": "colab/day25Propertydecorator.ipynb",
       "marimo": "marimo/day25Propertydecorator.py"
@@ -609,15 +1031,30 @@
         "loop",
         "conditional"
       ],
+      "allowedConceptLabels": [
+        "기본 문법 전체",
+        "반복문",
+        "조건문"
+      ],
       "newConcepts": [
         "list_comprehension",
         "dict_comprehension",
         "set_comprehension",
         "nested_comprehension"
       ],
+      "newConceptLabels": [
+        "리스트 컴프리헨션",
+        "딕셔너리 컴프리헨션",
+        "집합 컴프리헨션",
+        "중첩 컴프리헨션"
+      ],
       "forbidden": [
         "generator_expression",
         "external_library"
+      ],
+      "forbiddenLabels": [
+        "제너레이터 표현식",
+        "외부 라이브러리"
       ],
       "colab": "colab/day26Comprehensions.ipynb",
       "marimo": "marimo/day26Comprehensions.py"
@@ -631,6 +1068,11 @@
         "class_all",
         "comprehension"
       ],
+      "allowedConceptLabels": [
+        "함수 전체",
+        "클래스 전체",
+        "컴프리헨션"
+      ],
       "newConcepts": [
         "yield",
         "generator",
@@ -638,8 +1080,18 @@
         "next",
         "iterator_protocol"
       ],
+      "newConceptLabels": [
+        "yield",
+        "제너레이터",
+        "iter()",
+        "next()",
+        "이터레이터 규약"
+      ],
       "forbidden": [
         "external_library"
+      ],
+      "forbiddenLabels": [
+        "외부 라이브러리"
       ],
       "colab": "colab/day27Generatorsiterators.ipynb",
       "marimo": "marimo/day27Generatorsiterators.py"
@@ -651,13 +1103,24 @@
       "allowedConcepts": [
         "everything"
       ],
+      "allowedConceptLabels": [
+        "전체 문법"
+      ],
       "newConcepts": [
         "context_manager",
         "with_statement",
         "custom_context_manager"
       ],
+      "newConceptLabels": [
+        "컨텍스트 매니저",
+        "with 문",
+        "직접 만드는 컨텍스트 매니저"
+      ],
       "forbidden": [
         "external_library"
+      ],
+      "forbiddenLabels": [
+        "외부 라이브러리"
       ],
       "colab": "colab/day28Advancedsyntaxreview.ipynb",
       "marimo": "marimo/day28Advancedsyntaxreview.py"
@@ -669,13 +1132,24 @@
       "allowedConcepts": [
         "everything"
       ],
+      "allowedConceptLabels": [
+        "전체 문법"
+      ],
       "newConcepts": [
         "sorting",
         "searching",
         "recursion"
       ],
+      "newConceptLabels": [
+        "정렬",
+        "탐색",
+        "재귀"
+      ],
       "forbidden": [
         "external_library"
+      ],
+      "forbiddenLabels": [
+        "외부 라이브러리"
       ],
       "colab": "colab/day29Algorithmpractice.ipynb",
       "marimo": "marimo/day29Algorithmpractice.py"
@@ -687,9 +1161,16 @@
       "allowedConcepts": [
         "everything"
       ],
+      "allowedConceptLabels": [
+        "전체 문법"
+      ],
       "newConcepts": [],
+      "newConceptLabels": [],
       "forbidden": [
         "external_library"
+      ],
+      "forbiddenLabels": [
+        "외부 라이브러리"
       ],
       "colab": "colab/day30Finalproject.ipynb",
       "marimo": "marimo/day30Finalproject.py"

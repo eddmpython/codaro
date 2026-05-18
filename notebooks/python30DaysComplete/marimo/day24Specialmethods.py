@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -58,8 +58,8 @@ def _(mo):
     ## 오늘의 범위
 
     - 오늘 새로 배우는 개념: __str__, __repr__, __len__, __add__, __eq__, __getitem__
-    - 이미 써도 되는 개념: class_all
-    - 오늘은 일부러 쓰지 않는 개념: decorator, metaclass
+    - 이미 써도 되는 개념: 클래스 전체
+    - 오늘은 일부러 쓰지 않는 개념: 데코레이터, 메타클래스
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Book:
+    def __init__(self, title, author):
+    self.title = title
+    self.author = author
+
+    def __str__(self):
+    return self.title + ' by ' + self.author
+
+    book = Book('Python Guide', 'Kim')
+    str(book)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         class Book:
@@ -126,6 +144,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Product:
+    def __init__(self, name, price):
+    self.name = name
+    self.price = price
+
+    def __str__(self):
+    return self.name + ': ' + str(self.price) + '원'
+
+    item = Product('Laptop', 1500000)
+    str(item)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0009():
         class Product:
@@ -151,6 +187,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Account:
+    def __init__(self, owner, balance):
+    self.owner = owner
+    self.balance = balance
+
+    def __str__(self):
+    status = 'positive' if self.balance >= 0 else 'negative'
+    return self.owner + ' (' + status + ')'
+
+    acc = Account('Alice', -1000)
+    str(acc)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0011():
         class Account:
@@ -212,6 +267,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Point:
+    def __init__(self, x, y):
+    self.x = x
+    self.y = y
+
+    def __repr__(self):
+    return 'Point(' + str(self.x) + ', ' + str(self.y) + ')'
+
+    pt = Point(3, 4)
+    repr(pt)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         class Point:
@@ -237,6 +310,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Color:
+    def __init__(self, r, g, b):
+    self.r = r
+    self.g = g
+    self.b = b
+
+    def __repr__(self):
+    return 'Color(' + str(self.r) + ', ' + str(self.g) + ', ' + str(self.b) + ')'
+
+    color = Color(255, 128, 0)
+    repr(color)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         class Color:
@@ -263,6 +355,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class User:
+    def __init__(self, name, userId):
+    self.name = name
+    self.userId = userId
+
+    def __str__(self):
+    return self.name
+
+    def __repr__(self):
+    return 'User(' + str(self.userId) + ')'
+
+    user = User('Bob', 1001)
+    str(user), repr(user)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0021():
         class User:
@@ -326,6 +439,28 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Playlist:
+    def __init__(self):
+    self.songs = []
+
+    def add(self, song):
+    self.songs.append(song)
+
+    def __len__(self):
+    return len(self.songs)
+
+    pl = Playlist()
+    pl.add('Song A')
+    pl.add('Song B')
+    len(pl)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         class Playlist:
@@ -355,6 +490,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class TextDoc:
+    def __init__(self, content):
+    self.content = content
+
+    def __len__(self):
+    return len(self.content.split())
+
+    doc = TextDoc('Hello world from Python')
+    len(doc)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         class TextDoc:
@@ -379,6 +531,31 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Inventory:
+    def __init__(self):
+    self.items = []
+
+    def add(self, item, qty):
+    self.items.append({'item': item, 'qty': qty})
+
+    def __len__(self):
+    total = 0
+    for entry in self.items:
+    total = total + entry['qty']
+    return total
+
+    inv = Inventory()
+    inv.add('apple', 5)
+    inv.add('banana', 3)
+    len(inv)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0031():
         class Inventory:
@@ -446,6 +623,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Vector:
+    def __init__(self, x, y):
+    self.x = x
+    self.y = y
+
+    def __add__(self, other):
+    return Vector(self.x + other.x, self.y + other.y)
+
+    def __repr__(self):
+    return 'Vector(' + str(self.x) + ', ' + str(self.y) + ')'
+
+    v1 = Vector(1, 2)
+    v2 = Vector(3, 4)
+    v3 = v1 + v2
+    repr(v3)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         class Vector:
@@ -476,6 +676,28 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Name:
+    def __init__(self, text):
+    self.text = text
+
+    def __add__(self, other):
+    return Name(self.text + ' ' + other.text)
+
+    def __str__(self):
+    return self.text
+
+    first = Name('John')
+    last = Name('Doe')
+    full = first + last
+    str(full)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         class Name:
@@ -505,6 +727,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Counter:
+    def __init__(self, val):
+    self.val = val
+
+    def __add__(self, other):
+    return Counter(self.val + other.val)
+
+    cnt1 = Counter(10)
+    cnt2 = Counter(20)
+    combined = cnt1 + cnt2
+    combined.val
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0041():
         class Counter:
@@ -566,6 +807,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Location:
+    def __init__(self, x, y):
+    self.x = x
+    self.y = y
+
+    def __eq__(self, other):
+    return self.x == other.x and self.y == other.y
+
+    loc1 = Location(1, 2)
+    loc2 = Location(1, 2)
+    loc1 == loc2
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0047():
         class Location:
@@ -592,6 +852,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Tag:
+    def __init__(self, name):
+    self.name = name
+
+    def __eq__(self, other):
+    return self.name == other.name
+
+    tag1 = Tag('python')
+    tag2 = Tag('python')
+    tag1 == tag2
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         class Tag:
@@ -617,6 +895,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Card:
+    def __init__(self, rank, suit):
+    self.rank = rank
+    self.suit = suit
+
+    def __eq__(self, other):
+    return self.rank == other.rank and self.suit == other.suit
+
+    card1 = Card('A', 'hearts')
+    card2 = Card('A', 'spades')
+    card1 == card2
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         class Card:
@@ -678,6 +975,28 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Items:
+    def __init__(self):
+    self.data = []
+
+    def add(self, item):
+    self.data.append(item)
+
+    def __getitem__(self, idx):
+    return self.data[idx]
+
+    items = Items()
+    items.add('first')
+    items.add('second')
+    items[0]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0057():
         class Items:
@@ -707,6 +1026,27 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Config:
+    def __init__(self):
+    self.settings = {}
+
+    def set(self, key, val):
+    self.settings[key] = val
+
+    def __getitem__(self, key):
+    return self.settings.get(key, 'Not found')
+
+    cfg = Config()
+    cfg.set('host', 'localhost')
+    cfg['host']
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         class Config:
@@ -735,6 +1075,28 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Fibonacci:
+    def __getitem__(self, n):
+    if n <= 1:
+    return n
+    a = 0
+    b = 1
+    for i in range(2, n + 1):
+    c = a + b
+    a = b
+    b = c
+    return b
+
+    fib = Fibonacci()
+    fib[7]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         class Fibonacci:
@@ -799,6 +1161,34 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class TodoList:
+    def __init__(self):
+    self.tasks = []
+
+    def add(self, task):
+    self.tasks.append(task)
+
+    def __len__(self):
+    return len(self.tasks)
+
+    def __getitem__(self, idx):
+    return self.tasks[idx]
+
+    def __str__(self):
+    return str(len(self.tasks)) + ' tasks'
+
+    todo = TodoList()
+    todo.add('Study')
+    todo.add('Code')
+    len(todo), str(todo), todo[0]
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0067():
         class TodoList:
@@ -834,6 +1224,31 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Money:
+    def __init__(self, amount):
+    self.amount = amount
+
+    def __add__(self, other):
+    return Money(self.amount + other.amount)
+
+    def __eq__(self, other):
+    return self.amount == other.amount
+
+    def __str__(self):
+    return str(self.amount) + '원'
+
+    m1 = Money(1000)
+    m2 = Money(2000)
+    m3 = m1 + m2
+    str(m3)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0069():
         class Money:
@@ -866,6 +1281,29 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Chain:
+    def __init__(self, val):
+    self.val = val
+
+    def __add__(self, other):
+    return Chain(self.val + other.val)
+
+    def __repr__(self):
+    return 'Chain(' + str(self.val) + ')'
+
+    c1 = Chain(10)
+    c2 = Chain(20)
+    c3 = Chain(30)
+    chained = c1 + c2 + c3
+    repr(chained)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0071():
         class Chain:
@@ -921,12 +1359,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: __repr__ 구현
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -939,12 +1391,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: __add__ 구현
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -957,12 +1423,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: __str__과 __repr__ 함께
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -975,12 +1455,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 벡터 덧셈
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -993,12 +1487,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 복합 비교
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1011,12 +1519,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2: 커스텀 길이
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1029,12 +1551,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4: 딕셔너리형 접근
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1047,12 +1583,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화6: 시퀀스 프로토콜
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1065,12 +1615,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화8: 스마트 컨테이너
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1083,12 +1647,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화10: 완전한 자료구조
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

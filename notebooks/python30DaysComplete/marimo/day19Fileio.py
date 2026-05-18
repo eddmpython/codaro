@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: open, read, write, with, close, file_mode
-    - 이미 써도 되는 개념: function_all, import
-    - 오늘은 일부러 쓰지 않는 개념: class, external_library
+    - 오늘 새로 배우는 개념: open(), read(), write(), with, close(), 파일 모드
+    - 이미 써도 되는 개념: 함수 전체, import
+    - 오늘은 일부러 쓰지 않는 개념: 클래스, 외부 라이브러리
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    f = open('test.txt', 'w')
+    f.write('Hello World')
+    f.close()
+    'File created'
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         f = open('test.txt', 'w')
@@ -120,6 +132,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    handle = open('test.txt', 'r')
+    content = handle.read()
+    handle.close()
+    content
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0009():
         handle = open('test.txt', 'r')
@@ -139,6 +163,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    file = open('test.txt', 'w')
+    file.write('Python')
+    file.close()
+    'File written'
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0011():
         file = open('test.txt', 'w')
@@ -153,7 +189,7 @@ def _(mo):
     mo.md(r"""
     > **팁**
     >
-    > 파일은 반드시 close()로 닫아야 리소스가 해제됩니다. marimo에서는 좌측 상단의 Files 아이콘을 클릭하면 실제로 생성된 txt 파일을 확인할 수 있습니다.
+    > 파일은 반드시 close()로 닫아야 리소스가 해제됩니다. 노트북 환경에서는 파일 목록 패널에서 생성된 txt 파일을 확인할 수 있습니다.
     """)
     return
 
@@ -193,6 +229,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    writer = open('data.txt', 'w')
+    writer.write('Line 1\nLine 2\nLine 3')
+    writer.close()
+
+    reader = open('data.txt', 'r')
+    text = reader.read()
+    reader.close()
+    text
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         writer = open('data.txt', 'w')
@@ -216,6 +268,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    output = open('sample.txt', 'w')
+    output.write('First\nSecond\nThird')
+    output.close()
+
+    input = open('sample.txt', 'r')
+    line = input.readline()
+    input.close()
+    line
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         output = open('sample.txt', 'w')
@@ -239,6 +307,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    fw = open('lines.txt', 'w')
+    fw.write('A\nB\nC')
+    fw.close()
+
+    fr = open('lines.txt', 'r')
+    lines = fr.readlines()
+    fr.close()
+    lines
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0021():
         fw = open('lines.txt', 'w')
@@ -297,6 +381,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    fileObj = open('message.txt', 'w')
+    count = fileObj.write('Hello Python')
+    fileObj.close()
+    count
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         fileObj = open('message.txt', 'w')
@@ -316,6 +412,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    obj = open('log.txt', 'w')
+    obj.write('Start\n')
+    obj.close()
+
+    obj2 = open('log.txt', 'a')
+    obj2.write('End\n')
+    obj2.close()
+
+    obj3 = open('log.txt', 'r')
+    result = obj3.read()
+    obj3.close()
+    result
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         obj = open('log.txt', 'w')
@@ -343,6 +459,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    target = open('multi.txt', 'w')
+    target.write('Line 1\n')
+    target.write('Line 2\n')
+    target.write('Line 3\n')
+    target.close()
+
+    source = open('multi.txt', 'r')
+    multiText = source.read()
+    source.close()
+    multiText
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0031():
         target = open('multi.txt', 'w')
@@ -403,6 +537,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('test.txt', 'w') as outFile:
+    outFile.write('With statement')
+
+    with open('test.txt', 'r') as inFile:
+    data = inFile.read()
+
+    data
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         with open('test.txt', 'w') as outFile:
@@ -425,6 +574,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('output.txt', 'w') as stream:
+    stream.write('Easy and safe')
+
+    with open('output.txt', 'r') as stream:
+    output = stream.read()
+
+    output
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         with open('output.txt', 'w') as stream:
@@ -447,6 +611,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('numbers.txt', 'w') as dest:
+    for i in range(1, 4):
+    dest.write(str(i) + '\n')
+
+    with open('numbers.txt', 'r') as src:
+    numLines = src.readlines()
+
+    numLines
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0041():
         with open('numbers.txt', 'w') as dest:
@@ -505,6 +685,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('test.txt', 'w') as wf:
+    wf.write('Read mode test')
+
+    with open('test.txt', 'r') as rf:
+    readData = rf.read()
+
+    readData
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0047():
         with open('test.txt', 'w') as wf:
@@ -527,6 +722,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('append.txt', 'w') as initial:
+    initial.write('First\n')
+
+    with open('append.txt', 'a') as appender:
+    appender.write('Second\n')
+
+    with open('append.txt', 'r') as checker:
+    appended = checker.read()
+
+    appended
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         with open('append.txt', 'w') as initial:
@@ -552,6 +765,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('test.txt', 'w') as item:
+    mode = item.mode
+
+    mode
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         with open('test.txt', 'w') as item:
@@ -606,6 +831,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('items.txt', 'w') as creator:
+    creator.write('Apple\nBanana\nCherry')
+
+    with open('items.txt', 'r') as processor:
+    lineCount = 0
+    for line in processor:
+    lineCount = lineCount + 1
+
+    lineCount
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0057():
         with open('items.txt', 'w') as creator:
@@ -630,6 +872,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('words.txt', 'w') as gen:
+    gen.write('hello\nworld\npython')
+
+    with open('words.txt', 'r') as scan:
+    uppered = []
+    for word in scan:
+    uppered.append(word.strip().upper())
+
+    uppered
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         with open('words.txt', 'w') as gen:
@@ -654,6 +913,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    with open('scores.txt', 'w') as maker:
+    maker.write('80\n90\n70\n95')
+
+    with open('scores.txt', 'r') as reader:
+    passCount = 0
+    for score in reader:
+    if int(score) >= 80:
+    passCount = passCount + 1
+
+    passCount
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         with open('scores.txt', 'w') as maker:
@@ -704,12 +981,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 파일 읽기
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -722,12 +1013,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: 줄 읽기
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -740,12 +1045,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 카운터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -758,12 +1077,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 필터링
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -776,12 +1109,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 로그 작성
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -794,12 +1141,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화1-2: CSV 분석
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -812,12 +1173,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2-2: 파일 병합
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -830,12 +1205,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화3-2: 최빈 단어
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -848,12 +1237,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4-2: 성적 등급
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -866,12 +1269,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화5-2: 데이터 변환
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

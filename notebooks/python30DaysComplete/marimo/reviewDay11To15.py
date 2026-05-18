@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -45,11 +45,11 @@ def _(mo):
 
     | Day | 제목 | 핵심 개념 |
     |---|---|---|
-    | Day 11 | 딕셔너리 기초 | dict, key_value, dict_create, dict_access, dict_modify |
-    | Day 12 | 딕셔너리 메서드 | get, keys, values, items, update, pop, popitem, clear |
-    | Day 13 | 조건문 | if, elif, else, ternary_operator, nested_if |
-    | Day 14 | 반복문 | for, while, range, break, continue, else_clause, nested_loop |
-    | Day 15 | 함수 기초 | def, return, parameter, argument, docstring |
+    | Day 11 | 딕셔너리 기초 | 딕셔너리, 키와 값, 딕셔너리 만들기, 딕셔너리 값 읽기, 딕셔너리 값 바꾸기 |
+    | Day 12 | 딕셔너리 메서드 | get(), keys(), values(), items(), update(), pop(), popitem(), clear() |
+    | Day 13 | 조건문 | if, elif, else, 한 줄 조건식, 중첩 if |
+    | Day 14 | 반복문 | for 반복문, while 반복문, range(), break, continue, 반복문 else, 중첩 반복문 |
+    | Day 15 | 함수 기초 | def 함수 정의, return, 매개변수, 인자, 문서 문자열 |
     """)
     return
 
@@ -60,6 +60,13 @@ def _(mo):
 
     아래 셀에 이번 범위에서 기억나는 예제를 3개 이상 다시 작성하세요.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

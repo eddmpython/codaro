@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -57,9 +57,9 @@ def _(mo):
     mo.md(r"""
     ## 오늘의 범위
 
-    - 오늘 새로 배우는 개념: for, while, range, break, continue, else_clause, nested_loop
-    - 이미 써도 되는 개념: all_data_types, conditional
-    - 오늘은 일부러 쓰지 않는 개념: function, import
+    - 오늘 새로 배우는 개념: for 반복문, while 반복문, range(), break, continue, 반복문 else, 중첩 반복문
+    - 이미 써도 되는 개념: 지금까지 배운 자료형, 조건문
+    - 오늘은 일부러 쓰지 않는 개념: 함수, import
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    numbers = [1, 2, 3, 4, 5]
+    total = 0
+    for num in numbers:
+    total = total + num
+    total
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         numbers = [1, 2, 3, 4, 5]
@@ -121,6 +134,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    fruits = ['apple', 'banana', 'cherry']
+    joined = ''
+    for fruit in fruits:
+    joined = joined + fruit + ' '
+    joined
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0009():
         fruits = ['apple', 'banana', 'cherry']
@@ -141,6 +167,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    values = [10, 25, 30, 15, 40]
+    count = 0
+    for val in values:
+    if val >= 20:
+    count = count + 1
+    count
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0011():
         values = [10, 25, 30, 15, 40]
@@ -197,6 +237,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    msg = 'hello world'
+    found = 0
+    for char in msg:
+    if char == 'o':
+    found = found + 1
+    found
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         msg = 'hello world'
@@ -218,6 +272,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    text = 'python'
+    upper = ''
+    for ch in text:
+    upper = upper + ch.upper()
+    upper
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         text = 'python'
@@ -238,6 +305,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    sentence = 'hello python'
+    vowels = 'aeiou'
+    vowelCnt = 0
+    for letter in sentence:
+    if letter in vowels:
+    vowelCnt = vowelCnt + 1
+    vowelCnt
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0021():
         sentence = 'hello python'
@@ -295,6 +377,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    grades = {'math': 85, 'english': 90, 'science': 88}
+    subjects = ''
+    for subject in grades:
+    subjects = subjects + subject + ' '
+    subjects
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         grades = {'math': 85, 'english': 90, 'science': 88}
@@ -315,6 +410,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    marks = {'alice': 85, 'bob': 90, 'charlie': 88}
+    gradeSum = 0
+    for mark in marks.values():
+    gradeSum = gradeSum + mark
+    gradeSum
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         marks = {'alice': 85, 'bob': 90, 'charlie': 88}
@@ -335,6 +443,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    prices = {'apple': 1000, 'banana': 1500, 'cherry': 2000}
+    expensive = ''
+    for item, price in prices.items():
+    if price >= 1500:
+    expensive = expensive + item + ' '
+    expensive
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0031():
         prices = {'apple': 1000, 'banana': 1500, 'cherry': 2000}
@@ -391,6 +513,15 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    list(range(5))
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         return list(range(5))
@@ -407,6 +538,15 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    list(range(3, 8))
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         return list(range(3, 8))
@@ -423,6 +563,15 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    list(range(0, 10, 2))
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0041():
         return list(range(0, 10, 2))
@@ -474,6 +623,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    rangeSum = 0
+    for i in range(1, 6):
+    rangeSum = rangeSum + i
+    rangeSum
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0047():
         rangeSum = 0
@@ -493,6 +654,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    letters = ['a', 'b', 'c', 'd']
+    concat = ''
+    for idx in range(len(letters)):
+    concat = concat + letters[idx]
+    concat
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         letters = ['a', 'b', 'c', 'd']
@@ -513,6 +687,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    dan = 3
+    answer = 0
+    for i in range(1, 10):
+    answer = dan * i
+    answer
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         dan = 3
@@ -568,6 +755,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    idx = 0
+    acc = 0
+    while idx < 5:
+    acc = acc + idx
+    idx = idx + 1
+    acc
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0057():
         idx = 0
@@ -589,6 +790,18 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    n = 1
+    while n < 100:
+    n = n * 2
+    n
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         n = 1
@@ -608,6 +821,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    accumulated = 0
+    i = 1
+    while i <= 10:
+    if i % 2 == 0:
+    accumulated = accumulated + i
+    i = i + 1
+    accumulated
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         accumulated = 0
@@ -665,6 +893,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    seq = [1, 2, 3, 4, 5, 6, 7, 8]
+    hit = 0
+    for x in seq:
+    if x > 5:
+    hit = x
+    break
+    hit
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0067():
         seq = [1, 2, 3, 4, 5, 6, 7, 8]
@@ -687,6 +930,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    current = 1
+    while True:
+    current = current * 2
+    if current > 100:
+    break
+    current
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0069():
         current = 1
@@ -708,6 +965,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    data = ['apple', 'banana', 'cherry', 'date']
+    key = 'cherry'
+    loc = -1
+    for i in range(len(data)):
+    if data[i] == key:
+    loc = i
+    break
+    loc
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0071():
         data = ['apple', 'banana', 'cherry', 'date']
@@ -766,6 +1039,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    odd = 0
+    for n in range(1, 11):
+    if n % 2 == 0:
+    continue
+    odd = odd + n
+    odd
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0077():
         odd = 0
@@ -787,6 +1074,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    vals = [10, 0, 20, 0, 30, 40]
+    nonZero = 0
+    for v in vals:
+    if v == 0:
+    continue
+    nonZero = nonZero + v
+    nonZero
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0079():
         vals = [10, 0, 20, 0, 30, 40]
@@ -809,6 +1111,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    terms = ['apple', 'a', 'banana', 'at', 'cherry']
+    long = ''
+    for term in terms:
+    if len(term) <= 2:
+    continue
+    long = long + term + ' '
+    long
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0081():
         terms = ['apple', 'a', 'banana', 'at', 'cherry']
@@ -866,6 +1183,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    arr1 = [1, 2, 3, 4, 5]
+    for a in arr1:
+    if a > 10:
+    flag = 'found big'
+    break
+    else:
+    flag = 'all small'
+    flag
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0087():
         arr1 = [1, 2, 3, 4, 5]
@@ -889,6 +1222,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    arr2 = [1, 2, 15, 4, 5]
+    for b in arr2:
+    if b > 10:
+    msg = 'found'
+    break
+    else:
+    msg = 'not found'
+    msg
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0089():
         arr2 = [1, 2, 15, 4, 5]
@@ -912,6 +1261,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    users = ['alice', 'bob', 'charlie']
+    name = 'david'
+    for user in users:
+    if user == name:
+    status = 'exists'
+    break
+    else:
+    status = 'not exists'
+    status
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0091():
         users = ['alice', 'bob', 'charlie']
@@ -971,6 +1337,20 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    counter = 0
+    while counter < 3:
+    counter = counter + 1
+    else:
+    completion = 'done'
+    completion
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0097():
         counter = 0
@@ -992,6 +1372,23 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    x = 0
+    while x < 10:
+    x = x + 1
+    if x == 5:
+    outcome = 'stopped'
+    break
+    else:
+    outcome = 'completed'
+    outcome
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0099():
         x = 0
@@ -1016,6 +1413,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    amount = 0
+    limit = 100
+    while amount < 50:
+    amount = amount + 15
+    if amount > limit:
+    check = 'over limit'
+    break
+    else:
+    check = 'within limit'
+    check
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0101():
         amount = 0
@@ -1076,6 +1491,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    colors = ['red', 'blue']
+    sizes = ['S', 'M']
+    combinations = ''
+    for color in colors:
+    for size in sizes:
+    combinations = combinations + color + '-' + size + ' '
+    combinations
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0107():
         colors = ['red', 'blue']
@@ -1098,6 +1528,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    mult = 0
+    for x in range(2, 4):
+    for y in range(1, 4):
+    mult = x * y
+    mult
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0109():
         mult = 0
@@ -1118,6 +1561,19 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    coords = ''
+    for r in range(2):
+    for c in range(3):
+    coords = coords + str(r) + ',' + str(c) + ' '
+    coords
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0111():
         coords = ''
@@ -1163,12 +1619,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: range()
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1181,12 +1651,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: break
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1199,12 +1683,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 딕셔너리 순회
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1217,12 +1715,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 조건부 누적
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1235,12 +1747,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 중첩 반복
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1253,12 +1779,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화1-2: 최소값과 최대값
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1271,12 +1811,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2-2: 평균 이상 개수
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1289,12 +1843,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화3-2: 소수 목록
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1307,12 +1875,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4-2: 단어 역순
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -1325,12 +1907,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화5-2: 곱셈표
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

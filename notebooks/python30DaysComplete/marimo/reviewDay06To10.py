@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -45,11 +45,11 @@ def _(mo):
 
     | Day | 제목 | 핵심 개념 |
     |---|---|---|
-    | Day 06 | 문자열 메서드 | upper, lower, split, join, replace, strip, find, count |
-    | Day 07 | 리스트 기초 | list, list_create, list_indexing, list_slicing, list_modify |
-    | Day 08 | 리스트 메서드 | append, insert, remove, pop, sort, reverse, copy, extend, clear |
-    | Day 09 | 튜플 | tuple, tuple_immutable, tuple_packing, tuple_unpacking |
-    | Day 10 | 집합 | set, set_unique, add, remove, discard, union, intersection, difference |
+    | Day 06 | 문자열 메서드 | upper(), lower(), split(), join(), replace(), strip(), find(), count() |
+    | Day 07 | 리스트 기초 | 리스트, 리스트 만들기, 리스트 인덱싱, 리스트 슬라이싱, 리스트 값 바꾸기 |
+    | Day 08 | 리스트 메서드 | append(), insert(), remove(), pop(), sort(), reverse(), copy(), extend(), clear() |
+    | Day 09 | 튜플 | 튜플, 바꿀 수 없는 튜플, 튜플 패킹, 튜플 언패킹 |
+    | Day 10 | 집합 | 집합, 중복 제거, add(), remove(), discard(), 합집합, 교집합, 차집합 |
     """)
     return
 
@@ -60,6 +60,13 @@ def _(mo):
 
     아래 셀에 이번 범위에서 기억나는 예제를 3개 이상 다시 작성하세요.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

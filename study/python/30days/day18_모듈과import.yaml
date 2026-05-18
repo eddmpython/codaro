@@ -59,7 +59,7 @@ sections:
       value = math.ceil(3.2)
       value
   - type: "tip"
-    content: "marimo에서는 같은 모듈을 여러 셀에서 import하면 'multiple definitions' 에러가 발생합니다. 한 셀에서만 import하세요."
+    content: "처음에는 필요한 모듈을 노트북 위쪽 한 셀에 모아 import하면 흐름을 이해하기 쉽습니다."
 
 - id: "from_import"
   title: "from import"

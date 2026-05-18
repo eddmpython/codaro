@@ -10,7 +10,7 @@ def _():
     import marimo as mo
     return (mo,)
 
-@app.cell
+@app.cell(hide_code=True)
 def _():
     import ast
 
@@ -58,8 +58,8 @@ def _(mo):
     ## 오늘의 범위
 
     - 오늘 새로 배우는 개념: 복습
-    - 이미 써도 되는 개념: everything
-    - 오늘은 일부러 쓰지 않는 개념: external_library
+    - 이미 써도 되는 개념: 전체 문법
+    - 오늘은 일부러 쓰지 않는 개념: 외부 라이브러리
 
     범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
@@ -101,6 +101,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def analyzeWords(text):
+    words = text.lower().split()
+    frequency = {}
+    for word in words:
+    cleaned = word.strip('.,!?')
+    if cleaned:
+    frequency[cleaned] = frequency.get(cleaned, 0) + 1
+    return frequency
+
+    sampleText = 'hello world hello python world'
+    analyzeWords(sampleText)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0007():
         def analyzeWords(text):
@@ -127,6 +146,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def findTopWords(text, n):
+    words = text.lower().split()
+    freq = {}
+    for word in words:
+    freq[word] = freq.get(word, 0) + 1
+    sorted_items = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+    return sorted_items[:n]
+
+    document = 'python is great python is powerful python is easy'
+    findTopWords(document, 2)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0009():
         def findTopWords(text, n):
@@ -152,6 +189,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def textStats(text):
+    sentences = text.split('.')
+    words = text.split()
+    chars = len(text)
+    return len(sentences) - 1, len(words), chars
+
+    passage = 'This is a test. Python is amazing. I love coding.'
+    textStats(passage)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0011():
         def textStats(text):
@@ -210,6 +263,33 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class GradeBook:
+    def __init__(self):
+    self.students = {}
+
+    def addScore(self, name, score):
+    if name not in self.students:
+    self.students[name] = []
+    self.students[name].append(score)
+
+    def getAverage(self, name):
+    if name in self.students:
+    scores = self.students[name]
+    return sum(scores) / len(scores)
+    return 0
+
+    gb = GradeBook()
+    gb.addScore('Alice', 90)
+    gb.addScore('Alice', 85)
+    gb.getAverage('Alice')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0017():
         class GradeBook:
@@ -244,6 +324,32 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Inventory:
+    def __init__(self):
+    self.items = {}
+
+    def add(self, item, quantity):
+    self.items[item] = self.items.get(item, 0) + quantity
+
+    def remove(self, item, quantity):
+    if item in self.items:
+    self.items[item] = max(0, self.items[item] - quantity)
+
+    def check(self, item):
+    return self.items.get(item, 0)
+
+    inv = Inventory()
+    inv.add('apple', 10)
+    inv.remove('apple', 3)
+    inv.check('apple')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0019():
         class Inventory:
@@ -277,6 +383,33 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class ContactBook:
+    def __init__(self):
+    self.contacts = {}
+
+    def add(self, name, phone):
+    self.contacts[name] = phone
+
+    def find(self, name):
+    return self.contacts.get(name, 'Not found')
+
+    def delete(self, name):
+    if name in self.contacts:
+    del self.contacts[name]
+    return True
+    return False
+
+    cb = ContactBook()
+    cb.add('John', '123-4567')
+    cb.find('John')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0021():
         class ContactBook:
@@ -346,6 +479,28 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def playRPS(player1, player2):
+    wins = {
+    'rock': 'scissors',
+    'scissors': 'paper',
+    'paper': 'rock'
+    }
+    if player1 == player2:
+    return 'draw'
+    elif wins[player1] == player2:
+    return 'player1'
+    else:
+    return 'player2'
+
+    playRPS('rock', 'scissors')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0027():
         def playRPS(player1, player2):
@@ -375,6 +530,32 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def checkWinner(board):
+    lines = [
+    [board[0], board[1], board[2]],
+    [board[3], board[4], board[5]],
+    [board[6], board[7], board[8]],
+    [board[0], board[3], board[6]],
+    [board[1], board[4], board[7]],
+    [board[2], board[5], board[8]],
+    [board[0], board[4], board[8]],
+    [board[2], board[4], board[6]]
+    ]
+    for line in lines:
+    if line[0] == line[1] == line[2] and line[0] != ' ':
+    return line[0]
+    return None
+
+    gameBoard = ['X', 'X', 'X', 'O', 'O', ' ', ' ', ' ', ' ']
+    checkWinner(gameBoard)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0029():
         def checkWinner(board):
@@ -408,6 +589,22 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    import random
+
+    def rollDice():
+    die1 = random.randint(1, 6)
+    die2 = random.randint(1, 6)
+    return die1 + die2
+
+    rollDice()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0031():
         import random
@@ -466,6 +663,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def parseCSV(content):
+    lines = content.strip().split('\n')
+    header = lines[0].split(',')
+    data = []
+    for line in lines[1:]:
+    values = line.split(',')
+    row = dict(zip(header, values))
+    data.append(row)
+    return data
+
+    csvContent = 'name,age\nAlice,25\nBob,30'
+    parseCSV(csvContent)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0037():
         def parseCSV(content):
@@ -493,6 +710,21 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    import time
+
+    def createLog(level, message):
+    timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+    return f'[{timestamp}] {level}: {message}'
+
+    createLog('INFO', 'Application started')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0039():
         import time
@@ -515,6 +747,24 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def parseConfig(text):
+    config = {}
+    for line in text.strip().split('\n'):
+    if '=' in line:
+    key, value = line.split('=', 1)
+    config[key.strip()] = value.strip()
+    return config
+
+    configText = 'host=localhost\nport=8080\ndebug=true'
+    parseConfig(configText)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0041():
         def parseConfig(text):
@@ -575,6 +825,35 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class BankAccount:
+    def __init__(self, owner, balance=0):
+    self.owner = owner
+    self.balance = balance
+
+    def deposit(self, amount):
+    if amount > 0:
+    self.balance = self.balance + amount
+    return True
+    return False
+
+    def withdraw(self, amount):
+    if 0 < amount <= self.balance:
+    self.balance = self.balance - amount
+    return True
+    return False
+
+    account = BankAccount('Alice', 1000)
+    account.deposit(500)
+    account.withdraw(300)
+    account.balance
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0047():
         class BankAccount:
@@ -611,6 +890,42 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class Library:
+    def __init__(self):
+    self.books = {}
+    self.borrowed = {}
+
+    def addBook(self, title, copies):
+    self.books[title] = copies
+
+    def borrow(self, user, title):
+    if self.books.get(title, 0) > 0:
+    self.books[title] = self.books[title] - 1
+    if user not in self.borrowed:
+    self.borrowed[user] = []
+    self.borrowed[user].append(title)
+    return True
+    return False
+
+    def returnBook(self, user, title):
+    if user in self.borrowed and title in self.borrowed[user]:
+    self.borrowed[user].remove(title)
+    self.books[title] = self.books[title] + 1
+    return True
+    return False
+
+    lib = Library()
+    lib.addBook('Python Guide', 3)
+    lib.borrow('Bob', 'Python Guide')
+    lib.books['Python Guide']
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0049():
         class Library:
@@ -654,6 +969,34 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    class ShoppingCart:
+    def __init__(self):
+    self.items = {}
+
+    def add(self, item, price, quantity=1):
+    if item in self.items:
+    self.items[item]['quantity'] = self.items[item]['quantity'] + quantity
+    else:
+    self.items[item] = {'price': price, 'quantity': quantity}
+
+    def getTotal(self):
+    total = 0
+    for item in self.items.values():
+    total = total + item['price'] * item['quantity']
+    return total
+
+    cart = ShoppingCart()
+    cart.add('apple', 1.5, 3)
+    cart.add('banana', 0.8, 5)
+    cart.getTotal()
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0051():
         class ShoppingCart:
@@ -724,6 +1067,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def uniqueSorted(arr):
+    seen = set()
+    unique = []
+    for item in arr:
+    if item not in seen:
+    seen.add(item)
+    unique.append(item)
+    return sorted(unique)
+
+    mixedData = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]
+    uniqueSorted(mixedData)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0057():
         def uniqueSorted(arr):
@@ -750,6 +1112,25 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def groupBy(arr, keyFunc):
+    groups = {}
+    for item in arr:
+    key = keyFunc(item)
+    if key not in groups:
+    groups[key] = []
+    groups[key].append(item)
+    return groups
+
+    numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    groupBy(numbers, lambda x: 'even' if x % 2 == 0 else 'odd')
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0059():
         def groupBy(arr, keyFunc):
@@ -776,6 +1157,26 @@ def _(mo):
     return
 
 @app.cell
+def _(mo):
+    mo.md(r"""
+    ```python
+    def rangeSumQuery(arr):
+    prefixSum = [0]
+    for num in arr:
+    prefixSum.append(prefixSum[-1] + num)
+
+    def query(start, end):
+    return prefixSum[end + 1] - prefixSum[start]
+
+    return query
+
+    queryFunc = rangeSumQuery([1, 2, 3, 4, 5])
+    queryFunc(1, 3)
+    ```
+    """)
+    return
+
+@app.cell(hide_code=True)
 def _():
     def _snippet_0061():
         def rangeSumQuery(arr):
@@ -828,12 +1229,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본2: 리스트 필터
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -846,12 +1261,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟢 기본4: 카운터 클래스
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -864,12 +1293,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용1: 투표 시스템
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -882,12 +1325,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용3: 스택 구현
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -900,12 +1357,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🟡 응용5: 온도 변환기
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -918,12 +1389,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화2: 메모이제이션
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -936,12 +1421,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화4: 행렬 전치
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -954,12 +1453,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화6: LRU 캐시
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -972,12 +1485,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화8: 최소 편집 거리
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell
@@ -990,12 +1517,26 @@ def _(mo):
     return
 
 @app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
+    return
+
+@app.cell
 def _(mo):
     mo.md(r"""
     ### 연습: 🔴 심화10: 완성 축하
 
     아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
     """)
+    return
+
+@app.cell
+def _():
+    # 아래 두 줄을 지우고 직접 작성하세요.
+    _result = None
+    _result
     return
 
 @app.cell

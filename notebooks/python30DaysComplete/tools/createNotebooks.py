@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import ast
-import csv
 import json
 from pathlib import Path
 from textwrap import dedent
@@ -19,6 +18,7 @@ REPOSITORY = "eddmpython/codaro"
 BRANCH = "main"
 COURSE_PATH = "notebooks/python30DaysComplete"
 REVIEW_RANGES = [(1, 5), (6, 10), (11, 15), (16, 20), (21, 25), (26, 30)]
+CONCEPT_LABELS: dict[str, str] = {}
 
 OUTPUT_STEMS = {
     1: "day01Helloworld",
@@ -80,6 +80,25 @@ def makeCodeCell(source: str) -> dict[str, object]:
 def loadCurriculum() -> dict[str, object]:
     path = SOURCE_ROOT / "curriculum.json"
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def setConceptLabels(curriculum: dict[str, object]) -> None:
+    global CONCEPT_LABELS
+    rawLabels = curriculum.get("conceptLabels", {})
+    if not isinstance(rawLabels, dict):
+        raise TypeError("curriculum conceptLabels must be an object")
+    CONCEPT_LABELS = {str(key): str(value) for key, value in rawLabels.items()}
+
+
+def conceptLabel(concept: object) -> str:
+    token = str(concept)
+    return CONCEPT_LABELS.get(token, token.replace("_", " "))
+
+
+def formatConcepts(concepts: object) -> str:
+    if not isinstance(concepts, list) or not concepts:
+        return "복습"
+    return ", ".join(conceptLabel(item) for item in concepts)
 
 
 def loadDayContent(dayEntry: dict[str, object]) -> dict[str, object]:
@@ -148,9 +167,13 @@ def makeIntroMarkdown(dayEntry: dict[str, object], content: dict[str, object]) -
 
 
 def makeConceptPolicyMarkdown(dayEntry: dict[str, object]) -> str:
-    allowed = ", ".join(str(item) for item in dayEntry.get("allowedConcepts", [])) or "없음"
-    new = ", ".join(str(item) for item in dayEntry.get("newConcepts", [])) or "복습"
-    forbidden = ", ".join(str(item) for item in dayEntry.get("forbidden", [])) or "없음"
+    allowed = formatConcepts(dayEntry.get("allowedConcepts", []))
+    new = formatConcepts(dayEntry.get("newConcepts", []))
+    forbidden = formatConcepts(dayEntry.get("forbidden", []))
+    if allowed == "복습":
+        allowed = "없음"
+    if forbidden == "복습":
+        forbidden = "없음"
     return cleanMarkdown(
         f"""
         ## 오늘의 범위
@@ -262,7 +285,7 @@ def makeReviewNotebook(startDay: int, endDay: int, dayEntries: list[dict[str, ob
     for entry in dayEntries:
         day = int(entry["day"])
         if startDay <= day <= endDay:
-            newConcepts = ", ".join(str(item) for item in entry.get("newConcepts", [])) or "복습"
+            newConcepts = formatConcepts(entry.get("newConcepts", []))
             rows.append(f"| Day {day:02d} | {entry['title']} | {newConcepts} |")
     conceptRows = "\n".join(rows)
     cells = [
@@ -348,6 +371,24 @@ def isLearnerPlaceholder(source: str) -> bool:
     return bool(lines) and all(line.startswith("#") for line in lines)
 
 
+def appendMarimoCodePreview(chunks: list[str], source: str) -> None:
+    appendMarimoMarkdown(chunks, codeFence(source))
+
+
+def appendMarimoLearnerCode(chunks: list[str]) -> None:
+    chunks.extend(
+        [
+            "",
+            "@app.cell",
+            "def _():",
+            "    # 아래 두 줄을 지우고 직접 작성하세요.",
+            "    _result = None",
+            "    _result",
+            "    return",
+        ]
+    )
+
+
 def sourceHasGlobalStatement(source: str) -> bool:
     tree = ast.parse(source)
     return any(isinstance(node, ast.Global) for node in ast.walk(tree))
@@ -372,7 +413,7 @@ def appendMarimoLocalCode(chunks: list[str], source: str, cellIndex: int) -> Non
     chunks.extend(
         [
             "",
-            "@app.cell",
+            "@app.cell(hide_code=True)",
             "def _():",
             f"    def {functionName}():",
             *indentCode(transformed, spaces=8),
@@ -387,7 +428,7 @@ def appendMarimoRunnerCode(chunks: list[str], source: str) -> None:
     chunks.extend(
         [
             "",
-            "@app.cell",
+            "@app.cell(hide_code=True)",
             "def _(_runSnippet):",
             '    _runSnippet(r"""',
             *escaped.splitlines(),
@@ -399,7 +440,9 @@ def appendMarimoRunnerCode(chunks: list[str], source: str) -> None:
 
 def appendMarimoCode(chunks: list[str], source: str, cellIndex: int) -> None:
     if isLearnerPlaceholder(source):
+        appendMarimoLearnerCode(chunks)
         return
+    appendMarimoCodePreview(chunks, source)
     if sourceHasGlobalStatement(source):
         appendMarimoRunnerCode(chunks, source)
         return
@@ -421,7 +464,7 @@ def notebookToMarimoPython(notebook: dict[str, object], title: str) -> str:
         "    import marimo as mo",
         "    return (mo,)",
         "",
-        "@app.cell",
+        "@app.cell(hide_code=True)",
         "def _():",
         "    import ast",
         "",
@@ -492,8 +535,15 @@ def writeManifest(dayEntries: list[dict[str, object]]) -> None:
                 "title": entry["title"],
                 "sourceYaml": f"study/python/30days/{entry['file']}",
                 "allowedConcepts": entry.get("allowedConcepts", []),
+                "allowedConceptLabels": [
+                    conceptLabel(item) for item in entry.get("allowedConcepts", []) if isinstance(item, str)
+                ],
                 "newConcepts": entry.get("newConcepts", []),
+                "newConceptLabels": [
+                    conceptLabel(item) for item in entry.get("newConcepts", []) if isinstance(item, str)
+                ],
                 "forbidden": entry.get("forbidden", []),
+                "forbiddenLabels": [conceptLabel(item) for item in entry.get("forbidden", []) if isinstance(item, str)],
                 "colab": f"colab/{colabName(int(entry['day']))}",
                 "marimo": f"marimo/{marimoName(int(entry['day']))}",
             }
@@ -504,30 +554,11 @@ def writeManifest(dayEntries: list[dict[str, object]]) -> None:
     (ROOT / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
-def writeProgressCsv(dayEntries: list[dict[str, object]]) -> None:
-    with (ROOT / "progressTracker.csv").open("w", encoding="utf-8", newline="") as file:
-        writer = csv.writer(file)
-        writer.writerow(["day", "title", "sourceYaml", "colab", "marimo", "done", "memo"])
-        for entry in dayEntries:
-            day = int(entry["day"])
-            writer.writerow(
-                [
-                    f"{day:02d}",
-                    entry["title"],
-                    f"study/python/30days/{entry['file']}",
-                    f"colab/{colabName(day)}",
-                    f"marimo/{marimoName(day)}",
-                    "",
-                    "",
-                ]
-            )
-
-
 def writeReadme(dayEntries: list[dict[str, object]]) -> None:
     rows = []
     for entry in dayEntries:
         day = int(entry["day"])
-        newConcepts = ", ".join(str(item) for item in entry.get("newConcepts", [])) or "복습"
+        newConcepts = formatConcepts(entry.get("newConcepts", []))
         rows.append(
             f"| {day:02d} | {entry['title']} | {newConcepts} | "
             f"[Colab 열기]({colabUrl('colab/' + colabName(day))}) | "
@@ -574,7 +605,9 @@ def writeCourseGuide(dayEntries: list[dict[str, object]]) -> None:
     dayRows = []
     for entry in dayEntries:
         day = int(entry["day"])
-        forbidden = ", ".join(str(item) for item in entry.get("forbidden", [])) or "없음"
+        forbidden = formatConcepts(entry.get("forbidden", []))
+        if forbidden == "복습":
+            forbidden = "없음"
         dayRows.append(f"| {day:02d} | {entry['title']} | `{entry['file']}` | {forbidden} |")
     content = f"""
     # Python 30일 완성 코스 가이드
@@ -590,7 +623,7 @@ def writeCourseGuide(dayEntries: list[dict[str, object]]) -> None:
 
     ## 설계 기준
 
-    - Day별 `allowedConcepts`, `newConcepts`, `forbidden`을 노트북 상단에 표시한다.
+    - Day별 학습 범위를 SSOT의 개념 라벨로 노트북 상단에 표시한다.
     - 예제 코드는 원본 YAML의 `code` 블록을 그대로 사용한다.
     - 연습 미션은 원본 YAML의 `expansion` 블록에서 오며, 노트북에서는 학습자가 직접 작성하도록 빈 셀로 둔다.
     - 초보자에게 불필요한 채점형 장치나 숨은 예상 답변 확인 흐름을 넣지 않는다.
@@ -606,11 +639,11 @@ def writeCourseGuide(dayEntries: list[dict[str, object]]) -> None:
 
 def main() -> None:
     curriculum = loadCurriculum()
+    setConceptLabels(curriculum)
     dayEntries = list(curriculum.get("days", []))
     writeDayNotebooks(dayEntries)
     writeReviewNotebooks(dayEntries)
     writeManifest(dayEntries)
-    writeProgressCsv(dayEntries)
     writeReadme(dayEntries)
     writeCourseGuide(dayEntries)
 
