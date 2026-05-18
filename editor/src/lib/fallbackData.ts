@@ -110,14 +110,14 @@ export function categoryTrack(key: string) {
   return categoryMeta[key]?.track ?? "과정";
 }
 
-export const demoBootstrap: BootstrapPayload = {
+export const fallbackBootstrap: BootstrapPayload = {
   appMode: false,
   documentPath: null,
   workspaceRoot: "codaro-local",
   rootPath: "",
 };
 
-export const demoCategories: CurriculumCategoriesPayload = {
+export const fallbackCategories: CurriculumCategoriesPayload = {
   categories: [
     {
       key: "30days",
@@ -151,7 +151,7 @@ export const demoCategories: CurriculumCategoriesPayload = {
   },
 };
 
-export const demoContents: CurriculumContentsPayload = {
+export const fallbackContents: CurriculumContentsPayload = {
   category: "30days",
   categoryName: "파이썬 기초",
   contents: [
@@ -161,12 +161,12 @@ export const demoContents: CurriculumContentsPayload = {
   ],
 };
 
-export const demoDocument: CodaroDocument = {
-  id: "demo-doc",
+export const fallbackDocument: CodaroDocument = {
+  id: "fallback-doc",
   title: "값을 보이게 만들기",
   metadata: {
     sourceFormat: "curriculum",
-    tags: ["demo"],
+    tags: ["fallback"],
   },
   runtime: {
     defaultEngine: "local",
@@ -223,8 +223,8 @@ export const demoDocument: CodaroDocument = {
   ],
 };
 
-export const demoLesson: CurriculumLessonPayload = {
-  document: demoDocument,
+export const fallbackLesson: CurriculumLessonPayload = {
+  document: fallbackDocument,
   solutions: {
     "mission-cell": 'learner = "Ada"\nprint("안녕,", learner)',
   },
@@ -236,17 +236,17 @@ export const demoLesson: CurriculumLessonPayload = {
   },
 };
 
-export const demoProgress: ProgressSummary = {
+export const fallbackProgress: ProgressSummary = {
   totalAccessed: 1,
   totalCompleted: 0,
   updatedAt: new Date().toISOString(),
 };
 
-export const demoTasks: TaskListPayload = {
+export const fallbackTasks: TaskListPayload = {
   total: 2,
   tasks: [
     {
-      id: "task-demo-1",
+      id: "task-fallback-1",
       name: "일일 학습 리포트",
       description: "Python 문서를 실행하고 최신 진행 요약을 발행합니다.",
       documentPath: "daily_report.py",
@@ -256,8 +256,8 @@ export const demoTasks: TaskListPayload = {
       createdAt: new Date(Date.now() - 86400 * 1000).toISOString(),
       updatedAt: new Date().toISOString(),
       lastRun: {
-        id: "run-demo-1",
-        taskId: "task-demo-1",
+        id: "run-fallback-1",
+        taskId: "task-fallback-1",
         status: "success",
         startedAt: new Date(Date.now() - 3600 * 1000).toISOString(),
         finishedAt: new Date(Date.now() - 3590 * 1000).toISOString(),
@@ -267,7 +267,7 @@ export const demoTasks: TaskListPayload = {
       },
     },
     {
-      id: "task-demo-2",
+      id: "task-fallback-2",
       name: "워크북 정리",
       description: "Python 레슨에서 생성된 자동화 태스크 예시입니다.",
       documentPath: "automation/workbook_cleanup.py",
@@ -280,12 +280,12 @@ export const demoTasks: TaskListPayload = {
   ],
 };
 
-export const demoScheduler: SchedulerStatus = {
-  activeJobs: ["task-demo-1"],
+export const fallbackScheduler: SchedulerStatus = {
+  activeJobs: ["task-fallback-1"],
   jobCount: 1,
 };
 
-export const demoEStop: EStopStatus = {
+export const fallbackEStop: EStopStatus = {
   active: false,
   reason: "",
   triggeredAt: null,

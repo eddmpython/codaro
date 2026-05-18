@@ -30,7 +30,7 @@ import {
   SidebarMenuSubItem,
   SidebarRail,
 } from "@/components/ui/sidebar";
-import { categoryTitle } from "@/lib/demoData";
+import { categoryTitle } from "@/lib/fallbackData";
 import type { SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
 import type { CurriculumCategory, CurriculumContentSummary } from "@/types";
 

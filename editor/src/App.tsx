@@ -30,6 +30,7 @@ import {
   Metric,
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
+import { CellAiActions } from "@/components/app/cellAiActions";
 import { TopBar } from "@/components/app/topBar";
 import { ProductSidebar } from "@/components/app/productSidebar";
 import {
@@ -40,14 +41,14 @@ import {
 import {
   categorySubtitle,
   categoryTitle,
-  demoBootstrap,
-  demoCategories,
-  demoContents,
-  demoEStop,
-  demoLesson,
-  demoScheduler,
-  demoTasks,
-} from "@/lib/demoData";
+  fallbackBootstrap,
+  fallbackCategories,
+  fallbackContents,
+  fallbackEStop,
+  fallbackLesson,
+  fallbackScheduler,
+  fallbackTasks,
+} from "@/lib/fallbackData";
 import {
   defaultRegistrySelection,
   registryCategories,
@@ -201,10 +202,10 @@ function App() {
   const [apiOnline, setApiOnline] = useState(false);
   const [notice, setNotice] = useState<AppNotice>(emptyNotice);
   const [categories, setCategories] = useState<CurriculumCategory[]>(
-    builtInCurriculumCategories.categories.length ? builtInCurriculumCategories.categories : demoCategories.categories,
+    builtInCurriculumCategories.categories.length ? builtInCurriculumCategories.categories : fallbackCategories.categories,
   );
   const [contents, setContents] = useState<CurriculumContentSummary[]>(
-    builtInCurriculumContents.contents.length ? builtInCurriculumContents.contents : demoContents.contents,
+    builtInCurriculumContents.contents.length ? builtInCurriculumContents.contents : fallbackContents.contents,
   );
   const [selectedCategory, setSelectedCategory] = useState(defaultCurriculumSelection.category);
   const [selectedContentId, setSelectedContentId] = useState(defaultCurriculumSelection.contentId);
@@ -223,9 +224,9 @@ function App() {
   const [results, setResults] = useState<ResultMap>({});
   const [runningBlockId, setRunningBlockId] = useState<string | null>(null);
   const [notebookRunning, setNotebookRunning] = useState(false);
-  const [tasks, setTasks] = useState<TaskListPayload>(demoTasks);
-  const [scheduler, setScheduler] = useState<SchedulerStatus>(demoScheduler);
-  const [eStop, setEStop] = useState<EStopStatus>(demoEStop);
+  const [tasks, setTasks] = useState<TaskListPayload>(fallbackTasks);
+  const [scheduler, setScheduler] = useState<SchedulerStatus>(fallbackScheduler);
+  const [eStop, setEStop] = useState<EStopStatus>(fallbackEStop);
   const [auditCount, setAuditCount] = useState(0);
   const [toolCatalog, setToolCatalog] = useState<AiToolCatalogPayload>(emptyToolCatalog);
   const [aiProfile, setAiProfile] = useState<AiProfile | null>(null);
@@ -281,17 +282,17 @@ function App() {
 
   const refreshAutomation = useCallback(async () => {
     if (!shouldUseApi()) {
-      setTasks(demoTasks);
-      setScheduler(demoScheduler);
-      setEStop(demoEStop);
+      setTasks(fallbackTasks);
+      setScheduler(fallbackScheduler);
+      setEStop(fallbackEStop);
       setAuditCount(0);
       return;
     }
 
     const [taskResult, schedulerResult, eStopResult, auditResult] = await Promise.all([
-      optional(codaroApi.tasks, demoTasks),
-      optional(codaroApi.schedulerStatus, demoScheduler),
-      optional(codaroApi.eStop, demoEStop),
+      optional(codaroApi.tasks, fallbackTasks),
+      optional(codaroApi.schedulerStatus, fallbackScheduler),
+      optional(codaroApi.eStop, fallbackEStop),
       optional(codaroApi.audit, { entries: [], count: 0 }),
     ]);
 
@@ -308,8 +309,8 @@ function App() {
       setLoadState("loading");
       if (!shouldUseApi()) {
         setApiOnline(false);
-        setCategories(builtInCurriculumCategories.categories.length ? builtInCurriculumCategories.categories : demoCategories.categories);
-        setContents(builtInCurriculumContents.contents.length ? builtInCurriculumContents.contents : demoContents.contents);
+        setCategories(builtInCurriculumCategories.categories.length ? builtInCurriculumCategories.categories : fallbackCategories.categories);
+        setContents(builtInCurriculumContents.contents.length ? builtInCurriculumContents.contents : fallbackContents.contents);
         setCurriculumDocument(initialCurriculumDocument);
         setToolCatalog(emptyToolCatalog);
         setAiProfile({
@@ -322,7 +323,7 @@ function App() {
         return;
       }
 
-      const health = await optional(codaroApi.health, { status: "demo" });
+      const health = await optional(codaroApi.health, { status: "offline" });
       if (cancelled) return;
 
       const [
@@ -331,8 +332,8 @@ function App() {
         toolsResult,
         profileResult,
       ] = await Promise.all([
-        optional(codaroApi.bootstrap, demoBootstrap),
-        optional(codaroApi.curriculumCategories, builtInCurriculumCategories.categories.length ? builtInCurriculumCategories : demoCategories),
+        optional(codaroApi.bootstrap, fallbackBootstrap),
+        optional(codaroApi.curriculumCategories, builtInCurriculumCategories.categories.length ? builtInCurriculumCategories : fallbackCategories),
         optional(codaroApi.aiTools, emptyToolCatalog),
         optional(codaroApi.aiProfile, {}),
       ]);
@@ -340,7 +341,7 @@ function App() {
       if (cancelled) return;
 
       setApiOnline(health.online && bootstrapResult.online);
-      setCategories(categoryResult.data.categories.length ? categoryResult.data.categories : demoCategories.categories);
+      setCategories(categoryResult.data.categories.length ? categoryResult.data.categories : fallbackCategories.categories);
       setToolCatalog(toolsResult.data);
       setAiProfile(profileResult.data);
       if (health.online && bootstrapResult.online) {
@@ -402,9 +403,9 @@ function App() {
         const registryFallback = registryContents(selectedCategory);
         const fallback = registryFallback.contents.length
           ? registryFallback
-          : selectedCategory === demoContents.category
-            ? demoContents
-            : { ...demoContents, category: selectedCategory, categoryName: categoryTitle(selectedCategory) };
+          : selectedCategory === fallbackContents.category
+            ? fallbackContents
+            : { ...fallbackContents, category: selectedCategory, categoryName: categoryTitle(selectedCategory) };
         const result = shouldUseApi()
           ? await optional(() => codaroApi.curriculumContents(selectedCategory), fallback)
           : { data: fallback, online: false };
@@ -433,14 +434,14 @@ function App() {
       setReferenceLoading(true);
       try {
         const registryFallback = registryLesson(selectedCategory, selectedContentId);
-        const fallbackLesson = registryFallback ?? {
-          ...demoLesson,
+        const lessonFallback = registryFallback ?? {
+          ...fallbackLesson,
           category: selectedCategory,
           contentId: selectedContentId,
         };
         const result = shouldUseApi()
-          ? await optional(() => codaroApi.curriculumLesson(selectedCategory, selectedContentId), fallbackLesson)
-          : { data: fallbackLesson, online: false };
+          ? await optional(() => codaroApi.curriculumLesson(selectedCategory, selectedContentId), lessonFallback)
+          : { data: lessonFallback, online: false };
         if (cancelled) return;
         setCurriculumDocument(result.data.document);
         setDrafts((current) => ({
@@ -481,6 +482,7 @@ function App() {
   const activeDocument = surface === "curriculum" && curriculumDocument ? curriculumDocument : document;
   const activeSelectedBlockId = surface === "curriculum" ? selectedCurriculumBlockId : selectedBlockId;
   const codeBlocks = useMemo(() => document.blocks.filter((block) => block.type === "code"), [document.blocks]);
+  const hasRunnableNotebook = codeBlocks.some((block) => (drafts[block.id] ?? block.content).trim());
   const selectedBlock = activeDocument.blocks.find((block) => block.id === activeSelectedBlockId) ?? activeDocument.blocks.find((block) => block.type === "code") ?? activeDocument.blocks[0];
   const currentResult = selectedBlock ? results[selectedBlock.id] : undefined;
   const canRun = apiOnline ? Boolean(sessionId) : true;
@@ -617,15 +619,10 @@ function App() {
   async function connectAiProvider() {
     if (aiConnecting) return;
     if (!apiOnline) {
-      setAiProfile({
-        activeProvider: "Codaro",
-        activeModel: "기본",
-        ready: true,
-      });
       setNotice({
-        tone: "success",
-        title: "Codaro 준비됨",
-        detail: "기본 응답을 사용할 수 있습니다.",
+        tone: "warning",
+        title: "LLM 미연결",
+        detail: "서버 세션이 없어서 실제 제공자 연결은 사용할 수 없습니다.",
       });
       return;
     }
@@ -946,7 +943,7 @@ function App() {
       <SidebarInset className="grid h-svh min-h-0 min-w-0 grid-rows-[40px_minmax(0,1fr)] overflow-hidden">
         <TopBar
           assistantCollapsed={assistantCollapsed}
-          canRun={canRun}
+          canRun={canRun && hasRunnableNotebook}
           loadState={loadState}
           notice={notice}
           showSidebarTrigger
@@ -1616,8 +1613,6 @@ function NotebookPanel({
   onRunBlock: (block: BlockConfig) => void;
   onSelectBlock: (blockId: string) => void;
 }) {
-  void onCellAsk;
-
   return (
     <section className="grid h-full min-h-0 grid-rows-[auto_1fr] p-3">
       <div className="mb-2">
@@ -1646,13 +1641,14 @@ function NotebookPanel({
           {document.blocks.map((block, index) => (
             <DocumentBlock
               block={block}
-              canRun={canRun}
+              canRun={canRun && (block.type !== "code" || Boolean((drafts[block.id] ?? block.content).trim()))}
               draft={drafts[block.id] ?? block.content}
               isSelected={block.id === selectedBlockId}
               key={block.id}
               ordinal={index + 1}
               result={results[block.id]}
               isRunning={runningBlockId === block.id}
+              onCellAsk={(action) => onCellAsk(action, block)}
               onDraftChange={(value) => onDraftChange(block.id, value)}
               onRun={() => onRunBlock(block)}
               onSelect={() => onSelectBlock(block.id)}
@@ -1675,6 +1671,7 @@ function DocumentBlock({
   onDraftChange,
   onRun,
   onSelect,
+  onCellAsk,
 }: {
   block: BlockConfig;
   canRun: boolean;
@@ -1683,6 +1680,7 @@ function DocumentBlock({
   isRunning: boolean;
   ordinal: number;
   result?: ExecutionResult;
+  onCellAsk: (action: CellAiAction) => void;
   onDraftChange: (value: string) => void;
   onRun: () => void;
   onSelect: () => void;
@@ -1702,6 +1700,8 @@ function DocumentBlock({
               status={resultStatus}
               title={cellTitle}
               type="markdown"
+              selected={isSelected}
+              onCellAsk={onCellAsk}
               onSelect={onSelect}
             />
             <div className="px-3 pb-3">
@@ -1736,6 +1736,8 @@ function DocumentBlock({
             status={resultStatus}
             title={cellTitle}
             type="code"
+            selected={isSelected}
+            onCellAsk={onCellAsk}
             onSelect={onSelect}
           />
           <div className="space-y-2 px-3 pb-3">
@@ -1905,12 +1907,16 @@ function CellHeader({
   status,
   title,
   type,
+  selected,
+  onCellAsk,
   onSelect,
 }: {
   lineCount: number;
   status: string;
   title: string;
   type: "code" | "markdown";
+  selected: boolean;
+  onCellAsk: (action: CellAiAction) => void;
   onSelect: () => void;
 }) {
   const Icon = type === "code" ? TerminalSquare : MessageSquare;
@@ -1930,6 +1936,7 @@ function CellHeader({
         <span className="hidden text-xs text-muted-foreground sm:inline">{lineCount}줄</span>
         <Badge variant={status === "error" ? "destructive" : "outline"}>{statusLabel(status)}</Badge>
       </button>
+      <CellAiActions selected={selected} onAsk={onCellAsk} />
     </div>
   );
 }
@@ -2159,9 +2166,10 @@ function previewAssistantAnswer(message: string, scope: TeacherScope, blockCount
   const topic = inferPreviewTopic(message);
   const scopeLabel = teacherScopeLabel(scope);
   if (scope === "cell") {
+    const cellSubject = /선택한|셀 내용|cell/i.test(message) ? "선택한 셀" : topic;
     return [
       "LLM 미연결 상태라 기본 안내만 표시합니다.",
-      `${topic}에 대한 ${scopeLabel} 안내입니다.`,
+      `${cellSubject}에 대한 ${scopeLabel} 안내입니다.`,
       "선택한 셀을 읽고 실행한 뒤, 출력을 기대 학습 목표와 비교하세요.",
       "제공자를 연결하면 현재 셀과 실행 결과를 바탕으로 설명, 힌트, 검증을 이어갑니다.",
     ].join("\n\n");
