@@ -41,6 +41,243 @@ def toolSchemas() -> list[dict[str, Any]]:
     ]
 
 
+TOOL_GROUPS: dict[str, dict[str, str]] = {
+    "workbench": {
+        "label": "Workbench",
+        "description": "Create and edit the live notebook surface.",
+    },
+    "runtime": {
+        "label": "Runtime",
+        "description": "Run code, inspect state, and validate student work.",
+    },
+    "learning": {
+        "label": "Learning",
+        "description": "Generate curriculum, exercises, quizzes, and progress events.",
+    },
+    "files": {
+        "label": "Files",
+        "description": "Write files, install packages, and create notebooks.",
+    },
+    "automation": {
+        "label": "Automation",
+        "description": "Record, execute, and monitor desktop or workflow automation.",
+    },
+    "sensory": {
+        "label": "Sensory",
+        "description": "Read screen, voice, UI state, and external channels.",
+    },
+    "safety": {
+        "label": "Safety",
+        "description": "Control emergency stop and guarded external actions.",
+    },
+}
+
+
+TOOL_LANE_GROUPS: dict[str, dict[str, str]] = {
+    "curriculum": {
+        "label": "Curriculum",
+        "description": "Author YAML learning specs and materialize them as editor cells.",
+    },
+    "read": {
+        "label": "Read",
+        "description": "Inspect learning cells, runtime state, files, or visible UI state.",
+    },
+    "write": {
+        "label": "Write",
+        "description": "Create, update, delete, or stage editor/workspace content.",
+    },
+    "cell-call": {
+        "label": "Cell Call",
+        "description": "Run, check, or inspect a specific learning cell.",
+    },
+    "progress": {
+        "label": "Progress",
+        "description": "Record completion, mastery, and learner state.",
+    },
+    "automation": {
+        "label": "Automation",
+        "description": "Record or execute multi-step external workflows.",
+    },
+    "safety": {
+        "label": "Safety",
+        "description": "Guard input actions and stop unsafe automation.",
+    },
+}
+
+
+_TOOL_CATEGORIES: dict[str, str] = {
+    "read-cells": "workbench",
+    "write-cell": "workbench",
+    "cell-call": "runtime",
+    "write-curriculum-yaml": "learning",
+    "insert-block": "workbench",
+    "update-block": "workbench",
+    "delete-block": "workbench",
+    "get-blocks": "workbench",
+    "execute-reactive": "runtime",
+    "get-variables": "runtime",
+    "check-exercise": "runtime",
+    "create-guide": "learning",
+    "create-learning-card": "learning",
+    "create-quiz": "learning",
+    "create-notebook-exercise": "learning",
+    "track-achievement": "learning",
+    "split-notebook": "files",
+    "generate-notebook": "files",
+    "fs-write": "files",
+    "packages-install": "files",
+    "http-request": "automation",
+    "start-recording": "automation",
+    "stop-recording": "automation",
+    "run-automation": "automation",
+    "capture-screen": "sensory",
+    "read-screen-text": "sensory",
+    "find-element": "sensory",
+    "detect-elements": "sensory",
+    "voice-listen": "sensory",
+    "voice-speak": "sensory",
+    "send-notification": "sensory",
+    "click-element": "safety",
+    "type-text": "safety",
+    "press-hotkey": "safety",
+    "wait-for": "safety",
+    "emergency-stop": "safety",
+}
+
+
+_TOOL_LANES: dict[str, str] = {
+    "read-cells": "read",
+    "write-cell": "write",
+    "cell-call": "cell-call",
+    "write-curriculum-yaml": "curriculum",
+    "get-blocks": "read",
+    "get-variables": "read",
+    "insert-block": "write",
+    "update-block": "write",
+    "delete-block": "write",
+    "execute-reactive": "cell-call",
+    "check-exercise": "cell-call",
+    "create-guide": "write",
+    "create-learning-card": "write",
+    "create-quiz": "write",
+    "create-notebook-exercise": "write",
+    "track-achievement": "progress",
+    "split-notebook": "write",
+    "generate-notebook": "write",
+    "fs-write": "write",
+    "packages-install": "write",
+    "http-request": "automation",
+    "start-recording": "automation",
+    "stop-recording": "automation",
+    "run-automation": "automation",
+    "capture-screen": "read",
+    "read-screen-text": "read",
+    "find-element": "read",
+    "detect-elements": "read",
+    "voice-listen": "read",
+    "voice-speak": "automation",
+    "send-notification": "automation",
+    "click-element": "safety",
+    "type-text": "safety",
+    "press-hotkey": "safety",
+    "wait-for": "safety",
+    "emergency-stop": "safety",
+}
+
+
+_TOOL_TARGETS: dict[str, str] = {
+    "read-cells": "learning-editor",
+    "write-cell": "learning-editor",
+    "cell-call": "learning-editor",
+    "write-curriculum-yaml": "curriculum-yaml",
+    "get-blocks": "learning-editor",
+    "insert-block": "learning-editor",
+    "update-block": "learning-editor",
+    "delete-block": "learning-editor",
+    "execute-reactive": "kernel-runtime",
+    "get-variables": "kernel-runtime",
+    "check-exercise": "kernel-runtime",
+    "create-guide": "learning-editor",
+    "create-learning-card": "learning-editor",
+    "create-quiz": "learning-editor",
+    "create-notebook-exercise": "learning-editor",
+    "track-achievement": "learner-progress",
+    "split-notebook": "file-system",
+    "generate-notebook": "learning-editor",
+    "fs-write": "file-system",
+    "packages-install": "kernel-runtime",
+    "http-request": "external-api",
+    "start-recording": "desktop-automation",
+    "stop-recording": "desktop-automation",
+    "run-automation": "desktop-automation",
+    "capture-screen": "screen",
+    "read-screen-text": "screen",
+    "find-element": "screen",
+    "detect-elements": "screen",
+    "voice-listen": "voice",
+    "voice-speak": "voice",
+    "send-notification": "external-channel",
+    "click-element": "guarded-input",
+    "type-text": "guarded-input",
+    "press-hotkey": "guarded-input",
+    "wait-for": "guarded-input",
+    "emergency-stop": "automation-safety",
+}
+
+
+_TOOL_RISK: dict[str, str] = {
+    "write-cell": "writes",
+    "delete-block": "destructive",
+    "write-curriculum-yaml": "writes",
+    "fs-write": "writes",
+    "packages-install": "writes",
+    "http-request": "external",
+    "click-element": "input",
+    "type-text": "input",
+    "press-hotkey": "input",
+    "run-automation": "input",
+    "emergency-stop": "safety",
+}
+
+
+def toolManifest() -> dict[str, Any]:
+    tools = [_toolManifestItem(tool) for tool in allTools()]
+    grouped: dict[str, list[str]] = {group: [] for group in TOOL_GROUPS}
+    byLane: dict[str, list[str]] = {lane: [] for lane in TOOL_LANE_GROUPS}
+    for tool in tools:
+        grouped.setdefault(tool["category"], []).append(tool["name"])
+        byLane.setdefault(tool["lane"], []).append(tool["name"])
+    return {
+        "groups": [
+            {"id": groupId, **group}
+            for groupId, group in TOOL_GROUPS.items()
+        ],
+        "lanes": [
+            {"id": laneId, **lane}
+            for laneId, lane in TOOL_LANE_GROUPS.items()
+        ],
+        "tools": tools,
+        "grouped": grouped,
+        "byLane": byLane,
+    }
+
+
+def _toolManifestItem(tool: ToolDef) -> dict[str, Any]:
+    required = tool.parameters.get("required", [])
+    properties = tool.parameters.get("properties", {})
+    return {
+        "name": tool.name,
+        "description": tool.description,
+        "handler": tool.handler,
+        "category": _TOOL_CATEGORIES.get(tool.name, "workbench"),
+        "lane": _TOOL_LANES.get(tool.name, "write"),
+        "target": _TOOL_TARGETS.get(tool.name, "learning-editor"),
+        "risk": _TOOL_RISK.get(tool.name, "normal"),
+        "required": required if isinstance(required, list) else [],
+        "parameters": list(properties.keys()) if isinstance(properties, dict) else [],
+    }
+
+
 TOOL_INSERT_BLOCK = ToolDef(
     name="insert-block",
     description="Insert a new code, markdown, or guide block into the notebook at the specified position.",
@@ -136,6 +373,118 @@ TOOL_GET_BLOCKS = ToolDef(
         "properties": {},
     },
     handler="getBlocks",
+)
+
+TOOL_READ_CELLS = ToolDef(
+    name="read-cells",
+    description="Read learning editor cells by ID, including content, type, execution status, and order.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "blockIds": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Optional list of cell/block IDs to read. Omit to read every cell.",
+            },
+            "includeContent": {
+                "type": "boolean",
+                "description": "Include full cell content in the response. Defaults to true.",
+            },
+        },
+    },
+    handler="readCells",
+)
+
+TOOL_WRITE_CELL = ToolDef(
+    name="write-cell",
+    description="Insert, update, or delete one learning editor cell. Use this for cell-level writes.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "operation": {
+                "type": "string",
+                "enum": ["insert", "update", "delete"],
+                "description": "Cell write operation.",
+            },
+            "blockId": {
+                "type": "string",
+                "description": "Existing cell ID for update/delete.",
+            },
+            "position": {
+                "type": "integer",
+                "description": "Zero-based insertion index. -1 appends.",
+            },
+            "blockType": {
+                "type": "string",
+                "enum": ["code", "markdown", "guide", "automation"],
+                "description": "New cell type for insert.",
+            },
+            "content": {
+                "type": "string",
+                "description": "Cell content for insert/update.",
+            },
+        },
+        "required": ["operation"],
+    },
+    handler="writeCell",
+)
+
+TOOL_CELL_CALL = ToolDef(
+    name="cell-call",
+    description="Run or check a specific learning cell by ID. Use this for execution/check calls.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "operation": {
+                "type": "string",
+                "enum": ["run", "check"],
+                "description": "Run the cell or check it against an expected result.",
+            },
+            "blockId": {
+                "type": "string",
+                "description": "Cell/block ID to run or check.",
+            },
+            "checkType": {
+                "type": "string",
+                "enum": ["outputMatch", "outputContains", "variableCheck", "codeContains", "noError"],
+                "description": "Check strategy when operation is check.",
+            },
+            "expected": {
+                "type": "string",
+                "description": "Expected output, variable payload, or required code pattern.",
+            },
+        },
+        "required": ["operation", "blockId"],
+    },
+    handler="cellCall",
+)
+
+TOOL_WRITE_CURRICULUM_YAML = ToolDef(
+    name="write-curriculum-yaml",
+    description="Convert a YAML curriculum draft into runnable learning editor cells and load it into the editor.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "yamlContent": {
+                "type": "string",
+                "description": "Curriculum YAML with meta, intro, sections, and blocks.",
+            },
+            "category": {
+                "type": "string",
+                "description": "Curriculum category label for metadata. Defaults to ai.",
+            },
+            "contentId": {
+                "type": "string",
+                "description": "Stable curriculum content ID. Defaults to ai-generated.",
+            },
+            "loadInEditor": {
+                "type": "boolean",
+                "description": "Load the converted document into the active learning editor. Defaults to true.",
+            },
+        },
+        "required": ["yamlContent"],
+    },
+    handler="writeCurriculumYaml",
 )
 
 TOOL_FS_WRITE = ToolDef(
@@ -895,6 +1244,10 @@ def _registerDefaultTools() -> None:
         TOOL_EXECUTE_REACTIVE,
         TOOL_GET_VARIABLES,
         TOOL_GET_BLOCKS,
+        TOOL_READ_CELLS,
+        TOOL_WRITE_CELL,
+        TOOL_CELL_CALL,
+        TOOL_WRITE_CURRICULUM_YAML,
         TOOL_FS_WRITE,
         TOOL_PACKAGES_INSTALL,
         TOOL_CHECK_EXERCISE,

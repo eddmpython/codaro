@@ -15,6 +15,8 @@ from codaro.ai.providerSpec import (
     AI_ROLES,
 )
 from codaro.ai.baseProvider import BaseProvider
+from codaro.ai.providers.oauthChatgptProvider import OAuthChatGPTProvider, _parseSseResponseDetailed
+from codaro.ai.tools import toolManifest
 
 
 class TestLLMConfig:
@@ -137,3 +139,47 @@ class TestToolResponse:
         assert tc.id == "call_123"
         assert tc.name == "insert-block"
         assert tc.arguments == {"position": 0}
+
+
+class TestToolManifest:
+    def test_manifest_groups_tools_for_workbench(self):
+        manifest = toolManifest()
+
+        group_ids = {group["id"] for group in manifest["groups"]}
+        assert {"workbench", "runtime", "learning", "automation", "safety"}.issubset(group_ids)
+
+        tools = {tool["name"]: tool for tool in manifest["tools"]}
+        assert tools["insert-block"]["category"] == "workbench"
+        assert tools["execute-reactive"]["category"] == "runtime"
+        assert tools["create-notebook-exercise"]["category"] == "learning"
+        assert tools["read-cells"]["lane"] == "read"
+        assert tools["write-cell"]["lane"] == "write"
+        assert tools["cell-call"]["lane"] == "cell-call"
+        assert tools["write-curriculum-yaml"]["target"] == "curriculum-yaml"
+        assert tools["click-element"]["risk"] == "input"
+
+
+class TestOAuthChatGPTTools:
+    def test_oauth_provider_supports_native_tools(self):
+        provider = OAuthChatGPTProvider(LLMConfig(provider="oauth-chatgpt"))
+
+        assert provider.supportsNativeTools is True
+
+    def test_parse_responses_function_call_events(self):
+        raw = "\n".join(
+            [
+                'data: {"type":"response.output_item.added","item":{"id":"fc_1","type":"function_call","call_id":"call_1","name":"get-variables"}}',
+                'data: {"type":"response.function_call_arguments.delta","item_id":"fc_1","delta":"{\\"limit\\":"}',
+                'data: {"type":"response.function_call_arguments.done","item_id":"fc_1","arguments":"{\\"limit\\":5}"}',
+                'data: {"type":"response.output_text.delta","delta":"Checking variables."}',
+                "data: [DONE]",
+            ]
+        )
+
+        answer, toolCalls = _parseSseResponseDetailed(raw)
+
+        assert answer == "Checking variables."
+        assert len(toolCalls) == 1
+        assert toolCalls[0].id == "call_1"
+        assert toolCalls[0].name == "get-variables"
+        assert toolCalls[0].arguments == {"limit": 5}

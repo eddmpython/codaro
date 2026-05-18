@@ -13,6 +13,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ..ai.profile import AiProfileManager, getProfileManager
+from ..ai.providers.oauthChatgptProvider import ChatGPTOAuthError
 from ..ai.providerSpec import (
     buildProviderCatalog,
     getProviderSpec,
@@ -24,6 +25,7 @@ logger = logging.getLogger(__name__)
 
 _HANDLED_ERRORS = (
     AttributeError,
+    ChatGPTOAuthError,
     ConnectionError,
     FileNotFoundError,
     ImportError,
@@ -53,6 +55,12 @@ class AiSecretUpdateRequest(BaseModel):
     clear: bool = False
 
 
+def _providerUnavailable(exc: Exception) -> HTTPException:
+    detail = str(exc) or "AI provider unavailable"
+    logger.info("ai provider unavailable: %s", detail)
+    return HTTPException(status_code=503, detail=detail)
+
+
 def createAiRouter(state: Any) -> APIRouter:
     router = APIRouter()
 
@@ -63,6 +71,12 @@ def createAiRouter(state: Any) -> APIRouter:
     @router.get("/api/ai/profile")
     def apiAiProfile():
         return getProfileManager().serialize()
+
+    @router.get("/api/ai/tools")
+    def apiAiTools():
+        from ..ai.tools import toolManifest
+
+        return toolManifest()
 
     @router.put("/api/ai/profile")
     def apiAiProfileUpdate(req: AiProfileUpdateRequest):
@@ -281,18 +295,27 @@ def createAiRouter(state: Any) -> APIRouter:
             maxTokens=resolved.get("maxTokens", 4096),
         )
 
-        provider = createProvider(config)
+        try:
+            provider = createProvider(config)
+        except _HANDLED_ERRORS as exc:
+            raise _providerUnavailable(exc) from exc
         messages = convManager.buildMessages(conversationId)
         tools = toolSchemas()
 
         executor = _createToolExecutor(state, sessionId)
+        allToolResults: list[dict[str, Any]] = []
 
         maxToolRounds = 10
         for _round in range(maxToolRounds):
-            if provider.supportsNativeTools and tools:
-                response = provider.completeWithTools(messages, tools)
-            else:
-                response = provider.complete(messages)
+            try:
+                if provider.supportsNativeTools and tools:
+                    response = provider.completeWithTools(messages, tools)
+                else:
+                    response = provider.complete(messages)
+            except _HANDLED_ERRORS as exc:
+                raise _providerUnavailable(exc) from exc
+
+            if not provider.supportsNativeTools or not tools:
                 convManager.addAssistantMessage(conversationId, response.answer)
                 return {
                     "conversationId": conversationId,
@@ -300,7 +323,7 @@ def createAiRouter(state: Any) -> APIRouter:
                     "provider": response.provider,
                     "model": response.model,
                     "usage": response.usage,
-                    "toolCalls": [],
+                    "toolCalls": allToolResults,
                 }
 
             if not response.toolCalls:
@@ -311,7 +334,7 @@ def createAiRouter(state: Any) -> APIRouter:
                     "provider": response.provider,
                     "model": response.model,
                     "usage": response.usage,
-                    "toolCalls": [],
+                    "toolCalls": allToolResults,
                 }
 
             toolCallsData = [
@@ -321,15 +344,17 @@ def createAiRouter(state: Any) -> APIRouter:
             convManager.addAssistantMessage(conversationId, response.answer or "", toolCalls=toolCallsData)
             messages.append({"role": "assistant", "content": response.answer or "", "tool_calls": toolCallsData})
 
-            allToolResults = []
             for tc in response.toolCalls:
                 result = await executor.execute(tc.name, tc.arguments)
                 resultStr = json.dumps(result, ensure_ascii=False)
                 convManager.addToolResult(conversationId, tc.id, resultStr)
                 messages.append({"role": "tool", "tool_call_id": tc.id, "content": resultStr})
-                allToolResults.append({"toolCallId": tc.id, "name": tc.name, "result": result})
+                allToolResults.append(_toolCallResult(tc.id, tc.name, tc.arguments, result))
 
-        finalResponse = provider.complete(messages)
+        try:
+            finalResponse = provider.complete(messages)
+        except _HANDLED_ERRORS as exc:
+            raise _providerUnavailable(exc) from exc
         convManager.addAssistantMessage(conversationId, finalResponse.answer)
         return {
             "conversationId": conversationId,
@@ -337,7 +362,7 @@ def createAiRouter(state: Any) -> APIRouter:
             "provider": finalResponse.provider,
             "model": finalResponse.model,
             "usage": finalResponse.usage,
-            "toolCalls": [],
+            "toolCalls": allToolResults,
         }
 
     @router.post("/api/ai/chat/stream")
@@ -390,8 +415,9 @@ def createAiRouter(state: Any) -> APIRouter:
         tools = toolSchemas()
 
         executor = _createToolExecutor(state, sessionId)
+        allToolResults: list[dict[str, Any]] = []
 
-        async def _yieldTokenStream(messages):
+        async def _yieldTokenStream(messages, toolCalls: list[dict[str, Any]] | None = None):
             loop = asyncio.get_running_loop()
             queue: asyncio.Queue[str | None] = asyncio.Queue()
 
@@ -414,7 +440,7 @@ def createAiRouter(state: Any) -> APIRouter:
                 yield f"data: {json.dumps({'type': 'delta', 'delta': token, 'content': accumulated}, ensure_ascii=False)}\n\n"
 
             convManager.addAssistantMessage(conversationId, accumulated)
-            yield f"data: {json.dumps({'type': 'done', 'answer': accumulated, 'provider': llmProvider.config.provider, 'model': llmProvider.resolvedModel, 'usage': None, 'toolCalls': []}, ensure_ascii=False)}\n\n"
+            yield f"data: {json.dumps({'type': 'done', 'answer': accumulated, 'provider': llmProvider.config.provider, 'model': llmProvider.resolvedModel, 'usage': None, 'toolCalls': toolCalls or []}, ensure_ascii=False)}\n\n"
             thread.join(timeout=2)
 
         async def _streamGenerate():
@@ -433,7 +459,7 @@ def createAiRouter(state: Any) -> APIRouter:
                 if not response.toolCalls:
                     convManager.addAssistantMessage(conversationId, response.answer)
                     yield f"data: {json.dumps({'type': 'token', 'content': response.answer}, ensure_ascii=False)}\n\n"
-                    yield f"data: {json.dumps({'type': 'done', 'answer': response.answer, 'provider': response.provider, 'model': response.model, 'usage': response.usage, 'toolCalls': []}, ensure_ascii=False)}\n\n"
+                    yield f"data: {json.dumps({'type': 'done', 'answer': response.answer, 'provider': response.provider, 'model': response.model, 'usage': response.usage, 'toolCalls': allToolResults}, ensure_ascii=False)}\n\n"
                     return
 
                 toolCallsData = [
@@ -452,11 +478,13 @@ def createAiRouter(state: Any) -> APIRouter:
                     resultStr = json.dumps(result, ensure_ascii=False)
                     convManager.addToolResult(conversationId, tc.id, resultStr)
                     msgs.append({"role": "tool", "tool_call_id": tc.id, "content": resultStr})
-                    toolResults.append({"toolCallId": tc.id, "name": tc.name, "result": result})
+                    payload = _toolCallResult(tc.id, tc.name, tc.arguments, result)
+                    toolResults.append(payload)
+                    allToolResults.append(payload)
 
                 yield f"data: {json.dumps({'type': 'tool_results', 'toolCalls': toolResults}, ensure_ascii=False)}\n\n"
 
-            async for chunk in _yieldTokenStream(msgs):
+            async for chunk in _yieldTokenStream(msgs, allToolResults):
                 yield chunk
 
         return StreamingResponse(_streamGenerate(), media_type="text/event-stream")
@@ -561,6 +589,24 @@ def _injectContext(message: str, context: dict[str, Any]) -> str:
         return message
     contextStr = "\n\n".join(parts)
     return f"{message}\n\n---\nContext:\n{contextStr}"
+
+
+def _toolCallResult(
+    toolCallId: str,
+    name: str,
+    arguments: dict[str, Any],
+    result: dict[str, Any],
+) -> dict[str, Any]:
+    error = result.get("error") if isinstance(result, dict) else None
+    return {
+        "id": toolCallId,
+        "toolCallId": toolCallId,
+        "name": name,
+        "arguments": arguments,
+        "status": "error" if error else "done",
+        "error": error,
+        "result": result,
+    }
 
 
 def _createToolExecutor(state: Any, sessionId: str | None = None):

@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import Any
+
 from pydantic import BaseModel, Field
 
 
@@ -29,6 +31,13 @@ class BlockConfig(BaseModel):
     id: str
     type: str
     content: str
+    role: str | None = None
+    executionKind: str | None = None
+    displayKind: str | None = None
+    sourceType: str | None = None
+    payload: Any = None
+    title: str | None = None
+    description: str | None = None
     collapsed: bool = False
     execution: BlockExecution = Field(default_factory=BlockExecution)
     guide: GuideConfig | None = None
@@ -42,7 +51,7 @@ class DocumentMetadata(BaseModel):
 
 
 class RuntimeConfig(BaseModel):
-    defaultEngine: str = "pyodide"
+    defaultEngine: str = "local"
     reactiveMode: str = "hybrid"
     packages: list[str] = Field(default_factory=list)
 

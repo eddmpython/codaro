@@ -2,18 +2,20 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import yaml
+
 from codaro.curriculum.studyLoader import StudyLoader
 from codaro.curriculum.converter import yamlToDocument
 from codaro.curriculum.progress import ProgressTracker
 
 
-STUDY_DIR = Path(__file__).resolve().parent.parent / "study" / "python"
+CURRICULA_DIR = Path(__file__).resolve().parent.parent / "curricula" / "python"
 
 
 def testListCategories() -> None:
-    if not STUDY_DIR.exists():
+    if not CURRICULA_DIR.exists():
         return
-    loader = StudyLoader(str(STUDY_DIR))
+    loader = StudyLoader(str(CURRICULA_DIR))
     categories = loader.listCategories()
 
     assert len(categories) > 0
@@ -22,9 +24,9 @@ def testListCategories() -> None:
 
 
 def testListContents() -> None:
-    if not STUDY_DIR.exists():
+    if not CURRICULA_DIR.exists():
         return
-    loader = StudyLoader(str(STUDY_DIR))
+    loader = StudyLoader(str(CURRICULA_DIR))
     contents = loader.listContents("30days")
 
     assert len(contents) >= 20
@@ -33,9 +35,9 @@ def testListContents() -> None:
 
 
 def testLoadStudy() -> None:
-    if not STUDY_DIR.exists():
+    if not CURRICULA_DIR.exists():
         return
-    loader = StudyLoader(str(STUDY_DIR))
+    loader = StudyLoader(str(CURRICULA_DIR))
     content = loader.loadStudy("30days", "day01_헬로월드")
 
     assert "meta" in content
@@ -44,26 +46,97 @@ def testLoadStudy() -> None:
 
 
 def testYamlToDocument() -> None:
-    if not STUDY_DIR.exists():
+    if not CURRICULA_DIR.exists():
         return
-    loader = StudyLoader(str(STUDY_DIR))
+    loader = StudyLoader(str(CURRICULA_DIR))
     content = loader.loadStudy("30days", "day01_헬로월드")
     document, solutions = yamlToDocument(content, "30days", "day01_헬로월드")
 
     assert document.title == "헬로월드"
     assert len(document.blocks) > 5
+    assert document.runtime.defaultEngine == "local"
+    assert document.app.layout == "learning"
 
     types = [b.type for b in document.blocks]
     assert "markdown" in types
     assert "code" in types
+    assert any(b.sourceType for b in document.blocks)
+    assert all(b.sourceType != "marimoIDE" for b in document.blocks)
 
     assert len(solutions) > 0
 
 
-def testDocumentHasMissions() -> None:
-    if not STUDY_DIR.exists():
+def testYamlBlockTypesDriveCellMetadata() -> None:
+    content = {
+        "meta": {"title": "Type contract"},
+        "intro": {"goal": "Validate type-driven cells"},
+        "sections": [
+            {
+                "id": "types",
+                "title": "Types",
+                "blocks": [
+                    {"type": "marimoIDE", "title": "Legacy workbench"},
+                    {
+                        "type": "code",
+                        "title": "Folium display",
+                        "content": "import marimo as mo\nm = make_map()\nmo.iframe(m._repr_html_())",
+                    },
+                    {
+                        "type": "expansion",
+                        "title": "기본 연습",
+                        "description": "빈 셀에 답을 작성합니다.",
+                        "code": "print('solution')",
+                    },
+                ],
+            }
+        ],
+    }
+
+    document, solutions = yamlToDocument(content, "test", "type-contract")
+
+    workbench = next(block for block in document.blocks if block.sourceType == "localWorkbench")
+    snippet = next(block for block in document.blocks if block.title == "Folium display" and block.type == "code")
+    exercise = next(block for block in document.blocks if block.sourceType == "expansion" and block.type == "code")
+
+    assert workbench.displayKind == "hero"
+    assert workbench.role == "visual"
+    assert snippet.role == "snippet"
+    assert snippet.content == "m = make_map()\nm"
+    assert exercise.role == "exercise"
+    assert exercise.content == ""
+    assert solutions[exercise.id] == "print('solution')"
+
+
+def testAllCurriculaConvertToLocalDocuments() -> None:
+    if not CURRICULA_DIR.exists():
         return
-    loader = StudyLoader(str(STUDY_DIR))
+
+    converted = 0
+    failures: list[str] = []
+    for path in CURRICULA_DIR.rglob("*.yaml"):
+        if path.name == "schema.yaml":
+            continue
+        raw = yaml.safe_load(path.read_text(encoding="utf-8"))
+        if not isinstance(raw, dict) or not isinstance(raw.get("sections"), list):
+            continue
+        try:
+            document, _ = yamlToDocument(raw, path.parent.name, path.stem)
+        except Exception as exc:  # pragma: no cover - assertion reports the failing path
+            failures.append(f"{path}: {exc}")
+            continue
+        converted += 1
+        assert document.runtime.defaultEngine == "local"
+        assert document.blocks
+        assert all(block.sourceType != "marimoIDE" for block in document.blocks)
+
+    assert not failures
+    assert converted > 0
+
+
+def testDocumentHasMissions() -> None:
+    if not CURRICULA_DIR.exists():
+        return
+    loader = StudyLoader(str(CURRICULA_DIR))
     content = loader.loadStudy("30days", "day01_헬로월드")
     document, solutions = yamlToDocument(content, "30days", "day01_헬로월드")
 
@@ -77,9 +150,9 @@ def testDocumentHasMissions() -> None:
 
 
 def testPrevNext() -> None:
-    if not STUDY_DIR.exists():
+    if not CURRICULA_DIR.exists():
         return
-    loader = StudyLoader(str(STUDY_DIR))
+    loader = StudyLoader(str(CURRICULA_DIR))
     prevNext = loader.getPrevNext("30days", "day01_헬로월드")
 
     assert prevNext["prev"] is None

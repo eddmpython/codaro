@@ -35,9 +35,9 @@ from .serverLog import configureServerLogging, formatLogFields, isVerboseLogging
 
 
 PACKAGE_ROOT = Path(__file__).resolve().parent
-PROJECT_ROOT = PACKAGE_ROOT.parent.parent.parent
+PROJECT_ROOT = PACKAGE_ROOT.parent.parent
 EDITOR_ROOT = PROJECT_ROOT / "editor"
-STUDY_ROOT = PROJECT_ROOT / "study" / "python"
+CURRICULA_ROOT = PROJECT_ROOT / "curricula" / "python"
 
 
 def resolveWebBuildRoot() -> Path:
@@ -136,7 +136,7 @@ def createServerApp(
         mode=mode,
         documentPath=documentPath,
         workspaceRoot=workspaceRoot or Path.cwd().resolve(),
-        studyRoot=studyDir or STUDY_ROOT,
+        studyRoot=studyDir or CURRICULA_ROOT,
         packageRoot=PACKAGE_ROOT,
         editorRoot=EDITOR_ROOT,
         webBuildRoot=WEB_BUILD_ROOT,
@@ -327,7 +327,10 @@ def runServer(
             verbose=verbose,
         ),
     )
-    logger.info("workspace %s", formatLogFields(root=workspaceRoot, studyRoot=STUDY_ROOT if STUDY_ROOT.exists() else None))
+    logger.info(
+        "workspace %s",
+        formatLogFields(root=workspaceRoot, studyRoot=CURRICULA_ROOT if CURRICULA_ROOT.exists() else None),
+    )
     if documentPath is not None:
         logger.info("document %s", formatLogFields(path=documentPath))
     logger.info(

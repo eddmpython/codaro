@@ -32,10 +32,13 @@ class StudyData(BaseModel):
 
 
 CATEGORY_MAPPING = {
+    "main": "Python 입문",
     "30days": "30일완성",
     "advancedPython": "고급파이썬",
+    "builtins": "표준라이브러리",
     "excel": "엑셀자동화",
     "numpy": "NumPy 수치연산",
+    "sympy": "SymPy 기호수학",
     "pandas": "Pandas 데이터분석",
     "duckdb": "Duckdb 데이터분석",
     "polars": "Polars 데이터분석",
@@ -43,40 +46,58 @@ CATEGORY_MAPPING = {
     "seaborn": "seaborn 시각화",
     "plotly": "plotly 시각화",
     "altair": "altair 시각화",
+    "folium": "folium 지도시각화",
     "statsmodels": "statsmodels 통계모델",
     "sklearn": "sklearn 머신러닝",
+    "scipy": "SciPy 과학계산",
+    "networkx": "NetworkX 그래프분석",
     "regex": "regex 비정형데이터",
     "pillow": "Pillow 이미지처리",
     "opencv": "OpenCV 컴퓨터비전",
+    "pydantic": "Pydantic 데이터검증",
     "practical": "실전파이썬",
 }
 
 CATEGORY_META = {
+    "main": {"description": "Codaro 로컬 학습을 시작하는 짧은 Python 입문"},
     "30days": {"description": "30일 만에 완성하는 체계적인 Python 기초"},
     "advancedPython": {"description": "고급 문법과 패턴으로 레벨업"},
+    "builtins": {"description": "Python 표준 라이브러리를 로컬 환경에서 익히는 경로"},
     "excel": {"description": "엑셀 반복 작업을 자동화하세요"},
     "numpy": {"description": "고성능 수치 연산의 기초"},
+    "sympy": {"description": "기호 수학과 방정식 풀이"},
     "pandas": {"description": "데이터 분석의 필수 도구"},
+    "duckdb": {"description": "로컬 SQL 분석 엔진으로 데이터 탐색"},
+    "polars": {"description": "초고속 데이터프레임 처리"},
     "matplotlib": {"description": "Python 시각화의 기본"},
     "seaborn": {"description": "통계 시각화를 쉽고 예쁘게"},
     "plotly": {"description": "인터랙티브 차트 만들기"},
+    "altair": {"description": "선언적 시각화 문법"},
+    "folium": {"description": "지도와 위치 데이터를 Python으로 시각화"},
+    "statsmodels": {"description": "통계 모델링과 검정"},
     "sklearn": {"description": "머신러닝 입문과 실전"},
+    "scipy": {"description": "과학 계산과 최적화"},
+    "networkx": {"description": "그래프와 네트워크 분석"},
+    "regex": {"description": "정규표현식으로 텍스트 처리"},
+    "pillow": {"description": "이미지 편집과 처리"},
+    "opencv": {"description": "컴퓨터 비전의 세계"},
+    "pydantic": {"description": "타입 기반 데이터 검증"},
     "practical": {"description": "실전 프로젝트로 배우는 Python"},
 }
 
 CATEGORY_GROUPS = {
-    "기초": ["30days", "advancedPython"],
-    "데이터분석": ["pandas", "numpy", "polars", "duckdb", "excel"],
-    "시각화": ["matplotlib", "seaborn", "plotly", "altair"],
-    "수학/통계/ML": ["statsmodels", "sklearn"],
+    "기초": ["main", "30days", "advancedPython", "builtins"],
+    "데이터분석": ["pandas", "numpy", "polars", "duckdb", "excel", "pydantic"],
+    "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
+    "수학/통계/ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
     "이미지": ["pillow", "opencv"],
     "기타": ["regex", "practical"],
 }
 
 LEARNING_PATHS = {
-    "초급": {"categories": ["30days"], "description": "프로그래밍이 처음이라면"},
-    "중급": {"categories": ["advancedPython", "pandas", "numpy"], "description": "기초를 마쳤다면"},
-    "고급": {"categories": ["sklearn", "practical"], "description": "실무에 적용하고 싶다면"},
+    "초급": {"categories": ["main", "30days"], "description": "프로그래밍이 처음이라면"},
+    "중급": {"categories": ["advancedPython", "builtins", "pandas", "numpy"], "description": "기초를 마쳤다면"},
+    "고급": {"categories": ["scipy", "statsmodels", "sklearn", "practical"], "description": "실무에 적용하고 싶다면"},
 }
 
 

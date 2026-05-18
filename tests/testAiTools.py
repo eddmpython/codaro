@@ -19,6 +19,7 @@ from codaro.document.models import BlockConfig, CodaroDocument
 EXPECTED_BUILTIN_TOOLS = {
     "insert-block", "update-block", "delete-block",
     "execute-reactive", "get-variables", "get-blocks",
+    "read-cells", "write-cell", "cell-call", "write-curriculum-yaml",
     "fs-write", "packages-install", "check-exercise", "create-guide",
     "create-learning-card", "create-quiz",
     "create-notebook-exercise", "track-achievement",
@@ -125,6 +126,38 @@ class TestDocumentTools:
         executor, doc = _makeExecutor()
         result = asyncio.run(executor.execute("get-blocks", {}))
         assert len(result["blocks"]) == len(doc.blocks)
+
+    def test_read_cells_returns_full_cell_content(self):
+        executor, _ = _makeExecutor()
+        result = asyncio.run(executor.execute("read-cells", {"blockIds": ["b1"]}))
+        assert result["blockCount"] == 1
+        assert result["blocks"][0]["content"] == "x = 1"
+
+    def test_write_cell_insert_update_delete(self):
+        executor, doc = _makeExecutor()
+        inserted = asyncio.run(executor.execute("write-cell", {
+            "operation": "insert",
+            "blockType": "code",
+            "content": "z = 3",
+            "position": 1,
+        }))
+        blockId = inserted["blockId"]
+        assert doc.blocks[1].content == "z = 3"
+
+        updated = asyncio.run(executor.execute("write-cell", {
+            "operation": "update",
+            "blockId": blockId,
+            "content": "z = 4",
+        }))
+        assert updated["updated"] is True
+        assert doc.blocks[1].content == "z = 4"
+
+        deleted = asyncio.run(executor.execute("write-cell", {
+            "operation": "delete",
+            "blockId": blockId,
+        }))
+        assert deleted["deleted"] is True
+        assert all(block.id != blockId for block in doc.blocks)
 
     def test_unknown_tool_returns_error(self):
         executor, _ = _makeExecutor()
@@ -281,6 +314,47 @@ class TestNotebookExercise:
         guides = [b for b in doc.blocks if b.type == "guide"]
         assert json.loads(guides[-2].content)["exerciseType"] == "fillBlank"
         assert json.loads(guides[-1].content)["exerciseType"] == "writeCode"
+
+
+class TestCurriculumYaml:
+
+    def test_write_curriculum_yaml_loads_document(self):
+        captured = {}
+        doc = _makeDoc()
+        executor = ToolExecutor(
+            sessionManager=_MockSessionManager(),
+            documentGetter=lambda: doc,
+            documentSetter=lambda d: captured.update(doc=d),
+        )
+
+        yamlContent = """
+meta:
+  title: AI Pandas Starter
+intro:
+  points:
+    - Load data first
+sections:
+  - title: DataFrame basics
+    blocks:
+      - type: text
+        content: Read the rows, then run the cell.
+      - type: code
+        content: |
+          import pandas as pd
+          df = pd.DataFrame({"name": ["A"], "score": [90]})
+          print(df)
+"""
+
+        result = asyncio.run(executor.execute("write-curriculum-yaml", {
+            "yamlContent": yamlContent,
+            "contentId": "ai-pandas",
+        }))
+
+        assert result["loadedInEditor"] is True
+        assert result["title"] == "AI Pandas Starter"
+        assert result["blockCount"] >= 3
+        assert "document" in result
+        assert captured["doc"].title == "AI Pandas Starter"
 
 
 class TestGenerateNotebook:

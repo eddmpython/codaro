@@ -9,7 +9,7 @@ import requests
 from codaro.ai.baseProvider import BaseProvider
 from codaro.ai import oauthToken
 from codaro.ai.oauthToken import TokenRefreshError
-from codaro.ai.types import LLMResponse
+from codaro.ai.types import LLMResponse, ToolCall, ToolResponse
 
 log = logging.getLogger(__name__)
 
@@ -84,6 +84,10 @@ class OAuthChatGPTProvider(BaseProvider):
             return oauthToken.isAuthenticated()
         except TokenRefreshError:
             return False
+
+    @property
+    def supportsNativeTools(self) -> bool:
+        return True
 
     def _getTokenOrRaise(self) -> str:
         try:
@@ -163,27 +167,44 @@ class OAuthChatGPTProvider(BaseProvider):
             headers["chatgpt-account-id"] = accountId
         return headers
 
-    def _buildBody(self, messages: list[dict[str, str]]) -> dict:
+    def _buildBody(self, messages: list[dict[str, str]], tools: list[dict] | None = None) -> dict:
         systemParts = []
         inputItems = []
 
         for m in messages:
-            if m["role"] == "system":
-                systemParts.append(m["content"])
-            elif m["role"] == "assistant":
+            role = str(m.get("role") or "user")
+            content = str(m.get("content") or "")
+            if role == "system":
+                if content:
+                    systemParts.append(content)
+            elif role == "tool":
                 inputItems.append(
                     {
                         "type": "message",
-                        "role": "assistant",
-                        "content": [{"type": "output_text", "text": m["content"]}],
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "input_text",
+                                "text": f"[tool_result id={m.get('tool_call_id', '')}]\n{content}",
+                            }
+                        ],
                     }
                 )
+            elif role == "assistant":
+                if content:
+                    inputItems.append(
+                        {
+                            "type": "message",
+                            "role": "assistant",
+                            "content": [{"type": "output_text", "text": content}],
+                        }
+                    )
             else:
                 inputItems.append(
                     {
                         "type": "message",
                         "role": "user",
-                        "content": [{"type": "input_text", "text": m["content"]}],
+                        "content": [{"type": "input_text", "text": content}],
                     }
                 )
 
@@ -197,6 +218,9 @@ class OAuthChatGPTProvider(BaseProvider):
 
         if systemParts:
             body["instructions"] = "\n\n".join(systemParts)
+        responseTools = _responseTools(tools or [])
+        if responseTools:
+            body["tools"] = responseTools
 
         return body
 
@@ -218,6 +242,23 @@ class OAuthChatGPTProvider(BaseProvider):
             answer=answer,
             provider="oauth-chatgpt",
             model=self.resolvedModel,
+        )
+
+    def completeWithTools(
+        self,
+        messages: list[dict],
+        tools: list[dict],
+    ) -> ToolResponse:
+        token = self._getTokenOrRaise()
+        body = self._buildBody(messages, tools)
+        resp = self._requestWithRetry(token, body)
+
+        answer, toolCalls = _parseSseResponseDetailed(resp.text)
+        return ToolResponse(
+            answer=answer,
+            provider="oauth-chatgpt",
+            model=self.resolvedModel,
+            toolCalls=toolCalls,
         )
 
     def stream(self, messages: list[dict[str, str]]) -> Generator[str, None, None]:
@@ -284,26 +325,149 @@ class OAuthChatGPTProvider(BaseProvider):
             )
 
     def _parseSseResponse(self, raw: str) -> str:
-        answer = ""
-        for line in raw.split("\n"):
-            if not line.startswith("data: "):
-                continue
-            dataStr = line[6:]
-            if dataStr == "[DONE]":
-                break
-            try:
-                event = json.loads(dataStr)
-            except json.JSONDecodeError:
-                continue
-
-            if event.get("type") == "response.completed":
-                respObj = event.get("response", {})
-                for output in respObj.get("output", []):
-                    if output.get("type") == "message":
-                        for content in output.get("content", []):
-                            if content.get("type") == "output_text":
-                                answer = content.get("text", "")
-            elif event.get("type") == "response.output_text.delta":
-                answer += event.get("delta", "")
-
+        answer, _toolCalls = _parseSseResponseDetailed(raw)
         return answer
+
+
+def _responseTools(tools: list[dict]) -> list[dict]:
+    responseTools: list[dict] = []
+    for tool in tools:
+        function = tool.get("function") if isinstance(tool, dict) else None
+        if not isinstance(function, dict):
+            continue
+        responseTools.append(
+            {
+                "type": "function",
+                "name": function.get("name"),
+                "description": function.get("description", ""),
+                "parameters": function.get("parameters", {"type": "object", "properties": {}}),
+            }
+        )
+    return responseTools
+
+
+def _parseSseResponseDetailed(raw: str) -> tuple[str, list[ToolCall]]:
+    textParts: list[str] = []
+    completedText: list[str] = []
+    buffers: dict[str, dict[str, str]] = {}
+    finished: list[dict[str, str]] = []
+
+    def finishBuffer(itemId: str, finalArgs: str | None = None) -> None:
+        buffer = buffers.pop(itemId, None)
+        if buffer is None:
+            return
+        if finalArgs is not None:
+            buffer["arguments"] = finalArgs
+        finished.append(buffer)
+
+    for line in raw.split("\n"):
+        if not line.startswith("data: "):
+            continue
+        dataStr = line[6:]
+        if dataStr == "[DONE]":
+            break
+        try:
+            event = json.loads(dataStr)
+        except json.JSONDecodeError:
+            continue
+
+        eventType = event.get("type")
+        if eventType == "response.output_text.delta":
+            delta = event.get("delta")
+            if isinstance(delta, str):
+                textParts.append(delta)
+        elif eventType == "response.content_part.delta":
+            delta = event.get("delta", {})
+            text = delta.get("text", "") if isinstance(delta, dict) else ""
+            if text:
+                textParts.append(text)
+        elif eventType == "response.output_item.added":
+            item = event.get("item") if isinstance(event.get("item"), dict) else {}
+            if item.get("type") == "function_call":
+                itemId = str(item.get("id") or f"fc_{len(buffers)}")
+                buffers[itemId] = {
+                    "id": str(item.get("call_id") or itemId),
+                    "name": str(item.get("name") or ""),
+                    "arguments": "",
+                }
+        elif eventType == "response.function_call_arguments.delta":
+            itemId = str(event.get("item_id") or "")
+            if itemId in buffers:
+                buffers[itemId]["arguments"] += str(event.get("delta") or "")
+        elif eventType == "response.function_call_arguments.done":
+            itemId = str(event.get("item_id") or "")
+            finalArgs = event.get("arguments") if isinstance(event.get("arguments"), str) else None
+            finishBuffer(itemId, finalArgs)
+        elif eventType == "response.output_item.done":
+            item = event.get("item") if isinstance(event.get("item"), dict) else {}
+            if item.get("type") == "function_call":
+                itemId = str(item.get("id") or "")
+                finalArgs = item.get("arguments") if isinstance(item.get("arguments"), str) else None
+                if itemId in buffers:
+                    finishBuffer(itemId, finalArgs)
+                else:
+                    finished.append(
+                        {
+                            "id": str(item.get("call_id") or item.get("id") or f"fc_{len(finished)}"),
+                            "name": str(item.get("name") or ""),
+                            "arguments": str(item.get("arguments") or "{}"),
+                        }
+                    )
+            elif item.get("type") == "message":
+                completedText.extend(_textFromMessageItem(item))
+        elif eventType == "response.completed":
+            respObj = event.get("response", {})
+            for output in respObj.get("output", []):
+                if not isinstance(output, dict):
+                    continue
+                if output.get("type") == "message":
+                    completedText.extend(_textFromMessageItem(output))
+                elif output.get("type") == "function_call":
+                    finished.append(
+                        {
+                            "id": str(output.get("call_id") or output.get("id") or f"fc_{len(finished)}"),
+                            "name": str(output.get("name") or ""),
+                            "arguments": str(output.get("arguments") or "{}"),
+                        }
+                    )
+
+    calls: list[ToolCall] = []
+    seen: set[tuple[str, str]] = set()
+    for item in finished:
+        name = item.get("name") or ""
+        if not name:
+            continue
+        callId = item.get("id") or f"fc_{len(calls)}"
+        key = (callId, name)
+        if key in seen:
+            continue
+        seen.add(key)
+        calls.append(
+            ToolCall(
+                id=callId,
+                name=name,
+                arguments=_parseToolArgs(item.get("arguments") or "{}"),
+            )
+        )
+
+    return "".join(completedText) or "".join(textParts), calls
+
+
+def _textFromMessageItem(item: dict) -> list[str]:
+    texts: list[str] = []
+    for content in item.get("content") or []:
+        if not isinstance(content, dict):
+            continue
+        if content.get("type") == "output_text":
+            text = content.get("text")
+            if isinstance(text, str) and text:
+                texts.append(text)
+    return texts
+
+
+def _parseToolArgs(raw: str) -> dict:
+    try:
+        parsed = json.loads(raw or "{}")
+    except json.JSONDecodeError:
+        return {}
+    return parsed if isinstance(parsed, dict) else {}
