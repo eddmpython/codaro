@@ -25,10 +25,14 @@ _reference/
 # Backup (파일 삭제 대신 이동)
 _backup/
 
+# Local tool artifacts
+*.log
+*.tsbuildinfo
+.playwright-cli/
+logs/
+
 # Node modules (all locations)
 node_modules/
-.playwright-cli/
-*.tsbuildinfo
 editor/.svelte-kit/
 src/codaro/webBuild/
 launcher/target/
