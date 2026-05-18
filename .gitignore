@@ -27,6 +27,8 @@ _backup/
 
 # Node modules (all locations)
 node_modules/
+.playwright-cli/
+*.tsbuildinfo
 editor/.svelte-kit/
 src/codaro/webBuild/
 launcher/target/

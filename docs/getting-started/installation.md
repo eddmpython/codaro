@@ -28,7 +28,7 @@ Today, local development uses `uv` for Python environment and execution.
 
 - Python 3.12 or newer
 - `uv`
-- Node.js for the Svelte public site and local editor frontends
+- Node.js for the Svelte public site, current local editor frontend, and React product frontend
 
 ## Core commands
 

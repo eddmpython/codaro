@@ -35,13 +35,14 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [ai-sensory-system](skills/identity/ai-sensory-system)
 - [external-channels-mobile](skills/identity/external-channels-mobile)
 
-## Architecture (5) — 5층 구조
+## Architecture (6) — 5층 구조
 
 - [overview](skills/architecture/overview)
 - [document-model](skills/architecture/document-model)
 - [execution-engine](skills/architecture/execution-engine)
 - [dataflow](skills/architecture/dataflow)
 - [widget-bridge](skills/architecture/widget-bridge)
+- [frontend-product-surface](skills/architecture/frontend-product-surface)
 
 ## Ops (9) — 운영 규칙
 
