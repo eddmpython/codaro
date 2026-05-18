@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { writeFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
@@ -17,8 +17,8 @@ function stripHtml(value) {
 
 const urls = [
   { loc: `${siteUrl}/`, changefreq: "weekly", priority: "1.0" },
-  { loc: `${siteUrl}/blog`, changefreq: "weekly", priority: "0.9" },
   { loc: `${siteUrl}/docs`, changefreq: "weekly", priority: "0.9" },
+  { loc: `${siteUrl}/docs/blog`, changefreq: "weekly", priority: "0.8" },
   { loc: `${siteUrl}/search`, changefreq: "monthly", priority: "0.6" },
   ...posts.map((post) => ({ loc: `${siteUrl}${post.url}`, changefreq: "monthly", priority: "0.8", lastmod: post.date })),
   ...docsPages.map((page) => ({ loc: `${siteUrl}${page.url}`, changefreq: "monthly", priority: "0.7" })),
@@ -36,11 +36,11 @@ sitemap += "</urlset>\n";
 writeFileSync(resolve(buildRoot, "sitemap.xml"), sitemap, "utf-8");
 
 let atom = `<?xml version="1.0" encoding="UTF-8"?>\n<feed xmlns="http://www.w3.org/2005/Atom">\n`;
-atom += `  <title>Codaro Blog</title>\n`;
-atom += `  <subtitle>Interactive editor runtime, learning workflows, and automation notes.</subtitle>\n`;
+atom += `  <title>Codaro Writing</title>\n`;
+atom += `  <subtitle>Docs-integrated runtime, learning workflow, and automation notes.</subtitle>\n`;
 atom += `  <link href="${siteUrl}/feed.xml" rel="self" type="application/atom+xml"/>\n`;
-atom += `  <link href="${siteUrl}/blog" rel="alternate" type="text/html"/>\n`;
-atom += `  <id>${siteUrl}/blog</id>\n`;
+atom += `  <link href="${siteUrl}/docs/blog" rel="alternate" type="text/html"/>\n`;
+atom += `  <id>${siteUrl}/docs/blog</id>\n`;
 atom += `  <updated>${(posts[0]?.date || "2026-03-17")}T00:00:00Z</updated>\n`;
 for (const post of posts) {
   atom += "  <entry>\n";
@@ -59,7 +59,7 @@ const docsMirror = docsPages.map((page) => `- [${page.title}](${siteUrl}${page.u
 const blogMirror = posts.map((post) => `- [${post.title}](${siteUrl}${post.url}) — ${post.description}`);
 writeFileSync(
   resolve(buildRoot, "llms.txt"),
-  ["# Codaro", "", "> Interactive editor runtime for code, learning, and automation.", "", "## Docs", ...docsMirror, "", "## Blog", ...blogMirror, ""].join("\n"),
+  ["# Codaro", "", "> Interactive editor runtime for code, learning, and automation.", "", "## Docs", ...docsMirror, "", "## Writing", ...blogMirror, ""].join("\n"),
   "utf-8",
 );
 
@@ -68,19 +68,5 @@ writeFileSync(
   ["# Codaro Full Site Mirror", "", ...posts.map((post) => `## ${post.title}\n\nURL: ${siteUrl}${post.url}\n\n${stripHtml(post.html)}`), ...docsPages.map((page) => `## ${page.title}\n\nURL: ${siteUrl}${page.url}\n\n${stripHtml(page.html)}`), ""].join("\n\n"),
   "utf-8",
 );
-
-const docsIndexPath = resolve(buildRoot, "docs", "index.html");
-mkdirSync(dirname(docsIndexPath), { recursive: true });
-const docsHtmlPath = resolve(buildRoot, "docs.html");
-const docsSourcePath = existsSync(docsIndexPath) ? docsIndexPath : docsHtmlPath;
-const docsIndex = existsSync(docsSourcePath) ? readFileSync(docsSourcePath, "utf-8") : "";
-if (!docsIndex.includes("http-equiv=\"refresh\"")) {
-  const target = `${siteUrl}/docs/getting-started/installation`;
-  writeFileSync(
-    docsIndexPath,
-    `<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0;url=${target}"><link rel="canonical" href="${target}"><title>Redirecting...</title></head><body><script>window.location.replace(${JSON.stringify(target)})</script></body></html>`,
-    "utf-8",
-  );
-}
 
 console.log(`[postbuild] sitemap=${urls.length} feed=${posts.length} docs=${docsPages.length}`);

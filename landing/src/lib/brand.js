@@ -13,7 +13,7 @@ export const brand = {
     return [
       {
         title: "Documentation",
-        description: "Installation, concepts, guides, and reference pages.",
+        description: "Installation, concepts, operating notes, and public writing.",
         href: `${base}/docs`,
       },
       {
@@ -22,13 +22,13 @@ export const brand = {
         href: "https://github.com/eddmpython/codaro",
       },
       {
-        title: "Blog",
-        description: "Build notes on runtime, learning workflows, and automation.",
-        href: `${base}/blog`,
+        title: "Writing",
+        description: "Runtime, learning workflow, and automation notes inside docs.",
+        href: `${base}/docs/blog`,
       },
       {
         title: "Search",
-        description: "Find docs and blog posts from one place.",
+        description: "Find Codaro documentation and writing from one place.",
         href: `${base}/search`,
       },
     ];

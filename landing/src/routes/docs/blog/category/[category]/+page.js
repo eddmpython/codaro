@@ -1,5 +1,4 @@
-import { base } from "$app/paths";
-import { redirect } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 import { postCategories, posts } from "$lib/generated/posts";
 
 export function entries() {
@@ -8,5 +7,11 @@ export function entries() {
 
 export function load({ params }) {
   const category = postCategories.find((entry) => entry.slug === params.category);
-  throw redirect(308, category ? `${base}/docs/blog/category/${category.slug}` : `${base}/docs/blog`);
+  if (!category) {
+    throw error(404, "Category not found");
+  }
+  return {
+    category,
+    posts: posts.filter((post) => post.category === params.category),
+  };
 }

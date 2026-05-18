@@ -1,8 +1,6 @@
-import { posts, postCategories } from "$lib/generated/posts";
+import { base } from "$app/paths";
+import { redirect } from "@sveltejs/kit";
 
 export function load() {
-  return {
-    posts,
-    postCategories,
-  };
+  throw redirect(308, `${base}/docs/blog`);
 }

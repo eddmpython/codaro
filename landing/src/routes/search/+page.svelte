@@ -16,11 +16,11 @@
   <section class="pageHero">
     <div class="badge">Search</div>
     <h1>Search</h1>
-    <p>Find docs and blog posts from one place.</p>
+    <p>Find Codaro documentation and writing from one place.</p>
   </section>
 
   <section class="pageSection">
-    <input class="searchField" bind:value={query} placeholder="Search docs and blog..." />
+    <input class="searchField" bind:value={query} placeholder="Search docs..." />
   </section>
 
   <section class="pageSection">

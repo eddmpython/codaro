@@ -29,7 +29,7 @@ const panelDefinitions: Record<
       "Codaro keeps the editor focused on execution, learning, and automation. Long-form docs belong to the public site.",
     docLinks: [
       { label: "First notebook", path: "/docs/getting-started/first-notebook" },
-      { label: "What is Codaro", path: "/blog/what-is-codaro" },
+      { label: "What is Codaro", path: "/docs/blog/what-is-codaro" },
     ],
   },
   files: {
@@ -64,7 +64,7 @@ const panelDefinitions: Record<
     summary:
       "AI extends the runtime through visible editor tools. Lessons and notebook execution must still work without any provider attached.",
     docLinks: [
-      { label: "What is Codaro", path: "/blog/what-is-codaro" },
+      { label: "What is Codaro", path: "/docs/blog/what-is-codaro" },
       { label: "Execution runtime", path: "/docs/concepts/execution-runtime" },
     ],
   },
@@ -80,7 +80,7 @@ const panelDefinitions: Record<
   help: {
     title: "Context Help",
     summary:
-      "The helper rail now carries compact, task-specific guidance. Full docs, blog posts, and search stay on the public landing site.",
+      "The helper rail now carries compact, task-specific guidance. Full docs, writing, and search stay on the public landing site.",
     docLinks: [
       { label: "Public docs", path: "/docs" },
       { label: "Public search", path: "/search" },

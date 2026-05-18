@@ -20,7 +20,7 @@ The local editor is only one part of the product. The public site explains the c
 
 1. A document model that can host code, text, and workflow blocks
 2. An execution runtime that can run locally or in browser-oriented environments
-3. A public knowledge surface for docs, changelog-style writing, and product reasoning
+3. A docs-based public knowledge surface for guides, changelog-style writing, and product reasoning
 
 ## Why keep the public site separate
 
@@ -29,7 +29,7 @@ The editor must stay focused on execution and interaction.
 The public site has different constraints:
 
 - static delivery
-- SEO-friendly docs and blog
+- SEO-friendly docs and writing
 - stable GitHub Pages deployment
 - searchable product writing
 
@@ -44,10 +44,10 @@ It becomes the surface for:
 - installation guides
 - concept explanations
 - reference pages
-- blog posts that explain runtime decisions
+- writing that explains runtime decisions
 
 ## Public writing should stay close to the repo
 
-Codaro stores blog posts under the root `blog/` folder and public docs under the root `docs/` folder. The Svelte public site reads those sources directly at build time.
+Codaro stores public docs, operating notes, and writing under the root `docs/` folder. The Svelte public site reads those sources directly at build time.
 
 That keeps writing close to the codebase while still producing a static site.

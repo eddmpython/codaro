@@ -30,9 +30,9 @@
   - 투명 배경 브랜드 자산 생성 스크립트
 - `../landing/`
   - GitHub Pages용 public site
-  - docs/blog/search route와 static build
-- `../blog/`
-  - public blog markdown source
+  - docs/writing/search route와 static build
+- `../docs/blog/`
+  - public writing markdown source
 - `../launcher/`
   - 로컬 배포 계층
   - Rust launcher, embedded Python, install/update/rollback PRD
@@ -96,10 +96,10 @@
 - system 파일 API는 현재 workspace root 내부 경로만 허용한다
 - package install/list/uninstall은 프로젝트 루트 `.venv`를 기준으로 동작한다
 - 제품 배포 기준 source of truth는 장기적으로 `launcher/PRD.md`가 맡는다
-- public docs/blog/search는 `landing/` static build로 배포한다
+- public docs/writing/search는 `landing/` static build로 배포한다
 - editor surface는 full docs browser를 내장하지 않는다
   - IDE 안에는 `Context Help`만 둔다
-  - 장문 docs/blog/search는 항상 `landing/` public site로 연다
+  - 장문 docs/writing/search는 항상 `landing/` public site로 연다
 - `curriculum`과 `learning-spec`은 학습 runtime 계약이지 generic docs browsing API가 아니다
 - 서버 시작 시 editor 자산 준비 상태, workspace root, content root, document path를 터미널에 출력한다
 - CLI 로그는 명령 정규화 결과, 모드, URL, 브라우저 오픈 여부를 기록한다

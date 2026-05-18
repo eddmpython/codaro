@@ -1,11 +1,11 @@
-# Codaro Blog Asset Policy
+# Codaro Docs Writing Asset Policy
 
-Blog assets live inside each post folder under `assets/`.
+Writing assets live inside each post folder under `assets/`.
 
 ## Placement
 
 - Store assets only inside the matching post folder.
-- Do not create a shared root `blog/assets/` source folder.
+- Do not create a shared root `docs/blog/assets/` source folder.
 - Reference assets with relative paths such as `./assets/file.svg`.
 
 ## Naming
@@ -16,6 +16,6 @@ Blog assets live inside each post folder under `assets/`.
 
 ## Build behavior
 
-- Build copies post assets to `landing/static/blog/assets/`.
-- Public URLs become `/blog/assets/<filename>`.
+- Build copies post assets to `landing/static/docs/blog/assets/`.
+- Public URLs become `/docs/blog/assets/<filename>`.
 - Keep filenames globally unique to avoid collisions.

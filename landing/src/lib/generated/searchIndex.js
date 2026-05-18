@@ -1,10 +1,10 @@
 export const searchEntries = [
   {
-    "kind": "blog",
+    "kind": "writing",
     "title": "What Codaro is actually building",
     "description": "A public overview of Codaro as an interactive editor runtime for code, learning, and automation.",
-    "url": "/codaro/blog/what-is-codaro",
-    "text": "Codaro is not just another notebook clone Codaro is building a runtime surface where code, guided learning, and automation share one model. The local editor is only one part of the product. The public site explains the concepts, design choices, and workflow decisions behind that runtime. Three layers 1. A document model that can host code, text, and workflow blocks 2. An execution runtime that can run locally or in browser oriented environments 3. A public knowledge surface for docs, changelog style writing, and product reasoning Why keep the public site separate The editor must stay focused on execution and interaction. The public site has different constraints: static delivery SEO friendly docs and blog stable GitHub Pages deployment searchable product writing That is why Codaro keeps separate from the local editor . Public docs are part of the product The public site is not an afterthought. It becomes the surface for: installation guides concept explanations reference pages blog posts that explain runtime decisions Public writing should stay close to the repo Codaro stores blog posts under the root folder and public docs under the root folder. The Svelte public site reads those sources directly at build time. That keeps writing close to the codebase while still producing a static site.",
+    "url": "/codaro/docs/blog/what-is-codaro",
+    "text": "Codaro is not just another notebook clone Codaro is building a runtime surface where code, guided learning, and automation share one model. The local editor is only one part of the product. The public site explains the concepts, design choices, and workflow decisions behind that runtime. Three layers 1. A document model that can host code, text, and workflow blocks 2. An execution runtime that can run locally or in browser oriented environments 3. A docs based public knowledge surface for guides, changelog style writing, and product reasoning Why keep the public site separate The editor must stay focused on execution and interaction. The public site has different constraints: static delivery SEO friendly docs and writing stable GitHub Pages deployment searchable product writing That is why Codaro keeps separate from the local editor . Public docs are part of the product The public site is not an afterthought. It becomes the surface for: installation guides concept explanations reference pages writing that explains runtime decisions Public writing should stay close to the repo Codaro stores public docs, operating notes, and writing under the root folder. The Svelte public site reads those sources directly at build time. That keeps writing close to the codebase while still producing a static site.",
     "category": "product-and-runtime"
   },
   {
@@ -20,7 +20,7 @@ export const searchEntries = [
     "title": "브랜딩 + 프론트 톤",
     "description": "Branding rules for Codaro identity, assets, and product language.",
     "url": "/codaro/docs/skills/ops/branding",
-    "text": "브랜딩 원칙 Codaro는 다른 노트북의 \"대체재\"로 소개하지 않는다. 설명 기준: programmable studio interactive editor runtime code, learning, automation 다른 앱이 올라가는 기반 레이어로 보이게 설계한다. 프론트/브랜드 확정 규칙 Codaro 제품 UI 언어는 영어만 사용한다. index, editor, app mode, docs, blog 모두 영어 기준이다. 모든 공용 컴포넌트 톤은 계열을 기본으로 한다. 공용 UI는 패턴을 기본으로 사용한다. 기본 avatar와 favicon source는 의 첫 번째 왼쪽 pose다. pose sheet source는 , 다. 아바타는 항상 배경 제거 후 캐릭터만 사용한다. 브랜드 자산 경로 source of truth는 다. 색상/반지름/그림자 source of truth는 다. GitHub Pages는 Svelte로 운영한다. 문서와 블로그도 같은 Svelte 기반, 같은 브랜드 톤으로 운영한다.",
+    "text": "브랜딩 원칙 Codaro는 다른 노트북의 \"대체재\"로 소개하지 않는다. 설명 기준: programmable studio interactive editor runtime code, learning, automation 다른 앱이 올라가는 기반 레이어로 보이게 설계한다. 프론트/브랜드 확정 규칙 Codaro 제품 UI 언어는 영어만 사용한다. index, editor, app mode, docs, docs writing 모두 영어 기준이다. 모든 공용 컴포넌트 톤은 계열을 기본으로 한다. 공용 UI는 패턴을 기본으로 사용한다. 기본 avatar와 favicon source는 의 첫 번째 왼쪽 pose다. pose sheet source는 , 다. 아바타는 항상 배경 제거 후 캐릭터만 사용한다. 브랜드 자산 경로 source of truth는 다. 색상/반지름/그림자 source of truth는 다. GitHub Pages는 Svelte로 운영한다. 문서와 글쓰기는 기준의 같은 Svelte 표면에서 운영한다.",
     "category": "branding"
   },
   {
@@ -212,7 +212,7 @@ export const searchEntries = [
     "title": "문서 유지보수 + 세션 이어가기",
     "description": "Documentation and session rules for keeping project context aligned.",
     "url": "/codaro/docs/skills/ops/doc-and-session",
-    "text": "문서 유지보수 원칙 세션 시작 시 와 실제 코드 구조를 대조하고, 낡은 내용이 있으면 즉시 갱신한다. 파일/폴더 추가, 삭제, 이동이 있으면 관련 경로와 구조 설명을 함께 갱신한다. 삭제된 기능이나 파일에 대한 죽은 참조를 남기지 않는다. 세션 이어가기 원칙 세션이 끝나도 다음 세션이 채팅 없이 바로 이어갈 수 있게 현재 결정, 진행 상태, 다음 액션, 남은 검증을 반드시 저장소 문서에 남긴다. 중간 상태의 TODO, blocker, diff는 채팅이 아니라 관련 기능 문서의 체크리스트로 남긴다. 작업이 여러 세션에 걸리면 가장 가까운 (또는 해당 모듈의 SKILL 파일)에 최소한 , , 를 갱신한다. 다음 세션은 먼저 프로젝트 메모리, 그다음 관련 기능 문서, 마지막으로 직전 수정 파일을 읽고 시작한다. 채팅 기록만 믿고 이어가지 않는다. 설계 결정과 남은 작업은 반드시 저장소 안 문서로 고정한다. 코드 변경이 있었는데 문서가 업데이트되지 않았다면 세션 종료 전에 문서를 먼저 맞춘다. 와 동기화 검사는 로 수행한다.",
+    "text": "문서 유지보수 원칙 세션 시작 시 와 실제 코드 구조를 대조하고, 낡은 내용이 있으면 즉시 갱신한다. 파일/폴더 추가, 삭제, 이동이 있으면 관련 경로와 구조 설명을 함께 갱신한다. 삭제된 기능이나 파일에 대한 죽은 참조를 남기지 않는다. GitHub Pages 공개 문서는 를 기준으로 한다. 제품 운영 문서, 아키텍처 결정, API 성격의 설명은 별도 API 문서 트리를 만들지 않고 의 identity/architecture/ops 문서로 관리한다. 공개 글쓰기와 블로그성 콘텐츠는 루트 가 아니라 에 둔다. 공개 URL도 를 기준으로 한다. 세션 이어가기 원칙 세션이 끝나도 다음 세션이 채팅 없이 바로 이어갈 수 있게 현재 결정, 진행 상태, 다음 액션, 남은 검증을 반드시 저장소 문서에 남긴다. 중간 상태의 TODO, blocker, diff는 채팅이 아니라 관련 기능 문서의 체크리스트로 남긴다. 작업이 여러 세션에 걸리면 가장 가까운 (또는 해당 모듈의 SKILL 파일)에 최소한 , , 를 갱신한다. 다음 세션은 먼저 프로젝트 메모리, 그다음 관련 기능 문서, 마지막으로 직전 수정 파일을 읽고 시작한다. 채팅 기록만 믿고 이어가지 않는다. 설계 결정과 남은 작업은 반드시 저장소 안 문서로 고정한다. 코드 변경이 있었는데 문서가 업데이트되지 않았다면 세션 종료 전에 문서를 먼저 맞춘다. 가 로컬 규칙의 SSOT이고, 는 를 먼저 읽으라는 진입점 포인터로 둔다. 포인터 검사는 로 수행한다.",
     "category": "guides"
   },
   {

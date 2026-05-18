@@ -11,9 +11,8 @@
 
   const navDefs = [
     { path: "/", label: "Home" },
-    { path: "/tools", label: "Tools" },
-    { path: "/blog", label: "Blog" },
     { path: "/docs", label: "Docs" },
+    { path: "/tools", label: "Tools" },
     { path: "/search", label: "Search" },
   ];
 
@@ -43,7 +42,7 @@
   <meta name="twitter:title" content="{brand.name} — {brand.tagline}" />
   <meta name="twitter:description" content={brand.description} />
   <meta name="twitter:image" content="{brand.siteUrl}/brand/codaro-character.png" />
-  <link rel="alternate" type="application/atom+xml" title="Codaro Blog" href="{base}/feed.xml" />
+  <link rel="alternate" type="application/atom+xml" title="Codaro Writing" href="{base}/feed.xml" />
   <link rel="canonical" href="{brand.siteUrl}{pathname}" />
   <meta name="theme-color" content="#09090b" />
   {@html `<script type="application/ld+json">${websiteJsonLd}</script>`}

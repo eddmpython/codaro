@@ -23,37 +23,37 @@ whenToUse: 트리거 상황 또는 검색 키워드
 
 ## Identity (11) — 절대 흔들리지 않는 사상
 
-- [transparent-scope-isolation](identity/transparent-scope-isolation.md)
-- [reactive-execution](identity/reactive-execution.md)
-- [percent-format](identity/percent-format.md)
-- [pyodide-first-runtime](identity/pyodide-first-runtime.md)
-- [learning-three-pillars](identity/learning-three-pillars.md)
-- [ai-integration](identity/ai-integration.md)
-- [mounting-and-integration](identity/mounting-and-integration.md)
-- [automation-tasks-reports](identity/automation-tasks-reports.md)
-- [multi-editor-modes](identity/multi-editor-modes.md)
-- [ai-sensory-system](identity/ai-sensory-system.md)
-- [external-channels-mobile](identity/external-channels-mobile.md)
+- [transparent-scope-isolation](skills/identity/transparent-scope-isolation)
+- [reactive-execution](skills/identity/reactive-execution)
+- [percent-format](skills/identity/percent-format)
+- [pyodide-first-runtime](skills/identity/pyodide-first-runtime)
+- [learning-three-pillars](skills/identity/learning-three-pillars)
+- [ai-integration](skills/identity/ai-integration)
+- [mounting-and-integration](skills/identity/mounting-and-integration)
+- [automation-tasks-reports](skills/identity/automation-tasks-reports)
+- [multi-editor-modes](skills/identity/multi-editor-modes)
+- [ai-sensory-system](skills/identity/ai-sensory-system)
+- [external-channels-mobile](skills/identity/external-channels-mobile)
 
 ## Architecture (5) — 5층 구조
 
-- [overview](architecture/overview.md)
-- [document-model](architecture/document-model.md)
-- [execution-engine](architecture/execution-engine.md)
-- [dataflow](architecture/dataflow.md)
-- [widget-bridge](architecture/widget-bridge.md)
+- [overview](skills/architecture/overview)
+- [document-model](skills/architecture/document-model)
+- [execution-engine](skills/architecture/execution-engine)
+- [dataflow](skills/architecture/dataflow)
+- [widget-bridge](skills/architecture/widget-bridge)
 
 ## Ops (9) — 운영 규칙
 
-- [environment](ops/environment.md)
-- [code-quality](ops/code-quality.md)
-- [ai-transparency](ops/ai-transparency.md)
-- [experiment](ops/experiment.md)
-- [branding](ops/branding.md)
-- [git-and-release](ops/git-and-release.md)
-- [packaging](ops/packaging.md)
-- [doc-and-session](ops/doc-and-session.md)
-- [reference-impl](ops/reference-impl.md)
+- [environment](skills/ops/environment)
+- [code-quality](skills/ops/code-quality)
+- [ai-transparency](skills/ops/ai-transparency)
+- [experiment](skills/ops/experiment)
+- [branding](skills/ops/branding)
+- [git-and-release](skills/ops/git-and-release)
+- [packaging](skills/ops/packaging)
+- [doc-and-session](skills/ops/doc-and-session)
+- [reference-impl](skills/ops/reference-impl)
 
 ## 후속 (PR 2 이후)
 

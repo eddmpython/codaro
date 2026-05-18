@@ -1,6 +1,6 @@
-# Codaro Blog Structure
+# Codaro Docs Writing Structure
 
-This blog uses the `category folder -> post folder -> index.md + assets/` pattern.
+Public writing lives under `docs/blog/` and uses the `category folder -> post folder -> index.md + assets/` pattern.
 
 ## Categories
 
@@ -20,7 +20,7 @@ Category numbers are fixed. Add a new number instead of renaming existing catego
 Example:
 
 ```text
-blog/
+docs/blog/
   02-editor-and-notebooks/
     012-cell-shoulder-and-toolbar/
       index.md
@@ -30,8 +30,8 @@ blog/
 ## URL rules
 
 - Category folders do not appear in the public URL.
-- `blog/02-editor-and-notebooks/012-cell-shoulder-and-toolbar/index.md`
-- URL: `/blog/cell-shoulder-and-toolbar`
+- `docs/blog/02-editor-and-notebooks/012-cell-shoulder-and-toolbar/index.md`
+- URL: `/docs/blog/cell-shoulder-and-toolbar`
 
 ## Frontmatter rules
 

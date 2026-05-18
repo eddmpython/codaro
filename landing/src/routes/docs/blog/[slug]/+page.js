@@ -1,5 +1,4 @@
-import { base } from "$app/paths";
-import { redirect } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 import { posts } from "$lib/generated/posts";
 
 export function entries() {
@@ -8,5 +7,8 @@ export function entries() {
 
 export function load({ params }) {
   const post = posts.find((candidate) => candidate.slug === params.slug);
-  throw redirect(308, post ? post.url : `${base}/docs/blog`);
+  if (!post) {
+    throw error(404, "Post not found");
+  }
+  return { post };
 }

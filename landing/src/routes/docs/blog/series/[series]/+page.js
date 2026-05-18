@@ -1,5 +1,4 @@
-import { base } from "$app/paths";
-import { redirect } from "@sveltejs/kit";
+import { error } from "@sveltejs/kit";
 import { postSeries, posts } from "$lib/generated/posts";
 
 export function entries() {
@@ -8,5 +7,11 @@ export function entries() {
 
 export function load({ params }) {
   const series = postSeries.find((entry) => entry.slug === params.series);
-  throw redirect(308, series ? `${base}/docs/blog/series/${series.slug}` : `${base}/docs/blog`);
+  if (!series) {
+    throw error(404, "Series not found");
+  }
+  return {
+    series,
+    posts: posts.filter((post) => post.series === params.series).sort((left, right) => left.seriesOrder - right.seriesOrder),
+  };
 }

@@ -6,8 +6,8 @@ import { marked } from "marked";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..", "..");
-const blogRoot = resolve(projectRoot, "blog");
 const docsRoot = resolve(projectRoot, "docs");
+const blogRoot = resolve(docsRoot, "blog");
 const generatedRoot = resolve(projectRoot, "landing", "src", "lib", "generated");
 const basePath = process.env.NODE_ENV === "development" ? "" : "/codaro";
 
@@ -78,7 +78,7 @@ function collectBlogPosts() {
       }
       const previewValue = String(fileMeta.cardPreview);
       const cardPreview = previewValue.startsWith("./assets/")
-        ? `${basePath}/blog/assets/${previewValue.split("/").pop()}`
+        ? `${basePath}/docs/blog/assets/${previewValue.split("/").pop()}`
         : previewValue;
       posts.push({
         slug,
@@ -88,13 +88,13 @@ function collectBlogPosts() {
         category: String(fileMeta.category),
         categoryLabel: categoryMeta.label,
         categoryFolder: categoryEntry.name,
-        categoryPath: `${basePath}/blog/category/${String(fileMeta.category)}`,
+        categoryPath: `${basePath}/docs/blog/category/${String(fileMeta.category)}`,
         series: String(fileMeta.series),
         seriesOrder: Number(fileMeta.seriesOrder),
         thumbnail: `${basePath}${String(fileMeta.thumbnail)}`,
         cardPreview,
         draft: Boolean(fileMeta.draft),
-        url: `${basePath}/blog/${slug}`,
+        url: `${basePath}/docs/blog/${slug}`,
         html: marked.parse(parsed.content),
         text: stripMarkdown(parsed.content),
       });
@@ -117,6 +117,10 @@ function normalizeDocsPath(filePath) {
 
 function walkDocs(dirPath) {
   const results = [];
+  const relativeDir = toPosix(relative(docsRoot, dirPath));
+  if (relativeDir === "blog" || relativeDir.startsWith("blog/")) {
+    return results;
+  }
   for (const entry of readdirSync(dirPath, { withFileTypes: true })) {
     if (entry.name.startsWith("_")) {
       continue;
@@ -189,7 +193,7 @@ const postCategories = [...new Map(posts.map((post) => [post.category, { slug: p
 const postSeries = [...new Map(posts.map((post) => [post.series, { slug: post.series, label: post.series }])).values()];
 const searchEntries = [
   ...posts.map((post) => ({
-    kind: "blog",
+    kind: "writing",
     title: post.title,
     description: post.description,
     url: post.url,

@@ -36,6 +36,7 @@ launcher/cargo-test.log
 landing/build/
 landing/.svelte-kit/
 landing/static/blog/assets/
+landing/static/docs/blog/assets/
 
 # MkDocs build
 site/

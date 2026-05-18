@@ -4,32 +4,33 @@
 
 Current goals:
 - home
-- blog
 - docs
+- docs writing
 - search
 - feed / sitemap / llms files
 
 Source of truth:
-- blog content: `../blog/`
 - docs content: `../docs/`
+- writing content: `../docs/blog/`
 - brand assets: `../assets/brand/mascot/work/`
 
 Rules:
 - public UI language is English only
 - public tone is zinc-based and calm
 - `landing/` must stay separate from the local editor `editor/`
-- blog asset URLs are flattened to `/blog/assets/*` during build
+- writing asset URLs are flattened to `/docs/blog/assets/*` during build
 - `landing/` is the only shipped public docs surface
-- long-form docs, blog posts, and search must not be embedded back into the IDE as a full docs browser
+- long-form docs, writing, and search must not be embedded back into the IDE as a full docs browser
 - IDE help affordances may link here, but product-internal `DEV.md`, `PRD.md`, `SPEC.md`, and launcher design docs stay out of public navigation
 
 Current State:
 - docs/build/search generation is the only public documentation path
-- `landing/scripts/postbuild.js` now tolerates both `docs.html` and `docs/index.html` static outputs
+- writing is generated from `../docs/blog/` and published under `/docs/blog/...`
+- legacy `/blog/...` routes redirect to `/docs/blog/...`
 - public install docs no longer expose internal launcher design documents by path
 
 Next Action:
-- keep public docs end-user facing and strip any future internal design references from docs/blog content
+- keep public docs end-user facing and strip any future internal design references from docs writing content
 - add link policy review when new docs pages are introduced so internal repo paths do not leak back into generated search or llms files
 
 Verification Left:

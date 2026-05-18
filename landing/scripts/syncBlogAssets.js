@@ -4,8 +4,9 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(__dirname, "..", "..");
-const blogRoot = resolve(projectRoot, "blog");
-const targetRoot = resolve(projectRoot, "landing", "static", "blog", "assets");
+const blogRoot = resolve(projectRoot, "docs", "blog");
+const targetRoot = resolve(projectRoot, "landing", "static", "docs", "blog", "assets");
+const legacyTargetRoot = resolve(projectRoot, "landing", "static", "blog");
 
 function collectPostAssetDirs() {
   const results = [];
@@ -50,6 +51,7 @@ const mode = process.argv[2] || "prepare";
 const assetDirs = collectPostAssetDirs();
 const assetMap = ensureUniqueFilenames(assetDirs);
 
+rmSync(legacyTargetRoot, { recursive: true, force: true });
 rmSync(targetRoot, { recursive: true, force: true });
 mkdirSync(targetRoot, { recursive: true });
 
