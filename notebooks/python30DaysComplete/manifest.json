@@ -28,7 +28,7 @@
       ],
       "forbiddenLabels": [
         "변수",
-        "함수",
+        "직접 만드는 함수",
         "리스트",
         "딕셔너리",
         "import"
@@ -82,7 +82,7 @@
         "딕셔너리",
         "튜플",
         "집합",
-        "함수",
+        "직접 만드는 함수",
         "클래스",
         "import"
       ],
@@ -132,7 +132,7 @@
       "forbiddenLabels": [
         "리스트",
         "딕셔너리",
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day03Operators.ipynb",
@@ -183,7 +183,7 @@
         "슬라이싱",
         "문자열 메서드",
         "리스트",
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day04Stringbasics.ipynb",
@@ -222,7 +222,7 @@
       "forbiddenLabels": [
         "문자열 메서드",
         "리스트",
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day05Stringindexingslicing.ipynb",
@@ -269,7 +269,7 @@
       ],
       "forbiddenLabels": [
         "리스트 메서드",
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day06Stringmethods.ipynb",
@@ -318,7 +318,7 @@
         "튜플",
         "딕셔너리",
         "집합",
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day07Listbasics.ipynb",
@@ -367,7 +367,7 @@
         "튜플",
         "딕셔너리",
         "집합",
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day08Listmethods.ipynb",
@@ -406,7 +406,7 @@
       "forbiddenLabels": [
         "딕셔너리",
         "집합",
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day09Tuples.ipynb",
@@ -451,7 +451,7 @@
       ],
       "forbiddenLabels": [
         "딕셔너리",
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day10Sets.ipynb",
@@ -492,7 +492,7 @@
       ],
       "forbiddenLabels": [
         "딕셔너리 메서드",
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day11Dictbasics.ipynb",
@@ -533,7 +533,7 @@
         "import"
       ],
       "forbiddenLabels": [
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day12Dictmethods.ipynb",
@@ -571,7 +571,7 @@
         "import"
       ],
       "forbiddenLabels": [
-        "함수",
+        "직접 만드는 함수",
         "반복문",
         "import"
       ],
@@ -613,7 +613,7 @@
         "import"
       ],
       "forbiddenLabels": [
-        "함수",
+        "직접 만드는 함수",
         "import"
       ],
       "colab": "colab/day14Loops.ipynb",

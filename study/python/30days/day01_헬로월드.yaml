@@ -13,7 +13,7 @@ intro:
   emoji: "👋"
   points:
   - "파이썬 프로그램 실행 방법"
-  - "print() 함수로 텍스트 출력하기"
+  - "print()로 텍스트 출력하기"
   - "한 줄 주석과 여러 줄 설명 메모"
   - "코드 작성 시 주석의 중요성"
 
@@ -23,16 +23,16 @@ sections:
   subtitle: "첫 파이썬 프로그램"
   blocks:
   - type: text
-    content: "모든 프로그래밍 언어를 배울 때 가장 먼저 하는 것이 'Hello World'를 출력하는 것입니다. 이는 1970년대부터 이어져 온 전통으로, 프로그램이 제대로 실행되는지 확인하는 가장 간단한 방법입니다. 파이썬에서는 print() 함수를 사용하여 화면에 텍스트를 출력합니다."
+    content: "프로그래밍을 처음 배울 때는 보통 'Hello World'를 화면에 출력합니다. 코드가 제대로 실행되는지 가장 작게 확인할 수 있기 때문입니다. 파이썬에서는 print()를 사용해 화면에 텍스트를 보여줍니다."
   - type: list
     items:
-    - "print() 함수로 텍스트 출력"
+    - "print()로 텍스트 출력"
     - "작은따옴표 또는 큰따옴표로 문자 감싸기"
-    - "프로그래밍의 전통적인 첫 단계"
+    - "코드 실행 결과를 눈으로 확인하기"
   - type: code
     language: python
     title: "Hello World 출력"
-    description: "print() 함수로 'Hello World'를 출력합니다."
+    description: "print()로 'Hello World'를 출력합니다."
     content: |-
       print('Hello World')
   - type: tip
@@ -43,11 +43,11 @@ sections:
   subtitle: "파이썬은 모든 언어 지원"
   blocks:
   - type: text
-    content: "파이썬은 유니코드(Unicode)를 지원하므로 영어뿐만 아니라 한글, 일본어, 중국어 등 모든 언어를 출력할 수 있습니다. 유니코드는 전 세계 모든 문자를 컴퓨터에서 표현할 수 있도록 만든 국제 표준입니다."
+    content: "파이썬은 영어뿐만 아니라 한글, 일본어, 중국어처럼 여러 언어의 글자를 출력할 수 있습니다. 지금은 어려운 원리를 외울 필요 없이, 따옴표 안에 넣은 글자가 화면에 보인다고 이해하면 됩니다."
   - type: list
     items:
     - "한글, 영어, 일본어 등 모든 언어 출력 가능"
-    - "유니코드 완벽 지원"
+    - "따옴표 안의 글자가 그대로 화면에 보임"
     - "이모지도 출력 가능"
   - type: code
     language: python
@@ -63,7 +63,7 @@ sections:
   subtitle: "print() 여러 번 사용"
   blocks:
   - type: text
-    content: "여러 줄의 텍스트를 출력하려면 print() 함수를 여러 번 사용하면 됩니다. 각 print()는 자동으로 줄바꿈을 하므로 다음 출력은 새 줄에서 시작됩니다."
+    content: "여러 줄의 텍스트를 출력하려면 print()를 여러 번 사용하면 됩니다. 각 print()는 자동으로 줄을 바꾸므로 다음 출력은 새 줄에서 시작됩니다."
   - type: list
     items:
     - "print() 여러 번 사용하여 여러 줄 출력"
@@ -187,7 +187,7 @@ sections:
   subtitle: "print 없이 표현식만 쓰기"
   blocks:
   - type: text
-    content: "Colab과 marimo 같은 노트북 환경에서는 셀의 마지막 줄에 값이 있으면 화면에 자동으로 보입니다. 표현식(Expression)이란 값을 만들어내는 코드 조각입니다. 처음에는 print()를 주로 쓰되, 마지막 줄 값도 확인해보세요."
+    content: "Colab과 marimo 같은 노트북 환경에서는 셀의 마지막 줄에 값이 있으면 화면에 자동으로 보입니다. 처음에는 print()를 주로 쓰되, 마지막 줄에 값만 놓았을 때도 화면에 보일 수 있다는 점을 확인해보세요."
   - type: list
     items:
     - "노트북에서는 마지막 줄 값이 자동으로 보일 수 있음"
@@ -205,7 +205,7 @@ sections:
   subtitle: "Hello World와 주석 마스터하기"
   blocks:
   - type: text
-    content: "Day 1에서 배운 print() 함수와 주석을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
+    content: "Day 1에서 배운 print() 출력과 주석을 난이도별로 복습합니다. 기본 미션부터 시작하여 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다."
 
   - type: expansion
     title: "🟢 기본1: Hello World 출력"

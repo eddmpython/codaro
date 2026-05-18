@@ -41,6 +41,28 @@ LEGACY_TEXT = [
     "Marimo에서 자동 출력",
     "Marimo로 계산",
     "assert ",
+    "print() 함수",
+    "유니코드(Unicode)",
+    "표현식(Expression)",
+]
+REQUIRED_DESIGN_TEXT_KEYS = [
+    "objective",
+    "whyItMatters",
+    "mentalModel",
+    "beforeCoding",
+    "duringCoding",
+    "practiceFocus",
+    "debugRoutine",
+]
+REQUIRED_DESIGN_LIST_KEYS = ["exitTicket", "commonMistakes"]
+REQUIRED_NOTEBOOK_SECTIONS = [
+    "## 오늘의 목표",
+    "## 왜 중요한가",
+    "## 생각 모델",
+    "## 오늘의 학습 전략",
+    "## 오늘의 범위",
+    "## 완료 기준",
+    "## 흔한 막힘",
 ]
 
 
@@ -108,6 +130,42 @@ def validateConceptLabels(curriculum: dict[str, object]) -> None:
     assertCondition(not leaked, f"learner docs expose internal concept tokens: {leaked}")
 
 
+def validatePedagogy(curriculum: dict[str, object]) -> None:
+    pedagogy = curriculum.get("pedagogy", {})
+    assertCondition(isinstance(pedagogy, dict), "curriculum pedagogy must be an object")
+    promise = pedagogy.get("promise", "")
+    assertCondition(isinstance(promise, str) and len(promise.strip()) >= 20, "pedagogy promise is too thin")
+    for key in ["learningCycle", "qualityBars"]:
+        values = pedagogy.get(key, [])
+        assertCondition(isinstance(values, list) and len(values) >= 4, f"pedagogy {key} must have enough items")
+        for value in values:
+            assertCondition(isinstance(value, str) and value.strip(), f"pedagogy {key} has an empty item")
+
+
+def validateLearningDesign(dayEntry: dict[str, object]) -> dict[str, object]:
+    design = dayEntry.get("learningDesign", {})
+    day = dayEntry.get("day", "?")
+    assertCondition(isinstance(design, dict), f"day {day} learningDesign must be an object")
+    for key in REQUIRED_DESIGN_TEXT_KEYS:
+        value = design.get(key, "")
+        assertCondition(isinstance(value, str) and len(value.strip()) >= 12, f"day {day} {key} is too thin")
+    for key in REQUIRED_DESIGN_LIST_KEYS:
+        values = design.get(key, [])
+        assertCondition(isinstance(values, list) and len(values) >= 3, f"day {day} {key} needs at least 3 items")
+        for value in values:
+            assertCondition(isinstance(value, str) and value.strip(), f"day {day} {key} has an empty item")
+    return design
+
+
+def validateCurriculumDesign(curriculum: dict[str, object]) -> None:
+    validatePedagogy(curriculum)
+    dayEntries = curriculum.get("days", [])
+    assertCondition(isinstance(dayEntries, list), "curriculum days must be a list")
+    for dayEntry in dayEntries:
+        assertCondition(isinstance(dayEntry, dict), "curriculum day must be an object")
+        validateLearningDesign(dayEntry)
+
+
 def validateManifest(curriculum: dict[str, object]) -> None:
     manifest = loadJson(ROOT / "manifest.json")
     assertCondition(manifest.get("source") == "study/python/30days/curriculum.json", "manifest source mismatch")
@@ -135,7 +193,7 @@ def validateNoLegacyText(path: Path, text: str) -> None:
     assertCondition(not hits, f"{path.name} contains legacy notebook text: {hits}")
 
 
-def validateNotebookAgainstYaml(path: Path, sourceYaml: Path) -> None:
+def validateNotebookAgainstYaml(path: Path, sourceYaml: Path, dayEntry: dict[str, object]) -> None:
     notebook = loadNotebook(path)
     cells = notebook.get("cells", [])
     assertCondition(isinstance(cells, list), f"{path.name} cells must be a list")
@@ -143,11 +201,22 @@ def validateNotebookAgainstYaml(path: Path, sourceYaml: Path) -> None:
     yamlContent = loadYaml(sourceYaml)
     markdownText = "\n".join(readCellSource(cell) for cell in cells if cell.get("cell_type") == "markdown")
     codeText = "\n".join(readCellSource(cell) for cell in cells if cell.get("cell_type") == "code")
+    design = validateLearningDesign(dayEntry)
     validateNoLegacyText(path, markdownText + "\n" + codeText)
     assertCondition(
         str(sourceYaml.relative_to(REPO_ROOT)).replace("\\", "/") in markdownText, f"{path.name} missing YAML source"
     )
-    assertCondition("## 오늘의 범위" in markdownText, f"{path.name} missing concept policy")
+    for sectionName in REQUIRED_NOTEBOOK_SECTIONS:
+        assertCondition(sectionName in markdownText, f"{path.name} missing section: {sectionName}")
+    for key in REQUIRED_DESIGN_TEXT_KEYS:
+        assertCondition(str(design[key]) in markdownText, f"{path.name} missing learning design text: {key}")
+    for key in REQUIRED_DESIGN_LIST_KEYS:
+        for item in design[key]:
+            assertCondition(str(item) in markdownText, f"{path.name} missing learning design item: {item}")
+    codeBlockCount = countBlocks(yamlContent, "code")
+    assertCondition(markdownText.count("**실행 전**") >= codeBlockCount, f"{path.name} missing pre-run prompts")
+    assertCondition(markdownText.count("**실행 후**") >= codeBlockCount, f"{path.name} missing post-run prompts")
+    assertCondition("**막히면**" in markdownText, f"{path.name} missing practice recovery prompt")
     for section in yamlContent.get("sections", []):
         title = str(section.get("title", "")).strip()
         if title:
@@ -244,6 +313,7 @@ def main() -> None:
     assertCondition(isinstance(dayEntries, list), "curriculum days must be a list")
     assertCondition(len(dayEntries) == 30, "curriculum must list exactly 30 days")
     validateDocs()
+    validateCurriculumDesign(curriculum)
     validateConceptLabels(curriculum)
     validateManifest(curriculum)
     for dayEntry in dayEntries:
@@ -254,7 +324,7 @@ def main() -> None:
         manifestDay = manifestDays[day - 1]
         colabPath = ROOT / str(manifestDay["colab"])
         marimoPath = ROOT / str(manifestDay["marimo"])
-        validateNotebookAgainstYaml(colabPath, sourceYaml)
+        validateNotebookAgainstYaml(colabPath, sourceYaml, dayEntry)
         validateMarimoNotebook(marimoPath, sourceYaml)
     reviewNotebooks = sorted(COLAB_DIR.glob("review*.ipynb"))
     assertCondition(len(reviewNotebooks) == 6, "notebooks directory must contain exactly 6 review notebooks")

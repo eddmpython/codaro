@@ -19,6 +19,7 @@ BRANCH = "main"
 COURSE_PATH = "notebooks/python30DaysComplete"
 REVIEW_RANGES = [(1, 5), (6, 10), (11, 15), (16, 20), (21, 25), (26, 30)]
 CONCEPT_LABELS: dict[str, str] = {}
+COURSE_PEDAGOGY: dict[str, object] = {}
 
 OUTPUT_STEMS = {
     1: "day01Helloworld",
@@ -90,6 +91,14 @@ def setConceptLabels(curriculum: dict[str, object]) -> None:
     CONCEPT_LABELS = {str(key): str(value) for key, value in rawLabels.items()}
 
 
+def setCoursePedagogy(curriculum: dict[str, object]) -> None:
+    global COURSE_PEDAGOGY
+    rawPedagogy = curriculum.get("pedagogy", {})
+    if not isinstance(rawPedagogy, dict):
+        raise TypeError("curriculum pedagogy must be an object")
+    COURSE_PEDAGOGY = rawPedagogy
+
+
 def conceptLabel(concept: object) -> str:
     token = str(concept)
     return CONCEPT_LABELS.get(token, token.replace("_", " "))
@@ -140,6 +149,28 @@ def codeFence(source: str) -> str:
     return f"```python\n{cleanCode(source).rstrip()}\n```"
 
 
+def markdownList(items: object) -> str:
+    if not isinstance(items, list) or not items:
+        return "- 없음"
+    return "\n".join(f"- {item}" for item in items)
+
+
+def learningDesign(dayEntry: dict[str, object]) -> dict[str, object]:
+    rawDesign = dayEntry.get("learningDesign", {})
+    if not isinstance(rawDesign, dict):
+        return {}
+    return rawDesign
+
+
+def designText(dayEntry: dict[str, object], key: str, fallback: str) -> str:
+    value = learningDesign(dayEntry).get(key, fallback)
+    return str(value).strip() or fallback
+
+
+def designList(dayEntry: dict[str, object], key: str) -> str:
+    return markdownList(learningDesign(dayEntry).get(key, []))
+
+
 def makeIntroMarkdown(dayEntry: dict[str, object], content: dict[str, object]) -> str:
     meta = content.get("meta", {})
     intro = content.get("intro", {})
@@ -152,6 +183,18 @@ def makeIntroMarkdown(dayEntry: dict[str, object], content: dict[str, object]) -
 
         이 노트북은 `study/python/30days/{dayEntry["file"]}` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
 
+        ## 오늘의 목표
+
+        {designText(dayEntry, "objective", "오늘의 새 개념을 작은 코드로 직접 실행하고 설명합니다.")}
+
+        ## 왜 중요한가
+
+        {designText(dayEntry, "whyItMatters", "이 개념은 이후 Day의 예제와 프로젝트를 이해하는 기초가 됩니다.")}
+
+        ## 생각 모델
+
+        {designText(dayEntry, "mentalModel", "코드를 한 줄씩 읽고, 각 줄이 어떤 값을 만드는지 확인합니다.")}
+
         ## 오늘 배우는 것
 
         {pointLines}
@@ -162,6 +205,19 @@ def makeIntroMarkdown(dayEntry: dict[str, object], content: dict[str, object]) -
         2. 바로 아래 코드 셀을 실행합니다.
         3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
         4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
+        """
+    )
+
+
+def makeStudyRoutineMarkdown(dayEntry: dict[str, object]) -> str:
+    return cleanMarkdown(
+        f"""
+        ## 오늘의 학습 전략
+
+        - 코딩 전: {designText(dayEntry, "beforeCoding", "코드를 실행하기 전에 결과를 먼저 예상합니다.")}
+        - 실행 중: {designText(dayEntry, "duringCoding", "한 번에 하나의 셀만 실행하고 결과가 생긴 위치를 확인합니다.")}
+        - 연습 초점: {designText(dayEntry, "practiceFocus", "예제를 그대로 외우지 말고 이름과 값을 바꿔 다시 작성합니다.")}
+        - 막히면: {designText(dayEntry, "debugRoutine", "마지막으로 고친 한 줄부터 다시 보고, 에러 메시지의 첫 줄을 천천히 읽습니다.")}
         """
     )
 
@@ -214,6 +270,8 @@ def appendCodeBlock(cells: list[dict[str, object]], block: dict[str, object]) ->
         parts.append(f"### {title}")
     if description:
         parts.append(description)
+    parts.append("**실행 전**: 코드에서 값, 이름, 기호를 하나씩 짚고 어떤 결과가 나올지 먼저 예상하세요.")
+    parts.append("**실행 후**: 실제 결과가 어느 줄에서 만들어졌는지 한 문장으로 설명하세요.")
     if parts:
         cells.append(makeMarkdownCell("\n\n".join(parts)))
     cells.append(makeCodeCell(str(block.get("content", ""))))
@@ -226,7 +284,13 @@ def appendExpansionBlock(cells: list[dict[str, object]], block: dict[str, object
             f"""
             ### 연습: {title}
 
-            아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+            **목표**: 예제를 외우지 않고 같은 구조의 코드를 직접 작성합니다.
+
+            **조건**: 오늘의 범위 안에서 해결합니다. 아직 배우지 않은 문법을 검색해서 붙여 넣지 않습니다.
+
+            **막히면**: 바로 위 예제의 값과 이름만 바꿔 가장 작은 버전부터 실행합니다.
+
+            **완료 확인**: 실행 오류가 없고, 결과가 왜 그렇게 나왔는지 한 문장으로 설명할 수 있어야 합니다.
             """
         )
     )
@@ -248,6 +312,7 @@ def makeNotebook(dayEntry: dict[str, object], content: dict[str, object]) -> dic
     cells = [
         makeMarkdownCell(makeIntroMarkdown(dayEntry, content)),
         makeMarkdownCell(makeConceptPolicyMarkdown(dayEntry)),
+        makeMarkdownCell(makeStudyRoutineMarkdown(dayEntry)),
     ]
     for section in content.get("sections", []):
         title = str(section.get("title", "")).strip()
@@ -261,7 +326,15 @@ def makeNotebook(dayEntry: dict[str, object], content: dict[str, object]) -> dic
             appendBlockCells(cells, block)
     cells.append(
         makeMarkdownCell(
-            """
+            f"""
+            ## 완료 기준
+
+            {designList(dayEntry, "exitTicket")}
+
+            ## 흔한 막힘
+
+            {designList(dayEntry, "commonMistakes")}
+
             ## 마무리
 
             오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
@@ -556,20 +629,22 @@ def writeManifest(dayEntries: list[dict[str, object]]) -> None:
 
 def writeReadme(dayEntries: list[dict[str, object]]) -> None:
     rows = []
+    learningCycle = markdownList(COURSE_PEDAGOGY.get("learningCycle", []))
+    promise = str(COURSE_PEDAGOGY.get("promise", "")).strip()
     for entry in dayEntries:
         day = int(entry["day"])
         newConcepts = formatConcepts(entry.get("newConcepts", []))
         rows.append(
             f"| {day:02d} | {entry['title']} | {newConcepts} | "
             f"[Colab 열기]({colabUrl('colab/' + colabName(day))}) | "
-            f"[molab 열기]({molabUrl('marimo/' + marimoName(day))}) |"
+            f"[marimo 열기]({molabUrl('marimo/' + marimoName(day))}) |"
         )
     reviewRows = []
     for startDay, endDay in REVIEW_RANGES:
         reviewRows.append(
             f"| Day {startDay:02d}-{endDay:02d} | 누적 복습 | "
             f"[Colab 열기]({colabUrl('colab/' + reviewNotebookName(startDay, endDay))}) | "
-            f"[molab 열기]({molabUrl('marimo/' + reviewNotebookName(startDay, endDay).replace('.ipynb', '.py'))}) |"
+            f"[marimo 열기]({molabUrl('marimo/' + reviewNotebookName(startDay, endDay).replace('.ipynb', '.py'))}) |"
         )
     content = f"""
     # Python 30일 완성
@@ -577,14 +652,13 @@ def writeReadme(dayEntries: list[dict[str, object]]) -> None:
     이 폴더의 노트북은 `study/python/30days` YAML 커리큘럼을 원본으로 생성한 배포용 산출물입니다. 노트북 안에는 원본 YAML의 설명, 예제 코드, 연습 미션이 순서대로 들어 있습니다.
 
     [![Open Day 01 in Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colabUrl("colab/day01Helloworld.ipynb")})
-    [![Open Day 01 in molab](https://img.shields.io/badge/Day_01-open_in_molab-ff5a5f)]({molabUrl("marimo/day01Helloworld.py")})
+    [![Open Day 01 in marimo](https://img.shields.io/badge/Day_01-open_in_marimo-ff5a5f)]({molabUrl("marimo/day01Helloworld.py")})
 
     ## 학습 방식
 
-    1. 설명을 읽고 바로 아래 예제 코드를 실행합니다.
-    2. 출력이 왜 그렇게 나오는지 말로 설명합니다.
-    3. 연습 셀은 비워져 있으므로 직접 다시 작성합니다.
-    4. 다음 Day로 넘어가기 전에 같은 예제를 다른 값으로 한 번 바꿔봅니다.
+    {promise}
+
+    {learningCycle}
 
     ## 전체 Day
 
@@ -603,6 +677,8 @@ def writeReadme(dayEntries: list[dict[str, object]]) -> None:
 
 def writeCourseGuide(dayEntries: list[dict[str, object]]) -> None:
     dayRows = []
+    promise = str(COURSE_PEDAGOGY.get("promise", "")).strip()
+    qualityBars = markdownList(COURSE_PEDAGOGY.get("qualityBars", []))
     for entry in dayEntries:
         day = int(entry["day"])
         forbidden = formatConcepts(entry.get("forbidden", []))
@@ -623,10 +699,16 @@ def writeCourseGuide(dayEntries: list[dict[str, object]]) -> None:
 
     ## 설계 기준
 
+    {promise}
+
     - Day별 학습 범위를 SSOT의 개념 라벨로 노트북 상단에 표시한다.
     - 예제 코드는 원본 YAML의 `code` 블록을 그대로 사용한다.
     - 연습 미션은 원본 YAML의 `expansion` 블록에서 오며, 노트북에서는 학습자가 직접 작성하도록 빈 셀로 둔다.
     - 초보자에게 불필요한 채점형 장치나 숨은 예상 답변 확인 흐름을 넣지 않는다.
+
+    ## 품질 기준
+
+    {qualityBars}
 
     ## Day 목록
 
@@ -640,6 +722,7 @@ def writeCourseGuide(dayEntries: list[dict[str, object]]) -> None:
 def main() -> None:
     curriculum = loadCurriculum()
     setConceptLabels(curriculum)
+    setCoursePedagogy(curriculum)
     dayEntries = list(curriculum.get("days", []))
     writeDayNotebooks(dayEntries)
     writeReviewNotebooks(dayEntries)
