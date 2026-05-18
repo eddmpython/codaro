@@ -1,6 +1,6 @@
 # Python 30일 완성
 
-이 폴더의 노트북은 `study/python/30days` YAML 커리큘럼을 원본으로 생성한 배포용 산출물입니다. 노트북 안에는 원본 YAML의 설명, 예제 코드, 연습 미션이 순서대로 들어 있습니다.
+이 폴더의 노트북은 `curricula/python/30days` YAML 커리큘럼을 원본으로 생성한 배포용 산출물입니다. 노트북 안에는 원본 YAML의 설명, 예제 코드, 연습 미션이 순서대로 들어 있습니다.
 
 [![Open Day 01 in Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb)
 [![Open Day 01 in marimo](https://img.shields.io/badge/Day_01-open_in_marimo-ff5a5f)](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day01Helloworld.py)

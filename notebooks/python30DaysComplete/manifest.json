@@ -1,12 +1,12 @@
 {
   "title": "Python 30일 완성",
-  "source": "study/python/30days/curriculum.json",
-  "description": "study/python/30days YAML을 원본으로 생성한 Colab 및 marimo 학습 노트북",
+  "source": "curricula/python/30days/curriculum.json",
+  "description": "curricula/python/30days YAML을 원본으로 생성한 Colab 및 marimo 학습 노트북",
   "days": [
     {
       "day": 1,
       "title": "헬로월드",
-      "sourceYaml": "study/python/30days/day01_헬로월드.yaml",
+      "sourceYaml": "curricula/python/30days/day01_헬로월드.yaml",
       "allowedConcepts": [],
       "allowedConceptLabels": [],
       "newConcepts": [
@@ -39,7 +39,7 @@
     {
       "day": 2,
       "title": "변수와 데이터 타입",
-      "sourceYaml": "study/python/30days/day02_변수와데이터타입.yaml",
+      "sourceYaml": "curricula/python/30days/day02_변수와데이터타입.yaml",
       "allowedConcepts": [
         "print",
         "comment",
@@ -92,7 +92,7 @@
     {
       "day": 3,
       "title": "연산자",
-      "sourceYaml": "study/python/30days/day03_연산자.yaml",
+      "sourceYaml": "curricula/python/30days/day03_연산자.yaml",
       "allowedConcepts": [
         "variable",
         "int",
@@ -141,7 +141,7 @@
     {
       "day": 4,
       "title": "문자열 기초",
-      "sourceYaml": "study/python/30days/day04_문자열기초.yaml",
+      "sourceYaml": "curricula/python/30days/day04_문자열기초.yaml",
       "allowedConcepts": [
         "variable",
         "type",
@@ -192,7 +192,7 @@
     {
       "day": 5,
       "title": "문자열 인덱싱/슬라이싱",
-      "sourceYaml": "study/python/30days/day05_문자열인덱싱슬라이싱.yaml",
+      "sourceYaml": "curricula/python/30days/day05_문자열인덱싱슬라이싱.yaml",
       "allowedConcepts": [
         "string_basic",
         "operator"
@@ -231,7 +231,7 @@
     {
       "day": 6,
       "title": "문자열 메서드",
-      "sourceYaml": "study/python/30days/day06_문자열메서드.yaml",
+      "sourceYaml": "curricula/python/30days/day06_문자열메서드.yaml",
       "allowedConcepts": [
         "string_basic",
         "indexing",
@@ -278,7 +278,7 @@
     {
       "day": 7,
       "title": "리스트 기초",
-      "sourceYaml": "study/python/30days/day07_리스트기초.yaml",
+      "sourceYaml": "curricula/python/30days/day07_리스트기초.yaml",
       "allowedConcepts": [
         "string_all",
         "operator",
@@ -327,7 +327,7 @@
     {
       "day": 8,
       "title": "리스트 메서드",
-      "sourceYaml": "study/python/30days/day08_리스트메서드.yaml",
+      "sourceYaml": "curricula/python/30days/day08_리스트메서드.yaml",
       "allowedConcepts": [
         "list_basic"
       ],
@@ -376,7 +376,7 @@
     {
       "day": 9,
       "title": "튜플",
-      "sourceYaml": "study/python/30days/day09_튜플.yaml",
+      "sourceYaml": "curricula/python/30days/day09_튜플.yaml",
       "allowedConcepts": [
         "list_all",
         "string_all"
@@ -415,7 +415,7 @@
     {
       "day": 10,
       "title": "집합",
-      "sourceYaml": "study/python/30days/day10_집합.yaml",
+      "sourceYaml": "curricula/python/30days/day10_집합.yaml",
       "allowedConcepts": [
         "list_all",
         "tuple"
@@ -460,7 +460,7 @@
     {
       "day": 11,
       "title": "딕셔너리 기초",
-      "sourceYaml": "study/python/30days/day11_딕셔너리기초.yaml",
+      "sourceYaml": "curricula/python/30days/day11_딕셔너리기초.yaml",
       "allowedConcepts": [
         "list_all",
         "tuple",
@@ -501,7 +501,7 @@
     {
       "day": 12,
       "title": "딕셔너리 메서드",
-      "sourceYaml": "study/python/30days/day12_딕셔너리메서드.yaml",
+      "sourceYaml": "curricula/python/30days/day12_딕셔너리메서드.yaml",
       "allowedConcepts": [
         "dict_basic"
       ],
@@ -542,7 +542,7 @@
     {
       "day": 13,
       "title": "조건문",
-      "sourceYaml": "study/python/30days/day13_조건문.yaml",
+      "sourceYaml": "curricula/python/30days/day13_조건문.yaml",
       "allowedConcepts": [
         "all_data_types",
         "all_operators"
@@ -581,7 +581,7 @@
     {
       "day": 14,
       "title": "반복문",
-      "sourceYaml": "study/python/30days/day14_반복문.yaml",
+      "sourceYaml": "curricula/python/30days/day14_반복문.yaml",
       "allowedConcepts": [
         "all_data_types",
         "conditional"
@@ -622,7 +622,7 @@
     {
       "day": 15,
       "title": "함수 기초",
-      "sourceYaml": "study/python/30days/day15_함수기초.yaml",
+      "sourceYaml": "curricula/python/30days/day15_함수기초.yaml",
       "allowedConcepts": [
         "all_data_types",
         "conditional",
@@ -663,7 +663,7 @@
     {
       "day": 16,
       "title": "함수 고급",
-      "sourceYaml": "study/python/30days/day16_함수고급.yaml",
+      "sourceYaml": "curricula/python/30days/day16_함수고급.yaml",
       "allowedConcepts": [
         "function_basic"
       ],
@@ -700,7 +700,7 @@
     {
       "day": 17,
       "title": "스코프와 클로저",
-      "sourceYaml": "study/python/30days/day17_스코프와클로저.yaml",
+      "sourceYaml": "curricula/python/30days/day17_스코프와클로저.yaml",
       "allowedConcepts": [
         "function_all"
       ],
@@ -733,7 +733,7 @@
     {
       "day": 18,
       "title": "모듈과 import",
-      "sourceYaml": "study/python/30days/day18_모듈과import.yaml",
+      "sourceYaml": "curricula/python/30days/day18_모듈과import.yaml",
       "allowedConcepts": [
         "function_all"
       ],
@@ -774,7 +774,7 @@
     {
       "day": 19,
       "title": "파일 입출력",
-      "sourceYaml": "study/python/30days/day19_파일입출력.yaml",
+      "sourceYaml": "curricula/python/30days/day19_파일입출력.yaml",
       "allowedConcepts": [
         "function_all",
         "import"
@@ -813,7 +813,7 @@
     {
       "day": 20,
       "title": "예외 처리",
-      "sourceYaml": "study/python/30days/day20_예외처리.yaml",
+      "sourceYaml": "curricula/python/30days/day20_예외처리.yaml",
       "allowedConcepts": [
         "function_all",
         "import",
@@ -852,7 +852,7 @@
     {
       "day": 21,
       "title": "중간 종합 복습",
-      "sourceYaml": "study/python/30days/day21_중간종합복습.yaml",
+      "sourceYaml": "curricula/python/30days/day21_중간종합복습.yaml",
       "allowedConcepts": [
         "everything_before"
       ],
@@ -873,7 +873,7 @@
     {
       "day": 22,
       "title": "클래스 기초",
-      "sourceYaml": "study/python/30days/day22_클래스기초.yaml",
+      "sourceYaml": "curricula/python/30days/day22_클래스기초.yaml",
       "allowedConcepts": [
         "function_all",
         "import",
@@ -916,7 +916,7 @@
     {
       "day": 23,
       "title": "클래스 고급",
-      "sourceYaml": "study/python/30days/day23_클래스고급.yaml",
+      "sourceYaml": "curricula/python/30days/day23_클래스고급.yaml",
       "allowedConcepts": [
         "class_basic"
       ],
@@ -949,7 +949,7 @@
     {
       "day": 24,
       "title": "특수 메서드",
-      "sourceYaml": "study/python/30days/day24_특수메서드.yaml",
+      "sourceYaml": "curricula/python/30days/day24_특수메서드.yaml",
       "allowedConcepts": [
         "class_all"
       ],
@@ -986,7 +986,7 @@
     {
       "day": 25,
       "title": "프로퍼티와 데코레이터",
-      "sourceYaml": "study/python/30days/day25_프로퍼티와데코레이터.yaml",
+      "sourceYaml": "curricula/python/30days/day25_프로퍼티와데코레이터.yaml",
       "allowedConcepts": [
         "class_all",
         "special_method"
@@ -1025,7 +1025,7 @@
     {
       "day": 26,
       "title": "컴프리헨션",
-      "sourceYaml": "study/python/30days/day26_컴프리헨션.yaml",
+      "sourceYaml": "curricula/python/30days/day26_컴프리헨션.yaml",
       "allowedConcepts": [
         "all_basic",
         "loop",
@@ -1062,7 +1062,7 @@
     {
       "day": 27,
       "title": "제너레이터와 이터레이터",
-      "sourceYaml": "study/python/30days/day27_제너레이터와이터레이터.yaml",
+      "sourceYaml": "curricula/python/30days/day27_제너레이터와이터레이터.yaml",
       "allowedConcepts": [
         "function_all",
         "class_all",
@@ -1099,7 +1099,7 @@
     {
       "day": 28,
       "title": "고급 문법 종합",
-      "sourceYaml": "study/python/30days/day28_고급문법종합.yaml",
+      "sourceYaml": "curricula/python/30days/day28_고급문법종합.yaml",
       "allowedConcepts": [
         "everything"
       ],
@@ -1128,7 +1128,7 @@
     {
       "day": 29,
       "title": "알고리즘 연습",
-      "sourceYaml": "study/python/30days/day29_알고리즘연습.yaml",
+      "sourceYaml": "curricula/python/30days/day29_알고리즘연습.yaml",
       "allowedConcepts": [
         "everything"
       ],
@@ -1157,7 +1157,7 @@
     {
       "day": 30,
       "title": "최종 프로젝트",
-      "sourceYaml": "study/python/30days/day30_최종프로젝트.yaml",
+      "sourceYaml": "curricula/python/30days/day30_최종프로젝트.yaml",
       "allowedConcepts": [
         "everything"
       ],

@@ -19,11 +19,10 @@ const blogCategoryMeta = new Map([
 ]);
 
 const docsSectionMeta = new Map([
-  ["getting-started", "Getting Started"],
-  ["concepts", "Concepts"],
-  ["guides", "Guides"],
-  ["reference", "Reference"],
-  ["branding", "Branding"],
+  ["skills", "Skills"],
+  ["identity", "Identity"],
+  ["architecture", "Architecture"],
+  ["ops", "Operations"],
 ]);
 
 function toPosix(value) {
@@ -150,14 +149,18 @@ function collectDocsPages() {
       }
     }
     const path = normalizeDocsPath(filePath);
+    const isSkillPage = path === "skills" || path.startsWith("skills/");
+    const rawSection = String(fileMeta.section);
+    const skillCategory = fileMeta.category ? String(fileMeta.category) : "";
+    const section = isSkillPage && skillCategory ? skillCategory : rawSection;
     const slugSegments = path ? path.split("/") : [];
     pages.push({
       path,
       slugSegments,
       title: String(fileMeta.title),
       description: String(fileMeta.description),
-      section: String(fileMeta.section),
-      sectionLabel: docsSectionMeta.get(String(fileMeta.section)) || String(fileMeta.section),
+      section,
+      sectionLabel: docsSectionMeta.get(section) || section,
       order: Number(fileMeta.order),
       draft: Boolean(fileMeta.draft),
       url: path ? `${basePath}/docs/${path}` : `${basePath}/docs`,

@@ -11,7 +11,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SOURCE_ROOT = REPO_ROOT / "study" / "python" / "30days"
+SOURCE_ROOT = REPO_ROOT / "curricula" / "python" / "30days"
 COLAB_DIR = ROOT / "colab"
 MARIMO_DIR = ROOT / "marimo"
 REPOSITORY = "eddmpython/codaro"
@@ -181,7 +181,7 @@ def makeIntroMarkdown(dayEntry: dict[str, object], content: dict[str, object]) -
         f"""
         # Day {int(dayEntry["day"]):02d}. {title}
 
-        이 노트북은 `study/python/30days/{dayEntry["file"]}` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+        이 노트북은 `curricula/python/30days/{dayEntry["file"]}` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
 
         ## 오늘의 목표
 
@@ -600,13 +600,13 @@ def writeManifest(dayEntries: list[dict[str, object]]) -> None:
     ]
     manifest = {
         "title": "Python 30일 완성",
-        "source": "study/python/30days/curriculum.json",
-        "description": "study/python/30days YAML을 원본으로 생성한 Colab 및 marimo 학습 노트북",
+        "source": "curricula/python/30days/curriculum.json",
+        "description": "curricula/python/30days YAML을 원본으로 생성한 Colab 및 marimo 학습 노트북",
         "days": [
             {
                 "day": int(entry["day"]),
                 "title": entry["title"],
-                "sourceYaml": f"study/python/30days/{entry['file']}",
+                "sourceYaml": f"curricula/python/30days/{entry['file']}",
                 "allowedConcepts": entry.get("allowedConcepts", []),
                 "allowedConceptLabels": [
                     conceptLabel(item) for item in entry.get("allowedConcepts", []) if isinstance(item, str)
@@ -649,7 +649,7 @@ def writeReadme(dayEntries: list[dict[str, object]]) -> None:
     content = f"""
     # Python 30일 완성
 
-    이 폴더의 노트북은 `study/python/30days` YAML 커리큘럼을 원본으로 생성한 배포용 산출물입니다. 노트북 안에는 원본 YAML의 설명, 예제 코드, 연습 미션이 순서대로 들어 있습니다.
+    이 폴더의 노트북은 `curricula/python/30days` YAML 커리큘럼을 원본으로 생성한 배포용 산출물입니다. 노트북 안에는 원본 YAML의 설명, 예제 코드, 연습 미션이 순서대로 들어 있습니다.
 
     [![Open Day 01 in Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colabUrl("colab/day01Helloworld.ipynb")})
     [![Open Day 01 in marimo](https://img.shields.io/badge/Day_01-open_in_marimo-ff5a5f)]({molabUrl("marimo/day01Helloworld.py")})
@@ -690,7 +690,7 @@ def writeCourseGuide(dayEntries: list[dict[str, object]]) -> None:
 
     ## 원본과 산출물
 
-    - 원본: `study/python/30days/curriculum.json` 및 Day별 YAML
+    - 원본: `curricula/python/30days/curriculum.json` 및 Day별 YAML
     - 산출물: `notebooks/python30DaysComplete/colab`, `notebooks/python30DaysComplete/marimo`
     - 생성기: `notebooks/python30DaysComplete/tools/createNotebooks.py`
     - 검증기: `notebooks/python30DaysComplete/tools/validateCourse.py`

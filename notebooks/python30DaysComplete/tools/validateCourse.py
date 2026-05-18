@@ -14,7 +14,7 @@ import yaml
 
 ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = Path(__file__).resolve().parents[3]
-SOURCE_ROOT = REPO_ROOT / "study" / "python" / "30days"
+SOURCE_ROOT = REPO_ROOT / "curricula" / "python" / "30days"
 COLAB_DIR = ROOT / "colab"
 MARIMO_DIR = ROOT / "marimo"
 LOGGER = logging.getLogger(__name__)
@@ -168,7 +168,7 @@ def validateCurriculumDesign(curriculum: dict[str, object]) -> None:
 
 def validateManifest(curriculum: dict[str, object]) -> None:
     manifest = loadJson(ROOT / "manifest.json")
-    assertCondition(manifest.get("source") == "study/python/30days/curriculum.json", "manifest source mismatch")
+    assertCondition(manifest.get("source") == "curricula/python/30days/curriculum.json", "manifest source mismatch")
     days = manifest.get("days", [])
     assertCondition(isinstance(days, list), "manifest days must be a list")
     assertCondition(len(days) == 30, "manifest must list exactly 30 days")
@@ -178,7 +178,7 @@ def validateManifest(curriculum: dict[str, object]) -> None:
         assertCondition(manifestDay.get("day") == sourceDay.get("day"), "manifest day order mismatch")
         assertCondition(manifestDay.get("title") == sourceDay.get("title"), "manifest title mismatch")
         assertCondition(
-            manifestDay.get("sourceYaml") == f"study/python/30days/{sourceDay['file']}",
+            manifestDay.get("sourceYaml") == f"curricula/python/30days/{sourceDay['file']}",
             "manifest source YAML mismatch",
         )
         assertCondition((ROOT / str(manifestDay["colab"])).exists(), f"missing colab: {manifestDay['colab']}")
