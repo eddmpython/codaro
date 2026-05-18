@@ -44,7 +44,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [widget-bridge](skills/architecture/widget-bridge)
 - [frontend-product-surface](skills/architecture/frontend-product-surface)
 
-## Ops (9) — 운영 규칙
+## Ops (10) — 운영 규칙
 
 - [environment](skills/ops/environment)
 - [code-quality](skills/ops/code-quality)
@@ -52,6 +52,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [experiment](skills/ops/experiment)
 - [branding](skills/ops/branding)
 - [git-and-release](skills/ops/git-and-release)
+- [licensing](skills/ops/licensing)
 - [packaging](skills/ops/packaging)
 - [doc-and-session](skills/ops/doc-and-session)
 - [reference-impl](skills/ops/reference-impl)

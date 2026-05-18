@@ -1,0 +1,75 @@
+Codaro Non-Commercial Source License 1.0
+
+Copyright (c) 2026 eddmpython.
+
+All rights are reserved except as expressly granted by this license.
+
+1. Scope
+
+This license applies to the software source code, build scripts,
+configuration, runtime code, frontend code, launcher code, tests, and
+developer tooling in this repository, except for materials covered by
+LICENSE-CONTENT.md, TRADEMARKS.md, or separate third-party license notices.
+
+2. Non-Commercial Permission
+
+Subject to this license, you may use, copy, modify, run, study, and distribute
+the covered software for personal, educational, research, evaluation, and other
+non-commercial purposes.
+
+3. Commercial Use Is Not Permitted
+
+Commercial Use means use that is primarily intended for commercial advantage,
+monetary compensation, paid service delivery, business operations, or product
+distribution.
+
+You may not, without prior written permission from the copyright holder:
+
+- sell, rent, license, sublicense, or otherwise monetize the covered software;
+- provide the covered software as a hosted, managed, embedded, or paid service;
+- include the covered software in a commercial product, paid course, paid
+  training program, consulting deliverable, or internal business platform;
+- use the covered software to provide paid development, automation, education,
+  analytics, reporting, or workflow services;
+- remove or obscure copyright, license, or attribution notices.
+
+4. Distribution Conditions
+
+If you distribute copies or modified versions for non-commercial purposes, you
+must:
+
+- include this license and all copyright notices;
+- clearly mark material modifications;
+- license your modifications under this same license;
+- not imply that Codaro or the copyright holder endorses your version.
+
+5. No Trademark or Brand Rights
+
+This license does not grant rights to use the Codaro name, logo, avatar,
+mascot, icons, screenshots, visual identity, or other brand assets. See
+TRADEMARKS.md.
+
+6. Third-Party Materials
+
+Third-party dependencies, datasets, references, and packages remain governed by
+their own license terms. This license does not grant rights that the copyright
+holder does not have.
+
+7. Termination
+
+Your rights under this license terminate automatically if you violate its
+terms. Termination does not limit any other rights or remedies available to the
+copyright holder.
+
+8. No Warranty
+
+The covered software is provided "as is", without warranty of any kind,
+express or implied, including but not limited to warranties of merchantability,
+fitness for a particular purpose, and non-infringement. The copyright holder is
+not liable for any claim, damages, or other liability arising from use of the
+covered software.
+
+9. Commercial Permission
+
+Commercial licenses, paid redistribution, hosted service use, paid education
+use, and brand use require prior written permission from the copyright holder.

@@ -47,4 +47,12 @@ Codaro는 지금 먼저 **Python 학습 노트북**을 배포합니다.
 
 ## 라이선스
 
-[LICENSE](LICENSE)를 확인하세요.
+Codaro는 공개 학습과 검토를 허용하지만, 상업적 재사용을 허용하는 오픈소스 배포가 아닙니다.
+
+| 영역 | 라이선스 |
+|---|---|
+| 코드, 런타임, 프론트, 도구 | [Codaro Non-Commercial Source License 1.0](LICENSE) |
+| 노트북, 커리큘럼, 문서, 학습 콘텐츠 | [CC BY-NC-SA 4.0 기준](LICENSE-CONTENT.md) |
+| 이름, 로고, 아바타, 마스코트, 브랜드 자산 | [All rights reserved](TRADEMARKS.md) |
+
+상업적 사용, 재판매, 유료 강의 편입, 호스팅 서비스 제공, 브랜드 자산 재사용은 사전 서면 허가가 필요합니다.
