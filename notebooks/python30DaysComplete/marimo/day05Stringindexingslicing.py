@@ -2,7 +2,7 @@ import marimo
 
 __generated_with = "0.23.6"
 
-app = marimo.App(app_title="Day 05. 문자열 인덱싱과 슬라이싱")
+app = marimo.App(app_title="Day 05. 문자열 인덱싱/슬라이싱")
 
 
 @app.cell
@@ -14,549 +14,905 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    # Day 05. 문자열 인덱싱과 슬라이싱
-    
-    **오늘의 초점**: 문자열에서 특정 위치나 범위를 꺼내는 법을 익힌다.
-    
-    **완성 기준**: 양수/음수 인덱스와 슬라이스 범위를 사용해 필요한 글자만 가져올 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+    # Day 05. 문자열 인덱싱/슬라이싱
+
+    이 노트북은 `study/python/30days/day05_문자열인덱싱슬라이싱.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 인덱스로 문자열의 특정 위치 접근하기
+    - 음수 인덱스로 뒤에서부터 접근하기
+    - 슬라이싱으로 부분 문자열 추출하기
+    - 스텝을 사용한 다양한 슬라이싱 패턴
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 첫 번째 위치
-    - 뒤에서 세는 위치
-    - 일부분 잘라내기
-    - 건너뛰며 잘라내기
-    - 끝 번호는 포함하지 않는 규칙
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: indexing, negative_indexing, slicing, slice_step
+    - 이미 써도 되는 개념: string_basic, operator
+    - 오늘은 일부러 쓰지 않는 개념: string_method, list, function, import
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    로그, 코드, 이메일, 파일명처럼 텍스트에서 일부만 꺼내야 하는 일이 많다. 인덱싱과 슬라이싱은 텍스트를 자르는 가장 기본적인 도구다.
-    
-    ## 생각 모델
-    
-    인덱스는 글자 사이의 칸이 아니라 각 글자에 붙은 번호다. 슬라이스의 끝 번호는 포함되지 않는다는 규칙만 분명히 기억하면 된다.
-    
-    ## 자주 하는 실수
-    
-    - 끝 인덱스가 포함된다고 생각하기
-    - 첫 번째 글자를 1번으로 세기
-    - 음수 인덱스 방향을 반대로 이해하기
+    ## 인덱싱 기초
+
+    *0부터 시작하는 위치 접근*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `첫 번째 위치`를 한 문장으로 설명할 수 있는가?
-    2. `뒤에서 세는 위치`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    문자열의 각 문자는 인덱스(위치 번호)를 가집니다. 인덱스는 0부터 시작하며, 대괄호 []를 사용하여 특정 위치의 문자를 가져올 수 있습니다. 첫 번째 문자는 [0], 두 번째 문자는 [1]입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 04: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 02: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - 인덱스는 0부터 시작
+    - 대괄호 []로 접근
+    - 첫 문자는 [0]
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마일스톤: 문자열과 값 다루기 점검
-    
-    오늘은 단순 진도일이 아니라 누적 점검일입니다. 새 셀을 끝낸 뒤, 이전 Day의 작은 만들기 중 하나를 골라 변수명과 데이터를 바꿔 다시 구현하세요.
-    
-    통과 기준은 더 엄격합니다.
-    
-    - 이전 개념을 최소 3개 이상 함께 사용했다.
-    - 에러가 났을 때 에러 이름과 원인을 적었다.
-    - 최종 셀의 결과를 보고 “이 코드가 하는 일”을 비전공자에게 설명할 수 있다.
+    ### 첫 번째 문자
+
+    인덱스 0으로 첫 번째 문자를 가져옵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        lang = 'Python'
+        return lang[0]
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 두 번째 문자
+
+    인덱스 1로 두 번째 문자를 가져옵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0009():
+        code = 'Python'
+        return code[1]
+    _snippet_0009()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 세 번째 문자
+
+    인덱스 2로 세 번째 문자를 가져옵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0011():
+        name = 'Python'
+        return name[2]
+    _snippet_0011()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마지막 문자 접근
+
+    *길이를 이용한 마지막 문자*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `첫 번째 위치`, `뒤에서 세는 위치`, `일부분 잘라내기`, `건너뛰며 잘라내기`, `끝 번호는 포함하지 않는 규칙`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 끝 인덱스가 포함된다고 생각하기
-    - 첫 번째 글자를 1번으로 세기
-    - 음수 인덱스 방향을 반대로 이해하기
+    마지막 문자의 인덱스는 문자열 길이 - 1입니다. len() 함수를 사용하여 길이를 구한 후 1을 빼면 마지막 인덱스를 얻을 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `문자열 인덱싱과 슬라이싱`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    - 마지막 인덱스 = 길이 - 1
+    - len() 함수 활용
+    - 범위를 벗어나면 에러
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `code = "PYTHON"` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `firstLetter = code[0]` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 3 | `lastLetter = code[-1]` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 4 | `firstLetter, lastLetter` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    ### 마지막 문자
+
+    길이를 이용하여 마지막 문자를 가져옵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0016():
+        greet = 'Hello'
+        return greet[len(greet) - 1]
+    _snippet_0016()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 음수 인덱싱
+
+    *뒤에서부터 접근하기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-code = "PYTHON"
-firstLetter = code[0]
-lastLetter = code[-1]
-firstLetter, lastLetter
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `'CODARO'[1:4]`의 결과를 예측하세요. 시작은 포함, 끝은 제외입니다.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-"CODARO"[1:4]
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    'ODA'
-    ```
-    
-    </details>
+    음수 인덱스를 사용하면 문자열의 뒤에서부터 접근할 수 있습니다. -1은 마지막 문자, -2는 마지막에서 두 번째 문자입니다. 길이를 계산할 필요 없이 편리하게 사용할 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `fileName`에서 확장자 `csv`만 꺼내세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-fileName = "salesReport.csv"
-extension = fileName[-3:]
-assert extension == "csv"
-extension
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    fileName = "salesReport.csv"
-    extension = fileName[-3:]
-    assert extension == "csv"
-    extension
-    ```
-    
-    </details>
+    - -1은 마지막 문자
+    - -2는 마지막에서 두 번째
+    - 뒤에서부터 -1, -2, -3...
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 끝 인덱스를 포함한다고 착각해서 값이 짧게 나옵니다. `Python`이 나오게 고치세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
+    ### 마지막 문자
+
+    음수 인덱스 -1로 마지막 문자를 가져옵니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-text = "Learn Python Today"
-word = text[6:12]
-assert word == "Python"
-word
-"""
-    )
+def _():
+    def _snippet_0021():
+        word = 'Python'
+        return word[-1]
+    _snippet_0021()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    text = "Learn Python Today"
-    word = text[6:12]
-    assert word == "Python"
-    word
-    ```
-    
-    </details>
+    ### 마지막에서 두 번째
+
+    음수 인덱스 -2로 마지막에서 두 번째 문자를 가져옵니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0023():
+        term = 'Python'
+        return term[-2]
+    _snippet_0023()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    ### 마지막에서 세 번째
+
+    음수 인덱스 -3으로 마지막에서 세 번째 문자를 가져옵니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0025():
+        label = 'Python'
+        return label[-3]
+    _snippet_0025()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    날짜 문자열에서 연도, 월, 일을 각각 슬라이스하세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
+    ## 슬라이싱 기초
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dateText = "2026-05-17"
-year = dateText[:4]
-month = dateText[5:7]
-day = dateText[8:]
-assert (year, month, day) == ("2026", "05", "17")
-year, month, day
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    dateText = "2026-05-17"
-    year = dateText[:4]
-    month = dateText[5:7]
-    day = dateText[8:]
-    assert (year, month, day) == ("2026", "05", "17")
-    year, month, day
-    ```
-    
-    </details>
+    *[start:end]로 부분 문자열 추출*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'extension == "csv"'),
-    ('오류 고쳐보기', 'word == "Python"'),
-    ('비슷한 문제', '(year, month, day) == ("2026", "05", "17")')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 주민번호처럼 생긴 예시 문자열에서 생년월일 부분과 뒤 첫 숫자를 분리하세요. 실제 개인정보를 사용하지 마세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    슬라이싱은 문자열의 일부분을 추출합니다. [start:end] 형태로 사용하며, start 인덱스부터 end-1 인덱스까지 가져옵니다. end 위치는 포함되지 않는다는 점에 주의해야 합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    주민번호처럼 생긴 예시 문자열에서 생년월일 부분과 뒤 첫 숫자를 분리하세요. 실제 개인정보를 사용하지 마세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-sampleId = "990101-2345678"
-birth = sampleId[:6]
-groupCode = sampleId[7]
-birth, groupCode
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-logId = "2026-05-17-python"
-logDate = logId[:10]
-topic = logId[11:]
-logDate, topic
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 5
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: `sampleId`에서 하이픈을 기준으로 앞부분과 뒷부분을 각각 슬라이스해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    - [start:end] 형태
+    - start 포함, end 미포함
+    - 부분 문자열 추출
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `날짜 문자열에서 연도, 월, 일을 각각 슬라이스하세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 첫 번째 위치, 뒤에서 세는 위치, 일부분 잘라내기 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ### 슬라이싱 기초
+
+    문자열의 일부를 추출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0030():
+        phrase = 'Python Programming'
+        return phrase[0:6]
+    _snippet_0030()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > [0:6]은 인덱스 0부터 5까지, 총 6개의 문자를 가져옵니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `문자열 인덱싱과 슬라이싱`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    ## 시작 생략 슬라이싱
+
+    *[:end]는 처음부터*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    시작 인덱스를 생략하면 처음부터 추출합니다. [:end]는 [0:end]와 같은 의미입니다. 문자열의 앞부분을 가져올 때 편리합니다.
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - [:end]는 처음부터 end-1까지
+    - [0:end]와 동일
+    - 앞부분 추출에 편리
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 시작 생략
+
+    처음부터 특정 위치까지 추출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0036():
+        msg = 'Hello World'
+        return msg[:5]
+    _snippet_0036()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 끝 생략 슬라이싱
+
+    *[start:]는 끝까지*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    끝 인덱스를 생략하면 마지막까지 추출합니다. [start:]는 start 인덱스부터 문자열 끝까지 가져옵니다. 문자열의 뒷부분을 가져올 때 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - [start:]는 start부터 끝까지
+    - 마지막까지 추출
+    - 뒷부분 추출에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 끝 생략
+
+    특정 위치부터 끝까지 추출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        text = 'Hello World'
+        return text[6:]
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 전체 슬라이싱
+
+    *[:]는 전체 복사*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    시작과 끝을 모두 생략하면 전체 문자열을 복사합니다. [:]는 원본과 같은 내용의 새로운 문자열을 만듭니다. 문자열 전체를 복사할 때 사용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - [:]는 전체 문자열
+    - 문자열 복사
+    - 원본과 동일한 내용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 전체 슬라이싱
+
+    전체 문자열을 복사합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0046():
+        source = 'Python'
+        return source[:]
+    _snippet_0046()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 음수 슬라이싱
+
+    *음수 인덱스로 슬라이싱*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    슬라이싱에서도 음수 인덱스를 사용할 수 있습니다. 뒤에서부터 계산하여 원하는 부분을 추출할 수 있습니다. [-5:-2]는 뒤에서 5번째부터 뒤에서 3번째까지입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 음수 인덱스 사용 가능
+    - 뒤에서부터 추출
+    - 음수와 양수 혼용 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 음수 슬라이싱
+
+    음수 인덱스로 뒤에서부터 슬라이싱합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        sentence = 'Python Programming'
+        return sentence[-11:-7]
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 스텝 슬라이싱
+
+    *[start:end:step]으로 간격 지정*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    스텝을 지정하면 일정 간격으로 문자를 추출할 수 있습니다. [start:end:step] 형태로 사용하며, step은 간격을 의미합니다. [::2]는 처음부터 끝까지 2칸씩 건너뛰며 추출합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - [start:end:step] 형태
+    - step은 간격
+    - 문자를 건너뛰며 추출
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 스텝 슬라이싱
+
+    2칸씩 건너뛰며 문자를 추출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0056():
+        sample = 'Python Programming'
+        return sample[::2]
+    _snippet_0056()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 역순 슬라이싱
+
+    *[::-1]로 문자열 뒤집기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    스텝을 -1로 지정하면 문자열을 거꾸로 뒤집을 수 있습니다. [::-1]은 문자열 전체를 역순으로 만듭니다. 회문(palindrome) 확인이나 문자열 반전에 자주 사용됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - [::-1]로 문자열 뒤집기
+    - 역순으로 추출
+    - 회문 확인에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 역순 슬라이싱
+
+    문자열을 거꾸로 뒤집습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        title = 'Python'
+        return title[::-1]
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 슬라이싱 패턴
+
+    *다양한 슬라이싱 조합*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    슬라이싱의 start, end, step을 다양하게 조합하여 원하는 패턴을 추출할 수 있습니다. 홀수 번째 문자만, 짝수 번째 문자만, 또는 역순으로 일부만 등 다양한 패턴이 가능합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - start, end, step 자유롭게 조합
+    - 다양한 패턴 추출 가능
+    - 음수 스텝도 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 짝수 번째 문자
+
+    인덱스 1부터 2칸씩 건너뛰어 추출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0066():
+        alpha = 'abcdefghij'
+        return alpha[1::2]
+    _snippet_0066()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 역순 일부
+
+    인덱스 7부터 2까지 거꾸로 추출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0068():
+        seq = 'abcdefghij'
+        return seq[7:2:-1]
+    _snippet_0068()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 3칸씩 건너뛰기
+
+    처음부터 3칸씩 건너뛰어 추출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0070():
+        chars = 'abcdefghij'
+        return chars[::3]
+    _snippet_0070()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 5 종합 복습
+
+    *인덱싱과 슬라이싱 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 5에서 배운 인덱싱과 슬라이싱을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 첫 문자
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 음수 인덱스
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 앞 3글자
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 뒤 3글자
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 문자열 뒤집기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 중간 부분 추출
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 홀수 번째 문자
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 짝수 번째 문자
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 음수 슬라이싱
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 거꾸로 일부
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-1: 이메일 사용자명 추출
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-2: 이메일 도메인 추출
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 도메인 부분
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 확장자 부분
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2: 회문 확인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-1: 문자열 분할
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 앞 절반
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 뒤 절반
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-2: 패턴 추출
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 3개씩 건너뛰기
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 역순으로 2개씩 건너뛰기
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-1: 단어 분리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 첫 단어
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 둘째 단어
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-2: 문자열 재조합
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 이니셜
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 단어 순서 뒤집기
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-1: 범위 슬라이싱
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-2: 역방향 슬라이싱
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-3: 간격 슬라이싱
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

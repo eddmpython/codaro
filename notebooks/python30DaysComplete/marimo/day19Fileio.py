@@ -2,7 +2,7 @@ import marimo
 
 __generated_with = "0.23.6"
 
-app = marimo.App(app_title="Day 19. 파일 입출력")
+app = marimo.App(app_title="Day 19. 파일입출력")
 
 
 @app.cell
@@ -14,575 +14,875 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    # Day 19. 파일 입출력
-    
-    **오늘의 초점**: 텍스트 파일을 만들고 읽고 안전하게 닫는 패턴을 익힌다.
-    
-    **완성 기준**: `with open(...)`과 `pathlib.Path`로 작은 텍스트/JSON 파일을 다룰 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+    # Day 19. 파일입출력
+
+    이 노트북은 `study/python/30days/day19_파일입출력.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 파일 열기와 닫기
+    - 파일 읽고 쓰기
+    - with문으로 안전하게
+    - 파일 모드 이해
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - open
-    - with
-    - read
-    - write
-    - 파일 모드
-    - pathlib
-    - JSON 저장
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: open, read, write, with, close, file_mode
+    - 이미 써도 되는 개념: function_all, import
+    - 오늘은 일부러 쓰지 않는 개념: class, external_library
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    프로그램이 끝나도 남아야 하는 데이터는 파일에 저장해야 한다. 파일 입출력을 알면 실행 결과를 기록하고 다음 실행에서 다시 불러올 수 있다.
-    
-    ## 생각 모델
-    
-    `with`는 파일을 열고 작업이 끝나면 자동으로 닫는 안전한 작업 구역이다. 열기 모드가 읽기인지 쓰기인지에 따라 가능한 동작이 달라진다.
-    
-    ## 자주 하는 실수
-    
-    - 파일 모드를 잘못 고르기
-    - 인코딩을 생략해 한글이 깨지기
-    - 파일을 닫기 전에 읽거나 다른 작업을 섞기
+    ## 파일 열기
+
+    *open() 함수*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `open`를 한 문장으로 설명할 수 있는가?
-    2. `with`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    open() 함수로 파일을 엽니다. open(파일경로, 모드) 형식으로 쓰며, 파일 객체를 반환합니다. 사용 후에는 close()로 닫아야 합니다. 기본 모드는 읽기('r')입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 18: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 16: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 12: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - open(경로, 모드)
+    - 파일 객체 반환
+    - close()로 닫기
+    - 기본은 읽기 모드
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 파일 열기
+
+    텍스트 파일을 열어봅니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        f = open('test.txt', 'w')
+        f.write('Hello World')
+        f.close()
+        return 'File created'
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 파일 읽기
+
+    파일을 읽기 모드로 엽니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0009():
+        handle = open('test.txt', 'r')
+        content = handle.read()
+        handle.close()
+        return content
+    _snippet_0009()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 파일 존재 확인
+
+    파일이 없으면 에러가 발생합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0011():
+        file = open('test.txt', 'w')
+        file.write('Python')
+        file.close()
+        return 'File written'
+    _snippet_0011()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 파일은 반드시 close()로 닫아야 리소스가 해제됩니다. marimo에서는 좌측 상단의 Files 아이콘을 클릭하면 실제로 생성된 txt 파일을 확인할 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `open`, `with`, `read`, `write`, `파일 모드`, `pathlib`, `JSON 저장`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 파일 모드를 잘못 고르기
-    - 인코딩을 생략해 한글이 깨지기
-    - 파일을 닫기 전에 읽거나 다른 작업을 섞기
+    ## 파일 읽기
+
+    *read() 메서드*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `파일 입출력`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    read() 메서드로 파일 내용을 읽습니다. 전체 내용을 문자열로 반환합니다. readline()은 한 줄씩, readlines()는 모든 줄을 리스트로 반환합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `from pathlib import Path` | 이미 만들어진 도구를 현재 노트북으로 가져옵니다. |
-    | 2 | ` ` | 읽기 좋게 구획을 나누는 빈 줄입니다. |
-    | 3 | `notePath = Path("studyNote.txt")` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 4 | `notePath.write_text("Python file practice", encoding="utf-8")` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 5 | `notePath.read_text(encoding="utf-8")` | 계산 결과나 데이터를 이름에 연결합니다. |
+    - read(): 전체 읽기
+    - readline(): 한 줄 읽기
+    - readlines(): 리스트로
+    - 문자열로 반환
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 전체 읽기
+
+    read()로 파일 전체를 읽습니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-from pathlib import Path
+def _():
+    def _snippet_0017():
+        writer = open('data.txt', 'w')
+        writer.write('Line 1\nLine 2\nLine 3')
+        writer.close()
 
-notePath = Path("studyNote.txt")
-notePath.write_text("Python file practice", encoding="utf-8")
-notePath.read_text(encoding="utf-8")
-"""
-    )
+        reader = open('data.txt', 'r')
+        text = reader.read()
+        reader.close()
+        return text
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `write_text` 후 같은 경로에서 `read_text`를 하면 무엇이 나올지 예측하세요.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
+    ### 한 줄 읽기
+
+    readline()으로 첫 줄만 읽습니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-from pathlib import Path
+def _():
+    def _snippet_0019():
+        output = open('sample.txt', 'w')
+        output.write('First\nSecond\nThird')
+        output.close()
 
-path = Path("hello.txt")
-path.write_text("hello", encoding="utf-8")
-path.read_text(encoding="utf-8")
-"""
-    )
+        input = open('sample.txt', 'r')
+        line = input.readline()
+        input.close()
+        return line
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    'hello'
-    ```
-    
-    </details>
+    ### 모든 줄 읽기
+
+    readlines()로 모든 줄을 리스트로 읽습니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0021():
+        fw = open('lines.txt', 'w')
+        fw.write('A\nB\nC')
+        fw.close()
+
+        fr = open('lines.txt', 'r')
+        lines = fr.readlines()
+        fr.close()
+        return lines
+    _snippet_0021()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `daily.txt` 파일에 `Day 19 complete`를 저장하고 다시 읽으세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-from pathlib import Path
-
-dailyPath = Path("daily.txt")
-dailyPath.write_text("Day 19 complete", encoding="utf-8")
-content = dailyPath.read_text(encoding="utf-8")
-assert content == "Day 19 complete"
-content
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    from pathlib import Path
-    
-    dailyPath = Path("daily.txt")
-    dailyPath.write_text("Day 19 complete", encoding="utf-8")
-    content = dailyPath.read_text(encoding="utf-8")
-    assert content == "Day 19 complete"
-    content
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > readlines()는 각 줄에 줄바꿈 문자(\n)를 포함합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 쓰기 모드로 열어놓고 읽으려고 합니다. 쓰기와 읽기를 분리하세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
+    ## 파일 쓰기
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-with open("modeTest.txt", "w", encoding="utf-8") as file:
-    file.write("mode")
-
-with open("modeTest.txt", "r", encoding="utf-8") as file:
-    content = file.read()
-content
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    with open("modeTest.txt", "w", encoding="utf-8") as file:
-        file.write("mode")
-    
-    with open("modeTest.txt", "r", encoding="utf-8") as file:
-        content = file.read()
-    content
-    ```
-    
-    </details>
+    *write() 메서드*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    write() 메서드로 파일에 문자열을 씁니다. 'w' 모드는 기존 내용을 지우고, 'a' 모드는 끝에 추가합니다. write()는 쓴 문자 수를 반환합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    텍스트 파일에 두 줄을 저장하고 다시 읽어 줄 수를 확인하세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-from pathlib import Path
-
-path = Path("lines.txt")
-path.write_text("first\nsecond", encoding="utf-8")
-lines = path.read_text(encoding="utf-8").splitlines()
-assert len(lines) == 2
-lines
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    from pathlib import Path
-    
-    path = Path("lines.txt")
-    path.write_text("first\nsecond", encoding="utf-8")
-    lines = path.read_text(encoding="utf-8").splitlines()
-    assert len(lines) == 2
-    lines
-    ```
-    
-    </details>
+    - write(문자열)
+    - 'w': 덮어쓰기
+    - 'a': 추가하기
+    - 쓴 문자 수 반환
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### 새로 쓰기
+
+    'w' 모드로 새로 씁니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'dailyPath.read_text(encoding="utf-8") == "Day 19 complete"'),
-    ('오류 고쳐보기', 'content == "mode"'),
-    ('비슷한 문제', 'len(lines) == 2')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+def _():
+    def _snippet_0027():
+        fileObj = open('message.txt', 'w')
+        count = fileObj.write('Hello Python')
+        fileObj.close()
+        return count
+    _snippet_0027()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 학습 기록 딕셔너리를 JSON 파일로 저장하고 다시 읽어오세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    ### 추가하기
+
+    'a' 모드로 끝에 추가합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        obj = open('log.txt', 'w')
+        obj.write('Start\n')
+        obj.close()
+
+        obj2 = open('log.txt', 'a')
+        obj2.write('End\n')
+        obj2.close()
+
+        obj3 = open('log.txt', 'r')
+        result = obj3.read()
+        obj3.close()
+        return result
+    _snippet_0029()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    학습 기록 딕셔너리를 JSON 파일로 저장하고 다시 읽어오세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
+    ### 여러 줄 쓰기
+
+    여러 줄을 순서대로 씁니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-from pathlib import Path
-import json
+def _():
+    def _snippet_0031():
+        target = open('multi.txt', 'w')
+        target.write('Line 1\n')
+        target.write('Line 2\n')
+        target.write('Line 3\n')
+        target.close()
 
-record = {"day": 19, "topic": "file IO", "done": True}
-recordPath = Path("record.json")
-recordPath.write_text(json.dumps(record, ensure_ascii=False), encoding="utf-8")
-loaded = json.loads(recordPath.read_text(encoding="utf-8"))
-loaded
-"""
-    )
+        source = open('multi.txt', 'r')
+        multiText = source.read()
+        source.close()
+        return multiText
+    _snippet_0031()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-from pathlib import Path
-
-logPath = Path("studyLog.txt")
-logPath.write_text("Day 19 file practice", encoding="utf-8")
-logPath.read_text(encoding="utf-8")
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 19
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: `indent=2` 옵션을 넣어 JSON 파일을 사람이 읽기 좋게 저장해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    > **팁**
+    >
+    > 'w' 모드는 기존 파일을 완전히 지우므로 주의하세요.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `텍스트 파일에 두 줄을 저장하고 다시 읽어 줄 수를 확인하세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: open, with, read 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ## with 문
+
+    *자동으로 닫기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `파일 입출력`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    with 문을 사용하면 파일을 자동으로 닫아줍니다. with open(경로, 모드) as 변수: 형식으로 쓰며, 블록이 끝나면 자동으로 close()가 호출됩니다. 안전하고 권장되는 방법입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    - with open() as 변수:
+    - 자동으로 닫힘
+    - 예외 발생해도 안전
+    - 권장되는 방법
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### with로 읽기
+
+    with 문으로 파일을 읽습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0037():
+        with open('test.txt', 'w') as outFile:
+            outFile.write('With statement')
+
+        with open('test.txt', 'r') as inFile:
+            data = inFile.read()
+
+        return data
+    _snippet_0037()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### with로 쓰기
+
+    with 문으로 파일을 씁니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        with open('output.txt', 'w') as stream:
+            stream.write('Easy and safe')
+
+        with open('output.txt', 'r') as stream:
+            output = stream.read()
+
+        return output
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 여러 줄 처리
+
+    with 문 안에서 여러 작업을 합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        with open('numbers.txt', 'w') as dest:
+            for i in range(1, 4):
+                dest.write(str(i) + '\n')
+
+        with open('numbers.txt', 'r') as src:
+            numLines = src.readlines()
+
+        return numLines
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > with 문은 close()를 잊어버릴 걱정이 없어 안전합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 파일 모드
+
+    *읽기/쓰기/추가*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    파일 모드는 파일을 어떻게 열지 결정합니다. 'r'(읽기), 'w'(쓰기), 'a'(추가), 'r+'(읽기/쓰기) 등이 있습니다. 텍스트 모드가 기본이며, 'b'를 붙이면 바이너리 모드입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 'r': 읽기 (기본)
+    - 'w': 쓰기 (덮어쓰기)
+    - 'a': 추가
+    - 'r+': 읽기와 쓰기
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 읽기 모드
+
+    'r' 모드로 읽기만 합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0047():
+        with open('test.txt', 'w') as wf:
+            wf.write('Read mode test')
+
+        with open('test.txt', 'r') as rf:
+            readData = rf.read()
+
+        return readData
+    _snippet_0047()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 추가 모드
+
+    'a' 모드로 기존 내용에 추가합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        with open('append.txt', 'w') as initial:
+            initial.write('First\n')
+
+        with open('append.txt', 'a') as appender:
+            appender.write('Second\n')
+
+        with open('append.txt', 'r') as checker:
+            appended = checker.read()
+
+        return appended
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 모드 확인
+
+    파일 객체의 모드를 확인할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        with open('test.txt', 'w') as item:
+            mode = item.mode
+
+        return mode
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 파일이 없을 때 'r'은 에러, 'w'와 'a'는 파일을 생성합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 줄 단위 순회
+
+    *for문으로 읽기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    파일 객체는 for문으로 순회할 수 있습니다. 각 줄을 하나씩 가져오므로 메모리 효율적입니다. 큰 파일을 처리할 때 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - for 줄 in 파일:
+    - 한 줄씩 순회
+    - 메모리 효율적
+    - 큰 파일 처리 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 줄 순회
+
+    for문으로 각 줄을 읽습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0057():
+        with open('items.txt', 'w') as creator:
+            creator.write('Apple\nBanana\nCherry')
+
+        with open('items.txt', 'r') as processor:
+            lineCount = 0
+            for line in processor:
+                lineCount = lineCount + 1
+
+        return lineCount
+    _snippet_0057()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 줄 처리
+
+    각 줄을 처리하여 리스트로 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        with open('words.txt', 'w') as gen:
+            gen.write('hello\nworld\npython')
+
+        with open('words.txt', 'r') as scan:
+            uppered = []
+            for word in scan:
+                uppered.append(word.strip().upper())
+
+        return uppered
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 조건부 처리
+
+    조건에 맞는 줄만 처리합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        with open('scores.txt', 'w') as maker:
+            maker.write('80\n90\n70\n95')
+
+        with open('scores.txt', 'r') as reader:
+            passCount = 0
+            for score in reader:
+                if int(score) >= 80:
+                    passCount = passCount + 1
+
+        return passCount
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > strip()으로 줄바꿈 문자를 제거할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 19 종합 복습
+
+    *파일 입출력 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 19에서 배운 파일 입출력을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 파일 쓰기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 파일 읽기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 추가 모드
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 줄 읽기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 줄 순회
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 카운터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 숫자 합계
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 필터링
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 변환
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 로그 작성
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-1: CSV 읽기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-2: CSV 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-1: 파일 복사
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-2: 파일 병합
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-1: 단어 빈도
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-2: 최빈 단어
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-1: 성적 통계
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-2: 성적 등급
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-1: 필터 저장
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-2: 데이터 변환
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

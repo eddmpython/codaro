@@ -2,7 +2,7 @@ import marimo
 
 __generated_with = "0.23.6"
 
-app = marimo.App(app_title="Day 15. 함수 기초")
+app = marimo.App(app_title="Day 15. 함수기초")
 
 
 @app.cell
@@ -14,563 +14,1243 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    # Day 15. 함수 기초
-    
-    **오늘의 초점**: 반복되는 로직에 이름을 붙이고 재사용한다.
-    
-    **완성 기준**: `def`, 매개변수, 반환값을 사용해 작은 함수를 만들 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+    # Day 15. 함수기초
+
+    이 노트북은 `study/python/30days/day15_함수기초.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - def로 함수 정의
+    - return으로 값 반환
+    - 매개변수로 값 전달
+    - 함수로 코드 재사용
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - def
-    - 매개변수
-    - 인자
-    - return
-    - docstring
-    - 재사용
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: def, return, parameter, argument, docstring
+    - 이미 써도 되는 개념: all_data_types, conditional, loop
+    - 오늘은 일부러 쓰지 않는 개념: advanced_function, import, class
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    함수는 코드를 줄이는 도구일 뿐 아니라 생각에 이름을 붙이는 도구다. 잘 만든 함수는 프로그램을 읽기 쉬운 단계들로 나눈다.
-    
-    ## 생각 모델
-    
-    함수는 입력을 받아 내부 규칙을 적용하고 결과를 돌려주는 작은 기계다. 출력하려는 값과 반환하려는 값을 구분하는 것이 중요하다.
-    
-    ## 자주 하는 실수
-    
-    - `print`와 `return`을 혼동하기
-    - 함수 이름만 쓰고 호출 괄호를 빼먹기
-    - 매개변수와 인자의 방향을 헷갈리기
+    ## 함수 정의
+
+    *def로 함수 만들기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `def`를 한 문장으로 설명할 수 있는가?
-    2. `매개변수`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    함수는 특정 작업을 수행하는 코드 블록입니다. def 함수명(): 형식으로 정의하며, 들여쓰기로 함수 본문을 작성합니다. 함수를 정의한 후 함수명()으로 호출하여 실행합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 14: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 12: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 08: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - def 함수명(): 형식
+    - 들여쓰기로 본문 작성
+    - 함수명()으로 호출
+    - 코드 재사용 가능
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마일스톤: 조건, 반복, 함수 기초 점검
-    
-    오늘은 단순 진도일이 아니라 누적 점검일입니다. 새 셀을 끝낸 뒤, 이전 Day의 작은 만들기 중 하나를 골라 변수명과 데이터를 바꿔 다시 구현하세요.
-    
-    통과 기준은 더 엄격합니다.
-    
-    - 이전 개념을 최소 3개 이상 함께 사용했다.
-    - 에러가 났을 때 에러 이름과 원인을 적었다.
-    - 최종 셀의 결과를 보고 “이 코드가 하는 일”을 비전공자에게 설명할 수 있다.
+    ### 함수 정의
+
+    간단한 함수를 정의합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        def greet():
+            msg = 'Hello'
+            return msg
+
+        return greet()
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 함수 호출
+
+    함수를 여러 번 호출할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0009():
+        def getMessage():
+            return 'Welcome'
+
+        first = getMessage()
+        second = getMessage()
+        return (first, second)
+    _snippet_0009()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 함수 결과 사용
+
+    함수 결과를 변수에 저장하고 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0011():
+        def getNumber():
+            return 42
+
+        num = getNumber()
+        twice = num * 2
+        return twice
+    _snippet_0011()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 함수명은 소문자와 언더스코어를 사용하거나 카멜케이스를 사용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `def`, `매개변수`, `인자`, `return`, `docstring`, `재사용`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - `print`와 `return`을 혼동하기
-    - 함수 이름만 쓰고 호출 괄호를 빼먹기
-    - 매개변수와 인자의 방향을 헷갈리기
+    ## return 문
+
+    *값 반환하기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `함수 기초`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    return은 함수의 결과값을 반환합니다. return 값 형식으로 사용하며, 함수 실행을 즉시 종료하고 값을 호출한 곳으로 돌려줍니다. return이 없으면 None을 반환합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `def addTax(price):` | 재사용할 동작에 이름을 붙입니다. 입력과 반환값을 함께 생각합니다. |
-    | 2 | `    return int(price * 1.1)` | 함수 호출자에게 돌려줄 결과를 정합니다. |
-    | 3 | ` ` | 읽기 좋게 구획을 나누는 빈 줄입니다. |
-    | 4 | `addTax(10000)` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - return 값 형식
+    - 함수 결과 반환
+    - 함수 즉시 종료
+    - return 없으면 None
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### return 기본
+
+    계산 결과를 반환합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-def addTax(price):
-    return int(price * 1.1)
+def _():
+    def _snippet_0017():
+        def add():
+            answer = 10 + 20
+            return answer
 
-addTax(10000)
-"""
-    )
+        return add()
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `return` 이후의 값이 함수 호출 결과가 됩니다. 아래 결과를 예측하세요.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
+    ### return 즉시
+
+    계산식을 바로 반환합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-def double(num):
-    return num * 2
+def _():
+    def _snippet_0019():
+        def multiply():
+            return 5 * 6
 
-double(7)
-"""
-    )
+        return multiply()
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    14
-    ```
-    
-    </details>
+    ### 조건부 return
+
+    조건에 따라 다른 값을 반환합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0021():
+        def checkValue():
+            value = 15
+            if value > 10:
+                return 'big'
+            else:
+                return 'small'
+
+        return checkValue()
+    _snippet_0021()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    두 숫자의 평균을 반환하는 `averageTwo` 함수를 실행해 확인하세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def averageTwo(a, b):
-    return (a + b) / 2
-
-result = averageTwo(80, 100)
-assert result == 90
-result
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    def averageTwo(a, b):
-        return (a + b) / 2
-    
-    result = averageTwo(80, 100)
-    assert result == 90
-    result
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > return을 만나면 함수가 즉시 종료되므로 위치에 주의하세요.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    아래 함수는 계산만 하고 반환하지 않아 결과가 `None`입니다. `return`을 추가하세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
+    ## 매개변수 1개
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def makeTotal(price, count):
-    return price * count
-
-total = makeTotal(3000, 4)
-assert total == 12000
-total
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    def makeTotal(price, count):
-        return price * count
-    
-    total = makeTotal(3000, 4)
-    assert total == 12000
-    total
-    ```
-    
-    </details>
+    *값을 받는 함수*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    매개변수는 함수가 받는 입력값입니다. def 함수명(매개변수): 형식으로 정의하며, 호출시 전달하는 값을 인자라고 합니다. 매개변수를 사용하면 함수를 더 유연하게 만들 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    가격과 수량을 받아 총액을 반환하는 함수를 작성하세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def orderTotal(price, count):
-    return price * count
-
-result = orderTotal(4500, 3)
-assert result == 13500
-result
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    def orderTotal(price, count):
-        return price * count
-    
-    result = orderTotal(4500, 3)
-    assert result == 13500
-    result
-    ```
-    
-    </details>
+    - def 함수명(매개변수): 형식
+    - 매개변수: 함수가 받는 변수
+    - 인자: 호출시 전달하는 값
+    - 함수 유연성 증가
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### 매개변수 기본
+
+    매개변수를 받아 처리합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'averageTwo(80, 100) == 90'),
-    ('오류 고쳐보기', 'makeTotal(3000, 4) == 12000'),
-    ('비슷한 문제', 'orderTotal(4500, 3) == 13500')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
+def _():
+    def _snippet_0027():
+        def double(num):
+            return num * 2
 
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+        return double(5)
+    _snippet_0027()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 금액과 할인율을 받아 할인 후 금액을 반환하는 함수를 만드세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    ### 문자열 매개변수
+
+    문자열을 받아 처리합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        def sayHi(name):
+            return 'Hello ' + name
+
+        return sayHi('Alice')
+    _snippet_0029()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    금액과 할인율을 받아 할인 후 금액을 반환하는 함수를 만드세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
+    ### 조건과 매개변수
+
+    매개변수를 조건문에서 사용합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-def applyDiscount(price, rate):
-    return int(price * (1 - rate))
+def _():
+    def _snippet_0031():
+        def isAdult(age):
+            if age >= 18:
+                return True
+            else:
+                return False
 
-finalPrice = applyDiscount(20000, 0.15)
-finalPrice
-"""
-    )
+        return isAdult(25)
+    _snippet_0031()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def isFocused(minutes):
-    return minutes >= 30
-
-isFocused(45)
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 15
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: 할인 후 금액이 0보다 작아지지 않도록 함수를 보강해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    > **팁**
+    >
+    > 매개변수명은 함수 안에서만 유효한 지역 변수입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `가격과 수량을 받아 총액을 반환하는 함수를 작성하세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: def, 매개변수, 인자 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ## 매개변수 여러 개
+
+    *여러 값 받기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `함수 기초`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    함수는 여러 개의 매개변수를 받을 수 있습니다. 쉼표로 구분하여 나열하며, 호출시에도 같은 순서로 인자를 전달해야 합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    - def 함수명(매개변수1, 매개변수2): 형식
+    - 쉼표로 구분
+    - 순서대로 전달
+    - 여러 값 조합 가능
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 두 개 매개변수
+
+    두 개의 매개변수를 받아 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0037():
+        def addTwo(a, b):
+            return a + b
+
+        return addTwo(10, 20)
+    _snippet_0037()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 세 개 매개변수
+
+    세 개의 매개변수를 받아 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        def average(x, y, z):
+            return (x + y + z) / 3
+
+        return average(80, 90, 85)
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 문자열 조합
+
+    여러 문자열을 조합합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        def fullName(first, last):
+            return first + ' ' + last
+
+        return fullName('John', 'Doe')
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 매개변수 개수와 인자 개수가 일치해야 합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 여러 값 반환
+
+    *튜플로 반환*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    함수는 여러 값을 반환할 수 있습니다. 쉼표로 구분하여 반환하면 튜플로 묶여서 반환됩니다. 호출한 곳에서 여러 변수로 받을 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - return 값1, 값2 형식
+    - 튜플로 반환됨
+    - 여러 변수로 받기 가능
+    - 관련된 값 함께 반환
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 두 값 반환
+
+    두 개의 값을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0047():
+        def minMax(a, b):
+            if a < b:
+                return a, b
+            else:
+                return b, a
+
+        return minMax(10, 5)
+    _snippet_0047()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 계산 결과들
+
+    여러 계산 결과를 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        def calculate(num):
+            double = num * 2
+            triple = num * 3
+            return double, triple
+
+        return calculate(5)
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 분리해서 받기
+
+    반환된 값을 각각 변수에 저장합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        def getInfo():
+            name = 'Python'
+            version = 3.9
+            return name, version
+
+        lang, ver = getInfo()
+        return lang
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 여러 값을 반환하면 자동으로 튜플이 됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 매개변수 없는 함수
+
+    *입력 없이 실행*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    함수는 매개변수가 없어도 됩니다. 항상 같은 값을 반환하거나 내부 로직만 실행하는 함수에 사용합니다. 호출시에도 괄호만 씁니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - def 함수명(): 형식
+    - 매개변수 없음
+    - 고정된 동작 수행
+    - 함수명()로 호출
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 고정값 반환
+
+    항상 같은 값을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0057():
+        def getPi():
+            return 3.14159
+
+        return getPi()
+    _snippet_0057()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 내부 계산
+
+    함수 내부에서만 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        def getDefault():
+            base = 100
+            bonus = 50
+            return base + bonus
+
+        return getDefault()
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 리스트 생성
+
+    고정된 리스트를 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        def getColors():
+            return ['red', 'green', 'blue']
+
+        return getColors()
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 상수값이나 기본 설정을 반환할 때 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## return 없는 함수
+
+    *작업만 수행*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    함수는 return이 없어도 됩니다. return이 없으면 None을 반환합니다. 주로 작업만 수행하고 결과가 필요없을 때 사용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - return 생략 가능
+    - None 자동 반환
+    - 작업 수행용
+    - 부수 효과만 목적
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### return 없음
+
+    return이 없으면 None을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0067():
+        def doSomething():
+            x = 10 + 20
+
+        output = doSomething()
+        return output
+    _snippet_0067()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 조건부 return
+
+    조건에 따라 return이 없을 수도 있습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0069():
+        def checkPositive(num):
+            if num > 0:
+                return 'positive'
+
+        return checkPositive(-5)
+    _snippet_0069()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 명시적 None
+
+    명시적으로 None을 반환할 수도 있습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0071():
+        def getValue(flag):
+            if flag:
+                return 100
+            return None
+
+        return getValue(False)
+    _snippet_0071()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 반환값이 필요한 함수는 항상 return을 명시하는 것이 좋습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 함수와 조건문
+
+    *조건에 따른 처리*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    함수 안에서 조건문을 사용하여 매개변수에 따라 다른 결과를 반환할 수 있습니다. 함수의 유연성이 크게 증가합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 함수 내부에 조건문
+    - 매개변수 기반 분기
+    - 다양한 경우 처리
+    - 유연한 함수 구현
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 등급 판정
+
+    점수에 따라 등급을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0077():
+        def getGrade(score):
+            if score >= 90:
+                return 'A'
+            elif score >= 80:
+                return 'B'
+            elif score >= 70:
+                return 'C'
+            else:
+                return 'F'
+
+        return getGrade(85)
+    _snippet_0077()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 절대값
+
+    숫자의 절대값을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0079():
+        def absolute(num):
+            if num >= 0:
+                return num
+            else:
+                return -num
+
+        return absolute(-15)
+    _snippet_0079()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 할인 계산
+
+    금액에 따라 할인을 적용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0081():
+        def applyDiscount(price):
+            if price >= 100000:
+                return price * 0.9
+            elif price >= 50000:
+                return price * 0.95
+            else:
+                return price
+
+        return applyDiscount(80000)
+    _snippet_0081()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 조건문으로 다양한 입력에 대응할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 함수와 반복문
+
+    *반복 처리 함수*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    함수 안에서 반복문을 사용하여 리스트나 문자열을 처리할 수 있습니다. 반복 로직을 함수로 만들면 재사용이 쉬워집니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 함수 내부에 반복문
+    - 리스트/문자열 처리
+    - 반복 로직 재사용
+    - 코드 간결화
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 리스트 합계
+
+    리스트의 모든 요소를 더합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0087():
+        def sumList(numbers):
+            acc = 0
+            for num in numbers:
+                acc = acc + num
+            return acc
+
+        return sumList([1, 2, 3, 4, 5])
+    _snippet_0087()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 문자 개수
+
+    문자열에서 특정 문자의 개수를 셉니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0089():
+        def countChar(text, target):
+            cnt = 0
+            for char in text:
+                if char == target:
+                    cnt = cnt + 1
+            return cnt
+
+        return countChar('hello world', 'o')
+    _snippet_0089()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 최대값 찾기
+
+    리스트에서 최대값을 찾습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0091():
+        def findMax(values):
+            biggest = values[0]
+            for item in values:
+                if item > biggest:
+                    biggest = item
+            return biggest
+
+        return findMax([15, 42, 8, 23, 56])
+    _snippet_0091()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 복잡한 반복 로직을 함수로 만들면 코드가 깔끔해집니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 함수 재사용
+
+    *같은 함수 여러 번 사용*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    함수의 가장 큰 장점은 재사용입니다. 한 번 정의한 함수를 여러 곳에서 다른 인자로 호출할 수 있습니다. 코드 중복을 줄이고 유지보수가 쉬워집니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 한 번 정의, 여러 번 사용
+    - 다른 인자로 호출
+    - 코드 중복 감소
+    - 유지보수 용이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 여러 번 호출
+
+    같은 함수를 다른 인자로 호출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0097():
+        def square(n):
+            return n * n
+
+        sq3 = square(3)
+        sq5 = square(5)
+        sq7 = square(7)
+        return (sq3, sq5, sq7)
+    _snippet_0097()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 함수 조합
+
+    함수 결과를 다시 함수에 전달합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0099():
+        def addTen(num):
+            return num + 10
+
+        chained = addTen(5)
+        chained = addTen(chained)
+        return chained
+    _snippet_0099()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 반복문에서 호출
+
+    반복문 안에서 함수를 호출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0101():
+        def triple(x):
+            return x * 3
+
+        results = []
+        for i in range(1, 5):
+            results.append(triple(i))
+        return results
+    _snippet_0101()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 자주 사용하는 로직은 함수로 만들어 재사용하세요.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 15 종합 복습
+
+    *함수 기초 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 15에서 배운 함수 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 함수 정의
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 매개변수 1개
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 매개변수 2개
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 조건문 활용
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 여러 값 반환
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 온도 변환
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 문자열 처리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 리스트 평균
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 범위 검사
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 짝수 개수
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-1: BMI 계산
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-2: BMI 판정
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-1: 팩토리얼
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-2: 순열
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-1: 소수 판별
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-2: 소수 목록
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-1: 최대공약수
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-2: 최소공배수
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-1: 피보나치
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-2: 피보나치 수열
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

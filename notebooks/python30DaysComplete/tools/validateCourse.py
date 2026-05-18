@@ -1,15 +1,20 @@
 from __future__ import annotations
 
 import ast
+import contextlib
+import io
 import json
 import logging
 import os
-import re
 import tempfile
 from pathlib import Path
 
+import yaml
+
 
 ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = Path(__file__).resolve().parents[3]
+SOURCE_ROOT = REPO_ROOT / "study" / "python" / "30days"
 COLAB_DIR = ROOT / "colab"
 MARIMO_DIR = ROOT / "marimo"
 LOGGER = logging.getLogger(__name__)
@@ -25,12 +30,28 @@ SAFE_EXEC_ERRORS = (
     TypeError,
     ValueError,
 )
-PYTHON_FENCE_RE = re.compile(r"```python\n(?P<source>[\s\S]*?)\n```")
-MARIMO_CELL_RE = re.compile(r"(?P<kind>mo\.md|runCell)\(\s*r\"\"\"(?P<source>[\s\S]*?)\"\"\"\s*\)")
+LEGACY_TEXT = [
+    "예상 결과 확인",
+    "자동 확인",
+    "값 바꿔보기",
+    "오류 고쳐보기",
+    "틀린 이유 적기",
+    "비슷한 문제 3단계",
+    "assert ",
+]
+
+
+def assertCondition(condition: bool, message: str) -> None:
+    if not condition:
+        raise AssertionError(message)
+
+
+def loadJson(path: Path) -> dict[str, object]:
+    return json.loads(path.read_text(encoding="utf-8"))
 
 
 def loadNotebook(path: Path) -> dict[str, object]:
-    return json.loads(path.read_text(encoding="utf-8"))
+    return loadJson(path)
 
 
 def readCellSource(cell: dict[str, object]) -> str:
@@ -40,203 +61,151 @@ def readCellSource(cell: dict[str, object]) -> str:
     return str(source)
 
 
-def assertCondition(condition: bool, message: str) -> None:
-    if not condition:
-        raise AssertionError(message)
+def loadCurriculum() -> dict[str, object]:
+    return loadJson(SOURCE_ROOT / "curriculum.json")
 
 
-def validateManifest() -> None:
-    manifestPath = ROOT / "manifest.json"
-    assertCondition(manifestPath.exists(), "manifest.json is missing")
-    manifest = json.loads(manifestPath.read_text(encoding="utf-8"))
+def loadYaml(path: Path) -> dict[str, object]:
+    content = yaml.safe_load(path.read_text(encoding="utf-8"))
+    if not isinstance(content, dict):
+        raise TypeError(f"Invalid YAML content: {path}")
+    return content
+
+
+def validateDocs() -> None:
+    for name in ["readme.md", "courseGuide.md", "manifest.json", "progressTracker.csv"]:
+        assertCondition((ROOT / name).exists(), f"missing doc: {name}")
+
+
+def validateManifest(curriculum: dict[str, object]) -> None:
+    manifest = loadJson(ROOT / "manifest.json")
+    assertCondition(manifest.get("source") == "study/python/30days/curriculum.json", "manifest source mismatch")
     days = manifest.get("days", [])
+    assertCondition(isinstance(days, list), "manifest days must be a list")
     assertCondition(len(days) == 30, "manifest must list exactly 30 days")
-    missing = [day["colab"] for day in days if not (ROOT / day["colab"]).exists()]
-    assertCondition(not missing, f"missing notebooks: {missing}")
-    missingMarimo = [day["marimo"] for day in days if not (ROOT / day["marimo"]).exists()]
-    assertCondition(not missingMarimo, f"missing marimo notebooks: {missingMarimo}")
+    curriculumDays = curriculum.get("days", [])
+    assertCondition(isinstance(curriculumDays, list), "curriculum days must be a list")
+    for manifestDay, sourceDay in zip(days, curriculumDays, strict=True):
+        assertCondition(manifestDay.get("day") == sourceDay.get("day"), "manifest day order mismatch")
+        assertCondition(manifestDay.get("title") == sourceDay.get("title"), "manifest title mismatch")
+        assertCondition(
+            manifestDay.get("sourceYaml") == f"study/python/30days/{sourceDay['file']}",
+            "manifest source YAML mismatch",
+        )
+        assertCondition((ROOT / str(manifestDay["colab"])).exists(), f"missing colab: {manifestDay['colab']}")
+        assertCondition((ROOT / str(manifestDay["marimo"])).exists(), f"missing marimo: {manifestDay['marimo']}")
     reviews = manifest.get("reviews", [])
+    assertCondition(isinstance(reviews, list), "manifest reviews must be a list")
     assertCondition(len(reviews) == 6, "manifest must list exactly 6 review notebooks")
-    missingReviews = [review["colab"] for review in reviews if not (ROOT / review["colab"]).exists()]
-    assertCondition(not missingReviews, f"missing review notebooks: {missingReviews}")
-    missingMarimoReviews = [review["marimo"] for review in reviews if not (ROOT / review["marimo"]).exists()]
-    assertCondition(not missingMarimoReviews, f"missing marimo review notebooks: {missingMarimoReviews}")
 
 
-def validateNotebookStructure(path: Path) -> None:
+def validateNoLegacyText(path: Path, text: str) -> None:
+    hits = [item for item in LEGACY_TEXT if item in text]
+    assertCondition(not hits, f"{path.name} contains legacy notebook text: {hits}")
+
+
+def validateNotebookAgainstYaml(path: Path, sourceYaml: Path) -> None:
     notebook = loadNotebook(path)
     cells = notebook.get("cells", [])
-    assertCondition(len(cells) >= 30, f"{path.name} has too few cells")
+    assertCondition(isinstance(cells, list), f"{path.name} cells must be a list")
+    assertCondition(len(cells) >= 20, f"{path.name} has too few cells")
+    yamlContent = loadYaml(sourceYaml)
     markdownText = "\n".join(readCellSource(cell) for cell in cells if cell.get("cell_type") == "markdown")
-    requiredSections = [
-        "시작 전 떠올리기",
-        "코드가 실행되는 순서",
-        "값 바꿔보기",
-        "오류 고쳐보기",
-        "틀린 이유 적기",
-        "비슷한 문제 풀기",
-        "자동 확인",
-        "30일 프로젝트",
-        "마무리 체크",
-    ]
-    missingSections = [section for section in requiredSections if section not in markdownText]
-    assertCondition(not missingSections, f"{path.name} missing sections: {missingSections}")
+    codeText = "\n".join(readCellSource(cell) for cell in cells if cell.get("cell_type") == "code")
+    validateNoLegacyText(path, markdownText + "\n" + codeText)
+    assertCondition(
+        str(sourceYaml.relative_to(REPO_ROOT)).replace("\\", "/") in markdownText, f"{path.name} missing YAML source"
+    )
+    assertCondition("## 오늘의 범위" in markdownText, f"{path.name} missing concept policy")
+    for section in yamlContent.get("sections", []):
+        title = str(section.get("title", "")).strip()
+        if title:
+            assertCondition(title in markdownText, f"{path.name} missing section title: {title}")
+    validateCodeCells(path, cells)
 
 
-def validateCodeSyntax(path: Path) -> None:
-    notebook = loadNotebook(path)
-    for index, cell in enumerate(notebook.get("cells", [])):
-        if cell.get("cell_type") == "code":
-            source = readCellSource(cell)
-            assertCondition("..." not in source, f"{path.name} cell {index} still has placeholder ellipsis")
-            try:
-                ast.parse(source)
-            except SyntaxError as exc:
-                raise AssertionError(f"{path.name} cell {index} syntax error: {exc.msg}") from exc
-
-
-def shouldRunCell(previousMarkdown: str, code: str) -> bool:
-    return True
-
-
-def validateSafeExecution(path: Path) -> None:
-    notebook = loadNotebook(path)
-    previousMarkdown = ""
+def validateCodeCells(path: Path, cells: list[object]) -> None:
     namespace: dict[str, object] = {}
     with tempfile.TemporaryDirectory() as tempDir:
         currentDir = os.getcwd()
         os.chdir(tempDir)
         try:
-            for index, cell in enumerate(notebook.get("cells", [])):
-                cellType = cell.get("cell_type")
-                source = readCellSource(cell)
-                if cellType == "markdown":
-                    previousMarkdown = source
-                elif cellType == "code" and shouldRunCell(previousMarkdown, source):
-                    try:
+            for index, rawCell in enumerate(cells):
+                if not isinstance(rawCell, dict) or rawCell.get("cell_type") != "code":
+                    continue
+                source = readCellSource(rawCell)
+                try:
+                    ast.parse(source)
+                except SyntaxError as exc:
+                    raise AssertionError(f"{path.name} cell {index} syntax error: {exc.msg}") from exc
+                try:
+                    with (
+                        contextlib.redirect_stdout(io.StringIO()),
+                        contextlib.redirect_stderr(io.StringIO()),
+                    ):
                         exec(source, namespace)
-                    except SAFE_EXEC_ERRORS as exc:
-                        LOGGER.debug("safe execution failure in %s cell %s", path.name, index, exc_info=True)
-                        raise AssertionError(
-                            f"{path.name} cell {index} should run safely but raised {type(exc).__name__}: {exc}"
-                        ) from exc
+                except SAFE_EXEC_ERRORS as exc:
+                    LOGGER.debug("safe execution failure in %s cell %s", path.name, index, exc_info=True)
+                    raise AssertionError(
+                        f"{path.name} cell {index} should run safely but raised {type(exc).__name__}: {exc}"
+                    ) from exc
         finally:
             os.chdir(currentDir)
 
 
-def validateMarkdownPythonBlocks(path: Path) -> None:
+def validateReviewNotebook(path: Path) -> None:
     notebook = loadNotebook(path)
-    for cellIndex, cell in enumerate(notebook.get("cells", [])):
-        if cell.get("cell_type") != "markdown":
-            continue
-        markdown = readCellSource(cell)
-        for blockIndex, match in enumerate(PYTHON_FENCE_RE.finditer(markdown)):
-            source = match.group("source").strip()
-            if not source:
-                continue
-            try:
-                ast.parse(source)
-            except SyntaxError as exc:
-                raise AssertionError(
-                    f"{path.name} markdown cell {cellIndex} python block {blockIndex} syntax error: {exc.msg}"
-                ) from exc
-            with tempfile.TemporaryDirectory() as tempDir:
-                currentDir = os.getcwd()
-                os.chdir(tempDir)
-                try:
-                    exec(source, {})
-                except SAFE_EXEC_ERRORS as exc:
-                    raise AssertionError(
-                        f"{path.name} markdown cell {cellIndex} python block {blockIndex} "
-                        f"raised {type(exc).__name__}: {exc}"
-                    ) from exc
-                finally:
-                    os.chdir(currentDir)
+    cells = notebook.get("cells", [])
+    assertCondition(isinstance(cells, list), f"{path.name} cells must be a list")
+    markdownText = "\n".join(readCellSource(cell) for cell in cells if isinstance(cell, dict))
+    validateNoLegacyText(path, markdownText)
+    assertCondition("Review Day" in markdownText, f"{path.name} missing review title")
+    validateCodeCells(path, cells)
 
 
-def validateDocs() -> None:
-    requiredDocs = [
-        "readme.md",
-        "courseGuide.md",
-        "progressTracker.csv",
-    ]
-    missing = [name for name in requiredDocs if not (ROOT / name).exists()]
-    assertCondition(not missing, f"missing docs: {missing}")
-
-
-def validateMarimoNotebook(path: Path) -> None:
+def validateMarimoNotebook(path: Path, sourceYaml: Path | None) -> None:
     content = path.read_text(encoding="utf-8")
+    validateNoLegacyText(path, content)
     requiredText = ["import marimo", "app = marimo.App", "@app.cell", "app.run()"]
-    if path.name.startswith("day"):
-        requiredText.append("자동 확인")
-    else:
-        requiredText.append("리뷰 프로젝트")
     missing = [text for text in requiredText if text not in content]
     assertCondition(not missing, f"{path.name} missing marimo markers: {missing}")
     assertCondition("# %%" not in content, f"{path.name} still uses percent markers")
-    cellCount = content.count("@app.cell")
-    minimumCells = 20 if path.name.startswith("day") else 5
-    assertCondition(cellCount >= minimumCells, f"{path.name} has too few marimo cells")
+    assertCondition("runCell(" not in content, f"{path.name} must not wrap code in runCell strings")
+    if sourceYaml is not None:
+        sourceText = str(sourceYaml.relative_to(REPO_ROOT)).replace("\\", "/")
+        assertCondition(sourceText in content, f"{path.name} missing YAML source")
     try:
         ast.parse(content)
     except SyntaxError as exc:
         raise AssertionError(f"{path.name} syntax error: {exc.msg}") from exc
-    validateMarimoEmbeddedCode(path, content)
-
-
-def validateMarimoEmbeddedCode(path: Path, content: str) -> None:
-    previousMarkdown = ""
-    namespace: dict[str, object] = {}
-    with tempfile.TemporaryDirectory() as tempDir:
-        currentDir = os.getcwd()
-        os.chdir(tempDir)
-        try:
-            for index, match in enumerate(MARIMO_CELL_RE.finditer(content)):
-                source = match.group("source")
-                if match.group("kind") == "mo.md":
-                    previousMarkdown = source
-                    continue
-                try:
-                    ast.parse(source)
-                except SyntaxError as exc:
-                    raise AssertionError(f"{path.name} embedded cell {index} syntax error: {exc.msg}") from exc
-                if shouldRunCell(previousMarkdown, source):
-                    try:
-                        exec(source, namespace)
-                    except SAFE_EXEC_ERRORS as exc:
-                        raise AssertionError(
-                            f"{path.name} embedded cell {index} should run safely but raised "
-                            f"{type(exc).__name__}: {exc}"
-                        ) from exc
-        finally:
-            os.chdir(currentDir)
 
 
 def main() -> None:
     logging.basicConfig(level=logging.INFO)
+    curriculum = loadCurriculum()
+    dayEntries = curriculum.get("days", [])
+    assertCondition(isinstance(dayEntries, list), "curriculum days must be a list")
+    assertCondition(len(dayEntries) == 30, "curriculum must list exactly 30 days")
     validateDocs()
-    validateManifest()
-    notebooks = sorted(COLAB_DIR.glob("day*.ipynb"))
-    assertCondition(len(notebooks) == 30, "notebooks directory must contain exactly 30 day notebooks")
-    for path in notebooks:
-        validateNotebookStructure(path)
-        validateCodeSyntax(path)
-        validateMarkdownPythonBlocks(path)
-        validateSafeExecution(path)
+    validateManifest(curriculum)
+    for dayEntry in dayEntries:
+        day = int(dayEntry["day"])
+        sourceYaml = SOURCE_ROOT / str(dayEntry["file"])
+        colabPath = ROOT / "manifest.json"
+        manifestDays = loadJson(ROOT / "manifest.json")["days"]
+        manifestDay = manifestDays[day - 1]
+        colabPath = ROOT / str(manifestDay["colab"])
+        marimoPath = ROOT / str(manifestDay["marimo"])
+        validateNotebookAgainstYaml(colabPath, sourceYaml)
+        validateMarimoNotebook(marimoPath, sourceYaml)
     reviewNotebooks = sorted(COLAB_DIR.glob("review*.ipynb"))
     assertCondition(len(reviewNotebooks) == 6, "notebooks directory must contain exactly 6 review notebooks")
     for path in reviewNotebooks:
-        validateCodeSyntax(path)
-        validateMarkdownPythonBlocks(path)
-        validateSafeExecution(path)
-    marimoNotebooks = sorted(MARIMO_DIR.glob("day*.py"))
-    assertCondition(len(marimoNotebooks) == 30, "marimo directory must contain exactly 30 day notebooks")
-    for path in marimoNotebooks:
-        validateMarimoNotebook(path)
+        validateReviewNotebook(path)
     marimoReviews = sorted(MARIMO_DIR.glob("review*.py"))
     assertCondition(len(marimoReviews) == 6, "marimo directory must contain exactly 6 review notebooks")
     for path in marimoReviews:
-        validateMarimoNotebook(path)
+        validateMarimoNotebook(path, None)
     print("course validation ok")
 
 

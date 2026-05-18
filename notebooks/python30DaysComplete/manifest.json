@@ -1,284 +1,728 @@
 {
   "title": "Python 30일 완성",
-  "version": "4.0",
-  "description": "Colab에서 준비 질문, 코드가 실행되는 순서, 예측, 오류 고치기, 자동 확인, 리뷰 시험, 30일 프로젝트로 배우는 순수 파이썬 30일 과정",
-  "folderRule": "Repository path uses camelCase: notebooks/python30DaysComplete",
+  "source": "study/python/30days/curriculum.json",
+  "description": "study/python/30days YAML을 원본으로 생성한 Colab 및 marimo 학습 노트북",
   "days": [
     {
       "day": 1,
-      "title": "Hello World와 실행 감각",
-      "focus": "코드를 셀 단위로 실행하고 결과를 관찰하는 기본 습관을 만든다.",
-      "milestone": "",
+      "title": "헬로월드",
+      "sourceYaml": "study/python/30days/day01_헬로월드.yaml",
+      "allowedConcepts": [],
+      "newConcepts": [
+        "print",
+        "comment",
+        "string_literal"
+      ],
+      "forbidden": [
+        "variable",
+        "function",
+        "list",
+        "dict",
+        "import"
+      ],
       "colab": "colab/day01Helloworld.ipynb",
       "marimo": "marimo/day01Helloworld.py"
     },
     {
       "day": 2,
       "title": "변수와 데이터 타입",
-      "focus": "값에 이름을 붙이고 타입을 확인하는 법을 익힌다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day02_변수와데이터타입.yaml",
+      "allowedConcepts": [
+        "print",
+        "comment",
+        "string_literal"
+      ],
+      "newConcepts": [
+        "variable",
+        "int",
+        "float",
+        "str",
+        "bool",
+        "type",
+        "len"
+      ],
+      "forbidden": [
+        "list",
+        "dict",
+        "tuple",
+        "set",
+        "function",
+        "class",
+        "import"
+      ],
       "colab": "colab/day02Variablestypes.ipynb",
       "marimo": "marimo/day02Variablestypes.py"
     },
     {
       "day": 3,
       "title": "연산자",
-      "focus": "산술, 비교, 논리 연산자를 조합해 조건을 표현한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day03_연산자.yaml",
+      "allowedConcepts": [
+        "variable",
+        "int",
+        "float",
+        "str",
+        "bool",
+        "type",
+        "print"
+      ],
+      "newConcepts": [
+        "arithmetic_operator",
+        "comparison_operator",
+        "logical_operator",
+        "membership_operator"
+      ],
+      "forbidden": [
+        "list",
+        "dict",
+        "function",
+        "import"
+      ],
       "colab": "colab/day03Operators.ipynb",
       "marimo": "marimo/day03Operators.py"
     },
     {
       "day": 4,
       "title": "문자열 기초",
-      "focus": "문자열을 만들고 합치고 포맷팅하는 기본기를 익힌다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day04_문자열기초.yaml",
+      "allowedConcepts": [
+        "variable",
+        "type",
+        "operator",
+        "print",
+        "len"
+      ],
+      "newConcepts": [
+        "string_concat",
+        "fstring",
+        "string_escape",
+        "string_multiline",
+        "in_operator"
+      ],
+      "forbidden": [
+        "indexing",
+        "slicing",
+        "string_method",
+        "list",
+        "function",
+        "import"
+      ],
       "colab": "colab/day04Stringbasics.ipynb",
       "marimo": "marimo/day04Stringbasics.py"
     },
     {
       "day": 5,
-      "title": "문자열 인덱싱과 슬라이싱",
-      "focus": "문자열에서 특정 위치나 범위를 꺼내는 법을 익힌다.",
-      "milestone": "문자열과 값 다루기 점검",
+      "title": "문자열 인덱싱/슬라이싱",
+      "sourceYaml": "study/python/30days/day05_문자열인덱싱슬라이싱.yaml",
+      "allowedConcepts": [
+        "string_basic",
+        "operator"
+      ],
+      "newConcepts": [
+        "indexing",
+        "negative_indexing",
+        "slicing",
+        "slice_step"
+      ],
+      "forbidden": [
+        "string_method",
+        "list",
+        "function",
+        "import"
+      ],
       "colab": "colab/day05Stringindexingslicing.ipynb",
       "marimo": "marimo/day05Stringindexingslicing.py"
     },
     {
       "day": 6,
       "title": "문자열 메서드",
-      "focus": "문자열을 정리하고 나누고 바꾸는 대표 메서드를 익힌다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day06_문자열메서드.yaml",
+      "allowedConcepts": [
+        "string_basic",
+        "indexing",
+        "slicing"
+      ],
+      "newConcepts": [
+        "upper",
+        "lower",
+        "split",
+        "join",
+        "replace",
+        "strip",
+        "find",
+        "count"
+      ],
+      "forbidden": [
+        "list_method",
+        "function",
+        "import"
+      ],
       "colab": "colab/day06Stringmethods.ipynb",
       "marimo": "marimo/day06Stringmethods.py"
     },
     {
       "day": 7,
       "title": "리스트 기초",
-      "focus": "여러 값을 순서대로 담는 리스트를 만들고 읽고 바꾼다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day07_리스트기초.yaml",
+      "allowedConcepts": [
+        "string_all",
+        "operator",
+        "indexing",
+        "slicing"
+      ],
+      "newConcepts": [
+        "list",
+        "list_create",
+        "list_indexing",
+        "list_slicing",
+        "list_modify"
+      ],
+      "forbidden": [
+        "list_method",
+        "tuple",
+        "dict",
+        "set",
+        "function",
+        "import"
+      ],
       "colab": "colab/day07Listbasics.ipynb",
       "marimo": "marimo/day07Listbasics.py"
     },
     {
       "day": 8,
       "title": "리스트 메서드",
-      "focus": "리스트에 값을 추가, 삭제, 정렬, 복사하는 메서드를 익힌다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day08_리스트메서드.yaml",
+      "allowedConcepts": [
+        "list_basic"
+      ],
+      "newConcepts": [
+        "append",
+        "insert",
+        "remove",
+        "pop",
+        "sort",
+        "reverse",
+        "copy",
+        "extend",
+        "clear"
+      ],
+      "forbidden": [
+        "tuple",
+        "dict",
+        "set",
+        "function",
+        "import"
+      ],
       "colab": "colab/day08Listmethods.ipynb",
       "marimo": "marimo/day08Listmethods.py"
     },
     {
       "day": 9,
       "title": "튜플",
-      "focus": "바뀌면 안 되는 순서형 데이터를 튜플로 표현한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day09_튜플.yaml",
+      "allowedConcepts": [
+        "list_all",
+        "string_all"
+      ],
+      "newConcepts": [
+        "tuple",
+        "tuple_immutable",
+        "tuple_packing",
+        "tuple_unpacking"
+      ],
+      "forbidden": [
+        "dict",
+        "set",
+        "function",
+        "import"
+      ],
       "colab": "colab/day09Tuples.ipynb",
       "marimo": "marimo/day09Tuples.py"
     },
     {
       "day": 10,
       "title": "집합",
-      "focus": "중복 제거와 집합 연산으로 데이터를 비교한다.",
-      "milestone": "순서형/집합형 자료구조 점검",
+      "sourceYaml": "study/python/30days/day10_집합.yaml",
+      "allowedConcepts": [
+        "list_all",
+        "tuple"
+      ],
+      "newConcepts": [
+        "set",
+        "set_unique",
+        "add",
+        "remove",
+        "discard",
+        "union",
+        "intersection",
+        "difference"
+      ],
+      "forbidden": [
+        "dict",
+        "function",
+        "import"
+      ],
       "colab": "colab/day10Sets.ipynb",
       "marimo": "marimo/day10Sets.py"
     },
     {
       "day": 11,
       "title": "딕셔너리 기초",
-      "focus": "키와 값으로 구조화된 데이터를 표현한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day11_딕셔너리기초.yaml",
+      "allowedConcepts": [
+        "list_all",
+        "tuple",
+        "set"
+      ],
+      "newConcepts": [
+        "dict",
+        "key_value",
+        "dict_create",
+        "dict_access",
+        "dict_modify"
+      ],
+      "forbidden": [
+        "dict_method",
+        "function",
+        "import"
+      ],
       "colab": "colab/day11Dictbasics.ipynb",
       "marimo": "marimo/day11Dictbasics.py"
     },
     {
       "day": 12,
       "title": "딕셔너리 메서드",
-      "focus": "딕셔너리를 안전하게 읽고 순회하고 갱신한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day12_딕셔너리메서드.yaml",
+      "allowedConcepts": [
+        "dict_basic"
+      ],
+      "newConcepts": [
+        "get",
+        "keys",
+        "values",
+        "items",
+        "update",
+        "pop",
+        "popitem",
+        "clear"
+      ],
+      "forbidden": [
+        "function",
+        "import"
+      ],
       "colab": "colab/day12Dictmethods.ipynb",
       "marimo": "marimo/day12Dictmethods.py"
     },
     {
       "day": 13,
       "title": "조건문",
-      "focus": "상황에 따라 다른 코드를 실행하는 흐름을 만든다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day13_조건문.yaml",
+      "allowedConcepts": [
+        "all_data_types",
+        "all_operators"
+      ],
+      "newConcepts": [
+        "if",
+        "elif",
+        "else",
+        "ternary_operator",
+        "nested_if"
+      ],
+      "forbidden": [
+        "function",
+        "loop",
+        "import"
+      ],
       "colab": "colab/day13Conditionals.ipynb",
       "marimo": "marimo/day13Conditionals.py"
     },
     {
       "day": 14,
       "title": "반복문",
-      "focus": "여러 데이터에 같은 작업을 반복 적용한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day14_반복문.yaml",
+      "allowedConcepts": [
+        "all_data_types",
+        "conditional"
+      ],
+      "newConcepts": [
+        "for",
+        "while",
+        "range",
+        "break",
+        "continue",
+        "else_clause",
+        "nested_loop"
+      ],
+      "forbidden": [
+        "function",
+        "import"
+      ],
       "colab": "colab/day14Loops.ipynb",
       "marimo": "marimo/day14Loops.py"
     },
     {
       "day": 15,
       "title": "함수 기초",
-      "focus": "반복되는 로직에 이름을 붙이고 재사용한다.",
-      "milestone": "조건, 반복, 함수 기초 점검",
+      "sourceYaml": "study/python/30days/day15_함수기초.yaml",
+      "allowedConcepts": [
+        "all_data_types",
+        "conditional",
+        "loop"
+      ],
+      "newConcepts": [
+        "def",
+        "return",
+        "parameter",
+        "argument",
+        "docstring"
+      ],
+      "forbidden": [
+        "advanced_function",
+        "import",
+        "class"
+      ],
       "colab": "colab/day15Functionbasics.ipynb",
       "marimo": "marimo/day15Functionbasics.py"
     },
     {
       "day": 16,
       "title": "함수 고급",
-      "focus": "기본값, 키워드 인자, 가변 인자, 람다를 익힌다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day16_함수고급.yaml",
+      "allowedConcepts": [
+        "function_basic"
+      ],
+      "newConcepts": [
+        "default_parameter",
+        "keyword_argument",
+        "args",
+        "kwargs",
+        "lambda"
+      ],
+      "forbidden": [
+        "import",
+        "class",
+        "decorator"
+      ],
       "colab": "colab/day16Functionadvanced.ipynb",
       "marimo": "marimo/day16Functionadvanced.py"
     },
     {
       "day": 17,
       "title": "스코프와 클로저",
-      "focus": "변수가 보이는 범위와 상태를 기억하는 함수를 이해한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day17_스코프와클로저.yaml",
+      "allowedConcepts": [
+        "function_all"
+      ],
+      "newConcepts": [
+        "global",
+        "nonlocal",
+        "closure",
+        "scope"
+      ],
+      "forbidden": [
+        "import",
+        "class"
+      ],
       "colab": "colab/day17Scopeclosure.ipynb",
       "marimo": "marimo/day17Scopeclosure.py"
     },
     {
       "day": 18,
       "title": "모듈과 import",
-      "focus": "표준 라이브러리를 가져와 프로그램의 기능을 확장한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day18_모듈과import.yaml",
+      "allowedConcepts": [
+        "function_all"
+      ],
+      "newConcepts": [
+        "import",
+        "from_import",
+        "as",
+        "math",
+        "random",
+        "datetime",
+        "os",
+        "sys"
+      ],
+      "forbidden": [
+        "class",
+        "external_library"
+      ],
       "colab": "colab/day18Modulesimport.ipynb",
       "marimo": "marimo/day18Modulesimport.py"
     },
     {
       "day": 19,
       "title": "파일 입출력",
-      "focus": "텍스트 파일을 만들고 읽고 안전하게 닫는 패턴을 익힌다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day19_파일입출력.yaml",
+      "allowedConcepts": [
+        "function_all",
+        "import"
+      ],
+      "newConcepts": [
+        "open",
+        "read",
+        "write",
+        "with",
+        "close",
+        "file_mode"
+      ],
+      "forbidden": [
+        "class",
+        "external_library"
+      ],
       "colab": "colab/day19Fileio.ipynb",
       "marimo": "marimo/day19Fileio.py"
     },
     {
       "day": 20,
       "title": "예외 처리",
-      "focus": "실패 가능성을 예상하고 사용자에게 안전한 흐름을 제공한다.",
-      "milestone": "모듈, 파일, 예외 처리 점검",
+      "sourceYaml": "study/python/30days/day20_예외처리.yaml",
+      "allowedConcepts": [
+        "function_all",
+        "import",
+        "file_io"
+      ],
+      "newConcepts": [
+        "try",
+        "except",
+        "finally",
+        "raise",
+        "exception_type"
+      ],
+      "forbidden": [
+        "class",
+        "custom_exception"
+      ],
       "colab": "colab/day20Exceptionhandling.ipynb",
       "marimo": "marimo/day20Exceptionhandling.py"
     },
     {
       "day": 21,
       "title": "중간 종합 복습",
-      "focus": "자료구조, 조건문, 반복문, 함수, 파일, 예외를 하나의 흐름으로 묶는다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day21_중간종합복습.yaml",
+      "allowedConcepts": [
+        "everything_before"
+      ],
+      "newConcepts": [],
+      "forbidden": [
+        "class"
+      ],
       "colab": "colab/day21Midreview.ipynb",
       "marimo": "marimo/day21Midreview.py"
     },
     {
       "day": 22,
       "title": "클래스 기초",
-      "focus": "데이터와 동작을 함께 묶는 클래스를 만든다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day22_클래스기초.yaml",
+      "allowedConcepts": [
+        "function_all",
+        "import",
+        "exception"
+      ],
+      "newConcepts": [
+        "class",
+        "init",
+        "self",
+        "method",
+        "attribute",
+        "instance"
+      ],
+      "forbidden": [
+        "inheritance",
+        "special_method",
+        "decorator"
+      ],
       "colab": "colab/day22Classbasics.ipynb",
       "marimo": "marimo/day22Classbasics.py"
     },
     {
       "day": 23,
       "title": "클래스 고급",
-      "focus": "상속과 오버라이드로 공통 동작을 확장한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day23_클래스고급.yaml",
+      "allowedConcepts": [
+        "class_basic"
+      ],
+      "newConcepts": [
+        "inheritance",
+        "super",
+        "override",
+        "multiple_inheritance"
+      ],
+      "forbidden": [
+        "special_method",
+        "decorator"
+      ],
       "colab": "colab/day23Classadvanced.ipynb",
       "marimo": "marimo/day23Classadvanced.py"
     },
     {
       "day": 24,
       "title": "특수 메서드",
-      "focus": "객체가 파이썬 문법과 자연스럽게 어울리게 만든다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day24_특수메서드.yaml",
+      "allowedConcepts": [
+        "class_all"
+      ],
+      "newConcepts": [
+        "__str__",
+        "__repr__",
+        "__len__",
+        "__add__",
+        "__eq__",
+        "__getitem__"
+      ],
+      "forbidden": [
+        "decorator",
+        "metaclass"
+      ],
       "colab": "colab/day24Specialmethods.ipynb",
       "marimo": "marimo/day24Specialmethods.py"
     },
     {
       "day": 25,
       "title": "프로퍼티와 데코레이터",
-      "focus": "속성처럼 보이지만 검증과 계산을 포함하는 인터페이스를 만든다.",
-      "milestone": "객체지향 기본 설계 점검",
+      "sourceYaml": "study/python/30days/day25_프로퍼티와데코레이터.yaml",
+      "allowedConcepts": [
+        "class_all",
+        "special_method"
+      ],
+      "newConcepts": [
+        "property",
+        "setter",
+        "deleter",
+        "staticmethod",
+        "classmethod",
+        "decorator"
+      ],
+      "forbidden": [
+        "metaclass",
+        "external_library"
+      ],
       "colab": "colab/day25Propertydecorator.ipynb",
       "marimo": "marimo/day25Propertydecorator.py"
     },
     {
       "day": 26,
       "title": "컴프리헨션",
-      "focus": "반복과 조건을 짧고 읽기 쉬운 데이터 변환식으로 쓴다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day26_컴프리헨션.yaml",
+      "allowedConcepts": [
+        "all_basic",
+        "loop",
+        "conditional"
+      ],
+      "newConcepts": [
+        "list_comprehension",
+        "dict_comprehension",
+        "set_comprehension",
+        "nested_comprehension"
+      ],
+      "forbidden": [
+        "generator_expression",
+        "external_library"
+      ],
       "colab": "colab/day26Comprehensions.ipynb",
       "marimo": "marimo/day26Comprehensions.py"
     },
     {
       "day": 27,
       "title": "제너레이터와 이터레이터",
-      "focus": "필요할 때 하나씩 값을 만들어 메모리를 아끼는 흐름을 이해한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day27_제너레이터와이터레이터.yaml",
+      "allowedConcepts": [
+        "function_all",
+        "class_all",
+        "comprehension"
+      ],
+      "newConcepts": [
+        "yield",
+        "generator",
+        "iter",
+        "next",
+        "iterator_protocol"
+      ],
+      "forbidden": [
+        "external_library"
+      ],
       "colab": "colab/day27Generatorsiterators.ipynb",
       "marimo": "marimo/day27Generatorsiterators.py"
     },
     {
       "day": 28,
       "title": "고급 문법 종합",
-      "focus": "컨텍스트 매니저와 지금까지의 고급 문법을 연결한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day28_고급문법종합.yaml",
+      "allowedConcepts": [
+        "everything"
+      ],
+      "newConcepts": [
+        "context_manager",
+        "with_statement",
+        "custom_context_manager"
+      ],
+      "forbidden": [
+        "external_library"
+      ],
       "colab": "colab/day28Advancedsyntaxreview.ipynb",
       "marimo": "marimo/day28Advancedsyntaxreview.py"
     },
     {
       "day": 29,
       "title": "알고리즘 연습",
-      "focus": "문제를 작게 나누고 자료구조를 선택해 해결한다.",
-      "milestone": "",
+      "sourceYaml": "study/python/30days/day29_알고리즘연습.yaml",
+      "allowedConcepts": [
+        "everything"
+      ],
+      "newConcepts": [
+        "sorting",
+        "searching",
+        "recursion"
+      ],
+      "forbidden": [
+        "external_library"
+      ],
       "colab": "colab/day29Algorithmpractice.ipynb",
       "marimo": "marimo/day29Algorithmpractice.py"
     },
     {
       "day": 30,
       "title": "최종 프로젝트",
-      "focus": "30일 동안 배운 문법으로 작은 학습 리포트 프로그램을 완성한다.",
-      "milestone": "최종 프로젝트 완성 점검",
+      "sourceYaml": "study/python/30days/day30_최종프로젝트.yaml",
+      "allowedConcepts": [
+        "everything"
+      ],
+      "newConcepts": [],
+      "forbidden": [
+        "external_library"
+      ],
       "colab": "colab/day30Finalproject.ipynb",
       "marimo": "marimo/day30Finalproject.py"
     }
   ],
   "reviews": [
     {
-      "range": "01-05",
-      "title": "Review Day 01-05",
+      "range": "Day 01-05",
       "colab": "colab/reviewDay01To05.ipynb",
       "marimo": "marimo/reviewDay01To05.py"
     },
     {
-      "range": "06-10",
-      "title": "Review Day 06-10",
+      "range": "Day 06-10",
       "colab": "colab/reviewDay06To10.ipynb",
       "marimo": "marimo/reviewDay06To10.py"
     },
     {
-      "range": "11-15",
-      "title": "Review Day 11-15",
+      "range": "Day 11-15",
       "colab": "colab/reviewDay11To15.ipynb",
       "marimo": "marimo/reviewDay11To15.py"
     },
     {
-      "range": "16-20",
-      "title": "Review Day 16-20",
+      "range": "Day 16-20",
       "colab": "colab/reviewDay16To20.ipynb",
       "marimo": "marimo/reviewDay16To20.py"
     },
     {
-      "range": "21-25",
-      "title": "Review Day 21-25",
+      "range": "Day 21-25",
       "colab": "colab/reviewDay21To25.ipynb",
       "marimo": "marimo/reviewDay21To25.py"
     },
     {
-      "range": "26-30",
-      "title": "Review Day 26-30",
+      "range": "Day 26-30",
       "colab": "colab/reviewDay26To30.ipynb",
       "marimo": "marimo/reviewDay26To30.py"
     }

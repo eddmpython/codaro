@@ -14,641 +14,999 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
     # Day 30. 최종 프로젝트
-    
-    **오늘의 초점**: 30일 동안 배운 문법으로 작은 학습 리포트 프로그램을 완성한다.
-    
-    **완성 기준**: 데이터 구조 설계, 함수 분리, 클래스, 예외 처리, 파일 저장을 포함한 하나의 프로그램을 만들 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+
+    이 노트북은 `study/python/30days/day30_최종프로젝트.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 30일간 배운 모든 개념 통합
+    - 실전 프로젝트 구현
+    - 문제 해결 능력 완성
+    - 파이썬 마스터 달성
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 요구사항 분해
-    - 데이터 모델
-    - 함수 분리
-    - 클래스
-    - 파일 저장
-    - 최종 점검
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: 복습
+    - 이미 써도 되는 개념: everything
+    - 오늘은 일부러 쓰지 않는 개념: external_library
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    마지막 날의 목표는 새 문법을 더 배우는 것이 아니라 배운 것을 연결해 결과물을 만드는 것이다. 완성된 작은 프로그램 하나가 문법 목록보다 오래 기억에 남는다.
-    
-    ## 생각 모델
-    
-    프로젝트는 한 번에 완성하지 않는다. 데이터 모델, 계산 함수, 표시 함수, 저장 흐름으로 나누어 작은 조각을 검증하며 합친다.
-    
-    ## 자주 하는 실수
-    
-    - 프로젝트를 한 셀에 모두 작성해 검증하기 어렵게 만들기
-    - 데이터 구조를 먼저 정하지 않고 함수부터 쓰기
-    - 파일 저장 결과를 다시 읽어 검증하지 않기
+    ## 텍스트 처리 프로젝트
+
+    *문자열과 파일 다루기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `요구사항 분해`를 한 문장으로 설명할 수 있는가?
-    2. `데이터 모델`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    텍스트 처리는 파이썬의 대표적인 활용 분야입니다. 파일 읽기, 문자열 조작, 단어 카운팅, 텍스트 분석 등을 조합하여 실용적인 프로그램을 만들 수 있습니다. 딕셔너리와 리스트를 활용하여 효율적으로 데이터를 관리합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 29: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 27: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 23: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - 파일 읽기와 쓰기
+    - 문자열 메서드 활용
+    - 딕셔너리로 카운팅
+    - 데이터 분석
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마일스톤: 최종 프로젝트 완성 점검
-    
-    오늘은 단순 진도일이 아니라 누적 점검일입니다. 새 셀을 끝낸 뒤, 이전 Day의 작은 만들기 중 하나를 골라 변수명과 데이터를 바꿔 다시 구현하세요.
-    
-    통과 기준은 더 엄격합니다.
-    
-    - 이전 개념을 최소 3개 이상 함께 사용했다.
-    - 에러가 났을 때 에러 이름과 원인을 적었다.
-    - 최종 셀의 결과를 보고 “이 코드가 하는 일”을 비전공자에게 설명할 수 있다.
+    ### 단어 빈도 분석기
+
+    텍스트에서 단어 빈도를 분석합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        def analyzeWords(text):
+            words = text.lower().split()
+            frequency = {}
+            for word in words:
+                cleaned = word.strip('.,!?')
+                if cleaned:
+                    frequency[cleaned] = frequency.get(cleaned, 0) + 1
+            return frequency
+
+        sampleText = 'hello world hello python world'
+        return analyzeWords(sampleText)
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 최빈 단어 찾기
+
+    가장 많이 등장하는 단어를 찾습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0009():
+        def findTopWords(text, n):
+            words = text.lower().split()
+            freq = {}
+            for word in words:
+                freq[word] = freq.get(word, 0) + 1
+            sorted_items = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+            return sorted_items[:n]
+
+        document = 'python is great python is powerful python is easy'
+        return findTopWords(document, 2)
+    _snippet_0009()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 문장 통계
+
+    텍스트의 통계 정보를 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0011():
+        def textStats(text):
+            sentences = text.split('.')
+            words = text.split()
+            chars = len(text)
+            return len(sentences) - 1, len(words), chars
+
+        passage = 'This is a test. Python is amazing. I love coding.'
+        return textStats(passage)
+    _snippet_0011()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 텍스트 처리는 웹 크롤링, 데이터 분석, 자연어 처리의 기초입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `요구사항 분해`, `데이터 모델`, `함수 분리`, `클래스`, `파일 저장`, `최종 점검`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 프로젝트를 한 셀에 모두 작성해 검증하기 어렵게 만들기
-    - 데이터 구조를 먼저 정하지 않고 함수부터 쓰기
-    - 파일 저장 결과를 다시 읽어 검증하지 않기
+    ## 데이터 관리 프로젝트
+
+    *자료구조 활용하기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `최종 프로젝트`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    데이터 관리는 리스트, 딕셔너리, 세트를 조합하여 효율적으로 정보를 저장하고 조회하는 것입니다. 학생 성적 관리, 재고 관리, 주소록 등 실생활 문제를 자료구조로 해결할 수 있습니다. 클래스를 사용하면 더욱 체계적으로 관리할 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `records = [` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `    {"day": 1, "topic": "hello", "minutes": 25, "done": True},` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
-    | 3 | `    {"day": 2, "topic": "variables", "minutes": 40, "done": True},` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
-    | 4 | `]` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
-    | 5 | `totalMinutes = sum(record["minutes"] for record in records)` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 6 | `totalMinutes` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - 리스트로 순서 관리
+    - 딕셔너리로 빠른 조회
+    - 세트로 중복 제거
+    - 클래스로 구조화
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 학생 성적 관리
+
+    학생들의 성적을 관리합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-records = [
-    {"day": 1, "topic": "hello", "minutes": 25, "done": True},
-    {"day": 2, "topic": "variables", "minutes": 40, "done": True},
-]
-totalMinutes = sum(record["minutes"] for record in records)
-totalMinutes
-"""
-    )
+def _():
+    def _snippet_0017():
+        class GradeBook:
+            def __init__(self):
+                self.students = {}
+
+            def addScore(self, name, score):
+                if name not in self.students:
+                    self.students[name] = []
+                self.students[name].append(score)
+
+            def getAverage(self, name):
+                if name in self.students:
+                    scores = self.students[name]
+                    return sum(scores) / len(scores)
+                return 0
+
+        gb = GradeBook()
+        gb.addScore('Alice', 90)
+        gb.addScore('Alice', 85)
+        return gb.getAverage('Alice')
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    완료율은 `완료한 항목 수 / 전체 항목 수`입니다. 아래 결과를 예측하세요.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
+    ### 재고 관리 시스템
+
+    물품의 재고를 관리합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-records = [
-    {"done": True},
-    {"done": False},
-    {"done": True},
-]
-doneCount = sum(1 for record in records if record["done"])
-doneCount / len(records)
-"""
-    )
+def _():
+    def _snippet_0019():
+        class Inventory:
+            def __init__(self):
+                self.items = {}
+
+            def add(self, item, quantity):
+                self.items[item] = self.items.get(item, 0) + quantity
+
+            def remove(self, item, quantity):
+                if item in self.items:
+                    self.items[item] = max(0, self.items[item] - quantity)
+
+            def check(self, item):
+                return self.items.get(item, 0)
+
+        inv = Inventory()
+        inv.add('apple', 10)
+        inv.remove('apple', 3)
+        return inv.check('apple')
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    0.6666666666666666
-    ```
-    
-    </details>
+    ### 연락처 관리
+
+    연락처를 저장하고 검색합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0021():
+        class ContactBook:
+            def __init__(self):
+                self.contacts = {}
+
+            def add(self, name, phone):
+                self.contacts[name] = phone
+
+            def find(self, name):
+                return self.contacts.get(name, 'Not found')
+
+            def delete(self, name):
+                if name in self.contacts:
+                    del self.contacts[name]
+                    return True
+                return False
+
+        cb = ContactBook()
+        cb.add('John', '123-4567')
+        return cb.find('John')
+    _snippet_0021()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `StudyRecord` 클래스의 `isLongSession` 메서드를 실행해 확인하세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-class StudyRecord:
-    def __init__(self, day, topic, minutes, done):
-        self.day = day
-        self.topic = topic
-        self.minutes = minutes
-        self.done = done
-
-    def isLongSession(self):
-        return self.minutes >= 60
-
-record = StudyRecord(30, "final project", 80, True)
-assert record.isLongSession() is True
-record.isLongSession()
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    class StudyRecord:
-        def __init__(self, day, topic, minutes, done):
-            self.day = day
-            self.topic = topic
-            self.minutes = minutes
-            self.done = done
-    
-        def isLongSession(self):
-            return self.minutes >= 60
-    
-    record = StudyRecord(30, "final project", 80, True)
-    assert record.isLongSession() is True
-    record.isLongSession()
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > 적절한 자료구조를 선택하면 프로그램의 효율성이 크게 향상됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    아래 요약 함수는 완료하지 않은 항목까지 평균에 포함합니다. 완료한 항목만 사용하도록 고치세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
+    ## 게임 로직 프로젝트
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def averageDoneMinutes(records):
-    minutes = [record["minutes"] for record in records if record["done"]]
-    return sum(minutes) / len(minutes)
-
-records = [
-    {"minutes": 30, "done": True},
-    {"minutes": 100, "done": False},
-    {"minutes": 50, "done": True},
-]
-assert averageDoneMinutes(records) == 40
-averageDoneMinutes(records)
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    def averageDoneMinutes(records):
-        minutes = [record["minutes"] for record in records if record["done"]]
-        return sum(minutes) / len(minutes)
-    
-    records = [
-        {"minutes": 30, "done": True},
-        {"minutes": 100, "done": False},
-        {"minutes": 50, "done": True},
-    ]
-    assert averageDoneMinutes(records) == 40
-    averageDoneMinutes(records)
-    ```
-    
-    </details>
+    *알고리즘으로 게임 만들기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    게임 로직은 조건문, 반복문, 함수를 조합하여 규칙을 구현합니다. 숫자 맞추기, 가위바위보, 틱택토 등 간단한 게임을 만들면서 프로그래밍 논리를 익힐 수 있습니다. 난수 생성과 사용자 입력 처리가 핵심입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    최종 리포트에 완료율을 계산하는 함수를 추가하세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def completionRate(records):
-    doneCount = sum(1 for record in records if record["done"])
-    return round(doneCount / len(records), 2)
-
-records = [{"done": True}, {"done": False}, {"done": True}]
-rate = completionRate(records)
-assert rate == 0.67
-rate
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    def completionRate(records):
-        doneCount = sum(1 for record in records if record["done"])
-        return round(doneCount / len(records), 2)
-    
-    records = [{"done": True}, {"done": False}, {"done": True}]
-    rate = completionRate(records)
-    assert rate == 0.67
-    rate
-    ```
-    
-    </details>
+    - 게임 규칙 구현
+    - 상태 관리
+    - 승패 판정
+    - 점수 계산
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### 가위바위보 게임
+
+    가위바위보 승패를 판정합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'record.isLongSession() is True'),
-    ('오류 고쳐보기', 'averageDoneMinutes([{"minutes": 30, "done": True}, {"minutes": 100, "done": False}, {"minutes": 50, "done": True}]) == 40'),
-    ('비슷한 문제', 'rate == 0.67')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
+def _():
+    def _snippet_0027():
+        def playRPS(player1, player2):
+            wins = {
+                'rock': 'scissors',
+                'scissors': 'paper',
+                'paper': 'rock'
+            }
+            if player1 == player2:
+                return 'draw'
+            elif wins[player1] == player2:
+                return 'player1'
+            else:
+                return 'player2'
 
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+        return playRPS('rock', 'scissors')
+    _snippet_0027()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 최종 프로젝트: 30일 학습 기록을 요약하는 리포트 프로그램을 완성하세요. 아래 시작 코드를 확장해 JSON 저장까지 수행합니다.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    ### 틱택토 승리 체크
+
+    틱택토에서 승리 조건을 확인합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        def checkWinner(board):
+            lines = [
+                [board[0], board[1], board[2]],
+                [board[3], board[4], board[5]],
+                [board[6], board[7], board[8]],
+                [board[0], board[3], board[6]],
+                [board[1], board[4], board[7]],
+                [board[2], board[5], board[8]],
+                [board[0], board[4], board[8]],
+                [board[2], board[4], board[6]]
+            ]
+            for line in lines:
+                if line[0] == line[1] == line[2] and line[0] != ' ':
+                    return line[0]
+            return None
+
+        gameBoard = ['X', 'X', 'X', 'O', 'O', ' ', ' ', ' ', ' ']
+        return checkWinner(gameBoard)
+    _snippet_0029()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    최종 프로젝트: 30일 학습 기록을 요약하는 리포트 프로그램을 완성하세요. 아래 시작 코드를 확장해 JSON 저장까지 수행합니다.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
+    ### 주사위 게임
+
+    두 주사위의 합을 계산합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-from pathlib import Path
-import json
+def _():
+    def _snippet_0031():
+        import random
 
-class StudyRecord:
-    def __init__(self, day, topic, minutes, done):
-        self.day = day
-        self.topic = topic
-        self.minutes = minutes
-        self.done = done
+        def rollDice():
+            die1 = random.randint(1, 6)
+            die2 = random.randint(1, 6)
+            return die1 + die2
 
-    def toDict(self):
-        return {
-            "day": self.day,
-            "topic": self.topic,
-            "minutes": self.minutes,
-            "done": self.done,
-        }
-
-def summarize(records):
-    doneRecords = [record for record in records if record.done]
-    totalMinutes = sum(record.minutes for record in records)
-    doneMinutes = sum(record.minutes for record in doneRecords)
-    return {
-        "totalDays": len(records),
-        "doneDays": len(doneRecords),
-        "completionRate": round(len(doneRecords) / len(records), 2),
-        "totalMinutes": totalMinutes,
-        "doneMinutes": doneMinutes,
-    }
-
-records = [
-    StudyRecord(1, "hello", 25, True),
-    StudyRecord(2, "variables", 40, True),
-    StudyRecord(30, "final project", 90, True),
-]
-report = summarize(records)
-payload = {
-    "records": [record.toDict() for record in records],
-    "report": report,
-}
-Path("python30Report.json").write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
-report
-"""
-    )
+        return rollDice()
+    _snippet_0031()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-from pathlib import Path
-import json
-
-report = {
-    "course": "Python 30 Days",
-    "completedDays": 30,
-    "nextStep": "build a personal automation script",
-}
-Path("finalStudyReport.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
-report
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 30
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: 미완료 항목, 최장 학습일, 다음 복습 추천 주제를 리포트에 추가하세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    > **팁**
+    >
+    > 게임 로직은 조건문과 반복문을 연습하기에 좋은 주제입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `최종 리포트에 완료율을 계산하는 함수를 추가하세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 요구사항 분해, 데이터 모델, 함수 분리 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ## 파일 처리 프로젝트
+
+    *데이터 저장과 불러오기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `최종 프로젝트`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    파일 처리는 데이터를 영구적으로 저장하고 불러오는 기능입니다. CSV 파일 읽기, JSON 형식 저장, 로그 파일 작성 등 실무에서 자주 사용됩니다. with 문을 사용하여 안전하게 파일을 관리하고, 예외 처리로 오류를 방지합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    - 파일 읽기/쓰기
+    - with 문 활용
+    - 예외 처리
+    - 데이터 형식 변환
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### CSV 읽기
+
+    CSV 형식의 데이터를 파싱합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0037():
+        def parseCSV(content):
+            lines = content.strip().split('\n')
+            header = lines[0].split(',')
+            data = []
+            for line in lines[1:]:
+                values = line.split(',')
+                row = dict(zip(header, values))
+                data.append(row)
+            return data
+
+        csvContent = 'name,age\nAlice,25\nBob,30'
+        return parseCSV(csvContent)
+    _snippet_0037()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 로그 생성
+
+    로그 메시지를 생성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        import time
+
+        def createLog(level, message):
+            timestamp = time.strftime('%Y-%m-%d %H:%M:%S')
+            return f'[{timestamp}] {level}: {message}'
+
+        return createLog('INFO', 'Application started')
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 설정 파일 파싱
+
+    key=value 형식의 설정을 파싱합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        def parseConfig(text):
+            config = {}
+            for line in text.strip().split('\n'):
+                if '=' in line:
+                    key, value = line.split('=', 1)
+                    config[key.strip()] = value.strip()
+            return config
+
+        configText = 'host=localhost\nport=8080\ndebug=true'
+        return parseConfig(configText)
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 파일 처리는 데이터 영속성을 위한 필수 기능입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 객체지향 프로젝트
+
+    *클래스로 모델링하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    객체지향 프로그래밍은 현실 세계를 클래스와 객체로 모델링합니다. 은행 계좌, 도서관 시스템, 쇼핑카트 등을 클래스로 설계하면 코드의 재사용성과 유지보수성이 향상됩니다. 상속과 캡슐화를 활용하여 체계적인 프로그램을 작성합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 클래스 설계
+    - 상속과 다형성
+    - 캡슐화
+    - 메서드 구현
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 은행 계좌
+
+    입금과 출금이 가능한 계좌를 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0047():
+        class BankAccount:
+            def __init__(self, owner, balance=0):
+                self.owner = owner
+                self.balance = balance
+
+            def deposit(self, amount):
+                if amount > 0:
+                    self.balance = self.balance + amount
+                    return True
+                return False
+
+            def withdraw(self, amount):
+                if 0 < amount <= self.balance:
+                    self.balance = self.balance - amount
+                    return True
+                return False
+
+        account = BankAccount('Alice', 1000)
+        account.deposit(500)
+        account.withdraw(300)
+        return account.balance
+    _snippet_0047()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 도서관 시스템
+
+    책 대출과 반납을 관리합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        class Library:
+            def __init__(self):
+                self.books = {}
+                self.borrowed = {}
+
+            def addBook(self, title, copies):
+                self.books[title] = copies
+
+            def borrow(self, user, title):
+                if self.books.get(title, 0) > 0:
+                    self.books[title] = self.books[title] - 1
+                    if user not in self.borrowed:
+                        self.borrowed[user] = []
+                    self.borrowed[user].append(title)
+                    return True
+                return False
+
+            def returnBook(self, user, title):
+                if user in self.borrowed and title in self.borrowed[user]:
+                    self.borrowed[user].remove(title)
+                    self.books[title] = self.books[title] + 1
+                    return True
+                return False
+
+        lib = Library()
+        lib.addBook('Python Guide', 3)
+        lib.borrow('Bob', 'Python Guide')
+        return lib.books['Python Guide']
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 쇼핑 카트
+
+    장바구니에 상품을 추가하고 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        class ShoppingCart:
+            def __init__(self):
+                self.items = {}
+
+            def add(self, item, price, quantity=1):
+                if item in self.items:
+                    self.items[item]['quantity'] = self.items[item]['quantity'] + quantity
+                else:
+                    self.items[item] = {'price': price, 'quantity': quantity}
+
+            def getTotal(self):
+                total = 0
+                for item in self.items.values():
+                    total = total + item['price'] * item['quantity']
+                return total
+
+        cart = ShoppingCart()
+        cart.add('apple', 1.5, 3)
+        cart.add('banana', 0.8, 5)
+        return cart.getTotal()
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 클래스는 관련된 데이터와 기능을 하나로 묶어 관리합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 알고리즘 프로젝트
+
+    *효율적인 문제 해결*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    알고리즘 프로젝트는 정렬, 검색, 재귀를 조합하여 복잡한 문제를 해결합니다. 데이터 필터링, 패턴 찾기, 최적화 등 실무에서 자주 마주치는 문제들을 효율적으로 처리하는 방법을 배웁니다. 시간 복잡도를 고려하여 최적의 알고리즘을 선택합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 정렬과 검색 조합
+    - 재귀로 문제 분해
+    - 효율성 고려
+    - 최적화 전략
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 중복 제거 정렬
+
+    중복을 제거하고 정렬합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0057():
+        def uniqueSorted(arr):
+            seen = set()
+            unique = []
+            for item in arr:
+                if item not in seen:
+                    seen.add(item)
+                    unique.append(item)
+            return sorted(unique)
+
+        mixedData = [3, 1, 4, 1, 5, 9, 2, 6, 5, 3]
+        return uniqueSorted(mixedData)
+    _snippet_0057()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 그룹핑
+
+    조건에 따라 데이터를 그룹화합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        def groupBy(arr, keyFunc):
+            groups = {}
+            for item in arr:
+                key = keyFunc(item)
+                if key not in groups:
+                    groups[key] = []
+                groups[key].append(item)
+            return groups
+
+        numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
+        return groupBy(numbers, lambda x: 'even' if x % 2 == 0 else 'odd')
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 범위 합계
+
+    특정 범위의 합을 빠르게 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        def rangeSumQuery(arr):
+            prefixSum = [0]
+            for num in arr:
+                prefixSum.append(prefixSum[-1] + num)
+
+            def query(start, end):
+                return prefixSum[end + 1] - prefixSum[start]
+
+            return query
+
+        queryFunc = rangeSumQuery([1, 2, 3, 4, 5])
+        return queryFunc(1, 3)
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 알고리즘은 문제를 효율적으로 해결하는 절차입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 30 최종 복습
+
+    *30일 완성 프로젝트*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    30일간 배운 모든 파이썬 문법을 종합하여 실전 프로젝트를 완성합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전하며 파이썬 마스터가 되어보세요.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 문자열 역순
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 리스트 필터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 딕셔너리 병합
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 카운터 클래스
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 팩토리얼 반복
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 투표 시스템
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 날짜 파싱
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 스택 구현
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 큐 구현
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 온도 변환기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1: JSON 파싱
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2: 메모이제이션
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3: 단어 체인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4: 행렬 전치
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5: 괄호 검증
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화6: LRU 캐시
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화7: 표현식 계산기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화8: 최소 편집 거리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화9: 트리 순회
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화10: 완성 축하
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

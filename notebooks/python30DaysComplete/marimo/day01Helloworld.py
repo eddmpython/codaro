@@ -2,7 +2,7 @@ import marimo
 
 __generated_with = "0.23.6"
 
-app = marimo.App(app_title="Day 01. Hello World와 실행 감각")
+app = marimo.App(app_title="Day 01. 헬로월드")
 
 
 @app.cell
@@ -14,532 +14,644 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    # Day 01. Hello World와 실행 감각
-    
-    **오늘의 초점**: 코드를 셀 단위로 실행하고 결과를 관찰하는 기본 습관을 만든다.
-    
-    **완성 기준**: 문자열, 숫자, 간단한 표현식을 실행하고 결과가 어디에 나타나는지 설명할 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+    # Day 01. 헬로월드
+
+    이 노트북은 `study/python/30days/day01_헬로월드.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 파이썬 프로그램 실행 방법
+    - print() 함수로 텍스트 출력하기
+    - 한 줄 주석과 여러 줄 주석
+    - 코드 작성 시 주석의 중요성
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 코드 셀 실행
-    - 따옴표로 감싼 글자
-    - 숫자 계산
-    - 결과 보기
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: print, comment, string_literal
+    - 이미 써도 되는 개념: 없음
+    - 오늘은 일부러 쓰지 않는 개념: variable, function, list, dict, import
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    첫날의 목표는 문법을 많이 외우는 것이 아니라 실행 감각을 얻는 것이다. 파이썬은 한 줄씩 실행해도 바로 결과를 확인할 수 있으므로, 작은 실험을 자주 하는 사람이 빠르게 는다.
-    
-    ## 생각 모델
-    
-    코드 셀은 작은 실험실이다. 한 셀에는 하나의 생각만 담고, 실행 결과를 보고 다음 셀에서 생각을 조금 바꿔본다.
-    
-    ## 자주 하는 실수
-    
-    - 문자열 따옴표를 빼먹기
-    - 실행하지 않은 셀의 결과를 기대하기
-    - 한 셀에 너무 많은 실험을 넣기
+    ## Hello World
+
+    *첫 파이썬 프로그램*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `코드 셀 실행`를 한 문장으로 설명할 수 있는가?
-    2. `따옴표로 감싼 글자`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    모든 프로그래밍 언어를 배울 때 가장 먼저 하는 것이 'Hello World'를 출력하는 것입니다. 이는 1970년대부터 이어져 온 전통으로, 프로그램이 제대로 실행되는지 확인하는 가장 간단한 방법입니다. 파이썬에서는 print() 함수를 사용하여 화면에 텍스트를 출력합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    오늘은 복습할 이전 Day가 없습니다. 대신 아래 세 가지를 기준점으로 잡습니다.
-    
-    - 코드를 실행하기 전에 결과를 먼저 예상한다.
-    - 결과가 다르면 코드를 지우지 말고 왜 다른지 적는다.
-    - 한 셀에는 하나의 실험만 둔다.
+    - print() 함수로 텍스트 출력
+    - 작은따옴표 또는 큰따옴표로 문자 감싸기
+    - 프로그래밍의 전통적인 첫 단계
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### Hello World 출력
+
+    print() 함수로 'Hello World'를 출력합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        return print('Hello World')
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 작은따옴표('')와 큰따옴표(\"\")는 기능상 차이가 없습니다. 편한 것을 사용하세요.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `코드 셀 실행`, `따옴표로 감싼 글자`, `숫자 계산`, `결과 보기`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 문자열 따옴표를 빼먹기
-    - 실행하지 않은 셀의 결과를 기대하기
-    - 한 셀에 너무 많은 실험을 넣기
+    ## 한글 출력하기
+
+    *파이썬은 모든 언어 지원*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `Hello World와 실행 감각`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    파이썬은 유니코드(Unicode)를 지원하므로 영어뿐만 아니라 한글, 일본어, 중국어 등 모든 언어를 출력할 수 있습니다. 유니코드는 전 세계 모든 문자를 컴퓨터에서 표현할 수 있도록 만든 국제 표준입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `message = "Hello, Python"` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `message` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - 한글, 영어, 일본어 등 모든 언어 출력 가능
+    - 유니코드 완벽 지원
+    - 이모지도 출력 가능
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 한글 출력
+
+    한글도 자유롭게 출력할 수 있습니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-message = "Hello, Python"
-message
-"""
-    )
+def _():
+    def _snippet_0013():
+        return print('안녕하세요, 파이썬!')
+    _snippet_0013()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `2 + 3 * 4`의 결과를 먼저 적어본 뒤 실행하세요. 곱셈이 덧셈보다 먼저 계산됩니다.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-2 + 3 * 4
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    14
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > 이모지도 출력할 수 있습니다: print('🐍 Python')
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `answer`가 `Hello, Codaro`가 되도록 아래 완성 코드를 먼저 실행해 확인하세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
+    ## 여러 줄 출력하기
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-answer = "Hello, Codaro"
-assert answer == "Hello, Codaro"
-answer
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    answer = "Hello, Codaro"
-    assert answer == "Hello, Codaro"
-    answer
-    ```
-    
-    </details>
+    *print() 여러 번 사용*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 문자열 따옴표가 빠져서 오류가 납니다. 값을 문자열로 고쳐 실행하세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-greeting = "Hello"
-greeting
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    greeting = "Hello"
-    greeting
-    ```
-    
-    </details>
+    여러 줄의 텍스트를 출력하려면 print() 함수를 여러 번 사용하면 됩니다. 각 print()는 자동으로 줄바꿈을 하므로 다음 출력은 새 줄에서 시작됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    - print() 여러 번 사용하여 여러 줄 출력
+    - 각 print()는 자동으로 줄바꿈
+    - 순서대로 위에서 아래로 실행
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    다른 인사 문장을 직접 만들어보세요. `intro`가 정확히 `I run Python today.`가 되어야 합니다.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
+    ### 여러 줄 출력
+
+    print()를 여러 번 사용하여 여러 줄을 출력합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-intro = "I run Python today."
-assert intro == "I run Python today."
-intro
-"""
-    )
+def _():
+    def _snippet_0019():
+        print('첫 번째 줄')
+        print('두 번째 줄')
+        return print('세 번째 줄')
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    intro = "I run Python today."
-    assert intro == "I run Python today."
-    intro
-    ```
-    
-    </details>
+    ## 줄바꿈 문자
+
+    *\n으로 한 번에 여러 줄 출력*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'answer == "Hello, Codaro"'),
-    ('오류 고쳐보기', 'greeting == "Hello"'),
-    ('비슷한 문제', 'intro == "I run Python today."')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 오늘의 작은 결과물은 자기소개 한 줄입니다. 이름, 오늘 배운 것, 내일 목표를 각각 변수에 담고 하나의 문장으로 합치세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    \n은 줄바꿈 문자로, 하나의 print() 안에서 여러 줄을 출력할 수 있게 해줍니다. \n을 만나면 그 지점에서 줄이 바뀝니다. 백슬래시(\)와 문자 n을 함께 써서 만듭니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    오늘의 작은 결과물은 자기소개 한 줄입니다. 이름, 오늘 배운 것, 내일 목표를 각각 변수에 담고 하나의 문장으로 합치세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-name = "Mina"
-today = "running code cells"
-tomorrow = "variables"
-summary = f"{name} practiced {today}; tomorrow: {tomorrow}."
-summary
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-learner = "Mina"
-course = "Python 30 Days"
-todayLog = learner + " started " + course
-todayLog
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 1
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: 문장의 마침표를 느낌표로 바꾸고 다시 실행해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    - \n은 줄바꿈 문자
+    - 하나의 print()로 여러 줄 출력 가능
+    - 백슬래시(\)와 n을 함께 사용
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `다른 인사 문장을 직접 만들어보세요. `intro`가 정확히 `I run Python today.`가 되어야 합니다.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 코드 셀 실행, 따옴표로 감싼 글자, 숫자 계산 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ### 줄바꿈 문자 사용
+
+    \n을 사용하여 한 번에 여러 줄을 출력합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0024():
+        return print('첫 번째 줄\n두 번째 줄\n세 번째 줄')
+    _snippet_0024()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > \n을 사용하면 print() 한 번으로 여러 줄을 출력할 수 있어 편리합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `Hello World와 실행 감각`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    ## 한 줄 주석
+
+    *코드에 설명 추가하기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    주석(Comment)은 프로그램 실행에 영향을 주지 않는 메모입니다. 코드에 설명을 추가하여 나중에 다시 볼 때나 다른 사람이 볼 때 이해하기 쉽게 만듭니다. 파이썬에서 한 줄 주석은 # 기호로 시작합니다.
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - #으로 시작하는 한 줄 주석
+    - 프로그램 실행에 영향 없음
+    - 코드 설명이나 메모 작성
+    - 코드의 가독성 향상
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 한 줄 주석 사용
+
+    # 기호로 주석을 작성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0030():
+        return print('실행됩니다')
+    _snippet_0030()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 주석은 코드를 이해하기 쉽게 만들지만, 과도한 주석은 오히려 가독성을 해칩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 여러 줄 주석
+
+    *긴 설명 작성하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    여러 줄에 걸친 긴 주석을 작성할 때는 삼중 따옴표(''' 또는 \"\"\")를 사용합니다. 삼중 따옴표로 감싸진 부분은 프로그램이 무시하므로 여러 줄의 설명을 자유롭게 작성할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 삼중 따옴표(''' 또는 \"\"\")로 여러 줄 주석
+    - 긴 설명이나 문서화에 사용
+    - 프로그램 설명, 라이센스 정보 등에 활용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 여러 줄 주석 사용
+
+    삼중 따옴표로 여러 줄 주석을 작성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0036():
+        print('주석 전')
+        return print('주석 후')
+    _snippet_0036()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 작은따옴표 3개(''')와 큰따옴표 3개(\"\"\")는 동일하게 작동합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 숫자 출력하기
+
+    *따옴표 없이 숫자 출력*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    숫자를 출력할 때는 따옴표가 필요 없습니다. 따옴표로 감싸면 문자로 인식되고, 따옴표 없이 쓰면 숫자로 인식됩니다. 숫자는 계산에 사용할 수 있지만, 문자는 계산할 수 없습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 숫자는 따옴표 없이 출력
+    - 정수와 소수 모두 가능
+    - 따옴표로 감싸면 문자가 됨
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 숫자 출력
+
+    따옴표 없이 숫자를 출력합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0042():
+        return print(123)
+    _snippet_0042()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > print(123)은 숫자 123을, print('123')은 문자 '123'을 출력합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 계산 결과 출력하기
+
+    *파이썬을 계산기처럼 사용*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    print() 안에서 직접 계산을 할 수 있습니다. 파이썬은 계산 결과를 자동으로 구한 후 출력합니다. 더하기(+), 빼기(-), 곱하기(*), 나누기(/) 등 다양한 연산이 가능합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - print() 안에서 직접 계산 가능
+    - 계산 결과가 자동으로 출력됨
+    - 파이썬을 계산기처럼 사용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 계산 결과 출력
+
+    print() 안에서 계산을 하고 결과를 출력합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0048():
+        return print(10 + 20)
+    _snippet_0048()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Marimo에서 자동 출력
+
+    *print 없이 표현식만 쓰기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Marimo 환경에서는 셀의 마지막 표현식이 자동으로 출력됩니다. 표현식(Expression)이란 값을 만들어내는 코드 조각입니다. print()를 쓰지 않아도 마지막 줄에 값을 쓰면 자동으로 화면에 보입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - Marimo에서는 마지막 표현식 자동 출력
+    - print() 없이도 값이 화면에 표시
+    - 더 간결한 코드 작성 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 자동 출력
+
+    마지막 줄의 값이 자동으로 출력됩니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0053():
+        return 'Hello Marimo'
+    _snippet_0053()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 1 종합 복습
+
+    *Hello World와 주석 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 1에서 배운 print() 함수와 주석을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: Hello World 출력
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 한글 출력
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 숫자 출력
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 계산 결과
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 여러 줄 출력
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 줄바꿈으로 인사말
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 계산과 설명
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 이모지와 메시지
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 여러 계산 비교
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: Marimo로 계산
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1: 명함 만들기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2: 계산기 출력
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3: 패턴 만들기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4: 메뉴판 출력
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5: 복합 정보 카드
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

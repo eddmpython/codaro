@@ -14,572 +14,1334 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
     # Day 14. 반복문
-    
-    **오늘의 초점**: 여러 데이터에 같은 작업을 반복 적용한다.
-    
-    **완성 기준**: `for`, `while`, `range`, `break`, `continue`를 사용해 반복 흐름을 제어할 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+
+    이 노트북은 `study/python/30days/day14_반복문.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - for로 컬렉션 순회
+    - while로 조건 반복
+    - break, continue로 제어
+    - 중첩 반복문 활용
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - for
-    - while
-    - range
-    - 누적
-    - break
-    - continue
-    - 중첩 반복
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: for, while, range, break, continue, else_clause, nested_loop
+    - 이미 써도 되는 개념: all_data_types, conditional
+    - 오늘은 일부러 쓰지 않는 개념: function, import
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    리스트의 모든 값에 같은 계산을 하거나, 조건이 만족될 때까지 시도하는 일은 반복문 없이는 불편하다. 반복문은 작은 규칙을 여러 데이터에 확장한다.
-    
-    ## 생각 모델
-    
-    `for`는 준비된 묶음을 하나씩 꺼내고, `while`은 조건이 참인 동안 계속 돈다. 끝나는 조건을 명확히 두는 것이 안전하다.
-    
-    ## 자주 하는 실수
-    
-    - `range`의 끝값이 포함된다고 생각하기
-    - `while` 종료 조건을 빼먹기
-    - 누적 변수를 반복문 안에서 매번 초기화하기
+    ## for 리스트 순회
+
+    *리스트의 모든 요소 처리*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `for`를 한 문장으로 설명할 수 있는가?
-    2. `while`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    for문은 리스트의 요소를 하나씩 꺼내서 처리합니다. for 변수 in 리스트: 형식으로 쓰며, 리스트의 모든 요소에 대해 반복합니다. 들여쓰기로 반복할 코드 블록을 구분합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 13: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 11: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 07: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - for 변수 in 리스트: 형식
+    - 요소를 하나씩 꺼내기
+    - 모든 요소 처리할 때까지 반복
+    - 들여쓰기로 블록 구분
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 리스트 순회
+
+    리스트의 모든 요소를 순회합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        numbers = [1, 2, 3, 4, 5]
+        total = 0
+        for num in numbers:
+            total = total + num
+        return total
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 리스트 문자열
+
+    문자열 리스트를 순회합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0009():
+        fruits = ['apple', 'banana', 'cherry']
+        joined = ''
+        for fruit in fruits:
+            joined = joined + fruit + ' '
+        return joined
+    _snippet_0009()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 조건과 반복
+
+    반복문 안에서 조건문을 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0011():
+        values = [10, 25, 30, 15, 40]
+        count = 0
+        for val in values:
+            if val >= 20:
+                count = count + 1
+        return count
+    _snippet_0011()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 변수명은 의미있게 짓세요. for item in items보다 for fruit in fruits가 좋습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `for`, `while`, `range`, `누적`, `break`, `continue`, `중첩 반복`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - `range`의 끝값이 포함된다고 생각하기
-    - `while` 종료 조건을 빼먹기
-    - 누적 변수를 반복문 안에서 매번 초기화하기
+    ## for 문자열 순회
+
+    *문자열의 각 문자 처리*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `반복문`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    for문은 문자열의 각 문자를 하나씩 꺼낼 수 있습니다. 문자열도 시퀀스이므로 리스트처럼 순회할 수 있습니다. 각 문자에 대해 반복 작업을 수행합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `scores = [80, 95, 70]` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `total = 0` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 3 | `for score in scores:` | 묶음에서 값을 하나씩 꺼내 같은 규칙을 적용합니다. |
-    | 4 | `    total = total + score` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 5 | `average = total / len(scores)` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 6 | `average` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - 문자열도 순회 가능
+    - 각 문자를 하나씩 처리
+    - 공백과 특수문자 포함
+    - 리스트와 동일한 방식
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 문자 세기
+
+    특정 문자의 개수를 셉니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-scores = [80, 95, 70]
-total = 0
-for score in scores:
-    total = total + score
-average = total / len(scores)
-average
-"""
-    )
+def _():
+    def _snippet_0017():
+        msg = 'hello world'
+        found = 0
+        for char in msg:
+            if char == 'o':
+                found = found + 1
+        return found
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `range(1, 5)`가 실제로 어떤 숫자들을 만들어내는지 확인하세요.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
+    ### 대문자 변환
+
+    각 문자를 대문자로 변환하여 결합합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-list(range(1, 5))
-"""
-    )
+def _():
+    def _snippet_0019():
+        text = 'python'
+        upper = ''
+        for ch in text:
+            upper = upper + ch.upper()
+        return upper
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    [1, 2, 3, 4]
-    ```
-    
-    </details>
+    ### 모음 세기
+
+    문자열에서 모음의 개수를 셉니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0021():
+        sentence = 'hello python'
+        vowels = 'aeiou'
+        vowelCnt = 0
+        for letter in sentence:
+            if letter in vowels:
+                vowelCnt = vowelCnt + 1
+        return vowelCnt
+    _snippet_0021()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `numbers`에서 짝수만 골라 `evens`에 넣으세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-numbers = [1, 2, 3, 4, 5, 6]
-evens = []
-for num in numbers:
-    if num % 2 == 0:
-        evens.append(num)
-assert evens == [2, 4, 6]
-evens
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    numbers = [1, 2, 3, 4, 5, 6]
-    evens = []
-    for num in numbers:
-        if num % 2 == 0:
-            evens.append(num)
-    assert evens == [2, 4, 6]
-    evens
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > 문자열은 변경 불가능하므로 새 문자열을 만들어야 합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    아래 `while` 반복문은 `count`를 증가시키지 않아 끝나지 않습니다. 증가식을 추가하세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
+    ## for 딕셔너리 순회
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-count = 0
-items = []
-while count < 3:
-    items.append(count)
-    count = count + 1
-items
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    count = 0
-    items = []
-    while count < 3:
-        items.append(count)
-        count = count + 1
-    items
-    ```
-    
-    </details>
+    *키, 값, 아이템 순회*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    딕셔너리는 keys(), values(), items()로 순회할 수 있습니다. 기본적으로 for문은 키를 순회하며, items()를 사용하면 키-값 쌍을 튜플로 받을 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    문자열 목록에서 길이가 5 이상인 단어만 모으세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-words = ["py", "colab", "notebook", "go"]
-longWords = []
-for word in words:
-    if len(word) >= 5:
-        longWords.append(word)
-assert longWords == ["colab", "notebook"]
-longWords
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    words = ["py", "colab", "notebook", "go"]
-    longWords = []
-    for word in words:
-        if len(word) >= 5:
-            longWords.append(word)
-    assert longWords == ["colab", "notebook"]
-    longWords
-    ```
-    
-    </details>
+    - 기본: 키만 순회
+    - keys(): 키 순회
+    - values(): 값 순회
+    - items(): 키-값 쌍 순회
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### 키 순회
+
+    딕셔너리의 키를 순회합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'evens == [2, 4, 6]'),
-    ('오류 고쳐보기', 'items == [0, 1, 2]'),
-    ('비슷한 문제', 'longWords == ["colab", "notebook"]')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+def _():
+    def _snippet_0027():
+        grades = {'math': 85, 'english': 90, 'science': 88}
+        subjects = ''
+        for subject in grades:
+            subjects = subjects + subject + ' '
+        return subjects
+    _snippet_0027()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 구매 금액 리스트에서 10000원 이상인 주문만 골라 총합을 구하세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    ### 값 순회
+
+    딕셔너리의 값을 순회합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        marks = {'alice': 85, 'bob': 90, 'charlie': 88}
+        gradeSum = 0
+        for mark in marks.values():
+            gradeSum = gradeSum + mark
+        return gradeSum
+    _snippet_0029()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    구매 금액 리스트에서 10000원 이상인 주문만 골라 총합을 구하세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
+    ### 키-값 순회
+
+    items()로 키와 값을 함께 순회합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-orders = [8000, 12000, 5400, 23000, 15000]
-largeTotal = 0
-for order in orders:
-    if order >= 10000:
-        largeTotal = largeTotal + order
-largeTotal
-"""
-    )
+def _():
+    def _snippet_0031():
+        prices = {'apple': 1000, 'banana': 1500, 'cherry': 2000}
+        expensive = ''
+        for item, price in prices.items():
+            if price >= 1500:
+                expensive = expensive + item + ' '
+        return expensive
+    _snippet_0031()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-minutesList = [20, 45, 10, 60]
-focusedTotal = 0
-for minutes in minutesList:
-    if minutes >= 30:
-        focusedTotal = focusedTotal + minutes
-focusedTotal
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 14
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: `continue`를 사용해 10000원 미만 주문을 건너뛰는 형태로 바꿔보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    > **팁**
+    >
+    > items()를 사용하면 키와 값을 동시에 받을 수 있어 편리합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `문자열 목록에서 길이가 5 이상인 단어만 모으세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: for, while, range 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ## range() 함수
+
+    *숫자 시퀀스 생성*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `반복문`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    range() 함수는 숫자 시퀀스를 생성합니다. range(끝), range(시작, 끝), range(시작, 끝, 간격) 형식으로 사용하며, list()로 변환하면 리스트로 볼 수 있습니다. 끝 값은 포함되지 않습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    - range(끝): 0부터 끝-1까지
+    - range(시작, 끝): 시작부터 끝-1까지
+    - range(시작, 끝, 간격): 간격만큼
+    - 끝 값은 미포함
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### range(끝)
+
+    0부터 시작하는 범위를 생성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0037():
+        return list(range(5))
+    _snippet_0037()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### range(시작, 끝)
+
+    시작과 끝을 지정합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        return list(range(3, 8))
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### range(시작, 끝, 간격)
+
+    간격을 지정합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        return list(range(0, 10, 2))
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > range()는 메모리 효율적입니다. 필요할 때만 값을 생성합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## range()와 for
+
+    *정해진 횟수만큼 반복*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    range()와 for를 함께 사용하면 정해진 횟수만큼 반복할 수 있습니다. 인덱스를 이용한 순회나 n번 반복하는 작업에 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - for i in range(n): n번 반복
+    - 인덱스로 리스트 접근
+    - 정해진 횟수 반복
+    - 카운터 활용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### n번 반복
+
+    5번 반복하여 합계를 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0047():
+        rangeSum = 0
+        for i in range(1, 6):
+            rangeSum = rangeSum + i
+        return rangeSum
+    _snippet_0047()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 인덱스로 접근
+
+    인덱스를 사용하여 리스트 요소에 접근합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        letters = ['a', 'b', 'c', 'd']
+        concat = ''
+        for idx in range(len(letters)):
+            concat = concat + letters[idx]
+        return concat
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 구구단
+
+    range로 구구단을 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        dan = 3
+        answer = 0
+        for i in range(1, 10):
+            answer = dan * i
+        return answer
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 리스트 순회시 인덱스가 필요없다면 for item in items를 사용하세요.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## while 기본
+
+    *조건이 참인 동안 반복*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    while문은 조건이 True인 동안 계속 반복합니다. while 조건: 형식으로 쓰며, 조건이 False가 되면 반복을 멈춥니다. 무한 루프에 주의해야 합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - while 조건: 형식
+    - 조건이 True면 계속 반복
+    - 조건이 False면 종료
+    - 무한 루프 주의
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### while 카운터
+
+    카운터를 증가시키며 반복합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0057():
+        idx = 0
+        acc = 0
+        while idx < 5:
+            acc = acc + idx
+            idx = idx + 1
+        return acc
+    _snippet_0057()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### while 조건
+
+    특정 조건을 만족할 때까지 반복합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        n = 1
+        while n < 100:
+            n = n * 2
+        return n
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### while 누적
+
+    조건을 만족하는 동안 값을 누적합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        accumulated = 0
+        i = 1
+        while i <= 10:
+            if i % 2 == 0:
+                accumulated = accumulated + i
+            i = i + 1
+        return accumulated
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > while문에서는 조건을 변경하는 코드를 반드시 포함해야 합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## break 문
+
+    *반복문 즉시 종료*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    break는 반복문을 즉시 종료합니다. 조건을 만족하면 더 이상 반복하지 않고 빠져나올 때 사용합니다. for와 while 모두에서 사용할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 반복문 즉시 종료
+    - 조건 만족시 탈출
+    - for, while 모두 사용 가능
+    - 가장 안쪽 반복문만 종료
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### for break
+
+    조건을 만족하면 반복을 중단합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0067():
+        seq = [1, 2, 3, 4, 5, 6, 7, 8]
+        hit = 0
+        for x in seq:
+            if x > 5:
+                hit = x
+                break
+        return hit
+    _snippet_0067()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### while break
+
+    while문에서 break를 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0069():
+        current = 1
+        while True:
+            current = current * 2
+            if current > 100:
+                break
+        return current
+    _snippet_0069()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 검색 중단
+
+    원하는 값을 찾으면 즉시 중단합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0071():
+        data = ['apple', 'banana', 'cherry', 'date']
+        key = 'cherry'
+        loc = -1
+        for i in range(len(data)):
+            if data[i] == key:
+                loc = i
+                break
+        return loc
+    _snippet_0071()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > break는 가장 가까운 반복문 하나만 종료합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## continue 문
+
+    *현재 반복 건너뛰기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    continue는 현재 반복을 건너뛰고 다음 반복으로 넘어갑니다. 특정 조건에서 처리를 생략하고 싶을 때 사용합니다. 반복문 자체는 종료되지 않습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 현재 반복만 건너뛰기
+    - 다음 반복으로 이동
+    - 반복문은 계속 진행
+    - 조건부 처리 생략
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### continue 기본
+
+    짝수만 건너뛰고 홀수만 처리합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0077():
+        odd = 0
+        for n in range(1, 11):
+            if n % 2 == 0:
+                continue
+            odd = odd + n
+        return odd
+    _snippet_0077()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 특정 값 제외
+
+    특정 값을 제외하고 처리합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0079():
+        vals = [10, 0, 20, 0, 30, 40]
+        nonZero = 0
+        for v in vals:
+            if v == 0:
+                continue
+            nonZero = nonZero + v
+        return nonZero
+    _snippet_0079()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 조건부 문자열
+
+    조건을 만족하는 것만 결합합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0081():
+        terms = ['apple', 'a', 'banana', 'at', 'cherry']
+        long = ''
+        for term in terms:
+            if len(term) <= 2:
+                continue
+            long = long + term + ' '
+        return long
+    _snippet_0081()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > continue는 if-else 구조를 단순화할 때 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## for-else 절
+
+    *정상 종료시 실행*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    for문은 else 절을 가질 수 있습니다. 반복이 break 없이 정상적으로 완료되면 else 블록이 실행됩니다. break로 중단되면 else는 실행되지 않습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 정상 종료시 else 실행
+    - break시 else 건너뜀
+    - 완료 여부 판별
+    - 검색 성공/실패 처리
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### for-else 정상
+
+    break 없이 정상 종료되면 else가 실행됩니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0087():
+        arr1 = [1, 2, 3, 4, 5]
+        for a in arr1:
+            if a > 10:
+                flag = 'found big'
+                break
+        else:
+            flag = 'all small'
+        return flag
+    _snippet_0087()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### for-else break
+
+    break로 중단되면 else가 실행되지 않습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0089():
+        arr2 = [1, 2, 15, 4, 5]
+        for b in arr2:
+            if b > 10:
+                msg = 'found'
+                break
+        else:
+            msg = 'not found'
+        return msg
+    _snippet_0089()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 검색 완료
+
+    검색 성공 여부를 판별합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0091():
+        users = ['alice', 'bob', 'charlie']
+        name = 'david'
+        for user in users:
+            if user == name:
+                status = 'exists'
+                break
+        else:
+            status = 'not exists'
+        return status
+    _snippet_0091()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > for-else는 검색 작업에서 찾았는지 여부를 판별할 때 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## while-else 절
+
+    *조건 거짓시 실행*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    while문도 else 절을 가질 수 있습니다. 조건이 False가 되어 정상 종료되면 else가 실행됩니다. break로 중단되면 else는 실행되지 않습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 조건 거짓시 else 실행
+    - break시 else 건너뜀
+    - 정상 종료 여부 판별
+    - for-else와 동일한 원리
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### while-else 정상
+
+    조건이 거짓이 되면 else가 실행됩니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0097():
+        counter = 0
+        while counter < 3:
+            counter = counter + 1
+        else:
+            completion = 'done'
+        return completion
+    _snippet_0097()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### while-else break
+
+    break로 중단되면 else가 실행되지 않습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0099():
+        x = 0
+        while x < 10:
+            x = x + 1
+            if x == 5:
+                outcome = 'stopped'
+                break
+        else:
+            outcome = 'completed'
+        return outcome
+    _snippet_0099()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 한도 초과 검사
+
+    한도를 초과하면 중단합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0101():
+        amount = 0
+        limit = 100
+        while amount < 50:
+            amount = amount + 15
+            if amount > limit:
+                check = 'over limit'
+                break
+        else:
+            check = 'within limit'
+        return check
+    _snippet_0101()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > while-else는 제한 조건 검사에 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 중첩 반복문
+
+    *반복문 안의 반복문*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    반복문 안에 다시 반복문을 넣을 수 있습니다. 이를 중첩 반복문이라고 하며, 2차원 구조나 모든 조합을 처리할 때 사용합니다. 들여쓰기 단계가 늘어납니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 반복문 안에 반복문
+    - 2차원 구조 처리
+    - 모든 조합 생성
+    - 들여쓰기 단계 증가
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 중첩 for
+
+    두 리스트의 모든 조합을 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0107():
+        colors = ['red', 'blue']
+        sizes = ['S', 'M']
+        combinations = ''
+        for color in colors:
+            for size in sizes:
+                combinations = combinations + color + '-' + size + ' '
+        return combinations
+    _snippet_0107()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 구구단 전체
+
+    구구단 전체를 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0109():
+        mult = 0
+        for x in range(2, 4):
+            for y in range(1, 4):
+                mult = x * y
+        return mult
+    _snippet_0109()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 좌표 생성
+
+    격자 좌표를 생성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0111():
+        coords = ''
+        for r in range(2):
+            for c in range(3):
+                coords = coords + str(r) + ',' + str(c) + ' '
+        return coords
+    _snippet_0111()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 중첩이 깊어지면 성능에 영향을 줄 수 있으니 주의하세요.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 14 종합 복습
+
+    *반복문 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 14에서 배운 반복문을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: for 리스트
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: range()
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: while
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: break
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: continue
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 딕셔너리 순회
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 문자열 필터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 조건부 누적
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: for-else 검색
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 중첩 반복
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-1: 최대값 찾기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-2: 최소값과 최대값
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-1: 평균 계산
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-2: 평균 이상 개수
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-1: 소수 판별
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-2: 소수 목록
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-1: 문자열 역순
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-2: 단어 역순
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-1: 패턴 생성
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-2: 곱셈표
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

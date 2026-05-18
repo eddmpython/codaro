@@ -2,7 +2,7 @@ import marimo
 
 __generated_with = "0.23.6"
 
-app = marimo.App(app_title="Day 16. 함수 고급")
+app = marimo.App(app_title="Day 16. 함수고급")
 
 
 @app.cell
@@ -14,576 +14,1212 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    # Day 16. 함수 고급
-    
-    **오늘의 초점**: 기본값, 키워드 인자, 가변 인자, 람다를 익힌다.
-    
-    **완성 기준**: 함수 호출 방식을 유연하게 설계하고 간단한 콜백 함수를 만들 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+    # Day 16. 함수고급
+
+    이 노트북은 `study/python/30days/day16_함수고급.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 기본값으로 매개변수 유연화
+    - *args, **kwargs로 가변 인자
+    - lambda로 간단한 함수
+    - 고급 함수 패턴
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 기본 매개변수
-    - 키워드 인자
-    - *args
-    - **kwargs
-    - lambda
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: default_parameter, keyword_argument, args, kwargs, lambda
+    - 이미 써도 되는 개념: function_basic
+    - 오늘은 일부러 쓰지 않는 개념: import, class, decorator
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    실제 함수는 항상 같은 개수의 인자만 받지 않는다. 기본값과 키워드 인자는 함수의 사용성을 높이고, 가변 인자는 여러 값을 자연스럽게 처리하게 해준다.
-    
-    ## 생각 모델
-    
-    함수의 시그니처는 사용 설명서다. 어떤 값이 필수인지, 어떤 값은 선택인지 시그니처만 보고 알 수 있어야 한다.
-    
-    ## 자주 하는 실수
-    
-    - 가변 기본값을 그대로 쓰기
-    - `*args`가 튜플이라는 점을 잊기
-    - 키워드 인자를 위치 인자보다 앞에 두기
+    ## 기본값 매개변수
+
+    *선택적 매개변수*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `기본 매개변수`를 한 문장으로 설명할 수 있는가?
-    2. `키워드 인자`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    매개변수에 기본값을 지정하면 인자를 생략할 수 있습니다. def 함수명(매개변수=기본값): 형식으로 쓰며, 호출시 인자를 주지 않으면 기본값이 사용됩니다. 필수 매개변수 뒤에 와야 합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 15: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 13: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 09: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - 매개변수=기본값 형식
+    - 인자 생략 가능
+    - 생략시 기본값 사용
+    - 필수 매개변수 뒤 배치
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 기본값 기본
+
+    기본값이 있는 매개변수를 정의합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        def greet(name='Guest'):
+            return 'Hello ' + name
+
+        return greet()
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 기본값 덮어쓰기
+
+    인자를 전달하면 기본값을 덮어씁니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0009():
+        def greetUser(name='Guest'):
+            return 'Hello ' + name
+
+        return greetUser('Alice')
+    _snippet_0009()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 여러 기본값
+
+    여러 매개변수에 기본값을 설정합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0011():
+        def createProfile(name='Unknown', age=0, city='Seoul'):
+            return name + ' ' + str(age) + ' ' + city
+
+        return createProfile('Bob', 25)
+    _snippet_0011()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 기본값이 없는 매개변수는 기본값이 있는 매개변수보다 앞에 와야 합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `기본 매개변수`, `키워드 인자`, `*args`, `**kwargs`, `lambda`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 가변 기본값을 그대로 쓰기
-    - `*args`가 튜플이라는 점을 잊기
-    - 키워드 인자를 위치 인자보다 앞에 두기
+    ## 키워드 인자
+
+    *이름으로 인자 전달*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `함수 고급`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    키워드 인자는 매개변수 이름을 명시하여 값을 전달합니다. 함수명(매개변수=값) 형식으로 쓰며, 순서와 관계없이 전달할 수 있습니다. 코드 가독성이 높아집니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `def formatUser(name, level=1):` | 재사용할 동작에 이름을 붙입니다. 입력과 반환값을 함께 생각합니다. |
-    | 2 | `    return f"{name}: level {level}"` | 함수 호출자에게 돌려줄 결과를 정합니다. |
-    | 3 | ` ` | 읽기 좋게 구획을 나누는 빈 줄입니다. |
-    | 4 | `formatUser("Mina", level=3)` | 계산 결과나 데이터를 이름에 연결합니다. |
+    - 매개변수=값 형식
+    - 이름으로 전달
+    - 순서 무관
+    - 가독성 향상
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 키워드 인자
+
+    매개변수 이름을 지정하여 호출합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-def formatUser(name, level=1):
-    return f"{name}: level {level}"
+def _():
+    def _snippet_0017():
+        def introduce(name, age, city):
+            return name + ' ' + str(age) + ' ' + city
 
-formatUser("Mina", level=3)
-"""
-    )
+        return introduce(name='Alice', age=25, city='Seoul')
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    기본값이 있는 함수에 두 번째 인자를 생략하면 어떤 값이 쓰일까요?
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
+    ### 순서 변경
+
+    키워드 인자는 순서가 바뀌어도 됩니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-def addShipping(price, fee=3000):
-    return price + fee
+def _():
+    def _snippet_0019():
+        def showInfo(name, age, city):
+            return name + ' ' + str(age) + ' ' + city
 
-addShipping(10000)
-"""
-    )
+        return showInfo(city='Busan', name='Bob', age=30)
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    13000
-    ```
-    
-    </details>
+    ### 일부만 키워드
+
+    일부 매개변수만 키워드로 전달할 수 있습니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0021():
+        def makeText(first, second, third):
+            return first + ' ' + second + ' ' + third
+
+        return makeText('A', third='C', second='B')
+    _snippet_0021()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    여러 숫자를 받아 합계를 반환하는 `sumAll` 함수를 실행해 확인하세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def sumAll(*nums):
-    return sum(nums)
-
-result = sumAll(1, 2, 3, 4)
-assert result == 10
-result
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    def sumAll(*nums):
-        return sum(nums)
-    
-    result = sumAll(1, 2, 3, 4)
-    assert result == 10
-    result
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > 위치 인자는 키워드 인자보다 앞에 와야 합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    아래 함수는 가변 기본값 리스트를 공유합니다. 기본값을 `None`으로 바꾸고 내부에서 새 리스트를 만드세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
+    ## 위치 인자와 키워드 혼용
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def addTask(task, tasks=None):
-    if tasks is None:
-        tasks = []
-    tasks.append(task)
-    return tasks
-
-first = addTask("read")
-second = addTask("write")
-assert second == ["write"]
-second
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    def addTask(task, tasks=None):
-        if tasks is None:
-            tasks = []
-        tasks.append(task)
-        return tasks
-    
-    first = addTask("read")
-    second = addTask("write")
-    assert second == ["write"]
-    second
-    ```
-    
-    </details>
+    *유연한 호출 방식*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    위치 인자와 키워드 인자를 함께 사용할 수 있습니다. 위치 인자를 먼저 쓰고 키워드 인자를 뒤에 씁니다. 필수 매개변수는 위치로, 선택적 매개변수는 키워드로 전달하면 편리합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    기본 배송비가 있는 결제 함수를 만들고 키워드 인자로 배송비를 바꿔보세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def pay(price, fee=3000):
-    return price + fee
-
-basic = pay(10000)
-express = pay(10000, fee=5000)
-assert (basic, express) == (13000, 15000)
-basic, express
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    def pay(price, fee=3000):
-        return price + fee
-    
-    basic = pay(10000)
-    express = pay(10000, fee=5000)
-    assert (basic, express) == (13000, 15000)
-    basic, express
-    ```
-    
-    </details>
+    - 위치 인자 먼저
+    - 키워드 인자 뒤
+    - 필수/선택 구분
+    - 유연한 호출
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### 혼용 기본
+
+    위치 인자와 키워드 인자를 함께 사용합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'sumAll(1, 2, 3, 4) == 10'),
-    ('오류 고쳐보기', 'second == ["write"]'),
-    ('비슷한 문제', 'basic == 13000 and express == 15000')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
+def _():
+    def _snippet_0027():
+        def orderFood(menu, quantity=1, spicy=False):
+            result = menu + ' x' + str(quantity)
+            if spicy:
+                result = result + ' (spicy)'
+            return result
 
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+        return orderFood('Pizza', quantity=2, spicy=True)
+    _snippet_0027()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 금액 리스트와 할인율을 받아 할인 금액 리스트를 반환하는 함수를 만드세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    ### 일부 생략
+
+    기본값이 있는 매개변수는 생략할 수 있습니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        def bookTicket(destination, passengers=1, classType='economy'):
+            return destination + ' ' + str(passengers) + ' ' + classType
+
+        return bookTicket('Tokyo', passengers=2)
+    _snippet_0029()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    금액 리스트와 할인율을 받아 할인 금액 리스트를 반환하는 함수를 만드세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
+    ### 선택적 사용
+
+    필요한 매개변수만 키워드로 지정합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-def discountMany(rate, *prices):
-    results = []
-    for price in prices:
-        results.append(int(price * (1 - rate)))
-    return results
+def _():
+    def _snippet_0031():
+        def setConfig(host, port=8080, debug=False, timeout=30):
+            return host + ':' + str(port) + ' debug=' + str(debug)
 
-discountMany(0.1, 10000, 20000, 30000)
-"""
-    )
+        return setConfig('localhost', debug=True)
+    _snippet_0031()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def addSession(minutes, bonus=0):
-    return minutes + bonus
-
-regular = addSession(30)
-review = addSession(30, bonus=10)
-regular, review
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 16
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: `lambda price: price >= 20000`를 만들어 고가 상품만 필터링해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    > **팁**
+    >
+    > 기본값이 있는 매개변수는 키워드로 전달하면 가독성이 좋습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `기본 배송비가 있는 결제 함수를 만들고 키워드 인자로 배송비를 바꿔보세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 기본 매개변수, 키워드 인자, *args 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ## *args 기본
+
+    *가변 위치 인자*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `함수 고급`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    *args는 임의 개수의 위치 인자를 받습니다. def 함수명(*args): 형식으로 쓰며, args는 튜플로 전달됩니다. 몇 개의 인자가 올지 모를 때 사용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    - *args로 가변 인자
+    - 튜플로 전달됨
+    - 개수 제한 없음
+    - for문으로 순회 가능
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### *args 기본
+
+    여러 개의 인자를 받아 처리합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0037():
+        def sumAll(*args):
+            total = 0
+            for num in args:
+                total = total + num
+            return total
+
+        return sumAll(1, 2, 3, 4, 5)
+    _snippet_0037()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 개수 확인
+
+    전달된 인자의 개수를 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        def countArgs(*args):
+            return len(args)
+
+        return countArgs(10, 20, 30)
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 첫 번째 인자
+
+    args는 튜플이므로 인덱싱이 가능합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        def getFirst(*args):
+            if len(args) > 0:
+                return args[0]
+            return None
+
+        return getFirst(100, 200, 300)
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > args는 관례적인 이름이며, 다른 이름을 사용해도 됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## *args 활용
+
+    *일반 매개변수와 혼용*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    *args는 일반 매개변수와 함께 사용할 수 있습니다. 일반 매개변수를 먼저 쓰고 *args를 뒤에 씁니다. 필수 인자와 선택적 인자를 함께 받을 때 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 일반 매개변수 + *args
+    - 일반 매개변수 먼저
+    - *args는 나머지 모두
+    - 유연한 인자 처리
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 필수 + 가변
+
+    필수 매개변수와 *args를 함께 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0047():
+        def makeList(first, *rest):
+            result = [first]
+            for item in rest:
+                result.append(item)
+            return result
+
+        return makeList('a', 'b', 'c', 'd')
+    _snippet_0047()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연산 적용
+
+    첫 번째 인자를 나머지에 적용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        def multiplyAll(multiplier, *numbers):
+            results = []
+            for num in numbers:
+                results.append(num * multiplier)
+            return results
+
+        return multiplyAll(3, 1, 2, 3, 4)
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 평균 계산
+
+    레이블과 함께 평균을 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        def average(label, *values):
+            total = 0
+            for val in values:
+                total = total + val
+            avg = total / len(values)
+            return label + ': ' + str(avg)
+
+        return average('Score', 80, 90, 85, 88)
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > *args 뒤에는 키워드 전용 매개변수만 올 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## **kwargs 기본
+
+    *가변 키워드 인자*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    **kwargs는 임의 개수의 키워드 인자를 받습니다. def 함수명(**kwargs): 형식으로 쓰며, kwargs는 딕셔너리로 전달됩니다. 키-값 쌍을 여러 개 받을 때 사용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - **kwargs로 가변 키워드
+    - 딕셔너리로 전달됨
+    - 키=값 형식으로 호출
+    - 개수 제한 없음
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### **kwargs 기본
+
+    키워드 인자를 딕셔너리로 받습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0057():
+        def printInfo(**kwargs):
+            result = ''
+            for key in kwargs:
+                result = result + key + '=' + str(kwargs[key]) + ' '
+            return result
+
+        return printInfo(name='Alice', age=25, city='Seoul')
+    _snippet_0057()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 값 추출
+
+    딕셔너리처럼 값을 추출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        def getValue(**kwargs):
+            if 'name' in kwargs:
+                return kwargs['name']
+            return 'Unknown'
+
+        return getValue(name='Bob', age=30)
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 개수 확인
+
+    전달된 키워드 인자의 개수를 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        def countKwargs(**kwargs):
+            return len(kwargs)
+
+        return countKwargs(a=1, b=2, c=3, d=4)
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > kwargs도 관례적인 이름이며, 다른 이름을 사용해도 됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## **kwargs 활용
+
+    *일반 매개변수와 혼용*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    **kwargs는 일반 매개변수, *args와 함께 사용할 수 있습니다. 순서는 일반 매개변수, *args, **kwargs입니다. 매우 유연한 함수를 만들 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 일반 + *args + **kwargs
+    - 순서 지켜야 함
+    - 매우 유연한 호출
+    - 옵션 처리에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 필수 + 키워드
+
+    필수 매개변수와 **kwargs를 함께 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0067():
+        def createUser(userId, **options):
+            info = 'User: ' + userId
+            if 'name' in options:
+                info = info + ' Name: ' + options['name']
+            if 'email' in options:
+                info = info + ' Email: ' + options['email']
+            return info
+
+        return createUser('user123', name='Alice', email='alice@example.com')
+    _snippet_0067()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 기본값과 kwargs
+
+    기본값 매개변수와 **kwargs를 함께 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0069():
+        def configure(mode='dev', **settings):
+            config = 'Mode: ' + mode
+            for key in settings:
+                config = config + ' ' + key + '=' + str(settings[key])
+            return config
+
+        return configure('prod', host='localhost', port=8080, debug=False)
+    _snippet_0069()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 기본값 적용
+
+    kwargs에서 값을 가져오되 없으면 기본값을 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0071():
+        def getConfig(**config):
+            host = config.get('host', 'localhost')
+            port = config.get('port', 8080)
+            return host + ':' + str(port)
+
+        return getConfig(host='192.168.1.1')
+    _snippet_0071()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > **kwargs는 설정이나 옵션을 받을 때 매우 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## *args와 **kwargs 함께
+
+    *모든 인자 받기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    *args와 **kwargs를 함께 사용하면 모든 종류의 인자를 받을 수 있습니다. def 함수명(*args, **kwargs): 형식으로 쓰며, 위치 인자는 args로, 키워드 인자는 kwargs로 전달됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - *args, **kwargs 순서
+    - 모든 인자 수용
+    - 위치 인자 → args
+    - 키워드 인자 → kwargs
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 모든 인자
+
+    위치 인자와 키워드 인자를 모두 받습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0077():
+        def flexibleFunc(*args, **kwargs):
+            posCount = len(args)
+            kwCount = len(kwargs)
+            return posCount, kwCount
+
+        return flexibleFunc(1, 2, 3, name='Alice', age=25)
+    _snippet_0077()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 일반 + args + kwargs
+
+    일반 매개변수와 함께 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0079():
+        def process(required, *args, **kwargs):
+            result = 'Required: ' + str(required)
+            result = result + ' Args: ' + str(len(args))
+            result = result + ' Kwargs: ' + str(len(kwargs))
+            return result
+
+        return process('data', 1, 2, 3, flag=True, mode='fast')
+    _snippet_0079()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 인자 합치기
+
+    모든 인자를 하나의 리스트로 합칩니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0081():
+        def combineAll(*args, **kwargs):
+            combined = []
+            for arg in args:
+                combined.append(arg)
+            for key in kwargs:
+                combined.append(kwargs[key])
+            return combined
+
+        return combineAll(1, 2, 3, x=10, y=20)
+    _snippet_0081()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 매우 유연하지만 과도한 사용은 코드 가독성을 해칠 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## lambda 기본
+
+    *익명 함수*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    lambda는 이름 없는 함수를 만듭니다. lambda 매개변수: 표현식 형식으로 쓰며, 표현식의 결과가 자동으로 반환됩니다. 간단한 함수를 한 줄로 만들 때 사용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - lambda 매개변수: 표현식
+    - 이름 없는 함수
+    - 한 줄로 정의
+    - 자동 반환
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### lambda 기본
+
+    간단한 lambda 함수를 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0087():
+        square = lambda x: x * x
+        return square(5)
+    _snippet_0087()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 두 매개변수
+
+    여러 매개변수를 받는 lambda입니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0089():
+        add = lambda a, b: a + b
+        return add(10, 20)
+    _snippet_0089()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 즉시 호출
+
+    lambda를 정의하고 바로 호출합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0091():
+        return (lambda x: x * 3)(7)
+    _snippet_0091()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > lambda는 한 줄 표현식만 가능하며, 복잡한 로직에는 일반 함수를 사용하세요.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## lambda 활용
+
+    *조건식과 함께*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    lambda에서 조건식(삼항 연산자)을 사용할 수 있습니다. lambda 매개변수: 값1 if 조건 else 값2 형식으로 쓰며, 조건에 따라 다른 값을 반환할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 조건식 사용 가능
+    - 값1 if 조건 else 값2
+    - 간단한 조건 분기
+    - 리스트와 함께 활용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 조건식 lambda
+
+    조건에 따라 다른 값을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0097():
+        checkEven = lambda n: 'even' if n % 2 == 0 else 'odd'
+        return checkEven(8)
+    _snippet_0097()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 최대값
+
+    두 값 중 큰 값을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0099():
+        maxVal = lambda a, b: a if a > b else b
+        return maxVal(15, 23)
+    _snippet_0099()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 절대값
+
+    숫자의 절대값을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0101():
+        absVal = lambda x: x if x >= 0 else -x
+        return absVal(-42)
+    _snippet_0101()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 복잡한 조건은 lambda보다 일반 함수가 읽기 쉽습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 16 종합 복습
+
+    *함수 고급 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 16에서 배운 함수 고급을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 기본값
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 키워드 인자
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: *args
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: **kwargs
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: lambda
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 설정 함수
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 가변 평균
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 문자열 조합
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: lambda 필터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 복합 인자
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-1: 옵션 병합
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-2: 검증 함수
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-1: 최대값 찾기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-2: 최대값과 최소값
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-1: 범위 필터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-2: 변환 함수
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-1: 딕셔너리 빌더
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-2: 조건부 필터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-1: 함수 체이닝
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-2: 함수 리스트
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

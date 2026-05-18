@@ -14,547 +14,1507 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
     # Day 09. 튜플
-    
-    **오늘의 초점**: 바뀌면 안 되는 순서형 데이터를 튜플로 표현한다.
-    
-    **완성 기준**: 튜플 생성, 패킹, 언패킹, 불변성의 의미를 설명할 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+
+    이 노트북은 `study/python/30days/day09_튜플.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 튜플의 불변성과 리스트와의 차이
+    - 소괄호로 튜플 생성하기
+    - 튜플 패킹과 언패킹
+    - 안전한 데이터 저장
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 튜플 생성
-    - 불변성
-    - 패킹
-    - 언패킹
-    - 반환값 묶음
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: tuple, tuple_immutable, tuple_packing, tuple_unpacking
+    - 이미 써도 되는 개념: list_all, string_all
+    - 오늘은 일부러 쓰지 않는 개념: dict, set, function, import
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    좌표, 날짜, 고정된 설정처럼 위치는 중요하지만 값을 바꾸면 안 되는 데이터가 있다. 튜플은 그런 데이터를 명확하게 표현한다.
-    
-    ## 생각 모델
-    
-    튜플은 잠근 리스트가 아니라 의미 있는 묶음이다. 특히 언패킹을 사용하면 묶음 안의 의미를 변수명으로 드러낼 수 있다.
-    
-    ## 자주 하는 실수
-    
-    - 튜플을 리스트처럼 수정하려 하기
-    - 원소가 1개인 튜플에서 쉼표를 빼먹기
-    - 언패킹 변수 개수를 맞추지 않기
+    ## 튜플이란?
+
+    *변경 불가능한 리스트*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `튜플 생성`를 한 문장으로 설명할 수 있는가?
-    2. `불변성`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    튜플(Tuple)은 리스트와 비슷하지만 한 번 만들면 내용을 변경할 수 없는 자료구조입니다. 소괄호 ()로 만들고, 쉼표로 값을 구분합니다. 리스트는 수정 가능(mutable)하지만 튜플은 수정 불가능(immutable)합니다. 이러한 특성 때문에 변경되면 안 되는 중요한 데이터를 저장할 때 사용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 08: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 06: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 02: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - 소괄호 ()로 생성
+    - 쉼표로 값 구분
+    - 생성 후 변경 불가능 (immutable)
+    - 리스트보다 메모리 효율적
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 튜플 만들기
+
+    소괄호를 사용하여 튜플을 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        nums = (1, 2, 3, 4, 5)
+        return nums
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 튜플은 딕셔너리의 키로 사용할 수 있지만, 리스트는 불가능합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `튜플 생성`, `불변성`, `패킹`, `언패킹`, `반환값 묶음`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 튜플을 리스트처럼 수정하려 하기
-    - 원소가 1개인 튜플에서 쉼표를 빼먹기
-    - 언패킹 변수 개수를 맞추지 않기
+    ## 다양한 튜플 생성
+
+    *여러 형태의 튜플*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `튜플`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    튜플은 리스트처럼 다양한 타입을 담을 수 있습니다. 숫자만, 문자열만, 또는 여러 타입을 섞어서 만들 수 있습니다. 요소가 하나인 튜플은 쉼표를 꼭 붙여야 합니다. 소괄호 없이 쉼표만으로도 튜플이 됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `point = (3, 7)` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `x, y = point` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 3 | `x + y` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - 다양한 타입 저장 가능
+    - 빈 튜플: ()
+    - 요소 1개: (값,) 쉼표 필수
+    - 소괄호 생략 가능: 1, 2, 3
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 숫자 튜플
+
+    숫자만 담은 튜플을 만듭니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-point = (3, 7)
-x, y = point
-x + y
-"""
-    )
+def _():
+    def _snippet_0013():
+        digits = (10, 20, 30)
+        return digits
+    _snippet_0013()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `name, score = ('Ada', 95)` 이후 `score` 값은 무엇일까요?
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
+    ### 문자열 튜플
+
+    문자열만 담은 튜플을 만듭니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-name, score = ("Ada", 95)
-score
-"""
-    )
+def _():
+    def _snippet_0015():
+        fruits = ('사과', '바나나', '오렌지')
+        return fruits
+    _snippet_0015()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    95
-    ```
-    
-    </details>
+    ### 혼합 튜플
+
+    여러 타입을 섞어서 튜플을 만듭니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0017():
+        mixed = (1, 'hello', True, 3.14)
+        return mixed
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `userInfo`를 언패킹해서 `userName`과 `userLevel`을 만드세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
+    ### 요소 1개 튜플
+
+    요소가 하나일 때는 쉼표를 꼭 붙여야 합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-userInfo = ("Rin", 4)
-userName, userLevel = userInfo
-assert userName == "Rin"
-assert userLevel == 4
-userName, userLevel
-"""
-    )
+def _():
+    def _snippet_0019():
+        single = (42,)
+        return single
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    userInfo = ("Rin", 4)
-    userName, userLevel = userInfo
-    assert userName == "Rin"
-    assert userLevel == 4
-    userName, userLevel
-    ```
-    
-    </details>
+    ### 소괄호 없는 튜플
+
+    소괄호 없이 쉼표만으로도 튜플이 됩니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0021():
+        packed = 1, 2, 3
+        return packed
+    _snippet_0021()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 요소가 하나일 때 (42)는 그냥 숫자이고, (42,)가 튜플입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 튜플 값을 직접 바꾸려고 해서 오류가 납니다. 새 튜플을 만들어 해결하세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
+    ## 튜플 인덱싱
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-size = (1920, 1080)
-size = (size[0], 720)
-size
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    size = (1920, 1080)
-    size = (size[0], 720)
-    size
-    ```
-    
-    </details>
+    *리스트처럼 접근*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    튜플도 리스트처럼 인덱스로 요소에 접근할 수 있습니다. 0부터 시작하는 양수 인덱스와 -1부터 시작하는 음수 인덱스를 모두 사용할 수 있습니다. 접근 방법은 리스트와 완전히 동일합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    튜플로 묶인 좌표를 언패킹하고, 두 좌표의 합을 구하세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-position = (12, 8)
-x, y = position
-total = x + y
-assert total == 20
-total
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    position = (12, 8)
-    x, y = position
-    total = x + y
-    assert total == 20
-    total
-    ```
-    
-    </details>
+    - tuple[0]으로 첫 번째 요소
+    - tuple[-1]로 마지막 요소
+    - 리스트와 동일한 인덱싱
+    - 대괄호 [] 사용
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### 첫 번째 요소
+
+    인덱스 0으로 첫 번째 요소에 접근합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'userName == "Rin" and userLevel == 4'),
-    ('오류 고쳐보기', 'size == (1920, 720)'),
-    ('비슷한 문제', 'total == 20')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+def _():
+    def _snippet_0027():
+        palette = ('빨강', '초록', '파랑', '노랑')
+        return palette[0]
+    _snippet_0027()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 좌표 두 개를 튜플로 만들고, x/y 차이를 계산하세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    ### 마지막 요소
+
+    음수 인덱스 -1로 마지막 요소에 접근합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        hues = ('빨강', '초록', '파랑', '노랑')
+        return hues[-1]
+    _snippet_0029()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    좌표 두 개를 튜플로 만들고, x/y 차이를 계산하세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
+    ### 두 번째 요소
+
+    인덱스 1로 두 번째 요소에 접근합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-start = (2, 3)
-end = (8, 11)
-dx = end[0] - start[0]
-dy = end[1] - start[1]
-dx, dy
-"""
-    )
+def _():
+    def _snippet_0031():
+        tones = ('빨강', '초록', '파랑', '노랑')
+        return tones[1]
+    _snippet_0031()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-studyBlock = ("Day 09", "tuples", 40)
-dayLabel, topic, minutes = studyBlock
-dayLabel, topic, minutes
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 9
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: 언패킹을 사용해 `startX`, `startY`, `endX`, `endY`로 바꿔 계산해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    > **팁**
+    >
+    > 튜플의 인덱싱은 리스트와 동일하게 작동합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `튜플로 묶인 좌표를 언패킹하고, 두 좌표의 합을 구하세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 튜플 생성, 불변성, 패킹 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ## 튜플 슬라이싱
+
+    *부분 튜플 추출*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `튜플`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    튜플도 슬라이싱으로 부분 튜플을 추출할 수 있습니다. [시작:끝] 형식을 사용하며, 결과는 새로운 튜플입니다. step을 지정하여 간격을 두고 추출하거나 역순으로 만들 수도 있습니다. 슬라이싱 문법은 리스트와 완전히 동일합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    - tuple[시작:끝] 형식
+    - 새로운 튜플 반환
+    - step 사용 가능
+    - 리스트와 동일한 슬라이싱
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 처음 5개
+
+    [:5]로 처음 5개 요소를 가져옵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0037():
+        digits = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+        return digits[:5]
+    _snippet_0037()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 마지막 5개
+
+    [-5:]로 마지막 5개 요소를 가져옵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        sequence = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+        return sequence[-5:]
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 하나 건너
+
+    [::2]로 하나 건너 하나씩 가져옵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        range10 = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+        return range10[::2]
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 역순
+
+    [::-1]로 튜플을 역순으로 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0043():
+        series = (0, 1, 2, 3, 4, 5, 6, 7, 8, 9)
+        return series[::-1]
+    _snippet_0043()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 슬라이싱 결과는 항상 새로운 튜플입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 튜플의 불변성
+
+    *변경 불가능한 특성*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    튜플은 한 번 만들면 요소를 추가, 삭제, 수정할 수 없습니다. 인덱스로 값을 변경하려고 하면 에러가 발생합니다. 이것이 리스트와 가장 큰 차이점입니다. 불변성 덕분에 안전하게 데이터를 보호할 수 있고, 딕셔너리의 키로 사용할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 요소 추가/삭제/수정 불가
+    - 리스트와 가장 큰 차이점
+    - 데이터 보호와 안정성
+    - 딕셔너리 키로 사용 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 튜플 불변성 확인
+
+    튜플은 변경할 수 없습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        fixed = (1, 2, 3)
+        flex = [1, 2, 3]
+        flex[0] = 10
+        print('tuple:', fixed)
+        print('list_before:', [1, 2, 3])
+        return print('list_after:', flex)
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 튜플[0] = 새값 같은 코드는 에러가 발생합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 튜플 연결과 반복
+
+    *+ 와 * 연산자*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    튜플도 + 연산자로 연결하고 * 연산자로 반복할 수 있습니다. 이 연산들은 원본 튜플을 변경하지 않고 새로운 튜플을 만듭니다. 불변성을 유지하면서도 새로운 튜플을 생성할 수 있는 방법입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - + 연산자로 튜플 연결
+    - * 연산자로 튜플 반복
+    - 원본은 변경 안됨
+    - 새로운 튜플 생성
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 튜플 연결
+
+    + 연산자로 두 튜플을 연결합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0055():
+        left = (1, 2, 3)
+        right = (4, 5, 6)
+        return left + right
+    _snippet_0055()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 튜플 반복
+
+    * 연산자로 튜플을 반복합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0057():
+        repeated = (0,) * 5
+        return repeated
+    _snippet_0057()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 연결과 반복은 원본을 변경하지 않고 새 튜플을 만듭니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## in/not in 연산자
+
+    *요소 포함 여부 확인*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    튜플도 in과 not in 연산자로 특정 값의 포함 여부를 확인할 수 있습니다. 사용법은 리스트와 완전히 동일합니다. True 또는 False를 반환합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 값 in 튜플로 확인
+    - 값 not in 튜플로 미포함 확인
+    - True/False 반환
+    - 리스트와 동일한 사용법
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 값 포함 확인
+
+    in 연산자로 값이 튜플에 있는지 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0063():
+        weekdays = ('월', '화', '수', '목', '금')
+        return '수' in weekdays
+    _snippet_0063()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 값 미포함 확인
+
+    not in 연산자로 값이 튜플에 없는지 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0065():
+        workdays = ('월', '화', '수', '목', '금')
+        return '일' not in workdays
+    _snippet_0065()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > in 연산자는 튜플에서도 리스트처럼 작동합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 튜플 패킹
+
+    *여러 값을 하나로 묶기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    여러 개의 값을 쉼표로 나열하면 자동으로 튜플이 만들어집니다. 이를 튜플 패킹(Tuple Packing)이라고 합니다. 소괄호 없이도 튜플이 생성됩니다. 함수에서 여러 값을 반환할 때 자주 사용되는 기법입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 쉼표로 값 나열하면 튜플
+    - 소괄호 생략 가능
+    - 자동으로 튜플로 묶임
+    - 함수 반환값에 자주 사용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 좌표 패킹
+
+    두 값이 자동으로 튜플로 묶입니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0071():
+        coords = 10, 20
+        return coords
+    _snippet_0071()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 정보 패킹
+
+    여러 값이 자동으로 튜플로 묶입니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0073():
+        person = '홍길동', 25, '서울'
+        return person
+    _snippet_0073()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 쉼표가 튜플을 만드는 핵심입니다. 소괄호는 선택사항입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 튜플 언패킹
+
+    *튜플을 여러 변수로 분리*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    튜플의 요소들을 여러 개의 변수에 한 번에 할당하는 것을 튜플 언패킹(Tuple Unpacking)이라고 합니다. 튜플의 요소 개수와 변수 개수가 정확히 일치해야 합니다. 값 교환이나 함수 반환값 받기에 매우 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 튜플을 여러 변수로 분리
+    - 요소 개수와 변수 개수 일치 필수
+    - 값 교환에 매우 유용
+    - 코드가 간결해짐
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 좌표 언패킹
+
+    튜플의 요소를 두 변수로 분리합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0079():
+        point = (100, 200)
+        px, py = point
+        return (px, py)
+    _snippet_0079()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 정보 언패킹
+
+    여러 값을 여러 변수로 분리합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0081():
+        name, age, city = '김철수', 30, '부산'
+        return (name, age, city)
+    _snippet_0081()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > a, b = b, a 로 두 변수의 값을 간단히 교환할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 튜플과 리스트 변환
+
+    *tuple()과 list() 함수*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    tuple() 함수는 리스트를 튜플로, list() 함수는 튜플을 리스트로 변환합니다. 데이터를 수정해야 할 때는 리스트로, 보호해야 할 때는 튜플로 변환합니다. 문자열도 tuple()이나 list()로 변환하면 문자들이 개별 요소가 됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - tuple(리스트)로 튜플로 변환
+    - list(튜플)로 리스트로 변환
+    - 수정 필요시 리스트로
+    - 보호 필요시 튜플로
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 리스트를 튜플로
+
+    tuple() 함수로 리스트를 튜플로 변환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0087():
+        items = [1, 2, 3, 4, 5]
+        return tuple(items)
+    _snippet_0087()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 튜플을 리스트로
+
+    list() 함수로 튜플을 리스트로 변환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0089():
+        chars = ('a', 'b', 'c')
+        return list(chars)
+    _snippet_0089()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > tuple('hello')는 ('h', 'e', 'l', 'l', 'o')가 됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 튜플 메서드
+
+    *count()와 index()*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    튜플은 수정 불가능하기 때문에 리스트보다 메서드가 적습니다. count()는 특정 값의 개수를, index()는 특정 값의 위치를 반환합니다. 이 두 메서드는 리스트의 메서드와 완전히 동일하게 작동합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - count(값): 값의 개수 반환
+    - index(값): 값의 인덱스 반환
+    - 리스트보다 메서드 적음
+    - 수정 메서드는 없음
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### count 메서드
+
+    count()로 값의 개수를 셉니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0095():
+        sample = (1, 2, 3, 2, 4, 2, 5)
+        return sample.count(2)
+    _snippet_0095()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### index 메서드
+
+    index()로 값의 위치를 찾습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0097():
+        items = (1, 2, 3, 2, 4, 2, 5)
+        return items.index(4)
+    _snippet_0097()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > append, remove 같은 수정 메서드는 튜플에 없습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 튜플 길이
+
+    *len() 함수*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    len() 함수는 튜플의 요소 개수를 반환합니다. 리스트, 문자열과 동일하게 작동합니다. 튜플이 몇 개의 요소를 가지고 있는지 알 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - len(튜플)로 길이 확인
+    - 요소 개수 반환
+    - 리스트와 동일
+    - 빈 튜플은 0
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 튜플 길이
+
+    len() 함수로 튜플 요소 개수를 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0103():
+        week = ('월', '화', '수', '목', '금', '토', '일')
+        return len(week)
+    _snippet_0103()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 빈 튜플 길이
+
+    빈 튜플의 길이는 0입니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0105():
+        empty = ()
+        return len(empty)
+    _snippet_0105()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > len()은 문자열, 리스트, 튜플 모두에 사용 가능합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 9 종합 복습
+
+    *튜플 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 9에서 배운 튜플을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 튜플 생성
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 튜플 인덱싱
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 튜플 슬라이싱
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 튜플 패킹
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 튜플 언패킹
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 좌표 시스템
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 좌표1
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 좌표2
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### X 거리
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### Y 거리
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 사용자 정보
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 사용자 튜플
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 이름
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 정보 문자열
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 튜플 길이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: RGB 색상
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 빨강
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 초록
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 노랑 합성
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 시간 정보
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 시간 튜플
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 시
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 분
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 총 초
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 날짜 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 날짜 튜플
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 연도
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 겨울 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 날짜 문자열
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-1: 성적 데이터 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 점수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 과목
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 총점
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 평균
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-2: 성적 순위 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 상위 3개
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 국어 인덱스
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-1: 좌표 정보 추출
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 전체 좌표
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 첫 좌표
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 마지막 좌표
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-2: 좌표 연산
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 너비
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 높이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 중심점
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-1: 상품 재고 정보
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 상품1
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 상품2
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 상품3
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-2: 상품 재고 가치 계산
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 상품1 가치
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 전체 재고 가치
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4: 값 교환과 정렬
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 교환 후
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 정렬
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 최대값
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 최소값
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-1: 통계 기본 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 데이터
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 20의 개수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 30의 인덱스
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 길이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-2: 통계 슬라이싱 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 처음 3개
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 마지막 3개
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 역순
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-3: 통계 포함 여부 확인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 40 포함 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 60 포함 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

@@ -14,611 +14,1092 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
     # Day 24. 특수 메서드
-    
-    **오늘의 초점**: 객체가 파이썬 문법과 자연스럽게 어울리게 만든다.
-    
-    **완성 기준**: `__str__`, `__repr__`, `__len__`, `__eq__`, `__add__`, `__getitem__`의 역할을 이해한다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+
+    이 노트북은 `study/python/30days/day24_특수메서드.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - __str__과 __repr__로 문자열 표현
+    - __len__으로 길이 정의
+    - __add__, __eq__로 연산자 구현
+    - __getitem__으로 인덱싱 지원
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - __str__
-    - __repr__
-    - __len__
-    - __eq__
-    - __add__
-    - __getitem__
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: __str__, __repr__, __len__, __add__, __eq__, __getitem__
+    - 이미 써도 되는 개념: class_all
+    - 오늘은 일부러 쓰지 않는 개념: decorator, metaclass
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    특수 메서드는 객체가 `len(obj)`, `obj1 + obj2`, `obj[0]` 같은 파이썬 표준 문법에 반응하게 만든다. 잘 쓰면 직접 만든 객체도 내장 타입처럼 자연스럽게 다룰 수 있다.
-    
-    ## 생각 모델
-    
-    특수 메서드는 파이썬이 특정 문법을 만났을 때 대신 호출하는 약속된 이름이다. 직접 자주 호출하기보다 문법을 통해 호출되게 둔다.
-    
-    ## 자주 하는 실수
-    
-    - 특수 메서드 이름의 밑줄 개수를 틀리기
-    - `__len__`에서 정수가 아닌 값을 반환하기
-    - `__repr__`와 `__str__`의 목적을 구분하지 않기
+    ## __str__ 메서드
+
+    *사람이 읽기 쉬운 문자열 표현*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `__str__`를 한 문장으로 설명할 수 있는가?
-    2. `__repr__`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    __str__ 메서드는 객체를 문자열로 변환할 때 호출됩니다. str(객체)나 print(객체)를 사용하면 자동으로 __str__이 호출되어 사람이 읽기 쉬운 형태로 출력됩니다. 이 메서드를 정의하지 않으면 기본적으로 객체의 메모리 주소가 출력됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 23: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 21: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 17: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - __str__(self): 형식
+    - str(), print()에서 자동 호출
+    - 사용자 친화적인 출력
+    - 문자열 반환 필수
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 기본 __str__
+
+    __str__을 정의하여 객체를 문자열로 표현합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        class Book:
+            def __init__(self, title, author):
+                self.title = title
+                self.author = author
+
+            def __str__(self):
+                return self.title + ' by ' + self.author
+
+        book = Book('Python Guide', 'Kim')
+        return str(book)
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 상세한 문자열
+
+    여러 속성을 조합하여 정보를 제공합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0009():
+        class Product:
+            def __init__(self, name, price):
+                self.name = name
+                self.price = price
+
+            def __str__(self):
+                return self.name + ': ' + str(self.price) + '원'
+
+        item = Product('Laptop', 1500000)
+        return str(item)
+    _snippet_0009()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 조건부 문자열
+
+    상태에 따라 다른 문자열을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0011():
+        class Account:
+            def __init__(self, owner, balance):
+                self.owner = owner
+                self.balance = balance
+
+            def __str__(self):
+                status = 'positive' if self.balance >= 0 else 'negative'
+                return self.owner + ' (' + status + ')'
+
+        acc = Account('Alice', -1000)
+        return str(acc)
+    _snippet_0011()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > __str__은 최종 사용자를 위한 읽기 쉬운 출력을 만드는 데 사용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `__str__`, `__repr__`, `__len__`, `__eq__`, `__add__`, `__getitem__`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 특수 메서드 이름의 밑줄 개수를 틀리기
-    - `__len__`에서 정수가 아닌 값을 반환하기
-    - `__repr__`와 `__str__`의 목적을 구분하지 않기
+    ## __repr__ 메서드
+
+    *개발자를 위한 명확한 표현*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `특수 메서드`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    __repr__ 메서드는 객체의 공식적인 문자열 표현을 정의합니다. repr(객체)를 호출하거나 인터프리터에서 객체를 직접 입력하면 호출됩니다. 주로 디버깅이나 로깅에 사용되며, 가능하면 객체를 재생성할 수 있는 형태의 문자열을 반환해야 합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `class Playlist:` | 데이터와 동작을 묶을 새 타입의 설계도를 만듭니다. |
-    | 2 | `    def __init__(self, songs):` | 재사용할 동작에 이름을 붙입니다. 입력과 반환값을 함께 생각합니다. |
-    | 3 | `        self.songs = songs` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 4 | ` ` | 읽기 좋게 구획을 나누는 빈 줄입니다. |
-    | 5 | `    def __len__(self):` | 재사용할 동작에 이름을 붙입니다. 입력과 반환값을 함께 생각합니다. |
-    | 6 | `        return len(self.songs)` | 함수 호출자에게 돌려줄 결과를 정합니다. |
-    | 7 | ` ` | 읽기 좋게 구획을 나누는 빈 줄입니다. |
-    | 8 | `playlist = Playlist(["intro", "loop"])` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 9 | `len(playlist)` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - __repr__(self): 형식
+    - repr()에서 자동 호출
+    - 개발자용 명확한 표현
+    - 디버깅과 로깅에 유용
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 기본 __repr__
+
+    객체 정보를 명확하게 표현합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-class Playlist:
-    def __init__(self, songs):
-        self.songs = songs
+def _():
+    def _snippet_0017():
+        class Point:
+            def __init__(self, x, y):
+                self.x = x
+                self.y = y
 
-    def __len__(self):
-        return len(self.songs)
+            def __repr__(self):
+                return 'Point(' + str(self.x) + ', ' + str(self.y) + ')'
 
-playlist = Playlist(["intro", "loop"])
-len(playlist)
-"""
-    )
+        pt = Point(3, 4)
+        return repr(pt)
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `str(obj)`가 호출될 때 어떤 특수 메서드가 쓰이는지 확인하세요.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
+    ### 재생성 가능한 표현
+
+    반환된 문자열로 객체를 재생성할 수 있게 합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-class Label:
-    def __str__(self):
-        return "custom label"
+def _():
+    def _snippet_0019():
+        class Color:
+            def __init__(self, r, g, b):
+                self.r = r
+                self.g = g
+                self.b = b
 
-str(Label())
-"""
-    )
+            def __repr__(self):
+                return 'Color(' + str(self.r) + ', ' + str(self.g) + ', ' + str(self.b) + ')'
+
+        color = Color(255, 128, 0)
+        return repr(color)
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    'custom label'
-    ```
-    
-    </details>
+    ### __str__과 __repr__ 함께
+
+    두 메서드를 모두 정의할 수 있습니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0021():
+        class User:
+            def __init__(self, name, userId):
+                self.name = name
+                self.userId = userId
+
+            def __str__(self):
+                return self.name
+
+            def __repr__(self):
+                return 'User(' + str(self.userId) + ')'
+
+        user = User('Bob', 1001)
+        return (str(user), repr(user))
+    _snippet_0021()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `Point` 두 개가 같은 좌표면 같다고 판단하도록 `__eq__`를 실행해 확인하세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-
-    def __eq__(self, other):
-        return self.x == other.x and self.y == other.y
-
-assert Point(1, 2) == Point(1, 2)
-Point(1, 2) == Point(2, 1)
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    class Point:
-        def __init__(self, x, y):
-            self.x = x
-            self.y = y
-    
-        def __eq__(self, other):
-            return self.x == other.x and self.y == other.y
-    
-    assert Point(1, 2) == Point(1, 2)
-    Point(1, 2) == Point(2, 1)
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > __str__이 없으면 __repr__이 대신 사용됩니다. 하나만 정의한다면 __repr__을 권장합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    아래 클래스는 `len(box)`를 쓰려 하지만 `__len__`이 문자열을 반환합니다. 정수를 반환하도록 고치세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
+    ## __len__ 메서드
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-class Box:
-    def __init__(self, items):
-        self.items = items
-
-    def __len__(self):
-        return len(self.items)
-
-box = Box([1, 2, 3])
-len(box)
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    class Box:
-        def __init__(self, items):
-            self.items = items
-    
-        def __len__(self):
-            return len(self.items)
-    
-    box = Box([1, 2, 3])
-    len(box)
-    ```
-    
-    </details>
+    *객체의 길이 정의*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    __len__ 메서드는 객체의 길이를 정의합니다. len(객체)를 호출하면 자동으로 __len__이 호출되어 정수값을 반환합니다. 컬렉션 타입 클래스를 만들 때 매우 유용하며, 반드시 음이 아닌 정수를 반환해야 합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    `len()`이 직접 만든 클래스에서 동작하도록 특수 메서드를 추가하세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-class Stack:
-    def __init__(self, items):
-        self.items = items
-
-    def __len__(self):
-        return len(self.items)
-
-stack = Stack(["a", "b", "c"])
-assert len(stack) == 3
-len(stack)
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    class Stack:
-        def __init__(self, items):
-            self.items = items
-    
-        def __len__(self):
-            return len(self.items)
-    
-    stack = Stack(["a", "b", "c"])
-    assert len(stack) == 3
-    len(stack)
-    ```
-    
-    </details>
+    - __len__(self): 형식
+    - len()에서 자동 호출
+    - 정수값 반환 필수
+    - 컬렉션 클래스에 필수
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### 기본 __len__
+
+    내부 리스트의 길이를 반환합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'Point(1, 2) == Point(1, 2)'),
-    ('오류 고쳐보기', 'len(box) == 3'),
-    ('비슷한 문제', 'len(stack) == 3')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
+def _():
+    def _snippet_0027():
+        class Playlist:
+            def __init__(self):
+                self.songs = []
 
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+            def add(self, song):
+                self.songs.append(song)
+
+            def __len__(self):
+                return len(self.songs)
+
+        pl = Playlist()
+        pl.add('Song A')
+        pl.add('Song B')
+        return len(pl)
+    _snippet_0027()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 장바구니 클래스를 만들고 `len(cart)`, `cart[0]`, `str(cart)`가 동작하게 하세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    ### 커스텀 길이 계산
+
+    특정 기준으로 길이를 계산합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        class TextDoc:
+            def __init__(self, content):
+                self.content = content
+
+            def __len__(self):
+                return len(self.content.split())
+
+        doc = TextDoc('Hello world from Python')
+        return len(doc)
+    _snippet_0029()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    장바구니 클래스를 만들고 `len(cart)`, `cart[0]`, `str(cart)`가 동작하게 하세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
+    ### 여러 속성 기반 길이
+
+    여러 속성을 조합하여 길이를 계산합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-class Cart:
-    def __init__(self, items):
-        self.items = items
+def _():
+    def _snippet_0031():
+        class Inventory:
+            def __init__(self):
+                self.items = []
 
-    def __len__(self):
-        return len(self.items)
+            def add(self, item, qty):
+                self.items.append({'item': item, 'qty': qty})
 
-    def __getitem__(self, index):
-        return self.items[index]
+            def __len__(self):
+                total = 0
+                for entry in self.items:
+                    total = total + entry['qty']
+                return total
 
-    def __str__(self):
-        return f"Cart({len(self)} items)"
-
-cart = Cart(["coffee", "tea"])
-len(cart), cart[0], str(cart)
-"""
-    )
+        inv = Inventory()
+        inv.add('apple', 5)
+        inv.add('banana', 3)
+        return len(inv)
+    _snippet_0031()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-class StudyList:
-    def __init__(self, topics):
-        self.topics = topics
-
-    def __len__(self):
-        return len(self.topics)
-
-studyList = StudyList(["class", "special methods"])
-len(studyList)
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 24
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: `__add__`를 추가해 장바구니끼리 합칠 수 있게 해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    > **팁**
+    >
+    > __len__은 bool() 판단에도 사용됩니다. len이 0이면 False, 아니면 True입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 ``len()`이 직접 만든 클래스에서 동작하도록 특수 메서드를 추가하세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: __str__, __repr__, __len__ 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ## __add__ 메서드
+
+    *+ 연산자 구현*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `특수 메서드`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    __add__ 메서드는 + 연산자의 동작을 정의합니다. a + b를 실행하면 a.__add__(b)가 호출됩니다. 이를 통해 사용자 정의 클래스에서도 덧셈 연산을 의미있게 구현할 수 있습니다. 새로운 객체를 반환하는 것이 일반적입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    - __add__(self, other): 형식
+    - + 연산자에서 자동 호출
+    - 새 객체 반환 권장
+    - 연산자 오버로딩
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 기본 __add__
+
+    두 벡터를 더합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0037():
+        class Vector:
+            def __init__(self, x, y):
+                self.x = x
+                self.y = y
+
+            def __add__(self, other):
+                return Vector(self.x + other.x, self.y + other.y)
+
+            def __repr__(self):
+                return 'Vector(' + str(self.x) + ', ' + str(self.y) + ')'
+
+        v1 = Vector(1, 2)
+        v2 = Vector(3, 4)
+        v3 = v1 + v2
+        return repr(v3)
+    _snippet_0037()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 문자열 결합
+
+    객체를 더해서 새로운 문자열을 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        class Name:
+            def __init__(self, text):
+                self.text = text
+
+            def __add__(self, other):
+                return Name(self.text + ' ' + other.text)
+
+            def __str__(self):
+                return self.text
+
+        first = Name('John')
+        last = Name('Doe')
+        full = first + last
+        return str(full)
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 숫자 누적
+
+    카운터를 더해서 합산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        class Counter:
+            def __init__(self, val):
+                self.val = val
+
+            def __add__(self, other):
+                return Counter(self.val + other.val)
+
+        cnt1 = Counter(10)
+        cnt2 = Counter(20)
+        combined = cnt1 + cnt2
+        return combined.val
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > __sub__, __mul__, __div__ 등으로 다른 연산자도 구현할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## __eq__ 메서드
+
+    *== 연산자 구현*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    __eq__ 메서드는 == 연산자의 동작을 정의합니다. a == b를 실행하면 a.__eq__(b)가 호출됩니다. 기본적으로 객체는 같은 메모리 주소일 때만 같다고 판단하지만, __eq__를 정의하면 값 기반 비교가 가능합니다. True나 False를 반환해야 합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - __eq__(self, other): 형식
+    - == 연산자에서 자동 호출
+    - True/False 반환
+    - 값 기반 비교 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 기본 __eq__
+
+    좌표가 같으면 같은 점으로 판단합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0047():
+        class Location:
+            def __init__(self, x, y):
+                self.x = x
+                self.y = y
+
+            def __eq__(self, other):
+                return self.x == other.x and self.y == other.y
+
+        loc1 = Location(1, 2)
+        loc2 = Location(1, 2)
+        return loc1 == loc2
+    _snippet_0047()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 문자열 비교
+
+    내용이 같으면 같은 객체로 판단합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        class Tag:
+            def __init__(self, name):
+                self.name = name
+
+            def __eq__(self, other):
+                return self.name == other.name
+
+        tag1 = Tag('python')
+        tag2 = Tag('python')
+        return tag1 == tag2
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 복합 조건 비교
+
+    여러 속성을 모두 비교합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        class Card:
+            def __init__(self, rank, suit):
+                self.rank = rank
+                self.suit = suit
+
+            def __eq__(self, other):
+                return self.rank == other.rank and self.suit == other.suit
+
+        card1 = Card('A', 'hearts')
+        card2 = Card('A', 'spades')
+        return card1 == card2
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > __ne__(!=), __lt__(<), __le__(<=), __gt__(>), __ge__(>=)도 구현할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## __getitem__ 메서드
+
+    *인덱싱과 슬라이싱 지원*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    __getitem__ 메서드는 객체[키] 형태의 인덱싱을 가능하게 합니다. obj[key]를 실행하면 obj.__getitem__(key)가 호출됩니다. 리스트처럼 동작하는 커스텀 컨테이너를 만들 때 필수적이며, 슬라이싱도 지원할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - __getitem__(self, key): 형식
+    - obj[key]에서 자동 호출
+    - 인덱싱과 슬라이싱 지원
+    - 컨테이너 인터페이스
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 기본 __getitem__
+
+    인덱스로 내부 리스트에 접근합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0057():
+        class Items:
+            def __init__(self):
+                self.data = []
+
+            def add(self, item):
+                self.data.append(item)
+
+            def __getitem__(self, idx):
+                return self.data[idx]
+
+        items = Items()
+        items.add('first')
+        items.add('second')
+        return items[0]
+    _snippet_0057()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 딕셔너리형 접근
+
+    키로 값을 조회합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        class Config:
+            def __init__(self):
+                self.settings = {}
+
+            def set(self, key, val):
+                self.settings[key] = val
+
+            def __getitem__(self, key):
+                return self.settings.get(key, 'Not found')
+
+        cfg = Config()
+        cfg.set('host', 'localhost')
+        return cfg['host']
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 계산된 값 반환
+
+    인덱스에 따라 계산된 값을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        class Fibonacci:
+            def __getitem__(self, n):
+                if n <= 1:
+                    return n
+                a = 0
+                b = 1
+                for i in range(2, n + 1):
+                    c = a + b
+                    a = b
+                    b = c
+                return b
+
+        fib = Fibonacci()
+        return fib[7]
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > __setitem__과 __delitem__으로 obj[key] = val과 del obj[key]도 구현할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 특수 메서드 실전
+
+    *여러 특수 메서드 조합*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    실제 클래스는 여러 특수 메서드를 함께 구현하여 파이썬 내장 타입처럼 동작하게 만듭니다. __str__, __len__, __getitem__ 등을 조합하면 강력하고 직관적인 인터페이스를 제공할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 여러 특수 메서드 조합
+    - 내장 타입처럼 동작
+    - 직관적인 인터페이스
+    - 파이썬스러운 코드
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 완전한 컬렉션 클래스
+
+    여러 특수 메서드를 함께 구현합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0067():
+        class TodoList:
+            def __init__(self):
+                self.tasks = []
+
+            def add(self, task):
+                self.tasks.append(task)
+
+            def __len__(self):
+                return len(self.tasks)
+
+            def __getitem__(self, idx):
+                return self.tasks[idx]
+
+            def __str__(self):
+                return str(len(self.tasks)) + ' tasks'
+
+        todo = TodoList()
+        todo.add('Study')
+        todo.add('Code')
+        return (len(todo), str(todo), todo[0])
+    _snippet_0067()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 수학적 객체
+
+    덧셈과 비교를 모두 지원합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0069():
+        class Money:
+            def __init__(self, amount):
+                self.amount = amount
+
+            def __add__(self, other):
+                return Money(self.amount + other.amount)
+
+            def __eq__(self, other):
+                return self.amount == other.amount
+
+            def __str__(self):
+                return str(self.amount) + '원'
+
+        m1 = Money(1000)
+        m2 = Money(2000)
+        m3 = m1 + m2
+        return str(m3)
+    _snippet_0069()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 체이닝 가능한 클래스
+
+    여러 연산을 연결할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0071():
+        class Chain:
+            def __init__(self, val):
+                self.val = val
+
+            def __add__(self, other):
+                return Chain(self.val + other.val)
+
+            def __repr__(self):
+                return 'Chain(' + str(self.val) + ')'
+
+        c1 = Chain(10)
+        c2 = Chain(20)
+        c3 = Chain(30)
+        chained = c1 + c2 + c3
+        return repr(chained)
+    _snippet_0071()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 특수 메서드를 잘 활용하면 사용자 정의 클래스가 파이썬 내장 타입만큼 자연스럽게 동작합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 24 종합 복습
+
+    *특수 메서드 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 24에서 배운 특수 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: __str__ 구현
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: __repr__ 구현
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: __len__ 구현
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: __add__ 구현
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: __eq__ 구현
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: __str__과 __repr__ 함께
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 단어 수 __len__
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 벡터 덧셈
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: __getitem__ 리스트형
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 복합 비교
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1: 문자열 포맷팅
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2: 커스텀 길이
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3: 연산 체이닝
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4: 딕셔너리형 접근
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5: 범위 체크
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화6: 시퀀스 프로토콜
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화7: 불변 객체
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화8: 스마트 컨테이너
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화9: 비교 연산자
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화10: 완전한 자료구조
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

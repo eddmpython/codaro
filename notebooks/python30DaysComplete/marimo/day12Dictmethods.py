@@ -2,7 +2,7 @@ import marimo
 
 __generated_with = "0.23.6"
 
-app = marimo.App(app_title="Day 12. 딕셔너리 메서드")
+app = marimo.App(app_title="Day 12. 딕셔너리메서드")
 
 
 @app.cell
@@ -14,551 +14,1093 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    # Day 12. 딕셔너리 메서드
-    
-    **오늘의 초점**: 딕셔너리를 안전하게 읽고 순회하고 갱신한다.
-    
-    **완성 기준**: `get`, `keys`, `values`, `items`, `update`, `pop`을 실제 데이터 정리에 사용할 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+    # Day 12. 딕셔너리메서드
+
+    이 노트북은 `study/python/30days/day12_딕셔너리메서드.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 안전한 값 접근 get()
+    - 키, 값, 아이템 순회
+    - 딕셔너리 병합과 삭제
+    - 실전 데이터 처리
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 안전한 읽기
-    - 키 목록
-    - 값 목록
-    - 키-값 순회
-    - 갱신
-    - 삭제
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: get, keys, values, items, update, pop, popitem, clear
+    - 이미 써도 되는 개념: dict_basic
+    - 오늘은 일부러 쓰지 않는 개념: function, import
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    딕셔너리는 편리하지만 없는 키를 읽으면 에러가 난다. 메서드를 사용하면 안전하게 읽고, 여러 값을 한 번에 갱신하고, 키-값 쌍을 반복 처리할 수 있다.
-    
-    ## 생각 모델
-    
-    `items()`는 딕셔너리를 작은 튜플들의 흐름으로 보여준다. 키와 값을 동시에 다뤄야 할 때 가장 자주 쓴다.
-    
-    ## 자주 하는 실수
-    
-    - `get`의 기본값을 빼먹기
-    - `keys()`와 `values()`를 혼동하기
-    - `items()`가 키와 값을 함께 준다는 점을 놓치기
+    ## get() 메서드
+
+    *안전한 값 접근*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `안전한 읽기`를 한 문장으로 설명할 수 있는가?
-    2. `키 목록`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    get() 메서드는 대괄호[] 접근의 안전한 대안입니다. 키가 없어도 에러 없이 None을 반환하며, 기본값을 지정할 수도 있습니다. dict.get(key) 또는 dict.get(key, default) 형식으로 사용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 11: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 09: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 05: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - dict.get(key) 형식
+    - 없는 키는 None 반환
+    - 기본값 지정 가능
+    - 에러 없이 안전
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 기본 get()
+
+    존재하는 키로 값을 가져옵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        config = {'host': 'localhost', 'port': 8080}
+        return config.get('host')
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 없는 키 get()
+
+    없는 키는 None을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0009():
+        server = {'host': 'localhost', 'port': 8080}
+        return server.get('user')
+    _snippet_0009()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 기본값 지정
+
+    두 번째 인자로 기본값을 지정합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0011():
+        db = {'host': 'localhost', 'port': 5432}
+        return db.get('user', 'admin')
+    _snippet_0011()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > get()은 설정값이나 옵션 처리에 매우 유용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `안전한 읽기`, `키 목록`, `값 목록`, `키-값 순회`, `갱신`, `삭제`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - `get`의 기본값을 빼먹기
-    - `keys()`와 `values()`를 혼동하기
-    - `items()`가 키와 값을 함께 준다는 점을 놓치기
+    ## keys() 메서드
+
+    *모든 키 가져오기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `딕셔너리 메서드`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    keys() 메서드는 딕셔너리의 모든 키를 dict_keys 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 키만 필요할 때 유용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `settings = {"theme": "dark", "fontSize": 14}` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `fontSize = settings.get("fontSize", 12)` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 3 | `fontSize` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - dict.keys() 형식
+    - dict_keys 객체 반환
+    - list()로 변환 가능
+    - 키 목록 확인용
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### keys() 기본
+
+    딕셔너리의 모든 키를 가져옵니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-settings = {"theme": "dark", "fontSize": 14}
-fontSize = settings.get("fontSize", 12)
-fontSize
-"""
-    )
+def _():
+    def _snippet_0017():
+        grade = {'math': 85, 'english': 90, 'science': 88}
+        return grade.keys()
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    없는 키를 `get`으로 읽으면 기본값이 어떻게 쓰이는지 확인하세요.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
+    ### 리스트 변환
+
+    list()로 변환하여 리스트로 만듭니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-settings = {"theme": "dark"}
-settings.get("language", "en")
-"""
-    )
+def _():
+    def _snippet_0019():
+        score = {'math': 85, 'english': 90, 'science': 88}
+        return list(score.keys())
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    'en'
-    ```
-    
-    </details>
+    ### 키 개수 확인
+
+    len()과 함께 사용합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0021():
+        point = {'math': 85, 'english': 90, 'science': 88}
+        return len(point.keys())
+    _snippet_0021()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `inventory`에서 `pen`의 수량을 꺼내고, 없으면 0을 쓰도록 만드세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-inventory = {"notebook": 5, "eraser": 2}
-penCount = inventory.get("pen", 0)
-assert penCount == 0
-penCount
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    inventory = {"notebook": 5, "eraser": 2}
-    penCount = inventory.get("pen", 0)
-    assert penCount == 0
-    penCount
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > keys()는 딕셔너리 순회나 키 확인에 사용됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 `keys()` 결과에서 값 3000을 찾으려고 합니다. 값을 보려면 `values()`를 쓰세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
+    ## values() 메서드
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-prices = {"coffee": 3000, "tea": 2500}
-hasPrice = 3000 in prices.values()
-assert hasPrice is True
-hasPrice
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    prices = {"coffee": 3000, "tea": 2500}
-    hasPrice = 3000 in prices.values()
-    assert hasPrice is True
-    hasPrice
-    ```
-    
-    </details>
+    *모든 값 가져오기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    values() 메서드는 딕셔너리의 모든 값을 dict_values 객체로 반환합니다. list()로 변환하여 리스트로 사용할 수 있습니다. 값만 필요할 때 유용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    없는 키를 안전하게 읽고, 여러 설정을 한 번에 업데이트하세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-settings = {"theme": "light"}
-language = settings.get("language", "ko")
-settings.update({"theme": "dark", "fontSize": 16})
-assert language == "ko"
-assert settings["theme"] == "dark"
-settings
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    settings = {"theme": "light"}
-    language = settings.get("language", "ko")
-    settings.update({"theme": "dark", "fontSize": 16})
-    assert language == "ko"
-    assert settings["theme"] == "dark"
-    settings
-    ```
-    
-    </details>
+    - dict.values() 형식
+    - dict_values 객체 반환
+    - list()로 변환 가능
+    - 값 목록 확인용
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### values() 기본
+
+    딕셔너리의 모든 값을 가져옵니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'penCount == 0'),
-    ('오류 고쳐보기', 'hasPrice is True'),
-    ('비슷한 문제', 'language == "ko" and settings["theme"] == "dark" and settings["fontSize"] == 16')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+def _():
+    def _snippet_0027():
+        exam = {'math': 85, 'english': 90, 'science': 88}
+        return exam.values()
+    _snippet_0027()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 상품 가격 딕셔너리를 안전하게 읽고, 품절 상품을 제거한 뒤, 새 상품 가격을 한 번에 추가하세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    ### 리스트 변환
+
+    list()로 변환하여 리스트로 만듭니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        test = {'math': 85, 'english': 90, 'science': 88}
+        return list(test.values())
+    _snippet_0029()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    상품 가격 딕셔너리를 안전하게 읽고, 품절 상품을 제거한 뒤, 새 상품 가격을 한 번에 추가하세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
+    ### 값 확인
+
+    특정 값이 있는지 in으로 확인합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-prices = {"coffee": 5000, "tea": 4000, "cake": 7000}
-teaPrice = prices.get("tea", 0)
-soldOut = prices.pop("cake")
-prices.update({"cookie": 3500})
-teaPrice, soldOut, prices
-"""
-    )
+def _():
+    def _snippet_0031():
+        result = {'math': 85, 'english': 90, 'science': 88}
+        return 85 in result.values()
+    _snippet_0031()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-settings = {"targetMinutes": 30, "theme": "light"}
-target = settings.get("targetMinutes", 25)
-settings.update({"theme": "dark"})
-target, settings
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 12
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: `pop`으로 품절 상품을 제거한 뒤 남은 딕셔너리를 확인해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    > **팁**
+    >
+    > values()는 값의 존재 확인이나 통계 계산에 유용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `없는 키를 안전하게 읽고, 여러 설정을 한 번에 업데이트하세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 안전한 읽기, 키 목록, 값 목록 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ## items() 메서드
+
+    *키-값 쌍 가져오기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `딕셔너리 메서드`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    items() 메서드는 딕셔너리의 모든 키-값 쌍을 dict_items 객체로 반환합니다. 각 항목은 (키, 값) 튜플 형태입니다. list()로 변환하면 튜플의 리스트가 됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    - dict.items() 형식
+    - dict_items 객체 반환
+    - (키, 값) 튜플로 반환
+    - 순회와 변환에 유용
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### items() 기본
+
+    딕셔너리의 모든 키-값 쌍을 가져옵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0037():
+        product = {'name': '노트북', 'price': 1200000, 'stock': 5}
+        return product.items()
+    _snippet_0037()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 리스트 변환
+
+    list()로 변환하여 튜플 리스트로 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        item = {'name': '노트북', 'price': 1200000, 'stock': 5}
+        return list(item.items())
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 첫 번째 아이템
+
+    리스트로 변환 후 인덱싱합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        goods = {'name': '노트북', 'price': 1200000, 'stock': 5}
+        pairs = list(goods.items())
+        return pairs[0]
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > items()는 딕셔너리 전체를 순회하거나 변환할 때 사용됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## update() 메서드
+
+    *딕셔너리 병합*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    update() 메서드는 다른 딕셔너리의 키-값 쌍을 현재 딕셔너리에 추가하거나 업데이트합니다. dict1.update(dict2) 형식으로 사용하며, dict2의 내용이 dict1에 병합됩니다. 같은 키가 있으면 값이 덮어씌워집니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - dict1.update(dict2) 형식
+    - dict2의 내용을 dict1에 병합
+    - 같은 키는 값 덮어쓰기
+    - 원본 딕셔너리 직접 변경
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 새 키 추가
+
+    다른 딕셔너리의 새 키를 추가합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0047():
+        user = {'name': '김철수', 'age': 30}
+        extra = {'city': '서울', 'job': 'developer'}
+        user.update(extra)
+        return user
+    _snippet_0047()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 값 덮어쓰기
+
+    같은 키가 있으면 값이 업데이트됩니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        account = {'name': '이영희', 'age': 25, 'city': '부산'}
+        change = {'age': 26, 'job': 'designer'}
+        account.update(change)
+        return account
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 여러 번 병합
+
+    여러 딕셔너리를 순차적으로 병합합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        base = {'name': '박민수'}
+        info1 = {'age': 35, 'city': '대구'}
+        info2 = {'job': 'teacher', 'hobby': 'reading'}
+        base.update(info1)
+        base.update(info2)
+        return base
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > update()는 설정 병합이나 데이터 통합에 매우 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## pop() 메서드
+
+    *키로 값 제거하고 반환*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    pop() 메서드는 지정한 키의 값을 제거하고 그 값을 반환합니다. dict.pop(key) 형식으로 사용하며, 없는 키를 pop하면 에러가 발생합니다. dict.pop(key, default)로 기본값을 지정할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - dict.pop(key) 형식
+    - 키 제거하고 값 반환
+    - 없는 키는 에러 발생
+    - 기본값 지정 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### pop() 기본
+
+    키를 제거하고 값을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0057():
+        stock = {'laptop': 10, 'mouse': 50, 'keyboard': 30}
+        return stock.pop('mouse')
+    _snippet_0057()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 기본값 지정
+
+    없는 키를 pop할 때 기본값을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        inventory = {'laptop': 10, 'keyboard': 30}
+        return inventory.pop('monitor', 0)
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 여러 키 제거
+
+    여러 키를 순차적으로 제거합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        data = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+        data.pop('b')
+        data.pop('d')
+        return data
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > pop()은 값을 꺼내면서 동시에 제거할 때 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## popitem() 메서드
+
+    *마지막 키-값 쌍 제거*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    popitem() 메서드는 딕셔너리의 마지막 키-값 쌍을 제거하고 (키, 값) 튜플로 반환합니다. dict.popitem() 형식으로 사용하며, 빈 딕셔너리에 사용하면 에러가 발생합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - dict.popitem() 형식
+    - 마지막 키-값 쌍 제거
+    - (키, 값) 튜플 반환
+    - 빈 딕셔너리는 에러
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### popitem() 기본
+
+    마지막 키-값 쌍을 제거하고 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0067():
+        queue = {'first': 1, 'second': 2, 'third': 3}
+        return queue.popitem()
+    _snippet_0067()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연속 제거
+
+    popitem()을 여러 번 호출하여 제거합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0069():
+        stack = {'a': 1, 'b': 2, 'c': 3, 'd': 4}
+        stack.popitem()
+        stack.popitem()
+        return stack
+    _snippet_0069()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 키와 값 분리
+
+    반환된 튜플에서 키와 값을 인덱싱으로 가져옵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0071():
+        record = {'name': '김철수', 'age': 30, 'city': '서울'}
+        pair = record.popitem()
+        return pair[0]
+    _snippet_0071()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > popitem()은 LIFO(후입선출) 스택 구현에 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## clear() 메서드
+
+    *모든 항목 제거*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    clear() 메서드는 딕셔너리의 모든 키-값 쌍을 제거하여 빈 딕셔너리로 만듭니다. dict.clear() 형식으로 사용하며, 반환값은 None입니다. 리스트의 clear()와 동일하게 작동합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - dict.clear() 형식
+    - 모든 키-값 쌍 제거
+    - 빈 딕셔너리로 만듦
+    - 반환값 없음(None)
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### clear() 기본
+
+    딕셔너리의 모든 항목을 제거합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0077():
+        temp = {'a': 1, 'b': 2, 'c': 3}
+        temp.clear()
+        return temp
+    _snippet_0077()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 초기화 비교
+
+    clear()와 빈 딕셔너리 할당은 다릅니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0079():
+        data1 = {'x': 1, 'y': 2}
+        data2 = {'x': 1, 'y': 2}
+        data1.clear()
+        data2 = {}
+        return data1 == data2
+    _snippet_0079()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > clear()는 원본 딕셔너리를 유지하면서 내용만 비웁니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## setdefault() 메서드
+
+    *키가 없으면 추가*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    setdefault() 메서드는 키가 있으면 그 값을 반환하고, 없으면 지정한 기본값으로 키를 추가하고 그 값을 반환합니다. dict.setdefault(key, default) 형식으로 사용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - dict.setdefault(key, default) 형식
+    - 키 있으면 값 반환
+    - 키 없으면 추가하고 반환
+    - 카운팅에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 키 있을 때
+
+    이미 있는 키는 기존 값을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0085():
+        cache = {'name': '김철수', 'age': 30}
+        return cache.setdefault('name', '이영희')
+    _snippet_0085()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 키 없을 때
+
+    없는 키는 기본값으로 추가됩니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0087():
+        session = {'user': 'admin'}
+        session.setdefault('timeout', 3600)
+        return session
+    _snippet_0087()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 빈 리스트 초기화
+
+    빈 리스트를 기본값으로 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0089():
+        groups = {'admin': ['user1', 'user2']}
+        groups.setdefault('guest', [])
+        return groups
+    _snippet_0089()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > setdefault()는 딕셔너리 카운팅이나 그룹화에 매우 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 메서드 비교
+
+    *언제 어떤 메서드를 사용할까?*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    딕셔너리 메서드는 각각 특정 상황에 최적화되어 있습니다. get()은 안전한 접근, keys/values/items는 순회, update는 병합, pop/popitem/clear는 제거 작업에 사용됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - get(): 안전한 값 접근
+    - keys/values/items: 순회
+    - update(): 딕셔너리 병합
+    - pop/popitem/clear: 제거
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 종합 예제
+
+    여러 메서드를 조합하여 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0095():
+        setting = {'host': 'localhost', 'port': 8080}
+        setting.update({'user': 'admin', 'timeout': 30})
+        setting.pop('port')
+        return setting
+    _snippet_0095()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 상황에 맞는 메서드를 선택하면 코드가 간결해집니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 12 종합 복습
+
+    *딕셔너리 메서드 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 12에서 배운 딕셔너리 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: get() 메서드
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: keys() 메서드
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: values() 메서드
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: items() 메서드
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: update() 메서드
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 설정 관리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 재고 관리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 성적 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 사용자 프로필
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 주문 처리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-1: 멀티 설정 병합
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-2: 설정 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-1: 캐시 구현
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-2: 캐시 통계
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-1: 주문 시스템
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-2: 주문 처리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-1: 팀 관리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-2: 팀 재구성
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-1: 통계 계산
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-2: 통계 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

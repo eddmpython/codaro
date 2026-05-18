@@ -14,648 +14,974 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
     # Day 28. 고급 문법 종합
-    
-    **오늘의 초점**: 컨텍스트 매니저와 지금까지의 고급 문법을 연결한다.
-    
-    **완성 기준**: `with` 문이 자원 획득과 정리를 어떻게 보장하는지 이해하고 직접 구현할 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+
+    이 노트북은 `study/python/30days/day28_고급문법종합.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - with 문으로 리소스 관리
+    - 컨텍스트 매니저 프로토콜
+    - 자동 정리 메커니즘
+    - 커스텀 컨텍스트 매니저
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - with 문
-    - __enter__
-    - __exit__
-    - contextlib
-    - 정리 보장
-    - 고급 문법 연결
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: context_manager, with_statement, custom_context_manager
+    - 이미 써도 되는 개념: everything
+    - 오늘은 일부러 쓰지 않는 개념: external_library
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    파일, 연결, 임시 상태처럼 시작과 끝이 분명한 작업은 정리가 중요하다. 컨텍스트 매니저는 성공하든 실패하든 마무리 코드를 실행하게 만든다.
-    
-    ## 생각 모델
-    
-    `with`는 입장과 퇴장을 가진 안전 구역이다. `__enter__`가 시작을 맡고 `__exit__`가 마무리를 맡는다.
-    
-    ## 자주 하는 실수
-    
-    - 특수 메서드 이름을 틀리기
-    - `__exit__` 반환값이 예외 처리에 영향을 준다는 점을 모르는 것
-    - 정리 로직을 블록 안쪽에만 두기
+    ## with 문 기초
+
+    *자동 리소스 관리*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `with 문`를 한 문장으로 설명할 수 있는가?
-    2. `__enter__`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    with 문은 리소스를 자동으로 정리하는 파이썬의 강력한 기능입니다. 파일을 열고 닫거나, 데이터베이스 연결을 관리할 때 사용합니다. with 블록이 끝나면 자동으로 정리 작업이 수행되므로 close()를 직접 호출할 필요가 없습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 27: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 25: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 21: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - with 문: 자동 정리
+    - 블록 종료시 자동 close
+    - 예외 발생시에도 정리 보장
+    - 코드 간결성 향상
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 기본 with 문
+
+    with를 사용하여 파일을 안전하게 처리합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        content = ''
+        with open('test.txt', 'w') as f:
+            f.write('Hello World')
+            content = 'written'
+        return content
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### with 없이 사용
+
+    수동으로 파일을 닫아야 합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0009():
+        fileHandle = open('manual.txt', 'w')
+        fileHandle.write('Manual close')
+        fileHandle.close()
+        return 'closed manually'
+    _snippet_0009()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### with와 읽기
+
+    파일을 읽고 자동으로 닫습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0011():
+        with open('test.txt', 'r') as reader:
+            textData = reader.read()
+        return textData
+    _snippet_0011()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > with 문을 사용하면 예외가 발생해도 리소스가 자동으로 정리됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `with 문`, `__enter__`, `__exit__`, `contextlib`, `정리 보장`, `고급 문법 연결`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 특수 메서드 이름을 틀리기
-    - `__exit__` 반환값이 예외 처리에 영향을 준다는 점을 모르는 것
-    - 정리 로직을 블록 안쪽에만 두기
+    ## 컨텍스트 매니저 프로토콜
+
+    *__enter__와 __exit__*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `고급 문법 종합`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    컨텍스트 매니저는 __enter__와 __exit__ 메서드를 구현한 객체입니다. __enter__는 with 블록 진입시 호출되고, __exit__는 블록 종료시 호출됩니다. __exit__는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `from contextlib import contextmanager` | 이미 만들어진 도구를 현재 노트북으로 가져옵니다. |
-    | 2 | ` ` | 읽기 좋게 구획을 나누는 빈 줄입니다. |
-    | 3 | `@contextmanager` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
-    | 4 | `def section(name):` | 재사용할 동작에 이름을 붙입니다. 입력과 반환값을 함께 생각합니다. |
-    | 5 | `    result = f"enter {name}"` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 6 | `    yield result` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
-    | 7 | ` ` | 읽기 좋게 구획을 나누는 빈 줄입니다. |
-    | 8 | `with section("study") as message:` | 시작과 정리가 필요한 작업을 안전한 구역으로 묶습니다. |
-    | 9 | `    output = message.upper()` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 10 | `output` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - __enter__: 진입시 호출
+    - __exit__: 종료시 호출
+    - 예외 정보 처리 가능
+    - 자동 정리 보장
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 기본 컨텍스트 매니저
+
+    간단한 컨텍스트 매니저를 만듭니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-from contextlib import contextmanager
+def _():
+    def _snippet_0017():
+        class SimpleContext:
+            def __enter__(self):
+                return 'entered'
 
-@contextmanager
-def section(name):
-    result = f"enter {name}"
-    yield result
+            def __exit__(self, excType, excVal, excTb):
+                return False
 
-with section("study") as message:
-    output = message.upper()
-output
-"""
-    )
+        with SimpleContext() as sc:
+            result = sc
+        return result
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `with` 블록 안에서 만든 결과가 블록 밖 변수에 저장되면 어떻게 보일까요?
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
+    ### 상태 추적 컨텍스트
+
+    진입과 종료를 추적합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-from contextlib import contextmanager
+def _():
+    def _snippet_0019():
+        class StateTracker:
+            def __init__(self):
+                self.status = 'init'
 
-@contextmanager
-def label(text):
-    yield f"[{text}]"
+            def __enter__(self):
+                self.status = 'active'
+                return self
 
-with label("run") as tag:
-    result = tag + " done"
-result
-"""
-    )
+            def __exit__(self, excType, excVal, excTb):
+                self.status = 'closed'
+                return False
+
+        tracker = StateTracker()
+        with tracker:
+            pass
+        return tracker.status
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    '[run] done'
-    ```
-    
-    </details>
+    ### 값 반환 컨텍스트
+
+    __enter__에서 반환한 값을 사용합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0021():
+        class ValueProvider:
+            def __enter__(self):
+                return [1, 2, 3, 4, 5]
+
+            def __exit__(self, excType, excVal, excTb):
+                return False
+
+        with ValueProvider() as vals:
+            total = sum(vals)
+        return total
+    _snippet_0021()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `TimerLabel` 컨텍스트 매니저의 `__enter__`가 라벨 문자열을 반환하도록 실행해 확인하세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-class TimerLabel:
-    def __init__(self, name):
-        self.name = name
-
-    def __enter__(self):
-        return f"start {self.name}"
-
-    def __exit__(self, excType, exc, trace):
-        return False
-
-with TimerLabel("practice") as label:
-    timerResult = label
-assert timerResult == "start practice"
-timerResult
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    class TimerLabel:
-        def __init__(self, name):
-            self.name = name
-    
-        def __enter__(self):
-            return f"start {self.name}"
-    
-        def __exit__(self, excType, exc, trace):
-            return False
-    
-    with TimerLabel("practice") as label:
-        timerResult = label
-    assert timerResult == "start practice"
-    timerResult
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > __exit__의 세 매개변수는 예외 타입, 예외 값, 트레이스백입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    아래 컨텍스트 매니저는 `__exit__` 이름을 잘못 써서 동작하지 않습니다. 특수 메서드 이름을 고치세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
+    ## 리소스 관리
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-class OpenClose:
-    def __enter__(self):
-        return "open"
-
-    def __exit__(self, excType, exc, trace):
-        return False
-
-with OpenClose() as state:
-    result = state
-result
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    class OpenClose:
-        def __enter__(self):
-            return "open"
-    
-        def __exit__(self, excType, exc, trace):
-            return False
-    
-    with OpenClose() as state:
-        result = state
-    result
-    ```
-    
-    </details>
+    *파일과 연결 관리*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    컨텍스트 매니저의 주요 용도는 리소스 관리입니다. 파일, 네트워크 연결, 데이터베이스 커넥션 등 사용 후 반드시 정리해야 하는 리소스를 안전하게 처리합니다. with 문을 사용하면 예외 발생 여부와 관계없이 리소스가 정리됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    컨텍스트 매니저가 들어갈 때와 나올 때 상태를 바꾸도록 작성하세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-class Flag:
-    def __init__(self):
-        self.active = False
-
-    def __enter__(self):
-        self.active = True
-        return self
-
-    def __exit__(self, excType, exc, trace):
-        self.active = False
-        return False
-
-flag = Flag()
-with flag as current:
-    inside = current.active
-outside = flag.active
-assert (inside, outside) == (True, False)
-inside, outside
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    class Flag:
-        def __init__(self):
-            self.active = False
-    
-        def __enter__(self):
-            self.active = True
-            return self
-    
-        def __exit__(self, excType, exc, trace):
-            self.active = False
-            return False
-    
-    flag = Flag()
-    with flag as current:
-        inside = current.active
-    outside = flag.active
-    assert (inside, outside) == (True, False)
-    inside, outside
-    ```
-    
-    </details>
+    - 파일 자동 닫기
+    - 연결 자동 종료
+    - 예외 안전성
+    - 메모리 누수 방지
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### 파일 컨텍스트
+
+    파일을 안전하게 읽고 씁니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'timerResult == "start practice"'),
-    ('오류 고쳐보기', 'state == "open"'),
-    ('비슷한 문제', 'inside is True and outside is False')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
+def _():
+    def _snippet_0027():
+        class FileManager:
+            def __init__(self, filename, mode):
+                self.filename = filename
+                self.mode = mode
+                self.fileObj = None
 
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+            def __enter__(self):
+                self.fileObj = open(self.filename, self.mode)
+                return self.fileObj
+
+            def __exit__(self, excType, excVal, excTb):
+                if self.fileObj:
+                    self.fileObj.close()
+                return False
+
+        with FileManager('resource.txt', 'w') as fm:
+            fm.write('Resource managed')
+        return 'completed'
+    _snippet_0027()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 임시 설정을 켰다가 블록이 끝나면 원래 값으로 되돌리는 컨텍스트 매니저를 만드세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    ### 연결 컨텍스트
+
+    연결을 자동으로 정리합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        class Connection:
+            def __init__(self, host):
+                self.host = host
+                self.connected = False
+
+            def __enter__(self):
+                self.connected = True
+                return self
+
+            def __exit__(self, excType, excVal, excTb):
+                self.connected = False
+                return False
+
+        conn = Connection('localhost')
+        with conn:
+            status = conn.connected
+        return (conn.connected, status)
+    _snippet_0029()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    임시 설정을 켰다가 블록이 끝나면 원래 값으로 되돌리는 컨텍스트 매니저를 만드세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
+    ### 리소스 카운터
+
+    리소스 사용을 추적합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-class TemporaryMode:
-    def __init__(self, settings, value):
-        self.settings = settings
-        self.value = value
-        self.previous = settings["mode"]
+def _():
+    def _snippet_0031():
+        class ResourceCounter:
+            count = 0
 
-    def __enter__(self):
-        self.settings["mode"] = self.value
-        return self.settings
+            def __enter__(self):
+                ResourceCounter.count = ResourceCounter.count + 1
+                return ResourceCounter.count
 
-    def __exit__(self, excType, exc, trace):
-        self.settings["mode"] = self.previous
-        return False
+            def __exit__(self, excType, excVal, excTb):
+                ResourceCounter.count = ResourceCounter.count - 1
+                return False
 
-settings = {"mode": "normal"}
-with TemporaryMode(settings, "debug") as current:
-    inside = current["mode"]
-outside = settings["mode"]
-inside, outside
-"""
-    )
+        with ResourceCounter() as rc1:
+            with ResourceCounter() as rc2:
+                peak = ResourceCounter.count
+        return (ResourceCounter.count, peak)
+    _snippet_0031()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-class StudyMode:
-    def __enter__(self):
-        return "focus"
-
-    def __exit__(self, excType, exc, trace):
-        return False
-
-with StudyMode() as mode:
-    result = mode.upper()
-result
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 28
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: 블록 안에서 예외가 발생해도 `outside`가 복구되는지 실험해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    > **팁**
+    >
+    > with 블록이 중첩되면 안쪽 블록부터 바깥쪽 순서로 __exit__가 호출됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `컨텍스트 매니저가 들어갈 때와 나올 때 상태를 바꾸도록 작성하세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: with 문, __enter__, __exit__ 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ## 예외 처리
+
+    *컨텍스트 매니저와 예외*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `고급 문법 종합`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    컨텍스트 매니저는 예외 처리에 강력합니다. __exit__ 메서드는 예외 정보를 받아 처리할 수 있으며, True를 반환하면 예외를 억제합니다. 이를 통해 정리 작업은 수행하되 예외 전파를 제어할 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    - 예외 정보 수신
+    - 예외 억제 가능
+    - 정리 작업 보장
+    - 예외 전파 제어
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 예외 억제
+
+    예외를 잡아서 억제합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0037():
+        class ExceptionSuppressor:
+            def __enter__(self):
+                return self
+
+            def __exit__(self, excType, excVal, excTb):
+                if excType is ZeroDivisionError:
+                    return True
+                return False
+
+        outcome = 'no error'
+        with ExceptionSuppressor():
+            outcome = 10 / 0
+        return outcome
+    _snippet_0037()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 예외 로깅
+
+    예외 정보를 기록하고 전파합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        class ExceptionLogger:
+            def __init__(self):
+                self.errors = []
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, excType, excVal, excTb):
+                if excType:
+                    self.errors.append(str(excType.__name__))
+                return False
+
+        logger = ExceptionLogger()
+        try:
+            with logger:
+                raise ValueError('test error')
+        except ValueError:
+            pass
+        return logger.errors
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 조건부 억제
+
+    특정 예외만 억제합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        class SelectiveSuppressor:
+            def __init__(self, suppress):
+                self.suppress = suppress
+
+            def __enter__(self):
+                return self
+
+            def __exit__(self, excType, excVal, excTb):
+                return excType in self.suppress
+
+        msg = 'success'
+        with SelectiveSuppressor([TypeError]):
+            msg = 'error' + 5
+        return msg
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > __exit__가 True를 반환하면 예외가 억제되고, False나 None을 반환하면 예외가 전파됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 다중 컨텍스트
+
+    *여러 컨텍스트 매니저 사용*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    하나의 with 문에서 여러 컨텍스트 매니저를 사용할 수 있습니다. 콤마로 구분하여 나열하며, 왼쪽부터 오른쪽 순서로 __enter__가 호출되고, 오른쪽부터 왼쪽 순서로 __exit__가 호출됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 여러 리소스 동시 관리
+    - 콤마로 구분
+    - 진입: 왼쪽→오른쪽
+    - 종료: 오른쪽→왼쪽
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 다중 파일
+
+    여러 파일을 동시에 관리합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0047():
+        with open('source.txt', 'w') as src, open('dest.txt', 'w') as dst:
+            src.write('source')
+            dst.write('destination')
+            combined = 'both written'
+        return combined
+    _snippet_0047()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 순서 추적
+
+    진입과 종료 순서를 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        class OrderTracker:
+            def __init__(self, name):
+                self.name = name
+
+            def __enter__(self):
+                return self.name
+
+            def __exit__(self, excType, excVal, excTb):
+                return False
+
+        with OrderTracker('first') as f, OrderTracker('second') as s:
+            order = f, s
+        return order
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 리소스 체인
+
+    여러 리소스를 체인으로 연결합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        class ChainResource:
+            def __init__(self, value):
+                self.value = value
+
+            def __enter__(self):
+                return self.value
+
+            def __exit__(self, excType, excVal, excTb):
+                return False
+
+        with ChainResource(10) as a, ChainResource(20) as b, ChainResource(30) as c:
+            sumTotal = a + b + c
+        return sumTotal
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 다중 컨텍스트는 with a, b, c: 형태로 작성하며, 중첩 with와 동일하게 동작합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 실전 패턴
+
+    *컨텍스트 매니저 활용*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    컨텍스트 매니저는 실무에서 다양하게 활용됩니다. 타이머, 디렉토리 변경, 설정 임시 변경, 트랜잭션 관리 등 시작과 종료가 명확한 작업에 유용합니다. 코드의 안전성과 가독성을 동시에 향상시킵니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 타이머 측정
+    - 임시 상태 변경
+    - 트랜잭션 관리
+    - 코드 블록 래핑
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 타이머 컨텍스트
+
+    코드 실행 시간을 측정합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0057():
+        import time
+
+        class Timer:
+            def __enter__(self):
+                self.start = time.time()
+                return self
+
+            def __exit__(self, excType, excVal, excTb):
+                self.elapsed = time.time() - self.start
+                return False
+
+        timer = Timer()
+        with timer:
+            total = sum(range(1000))
+        return timer.elapsed > 0
+    _snippet_0057()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 상태 백업
+
+    상태를 임시로 변경하고 복원합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        class StateBackup:
+            def __init__(self, obj, attr, newVal):
+                self.obj = obj
+                self.attr = attr
+                self.newVal = newVal
+                self.oldVal = None
+
+            def __enter__(self):
+                self.oldVal = getattr(self.obj, self.attr)
+                setattr(self.obj, self.attr, self.newVal)
+                return self
+
+            def __exit__(self, excType, excVal, excTb):
+                setattr(self.obj, self.attr, self.oldVal)
+                return False
+
+        class Config:
+            debug = False
+
+        cfg = Config()
+        with StateBackup(cfg, 'debug', True):
+            insideVal = cfg.debug
+        return (cfg.debug, insideVal)
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 리스트 보호
+
+    리스트를 임시로 사용하고 복원합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        class ListGuard:
+            def __init__(self, lst):
+                self.lst = lst
+                self.backup = None
+
+            def __enter__(self):
+                self.backup = self.lst[:]
+                return self.lst
+
+            def __exit__(self, excType, excVal, excTb):
+                self.lst[:] = self.backup
+                return False
+
+        myList = [1, 2, 3]
+        with ListGuard(myList) as ml:
+            ml.append(4)
+            ml.append(5)
+            modified = len(ml)
+        return (len(myList), modified)
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 컨텍스트 매니저는 '설정-작업-복원' 패턴에 이상적입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 28 종합 복습
+
+    *컨텍스트 매니저 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 28에서 배운 컨텍스트 매니저를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 간단한 with
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 기본 컨텍스트
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 상태 변경
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 값 반환
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 리스트 제공
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 카운터 컨텍스트
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 예외 억제
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 다중 컨텍스트
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 속성 추적
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 조건부 실행
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1: 중첩 카운터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2: 리소스 풀
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3: 예외 분류
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4: 값 누적
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5: 상태 머신
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화6: 시간 제한
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화7: 조건부 롤백
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화8: 멀티 상태
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화9: 체인 컨텍스트
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화10: 컨텍스트 팩토리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

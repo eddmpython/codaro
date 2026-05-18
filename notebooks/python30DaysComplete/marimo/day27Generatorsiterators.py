@@ -14,587 +14,898 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
     # Day 27. 제너레이터와 이터레이터
-    
-    **오늘의 초점**: 필요할 때 하나씩 값을 만들어 메모리를 아끼는 흐름을 이해한다.
-    
-    **완성 기준**: `yield`, `iter`, `next`, 이터레이터 프로토콜을 사용해 지연 계산을 설명할 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+
+    이 노트북은 `study/python/30days/day27_제너레이터와이터레이터.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - yield로 제너레이터 생성
+    - 메모리 효율적인 순회
+    - iter()와 next() 활용
+    - 이터레이터 프로토콜 구현
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - yield
-    - 제너레이터
-    - next
-    - iter
-    - 이터레이터 프로토콜
-    - 지연 평가
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: yield, generator, iter, next, iterator_protocol
+    - 이미 써도 되는 개념: function_all, class_all, comprehension
+    - 오늘은 일부러 쓰지 않는 개념: external_library
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    모든 값을 한 번에 리스트로 만들 필요는 없다. 데이터가 크거나 끝이 없을 수 있을 때 제너레이터는 필요한 만큼만 계산하게 해준다.
-    
-    ## 생각 모델
-    
-    제너레이터는 멈췄다가 이어지는 함수다. `yield`에서 값을 하나 내보내고, 다음 요청이 올 때 그 자리부터 다시 시작한다.
-    
-    ## 자주 하는 실수
-    
-    - 제너레이터를 리스트처럼 여러 번 재사용하려 하기
-    - `yield`와 `return`의 차이를 놓치기
-    - 지연 평가 때문에 아직 실행되지 않았다는 점을 잊기
+    ## 제너레이터 기초
+
+    *yield 키워드*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `yield`를 한 문장으로 설명할 수 있는가?
-    2. `제너레이터`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    제너레이터는 yield 키워드를 사용하여 값을 하나씩 생성하는 함수입니다. return과 달리 yield는 함수 실행을 일시 중지하고 값을 반환한 후, 다음 호출 시 중지된 지점부터 계속 실행됩니다. 모든 값을 메모리에 저장하지 않고 필요할 때마다 생성하므로 매우 효율적입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 26: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 24: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 20: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - yield: 값을 하나씩 생성
+    - 함수 실행 일시 중지
+    - 메모리 효율적
+    - 필요할 때 값 생성
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 기본 제너레이터
+
+    yield로 숫자를 하나씩 생성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        def simpleGen():
+            yield 1
+            yield 2
+            yield 3
+
+        gen = simpleGen()
+        return (next(gen), next(gen), next(gen))
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 범위 제너레이터
+
+    특정 범위의 숫자를 생성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0009():
+        def rangeGen(n):
+            i = 0
+            while i < n:
+                yield i
+                i = i + 1
+
+        g = rangeGen(5)
+        return list(g)
+    _snippet_0009()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 제너레이터 순회
+
+    for 루프로 제너레이터를 순회합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0011():
+        def countdown(n):
+            while n > 0:
+                yield n
+                n = n - 1
+
+        output = []
+        for val in countdown(5):
+            output.append(val)
+        return output
+    _snippet_0011()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 제너레이터는 한 번만 순회할 수 있습니다. 다시 순회하려면 새로 생성해야 합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `yield`, `제너레이터`, `next`, `iter`, `이터레이터 프로토콜`, `지연 평가`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 제너레이터를 리스트처럼 여러 번 재사용하려 하기
-    - `yield`와 `return`의 차이를 놓치기
-    - 지연 평가 때문에 아직 실행되지 않았다는 점을 잊기
+    ## 제너레이터 표현식
+
+    *간결한 제너레이터 생성*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `제너레이터와 이터레이터`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    제너레이터 표현식은 리스트 컴프리헨션과 비슷하지만 괄호를 사용합니다. (표현식 for 변수 in 시퀀스) 형태로 작성하며, 리스트를 만들지 않고 제너레이터를 반환합니다. 대량의 데이터를 처리할 때 메모리를 절약할 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `def countdown(start):` | 재사용할 동작에 이름을 붙입니다. 입력과 반환값을 함께 생각합니다. |
-    | 2 | `    current = start` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 3 | `    while current > 0:` | 조건이 참인 동안 같은 작업을 반복합니다. |
-    | 4 | `        yield current` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
-    | 5 | `        current = current - 1` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 6 | ` ` | 읽기 좋게 구획을 나누는 빈 줄입니다. |
-    | 7 | `list(countdown(3))` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - (표현식 for 변수 in 시퀀스) 형식
+    - 괄호 사용
+    - 리스트 대신 제너레이터
+    - 메모리 절약
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 기본 제너레이터 표현식
+
+    제곱수를 생성하는 제너레이터를 만듭니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-def countdown(start):
-    current = start
-    while current > 0:
-        yield current
-        current = current - 1
-
-list(countdown(3))
-"""
-    )
+def _():
+    def _snippet_0017():
+        squares = (x ** 2 for x in range(5))
+        return list(squares)
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `next`를 두 번 호출하면 제너레이터가 어디까지 진행될까요?
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
+    ### 조건부 제너레이터
+
+    조건을 만족하는 값만 생성합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-def makeNums():
-    yield 1
-    yield 2
-    yield 3
-
-nums = makeNums()
-first = next(nums)
-second = next(nums)
-first, second
-"""
-    )
+def _():
+    def _snippet_0019():
+        evens = (n for n in range(10) if n % 2 == 0)
+        return list(evens)
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    (1, 2)
-    ```
-    
-    </details>
+    ### 변환 제너레이터
+
+    문자열을 대문자로 변환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0021():
+        words = ['hello', 'world', 'python']
+        upper = (w.upper() for w in words)
+        return list(upper)
+    _snippet_0021()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 제너레이터 표현식은 sum(), max(), min() 같은 함수에 바로 전달할 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    0부터 `limit - 1`까지 짝수만 내보내는 `evenNumbers`를 실행해 확인하세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
+    ## 이터레이터 기초
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def evenNumbers(limit):
-    for num in range(limit):
-        if num % 2 == 0:
-            yield num
-
-result = list(evenNumbers(7))
-assert result == [0, 2, 4, 6]
-result
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    def evenNumbers(limit):
-        for num in range(limit):
-            if num % 2 == 0:
-                yield num
-    
-    result = list(evenNumbers(7))
-    assert result == [0, 2, 4, 6]
-    result
-    ```
-    
-    </details>
+    *iter()와 next()*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 제너레이터를 한 번 소비한 뒤 다시 쓰려고 합니다. 새 제너레이터를 만들거나 리스트로 보관하세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-values = (num for num in range(3))
-firstList = list(values)
-values = (num for num in range(3))
-secondList = list(values)
-assert secondList == [0, 1, 2]
-secondList
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    values = (num for num in range(3))
-    firstList = list(values)
-    values = (num for num in range(3))
-    secondList = list(values)
-    assert secondList == [0, 1, 2]
-    secondList
-    ```
-    
-    </details>
+    이터레이터는 순회 가능한 객체입니다. iter() 함수로 이터레이터를 생성하고, next() 함수로 다음 값을 가져옵니다. 리스트, 튜플, 문자열 등 모든 시퀀스는 iter()로 이터레이터를 만들 수 있으며, 더 이상 값이 없으면 StopIteration 예외가 발생합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    - iter(): 이터레이터 생성
+    - next(): 다음 값 가져오기
+    - StopIteration: 종료 신호
+    - 모든 시퀀스 지원
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    제너레이터로 특정 길이 이상의 단어만 하나씩 내보내세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
+    ### 리스트 이터레이터
+
+    리스트를 이터레이터로 변환합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-def longWords(words, minLength):
-    for word in words:
-        if len(word) >= minLength:
-            yield word
-
-result = list(longWords(["py", "colab", "python"], 5))
-assert result == ["colab", "python"]
-result
-"""
-    )
+def _():
+    def _snippet_0027():
+        nums = [1, 2, 3]
+        it = iter(nums)
+        return (next(it), next(it), next(it))
+    _snippet_0027()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    def longWords(words, minLength):
-        for word in words:
-            if len(word) >= minLength:
-                yield word
-    
-    result = list(longWords(["py", "colab", "python"], 5))
-    assert result == ["colab", "python"]
-    result
-    ```
-    
-    </details>
+    ### 문자열 이터레이터
+
+    문자열을 한 글자씩 순회합니다.
     """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        text = 'abc'
+        textIter = iter(text)
+        return (next(textIter), next(textIter))
+    _snippet_0029()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### 수동 순회
+
+    while과 next로 수동으로 순회합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', "result == [0, 2, 4, 6] or result == ['colab', 'python']"),
-    ('오류 고쳐보기', 'secondList == [0, 1, 2]'),
-    ('비슷한 문제', 'result == ["colab", "python"]')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+def _():
+    def _snippet_0031():
+        items = [10, 20, 30]
+        iterator = iter(items)
+        collected = []
+        try:
+            while True:
+                collected.append(next(iterator))
+        except StopIteration:
+            pass
+        return collected
+    _snippet_0031()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 로그 문자열 리스트에서 `ERROR`가 들어간 줄만 하나씩 내보내는 제너레이터를 만드세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    > **팁**
+    >
+    > for 루프는 내부적으로 iter()와 next()를 사용하여 순회합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    로그 문자열 리스트에서 `ERROR`가 들어간 줄만 하나씩 내보내는 제너레이터를 만드세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
-    """)
-    return
+    ## 이터레이터 프로토콜
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def errorLines(lines):
-    for line in lines:
-        if "ERROR" in line:
-            yield line
-
-logs = ["INFO start", "ERROR missing", "INFO end", "ERROR timeout"]
-list(errorLines(logs))
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-def doneTopics(records):
-    for record in records:
-        if record["done"]:
-            yield record["topic"]
-
-records = [{"topic": "yield", "done": True}, {"topic": "io", "done": False}]
-list(doneTopics(records))
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 27
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: `next`와 `try/except StopIteration`으로 직접 하나씩 꺼내보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    *__iter__와 __next__ 구현*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `제너레이터로 특정 길이 이상의 단어만 하나씩 내보내세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: yield, 제너레이터, next 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    이터레이터 프로토콜은 __iter__와 __next__ 메서드를 구현하여 객체를 순회 가능하게 만드는 규약입니다. __iter__는 self를 반환하고, __next__는 다음 값을 반환하거나 StopIteration을 발생시킵니다. 이를 통해 사용자 정의 객체를 for 루프에서 사용할 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `제너레이터와 이터레이터`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    - __iter__: self 반환
+    - __next__: 다음 값 반환
+    - StopIteration 발생
+    - for 루프 지원
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    ### 기본 이터레이터 클래스
+
+    숫자를 순회하는 이터레이터를 만듭니다.
     """)
     return
+
+@app.cell
+def _():
+    def _snippet_0037():
+        class Counter:
+            def __init__(self, max):
+                self.max = max
+                self.current = 0
+
+            def __iter__(self):
+                return self
+
+            def __next__(self):
+                if self.current < self.max:
+                    self.current = self.current + 1
+                    return self.current
+                raise StopIteration
+
+        c = Counter(3)
+        return list(c)
+    _snippet_0037()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 범위 이터레이터
+
+    시작과 끝을 지정하는 이터레이터를 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        class Range:
+            def __init__(self, start, end):
+                self.current = start
+                self.end = end
+
+            def __iter__(self):
+                return self
+
+            def __next__(self):
+                if self.current < self.end:
+                    val = self.current
+                    self.current = self.current + 1
+                    return val
+                raise StopIteration
+
+        r = Range(5, 10)
+        return list(r)
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 무한 이터레이터
+
+    무한히 값을 생성하는 이터레이터를 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0041():
+        class Infinite:
+            def __init__(self):
+                self.num = 0
+
+            def __iter__(self):
+                return self
+
+            def __next__(self):
+                self.num = self.num + 1
+                return self.num
+
+        inf = Infinite()
+        values = []
+        for val in inf:
+            values.append(val)
+            if val >= 5:
+                break
+        return values
+    _snippet_0041()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 제너레이터는 이터레이터 프로토콜을 자동으로 구현합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 고급 제너레이터
+
+    *실전 활용 패턴*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    제너레이터는 파일 읽기, 무한 시퀀스 생성, 파이프라인 처리 등 다양한 실전 상황에서 활용됩니다. 메모리를 효율적으로 사용하면서도 코드를 간결하게 유지할 수 있어 대용량 데이터 처리에 매우 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 파일 처리
+    - 무한 시퀀스
+    - 데이터 파이프라인
+    - 메모리 효율성
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 피보나치 제너레이터
+
+    피보나치 수열을 무한히 생성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0047():
+        def fibonacci():
+            a = 0
+            b = 1
+            while True:
+                yield a
+                a, b = b, a + b
+
+        fib = fibonacci()
+        sequence = []
+        for i in range(10):
+            sequence.append(next(fib))
+        return sequence
+    _snippet_0047()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 필터링 제너레이터
+
+    조건에 맞는 값만 생성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        def filterPositive(numbers):
+            for n in numbers:
+                if n > 0:
+                    yield n
+
+        dataset = [-2, -1, 0, 1, 2, 3]
+        filtered = filterPositive(dataset)
+        return list(filtered)
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 변환 제너레이터
+
+    값을 변환하여 생성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        def doubleValues(nums):
+            for n in nums:
+                yield n * 2
+
+        source = [1, 2, 3, 4, 5]
+        doubled = doubleValues(source)
+        return list(doubled)
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 여러 제너레이터를 연결하여 데이터 파이프라인을 만들 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 실전 패턴
+
+    *제너레이터와 이터레이터 활용*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    제너레이터와 이터레이터는 실무에서 대용량 파일 처리, 배치 처리, 스트리밍 데이터 처리 등에 활용됩니다. 메모리를 절약하면서도 깔끔한 코드를 작성할 수 있어 파이썬의 강력한 기능 중 하나입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 배치 처리
+    - 청크 단위 읽기
+    - 파이프라인 구성
+    - 메모리 최적화
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 배치 제너레이터
+
+    데이터를 일정 크기로 묶어 생성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0057():
+        def batchGen(elements, size):
+            chunk = []
+            for item in elements:
+                chunk.append(item)
+                if len(chunk) == size:
+                    yield chunk
+                    chunk = []
+            if chunk:
+                yield chunk
+
+        collection = [1, 2, 3, 4, 5, 6, 7]
+        batches = list(batchGen(collection, 3))
+        return batches
+    _snippet_0057()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 체인 제너레이터
+
+    여러 제너레이터를 연결합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        def square(values):
+            for n in values:
+                yield n ** 2
+
+        def addTen(integers):
+            for n in integers:
+                yield n + 10
+
+        original = [1, 2, 3, 4, 5]
+        pipeline = addTen(square(original))
+        return list(pipeline)
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 조건부 생성
+
+    여러 조건을 조합하여 생성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        def complexFilter(entries):
+            for item in entries:
+                if item > 0 and item % 2 == 0:
+                    yield item * 3
+
+        integers = [-2, -1, 0, 1, 2, 3, 4, 5, 6]
+        outcomes = list(complexFilter(integers))
+        return outcomes
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 제너레이터는 필요한 만큼만 값을 생성하므로 대용량 데이터 처리에 이상적입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 27 종합 복습
+
+    *제너레이터와 이터레이터 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 27에서 배운 제너레이터와 이터레이터를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 간단한 제너레이터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 범위 생성
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 제너레이터 표현식
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: iter와 next
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 문자열 이터레이터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 조건부 제너레이터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 제너레이터 표현식 필터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 변환 제너레이터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 이터레이터 클래스
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 무한 카운터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1: 피보나치 N개
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2: 제곱수 필터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3: 배치 생성
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4: 파이프라인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5: 복합 필터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화6: 커스텀 범위
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화7: 누적 합계
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화8: 윈도우 생성
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화9: 조건부 변환
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화10: 중첩 제너레이터
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

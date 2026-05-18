@@ -14,548 +14,841 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
     # Day 04. 문자열 기초
-    
-    **오늘의 초점**: 문자열을 만들고 합치고 포맷팅하는 기본기를 익힌다.
-    
-    **완성 기준**: f-string으로 읽기 쉬운 문장을 만들고 특수 문자를 다룰 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+
+    이 노트북은 `study/python/30days/day04_문자열기초.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 문자열 연결과 반복
+    - f-string으로 간편한 포맷팅
+    - 이스케이프 문자로 특수 문자 표현하기
+    - 여러 줄 문자열 작성하기
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 글자 이어 붙이기
-    - f-string
-    - 특수 문자 쓰기
-    - 여러 줄 글자
-    - 글자가 들어 있는지 확인하기
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: string_concat, fstring, string_escape, string_multiline, in_operator
+    - 이미 써도 되는 개념: variable, type, operator, print, len
+    - 오늘은 일부러 쓰지 않는 개념: indexing, slicing, string_method, list, function, import
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    실제 프로그램의 많은 출력은 사람이 읽는 문장이다. 문자열을 잘 다루면 데이터가 사용자에게 의미 있는 메시지로 바뀐다.
-    
-    ## 생각 모델
-    
-    문자열은 글자들의 순서 있는 묶음이다. 숫자 계산과 달리 문자열 연산은 문장을 만들거나 반복하는 방향으로 생각해야 한다.
-    
-    ## 자주 하는 실수
-    
-    - 문자열과 숫자를 `+`로 바로 연결하기
-    - f-string 앞의 `f`를 빼먹기
-    - 따옴표 안팎을 헷갈리기
+    ## 문자열 연결
+
+    *+ 기호로 문자열 합치기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `글자 이어 붙이기`를 한 문장으로 설명할 수 있는가?
-    2. `f-string`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    문자열은 + 연산자로 연결할 수 있습니다. 두 개 이상의 문자열을 하나로 합칠 때 사용합니다. 숫자의 덧셈과 같은 기호지만 문자열에서는 연결의 의미입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 03: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 01: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - + 기호로 문자열 연결
+    - 여러 문자열 연결 가능
+    - 공백도 문자로 포함됨
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 문자열 연결
+
+    두 문자열을 + 기호로 연결합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        first = 'Hello'
+        second = 'World'
+        return first + ' ' + second
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 공백을 넣으려면 ' ' 처럼 공백 문자열을 중간에 추가합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `글자 이어 붙이기`, `f-string`, `특수 문자 쓰기`, `여러 줄 글자`, `글자가 들어 있는지 확인하기`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 문자열과 숫자를 `+`로 바로 연결하기
-    - f-string 앞의 `f`를 빼먹기
-    - 따옴표 안팎을 헷갈리기
+    ## 문자열 반복
+
+    ** 기호로 문자열 반복하기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `문자열 기초`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    문자열에 * 연산자를 사용하면 문자열을 반복할 수 있습니다. 숫자를 곱하면 그 횟수만큼 문자열이 반복됩니다. 같은 문자를 여러 번 출력할 때 유용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `name = "Sora"` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `level = 3` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 3 | `badge = f"{name} reached level {level}."` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 4 | `badge` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - * 기호로 문자열 반복
+    - 문자열 * 숫자 형태로 사용
+    - 반복 횟수는 정수만 가능
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 문자열 반복
+
+    문자열을 3번 반복합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-name = "Sora"
-level = 3
-badge = f"{name} reached level {level}."
-badge
-"""
-    )
+def _():
+    def _snippet_0013():
+        word = 'Python'
+        return word * 3
+    _snippet_0013()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `'ha' * 3`의 결과를 예측하세요. 문자열 곱셈은 같은 문자열을 반복합니다.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-"ha" * 3
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    'hahaha'
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > '=' * 50 처럼 사용하면 구분선을 만들 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `userName`과 `points`를 이용해 `Rin has 42 points.` 문장을 만드세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
+    ## 문자열 길이
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-userName = "Rin"
-points = 42
-sentence = f"{userName} has {points} points."
-assert sentence == "Rin has 42 points."
-sentence
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    userName = "Rin"
-    points = 42
-    sentence = f"{userName} has {points} points."
-    assert sentence == "Rin has 42 points."
-    sentence
-    ```
-    
-    </details>
+    *len() 함수로 길이 구하기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 숫자와 문자열을 `+`로 바로 합치고 있습니다. f-string으로 고치세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-rank = 1
-message = f"Rank: {rank}"
-message
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    rank = 1
-    message = f"Rank: {rank}"
-    message
-    ```
-    
-    </details>
+    len() 함수는 문자열의 길이를 반환합니다. 문자열에 포함된 문자의 개수를 세어줍니다. 공백과 특수문자도 모두 포함됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    - len() 함수로 문자열 길이 계산
+    - 공백, 특수문자 모두 포함
+    - 결과는 정수(int)
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    이름과 남은 미션 수를 사용해 `Noa has 3 missions left.` 문장을 만드세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
+    ### 문자열 길이
+
+    문자열의 길이를 구합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-learner = "Noa"
-left = 3
-status = f"{learner} has {left} missions left."
-assert status == "Noa has 3 missions left."
-status
-"""
-    )
+def _():
+    def _snippet_0019():
+        text = 'Hello Python'
+        return len(text)
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    learner = "Noa"
-    left = 3
-    status = f"{learner} has {left} missions left."
-    assert status == "Noa has 3 missions left."
-    status
-    ```
-    
-    </details>
+    ## f-string 포맷팅
+
+    *f-string으로 간편하게 문자열 만들기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'sentence == "Rin has 42 points."'),
-    ('오류 고쳐보기', 'message == "Rank: 1"'),
-    ('비슷한 문제', 'status == "Noa has 3 missions left."')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 짧은 주문 확인 문장을 만드세요. 메뉴명, 수량, 결제 금액이 모두 들어가야 합니다.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    f-string은 문자열 앞에 f를 붙여 변수를 직접 넣을 수 있는 방법입니다. + 연결이나 str() 변환 없이도 변수와 문자를 자연스럽게 조합할 수 있습니다. 중괄호 {} 안에 변수명이나 표현식을 넣으면 자동으로 문자열로 변환됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    짧은 주문 확인 문장을 만드세요. 메뉴명, 수량, 결제 금액이 모두 들어가야 합니다.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-menu = "latte"
-quantity = 2
-amount = 9000
-receipt = f"Order: {menu} x {quantity}, total {amount} won"
-receipt
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-learner = "Mina"
-studyMinutes = 35
-message = f"{learner} studied for {studyMinutes} minutes."
-message
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 4
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: 문장 안에 줄바꿈 `\n`을 넣어 영수증처럼 두 줄로 출력해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    - f'...' 형식으로 사용
+    - {변수명}으로 변수 삽입
+    - 자동으로 str() 변환
+    - + 연결보다 읽기 쉬움
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `이름과 남은 미션 수를 사용해 `Noa has 3 missions left.` 문장을 만드세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 글자 이어 붙이기, f-string, 특수 문자 쓰기 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ### f-string 기본
+
+    f-string으로 변수를 문자열에 삽입합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0024():
+        name = '김철수'
+        age = 25
+        return f'{name}님의 나이는 {age}세입니다'
+    _snippet_0024()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 중괄호 {} 안에는 변수뿐만 아니라 연산식(예: {age + 1})도 넣을 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `문자열 기초`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    ## 줄바꿈 문자
+
+    *\n으로 줄 바꾸기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    이스케이프 문자는 백슬래시(\)로 시작하는 특수 문자입니다. \n은 줄바꿈을 의미하며, 문자열 중간에 사용하면 그 지점에서 줄이 바뀝니다. 여러 줄 출력에 유용합니다.
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - \n은 줄바꿈 문자
+    - 백슬래시(\)로 시작
+    - 문자열 중간에 삽입 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 줄바꿈 문자
+
+    \n을 사용하여 줄을 바꿉니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0030():
+        lines = '첫 번째 줄\n두 번째 줄\n세 번째 줄'
+        return print(lines)
+    _snippet_0030()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 탭 문자
+
+    *\t로 간격 넣기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    \t는 탭 문자로, 일정한 간격을 만듭니다. 텍스트를 정렬할 때 유용하며, 보통 4칸 또는 8칸의 공백과 같은 효과를 냅니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - \t는 탭 문자
+    - 일정한 간격 생성
+    - 텍스트 정렬에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 탭 문자
+
+    \t를 사용하여 탭 간격을 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0035():
+        row = '이름\t나이\t도시'
+        return print(row)
+    _snippet_0035()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 따옴표 문자
+
+    *\'와 \"로 따옴표 넣기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    문자열 안에 따옴표를 넣으려면 백슬래시를 앞에 붙입니다. \'는 작은따옴표, \"는 큰따옴표를 문자로 표현합니다. 또는 작은따옴표 문자열 안에 큰따옴표를 사용할 수도 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - \' 작은따옴표 문자
+    - \" 큰따옴표 문자
+    - 작은따옴표 안에 큰따옴표 직접 사용 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 따옴표 문자
+
+    문자열 안에 따옴표를 넣습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0040():
+        quote = "It's a beautiful day"
+        return quote
+    _snippet_0040()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 백슬래시 문자
+
+    *\\로 백슬래시 표현하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    백슬래시 자체를 문자로 표현하려면 \\처럼 두 번 사용합니다. Windows 경로(C:\Users)나 정규표현식에서 자주 사용됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - \\ 백슬래시 문자
+    - 두 번 사용해야 하나로 표시
+    - 파일 경로 표현에 사용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 백슬래시 문자
+
+    백슬래시를 문자로 표현합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0045():
+        path = 'C:\\\\Users\\\\Documents'
+        return print(path)
+    _snippet_0045()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 여러 줄 문자열
+
+    *삼중 따옴표로 여러 줄 작성*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    삼중 따옴표(''' 또는 \"\"\")를 사용하면 여러 줄에 걸친 문자열을 쉽게 작성할 수 있습니다. 줄바꿈이 자동으로 포함되며, \n을 사용하지 않아도 됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 삼중 따옴표로 여러 줄 문자열
+    - 줄바꿈 자동 포함
+    - 긴 텍스트 작성에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 여러 줄 문자열
+
+    삼중 따옴표로 여러 줄 문자열을 작성합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0050():
+        block = '''첫 번째 줄
+        두 번째 줄
+        세 번째 줄'''
+        return print(block)
+    _snippet_0050()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 원시 문자열
+
+    *r 접두사로 이스케이프 무시하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    문자열 앞에 r을 붙이면 이스케이프 문자를 무시합니다. \n이 줄바꿈이 아닌 문자 그대로 표시됩니다. 정규표현식이나 파일 경로 작성에 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - r 접두사로 원시 문자열
+    - 이스케이프 문자 무시
+    - 정규표현식, 경로 작성에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 원시 문자열
+
+    r 접두사를 사용하여 이스케이프를 무시합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0055():
+        raw = r'C:\Users\Documents'
+        return print(raw)
+    _snippet_0055()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 문자열 포함 확인
+
+    *in 연산자로 부분 문자열 찾기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    in 연산자는 문자열 안에 특정 문자나 단어가 포함되어 있는지 확인합니다. 포함되어 있으면 True, 없으면 False를 반환합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - in 연산자로 포함 여부 확인
+    - 결과는 True 또는 False
+    - 대소문자 구분함
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 문자열 포함 확인
+
+    특정 문자가 포함되어 있는지 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0060():
+        phrase = 'Python Programming'
+        return 'Python' in phrase
+    _snippet_0060()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 대소문자를 구분하므로 'python' in inCheckText는 False입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 문자열 미포함 확인
+
+    *not in 연산자로 확인하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    not in 연산자는 문자열에 특정 문자나 단어가 포함되지 않았는지 확인합니다. 포함되지 않으면 True, 포함되어 있으면 False를 반환합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - not in 연산자로 미포함 확인
+    - in의 반대 결과
+    - 필터링에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 문자열 미포함 확인
+
+    특정 문자가 포함되지 않았는지 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0066():
+        sentence = 'Hello World'
+        return 'Python' not in sentence
+    _snippet_0066()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 4 종합 복습
+
+    *문자열 기초 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 4에서 배운 문자열 기초를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 문자열 연결
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 문자열 반복
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 문자열 길이
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 줄바꿈 문자
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: in 연산자
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본6: f-string
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 이름표 만들기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 메시지 포맷팅
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 주소 라벨
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 파일 경로 확인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 경로
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### txt 파일 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### doc 파일 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 반복 패턴
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1: 영수증 만들기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2: 테이블 헤더
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3: URL 생성 및 검증
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### URL 생성
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 보안 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 유효성 검증
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4: 명함 디자인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5: 로그 메시지
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 로그 메시지
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 메시지 길이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### ERROR 포함 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### INFO 포함 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

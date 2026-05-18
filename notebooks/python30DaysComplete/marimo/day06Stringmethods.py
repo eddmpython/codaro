@@ -14,544 +14,918 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
     # Day 06. 문자열 메서드
-    
-    **오늘의 초점**: 문자열을 정리하고 나누고 바꾸는 대표 메서드를 익힌다.
-    
-    **완성 기준**: `strip`, `lower`, `split`, `join`, `replace`, `find`, `count`를 실제 텍스트 정리에 사용할 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+
+    이 노트북은 `study/python/30days/day06_문자열메서드.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 대소문자 변환 메서드
+    - 공백 제거와 문자열 정리
+    - 문자열 치환과 검색
+    - 문자열 분할과 개수 세기
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 공백 제거
-    - 대소문자 변환
-    - 분리
-    - 결합
-    - 치환
-    - 검색
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: upper, lower, split, join, replace, strip, find, count
+    - 이미 써도 되는 개념: string_basic, indexing, slicing
+    - 오늘은 일부러 쓰지 않는 개념: list_method, function, import
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    현실의 텍스트 데이터는 대소문자, 공백, 구분자가 뒤섞여 있다. 문자열 메서드는 지저분한 입력을 비교 가능한 형태로 정리해준다.
-    
-    ## 생각 모델
-    
-    메서드는 값 뒤에 붙여 쓰는 동작이다. 문자열 메서드는 원본을 직접 바꾸지 않고 새 문자열을 만든다는 점이 중요하다.
-    
-    ## 자주 하는 실수
-    
-    - 메서드 결과를 저장하지 않기
-    - `split` 결과가 문자열이라고 착각하기
-    - 원본 문자열이 바뀐다고 생각하기
+    ## 대문자 변환
+
+    *upper()로 모두 대문자로*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `공백 제거`를 한 문장으로 설명할 수 있는가?
-    2. `대소문자 변환`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    upper() 메서드는 문자열의 모든 문자를 대문자로 변환합니다. 영문자만 영향을 받으며, 숫자나 특수문자는 그대로 유지됩니다. 원본 문자열은 변경되지 않고 새로운 문자열을 반환합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 05: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 03: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - 모든 문자를 대문자로 변환
+    - 원본은 변경되지 않음
+    - 새로운 문자열 반환
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 대문자 변환
+
+    문자열을 모두 대문자로 변환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        text = 'hello python'
+        return text.upper()
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 소문자 변환
+
+    *lower()로 모두 소문자로*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `공백 제거`, `대소문자 변환`, `분리`, `결합`, `치환`, `검색`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 메서드 결과를 저장하지 않기
-    - `split` 결과가 문자열이라고 착각하기
-    - 원본 문자열이 바뀐다고 생각하기
+    lower() 메서드는 문자열의 모든 문자를 소문자로 변환합니다. 대소문자 구분 없이 비교할 때 자주 사용됩니다. 원본 문자열은 그대로 유지됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `문자열 메서드`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    - 모든 문자를 소문자로 변환
+    - 대소문자 구분 없는 비교에 유용
+    - 원본은 유지됨
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `rawEmail = "  USER@Example.COM  "` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `cleanEmail = rawEmail.strip().lower()` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 3 | `cleanEmail` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    ### 소문자 변환
+
+    문자열을 모두 소문자로 변환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0012():
+        msg = 'HELLO PYTHON'
+        return msg.lower()
+    _snippet_0012()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 첫 글자 대문자
+
+    *capitalize()로 첫 문자만 대문자*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-rawEmail = "  USER@Example.COM  "
-cleanEmail = rawEmail.strip().lower()
-cleanEmail
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `'a,b,c'.split(',')`의 결과를 예측하세요. 문자열이 어떤 자료구조로 바뀌는지 보세요.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-"a,b,c".split(",")
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    ['a', 'b', 'c']
-    ```
-    
-    </details>
+    capitalize() 메서드는 문자열의 첫 번째 문자만 대문자로 만들고 나머지는 모두 소문자로 변환합니다. 문장의 시작을 정리할 때 유용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `rawTags`를 쉼표로 나누고, 하이픈으로 다시 연결해 `python-colab-practice`를 만드세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-rawTags = "python,colab,practice"
-tagList = rawTags.split(",")
-joinedTags = "-".join(tagList)
-assert joinedTags == "python-colab-practice"
-joinedTags
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    rawTags = "python,colab,practice"
-    tagList = rawTags.split(",")
-    joinedTags = "-".join(tagList)
-    assert joinedTags == "python-colab-practice"
-    joinedTags
-    ```
-    
-    </details>
+    - 첫 문자만 대문자
+    - 나머지는 모두 소문자
+    - 문장 시작 정리에 유용
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 `replace` 결과를 저장하지 않아 원본이 그대로입니다. 새 값을 변수에 담으세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
+    ### 첫 글자 대문자
+
+    첫 문자만 대문자로 변환합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-title = "Python basics"
-title = title.replace("basics", "mastery")
-assert title == "Python mastery"
-title
-"""
-    )
+def _():
+    def _snippet_0017():
+        phrase = 'hello PYTHON'
+        return phrase.capitalize()
+    _snippet_0017()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    title = "Python basics"
-    title = title.replace("basics", "mastery")
-    assert title == "Python mastery"
-    title
-    ```
-    
-    </details>
+    ## 제목 형식
+
+    *title()로 각 단어 첫 글자 대문자*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    title() 메서드는 각 단어의 첫 글자를 대문자로 만듭니다. 공백이나 특수문자로 구분된 각 단어마다 적용됩니다. 제목이나 이름을 정리할 때 사용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    입력 문장을 검색용 slug로 정리하세요. 앞뒤 공백 제거, 소문자 변환, 공백을 하이픈으로 바꾸는 순서입니다.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-rawTitle = "  Python Practice Plan  "
-slug = rawTitle.strip().lower().replace(" ", "-")
-assert slug == "python-practice-plan"
-slug
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    rawTitle = "  Python Practice Plan  "
-    slug = rawTitle.strip().lower().replace(" ", "-")
-    assert slug == "python-practice-plan"
-    slug
-    ```
-    
-    </details>
+    - 각 단어 첫 글자 대문자
+    - 나머지는 소문자
+    - 제목 형식으로 변환
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
+    ### 제목 형식
+
+    각 단어의 첫 글자를 대문자로 만듭니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'joinedTags == "python-colab-practice"'),
-    ('오류 고쳐보기', 'title == "Python mastery"'),
-    ('비슷한 문제', 'slug == "python-practice-plan"')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
+def _():
+    def _snippet_0022():
+        sentence = 'hello python programming'
+        return sentence.title()
+    _snippet_0022()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 사용자가 입력한 문장처럼 보이는 텍스트를 정리해 검색 키워드로 바꾸세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    ## 양쪽 공백 제거
+
+    *strip()으로 공백 정리*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    사용자가 입력한 문장처럼 보이는 텍스트를 정리해 검색 키워드로 바꾸세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-rawQuery = "  Learn Python Fast  "
-keyword = rawQuery.strip().lower().replace(" ", "-")
-keyword
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-rawTopic = "  Python String Methods  "
-cleanTopic = rawTopic.strip().lower().replace(" ", "-")
-cleanTopic
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 6
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: `keyword.count('-')`로 단어 사이 구분자가 몇 개인지 확인해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    strip() 메서드는 문자열 양쪽 끝의 공백을 제거합니다. 사용자 입력을 정리하거나 데이터를 깔끔하게 만들 때 자주 사용됩니다. 문자열 중간의 공백은 제거하지 않습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `입력 문장을 검색용 slug로 정리하세요. 앞뒤 공백 제거, 소문자 변환, 공백을 하이픈으로 바꾸는 순서입니다.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 공백 제거, 대소문자 변환, 분리 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    - 양쪽 끝 공백 제거
+    - 중간 공백은 유지
+    - 입력 데이터 정리에 유용
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `문자열 메서드`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    ### 공백 제거
+
+    문자열 양쪽의 공백을 제거합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0027():
+        raw = '   hello python   '
+        return raw.strip()
+    _snippet_0027()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 한쪽 공백 제거
+
+    *lstrip(), rstrip()으로 한쪽만 제거*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    lstrip()은 왼쪽 공백만, rstrip()은 오른쪽 공백만 제거합니다. l은 left(왼쪽), r은 right(오른쪽)를 의미합니다. 특정 방향의 공백만 제거할 때 사용합니다.
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - lstrip(): 왼쪽 공백 제거
+    - rstrip(): 오른쪽 공백 제거
+    - 한쪽만 정리 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 왼쪽 공백 제거
+
+    lstrip()으로 왼쪽 공백만 제거합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0032():
+        left = '   hello   '
+        return left.lstrip()
+    _snippet_0032()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 오른쪽 공백 제거
+
+    rstrip()으로 오른쪽 공백만 제거합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0034():
+        right = '   hello   '
+        return right.rstrip()
+    _snippet_0034()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 문자열 치환
+
+    *replace()로 문자 바꾸기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    replace() 메서드는 문자열 안의 특정 부분을 다른 문자열로 바꿉니다. replace(찾을문자, 바꿀문자) 형태로 사용하며, 모든 일치하는 부분을 바꿉니다. 원본은 변경되지 않습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 문자열 치환
+    - 모든 일치 부분 변경
+    - replace(old, new) 형태
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 문자열 치환
+
+    특정 문자를 다른 문자로 바꿉니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        greeting = 'Hello World'
+        return greeting.replace('World', 'Python')
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 여러 개 치환
+
+    *모든 일치 항목 바꾸기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    replace()는 기본적으로 일치하는 모든 부분을 바꿉니다. 같은 문자가 여러 번 나와도 모두 치환됩니다. 공백을 다른 문자로 바꾸거나 특정 패턴을 제거할 때 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 모든 일치 부분 치환
+    - 여러 번 반복 가능
+    - 공백 제거/변경에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 여러 개 치환
+
+    같은 문자가 여러 번 나올 때 모두 바꿉니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0044():
+        allText = 'apple apple orange apple'
+        return allText.replace('apple', 'banana')
+    _snippet_0044()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 문자열 개수 세기
+
+    *count()로 등장 횟수 확인*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    count() 메서드는 문자열에서 특정 문자나 문자열이 몇 번 등장하는지 셉니다. 결과는 정수로 반환되며, 없으면 0을 반환합니다. 대소문자를 구분합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 등장 횟수 세기
+    - 결과는 정수
+    - 대소문자 구분
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 개수 세기
+
+    특정 문자가 몇 번 나오는지 셉니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0049():
+        words = 'hello hello world hello'
+        return words.count('hello')
+    _snippet_0049()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 문자열 위치 찾기
+
+    *find()로 첫 등장 위치 확인*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    find() 메서드는 문자열에서 특정 문자나 문자열이 처음 나타나는 위치(인덱스)를 반환합니다. 찾지 못하면 -1을 반환합니다. 문자열의 위치를 확인할 때 사용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 첫 등장 위치 반환
+    - 못 찾으면 -1 반환
+    - 인덱스로 결과 제공
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 위치 찾기
+
+    특정 문자가 처음 나오는 위치를 찾습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0054():
+        code = 'Hello Python Programming'
+        return code.find('Python')
+    _snippet_0054()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 찾기 실패
+
+    *없는 문자 찾을 때*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    find() 메서드로 문자열을 찾지 못하면 -1을 반환합니다. 이를 활용하여 특정 문자열의 존재 여부를 확인할 수 있습니다. in 연산자와 비슷하지만 위치 정보도 함께 얻을 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 못 찾으면 -1 반환
+    - 존재 여부 확인 가능
+    - in 연산자와 유사
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 찾기 결과
+
+    없는 문자를 찾으면 -1을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        text = 'Hello World'
+        result = text.find('Python')
+        return print('found:', result)
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 존재 여부 확인
+
+    find 결과로 존재 여부를 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        msg = 'Hello World'
+        exists = msg.find('Python') != -1
+        return print('exists:', exists)
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 시작 문자 확인
+
+    *startswith()로 시작 여부 확인*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    startswith() 메서드는 문자열이 특정 문자로 시작하는지 확인합니다. 결과는 True 또는 False입니다. URL이 http로 시작하는지, 파일명이 특정 문자로 시작하는지 등을 확인할 때 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 시작 문자 확인
+    - 결과는 True/False
+    - URL, 파일명 검증에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 시작 문자 확인
+
+    특정 문자로 시작하는지 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0066():
+        title = 'Python Programming'
+        return title.startswith('Python')
+    _snippet_0066()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 끝 문자 확인
+
+    *endswith()로 종료 여부 확인*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    endswith() 메서드는 문자열이 특정 문자로 끝나는지 확인합니다. 파일 확장자 확인이나 문장 부호 확인 등에 자주 사용됩니다. 결과는 True 또는 False입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 끝 문자 확인
+    - 결과는 True/False
+    - 파일 확장자 검증에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 끝 문자 확인
+
+    특정 문자로 끝나는지 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0071():
+        file = 'script.py'
+        return file.endswith('.py')
+    _snippet_0071()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 6 종합 복습
+
+    *문자열 메서드 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 6에서 배운 문자열 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 대문자 변환
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 소문자 변환
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 공백 제거
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 문자열 치환
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 개수 세기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 이름 정리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 파일 확장자 확인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### PDF 확인
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### TXT 확인
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: URL 검증
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### HTTPS 확인
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### WWW 포함 확인
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 문자 치환
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 위치 찾기
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### @ 위치
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### . 위치
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1: 문자열 정규화
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2: 비밀번호 검증
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 숫자 포함 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 최소 길이 확인
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 대문자 포함 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3: 문자열 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### Hello 개수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 느낌표 위치
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 대문자 버전
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 느낌표 제거
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4: 데이터 정제
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5: 여러 메서드 조합
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 소문자 변환
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 대시를 공백으로
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 제목 형식 변환
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 대시 개수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

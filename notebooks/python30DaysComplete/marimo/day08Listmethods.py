@@ -2,7 +2,7 @@ import marimo
 
 __generated_with = "0.23.6"
 
-app = marimo.App(app_title="Day 08. 리스트 메서드")
+app = marimo.App(app_title="Day 08. 리스트메서드")
 
 
 @app.cell
@@ -14,557 +14,1187 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    # Day 08. 리스트 메서드
-    
-    **오늘의 초점**: 리스트에 값을 추가, 삭제, 정렬, 복사하는 메서드를 익힌다.
-    
-    **완성 기준**: `append`, `insert`, `remove`, `pop`, `sort`, `reverse`, `copy`, `extend`를 상황에 맞게 고를 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+    # Day 08. 리스트메서드
+
+    이 노트북은 `study/python/30days/day08_리스트메서드.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - append/insert로 요소 추가
+    - remove/pop으로 요소 삭제
+    - sort/reverse로 정렬과 뒤집기
+    - extend/copy로 리스트 확장과 복사
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 추가
-    - 삽입
-    - 삭제
-    - 정렬
-    - 복사
-    - 확장
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: append, insert, remove, pop, sort, reverse, copy, extend, clear
+    - 이미 써도 되는 개념: list_basic
+    - 오늘은 일부러 쓰지 않는 개념: tuple, dict, set, function, import
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    리스트는 고정된 표가 아니라 계속 변하는 작업 목록에 가깝다. 메서드를 알면 데이터를 직접 관리하는 작은 프로그램을 만들 수 있다.
-    
-    ## 생각 모델
-    
-    일부 리스트 메서드는 원본 리스트를 직접 바꾼다. `sort()`처럼 결과를 반환하지 않는 메서드와 `sorted()`처럼 새 값을 만드는 함수를 구분해야 한다.
-    
-    ## 자주 하는 실수
-    
-    - `sort()` 결과를 변수에 저장하기
-    - `remove`와 `pop`의 기준을 헷갈리기
-    - 복사 없이 같은 리스트를 두 이름으로 공유하기
+    ## 리스트 메서드란?
+
+    *리스트를 조작하는 내장 함수*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `추가`를 한 문장으로 설명할 수 있는가?
-    2. `삽입`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    메서드(Method)는 객체가 가지고 있는 함수입니다. 리스트에는 요소를 추가, 삭제, 정렬하는 다양한 메서드가 내장되어 있습니다. 메서드는 리스트 이름 뒤에 점(.)을 찍고 메서드 이름을 쓰는 형식으로 사용합니다. 대부분의 리스트 메서드는 원본 리스트를 직접 변경하며 None을 반환합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 07: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 05: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    - Day 01: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - list.method() 형식으로 사용
+    - 원본 리스트를 직접 수정
+    - 대부분 None을 반환
+    - 리스트 조작의 핵심 도구
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 메서드 사용 예시
+
+    리스트 메서드의 기본 사용법입니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        nums = [1, 2, 3]
+        nums.append(4)
+        return nums
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 메서드는 원본을 변경하므로 사용 후 리스트가 달라집니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `추가`, `삽입`, `삭제`, `정렬`, `복사`, `확장`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - `sort()` 결과를 변수에 저장하기
-    - `remove`와 `pop`의 기준을 헷갈리기
-    - 복사 없이 같은 리스트를 두 이름으로 공유하기
+    ## append() 메서드
+
+    *리스트 끝에 요소 추가*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `리스트 메서드`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    append() 메서드는 리스트의 끝에 새로운 요소를 추가합니다. 괄호 안에 추가할 값을 넣으면 리스트 마지막에 그 값이 추가됩니다. 원본 리스트가 직접 변경되며, None을 반환합니다. 리스트를 점진적으로 만들어갈 때 가장 많이 사용하는 메서드입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `queue = ["A", "B"]` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `queue.append("C")` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
-    | 3 | `served = queue.pop(0)` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 4 | `served, queue` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - list.append(값) 형식
+    - 리스트 끝에 요소 추가
+    - 원본 리스트 직접 변경
+    - 반환값은 None
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### append로 요소 추가
+
+    리스트 끝에 새로운 요소를 추가합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-queue = ["A", "B"]
-queue.append("C")
-served = queue.pop(0)
-served, queue
-"""
-    )
+def _():
+    def _snippet_0013():
+        fruits = ['사과', '바나나']
+        fruits.append('오렌지')
+        fruits.append('포도')
+        return fruits
+    _snippet_0013()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `nums.sort()`를 실행한 뒤 `nums`가 어떻게 바뀌는지 예측하세요.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-nums = [3, 1, 2]
-nums.sort()
-nums
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    [1, 2, 3]
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > append()는 한 번에 하나의 요소만 추가합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `cart`에 `tea`를 추가하고 `cookie`를 제거하세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
+    ## insert() 메서드
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-cart = ["coffee", "cookie"]
-cart.append("tea")
-cart.remove("cookie")
-assert cart == ["coffee", "tea"]
-cart
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    cart = ["coffee", "cookie"]
-    cart.append("tea")
-    cart.remove("cookie")
-    assert cart == ["coffee", "tea"]
-    cart
-    ```
-    
-    </details>
+    *원하는 위치에 요소 추가*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 `sort()`의 반환값을 저장하려고 해서 `None`이 됩니다. 원본 리스트를 정렬한 뒤 출력하세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-levels = [2, 5, 1]
-levels.sort()
-sortedLevels = levels
-assert sortedLevels == [1, 2, 5]
-sortedLevels
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    levels = [2, 5, 1]
-    levels.sort()
-    sortedLevels = levels
-    assert sortedLevels == [1, 2, 5]
-    sortedLevels
-    ```
-    
-    </details>
+    insert() 메서드는 리스트의 특정 위치에 요소를 추가합니다. 첫 번째 인수로 인덱스를, 두 번째 인수로 추가할 값을 받습니다. 그 위치에 값이 삽입되고, 기존 요소들은 뒤로 밀립니다. append()와 달리 원하는 위치에 정확히 추가할 수 있습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    - list.insert(인덱스, 값) 형식
+    - 특정 위치에 요소 삽입
+    - 기존 요소는 뒤로 이동
+    - 순서가 중요할 때 유용
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    작업 목록에 `test`를 추가하고, 가장 앞 작업을 꺼내세요.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
+    ### insert로 특정 위치에 추가
+
+    원하는 위치에 정확히 요소를 삽입합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-tasks = ["plan", "write"]
-tasks.append("test")
-firstTask = tasks.pop(0)
-assert firstTask == "plan"
-assert tasks == ["write", "test"]
-firstTask, tasks
-"""
-    )
+def _():
+    def _snippet_0019():
+        colors = ['빨강', '파랑']
+        colors.insert(1, '초록')
+        return colors
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    tasks = ["plan", "write"]
-    tasks.append("test")
-    firstTask = tasks.pop(0)
-    assert firstTask == "plan"
-    assert tasks == ["write", "test"]
-    firstTask, tasks
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > insert(0, 값)은 리스트 맨 앞에 추가합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
-    """)
-    return
+    ## remove() 메서드
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'cart == ["coffee", "tea"]'),
-    ('오류 고쳐보기', 'sortedLevels == [1, 2, 5]'),
-    ('비슷한 문제', 'firstTask == "plan" and tasks == ["write", "test"]')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 대기열을 만들고 한 명을 앞에 추가한 뒤, 첫 번째 사람을 처리하세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    *값으로 요소 삭제*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    대기열을 만들고 한 명을 앞에 추가한 뒤, 첫 번째 사람을 처리하세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-waiting = ["Noa", "Mia", "Leo"]
-waiting.insert(0, "Kai")
-nextUser = waiting.pop(0)
-nextUser, waiting
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-todo = ["review", "practice"]
-todo.append("reflect")
-done = todo.pop(0)
-done, todo
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 8
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: `copy()`를 사용해 원본 대기열과 백업 대기열을 분리해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    remove() 메서드는 리스트에서 특정 값을 찾아 삭제합니다. 괄호 안에 삭제할 값을 넣으면 그 값이 처음 나타나는 위치에서 제거됩니다. 같은 값이 여러 개 있어도 첫 번째 것만 삭제됩니다. 값이 리스트에 없으면 에러가 발생합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `작업 목록에 `test`를 추가하고, 가장 앞 작업을 꺼내세요.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 추가, 삽입, 삭제 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    - list.remove(값) 형식
+    - 해당 값을 찾아 삭제
+    - 첫 번째로 발견된 값만 삭제
+    - 값이 없으면 에러 발생
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `리스트 메서드`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    ### remove로 값 삭제
+
+    특정 값을 찾아서 삭제합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0025():
+        items = ['사과', '바나나', '오렌지', '바나나']
+        items.remove('바나나')
+        return items
+    _snippet_0025()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 값이 여러 개 있어도 첫 번째 것만 삭제됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    ## pop() 메서드
+
+    *인덱스로 요소 삭제하고 반환*
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    pop() 메서드는 리스트에서 특정 인덱스의 요소를 제거하고 그 값을 반환합니다. 괄호 안에 인덱스를 넣으면 그 위치의 요소가 삭제됩니다. 인덱스를 생략하면 마지막 요소가 삭제됩니다. remove()와 달리 삭제된 값을 받을 수 있어 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - list.pop() 또는 list.pop(인덱스)
+    - 요소를 삭제하고 값을 반환
+    - 인덱스 생략시 마지막 요소 삭제
+    - 삭제된 값을 사용 가능
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 마지막 요소 pop
+
+    pop()으로 마지막 요소를 삭제하고 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0031():
+        nums = [10, 20, 30, 40, 50]
+        return nums.pop()
+    _snippet_0031()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 첫 번째 요소 pop
+
+    pop(0)으로 첫 번째 요소를 삭제하고 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0033():
+        vals = [10, 20, 30, 40, 50]
+        return vals.pop(0)
+    _snippet_0033()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > pop()은 스택(stack) 자료구조 구현에 자주 사용됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## clear() 메서드
+
+    *모든 요소 삭제*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    clear() 메서드는 리스트의 모든 요소를 삭제하여 빈 리스트로 만듭니다. 리스트 자체는 그대로 유지되고 내용만 비워집니다. 리스트를 초기화할 때 사용합니다. 변수에 []를 할당하는 것과 비슷하지만, 같은 리스트를 참조하는 다른 변수가 있을 때 차이가 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - list.clear() 형식
+    - 모든 요소 삭제
+    - 빈 리스트가 됨
+    - 리스트 초기화에 사용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### clear로 모두 삭제
+
+    리스트의 모든 요소를 삭제합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0039():
+        nums = [1, 2, 3, 4, 5]
+        nums.clear()
+        return nums
+    _snippet_0039()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > clear()는 리스트를 재사용할 때 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## extend() 메서드
+
+    *리스트 합치기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    extend() 메서드는 리스트에 다른 리스트의 모든 요소를 추가합니다. + 연산자와 비슷하지만, + 는 새 리스트를 만들고 extend()는 원본 리스트를 변경합니다. 여러 요소를 한 번에 추가할 때 append()를 반복하는 것보다 효율적입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - list.extend(다른리스트) 형식
+    - 다른 리스트의 모든 요소 추가
+    - 원본 리스트 직접 변경
+    - + 연산자보다 메모리 효율적
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### extend로 리스트 확장
+
+    다른 리스트의 모든 요소를 추가합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0045():
+        base = [1, 2, 3]
+        extra = [4, 5, 6]
+        base.extend(extra)
+        return base
+    _snippet_0045()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > append([4,5,6])은 리스트를 통째로 추가하지만, extend([4,5,6])은 요소들을 개별적으로 추가합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## sort() 메서드
+
+    *리스트 정렬*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    sort() 메서드는 리스트의 요소를 오름차순으로 정렬합니다. 숫자는 작은 것부터, 문자열은 사전 순으로 정렬됩니다. reverse=True 인수를 주면 내림차순으로 정렬됩니다. 원본 리스트가 직접 변경되며, None을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - list.sort() 형식
+    - 오름차순 정렬 (기본)
+    - reverse=True로 내림차순
+    - 원본 리스트 직접 변경
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 오름차순 정렬
+
+    sort()로 리스트를 오름차순으로 정렬합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        data = [5, 2, 8, 1, 9]
+        data.sort()
+        return data
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 내림차순 정렬
+
+    sort(reverse=True)로 내림차순으로 정렬합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0053():
+        scores = [5, 2, 8, 1, 9]
+        scores.sort(reverse=True)
+        return scores
+    _snippet_0053()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > sorted() 함수는 원본을 유지하고 정렬된 새 리스트를 반환합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## reverse() 메서드
+
+    *리스트 뒤집기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    reverse() 메서드는 리스트의 순서를 완전히 뒤집습니다. 첫 번째와 마지막, 두 번째와 끝에서 두 번째 같은 식으로 위치를 바꿉니다. 정렬과는 다르며, 단순히 순서만 반대로 만듭니다. 원본 리스트가 직접 변경됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - list.reverse() 형식
+    - 순서를 완전히 반대로
+    - 정렬과는 다른 개념
+    - 원본 리스트 직접 변경
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### reverse로 뒤집기
+
+    리스트의 순서를 반대로 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0059():
+        chars = ['A', 'B', 'C', 'D', 'E']
+        chars.reverse()
+        return chars
+    _snippet_0059()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > [::-1] 슬라이싱도 리스트를 뒤집지만 새 리스트를 만듭니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## copy() 메서드
+
+    *리스트 복사*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    copy() 메서드는 리스트의 얕은 복사본을 만듭니다. 원본과 똑같은 내용의 새로운 리스트가 생성됩니다. 단순히 변수에 할당(=)하면 같은 리스트를 참조하지만, copy()는 완전히 독립적인 리스트를 만듭니다. 한쪽을 변경해도 다른 쪽에 영향을 주지 않습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - list.copy() 형식
+    - 독립적인 새 리스트 생성
+    - 원본과 복사본은 서로 독립적
+    - = 할당과는 다름
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### copy로 복사
+
+    원본과 독립적인 리스트를 만듭니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0065():
+        orig = [1, 2, 3]
+        copy = orig.copy()
+        copy.append(4)
+        return copy
+    _snippet_0065()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > list[:] 슬라이싱도 복사본을 만듭니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## count() 메서드
+
+    *요소 개수 세기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    count() 메서드는 리스트에서 특정 값이 몇 번 나타나는지 세어줍니다. 괄호 안에 찾을 값을 넣으면 그 값의 개수를 반환합니다. 값이 없으면 0을 반환합니다. 리스트를 변경하지 않고 정보만 알려줍니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - list.count(값) 형식
+    - 특정 값의 개수 반환
+    - 없으면 0 반환
+    - 리스트는 변경 안됨
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 값 개수 세기
+
+    count()로 특정 값이 몇 번 나타나는지 셉니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0071():
+        nums = [1, 2, 3, 2, 4, 2, 5]
+        return nums.count(2)
+    _snippet_0071()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 없는 값 개수
+
+    없는 값을 세면 0을 반환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0073():
+        arr = [1, 2, 3, 2, 4, 2, 5]
+        return arr.count(6)
+    _snippet_0073()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > count()는 데이터 분석에서 빈도 계산에 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## index() 메서드
+
+    *요소 위치 찾기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    index() 메서드는 리스트에서 특정 값이 처음 나타나는 위치의 인덱스를 반환합니다. 같은 값이 여러 개 있어도 첫 번째 위치만 알려줍니다. 값이 리스트에 없으면 에러가 발생합니다. 요소의 위치를 알아야 할 때 사용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - list.index(값) 형식
+    - 값의 첫 번째 인덱스 반환
+    - 값이 없으면 에러 발생
+    - 위치 파악에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 첫 번째 위치 찾기
+
+    index()로 값의 첫 번째 위치를 찾습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0079():
+        fruits = ['사과', '바나나', '오렌지', '바나나']
+        return fruits.index('바나나')
+    _snippet_0079()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 다른 값 위치 찾기
+
+    다른 값의 인덱스를 찾습니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0081():
+        basket = ['사과', '바나나', '오렌지', '바나나']
+        return basket.index('오렌지')
+    _snippet_0081()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > in 연산자로 값의 존재 여부를 먼저 확인한 후 index()를 사용하면 안전합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 8 종합 복습
+
+    *리스트 메서드 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 8에서 배운 리스트 메서드를 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: append 사용
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: remove 사용
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: sort 사용
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: reverse 사용
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: pop 사용
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 리스트 상태
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 제거된 값
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 할일 목록 관리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 남은 할일
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 완료한 할일
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 점수 정렬
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 원본
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 오름차순
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 내림차순
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 장바구니 수정
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 장바구니 내용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 아이템 개수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 학생 명단 관리
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 전체 학생
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 첫 번째 학생
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 마지막 학생
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 숫자 목록 조작
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 리스트
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 1의 개수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 4의 위치
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1: 재고 관리 시스템
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 제품 목록
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 재고 수량
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 재고 부족 제품
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-1: 플레이리스트 추가 및 재생
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 현재 플레이리스트
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 재생한 노래
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-2: 플레이리스트 정렬
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 정렬된 복사본
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 전체 개수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3: 메시지 큐
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 남은 큐
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 처리된 메시지
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 남은 개수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-1: 투표 개수 집계
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 전체 투표
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### A 득표수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### B 득표수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### C 득표수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-2: 투표 결과 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-1: 게임 플레이어 추가
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 플레이어 목록
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 점수 목록
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-2: 게임 랭킹 분석
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 점수 랭킹
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 상위 3명
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 영희 점수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

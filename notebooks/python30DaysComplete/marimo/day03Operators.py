@@ -14,548 +14,1156 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
     # Day 03. 연산자
-    
-    **오늘의 초점**: 산술, 비교, 논리 연산자를 조합해 조건을 표현한다.
-    
-    **완성 기준**: 계산 결과뿐 아니라 `True`/`False`로 나오는 판단식을 만들 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+
+    이 노트북은 `study/python/30days/day03_연산자.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 산술 연산자로 수학 계산하기
+    - 비교 연산자로 값 비교하기
+    - 논리 연산자로 조건 조합하기
+    - 멤버십 연산자로 포함 여부 확인하기
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 숫자 계산
-    - 나머지
-    - 값 비교하기
-    - 조건 묶기
-    - 안에 있는지 확인하기
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: arithmetic_operator, comparison_operator, logical_operator, membership_operator
+    - 이미 써도 되는 개념: variable, int, float, str, bool, type, print
+    - 오늘은 일부러 쓰지 않는 개념: list, dict, function, import
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    연산자는 프로그램의 판단 언어다. 숫자를 계산하고, 값이 조건을 만족하는지 비교하고, 여러 조건을 하나로 묶는다.
-    
-    ## 생각 모델
-    
-    연산식은 질문이다. `price > 10000`은 가격이 큰지 묻는 질문이고, 파이썬은 그 답으로 `True` 또는 `False`를 준다.
-    
-    ## 자주 하는 실수
-    
-    - `=`와 `==`를 혼동하기
-    - `and`와 `or`를 감으로 고르기
-    - 나머지 연산을 몫으로 착각하기
+    ## 덧셈 연산자
+
+    *+ 기호로 더하기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `숫자 계산`를 한 문장으로 설명할 수 있는가?
-    2. `나머지`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    덧셈 연산자(+)는 두 숫자를 더합니다. 정수끼리, 소수끼리, 정수와 소수를 섞어서도 계산할 수 있습니다. 결과는 자동으로 화면에 표시됩니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 02: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - 정수 덧셈 가능
+    - 소수 덧셈 가능
+    - 정수 + 소수 = 소수
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 덧셈 계산
+
+    두 숫자를 더한 결과가 자동 출력됩니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        itemA = 10
+        itemB = 20
+        return itemA + itemB
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 결과를 변수에 저장하려면 result = price + qty처럼 사용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `숫자 계산`, `나머지`, `값 비교하기`, `조건 묶기`, `안에 있는지 확인하기`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - `=`와 `==`를 혼동하기
-    - `and`와 `or`를 감으로 고르기
-    - 나머지 연산을 몫으로 착각하기
+    ## 뺄셈 연산자
+
+    *- 기호로 빼기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `연산자`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    뺄셈 연산자(-)는 앞 숫자에서 뒤 숫자를 뺍니다. 음수 결과도 가능하며, 순서가 중요합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `orderTotal = 27000` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `hasCoupon = True` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 3 | `canDiscount = orderTotal >= 20000 and hasCoupon` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
-    | 4 | `canDiscount` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - 앞 숫자 - 뒤 숫자
+    - 음수 결과 가능
+    - 순서 바뀌면 결과도 바뀜
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 뺄셈 계산
+
+    100에서 35를 뺀 결과입니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-orderTotal = 27000
-hasCoupon = True
-canDiscount = orderTotal >= 20000 and hasCoupon
-canDiscount
-"""
-    )
+def _():
+    def _snippet_0013():
+        budget = 100
+        spent = 35
+        return budget - spent
+    _snippet_0013()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `17 % 5`는 무엇을 의미할까요? 몫이 아니라 남는 값을 생각하세요.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
-    """)
-    return
+    ## 곱셈 연산자
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-17 % 5
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    2
-    ```
-    
-    </details>
+    ** 기호로 곱하기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    `score`가 80 이상이고 `attendance`가 10 이상이면 통과입니다. `passed`를 실행해 확인하세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-score = 86
-attendance = 12
-passed = score >= 80 and attendance >= 10
-assert passed is True
-passed
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    score = 86
-    attendance = 12
-    passed = score >= 80 and attendance >= 10
-    assert passed is True
-    passed
-    ```
-    
-    </details>
+    곱셈 연산자(*)는 두 숫자를 곱합니다. 수학에서는 ×를 사용하지만, 프로그래밍에서는 *를 사용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 할인 조건을 반대로 쓰고 있습니다. 20000원 이상일 때 할인되도록 고치세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-cartTotal = 23000
-discountTarget = cartTotal >= 20000
-assert discountTarget is True
-discountTarget
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    cartTotal = 23000
-    discountTarget = cartTotal >= 20000
-    assert discountTarget is True
-    discountTarget
-    ```
-    
-    </details>
+    - * 기호로 곱셈
+    - 정수와 소수 모두 가능
+    - 음수 곱셈도 가능
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    ### 곱셈 계산
+
+    7과 8을 곱한 결과입니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0018():
+        width = 7
+        height = 8
+        return width * height
+    _snippet_0018()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 나눗셈 연산자
+
+    */ 기호로 나누기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    무료 배송 조건을 판단하세요. 주문 금액이 30000 이상이거나 VIP면 무료 배송입니다.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-orderAmount = 22000
-isVip = True
-freeShipping = orderAmount >= 30000 or isVip
-assert freeShipping is True
-freeShipping
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    orderAmount = 22000
-    isVip = True
-    freeShipping = orderAmount >= 30000 or isVip
-    assert freeShipping is True
-    freeShipping
-    ```
-    
-    </details>
+    나눗셈 연산자(/)는 앞 숫자를 뒤 숫자로 나눕니다. 결과는 항상 소수(float)로 나옵니다. 정수 나누기 정수도 결과는 소수입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'passed is True'),
-    ('오류 고쳐보기', 'discountTarget is True'),
-    ('비슷한 문제', 'freeShipping is True')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 간단한 입장 조건을 만드세요. 나이가 13 이상이고 티켓을 가진 사람만 입장할 수 있습니다.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    - / 기호로 나눗셈
+    - 결과는 항상 소수
+    - 0으로 나누면 에러
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    간단한 입장 조건을 만드세요. 나이가 13 이상이고 티켓을 가진 사람만 입장할 수 있습니다.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
+    ### 나눗셈 계산
+
+    10을 3으로 나눈 결과입니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-age = 15
-hasTicket = True
-canEnter = age >= 13 and hasTicket
-canEnter
-"""
-    )
+def _():
+    def _snippet_0023():
+        dividend = 10
+        divisor = 3
+        return dividend / divisor
+    _snippet_0023()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-studyMinutes = 35
-targetMinutes = 30
-isOnTrack = studyMinutes >= targetMinutes
-isOnTrack
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 3
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: 나이가 65 이상이면 티켓이 없어도 입장 가능하도록 조건을 확장해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    > **팁**
+    >
+    > 결과가 3.3333...처럼 소수로 나옵니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `무료 배송 조건을 판단하세요. 주문 금액이 30000 이상이거나 VIP면 무료 배송입니다.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 숫자 계산, 나머지, 값 비교하기 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    ## 몫 연산자
+
+    *// 기호로 몫 구하기*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `연산자`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    몫 연산자(//)는 나눗셈의 몫만 구합니다. 소수점 이하는 버리고 정수 부분만 반환합니다. 10 // 3 = 3 (나머지 1은 버림)
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    - // 기호로 몫 계산
+    - 소수점 이하 버림
+    - 정수 결과 반환
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 몫 계산
+
+    17을 5로 나눈 몫을 구합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0029():
+        items = 17
+        boxes = 5
+        return items // boxes
+    _snippet_0029()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 나머지 연산자
+
+    *% 기호로 나머지 구하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    나머지 연산자(%)는 나눗셈의 나머지를 구합니다. 10 % 3 = 1 (10을 3으로 나누면 몫 3, 나머지 1) 짝수/홀수 판별, 배수 확인 등에 자주 사용됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - % 기호로 나머지 계산
+    - 나눗셈 후 남은 값
+    - 짝수/홀수 판별에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 나머지 계산
+
+    17을 5로 나눈 나머지를 구합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0034():
+        coins = 17
+        slots = 5
+        return coins % slots
+    _snippet_0034()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > val % 2가 0이면 짝수, 1이면 홀수입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 거듭제곱 연산자
+
+    *** 기호로 제곱 계산*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    거듭제곱 연산자(**)는 앞 숫자를 뒤 숫자만큼 거듭제곱합니다. 2 ** 3 = 8 (2 × 2 × 2) 수학의 2³를 프로그래밍에서는 2 ** 3으로 씁니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - ** 기호로 거듭제곱
+    - 2 ** 3 = 2³ = 8
+    - 제곱근도 가능 (9 ** 0.5 = 3)
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 거듭제곱 계산
+
+    2의 10승을 계산합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0040():
+        base = 2
+        power = 10
+        return base ** power
+    _snippet_0040()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 같음 비교 연산자
+
+    *== 기호로 같은지 확인*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    같음 연산자(==)는 두 값이 같은지 비교합니다. 같으면 True, 다르면 False를 반환합니다. 주의: 대입(=)과 비교(==)는 다릅니다!
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - == 기호로 같은지 비교
+    - 결과는 True 또는 False
+    - = (대입)과 == (비교) 구별
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 같음 비교
+
+    두 숫자가 같은지 비교합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0045():
+        left = 10
+        right = 10
+        return left == right
+    _snippet_0045()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > = 하나는 대입, == 두 개는 비교입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 다름 비교 연산자
+
+    *!= 기호로 다른지 확인*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    다름 연산자(!=)는 두 값이 다른지 비교합니다. 다르면 True, 같으면 False를 반환합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - != 기호로 다른지 비교
+    - 다르면 True
+    - 같으면 False
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 다름 비교
+
+    두 숫자가 다른지 비교합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0051():
+        first = 5
+        second = 8
+        return first != second
+    _snippet_0051()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 크기 비교 연산자
+
+    *> < >= <= 기호로 크기 비교*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    크기 비교 연산자는 두 값의 대소를 비교합니다. > (크다), < (작다), >= (크거나 같다), <= (작거나 같다) 결과는 True 또는 False입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - > (크다), < (작다)
+    - >= (크거나 같다), <= (작거나 같다)
+    - 결과는 True 또는 False
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 크다 (>)
+
+    왼쪽이 오른쪽보다 큰지 비교합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0056():
+        val = 15
+        target = 10
+        return val > target
+    _snippet_0056()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 작다 (<)
+
+    왼쪽이 오른쪽보다 작은지 비교합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0058():
+        num = 15
+        limit = 10
+        return num < limit
+    _snippet_0058()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 크거나 같다 (>=)
+
+    왼쪽이 오른쪽보다 크거나 같은지 비교합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0060():
+        level = 15
+        min = 10
+        return level >= min
+    _snippet_0060()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 작거나 같다 (<=)
+
+    왼쪽이 오른쪽보다 작거나 같은지 비교합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0062():
+        stock = 15
+        max = 10
+        return stock <= max
+    _snippet_0062()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## and 논리 연산자
+
+    *모두 참이어야 참*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    and 연산자는 양쪽 조건이 모두 True일 때만 True를 반환합니다. 하나라도 False면 결과는 False입니다. '그리고'의 의미입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 양쪽 모두 True → True
+    - 하나라도 False → False
+    - '그리고'의 의미
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### and 연산
+
+    두 조건을 and로 결합합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0067():
+        adult = True
+        valid = True
+        return adult and valid
+    _snippet_0067()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## or 논리 연산자
+
+    *하나만 참이어도 참*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    or 연산자는 양쪽 조건 중 하나만 True여도 True를 반환합니다. 둘 다 False일 때만 False입니다. '또는'의 의미입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 하나라도 True → True
+    - 둘 다 False → False
+    - '또는'의 의미
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### or 연산
+
+    두 조건을 or로 결합합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0072():
+        cash = True
+        card = False
+        return cash or card
+    _snippet_0072()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## not 논리 연산자
+
+    *참과 거짓 반전*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    not 연산자는 True를 False로, False를 True로 바꿉니다. 조건의 반대를 표현할 때 사용합니다. '아니다'의 의미입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - True → False
+    - False → True
+    - '아니다'의 의미
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### not 연산
+
+    조건을 반전시킵니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0077():
+        rain = True
+        return not rain
+    _snippet_0077()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## in 멤버십 연산자
+
+    *포함 여부 확인*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    in 연산자는 왼쪽 값이 오른쪽 문자열에 포함되어 있는지 확인합니다. 포함되어 있으면 True, 없으면 False를 반환합니다. 문자열에서 특정 문자나 단어를 찾을 때 사용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 포함되어 있으면 True
+    - 없으면 False
+    - 문자열 검색에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### in 연산
+
+    문자열에 특정 문자가 포함되어 있는지 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0082():
+        lang = 'Python'
+        return 'th' in lang
+    _snippet_0082()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 'not in'을 사용하면 포함되지 않았는지 확인할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 복합 대입 연산자
+
+    *연산과 대입을 한번에*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    복합 대입 연산자는 연산과 대입을 동시에 합니다. x += 5는 x = x + 5와 같은 의미입니다. 코드를 더 간결하게 만들어줍니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - += 덧셈 후 대입
+    - -= 뺄셈 후 대입
+    - *= 곱셈 후 대입
+    - /= 나눗셈 후 대입
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 복합 대입 연산
+
+    숫자에 10을 더한 후 다시 저장합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0088():
+        balance = 50
+        balance += 10
+        return balance
+    _snippet_0088()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 연산자 우선순위
+
+    *계산 순서 이해하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    여러 연산자가 함께 사용될 때 계산 순서가 정해져 있습니다. 수학처럼 곱셈/나눗셈이 덧셈/뺄셈보다 먼저 계산됩니다. 괄호를 사용하면 우선순위를 변경할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 1순위: 괄호 ()
+    - 2순위: 거듭제곱 **
+    - 3순위: 곱셈/나눗셈 * / // %
+    - 4순위: 덧셈/뺄셈 + -
+    - 5순위: 비교 연산자
+    - 6순위: 논리 연산자
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연산자 우선순위
+
+    우선순위에 따라 계산됩니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0093():
+        raw = 2 + 3 * 4
+        grouped = (2 + 3) * 4
+        print('without_paren:', raw)
+        return print('with_paren:', grouped)
+    _snippet_0093()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 헷갈릴 때는 괄호를 사용하면 명확해집니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 3 종합 복습
+
+    *연산자 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 3에서 배운 연산자들을 난이도별로 복습합니다. 🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요. 각 미션은 독립적으로 실행 가능하므로 어떤 순서로 해도 괜찮습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 덧셈
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 곱셈
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 나눗셈
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 같음 비교
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 크기 비교
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1: 온도 범위 확인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 점수 계산 및 비교
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 총점
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 평균
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 합격 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 할인가 계산
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4: 자격 조건 확인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 이메일 검증
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1: 학점 계산 시스템
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 점수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### A학점 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### B학점 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### C학점 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2: 쇼핑 총액 계산
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 소계
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 세금
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 총액
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 무료배송 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3: 온도 변환 및 검증
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 섭씨 온도
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 화씨 온도
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 쾌적 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4: 게임 점수 시스템
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 게임 점수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### KDA 비율
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### MVP 여부
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5: 복잡한 조건 판별
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 조건1 확인
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 조건2 확인
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 최종 승인
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()

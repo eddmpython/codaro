@@ -14,545 +14,1156 @@ def _():
 def _():
     import ast
 
-    _courseState = {"__builtins__": __builtins__}
-
-    def runCell(source):
+    def _runSnippet(source):
+        namespace = {"__builtins__": __builtins__}
         tree = ast.parse(source, mode="exec")
         if tree.body and isinstance(tree.body[-1], ast.Expr):
             lastExpr = ast.Expression(tree.body.pop().value)
             ast.fix_missing_locations(tree)
             ast.fix_missing_locations(lastExpr)
-            exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
-            return eval(compile(lastExpr, "<marimo-cell>", "eval"), _courseState)
+            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
+            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)
         ast.fix_missing_locations(tree)
-        exec(compile(tree, "<marimo-cell>", "exec"), _courseState)
+        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)
         return None
 
-    return (runCell,)
+    return (_runSnippet,)
 
 @app.cell
 def _(mo):
     mo.md(r"""
     # Day 02. 변수와 데이터 타입
-    
-    **오늘의 초점**: 값에 이름을 붙이고 타입을 확인하는 법을 익힌다.
-    
-    **완성 기준**: int, float, str, bool 값을 구분하고 `type()`과 `len()`으로 기본 정보를 확인할 수 있다.
-    
-    이 노트북의 기본 코드는 위에서 아래로 모두 실행됩니다. 먼저 실행해서 결과를 확인하고, 그다음 안내에 따라 값을 조금씩 바꿔 보세요.
+
+    이 노트북은 `study/python/30days/day02_변수와데이터타입.yaml` YAML을 원본으로 생성했습니다. 위에서 아래로 읽고 실행하되, 연습 셀은 일부러 비워둔 공간입니다.
+
+    ## 오늘 배우는 것
+
+    - 변수의 개념과 값 저장 방법
+    - 정수, 실수, 문자열, 불린 데이터 타입
+    - type() 함수로 타입 확인하기
+    - len() 함수로 길이 측정하기
+    - 타입 변환 (int, float, str)
+    - 다중 변수 할당 기법
+
+    ## 학습 방법
+
+    1. 설명을 먼저 읽습니다.
+    2. 바로 아래 코드 셀을 실행합니다.
+    3. 출력이 설명과 어떻게 연결되는지 한 문장으로 말합니다.
+    4. 연습 셀에는 예제를 보지 않고 직접 다시 작성합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 학습 흐름
-    
-    1. 준비 질문과 시작 전 떠올리기로 오늘 배울 내용을 확인합니다.
-    2. 오늘 배울 범위, 코드가 실행되는 순서, 한 줄씩 보기를 읽습니다.
-    3. 예측 문제는 먼저 머릿속으로 답을 정하고 실행합니다.
-    4. 값 바꿔보기와 오류 고쳐보기를 따라 실행합니다.
-    5. 비슷한 문제와 자동 확인으로 오늘 코드를 확인합니다.
-    6. 작은 만들기, 30일 프로젝트, 더 연습하기로 자기 코드까지 확장합니다.
-    
-    ## 오늘 다룰 개념
-    
-    - 값에 이름 붙이기
-    - 정수와 소수
-    - 글자 데이터
-    - 참/거짓 값
-    - 값의 종류 확인
+    ## 오늘의 범위
+
+    - 오늘 새로 배우는 개념: variable, int, float, str, bool, type, len
+    - 이미 써도 되는 개념: print, comment, string_literal
+    - 오늘은 일부러 쓰지 않는 개념: list, dict, tuple, set, function, class, import
+
+    범위를 좁히는 이유는 간단합니다. 처음 배우는 사람은 한 번에 많은 문법을 보면 어디서 막혔는지 찾기 어렵습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 왜 배우는가
-    
-    프로그램은 값을 다루고, 변수는 그 값에 붙이는 이름이다. 이름이 명확하면 코드를 읽는 사람이 데이터의 의미를 바로 이해할 수 있다.
-    
-    ## 생각 모델
-    
-    변수는 상자가 아니라 이름표에 가깝다. 같은 값에도 여러 이름표를 붙일 수 있고, 같은 이름표를 다른 값에 다시 붙일 수도 있다.
-    
-    ## 자주 하는 실수
-    
-    - 숫자처럼 보이는 문자열을 숫자로 착각하기
-    - 변수명에 띄어쓰기 넣기
-    - 타입을 확인하지 않고 연산하기
+    ## 변수란?
+
+    *데이터를 저장하는 이름표*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 0. 준비 질문
-    
-    아래 질문은 점수를 매기기 위한 것이 아니라, 오늘 어디를 집중해야 하는지 찾기 위한 준비 질문입니다. 답이 흐릿하면 해당 부분을 천천히 다시 읽으세요.
-    
-    1. `값에 이름 붙이기`를 한 문장으로 설명할 수 있는가?
-    2. `정수와 소수`를 잘못 쓰면 어떤 결과나 에러가 날 수 있는가?
-    3. 오늘 작은 만들기에서 어떤 값이 입력이고 어떤 값이 결과인가?
+    변수(Variable)는 데이터를 저장하는 메모리 공간에 붙인 이름표입니다.
+    마치 상자에 물건을 넣고 라벨을 붙이는 것과 같습니다.
+    변수를 사용하면 데이터를 저장했다가 나중에 다시 사용할 수 있습니다.
+    = 기호는 수학의 "같다"가 아니라 "오른쪽 값을 왼쪽 변수에 저장한다"는 의미입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 시작 전 떠올리기
-    
-    새 문법을 보기 전에 이전 내용을 먼저 꺼내야 장기 기억으로 넘어갑니다. 아래 질문은 실행하지 않고 말이나 메모로 답합니다.
-    
-    - Day 01: 제목을 보지 않고 핵심 문법 하나와 실수 하나를 떠올린다.
-    
-    답이 바로 떠오르지 않으면 해당 Day의 예측 문제만 다시 실행하고 돌아오세요.
+    - 변수명 = 값 형태로 할당
+    - 데이터를 저장하고 재사용
+    - = 기호는 할당(assignment) 의미
+    - 의미 있는 이름으로 가독성 향상
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘의 통과 기준
-    
-    이 Day는 새 개념 하나를 익히는 날입니다. 아래 기준을 만족하면 다음 Day로 넘어갑니다.
-    
-    - 예측 문제를 실행 전에 답했다.
-    - 값 바꿔보기 셀의 확인 코드가 통과했다.
-    - 오류 고쳐보기 셀의 원인을 한 문장으로 설명했다.
-    - 비슷한 문제를 한 번 더 풀었다.
-    - 작은 만들기를 자기 데이터로 변형했다.
+    ### 변수 기본 사용
+
+    변수에 값을 저장하고 사용합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0007():
+        msg = 'Python'
+        return msg
+    _snippet_0007()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 변수명은 영문자, 숫자, 밑줄(_)만 사용 가능하며, 숫자로 시작할 수 없습니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 배울 범위
-    
-    오늘은 `값에 이름 붙이기`, `정수와 소수`, `글자 데이터`, `참/거짓 값`, `값의 종류 확인`만 집중합니다. 한 번에 너무 많이 배우면 어디서 막혔는지 찾기 어렵기 때문입니다.
-    
-    **오늘 집중할 것**
-    
-    - 값을 어떻게 만들고 확인하는가
-    - 결과가 예상과 다를 때 어느 줄을 먼저 볼 것인가
-    - 같은 문법을 다른 데이터에 적용할 수 있는가
-    
-    **오늘 피할 실수**
-    
-    - 숫자처럼 보이는 문자열을 숫자로 착각하기
-    - 변수명에 띄어쓰기 넣기
-    - 타입을 확인하지 않고 연산하기
+    ## 변수명 작성 스타일
+
+    *카멜케이스 vs 스네이크케이스*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 코드가 실행되는 순서
-    
-    오늘 핵심 내용은 `변수와 데이터 타입`입니다. 예제 셀을 실행하기 전에 아래 순서로 천천히 따라가 봅니다.
-    
-    | 단계 | 볼 것 | 적을 내용 |
-    |---:|---|---|
-    | 1 | 입력값 | 처음 만들어지는 값과 타입 |
-    | 2 | 변환 | 어떤 연산이나 메서드가 값을 바꾸는지 |
-    | 3 | 결과 | 마지막 줄이 보여줄 값 |
-    
-    표를 완벽하게 채우는 것이 목표가 아닙니다. 코드가 위에서 아래로 한 줄씩 실행된다는 감각을 만드는 것이 목표입니다.
+    변수명을 지을 때 단어를 연결하는 방법에는 크게 두 가지 스타일이 있습니다. 카멜케이스(camelCase)는 첫 단어는 소문자로 시작하고 이후 단어의 첫 글자를 대문자로 쓰는 방식입니다. 스네이크케이스(snake_case)는 모든 단어를 소문자로 쓰고 밑줄(_)로 연결하는 방식입니다. 파이썬 공식 스타일 가이드(PEP 8)는 스네이크케이스를 권장하지만, 이 학습 컨텐츠는 작성자의 코딩 스타일에 따라 카멜케이스를 사용합니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 한 줄씩 보기
-    
-    예제 코드를 실행하기 전에 한 줄씩 의미를 봅니다. 코드를 통째로 외우기보다, 각 줄이 무엇을 만드는지 말할 수 있으면 됩니다.
-    
-    | 줄 | 코드 | 역할 |
-    |---:|---|---|
-    | 1 | `studentName = "Jin"` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 2 | `studentAge = 17` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 3 | `hasLaptop = True` | 계산 결과나 데이터를 이름에 연결합니다. |
-    | 4 | `type(studentName), type(studentAge), type(hasLaptop)` | 마지막 표현식이거나 호출입니다. 실행 결과를 관찰해 상태를 확인합니다. |
+    - 카멜케이스: userName, totalPrice, isActive
+    - 스네이크케이스: user_name, total_price, is_active
+    - 파이썬 공식 가이드는 스네이크케이스 권장
+    - 중요한 것은 한 프로젝트에서 일관성 유지
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 1. 핵심 예제
-    
-    먼저 완성된 예제를 실행해 오늘의 문법이 어떤 모양인지 확인합니다.
+    ### 두 가지 스타일 비교
+
+    카멜케이스와 스네이크케이스 모두 사용 가능합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-studentName = "Jin"
-studentAge = 17
-hasLaptop = True
-type(studentName), type(studentAge), type(hasLaptop)
-"""
-    )
+def _():
+    def _snippet_0013():
+        userName = 'John Doe'
+        user_name = 'Jane Smith'
+        return print('카멜케이스 : ', userName, '\n스네이크케이스 : ', user_name)
+    _snippet_0013()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 2. 먼저 예상하고 실행하기
-    
-    `len('Python')`의 결과를 예측하세요. 공백이나 따옴표는 길이에 포함되지 않습니다.
-    
-    실행 전에 예상 결과를 노트에 적어두세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-len("Python")
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>예상 결과 확인</summary>
-    
-    ```python
-    6
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > 이 학습 컨텐츠는 카멜케이스로 작성되었지만, 여러분은 원하는 스타일을 선택하여 사용하세요. 중요한 것은 선택한 스타일을 일관되게 유지하는 것입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 3. 값 바꿔보기
-    
-    상품 가격과 수량으로 `totalPrice`를 계산하세요.
-    
-    아래 코드는 바로 실행됩니다. `assert`는 “이 조건이 맞아야 한다”는 확인문입니다. 조건이 맞으면 아무 말 없이 지나갑니다. 먼저 실행한 뒤 값을 하나 바꿔 보세요.
-    """)
-    return
+    ## 변수 값 변경하기
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-itemPrice = 12000
-itemCount = 3
-totalPrice = itemPrice * itemCount
-assert totalPrice == 36000
-totalPrice
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>힌트와 설명</summary>
-    
-    1. 어떤 값이 최종 변수에 들어가야 하는지 먼저 말로 설명합니다.
-    2. 이미 만들어진 변수 중 재사용할 수 있는 값을 찾습니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    itemPrice = 12000
-    itemCount = 3
-    totalPrice = itemPrice * itemCount
-    assert totalPrice == 36000
-    totalPrice
-    ```
-    
-    </details>
+    *저장된 값을 새 값으로 교체*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 4. 오류 고쳐보기
-    
-    자주 하는 실수는 숫자 문자열과 정수를 바로 더하려고 해서 오류가 납니다. 문자열을 정수로 바꾸세요.
-    
-    아래 셀은 그 실수를 고친 버전입니다. 먼저 실행해서 정상 결과를 보고, 어떤 부분이 고쳐졌는지 한 문장으로 적어 보세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-rawCount = "5"
-nextCount = int(rawCount) + 1
-nextCount
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    <details>
-    <summary>수정 예시</summary>
-    
-    ```python
-    rawCount = "5"
-    nextCount = int(rawCount) + 1
-    nextCount
-    ```
-    
-    </details>
+    변수는 언제든지 새로운 값으로 변경할 수 있습니다.
+    같은 변수에 새 값을 할당하면 이전 값은 사라지고 새 값으로 대체됩니다.
+    이것이 "변수(Variable)"라는 이름의 의미입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 틀린 이유 적기
-    
-    오류 고쳐보기 셀을 실행한 뒤 아래 세 줄을 노트나 마크다운 셀에 직접 적습니다. 중요한 것은 정답 코드를 외우는 것이 아니라, 같은 실수를 다시 줄이는 규칙을 만드는 것입니다.
-    
-    - 오류 이름:
-    - 실제 원인:
-    - 다음에 확인할 규칙:
+    - 같은 변수에 새 값 할당 가능
+    - 이전 값은 사라지고 새 값으로 대체
+    - 변할 수 있기에 "변수"
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 5. 비슷한 문제 풀기
-    
-    학습 시간을 분 단위에서 시간 단위로 바꾸세요. 나눗셈 결과는 실수입니다.
-    
-    같은 문법을 다른 데이터와 다른 변수명으로 다시 써 봅니다. 아래 코드는 바로 실행됩니다. 실행한 뒤 값 하나를 바꿔 다시 확인하세요.
+    ### 변수 값 변경
+
+    변수에 새로운 값을 할당합니다.
     """)
     return
 
 @app.cell
-def _(runCell):
-    runCell(
-        r"""
-studyMinutes = 90
-studyHours = studyMinutes / 60
-assert studyHours == 1.5
-studyHours
-"""
-    )
+def _():
+    def _snippet_0019():
+        score = 80
+        score = 95
+        return score
+    _snippet_0019()
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    <details>
-    <summary>비슷한 문제 3단계 힌트</summary>
-    
-    1. 개념 힌트: 오늘 배운 핵심 문법 중 어떤 것을 써야 하는지 먼저 고릅니다.
-    2. 구조 힌트: 최종 변수에 어떤 값이 들어가야 `assert`가 통과하는지 역으로 생각합니다.
-    3. 정답 예시는 아래와 같습니다.
-    
-    ```python
-    studyMinutes = 90
-    studyHours = studyMinutes / 60
-    assert studyHours == 1.5
-    studyHours
-    ```
-    
-    </details>
+    > **팁**
+    >
+    > 변수는 최종적으로 할당된 값을 가집니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 자동 확인
-    
-    값 바꿔보기, 오류 고쳐보기, 비슷한 문제 풀기를 확인합니다. 실패 항목이 있으면 해당 셀로 돌아가 값을 다시 확인하세요.
-    """)
-    return
+    ## 정수 타입
 
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-checks = [
-    ('값 바꾸기', 'totalPrice == 36000'),
-    ('오류 고쳐보기', 'nextCount == 6'),
-    ('비슷한 문제', 'studyHours == 1.5')
-]
-checkpointResults = []
-for checkName, expression in checks:
-    try:
-        passed = bool(eval(expression))
-        checkpointResults.append({"check": checkName, "passed": passed, "error": ""})
-    except (NameError, AssertionError, TypeError, ValueError, AttributeError, KeyError, IndexError) as exc:
-        checkpointResults.append({"check": checkName, "passed": False, "error": type(exc).__name__})
-
-passedCount = sum(1 for item in checkpointResults if item["passed"])
-{"passed": passedCount, "total": len(checkpointResults), "details": checkpointResults}
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 작은 만들기 기준
-    
-    작은 만들기는 오늘 배운 문법을 내 예제로 바꾸는 단계입니다.
-    
-    **랩 목표**: 간단한 영수증 데이터를 변수로 만들고, 최종 결제 금액을 계산하세요.
-    
-    **우수 제출 기준**
-    
-    - 변수명만 읽어도 데이터 의미가 드러난다.
-    - 마지막 줄의 출력이 목표와 직접 연결된다.
-    - `assert` 또는 자동 확인 코드로 핵심 결과를 확인한다.
-    - 데이터를 하나 바꿨을 때 결과가 어떻게 바뀌는지 설명할 수 있다.
-    - 오늘 배운 문법을 적어도 한 번은 자기 예제로 변형했다.
+    *소수점 없는 숫자*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 6. 작은 만들기
-    
-    간단한 영수증 데이터를 변수로 만들고, 최종 결제 금액을 계산하세요.
-    
-    아래 코드는 시작점입니다. 실행 후 값을 바꿔보고, 마지막 줄의 결과가 어떻게 달라지는지 확인하세요.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-coffeePrice = 4500
-cakePrice = 6200
-coupon = 1000
-payment = coffeePrice + cakePrice - coupon
-payment
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 7. 30일 프로젝트
-    
-    매일 하나의 작은 학습 기록 프로그램을 조금씩 키웁니다. 오늘 셀은 이전 문법을 버리지 않고 새 문법을 얹는 방식으로 작성되어 있습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-studyMinutes = 35
-breakMinutes = 10
-totalMinutes = studyMinutes + breakMinutes
-totalMinutes
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 8. 마무리 체크
-    
-    아래 값을 직접 `True`로 바꾸는 것은 체크 표시가 아니라 약속입니다. 각 항목을 실제로 끝낸 뒤에만 바꾸세요. 마지막 값이 `True`가 아니면 다음 Day로 넘어가지 않습니다.
-    """)
-    return
-
-@app.cell
-def _(runCell):
-    runCell(
-        r"""
-dayNumber = 2
-predictionWritten = False
-fillBlankPassed = False
-bugExplained = False
-transferSolved = False
-projectChanged = False
-readyForNextDay = predictionWritten and fillBlankPassed and bugExplained and transferSolved and projectChanged
-readyForNextDay
-"""
-    )
-    return
-
-@app.cell
-def _(mo):
-    mo.md(r"""
-    ## 9. 변형 과제와 회고
-    
-    **변형 과제**: `payment`가 10000 이상인지 `isBigOrder` 변수에 저장해보세요.
-    
-    **회고 질문**
-    
-    - 오늘 문법을 어디에 쓸 수 있는가?
-    - 가장 헷갈린 규칙은 무엇인가?
-    - 같은 문제를 내일 다시 푼다면 어떤 변수명이나 함수명을 더 좋게 바꿀 수 있는가?
+    정수(Integer)는 소수점이 없는 숫자입니다.
+    1, 100, -5처럼 양수, 0, 음수 모두 정수입니다.
+    파이썬에서 정수 타입은 int로 표시됩니다.
+    int는 integer(정수)의 줄임말입니다.
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 더 연습하기
-    
-    자동 확인까지 통과했다면 아래 문제를 노트북 맨 아래 새 셀에 직접 풉니다. 정답보다 중요한 것은 같은 코드를 내 데이터로 바꿔 보는 것입니다.
-    
-    1. **따라 쓰기**: 핵심 예제와 같은 구조로 변수명과 데이터만 바꿔 다시 작성합니다.
-    2. **값 바꾸기**: 비슷한 문제 `학습 시간을 분 단위에서 시간 단위로 바꾸세요. 나눗셈 결과는 실수입니다.`에서 숫자나 문자열을 하나 바꾸고 확인 코드도 함께 고칩니다.
-    3. **역문제**: 결과값을 먼저 정하고, 그 결과가 나오도록 입력 데이터를 설계합니다.
-    4. **오류 만들기**: 오늘의 자주 하는 실수 중 하나를 일부러 만들고, 에러 이름이나 잘못된 결과를 기록합니다.
-    5. **설명하기**: 값에 이름 붙이기, 정수와 소수, 글자 데이터 중 하나를 비전공자에게 설명하는 3문장 메모를 씁니다.
-    6. **연결하기**: 30일 프로젝트 셀에 오늘 배운 문법을 한 줄 더 추가합니다.
+    - 소수점 없는 숫자
+    - 양수, 0, 음수 모두 가능
+    - 타입 이름은 int
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 마지막 한 줄 정리
-    
-    다음 세 문장을 직접 완성해야 오늘 학습을 끝낸 것으로 봅니다.
-    
-    - 오늘 내가 배운 핵심은 `변수와 데이터 타입`이고, 한 문장으로 말하면:
-    - 내가 고친 오류의 원인은:
-    - 내일 다시 보면 가장 먼저 확인할 코드는:
+    ### 정수 변수
+
+    정수를 변수에 저장합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0025():
+        years = 25
+        return years
+    _snippet_0025()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 실수 타입
+
+    *소수점 있는 숫자*
     """)
     return
 
 @app.cell
 def _(mo):
     mo.md(r"""
-    ## 오늘 완료 기준
-    
-    이 노트북을 공개 학습 자료로 사용할 때의 기준입니다. 단순히 셀을 모두 실행한 것이 아니라, 아래 조건을 만족해야 훌륭한 완료로 봅니다.
-    
-    - 예측, 값 바꾸기, 오류 고치기, 비슷한 문제, 프로젝트 변형이 모두 남아 있다.
-    - 자동 확인이 통과한 상태의 노트북을 저장했다.
-    - 틀린 이유 적기에 최소 1개의 실제 실수가 기록되어 있다.
-    - 30일 프로젝트 셀을 자기 데이터로 바꿔 실행했다.
+    실수(Float)는 소수점이 있는 숫자입니다.
+    3.14, 2.5, -1.5처럼 소수점을 포함한 숫자입니다.
+    파이썬에서 실수 타입은 float로 표시됩니다.
+    float는 floating point(부동소수점)의 줄임말입니다.
     """)
     return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 소수점 있는 숫자
+    - 정밀한 계산에 사용
+    - 타입 이름은 float
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 실수 변수
+
+    실수를 변수에 저장합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0030():
+        pi = 3.14159
+        return pi
+    _snippet_0030()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 문자열 타입
+
+    *따옴표로 감싼 텍스트*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    문자열(String)은 따옴표로 감싼 텍스트입니다.
+    'Hello', "Python"처럼 작은따옴표나 큰따옴표로 만듭니다.
+    문자 하나('A')도 문자열이고, 긴 문장도 문자열입니다.
+    파이썬에서 문자열 타입은 str로 표시됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 따옴표로 감싼 텍스트
+    - 한 글자도 문자열
+    - 타입 이름은 str
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 문자열 변수
+
+    문자열을 변수에 저장합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0035():
+        town = 'Seoul'
+        return town
+    _snippet_0035()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 불린 타입
+
+    *참과 거짓*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    불린(Boolean)은 참(True) 또는 거짓(False) 두 가지 값만 가지는 타입입니다.
+    영국 수학자 조지 불(George Boole)의 이름에서 유래했습니다.
+    True와 False는 첫 글자가 반드시 대문자여야 합니다.
+    조건 판단, 비교 연산에서 주로 사용됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - True 또는 False 두 값만 존재
+    - 첫 글자 반드시 대문자
+    - 조건 판단에 사용
+    - 타입 이름은 bool
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 불린 변수
+
+    True와 False를 변수에 저장합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0040():
+        active = True
+        return active
+    _snippet_0040()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## type() 함수
+
+    *데이터 타입 확인하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    type() 함수는 값이나 변수의 데이터 타입을 알려줍니다.
+    괄호 안에 변수나 값을 넣으면 그것의 타입을 반환합니다.
+    결과는 <class 'int'>, <class 'str'> 같은 형태로 표시됩니다.
+    디버깅이나 타입 확인에 매우 유용합니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - type(값) 형태로 사용
+    - 데이터 타입 확인
+    - <class '타입이름'> 형태로 반환
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### type() 함수 사용
+
+    다양한 값의 타입을 확인합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0045():
+        point = 100
+        return type(point)
+    _snippet_0045()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## len() 함수
+
+    *문자열 길이 측정*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    len() 함수는 문자열의 길이(문자 개수)를 반환합니다.
+    len은 length(길이)의 줄임말입니다.
+    공백, 특수문자, 한글 모두 각각 1로 계산됩니다.
+    빈 문자열('')의 길이는 0입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - len(문자열) 형태로 사용
+    - 문자 개수 반환
+    - 공백도 1로 계산
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### len() 함수 사용
+
+    문자열의 길이를 측정합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0050():
+        email = 'python@example.com'
+        return len(email)
+    _snippet_0050()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    > **팁**
+    >
+    > 'Hello World'의 길이는 11입니다. 공백도 문자로 계산됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## int() 변환
+
+    *정수로 변환하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    int() 함수는 다른 타입을 정수로 변환합니다.
+    문자열 '100'을 숫자 100으로 바꿀 수 있습니다.
+    단, 문자열은 숫자로만 이루어져 있어야 합니다.
+    실수를 정수로 변환하면 소수점 이하는 버려집니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - int(값) 형태로 사용
+    - 문자열을 정수로 변환
+    - 실수는 소수점 이하 버림
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### int() 변환
+
+    문자열과 실수를 정수로 변환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0056():
+        text = '100'
+        return int(text)
+    _snippet_0056()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## float() 변환
+
+    *실수로 변환하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    float() 함수는 다른 타입을 실수로 변환합니다.
+    정수 10을 실수 10.0으로 바꿀 수 있습니다.
+    문자열 '3.14'를 숫자 3.14로 변환할 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - float(값) 형태로 사용
+    - 정수를 실수로 변환
+    - 문자열을 실수로 변환
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### float() 변환
+
+    정수와 문자열을 실수로 변환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0061():
+        val = 42
+        return float(val)
+    _snippet_0061()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## str() 변환
+
+    *문자열로 변환하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    str() 함수는 어떤 값이든 문자열로 변환합니다.
+    숫자 25를 문자열 '25'로 바꿀 수 있습니다.
+    문자열 연결이나 출력 메시지를 만들 때 자주 사용됩니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - str(값) 형태로 사용
+    - 모든 타입을 문자열로 변환
+    - 문자열 연결에 필수
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### str() 변환
+
+    숫자를 문자열로 변환합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0066():
+        code = 123
+        return str(code)
+    _snippet_0066()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 다중 변수 할당
+
+    *한 줄로 여러 변수 선언*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    쉼표로 구분하여 한 줄에 여러 변수를 선언할 수 있습니다.
+    순서대로 매칭되므로 첫 번째 변수에 첫 번째 값이 저장됩니다.
+    코드를 더 간결하게 만들 수 있습니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - 쉼표로 변수와 값 구분
+    - 순서대로 매칭
+    - 코드 간결화
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 다중 변수 할당
+
+    여러 변수를 한 줄에 선언합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0071():
+        name, age, city = 'Alice', 25, 'Seoul'
+        return (name, age, city)
+    _snippet_0071()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 같은 값 할당
+
+    *여러 변수에 동일한 값*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    = 연산자를 연결하면 여러 변수에 같은 값을 동시에 할당할 수 있습니다.
+    모든 변수가 동일한 값을 가지게 됩니다.
+    초기화할 때 자주 사용하는 패턴입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    - = 연산자 연결
+    - 모든 변수에 같은 값
+    - 초기화에 유용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 같은 값 할당
+
+    여러 변수에 같은 값을 할당합니다.
+    """)
+    return
+
+@app.cell
+def _():
+    def _snippet_0076():
+        a = b = c = 0
+        return a
+    _snippet_0076()
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## Day 2 종합 복습
+
+    *변수와 타입 마스터하기*
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    Day 2에서 배운 변수, 데이터 타입, 타입 변환을 난이도별로 복습합니다.
+    🟢 기본 미션부터 시작하여 🔴 심화 미션까지 도전해보세요.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본1: 변수 선언
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본2: 정수 변수
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본3: 실수 변수
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본4: 타입 확인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟢 기본5: 길이 확인
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1-1: 사용자 이름과 나이
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 사용자 이름
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 사용자 나이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용1-2: 사용자 도시
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용2: 나이 계산
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용3: 가격 계산
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4-1: 문자열 길이
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 문자열 내용
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 문자열 길이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용4-2: 문자열 타입
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🟡 응용5: 다중 할당 활용
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-1: 프로필 기본 정보
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 이름
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 나이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 직업
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화1-2: 프로필 상세 정보
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 급여
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 활성 상태
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 이름 길이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-1: 상품 기본 정보
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 상품명
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 단가
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화2-2: 상품 재고 가치
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 재고 수량
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 총 가치
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-1: 문자열 검증
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 텍스트 값
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 텍스트 타입
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 텍스트 길이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화3-2: 숫자 변환 검증
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 문자열 숫자
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 정수로 변환
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 변환된 타입
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-1: 학생 개별 과목 성적
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 학생 이름
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 수학 성적
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 영어 성적
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화4-2: 학생 평균 성적
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 과학 성적
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 평균 계산
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-1: 타입 변환 1단계
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 원본 문자열
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 실수로 변환
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 정수로 변환
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ### 연습: 🔴 심화5-2: 타입 변환 2단계
+
+    아래 빈 코드 셀에 직접 작성하세요. 바로 위 예제를 그대로 복사하기보다 이름이나 값을 조금 바꿔 다시 써보는 것이 목표입니다.
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 문자열로 변환
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    #### 최종 길이
+    """)
+    return
+
+@app.cell
+def _(mo):
+    mo.md(r"""
+    ## 마무리
+
+    오늘 노트북에서 직접 작성한 연습 셀을 다시 훑어보세요. 설명을 보지 않고 같은 코드를 한 번 더 쓸 수 있으면 다음 Day로 넘어갑니다.
+    """)
+    return
+
 
 if __name__ == "__main__":
     app.run()
