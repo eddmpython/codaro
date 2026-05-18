@@ -5,7 +5,7 @@ description: Documentation and session rules for keeping project context aligned
 category: ops
 section: guides
 order: 307
-purpose: CLAUDE.md/AGENTS.md와 코드 구조가 어긋나면 즉시 갱신. 세션 종료 전 가장 가까운 docs/skills/.../README.md에 Current State / Next Action / Verification Left 갱신.
+purpose: CLAUDE.md와 코드 구조가 어긋나면 즉시 갱신하고 AGENTS.md는 CLAUDE.md 포인터로 유지. 세션 종료 전 가장 가까운 docs/skills/.../README.md에 Current State / Next Action / Verification Left 갱신.
 whenToUse: 세션 종료 직전, 폴더 구조 변경 후, 죽은 참조 발견 시.
 ---
 
@@ -23,4 +23,5 @@ whenToUse: 세션 종료 직전, 폴더 구조 변경 후, 죽은 참조 발견 
 - 다음 세션은 먼저 프로젝트 메모리, 그다음 관련 기능 문서, 마지막으로 직전 수정 파일을 읽고 시작한다.
 - 채팅 기록만 믿고 이어가지 않는다. 설계 결정과 남은 작업은 반드시 저장소 안 문서로 고정한다.
 - 코드 변경이 있었는데 문서가 업데이트되지 않았다면 세션 종료 전에 문서를 먼저 맞춘다.
-- `CLAUDE.md`와 `AGENTS.md` 동기화 검사는 `uv run python -X utf8 docs/skills/ops/tools/syncAgentsMd.py --check`로 수행한다.
+- `CLAUDE.md`가 로컬 규칙의 SSOT이고, `AGENTS.md`는 `CLAUDE.md`를 먼저 읽으라는 진입점 포인터로 둔다.
+- `AGENTS.md` 포인터 검사는 `uv run python -X utf8 docs/skills/ops/tools/syncAgentsMd.py --check`로 수행한다.

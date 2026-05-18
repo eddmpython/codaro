@@ -1,13 +1,11 @@
-"""CLAUDE.md <-> AGENTS.md byte-identical sync gate.
+"""CLAUDE.md -> AGENTS.md pointer sync gate.
 
 Run modes:
-    uv run python -X utf8 docs/skills/ops/tools/syncAgentsMd.py            # copy CLAUDE.md to AGENTS.md
-    uv run python -X utf8 docs/skills/ops/tools/syncAgentsMd.py --check    # exit 1 if they drift
-    uv run python -X utf8 docs/skills/ops/tools/syncAgentsMd.py --reverse  # copy AGENTS.md to CLAUDE.md
+    uv run python -X utf8 docs/skills/ops/tools/syncAgentsMd.py
+    uv run python -X utf8 docs/skills/ops/tools/syncAgentsMd.py --check
 
-Source of truth defaults to CLAUDE.md. The two files must remain byte-identical
-because Codaro entrypoint rules (see docs/skills/ops/doc-and-session.md) require
-that AGENTS.md and CLAUDE.md never drift.
+CLAUDE.md is the local rule source of truth. AGENTS.md is a thin entrypoint
+that tells agents to read CLAUDE.md first.
 """
 
 from __future__ import annotations
@@ -21,47 +19,65 @@ CLAUDE_PATH = REPO_ROOT / "CLAUDE.md"
 AGENTS_PATH = REPO_ROOT / "AGENTS.md"
 
 
-def readBytes(path: Path) -> bytes:
+def readText(path: Path) -> str:
     if not path.exists():
         raise FileNotFoundError(f"missing: {path}")
-    return path.read_bytes()
+    return path.read_text(encoding="utf-8")
 
 
-def writeBytes(path: Path, data: bytes) -> None:
-    path.write_bytes(data)
+def writeText(path: Path, data: str) -> None:
+    path.write_text(data, encoding="utf-8", newline="\n")
+
+
+def buildAgentsPointer() -> str:
+    return (
+        "# Codaro 프로젝트 규칙\n"
+        "\n"
+        "이 파일은 에이전트 진입점 포인터입니다. 상세 규칙의 SSOT는 [CLAUDE.md](CLAUDE.md)입니다.\n"
+        "\n"
+        "작업 시작 전 반드시:\n"
+        "\n"
+        "1. `CLAUDE.md`를 먼저 읽는다.\n"
+        "2. `C:\\Users\\MSI\\.claude\\projects\\c--Users-MSI-OneDrive-Desktop-sideProject-codaro\\memory\\MEMORY.md`를 읽는다.\n"
+        "3. 관련 상세 규칙은 `docs/skills/`에서 확인한다.\n"
+        "\n"
+        "이 파일에는 전체 규칙을 복사하지 않는다. `uv run python -X utf8 docs/skills/ops/tools/syncAgentsMd.py`로 포인터를 재생성한다.\n"
+    )
 
 
 def runCheck() -> int:
-    claudeBytes = readBytes(CLAUDE_PATH)
-    agentsBytes = readBytes(AGENTS_PATH)
-    if claudeBytes == agentsBytes:
-        print("ok: CLAUDE.md and AGENTS.md are byte-identical")
+    readText(CLAUDE_PATH)
+    agentsText = readText(AGENTS_PATH)
+    expectedText = buildAgentsPointer()
+    if agentsText == expectedText:
+        print("ok: AGENTS.md points to CLAUDE.md")
         return 0
-    print("drift: CLAUDE.md and AGENTS.md differ", file=sys.stderr)
-    print(f"  CLAUDE.md  {len(claudeBytes):>6} bytes", file=sys.stderr)
-    print(f"  AGENTS.md  {len(agentsBytes):>6} bytes", file=sys.stderr)
-    print("run 'uv run python -X utf8 docs/skills/ops/tools/syncAgentsMd.py' to sync", file=sys.stderr)
+    print("drift: AGENTS.md is not the expected CLAUDE.md pointer", file=sys.stderr)
+    print(f"  expected {len(expectedText.encode('utf-8')):>6} bytes", file=sys.stderr)
+    print(f"  actual   {len(agentsText.encode('utf-8')):>6} bytes", file=sys.stderr)
+    print(
+        "run 'uv run python -X utf8 docs/skills/ops/tools/syncAgentsMd.py' to regenerate",
+        file=sys.stderr,
+    )
     return 1
 
 
-def runCopy(reverse: bool) -> int:
-    src = AGENTS_PATH if reverse else CLAUDE_PATH
-    dst = CLAUDE_PATH if reverse else AGENTS_PATH
-    data = readBytes(src)
-    writeBytes(dst, data)
-    print(f"copied: {src.name} -> {dst.name} ({len(data)} bytes)")
+def runCopy() -> int:
+    readText(CLAUDE_PATH)
+    data = buildAgentsPointer()
+    writeText(AGENTS_PATH, data)
+    print(f"written: {AGENTS_PATH.name} -> CLAUDE.md pointer ({len(data.encode('utf-8'))} bytes)")
     return 0
 
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="exit 1 on drift")
-    parser.add_argument("--reverse", action="store_true", help="copy AGENTS.md to CLAUDE.md instead")
     args = parser.parse_args()
 
     if args.check:
         return runCheck()
-    return runCopy(reverse=args.reverse)
+    return runCopy()
 
 
 if __name__ == "__main__":
