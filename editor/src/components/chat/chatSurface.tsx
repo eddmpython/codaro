@@ -46,20 +46,20 @@ export function ChatSurface({
           </div>
           <AssistantComposer
             loading={loading}
-            placeholder="레슨, 실습 노트북, 브라우저 루틴, 리포트, 자동화를 요청하세요."
+            placeholder="레슨, 실습 노트북, 브라우저 루틴, 자동화, 태스크를 요청하세요."
             prompt={prompt}
             variant="hero"
             onAsk={onAsk}
             onPromptChange={onPromptChange}
           />
           <div className="mt-4 flex flex-wrap justify-center gap-2">
-            <Button size="sm" variant="outline" onClick={() => onAsk("실습 검증이 포함된 3단계 pandas 레슨을 만들어줘.", "curriculum")}>
+            <Button size="sm" type="button" variant="outline" onClick={() => onAsk("실습 검증이 포함된 3단계 pandas 레슨을 만들어줘.", "curriculum")}>
               Pandas 레슨
             </Button>
-            <Button size="sm" variant="outline" onClick={() => onAsk("브라우저 자동화 학습 루틴을 처음부터 만들어줘.", "curriculum")}>
+            <Button size="sm" type="button" variant="outline" onClick={() => onAsk("브라우저 자동화 학습 루틴을 처음부터 만들어줘.", "curriculum")}>
               브라우저 루틴
             </Button>
-            <Button size="sm" variant="outline" onClick={() => onAsk("반복 업무를 공유 가능한 자동화 노트북으로 바꿔줘.", "curriculum")}>
+            <Button size="sm" type="button" variant="outline" onClick={() => onAsk("반복 업무를 공유 가능한 자동화 노트북으로 바꿔줘.", "curriculum")}>
               자동화 노트북
             </Button>
           </div>

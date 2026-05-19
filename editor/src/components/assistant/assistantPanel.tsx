@@ -4,6 +4,7 @@ import {
   RotateCcw,
   Send,
 } from "lucide-react";
+import { useRef } from "react";
 
 import {
   EmptyState,
@@ -191,6 +192,7 @@ export function AssistantComposer({
   onPromptChange: (value: string) => void;
 }) {
   const canAsk = Boolean(prompt.trim()) && !loading;
+  const submittedOnKeyDownRef = useRef(false);
   const submit = () => {
     if (!canAsk) return;
     onAsk();
@@ -218,12 +220,24 @@ export function AssistantComposer({
         value={prompt}
         onChange={(event) => onPromptChange(event.target.value)}
         onKeyDown={(event) => {
+          submittedOnKeyDownRef.current = false;
           const nativeEvent = event.nativeEvent as KeyboardEvent & { isComposing?: boolean };
           if (nativeEvent.isComposing) return;
           if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
+            submittedOnKeyDownRef.current = true;
             submit();
           }
+        }}
+        onKeyUp={(event) => {
+          const nativeEvent = event.nativeEvent as KeyboardEvent & { isComposing?: boolean };
+          if (event.key !== "Enter" || event.shiftKey || nativeEvent.isComposing) return;
+          if (submittedOnKeyDownRef.current) {
+            submittedOnKeyDownRef.current = false;
+            return;
+          }
+          event.preventDefault();
+          submit();
         }}
       />
       <IconButton className="self-end" disabled={!canAsk} label="보내기" type="submit" variant="default">

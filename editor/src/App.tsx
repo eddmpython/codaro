@@ -685,9 +685,7 @@ function App() {
       content: message,
     };
     setMessages((current) => [...current, userMessage]);
-    if (!messageOverride) {
-      setPrompt("");
-    }
+    setPrompt("");
     setAssistantLoading(true);
 
     if (!apiOnline) {
