@@ -1,24 +1,12 @@
 ﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { codaroApi, optional, shouldUseApi } from "@/lib/api";
-import { cn } from "@/lib/utils";
+import { MainSurface } from "@/components/app/mainSurface";
 import { TopBar } from "@/components/app/topBar";
 import { ProductSidebar, type SidebarCustomCurriculum } from "@/components/app/productSidebar";
 import {
-  TeacherPanel,
   aiProviderName,
   type AssistantMessage,
 } from "@/components/assistant/assistantPanel";
-import { AutomationView } from "@/components/automation/automationSurface";
-import { ChatSurface } from "@/components/chat/chatSurface";
-import {
-  CodeCellEditor,
-  NotebookPanel,
-} from "@/components/notebook/notebookPanel";
-import {
-  CollapsedAssistantButton,
-  CurriculumCellToc,
-  CurriculumView,
-} from "@/components/curriculum/curriculumSurface";
 import {
   categorySubtitle,
   categoryTitle,
@@ -993,10 +981,8 @@ function App() {
           canRun={canRun}
           categories={filteredCategories}
           contents={contents}
-          contentsLoading={contentsLoading}
           curriculumDocument={curriculumDocument}
           conversationId={conversationId}
-          currentResult={currentResult}
           document={document}
           drafts={drafts}
           eStop={eStop}
@@ -1013,7 +999,6 @@ function App() {
           selectedContentId={selectedContentId}
           surface={surface}
           tasks={tasks}
-          variables={variables}
           loadState={loadState}
           assistantCollapsed={assistantCollapsed}
           onAddCell={addNotebookCell}
@@ -1033,238 +1018,12 @@ function App() {
           onRunBlock={runBlock}
           onRunTask={runTask}
           onSelectBlock={setSelectedBlockId}
-          onSelectCategory={selectCurriculumCategory}
-          onSelectContent={selectCurriculumContent}
           onSelectCurriculumBlock={setSelectedCurriculumBlockId}
-          onSurfaceChange={setSurface}
           onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
           onToggleEStop={toggleEStop}
         />
       </SidebarInset>
     </SidebarProvider>
-  );
-}
-
-type MainSurfaceProps = {
-  aiConnecting: boolean;
-  aiProfile: AiProfile | null;
-  apiOnline: boolean;
-  auditCount: number;
-  automationSection: AutomationSection;
-  assistantLoading: boolean;
-  canRun: boolean;
-  categories: CurriculumCategory[];
-  contents: CurriculumContentSummary[];
-  contentsLoading: boolean;
-  curriculumDocument: CodaroDocument | null;
-  conversationId: string | null;
-  currentResult?: ExecutionResult;
-  document: CodaroDocument;
-  drafts: Record<string, string>;
-  eStop: EStopStatus;
-  messages: AssistantMessage[];
-  pendingBlocks: BlockConfig[];
-  prompt: string;
-  referenceLoading: boolean;
-  results: ResultMap;
-  runningBlockId: string | null;
-  scheduler: SchedulerStatus;
-  selectedCategory: string;
-  selectedBlockId: string;
-  selectedCurriculumBlockId: string;
-  selectedContentId: string;
-  surface: SurfaceMode;
-  tasks: TaskListPayload;
-  variables: VariableInfo[];
-  loadState: LoadState;
-  assistantCollapsed: boolean;
-  onAddCell: (type: "code" | "markdown") => void;
-  onAsk: (messageOverride?: string, scopeOverride?: TeacherScope) => void;
-  onAcceptPendingBlocks: () => void;
-  onCellAsk: (action: CellAiAction, block: BlockConfig) => void;
-  onConnectAi: () => void;
-  onDraftChange: (blockId: string, value: string) => void;
-  onNewChat: () => void;
-  onPromptChange: (value: string) => void;
-  onRejectPendingBlocks: () => void;
-  onRefreshAutomation: () => void;
-  onRunBlock: (block: BlockConfig) => void;
-  onRunTask: (task: TaskDefinition) => void;
-  onSelectBlock: (blockId: string) => void;
-  onSelectCategory: (key: string) => void;
-  onSelectContent: (contentId: string) => void;
-  onSelectCurriculumBlock: (blockId: string) => void;
-  onSurfaceChange: (surface: SurfaceMode) => void;
-  onToggleAssistant: () => void;
-  onToggleEStop: () => void;
-};
-
-function MainSurface(props: MainSurfaceProps) {
-  const activeDocument = props.surface === "curriculum" && props.curriculumDocument ? props.curriculumDocument : props.document;
-  const activeBlockId = props.surface === "curriculum" ? props.selectedCurriculumBlockId : props.selectedBlockId;
-  const selectedBlock =
-    activeDocument.blocks.find((block) => block.id === activeBlockId) ??
-    activeDocument.blocks.find((block) => block.type === "code") ??
-    activeDocument.blocks[0];
-
-  if (props.surface === "chat") {
-    return (
-      <ChatSurface
-        loading={props.assistantLoading}
-        loadState={props.loadState}
-        messages={props.messages}
-        pendingBlocks={props.pendingBlocks}
-        prompt={props.prompt}
-        onAsk={props.onAsk}
-        onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-        onPromptChange={props.onPromptChange}
-        onRejectPendingBlocks={props.onRejectPendingBlocks}
-      />
-    );
-  }
-
-  if (props.surface === "editor") {
-    return (
-      <div
-        className={cn(
-          "grid h-[calc(100vh-40px)] min-h-0 grid-cols-1",
-          props.assistantCollapsed ? "xl:grid-cols-[minmax(0,1fr)_48px]" : "xl:grid-cols-[minmax(0,1fr)_380px]",
-        )}
-      >
-        <NotebookPanel
-          canRun={props.canRun}
-          document={props.document}
-          drafts={props.drafts}
-          pendingBlocks={props.pendingBlocks}
-          results={props.results}
-          runningBlockId={props.runningBlockId}
-          selectedBlockId={props.selectedBlockId}
-          onAddCell={props.onAddCell}
-          onDraftChange={props.onDraftChange}
-          onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-          onCellAsk={props.onCellAsk}
-          onRejectPendingBlocks={props.onRejectPendingBlocks}
-          onRunBlock={props.onRunBlock}
-          onSelectBlock={props.onSelectBlock}
-        />
-        {props.assistantCollapsed ? (
-          <CollapsedAssistantButton onClick={props.onToggleAssistant} />
-        ) : (
-          <TeacherPanel
-            aiConnecting={props.aiConnecting}
-            aiProfile={props.aiProfile}
-            apiOnline={props.apiOnline}
-            conversationId={props.conversationId}
-            loading={props.assistantLoading}
-            messages={props.messages}
-            pendingBlocks={props.pendingBlocks}
-            placement="right"
-            prompt={props.prompt}
-          selectedBlock={selectedBlock}
-          onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-          onAsk={props.onAsk}
-          onConnectAi={props.onConnectAi}
-            onNewChat={props.onNewChat}
-            onPromptChange={props.onPromptChange}
-            onRejectPendingBlocks={props.onRejectPendingBlocks}
-          />
-        )}
-      </div>
-    );
-  }
-
-  if (props.surface === "curriculum") {
-    const curriculumDoc = props.curriculumDocument ?? props.document;
-    const isCustomCurriculum = props.selectedCategory === CUSTOM_CURRICULUM_CATEGORY;
-    const selectedCategoryLabel =
-      isCustomCurriculum
-        ? "나만의 커리큘럼"
-        : props.categories.find((category) => category.key === props.selectedCategory)?.name ?? props.selectedCategory;
-    const selectedContentLabel =
-      isCustomCurriculum
-        ? curriculumDoc.title
-        : props.contents.find((content) => content.contentId === props.selectedContentId)?.title ?? props.selectedContentId;
-    return (
-      <div
-        className={cn(
-          "grid h-[calc(100vh-40px)] min-h-0 grid-cols-1",
-          props.assistantCollapsed
-            ? "xl:grid-cols-[minmax(0,1fr)_48px] 2xl:grid-cols-[minmax(0,1fr)_44px_48px]"
-            : "xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_44px_360px]",
-        )}
-      >
-        <CurriculumView
-          canRun={props.canRun}
-          document={curriculumDoc}
-          drafts={props.drafts}
-          pendingBlocks={props.pendingBlocks}
-          referenceLoading={props.referenceLoading}
-          results={props.results}
-          runningBlockId={props.runningBlockId}
-          selectedBlockId={props.selectedCurriculumBlockId}
-          selectedCategory={props.selectedCategory}
-          selectedCategoryLabel={selectedCategoryLabel}
-          selectedContentId={props.selectedContentId}
-          selectedContentLabel={selectedContentLabel}
-          renderCodeCellEditor={({ block, draft, onChange, onFocus, onRun }) => (
-            <CodeCellEditor
-              autoFocus
-              placeholderText={block.role === "snippet" ? "예제를 보고 직접 입력하세요." : "여기에 Python 코드를 입력하세요."}
-              value={draft}
-              onChange={onChange}
-              onFocus={onFocus}
-              onRun={onRun}
-            />
-          )}
-          onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-          onCellAsk={props.onCellAsk}
-          onDraftChange={props.onDraftChange}
-          onRejectPendingBlocks={props.onRejectPendingBlocks}
-          onRunBlock={props.onRunBlock}
-          onSelectBlock={props.onSelectCurriculumBlock}
-        />
-        <CurriculumCellToc
-          document={curriculumDoc}
-          selectedBlockId={props.selectedCurriculumBlockId}
-          onSelectBlock={props.onSelectCurriculumBlock}
-        />
-        {props.assistantCollapsed ? (
-          <CollapsedAssistantButton onClick={props.onToggleAssistant} />
-        ) : (
-          <TeacherPanel
-            aiConnecting={props.aiConnecting}
-            aiProfile={props.aiProfile}
-            apiOnline={props.apiOnline}
-            conversationId={props.conversationId}
-            loading={props.assistantLoading}
-            messages={props.messages}
-            pendingBlocks={props.pendingBlocks}
-            placement="right"
-            prompt={props.prompt}
-            selectedBlock={selectedBlock}
-            onAcceptPendingBlocks={props.onAcceptPendingBlocks}
-            onAsk={props.onAsk}
-            onConnectAi={props.onConnectAi}
-            onNewChat={props.onNewChat}
-            onPromptChange={props.onPromptChange}
-            onRejectPendingBlocks={props.onRejectPendingBlocks}
-          />
-        )}
-      </div>
-    );
-  }
-
-  return (
-    <AutomationView
-      activeSection={props.automationSection}
-      auditCount={props.auditCount}
-      eStop={props.eStop}
-      scheduler={props.scheduler}
-      tasks={props.tasks.tasks}
-      onRefresh={props.onRefreshAutomation}
-      onRunTask={props.onRunTask}
-      onToggleEStop={props.onToggleEStop}
-    />
   );
 }
 
