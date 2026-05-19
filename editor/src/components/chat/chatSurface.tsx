@@ -89,7 +89,7 @@ export function ChatSurface({
 
   return (
     <div className="h-[calc(100vh-40px)] min-h-0">
-      <section className="mx-auto grid h-full min-h-0 w-full max-w-4xl grid-rows-[1fr_auto] p-3 pt-5">
+      <section className="grid h-full min-h-0 w-full grid-rows-[minmax(0,1fr)_auto] pt-5">
         <AssistantMessages
           aiConnecting={aiConnecting}
           aiProfile={aiProfile}
@@ -99,7 +99,7 @@ export function ChatSurface({
           messages={messages}
           onConnectAi={onConnectAi}
         />
-        <div>
+        <div className="mx-auto w-full max-w-4xl p-3 pt-0">
           <PendingNotebookBar
             pendingBlocks={pendingBlocks}
             onAccept={onAcceptPendingBlocks}

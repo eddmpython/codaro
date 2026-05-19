@@ -689,27 +689,35 @@ function App() {
 
     if (!apiOnline) {
       const generatedBlocks = activeScope === "cell" ? [] : buildLocalBlocksFromPrompt(message, activeScope);
+      const savedEntry = generatedBlocks.length && activeScope !== "cell"
+        ? saveCustomCurriculum(generatedBlocks)
+        : null;
       if (generatedBlocks.length) {
-        setPendingTarget("curriculum");
-        setPendingBlocks((current) => {
-          const knownIds = new Set(current.map((block) => block.id));
-          return [...current, ...generatedBlocks.filter((block) => !knownIds.has(block.id))];
-        });
+        if (activeScope === "cell") {
+          setPendingTarget("notebook");
+          setPendingBlocks((current) => {
+            const knownIds = new Set(current.map((block) => block.id));
+            return [...current, ...generatedBlocks.filter((block) => !knownIds.has(block.id))];
+          });
+        } else {
+          setPendingBlocks([]);
+          setPendingTarget("notebook");
+        }
       }
       setMessages((current) => [
         ...current,
         {
           id: `assistant-preview-${Date.now()}`,
           role: "assistant",
-          content: buildLocalAssistantAnswer(message, activeScope, generatedBlocks.length),
+          content: buildLocalAssistantAnswer(message, activeScope, generatedBlocks.length, Boolean(savedEntry)),
           provider: "기본 안내",
           model: "기본 안내",
         },
       ]);
       setNotice({
         tone: generatedBlocks.length ? "success" : "default",
-        title: generatedBlocks.length ? "커리큘럼 초안 준비됨" : "어시스턴트 답변 완료",
-        detail: generatedBlocks.length ? `${generatedBlocks.length}개 학습 셀을 생성했습니다.` : "셀 안내가 준비됐습니다.",
+        title: savedEntry ? "나만의 커리큘럼 저장됨" : generatedBlocks.length ? "커리큘럼 초안 준비됨" : "어시스턴트 답변 완료",
+        detail: savedEntry?.title ?? (generatedBlocks.length ? `${generatedBlocks.length}개 학습 셀을 생성했습니다.` : "셀 안내가 준비됐습니다."),
       });
       setAssistantLoading(false);
       return;
@@ -815,13 +823,25 @@ function App() {
         } else {
           const generatedBlocks = collectBlocksFromToolCalls(response.toolCalls);
           if (generatedBlocks.length) {
-            setPendingTarget(activeScope === "cell" ? "notebook" : "curriculum");
-            setPendingBlocks((current) => {
-              const knownIds = new Set(current.map((block) => block.id));
-              return [...current, ...generatedBlocks.filter((block) => !knownIds.has(block.id))];
-            });
+            if (activeScope === "cell") {
+              setPendingTarget("notebook");
+              setPendingBlocks((current) => {
+                const knownIds = new Set(current.map((block) => block.id));
+                return [...current, ...generatedBlocks.filter((block) => !knownIds.has(block.id))];
+              });
+            } else {
+              savedCurriculumTitle = saveCustomCurriculum(generatedBlocks)?.title ?? "";
+              setPendingBlocks([]);
+              setPendingTarget("notebook");
+            }
           }
         }
+      }
+      if (!savedCurriculumTitle && activeScope !== "cell") {
+        const fallbackBlocks = buildLocalBlocksFromPrompt(message, activeScope);
+        savedCurriculumTitle = saveCustomCurriculum(fallbackBlocks)?.title ?? "";
+        setPendingBlocks([]);
+        setPendingTarget("notebook");
       }
       setMessages((current) => current.map((item) => (
         item.id === assistantMessageId
@@ -1172,7 +1192,7 @@ function assistantWorkStepFromToolCalls(toolCalls: NonNullable<AssistantMessage[
     id: "work-results",
     label: workStepLabel(toolCalls),
     status: "done",
-    detail: `${toolCalls.length}개 결과를 대화와 셀 상태에 반영했습니다.`,
+    detail: `${toolCalls.length}개 결과를 처리했습니다.`,
   };
 }
 

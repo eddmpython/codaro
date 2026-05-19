@@ -9,7 +9,6 @@ export function documentFromToolCalls(toolCalls: AiToolCall[]): CodaroDocument |
   for (const toolCall of toolCalls) {
     const result = toolCall.result;
     if (!isRecord(result)) continue;
-    if (result.loadedInEditor === false) continue;
     const document = normalizeDocumentPayload(result.document, {
       fallbackIdPrefix: "tool",
       fallbackTitle: "Codaro 노트북",

@@ -86,7 +86,7 @@ export function buildLocalBlocksFromPrompt(message: string, scope: TeacherScope)
   ];
 }
 
-export function buildLocalAssistantAnswer(message: string, scope: TeacherScope, blockCount: number) {
+export function buildLocalAssistantAnswer(message: string, scope: TeacherScope, blockCount: number, saved = false) {
   const topic = inferLocalTopic(message);
   const scopeLabel = teacherScopeLabel(scope);
   if (scope === "cell") {
@@ -101,7 +101,9 @@ export function buildLocalAssistantAnswer(message: string, scope: TeacherScope, 
   return [
     "기본 안내 모드라 간단한 커리큘럼 초안만 표시합니다.",
     `${topic}용 ${scopeLabel} 노트북을 초안화했습니다.`,
-    `${blockCount}개 학습 셀을 검토할 수 있습니다. 적용하면 나만의 커리큘럼에 저장되고 커리큘럼 화면에서 열립니다.`,
+    saved
+      ? `${blockCount}개 학습 셀을 나만의 커리큘럼에 저장했고 커리큘럼 화면에서 열었습니다.`
+      : `${blockCount}개 학습 셀을 검토할 수 있습니다. 적용하면 나만의 커리큘럼에 저장되고 커리큘럼 화면에서 열립니다.`,
     "provider를 연결하면 커리큘럼 초안을 대화로 조정하고, 필요한 셀만 읽고 고치며 학습 흐름을 이어갑니다.",
   ].join("\n\n");
 }
@@ -174,6 +176,7 @@ function inferTypeName(value: string) {
 
 function inferLocalTopic(message: string) {
   const normalized = message.replace(/\s+/g, " ").trim();
+  if (/아무거나|해보자|시작|처음|입문/i.test(normalized)) return "파이썬 print와 변수";
   if (/browser|브라우저/i.test(normalized)) return "브라우저 자동화 루틴";
   if (/pandas/i.test(normalized)) return "Pandas 실습 레슨";
   if (/automation|routine|task|workflow|자동화|루틴|태스크|업무/i.test(normalized)) return "자동화 노트북";
