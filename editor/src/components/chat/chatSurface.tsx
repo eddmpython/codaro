@@ -2,10 +2,10 @@ import {
   AssistantComposer,
   AssistantMessages,
   type AssistantMessage,
-  type TeacherScope,
 } from "@/components/assistant/assistantPanel";
 import { PendingNotebookBar } from "@/components/app/appPrimitives";
 import { Button } from "@/components/ui/button";
+import type { TeacherScope } from "@/lib/teacherScope";
 import type {
   BlockConfig,
   LoadState,

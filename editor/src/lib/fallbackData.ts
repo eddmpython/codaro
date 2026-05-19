@@ -83,7 +83,7 @@ export const categoryMeta: Record<string, { title: string; subtitle: string; tra
   },
   pillow: {
     title: "Pillow",
-    subtitle: "파일, 리포트, 작은 도구에 쓰는 이미지 처리 레시피를 익힙니다.",
+    subtitle: "파일, 이미지, 작은 도구에 쓰는 처리 레시피를 익힙니다.",
     track: "자동화",
   },
   opencv: {
@@ -247,9 +247,9 @@ export const fallbackTasks: TaskListPayload = {
   tasks: [
     {
       id: "task-fallback-1",
-      name: "일일 학습 리포트",
-      description: "Python 문서를 실행하고 최신 진행 요약을 발행합니다.",
-      documentPath: "daily_report.py",
+      name: "일일 학습 요약",
+      description: "Python 문서를 실행하고 최신 진행 요약을 만듭니다.",
+      documentPath: "daily_summary.py",
       schedule: "@daily",
       enabled: true,
       outputs: ["stdout", "variables"],
@@ -262,7 +262,7 @@ export const fallbackTasks: TaskListPayload = {
         startedAt: new Date(Date.now() - 3600 * 1000).toISOString(),
         finishedAt: new Date(Date.now() - 3590 * 1000).toISOString(),
         durationMs: 998,
-        output: "리포트 준비됨",
+        output: "요약 준비됨",
         variables: { lessons: 1 },
       },
     },

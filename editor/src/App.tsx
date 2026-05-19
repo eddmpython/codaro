@@ -6,10 +6,7 @@ import { ProductSidebar, type SidebarCustomCurriculum } from "@/components/app/p
 import {
   TeacherPanel,
   aiProviderName,
-  inferTeacherScope,
-  teacherScopeLabel,
   type AssistantMessage,
-  type TeacherScope,
 } from "@/components/assistant/assistantPanel";
 import { AutomationView } from "@/components/automation/automationSurface";
 import { ChatSurface } from "@/components/chat/chatSurface";
@@ -39,8 +36,15 @@ import {
   registryContents,
   registryLesson,
 } from "@/lib/curriculaRegistry";
-import { shortPath, statusLabel, stringifyData } from "@/lib/displayFormat";
+import { shortPath, statusLabel } from "@/lib/displayFormat";
+import {
+  buildLocalAssistantAnswer,
+  buildLocalBlocksFromPrompt,
+  buildLocalExecutionResult,
+  firstOutputLine,
+} from "@/lib/localFallback";
 import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
+import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
 import {
   blockLabel,
   buildCellAiPrompt,
@@ -534,13 +538,13 @@ function App() {
 
     if (!apiOnline) {
       await sleep(250);
-      const result = previewExecutionResult(block, code, Object.keys(results).length + 1);
+      const result = buildLocalExecutionResult(block, code, Object.keys(results).length + 1);
       setResults((current) => ({ ...current, [block.id]: result }));
       setVariables(result.variables);
       setNotice({
         tone: "success",
         title: "셀 실행 완료",
-        detail: firstOutputLine(result) || "미리보기 출력 준비됨",
+        detail: firstOutputLine(result) || "출력 준비됨",
       });
       setRunningBlockId(null);
       return;
@@ -583,7 +587,7 @@ function App() {
       const nextResults = Object.fromEntries(
         codeBlocks.map((block, index) => [
           block.id,
-          previewExecutionResult(block, drafts[block.id] ?? block.content, index + 1),
+          buildLocalExecutionResult(block, drafts[block.id] ?? block.content, index + 1),
         ]),
       ) as ResultMap;
       setResults((current) => ({ ...current, ...nextResults }));
@@ -689,7 +693,7 @@ function App() {
     setAssistantLoading(true);
 
     if (!apiOnline) {
-      const generatedBlocks = activeScope === "cell" ? [] : previewBlocksFromPrompt(message, activeScope);
+      const generatedBlocks = activeScope === "cell" ? [] : buildLocalBlocksFromPrompt(message, activeScope);
       if (generatedBlocks.length) {
         setPendingTarget("curriculum");
         setPendingBlocks((current) => {
@@ -702,7 +706,7 @@ function App() {
         {
           id: `assistant-preview-${Date.now()}`,
           role: "assistant",
-          content: previewAssistantAnswer(message, activeScope, generatedBlocks.length),
+          content: buildLocalAssistantAnswer(message, activeScope, generatedBlocks.length),
           provider: "LLM 미연결",
           model: "기본 안내",
         },
@@ -861,7 +865,7 @@ function App() {
       setNotice({
         tone: "success",
         title: "태스크 성공",
-        detail: `${task.name} 미리보기 실행을 완료했습니다.`,
+        detail: `${task.name} 실행을 완료했습니다.`,
       });
       return;
     }
@@ -1377,187 +1381,8 @@ function titleFromBlocks(blocks: BlockConfig[]) {
   return blockLabel(first);
 }
 
-function previewBlocksFromPrompt(message: string, scope: TeacherScope): BlockConfig[] {
-  const topic = inferPreviewTopic(message);
-  const seed = `${Date.now()}-${slugifyText(topic)}`;
-  const scopeLine = scope === "cell"
-    ? "선택한 셀에서 시작해 작은 실습 단계로 확장합니다."
-    : scope === "lesson"
-      ? "현재 레슨을 집중 학습 흐름으로 다시 구성합니다."
-      : "셀로 전개할 수 있는 커리큘럼 개요를 초안화합니다.";
-
-  return [
-    {
-      id: `preview-${seed}-goal`,
-      type: "markdown",
-      content: `# ${topic}\n\n${scopeLine}\n\nCodaro는 먼저 커리큘럼 YAML을 만들고, 검토 가능한 학습 셀로 전개합니다.`,
-      displayKind: "hero",
-      role: "title",
-      sourceType: "intro",
-      title: topic,
-      payload: {
-        title: topic,
-        description: scopeLine,
-        points: [
-          "학습 목표를 먼저 잡습니다.",
-          "실행 가능한 실습 셀을 만듭니다.",
-          "검증 셀로 답을 확인합니다.",
-        ],
-      },
-    },
-    {
-      id: `preview-${seed}-concept`,
-      type: "markdown",
-      content: `## 개념\n\n- 학습자 목표를 정의합니다.\n- 실행 가능한 예제 하나를 만듭니다.\n- 학습자가 답을 확인할 수 있도록 검증 셀을 추가합니다.`,
-      displayKind: "cardGrid",
-      role: "learning",
-      sourceType: "featureCards",
-      title: "학습 흐름",
-      payload: {
-        title: "학습 흐름",
-        cards: [
-          { title: "목표", description: "무엇을 익힐지 한 문장으로 고정합니다." },
-          { title: "실습", description: "작은 코드를 직접 수정하고 실행합니다." },
-          { title: "검증", description: "출력과 상태를 기준으로 답을 확인합니다." },
-        ],
-      },
-    },
-    {
-      id: `preview-${seed}-practice`,
-      type: "code",
-      content: `topic = "${topic}"\nprint(f"실습: {topic}")\n# 이 줄을 바꾼 뒤 셀을 다시 실행하세요.`,
-      displayKind: "code",
-      role: "exercise",
-      sourceType: "expansion",
-      title: "직접 실습",
-      guide: {
-        exerciseType: "practice",
-        hints: ["먼저 셀을 실행하세요.", "topic 텍스트를 바꿔 보세요.", "수정 후 검증 셀을 사용하세요."],
-        checkConfig: {},
-        difficulty: "easy",
-        solution: `topic = "${topic}"\nprint(f"실습: {topic}")`,
-        description: "생성된 실습 셀을 편집하고 실행합니다.",
-        studentAnswer: "",
-      },
-    },
-    {
-      id: `preview-${seed}-check`,
-      type: "code",
-      content: `assert topic\nprint("검증 통과")`,
-      displayKind: "code",
-      role: "check",
-      sourceType: "quiz",
-      title: "답 확인",
-      guide: {
-        exerciseType: "check",
-        hints: ["topic 변수는 비어 있으면 안 됩니다."],
-        checkConfig: {},
-        difficulty: "easy",
-        solution: `assert topic\nprint("검증 통과")`,
-        description: "실습 상태를 검증합니다.",
-        studentAnswer: "",
-      },
-    },
-  ];
-}
-
-function previewAssistantAnswer(message: string, scope: TeacherScope, blockCount: number) {
-  const topic = inferPreviewTopic(message);
-  const scopeLabel = teacherScopeLabel(scope);
-  if (scope === "cell") {
-    const cellSubject = /선택한|셀 내용|cell/i.test(message) ? "선택한 셀" : topic;
-    return [
-      "LLM 미연결 상태라 기본 안내만 표시합니다.",
-      `${cellSubject}에 대한 ${scopeLabel} 안내입니다.`,
-      "선택한 셀을 읽고 실행한 뒤, 출력을 기대 학습 목표와 비교하세요.",
-      "제공자를 연결하면 현재 셀과 실행 결과를 바탕으로 설명, 힌트, 검증을 이어갑니다.",
-    ].join("\n\n");
-  }
-  return [
-    "LLM 미연결 상태라 기본 커리큘럼 초안만 표시합니다.",
-    `${topic}용 ${scopeLabel} 노트북을 초안화했습니다.`,
-    `${blockCount}개 학습 셀을 검토할 수 있습니다. 적용하면 나만의 커리큘럼에 저장되고 커리큘럼 화면에서 열립니다.`,
-    "제공자를 연결하면 커리큘럼 초안을 대화로 조정하고, 필요한 셀만 읽고 고치며 학습 흐름을 이어갑니다.",
-  ].join("\n\n");
-}
-
-function previewExecutionResult(block: BlockConfig, code: string, executionCount: number): ExecutionResult {
-  const assignmentMap = collectPreviewAssignments(code);
-  const stdout = extractPreviewStdout(code, assignmentMap);
-  const variables = extractPreviewVariables(code);
-  return {
-    type: "text",
-    blockId: block.id,
-    data: stdout,
-    stdout,
-    stderr: "",
-    variables,
-    stateDelta: {
-      added: variables,
-      updated: [],
-      removed: [],
-    },
-    executionCount,
-    status: "success",
-  };
-}
-
-function extractPreviewStdout(code: string, assignmentMap: Record<string, string>) {
-  const printMatches = [...code.matchAll(/print\(([^)]*)\)/g)];
-  if (!printMatches.length) return "미리보기 실행 완료";
-  return printMatches
-    .map((match) => {
-      const raw = match[1].trim();
-      const text = raw.replace(/^f?["']|["']$/g, "");
-      return text.replace(/\{([A-Za-z_]\w*)\}/g, (_, name: string) => assignmentMap[name] ?? name).trim();
-    })
-    .filter(Boolean)
-    .join("\n");
-}
-
-function collectPreviewAssignments(code: string) {
-  return Object.fromEntries(
-    [...code.matchAll(/^\s*([A-Za-z_]\w*)\s*=\s*(.+)$/gm)].map((match) => [
-      match[1],
-      match[2].trim().replace(/^["']|["']$/g, ""),
-    ]),
-  );
-}
-
-function extractPreviewVariables(code: string): VariableInfo[] {
-  return [...code.matchAll(/^\s*([A-Za-z_]\w*)\s*=\s*(.+)$/gm)]
-    .slice(0, 12)
-    .map((match) => ({
-      name: match[1],
-      typeName: inferPreviewTypeName(match[2]),
-      repr: match[2].trim().slice(0, 80),
-    }));
-}
-
-function inferPreviewTypeName(value: string) {
-  const trimmed = value.trim();
-  if (/^["']/.test(trimmed)) return "str";
-  if (/^\d+(\.\d+)?$/.test(trimmed)) return trimmed.includes(".") ? "float" : "int";
-  if (/^\[/.test(trimmed)) return "list";
-  if (/^\{/.test(trimmed)) return "dict";
-  return "object";
-}
-
-function inferPreviewTopic(message: string) {
-  const normalized = message.replace(/\s+/g, " ").trim();
-  if (/browser|브라우저/i.test(normalized)) return "브라우저 자동화 루틴";
-  if (/pandas/i.test(normalized)) return "Pandas 실습 레슨";
-  if (/automation|routine|task|workflow|자동화|루틴|태스크|업무/i.test(normalized)) return "자동화 노트북";
-  if (/curriculum|커리큘럼/i.test(normalized)) return "학습 커리큘럼";
-  return normalized.slice(0, 48) || "Codaro 노트북";
-}
-
 function slugifyText(value: string) {
   return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "item";
-}
-
-function firstOutputLine(result: ExecutionResult) {
-  return (result.stderr || result.stdout || stringifyData(result.data)).split("\n").find(Boolean) ?? "";
 }
 
 function draftsFromDocument(document: CodaroDocument) {

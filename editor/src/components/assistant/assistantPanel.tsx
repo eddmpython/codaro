@@ -17,10 +17,9 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { blockLabel } from "@/lib/cellModel";
+import type { TeacherScope } from "@/lib/teacherScope";
 import { cn } from "@/lib/utils";
 import type { AiProfile, AiToolCall, BlockConfig } from "@/types";
-
-export type TeacherScope = "cell" | "lesson" | "curriculum";
 
 export type AssistantMessage = {
   id: string;
@@ -245,20 +244,6 @@ export function AssistantComposer({
       </IconButton>
     </form>
   );
-}
-
-export function teacherScopeLabel(scope: TeacherScope) {
-  if (scope === "lesson") return "레슨";
-  if (scope === "curriculum") return "커리큘럼";
-  return "셀";
-}
-
-export function inferTeacherScope(message: string, fallback: TeacherScope): TeacherScope {
-  const normalized = message.toLowerCase();
-  if (/커리큘럼|학습\s*경로|전체\s*과정|로드맵|curriculum/.test(normalized)) return "curriculum";
-  if (/레슨|강의|수업|lesson/.test(normalized)) return "lesson";
-  if (/셀|코드|답|출력|에러|오류|cell|answer|output|error/.test(normalized)) return "cell";
-  return fallback;
 }
 
 export function aiProviderName(profile: AiProfile | null) {

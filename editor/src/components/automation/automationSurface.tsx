@@ -83,7 +83,7 @@ export function AutomationView({
                 <CardDescription>기본 제공 자동화 템플릿입니다.</CardDescription>
               </CardHeader>
               <CardContent className="space-y-3">
-                {["파일 정리", "웹 리포트 수집", "엑셀 반복 작업"].map((name) => (
+                {["파일 정리", "웹 데이터 수집", "엑셀 반복 작업"].map((name) => (
                   <div className="flex items-center gap-3 rounded-md border bg-muted/10 px-3 py-2" key={name}>
                     <Workflow className="size-4 text-muted-foreground" />
                     <div className="min-w-0 flex-1">
