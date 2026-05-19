@@ -362,6 +362,36 @@ class ToolExecutor:
         result = await session.writeFile(path, content)
         return {"path": result, "written": True}
 
+    async def _handle_packagesCheck(self, args: dict[str, Any]) -> dict[str, Any]:
+        session = self._getSession()
+        names = args.get("names", [])
+        if not isinstance(names, list) or not names:
+            return {"error": "names must be a non-empty list"}
+        requested = [str(name).strip() for name in names if str(name).strip()]
+        installedPackages = await session.listPackages()
+        installedByName = {
+            package.name.lower().replace("_", "-"): package
+            for package in installedPackages
+        }
+        packageResults = []
+        missing = []
+        for name in requested:
+            normalized = name.lower().replace("_", "-")
+            package = installedByName.get(normalized)
+            installed = package is not None
+            if not installed:
+                missing.append(name)
+            packageResults.append({
+                "name": name,
+                "installed": installed,
+                "version": package.version if package is not None else None,
+            })
+        return {
+            "packages": packageResults,
+            "missing": missing,
+            "ready": not missing,
+        }
+
     async def _handle_packagesInstall(self, args: dict[str, Any]) -> dict[str, Any]:
         session = self._getSession()
         name = args["name"]

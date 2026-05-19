@@ -125,6 +125,7 @@ _TOOL_CATEGORIES: dict[str, str] = {
     "split-notebook": "files",
     "generate-notebook": "files",
     "fs-write": "files",
+    "packages-check": "files",
     "packages-install": "files",
     "http-request": "automation",
     "start-recording": "automation",
@@ -165,6 +166,7 @@ _TOOL_LANES: dict[str, str] = {
     "split-notebook": "write",
     "generate-notebook": "write",
     "fs-write": "write",
+    "packages-check": "read",
     "packages-install": "write",
     "http-request": "automation",
     "start-recording": "automation",
@@ -205,6 +207,7 @@ _TOOL_TARGETS: dict[str, str] = {
     "split-notebook": "file-system",
     "generate-notebook": "learning-editor",
     "fs-write": "file-system",
+    "packages-check": "kernel-runtime",
     "packages-install": "kernel-runtime",
     "http-request": "external-api",
     "start-recording": "desktop-automation",
@@ -505,6 +508,23 @@ TOOL_FS_WRITE = ToolDef(
         "required": ["path", "content"],
     },
     handler="fsWrite",
+)
+
+TOOL_PACKAGES_CHECK = ToolDef(
+    name="packages-check",
+    description="Check whether Python packages are already installed in the workspace environment before installing or running dependent cells.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "names": {
+                "type": "array",
+                "items": {"type": "string"},
+                "description": "Package names to check, e.g. ['pandas', 'matplotlib'].",
+            },
+        },
+        "required": ["names"],
+    },
+    handler="packagesCheck",
 )
 
 TOOL_PACKAGES_INSTALL = ToolDef(
@@ -1249,6 +1269,7 @@ def _registerDefaultTools() -> None:
         TOOL_CELL_CALL,
         TOOL_WRITE_CURRICULUM_YAML,
         TOOL_FS_WRITE,
+        TOOL_PACKAGES_CHECK,
         TOOL_PACKAGES_INSTALL,
         TOOL_CHECK_EXERCISE,
         TOOL_CREATE_GUIDE,

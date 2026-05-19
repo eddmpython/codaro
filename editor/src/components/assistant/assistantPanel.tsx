@@ -42,6 +42,12 @@ export type AssistantWorkStep = {
   label: string;
   status: "running" | "done" | "error";
   detail?: string;
+  toolName?: string;
+  arguments?: unknown;
+  result?: unknown;
+  error?: string | null;
+  startedAt?: number;
+  finishedAt?: number;
 };
 
 export function TeacherPanel({
@@ -236,11 +242,12 @@ function AssistantWorkLoop({ steps }: { steps?: AssistantWorkStep[] }) {
   if (!steps?.length) return null;
   const runningStep = steps.find((step) => step.status === "running");
   const hasError = steps.some((step) => step.status === "error");
+  const toolSteps = steps.filter((step) => step.toolName);
   const label = runningStep
     ? `처리 중 · ${runningStep.label}`
     : hasError
-      ? `처리 확인 필요 · ${steps.length}건`
-      : `처리 완료 · ${steps.length}건`;
+      ? `처리 확인 필요 · ${toolSteps.length || steps.length}건`
+      : `처리 완료 · ${toolSteps.length || steps.length}건`;
 
   return (
     <details className="my-2 rounded-md border bg-muted/20 px-3 py-2 text-xs text-muted-foreground" open={Boolean(runningStep)}>
@@ -256,23 +263,82 @@ function AssistantWorkLoop({ steps }: { steps?: AssistantWorkStep[] }) {
       </summary>
       <div className="mt-2 space-y-1 border-l pl-3">
         {steps.map((step) => (
-          <div className="flex items-start gap-2 leading-5" key={step.id}>
-            {step.status === "running" ? (
-              <Loader2 className="mt-1 size-3 animate-spin" />
-            ) : step.status === "error" ? (
-              <AlertCircle className="mt-1 size-3 text-destructive" />
-            ) : (
-              <CheckCircle2 className="mt-1 size-3 text-emerald-500" />
-            )}
-            <div className="min-w-0">
-              <div className="text-foreground">{step.label}</div>
-              {step.detail ? <div>{step.detail}</div> : null}
-            </div>
-          </div>
+          <AssistantWorkStepRow key={step.id} step={step} />
         ))}
       </div>
     </details>
   );
+}
+
+function AssistantWorkStepRow({ step }: { step: AssistantWorkStep }) {
+  const duration = step.startedAt && step.finishedAt ? formatDuration(step.finishedAt - step.startedAt) : null;
+  const icon = step.status === "running" ? (
+    <Loader2 className="mt-1 size-3 animate-spin" />
+  ) : step.status === "error" ? (
+    <AlertCircle className="mt-1 size-3 text-destructive" />
+  ) : (
+    <CheckCircle2 className="mt-1 size-3 text-emerald-500" />
+  );
+
+  if (!step.toolName) {
+    return (
+      <div className="flex items-start gap-2 leading-5">
+        {icon}
+        <div className="min-w-0">
+          <div className="text-foreground">{step.label}</div>
+          {step.detail ? <div>{step.detail}</div> : null}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <details className="rounded-md border border-border/70 bg-background/60 px-2.5 py-1.5">
+      <summary className="flex cursor-pointer list-none items-center gap-2">
+        {icon}
+        <span className="text-foreground">{step.label}</span>
+        <span className="font-mono text-[10px] text-muted-foreground">{step.toolName}</span>
+        {duration ? <span className="ml-auto font-mono text-[10px] text-muted-foreground">{duration}</span> : null}
+      </summary>
+      <div className="mt-2 space-y-2">
+        <ToolPayloadBlock label="In" value={step.arguments} />
+        {step.status === "running" ? (
+          <div className="flex items-center gap-2 rounded-md bg-muted/20 px-2 py-1.5 text-muted-foreground">
+            <Loader2 className="size-3 animate-spin" />
+            실행 중
+          </div>
+        ) : step.error ? (
+          <ToolPayloadBlock label="Error" tone="error" value={step.error} />
+        ) : (
+          <ToolPayloadBlock label="Out" value={step.result} />
+        )}
+      </div>
+    </details>
+  );
+}
+
+function ToolPayloadBlock({ label, tone = "default", value }: { label: string; tone?: "default" | "error"; value: unknown }) {
+  return (
+    <div className={cn("rounded-md bg-muted/20 px-2 py-1.5", tone === "error" && "bg-destructive/10 text-destructive")}>
+      <div className="mb-1 font-mono text-[10px] font-medium uppercase tracking-normal text-muted-foreground">{label}</div>
+      <pre className="max-h-40 overflow-auto whitespace-pre-wrap break-words font-mono text-[11px] leading-5">{formatPayload(value)}</pre>
+    </div>
+  );
+}
+
+function formatPayload(value: unknown) {
+  if (value === undefined || value === null || value === "") return "없음";
+  if (typeof value === "string") return value;
+  try {
+    return JSON.stringify(value, null, 2).slice(0, 2000);
+  } catch {
+    return String(value);
+  }
+}
+
+function formatDuration(milliseconds: number) {
+  if (milliseconds < 1000) return `${milliseconds}ms`;
+  return `${(milliseconds / 1000).toFixed(1)}s`;
 }
 
 export function AssistantComposer({

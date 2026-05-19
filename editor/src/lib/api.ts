@@ -91,6 +91,7 @@ type StreamEvent = {
   provider?: string;
   model?: string | null;
   usage?: unknown;
+  toolCall?: AiChatResponse["toolCalls"][number];
   toolCalls?: AiChatResponse["toolCalls"];
 };
 

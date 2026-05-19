@@ -94,6 +94,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [widget-bridge](architecture/widget-bridge.md)
 - [frontend-product-surface](architecture/frontend-product-surface.md)
 - [curriculum-registry](architecture/curriculum-registry.md)
+- [teacher-tool-loop](architecture/teacher-tool-loop.md)
 
 ## Ops (10) — 운영 규칙
 
