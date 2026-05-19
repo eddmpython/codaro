@@ -6,15 +6,12 @@ import { EditorState, Prec } from "@codemirror/state";
 import { EditorView, highlightActiveLine, keymap, lineNumbers, placeholder } from "@codemirror/view";
 import {
   AlertTriangle,
-  Bot,
   CheckCircle2,
   Clock3,
   Loader2,
   MessageSquare,
   Play,
   RefreshCw,
-  RotateCcw,
-  Send,
   ShieldAlert,
   TerminalSquare,
   Workflow,
@@ -33,6 +30,16 @@ import {
 import { CellAiActions } from "@/components/app/cellAiActions";
 import { TopBar } from "@/components/app/topBar";
 import { ProductSidebar, type SidebarCustomCurriculum } from "@/components/app/productSidebar";
+import {
+  AssistantComposer,
+  AssistantMessages,
+  TeacherPanel,
+  aiProviderName,
+  inferTeacherScope,
+  teacherScopeLabel,
+  type AssistantMessage,
+  type TeacherScope,
+} from "@/components/assistant/assistantPanel";
 import {
   CollapsedAssistantButton,
   CurriculumCellToc,
@@ -66,7 +73,6 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Skeleton } from "@/components/ui/skeleton";
 import {
   SidebarInset,
   SidebarProvider,
@@ -91,7 +97,6 @@ import type {
 } from "@/types";
 
 type ResultMap = Record<string, ExecutionResult>;
-type TeacherScope = "cell" | "lesson" | "curriculum";
 type PendingTarget = "notebook" | "curriculum";
 
 type CustomCurriculumEntry = {
@@ -99,16 +104,6 @@ type CustomCurriculumEntry = {
   title: string;
   document: CodaroDocument;
   createdAt: number;
-};
-
-type AssistantMessage = {
-  id: string;
-  role: "user" | "assistant" | "system";
-  content: string;
-  provider?: string;
-  model?: string | null;
-  toolCalls?: AiToolCall[];
-  tone?: "default" | "warning" | "error";
 };
 
 const codeCellEditorTheme = EditorView.theme({
@@ -1478,278 +1473,6 @@ function ChatSurface({
   );
 }
 
-function TeacherPanel({
-  aiConnecting,
-  aiProfile,
-  apiOnline,
-  conversationId,
-  loading,
-  messages,
-  pendingBlocks,
-  placement = "right",
-  prompt,
-  selectedBlock,
-  onAcceptPendingBlocks,
-  onAsk,
-  onConnectAi,
-  onNewChat,
-  onPromptChange,
-  onRejectPendingBlocks,
-}: {
-  aiConnecting: boolean;
-  aiProfile: AiProfile | null;
-  apiOnline: boolean;
-  conversationId: string | null;
-  loading: boolean;
-  messages: AssistantMessage[];
-  pendingBlocks: BlockConfig[];
-  placement?: "left" | "right";
-  prompt: string;
-  selectedBlock?: BlockConfig;
-  onAcceptPendingBlocks: () => void;
-  onAsk: (messageOverride?: string, scopeOverride?: TeacherScope) => void;
-  onConnectAi: () => void;
-  onNewChat: () => void;
-  onPromptChange: (value: string) => void;
-  onRejectPendingBlocks: () => void;
-}) {
-  const selectedLabel = selectedBlock ? blockLabel(selectedBlock) : "선택된 셀 없음";
-
-  return (
-    <aside
-      className={cn(
-        "grid h-full min-h-0 grid-rows-[auto_minmax(0,1fr)_auto] border-t bg-background p-3",
-        placement === "right" ? "xl:border-l xl:border-t-0" : "xl:border-r xl:border-t-0",
-      )}
-    >
-      <div className="min-w-0">
-        <AssistantHeader
-          aiConnecting={aiConnecting}
-          aiProfile={aiProfile}
-          apiOnline={apiOnline}
-          compact
-          conversationId={conversationId}
-          onConnectAi={onConnectAi}
-          onNewChat={onNewChat}
-        />
-
-        <div className="mt-2 rounded-md border bg-muted/15 px-3 py-2">
-          <div className="text-[11px] font-medium uppercase text-muted-foreground">선택</div>
-          <div className="mt-1 truncate text-sm">{selectedLabel}</div>
-          <div className="mt-1 text-xs leading-5 text-muted-foreground">
-            셀, 레슨, 커리큘럼 범위는 대화 내용으로 판단합니다.
-          </div>
-        </div>
-
-        <PendingNotebookBar
-          pendingBlocks={pendingBlocks}
-          onAccept={onAcceptPendingBlocks}
-          onReject={onRejectPendingBlocks}
-        />
-      </div>
-
-      <AssistantMessages appLoading={false} loading={loading} messages={messages} />
-
-      <AssistantComposer
-        className="mt-3"
-        loading={loading}
-        placeholder="설명, 답 확인, 셀 수정, 레슨 재구성, 자동화를 자연어로 요청하세요."
-        prompt={prompt}
-        variant="panel"
-        onAsk={() => onAsk()}
-        onPromptChange={onPromptChange}
-      />
-    </aside>
-  );
-}
-
-function AssistantHeader({
-  aiConnecting,
-  aiProfile,
-  apiOnline,
-  compact = false,
-  conversationId,
-  onConnectAi,
-  onNewChat,
-}: {
-  aiConnecting: boolean;
-  aiProfile: AiProfile | null;
-  apiOnline: boolean;
-  compact?: boolean;
-  conversationId: string | null;
-  onConnectAi: () => void;
-  onNewChat: () => void;
-}) {
-  return (
-    <div className="mb-3 flex items-start justify-between gap-3">
-      <div className="min-w-0">
-        <div className="flex items-center gap-2 text-sm font-semibold">
-          <Bot className="size-4" />
-          Codaro 어시스턴트
-        </div>
-        {compact ? (
-          <div className="mt-1 text-xs leading-5 text-muted-foreground">{assistantStatusText(apiOnline, aiProfile)}</div>
-        ) : (
-          <div className="mt-1 flex flex-wrap gap-2">
-            <Badge variant={apiOnline && aiProfileReady(aiProfile) ? "secondary" : "outline"}>
-              {apiOnline && aiProfileReady(aiProfile) ? "LLM 연결됨" : "LLM 미연결"}
-            </Badge>
-            <Badge variant={aiProfileReady(aiProfile) ? "secondary" : "outline"}>{aiProviderName(aiProfile)}</Badge>
-            {conversationId ? <Badge variant="outline">{conversationId.slice(0, 14)}</Badge> : null}
-          </div>
-        )}
-      </div>
-      <div className="flex shrink-0 items-center gap-2">
-        {compact ? null : (
-          <>
-            <IconButton disabled={aiConnecting} label="제공자 연결" onClick={onConnectAi}>
-              {aiConnecting ? <Loader2 className="animate-spin" /> : <Bot />}
-            </IconButton>
-            <IconButton label="새 채팅" onClick={onNewChat}>
-              <RotateCcw />
-            </IconButton>
-          </>
-        )}
-      </div>
-    </div>
-  );
-}
-
-function AssistantMessages({
-  appLoading,
-  loading,
-  messages,
-}: {
-  appLoading: boolean;
-  loading: boolean;
-  messages: AssistantMessage[];
-}) {
-  return (
-    <ScrollArea className="min-h-0">
-      <div className="space-y-3 pr-3">
-        {appLoading ? (
-          <LoadingState title="Codaro 여는 중" detail="노트북, 커리큘럼, 자동화 상태를 불러오고 있습니다." />
-        ) : messages.length ? (
-          messages.map((message) => (
-            <Card
-              className={cn(
-                message.role === "user" && "bg-muted/30",
-                message.tone === "error" && "bg-destructive/10",
-                message.tone === "warning" && "bg-muted/40",
-              )}
-              key={message.id}
-            >
-              <CardHeader className="pb-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={message.role === "assistant" ? "secondary" : "outline"}>
-                    {roleLabel(message.role)}
-                  </Badge>
-                  {message.provider ? <Badge variant="outline">{message.provider}</Badge> : null}
-                  {message.model ? <Badge variant="outline">{message.model}</Badge> : null}
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{message.content}</div>
-              </CardContent>
-            </Card>
-          ))
-        ) : (
-          <EmptyState
-            detail="Codaro에게 다음 설명, 실습 셀, 검증, 자동화를 만들어 달라고 요청하세요."
-            title="채팅에서 시작"
-          />
-        )}
-        {loading ? (
-          <Card className="bg-muted/30">
-            <CardContent className="flex items-center gap-2 p-4 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" />
-              다음 노트북 단계를 만드는 중입니다.
-            </CardContent>
-          </Card>
-        ) : null}
-      </div>
-    </ScrollArea>
-  );
-}
-
-function AssistantComposer({
-  className,
-  loading,
-  placeholder = "Codaro에게 커리큘럼 생성, 실습 셀 구성, 코드 실행, 변수 확인, 워크플로 자동화를 요청하세요.",
-  prompt,
-  variant = "dock",
-  onAsk,
-  onPromptChange,
-}: {
-  className?: string;
-  loading: boolean;
-  placeholder?: string;
-  prompt: string;
-  variant?: "dock" | "hero" | "panel";
-  onAsk: () => void;
-  onPromptChange: (value: string) => void;
-}) {
-  const canAsk = Boolean(prompt.trim()) && !loading;
-  const submit = () => {
-    if (!canAsk) return;
-    onAsk();
-  };
-  return (
-    <form
-      className={cn(
-        "grid grid-cols-[1fr_auto] gap-2",
-        variant === "dock" && "mt-3",
-        variant === "hero" && "rounded-md border bg-card p-2 shadow-sm",
-        variant === "panel" && "rounded-md border bg-background p-2",
-        className,
-      )}
-      onSubmit={(event) => {
-        event.preventDefault();
-        submit();
-      }}
-    >
-      <Textarea
-        className={cn(
-          "resize-none border-0 bg-transparent shadow-none focus-visible:ring-0",
-          variant === "panel" ? "min-h-20" : "min-h-24",
-        )}
-        placeholder={placeholder}
-        value={prompt}
-        onChange={(event) => onPromptChange(event.target.value)}
-        onKeyDown={(event) => {
-          const nativeEvent = event.nativeEvent as KeyboardEvent & { isComposing?: boolean };
-          if (nativeEvent.isComposing) return;
-          if (event.key === "Enter" && !event.shiftKey) {
-            event.preventDefault();
-            submit();
-          }
-        }}
-      />
-      <IconButton className="self-end" disabled={!canAsk} label="보내기" type="submit" variant="default">
-        {loading ? <Loader2 className="animate-spin" /> : <Send />}
-      </IconButton>
-    </form>
-  );
-}
-
-function LoadingState({ title, detail }: { title: string; detail: string }) {
-  return (
-    <Card className="bg-muted/20">
-      <CardContent className="space-y-3 p-4">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <Loader2 className="size-4 animate-spin text-muted-foreground" />
-          {title}
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-3 w-3/4" />
-          <Skeleton className="h-3 w-1/2" />
-        </div>
-        <div className="text-xs text-muted-foreground">{detail}</div>
-      </CardContent>
-    </Card>
-  );
-}
-
 function NotebookPanel({
   canRun,
   document,
@@ -2243,40 +1966,6 @@ function AutomationView({
       </div>
     </ScrollArea>
   );
-}
-
-function roleLabel(role: AssistantMessage["role"]) {
-  if (role === "assistant") return "어시스턴트";
-  if (role === "user") return "나";
-  return "시스템";
-}
-
-function teacherScopeLabel(scope: TeacherScope) {
-  if (scope === "lesson") return "레슨";
-  if (scope === "curriculum") return "커리큘럼";
-  return "셀";
-}
-
-function inferTeacherScope(message: string, fallback: TeacherScope): TeacherScope {
-  const normalized = message.toLowerCase();
-  if (/커리큘럼|학습\s*경로|전체\s*과정|로드맵|curriculum/.test(normalized)) return "curriculum";
-  if (/레슨|강의|수업|lesson/.test(normalized)) return "lesson";
-  if (/셀|코드|답|출력|에러|오류|cell|answer|output|error/.test(normalized)) return "cell";
-  return fallback;
-}
-
-function aiProviderName(profile: AiProfile | null) {
-  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? "제공자 없음");
-}
-
-function aiProfileReady(profile: AiProfile | null) {
-  return Boolean(profile?.ready ?? profile?.enabled);
-}
-
-function assistantStatusText(apiOnline: boolean, profile: AiProfile | null) {
-  if (!apiOnline) return "LLM 미연결 - 지금은 기본 안내만 표시합니다.";
-  if (!aiProfileReady(profile)) return "LLM 미설정 - 제공자 연결 후 실제 대화가 가능합니다.";
-  return "대화로 셀, 레슨, 커리큘럼을 다룹니다.";
 }
 
 function createCustomCurriculumEntry(blocks: BlockConfig[], title?: string): CustomCurriculumEntry {
