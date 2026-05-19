@@ -195,7 +195,7 @@ export function CurriculumCellToc({
         </ScrollArea>
       </div>
 
-      <div className="pointer-events-none absolute right-0 top-0 z-40 h-full w-72 translate-x-2 border-l bg-background/98 opacity-0 shadow-xl shadow-background/40 transition duration-150 group-hover/toc:pointer-events-auto group-hover/toc:translate-x-0 group-hover/toc:opacity-100">
+      <div className="pointer-events-none absolute right-full top-0 z-40 h-full w-72 -translate-x-2 border-r bg-background/98 opacity-0 shadow-xl shadow-background/40 transition duration-150 group-hover/toc:pointer-events-auto group-hover/toc:translate-x-0 group-hover/toc:opacity-100">
         <div className="border-b px-3 py-3">
           <div className="text-sm font-semibold tracking-normal">셀 목차</div>
           <div className="mt-1 text-xs leading-5 text-muted-foreground">마우스를 올려 현재 레슨의 셀로 이동합니다.</div>
@@ -258,8 +258,14 @@ function shouldShowTocItem(block: BlockConfig, label: string) {
     "참고",
   ]);
   if (genericLabels.has(normalized)) return false;
-  if (block.role === "explanation" && block.displayKind === "callout" && normalized.length <= 8) return false;
-  return true;
+  if (block.displayKind === "callout") return false;
+  if (block.sourceType === "tip" || block.sourceType === "tipCard" || block.sourceType === "note") return false;
+  if (block.role === "title" || block.displayKind === "hero" || block.displayKind === "title") return true;
+  if (block.type === "code") return true;
+  if (block.type === "markdown" && block.sourceType === "expansion") return false;
+  if (block.role === "exercise" || block.displayKind === "practice") return true;
+  if (block.displayKind === "quiz") return true;
+  return false;
 }
 
 function CurriculumLearningCell({

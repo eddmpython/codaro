@@ -825,6 +825,7 @@ function normalizeSourceType(value: string) {
 }
 
 function blockTypeLabel(type: string) {
+  const normalized = type.trim();
   const labels: Record<string, string> = {
     centerText: "중앙 설명",
     choiceCards: "선택 카드",
@@ -855,7 +856,7 @@ function blockTypeLabel(type: string) {
     warning: "주의",
     youtube: "YouTube",
   };
-  return labels[type] ?? type.replace(/([a-z])([A-Z])/g, "$1 $2");
+  return labels[normalized] ?? labels[normalized.toLowerCase()] ?? normalized.replace(/([a-z])([A-Z])/g, "$1 $2");
 }
 
 function mapValue(value: unknown): YamlMap {

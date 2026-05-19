@@ -966,12 +966,18 @@ function payloadTextList(value: unknown) {
 }
 
 function blockTypeLabel(type: string) {
+  const normalized = type.trim();
   const labels: Record<string, string> = {
     image: "이미지",
     pdf: "PDF",
     video: "비디오",
     youtube: "YouTube",
     MIME: "미디어",
+    tip: "팁",
+    tipCard: "팁",
+    note: "노트",
+    warning: "주의",
+    info: "정보",
   };
-  return labels[type] ?? type.replace(/([a-z])([A-Z])/g, "$1 $2");
+  return labels[normalized] ?? labels[normalized.toLowerCase()] ?? normalized.replace(/([a-z])([A-Z])/g, "$1 $2");
 }
