@@ -285,7 +285,7 @@ function DocumentBlock({
   onSelect: () => void;
 }) {
   const cellTitle = block.type === "markdown" ? "Markdown" : "Python";
-  const lineCount = (block.type === "code" ? draft : block.content).split("\n").length;
+  const lineCount = countMeaningfulLines(block.type === "code" ? draft : block.content);
   const resultStatus = isRunning ? "running" : result?.status ?? "idle";
 
   if (block.type === "markdown") {
@@ -423,10 +423,14 @@ function CellHeader({
           {title}
         </Badge>
         <span className="min-w-0 flex-1 truncate text-sm font-medium">{type === "code" ? "파이썬 셀" : "마크다운 셀"}</span>
-        <span className="hidden text-xs text-muted-foreground sm:inline">{lineCount}줄</span>
-        <Badge variant={status === "error" ? "destructive" : "outline"}>{statusLabel(status)}</Badge>
+        {lineCount ? <span className="hidden text-xs text-muted-foreground sm:inline">{lineCount}줄</span> : null}
+        {status !== "idle" ? <Badge variant={status === "error" ? "destructive" : "outline"}>{statusLabel(status)}</Badge> : null}
       </button>
       <CellAiActions selected={selected} onAsk={onCellAsk} />
     </div>
   );
+}
+
+function countMeaningfulLines(value: string) {
+  return value.split("\n").filter((line) => line.trim()).length;
 }
