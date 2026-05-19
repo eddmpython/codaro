@@ -10,14 +10,23 @@
   <a href="https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day01Helloworld.py"><img alt="Open Day 01 in molab" src="https://img.shields.io/badge/Day_01-open_in_molab-ff5a5f" /></a>
 </p>
 
-Codaro는 지금 먼저 **Python 학습 노트북**을 배포합니다.
+Codaro는 코드가 인터페이스가 되는 **개인 학습 + 자동화 스튜디오**입니다.
 
-편집기, 자동화, 리포트, 학습 GUI 안내는 제품 흐름이 더 완성된 뒤 별도 README로 정리합니다. 현재 이 README는 학습자가 바로 노트북을 열고 시작하는 데만 집중합니다.
+제품 표면은 네 가지로 정리합니다.
+
+- **채팅** — 목표, 학습 요청, 자동화 요청을 자연어로 시작하는 기본 진입점
+- **에디터** — 빈 노트북에서 Python 셀과 Markdown 셀을 작성하고 실행하는 공간
+- **커리큘럼** — `curricula/` YAML을 학습 셀 카드로 펼쳐 공부하는 순수 학습 공간
+- **자동화** — 에디터에서 만든 셀 조합과 스크립트를 태스크로 예약 실행하는 공간
+
+상세 제품 사상과 프론트 구조 기준은 [Codaro Skills](docs/skills/README.md)와 [프론트 제품 표면](docs/skills/architecture/frontend-product-surface.md)에 둡니다. 이 README는 외부 진입점으로, 현재 공개 학습 콘텐츠와 핵심 구조만 짧게 안내합니다.
 
 ## 바로 시작
 
 | 시작점 | 설명 |
 |---|---|
+| [제품 사상](docs/skills/README.md) | 채팅, 에디터, 커리큘럼, 자동화 네 표면 기준 |
+| [프론트 구조 기준](docs/skills/architecture/frontend-product-surface.md) | `editor/` 제품 표면과 UI 판단 기준 |
 | [Python 30일 완성 안내](notebooks/python30DaysComplete/readme.md) | 전체 Day 목록, 리뷰 노트북, 진행표 |
 | [Day 01 Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb) | 브라우저에서 바로 실행 |
 | [Day 01 marimo 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day01Helloworld.py) | molab에서 바로 실행 |
