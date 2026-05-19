@@ -409,7 +409,7 @@ function CurriculumLearningCell({
           </IconButton>
           <CellAiActions onAsk={onAsk} selected={isSelected} />
         </div>
-        <div className="space-y-2 px-3 py-3">
+        <div className="space-y-3 px-3 py-3">
           {isSnippetCode ? <SnippetPracticeIntro block={block} /> : null}
           {!isSnippetCode && block.guide ? <ExerciseBrief block={block} lineCount={lineCount} /> : null}
           <div className="space-y-1.5">
@@ -443,13 +443,20 @@ function CurriculumLearningCell({
 }
 
 function SnippetPracticeIntro({ block }: { block: BlockConfig }) {
+  const description = block.description?.trim();
+
   return (
-    <div className="rounded-md border bg-muted/15 p-3">
-      <div className="mb-2 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-        <TerminalSquare className="size-3.5" />
-        예제 스니펫
+    <div className="overflow-hidden rounded-md border bg-muted/15">
+      <div className="space-y-2 px-3 py-2.5">
+        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          <TerminalSquare className="size-3.5" />
+          <span>예제 스니펫</span>
+        </div>
+        {description ? <p className="text-sm leading-6 text-foreground">{description}</p> : null}
       </div>
-      <CodePayload value={block.content} />
+      <div className="border-t p-3">
+        <CodePayload value={block.content} />
+      </div>
     </div>
   );
 }
