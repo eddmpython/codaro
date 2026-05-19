@@ -7,6 +7,7 @@ import {
   aiProviderName,
   type AssistantMessage,
 } from "@/components/assistant/assistantPanel";
+import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
 import {
   categorySubtitle,
   categoryTitle,
@@ -150,6 +151,7 @@ function App() {
   const [toolCatalog, setToolCatalog] = useState<AiToolCatalogPayload>(emptyToolCatalog);
   const [aiProfile, setAiProfile] = useState<AiProfile | null>(null);
   const [aiConnecting, setAiConnecting] = useState(false);
+  const [providerSettingsOpen, setProviderSettingsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     const stored = window.localStorage.getItem("codaro-theme");
@@ -554,11 +556,23 @@ function App() {
   }
 
   async function connectAiProvider() {
+    if (!apiOnline) {
+      setNotice({
+        tone: "warning",
+        title: "제공자 연결 불가",
+        detail: "서버 세션이 없어서 실제 대화 제공자 연결은 사용할 수 없습니다.",
+      });
+      return;
+    }
+    setProviderSettingsOpen(true);
+  }
+
+  async function startOauthProviderLogin(providerId = "oauth-chatgpt") {
     if (aiConnecting) return;
     if (!apiOnline) {
       setNotice({
         tone: "warning",
-        title: "기본 안내 모드",
+        title: "제공자 연결 불가",
         detail: "서버 세션이 없어서 실제 대화 제공자 연결은 사용할 수 없습니다.",
       });
       return;
@@ -566,6 +580,9 @@ function App() {
 
     setAiConnecting(true);
     try {
+      if (providerId !== "oauth-chatgpt") {
+        await codaroApi.updateAiProfile({ provider: providerId });
+      }
       const auth = await codaroApi.oauthAuthorize();
       window.open(auth.authUrl, "_blank", "noopener,noreferrer");
       setNotice({ tone: "default", title: "제공자 로그인 열림", detail: "새 탭에서 제공자 로그인을 완료하세요." });
@@ -577,6 +594,7 @@ function App() {
         if (status.error) throw new Error(status.error);
         const profile = await codaroApi.aiProfile();
         setAiProfile(profile);
+        setProviderSettingsOpen(false);
         setNotice({ tone: "success", title: "제공자 연결됨", detail: aiProviderName(profile) });
         return;
       }
@@ -588,6 +606,47 @@ function App() {
         tone: "error",
         title: "제공자 로그인 실패",
         detail: isProviderAuthError(detail) ? "대화 제공자 로그인을 다시 시작하세요." : detail,
+      });
+    } finally {
+      setAiConnecting(false);
+    }
+  }
+
+  async function selectAiProvider(providerId: string) {
+    if (!apiOnline || aiConnecting) return;
+    setAiConnecting(true);
+    try {
+      const profile = await codaroApi.updateAiProfile({ provider: providerId });
+      const latestProfile = await codaroApi.aiProfile().catch(() => profile);
+      setAiProfile(latestProfile);
+      setNotice({ tone: "success", title: "제공자 선택됨", detail: aiProviderName(latestProfile) });
+    } catch (error) {
+      setNotice({
+        tone: "error",
+        title: "제공자 선택 실패",
+        detail: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setAiConnecting(false);
+    }
+  }
+
+  async function saveApiProvider(providerId: string, apiKey: string, baseUrl?: string) {
+    if (!apiOnline || aiConnecting) return;
+    setAiConnecting(true);
+    try {
+      if (baseUrl) {
+        await codaroApi.updateAiProfile({ provider: providerId, baseUrl });
+      }
+      const profile = await codaroApi.saveAiSecret(providerId, apiKey);
+      const latestProfile = await codaroApi.aiProfile().catch(() => profile);
+      setAiProfile(latestProfile);
+      setNotice({ tone: "success", title: "제공자 연결됨", detail: aiProviderName(latestProfile) });
+    } catch (error) {
+      setNotice({
+        tone: "error",
+        title: "제공자 저장 실패",
+        detail: error instanceof Error ? error.message : String(error),
       });
     } finally {
       setAiConnecting(false);
@@ -993,6 +1052,17 @@ function App() {
           onToggleEStop={toggleEStop}
         />
       </SidebarInset>
+
+      <ProviderSettingsSheet
+        aiConnecting={aiConnecting}
+        aiProfile={aiProfile}
+        apiOnline={apiOnline}
+        open={providerSettingsOpen}
+        onOauthLogin={startOauthProviderLogin}
+        onOpenChange={setProviderSettingsOpen}
+        onSaveApiProvider={saveApiProvider}
+        onSelectProvider={selectAiProvider}
+      />
     </SidebarProvider>
   );
 }

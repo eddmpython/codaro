@@ -225,11 +225,16 @@ export type AuditPayload = {
 export type AiProvider = {
   id?: string;
   name?: string;
+  label?: string;
   public?: boolean;
   status?: string;
   description?: string;
   authKind?: string;
+  setupKind?: string;
+  envKey?: string;
+  probePolicy?: string;
   defaultModel?: string;
+  supportedRoles?: string[];
 };
 
 export type AiProviderCatalogPayload = {
