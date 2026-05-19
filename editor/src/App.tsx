@@ -40,7 +40,7 @@ import {
   registryLesson,
 } from "@/lib/curriculaRegistry";
 import { shortPath, statusLabel, stringifyData } from "@/lib/displayFormat";
-import type { SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
+import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
 import {
   blockLabel,
   buildCellAiPrompt,
@@ -215,6 +215,7 @@ function App() {
   const [scheduler, setScheduler] = useState<SchedulerStatus>(fallbackScheduler);
   const [eStop, setEStop] = useState<EStopStatus>(fallbackEStop);
   const [auditCount, setAuditCount] = useState(0);
+  const [automationSection, setAutomationSection] = useState<AutomationSection>("codaro");
   const [toolCatalog, setToolCatalog] = useState<AiToolCatalogPayload>(emptyToolCatalog);
   const [aiProfile, setAiProfile] = useState<AiProfile | null>(null);
   const [aiConnecting, setAiConnecting] = useState(false);
@@ -1004,6 +1005,11 @@ function App() {
     setSurface("curriculum");
   }
 
+  function selectAutomationSection(section: AutomationSection) {
+    setAutomationSection(section);
+    setSurface("automation");
+  }
+
   return (
     <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <ProductSidebar
@@ -1013,12 +1019,14 @@ function App() {
         customCurricula={sidebarCustomCurricula}
         query={query}
         referenceLoading={referenceLoading}
+        selectedAutomationSection={automationSection}
         surface={surface}
         selectedCategory={selectedCategory}
         selectedCustomCurriculumId={selectedCustomCurriculumId}
         selectedContentId={selectedContentId}
         themeMode={themeMode}
         onQueryChange={setQuery}
+        onSelectAutomationSection={selectAutomationSection}
         onSelectCategory={selectCurriculumCategory}
         onSelectContent={selectCurriculumContent}
         onSelectCustomCurriculum={selectCustomCurriculum}
@@ -1044,6 +1052,7 @@ function App() {
           aiProfile={aiProfile}
           apiOnline={apiOnline}
           auditCount={auditCount}
+          automationSection={automationSection}
           assistantLoading={assistantLoading}
           canRun={canRun}
           categories={filteredCategories}
@@ -1105,6 +1114,7 @@ type MainSurfaceProps = {
   aiProfile: AiProfile | null;
   apiOnline: boolean;
   auditCount: number;
+  automationSection: AutomationSection;
   assistantLoading: boolean;
   canRun: boolean;
   categories: CurriculumCategory[];
@@ -1310,6 +1320,7 @@ function MainSurface(props: MainSurfaceProps) {
 
   return (
     <AutomationView
+      activeSection={props.automationSection}
       auditCount={props.auditCount}
       eStop={props.eStop}
       scheduler={props.scheduler}

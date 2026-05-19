@@ -8,6 +8,7 @@ import {
   TerminalSquare,
   Workflow,
 } from "lucide-react";
+import { useEffect } from "react";
 
 import {
   EmptyState,
@@ -17,6 +18,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import type { AutomationSection } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
 import type {
   EStopStatus,
@@ -25,6 +27,7 @@ import type {
 } from "@/types";
 
 export function AutomationView({
+  activeSection,
   auditCount,
   eStop,
   scheduler,
@@ -33,6 +36,7 @@ export function AutomationView({
   onRunTask,
   onToggleEStop,
 }: {
+  activeSection: AutomationSection;
   auditCount: number;
   eStop: EStopStatus;
   scheduler: SchedulerStatus;
@@ -41,6 +45,12 @@ export function AutomationView({
   onRunTask: (task: TaskDefinition) => void;
   onToggleEStop: () => void;
 }) {
+  useEffect(() => {
+    window.document
+      .getElementById(automationSectionId(activeSection))
+      ?.scrollIntoView({ block: "start", behavior: "smooth" });
+  }, [activeSection]);
+
   return (
     <ScrollArea className="h-[calc(100vh-40px)] min-h-0">
       <div className="p-4">
@@ -67,7 +77,7 @@ export function AutomationView({
           </div>
 
           <section className="grid gap-3 md:grid-cols-2">
-            <Card>
+            <Card id={automationSectionId("codaro")} className={sectionCardClass(activeSection, "codaro")}>
               <CardHeader>
                 <CardTitle>Codaro 자동화</CardTitle>
                 <CardDescription>기본 제공 자동화 템플릿입니다.</CardDescription>
@@ -85,7 +95,7 @@ export function AutomationView({
               </CardContent>
             </Card>
 
-            <Card>
+            <Card id={automationSectionId("custom")} className={sectionCardClass(activeSection, "custom")}>
               <CardHeader>
                 <CardTitle>나만의 자동화</CardTitle>
                 <CardDescription>사용자가 만든 자동화 스크립트입니다.</CardDescription>
@@ -116,7 +126,7 @@ export function AutomationView({
             </Card>
           </section>
 
-          <Card>
+          <Card id={automationSectionId("tasks")} className={sectionCardClass(activeSection, "tasks")}>
             <CardHeader>
               <CardTitle>태스크</CardTitle>
               <CardDescription>자동화 스크립트를 몇 시 몇 분에 실행할지 정하는 예약입니다.</CardDescription>
@@ -158,4 +168,12 @@ export function AutomationView({
       </div>
     </ScrollArea>
   );
+}
+
+function automationSectionId(section: AutomationSection) {
+  return `automation-section-${section}`;
+}
+
+function sectionCardClass(activeSection: AutomationSection, section: AutomationSection) {
+  return cn("scroll-mt-3", activeSection === section && "ring-1 ring-ring/40");
 }

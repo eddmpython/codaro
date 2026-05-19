@@ -31,7 +31,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { categoryTitle } from "@/lib/fallbackData";
-import type { SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
+import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
 import type { CurriculumCategory, CurriculumContentSummary } from "@/types";
 
 type ProductSidebarProps = {
@@ -41,12 +41,14 @@ type ProductSidebarProps = {
   customCurricula: SidebarCustomCurriculum[];
   query: string;
   referenceLoading: boolean;
+  selectedAutomationSection: AutomationSection;
   surface: SurfaceMode;
   selectedCategory: string;
   selectedCustomCurriculumId: string;
   selectedContentId: string;
   themeMode: ThemeMode;
   onQueryChange: (value: string) => void;
+  onSelectAutomationSection: (section: AutomationSection) => void;
   onSelectCategory: (key: string) => void;
   onSelectContent: (contentId: string) => void;
   onSelectCustomCurriculum: (id: string) => void;
@@ -75,12 +77,14 @@ export function ProductSidebar({
   customCurricula,
   query,
   referenceLoading,
+  selectedAutomationSection,
   surface,
   selectedCategory,
   selectedCustomCurriculumId,
   selectedContentId,
   themeMode,
   onQueryChange,
+  onSelectAutomationSection,
   onSelectCategory,
   onSelectContent,
   onSelectCustomCurriculum,
@@ -167,7 +171,12 @@ export function ProductSidebar({
             </div>
           ) : null}
 
-          {surface === "automation" ? <AutomationTree /> : null}
+          {surface === "automation" ? (
+            <AutomationTree
+              selectedSection={selectedAutomationSection}
+              onSelectSection={onSelectAutomationSection}
+            />
+          ) : null}
         </ScrollArea>
       </SidebarContent>
 
@@ -299,30 +308,37 @@ function CurriculumTree({
   );
 }
 
-function AutomationTree() {
+function AutomationTree({
+  selectedSection,
+  onSelectSection,
+}: {
+  selectedSection: AutomationSection;
+  onSelectSection: (section: AutomationSection) => void;
+}) {
+  const items: Array<{ section: AutomationSection; label: string; Icon: React.ComponentType<{ className?: string }> }> = [
+    { section: "codaro", label: "Codaro 자동화", Icon: Workflow },
+    { section: "custom", label: "나만의 자동화", Icon: TerminalSquare },
+    { section: "tasks", label: "태스크", Icon: Clock3 },
+  ];
+
   return (
     <SidebarGroup className="py-0.5">
       <SidebarGroupLabel className="h-6 px-2 text-[11px]">자동화</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
-          <SidebarMenuItem>
-            <SidebarMenuButton className="h-7 px-2 text-[13px] [&>svg]:size-3.5" tooltip="Codaro 자동화">
-              <Workflow />
-              <span>Codaro 자동화</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton className="h-7 px-2 text-[13px] [&>svg]:size-3.5" tooltip="나만의 자동화">
-              <TerminalSquare />
-              <span>나만의 자동화</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton className="h-7 px-2 text-[13px] [&>svg]:size-3.5" tooltip="태스크">
-              <Clock3 />
-              <span>태스크</span>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {items.map(({ Icon, label, section }) => (
+            <SidebarMenuItem key={section}>
+              <SidebarMenuButton
+                className="h-7 px-2 text-[13px] [&>svg]:size-3.5"
+                isActive={selectedSection === section}
+                tooltip={label}
+                onClick={() => onSelectSection(section)}
+              >
+                <Icon />
+                <span>{label}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ))}
         </SidebarMenu>
       </SidebarGroupContent>
     </SidebarGroup>

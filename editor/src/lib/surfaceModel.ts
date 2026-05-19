@@ -1,5 +1,6 @@
 export type SurfaceMode = "chat" | "editor" | "curriculum" | "automation";
 export type ThemeMode = "dark" | "light";
+export type AutomationSection = "codaro" | "custom" | "tasks";
 
 export function surfaceTitle(surface: SurfaceMode) {
   if (surface === "editor") return "에디터";
