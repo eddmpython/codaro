@@ -5,6 +5,7 @@ import { TopBar } from "@/components/app/topBar";
 import { ProductSidebar, type SidebarCustomCurriculum } from "@/components/app/productSidebar";
 import {
   aiProviderName,
+  type AssistantWorkStep,
   type AssistantMessage,
 } from "@/components/assistant/assistantPanel";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
@@ -612,6 +613,25 @@ function App() {
     }
   }
 
+  async function logoutOauthProvider(providerId = "oauth-chatgpt") {
+    if (!apiOnline || aiConnecting) return;
+    setAiConnecting(true);
+    try {
+      await codaroApi.oauthLogout();
+      const profile = await codaroApi.aiProfile();
+      setAiProfile(profile);
+      setNotice({ tone: "success", title: "Provider 로그아웃됨", detail: providerId });
+    } catch (error) {
+      setNotice({
+        tone: "error",
+        title: "Provider 로그아웃 실패",
+        detail: error instanceof Error ? error.message : String(error),
+      });
+    } finally {
+      setAiConnecting(false);
+    }
+  }
+
   async function selectAiProvider(providerId: string) {
     if (!apiOnline || aiConnecting) return;
     setAiConnecting(true);
@@ -743,6 +763,7 @@ function App() {
         role: "assistant",
         content: "",
         provider: aiProviderName(aiProfile),
+        steps: [createComposeStep()],
         loading: true,
       },
     ]);
@@ -759,6 +780,14 @@ function App() {
         (event) => {
           if (event.conversationId) {
             setConversationId(event.conversationId);
+          }
+          if (event.type === "tool_results" && event.toolCalls?.length) {
+            setMessages((current) => current.map((item) => (
+              item.id === assistantMessageId
+                ? { ...item, steps: withToolWorkStep(item.steps, event.toolCalls ?? []) }
+                : item
+            )));
+            return;
           }
           if (event.type === "delta") {
             streamedContent = event.content ?? `${streamedContent}${event.delta ?? ""}`;
@@ -802,6 +831,7 @@ function App() {
             provider: response.provider,
             model: response.model,
             toolCalls: response.toolCalls,
+            steps: response.toolCalls.length ? finishAssistantSteps(item.steps, response.toolCalls) : undefined,
             loading: false,
           }
           : item
@@ -828,6 +858,7 @@ function App() {
             tone: "error",
             action: providerAuthIssue ? "connect-provider" : undefined,
             content: displayDetail,
+            steps: markAssistantStepsError(item.steps),
             loading: false,
           }
           : item
@@ -1095,6 +1126,7 @@ function App() {
         apiOnline={apiOnline}
         open={providerSettingsOpen}
         onOauthLogin={startOauthProviderLogin}
+        onOauthLogout={logoutOauthProvider}
         onOpenChange={setProviderSettingsOpen}
         onSaveApiProvider={saveApiProvider}
         onSelectProvider={selectAiProvider}
@@ -1107,6 +1139,73 @@ function sleep(milliseconds: number) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, milliseconds);
   });
+}
+
+function createComposeStep(): AssistantWorkStep {
+  return { id: "compose", label: "답변 작성", status: "running" };
+}
+
+function withToolWorkStep(steps: AssistantWorkStep[] | undefined, toolCalls: NonNullable<AssistantMessage["toolCalls"]>): AssistantWorkStep[] {
+  const base = steps?.length ? steps : [createComposeStep()];
+  const workStep = assistantWorkStepFromToolCalls(toolCalls);
+  return [
+    ...base
+      .filter((step) => step.id !== workStep.id)
+      .map((step) => step.status === "running" ? { ...step, status: "done" as const } : step),
+    workStep,
+  ];
+}
+
+function finishAssistantSteps(steps: AssistantWorkStep[] | undefined, toolCalls: NonNullable<AssistantMessage["toolCalls"]>): AssistantWorkStep[] {
+  return withToolWorkStep(steps, toolCalls).map((step) => (
+    step.status === "running" ? { ...step, status: "done" as const } : step
+  ));
+}
+
+function markAssistantStepsError(steps: AssistantWorkStep[] | undefined): AssistantWorkStep[] {
+  const base = steps?.length ? steps : [createComposeStep()];
+  return base.map((step) => step.status === "running" ? { ...step, status: "error" as const } : step);
+}
+
+function assistantWorkStepFromToolCalls(toolCalls: NonNullable<AssistantMessage["toolCalls"]>): AssistantWorkStep {
+  return {
+    id: "work-results",
+    label: workStepLabel(toolCalls),
+    status: "done",
+    detail: `${toolCalls.length}개 결과를 대화와 셀 상태에 반영했습니다.`,
+  };
+}
+
+function workStepLabel(toolCalls: NonNullable<AssistantMessage["toolCalls"]>) {
+  const labels = Array.from(new Set(toolCalls.map((toolCall) => workLabelFromToolName(toolCall.name ?? toolCall.function?.name ?? ""))));
+  const visibleLabels = labels.filter(Boolean).slice(0, 2);
+  if (!visibleLabels.length) return "작업 결과 반영";
+  return `${visibleLabels.join(", ")} 반영`;
+}
+
+function workLabelFromToolName(name: string) {
+  switch (name) {
+    case "write-curriculum-yaml":
+      return "커리큘럼 구성";
+    case "create-notebook-exercise":
+      return "실습 구성";
+    case "insert-block":
+    case "write-cell":
+      return "셀 편집";
+    case "read-cells":
+      return "셀 읽기";
+    case "cell-call":
+      return "셀 요청";
+    case "execute-reactive":
+      return "셀 실행";
+    case "get-variables":
+      return "변수 확인";
+    case "click-element":
+    case "type-text":
+      return "화면 자동화";
+    default:
+      return "작업 결과";
+  }
 }
 
 function isProviderAuthError(detail: string) {

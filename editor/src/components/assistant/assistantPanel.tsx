@@ -2,6 +2,7 @@ import {
   AlertCircle,
   ArrowUp,
   Bot,
+  CheckCircle2,
   LogIn,
   Loader2,
   RotateCcw,
@@ -30,9 +31,17 @@ export type AssistantMessage = {
   provider?: string;
   model?: string | null;
   toolCalls?: AiToolCall[];
+  steps?: AssistantWorkStep[];
   tone?: "default" | "warning" | "error";
   action?: "connect-provider";
   loading?: boolean;
+};
+
+export type AssistantWorkStep = {
+  id: string;
+  label: string;
+  status: "running" | "done" | "error";
+  detail?: string;
 };
 
 export function TeacherPanel({
@@ -151,6 +160,7 @@ export function AssistantMessages({
           messages.map((message) => {
             const needsProvider = message.action === "connect-provider" || isProviderAuthMessage(message.content);
             const isWriting = message.role === "assistant" && message.loading;
+            const hasWorkSteps = Boolean(message.steps?.length);
             return (
               <div
                 className={cn(
@@ -184,8 +194,9 @@ export function AssistantMessages({
                         {message.content.trim() ? (
                           <AssistantMarkdown content={cleanAssistantMessage(message.content)} />
                         ) : null}
+                        <AssistantWorkLoop steps={message.steps} />
                         {isWriting ? (
-                          <div className="flex items-center gap-2 py-1 text-sm text-muted-foreground">
+                          <div className={cn("flex items-center gap-2 py-1 text-sm text-muted-foreground", hasWorkSteps && "sr-only")}>
                             <Loader2 className="size-3.5 animate-spin" />
                             <span>{message.content.trim() ? "답변 작성 중" : "응답 준비 중"}</span>
                           </div>
@@ -218,6 +229,49 @@ export function AssistantMessages({
         ) : null}
       </div>
     </ScrollArea>
+  );
+}
+
+function AssistantWorkLoop({ steps }: { steps?: AssistantWorkStep[] }) {
+  if (!steps?.length) return null;
+  const runningStep = steps.find((step) => step.status === "running");
+  const hasError = steps.some((step) => step.status === "error");
+  const label = runningStep
+    ? `처리 중 · ${runningStep.label}`
+    : hasError
+      ? `처리 확인 필요 · ${steps.length}건`
+      : `처리 완료 · ${steps.length}건`;
+
+  return (
+    <details className="my-2 rounded-md border bg-muted/20 px-3 py-2 text-xs text-muted-foreground" open={Boolean(runningStep)}>
+      <summary className="flex cursor-pointer list-none items-center gap-2 text-foreground">
+        {runningStep ? (
+          <Loader2 className="size-3.5 animate-spin text-muted-foreground" />
+        ) : hasError ? (
+          <AlertCircle className="size-3.5 text-destructive" />
+        ) : (
+          <CheckCircle2 className="size-3.5 text-emerald-500" />
+        )}
+        <span>{label}</span>
+      </summary>
+      <div className="mt-2 space-y-1 border-l pl-3">
+        {steps.map((step) => (
+          <div className="flex items-start gap-2 leading-5" key={step.id}>
+            {step.status === "running" ? (
+              <Loader2 className="mt-1 size-3 animate-spin" />
+            ) : step.status === "error" ? (
+              <AlertCircle className="mt-1 size-3 text-destructive" />
+            ) : (
+              <CheckCircle2 className="mt-1 size-3 text-emerald-500" />
+            )}
+            <div className="min-w-0">
+              <div className="text-foreground">{step.label}</div>
+              {step.detail ? <div>{step.detail}</div> : null}
+            </div>
+          </div>
+        ))}
+      </div>
+    </details>
   );
 }
 

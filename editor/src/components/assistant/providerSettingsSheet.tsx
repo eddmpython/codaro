@@ -4,6 +4,7 @@ import {
   Laptop,
   Loader2,
   LogIn,
+  LogOut,
   Server,
 } from "lucide-react";
 import { useMemo, useState } from "react";
@@ -29,6 +30,7 @@ type ProviderSettingsSheetProps = {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onOauthLogin: (providerId: string) => void;
+  onOauthLogout: (providerId: string) => void;
   onSaveApiProvider: (providerId: string, apiKey: string, baseUrl?: string) => void;
   onSelectProvider: (providerId: string) => void;
 };
@@ -65,6 +67,7 @@ export function ProviderSettingsSheet({
   open,
   onOpenChange,
   onOauthLogin,
+  onOauthLogout,
   onSaveApiProvider,
   onSelectProvider,
 }: ProviderSettingsSheetProps) {
@@ -102,6 +105,7 @@ export function ProviderSettingsSheet({
                   ready={provider.id === activeProvider && ready}
                   runtime={runtime[provider.id ?? ""] ?? {}}
                   onOauthLogin={onOauthLogin}
+                  onOauthLogout={onOauthLogout}
                   onSaveApiProvider={onSaveApiProvider}
                   onSelectProvider={onSelectProvider}
                 />
@@ -126,6 +130,7 @@ function ProviderCard({
   ready,
   runtime,
   onOauthLogin,
+  onOauthLogout,
   onSaveApiProvider,
   onSelectProvider,
 }: {
@@ -136,6 +141,7 @@ function ProviderCard({
   ready: boolean;
   runtime: ProviderRuntime;
   onOauthLogin: (providerId: string) => void;
+  onOauthLogout: (providerId: string) => void;
   onSaveApiProvider: (providerId: string, apiKey: string, baseUrl?: string) => void;
   onSelectProvider: (providerId: string) => void;
 }) {
@@ -188,6 +194,19 @@ function ProviderCard({
             {canUseStoredSecret && !active ? (
               <Button disabled={!apiOnline || aiConnecting} size="sm" type="button" variant="outline" onClick={() => onSelectProvider(providerId)}>
                 사용
+              </Button>
+            ) : null}
+            {canUseStoredSecret ? (
+              <Button
+                className="gap-1.5"
+                disabled={!apiOnline || aiConnecting}
+                size="sm"
+                type="button"
+                variant="ghost"
+                onClick={() => onOauthLogout(providerId)}
+              >
+                {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogOut className="size-3.5" />}
+                로그아웃
               </Button>
             ) : null}
           </div>
