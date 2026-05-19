@@ -20,6 +20,7 @@ from ..ai.providerSpec import (
     normalizeProvider,
     publicProviderIds,
 )
+from ..ai.teacherLoop import injectContext, toolCallResult, toolCallStart
 
 logger = logging.getLogger(__name__)
 
@@ -261,7 +262,7 @@ def createAiRouter(state: Any) -> APIRouter:
         roleOverride = body.get("role")
         context = body.get("context")
         if context:
-            message = _injectContext(message, context)
+            message = injectContext(message, context)
 
         from ..ai.conversation import ConversationManager
         from ..ai.factory import createProvider
@@ -349,7 +350,7 @@ def createAiRouter(state: Any) -> APIRouter:
                 resultStr = json.dumps(result, ensure_ascii=False)
                 convManager.addToolResult(conversationId, tc.id, resultStr)
                 messages.append({"role": "tool", "tool_call_id": tc.id, "content": resultStr})
-                allToolResults.append(_toolCallResult(tc.id, tc.name, tc.arguments, result))
+                allToolResults.append(toolCallResult(tc.id, tc.name, tc.arguments, result))
 
         try:
             finalResponse = provider.complete(messages)
@@ -377,7 +378,7 @@ def createAiRouter(state: Any) -> APIRouter:
         roleOverride = body.get("role")
         context = body.get("context")
         if context:
-            message = _injectContext(message, context)
+            message = injectContext(message, context)
 
         from ..ai.factory import createProvider
         from ..ai.toolExecutor import ToolExecutor
@@ -474,12 +475,12 @@ def createAiRouter(state: Any) -> APIRouter:
 
                 toolResults = []
                 for tc in response.toolCalls:
-                    yield f"data: {json.dumps({'type': 'tool_start', 'toolCall': _toolCallStart(tc.id, tc.name, tc.arguments)}, ensure_ascii=False)}\n\n"
+                    yield f"data: {json.dumps({'type': 'tool_start', 'toolCall': toolCallStart(tc.id, tc.name, tc.arguments)}, ensure_ascii=False)}\n\n"
                     result = await executor.execute(tc.name, tc.arguments)
                     resultStr = json.dumps(result, ensure_ascii=False)
                     convManager.addToolResult(conversationId, tc.id, resultStr)
                     msgs.append({"role": "tool", "tool_call_id": tc.id, "content": resultStr})
-                    payload = _toolCallResult(tc.id, tc.name, tc.arguments, result)
+                    payload = toolCallResult(tc.id, tc.name, tc.arguments, result)
                     toolResults.append(payload)
                     allToolResults.append(payload)
 
@@ -565,116 +566,6 @@ def createAiRouter(state: Any) -> APIRouter:
             return {"completions": [], "provider": "", "model": ""}
 
     return router
-
-
-def _injectContext(message: str, context: dict[str, Any]) -> str:
-    parts: list[str] = []
-    if context.get("instruction"):
-        parts.append(f"[Codaro procedure]\n{context['instruction']}")
-    selectedCell = context.get("selectedCell") or context.get("selectedBlock")
-    if isinstance(selectedCell, dict):
-        cell = selectedCell
-        parts.append(f"[Selected cell ({cell.get('type', 'code')})]\n```\n{cell.get('content', '')}\n```")
-        if cell.get("result"):
-            parts.append(f"[Selected cell result]\n{json.dumps(cell.get('result'), ensure_ascii=False)[:1200]}")
-    if context.get("variables"):
-        varLines = [
-            f"  {v.get('name', '?')}: {v.get('typeName', v.get('type', '?'))} = {v.get('repr', '?')}"
-            for v in context["variables"][:20]
-            if isinstance(v, dict)
-        ]
-        parts.append(f"[Variables]\n" + "\n".join(varLines))
-    document = context.get("document")
-    if isinstance(document, dict) and isinstance(document.get("blocks"), list):
-        blockLines = [
-            f"  [{b.get('type', '?')}] {b.get('id', '?')}: {str(b.get('content', ''))[:80]}"
-            for b in document["blocks"][:15]
-            if isinstance(b, dict)
-        ]
-        if blockLines:
-            title = document.get("title") or document.get("id") or "document"
-            parts.append(f"[Document: {title}]\n" + "\n".join(blockLines))
-    if context.get("blocks"):
-        blockLines = [f"  [{b['type']}] {b['id']}: {b.get('content', '')[:80]}" for b in context["blocks"][:15]]
-        parts.append(f"[Document blocks]\n" + "\n".join(blockLines))
-    cellMap = context.get("cellMap")
-    if isinstance(cellMap, list) and cellMap:
-        cellLines = []
-        for cell in cellMap[:40]:
-            if not isinstance(cell, dict):
-                continue
-            cellLines.append(
-                "  "
-                + json.dumps({
-                    "index": cell.get("index"),
-                    "id": cell.get("id"),
-                    "type": cell.get("type"),
-                    "role": cell.get("role"),
-                    "displayKind": cell.get("displayKind"),
-                    "executionKind": cell.get("executionKind"),
-                    "title": cell.get("title"),
-                    "purpose": cell.get("purpose"),
-                    "canRun": cell.get("canRun"),
-                }, ensure_ascii=False)
-            )
-        if cellLines:
-            parts.append("[Cell map]\n" + "\n".join(cellLines))
-    dependencyPreflight = context.get("dependencyPreflight")
-    if isinstance(dependencyPreflight, dict):
-        parts.append("[Dependency preflight]\n" + json.dumps(dependencyPreflight, ensure_ascii=False)[:1600])
-    if context.get("tools"):
-        toolLines = []
-        for tool in context["tools"][:40]:
-            if isinstance(tool, dict):
-                toolLines.append(
-                    f"  {tool.get('name')} lane={tool.get('lane')} target={tool.get('target')} risk={tool.get('risk')}"
-                )
-        if toolLines:
-            parts.append("[Available tool map]\n" + "\n".join(toolLines))
-    if context.get("fileName"):
-        parts.append(f"[File: {context['fileName']}]")
-    if context.get("workspaceFiles"):
-        fileLines = [f"  {f}" for f in context["workspaceFiles"][:30]]
-        parts.append("[Workspace files]\n" + "\n".join(fileLines))
-    if context.get("errorHistory"):
-        errLines = [f"  [{e.get('blockId', '?')}] {e.get('error', '')[:200]}" for e in context["errorHistory"][:5]]
-        parts.append("[Recent errors]\n" + "\n".join(errLines))
-    if not parts:
-        return message
-    contextStr = "\n\n".join(parts)
-    return f"{message}\n\n---\nContext:\n{contextStr}"
-
-
-def _toolCallStart(
-    toolCallId: str,
-    name: str,
-    arguments: dict[str, Any],
-) -> dict[str, Any]:
-    return {
-        "id": toolCallId,
-        "toolCallId": toolCallId,
-        "name": name,
-        "arguments": arguments,
-        "status": "running",
-    }
-
-
-def _toolCallResult(
-    toolCallId: str,
-    name: str,
-    arguments: dict[str, Any],
-    result: dict[str, Any],
-) -> dict[str, Any]:
-    error = result.get("error") if isinstance(result, dict) else None
-    return {
-        "id": toolCallId,
-        "toolCallId": toolCallId,
-        "name": name,
-        "arguments": arguments,
-        "status": "error" if error else "done",
-        "error": error,
-        "result": result,
-    }
 
 
 def _createToolExecutor(state: Any, sessionId: str | None = None):

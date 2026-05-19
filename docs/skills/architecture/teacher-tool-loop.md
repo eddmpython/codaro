@@ -52,6 +52,21 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - `tool_results`가 오면 각 tool row를 done/error로 갱신한다.
    - raw payload는 기본 노출하지 않고, 필요할 때 `In`/`Out`으로 펼쳐 본다.
 
+## 코드 경계
+
+```
+src/codaro/ai/
+├── conversation.py   # 역할별 prompt와 conversation state
+├── teacherLoop.py    # context injection, tool_start/tool_result payload
+├── tools.py          # tool schema/manifest
+└── toolExecutor.py   # 실제 tool handler
+
+src/codaro/api/
+└── aiRouter.py       # HTTP/SSE endpoint, provider 호출 경계
+```
+
+router가 셀 맥락 조립이나 tool payload 포맷을 직접 소유하면 금방 덕지덕지 붙는다. provider loop의 판단 재료와 workloop 표시 payload는 `teacherLoop.py`에서 관리한다.
+
 ## Tool Map
 
 | 단계 | Tool | 역할 |

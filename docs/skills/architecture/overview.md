@@ -35,6 +35,31 @@ src/codaro/
 └── cli.py        # entry
 ```
 
+## 현재 provider engine 트리
+
+큰 이동 전까지는 아래 경계로 유지한다. router가 provider 루프 세부 구현을 직접 소유하지 않게 하고, 제품 표면은 `api.ts`를 통해서만 접근한다.
+
+```
+src/codaro/
+├── ai/
+│   ├── providerSpec.py      # provider catalog/spec
+│   ├── profile.py secrets.py
+│   ├── factory.py baseProvider.py providers/
+│   ├── conversation.py      # conversation state + role prompts
+│   ├── teacherLoop.py       # context injection + tool lifecycle payloads
+│   ├── tools.py             # tool manifest/schema
+│   └── toolExecutor.py      # tool handlers
+├── api/
+│   └── aiRouter.py          # HTTP/SSE boundary only
+└── webBuild/                # built product surface
+```
+
+정리 기준:
+
+- `api/aiRouter.py`에는 HTTP/SSE, request parsing, status code만 둔다.
+- provider 선택, context 조립, tool payload는 `ai/` 안에서 관리한다.
+- 실행기/문서/커리큘럼 세부 모델은 router가 직접 해석하지 않는다.
+
 ## 관련
 
 - [[document-model]] [[execution-engine]] [[dataflow]] [[widget-bridge]]

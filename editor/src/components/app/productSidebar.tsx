@@ -7,6 +7,7 @@ import {
   MessageSquare,
   Moon,
   Search,
+  Settings,
   Sun,
   TerminalSquare,
   Workflow,
@@ -47,7 +48,9 @@ type ProductSidebarProps = {
   selectedCustomCurriculumId: string;
   selectedContentId: string;
   themeMode: ThemeMode;
+  aiConnecting: boolean;
   onQueryChange: (value: string) => void;
+  onConnectProvider: () => void;
   onSelectAutomationSection: (section: AutomationSection) => void;
   onSelectCategory: (key: string) => void;
   onSelectContent: (contentId: string) => void;
@@ -83,7 +86,9 @@ export function ProductSidebar({
   selectedCustomCurriculumId,
   selectedContentId,
   themeMode,
+  aiConnecting,
   onQueryChange,
+  onConnectProvider,
   onSelectAutomationSection,
   onSelectCategory,
   onSelectContent,
@@ -105,6 +110,16 @@ export function ProductSidebar({
               </SidebarMenuButton>
             </SidebarMenuItem>
           </SidebarMenu>
+          <button
+            aria-label="Provider 설정"
+            className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"
+            disabled={aiConnecting}
+            title="Provider 설정"
+            type="button"
+            onClick={onConnectProvider}
+          >
+            {aiConnecting ? <Loader2 className="size-4 animate-spin" /> : <Settings className="size-4" />}
+          </button>
           <button
             aria-label={themeMode === "dark" ? "라이트 모드" : "다크 모드"}
             className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"

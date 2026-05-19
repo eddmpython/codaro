@@ -1079,7 +1079,9 @@ function App() {
         selectedCustomCurriculumId={selectedCustomCurriculumId}
         selectedContentId={selectedContentId}
         themeMode={themeMode}
+        aiConnecting={aiConnecting}
         onQueryChange={setQuery}
+        onConnectProvider={connectAiProvider}
         onSelectAutomationSection={selectAutomationSection}
         onSelectCategory={selectCurriculumCategory}
         onSelectContent={selectCurriculumContent}
@@ -1090,9 +1092,6 @@ function App() {
 
       <SidebarInset className="grid h-svh min-h-0 min-w-0 grid-rows-[40px_minmax(0,1fr)] overflow-hidden">
         <TopBar
-          aiConnecting={aiConnecting}
-          aiProfile={aiProfile}
-          apiOnline={apiOnline}
           assistantCollapsed={assistantCollapsed}
           canRun={canRun && hasRunnableNotebook}
           loadState={loadState}
@@ -1100,7 +1099,6 @@ function App() {
           showSidebarTrigger={!sidebarOpen}
           surface={surface}
           notebookRunning={notebookRunning}
-          onConnectAi={connectAiProvider}
           onRunNotebook={runNotebook}
           onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
         />
