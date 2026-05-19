@@ -15,7 +15,7 @@ export function buildLocalBlocksFromPrompt(message: string, scope: TeacherScope)
     {
       id: `local-${seed}-goal`,
       type: "markdown",
-      content: `# ${topic}\n\n${scopeLine}\n\nCodaro는 먼저 커리큘럼 YAML을 만들고, 검토 가능한 학습 셀로 전개합니다.`,
+      content: `# ${topic}\n\n${scopeLine}\n\nCodaro는 먼저 학습 흐름을 설계하고, 검토 가능한 학습 셀로 전개합니다.`,
       displayKind: "hero",
       role: "title",
       sourceType: "intro",

@@ -106,7 +106,7 @@ export function CurriculumView({
                 </div>
                 <h1 className="mt-2 truncate text-2xl font-semibold tracking-normal">{document.title}</h1>
                 <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  YAML 커리큘럼을 학습 셀로 펼친 공간입니다. 셀마다 실행하거나 Codaro에게 설명, 힌트, 검증을 요청할 수 있습니다.
+                  커리큘럼을 학습 셀로 펼친 공간입니다. 셀마다 실행하거나 Codaro에게 설명, 힌트, 검증을 요청할 수 있습니다.
                 </p>
               </div>
               {referenceLoading ? <LoadingInline label="레슨 불러오는 중" /> : null}

@@ -842,7 +842,7 @@ function App() {
     setNotice({
       tone: "success",
       title: "노트북 변경 적용됨",
-      detail: `${pendingBlocks.length}개 블록을 추가했습니다.`,
+      detail: `${pendingBlocks.length}개 셀을 추가했습니다.`,
     });
   }
 
