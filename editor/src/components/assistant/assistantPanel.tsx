@@ -1,5 +1,7 @@
 import {
+  AlertCircle,
   Bot,
+  LogIn,
   Loader2,
   RotateCcw,
   Send,
@@ -12,7 +14,7 @@ import {
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
@@ -28,6 +30,7 @@ export type AssistantMessage = {
   model?: string | null;
   toolCalls?: AiToolCall[];
   tone?: "default" | "warning" | "error";
+  action?: "connect-provider";
 };
 
 export function TeacherPanel({
@@ -85,7 +88,15 @@ export function TeacherPanel({
         />
       </div>
 
-      <AssistantMessages appLoading={false} loading={loading} messages={messages} />
+      <AssistantMessages
+        aiConnecting={aiConnecting}
+        aiProfile={aiProfile}
+        apiOnline={apiOnline}
+        appLoading={false}
+        loading={loading}
+        messages={messages}
+        onConnectAi={onConnectAi}
+      />
 
       <AssistantComposer
         className="mt-3"
@@ -101,41 +112,79 @@ export function TeacherPanel({
 }
 
 export function AssistantMessages({
+  aiConnecting = false,
+  aiProfile = null,
+  apiOnline = false,
   appLoading,
   loading,
   messages,
+  onConnectAi,
 }: {
+  aiConnecting?: boolean;
+  aiProfile?: AiProfile | null;
+  apiOnline?: boolean;
   appLoading: boolean;
   loading: boolean;
   messages: AssistantMessage[];
+  onConnectAi?: () => void;
 }) {
   return (
-    <ScrollArea className="min-h-0">
-      <div className="space-y-3 pr-3">
+    <ScrollArea className="h-full min-h-0">
+      <div className="space-y-1 pr-3">
         {appLoading ? (
           <LoadingState title="Codaro 여는 중" detail="노트북, 커리큘럼, 자동화 상태를 불러오고 있습니다." />
         ) : messages.length ? (
-          messages.map((message) => (
-            <Card
-              className={cn(
-                message.role === "user" && "bg-muted/30",
-                message.tone === "error" && "bg-destructive/10",
-                message.tone === "warning" && "bg-muted/40",
-              )}
-              key={message.id}
-            >
-              <CardHeader className="pb-2">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant={message.role === "assistant" ? "secondary" : "outline"}>
-                    {roleLabel(message.role)}
-                  </Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="whitespace-pre-wrap text-sm leading-6 text-muted-foreground">{message.content}</div>
-              </CardContent>
-            </Card>
-          ))
+          messages.map((message) => {
+            const needsProvider = message.action === "connect-provider" || isProviderAuthMessage(message.content);
+            return (
+              <div
+                className={cn(
+                  "group flex px-1 py-2",
+                  message.role === "user" ? "justify-end" : "justify-start",
+                )}
+                key={message.id}
+              >
+                {message.role === "user" ? (
+                  <div className="max-w-[75%] rounded-2xl bg-muted/60 px-4 py-2.5 text-sm leading-6 whitespace-pre-wrap break-words text-foreground">
+                    {message.content}
+                  </div>
+                ) : (
+                  <div className="w-full max-w-3xl space-y-2 text-sm leading-6 text-foreground">
+                    {message.tone === "error" ? (
+                      <div className="flex items-start gap-2 text-destructive">
+                        <AlertCircle className="mt-1 size-4 shrink-0" />
+                        <div className="min-w-0">
+                          <div className="whitespace-pre-wrap break-words">
+                            {cleanAssistantMessage(message.content)}
+                          </div>
+                          {needsProvider ? (
+                            <ProviderConnectAction
+                              aiConnecting={aiConnecting}
+                              apiOnline={apiOnline}
+                              onConnectAi={onConnectAi}
+                            />
+                          ) : null}
+                        </div>
+                      </div>
+                    ) : (
+                      <>
+                        <div className="whitespace-pre-wrap break-words text-muted-foreground">
+                          {cleanAssistantMessage(message.content)}
+                        </div>
+                        {needsProvider && !aiProfileReady(aiProfile) ? (
+                          <ProviderConnectAction
+                            aiConnecting={aiConnecting}
+                            apiOnline={apiOnline}
+                            onConnectAi={onConnectAi}
+                          />
+                        ) : null}
+                      </>
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })
         ) : (
           <EmptyState
             detail="Codaro에게 다음 설명, 실습 셀, 검증, 자동화를 만들어 달라고 요청하세요."
@@ -143,12 +192,10 @@ export function AssistantMessages({
           />
         )}
         {loading ? (
-          <Card className="bg-muted/30">
-            <CardContent className="flex items-center gap-2 p-4 text-sm text-muted-foreground">
-              <Loader2 className="size-4 animate-spin" />
-              다음 노트북 단계를 만드는 중입니다.
-            </CardContent>
-          </Card>
+          <div className="flex items-center gap-2 px-1 py-3 text-sm text-muted-foreground">
+            <Loader2 className="size-4 animate-spin" />
+            응답 작성 중
+          </div>
         ) : null}
       </div>
     </ScrollArea>
@@ -270,7 +317,14 @@ function AssistantHeader({
         )}
       </div>
       <div className="flex shrink-0 items-center gap-2">
-        {compact ? null : (
+        {compact ? (
+          apiOnline && !aiProfileReady(aiProfile) ? (
+            <Button className="h-8 gap-1.5 px-2 text-xs" disabled={aiConnecting} size="sm" variant="outline" onClick={onConnectAi}>
+              {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogIn className="size-3.5" />}
+              연결
+            </Button>
+          ) : null
+        ) : (
           <>
             <IconButton disabled={aiConnecting} label="제공자 연결" onClick={onConnectAi}>
               {aiConnecting ? <Loader2 className="animate-spin" /> : <Bot />}
@@ -285,12 +339,6 @@ function AssistantHeader({
   );
 }
 
-function roleLabel(role: AssistantMessage["role"]) {
-  if (role === "assistant") return "어시스턴트";
-  if (role === "user") return "나";
-  return "시스템";
-}
-
 function assistantStatusText(apiOnline: boolean, profile: AiProfile | null) {
   if (!apiOnline) return "기본 안내 모드입니다.";
   if (!aiProfileReady(profile)) return "대화 제공자를 연결하면 실제 응답을 사용할 수 있습니다.";
@@ -299,18 +347,53 @@ function assistantStatusText(apiOnline: boolean, profile: AiProfile | null) {
 
 function LoadingState({ title, detail }: { title: string; detail: string }) {
   return (
-    <Card className="bg-muted/20">
-      <CardContent className="space-y-3 p-4">
-        <div className="flex items-center gap-2 text-sm font-medium">
-          <Loader2 className="size-4 animate-spin text-muted-foreground" />
-          {title}
-        </div>
-        <div className="space-y-2">
-          <Skeleton className="h-3 w-3/4" />
-          <Skeleton className="h-3 w-1/2" />
-        </div>
-        <div className="text-xs text-muted-foreground">{detail}</div>
-      </CardContent>
-    </Card>
+    <div className="space-y-3 rounded-md border bg-muted/20 p-4">
+      <div className="flex items-center gap-2 text-sm font-medium">
+        <Loader2 className="size-4 animate-spin text-muted-foreground" />
+        {title}
+      </div>
+      <div className="space-y-2">
+        <Skeleton className="h-3 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
+      </div>
+      <div className="text-xs text-muted-foreground">{detail}</div>
+    </div>
+  );
+}
+
+function isProviderAuthMessage(content: string) {
+  const normalized = content.toLowerCase();
+  return (
+    normalized.includes("oauth authentication required") ||
+    normalized.includes("please login") ||
+    normalized.includes("authentication expired") ||
+    normalized.includes("re-login") ||
+    normalized.includes("대화 제공자 로그인이 필요")
+  );
+}
+
+function cleanAssistantMessage(content: string) {
+  return isProviderAuthMessage(content)
+    ? "대화 제공자 로그인이 필요합니다. 연결을 누르고 브라우저 로그인을 완료한 뒤 다시 요청하세요."
+    : content.replace(/^503\s+/, "");
+}
+
+function ProviderConnectAction({
+  aiConnecting,
+  apiOnline,
+  onConnectAi,
+}: {
+  aiConnecting: boolean;
+  apiOnline: boolean;
+  onConnectAi?: () => void;
+}) {
+  if (!apiOnline) {
+    return <div className="mt-2 text-xs text-muted-foreground">서버 세션이 열리면 제공자를 연결할 수 있습니다.</div>;
+  }
+  return (
+    <Button className="mt-2 h-8 gap-1.5 px-3 text-xs" disabled={aiConnecting || !onConnectAi} size="sm" onClick={onConnectAi}>
+      {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogIn className="size-3.5" />}
+      대화 제공자 연결
+    </Button>
   );
 }

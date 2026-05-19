@@ -1,17 +1,22 @@
 import {
   AssistantComposer,
   AssistantMessages,
+  aiProfileReady,
   type AssistantMessage,
 } from "@/components/assistant/assistantPanel";
 import { PendingNotebookBar } from "@/components/app/appPrimitives";
 import { Button } from "@/components/ui/button";
 import type { TeacherScope } from "@/lib/teacherScope";
 import type {
+  AiProfile,
   BlockConfig,
   LoadState,
 } from "@/types";
 
 export function ChatSurface({
+  aiConnecting,
+  aiProfile,
+  apiOnline,
   loading,
   loadState,
   messages,
@@ -19,9 +24,13 @@ export function ChatSurface({
   prompt,
   onAsk,
   onAcceptPendingBlocks,
+  onConnectAi,
   onPromptChange,
   onRejectPendingBlocks,
 }: {
+  aiConnecting: boolean;
+  aiProfile: AiProfile | null;
+  apiOnline: boolean;
   loading: boolean;
   loadState: LoadState;
   messages: AssistantMessage[];
@@ -29,10 +38,12 @@ export function ChatSurface({
   prompt: string;
   onAsk: (messageOverride?: string, scopeOverride?: TeacherScope) => void;
   onAcceptPendingBlocks: () => void;
+  onConnectAi: () => void;
   onPromptChange: (value: string) => void;
   onRejectPendingBlocks: () => void;
 }) {
   const isEmptyChat = !messages.length && !pendingBlocks.length && loadState !== "loading";
+  const providerReady = apiOnline && aiProfileReady(aiProfile);
   if (isEmptyChat) {
     return (
       <div className="grid h-[calc(100vh-40px)] min-h-0 place-items-center px-4">
@@ -52,6 +63,13 @@ export function ChatSurface({
             onAsk={onAsk}
             onPromptChange={onPromptChange}
           />
+          {!providerReady ? (
+            <div className="mt-3 flex justify-center">
+              <Button className="h-8 px-3 text-xs" disabled={aiConnecting || !apiOnline} size="sm" type="button" variant="secondary" onClick={onConnectAi}>
+                {aiConnecting ? "연결 대기 중" : "대화 제공자 연결"}
+              </Button>
+            </div>
+          ) : null}
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             <Button size="sm" type="button" variant="outline" onClick={() => onAsk("실습 검증이 포함된 3단계 pandas 레슨을 만들어줘.", "curriculum")}>
               Pandas 레슨
@@ -71,7 +89,15 @@ export function ChatSurface({
   return (
     <div className="h-[calc(100vh-40px)] min-h-0">
       <section className="mx-auto grid h-full min-h-0 w-full max-w-4xl grid-rows-[1fr_auto] p-3 pt-5">
-        <AssistantMessages appLoading={loadState === "loading"} loading={loading} messages={messages} />
+        <AssistantMessages
+          aiConnecting={aiConnecting}
+          aiProfile={aiProfile}
+          apiOnline={apiOnline}
+          appLoading={loadState === "loading"}
+          loading={loading}
+          messages={messages}
+          onConnectAi={onConnectAi}
+        />
         <div>
           <PendingNotebookBar
             pendingBlocks={pendingBlocks}

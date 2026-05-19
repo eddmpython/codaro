@@ -583,10 +583,11 @@ function App() {
 
       setNotice({ tone: "warning", title: "제공자 로그인 대기 중", detail: "로그인 탭을 완료한 뒤 상태를 다시 확인하세요." });
     } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
       setNotice({
         tone: "error",
         title: "제공자 로그인 실패",
-        detail: error instanceof Error ? error.message : String(error),
+        detail: isProviderAuthError(detail) ? "대화 제공자 로그인을 다시 시작하세요." : detail,
       });
     } finally {
       setAiConnecting(false);
@@ -726,16 +727,25 @@ function App() {
       });
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
+      const providerAuthIssue = isProviderAuthError(detail);
+      const displayDetail = providerAuthIssue
+        ? "대화 제공자 로그인이 필요합니다. 연결을 누르고 브라우저 로그인을 완료한 뒤 다시 요청하세요."
+        : detail;
       setMessages((current) => [
         ...current,
         {
           id: `assistant-error-${Date.now()}`,
-          role: "system",
+          role: "assistant",
           tone: "error",
-          content: detail,
+          action: providerAuthIssue ? "connect-provider" : undefined,
+          content: displayDetail,
         },
       ]);
-      setNotice({ tone: "error", title: "어시스턴트 사용 불가", detail });
+      setNotice({
+        tone: "error",
+        title: providerAuthIssue ? "대화 제공자 연결 필요" : "어시스턴트 사용 불가",
+        detail: displayDetail,
+      });
     } finally {
       setAssistantLoading(false);
     }
@@ -991,6 +1001,18 @@ function sleep(milliseconds: number) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, milliseconds);
   });
+}
+
+function isProviderAuthError(detail: string) {
+  const normalized = detail.toLowerCase();
+  return (
+    normalized.includes("oauth authentication required") ||
+    normalized.includes("authentication expired") ||
+    normalized.includes("please login") ||
+    normalized.includes("re-login") ||
+    normalized.includes("no saved token") ||
+    normalized.includes("token refresh failed")
+  );
 }
 
 export default App;

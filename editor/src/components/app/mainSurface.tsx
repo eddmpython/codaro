@@ -84,6 +84,9 @@ export function MainSurface(props: MainSurfaceProps) {
   if (props.surface === "chat") {
     return (
       <ChatSurface
+        aiConnecting={props.aiConnecting}
+        aiProfile={props.aiProfile}
+        apiOnline={props.apiOnline}
         loading={props.assistantLoading}
         loadState={props.loadState}
         messages={props.messages}
@@ -91,6 +94,7 @@ export function MainSurface(props: MainSurfaceProps) {
         prompt={props.prompt}
         onAsk={props.onAsk}
         onAcceptPendingBlocks={props.onAcceptPendingBlocks}
+        onConnectAi={props.onConnectAi}
         onPromptChange={props.onPromptChange}
         onRejectPendingBlocks={props.onRejectPendingBlocks}
       />
