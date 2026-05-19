@@ -46,7 +46,6 @@ type MainSurfaceProps = {
   categories: CurriculumCategory[];
   contents: CurriculumContentSummary[];
   curriculumDocument: CodaroDocument | null;
-  conversationId: string | null;
   document: CodaroDocument;
   drafts: Record<string, string>;
   eStop: EStopStatus;
@@ -83,13 +82,6 @@ type MainSurfaceProps = {
 };
 
 export function MainSurface(props: MainSurfaceProps) {
-  const activeDocument = props.surface === "curriculum" && props.curriculumDocument ? props.curriculumDocument : props.document;
-  const activeBlockId = props.surface === "curriculum" ? props.selectedCurriculumBlockId : props.selectedBlockId;
-  const selectedBlock =
-    activeDocument.blocks.find((block) => block.id === activeBlockId) ??
-    activeDocument.blocks.find((block) => block.type === "code") ??
-    activeDocument.blocks[0];
-
   if (props.surface === "chat") {
     return (
       <ChatSurface
@@ -137,13 +129,11 @@ export function MainSurface(props: MainSurfaceProps) {
             aiConnecting={props.aiConnecting}
             aiProfile={props.aiProfile}
             apiOnline={props.apiOnline}
-            conversationId={props.conversationId}
             loading={props.assistantLoading}
             messages={props.messages}
             pendingBlocks={props.pendingBlocks}
             placement="right"
             prompt={props.prompt}
-            selectedBlock={selectedBlock}
             onAcceptPendingBlocks={props.onAcceptPendingBlocks}
             onAsk={props.onAsk}
             onConnectAi={props.onConnectAi}
@@ -219,13 +209,11 @@ export function MainSurface(props: MainSurfaceProps) {
             aiConnecting={props.aiConnecting}
             aiProfile={props.aiProfile}
             apiOnline={props.apiOnline}
-            conversationId={props.conversationId}
             loading={props.assistantLoading}
             messages={props.messages}
             pendingBlocks={props.pendingBlocks}
             placement="right"
             prompt={props.prompt}
-            selectedBlock={selectedBlock}
             onAcceptPendingBlocks={props.onAcceptPendingBlocks}
             onAsk={props.onAsk}
             onConnectAi={props.onConnectAi}

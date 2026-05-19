@@ -15,7 +15,7 @@ export function CellAiActions({
   return (
     <IconButton
       className="size-7 shrink-0 opacity-80 lg:opacity-0 lg:transition group-hover:opacity-100 focus-visible:opacity-100"
-      label="셀 AI"
+      label="셀 도움 요청"
       tabIndex={selected ? 0 : -1}
       variant="ghost"
       onClick={(event) => {

@@ -235,7 +235,7 @@ function App() {
         setCurriculumDocument(initialCurriculumDocument);
         setToolCatalog(emptyToolCatalog);
         setAiProfile({
-          activeProvider: "LLM 미연결",
+          activeProvider: "대화 제공자 없음",
           activeModel: null,
           ready: false,
         });
@@ -559,8 +559,8 @@ function App() {
     if (!apiOnline) {
       setNotice({
         tone: "warning",
-        title: "LLM 미연결",
-        detail: "서버 세션이 없어서 실제 제공자 연결은 사용할 수 없습니다.",
+        title: "기본 안내 모드",
+        detail: "서버 세션이 없어서 실제 대화 제공자 연결은 사용할 수 없습니다.",
       });
       return;
     }
@@ -623,7 +623,7 @@ function App() {
           id: `assistant-preview-${Date.now()}`,
           role: "assistant",
           content: buildLocalAssistantAnswer(message, activeScope, generatedBlocks.length),
-          provider: "LLM 미연결",
+          provider: "기본 안내",
           model: "기본 안내",
         },
       ]);
@@ -944,7 +944,6 @@ function App() {
           categories={filteredCategories}
           contents={contents}
           curriculumDocument={curriculumDocument}
-          conversationId={conversationId}
           document={document}
           drafts={drafts}
           eStop={eStop}

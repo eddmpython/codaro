@@ -16,7 +16,6 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { blockLabel } from "@/lib/cellModel";
 import type { TeacherScope } from "@/lib/teacherScope";
 import { cn } from "@/lib/utils";
 import type { AiProfile, AiToolCall, BlockConfig } from "@/types";
@@ -35,13 +34,11 @@ export function TeacherPanel({
   aiConnecting,
   aiProfile,
   apiOnline,
-  conversationId,
   loading,
   messages,
   pendingBlocks,
   placement = "right",
   prompt,
-  selectedBlock,
   onAcceptPendingBlocks,
   onAsk,
   onConnectAi,
@@ -52,13 +49,11 @@ export function TeacherPanel({
   aiConnecting: boolean;
   aiProfile: AiProfile | null;
   apiOnline: boolean;
-  conversationId: string | null;
   loading: boolean;
   messages: AssistantMessage[];
   pendingBlocks: BlockConfig[];
   placement?: "left" | "right";
   prompt: string;
-  selectedBlock?: BlockConfig;
   onAcceptPendingBlocks: () => void;
   onAsk: (messageOverride?: string, scopeOverride?: TeacherScope) => void;
   onConnectAi: () => void;
@@ -66,8 +61,6 @@ export function TeacherPanel({
   onPromptChange: (value: string) => void;
   onRejectPendingBlocks: () => void;
 }) {
-  const selectedLabel = selectedBlock ? blockLabel(selectedBlock) : "선택된 셀 없음";
-
   return (
     <aside
       className={cn(
@@ -81,18 +74,9 @@ export function TeacherPanel({
           aiProfile={aiProfile}
           apiOnline={apiOnline}
           compact
-          conversationId={conversationId}
           onConnectAi={onConnectAi}
           onNewChat={onNewChat}
         />
-
-        <div className="mt-2 rounded-md border bg-muted/15 px-3 py-2">
-          <div className="text-[11px] font-medium uppercase text-muted-foreground">선택</div>
-          <div className="mt-1 truncate text-sm">{selectedLabel}</div>
-          <div className="mt-1 text-xs leading-5 text-muted-foreground">
-            셀, 레슨, 커리큘럼 범위는 대화 내용으로 판단합니다.
-          </div>
-        </div>
 
         <PendingNotebookBar
           pendingBlocks={pendingBlocks}
@@ -145,8 +129,6 @@ export function AssistantMessages({
                   <Badge variant={message.role === "assistant" ? "secondary" : "outline"}>
                     {roleLabel(message.role)}
                   </Badge>
-                  {message.provider ? <Badge variant="outline">{message.provider}</Badge> : null}
-                  {message.model ? <Badge variant="outline">{message.model}</Badge> : null}
                 </div>
               </CardHeader>
               <CardContent>
@@ -247,7 +229,7 @@ export function AssistantComposer({
 }
 
 export function aiProviderName(profile: AiProfile | null) {
-  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? "제공자 없음");
+  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? "대화 제공자 없음");
 }
 
 export function aiProfileReady(profile: AiProfile | null) {
@@ -259,7 +241,6 @@ function AssistantHeader({
   aiProfile,
   apiOnline,
   compact = false,
-  conversationId,
   onConnectAi,
   onNewChat,
 }: {
@@ -267,7 +248,6 @@ function AssistantHeader({
   aiProfile: AiProfile | null;
   apiOnline: boolean;
   compact?: boolean;
-  conversationId: string | null;
   onConnectAi: () => void;
   onNewChat: () => void;
 }) {
@@ -283,10 +263,9 @@ function AssistantHeader({
         ) : (
           <div className="mt-1 flex flex-wrap gap-2">
             <Badge variant={apiOnline && aiProfileReady(aiProfile) ? "secondary" : "outline"}>
-              {apiOnline && aiProfileReady(aiProfile) ? "LLM 연결됨" : "LLM 미연결"}
+              {apiOnline && aiProfileReady(aiProfile) ? "대화 연결됨" : "기본 안내 모드"}
             </Badge>
             <Badge variant={aiProfileReady(aiProfile) ? "secondary" : "outline"}>{aiProviderName(aiProfile)}</Badge>
-            {conversationId ? <Badge variant="outline">{conversationId.slice(0, 14)}</Badge> : null}
           </div>
         )}
       </div>
@@ -313,8 +292,8 @@ function roleLabel(role: AssistantMessage["role"]) {
 }
 
 function assistantStatusText(apiOnline: boolean, profile: AiProfile | null) {
-  if (!apiOnline) return "LLM 미연결 - 지금은 기본 안내만 표시합니다.";
-  if (!aiProfileReady(profile)) return "LLM 미설정 - 제공자 연결 후 실제 대화가 가능합니다.";
+  if (!apiOnline) return "기본 안내 모드입니다.";
+  if (!aiProfileReady(profile)) return "대화 제공자를 연결하면 실제 응답을 사용할 수 있습니다.";
   return "대화로 셀, 레슨, 커리큘럼을 다룹니다.";
 }
 
