@@ -155,7 +155,7 @@ function App() {
     const stored = window.localStorage.getItem("codaro-theme");
     return stored === "light" ? "light" : "dark";
   });
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(true);
   const [assistantCollapsed, setAssistantCollapsed] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [prompt, setPrompt] = useState("");
@@ -206,7 +206,6 @@ function App() {
   }, [customCurricula]);
 
   useEffect(() => {
-    setSidebarOpen(surface !== "chat");
     if (window.location.hash !== `#${surface}`) {
       window.history.replaceState(null, "", `#${surface}`);
     }
