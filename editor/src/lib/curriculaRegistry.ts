@@ -158,13 +158,12 @@ const lessons = Object.entries(rawCurricula)
 
     const [, category, fileName] = match;
     const contentId = fileName.replace(/\.yaml$/, "");
-    const parsed = parseYaml(raw);
     return {
       category,
       contentId,
       fileName,
       raw,
-      title: lessonTitle(parsed) || titleFromFileName(contentId),
+      title: lessonTitleFromRaw(raw) || titleFromFileName(contentId),
     } satisfies RegistryLesson;
   })
   .filter((lesson): lesson is RegistryLesson => Boolean(lesson))
@@ -172,6 +171,8 @@ const lessons = Object.entries(rawCurricula)
     if (left.category !== right.category) return left.category.localeCompare(right.category);
     return left.fileName.localeCompare(right.fileName, "ko", { numeric: true });
   });
+
+const lessonPayloadCache = new Map<string, CurriculumLessonPayload>();
 
 export function registryCategories(): CurriculumCategoriesPayload {
   const grouped = groupLessons();
@@ -216,11 +217,15 @@ export function registryLesson(category: string, contentId: string): CurriculumL
   const lesson = lessons.find((item) => item.category === category && item.contentId === contentId);
   if (!lesson) return null;
 
+  const cacheKey = `${category}/${contentId}`;
+  const cached = lessonPayloadCache.get(cacheKey);
+  if (cached) return cached;
+
   const document = documentFromCurriculumYaml(lesson.raw, category, contentId, lesson.title);
   const categoryLessons = lessons.filter((item) => item.category === category);
   const index = categoryLessons.findIndex((item) => item.contentId === contentId);
 
-  return {
+  const payload = {
     document,
     solutions: {},
     category,
@@ -232,6 +237,8 @@ export function registryLesson(category: string, contentId: string): CurriculumL
         : null,
     },
   };
+  lessonPayloadCache.set(cacheKey, payload);
+  return payload;
 }
 
 export function defaultRegistrySelection() {
@@ -549,6 +556,40 @@ function parseYaml(raw: string): YamlMap {
 
 function lessonTitle(yaml: YamlMap) {
   return textValue(mapValue(yaml.meta).title ?? yaml.title);
+}
+
+function lessonTitleFromRaw(raw: string) {
+  const lines = raw.split(/\r?\n/).slice(0, 80);
+  let inMeta = false;
+
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith("#")) continue;
+
+    const indent = line.length - line.trimStart().length;
+    if (indent === 0 && /^meta\s*:/.test(trimmed)) {
+      inMeta = true;
+      continue;
+    }
+    if (inMeta && indent === 0) {
+      inMeta = false;
+    }
+
+    if (trimmed.startsWith("title:") && (inMeta || indent === 0)) {
+      return cleanYamlTitle(trimmed.slice("title:".length));
+    }
+  }
+
+  return "";
+}
+
+function cleanYamlTitle(value: string) {
+  const trimmed = value.trim();
+  if (!trimmed || trimmed === "|" || trimmed === ">") return "";
+  if ((trimmed.startsWith("\"") && trimmed.endsWith("\"")) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
+    return trimmed.slice(1, -1).trim();
+  }
+  return trimmed.replace(/\s+#.*$/, "").trim();
 }
 
 function introMarkdown(title: string, intro: YamlMap) {
