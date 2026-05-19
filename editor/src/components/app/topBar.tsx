@@ -1,8 +1,10 @@
 import {
   AlertTriangle,
+  Bot,
   CheckCircle2,
   Clock3,
   Loader2,
+  LogIn,
   PanelRightClose,
   PanelRightOpen,
   Play,
@@ -14,10 +16,13 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { surfaceTitle, type SurfaceMode } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
-import type { AppNotice, LoadState } from "@/types";
+import type { AiProfile, AppNotice, LoadState } from "@/types";
 import { SocialLinks } from "./socialLinks";
 
 export function TopBar({
+  aiConnecting,
+  aiProfile,
+  apiOnline,
   assistantCollapsed,
   canRun,
   loadState,
@@ -25,9 +30,13 @@ export function TopBar({
   showSidebarTrigger,
   surface,
   notebookRunning,
+  onConnectAi,
   onRunNotebook,
   onToggleAssistant,
 }: {
+  aiConnecting: boolean;
+  aiProfile: AiProfile | null;
+  apiOnline: boolean;
   assistantCollapsed: boolean;
   canRun: boolean;
   loadState: LoadState;
@@ -35,6 +44,7 @@ export function TopBar({
   showSidebarTrigger: boolean;
   surface: SurfaceMode;
   notebookRunning: boolean;
+  onConnectAi: () => void;
   onRunNotebook: () => void;
   onToggleAssistant: () => void;
 }) {
@@ -43,6 +53,7 @@ export function TopBar({
   const showAssistantToggle = surface === "editor" || surface === "curriculum";
   const assistantDividerClass = topBarAssistantDividerClass(surface, assistantCollapsed);
   const tocDividerClass = topBarTocDividerClass(surface, assistantCollapsed);
+  const providerReady = Boolean(aiProfile?.ready ?? aiProfile?.enabled);
 
   return (
     <header className="sticky top-0 z-20 flex h-10 min-w-0 items-center justify-between gap-1.5 bg-background/95 px-2.5 backdrop-blur">
@@ -69,6 +80,13 @@ export function TopBar({
       )}
 
       <div className="relative z-10 flex shrink-0 items-center gap-1">
+        <TopBarIconButton
+          disabled={aiConnecting}
+          label={apiOnline && providerReady ? "대화 제공자 설정" : "대화 제공자 연결"}
+          onClick={onConnectAi}
+        >
+          {aiConnecting ? <Loader2 className="animate-spin" /> : providerReady ? <Bot /> : <LogIn />}
+        </TopBarIconButton>
         <SocialLinks />
         {showAssistantToggle ? (
           <TopBarIconButton

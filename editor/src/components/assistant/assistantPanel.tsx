@@ -1,12 +1,12 @@
 import {
   AlertCircle,
+  ArrowUp,
   Bot,
   LogIn,
   Loader2,
   RotateCcw,
-  Send,
 } from "lucide-react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 
 import {
   EmptyState,
@@ -128,9 +128,21 @@ export function AssistantMessages({
   messages: AssistantMessage[];
   onConnectAi?: () => void;
 }) {
+  const viewportRef = useRef<HTMLDivElement | null>(null);
+  const latestMessageLength = messages.at(-1)?.content.length ?? 0;
+
+  useEffect(() => {
+    const viewport = viewportRef.current;
+    if (!viewport) return;
+    const distanceFromBottom = viewport.scrollHeight - viewport.scrollTop - viewport.clientHeight;
+    if (distanceFromBottom < 220) {
+      viewport.scrollTop = viewport.scrollHeight;
+    }
+  }, [loading, messages.length, latestMessageLength]);
+
   return (
-    <ScrollArea className="h-full min-h-0">
-      <div className="space-y-1 pr-3">
+    <ScrollArea className="h-full min-h-0" viewportRef={viewportRef}>
+      <div className="mx-auto w-full max-w-3xl space-y-1 pr-3">
         {appLoading ? (
           <LoadingState title="Codaro 여는 중" detail="노트북, 커리큘럼, 자동화 상태를 불러오고 있습니다." />
         ) : messages.length ? (
@@ -203,6 +215,7 @@ export function AssistantMessages({
 }
 
 export function AssistantComposer({
+  autoFocus = false,
   className,
   loading,
   placeholder = "Codaro에게 커리큘럼 생성, 실습 셀 구성, 코드 실행, 변수 확인, 워크플로 자동화를 요청하세요.",
@@ -211,6 +224,7 @@ export function AssistantComposer({
   onAsk,
   onPromptChange,
 }: {
+  autoFocus?: boolean;
   className?: string;
   loading: boolean;
   placeholder?: string;
@@ -220,7 +234,6 @@ export function AssistantComposer({
   onPromptChange: (value: string) => void;
 }) {
   const canAsk = Boolean(prompt.trim()) && !loading;
-  const submittedOnKeyDownRef = useRef(false);
   const submit = () => {
     if (!canAsk) return;
     onAsk();
@@ -228,7 +241,7 @@ export function AssistantComposer({
   return (
     <form
       className={cn(
-        "grid grid-cols-[1fr_auto] gap-2",
+        "flex w-full items-end gap-2",
         variant === "dock" && "mt-3",
         variant === "hero" && "rounded-md border bg-card p-2 shadow-sm",
         variant === "panel" && "rounded-md border bg-background p-2",
@@ -240,37 +253,34 @@ export function AssistantComposer({
       }}
     >
       <Textarea
+        autoFocus={autoFocus}
         className={cn(
-          "resize-none border-0 bg-transparent shadow-none focus-visible:ring-0",
-          variant === "panel" ? "min-h-20" : "min-h-24",
+          "min-h-10 max-h-48 flex-1 resize-none overflow-y-auto border-0 bg-transparent py-2.5 shadow-none focus-visible:ring-0",
+          variant === "panel" && "max-h-40",
         )}
         placeholder={placeholder}
+        rows={1}
         value={prompt}
         onChange={(event) => onPromptChange(event.target.value)}
         onKeyDown={(event) => {
-          submittedOnKeyDownRef.current = false;
           const nativeEvent = event.nativeEvent as KeyboardEvent & { isComposing?: boolean };
           if (nativeEvent.isComposing) return;
           if (event.key === "Enter" && !event.shiftKey) {
             event.preventDefault();
-            submittedOnKeyDownRef.current = true;
             submit();
           }
         }}
-        onKeyUp={(event) => {
-          const nativeEvent = event.nativeEvent as KeyboardEvent & { isComposing?: boolean };
-          if (event.key !== "Enter" || event.shiftKey || nativeEvent.isComposing) return;
-          if (submittedOnKeyDownRef.current) {
-            submittedOnKeyDownRef.current = false;
-            return;
-          }
-          event.preventDefault();
-          submit();
-        }}
       />
-      <IconButton className="self-end" disabled={!canAsk} label="보내기" type="submit" variant="default">
-        {loading ? <Loader2 className="animate-spin" /> : <Send />}
-      </IconButton>
+      <Button
+        aria-label="전송"
+        className="size-9 shrink-0 rounded-full [&_svg]:size-4"
+        disabled={!canAsk}
+        size="icon"
+        title="전송"
+        type="submit"
+      >
+        {loading ? <Loader2 className="animate-spin" /> : <ArrowUp />}
+      </Button>
     </form>
   );
 }
