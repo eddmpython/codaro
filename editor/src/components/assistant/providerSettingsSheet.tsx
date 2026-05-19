@@ -46,7 +46,7 @@ const providerKoreanCopy: Record<string, { label: string; description: string }>
   },
   openai: {
     label: "OpenAI API 키",
-    description: "API 키를 저장해 Codaro 대화 제공자로 사용합니다.",
+    description: "API 키를 저장해 Codaro provider로 사용합니다.",
   },
   ollama: {
     label: "Ollama 로컬",
@@ -77,9 +77,9 @@ export function ProviderSettingsSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-md">
         <SheetHeader>
-          <SheetTitle>대화 제공자</SheetTitle>
+          <SheetTitle>AI Provider</SheetTitle>
           <SheetDescription>
-            Codaro가 채팅, 학습 셀, 자동화 요청에 사용할 제공자를 연결합니다.
+            Codaro가 채팅, 학습 셀, 자동화 요청에 사용할 provider를 연결합니다.
           </SheetDescription>
         </SheetHeader>
 
@@ -87,7 +87,7 @@ export function ProviderSettingsSheet({
           <div className="space-y-2 pb-4">
             {!apiOnline ? (
               <div className="rounded-md border bg-muted/30 p-3 text-sm leading-6 text-muted-foreground">
-                서버 세션이 열리면 제공자를 연결할 수 있습니다.
+                서버 세션이 열리면 provider를 연결할 수 있습니다.
               </div>
             ) : null}
 
@@ -108,7 +108,7 @@ export function ProviderSettingsSheet({
               ))
             ) : (
               <div className="rounded-md border bg-muted/30 p-3 text-sm leading-6 text-muted-foreground">
-                제공자 목록을 불러오지 못했습니다. 서버 상태를 확인하세요.
+                provider 목록을 불러오지 못했습니다. 서버 상태를 확인하세요.
               </div>
             )}
           </div>
@@ -264,8 +264,8 @@ function providerRuntime(profile: AiProfile | null): Record<string, ProviderRunt
 
 function providerCopy(provider: AiProvider) {
   return providerKoreanCopy[provider.id ?? ""] ?? {
-    label: provider.label ?? provider.name ?? provider.id ?? "제공자",
-    description: provider.description ?? "Codaro 대화 제공자로 사용합니다.",
+    label: provider.label ?? provider.name ?? provider.id ?? "provider",
+    description: provider.description ?? "Codaro provider로 사용합니다.",
   };
 }
 

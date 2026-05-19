@@ -67,7 +67,7 @@ export function ChatSurface({
           {!providerReady ? (
             <div className="mt-3 flex justify-center">
               <Button className="h-8 px-3 text-xs" disabled={aiConnecting || !apiOnline} size="sm" type="button" variant="secondary" onClick={onConnectAi}>
-                {aiConnecting ? "연결 대기 중" : "대화 제공자 연결"}
+                {aiConnecting ? "연결 대기 중" : "Provider 연결"}
               </Button>
             </div>
           ) : null}

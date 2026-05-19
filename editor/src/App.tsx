@@ -236,7 +236,7 @@ function App() {
         setCurriculumDocument(initialCurriculumDocument);
         setToolCatalog(emptyToolCatalog);
         setAiProfile({
-          activeProvider: "대화 제공자 없음",
+          activeProvider: "provider 없음",
           activeModel: null,
           ready: false,
         });
@@ -559,8 +559,8 @@ function App() {
     if (!apiOnline) {
       setNotice({
         tone: "warning",
-        title: "제공자 연결 불가",
-        detail: "서버 세션이 없어서 실제 대화 제공자 연결은 사용할 수 없습니다.",
+        title: "Provider 연결 불가",
+        detail: "서버 세션이 없어서 실제 provider 연결은 사용할 수 없습니다.",
       });
       return;
     }
@@ -572,8 +572,8 @@ function App() {
     if (!apiOnline) {
       setNotice({
         tone: "warning",
-        title: "제공자 연결 불가",
-        detail: "서버 세션이 없어서 실제 대화 제공자 연결은 사용할 수 없습니다.",
+        title: "Provider 연결 불가",
+        detail: "서버 세션이 없어서 실제 provider 연결은 사용할 수 없습니다.",
       });
       return;
     }
@@ -585,7 +585,7 @@ function App() {
       }
       const auth = await codaroApi.oauthAuthorize();
       window.open(auth.authUrl, "_blank", "noopener,noreferrer");
-      setNotice({ tone: "default", title: "제공자 로그인 열림", detail: "새 탭에서 제공자 로그인을 완료하세요." });
+      setNotice({ tone: "default", title: "Provider 로그인 열림", detail: "새 탭에서 provider 로그인을 완료하세요." });
 
       for (let attempt = 0; attempt < 60; attempt += 1) {
         await sleep(1000);
@@ -595,17 +595,17 @@ function App() {
         const profile = await codaroApi.aiProfile();
         setAiProfile(profile);
         setProviderSettingsOpen(false);
-        setNotice({ tone: "success", title: "제공자 연결됨", detail: aiProviderName(profile) });
+        setNotice({ tone: "success", title: "Provider 연결됨", detail: aiProviderName(profile) });
         return;
       }
 
-      setNotice({ tone: "warning", title: "제공자 로그인 대기 중", detail: "로그인 탭을 완료한 뒤 상태를 다시 확인하세요." });
+      setNotice({ tone: "warning", title: "Provider 로그인 대기 중", detail: "로그인 탭을 완료한 뒤 상태를 다시 확인하세요." });
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
       setNotice({
         tone: "error",
-        title: "제공자 로그인 실패",
-        detail: isProviderAuthError(detail) ? "대화 제공자 로그인을 다시 시작하세요." : detail,
+        title: "Provider 로그인 실패",
+        detail: isProviderAuthError(detail) ? "provider 로그인을 다시 시작하세요." : detail,
       });
     } finally {
       setAiConnecting(false);
@@ -619,11 +619,11 @@ function App() {
       const profile = await codaroApi.updateAiProfile({ provider: providerId });
       const latestProfile = await codaroApi.aiProfile().catch(() => profile);
       setAiProfile(latestProfile);
-      setNotice({ tone: "success", title: "제공자 선택됨", detail: aiProviderName(latestProfile) });
+      setNotice({ tone: "success", title: "Provider 선택됨", detail: aiProviderName(latestProfile) });
     } catch (error) {
       setNotice({
         tone: "error",
-        title: "제공자 선택 실패",
+        title: "Provider 선택 실패",
         detail: error instanceof Error ? error.message : String(error),
       });
     } finally {
@@ -641,11 +641,11 @@ function App() {
       const profile = await codaroApi.saveAiSecret(providerId, apiKey);
       const latestProfile = await codaroApi.aiProfile().catch(() => profile);
       setAiProfile(latestProfile);
-      setNotice({ tone: "success", title: "제공자 연결됨", detail: aiProviderName(latestProfile) });
+      setNotice({ tone: "success", title: "Provider 연결됨", detail: aiProviderName(latestProfile) });
     } catch (error) {
       setNotice({
         tone: "error",
-        title: "제공자 저장 실패",
+        title: "Provider 저장 실패",
         detail: error instanceof Error ? error.message : String(error),
       });
     } finally {
@@ -734,14 +734,44 @@ function App() {
         `채팅 우선 노트북 생성을 기본으로 한다. 현재 판단 범위는 ${activeScope}이다. 학습 요청은 커리큘럼 YAML을 먼저 초안화하고 write-curriculum-yaml로 셀을 전개한 뒤 read-cells, write-cell, cell-call로 셀 단위 작업을 수행한다. 사용자가 레슨이나 전체 커리큘럼 재정의를 요청하면 적용 전에 검토 가능한 YAML diff를 제안한다.`,
     };
 
+    const assistantMessageId = `assistant-${Date.now()}`;
+    let streamedContent = "";
+    setMessages((current) => [
+      ...current,
+      {
+        id: assistantMessageId,
+        role: "assistant",
+        content: "",
+        provider: aiProviderName(aiProfile),
+        loading: true,
+      },
+    ]);
+
     try {
-      const response = await codaroApi.teacherChat({
-        conversationId,
-        message,
-        sessionId,
-        role: "teacher",
-        context,
-      });
+      const response = await codaroApi.teacherChatStream(
+        {
+          conversationId,
+          message,
+          sessionId,
+          role: "teacher",
+          context,
+        },
+        (event) => {
+          if (event.conversationId) {
+            setConversationId(event.conversationId);
+          }
+          if (event.type === "delta") {
+            streamedContent = event.content ?? `${streamedContent}${event.delta ?? ""}`;
+          } else if (event.type === "token" && event.content) {
+            streamedContent = `${streamedContent}${event.content}`;
+          } else {
+            return;
+          }
+          setMessages((current) => current.map((item) => (
+            item.id === assistantMessageId ? { ...item, content: streamedContent, loading: true } : item
+          )));
+        },
+      );
       let savedCurriculumTitle = "";
       setConversationId(response.conversationId);
       if (response.toolCalls.length) {
@@ -764,17 +794,18 @@ function App() {
           }
         }
       }
-      setMessages((current) => [
-        ...current,
-        {
-          id: `assistant-${Date.now()}`,
-          role: "assistant",
-          content: response.answer || "완료했습니다.",
-          provider: response.provider,
-          model: response.model,
-          toolCalls: response.toolCalls,
-        },
-      ]);
+      setMessages((current) => current.map((item) => (
+        item.id === assistantMessageId
+          ? {
+            ...item,
+            content: response.answer || streamedContent || "완료했습니다.",
+            provider: response.provider,
+            model: response.model,
+            toolCalls: response.toolCalls,
+            loading: false,
+          }
+          : item
+      )));
       setNotice({
         tone: response.toolCalls.length ? "success" : "default",
         title: response.toolCalls.length
@@ -788,21 +819,22 @@ function App() {
       const detail = error instanceof Error ? error.message : String(error);
       const providerAuthIssue = isProviderAuthError(detail);
       const displayDetail = providerAuthIssue
-        ? "대화 제공자 로그인이 필요합니다. 연결을 누르고 브라우저 로그인을 완료한 뒤 다시 요청하세요."
+        ? "provider 로그인이 필요합니다. Provider 설정에서 브라우저 로그인을 완료한 뒤 다시 요청하세요."
         : detail;
-      setMessages((current) => [
-        ...current,
-        {
-          id: `assistant-error-${Date.now()}`,
-          role: "assistant",
-          tone: "error",
-          action: providerAuthIssue ? "connect-provider" : undefined,
-          content: displayDetail,
-        },
-      ]);
+      setMessages((current) => current.map((item) => (
+        item.id === assistantMessageId
+          ? {
+            ...item,
+            tone: "error",
+            action: providerAuthIssue ? "connect-provider" : undefined,
+            content: displayDetail,
+            loading: false,
+          }
+          : item
+      )));
       setNotice({
         tone: "error",
-        title: providerAuthIssue ? "대화 제공자 연결 필요" : "어시스턴트 사용 불가",
+        title: providerAuthIssue ? "Provider 연결 필요" : "어시스턴트 사용 불가",
         detail: displayDetail,
       });
     } finally {

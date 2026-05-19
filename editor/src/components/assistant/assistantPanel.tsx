@@ -13,6 +13,7 @@ import {
   IconButton,
   PendingNotebookBar,
 } from "@/components/app/appPrimitives";
+import { AssistantMarkdown } from "@/components/assistant/assistantMarkdown";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -31,6 +32,7 @@ export type AssistantMessage = {
   toolCalls?: AiToolCall[];
   tone?: "default" | "warning" | "error";
   action?: "connect-provider";
+  loading?: boolean;
 };
 
 export function TeacherPanel({
@@ -148,6 +150,7 @@ export function AssistantMessages({
         ) : messages.length ? (
           messages.map((message) => {
             const needsProvider = message.action === "connect-provider" || isProviderAuthMessage(message.content);
+            const isWriting = message.role === "assistant" && message.loading;
             return (
               <div
                 className={cn(
@@ -166,9 +169,7 @@ export function AssistantMessages({
                       <div className="flex items-start gap-2 text-destructive">
                         <AlertCircle className="mt-1 size-4 shrink-0" />
                         <div className="min-w-0">
-                          <div className="whitespace-pre-wrap break-words">
-                            {cleanAssistantMessage(message.content)}
-                          </div>
+                          <AssistantMarkdown content={cleanAssistantMessage(message.content)} />
                           {needsProvider ? (
                             <ProviderConnectAction
                               aiConnecting={aiConnecting}
@@ -180,9 +181,15 @@ export function AssistantMessages({
                       </div>
                     ) : (
                       <>
-                        <div className="whitespace-pre-wrap break-words text-muted-foreground">
-                          {cleanAssistantMessage(message.content)}
-                        </div>
+                        {message.content.trim() ? (
+                          <AssistantMarkdown content={cleanAssistantMessage(message.content)} />
+                        ) : null}
+                        {isWriting ? (
+                          <div className="flex items-center gap-2 py-1 text-sm text-muted-foreground">
+                            <Loader2 className="size-3.5 animate-spin" />
+                            <span>{message.content.trim() ? "답변 작성 중" : "응답 준비 중"}</span>
+                          </div>
+                        ) : null}
                         {needsProvider && !aiProfileReady(aiProfile) ? (
                           <ProviderConnectAction
                             aiConnecting={aiConnecting}
@@ -203,7 +210,7 @@ export function AssistantMessages({
             title="채팅에서 시작"
           />
         )}
-        {loading ? (
+        {loading && !messages.some((message) => message.loading) ? (
           <div className="flex items-center gap-2 px-1 py-3 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />
             응답 작성 중
@@ -243,7 +250,7 @@ export function AssistantComposer({
       className={cn(
         "flex w-full items-end gap-2",
         variant === "dock" && "mt-3",
-        variant === "hero" && "rounded-md border bg-card p-2 shadow-sm",
+        variant === "hero" && "rounded-md",
         variant === "panel" && "rounded-md border bg-background p-2",
         className,
       )}
@@ -255,8 +262,8 @@ export function AssistantComposer({
       <Textarea
         autoFocus={autoFocus}
         className={cn(
-          "min-h-10 max-h-48 flex-1 resize-none overflow-y-auto border-0 bg-transparent py-2.5 shadow-none focus-visible:ring-0",
-          variant === "panel" && "max-h-40",
+          "min-h-10 max-h-48 flex-1 resize-none overflow-y-auto py-2.5",
+          variant === "panel" && "max-h-40 border-0 bg-transparent shadow-none focus-visible:ring-0",
         )}
         placeholder={placeholder}
         rows={1}
@@ -286,7 +293,7 @@ export function AssistantComposer({
 }
 
 export function aiProviderName(profile: AiProfile | null) {
-  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? "대화 제공자 없음");
+  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? "provider 없음");
 }
 
 export function aiProfileReady(profile: AiProfile | null) {
@@ -320,7 +327,7 @@ function AssistantHeader({
         ) : (
           <div className="mt-1 flex flex-wrap gap-2">
             <Badge variant={apiOnline && aiProfileReady(aiProfile) ? "secondary" : "outline"}>
-              {apiOnline && aiProfileReady(aiProfile) ? "대화 연결됨" : "기본 안내 모드"}
+              {apiOnline && aiProfileReady(aiProfile) ? "provider 연결됨" : "기본 안내 모드"}
             </Badge>
             <Badge variant={aiProfileReady(aiProfile) ? "secondary" : "outline"}>{aiProviderName(aiProfile)}</Badge>
           </div>
@@ -331,12 +338,12 @@ function AssistantHeader({
           apiOnline && !aiProfileReady(aiProfile) ? (
             <Button className="h-8 gap-1.5 px-2 text-xs" disabled={aiConnecting} size="sm" variant="outline" onClick={onConnectAi}>
               {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogIn className="size-3.5" />}
-              연결
+              Provider
             </Button>
           ) : null
         ) : (
           <>
-            <IconButton disabled={aiConnecting} label="제공자 연결" onClick={onConnectAi}>
+            <IconButton disabled={aiConnecting} label="Provider 연결" onClick={onConnectAi}>
               {aiConnecting ? <Loader2 className="animate-spin" /> : <Bot />}
             </IconButton>
             <IconButton label="새 채팅" onClick={onNewChat}>
@@ -351,7 +358,7 @@ function AssistantHeader({
 
 function assistantStatusText(apiOnline: boolean, profile: AiProfile | null) {
   if (!apiOnline) return "기본 안내 모드입니다.";
-  if (!aiProfileReady(profile)) return "대화 제공자를 연결하면 실제 응답을 사용할 수 있습니다.";
+  if (!aiProfileReady(profile)) return "provider를 연결하면 실제 응답을 사용할 수 있습니다.";
   return "대화로 셀, 레슨, 커리큘럼을 다룹니다.";
 }
 
@@ -378,13 +385,14 @@ function isProviderAuthMessage(content: string) {
     normalized.includes("please login") ||
     normalized.includes("authentication expired") ||
     normalized.includes("re-login") ||
+    normalized.includes("provider 로그인이 필요") ||
     normalized.includes("대화 제공자 로그인이 필요")
   );
 }
 
 function cleanAssistantMessage(content: string) {
   return isProviderAuthMessage(content)
-    ? "대화 제공자 로그인이 필요합니다. 연결을 누르고 브라우저 로그인을 완료한 뒤 다시 요청하세요."
+    ? "provider 로그인이 필요합니다. Provider 설정에서 브라우저 로그인을 완료한 뒤 다시 요청하세요."
     : content.replace(/^503\s+/, "");
 }
 
@@ -398,12 +406,12 @@ function ProviderConnectAction({
   onConnectAi?: () => void;
 }) {
   if (!apiOnline) {
-    return <div className="mt-2 text-xs text-muted-foreground">서버 세션이 열리면 제공자를 연결할 수 있습니다.</div>;
+    return <div className="mt-2 text-xs text-muted-foreground">서버 세션이 열리면 provider를 연결할 수 있습니다.</div>;
   }
   return (
     <Button className="mt-2 h-8 gap-1.5 px-3 text-xs" disabled={aiConnecting || !onConnectAi} size="sm" onClick={onConnectAi}>
       {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogIn className="size-3.5" />}
-      대화 제공자 연결
+      Provider 연결
     </Button>
   );
 }

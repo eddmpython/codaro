@@ -82,7 +82,7 @@ export function TopBar({
       <div className="relative z-10 flex shrink-0 items-center gap-1">
         <TopBarIconButton
           disabled={aiConnecting}
-          label={apiOnline && providerReady ? "대화 제공자 설정" : "대화 제공자 연결"}
+          label={apiOnline && providerReady ? "Provider 설정" : "Provider 연결"}
           onClick={onConnectAi}
         >
           {aiConnecting ? <Loader2 className="animate-spin" /> : providerReady ? <Bot /> : <LogIn />}
