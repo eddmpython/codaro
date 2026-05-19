@@ -925,7 +925,7 @@ function App() {
           canRun={canRun && hasRunnableNotebook}
           loadState={loadState}
           notice={notice}
-          showSidebarTrigger
+          showSidebarTrigger={!sidebarOpen}
           surface={surface}
           notebookRunning={notebookRunning}
           onRunNotebook={runNotebook}
