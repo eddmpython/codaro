@@ -36,6 +36,21 @@ import {
   registryContents,
   registryLesson,
 } from "@/lib/curriculaRegistry";
+import {
+  CUSTOM_CURRICULUM_CATEGORY,
+  createCustomCurriculumEntry,
+  customCurriculaStorageKey,
+  loadCustomCurricula,
+  type CustomCurriculumEntry,
+} from "@/lib/customCurricula";
+import {
+  draftsFromDocument,
+  isRecord,
+  materializeDrafts,
+  normalizeBlockType,
+  normalizeDocumentPayload,
+  starterDocument,
+} from "@/lib/documentModel";
 import { shortPath, statusLabel } from "@/lib/displayFormat";
 import {
   buildLocalAssistantAnswer,
@@ -75,13 +90,6 @@ import type {
 type ResultMap = Record<string, ExecutionResult>;
 type PendingTarget = "notebook" | "curriculum";
 
-type CustomCurriculumEntry = {
-  id: string;
-  title: string;
-  document: CodaroDocument;
-  createdAt: number;
-};
-
 const emptyNotice: AppNotice = {
   tone: "default",
   title: "준비됨",
@@ -95,80 +103,6 @@ const emptyToolCatalog: AiToolCatalogPayload = {
   grouped: {},
   byLane: {},
 };
-
-const CUSTOM_CURRICULUM_CATEGORY = "__custom__";
-const customCurriculaStorageKey = "codaro-custom-curricula";
-
-const starterDocument: CodaroDocument = {
-  id: "new-notebook",
-  title: "새 노트북",
-  blocks: [
-    {
-      id: "cell-1",
-      type: "code",
-      content: "",
-    },
-  ],
-  metadata: {
-    sourceFormat: "codaro",
-    tags: ["notebook"],
-  },
-  runtime: {
-    defaultEngine: "local",
-    reactiveMode: "hybrid",
-    packages: [],
-  },
-};
-
-function loadCustomCurricula(): CustomCurriculumEntry[] {
-  try {
-    const raw = window.localStorage.getItem(customCurriculaStorageKey);
-    if (!raw) return [];
-    const parsed = JSON.parse(raw) as unknown;
-    if (!Array.isArray(parsed)) return [];
-    return parsed
-      .filter(isRecord)
-      .map((item) => {
-        const document = normalizeStoredDocument(item.document);
-        if (!document) return null;
-        return {
-          id: String(item.id ?? document.id),
-          title: String(item.title ?? document.title),
-          document,
-          createdAt: Number(item.createdAt ?? Date.now()),
-        };
-      })
-      .filter((item): item is CustomCurriculumEntry => item !== null);
-  } catch {
-    return [];
-  }
-}
-
-function normalizeStoredDocument(raw: unknown): CodaroDocument | null {
-  if (!isRecord(raw) || !Array.isArray(raw.blocks)) return null;
-  const blocks = raw.blocks
-    .filter(isRecord)
-    .map((block, index) => normalizeBlockPayload(block, index))
-    .filter((block): block is BlockConfig => block !== null);
-  if (!blocks.length) return null;
-  return {
-    ...starterDocument,
-    id: String(raw.id ?? `custom-${Date.now()}`),
-    title: String(raw.title ?? "나만의 커리큘럼"),
-    blocks,
-    metadata: isRecord(raw.metadata) ? (raw.metadata as CodaroDocument["metadata"]) : {
-      sourceFormat: "custom-curriculum",
-      tags: ["custom"],
-    },
-    runtime: isRecord(raw.runtime) ? (raw.runtime as CodaroDocument["runtime"]) : starterDocument.runtime,
-    app: isRecord(raw.app) ? (raw.app as CodaroDocument["app"]) : {
-      title: String(raw.title ?? "나만의 커리큘럼"),
-      layout: "learning",
-      hideCode: false,
-      entryBlockIds: [],
-    },
-  };
-}
 
 const builtInCurriculumCategories = registryCategories();
 const defaultCurriculumSelection = defaultRegistrySelection();
@@ -1334,127 +1268,18 @@ function MainSurface(props: MainSurfaceProps) {
   );
 }
 
-function createCustomCurriculumEntry(blocks: BlockConfig[], title?: string): CustomCurriculumEntry {
-  const createdAt = Date.now();
-  const resolvedTitle = title?.trim() || titleFromBlocks(blocks) || "나만의 커리큘럼";
-  const id = `custom-${createdAt}-${slugifyText(resolvedTitle)}`;
-  const normalizedBlocks = blocks.map((block, index) => ({
-    ...block,
-    id: `${id}-${block.id || index}`.replace(/[^a-zA-Z0-9_-]/g, "-"),
-  }));
-  const document: CodaroDocument = {
-    ...starterDocument,
-    id: `curriculum-${id}`,
-    title: resolvedTitle,
-    blocks: normalizedBlocks,
-    metadata: {
-      sourceFormat: "custom-curriculum",
-      tags: ["custom", slugifyText(resolvedTitle)],
-      createdAt: new Date(createdAt).toISOString(),
-    },
-    runtime: {
-      defaultEngine: "local",
-      reactiveMode: "hybrid",
-      packages: [],
-    },
-    app: {
-      title: resolvedTitle,
-      layout: "learning",
-      hideCode: false,
-      entryBlockIds: [],
-    },
-  };
-  return {
-    id,
-    title: resolvedTitle,
-    document,
-    createdAt,
-  };
-}
-
-function titleFromBlocks(blocks: BlockConfig[]) {
-  const first = blocks.find((block) => block.title || block.content.trim());
-  if (!first) return "";
-  if (first.title) return first.title;
-  const heading = first.content.split("\n").find((line) => line.trim().startsWith("#"));
-  if (heading) return heading.replace(/^#+\s*/, "").trim();
-  return blockLabel(first);
-}
-
-function slugifyText(value: string) {
-  return value.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "") || "item";
-}
-
-function draftsFromDocument(document: CodaroDocument) {
-  return Object.fromEntries(
-    document.blocks
-      .filter((block) => block.type === "code" || block.type === "markdown")
-      .map((block) => [block.id, block.content]),
-  );
-}
-
-function materializeDrafts(document: CodaroDocument, drafts: Record<string, string>): CodaroDocument {
-  return {
-    ...document,
-    blocks: document.blocks.map((block) =>
-      block.type === "code" || block.type === "markdown"
-        ? { ...block, content: drafts[block.id] ?? block.content }
-        : block,
-    ),
-  };
-}
-
 function documentFromToolCalls(toolCalls: AiToolCall[]): CodaroDocument | null {
   for (const toolCall of toolCalls) {
     const result = toolCall.result;
     if (!isRecord(result)) continue;
     if (result.loadedInEditor === false) continue;
-    const document = normalizeDocumentPayload(result.document);
+    const document = normalizeDocumentPayload(result.document, {
+      fallbackIdPrefix: "tool",
+      fallbackTitle: "Codaro 노트북",
+    });
     if (document) return document;
   }
   return null;
-}
-
-function normalizeDocumentPayload(raw: unknown): CodaroDocument | null {
-  if (!isRecord(raw) || !Array.isArray(raw.blocks)) return null;
-
-  const blocks = raw.blocks
-    .filter(isRecord)
-    .map((block, index) => normalizeBlockPayload(block, index))
-    .filter((block): block is BlockConfig => block !== null);
-
-  if (!blocks.length) return null;
-
-  return {
-    ...starterDocument,
-    id: String(raw.id ?? `ai-${Date.now()}`),
-    title: String(raw.title ?? "Codaro 노트북"),
-    blocks,
-    metadata: isRecord(raw.metadata) ? (raw.metadata as CodaroDocument["metadata"]) : starterDocument.metadata,
-    runtime: isRecord(raw.runtime) ? (raw.runtime as CodaroDocument["runtime"]) : starterDocument.runtime,
-    app: isRecord(raw.app) ? (raw.app as CodaroDocument["app"]) : starterDocument.app,
-  };
-}
-
-function normalizeBlockPayload(raw: Record<string, unknown>, index: number): BlockConfig | null {
-  const content = raw.content;
-  if (content === undefined || content === null) return null;
-
-  return {
-    id: String(raw.id ?? `ai-cell-${index}-${Date.now()}`),
-    type: normalizeBlockType(String(raw.type ?? "markdown")),
-    content: String(content),
-    role: typeof raw.role === "string" ? (raw.role as BlockConfig["role"]) : undefined,
-    executionKind: typeof raw.executionKind === "string" ? (raw.executionKind as BlockConfig["executionKind"]) : undefined,
-    displayKind: typeof raw.displayKind === "string" ? (raw.displayKind as BlockConfig["displayKind"]) : undefined,
-    sourceType: typeof raw.sourceType === "string" ? raw.sourceType : undefined,
-    payload: raw.payload,
-    title: typeof raw.title === "string" ? raw.title : undefined,
-    description: typeof raw.description === "string" ? raw.description : undefined,
-    collapsed: Boolean(raw.collapsed),
-    execution: isRecord(raw.execution) ? (raw.execution as BlockConfig["execution"]) : undefined,
-    guide: isRecord(raw.guide) ? (raw.guide as BlockConfig["guide"]) : null,
-  };
 }
 
 function collectBlocksFromToolCalls(toolCalls: AiToolCall[]): BlockConfig[] {
@@ -1530,12 +1355,6 @@ function createBlock(type: BlockConfig["type"], content: string, prefix: string)
   };
 }
 
-function normalizeBlockType(type: string): BlockConfig["type"] {
-  if (type === "code") return "code";
-  if (type === "automation") return "automation";
-  return "markdown";
-}
-
 function toolCallName(toolCall: AiToolCall) {
   return toolCall.name ?? toolCall.function?.name ?? String(toolCall.toolCallId ?? toolCall.id ?? "tool-call");
 }
@@ -1549,10 +1368,6 @@ function toolCallArguments(toolCall: AiToolCall): unknown {
   } catch {
     return raw;
   }
-}
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
 }
 
 function sleep(milliseconds: number) {
