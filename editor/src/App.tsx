@@ -13,10 +13,7 @@ import {
   fallbackBootstrap,
   fallbackCategories,
   fallbackContents,
-  fallbackEStop,
   fallbackLesson,
-  fallbackScheduler,
-  fallbackTasks,
 } from "@/lib/fallbackData";
 import {
   defaultRegistrySelection,
@@ -36,7 +33,14 @@ import {
   materializeDrafts,
   starterDocument,
 } from "@/lib/documentModel";
-import { shortPath, statusLabel } from "@/lib/displayFormat";
+import { shortPath } from "@/lib/displayFormat";
+import {
+  fallbackAutomationSnapshot,
+  loadAutomationSnapshot,
+  runAutomationTask,
+  toggleAutomationStop,
+  type AutomationSnapshot,
+} from "@/lib/automationState";
 import {
   buildLocalAssistantAnswer,
   buildLocalBlocksFromPrompt,
@@ -99,6 +103,7 @@ const initialCurriculumDocument = registryLesson(
   defaultCurriculumSelection.category,
   defaultCurriculumSelection.contentId,
 )?.document ?? null;
+const initialAutomationSnapshot = fallbackAutomationSnapshot();
 
 function initialSurfaceFromLocation(): SurfaceMode {
   const value = window.location.hash.replace(/^#/, "");
@@ -137,10 +142,10 @@ function App() {
   const [results, setResults] = useState<ResultMap>({});
   const [runningBlockId, setRunningBlockId] = useState<string | null>(null);
   const [notebookRunning, setNotebookRunning] = useState(false);
-  const [tasks, setTasks] = useState<TaskListPayload>(fallbackTasks);
-  const [scheduler, setScheduler] = useState<SchedulerStatus>(fallbackScheduler);
-  const [eStop, setEStop] = useState<EStopStatus>(fallbackEStop);
-  const [auditCount, setAuditCount] = useState(0);
+  const [tasks, setTasks] = useState<TaskListPayload>(initialAutomationSnapshot.tasks);
+  const [scheduler, setScheduler] = useState<SchedulerStatus>(initialAutomationSnapshot.scheduler);
+  const [eStop, setEStop] = useState<EStopStatus>(initialAutomationSnapshot.eStop);
+  const [auditCount, setAuditCount] = useState(initialAutomationSnapshot.auditCount);
   const [automationSection, setAutomationSection] = useState<AutomationSection>("codaro");
   const [toolCatalog, setToolCatalog] = useState<AiToolCatalogPayload>(emptyToolCatalog);
   const [aiProfile, setAiProfile] = useState<AiProfile | null>(null);
@@ -207,27 +212,16 @@ function App() {
     }
   }, [surface]);
 
-  const refreshAutomation = useCallback(async () => {
-    if (!shouldUseApi()) {
-      setTasks(fallbackTasks);
-      setScheduler(fallbackScheduler);
-      setEStop(fallbackEStop);
-      setAuditCount(0);
-      return;
-    }
-
-    const [taskResult, schedulerResult, eStopResult, auditResult] = await Promise.all([
-      optional(codaroApi.tasks, fallbackTasks),
-      optional(codaroApi.schedulerStatus, fallbackScheduler),
-      optional(codaroApi.eStop, fallbackEStop),
-      optional(codaroApi.audit, { entries: [], count: 0 }),
-    ]);
-
-    setTasks(taskResult.data);
-    setScheduler(schedulerResult.data);
-    setEStop(eStopResult.data);
-    setAuditCount(auditResult.data.count);
+  const applyAutomationSnapshot = useCallback((snapshot: AutomationSnapshot) => {
+    setTasks(snapshot.tasks);
+    setScheduler(snapshot.scheduler);
+    setEStop(snapshot.eStop);
+    setAuditCount(snapshot.auditCount);
   }, []);
+
+  const refreshAutomation = useCallback(async () => {
+    applyAutomationSnapshot(await loadAutomationSnapshot());
+  }, [applyAutomationSnapshot]);
 
   useEffect(() => {
     let cancelled = false;
@@ -749,30 +743,11 @@ function App() {
   }
 
   async function toggleEStop() {
-    if (!apiOnline) {
-      const next = eStop.active
-        ? { active: false, reason: "", triggeredAt: null }
-        : { active: true, reason: "Codaro에서 수동으로 정지함", triggeredAt: Date.now() };
-      setEStop(next);
-      setNotice({
-        tone: next.active ? "warning" : "success",
-        title: next.active ? "긴급 정지 활성화" : "긴급 정지 해제",
-        detail: next.active ? next.reason : "자동화 작업을 다시 실행할 수 있습니다.",
-      });
-      return;
-    }
-
     try {
-      const next = eStop.active
-        ? await codaroApi.clearEStop()
-        : await codaroApi.triggerEStop("Codaro에서 수동으로 정지함");
-      setEStop(next);
-      setNotice({
-        tone: next.active ? "warning" : "success",
-        title: next.active ? "긴급 정지 활성화" : "긴급 정지 해제",
-        detail: next.active ? next.reason : "자동화 작업을 다시 실행할 수 있습니다.",
-      });
-      await refreshAutomation();
+      const result = await toggleAutomationStop(eStop, apiOnline);
+      setEStop(result.eStop);
+      setNotice(result.notice);
+      if (result.refresh) await refreshAutomation();
     } catch (error) {
       setNotice({
         tone: "error",
@@ -783,23 +758,10 @@ function App() {
   }
 
   async function runTask(task: TaskDefinition) {
-    if (!apiOnline) {
-      setNotice({
-        tone: "success",
-        title: "태스크 성공",
-        detail: `${task.name} 실행을 완료했습니다.`,
-      });
-      return;
-    }
-
     try {
-      const run = await codaroApi.runTask(task.id);
-      setNotice({
-        tone: run.status === "success" ? "success" : "warning",
-        title: `태스크 ${statusLabel(run.status)}`,
-        detail: run.output || run.error || task.name,
-      });
-      await refreshAutomation();
+      const result = await runAutomationTask(task, apiOnline);
+      setNotice(result.notice);
+      if (result.refresh) await refreshAutomation();
     } catch (error) {
       setNotice({
         tone: "error",
