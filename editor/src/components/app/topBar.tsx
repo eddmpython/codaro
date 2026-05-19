@@ -89,14 +89,15 @@ export function TopBar({
 }
 
 function topBarAssistantDividerClass(surface: SurfaceMode, assistantCollapsed: boolean) {
-  if (surface === "editor") return assistantCollapsed ? "right-12" : "right-[380px]";
-  if (surface === "curriculum") return assistantCollapsed ? "right-12" : "right-[360px]";
+  if (assistantCollapsed) return "";
+  if (surface === "editor") return "right-[380px]";
+  if (surface === "curriculum") return "right-[360px]";
   return "";
 }
 
 function topBarTocDividerClass(surface: SurfaceMode, assistantCollapsed: boolean) {
   if (surface !== "curriculum") return "";
-  return assistantCollapsed ? "right-[92px]" : "right-[404px]";
+  return assistantCollapsed ? "right-11" : "right-[404px]";
 }
 
 function TopBarIconButton({

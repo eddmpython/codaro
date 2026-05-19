@@ -6,7 +6,6 @@ import {
   ListChecks,
   Loader2,
   MessageSquare,
-  PanelRightOpen,
   Play,
   Sparkles,
   Target,
@@ -140,16 +139,6 @@ export function CurriculumView({
         </div>
       </div>
     </ScrollArea>
-  );
-}
-
-export function CollapsedAssistantButton({ onClick }: { onClick: () => void }) {
-  return (
-    <aside className="hidden h-full border-l bg-background p-2 xl:flex xl:items-start xl:justify-center">
-      <IconButton className="mt-2" label="어시스턴트 열기" onClick={onClick}>
-        <PanelRightOpen />
-      </IconButton>
-    </aside>
   );
 }
 

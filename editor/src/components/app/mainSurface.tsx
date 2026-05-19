@@ -5,7 +5,6 @@ import {
 import { AutomationView } from "@/components/automation/automationSurface";
 import { ChatSurface } from "@/components/chat/chatSurface";
 import {
-  CollapsedAssistantButton,
   CurriculumCellToc,
   CurriculumView,
 } from "@/components/curriculum/curriculumSurface";
@@ -103,7 +102,7 @@ export function MainSurface(props: MainSurfaceProps) {
       <div
         className={cn(
           "grid h-[calc(100vh-40px)] min-h-0 grid-cols-1",
-          props.assistantCollapsed ? "xl:grid-cols-[minmax(0,1fr)_48px]" : "xl:grid-cols-[minmax(0,1fr)_380px]",
+          !props.assistantCollapsed && "xl:grid-cols-[minmax(0,1fr)_380px]",
         )}
       >
         <NotebookPanel
@@ -122,9 +121,7 @@ export function MainSurface(props: MainSurfaceProps) {
           onRunBlock={props.onRunBlock}
           onSelectBlock={props.onSelectBlock}
         />
-        {props.assistantCollapsed ? (
-          <CollapsedAssistantButton onClick={props.onToggleAssistant} />
-        ) : (
+        {props.assistantCollapsed ? null : (
           <TeacherPanel
             aiConnecting={props.aiConnecting}
             aiProfile={props.aiProfile}
@@ -163,7 +160,7 @@ export function MainSurface(props: MainSurfaceProps) {
         className={cn(
           "grid h-[calc(100vh-40px)] min-h-0 grid-cols-1",
           props.assistantCollapsed
-            ? "xl:grid-cols-[minmax(0,1fr)_48px] 2xl:grid-cols-[minmax(0,1fr)_44px_48px]"
+            ? "2xl:grid-cols-[minmax(0,1fr)_44px]"
             : "xl:grid-cols-[minmax(0,1fr)_360px] 2xl:grid-cols-[minmax(0,1fr)_44px_360px]",
         )}
       >
@@ -202,9 +199,7 @@ export function MainSurface(props: MainSurfaceProps) {
           selectedBlockId={props.selectedCurriculumBlockId}
           onSelectBlock={props.onSelectCurriculumBlock}
         />
-        {props.assistantCollapsed ? (
-          <CollapsedAssistantButton onClick={props.onToggleAssistant} />
-        ) : (
+        {props.assistantCollapsed ? null : (
           <TeacherPanel
             aiConnecting={props.aiConnecting}
             aiProfile={props.aiProfile}
