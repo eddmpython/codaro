@@ -63,12 +63,12 @@ import {
   type ResultMap,
 } from "@/lib/assistantContext";
 import {
-  applyAssistantStreamEvent,
   createAssistantPlaceholder,
   createUserMessage,
   failAssistantMessage,
   finalizeAssistantMessage,
 } from "@/lib/assistantConversationState";
+import { runAssistantProviderTurn } from "@/lib/assistantProviderTurn";
 import {
   assistantResponseNotice,
   buildAssistantResponsePlan,
@@ -651,7 +651,6 @@ function App() {
     });
 
     const assistantMessageId = `assistant-${Date.now()}`;
-    let streamedContent = "";
     setMessages((current) => [
       ...current,
       createAssistantPlaceholder({
@@ -661,30 +660,18 @@ function App() {
     ]);
 
     try {
-      const response = await codaroApi.teacherChatStream(
-        {
+      const { response, streamedContent } = await runAssistantProviderTurn({
+        assistantMessageId,
+        onConversationId: setConversationId,
+        request: {
           conversationId,
           message,
           sessionId,
           role: "teacher",
           context,
         },
-        (event) => {
-          if (event.conversationId) {
-            setConversationId(event.conversationId);
-          }
-          setMessages((current) => {
-            const next = applyAssistantStreamEvent({
-              assistantMessageId,
-              event,
-              messages: current,
-              streamedContent,
-            });
-            streamedContent = next.streamedContent;
-            return next.messages;
-          });
-        },
-      );
+        updateMessages: setMessages,
+      });
       let savedCurriculumTitle = "";
       setConversationId(response.conversationId);
 
