@@ -10,6 +10,12 @@ from .completion import (
 from .conversation import ConversationManager, ConversationState, buildSystemPrompt
 from .factory import createProvider, registerProvider, availableProviders
 from .profile import AiProfileManager, AiProfile, getProfileManager
+from .providerModels import (
+    DEFAULT_OPENAI_CHAT_MODELS,
+    filterOpenaiChatModelIds,
+    fetchOpenaiChatModels,
+    providerModelList,
+)
 from .providerSpec import (
     ProviderSpec,
     getProviderSpec,
@@ -42,6 +48,10 @@ __all__ = [
     "AiProfileManager",
     "AiProfile",
     "getProfileManager",
+    "DEFAULT_OPENAI_CHAT_MODELS",
+    "fetchOpenaiChatModels",
+    "filterOpenaiChatModelIds",
+    "providerModelList",
     "ProviderSpec",
     "getProviderSpec",
     "publicProviderIds",

@@ -14,12 +14,12 @@ from pydantic import BaseModel
 
 from ..ai.completion import completeCode, emptyCompletionResult
 from ..ai.profile import AiProfileManager, getProfileManager
+from ..ai.providerModels import providerModelList
 from ..ai.providers.oauthChatgptProvider import ChatGPTOAuthError
 from ..ai.providerSpec import (
     buildProviderCatalog,
     getProviderSpec,
     normalizeProvider,
-    publicProviderIds,
 )
 from ..ai.teacher import (
     TeacherConversationNotFound,
@@ -145,43 +145,7 @@ def createAiRouter(state: Any) -> APIRouter:
 
     @router.get("/api/ai/models/{provider}")
     def apiModels(provider: str):
-        from ..ai.factory import createProvider
-        from ..ai.types import LLMConfig
-
-        normalized = normalizeProvider(provider) or provider
-
-        if normalized == "oauth-chatgpt":
-            from ..ai.providers.oauthChatgptProvider import AVAILABLE_MODELS
-
-            return {"models": AVAILABLE_MODELS}
-
-        if normalized == "ollama":
-            try:
-                config = LLMConfig(provider="ollama")
-                prov = createProvider(config)
-                installed = prov.getInstalledModels()
-                return {"models": installed}
-            except _HANDLED_ERRORS as exc:
-                logger.info("ollama models unavailable: %s", exc)
-                return {"models": []}
-
-        if normalized == "openai":
-            models = _fetchOpenaiModels()
-            if models:
-                return {"models": models}
-            return {
-                "models": [
-                    "o3",
-                    "gpt-4.1",
-                    "gpt-4.1-mini",
-                    "gpt-4.1-nano",
-                    "o4-mini",
-                    "gpt-4o",
-                    "gpt-4o-mini",
-                ]
-            }
-
-        return {"models": []}
+        return {"models": providerModelList(provider, profileManager=getProfileManager())}
 
     @router.get("/api/ai/profile/events")
     async def apiAiProfileEvents(request: Request):
@@ -457,49 +421,3 @@ def _startOauthCallbackServer(port: int):
 
     thread = threading.Thread(target=_runServer, daemon=True)
     thread.start()
-
-
-def _fetchOpenaiModels() -> list[str]:
-    manager = getProfileManager()
-    resolved = manager.resolve(provider="openai")
-    apiKey = resolved.get("apiKey")
-    if not apiKey:
-        import os
-
-        apiKey = os.environ.get("OPENAI_API_KEY")
-    if not apiKey:
-        return []
-    try:
-        from openai import OpenAI
-
-        client = OpenAI(api_key=apiKey)
-        raw = client.models.list()
-        chatPrefixes = ("gpt-5", "gpt-4", "gpt-3.5", "o1", "o3", "o4")
-        exclude = (
-            "realtime", "audio", "search", "instruct", "embedding",
-            "tts", "whisper", "dall-e", "davinci", "babbage", "transcribe",
-        )
-        models = []
-        for model in raw:
-            mid = model.id
-            if any(mid.startswith(prefix) for prefix in chatPrefixes):
-                if not any(excluded in mid for excluded in exclude):
-                    models.append(mid)
-        priority = [
-            "gpt-5.4", "gpt-5.3", "gpt-5.2", "gpt-5.1", "gpt-5",
-            "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano",
-            "gpt-4o", "gpt-4o-mini",
-            "o4-mini", "o3", "o3-mini", "o1", "o1-mini",
-        ]
-
-        def sortKey(name: str):
-            for idx, prefix in enumerate(priority):
-                if name == prefix or name.startswith(prefix + "-"):
-                    return (idx, name)
-            return (100, name)
-
-        models.sort(key=sortKey)
-        return models
-    except (ImportError, OSError, RuntimeError, ValueError) as exc:
-        logger.info("openai models fetch failed: %s", exc)
-        return []

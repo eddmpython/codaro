@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from codaro.ai.completion import buildCompletionMessages, completeCode, completionTextFromAnswer
+from codaro.ai.providerModels import DEFAULT_OPENAI_CHAT_MODELS, filterOpenaiChatModelIds, providerModelList
 from codaro.ai.types import LLMConfig, LLMResponse, ToolCall, ToolResponse
 from codaro.ai.factory import createProvider, availableProviders, registerProvider
 from codaro.ai.providerSpec import (
@@ -44,6 +45,14 @@ class _CompletionProvider:
     def complete(self, messages: list[dict[str, str]]) -> LLMResponse:
         self.messages = messages
         return LLMResponse(answer="```python\nvalue + 1\n```", provider=self.config.provider, model=self.config.model)
+
+
+class _InstalledModelsProvider:
+    def __init__(self, models: list[str]) -> None:
+        self.models = models
+
+    def getInstalledModels(self) -> list[str]:
+        return self.models
 
 
 class TestLLMConfig:
@@ -184,6 +193,41 @@ class TestToolManifest:
         assert tools["cell-call"]["lane"] == "cell-call"
         assert tools["write-curriculum-yaml"]["target"] == "curriculum-yaml"
         assert tools["click-element"]["risk"] == "input"
+
+
+class TestProviderModels:
+    def test_ollama_model_list_uses_provider_capability(self):
+        def providerFactory(config: LLMConfig):
+            assert config.provider == "ollama"
+            return _InstalledModelsProvider(["llama3.2", "codellama"])
+
+        models = providerModelList(
+            "ollama",
+            profileManager=_CompletionProfileManager(),
+            providerFactory=providerFactory,
+        )
+
+        assert models == ["llama3.2", "codellama"]
+
+    def test_openai_model_list_uses_fallback_when_fetch_empty(self):
+        models = providerModelList(
+            "openai",
+            profileManager=_CompletionProfileManager(),
+            openaiModelFetcher=lambda profileManager: [],
+        )
+
+        assert models == list(DEFAULT_OPENAI_CHAT_MODELS)
+
+    def test_openai_model_filter_keeps_chat_models_sorted(self):
+        models = filterOpenaiChatModelIds([
+            "text-embedding-3-large",
+            "gpt-4.1-audio-preview",
+            "o3",
+            "gpt-4.1-mini",
+            "custom-model",
+        ])
+
+        assert models == ["gpt-4.1-mini", "o3"]
 
 
 class TestCompletion:
