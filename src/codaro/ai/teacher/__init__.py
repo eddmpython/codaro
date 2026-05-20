@@ -44,6 +44,8 @@ from .toolLifecycle import toolCallResult, toolCallStart
 from .toolPolicy import (
     ToolPolicyState,
     ToolPolicyViolation,
+    normalizeToolPolicyViolation,
+    normalizeToolPolicyViolations,
     toolPolicyViolationPayload,
     toolRequiresDependencyPreflight,
 )
@@ -79,6 +81,8 @@ __all__ = [
     "finishTeacherToolCall",
     "goldenEvalCases",
     "injectContext",
+    "normalizeToolPolicyViolation",
+    "normalizeToolPolicyViolations",
     "prepareTeacherTurn",
     "prepareTeacherRuntimeTurn",
     "prepareTeacherRuntimeTurnFromRequest",

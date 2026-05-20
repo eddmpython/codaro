@@ -4,6 +4,7 @@ from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from typing import Any
 
+from .toolPolicy import normalizeToolPolicyViolations
 from .traceModel import TeacherTrace
 
 
@@ -158,18 +159,7 @@ def _policyViolationsFromPayload(tracePayload: Mapping[str, Any]) -> tuple[dict[
 
 
 def _normalizePolicyViolations(violations: Sequence[Mapping[str, Any]] | Any) -> tuple[dict[str, str], ...]:
-    normalized: list[dict[str, str]] = []
-    for violation in violations:
-        code = str(violation.get("policyCode") or violation.get("policy") or "")
-        toolName = str(violation.get("toolName") or violation.get("tool") or "")
-        message = str(violation.get("message") or violation.get("error") or "")
-        if code or toolName or message:
-            normalized.append({
-                "policyCode": code,
-                "toolName": toolName,
-                "message": message,
-            })
-    return tuple(normalized)
+    return normalizeToolPolicyViolations(violation for violation in violations if isinstance(violation, Mapping))
 
 
 def _policyViolationDetails(violations: Sequence[Mapping[str, str]]) -> str:

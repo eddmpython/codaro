@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Iterable, Mapping
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -25,6 +26,40 @@ def toolPolicyViolationPayload(violation: ToolPolicyViolation) -> dict[str, Any]
         "tool": violation.toolName,
         "toolName": violation.toolName,
     }
+
+
+def normalizeToolPolicyViolation(
+    violation: ToolPolicyViolation | Mapping[str, Any],
+) -> dict[str, str] | None:
+    if isinstance(violation, ToolPolicyViolation):
+        code = violation.code
+        toolName = violation.toolName
+        message = violation.message
+    elif isinstance(violation, Mapping):
+        code = str(violation.get("policyCode") or violation.get("policy") or "")
+        toolName = str(violation.get("toolName") or violation.get("tool") or "")
+        message = str(violation.get("message") or violation.get("error") or "")
+    else:
+        return None
+
+    if not (code or toolName or message):
+        return None
+    return {
+        "policyCode": code,
+        "toolName": toolName,
+        "message": message,
+    }
+
+
+def normalizeToolPolicyViolations(
+    violations: Iterable[ToolPolicyViolation | Mapping[str, Any]],
+) -> tuple[dict[str, str], ...]:
+    normalized: list[dict[str, str]] = []
+    for violation in violations:
+        payload = normalizeToolPolicyViolation(violation)
+        if payload is not None:
+            normalized.append(payload)
+    return tuple(normalized)
 
 
 @dataclass

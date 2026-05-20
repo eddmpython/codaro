@@ -5,6 +5,8 @@ import uuid
 from dataclasses import dataclass, field
 from typing import Any
 
+from .toolPolicy import normalizeToolPolicyViolations
+
 
 @dataclass
 class TeacherTraceEvent:
@@ -70,7 +72,7 @@ class TeacherTrace:
             "toolCount": len(toolResults),
             "errorCount": len(errors),
             "policyViolationCount": len(policyViolations),
-            "policyViolations": [event.payload for event in policyViolations],
+            "policyViolations": list(normalizeToolPolicyViolations(event.payload for event in policyViolations)),
             "toolSequence": self.toolSequence(),
         }
         if includeEvents:

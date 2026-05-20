@@ -26,6 +26,7 @@ from codaro.ai.teacher import (
     teacherStreamSseFrame,
     teacherStreamToolResultsEvent,
     toolPolicyViolationPayload,
+    normalizeToolPolicyViolation,
     toolCallsToProviderPayloads,
     toolRequiresDependencyPreflight,
     validateTeacherSkills,
@@ -212,6 +213,11 @@ def testToolPolicyViolationPayloadOwnsTraceAndResultShape() -> None:
     assert payload["policyCode"] == "dependency-preflight-required"
     assert payload["tool"] == "cell-call"
     assert payload["toolName"] == "cell-call"
+    assert normalizeToolPolicyViolation(payload) == {
+        "policyCode": "dependency-preflight-required",
+        "toolName": "cell-call",
+        "message": "packages-check가 필요합니다.",
+    }
 
 
 def testToolPolicyUsesManifestCellCallLaneForPreflight() -> None:
@@ -346,6 +352,11 @@ def testEvalHarnessFailsPolicyViolationsByDefault() -> None:
     report = evaluateToolTrace(case, trace)
 
     assert not report.passed
+    assert trace.summary()["policyViolations"] == [{
+        "policyCode": "dependency-preflight-required",
+        "toolName": "cell-call",
+        "message": "packages-check가 필요합니다.",
+    }]
     assert report.policyViolationCount == 1
     assert any("policy violations observed: 1" in failure for failure in report.failures)
     assert report.policyViolations == ({
