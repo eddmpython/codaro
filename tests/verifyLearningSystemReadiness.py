@@ -207,6 +207,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "clarificationAssumptionKeys",
                     "pending clarification was not consumed",
                     "stale clarification leaked into a new request",
+                    "specific new learning request reused stale clarification",
                 )),
                 ("src/codaro/ai/teacher/clarificationPolicy.py", (
                     "\"assumptions\": dict(self.defaults)",
@@ -232,6 +233,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "consumePendingClarification",
                     "shouldApplyPendingClarification",
                     "STALE_CLARIFICATION_RESET_MARKERS",
+                    "NEW_LEARNING_REQUEST_MARKERS",
                     "contextMap[\"clarificationPlan\"] = pendingClarification",
                 )),
             ),

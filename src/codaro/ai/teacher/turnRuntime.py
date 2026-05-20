@@ -13,6 +13,7 @@ from .clarificationPolicy import (
     DEPTH_MARKERS,
     ENVIRONMENT_MARKERS,
     LEVEL_MARKERS,
+    LEARNING_KEYWORDS,
     buildClarificationPlan,
 )
 from .teacherOrchestrator import TeacherOrchestrator
@@ -194,6 +195,10 @@ CLARIFICATION_AXIS_MARKERS = (
     *ENVIRONMENT_MARKERS,
 )
 
+NEW_LEARNING_REQUEST_MARKERS = tuple(
+    marker for marker in LEARNING_KEYWORDS if marker not in {"실습", "practice"}
+)
+
 
 def shouldApplyPendingClarification(message: str, pendingClarification: Mapping[str, Any]) -> bool:
     assumptions = pendingClarification.get("assumptions")
@@ -207,6 +212,8 @@ def shouldApplyPendingClarification(message: str, pendingClarification: Mapping[
         return True
     if len(normalized) <= 80 and _hasPendingMarker(normalized, CONTINUATION_MARKERS):
         return True
+    if _hasPendingMarker(normalized, NEW_LEARNING_REQUEST_MARKERS):
+        return False
     return len(normalized) <= 120 and _hasPendingMarker(normalized, CLARIFICATION_AXIS_MARKERS)
 
 

@@ -20,7 +20,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - 학습 요청이면 curriculum YAML을 먼저 만든다.
    - 학습 요청이 너무 모호하면 provider를 호출하지 않고 deterministic clarification gate에서 먼저 멈춘다. 수준, 깊이, 환경, 실습/설명 비중 중 결과를 바꿀 핵심 질문만 최대 1-3개 묻는다.
    - 답이 없으면 바로 생성했다고 느껴지지 않도록, 먼저 되묻고 현재 작업 기준을 clarification plan/workloop에 남긴다.
-   - clarification gate가 멈춘 대화는 `pendingClarification`으로 `assumptions` payload를 대화 상태에 저장한다. 다음 턴에서 사용자가 `진행`하거나 수준/깊이/환경/실습 비중을 짧게 답하면 이 payload를 `[Clarification plan]`으로 provider prompt에 주입하고 한 번 소비한다. `취소`, `새로`, `다른 주제`처럼 새 요청으로 보이는 턴에는 주입하지 않고 stale pending을 비운다. 이전 assistant 텍스트만 다시 읽게 만들거나 무관한 다음 요청에 기준을 섞으면 실패다.
+   - clarification gate가 멈춘 대화는 `pendingClarification`으로 `assumptions` payload를 대화 상태에 저장한다. 다음 턴에서 사용자가 `진행`하거나 수준/깊이/환경/실습 비중을 짧게 답하면 이 payload를 `[Clarification plan]`으로 provider prompt에 주입하고 한 번 소비한다. `취소`, `새로`, `다른 주제`처럼 새 요청으로 보이는 턴이나 `초급 pandas 실습 중심 짧은 레슨 만들어줘`처럼 독립적인 새 학습 요청에는 주입하지 않고 stale pending을 비운다. 이전 assistant 텍스트만 다시 읽게 만들거나 무관한 다음 요청에 기준을 섞으면 실패다.
    - 셀 수정/답 확인이면 현재 cell map에서 대상 셀을 고른다.
    - 자동화 요청이면 자동화 셀/태스크 흐름으로 보낸다.
    - skill registry의 required tool은 등록된 tool과 manifest metadata를 기준으로 검증한다.
@@ -83,7 +83,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - `uv run python -X utf8 tests/run.py gate teacher-e2e`는 clarification gate, dependency preflight, provider error workloop, 실제 curriculum YAML handler를 한 번에 통과하는 최소 golden e2e 증거이며, 실행 출력에 teacher golden e2e score를 남긴다.
    - `uv run python -X utf8 tests/run.py gate assistant-workloop-contract`는 프론트 workloop state가 clarification 작업 기준, provider 오류 detail+error, packages-check/install/cell-call 표시 문장을 보존하는지 확인하는 집중 gate다.
    - clarification golden case는 provider를 호출하지 않고 `toolSequence`가 비어 있어야 한다. trace에는 `clarification-gate`, workloop에는 `작업 전 확인 질문`, payload에는 1-3개 질문과 `level`/`depth`/`environment`/`balance` 작업 기준이 남아야 한다.
-   - clarification continuation golden case는 첫 turn의 `pendingClarification.assumptions`가 다음 provider turn의 `[Clarification plan]`에 machine-readable JSON으로 들어가고, `defaults` alias 없이 소비되는지 확인한다. 이어 답변이 아닌 새 요청에서는 stale clarification이 주입되지 않고 pending이 비워지는지도 함께 확인한다.
+   - clarification continuation golden case는 첫 turn의 `pendingClarification.assumptions`가 다음 provider turn의 `[Clarification plan]`에 machine-readable JSON으로 들어가고, `defaults` alias 없이 소비되는지 확인한다. 이어 답변이 아닌 새 요청과 이미 구체적인 새 학습 요청에서는 stale clarification이 주입되지 않고 pending이 비워지는지도 함께 확인한다.
    - 커리큘럼 YAML golden case는 실제 `write-curriculum-yaml` 핸들러가 에디터 document를 바꾸는지까지 확인한다. 결과 payload의 `loadedInEditor`, materialize된 `sectionContract:*` block, document runtime packages는 평가 신호로 남겨야 한다.
 
 ## 코드 경계

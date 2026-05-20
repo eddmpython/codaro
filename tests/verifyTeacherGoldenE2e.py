@@ -315,6 +315,33 @@ async def runClarificationContinuationCase() -> dict[str, Any]:
         extraFailures.append("ambiguous new request bypassed clarification gate after stale pending reset")
     if manager.consumePendingClarification(conversation.conversationId) is not None:
         extraFailures.append("stale pending clarification was not cleared")
+
+    manager.setPendingClarification(conversation.conversationId, plan.payload())
+    specificProvider = ContinuationProvider()
+    specificFactory = ContinuationProviderFactory(specificProvider)
+    specificRuntimeTurn = prepareTeacherRuntimeTurn(
+        convManager=manager,
+        profileManager=ContinuationProfileManager(),
+        sessionManager=NoSessionManager(),
+        documentPath=None,
+        workspaceRoot=None,
+        conversationId=conversation.conversationId,
+        message="초급 pandas 실습 중심 짧은 레슨 만들어줘",
+        roleOverride="teacher",
+        providerOverride="custom",
+        providerFactory=specificFactory,
+    )
+    specificUserMessage = specificRuntimeTurn.turn.messages[-1]["content"]
+    if "[Clarification plan]" in specificUserMessage:
+        extraFailures.append("specific new learning request reused stale clarification")
+    if "초급-중급 사이" in specificUserMessage:
+        extraFailures.append("specific new learning request leaked stale assumptions")
+    if specificRuntimeTurn.turn.clarificationPlan is not None:
+        extraFailures.append("specific new learning request re-opened clarification gate")
+    if specificRuntimeTurn.turn.provider is None or specificFactory.config is None:
+        extraFailures.append("specific new learning request did not reach provider setup")
+    if manager.consumePendingClarification(conversation.conversationId) is not None:
+        extraFailures.append("specific new learning request did not clear stale pending")
     return reportPayload(continuationPayload, extraFailures)
 
 

@@ -93,6 +93,7 @@ OBJECTIVE_REQUIREMENTS = (
                 "clarificationAssumptionKeys",
                 "pending clarification was not consumed",
                 "stale clarification leaked into a new request",
+                "specific new learning request reused stale clarification",
             )),
             ("src/codaro/ai/conversation.py", (
                 "pendingClarification",
@@ -110,6 +111,7 @@ OBJECTIVE_REQUIREMENTS = (
             ("src/codaro/ai/teacher/turnRuntime.py", (
                 "shouldApplyPendingClarification",
                 "STALE_CLARIFICATION_RESET_MARKERS",
+                "NEW_LEARNING_REQUEST_MARKERS",
             )),
         ),
     ),
