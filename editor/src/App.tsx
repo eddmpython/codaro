@@ -1,26 +1,19 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import {
   initialAppNotice,
   initialBootstrapState,
 } from "@/lib/appBootstrap";
 import { MainSurface } from "@/components/app/mainSurface";
 import { TopBar } from "@/components/app/topBar";
-import { ProductSidebar, type SidebarCustomCurriculum } from "@/components/app/productSidebar";
+import { ProductSidebar } from "@/components/app/productSidebar";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
-import {
-  categorySubtitle,
-  categoryTitle,
-} from "@/lib/fallbackData";
-import {
-  buildCustomCurriculumApplication,
-  type CustomCurriculumApplication,
-} from "@/lib/customCurricula";
 import type { AutomationSection } from "@/lib/surfaceModel";
 import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
 import { useAssistantTurnState } from "@/hooks/useAssistantTurnState";
 import { useAutomationState } from "@/hooks/useAutomationState";
 import { useCustomCurriculaState } from "@/hooks/useCustomCurriculaState";
 import { useCurriculumLibraryState } from "@/hooks/useCurriculumLibraryState";
+import { useCurriculumNavigationState } from "@/hooks/useCurriculumNavigationState";
 import { useNotebookDocumentState } from "@/hooks/useNotebookDocumentState";
 import { useNotebookRuntimeState } from "@/hooks/useNotebookRuntimeState";
 import { usePendingChangesState } from "@/hooks/usePendingChangesState";
@@ -33,7 +26,6 @@ import {
 } from "@/components/ui/sidebar";
 import type {
   AppNotice,
-  BlockConfig,
   CodaroDocument,
   LoadState,
 } from "@/types";
@@ -83,7 +75,6 @@ function App() {
     onNotice: setNotice,
   });
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
-  const [query, setQuery] = useState("");
   const { themeMode, toggleThemeMode } = useThemeMode();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [assistantCollapsed, setAssistantCollapsed] = useState(false);
@@ -111,22 +102,27 @@ function App() {
     startOauthProviderLogin,
   } = useProviderConnection({ apiOnline, onNotice: setNotice });
 
-  const filteredCategories = useMemo(() => {
-    const trimmed = query.trim().toLowerCase();
-    if (!trimmed) return categories;
-    return categories.filter((category) => {
-      const label = `${category.name} ${category.description} ${categoryTitle(category.key)} ${categorySubtitle(category.key, category.description)} ${category.key}`;
-      return label.toLowerCase().includes(trimmed);
-    });
-  }, [categories, query]);
-  const sidebarCustomCurricula = useMemo<SidebarCustomCurriculum[]>(() => {
-    return customCurricula.map((entry) => ({
-      id: entry.id,
-      title: entry.title,
-      blockCount: entry.document.blocks.length,
-      createdAt: entry.createdAt,
-    }));
-  }, [customCurricula]);
+  const {
+    filteredCategories,
+    query,
+    saveCustomCurriculum,
+    selectCustomCurriculum,
+    selectCurriculumCategory,
+    selectCurriculumContent,
+    setQuery,
+    sidebarCustomCurricula,
+  } = useCurriculumNavigationState({
+    applyCurriculumSelectionState,
+    categories,
+    customCurricula,
+    findCustomCurriculum,
+    saveCustomCurriculumEntry,
+    selectCurriculumCategoryState,
+    selectCurriculumContentState,
+    setSelectedCustomCurriculumId,
+    setSurface,
+    onNotice: setNotice,
+  });
 
   const activeDocument = surface === "curriculum" && curriculumDocument ? curriculumDocument : document;
   const activeSelectedBlockId = surface === "curriculum" ? selectedCurriculumBlockId : selectedBlockId;
@@ -218,40 +214,6 @@ function App() {
     variables,
     onNotice: setNotice,
   });
-
-  function saveCustomCurriculum(blocks: BlockConfig[], title?: string) {
-    const entry = saveCustomCurriculumEntry(blocks, title);
-    if (!entry) return null;
-    applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry, { showNotice: true }));
-    return entry;
-  }
-
-  function applyCustomCurriculumApplication(application: CustomCurriculumApplication) {
-    applyCurriculumSelectionState(application);
-    setSelectedCustomCurriculumId(application.selectedCustomCurriculumId);
-    setSurface(application.surfaceToOpen);
-    if (application.notice) {
-      setNotice(application.notice);
-    }
-  }
-
-  function selectCurriculumCategory(key: string) {
-    const selection = selectCurriculumCategoryState(key);
-    setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
-    setSurface("curriculum");
-  }
-
-  function selectCurriculumContent(contentId: string) {
-    const selection = selectCurriculumContentState(contentId);
-    setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
-    setSurface("curriculum");
-  }
-
-  function selectCustomCurriculum(id: string) {
-    const entry = findCustomCurriculum(id);
-    if (!entry) return;
-    applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry));
-  }
 
   function selectAutomationSection(section: AutomationSection) {
     setAutomationSection(section);

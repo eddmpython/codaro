@@ -1,0 +1,109 @@
+import { useCallback, useMemo, useState } from "react";
+
+import type { SidebarCustomCurriculum } from "@/components/app/productSidebar";
+import {
+  categorySubtitle,
+  categoryTitle,
+} from "@/lib/fallbackData";
+import {
+  buildCustomCurriculumApplication,
+  type CustomCurriculumApplication,
+  type CustomCurriculumEntry,
+} from "@/lib/customCurricula";
+import type { SurfaceMode } from "@/lib/surfaceModel";
+import type { AppNotice, BlockConfig, CurriculumCategory } from "@/types";
+
+type UseCurriculumNavigationStateOptions = {
+  applyCurriculumSelectionState: (selection: CustomCurriculumApplication) => void;
+  categories: CurriculumCategory[];
+  customCurricula: CustomCurriculumEntry[];
+  findCustomCurriculum: (id: string) => CustomCurriculumEntry | undefined;
+  saveCustomCurriculumEntry: (blocks: BlockConfig[], title?: string) => CustomCurriculumEntry | null;
+  selectCurriculumCategoryState: (category: string) => {
+    selectedCustomCurriculumId: string;
+  };
+  selectCurriculumContentState: (contentId: string) => {
+    selectedCustomCurriculumId: string;
+  };
+  setSelectedCustomCurriculumId: (id: string) => void;
+  setSurface: (surface: SurfaceMode) => void;
+  onNotice: (notice: AppNotice) => void;
+};
+
+export function useCurriculumNavigationState({
+  applyCurriculumSelectionState,
+  categories,
+  customCurricula,
+  findCustomCurriculum,
+  saveCustomCurriculumEntry,
+  selectCurriculumCategoryState,
+  selectCurriculumContentState,
+  setSelectedCustomCurriculumId,
+  setSurface,
+  onNotice,
+}: UseCurriculumNavigationStateOptions) {
+  const [query, setQuery] = useState("");
+
+  const filteredCategories = useMemo(() => {
+    const trimmed = query.trim().toLowerCase();
+    if (!trimmed) return categories;
+    return categories.filter((category) => {
+      const label = `${category.name} ${category.description} ${categoryTitle(category.key)} ${categorySubtitle(category.key, category.description)} ${category.key}`;
+      return label.toLowerCase().includes(trimmed);
+    });
+  }, [categories, query]);
+
+  const sidebarCustomCurricula = useMemo<SidebarCustomCurriculum[]>(() => {
+    return customCurricula.map((entry) => ({
+      id: entry.id,
+      title: entry.title,
+      blockCount: entry.document.blocks.length,
+      createdAt: entry.createdAt,
+    }));
+  }, [customCurricula]);
+
+  const applyCustomCurriculumApplication = useCallback((application: CustomCurriculumApplication) => {
+    applyCurriculumSelectionState(application);
+    setSelectedCustomCurriculumId(application.selectedCustomCurriculumId);
+    setSurface(application.surfaceToOpen);
+    if (application.notice) {
+      onNotice(application.notice);
+    }
+  }, [applyCurriculumSelectionState, onNotice, setSelectedCustomCurriculumId, setSurface]);
+
+  const saveCustomCurriculum = useCallback((blocks: BlockConfig[], title?: string) => {
+    const entry = saveCustomCurriculumEntry(blocks, title);
+    if (!entry) return null;
+    applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry, { showNotice: true }));
+    return entry;
+  }, [applyCustomCurriculumApplication, saveCustomCurriculumEntry]);
+
+  const selectCurriculumCategory = useCallback((key: string) => {
+    const selection = selectCurriculumCategoryState(key);
+    setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
+    setSurface("curriculum");
+  }, [selectCurriculumCategoryState, setSelectedCustomCurriculumId, setSurface]);
+
+  const selectCurriculumContent = useCallback((contentId: string) => {
+    const selection = selectCurriculumContentState(contentId);
+    setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
+    setSurface("curriculum");
+  }, [selectCurriculumContentState, setSelectedCustomCurriculumId, setSurface]);
+
+  const selectCustomCurriculum = useCallback((id: string) => {
+    const entry = findCustomCurriculum(id);
+    if (!entry) return;
+    applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry));
+  }, [applyCustomCurriculumApplication, findCustomCurriculum]);
+
+  return {
+    filteredCategories,
+    query,
+    saveCustomCurriculum,
+    selectCustomCurriculum,
+    selectCurriculumCategory,
+    selectCurriculumContent,
+    setQuery,
+    sidebarCustomCurricula,
+  };
+}
