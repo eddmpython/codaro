@@ -1,8 +1,7 @@
-﻿import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   initialAppNotice,
   initialBootstrapState,
-  loadAppBootstrapState,
 } from "@/lib/appBootstrap";
 import { MainSurface } from "@/components/app/mainSurface";
 import { TopBar } from "@/components/app/topBar";
@@ -61,6 +60,7 @@ import {
   type PendingTarget,
 } from "@/lib/assistantResponsePlan";
 import { providerAssistantFailure } from "@/lib/providerConnection";
+import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
 import { useAutomationState } from "@/hooks/useAutomationState";
 import { useCustomCurriculaState } from "@/hooks/useCustomCurriculaState";
 import { useCurriculumLibraryState } from "@/hooks/useCurriculumLibraryState";
@@ -173,40 +173,17 @@ function App() {
     setPendingTarget("notebook");
   }, [applyNotebookDocument]);
 
-  useEffect(() => {
-    let cancelled = false;
-
-    async function initialize() {
-      setLoadState("loading");
-      const bootstrap = await loadAppBootstrapState();
-      if (cancelled) return;
-      setApiOnline(bootstrap.apiOnline);
-      applyBootstrapCurriculumState(bootstrap);
-      setToolCatalog(bootstrap.toolCatalog);
-      setAiProfile(bootstrap.profile);
-      if (bootstrap.sessionId) setSessionId(bootstrap.sessionId);
-      if (bootstrap.documentToApply) applyDocument(bootstrap.documentToApply);
-      if (bootstrap.notice) setNotice(bootstrap.notice);
-      if (bootstrap.refreshAutomation) {
-        await refreshAutomation();
-      }
-      if (!cancelled) setLoadState("ready");
-    }
-
-    void initialize().catch((error) => {
-      if (cancelled) return;
-      setLoadState("error");
-      setNotice({
-        tone: "error",
-        title: "시작 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, [applyBootstrapCurriculumState, applyDocument, refreshAutomation]);
+  useAppBootstrapEffect({
+    applyBootstrapCurriculumState,
+    applyDocument,
+    onApiOnline: setApiOnline,
+    onLoadState: setLoadState,
+    onNotice: setNotice,
+    onProfile: setAiProfile,
+    onSessionId: setSessionId,
+    onToolCatalog: setToolCatalog,
+    refreshAutomation,
+  });
 
   const filteredCategories = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
