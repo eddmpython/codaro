@@ -399,6 +399,38 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
             liveChecks=tuple(liveChecks[name] for name in LIVE_GATE_NAMES),
             blocking=True,
         ),
+        fileCriterion(
+            "teacher-eval-score-contract",
+            "Teacher/provider evaluation harness exposes an objective score and 9.0 minimum threshold.",
+            (
+                ("src/codaro/ai/teacher/evalHarness.py", (
+                    "MINIMUM_TEACHER_EVAL_SCORE = 9.0",
+                    "MAXIMUM_TEACHER_EVAL_SCORE = 10.0",
+                    "scoreTeacherEvalReports",
+                    "\"score\": self.score",
+                    "\"maxScore\": MAXIMUM_TEACHER_EVAL_SCORE",
+                    "\"minimumScore\": MINIMUM_TEACHER_EVAL_SCORE",
+                )),
+                ("tests/verifyTeacherGoldenE2e.py", (
+                    "teacher golden e2e score",
+                    "\"score\": score",
+                    "\"maxScore\": MAXIMUM_TEACHER_EVAL_SCORE",
+                    "\"minimumScore\": MINIMUM_TEACHER_EVAL_SCORE",
+                )),
+                ("docs/skills/architecture/teacher-tool-loop.md", (
+                    "`score`, `maxScore`, `minimumScore`",
+                    "`minimumScore: 9.0`",
+                    "teacher golden e2e score",
+                )),
+                ("docs/skills/ops/foundation/testing-and-gates.md", (
+                    "`score`, `maxScore`, `minimumScore`",
+                    "`minimumScore`는 9.0",
+                    "teacher golden e2e score",
+                )),
+            ),
+            liveChecks=(liveChecks["teacher-eval"], liveChecks["teacher-e2e"]),
+            blocking=True,
+        ),
     )
 
 

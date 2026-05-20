@@ -5,6 +5,8 @@ import asyncio
 from codaro.ai.conversation import buildSystemPrompt
 from codaro.ai.toolExecutor import ToolExecutor
 from codaro.ai.teacher import (
+    MAXIMUM_TEACHER_EVAL_SCORE,
+    MINIMUM_TEACHER_EVAL_SCORE,
     TeacherEvalCase,
     TeacherOrchestrator,
     TeacherRuntimeTurnRequest,
@@ -25,6 +27,7 @@ from codaro.ai.teacher import (
     runTeacherChatLoop,
     runTeacherChatStream,
     runTeacherGoldenProviderCase,
+    scoreTeacherEvalReports,
     teacherTurnTracePayload,
     teacherSkillToolSummary,
     teacherSkills,
@@ -762,7 +765,11 @@ def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
 
     assert report.passed
     assert report.missingCaseIds == ()
-    assert report.payload()["caseCount"] == 2
+    payload = report.payload()
+    assert payload["caseCount"] == 2
+    assert payload["score"] == MAXIMUM_TEACHER_EVAL_SCORE
+    assert payload["maxScore"] == MAXIMUM_TEACHER_EVAL_SCORE
+    assert payload["minimumScore"] == MINIMUM_TEACHER_EVAL_SCORE
 
 
 def testGoldenProviderCaseRunsActualLoopAndValidatesResults() -> None:
@@ -805,6 +812,7 @@ def testGoldenProviderCaseRunsActualLoopAndValidatesResults() -> None:
     ))
 
     assert report.passed
+    assert report.payload()["score"] == MAXIMUM_TEACHER_EVAL_SCORE
     assert report.evaluation.observedTools == ("packages-check", "packages-install", "cell-call")
     assert report.evaluation.failures == ()
     assert "cell-call.passed" in report.evaluation.observedResultSignals
@@ -960,8 +968,21 @@ def testEvalHarnessFailsMissingGoldenTracePayload() -> None:
     report = evaluateGoldenTracePayloads({}, cases=(goldenEvalCases[0],))
 
     assert not report.passed
+    assert report.score == 0.0
     assert report.missingCaseIds == (goldenEvalCases[0].caseId,)
     assert report.reports[0].failures == ("missing trace payload",)
+
+
+def testEvalHarnessScoresPartialGoldenReports() -> None:
+    passedReport = evaluateToolSequence(TeacherEvalCase(caseId="passed", prompt=""), [])
+    failedReport = evaluateToolSequence(
+        TeacherEvalCase(caseId="failed", prompt="", expectedTools=("cell-call",)),
+        [],
+    )
+
+    assert passedReport.passed
+    assert not failedReport.passed
+    assert scoreTeacherEvalReports((passedReport, failedReport)) == 5.0
 
 
 def testEvalHarnessFailsPolicyViolationsByDefault() -> None:

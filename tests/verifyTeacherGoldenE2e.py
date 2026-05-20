@@ -6,10 +6,13 @@ import sys
 from typing import Any
 
 from codaro.ai.teacher import (
+    MAXIMUM_TEACHER_EVAL_SCORE,
+    MINIMUM_TEACHER_EVAL_SCORE,
     TeacherOrchestrator,
     buildClarificationPlan,
     goldenEvalCases,
     runTeacherGoldenProviderCase,
+    scoreTeacherEvalReports,
 )
 from codaro.ai.tools import toolSchemas
 from codaro.ai.toolExecutor import ToolExecutor
@@ -126,22 +129,25 @@ async def mainAsync() -> int:
     failures = []
     for report in reports:
         if not report["passed"]:
-            failures.append(report)
+            failures.append(publicReportPayload(report))
+    score = scoreTeacherEvalReports(tuple(report["evaluation"] for report in reports))
+    payload = {
+        "passed": not failures and score >= MINIMUM_TEACHER_EVAL_SCORE,
+        "score": score,
+        "maxScore": MAXIMUM_TEACHER_EVAL_SCORE,
+        "minimumScore": MINIMUM_TEACHER_EVAL_SCORE,
+        "caseCount": len(reports),
+        "failureCount": len(failures),
+        "reports": [publicReportPayload(report) for report in reports],
+    }
 
-    if failures:
+    if failures or score < MINIMUM_TEACHER_EVAL_SCORE:
         print("FAIL: teacher golden e2e verification failed", file=sys.stderr)
-        print(json.dumps(failures, ensure_ascii=False, indent=2), file=sys.stderr)
+        print(json.dumps(payload | {"failures": failures}, ensure_ascii=False, indent=2), file=sys.stderr)
         return 1
 
-    summary = [
-        {
-            "caseId": report["caseId"],
-            "toolSequence": report["toolSequence"],
-            "signals": report["signals"],
-        }
-        for report in reports
-    ]
-    print(f"ok: teacher golden e2e verified {json.dumps(summary, ensure_ascii=False)}")
+    print(f"ok: teacher golden e2e score {score}/{MAXIMUM_TEACHER_EVAL_SCORE}")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -289,13 +295,38 @@ async def runCurriculumMaterializationCase() -> dict[str, Any]:
 
 def reportPayload(report, extraFailures: list[str]) -> dict[str, Any]:
     failures = [*report.evaluation.failures, *extraFailures]
+    evaluation = report.evaluation
+    if extraFailures:
+        evaluation = type(report.evaluation)(
+            caseId=report.evaluation.caseId,
+            passed=False,
+            failures=tuple(failures),
+            observedTools=report.evaluation.observedTools,
+            observedWorkLabels=report.evaluation.observedWorkLabels,
+            observedWorkDetails=report.evaluation.observedWorkDetails,
+            workloopEventCount=report.evaluation.workloopEventCount,
+            policyViolationCount=report.evaluation.policyViolationCount,
+            policyViolations=report.evaluation.policyViolations,
+            observedResultSignals=report.evaluation.observedResultSignals,
+        )
     return {
         "caseId": report.caseId,
         "passed": report.passed and not extraFailures,
         "failures": failures,
+        "evaluation": evaluation,
         "toolSequence": list(report.evaluation.observedTools),
         "workLabels": list(report.evaluation.observedWorkLabels),
         "signals": list(report.evaluation.observedResultSignals),
+    }
+
+
+def publicReportPayload(report: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "caseId": report["caseId"],
+        "passed": report["passed"],
+        "failures": report["failures"],
+        "toolSequence": report["toolSequence"],
+        "signals": report["signals"],
     }
 
 

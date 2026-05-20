@@ -8,6 +8,10 @@ from .toolPolicy import normalizeToolPolicyViolations
 from .traceModel import TeacherTrace
 
 
+MAXIMUM_TEACHER_EVAL_SCORE = 10.0
+MINIMUM_TEACHER_EVAL_SCORE = 9.0
+
+
 @dataclass(frozen=True)
 class TeacherEvalCase:
     caseId: str
@@ -51,9 +55,16 @@ class TeacherEvalReport:
     reports: tuple[ToolSequenceReport, ...]
     missingCaseIds: tuple[str, ...] = field(default_factory=tuple)
 
+    @property
+    def score(self) -> float:
+        return scoreTeacherEvalReports(self.reports)
+
     def payload(self) -> dict[str, Any]:
         return {
             "passed": self.passed,
+            "score": self.score,
+            "maxScore": MAXIMUM_TEACHER_EVAL_SCORE,
+            "minimumScore": MINIMUM_TEACHER_EVAL_SCORE,
             "caseCount": len(self.reports),
             "failureCount": sum(1 for report in self.reports if not report.passed),
             "missingCaseIds": list(self.missingCaseIds),
@@ -84,9 +95,13 @@ class TeacherGoldenRunReport:
     tracePayload: Mapping[str, Any]
 
     def payload(self) -> dict[str, Any]:
+        score = scoreTeacherEvalReports((self.evaluation,))
         return {
             "caseId": self.caseId,
             "passed": self.passed,
+            "score": score,
+            "maxScore": MAXIMUM_TEACHER_EVAL_SCORE,
+            "minimumScore": MINIMUM_TEACHER_EVAL_SCORE,
             "evaluation": {
                 "passed": self.evaluation.passed,
                 "failures": list(self.evaluation.failures),
@@ -99,6 +114,13 @@ class TeacherGoldenRunReport:
             },
             "trace": dict(self.tracePayload),
         }
+
+
+def scoreTeacherEvalReports(reports: Sequence[ToolSequenceReport]) -> float:
+    if not reports:
+        return 0.0
+    passedCount = sum(1 for report in reports if report.passed)
+    return round(MAXIMUM_TEACHER_EVAL_SCORE * passedCount / len(reports), 2)
 
 
 goldenEvalCases: tuple[TeacherEvalCase, ...] = (

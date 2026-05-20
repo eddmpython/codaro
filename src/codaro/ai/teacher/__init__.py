@@ -3,6 +3,8 @@ from __future__ import annotations
 from .clarificationPolicy import ClarificationPlan, buildClarificationPlan, clarificationAnswer
 from .contextBuilder import injectContext
 from .evalHarness import (
+    MAXIMUM_TEACHER_EVAL_SCORE,
+    MINIMUM_TEACHER_EVAL_SCORE,
     TeacherEvalCase,
     TeacherEvalReport,
     TeacherGoldenRunReport,
@@ -14,6 +16,7 @@ from .evalHarness import (
     evaluateToolTracePayload,
     goldenEvalCases,
     runTeacherGoldenProviderCase,
+    scoreTeacherEvalReports,
     teacherTurnTracePayload,
 )
 from .providerLoop import (
@@ -81,6 +84,8 @@ __all__ = [
     "TeacherTurnSession",
     "TeacherToolRound",
     "ClarificationPlan",
+    "MAXIMUM_TEACHER_EVAL_SCORE",
+    "MINIMUM_TEACHER_EVAL_SCORE",
     "ToolPolicyState",
     "ToolPolicyViolation",
     "ToolSequenceReport",
@@ -107,6 +112,7 @@ __all__ = [
     "runTeacherChatLoop",
     "runTeacherChatStream",
     "runTeacherGoldenProviderCase",
+    "scoreTeacherEvalReports",
     "startTeacherToolCall",
     "streamTeacherTokens",
     "teacherTurnPayload",
