@@ -257,9 +257,11 @@ def testTeacherSkillRegistryReferencesRegisteredManifestTools() -> None:
     summary = teacherSkillToolSummary()
     curriculum = next(item for item in summary if item["skillId"] == "curriculum-authoring")
     tools = {tool["name"]: tool for tool in curriculum["tools"]}
+    prompt = buildSystemPrompt(role="teacher")
 
     assert tools["write-curriculum-yaml"]["lane"] == "curriculum"
     assert tools["read-cells"]["target"] == "learning-editor"
+    assert "write-curriculum-yaml(lane=curriculum,target=curriculum-yaml,risk=writes)" in prompt
 
 
 def testTeacherSkillRegistryReportsMissingRequiredTools() -> None:

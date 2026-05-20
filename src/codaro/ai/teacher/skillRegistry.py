@@ -150,9 +150,10 @@ def teacherSkillToolSummary() -> tuple[dict[str, Any], ...]:
 
 def teacherSkillPrompt() -> str:
     lines = ["Teacher skill registry:"]
-    for skill in teacherSkills:
+    for skill, summary in zip(teacherSkills, teacherSkillToolSummary(), strict=True):
+        tools = ", ".join(_toolPromptLabel(tool) for tool in summary["tools"])
         lines.append(
-            f"- {skill.skillId}: trigger={skill.trigger}; tools={', '.join(skill.requiredTools)}; policy={skill.policy}"
+            f"- {skill.skillId}: trigger={skill.trigger}; tools={tools}; policy={skill.policy}"
         )
     return "\n".join(lines)
 
@@ -177,3 +178,15 @@ def _toolSummary(descriptor: dict[str, Any]) -> dict[str, str]:
         "target": str(descriptor.get("target", "")),
         "risk": str(descriptor.get("risk", "")),
     }
+
+
+def _toolPromptLabel(tool: dict[str, str]) -> str:
+    name = tool.get("name", "")
+    metadata = [
+        f"lane={tool.get('lane', '')}",
+        f"target={tool.get('target', '')}",
+    ]
+    risk = tool.get("risk", "")
+    if risk and risk != "normal":
+        metadata.append(f"risk={risk}")
+    return f"{name}({','.join(metadata)})" if name else ""
