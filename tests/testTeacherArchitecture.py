@@ -712,7 +712,7 @@ def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
             ],
             "toolCalls": [
                 {"name": "packages-check", "result": {"missing": ["matplotlib"]}},
-                {"name": "packages-install", "result": {"success": True}},
+                {"name": "packages-install", "result": {"success": True, "installer": "uv", "durationMs": 42}},
                 {"name": "cell-call", "result": {"passed": True}},
             ],
         },
@@ -755,7 +755,7 @@ def testGoldenProviderCaseRunsActualLoopAndValidatesResults() -> None:
     ])
     executor = _ScriptedExecutor({
         "packages-check": {"missing": ["matplotlib"], "installed": []},
-        "packages-install": {"success": True, "package": "matplotlib"},
+        "packages-install": {"success": True, "package": "matplotlib", "installer": "uv", "durationMs": 42},
         "cell-call": {"passed": True, "feedback": "정답입니다."},
     })
     orchestrator = TeacherOrchestrator.fromContext({"dependencyPreflight": {"packages": ["matplotlib"]}})

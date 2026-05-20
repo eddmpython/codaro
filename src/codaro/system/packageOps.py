@@ -4,12 +4,17 @@ import asyncio
 import json
 import re
 import subprocess
+import time
 from pathlib import Path
 
 from pydantic import BaseModel
 
 
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
+PACKAGE_LIST_TIMEOUT_SECONDS = 30
+PACKAGE_VERSION_TIMEOUT_SECONDS = 10
+INSTALL_TIMEOUT_SECONDS = 600
+UNINSTALL_TIMEOUT_SECONDS = 120
 
 
 class PackageInfo(BaseModel):
@@ -21,6 +26,10 @@ class InstallResult(BaseModel):
     package: str
     success: bool
     message: str
+    installer: str = "uv"
+    environment: str = "project .venv"
+    durationMs: int | None = None
+    skipped: bool = False
 
 
 class PackageEnvironmentError(RuntimeError):
@@ -77,7 +86,7 @@ print(json.dumps(sorted(seen.values(), key=lambda item: item["name"].lower())))
             [str(pythonPath), "-X", "utf8", "-c", script],
             capture_output=True,
             text=True,
-            timeout=30,
+            timeout=PACKAGE_LIST_TIMEOUT_SECONDS,
             cwd=PROJECT_ROOT,
             check=False,
         )
@@ -89,7 +98,7 @@ print(json.dumps(sorted(seen.values(), key=lambda item: item["name"].lower())))
     except subprocess.TimeoutExpired as error:
         raise PackageEnvironmentError(
             "package_list_timeout",
-            "Package listing timed out after 30 seconds.",
+            f"Package listing timed out after {PACKAGE_LIST_TIMEOUT_SECONDS} seconds.",
         ) from error
 
     if result.returncode != 0:
@@ -135,54 +144,46 @@ async def installPackage(name: str) -> InstallResult:
 
 
 def _installSync(name: str) -> InstallResult:
+    startedAt = time.monotonic()
     try:
         validatePackageName(name)
     except PackageEnvironmentError as error:
-        return InstallResult(package=name, success=False, message=error.message)
+        return _packageResult(name, False, error.message, startedAt)
 
     try:
         pythonPath = getProjectPythonPath()
     except PackageEnvironmentError as error:
-        return InstallResult(package=name, success=False, message=error.message)
+        return _packageResult(name, False, error.message, startedAt)
 
     try:
         installedVersion = installedPackageVersion(name, pythonPath=pythonPath)
     except FileNotFoundError:
-        return InstallResult(
-            package=name,
-            success=False,
-            message="Project virtual environment Python executable was not found.",
-        )
+        return _packageResult(name, False, "Project virtual environment Python executable was not found.", startedAt)
     except subprocess.TimeoutExpired:
         installedVersion = None
     if installedVersion:
-        return InstallResult(
-            package=name,
-            success=True,
-            message=f"{name} is already installed in the project .venv ({installedVersion}).",
+        return _packageResult(
+            name,
+            True,
+            f"{name} is already installed in the project .venv ({installedVersion}).",
+            startedAt,
+            skipped=True,
         )
 
     try:
-        result = runUvPip("install", [name], pythonPath=pythonPath, timeoutSeconds=180)
+        result = runUvPip("install", [name], pythonPath=pythonPath, timeoutSeconds=INSTALL_TIMEOUT_SECONDS)
     except FileNotFoundError:
-        return InstallResult(
-            package=name,
-            success=False,
-            message="uv executable was not found.",
-        )
+        return _packageResult(name, False, "uv executable was not found.", startedAt)
     except subprocess.TimeoutExpired:
-        return InstallResult(
-            package=name,
-            success=False,
-            message="Installation timed out after 180 seconds.",
+        return _packageResult(
+            name,
+            False,
+            f"Installation timed out after {INSTALL_TIMEOUT_SECONDS} seconds while running uv pip install.",
+            startedAt,
         )
 
     output = (result.stdout + "\n" + result.stderr).strip()
-    return InstallResult(
-        package=name,
-        success=result.returncode == 0,
-        message=output,
-    )
+    return _packageResult(name, result.returncode == 0, output, startedAt)
 
 
 async def uninstallPackage(name: str) -> InstallResult:
@@ -191,37 +192,26 @@ async def uninstallPackage(name: str) -> InstallResult:
 
 
 def _uninstallSync(name: str) -> InstallResult:
+    startedAt = time.monotonic()
     try:
         validatePackageName(name)
     except PackageEnvironmentError as error:
-        return InstallResult(package=name, success=False, message=error.message)
+        return _packageResult(name, False, error.message, startedAt)
 
     try:
         pythonPath = getProjectPythonPath()
     except PackageEnvironmentError as error:
-        return InstallResult(package=name, success=False, message=error.message)
+        return _packageResult(name, False, error.message, startedAt)
 
     try:
-        result = runUvPip("uninstall", [name, "-y"], pythonPath=pythonPath, timeoutSeconds=60)
+        result = runUvPip("uninstall", [name, "-y"], pythonPath=pythonPath, timeoutSeconds=UNINSTALL_TIMEOUT_SECONDS)
     except FileNotFoundError:
-        return InstallResult(
-            package=name,
-            success=False,
-            message="uv executable was not found.",
-        )
+        return _packageResult(name, False, "uv executable was not found.", startedAt)
     except subprocess.TimeoutExpired:
-        return InstallResult(
-            package=name,
-            success=False,
-            message="Uninstall timed out.",
-        )
+        return _packageResult(name, False, f"Uninstall timed out after {UNINSTALL_TIMEOUT_SECONDS} seconds.", startedAt)
 
     output = (result.stdout + "\n" + result.stderr).strip()
-    return InstallResult(
-        package=name,
-        success=result.returncode == 0,
-        message=output,
-    )
+    return _packageResult(name, result.returncode == 0, output, startedAt)
 
 
 def installedPackageVersion(name: str, *, pythonPath: Path) -> str | None:
@@ -243,13 +233,34 @@ print(dist.version)
         [str(pythonPath), "-X", "utf8", "-c", script, name],
         capture_output=True,
         text=True,
-        timeout=10,
+        timeout=PACKAGE_VERSION_TIMEOUT_SECONDS,
         cwd=PROJECT_ROOT,
         check=False,
     )
     if result.returncode != 0:
         return None
     return result.stdout.strip() or None
+
+
+def _packageResult(
+    name: str,
+    success: bool,
+    message: str,
+    startedAt: float,
+    *,
+    skipped: bool = False,
+) -> InstallResult:
+    return InstallResult(
+        package=name,
+        success=success,
+        message=message,
+        durationMs=_elapsedMs(startedAt),
+        skipped=skipped,
+    )
+
+
+def _elapsedMs(startedAt: float) -> int:
+    return max(0, int((time.monotonic() - startedAt) * 1000))
 
 
 def runUvPip(

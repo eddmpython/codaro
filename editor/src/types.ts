@@ -31,6 +31,10 @@ export type PackageInstallResult = {
   package: string;
   success: boolean;
   message: string;
+  installer?: string;
+  environment?: string;
+  durationMs?: number | null;
+  skipped?: boolean;
 };
 
 export type VariableDelta = {

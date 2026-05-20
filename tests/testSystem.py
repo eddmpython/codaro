@@ -164,8 +164,38 @@ def testInstallPackageSkipsUvWhenPlainPackageAlreadyInstalled(monkeypatch, tmp_p
     result = _run(packageOps.installPackage("rich"))
 
     assert result.success is True
+    assert result.installer == "uv"
+    assert result.environment == "project .venv"
+    assert result.durationMs is not None
+    assert result.skipped is True
     assert "already installed" in result.message
     assert "1.2.3" in result.message
+
+
+def testInstallPackageUsesUvProjectPythonAndReportsMetadata(monkeypatch, tmp_path: Path) -> None:
+    expectedPythonPath = tmp_path / "python.exe"
+    expectedPythonPath.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: expectedPythonPath)
+    monkeypatch.setattr(packageOps, "installedPackageVersion", lambda name, *, pythonPath: None)
+
+    def fakeRunUvPip(command: str, arguments: list[str], *, pythonPath: Path, timeoutSeconds: int):
+        assert command == "install"
+        assert arguments == ["rich"]
+        assert pythonPath == expectedPythonPath
+        assert timeoutSeconds == packageOps.INSTALL_TIMEOUT_SECONDS
+        return subprocess.CompletedProcess(["uv"], 0, stdout="Installed rich", stderr="")
+
+    monkeypatch.setattr(packageOps, "runUvPip", fakeRunUvPip)
+
+    result = _run(packageOps.installPackage("rich"))
+
+    assert result.success is True
+    assert result.installer == "uv"
+    assert result.environment == "project .venv"
+    assert result.durationMs is not None
+    assert result.skipped is False
+    assert result.message == "Installed rich"
 
 
 def testInstallPackageReportsTimeout(monkeypatch, tmp_path: Path) -> None:
@@ -184,7 +214,11 @@ def testInstallPackageReportsTimeout(monkeypatch, tmp_path: Path) -> None:
     result = _run(packageOps.installPackage("rich"))
 
     assert result.success is False
+    assert result.installer == "uv"
+    assert result.environment == "project .venv"
+    assert result.durationMs is not None
     assert "timed out" in result.message
+    assert str(packageOps.INSTALL_TIMEOUT_SECONDS) in result.message
 
 
 def testUninstallPackageReportsInvalidName() -> None:
@@ -203,7 +237,7 @@ def testUninstallPackageUsesProjectPython(monkeypatch, tmp_path: Path) -> None:
     def fakeRunUvPip(command, arguments, *, pythonPath, timeoutSeconds):
         assert command == "uninstall"
         assert arguments == ["rich", "-y"]
-        assert timeoutSeconds == 60
+        assert timeoutSeconds == packageOps.UNINSTALL_TIMEOUT_SECONDS
         return subprocess.CompletedProcess(["uv"], 0, stdout="Removed rich", stderr="")
 
     monkeypatch.setattr(packageOps, "runUvPip", fakeRunUvPip)

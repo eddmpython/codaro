@@ -139,6 +139,8 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         expectedToolResultFields=(
             ("packages-check", "missing"),
             ("packages-install", "success"),
+            ("packages-install", "installer"),
+            ("packages-install", "durationMs"),
             ("cell-call", "passed"),
         ),
     ),
@@ -157,6 +159,8 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         expectedToolResultFields=(
             ("packages-check", "missing"),
             ("packages-install", "success"),
+            ("packages-install", "installer"),
+            ("packages-install", "durationMs"),
             ("cell-call", "status"),
         ),
     ),

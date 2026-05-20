@@ -25,6 +25,7 @@ from codaro.ai.toolManifest import (
 )
 from codaro.document.models import BlockConfig, CodaroDocument
 from codaro.kernel.session import KernelSession
+from codaro.system.packageOps import InstallResult
 
 
 EXPECTED_BUILTIN_TOOLS = {
@@ -53,6 +54,17 @@ class _MockSessionManager:
 
     def getSession(self, sessionId):
         return self._sessions.get(sessionId)
+
+
+class _PackageSession:
+    async def installPackage(self, packageName: str):
+        return InstallResult(
+            package=packageName,
+            success=True,
+            message="already installed",
+            durationMs=42,
+            skipped=True,
+        )
 
 
 def _makeExecutor(doc=None, workspaceRoot=None):
@@ -232,6 +244,24 @@ class TestDocumentTools:
         assert result["passed"] is True
         assert result["actual"] == "42"
         session.dispose()
+
+    def test_packages_install_exposes_uv_metadata(self):
+        sessionManager = _MockSessionManager()
+        sessionManager._sessions["session-1"] = _PackageSession()
+        executor = ToolExecutor(sessionManager=sessionManager, documentGetter=lambda: _makeDoc())
+        executor.setActiveSession("session-1")
+
+        result = asyncio.run(executor.execute("packages-install", {"name": "pandas"}))
+
+        assert result == {
+            "package": "pandas",
+            "success": True,
+            "message": "already installed",
+            "installer": "uv",
+            "environment": "project .venv",
+            "durationMs": 42,
+            "skipped": True,
+        }
 
 
 class TestGuide:

@@ -44,7 +44,7 @@ import {
 } from "@/lib/cellModel";
 import { difficultyLabel, statusLabel } from "@/lib/displayFormat";
 import { cn } from "@/lib/utils";
-import type { BlockConfig, CodaroDocument, ExecutionResult, PackageInfo } from "@/types";
+import type { BlockConfig, CodaroDocument, ExecutionResult, PackageInfo, PackageInstallResult } from "@/types";
 import {
   CurriculumMarkdownBody,
   curriculumCellTone,
@@ -335,7 +335,7 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
       setInstalling(packageName);
       try {
         const result = await codaroApi.packageInstall(packageName);
-        setLastMessage(firstMessageLine(result.message) || `${packageName} 설치 완료`);
+        setLastMessage(packageInstallStatusText(result));
         if (!result.success) {
           setError(firstMessageLine(result.message) || `${packageName} 설치에 실패했습니다.`);
           break;
@@ -1016,6 +1016,21 @@ function normalizePackageName(value: string) {
 
 function firstMessageLine(value: string) {
   return value.split(/\r?\n/).map((line) => line.trim()).find(Boolean) ?? "";
+}
+
+function packageInstallStatusText(result: PackageInstallResult) {
+  if (!result.success) return firstMessageLine(result.message) || `${result.package} 설치에 실패했습니다.`;
+  const duration = formatPackageDuration(result.durationMs);
+  const environment = result.environment || "project .venv";
+  const suffix = duration ? ` · ${duration}` : "";
+  if (result.skipped) return `${result.package} 이미 준비됨 · ${environment}${suffix}`;
+  return `${result.package} 설치 완료 · ${result.installer || "uv"} → ${environment}${suffix}`;
+}
+
+function formatPackageDuration(durationMs?: number | null) {
+  if (typeof durationMs !== "number" || Number.isNaN(durationMs)) return "";
+  if (durationMs < 1000) return `${Math.max(0, Math.round(durationMs))}ms`;
+  return `${Math.round(durationMs / 100) / 10}s`;
 }
 
 function errorText(error: unknown) {

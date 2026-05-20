@@ -88,6 +88,10 @@ class RuntimeToolHandlers:
             "package": name,
             "success": result.success,
             "message": result.message,
+            "installer": result.installer,
+            "environment": result.environment,
+            "durationMs": result.durationMs,
+            "skipped": result.skipped,
         }
 
     async def _handle_checkExercise(self, args: dict[str, Any]) -> dict[str, Any]:
