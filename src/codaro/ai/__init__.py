@@ -16,6 +16,11 @@ from .providerModels import (
     fetchOpenaiChatModels,
     providerModelList,
 )
+from .providerValidation import (
+    ProviderValidationResult,
+    providerValidationConfig,
+    validateProviderConnection,
+)
 from .providerSpec import (
     ProviderSpec,
     getProviderSpec,
@@ -52,6 +57,9 @@ __all__ = [
     "fetchOpenaiChatModels",
     "filterOpenaiChatModelIds",
     "providerModelList",
+    "ProviderValidationResult",
+    "providerValidationConfig",
+    "validateProviderConnection",
     "ProviderSpec",
     "getProviderSpec",
     "publicProviderIds",

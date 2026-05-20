@@ -15,6 +15,7 @@ from pydantic import BaseModel
 from ..ai.completion import completeCode, emptyCompletionResult
 from ..ai.profile import AiProfileManager, getProfileManager
 from ..ai.providerModels import providerModelList
+from ..ai.providerValidation import validateProviderConnection
 from ..ai.providers.oauthChatgptProvider import ChatGPTOAuthError
 from ..ai.providerSpec import (
     buildProviderCatalog,
@@ -124,24 +125,11 @@ def createAiRouter(state: Any) -> APIRouter:
         provider: str = Query(...),
         model: str | None = Query(None),
     ):
-        from ..ai.factory import createProvider
-        from ..ai.types import LLMConfig
-
-        normalized = normalizeProvider(provider) or provider
-        manager = getProfileManager()
-        resolved = manager.resolve(provider=normalized)
-        config = LLMConfig(
-            provider=normalized,
-            model=model or resolved.get("model"),
-            apiKey=resolved.get("apiKey"),
-            baseUrl=resolved.get("baseUrl"),
-        )
-        try:
-            prov = createProvider(config)
-            available = prov.checkAvailable()
-            return {"valid": available, "model": prov.resolvedModel}
-        except _HANDLED_ERRORS as exc:
-            return {"valid": False, "error": str(exc)}
+        return validateProviderConnection(
+            provider=provider,
+            model=model,
+            profileManager=getProfileManager(),
+        ).payload()
 
     @router.get("/api/ai/models/{provider}")
     def apiModels(provider: str):

@@ -4,6 +4,7 @@ from pathlib import Path
 
 from fastapi.testclient import TestClient
 
+import codaro.api.aiRouter as aiRouterModule
 import codaro.server as serverModule
 from codaro.document import createEmptyDocument
 from codaro.runtime import LocalEngine
@@ -214,6 +215,29 @@ def testPackagesListUsesWorkspaceEngine(monkeypatch) -> None:
 
     assert response.status_code == 200
     assert response.json() == [{"name": "WorkspacePkg", "version": "9.9.9"}]
+
+
+def testProviderValidateUsesProviderValidationDomain(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    class _ValidationResult:
+        def payload(self):
+            return {"valid": True, "model": "demo-model"}
+
+    def fakeValidateProviderConnection(**kwargs):
+        captured.update(kwargs)
+        return _ValidationResult()
+
+    monkeypatch.setattr(aiRouterModule, "validateProviderConnection", fakeValidateProviderConnection)
+    client = TestClient(createServerApp())
+
+    response = client.post("/api/ai/provider/validate?provider=custom&model=demo-model")
+
+    assert response.status_code == 200
+    assert response.json() == {"valid": True, "model": "demo-model"}
+    assert captured["provider"] == "custom"
+    assert captured["model"] == "demo-model"
+    assert captured["profileManager"] is not None
 
 
 def testEnvironmentInfo() -> None:

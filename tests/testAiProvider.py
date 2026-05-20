@@ -4,6 +4,7 @@ import pytest
 
 from codaro.ai.completion import buildCompletionMessages, completeCode, completionTextFromAnswer
 from codaro.ai.providerModels import DEFAULT_OPENAI_CHAT_MODELS, filterOpenaiChatModelIds, providerModelList
+from codaro.ai.providerValidation import providerValidationConfig, validateProviderConnection
 from codaro.ai.types import LLMConfig, LLMResponse, ToolCall, ToolResponse
 from codaro.ai.factory import createProvider, availableProviders, registerProvider
 from codaro.ai.providerSpec import (
@@ -53,6 +54,15 @@ class _InstalledModelsProvider:
 
     def getInstalledModels(self) -> list[str]:
         return self.models
+
+
+class _ValidationProvider:
+    def __init__(self, available: bool = True) -> None:
+        self.available = available
+        self.resolvedModel = "validated-model"
+
+    def checkAvailable(self) -> bool:
+        return self.available
 
 
 class TestLLMConfig:
@@ -228,6 +238,48 @@ class TestProviderModels:
         ])
 
         assert models == ["gpt-4.1-mini", "o3"]
+
+
+class TestProviderValidation:
+    def test_validation_config_uses_profile_and_model_override(self):
+        profileManager = _CompletionProfileManager()
+
+        config = providerValidationConfig("custom", "override-model", profileManager)
+
+        assert config.provider == "custom"
+        assert config.model == "override-model"
+        assert config.apiKey == "secret"
+        assert config.baseUrl == "http://local.test"
+        assert profileManager.resolvedProvider == "custom"
+
+    def test_validate_provider_returns_payload(self):
+        configs: list[LLMConfig] = []
+
+        def providerFactory(config: LLMConfig):
+            configs.append(config)
+            return _ValidationProvider()
+
+        result = validateProviderConnection(
+            provider="custom",
+            profileManager=_CompletionProfileManager(),
+            providerFactory=providerFactory,
+        )
+
+        assert result.payload() == {"valid": True, "model": "validated-model"}
+        assert configs[0].provider == "custom"
+        assert configs[0].model == "completion-model"
+
+    def test_validate_provider_captures_connection_errors(self):
+        def providerFactory(config: LLMConfig):
+            raise ConnectionError("not reachable")
+
+        result = validateProviderConnection(
+            provider="custom",
+            profileManager=_CompletionProfileManager(),
+            providerFactory=providerFactory,
+        )
+
+        assert result.payload() == {"valid": False, "error": "not reachable"}
 
 
 class TestCompletion:
