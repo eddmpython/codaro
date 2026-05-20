@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import time
 import uuid
 from pathlib import Path
 from typing import Any
@@ -9,6 +8,7 @@ from fastapi import APIRouter
 
 from ..document.models import BlockConfig, CodaroDocument, ExportRequest, ExportResponse, LoadRequest, SaveRequest
 from ..document.service import createEmptyDocument, exportDocument, loadDocument, saveDocument
+from ..kernel.executionPayload import executeKernelBlock
 from ..serverLog import formatLogFields, getServerLogger
 from ..system.fileOps import WorkspacePathError, resolvePath
 from .appState import ServerState
@@ -192,19 +192,18 @@ def createDocumentRouter(state: ServerState) -> APIRouter:
         block = document.blocks[index]
         if block.type != "code":
             fail(400, "document_block_not_code", "Block is not a code block.")
-        startedAt = time.perf_counter()
-        result = await session.execute(block.content, blockId=block.id)
+        payload = await executeKernelBlock(session, block.content, blockId=block.id)
         logger.debug(
             "document-run %s",
             formatLogFields(
                 path=path,
                 sessionId=request.sessionId,
                 blockId=block.id,
-                status=result.status,
-                durationMs=round((time.perf_counter() - startedAt) * 1000, 1),
+                status=payload.result.status,
+                durationMs=payload.durationMs,
             ),
         )
-        return {"result": result.model_dump(), "blockId": block.id}
+        return {"result": payload.httpPayload(), "blockId": block.id}
 
     return router
 

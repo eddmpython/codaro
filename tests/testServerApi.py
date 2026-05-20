@@ -396,6 +396,37 @@ def testDocumentBlockOperations(tmp_path: Path) -> None:
     assert newBlockId not in remainingIds
 
 
+def testDocumentRunBlockUsesKernelExecutionPayload(tmp_path: Path) -> None:
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+    path = tmp_path / "run_block.py"
+    document = createEmptyDocument("RunBlock")
+    document.blocks[0].content = "value = 3\nvalue + 4"
+    client.post(
+        "/api/document/save",
+        json={"path": str(path), "document": document.model_dump()},
+    )
+    sessionId = client.post("/api/kernel/create", json={}).json()["sessionId"]
+
+    response = client.post(
+        "/api/document/run-block",
+        json={
+            "sessionId": sessionId,
+            "path": str(path),
+            "blockId": document.blocks[0].id,
+        },
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    result = payload["result"]
+    assert payload["blockId"] == document.blocks[0].id
+    assert result["blockId"] == document.blocks[0].id
+    assert result["status"] == "done"
+    assert "7" in result["data"]
+    assert [event["eventType"] for event in result["events"]] == ["started", "display", "stateDelta", "finished"]
+    client.delete(f"/api/kernel/{sessionId}")
+
+
 def testWorkspaceBoundaryBlocksOutsideFsPaths(tmp_path: Path) -> None:
     client = TestClient(createServerApp(workspaceRoot=tmp_path))
     outsidePath = tmp_path.parent / "outside.txt"
