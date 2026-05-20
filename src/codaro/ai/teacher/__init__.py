@@ -18,12 +18,15 @@ from .teacherOrchestrator import TeacherOrchestrator
 from .toolLifecycle import toolCallResult, toolCallStart
 from .toolPolicy import ToolPolicyState, ToolPolicyViolation
 from .traceModel import TeacherTrace
+from .turnSession import TeacherConversationNotFound, TeacherTurnSession, prepareTeacherTurn
 
 __all__ = [
     "TeacherEvalCase",
+    "TeacherConversationNotFound",
     "TeacherOrchestrator",
     "TeacherSkill",
     "TeacherTrace",
+    "TeacherTurnSession",
     "TeacherToolRound",
     "ToolPolicyState",
     "ToolPolicyViolation",
@@ -33,6 +36,7 @@ __all__ = [
     "finishTeacherToolCall",
     "goldenEvalCases",
     "injectContext",
+    "prepareTeacherTurn",
     "recordAssistantToolRequest",
     "runTeacherChatLoop",
     "runTeacherChatStream",

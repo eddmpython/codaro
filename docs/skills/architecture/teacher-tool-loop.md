@@ -66,6 +66,7 @@ src/codaro/ai/
 ├── conversation.py   # 역할별 prompt와 conversation state
 ├── teacher/
 │   ├── teacherOrchestrator.py
+│   ├── turnSession.py
 │   ├── providerLoop.py
 │   ├── providerStream.py
 │   ├── contextBuilder.py

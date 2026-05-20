@@ -21,7 +21,9 @@ from ..ai.providerSpec import (
     publicProviderIds,
 )
 from ..ai.teacher import (
+    TeacherConversationNotFound,
     TeacherOrchestrator,
+    prepareTeacherTurn,
     runTeacherChatLoop,
     runTeacherChatStream,
 )
@@ -266,51 +268,29 @@ def createAiRouter(state: Any) -> APIRouter:
         orchestrator = TeacherOrchestrator.fromContext(context)
         message = orchestrator.injectContext(message)
 
-        from ..ai.factory import createProvider
-        from ..ai.tools import toolSchemas
-        from ..ai.types import LLMConfig
-
         convManager = _getConversationManager()
-
-        if not conversationId:
-            role = roleOverride or "copilot"
-            conv = convManager.create(role=role)
-            conversationId = conv.conversationId
-        else:
-            conv = convManager.get(conversationId)
-            if conv is None:
-                raise HTTPException(status_code=404, detail="Conversation not found")
-
-        convManager.addUserMessage(conversationId, message)
-
-        profileManager = getProfileManager()
-        role = conv.role if conv else "copilot"
-        resolved = profileManager.resolve(provider=providerOverride, role=role)
-
-        config = LLMConfig(
-            provider=resolved["provider"],
-            model=resolved.get("model"),
-            apiKey=resolved.get("apiKey"),
-            baseUrl=resolved.get("baseUrl"),
-            temperature=resolved.get("temperature", 0.3),
-            maxTokens=resolved.get("maxTokens", 4096),
-        )
-
         try:
-            provider = createProvider(config)
+            turn = prepareTeacherTurn(
+                convManager=convManager,
+                profileManager=getProfileManager(),
+                conversationId=conversationId,
+                message=message,
+                providerOverride=providerOverride,
+                roleOverride=roleOverride,
+            )
+        except TeacherConversationNotFound as exc:
+            raise HTTPException(status_code=404, detail="Conversation not found") from exc
         except _HANDLED_ERRORS as exc:
             raise _providerUnavailable(exc) from exc
-        messages = convManager.buildMessages(conversationId)
-        tools = toolSchemas()
 
         executor = _createToolExecutor(state, sessionId)
         try:
             return await runTeacherChatLoop(
-                provider=provider,
+                provider=turn.provider,
                 convManager=convManager,
-                conversationId=conversationId,
-                messages=messages,
-                tools=tools,
+                conversationId=turn.conversationId,
+                messages=turn.messages,
+                tools=turn.tools,
                 executor=executor,
                 orchestrator=orchestrator,
             )
@@ -331,47 +311,28 @@ def createAiRouter(state: Any) -> APIRouter:
         orchestrator = TeacherOrchestrator.fromContext(context)
         message = orchestrator.injectContext(message)
 
-        from ..ai.factory import createProvider
-        from ..ai.tools import toolSchemas
-        from ..ai.types import LLMConfig
-
         convManager = _getConversationManager()
-
-        if not conversationId:
-            role = roleOverride or "copilot"
-            conv = convManager.create(role=role)
-            conversationId = conv.conversationId
-        else:
-            conv = convManager.get(conversationId)
-            if conv is None:
-                raise HTTPException(status_code=404, detail="Conversation not found")
-
-        convManager.addUserMessage(conversationId, message)
-
-        profileManager = getProfileManager()
-        role = conv.role if conv else "copilot"
-        resolved = profileManager.resolve(provider=providerOverride, role=role)
-
-        config = LLMConfig(
-            provider=resolved["provider"],
-            model=resolved.get("model"),
-            apiKey=resolved.get("apiKey"),
-            baseUrl=resolved.get("baseUrl"),
-            temperature=resolved.get("temperature", 0.3),
-            maxTokens=resolved.get("maxTokens", 4096),
-        )
-
-        llmProvider = createProvider(config)
-        msgs = convManager.buildMessages(conversationId)
-        tools = toolSchemas()
+        try:
+            turn = prepareTeacherTurn(
+                convManager=convManager,
+                profileManager=getProfileManager(),
+                conversationId=conversationId,
+                message=message,
+                providerOverride=providerOverride,
+                roleOverride=roleOverride,
+            )
+        except TeacherConversationNotFound as exc:
+            raise HTTPException(status_code=404, detail="Conversation not found") from exc
+        except _HANDLED_ERRORS as exc:
+            raise _providerUnavailable(exc) from exc
 
         async def _streamGenerate():
             async for event in runTeacherChatStream(
-                provider=llmProvider,
+                provider=turn.provider,
                 convManager=convManager,
-                conversationId=conversationId,
-                messages=msgs,
-                tools=tools,
+                conversationId=turn.conversationId,
+                messages=turn.messages,
+                tools=turn.tools,
                 executor=_createToolExecutor(state, sessionId),
                 orchestrator=orchestrator,
             ):

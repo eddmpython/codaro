@@ -10,20 +10,42 @@ from codaro.ai.teacher import (
     evaluateToolSequence,
     evaluateToolTrace,
     goldenEvalCases,
+    prepareTeacherTurn,
     runTeacherChatLoop,
     runTeacherChatStream,
     teacherSkills,
     toolCallsToProviderPayloads,
 )
-from codaro.ai.types import ToolCall, ToolResponse
+from codaro.ai.types import LLMConfig, ToolCall, ToolResponse
 from codaro.document.cellSchema import schemaSummary
 from codaro.ai.tools import toolSchemas
+
+
+class _FakeConversation:
+    def __init__(self, conversationId: str, role: str) -> None:
+        self.conversationId = conversationId
+        self.role = role
 
 
 class _FakeConversationManager:
     def __init__(self) -> None:
         self.assistantMessages: list[dict] = []
         self.toolResults: list[dict] = []
+        self.userMessages: list[dict] = []
+        self.created: _FakeConversation | None = None
+        self.existing: _FakeConversation | None = None
+
+    def create(self, role: str, systemPrompt=None):
+        self.created = _FakeConversation("conv-created", role)
+        return self.created
+
+    def get(self, conversationId: str):
+        if self.existing and self.existing.conversationId == conversationId:
+            return self.existing
+        return None
+
+    def addUserMessage(self, conversationId: str, content: str):
+        self.userMessages.append({"conversationId": conversationId, "content": content})
 
     def addAssistantMessage(self, conversationId: str, content: str, toolCalls=None):
         self.assistantMessages.append({
@@ -38,6 +60,13 @@ class _FakeConversationManager:
             "toolCallId": toolCallId,
             "result": result,
         })
+
+    def buildMessages(self, conversationId: str):
+        return [
+            {"role": "user", "content": item["content"]}
+            for item in self.userMessages
+            if item["conversationId"] == conversationId
+        ]
 
 
 class _FakeExecutor:
@@ -64,6 +93,33 @@ class _FakeProvider:
 
     def complete(self, messages: list[dict]):
         return ToolResponse(answer="완료", provider="fake", model="test", toolCalls=[])
+
+
+class _FakeProfileManager:
+    def __init__(self) -> None:
+        self.resolvedRole = ""
+        self.resolvedProvider: str | None = None
+
+    def resolve(self, provider: str | None = None, *, role: str | None = None):
+        self.resolvedRole = role or ""
+        self.resolvedProvider = provider
+        return {
+            "provider": "custom",
+            "model": "fake-model",
+            "apiKey": "fake-key",
+            "baseUrl": "http://local.test",
+            "temperature": 0.2,
+            "maxTokens": 128,
+        }
+
+
+class _ProviderFactory:
+    def __init__(self) -> None:
+        self.config: LLMConfig | None = None
+
+    def __call__(self, config: LLMConfig):
+        self.config = config
+        return _FakeProvider()
 
 
 async def _collectStreamEvents(stream) -> list[dict]:
@@ -227,6 +283,32 @@ def testProviderLoopOwnsNonStreamingTurn() -> None:
     assert payload["toolCalls"][0]["name"] == "read-cells"
     assert payload["trace"]["toolSequence"] == ["read-cells"]
     assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
+
+
+def testPrepareTeacherTurnOwnsConversationAndProviderSetup() -> None:
+    convManager = _FakeConversationManager()
+    profileManager = _FakeProfileManager()
+    providerFactory = _ProviderFactory()
+
+    turn = prepareTeacherTurn(
+        convManager=convManager,
+        profileManager=profileManager,
+        message="커리큘럼 만들어줘",
+        roleOverride="teacher",
+        providerOverride="custom",
+        providerFactory=providerFactory,
+    )
+
+    assert turn.conversationId == "conv-created"
+    assert turn.role == "teacher"
+    assert turn.messages == [{"role": "user", "content": "커리큘럼 만들어줘"}]
+    assert turn.tools
+    assert isinstance(turn.provider, _FakeProvider)
+    assert profileManager.resolvedRole == "teacher"
+    assert profileManager.resolvedProvider == "custom"
+    assert providerFactory.config is not None
+    assert providerFactory.config.provider == "custom"
+    assert providerFactory.config.model == "fake-model"
 
 
 def testProviderStreamOwnsStreamingToolEvents() -> None:
