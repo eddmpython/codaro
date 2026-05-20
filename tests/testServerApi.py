@@ -2,11 +2,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
 from fastapi.testclient import TestClient
+from pydantic import ValidationError
 
 import codaro.api.aiRouter as aiRouterModule
+from codaro.api.kernelWebSocket import firstKernelWsValidationMessage, validateKernelWsMessage
 import codaro.server as serverModule
 from codaro.document import createEmptyDocument
+from codaro.kernel.protocol import WsExecuteMessage
 from codaro.runtime import LocalEngine
 from codaro.server import createServerApp
 from codaro.system import packageOps
@@ -468,6 +472,27 @@ def testDocumentInsertBlockRejectsInvalidType(tmp_path: Path) -> None:
 
     assert response.status_code == 422
     assert response.json()["error"]["code"] == "validation_error"
+
+
+def testKernelWebSocketMessageValidationOwnsProtocolParsing() -> None:
+    parsed = validateKernelWsMessage({
+        "type": "execute",
+        "requestId": "req-1",
+        "code": "value = 1",
+    })
+
+    assert isinstance(parsed, WsExecuteMessage)
+    assert parsed.requestId == "req-1"
+
+    with pytest.raises(ValueError, match="Unsupported websocket message type"):
+        validateKernelWsMessage({"type": "mystery"})
+
+
+def testKernelWebSocketValidationMessageUsesFirstError() -> None:
+    with pytest.raises(ValidationError) as excInfo:
+        validateKernelWsMessage({"type": "execute", "requestId": "req-1"})
+
+    assert "Field required" in firstKernelWsValidationMessage(excInfo.value)
 
 
 def testKernelWebSocketExecuteAndVariables() -> None:
