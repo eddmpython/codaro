@@ -80,22 +80,13 @@ import {
   mergePendingBlocks,
   type PendingTarget,
 } from "@/lib/assistantResponsePlan";
-import {
-  loginOauthProvider,
-  logoutOauthProvider as logoutOauthProviderAction,
-  openProviderSettings,
-  providerAssistantFailure,
-  providerAuthFailureNotice,
-  saveApiProvider as saveApiProviderAction,
-  selectProvider,
-  type ProviderActionResult,
-} from "@/lib/providerConnection";
+import { providerAssistantFailure } from "@/lib/providerConnection";
+import { useProviderConnection } from "@/hooks/useProviderConnection";
 import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
 import type {
-  AiProfile,
   AppNotice,
   BlockConfig,
   CodaroDocument,
@@ -148,9 +139,6 @@ function App() {
   const [auditCount, setAuditCount] = useState(initialAutomationSnapshot.auditCount);
   const [automationSection, setAutomationSection] = useState<AutomationSection>("codaro");
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
-  const [aiProfile, setAiProfile] = useState<AiProfile | null>(null);
-  const [aiConnecting, setAiConnecting] = useState(false);
-  const [providerSettingsOpen, setProviderSettingsOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
     const stored = window.localStorage.getItem("codaro-theme");
@@ -163,6 +151,18 @@ function App() {
   const [teacherScope, setTeacherScope] = useState<TeacherScope>("cell");
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [assistantLoading, setAssistantLoading] = useState(false);
+  const {
+    aiConnecting,
+    aiProfile,
+    connectProvider: connectAiProvider,
+    logoutOauthProvider,
+    providerSettingsOpen,
+    saveApiProvider,
+    selectAiProvider,
+    setAiProfile,
+    setProviderSettingsOpen,
+    startOauthProviderLogin,
+  } = useProviderConnection({ apiOnline, onNotice: setNotice });
 
   const applyDocument = useCallback((nextDocument: CodaroDocument) => {
     const nextDrafts = draftsFromDocument(nextDocument);
@@ -392,85 +392,6 @@ function App() {
     } finally {
       setNotebookRunning(false);
     }
-  }
-
-  async function connectAiProvider() {
-    applyProviderActionResult(openProviderSettings(apiOnline));
-  }
-
-  async function startOauthProviderLogin(providerId = "oauth-chatgpt") {
-    if (aiConnecting) return;
-    const availability = openProviderSettings(apiOnline);
-    if (!availability.openSettings) {
-      applyProviderActionResult(availability);
-      return;
-    }
-
-    setAiConnecting(true);
-    try {
-      setNotice({ tone: "default", title: "Provider 로그인 열림", detail: "새 탭에서 provider 로그인을 완료하세요." });
-      applyProviderActionResult(await loginOauthProvider(providerId));
-    } catch (error) {
-      const detail = error instanceof Error ? error.message : String(error);
-      setNotice(providerAuthFailureNotice(detail));
-    } finally {
-      setAiConnecting(false);
-    }
-  }
-
-  async function logoutOauthProvider(providerId = "oauth-chatgpt") {
-    if (!apiOnline || aiConnecting) return;
-    setAiConnecting(true);
-    try {
-      applyProviderActionResult(await logoutOauthProviderAction(providerId));
-    } catch (error) {
-      setNotice({
-        tone: "error",
-        title: "Provider 로그아웃 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
-    } finally {
-      setAiConnecting(false);
-    }
-  }
-
-  async function selectAiProvider(providerId: string) {
-    if (!apiOnline || aiConnecting) return;
-    setAiConnecting(true);
-    try {
-      applyProviderActionResult(await selectProvider(providerId));
-    } catch (error) {
-      setNotice({
-        tone: "error",
-        title: "Provider 선택 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
-    } finally {
-      setAiConnecting(false);
-    }
-  }
-
-  async function saveApiProvider(providerId: string, apiKey: string, baseUrl?: string) {
-    if (!apiOnline || aiConnecting) return;
-    setAiConnecting(true);
-    try {
-      applyProviderActionResult(await saveApiProviderAction(providerId, apiKey, baseUrl));
-    } catch (error) {
-      setNotice({
-        tone: "error",
-        title: "Provider 저장 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
-    } finally {
-      setAiConnecting(false);
-    }
-  }
-
-  function applyProviderActionResult(result: ProviderActionResult) {
-    if (result.profile) setAiProfile(result.profile);
-    if (result.openSettings) setProviderSettingsOpen(true);
-    if (result.closeSettings) setProviderSettingsOpen(false);
-    setNotice(result.notice);
   }
 
   async function askAssistant(messageOverride?: string, scopeOverride?: TeacherScope) {
