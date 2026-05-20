@@ -13,6 +13,10 @@ import urllib.request
 from pathlib import Path
 from typing import Any
 
+import yaml
+
+from codaro.curriculum.converter import yamlToDocument
+
 
 ROOT = Path(__file__).resolve().parents[1]
 EDITOR_DIR = ROOT / "editor"
@@ -175,118 +179,7 @@ def freePort() -> int:
 
 def customCurriculumEntry() -> dict[str, Any]:
     createdAt = 1_700_000_000_000
-    document = {
-        "id": "curriculum-playwright-structured-section-card",
-        "title": FIXTURE_TITLE,
-        "metadata": {
-            "sourceFormat": "playwright-fixture",
-            "tags": ["playwright", "learning-card"],
-        },
-        "runtime": {
-            "defaultEngine": "local",
-            "reactiveMode": "hybrid",
-            "packages": ["pandas"],
-        },
-        "app": {
-            "title": FIXTURE_TITLE,
-            "layout": "learning",
-            "hideCode": False,
-            "entryBlockIds": [],
-        },
-        "blocks": [
-            {
-                "id": "intro",
-                "type": "markdown",
-                "content": "# Playwright structured section card\n섹션 카드의 실제 렌더링을 확인합니다.",
-                "role": "title",
-                "displayKind": "hero",
-                "sourceType": "intro",
-                "title": FIXTURE_TITLE,
-                "payload": {
-                    "title": FIXTURE_TITLE,
-                    "direction": "DataFrame 생성부터 직접 입력 실습과 검증까지 한 카드에서 확인합니다.",
-                    "benefits": ["작은 카드 반복 없이 섹션 흐름을 유지합니다."],
-                    "learningContract": {
-                        "meta": {"title": FIXTURE_TITLE, "packages": ["pandas"]},
-                        "intro": {
-                            "direction": "DataFrame 생성부터 직접 입력 실습과 검증까지 한 카드에서 확인합니다.",
-                            "benefits": ["작은 카드 반복 없이 섹션 흐름을 유지합니다."],
-                            "diagram": {
-                                "steps": [
-                                    {"label": "목표", "detail": "무슨 공부"},
-                                    {"label": "스니펫", "detail": "따라 칠 코드"},
-                                    {"label": "실행", "detail": "입력과 검증"},
-                                ],
-                            },
-                        },
-                        "sections": [],
-                    },
-                },
-            },
-            {
-                "id": "section-dataframe",
-                "type": "markdown",
-                "content": "## DataFrame 만들기\n행과 열의 감각",
-                "role": "title",
-                "displayKind": "title",
-                "sourceType": "section",
-                "title": "DataFrame 만들기",
-                "payload": {
-                    "title": "DataFrame 만들기",
-                    "subtitle": "행과 열의 감각",
-                    "sectionContract": sectionContract(),
-                },
-            },
-            {
-                "id": "section-dataframe-explanation",
-                "type": "markdown",
-                "content": "pandas.DataFrame은 dict의 key를 열 이름으로 사용합니다.",
-                "role": "learning",
-                "displayKind": "prose",
-                "sourceType": "sectionContract:explanation",
-                "title": "DataFrame 만들기",
-                "payload": {"sectionContract": sectionContract()},
-            },
-            {
-                "id": "section-dataframe-snippet",
-                "type": "code",
-                "content": "import pandas as pd\nframe = pd.DataFrame({'sales': [10, 20]})\nframe",
-                "role": "snippet",
-                "executionKind": "python",
-                "sourceType": "sectionContract:snippet",
-                "title": "DataFrame 만들기 스니펫",
-                "description": "dict에서 DataFrame을 만드는 기본 모양입니다.",
-            },
-            {
-                "id": "section-dataframe-exercise",
-                "type": "code",
-                "content": "import pandas as pd\nframe = ___",
-                "role": "exercise",
-                "executionKind": "python",
-                "sourceType": "sectionContract:exercise",
-                "title": "DataFrame 만들기 실습",
-                "description": "sales 열을 가진 DataFrame을 직접 만드세요.",
-                "guide": {
-                    "exerciseType": "sectionPractice",
-                    "hints": ["dict의 key가 열 이름입니다."],
-                    "checkConfig": {"variable": "frame"},
-                    "difficulty": "easy",
-                    "solution": "import pandas as pd\nframe = pd.DataFrame({'sales': [10, 20]})",
-                    "description": "sales 열을 가진 DataFrame을 직접 만드세요.",
-                    "studentAnswer": "",
-                },
-            },
-            {
-                "id": "section-dataframe-check",
-                "type": "markdown",
-                "content": "실행 오류가 없고 `frame` 변수가 만들어져야 합니다.",
-                "role": "check",
-                "displayKind": "quiz",
-                "sourceType": "sectionContract:check",
-                "title": "DataFrame 만들기 검증",
-            },
-        ],
-    }
+    document = materializedStructuredLessonDocument()
     return {
         "id": "custom-playwright-structured-section-card",
         "title": FIXTURE_TITLE,
@@ -295,26 +188,223 @@ def customCurriculumEntry() -> dict[str, Any]:
     }
 
 
-def sectionContract() -> dict[str, Any]:
+def materializedStructuredLessonDocument() -> dict[str, Any]:
+    document, _solutions = yamlToDocument(yaml.safe_load(structuredLessonYaml()), "playwright", "structured-section-card")
+    payload = document.model_dump(mode="json")
+    payload["id"] = "curriculum-playwright-structured-section-card"
+    assertMaterializedContract(payload)
+    return compactDocumentForBrowserStorage(payload)
+
+
+def assertMaterializedContract(document: dict[str, Any]) -> None:
+    blocks = document.get("blocks")
+    if not isinstance(blocks, list):
+        raise VerificationError("materialized document has no blocks")
+
+    sourceTypes = [block.get("sourceType") for block in blocks if isinstance(block, dict)]
+    expectedFlow = [
+        "section",
+        "sectionContract:explanation",
+        "sectionContract:snippet",
+        "sectionContract:exercise",
+        "sectionContract:check",
+    ]
+    for sourceType in expectedFlow:
+        if sourceType not in sourceTypes:
+            raise VerificationError(f"materialized document missing {sourceType}")
+    sectionIndex = sourceTypes.index("section")
+    if sourceTypes[sectionIndex:sectionIndex + len(expectedFlow)] != expectedFlow:
+        raise VerificationError(f"materialized section flow is not contiguous: {sourceTypes}")
+
+    runtime = document.get("runtime")
+    packages = runtime.get("packages") if isinstance(runtime, dict) else None
+    if packages != ["pandas"]:
+        raise VerificationError(f"materialized runtime packages not preserved: {packages}")
+
+    intro = next((block for block in blocks if isinstance(block, dict) and block.get("sourceType") == "intro"), None)
+    introPayload = intro.get("payload") if isinstance(intro, dict) else None
+    if not isinstance(introPayload, dict) or "learningContract" not in introPayload:
+        raise VerificationError("materialized intro is missing learningContract payload")
+
+
+def compactDocumentForBrowserStorage(document: dict[str, Any]) -> dict[str, Any]:
+    blocks = document.get("blocks")
+    if not isinstance(blocks, list):
+        return document
+
+    compactBlocks = [compactBlock(block) for block in blocks if isinstance(block, dict)]
     return {
-        "id": "dataframe",
-        "title": "DataFrame 만들기",
-        "subtitle": "행과 열의 감각",
-        "goal": "dict에서 DataFrame을 만드는 흐름을 익힙니다.",
-        "why": "표 자동화의 첫 단계입니다.",
-        "explanation": "pandas.DataFrame은 열 이름과 값 목록으로 표를 만듭니다.",
-        "tips": ["모든 열의 길이는 같아야 합니다."],
-        "snippet": "import pandas as pd\nframe = pd.DataFrame({'sales': [10, 20]})\nframe",
-        "exercise": {
-            "prompt": "sales 열을 가진 DataFrame을 직접 만드세요.",
-            "starterCode": "import pandas as pd\nframe = ___",
-            "solution": "import pandas as pd\nframe = pd.DataFrame({'sales': [10, 20]})",
-            "check": {"variable": "frame"},
-            "hints": ["dict의 key가 열 이름입니다."],
-            "difficulty": "easy",
+        "id": document.get("id"),
+        "title": document.get("title"),
+        "blocks": compactBlocks,
+        "metadata": {
+            "sourceFormat": "curriculum",
+            "tags": ["playwright", "structured-section-card"],
         },
-        "check": {"variable": "frame"},
+        "runtime": document.get("runtime"),
+        "app": document.get("app"),
     }
+
+
+def compactBlock(block: dict[str, Any]) -> dict[str, Any]:
+    result = {
+        key: block.get(key)
+        for key in (
+            "id",
+            "type",
+            "content",
+            "role",
+            "executionKind",
+            "displayKind",
+            "sourceType",
+            "title",
+            "description",
+            "guide",
+        )
+        if block.get(key) not in (None, "", [], {})
+    }
+    payload = compactBlockPayload(block)
+    if payload:
+        result["payload"] = payload
+    return result
+
+
+def compactBlockPayload(block: dict[str, Any]) -> dict[str, Any] | None:
+    payload = block.get("payload")
+    if not isinstance(payload, dict):
+        return None
+
+    if block.get("sourceType") == "intro":
+        contract = payload.get("learningContract")
+        compactContract = compactLearningContract(contract) if isinstance(contract, dict) else None
+        return {
+            key: value
+            for key, value in {
+                "title": payload.get("title"),
+                "direction": payload.get("direction"),
+                "benefits": payload.get("benefits"),
+                "diagram": payload.get("diagram"),
+                "learningContract": compactContract,
+            }.items()
+            if value not in (None, "", [], {})
+        }
+
+    if block.get("sourceType") == "section":
+        contract = payload.get("sectionContract")
+        compactContract = compactSectionContract(contract) if isinstance(contract, dict) else None
+        return {
+            key: value
+            for key, value in {
+                "title": payload.get("title"),
+                "subtitle": payload.get("subtitle"),
+                "id": payload.get("id"),
+                "sectionContract": compactContract,
+            }.items()
+            if value not in (None, "", [], {})
+        }
+
+    if block.get("sourceType") == "sectionContract:check":
+        return {
+            key: value
+            for key, value in {
+                "check": payload.get("check"),
+                "sectionId": payload.get("sectionId"),
+            }.items()
+            if value not in (None, "", [], {})
+        }
+
+    return None
+
+
+def compactLearningContract(contract: dict[str, Any]) -> dict[str, Any]:
+    intro = contract.get("intro") if isinstance(contract.get("intro"), dict) else {}
+    meta = contract.get("meta") if isinstance(contract.get("meta"), dict) else {}
+    return {
+        "meta": {
+            key: value
+            for key, value in {
+                "title": meta.get("title"),
+                "packages": meta.get("packages"),
+            }.items()
+            if value not in (None, "", [], {})
+        },
+        "intro": {
+            key: value
+            for key, value in {
+                "direction": intro.get("direction"),
+                "benefits": intro.get("benefits"),
+                "diagram": intro.get("diagram"),
+            }.items()
+            if value not in (None, "", [], {})
+        },
+    }
+
+
+def compactSectionContract(contract: dict[str, Any]) -> dict[str, Any]:
+    return {
+        key: value
+        for key, value in {
+            "id": contract.get("id"),
+            "title": contract.get("title"),
+            "subtitle": contract.get("subtitle"),
+            "goal": contract.get("goal"),
+            "why": contract.get("why"),
+            "explanation": contract.get("explanation"),
+            "tips": contract.get("tips"),
+        }.items()
+        if value not in (None, "", [], {})
+    }
+
+
+def structuredLessonYaml() -> str:
+    return f"""
+meta:
+  title: {FIXTURE_TITLE}
+  audience: 초급
+  difficulty: easy
+  packages:
+    - pandas
+intro:
+  direction: DataFrame 생성부터 직접 입력 실습과 검증까지 한 카드에서 확인합니다.
+  benefits:
+    - 작은 카드 반복 없이 섹션 흐름을 유지합니다.
+  diagram:
+    steps:
+      - label: 목표
+        detail: 무슨 공부
+      - label: 스니펫
+        detail: 따라 칠 코드
+      - label: 실행
+        detail: 입력과 검증
+sections:
+  - id: dataframe
+    title: DataFrame 만들기
+    subtitle: 행과 열의 감각
+    goal: dict에서 DataFrame을 만드는 흐름을 익힙니다.
+    why: 표 자동화의 첫 단계입니다.
+    explanation: pandas.DataFrame은 열 이름과 값 목록으로 표를 만듭니다.
+    tips:
+      - 모든 열의 길이는 같아야 합니다.
+    snippet: |
+      import pandas as pd
+      frame = pd.DataFrame({{'sales': [10, 20]}})
+      frame
+    exercise:
+      prompt: sales 열을 가진 DataFrame을 직접 만드세요.
+      starterCode: |
+        import pandas as pd
+        frame = ___
+      solution: |
+        import pandas as pd
+        frame = pd.DataFrame({{'sales': [10, 20]}})
+      check:
+        variable: frame
+      hints:
+        - dict의 key가 열 이름입니다.
+      difficulty: easy
+    check:
+      variable: frame
+""".strip()
 
 
 def jsTextPresent(text: str) -> str:

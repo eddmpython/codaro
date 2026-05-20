@@ -106,7 +106,7 @@ teacher/provider loop의 golden case는 다음을 확인해야 한다.
 - golden provider run은 `section` 블록 뒤에 `sectionContract:explanation → sectionContract:snippet → sectionContract:exercise → sectionContract:check`가 같은 섹션 범위 안에서 materialize됐는지 확인한다.
 - golden provider run은 가능한 한 실제 `write-curriculum-yaml` 핸들러를 통과해야 한다. synthetic trace만으로 통과시키지 않고, 결과 document가 에디터에 로드됐는지(`loadedInEditor`)와 `meta.packages`가 document runtime packages에 보존됐는지 확인한다.
 - `learning-card-contract` gate가 structured section marker와 editor build를 고정해야 한다.
-- `learning-card-browser` gate가 Playwright CLI로 데스크톱과 모바일에서 structured section card가 하나의 카드 흐름으로 보이고, 실습 입력 셀/실행 결과/검증 구역의 텍스트가 겹치지 않는지 확인한다.
+- `learning-card-browser` gate가 실제 `yamlToDocument` materializer 산출물의 contract flow와 runtime package를 먼저 검증한 뒤, 같은 산출물의 렌더링 필드를 custom curriculum으로 주입해 Playwright CLI로 데스크톱과 모바일 structured section card 흐름과 실습 입력 셀/실행 결과/검증 구역 겹침 여부를 확인한다.
 - 패키지 흐름은 `packages-check → packages-install(필요할 때만) → cell-call` 순서를 지킨다.
 - trace/workloop에는 `커리큘럼 YAML 전개`, `라이브러리 확인`, `uv 라이브러리 설치`, `셀 실행/검증` 같은 사용자가 읽을 수 있는 단계가 남는다.
 - 질문이 필요할 때만 1-3개 핵심 질문을 제안하고, 기본값으로 진행한 경우 그 기본값이 남는다.
