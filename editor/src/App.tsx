@@ -72,6 +72,16 @@ import {
   mergePendingBlocks,
 } from "@/lib/assistantResponsePlan";
 import {
+  isProviderAuthError,
+  loginOauthProvider,
+  logoutOauthProvider as logoutOauthProviderAction,
+  openProviderSettings,
+  providerAuthFailureNotice,
+  saveApiProvider as saveApiProviderAction,
+  selectProvider,
+  type ProviderActionResult,
+} from "@/lib/providerConnection";
+import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
@@ -567,57 +577,24 @@ function App() {
   }
 
   async function connectAiProvider() {
-    if (!apiOnline) {
-      setNotice({
-        tone: "warning",
-        title: "Provider 연결 불가",
-        detail: "서버 세션이 없어서 실제 provider 연결은 사용할 수 없습니다.",
-      });
-      return;
-    }
-    setProviderSettingsOpen(true);
+    applyProviderActionResult(openProviderSettings(apiOnline));
   }
 
   async function startOauthProviderLogin(providerId = "oauth-chatgpt") {
     if (aiConnecting) return;
-    if (!apiOnline) {
-      setNotice({
-        tone: "warning",
-        title: "Provider 연결 불가",
-        detail: "서버 세션이 없어서 실제 provider 연결은 사용할 수 없습니다.",
-      });
+    const availability = openProviderSettings(apiOnline);
+    if (!availability.openSettings) {
+      applyProviderActionResult(availability);
       return;
     }
 
     setAiConnecting(true);
     try {
-      if (providerId !== "oauth-chatgpt") {
-        await codaroApi.updateAiProfile({ provider: providerId });
-      }
-      const auth = await codaroApi.oauthAuthorize();
-      window.open(auth.authUrl, "_blank", "noopener,noreferrer");
       setNotice({ tone: "default", title: "Provider 로그인 열림", detail: "새 탭에서 provider 로그인을 완료하세요." });
-
-      for (let attempt = 0; attempt < 60; attempt += 1) {
-        await sleep(1000);
-        const status = await codaroApi.oauthStatus();
-        if (!status.done) continue;
-        if (status.error) throw new Error(status.error);
-        const profile = await codaroApi.aiProfile();
-        setAiProfile(profile);
-        setProviderSettingsOpen(false);
-        setNotice({ tone: "success", title: "Provider 연결됨", detail: aiProviderName(profile) });
-        return;
-      }
-
-      setNotice({ tone: "warning", title: "Provider 로그인 대기 중", detail: "로그인 탭을 완료한 뒤 상태를 다시 확인하세요." });
+      applyProviderActionResult(await loginOauthProvider(providerId));
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
-      setNotice({
-        tone: "error",
-        title: "Provider 로그인 실패",
-        detail: isProviderAuthError(detail) ? "provider 로그인을 다시 시작하세요." : detail,
-      });
+      setNotice(providerAuthFailureNotice(detail));
     } finally {
       setAiConnecting(false);
     }
@@ -627,10 +604,7 @@ function App() {
     if (!apiOnline || aiConnecting) return;
     setAiConnecting(true);
     try {
-      await codaroApi.oauthLogout();
-      const profile = await codaroApi.aiProfile();
-      setAiProfile(profile);
-      setNotice({ tone: "success", title: "Provider 로그아웃됨", detail: providerId });
+      applyProviderActionResult(await logoutOauthProviderAction(providerId));
     } catch (error) {
       setNotice({
         tone: "error",
@@ -646,10 +620,7 @@ function App() {
     if (!apiOnline || aiConnecting) return;
     setAiConnecting(true);
     try {
-      const profile = await codaroApi.updateAiProfile({ provider: providerId });
-      const latestProfile = await codaroApi.aiProfile().catch(() => profile);
-      setAiProfile(latestProfile);
-      setNotice({ tone: "success", title: "Provider 선택됨", detail: aiProviderName(latestProfile) });
+      applyProviderActionResult(await selectProvider(providerId));
     } catch (error) {
       setNotice({
         tone: "error",
@@ -665,13 +636,7 @@ function App() {
     if (!apiOnline || aiConnecting) return;
     setAiConnecting(true);
     try {
-      if (baseUrl) {
-        await codaroApi.updateAiProfile({ provider: providerId, baseUrl });
-      }
-      const profile = await codaroApi.saveAiSecret(providerId, apiKey);
-      const latestProfile = await codaroApi.aiProfile().catch(() => profile);
-      setAiProfile(latestProfile);
-      setNotice({ tone: "success", title: "Provider 연결됨", detail: aiProviderName(latestProfile) });
+      applyProviderActionResult(await saveApiProviderAction(providerId, apiKey, baseUrl));
     } catch (error) {
       setNotice({
         tone: "error",
@@ -681,6 +646,13 @@ function App() {
     } finally {
       setAiConnecting(false);
     }
+  }
+
+  function applyProviderActionResult(result: ProviderActionResult) {
+    if (result.profile) setAiProfile(result.profile);
+    if (result.openSettings) setProviderSettingsOpen(true);
+    if (result.closeSettings) setProviderSettingsOpen(false);
+    setNotice(result.notice);
   }
 
   async function askAssistant(messageOverride?: string, scopeOverride?: TeacherScope) {
@@ -1099,18 +1071,6 @@ function sleep(milliseconds: number) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, milliseconds);
   });
-}
-
-function isProviderAuthError(detail: string) {
-  const normalized = detail.toLowerCase();
-  return (
-    normalized.includes("oauth authentication required") ||
-    normalized.includes("authentication expired") ||
-    normalized.includes("please login") ||
-    normalized.includes("re-login") ||
-    normalized.includes("no saved token") ||
-    normalized.includes("token refresh failed")
-  );
 }
 
 export default App;
