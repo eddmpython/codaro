@@ -98,7 +98,13 @@ async def runTeacherChatStream(
         return
 
     for _round in range(maxToolRounds):
-        response = provider.completeWithTools(messages, tools)
+        try:
+            response = provider.completeWithTools(messages, tools)
+        except PROVIDER_STREAM_ERRORS as exc:
+            error = str(exc) or "provider unavailable"
+            logger.info("provider stream tool loop failed: %s", error)
+            yield providerStreamErrorEvent(trace, error)
+            return
 
         if not response.toolCalls:
             donePayload = finishTeacherTurnPayload(
@@ -199,8 +205,7 @@ async def streamTeacherTokens(
         yield teacherStreamDeltaEvent(delta=token, content=accumulated)
 
     if streamError is not None:
-        trace.record("turn-error", {"message": streamError.message})
-        yield teacherStreamErrorEvent(error=streamError.message, trace=trace.summary())
+        yield providerStreamErrorEvent(trace, streamError.message)
         thread.join(timeout=2)
         return
 
@@ -217,3 +222,9 @@ async def streamTeacherTokens(
     )
     yield teacherStreamDoneEvent(donePayload)
     thread.join(timeout=2)
+
+
+def providerStreamErrorEvent(trace: TeacherTrace, error: str) -> dict[str, Any]:
+    message = error or "provider unavailable"
+    trace.record("turn-error", {"message": message})
+    return teacherStreamErrorEvent(error=message, trace=trace.summary())

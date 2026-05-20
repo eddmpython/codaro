@@ -177,6 +177,10 @@ OBJECTIVE_REQUIREMENTS = (
                 "trace.record(\"turn-error\"",
                 "finishTeacherTurnErrorPayload",
             )),
+            ("src/codaro/ai/teacher/providerStream.py", (
+                "provider stream tool loop failed",
+                "providerStreamErrorEvent",
+            )),
             ("editor/src/lib/workLoop.ts", (
                 "traceWorkloopDetail",
                 "toolResultDetail",
@@ -201,6 +205,10 @@ OBJECTIVE_REQUIREMENTS = (
                 "project .venv",
                 "pandas 이미 준비됨",
                 "계약 gap 2개",
+            )),
+            ("tests/testTeacherArchitecture.py", (
+                "testProviderStreamReportsToolLoopProviderErrorsInTrace",
+                "provider broken after tool",
             )),
         ),
     ),

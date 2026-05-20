@@ -78,6 +78,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - response의 `trace.toolSequence`와 `trace.policyViolationCount`는 평가 harness의 입력으로 쓴다.
    - response의 `trace.workloop`은 사용자가 읽을 수 있는 단계 품질 평가에 쓴다. golden case는 `workLabel`뿐 아니라 핵심 `workDetail` 문장도 검증한다. 정책 위반, 작업 전 확인 질문, provider 오류는 반드시 사람이 읽을 수 있는 `workLabel`/`workDetail`/`error`를 가진다.
    - provider 오류는 streaming이면 `error` event와 trace `turn-error`로, non-streaming이면 turn payload의 `trace.workloop`에 `provider 오류` row로 남긴다.
+   - streaming native tool loop도 예외가 다른 경로가 아니다. `completeWithTools`가 첫 호출 또는 tool result 이후 다음 호출에서 실패하면 이미 실행된 tool row를 유지하고 마지막 workloop row를 `provider 오류`로 끝낸다.
    - golden case는 명시적으로 허용한 경우가 아니면 policy violation이 1건이라도 있으면 실패다.
    - 평가 harness는 `score`, `maxScore`, `minimumScore`를 payload에 남긴다. teacher/provider golden 평가는 10점 만점, 완료 기준은 `minimumScore: 9.0`이다.
    - dependency preflight golden case는 `packages-check → packages-install → cell-call` exact sequence를 요구한다. 필요한 도구가 모두 있어도 순서가 다르거나 불필요한 tool call이 끼면 실패다.

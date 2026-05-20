@@ -389,10 +389,18 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "trace.record(\"turn-error\"",
                     "provider 응답 중 오류가 발생했습니다",
                 )),
+                ("src/codaro/ai/teacher/providerStream.py", (
+                    "provider stream tool loop failed",
+                    "providerStreamErrorEvent",
+                )),
                 ("src/codaro/ai/teacher/traceModel.py", (
                     "provider 오류",
                     "provider 응답 처리 중단",
                     "provider-loop",
+                )),
+                ("tests/testTeacherArchitecture.py", (
+                    "testProviderStreamReportsToolLoopProviderErrorsInTrace",
+                    "provider broken after tool",
                 )),
                 ("tests/verifyTeacherGoldenE2e.py", (
                     "runProviderErrorCase",

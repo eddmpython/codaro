@@ -201,6 +201,33 @@ class _FailingProvider:
         raise RuntimeError("provider broken")
 
 
+class _FailingSecondToolProvider:
+    supportsNativeTools = True
+    resolvedModel = "broken-model"
+    provider = "fake"
+
+    def __init__(self) -> None:
+        self.callCount = 0
+
+    def completeWithTools(self, messages: list[dict], tools: list[dict]):
+        del tools
+        self.callCount += 1
+        if self.callCount == 1:
+            return ToolResponse(
+                answer="",
+                provider="fake",
+                model="test",
+                toolCalls=[ToolCall(id="call-1", name="read-cells", arguments={})],
+            )
+        assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
+        raise RuntimeError("provider broken after tool")
+
+    def complete(self, messages: list[dict]):
+        del messages
+        self.callCount += 1
+        raise RuntimeError("provider broken after tool")
+
+
 class _FakeProfileManager:
     def __init__(self) -> None:
         self.resolvedRole = ""
@@ -1690,6 +1717,34 @@ def testProviderStreamReportsStreamingErrorsInTrace() -> None:
     assert events[-1]["trace"]["eventCount"] == 2
     assert events[-1]["trace"]["workloop"][0]["workLabel"] == "provider 오류"
     assert events[-1]["trace"]["workloop"][0]["error"] == "stream broken"
+
+
+def testProviderStreamReportsToolLoopProviderErrorsInTrace() -> None:
+    convManager = _FakeConversationManager()
+    provider = _FailingSecondToolProvider()
+    messages: list[dict] = [{"role": "user", "content": "셀 읽고 이어서 설명해줘"}]
+    orchestrator = TeacherOrchestrator.fromContext({})
+
+    events = asyncio.run(_collectStreamEvents(runTeacherChatStream(
+        provider=provider,
+        convManager=convManager,
+        conversationId="conv-stream-tool-error",
+        messages=messages,
+        tools=[{"type": "function"}],
+        executor=_FakeExecutor(),
+        orchestrator=orchestrator,
+    )))
+
+    assert [event["type"] for event in events] == ["start", "tool_start", "tool_results", "error"]
+    assert provider.callCount == 2
+    assert events[1]["toolCall"]["name"] == "read-cells"
+    assert events[2]["toolCalls"][0]["status"] == "done"
+    assert events[-1]["error"] == "provider broken after tool"
+    assert events[-1]["trace"]["errorCount"] == 1
+    assert events[-1]["trace"]["toolSequence"] == ["read-cells"]
+    assert events[-1]["trace"]["workloop"][-1]["workLabel"] == "provider 오류"
+    assert events[-1]["trace"]["workloop"][-1]["error"] == "provider broken after tool"
+    assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
 
 
 def testProviderStreamEventHelpersOwnProtocolShape() -> None:
