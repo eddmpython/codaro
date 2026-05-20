@@ -65,8 +65,11 @@ src/codaro/ai/
 │   ├── skillRegistry.py
 │   └── evalHarness.py
 ├── teacherLoop.py    # compatibility re-export
-├── tools.py          # tool schema/manifest
-└── toolExecutor.py   # 실제 tool handler
+├── tools.py          # 기본 tool 정의
+├── toolRegistry.py   # registry + provider schema 변환
+├── toolManifest.py   # group/lane/risk 표시 메타데이터
+├── toolHandlers/     # workbench/runtime/learning/automation 실행 핸들러
+└── toolExecutor.py   # dispatch와 공통 session/document 경계
 
 src/codaro/api/
 └── aiRouter.py       # HTTP/SSE endpoint, provider 호출 경계

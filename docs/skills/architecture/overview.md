@@ -48,8 +48,11 @@ src/codaro/
 │   ├── conversation.py      # conversation state + role prompts
 │   ├── teacher/             # orchestrator + context + policy + trace + eval
 │   ├── teacherLoop.py       # compatibility re-export
-│   ├── tools.py             # tool manifest/schema
-│   └── toolExecutor.py      # tool handlers
+│   ├── tools.py             # default tool definitions
+│   ├── toolRegistry.py      # ToolDef + schema registry
+│   ├── toolManifest.py      # group/lane/risk metadata
+│   ├── toolHandlers/        # workbench/runtime/learning/automation handlers
+│   └── toolExecutor.py      # dispatch + session/document boundary
 ├── api/
 │   └── aiRouter.py          # HTTP/SSE boundary only
 └── webBuild/                # built product surface
