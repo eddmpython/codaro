@@ -21,6 +21,15 @@ from .providerLoop import (
     toolCallsToProviderPayloads,
 )
 from .providerStream import runTeacherChatStream, streamTeacherTokens
+from .streamEvents import (
+    teacherStreamDeltaEvent,
+    teacherStreamDoneEvent,
+    teacherStreamErrorEvent,
+    teacherStreamStartEvent,
+    teacherStreamTokenEvent,
+    teacherStreamToolResultsEvent,
+    teacherStreamToolStartEvent,
+)
 from .skillRegistry import (
     TeacherSkill,
     TeacherSkillIssue,
@@ -77,6 +86,13 @@ __all__ = [
     "teacherSkillPrompt",
     "teacherSkillToolSummary",
     "teacherSkills",
+    "teacherStreamDeltaEvent",
+    "teacherStreamDoneEvent",
+    "teacherStreamErrorEvent",
+    "teacherStreamStartEvent",
+    "teacherStreamTokenEvent",
+    "teacherStreamToolResultsEvent",
+    "teacherStreamToolStartEvent",
     "toolCallResult",
     "toolCallStart",
     "toolCallsToProviderPayloads",

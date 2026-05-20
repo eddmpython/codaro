@@ -13,6 +13,15 @@ from .providerLoop import (
     recordTeacherToolRoundRequest,
     startTeacherToolCall,
 )
+from .streamEvents import (
+    teacherStreamDeltaEvent,
+    teacherStreamDoneEvent,
+    teacherStreamErrorEvent,
+    teacherStreamStartEvent,
+    teacherStreamTokenEvent,
+    teacherStreamToolResultsEvent,
+    teacherStreamToolStartEvent,
+)
 from .teacherOrchestrator import TeacherOrchestrator
 from .traceModel import TeacherTrace
 
@@ -51,7 +60,7 @@ async def runTeacherChatStream(
     policy = orchestrator.createToolPolicy()
     trace = orchestrator.startTrace(conversationId)
 
-    yield {"type": "start", "conversationId": conversationId}
+    yield teacherStreamStartEvent(conversationId)
 
     if not (provider.supportsNativeTools and tools):
         async for event in streamTeacherTokens(
@@ -81,8 +90,8 @@ async def runTeacherChatStream(
                 toolCalls=allToolResults,
             )
             if response.answer:
-                yield {"type": "token", "content": response.answer}
-            yield {"type": "done", **donePayload}
+                yield teacherStreamTokenEvent(response.answer)
+            yield teacherStreamDoneEvent(donePayload)
             return
 
         recordTeacherToolRoundRequest(
@@ -94,12 +103,12 @@ async def runTeacherChatStream(
         )
 
         if response.answer:
-            yield {"type": "token", "content": response.answer}
+            yield teacherStreamTokenEvent(response.answer)
 
         toolResults: list[dict[str, Any]] = []
         for toolCall in response.toolCalls:
             toolStart = startTeacherToolCall(orchestrator=orchestrator, trace=trace, toolCall=toolCall)
-            yield {"type": "tool_start", "toolCall": toolStart}
+            yield teacherStreamToolStartEvent(toolStart)
             payload = await finishTeacherToolCall(
                 convManager=convManager,
                 conversationId=conversationId,
@@ -113,7 +122,7 @@ async def runTeacherChatStream(
             toolResults.append(payload)
             allToolResults.append(payload)
 
-        yield {"type": "tool_results", "toolCalls": toolResults}
+        yield teacherStreamToolResultsEvent(toolResults)
 
     async for event in streamTeacherTokens(
         provider=provider,
@@ -164,11 +173,11 @@ async def streamTeacherTokens(
             break
         token = item
         accumulated += token
-        yield {"type": "delta", "delta": token, "content": accumulated}
+        yield teacherStreamDeltaEvent(delta=token, content=accumulated)
 
     if streamError is not None:
         trace.record("turn-error", {"message": streamError.message})
-        yield {"type": "error", "error": streamError.message, "trace": trace.summary()}
+        yield teacherStreamErrorEvent(error=streamError.message, trace=trace.summary())
         thread.join(timeout=2)
         return
 
@@ -183,5 +192,5 @@ async def streamTeacherTokens(
         usage=None,
         toolCalls=toolCalls or [],
     )
-    yield {"type": "done", **donePayload}
+    yield teacherStreamDoneEvent(donePayload)
     thread.join(timeout=2)

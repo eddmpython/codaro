@@ -21,6 +21,9 @@ from codaro.ai.teacher import (
     runTeacherChatStream,
     teacherSkillToolSummary,
     teacherSkills,
+    teacherStreamDoneEvent,
+    teacherStreamErrorEvent,
+    teacherStreamToolResultsEvent,
     toolCallsToProviderPayloads,
     toolRequiresDependencyPreflight,
     validateTeacherSkills,
@@ -525,6 +528,25 @@ def testProviderStreamReportsStreamingErrorsInTrace() -> None:
     assert events[-1]["trace"]["conversationId"] == "conv-stream-error"
     assert events[-1]["trace"]["errorCount"] == 1
     assert events[-1]["trace"]["eventCount"] == 2
+
+
+def testProviderStreamEventHelpersOwnProtocolShape() -> None:
+    doneEvent = teacherStreamDoneEvent({
+        "conversationId": "conv-event",
+        "answer": "완료",
+        "provider": "fake",
+        "model": "test",
+        "usage": None,
+        "toolCalls": [],
+        "trace": {"traceId": "trace-event"},
+    })
+    errorEvent = teacherStreamErrorEvent(error="broken", trace={"errorCount": 1})
+    resultsEvent = teacherStreamToolResultsEvent([{"toolCallId": "call-1", "status": "done"}])
+
+    assert doneEvent["type"] == "done"
+    assert doneEvent["conversationId"] == "conv-event"
+    assert errorEvent == {"type": "error", "error": "broken", "trace": {"errorCount": 1}}
+    assert resultsEvent["toolCalls"][0]["toolCallId"] == "call-1"
 
 
 def testTeacherSkillsAndCellSchemaAreVisibleSsot() -> None:
