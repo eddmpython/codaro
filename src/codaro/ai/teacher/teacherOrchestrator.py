@@ -36,6 +36,11 @@ class TeacherOrchestrator:
         event = trace.record("tool-start", {"toolCallId": toolCallId, "name": name})
         payload = toolCallStart(toolCallId, name, arguments, traceId=trace.traceId, traceEvent=event)
         event.payload.update({
+            "status": payload.get("status"),
+            "category": payload.get("category"),
+            "lane": payload.get("lane"),
+            "target": payload.get("target"),
+            "risk": payload.get("risk"),
             "workLabel": payload.get("workLabel"),
             "workDetail": payload.get("workDetail"),
         })
@@ -61,6 +66,12 @@ class TeacherOrchestrator:
         event = trace.record("tool-result", {"toolCallId": toolCallId, "name": name, "status": resultStatus(result)})
         payload = toolCallResult(toolCallId, name, arguments, result, traceId=trace.traceId, traceEvent=event)
         event.payload.update({
+            "error": payload.get("error"),
+            "result": result,
+            "category": payload.get("category"),
+            "lane": payload.get("lane"),
+            "target": payload.get("target"),
+            "risk": payload.get("risk"),
             "workLabel": payload.get("workLabel"),
             "workDetail": payload.get("workDetail"),
             "yamlContractObserved": learningContractObserved(result) if name == "write-curriculum-yaml" else None,

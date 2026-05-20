@@ -4,9 +4,11 @@ import type {
 } from "@/lib/assistantTypes";
 import type {
   AiChatResponse,
+  AiTraceEvent,
   AiToolCall,
   AiTracePolicyViolation,
   AiTraceSummary,
+  AiTraceWorkloopEvent,
 } from "@/types";
 
 export type AssistantTraceSummary = AiTraceSummary;
@@ -94,6 +96,58 @@ export function normalizeAssistantTrace(trace: AiChatResponse["trace"]): Assista
     const toolSequence = trace.toolSequence.filter((item): item is string => typeof item === "string");
     if (toolSequence.length) normalized.toolSequence = toolSequence;
   }
+  const workloop = normalizeTraceWorkloop(trace.workloop);
+  if (workloop.length) normalized.workloop = workloop;
+  const events = normalizeTraceEvents(trace.events);
+  if (events.length) normalized.events = events;
+  if (typeof trace.yamlContractObserved === "boolean") normalized.yamlContractObserved = trace.yamlContractObserved;
+  return Object.keys(normalized).length ? normalized : undefined;
+}
+
+function normalizeTraceWorkloop(value: unknown): AiTraceWorkloopEvent[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => normalizeTraceWorkloopEvent(item))
+    .filter((item): item is AiTraceWorkloopEvent => Boolean(item));
+}
+
+function normalizeTraceWorkloopEvent(value: unknown): AiTraceWorkloopEvent | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const item = value as Record<string, unknown>;
+  const normalized: AiTraceWorkloopEvent = {};
+  numberField(item.eventIndex, (value) => { normalized.eventIndex = value; });
+  numberField(item.elapsedMs, (value) => { normalized.elapsedMs = value; });
+  copyStringField(item, normalized, "eventType");
+  copyStringField(item, normalized, "toolCallId");
+  copyStringField(item, normalized, "toolName");
+  copyStringField(item, normalized, "status");
+  copyStringField(item, normalized, "category");
+  copyStringField(item, normalized, "lane");
+  copyStringField(item, normalized, "target");
+  copyStringField(item, normalized, "risk");
+  copyStringField(item, normalized, "workLabel");
+  copyStringField(item, normalized, "workDetail");
+  if (typeof item.error === "string" || item.error === null) normalized.error = item.error;
+  return Object.keys(normalized).length ? normalized : undefined;
+}
+
+function normalizeTraceEvents(value: unknown): AiTraceEvent[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => normalizeTraceEvent(item))
+    .filter((item): item is AiTraceEvent => Boolean(item));
+}
+
+function normalizeTraceEvent(value: unknown): AiTraceEvent | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const item = value as Record<string, unknown>;
+  const normalized: AiTraceEvent = {};
+  numberField(item.eventIndex, (value) => { normalized.eventIndex = value; });
+  numberField(item.elapsedMs, (value) => { normalized.elapsedMs = value; });
+  copyStringField(item, normalized, "eventType");
+  if (item.payload && typeof item.payload === "object" && !Array.isArray(item.payload)) {
+    normalized.payload = item.payload as Record<string, unknown>;
+  }
   return Object.keys(normalized).length ? normalized : undefined;
 }
 
@@ -116,6 +170,19 @@ function normalizeTracePolicyViolation(value: unknown): AiTracePolicyViolation |
 
 function stringField(value: unknown): string {
   return typeof value === "string" ? value : "";
+}
+
+function copyStringField(source: Record<string, unknown>, target: Record<string, unknown>, key: string) {
+  const value = source[key];
+  if (typeof value === "string" && value) {
+    target[key] = value;
+  }
+}
+
+function numberField(value: unknown, assign: (value: number) => void) {
+  if (typeof value === "number" && Number.isFinite(value)) {
+    assign(value);
+  }
 }
 
 function withTracePolicySteps(

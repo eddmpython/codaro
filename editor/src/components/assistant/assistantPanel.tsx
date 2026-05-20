@@ -3,9 +3,11 @@ import {
   ArrowUp,
   Bot,
   CheckCircle2,
+  ListTree,
   LogIn,
   Loader2,
   RotateCcw,
+  ShieldAlert,
 } from "lucide-react";
 import { useEffect, useRef } from "react";
 
@@ -26,7 +28,7 @@ import type {
 } from "@/lib/assistantTypes";
 import type { TeacherScope } from "@/lib/teacherScope";
 import { cn } from "@/lib/utils";
-import type { AiProfile, BlockConfig } from "@/types";
+import type { AiProfile, AiTraceSummary, AiTraceWorkloopEvent, BlockConfig } from "@/types";
 
 export function TeacherPanel({
   aiConnecting,
@@ -178,7 +180,7 @@ export function AssistantMessages({
                         {message.content.trim() ? (
                           <AssistantMarkdown content={cleanAssistantMessage(message.content)} />
                         ) : null}
-                        <AssistantWorkLoop steps={message.steps} />
+                        <AssistantWorkLoop steps={message.steps} trace={message.trace} />
                         {isWriting ? (
                           <div className={cn("flex items-center gap-2 py-1 text-sm text-muted-foreground", hasWorkSteps && "sr-only")}>
                             <Loader2 className="size-3.5 animate-spin" />
@@ -216,16 +218,19 @@ export function AssistantMessages({
   );
 }
 
-function AssistantWorkLoop({ steps }: { steps?: AssistantWorkStep[] }) {
-  if (!steps?.length) return null;
-  const runningStep = steps.find((step) => step.status === "running");
-  const hasError = steps.some((step) => step.status === "error");
-  const toolSteps = steps.filter((step) => step.toolName);
+function AssistantWorkLoop({ steps, trace }: { steps?: AssistantWorkStep[]; trace?: AiTraceSummary }) {
+  const visibleSteps = steps ?? [];
+  const traceWorkloop = traceWorkloopEvents(trace);
+  if (!visibleSteps.length && !trace) return null;
+  const runningStep = visibleSteps.find((step) => step.status === "running");
+  const hasError = visibleSteps.some((step) => step.status === "error") || Boolean((trace?.errorCount ?? 0) > 0);
+  const toolSteps = visibleSteps.filter((step) => step.toolName);
+  const groups = groupAssistantSteps(visibleSteps);
   const label = runningStep
-    ? `처리 중 · ${[runningStep.label, runningStep.detail].filter(Boolean).join(" · ")}`
+      ? `처리 중 · ${[runningStep.label, runningStep.detail].filter(Boolean).join(" · ")}`
     : hasError
-      ? `처리 확인 필요 · ${toolSteps.length || steps.length}건`
-      : `처리 완료 · ${toolSteps.length || steps.length}건`;
+      ? `처리 확인 필요 · ${toolSteps.length || traceWorkloop.length || visibleSteps.length}건`
+      : `처리 완료 · ${toolSteps.length || traceWorkloop.length || visibleSteps.length}건`;
 
   return (
     <details className="my-2 rounded-md border bg-muted/20 px-3 py-2 text-xs text-muted-foreground" open={Boolean(runningStep)}>
@@ -239,10 +244,23 @@ function AssistantWorkLoop({ steps }: { steps?: AssistantWorkStep[] }) {
         )}
         <span>{label}</span>
       </summary>
-      <div className="mt-2 space-y-1 border-l pl-3">
-        {steps.map((step) => (
-          <AssistantWorkStepRow key={step.id} step={step} />
+      <div className="mt-2 space-y-3 border-l pl-3">
+        {groups.map((group) => (
+          <div className="space-y-1.5" key={group.key}>
+            <div className="flex flex-wrap items-center gap-2 text-[11px] text-muted-foreground">
+              <ListTree className="size-3" />
+              <span className="font-medium text-foreground">{group.label}</span>
+              <span>{group.steps.length}단계</span>
+              {group.errorCount ? <span className="text-destructive">오류 {group.errorCount}</span> : null}
+            </div>
+            <div className="space-y-1">
+              {group.steps.map((step) => (
+                <AssistantWorkStepRow key={step.id} step={step} />
+              ))}
+            </div>
+          </div>
         ))}
+        <AssistantTraceDetails trace={trace} workloop={traceWorkloop} />
       </div>
     </details>
   );
@@ -277,11 +295,16 @@ function AssistantWorkStepRow({ step }: { step: AssistantWorkStep }) {
         {icon}
         <span className="text-foreground">{step.label}</span>
         <span className="font-mono text-[10px] text-muted-foreground">{step.toolName}</span>
+        {step.policyCode ? (
+          <span className="rounded-sm bg-destructive/10 px-1.5 py-0.5 text-[10px] text-destructive">{step.policyCode}</span>
+        ) : null}
         {duration || traceElapsed ? (
           <span className="ml-auto font-mono text-[10px] text-muted-foreground">{duration ?? traceElapsed}</span>
         ) : null}
       </summary>
       <div className="mt-2 space-y-2">
+        <AssistantWorkStepMeta step={step} />
+        {step.detail ? <div className="text-muted-foreground">{step.detail}</div> : null}
         <ToolPayloadBlock label="In" value={step.arguments} />
         {step.status === "running" ? (
           <div className="flex items-center gap-2 rounded-md bg-muted/20 px-2 py-1.5 text-muted-foreground">
@@ -295,6 +318,89 @@ function AssistantWorkStepRow({ step }: { step: AssistantWorkStep }) {
         )}
       </div>
     </details>
+  );
+}
+
+function AssistantWorkStepMeta({ step }: { step: AssistantWorkStep }) {
+  const items = [
+    step.lane && `lane:${step.lane}`,
+    step.category && `category:${step.category}`,
+    step.target && `target:${step.target}`,
+    step.risk && step.risk !== "normal" && `risk:${step.risk}`,
+    typeof step.traceEventIndex === "number" && `event:${step.traceEventIndex}`,
+  ].filter((item): item is string => typeof item === "string" && item.length > 0);
+  if (!items.length) return null;
+  return (
+    <div className="flex flex-wrap gap-1.5">
+      {items.map((item) => (
+        <span className="rounded-sm bg-muted/40 px-1.5 py-0.5 font-mono text-[10px] text-muted-foreground" key={item}>
+          {item}
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function AssistantTraceDetails({ trace, workloop }: { trace?: AiTraceSummary; workloop: AiTraceWorkloopEvent[] }) {
+  if (!trace) return null;
+  const eventCount = trace.eventCount ?? trace.events?.length ?? 0;
+  const toolCount = trace.toolCount ?? trace.toolSequence?.length ?? 0;
+  const errorCount = trace.errorCount ?? workloop.filter((event) => event.status === "error" || event.error).length;
+  const hasPolicyViolation = Boolean((trace.policyViolationCount ?? 0) > 0 || trace.policyViolations?.length);
+
+  return (
+    <details className="rounded-md border border-border/70 bg-background/50 px-2.5 py-2">
+      <summary className="flex cursor-pointer list-none flex-wrap items-center gap-2 text-foreground">
+        {hasPolicyViolation || errorCount ? (
+          <ShieldAlert className="size-3.5 text-destructive" />
+        ) : (
+          <ListTree className="size-3.5 text-muted-foreground" />
+        )}
+        <span>trace detail</span>
+        {trace.traceId ? <span className="font-mono text-[10px] text-muted-foreground">{trace.traceId}</span> : null}
+        <span className="ml-auto text-[10px] text-muted-foreground">
+          event {eventCount} · tool {toolCount} · error {errorCount}
+        </span>
+      </summary>
+      <div className="mt-2 space-y-2">
+        {workloop.length ? (
+          <div className="space-y-1">
+            {workloop.map((event, index) => (
+              <TraceWorkloopRow event={event} key={`${event.eventIndex ?? index}-${event.eventType ?? "event"}`} />
+            ))}
+          </div>
+        ) : null}
+        {trace.policyViolations?.length ? (
+          <ToolPayloadBlock label="Policy" tone="error" value={trace.policyViolations} />
+        ) : null}
+        <details>
+          <summary className="cursor-pointer list-none font-mono text-[10px] uppercase text-muted-foreground">
+            raw trace
+          </summary>
+          <div className="mt-1">
+            <ToolPayloadBlock label="Trace" value={trace} />
+          </div>
+        </details>
+      </div>
+    </details>
+  );
+}
+
+function TraceWorkloopRow({ event }: { event: AiTraceWorkloopEvent }) {
+  const isError = event.status === "error" || Boolean(event.error);
+  const elapsed = typeof event.elapsedMs === "number" ? `+${formatDuration(event.elapsedMs)}` : null;
+  return (
+    <div className={cn("rounded-sm px-2 py-1.5", isError ? "bg-destructive/10 text-destructive" : "bg-muted/20")}>
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="font-medium text-foreground">{event.workLabel || event.toolName || event.eventType || "작업"}</span>
+        {event.toolName ? <span className="font-mono text-[10px] text-muted-foreground">{event.toolName}</span> : null}
+        {event.status ? <span className="font-mono text-[10px] text-muted-foreground">{event.status}</span> : null}
+        {elapsed ? <span className="ml-auto font-mono text-[10px] text-muted-foreground">{elapsed}</span> : null}
+      </div>
+      {event.workDetail || event.error ? (
+        <div className="mt-1 text-[11px] leading-5">{event.error || event.workDetail}</div>
+      ) : null}
+    </div>
   );
 }
 
@@ -315,6 +421,81 @@ function formatPayload(value: unknown) {
   } catch {
     return String(value);
   }
+}
+
+function groupAssistantSteps(steps: AssistantWorkStep[]) {
+  const groups: Array<{ key: string; label: string; steps: AssistantWorkStep[]; errorCount: number }> = [];
+  for (const step of steps) {
+    const key = stepGroupKey(step);
+    const existing = groups.find((group) => group.key === key);
+    if (existing) {
+      existing.steps.push(step);
+      if (step.status === "error") existing.errorCount += 1;
+      continue;
+    }
+    groups.push({
+      key,
+      label: stepGroupLabel(step, key),
+      steps: [step],
+      errorCount: step.status === "error" ? 1 : 0,
+    });
+  }
+  return groups;
+}
+
+function stepGroupKey(step: AssistantWorkStep) {
+  return step.lane || step.category || (step.toolName ? "tool" : "compose");
+}
+
+function stepGroupLabel(step: AssistantWorkStep, key: string) {
+  if (step.lane) return laneLabel(step.lane);
+  if (step.category) return categoryLabel(step.category);
+  if (key === "compose") return "요청 준비";
+  return "도구 실행";
+}
+
+function laneLabel(lane: string) {
+  switch (lane) {
+    case "curriculum":
+      return "커리큘럼 설계";
+    case "read":
+      return "상태 확인";
+    case "write":
+      return "노트북 반영";
+    case "cell-call":
+      return "셀 실행/검증";
+    case "progress":
+      return "진도 기록";
+    case "automation":
+      return "자동화";
+    case "safety":
+      return "안전 확인";
+    default:
+      return lane;
+  }
+}
+
+function categoryLabel(category: string) {
+  switch (category) {
+    case "runtime":
+      return "런타임";
+    case "learning":
+      return "학습 구성";
+    case "workbench":
+      return "워크벤치";
+    case "files":
+      return "파일/패키지";
+    case "automation":
+      return "자동화";
+    case "safety":
+      return "안전";
+    default:
+      return category;
+  }
+}
+
+function traceWorkloopEvents(trace?: AiTraceSummary): AiTraceWorkloopEvent[] {
+  return Array.isArray(trace?.workloop) ? trace.workloop : [];
 }
 
 function formatDuration(milliseconds: number) {

@@ -49,7 +49,8 @@ uv run python -X utf8 tests/run.py gate teacher-eval
 
 - 새 gate는 `tests/run.py`, 이 문서, CI 중 필요한 위치를 함께 갱신한다.
 - 새 pytest 파일은 가능한 한 제품/도메인 경계를 드러내는 이름을 쓴다.
-- teacher/tool 변경은 최소한 tool sequence, policy violation, workloop label, structured YAML contract 중 변경 표면 하나를 고정한다.
+- teacher/tool 변경은 최소한 tool sequence, policy violation, workloop label, structured YAML contract, provider loop result signal 중 변경 표면 하나를 고정한다.
+- provider loop 변경은 가능한 한 실제 scripted provider run으로 `packages-check` → `packages-install` → `cell-call` 순서와 결과 필드(`missing`, `success`, `passed`)를 함께 검증한다.
 - 학습카드/YAML 변경은 backend materializer 테스트와 editor build를 함께 확인한다.
 - 기존 부채를 새 테스트로 한 번에 해결하지 못하면 별도 baseline 또는 명시적 TODO 문서로 분리한다.
 - CI YAML은 세부 명령을 소유하지 않고 `tests/run.py gate <name>`만 호출한다.

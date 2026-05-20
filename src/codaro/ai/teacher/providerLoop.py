@@ -52,7 +52,7 @@ def finishTeacherTurnPayload(
     toolCalls: list[dict[str, Any]],
 ) -> dict[str, Any]:
     convManager.addAssistantMessage(conversationId, answer)
-    tracePayload = orchestrator.finishTrace(trace, answer=answer, toolCalls=toolCalls)
+    tracePayload = orchestrator.finishTrace(trace, answer=answer, toolCalls=toolCalls, includeEvents=True)
     return teacherTurnPayload(
         conversationId=conversationId,
         answer=answer,

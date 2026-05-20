@@ -12,6 +12,7 @@ from codaro.ai.teacher import (
     buildClarificationPlan,
     executeTeacherToolRound,
     evaluateGoldenTracePayloads,
+    evaluateTeacherTurnPayload,
     evaluateToolSequence,
     evaluateToolTrace,
     evaluateToolTracePayload,
@@ -21,6 +22,8 @@ from codaro.ai.teacher import (
     prepareTeacherTurn,
     runTeacherChatLoop,
     runTeacherChatStream,
+    runTeacherGoldenProviderCase,
+    teacherTurnTracePayload,
     teacherSkillToolSummary,
     teacherSkills,
     teacherStreamDoneEvent,
@@ -110,6 +113,36 @@ class _FakeProvider:
 
     def complete(self, messages: list[dict]):
         return ToolResponse(answer="완료", provider="fake", model="test", toolCalls=[])
+
+
+class _ScriptedProvider:
+    supportsNativeTools = True
+
+    def __init__(self, responses: list[ToolResponse]) -> None:
+        self.responses = responses
+        self.callCount = 0
+
+    def completeWithTools(self, messages: list[dict], tools: list[dict]):
+        return self._next()
+
+    def complete(self, messages: list[dict]):
+        return self._next()
+
+    def _next(self) -> ToolResponse:
+        self.callCount += 1
+        if self.responses:
+            return self.responses.pop(0)
+        return ToolResponse(answer="완료", provider="fake", model="test", toolCalls=[])
+
+
+class _ScriptedExecutor:
+    def __init__(self, results: dict[str, dict]) -> None:
+        self.results = results
+        self.calls: list[dict] = []
+
+    async def execute(self, toolName: str, arguments: dict):
+        self.calls.append({"tool": toolName, "arguments": arguments})
+        return self.results.get(toolName, {"ok": True, "tool": toolName})
 
 
 class _FailingStreamProvider:
@@ -338,6 +371,7 @@ def testTracePayloadsHaveStableTraceId() -> None:
     assert [event.eventType for event in trace.events] == ["turn-start", "tool-start", "tool-result"]
     assert trace.summary()["toolSequence"] == ["read-cells"]
     assert trace.summary()["workloop"][0]["workLabel"] == "노트북 셀 읽기"
+    assert trace.summary()["workloop"][0]["lane"] == "read"
 
 
 def testEvalHarnessCanReadTraceSequence() -> None:
@@ -360,6 +394,10 @@ def testEvalHarnessCanReadTracePayload() -> None:
     tracePayload = {
         "toolSequence": ["read-cells", "cell-call"],
         "policyViolationCount": 0,
+        "toolCalls": [
+            {"name": "read-cells", "result": {"blocks": []}},
+            {"name": "cell-call", "result": {"passed": True, "feedback": "ok"}},
+        ],
     }
 
     report = evaluateToolTracePayload(case, tracePayload)
@@ -368,6 +406,24 @@ def testEvalHarnessCanReadTracePayload() -> None:
     assert report.observedTools == ("read-cells", "cell-call")
     assert report.policyViolationCount == 0
     assert report.policyViolations == ()
+    assert "cell-call.passed" in report.observedResultSignals
+
+
+def testEvalHarnessCanReadTeacherTurnPayload() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "answer-check-uses-cell-call")
+    turnPayload = {
+        "trace": {"toolSequence": ["read-cells", "cell-call"], "policyViolationCount": 0},
+        "toolCalls": [
+            {"name": "read-cells", "result": {"blocks": []}},
+            {"name": "cell-call", "result": {"passed": True}},
+        ],
+    }
+
+    tracePayload = teacherTurnTracePayload(turnPayload)
+    report = evaluateTeacherTurnPayload(case, turnPayload)
+
+    assert tracePayload["toolCalls"] == turnPayload["toolCalls"]
+    assert report.passed
 
 
 def testEvalHarnessCanValidateStructuredCurriculumTrace() -> None:
@@ -445,10 +501,18 @@ def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
         "answer-check-uses-cell-call": {
             "toolSequence": ["read-cells", "cell-call"],
             "policyViolationCount": 0,
+            "toolCalls": [
+                {"name": "read-cells", "result": {"blocks": []}},
+                {"name": "cell-call", "result": {"passed": True}},
+            ],
         },
         "dependency-preflight-before-install": {
             "toolSequence": ["packages-check", "packages-install"],
             "policyViolationCount": 0,
+            "toolCalls": [
+                {"name": "packages-check", "result": {"missing": ["matplotlib"]}},
+                {"name": "packages-install", "result": {"success": True}},
+            ],
         },
     }
     cases = tuple(
@@ -462,6 +526,100 @@ def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
     assert report.passed
     assert report.missingCaseIds == ()
     assert report.payload()["caseCount"] == 2
+
+
+def testGoldenProviderCaseRunsActualLoopAndValidatesResults() -> None:
+    case = TeacherEvalCase(
+        caseId="provider-package-cell-check",
+        prompt="seaborn 그래프 실습 셀을 실행하고 확인해줘",
+        expectedTools=("packages-check", "packages-install", "cell-call"),
+        orderedBefore=(("packages-check", "packages-install"), ("packages-install", "cell-call")),
+        expectedWorkLabels=("라이브러리 확인", "uv 라이브러리 설치", "셀 실행/검증"),
+        expectedTraceEvents=("tool-start", "tool-result"),
+        expectedToolResultFields=(
+            ("packages-check", "missing"),
+            ("packages-install", "success"),
+            ("cell-call", "passed"),
+        ),
+    )
+    provider = _ScriptedProvider([
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-check", name="packages-check", arguments={"names": ["seaborn"]})],
+        ),
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-install", name="packages-install", arguments={"name": "seaborn"})],
+        ),
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-cell", name="cell-call", arguments={"operation": "check", "blockId": "cell-1"})],
+        ),
+        ToolResponse(answer="검증 완료", provider="fake", model="test", toolCalls=[]),
+    ])
+    executor = _ScriptedExecutor({
+        "packages-check": {"missing": ["seaborn"], "installed": []},
+        "packages-install": {"success": True, "package": "seaborn"},
+        "cell-call": {"passed": True, "feedback": "정답입니다."},
+    })
+    orchestrator = TeacherOrchestrator.fromContext({"dependencyPreflight": {"packages": ["seaborn"]}})
+
+    report = asyncio.run(runTeacherGoldenProviderCase(
+        case,
+        provider=provider,
+        executor=executor,
+        convManager=_FakeConversationManager(),
+        orchestrator=orchestrator,
+        tools=[{"type": "function"}],
+    ))
+
+    assert report.passed
+    assert report.evaluation.observedTools == ("packages-check", "packages-install", "cell-call")
+    assert "cell-call.passed" in report.evaluation.observedResultSignals
+    assert report.turnPayload["answer"] == "검증 완료"
+    assert [call["tool"] for call in executor.calls] == ["packages-check", "packages-install", "cell-call"]
+
+
+def testGoldenProviderCaseValidatesStructuredYamlMaterialization() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
+    provider = _ScriptedProvider([
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-yaml", name="write-curriculum-yaml", arguments={"title": "pandas 기초"})],
+        ),
+        ToolResponse(answer="커리큘럼을 구성했습니다.", provider="fake", model="test", toolCalls=[]),
+    ])
+    executor = _ScriptedExecutor({
+        "write-curriculum-yaml": {
+            "document": {
+                "blocks": [
+                    {"payload": {"learningContract": {"meta": {"title": "pandas 기초"}}}},
+                    {"payload": {"sectionContract": {"title": "DataFrame 만들기"}}},
+                ]
+            }
+        },
+    })
+
+    report = asyncio.run(runTeacherGoldenProviderCase(
+        case,
+        provider=provider,
+        executor=executor,
+        convManager=_FakeConversationManager(),
+        orchestrator=TeacherOrchestrator.fromContext({}),
+        tools=[{"type": "function"}],
+    ))
+
+    assert report.passed
+    assert report.tracePayload["yamlContractObserved"]
+    assert "write-curriculum-yaml.document" in report.evaluation.observedResultSignals
 
 
 def testEvalHarnessFailsMissingGoldenTracePayload() -> None:

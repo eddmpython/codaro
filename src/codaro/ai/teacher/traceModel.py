@@ -84,9 +84,16 @@ class TeacherTrace:
     def workloopEvents(self) -> list[dict[str, Any]]:
         return [
             {
+                "eventIndex": event.eventIndex,
                 "eventType": event.eventType,
+                "toolCallId": event.payload.get("toolCallId"),
                 "toolName": event.payload.get("name"),
                 "status": event.payload.get("status"),
+                "error": event.payload.get("error"),
+                "category": event.payload.get("category"),
+                "lane": event.payload.get("lane"),
+                "target": event.payload.get("target"),
+                "risk": event.payload.get("risk"),
                 "workLabel": event.payload.get("workLabel"),
                 "workDetail": event.payload.get("workDetail"),
                 "elapsedMs": event.elapsedMs,

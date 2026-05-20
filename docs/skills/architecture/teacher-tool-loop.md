@@ -58,17 +58,19 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - 대화 표면은 tool lifecycle을 숨기지 않는다.
    - `tool_start`가 오면 "처리 중 · {작업명}"으로 표시한다.
    - `tool_results`가 오면 각 tool row를 done/error로 갱신한다.
+   - 단계는 `lane`/`category` 기준으로 묶어 보여주고, 오류가 있는 그룹은 바로 식별 가능해야 한다.
    - 노트북/커리큘럼 작성 중에는 "YAML을 섹션 카드와 실행 셀로 변환", "{blockId} 셀 내용 반영", "{package}를 uv로 설치"처럼 현재 상태를 문장으로 보여준다.
-   - raw payload는 기본 노출하지 않고, 필요할 때 `In`/`Out`으로 펼쳐 본다.
+   - raw payload와 trace event는 기본 노출하지 않고, 필요할 때 `In`/`Out`/`raw trace`로 펼쳐 본다.
 
 7. **Trace와 평가**
    - 모든 turn은 `traceId`를 가진다.
    - tool payload에는 `category`, `lane`, `target`, `risk`, `traceEventIndex`, `turnElapsedMs`, `workLabel`, `workDetail`을 붙인다.
+   - `tool-result` trace event에는 평가 가능한 result signal을 보존한다. 예: `write-curriculum-yaml.document`, `packages-check.missing`, `packages-install.success`, `cell-call.passed`.
    - response의 `trace.toolSequence`와 `trace.policyViolationCount`는 평가 harness의 입력으로 쓴다.
    - response의 `trace.workloop`은 사용자가 읽을 수 있는 단계 품질 평가에 쓴다.
    - streaming 중 provider 오류는 `error` event와 trace `turn-error`로 남긴다.
    - golden case는 명시적으로 허용한 경우가 아니면 policy violation이 1건이라도 있으면 실패다.
-   - 새 provider 동작을 추가하면 golden case가 tool 순서, workloop 라벨, YAML contract 산출 여부를 검증해야 한다.
+   - 새 provider 동작을 추가하면 golden case가 실제 provider loop payload를 대상으로 tool 순서, workloop 라벨, YAML contract 산출 여부, 패키지 preflight 결과, 셀 실행/검증 결과를 검증해야 한다.
 
 ## 코드 경계
 

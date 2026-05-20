@@ -17,6 +17,7 @@ class TeacherEvalCase:
     forbiddenTools: tuple[str, ...] = ()
     expectedWorkLabels: tuple[str, ...] = ()
     expectedTraceEvents: tuple[str, ...] = ()
+    expectedToolResultFields: tuple[tuple[str, str], ...] = ()
     expectedYamlContract: bool = False
     allowPolicyViolations: bool = False
 
@@ -31,6 +32,7 @@ class ToolSequenceReport:
     workloopEventCount: int = 0
     policyViolationCount: int = 0
     policyViolations: tuple[dict[str, str], ...] = field(default_factory=tuple)
+    observedResultSignals: tuple[str, ...] = field(default_factory=tuple)
 
 
 @dataclass(frozen=True)
@@ -55,9 +57,35 @@ class TeacherEvalReport:
                     "workloopEventCount": report.workloopEventCount,
                     "policyViolationCount": report.policyViolationCount,
                     "policyViolations": list(report.policyViolations),
+                    "observedResultSignals": list(report.observedResultSignals),
                 }
                 for report in self.reports
             ],
+        }
+
+
+@dataclass(frozen=True)
+class TeacherGoldenRunReport:
+    caseId: str
+    passed: bool
+    evaluation: ToolSequenceReport
+    turnPayload: Mapping[str, Any]
+    tracePayload: Mapping[str, Any]
+
+    def payload(self) -> dict[str, Any]:
+        return {
+            "caseId": self.caseId,
+            "passed": self.passed,
+            "evaluation": {
+                "passed": self.evaluation.passed,
+                "failures": list(self.evaluation.failures),
+                "observedTools": list(self.evaluation.observedTools),
+                "observedWorkLabels": list(self.evaluation.observedWorkLabels),
+                "observedResultSignals": list(self.evaluation.observedResultSignals),
+                "policyViolationCount": self.evaluation.policyViolationCount,
+                "policyViolations": list(self.evaluation.policyViolations),
+            },
+            "trace": dict(self.tracePayload),
         }
 
 
@@ -68,6 +96,7 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         expectedTools=("write-curriculum-yaml",),
         expectedWorkLabels=("커리큘럼 YAML 전개",),
         expectedTraceEvents=("tool-start", "tool-result"),
+        expectedToolResultFields=(("write-curriculum-yaml", "document"),),
         expectedYamlContract=True,
     ),
     TeacherEvalCase(
@@ -75,23 +104,27 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         prompt="matplotlib 그래프 실습 만들어줘",
         expectedTools=("packages-check",),
         orderedBefore=(("packages-check", "packages-install"),),
+        expectedToolResultFields=(("packages-check", "missing"),),
     ),
     TeacherEvalCase(
         caseId="answer-check-uses-cell-call",
         prompt="내 답 맞아?",
         expectedTools=("read-cells", "cell-call"),
+        expectedToolResultFields=(("cell-call", "passed"),),
     ),
     TeacherEvalCase(
         caseId="cell-run-does-not-skip-package-preflight",
         prompt="seaborn으로 그래프 셀 실행해줘",
         expectedTools=("packages-check", "cell-call"),
         orderedBefore=(("packages-check", "cell-call"),),
+        expectedToolResultFields=(("packages-check", "missing"), ("cell-call", "status")),
     ),
     TeacherEvalCase(
         caseId="automation-uses-guarded-input-tools",
         prompt="브라우저에서 버튼을 찾아 클릭하는 자동화를 만들어줘",
         expectedTools=("find-element", "click-element"),
         orderedBefore=(("find-element", "click-element"),),
+        expectedToolResultFields=(("find-element", "elements"), ("click-element", "success")),
     ),
 )
 
@@ -152,6 +185,9 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
             failures.append(f"missing expected trace event: {eventType}")
     if case.expectedYamlContract and not _hasYamlContract(tracePayload):
         failures.append("missing structured learning YAML contract")
+    for toolName, fieldName in case.expectedToolResultFields:
+        if not _toolResultFieldObserved(tracePayload, toolName, fieldName):
+            failures.append(f"missing result field for {toolName}: {fieldName}")
     return ToolSequenceReport(
         caseId=baseReport.caseId,
         passed=not failures,
@@ -161,6 +197,7 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
         workloopEventCount=len(workLabels),
         policyViolationCount=baseReport.policyViolationCount,
         policyViolations=baseReport.policyViolations,
+        observedResultSignals=_toolResultSignals(tracePayload),
     )
 
 
@@ -187,6 +224,57 @@ def evaluateGoldenTracePayloads(
         passed=all(report.passed for report in reports),
         reports=tuple(reports),
         missingCaseIds=tuple(missingCaseIds),
+    )
+
+
+def teacherTurnTracePayload(turnPayload: Mapping[str, Any]) -> dict[str, Any]:
+    trace = turnPayload.get("trace")
+    tracePayload: dict[str, Any] = dict(trace) if isinstance(trace, Mapping) else {}
+    toolCalls = turnPayload.get("toolCalls")
+    if isinstance(toolCalls, list):
+        tracePayload["toolCalls"] = toolCalls
+    return tracePayload
+
+
+def evaluateTeacherTurnPayload(case: TeacherEvalCase, turnPayload: Mapping[str, Any]) -> ToolSequenceReport:
+    return evaluateToolTracePayload(case, teacherTurnTracePayload(turnPayload))
+
+
+async def runTeacherGoldenProviderCase(
+    case: TeacherEvalCase,
+    *,
+    provider: Any,
+    executor: Any,
+    convManager: Any,
+    orchestrator: Any,
+    tools: list[dict[str, Any]] | None = None,
+    conversationId: str | None = None,
+    messages: list[dict[str, Any]] | None = None,
+    maxToolRounds: int = 10,
+) -> TeacherGoldenRunReport:
+    from ..tools import toolSchemas
+    from .providerLoop import runTeacherChatLoop
+
+    runConversationId = conversationId or f"golden-{case.caseId}"
+    runMessages = list(messages) if messages is not None else [{"role": "user", "content": case.prompt}]
+    turnPayload = await runTeacherChatLoop(
+        provider=provider,
+        convManager=convManager,
+        conversationId=runConversationId,
+        messages=runMessages,
+        tools=tools if tools is not None else toolSchemas(),
+        executor=executor,
+        orchestrator=orchestrator,
+        maxToolRounds=maxToolRounds,
+    )
+    tracePayload = teacherTurnTracePayload(turnPayload)
+    evaluation = evaluateToolTracePayload(case, tracePayload)
+    return TeacherGoldenRunReport(
+        caseId=case.caseId,
+        passed=evaluation.passed,
+        evaluation=evaluation,
+        turnPayload=turnPayload,
+        tracePayload=tracePayload,
     )
 
 
@@ -248,6 +336,45 @@ def _hasYamlContract(tracePayload: Mapping[str, Any]) -> bool:
         if _documentHasLearningContract(result.get("curriculumDocument")):
             return True
     return False
+
+
+def _toolResultFieldObserved(tracePayload: Mapping[str, Any], toolName: str, fieldName: str) -> bool:
+    for result in _toolResultPayloads(tracePayload, toolName):
+        value = _valueAtPath(result, fieldName)
+        if value is not None:
+            return True
+    return False
+
+
+def _toolResultSignals(tracePayload: Mapping[str, Any]) -> tuple[str, ...]:
+    signals: list[str] = []
+    for payload in _iterTraceToolPayloads(tracePayload):
+        toolName = payload.get("name")
+        result = payload.get("result")
+        if not toolName or not isinstance(result, Mapping):
+            continue
+        signals.extend(f"{toolName}.{fieldName}" for fieldName in result.keys())
+    return tuple(dict.fromkeys(signals))
+
+
+def _toolResultPayloads(tracePayload: Mapping[str, Any], toolName: str) -> tuple[Mapping[str, Any], ...]:
+    results: list[Mapping[str, Any]] = []
+    for payload in _iterTraceToolPayloads(tracePayload):
+        if payload.get("name") != toolName:
+            continue
+        result = payload.get("result")
+        if isinstance(result, Mapping):
+            results.append(result)
+    return tuple(results)
+
+
+def _valueAtPath(value: Mapping[str, Any], path: str) -> Any:
+    current: Any = value
+    for part in path.split("."):
+        if not isinstance(current, Mapping) or part not in current:
+            return None
+        current = current[part]
+    return current
 
 
 def _documentHasLearningContract(value: Any) -> bool:

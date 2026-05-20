@@ -304,6 +304,31 @@ export type AiTracePolicyViolation = {
   message: string;
 };
 
+export type AiTraceWorkloopEvent = {
+  eventIndex?: number;
+  eventType?: string;
+  toolCallId?: string;
+  toolName?: string;
+  status?: string;
+  error?: string | null;
+  category?: string;
+  lane?: string;
+  target?: string;
+  risk?: string;
+  workLabel?: string;
+  workDetail?: string;
+  elapsedMs?: number;
+  [key: string]: unknown;
+};
+
+export type AiTraceEvent = {
+  eventIndex?: number;
+  eventType?: string;
+  elapsedMs?: number;
+  payload?: Record<string, unknown>;
+  [key: string]: unknown;
+};
+
 export type AiTraceSummary = {
   traceId?: string;
   conversationId?: string | null;
@@ -314,6 +339,9 @@ export type AiTraceSummary = {
   policyViolationCount?: number;
   policyViolations?: AiTracePolicyViolation[];
   toolSequence?: string[];
+  workloop?: AiTraceWorkloopEvent[];
+  events?: AiTraceEvent[];
+  yamlContractObserved?: boolean;
   [key: string]: unknown;
 };
 
