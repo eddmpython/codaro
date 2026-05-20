@@ -1,5 +1,5 @@
 import type { AssistantMessage } from "@/components/assistant/assistantPanel";
-import type { StreamEvent } from "@/lib/api";
+import type { StreamEvent } from "@/lib/assistantStream";
 import {
   createComposeStep,
   finishAssistantWorkLoop,

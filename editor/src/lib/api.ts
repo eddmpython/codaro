@@ -21,6 +21,12 @@ import type {
   TaskRun,
   VariableInfo,
 } from "@/types";
+import {
+  applyAssistantStreamProtocolEvent,
+  initialAssistantStreamState,
+  parseAssistantStreamEvent,
+  type StreamEvent,
+} from "@/lib/assistantStream";
 
 const configuredApiBase = import.meta.env.VITE_CODARO_API_BASE?.replace(/\/$/, "") ?? "";
 
@@ -82,21 +88,6 @@ function deleteJson<T>(path: string): Promise<T> {
   return requestJson<T>(path, { method: "DELETE" });
 }
 
-export type StreamEvent = {
-  type?: string;
-  conversationId?: string;
-  delta?: string;
-  content?: string;
-  answer?: string;
-  provider?: string;
-  model?: string | null;
-  usage?: unknown;
-  toolCall?: AiChatResponse["toolCalls"][number];
-  toolCalls?: AiChatResponse["toolCalls"];
-  trace?: AiChatResponse["trace"];
-  error?: string;
-};
-
 async function postStreamChat(
   path: string,
   body: AiChatRequest,
@@ -130,30 +121,11 @@ async function postStreamChat(
   const reader = response.body.getReader();
   const decoder = new TextDecoder();
   let buffer = "";
-  let donePayload: AiChatResponse | null = null;
-  let streamConversationId = body.conversationId ?? "";
-  let streamError: string | null = null;
+  let streamState = initialAssistantStreamState(body);
 
   const handleEvent = (event: StreamEvent) => {
-    if (event.conversationId) {
-      streamConversationId = event.conversationId;
-    }
+    streamState = applyAssistantStreamProtocolEvent(streamState, event);
     onEvent(event);
-    if (event.type === "error") {
-      streamError = event.error ?? "provider stream failed";
-      return;
-    }
-    if (event.type === "done") {
-      donePayload = {
-        conversationId: event.conversationId ?? streamConversationId,
-        answer: event.answer ?? event.content ?? "",
-        provider: event.provider ?? "",
-        model: event.model,
-        usage: event.usage,
-        toolCalls: event.toolCalls ?? [],
-        trace: event.trace,
-      };
-    }
   };
 
   while (true) {
@@ -163,36 +135,25 @@ async function postStreamChat(
     const events = buffer.split("\n\n");
     buffer = events.pop() ?? "";
     for (const rawEvent of events) {
-      const event = parseStreamEvent(rawEvent);
+      const event = parseAssistantStreamEvent(rawEvent);
       if (!event) continue;
       handleEvent(event);
     }
   }
 
-  const tail = parseStreamEvent(buffer);
+  const tail = parseAssistantStreamEvent(buffer);
   if (tail) {
     handleEvent(tail);
   }
 
-  if (streamError) {
-    throw new Error(streamError);
+  if (streamState.error) {
+    throw new Error(streamState.error);
   }
 
-  if (!donePayload) {
+  if (!streamState.donePayload) {
     throw new Error("stream finished without done event");
   }
-  return donePayload;
-}
-
-function parseStreamEvent(rawEvent: string): StreamEvent | null {
-  const data = rawEvent
-    .split(/\r?\n/)
-    .filter((line) => line.startsWith("data:"))
-    .map((line) => line.slice(5).trimStart())
-    .join("\n")
-    .trim();
-  if (!data) return null;
-  return JSON.parse(data) as StreamEvent;
+  return streamState.donePayload;
 }
 
 export const codaroApi = {
