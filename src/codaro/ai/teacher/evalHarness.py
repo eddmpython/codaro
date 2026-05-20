@@ -18,6 +18,7 @@ class TeacherEvalCase:
     orderedBefore: tuple[tuple[str, str], ...] = ()
     forbiddenTools: tuple[str, ...] = ()
     expectedWorkLabels: tuple[str, ...] = ()
+    expectedWorkDetails: tuple[str, ...] = ()
     expectedTraceEvents: tuple[str, ...] = ()
     expectedToolResultFields: tuple[tuple[str, str], ...] = ()
     expectedClarificationGate: bool = False
@@ -37,6 +38,7 @@ class ToolSequenceReport:
     failures: tuple[str, ...] = field(default_factory=tuple)
     observedTools: tuple[str, ...] = field(default_factory=tuple)
     observedWorkLabels: tuple[str, ...] = field(default_factory=tuple)
+    observedWorkDetails: tuple[str, ...] = field(default_factory=tuple)
     workloopEventCount: int = 0
     policyViolationCount: int = 0
     policyViolations: tuple[dict[str, str], ...] = field(default_factory=tuple)
@@ -62,6 +64,7 @@ class TeacherEvalReport:
                     "failures": list(report.failures),
                     "observedTools": list(report.observedTools),
                     "observedWorkLabels": list(report.observedWorkLabels),
+                    "observedWorkDetails": list(report.observedWorkDetails),
                     "workloopEventCount": report.workloopEventCount,
                     "policyViolationCount": report.policyViolationCount,
                     "policyViolations": list(report.policyViolations),
@@ -89,6 +92,7 @@ class TeacherGoldenRunReport:
                 "failures": list(self.evaluation.failures),
                 "observedTools": list(self.evaluation.observedTools),
                 "observedWorkLabels": list(self.evaluation.observedWorkLabels),
+                "observedWorkDetails": list(self.evaluation.observedWorkDetails),
                 "observedResultSignals": list(self.evaluation.observedResultSignals),
                 "policyViolationCount": self.evaluation.policyViolationCount,
                 "policyViolations": list(self.evaluation.policyViolations),
@@ -104,6 +108,7 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         expectedNoTools=True,
         forbiddenTools=("write-curriculum-yaml", "packages-check", "cell-call"),
         expectedWorkLabels=("작업 전 확인 질문",),
+        expectedWorkDetails=("핵심 질문", "기본값"),
         expectedTraceEvents=("clarification-gate",),
         expectedClarificationGate=True,
         expectedClarificationQuestionRange=(1, 3),
@@ -114,6 +119,7 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         prompt="pandas 기초 커리큘럼 만들어줘",
         expectedTools=("write-curriculum-yaml",),
         expectedWorkLabels=("커리큘럼 YAML 전개",),
+        expectedWorkDetails=("구조화된 YAML을 섹션 카드와 실행 셀로 변환",),
         expectedTraceEvents=("tool-start", "tool-result"),
         expectedToolResultFields=(("write-curriculum-yaml", "document"),),
         expectedYamlContract=True,
@@ -128,6 +134,7 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         expectedToolSequence=("packages-check", "packages-install", "cell-call"),
         orderedBefore=(("packages-check", "packages-install"), ("packages-install", "cell-call")),
         expectedWorkLabels=("라이브러리 확인", "uv 라이브러리 설치", "셀 실행/검증"),
+        expectedWorkDetails=("matplotlib 설치 여부 확인", "matplotlib를 uv로 설치", "cell-1 실행 또는 검증"),
         expectedTraceEvents=("tool-start", "tool-result"),
         expectedToolResultFields=(
             ("packages-check", "missing"),
@@ -216,10 +223,14 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
     )
     failures = list(baseReport.failures)
     workLabels = _workLabelsFromPayload(tracePayload)
+    workDetails = _workDetailsFromPayload(tracePayload)
     eventTypes = _eventTypesFromPayload(tracePayload)
     for label in case.expectedWorkLabels:
         if label not in workLabels:
             failures.append(f"missing expected work label: {label}")
+    for detail in case.expectedWorkDetails:
+        if not any(detail in observedDetail for observedDetail in workDetails):
+            failures.append(f"missing expected work detail: {detail}")
     for eventType in case.expectedTraceEvents:
         if eventType not in eventTypes:
             failures.append(f"missing expected trace event: {eventType}")
@@ -243,6 +254,7 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
         failures=tuple(failures),
         observedTools=baseReport.observedTools,
         observedWorkLabels=workLabels,
+        observedWorkDetails=workDetails,
         workloopEventCount=len(workLabels),
         policyViolationCount=baseReport.policyViolationCount,
         policyViolations=baseReport.policyViolations,
@@ -360,6 +372,20 @@ def _workLabelsFromPayload(tracePayload: Mapping[str, Any]) -> tuple[str, ...]:
         if item.get("workLabel"):
             labels.append(str(item["workLabel"]))
     return tuple(dict.fromkeys(labels))
+
+
+def _workDetailsFromPayload(tracePayload: Mapping[str, Any]) -> tuple[str, ...]:
+    details: list[str] = []
+    workloop = tracePayload.get("workloop")
+    if isinstance(workloop, list):
+        for item in workloop:
+            if isinstance(item, Mapping) and item.get("workDetail"):
+                details.append(str(item["workDetail"]))
+
+    for item in _iterTraceToolPayloads(tracePayload):
+        if item.get("workDetail"):
+            details.append(str(item["workDetail"]))
+    return tuple(dict.fromkeys(details))
 
 
 def _eventTypesFromPayload(tracePayload: Mapping[str, Any]) -> tuple[str, ...]:

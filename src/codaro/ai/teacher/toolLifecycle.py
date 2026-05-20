@@ -109,9 +109,21 @@ def _workDetail(name: str, arguments: dict[str, Any]) -> str:
     if name == "packages-install":
         packageName = _textArg(arguments, "name")
         return f"{packageName}를 uv로 설치" if packageName else "누락 패키지를 uv로 설치"
-    if name in {"write-cell", "insert-block", "cell-call", "execute-reactive", "check-exercise"}:
-        blockId = _textArg(arguments, "blockId") or _textArg(arguments, "anchorBlockId")
-        return f"{blockId} 대상 작업" if blockId else "대상 셀 확인 후 작업"
+    if name == "cell-call":
+        blockId = _textArg(arguments, "blockId")
+        return f"{blockId} 실행 또는 검증" if blockId else "대상 셀 실행 또는 검증"
+    if name == "execute-reactive":
+        blockId = _textArg(arguments, "blockId")
+        return f"{blockId}부터 의존 셀 재실행" if blockId else "의존 셀 재실행"
+    if name == "check-exercise":
+        blockId = _textArg(arguments, "blockId")
+        return f"{blockId} 답안 검증" if blockId else "실습 답안 검증"
+    if name == "write-cell":
+        blockId = _textArg(arguments, "blockId")
+        return f"{blockId} 셀 내용 반영" if blockId else "셀 내용 반영"
+    if name == "insert-block":
+        anchorBlockId = _textArg(arguments, "anchorBlockId")
+        return f"{anchorBlockId} 주변에 셀 추가" if anchorBlockId else "새 셀 추가"
     if name == "read-cells":
         return "현재 노트북 구조와 셀 역할 확인"
     if name == "get-variables":

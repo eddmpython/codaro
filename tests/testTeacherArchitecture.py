@@ -562,6 +562,7 @@ def testEvalHarnessValidatesClarificationGateTrace() -> None:
     assert report.passed
     assert report.observedTools == ()
     assert report.observedWorkLabels == ("작업 전 확인 질문",)
+    assert any("핵심 질문" in detail for detail in report.observedWorkDetails)
 
 
 def testEvalHarnessFailsWeakClarificationGateTrace() -> None:
@@ -585,6 +586,7 @@ def testEvalHarnessFailsWeakClarificationGateTrace() -> None:
     assert not report.passed
     assert "clarification question count out of range: 0" in report.failures
     assert "missing clarification defaults: depth, environment, balance" in report.failures
+    assert "missing expected work detail: 핵심 질문" in report.failures
 
 
 def testEvalHarnessChecksWorkloopAndStructuredYamlContract() -> None:
@@ -593,13 +595,17 @@ def testEvalHarnessChecksWorkloopAndStructuredYamlContract() -> None:
         prompt="pandas 실습 레슨 만들어줘",
         expectedTools=("write-curriculum-yaml",),
         expectedWorkLabels=("커리큘럼 YAML 전개",),
+        expectedWorkDetails=("구조화된 YAML을 섹션 카드와 실행 셀로 변환",),
         expectedTraceEvents=("tool-start", "tool-result"),
         expectedYamlContract=True,
         expectedSectionCardFlow=True,
     )
     tracePayload = {
         "toolSequence": ["write-curriculum-yaml"],
-        "workloop": [{"workLabel": "커리큘럼 YAML 전개"}],
+        "workloop": [{
+            "workLabel": "커리큘럼 YAML 전개",
+            "workDetail": "구조화된 YAML을 섹션 카드와 실행 셀로 변환",
+        }],
         "events": [
             {"eventType": "tool-start", "payload": {"name": "write-curriculum-yaml", "workLabel": "커리큘럼 YAML 전개"}},
             {"eventType": "tool-result", "payload": {"name": "write-curriculum-yaml"}},
@@ -618,6 +624,7 @@ def testEvalHarnessChecksWorkloopAndStructuredYamlContract() -> None:
 
     assert report.passed
     assert report.observedWorkLabels == ("커리큘럼 YAML 전개",)
+    assert report.observedWorkDetails == ("구조화된 YAML을 섹션 카드와 실행 셀로 변환",)
 
 
 def testEvalHarnessFailsMissingStructuredYamlContract() -> None:
@@ -695,9 +702,9 @@ def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
             "toolSequence": ["packages-check", "packages-install", "cell-call"],
             "policyViolationCount": 0,
             "workloop": [
-                {"workLabel": "라이브러리 확인"},
-                {"workLabel": "uv 라이브러리 설치"},
-                {"workLabel": "셀 실행/검증"},
+                {"workLabel": "라이브러리 확인", "workDetail": "matplotlib 설치 여부 확인"},
+                {"workLabel": "uv 라이브러리 설치", "workDetail": "matplotlib를 uv로 설치"},
+                {"workLabel": "셀 실행/검증", "workDetail": "cell-1 실행 또는 검증"},
             ],
             "events": [
                 {"eventType": "tool-start"},

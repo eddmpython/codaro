@@ -70,7 +70,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - tool payload에는 `category`, `lane`, `target`, `risk`, `traceEventIndex`, `turnElapsedMs`, `workLabel`, `workDetail`을 붙인다.
    - `tool-result` trace event에는 평가 가능한 result signal을 보존한다. 예: `write-curriculum-yaml.document`, `packages-check.missing`, `packages-install.success`, `cell-call.passed`.
    - response의 `trace.toolSequence`와 `trace.policyViolationCount`는 평가 harness의 입력으로 쓴다.
-   - response의 `trace.workloop`은 사용자가 읽을 수 있는 단계 품질 평가에 쓴다. 정책 위반, 작업 전 확인 질문, provider 오류는 반드시 사람이 읽을 수 있는 `workLabel`/`workDetail`/`error`를 가진다.
+   - response의 `trace.workloop`은 사용자가 읽을 수 있는 단계 품질 평가에 쓴다. golden case는 `workLabel`뿐 아니라 핵심 `workDetail` 문장도 검증한다. 정책 위반, 작업 전 확인 질문, provider 오류는 반드시 사람이 읽을 수 있는 `workLabel`/`workDetail`/`error`를 가진다.
    - streaming 중 provider 오류는 `error` event와 trace `turn-error`로 남긴다.
    - golden case는 명시적으로 허용한 경우가 아니면 policy violation이 1건이라도 있으면 실패다.
    - dependency preflight golden case는 `packages-check → packages-install → cell-call` exact sequence를 요구한다. 필요한 도구가 모두 있어도 순서가 다르거나 불필요한 tool call이 끼면 실패다.
