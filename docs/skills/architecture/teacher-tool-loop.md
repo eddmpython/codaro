@@ -48,6 +48,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - 섹션 하나가 학습카드 하나다. 한 개념을 작은 카드 여러 개로 쪼개 반복하지 않는다.
    - `meta.packages`는 패키지 preflight의 1차 입력이다.
    - YAML을 만들면 반드시 `write-curriculum-yaml`로 materialize한다.
+   - `create-guide`, `create-learning-card`, `create-quiz`, `create-notebook-exercise`는 기존/단일 실습 보조용이다. 신규 전체 레슨은 이 도구들로 작은 카드 묶음을 만들지 않고 `write-curriculum-yaml`을 쓴다.
    - materialize 결과 document는 `나만의 커리큘럼`에 저장되어 커리큘럼 화면에서 열린다.
 
 5. **Cell 단위 조작**

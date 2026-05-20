@@ -132,8 +132,18 @@ class TestToolRegistry:
         yamlDescription = function["parameters"]["properties"]["yamlContent"]["description"]
 
         assert "Required structured contract for new lessons" in yamlDescription
+        assert "intro(direction,benefits,diagram.steps,diagram.runtime)" in yamlDescription
         assert "sections[].title/subtitle/goal/why/explanation/tips/snippet/exercise/check" in yamlDescription
+        assert "Each section becomes one learning card" in yamlDescription
         assert "do not use sections[].blocks unless converting a legacy curriculum" in function["description"]
+
+    def test_legacy_learning_card_tool_does_not_compete_with_section_card_lessons(self):
+        schema = next(schema for schema in toolSchemas() if schema["function"]["name"] == "create-learning-card")
+        description = schema["function"]["description"]
+
+        assert "legacy targeted concept drill" in description
+        assert "Prefer write-curriculum-yaml" in description
+        assert "structured section-card lessons" in description
 
     def test_every_tool_has_required_fields(self):
         for tool in allTools():

@@ -99,6 +99,46 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
             ),
         ),
         fileCriterion(
+            "teacher-prompt-contract-alignment",
+            "Teacher prompts and legacy practice tools steer new lessons to structured section-card YAML.",
+            (
+                ("src/codaro/ai/conversation.py", (
+                    "intro(direction,benefits,diagram.steps,diagram.runtime)",
+                    "Each new concept lives in one YAML section card",
+                    "legacy or targeted practice helpers",
+                )),
+                ("src/codaro/curriculum/learningSpec.py", (
+                    "sections(title,subtitle,goal,why,explanation,tips,snippet,exercise,check)",
+                    "Treat each section as one learning card",
+                    "not several small blocks",
+                    "packages-check",
+                    "packages-install",
+                )),
+                ("src/codaro/ai/toolDefinitions/learning.py", (
+                    "legacy targeted concept drill",
+                    "Prefer write-curriculum-yaml",
+                    "structured section-card lessons",
+                )),
+                ("docs/skills/architecture/teacher-tool-loop.md", (
+                    "`create-guide`, `create-learning-card`, `create-quiz`, `create-notebook-exercise`",
+                    "신규 전체 레슨은 이 도구들로 작은 카드 묶음을 만들지 않고 `write-curriculum-yaml`을 쓴다",
+                )),
+                ("docs/skills/identity/ai-integration.md", (
+                    "`write-curriculum-yaml`: structured YAML을 섹션 카드와 실행 셀로 전개",
+                    "`packages-check`, `packages-install`: 실행 전 라이브러리 확인과 uv 설치",
+                    "`sections[].blocks[]`는 기존 curriculum 변환용이다",
+                )),
+                ("tests/testTeacherArchitecture.py", (
+                    "testLearningSpecInstructionsPromoteStructuredSectionYaml",
+                    "create-learning-card: explanation + fill-blank card",
+                    "sections, and blocks",
+                )),
+                ("tests/testAiTools.py", (
+                    "test_legacy_learning_card_tool_does_not_compete_with_section_card_lessons",
+                )),
+            ),
+        ),
+        fileCriterion(
             "section-card-render-contract",
             "Section learning cards render as one structured card with stable marker parts.",
             (

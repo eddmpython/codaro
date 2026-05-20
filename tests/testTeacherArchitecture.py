@@ -43,6 +43,7 @@ from codaro.ai.teacher import (
     validateTeacherSkills,
 )
 from codaro.ai.types import LLMConfig, ToolCall, ToolResponse
+from codaro.curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS
 from codaro.document import createEmptyDocument
 from codaro.document.cellSchema import schemaSummary
 from codaro.ai.tools import toolSchemas
@@ -501,6 +502,21 @@ def testTeacherSkillRegistryReferencesRegisteredManifestTools() -> None:
     assert "write-curriculum-yaml(lane=curriculum,target=curriculum-yaml,risk=writes)" in prompt
     assert "sections[].blocks는 legacy 변환에만" in prompt
     assert "one learning card" in prompt
+    assert "intro.diagram.runtime" in prompt
+    assert "create-learning-card: explanation + fill-blank card" not in prompt
+    assert "Each new concept lives in one YAML section card" in prompt
+
+
+def testLearningSpecInstructionsPromoteStructuredSectionYaml() -> None:
+    assert "sections, and blocks" not in AI_TEACHER_INSTRUCTIONS
+    assert "intro(direction,benefits,diagram.steps,diagram.runtime)" in AI_TEACHER_INSTRUCTIONS
+    assert "sections(title,subtitle,goal,why,explanation,tips,snippet,exercise,check)" in AI_TEACHER_INSTRUCTIONS
+    assert "Treat each section as one learning card" in AI_TEACHER_INSTRUCTIONS
+    assert "not several small blocks" in AI_TEACHER_INSTRUCTIONS
+    assert "packages-check" in AI_TEACHER_INSTRUCTIONS
+    assert "packages-install" in AI_TEACHER_INSTRUCTIONS
+    assert "packages/install" not in AI_TEACHER_INSTRUCTIONS
+    assert "insert-block" not in AI_TEACHER_INSTRUCTIONS
 
 
 def testTeacherSkillRegistryReportsMissingRequiredTools() -> None:

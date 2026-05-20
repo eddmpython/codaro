@@ -46,7 +46,25 @@ OBJECTIVE_REQUIREMENTS = (
             )),
             ("tests/verifyLearningSystemReadiness.py", (
                 "learning-yaml-contract-ssot",
+                "teacher-prompt-contract-alignment",
                 "section-card-render-contract",
+            )),
+            ("src/codaro/ai/conversation.py", (
+                "Each new concept lives in one YAML section card",
+                "legacy or targeted practice helpers",
+            )),
+            ("src/codaro/curriculum/learningSpec.py", (
+                "Treat each section as one learning card",
+                "not several small blocks",
+            )),
+            ("src/codaro/ai/toolDefinitions/learning.py", (
+                "legacy targeted concept drill",
+                "Prefer write-curriculum-yaml",
+            )),
+            ("docs/skills/identity/ai-integration.md", (
+                "`write-curriculum-yaml`: structured YAML을 섹션 카드와 실행 셀로 전개",
+                "`packages-check`, `packages-install`: 실행 전 라이브러리 확인과 uv 설치",
+                "`sections[].blocks[]`는 기존 curriculum 변환용이다",
             )),
         ),
     ),

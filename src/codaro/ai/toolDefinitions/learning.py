@@ -49,7 +49,10 @@ TOOL_CREATE_GUIDE = ToolDef(
 
 TOOL_CREATE_LEARNING_CARD = ToolDef(
     name="create-learning-card",
-    description="Create a concept learning card with title, explanation, example code, and fill-in-the-blank exercise.",
+    description=(
+        "Create a legacy targeted concept drill with title, explanation, example code, and fill-in-the-blank exercise. "
+        "Prefer write-curriculum-yaml for new structured section-card lessons."
+    ),
     parameters={
         "type": "object",
         "properties": {
