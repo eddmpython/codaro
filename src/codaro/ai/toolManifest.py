@@ -1,8 +1,17 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
 from typing import Any
 
 from .toolRegistry import ToolDef, allTools
+
+
+@dataclass(frozen=True)
+class ToolManifestMetadata:
+    category: str
+    lane: str
+    target: str
+    risk: str = "normal"
 
 
 TOOL_GROUPS: dict[str, dict[str, str]] = {
@@ -69,141 +78,68 @@ TOOL_LANE_GROUPS: dict[str, dict[str, str]] = {
 }
 
 
+TOOL_METADATA: dict[str, ToolManifestMetadata] = {
+    "read-cells": ToolManifestMetadata("workbench", "read", "learning-editor"),
+    "write-cell": ToolManifestMetadata("workbench", "write", "learning-editor", "writes"),
+    "cell-call": ToolManifestMetadata("runtime", "cell-call", "learning-editor"),
+    "write-curriculum-yaml": ToolManifestMetadata("learning", "curriculum", "curriculum-yaml", "writes"),
+    "insert-block": ToolManifestMetadata("workbench", "write", "learning-editor"),
+    "update-block": ToolManifestMetadata("workbench", "write", "learning-editor"),
+    "delete-block": ToolManifestMetadata("workbench", "write", "learning-editor", "destructive"),
+    "get-blocks": ToolManifestMetadata("workbench", "read", "learning-editor"),
+    "execute-reactive": ToolManifestMetadata("runtime", "cell-call", "kernel-runtime"),
+    "get-variables": ToolManifestMetadata("runtime", "read", "kernel-runtime"),
+    "check-exercise": ToolManifestMetadata("runtime", "cell-call", "kernel-runtime"),
+    "create-guide": ToolManifestMetadata("learning", "write", "learning-editor"),
+    "create-learning-card": ToolManifestMetadata("learning", "write", "learning-editor"),
+    "create-quiz": ToolManifestMetadata("learning", "write", "learning-editor"),
+    "create-notebook-exercise": ToolManifestMetadata("learning", "write", "learning-editor"),
+    "track-achievement": ToolManifestMetadata("learning", "progress", "learner-progress"),
+    "split-notebook": ToolManifestMetadata("files", "write", "file-system"),
+    "generate-notebook": ToolManifestMetadata("files", "write", "learning-editor"),
+    "fs-write": ToolManifestMetadata("files", "write", "file-system", "writes"),
+    "packages-check": ToolManifestMetadata("files", "read", "kernel-runtime"),
+    "packages-install": ToolManifestMetadata("files", "write", "kernel-runtime", "writes"),
+    "http-request": ToolManifestMetadata("automation", "automation", "external-api", "external"),
+    "start-recording": ToolManifestMetadata("automation", "automation", "desktop-automation"),
+    "stop-recording": ToolManifestMetadata("automation", "automation", "desktop-automation"),
+    "run-automation": ToolManifestMetadata("automation", "automation", "desktop-automation", "input"),
+    "capture-screen": ToolManifestMetadata("sensory", "read", "screen"),
+    "read-screen-text": ToolManifestMetadata("sensory", "read", "screen"),
+    "find-element": ToolManifestMetadata("sensory", "read", "screen"),
+    "detect-elements": ToolManifestMetadata("sensory", "read", "screen"),
+    "voice-listen": ToolManifestMetadata("sensory", "read", "voice"),
+    "voice-speak": ToolManifestMetadata("sensory", "automation", "voice"),
+    "send-notification": ToolManifestMetadata("sensory", "automation", "external-channel"),
+    "click-element": ToolManifestMetadata("safety", "safety", "guarded-input", "input"),
+    "type-text": ToolManifestMetadata("safety", "safety", "guarded-input", "input"),
+    "press-hotkey": ToolManifestMetadata("safety", "safety", "guarded-input", "input"),
+    "wait-for": ToolManifestMetadata("safety", "safety", "guarded-input"),
+    "emergency-stop": ToolManifestMetadata("safety", "safety", "automation-safety", "safety"),
+}
+
+
 TOOL_CATEGORIES: dict[str, str] = {
-    "read-cells": "workbench",
-    "write-cell": "workbench",
-    "cell-call": "runtime",
-    "write-curriculum-yaml": "learning",
-    "insert-block": "workbench",
-    "update-block": "workbench",
-    "delete-block": "workbench",
-    "get-blocks": "workbench",
-    "execute-reactive": "runtime",
-    "get-variables": "runtime",
-    "check-exercise": "runtime",
-    "create-guide": "learning",
-    "create-learning-card": "learning",
-    "create-quiz": "learning",
-    "create-notebook-exercise": "learning",
-    "track-achievement": "learning",
-    "split-notebook": "files",
-    "generate-notebook": "files",
-    "fs-write": "files",
-    "packages-check": "files",
-    "packages-install": "files",
-    "http-request": "automation",
-    "start-recording": "automation",
-    "stop-recording": "automation",
-    "run-automation": "automation",
-    "capture-screen": "sensory",
-    "read-screen-text": "sensory",
-    "find-element": "sensory",
-    "detect-elements": "sensory",
-    "voice-listen": "sensory",
-    "voice-speak": "sensory",
-    "send-notification": "sensory",
-    "click-element": "safety",
-    "type-text": "safety",
-    "press-hotkey": "safety",
-    "wait-for": "safety",
-    "emergency-stop": "safety",
+    toolName: metadata.category
+    for toolName, metadata in TOOL_METADATA.items()
 }
 
 
 TOOL_LANES: dict[str, str] = {
-    "read-cells": "read",
-    "write-cell": "write",
-    "cell-call": "cell-call",
-    "write-curriculum-yaml": "curriculum",
-    "get-blocks": "read",
-    "get-variables": "read",
-    "insert-block": "write",
-    "update-block": "write",
-    "delete-block": "write",
-    "execute-reactive": "cell-call",
-    "check-exercise": "cell-call",
-    "create-guide": "write",
-    "create-learning-card": "write",
-    "create-quiz": "write",
-    "create-notebook-exercise": "write",
-    "track-achievement": "progress",
-    "split-notebook": "write",
-    "generate-notebook": "write",
-    "fs-write": "write",
-    "packages-check": "read",
-    "packages-install": "write",
-    "http-request": "automation",
-    "start-recording": "automation",
-    "stop-recording": "automation",
-    "run-automation": "automation",
-    "capture-screen": "read",
-    "read-screen-text": "read",
-    "find-element": "read",
-    "detect-elements": "read",
-    "voice-listen": "read",
-    "voice-speak": "automation",
-    "send-notification": "automation",
-    "click-element": "safety",
-    "type-text": "safety",
-    "press-hotkey": "safety",
-    "wait-for": "safety",
-    "emergency-stop": "safety",
+    toolName: metadata.lane
+    for toolName, metadata in TOOL_METADATA.items()
 }
 
 
 TOOL_TARGETS: dict[str, str] = {
-    "read-cells": "learning-editor",
-    "write-cell": "learning-editor",
-    "cell-call": "learning-editor",
-    "write-curriculum-yaml": "curriculum-yaml",
-    "get-blocks": "learning-editor",
-    "insert-block": "learning-editor",
-    "update-block": "learning-editor",
-    "delete-block": "learning-editor",
-    "execute-reactive": "kernel-runtime",
-    "get-variables": "kernel-runtime",
-    "check-exercise": "kernel-runtime",
-    "create-guide": "learning-editor",
-    "create-learning-card": "learning-editor",
-    "create-quiz": "learning-editor",
-    "create-notebook-exercise": "learning-editor",
-    "track-achievement": "learner-progress",
-    "split-notebook": "file-system",
-    "generate-notebook": "learning-editor",
-    "fs-write": "file-system",
-    "packages-check": "kernel-runtime",
-    "packages-install": "kernel-runtime",
-    "http-request": "external-api",
-    "start-recording": "desktop-automation",
-    "stop-recording": "desktop-automation",
-    "run-automation": "desktop-automation",
-    "capture-screen": "screen",
-    "read-screen-text": "screen",
-    "find-element": "screen",
-    "detect-elements": "screen",
-    "voice-listen": "voice",
-    "voice-speak": "voice",
-    "send-notification": "external-channel",
-    "click-element": "guarded-input",
-    "type-text": "guarded-input",
-    "press-hotkey": "guarded-input",
-    "wait-for": "guarded-input",
-    "emergency-stop": "automation-safety",
+    toolName: metadata.target
+    for toolName, metadata in TOOL_METADATA.items()
 }
 
 
 TOOL_RISK: dict[str, str] = {
-    "write-cell": "writes",
-    "delete-block": "destructive",
-    "write-curriculum-yaml": "writes",
-    "fs-write": "writes",
-    "packages-install": "writes",
-    "http-request": "external",
-    "click-element": "input",
-    "type-text": "input",
-    "press-hotkey": "input",
-    "run-automation": "input",
-    "emergency-stop": "safety",
+    toolName: metadata.risk
+    for toolName, metadata in TOOL_METADATA.items()
 }
 
 
@@ -234,12 +170,13 @@ def toolDescriptor(toolName: str) -> dict[str, Any]:
 
     tool = getTool(toolName)
     if tool is None:
+        metadata = _metadataForToolName(toolName)
         return {
             "name": toolName,
-            "category": TOOL_CATEGORIES.get(toolName, "workbench"),
-            "lane": TOOL_LANES.get(toolName, "write"),
-            "target": TOOL_TARGETS.get(toolName, "learning-editor"),
-            "risk": TOOL_RISK.get(toolName, "normal"),
+            "category": metadata.category,
+            "lane": metadata.lane,
+            "target": metadata.target,
+            "risk": metadata.risk,
         }
     return _toolManifestItem(tool)
 
@@ -247,14 +184,19 @@ def toolDescriptor(toolName: str) -> dict[str, Any]:
 def _toolManifestItem(tool: ToolDef) -> dict[str, Any]:
     required = tool.parameters.get("required", [])
     properties = tool.parameters.get("properties", {})
+    metadata = _metadataForToolName(tool.name)
     return {
         "name": tool.name,
         "description": tool.description,
         "handler": tool.handler,
-        "category": TOOL_CATEGORIES.get(tool.name, "workbench"),
-        "lane": TOOL_LANES.get(tool.name, "write"),
-        "target": TOOL_TARGETS.get(tool.name, "learning-editor"),
-        "risk": TOOL_RISK.get(tool.name, "normal"),
+        "category": metadata.category,
+        "lane": metadata.lane,
+        "target": metadata.target,
+        "risk": metadata.risk,
         "required": required if isinstance(required, list) else [],
         "parameters": list(properties.keys()) if isinstance(properties, dict) else [],
     }
+
+
+def _metadataForToolName(toolName: str) -> ToolManifestMetadata:
+    return TOOL_METADATA.get(toolName, ToolManifestMetadata("workbench", "write", "learning-editor"))

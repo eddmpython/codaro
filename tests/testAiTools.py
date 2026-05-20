@@ -15,6 +15,14 @@ from codaro.ai.tools import (
 )
 from codaro.ai.toolContract import validateDefaultToolContract
 from codaro.ai.toolExecutor import ToolExecutor
+from codaro.ai.toolManifest import (
+    TOOL_CATEGORIES,
+    TOOL_LANES,
+    TOOL_METADATA,
+    TOOL_RISK,
+    TOOL_TARGETS,
+    toolDescriptor,
+)
 from codaro.document.models import BlockConfig, CodaroDocument
 
 
@@ -70,6 +78,20 @@ class TestToolRegistry:
 
     def test_default_tool_contract_is_complete(self):
         assert validateDefaultToolContract() == []
+
+    def test_tool_manifest_metadata_is_ssot(self):
+        for tool in allTools():
+            metadata = TOOL_METADATA[tool.name]
+            descriptor = toolDescriptor(tool.name)
+
+            assert TOOL_CATEGORIES[tool.name] == metadata.category
+            assert TOOL_LANES[tool.name] == metadata.lane
+            assert TOOL_TARGETS[tool.name] == metadata.target
+            assert TOOL_RISK[tool.name] == metadata.risk
+            assert descriptor["category"] == metadata.category
+            assert descriptor["lane"] == metadata.lane
+            assert descriptor["target"] == metadata.target
+            assert descriptor["risk"] == metadata.risk
 
     def test_get_returns_none_for_unknown(self):
         assert getTool("nonexistent-xyz") is None
