@@ -290,6 +290,11 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
 
   const installedNames = useMemo(() => new Set(installedPackages.map((item) => normalizePackageName(item.name))), [installedPackages]);
   const missingPackages = requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item)));
+  const activeMessage = installing
+    ? `${installing} 패키지를 uv로 설치 중입니다. 처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.`
+    : checking
+      ? "필요한 라이브러리 설치 상태를 확인 중입니다."
+      : null;
 
   useEffect(() => {
     let cancelled = false;
@@ -386,8 +391,9 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
         })}
       </div>
       {!apiOnline ? <div className="mt-2 text-xs leading-5 text-muted-foreground">서버 세션이 열리면 uv 설치를 실행할 수 있습니다.</div> : null}
+      {activeMessage ? <div className="mt-2 text-xs leading-5 text-muted-foreground">{activeMessage}</div> : null}
       {error ? <div className="mt-2 text-xs leading-5 text-destructive">{error}</div> : null}
-      {!error && lastMessage ? <div className="mt-2 text-xs leading-5 text-muted-foreground">{lastMessage}</div> : null}
+      {!activeMessage && !error && lastMessage ? <div className="mt-2 text-xs leading-5 text-muted-foreground">{lastMessage}</div> : null}
     </div>
   );
 }

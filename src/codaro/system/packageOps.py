@@ -111,6 +111,7 @@ print(json.dumps(sorted(seen.values(), key=lambda item: item["name"].lower())))
 
 
 _VALID_PACKAGE_NAME = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?(\[.*\])?(([<>=!~]+)[\d.*]+)?$")
+_PLAIN_PACKAGE_NAME = re.compile(r"^[A-Za-z0-9]([A-Za-z0-9._-]*[A-Za-z0-9])?$")
 
 
 def validatePackageName(name: str) -> None:
@@ -129,16 +130,37 @@ def validatePackageName(name: str) -> None:
 
 
 async def installPackage(name: str) -> InstallResult:
-    validatePackageName(name)
     loop = asyncio.get_running_loop()
     return await loop.run_in_executor(None, _installSync, name)
 
 
 def _installSync(name: str) -> InstallResult:
     try:
+        validatePackageName(name)
+    except PackageEnvironmentError as error:
+        return InstallResult(package=name, success=False, message=error.message)
+
+    try:
         pythonPath = getProjectPythonPath()
     except PackageEnvironmentError as error:
         return InstallResult(package=name, success=False, message=error.message)
+
+    try:
+        installedVersion = installedPackageVersion(name, pythonPath=pythonPath)
+    except FileNotFoundError:
+        return InstallResult(
+            package=name,
+            success=False,
+            message="Project virtual environment Python executable was not found.",
+        )
+    except subprocess.TimeoutExpired:
+        installedVersion = None
+    if installedVersion:
+        return InstallResult(
+            package=name,
+            success=True,
+            message=f"{name} is already installed in the project .venv ({installedVersion}).",
+        )
 
     try:
         result = runUvPip("install", [name], pythonPath=pythonPath, timeoutSeconds=180)
@@ -170,6 +192,11 @@ async def uninstallPackage(name: str) -> InstallResult:
 
 def _uninstallSync(name: str) -> InstallResult:
     try:
+        validatePackageName(name)
+    except PackageEnvironmentError as error:
+        return InstallResult(package=name, success=False, message=error.message)
+
+    try:
         pythonPath = getProjectPythonPath()
     except PackageEnvironmentError as error:
         return InstallResult(package=name, success=False, message=error.message)
@@ -195,6 +222,34 @@ def _uninstallSync(name: str) -> InstallResult:
         success=result.returncode == 0,
         message=output,
     )
+
+
+def installedPackageVersion(name: str, *, pythonPath: Path) -> str | None:
+    if not _PLAIN_PACKAGE_NAME.match(name):
+        return None
+
+    script = """
+import importlib.metadata as metadata
+import sys
+
+try:
+    dist = metadata.distribution(sys.argv[1])
+except metadata.PackageNotFoundError:
+    raise SystemExit(1)
+
+print(dist.version)
+""".strip()
+    result = subprocess.run(
+        [str(pythonPath), "-X", "utf8", "-c", script, name],
+        capture_output=True,
+        text=True,
+        timeout=10,
+        cwd=PROJECT_ROOT,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip() or None
 
 
 def runUvPip(

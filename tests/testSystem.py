@@ -141,11 +141,39 @@ def testInstallPackageReportsMissingEnvironment(monkeypatch) -> None:
     assert "virtual environment" in result.message
 
 
+def testInstallPackageReportsInvalidName() -> None:
+    result = _run(packageOps.installPackage("package/evil"))
+
+    assert result.success is False
+    assert "Invalid package name" in result.message or "Suspicious package name" in result.message
+
+
+def testInstallPackageSkipsUvWhenPlainPackageAlreadyInstalled(monkeypatch, tmp_path: Path) -> None:
+    pythonPath = tmp_path / "python.exe"
+    pythonPath.write_text("", encoding="utf-8")
+
+    monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
+    monkeypatch.setattr(packageOps, "installedPackageVersion", lambda name, *, pythonPath: "1.2.3")
+
+    def failRunUvPip(*args, **kwargs):
+        del args, kwargs
+        raise AssertionError("uv pip should not run for an already installed plain package")
+
+    monkeypatch.setattr(packageOps, "runUvPip", failRunUvPip)
+
+    result = _run(packageOps.installPackage("rich"))
+
+    assert result.success is True
+    assert "already installed" in result.message
+    assert "1.2.3" in result.message
+
+
 def testInstallPackageReportsTimeout(monkeypatch, tmp_path: Path) -> None:
     pythonPath = tmp_path / "python.exe"
     pythonPath.write_text("", encoding="utf-8")
 
     monkeypatch.setattr(packageOps, "getProjectPythonPath", lambda: pythonPath)
+    monkeypatch.setattr(packageOps, "installedPackageVersion", lambda name, *, pythonPath: None)
 
     def fakeRunUvPip(*args, **kwargs):
         del args, kwargs
@@ -157,6 +185,13 @@ def testInstallPackageReportsTimeout(monkeypatch, tmp_path: Path) -> None:
 
     assert result.success is False
     assert "timed out" in result.message
+
+
+def testUninstallPackageReportsInvalidName() -> None:
+    result = _run(packageOps.uninstallPackage("package/evil"))
+
+    assert result.success is False
+    assert "Invalid package name" in result.message or "Suspicious package name" in result.message
 
 
 def testUninstallPackageUsesProjectPython(monkeypatch, tmp_path: Path) -> None:
