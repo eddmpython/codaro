@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -21,8 +22,42 @@ class CodeCompletionResult:
         }
 
 
+@dataclass(frozen=True)
+class CodeCompletionRequest:
+    prefix: str
+    suffix: str = ""
+    context: dict[str, Any] | None = None
+    providerOverride: str | None = None
+
+    @classmethod
+    def fromPayload(cls, payload: Mapping[str, Any]) -> "CodeCompletionRequest":
+        context = payload.get("context")
+        return cls(
+            prefix=_payloadText(payload.get("prefix"), fallback=""),
+            suffix=_payloadText(payload.get("suffix"), fallback=""),
+            context=context if isinstance(context, dict) else None,
+            providerOverride=_optionalPayloadText(payload.get("provider")),
+        )
+
+
 def emptyCompletionResult() -> CodeCompletionResult:
     return CodeCompletionResult(completions=[], provider="", model="")
+
+
+def completeCodeFromRequest(
+    *,
+    profileManager: Any,
+    request: CodeCompletionRequest,
+    providerFactory: Callable[[LLMConfig], Any] = createProvider,
+) -> CodeCompletionResult:
+    return completeCode(
+        profileManager=profileManager,
+        prefix=request.prefix,
+        suffix=request.suffix,
+        context=request.context,
+        providerOverride=request.providerOverride,
+        providerFactory=providerFactory,
+    )
 
 
 def completeCode(
@@ -119,3 +154,19 @@ def completionTextFromAnswer(answer: str) -> str:
     if len(lines) <= 2:
         return ""
     return "\n".join(lines[1:-1]).strip()
+
+
+def _payloadText(value: Any, *, fallback: str) -> str:
+    if value is None:
+        return fallback
+    if isinstance(value, str):
+        return value
+    return str(value)
+
+
+def _optionalPayloadText(value: Any) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value
+    return str(value)

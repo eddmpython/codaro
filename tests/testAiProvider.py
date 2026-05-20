@@ -2,7 +2,13 @@ from __future__ import annotations
 
 import pytest
 
-from codaro.ai.completion import buildCompletionMessages, completeCode, completionTextFromAnswer
+from codaro.ai.completion import (
+    CodeCompletionRequest,
+    buildCompletionMessages,
+    completeCode,
+    completeCodeFromRequest,
+    completionTextFromAnswer,
+)
 from codaro.ai.providerModels import DEFAULT_OPENAI_CHAT_MODELS, filterOpenaiChatModelIds, providerModelList
 from codaro.ai.providerValidation import providerValidationConfig, validateProviderConnection
 from codaro.ai.oauthFlow import OAuthLoginFlow
@@ -341,6 +347,38 @@ class TestCompletion:
         assert providers[0].config.temperature == 0
         assert providers[0].config.maxTokens == 120
         assert "Available variables" in providers[0].messages[0]["content"]
+
+    def test_completion_request_owns_payload_shape(self):
+        request = CodeCompletionRequest.fromPayload({
+            "prefix": 123,
+            "suffix": "\nprint(value)",
+            "provider": "custom",
+            "context": {"variables": [{"name": "value", "type": "int"}]},
+        })
+
+        assert request.prefix == "123"
+        assert request.suffix == "\nprint(value)"
+        assert request.providerOverride == "custom"
+        assert request.context == {"variables": [{"name": "value", "type": "int"}]}
+
+    def test_complete_code_from_request_uses_runtime_request(self):
+        profileManager = _CompletionProfileManager()
+        providers: list[_CompletionProvider] = []
+
+        def providerFactory(config: LLMConfig):
+            provider = _CompletionProvider(config)
+            providers.append(provider)
+            return provider
+
+        result = completeCodeFromRequest(
+            profileManager=profileManager,
+            request=CodeCompletionRequest(prefix="value = ", providerOverride="custom"),
+            providerFactory=providerFactory,
+        )
+
+        assert result.payload()["completions"] == ["value + 1"]
+        assert profileManager.resolvedProvider == "custom"
+        assert providers[0].config.provider == "custom"
 
 
 class TestOAuthChatGPTTools:

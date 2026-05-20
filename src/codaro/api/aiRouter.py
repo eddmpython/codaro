@@ -8,7 +8,7 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
-from ..ai.completion import completeCode, emptyCompletionResult
+from ..ai.completion import CodeCompletionRequest, completeCodeFromRequest, emptyCompletionResult
 from ..ai.oauthFlow import getOAuthLoginFlow
 from ..ai.profile import AiProfileManager, getProfileManager
 from ..ai.providerModels import providerModelList
@@ -235,21 +235,12 @@ def createAiRouter(state: Any) -> APIRouter:
     @router.post("/api/ai/complete")
     async def apiComplete(request: Request):
         body = await request.json()
-        prefix = body.get("prefix", "")
-        suffix = body.get("suffix", "")
-        providerOverride = body.get("provider")
-        context = body.get("context")
-
-        if not prefix.strip():
-            return emptyCompletionResult().payload()
+        completionRequest = CodeCompletionRequest.fromPayload(body)
 
         try:
-            return completeCode(
+            return completeCodeFromRequest(
                 profileManager=getProfileManager(),
-                prefix=prefix,
-                suffix=suffix,
-                context=context,
-                providerOverride=providerOverride,
+                request=completionRequest,
             ).payload()
         except _HANDLED_ERRORS as exc:
             logger.info("completion failed: %s", exc)

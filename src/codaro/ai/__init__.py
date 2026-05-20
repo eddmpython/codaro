@@ -1,8 +1,10 @@
 from .baseProvider import BaseProvider
 from .completion import (
     CodeCompletionResult,
+    CodeCompletionRequest,
     buildCompletionMessages,
     completeCode,
+    completeCodeFromRequest,
     completionContextText,
     completionTextFromAnswer,
     emptyCompletionResult,
@@ -39,11 +41,13 @@ from .types import LLMConfig, LLMResponse, ToolCall, ToolResponse
 __all__ = [
     "BaseProvider",
     "CodeCompletionResult",
+    "CodeCompletionRequest",
     "ConversationManager",
     "ConversationState",
     "buildSystemPrompt",
     "buildCompletionMessages",
     "completeCode",
+    "completeCodeFromRequest",
     "completionContextText",
     "completionTextFromAnswer",
     "createProvider",
