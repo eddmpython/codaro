@@ -417,6 +417,8 @@ def testTeacherSkillRegistryReferencesRegisteredManifestTools() -> None:
     assert tools["write-curriculum-yaml"]["lane"] == "curriculum"
     assert tools["read-cells"]["target"] == "learning-editor"
     assert "write-curriculum-yaml(lane=curriculum,target=curriculum-yaml,risk=writes)" in prompt
+    assert "sections[].blocks는 legacy 변환에만" in prompt
+    assert "one learning card" in prompt
 
 
 def testTeacherSkillRegistryReportsMissingRequiredTools() -> None:

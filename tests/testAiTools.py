@@ -114,6 +114,15 @@ class TestToolRegistry:
             assert isinstance(func["description"], str)
             assert "properties" in func["parameters"]
 
+    def test_curriculum_yaml_tool_schema_promotes_structured_section_contract(self):
+        schema = next(schema for schema in toolSchemas() if schema["function"]["name"] == "write-curriculum-yaml")
+        function = schema["function"]
+        yamlDescription = function["parameters"]["properties"]["yamlContent"]["description"]
+
+        assert "Required structured contract for new lessons" in yamlDescription
+        assert "sections[].title/subtitle/goal/why/explanation/tips/snippet/exercise/check" in yamlDescription
+        assert "do not use sections[].blocks unless converting a legacy curriculum" in function["description"]
+
     def test_every_tool_has_required_fields(self):
         for tool in allTools():
             assert tool.name

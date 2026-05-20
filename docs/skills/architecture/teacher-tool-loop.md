@@ -43,6 +43,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
 4. **Curriculum YAML 우선**
    - 학습 요청은 `meta`, `intro`, `sections` 구조의 YAML로 설계한다.
    - 신규 YAML은 structured section contract를 우선한다. `sections[].blocks[]`는 기존 curriculum 호환용이다.
+   - provider system prompt, teacher skill registry, `write-curriculum-yaml` tool schema는 모두 신규 레슨에서 `sections[].blocks[]` 대신 `title/subtitle/goal/why/explanation/tips/snippet/exercise/check` fields를 쓰도록 안내해야 한다.
    - 섹션 하나가 학습카드 하나다. 한 개념을 작은 카드 여러 개로 쪼개 반복하지 않는다.
    - `meta.packages`는 패키지 preflight의 1차 입력이다.
    - YAML을 만들면 반드시 `write-curriculum-yaml`로 materialize한다.

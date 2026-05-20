@@ -28,7 +28,10 @@ teacherSkills: tuple[TeacherSkill, ...] = (
         purpose="학습 요청을 curriculum YAML과 학습 셀 document로 전개한다.",
         trigger="사용자가 주제 학습, 레슨, 커리큘럼, 루틴 학습을 요청할 때",
         requiredTools=("write-curriculum-yaml", "read-cells"),
-        policy="학습 요청을 긴 채팅 답변만으로 끝내지 않는다.",
+        policy=(
+            "신규 레슨은 meta/intro/sections structured YAML로 만들고 sections[].blocks는 legacy 변환에만 쓴다. "
+            "각 section은 goal/why/explanation/tips/snippet/exercise/check를 가진 하나의 학습카드 단위다."
+        ),
     ),
     TeacherSkill(
         skillId="cell-editing",

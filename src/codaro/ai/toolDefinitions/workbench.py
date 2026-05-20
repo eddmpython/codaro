@@ -160,16 +160,23 @@ TOOL_CELL_CALL = ToolDef(
 
 TOOL_WRITE_CURRICULUM_YAML = ToolDef(
     name="write-curriculum-yaml",
-    description="Convert a YAML curriculum draft into runnable learning editor cells and load it into the editor.",
+    description=(
+        "Convert a structured Codaro curriculum YAML draft into section-card learning cells and load it into the editor. "
+        "For new lessons, use meta, intro, and sections with title/subtitle/goal/why/explanation/tips/snippet/exercise/check; "
+        "do not use sections[].blocks unless converting a legacy curriculum."
+    ),
     parameters={
         "type": "object",
         "properties": {
             "yamlContent": {
                 "type": "string",
                 "description": (
-                    "Curriculum YAML. Prefer the structured contract: meta(title,audience,difficulty,packages), "
-                    "intro(direction,benefits,diagram), sections(title,subtitle,goal,why,explanation,tips,snippet,exercise,check). "
-                    "Legacy sections[].blocks is still accepted."
+                    "Curriculum YAML. Required structured contract for new lessons: "
+                    "meta(title,audience,difficulty,packages), intro(direction,benefits,diagram), "
+                    "sections[].title/subtitle/goal/why/explanation/tips/snippet/exercise/check. "
+                    "Each section becomes one learning card: snippet is the example, "
+                    "exercise.prompt/starterCode/solution/hints/check is the learner input cell, and check is validation feedback. "
+                    "Use legacy sections[].blocks only for existing legacy curriculum conversion."
                 ),
             },
             "category": {
