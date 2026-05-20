@@ -74,6 +74,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - 모든 turn은 `traceId`를 가진다.
    - tool payload에는 `category`, `lane`, `target`, `risk`, `traceEventIndex`, `turnElapsedMs`, `workLabel`, `workDetail`을 붙인다.
    - `tool-result` trace event에는 평가 가능한 result signal을 보존한다. 예: `write-curriculum-yaml.document`, `write-curriculum-yaml.sectionCount`, `packages-check.missing`, `packages-install.success`, `cell-call.passed`.
+   - 다음 provider 호출에 넣는 `role: tool` message는 무제한 raw result가 아니다. 큰 result는 valid JSON envelope로 줄이고 `truncated`, `originalChars`, `sectionCount`, `exerciseCellCount`, `contractGapCount`, `loadedInEditor` 같은 핵심 signal을 보존한다. 현재 turn payload와 trace에는 full result를 남겨 사용자가 펼쳐 확인할 수 있어야 한다.
    - `packages-install` result signal은 `success`뿐 아니라 `installer: uv`, `environment: project .venv`, `durationMs`, `skipped`를 보존한다. 이미 설치된 plain package는 `skipped: true`로 남긴다. 프론트 workloop detail은 이 result signal을 사용해 `설치 완료 · uv · project .venv · 42ms` 또는 `이미 준비됨 · project .venv`처럼 결과까지 읽히게 한다.
    - response의 `trace.toolSequence`와 `trace.policyViolationCount`는 평가 harness의 입력으로 쓴다.
    - response의 `trace.workloop`은 사용자가 읽을 수 있는 단계 품질 평가에 쓴다. golden case는 `workLabel`뿐 아니라 핵심 `workDetail` 문장도 검증한다. 정책 위반, 작업 전 확인 질문, provider 오류는 반드시 사람이 읽을 수 있는 `workLabel`/`workDetail`/`error`를 가진다.

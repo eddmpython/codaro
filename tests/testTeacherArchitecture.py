@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import copy
+import json
 
+import codaro.ai.teacher.providerLoop as teacherProviderLoop
 from codaro.ai.conversation import ConversationManager, buildSystemPrompt
 from codaro.ai.toolExecutor import ToolExecutor
 from codaro.ai.teacher import (
@@ -1245,6 +1247,77 @@ def testProviderLoopOwnsToolRoundRecording() -> None:
     assert convManager.toolResults[0]["toolCallId"] == "call-1"
     assert [message["role"] for message in messages] == ["assistant", "tool"]
     assert trace.toolSequence() == ["read-cells"]
+
+
+def testProviderLoopBoundsLargeToolResultMessages(monkeypatch) -> None:
+    monkeypatch.setattr(teacherProviderLoop, "PROVIDER_TOOL_RESULT_MAX_CHARS", 900)
+    largeResult = {
+        "ok": True,
+        "title": "큰 커리큘럼",
+        "loadedInEditor": True,
+        "sectionCount": 2,
+        "exerciseCellCount": 2,
+        "contractGapCount": 0,
+        "document": {"blocks": [{"content": "x" * 6000}]},
+    }
+    toolCalls = [ToolCall(id="call-large", name="write-curriculum-yaml", arguments={"yamlContent": "meta:"})]
+    convManager = _FakeConversationManager()
+    messages: list[dict] = []
+    orchestrator = TeacherOrchestrator.fromContext({})
+    trace = orchestrator.startTrace("conv-large")
+
+    roundResult = asyncio.run(executeTeacherToolRound(
+        toolCalls=toolCalls,
+        assistantAnswer="",
+        convManager=convManager,
+        conversationId="conv-large",
+        messages=messages,
+        executor=_ScriptedExecutor({"write-curriculum-yaml": largeResult}),
+        policy=ToolPolicyState(),
+        orchestrator=orchestrator,
+        trace=trace,
+    ))
+
+    providerContent = messages[-1]["content"]
+    providerPayload = json.loads(providerContent)
+    assert len(providerContent) <= 900
+    assert providerPayload["truncated"] is True
+    assert providerPayload["truncatedReason"] == "provider-tool-result-max-chars"
+    assert providerPayload["loadedInEditor"] is True
+    assert providerPayload["sectionCount"] == 2
+    assert providerPayload["exerciseCellCount"] == 2
+    assert providerPayload["contractGapCount"] == 0
+    assert "document" not in providerPayload
+    assert convManager.toolResults[0]["result"] == providerContent
+    assert roundResult.toolResults[0]["result"]["document"]["blocks"][0]["content"] == "x" * 6000
+    assert trace.events[-1].payload["result"]["document"]["blocks"][0]["content"] == "x" * 6000
+
+
+def testProviderToolResultSerializationPreservesSmallPayloads() -> None:
+    result = {"success": True, "package": "pandas", "installer": "uv", "durationMs": 42}
+
+    content = teacherProviderLoop.serializeToolResultForProvider(result, maxChars=900)
+
+    assert json.loads(content) == result
+
+
+def testProviderToolResultSerializationBoundsLargeSignalText() -> None:
+    result = {
+        "ok": False,
+        "message": "m" * 5000,
+        "contractGaps": [{"path": "sections.0.explanation", "message": "g" * 5000}],
+        "document": {"blocks": [{"content": "x" * 6000}]},
+    }
+
+    content = teacherProviderLoop.serializeToolResultForProvider(result, maxChars=1200)
+    payload = json.loads(content)
+
+    assert len(content) <= 1200
+    assert payload["truncated"] is True
+    assert payload["truncatedReason"] == "provider-tool-result-max-chars"
+    assert payload["message"].endswith("...[truncated]")
+    assert payload["contractGaps"][0]["message"].endswith("...[truncated]")
+    assert "document" not in payload
 
 
 def testProviderLoopOwnsNonStreamingTurn() -> None:

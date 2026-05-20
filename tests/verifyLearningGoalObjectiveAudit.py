@@ -228,6 +228,16 @@ OBJECTIVE_REQUIREMENTS = (
                 "(\"write-curriculum-yaml\", \"contractGapCount\")",
                 "expectedNoContractGaps",
             )),
+            ("src/codaro/ai/teacher/providerLoop.py", (
+                "serializeToolResultForProvider",
+                "provider-tool-result-max-chars",
+                "PROVIDER_TOOL_RESULT_SIGNAL_KEYS",
+            )),
+            ("tests/testTeacherArchitecture.py", (
+                "testProviderLoopBoundsLargeToolResultMessages",
+                "roundResult.toolResults[0][\"result\"]",
+                "\"truncatedReason\"",
+            )),
             ("tests/verifyTeacherGoldenE2e.py", (
                 "teacher golden e2e score",
                 "\"score\": score",

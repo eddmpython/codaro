@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 import logging
+import os
 from dataclasses import dataclass
 from typing import Any
 
@@ -14,6 +15,16 @@ from .traceModel import TeacherTrace
 
 logger = logging.getLogger(__name__)
 
+def _envInt(name: str, default: int) -> int:
+    try:
+        return int(os.environ.get(name, str(default)))
+    except ValueError:
+        return default
+
+
+PROVIDER_TOOL_RESULT_MAX_CHARS = _envInt("CODARO_PROVIDER_TOOL_RESULT_MAX_CHARS", 16000)
+PROVIDER_TOOL_RESULT_SIGNAL_TEXT_MAX_CHARS = 240
+
 PROVIDER_LOOP_ERRORS = (
     AttributeError,
     ConnectionError,
@@ -24,6 +35,33 @@ PROVIDER_LOOP_ERRORS = (
     RuntimeError,
     TypeError,
     ValueError,
+)
+
+PROVIDER_TOOL_RESULT_SIGNAL_KEYS = (
+    "ok",
+    "success",
+    "error",
+    "message",
+    "title",
+    "status",
+    "passed",
+    "missing",
+    "packages",
+    "package",
+    "installer",
+    "environment",
+    "durationMs",
+    "skipped",
+    "loadedInEditor",
+    "documentId",
+    "sectionCount",
+    "exerciseCellCount",
+    "snippetCellCount",
+    "contractGapCount",
+    "contractGaps",
+    "runtimePackageCount",
+    "blockCount",
+    "solutionCount",
 )
 
 
@@ -298,10 +336,93 @@ async def finishTeacherToolCall(
         result = await executor.execute(toolCall.name, toolCall.arguments)
     policy.recordResult(toolCall.name, toolCall.arguments, result)
 
-    resultText = json.dumps(result, ensure_ascii=False)
+    resultText = serializeToolResultForProvider(result)
     convManager.addToolResult(conversationId, toolCall.id, resultText)
     messages.append({"role": "tool", "tool_call_id": toolCall.id, "content": resultText})
     return orchestrator.toolCallResult(trace, toolCall.id, toolCall.name, toolCall.arguments, result)
+
+
+def serializeToolResultForProvider(result: dict[str, Any], *, maxChars: int | None = None) -> str:
+    fullText = json.dumps(result, ensure_ascii=False, default=str)
+    limit = providerToolResultMaxChars(maxChars)
+    if len(fullText) <= limit:
+        return fullText
+    return _boundedToolResultEnvelope(result, fullText, limit)
+
+
+def providerToolResultMaxChars(maxChars: int | None = None) -> int:
+    value = PROVIDER_TOOL_RESULT_MAX_CHARS if maxChars is None else maxChars
+    if not isinstance(value, int) or isinstance(value, bool) or value < 512:
+        return 512
+    return value
+
+
+def _boundedToolResultEnvelope(result: dict[str, Any], fullText: str, limit: int) -> str:
+    previewLength = min(4000, max(0, limit // 2))
+    while previewLength >= 0:
+        envelope = {
+            "truncated": True,
+            "truncatedReason": "provider-tool-result-max-chars",
+            "originalChars": len(fullText),
+            "maxChars": limit,
+            **_providerToolResultSignals(result),
+        }
+        if previewLength:
+            envelope["preview"] = fullText[:previewLength]
+        boundedText = json.dumps(envelope, ensure_ascii=False, default=str)
+        if len(boundedText) <= limit or previewLength == 0:
+            if len(boundedText) <= limit:
+                return boundedText
+            return _minimalToolResultEnvelope(result, fullText, limit)
+        previewLength = max(0, previewLength - max(128, len(boundedText) - limit))
+    return _minimalToolResultEnvelope(result, fullText, limit)
+
+
+def _minimalToolResultEnvelope(result: dict[str, Any], fullText: str, limit: int) -> str:
+    envelope = {
+        "truncated": True,
+        "truncatedReason": "provider-tool-result-max-chars",
+        "originalChars": len(fullText),
+        "maxChars": limit,
+    }
+    for key in ("ok", "success", "loadedInEditor", "sectionCount", "exerciseCellCount", "contractGapCount"):
+        if key in result:
+            envelope[key] = _compactProviderSignalValue(result[key])
+    return json.dumps(envelope, ensure_ascii=False, default=str)
+
+
+def _providerToolResultSignals(result: dict[str, Any]) -> dict[str, Any]:
+    signals: dict[str, Any] = {}
+    for key in PROVIDER_TOOL_RESULT_SIGNAL_KEYS:
+        if key not in result:
+            continue
+        value = result[key]
+        if key == "contractGaps" and isinstance(value, list):
+            signals[key] = [_compactProviderSignalValue(item) for item in value[:8]]
+        elif key == "packages" and isinstance(value, list):
+            signals[key] = [_compactProviderSignalValue(item) for item in value[:20]]
+        else:
+            signals[key] = _compactProviderSignalValue(value)
+    return signals
+
+
+def _compactProviderSignalValue(value: Any, *, depth: int = 0) -> Any:
+    if isinstance(value, str):
+        if len(value) <= PROVIDER_TOOL_RESULT_SIGNAL_TEXT_MAX_CHARS:
+            return value
+        return f"{value[:PROVIDER_TOOL_RESULT_SIGNAL_TEXT_MAX_CHARS]}...[truncated]"
+    if isinstance(value, list):
+        if depth >= 2:
+            return f"[{len(value)} items]"
+        return [_compactProviderSignalValue(item, depth=depth + 1) for item in value[:20]]
+    if isinstance(value, dict):
+        if depth >= 2:
+            return {"keys": list(value.keys())[:8]}
+        return {
+            str(key): _compactProviderSignalValue(item, depth=depth + 1)
+            for key, item in list(value.items())[:16]
+        }
+    return value
 
 
 async def executeTeacherToolRound(
