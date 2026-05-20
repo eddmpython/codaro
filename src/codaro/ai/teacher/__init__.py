@@ -23,7 +23,7 @@ from .providerStream import runTeacherChatStream, streamTeacherTokens
 from .skillRegistry import TeacherSkill, teacherSkillPrompt, teacherSkills
 from .teacherOrchestrator import TeacherOrchestrator
 from .toolLifecycle import toolCallResult, toolCallStart
-from .toolPolicy import ToolPolicyState, ToolPolicyViolation
+from .toolPolicy import ToolPolicyState, ToolPolicyViolation, toolRequiresDependencyPreflight
 from .traceModel import TeacherTrace
 from .turnSession import TeacherConversationNotFound, TeacherTurnSession, prepareTeacherTurn
 
@@ -57,4 +57,5 @@ __all__ = [
     "toolCallResult",
     "toolCallStart",
     "toolCallsToProviderPayloads",
+    "toolRequiresDependencyPreflight",
 ]

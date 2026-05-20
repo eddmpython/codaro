@@ -17,6 +17,7 @@ from codaro.ai.teacher import (
     runTeacherChatStream,
     teacherSkills,
     toolCallsToProviderPayloads,
+    toolRequiresDependencyPreflight,
     ToolPolicyViolation,
 )
 from codaro.ai.types import LLMConfig, ToolCall, ToolResponse
@@ -172,6 +173,19 @@ def testToolPolicyRequiresPreflightBeforeExecution() -> None:
 
     policy.recordResult("packages-check", {"names": ["matplotlib"]}, {"missing": []})
     assert policy.validateStart("cell-call", {"operation": "run", "blockId": "cell-1"}) is None
+
+
+def testToolPolicyUsesManifestCellCallLaneForPreflight() -> None:
+    policy = ToolPolicyState.fromContext({"dependencyPreflight": {"packages": ["numpy"]}})
+
+    for toolName in ("cell-call", "execute-reactive", "check-exercise"):
+        assert toolRequiresDependencyPreflight(toolName)
+        violation = policy.validateStart(toolName, {"blockId": "cell-1"})
+        assert violation is not None
+        assert violation.code == "dependency-preflight-required"
+
+    assert not toolRequiresDependencyPreflight("get-variables")
+    assert policy.validateStart("get-variables", {}) is None
 
 
 def testToolPolicyRequiresInstallBeforeExecutionWhenPackageIsMissing() -> None:

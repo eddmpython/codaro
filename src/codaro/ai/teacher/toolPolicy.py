@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any
 
+from ..toolManifest import toolDescriptor
+
 
 @dataclass(frozen=True)
 class ToolPolicyViolation:
@@ -49,7 +51,7 @@ class ToolPolicyState:
                     toolName,
                 )
 
-        if toolName in {"cell-call", "execute-reactive"}:
+        if toolRequiresDependencyPreflight(toolName):
             unchecked = self.requiredPackages - self.checkedPackages
             if unchecked:
                 return ToolPolicyViolation(
@@ -94,3 +96,7 @@ class ToolPolicyState:
 
 def normalizePackageName(value: Any) -> str:
     return str(value).strip().lower().replace("_", "-")
+
+
+def toolRequiresDependencyPreflight(toolName: str) -> bool:
+    return toolDescriptor(toolName).get("lane") == "cell-call"
