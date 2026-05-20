@@ -14,6 +14,7 @@ class TeacherEvalCase:
     prompt: str
     expectedTools: tuple[str, ...] = ()
     expectedNoTools: bool = False
+    expectedToolSequence: tuple[str, ...] = ()
     orderedBefore: tuple[tuple[str, str], ...] = ()
     forbiddenTools: tuple[str, ...] = ()
     expectedWorkLabels: tuple[str, ...] = ()
@@ -122,10 +123,17 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
     ),
     TeacherEvalCase(
         caseId="dependency-preflight-before-install",
-        prompt="matplotlib 그래프 실습 만들어줘",
-        expectedTools=("packages-check",),
-        orderedBefore=(("packages-check", "packages-install"),),
-        expectedToolResultFields=(("packages-check", "missing"),),
+        prompt="matplotlib 그래프 실습 셀을 실행하고 확인해줘",
+        expectedTools=("packages-check", "packages-install", "cell-call"),
+        expectedToolSequence=("packages-check", "packages-install", "cell-call"),
+        orderedBefore=(("packages-check", "packages-install"), ("packages-install", "cell-call")),
+        expectedWorkLabels=("라이브러리 확인", "uv 라이브러리 설치", "셀 실행/검증"),
+        expectedTraceEvents=("tool-start", "tool-result"),
+        expectedToolResultFields=(
+            ("packages-check", "missing"),
+            ("packages-install", "success"),
+            ("cell-call", "passed"),
+        ),
     ),
     TeacherEvalCase(
         caseId="answer-check-uses-cell-call",
@@ -136,9 +144,14 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
     TeacherEvalCase(
         caseId="cell-run-does-not-skip-package-preflight",
         prompt="seaborn으로 그래프 셀 실행해줘",
-        expectedTools=("packages-check", "cell-call"),
-        orderedBefore=(("packages-check", "cell-call"),),
-        expectedToolResultFields=(("packages-check", "missing"), ("cell-call", "status")),
+        expectedTools=("packages-check", "packages-install", "cell-call"),
+        expectedToolSequence=("packages-check", "packages-install", "cell-call"),
+        orderedBefore=(("packages-check", "packages-install"), ("packages-install", "cell-call")),
+        expectedToolResultFields=(
+            ("packages-check", "missing"),
+            ("packages-install", "success"),
+            ("cell-call", "status"),
+        ),
     ),
     TeacherEvalCase(
         caseId="automation-uses-guarded-input-tools",
@@ -164,6 +177,10 @@ def evaluateToolSequence(
             failures.append(f"missing expected tool: {toolName}")
     if case.expectedNoTools and toolNames:
         failures.append(f"expected no tools, observed: {', '.join(toolNames)}")
+    if case.expectedToolSequence and tuple(toolNames) != case.expectedToolSequence:
+        expected = " -> ".join(case.expectedToolSequence)
+        observed = " -> ".join(str(toolName) for toolName in toolNames) or "(none)"
+        failures.append(f"expected exact tool sequence {expected}, observed {observed}")
     for toolName in case.forbiddenTools:
         if toolName in toolNames:
             failures.append(f"forbidden tool used: {toolName}")

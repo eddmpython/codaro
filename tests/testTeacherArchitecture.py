@@ -414,8 +414,12 @@ def testToolSequenceHarnessCapturesCoreExpectations() -> None:
     dependencyCase = next(case for case in goldenEvalCases if case.caseId == "dependency-preflight-before-install")
 
     assert evaluateToolSequence(curriculumCase, ["write-curriculum-yaml"]).passed
-    report = evaluateToolSequence(dependencyCase, ["packages-install", "packages-check"])
+    report = evaluateToolSequence(dependencyCase, ["packages-install", "packages-check", "cell-call"])
     assert not report.passed
+    assert (
+        "expected exact tool sequence packages-check -> packages-install -> cell-call, "
+        "observed packages-install -> packages-check -> cell-call"
+    ) in report.failures
     assert "packages-check must run before packages-install" in report.failures
 
 
@@ -688,11 +692,21 @@ def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
             ],
         },
         "dependency-preflight-before-install": {
-            "toolSequence": ["packages-check", "packages-install"],
+            "toolSequence": ["packages-check", "packages-install", "cell-call"],
             "policyViolationCount": 0,
+            "workloop": [
+                {"workLabel": "라이브러리 확인"},
+                {"workLabel": "uv 라이브러리 설치"},
+                {"workLabel": "셀 실행/검증"},
+            ],
+            "events": [
+                {"eventType": "tool-start"},
+                {"eventType": "tool-result"},
+            ],
             "toolCalls": [
                 {"name": "packages-check", "result": {"missing": ["matplotlib"]}},
                 {"name": "packages-install", "result": {"success": True}},
+                {"name": "cell-call", "result": {"passed": True}},
             ],
         },
     }
@@ -710,31 +724,19 @@ def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
 
 
 def testGoldenProviderCaseRunsActualLoopAndValidatesResults() -> None:
-    case = TeacherEvalCase(
-        caseId="provider-package-cell-check",
-        prompt="seaborn 그래프 실습 셀을 실행하고 확인해줘",
-        expectedTools=("packages-check", "packages-install", "cell-call"),
-        orderedBefore=(("packages-check", "packages-install"), ("packages-install", "cell-call")),
-        expectedWorkLabels=("라이브러리 확인", "uv 라이브러리 설치", "셀 실행/검증"),
-        expectedTraceEvents=("tool-start", "tool-result"),
-        expectedToolResultFields=(
-            ("packages-check", "missing"),
-            ("packages-install", "success"),
-            ("cell-call", "passed"),
-        ),
-    )
+    case = next(case for case in goldenEvalCases if case.caseId == "dependency-preflight-before-install")
     provider = _ScriptedProvider([
         ToolResponse(
             answer="",
             provider="fake",
             model="test",
-            toolCalls=[ToolCall(id="call-check", name="packages-check", arguments={"names": ["seaborn"]})],
+            toolCalls=[ToolCall(id="call-check", name="packages-check", arguments={"names": ["matplotlib"]})],
         ),
         ToolResponse(
             answer="",
             provider="fake",
             model="test",
-            toolCalls=[ToolCall(id="call-install", name="packages-install", arguments={"name": "seaborn"})],
+            toolCalls=[ToolCall(id="call-install", name="packages-install", arguments={"name": "matplotlib"})],
         ),
         ToolResponse(
             answer="",
@@ -745,11 +747,11 @@ def testGoldenProviderCaseRunsActualLoopAndValidatesResults() -> None:
         ToolResponse(answer="검증 완료", provider="fake", model="test", toolCalls=[]),
     ])
     executor = _ScriptedExecutor({
-        "packages-check": {"missing": ["seaborn"], "installed": []},
-        "packages-install": {"success": True, "package": "seaborn"},
+        "packages-check": {"missing": ["matplotlib"], "installed": []},
+        "packages-install": {"success": True, "package": "matplotlib"},
         "cell-call": {"passed": True, "feedback": "정답입니다."},
     })
-    orchestrator = TeacherOrchestrator.fromContext({"dependencyPreflight": {"packages": ["seaborn"]}})
+    orchestrator = TeacherOrchestrator.fromContext({"dependencyPreflight": {"packages": ["matplotlib"]}})
 
     report = asyncio.run(runTeacherGoldenProviderCase(
         case,
@@ -762,6 +764,7 @@ def testGoldenProviderCaseRunsActualLoopAndValidatesResults() -> None:
 
     assert report.passed
     assert report.evaluation.observedTools == ("packages-check", "packages-install", "cell-call")
+    assert report.evaluation.failures == ()
     assert "cell-call.passed" in report.evaluation.observedResultSignals
     assert report.turnPayload["answer"] == "검증 완료"
     assert [call["tool"] for call in executor.calls] == ["packages-check", "packages-install", "cell-call"]
