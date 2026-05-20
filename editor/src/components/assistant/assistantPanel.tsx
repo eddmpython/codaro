@@ -20,43 +20,13 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
+import type {
+  AssistantMessage,
+  AssistantWorkStep,
+} from "@/lib/assistantTypes";
 import type { TeacherScope } from "@/lib/teacherScope";
 import { cn } from "@/lib/utils";
-import type { AiProfile, AiToolCall, AiTraceSummary, BlockConfig } from "@/types";
-
-export type AssistantMessage = {
-  id: string;
-  role: "user" | "assistant" | "system";
-  content: string;
-  provider?: string;
-  model?: string | null;
-  toolCalls?: AiToolCall[];
-  trace?: AiTraceSummary;
-  steps?: AssistantWorkStep[];
-  tone?: "default" | "warning" | "error";
-  action?: "connect-provider";
-  loading?: boolean;
-};
-
-export type AssistantWorkStep = {
-  id: string;
-  label: string;
-  status: "running" | "done" | "error";
-  detail?: string;
-  toolName?: string;
-  arguments?: unknown;
-  result?: unknown;
-  error?: string | null;
-  traceId?: string;
-  traceEventIndex?: number;
-  turnElapsedMs?: number;
-  category?: string;
-  lane?: string;
-  target?: string;
-  risk?: string;
-  startedAt?: number;
-  finishedAt?: number;
-};
+import type { AiProfile, BlockConfig } from "@/types";
 
 export function TeacherPanel({
   aiConnecting,

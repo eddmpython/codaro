@@ -1,7 +1,4 @@
-import {
-  TeacherPanel,
-  type AssistantMessage,
-} from "@/components/assistant/assistantPanel";
+import { TeacherPanel } from "@/components/assistant/assistantPanel";
 import { AutomationView } from "@/components/automation/automationSurface";
 import { ChatSurface } from "@/components/chat/chatSurface";
 import {
@@ -12,6 +9,7 @@ import {
   CodeCellEditor,
   NotebookPanel,
 } from "@/components/notebook/notebookPanel";
+import type { AssistantMessage } from "@/lib/assistantTypes";
 import { CUSTOM_CURRICULUM_CATEGORY } from "@/lib/customCurricula";
 import { cn } from "@/lib/utils";
 import type { CellAiAction } from "@/lib/cellModel";

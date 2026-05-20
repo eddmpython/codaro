@@ -2,10 +2,10 @@ import {
   AssistantComposer,
   AssistantMessages,
   aiProfileReady,
-  type AssistantMessage,
 } from "@/components/assistant/assistantPanel";
 import { PendingNotebookBar } from "@/components/app/appPrimitives";
 import { Button } from "@/components/ui/button";
+import type { AssistantMessage } from "@/lib/assistantTypes";
 import type { TeacherScope } from "@/lib/teacherScope";
 import type {
   AiProfile,

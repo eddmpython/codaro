@@ -1,4 +1,4 @@
-import type { AssistantMessage } from "@/components/assistant/assistantPanel";
+import type { AssistantMessage } from "@/lib/assistantTypes";
 import { codaroApi } from "@/lib/api";
 import { applyAssistantStreamEvent } from "@/lib/assistantConversationState";
 import type { AiChatRequest, AiChatResponse } from "@/types";

@@ -1,8 +1,6 @@
 import { useCallback, useState, type Dispatch, type SetStateAction } from "react";
-import {
-  aiProviderName,
-  type AssistantMessage,
-} from "@/components/assistant/assistantPanel";
+import { aiProviderName } from "@/components/assistant/assistantPanel";
+import type { AssistantMessage } from "@/lib/assistantTypes";
 import {
   buildCellAiPrompt,
   type CellAiAction,

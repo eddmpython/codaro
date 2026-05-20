@@ -1,7 +1,7 @@
 import type {
   AssistantMessage,
   AssistantWorkStep,
-} from "@/components/assistant/assistantPanel";
+} from "@/lib/assistantTypes";
 import type {
   AiChatResponse,
   AiToolCall,
@@ -65,9 +65,11 @@ export function finishAssistantWorkLoop({
   steps?: AssistantWorkStep[];
   trace?: AssistantTraceSummary;
 } {
+  const trace = normalizeAssistantTrace(response.trace);
+  const toolSteps = response.toolCalls.length ? finishAssistantSteps(steps, response.toolCalls) : undefined;
   return {
-    steps: response.toolCalls.length ? finishAssistantSteps(steps, response.toolCalls) : undefined,
-    trace: normalizeAssistantTrace(response.trace),
+    steps: withTracePolicySteps(toolSteps ?? steps, trace) ?? toolSteps,
+    trace,
   };
 }
 
@@ -114,6 +116,73 @@ function normalizeTracePolicyViolation(value: unknown): AiTracePolicyViolation |
 
 function stringField(value: unknown): string {
   return typeof value === "string" ? value : "";
+}
+
+function withTracePolicySteps(
+  steps: AssistantWorkStep[] | undefined,
+  trace: AssistantTraceSummary | undefined,
+): AssistantWorkStep[] | undefined {
+  const policyViolations = tracePolicyViolations(trace);
+  if (!policyViolations.length) return undefined;
+
+  const next = (steps ?? []).map((step) => (
+    step.status === "running" ? { ...step, status: "done" as const, finishedAt: step.finishedAt ?? Date.now() } : step
+  ));
+  policyViolations.forEach((violation, index) => {
+    const matchingToolIndex = next.findIndex((step) => step.toolName === violation.toolName);
+    if (matchingToolIndex >= 0) {
+      next[matchingToolIndex] = {
+        ...next[matchingToolIndex],
+        status: "error",
+        detail: policyViolationDetail(violation, next[matchingToolIndex].detail),
+        error: violation.message || next[matchingToolIndex].error,
+        policyCode: violation.policyCode,
+        finishedAt: next[matchingToolIndex].finishedAt ?? Date.now(),
+      };
+      return;
+    }
+    next.push(policyViolationStep(violation, index));
+  });
+  return next;
+}
+
+function policyViolationStep(violation: AiTracePolicyViolation, index: number): AssistantWorkStep {
+  const now = Date.now();
+  return {
+    id: `policy-${index}-${policyStepIdPart(violation.policyCode || violation.toolName || "violation")}`,
+    label: "도구 정책 확인",
+    status: "error",
+    detail: policyViolationDetail(violation),
+    error: violation.message,
+    policyCode: violation.policyCode,
+    startedAt: now,
+    finishedAt: now,
+  };
+}
+
+function policyViolationDetail(violation: AiTracePolicyViolation, existingDetail?: string) {
+  const details = existingDetail
+    ? [existingDetail, violation.policyCode, violation.message]
+    : [violation.toolName, violation.policyCode, violation.message];
+  return details.filter(Boolean).join(" · ");
+}
+
+function tracePolicyViolations(trace: AssistantTraceSummary | undefined): AiTracePolicyViolation[] {
+  if (!trace) return [];
+  if (trace.policyViolations?.length) return trace.policyViolations;
+  const count = trace.policyViolationCount ?? 0;
+  if (count < 1) return [];
+  return [
+    {
+      policyCode: "policy-violation",
+      toolName: "",
+      message: `도구 정책 확인 필요 ${count}건`,
+    },
+  ];
+}
+
+function policyStepIdPart(value: string) {
+  return value.replace(/[^a-zA-Z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || "violation";
 }
 
 function assistantWorkStepFromToolCall(toolCall: AiToolCall, status: AssistantWorkStep["status"]): AssistantWorkStep {
