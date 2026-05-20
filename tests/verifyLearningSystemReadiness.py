@@ -107,8 +107,19 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "data-learning-section-part",
                     "data-learning-exercise-input",
                     "data-learning-code-input",
+                    "hideRepeatedTitle",
                     "sectionContract:snippet",
                     "sectionContract:exercise",
+                )),
+                ("editor/src/components/curriculum/curriculumMarkdownBody.tsx", (
+                    "dedupeRepeatedItems",
+                    "dedupeRepeatedLines",
+                    "shouldHideRepeatedTitle",
+                )),
+                ("editor/src/components/app/appPrimitives.tsx", (
+                    "data-code-payload=\"snippet\"",
+                    "data-code-payload-copy=\"true\"",
+                    "스니펫 복사",
                 )),
                 ("editor/src/components/app/cellAiActions.tsx", (
                     "data-cell-ai-popover",
@@ -127,6 +138,8 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "data-learning-section-part",
                     "data-cell-ai-popover",
                     "data-learning-code-input",
+                    "data-code-payload-copy",
+                    "dedupeRepeatedItems",
                     "overview",
                     "snippet",
                     "exercise",

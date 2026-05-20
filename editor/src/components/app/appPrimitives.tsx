@@ -1,10 +1,12 @@
 import {
+  Check,
   CheckCircle2,
+  Copy,
   Loader2,
   Sparkles,
   XCircle,
 } from "lucide-react";
-import type { ComponentProps } from "react";
+import { useState, type ComponentProps } from "react";
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -43,12 +45,42 @@ export function IconButton({
   );
 }
 
-export function CodePayload({ label, value }: { label?: string; value: unknown }) {
+export function CodePayload({ label = "예제 스니펫", value }: { label?: string; value: unknown }) {
+  const [copied, setCopied] = useState(false);
+  const text = stringifyData(value);
+
+  const copySnippet = async () => {
+    try {
+      await navigator.clipboard.writeText(text);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1400);
+    } catch {
+      setCopied(false);
+    }
+  };
+
   return (
-    <div className="rounded-md bg-code">
-      {label ? <div className="px-3 pt-3 text-[10px] font-medium uppercase text-muted-foreground">{label}</div> : null}
+    <div className="overflow-hidden rounded-md border bg-code shadow-inner" data-code-payload="snippet">
+      <div className="flex items-center justify-between gap-2 border-b border-border/70 bg-background/35 px-3 py-2">
+        <div className="flex min-w-0 items-center gap-1.5 text-[10px] font-medium uppercase text-muted-foreground">
+          <span className="size-1.5 rounded-full bg-emerald-400" />
+          <span className="truncate">{label}</span>
+        </div>
+        <Button
+          aria-label="스니펫 복사"
+          className="h-6 gap-1.5 px-2 text-[11px]"
+          data-code-payload-copy="true"
+          size="sm"
+          type="button"
+          variant="ghost"
+          onClick={copySnippet}
+        >
+          {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
+          {copied ? "복사됨" : "복사"}
+        </Button>
+      </div>
       <ScrollArea className="max-h-64">
-        <pre className="whitespace-pre-wrap p-3 font-mono text-xs leading-5 text-code-foreground">{stringifyData(value)}</pre>
+        <pre className="whitespace-pre-wrap p-3 font-mono text-xs leading-5 text-code-foreground">{text}</pre>
       </ScrollArea>
     </div>
   );

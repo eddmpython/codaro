@@ -74,6 +74,8 @@ sections:
 - 섹션 카드는 `title → subtitle → goal → why → explanation → tips → snippet → exercise → result → check` 순서로 이어진다.
 - 카드 내부 정보는 라벨, 구획선, 여백으로 구분한다. 카드 안에 또 카드가 덕지덕지 쌓이는 구조는 피한다.
 - `sectionContract:*`로 materialize된 신규 섹션은 작은 block card를 반복 렌더링하지 않고, 하나의 섹션 카드 안에서 예제 스니펫, 직접 입력 실습, 실행 결과, 검증/피드백을 흐름형 band로 보여준다.
+- 카드 헤더와 본문은 같은 제목을 반복하지 않는다. legacy list/prose block에서 첫 목록 항목이나 첫 markdown heading이 셀 제목과 같으면 렌더러가 한 번만 보이게 정리한다.
+- `snippet` band는 코드임을 명확히 알 수 있는 박스와 `예제 스니펫` 라벨, 우측 상단 복사 버튼을 가진다.
 - structured 섹션의 `exercise` band는 클릭해야 열리는 preview가 아니라 바로 보이는 실제 입력 editor를 가진다. `learning-card-browser` gate는 이 editor가 desktop/mobile에서 보이고 starter code를 렌더링하는지 확인한다.
 - 레슨 overview는 `data-learning-overview`, `data-learning-overview-part`, `data-learning-flow-diagram`, `data-learning-flow-step` marker를 가진다. `learning-card-browser` gate는 방향, 학습 효과, 플로우 step이 실제 desktop/mobile 화면에 보이는지 확인한다.
 - structured section card는 브라우저 검증을 위해 `data-learning-section-card`, `data-learning-section-structured`, `data-learning-section-part` marker를 가진다. 검증 대상 part는 `overview`, `snippet`, `exercise`, `result`, `check`다.

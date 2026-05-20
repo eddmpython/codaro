@@ -547,6 +547,14 @@ def jsAssertStructuredCard(viewport: str) -> str:
 
   const exercise = card.querySelector('[data-learning-section-part="exercise"]');
   const result = card.querySelector('[data-learning-section-part="result"]');
+  const snippet = card.querySelector('[data-learning-section-part="snippet"]');
+  const snippetBox = snippet.querySelector('[data-code-payload="snippet"]');
+  if (!snippetBox) throw new Error('snippet code box marker is missing');
+  const copyButton = snippetBox.querySelector('[data-code-payload-copy="true"]');
+  if (!copyButton) throw new Error('snippet copy button is missing');
+  if (!(snippetBox.textContent || '').includes('예제 스니펫')) {{
+    throw new Error('snippet box label is missing');
+  }}
   const exerciseEditor = exercise.querySelector('[data-learning-exercise-input="editor"] .cm-editor');
   if (!exerciseEditor) throw new Error('exercise direct editor is missing');
   const exerciseEditorRect = exerciseEditor.getBoundingClientRect();

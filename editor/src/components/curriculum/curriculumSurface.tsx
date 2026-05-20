@@ -1220,7 +1220,7 @@ function CurriculumLearningCell({
             </Badge>
             <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
           </div>
-          <CurriculumMarkdownBody block={block} />
+          <CurriculumMarkdownBody block={block} hideRepeatedTitle />
         </section>
       );
     }
@@ -1261,7 +1261,7 @@ function CurriculumLearningCell({
             </div>
           )}
           <div className={cn("space-y-3 px-3 pb-3", bodyFirst ? "pt-2" : "pt-3")}>
-            <CurriculumMarkdownBody block={block} />
+            <CurriculumMarkdownBody block={block} hideRepeatedTitle={!bodyFirst} />
           </div>
         </div>
       </section>

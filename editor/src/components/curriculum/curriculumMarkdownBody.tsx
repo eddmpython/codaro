@@ -28,9 +28,11 @@ import {
 import { cn } from "@/lib/utils";
 import type { BlockConfig } from "@/types";
 
-export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
+export function CurriculumMarkdownBody({ block, hideRepeatedTitle = false }: { block: BlockConfig; hideRepeatedTitle?: boolean }) {
   const payload = payloadMap(block.payload);
   const displayKind = block.displayKind ?? "prose";
+  const repeatedTitle = hideRepeatedTitle ? blockLabel(block) : "";
+  const leadHidden = (title: string) => shouldHideRepeatedTitle(title, repeatedTitle);
 
   if (displayKind === "title") {
     const title = payloadText(payload, "title") || block.title || blockLabel(block);
@@ -76,11 +78,11 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     );
   }
 
-  if (displayKind === "resource") return <ResourceCardsCell block={block} payload={payload} />;
+  if (displayKind === "resource") return <ResourceCardsCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
 
   if (displayKind === "cardGrid") {
-    if (block.sourceType === "choiceCards") return <ChoiceCardsCell block={block} payload={payload} />;
-    if (block.sourceType === "resourceCards") return <ResourceCardsCell block={block} payload={payload} />;
+    if (block.sourceType === "choiceCards") return <ChoiceCardsCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
+    if (block.sourceType === "resourceCards") return <ResourceCardsCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
 
     const primaryKey = "cards";
     const cards = payloadItems(payload, primaryKey).length
@@ -90,11 +92,11 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     const subtitle = payloadText(payload, "subtitle");
     return (
       <div className="space-y-3">
-        <LearningSectionLead title={title} subtitle={subtitle || block.description} />
+        <LearningSectionLead hideTitle={leadHidden(title)} title={title} subtitle={subtitle || block.description} />
         <div className="grid gap-2 md:grid-cols-2">
           {cards.length ? cards.map((card, index) => (
             <LearningValuePanel key={`${card.title}-${index}`} index={index + 1} item={card} />
-          )) : <MarkdownBlock content={block.content} />}
+          )) : <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} />}
         </div>
       </div>
     );
@@ -104,9 +106,10 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     const cards = payloadItems(payload, "cards");
     const left = payloadMap(payload.left);
     const right = payloadMap(payload.right);
+    const title = payloadText(payload, "title") || block.title || "비교";
     return (
       <div className="space-y-3">
-        <LearningSectionLead title={payloadText(payload, "title") || block.title || "비교"} subtitle={payloadText(payload, "subtitle")} />
+        <LearningSectionLead hideTitle={leadHidden(title)} title={title} subtitle={payloadText(payload, "subtitle")} />
         {cards.length ? (
           <ComparisonGrid cards={cards} />
         ) : (
@@ -121,16 +124,17 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
 
   if (displayKind === "table") {
     const rows = payloadItems(payload, "rows");
+    const title = payloadText(payload, "title") || block.title || "표";
     return (
       <div className="space-y-3">
-        <LearningSectionLead title={payloadText(payload, "title") || block.title || "표"} subtitle={payloadText(payload, "subtitle")} />
+        <LearningSectionLead hideTitle={leadHidden(title)} title={title} subtitle={payloadText(payload, "subtitle")} />
         <LearningTable rows={rows} fallback={block.content} />
       </div>
     );
   }
 
   if (displayKind === "media") {
-    return <MediaCell block={block} payload={payload} />;
+    return <MediaCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
   }
 
   if (displayKind === "callout") {
@@ -138,10 +142,10 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
   }
 
   if (block.sourceType === "list") {
-    const items = block.content
+    const items = dedupeRepeatedItems(block.content
       .split("\n")
       .map((line) => line.replace(/^[-*]\s+/, "").replace(/^\d+\.\s+/, "").trim())
-      .filter(Boolean);
+      .filter(Boolean), repeatedTitle);
     return (
       <div className="grid gap-2">
         {items.map((item, index) => (
@@ -155,7 +159,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
   }
 
   if (displayKind === "prose") {
-    return <ProseLearningCell block={block} payload={payload} />;
+    return <ProseLearningCell block={block} payload={payload} repeatedTitle={repeatedTitle} />;
   }
 
   if (displayKind === "quiz") {
@@ -191,17 +195,19 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
     if (block.sourceType === "practiceCard") return <PracticePromptCell block={block} payload={payload} />;
 
     const items = payloadItems(payload, "items");
+    const title = payloadText(payload, "title") || block.title || "실습";
     return (
       <div className="space-y-3">
         <LearningSectionLead
-          title={payloadText(payload, "title") || block.title || "실습"}
+          hideTitle={leadHidden(title)}
+          title={title}
           subtitle={payloadText(payload, "description") || payloadText(payload, "content") || block.description}
         />
         {items.length ? (
           <div className="grid gap-2">
             {items.map((item, index) => <LearningValuePanel key={`${item.title}-${index}`} index={index + 1} item={item} />)}
           </div>
-        ) : <MarkdownBlock content={block.content} />}
+        ) : <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} />}
       </div>
     );
   }
@@ -224,7 +230,7 @@ export function CurriculumMarkdownBody({ block }: { block: BlockConfig }) {
           {block.description}
         </div>
       ) : null}
-      <MarkdownBlock content={block.content} />
+      <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} />
     </div>
   );
 }
@@ -302,7 +308,7 @@ function RankInsightHero({ block, payload }: { block: BlockConfig; payload: Reco
   );
 }
 
-function ProseLearningCell({ block, payload }: { block: BlockConfig; payload: Record<string, unknown> }) {
+function ProseLearningCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
   const title = payloadText(payload, "title") || block.title || "";
   const subtitle = payloadText(payload, "subtitle") || block.description;
   const content = payloadText(payload, "content") || payloadText(payload, "text") || block.content;
@@ -322,24 +328,24 @@ function ProseLearningCell({ block, payload }: { block: BlockConfig; payload: Re
         </div>
       ) : null}
       <div className="rounded-md border bg-background px-4 py-3">
-        <MarkdownBlock content={content} />
+        <MarkdownBlock content={content} dedupeTitle={repeatedTitle} />
       </div>
     </div>
   );
 }
 
-function ChoiceCardsCell({ block, payload }: { block: BlockConfig; payload: Record<string, unknown> }) {
+function ChoiceCardsCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
   const title = payloadText(payload, "title") || block.title || "선택지";
   const subtitle = payloadText(payload, "subtitle") || block.description;
   const cards = payloadItems(payload, "cards");
 
   return (
     <div className="space-y-3">
-      <LearningSectionLead title={title} subtitle={subtitle} />
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
       <div className="grid gap-2 lg:grid-cols-2">
         {cards.length ? cards.map((card, index) => (
           <ChoiceOptionCard item={card} index={index + 1} key={`${payloadText(card, "title")}-${index}`} />
-        )) : <MarkdownBlock content={block.content} />}
+        )) : <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} />}
       </div>
     </div>
   );
@@ -373,7 +379,7 @@ function ChoiceOptionCard({ item, index }: { item: Record<string, unknown>; inde
   );
 }
 
-function ResourceCardsCell({ block, payload }: { block: BlockConfig; payload: Record<string, unknown> }) {
+function ResourceCardsCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
   const title = payloadText(payload, "title") || block.title || "참고 자료";
   const subtitle = payloadText(payload, "subtitle") || block.description;
   const resources = payloadItems(payload, "cards").length
@@ -382,11 +388,11 @@ function ResourceCardsCell({ block, payload }: { block: BlockConfig; payload: Re
 
   return (
     <div className="space-y-3">
-      <LearningSectionLead title={title} subtitle={subtitle} />
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={subtitle} />
       <div className="grid gap-2 md:grid-cols-2">
         {resources.length ? resources.map((resource, index) => (
           <ResourceCard item={resource} index={index + 1} key={`${payloadText(resource, "title")}-${index}`} />
-        )) : <MarkdownBlock content={block.content} />}
+        )) : <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} />}
       </div>
     </div>
   );
@@ -552,11 +558,13 @@ function PracticePromptCell({ block, payload }: { block: BlockConfig; payload: R
   );
 }
 
-function LearningSectionLead({ title, subtitle }: { title: string; subtitle?: string }) {
+function LearningSectionLead({ hideTitle = false, title, subtitle }: { hideTitle?: boolean; title: string; subtitle?: string }) {
+  if (hideTitle && !subtitle) return null;
+
   return (
     <div className="min-w-0">
-      <div className="truncate text-base font-semibold tracking-normal">{stripMarkdown(title)}</div>
-      {subtitle ? <p className="mt-1 text-sm leading-6 text-muted-foreground">{stripMarkdown(subtitle)}</p> : null}
+      {!hideTitle ? <div className="truncate text-base font-semibold tracking-normal">{stripMarkdown(title)}</div> : null}
+      {subtitle ? <p className={cn("text-sm leading-6 text-muted-foreground", !hideTitle && "mt-1")}>{stripMarkdown(subtitle)}</p> : null}
     </div>
   );
 }
@@ -763,7 +771,7 @@ function LearningTable({ rows, fallback }: { rows: Array<Record<string, unknown>
   );
 }
 
-function MediaCell({ block, payload }: { block: BlockConfig; payload: Record<string, unknown> }) {
+function MediaCell({ block, payload, repeatedTitle }: { block: BlockConfig; payload: Record<string, unknown>; repeatedTitle: string }) {
   const src = payloadText(payload, "src") || payloadText(payload, "url") || youtubeUrl(payloadText(payload, "youtube"));
   const sourceType = payloadText(payload, "sourceType") || block.sourceType || "media";
   const title = payloadText(payload, "title") || block.title || blockLabel(block);
@@ -773,7 +781,7 @@ function MediaCell({ block, payload }: { block: BlockConfig; payload: Record<str
   if (sourceType === "image" && src) {
     return (
       <div className="space-y-3">
-        <LearningSectionLead title={title} subtitle={description} />
+        <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={description} />
         <VisualAsset src={src} title={title} />
       </div>
     );
@@ -781,11 +789,11 @@ function MediaCell({ block, payload }: { block: BlockConfig; payload: Record<str
 
   return (
     <div className="space-y-3">
-      <LearningSectionLead title={title} subtitle={description} />
+      <LearningSectionLead hideTitle={shouldHideRepeatedTitle(title, repeatedTitle)} title={title} subtitle={description} />
       <div className="grid gap-2 md:grid-cols-2">
         {src ? <MediaResourceCard index={1} item={{ title: blockTypeLabel(sourceType), url: src, sourceType }} /> : null}
         {items.map((item, index) => <MediaResourceCard key={`${payloadText(item, "title")}-${index}`} index={index + 2} item={item} />)}
-        {!src && !items.length ? <MarkdownBlock content={block.content} /> : null}
+        {!src && !items.length ? <MarkdownBlock content={block.content} dedupeTitle={repeatedTitle} /> : null}
       </div>
     </div>
   );
@@ -826,8 +834,8 @@ function MediaResourceCard({ index, item }: { index: number; item: Record<string
   );
 }
 
-function MarkdownBlock({ content }: { content: string }) {
-  const lines = normalizeRichText(content).split("\n");
+function MarkdownBlock({ content, dedupeTitle = "" }: { content: string; dedupeTitle?: string }) {
+  const lines = dedupeRepeatedLines(normalizeRichText(content).split("\n"), dedupeTitle);
   return (
     <div className="space-y-2 break-words text-sm leading-6">
       {lines.map((line, index) => {
@@ -963,6 +971,38 @@ function payloadTextList(value: unknown) {
     }
     return "";
   }).filter(Boolean);
+}
+
+function dedupeRepeatedItems(items: string[], title: string) {
+  if (!title) return items;
+  const titleKey = comparableText(title);
+  return items.filter((item, index) => index !== 0 || comparableText(item) !== titleKey);
+}
+
+function dedupeRepeatedLines(lines: string[], title: string) {
+  if (!title) return lines;
+  const titleKey = comparableText(title);
+  let removed = false;
+  return lines.filter((line) => {
+    if (removed || !line.trim()) return true;
+    removed = true;
+    return comparableText(line) !== titleKey;
+  });
+}
+
+function shouldHideRepeatedTitle(title: string, repeatedTitle: string) {
+  return Boolean(title && repeatedTitle && comparableText(title) === comparableText(repeatedTitle));
+}
+
+function comparableText(value: string) {
+  return stripMarkdown(value)
+    .replace(/^#{1,6}\s+/, "")
+    .replace(/^[-*]\s+/, "")
+    .replace(/^\d+\.\s+/, "")
+    .replace(/[.:：。]+$/g, "")
+    .replace(/\s+/g, " ")
+    .trim()
+    .toLowerCase();
 }
 
 function blockTypeLabel(type: string) {

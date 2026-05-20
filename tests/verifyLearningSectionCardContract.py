@@ -6,6 +6,8 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SURFACE = ROOT / "editor" / "src" / "components" / "curriculum" / "curriculumSurface.tsx"
+MARKDOWN_BODY = ROOT / "editor" / "src" / "components" / "curriculum" / "curriculumMarkdownBody.tsx"
+APP_PRIMITIVES = ROOT / "editor" / "src" / "components" / "app" / "appPrimitives.tsx"
 CELL_ACTIONS = ROOT / "editor" / "src" / "components" / "app" / "cellAiActions.tsx"
 AI_PANEL = ROOT / "editor" / "src" / "components" / "assistant" / "assistantPanel.tsx"
 
@@ -28,7 +30,7 @@ def require_order(text: str, before: str, after: str, label: str, failures: list
 def main() -> int:
     failures: list[str] = []
 
-    for path in (SURFACE, CELL_ACTIONS, AI_PANEL):
+    for path in (SURFACE, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL):
         if not path.exists():
             print(f"FAIL: missing editor surface: {path.relative_to(ROOT)}", file=sys.stderr)
             return 1
@@ -36,6 +38,8 @@ def main() -> int:
     text = SURFACE.read_text(encoding="utf-8")
     cellActionsText = CELL_ACTIONS.read_text(encoding="utf-8")
     aiPanelText = AI_PANEL.read_text(encoding="utf-8")
+    markdownBodyText = MARKDOWN_BODY.read_text(encoding="utf-8")
+    appPrimitivesText = APP_PRIMITIVES.read_text(encoding="utf-8")
 
     required_tokens = {
         "section card marker": "data-learning-section-card={section.id}",
@@ -60,6 +64,7 @@ def main() -> int:
         "check part assignment": 'part="check"',
         "structured exercise direct editor": "autoFocus: exerciseSelected",
         "code cell direct editor marker": 'data-learning-code-input="editor"',
+        "embedded markdown title dedupe": "<CurriculumMarkdownBody block={block} hideRepeatedTitle />",
     }
     for label, token in required_tokens.items():
         require(text, token, label, failures)
@@ -82,6 +87,25 @@ def main() -> int:
     }
     for label, token in ai_panel_tokens.items():
         require(aiPanelText, token, label, failures)
+
+    markdown_body_tokens = {
+        "hide repeated title prop": "hideRepeatedTitle = false",
+        "list item title dedupe": "dedupeRepeatedItems",
+        "markdown line title dedupe": "dedupeRepeatedLines",
+        "lead title hide": "shouldHideRepeatedTitle",
+    }
+    for label, token in markdown_body_tokens.items():
+        require(markdownBodyText, token, label, failures)
+
+    code_payload_tokens = {
+        "snippet code box marker": 'data-code-payload="snippet"',
+        "snippet copy marker": 'data-code-payload-copy="true"',
+        "copy action label": "스니펫 복사",
+        "copy button text": "복사",
+        "snippet box label": "예제 스니펫",
+    }
+    for label, token in code_payload_tokens.items():
+        require(appPrimitivesText, token, label, failures)
 
     require_order(
         text,
