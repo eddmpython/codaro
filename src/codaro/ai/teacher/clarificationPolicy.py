@@ -22,6 +22,7 @@ class ClarificationPlan:
         return {
             "shouldAsk": self.shouldAsk,
             "questions": list(self.questions),
+            "assumptions": self.defaults,
             "defaults": self.defaults,
         }
 
@@ -42,8 +43,8 @@ def clarificationAnswer(plan: ClarificationPlan) -> str:
         for part in [
             "바로 만들기 전에 결과가 달라지는 부분만 되묻겠습니다.",
             questionLines,
-            "답을 주면 그 기준으로 만들겠습니다. 지금 기준이 맞으면 그대로 진행해도 됩니다.",
-            "현재 가정:",
+            "답을 주면 그 기준으로 조정하겠습니다. 이 기준이 맞으면 '진행'이라고만 답해도 됩니다.",
+            "작업 기준:",
             defaultLines,
         ]
         if part

@@ -27,7 +27,7 @@ class TeacherEvalCase:
     expectedToolResultFields: tuple[tuple[str, str], ...] = ()
     expectedClarificationGate: bool = False
     expectedClarificationQuestionRange: tuple[int, int] | None = None
-    expectedClarificationDefaultKeys: tuple[str, ...] = ()
+    expectedClarificationAssumptionKeys: tuple[str, ...] = ()
     expectedYamlContract: bool = False
     expectedSectionCardFlow: bool = False
     expectedLoadedInEditor: bool = False
@@ -130,11 +130,11 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         expectedNoTools=True,
         forbiddenTools=("write-curriculum-yaml", "packages-check", "cell-call"),
         expectedWorkLabels=("작업 전 확인 질문",),
-        expectedWorkDetails=("핵심 질문", "현재 가정"),
+        expectedWorkDetails=("핵심 질문", "작업 기준"),
         expectedTraceEvents=("clarification-gate",),
         expectedClarificationGate=True,
         expectedClarificationQuestionRange=(1, 3),
-        expectedClarificationDefaultKeys=("level", "depth", "environment", "balance"),
+        expectedClarificationAssumptionKeys=("level", "depth", "environment", "balance"),
     ),
     TeacherEvalCase(
         caseId="curriculum-yaml-materialized",
@@ -470,11 +470,11 @@ def _clarificationGateFailures(tracePayload: Mapping[str, Any], case: TeacherEva
         if not minimum <= questionCount <= maximum:
             failures.append(f"clarification question count out of range: {questionCount}")
 
-    defaults = payload.get("defaults")
-    defaultKeys = set(defaults.keys()) if isinstance(defaults, Mapping) else set()
-    missingDefaultKeys = [key for key in case.expectedClarificationDefaultKeys if key not in defaultKeys]
-    if missingDefaultKeys:
-        failures.append(f"missing clarification defaults: {', '.join(missingDefaultKeys)}")
+    assumptions = payload.get("assumptions") or payload.get("defaults")
+    assumptionKeys = set(assumptions.keys()) if isinstance(assumptions, Mapping) else set()
+    missingAssumptionKeys = [key for key in case.expectedClarificationAssumptionKeys if key not in assumptionKeys]
+    if missingAssumptionKeys:
+        failures.append(f"missing clarification assumptions: {', '.join(missingAssumptionKeys)}")
 
     return failures
 

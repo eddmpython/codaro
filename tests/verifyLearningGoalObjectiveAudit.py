@@ -80,6 +80,7 @@ OBJECTIVE_REQUIREMENTS = (
                 "ambiguous-learning-asks-clarification",
                 "expectedNoTools=True",
                 "expectedClarificationQuestionRange=(1, 3)",
+                "expectedClarificationAssumptionKeys",
             )),
             ("tests/verifyTeacherGoldenE2e.py", (
                 "ProviderShouldNotBeCalled",
@@ -87,6 +88,8 @@ OBJECTIVE_REQUIREMENTS = (
                 "clarification gate called provider",
             )),
             ("src/codaro/ai/teacher/clarificationPolicy.py", (
+                "\"assumptions\": self.defaults",
+                "작업 기준:",
                 "questions[:3]",
                 "\"level\"",
                 "\"depth\"",
@@ -135,6 +138,7 @@ OBJECTIVE_REQUIREMENTS = (
             )),
             ("tests/verifyAssistantWorkloopContract.py", (
                 "작업 전 확인 질문",
+                "작업 기준",
                 "provider 응답 처리 중단",
                 "packages-check",
                 "packages-install",

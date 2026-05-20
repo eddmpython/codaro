@@ -344,6 +344,7 @@ def testTeacherClarificationPlanStaysFocused() -> None:
     assert plan.shouldAsk
     assert 1 <= len(plan.questions) <= 3
     assert "level" in plan.defaults
+    assert plan.payload()["assumptions"] == plan.defaults
     assert any("수준" in question for question in plan.questions)
 
 
@@ -353,8 +354,9 @@ def testTeacherClarificationAnswerShowsReadableDefaults() -> None:
     answer = clarificationAnswer(plan)
 
     assert "바로 만들기 전에 결과가 달라지는 부분만 되묻겠습니다." in answer
-    assert "답을 주면 그 기준으로 만들겠습니다." in answer
-    assert "현재 가정:" in answer
+    assert "답을 주면 그 기준으로 조정하겠습니다." in answer
+    assert "작업 기준:" in answer
+    assert "기본값으로 진행" not in answer
     assert "- 수준: 초급-중급 사이" in answer
     assert "- 환경: 현재 Codaro 로컬 Python과 uv 패키지 설치" in answer
     assert "level:" not in answer
@@ -613,6 +615,7 @@ def testEvalHarnessFailsWeakClarificationGateTrace() -> None:
                 "eventType": "clarification-gate",
                 "payload": {
                     "questions": [],
+                    "assumptions": {"level": "초급"},
                     "defaults": {"level": "초급"},
                 },
             }
@@ -623,7 +626,7 @@ def testEvalHarnessFailsWeakClarificationGateTrace() -> None:
 
     assert not report.passed
     assert "clarification question count out of range: 0" in report.failures
-    assert "missing clarification defaults: depth, environment, balance" in report.failures
+    assert "missing clarification assumptions: depth, environment, balance" in report.failures
     assert "missing expected work detail: 핵심 질문" in report.failures
 
 

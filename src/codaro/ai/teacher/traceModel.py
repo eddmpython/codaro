@@ -159,9 +159,9 @@ def _turnErrorWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
 
 def _clarificationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
     questions = event.payload.get("questions")
-    defaults = event.payload.get("defaults")
+    assumptions = event.payload.get("assumptions") or event.payload.get("defaults")
     questionCount = len(questions) if isinstance(questions, list) else 0
-    workDetail = _clarificationWorkDetail(questionCount, defaults)
+    workDetail = _clarificationWorkDetail(questionCount, assumptions)
     return {
         "eventIndex": event.eventIndex,
         "eventType": event.eventType,
@@ -176,17 +176,17 @@ def _clarificationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
     }
 
 
-def _clarificationWorkDetail(questionCount: int, defaults: Any) -> str:
-    if not isinstance(defaults, dict):
-        return f"핵심 질문 {questionCount}개 · 현재 가정 0개"
+def _clarificationWorkDetail(questionCount: int, assumptions: Any) -> str:
+    if not isinstance(assumptions, dict):
+        return f"핵심 질문 {questionCount}개 · 작업 기준 0개"
     summary = [
         value
         for key in ("level", "depth", "environment", "balance")
-        if isinstance(value := defaults.get(key), str) and value
+        if isinstance(value := assumptions.get(key), str) and value
     ]
     if not summary:
-        return f"핵심 질문 {questionCount}개 · 현재 가정 {len(defaults)}개"
-    return f"핵심 질문 {questionCount}개 · 현재 가정: {' / '.join(summary)}"
+        return f"핵심 질문 {questionCount}개 · 작업 기준 {len(assumptions)}개"
+    return f"핵심 질문 {questionCount}개 · 작업 기준: {' / '.join(summary)}"
 
 
 def _payloadText(payload: dict[str, Any], key: str) -> str:
