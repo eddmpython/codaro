@@ -82,26 +82,34 @@ class TeacherTrace:
         return payload
 
     def workloopEvents(self) -> list[dict[str, Any]]:
-        return [
-            {
-                "eventIndex": event.eventIndex,
-                "eventType": event.eventType,
-                "toolCallId": event.payload.get("toolCallId"),
-                "toolName": event.payload.get("name"),
-                "status": event.payload.get("status"),
-                "error": event.payload.get("error"),
-                "category": event.payload.get("category"),
-                "lane": event.payload.get("lane"),
-                "target": event.payload.get("target"),
-                "risk": event.payload.get("risk"),
-                "workLabel": event.payload.get("workLabel"),
-                "workDetail": event.payload.get("workDetail"),
-                "elapsedMs": event.elapsedMs,
-            }
-            for event in self.events
-            if event.eventType in {"tool-start", "tool-result"}
-            and event.payload.get("workLabel")
-        ]
+        workloop: list[dict[str, Any]] = []
+        for event in self.events:
+            if event.eventType in {"tool-start", "tool-result"} and event.payload.get("workLabel"):
+                workloop.append({
+                    "eventIndex": event.eventIndex,
+                    "eventType": event.eventType,
+                    "toolCallId": event.payload.get("toolCallId"),
+                    "toolName": event.payload.get("name"),
+                    "status": event.payload.get("status"),
+                    "error": event.payload.get("error"),
+                    "category": event.payload.get("category"),
+                    "lane": event.payload.get("lane"),
+                    "target": event.payload.get("target"),
+                    "risk": event.payload.get("risk"),
+                    "workLabel": event.payload.get("workLabel"),
+                    "workDetail": event.payload.get("workDetail"),
+                    "elapsedMs": event.elapsedMs,
+                })
+                continue
+            if event.eventType == "tool-policy-violation":
+                workloop.append(_policyViolationWorkloopEvent(event))
+                continue
+            if event.eventType == "turn-error":
+                workloop.append(_turnErrorWorkloopEvent(event))
+                continue
+            if event.eventType == "clarification-gate":
+                workloop.append(_clarificationWorkloopEvent(event))
+        return workloop
 
     def yamlContractObserved(self) -> bool:
         return any(
@@ -109,3 +117,65 @@ class TeacherTrace:
             for event in self.events
             if event.eventType == "tool-result"
         )
+
+
+def _policyViolationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
+    policyCode = _payloadText(event.payload, "policyCode") or _payloadText(event.payload, "policy")
+    toolName = _payloadText(event.payload, "toolName") or _payloadText(event.payload, "tool")
+    message = _payloadText(event.payload, "message") or _payloadText(event.payload, "error")
+    detail = " · ".join(item for item in (toolName, policyCode) if item)
+    return {
+        "eventIndex": event.eventIndex,
+        "eventType": event.eventType,
+        "toolName": toolName,
+        "status": "error",
+        "error": message,
+        "category": "policy",
+        "lane": "safety",
+        "target": "teacher-tool-policy",
+        "risk": "safety",
+        "workLabel": "도구 정책 확인",
+        "workDetail": detail or "tool policy violation",
+        "elapsedMs": event.elapsedMs,
+    }
+
+
+def _turnErrorWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
+    message = _payloadText(event.payload, "message") or _payloadText(event.payload, "error")
+    return {
+        "eventIndex": event.eventIndex,
+        "eventType": event.eventType,
+        "status": "error",
+        "error": message,
+        "category": "provider",
+        "lane": "read",
+        "target": "provider-stream",
+        "risk": "normal",
+        "workLabel": "provider 오류",
+        "workDetail": "provider 응답 스트림 처리 중단",
+        "elapsedMs": event.elapsedMs,
+    }
+
+
+def _clarificationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
+    questions = event.payload.get("questions")
+    defaults = event.payload.get("defaults")
+    questionCount = len(questions) if isinstance(questions, list) else 0
+    defaultCount = len(defaults) if isinstance(defaults, dict) else 0
+    return {
+        "eventIndex": event.eventIndex,
+        "eventType": event.eventType,
+        "status": "waiting",
+        "category": "teacher",
+        "lane": "read",
+        "target": "clarification-gate",
+        "risk": "normal",
+        "workLabel": "작업 전 확인 질문",
+        "workDetail": f"핵심 질문 {questionCount}개 · 기본값 {defaultCount}개",
+        "elapsedMs": event.elapsedMs,
+    }
+
+
+def _payloadText(payload: dict[str, Any], key: str) -> str:
+    value = payload.get(key)
+    return value if isinstance(value, str) else ""

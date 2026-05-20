@@ -223,7 +223,9 @@ function AssistantWorkLoop({ steps, trace }: { steps?: AssistantWorkStep[]; trac
   const traceWorkloop = traceWorkloopEvents(trace);
   if (!visibleSteps.length && !trace) return null;
   const runningStep = visibleSteps.find((step) => step.status === "running");
-  const hasError = visibleSteps.some((step) => step.status === "error") || Boolean((trace?.errorCount ?? 0) > 0);
+  const policyCount = trace?.policyViolationCount ?? trace?.policyViolations?.length ?? 0;
+  const hasError =
+    visibleSteps.some((step) => step.status === "error") || Boolean((trace?.errorCount ?? 0) > 0 || policyCount > 0);
   const toolSteps = visibleSteps.filter((step) => step.toolName);
   const groups = groupAssistantSteps(visibleSteps);
   const label = runningStep
@@ -346,7 +348,8 @@ function AssistantTraceDetails({ trace, workloop }: { trace?: AiTraceSummary; wo
   const eventCount = trace.eventCount ?? trace.events?.length ?? 0;
   const toolCount = trace.toolCount ?? trace.toolSequence?.length ?? 0;
   const errorCount = trace.errorCount ?? workloop.filter((event) => event.status === "error" || event.error).length;
-  const hasPolicyViolation = Boolean((trace.policyViolationCount ?? 0) > 0 || trace.policyViolations?.length);
+  const policyCount = trace.policyViolationCount ?? trace.policyViolations?.length ?? 0;
+  const hasPolicyViolation = policyCount > 0;
 
   return (
     <details className="rounded-md border border-border/70 bg-background/50 px-2.5 py-2">
@@ -359,7 +362,7 @@ function AssistantTraceDetails({ trace, workloop }: { trace?: AiTraceSummary; wo
         <span>trace detail</span>
         {trace.traceId ? <span className="font-mono text-[10px] text-muted-foreground">{trace.traceId}</span> : null}
         <span className="ml-auto text-[10px] text-muted-foreground">
-          event {eventCount} · tool {toolCount} · error {errorCount}
+          event {eventCount} · tool {toolCount} · error {errorCount} · policy {policyCount}
         </span>
       </summary>
       <div className="mt-2 space-y-2">
@@ -392,7 +395,9 @@ function TraceWorkloopRow({ event }: { event: AiTraceWorkloopEvent }) {
   return (
     <div className={cn("rounded-sm px-2 py-1.5", isError ? "bg-destructive/10 text-destructive" : "bg-muted/20")}>
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-medium text-foreground">{event.workLabel || event.toolName || event.eventType || "작업"}</span>
+        <span className={cn("font-medium", !isError && "text-foreground")}>
+          {event.workLabel || event.toolName || event.eventType || "작업"}
+        </span>
         {event.toolName ? <span className="font-mono text-[10px] text-muted-foreground">{event.toolName}</span> : null}
         {event.status ? <span className="font-mono text-[10px] text-muted-foreground">{event.status}</span> : null}
         {elapsed ? <span className="ml-auto font-mono text-[10px] text-muted-foreground">{elapsed}</span> : null}

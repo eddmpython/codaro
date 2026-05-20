@@ -732,12 +732,19 @@ def testEvalHarnessFailsPolicyViolationsByDefault() -> None:
     case = TeacherEvalCase(caseId="no-policy-violations", prompt="셀 실행해줘")
     report = evaluateToolTrace(case, trace)
 
+    traceSummary = trace.summary()
+
     assert not report.passed
-    assert trace.summary()["policyViolations"] == [{
+    assert traceSummary["policyViolations"] == [{
         "policyCode": "dependency-preflight-required",
         "toolName": "cell-call",
         "message": "packages-check가 필요합니다.",
     }]
+    assert traceSummary["workloop"][0]["workLabel"] == "도구 정책 확인"
+    assert traceSummary["workloop"][0]["target"] == "teacher-tool-policy"
+    assert traceSummary["workloop"][0]["toolName"] == "cell-call"
+    assert traceSummary["workloop"][0]["status"] == "error"
+    assert traceSummary["workloop"][0]["error"] == "packages-check가 필요합니다."
     assert report.policyViolationCount == 1
     assert any("policy violations observed: 1" in failure for failure in report.failures)
     assert report.policyViolations == ({
@@ -824,6 +831,8 @@ def testProviderLoopReturnsClarificationWithoutProviderCall() -> None:
     assert payload["toolCalls"] == []
     assert payload["trace"]["toolSequence"] == []
     assert payload["trace"]["eventCount"] == 3
+    assert payload["trace"]["workloop"][0]["workLabel"] == "작업 전 확인 질문"
+    assert payload["trace"]["workloop"][0]["target"] == "clarification-gate"
     assert "학습자 수준" in payload["answer"]
     assert convManager.assistantMessages[0]["content"] == payload["answer"]
 
@@ -1044,6 +1053,8 @@ def testProviderStreamReportsStreamingErrorsInTrace() -> None:
     assert events[-1]["trace"]["conversationId"] == "conv-stream-error"
     assert events[-1]["trace"]["errorCount"] == 1
     assert events[-1]["trace"]["eventCount"] == 2
+    assert events[-1]["trace"]["workloop"][0]["workLabel"] == "provider 오류"
+    assert events[-1]["trace"]["workloop"][0]["error"] == "stream broken"
 
 
 def testProviderStreamEventHelpersOwnProtocolShape() -> None:
