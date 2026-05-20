@@ -7,11 +7,13 @@ import pytest
 
 from codaro.ai.tools import (
     allTools,
+    defaultTools,
     getTool,
     registerTool,
     toolSchemas,
     ToolDef,
 )
+from codaro.ai.toolContract import validateDefaultToolContract
 from codaro.ai.toolExecutor import ToolExecutor
 from codaro.document.models import BlockConfig, CodaroDocument
 
@@ -60,6 +62,14 @@ class TestToolRegistry:
     def test_all_builtin_tools_registered(self):
         names = {t.name for t in allTools()}
         assert EXPECTED_BUILTIN_TOOLS.issubset(names)
+
+    def test_default_tool_list_matches_registry(self):
+        defaultNames = {tool.name for tool in defaultTools()}
+        registeredNames = {tool.name for tool in allTools()}
+        assert defaultNames.issubset(registeredNames)
+
+    def test_default_tool_contract_is_complete(self):
+        assert validateDefaultToolContract() == []
 
     def test_get_returns_none_for_unknown(self):
         assert getTool("nonexistent-xyz") is None

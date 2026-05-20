@@ -13,7 +13,8 @@ from .providerSpec import (
 )
 from .secrets import SecretStore, getSecretStore
 from .toolExecutor import ToolExecutor
-from .tools import ToolDef, toolSchemas, allTools, getTool, registerTool
+from .toolContract import ToolContractIssue, assertDefaultToolContract, validateDefaultToolContract
+from .tools import ToolDef, toolSchemas, allTools, defaultTools, getTool, registerTool
 from .types import LLMConfig, LLMResponse, ToolCall, ToolResponse
 
 __all__ = [
@@ -38,8 +39,12 @@ __all__ = [
     "getSecretStore",
     "ToolDef",
     "ToolExecutor",
+    "ToolContractIssue",
+    "assertDefaultToolContract",
+    "validateDefaultToolContract",
     "toolSchemas",
     "allTools",
+    "defaultTools",
     "getTool",
     "registerTool",
     "LLMConfig",
