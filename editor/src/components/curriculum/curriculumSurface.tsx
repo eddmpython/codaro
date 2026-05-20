@@ -430,10 +430,13 @@ function CurriculumSectionCard({
 
   return (
     <section
+      aria-label={`${section.title} 학습 섹션`}
       className={cn(
         "overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm",
         selected && "ring-1 ring-ring/35",
       )}
+      data-learning-section-card={section.id}
+      data-learning-section-structured={structured ? "true" : "false"}
       id={cellDomId(section.anchorBlockId)}
     >
       <button
@@ -613,7 +616,7 @@ function SectionContractOverview({ contract }: { contract?: CurriculumSectionCon
   if (!goal && !why && !explanation && !tips.length) return null;
 
   return (
-    <div className="border-b bg-background/35 px-4 py-3">
+    <div className="border-b bg-background/35 px-4 py-3" data-learning-section-part="overview">
       <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(220px,280px)]">
         <div className="min-w-0 space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -636,7 +639,15 @@ function SectionContractOverview({ contract }: { contract?: CurriculumSectionCon
               </div>
             ) : null}
           </div>
-          {explanation ? <p className="text-sm leading-6 text-muted-foreground">{explanation}</p> : null}
+          {explanation ? (
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                <BookOpen className="size-3.5" />
+                상세 설명
+              </div>
+              <p className="mt-1 text-sm leading-6 text-muted-foreground">{explanation}</p>
+            </div>
+          ) : null}
         </div>
         {tips.length ? (
           <div className="min-w-0 border-t pt-3 lg:border-l lg:border-t-0 lg:pl-3 lg:pt-0">
@@ -698,6 +709,7 @@ function StructuredSectionLearningBody({
           detail={parts.snippet.description || stripMarkdown(readPayloadText(section.contract?.goal))}
           icon={<TerminalSquare className="size-3.5" />}
           label="예제 스니펫"
+          part="snippet"
           title={blockLabel(parts.snippet)}
         >
           <CodePayload value={parts.snippet.content} />
@@ -707,6 +719,7 @@ function StructuredSectionLearningBody({
       {exercise ? (
         <div
           className={cn("px-4 py-4", exerciseSelected && "bg-muted/20")}
+          data-learning-section-part="exercise"
           id={cellDomId(exercise.id)}
           onClick={() => onSelectBlock(exercise.id)}
         >
@@ -775,16 +788,21 @@ function StructuredSectionLearningBody({
             )}
           </div>
 
-          {exerciseResult ? (
-            <div className="mt-3">
-              <div className="mb-1.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
-                <CheckCircle2 className="size-3.5" />
-                실행 결과
-              </div>
-              <ExecutionOutput result={exerciseResult} />
+          <div className="mt-3" data-learning-section-part="result">
+            <div className="mb-1.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <CheckCircle2 className="size-3.5" />
+              실행 결과
             </div>
-          ) : null}
-          {exerciseRunning && !exerciseResult ? <div className="mt-3"><LoadingInline label="셀 실행 중" /></div> : null}
+            {exerciseResult ? (
+              <ExecutionOutput result={exerciseResult} />
+            ) : exerciseRunning ? (
+              <LoadingInline label="셀 실행 중" />
+            ) : (
+              <div className="rounded-md border border-dashed bg-background/60 px-3 py-2 text-xs leading-5 text-muted-foreground">
+                셀을 실행하면 결과와 오류가 여기에 표시됩니다.
+              </div>
+            )}
+          </div>
         </div>
       ) : null}
 
@@ -792,6 +810,7 @@ function StructuredSectionLearningBody({
         <StructuredSectionBand
           icon={<CheckCircle2 className="size-3.5" />}
           label="검증/피드백"
+          part="check"
           title={blockLabel(parts.check)}
         >
           <CurriculumMarkdownBody block={parts.check} />
@@ -828,16 +847,18 @@ function StructuredSectionBand({
   detail,
   icon,
   label,
+  part,
   title,
 }: {
   children: ReactNode;
   detail?: string;
   icon: ReactNode;
   label: string;
+  part: string;
   title?: string;
 }) {
   return (
-    <div className="px-4 py-4">
+    <div className="px-4 py-4" data-learning-section-part={part}>
       <div className="mb-3 min-w-0">
         <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
           {icon}
