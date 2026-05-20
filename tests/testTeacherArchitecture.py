@@ -117,6 +117,21 @@ class _FakeProvider:
         return ToolResponse(answer="완료", provider="fake", model="test", toolCalls=[])
 
 
+class _ProviderShouldNotBeCalled:
+    supportsNativeTools = True
+
+    def __init__(self) -> None:
+        self.callCount = 0
+
+    def completeWithTools(self, messages: list[dict], tools: list[dict]):
+        self.callCount += 1
+        raise AssertionError("provider should not be called")
+
+    def complete(self, messages: list[dict]):
+        self.callCount += 1
+        raise AssertionError("provider should not be called")
+
+
 class _ScriptedProvider:
     supportsNativeTools = True
 
@@ -531,6 +546,43 @@ def testEvalHarnessCanValidateStructuredCurriculumTrace() -> None:
     assert trace.summary()["yamlContractObserved"]
 
 
+def testEvalHarnessValidatesClarificationGateTrace() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "ambiguous-learning-asks-clarification")
+    plan = buildClarificationPlan(case.prompt)
+    orchestrator = TeacherOrchestrator.fromContext({})
+    trace = orchestrator.startTrace("conv-clarification-eval")
+    trace.record("clarification-gate", plan.payload())
+
+    report = evaluateToolTrace(case, trace)
+
+    assert report.passed
+    assert report.observedTools == ()
+    assert report.observedWorkLabels == ("작업 전 확인 질문",)
+
+
+def testEvalHarnessFailsWeakClarificationGateTrace() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "ambiguous-learning-asks-clarification")
+    tracePayload = {
+        "toolSequence": [],
+        "workloop": [{"workLabel": "작업 전 확인 질문"}],
+        "events": [
+            {
+                "eventType": "clarification-gate",
+                "payload": {
+                    "questions": [],
+                    "defaults": {"level": "초급"},
+                },
+            }
+        ],
+    }
+
+    report = evaluateToolTracePayload(case, tracePayload)
+
+    assert not report.passed
+    assert "clarification question count out of range: 0" in report.failures
+    assert "missing clarification defaults: depth, environment, balance" in report.failures
+
+
 def testEvalHarnessChecksWorkloopAndStructuredYamlContract() -> None:
     case = TeacherEvalCase(
         caseId="structured-curriculum",
@@ -713,6 +765,30 @@ def testGoldenProviderCaseRunsActualLoopAndValidatesResults() -> None:
     assert "cell-call.passed" in report.evaluation.observedResultSignals
     assert report.turnPayload["answer"] == "검증 완료"
     assert [call["tool"] for call in executor.calls] == ["packages-check", "packages-install", "cell-call"]
+
+
+def testGoldenProviderCaseStopsAtClarificationGateWithoutProviderCall() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "ambiguous-learning-asks-clarification")
+    provider = _ProviderShouldNotBeCalled()
+    plan = buildClarificationPlan(case.prompt)
+
+    report = asyncio.run(runTeacherGoldenProviderCase(
+        case,
+        provider=provider,
+        executor=_FakeExecutor(),
+        convManager=_FakeConversationManager(),
+        orchestrator=TeacherOrchestrator.fromContext({}),
+        tools=toolSchemas(),
+        clarificationPlan=plan,
+    ))
+
+    assert report.passed
+    assert provider.callCount == 0
+    assert report.turnPayload["provider"] == "codaro"
+    assert report.turnPayload["model"] == "clarification-gate"
+    assert report.turnPayload["toolCalls"] == []
+    assert "학습자 수준" in report.turnPayload["answer"]
+    assert report.tracePayload["workloop"][0]["workLabel"] == "작업 전 확인 질문"
 
 
 def testGoldenProviderCaseValidatesStructuredYamlMaterialization() -> None:

@@ -13,11 +13,15 @@ class TeacherEvalCase:
     caseId: str
     prompt: str
     expectedTools: tuple[str, ...] = ()
+    expectedNoTools: bool = False
     orderedBefore: tuple[tuple[str, str], ...] = ()
     forbiddenTools: tuple[str, ...] = ()
     expectedWorkLabels: tuple[str, ...] = ()
     expectedTraceEvents: tuple[str, ...] = ()
     expectedToolResultFields: tuple[tuple[str, str], ...] = ()
+    expectedClarificationGate: bool = False
+    expectedClarificationQuestionRange: tuple[int, int] | None = None
+    expectedClarificationDefaultKeys: tuple[str, ...] = ()
     expectedYamlContract: bool = False
     expectedSectionCardFlow: bool = False
     expectedLoadedInEditor: bool = False
@@ -94,6 +98,17 @@ class TeacherGoldenRunReport:
 
 goldenEvalCases: tuple[TeacherEvalCase, ...] = (
     TeacherEvalCase(
+        caseId="ambiguous-learning-asks-clarification",
+        prompt="데이터 분석 커리큘럼 만들어줘",
+        expectedNoTools=True,
+        forbiddenTools=("write-curriculum-yaml", "packages-check", "cell-call"),
+        expectedWorkLabels=("작업 전 확인 질문",),
+        expectedTraceEvents=("clarification-gate",),
+        expectedClarificationGate=True,
+        expectedClarificationQuestionRange=(1, 3),
+        expectedClarificationDefaultKeys=("level", "depth", "environment", "balance"),
+    ),
+    TeacherEvalCase(
         caseId="curriculum-yaml-materialized",
         prompt="pandas 기초 커리큘럼 만들어줘",
         expectedTools=("write-curriculum-yaml",),
@@ -147,6 +162,8 @@ def evaluateToolSequence(
     for toolName in case.expectedTools:
         if toolName not in toolNames:
             failures.append(f"missing expected tool: {toolName}")
+    if case.expectedNoTools and toolNames:
+        failures.append(f"expected no tools, observed: {', '.join(toolNames)}")
     for toolName in case.forbiddenTools:
         if toolName in toolNames:
             failures.append(f"forbidden tool used: {toolName}")
@@ -189,6 +206,8 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
     for eventType in case.expectedTraceEvents:
         if eventType not in eventTypes:
             failures.append(f"missing expected trace event: {eventType}")
+    if case.expectedClarificationGate:
+        failures.extend(_clarificationGateFailures(tracePayload, case))
     if case.expectedYamlContract and not _hasYamlContract(tracePayload):
         failures.append("missing structured learning YAML contract")
     if case.expectedSectionCardFlow and not _hasStructuredSectionCardFlow(tracePayload):
@@ -264,6 +283,7 @@ async def runTeacherGoldenProviderCase(
     conversationId: str | None = None,
     messages: list[dict[str, Any]] | None = None,
     maxToolRounds: int = 10,
+    clarificationPlan: Any | None = None,
 ) -> TeacherGoldenRunReport:
     from ..tools import toolSchemas
     from .providerLoop import runTeacherChatLoop
@@ -279,6 +299,7 @@ async def runTeacherGoldenProviderCase(
         executor=executor,
         orchestrator=orchestrator,
         maxToolRounds=maxToolRounds,
+        clarificationPlan=clarificationPlan,
     )
     tracePayload = teacherTurnTracePayload(turnPayload)
     evaluation = evaluateToolTracePayload(case, tracePayload)
@@ -356,6 +377,43 @@ def _hasStructuredSectionCardFlow(tracePayload: Mapping[str, Any]) -> bool:
         _documentHasStructuredSectionCardFlow(document)
         for document in _iterCurriculumDocuments(tracePayload)
     )
+
+
+def _clarificationGateFailures(tracePayload: Mapping[str, Any], case: TeacherEvalCase) -> list[str]:
+    payloads = _clarificationGatePayloads(tracePayload)
+    if not payloads:
+        return ["missing clarification gate payload"]
+
+    failures: list[str] = []
+    payload = payloads[0]
+    questions = payload.get("questions")
+    questionCount = len(questions) if isinstance(questions, list) else 0
+    if case.expectedClarificationQuestionRange is not None:
+        minimum, maximum = case.expectedClarificationQuestionRange
+        if not minimum <= questionCount <= maximum:
+            failures.append(f"clarification question count out of range: {questionCount}")
+
+    defaults = payload.get("defaults")
+    defaultKeys = set(defaults.keys()) if isinstance(defaults, Mapping) else set()
+    missingDefaultKeys = [key for key in case.expectedClarificationDefaultKeys if key not in defaultKeys]
+    if missingDefaultKeys:
+        failures.append(f"missing clarification defaults: {', '.join(missingDefaultKeys)}")
+
+    return failures
+
+
+def _clarificationGatePayloads(tracePayload: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...]:
+    events = tracePayload.get("events")
+    if not isinstance(events, list):
+        return ()
+    payloads: list[Mapping[str, Any]] = []
+    for event in events:
+        if not isinstance(event, Mapping) or event.get("eventType") != "clarification-gate":
+            continue
+        payload = event.get("payload")
+        if isinstance(payload, Mapping):
+            payloads.append(payload)
+    return tuple(payloads)
 
 
 def _hasLoadedCurriculumDocument(tracePayload: Mapping[str, Any]) -> bool:

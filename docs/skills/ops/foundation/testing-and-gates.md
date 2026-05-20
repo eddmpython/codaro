@@ -51,6 +51,7 @@ uv run python -X utf8 tests/run.py gate teacher-eval
 - 새 pytest 파일은 가능한 한 제품/도메인 경계를 드러내는 이름을 쓴다.
 - teacher/tool 변경은 최소한 tool sequence, policy violation, workloop label, structured YAML contract, provider loop result signal 중 변경 표면 하나를 고정한다.
 - provider loop 변경은 가능한 한 실제 scripted provider run으로 `packages-check` → `packages-install` → `cell-call` 순서와 결과 필드(`missing`, `success`, `passed`)를 함께 검증한다.
+- clarification gate 변경은 실제 provider 호출 없이 멈추는 golden provider run을 검증한다. `toolSequence`가 비어 있고, 질문 수 1-3개와 기본값 key, workloop label이 빠지면 실패해야 한다.
 - curriculum YAML/provider golden 변경은 실제 `write-curriculum-yaml` 핸들러를 통과한 document 변경을 검증한다. `loadedInEditor`, structured section card flow, document runtime packages가 빠지면 실패해야 한다.
 - 학습카드/YAML 변경은 backend materializer 테스트와 editor build를 함께 확인한다.
 - 기존 부채를 새 테스트로 한 번에 해결하지 못하면 별도 baseline 또는 명시적 TODO 문서로 분리한다.
