@@ -50,7 +50,7 @@ import {
   buildRejectPendingChangesApplication,
   type PendingChangesApplication,
 } from "@/lib/pendingChanges";
-import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
+import type { AutomationSection, ThemeMode } from "@/lib/surfaceModel";
 import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
 import {
   blockLabel,
@@ -76,6 +76,7 @@ import {
 import { providerAssistantFailure } from "@/lib/providerConnection";
 import { useAutomationState } from "@/hooks/useAutomationState";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
+import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import {
   SidebarInset,
   SidebarProvider,
@@ -88,14 +89,8 @@ import type {
   VariableInfo,
 } from "@/types";
 
-function initialSurfaceFromLocation(): SurfaceMode {
-  const value = window.location.hash.replace(/^#/, "");
-  if (value === "editor" || value === "curriculum" || value === "automation" || value === "chat") return value;
-  return "chat";
-}
-
 function App() {
-  const [surface, setSurface] = useState<SurfaceMode>(() => initialSurfaceFromLocation());
+  const [surface, setSurface] = useSurfaceRoute();
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [apiOnline, setApiOnline] = useState(initialBootstrapState.apiOnline);
   const [notice, setNotice] = useState<AppNotice>(initialAppNotice);
@@ -199,12 +194,6 @@ function App() {
       });
     }
   }, [customCurricula]);
-
-  useEffect(() => {
-    if (window.location.hash !== `#${surface}`) {
-      window.history.replaceState(null, "", `#${surface}`);
-    }
-  }, [surface]);
 
   useEffect(() => {
     let cancelled = false;
