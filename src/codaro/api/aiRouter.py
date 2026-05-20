@@ -1,18 +1,15 @@
 from __future__ import annotations
 
 import asyncio
-import html as _html
 import json
 import logging
-import threading
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
-from urllib.parse import parse_qs, urlparse
 
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ..ai.completion import completeCode, emptyCompletionResult
+from ..ai.oauthFlow import getOAuthLoginFlow
 from ..ai.profile import AiProfileManager, getProfileManager
 from ..ai.providerModels import providerModelList
 from ..ai.profileMutation import (
@@ -49,9 +46,6 @@ _HANDLED_ERRORS = (
     TypeError,
     ValueError,
 )
-
-_oauthState: dict[str, Any] = {}
-
 
 class AiProfileUpdateRequest(BaseModel):
     provider: str | None = None
@@ -157,34 +151,15 @@ def createAiRouter(state: Any) -> APIRouter:
 
     @router.get("/api/oauth/authorize")
     def apiOauthAuthorize():
-        from ..ai.oauthToken import OAUTH_REDIRECT_PORT, buildAuthUrl
-
-        authUrl, verifier, oauthStateValue = buildAuthUrl()
-
-        _oauthState["verifier"] = verifier
-        _oauthState["state"] = oauthStateValue
-        _oauthState["done"] = False
-        _oauthState["error"] = None
-
-        _startOauthCallbackServer(OAUTH_REDIRECT_PORT)
-
-        return {"authUrl": authUrl, "state": oauthStateValue}
+        return getOAuthLoginFlow().authorize()
 
     @router.get("/api/oauth/status")
     def apiOauthStatus():
-        if _oauthState.get("error"):
-            return {"done": True, "error": _oauthState["error"]}
-        if _oauthState.get("done"):
-            return {"done": True, "error": None}
-        return {"done": False}
+        return getOAuthLoginFlow().status()
 
     @router.post("/api/oauth/logout")
     def apiOauthLogout():
-        from ..ai.oauthToken import revokeToken
-
-        revokeToken()
-        getProfileManager().update(provider="oauth-chatgpt", updatedBy="ui")
-        return {"ok": True}
+        return getOAuthLoginFlow().logout()
 
     @router.post("/api/ai/conversations")
     def apiCreateConversation(
@@ -308,80 +283,3 @@ def _prepareTeacherRuntimeTurnForHttp(*, body: dict[str, Any], convManager: Any,
         raise HTTPException(status_code=404, detail="Conversation not found") from exc
     except _HANDLED_ERRORS as exc:
         raise _providerUnavailable(exc) from exc
-
-
-def _startOauthCallbackServer(port: int):
-    class CallbackHandler(BaseHTTPRequestHandler):
-        def do_GET(self):
-            parsed = urlparse(self.path)
-            if parsed.path != "/auth/callback":
-                self.send_response(404)
-                self.end_headers()
-                return
-
-            params = parse_qs(parsed.query)
-            code = params.get("code", [None])[0]
-            callbackState = params.get("state", [None])[0]
-            error = params.get("error", [None])[0]
-
-            if error:
-                _oauthState["error"] = error
-                _oauthState["done"] = True
-                self._respondHtml("Authentication Failed", f"Error: {error}")
-                return
-
-            if callbackState != _oauthState.get("state"):
-                _oauthState["error"] = "state_mismatch"
-                _oauthState["done"] = True
-                self._respondHtml("Authentication Failed", "Security validation failed (state mismatch)")
-                return
-
-            if not code:
-                _oauthState["error"] = "no_code"
-                _oauthState["done"] = True
-                self._respondHtml("Authentication Failed", "No authorization code received")
-                return
-
-            try:
-                from codaro.ai.oauthToken import exchangeCode
-
-                exchangeCode(code, _oauthState["verifier"])
-                getProfileManager().update(provider="oauth-chatgpt", updatedBy="ui")
-                _oauthState["done"] = True
-                self._respondHtml("Authentication Successful", "Codaro authentication complete. You may close this window.")
-            except Exception as exc:  # noqa: BLE001 — browser callback must not crash
-                _oauthState["error"] = str(exc)
-                _oauthState["done"] = True
-                self._respondHtml("Authentication Failed", f"Token exchange failed: {exc}")
-
-        def _respondHtml(self, title: str, message: str):
-            safeTitle = _html.escape(title)
-            safeMessage = _html.escape(message)
-            markup = (
-                "<!DOCTYPE html><html><head><meta charset='utf-8'>"
-                f"<title>{safeTitle}</title>"
-                "<style>body{font-family:system-ui;display:flex;align-items:center;"
-                "justify-content:center;min-height:100vh;margin:0;background:#09090b;color:#e4e4e7}"
-                "div{text-align:center;padding:2rem}"
-                "h1{font-size:1.5rem;margin-bottom:1rem}"
-                "</style></head><body>"
-                f"<div><h1>{safeTitle}</h1><p>{safeMessage}</p></div>"
-                "<script>setTimeout(()=>window.close(),3000)</script>"
-                "</body></html>"
-            )
-            self.send_response(200)
-            self.send_header("Content-Type", "text/html; charset=utf-8")
-            self.end_headers()
-            self.wfile.write(markup.encode("utf-8"))
-
-        def log_message(self, fmt, *args):
-            pass
-
-    def _runServer():
-        server = HTTPServer(("127.0.0.1", port), CallbackHandler)
-        server.timeout = 120
-        server.handle_request()
-        server.server_close()
-
-    thread = threading.Thread(target=_runServer, daemon=True)
-    thread.start()

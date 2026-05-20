@@ -5,6 +5,7 @@ import pytest
 from codaro.ai.completion import buildCompletionMessages, completeCode, completionTextFromAnswer
 from codaro.ai.providerModels import DEFAULT_OPENAI_CHAT_MODELS, filterOpenaiChatModelIds, providerModelList
 from codaro.ai.providerValidation import providerValidationConfig, validateProviderConnection
+from codaro.ai.oauthFlow import OAuthLoginFlow
 from codaro.ai.types import LLMConfig, LLMResponse, ToolCall, ToolResponse
 from codaro.ai.factory import createProvider, availableProviders, registerProvider
 from codaro.ai.providerSpec import (
@@ -63,6 +64,14 @@ class _ValidationProvider:
 
     def checkAvailable(self) -> bool:
         return self.available
+
+
+class _OAuthProfileManager:
+    def __init__(self) -> None:
+        self.updates: list[dict[str, str]] = []
+
+    def update(self, *, provider: str, updatedBy: str):
+        self.updates.append({"provider": provider, "updatedBy": updatedBy})
 
 
 class TestLLMConfig:
@@ -358,3 +367,54 @@ class TestOAuthChatGPTTools:
         assert toolCalls[0].id == "call_1"
         assert toolCalls[0].name == "get-variables"
         assert toolCalls[0].arguments == {"limit": 5}
+
+
+class TestOAuthLoginFlow:
+    def test_authorize_and_callback_success(self):
+        exchanged: list[tuple[str, str]] = []
+        profileManager = _OAuthProfileManager()
+        flow = OAuthLoginFlow(
+            authUrlBuilder=lambda: ("http://auth.test", "verifier-test", "state-test"),
+            codeExchanger=lambda code, verifier: exchanged.append((code, verifier)) or {},
+            profileManagerFactory=lambda: profileManager,
+            tokenRevoker=lambda: None,
+        )
+
+        assert flow.authorize(startServer=False) == {"authUrl": "http://auth.test", "state": "state-test"}
+        assert flow.status() == {"done": False}
+
+        response = flow.handleCallback("/auth/callback?code=code-test&state=state-test")
+
+        assert response.statusCode == 200
+        assert response.title == "Authentication Successful"
+        assert flow.status() == {"done": True, "error": None}
+        assert exchanged == [("code-test", "verifier-test")]
+        assert profileManager.updates == [{"provider": "oauth-chatgpt", "updatedBy": "ui"}]
+
+    def test_callback_rejects_state_mismatch(self):
+        flow = OAuthLoginFlow(
+            authUrlBuilder=lambda: ("http://auth.test", "verifier-test", "state-test"),
+            codeExchanger=lambda code, verifier: {},
+            profileManagerFactory=lambda: _OAuthProfileManager(),
+            tokenRevoker=lambda: None,
+        )
+        flow.authorize(startServer=False)
+
+        response = flow.handleCallback("/auth/callback?code=code-test&state=wrong")
+
+        assert response.title == "Authentication Failed"
+        assert flow.status() == {"done": True, "error": "state_mismatch"}
+
+    def test_logout_revokes_token_and_updates_profile(self):
+        revoked: list[bool] = []
+        profileManager = _OAuthProfileManager()
+        flow = OAuthLoginFlow(
+            authUrlBuilder=lambda: ("http://auth.test", "verifier-test", "state-test"),
+            codeExchanger=lambda code, verifier: {},
+            profileManagerFactory=lambda: profileManager,
+            tokenRevoker=lambda: revoked.append(True),
+        )
+
+        assert flow.logout() == {"ok": True}
+        assert revoked == [True]
+        assert profileManager.updates == [{"provider": "oauth-chatgpt", "updatedBy": "ui"}]
