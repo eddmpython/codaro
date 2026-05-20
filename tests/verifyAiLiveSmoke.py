@@ -9,6 +9,8 @@ import time
 from dataclasses import dataclass, field
 from typing import Any
 
+import yaml
+
 from codaro.ai.conversation import ConversationManager, buildSystemPrompt
 from codaro.ai.factory import createProvider
 from codaro.ai.oauthToken import TokenRefreshError, loadToken
@@ -114,25 +116,20 @@ class LiveProviderRun:
 class LiveSmokeExecutor:
     def __init__(self) -> None:
         self.calls: list[dict[str, Any]] = []
+        self.results: list[dict[str, Any]] = []
 
     async def execute(self, toolName: str, arguments: dict[str, Any]) -> dict[str, Any]:
         self.calls.append({"tool": toolName, "arguments": arguments})
         if toolName == "write-curriculum-yaml":
-            return {
-                "ok": True,
-                "loadedInEditor": True,
-                "documentId": "live-smoke-document",
-                "title": "live smoke lesson",
-                "sectionCount": 1,
-                "exerciseCellCount": 1,
-                "snippetCellCount": 1,
-                "contractGapCount": 0,
-                "runtimePackageCount": 1,
-            }
+            result = materializeLiveSmokeYaml(arguments)
+            self.results.append({"tool": toolName, "result": result})
+            return result
         if toolName == "packages-check":
-            return {"missing": [], "packages": [], "ready": True}
+            result = {"missing": [], "packages": [], "ready": True}
+            self.results.append({"tool": toolName, "result": result})
+            return result
         if toolName == "packages-install":
-            return {
+            result = {
                 "success": True,
                 "package": str(arguments.get("name") or "package"),
                 "installer": "uv",
@@ -140,15 +137,27 @@ class LiveSmokeExecutor:
                 "durationMs": 0,
                 "skipped": True,
             }
+            self.results.append({"tool": toolName, "result": result})
+            return result
         if toolName == "cell-call":
-            return {"passed": True, "status": "live-smoke-simulated"}
+            result = {"passed": True, "status": "live-smoke-simulated"}
+            self.results.append({"tool": toolName, "result": result})
+            return result
         if toolName == "read-cells":
-            return {"blocks": []}
+            result = {"blocks": []}
+            self.results.append({"tool": toolName, "result": result})
+            return result
         if toolName == "get-variables":
-            return {"variables": []}
+            result = {"variables": []}
+            self.results.append({"tool": toolName, "result": result})
+            return result
         if toolName == "write-cell":
-            return {"ok": True, "updated": True}
-        return {"ok": True, "tool": toolName}
+            result = {"ok": True, "updated": True}
+            self.results.append({"tool": toolName, "result": result})
+            return result
+        result = {"ok": True, "tool": toolName}
+        self.results.append({"tool": toolName, "result": result})
+        return result
 
 
 def main() -> int:
@@ -458,7 +467,10 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
             "role": "user",
             "content": (
                 "초급 pandas 실습 중심 아주 짧은 레슨을 만들어줘. "
-                "답변만 하지 말고 write-curriculum-yaml tool을 호출해 Codaro 커리큘럼으로 반영해줘."
+                "반드시 structured Codaro YAML 계약으로 작성하세요: meta, intro.direction, intro.benefits, "
+                "intro.diagram.steps, intro.diagram.runtime, sections[0].title/subtitle/goal/why/explanation/"
+                "tips/snippet/exercise.prompt/exercise.starterCode/exercise.hints/exercise.check/check. "
+                "섹션은 1개만 만들고, 답변만 하지 말고 write-curriculum-yaml tool을 호출해 반영하세요."
             ),
         },
     ]
@@ -478,15 +490,36 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
 
     toolNames = toolNamesFromPayload(payload)
     trace = traceFromPayload(payload)
+    yamlResults = toolResultsByName(executor.results, "write-curriculum-yaml")
+    yamlResult = yamlResults[-1] if yamlResults else {}
+    contractGapCount = intSignal(yamlResult, "contractGapCount")
+    sectionCount = intSignal(yamlResult, "sectionCount")
+    exerciseCellCount = intSignal(yamlResult, "exerciseCellCount")
+    snippetCellCount = intSignal(yamlResult, "snippetCellCount")
+    yamlContractObserved = bool(trace.get("yamlContractObserved"))
     usedCurriculumTool = "write-curriculum-yaml" in toolNames
-    passed = usedCurriculumTool and str(payload.get("provider") or "") != ""
+    passed = (
+        usedCurriculumTool
+        and str(payload.get("provider") or "") != ""
+        and contractGapCount == 0
+        and sectionCount >= 1
+        and exerciseCellCount >= 1
+        and snippetCellCount >= 1
+        and yamlContractObserved
+    )
     error = None
     if not usedCurriculumTool:
         error = "live provider did not call write-curriculum-yaml; prompt/tool schema tuning required"
+    elif contractGapCount != 0:
+        error = f"live provider YAML has contract gaps: {yamlResult.get('contractGaps')}"
+    elif not yamlContractObserved:
+        error = "live provider YAML materialization did not expose learning/section contract"
+    elif sectionCount < 1 or exerciseCellCount < 1 or snippetCellCount < 1:
+        error = "live provider YAML did not materialize section, snippet, and exercise cells"
     return LiveSmokeCase(
         caseId="live-tool-loop",
         passed=passed,
-        status="passed" if passed else "missing live tool call",
+        status="passed" if passed else "live curriculum quality failed",
         durationMs=elapsedMs(startedAt),
         provider=str(payload.get("provider") or config.provider),
         model=str(payload.get("model") or provider.resolvedModel),
@@ -495,6 +528,11 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
             "toolCount": len(toolNames),
             "workloopCount": len(trace.get("workloop") or []),
             "executorCalls": [call["tool"] for call in executor.calls],
+            "contractGapCount": contractGapCount,
+            "sectionCount": sectionCount,
+            "exerciseCellCount": exerciseCellCount,
+            "snippetCellCount": snippetCellCount,
+            "yamlContractObserved": yamlContractObserved,
             "answerChars": len(str(payload.get("answer") or "")),
         },
         error=error,
@@ -523,8 +561,10 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
             "role": "user",
             "content": (
                 "실제 실행 도구 smoke입니다. 대상 셀 id는 live-smoke-cell입니다. "
-                "먼저 packages-check tool로 numpy 준비 상태를 확인한 뒤, "
-                "packages-check 결과가 ready이면 cell-call tool로 live-smoke-cell을 run 하세요. "
+                "정확히 두 개의 tool call만 사용하세요. "
+                "1) packages-check tool을 names=[\"numpy\"]로 한 번만 호출합니다. "
+                "2) 그 결과가 ready이면 cell-call tool을 operation=\"run\", blockId=\"live-smoke-cell\"로 한 번만 호출합니다. "
+                "packages-check를 반복 호출하거나 read-cells/write-cell/write-curriculum-yaml을 호출하지 마세요. "
                 "답변만 하지 말고 반드시 도구 호출로 확인하세요."
             ),
         },
@@ -549,11 +589,13 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
     usedPackageCheck = "packages-check" in executorCalls
     usedCellCall = "cell-call" in executorCalls
     ordered = toolsInOrder(executorCalls, "packages-check", "cell-call")
+    exactSequence = executorCalls == ["packages-check", "cell-call"]
     policyViolationCount = int(trace.get("policyViolationCount") or 0)
     passed = (
         usedPackageCheck
         and usedCellCall
         and ordered
+        and exactSequence
         and policyViolationCount == 0
         and str(payload.get("provider") or "") != ""
     )
@@ -564,6 +606,8 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
         error = "live provider did not call packages-check before cell-call"
     elif not ordered:
         error = "live provider called cell-call before packages-check"
+    elif not exactSequence:
+        error = f"live provider made unnecessary tool calls: {executorCalls}"
     elif policyViolationCount:
         error = "live provider cell-call triggered tool policy violation"
     return LiveSmokeCase(
@@ -579,6 +623,7 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
             "workloopCount": len(trace.get("workloop") or []),
             "policyViolationCount": policyViolationCount,
             "executorCalls": executorCalls,
+            "exactSequence": exactSequence,
             "answerChars": len(str(payload.get("answer") or "")),
         },
         error=error,
@@ -599,6 +644,60 @@ def toolsInOrder(toolNames: list[str], before: str, after: str) -> bool:
         return toolNames.index(before) < toolNames.index(after)
     except ValueError:
         return False
+
+
+def materializeLiveSmokeYaml(arguments: dict[str, Any]) -> dict[str, Any]:
+    rawContent = arguments.get("yamlContent")
+    try:
+        from codaro.ai.toolHandlers.workbench import _curriculumContractGaps
+        from codaro.curriculum.converter import yamlToDocument
+
+        payload = yaml.safe_load(rawContent) if isinstance(rawContent, str) else rawContent
+    except yaml.YAMLError as exc:
+        return {"error": f"Invalid curriculum YAML: {safeError(exc)}"}
+
+    if payload is None:
+        payload = {}
+    if not isinstance(payload, dict):
+        return {"error": "Curriculum YAML must parse to an object"}
+
+    try:
+        document, solutions = yamlToDocument(payload, "live-smoke", "live-provider")
+    except (KeyError, TypeError, ValueError) as exc:
+        return {"error": f"Curriculum YAML conversion failed: {safeError(exc)}"}
+
+    contractGaps = _curriculumContractGaps(document)
+    contractGapCount = sum(len(item["missingFields"]) for item in contractGaps)
+    return {
+        "ok": True,
+        "loadedInEditor": True,
+        "documentId": document.id,
+        "title": document.title,
+        "sectionCount": sum(1 for block in document.blocks if block.sourceType == "section"),
+        "exerciseCellCount": sum(1 for block in document.blocks if block.sourceType == "sectionContract:exercise"),
+        "snippetCellCount": sum(1 for block in document.blocks if block.sourceType == "sectionContract:snippet"),
+        "contractGapCount": contractGapCount,
+        "contractGaps": contractGaps,
+        "runtimePackageCount": len(document.runtime.packages),
+        "blockCount": len(document.blocks),
+        "solutionCount": len(solutions),
+        "document": document.model_dump(),
+    }
+
+
+def toolResultsByName(results: list[dict[str, Any]], toolName: str) -> list[dict[str, Any]]:
+    return [
+        item["result"]
+        for item in results
+        if item.get("tool") == toolName and isinstance(item.get("result"), dict)
+    ]
+
+
+def intSignal(payload: dict[str, Any], key: str) -> int:
+    value = payload.get(key)
+    if isinstance(value, int) and not isinstance(value, bool):
+        return value
+    return -1
 
 
 def failedCase(caseId: str, startedAt: float, config: LLMConfig, exc: BaseException) -> LiveSmokeCase:

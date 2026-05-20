@@ -153,3 +153,93 @@ def testToolsInOrderRequiresBothTools() -> None:
     assert smoke.toolsInOrder(["packages-check", "cell-call"], "packages-check", "cell-call")
     assert not smoke.toolsInOrder(["cell-call", "packages-check"], "packages-check", "cell-call")
     assert not smoke.toolsInOrder(["packages-check"], "packages-check", "cell-call")
+
+
+def testMaterializeLiveSmokeYamlReportsStructuredContractSignals() -> None:
+    smoke = loadSmoke()
+    yamlContent = """
+meta:
+  title: pandas live smoke
+  packages: [pandas]
+intro:
+  direction: DataFrame을 직접 만듭니다.
+  benefits:
+    - 표 데이터를 코드로 확인합니다.
+  diagram:
+    steps:
+      - label: 목표
+      - label: 실습
+    runtime:
+      - label: uv
+        detail: pandas 준비
+sections:
+  - title: DataFrame 만들기
+    subtitle: dict에서 표로
+    goal: dict를 DataFrame으로 바꿉니다.
+    why: 실무 표 데이터를 자동화할 수 있습니다.
+    explanation: pandas.DataFrame은 열 단위 데이터를 표로 묶습니다.
+    tips:
+      - 열 길이를 맞춥니다.
+    snippet: |
+      import pandas as pd
+      pd.DataFrame({"name": ["A"]})
+    exercise:
+      prompt: sales 열을 직접 만드세요.
+      starterCode: |
+        import pandas as pd
+        sales = ___
+      hints:
+        - pd.DataFrame을 사용하세요.
+      check:
+        variable: sales
+    check:
+      variable: sales
+"""
+
+    result = smoke.materializeLiveSmokeYaml({"yamlContent": yamlContent})
+
+    assert result["ok"] is True
+    assert result["sectionCount"] == 1
+    assert result["exerciseCellCount"] == 1
+    assert result["snippetCellCount"] == 1
+    assert result["contractGapCount"] == 0
+    assert result["runtimePackageCount"] == 1
+    assert result["document"]["blocks"][0]["payload"]["learningContract"]["meta"]["packages"] == ["pandas"]
+
+
+def testMaterializeLiveSmokeYamlReportsContractGaps() -> None:
+    smoke = loadSmoke()
+    yamlContent = """
+meta:
+  title: partial
+sections:
+  - title: 부분 섹션
+    goal: 목표만 있습니다.
+"""
+
+    result = smoke.materializeLiveSmokeYaml({"yamlContent": yamlContent})
+
+    assert result["contractGapCount"] > 0
+    assert result["contractGaps"][0]["missingFields"] == [
+        "subtitle",
+        "why",
+        "explanation",
+        "tips",
+        "snippet",
+        "exercise.prompt",
+        "exercise.starterCode",
+        "check",
+    ]
+
+
+def testToolResultsByNameFiltersResultPayloads() -> None:
+    smoke = loadSmoke()
+    results = [
+        {"tool": "packages-check", "result": {"ready": True}},
+        {"tool": "write-curriculum-yaml", "result": {"contractGapCount": 0}},
+        {"tool": "write-curriculum-yaml", "result": "ignored"},
+    ]
+
+    assert smoke.toolResultsByName(results, "write-curriculum-yaml") == [{"contractGapCount": 0}]
+    assert smoke.intSignal({"contractGapCount": 0}, "contractGapCount") == 0
+    assert smoke.intSignal({"contractGapCount": True}, "contractGapCount") == -1
