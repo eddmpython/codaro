@@ -467,6 +467,15 @@ def jsAssertLearningOverview(viewport: str) -> str:
   if (!diagram || !(diagram.textContent || '').includes('학습 아키텍처')) {{
     throw new Error('learning architecture diagram is missing');
   }}
+  if (!overview.querySelector('[data-learning-overview-blueprint="true"]')) {{
+    throw new Error('learning overview blueprint texture is missing');
+  }}
+  if (!overview.querySelector('[data-learning-overview-rail="true"]')) {{
+    throw new Error('learning overview rail is missing');
+  }}
+  if (!diagram.querySelector('[data-learning-flow-blueprint="true"]')) {{
+    throw new Error('learning architecture blueprint canvas is missing');
+  }}
   const canvas = diagram.querySelector('[data-learning-flow-canvas="true"]');
   if (!canvas) throw new Error('learning architecture canvas is missing');
   const track = diagram.querySelector('[data-learning-flow-track="spine"]');
@@ -475,10 +484,20 @@ def jsAssertLearningOverview(viewport: str) -> str:
   if (trackRect.width <= 0 || trackRect.height <= 0) throw new Error('learning architecture track has no visible size');
   const nodes = Array.from(canvas.querySelectorAll('[data-learning-flow-node="true"]'));
   if (nodes.length < 3) throw new Error('learning architecture nodes are missing');
+  if (canvas.querySelectorAll('[data-learning-flow-node-index="true"]').length !== nodes.length) {{
+    throw new Error('learning architecture node numbers are missing');
+  }}
+  if (canvas.querySelectorAll('[data-learning-flow-node-accent="true"]').length !== nodes.length) {{
+    throw new Error('learning architecture node accents are missing');
+  }}
   const connectors = Array.from(canvas.querySelectorAll('[data-learning-flow-connector="true"]'));
   if (connectors.length < 2) throw new Error('learning architecture connectors are missing');
-  if (!canvas.querySelector('[data-learning-flow-runtime="true"]')) {{
+  const runtime = canvas.querySelector('[data-learning-flow-runtime="true"]');
+  if (!runtime) {{
     throw new Error('learning architecture runtime strip is missing');
+  }}
+  if (runtime.querySelectorAll('[data-learning-flow-runtime-node="true"]').length < 3) {{
+    throw new Error('learning architecture runtime nodes are missing');
   }}
   const steps = Array.from(diagram.querySelectorAll('[data-learning-flow-step]')).map((item) =>
     item.getAttribute('data-learning-flow-step')

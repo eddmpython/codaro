@@ -61,6 +61,8 @@ OBJECTIVE_REQUIREMENTS = (
                 "data-learning-exercise-input",
                 "data-learning-exercise-input-role",
                 "data-learning-flow-canvas",
+                "data-learning-flow-blueprint",
+                "data-learning-flow-runtime-node",
                 "data-learning-flow-track",
             )),
             ("editor/src/components/app/appPrimitives.tsx", (
@@ -227,6 +229,8 @@ OBJECTIVE_REQUIREMENTS = (
                 "desktopOverview",
                 "mobileOverview",
                 "data-learning-flow-canvas",
+                "data-learning-flow-blueprint",
+                "data-learning-flow-runtime-node",
                 "data-learning-flow-track",
             )),
         ),

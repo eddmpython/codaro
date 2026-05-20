@@ -211,7 +211,22 @@ function LearningOverviewHeader({
       data-learning-overview="true"
       id={introBlock ? cellDomId(introBlock.id) : undefined}
     >
-      <div className="grid gap-5 p-5 xl:grid-cols-[minmax(0,1fr)_430px]">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-40"
+        data-learning-overview-blueprint="true"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, hsl(var(--border) / 0.55) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border) / 0.55) 1px, transparent 1px)",
+          backgroundSize: "32px 32px",
+        }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-y-0 left-0 w-1 bg-emerald-500"
+        data-learning-overview-rail="true"
+      />
+      <div className="relative z-10 grid gap-5 p-5 xl:grid-cols-[minmax(0,1fr)_430px]">
         <div className="flex min-w-0 flex-col">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary">커리큘럼</Badge>
@@ -312,19 +327,34 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
 
   return (
     <div
-      className="relative min-h-[260px] overflow-hidden rounded-md border bg-muted/20 p-4"
+      className="relative min-h-[286px] overflow-hidden rounded-md bg-background/75 p-4 ring-1 ring-border/80"
       data-learning-flow-diagram="true"
       data-learning-overview-part="diagram"
     >
       <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 opacity-45"
+        data-learning-flow-blueprint="true"
+        style={{
+          backgroundImage:
+            "linear-gradient(to right, hsl(var(--border) / 0.5) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--border) / 0.5) 1px, transparent 1px)",
+          backgroundSize: "28px 28px",
+        }}
+      />
+      <div
         aria-hidden
-        className="absolute left-[31px] top-[104px] bottom-16 w-px bg-border sm:inset-x-4 sm:bottom-auto sm:h-px sm:w-auto"
+        className="absolute left-[35px] top-[118px] bottom-[92px] w-px bg-border sm:inset-x-7 sm:top-[122px] sm:bottom-auto sm:h-px sm:w-auto"
         data-learning-flow-track="spine"
       />
       <div className="relative z-10 flex items-center justify-between gap-2">
-        <div className="flex items-center gap-2 text-sm font-semibold">
-          <Boxes className="size-4 text-muted-foreground" />
-          학습 아키텍처
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 text-sm font-semibold">
+            <Boxes className="size-4 text-muted-foreground" />
+            학습 아키텍처
+          </div>
+          <div className="mt-1 text-xs leading-5 text-muted-foreground">
+            YAML 계약에서 입력 셀과 검증까지 한 흐름으로 이어집니다
+          </div>
         </div>
         <Badge className="gap-1" variant="outline">
           <Wrench className="size-3" />
@@ -339,20 +369,26 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
           {visibleSteps.map(({ Icon, detail, label, tone }, index) => (
             <div className="contents" key={label}>
               <div
-                className="relative z-10 flex min-h-24 min-w-0 flex-1 flex-col justify-between rounded-md bg-card/95 px-3 py-2 ring-1 ring-border"
+                className="relative z-10 flex min-h-28 min-w-0 flex-1 flex-col justify-between rounded-md bg-card/95 px-3 py-3 shadow-sm ring-1 ring-border"
                 data-learning-flow-node="true"
                 data-learning-flow-step={label}
               >
-                <div className="flex items-start gap-2">
-                  <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-muted/50 ring-1 ring-border", tone)}>
+                <span
+                  className="absolute -top-2 left-3 rounded-md border bg-background px-1.5 py-0.5 text-[11px] font-semibold tabular-nums text-muted-foreground"
+                  data-learning-flow-node-index="true"
+                >
+                  {index + 1}
+                </span>
+                <div className="flex items-start gap-2 pt-1">
+                  <span className={cn("flex size-9 shrink-0 items-center justify-center rounded-md bg-muted/50 ring-1 ring-border", tone)}>
                     <Icon className="size-4" />
                   </span>
                   <span className="min-w-0">
                     <span className="block truncate text-sm font-semibold">{label}</span>
-                    <span className="mt-0.5 block truncate text-xs text-muted-foreground">{detail}</span>
+                    <span className="mt-1 block text-xs leading-5 text-muted-foreground">{detail}</span>
                   </span>
                 </div>
-                <span className="mt-3 h-1 rounded-full bg-muted">
+                <span className="mt-3 h-1 rounded-full bg-muted" data-learning-flow-node-accent="true">
                   <span
                     className={cn(
                       "block h-full rounded-full",
@@ -378,13 +414,15 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
             </div>
           ))}
         </div>
-        <div className="mt-4 grid gap-2 border-t pt-3 sm:grid-cols-3" data-learning-flow-runtime="true">
+        <div className="mt-4 rounded-md border bg-card/80 px-3 py-3" data-learning-flow-runtime="true">
+          <div className="mb-2 text-xs font-medium text-muted-foreground">런타임 레이어</div>
+          <div className="grid gap-2 sm:grid-cols-3">
           {[
             { label: "계약", detail: "YAML SSOT", Icon: GitBranch },
             { label: "환경", detail: "uv 패키지", Icon: Wrench },
             { label: "검증", detail: "실행 결과", Icon: CheckCircle2 },
           ].map(({ Icon, detail, label }) => (
-            <div className="flex min-w-0 items-center gap-2 text-xs" key={label}>
+            <div className="flex min-w-0 items-center gap-2 text-xs" data-learning-flow-runtime-node="true" key={label}>
               <Icon className="size-3.5 shrink-0 text-muted-foreground" />
               <span className="min-w-0">
                 <span className="mr-1 font-medium">{label}</span>
@@ -392,6 +430,7 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
               </span>
             </div>
           ))}
+          </div>
         </div>
       </div>
     </div>
