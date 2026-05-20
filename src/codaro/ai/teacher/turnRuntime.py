@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Callable
@@ -16,6 +17,69 @@ class TeacherRuntimeTurn:
     turn: TeacherTurnSession
     orchestrator: TeacherOrchestrator
     executor: ToolExecutor
+
+
+@dataclass(frozen=True)
+class TeacherRuntimeTurnRequest:
+    message: str
+    context: Any = None
+    conversationId: str | None = None
+    sessionId: str | None = None
+    providerOverride: str | None = None
+    roleOverride: str | None = None
+
+    @classmethod
+    def fromPayload(cls, payload: Mapping[str, Any]) -> TeacherRuntimeTurnRequest:
+        return cls(
+            conversationId=_optionalPayloadText(payload.get("conversationId")),
+            message=_payloadText(payload.get("message"), fallback=""),
+            sessionId=_optionalPayloadText(payload.get("sessionId")),
+            providerOverride=_optionalPayloadText(payload.get("provider")),
+            roleOverride=_optionalPayloadText(payload.get("role")),
+            context=payload.get("context"),
+        )
+
+
+def _payloadText(value: Any, *, fallback: str) -> str:
+    if value is None:
+        return fallback
+    if isinstance(value, str):
+        return value
+    return str(value)
+
+
+def _optionalPayloadText(value: Any) -> str | None:
+    if value is None:
+        return None
+    if isinstance(value, str):
+        return value
+    return str(value)
+
+
+def prepareTeacherRuntimeTurnFromRequest(
+    *,
+    convManager: Any,
+    profileManager: Any,
+    sessionManager: Any,
+    documentPath: str | Path | None,
+    workspaceRoot: str | Path | None,
+    request: TeacherRuntimeTurnRequest,
+    providerFactory: Callable[[LLMConfig], Any] = createProvider,
+) -> TeacherRuntimeTurn:
+    return prepareTeacherRuntimeTurn(
+        convManager=convManager,
+        profileManager=profileManager,
+        sessionManager=sessionManager,
+        documentPath=documentPath,
+        workspaceRoot=workspaceRoot,
+        conversationId=request.conversationId,
+        message=request.message,
+        context=request.context,
+        sessionId=request.sessionId,
+        providerOverride=request.providerOverride,
+        roleOverride=request.roleOverride,
+        providerFactory=providerFactory,
+    )
 
 
 def prepareTeacherRuntimeTurn(

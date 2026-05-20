@@ -24,7 +24,8 @@ from ..ai.providerSpec import (
 )
 from ..ai.teacher import (
     TeacherConversationNotFound,
-    prepareTeacherRuntimeTurn,
+    TeacherRuntimeTurnRequest,
+    prepareTeacherRuntimeTurnFromRequest,
     runTeacherChatLoop,
     runTeacherChatStream,
 )
@@ -211,32 +212,12 @@ def createAiRouter(state: Any) -> APIRouter:
     @router.post("/api/ai/chat")
     async def apiChat(request: Request):
         body = await request.json()
-        conversationId = body.get("conversationId")
-        message = body.get("message", "")
-        sessionId = body.get("sessionId")
-        providerOverride = body.get("provider")
-        roleOverride = body.get("role")
-        context = body.get("context")
-
         convManager = _getConversationManager()
-        try:
-            runtimeTurn = prepareTeacherRuntimeTurn(
-                convManager=convManager,
-                profileManager=getProfileManager(),
-                sessionManager=state.sessionManager,
-                documentPath=state.documentPath,
-                workspaceRoot=state.workspaceRoot,
-                conversationId=conversationId,
-                message=message,
-                context=context,
-                sessionId=sessionId,
-                providerOverride=providerOverride,
-                roleOverride=roleOverride,
-            )
-        except TeacherConversationNotFound as exc:
-            raise HTTPException(status_code=404, detail="Conversation not found") from exc
-        except _HANDLED_ERRORS as exc:
-            raise _providerUnavailable(exc) from exc
+        runtimeTurn = _prepareTeacherRuntimeTurnForHttp(
+            body=body,
+            convManager=convManager,
+            state=state,
+        )
 
         try:
             return await runTeacherChatLoop(
@@ -256,32 +237,12 @@ def createAiRouter(state: Any) -> APIRouter:
         from starlette.responses import StreamingResponse
 
         body = await request.json()
-        conversationId = body.get("conversationId")
-        message = body.get("message", "")
-        sessionId = body.get("sessionId")
-        providerOverride = body.get("provider")
-        roleOverride = body.get("role")
-        context = body.get("context")
-
         convManager = _getConversationManager()
-        try:
-            runtimeTurn = prepareTeacherRuntimeTurn(
-                convManager=convManager,
-                profileManager=getProfileManager(),
-                sessionManager=state.sessionManager,
-                documentPath=state.documentPath,
-                workspaceRoot=state.workspaceRoot,
-                conversationId=conversationId,
-                message=message,
-                context=context,
-                sessionId=sessionId,
-                providerOverride=providerOverride,
-                roleOverride=roleOverride,
-            )
-        except TeacherConversationNotFound as exc:
-            raise HTTPException(status_code=404, detail="Conversation not found") from exc
-        except _HANDLED_ERRORS as exc:
-            raise _providerUnavailable(exc) from exc
+        runtimeTurn = _prepareTeacherRuntimeTurnForHttp(
+            body=body,
+            convManager=convManager,
+            state=state,
+        )
 
         async def _streamGenerate():
             async for event in runTeacherChatStream(
@@ -332,6 +293,22 @@ def _getConversationManager():
         from ..ai.conversation import ConversationManager
         _conversationManager = ConversationManager()
     return _conversationManager
+
+
+def _prepareTeacherRuntimeTurnForHttp(*, body: dict[str, Any], convManager: Any, state: Any):
+    try:
+        return prepareTeacherRuntimeTurnFromRequest(
+            convManager=convManager,
+            profileManager=getProfileManager(),
+            sessionManager=state.sessionManager,
+            documentPath=state.documentPath,
+            workspaceRoot=state.workspaceRoot,
+            request=TeacherRuntimeTurnRequest.fromPayload(body),
+        )
+    except TeacherConversationNotFound as exc:
+        raise HTTPException(status_code=404, detail="Conversation not found") from exc
+    except _HANDLED_ERRORS as exc:
+        raise _providerUnavailable(exc) from exc
 
 
 def _startOauthCallbackServer(port: int):

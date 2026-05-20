@@ -6,6 +6,7 @@ from codaro.ai.conversation import buildSystemPrompt
 from codaro.ai.teacher import (
     TeacherEvalCase,
     TeacherOrchestrator,
+    TeacherRuntimeTurnRequest,
     ToolPolicyState,
     ToolPolicyViolation,
     executeTeacherToolRound,
@@ -14,6 +15,7 @@ from codaro.ai.teacher import (
     evaluateToolTracePayload,
     goldenEvalCases,
     prepareTeacherRuntimeTurn,
+    prepareTeacherRuntimeTurnFromRequest,
     prepareTeacherTurn,
     runTeacherChatLoop,
     runTeacherChatStream,
@@ -443,6 +445,38 @@ def testPrepareTeacherRuntimeTurnOwnsContextAndExecutorSetup(tmp_path) -> None:
     result = asyncio.run(runtimeTurn.executor.execute("get-variables", {}))
     assert result["error"] == "Session not found: session-test"
     assert sessionManager.requestedSessionId == "session-test"
+
+
+def testTeacherRuntimeTurnRequestOwnsPayloadShape(tmp_path) -> None:
+    convManager = _FakeConversationManager()
+    profileManager = _FakeProfileManager()
+    providerFactory = _ProviderFactory()
+    sessionManager = _FakeSessionManager()
+
+    request = TeacherRuntimeTurnRequest.fromPayload({
+        "message": "상태 확인",
+        "context": {"dependencyPreflight": {"packages": ["pandas"]}},
+        "sessionId": "session-payload",
+        "provider": "custom",
+        "role": "teacher",
+    })
+
+    runtimeTurn = prepareTeacherRuntimeTurnFromRequest(
+        convManager=convManager,
+        profileManager=profileManager,
+        sessionManager=sessionManager,
+        documentPath=None,
+        workspaceRoot=tmp_path,
+        request=request,
+        providerFactory=providerFactory,
+    )
+
+    assert request.message == "상태 확인"
+    assert request.sessionId == "session-payload"
+    assert runtimeTurn.turn.conversationId == "conv-created"
+    assert "[Dependency preflight]" in runtimeTurn.turn.messages[0]["content"]
+    assert profileManager.resolvedRole == "teacher"
+    assert profileManager.resolvedProvider == "custom"
 
 
 def testProviderStreamOwnsStreamingToolEvents() -> None:
