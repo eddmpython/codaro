@@ -47,13 +47,15 @@ class ScriptedProvider:
     def __init__(self, responses: list[ToolResponse]) -> None:
         self._responses = responses
         self.callCount = 0
+        self.messagesByCall: list[list[dict[str, Any]]] = []
 
     def completeWithTools(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> ToolResponse:
-        del messages, tools
+        del tools
+        self.messagesByCall.append(cloneProviderMessages(messages))
         return self._next()
 
     def complete(self, messages: list[dict[str, Any]]) -> ToolResponse:
-        del messages
+        self.messagesByCall.append(cloneProviderMessages(messages))
         return self._next()
 
     def _next(self) -> ToolResponse:
@@ -412,6 +414,11 @@ async def runDependencyPreflightCase() -> dict[str, Any]:
     extraFailures = []
     if observedCalls != ["packages-check", "packages-install", "cell-call"]:
         extraFailures.append(f"unexpected executor sequence: {observedCalls}")
+    if provider.callCount != 4:
+        extraFailures.append(f"dependency provider loop call count mismatch: {provider.callCount}")
+    for callIndex, toolCallId in ((1, "call-check"), (2, "call-install"), (3, "call-cell")):
+        if providerCallToolResultPayload(provider, callIndex, toolCallId) is None:
+            extraFailures.append(f"provider did not receive tool result before call {callIndex + 1}: {toolCallId}")
     return reportPayload(report, extraFailures)
 
 
@@ -463,6 +470,13 @@ async def runCurriculumMaterializationCase() -> dict[str, Any]:
     sourceTypes = {block.sourceType for block in activeDocument.blocks}
     if "sectionContract:exercise" not in sourceTypes:
         extraFailures.append("materialized document is missing sectionContract:exercise")
+    if provider.callCount != 2:
+        extraFailures.append(f"curriculum provider loop call count mismatch: {provider.callCount}")
+    yamlResult = providerCallToolResultPayload(provider, 1, "call-yaml")
+    if yamlResult is None:
+        extraFailures.append("provider did not receive curriculum materialization tool result")
+    elif yamlResult.get("loadedInEditor") is not True:
+        extraFailures.append("provider received curriculum tool result without loadedInEditor")
     signals = set(report.evaluation.observedResultSignals)
     if "write-curriculum-yaml.sectionCount" not in signals:
         extraFailures.append("curriculum materialization result is missing sectionCount")
@@ -520,6 +534,27 @@ def firstTraceEventPayload(tracePayload: dict[str, Any], eventType: str) -> dict
         if not isinstance(event, dict) or event.get("eventType") != eventType:
             continue
         payload = event.get("payload")
+        return payload if isinstance(payload, dict) else None
+    return None
+
+
+def cloneProviderMessages(messages: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return json.loads(json.dumps(messages, ensure_ascii=False))
+
+
+def providerCallToolResultPayload(provider: ScriptedProvider, callIndex: int, toolCallId: str) -> dict[str, Any] | None:
+    if callIndex >= len(provider.messagesByCall):
+        return None
+    for message in provider.messagesByCall[callIndex]:
+        if message.get("role") != "tool" or message.get("tool_call_id") != toolCallId:
+            continue
+        content = message.get("content")
+        if not isinstance(content, str):
+            return None
+        try:
+            payload = json.loads(content)
+        except json.JSONDecodeError:
+            return None
         return payload if isinstance(payload, dict) else None
     return None
 

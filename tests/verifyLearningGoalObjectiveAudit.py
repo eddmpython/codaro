@@ -214,10 +214,20 @@ OBJECTIVE_REQUIREMENTS = (
                 "teacher golden e2e score",
                 "\"score\": score",
                 "\"minimumScore\": MINIMUM_TEACHER_EVAL_SCORE",
+                "messagesByCall",
+                "providerCallToolResultPayload",
+                "provider did not receive tool result",
                 "write-curriculum-yaml.sectionCount",
                 "write-curriculum-yaml.exerciseCellCount",
                 "uv 사전 확인",
                 "검증 결과",
+            )),
+            ("docs/skills/architecture/teacher-tool-loop.md", (
+                "role: tool",
+                "tool sequence만 맞고 provider가 결과를 보지 못한 채 다음 응답으로 넘어가면 실패",
+            )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", (
+                "provider가 tool result를 보지 못하면 실패",
             )),
             ("tests/run.py", (
                 "\"teacher-eval\"",
