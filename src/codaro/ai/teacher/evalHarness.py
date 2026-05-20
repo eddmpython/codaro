@@ -145,6 +145,14 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         ),
     ),
     TeacherEvalCase(
+        caseId="provider-error-promotes-workloop",
+        prompt="요약해줘",
+        expectedNoTools=True,
+        expectedWorkLabels=("provider 오류",),
+        expectedWorkDetails=("provider 응답 처리 중단",),
+        expectedTraceEvents=("turn-error",),
+    ),
+    TeacherEvalCase(
         caseId="answer-check-uses-cell-call",
         prompt="내 답 맞아?",
         expectedTools=("read-cells", "cell-call"),

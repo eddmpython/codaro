@@ -56,6 +56,25 @@ class ScriptedProvider:
         return ToolResponse(answer="완료", provider="fake", model="test", toolCalls=[])
 
 
+class FailingProvider:
+    supportsNativeTools = True
+    resolvedModel = "broken-model"
+    provider = "fake"
+
+    def __init__(self) -> None:
+        self.callCount = 0
+
+    def completeWithTools(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> ToolResponse:
+        del messages, tools
+        self.callCount += 1
+        raise RuntimeError("provider broken")
+
+    def complete(self, messages: list[dict[str, Any]]) -> ToolResponse:
+        del messages
+        self.callCount += 1
+        raise RuntimeError("provider broken")
+
+
 class ScriptedExecutor:
     def __init__(self, results: dict[str, dict[str, Any]]) -> None:
         self._results = results
@@ -101,6 +120,7 @@ async def mainAsync() -> int:
     reports = [
         await runClarificationCase(),
         await runDependencyPreflightCase(),
+        await runProviderErrorCase(),
         await runCurriculumMaterializationCase(),
     ]
     failures = []
@@ -143,6 +163,27 @@ async def runClarificationCase() -> dict[str, Any]:
         extraFailures.append("clarification gate called provider")
     if report.turnPayload.get("model") != "clarification-gate":
         extraFailures.append("clarification gate did not return clarification model")
+    return reportPayload(report, extraFailures)
+
+
+async def runProviderErrorCase() -> dict[str, Any]:
+    case = goldenCase("provider-error-promotes-workloop")
+    provider = FailingProvider()
+    report = await runTeacherGoldenProviderCase(
+        case,
+        provider=provider,
+        executor=ScriptedExecutor({}),
+        convManager=FakeConversationManager(),
+        orchestrator=TeacherOrchestrator.fromContext({}),
+        tools=toolSchemas(),
+    )
+    extraFailures = []
+    if provider.callCount != 1:
+        extraFailures.append(f"provider error case call count mismatch: {provider.callCount}")
+    if report.turnPayload.get("toolCalls") != []:
+        extraFailures.append("provider error case returned tool calls")
+    if "provider broken" not in str(report.turnPayload.get("answer", "")):
+        extraFailures.append("provider error case did not surface readable answer")
     return reportPayload(report, extraFailures)
 
 

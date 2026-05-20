@@ -149,10 +149,10 @@ def _turnErrorWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
         "error": message,
         "category": "provider",
         "lane": "read",
-        "target": "provider-stream",
+        "target": "provider-loop",
         "risk": "normal",
         "workLabel": "provider 오류",
-        "workDetail": "provider 응답 스트림 처리 중단",
+        "workDetail": "provider 응답 처리 중단",
         "elapsedMs": event.elapsedMs,
     }
 

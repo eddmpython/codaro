@@ -177,6 +177,25 @@ class _FailingStreamProvider:
         raise RuntimeError("stream broken")
 
 
+class _FailingProvider:
+    supportsNativeTools = True
+    resolvedModel = "broken-model"
+    provider = "fake"
+
+    def __init__(self) -> None:
+        self.callCount = 0
+
+    def completeWithTools(self, messages: list[dict], tools: list[dict]):
+        del messages, tools
+        self.callCount += 1
+        raise RuntimeError("provider broken")
+
+    def complete(self, messages: list[dict]):
+        del messages
+        self.callCount += 1
+        raise RuntimeError("provider broken")
+
+
 class _FakeProfileManager:
     def __init__(self) -> None:
         self.resolvedRole = ""
@@ -1029,6 +1048,39 @@ def testProviderLoopOwnsNonStreamingTurn() -> None:
     assert payload["toolCalls"][0]["name"] == "read-cells"
     assert payload["trace"]["toolSequence"] == ["read-cells"]
     assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
+
+
+def testProviderLoopReportsProviderErrorsInTrace() -> None:
+    convManager = _FakeConversationManager()
+    provider = _FailingProvider()
+    messages: list[dict] = [{"role": "user", "content": "말해줘"}]
+    orchestrator = TeacherOrchestrator.fromContext({})
+
+    payload = asyncio.run(runTeacherChatLoop(
+        provider=provider,
+        convManager=convManager,
+        conversationId="conv-provider-error",
+        messages=messages,
+        tools=[{"type": "function"}],
+        executor=_FakeExecutor(),
+        orchestrator=orchestrator,
+    ))
+
+    case = next(case for case in goldenEvalCases if case.caseId == "provider-error-promotes-workloop")
+    report = evaluateTeacherTurnPayload(case, payload)
+
+    assert report.passed
+    assert provider.callCount == 1
+    assert payload["provider"] == "fake"
+    assert payload["model"] == "broken-model"
+    assert payload["toolCalls"] == []
+    assert "provider 응답 중 오류가 발생했습니다: provider broken" == payload["answer"]
+    assert payload["trace"]["errorCount"] == 1
+    assert payload["trace"]["toolSequence"] == []
+    assert payload["trace"]["workloop"][0]["workLabel"] == "provider 오류"
+    assert payload["trace"]["workloop"][0]["workDetail"] == "provider 응답 처리 중단"
+    assert payload["trace"]["workloop"][0]["error"] == "provider broken"
+    assert convManager.assistantMessages[0]["content"] == payload["answer"]
 
 
 def testProviderLoopReturnsClarificationWithoutProviderCall() -> None:

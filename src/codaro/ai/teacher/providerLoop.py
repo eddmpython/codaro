@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import logging
 from dataclasses import dataclass
 from typing import Any
 
@@ -9,6 +10,21 @@ from .clarificationPolicy import ClarificationPlan, clarificationAnswer
 from .teacherOrchestrator import TeacherOrchestrator
 from .toolPolicy import ToolPolicyState
 from .traceModel import TeacherTrace
+
+
+logger = logging.getLogger(__name__)
+
+PROVIDER_LOOP_ERRORS = (
+    AttributeError,
+    ConnectionError,
+    FileNotFoundError,
+    ImportError,
+    OSError,
+    PermissionError,
+    RuntimeError,
+    TypeError,
+    ValueError,
+)
 
 
 @dataclass(frozen=True)
@@ -64,6 +80,32 @@ def finishTeacherTurnPayload(
     )
 
 
+def finishTeacherTurnErrorPayload(
+    *,
+    convManager: Any,
+    conversationId: str,
+    orchestrator: TeacherOrchestrator,
+    trace: TeacherTrace,
+    provider: Any,
+    error: str,
+    toolCalls: list[dict[str, Any]],
+) -> dict[str, Any]:
+    logger.info("provider loop failed: %s", error)
+    trace.record("turn-error", {"message": error})
+    answer = f"provider 응답 중 오류가 발생했습니다: {error}"
+    return finishTeacherTurnPayload(
+        convManager=convManager,
+        conversationId=conversationId,
+        orchestrator=orchestrator,
+        trace=trace,
+        answer=answer,
+        provider=providerName(provider),
+        model=providerModel(provider),
+        usage=None,
+        toolCalls=toolCalls,
+    )
+
+
 async def runTeacherChatLoop(
     *,
     provider: Any,
@@ -96,10 +138,21 @@ async def runTeacherChatLoop(
         )
 
     for _round in range(maxToolRounds):
-        if provider.supportsNativeTools and tools:
-            response = provider.completeWithTools(messages, tools)
-        else:
-            response = provider.complete(messages)
+        try:
+            if provider.supportsNativeTools and tools:
+                response = provider.completeWithTools(messages, tools)
+            else:
+                response = provider.complete(messages)
+        except PROVIDER_LOOP_ERRORS as exc:
+            return finishTeacherTurnErrorPayload(
+                convManager=convManager,
+                conversationId=conversationId,
+                orchestrator=orchestrator,
+                trace=trace,
+                provider=provider,
+                error=str(exc) or "provider unavailable",
+                toolCalls=allToolResults,
+            )
 
         if not provider.supportsNativeTools or not tools:
             return finishTeacherTurnPayload(
@@ -140,7 +193,18 @@ async def runTeacherChatLoop(
         )
         allToolResults.extend(roundResult.toolResults)
 
-    finalResponse = provider.complete(messages)
+    try:
+        finalResponse = provider.complete(messages)
+    except PROVIDER_LOOP_ERRORS as exc:
+        return finishTeacherTurnErrorPayload(
+            convManager=convManager,
+            conversationId=conversationId,
+            orchestrator=orchestrator,
+            trace=trace,
+            provider=provider,
+            error=str(exc) or "provider unavailable",
+            toolCalls=allToolResults,
+        )
     return finishTeacherTurnPayload(
         convManager=convManager,
         conversationId=conversationId,
@@ -274,3 +338,25 @@ async def executeTeacherToolRound(
         toolStarts=toolStarts,
         toolResults=toolResults,
     )
+
+
+def providerName(provider: Any) -> str:
+    config = getattr(provider, "config", None)
+    configured = getattr(config, "provider", None)
+    if isinstance(configured, str) and configured:
+        return configured
+    name = getattr(provider, "provider", None)
+    if isinstance(name, str) and name:
+        return name
+    return "provider"
+
+
+def providerModel(provider: Any) -> str:
+    resolved = getattr(provider, "resolvedModel", None)
+    if isinstance(resolved, str) and resolved:
+        return resolved
+    config = getattr(provider, "config", None)
+    configured = getattr(config, "model", None)
+    if isinstance(configured, str) and configured:
+        return configured
+    return "turn-error"

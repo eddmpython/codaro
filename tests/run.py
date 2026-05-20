@@ -55,7 +55,7 @@ GATES: dict[str, Gate] = {
     ),
     "teacher-e2e": Gate(
         tier="fast",
-        description="teacher provider loop golden e2e harness를 실행한다.",
+        description="teacher provider loop, provider error workloop, curriculum golden e2e harness를 실행한다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyTeacherGoldenE2e.py")),),
         ci_required=False,
     ),
@@ -70,7 +70,7 @@ GATES: dict[str, Gate] = {
     ),
     "learning-card-browser": Gate(
         tier="surface",
-        description="Playwright CLI로 structured learning section card의 desktop/mobile 렌더링을 확인한다.",
+        description="Playwright CLI로 lesson overview와 structured section card의 desktop/mobile 렌더링을 확인한다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningCardPlaywright.py")),),
         ci_required=False,
     ),
