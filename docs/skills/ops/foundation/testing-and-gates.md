@@ -29,6 +29,7 @@ uv run python -X utf8 tests/run.py gate backend
 uv run python -X utf8 tests/run.py gate teacher-eval
 uv run python -X utf8 tests/run.py gate teacher-e2e
 uv run python -X utf8 tests/run.py gate assistant-workloop-contract
+uv run python -X utf8 tests/run.py gate ai-live-smoke
 uv run python -X utf8 tests/run.py gate editor-runtime-preflight
 uv run python -X utf8 tests/run.py gate learning-system-readiness
 uv run python -X utf8 tests/run.py gate learning-goal-audit
@@ -47,6 +48,7 @@ uv run python -X utf8 tests/run.py gate learning-card-browser
 | `teacher-eval` | fast | teacher tool policy, trace, golden eval 계약을 빠르게 확인한다. |
 | `teacher-e2e` | fast | scripted provider loop, provider error workloop, tool policy, 실제 curriculum YAML handler를 통과하는 golden e2e harness와 9점 기준 score를 실행한다. |
 | `assistant-workloop-contract` | fast | assistant workloop/trace UI state가 작업 전 확인 질문, provider 오류, tool detail을 보존하는지 확인한다. |
+| `ai-live-smoke` | fast | 실제 provider credential이 있을 때 provider 응답, OAuth 상태, live tool loop smoke를 확인한다. |
 | `editor-runtime-preflight` | fast | editor 직접 실행 경로가 패키지 확인, uv 설치, 셀 실행 순서를 지키는지 확인한다. |
 | `learning-system-readiness` | fast | 학습 YAML, 섹션 카드, teacher loop, workloop, gate SSOT의 readiness score를 확인한다. |
 | `learning-goal-audit` | surface | 목표 완료 전 docs, readiness, backend, landing build를 묶어 확인한다. |
@@ -63,6 +65,7 @@ uv run python -X utf8 tests/run.py gate learning-card-browser
 
 - 새 gate는 `tests/run.py`, 이 문서, CI 중 필요한 위치를 함께 갱신한다.
 - 새 pytest 파일은 가능한 한 제품/도메인 경계를 드러내는 이름을 쓴다.
+- `ai-live-smoke`는 opt-in gate다. credential/token이 없으면 skip하지 않고 `live credential missing`을 JSON으로 보고한다. 이 gate는 CI required가 아니며, 실제 provider/OAuth/네트워크 문제를 기본 CI 안정성과 분리한다.
 - teacher/tool 변경은 최소한 tool sequence, policy violation, workloop label/detail, structured YAML contract, provider loop result signal 중 변경 표면 하나를 고정한다.
 - provider loop 변경은 가능한 한 실제 scripted provider run으로 `packages-check` → `packages-install` → `cell-call`의 정확한 순서와 결과 필드(`missing`, `success`, `passed`)를 함께 검증한다. `packages-check` 실패 뒤 provider가 `cell-call`을 요청하는 negative golden도 executor 호출을 차단하고 `dependency-preflight-required` policy result를 provider에게 돌려줘야 한다. 다음 provider 호출에 직전 `role: tool` 결과 메시지가 들어갔는지도 확인한다. golden case가 요구하는 exact sequence에 불필요한 tool call이 끼거나 provider가 tool result를 보지 못하면 실패해야 한다. 큰 tool result는 provider message에서 bounded JSON으로 줄이되 현재 turn payload/trace의 full result는 보존해야 한다. streaming native tool loop 변경은 tool result 이후 다음 provider 호출 실패가 `error` event와 `trace.workloop`의 `provider 오류` row로 남는지도 고정한다.
 - editor runtime 실행 변경은 `editor-runtime-preflight`로 세션 패키지 확인, 누락 패키지 uv 설치, kernel 실행 순서가 지켜지는지 확인한다.

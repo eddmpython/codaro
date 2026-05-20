@@ -85,7 +85,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [ai-sensory-system](identity/ai-sensory-system.md)
 - [external-channels-mobile](identity/external-channels-mobile.md)
 
-## Architecture (10) — 5층 구조
+## Architecture (11) — 5층 구조
 
 - [ssot-map](architecture/ssot-map.md)
 - [overview](architecture/overview.md)
@@ -97,6 +97,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [learning-yaml-contract](architecture/learning-yaml-contract.md)
 - [curriculum-registry](architecture/curriculum-registry.md)
 - [teacher-tool-loop](architecture/teacher-tool-loop.md)
+- [live-provider-ops](architecture/live-provider-ops.md)
 
 ## Ops (11) — 운영 규칙
 
