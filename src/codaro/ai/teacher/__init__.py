@@ -3,6 +3,9 @@ from __future__ import annotations
 from .contextBuilder import injectContext
 from .evalHarness import (
     TeacherEvalCase,
+    TeacherEvalReport,
+    ToolSequenceReport,
+    evaluateGoldenTracePayloads,
     evaluateToolSequence,
     evaluateToolTrace,
     evaluateToolTracePayload,
@@ -61,6 +64,7 @@ from .turnSession import TeacherConversationNotFound, TeacherTurnSession, prepar
 
 __all__ = [
     "TeacherEvalCase",
+    "TeacherEvalReport",
     "TeacherConversationNotFound",
     "TeacherOrchestrator",
     "TeacherSkill",
@@ -72,9 +76,11 @@ __all__ = [
     "TeacherToolRound",
     "ToolPolicyState",
     "ToolPolicyViolation",
+    "ToolSequenceReport",
     "createTeacherToolExecutor",
     "executeTeacherToolRound",
     "evaluateToolSequence",
+    "evaluateGoldenTracePayloads",
     "evaluateToolTrace",
     "evaluateToolTracePayload",
     "finishTeacherTurnPayload",

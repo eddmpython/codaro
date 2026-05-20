@@ -10,6 +10,7 @@ from codaro.ai.teacher import (
     ToolPolicyState,
     ToolPolicyViolation,
     executeTeacherToolRound,
+    evaluateGoldenTracePayloads,
     evaluateToolSequence,
     evaluateToolTrace,
     evaluateToolTracePayload,
@@ -338,6 +339,38 @@ def testEvalHarnessCanReadTracePayload() -> None:
     assert report.observedTools == ("read-cells", "cell-call")
     assert report.policyViolationCount == 0
     assert report.policyViolations == ()
+
+
+def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
+    tracePayloads = {
+        "answer-check-uses-cell-call": {
+            "toolSequence": ["read-cells", "cell-call"],
+            "policyViolationCount": 0,
+        },
+        "dependency-preflight-before-install": {
+            "toolSequence": ["packages-check", "packages-install"],
+            "policyViolationCount": 0,
+        },
+    }
+    cases = tuple(
+        case
+        for case in goldenEvalCases
+        if case.caseId in {"answer-check-uses-cell-call", "dependency-preflight-before-install"}
+    )
+
+    report = evaluateGoldenTracePayloads(tracePayloads, cases=cases)
+
+    assert report.passed
+    assert report.missingCaseIds == ()
+    assert report.payload()["caseCount"] == 2
+
+
+def testEvalHarnessFailsMissingGoldenTracePayload() -> None:
+    report = evaluateGoldenTracePayloads({}, cases=(goldenEvalCases[0],))
+
+    assert not report.passed
+    assert report.missingCaseIds == (goldenEvalCases[0].caseId,)
+    assert report.reports[0].failures == ("missing trace payload",)
 
 
 def testEvalHarnessFailsPolicyViolationsByDefault() -> None:

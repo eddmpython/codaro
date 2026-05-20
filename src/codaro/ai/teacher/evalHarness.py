@@ -28,6 +28,32 @@ class ToolSequenceReport:
     policyViolations: tuple[dict[str, str], ...] = field(default_factory=tuple)
 
 
+@dataclass(frozen=True)
+class TeacherEvalReport:
+    passed: bool
+    reports: tuple[ToolSequenceReport, ...]
+    missingCaseIds: tuple[str, ...] = field(default_factory=tuple)
+
+    def payload(self) -> dict[str, Any]:
+        return {
+            "passed": self.passed,
+            "caseCount": len(self.reports),
+            "failureCount": sum(1 for report in self.reports if not report.passed),
+            "missingCaseIds": list(self.missingCaseIds),
+            "reports": [
+                {
+                    "caseId": report.caseId,
+                    "passed": report.passed,
+                    "failures": list(report.failures),
+                    "observedTools": list(report.observedTools),
+                    "policyViolationCount": report.policyViolationCount,
+                    "policyViolations": list(report.policyViolations),
+                }
+                for report in self.reports
+            ],
+        }
+
+
 goldenEvalCases: tuple[TeacherEvalCase, ...] = (
     TeacherEvalCase(
         caseId="curriculum-yaml-materialized",
@@ -104,6 +130,32 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
         _toolSequenceFromPayload(tracePayload),
         policyViolationCount=_policyViolationCountFromPayload(tracePayload),
         policyViolations=_policyViolationsFromPayload(tracePayload),
+    )
+
+
+def evaluateGoldenTracePayloads(
+    tracePayloadsByCaseId: Mapping[str, Mapping[str, Any]],
+    cases: Sequence[TeacherEvalCase] = goldenEvalCases,
+) -> TeacherEvalReport:
+    reports: list[ToolSequenceReport] = []
+    missingCaseIds: list[str] = []
+    for case in cases:
+        tracePayload = tracePayloadsByCaseId.get(case.caseId)
+        if tracePayload is None:
+            missingCaseIds.append(case.caseId)
+            reports.append(
+                ToolSequenceReport(
+                    caseId=case.caseId,
+                    passed=False,
+                    failures=("missing trace payload",),
+                )
+            )
+            continue
+        reports.append(evaluateToolTracePayload(case, tracePayload))
+    return TeacherEvalReport(
+        passed=all(report.passed for report in reports),
+        reports=tuple(reports),
+        missingCaseIds=tuple(missingCaseIds),
     )
 
 
