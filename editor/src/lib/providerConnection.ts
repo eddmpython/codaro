@@ -96,6 +96,26 @@ export async function saveApiProvider(providerId: string, apiKey: string, baseUr
   });
 }
 
+export async function validateProviderAction(providerId: string, model?: string | null): Promise<ProviderActionResult> {
+  const validation = await validateProvider(providerId, model, "response");
+  if (validation.valid) {
+    return {
+      notice: {
+        tone: "success",
+        title: "Provider 응답 확인됨",
+        detail: validation.model ? `${providerId} · ${validation.model}` : providerId,
+      },
+    };
+  }
+  return {
+    notice: {
+      tone: "warning",
+      title: "Provider 확인 필요",
+      detail: validation.diagnostic?.message ?? validation.error ?? "Provider 응답 검증에 실패했습니다.",
+    },
+  };
+}
+
 export function providerAuthFailureNotice(error: unknown): AppNotice {
   const diagnostic = providerDiagnosticFromError(error);
   return {
@@ -124,7 +144,10 @@ export function providerAssistantFailure(error: unknown): ProviderAssistantFailu
 
 export function isProviderAuthError(error: unknown) {
   const diagnostic = providerDiagnosticFromError(error);
-  if (diagnostic?.action && ["connect-provider", "relogin-provider", "restart-login"].includes(diagnostic.action)) {
+  if (
+    diagnostic?.action
+    && ["connect-provider", "relogin-provider", "restart-login", "configure-api-key", "configure-base-url"].includes(diagnostic.action)
+  ) {
     return true;
   }
   const normalized = errorMessage(error).toLowerCase();
@@ -158,7 +181,7 @@ async function withProviderValidation(
       notice: { tone: "warning", title: "Provider 확인 필요", detail: "선택된 provider가 없습니다." },
     };
   }
-  const validation = await validateProvider(provider, profile.activeModel);
+  const validation = await validateProvider(provider, profile.activeModel, "response");
   if (validation.valid) {
     return {
       ...base,
@@ -169,8 +192,9 @@ async function withProviderValidation(
       },
     };
   }
+  const failureBase = base.closeSettings ? { ...base, closeSettings: false, openSettings: true } : base;
   return {
-    ...base,
+    ...failureBase,
     notice: {
       tone: "warning",
       title: "Provider 확인 필요",
@@ -179,9 +203,9 @@ async function withProviderValidation(
   };
 }
 
-async function validateProvider(provider: string, model?: unknown): Promise<ProviderValidationPayload> {
+async function validateProvider(provider: string, model?: unknown, probe = "availability"): Promise<ProviderValidationPayload> {
   try {
-    return await codaroApi.validateAiProvider(provider, typeof model === "string" ? model : undefined);
+    return await codaroApi.validateAiProvider(provider, typeof model === "string" ? model : undefined, probe);
   } catch (error) {
     const diagnostic = providerDiagnosticFromError(error);
     return {

@@ -73,6 +73,26 @@ class _ValidationProvider:
         return self.available
 
 
+class _ResponseValidationProvider(_ValidationProvider):
+    def __init__(self, answer: str = "검증되었습니다.") -> None:
+        super().__init__(available=True)
+        self.answer = answer
+        self.messages: list[dict[str, str]] = []
+
+    def complete(self, messages: list[dict[str, str]]) -> LLMResponse:
+        self.messages = messages
+        return LLMResponse(answer=self.answer, provider="custom", model=self.resolvedModel)
+
+
+class _ResolvedProfileManager:
+    def __init__(self, resolved: dict[str, object]) -> None:
+        self.resolved = resolved
+
+    def resolve(self, provider: str | None = None, *, role: str | None = None):
+        del provider, role
+        return self.resolved
+
+
 class _OAuthProfileManager:
     def __init__(self) -> None:
         self.updates: list[dict[str, str]] = []
@@ -285,6 +305,21 @@ class TestProviderValidation:
         assert configs[0].provider == "custom"
         assert configs[0].model == "completion-model"
 
+    def test_validation_config_uses_env_api_key(self, monkeypatch):
+        monkeypatch.setenv("OPENAI_API_KEY", "env-secret")
+        profileManager = _ResolvedProfileManager({
+            "provider": "openai",
+            "model": "gpt-test",
+            "apiKey": None,
+            "baseUrl": None,
+        })
+
+        config = providerValidationConfig("openai", None, profileManager)
+
+        assert config.apiKey == "env-secret"
+        assert config.temperature == 0
+        assert config.maxTokens == 64
+
     def test_validate_provider_captures_connection_errors(self):
         def providerFactory(config: LLMConfig):
             raise ConnectionError("not reachable")
@@ -301,6 +336,85 @@ class TestProviderValidation:
         assert payload["diagnostic"]["code"] == "provider_unavailable"
         assert payload["diagnostic"]["action"] == "check-provider"
         assert payload["diagnostic"]["provider"] == "custom"
+
+    def test_validate_provider_response_probe_calls_provider(self):
+        providers: list[_ResponseValidationProvider] = []
+
+        def providerFactory(config: LLMConfig):
+            del config
+            provider = _ResponseValidationProvider()
+            providers.append(provider)
+            return provider
+
+        result = validateProviderConnection(
+            provider="custom",
+            probe="response",
+            profileManager=_CompletionProfileManager(),
+            providerFactory=providerFactory,
+        )
+
+        assert result.payload() == {"valid": True, "model": "validated-model"}
+        assert providers[0].messages[0]["role"] == "system"
+        assert providers[0].messages[1]["role"] == "user"
+
+    def test_validate_provider_response_probe_rejects_empty_answer(self):
+        def providerFactory(config: LLMConfig):
+            del config
+            return _ResponseValidationProvider(answer="")
+
+        result = validateProviderConnection(
+            provider="custom",
+            probe="response",
+            profileManager=_CompletionProfileManager(),
+            providerFactory=providerFactory,
+        )
+
+        payload = result.payload()
+        assert payload["valid"] is False
+        assert payload["diagnostic"]["code"] == "provider_empty_response"
+        assert payload["diagnostic"]["action"] == "check-provider"
+
+    def test_validate_provider_rejects_missing_openai_key(self, monkeypatch):
+        monkeypatch.delenv("OPENAI_API_KEY", raising=False)
+        profileManager = _ResolvedProfileManager({
+            "provider": "openai",
+            "model": "gpt-test",
+            "apiKey": None,
+            "baseUrl": None,
+        })
+
+        result = validateProviderConnection(
+            provider="openai",
+            probe="response",
+            profileManager=profileManager,
+            providerFactory=lambda config: _ValidationProvider(),
+        )
+
+        payload = result.payload()
+        assert payload["valid"] is False
+        assert payload["diagnostic"]["code"] == "provider_credential_missing"
+        assert payload["diagnostic"]["action"] == "configure-api-key"
+
+    def test_validate_provider_rejects_missing_custom_base_url(self, monkeypatch):
+        monkeypatch.delenv("CODARO_LLM_BASE_URL", raising=False)
+        profileManager = _ResolvedProfileManager({
+            "provider": "custom",
+            "model": "demo",
+            "apiKey": "secret",
+            "baseUrl": None,
+        })
+
+        result = validateProviderConnection(
+            provider="custom",
+            probe="response",
+            profileManager=profileManager,
+            providerFactory=lambda config: _ValidationProvider(),
+        )
+
+        payload = result.payload()
+        assert payload["valid"] is False
+        assert payload["diagnostic"]["code"] == "provider_base_url_missing"
+        assert payload["diagnostic"]["action"] == "configure-base-url"
 
 
 class TestCompletion:

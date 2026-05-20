@@ -237,9 +237,10 @@ export const codaroApi = {
   aiProviders: () => requestJson<AiProviderCatalogPayload>("/api/ai/providers"),
   aiTools: () => requestJson<AiToolCatalogPayload>("/api/ai/tools"),
   aiProfile: () => requestJson<AiProfile>("/api/ai/profile"),
-  validateAiProvider: (provider: string, model?: string | null) => {
+  validateAiProvider: (provider: string, model?: string | null, probe = "availability") => {
     const params = new URLSearchParams({ provider });
     if (model) params.set("model", model);
+    if (probe) params.set("probe", probe);
     return postJson<ProviderValidationPayload>(`/api/ai/provider/validate?${params.toString()}`, {});
   },
   updateAiProfile: (payload: {

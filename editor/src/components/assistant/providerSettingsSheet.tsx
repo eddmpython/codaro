@@ -33,6 +33,7 @@ type ProviderSettingsSheetProps = {
   onOauthLogout: (providerId: string) => void;
   onSaveApiProvider: (providerId: string, apiKey: string, baseUrl?: string) => void;
   onSelectProvider: (providerId: string) => void;
+  onValidateProvider: (providerId: string) => void;
 };
 
 type ProviderRuntime = {
@@ -70,6 +71,7 @@ export function ProviderSettingsSheet({
   onOauthLogout,
   onSaveApiProvider,
   onSelectProvider,
+  onValidateProvider,
 }: ProviderSettingsSheetProps) {
   const providers = useMemo(() => providerCatalog(aiProfile), [aiProfile]);
   const runtime = useMemo(() => providerRuntime(aiProfile), [aiProfile]);
@@ -108,6 +110,7 @@ export function ProviderSettingsSheet({
                   onOauthLogout={onOauthLogout}
                   onSaveApiProvider={onSaveApiProvider}
                   onSelectProvider={onSelectProvider}
+                  onValidateProvider={onValidateProvider}
                 />
               ))
             ) : (
@@ -133,6 +136,7 @@ function ProviderCard({
   onOauthLogout,
   onSaveApiProvider,
   onSelectProvider,
+  onValidateProvider,
 }: {
   active: boolean;
   aiConnecting: boolean;
@@ -144,6 +148,7 @@ function ProviderCard({
   onOauthLogout: (providerId: string) => void;
   onSaveApiProvider: (providerId: string, apiKey: string, baseUrl?: string) => void;
   onSelectProvider: (providerId: string) => void;
+  onValidateProvider: (providerId: string) => void;
 }) {
   const providerId = provider.id ?? "";
   const copy = providerCopy(provider);
@@ -209,6 +214,17 @@ function ProviderCard({
                 로그아웃
               </Button>
             ) : null}
+            <Button
+              className="gap-1.5"
+              disabled={!apiOnline || aiConnecting}
+              size="sm"
+              type="button"
+              variant="outline"
+              onClick={() => onValidateProvider(providerId)}
+            >
+              {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5" />}
+              응답 검증
+            </Button>
           </div>
         ) : null}
 
@@ -245,20 +261,44 @@ function ProviderCard({
                 저장된 키 사용
               </Button>
             ) : null}
+            <Button
+              className="gap-1.5"
+              disabled={!apiOnline || aiConnecting}
+              size="sm"
+              type="button"
+              variant="outline"
+              onClick={() => onValidateProvider(providerId)}
+            >
+              {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5" />}
+              응답 검증
+            </Button>
           </div>
         ) : null}
 
         {authKind === "none" ? (
-          <Button disabled={!apiOnline || aiConnecting || active} size="sm" type="button" variant={active ? "secondary" : "outline"} onClick={() => onSelectProvider(providerId)}>
-            {active ? (
-              <>
-                <Check className="size-3.5" />
-                사용 중
-              </>
-            ) : (
-              "사용"
-            )}
-          </Button>
+          <div className="flex flex-wrap gap-2">
+            <Button disabled={!apiOnline || aiConnecting || active} size="sm" type="button" variant={active ? "secondary" : "outline"} onClick={() => onSelectProvider(providerId)}>
+              {active ? (
+                <>
+                  <Check className="size-3.5" />
+                  사용 중
+                </>
+              ) : (
+                "사용"
+              )}
+            </Button>
+            <Button
+              className="gap-1.5"
+              disabled={!apiOnline || aiConnecting}
+              size="sm"
+              type="button"
+              variant="outline"
+              onClick={() => onValidateProvider(providerId)}
+            >
+              {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5" />}
+              응답 검증
+            </Button>
+          </div>
         ) : null}
       </div>
     </section>

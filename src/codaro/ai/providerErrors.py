@@ -101,6 +101,30 @@ _ACTION_DIAGNOSTICS = {
         "Provider 요청 한도가 초과되었습니다. 잠시 후 다시 시도하세요.",
         True,
     ),
+    "api_key_missing": (
+        "provider_credential_missing",
+        "configure-api-key",
+        "Provider API 키가 필요합니다. Provider 설정에서 키를 저장한 뒤 다시 검증하세요.",
+        True,
+    ),
+    "base_url_missing": (
+        "provider_base_url_missing",
+        "configure-base-url",
+        "호환 provider 서버 주소가 필요합니다. Provider 설정에서 base URL을 입력하세요.",
+        True,
+    ),
+    "unavailable": (
+        "provider_unavailable",
+        "check-provider",
+        "Provider에 연결하지 못했습니다. 설정과 서버 상태를 확인하세요.",
+        True,
+    ),
+    "empty_response": (
+        "provider_empty_response",
+        "check-provider",
+        "Provider 검증 응답이 비어 있습니다. 모델과 endpoint 설정을 확인하세요.",
+        True,
+    ),
     "check_client_id": (
         "provider_compatibility_error",
         "check-provider-compatibility",

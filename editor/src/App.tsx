@@ -100,6 +100,7 @@ function App() {
     setAiProfile,
     setProviderSettingsOpen,
     startOauthProviderLogin,
+    validateAiProvider,
   } = useProviderConnection({ apiOnline, onNotice: setNotice });
 
   const {
@@ -319,6 +320,7 @@ function App() {
         onOpenChange={setProviderSettingsOpen}
         onSaveApiProvider={saveApiProvider}
         onSelectProvider={selectAiProvider}
+        onValidateProvider={validateAiProvider}
       />
     </SidebarProvider>
   );

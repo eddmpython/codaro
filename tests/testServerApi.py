@@ -241,7 +241,29 @@ def testProviderValidateUsesProviderValidationDomain(monkeypatch) -> None:
     assert response.json() == {"valid": True, "model": "demo-model"}
     assert captured["provider"] == "custom"
     assert captured["model"] == "demo-model"
+    assert captured["probe"] == "availability"
     assert captured["profileManager"] is not None
+
+
+def testProviderValidatePassesResponseProbe(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    class _ValidationResult:
+        def payload(self):
+            return {"valid": True, "model": "demo-model"}
+
+    def fakeValidateProviderConnection(**kwargs):
+        captured.update(kwargs)
+        return _ValidationResult()
+
+    monkeypatch.setattr(aiRouterModule, "validateProviderConnection", fakeValidateProviderConnection)
+    client = TestClient(createServerApp())
+
+    response = client.post("/api/ai/provider/validate?provider=custom&probe=response")
+
+    assert response.status_code == 200
+    assert captured["provider"] == "custom"
+    assert captured["probe"] == "response"
 
 
 def testEnvironmentInfo() -> None:

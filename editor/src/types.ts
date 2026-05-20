@@ -249,6 +249,7 @@ export type ProviderValidationPayload = {
   model?: string | null;
   error?: string | null;
   diagnostic?: ProviderDiagnostic | null;
+  probe?: string;
 };
 
 export type AiToolCatalogPayload = {

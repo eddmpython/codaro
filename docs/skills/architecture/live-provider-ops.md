@@ -40,7 +40,9 @@ Codaro의 기본 gate는 deterministic scripted provider를 사용한다. 실제
 - network timeout/connection: 네트워크 문제.
 - endpoint/header/SSE 변경: OAuth provider compatibility 점검 필요.
 
-HTTP/stream/UI 경계에는 `code`, `message`, `action`, `provider`, `detail`, `recoverable`을 가진 진단 payload를 넘긴다. 기본 화면은 `message`만 보여주고, raw detail은 trace나 확장 진단에서만 본다. editor는 `connect-provider`, `relogin-provider`, `restart-login`, `check-network`, `check-provider-compatibility` action을 구분해 설정 열기/재로그인/네트워크 점검/호환성 점검으로 안내한다.
+HTTP/stream/UI 경계에는 `code`, `message`, `action`, `provider`, `detail`, `recoverable`을 가진 진단 payload를 넘긴다. 기본 화면은 `message`만 보여주고, raw detail은 trace나 확장 진단에서만 본다. editor는 `connect-provider`, `relogin-provider`, `restart-login`, `configure-api-key`, `configure-base-url`, `check-network`, `check-provider-compatibility` action을 구분해 설정 열기/재로그인/키 입력/base URL 입력/네트워크 점검/호환성 점검으로 안내한다.
+
+Provider 설정의 검증은 `probe=availability`와 `probe=response`를 구분한다. 목록/상태 확인은 availability probe로 충분하지만, 로그인/저장/선택 직후와 사용자가 누르는 “응답 검증”은 response probe를 써서 짧은 실제 응답까지 확인한다. `openai`는 저장된 key 또는 `OPENAI_API_KEY`, `custom`은 base URL과 key, `ollama`는 로컬 서버와 모델 응답, `oauth-chatgpt`는 저장 token과 live endpoint 응답을 기준으로 실패 메시지를 갈라야 한다.
 
 ## Live Smoke Gate
 

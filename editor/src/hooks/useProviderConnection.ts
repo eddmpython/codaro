@@ -6,6 +6,7 @@ import {
   providerAuthFailureNotice,
   saveApiProvider as saveApiProviderAction,
   selectProvider,
+  validateProviderAction,
   type ProviderActionResult,
 } from "@/lib/providerConnection";
 import type { AiProfile, AppNotice } from "@/types";
@@ -99,6 +100,18 @@ export function useProviderConnection({
     }
   }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice]);
 
+  const validateAiProvider = useCallback(async (providerId: string) => {
+    if (!apiOnline || aiConnecting) return;
+    setAiConnecting(true);
+    try {
+      applyProviderActionResult(await validateProviderAction(providerId, providerModel(aiProfile, providerId)));
+    } catch (error) {
+      onNotice(providerAuthFailureNotice(error));
+    } finally {
+      setAiConnecting(false);
+    }
+  }, [aiConnecting, aiProfile, apiOnline, applyProviderActionResult, onNotice]);
+
   return {
     aiConnecting,
     aiProfile,
@@ -110,5 +123,13 @@ export function useProviderConnection({
     setAiProfile,
     setProviderSettingsOpen,
     startOauthProviderLogin,
+    validateAiProvider,
   };
+}
+
+function providerModel(profile: AiProfile | null, providerId: string): string | null {
+  const providers = profile?.providers;
+  if (!providers || typeof providers !== "object" || Array.isArray(providers)) return null;
+  const runtime = (providers as Record<string, { model?: unknown }>)[providerId];
+  return typeof runtime?.model === "string" ? runtime.model : null;
 }

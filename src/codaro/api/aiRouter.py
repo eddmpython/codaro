@@ -128,10 +128,12 @@ def createAiRouter(state: Any) -> APIRouter:
     def apiValidateProvider(
         provider: str = Query(...),
         model: str | None = Query(None),
+        probe: str = Query("availability"),
     ):
         return validateProviderConnection(
             provider=provider,
             model=model,
+            probe=probe,
             profileManager=getProfileManager(),
         ).payload()
 
