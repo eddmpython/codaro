@@ -11,7 +11,7 @@ whenToUse: 커리큘럼 YAML 생성, write-curriculum-yaml materializer, 섹션 
 
 # Learning YAML Contract
 
-Codaro의 학습 YAML은 화면 조각 목록이 아니라 **학습 설계의 source of truth**다. 프론트는 YAML 의미를 추측하지 않고 contract payload를 읽어 렌더링한다.
+Codaro의 학습 YAML은 화면 조각 목록이 아니라 **학습 설계의 source of truth**다. YAML은 lesson SSOT다. 프론트는 YAML 의미를 추측하지 않고 contract payload를 읽어 렌더링한다.
 
 ## 계약
 

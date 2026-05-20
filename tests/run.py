@@ -83,6 +83,7 @@ GATES: dict[str, Gate] = {
         commands=(
             command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/syncAgentsMd.py", "--check")),
             command(("uv", "run", "python", "-X", "utf8", "tests/run.py", "audit-self")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningGoalObjectiveAudit.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningSystemReadiness.py")),
             command(("uv", "run", "pytest", "tests/", "-q", "--tb=short")),
             command(("npm", "run", "build"), cwd="landing"),

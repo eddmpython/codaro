@@ -431,6 +431,35 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
             liveChecks=(liveChecks["teacher-eval"], liveChecks["teacher-e2e"]),
             blocking=True,
         ),
+        fileCriterion(
+            "goal-objective-audit-contract",
+            "Learning goal audit maps the original objective requirements to named evidence before completion.",
+            (
+                ("tests/verifyLearningGoalObjectiveAudit.py", (
+                    "OBJECTIVE_REQUIREMENTS",
+                    "structured-yaml-and-section-card-ssot",
+                    "deterministic-clarification-gate",
+                    "uv-package-tool-policy",
+                    "workloop-and-trace-visibility",
+                    "real-provider-golden-e2e-score",
+                    "playwright-product-verification",
+                    "goal-audit-gate-covers-builds-and-tests",
+                    "MINIMUM_SCORE = 9",
+                )),
+                ("tests/run.py", (
+                    "tests/verifyLearningGoalObjectiveAudit.py",
+                    "\"learning-goal-audit\"",
+                    "tests/verifyLearningSystemReadiness.py",
+                    "\"pytest\", \"tests/\"",
+                    "\"npm\", \"run\", \"build\"",
+                )),
+                ("docs/skills/ops/foundation/testing-and-gates.md", (
+                    "명시 요구사항 audit",
+                    "`learning-goal-audit`",
+                )),
+            ),
+            blocking=True,
+        ),
     )
 
 
