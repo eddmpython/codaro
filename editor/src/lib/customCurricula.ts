@@ -74,6 +74,13 @@ export function createCustomCurriculumEntry(blocks: BlockConfig[], title?: strin
   };
 }
 
+export function upsertCustomCurriculumEntry(
+  current: CustomCurriculumEntry[],
+  entry: CustomCurriculumEntry,
+) {
+  return [entry, ...current.filter((item) => item.id !== entry.id)];
+}
+
 function normalizeStoredCurriculumDocument(raw: unknown) {
   const fallbackTitle = isRecord(raw) ? String(raw.title ?? "나만의 커리큘럼") : "나만의 커리큘럼";
   return normalizeDocumentPayload(raw, {

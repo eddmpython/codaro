@@ -27,10 +27,14 @@ import {
   createCustomCurriculumEntry,
   customCurriculaStorageKey,
   loadCustomCurricula,
+  upsertCustomCurriculumEntry,
   type CustomCurriculumEntry,
 } from "@/lib/customCurricula";
 import {
+  appendUniqueBlocks,
+  draftsFromBlocks,
   draftsFromDocument,
+  firstCodeBlockId,
   materializeDrafts,
   starterDocument,
 } from "@/lib/documentModel";
@@ -755,15 +759,11 @@ function App() {
   function saveCustomCurriculum(blocks: BlockConfig[], title?: string) {
     if (!blocks.length) return null;
     const entry = createCustomCurriculumEntry(blocks, title);
-    setCustomCurricula((current) => [entry, ...current.filter((item) => item.id !== entry.id)]);
+    setCustomCurricula((current) => upsertCustomCurriculumEntry(current, entry));
     setCurriculumDocument(entry.document);
     setDrafts((current) => ({
       ...current,
-      ...Object.fromEntries(
-        entry.document.blocks
-          .filter((block) => block.type === "code")
-          .map((block) => [block.id, block.role === "snippet" ? "" : block.content]),
-      ),
+      ...draftsFromBlocks(entry.document.blocks, { emptySnippetDraft: true }),
     }));
     setSelectedCategory(CUSTOM_CURRICULUM_CATEGORY);
     setSelectedContentId(entry.id);
@@ -787,27 +787,14 @@ function App() {
       return;
     }
     setDocument((current) => {
-      const existingIds = new Set(current.blocks.map((block) => block.id));
-      const nextBlocks = pendingBlocks.filter((block) => !existingIds.has(block.id));
-      if (!nextBlocks.length) return current;
-      return {
-        ...current,
-        title: current.title === "새 노트북" || current.title === "생성 노트북" ? "생성된 노트북" : current.title,
-        blocks: [...current.blocks, ...nextBlocks],
-      };
+      return appendUniqueBlocks(current, pendingBlocks, { generatedTitle: "생성된 노트북" }).document;
     });
     setDrafts((current) => ({
       ...current,
-      ...Object.fromEntries(
-        pendingBlocks
-          .filter((block) => block.type === "code" || block.type === "markdown")
-          .map((block) => [block.id, block.content]),
-      ),
+      ...draftsFromBlocks(pendingBlocks, { includeMarkdown: true }),
     }));
-    const firstCodeBlock = pendingBlocks.find((block) => block.type === "code");
-    if (firstCodeBlock) {
-      setSelectedBlockId(firstCodeBlock.id);
-    }
+    const firstCodeId = firstCodeBlockId(pendingBlocks);
+    if (firstCodeId) setSelectedBlockId(firstCodeId);
     setPendingBlocks([]);
     setPendingTarget("notebook");
     setSurface("editor");

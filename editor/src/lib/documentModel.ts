@@ -22,11 +22,49 @@ export const starterDocument: CodaroDocument = {
 };
 
 export function draftsFromDocument(document: CodaroDocument) {
+  return draftsFromBlocks(document.blocks, { includeMarkdown: true });
+}
+
+export function draftsFromBlocks(
+  blocks: BlockConfig[],
+  options: { emptySnippetDraft?: boolean; includeMarkdown?: boolean } = {},
+) {
   return Object.fromEntries(
-    document.blocks
-      .filter((block) => block.type === "code" || block.type === "markdown")
-      .map((block) => [block.id, block.content]),
+    blocks
+      .filter((block) => block.type === "code" || (options.includeMarkdown && block.type === "markdown"))
+      .map((block) => [
+        block.id,
+        options.emptySnippetDraft && block.role === "snippet" ? "" : block.content,
+      ]),
   );
+}
+
+export function appendUniqueBlocks(
+  document: CodaroDocument,
+  blocks: BlockConfig[],
+  options: { generatedTitle?: string } = {},
+) {
+  const existingIds = new Set(document.blocks.map((block) => block.id));
+  const nextBlocks = blocks.filter((block) => !existingIds.has(block.id));
+  if (!nextBlocks.length) {
+    return {
+      addedBlocks: [],
+      document,
+    };
+  }
+
+  return {
+    addedBlocks: nextBlocks,
+    document: {
+      ...document,
+      title: shouldUseGeneratedTitle(document.title) && options.generatedTitle ? options.generatedTitle : document.title,
+      blocks: [...document.blocks, ...nextBlocks],
+    },
+  };
+}
+
+export function firstCodeBlockId(blocks: BlockConfig[]) {
+  return blocks.find((block) => block.type === "code")?.id ?? "";
 }
 
 export function materializeDrafts(document: CodaroDocument, drafts: Record<string, string>): CodaroDocument {
@@ -110,4 +148,8 @@ export function normalizeBlockType(type: string): BlockConfig["type"] {
 
 export function isRecord(value: unknown): value is Record<string, unknown> {
   return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
+
+function shouldUseGeneratedTitle(title: string) {
+  return title === "새 노트북" || title === "생성 노트북";
 }
