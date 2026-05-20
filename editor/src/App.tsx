@@ -27,9 +27,7 @@ import {
   type CustomCurriculumApplication,
 } from "@/lib/customCurricula";
 import {
-  draftsFromDocument,
   materializeDrafts,
-  starterDocument,
 } from "@/lib/documentModel";
 import {
   buildLocalAssistantDraft,
@@ -71,6 +69,7 @@ import {
 import { providerAssistantFailure } from "@/lib/providerConnection";
 import { useAutomationState } from "@/hooks/useAutomationState";
 import { useCustomCurriculaState } from "@/hooks/useCustomCurriculaState";
+import { useNotebookDocumentState } from "@/hooks/useNotebookDocumentState";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import { useThemeMode } from "@/hooks/useThemeMode";
@@ -97,12 +96,19 @@ function App() {
   const [selectedContentId, setSelectedContentId] = useState(initialBootstrapState.selectedContentId);
   const [contentsLoading, setContentsLoading] = useState(false);
   const [referenceLoading, setReferenceLoading] = useState(false);
-  const [document, setDocument] = useState<CodaroDocument>(starterDocument);
+  const {
+    addNotebookCell,
+    applyDraftUpdates,
+    applyNotebookDocument,
+    document,
+    drafts,
+    replaceDocument,
+    selectedBlockId,
+    selectBlock,
+    updateDraft,
+  } = useNotebookDocumentState();
   const [curriculumDocument, setCurriculumDocument] = useState<CodaroDocument | null>(initialBootstrapState.curriculumDocument);
   const [selectedCurriculumBlockId, setSelectedCurriculumBlockId] = useState(initialBootstrapState.curriculumDocument?.blocks[0]?.id ?? "");
-  const [drafts, setDrafts] = useState<Record<string, string>>(
-    draftsFromDocument(starterDocument),
-  );
   const [pendingBlocks, setPendingBlocks] = useState<BlockConfig[]>([]);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget>("notebook");
   const {
@@ -115,7 +121,6 @@ function App() {
     initialSelectedCustomCurriculumId: initialBootstrapState.selectedCustomCurriculumId,
     onNotice: setNotice,
   });
-  const [selectedBlockId, setSelectedBlockId] = useState(starterDocument.blocks[1]?.id ?? starterDocument.blocks[0]?.id ?? "");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [variables, setVariables] = useState<VariableInfo[]>([]);
   const [results, setResults] = useState<ResultMap>({});
@@ -156,29 +161,12 @@ function App() {
   } = useProviderConnection({ apiOnline, onNotice: setNotice });
 
   const applyDocument = useCallback((nextDocument: CodaroDocument) => {
-    const nextDrafts = draftsFromDocument(nextDocument);
-    const firstCodeBlock = nextDocument.blocks.find((block) => block.type === "code");
-
-    setDocument(nextDocument);
-    setDrafts(nextDrafts);
-    setSelectedBlockId(firstCodeBlock?.id ?? nextDocument.blocks[0]?.id ?? "");
+    applyNotebookDocument(nextDocument);
     setResults({});
     setVariables([]);
     setPendingBlocks([]);
     setPendingTarget("notebook");
-  }, []);
-
-  const addNotebookCell = useCallback((type: "code" | "markdown") => {
-    const id = `${type}-${Date.now()}`;
-    const nextBlock: BlockConfig = { id, type, content: "" };
-
-    setDocument((current) => ({
-      ...current,
-      blocks: [...current.blocks, nextBlock],
-    }));
-    setDrafts((current) => ({ ...current, [id]: "" }));
-    setSelectedBlockId(id);
-  }, []);
+  }, [applyNotebookDocument]);
 
   useEffect(() => {
     let cancelled = false;
@@ -251,10 +239,7 @@ function App() {
         if (cancelled) return;
         if (result) {
           setCurriculumDocument(result.document);
-          setDrafts((current) => ({
-            ...current,
-            ...result.draftUpdates,
-          }));
+          applyDraftUpdates(result.draftUpdates);
           setSelectedCurriculumBlockId(result.selectedBlockId);
           setNotice(result.notice);
         }
@@ -268,7 +253,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [applyDocument, selectedCategory, selectedContentId]);
+  }, [applyDraftUpdates, selectedCategory, selectedContentId]);
 
   const filteredCategories = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
@@ -301,7 +286,7 @@ function App() {
     if (surface === "curriculum") {
       setSelectedCurriculumBlockId(block.id);
     } else {
-      setSelectedBlockId(block.id);
+      selectBlock(block.id);
     }
     setRunningBlockId(block.id);
     setNotice({ tone: "default", title: "셀 실행 중", detail: blockLabel(block) });
@@ -478,10 +463,7 @@ function App() {
 
   function applyCustomCurriculumApplication(application: CustomCurriculumApplication) {
     setCurriculumDocument(application.document);
-    setDrafts((current) => ({
-      ...current,
-      ...application.draftUpdates,
-    }));
+    applyDraftUpdates(application.draftUpdates);
     setSelectedCategory(application.selectedCategory);
     setSelectedContentId(application.selectedContentId);
     setSelectedCustomCurriculumId(application.selectedCustomCurriculumId);
@@ -510,16 +492,13 @@ function App() {
       saveCustomCurriculum(application.curriculumToSave.blocks, application.curriculumToSave.title);
     }
     if (application.documentToApply) {
-      setDocument(application.documentToApply);
+      replaceDocument(application.documentToApply);
     }
     if (Object.keys(application.draftUpdates).length) {
-      setDrafts((current) => ({
-        ...current,
-        ...application.draftUpdates,
-      }));
+      applyDraftUpdates(application.draftUpdates);
     }
     if (application.selectedBlockId) {
-      setSelectedBlockId(application.selectedBlockId);
+      selectBlock(application.selectedBlockId);
     }
     if (application.clearPendingBlocks) {
       setPendingBlocks([]);
@@ -537,7 +516,7 @@ function App() {
     if (surface === "curriculum") {
       setSelectedCurriculumBlockId(block.id);
     } else {
-      setSelectedBlockId(block.id);
+      selectBlock(block.id);
     }
     setTeacherScope("cell");
     void askAssistant(buildCellAiPrompt(action, block), "cell");
@@ -643,7 +622,7 @@ function App() {
           onAcceptPendingBlocks={acceptPendingBlocks}
           onConnectAi={connectAiProvider}
           onCellAsk={askCellAssistant}
-          onDraftChange={(blockId, value) => setDrafts((current) => ({ ...current, [blockId]: value }))}
+          onDraftChange={updateDraft}
           onNewChat={() => {
             setConversationId(null);
             setMessages([]);
@@ -654,7 +633,7 @@ function App() {
           onRefreshAutomation={refreshAutomation}
           onRunBlock={runBlock}
           onRunTask={runTask}
-          onSelectBlock={setSelectedBlockId}
+          onSelectBlock={selectBlock}
           onSelectCurriculumBlock={setSelectedCurriculumBlockId}
           onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
           onToggleEStop={toggleEStop}
