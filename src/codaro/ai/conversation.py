@@ -101,6 +101,12 @@ class ConversationState:
     turnCount: int = 0
 
 
+class ConversationNotFound(ValueError):
+    def __init__(self, conversationId: str) -> None:
+        super().__init__("Conversation not found")
+        self.conversationId = conversationId
+
+
 class ConversationManager:
 
     def __init__(self) -> None:
@@ -229,6 +235,26 @@ class ConversationManager:
 
     def getToolSchemas(self) -> list[dict[str, Any]]:
         return toolSchemas()
+
+
+def createConversationPayload(
+    manager: ConversationManager,
+    *,
+    role: str = "copilot",
+    systemPrompt: str | None = None,
+) -> dict[str, str]:
+    conversation = manager.create(role=role, systemPrompt=systemPrompt)
+    return {"conversationId": conversation.conversationId, "role": conversation.role}
+
+
+def conversationListPayload(manager: ConversationManager) -> dict[str, list[dict[str, Any]]]:
+    return {"conversations": manager.listConversations()}
+
+
+def deleteConversationPayload(manager: ConversationManager, conversationId: str) -> dict[str, bool]:
+    if not manager.delete(conversationId):
+        raise ConversationNotFound(conversationId)
+    return {"ok": True}
 
 
 def buildSystemPrompt(

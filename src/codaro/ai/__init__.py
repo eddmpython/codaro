@@ -9,7 +9,15 @@ from .completion import (
     completionTextFromAnswer,
     emptyCompletionResult,
 )
-from .conversation import ConversationManager, ConversationState, buildSystemPrompt
+from .conversation import (
+    ConversationManager,
+    ConversationNotFound,
+    ConversationState,
+    buildSystemPrompt,
+    conversationListPayload,
+    createConversationPayload,
+    deleteConversationPayload,
+)
 from .factory import createProvider, registerProvider, availableProviders
 from .profile import AiProfileManager, AiProfile, getProfileManager
 from .providerModels import (
@@ -43,8 +51,12 @@ __all__ = [
     "CodeCompletionResult",
     "CodeCompletionRequest",
     "ConversationManager",
+    "ConversationNotFound",
     "ConversationState",
     "buildSystemPrompt",
+    "conversationListPayload",
+    "createConversationPayload",
+    "deleteConversationPayload",
     "buildCompletionMessages",
     "completeCode",
     "completeCodeFromRequest",

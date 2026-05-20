@@ -4,9 +4,13 @@ import pytest
 
 from codaro.ai.conversation import (
     ConversationManager,
+    ConversationNotFound,
     ConversationState,
     Message,
     buildSystemPrompt,
+    conversationListPayload,
+    createConversationPayload,
+    deleteConversationPayload,
 )
 from codaro.ai.tools import toolSchemas
 
@@ -99,6 +103,32 @@ class TestConversationManager:
         c1 = manager.create()
         c2 = manager.create()
         assert c1.conversationId != c2.conversationId
+
+    def test_create_conversation_payload(self):
+        manager = ConversationManager()
+        payload = createConversationPayload(manager, role="teacher", systemPrompt="Use examples")
+        conversation = manager.get(payload["conversationId"])
+        assert payload["role"] == "teacher"
+        assert conversation is not None
+        assert conversation.systemPrompt == "Use examples"
+
+    def test_conversation_list_payload(self):
+        manager = ConversationManager()
+        createConversationPayload(manager, role="teacher")
+        payload = conversationListPayload(manager)
+        assert payload["conversations"][0]["role"] == "teacher"
+
+    def test_delete_conversation_payload(self):
+        manager = ConversationManager()
+        payload = createConversationPayload(manager)
+        assert deleteConversationPayload(manager, payload["conversationId"]) == {"ok": True}
+        assert manager.get(payload["conversationId"]) is None
+
+    def test_delete_conversation_payload_missing(self):
+        manager = ConversationManager()
+        with pytest.raises(ConversationNotFound) as excInfo:
+            deleteConversationPayload(manager, "missing-conversation")
+        assert excInfo.value.conversationId == "missing-conversation"
 
 
 class TestBuildSystemPrompt:

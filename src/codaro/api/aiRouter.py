@@ -7,6 +7,12 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
 from ..ai.completion import CodeCompletionRequest, completeCodeFromRequest, emptyCompletionResult
+from ..ai.conversation import (
+    ConversationNotFound,
+    conversationListPayload,
+    createConversationPayload,
+    deleteConversationPayload,
+)
 from ..ai.oauthFlow import getOAuthLoginFlow
 from ..ai.profile import AiProfileManager, getProfileManager
 from ..ai.profileEvents import streamProfileChangeEvents
@@ -159,22 +165,22 @@ def createAiRouter(state: Any) -> APIRouter:
         role: str = Query("copilot"),
         systemPrompt: str | None = Query(None),
     ):
-        manager = _getConversationManager()
-        conv = manager.create(role=role, systemPrompt=systemPrompt)
-        return {"conversationId": conv.conversationId, "role": conv.role}
+        return createConversationPayload(
+            _getConversationManager(),
+            role=role,
+            systemPrompt=systemPrompt,
+        )
 
     @router.get("/api/ai/conversations")
     def apiListConversations():
-        manager = _getConversationManager()
-        return {"conversations": manager.listConversations()}
+        return conversationListPayload(_getConversationManager())
 
     @router.delete("/api/ai/conversations/{conversationId}")
     def apiDeleteConversation(conversationId: str):
-        manager = _getConversationManager()
-        deleted = manager.delete(conversationId)
-        if not deleted:
-            raise HTTPException(status_code=404, detail="Conversation not found")
-        return {"ok": True}
+        try:
+            return deleteConversationPayload(_getConversationManager(), conversationId)
+        except ConversationNotFound as exc:
+            raise HTTPException(status_code=404, detail="Conversation not found") from exc
 
     @router.post("/api/ai/chat")
     async def apiChat(request: Request):
