@@ -20,7 +20,14 @@ from ..ai.providerSpec import (
     normalizeProvider,
     publicProviderIds,
 )
-from ..ai.teacher import TeacherOrchestrator
+from ..ai.teacher import (
+    TeacherOrchestrator,
+    finishTeacherToolCall,
+    recordAssistantToolRequest,
+    runTeacherChatLoop,
+    startTeacherToolCall,
+    toolCallsToProviderPayloads,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -304,81 +311,18 @@ def createAiRouter(state: Any) -> APIRouter:
         tools = toolSchemas()
 
         executor = _createToolExecutor(state, sessionId)
-        allToolResults: list[dict[str, Any]] = []
-        policy = orchestrator.createToolPolicy()
-        trace = orchestrator.startTrace(conversationId)
-
-        maxToolRounds = 10
-        for _round in range(maxToolRounds):
-            try:
-                if provider.supportsNativeTools and tools:
-                    response = provider.completeWithTools(messages, tools)
-                else:
-                    response = provider.complete(messages)
-            except _HANDLED_ERRORS as exc:
-                raise _providerUnavailable(exc) from exc
-
-            if not provider.supportsNativeTools or not tools:
-                convManager.addAssistantMessage(conversationId, response.answer)
-                tracePayload = orchestrator.finishTrace(trace, answer=response.answer, toolCalls=allToolResults)
-                return {
-                    "conversationId": conversationId,
-                    "answer": response.answer,
-                    "provider": response.provider,
-                    "model": response.model,
-                    "usage": response.usage,
-                    "toolCalls": allToolResults,
-                    "trace": tracePayload,
-                }
-
-            if not response.toolCalls:
-                convManager.addAssistantMessage(conversationId, response.answer)
-                tracePayload = orchestrator.finishTrace(trace, answer=response.answer, toolCalls=allToolResults)
-                return {
-                    "conversationId": conversationId,
-                    "answer": response.answer,
-                    "provider": response.provider,
-                    "model": response.model,
-                    "usage": response.usage,
-                    "toolCalls": allToolResults,
-                    "trace": tracePayload,
-                }
-
-            toolCallsData = [
-                {"id": tc.id, "type": "function", "function": {"name": tc.name, "arguments": json.dumps(tc.arguments, ensure_ascii=False)}}
-                for tc in response.toolCalls
-            ]
-            convManager.addAssistantMessage(conversationId, response.answer or "", toolCalls=toolCallsData)
-            messages.append({"role": "assistant", "content": response.answer or "", "tool_calls": toolCallsData})
-
-            for tc in response.toolCalls:
-                orchestrator.toolCallStart(trace, tc.id, tc.name, tc.arguments)
-                violation = policy.validateStart(tc.name, tc.arguments)
-                if violation is not None:
-                    result = orchestrator.toolPolicyViolation(trace, violation)
-                else:
-                    result = await executor.execute(tc.name, tc.arguments)
-                policy.recordResult(tc.name, tc.arguments, result)
-                resultStr = json.dumps(result, ensure_ascii=False)
-                convManager.addToolResult(conversationId, tc.id, resultStr)
-                messages.append({"role": "tool", "tool_call_id": tc.id, "content": resultStr})
-                allToolResults.append(orchestrator.toolCallResult(trace, tc.id, tc.name, tc.arguments, result))
-
         try:
-            finalResponse = provider.complete(messages)
+            return await runTeacherChatLoop(
+                provider=provider,
+                convManager=convManager,
+                conversationId=conversationId,
+                messages=messages,
+                tools=tools,
+                executor=executor,
+                orchestrator=orchestrator,
+            )
         except _HANDLED_ERRORS as exc:
             raise _providerUnavailable(exc) from exc
-        convManager.addAssistantMessage(conversationId, finalResponse.answer)
-        tracePayload = orchestrator.finishTrace(trace, answer=finalResponse.answer, toolCalls=allToolResults)
-        return {
-            "conversationId": conversationId,
-            "answer": finalResponse.answer,
-            "provider": finalResponse.provider,
-            "model": finalResponse.model,
-            "usage": finalResponse.usage,
-            "toolCalls": allToolResults,
-            "trace": tracePayload,
-        }
 
     @router.post("/api/ai/chat/stream")
     async def apiChatStream(request: Request):
@@ -481,30 +425,32 @@ def createAiRouter(state: Any) -> APIRouter:
                     yield f"data: {json.dumps({'type': 'done', 'answer': response.answer, 'provider': response.provider, 'model': response.model, 'usage': response.usage, 'toolCalls': allToolResults, 'trace': tracePayload}, ensure_ascii=False)}\n\n"
                     return
 
-                toolCallsData = [
-                    {"id": tc.id, "type": "function", "function": {"name": tc.name, "arguments": json.dumps(tc.arguments, ensure_ascii=False)}}
-                    for tc in response.toolCalls
-                ]
-                convManager.addAssistantMessage(conversationId, response.answer or "", toolCalls=toolCallsData)
-                msgs.append({"role": "assistant", "content": response.answer or "", "tool_calls": toolCallsData})
+                toolCallsData = toolCallsToProviderPayloads(response.toolCalls)
+                recordAssistantToolRequest(
+                    convManager=convManager,
+                    conversationId=conversationId,
+                    messages=msgs,
+                    assistantAnswer=response.answer or "",
+                    providerToolCalls=toolCallsData,
+                )
 
                 if response.answer:
                     yield f"data: {json.dumps({'type': 'token', 'content': response.answer}, ensure_ascii=False)}\n\n"
 
                 toolResults = []
                 for tc in response.toolCalls:
-                    toolStart = orchestrator.toolCallStart(trace, tc.id, tc.name, tc.arguments)
+                    toolStart = startTeacherToolCall(orchestrator=orchestrator, trace=trace, toolCall=tc)
                     yield f"data: {json.dumps({'type': 'tool_start', 'toolCall': toolStart}, ensure_ascii=False)}\n\n"
-                    violation = policy.validateStart(tc.name, tc.arguments)
-                    if violation is not None:
-                        result = orchestrator.toolPolicyViolation(trace, violation)
-                    else:
-                        result = await executor.execute(tc.name, tc.arguments)
-                    policy.recordResult(tc.name, tc.arguments, result)
-                    resultStr = json.dumps(result, ensure_ascii=False)
-                    convManager.addToolResult(conversationId, tc.id, resultStr)
-                    msgs.append({"role": "tool", "tool_call_id": tc.id, "content": resultStr})
-                    payload = orchestrator.toolCallResult(trace, tc.id, tc.name, tc.arguments, result)
+                    payload = await finishTeacherToolCall(
+                        convManager=convManager,
+                        conversationId=conversationId,
+                        messages=msgs,
+                        executor=executor,
+                        policy=policy,
+                        orchestrator=orchestrator,
+                        trace=trace,
+                        toolCall=tc,
+                    )
                     toolResults.append(payload)
                     allToolResults.append(payload)
 

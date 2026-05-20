@@ -1,16 +1,68 @@
 from __future__ import annotations
 
+import asyncio
+
 from codaro.ai.conversation import buildSystemPrompt
 from codaro.ai.teacher import (
     TeacherOrchestrator,
     ToolPolicyState,
+    executeTeacherToolRound,
     evaluateToolSequence,
     evaluateToolTrace,
     goldenEvalCases,
+    runTeacherChatLoop,
     teacherSkills,
+    toolCallsToProviderPayloads,
 )
+from codaro.ai.types import ToolCall, ToolResponse
 from codaro.document.cellSchema import schemaSummary
 from codaro.ai.tools import toolSchemas
+
+
+class _FakeConversationManager:
+    def __init__(self) -> None:
+        self.assistantMessages: list[dict] = []
+        self.toolResults: list[dict] = []
+
+    def addAssistantMessage(self, conversationId: str, content: str, toolCalls=None):
+        self.assistantMessages.append({
+            "conversationId": conversationId,
+            "content": content,
+            "toolCalls": toolCalls,
+        })
+
+    def addToolResult(self, conversationId: str, toolCallId: str, result: str):
+        self.toolResults.append({
+            "conversationId": conversationId,
+            "toolCallId": toolCallId,
+            "result": result,
+        })
+
+
+class _FakeExecutor:
+    async def execute(self, toolName: str, arguments: dict):
+        return {"ok": True, "tool": toolName, "arguments": arguments}
+
+
+class _FakeProvider:
+    supportsNativeTools = True
+
+    def __init__(self) -> None:
+        self.callCount = 0
+
+    def completeWithTools(self, messages: list[dict], tools: list[dict]):
+        self.callCount += 1
+        if self.callCount == 1:
+            return ToolResponse(
+                answer="",
+                provider="fake",
+                model="test",
+                toolCalls=[ToolCall(id="call-1", name="read-cells", arguments={})],
+            )
+        return ToolResponse(answer="완료", provider="fake", model="test", toolCalls=[])
+
+    def complete(self, messages: list[dict]):
+        return ToolResponse(answer="완료", provider="fake", model="test", toolCalls=[])
 
 
 def testTeacherContextInjectionIncludesCellMapAndPreflight() -> None:
@@ -99,6 +151,60 @@ def testEvalHarnessCanReadTraceSequence() -> None:
 
     assert report.passed
     assert report.observedTools == ("read-cells", "cell-call")
+
+
+def testProviderLoopOwnsToolRoundRecording() -> None:
+    toolCalls = [ToolCall(id="call-1", name="read-cells", arguments={"includeContent": False})]
+    providerPayloads = toolCallsToProviderPayloads(toolCalls)
+
+    assert providerPayloads[0]["function"]["name"] == "read-cells"
+    assert '"includeContent": false' in providerPayloads[0]["function"]["arguments"]
+
+    convManager = _FakeConversationManager()
+    messages: list[dict] = []
+    orchestrator = TeacherOrchestrator.fromContext({})
+    trace = orchestrator.startTrace("conv-3")
+
+    roundResult = asyncio.run(executeTeacherToolRound(
+        toolCalls=toolCalls,
+        assistantAnswer="",
+        convManager=convManager,
+        conversationId="conv-3",
+        messages=messages,
+        executor=_FakeExecutor(),
+        policy=ToolPolicyState(),
+        orchestrator=orchestrator,
+        trace=trace,
+    ))
+
+    assert len(roundResult.toolStarts) == 1
+    assert len(roundResult.toolResults) == 1
+    assert roundResult.toolResults[0]["status"] == "done"
+    assert convManager.assistantMessages[0]["toolCalls"] == providerPayloads
+    assert convManager.toolResults[0]["toolCallId"] == "call-1"
+    assert [message["role"] for message in messages] == ["assistant", "tool"]
+    assert trace.toolSequence() == ["read-cells"]
+
+
+def testProviderLoopOwnsNonStreamingTurn() -> None:
+    convManager = _FakeConversationManager()
+    messages: list[dict] = [{"role": "user", "content": "셀 읽어줘"}]
+    orchestrator = TeacherOrchestrator.fromContext({})
+
+    payload = asyncio.run(runTeacherChatLoop(
+        provider=_FakeProvider(),
+        convManager=convManager,
+        conversationId="conv-4",
+        messages=messages,
+        tools=[{"type": "function"}],
+        executor=_FakeExecutor(),
+        orchestrator=orchestrator,
+    ))
+
+    assert payload["answer"] == "완료"
+    assert payload["toolCalls"][0]["name"] == "read-cells"
+    assert payload["trace"]["toolSequence"] == ["read-cells"]
+    assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
 
 
 def testTeacherSkillsAndCellSchemaAreVisibleSsot() -> None:

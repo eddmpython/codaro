@@ -65,6 +65,7 @@ src/codaro/ai/
 ├── conversation.py   # 역할별 prompt와 conversation state
 ├── teacher/
 │   ├── teacherOrchestrator.py
+│   ├── providerLoop.py
 │   ├── contextBuilder.py
 │   ├── toolPolicy.py
 │   ├── traceModel.py
@@ -81,7 +82,7 @@ src/codaro/api/
 └── aiRouter.py       # HTTP/SSE endpoint, provider 호출 경계
 ```
 
-router가 셀 맥락 조립이나 tool payload 포맷을 직접 소유하면 금방 덕지덕지 붙는다. provider loop의 판단 재료와 workloop 표시 payload는 `teacher/` 패키지에서 관리한다.
+router가 셀 맥락 조립, tool round 실행, tool payload 포맷을 직접 소유하면 금방 덕지덕지 붙는다. provider loop의 판단 재료와 workloop 표시 payload는 `teacher/` 패키지에서 관리한다.
 
 ## Tool Map
 

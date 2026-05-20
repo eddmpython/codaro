@@ -46,7 +46,7 @@ src/codaro/
 │   ├── profile.py secrets.py
 │   ├── factory.py baseProvider.py providers/
 │   ├── conversation.py      # conversation state + role prompts
-│   ├── teacher/             # orchestrator + context + policy + trace + eval
+│   ├── teacher/             # provider loop + orchestrator + context + policy + trace + eval
 │   ├── teacherLoop.py       # compatibility re-export
 │   ├── tools.py             # default tool definitions
 │   ├── toolRegistry.py      # ToolDef + schema registry
