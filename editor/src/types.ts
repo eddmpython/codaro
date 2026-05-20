@@ -22,6 +22,17 @@ export type VariableInfo = {
   size?: number | null;
 };
 
+export type PackageInfo = {
+  name: string;
+  version: string;
+};
+
+export type PackageInstallResult = {
+  package: string;
+  success: boolean;
+  message: string;
+};
+
 export type VariableDelta = {
   added: VariableInfo[];
   updated: VariableInfo[];

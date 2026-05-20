@@ -1,17 +1,24 @@
 import {
+  BookOpen,
+  Boxes,
   CheckCircle2,
+  Code2,
   GraduationCap,
   Layers3,
   Lightbulb,
   ListChecks,
   Loader2,
   MessageSquare,
+  Package,
   Play,
+  RefreshCw,
+  Route,
   Sparkles,
   Target,
   TerminalSquare,
+  Wrench,
 } from "lucide-react";
-import type { ComponentType, ReactNode } from "react";
+import { useEffect, useMemo, useState, type ComponentType, type ReactNode } from "react";
 
 import { CellAiActions } from "@/components/app/cellAiActions";
 import {
@@ -23,7 +30,9 @@ import {
 } from "@/components/app/appPrimitives";
 import { learningCellCatalog } from "@/components/app/learningCellCatalog";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { codaroApi } from "@/lib/api";
 import {
   blockLabel,
   classifyLearningCell,
@@ -35,7 +44,7 @@ import {
 } from "@/lib/cellModel";
 import { difficultyLabel, statusLabel } from "@/lib/displayFormat";
 import { cn } from "@/lib/utils";
-import type { BlockConfig, CodaroDocument, ExecutionResult } from "@/types";
+import type { BlockConfig, CodaroDocument, ExecutionResult, PackageInfo } from "@/types";
 import {
   CurriculumMarkdownBody,
   curriculumCellTone,
@@ -52,6 +61,7 @@ type RenderCodeCellEditor = (args: {
 }) => ReactNode;
 
 export function CurriculumView({
+  apiOnline,
   canRun,
   document,
   drafts,
@@ -72,6 +82,7 @@ export function CurriculumView({
   onRunBlock,
   onSelectBlock,
 }: {
+  apiOnline: boolean;
   canRun: boolean;
   document: CodaroDocument;
   drafts: Record<string, string>;
@@ -92,47 +103,43 @@ export function CurriculumView({
   onRunBlock: (block: BlockConfig) => void;
   onSelectBlock: (blockId: string) => void;
 }) {
+  const curriculumSections = useMemo(() => groupCurriculumSections(document.blocks), [document.blocks]);
+  const introBlock = curriculumSections.introBlocks[0] ?? document.blocks.find((block) => block.displayKind === "hero" || block.sourceType === "intro");
+
   return (
     <ScrollArea className="h-full min-h-0 min-w-0">
       <div className="min-w-0 p-4">
-        <div className="mx-auto min-w-0 max-w-4xl space-y-3">
-          <header className="rounded-md border bg-card px-4 py-3">
-            <div className="flex flex-wrap items-start justify-between gap-3">
-              <div className="min-w-0">
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge variant="secondary">커리큘럼</Badge>
-                  <Badge variant="outline">{selectedCategoryLabel || selectedCategory}</Badge>
-                  {selectedContentLabel || selectedContentId ? <Badge variant="outline">{selectedContentLabel || selectedContentId}</Badge> : null}
-                </div>
-                <h1 className="mt-2 truncate text-2xl font-semibold tracking-normal">{document.title}</h1>
-                <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                  커리큘럼을 학습 셀로 펼친 공간입니다. 셀마다 실행하거나 Codaro에게 설명, 힌트, 검증을 요청할 수 있습니다.
-                </p>
-              </div>
-              {referenceLoading ? <LoadingInline label="레슨 불러오는 중" /> : null}
-            </div>
-            <PendingNotebookBar
-              pendingBlocks={pendingBlocks}
-              onAccept={onAcceptPendingBlocks}
-              onReject={onRejectPendingBlocks}
-            />
-          </header>
+        <div className="mx-auto min-w-0 max-w-5xl space-y-4">
+          <LearningOverviewHeader
+            apiOnline={apiOnline}
+            document={document}
+            introBlock={introBlock}
+            pendingBlocks={pendingBlocks}
+            referenceLoading={referenceLoading}
+            selectedCategory={selectedCategory}
+            selectedCategoryLabel={selectedCategoryLabel}
+            selectedContentId={selectedContentId}
+            selectedContentLabel={selectedContentLabel}
+            onAcceptPendingBlocks={onAcceptPendingBlocks}
+            onRejectPendingBlocks={onRejectPendingBlocks}
+          />
 
-          <div className="space-y-3">
-            {document.blocks.map((block) => (
-              <CurriculumLearningCell
-                block={block}
+          <div className="space-y-4">
+            {curriculumSections.sections.map((section, index) => (
+              <CurriculumSectionCard
                 canRun={canRun}
-                draft={drafts[block.id] ?? curriculumInitialDraft(block)}
-                isRunning={runningBlockId === block.id}
-                isSelected={block.id === selectedBlockId}
-                key={block.id}
+                drafts={drafts}
+                index={index}
+                key={section.id}
                 renderCodeCellEditor={renderCodeCellEditor}
-                result={results[block.id]}
-                onAsk={(action) => onCellAsk(action, block)}
-                onDraftChange={(value) => onDraftChange(block.id, value)}
-                onRun={() => onRunBlock(block)}
-                onSelect={() => onSelectBlock(block.id)}
+                results={results}
+                runningBlockId={runningBlockId}
+                section={section}
+                selectedBlockId={selectedBlockId}
+                onCellAsk={onCellAsk}
+                onDraftChange={onDraftChange}
+                onRunBlock={onRunBlock}
+                onSelectBlock={onSelectBlock}
               />
             ))}
           </div>
@@ -140,6 +147,624 @@ export function CurriculumView({
       </div>
     </ScrollArea>
   );
+}
+
+type CurriculumSectionGroup = {
+  id: string;
+  title: string;
+  subtitle: string;
+  contract?: CurriculumSectionContract;
+  anchorBlockId: string;
+  titleBlock?: BlockConfig;
+  blocks: BlockConfig[];
+};
+
+type CurriculumSectionContract = Record<string, unknown> & {
+  title?: unknown;
+  subtitle?: unknown;
+  goal?: unknown;
+  why?: unknown;
+  explanation?: unknown;
+  tips?: unknown;
+};
+
+function LearningOverviewHeader({
+  apiOnline,
+  document,
+  introBlock,
+  pendingBlocks,
+  referenceLoading,
+  selectedCategory,
+  selectedCategoryLabel,
+  selectedContentId,
+  selectedContentLabel,
+  onAcceptPendingBlocks,
+  onRejectPendingBlocks,
+}: {
+  apiOnline: boolean;
+  document: CodaroDocument;
+  introBlock?: BlockConfig;
+  pendingBlocks: BlockConfig[];
+  referenceLoading: boolean;
+  selectedCategory: string;
+  selectedCategoryLabel: string;
+  selectedContentId: string;
+  selectedContentLabel: string;
+  onAcceptPendingBlocks: () => void;
+  onRejectPendingBlocks: () => void;
+}) {
+  const overview = curriculumOverview(document, introBlock);
+
+  return (
+    <header id={introBlock ? cellDomId(introBlock.id) : undefined} className="overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm">
+      <div className="grid gap-4 p-4 2xl:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-center gap-2">
+            <Badge variant="secondary">커리큘럼</Badge>
+            <Badge variant="outline">{selectedCategoryLabel || selectedCategory}</Badge>
+            {selectedContentLabel || selectedContentId ? <Badge variant="outline">{selectedContentLabel || selectedContentId}</Badge> : null}
+            {referenceLoading ? <LoadingInline label="레슨 불러오는 중" /> : null}
+          </div>
+          <h1 className="mt-3 text-2xl font-semibold tracking-normal">{overview.title}</h1>
+          {overview.direction ? (
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{overview.direction}</p>
+          ) : null}
+          {overview.benefits.length ? (
+            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+              {overview.benefits.slice(0, 4).map((benefit, index) => (
+                <div className="flex min-w-0 items-start gap-2 rounded-md border bg-background/60 px-3 py-2 text-sm leading-5" key={`${benefit}-${index}`}>
+                  <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-emerald-500" />
+                  <span className="min-w-0 text-muted-foreground">{benefit}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+          <CurriculumDependencyPanel apiOnline={apiOnline} document={document} />
+        </div>
+        <LearningFlowDiagram diagram={overview.diagram} />
+      </div>
+      <PendingNotebookBar
+        pendingBlocks={pendingBlocks}
+        onAccept={onAcceptPendingBlocks}
+        onReject={onRejectPendingBlocks}
+      />
+    </header>
+  );
+}
+
+function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> }) {
+  const customSteps = diagramSteps(diagram);
+  const fallbackSteps = [
+    { label: "목표", detail: "무슨 공부", Icon: Route, tone: "text-sky-500" },
+    { label: "개념", detail: "설명과 팁", Icon: BookOpen, tone: "text-amber-500" },
+    { label: "스니펫", detail: "따라 칠 코드", Icon: Code2, tone: "text-emerald-500" },
+    { label: "실행", detail: "입력과 검증", Icon: Play, tone: "text-rose-500" },
+  ];
+  const stepIcons = [Route, BookOpen, Code2, Play];
+  const stepTones = ["text-sky-500", "text-amber-500", "text-emerald-500", "text-rose-500"];
+  const steps = customSteps.length
+    ? customSteps.map((step, index) => ({
+      ...step,
+      Icon: stepIcons[index % stepIcons.length],
+      tone: stepTones[index % stepTones.length],
+    }))
+    : fallbackSteps;
+
+  return (
+    <div className="rounded-md border bg-background/70 p-3">
+      <div className="mb-3 flex items-center justify-between gap-2">
+        <div className="flex items-center gap-2 text-sm font-semibold">
+          <Boxes className="size-4 text-muted-foreground" />
+          학습 아키텍처
+        </div>
+        <Badge className="gap-1" variant="outline">
+          <Wrench className="size-3" />
+          uv
+        </Badge>
+      </div>
+      <div className="relative grid gap-2">
+        {steps.map(({ Icon, detail, label, tone }, index) => (
+          <div className="relative flex items-center gap-3 rounded-md border bg-card px-3 py-2" key={label}>
+            {index < steps.length - 1 ? <span className="absolute left-[21px] top-[36px] h-4 w-px bg-border" /> : null}
+            <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-muted", tone)}>
+              <Icon className="size-4" />
+            </span>
+            <span className="min-w-0 flex-1">
+              <span className="block text-sm font-medium">{label}</span>
+              <span className="block truncate text-xs text-muted-foreground">{detail}</span>
+            </span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean; document: CodaroDocument }) {
+  const requiredPackages = useMemo(() => inferRequiredPackages(document), [document]);
+  const [installedPackages, setInstalledPackages] = useState<PackageInfo[]>([]);
+  const [checking, setChecking] = useState(false);
+  const [installing, setInstalling] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [lastMessage, setLastMessage] = useState<string | null>(null);
+
+  const installedNames = useMemo(() => new Set(installedPackages.map((item) => normalizePackageName(item.name))), [installedPackages]);
+  const missingPackages = requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item)));
+
+  useEffect(() => {
+    let cancelled = false;
+    if (!requiredPackages.length || !apiOnline) {
+      setInstalledPackages([]);
+      setError(null);
+      setLastMessage(null);
+      return undefined;
+    }
+
+    async function refreshPackages() {
+      setChecking(true);
+      setError(null);
+      try {
+        const packages = await codaroApi.packagesList();
+        if (!cancelled) setInstalledPackages(packages);
+      } catch (refreshError) {
+        if (!cancelled) setError(errorText(refreshError));
+      } finally {
+        if (!cancelled) setChecking(false);
+      }
+    }
+
+    void refreshPackages();
+    return () => {
+      cancelled = true;
+    };
+  }, [apiOnline, requiredPackages]);
+
+  if (!requiredPackages.length) return null;
+
+  const installMissing = async () => {
+    setError(null);
+    setLastMessage(null);
+    for (const packageName of missingPackages) {
+      setInstalling(packageName);
+      try {
+        const result = await codaroApi.packageInstall(packageName);
+        setLastMessage(firstMessageLine(result.message) || `${packageName} 설치 완료`);
+        if (!result.success) {
+          setError(firstMessageLine(result.message) || `${packageName} 설치에 실패했습니다.`);
+          break;
+        }
+      } catch (installError) {
+        setError(errorText(installError));
+        break;
+      } finally {
+        setInstalling(null);
+      }
+    }
+
+    try {
+      setChecking(true);
+      setInstalledPackages(await codaroApi.packagesList());
+    } catch (refreshError) {
+      setError(errorText(refreshError));
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  return (
+    <div className="mt-4 rounded-md border bg-background/60 px-3 py-2.5">
+      <div className="flex flex-wrap items-center justify-between gap-2">
+        <div className="flex min-w-0 items-center gap-2">
+          <Package className="size-4 text-muted-foreground" />
+          <span className="text-sm font-medium">라이브러리</span>
+          <span className="text-xs text-muted-foreground">uv로 준비</span>
+        </div>
+        <div className="flex shrink-0 items-center gap-2">
+          {checking ? <Loader2 className="size-3.5 animate-spin text-muted-foreground" /> : null}
+          <Button
+            className="h-7 gap-1.5 px-2 text-xs"
+            disabled={!apiOnline || !missingPackages.length || checking || Boolean(installing)}
+            size="sm"
+            type="button"
+            variant="outline"
+            onClick={installMissing}
+          >
+            {installing ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />}
+            {apiOnline ? (installing ? `${installing} 설치 중` : missingPackages.length ? "누락 설치" : "준비됨") : "서버 필요"}
+          </Button>
+        </div>
+      </div>
+      <div className="mt-2 flex flex-wrap gap-1.5">
+        {requiredPackages.map((packageName) => {
+          const installed = installedNames.has(normalizePackageName(packageName));
+          return (
+            <Badge className="gap-1" key={packageName} variant={installed ? "secondary" : "outline"}>
+              <span className={cn("size-1.5 rounded-full", installed ? "bg-emerald-500" : "bg-amber-500")} />
+              {packageName}
+            </Badge>
+          );
+        })}
+      </div>
+      {!apiOnline ? <div className="mt-2 text-xs leading-5 text-muted-foreground">서버 세션이 열리면 uv 설치를 실행할 수 있습니다.</div> : null}
+      {error ? <div className="mt-2 text-xs leading-5 text-destructive">{error}</div> : null}
+      {!error && lastMessage ? <div className="mt-2 text-xs leading-5 text-muted-foreground">{lastMessage}</div> : null}
+    </div>
+  );
+}
+
+function CurriculumSectionCard({
+  canRun,
+  drafts,
+  index,
+  renderCodeCellEditor,
+  results,
+  runningBlockId,
+  section,
+  selectedBlockId,
+  onCellAsk,
+  onDraftChange,
+  onRunBlock,
+  onSelectBlock,
+}: {
+  canRun: boolean;
+  drafts: Record<string, string>;
+  index: number;
+  renderCodeCellEditor: RenderCodeCellEditor;
+  results: ResultMap;
+  runningBlockId: string | null;
+  section: CurriculumSectionGroup;
+  selectedBlockId: string;
+  onCellAsk: (action: CellAiAction, block: BlockConfig) => void;
+  onDraftChange: (blockId: string, value: string) => void;
+  onRunBlock: (block: BlockConfig) => void;
+  onSelectBlock: (blockId: string) => void;
+}) {
+  const selected = section.anchorBlockId === selectedBlockId || section.blocks.some((block) => block.id === selectedBlockId);
+
+  return (
+    <section
+      className={cn(
+        "overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm",
+        selected && "ring-1 ring-ring/35",
+      )}
+      id={cellDomId(section.anchorBlockId)}
+    >
+      <button
+        className="flex w-full min-w-0 items-start gap-3 border-b bg-muted/15 px-4 py-3 text-left"
+        type="button"
+        onClick={() => onSelectBlock(section.anchorBlockId)}
+      >
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-background text-sm font-semibold text-muted-foreground">
+          {index + 1}
+        </span>
+        <span className="min-w-0 flex-1">
+          <span className="block text-lg font-semibold tracking-normal">{section.title}</span>
+          {section.subtitle ? <span className="mt-1 block text-sm leading-6 text-muted-foreground">{section.subtitle}</span> : null}
+        </span>
+        <Badge className="mt-1 gap-1" variant="outline">
+          <Layers3 className="size-3" />
+          섹션
+        </Badge>
+      </button>
+
+      <SectionContractOverview contract={section.contract} />
+
+      <div className="space-y-3 p-3">
+        {section.blocks.map((block) => (
+          <CurriculumLearningCell
+            block={block}
+            canRun={canRun}
+            draft={drafts[block.id] ?? curriculumInitialDraft(block)}
+            isRunning={runningBlockId === block.id}
+            isSelected={block.id === selectedBlockId}
+            key={block.id}
+            renderCodeCellEditor={renderCodeCellEditor}
+            result={results[block.id]}
+            variant="embedded"
+            onAsk={(action) => onCellAsk(action, block)}
+            onDraftChange={(value) => onDraftChange(block.id, value)}
+            onRun={() => onRunBlock(block)}
+            onSelect={() => onSelectBlock(block.id)}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function groupCurriculumSections(blocks: BlockConfig[]): { introBlocks: BlockConfig[]; sections: CurriculumSectionGroup[] } {
+  const introBlocks: BlockConfig[] = [];
+  const sections: CurriculumSectionGroup[] = [];
+  let current: CurriculumSectionGroup | null = null;
+
+  const flush = () => {
+    if (!current) return;
+    if (current.blocks.length || current.titleBlock) sections.push(current);
+    current = null;
+  };
+
+  blocks.forEach((block, index) => {
+    if (block.sourceType === "intro" || (block.displayKind === "hero" && block.role === "title")) {
+      introBlocks.push(block);
+      return;
+    }
+
+    if (isSectionTitleBlock(block)) {
+      flush();
+      const info = sectionInfo(block);
+      current = {
+        id: `section-${block.id}`,
+        title: info.title || `섹션 ${sections.length + 1}`,
+        subtitle: info.subtitle,
+        contract: info.contract,
+        anchorBlockId: block.id,
+        titleBlock: block,
+        blocks: [],
+      };
+      return;
+    }
+
+    if (!current) {
+      current = {
+        id: `section-fallback-${index}`,
+        title: "학습 섹션",
+        subtitle: "",
+        anchorBlockId: block.id,
+        blocks: [],
+      };
+    }
+    current.blocks.push(block);
+  });
+
+  flush();
+  if (!sections.length && introBlocks.length) {
+    const firstIntro = introBlocks[0];
+    sections.push({
+      id: "section-overview",
+      title: "학습 시작",
+      subtitle: "",
+      anchorBlockId: firstIntro.id,
+      blocks: introBlocks.slice(1),
+    });
+  }
+  return { introBlocks, sections };
+}
+
+function isSectionTitleBlock(block: BlockConfig) {
+  if (block.sourceType === "section") return true;
+  if (block.displayKind !== "title") return false;
+  return block.role === "title" && block.sourceType !== "intro";
+}
+
+function curriculumOverview(document: CodaroDocument, introBlock?: BlockConfig) {
+  const payload = isRecord(introBlock?.payload) ? introBlock.payload : {};
+  const lessonContract = isRecord(payload.learningContract) ? payload.learningContract : {};
+  const meta = isRecord(lessonContract.meta) ? lessonContract.meta : {};
+  const intro = isRecord(lessonContract.intro) ? lessonContract.intro : {};
+  const title = readPayloadText(meta.title) || readPayloadText(payload.title) || introBlock?.title || document.title;
+  const goal = readPayloadText(intro.direction) || readPayloadText(payload.goal);
+  const description = readPayloadText(payload.description) || introBlock?.description || textAfterHeading(introBlock?.content ?? "");
+  const contractBenefits = payloadTextList(intro.benefits);
+  const benefits = contractBenefits.length
+    ? contractBenefits.map(stripMarkdown)
+    : payloadTextList(payload.points).length
+      ? payloadTextList(payload.points).map(stripMarkdown)
+    : inferBenefits(document.blocks);
+  return {
+    title: stripMarkdown(title),
+    direction: stripMarkdown(goal || description || "한 섹션씩 개념, 예제, 직접 입력, 실행 결과를 연결해 학습합니다."),
+    benefits,
+    diagram: isRecord(intro.diagram) ? intro.diagram : undefined,
+  };
+}
+
+function sectionInfo(block: BlockConfig) {
+  const payload = isRecord(block.payload) ? block.payload : {};
+  const contract = readSectionContract(payload.sectionContract);
+  const title = readPayloadText(contract?.title) || readPayloadText(payload.title) || block.title || blockLabel(block);
+  const contentLines = block.content
+    .split("\n")
+    .map((line) => stripMarkdown(line))
+    .filter(Boolean);
+  const cleanTitle = stripMarkdown(title);
+  const subtitle =
+    readPayloadText(contract?.subtitle) ||
+    readPayloadText(payload.subtitle) ||
+    block.description ||
+    contentLines.find((line) => line !== cleanTitle) ||
+    "";
+
+  return {
+    title: cleanTitle,
+    subtitle: stripMarkdown(subtitle),
+    contract,
+  };
+}
+
+function SectionContractOverview({ contract }: { contract?: CurriculumSectionContract }) {
+  if (!contract) return null;
+  const goal = stripMarkdown(readPayloadText(contract.goal));
+  const why = stripMarkdown(readPayloadText(contract.why));
+  const explanation = stripMarkdown(readPayloadText(contract.explanation));
+  const tips = payloadTextList(contract.tips).map(stripMarkdown).slice(0, 4);
+  if (!goal && !why && !explanation && !tips.length) return null;
+
+  return (
+    <div className="border-b bg-background/35 px-4 py-3">
+      <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(220px,280px)]">
+        <div className="min-w-0 space-y-3">
+          <div className="grid gap-3 sm:grid-cols-2">
+            {goal ? (
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <Target className="size-3.5" />
+                  이번 섹션에서 공부할 것
+                </div>
+                <p className="mt-1 text-sm leading-6">{goal}</p>
+              </div>
+            ) : null}
+            {why ? (
+              <div className="min-w-0">
+                <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+                  <CheckCircle2 className="size-3.5" />
+                  왜 유용한지
+                </div>
+                <p className="mt-1 text-sm leading-6">{why}</p>
+              </div>
+            ) : null}
+          </div>
+          {explanation ? <p className="text-sm leading-6 text-muted-foreground">{explanation}</p> : null}
+        </div>
+        {tips.length ? (
+          <div className="min-w-0 border-t pt-3 lg:border-l lg:border-t-0 lg:pl-3 lg:pt-0">
+            <div className="flex items-center gap-1.5 text-xs font-medium text-muted-foreground">
+              <Lightbulb className="size-3.5" />
+              팁
+            </div>
+            <div className="mt-2 space-y-1.5">
+              {tips.map((tip, index) => (
+                <div className="flex gap-2 text-xs leading-5 text-muted-foreground" key={`${tip}-${index}`}>
+                  <span className="mt-2 size-1 rounded-full bg-muted-foreground/60" />
+                  <span className="min-w-0">{stripBullet(tip)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
+function inferBenefits(blocks: BlockConfig[]) {
+  const benefits = blocks
+    .filter((block) => block.type === "markdown" && block.displayKind !== "title")
+    .map((block) => stripMarkdown(block.title || firstContentLine(block.content)))
+    .filter(Boolean);
+  return Array.from(new Set(benefits)).slice(0, 4);
+}
+
+function textAfterHeading(content: string) {
+  return content
+    .split("\n")
+    .map((line) => stripMarkdown(line))
+    .filter((line) => line && !line.startsWith("#"))
+    .find(Boolean) ?? "";
+}
+
+function firstContentLine(content: string) {
+  return content
+    .split("\n")
+    .map((line) => stripMarkdown(line).replace(/^[-*]\s*/, "").trim())
+    .find(Boolean) ?? "";
+}
+
+function inferRequiredPackages(document: CodaroDocument) {
+  const packages = new Set<string>((document.runtime?.packages ?? []).map(String).filter(Boolean));
+  for (const block of document.blocks) {
+    if (block.type !== "code") continue;
+    for (const match of block.content.matchAll(/^\s*(?:import|from)\s+([A-Za-z_][\w.]*)/gm)) {
+      const packageName = importPackageName(match[1]?.split(".")[0] ?? "");
+      if (packageName) packages.add(packageName);
+    }
+  }
+  return Array.from(packages).sort((left, right) => left.localeCompare(right));
+}
+
+function payloadTextList(value: unknown): string[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => {
+      if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") return String(item);
+      if (isRecord(item)) {
+        return [
+          readPayloadText(item.emoji),
+          readPayloadText(item.title ?? item.label ?? item.name ?? item.text),
+          readPayloadText(item.description ?? item.content),
+        ].filter(Boolean).join(" ");
+      }
+      return "";
+    })
+    .filter(Boolean);
+}
+
+function diagramSteps(diagram?: Record<string, unknown>) {
+  if (!diagram || !Array.isArray(diagram.steps)) return [];
+  return diagram.steps
+    .map((item) => {
+      if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") {
+        return { label: String(item), detail: "" };
+      }
+      if (!isRecord(item)) return null;
+      const label = readPayloadText(item.label ?? item.title ?? item.name);
+      const detail = readPayloadText(item.detail ?? item.description ?? item.content);
+      return label ? { label, detail } : null;
+    })
+    .filter((item): item is { label: string; detail: string } => Boolean(item))
+    .slice(0, 5);
+}
+
+function readSectionContract(value: unknown): CurriculumSectionContract | undefined {
+  return isRecord(value) ? value as CurriculumSectionContract : undefined;
+}
+
+function importPackageName(moduleName: string) {
+  const normalized = moduleName.trim();
+  if (!normalized || PYTHON_STDLIB_MODULES.has(normalized)) return "";
+  return PACKAGE_ALIASES[normalized] ?? normalized;
+}
+
+const PACKAGE_ALIASES: Record<string, string> = {
+  PIL: "pillow",
+  cv2: "opencv-python",
+  matplotlib: "matplotlib",
+  numpy: "numpy",
+  pandas: "pandas",
+  sklearn: "scikit-learn",
+  yaml: "pyyaml",
+};
+
+const PYTHON_STDLIB_MODULES = new Set([
+  "__future__",
+  "argparse",
+  "asyncio",
+  "base64",
+  "collections",
+  "contextlib",
+  "csv",
+  "dataclasses",
+  "datetime",
+  "decimal",
+  "functools",
+  "glob",
+  "itertools",
+  "json",
+  "math",
+  "os",
+  "pathlib",
+  "random",
+  "re",
+  "statistics",
+  "string",
+  "subprocess",
+  "sys",
+  "textwrap",
+  "time",
+  "typing",
+  "urllib",
+  "uuid",
+]);
+
+function normalizePackageName(value: string) {
+  return value.toLowerCase().replace(/_/g, "-");
+}
+
+function firstMessageLine(value: string) {
+  return value.split(/\r?\n/).map((line) => line.trim()).find(Boolean) ?? "";
+}
+
+function errorText(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
 }
 
 export function CurriculumCellToc({
@@ -276,6 +901,7 @@ function CurriculumLearningCell({
   isSelected,
   renderCodeCellEditor,
   result,
+  variant = "standalone",
   onAsk,
   onDraftChange,
   onRun,
@@ -288,6 +914,7 @@ function CurriculumLearningCell({
   isSelected: boolean;
   renderCodeCellEditor: RenderCodeCellEditor;
   result?: ExecutionResult;
+  variant?: "standalone" | "embedded";
   onAsk: (action: CellAiAction) => void;
   onDraftChange: (value: string) => void;
   onRun: () => void;
@@ -304,9 +931,11 @@ function CurriculumLearningCell({
   const TypeIcon = typeMeta.Icon;
   const bodyFirst = block.displayKind === "hero";
   const isSnippetCode = block.type === "code" && role === "snippet";
+  const embedded = variant === "embedded";
 
   if (block.type === "markdown") {
     if (block.displayKind === "title") {
+      if (embedded) return null;
       return (
         <CurriculumSectionTitle
           block={block}
@@ -323,6 +952,33 @@ function CurriculumLearningCell({
           className={cn("group min-w-0", isSelected && "rounded-md ring-1 ring-ring/30")}
           onClick={onSelect}
         >
+          <CurriculumMarkdownBody block={block} />
+        </section>
+      );
+    }
+
+    if (embedded) {
+      return (
+        <section
+          id={cellDomId(block.id)}
+          className={cn(
+            "group min-w-0 rounded-md border bg-background/60 px-3 py-3",
+            isSelected && "ring-1 ring-ring/30",
+            tone.frame,
+          )}
+          onClick={onSelect}
+        >
+          <div className="mb-2 flex min-w-0 items-center gap-2">
+            <span className={cn("flex size-6 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground", tone.icon)}>
+              <Icon className="size-3.5" />
+            </span>
+            <span className="min-w-0 flex-1 truncate text-sm font-semibold">{blockLabel(block)}</span>
+            <Badge className="gap-1 bg-background/80" variant="outline">
+              <TypeIcon className="size-3" />
+              {typeMeta.label}
+            </Badge>
+            <CellAiActions onAsk={onAsk} selected={isSelected} />
+          </div>
           <CurriculumMarkdownBody block={block} />
         </section>
       );
@@ -375,7 +1031,8 @@ function CurriculumLearningCell({
     <section
       id={cellDomId(block.id)}
       className={cn(
-        "group min-w-0 overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm",
+        "group min-w-0 overflow-hidden rounded-md border text-card-foreground",
+        embedded ? "bg-background/60" : "bg-card shadow-sm",
         isSelected && "bg-muted/20 ring-1 ring-ring/30",
         tone.frame,
       )}

@@ -202,6 +202,7 @@ def createAiRouter(state: Any) -> APIRouter:
                 tools=runtimeTurn.turn.tools,
                 executor=runtimeTurn.executor,
                 orchestrator=runtimeTurn.orchestrator,
+                clarificationPlan=runtimeTurn.turn.clarificationPlan,
             )
         except _HANDLED_ERRORS as exc:
             raise _providerUnavailable(exc) from exc
@@ -227,6 +228,7 @@ def createAiRouter(state: Any) -> APIRouter:
                 tools=runtimeTurn.turn.tools,
                 executor=runtimeTurn.executor,
                 orchestrator=runtimeTurn.orchestrator,
+                clarificationPlan=runtimeTurn.turn.clarificationPlan,
             ):
                 yield teacherStreamSseFrame(event)
 

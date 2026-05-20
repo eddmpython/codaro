@@ -346,23 +346,24 @@ class LocalEngine(ExecutionEngine):
                         "cellDefinitions": {},
                         "executionCount": 0,
                     }
+                crashMessage = self._workerCrashMessage(error)
                 self._replaceWorker()
                 return {
                     "type": "error",
-                        "data": f"Engine worker crashed: {error}",
-                        "stdout": "",
-                        "stderr": "",
-                        "status": "error",
-                        "variables": self._serializeVariables(self._variableStates),
-                        "stateDelta": {
-                            "added": [],
-                            "updated": [],
-                            "removed": [],
-                        },
-                        "registryMirror": dict(self._registry),
-                        "cellDefinitions": {block: sorted(defines) for block, defines in self._cellDefinitions.items()},
-                        "executionCount": self.executionCount,
-                    }
+                    "data": crashMessage,
+                    "stdout": "",
+                    "stderr": "",
+                    "status": "error",
+                    "variables": self._serializeVariables(self._variableStates),
+                    "stateDelta": {
+                        "added": [],
+                        "updated": [],
+                        "removed": [],
+                    },
+                    "registryMirror": dict(self._registry),
+                    "cellDefinitions": {block: sorted(defines) for block, defines in self._cellDefinitions.items()},
+                    "executionCount": self.executionCount,
+                }
 
     def _sendCommand(self, command: dict[str, Any], *, eventSink=None) -> dict[str, Any]:
         with self._processLock:
@@ -389,6 +390,20 @@ class LocalEngine(ExecutionEngine):
         with self._processLock:
             self._terminateWorkerLocked()
             self._startWorkerLocked()
+
+    def _workerCrashMessage(self, error: BaseException) -> str:
+        process = self._process
+        exitCode = process.exitcode if process is not None else None
+        errorName = type(error).__name__
+        detail = str(error).strip()
+        suffix = f"{errorName}: {detail}" if detail else errorName
+        if exitCode is not None:
+            suffix = f"{suffix}; exitCode={exitCode}"
+        return (
+            "Engine worker crashed and was restarted. "
+            "Run the cell again; if this happened after installing a package, Codaro has refreshed import caches. "
+            f"Last IPC error: {suffix}"
+        )
 
     def _ensureWorker(self) -> None:
         with self._processLock:

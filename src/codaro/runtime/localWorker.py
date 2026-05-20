@@ -3,6 +3,7 @@ from __future__ import annotations
 import ast
 import base64
 from contextlib import redirect_stderr, redirect_stdout
+import importlib
 import inspect
 import io
 import os
@@ -170,6 +171,7 @@ def _executeCommand(
     try:
         if targetCwd is not None:
             os.chdir(targetCwd)
+        importlib.invalidate_caches()
 
         tree = ast.parse(code)
         lastExpr = None

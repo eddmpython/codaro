@@ -6,6 +6,7 @@ from typing import Any, Callable
 from ..factory import createProvider
 from ..tools import toolSchemas
 from ..types import LLMConfig
+from .clarificationPolicy import ClarificationPlan
 
 
 class TeacherConversationNotFound(LookupError):
@@ -19,6 +20,7 @@ class TeacherTurnSession:
     messages: list[dict[str, Any]]
     role: str
     tools: list[dict[str, Any]]
+    clarificationPlan: ClarificationPlan | None = None
 
 
 def prepareTeacherTurn(
@@ -29,6 +31,8 @@ def prepareTeacherTurn(
     conversationId: str | None = None,
     providerOverride: str | None = None,
     roleOverride: str | None = None,
+    clarificationPlan: ClarificationPlan | None = None,
+    skipProvider: bool = False,
     providerFactory: Callable[[LLMConfig], Any] = createProvider,
 ) -> TeacherTurnSession:
     if not conversationId:
@@ -41,6 +45,16 @@ def prepareTeacherTurn(
 
     convManager.addUserMessage(conversationId, message)
     role = conv.role if conv else "copilot"
+    if skipProvider:
+        return TeacherTurnSession(
+            conversationId=conversationId,
+            provider=None,
+            messages=convManager.buildMessages(conversationId),
+            role=role,
+            tools=[],
+            clarificationPlan=clarificationPlan,
+        )
+
     resolved = profileManager.resolve(provider=providerOverride, role=role)
     config = LLMConfig(
         provider=resolved["provider"],
@@ -57,4 +71,5 @@ def prepareTeacherTurn(
         messages=convManager.buildMessages(conversationId),
         role=role,
         tools=toolSchemas(),
+        clarificationPlan=clarificationPlan,
     )

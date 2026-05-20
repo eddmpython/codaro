@@ -3,7 +3,7 @@ id: licensing
 title: 라이선스 경계
 description: Licensing boundaries for Codaro source code, learning content, and brand assets.
 category: ops
-section: guides
+section: release
 order: 306
 purpose: 코드, 교육 콘텐츠, 브랜드 자산의 권리 범위를 분리하고 상업적 사용 금지 기준을 유지한다.
 whenToUse: 배포 문구 작성, README 수정, 콘텐츠 재사용 허용 범위 판단, 브랜드 자산 공개 여부 결정할 때.
@@ -15,9 +15,9 @@ Codaro는 공개 학습과 검토를 허용하지만, 상업적 재사용을 허
 
 ## 기본 원칙
 
-- 코드는 [LICENSE](../../../LICENSE)의 비상업 소스 라이선스를 따른다.
-- 교육 콘텐츠는 [LICENSE-CONTENT.md](../../../LICENSE-CONTENT.md)의 CC BY-NC-SA 4.0 기준을 따른다.
-- 브랜드 자산은 [TRADEMARKS.md](../../../TRADEMARKS.md)에 따라 전권 보유한다.
+- 코드는 [LICENSE](https://github.com/eddmpython/codaro/blob/main/LICENSE)의 비상업 소스 라이선스를 따른다.
+- 교육 콘텐츠는 [LICENSE-CONTENT.md](https://github.com/eddmpython/codaro/blob/main/LICENSE-CONTENT.md)의 CC BY-NC-SA 4.0 기준을 따른다.
+- 브랜드 자산은 [TRADEMARKS.md](https://github.com/eddmpython/codaro/blob/main/TRADEMARKS.md)에 따라 전권 보유한다.
 - 상업적 사용, 재판매, 유료 강의 편입, 호스팅 서비스 제공, 브랜드 재사용은 사전 서면 허가가 필요하다.
 
 ## 코드

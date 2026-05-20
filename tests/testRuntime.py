@@ -91,6 +91,46 @@ def testLocalEngineExecuteAllStopsOnError() -> None:
     engine.dispose()
 
 
+def testLocalEngineImportErrorDoesNotCrashWorker() -> None:
+    engine = LocalEngine()
+
+    result = _run(engine.executeBlock("import definitely_missing_codaro_package", blockId="missing-package"))
+    recoveryResult = _run(engine.executeBlock("value = 7\nvalue", blockId="after-missing-package"))
+
+    assert result.status == "error"
+    assert "ModuleNotFoundError" in str(result.data)
+    assert "Engine worker crashed" not in str(result.data)
+    assert recoveryResult.status == "done"
+    assert recoveryResult.data == "7"
+
+    engine.dispose()
+
+
+def testLocalEngineWorkerCrashMessageSaysRestarted(monkeypatch) -> None:
+    engine = LocalEngine()
+    replaced = False
+
+    def fakeSendCommand(*args, **kwargs):
+        del args, kwargs
+        raise EOFError("pipe closed")
+
+    def fakeReplaceWorker():
+        nonlocal replaced
+        replaced = True
+
+    monkeypatch.setattr(engine, "_sendCommand", fakeSendCommand)
+    monkeypatch.setattr(engine, "_replaceWorker", fakeReplaceWorker)
+
+    result = engine._executeBlocking("value = 1", "crash", None, 0, lambda event: None)
+
+    assert replaced is True
+    assert result["status"] == "error"
+    assert "restarted" in result["data"]
+    assert "EOFError" in result["data"]
+
+    engine.dispose()
+
+
 def testLocalEngineUsesWorkspaceRootForFiles(tmp_path: Path) -> None:
     engine = LocalEngine(workspaceRoot=tmp_path)
 

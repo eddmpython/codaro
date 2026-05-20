@@ -30,8 +30,11 @@ jobs:
       - name: Install dependencies
         run: uv sync --extra dev
 
-      - name: Run tests
-        run: uv run pytest tests/ -v --tb=short
+      - name: Run docs gate
+        run: uv run python -X utf8 tests/run.py gate docs
+
+      - name: Run backend gate
+        run: uv run python -X utf8 tests/run.py gate backend
 
   editor:
     runs-on: ubuntu-latest
@@ -50,8 +53,7 @@ jobs:
         run: npm ci
 
       - name: Build
-        working-directory: editor
-        run: npm run build
+        run: python -X utf8 tests/run.py gate editor-build
 
   landing:
     runs-on: ubuntu-latest
@@ -70,8 +72,7 @@ jobs:
         run: npm install
 
       - name: Build
-        working-directory: landing
-        run: npm run build
+        run: python -X utf8 tests/run.py gate landing-build
 
   launcher:
     runs-on: ubuntu-latest
@@ -93,9 +94,7 @@ jobs:
           key: cargo-${{ runner.os }}-${{ hashFiles('launcher/codaro-launcher/Cargo.lock') }}
 
       - name: Check (no build)
-        working-directory: launcher/codaro-launcher
-        run: cargo check
+        run: python -X utf8 tests/run.py gate launcher-check
 
       - name: Run tests
-        working-directory: launcher/codaro-launcher
-        run: cargo test
+        run: python -X utf8 tests/run.py gate launcher-test

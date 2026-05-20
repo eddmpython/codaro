@@ -3,7 +3,7 @@ id: environment
 title: 실행 환경 + 인코딩
 description: Environment requirements for Python, uv, and local execution.
 category: ops
-section: guides
+section: foundation
 order: 301
 purpose: PowerShell `.venv` (root), WSL은 `.venv-wsl` 분리. 모든 실행은 `uv run python -X utf8`. 텍스트 파일 UTF-8 기본.
 whenToUse: 새 머신 셋업, 인코딩 깨짐 디버그, WSL/PowerShell 동시 작업할 때.
@@ -41,8 +41,15 @@ uv run codaro
 uv run codaro path.py
 uv run codaro export path.py --format codaro
 uv run codaro export path.py --format ipynb
-uv run pytest tests/ -v
+uv run python -X utf8 tests/run.py preflight
+uv run python -X utf8 tests/run.py list
 ```
+
+# 패키지 설치
+
+- 사용자가 에디터에서 라이브러리를 설치해도 내부 경로는 `/api/packages/install` 또는 세션 패키지 capability를 거쳐 `uv pip ... --python .venv`로 실행한다.
+- AI 교사 도구도 같은 경로를 사용한다. `packages-check`로 누락 여부를 확인한 뒤 `packages-install`을 호출한다.
+- 직접 `pip install` 명령을 문서, 테스트, UI 안내에 추가하지 않는다.
 
 # 프론트 표면 실행
 

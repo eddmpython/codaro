@@ -18,7 +18,7 @@ Codaro의 저장소 문서는 두 축만 둔다.
 - `docs/blog/` — 공개 글, 릴리즈 스토리, 긴 설명형 콘텐츠.
 - `curricula/` — 문서가 아니라 제품이 읽는 기본 curriculum YAML 레지스트리.
 
-`docs/concepts/`, `docs/guides/`, `docs/reference/`, `docs/getting-started/`, `docs/branding/` 같은 별도 문서 폴더는 유지하지 않는다. 필요한 내용은 `docs/skills/identity`, `docs/skills/architecture`, `docs/skills/ops` 중 하나로 흡수한다.
+`docs/concepts/`, `docs/guides/`, `docs/reference/`, `docs/getting-started/`, `docs/branding/` 같은 별도 문서 폴더는 유지하지 않는다. 필요한 내용은 `docs/skills/identity`, `docs/skills/architecture`, `docs/skills/ops` 중 하나로 흡수한다. 운영 문서는 `docs/skills/ops` 아래에서 다시 foundation, workflow, release, product 카테고리로 나눈다.
 
 README는 외부 진입점이다. 제품 철학 전체를 README에 길게 복사하지 않고, 바로 시작 링크와 현재 공개 배포 상태만 둔다.
 
@@ -85,7 +85,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [ai-sensory-system](identity/ai-sensory-system.md)
 - [external-channels-mobile](identity/external-channels-mobile.md)
 
-## Architecture (9) — 5층 구조
+## Architecture (10) — 5층 구조
 
 - [ssot-map](architecture/ssot-map.md)
 - [overview](architecture/overview.md)
@@ -94,21 +94,36 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [dataflow](architecture/dataflow.md)
 - [widget-bridge](architecture/widget-bridge.md)
 - [frontend-product-surface](architecture/frontend-product-surface.md)
+- [learning-yaml-contract](architecture/learning-yaml-contract.md)
 - [curriculum-registry](architecture/curriculum-registry.md)
 - [teacher-tool-loop](architecture/teacher-tool-loop.md)
 
-## Ops (10) — 운영 규칙
+## Ops (11) — 운영 규칙
 
-- [environment](ops/environment.md)
-- [code-quality](ops/code-quality.md)
-- [ai-transparency](ops/ai-transparency.md)
-- [experiment](ops/experiment.md)
-- [branding](ops/branding.md)
-- [git-and-release](ops/git-and-release.md)
-- [licensing](ops/licensing.md)
-- [packaging](ops/packaging.md)
-- [doc-and-session](ops/doc-and-session.md)
-- [reference-impl](ops/reference-impl.md)
+- [ops index](ops/README.md)
+
+Foundation:
+
+- [environment](ops/foundation/environment.md)
+- [code-quality](ops/foundation/code-quality.md)
+- [testing-and-gates](ops/foundation/testing-and-gates.md)
+- [ai-transparency](ops/foundation/ai-transparency.md)
+
+Workflow:
+
+- [experiment](ops/workflow/experiment.md)
+- [doc-and-session](ops/workflow/doc-and-session.md)
+- [reference-impl](ops/workflow/reference-impl.md)
+
+Release:
+
+- [git-and-release](ops/release/git-and-release.md)
+- [licensing](ops/release/licensing.md)
+- [packaging](ops/release/packaging.md)
+
+Product:
+
+- [branding](ops/product/branding.md)
 
 ## 후속 (PR 2 이후)
 

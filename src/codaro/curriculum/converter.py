@@ -5,6 +5,7 @@ from typing import Any
 import uuid
 
 from ..document.models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, GuideConfig, RuntimeConfig
+from .sectionContract import LearningSectionContract, lessonContractFromYaml, sectionHasStructuredFields
 
 
 TITLE_TYPES = {"mainHeader", "sectionHeader", "sectionTitle"}
@@ -25,6 +26,9 @@ def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[Codaro
     sections = _arrayOfMaps(content.get("sections"))
 
     title = _textValue(meta.get("title")) or contentId
+    lessonContract = lessonContractFromYaml(content, fallbackTitle=title)
+    contractPayload = lessonContract.model_dump(mode="json")
+    title = lessonContract.meta.title or title
     blocks: list[BlockConfig] = [
         _markdownBlock(
             _buildIntroMarkdown(title, intro),
@@ -32,16 +36,18 @@ def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[Codaro
             role="title",
             sourceType="intro",
             title=title,
-            payload={"title": title, **intro},
+            payload={"title": title, **intro, "learningContract": contractPayload},
         )
     ]
     solutions: dict[str, str] = {}
 
-    for section in sections:
-        sectionTitle = _textValue(section.get("title"))
-        sectionSubtitle = _textValue(section.get("subtitle"))
+    for index, section in enumerate(sections):
+        sectionContract = lessonContract.sections[index] if index < len(lessonContract.sections) else None
+        sectionTitle = _textValue(section.get("title")) or (sectionContract.title if sectionContract else "")
+        sectionSubtitle = _textValue(section.get("subtitle")) or (sectionContract.subtitle if sectionContract else "")
+        sourceBlocks = _arrayOfMaps(section.get("blocks"))
 
-        if sectionTitle or sectionSubtitle:
+        if sectionTitle or sectionSubtitle or sectionHasStructuredFields(section):
             blocks.append(
                 _markdownBlock(
                     "\n\n".join(item for item in [f"## {sectionTitle}" if sectionTitle else "", sectionSubtitle] if item),
@@ -49,11 +55,19 @@ def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[Codaro
                     role="title",
                     sourceType="section",
                     title=sectionTitle or sectionSubtitle,
-                    payload={"title": sectionTitle, "subtitle": sectionSubtitle, "id": section.get("id")},
+                    payload={
+                        "title": sectionTitle,
+                        "subtitle": sectionSubtitle,
+                        "id": section.get("id"),
+                        "sectionContract": sectionContract.model_dump(mode="json") if sectionContract else None,
+                    },
                 )
             )
 
-        for block in _arrayOfMaps(section.get("blocks")):
+        if sectionContract and sectionHasStructuredFields(section) and not sourceBlocks:
+            blocks.extend(_convertStructuredSection(sectionContract, solutions))
+
+        for block in sourceBlocks:
             blocks.extend(_convertBlock(block, solutions))
 
     if not blocks:
@@ -65,11 +79,109 @@ def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[Codaro
             title=title,
             blocks=blocks,
             metadata=DocumentMetadata(sourceFormat="curriculum", tags=[category, contentId]),
-            runtime=RuntimeConfig(defaultEngine="local", reactiveMode="hybrid"),
+            runtime=RuntimeConfig(defaultEngine="local", reactiveMode="hybrid", packages=lessonContract.meta.packages),
             app=AppConfig(title=title, layout="learning", hideCode=False),
         ),
         solutions,
     )
+
+
+def _convertStructuredSection(section: LearningSectionContract, solutions: dict[str, str]) -> list[BlockConfig]:
+    result: list[BlockConfig] = []
+    explanation = _structuredExplanationMarkdown(section)
+    if explanation:
+        result.append(
+            _markdownBlock(
+                explanation,
+                displayKind="prose",
+                role="learning",
+                sourceType="sectionContract:explanation",
+                title=section.title,
+                description=section.goal or section.explanation,
+                payload={"sectionContract": section.model_dump(mode="json")},
+            )
+        )
+
+    if section.snippet:
+        result.append(
+            _codeBlock(
+                _localizeCode(section.snippet),
+                role="snippet",
+                executionKind="python",
+                sourceType="sectionContract:snippet",
+                title=f"{section.title} 스니펫" if section.title else "예제 스니펫",
+                description=section.goal,
+            )
+        )
+
+    exercise = section.exercise
+    if _hasStructuredExercise(section):
+        starterCode = _localizeCode(exercise.starterCode)
+        solutionCode = _localizeCode(exercise.solution)
+        exerciseCell = _codeBlock(
+            starterCode,
+            role="exercise",
+            executionKind="python",
+            sourceType="sectionContract:exercise",
+            title=f"{section.title} 실습" if section.title else "실습 셀",
+            description=exercise.prompt or section.goal,
+            guide=GuideConfig(
+                exerciseType="sectionPractice",
+                hints=exercise.hints or section.tips,
+                checkConfig=exercise.check or section.check,
+                difficulty=exercise.difficulty or "easy",
+                solution=solutionCode,
+                description=exercise.prompt or section.goal or "직접 코드를 입력하고 실행하세요.",
+            ),
+        )
+        result.append(exerciseCell)
+        if solutionCode:
+            solutions[exerciseCell.id] = solutionCode
+
+    if section.check:
+        result.append(
+            _markdownBlock(
+                _formatStructuredCheck(section.check),
+                displayKind="callout",
+                role="check",
+                sourceType="sectionContract:check",
+                title=f"{section.title} 검증" if section.title else "검증",
+                payload={"check": section.check, "sectionId": section.id},
+            )
+        )
+    return result
+
+
+def _structuredExplanationMarkdown(section: LearningSectionContract) -> str:
+    parts = [
+        _labeledMarkdown("이번 섹션에서 공부할 것", section.goal),
+        _labeledMarkdown("왜 유용한지", section.why),
+        _labeledMarkdown("상세 설명", section.explanation),
+        _labeledMarkdown("팁", "\n".join(f"- {tip}" for tip in section.tips)),
+    ]
+    return "\n\n".join(part for part in parts if part)
+
+
+def _labeledMarkdown(label: str, content: str) -> str:
+    return f"### {label}\n{content}" if content else ""
+
+
+def _hasStructuredExercise(section: LearningSectionContract) -> bool:
+    exercise = section.exercise
+    return any([
+        exercise.prompt,
+        exercise.starterCode,
+        exercise.solution,
+        bool(exercise.check),
+        bool(exercise.hints),
+    ])
+
+
+def _formatStructuredCheck(check: dict[str, str]) -> str:
+    lines = ["### 검증/피드백"]
+    for key, value in check.items():
+        lines.append(f"- **{key}**: {value}")
+    return "\n".join(lines)
 
 
 def _convertBlock(block: dict[str, Any], solutions: dict[str, str], parentRole: str | None = None) -> list[BlockConfig]:

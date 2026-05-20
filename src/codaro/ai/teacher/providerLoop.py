@@ -5,6 +5,7 @@ from dataclasses import dataclass
 from typing import Any
 
 from ..types import ToolCall
+from .clarificationPolicy import ClarificationPlan, clarificationAnswer
 from .teacherOrchestrator import TeacherOrchestrator
 from .toolPolicy import ToolPolicyState
 from .traceModel import TeacherTrace
@@ -72,11 +73,27 @@ async def runTeacherChatLoop(
     tools: list[dict[str, Any]],
     executor: Any,
     orchestrator: TeacherOrchestrator,
+    clarificationPlan: ClarificationPlan | None = None,
     maxToolRounds: int = 10,
 ) -> dict[str, Any]:
     allToolResults: list[dict[str, Any]] = []
     policy = orchestrator.createToolPolicy()
     trace = orchestrator.startTrace(conversationId)
+
+    if clarificationPlan and clarificationPlan.shouldAsk:
+        answer = clarificationAnswer(clarificationPlan)
+        trace.record("clarification-gate", clarificationPlan.payload())
+        return finishTeacherTurnPayload(
+            convManager=convManager,
+            conversationId=conversationId,
+            orchestrator=orchestrator,
+            trace=trace,
+            answer=answer,
+            provider="codaro",
+            model="clarification-gate",
+            usage=None,
+            toolCalls=[],
+        )
 
     for _round in range(maxToolRounds):
         if provider.supportsNativeTools and tools:

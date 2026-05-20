@@ -15,6 +15,9 @@ class TeacherEvalCase:
     expectedTools: tuple[str, ...] = ()
     orderedBefore: tuple[tuple[str, str], ...] = ()
     forbiddenTools: tuple[str, ...] = ()
+    expectedWorkLabels: tuple[str, ...] = ()
+    expectedTraceEvents: tuple[str, ...] = ()
+    expectedYamlContract: bool = False
     allowPolicyViolations: bool = False
 
 
@@ -24,6 +27,8 @@ class ToolSequenceReport:
     passed: bool
     failures: tuple[str, ...] = field(default_factory=tuple)
     observedTools: tuple[str, ...] = field(default_factory=tuple)
+    observedWorkLabels: tuple[str, ...] = field(default_factory=tuple)
+    workloopEventCount: int = 0
     policyViolationCount: int = 0
     policyViolations: tuple[dict[str, str], ...] = field(default_factory=tuple)
 
@@ -46,6 +51,8 @@ class TeacherEvalReport:
                     "passed": report.passed,
                     "failures": list(report.failures),
                     "observedTools": list(report.observedTools),
+                    "observedWorkLabels": list(report.observedWorkLabels),
+                    "workloopEventCount": report.workloopEventCount,
                     "policyViolationCount": report.policyViolationCount,
                     "policyViolations": list(report.policyViolations),
                 }
@@ -59,6 +66,9 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         caseId="curriculum-yaml-materialized",
         prompt="pandas 기초 커리큘럼 만들어줘",
         expectedTools=("write-curriculum-yaml",),
+        expectedWorkLabels=("커리큘럼 YAML 전개",),
+        expectedTraceEvents=("tool-start", "tool-result"),
+        expectedYamlContract=True,
     ),
     TeacherEvalCase(
         caseId="dependency-preflight-before-install",
@@ -121,15 +131,36 @@ def evaluateToolSequence(
 
 
 def evaluateToolTrace(case: TeacherEvalCase, trace: TeacherTrace) -> ToolSequenceReport:
-    return evaluateToolTracePayload(case, trace.summary())
+    return evaluateToolTracePayload(case, trace.summary(includeEvents=True))
 
 
 def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, Any]) -> ToolSequenceReport:
-    return evaluateToolSequence(
+    baseReport = evaluateToolSequence(
         case,
         _toolSequenceFromPayload(tracePayload),
         policyViolationCount=_policyViolationCountFromPayload(tracePayload),
         policyViolations=_policyViolationsFromPayload(tracePayload),
+    )
+    failures = list(baseReport.failures)
+    workLabels = _workLabelsFromPayload(tracePayload)
+    eventTypes = _eventTypesFromPayload(tracePayload)
+    for label in case.expectedWorkLabels:
+        if label not in workLabels:
+            failures.append(f"missing expected work label: {label}")
+    for eventType in case.expectedTraceEvents:
+        if eventType not in eventTypes:
+            failures.append(f"missing expected trace event: {eventType}")
+    if case.expectedYamlContract and not _hasYamlContract(tracePayload):
+        failures.append("missing structured learning YAML contract")
+    return ToolSequenceReport(
+        caseId=baseReport.caseId,
+        passed=not failures,
+        failures=tuple(failures),
+        observedTools=baseReport.observedTools,
+        observedWorkLabels=workLabels,
+        workloopEventCount=len(workLabels),
+        policyViolationCount=baseReport.policyViolationCount,
+        policyViolations=baseReport.policyViolations,
     )
 
 
@@ -176,6 +207,83 @@ def _toolSequenceFromPayload(tracePayload: Mapping[str, Any]) -> tuple[str, ...]
         if isinstance(payload, dict) and payload.get("name"):
             toolNames.append(str(payload["name"]))
     return tuple(toolNames)
+
+
+def _workLabelsFromPayload(tracePayload: Mapping[str, Any]) -> tuple[str, ...]:
+    labels: list[str] = []
+    workloop = tracePayload.get("workloop")
+    if isinstance(workloop, list):
+        for item in workloop:
+            if isinstance(item, Mapping) and item.get("workLabel"):
+                labels.append(str(item["workLabel"]))
+
+    for item in _iterTraceToolPayloads(tracePayload):
+        if item.get("workLabel"):
+            labels.append(str(item["workLabel"]))
+    return tuple(dict.fromkeys(labels))
+
+
+def _eventTypesFromPayload(tracePayload: Mapping[str, Any]) -> tuple[str, ...]:
+    events = tracePayload.get("events")
+    if not isinstance(events, list):
+        return ()
+    return tuple(
+        str(event.get("eventType"))
+        for event in events
+        if isinstance(event, Mapping) and event.get("eventType")
+    )
+
+
+def _hasYamlContract(tracePayload: Mapping[str, Any]) -> bool:
+    if tracePayload.get("yamlContractObserved") is True:
+        return True
+    for payload in _iterTraceToolPayloads(tracePayload):
+        if payload.get("name") != "write-curriculum-yaml":
+            continue
+        result = payload.get("result")
+        if not isinstance(result, Mapping):
+            continue
+        if _documentHasLearningContract(result.get("document")):
+            return True
+        if _documentHasLearningContract(result.get("curriculumDocument")):
+            return True
+    return False
+
+
+def _documentHasLearningContract(value: Any) -> bool:
+    if not isinstance(value, Mapping):
+        return False
+    blocks = value.get("blocks")
+    if not isinstance(blocks, list):
+        return False
+    for block in blocks:
+        if not isinstance(block, Mapping):
+            continue
+        payload = block.get("payload")
+        if not isinstance(payload, Mapping):
+            continue
+        if isinstance(payload.get("learningContract"), Mapping):
+            return True
+        if isinstance(payload.get("sectionContract"), Mapping):
+            return True
+    return False
+
+
+def _iterTraceToolPayloads(tracePayload: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...]:
+    payloads: list[Mapping[str, Any]] = []
+    toolCalls = tracePayload.get("toolCalls")
+    if isinstance(toolCalls, list):
+        payloads.extend(item for item in toolCalls if isinstance(item, Mapping))
+
+    events = tracePayload.get("events")
+    if isinstance(events, list):
+        for event in events:
+            if not isinstance(event, Mapping):
+                continue
+            payload = event.get("payload")
+            if isinstance(payload, Mapping):
+                payloads.append(payload)
+    return tuple(payloads)
 
 
 def _policyViolationCountFromPayload(tracePayload: Mapping[str, Any]) -> int:

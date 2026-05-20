@@ -27,6 +27,15 @@ from .studyLoader import (
 from .converter import yamlToDocument
 from .learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, PHILOSOPHY
 from .progress import LessonProgress, ProgressTracker, UserProgress
+from .sectionContract import (
+    LearningExerciseContract,
+    LearningLessonContract,
+    LearningSectionContract,
+    LessonIntroContract,
+    LessonMetaContract,
+    lessonContractFromYaml,
+    sectionHasStructuredFields,
+)
 
 __all__ = [
     "AI_TEACHER_INSTRUCTIONS",
@@ -42,7 +51,12 @@ __all__ = [
     "EXERCISE_TYPES",
     "HINT_STRATEGY",
     "LEARNING_PATHS",
+    "LearningExerciseContract",
+    "LearningLessonContract",
+    "LearningSectionContract",
     "LessonProgress",
+    "LessonIntroContract",
+    "LessonMetaContract",
     "PHILOSOPHY",
     "ProgressTracker",
     "ToolExerciseCheckInput",
@@ -57,5 +71,7 @@ __all__ = [
     "checkVariableSnapshotContains",
     "runExerciseCheck",
     "runToolExerciseCheck",
+    "lessonContractFromYaml",
+    "sectionHasStructuredFields",
     "yamlToDocument",
 ]

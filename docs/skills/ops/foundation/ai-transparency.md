@@ -3,7 +3,7 @@ id: ai-transparency
 title: AI 투명성 원칙
 description: Transparency rules for assisted teaching and tool-visible work.
 category: ops
-section: guides
+section: foundation
 order: 303
 purpose: AI가 실제로 본 데이터(컨텍스트, 시스템 프롬프트, tool 호출/결과)는 필요할 때 검토 가능하게 보존한다. 기본 학습 UI는 셀과 대화를 우선한다.
 whenToUse: AI UI 컴포넌트 디자인, 시스템 프롬프트 표시 결정, tool_use 결과 가시화할 때.

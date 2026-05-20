@@ -13,6 +13,7 @@ from .providerLoop import (
     recordTeacherToolRoundRequest,
     startTeacherToolCall,
 )
+from .clarificationPolicy import ClarificationPlan, clarificationAnswer
 from .streamEvents import (
     teacherStreamDeltaEvent,
     teacherStreamDoneEvent,
@@ -54,6 +55,7 @@ async def runTeacherChatStream(
     tools: list[dict[str, Any]],
     executor: Any,
     orchestrator: TeacherOrchestrator,
+    clarificationPlan: ClarificationPlan | None = None,
     maxToolRounds: int = 10,
 ) -> AsyncIterator[dict[str, Any]]:
     allToolResults: list[dict[str, Any]] = []
@@ -61,6 +63,24 @@ async def runTeacherChatStream(
     trace = orchestrator.startTrace(conversationId)
 
     yield teacherStreamStartEvent(conversationId)
+
+    if clarificationPlan and clarificationPlan.shouldAsk:
+        answer = clarificationAnswer(clarificationPlan)
+        trace.record("clarification-gate", clarificationPlan.payload())
+        donePayload = finishTeacherTurnPayload(
+            convManager=convManager,
+            conversationId=conversationId,
+            orchestrator=orchestrator,
+            trace=trace,
+            answer=answer,
+            provider="codaro",
+            model="clarification-gate",
+            usage=None,
+            toolCalls=[],
+        )
+        yield teacherStreamTokenEvent(answer)
+        yield teacherStreamDoneEvent(donePayload)
+        return
 
     if not (provider.supportsNativeTools and tools):
         async for event in streamTeacherTokens(

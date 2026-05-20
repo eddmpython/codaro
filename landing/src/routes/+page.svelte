@@ -15,7 +15,7 @@
     <h1 class="mascotTitle">{brand.name}</h1>
     <p class="mascotTagline">{brand.tagline}</p>
     <div class="heroActions">
-      <a class="primaryButton" href="{base}/docs/skills/ops/environment">
+      <a class="primaryButton" href="{base}/docs/skills/ops/foundation/environment">
         Get started
       </a>
       <a class="ghostButton" href={brand.repoUrl}>

@@ -40,11 +40,9 @@ class TestOcrProtocol:
 class TestPaddleOcrEngine:
 
     def test_emptyFrameReturnsEmpty(self):
-        try:
-            from codaro.automation.vision.paddleOcr import PaddleOcrEngine
-            import numpy
-        except ImportError:
-            pytest.skip("paddleocr or numpy not installed")
+        pytest.importorskip("numpy")
+        pytest.importorskip("paddleocr")
+        from codaro.automation.vision.paddleOcr import PaddleOcrEngine
 
         engine = PaddleOcrEngine()
         frame = Frame(data=b"", width=0, height=0, channels=3)
@@ -53,10 +51,8 @@ class TestPaddleOcrEngine:
         engine.dispose()
 
     def test_disposeIdempotent(self):
-        try:
-            from codaro.automation.vision.paddleOcr import PaddleOcrEngine
-        except ImportError:
-            pytest.skip("paddleocr not installed")
+        pytest.importorskip("paddleocr")
+        from codaro.automation.vision.paddleOcr import PaddleOcrEngine
 
         engine = PaddleOcrEngine()
         engine.dispose()
@@ -66,11 +62,9 @@ class TestPaddleOcrEngine:
 class TestEasyOcrEngine:
 
     def test_emptyFrameReturnsEmpty(self):
-        try:
-            from codaro.automation.vision.easyOcr import EasyOcrEngine
-            import numpy
-        except ImportError:
-            pytest.skip("easyocr or numpy not installed")
+        pytest.importorskip("numpy")
+        pytest.importorskip("easyocr")
+        from codaro.automation.vision.easyOcr import EasyOcrEngine
 
         engine = EasyOcrEngine()
         frame = Frame(data=b"", width=0, height=0, channels=3)
@@ -79,10 +73,8 @@ class TestEasyOcrEngine:
         engine.dispose()
 
     def test_disposeIdempotent(self):
-        try:
-            from codaro.automation.vision.easyOcr import EasyOcrEngine
-        except ImportError:
-            pytest.skip("easyocr not installed")
+        pytest.importorskip("easyocr")
+        from codaro.automation.vision.easyOcr import EasyOcrEngine
 
         engine = EasyOcrEngine()
         engine.dispose()

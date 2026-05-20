@@ -900,7 +900,14 @@ fn recover_backend_with_rollback(
         );
     };
 
-    match start_backend_for_state(paths, &rollback_state, host, port, workspace_root) {
+    match start_backend_for_state_with_retries(
+        paths,
+        &rollback_state,
+        host,
+        port,
+        workspace_root,
+        3,
+    ) {
         Ok((config, child)) => {
             stores.active_release.save(&rollback_state)?;
             stores.last_known_good_release.save(&rollback_state)?;
@@ -1032,6 +1039,30 @@ fn start_backend_for_state(
         )));
     }
     Ok((config, child))
+}
+
+fn start_backend_for_state_with_retries(
+    paths: &LauncherPaths,
+    state: &ActiveReleaseState,
+    host: &str,
+    port: u16,
+    workspace_root: &std::path::Path,
+    attempts: u32,
+) -> Result<(BackendLaunchConfig, Child)> {
+    let attempts = attempts.max(1);
+    let mut last_error = None;
+    for attempt in 1..=attempts {
+        match start_backend_for_state(paths, state, host, port, workspace_root) {
+            Ok(result) => return Ok(result),
+            Err(error) => {
+                last_error = Some(error);
+                if attempt < attempts {
+                    std::thread::sleep(BACKEND_RESTART_DELAY);
+                }
+            }
+        }
+    }
+    Err(last_error.expect("backend start retry must record the final error"))
 }
 
 fn resolve_probe_port(host: &str, requested_port: Option<u16>) -> Result<u16> {

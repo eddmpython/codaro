@@ -7,6 +7,7 @@ from typing import Any
 def injectContext(message: str, context: dict[str, Any]) -> str:
     parts: list[str] = []
     _appendInstruction(parts, context)
+    _appendClarificationPlan(parts, context)
     _appendSelectedCell(parts, context)
     _appendVariables(parts, context)
     _appendDocument(parts, context)
@@ -23,6 +24,13 @@ def injectContext(message: str, context: dict[str, Any]) -> str:
 def _appendInstruction(parts: list[str], context: dict[str, Any]) -> None:
     if context.get("instruction"):
         parts.append(f"[Codaro procedure]\n{context['instruction']}")
+
+
+def _appendClarificationPlan(parts: list[str], context: dict[str, Any]) -> None:
+    clarificationPlan = context.get("clarificationPlan")
+    if not isinstance(clarificationPlan, dict):
+        return
+    parts.append("[Clarification plan]\n" + json.dumps(clarificationPlan, ensure_ascii=False)[:1600])
 
 
 def _appendSelectedCell(parts: list[str], context: dict[str, Any]) -> None:

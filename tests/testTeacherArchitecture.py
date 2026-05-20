@@ -9,6 +9,7 @@ from codaro.ai.teacher import (
     TeacherRuntimeTurnRequest,
     ToolPolicyState,
     ToolPolicyViolation,
+    buildClarificationPlan,
     executeTeacherToolRound,
     evaluateGoldenTracePayloads,
     evaluateToolSequence,
@@ -182,6 +183,31 @@ def testTeacherContextInjectionIncludesCellMapAndPreflight() -> None:
     assert "pandas" in message
 
 
+def testTeacherClarificationPlanStaysFocused() -> None:
+    plan = buildClarificationPlan("데이터 분석 커리큘럼 만들어줘")
+
+    assert plan.shouldAsk
+    assert 1 <= len(plan.questions) <= 3
+    assert "level" in plan.defaults
+    assert any("수준" in question for question in plan.questions)
+
+
+def testTeacherOrchestratorInjectsClarificationPlanForLearningRequests() -> None:
+    orchestrator = TeacherOrchestrator.fromContext({})
+
+    message = orchestrator.injectContext("pandas 커리큘럼 만들어줘")
+
+    assert "[Clarification plan]" in message
+    assert "questions" in message
+
+
+def testTeacherClarificationPlanSkipsWhenRequestIsSpecificEnough() -> None:
+    plan = buildClarificationPlan("초급 pandas 실습 중심 짧은 레슨 만들어줘", {"lessonDepth": "brief"})
+
+    assert not plan.shouldAsk
+    assert plan.questions == ()
+
+
 def testToolPolicyRequiresPackageCheckBeforeInstall() -> None:
     policy = ToolPolicyState.fromContext({"dependencyPreflight": {"packages": ["pandas"]}})
 
@@ -305,10 +331,13 @@ def testTracePayloadsHaveStableTraceId() -> None:
     assert done["traceId"] == trace.traceId
     assert start["lane"] == "read"
     assert done["target"] == "learning-editor"
+    assert start["workLabel"] == "노트북 셀 읽기"
+    assert done["workDetail"] == "현재 노트북 구조와 셀 역할 확인"
     assert start["traceEventIndex"] == 2
     assert done["traceEventIndex"] == 3
     assert [event.eventType for event in trace.events] == ["turn-start", "tool-start", "tool-result"]
     assert trace.summary()["toolSequence"] == ["read-cells"]
+    assert trace.summary()["workloop"][0]["workLabel"] == "노트북 셀 읽기"
 
 
 def testEvalHarnessCanReadTraceSequence() -> None:
@@ -339,6 +368,76 @@ def testEvalHarnessCanReadTracePayload() -> None:
     assert report.observedTools == ("read-cells", "cell-call")
     assert report.policyViolationCount == 0
     assert report.policyViolations == ()
+
+
+def testEvalHarnessCanValidateStructuredCurriculumTrace() -> None:
+    orchestrator = TeacherOrchestrator.fromContext({})
+    trace = orchestrator.startTrace("conv-curriculum")
+    orchestrator.toolCallStart(trace, "call-1", "write-curriculum-yaml", {})
+    orchestrator.toolCallResult(
+        trace,
+        "call-1",
+        "write-curriculum-yaml",
+        {},
+        {
+            "document": {
+                "blocks": [
+                    {"payload": {"learningContract": {"meta": {"title": "lesson"}}}},
+                ]
+            }
+        },
+    )
+
+    case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
+    report = evaluateToolTrace(case, trace)
+
+    assert report.passed
+    assert trace.summary()["yamlContractObserved"]
+
+
+def testEvalHarnessChecksWorkloopAndStructuredYamlContract() -> None:
+    case = TeacherEvalCase(
+        caseId="structured-curriculum",
+        prompt="pandas 실습 레슨 만들어줘",
+        expectedTools=("write-curriculum-yaml",),
+        expectedWorkLabels=("커리큘럼 YAML 전개",),
+        expectedTraceEvents=("tool-start", "tool-result"),
+        expectedYamlContract=True,
+    )
+    tracePayload = {
+        "toolSequence": ["write-curriculum-yaml"],
+        "workloop": [{"workLabel": "커리큘럼 YAML 전개"}],
+        "events": [
+            {"eventType": "tool-start", "payload": {"name": "write-curriculum-yaml", "workLabel": "커리큘럼 YAML 전개"}},
+            {"eventType": "tool-result", "payload": {"name": "write-curriculum-yaml"}},
+        ],
+        "toolCalls": [
+            {
+                "name": "write-curriculum-yaml",
+                "result": {
+                    "document": {
+                        "blocks": [
+                            {"payload": {"learningContract": {"meta": {"title": "lesson"}}}},
+                            {"payload": {"sectionContract": {"title": "section"}}},
+                        ]
+                    }
+                },
+            }
+        ],
+    }
+
+    report = evaluateToolTracePayload(case, tracePayload)
+
+    assert report.passed
+    assert report.observedWorkLabels == ("커리큘럼 YAML 전개",)
+
+
+def testEvalHarnessFailsMissingStructuredYamlContract() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
+    report = evaluateToolTracePayload(case, {"toolSequence": ["write-curriculum-yaml"]})
+
+    assert not report.passed
+    assert "missing structured learning YAML contract" in report.failures
 
 
 def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
@@ -454,6 +553,32 @@ def testProviderLoopOwnsNonStreamingTurn() -> None:
     assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
 
 
+def testProviderLoopReturnsClarificationWithoutProviderCall() -> None:
+    convManager = _FakeConversationManager()
+    messages: list[dict] = [{"role": "user", "content": "데이터 분석 커리큘럼 만들어줘"}]
+    orchestrator = TeacherOrchestrator.fromContext({})
+    plan = buildClarificationPlan("데이터 분석 커리큘럼 만들어줘")
+
+    payload = asyncio.run(runTeacherChatLoop(
+        provider=None,
+        convManager=convManager,
+        conversationId="conv-clarify",
+        messages=messages,
+        tools=[],
+        executor=_FakeExecutor(),
+        orchestrator=orchestrator,
+        clarificationPlan=plan,
+    ))
+
+    assert payload["provider"] == "codaro"
+    assert payload["model"] == "clarification-gate"
+    assert payload["toolCalls"] == []
+    assert payload["trace"]["toolSequence"] == []
+    assert payload["trace"]["eventCount"] == 3
+    assert "학습자 수준" in payload["answer"]
+    assert convManager.assistantMessages[0]["content"] == payload["answer"]
+
+
 def testPrepareTeacherTurnOwnsConversationAndProviderSetup() -> None:
     convManager = _FakeConversationManager()
     profileManager = _FakeProfileManager()
@@ -517,6 +642,56 @@ def testPrepareTeacherRuntimeTurnOwnsContextAndExecutorSetup(tmp_path) -> None:
     assert sessionManager.requestedSessionId == "session-test"
 
 
+def testPrepareTeacherRuntimeTurnGatesAmbiguousLearningRequest(tmp_path) -> None:
+    convManager = _FakeConversationManager()
+    profileManager = _FakeProfileManager()
+    providerFactory = _ProviderFactory()
+    sessionManager = _FakeSessionManager()
+
+    runtimeTurn = prepareTeacherRuntimeTurn(
+        convManager=convManager,
+        profileManager=profileManager,
+        sessionManager=sessionManager,
+        documentPath=None,
+        workspaceRoot=tmp_path,
+        message="데이터 분석 커리큘럼 만들어줘",
+        roleOverride="teacher",
+        providerOverride="custom",
+        providerFactory=providerFactory,
+    )
+
+    assert runtimeTurn.turn.clarificationPlan is not None
+    assert runtimeTurn.turn.clarificationPlan.shouldAsk
+    assert runtimeTurn.turn.provider is None
+    assert runtimeTurn.turn.tools == []
+    assert providerFactory.config is None
+    assert profileManager.resolvedRole == ""
+    assert runtimeTurn.turn.messages == [{"role": "user", "content": "데이터 분석 커리큘럼 만들어줘"}]
+
+
+def testPrepareTeacherRuntimeTurnDoesNotGateSpecificLearningRequest(tmp_path) -> None:
+    convManager = _FakeConversationManager()
+    profileManager = _FakeProfileManager()
+    providerFactory = _ProviderFactory()
+    sessionManager = _FakeSessionManager()
+
+    runtimeTurn = prepareTeacherRuntimeTurn(
+        convManager=convManager,
+        profileManager=profileManager,
+        sessionManager=sessionManager,
+        documentPath=None,
+        workspaceRoot=tmp_path,
+        message="초급 pandas 실습 중심 짧은 레슨 만들어줘",
+        roleOverride="teacher",
+        providerOverride="custom",
+        providerFactory=providerFactory,
+    )
+
+    assert runtimeTurn.turn.clarificationPlan is None
+    assert isinstance(runtimeTurn.turn.provider, _FakeProvider)
+    assert profileManager.resolvedRole == "teacher"
+
+
 def testTeacherRuntimeTurnRequestOwnsPayloadShape(tmp_path) -> None:
     convManager = _FakeConversationManager()
     profileManager = _FakeProfileManager()
@@ -572,6 +747,31 @@ def testProviderStreamOwnsStreamingToolEvents() -> None:
     assert events[-1]["toolCalls"][0]["name"] == "read-cells"
     assert events[-1]["trace"]["toolSequence"] == ["read-cells"]
     assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
+
+
+def testProviderStreamReturnsClarificationWithoutProviderCall() -> None:
+    convManager = _FakeConversationManager()
+    messages: list[dict] = [{"role": "user", "content": "데이터 분석 커리큘럼 만들어줘"}]
+    orchestrator = TeacherOrchestrator.fromContext({})
+    plan = buildClarificationPlan("데이터 분석 커리큘럼 만들어줘")
+
+    events = asyncio.run(_collectStreamEvents(runTeacherChatStream(
+        provider=None,
+        convManager=convManager,
+        conversationId="conv-stream-clarify",
+        messages=messages,
+        tools=[],
+        executor=_FakeExecutor(),
+        orchestrator=orchestrator,
+        clarificationPlan=plan,
+    )))
+
+    assert [event["type"] for event in events] == ["start", "token", "done"]
+    assert "학습자 수준" in events[1]["content"]
+    assert events[-1]["provider"] == "codaro"
+    assert events[-1]["toolCalls"] == []
+    assert events[-1]["trace"]["toolSequence"] == []
+    assert convManager.assistantMessages[0]["content"] == events[-1]["answer"]
 
 
 def testProviderStreamReportsStreamingErrorsInTrace() -> None:

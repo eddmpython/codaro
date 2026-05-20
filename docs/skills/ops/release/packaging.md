@@ -3,7 +3,7 @@ id: packaging
 title: 로컬 배포 bundle 원칙
 description: Packaging rules for local distribution and bundled assets.
 category: ops
-section: guides
+section: release
 order: 306
 purpose: 최종 사용자는 CodaroLauncher.exe 단일 진입. Embedded Python + manifest exact wheel curated bundle. 외부 앱(Excel) 의존성은 별도 경계.
 whenToUse: 새 bundle 정의, manifest 스키마 변경, 외부 앱(xlwings 등) 통합 정책 결정할 때.

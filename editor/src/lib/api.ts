@@ -15,6 +15,8 @@ import type {
   ExecutionResult,
   OauthAuthorizePayload,
   OauthStatusPayload,
+  PackageInfo,
+  PackageInstallResult,
   ProgressSummary,
   SchedulerStatus,
   TaskListPayload,
@@ -185,6 +187,11 @@ export const codaroApi = {
   ),
   variables: (sessionId: string) => requestJson<VariableInfo[]>(`/api/kernel/${sessionId}/variables`),
   resetSession: (sessionId: string) => postJson<{ status: string }>(`/api/kernel/${sessionId}/reset`, {}),
+  packagesList: () => requestJson<PackageInfo[]>("/api/packages/list"),
+  packageInstall: (name: string) => postJson<PackageInstallResult>("/api/packages/install", { name }),
+  sessionPackagesList: (sessionId: string) => requestJson<PackageInfo[]>(`/api/kernel/${sessionId}/packages/list`),
+  sessionPackageInstall: (sessionId: string, name: string) =>
+    postJson<PackageInstallResult>(`/api/kernel/${sessionId}/packages/install`, { name }),
   curriculumCategories: () => requestJson<CurriculumCategoriesPayload>("/api/curriculum/categories"),
   curriculumContents: (category: string) => requestJson<CurriculumContentsPayload>(
     `/api/curriculum/contents/${encodeURIComponent(category)}`,

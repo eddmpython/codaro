@@ -27,6 +27,44 @@ type RegistryLesson = {
 
 type YamlMap = Record<string, unknown>;
 
+type LearningExerciseContract = {
+  prompt: string;
+  starterCode: string;
+  solution: string;
+  check: Record<string, string>;
+  hints: string[];
+  difficulty: string;
+};
+
+type LearningSectionContract = {
+  id: string;
+  title: string;
+  subtitle: string;
+  goal: string;
+  why: string;
+  explanation: string;
+  tips: string[];
+  snippet: string;
+  exercise: LearningExerciseContract;
+  check: Record<string, string>;
+  rawBlocks: YamlMap[];
+};
+
+type LearningLessonContract = {
+  meta: {
+    title: string;
+    audience: string;
+    difficulty: string;
+    packages: string[];
+  };
+  intro: {
+    direction: string;
+    benefits: string[];
+    diagram: YamlMap;
+  };
+  sections: LearningSectionContract[];
+};
+
 const categoryLabels: Record<string, { title: string; track: string; description: string }> = {
   main: {
     title: "파이썬 시작",
@@ -255,34 +293,42 @@ function groupLessons() {
 
 function documentFromCurriculumYaml(raw: string, category: string, contentId: string, fallbackTitle: string): CodaroDocument {
   const yaml = parseYaml(raw);
-  const title = lessonTitle(yaml) || fallbackTitle;
+  const baseTitle = lessonTitle(yaml) || fallbackTitle;
+  const learningContract = learningContractFromYaml(yaml, baseTitle);
+  const title = learningContract.meta.title || baseTitle;
   const blocks: BlockConfig[] = [];
   const intro = mapValue(yaml.intro);
 
   blocks.push(markdownBlock({
     content: introMarkdown(title, intro),
     displayKind: "hero",
-    payload: { title, ...intro },
+    payload: { title, ...intro, learningContract },
     role: "title",
     sourceType: "intro",
     title,
   }));
 
-  for (const section of arrayOfMaps(yaml.sections)) {
-    const sectionTitle = textValue(section.title);
-    const sectionSubtitle = textValue(section.subtitle);
-    if (sectionTitle || sectionSubtitle) {
+  for (const [index, section] of arrayOfMaps(yaml.sections).entries()) {
+    const sectionContract = learningContract.sections[index] ?? sectionContractFromYaml(section, index + 1);
+    const sourceBlocks = arrayOfMaps(section.blocks);
+    const sectionTitle = textValue(section.title) || sectionContract.title;
+    const sectionSubtitle = textValue(section.subtitle) || sectionContract.subtitle;
+    if (sectionTitle || sectionSubtitle || sectionHasStructuredFields(section)) {
       blocks.push(markdownBlock({
         content: [sectionTitle ? `## ${sectionTitle}` : "", sectionSubtitle].filter(Boolean).join("\n\n"),
         displayKind: "title",
-        payload: { title: sectionTitle, subtitle: sectionSubtitle },
+        payload: { title: sectionTitle, subtitle: sectionSubtitle, id: textValue(section.id), sectionContract },
         role: "title",
         sourceType: "section",
         title: sectionTitle || sectionSubtitle,
       }));
     }
 
-    for (const block of arrayOfMaps(section.blocks)) {
+    if (sectionHasStructuredFields(section) && !sourceBlocks.length) {
+      blocks.push(...structuredBlocksFromSectionContract(sectionContract));
+    }
+
+    for (const block of sourceBlocks) {
       blocks.push(...convertYamlBlock(block));
     }
   }
@@ -298,7 +344,7 @@ function documentFromCurriculumYaml(raw: string, category: string, contentId: st
     runtime: {
       defaultEngine: "local",
       reactiveMode: "hybrid",
-      packages: [],
+      packages: learningContract.meta.packages,
     },
     app: {
       title,
@@ -556,6 +602,225 @@ function parseYaml(raw: string): YamlMap {
 
 function lessonTitle(yaml: YamlMap) {
   return textValue(mapValue(yaml.meta).title ?? yaml.title);
+}
+
+function learningContractFromYaml(yaml: YamlMap, fallbackTitle: string): LearningLessonContract {
+  const meta = mapValue(yaml.meta);
+  const intro = mapValue(yaml.intro);
+  const runtime = mapValue(yaml.runtime);
+  return {
+    meta: {
+      title: textValue(meta.title ?? yaml.title) || fallbackTitle,
+      audience: textValue(meta.audience ?? meta.target ?? meta.level),
+      difficulty: textValue(meta.difficulty),
+      packages: uniqueTextList(meta.packages ?? runtime.packages ?? yaml.packages),
+    },
+    intro: {
+      direction: textValue(intro.direction ?? intro.goal ?? intro.description),
+      benefits: uniqueTextList(intro.benefits ?? intro.points ?? intro.outcomes),
+      diagram: diagramValue(intro.diagram ?? intro.flow ?? intro.architecture),
+    },
+    sections: arrayOfMaps(yaml.sections).map((section, index) => sectionContractFromYaml(section, index + 1)),
+  };
+}
+
+function sectionContractFromYaml(section: YamlMap, index: number): LearningSectionContract {
+  const rawBlocks = arrayOfMaps(section.blocks);
+  const directExercise = exerciseContract(section.exercise);
+  const inferredExercise = firstExerciseFromBlocks(rawBlocks);
+  const exercise = hasExerciseData(directExercise) ? directExercise : inferredExercise;
+  const check = checkMap(section.check);
+  return {
+    id: textValue(section.id) || `section-${index}`,
+    title: textValue(section.title) || `${index}단계`,
+    subtitle: textValue(section.subtitle),
+    goal: textValue(section.goal ?? section.study ?? section.objective),
+    why: textValue(section.why ?? section.benefit ?? section.value),
+    explanation: textValue(section.explanation ?? section.description ?? section.content) || firstBlockText(rawBlocks, new Set(["text", "prose", "centerText", "info"])),
+    tips: uniqueTextList(section.tips).length ? uniqueTextList(section.tips) : tipsFromBlocks(rawBlocks),
+    snippet: snippetText(section.snippet) || firstCodeFromBlocks(rawBlocks),
+    exercise,
+    check: Object.keys(check).length ? check : exercise.check,
+    rawBlocks,
+  };
+}
+
+function structuredBlocksFromSectionContract(section: LearningSectionContract): BlockConfig[] {
+  const blocks: BlockConfig[] = [];
+  const explanation = structuredExplanationMarkdown(section);
+  if (explanation) {
+    blocks.push(markdownBlock({
+      content: explanation,
+      description: section.goal || section.explanation,
+      displayKind: "prose",
+      payload: { sectionContract: section },
+      role: "learning",
+      sourceType: "sectionContract:explanation",
+      title: section.title,
+    }));
+  }
+
+  if (section.snippet) {
+    blocks.push(codeBlock({
+      content: localizeCode(section.snippet),
+      description: section.goal,
+      executionKind: "python",
+      role: "snippet",
+      sourceType: "sectionContract:snippet",
+      title: section.title ? `${section.title} 스니펫` : "예제 스니펫",
+    }));
+  }
+
+  if (hasStructuredExercise(section)) {
+    const solution = localizeCode(section.exercise.solution);
+    blocks.push(codeBlock({
+      content: localizeCode(section.exercise.starterCode),
+      description: section.exercise.prompt || section.goal,
+      executionKind: "python",
+      guide: {
+        checkConfig: Object.keys(section.exercise.check).length ? section.exercise.check : section.check,
+        description: section.exercise.prompt || section.goal || "직접 코드를 입력하고 실행하세요.",
+        difficulty: section.exercise.difficulty || "easy",
+        exerciseType: "sectionPractice",
+        hints: section.exercise.hints.length ? section.exercise.hints : section.tips,
+        solution,
+        studentAnswer: "",
+      },
+      role: "exercise",
+      sourceType: "sectionContract:exercise",
+      title: section.title ? `${section.title} 실습` : "실습 셀",
+    }));
+  }
+
+  if (Object.keys(section.check).length) {
+    blocks.push(markdownBlock({
+      content: structuredCheckMarkdown(section.check),
+      displayKind: "callout",
+      payload: { check: section.check, sectionId: section.id },
+      role: "check",
+      sourceType: "sectionContract:check",
+      title: section.title ? `${section.title} 검증` : "검증",
+    }));
+  }
+  return blocks;
+}
+
+function sectionHasStructuredFields(section: YamlMap) {
+  return ["goal", "why", "explanation", "tips", "snippet", "exercise", "check"].some((fieldName) => fieldName in section);
+}
+
+function exerciseContract(value: unknown): LearningExerciseContract {
+  if (!isMap(value)) {
+    return {
+      prompt: textValue(value),
+      starterCode: "",
+      solution: "",
+      check: {},
+      hints: [],
+      difficulty: "easy",
+    };
+  }
+  return {
+    prompt: textValue(value.prompt ?? value.title ?? value.description ?? value.content),
+    starterCode: textValue(value.starterCode ?? value.starter ?? value.template ?? value.content),
+    solution: textValue(value.solution ?? value.answer ?? value.code),
+    check: checkMap(value.check ?? value.checkConfig),
+    hints: uniqueTextList(value.hints ?? value.tips),
+    difficulty: textValue(value.difficulty) || "easy",
+  };
+}
+
+function firstExerciseFromBlocks(blocks: YamlMap[]): LearningExerciseContract {
+  for (const block of blocks) {
+    const sourceType = textValue(block.type);
+    if (!["expansion", "practiceCard", "stepCard"].includes(sourceType)) continue;
+    return {
+      prompt: textValue(block.title ?? block.description ?? block.content),
+      starterCode: textValue(block.starterCode ?? block.starter),
+      solution: textValue(block.solution ?? block.code),
+      check: checkMap(block.check ?? block.checkConfig),
+      hints: uniqueTextList(block.hints ?? block.tips),
+      difficulty: textValue(block.difficulty) || "easy",
+    };
+  }
+  return exerciseContract(null);
+}
+
+function hasStructuredExercise(section: LearningSectionContract) {
+  return hasExerciseData(section.exercise);
+}
+
+function hasExerciseData(exercise: LearningExerciseContract) {
+  return Boolean(exercise.prompt || exercise.starterCode || exercise.solution || exercise.hints.length || Object.keys(exercise.check).length);
+}
+
+function structuredExplanationMarkdown(section: LearningSectionContract) {
+  return [
+    labeledMarkdown("이번 섹션에서 공부할 것", section.goal),
+    labeledMarkdown("왜 유용한지", section.why),
+    labeledMarkdown("상세 설명", section.explanation),
+    labeledMarkdown("팁", section.tips.map((tip) => `- ${tip}`).join("\n")),
+  ].filter(Boolean).join("\n\n");
+}
+
+function labeledMarkdown(label: string, content: string) {
+  return content ? `### ${label}\n${content}` : "";
+}
+
+function structuredCheckMarkdown(check: Record<string, string>) {
+  return ["### 검증/피드백", ...Object.entries(check).map(([key, value]) => `- **${key}**: ${value}`)].join("\n");
+}
+
+function snippetText(value: unknown) {
+  if (isMap(value)) return textValue(value.code ?? value.content ?? value.text);
+  return textValue(value);
+}
+
+function firstCodeFromBlocks(blocks: YamlMap[]) {
+  for (const block of blocks) {
+    if (textValue(block.type) === "code") return textValue(block.content ?? block.code);
+  }
+  return "";
+}
+
+function firstBlockText(blocks: YamlMap[], sourceTypes: Set<string>) {
+  for (const block of blocks) {
+    if (!sourceTypes.has(textValue(block.type) || "text")) continue;
+    const text = textValue(block.content ?? block.description ?? block.text);
+    if (text) return text;
+  }
+  return "";
+}
+
+function tipsFromBlocks(blocks: YamlMap[]) {
+  const tips: string[] = [];
+  for (const block of blocks) {
+    if (!["tip", "tipCard", "note", "info"].includes(textValue(block.type))) continue;
+    tips.push(...uniqueTextList(block.tips ?? block.items));
+    const tipText = textValue(block.content ?? block.description ?? block.text);
+    if (tipText) tips.push(tipText);
+  }
+  return uniqueValues(tips);
+}
+
+function checkMap(value: unknown): Record<string, string> {
+  if (isMap(value)) {
+    const result: Record<string, string> = {};
+    Object.entries(value).forEach(([key, item]) => {
+      const text = textValue(item);
+      if (text) result[key] = text;
+    });
+    return result;
+  }
+  const text = textValue(value);
+  return text ? { description: text } : {};
+}
+
+function diagramValue(value: unknown): YamlMap {
+  if (isMap(value)) return value;
+  if (Array.isArray(value)) return { steps: value };
+  const description = textValue(value);
+  return description ? { description } : {};
 }
 
 function lessonTitleFromRaw(raw: string) {
@@ -874,6 +1139,25 @@ function arrayOfText(value: unknown): string[] {
     if (isMap(item)) return [textValue(item.emoji), textValue(item.title ?? item.label ?? item.name), textValue(item.description ?? item.content)].filter(Boolean).join(" ");
     return "";
   }).filter(Boolean);
+}
+
+function uniqueTextList(value: unknown): string[] {
+  if (typeof value === "string" || typeof value === "number" || typeof value === "boolean") return [String(value)];
+  if (!Array.isArray(value)) return [];
+  return uniqueValues(value.map((item) => {
+    if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") return String(item);
+    if (isMap(item)) {
+      return [
+        textValue(item.title ?? item.label ?? item.name ?? item.text),
+        textValue(item.description ?? item.content),
+      ].filter(Boolean).join(" ");
+    }
+    return "";
+  }).filter(Boolean));
+}
+
+function uniqueValues(values: string[]) {
+  return Array.from(new Set(values.map((value) => value.trim()).filter(Boolean)));
 }
 
 function textValue(value: unknown): string {

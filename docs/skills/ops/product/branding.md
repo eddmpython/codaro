@@ -3,7 +3,7 @@ id: branding
 title: 브랜딩 + 프론트 톤
 description: Branding rules for Codaro identity, assets, and product language.
 category: ops
-section: branding
+section: product
 order: 10
 purpose: programmable studio 포지션. 제품 UI는 한국어 기본. 제품 표면은 React + shadcn/ui, 문서/블로그 표면은 Svelte. 마스코트 source는 codaro-sheet-01/02.png.
 whenToUse: 새 UI 컴포넌트 추가, 색/반지름/그림자 변경, 랜딩/문서 톤 결정할 때.

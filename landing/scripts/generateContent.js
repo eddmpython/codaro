@@ -1,5 +1,5 @@
 import { readFileSync, readdirSync, writeFileSync } from "node:fs";
-import { dirname, extname, relative, resolve, sep } from "node:path";
+import { dirname, extname, posix, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
 import { marked } from "marked";
@@ -114,6 +114,52 @@ function normalizeDocsPath(filePath) {
   return withoutExtension;
 }
 
+function docsRouteFromMarkdownPath(pathValue) {
+  const withoutExtension = pathValue.replace(/\.md$/, "");
+  if (withoutExtension.endsWith("/README")) {
+    return withoutExtension.slice(0, -"/README".length);
+  }
+  if (withoutExtension === "README") {
+    return "";
+  }
+  return withoutExtension;
+}
+
+function normalizeDocsLink(href, sourceRelativePath) {
+  if (
+    href.startsWith("#")
+    || href.startsWith("/")
+    || /^[a-zA-Z][a-zA-Z0-9+.-]*:/.test(href)
+  ) {
+    return href;
+  }
+
+  const [pathPart, hashPart] = href.split("#", 2);
+  if (!pathPart.endsWith(".md")) {
+    return href;
+  }
+
+  const sourceDir = posix.dirname(sourceRelativePath);
+  const resolvedPath = posix.normalize(posix.join(sourceDir, pathPart));
+  if (resolvedPath.startsWith("../")) {
+    return href;
+  }
+
+  const route = docsRouteFromMarkdownPath(resolvedPath);
+  return `${basePath}/docs/${route}${hashPart ? `#${hashPart}` : ""}`;
+}
+
+function renderDocsMarkdown(content, sourceRelativePath) {
+  const renderer = new marked.Renderer();
+  renderer.link = ({ href, title, tokens }) => {
+    const label = renderer.parser.parseInline(tokens);
+    const normalizedHref = normalizeDocsLink(String(href || ""), sourceRelativePath);
+    const titleAttr = title ? ` title="${String(title).replace(/"/g, "&quot;")}"` : "";
+    return `<a href="${normalizedHref}"${titleAttr}>${label}</a>`;
+  };
+  return marked.parse(content, { renderer });
+}
+
 function walkDocs(dirPath) {
   const results = [];
   const relativeDir = toPosix(relative(docsRoot, dirPath));
@@ -149,6 +195,7 @@ function collectDocsPages() {
       }
     }
     const path = normalizeDocsPath(filePath);
+    const sourceRelativePath = toPosix(relative(docsRoot, filePath));
     const isSkillPage = path === "skills" || path.startsWith("skills/");
     const rawSection = String(fileMeta.section);
     const skillCategory = fileMeta.category ? String(fileMeta.category) : "";
@@ -164,7 +211,7 @@ function collectDocsPages() {
       order: Number(fileMeta.order),
       draft: Boolean(fileMeta.draft),
       url: path ? `${basePath}/docs/${path}` : `${basePath}/docs`,
-      html: marked.parse(parsed.content),
+      html: renderDocsMarkdown(parsed.content, sourceRelativePath),
       text: stripMarkdown(parsed.content),
     });
   }

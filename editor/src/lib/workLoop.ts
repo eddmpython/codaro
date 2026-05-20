@@ -189,9 +189,9 @@ function assistantWorkStepFromToolCall(toolCall: AiToolCall, status: AssistantWo
   const name = toolCallName(toolCall);
   return {
     id: toolStepId(toolCall),
-    label: workLabelFromToolCall(toolCall, name),
+    label: stringField(toolCall.workLabel) || workLabelFromToolCall(toolCall, name),
     status,
-    detail: toolCallDetail(toolCall, name),
+    detail: stringField(toolCall.workDetail) || toolCallDetail(toolCall, name),
     toolName: name,
     arguments: toolCallArguments(toolCall),
     result: toolCall.result,
@@ -230,20 +230,20 @@ function toolCallArguments(toolCall: AiToolCall) {
 function workLabelFromToolCall(toolCall: AiToolCall, name: string) {
   switch (name) {
     case "write-curriculum-yaml":
-      return "커리큘럼 구성";
+      return "커리큘럼 YAML 전개";
     case "packages-check":
       return "라이브러리 확인";
     case "packages-install":
-      return "라이브러리 설치";
+      return "uv 라이브러리 설치";
     case "create-notebook-exercise":
       return "실습 구성";
     case "insert-block":
     case "write-cell":
-      return "셀 편집";
+      return "노트북 셀 작성";
     case "read-cells":
-      return "셀 읽기";
+      return "노트북 셀 읽기";
     case "cell-call":
-      return "셀 요청";
+      return "셀 실행/검증";
     case "execute-reactive":
       return "셀 실행";
     case "get-variables":
@@ -273,7 +273,46 @@ function workLabelFromToolCall(toolCall: AiToolCall, name: string) {
 }
 
 function toolCallDetail(toolCall: AiToolCall, name: string) {
-  return [name, toolCall.target, toolCall.risk && toolCall.risk !== "normal" ? toolCall.risk : null]
+  const args = toolCallArguments(toolCall);
+  const specific = toolSpecificDetail(name, args);
+  return [specific, toolCall.target, toolCall.risk && toolCall.risk !== "normal" ? toolCall.risk : null]
     .filter(Boolean)
     .join(" · ");
+}
+
+function toolSpecificDetail(name: string, args: Record<string, unknown>) {
+  switch (name) {
+    case "write-curriculum-yaml":
+      return textArg(args, "title") || "YAML을 섹션 카드와 실행 셀로 변환";
+    case "packages-check":
+      return listArg(args, "names").length
+        ? `${listArg(args, "names").join(", ")} 설치 여부 확인`
+        : "필요한 패키지 설치 여부 확인";
+    case "packages-install":
+      return textArg(args, "name") ? `${textArg(args, "name")}를 uv로 설치` : "누락 패키지를 uv로 설치";
+    case "write-cell":
+      return textArg(args, "blockId") ? `${textArg(args, "blockId")} 셀 내용 반영` : "셀 내용 반영";
+    case "insert-block":
+      return textArg(args, "anchorBlockId") ? `${textArg(args, "anchorBlockId")} 주변에 셀 추가` : "새 셀 추가";
+    case "read-cells":
+      return "현재 노트북 구조와 셀 역할 확인";
+    case "cell-call":
+      return textArg(args, "blockId") ? `${textArg(args, "blockId")} 실행 또는 검증` : "셀 실행 또는 검증";
+    case "execute-reactive":
+      return textArg(args, "blockId") ? `${textArg(args, "blockId")}부터 의존 셀 재실행` : "의존 셀 재실행";
+    case "get-variables":
+      return "현재 런타임 변수 확인";
+    default:
+      return name;
+  }
+}
+
+function textArg(args: Record<string, unknown>, key: string) {
+  const value = args[key];
+  return typeof value === "string" ? value : "";
+}
+
+function listArg(args: Record<string, unknown>, key: string) {
+  const value = args[key];
+  return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
 }

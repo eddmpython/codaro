@@ -166,7 +166,11 @@ TOOL_WRITE_CURRICULUM_YAML = ToolDef(
         "properties": {
             "yamlContent": {
                 "type": "string",
-                "description": "Curriculum YAML with meta, intro, sections, and blocks.",
+                "description": (
+                    "Curriculum YAML. Prefer the structured contract: meta(title,audience,difficulty,packages), "
+                    "intro(direction,benefits,diagram), sections(title,subtitle,goal,why,explanation,tips,snippet,exercise,check). "
+                    "Legacy sections[].blocks is still accepted."
+                ),
             },
             "category": {
                 "type": "string",

@@ -167,6 +167,7 @@ export function MainSurface(props: MainSurfaceProps) {
         )}
       >
         <CurriculumView
+          apiOnline={props.apiOnline}
           canRun={props.canRun}
           document={curriculumDoc}
           drafts={props.drafts}

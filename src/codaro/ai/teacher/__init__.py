@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from .clarificationPolicy import ClarificationPlan, buildClarificationPlan
 from .contextBuilder import injectContext
 from .evalHarness import (
     TeacherEvalCase,
@@ -74,10 +75,12 @@ __all__ = [
     "TeacherRuntimeTurnRequest",
     "TeacherTurnSession",
     "TeacherToolRound",
+    "ClarificationPlan",
     "ToolPolicyState",
     "ToolPolicyViolation",
     "ToolSequenceReport",
     "createTeacherToolExecutor",
+    "buildClarificationPlan",
     "executeTeacherToolRound",
     "evaluateToolSequence",
     "evaluateGoldenTracePayloads",

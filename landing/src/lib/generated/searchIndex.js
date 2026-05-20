@@ -9,10 +9,18 @@ export const searchEntries = [
   },
   {
     "kind": "docs",
+    "title": "SSOT Map",
+    "description": "Single source of truth map for Codaro schema, provider loop, tool policy, and product surface boundaries.",
+    "url": "/codaro/docs/skills/architecture/ssot-map",
+    "text": "SSOT Map Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙을 여러 파일에 복사하지 않는다. Product Surface | 기준 | 파일 | 역할 | | | | | | 제품 표면 | | 채팅, 에디터, 커리큘럼, 자동화의 의미와 UX 경계 | | 표면 라우팅 | | 프론트 surface enum과 표시 이름 | | 표면 route state | | URL hash와 surface state 동기화 | | 표면 조립 | | surface별 화면 조립 | Cell Schema | 기준 | 파일 | 역할 | | | | | | 프론트 셀 스키마 | | , , , | | 백엔드 셀 스키마 | | 같은 셀 어휘의 Python 기준 | | 문서 모델 | | 실제 document/block 저장 모델 | | 프론트 문서 조작 | | draft 생성, block 병합, payload 정규화 | | 셀 해석 | | 셀 라벨, 분류, 셀별 요청 prompt | Curriculum System | 기준 | 파일 | 역할 | | | | | | curriculum content cache | | YAML lesson 변환 캐시, content response payload, 방어적 복사 기준 | | exercise check dispatch | | curriculum API와 tool의 check type별 실행 분기, check response payload 기준 | | check primitives | | output, variable, contains, noError 채점 구현 | Teacher Loop | 기준 | 파일 | 역할 | | | | | | loop 절차 문서 | | 요청 분류, cell map, dependency preflight, tool lifecycle 원칙 | | conversation state | | conversation 저장소 singleton, system prompt, 생성/목록/삭제 payload 기준 | | turn session | | conversation, provider, messages, tools를 한 turn 실행 단위로 준비 | | turn runtime | | context 주입, request payload, turn session, tool executor를 provider 실행 단위로 조립 | | orchestrator | | context, policy, trace, tool payload를 묶는 진입점 | | provider loop | | provider tool call과 turn 완료 payload를 conversation, policy, executor, trace에 반영 | | provider stream | | streaming token과 tool lifecycle event를 생성하되 완료 payload는 provider loop 기준을 공유 | | provider stream events | | streaming start/delta/tool/done/error event payload 기준 | | context builder | | provider에 들어가는 context text 구성 | | tool policy | | packages check 선행, 실행 전 preflight, policy violation payload 같은 강제 규칙 | | trace model | | turn/tool lifecycle, tool sequence, summary 추적 | | skill registry | | provider가 따라야 할 작업별 skill 목록과 required tool 계약 | | eval harness | | response trace payload, tool sequence golden case, batch report 기준 | | completion runtime | | editor code completion request payload, prompt, context 축약, provider 호출 기준 | | provider profile mutation | | provider profile update와 secret 저장 정책 | | provider profile events | | provider profile change SSE frame과 fingerprint polling 기준 | | provider oauth flow | | OAuth authorize/status/logout와 callback state/html 응답 기준 | | provider models | | provider별 모델 목록 조회와 fallback 기준 | | provider validation | | provider 연결 검증 config와 availability probe 기준 | Runtime System | 기준 | 파일 | 역할 | | | | | | kernel 실행 payload | | 실행 결과를 HTTP, websocket, tool payload로 변환하는 기준 | | kernel session | | runtime engine을 kernel protocol로 변환하는 session 경계 | | reactive 실행 | | block 의존 그래프와 reactive 실행 순서 | | runtime engine | | 교체 가능한 실행 capability 인터페이스 | | local engine | | 로컬 기본 실행 engine 구현 | Tool System | 기준 | 파일 | 역할 | | | | | | tool 진입점 | | 기본 tool 목록, 등록 순서, 하위 호환 export | | tool 정의 모듈 | | 제품 경계별 기본 tool 이름, description, parameter schema | | tool 계약 검증 | | 기본 tool 정의, manifest metadata, handler 연결성 검증 | | registry | | 와 register/get/schema 변환 | | manifest | | tool별 category, lane, target, risk 단일 메타데이터와 표시 그룹 | | dispatch | | session/document 공통 접근과 handler dispatch | | workbench handlers | | 셀 읽기/쓰기, curriculum YAML 전개 | | runtime handlers | | 실행, 변수, 패키지, 검증 | | learning handlers | | 학습 카드, 퀴즈, 노트북 생성 | | automation handlers | | 화면 인식, 입력, 녹화, 자동화 실행, 알림 | Transport Boundary | 기준 | 파일 | 역할 | | | | | | provider HTTP/SSE | | request parsing, provider 호출, SSE 전송만 담당 | | kernel websocket transport | | websocket message validation, 실행 event 전송, session status payload 기준 | | frontend API | | 제품 표면에서 server와 통신하는 유일한 통로 | Frontend State Boundary | 기준 | 파일 | 역할 | | | | | | assistant context | | provider 요청에 들어가는 document/cell/dependency/tool context | | assistant state types | | assistant message, work step, trace UI state 타입 기준 | | assistant turn request | | provider turn request payload와 context materialization 기준 | | assistant stream protocol | | provider SSE event parsing, done/error response 누적 기준 | | assistant message state | | stream event와 response를 assistant message state로 변환 | | assistant provider turn | | provider stream 호출과 stream event를 message state에 연결 | | assistant response plan | | provider 응답과 tool 결과를 에디터 적용, pending blocks, 나만의 커리큘럼 저장 계획으로 변환 | | assistant local turn | | provider 미연결 시 local fallback 저장, notice, pending reset 결정 | | assistant turn state hook | | 대화 prompt/message/conversation 상태와 provider/local turn 실행 UI 상태 | | pending changes | | 생성된 셀 대기분을 노트북/커리큘럼에 적용하거나 버리는 정책 | | pending changes state hook | | 생성된 셀 대기분 상태와 적용/버리기 UI handler | | local fallback | | provider 미연결 시 기본 안내, 로컬 커리큘럼 초안, 로컬 실행 결과 | | app bootstrap | | 앱 시작 시 health, bootstrap, 기본 커리큘럼, provider profile, session 초기 상태 | | app bootstrap effect hook | | 앱 시작 결과를 surface state, provider, curriculum, automation state에 적용 | | notebook document state hook | | 편집기 document, draft, 선택 셀, 셀 추가/적용 상태 | | provider connection | | provider 선택, OAuth polling, API key 저장, 연결 notice 결정 | | provider connection state | | provider profile, 설정 sheet, 연결 중 상태와 UI handler | | notebook runtime | | 세션 생성, 셀 실행, reactive 노트북 실행, 로컬 실행 결과 결정 | | notebook runtime state hook | | 세션, 변수, 실행 결과, 셀/노트북 실행 UI 상태 | | workloop state | | tool start/tool results와 response trace summary를 UI state로 변환 | | custom curricula | | 나만의 커리큘럼 저장/로드/선택 상태 적용 | | custom curricula state hook | | 나만의 커리큘럼 저장소 persistence와 선택 상태 | | curriculum selection | | 기본 커리큘럼 fallback, 콘텐츠/레슨 로딩, 선택 상태 | | curriculum library state hook | | 커리큘럼 목록/레슨 로딩과 현재 학습 셀 선택 상태 | | curriculum navigation state hook | | 기본/나만의 커리큘럼 선택과 사이드바 검색/목록 상태 | | automation state | | 자동화/태스크 상태 | | automation state hook | | 자동화 snapshot refresh, 긴급 정지, 태스크 실행 UI 상태 | | theme state hook | | theme local storage와 document class 동기화 | 원칙 router는 판단하지 않는다. 판단 재료는 domain/provider loop 계층에서 만든다. UI 컴포넌트는 context를 직접 조립하지 않는다. 를 통한다. tool을 추가할 때는 의 schema, 의 노출 메타데이터, 의 실행 위치를 같이 본다. 셀 어휘를 늘릴 때는 프론트/백엔드 셀 스키마와 문서 모델 영향까지 같이 본다. provider 응답 품질은 평가 harness로 판단한다. 감으로 좋고 나쁨을 말하지 않는다.",
+    "category": "architecture"
+  },
+  {
+    "kind": "docs",
     "title": "아키텍처 방향 — 5층 구조",
     "description": "Five-layer architecture overview for the Codaro runtime.",
     "url": "/codaro/docs/skills/architecture/overview",
-    "text": "아키텍처 방향 1차 목표는 의 독립이다. 구조는 아래 5층을 기본으로 본다. UI가 실행기 구현 세부사항에 직접 묶이면 안 된다. 웹, 모바일, 로컬은 가능한 한 같은 문서 모델과 같은 실행 인터페이스를 공유해야 한다. 폴더 매핑 (PR 3~4 후 목표 상태) 관련 [[document model]] [[execution engine]] [[dataflow]] [[widget bridge]]",
+    "text": "아키텍처 방향 1차 목표는 의 독립이다. 구조는 아래 5층을 기본으로 본다. UI가 실행기 구현 세부사항에 직접 묶이면 안 된다. 웹, 모바일, 로컬은 가능한 한 같은 문서 모델과 같은 실행 인터페이스를 공유해야 한다. 폴더 매핑 (PR 3~4 후 목표 상태) 현재 provider engine 트리 큰 이동 전까지는 아래 경계로 유지한다. router가 provider 루프 세부 구현을 직접 소유하지 않게 하고, 제품 표면은 를 통해서만 접근한다. 정리 기준: 에는 HTTP/SSE, request parsing, status code만 둔다. provider 선택, context 조립, tool payload는 안에서 관리한다. 실행기/문서/커리큘럼 세부 모델은 router가 직접 해석하지 않는다. 관련 [[ssot map]] [[document model]] [[execution engine]] [[dataflow]] [[widget bridge]]",
     "category": "architecture"
   },
   {
@@ -28,7 +36,7 @@ export const searchEntries = [
     "title": "실행 엔진 원칙",
     "description": "Execution engine responsibilities for kernels, runtimes, and reruns.",
     "url": "/codaro/docs/skills/architecture/execution-engine",
-    "text": "실행 엔진 원칙 실행 엔진은 교체 가능한 인터페이스로 설계한다. 기본 후보: 편집기는 , , , , , 같은 capability를 호출하고, 개별 엔진 구현을 직접 알지 않아야 한다. AI teacher와 제품 표면도 같은 capability surface를 호출한다. 셀 실행/검증은 장기적으로 계약으로 수렴한다. , 는 하위 호환 및 세부 구현 도구다. 관련 [[pyodide first runtime]] — Pyodide 기본, 로컬 슈퍼셋 [[reactive execution]] — 의존 그래프 위에서 동작",
+    "text": "실행 엔진 원칙 실행 엔진은 교체 가능한 인터페이스로 설계한다. 기본 후보: 편집기는 , , , , , 같은 capability를 호출하고, 개별 엔진 구현을 직접 알지 않아야 한다. AI teacher와 제품 표면도 같은 capability surface를 호출한다. 셀 실행/검증은 장기적으로 계약으로 수렴한다. , 는 하위 호환 및 세부 구현 도구다. kernel 실행 결과를 HTTP, websocket, tool payload로 바꾸는 기준은 에 둔다. 관련 [[local first runtime]] — 로컬 기본 실행 정책 [[reactive execution]] — 의존 그래프 위에서 동작",
     "category": "architecture"
   },
   {
@@ -52,7 +60,7 @@ export const searchEntries = [
     "title": "제품 프론트 표면",
     "description": "React and shadcn/ui strategy for Codaro editor and learning surfaces.",
     "url": "/codaro/docs/skills/architecture/frontend-product-surface",
-    "text": "제품 프론트 표면 Codaro의 프론트는 두 표면으로 나눈다. — GitHub Pages 문서와 글쓰기 표면. 현재 Svelte 유지. — Codaro 제품 표면. AI workbench, notebook/editor, learning, automation UI를 모두 포함한다. React + shadcn/ui 기준. 기존 Svelte 앱은 더 이상 제품 표면의 기준이 아니다. 현재 제품 표면의 source of truth는 하나다. 제품 표면 계약 가 Codaro의 실제 제품 UI 표면이다. 제품 내부 실행/편집 단위는 workbench, notebook, cell로 구분한다. 기존 Svelte 편집기는 참고/레거시 판단 대상일 뿐, 현재 저장소의 제품 기준으로 보지 않는다. 제품 기본 진입은 다. 제품 흐름은 이다. 따라서 새 UI 판단 기준은 \"편집기 앱을 어떻게 꾸밀까\"가 아니라 \"채팅에서 만들어진 학습/자동화 작업대가 어떻게 실제 셀과 실행 상태로 변하는가\"다. 작업대 정보 구조 는 아래 정보를 1급 UI로 보여줘야 한다. 현재 conversation과 provider/model 상태 AI가 작성한 curriculum YAML artifact materialized document와 cell 목록 tool lane timeline: , , , , , , cell별 실행 결과, 변수 상태, 검증 결과 pending workbench changes의 diff, accept/reject AI 없이 불러온 reference curriculum과 AI가 생성한 임시 curriculum의 출처 차이 task/report/automation으로 넘기는 handoff 상태 결정 편집기와 학습기 프론트의 신규 작업은 React + shadcn/ui 컴포넌트 구조를 기본값으로 한다. shadcn/ui는 완성된 외부 라이브러리를 가져다 쓰는 방식이 아니라, 컴포넌트 코드를 소유하고 조정하는 방식으로 사용한다. 화면의 난이도는 컴포넌트 자체보다 배치, 상태, 정보 밀도에서 결정한다. 따라서 새 화면은 먼저 레이아웃 계약을 고정한 뒤 기능을 붙인다. 공용 컴포넌트는 아래에 둔다. 제품 기능 화면은 아래에서 AI workbench, notebook/editor, learning, runtime 패널을 분리해 키운다. 편집기 기준 편집기는 코드 셀, 실행 결과, 런타임 상태, 파일 탐색이 한 화면에서 끊기지 않아야 한다. 실행 버튼, 저장, 검색, 명령 팔레트 같은 기본 행동은 shadcn 버튼/탭/패널 패턴 위에서 만든다. 코드 편집 영역은 별도 엔진 영역으로 보고, 주변 크롬은 shadcn/ui 컴포넌트로 구성한다. 출력은 셀 바로 아래에 붙이며, 실행 상태는 셀과 런타임 패널 양쪽에서 확인 가능해야 한다. 학습기 기준 학습기는 설명 페이지가 아니라 실행 흐름이다. 한 화면에는 현재 목표, 실습 셀, 예측/실행/수정 단계, 피드백 패널이 함께 보여야 한다. 초보자용 문구는 화면에서 직접 행동을 유도해야 한다. 용어 설명은 기능 사용을 막지 않는 위치에 둔다. 진행률은 단순 퍼센트보다 현재 단계와 다음 행동을 우선한다. 학습 요청의 기본값은 reference tree 선택이 아니라 채팅에서 작업대를 생성하는 것이다. reference tree는 AI 없이도 학습 가능한 기본 curriculum 경로다. AI 생성 curriculum은 YAML artifact와 셀 전개 결과를 함께 보여준다. 경계 는 React + shadcn/ui 제품 표면이다. 의 빌드 결과는 로 간다. 폐기된 Svelte 편집기는 현재 저장소의 제품 기준에서 제외한다. 은 이 결정의 대상이 아니다. 문서 사이트 전환은 별도 결정 없이는 하지 않는다. 관련 [[overview]] — UI는 실행기 구현 세부사항에 직접 묶이지 않는다 [[widget bridge]] — Python descriptor와 프론트 렌더링 경계 [[learning three pillars]] — 학습 모드의 콘텐츠와 철학",
+    "text": "제품 프론트 표면 Codaro의 프론트는 두 폴더 경계로 나눈다. — GitHub Pages 문서와 글쓰기 표면. 현재 Svelte 유지. — Codaro 제품 표면. 채팅, 에디터, 커리큘럼, 자동화 UI를 모두 포함한다. React + shadcn/ui 기준. 기존 Svelte 앱은 더 이상 제품 표면의 기준이 아니다. 현재 제품 표면의 source of truth는 하나다. 제품 표면 계약 가 Codaro의 실제 제품 UI 표면이다. 사용자에게 보이는 1급 표면은 채팅 , 에디터 , 커리큘럼 , 자동화 네 가지다. 제품 내부 실행/편집 단위는 notebook과 cell로 구분한다. 제품 UI와 프론트 코드의 기본 명칭도 노트북/셀을 기준으로 둔다. 기존 Svelte 편집기는 참고/레거시 판단 대상일 뿐, 현재 저장소의 제품 기준으로 보지 않는다. 제품 기본 진입은 채팅 이다. 제품 흐름은 다. 분할 모드는 1급 표면에서 제외한다. 필요하면 특정 화면 안의 고급 레이아웃으로만 다룬다. 따라서 새 UI 판단 기준은 \"편집기 앱을 어떻게 꾸밀까\"가 아니라 \"채팅, 노트북, 학습 셀, 자동화가 어떻게 하나의 셀 모델로 이어지는가\"다. 제품 정보 구조 는 표면별로 아래 정보를 우선 보여준다. 디버그성 정보는 기본 패널로 고정하지 않는다. 채팅: conversation, 생성된 curriculum/automation 초안, 적용 대기 중인 노트북 변경 에디터: 빈 노트북, Python/Markdown 셀, 셀 바로 아래 실행 결과, 우측 어시스턴트 커리큘럼: 레슨 트리, YAML에서 전개된 학습 셀, 셀 바로가기 TOC, 접을 수 있는 어시스턴트 자동화: , , 태스크 예약과 실행 상태 tool call과 컨텍스트는 사용자가 검토해야 할 때 action log/diff/detail로 열 수 있게 한다. 학습 화면의 기본 우측 패널로 고정하지 않는다. 결정 편집기와 학습기 프론트의 신규 작업은 React + shadcn/ui 컴포넌트 구조를 기본값으로 한다. shadcn/ui는 완성된 외부 라이브러리를 가져다 쓰는 방식이 아니라, 컴포넌트 코드를 소유하고 조정하는 방식으로 사용한다. 화면의 난이도는 컴포넌트 자체보다 배치, 상태, 정보 밀도에서 결정한다. 따라서 새 화면은 먼저 레이아웃 계약을 고정한 뒤 기능을 붙인다. 공용 컴포넌트는 아래에 둔다. 제품 기능 화면은 아래에서 채팅, 노트북 에디터, 커리큘럼 학습 셀, 자동화를 분리해 키운다. 에디터 기준 에디터는 빈 노트북에서 시작한다. 기본 생성 버튼은 Python 셀과 Markdown 셀만 둔다. 학습셀, 타이틀셀, 설명셀, 실행셀, 시각화셀 같은 전용 의미는 별도 물리 타입을 남발하지 않고 셀 메타데이터( , , , )로 표현한다. 에디터는 코드 셀, 실행 결과, 런타임 상태가 한 화면에서 끊기지 않아야 한다. 실행 버튼, 셀 추가, 검색, 명령 팔레트 같은 기본 행동은 shadcn 버튼/탭/패널 패턴 위에서 만든다. 저장/동기화는 명확한 제품 흐름이 생기기 전까지 전역 헤더 액션으로 두지 않는다. 코드 편집 영역은 별도 엔진 영역으로 보고, 주변 크롬은 shadcn/ui 컴포넌트로 구성한다. 출력은 셀 바로 아래에 붙이며, 실행 상태는 셀 안에서 먼저 확인할 수 있어야 한다. 커리큘럼 기준 커리큘럼은 순수 학습 공간이다. 과 을 분리한다. 왼쪽 사이드바는 커리큘럼 과정과 레슨 트리를 보여준다. 셀 영역과 어시스턴트 사이에는 셀 바로가기 TOC를 둘 수 있다. 각 셀은 AI 호출을 직접 할 수 있어야 하고, 어시스턴트 패널은 접을 수 있어야 한다. 커리큘럼 YAML은 설명 페이지가 아니라 학습 셀 카드로 전개된다. 기본 화면 구조는 레슨 개요 + 섹션 단위 학습 카드 다. 블록마다 독립 카드가 반복되는 구조를 기본값으로 삼지 않는다. 렌더러는 YAML 의미를 추측하지 않는다. 와 payload를 우선 읽고, legacy block 정보는 호환 레이어로만 보조한다. 레슨 개요에는 무엇을 공부하는지, 왜 유용한지, 학습 흐름을 보여주는 제품형 다이어그램을 둔다. Mermaid 같은 문서용 다이어그램을 제품 UI 기본값으로 쓰지 않는다. 섹션 카드는 한 학습 단위를 가진다. 같은 섹션 안에 , 설명, 팁, 예제 스니펫, 학습자 입력 셀, 실행/검증 결과가 붙어 있어야 한다. 한 화면에는 현재 목표, 실습 셀, 예측/실행/수정 단계, 피드백 패널이 함께 보여야 한다. 초보자용 문구는 화면에서 직접 행동을 유도해야 한다. 용어 설명은 기능 사용을 막지 않는 위치에 둔다. 진행률은 단순 퍼센트보다 현재 단계와 다음 행동을 우선한다. 학습 요청은 채팅에서 시작할 수도 있고, 커리큘럼 트리에서 바로 시작할 수도 있다. 기본 curriculum은 AI 없이도 학습 가능한 경로다. AI 생성 curriculum은 에 쌓을 수 있어야 한다. 외부 라이브러리가 필요한 레슨은 상단에서 필요한 패키지를 보여주고, 누락된 항목은 에디터 안에서 설치 경로로 준비한다. 자동화 기준 자동화는 에디터에서 만든 셀 조합과 스크립트를 모아두는 표면이다. 와 를 분리한다. 태스크는 자동화 스크립트를 몇 시 몇 분에 실행할지 정하는 예약이다. 자동화 셀은 OS, 브라우저, 이미지, 마우스, 스킬 실행까지 확장될 수 있지만, 기본 셀 모델은 notebook/cell 계약을 유지한다. 경계 는 React + shadcn/ui 제품 표면이다. 의 빌드 결과는 로 간다. 폐기된 Svelte 편집기는 현재 저장소의 제품 기준에서 제외한다. 은 이 결정의 대상이 아니다. 문서 사이트 전환은 별도 결정 없이는 하지 않는다. 관련 [[overview]] — UI는 실행기 구현 세부사항에 직접 묶이지 않는다 [[widget bridge]] — Python descriptor와 프론트 렌더링 경계 [[learning yaml contract]] — 섹션 단위 학습카드의 YAML SSOT [[learning three pillars]] — 학습 모드의 콘텐츠와 철학",
     "category": "architecture"
   },
   {
@@ -60,7 +68,23 @@ export const searchEntries = [
     "title": "커리큘럼 레지스트리",
     "description": "Product content boundary for built-in YAML curricula.",
     "url": "/codaro/docs/skills/architecture/curriculum-registry",
-    "text": "커리큘럼 레지스트리 는 Codaro가 기본 제공하는 학습 콘텐츠의 제품 자산 루트다. 문서 사이트에 넣는 읽기 자료가 아니라, 서버와 에디터가 읽어서 runnable notebook cells로 전개하는 YAML 소스다. 기본 구조: 경계 는 제품 사상, 아키텍처, 운영 규칙을 설명한다. 는 공개 글을 담는다. 는 제품이 읽는 built in curriculum YAML과 관련 생성 도구를 담는다. 는 에서 파생된 배포용 노트북 산출물이다. 따라서 를 아래에 넣지 않는다. 공개 사이트에서 커리큘럼 목록을 보여줘야 하면 를 읽어 인덱스를 생성하고, 설명 문서만 에 둔다. 런타임 계약 기본 커리큘럼 루트는 이다. YAML은 변환기를 통해 document/cell 구조로 materialize된다. AI가 채팅에서 만든 임시 curriculum YAML도 같은 변환기를 통과한다. 파일명과 URL은 기존 콘텐츠 포맷과 라우트 계약이므로 폴더명 변경과 별개로 유지한다. 정리 원칙 백업성 커리큘럼 폴더는 레지스트리에 두지 않는다. 레슨 원본은 YAML, 파생 산출물은 로 분리한다. PRD나 설계 메모가 커리큘럼 생성에 필요한 경우 해당 커리큘럼 폴더 안에 둔다. 관련 [[learning three pillars]] — 기본 커리큘럼과 AI 생성 YAML의 제품 사상 [[document model]] — YAML이 block document로 전개되는 방식 [[frontend product surface]] — reference curriculum을 제품 UI에서 다루는 방식",
+    "text": "커리큘럼 레지스트리 는 Codaro가 기본 제공하는 학습 콘텐츠의 제품 자산 루트다. 문서 사이트에 넣는 읽기 자료가 아니라, 서버와 에디터가 읽어서 학습 셀 카드와 실행 가능한 notebook cell로 전개하는 YAML 소스다. 기본 구조: 경계 는 제품 사상, 아키텍처, 운영 규칙을 설명한다. 는 공개 글을 담는다. 는 제품이 읽는 built in curriculum YAML과 관련 생성 도구를 담는다. 는 에서 파생된 배포용 노트북 산출물이다. 따라서 를 아래에 넣지 않는다. 공개 사이트에서 커리큘럼 목록을 보여줘야 하면 를 읽어 인덱스를 생성하고, 설명 문서만 에 둔다. 런타임 계약 기본 커리큘럼 루트는 이다. YAML은 변환기를 통해 document/cell 구조로 materialize된다. 커리큘럼 표면은 YAML의 , , , , , , , , 를 보존해 다양한 학습 셀 카드로 렌더링한다. 물리 셀 타입은 과 를 기본으로 유지하고, 학습 의미는 , , , 에 둔다. AI가 채팅에서 만든 임시 curriculum YAML도 같은 변환기를 통과한다. 파일명과 URL은 기존 콘텐츠 포맷과 라우트 계약이므로 폴더명 변경과 별개로 유지한다. 정리 원칙 백업성 커리큘럼 폴더는 레지스트리에 두지 않는다. 레슨 원본은 YAML, 파생 산출물은 로 분리한다. PRD나 설계 메모가 커리큘럼 생성에 필요한 경우 해당 커리큘럼 폴더 안에 둔다. 관련 [[learning three pillars]] — 기본 커리큘럼과 AI 생성 YAML의 제품 사상 [[document model]] — YAML이 block document로 전개되는 방식 [[frontend product surface]] — reference curriculum을 제품 UI에서 다루는 방식",
+    "category": "architecture"
+  },
+  {
+    "kind": "docs",
+    "title": "Learning YAML Contract",
+    "description": "Structured YAML contract for Codaro curriculum lessons and section-card rendering.",
+    "url": "/codaro/docs/skills/architecture/learning-yaml-contract",
+    "text": "Learning YAML Contract Codaro의 학습 YAML은 화면 조각 목록이 아니라 학습 설계의 source of truth 다. 프론트는 YAML 의미를 추측하지 않고 contract payload를 읽어 렌더링한다. 계약 신규 레슨과 teacher가 생성하는 YAML은 아래 구조를 우선한다. 렌더링 원칙 레슨 상단은 , , 을 읽어 무엇을 공부하는지, 왜 유용한지, 전체 흐름을 보여준다. 섹션 하나가 학습카드 하나다. 의 작은 카드 반복을 기본 구조로 삼지 않는다. 섹션 카드는 순서로 이어진다. 카드 내부 정보는 라벨, 구획선, 여백으로 구분한다. 카드 안에 또 카드가 덕지덕지 쌓이는 구조는 피한다. 은 예제 스니펫 셀로, 는 학습자가 직접 입력/수정하는 실습 셀로 materialize한다. 는 런타임 패키지 preflight의 1차 입력이다. 코드 import 추론은 보조 수단이다. 호환 레이어 기존 curriculum은 를 계속 허용한다. 다만 materializer는 legacy blocks를 읽더라도 와 payload를 함께 만든다. 새 YAML에서 가 없고 structured section fields가 있으면 materializer가 설명, 스니펫, 실습, 검증 셀을 직접 생성한다. 구현 경계 Python SSOT 모델: Backend materializer: Frontend registry mirror: Section renderer: Teacher tool contract: Eval harness: 프론트 상태, document model, runtime result, trace/workloop은 서로 직접 참조하지 않는다. YAML contract는 document payload로 들어가고, runtime result는 셀 실행 결과로만 붙는다. 평가 기준 teacher/provider loop의 golden case는 다음을 확인해야 한다. 결과 document에 또는 가 존재한다. 섹션 카드가 goal, why, explanation, tips를 contract에서 읽는다. 패키지 흐름은 순서를 지킨다. trace/workloop에는 , , , 같은 사용자가 읽을 수 있는 단계가 남는다. 질문이 필요할 때만 1 3개 핵심 질문을 제안하고, 기본값으로 진행한 경우 그 기본값이 남는다. 관련 [[frontend product surface]] [[teacher tool loop]] [[curriculum registry]]",
+    "category": "architecture"
+  },
+  {
+    "kind": "docs",
+    "title": "Teacher Tool Loop",
+    "description": "Skill-guided loop for turning chat requests into curriculum cells, runtime checks, and dependency preparation.",
+    "url": "/codaro/docs/skills/architecture/teacher-tool-loop",
+    "text": "Teacher Tool Loop Codaro의 채팅은 답변 창이 아니라 skill guided tool loop 의 입구다. 사용자가 학습이나 자동화를 요청하면 provider는 바로 긴 설명을 쓰지 않고, 아래 절차로 제품 상태를 바꾼다. 절차 1. 요청 분류 단순 질문이면 짧게 답한다. 학습 요청이면 curriculum YAML을 먼저 만든다. 학습 요청이 너무 모호하면 provider를 호출하지 않고 deterministic clarification gate에서 먼저 멈춘다. 수준, 깊이, 환경, 실습/설명 비중 중 결과를 바꿀 핵심 질문만 최대 1 3개 묻는다. 답이 없으면 기본값으로 진행하되, 사용한 기본값을 clarification plan/workloop에 남긴다. 셀 수정/답 확인이면 현재 cell map에서 대상 셀을 고른다. 자동화 요청이면 자동화 셀/태스크 흐름으로 보낸다. skill registry의 required tool은 등록된 tool과 manifest metadata를 기준으로 검증한다. 2. Cell Map 확인 모든 셀은 , , , , , , 를 가진다. 타이틀/설명 셀에는 실행 코드를 쓰지 않는다. 스니펫 셀은 예제 표시용이다. 학생 입력은 별도 연습 입력 영역 또는 exercise 셀에 둔다. exercise 셀은 학습자가 직접 수정/작성하는 공간이다. check 셀은 답 확인, 실행 결과 검증, 변수 확인에 쓴다. automation 셀은 OS, 브라우저, 마우스, 이미지, task 흐름에 쓴다. 3. Dependency Preflight 외부 라이브러리가 필요한 흐름이면 실행 전에 를 호출한다. 결과의 이 비어 있으면 바로 다음 단계로 간다. 누락이 있으면 을 누락 패키지별로 호출한다. 누락 패키지가 설치 성공으로 기록되기 전에는 lane 도구( , , )로 넘어가지 않는다. 은 workspace 를 대상으로 경로만 사용한다. 직접 실행 경로를 추가하지 않는다. 학습자에게는 패키지 설치 세부 로그보다 \"필요한 도구를 uv로 준비 중\"이라고 보여주고, 실패 시 첫 오류 줄을 바로 노출한다. 4. Curriculum YAML 우선 학습 요청은 , , 구조의 YAML로 설계한다. 신규 YAML은 structured section contract를 우선한다. 는 기존 curriculum 호환용이다. 섹션 하나가 학습카드 하나다. 한 개념을 작은 카드 여러 개로 쪼개 반복하지 않는다. 는 패키지 preflight의 1차 입력이다. YAML을 만들면 반드시 로 materialize한다. materialize 결과 document는 에 저장되어 커리큘럼 화면에서 열린다. 5. Cell 단위 조작 읽기는 . 수정/삽입/삭제는 . 실행/검증은 . 하위 호환이 필요할 때만 , 를 직접 쓴다. 6. Workloop 표시 대화 표면은 tool lifecycle을 숨기지 않는다. 가 오면 \"처리 중 · {작업명}\"으로 표시한다. 가 오면 각 tool row를 done/error로 갱신한다. 노트북/커리큘럼 작성 중에는 \"YAML을 섹션 카드와 실행 셀로 변환\", \"{blockId} 셀 내용 반영\", \"{package}를 uv로 설치\"처럼 현재 상태를 문장으로 보여준다. raw payload는 기본 노출하지 않고, 필요할 때 / 으로 펼쳐 본다. 7. Trace와 평가 모든 turn은 를 가진다. tool payload에는 , , , , , , , 을 붙인다. response의 와 는 평가 harness의 입력으로 쓴다. response의 은 사용자가 읽을 수 있는 단계 품질 평가에 쓴다. streaming 중 provider 오류는 event와 trace 로 남긴다. golden case는 명시적으로 허용한 경우가 아니면 policy violation이 1건이라도 있으면 실패다. 새 provider 동작을 추가하면 golden case가 tool 순서, workloop 라벨, YAML contract 산출 여부를 검증해야 한다. 코드 경계 router가 셀 맥락 조립, tool round 실행, tool payload 포맷을 직접 소유하면 금방 덕지덕지 붙는다. provider loop의 판단 재료와 workloop 표시 payload는 패키지에서 관리한다. Tool Map | 단계 | Tool | 역할 | | | | | | 환경 확인 | | 필요한 Python 패키지 설치 여부 확인 | | 환경 준비 | | 누락된 패키지만 설치 | | YAML 전개 | | 커리큘럼 YAML을 학습 셀 document로 변환 | | 셀 읽기 | | 현재 셀 구조와 내용을 확인 | | 셀 수정 | | 셀 단위 삽입/수정/삭제 | | 셀 호출 | | 실행 또는 검증 | | 변수 확인 | | 런타임 변수 상태 확인 | 실패 기준 학습 요청을 긴 채팅 답변만으로 끝내면 실패다. YAML을 만들고도 커리큘럼 화면에 반영하지 않으면 실패다. 필요한 패키지를 확인하지 않고 실행 셀부터 만들면 실패다. 모호한 학습 요청에 대해 필요한 질문 없이 바로 길고 복잡한 커리큘럼을 만들면 실패다. 셀 역할을 보지 않고 설명 셀에 실행 코드를 쓰면 실패다. tool call을 raw JSON 로그처럼 항상 노출하면 실패다. 관련 [[frontend product surface]] [[learning yaml contract]] [[curriculum registry]] [[ai integration]]",
     "category": "architecture"
   },
   {
@@ -84,15 +108,15 @@ export const searchEntries = [
     "title": "파일 포맷 — Percent Format (.py)",
     "description": "Percent-format notebook conventions that keep files executable as Python.",
     "url": "/codaro/docs/skills/identity/percent-format",
-    "text": "파일 포맷: Percent Format (.py) Codaro의 기본 저장 포맷은 Percent Format이다. , 주석이 셀 경계를 구분한다. 코드는 모듈 레벨 (들여쓰기 0칸). 함수로 감싸지 않는다. 로 그대로 실행 가능하다. VS Code, Spyder, Jupytext가 동일한 포맷을 인식한다. reactive app/ipynb 호환 import/export는 유지한다. 관련 [[document model]] — 블록 중심 내부 모델 [[transparent scope isolation]] — 셀이 모듈 레벨에서 실행되는 의미",
+    "text": "파일 포맷: Percent Format (.py) Codaro의 기본 저장 포맷은 Percent Format이다. , 주석이 셀 경계를 구분한다. 코드는 모듈 레벨 (들여쓰기 0칸). 함수로 감싸지 않는다. 로 그대로 실행 가능하다. VS Code, Spyder, Jupytext가 동일한 포맷을 인식한다. ipynb 호환 import/export는 유지한다. 관련 [[document model]] — 블록 중심 내부 모델 [[transparent scope isolation]] — 셀이 모듈 레벨에서 실행되는 의미",
     "category": "identity"
   },
   {
     "kind": "docs",
-    "title": "실행 환경 — Pyodide 기본, 로컬 확장",
-    "description": "Runtime policy for Pyodide-first execution with optional local expansion.",
-    "url": "/codaro/docs/skills/identity/pyodide-first-runtime",
-    "text": "실행 환경: Pyodide 기본, 로컬 확장 Pyodide(브라우저)가 기본 실행 플랫폼 이다. 모든 학습 콘텐츠가 Pyodide에서 동작한다. 로컬(서버 커널)은 Pyodide의 모든 것 + 추가 자동화 를 제공한다. 실제 파일 I/O, 패키지 자동 설치, DB 연결, 무거운 ML, 로컬 AI(Ollama). 프론트엔드는 서버 커널 우선 → Pyodide 폴백으로 동작한다. 편집기 코드가 실행 엔진의 구현을 직접 알지 않는다. 관련 [[execution engine]] — 교체 가능한 엔진 인터페이스 [[mounting and integration]] — createServerApp 마운팅",
+    "title": "실행 환경 — 로컬 기본",
+    "description": "Runtime policy for Codaro local learning curricula.",
+    "url": "/codaro/docs/skills/identity/local-first-runtime",
+    "text": "실행 환경: 로컬 기본 Codaro local Python이 기본 실행 플랫폼 이다. 모든 커리큘럼 YAML은 로컬 파일 I/O, 로컬 패키지, 로컬 커널 출력을 기준으로 작성한다. 브라우저 전용 패키지 설치, WebAssembly 전용 API, 앱 마운트 전용 블록을 커리큘럼 계약에 넣지 않는다. 편집기 코드는 실행 엔진의 구현을 직접 알지 않고 capability surface만 호출한다. 관련 [[execution engine]] — 교체 가능한 엔진 인터페이스 [[mounting and integration]] — createServerApp 마운팅",
     "category": "identity"
   },
   {
@@ -100,7 +124,7 @@ export const searchEntries = [
     "title": "학습 시스템 3기둥",
     "description": "Notebook, curriculum, and learning philosophy pillars for Codaro education.",
     "url": "/codaro/docs/skills/identity/learning-three-pillars",
-    "text": "학습 시스템 3기둥 기둥 1: 노트북 기능 — 학습의 실행 환경. 셀 편집/실행/리액티브/분할/병합. 기둥 2: 뼈대 커리큘럼 — 의 YAML 기반 130+ 레슨. 카테고리/레슨/미션/진행 추적. 정적 레슨뿐 아니라 AI가 채팅에서 만든 임시 curriculum YAML도 같은 변환기( )를 통과해 학습 에디터 셀이 된다. 사용자가 커리큘럼을 먼저 고르지 않아도, AI가 YAML 명세를 만들고 로 에디터에 보낸 뒤 셀 단위 실행/검증을 이어간다. 기둥 3: 학습 사상 — 코드로 정의된 교육 철학. AI도 사람도 이 사상을 따른다. 최소 설명, 최대 실행 빈칸부터 시작 (빈 셀이 아니라 거의 완성된 코드에서 빈칸 채우기) 예측 → 검증 (먼저 예측하게 하고 실행으로 확인) 오류는 학습 (일부러 버그가 있는 코드를 주고 고치게 한다) 점진적 빌드 (한 셀에 한 개념, 쌓아가며 완성) 수정 실험 (\"이 값을 바꿔보세요\") 3단계 힌트 (개념 → 구조 → 정답, 바로 답을 주지 않는다) 즉시 피드백 (맞았는지 1초 안에) 반복 변주 (같은 개념을 다른 상황에서) 실제 맥락 (추상적 예제가 아니라 현실 상황) 제품 학습 흐름 학습의 기본 진입은 의 Chat first AI workbench다. AI가 없을 때는 의 reference curriculum YAML을 같은 변환기로 열어 학습한다. AI가 있을 때는 같은 YAML/셀 구조 위에서 개인화, 추가 설명, 답 검증, 보충 셀 생성이 붙는다. 관련 [[ai integration]] — AI가 같은 사상으로 가르친다 [[multi editor modes]] — 학습 에디터 모드 [[curriculum registry]] — 기본 curriculum YAML의 제품 자산 경계",
+    "text": "학습 시스템 3기둥 기둥 1: 노트북 기능 — 학습의 실행 환경. 셀 편집/실행/리액티브/병합. 기둥 2: 뼈대 커리큘럼 — 의 YAML 기반 130+ 레슨. 카테고리/레슨/미션/진행 추적. 정적 레슨뿐 아니라 AI가 채팅에서 만든 임시 curriculum YAML도 같은 변환기( )를 통과해 커리큘럼 학습 셀이 된다. 사용자가 커리큘럼을 먼저 고르지 않아도, AI가 YAML 명세를 만들고 로 커리큘럼 표면에 학습 셀을 전개한 뒤 셀 단위 실행/검증을 이어간다. 기둥 3: 학습 사상 — 코드로 정의된 교육 철학. AI도 사람도 이 사상을 따른다. 최소 설명, 최대 실행 빈칸부터 시작 (빈 셀이 아니라 거의 완성된 코드에서 빈칸 채우기) 예측 → 검증 (먼저 예측하게 하고 실행으로 확인) 오류는 학습 (일부러 버그가 있는 코드를 주고 고치게 한다) 점진적 빌드 (한 셀에 한 개념, 쌓아가며 완성) 수정 실험 (\"이 값을 바꿔보세요\") 3단계 힌트 (개념 → 구조 → 정답, 바로 답을 주지 않는다) 즉시 피드백 (맞았는지 1초 안에) 반복 변주 (같은 개념을 다른 상황에서) 실제 맥락 (추상적 예제가 아니라 현실 상황) 제품 학습 흐름 학습의 진입은 두 가지다. 채팅에서 시작 — 사용자가 목표를 말하면 AI가 curriculum YAML을 만들고 학습 셀로 전개한다. 커리큘럼에서 바로 시작 — 의 기본 레슨을 선택해 AI 없이도 바로 학습한다. AI가 없을 때는 의 reference curriculum YAML을 같은 변환기로 열어 학습한다. AI가 있을 때는 같은 YAML/셀 구조 위에서 개인화, 추가 설명, 답 검증, 보충 셀 생성이 붙는다. 학습 셀 모델 물리 셀 타입은 적게 유지한다. 기본은 과 이며, 다음 의미는 셀 메타데이터로 표현한다. : title, explanation, learning, snippet, exercise, check, visual, automation, skill : title, hero, prose, callout, cardGrid, comparison, table, media, resource, practice, quiz, centerText : python, browser, os, mouse, image, task, skill : YAML 원본 의미를 보존하는 구조화 데이터 이 구조를 쓰면 AI는 같은 셀 모델을 읽고 수정하면서도, 화면은 타이틀셀/설명셀/학습셀/스니펫셀/실행셀/시각화셀처럼 다양하게 표현할 수 있다. 커리큘럼 표면은 YAML의 을 버리지 않는다. 는 읽기 카드, 는 카드 그리드, 은 비교 카드, 은 실습 카드, 은 표 셀, 는 미디어 셀, 는 검증/힌트 셀로 렌더링한다. 즉 셀의 물리 타입을 계속 늘리는 방식이 아니라, YAML 의미를 과 에 보존하고 커리큘럼 렌더러가 학습용 카드로 해석한다. 이 구조 때문에 AI도 같은 셀을 읽고 설명, 힌트, 답 확인, 셀 수정 요청을 셀 단위로 처리할 수 있다. 관련 [[ai integration]] — AI가 같은 사상으로 가르친다 [[multi editor modes]] — 채팅, 에디터, 커리큘럼, 자동화 제품 표면 [[curriculum registry]] — 기본 curriculum YAML의 제품 자산 경계",
     "category": "identity"
   },
   {
@@ -108,7 +132,7 @@ export const searchEntries = [
     "title": "AI 통합 원칙",
     "description": "Optional teacher integration rules that keep assistance transparent and inspectable.",
     "url": "/codaro/docs/skills/identity/ai-integration",
-    "text": "AI 통합 원칙 AI 없이도 모든 학습이 완전히 동작 한다. AI는 선택적 확장이다. AI가 붙으면 편집기의 기존 API를 도구(tool use)로 사용 해서 가르친다. : 설명/예시/힌트 셀 삽입 : 학생 코드 실행 후 결과 검증 : 변수 상태 확인 : 피드백 추가 , : 교육 환경 자동 설정 AI는 에서 학습 사상을 읽고 동일한 철학으로 가르친다. 커리큘럼에 없는 주제도 같은 사상(빈칸→수정→작성, 3단계 힌트, 즉시 피드백)으로 생성한다. AI Provider는 교체 가능: GPT(OAuth), Ollama(로컬), Claude, 또는 없음. YAML 우선 학습 작업대 절차 AI가 학습 흐름을 만들 때 기본값은 기존 커리큘럼 선택이 아니라 의 채팅에서 작업대를 생성 하는 것이다. 사용자가 \"pandas 3일 과정 만들어줘\"처럼 말하면 아래 절차를 따른다. 1. 읽기 — , , 로 현재 에디터 상태와 실행 상태를 확인한다. 2. YAML 작성 — , , , 구조의 curriculum YAML을 먼저 만든다. 커리큘럼 파일이 없어도 이 YAML이 임시 학습 명세가 된다. 3. 에디터 전개 — 을 호출해 YAML을 변환기로 보내고, 결과 document를 editor의 learning workbench에 로드한다. 4. 셀 단위 수정 — 추가 설명, 빈칸, 예측, 체크 셀은 로 한 셀씩 삽입/수정/삭제한다. 5. 셀 단위 호출 — 실행과 검증은 을 기본으로 한다. 하위 호환이 필요할 때만 , 를 직접 쓴다. 6. 진행 기록 — 주제 단위 완료, 반복 실패, 숙련도 변화는 로 남긴다. 이 절차의 핵심은 \"YAML이 커리큘럼 SSOT, 에디터가 실행 표면, 툴콜이 셀별 조작 로그\"라는 구조다. AI 응답 텍스트가 커리큘럼이 아니라, YAML과 셀 툴콜이 실제 학습 상태를 만든다. 여기서 는 제품 표면 폴더명이다. 제품 내부의 실행/학습 단위는 workbench, notebook, cell로 부른다. Tool lane 계약 : — YAML 학습 명세를 runnable cells로 materialize. : , , — 현재 셀/런타임/화면 상태 읽기. : , , , , 학습 생성 툴 — 에디터와 워크스페이스 변경. : , , — 특정 셀 실행/검증. : — 학습 완료/숙련도 기록. DartLab 참고 구조 DartLab의 작업대는 tool lifecycle을 로 분리하고, tool call id에 refs/artifacts/workloop UI를 연결한다. Codaro도 같은 방향으로 간다. 단, Codaro의 기본 artifact는 일반 파일이 아니라 학습 에디터 셀과 YAML curriculum spec 이다. 따라서 Codaro 작업대 UI는 최종 답변보다 tool lane, cell id, 실행 결과, 변환된 YAML document를 더 중요하게 보여준다. 사용자는 \"AI가 뭐라고 말했는지\"보다 \"어떤 셀이 만들어졌고 어떤 셀이 실행/검증됐는지\"를 확인할 수 있어야 한다. 관련 [[learning three pillars]] — 학습 사상 SSOT [[ai sensory system]] — AI에게 눈/귀/손을 주는 별도 축 [[ai transparency]] — AI 실제 본 데이터 노출 원칙",
+    "text": "AI 통합 원칙 AI 없이도 모든 학습이 완전히 동작 한다. AI는 선택적 확장이다. AI가 붙으면 편집기의 기존 API를 도구(tool use)로 사용 해서 가르친다. : 설명/예시/힌트 셀 삽입 : 학생 코드 실행 후 결과 검증 : 변수 상태 확인 : 피드백 추가 , : 교육 환경 자동 설정 AI는 에서 학습 사상을 읽고 동일한 철학으로 가르친다. 커리큘럼에 없는 주제도 같은 사상(빈칸→수정→작성, 3단계 힌트, 즉시 피드백)으로 생성한다. AI Provider는 교체 가능: GPT(OAuth), Ollama(로컬), Claude, 또는 없음. YAML 우선 학습 절차 AI가 학습 흐름을 만들 때 기본값은 의 채팅에서 커리큘럼을 생성 하는 것이다. 사용자가 \"pandas 3일 과정 만들어줘\"처럼 말하면 아래 절차를 따른다. 1. 읽기 — , , 로 현재 에디터 상태와 실행 상태를 확인한다. 2. YAML 작성 — , , , 구조의 curriculum YAML을 먼저 만든다. 커리큘럼 파일이 없어도 이 YAML이 임시 학습 명세가 된다. 3. 커리큘럼 전개 — 을 호출해 YAML을 변환기로 보내고, 결과 document를 커리큘럼 학습 셀로 로드한다. 4. 셀 단위 수정 — 추가 설명, 빈칸, 예측, 체크 셀은 로 한 셀씩 삽입/수정/삭제한다. 5. 셀 단위 호출 — 실행과 검증은 을 기본으로 한다. 하위 호환이 필요할 때만 , 를 직접 쓴다. 6. 진행 기록 — 주제 단위 완료, 반복 실패, 숙련도 변화는 로 남긴다. 이 절차의 핵심은 \"YAML이 커리큘럼 SSOT, 셀이 실행/학습 단위, tool call이 셀별 조작 로그\"라는 구조다. AI 응답 텍스트가 커리큘럼이 아니라, YAML과 셀 단위 조작이 실제 학습 상태를 만든다. 여기서 는 제품 표면 폴더명이다. 사용자에게 보이는 표면은 채팅, 에디터, 커리큘럼, 자동화이며, 내부 실행/학습 단위는 notebook과 cell이다. Tool action 계약 : — YAML 학습 명세를 runnable cells로 materialize. : , , — 현재 셀/런타임/화면 상태 읽기. : , , , , 학습 생성 툴 — 노트북과 제품 상태 변경. : , , — 특정 셀 실행/검증. : — 학습 완료/숙련도 기록. DartLab 참고 구조 DartLab의 tool UI는 tool lifecycle을 로 분리하고, tool call id에 refs/artifacts/workloop UI를 연결한다. Codaro도 tool lifecycle은 참고한다. 단, Codaro의 기본 artifact는 일반 파일이 아니라 커리큘럼 학습 셀과 YAML curriculum spec 이다. 따라서 Codaro는 최종 답변보다 cell id, 실행 결과, 변환된 YAML document, 적용 대기 중인 diff를 더 중요하게 다룬다. 사용자는 \"AI가 뭐라고 말했는지\"보다 \"어떤 셀이 만들어졌고 어떤 셀이 실행/검증됐는지\"를 먼저 확인할 수 있어야 한다. tool action 로그는 기본 학습 패널이 아니라 필요한 때 열어보는 세부 기록이다. 관련 [[learning three pillars]] — 학습 사상 SSOT [[ai sensory system]] — AI에게 눈/귀/손을 주는 별도 축 [[ai transparency]] — AI 실제 본 데이터 노출 원칙",
     "category": "identity"
   },
   {
@@ -121,18 +145,18 @@ export const searchEntries = [
   },
   {
     "kind": "docs",
-    "title": "자동화 + 태스크 + 리포트",
-    "description": "Automation, task, and report concepts for Codaro workflows.",
+    "title": "자동화 + 태스크",
+    "description": "Automation, task, and execution-result concepts for Codaro workflows.",
     "url": "/codaro/docs/skills/identity/automation-tasks-reports",
-    "text": "자동화 + 태스크 + 리포트 사용자가 작성하거나 AI가 생성한 Python 문서(.py)는 그 자체가 실행 가능한 태스크 가 된다. 태스크는 스케줄(@every 5m, @daily 등)에 자동 실행되거나, 웹훅으로 외부 트리거되거나, 수동 실행할 수 있다. 여러 태스크를 의존성(DAG)으로 묶은 워크플로우 가 가능하다. 모든 자동화 액션은 감사 로그 (audit trail, JSONL)에 기록된다. 태스크 실행 결과(변수, stdout, 에러)는 리포트로 조회 가능하다. 비상 정지(E Stop) 가 모든 자동화를 즉시 중단시킨다. 관련 [[external channels mobile]] — Webhook/Slack 트리거 [[multi editor modes]] — 리포트 뷰어 모드 [[percent format]] — .py가 곧 태스크",
+    "text": "자동화 + 태스크 사용자가 작성하거나 AI가 생성한 Python 문서(.py)는 그 자체가 실행 가능한 태스크 가 된다. 자동화 표면은 에디터에서 만든 셀 조합과 스크립트를 모아두는 곳이다. 는 기본 제공 템플릿, 는 사용자가 만든 자동화다. 태스크는 스케줄(@every 5m, @daily 등)에 자동 실행되거나, 웹훅으로 외부 트리거되거나, 수동 실행할 수 있다. 태스크는 자동화 스크립트를 몇 시 몇 분에 실행할지 정하는 예약 단위다. 여러 태스크를 의존성(DAG)으로 묶은 워크플로우 가 가능하다. 모든 자동화 액션은 감사 로그 (audit trail, JSONL)에 기록된다. 태스크 실행 결과(변수, stdout, 에러)는 리포트 산출물로 조회 가능하다. 리포트는 제품의 1급 표면이 아니라 자동화 결과를 읽기 좋게 보여주는 결과물이다. 비상 정지(E Stop) 가 모든 자동화를 즉시 중단시킨다. 셀 기반 자동화 자동화도 결국 셀 조합이다. Python 실행 셀에서 시작하되, 로 브라우저, OS, 마우스, 이미지, 태스크, 스킬 실행을 구분한다. 이렇게 해야 학습 셀, 실습 셀, 자동화 셀이 같은 notebook/cell 모델 위에서 이어진다. 관련 [[external channels mobile]] — Webhook/Slack 트리거 [[multi editor modes]] — 채팅, 에디터, 커리큘럼, 자동화 네 제품 표면 [[percent format]] — .py가 곧 태스크",
     "category": "identity"
   },
   {
     "kind": "docs",
-    "title": "다중 에디터 모드",
-    "description": "Multi-editor mode principles for notebook, app, and automation surfaces.",
+    "title": "제품 표면 모드",
+    "description": "Product surface principles for chat, editor, curriculum, and automation.",
     "url": "/codaro/docs/skills/identity/multi-editor-modes",
-    "text": "다중 에디터 모드 Codaro의 제품 표면은 이고, 그 안에서 하나의 런타임 위에 여러 얼굴 을 가진다. 코드 에디터 : 셀 편집 + 실행 + 리액티브 데이터플로우. 개발자의 작업 공간. 학습 에디터 : 커리큘럼 브라우저 + 가이드 카드 + 퀴즈 + 성취 추적. 학습자의 교실. 리포트/앱 에디터 : 코드는 숨기고 출력만 표시. 대시보드, 프레젠테이션, 자동화 결과 뷰어. 세 모드 모두 같은 문서 모델, 같은 실행 엔진, 같은 API 위에서 동작한다. 사용자는 대화로 학습 → 에디터에서 코드 작성 → 태스크로 등록 → 스케줄 자동 실행 → 결과 리포트 확인의 연속 워크플로우 를 가진다. 제품 흐름에서의 editor 위치 는 Codaro 제품 표면 폴더명이다. 제품 내부에서는 materialized notebook/workbench를 실행하고 수정한다. 기본 진입은 Chat first AI workbench다. AI가 만든 YAML curriculum이 learning editor에 셀로 전개되고, 사용자는 그 셀을 실행/수정/검증한다. 같은 문서는 코드 모드에서는 노트북, 학습 모드에서는 수업, 자동화 모드에서는 태스크 원본, 리포트 모드에서는 출력 대시보드가 된다. 기존 Svelte 편집기는 현재 제품 판단 기준이 아니다. 새 제품 판단 기준은 다. 관련 [[learning three pillars]] — 학습 모드의 콘텐츠 [[automation tasks reports]] — 리포트 모드의 데이터 [[widget bridge]] — 모드별 위젯 렌더링",
+    "text": "제품 표면 모드 Codaro의 제품 표면은 이고, 사용자에게 보이는 1급 표면은 네 개다. 채팅 : 기본 진입점. 학습, 코드, 자동화 목표를 자연어로 말한다. 에디터 : 빈 노트북. Python 셀과 Markdown 셀에서 직접 작성하고 실행한다. 커리큘럼 : 순수 학습 공간. Codaro 커리큘럼과 나만의 커리큘럼을 학습 셀 카드로 읽고 실행한다. 자동화 : 에디터에서 만든 셀 조합과 스크립트를 모으고, 태스크로 예약 실행한다. 네 표면 모두 같은 문서 모델, 같은 실행 엔진, 같은 API 위에서 동작한다. 사용자는 대화로 학습 → 커리큘럼 셀에서 공부 → 에디터에서 코드 작성 → 자동화로 등록 → 태스크 예약 실행의 연속 흐름 을 가진다. 제품 흐름에서의 위치 는 Codaro 제품 표면 폴더명이다. 기본 진입은 채팅이다. 에디터는 빈 노트북에서 시작한다. 이상한 예제 셀이나 스니펫을 기본으로 넣지 않는다. AI가 만든 YAML curriculum은 커리큘럼 표면에서 학습 셀로 전개되고, 사용자는 그 셀을 실행/수정/검증한다. 같은 문서는 에디터에서는 노트북, 커리큘럼에서는 학습 실행 단위, 자동화에서는 태스크 원본이 된다. 리포트는 별도 1급 표면이 아니라 자동화/태스크 실행 결과의 산출물이다. 기존 Svelte 편집기는 현재 제품 판단 기준이 아니다. 새 제품 판단 기준은 다. 분할 모드는 제품의 1급 표면이 아니다. 관련 [[learning three pillars]] — 학습 모드의 콘텐츠 [[automation tasks reports]] — 자동화, 태스크, 실행 결과 산출물 [[widget bridge]] — 모드별 위젯 렌더링",
     "category": "identity"
   },
   {
@@ -155,23 +179,31 @@ export const searchEntries = [
     "kind": "docs",
     "title": "브랜딩 + 프론트 톤",
     "description": "Branding rules for Codaro identity, assets, and product language.",
-    "url": "/codaro/docs/skills/ops/branding",
-    "text": "브랜딩 원칙 Codaro는 다른 노트북의 \"대체재\"로 소개하지 않는다. 설명 기준: programmable studio interactive editor runtime code, learning, automation 다른 앱이 올라가는 기반 레이어로 보이게 설계한다. 프론트/브랜드 확정 규칙 Codaro 제품 UI 언어는 영어만 사용한다. index, editor, app mode, docs, docs writing 모두 영어 기준이다. 모든 공용 컴포넌트 톤은 계열을 기본으로 한다. 편집기와 학습기 제품 UI는 패턴을 기본으로 사용한다. 는 React + shadcn/ui 기반의 Codaro 제품 표면이다. 폐기된 Svelte 편집기는 현재 제품 기준에서 제외한다. 기본 avatar와 favicon source는 의 첫 번째 왼쪽 pose다. pose sheet source는 , 다. 아바타는 항상 배경 제거 후 캐릭터만 사용한다. Codaro 이름, 아바타, 마스코트, 로고, pose sheet, 브랜드 자산은 기준으로 전권 보유한다. 교육 콘텐츠 라이선스는 브랜드 자산 재사용 권한을 주지 않는다. 제품 favicon/avatar source는 다. 제품 색상/반지름/테두리 source of truth는 의 shadcn token layer다. GitHub Pages 문서 표면은 Svelte로 운영한다. 문서와 글쓰기는 기준의 같은 Svelte 표면에서 운영한다. 브랜드 자산 운영 마스코트 원본은 아래에 둔다. 실제 서비스 반영 파일은 제품 표면별 static/public 경로로 export한다. GitHub에 같이 올려서 브랜딩 자산도 저장소 이력으로 관리한다. 아바타는 얼굴 중심 정사각 크롭을 기본으로 하며, 눈과 입이 살아 있어야 한다. 파비콘은 얼굴 전체나 책 전체를 그대로 축소하지 않고 머리 실루엣, 새싹, 눈 같은 핵심 요소만 남긴 단순 버전을 쓴다. 앱 아이콘은 파비콘보다 디테일을 허용하지만 128, 180, 512 기준으로 따로 검토한다. 브랜드 작업 순서는 원본 저장 → 작업본 생성 → 확정본 export → 프론트 적용이다.",
+    "url": "/codaro/docs/skills/ops/product/branding",
+    "text": "브랜딩 원칙 Codaro는 다른 노트북의 \"대체재\"로 소개하지 않는다. 설명 기준: programmable studio interactive editor runtime code, learning, automation 다른 앱이 올라가는 기반 레이어로 보이게 설계한다. 프론트/브랜드 확정 규칙 Codaro 제품 UI 언어는 한국어를 기본으로 한다. 사용자 facing label, 안내문, 빈 상태, 버튼, 패널 제목은 한국어가 기본이다. 코드 식별자, 라이브러리명, 파일 포맷, API 이름처럼 번역하면 의미가 흐려지는 기술 명칭은 원어를 유지할 수 있다. 모든 공용 컴포넌트 톤은 계열을 기본으로 한다. 편집기와 학습기 제품 UI는 패턴을 기본으로 사용한다. 는 React + shadcn/ui 기반의 Codaro 제품 표면이다. 폐기된 Svelte 편집기는 현재 제품 기준에서 제외한다. 기본 avatar와 favicon source는 의 첫 번째 왼쪽 pose다. pose sheet source는 , 다. 아바타는 항상 배경 제거 후 캐릭터만 사용한다. Codaro 이름, 아바타, 마스코트, 로고, pose sheet, 브랜드 자산은 기준으로 전권 보유한다. 교육 콘텐츠 라이선스는 브랜드 자산 재사용 권한을 주지 않는다. 제품 favicon/avatar source는 다. 제품 색상/반지름/테두리 source of truth는 의 shadcn token layer다. GitHub Pages 문서 표면은 Svelte로 운영한다. 문서와 글쓰기는 기준의 같은 Svelte 표면에서 운영한다. 브랜드 자산 운영 마스코트 원본은 아래에 둔다. 실제 서비스 반영 파일은 제품 표면별 static/public 경로로 export한다. GitHub에 같이 올려서 브랜딩 자산도 저장소 이력으로 관리한다. 아바타는 얼굴 중심 정사각 크롭을 기본으로 하며, 눈과 입이 살아 있어야 한다. 파비콘은 얼굴 전체나 책 전체를 그대로 축소하지 않고 머리 실루엣, 새싹, 눈 같은 핵심 요소만 남긴 단순 버전을 쓴다. 앱 아이콘은 파비콘보다 디테일을 허용하지만 128, 180, 512 기준으로 따로 검토한다. 브랜드 작업 순서는 원본 저장 → 작업본 생성 → 확정본 export → 프론트 적용이다.",
+    "category": "ops"
+  },
+  {
+    "kind": "docs",
+    "title": "운영 규칙 인덱스",
+    "description": "Category index for Codaro operational rules.",
+    "url": "/codaro/docs/skills/ops",
+    "text": "운영 규칙 인덱스 운영 문서는 아래에 두되, 평면 목록으로 늘리지 않는다. 새 운영 문서는 아래 네 카테고리 중 하나에 넣고, 이 인덱스와 상위 를 함께 갱신한다. Foundation 실행 환경, 코드 품질, 테스트 gate, AI 기능의 투명성처럼 모든 작업 전에 적용되는 기본 규칙. Workflow 실험, 문서 유지보수, 참고 구현 검토처럼 작업을 진행하고 이어받는 방식. Release Git, 릴리즈, 라이선스, 패키징처럼 외부 배포와 권리 경계에 닿는 규칙. Product 사용자에게 보이는 제품 정체성과 브랜드 자산 규칙. Tools 는 운영 문서가 아니라 문서 동기화와 검증을 돕는 스크립트 위치다. 사용법은 관련 문서에서 명시한다.",
     "category": "ops"
   },
   {
     "kind": "docs",
     "title": "실행 환경 + 인코딩",
     "description": "Environment requirements for Python, uv, and local execution.",
-    "url": "/codaro/docs/skills/ops/environment",
-    "text": "실행 환경 규칙 PowerShell 메인 가상환경은 프로젝트 루트 를 사용한다. WSL에서는 루트 를 공유하지 않는다. WSL 전용 가상환경이 필요하면 을 사용한다. Python 3.12 이상과 를 기준으로 한다. Node.js는 문서 표면과 제품 표면 작업에 필요하다. 실행 인코딩 규칙 Python 실행은 기본적으로 형태를 사용한다. PowerShell에서 인코딩이 의심되면 실행 전에 아래를 적용한다. 파일 읽기/쓰기 명령은 가능한 한 UTF 8을 명시한다. 모든 텍스트 파일은 UTF 8을 기본으로 유지한다. 로컬 산출물 위생 프로젝트 루트는 임시 로그/스크린샷/캐시/세션 파일을 쓰는 장소가 아니다. 백그라운드 서버를 띄울 때 , , , , 를 루트나 앱 루트에 만들지 않는다. stdout/stderr 리다이렉트가 필요하면 아래를 우선 사용한다. 보존이 필요 없는 로컬 산출물은 삭제한다. 보존이 꼭 필요하면 레포 밖 아래를 사용한다. Playwright CLI는 레포 루트에서 실행하지 않는다. 브라우저 산출물이 필요하면 임시 작업 폴더나 를 사용한다. 백그라운드 프로세스를 띄운 작업은 종료 전 반드시 프로세스를 정리하고, 루트에 와 가 남지 않았는지 확인한다. 주요 명령 프론트 표면 실행 — 실제 제품 UI 표면. React + shadcn/ui 기준. — GitHub Pages 문서와 블로그 표면. 폐기된 Svelte 편집기는 현재 저장소의 실행 표면으로 보지 않는다. 제품 프론트를 반복 개발할 때는 를 기준으로 본다.",
+    "url": "/codaro/docs/skills/ops/foundation/environment",
+    "text": "실행 환경 규칙 PowerShell 메인 가상환경은 프로젝트 루트 를 사용한다. WSL에서는 루트 를 공유하지 않는다. WSL 전용 가상환경이 필요하면 을 사용한다. Python 3.12 이상과 를 기준으로 한다. Node.js는 문서 표면과 제품 표면 작업에 필요하다. 실행 인코딩 규칙 Python 실행은 기본적으로 형태를 사용한다. PowerShell에서 인코딩이 의심되면 실행 전에 아래를 적용한다. 파일 읽기/쓰기 명령은 가능한 한 UTF 8을 명시한다. 모든 텍스트 파일은 UTF 8을 기본으로 유지한다. 로컬 산출물 위생 프로젝트 루트는 임시 로그/스크린샷/캐시/세션 파일을 쓰는 장소가 아니다. 백그라운드 서버를 띄울 때 , , , , 를 루트나 앱 루트에 만들지 않는다. stdout/stderr 리다이렉트가 필요하면 아래를 우선 사용한다. 보존이 필요 없는 로컬 산출물은 삭제한다. 보존이 꼭 필요하면 레포 밖 아래를 사용한다. Playwright CLI는 레포 루트에서 실행하지 않는다. 브라우저 산출물이 필요하면 임시 작업 폴더나 를 사용한다. 백그라운드 프로세스를 띄운 작업은 종료 전 반드시 프로세스를 정리하고, 루트에 와 가 남지 않았는지 확인한다. 주요 명령 패키지 설치 사용자가 에디터에서 라이브러리를 설치해도 내부 경로는 또는 세션 패키지 capability를 거쳐 로 실행한다. AI 교사 도구도 같은 경로를 사용한다. 로 누락 여부를 확인한 뒤 을 호출한다. 직접 명령을 문서, 테스트, UI 안내에 추가하지 않는다. 프론트 표면 실행 — 실제 제품 UI 표면. React + shadcn/ui 기준. — GitHub Pages 문서와 블로그 표면. 폐기된 Svelte 편집기는 현재 저장소의 실행 표면으로 보지 않는다. 제품 프론트를 반복 개발할 때는 를 기준으로 본다.",
     "category": "ops"
   },
   {
     "kind": "docs",
     "title": "코드 품질 원칙",
     "description": "Code quality rules for naming, exceptions, and maintainable changes.",
-    "url": "/codaro/docs/skills/ops/code-quality",
+    "url": "/codaro/docs/skills/ops/foundation/code-quality",
     "text": "코드 품질 원칙 파일/폴더/함수/변수는 , 클래스는 , 상수는 를 사용한다. 불필요한 캐시, 산출물, 백업성 폴더는 삭제한다. 보존이 필요한 자료만 명확한 제품 자산 위치로 옮긴다. 인라인 주석은 넣지 않는다. bare except ( ) 절대 금지 는 금지. 로깅 없는 삼킴은 허용하지 않는다. 사용 시 반드시: (1) 예외 변수 바인딩 ( ), (2) 최소 logger.debug 이상 로깅, (3) 좁힐 수 없는 사유가 명확해야 한다. 예외 타입은 가능한 한 좁힌다 (json.JSONDecodeError, OSError 등 구체 타입 우선). try except를 if else 대용으로 쓰지 않는다. asyncio.create task()에는 done callback을 붙여 예외를 수면 위로 올린다. dispose/cleanup 패턴은 를 사용한다. raise 시 원본 예외 체인을 유지한다 ( ). 사용자 입력 검증은 가능하면 early return으로 처리한다. ruff 린트 규칙 BLE001, S110, S112, TRY400이 pyproject.toml에 설정되어 있다. 정당한 면제는 주석으로 처리한다. 초기 단계일수록 \"대충 동작\"보다 \"계층이 맞는가\"를 우선한다.",
     "category": "ops"
   },
@@ -179,15 +211,23 @@ export const searchEntries = [
     "kind": "docs",
     "title": "AI 투명성 원칙",
     "description": "Transparency rules for assisted teaching and tool-visible work.",
-    "url": "/codaro/docs/skills/ops/ai-transparency",
-    "text": "AI 투명성 원칙 Codaro에 AI 기능을 붙일 때, 모델이 실제로 본 데이터는 UI에서 사용자에게 드러나야 한다. 시스템이 제공한 컨텍스트, 시스템 프롬프트, tool 호출과 결과는 숨기지 않는다. AI 표현을 바꾸려면 UI 임시 가공보다 원천 데이터 계층 개선을 우선한다. 소비자 계층은 원천 데이터를 읽기만 하고, 표시용 이름/정렬/단위를 임의로 재정의하지 않는다. 관련 [[ai integration]] — tool use surface [[ai sensory system]] — 감각계 출력도 동일 원칙",
+    "url": "/codaro/docs/skills/ops/foundation/ai-transparency",
+    "text": "AI 투명성 원칙 Codaro에 AI 기능을 붙일 때, 모델이 실제로 본 데이터는 사용자가 필요할 때 검토할 수 있어야 한다. 시스템이 제공한 컨텍스트, 시스템 프롬프트, tool 호출과 결과는 삭제하거나 위조하지 않는다. 다만 도구 호출 기록은 학습에 직접 도움이 되는 셀 설명, 변경 diff, 실행 결과로 먼저 요약한다. 기본 학습 화면에 기술 로그 전용 패널을 고정하지 않는다. AI 표현을 바꾸려면 UI 임시 가공보다 원천 데이터 계층 개선을 우선한다. 소비자 계층은 원천 데이터를 읽기만 하고, 표시용 이름/정렬/단위를 임의로 재정의하지 않는다. 관련 [[ai integration]] — tool use surface [[ai sensory system]] — 감각계 출력도 동일 원칙",
+    "category": "ops"
+  },
+  {
+    "kind": "docs",
+    "title": "테스트 단위 + Gate 운영",
+    "description": "Test gate policy for Codaro local verification and CI.",
+    "url": "/codaro/docs/skills/ops/foundation/testing-and-gates",
+    "text": "테스트 단위 + Gate 운영 테스트의 기준은 \"지금 통과하는가\"가 아니라 \"다음 변경이 이 동작과 경계를 깨면 자동으로 fail 하는가\"다. 새 테스트는 어떤 실패 표면을 막는지 분명해야 한다. 단위 Gate : 사람이 실행하고 CI가 호출하는 이름 붙은 검증 단위. source of truth는 다. Suite : gate 안에서 실행되는 pytest, npm, cargo 같은 도구별 묶음. Targeted test : 특정 계약을 빠르게 확인하는 파일/케이스 단위. 예: . Contract fixture : tool sequence, trace payload, schema처럼 결과 모양을 고정하는 입력/출력 자료. 명령 직접 를 금지하지는 않는다. 다만 PR 전 확인, CI, 세션 종료 검증은 gate 이름으로 남긴다. Gate 목록 | Gate | Tier | 역할 | | | | | | | fast | 운영 문서 포인터, gate 정의, CI 연결 상태를 확인한다. | | | fast | Python backend 전체 테스트를 실행한다. | | | fast | teacher tool policy, trace, golden eval 계약을 빠르게 확인한다. | | | surface | 제품 editor surface의 TypeScript/Vite build를 확인한다. | | | surface | 문서/landing surface의 static build를 확인한다. | | | release | launcher Rust crate의 type/build 계약을 확인한다. | | | release | launcher Rust crate 테스트를 직렬 실행한다. | 는 로컬 기본 확인이며 현재 와 를 실행한다. 가 전체 pytest를 포함하므로 은 빠른 집중 확인용으로 둔다. 추가 규칙 새 gate는 , 이 문서, CI 중 필요한 위치를 함께 갱신한다. 새 pytest 파일은 가능한 한 제품/도메인 경계를 드러내는 이름을 쓴다. teacher/tool 변경은 최소한 tool sequence, policy violation, workloop label, structured YAML contract 중 변경 표면 하나를 고정한다. 학습카드/YAML 변경은 backend materializer 테스트와 editor build를 함께 확인한다. 기존 부채를 새 테스트로 한 번에 해결하지 못하면 별도 baseline 또는 명시적 TODO 문서로 분리한다. CI YAML은 세부 명령을 소유하지 않고 만 호출한다.",
     "category": "ops"
   },
   {
     "kind": "docs",
     "title": "실험 규칙",
     "description": "Experiment policy for prototypes, validation, and production boundaries.",
-    "url": "/codaro/docs/skills/ops/experiment",
+    "url": "/codaro/docs/skills/ops/workflow/experiment",
     "text": "실험 규칙 실험은 반드시 아래에서만 한다. 실험 먼저 진행하고, 로직이 굳기 전에는 패키지 코드로 바로 들어가지 않는다. 실험별 하위 폴더를 분리한다. 예: 각 실험 폴더에는 를 둔다. 파일명은 숫자 접두사를 붙인다. 예: 실패한 실험도 지우지 말고 결론을 남긴다.",
     "category": "ops"
   },
@@ -195,7 +235,7 @@ export const searchEntries = [
     "kind": "docs",
     "title": "Git + 릴리즈 원칙",
     "description": "Git, commit, and release rules for Codaro changes.",
-    "url": "/codaro/docs/skills/ops/git-and-release",
+    "url": "/codaro/docs/skills/ops/release/git-and-release",
     "text": "Git 및 릴리즈 원칙 커밋, 주석, 문서 어디에도 AI 생성 흔적 문구를 남기지 않는다. 커밋 메시지와 커밋 본문에도 , , , , , 같은 흔적을 남기지 않는다. GitHub 원격 작업은 사용을 허용한다. 기본 원격 저장소는 이다. 릴리즈 시 에 변경 내용을 상세하게 기록한다. 배포는 GitHub Actions trusted publishing 기준을 유지한다. 버전 릴리즈는 흐름을 기준으로 한다.",
     "category": "ops"
   },
@@ -203,7 +243,7 @@ export const searchEntries = [
     "kind": "docs",
     "title": "라이선스 경계",
     "description": "Licensing boundaries for Codaro source code, learning content, and brand assets.",
-    "url": "/codaro/docs/skills/ops/licensing",
+    "url": "/codaro/docs/skills/ops/release/licensing",
     "text": "라이선스 경계 Codaro는 공개 학습과 검토를 허용하지만, 상업적 재사용을 허용하는 오픈소스 배포가 아니다. 기본 원칙 코드는 의 비상업 소스 라이선스를 따른다. 교육 콘텐츠는 의 CC BY NC SA 4.0 기준을 따른다. 브랜드 자산은 에 따라 전권 보유한다. 상업적 사용, 재판매, 유료 강의 편입, 호스팅 서비스 제공, 브랜드 재사용은 사전 서면 허가가 필요하다. 코드 개인 학습, 연구, 평가, 비상업 수정과 실행은 허용한다. 상업 제품, 유료 서비스, 내부 업무 플랫폼, 유료 교육 프로그램, 컨설팅 산출물 편입은 허용하지 않는다. 수정본을 비상업적으로 배포할 때도 같은 라이선스와 저작권 표시를 유지한다. 교육 콘텐츠 , , 의 학습 자료와 문서는 비상업 학습과 공유를 허용한다. 출처 표시, 변경 표시, 동일 조건 공유를 유지한다. 유료 강의, 부트캠프, 교재, 기업 교육, 유료 플랫폼 번들링은 허가 없이는 금지한다. 브랜드 Codaro 이름, 로고, 아바타, 마스코트, pose sheet, 아이콘, 시각 정체성은 콘텐츠 라이선스에 포함되지 않는다. 비상업 리뷰나 출처 표시는 가능하지만, 다른 제품의 정체성으로 쓰면 안 된다.",
     "category": "ops"
   },
@@ -211,7 +251,7 @@ export const searchEntries = [
     "kind": "docs",
     "title": "로컬 배포 bundle 원칙",
     "description": "Packaging rules for local distribution and bundled assets.",
-    "url": "/codaro/docs/skills/ops/packaging",
+    "url": "/codaro/docs/skills/ops/release/packaging",
     "text": "로컬 배포 bundle 원칙 최종 사용자 배포는 하나를 기준으로 한다. launcher는 embedded Python runtime과 manifest가 지정한 exact wheel 기반 curated bundle만 설치한다. launcher는 index에서 arbitrary latest package를 해석하거나 무제한 경로를 제품 기본으로 삼지 않는다. 같은 automation bundle은 Python package, helper runtime, capability probe, bootstrap을 launcher가 관리한다. 외부 앱과 드라이버 의존성은 별도 경계로 둔다. 예: 기반 Excel app automation은 launcher가 Python 쪽 의존성과 bootstrap을 관리하지만, Microsoft Excel 자체는 사용자가 설치해야 한다. 세부 배포 설계의 source of truth는 , 다.",
     "category": "ops"
   },
@@ -219,7 +259,7 @@ export const searchEntries = [
     "kind": "docs",
     "title": "문서 유지보수 + 세션 이어가기",
     "description": "Documentation and session rules for keeping project context aligned.",
-    "url": "/codaro/docs/skills/ops/doc-and-session",
+    "url": "/codaro/docs/skills/ops/workflow/doc-and-session",
     "text": "문서 유지보수 원칙 세션 시작 시 와 실제 코드 구조를 대조하고, 낡은 내용이 있으면 즉시 갱신한다. 파일/폴더 추가, 삭제, 이동이 있으면 관련 경로와 구조 설명을 함께 갱신한다. 삭제된 기능이나 파일에 대한 죽은 참조를 남기지 않는다. GitHub Pages 공개 문서는 를 기준으로 한다. 제품 운영 문서, 아키텍처 결정, API 성격의 설명은 별도 API 문서 트리를 만들지 않고 의 identity/architecture/ops 문서로 관리한다. 공개 글쓰기와 블로그성 콘텐츠는 루트 가 아니라 에 둔다. 공개 URL도 를 기준으로 한다. 하위의 장기 유지 폴더는 와 두 개만 둔다. , , , , 같은 폴더가 필요해지면 새 폴더를 만들기 전에 에 흡수한다. 기존 문서를 제거해야 할 때는 먼저 또는 에 흡수됐는지 확인하고, 사용자가 보관을 요구하지 않으면 삭제한다. 세션 이어가기 원칙 세션이 끝나도 다음 세션이 채팅 없이 바로 이어갈 수 있게 현재 결정, 진행 상태, 다음 액션, 남은 검증을 반드시 저장소 문서에 남긴다. 중간 상태의 TODO, blocker, diff는 채팅이 아니라 관련 기능 문서의 체크리스트로 남긴다. 작업이 여러 세션에 걸리면 가장 가까운 (또는 해당 모듈의 SKILL 파일)에 최소한 , , 를 갱신한다. 다음 세션은 먼저 프로젝트 메모리, 그다음 관련 기능 문서, 마지막으로 직전 수정 파일을 읽고 시작한다. 채팅 기록만 믿고 이어가지 않는다. 설계 결정과 남은 작업은 반드시 저장소 안 문서로 고정한다. 코드 변경이 있었는데 문서가 업데이트되지 않았다면 세션 종료 전에 문서를 먼저 맞춘다. 가 로컬 규칙의 SSOT이고, 는 를 먼저 읽으라는 진입점 포인터로 둔다. 포인터 검사는 로 수행한다.",
     "category": "ops"
   },
@@ -227,7 +267,7 @@ export const searchEntries = [
     "kind": "docs",
     "title": "참고 구현 사용 원칙",
     "description": "Reference implementation rules for borrowing patterns without coupling.",
-    "url": "/codaro/docs/skills/ops/reference-impl",
+    "url": "/codaro/docs/skills/ops/workflow/reference-impl",
     "text": "참고 구현 사용 원칙 참고 경로: 우선 참고할 영역: 그대로 복제하지 않는다. 먼저 메커니즘을 해부하고, Codaro 목적에 맞는 계층으로 재설계한 뒤 가져온다.",
     "category": "ops"
   },
@@ -236,7 +276,7 @@ export const searchEntries = [
     "title": "Codaro Skills",
     "description": "Codaro project rules and shared skill documents for humans and maintainers.",
     "url": "/codaro/docs/skills",
-    "text": "Codaro Skills Codaro의 사람 + AI 공용 SSOT. 한 마크다운 파일이 두 청중을 동시에 섬긴다 — 사람은 직접 읽고, AI는 같은 파일을 컨텍스트로 받는다. 문서 구조 결정 Codaro의 저장소 문서는 두 축만 둔다. — 제품 사상, 아키텍처, 운영 규칙의 SSOT. — 공개 글, 릴리즈 스토리, 긴 설명형 콘텐츠. — 문서가 아니라 제품이 읽는 기본 curriculum YAML 레지스트리. , , , , 같은 별도 문서 폴더는 유지하지 않는다. 필요한 내용은 , , 중 하나로 흡수한다. README는 외부 진입점이다. 제품 철학 전체를 README에 길게 복사하지 않고, 바로 시작 링크와 현재 공개 배포 상태만 둔다. 제품 사상 Codaro의 제품 표면은 다. 현재 는 React + shadcn/ui 기준이며, 기존 Svelte 편집기는 제품 기준에서 제외한다. 기본 흐름은 아래와 같다. 핵심 계약: YAML은 학습 설계도의 source of truth다. 기본 curriculum YAML은 에 둔다. Editor는 Codaro 제품 표면의 이름이다. 내부 실행 단위는 workbench/notebook/cell로 구분한다. Tool call은 숨겨진 내부 로그가 아니라 사용자가 검토할 수 있는 제품 액션이다. AI 없이도 기본 curriculum YAML로 학습이 가능해야 한다. AI가 붙으면 개인화, 셀 조율, 답 검증, 자동화 생성이 추가된다. DartLab에서 가져올 점 DartLab은 와 skills를 분리하고, AI가 읽을 작업 지식은 skills에 모은다. Codaro도 같은 원칙을 따르되 공개 사이트가 를 기준으로 동작하므로 루트 를 만들지 않고 를 유지한다. DartLab의 generated reference처럼 코드에서 자동 생성되는 API 표가 필요해지면 별도 를 만들지 말고 또는 아래의 생성 파일로 둔다. 각 스킬은 5필드 frontmatter를 가진다: Identity (11) — 절대 흔들리지 않는 사상 Architecture (7) — 5층 구조 Ops (10) — 운영 규칙 후속 (PR 2 이후) — 기존 src/codaro/ /DEV.md 본문 이관 — launcher/PRD.md 530줄 분할",
+    "text": "Codaro Skills Codaro의 사람 + AI 공용 SSOT. 한 마크다운 파일이 두 청중을 동시에 섬긴다 — 사람은 직접 읽고, AI는 같은 파일을 컨텍스트로 받는다. 문서 구조 결정 Codaro의 저장소 문서는 두 축만 둔다. — 제품 사상, 아키텍처, 운영 규칙의 SSOT. — 공개 글, 릴리즈 스토리, 긴 설명형 콘텐츠. — 문서가 아니라 제품이 읽는 기본 curriculum YAML 레지스트리. , , , , 같은 별도 문서 폴더는 유지하지 않는다. 필요한 내용은 , , 중 하나로 흡수한다. 운영 문서는 아래에서 다시 foundation, workflow, release, product 카테고리로 나눈다. README는 외부 진입점이다. 제품 철학 전체를 README에 길게 복사하지 않고, 바로 시작 링크와 현재 공개 배포 상태만 둔다. 제품 사상 Codaro의 제품 표면은 다. 현재 는 React + shadcn/ui 기준이며, 기존 Svelte 편집기는 제품 기준에서 제외한다. 제품은 네 개의 1급 표면으로 정리한다. 채팅 — 기본 진입점. 목표, 학습 요청, 자동화 요청을 자연어로 받는다. 에디터 — 빈 노트북에서 시작하는 실행/편집 표면. 기본 셀은 Python 셀과 Markdown 셀이고, 특수 셀은 메타데이터로 표현한다. 커리큘럼 — 순수 학습 공간. YAML과 AI가 만든 YAML을 학습 셀 카드로 펼친다. 자동화 — 에디터와 채팅에서 만든 셀 조합/스크립트를 모으고, 태스크로 예약 실행한다. 기본 흐름은 아래와 같다. 핵심 계약: YAML은 학습 설계도의 source of truth다. 기본 curriculum YAML은 에 둔다. 는 제품 프론트 폴더명이다. 사용자에게 보이는 표면 이름은 채팅, 에디터, 커리큘럼, 자동화다. 커리큘럼 셀은 물리 타입을 과도하게 늘리지 않는다. 기본은 markdown/code이고, 학습셀/타이틀셀/설명셀/실행셀/시각화셀 같은 의미는 , , , 로 표현한다. Tool call은 숨겨진 내부 로그가 아니라 사용자가 필요할 때 검토할 수 있는 제품 액션이다. 다만 학습 화면의 기본 정보 구조는 셀과 대화가 우선이다. AI 없이도 기본 curriculum YAML로 학습이 가능해야 한다. AI가 붙으면 개인화, 셀 조율, 답 검증, 자동화 생성이 추가된다. DartLab에서 가져올 점 DartLab은 와 skills를 분리하고, AI가 읽을 작업 지식은 skills에 모은다. Codaro도 같은 원칙을 따르되 공개 사이트가 를 기준으로 동작하므로 루트 를 만들지 않고 를 유지한다. DartLab의 generated reference처럼 코드에서 자동 생성되는 API 표가 필요해지면 별도 를 만들지 말고 또는 아래의 생성 파일로 둔다. 각 스킬은 5필드 frontmatter를 가진다: Identity (11) — 절대 흔들리지 않는 사상 Architecture (10) — 5층 구조 Ops (11) — 운영 규칙 Foundation: Workflow: Release: Product: 후속 (PR 2 이후) — 기존 src/codaro/ /DEV.md 본문 이관 — launcher/PRD.md 530줄 분할",
     "category": "skills"
   }
 ];

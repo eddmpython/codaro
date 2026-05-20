@@ -74,7 +74,31 @@ class TeacherTrace:
             "policyViolationCount": len(policyViolations),
             "policyViolations": list(normalizeToolPolicyViolations(event.payload for event in policyViolations)),
             "toolSequence": self.toolSequence(),
+            "workloop": self.workloopEvents(),
+            "yamlContractObserved": self.yamlContractObserved(),
         }
         if includeEvents:
             payload["events"] = [event.toPayload() for event in self.events]
         return payload
+
+    def workloopEvents(self) -> list[dict[str, Any]]:
+        return [
+            {
+                "eventType": event.eventType,
+                "toolName": event.payload.get("name"),
+                "status": event.payload.get("status"),
+                "workLabel": event.payload.get("workLabel"),
+                "workDetail": event.payload.get("workDetail"),
+                "elapsedMs": event.elapsedMs,
+            }
+            for event in self.events
+            if event.eventType in {"tool-start", "tool-result"}
+            and event.payload.get("workLabel")
+        ]
+
+    def yamlContractObserved(self) -> bool:
+        return any(
+            bool(event.payload.get("yamlContractObserved"))
+            for event in self.events
+            if event.eventType == "tool-result"
+        )

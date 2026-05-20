@@ -222,7 +222,7 @@ function AssistantWorkLoop({ steps }: { steps?: AssistantWorkStep[] }) {
   const hasError = steps.some((step) => step.status === "error");
   const toolSteps = steps.filter((step) => step.toolName);
   const label = runningStep
-    ? `처리 중 · ${runningStep.label}`
+    ? `처리 중 · ${[runningStep.label, runningStep.detail].filter(Boolean).join(" · ")}`
     : hasError
       ? `처리 확인 필요 · ${toolSteps.length || steps.length}건`
       : `처리 완료 · ${toolSteps.length || steps.length}건`;

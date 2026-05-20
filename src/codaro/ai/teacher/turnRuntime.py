@@ -8,6 +8,7 @@ from typing import Any, Callable
 from ..factory import createProvider
 from ..toolExecutor import ToolExecutor
 from ..types import LLMConfig
+from .clarificationPolicy import buildClarificationPlan
 from .teacherOrchestrator import TeacherOrchestrator
 from .turnSession import TeacherTurnSession, prepareTeacherTurn
 
@@ -98,13 +99,18 @@ def prepareTeacherRuntimeTurn(
     providerFactory: Callable[[LLMConfig], Any] = createProvider,
 ) -> TeacherRuntimeTurn:
     orchestrator = TeacherOrchestrator.fromContext(context)
+    contextMap = context if isinstance(context, dict) else {}
+    clarificationPlan = buildClarificationPlan(message, contextMap)
+    gateClarification = clarificationPlan.shouldAsk
     turn = prepareTeacherTurn(
         convManager=convManager,
         profileManager=profileManager,
         conversationId=conversationId,
-        message=orchestrator.injectContext(message),
+        message=message if gateClarification else orchestrator.injectContext(message),
         providerOverride=providerOverride,
         roleOverride=roleOverride,
+        clarificationPlan=clarificationPlan if gateClarification else None,
+        skipProvider=gateClarification,
         providerFactory=providerFactory,
     )
     executor = createTeacherToolExecutor(
