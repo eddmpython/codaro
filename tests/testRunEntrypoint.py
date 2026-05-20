@@ -30,6 +30,7 @@ def testGateNamesAreStable() -> None:
         "assistant-workloop-contract",
         "editor-runtime-preflight",
         "learning-system-readiness",
+        "learning-goal-audit",
         "learning-card-contract",
         "learning-card-browser",
         "editor-build",

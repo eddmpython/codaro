@@ -77,6 +77,18 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningSystemReadiness.py")),),
         ci_required=False,
     ),
+    "learning-goal-audit": Gate(
+        tier="surface",
+        description="목표 완료 전 docs, readiness, backend, landing build를 묶어 확인한다.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/syncAgentsMd.py", "--check")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/run.py", "audit-self")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningSystemReadiness.py")),
+            command(("uv", "run", "pytest", "tests/", "-q", "--tb=short")),
+            command(("npm", "run", "build"), cwd="landing"),
+        ),
+        ci_required=False,
+    ),
     "learning-card-contract": Gate(
         tier="surface",
         description="structured learning section card marker와 editor build를 확인한다.",
@@ -173,8 +185,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 13:
-        failures.append(f"expected 13 gates, found {len(GATES)}")
+    if len(GATES) != 14:
+        failures.append(f"expected 14 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

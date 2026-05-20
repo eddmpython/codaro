@@ -377,6 +377,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "\"learning-card-contract\"",
                     "\"learning-card-browser\"",
                     "\"learning-system-readiness\"",
+                    "\"learning-goal-audit\"",
                 )),
                 ("docs/skills/ops/foundation/testing-and-gates.md", (
                     "`teacher-eval`",
@@ -386,6 +387,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "`learning-card-contract`",
                     "`learning-card-browser`",
                     "`learning-system-readiness`",
+                    "`learning-goal-audit`",
                 )),
                 ("docs/skills/architecture/ssot-map.md", (
                     "teacher/provider loop",

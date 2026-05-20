@@ -31,6 +31,7 @@ uv run python -X utf8 tests/run.py gate teacher-e2e
 uv run python -X utf8 tests/run.py gate assistant-workloop-contract
 uv run python -X utf8 tests/run.py gate editor-runtime-preflight
 uv run python -X utf8 tests/run.py gate learning-system-readiness
+uv run python -X utf8 tests/run.py gate learning-goal-audit
 uv run python -X utf8 tests/run.py gate learning-card-contract
 uv run python -X utf8 tests/run.py gate learning-card-browser
 ```
@@ -48,6 +49,7 @@ uv run python -X utf8 tests/run.py gate learning-card-browser
 | `assistant-workloop-contract` | fast | assistant workloop/trace UI state가 작업 전 확인 질문, provider 오류, tool detail을 보존하는지 확인한다. |
 | `editor-runtime-preflight` | fast | editor 직접 실행 경로가 패키지 확인, uv 설치, 셀 실행 순서를 지키는지 확인한다. |
 | `learning-system-readiness` | fast | 학습 YAML, 섹션 카드, teacher loop, workloop, gate SSOT의 readiness score를 확인한다. |
+| `learning-goal-audit` | surface | 목표 완료 전 docs, readiness, backend, landing build를 묶어 확인한다. |
 | `learning-card-contract` | surface | structured section card marker 계약과 editor build를 확인한다. |
 | `learning-card-browser` | surface | Playwright CLI로 lesson overview와 structured section card의 desktop/mobile 렌더링을 확인한다. |
 | `editor-build` | surface | 제품 editor surface의 TypeScript/Vite build를 확인한다. |
@@ -70,5 +72,6 @@ uv run python -X utf8 tests/run.py gate learning-card-browser
 - curriculum YAML/provider golden 변경은 실제 `write-curriculum-yaml` 핸들러를 통과한 document 변경을 검증한다. `loadedInEditor`, structured section card flow, document runtime packages가 빠지면 실패해야 한다.
 - 학습카드/YAML 변경은 backend materializer 테스트, `learning-card-contract`, 레이아웃 변경 시 `learning-card-browser`를 함께 확인한다. `learning-card-contract`는 섹션 카드 part, 직접 입력 editor, 셀 도움 팝오버, 제목 중복 제거, 스니펫 복사 버튼, push TOC를 고정한다. `learning-card-browser`는 손으로 만든 fixture가 아니라 실제 `yamlToDocument` 산출물을 검증하고, 그 산출물의 렌더링 필드를 브라우저에 주입해야 한다.
 - 목표 완료를 말하기 전에는 `learning-system-readiness`가 최소 9점을 증명해야 한다. 이 gate는 완료 선언을 대체하지 않고, YAML 계약, 카드 UI, clarification, uv 패키지 정책, editor runtime preflight, provider 오류 workloop, frontend workloop, golden eval/e2e, 운영 SSOT 증거가 현재 저장소에 남아 있는지 확인한다. 또한 `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`를 실제로 실행하는 blocking probe가 실패하면 점수와 무관하게 실패해야 한다.
+- 목표를 닫기 전 최종 검증은 `learning-goal-audit`로 남긴다. 이 gate는 docs 정합성, `learning-system-readiness`, 전체 backend, landing build를 한 번에 실행해 "9점 readiness는 통과했지만 제품 빌드/문서가 따로 깨진" 상태를 막는다.
 - 기존 부채를 새 테스트로 한 번에 해결하지 못하면 별도 baseline 또는 명시적 TODO 문서로 분리한다.
 - CI YAML은 세부 명령을 소유하지 않고 `tests/run.py gate <name>`만 호출한다.
