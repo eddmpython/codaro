@@ -94,6 +94,7 @@ function App() {
     aiProfile,
     connectProvider: connectAiProvider,
     logoutOauthProvider,
+    providerValidation,
     providerSettingsOpen,
     saveApiProvider,
     selectAiProvider,
@@ -315,6 +316,7 @@ function App() {
         aiProfile={aiProfile}
         apiOnline={apiOnline}
         open={providerSettingsOpen}
+        providerValidation={providerValidation}
         onOauthLogin={startOauthProviderLogin}
         onOauthLogout={logoutOauthProvider}
         onOpenChange={setProviderSettingsOpen}

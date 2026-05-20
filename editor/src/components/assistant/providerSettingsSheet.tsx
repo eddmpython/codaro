@@ -1,11 +1,15 @@
 import {
+  AlertTriangle,
   Check,
+  CircleCheck,
+  Info,
   KeyRound,
   Laptop,
   Loader2,
   LogIn,
   LogOut,
   Server,
+  type LucideIcon,
 } from "lucide-react";
 import { useMemo, useState } from "react";
 
@@ -21,13 +25,14 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
-import type { AiProfile, AiProvider } from "@/types";
+import type { AiProfile, AiProvider, ProviderValidationSnapshot } from "@/types";
 
 type ProviderSettingsSheetProps = {
   aiConnecting: boolean;
   aiProfile: AiProfile | null;
   apiOnline: boolean;
   open: boolean;
+  providerValidation: Record<string, ProviderValidationSnapshot>;
   onOpenChange: (open: boolean) => void;
   onOauthLogin: (providerId: string) => void;
   onOauthLogout: (providerId: string) => void;
@@ -66,6 +71,7 @@ export function ProviderSettingsSheet({
   aiProfile,
   apiOnline,
   open,
+  providerValidation,
   onOpenChange,
   onOauthLogin,
   onOauthLogout,
@@ -106,6 +112,7 @@ export function ProviderSettingsSheet({
                   provider={provider}
                   ready={provider.id === activeProvider && ready}
                   runtime={runtime[provider.id ?? ""] ?? {}}
+                  validation={providerValidation[provider.id ?? ""]}
                   onOauthLogin={onOauthLogin}
                   onOauthLogout={onOauthLogout}
                   onSaveApiProvider={onSaveApiProvider}
@@ -132,6 +139,7 @@ function ProviderCard({
   provider,
   ready,
   runtime,
+  validation,
   onOauthLogin,
   onOauthLogout,
   onSaveApiProvider,
@@ -144,6 +152,7 @@ function ProviderCard({
   provider: AiProvider;
   ready: boolean;
   runtime: ProviderRuntime;
+  validation?: ProviderValidationSnapshot;
   onOauthLogin: (providerId: string) => void;
   onOauthLogout: (providerId: string) => void;
   onSaveApiProvider: (providerId: string, apiKey: string, baseUrl?: string) => void;
@@ -182,6 +191,15 @@ function ProviderCard({
           {runtime.model ? <div className="mt-1 font-mono text-[11px] text-muted-foreground">{runtime.model}</div> : null}
         </div>
       </div>
+
+      <ProviderConnectionStatus
+        active={active}
+        authKind={authKind}
+        canUseStoredSecret={canUseStoredSecret}
+        providerId={providerId}
+        ready={ready}
+        validation={validation}
+      />
 
       <div className="mt-3 space-y-2">
         {authKind === "oauth" ? (
@@ -303,6 +321,178 @@ function ProviderCard({
       </div>
     </section>
   );
+}
+
+function ProviderConnectionStatus({
+  active,
+  authKind,
+  canUseStoredSecret,
+  providerId,
+  ready,
+  validation,
+}: {
+  active: boolean;
+  authKind: string;
+  canUseStoredSecret: boolean;
+  providerId: string;
+  ready: boolean;
+  validation?: ProviderValidationSnapshot;
+}) {
+  const status = providerStatusCopy({
+    active,
+    authKind,
+    canUseStoredSecret,
+    providerId,
+    ready,
+    validation,
+  });
+  const StatusIcon = status.icon;
+
+  return (
+    <div
+      className={cn("mt-3 rounded-md border px-3 py-2 text-xs leading-5", status.className)}
+      data-provider-fallback-state={status.mode}
+      data-provider-validation-status={validation ? validation.valid ? "valid" : "invalid" : "unchecked"}
+    >
+      <div className="flex items-start gap-2">
+        <StatusIcon className="mt-0.5 size-3.5 shrink-0" />
+        <div className="min-w-0">
+          <div className="font-medium tracking-normal">{status.title}</div>
+          <div className="text-muted-foreground">{status.detail}</div>
+          {status.action ? (
+            <div className="mt-1 font-medium text-foreground">권장 조치: {status.action}</div>
+          ) : null}
+          {status.meta ? <div className="mt-1 font-mono text-[11px] text-muted-foreground">{status.meta}</div> : null}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function providerStatusCopy({
+  active,
+  authKind,
+  canUseStoredSecret,
+  providerId,
+  ready,
+  validation,
+}: {
+  active: boolean;
+  authKind: string;
+  canUseStoredSecret: boolean;
+  providerId: string;
+  ready: boolean;
+  validation?: ProviderValidationSnapshot;
+}): {
+  action?: string;
+  className: string;
+  detail: string;
+  icon: LucideIcon;
+  meta?: string;
+  mode: string;
+  title: string;
+} {
+  if (validation?.valid) {
+    const liveActive = active && ready;
+    return {
+      className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100",
+      detail: liveActive
+        ? `${validation.model ?? providerId} 응답 검증을 통과했습니다.`
+        : `${validation.model ?? providerId} 응답 검증을 통과했습니다. 사용으로 전환하면 이 provider를 쓸 수 있습니다.`,
+      icon: CircleCheck,
+      meta: validationMeta(validation),
+      mode: liveActive ? "live" : "validated",
+      title: liveActive ? "실제 응답 사용 중" : "응답 검증 완료",
+    };
+  }
+
+  if (validation && !validation.valid) {
+    return {
+      action: providerActionLabel(validation.diagnostic?.action),
+      className: "border-amber-500/30 bg-amber-500/10 text-amber-950 dark:text-amber-100",
+      detail: validation.diagnostic?.message ?? validation.error ?? "Provider 응답을 확인하지 못했습니다.",
+      icon: AlertTriangle,
+      meta: validationMeta(validation),
+      mode: "needs-action",
+      title: "연결 확인 필요",
+    };
+  }
+
+  if (active && ready) {
+    return {
+      className: "border-sky-500/25 bg-sky-500/10 text-sky-950 dark:text-sky-100",
+      detail: "프로필은 연결됨 상태입니다. 응답 검증으로 현재 모델의 실제 응답까지 확인하세요.",
+      icon: Info,
+      mode: "live-unverified",
+      title: "실제 응답 확인 전",
+    };
+  }
+
+  if (active) {
+    return {
+      action: authKind === "oauth" ? "다시 로그인 필요" : authKind === "api_key" ? "키 또는 Base URL 확인" : undefined,
+      className: "bg-muted/40 text-muted-foreground",
+      detail: "연결 전에는 기본 안내만 사용합니다. 로그인이나 키 저장 후 응답 검증을 통과해야 실제 응답을 사용합니다.",
+      icon: Info,
+      mode: "fallback",
+      title: "기본 안내 모드",
+    };
+  }
+
+  if (canUseStoredSecret) {
+    return {
+      className: "bg-muted/40 text-muted-foreground",
+      detail: "저장된 인증이 있습니다. 사용으로 전환한 뒤 응답 검증을 실행하세요.",
+      icon: Info,
+      mode: "candidate",
+      title: "저장된 인증 있음",
+    };
+  }
+
+  return {
+    action: authKind === "oauth" ? "브라우저 로그인" : authKind === "api_key" ? "키 저장" : undefined,
+    className: "bg-muted/40 text-muted-foreground",
+    detail: "아직 연결되지 않았습니다. 연결 전에는 이 provider의 실제 응답을 사용하지 않습니다.",
+    icon: Info,
+    mode: "not-configured",
+    title: authKind === "oauth" ? "로그인 필요" : authKind === "api_key" ? "키 필요" : "미선택",
+  };
+}
+
+function providerActionLabel(action?: string | null) {
+  if (!action) return undefined;
+  const labels: Record<string, string> = {
+    "check-network": "네트워크 문제",
+    "check-provider": "Provider 상태 확인",
+    "check-provider-compatibility": "OAuth 호환성 점검",
+    "configure-api-key": "API 키 입력 필요",
+    "configure-base-url": "Base URL 입력 필요",
+    "connect-provider": "다시 로그인 필요",
+    "relogin-provider": "다시 로그인 필요",
+    "restart-login": "로그인 다시 시작",
+  };
+  return labels[action] ?? action;
+}
+
+function validationMeta(validation: ProviderValidationSnapshot) {
+  const checkedAt = formatCheckedAt(validation.checkedAt);
+  const parts = [
+    validation.phase ? `phase=${validation.phase}` : null,
+    validation.probe ? `probe=${validation.probe}` : null,
+    validation.diagnostic?.code ? `code=${validation.diagnostic.code}` : null,
+    checkedAt ? `checked=${checkedAt}` : null,
+  ].filter(Boolean);
+  return parts.length ? parts.join(" · ") : undefined;
+}
+
+function formatCheckedAt(value?: string) {
+  if (!value) return undefined;
+  const parsed = new Date(value);
+  if (Number.isNaN(parsed.getTime())) return undefined;
+  return new Intl.DateTimeFormat("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(parsed);
 }
 
 function providerCatalog(profile: AiProfile | null): AiProvider[] {

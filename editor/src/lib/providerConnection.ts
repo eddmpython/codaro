@@ -1,11 +1,18 @@
 import { CodaroApiError, codaroApi } from "@/lib/api";
-import type { AiProfile, AppNotice, ProviderDiagnostic, ProviderValidationPayload } from "@/types";
+import type {
+  AiProfile,
+  AppNotice,
+  ProviderDiagnostic,
+  ProviderValidationPayload,
+  ProviderValidationSnapshot,
+} from "@/types";
 
 export type ProviderActionResult = {
   closeSettings?: boolean;
   notice: AppNotice;
   openSettings?: boolean;
   profile?: AiProfile;
+  validation?: ProviderValidationSnapshot;
 };
 
 export type ProviderAssistantFailure = {
@@ -56,7 +63,7 @@ export async function loginOauthProvider(providerId = "oauth-chatgpt"): Promise<
     return withProviderValidation(profile, {
       closeSettings: true,
       profile,
-    });
+    }, "login");
   }
 
   return {
@@ -74,6 +81,16 @@ export async function logoutOauthProvider(providerId = "oauth-chatgpt"): Promise
   return {
     notice: { tone: "success", title: "Provider 로그아웃됨", detail: providerId },
     profile,
+    validation: snapshotProviderValidation(providerId, {
+      valid: false,
+      diagnostic: {
+        action: "connect-provider",
+        code: "provider_logged_out",
+        message: "로그아웃되었습니다. 실제 응답을 사용하려면 다시 로그인하세요.",
+        provider: providerId,
+        recoverable: true,
+      },
+    }, "logout"),
   };
 }
 
@@ -82,7 +99,7 @@ export async function selectProvider(providerId: string): Promise<ProviderAction
   const latestProfile = await codaroApi.aiProfile().catch(() => profile);
   return withProviderValidation(latestProfile, {
     profile: latestProfile,
-  });
+  }, "select");
 }
 
 export async function saveApiProvider(providerId: string, apiKey: string, baseUrl?: string): Promise<ProviderActionResult> {
@@ -93,7 +110,7 @@ export async function saveApiProvider(providerId: string, apiKey: string, baseUr
   const latestProfile = await codaroApi.aiProfile().catch(() => profile);
   return withProviderValidation(latestProfile, {
     profile: latestProfile,
-  });
+  }, "save");
 }
 
 export async function validateProviderAction(providerId: string, model?: string | null): Promise<ProviderActionResult> {
@@ -105,6 +122,7 @@ export async function validateProviderAction(providerId: string, model?: string 
         title: "Provider 응답 확인됨",
         detail: validation.model ? `${providerId} · ${validation.model}` : providerId,
       },
+      validation: snapshotProviderValidation(providerId, validation, "manual"),
     };
   }
   return {
@@ -113,7 +131,21 @@ export async function validateProviderAction(providerId: string, model?: string 
       title: "Provider 확인 필요",
       detail: validation.diagnostic?.message ?? validation.error ?? "Provider 응답 검증에 실패했습니다.",
     },
+    validation: snapshotProviderValidation(providerId, validation, "manual"),
   };
+}
+
+export function providerValidationFailure(
+  providerId: string,
+  error: unknown,
+  phase: ProviderValidationSnapshot["phase"] = "failure",
+): ProviderValidationSnapshot {
+  const diagnostic = providerDiagnosticFromError(error);
+  return snapshotProviderValidation(providerId, {
+    valid: false,
+    error: diagnostic?.message ?? errorMessage(error),
+    diagnostic,
+  }, phase);
 }
 
 export function providerAuthFailureNotice(error: unknown): AppNotice {
@@ -173,6 +205,7 @@ function providerDiagnosticFromError(error: unknown): ProviderDiagnostic | undef
 async function withProviderValidation(
   profile: AiProfile,
   base: Omit<ProviderActionResult, "notice">,
+  phase: ProviderValidationSnapshot["phase"],
 ): Promise<ProviderActionResult> {
   const provider = String(profile.activeProvider ?? profile.defaultProvider ?? "");
   if (!provider) {
@@ -182,6 +215,7 @@ async function withProviderValidation(
     };
   }
   const validation = await validateProvider(provider, profile.activeModel, "response");
+  const validationSnapshot = snapshotProviderValidation(provider, validation, phase);
   if (validation.valid) {
     return {
       ...base,
@@ -190,6 +224,7 @@ async function withProviderValidation(
         title: "Provider 연결됨",
         detail: validation.model ? `${provider} · ${validation.model}` : providerName(profile),
       },
+      validation: validationSnapshot,
     };
   }
   const failureBase = base.closeSettings ? { ...base, closeSettings: false, openSettings: true } : base;
@@ -200,6 +235,7 @@ async function withProviderValidation(
       title: "Provider 확인 필요",
       detail: validation.diagnostic?.message ?? validation.error ?? "Provider 연결 상태를 확인하지 못했습니다.",
     },
+    validation: validationSnapshot,
   };
 }
 
@@ -218,6 +254,19 @@ async function validateProvider(provider: string, model?: unknown, probe = "avai
 
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error);
+}
+
+function snapshotProviderValidation(
+  providerId: string,
+  validation: ProviderValidationPayload,
+  phase: ProviderValidationSnapshot["phase"],
+): ProviderValidationSnapshot {
+  return {
+    ...validation,
+    checkedAt: new Date().toISOString(),
+    phase,
+    provider: providerId,
+  };
 }
 
 function providerName(profile: AiProfile | null) {

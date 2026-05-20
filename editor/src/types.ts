@@ -252,6 +252,12 @@ export type ProviderValidationPayload = {
   probe?: string;
 };
 
+export type ProviderValidationSnapshot = ProviderValidationPayload & {
+  provider: string;
+  checkedAt: string;
+  phase?: "login" | "select" | "save" | "manual" | "logout" | "failure";
+};
+
 export type AiToolCatalogPayload = {
   groups: Array<{
     id: string;

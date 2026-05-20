@@ -4,12 +4,13 @@ import {
   logoutOauthProvider as logoutOauthProviderAction,
   openProviderSettings,
   providerAuthFailureNotice,
+  providerValidationFailure,
   saveApiProvider as saveApiProviderAction,
   selectProvider,
   validateProviderAction,
   type ProviderActionResult,
 } from "@/lib/providerConnection";
-import type { AiProfile, AppNotice } from "@/types";
+import type { AiProfile, AppNotice, ProviderValidationSnapshot } from "@/types";
 
 export function useProviderConnection({
   apiOnline,
@@ -21,13 +22,33 @@ export function useProviderConnection({
   const [aiProfile, setAiProfile] = useState<AiProfile | null>(null);
   const [aiConnecting, setAiConnecting] = useState(false);
   const [providerSettingsOpen, setProviderSettingsOpen] = useState(false);
+  const [providerValidation, setProviderValidation] = useState<Record<string, ProviderValidationSnapshot>>({});
 
   const applyProviderActionResult = useCallback((result: ProviderActionResult) => {
     if (result.profile) setAiProfile(result.profile);
+    const validation = result.validation;
+    if (validation) {
+      setProviderValidation((current) => ({
+        ...current,
+        [validation.provider]: validation,
+      }));
+    }
     if (result.openSettings) setProviderSettingsOpen(true);
     if (result.closeSettings) setProviderSettingsOpen(false);
     onNotice(result.notice);
   }, [onNotice]);
+
+  const recordProviderFailure = useCallback((
+    providerId: string,
+    error: unknown,
+    phase: ProviderValidationSnapshot["phase"] = "failure",
+  ) => {
+    const validation = providerValidationFailure(providerId, error, phase);
+    setProviderValidation((current) => ({
+      ...current,
+      [validation.provider]: validation,
+    }));
+  }, []);
 
   const connectProvider = useCallback(async () => {
     applyProviderActionResult(openProviderSettings(apiOnline));
@@ -46,11 +67,12 @@ export function useProviderConnection({
       onNotice({ tone: "default", title: "Provider 로그인 열림", detail: "새 탭에서 provider 로그인을 완료하세요." });
       applyProviderActionResult(await loginOauthProvider(providerId));
     } catch (error) {
+      recordProviderFailure(providerId, error, "login");
       onNotice(providerAuthFailureNotice(error));
     } finally {
       setAiConnecting(false);
     }
-  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice]);
+  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
 
   const logoutOauthProvider = useCallback(async (providerId = "oauth-chatgpt") => {
     if (!apiOnline || aiConnecting) return;
@@ -58,6 +80,7 @@ export function useProviderConnection({
     try {
       applyProviderActionResult(await logoutOauthProviderAction(providerId));
     } catch (error) {
+      recordProviderFailure(providerId, error, "logout");
       onNotice({
         tone: "error",
         title: "Provider 로그아웃 실패",
@@ -66,7 +89,7 @@ export function useProviderConnection({
     } finally {
       setAiConnecting(false);
     }
-  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice]);
+  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
 
   const selectAiProvider = useCallback(async (providerId: string) => {
     if (!apiOnline || aiConnecting) return;
@@ -74,6 +97,7 @@ export function useProviderConnection({
     try {
       applyProviderActionResult(await selectProvider(providerId));
     } catch (error) {
+      recordProviderFailure(providerId, error, "select");
       onNotice({
         tone: "error",
         title: "Provider 선택 실패",
@@ -82,7 +106,7 @@ export function useProviderConnection({
     } finally {
       setAiConnecting(false);
     }
-  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice]);
+  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
 
   const saveApiProvider = useCallback(async (providerId: string, apiKey: string, baseUrl?: string) => {
     if (!apiOnline || aiConnecting) return;
@@ -90,6 +114,7 @@ export function useProviderConnection({
     try {
       applyProviderActionResult(await saveApiProviderAction(providerId, apiKey, baseUrl));
     } catch (error) {
+      recordProviderFailure(providerId, error, "save");
       onNotice({
         tone: "error",
         title: "Provider 저장 실패",
@@ -98,7 +123,7 @@ export function useProviderConnection({
     } finally {
       setAiConnecting(false);
     }
-  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice]);
+  }, [aiConnecting, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
 
   const validateAiProvider = useCallback(async (providerId: string) => {
     if (!apiOnline || aiConnecting) return;
@@ -106,17 +131,19 @@ export function useProviderConnection({
     try {
       applyProviderActionResult(await validateProviderAction(providerId, providerModel(aiProfile, providerId)));
     } catch (error) {
+      recordProviderFailure(providerId, error, "manual");
       onNotice(providerAuthFailureNotice(error));
     } finally {
       setAiConnecting(false);
     }
-  }, [aiConnecting, aiProfile, apiOnline, applyProviderActionResult, onNotice]);
+  }, [aiConnecting, aiProfile, apiOnline, applyProviderActionResult, onNotice, recordProviderFailure]);
 
   return {
     aiConnecting,
     aiProfile,
     connectProvider,
     logoutOauthProvider,
+    providerValidation,
     providerSettingsOpen,
     saveApiProvider,
     selectAiProvider,
