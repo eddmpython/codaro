@@ -20,6 +20,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - 학습 요청이면 curriculum YAML을 먼저 만든다.
    - 셀 수정/답 확인이면 현재 cell map에서 대상 셀을 고른다.
    - 자동화 요청이면 자동화 셀/태스크 흐름으로 보낸다.
+   - skill registry의 required tool은 등록된 tool과 manifest metadata를 기준으로 검증한다.
 
 2. **Cell Map 확인**
    - 모든 셀은 `type`, `role`, `displayKind`, `executionKind`, `title`, `purpose`, `resultStatus`를 가진다.

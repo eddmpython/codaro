@@ -20,7 +20,14 @@ from .providerLoop import (
     toolCallsToProviderPayloads,
 )
 from .providerStream import runTeacherChatStream, streamTeacherTokens
-from .skillRegistry import TeacherSkill, teacherSkillPrompt, teacherSkills
+from .skillRegistry import (
+    TeacherSkill,
+    TeacherSkillIssue,
+    teacherSkillPrompt,
+    teacherSkillToolSummary,
+    teacherSkills,
+    validateTeacherSkills,
+)
 from .teacherOrchestrator import TeacherOrchestrator
 from .toolLifecycle import toolCallResult, toolCallStart
 from .toolPolicy import ToolPolicyState, ToolPolicyViolation, toolRequiresDependencyPreflight
@@ -32,6 +39,7 @@ __all__ = [
     "TeacherConversationNotFound",
     "TeacherOrchestrator",
     "TeacherSkill",
+    "TeacherSkillIssue",
     "TeacherTrace",
     "TeacherTurnSession",
     "TeacherToolRound",
@@ -53,9 +61,11 @@ __all__ = [
     "streamTeacherTokens",
     "teacherTurnPayload",
     "teacherSkillPrompt",
+    "teacherSkillToolSummary",
     "teacherSkills",
     "toolCallResult",
     "toolCallStart",
     "toolCallsToProviderPayloads",
     "toolRequiresDependencyPreflight",
+    "validateTeacherSkills",
 ]

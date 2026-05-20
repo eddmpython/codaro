@@ -7,6 +7,7 @@ from codaro.ai.teacher import (
     TeacherEvalCase,
     TeacherOrchestrator,
     ToolPolicyState,
+    ToolPolicyViolation,
     executeTeacherToolRound,
     evaluateToolSequence,
     evaluateToolTrace,
@@ -15,10 +16,11 @@ from codaro.ai.teacher import (
     prepareTeacherTurn,
     runTeacherChatLoop,
     runTeacherChatStream,
+    teacherSkillToolSummary,
     teacherSkills,
     toolCallsToProviderPayloads,
     toolRequiresDependencyPreflight,
-    ToolPolicyViolation,
+    validateTeacherSkills,
 )
 from codaro.ai.types import LLMConfig, ToolCall, ToolResponse
 from codaro.document.cellSchema import schemaSummary
@@ -226,6 +228,25 @@ def testGoldenEvalCasesReferenceRegisteredTools() -> None:
         assert referencedTools <= registeredTools
 
 
+def testTeacherSkillRegistryReferencesRegisteredManifestTools() -> None:
+    assert validateTeacherSkills() == ()
+
+    summary = teacherSkillToolSummary()
+    curriculum = next(item for item in summary if item["skillId"] == "curriculum-authoring")
+    tools = {tool["name"]: tool for tool in curriculum["tools"]}
+
+    assert tools["write-curriculum-yaml"]["lane"] == "curriculum"
+    assert tools["read-cells"]["target"] == "learning-editor"
+
+
+def testTeacherSkillRegistryReportsMissingRequiredTools() -> None:
+    issues = validateTeacherSkills({"read-cells"})
+    missing = {issue.toolName: issue for issue in issues if issue.code == "missing-required-tool"}
+
+    assert missing["write-curriculum-yaml"].skillId == "curriculum-authoring"
+    assert missing["packages-check"].skillId == "package-preflight"
+
+
 def testTracePayloadsHaveStableTraceId() -> None:
     toolSchemas()
     orchestrator = TeacherOrchestrator.fromContext({})
@@ -400,6 +421,7 @@ def testTeacherSkillsAndCellSchemaAreVisibleSsot() -> None:
 
     assert "Teacher skill registry:" in prompt
     assert {skill.skillId for skill in teacherSkills} >= {"curriculum-authoring", "package-preflight"}
+    assert validateTeacherSkills() == ()
     assert "exercise" in summary["cellRoles"]
     assert "practice" in summary["cellDisplayKinds"]
     assert "python" in summary["executionKinds"]

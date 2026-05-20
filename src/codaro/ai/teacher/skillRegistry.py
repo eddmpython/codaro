@@ -1,6 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Collection
 from dataclasses import dataclass
+from typing import Any
 
 
 @dataclass(frozen=True)
@@ -10,6 +12,14 @@ class TeacherSkill:
     trigger: str
     requiredTools: tuple[str, ...]
     policy: str
+
+
+@dataclass(frozen=True)
+class TeacherSkillIssue:
+    code: str
+    skillId: str
+    message: str
+    toolName: str | None = None
 
 
 teacherSkills: tuple[TeacherSkill, ...] = (
@@ -58,6 +68,86 @@ teacherSkills: tuple[TeacherSkill, ...] = (
 )
 
 
+def validateTeacherSkills(
+    registeredToolNames: Collection[str] | None = None,
+) -> tuple[TeacherSkillIssue, ...]:
+    toolNames = _registeredToolNames() if registeredToolNames is None else set(registeredToolNames)
+    manifestToolNames = _manifestToolNames()
+    issues: list[TeacherSkillIssue] = []
+    seenSkillIds: set[str] = set()
+
+    for skill in teacherSkills:
+        if skill.skillId in seenSkillIds:
+            issues.append(
+                TeacherSkillIssue(
+                    code="duplicate-skill-id",
+                    skillId=skill.skillId,
+                    message=f"Teacher skill id is duplicated: {skill.skillId}",
+                )
+            )
+        seenSkillIds.add(skill.skillId)
+
+        if not skill.requiredTools:
+            issues.append(
+                TeacherSkillIssue(
+                    code="empty-required-tools",
+                    skillId=skill.skillId,
+                    message=f"Teacher skill has no required tools: {skill.skillId}",
+                )
+            )
+
+        seenRequiredTools: set[str] = set()
+        for toolName in skill.requiredTools:
+            if toolName in seenRequiredTools:
+                issues.append(
+                    TeacherSkillIssue(
+                        code="duplicate-required-tool",
+                        skillId=skill.skillId,
+                        toolName=toolName,
+                        message=f"Teacher skill repeats required tool: {toolName}",
+                    )
+                )
+            seenRequiredTools.add(toolName)
+
+            if toolName not in toolNames:
+                issues.append(
+                    TeacherSkillIssue(
+                        code="missing-required-tool",
+                        skillId=skill.skillId,
+                        toolName=toolName,
+                        message=f"Teacher skill requires an unregistered tool: {toolName}",
+                    )
+                )
+                continue
+
+            if toolName not in manifestToolNames:
+                issues.append(
+                    TeacherSkillIssue(
+                        code="missing-tool-metadata",
+                        skillId=skill.skillId,
+                        toolName=toolName,
+                        message=f"Teacher skill tool has no manifest metadata: {toolName}",
+                    )
+                )
+
+    return tuple(issues)
+
+
+def teacherSkillToolSummary() -> tuple[dict[str, Any], ...]:
+    from ..toolManifest import toolDescriptor
+
+    return tuple(
+        {
+            "skillId": skill.skillId,
+            "purpose": skill.purpose,
+            "trigger": skill.trigger,
+            "policy": skill.policy,
+            "tools": tuple(_toolSummary(toolDescriptor(toolName)) for toolName in skill.requiredTools),
+        }
+        for skill in teacherSkills
+    )
+
+
 def teacherSkillPrompt() -> str:
     lines = ["Teacher skill registry:"]
     for skill in teacherSkills:
@@ -65,3 +155,25 @@ def teacherSkillPrompt() -> str:
             f"- {skill.skillId}: trigger={skill.trigger}; tools={', '.join(skill.requiredTools)}; policy={skill.policy}"
         )
     return "\n".join(lines)
+
+
+def _registeredToolNames() -> set[str]:
+    from ..tools import allTools
+
+    return {tool.name for tool in allTools()}
+
+
+def _manifestToolNames() -> set[str]:
+    from ..toolManifest import TOOL_METADATA
+
+    return set(TOOL_METADATA)
+
+
+def _toolSummary(descriptor: dict[str, Any]) -> dict[str, str]:
+    return {
+        "name": str(descriptor.get("name", "")),
+        "category": str(descriptor.get("category", "")),
+        "lane": str(descriptor.get("lane", "")),
+        "target": str(descriptor.get("target", "")),
+        "risk": str(descriptor.get("risk", "")),
+    }
