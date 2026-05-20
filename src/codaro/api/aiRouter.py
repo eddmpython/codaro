@@ -15,12 +15,17 @@ from pydantic import BaseModel
 from ..ai.completion import completeCode, emptyCompletionResult
 from ..ai.profile import AiProfileManager, getProfileManager
 from ..ai.providerModels import providerModelList
+from ..ai.profileMutation import (
+    ProfileMutationError,
+    ProviderProfileUpdate,
+    ProviderSecretUpdate,
+    updateProviderProfile,
+    updateProviderSecret,
+)
 from ..ai.providerValidation import validateProviderConnection
 from ..ai.providers.oauthChatgptProvider import ChatGPTOAuthError
 from ..ai.providerSpec import (
     buildProviderCatalog,
-    getProviderSpec,
-    normalizeProvider,
 )
 from ..ai.teacher import (
     TeacherConversationNotFound,
@@ -89,37 +94,31 @@ def createAiRouter(state: Any) -> APIRouter:
 
     @router.put("/api/ai/profile")
     def apiAiProfileUpdate(req: AiProfileUpdateRequest):
-        manager = getProfileManager()
-        provider = normalizeProvider(req.provider) or req.provider
-        if provider and getProviderSpec(provider) is None:
-            raise HTTPException(status_code=400, detail=f"Unsupported provider: {provider}")
-        profile = manager.update(
-            provider=provider,
-            role=req.role,
-            model=req.model,
-            baseUrl=req.baseUrl,
-            temperature=req.temperature,
-            maxTokens=req.maxTokens,
-            systemPrompt=req.systemPrompt,
-            updatedBy="ui",
-        )
-        return manager.serialize() | {"revision": profile.revision}
+        try:
+            return updateProviderProfile(
+                getProfileManager(),
+                ProviderProfileUpdate(
+                    provider=req.provider,
+                    model=req.model,
+                    role=req.role,
+                    baseUrl=req.baseUrl,
+                    temperature=req.temperature,
+                    maxTokens=req.maxTokens,
+                    systemPrompt=req.systemPrompt,
+                ),
+            )
+        except ProfileMutationError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     @router.post("/api/ai/profile/secrets")
     def apiAiProfileSecret(req: AiSecretUpdateRequest):
-        provider = normalizeProvider(req.provider) or req.provider
-        spec = getProviderSpec(provider)
-        if spec is None:
-            raise HTTPException(status_code=400, detail=f"Unsupported provider: {provider}")
-        if spec.authKind != "api_key":
-            raise HTTPException(status_code=400, detail=f"{provider} provider does not use API key secrets")
-
-        manager = getProfileManager()
-        if req.clear or not req.apiKey:
-            profile = manager.clearApiKey(provider, updatedBy="ui")
-        else:
-            profile = manager.saveApiKey(provider, req.apiKey, updatedBy="ui")
-        return manager.serialize() | {"revision": profile.revision}
+        try:
+            return updateProviderSecret(
+                getProfileManager(),
+                ProviderSecretUpdate(provider=req.provider, apiKey=req.apiKey, clear=req.clear),
+            )
+        except ProfileMutationError as exc:
+            raise HTTPException(status_code=400, detail=str(exc)) from exc
 
     @router.post("/api/ai/provider/validate")
     def apiValidateProvider(

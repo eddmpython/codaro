@@ -6,6 +6,13 @@ from pathlib import Path
 import pytest
 
 from codaro.ai.profile import AiProfile, AiProfileManager, ProviderProfile, RoleBinding
+from codaro.ai.profileMutation import (
+    ProfileMutationError,
+    ProviderProfileUpdate,
+    ProviderSecretUpdate,
+    updateProviderProfile,
+    updateProviderSecret,
+)
 from codaro.ai.secrets import SecretStore
 
 
@@ -118,6 +125,42 @@ class TestAiProfileSecrets:
     def test_save_api_key_invalid_provider(self, tmpProfile):
         with pytest.raises(ValueError, match="Unsupported provider"):
             tmpProfile.saveApiKey("nonexistent", "key", updatedBy="test")
+
+
+class TestAiProfileMutations:
+    def test_update_provider_profile_returns_serialized_revision(self, tmpProfile):
+        payload = updateProviderProfile(
+            tmpProfile,
+            ProviderProfileUpdate(provider="openai", model="gpt-4o-mini"),
+            updatedBy="test",
+        )
+
+        assert payload["defaultProvider"] == "openai"
+        assert payload["providers"]["openai"]["model"] == "gpt-4o-mini"
+        assert payload["revision"] == 1
+
+    def test_update_provider_profile_rejects_unknown_provider(self, tmpProfile):
+        with pytest.raises(ProfileMutationError, match="Unsupported provider"):
+            updateProviderProfile(tmpProfile, ProviderProfileUpdate(provider="missing"), updatedBy="test")
+
+    def test_update_provider_secret_requires_api_key_provider(self, tmpProfile):
+        with pytest.raises(ProfileMutationError, match="does not use API key secrets"):
+            updateProviderSecret(tmpProfile, ProviderSecretUpdate(provider="ollama", apiKey="key"), updatedBy="test")
+
+    def test_update_provider_secret_saves_and_clears(self, tmpProfile):
+        saved = updateProviderSecret(
+            tmpProfile,
+            ProviderSecretUpdate(provider="openai", apiKey="sk-test"),
+            updatedBy="test",
+        )
+        assert saved["providers"]["openai"]["secretConfigured"] is True
+
+        cleared = updateProviderSecret(
+            tmpProfile,
+            ProviderSecretUpdate(provider="openai", clear=True),
+            updatedBy="test",
+        )
+        assert cleared["providers"]["openai"]["secretConfigured"] is False
 
 
 class TestAiProfileSerialize:
