@@ -172,7 +172,7 @@ TOOL_WRITE_CURRICULUM_YAML = ToolDef(
                 "type": "string",
                 "description": (
                     "Curriculum YAML. Required structured contract for new lessons: "
-                    "meta(title,audience,difficulty,packages), intro(direction,benefits,diagram), "
+                    "meta(title,audience,difficulty,packages), intro(direction,benefits,diagram.steps,diagram.runtime), "
                     "sections[].title/subtitle/goal/why/explanation/tips/snippet/exercise/check. "
                     "Each section becomes one learning card: snippet is the example, "
                     "exercise.prompt/starterCode/solution/hints/check is the learner input cell, and check is validation feedback. "

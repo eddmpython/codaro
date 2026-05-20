@@ -308,6 +308,7 @@ function LearningRouteConnector() {
 
 function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> }) {
   const customSteps = diagramSteps(diagram);
+  const customRuntimeNodes = diagramRuntimeNodes(diagram);
   const fallbackSteps = [
     { label: "목표", detail: "무슨 공부", Icon: Route, tone: "text-sky-500" },
     { label: "개념", detail: "설명과 팁", Icon: BookOpen, tone: "text-amber-500" },
@@ -324,6 +325,18 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
     }))
     : fallbackSteps;
   const visibleSteps = steps.slice(0, 4);
+  const runtimeIcons = [GitBranch, Package, CheckCircle2];
+  const fallbackRuntimeNodes = [
+    { label: "계약", detail: "YAML SSOT", Icon: GitBranch },
+    { label: "환경", detail: "uv 패키지", Icon: Package },
+    { label: "검증", detail: "실행 결과", Icon: CheckCircle2 },
+  ];
+  const runtimeNodes = customRuntimeNodes.length
+    ? customRuntimeNodes.map((node, index) => ({
+      ...node,
+      Icon: runtimeIcons[index % runtimeIcons.length],
+    }))
+    : fallbackRuntimeNodes;
 
   return (
     <div
@@ -417,11 +430,7 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
         <div className="mt-4 rounded-md border bg-card/80 px-3 py-3" data-learning-flow-runtime="true">
           <div className="mb-2 text-xs font-medium text-muted-foreground">런타임 레이어</div>
           <div className="grid gap-2 sm:grid-cols-3">
-          {[
-            { label: "계약", detail: "YAML SSOT", Icon: GitBranch },
-            { label: "환경", detail: "uv 패키지", Icon: Wrench },
-            { label: "검증", detail: "실행 결과", Icon: CheckCircle2 },
-          ].map(({ Icon, detail, label }) => (
+          {runtimeNodes.slice(0, 3).map(({ Icon, detail, label }) => (
             <div className="flex min-w-0 items-center gap-2 text-xs" data-learning-flow-runtime-node="true" key={label}>
               <Icon className="size-3.5 shrink-0 text-muted-foreground" />
               <span className="min-w-0">
@@ -1123,6 +1132,29 @@ function diagramSteps(diagram?: Record<string, unknown>) {
     })
     .filter((item): item is { label: string; detail: string } => Boolean(item))
     .slice(0, 5);
+}
+
+function diagramRuntimeNodes(diagram?: Record<string, unknown>) {
+  if (!diagram) return [];
+  const source = Array.isArray(diagram.runtime)
+    ? diagram.runtime
+    : Array.isArray(diagram.runtimeLayer)
+      ? diagram.runtimeLayer
+      : Array.isArray(diagram.layers)
+        ? diagram.layers
+        : [];
+  return source
+    .map((item) => {
+      if (typeof item === "string" || typeof item === "number" || typeof item === "boolean") {
+        return { label: String(item), detail: "" };
+      }
+      if (!isRecord(item)) return null;
+      const label = readPayloadText(item.label ?? item.title ?? item.name);
+      const detail = readPayloadText(item.detail ?? item.description ?? item.content);
+      return label ? { label, detail } : null;
+    })
+    .filter((item): item is { label: string; detail: string } => Boolean(item))
+    .slice(0, 3);
 }
 
 function readSectionContract(value: unknown): CurriculumSectionContract | undefined {

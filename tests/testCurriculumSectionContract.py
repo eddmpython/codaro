@@ -15,7 +15,10 @@ def testLessonContractExtractsStructuredSectionFields() -> None:
         "intro": {
             "direction": "DataFrame을 직접 만들고 확인합니다.",
             "benefits": ["표 데이터를 코드로 다룹니다."],
-            "diagram": {"steps": [{"label": "개념"}, {"label": "실습"}]},
+            "diagram": {
+                "steps": [{"label": "개념"}, {"label": "실습"}],
+                "runtime": [{"label": "환경", "detail": "uv 패키지"}],
+            },
         },
         "sections": [
             {
@@ -46,6 +49,7 @@ def testLessonContractExtractsStructuredSectionFields() -> None:
     assert contract.intro.direction == "DataFrame을 직접 만들고 확인합니다."
     assert contract.intro.benefits == ["표 데이터를 코드로 다룹니다."]
     assert contract.intro.diagram["steps"][0]["label"] == "개념"
+    assert contract.intro.diagram["runtime"][0]["detail"] == "uv 패키지"
     section = contract.sections[0]
     assert section.id == "dataframe-basics"
     assert section.goal.startswith("dict에서")

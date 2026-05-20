@@ -177,6 +177,8 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "data-learning-flow-runtime-node",
                     "data-learning-flow-step",
                     "data-learning-flow-track",
+                    "diagramRuntimeNodes",
+                    "diagram.runtime",
                 )),
                 ("tests/verifyLearningCardPlaywright.py", (
                     "yamlToDocument",
@@ -187,6 +189,8 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "data-learning-flow-blueprint",
                     "data-learning-flow-runtime-node",
                     "data-learning-flow-track",
+                    "uv preflight",
+                    "check result",
                     "jsAssertTocPushRail",
                     "desktopOverview",
                     "mobileOverview",

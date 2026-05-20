@@ -64,6 +64,8 @@ OBJECTIVE_REQUIREMENTS = (
                 "data-learning-flow-blueprint",
                 "data-learning-flow-runtime-node",
                 "data-learning-flow-track",
+                "diagramRuntimeNodes",
+                "diagram.runtime",
             )),
             ("editor/src/components/app/appPrimitives.tsx", (
                 "data-code-payload=\"snippet\"",
@@ -232,6 +234,8 @@ OBJECTIVE_REQUIREMENTS = (
                 "data-learning-flow-blueprint",
                 "data-learning-flow-runtime-node",
                 "data-learning-flow-track",
+                "uv preflight",
+                "check result",
             )),
         ),
     ),

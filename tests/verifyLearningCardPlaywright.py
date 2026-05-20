@@ -383,6 +383,13 @@ intro:
         detail: 따라 칠 코드
       - label: 실행
         detail: 입력과 검증
+    runtime:
+      - label: 계약
+        detail: YAML SSOT
+      - label: 준비
+        detail: uv preflight
+      - label: 피드백
+        detail: check result
 sections:
   - id: dataframe
     title: DataFrame 만들기
@@ -498,6 +505,10 @@ def jsAssertLearningOverview(viewport: str) -> str:
   }}
   if (runtime.querySelectorAll('[data-learning-flow-runtime-node="true"]').length < 3) {{
     throw new Error('learning architecture runtime nodes are missing');
+  }}
+  const runtimeText = runtime.textContent || '';
+  if (!runtimeText.includes('uv preflight') || !runtimeText.includes('check result')) {{
+    throw new Error('learning architecture runtime nodes did not render YAML contract data');
   }}
   const steps = Array.from(diagram.querySelectorAll('[data-learning-flow-step]')).map((item) =>
     item.getAttribute('data-learning-flow-step')
