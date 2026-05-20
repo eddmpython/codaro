@@ -1,6 +1,12 @@
 import { blockLabel } from "@/lib/cellModel";
-import { isRecord, normalizeDocumentPayload, starterDocument } from "@/lib/documentModel";
-import type { BlockConfig, CodaroDocument } from "@/types";
+import {
+  draftsFromBlocks,
+  isRecord,
+  normalizeDocumentPayload,
+  starterDocument,
+} from "@/lib/documentModel";
+import type { SurfaceMode } from "@/lib/surfaceModel";
+import type { AppNotice, BlockConfig, CodaroDocument } from "@/types";
 
 export const CUSTOM_CURRICULUM_CATEGORY = "__custom__";
 export const customCurriculaStorageKey = "codaro-custom-curricula";
@@ -10,6 +16,17 @@ export type CustomCurriculumEntry = {
   title: string;
   document: CodaroDocument;
   createdAt: number;
+};
+
+export type CustomCurriculumApplication = {
+  draftUpdates: Record<string, string>;
+  document: CodaroDocument;
+  notice: AppNotice | null;
+  selectedBlockId: string;
+  selectedCategory: string;
+  selectedContentId: string;
+  selectedCustomCurriculumId: string;
+  surfaceToOpen: SurfaceMode;
 };
 
 export function loadCustomCurricula(): CustomCurriculumEntry[] {
@@ -79,6 +96,28 @@ export function upsertCustomCurriculumEntry(
   entry: CustomCurriculumEntry,
 ) {
   return [entry, ...current.filter((item) => item.id !== entry.id)];
+}
+
+export function buildCustomCurriculumApplication(
+  entry: CustomCurriculumEntry,
+  options: { showNotice?: boolean } = {},
+): CustomCurriculumApplication {
+  return {
+    draftUpdates: draftsFromBlocks(entry.document.blocks, { emptySnippetDraft: true }),
+    document: entry.document,
+    notice: options.showNotice
+      ? {
+          tone: "success",
+          title: "나만의 커리큘럼 저장됨",
+          detail: entry.title,
+        }
+      : null,
+    selectedBlockId: entry.document.blocks[0]?.id ?? "",
+    selectedCategory: CUSTOM_CURRICULUM_CATEGORY,
+    selectedContentId: entry.id,
+    selectedCustomCurriculumId: entry.id,
+    surfaceToOpen: "curriculum",
+  };
 }
 
 function normalizeStoredCurriculumDocument(raw: unknown) {

@@ -23,9 +23,10 @@ import {
   selectCategory,
   selectContent,
   selectedContentOrFirst,
-  selectCustomCurriculum as selectCustomCurriculumState,
 } from "@/lib/curriculumSelection";
 import {
+  buildCustomCurriculumApplication,
+  type CustomCurriculumApplication,
   CUSTOM_CURRICULUM_CATEGORY,
   createCustomCurriculumEntry,
   customCurriculaStorageKey,
@@ -651,22 +652,24 @@ function App() {
     if (!blocks.length) return null;
     const entry = createCustomCurriculumEntry(blocks, title);
     setCustomCurricula((current) => upsertCustomCurriculumEntry(current, entry));
-    setCurriculumDocument(entry.document);
+    applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry, { showNotice: true }));
+    return entry;
+  }
+
+  function applyCustomCurriculumApplication(application: CustomCurriculumApplication) {
+    setCurriculumDocument(application.document);
     setDrafts((current) => ({
       ...current,
-      ...draftsFromBlocks(entry.document.blocks, { emptySnippetDraft: true }),
+      ...application.draftUpdates,
     }));
-    setSelectedCategory(CUSTOM_CURRICULUM_CATEGORY);
-    setSelectedContentId(entry.id);
-    setSelectedCustomCurriculumId(entry.id);
-    setSelectedCurriculumBlockId(entry.document.blocks[0]?.id ?? "");
-    setSurface("curriculum");
-    setNotice({
-      tone: "success",
-      title: "나만의 커리큘럼 저장됨",
-      detail: entry.title,
-    });
-    return entry;
+    setSelectedCategory(application.selectedCategory);
+    setSelectedContentId(application.selectedContentId);
+    setSelectedCustomCurriculumId(application.selectedCustomCurriculumId);
+    setSelectedCurriculumBlockId(application.selectedBlockId);
+    setSurface(application.surfaceToOpen);
+    if (application.notice) {
+      setNotice(application.notice);
+    }
   }
 
   function acceptPendingBlocks() {
@@ -739,17 +742,7 @@ function App() {
   function selectCustomCurriculum(id: string) {
     const entry = customCurricula.find((item) => item.id === id);
     if (!entry) return;
-    const selection = selectCustomCurriculumState(entry);
-    setSelectedCategory(selection.selectedCategory);
-    setSelectedContentId(selection.selectedContentId);
-    setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
-    setCurriculumDocument(selection.document);
-    setDrafts((current) => ({
-      ...current,
-      ...draftsFromBlocks(selection.document.blocks, { emptySnippetDraft: true }),
-    }));
-    setSelectedCurriculumBlockId(selection.document.blocks[0]?.id ?? "");
-    setSurface("curriculum");
+    applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry));
   }
 
   function selectAutomationSection(section: AutomationSection) {
