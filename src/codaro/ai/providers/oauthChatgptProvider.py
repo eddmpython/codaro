@@ -42,6 +42,26 @@ class ChatGPTOAuthError(ProviderRuntimeError):
         super().__init__(message, action=action, provider="oauth-chatgpt", detail=detail)
 
 
+def _chatgptErrorFromRefreshError(error: TokenRefreshError) -> ChatGPTOAuthError:
+    if error.reason == "client_changed":
+        return ChatGPTOAuthError(
+            "check_client_id",
+            "OAuth Client ID may have changed. Provider compatibility check required.",
+            detail=error.detail,
+        )
+    if error.reason in {"network", "no_token", "expired", "reused", "revoked"}:
+        return ChatGPTOAuthError(
+            error.reason,
+            f"ChatGPT token refresh failed: {error.detail}",
+            detail=error.detail,
+        )
+    return ChatGPTOAuthError(
+        "relogin",
+        f"ChatGPT token refresh failed ({error.reason}): {error.detail}",
+        detail=error.detail,
+    )
+
+
 def _raiseHttpError(status: int, body: str) -> None:
     if status == 401:
         raise ChatGPTOAuthError(
@@ -91,12 +111,7 @@ class OAuthChatGPTProvider(BaseProvider):
         try:
             token = oauthToken.getValidToken()
         except TokenRefreshError as e:
-            if e.reason == "client_changed":
-                raise ChatGPTOAuthError("check_client_id", e.detail) from e
-            raise ChatGPTOAuthError(
-                "relogin",
-                f"ChatGPT token refresh failed: {e.detail}",
-            ) from e
+            raise _chatgptErrorFromRefreshError(e) from e
         if not token:
             raise ChatGPTOAuthError(
                 "login",
@@ -104,46 +119,42 @@ class OAuthChatGPTProvider(BaseProvider):
             )
         return token
 
-    def _requestWithRetry(self, token: str, body: dict, *, stream: bool = False):
-        url = f"{CHATGPT_API_BASE}{CHATGPT_RESPONSES_PATH}"
-        headers = self._buildHeaders(token)
-
+    def _postResponse(self, url: str, headers: dict[str, str], body: dict, *, stream: bool = False):
         try:
-            resp = requests.post(
+            return requests.post(
                 url,
                 headers=headers,
                 json=body,
                 stream=stream,
                 timeout=90,
             )
-        except requests.ConnectionError:
+        except requests.ConnectionError as exc:
             raise ChatGPTOAuthError(
                 "network",
                 "Cannot connect to ChatGPT server. Please check your network.",
-            )
-        except requests.Timeout:
+                detail=str(exc),
+            ) from exc
+        except requests.Timeout as exc:
             raise ChatGPTOAuthError(
                 "network",
                 "ChatGPT server response timeout. Please try again later.",
-            )
+                detail=str(exc),
+            ) from exc
+
+    def _requestWithRetry(self, token: str, body: dict, *, stream: bool = False):
+        url = f"{CHATGPT_API_BASE}{CHATGPT_RESPONSES_PATH}"
+        headers = self._buildHeaders(token)
+
+        resp = self._postResponse(url, headers, body, stream=stream)
 
         if resp.status_code == 401:
             try:
                 refreshed = oauthToken.refreshAccessToken()
             except TokenRefreshError as e:
-                raise ChatGPTOAuthError(
-                    "relogin",
-                    f"Token refresh failed ({e.reason}): {e.detail}",
-                ) from e
+                raise _chatgptErrorFromRefreshError(e) from e
             if refreshed:
                 headers = self._buildHeaders(refreshed["access_token"])
-                resp = requests.post(
-                    url,
-                    headers=headers,
-                    json=body,
-                    stream=stream,
-                    timeout=90,
-                )
+                resp = self._postResponse(url, headers, body, stream=stream)
 
         if resp.status_code != 200:
             resp.encoding = "utf-8"

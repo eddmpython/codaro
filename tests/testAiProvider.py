@@ -10,9 +10,10 @@ from codaro.ai.completion import (
     completionTextFromAnswer,
 )
 from codaro.ai.providerModels import DEFAULT_OPENAI_CHAT_MODELS, filterOpenaiChatModelIds, providerModelList
+from codaro.ai.providerErrors import providerErrorDiagnostic
 from codaro.ai.providerValidation import providerValidationConfig, validateProviderConnection
 from codaro.ai.oauthFlow import OAuthLoginFlow
-from codaro.ai.oauthToken import TokenExchangeError
+from codaro.ai.oauthToken import TokenExchangeError, TokenRefreshError
 from codaro.ai.types import LLMConfig, LLMResponse, ToolCall, ToolResponse
 from codaro.ai.factory import createProvider, availableProviders, registerProvider
 from codaro.ai.providerSpec import (
@@ -26,7 +27,8 @@ from codaro.ai.providerSpec import (
     AI_ROLES,
 )
 from codaro.ai.baseProvider import BaseProvider
-from codaro.ai.providers.oauthChatgptProvider import OAuthChatGPTProvider, _parseSseResponseDetailed
+from codaro.ai.providers import oauthChatgptProvider as oauthProviderModule
+from codaro.ai.providers.oauthChatgptProvider import ChatGPTOAuthError, OAuthChatGPTProvider, _parseSseResponseDetailed
 from codaro.ai.tools import toolManifest
 
 
@@ -82,6 +84,16 @@ class _ResponseValidationProvider(_ValidationProvider):
     def complete(self, messages: list[dict[str, str]]) -> LLMResponse:
         self.messages = messages
         return LLMResponse(answer=self.answer, provider="custom", model=self.resolvedModel)
+
+
+class _OAuthResponse:
+    def __init__(self, statusCode: int, text: str = "") -> None:
+        self.status_code = statusCode
+        self.text = text
+        self.encoding = "utf-8"
+
+    def json(self):
+        return {}
 
 
 class _ResolvedProfileManager:
@@ -506,6 +518,80 @@ class TestOAuthChatGPTTools:
         provider = OAuthChatGPTProvider(LLMConfig(provider="oauth-chatgpt"))
 
         assert provider.supportsNativeTools is True
+
+    def test_refresh_network_failure_keeps_network_action(self, monkeypatch):
+        def failToken():
+            raise TokenRefreshError("network", "OpenAI auth server response timeout.")
+
+        monkeypatch.setattr(oauthProviderModule.oauthToken, "getValidToken", failToken)
+        provider = OAuthChatGPTProvider(LLMConfig(provider="oauth-chatgpt"))
+
+        with pytest.raises(ChatGPTOAuthError) as excinfo:
+            provider.checkAvailable()
+
+        diagnostic = providerErrorDiagnostic(excinfo.value)
+        assert diagnostic.code == "provider_network_error"
+        assert diagnostic.action == "check-network"
+        assert diagnostic.provider == "oauth-chatgpt"
+
+    def test_refresh_expired_failure_keeps_relogin_action(self, monkeypatch):
+        def failToken():
+            raise TokenRefreshError("expired", "refresh_token expired. Re-login required.")
+
+        monkeypatch.setattr(oauthProviderModule.oauthToken, "getValidToken", failToken)
+        provider = OAuthChatGPTProvider(LLMConfig(provider="oauth-chatgpt"))
+
+        with pytest.raises(ChatGPTOAuthError) as excinfo:
+            provider.checkAvailable()
+
+        diagnostic = providerErrorDiagnostic(excinfo.value)
+        assert diagnostic.code == "provider_relogin_required"
+        assert diagnostic.action == "relogin-provider"
+        assert diagnostic.provider == "oauth-chatgpt"
+
+    def test_retry_refresh_network_failure_keeps_network_action(self, monkeypatch):
+        monkeypatch.setattr(oauthProviderModule.oauthToken, "getAccountId", lambda: None)
+        monkeypatch.setattr(
+            oauthProviderModule.oauthToken,
+            "refreshAccessToken",
+            lambda: (_ for _ in ()).throw(TokenRefreshError("network", "Cannot connect to auth server.")),
+        )
+        monkeypatch.setattr(
+            oauthProviderModule.requests,
+            "post",
+            lambda *args, **kwargs: _OAuthResponse(401, "expired"),
+        )
+        provider = OAuthChatGPTProvider(LLMConfig(provider="oauth-chatgpt"))
+
+        with pytest.raises(ChatGPTOAuthError) as excinfo:
+            provider._requestWithRetry("old-token", {"input": []})
+
+        diagnostic = providerErrorDiagnostic(excinfo.value)
+        assert diagnostic.code == "provider_network_error"
+        assert diagnostic.action == "check-network"
+
+    def test_retry_second_request_network_failure_is_diagnostic(self, monkeypatch):
+        monkeypatch.setattr(oauthProviderModule.oauthToken, "getAccountId", lambda: None)
+        monkeypatch.setattr(oauthProviderModule.oauthToken, "refreshAccessToken", lambda: {"access_token": "new-token"})
+        authorizations: list[str] = []
+
+        def fakePost(url, *, headers, json, stream, timeout):
+            del url, json, stream, timeout
+            authorizations.append(headers["Authorization"])
+            if len(authorizations) == 1:
+                return _OAuthResponse(401, "expired")
+            raise oauthProviderModule.requests.ConnectionError("network down")
+
+        monkeypatch.setattr(oauthProviderModule.requests, "post", fakePost)
+        provider = OAuthChatGPTProvider(LLMConfig(provider="oauth-chatgpt"))
+
+        with pytest.raises(ChatGPTOAuthError) as excinfo:
+            provider._requestWithRetry("old-token", {"input": []})
+
+        diagnostic = providerErrorDiagnostic(excinfo.value)
+        assert authorizations == ["Bearer old-token", "Bearer new-token"]
+        assert diagnostic.code == "provider_network_error"
+        assert diagnostic.action == "check-network"
 
     def test_parse_responses_function_call_events(self):
         raw = "\n".join(

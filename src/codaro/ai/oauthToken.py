@@ -112,10 +112,10 @@ def refreshAccessToken() -> dict[str, Any] | None:
             headers={"Content-Type": "application/x-www-form-urlencoded"},
             timeout=15,
         )
-    except requests.ConnectionError:
-        raise TokenRefreshError("network", "Cannot connect to OpenAI auth server.")
-    except requests.Timeout:
-        raise TokenRefreshError("network", "OpenAI auth server response timeout.")
+    except requests.ConnectionError as exc:
+        raise TokenRefreshError("network", "Cannot connect to OpenAI auth server.") from exc
+    except requests.Timeout as exc:
+        raise TokenRefreshError("network", "OpenAI auth server response timeout.") from exc
 
     if resp.status_code == 200:
         data = resp.json()
