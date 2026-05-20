@@ -49,8 +49,8 @@ import {
   type AutomationSnapshot,
 } from "@/lib/automationState";
 import {
-  buildLocalAssistantAnswer,
-  buildLocalBlocksFromPrompt,
+  buildLocalAssistantDraft,
+  completeLocalAssistantDraft,
 } from "@/lib/localFallback";
 import {
   resolveBlockRunCode,
@@ -503,37 +503,22 @@ function App() {
     setAssistantLoading(true);
 
     if (!apiOnline) {
-      const generatedBlocks = activeScope === "cell" ? [] : buildLocalBlocksFromPrompt(message, activeScope);
-      const savedEntry = generatedBlocks.length && activeScope !== "cell"
-        ? saveCustomCurriculum(generatedBlocks)
+      const localDraft = buildLocalAssistantDraft(message, activeScope);
+      const savedEntry = localDraft.shouldSaveCurriculum
+        ? saveCustomCurriculum(localDraft.generatedBlocks)
         : null;
-      if (generatedBlocks.length) {
-        if (activeScope === "cell") {
-          setPendingTarget("notebook");
-          setPendingBlocks((current) => {
-            const knownIds = new Set(current.map((block) => block.id));
-            return [...current, ...generatedBlocks.filter((block) => !knownIds.has(block.id))];
-          });
-        } else {
-          setPendingBlocks([]);
-          setPendingTarget("notebook");
-        }
+      if (localDraft.clearPendingBlocks) {
+        setPendingBlocks([]);
+        setPendingTarget("notebook");
       }
-      setMessages((current) => [
-        ...current,
-        {
-          id: `assistant-preview-${Date.now()}`,
-          role: "assistant",
-          content: buildLocalAssistantAnswer(message, activeScope, generatedBlocks.length, Boolean(savedEntry)),
-          provider: "기본 안내",
-          model: "기본 안내",
-        },
-      ]);
-      setNotice({
-        tone: generatedBlocks.length ? "success" : "default",
-        title: savedEntry ? "나만의 커리큘럼 저장됨" : generatedBlocks.length ? "커리큘럼 초안 준비됨" : "어시스턴트 답변 완료",
-        detail: savedEntry?.title ?? (generatedBlocks.length ? `${generatedBlocks.length}개 학습 셀을 생성했습니다.` : "셀 안내가 준비됐습니다."),
+      const localResult = completeLocalAssistantDraft({
+        draft: localDraft,
+        message,
+        savedTitle: savedEntry?.title,
+        scope: activeScope,
       });
+      setMessages((current) => [...current, localResult.assistantMessage]);
+      setNotice(localResult.notice);
       setAssistantLoading(false);
       return;
     }

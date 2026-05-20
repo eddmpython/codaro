@@ -1,6 +1,61 @@
 import { teacherScopeLabel, type TeacherScope } from "@/lib/teacherScope";
 import { stringifyData } from "@/lib/displayFormat";
-import type { BlockConfig, ExecutionResult, VariableInfo } from "@/types";
+import type { AppNotice, BlockConfig, ExecutionResult, VariableInfo } from "@/types";
+
+export type LocalAssistantDraft = {
+  clearPendingBlocks: boolean;
+  generatedBlocks: BlockConfig[];
+  shouldSaveCurriculum: boolean;
+};
+
+export function buildLocalAssistantDraft(message: string, scope: TeacherScope): LocalAssistantDraft {
+  const generatedBlocks = scope === "cell" ? [] : buildLocalBlocksFromPrompt(message, scope);
+  return {
+    clearPendingBlocks: generatedBlocks.length > 0 && scope !== "cell",
+    generatedBlocks,
+    shouldSaveCurriculum: generatedBlocks.length > 0 && scope !== "cell",
+  };
+}
+
+export function completeLocalAssistantDraft({
+  draft,
+  message,
+  now = Date.now(),
+  savedTitle,
+  scope,
+}: {
+  draft: LocalAssistantDraft;
+  message: string;
+  now?: number;
+  savedTitle?: string;
+  scope: TeacherScope;
+}): {
+  assistantMessage: {
+    id: string;
+    role: "assistant";
+    content: string;
+    provider: string;
+    model: string;
+  };
+  notice: AppNotice;
+} {
+  const blockCount = draft.generatedBlocks.length;
+  const saved = Boolean(savedTitle);
+  return {
+    assistantMessage: {
+      id: `assistant-preview-${now}`,
+      role: "assistant",
+      content: buildLocalAssistantAnswer(message, scope, blockCount, saved),
+      provider: "기본 안내",
+      model: "기본 안내",
+    },
+    notice: {
+      tone: blockCount ? "success" : "default",
+      title: saved ? "나만의 커리큘럼 저장됨" : blockCount ? "커리큘럼 초안 준비됨" : "어시스턴트 답변 완료",
+      detail: savedTitle ?? (blockCount ? `${blockCount}개 학습 셀을 생성했습니다.` : "셀 안내가 준비됐습니다."),
+    },
+  };
+}
 
 export function buildLocalBlocksFromPrompt(message: string, scope: TeacherScope): BlockConfig[] {
   const topic = inferLocalTopic(message);
