@@ -59,6 +59,7 @@ OBJECTIVE_REQUIREMENTS = (
                 "data-learning-section-heading",
                 "data-learning-code-input",
                 "data-learning-exercise-input",
+                "data-learning-exercise-input-role",
                 "data-learning-flow-canvas",
                 "data-learning-flow-track",
             )),

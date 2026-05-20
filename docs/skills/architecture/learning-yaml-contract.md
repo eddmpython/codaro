@@ -83,7 +83,7 @@ sections:
 - 레슨 overview는 `data-learning-overview`, `data-learning-overview-part`, `data-learning-flow-diagram`, `data-learning-flow-track`, `data-learning-flow-step` marker를 가진다. `learning-card-browser` gate는 방향, 학습 효과, 플로우 track/step이 실제 desktop/mobile 화면에 보이는지 확인한다.
 - structured section card는 브라우저 검증을 위해 `data-learning-section-card`, `data-learning-section-structured`, `data-learning-section-part` marker를 가진다. 검증 대상 part는 `overview`, `snippet`, `exercise`, `result`, `check`다.
 - marker 계약과 editor build는 `uv run python -X utf8 tests/run.py gate learning-card-contract`로 확인한다. 실제 데스크톱/모바일 브라우저 렌더링은 `uv run python -X utf8 tests/run.py gate learning-card-browser`로 확인한다.
-- `snippet`은 예제 스니펫 셀로, `exercise.starterCode`는 학습자가 직접 입력/수정하는 실습 셀로 materialize한다.
+- `snippet`은 예제 스니펫 셀로, `exercise.starterCode`는 학습자가 직접 입력/수정하는 실습 셀로 materialize한다. 렌더러는 이 영역을 `Python 실습 코드`와 `학습자가 작성` 상태로 명확히 표시하고 `data-learning-exercise-input-role="student-practice"`를 유지한다.
 - `meta.packages`는 런타임 패키지 preflight의 1차 입력이다. 코드 import 추론은 보조 수단이다.
 
 ## 호환 레이어

@@ -54,6 +54,10 @@ def main() -> int:
         "overview route track marker": 'data-learning-flow-track="overview-route"',
         "exercise marker": 'data-learning-section-part="exercise"',
         "exercise direct editor marker": 'data-learning-exercise-input="editor"',
+        "exercise student practice role": 'data-learning-exercise-input-role="student-practice"',
+        "exercise selected state marker": "data-learning-exercise-input-state={exerciseSelected ? \"selected\" : \"ready\"}",
+        "exercise direct editor label": "Python 실습 코드",
+        "exercise student-authored badge": "학습자가 작성",
         "result marker": 'data-learning-section-part="result"',
         "section overview renderer": "function SectionContractOverview",
         "structured body renderer": "function StructuredSectionLearningBody",
@@ -76,6 +80,8 @@ def main() -> int:
         "check part assignment": 'part="check"',
         "structured exercise direct editor": "autoFocus: exerciseSelected",
         "code cell direct editor marker": 'data-learning-code-input="editor"',
+        "code input role marker": 'data-learning-code-input-role={isSnippetCode ? "student-practice" : "code-edit"}',
+        "code input selected marker": "data-learning-code-input-state={isSelected ? \"selected\" : \"ready\"}",
         "embedded markdown title dedupe": "<CurriculumMarkdownBody block={block} hideRepeatedTitle />",
     }
     for label, token in required_tokens.items():

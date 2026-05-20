@@ -901,15 +901,21 @@ function StructuredSectionLearningBody({
 
           <div className="mt-3 space-y-1.5">
             <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-              <span>실습 입력 셀</span>
-              <Badge className="hidden sm:inline-flex" variant="outline">Ctrl+Enter 실행</Badge>
+              <span className="font-medium text-foreground">Python 실습 코드</span>
+              <span className="flex items-center gap-1.5">
+                <Badge variant="outline">학습자가 작성</Badge>
+                <Badge className="hidden sm:inline-flex" variant="outline">Ctrl+Enter 실행</Badge>
+              </span>
             </div>
             <div
+              aria-label={`${blockLabel(exercise)} 직접 입력 실습 코드 편집기`}
               className={cn(
-                "rounded-md border bg-code shadow-inner transition-colors",
+                "rounded-md border bg-code shadow-inner transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/25",
                 exerciseSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/60",
               )}
               data-learning-exercise-input="editor"
+              data-learning-exercise-input-role="student-practice"
+              data-learning-exercise-input-state={exerciseSelected ? "selected" : "ready"}
             >
               {renderCodeCellEditor({
                 autoFocus: exerciseSelected,
@@ -1394,18 +1400,21 @@ function CurriculumLearningCell({
           {!isSnippetCode && block.guide ? <ExerciseBrief block={block} lineCount={lineCount} /> : null}
           <div className="space-y-1.5">
             <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-              <span>{isSnippetCode ? "연습 입력" : "코드 입력"}</span>
+              <span className="font-medium text-foreground">{isSnippetCode ? "Python 연습 코드" : "Python 코드"}</span>
               <span className="flex items-center gap-1.5">
+                <Badge variant="outline">{isSnippetCode ? "학습자가 작성" : "직접 편집"}</Badge>
                 <Badge className="hidden sm:inline-flex" variant="outline">Ctrl+Enter 실행</Badge>
-                {isSnippetCode && !draft.trim() ? <Badge variant="outline">직접 입력</Badge> : null}
               </span>
             </div>
             <div
+              aria-label={`${blockLabel(block)} 코드 편집기`}
               className={cn(
-                "rounded-md border bg-code shadow-inner transition-colors",
+                "rounded-md border bg-code shadow-inner transition-colors focus-within:border-ring focus-within:ring-2 focus-within:ring-ring/25",
                 isSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/60",
               )}
               data-learning-code-input="editor"
+              data-learning-code-input-role={isSnippetCode ? "student-practice" : "code-edit"}
+              data-learning-code-input-state={isSelected ? "selected" : "ready"}
               onClick={onSelect}
             >
               {renderCodeCellEditor({

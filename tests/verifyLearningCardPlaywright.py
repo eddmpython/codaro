@@ -595,7 +595,21 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
   if (!(snippetBox.textContent || '').includes('예제 스니펫')) {{
     throw new Error('snippet label missing');
   }}
-  const exerciseEditor = exercise.querySelector('[data-learning-exercise-input="editor"] .cm-editor');
+  const exerciseInput = exercise.querySelector('[data-learning-exercise-input="editor"][data-learning-exercise-input-role="student-practice"]');
+  if (!exerciseInput) throw new Error('student practice input missing');
+  if (!['ready', 'selected'].includes(exerciseInput.getAttribute('data-learning-exercise-input-state') || '')) {{
+    throw new Error('student practice state missing');
+  }}
+  if (!(exerciseInput.getAttribute('aria-label') || '').includes('직접 입력 실습 코드 편집기')) {{
+    throw new Error('student practice aria label missing');
+  }}
+  if (!(exercise.textContent || '').includes('Python 실습 코드')) {{
+    throw new Error('student practice label missing');
+  }}
+  if (!(exercise.textContent || '').includes('학습자가 작성')) {{
+    throw new Error('student authored badge missing');
+  }}
+  const exerciseEditor = exerciseInput.querySelector('.cm-editor');
   if (!exerciseEditor) throw new Error('editor missing');
   const exerciseEditorRect = exerciseEditor.getBoundingClientRect();
   if (exerciseEditorRect.width <= 0 || exerciseEditorRect.height <= 0) {{
