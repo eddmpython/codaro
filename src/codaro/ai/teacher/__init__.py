@@ -27,6 +27,7 @@ from .streamEvents import (
     teacherStreamErrorEvent,
     teacherStreamStartEvent,
     teacherStreamTokenEvent,
+    teacherStreamSseFrame,
     teacherStreamToolResultsEvent,
     teacherStreamToolStartEvent,
 )
@@ -96,6 +97,7 @@ __all__ = [
     "teacherStreamErrorEvent",
     "teacherStreamStartEvent",
     "teacherStreamTokenEvent",
+    "teacherStreamSseFrame",
     "teacherStreamToolResultsEvent",
     "teacherStreamToolStartEvent",
     "toolCallResult",

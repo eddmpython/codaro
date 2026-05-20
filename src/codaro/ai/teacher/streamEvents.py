@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import Any
 
 
@@ -29,3 +30,7 @@ def teacherStreamDoneEvent(payload: dict[str, Any]) -> dict[str, Any]:
 
 def teacherStreamErrorEvent(*, error: str, trace: dict[str, Any]) -> dict[str, Any]:
     return {"type": "error", "error": error, "trace": trace}
+
+
+def teacherStreamSseFrame(event: dict[str, Any]) -> str:
+    return f"data: {json.dumps(event, ensure_ascii=False)}\n\n"

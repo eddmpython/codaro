@@ -23,6 +23,7 @@ from codaro.ai.teacher import (
     teacherSkills,
     teacherStreamDoneEvent,
     teacherStreamErrorEvent,
+    teacherStreamSseFrame,
     teacherStreamToolResultsEvent,
     toolPolicyViolationPayload,
     toolCallsToProviderPayloads,
@@ -569,6 +570,7 @@ def testProviderStreamEventHelpersOwnProtocolShape() -> None:
     assert doneEvent["conversationId"] == "conv-event"
     assert errorEvent == {"type": "error", "error": "broken", "trace": {"errorCount": 1}}
     assert resultsEvent["toolCalls"][0]["toolCallId"] == "call-1"
+    assert teacherStreamSseFrame(doneEvent).startswith('data: {"type": "done", "conversationId": "conv-event"')
 
 
 def testTeacherSkillsAndCellSchemaAreVisibleSsot() -> None:

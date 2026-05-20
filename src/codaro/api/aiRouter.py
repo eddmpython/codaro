@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import json
 import logging
 from typing import Any
 
@@ -30,6 +29,7 @@ from ..ai.teacher import (
     prepareTeacherRuntimeTurnFromRequest,
     runTeacherChatLoop,
     runTeacherChatStream,
+    teacherStreamSseFrame,
 )
 
 logger = logging.getLogger(__name__)
@@ -46,6 +46,7 @@ _HANDLED_ERRORS = (
     TypeError,
     ValueError,
 )
+
 
 class AiProfileUpdateRequest(BaseModel):
     provider: str | None = None
@@ -220,7 +221,7 @@ def createAiRouter(state: Any) -> APIRouter:
                 executor=runtimeTurn.executor,
                 orchestrator=runtimeTurn.orchestrator,
             ):
-                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
+                yield teacherStreamSseFrame(event)
 
         return StreamingResponse(_streamGenerate(), media_type="text/event-stream")
 
