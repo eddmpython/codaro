@@ -60,6 +60,7 @@ OBJECTIVE_REQUIREMENTS = (
                 "data-learning-code-input",
                 "data-learning-exercise-input",
                 "data-learning-flow-canvas",
+                "data-learning-flow-track",
             )),
             ("editor/src/components/app/appPrimitives.tsx", (
                 "data-code-payload=\"snippet\"",
@@ -198,6 +199,7 @@ OBJECTIVE_REQUIREMENTS = (
                 "desktopOverview",
                 "mobileOverview",
                 "data-learning-flow-canvas",
+                "data-learning-flow-track",
             )),
         ),
     ),

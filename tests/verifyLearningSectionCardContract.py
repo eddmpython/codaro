@@ -50,6 +50,8 @@ def main() -> int:
         "diagram node marker": 'data-learning-flow-node="true"',
         "diagram connector marker": 'data-learning-flow-connector="true"',
         "diagram runtime marker": 'data-learning-flow-runtime="true"',
+        "diagram track marker": 'data-learning-flow-track="spine"',
+        "overview route track marker": 'data-learning-flow-track="overview-route"',
         "exercise marker": 'data-learning-section-part="exercise"',
         "exercise direct editor marker": 'data-learning-exercise-input="editor"',
         "result marker": 'data-learning-section-part="result"',

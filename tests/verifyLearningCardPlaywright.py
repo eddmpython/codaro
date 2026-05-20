@@ -469,6 +469,10 @@ def jsAssertLearningOverview(viewport: str) -> str:
   }}
   const canvas = diagram.querySelector('[data-learning-flow-canvas="true"]');
   if (!canvas) throw new Error('learning architecture canvas is missing');
+  const track = diagram.querySelector('[data-learning-flow-track="spine"]');
+  if (!track) throw new Error('learning architecture track is missing');
+  const trackRect = track.getBoundingClientRect();
+  if (trackRect.width <= 0 || trackRect.height <= 0) throw new Error('learning architecture track has no visible size');
   const nodes = Array.from(canvas.querySelectorAll('[data-learning-flow-node="true"]'));
   if (nodes.length < 3) throw new Error('learning architecture nodes are missing');
   const connectors = Array.from(canvas.querySelectorAll('[data-learning-flow-connector="true"]'));

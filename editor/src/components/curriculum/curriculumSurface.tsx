@@ -207,11 +207,11 @@ function LearningOverviewHeader({
 
   return (
     <header
-      className="overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm"
+      className="relative overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm"
       data-learning-overview="true"
       id={introBlock ? cellDomId(introBlock.id) : undefined}
     >
-      <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1fr)_410px]">
+      <div className="grid gap-5 p-5 xl:grid-cols-[minmax(0,1fr)_430px]">
         <div className="flex min-w-0 flex-col">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary">커리큘럼</Badge>
@@ -223,27 +223,22 @@ function LearningOverviewHeader({
           {overview.direction ? (
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground" data-learning-overview-part="direction">{overview.direction}</p>
           ) : null}
-          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground" data-learning-overview-part="route">
-            <span className="inline-flex items-center gap-1.5 rounded-md border bg-background/70 px-2.5 py-1.5">
-              <GitBranch className="size-3.5 text-sky-500" />
-              YAML 설계
-            </span>
-            <ArrowRight className="size-3.5" />
-            <span className="inline-flex items-center gap-1.5 rounded-md border bg-background/70 px-2.5 py-1.5">
-              <Layers3 className="size-3.5 text-amber-500" />
-              섹션 카드
-            </span>
-            <ArrowRight className="size-3.5" />
-            <span className="inline-flex items-center gap-1.5 rounded-md border bg-background/70 px-2.5 py-1.5">
-              <TerminalSquare className="size-3.5 text-emerald-500" />
-              직접 실행
-            </span>
+          <div
+            className="mt-5 grid gap-2 text-xs text-muted-foreground sm:grid-cols-[auto_minmax(20px,1fr)_auto_minmax(20px,1fr)_auto]"
+            data-learning-flow-track="overview-route"
+            data-learning-overview-part="route"
+          >
+            <LearningRouteStep Icon={GitBranch} label="YAML 설계" tone="text-sky-500" />
+            <LearningRouteConnector />
+            <LearningRouteStep Icon={Layers3} label="섹션 카드" tone="text-amber-500" />
+            <LearningRouteConnector />
+            <LearningRouteStep Icon={TerminalSquare} label="직접 실행" tone="text-emerald-500" />
           </div>
           {overview.benefits.length ? (
-            <div className="mt-4 grid gap-2 sm:grid-cols-2">
+            <div className="mt-5 grid gap-x-5 gap-y-2 border-t pt-4 sm:grid-cols-2">
               {overview.benefits.slice(0, 4).map((benefit, index) => (
                 <div
-                  className="flex min-w-0 items-start gap-2 rounded-md border bg-background/60 px-3 py-2 text-sm leading-5"
+                  className="flex min-w-0 items-start gap-2 text-sm leading-5"
                   data-learning-overview-part="benefit"
                   key={`${benefit}-${index}`}
                 >
@@ -268,6 +263,34 @@ function LearningOverviewHeader({
   );
 }
 
+function LearningRouteStep({
+  Icon,
+  label,
+  tone,
+}: {
+  Icon: ComponentType<{ className?: string }>;
+  label: string;
+  tone: string;
+}) {
+  return (
+    <span className="inline-flex min-w-0 items-center gap-1.5 font-medium text-foreground">
+      <span className={cn("flex size-7 shrink-0 items-center justify-center rounded-md bg-muted ring-1 ring-border", tone)}>
+        <Icon className="size-3.5" />
+      </span>
+      <span className="truncate">{label}</span>
+    </span>
+  );
+}
+
+function LearningRouteConnector() {
+  return (
+    <span className="hidden items-center sm:flex" data-learning-flow-connector="true">
+      <span className="h-px w-full min-w-6 bg-border" />
+      <ArrowRight className="-ml-1 size-3.5 shrink-0 text-muted-foreground" />
+    </span>
+  );
+}
+
 function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> }) {
   const customSteps = diagramSteps(diagram);
   const fallbackSteps = [
@@ -288,8 +311,17 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
   const visibleSteps = steps.slice(0, 4);
 
   return (
-    <div className="rounded-md border bg-background/70 p-3" data-learning-flow-diagram="true" data-learning-overview-part="diagram">
-      <div className="mb-3 flex items-center justify-between gap-2">
+    <div
+      className="relative min-h-[260px] overflow-hidden rounded-md border bg-muted/20 p-4"
+      data-learning-flow-diagram="true"
+      data-learning-overview-part="diagram"
+    >
+      <div
+        aria-hidden
+        className="absolute left-[31px] top-[104px] bottom-16 w-px bg-border sm:inset-x-4 sm:bottom-auto sm:h-px sm:w-auto"
+        data-learning-flow-track="spine"
+      />
+      <div className="relative z-10 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Boxes className="size-4 text-muted-foreground" />
           학습 아키텍처
@@ -300,14 +332,14 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
         </Badge>
       </div>
       <div
-        className="relative overflow-hidden rounded-md border bg-muted/20 p-3"
+        className="relative z-10 mt-4"
         data-learning-flow-canvas="true"
       >
         <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
           {visibleSteps.map(({ Icon, detail, label, tone }, index) => (
             <div className="contents" key={label}>
               <div
-                className="relative z-10 flex min-h-20 min-w-0 flex-1 flex-col justify-between rounded-md border bg-background px-3 py-2 shadow-xs"
+                className="relative z-10 flex min-h-24 min-w-0 flex-1 flex-col justify-between rounded-md bg-card/95 px-3 py-2 ring-1 ring-border"
                 data-learning-flow-node="true"
                 data-learning-flow-step={label}
               >
@@ -336,7 +368,7 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
               {index < visibleSteps.length - 1 ? (
                 <div
                   aria-hidden="true"
-                  className="flex items-center justify-center text-muted-foreground sm:w-6"
+                  className="flex items-center justify-center text-muted-foreground sm:w-7"
                   data-learning-flow-connector="true"
                 >
                   <ArrowRight className="hidden size-4 sm:block" />
@@ -346,13 +378,13 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
             </div>
           ))}
         </div>
-        <div className="mt-3 grid gap-2 sm:grid-cols-3" data-learning-flow-runtime="true">
+        <div className="mt-4 grid gap-2 border-t pt-3 sm:grid-cols-3" data-learning-flow-runtime="true">
           {[
             { label: "계약", detail: "YAML SSOT", Icon: GitBranch },
             { label: "환경", detail: "uv 패키지", Icon: Wrench },
             { label: "검증", detail: "실행 결과", Icon: CheckCircle2 },
           ].map(({ Icon, detail, label }) => (
-            <div className="flex min-w-0 items-center gap-2 rounded-md bg-background/70 px-2 py-1.5 text-xs" key={label}>
+            <div className="flex min-w-0 items-center gap-2 text-xs" key={label}>
               <Icon className="size-3.5 shrink-0 text-muted-foreground" />
               <span className="min-w-0">
                 <span className="mr-1 font-medium">{label}</span>
