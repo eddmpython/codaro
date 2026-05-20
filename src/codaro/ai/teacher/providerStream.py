@@ -10,9 +10,8 @@ from typing import Any
 from .providerLoop import (
     finishTeacherTurnPayload,
     finishTeacherToolCall,
-    recordAssistantToolRequest,
+    recordTeacherToolRoundRequest,
     startTeacherToolCall,
-    toolCallsToProviderPayloads,
 )
 from .teacherOrchestrator import TeacherOrchestrator
 from .traceModel import TeacherTrace
@@ -86,13 +85,12 @@ async def runTeacherChatStream(
             yield {"type": "done", **donePayload}
             return
 
-        providerToolCalls = toolCallsToProviderPayloads(response.toolCalls)
-        recordAssistantToolRequest(
+        recordTeacherToolRoundRequest(
+            toolCalls=response.toolCalls,
+            assistantAnswer=response.answer or "",
             convManager=convManager,
             conversationId=conversationId,
             messages=messages,
-            assistantAnswer=response.answer or "",
-            providerToolCalls=providerToolCalls,
         )
 
         if response.answer:

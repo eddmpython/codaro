@@ -163,6 +163,25 @@ def recordAssistantToolRequest(
     messages.append({"role": "assistant", "content": assistantAnswer, "tool_calls": providerToolCalls})
 
 
+def recordTeacherToolRoundRequest(
+    *,
+    toolCalls: list[ToolCall],
+    assistantAnswer: str,
+    convManager: Any,
+    conversationId: str,
+    messages: list[dict[str, Any]],
+) -> list[dict[str, Any]]:
+    providerToolCalls = toolCallsToProviderPayloads(toolCalls)
+    recordAssistantToolRequest(
+        convManager=convManager,
+        conversationId=conversationId,
+        messages=messages,
+        assistantAnswer=assistantAnswer,
+        providerToolCalls=providerToolCalls,
+    )
+    return providerToolCalls
+
+
 def startTeacherToolCall(
     *,
     orchestrator: TeacherOrchestrator,
@@ -208,13 +227,12 @@ async def executeTeacherToolRound(
     orchestrator: TeacherOrchestrator,
     trace: TeacherTrace,
 ) -> TeacherToolRound:
-    providerToolCalls = toolCallsToProviderPayloads(toolCalls)
-    recordAssistantToolRequest(
+    providerToolCalls = recordTeacherToolRoundRequest(
+        toolCalls=toolCalls,
+        assistantAnswer=assistantAnswer,
         convManager=convManager,
         conversationId=conversationId,
         messages=messages,
-        assistantAnswer=assistantAnswer,
-        providerToolCalls=providerToolCalls,
     )
 
     toolStarts: list[dict[str, Any]] = []
