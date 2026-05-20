@@ -110,6 +110,23 @@ def testToolPolicyRequiresPreflightBeforeExecution() -> None:
     assert policy.validateStart("cell-call", {"operation": "run", "blockId": "cell-1"}) is None
 
 
+def testToolPolicyRequiresInstallBeforeExecutionWhenPackageIsMissing() -> None:
+    policy = ToolPolicyState.fromContext({"dependencyPreflight": {"packages": ["seaborn"]}})
+
+    policy.recordResult("packages-check", {"names": ["seaborn"]}, {"missing": ["seaborn"]})
+    violation = policy.validateStart("cell-call", {"operation": "run", "blockId": "cell-1"})
+    assert violation is not None
+    assert violation.code == "dependency-install-required"
+
+    policy.recordResult("packages-install", {"name": "seaborn"}, {"success": False})
+    violation = policy.validateStart("cell-call", {"operation": "run", "blockId": "cell-1"})
+    assert violation is not None
+    assert violation.code == "dependency-install-required"
+
+    policy.recordResult("packages-install", {"name": "seaborn"}, {"success": True})
+    assert policy.validateStart("cell-call", {"operation": "run", "blockId": "cell-1"}) is None
+
+
 def testToolSequenceHarnessCapturesCoreExpectations() -> None:
     curriculumCase = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
     dependencyCase = next(case for case in goldenEvalCases if case.caseId == "dependency-preflight-before-install")

@@ -22,6 +22,7 @@ class ToolPolicyViolation:
 class ToolPolicyState:
     requiredPackages: set[str] = field(default_factory=set)
     checkedPackages: set[str] = field(default_factory=set)
+    installedPackages: set[str] = field(default_factory=set)
     missingPackages: set[str] = field(default_factory=set)
 
     @classmethod
@@ -34,11 +35,11 @@ class ToolPolicyState:
         packages = preflight.get("packages")
         if not isinstance(packages, list):
             return cls()
-        return cls(requiredPackages={str(package).strip().lower() for package in packages if str(package).strip()})
+        return cls(requiredPackages={normalizePackageName(package) for package in packages if normalizePackageName(package)})
 
     def validateStart(self, toolName: str, arguments: dict[str, Any]) -> ToolPolicyViolation | None:
         if toolName == "packages-install":
-            packageName = str(arguments.get("name", "")).strip().lower()
+            packageName = normalizePackageName(arguments.get("name", ""))
             if not packageName:
                 return ToolPolicyViolation("package-name-required", "packages-install에는 name이 필요합니다.", toolName)
             if packageName not in self.missingPackages:
@@ -56,15 +57,40 @@ class ToolPolicyState:
                     f"실행 전 packages-check가 필요합니다: {', '.join(sorted(unchecked))}",
                     toolName,
                 )
+            unresolved = (self.requiredPackages & self.missingPackages) - self.installedPackages
+            if unresolved:
+                return ToolPolicyViolation(
+                    "dependency-install-required",
+                    f"실행 전 packages-install이 필요합니다: {', '.join(sorted(unresolved))}",
+                    toolName,
+                )
 
         return None
 
     def recordResult(self, toolName: str, arguments: dict[str, Any], result: dict[str, Any]) -> None:
-        if toolName != "packages-check" or not isinstance(result, dict):
+        if not isinstance(result, dict):
             return
-        names = arguments.get("names")
-        if isinstance(names, list):
-            self.checkedPackages.update(str(name).strip().lower() for name in names if str(name).strip())
-        missing = result.get("missing")
-        if isinstance(missing, list):
-            self.missingPackages.update(str(name).strip().lower() for name in missing if str(name).strip())
+
+        if toolName == "packages-check":
+            names = arguments.get("names")
+            checked = set()
+            if isinstance(names, list):
+                checked = {normalizePackageName(name) for name in names if normalizePackageName(name)}
+            missing = result.get("missing")
+            missingNames = set()
+            if isinstance(missing, list):
+                missingNames = {normalizePackageName(name) for name in missing if normalizePackageName(name)}
+            self.checkedPackages.update(checked)
+            self.missingPackages.update(missingNames)
+            self.installedPackages.update(checked - missingNames)
+            return
+
+        if toolName == "packages-install" and result.get("success") is True:
+            packageName = normalizePackageName(arguments.get("name", ""))
+            if packageName:
+                self.installedPackages.add(packageName)
+                self.missingPackages.discard(packageName)
+
+
+def normalizePackageName(value: Any) -> str:
+    return str(value).strip().lower().replace("_", "-")

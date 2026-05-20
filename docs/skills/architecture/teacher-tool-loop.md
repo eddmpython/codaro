@@ -33,6 +33,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - 외부 라이브러리가 필요한 흐름이면 실행 전에 `packages-check`를 호출한다.
    - `packages-check` 결과의 `missing`이 비어 있으면 바로 다음 단계로 간다.
    - 누락이 있으면 `packages-install`을 누락 패키지별로 호출한다.
+   - 누락 패키지가 설치 성공으로 기록되기 전에는 `cell-call`이나 `execute-reactive`로 넘어가지 않는다.
    - 학습자에게는 패키지 설치 세부 로그보다 "필요한 도구를 준비 중"이라고 보여준다.
 
 4. **Curriculum YAML 우선**

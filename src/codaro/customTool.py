@@ -25,7 +25,7 @@ def _buildParametersSchema(func: Callable[..., Any]) -> dict[str, Any]:
     try:
         hints = inspect.get_annotations(func, eval_str=False)
     except Exception:  # noqa: BLE001 — annotation eval may fail
-        pass
+        logger.debug("Could not inspect custom tool annotations for %s", func, exc_info=True)
 
     properties: dict[str, Any] = {}
     required: list[str] = []

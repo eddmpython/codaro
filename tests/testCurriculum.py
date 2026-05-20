@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 import yaml
+from pydantic import ValidationError
 
 from codaro.curriculum.studyLoader import StudyLoader
 from codaro.curriculum.converter import yamlToDocument
@@ -121,7 +122,7 @@ def testAllCurriculaConvertToLocalDocuments() -> None:
             continue
         try:
             document, _ = yamlToDocument(raw, path.parent.name, path.stem)
-        except Exception as exc:  # pragma: no cover - assertion reports the failing path
+        except (KeyError, TypeError, ValueError, ValidationError) as exc:  # pragma: no cover - reports the failing path
             failures.append(f"{path}: {exc}")
             continue
         converted += 1
