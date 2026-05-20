@@ -34,10 +34,8 @@ import {
   type CustomCurriculumEntry,
 } from "@/lib/customCurricula";
 import {
-  appendUniqueBlocks,
   draftsFromBlocks,
   draftsFromDocument,
-  firstCodeBlockId,
   materializeDrafts,
   starterDocument,
 } from "@/lib/documentModel";
@@ -57,6 +55,11 @@ import {
   runNotebookBlock,
   runReactiveNotebook,
 } from "@/lib/notebookRuntime";
+import {
+  buildAcceptPendingChangesApplication,
+  buildRejectPendingChangesApplication,
+  type PendingChangesApplication,
+} from "@/lib/pendingChanges";
 import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
 import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
 import {
@@ -667,41 +670,44 @@ function App() {
   }
 
   function acceptPendingBlocks() {
-    if (!pendingBlocks.length) return;
-    if (pendingTarget === "curriculum") {
-      saveCustomCurriculum(pendingBlocks);
-      setPendingBlocks([]);
-      setPendingTarget("notebook");
-      return;
-    }
-    setDocument((current) => {
-      return appendUniqueBlocks(current, pendingBlocks, { generatedTitle: "생성된 노트북" }).document;
-    });
-    setDrafts((current) => ({
-      ...current,
-      ...draftsFromBlocks(pendingBlocks, { includeMarkdown: true }),
+    applyPendingChangesApplication(buildAcceptPendingChangesApplication({
+      document,
+      pendingBlocks,
+      pendingTarget,
     }));
-    const firstCodeId = firstCodeBlockId(pendingBlocks);
-    if (firstCodeId) setSelectedBlockId(firstCodeId);
-    setPendingBlocks([]);
-    setPendingTarget("notebook");
-    setSurface("editor");
-    setNotice({
-      tone: "success",
-      title: "노트북 변경 적용됨",
-      detail: `${pendingBlocks.length}개 셀을 추가했습니다.`,
-    });
   }
 
   function rejectPendingBlocks() {
-    if (!pendingBlocks.length) return;
-    setPendingBlocks([]);
-    setPendingTarget("notebook");
-    setNotice({
-      tone: "default",
-      title: "생성 항목 버림",
-      detail: "현재 문서는 변경하지 않았습니다.",
-    });
+    applyPendingChangesApplication(buildRejectPendingChangesApplication(pendingBlocks));
+  }
+
+  function applyPendingChangesApplication(application: PendingChangesApplication | null) {
+    if (!application) return;
+    if (application.curriculumToSave) {
+      saveCustomCurriculum(application.curriculumToSave.blocks, application.curriculumToSave.title);
+    }
+    if (application.documentToApply) {
+      setDocument(application.documentToApply);
+    }
+    if (Object.keys(application.draftUpdates).length) {
+      setDrafts((current) => ({
+        ...current,
+        ...application.draftUpdates,
+      }));
+    }
+    if (application.selectedBlockId) {
+      setSelectedBlockId(application.selectedBlockId);
+    }
+    if (application.clearPendingBlocks) {
+      setPendingBlocks([]);
+    }
+    setPendingTarget(application.pendingTarget);
+    if (application.surfaceToOpen) {
+      setSurface(application.surfaceToOpen);
+    }
+    if (application.notice) {
+      setNotice(application.notice);
+    }
   }
 
   function askCellAssistant(action: CellAiAction, block: BlockConfig) {
