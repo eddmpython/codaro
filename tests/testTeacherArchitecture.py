@@ -374,6 +374,7 @@ def testProviderStreamOwnsStreamingToolEvents() -> None:
     assert events[0]["conversationId"] == "conv-5"
     assert events[1]["toolCall"]["name"] == "read-cells"
     assert events[2]["toolCalls"][0]["status"] == "done"
+    assert events[-1]["conversationId"] == "conv-5"
     assert events[-1]["toolCalls"][0]["name"] == "read-cells"
     assert events[-1]["trace"]["toolSequence"] == ["read-cells"]
     assert [message["role"] for message in messages] == ["user", "assistant", "tool"]

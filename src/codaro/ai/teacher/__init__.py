@@ -11,6 +11,7 @@ from .evalHarness import (
 from .providerLoop import (
     TeacherToolRound,
     executeTeacherToolRound,
+    finishTeacherTurnPayload,
     finishTeacherToolCall,
     recordAssistantToolRequest,
     runTeacherChatLoop,
@@ -40,6 +41,7 @@ __all__ = [
     "evaluateToolSequence",
     "evaluateToolTrace",
     "evaluateToolTracePayload",
+    "finishTeacherTurnPayload",
     "finishTeacherToolCall",
     "goldenEvalCases",
     "injectContext",

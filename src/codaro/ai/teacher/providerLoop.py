@@ -38,6 +38,31 @@ def teacherTurnPayload(
     }
 
 
+def finishTeacherTurnPayload(
+    *,
+    convManager: Any,
+    conversationId: str,
+    orchestrator: TeacherOrchestrator,
+    trace: TeacherTrace,
+    answer: str,
+    provider: str,
+    model: str | None,
+    usage: Any,
+    toolCalls: list[dict[str, Any]],
+) -> dict[str, Any]:
+    convManager.addAssistantMessage(conversationId, answer)
+    tracePayload = orchestrator.finishTrace(trace, answer=answer, toolCalls=toolCalls)
+    return teacherTurnPayload(
+        conversationId=conversationId,
+        answer=answer,
+        provider=provider,
+        model=model,
+        usage=usage,
+        toolCalls=toolCalls,
+        trace=tracePayload,
+    )
+
+
 async def runTeacherChatLoop(
     *,
     provider: Any,
@@ -60,29 +85,29 @@ async def runTeacherChatLoop(
             response = provider.complete(messages)
 
         if not provider.supportsNativeTools or not tools:
-            convManager.addAssistantMessage(conversationId, response.answer)
-            tracePayload = orchestrator.finishTrace(trace, answer=response.answer, toolCalls=allToolResults)
-            return teacherTurnPayload(
+            return finishTeacherTurnPayload(
+                convManager=convManager,
                 conversationId=conversationId,
+                orchestrator=orchestrator,
+                trace=trace,
                 answer=response.answer,
                 provider=response.provider,
                 model=response.model,
                 usage=response.usage,
                 toolCalls=allToolResults,
-                trace=tracePayload,
             )
 
         if not response.toolCalls:
-            convManager.addAssistantMessage(conversationId, response.answer)
-            tracePayload = orchestrator.finishTrace(trace, answer=response.answer, toolCalls=allToolResults)
-            return teacherTurnPayload(
+            return finishTeacherTurnPayload(
+                convManager=convManager,
                 conversationId=conversationId,
+                orchestrator=orchestrator,
+                trace=trace,
                 answer=response.answer,
                 provider=response.provider,
                 model=response.model,
                 usage=response.usage,
                 toolCalls=allToolResults,
-                trace=tracePayload,
             )
 
         roundResult = await executeTeacherToolRound(
@@ -99,16 +124,16 @@ async def runTeacherChatLoop(
         allToolResults.extend(roundResult.toolResults)
 
     finalResponse = provider.complete(messages)
-    convManager.addAssistantMessage(conversationId, finalResponse.answer)
-    tracePayload = orchestrator.finishTrace(trace, answer=finalResponse.answer, toolCalls=allToolResults)
-    return teacherTurnPayload(
+    return finishTeacherTurnPayload(
+        convManager=convManager,
         conversationId=conversationId,
+        orchestrator=orchestrator,
+        trace=trace,
         answer=finalResponse.answer,
         provider=finalResponse.provider,
         model=finalResponse.model,
         usage=finalResponse.usage,
         toolCalls=allToolResults,
-        trace=tracePayload,
     )
 
 

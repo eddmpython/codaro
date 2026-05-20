@@ -6,6 +6,7 @@ from collections.abc import AsyncIterator
 from typing import Any
 
 from .providerLoop import (
+    finishTeacherTurnPayload,
     finishTeacherToolCall,
     recordAssistantToolRequest,
     startTeacherToolCall,
@@ -48,19 +49,20 @@ async def runTeacherChatStream(
         response = provider.completeWithTools(messages, tools)
 
         if not response.toolCalls:
-            convManager.addAssistantMessage(conversationId, response.answer)
-            tracePayload = orchestrator.finishTrace(trace, answer=response.answer, toolCalls=allToolResults)
+            donePayload = finishTeacherTurnPayload(
+                convManager=convManager,
+                conversationId=conversationId,
+                orchestrator=orchestrator,
+                trace=trace,
+                answer=response.answer,
+                provider=response.provider,
+                model=response.model,
+                usage=response.usage,
+                toolCalls=allToolResults,
+            )
             if response.answer:
                 yield {"type": "token", "content": response.answer}
-            yield {
-                "type": "done",
-                "answer": response.answer,
-                "provider": response.provider,
-                "model": response.model,
-                "usage": response.usage,
-                "toolCalls": allToolResults,
-                "trace": tracePayload,
-            }
+            yield {"type": "done", **donePayload}
             return
 
         providerToolCalls = toolCallsToProviderPayloads(response.toolCalls)
@@ -137,15 +139,16 @@ async def streamTeacherTokens(
         accumulated += token
         yield {"type": "delta", "delta": token, "content": accumulated}
 
-    convManager.addAssistantMessage(conversationId, accumulated)
-    tracePayload = orchestrator.finishTrace(trace, answer=accumulated, toolCalls=toolCalls or [])
-    yield {
-        "type": "done",
-        "answer": accumulated,
-        "provider": provider.config.provider,
-        "model": provider.resolvedModel,
-        "usage": None,
-        "toolCalls": toolCalls or [],
-        "trace": tracePayload,
-    }
+    donePayload = finishTeacherTurnPayload(
+        convManager=convManager,
+        conversationId=conversationId,
+        orchestrator=orchestrator,
+        trace=trace,
+        answer=accumulated,
+        provider=provider.config.provider,
+        model=provider.resolvedModel,
+        usage=None,
+        toolCalls=toolCalls or [],
+    )
+    yield {"type": "done", **donePayload}
     thread.join(timeout=2)
