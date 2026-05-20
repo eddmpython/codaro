@@ -76,9 +76,9 @@ import {
 } from "@/lib/assistantConversationState";
 import { runAssistantProviderTurn } from "@/lib/assistantProviderTurn";
 import {
-  assistantResponseNotice,
-  buildAssistantResponsePlan,
+  buildAssistantResponseApplication,
   mergePendingBlocks,
+  type PendingTarget,
 } from "@/lib/assistantResponsePlan";
 import {
   isProviderAuthError,
@@ -106,8 +106,6 @@ import type {
   TaskListPayload,
   VariableInfo,
 } from "@/types";
-
-type PendingTarget = "notebook" | "curriculum";
 
 const initialAutomationSnapshot = fallbackAutomationSnapshot();
 
@@ -565,27 +563,28 @@ function App() {
         },
         updateMessages: setMessages,
       });
-      let savedCurriculumTitle = "";
       setConversationId(response.conversationId);
 
-      const responsePlan = buildAssistantResponsePlan({ activeScope, message, response });
-      if (responsePlan.documentToApply) {
-        applyDocument(responsePlan.documentToApply);
-        setSurface("editor");
+      const application = buildAssistantResponseApplication({
+        activeScope,
+        message,
+        response,
+        saveCurriculum: saveCustomCurriculum,
+      });
+      if (application.documentToApply) {
+        applyDocument(application.documentToApply);
       }
-      if (responsePlan.pendingBlocks.length) {
-        setPendingTarget("notebook");
-        setPendingBlocks((current) => mergePendingBlocks(current, responsePlan.pendingBlocks));
+      if (application.surfaceToOpen) {
+        setSurface(application.surfaceToOpen);
       }
-      if (responsePlan.curriculumToSave) {
-        savedCurriculumTitle = saveCustomCurriculum(
-          responsePlan.curriculumToSave.blocks,
-          responsePlan.curriculumToSave.title,
-        )?.title ?? responsePlan.curriculumToSave.title ?? "";
+      if (application.pendingBlocks.length) {
+        setPendingBlocks((current) => mergePendingBlocks(current, application.pendingBlocks));
       }
-      if (responsePlan.clearPendingBlocks) {
+      if (application.pendingTarget) {
+        setPendingTarget(application.pendingTarget);
+      }
+      if (application.clearPendingBlocks) {
         setPendingBlocks([]);
-        setPendingTarget("notebook");
       }
       setMessages((current) => finalizeAssistantMessage({
         assistantMessageId,
@@ -593,7 +592,7 @@ function App() {
         response,
         streamedContent,
       }));
-      setNotice(assistantResponseNotice({ activeScope, response, savedCurriculumTitle }));
+      setNotice(application.notice);
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
       const providerAuthIssue = isProviderAuthError(detail);
