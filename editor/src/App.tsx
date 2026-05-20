@@ -6,10 +6,6 @@ import {
 import { MainSurface } from "@/components/app/mainSurface";
 import { TopBar } from "@/components/app/topBar";
 import { ProductSidebar, type SidebarCustomCurriculum } from "@/components/app/productSidebar";
-import {
-  aiProviderName,
-  type AssistantMessage,
-} from "@/components/assistant/assistantPanel";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
 import {
   categorySubtitle,
@@ -20,40 +16,14 @@ import {
   type CustomCurriculumApplication,
 } from "@/lib/customCurricula";
 import {
-  materializeDrafts,
-} from "@/lib/documentModel";
-import {
-  buildLocalAssistantDraft,
-  completeLocalAssistantDraft,
-} from "@/lib/localFallback";
-import {
   buildAcceptPendingChangesApplication,
   buildRejectPendingChangesApplication,
   type PendingChangesApplication,
 } from "@/lib/pendingChanges";
 import type { AutomationSection } from "@/lib/surfaceModel";
-import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
-import {
-  buildCellAiPrompt,
-  type CellAiAction,
-} from "@/lib/cellModel";
-import {
-  buildAssistantContext,
-} from "@/lib/assistantContext";
-import {
-  createAssistantPlaceholder,
-  createUserMessage,
-  failAssistantMessage,
-  finalizeAssistantMessage,
-} from "@/lib/assistantConversationState";
-import { runAssistantProviderTurn } from "@/lib/assistantProviderTurn";
-import {
-  buildAssistantResponseApplication,
-  mergePendingBlocks,
-  type PendingTarget,
-} from "@/lib/assistantResponsePlan";
-import { providerAssistantFailure } from "@/lib/providerConnection";
+import type { PendingTarget } from "@/lib/assistantResponsePlan";
 import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
+import { useAssistantTurnState } from "@/hooks/useAssistantTurnState";
 import { useAutomationState } from "@/hooks/useAutomationState";
 import { useCustomCurriculaState } from "@/hooks/useCustomCurriculaState";
 import { useCurriculumLibraryState } from "@/hooks/useCurriculumLibraryState";
@@ -124,11 +94,6 @@ function App() {
   const { themeMode, toggleThemeMode } = useThemeMode();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [assistantCollapsed, setAssistantCollapsed] = useState(false);
-  const [conversationId, setConversationId] = useState<string | null>(null);
-  const [prompt, setPrompt] = useState("");
-  const [teacherScope, setTeacherScope] = useState<TeacherScope>("cell");
-  const [messages, setMessages] = useState<AssistantMessage[]>([]);
-  const [assistantLoading, setAssistantLoading] = useState(false);
   const {
     auditCount,
     automationSection,
@@ -216,123 +181,35 @@ function App() {
     refreshAutomation,
   });
 
-  async function askAssistant(messageOverride?: string, scopeOverride?: TeacherScope) {
-    const message = (messageOverride ?? prompt).trim();
-    const activeScope = scopeOverride ?? inferTeacherScope(message, teacherScope);
-    if (!message || assistantLoading) return;
-
-    const userMessage = createUserMessage(message);
-    setMessages((current) => [...current, userMessage]);
-    setPrompt("");
-    setAssistantLoading(true);
-
-    if (!apiOnline) {
-      const localDraft = buildLocalAssistantDraft(message, activeScope);
-      const savedEntry = localDraft.shouldSaveCurriculum
-        ? saveCustomCurriculum(localDraft.generatedBlocks)
-        : null;
-      if (localDraft.clearPendingBlocks) {
-        setPendingBlocks([]);
-        setPendingTarget("notebook");
-      }
-      const localResult = completeLocalAssistantDraft({
-        draft: localDraft,
-        message,
-        savedTitle: savedEntry?.title,
-        scope: activeScope,
-      });
-      setMessages((current) => [...current, localResult.assistantMessage]);
-      setNotice(localResult.notice);
-      setAssistantLoading(false);
-      return;
-    }
-
-    const contextDocument = materializeDrafts(activeDocument, drafts);
-    const context = buildAssistantContext({
-      surface,
-      activeScope,
-      document: contextDocument,
-      drafts,
-      message,
-      results,
-      selectedBlock,
-      currentResult: currentResult ?? null,
-      variables,
-      tools: toolCatalog.tools.map((tool) => ({
-        name: tool.name,
-        category: tool.category,
-        lane: tool.lane,
-        target: tool.target,
-        risk: tool.risk,
-      })),
-    });
-
-    const assistantMessageId = `assistant-${Date.now()}`;
-    setMessages((current) => [
-      ...current,
-      createAssistantPlaceholder({
-        id: assistantMessageId,
-        provider: aiProviderName(aiProfile),
-      }),
-    ]);
-
-    try {
-      const { response, streamedContent } = await runAssistantProviderTurn({
-        assistantMessageId,
-        onConversationId: setConversationId,
-        request: {
-          conversationId,
-          message,
-          sessionId,
-          role: "teacher",
-          context,
-        },
-        updateMessages: setMessages,
-      });
-      setConversationId(response.conversationId);
-
-      const application = buildAssistantResponseApplication({
-        activeScope,
-        message,
-        response,
-        saveCurriculum: saveCustomCurriculum,
-      });
-      if (application.documentToApply) {
-        applyDocument(application.documentToApply);
-      }
-      if (application.surfaceToOpen) {
-        setSurface(application.surfaceToOpen);
-      }
-      if (application.pendingBlocks.length) {
-        setPendingBlocks((current) => mergePendingBlocks(current, application.pendingBlocks));
-      }
-      if (application.pendingTarget) {
-        setPendingTarget(application.pendingTarget);
-      }
-      if (application.clearPendingBlocks) {
-        setPendingBlocks([]);
-      }
-      setMessages((current) => finalizeAssistantMessage({
-        assistantMessageId,
-        messages: current,
-        response,
-        streamedContent,
-      }));
-      setNotice(application.notice);
-    } catch (error) {
-      const detail = error instanceof Error ? error.message : String(error);
-      const failure = providerAssistantFailure(detail);
-      setMessages((current) => failAssistantMessage({
-        action: failure.action,
-        assistantMessageId,
-        content: failure.content,
-        messages: current,
-      }));
-      setNotice(failure.notice);
-    } finally {
-      setAssistantLoading(false);
-    }
-  }
+  const {
+    askAssistant,
+    askCellAssistant,
+    assistantLoading,
+    messages,
+    prompt,
+    setPrompt,
+    startNewChat,
+  } = useAssistantTurnState({
+    activeDocument,
+    apiOnline,
+    applyDocument,
+    currentResult,
+    drafts,
+    profile: aiProfile,
+    results,
+    saveCurriculum: saveCustomCurriculum,
+    selectedBlock,
+    selectCurriculumBlock: setSelectedCurriculumBlockId,
+    selectNotebookBlock: selectBlock,
+    sessionId,
+    setPendingBlocks,
+    setPendingTarget,
+    setSurface,
+    surface,
+    toolCatalog,
+    variables,
+    onNotice: setNotice,
+  });
 
   function saveCustomCurriculum(blocks: BlockConfig[], title?: string) {
     const entry = saveCustomCurriculumEntry(blocks, title);
@@ -386,16 +263,6 @@ function App() {
     if (application.notice) {
       setNotice(application.notice);
     }
-  }
-
-  function askCellAssistant(action: CellAiAction, block: BlockConfig) {
-    if (surface === "curriculum") {
-      setSelectedCurriculumBlockId(block.id);
-    } else {
-      selectBlock(block.id);
-    }
-    setTeacherScope("cell");
-    void askAssistant(buildCellAiPrompt(action, block), "cell");
   }
 
   function selectCurriculumCategory(key: string) {
@@ -495,11 +362,7 @@ function App() {
           onConnectAi={connectAiProvider}
           onCellAsk={askCellAssistant}
           onDraftChange={updateDraft}
-          onNewChat={() => {
-            setConversationId(null);
-            setMessages([]);
-            setPrompt("");
-          }}
+          onNewChat={startNewChat}
           onPromptChange={setPrompt}
           onRejectPendingBlocks={rejectPendingBlocks}
           onRefreshAutomation={refreshAutomation}
