@@ -237,6 +237,16 @@ class ConversationManager:
         return toolSchemas()
 
 
+_conversationManager: ConversationManager | None = None
+
+
+def getConversationManager() -> ConversationManager:
+    global _conversationManager
+    if _conversationManager is None:
+        _conversationManager = ConversationManager()
+    return _conversationManager
+
+
 def createConversationPayload(
     manager: ConversationManager,
     *,

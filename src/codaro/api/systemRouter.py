@@ -154,8 +154,9 @@ def createSystemRouter(state: ServerState) -> APIRouter:
             except (ImportError, AttributeError):
                 pass
 
-        from .aiRouter import _getConversationManager
-        convManager = _getConversationManager()
+        from ..ai.conversation import getConversationManager
+
+        convManager = getConversationManager()
 
         return {
             "status": "ok",

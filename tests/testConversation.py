@@ -11,6 +11,7 @@ from codaro.ai.conversation import (
     conversationListPayload,
     createConversationPayload,
     deleteConversationPayload,
+    getConversationManager,
 )
 from codaro.ai.tools import toolSchemas
 
@@ -129,6 +130,9 @@ class TestConversationManager:
         with pytest.raises(ConversationNotFound) as excInfo:
             deleteConversationPayload(manager, "missing-conversation")
         assert excInfo.value.conversationId == "missing-conversation"
+
+    def test_get_conversation_manager_returns_singleton(self):
+        assert getConversationManager() is getConversationManager()
 
 
 class TestBuildSystemPrompt:

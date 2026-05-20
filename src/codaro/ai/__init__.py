@@ -17,6 +17,7 @@ from .conversation import (
     conversationListPayload,
     createConversationPayload,
     deleteConversationPayload,
+    getConversationManager,
 )
 from .factory import createProvider, registerProvider, availableProviders
 from .profile import AiProfileManager, AiProfile, getProfileManager
@@ -57,6 +58,7 @@ __all__ = [
     "conversationListPayload",
     "createConversationPayload",
     "deleteConversationPayload",
+    "getConversationManager",
     "buildCompletionMessages",
     "completeCode",
     "completeCodeFromRequest",

@@ -12,6 +12,7 @@ from ..ai.conversation import (
     conversationListPayload,
     createConversationPayload,
     deleteConversationPayload,
+    getConversationManager,
 )
 from ..ai.oauthFlow import getOAuthLoginFlow
 from ..ai.profile import AiProfileManager, getProfileManager
@@ -166,26 +167,26 @@ def createAiRouter(state: Any) -> APIRouter:
         systemPrompt: str | None = Query(None),
     ):
         return createConversationPayload(
-            _getConversationManager(),
+            getConversationManager(),
             role=role,
             systemPrompt=systemPrompt,
         )
 
     @router.get("/api/ai/conversations")
     def apiListConversations():
-        return conversationListPayload(_getConversationManager())
+        return conversationListPayload(getConversationManager())
 
     @router.delete("/api/ai/conversations/{conversationId}")
     def apiDeleteConversation(conversationId: str):
         try:
-            return deleteConversationPayload(_getConversationManager(), conversationId)
+            return deleteConversationPayload(getConversationManager(), conversationId)
         except ConversationNotFound as exc:
             raise HTTPException(status_code=404, detail="Conversation not found") from exc
 
     @router.post("/api/ai/chat")
     async def apiChat(request: Request):
         body = await request.json()
-        convManager = _getConversationManager()
+        convManager = getConversationManager()
         runtimeTurn = _prepareTeacherRuntimeTurnForHttp(
             body=body,
             convManager=convManager,
@@ -210,7 +211,7 @@ def createAiRouter(state: Any) -> APIRouter:
         from starlette.responses import StreamingResponse
 
         body = await request.json()
-        convManager = _getConversationManager()
+        convManager = getConversationManager()
         runtimeTurn = _prepareTeacherRuntimeTurnForHttp(
             body=body,
             convManager=convManager,
@@ -246,17 +247,6 @@ def createAiRouter(state: Any) -> APIRouter:
             return emptyCompletionResult().payload()
 
     return router
-
-
-_conversationManager = None
-
-
-def _getConversationManager():
-    global _conversationManager
-    if _conversationManager is None:
-        from ..ai.conversation import ConversationManager
-        _conversationManager = ConversationManager()
-    return _conversationManager
 
 
 def _prepareTeacherRuntimeTurnForHttp(*, body: dict[str, Any], convManager: Any, state: Any):

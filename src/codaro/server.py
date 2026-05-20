@@ -164,12 +164,13 @@ def createServerApp(
         )
 
         async def reapSessionsPeriodically() -> None:
-            from .api.aiRouter import _getConversationManager
+            from .ai.conversation import getConversationManager
+
             while True:
                 await asyncio.sleep(300)
                 try:
                     sessionReaped = state.sessionManager.reapExpired()
-                    convManager = _getConversationManager()
+                    convManager = getConversationManager()
                     convReaped = convManager.reapExpired()
                     if sessionReaped > 0 or convReaped > 0:
                         logger.info(
