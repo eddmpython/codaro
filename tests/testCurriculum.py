@@ -5,12 +5,36 @@ from pathlib import Path
 import yaml
 from pydantic import ValidationError
 
+from codaro.curriculum.contentCache import CurriculumContentCache
 from codaro.curriculum.studyLoader import StudyLoader
 from codaro.curriculum.converter import yamlToDocument
 from codaro.curriculum.progress import ProgressTracker
 
 
 CURRICULA_DIR = Path(__file__).resolve().parent.parent / "curricula" / "python"
+
+
+class _CountingStudyLoader:
+    def __init__(self) -> None:
+        self.loadCount = 0
+        self.prevNextCount = 0
+
+    def loadStudy(self, category: str, contentId: str) -> dict:
+        self.loadCount += 1
+        return {
+            "meta": {"title": f"{category}:{contentId}"},
+            "intro": {"goal": "cache test"},
+            "sections": [
+                {
+                    "title": "섹션",
+                    "blocks": [{"type": "code", "title": "실행", "content": "value = 1"}],
+                }
+            ],
+        }
+
+    def getPrevNext(self, category: str, contentId: str) -> dict:
+        self.prevNextCount += 1
+        return {"prev": None, "next": {"contentId": f"{contentId}-next", "title": "다음"}}
 
 
 def testListCategories() -> None:
@@ -65,6 +89,26 @@ def testYamlToDocument() -> None:
     assert all(b.sourceType != "marimoIDE" for b in document.blocks)
 
     assert len(solutions) > 0
+
+
+def testCurriculumContentCacheOwnsResponseAndDefensiveCopy() -> None:
+    loader = _CountingStudyLoader()
+    cache = CurriculumContentCache()
+
+    first = cache.get(loader, "demo", "lesson")
+    first.document.blocks[0].content = "mutated"
+    second = cache.get(loader, "demo", "lesson")
+    response = second.response()
+
+    assert loader.loadCount == 1
+    assert loader.prevNextCount == 1
+    assert second.category == "demo"
+    assert second.contentId == "lesson"
+    assert second.blockCount >= 2
+    assert response["category"] == "demo"
+    assert response["contentId"] == "lesson"
+    assert response["prevNext"] == {"prev": None, "next": {"contentId": "lesson-next", "title": "다음"}}
+    assert response["document"]["blocks"][0]["content"] != "mutated"
 
 
 def testYamlBlockTypesDriveCellMetadata() -> None:

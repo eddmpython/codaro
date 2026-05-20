@@ -1,4 +1,5 @@
 from .checker import CheckResult, checkByOutput, checkByVariable, checkContains, checkNoError
+from .contentCache import CurriculumContentCache, CurriculumContentPayload
 from .exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
 from .studyLoader import (
     CATEGORY_GROUPS,
@@ -18,6 +19,8 @@ __all__ = [
     "CATEGORY_MAPPING",
     "CategoryInfo",
     "CheckResult",
+    "CurriculumContentCache",
+    "CurriculumContentPayload",
     "ExerciseCheckInput",
     "StudyLoader",
     "StudySummary",

@@ -3,8 +3,8 @@ from __future__ import annotations
 from fastapi import APIRouter
 
 from ..curriculum.exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
+from ..curriculum.contentCache import CurriculumContentCache
 from ..curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS
-from ..curriculum.converter import yamlToDocument
 from ..curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, LESSON_STRUCTURE, PHILOSOPHY
 from ..serverLog import formatLogFields, getServerLogger
 from .appState import ServerState
@@ -15,7 +15,7 @@ from .requestModels import CheckExerciseRequest, CurriculumProgressRequest
 def createCurriculumRouter(state: ServerState) -> APIRouter:
     router = APIRouter()
     logger = getServerLogger()
-    convertedStudyCache: dict[str, dict[str, object]] = {}
+    contentCache = CurriculumContentCache()
 
     @router.get("/api/curriculum/categories")
     def apiCurriculumCategories() -> dict[str, object]:
@@ -51,42 +51,22 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
     def apiCurriculumContent(category: str, contentId: str) -> dict[str, object]:
         if state.studyLoader is None:
             fail(404, "curriculum_unavailable", "Curriculum content not available.")
-        cacheKey = f"{category}/{contentId}"
-        cachedPayload = convertedStudyCache.get(cacheKey)
-        if cachedPayload is None:
-            try:
-                yamlContent = state.studyLoader.loadStudy(category, contentId)
-            except FileNotFoundError:
-                fail(404, "curriculum_content_not_found", "Content not found.")
-            document, solutions = yamlToDocument(yamlContent, category, contentId)
-            prevNext = state.studyLoader.getPrevNext(category, contentId)
-            cachedPayload = {
-                "document": document,
-                "solutions": dict(solutions),
-                "prevNext": dict(prevNext),
-            }
-            convertedStudyCache[cacheKey] = cachedPayload
+        try:
+            payload = contentCache.get(state.studyLoader, category, contentId)
+        except FileNotFoundError:
+            fail(404, "curriculum_content_not_found", "Content not found.")
         state.progressTracker.markAccessed(category, contentId)
-        document = cachedPayload["document"].model_copy(deep=True)
-        solutions = dict(cachedPayload["solutions"])
-        prevNext = dict(cachedPayload["prevNext"])
         logger.debug(
             "curriculum %s",
             formatLogFields(
                 action="content",
                 category=category,
                 contentId=contentId,
-                blockCount=len(document.blocks),
-                solutionCount=len(solutions),
+                blockCount=payload.blockCount,
+                solutionCount=payload.solutionCount,
             ),
         )
-        return {
-            "document": document.model_dump(),
-            "solutions": solutions,
-            "category": category,
-            "contentId": contentId,
-            "prevNext": prevNext,
-        }
+        return payload.response()
 
     @router.get("/api/curriculum/progress")
     def apiCurriculumProgress() -> dict[str, object]:
