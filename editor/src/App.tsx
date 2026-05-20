@@ -17,12 +17,6 @@ import {
   categoryTitle,
 } from "@/lib/fallbackData";
 import {
-  loadCurriculumContentsState,
-  loadCurriculumLessonState,
-  selectCategory,
-  selectContent,
-} from "@/lib/curriculumSelection";
-import {
   buildCustomCurriculumApplication,
   type CustomCurriculumApplication,
 } from "@/lib/customCurricula";
@@ -69,6 +63,7 @@ import {
 import { providerAssistantFailure } from "@/lib/providerConnection";
 import { useAutomationState } from "@/hooks/useAutomationState";
 import { useCustomCurriculaState } from "@/hooks/useCustomCurriculaState";
+import { useCurriculumLibraryState } from "@/hooks/useCurriculumLibraryState";
 import { useNotebookDocumentState } from "@/hooks/useNotebookDocumentState";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
@@ -90,12 +85,6 @@ function App() {
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [apiOnline, setApiOnline] = useState(initialBootstrapState.apiOnline);
   const [notice, setNotice] = useState<AppNotice>(initialAppNotice);
-  const [categories, setCategories] = useState(initialBootstrapState.categories);
-  const [contents, setContents] = useState(initialBootstrapState.contents);
-  const [selectedCategory, setSelectedCategory] = useState(initialBootstrapState.selectedCategory);
-  const [selectedContentId, setSelectedContentId] = useState(initialBootstrapState.selectedContentId);
-  const [contentsLoading, setContentsLoading] = useState(false);
-  const [referenceLoading, setReferenceLoading] = useState(false);
   const {
     addNotebookCell,
     applyDraftUpdates,
@@ -107,8 +96,24 @@ function App() {
     selectBlock,
     updateDraft,
   } = useNotebookDocumentState();
-  const [curriculumDocument, setCurriculumDocument] = useState<CodaroDocument | null>(initialBootstrapState.curriculumDocument);
-  const [selectedCurriculumBlockId, setSelectedCurriculumBlockId] = useState(initialBootstrapState.curriculumDocument?.blocks[0]?.id ?? "");
+  const {
+    applyBootstrapCurriculumState,
+    applyCurriculumSelectionState,
+    categories,
+    contents,
+    contentsLoading,
+    curriculumDocument,
+    referenceLoading,
+    selectCurriculumCategoryState,
+    selectCurriculumContentState,
+    selectedCategory,
+    selectedContentId,
+    selectedCurriculumBlockId,
+    setSelectedCurriculumBlockId,
+  } = useCurriculumLibraryState({
+    onDraftUpdates: applyDraftUpdates,
+    onNotice: setNotice,
+  });
   const [pendingBlocks, setPendingBlocks] = useState<BlockConfig[]>([]);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget>("notebook");
   const {
@@ -176,9 +181,7 @@ function App() {
       const bootstrap = await loadAppBootstrapState();
       if (cancelled) return;
       setApiOnline(bootstrap.apiOnline);
-      setCategories(bootstrap.categories);
-      setContents(bootstrap.contents);
-      setCurriculumDocument(bootstrap.curriculumDocument);
+      applyBootstrapCurriculumState(bootstrap);
       setToolCatalog(bootstrap.toolCatalog);
       setAiProfile(bootstrap.profile);
       if (bootstrap.sessionId) setSessionId(bootstrap.sessionId);
@@ -203,57 +206,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [applyDocument, refreshAutomation]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadContents() {
-      setContentsLoading(true);
-      try {
-        const result = await loadCurriculumContentsState(selectedCategory, selectedContentId);
-        if (cancelled) return;
-        if (result) {
-          setContents(result.contents);
-          setSelectedContentId(result.selectedContentId);
-        }
-      } finally {
-        if (!cancelled) setContentsLoading(false);
-      }
-    }
-
-    void loadContents();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [selectedCategory, selectedContentId]);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    async function loadReferenceLesson() {
-      setReferenceLoading(true);
-      try {
-        const result = await loadCurriculumLessonState(selectedCategory, selectedContentId);
-        if (cancelled) return;
-        if (result) {
-          setCurriculumDocument(result.document);
-          applyDraftUpdates(result.draftUpdates);
-          setSelectedCurriculumBlockId(result.selectedBlockId);
-          setNotice(result.notice);
-        }
-      } finally {
-        if (!cancelled) setReferenceLoading(false);
-      }
-    }
-
-    void loadReferenceLesson();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [applyDraftUpdates, selectedCategory, selectedContentId]);
+  }, [applyBootstrapCurriculumState, applyDocument, refreshAutomation]);
 
   const filteredCategories = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
@@ -462,12 +415,8 @@ function App() {
   }
 
   function applyCustomCurriculumApplication(application: CustomCurriculumApplication) {
-    setCurriculumDocument(application.document);
-    applyDraftUpdates(application.draftUpdates);
-    setSelectedCategory(application.selectedCategory);
-    setSelectedContentId(application.selectedContentId);
+    applyCurriculumSelectionState(application);
     setSelectedCustomCurriculumId(application.selectedCustomCurriculumId);
-    setSelectedCurriculumBlockId(application.selectedBlockId);
     setSurface(application.surfaceToOpen);
     if (application.notice) {
       setNotice(application.notice);
@@ -523,17 +472,13 @@ function App() {
   }
 
   function selectCurriculumCategory(key: string) {
-    const selection = selectCategory(key);
-    setSelectedCategory(selection.selectedCategory);
-    setSelectedContentId(selection.selectedContentId);
+    const selection = selectCurriculumCategoryState(key);
     setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
     setSurface("curriculum");
   }
 
   function selectCurriculumContent(contentId: string) {
-    const selection = selectContent(contentId, selectedCategory);
-    setSelectedCategory(selection.selectedCategory);
-    setSelectedContentId(selection.selectedContentId);
+    const selection = selectCurriculumContentState(contentId);
     setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
     setSurface("curriculum");
   }
