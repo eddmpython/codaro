@@ -68,6 +68,7 @@ def main(argv: list[str] | None = None) -> int:
         desktopOverview = cli.eval(jsAssertLearningOverview("desktop"))
         desktop = cli.eval(jsAssertStructuredCardLayout("desktop"))
         desktopControls = cli.eval(jsAssertStructuredCardControls("desktop"))
+        desktopContractGaps = cli.eval(jsAssertContractGapWarning("desktop"))
         cli.run("resize", "1680", "900")
         toc = cli.eval(jsAssertTocPushRail())
         cli.run("resize", "390", "844")
@@ -76,9 +77,11 @@ def main(argv: list[str] | None = None) -> int:
         mobileOverview = cli.eval(jsAssertLearningOverview("mobile"))
         mobile = cli.eval(jsAssertStructuredCardLayout("mobile"))
         mobileControls = cli.eval(jsAssertStructuredCardControls("mobile"))
+        mobileContractGaps = cli.eval(jsAssertContractGapWarning("mobile"))
         print(
             "ok: Playwright structured learning card verified "
-            f"{desktopOverview} {desktop} {desktopControls} {toc} {mobileOverview} {mobile} {mobileControls}"
+            f"{desktopOverview} {desktop} {desktopControls} {desktopContractGaps} "
+            f"{toc} {mobileOverview} {mobile} {mobileControls} {mobileContractGaps}"
         )
         return 0
     except VerificationError as exc:
@@ -222,6 +225,21 @@ def assertMaterializedContract(document: dict[str, Any]) -> None:
     sectionIndex = sourceTypes.index("section")
     if sourceTypes[sectionIndex:sectionIndex + len(expectedFlow)] != expectedFlow:
         raise VerificationError(f"materialized section flow is not contiguous: {sourceTypes}")
+    gapSections = [
+        block
+        for block in blocks
+        if isinstance(block, dict)
+        and block.get("sourceType") == "section"
+        and isinstance(block.get("payload"), dict)
+        and isinstance(block["payload"].get("sectionContract"), dict)
+        and block["payload"]["sectionContract"].get("title") == "부분 구조화 섹션"
+    ]
+    if not gapSections:
+        raise VerificationError("materialized document missing partial contract gap section")
+    gapContract = gapSections[0]["payload"]["sectionContract"]
+    gaps = gapContract.get("contractGaps")
+    if not isinstance(gaps, list) or "snippet" not in gaps or "exercise.starterCode" not in gaps:
+        raise VerificationError(f"partial contract gaps not preserved: {gaps}")
 
     runtime = document.get("runtime")
     packages = runtime.get("packages") if isinstance(runtime, dict) else None
@@ -239,17 +257,16 @@ def compactDocumentForBrowserStorage(document: dict[str, Any]) -> dict[str, Any]
     if not isinstance(blocks, list):
         return document
 
-    compactBlocks = [compactBlock(block) for block in blocks if isinstance(block, dict)]
+    compactBlocks = []
+    for index, block in enumerate(block for block in blocks if isinstance(block, dict)):
+        compact = compactBlock(block)
+        compact["id"] = f"b{index}"
+        compactBlocks.append(compact)
     return {
         "id": document.get("id"),
         "title": document.get("title"),
         "blocks": compactBlocks,
-        "metadata": {
-            "sourceFormat": "curriculum",
-            "tags": ["playwright", "structured-section-card"],
-        },
         "runtime": document.get("runtime"),
-        "app": document.get("app"),
     }
 
 
@@ -265,7 +282,6 @@ def compactBlock(block: dict[str, Any]) -> dict[str, Any]:
             "displayKind",
             "sourceType",
             "title",
-            "description",
             "guide",
         )
         if block.get(key) not in (None, "", [], {})
@@ -287,10 +303,6 @@ def compactBlockPayload(block: dict[str, Any]) -> dict[str, Any] | None:
         return {
             key: value
             for key, value in {
-                "title": payload.get("title"),
-                "direction": payload.get("direction"),
-                "benefits": payload.get("benefits"),
-                "diagram": payload.get("diagram"),
                 "learningContract": compactContract,
             }.items()
             if value not in (None, "", [], {})
@@ -306,6 +318,7 @@ def compactBlockPayload(block: dict[str, Any]) -> dict[str, Any] | None:
                 "subtitle": payload.get("subtitle"),
                 "id": payload.get("id"),
                 "sectionContract": compactContract,
+                "sectionContractGaps": payload.get("sectionContractGaps"),
             }.items()
             if value not in (None, "", [], {})
         }
@@ -358,6 +371,7 @@ def compactSectionContract(contract: dict[str, Any]) -> dict[str, Any]:
             "why": contract.get("why"),
             "explanation": contract.get("explanation"),
             "tips": contract.get("tips"),
+            "contractGaps": contract.get("contractGaps"),
         }.items()
         if value not in (None, "", [], {})
     }
@@ -418,6 +432,9 @@ sections:
       difficulty: easy
     check:
       variable: frame
+  - id: partial-contract
+    title: 부분 구조화 섹션
+    goal: goal만 있는 새 YAML 초안은 누락 필드를 카드에서 보여줍니다.
 """.strip()
 
 
@@ -686,6 +703,32 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
     directEditor: true,
     snippetCopy: true,
     helpVisible: true,
+  }});
+}})()
+""")
+
+
+def jsAssertContractGapWarning(viewport: str) -> str:
+    return compactJs(f"""
+(() => {{
+  const cards = Array.from(document.querySelectorAll('[data-learning-section-card]'));
+  const gapCard = cards.find((item) => (item.textContent || '').includes('부분 구조화 섹션'));
+  if (!gapCard) throw new Error('contract gap section card missing');
+  const warning = gapCard.querySelector('[data-learning-section-contract-gaps="true"]');
+  if (!warning) throw new Error('contract gap warning missing');
+  const text = warning.textContent || '';
+  for (const expected of ['YAML 계약 보강 필요', '보조 타이틀', '예제 스니펫', '실습 시작 코드', '검증/피드백']) {{
+    if (!text.includes(expected)) throw new Error('contract gap label missing: ' + expected);
+  }}
+  const cardRect = gapCard.getBoundingClientRect();
+  const warningRect = warning.getBoundingClientRect();
+  if (warningRect.width <= 0 || warningRect.height <= 0) throw new Error('contract gap warning has no size');
+  if (warningRect.left < cardRect.left - 1 || warningRect.right > cardRect.right + 1) {{
+    throw new Error('contract gap warning escapes card');
+  }}
+  return JSON.stringify({{
+    viewport: {json.dumps(viewport)},
+    labels: ['보조 타이틀', '예제 스니펫', '실습 시작 코드', '검증/피드백'],
   }});
 }})()
 """)

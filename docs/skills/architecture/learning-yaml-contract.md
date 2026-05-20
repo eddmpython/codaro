@@ -100,6 +100,7 @@ sections:
 새 YAML에서 `blocks`가 없고 structured section fields가 있으면 materializer가 설명, 스니펫, 실습, 검증 셀을 직접 생성한다.
 
 새 structured section이 `subtitle`, `goal`, `why`, `explanation`, `tips`, `snippet`, `exercise.prompt`, `exercise.starterCode`, `check` 중 일부를 빠뜨리면 materializer는 이를 조용히 추측하지 않는다. `sectionContract.contractGaps`, `sectionContractGaps`, `contractGapCount`, `contractGaps`로 누락 필드를 보고한다. teacher가 생성하는 신규 YAML과 golden provider run은 `contractGapCount: 0`이어야 한다.
+에디터의 섹션 카드도 `data-learning-section-contract-gaps` 경고 band로 누락 필드를 보여준다. 이 표시는 raw JSON이 아니라 `YAML 계약 보강 필요`, `예제 스니펫`, `실습 시작 코드`, `검증/피드백`처럼 작성자가 읽을 수 있는 라벨이어야 한다.
 
 ## 구현 경계
 
@@ -123,6 +124,7 @@ teacher/provider loop의 golden case는 다음을 확인해야 한다.
 - golden provider run은 `contractGapCount` result signal을 확인하고, 새 structured YAML에 누락 필드가 남으면 실패해야 한다.
 - `learning-card-contract` gate가 structured section marker와 editor build를 고정해야 한다.
 - `learning-card-browser` gate가 실제 `yamlToDocument` materializer 산출물의 contract flow와 runtime package를 먼저 검증한 뒤, 같은 산출물의 렌더링 필드를 custom curriculum으로 주입해 Playwright CLI로 데스크톱과 모바일 structured section card 흐름과 실습 입력 셀/실행 결과/검증 구역 겹침 여부를 확인한다.
+- `learning-card-browser` gate는 불완전한 structured section도 포함해 `data-learning-section-contract-gaps` 경고가 desktop/mobile 카드 안에서 보이고 넘치지 않는지 확인한다.
 - 패키지 흐름은 `packages-check → packages-install(필요할 때만) → cell-call` 순서를 지킨다.
 - trace/workloop에는 `커리큘럼 YAML 전개`, `라이브러리 확인`, `uv 라이브러리 설치`, `셀 실행/검증` 같은 사용자가 읽을 수 있는 단계가 남는다.
 - 질문이 필요할 때만 1-3개 핵심 질문을 제안하고, 바로 생성하지 않고 현재 작업 기준이 trace/workloop에 남는다.

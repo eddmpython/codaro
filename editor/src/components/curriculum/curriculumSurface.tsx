@@ -1,4 +1,5 @@
 import {
+  AlertTriangle,
   ArrowRight,
   BookOpen,
   Boxes,
@@ -174,6 +175,7 @@ type CurriculumSectionContract = Record<string, unknown> & {
   why?: unknown;
   explanation?: unknown;
   tips?: unknown;
+  contractGaps?: unknown;
 };
 
 type StructuredSectionPart = "snippet" | "check";
@@ -786,10 +788,33 @@ function SectionContractOverview({ contract }: { contract?: CurriculumSectionCon
   const why = stripMarkdown(readPayloadText(contract.why));
   const explanation = stripMarkdown(readPayloadText(contract.explanation));
   const tips = payloadTextList(contract.tips).map(stripMarkdown).slice(0, 4);
-  if (!goal && !why && !explanation && !tips.length) return null;
+  const gapLabels = sectionContractGapLabels(contract.contractGaps);
+  if (!goal && !why && !explanation && !tips.length && !gapLabels.length) return null;
 
   return (
     <div className="border-b bg-background/35 px-4 py-3" data-learning-section-part="overview">
+      {gapLabels.length ? (
+        <div
+          className="mb-3 rounded-md border border-amber-300/70 bg-amber-50 px-3 py-2 text-amber-950 dark:border-amber-500/40 dark:bg-amber-500/10 dark:text-amber-100"
+          data-learning-section-contract-gaps="true"
+        >
+          <div className="flex flex-wrap items-center gap-2 text-xs font-medium">
+            <AlertTriangle className="size-3.5" />
+            <span>YAML 계약 보강 필요</span>
+          </div>
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {gapLabels.map((label) => (
+              <span
+                className="rounded border border-amber-300/70 bg-background/70 px-1.5 py-0.5 text-[11px] leading-4 text-amber-900 dark:border-amber-400/40 dark:bg-background/20 dark:text-amber-100"
+                key={label}
+              >
+                {label}
+              </span>
+            ))}
+          </div>
+        </div>
+      ) : null}
+
       <div className="grid min-w-0 gap-3 lg:grid-cols-[minmax(0,1fr)_minmax(220px,280px)]">
         <div className="min-w-0 space-y-3">
           <div className="grid gap-3 sm:grid-cols-2">
@@ -841,6 +866,24 @@ function SectionContractOverview({ contract }: { contract?: CurriculumSectionCon
       </div>
     </div>
   );
+}
+
+function sectionContractGapLabels(value: unknown) {
+  if (!Array.isArray(value)) return [];
+  const labels: Record<string, string> = {
+    subtitle: "보조 타이틀",
+    goal: "이번 섹션에서 공부할 것",
+    why: "왜 유용한지",
+    explanation: "상세 설명",
+    tips: "팁",
+    snippet: "예제 스니펫",
+    "exercise.prompt": "실습 안내",
+    "exercise.starterCode": "실습 시작 코드",
+    check: "검증/피드백",
+  };
+  return value
+    .map((item) => typeof item === "string" ? (labels[item] ?? item) : "")
+    .filter(Boolean);
 }
 
 function StructuredSectionLearningBody({
