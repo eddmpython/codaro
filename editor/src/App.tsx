@@ -5,7 +5,6 @@ import { TopBar } from "@/components/app/topBar";
 import { ProductSidebar, type SidebarCustomCurriculum } from "@/components/app/productSidebar";
 import {
   aiProviderName,
-  type AssistantWorkStep,
   type AssistantMessage,
 } from "@/components/assistant/assistantPanel";
 import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSheet";
@@ -58,16 +57,25 @@ import {
 import {
   blockLabel,
   buildCellAiPrompt,
-  executionKindLabel,
   type CellAiAction,
 } from "@/lib/cellModel";
+import {
+  buildAssistantContext,
+  type ResultMap,
+} from "@/lib/assistantContext";
+import {
+  createComposeStep,
+  finishAssistantSteps,
+  markAssistantStepsError,
+  withToolStartStep,
+  withToolWorkStep,
+} from "@/lib/workLoop";
 import {
   SidebarInset,
   SidebarProvider,
 } from "@/components/ui/sidebar";
 import type {
   AiProfile,
-  AiToolCall,
   AiToolCatalogPayload,
   AppNotice,
   BlockConfig,
@@ -83,7 +91,6 @@ import type {
   VariableInfo,
 } from "@/types";
 
-type ResultMap = Record<string, ExecutionResult>;
 type PendingTarget = "notebook" | "curriculum";
 
 const emptyNotice: AppNotice = {
@@ -726,40 +733,16 @@ function App() {
     }
 
     const contextDocument = materializeDrafts(activeDocument, drafts);
-    const context = {
+    const context = buildAssistantContext({
       surface,
-      teacherScope: activeScope,
-      document: {
-        id: contextDocument.id,
-        title: contextDocument.title,
-        blocks: contextDocument.blocks.slice(0, 24).map((block) => ({
-          id: block.id,
-          type: block.type,
-          role: block.role,
-          displayKind: block.displayKind,
-          executionKind: block.executionKind,
-          title: blockLabel(block),
-          content: block.content,
-        })),
-      },
-      selectedBlock: selectedBlock
-        ? {
-            id: selectedBlock.id,
-            type: selectedBlock.type,
-            content: drafts[selectedBlock.id] ?? selectedBlock.content,
-            result: currentResult
-              ? {
-                  status: currentResult.status,
-                  stdout: currentResult.stdout,
-                  stderr: currentResult.stderr,
-                  data: currentResult.data,
-                }
-              : null,
-          }
-        : null,
-      variables: variables.slice(0, 24),
-      cellMap: buildCellMap(contextDocument, drafts, results),
-      dependencyPreflight: buildDependencyPreflight(message, contextDocument),
+      activeScope,
+      document: contextDocument,
+      drafts,
+      message,
+      results,
+      selectedBlock,
+      currentResult: currentResult ?? null,
+      variables,
       tools: toolCatalog.tools.map((tool) => ({
         name: tool.name,
         category: tool.category,
@@ -767,9 +750,7 @@ function App() {
         target: tool.target,
         risk: tool.risk,
       })),
-      instruction:
-        `채팅 우선 노트북 생성을 기본으로 한다. 현재 판단 범위는 ${activeScope}이다. 학습 요청은 커리큘럼 YAML을 먼저 초안화하고 write-curriculum-yaml로 셀을 전개한 뒤 read-cells, write-cell, cell-call로 셀 단위 작업을 수행한다. 외부 패키지가 필요한 셀은 packages-check로 확인한 뒤 없으면 packages-install을 먼저 호출한다. 셀 수정 전에는 cellMap의 role/displayKind/executionKind/purpose를 보고 설명/스니펫/실습/검증 셀 중 올바른 대상만 수정한다.`,
-    };
+    });
 
     const assistantMessageId = `assistant-${Date.now()}`;
     let streamedContent = "";
@@ -799,9 +780,10 @@ function App() {
             setConversationId(event.conversationId);
           }
           if (event.type === "tool_start" && event.toolCall) {
+            const toolCall = event.toolCall;
             setMessages((current) => current.map((item) => (
               item.id === assistantMessageId
-                ? { ...item, steps: withToolStartStep(item.steps, event.toolCall as AiToolCall) }
+                ? { ...item, steps: withToolStartStep(item.steps, toolCall) }
                 : item
             )));
             return;
@@ -1174,202 +1156,6 @@ function sleep(milliseconds: number) {
   return new Promise((resolve) => {
     window.setTimeout(resolve, milliseconds);
   });
-}
-
-function createComposeStep(): AssistantWorkStep {
-  return { id: "compose", label: "요청 분석", status: "running", startedAt: Date.now() };
-}
-
-function withToolStartStep(steps: AssistantWorkStep[] | undefined, toolCall: AiToolCall): AssistantWorkStep[] {
-  const base = steps?.length ? steps : [createComposeStep()];
-  const toolStep = assistantWorkStepFromToolCall(toolCall, "running");
-  return [
-    ...base
-      .filter((step) => step.id !== toolStep.id)
-      .map((step) => step.status === "running" ? { ...step, status: "done" as const, finishedAt: step.finishedAt ?? Date.now() } : step),
-    toolStep,
-  ];
-}
-
-function withToolWorkStep(steps: AssistantWorkStep[] | undefined, toolCalls: NonNullable<AssistantMessage["toolCalls"]>): AssistantWorkStep[] {
-  const base = steps?.length ? steps : [createComposeStep()];
-  const next = [...base];
-  for (const toolCall of toolCalls) {
-    const toolStep = assistantWorkStepFromToolCall(toolCall, toolCall.status === "error" ? "error" : "done");
-    const existingIndex = next.findIndex((step) => step.id === toolStep.id);
-    if (existingIndex >= 0) {
-      next[existingIndex] = {
-        ...next[existingIndex],
-        ...toolStep,
-        startedAt: next[existingIndex].startedAt ?? toolStep.startedAt,
-      };
-    } else {
-      next.push(toolStep);
-    }
-  }
-  return next.map((step) => (
-    step.status === "running" && step.id === "compose"
-      ? { ...step, status: "done" as const, finishedAt: step.finishedAt ?? Date.now() }
-      : step
-  ));
-}
-
-function finishAssistantSteps(steps: AssistantWorkStep[] | undefined, toolCalls: NonNullable<AssistantMessage["toolCalls"]>): AssistantWorkStep[] {
-  return withToolWorkStep(steps, toolCalls).map((step) => (
-    step.status === "running" ? { ...step, status: "done" as const } : step
-  ));
-}
-
-function markAssistantStepsError(steps: AssistantWorkStep[] | undefined): AssistantWorkStep[] {
-  const base = steps?.length ? steps : [createComposeStep()];
-  return base.map((step) => step.status === "running" ? { ...step, status: "error" as const } : step);
-}
-
-function assistantWorkStepFromToolCall(toolCall: AiToolCall, status: AssistantWorkStep["status"]): AssistantWorkStep {
-  const name = toolCallName(toolCall);
-  return {
-    id: toolStepId(toolCall),
-    label: workLabelFromToolName(name),
-    status,
-    detail: name,
-    toolName: name,
-    arguments: toolCallArguments(toolCall),
-    result: toolCall.result,
-    error: toolCall.error,
-    startedAt: Date.now(),
-    finishedAt: status === "running" ? undefined : Date.now(),
-  };
-}
-
-function toolStepId(toolCall: AiToolCall) {
-  return `tool-${toolCall.toolCallId ?? toolCall.id ?? toolCallName(toolCall)}`;
-}
-
-function toolCallName(toolCall: AiToolCall) {
-  return toolCall.name ?? toolCall.function?.name ?? String(toolCall.toolCallId ?? toolCall.id ?? "tool-call");
-}
-
-function toolCallArguments(toolCall: AiToolCall) {
-  if (toolCall.arguments) return toolCall.arguments;
-  const raw = toolCall.function?.arguments;
-  if (!raw) return {};
-  try {
-    return JSON.parse(raw) as Record<string, unknown>;
-  } catch {
-    return { raw };
-  }
-}
-
-function workLabelFromToolName(name: string) {
-  switch (name) {
-    case "write-curriculum-yaml":
-      return "커리큘럼 구성";
-    case "packages-check":
-      return "라이브러리 확인";
-    case "packages-install":
-      return "라이브러리 설치";
-    case "create-notebook-exercise":
-      return "실습 구성";
-    case "insert-block":
-    case "write-cell":
-      return "셀 편집";
-    case "read-cells":
-      return "셀 읽기";
-    case "cell-call":
-      return "셀 요청";
-    case "execute-reactive":
-      return "셀 실행";
-    case "get-variables":
-      return "변수 확인";
-    case "click-element":
-    case "type-text":
-      return "화면 자동화";
-    default:
-      return "작업 결과";
-  }
-}
-
-function buildCellMap(document: CodaroDocument, drafts: Record<string, string>, results: ResultMap) {
-  return document.blocks.map((block, index) => {
-    const content = drafts[block.id] ?? block.content;
-    return {
-      index: index + 1,
-      id: block.id,
-      type: block.type,
-      role: block.role ?? (block.type === "code" ? "snippet" : "explanation"),
-      displayKind: block.displayKind ?? (block.type === "code" ? "code" : "prose"),
-      executionKind: block.type === "code" ? executionKindLabel(block.executionKind) : null,
-      title: blockLabel(block),
-      sourceType: block.sourceType ?? null,
-      purpose: cellPurpose(block),
-      canRun: block.type === "code",
-      draftEmpty: block.type === "code" ? !content.trim() : false,
-      resultStatus: results[block.id]?.status ?? null,
-      lineCount: content.split("\n").filter((line) => line.trim()).length,
-    };
-  });
-}
-
-function cellPurpose(block: BlockConfig) {
-  if (block.role === "title" || block.displayKind === "hero" || block.displayKind === "title") return "학습 흐름의 제목과 목표를 보여준다.";
-  if (block.role === "snippet") return "학습자가 따라 칠 예제 스니펫을 보여준다.";
-  if (block.role === "exercise" || block.displayKind === "practice") return "학습자가 직접 수정하거나 작성하는 실습 셀이다.";
-  if (block.role === "check" || block.displayKind === "quiz") return "학습자의 답이나 실행 결과를 검증하는 셀이다.";
-  if (block.role === "visual" || block.displayKind === "media" || block.displayKind === "cardGrid") return "개념을 시각적으로 정리하는 학습 카드다.";
-  if (block.role === "automation" || block.executionKind === "browser" || block.executionKind === "os") return "자동화 작업을 실행하거나 준비하는 셀이다.";
-  if (block.type === "code") return "실행 가능한 코드 셀이다.";
-  return "설명과 개념을 읽기 좋게 정리하는 셀이다.";
-}
-
-function buildDependencyPreflight(message: string, document: CodaroDocument) {
-  const packages = inferRequiredPackages(message, document);
-  return {
-    policy: "필요한 외부 라이브러리는 실행 셀 작성 또는 실행 전에 packages-check로 확인하고, missing이면 packages-install을 먼저 호출한다.",
-    packages,
-    checkTool: "packages-check",
-    installTool: "packages-install",
-    beginnerCopy: "학습자에게는 패키지 설치 대신 필요한 도구를 준비 중이라고 설명한다.",
-  };
-}
-
-function inferRequiredPackages(message: string, document: CodaroDocument) {
-  const packages = new Set<string>(document.runtime?.packages ?? []);
-  const normalized = message.toLowerCase();
-  const keywordPackages: Record<string, string> = {
-    pandas: "pandas",
-    dataframe: "pandas",
-    csv: "pandas",
-    numpy: "numpy",
-    matplotlib: "matplotlib",
-    plotly: "plotly",
-    altair: "altair",
-    browser: "playwright",
-    "브라우저": "playwright",
-    selenium: "selenium",
-    requests: "requests",
-  };
-  for (const [keyword, packageName] of Object.entries(keywordPackages)) {
-    if (normalized.includes(keyword)) packages.add(packageName);
-  }
-  for (const block of document.blocks) {
-    if (block.type !== "code") continue;
-    const content = block.content;
-    for (const match of content.matchAll(/^\s*(?:import|from)\s+([A-Za-z_][\w]*)/gm)) {
-      const moduleName = match[1];
-      const packageName = importPackageName(moduleName);
-      if (packageName) packages.add(packageName);
-    }
-  }
-  return Array.from(packages).filter(Boolean);
-}
-
-function importPackageName(moduleName: string) {
-  const standardModules = new Set(["abc", "asyncio", "collections", "csv", "datetime", "functools", "glob", "itertools", "json", "math", "os", "pathlib", "random", "re", "statistics", "string", "sys", "time", "typing"]);
-  if (standardModules.has(moduleName)) return "";
-  if (moduleName === "PIL") return "pillow";
-  if (moduleName === "sklearn") return "scikit-learn";
-  if (moduleName === "cv2") return "opencv-python";
-  return moduleName;
 }
 
 function isProviderAuthError(detail: string) {

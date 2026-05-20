@@ -255,6 +255,8 @@ def buildSystemPrompt(
             parts.append(f"Learning Philosophy:\n{PHILOSOPHY}")
         except ImportError:
             logger.debug("curriculum.learningSpec not available, skipping philosophy")
+        from .teacher.skillRegistry import teacherSkillPrompt
+        parts.append(teacherSkillPrompt())
 
     if curriculumContext:
         parts.append(f"Current curriculum context:\n{curriculumContext}")

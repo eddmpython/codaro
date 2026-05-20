@@ -20,7 +20,7 @@ from ..ai.providerSpec import (
     normalizeProvider,
     publicProviderIds,
 )
-from ..ai.teacherLoop import injectContext, toolCallResult, toolCallStart
+from ..ai.teacher import TeacherOrchestrator
 
 logger = logging.getLogger(__name__)
 
@@ -261,8 +261,8 @@ def createAiRouter(state: Any) -> APIRouter:
         providerOverride = body.get("provider")
         roleOverride = body.get("role")
         context = body.get("context")
-        if context:
-            message = injectContext(message, context)
+        orchestrator = TeacherOrchestrator.fromContext(context)
+        message = orchestrator.injectContext(message)
 
         from ..ai.conversation import ConversationManager
         from ..ai.factory import createProvider
@@ -305,6 +305,8 @@ def createAiRouter(state: Any) -> APIRouter:
 
         executor = _createToolExecutor(state, sessionId)
         allToolResults: list[dict[str, Any]] = []
+        policy = orchestrator.createToolPolicy()
+        trace = orchestrator.startTrace(conversationId)
 
         maxToolRounds = 10
         for _round in range(maxToolRounds):
@@ -346,11 +348,16 @@ def createAiRouter(state: Any) -> APIRouter:
             messages.append({"role": "assistant", "content": response.answer or "", "tool_calls": toolCallsData})
 
             for tc in response.toolCalls:
-                result = await executor.execute(tc.name, tc.arguments)
+                violation = policy.validateStart(tc.name, tc.arguments)
+                if violation is not None:
+                    result = orchestrator.toolPolicyViolation(trace, violation)
+                else:
+                    result = await executor.execute(tc.name, tc.arguments)
+                policy.recordResult(tc.name, tc.arguments, result)
                 resultStr = json.dumps(result, ensure_ascii=False)
                 convManager.addToolResult(conversationId, tc.id, resultStr)
                 messages.append({"role": "tool", "tool_call_id": tc.id, "content": resultStr})
-                allToolResults.append(toolCallResult(tc.id, tc.name, tc.arguments, result))
+                allToolResults.append(orchestrator.toolCallResult(trace, tc.id, tc.name, tc.arguments, result))
 
         try:
             finalResponse = provider.complete(messages)
@@ -377,8 +384,8 @@ def createAiRouter(state: Any) -> APIRouter:
         providerOverride = body.get("provider")
         roleOverride = body.get("role")
         context = body.get("context")
-        if context:
-            message = injectContext(message, context)
+        orchestrator = TeacherOrchestrator.fromContext(context)
+        message = orchestrator.injectContext(message)
 
         from ..ai.factory import createProvider
         from ..ai.toolExecutor import ToolExecutor
@@ -417,6 +424,8 @@ def createAiRouter(state: Any) -> APIRouter:
 
         executor = _createToolExecutor(state, sessionId)
         allToolResults: list[dict[str, Any]] = []
+        policy = orchestrator.createToolPolicy()
+        trace = orchestrator.startTrace(conversationId)
 
         async def _yieldTokenStream(messages, toolCalls: list[dict[str, Any]] | None = None):
             loop = asyncio.get_running_loop()
@@ -475,12 +484,18 @@ def createAiRouter(state: Any) -> APIRouter:
 
                 toolResults = []
                 for tc in response.toolCalls:
-                    yield f"data: {json.dumps({'type': 'tool_start', 'toolCall': toolCallStart(tc.id, tc.name, tc.arguments)}, ensure_ascii=False)}\n\n"
-                    result = await executor.execute(tc.name, tc.arguments)
+                    toolStart = orchestrator.toolCallStart(trace, tc.id, tc.name, tc.arguments)
+                    yield f"data: {json.dumps({'type': 'tool_start', 'toolCall': toolStart}, ensure_ascii=False)}\n\n"
+                    violation = policy.validateStart(tc.name, tc.arguments)
+                    if violation is not None:
+                        result = orchestrator.toolPolicyViolation(trace, violation)
+                    else:
+                        result = await executor.execute(tc.name, tc.arguments)
+                    policy.recordResult(tc.name, tc.arguments, result)
                     resultStr = json.dumps(result, ensure_ascii=False)
                     convManager.addToolResult(conversationId, tc.id, resultStr)
                     msgs.append({"role": "tool", "tool_call_id": tc.id, "content": resultStr})
-                    payload = toolCallResult(tc.id, tc.name, tc.arguments, result)
+                    payload = orchestrator.toolCallResult(trace, tc.id, tc.name, tc.arguments, result)
                     toolResults.append(payload)
                     allToolResults.append(payload)
 

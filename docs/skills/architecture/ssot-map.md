@@ -1,0 +1,66 @@
+---
+id: ssot-map
+title: SSOT Map
+description: Single source of truth map for Codaro schema, provider loop, tool policy, and product surface boundaries.
+category: architecture
+section: reference
+order: 200
+purpose: 새 세션이 들어와도 어떤 파일이 기준인지 즉시 판단하게 한다.
+whenToUse: 셀 스키마, provider loop, tool 정책, trace, 평가 harness, 프론트 상태 경계를 바꿀 때.
+---
+
+# SSOT Map
+
+Codaro에서 기준 파일은 아래 순서로 본다. 같은 의미의 규칙을 여러 파일에 복사하지 않는다.
+
+## Product Surface
+
+| 기준 | 파일 | 역할 |
+|---|---|---|
+| 제품 표면 | `docs/skills/architecture/frontend-product-surface.md` | 채팅, 에디터, 커리큘럼, 자동화의 의미와 UX 경계 |
+| 표면 라우팅 | `editor/src/lib/surfaceModel.ts` | 프론트 surface enum과 표시 이름 |
+| 표면 조립 | `editor/src/components/app/mainSurface.tsx` | surface별 화면 조립 |
+
+## Cell Schema
+
+| 기준 | 파일 | 역할 |
+|---|---|---|
+| 프론트 셀 스키마 | `editor/src/lib/cellSchema.ts` | `blockTypes`, `cellRoles`, `executionKinds`, `cellDisplayKinds` |
+| 백엔드 셀 스키마 | `src/codaro/document/cellSchema.py` | 같은 셀 어휘의 Python 기준 |
+| 문서 모델 | `src/codaro/document/models.py` | 실제 document/block 저장 모델 |
+| 셀 해석 | `editor/src/lib/cellModel.ts` | 셀 라벨, 분류, 셀별 요청 prompt |
+
+## Teacher Loop
+
+| 기준 | 파일 | 역할 |
+|---|---|---|
+| loop 절차 문서 | `docs/skills/architecture/teacher-tool-loop.md` | 요청 분류, cell map, dependency preflight, tool lifecycle 원칙 |
+| orchestrator | `src/codaro/ai/teacher/teacherOrchestrator.py` | context, policy, trace, tool payload를 묶는 진입점 |
+| context builder | `src/codaro/ai/teacher/contextBuilder.py` | provider에 들어가는 context text 구성 |
+| tool policy | `src/codaro/ai/teacher/toolPolicy.py` | packages-check 선행, 실행 전 preflight 같은 강제 규칙 |
+| trace model | `src/codaro/ai/teacher/traceModel.py` | turn/tool lifecycle 추적 |
+| skill registry | `src/codaro/ai/teacher/skillRegistry.py` | provider가 따라야 할 작업별 skill 목록 |
+| eval harness | `src/codaro/ai/teacher/evalHarness.py` | tool sequence golden case |
+
+## Transport Boundary
+
+| 기준 | 파일 | 역할 |
+|---|---|---|
+| provider HTTP/SSE | `src/codaro/api/aiRouter.py` | request parsing, provider 호출, SSE 전송만 담당 |
+| frontend API | `editor/src/lib/api.ts` | 제품 표면에서 server와 통신하는 유일한 통로 |
+
+## Frontend State Boundary
+
+| 기준 | 파일 | 역할 |
+|---|---|---|
+| assistant context | `editor/src/lib/assistantContext.ts` | provider 요청에 들어가는 document/cell/dependency/tool context |
+| workloop state | `editor/src/lib/workLoop.ts` | tool_start/tool_results를 UI step으로 변환 |
+| custom curricula | `editor/src/lib/customCurricula.ts` | 나만의 커리큘럼 저장/로드 |
+| automation state | `editor/src/lib/automationState.ts` | 자동화/태스크 상태 |
+
+## 원칙
+
+- router는 판단하지 않는다. 판단 재료는 domain/provider loop 계층에서 만든다.
+- UI 컴포넌트는 context를 직접 조립하지 않는다. `editor/src/lib/*`를 통한다.
+- 셀 어휘를 늘릴 때는 프론트/백엔드 셀 스키마와 문서 모델 영향까지 같이 본다.
+- provider 응답 품질은 평가 harness로 판단한다. 감으로 좋고 나쁨을 말하지 않는다.

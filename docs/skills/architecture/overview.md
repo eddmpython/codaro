@@ -46,7 +46,8 @@ src/codaro/
 │   ├── profile.py secrets.py
 │   ├── factory.py baseProvider.py providers/
 │   ├── conversation.py      # conversation state + role prompts
-│   ├── teacherLoop.py       # context injection + tool lifecycle payloads
+│   ├── teacher/             # orchestrator + context + policy + trace + eval
+│   ├── teacherLoop.py       # compatibility re-export
 │   ├── tools.py             # tool manifest/schema
 │   └── toolExecutor.py      # tool handlers
 ├── api/
@@ -62,4 +63,4 @@ src/codaro/
 
 ## 관련
 
-- [[document-model]] [[execution-engine]] [[dataflow]] [[widget-bridge]]
+- [[ssot-map]] [[document-model]] [[execution-engine]] [[dataflow]] [[widget-bridge]]

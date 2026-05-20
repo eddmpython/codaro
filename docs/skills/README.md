@@ -85,8 +85,9 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [ai-sensory-system](identity/ai-sensory-system.md)
 - [external-channels-mobile](identity/external-channels-mobile.md)
 
-## Architecture (8) — 5층 구조
+## Architecture (9) — 5층 구조
 
+- [ssot-map](architecture/ssot-map.md)
 - [overview](architecture/overview.md)
 - [document-model](architecture/document-model.md)
 - [execution-engine](architecture/execution-engine.md)

@@ -1,41 +1,19 @@
+import type {
+  blockTypes,
+  cellDisplayKinds,
+  cellRoles,
+  executionKinds,
+} from "@/lib/cellSchema";
+
 export type LoadState = "idle" | "loading" | "ready" | "error";
 
-export type BlockType = "code" | "markdown" | "automation";
+export type BlockType = (typeof blockTypes)[number];
 
-export type CellRole =
-  | "title"
-  | "explanation"
-  | "learning"
-  | "snippet"
-  | "exercise"
-  | "check"
-  | "visual"
-  | "automation"
-  | "skill";
+export type CellRole = (typeof cellRoles)[number];
 
-export type ExecutionKind =
-  | "python"
-  | "browser"
-  | "os"
-  | "mouse"
-  | "image"
-  | "task"
-  | "skill";
+export type ExecutionKind = (typeof executionKinds)[number];
 
-export type CellDisplayKind =
-  | "title"
-  | "hero"
-  | "prose"
-  | "callout"
-  | "code"
-  | "cardGrid"
-  | "comparison"
-  | "table"
-  | "media"
-  | "resource"
-  | "practice"
-  | "quiz"
-  | "centerText";
+export type CellDisplayKind = (typeof cellDisplayKinds)[number];
 
 export type VariableInfo = {
   name: string;
