@@ -73,6 +73,7 @@ class LiveGateCheck:
 
 
 LIVE_GATE_NAMES = (
+    "teacher-eval",
     "teacher-e2e",
     "assistant-workloop-contract",
     "editor-runtime-preflight",
