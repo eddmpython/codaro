@@ -27,6 +27,7 @@ uv run python -X utf8 tests/run.py list
 uv run python -X utf8 tests/run.py preflight
 uv run python -X utf8 tests/run.py gate backend
 uv run python -X utf8 tests/run.py gate teacher-eval
+uv run python -X utf8 tests/run.py gate learning-card-contract
 ```
 
 직접 `pytest tests/ -v`를 금지하지는 않는다. 다만 PR 전 확인, CI, 세션 종료 검증은 gate 이름으로 남긴다.
@@ -38,6 +39,7 @@ uv run python -X utf8 tests/run.py gate teacher-eval
 | `docs` | fast | 운영 문서 포인터, gate 정의, CI 연결 상태를 확인한다. |
 | `backend` | fast | Python backend 전체 테스트를 실행한다. |
 | `teacher-eval` | fast | teacher tool policy, trace, golden eval 계약을 빠르게 확인한다. |
+| `learning-card-contract` | surface | structured section card marker 계약과 editor build를 확인한다. |
 | `editor-build` | surface | 제품 editor surface의 TypeScript/Vite build를 확인한다. |
 | `landing-build` | surface | 문서/landing surface의 static build를 확인한다. |
 | `launcher-check` | release | launcher Rust crate의 type/build 계약을 확인한다. |
@@ -53,6 +55,6 @@ uv run python -X utf8 tests/run.py gate teacher-eval
 - provider loop 변경은 가능한 한 실제 scripted provider run으로 `packages-check` → `packages-install` → `cell-call`의 정확한 순서와 결과 필드(`missing`, `success`, `passed`)를 함께 검증한다. golden case가 요구하는 exact sequence에 불필요한 tool call이 끼면 실패해야 한다.
 - clarification gate 변경은 실제 provider 호출 없이 멈추는 golden provider run을 검증한다. `toolSequence`가 비어 있고, 질문 수 1-3개와 기본값 key, workloop label이 빠지면 실패해야 한다.
 - curriculum YAML/provider golden 변경은 실제 `write-curriculum-yaml` 핸들러를 통과한 document 변경을 검증한다. `loadedInEditor`, structured section card flow, document runtime packages가 빠지면 실패해야 한다.
-- 학습카드/YAML 변경은 backend materializer 테스트와 editor build를 함께 확인한다.
+- 학습카드/YAML 변경은 backend materializer 테스트, `learning-card-contract`, 필요 시 실제 브라우저 Playwright 확인을 함께 확인한다.
 - 기존 부채를 새 테스트로 한 번에 해결하지 못하면 별도 baseline 또는 명시적 TODO 문서로 분리한다.
 - CI YAML은 세부 명령을 소유하지 않고 `tests/run.py gate <name>`만 호출한다.

@@ -168,6 +168,8 @@ type CurriculumSectionContract = Record<string, unknown> & {
   tips?: unknown;
 };
 
+type StructuredSectionPart = "snippet" | "check";
+
 function LearningOverviewHeader({
   apiOnline,
   document,
@@ -854,7 +856,7 @@ function StructuredSectionBand({
   detail?: string;
   icon: ReactNode;
   label: string;
-  part: string;
+  part: StructuredSectionPart;
   title?: string;
 }) {
   return (
