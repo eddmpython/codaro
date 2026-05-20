@@ -420,6 +420,7 @@ function CurriculumSectionCard({
   onSelectBlock: (blockId: string) => void;
 }) {
   const selected = section.anchorBlockId === selectedBlockId || section.blocks.some((block) => block.id === selectedBlockId);
+  const structured = hasStructuredSectionBlocks(section);
 
   return (
     <section
@@ -449,25 +450,41 @@ function CurriculumSectionCard({
 
       <SectionContractOverview contract={section.contract} />
 
-      <div className="space-y-3 p-3">
-        {section.blocks.map((block) => (
-          <CurriculumLearningCell
-            block={block}
-            canRun={canRun}
-            draft={drafts[block.id] ?? curriculumInitialDraft(block)}
-            isRunning={runningBlockId === block.id}
-            isSelected={block.id === selectedBlockId}
-            key={block.id}
-            renderCodeCellEditor={renderCodeCellEditor}
-            result={results[block.id]}
-            variant="embedded"
-            onAsk={(action) => onCellAsk(action, block)}
-            onDraftChange={(value) => onDraftChange(block.id, value)}
-            onRun={() => onRunBlock(block)}
-            onSelect={() => onSelectBlock(block.id)}
-          />
-        ))}
-      </div>
+      {structured ? (
+        <StructuredSectionLearningBody
+          canRun={canRun}
+          drafts={drafts}
+          renderCodeCellEditor={renderCodeCellEditor}
+          results={results}
+          runningBlockId={runningBlockId}
+          section={section}
+          selectedBlockId={selectedBlockId}
+          onCellAsk={onCellAsk}
+          onDraftChange={onDraftChange}
+          onRunBlock={onRunBlock}
+          onSelectBlock={onSelectBlock}
+        />
+      ) : (
+        <div className="space-y-3 p-3">
+          {section.blocks.map((block) => (
+            <CurriculumLearningCell
+              block={block}
+              canRun={canRun}
+              draft={drafts[block.id] ?? curriculumInitialDraft(block)}
+              isRunning={runningBlockId === block.id}
+              isSelected={block.id === selectedBlockId}
+              key={block.id}
+              renderCodeCellEditor={renderCodeCellEditor}
+              result={results[block.id]}
+              variant="embedded"
+              onAsk={(action) => onCellAsk(action, block)}
+              onDraftChange={(value) => onDraftChange(block.id, value)}
+              onRun={() => onRunBlock(block)}
+              onSelect={() => onSelectBlock(block.id)}
+            />
+          ))}
+        </div>
+      )}
     </section>
   );
 }
@@ -634,6 +651,215 @@ function SectionContractOverview({ contract }: { contract?: CurriculumSectionCon
       </div>
     </div>
   );
+}
+
+function StructuredSectionLearningBody({
+  canRun,
+  drafts,
+  renderCodeCellEditor,
+  results,
+  runningBlockId,
+  section,
+  selectedBlockId,
+  onCellAsk,
+  onDraftChange,
+  onRunBlock,
+  onSelectBlock,
+}: {
+  canRun: boolean;
+  drafts: Record<string, string>;
+  renderCodeCellEditor: RenderCodeCellEditor;
+  results: ResultMap;
+  runningBlockId: string | null;
+  section: CurriculumSectionGroup;
+  selectedBlockId: string;
+  onCellAsk: (action: CellAiAction, block: BlockConfig) => void;
+  onDraftChange: (blockId: string, value: string) => void;
+  onRunBlock: (block: BlockConfig) => void;
+  onSelectBlock: (blockId: string) => void;
+}) {
+  const parts = structuredSectionParts(section);
+  const exercise = parts.exercise;
+  const exerciseDraft = exercise ? drafts[exercise.id] ?? curriculumInitialDraft(exercise) : "";
+  const exerciseResult = exercise ? results[exercise.id] : undefined;
+  const exerciseRunning = exercise ? runningBlockId === exercise.id : false;
+  const exerciseSelected = exercise ? selectedBlockId === exercise.id : false;
+
+  return (
+    <div className="divide-y">
+      {parts.snippet ? (
+        <StructuredSectionBand
+          detail={parts.snippet.description || stripMarkdown(readPayloadText(section.contract?.goal))}
+          icon={<TerminalSquare className="size-3.5" />}
+          label="예제 스니펫"
+          title={blockLabel(parts.snippet)}
+        >
+          <CodePayload value={parts.snippet.content} />
+        </StructuredSectionBand>
+      ) : null}
+
+      {exercise ? (
+        <div
+          className={cn("px-4 py-4", exerciseSelected && "bg-muted/20")}
+          id={cellDomId(exercise.id)}
+          onClick={() => onSelectBlock(exercise.id)}
+        >
+          <div className="flex flex-wrap items-start gap-3">
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-wrap items-center gap-2 text-xs font-medium text-muted-foreground">
+                <Play className="size-3.5" />
+                <span>직접 입력 실습</span>
+                {exercise.guide ? <Badge variant="outline">{difficultyLabel(exercise.guide.difficulty)}</Badge> : null}
+              </div>
+              <h3 className="mt-1 text-base font-semibold tracking-normal">{blockLabel(exercise)}</h3>
+              {exercise.guide?.description || exercise.description ? (
+                <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">
+                  {stripMarkdown(exercise.guide?.description || exercise.description || "")}
+                </p>
+              ) : null}
+            </div>
+            <div className="flex shrink-0 items-center gap-1.5">
+              <Badge variant={exerciseResult?.status === "error" ? "destructive" : "outline"}>
+                {statusLabel(exerciseRunning ? "running" : exerciseResult?.status ?? "idle")}
+              </Badge>
+              <IconButton
+                className="size-8"
+                disabled={!canRun}
+                label="셀 실행"
+                variant="outline"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onRunBlock(exercise);
+                }}
+              >
+                {exerciseRunning ? <Loader2 className="animate-spin" /> : <Play />}
+              </IconButton>
+              <CellAiActions onAsk={(action) => onCellAsk(action, exercise)} selected={exerciseSelected} />
+            </div>
+          </div>
+
+          {exercise.guide?.hints?.length ? (
+            <div className="mt-3 grid gap-2 sm:grid-cols-2">
+              {exercise.guide.hints.slice(0, 4).map((hint, index) => (
+                <div className="flex min-w-0 items-start gap-2 text-xs leading-5 text-muted-foreground" key={`${hint}-${index}`}>
+                  <Lightbulb className="mt-0.5 size-3.5 shrink-0 text-amber-500" />
+                  <span className="min-w-0">{stripBullet(stripMarkdown(hint))}</span>
+                </div>
+              ))}
+            </div>
+          ) : null}
+
+          <div className="mt-3 space-y-1.5">
+            <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+              <span>실습 입력 셀</span>
+              <Badge className="hidden sm:inline-flex" variant="outline">Ctrl+Enter 실행</Badge>
+            </div>
+            {exerciseSelected ? renderCodeCellEditor({
+              block: exercise,
+              draft: exerciseDraft,
+              onChange: (value) => onDraftChange(exercise.id, value),
+              onFocus: () => onSelectBlock(exercise.id),
+              onRun: () => onRunBlock(exercise),
+            }) : (
+              <LightweightCodePreview
+                draft={exerciseDraft}
+                placeholder="클릭해서 직접 입력하세요."
+                onSelect={() => onSelectBlock(exercise.id)}
+              />
+            )}
+          </div>
+
+          {exerciseResult ? (
+            <div className="mt-3">
+              <div className="mb-1.5 flex items-center gap-2 text-xs font-medium text-muted-foreground">
+                <CheckCircle2 className="size-3.5" />
+                실행 결과
+              </div>
+              <ExecutionOutput result={exerciseResult} />
+            </div>
+          ) : null}
+          {exerciseRunning && !exerciseResult ? <div className="mt-3"><LoadingInline label="셀 실행 중" /></div> : null}
+        </div>
+      ) : null}
+
+      {parts.check ? (
+        <StructuredSectionBand
+          icon={<CheckCircle2 className="size-3.5" />}
+          label="검증/피드백"
+          title={blockLabel(parts.check)}
+        >
+          <CurriculumMarkdownBody block={parts.check} />
+        </StructuredSectionBand>
+      ) : null}
+
+      {parts.extraBlocks.length ? (
+        <div className="space-y-3 p-3">
+          {parts.extraBlocks.map((block) => (
+            <CurriculumLearningCell
+              block={block}
+              canRun={canRun}
+              draft={drafts[block.id] ?? curriculumInitialDraft(block)}
+              isRunning={runningBlockId === block.id}
+              isSelected={block.id === selectedBlockId}
+              key={block.id}
+              renderCodeCellEditor={renderCodeCellEditor}
+              result={results[block.id]}
+              variant="embedded"
+              onAsk={(action) => onCellAsk(action, block)}
+              onDraftChange={(value) => onDraftChange(block.id, value)}
+              onRun={() => onRunBlock(block)}
+              onSelect={() => onSelectBlock(block.id)}
+            />
+          ))}
+        </div>
+      ) : null}
+    </div>
+  );
+}
+
+function StructuredSectionBand({
+  children,
+  detail,
+  icon,
+  label,
+  title,
+}: {
+  children: ReactNode;
+  detail?: string;
+  icon: ReactNode;
+  label: string;
+  title?: string;
+}) {
+  return (
+    <div className="px-4 py-4">
+      <div className="mb-3 min-w-0">
+        <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+          {icon}
+          <span>{label}</span>
+        </div>
+        {title ? <h3 className="mt-1 text-base font-semibold tracking-normal">{title}</h3> : null}
+        {detail ? <p className="mt-1 max-w-3xl text-sm leading-6 text-muted-foreground">{stripMarkdown(detail)}</p> : null}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function hasStructuredSectionBlocks(section: CurriculumSectionGroup) {
+  return section.blocks.some((block) => block.sourceType?.startsWith("sectionContract:"));
+}
+
+function structuredSectionParts(section: CurriculumSectionGroup) {
+  const snippet = section.blocks.find((block) => block.sourceType === "sectionContract:snippet");
+  const exercise = section.blocks.find((block) => block.sourceType === "sectionContract:exercise");
+  const check = section.blocks.find((block) => block.sourceType === "sectionContract:check");
+  const extraBlocks = section.blocks.filter((block) => (
+    block.sourceType !== "sectionContract:explanation"
+    && block.sourceType !== "sectionContract:snippet"
+    && block.sourceType !== "sectionContract:exercise"
+    && block.sourceType !== "sectionContract:check"
+  ));
+  return { snippet, exercise, check, extraBlocks };
 }
 
 function inferBenefits(blocks: BlockConfig[]) {

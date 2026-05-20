@@ -102,3 +102,45 @@ def testYamlToDocumentMaterializesStructuredSectionContract() -> None:
     assert exercise.guide.checkConfig == {"variable": "frame"}
     assert solutions[exercise.id] == "import pandas as pd\nframe = pd.DataFrame({'x': [1]})"
     assert check.role == "check"
+
+
+def testStructuredSectionMaterializesSingleCardFlowBlocks() -> None:
+    content = {
+        "meta": {"title": "Single card flow"},
+        "sections": [
+            {
+                "id": "one-card",
+                "title": "한 섹션 카드",
+                "subtitle": "설명에서 검증까지 한 흐름",
+                "goal": "스니펫을 보고 직접 입력합니다.",
+                "why": "작은 카드 반복 없이 학습 맥락을 유지합니다.",
+                "explanation": "섹션 카드 안에서 설명, 팁, 예제, 실습, 검증이 이어집니다.",
+                "tips": ["먼저 예제를 읽고, 다음 입력 셀만 수정합니다."],
+                "snippet": "value = 1\nvalue",
+                "exercise": {
+                    "prompt": "value를 2로 바꾸세요.",
+                    "starterCode": "value = ___",
+                    "solution": "value = 2",
+                    "check": {"variable": "value"},
+                },
+                "check": {"expected": "value == 2"},
+            }
+        ],
+    }
+
+    document, _solutions = yamlToDocument(content, "ai", "single-card")
+
+    sourceTypes = [block.sourceType for block in document.blocks]
+    assert sourceTypes.count("section") == 1
+    assert sourceTypes[sourceTypes.index("section") + 1:sourceTypes.index("section") + 5] == [
+        "sectionContract:explanation",
+        "sectionContract:snippet",
+        "sectionContract:exercise",
+        "sectionContract:check",
+    ]
+
+    sectionBlock = next(block for block in document.blocks if block.sourceType == "section")
+    contract = sectionBlock.payload["sectionContract"]
+    assert contract["title"] == "한 섹션 카드"
+    assert contract["subtitle"] == "설명에서 검증까지 한 흐름"
+    assert contract["goal"] == "스니펫을 보고 직접 입력합니다."

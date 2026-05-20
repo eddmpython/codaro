@@ -73,6 +73,7 @@ sections:
 - 섹션 하나가 학습카드 하나다. `sections[].blocks[]`의 작은 카드 반복을 기본 구조로 삼지 않는다.
 - 섹션 카드는 `title → subtitle → goal → why → explanation → tips → snippet → exercise → result → check` 순서로 이어진다.
 - 카드 내부 정보는 라벨, 구획선, 여백으로 구분한다. 카드 안에 또 카드가 덕지덕지 쌓이는 구조는 피한다.
+- `sectionContract:*`로 materialize된 신규 섹션은 작은 block card를 반복 렌더링하지 않고, 하나의 섹션 카드 안에서 예제 스니펫, 직접 입력 실습, 실행 결과, 검증/피드백을 흐름형 band로 보여준다.
 - `snippet`은 예제 스니펫 셀로, `exercise.starterCode`는 학습자가 직접 입력/수정하는 실습 셀로 materialize한다.
 - `meta.packages`는 런타임 패키지 preflight의 1차 입력이다. 코드 import 추론은 보조 수단이다.
 
@@ -99,6 +100,7 @@ teacher/provider loop의 golden case는 다음을 확인해야 한다.
 
 - `write-curriculum-yaml` 결과 document에 `learningContract` 또는 `sectionContract`가 존재한다.
 - 섹션 카드가 goal, why, explanation, tips를 contract에서 읽는다.
+- Playwright로 데스크톱과 모바일에서 structured section card가 하나의 카드 흐름으로 보이고, 실습 입력 셀/실행 결과/검증 구역의 텍스트가 겹치지 않는지 확인한다.
 - 패키지 흐름은 `packages-check → packages-install(필요할 때만) → cell-call` 순서를 지킨다.
 - trace/workloop에는 `커리큘럼 YAML 전개`, `라이브러리 확인`, `uv 라이브러리 설치`, `셀 실행/검증` 같은 사용자가 읽을 수 있는 단계가 남는다.
 - 질문이 필요할 때만 1-3개 핵심 질문을 제안하고, 기본값으로 진행한 경우 그 기본값이 남는다.
