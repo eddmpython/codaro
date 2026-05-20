@@ -22,8 +22,7 @@ from ..ai.providerSpec import (
 )
 from ..ai.teacher import (
     TeacherConversationNotFound,
-    TeacherOrchestrator,
-    prepareTeacherTurn,
+    prepareTeacherRuntimeTurn,
     runTeacherChatLoop,
     runTeacherChatStream,
 )
@@ -265,16 +264,19 @@ def createAiRouter(state: Any) -> APIRouter:
         providerOverride = body.get("provider")
         roleOverride = body.get("role")
         context = body.get("context")
-        orchestrator = TeacherOrchestrator.fromContext(context)
-        message = orchestrator.injectContext(message)
 
         convManager = _getConversationManager()
         try:
-            turn = prepareTeacherTurn(
+            runtimeTurn = prepareTeacherRuntimeTurn(
                 convManager=convManager,
                 profileManager=getProfileManager(),
+                sessionManager=state.sessionManager,
+                documentPath=state.documentPath,
+                workspaceRoot=state.workspaceRoot,
                 conversationId=conversationId,
                 message=message,
+                context=context,
+                sessionId=sessionId,
                 providerOverride=providerOverride,
                 roleOverride=roleOverride,
             )
@@ -283,16 +285,15 @@ def createAiRouter(state: Any) -> APIRouter:
         except _HANDLED_ERRORS as exc:
             raise _providerUnavailable(exc) from exc
 
-        executor = _createToolExecutor(state, sessionId)
         try:
             return await runTeacherChatLoop(
-                provider=turn.provider,
+                provider=runtimeTurn.turn.provider,
                 convManager=convManager,
-                conversationId=turn.conversationId,
-                messages=turn.messages,
-                tools=turn.tools,
-                executor=executor,
-                orchestrator=orchestrator,
+                conversationId=runtimeTurn.turn.conversationId,
+                messages=runtimeTurn.turn.messages,
+                tools=runtimeTurn.turn.tools,
+                executor=runtimeTurn.executor,
+                orchestrator=runtimeTurn.orchestrator,
             )
         except _HANDLED_ERRORS as exc:
             raise _providerUnavailable(exc) from exc
@@ -308,16 +309,19 @@ def createAiRouter(state: Any) -> APIRouter:
         providerOverride = body.get("provider")
         roleOverride = body.get("role")
         context = body.get("context")
-        orchestrator = TeacherOrchestrator.fromContext(context)
-        message = orchestrator.injectContext(message)
 
         convManager = _getConversationManager()
         try:
-            turn = prepareTeacherTurn(
+            runtimeTurn = prepareTeacherRuntimeTurn(
                 convManager=convManager,
                 profileManager=getProfileManager(),
+                sessionManager=state.sessionManager,
+                documentPath=state.documentPath,
+                workspaceRoot=state.workspaceRoot,
                 conversationId=conversationId,
                 message=message,
+                context=context,
+                sessionId=sessionId,
                 providerOverride=providerOverride,
                 roleOverride=roleOverride,
             )
@@ -328,13 +332,13 @@ def createAiRouter(state: Any) -> APIRouter:
 
         async def _streamGenerate():
             async for event in runTeacherChatStream(
-                provider=turn.provider,
+                provider=runtimeTurn.turn.provider,
                 convManager=convManager,
-                conversationId=turn.conversationId,
-                messages=turn.messages,
-                tools=turn.tools,
-                executor=_createToolExecutor(state, sessionId),
-                orchestrator=orchestrator,
+                conversationId=runtimeTurn.turn.conversationId,
+                messages=runtimeTurn.turn.messages,
+                tools=runtimeTurn.turn.tools,
+                executor=runtimeTurn.executor,
+                orchestrator=runtimeTurn.orchestrator,
             ):
                 yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
 
@@ -415,35 +419,6 @@ def createAiRouter(state: Any) -> APIRouter:
             return {"completions": [], "provider": "", "model": ""}
 
     return router
-
-
-def _createToolExecutor(state: Any, sessionId: str | None = None):
-    from ..ai.toolExecutor import ToolExecutor
-    from ..document.service import loadDocument, saveDocument
-
-    docPath = state.documentPath
-
-    def documentGetter():
-        if docPath is None:
-            return None
-        try:
-            return loadDocument(str(docPath))
-        except (FileNotFoundError, OSError):
-            return None
-
-    def documentSetter(doc):
-        if docPath is not None:
-            saveDocument(str(docPath), doc)
-
-    executor = ToolExecutor(
-        sessionManager=state.sessionManager,
-        documentGetter=documentGetter if docPath else None,
-        documentSetter=documentSetter if docPath else None,
-        workspaceRoot=str(state.workspaceRoot),
-    )
-    if sessionId:
-        executor.setActiveSession(sessionId)
-    return executor
 
 
 _conversationManager = None

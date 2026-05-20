@@ -13,6 +13,7 @@ from codaro.ai.teacher import (
     evaluateToolTrace,
     evaluateToolTracePayload,
     goldenEvalCases,
+    prepareTeacherRuntimeTurn,
     prepareTeacherTurn,
     runTeacherChatLoop,
     runTeacherChatStream,
@@ -126,6 +127,15 @@ class _ProviderFactory:
     def __call__(self, config: LLMConfig):
         self.config = config
         return _FakeProvider()
+
+
+class _FakeSessionManager:
+    def __init__(self) -> None:
+        self.requestedSessionId: str | None = None
+
+    def getSession(self, sessionId: str):
+        self.requestedSessionId = sessionId
+        return None
 
 
 async def _collectStreamEvents(stream) -> list[dict]:
@@ -388,6 +398,43 @@ def testPrepareTeacherTurnOwnsConversationAndProviderSetup() -> None:
     assert providerFactory.config is not None
     assert providerFactory.config.provider == "custom"
     assert providerFactory.config.model == "fake-model"
+
+
+def testPrepareTeacherRuntimeTurnOwnsContextAndExecutorSetup(tmp_path) -> None:
+    convManager = _FakeConversationManager()
+    profileManager = _FakeProfileManager()
+    providerFactory = _ProviderFactory()
+    sessionManager = _FakeSessionManager()
+
+    runtimeTurn = prepareTeacherRuntimeTurn(
+        convManager=convManager,
+        profileManager=profileManager,
+        sessionManager=sessionManager,
+        documentPath=None,
+        workspaceRoot=tmp_path,
+        message="check answer",
+        context={
+            "cellMap": [{
+                "id": "cell-1",
+                "type": "code",
+                "role": "exercise",
+                "displayKind": "practice",
+                "executionKind": "python",
+            }],
+            "dependencyPreflight": {"packages": ["numpy"]},
+        },
+        sessionId="session-test",
+        roleOverride="teacher",
+        providerOverride="custom",
+        providerFactory=providerFactory,
+    )
+
+    assert runtimeTurn.turn.conversationId == "conv-created"
+    assert "[Cell map]" in runtimeTurn.turn.messages[0]["content"]
+    assert "[Dependency preflight]" in runtimeTurn.turn.messages[0]["content"]
+    result = asyncio.run(runtimeTurn.executor.execute("get-variables", {}))
+    assert result["error"] == "Session not found: session-test"
+    assert sessionManager.requestedSessionId == "session-test"
 
 
 def testProviderStreamOwnsStreamingToolEvents() -> None:
