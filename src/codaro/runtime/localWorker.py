@@ -35,12 +35,14 @@ def runLocalWorker(
         try:
             command = connection.recv()
         except (EOFError, OSError):
+            _uninstallInterruptTrace(interruptFlag)
             break
 
         try:
             action = command.get("action")
             if action == "shutdown":
                 _workerSend(connection, {"ok": True})
+                _uninstallInterruptTrace(interruptFlag)
                 break
 
             if action == "execute":
@@ -121,6 +123,7 @@ def runLocalWorker(
 
             _workerSend(connection, {"error": f"Unsupported worker action: {action}"})
         except (BrokenPipeError, EOFError, OSError):
+            _uninstallInterruptTrace(interruptFlag)
             break
 
 
@@ -559,10 +562,22 @@ def _sanitizeDescriptor(value: object) -> object:
 
 def _installInterruptTrace(interruptFlag) -> None:
     def traceCallback(frame, event, arg):
-        if interruptFlag.is_set() and frame.f_code.co_filename == "<codaro>":
+        if frame.f_code.co_filename == "<codaro>" and _interruptFlagIsSet(interruptFlag):
             raise KeyboardInterrupt("Soft interrupt requested")
         return traceCallback
     sys.settrace(traceCallback)
+
+
+def _uninstallInterruptTrace(interruptFlag) -> None:
+    if interruptFlag is not None:
+        sys.settrace(None)
+
+
+def _interruptFlagIsSet(interruptFlag) -> bool:
+    try:
+        return bool(interruptFlag.is_set())
+    except OSError:
+        return False
 
 
 STREAM_BUFFER_MAX_BYTES = 5 * 1024 * 1024

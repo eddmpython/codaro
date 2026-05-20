@@ -6,11 +6,21 @@ from pathlib import Path
 import time
 
 from codaro.runtime import ExecutionBlock, LocalEngine
+from codaro.runtime.localWorker import _interruptFlagIsSet
 from codaro.system import packageOps
 
 
 def _run(coro):
     return asyncio.new_event_loop().run_until_complete(coro)
+
+
+class _BrokenInterruptFlag:
+    def is_set(self):
+        raise OSError("invalid handle")
+
+
+def testInterruptTraceTreatsClosedFlagAsNotInterrupted() -> None:
+    assert _interruptFlagIsSet(_BrokenInterruptFlag()) is False
 
 
 def testLocalEngineExecuteBlock() -> None:
