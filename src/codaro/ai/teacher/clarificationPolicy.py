@@ -4,6 +4,14 @@ from dataclasses import dataclass, field
 from typing import Any
 
 
+DEFAULT_LABELS = {
+    "level": "수준",
+    "depth": "깊이",
+    "environment": "환경",
+    "balance": "학습 비중",
+}
+
+
 @dataclass(frozen=True)
 class ClarificationPlan:
     shouldAsk: bool
@@ -26,7 +34,7 @@ def clarificationAnswer(plan: ClarificationPlan) -> str:
         for index, question in enumerate(plan.questions, start=1)
     )
     defaultLines = "\n".join(
-        f"- {key}: {value}"
+        f"- {DEFAULT_LABELS.get(key, key)}: {value}"
         for key, value in plan.defaults.items()
     )
     return "\n\n".join(

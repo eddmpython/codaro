@@ -11,6 +11,7 @@ from codaro.ai.teacher import (
     ToolPolicyState,
     ToolPolicyViolation,
     buildClarificationPlan,
+    clarificationAnswer,
     executeTeacherToolRound,
     evaluateGoldenTracePayloads,
     evaluateTeacherTurnPayload,
@@ -324,6 +325,17 @@ def testTeacherClarificationPlanStaysFocused() -> None:
     assert any("수준" in question for question in plan.questions)
 
 
+def testTeacherClarificationAnswerShowsReadableDefaults() -> None:
+    plan = buildClarificationPlan("데이터 분석 커리큘럼 만들어줘")
+
+    answer = clarificationAnswer(plan)
+
+    assert "답이 없으면 아래 기본값으로 진행합니다." in answer
+    assert "- 수준: 초급-중급 사이" in answer
+    assert "- 환경: 현재 Codaro 로컬 Python과 uv 패키지 설치" in answer
+    assert "level:" not in answer
+
+
 def testTeacherOrchestratorInjectsClarificationPlanForLearningRequests() -> None:
     orchestrator = TeacherOrchestrator.fromContext({})
 
@@ -563,6 +575,8 @@ def testEvalHarnessValidatesClarificationGateTrace() -> None:
     assert report.observedTools == ()
     assert report.observedWorkLabels == ("작업 전 확인 질문",)
     assert any("핵심 질문" in detail for detail in report.observedWorkDetails)
+    assert any("초급-중급 사이" in detail for detail in report.observedWorkDetails)
+    assert any("직접 입력 셀" in detail for detail in report.observedWorkDetails)
 
 
 def testEvalHarnessFailsWeakClarificationGateTrace() -> None:

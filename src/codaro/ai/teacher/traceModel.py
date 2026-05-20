@@ -161,7 +161,7 @@ def _clarificationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
     questions = event.payload.get("questions")
     defaults = event.payload.get("defaults")
     questionCount = len(questions) if isinstance(questions, list) else 0
-    defaultCount = len(defaults) if isinstance(defaults, dict) else 0
+    workDetail = _clarificationWorkDetail(questionCount, defaults)
     return {
         "eventIndex": event.eventIndex,
         "eventType": event.eventType,
@@ -171,9 +171,22 @@ def _clarificationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
         "target": "clarification-gate",
         "risk": "normal",
         "workLabel": "작업 전 확인 질문",
-        "workDetail": f"핵심 질문 {questionCount}개 · 기본값 {defaultCount}개",
+        "workDetail": workDetail,
         "elapsedMs": event.elapsedMs,
     }
+
+
+def _clarificationWorkDetail(questionCount: int, defaults: Any) -> str:
+    if not isinstance(defaults, dict):
+        return f"핵심 질문 {questionCount}개 · 기본값 0개"
+    summary = [
+        value
+        for key in ("level", "depth", "environment", "balance")
+        if isinstance(value := defaults.get(key), str) and value
+    ]
+    if not summary:
+        return f"핵심 질문 {questionCount}개 · 기본값 {len(defaults)}개"
+    return f"핵심 질문 {questionCount}개 · 기본값: {' / '.join(summary)}"
 
 
 def _payloadText(payload: dict[str, Any], key: str) -> str:
