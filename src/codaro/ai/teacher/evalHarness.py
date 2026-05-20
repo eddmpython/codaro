@@ -176,6 +176,21 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         ),
     ),
     TeacherEvalCase(
+        caseId="dependency-preflight-failure-blocks-cell-call",
+        prompt="matplotlib 그래프 실습 셀을 실행하고 확인해줘",
+        expectedTools=("packages-check", "cell-call"),
+        expectedToolSequence=("packages-check", "cell-call"),
+        orderedBefore=(("packages-check", "cell-call"),),
+        expectedWorkLabels=("라이브러리 확인", "셀 실행/검증", "도구 정책 확인"),
+        expectedWorkDetails=("matplotlib 설치 여부 확인", "kernel offline", "cell-1 실행 또는 검증", "dependency-preflight-required"),
+        expectedTraceEvents=("tool-start", "tool-result", "tool-policy-violation"),
+        expectedToolResultFields=(
+            ("packages-check", "error"),
+            ("cell-call", "policyCode"),
+        ),
+        allowPolicyViolations=True,
+    ),
+    TeacherEvalCase(
         caseId="provider-error-promotes-workloop",
         prompt="요약해줘",
         expectedNoTools=True,

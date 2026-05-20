@@ -172,6 +172,7 @@ async def mainAsync() -> int:
         await runClarificationCase(),
         await runClarificationContinuationCase(),
         await runDependencyPreflightCase(),
+        await runDependencyPreflightFailureCase(),
         await runProviderErrorCase(),
         await runCurriculumMaterializationCase(),
     ]
@@ -422,6 +423,59 @@ async def runDependencyPreflightCase() -> dict[str, Any]:
     return reportPayload(report, extraFailures)
 
 
+async def runDependencyPreflightFailureCase() -> dict[str, Any]:
+    case = goldenCase("dependency-preflight-failure-blocks-cell-call")
+    provider = ScriptedProvider([
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-check", name="packages-check", arguments={"names": ["matplotlib"]})],
+        ),
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-cell", name="cell-call", arguments={"operation": "check", "blockId": "cell-1"})],
+        ),
+        ToolResponse(answer="패키지 확인 실패로 실행을 중단했습니다.", provider="fake", model="test", toolCalls=[]),
+    ])
+    executor = ScriptedExecutor({
+        "packages-check": {"error": "kernel offline"},
+        "cell-call": {"passed": True, "status": "should-not-run"},
+    })
+    report = await runTeacherGoldenProviderCase(
+        case,
+        provider=provider,
+        executor=executor,
+        convManager=FakeConversationManager(),
+        orchestrator=TeacherOrchestrator.fromContext({"dependencyPreflight": {"packages": ["matplotlib"]}}),
+        tools=toolSchemas(),
+    )
+    observedCalls = [call["tool"] for call in executor.calls]
+    extraFailures = []
+    if observedCalls != ["packages-check"]:
+        extraFailures.append(f"failed preflight should block executor cell-call, observed: {observedCalls}")
+    if provider.callCount != 3:
+        extraFailures.append(f"failed preflight provider loop call count mismatch: {provider.callCount}")
+    checkPayload = providerCallToolResultPayload(provider, 1, "call-check")
+    if checkPayload is None or checkPayload.get("error") != "kernel offline":
+        extraFailures.append("provider did not receive failed packages-check result")
+    cellPayload = providerCallToolResultPayload(provider, 2, "call-cell")
+    if cellPayload is None or cellPayload.get("policyCode") != "dependency-preflight-required":
+        extraFailures.append("provider did not receive dependency-preflight policy result")
+    if not any(
+        violation.get("policyCode") == "dependency-preflight-required" and violation.get("toolName") == "cell-call"
+        for violation in report.evaluation.policyViolations
+    ):
+        extraFailures.append("trace did not preserve dependency-preflight policy violation")
+    if "kernel offline" not in report.evaluation.observedWorkDetails:
+        extraFailures.append("failed packages-check did not expose readable workloop error")
+    if "matplotlib 준비됨" in report.evaluation.observedWorkDetails:
+        extraFailures.append("failed packages-check was shown as ready")
+    return reportPayload(report, extraFailures)
+
+
 async def runCurriculumMaterializationCase() -> dict[str, Any]:
     case = goldenCase("curriculum-yaml-materialized")
     activeDocument = createEmptyDocument("빈 문서")
@@ -514,6 +568,7 @@ def reportPayload(report, extraFailures: list[str]) -> dict[str, Any]:
         "workLabels": list(report.evaluation.observedWorkLabels),
         "workDetails": list(report.evaluation.observedWorkDetails),
         "signals": list(report.evaluation.observedResultSignals),
+        "policyViolations": list(report.evaluation.policyViolations),
         "clarificationAssumptionKeys": clarificationAssumptionKeys(report.tracePayload),
     }
 
@@ -526,6 +581,7 @@ def publicReportPayload(report: dict[str, Any]) -> dict[str, Any]:
         "toolSequence": report["toolSequence"],
         "workDetails": report["workDetails"],
         "signals": report["signals"],
+        "policyViolations": report["policyViolations"],
         "clarificationAssumptionKeys": report["clarificationAssumptionKeys"],
     }
 

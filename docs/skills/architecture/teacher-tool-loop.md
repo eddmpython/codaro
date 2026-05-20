@@ -83,6 +83,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - golden case는 명시적으로 허용한 경우가 아니면 policy violation이 1건이라도 있으면 실패다.
    - 평가 harness는 `score`, `maxScore`, `minimumScore`를 payload에 남긴다. teacher/provider golden 평가는 10점 만점, 완료 기준은 `minimumScore: 9.0`이다.
    - dependency preflight golden case는 `packages-check → packages-install → cell-call` exact sequence를 요구한다. 필요한 도구가 모두 있어도 순서가 다르거나 불필요한 tool call이 끼면 실패다.
+   - `packages-check` 자체가 실패하거나 malformed 결과를 주면 preflight는 완료된 것으로 보지 않는다. provider가 그 다음 `cell-call`을 요청해도 executor로 넘기지 않고 `dependency-preflight-required` policy result를 다음 provider call에 전달한다.
    - 새 provider 동작을 추가하면 golden case가 실제 provider loop payload를 대상으로 tool 순서, workloop 라벨, YAML contract 산출 여부, structured section card flow, 패키지 preflight 결과, 셀 실행/검증 결과를 검증해야 한다.
    - provider loop e2e는 tool call 실행 후 `role: tool` 결과 메시지가 다음 provider 호출에 다시 들어갔는지도 검증해야 한다. tool sequence만 맞고 provider가 결과를 보지 못한 채 다음 응답으로 넘어가면 실패다.
    - `uv run python -X utf8 tests/run.py gate teacher-e2e`는 clarification gate, dependency preflight, provider error workloop, 실제 curriculum YAML handler를 한 번에 통과하는 최소 golden e2e 증거이며, 실행 출력에 teacher golden e2e score를 남긴다.

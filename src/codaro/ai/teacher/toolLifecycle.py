@@ -153,6 +153,9 @@ def _resultWorkDetail(name: str, arguments: dict[str, Any], result: dict[str, An
             parts.append("에디터 반영")
         return " · ".join(parts)
     if name == "packages-check":
+        if result.get("error"):
+            message = _firstLine(_textResult(result, "message") or _textResult(result, "error"))
+            return message or "패키지 확인 실패"
         missing = _listResult(result, "missing")
         if missing:
             return f"{', '.join(missing)} 누락 확인"

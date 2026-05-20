@@ -365,8 +365,16 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "dependency-install-required",
                     "toolRequiresDependencyPreflight",
                 )),
+                ("src/codaro/ai/teacher/evalHarness.py", (
+                    "dependency-preflight-failure-blocks-cell-call",
+                    "allowPolicyViolations=True",
+                    "(\"cell-call\", \"policyCode\")",
+                )),
                 ("tests/verifyTeacherGoldenE2e.py", (
                     "observedCalls != [\"packages-check\", \"packages-install\", \"cell-call\"]",
+                    "failed preflight should block executor cell-call",
+                    "provider did not receive dependency-preflight policy result",
+                    "failed packages-check did not expose readable workloop error",
                     "\"packages-install\": {",
                     "\"installer\": \"uv\"",
                     "\"cell-call\": {\"passed\": True",

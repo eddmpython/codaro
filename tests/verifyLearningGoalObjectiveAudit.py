@@ -203,12 +203,19 @@ OBJECTIVE_REQUIREMENTS = (
         evidenceChecks=(
             ("src/codaro/ai/teacher/evalHarness.py", (
                 "dependency-preflight-before-install",
+                "dependency-preflight-failure-blocks-cell-call",
                 "expectedToolSequence=(\"packages-check\", \"packages-install\", \"cell-call\")",
+                "allowPolicyViolations=True",
             )),
             ("src/codaro/ai/teacher/toolPolicy.py", (
                 "package-check-required",
                 "dependency-preflight-required",
                 "dependency-install-required",
+            )),
+            ("tests/verifyTeacherGoldenE2e.py", (
+                "failed preflight should block executor cell-call",
+                "provider did not receive dependency-preflight policy result",
+                "failed packages-check did not expose readable workloop error",
             )),
             ("src/codaro/system/packageOps.py", (
                 "installer: str = \"uv\"",

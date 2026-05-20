@@ -988,6 +988,53 @@ def testGoldenProviderCaseRunsActualLoopAndValidatesResults() -> None:
     assert [call["tool"] for call in executor.calls] == ["packages-check", "packages-install", "cell-call"]
 
 
+def testGoldenProviderCaseBlocksCellCallAfterFailedPackageCheck() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "dependency-preflight-failure-blocks-cell-call")
+    provider = _ScriptedProvider([
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-check", name="packages-check", arguments={"names": ["matplotlib"]})],
+        ),
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-cell", name="cell-call", arguments={"operation": "check", "blockId": "cell-1"})],
+        ),
+        ToolResponse(answer="패키지 확인 실패로 실행을 중단했습니다.", provider="fake", model="test", toolCalls=[]),
+    ])
+    executor = _ScriptedExecutor({
+        "packages-check": {"error": "kernel offline"},
+        "cell-call": {"passed": True, "feedback": "should not run"},
+    })
+    orchestrator = TeacherOrchestrator.fromContext({"dependencyPreflight": {"packages": ["matplotlib"]}})
+
+    report = asyncio.run(runTeacherGoldenProviderCase(
+        case,
+        provider=provider,
+        executor=executor,
+        convManager=_FakeConversationManager(),
+        orchestrator=orchestrator,
+        tools=[{"type": "function"}],
+    ))
+
+    assert report.passed
+    assert report.evaluation.observedTools == ("packages-check", "cell-call")
+    assert report.evaluation.policyViolationCount == 1
+    assert report.evaluation.policyViolations == ({
+        "policyCode": "dependency-preflight-required",
+        "toolName": "cell-call",
+        "message": "실행 전 packages-check가 필요합니다: matplotlib",
+    },)
+    assert "packages-check.error" in report.evaluation.observedResultSignals
+    assert "cell-call.policyCode" in report.evaluation.observedResultSignals
+    assert "kernel offline" in report.evaluation.observedWorkDetails
+    assert "matplotlib 준비됨" not in report.evaluation.observedWorkDetails
+    assert [call["tool"] for call in executor.calls] == ["packages-check"]
+
+
 def testGoldenProviderCaseStopsAtClarificationGateWithoutProviderCall() -> None:
     case = next(case for case in goldenEvalCases if case.caseId == "ambiguous-learning-asks-clarification")
     provider = _ProviderShouldNotBeCalled()
