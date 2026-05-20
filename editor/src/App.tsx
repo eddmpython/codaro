@@ -45,9 +45,12 @@ import {
 import {
   buildLocalAssistantAnswer,
   buildLocalBlocksFromPrompt,
-  buildLocalExecutionResult,
-  firstOutputLine,
 } from "@/lib/localFallback";
+import {
+  resolveBlockRunCode,
+  runNotebookBlock,
+  runReactiveNotebook,
+} from "@/lib/notebookRuntime";
 import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
 import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
 import {
@@ -94,7 +97,6 @@ import type {
   CurriculumCategory,
   CurriculumContentSummary,
   EStopStatus,
-  ExecutionResult,
   LoadState,
   SchedulerStatus,
   TaskDefinition,
@@ -447,25 +449,9 @@ function App() {
   const currentResult = selectedBlock ? results[selectedBlock.id] : undefined;
   const canRun = apiOnline ? Boolean(sessionId) : true;
 
-  async function ensureSession() {
-    if (sessionId) return sessionId;
-    try {
-      const created = await codaroApi.createSession();
-      setSessionId(created.sessionId);
-      return created.sessionId;
-    } catch (error) {
-      setNotice({
-        tone: "error",
-        title: "런타임 사용 불가",
-        detail: error instanceof Error ? error.message : String(error),
-      });
-      return null;
-    }
-  }
-
   async function runBlock(block: BlockConfig) {
     if (block.type !== "code") return;
-    const code = drafts[block.id] ?? (surface === "curriculum" && block.role === "snippet" ? "" : block.content);
+    const code = resolveBlockRunCode(block, drafts, { emptySnippetFallback: surface === "curriculum" });
     if (surface === "curriculum") {
       setSelectedCurriculumBlockId(block.id);
     } else {
@@ -474,41 +460,21 @@ function App() {
     setRunningBlockId(block.id);
     setNotice({ tone: "default", title: "셀 실행 중", detail: blockLabel(block) });
 
-    if (!apiOnline) {
-      await sleep(250);
-      const result = buildLocalExecutionResult(block, code, Object.keys(results).length + 1);
-      setResults((current) => ({ ...current, [block.id]: result }));
-      setVariables(result.variables);
-      setNotice({
-        tone: "success",
-        title: "셀 실행 완료",
-        detail: firstOutputLine(result) || "출력 준비됨",
-      });
-      setRunningBlockId(null);
-      return;
-    }
-
-    const activeSession = await ensureSession();
-    if (!activeSession) {
-      setRunningBlockId(null);
-      return;
-    }
-
     try {
-      const result = await codaroApi.executeCode(activeSession, code, block.id);
-      setResults((current) => ({ ...current, [block.id]: result }));
-      setVariables(result.variables);
-      setNotice({
-        tone: result.status === "error" ? "error" : "success",
-        title: result.status === "error" ? "셀 실행 실패" : "셀 실행 완료",
-        detail: firstOutputLine(result) || "출력 없음",
+      const outcome = await runNotebookBlock({
+        apiOnline,
+        block,
+        code,
+        localExecutionCount: Object.keys(results).length + 1,
+        sessionId,
       });
-    } catch (error) {
-      setNotice({
-        tone: "error",
-        title: "실행 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
+      if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
+      if (outcome.result) {
+        const result = outcome.result;
+        setResults((current) => ({ ...current, [block.id]: result }));
+      }
+      if (outcome.variables) setVariables(outcome.variables);
+      if (outcome.notice) setNotice(outcome.notice);
     } finally {
       setRunningBlockId(null);
     }
@@ -520,57 +486,20 @@ function App() {
     setNotice({ tone: "default", title: "노트북 실행 중", detail: document.title });
     setNotebookRunning(true);
 
-    if (!apiOnline) {
-      await sleep(350);
-      const nextResults = Object.fromEntries(
-        codeBlocks.map((block, index) => [
-          block.id,
-          buildLocalExecutionResult(block, drafts[block.id] ?? block.content, index + 1),
-        ]),
-      ) as ResultMap;
-      setResults((current) => ({ ...current, ...nextResults }));
-      const lastResult = Object.values(nextResults).at(-1);
-      setVariables(lastResult?.variables ?? []);
-      setNotice({
-        tone: "success",
-        title: "노트북 실행 완료",
-        detail: `${codeBlocks.length}개 셀을 평가했습니다.`,
-      });
-      setNotebookRunning(false);
-      return;
-    }
-
-    const activeSession = await ensureSession();
-    if (!activeSession) {
-      setNotebookRunning(false);
-      return;
-    }
-
     try {
-      const blocks = document.blocks
-        .filter((block): block is BlockConfig & { type: "code" | "markdown" } =>
-          block.type === "code" || block.type === "markdown",
-        )
-        .map((block) => ({
-          id: block.id,
-          type: block.type,
-          content: drafts[block.id] ?? block.content,
-        }));
-      const payload = await codaroApi.executeReactive(activeSession, firstBlock.id, blocks);
-      const nextResults = Object.fromEntries(payload.results.map((result) => [result.blockId ?? "", result]));
-      setResults((current) => ({ ...current, ...nextResults }));
-      setVariables(payload.results.at(-1)?.variables ?? variables);
-      setNotice({
-        tone: "success",
-        title: "노트북 실행 완료",
-        detail: `${payload.executionOrder.length}개 셀을 평가했습니다.`,
+      const outcome = await runReactiveNotebook({
+        apiOnline,
+        codeBlocks,
+        document,
+        drafts,
+        firstBlock,
+        previousVariables: variables,
+        sessionId,
       });
-    } catch (error) {
-      setNotice({
-        tone: "error",
-        title: "노트북 실행 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
+      if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
+      if (outcome.results) setResults((current) => ({ ...current, ...outcome.results }));
+      if (outcome.variables) setVariables(outcome.variables);
+      if (outcome.notice) setNotice(outcome.notice);
     } finally {
       setNotebookRunning(false);
     }
@@ -1065,12 +994,6 @@ function App() {
       />
     </SidebarProvider>
   );
-}
-
-function sleep(milliseconds: number) {
-  return new Promise((resolve) => {
-    window.setTimeout(resolve, milliseconds);
-  });
 }
 
 export default App;
