@@ -70,7 +70,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - response의 `trace.workloop`은 사용자가 읽을 수 있는 단계 품질 평가에 쓴다.
    - streaming 중 provider 오류는 `error` event와 trace `turn-error`로 남긴다.
    - golden case는 명시적으로 허용한 경우가 아니면 policy violation이 1건이라도 있으면 실패다.
-   - 새 provider 동작을 추가하면 golden case가 실제 provider loop payload를 대상으로 tool 순서, workloop 라벨, YAML contract 산출 여부, 패키지 preflight 결과, 셀 실행/검증 결과를 검증해야 한다.
+   - 새 provider 동작을 추가하면 golden case가 실제 provider loop payload를 대상으로 tool 순서, workloop 라벨, YAML contract 산출 여부, structured section card flow, 패키지 preflight 결과, 셀 실행/검증 결과를 검증해야 한다.
 
 ## 코드 경계
 

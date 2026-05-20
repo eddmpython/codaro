@@ -100,6 +100,7 @@ teacher/provider loop의 golden case는 다음을 확인해야 한다.
 
 - `write-curriculum-yaml` 결과 document에 `learningContract` 또는 `sectionContract`가 존재한다.
 - 섹션 카드가 goal, why, explanation, tips를 contract에서 읽는다.
+- golden provider run은 `section` 블록 뒤에 `sectionContract:explanation → sectionContract:snippet → sectionContract:exercise → sectionContract:check`가 같은 섹션 범위 안에서 materialize됐는지 확인한다.
 - Playwright로 데스크톱과 모바일에서 structured section card가 하나의 카드 흐름으로 보이고, 실습 입력 셀/실행 결과/검증 구역의 텍스트가 겹치지 않는지 확인한다.
 - 패키지 흐름은 `packages-check → packages-install(필요할 때만) → cell-call` 순서를 지킨다.
 - trace/workloop에는 `커리큘럼 YAML 전개`, `라이브러리 확인`, `uv 라이브러리 설치`, `셀 실행/검증` 같은 사용자가 읽을 수 있는 단계가 남는다.

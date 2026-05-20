@@ -19,6 +19,7 @@ class TeacherEvalCase:
     expectedTraceEvents: tuple[str, ...] = ()
     expectedToolResultFields: tuple[tuple[str, str], ...] = ()
     expectedYamlContract: bool = False
+    expectedSectionCardFlow: bool = False
     allowPolicyViolations: bool = False
 
 
@@ -98,6 +99,7 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         expectedTraceEvents=("tool-start", "tool-result"),
         expectedToolResultFields=(("write-curriculum-yaml", "document"),),
         expectedYamlContract=True,
+        expectedSectionCardFlow=True,
     ),
     TeacherEvalCase(
         caseId="dependency-preflight-before-install",
@@ -185,6 +187,8 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
             failures.append(f"missing expected trace event: {eventType}")
     if case.expectedYamlContract and not _hasYamlContract(tracePayload):
         failures.append("missing structured learning YAML contract")
+    if case.expectedSectionCardFlow and not _hasStructuredSectionCardFlow(tracePayload):
+        failures.append("missing structured section card flow")
     for toolName, fieldName in case.expectedToolResultFields:
         if not _toolResultFieldObserved(tracePayload, toolName, fieldName):
             failures.append(f"missing result field for {toolName}: {fieldName}")
@@ -338,6 +342,109 @@ def _hasYamlContract(tracePayload: Mapping[str, Any]) -> bool:
     return False
 
 
+def _hasStructuredSectionCardFlow(tracePayload: Mapping[str, Any]) -> bool:
+    return any(
+        _documentHasStructuredSectionCardFlow(document)
+        for document in _iterCurriculumDocuments(tracePayload)
+    )
+
+
+def _iterCurriculumDocuments(tracePayload: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...]:
+    documents: list[Mapping[str, Any]] = []
+    for result in _toolResultPayloads(tracePayload, "write-curriculum-yaml"):
+        for key in ("document", "curriculumDocument"):
+            document = result.get(key)
+            if isinstance(document, Mapping):
+                documents.append(document)
+    return tuple(documents)
+
+
+def _documentHasStructuredSectionCardFlow(document: Mapping[str, Any]) -> bool:
+    blocks = document.get("blocks")
+    if not isinstance(blocks, list):
+        return False
+
+    for index, block in enumerate(blocks):
+        if not isinstance(block, Mapping) or block.get("sourceType") != "section":
+            continue
+        contract = _sectionContractFromBlock(block)
+        if not _sectionContractHasCardFields(contract):
+            continue
+        sectionBlocks = _sectionContractBlocksAfter(blocks, index)
+        if _sectionBlocksHaveCardFlow(sectionBlocks):
+            return True
+    return False
+
+
+def _sectionContractFromBlock(block: Mapping[str, Any]) -> Mapping[str, Any] | None:
+    payload = block.get("payload")
+    if not isinstance(payload, Mapping):
+        return None
+    contract = payload.get("sectionContract")
+    return contract if isinstance(contract, Mapping) else None
+
+
+def _sectionContractHasCardFields(contract: Mapping[str, Any] | None) -> bool:
+    if not isinstance(contract, Mapping):
+        return False
+    requiredTextFields = ("title", "goal", "why", "explanation")
+    if any(not _hasText(contract.get(fieldName)) for fieldName in requiredTextFields):
+        return False
+    tips = contract.get("tips")
+    return isinstance(tips, list) and any(_hasText(tip) for tip in tips)
+
+
+def _sectionContractBlocksAfter(blocks: Sequence[Any], sectionIndex: int) -> tuple[Mapping[str, Any], ...]:
+    result: list[Mapping[str, Any]] = []
+    for block in blocks[sectionIndex + 1:]:
+        if not isinstance(block, Mapping):
+            continue
+        sourceType = block.get("sourceType")
+        if sourceType == "section":
+            break
+        if isinstance(sourceType, str) and sourceType.startswith("sectionContract:"):
+            result.append(block)
+    return tuple(result)
+
+
+def _sectionBlocksHaveCardFlow(blocks: Sequence[Mapping[str, Any]]) -> bool:
+    expectedTypes = (
+        "sectionContract:explanation",
+        "sectionContract:snippet",
+        "sectionContract:exercise",
+        "sectionContract:check",
+    )
+    nextExpectedIndex = 0
+    for block in blocks:
+        expectedType = expectedTypes[nextExpectedIndex]
+        if block.get("sourceType") != expectedType:
+            continue
+        if not _sectionFlowBlockIsValid(block, expectedType):
+            return False
+        nextExpectedIndex += 1
+        if nextExpectedIndex == len(expectedTypes):
+            return True
+    return False
+
+
+def _sectionFlowBlockIsValid(block: Mapping[str, Any], sourceType: str) -> bool:
+    if sourceType == "sectionContract:explanation":
+        return block.get("role") == "learning" and _hasText(block.get("content"))
+    if sourceType == "sectionContract:snippet":
+        return block.get("type") == "code" and block.get("role") == "snippet" and _hasText(block.get("content"))
+    if sourceType == "sectionContract:exercise":
+        guide = block.get("guide")
+        return (
+            block.get("type") == "code"
+            and block.get("role") == "exercise"
+            and _hasText(block.get("content"))
+            and isinstance(guide, Mapping)
+        )
+    if sourceType == "sectionContract:check":
+        return block.get("role") == "check" and _hasText(block.get("content"))
+    return False
+
+
 def _toolResultFieldObserved(tracePayload: Mapping[str, Any], toolName: str, fieldName: str) -> bool:
     for result in _toolResultPayloads(tracePayload, toolName):
         value = _valueAtPath(result, fieldName)
@@ -394,6 +501,10 @@ def _documentHasLearningContract(value: Any) -> bool:
         if isinstance(payload.get("sectionContract"), Mapping):
             return True
     return False
+
+
+def _hasText(value: Any) -> bool:
+    return isinstance(value, str) and bool(value.strip())
 
 
 def _iterTraceToolPayloads(tracePayload: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...]:

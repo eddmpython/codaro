@@ -189,6 +189,81 @@ class _FakeSessionManager:
         return None
 
 
+def _structuredSectionContractPayload() -> dict:
+    return {
+        "id": "dataframe-basics",
+        "title": "DataFrame 만들기",
+        "subtitle": "행과 열의 감각",
+        "goal": "dict에서 DataFrame을 만드는 흐름을 익힌다.",
+        "why": "엑셀 표 자동화의 첫 단계다.",
+        "explanation": "열 이름과 값 목록으로 표를 만든다.",
+        "tips": ["모든 열의 길이는 같아야 한다."],
+        "snippet": "import pandas as pd\nframe = pd.DataFrame({'sales': [10]})\nframe",
+        "exercise": {
+            "prompt": "sales 열을 가진 DataFrame을 직접 만드세요.",
+            "starterCode": "import pandas as pd\nframe = ___",
+            "solution": "import pandas as pd\nframe = pd.DataFrame({'sales': [10, 20]})",
+            "check": {"variable": "frame"},
+            "hints": ["dict의 key가 열 이름이다."],
+            "difficulty": "easy",
+        },
+        "check": {"noError": "실행 오류가 없어야 한다."},
+    }
+
+
+def _structuredCurriculumDocumentPayload() -> dict:
+    sectionContract = _structuredSectionContractPayload()
+    return {
+        "blocks": [
+            {
+                "sourceType": "intro",
+                "payload": {
+                    "learningContract": {
+                        "meta": {"title": "pandas 기초", "packages": ["pandas"]},
+                        "intro": {"direction": "DataFrame 흐름을 익힌다."},
+                        "sections": [sectionContract],
+                    }
+                },
+            },
+            {
+                "sourceType": "section",
+                "payload": {"sectionContract": sectionContract},
+            },
+            {
+                "type": "markdown",
+                "role": "learning",
+                "sourceType": "sectionContract:explanation",
+                "content": "### 이번 섹션에서 공부할 것\nDataFrame을 만든다.",
+                "payload": {"sectionContract": sectionContract},
+            },
+            {
+                "type": "code",
+                "role": "snippet",
+                "sourceType": "sectionContract:snippet",
+                "content": "import pandas as pd\nframe = pd.DataFrame({'sales': [10]})\nframe",
+            },
+            {
+                "type": "code",
+                "role": "exercise",
+                "sourceType": "sectionContract:exercise",
+                "content": "import pandas as pd\nframe = ___",
+                "guide": {
+                    "exerciseType": "sectionPractice",
+                    "hints": ["dict의 key가 열 이름이다."],
+                    "checkConfig": {"variable": "frame"},
+                    "difficulty": "easy",
+                },
+            },
+            {
+                "type": "markdown",
+                "role": "check",
+                "sourceType": "sectionContract:check",
+                "content": "### 검증/피드백\n- **noError**: 실행 오류가 없어야 한다.",
+            },
+        ]
+    }
+
+
 async def _collectStreamEvents(stream) -> list[dict]:
     return [event async for event in stream]
 
@@ -435,13 +510,7 @@ def testEvalHarnessCanValidateStructuredCurriculumTrace() -> None:
         "call-1",
         "write-curriculum-yaml",
         {},
-        {
-            "document": {
-                "blocks": [
-                    {"payload": {"learningContract": {"meta": {"title": "lesson"}}}},
-                ]
-            }
-        },
+        {"document": _structuredCurriculumDocumentPayload()},
     )
 
     case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
@@ -459,6 +528,7 @@ def testEvalHarnessChecksWorkloopAndStructuredYamlContract() -> None:
         expectedWorkLabels=("커리큘럼 YAML 전개",),
         expectedTraceEvents=("tool-start", "tool-result"),
         expectedYamlContract=True,
+        expectedSectionCardFlow=True,
     )
     tracePayload = {
         "toolSequence": ["write-curriculum-yaml"],
@@ -471,12 +541,7 @@ def testEvalHarnessChecksWorkloopAndStructuredYamlContract() -> None:
             {
                 "name": "write-curriculum-yaml",
                 "result": {
-                    "document": {
-                        "blocks": [
-                            {"payload": {"learningContract": {"meta": {"title": "lesson"}}}},
-                            {"payload": {"sectionContract": {"title": "section"}}},
-                        ]
-                    }
+                    "document": _structuredCurriculumDocumentPayload(),
                 },
             }
         ],
@@ -494,6 +559,35 @@ def testEvalHarnessFailsMissingStructuredYamlContract() -> None:
 
     assert not report.passed
     assert "missing structured learning YAML contract" in report.failures
+    assert "missing structured section card flow" in report.failures
+
+
+def testEvalHarnessFailsMissingStructuredSectionCardFlow() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
+    tracePayload = {
+        "toolSequence": ["write-curriculum-yaml"],
+        "toolCalls": [
+            {
+                "name": "write-curriculum-yaml",
+                "result": {
+                    "document": {
+                        "blocks": [
+                            {"payload": {"learningContract": {"meta": {"title": "lesson"}}}},
+                            {
+                                "sourceType": "section",
+                                "payload": {"sectionContract": _structuredSectionContractPayload()},
+                            },
+                        ]
+                    }
+                },
+            }
+        ],
+    }
+
+    report = evaluateToolTracePayload(case, tracePayload)
+
+    assert not report.passed
+    assert "missing structured section card flow" in report.failures
 
 
 def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
@@ -593,18 +687,13 @@ def testGoldenProviderCaseValidatesStructuredYamlMaterialization() -> None:
             answer="",
             provider="fake",
             model="test",
-            toolCalls=[ToolCall(id="call-yaml", name="write-curriculum-yaml", arguments={"title": "pandas 기초"})],
+            toolCalls=[ToolCall(id="call-yaml", name="write-curriculum-yaml", arguments={"yamlContent": "meta:\n  title: pandas 기초"})],
         ),
         ToolResponse(answer="커리큘럼을 구성했습니다.", provider="fake", model="test", toolCalls=[]),
     ])
     executor = _ScriptedExecutor({
         "write-curriculum-yaml": {
-            "document": {
-                "blocks": [
-                    {"payload": {"learningContract": {"meta": {"title": "pandas 기초"}}}},
-                    {"payload": {"sectionContract": {"title": "DataFrame 만들기"}}},
-                ]
-            }
+            "document": _structuredCurriculumDocumentPayload(),
         },
     })
 
