@@ -51,10 +51,6 @@ import {
 import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
 import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
 import {
-  collectBlocksFromToolCalls,
-  documentFromToolCalls,
-} from "@/lib/toolCallDocuments";
-import {
   blockLabel,
   buildCellAiPrompt,
   type CellAiAction,
@@ -70,6 +66,11 @@ import {
   failAssistantMessage,
   finalizeAssistantMessage,
 } from "@/lib/assistantConversationState";
+import {
+  assistantResponseNotice,
+  buildAssistantResponsePlan,
+  mergePendingBlocks,
+} from "@/lib/assistantResponsePlan";
 import {
   SidebarInset,
   SidebarProvider,
@@ -785,35 +786,23 @@ function App() {
       );
       let savedCurriculumTitle = "";
       setConversationId(response.conversationId);
-      if (response.toolCalls.length) {
-        const generatedDocument = documentFromToolCalls(response.toolCalls);
-        if (generatedDocument) {
-          if (activeScope === "lesson" || activeScope === "curriculum") {
-            savedCurriculumTitle = saveCustomCurriculum(generatedDocument.blocks, generatedDocument.title)?.title ?? generatedDocument.title;
-          } else {
-            applyDocument(generatedDocument);
-            setSurface("editor");
-          }
-        } else {
-          const generatedBlocks = collectBlocksFromToolCalls(response.toolCalls);
-          if (generatedBlocks.length) {
-            if (activeScope === "cell") {
-              setPendingTarget("notebook");
-              setPendingBlocks((current) => {
-                const knownIds = new Set(current.map((block) => block.id));
-                return [...current, ...generatedBlocks.filter((block) => !knownIds.has(block.id))];
-              });
-            } else {
-              savedCurriculumTitle = saveCustomCurriculum(generatedBlocks)?.title ?? "";
-              setPendingBlocks([]);
-              setPendingTarget("notebook");
-            }
-          }
-        }
+
+      const responsePlan = buildAssistantResponsePlan({ activeScope, message, response });
+      if (responsePlan.documentToApply) {
+        applyDocument(responsePlan.documentToApply);
+        setSurface("editor");
       }
-      if (!savedCurriculumTitle && activeScope !== "cell") {
-        const fallbackBlocks = buildLocalBlocksFromPrompt(message, activeScope);
-        savedCurriculumTitle = saveCustomCurriculum(fallbackBlocks)?.title ?? "";
+      if (responsePlan.pendingBlocks.length) {
+        setPendingTarget("notebook");
+        setPendingBlocks((current) => mergePendingBlocks(current, responsePlan.pendingBlocks));
+      }
+      if (responsePlan.curriculumToSave) {
+        savedCurriculumTitle = saveCustomCurriculum(
+          responsePlan.curriculumToSave.blocks,
+          responsePlan.curriculumToSave.title,
+        )?.title ?? responsePlan.curriculumToSave.title ?? "";
+      }
+      if (responsePlan.clearPendingBlocks) {
         setPendingBlocks([]);
         setPendingTarget("notebook");
       }
@@ -823,15 +812,7 @@ function App() {
         response,
         streamedContent,
       }));
-      setNotice({
-        tone: response.toolCalls.length ? "success" : "default",
-        title: response.toolCalls.length
-          ? savedCurriculumTitle ? "나만의 커리큘럼 저장됨" : activeScope === "cell" ? "노트북 변경 준비됨" : "커리큘럼 초안 준비됨"
-          : "어시스턴트 답변 완료",
-        detail: response.toolCalls.length
-          ? savedCurriculumTitle || (activeScope === "cell" ? "검토할 노트북 변경이 생성됐습니다." : "나만의 커리큘럼으로 저장할 초안이 생성됐습니다.")
-          : response.provider,
-      });
+      setNotice(assistantResponseNotice({ activeScope, response, savedCurriculumTitle }));
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
       const providerAuthIssue = isProviderAuthError(detail);

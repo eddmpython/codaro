@@ -1,0 +1,125 @@
+import { buildLocalBlocksFromPrompt } from "@/lib/localFallback";
+import type { TeacherScope } from "@/lib/teacherScope";
+import {
+  collectBlocksFromToolCalls,
+  documentFromToolCalls,
+} from "@/lib/toolCallDocuments";
+import type { AiChatResponse, AppNotice, BlockConfig, CodaroDocument } from "@/types";
+
+export type AssistantResponsePlan = {
+  clearPendingBlocks: boolean;
+  curriculumToSave: {
+    blocks: BlockConfig[];
+    title?: string;
+  } | null;
+  documentToApply: CodaroDocument | null;
+  pendingBlocks: BlockConfig[];
+};
+
+export function buildAssistantResponsePlan({
+  activeScope,
+  message,
+  response,
+}: {
+  activeScope: TeacherScope;
+  message: string;
+  response: AiChatResponse;
+}): AssistantResponsePlan {
+  const plan: AssistantResponsePlan = {
+    clearPendingBlocks: false,
+    curriculumToSave: null,
+    documentToApply: null,
+    pendingBlocks: [],
+  };
+
+  if (response.toolCalls.length) {
+    applyToolArtifacts(plan, response, activeScope);
+  }
+
+  if (!plan.curriculumToSave && activeScope !== "cell") {
+    plan.curriculumToSave = {
+      blocks: buildLocalBlocksFromPrompt(message, activeScope),
+    };
+    plan.clearPendingBlocks = true;
+  }
+
+  return plan;
+}
+
+export function mergePendingBlocks(current: BlockConfig[], incoming: BlockConfig[]): BlockConfig[] {
+  const knownIds = new Set(current.map((block) => block.id));
+  return [...current, ...incoming.filter((block) => !knownIds.has(block.id))];
+}
+
+export function assistantResponseNotice({
+  activeScope,
+  response,
+  savedCurriculumTitle,
+}: {
+  activeScope: TeacherScope;
+  response: AiChatResponse;
+  savedCurriculumTitle: string;
+}): AppNotice {
+  if (!response.toolCalls.length) {
+    return {
+      tone: "default",
+      title: "어시스턴트 답변 완료",
+      detail: response.provider,
+    };
+  }
+
+  if (savedCurriculumTitle) {
+    return {
+      tone: "success",
+      title: "나만의 커리큘럼 저장됨",
+      detail: savedCurriculumTitle,
+    };
+  }
+
+  if (activeScope === "cell") {
+    return {
+      tone: "success",
+      title: "노트북 변경 준비됨",
+      detail: "검토할 노트북 변경이 생성됐습니다.",
+    };
+  }
+
+  return {
+    tone: "success",
+    title: "커리큘럼 초안 준비됨",
+    detail: "나만의 커리큘럼으로 저장할 초안이 생성됐습니다.",
+  };
+}
+
+function applyToolArtifacts(
+  plan: AssistantResponsePlan,
+  response: AiChatResponse,
+  activeScope: TeacherScope,
+) {
+  const generatedDocument = documentFromToolCalls(response.toolCalls);
+  if (generatedDocument) {
+    if (activeScope === "lesson" || activeScope === "curriculum") {
+      plan.curriculumToSave = {
+        blocks: generatedDocument.blocks,
+        title: generatedDocument.title,
+      };
+      plan.clearPendingBlocks = true;
+    } else {
+      plan.documentToApply = generatedDocument;
+    }
+    return;
+  }
+
+  const generatedBlocks = collectBlocksFromToolCalls(response.toolCalls);
+  if (!generatedBlocks.length) return;
+
+  if (activeScope === "cell") {
+    plan.pendingBlocks = generatedBlocks;
+    return;
+  }
+
+  plan.curriculumToSave = {
+    blocks: generatedBlocks,
+  };
+  plan.clearPendingBlocks = true;
+}
