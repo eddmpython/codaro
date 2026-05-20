@@ -351,8 +351,11 @@ OBJECTIVE_REQUIREMENTS = (
             ("tests/verifyLearningCardPlaywright.py", (
                 "yamlToDocument",
                 "materializedStructuredLessonDocument",
+                "isPlaywrightEvalError",
                 "desktopOverview",
                 "mobileOverview",
+                "jsAssertLearningVisualIntegrity",
+                "visualIntegrity",
                 "data-learning-flow-canvas",
                 "data-learning-flow-blueprint",
                 "data-learning-flow-runtime-node",

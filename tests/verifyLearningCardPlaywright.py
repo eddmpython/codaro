@@ -68,6 +68,7 @@ def main(argv: list[str] | None = None) -> int:
         desktopOverview = cli.eval(jsAssertLearningOverview("desktop"))
         desktop = cli.eval(jsAssertStructuredCardLayout("desktop"))
         desktopControls = cli.eval(jsAssertStructuredCardControls("desktop"))
+        desktopVisual = cli.eval(jsAssertLearningVisualIntegrity("desktop"))
         desktopContractGaps = cli.eval(jsAssertContractGapWarning("desktop"))
         cli.run("resize", "1680", "900")
         toc = cli.eval(jsAssertTocPushRail())
@@ -77,11 +78,12 @@ def main(argv: list[str] | None = None) -> int:
         mobileOverview = cli.eval(jsAssertLearningOverview("mobile"))
         mobile = cli.eval(jsAssertStructuredCardLayout("mobile"))
         mobileControls = cli.eval(jsAssertStructuredCardControls("mobile"))
+        mobileVisual = cli.eval(jsAssertLearningVisualIntegrity("mobile"))
         mobileContractGaps = cli.eval(jsAssertContractGapWarning("mobile"))
         print(
             "ok: Playwright structured learning card verified "
-            f"{desktopOverview} {desktop} {desktopControls} {desktopContractGaps} "
-            f"{toc} {mobileOverview} {mobile} {mobileControls} {mobileContractGaps}"
+            f"{desktopOverview} {desktop} {desktopControls} {desktopVisual} {desktopContractGaps} "
+            f"{toc} {mobileOverview} {mobile} {mobileControls} {mobileVisual} {mobileContractGaps}"
         )
         return 0
     except VerificationError as exc:
@@ -149,7 +151,7 @@ class PlaywrightCli:
 
     def eval(self, expression: str) -> str:
         output = self.run("eval", expression, "--raw")
-        if output.lstrip().startswith("### Error"):
+        if isPlaywrightEvalError(output):
             raise VerificationError(output)
         return output
 
@@ -179,6 +181,20 @@ def waitForHttp(url: str, timeout: float = 30.0) -> None:
             lastError = str(exc)
         time.sleep(0.25)
     raise VerificationError(f"dev server did not become ready: {lastError}")
+
+
+def isPlaywrightEvalError(output: str) -> bool:
+    stripped = output.lstrip()
+    if stripped.startswith("### Error"):
+        return True
+    errorPrefixes = (
+        "Error:",
+        "ReferenceError:",
+        "TypeError:",
+        "SyntaxError:",
+        "RangeError:",
+    )
+    return stripped.startswith(errorPrefixes) and "\n    at " in stripped
 
 
 def freePort() -> int:
@@ -703,6 +719,74 @@ def jsAssertStructuredCardControls(viewport: str) -> str:
     directEditor: true,
     snippetCopy: true,
     helpVisible: true,
+  }});
+}})()
+""")
+
+
+def jsAssertLearningVisualIntegrity(viewport: str) -> str:
+    return compactJs(f"""
+(() => {{
+  const overview = document.querySelector('[data-learning-overview="true"]');
+  const card = document.querySelector('[data-learning-section-card][data-learning-section-structured="true"]');
+  if (!overview || !card) throw new Error('visual integrity scope missing');
+  if (document.documentElement.scrollWidth > window.innerWidth + 2) {{
+    throw new Error('page horizontal overflow');
+  }}
+
+  const checked = [];
+  const selectors = [
+    '[data-learning-overview-part="title"]',
+    '[data-learning-overview-part="direction"]',
+    '[data-learning-overview-part="benefit"]',
+    '[data-learning-flow-node="true"]',
+    '[data-learning-flow-runtime-node="true"]',
+    '[data-learning-section-index="true"]',
+    '[data-learning-section-heading="true"]',
+    '[data-code-payload-copy="true"]',
+    '[data-cell-ai-help-trigger="always-visible"]',
+  ];
+  for (const root of [overview, card]) {{
+    const rootRect = root.getBoundingClientRect();
+    selectors.forEach((selector) => {{
+      Array.from(root.querySelectorAll(selector)).forEach((item) => {{
+        if (item.closest('[data-cell-ai-popover="true"]')) return;
+        const rect = item.getBoundingClientRect();
+        if (rect.width <= 0 || rect.height <= 0) {{
+          throw new Error('empty visual element: ' + selector);
+        }}
+        if (rect.left < rootRect.left - 2 || rect.right > rootRect.right + 2) {{
+          throw new Error('visual element escapes root: ' + selector);
+        }}
+        if (item instanceof HTMLElement && item.tagName === 'BUTTON' && item.scrollWidth > item.clientWidth + 2) {{
+          throw new Error('button text overflow: ' + (item.textContent || '').trim());
+        }}
+        checked.push(selector);
+      }});
+    }});
+  }}
+
+  const controlRects = Array.from(new Set(Array.from(card.querySelectorAll('button, [data-code-payload-copy="true"]'))))
+    .filter((item) => !item.closest('[data-cell-ai-popover="true"]'))
+    .map((item) => ({{ text: (item.textContent || item.getAttribute('aria-label') || '').trim(), rect: item.getBoundingClientRect() }}))
+    .filter((item) => item.rect.width > 0 && item.rect.height > 0);
+  for (let outer = 0; outer < controlRects.length; outer += 1) {{
+    for (let inner = outer + 1; inner < controlRects.length; inner += 1) {{
+      const a = controlRects[outer].rect;
+      const b = controlRects[inner].rect;
+      const overlapX = Math.min(a.right, b.right) - Math.max(a.left, b.left);
+      const overlapY = Math.min(a.bottom, b.bottom) - Math.max(a.top, b.top);
+      if (overlapX > 1 && overlapY > 1) {{
+        throw new Error('control overlap: ' + controlRects[outer].text + ' / ' + controlRects[inner].text);
+      }}
+    }}
+  }}
+
+  return JSON.stringify({{
+    viewport: {json.dumps(viewport)},
+    visualIntegrity: true,
+    checked: checked.length,
+    controls: controlRects.length,
   }});
 }})()
 """)
