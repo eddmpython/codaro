@@ -403,10 +403,17 @@ function TraceWorkloopRow({ event }: { event: AiTraceWorkloopEvent }) {
         {elapsed ? <span className="ml-auto font-mono text-[10px] text-muted-foreground">{elapsed}</span> : null}
       </div>
       {event.workDetail || event.error ? (
-        <div className="mt-1 text-[11px] leading-5">{event.error || event.workDetail}</div>
+        <div className="mt-1 text-[11px] leading-5">{traceWorkloopRowDetail(event)}</div>
       ) : null}
     </div>
   );
+}
+
+function traceWorkloopRowDetail(event: AiTraceWorkloopEvent) {
+  if (event.error && event.workDetail && event.error !== event.workDetail) {
+    return `${event.workDetail} · ${event.error}`;
+  }
+  return event.error || event.workDetail;
 }
 
 function ToolPayloadBlock({ label, tone = "default", value }: { label: string; tone?: "default" | "error"; value: unknown }) {

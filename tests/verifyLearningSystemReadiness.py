@@ -74,6 +74,7 @@ class LiveGateCheck:
 
 LIVE_GATE_NAMES = (
     "teacher-e2e",
+    "assistant-workloop-contract",
     "learning-card-contract",
     "learning-card-browser",
 )
@@ -234,11 +235,12 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
         ),
         fileCriterion(
             "frontend-workloop-boundary",
-            "Frontend workloop promotes trace-only clarification and turn-error events without mixing runtime state.",
+            "Frontend workloop promotes trace-only clarification and turn-error events while preserving user-readable detail.",
             (
                 ("editor/src/lib/workLoop.ts", (
                     "normalizeAssistantTrace",
                     "withTraceWorkloopSteps",
+                    "traceWorkloopDetail",
                     "shouldPromoteTraceWorkloopEvent",
                     "clarification-gate",
                     "turn-error",
@@ -248,9 +250,20 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                 ("editor/src/components/assistant/assistantPanel.tsx", (
                     "AssistantTraceDetails",
                     "trace.workloop",
+                    "traceWorkloopRowDetail",
                     "raw trace",
                 )),
+                ("tests/verifyAssistantWorkloopContract.py", (
+                    "finishAssistantWorkLoop",
+                    "작업 전 확인 질문",
+                    "provider 응답 처리 중단",
+                    "packages-check",
+                    "packages-install",
+                    "cell-call",
+                )),
             ),
+            liveChecks=(liveChecks["assistant-workloop-contract"],),
+            blocking=True,
         ),
         goldenCaseCriterion(
             "curriculum-materialization-golden",
@@ -284,6 +297,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                 ("tests/run.py", (
                     "\"teacher-eval\"",
                     "\"teacher-e2e\"",
+                    "\"assistant-workloop-contract\"",
                     "\"learning-card-contract\"",
                     "\"learning-card-browser\"",
                     "\"learning-system-readiness\"",
@@ -291,6 +305,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                 ("docs/skills/ops/foundation/testing-and-gates.md", (
                     "`teacher-eval`",
                     "`teacher-e2e`",
+                    "`assistant-workloop-contract`",
                     "`learning-card-contract`",
                     "`learning-card-browser`",
                     "`learning-system-readiness`",

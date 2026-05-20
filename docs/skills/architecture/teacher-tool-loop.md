@@ -64,6 +64,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - `clarification-gate`, `tool-policy-violation`, `turn-error`도 사용자용 `trace.workloop` row로 변환한다. 사용자는 작업 전 질문, 정책 차단, provider 오류를 raw JSON 없이 먼저 이해할 수 있어야 한다.
    - clarification workloop detail은 질문 수만 쓰지 않고 실제 기본값 요약을 포함한다. 예: `핵심 질문 3개 · 기본값: 초급-중급 사이 / 실습 중심 / 현재 Codaro 로컬 Python과 uv 패키지 설치`.
    - 프론트 `workLoop` state는 도구 row와 중복되지 않는 `clarification-gate`/`turn-error`를 메인 작업 단계로 승격한다. raw trace 안쪽에만 묻히면 실패다.
+   - provider 오류는 `workDetail`과 `error`를 함께 보존한다. "provider 응답 처리 중단 · provider broken"처럼 무엇을 하다 멈췄는지와 실제 오류를 한 줄에서 읽을 수 있어야 한다.
    - raw payload와 trace event는 기본 노출하지 않고, 필요할 때 `In`/`Out`/`raw trace`로 펼쳐 본다.
 
 7. **Trace와 평가**
@@ -78,6 +79,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - dependency preflight golden case는 `packages-check → packages-install → cell-call` exact sequence를 요구한다. 필요한 도구가 모두 있어도 순서가 다르거나 불필요한 tool call이 끼면 실패다.
    - 새 provider 동작을 추가하면 golden case가 실제 provider loop payload를 대상으로 tool 순서, workloop 라벨, YAML contract 산출 여부, structured section card flow, 패키지 preflight 결과, 셀 실행/검증 결과를 검증해야 한다.
    - `uv run python -X utf8 tests/run.py gate teacher-e2e`는 clarification gate, dependency preflight, provider error workloop, 실제 curriculum YAML handler를 한 번에 통과하는 최소 golden e2e 증거다.
+   - `uv run python -X utf8 tests/run.py gate assistant-workloop-contract`는 프론트 workloop state가 clarification 기본값, provider 오류 detail+error, packages-check/install/cell-call 표시 문장을 보존하는지 확인하는 집중 gate다.
    - clarification golden case는 provider를 호출하지 않고 `toolSequence`가 비어 있어야 한다. trace에는 `clarification-gate`, workloop에는 `작업 전 확인 질문`, payload에는 1-3개 질문과 `level`/`depth`/`environment`/`balance` 기본값이 남아야 한다.
    - 커리큘럼 YAML golden case는 실제 `write-curriculum-yaml` 핸들러가 에디터 document를 바꾸는지까지 확인한다. 결과 payload의 `loadedInEditor`, materialize된 `sectionContract:*` block, document runtime packages는 평가 신호로 남겨야 한다.
 

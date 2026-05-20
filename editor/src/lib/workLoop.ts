@@ -255,7 +255,7 @@ function traceWorkloopStep(event: AiTraceWorkloopEvent, index: number): Assistan
     id: `trace-${event.eventIndex ?? index}-${policyStepIdPart(event.eventType || event.target || event.workLabel || "work")}`,
     label: event.workLabel || event.eventType || "작업",
     status: traceWorkloopStatus(event),
-    detail: event.error || event.workDetail,
+    detail: traceWorkloopDetail(event),
     error: event.error,
     toolName: event.toolName,
     traceEventIndex: event.eventIndex,
@@ -279,6 +279,13 @@ function shouldPromoteTraceWorkloopEvent(event: AiTraceWorkloopEvent) {
 function traceWorkloopStatus(event: AiTraceWorkloopEvent): AssistantWorkStep["status"] {
   if (event.error || event.status === "error") return "error";
   return "done";
+}
+
+function traceWorkloopDetail(event: AiTraceWorkloopEvent) {
+  if (event.error && event.workDetail && event.error !== event.workDetail) {
+    return `${event.workDetail} · ${event.error}`;
+  }
+  return event.error || event.workDetail;
 }
 
 function hasTraceWorkloopSignal(trace: AssistantTraceSummary | undefined) {
