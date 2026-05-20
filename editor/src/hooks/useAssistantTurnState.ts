@@ -7,7 +7,7 @@ import {
   buildCellAiPrompt,
   type CellAiAction,
 } from "@/lib/cellModel";
-import { buildAssistantContext, type ResultMap } from "@/lib/assistantContext";
+import type { ResultMap } from "@/lib/assistantContext";
 import {
   createAssistantPlaceholder,
   createUserMessage,
@@ -20,7 +20,7 @@ import {
   mergePendingBlocks,
   type PendingTarget,
 } from "@/lib/assistantResponsePlan";
-import { materializeDrafts } from "@/lib/documentModel";
+import { buildAssistantTurnRequest } from "@/lib/assistantTurnRequest";
 import {
   buildLocalAssistantDraft,
   completeLocalAssistantDraft,
@@ -123,26 +123,6 @@ export function useAssistantTurnState({
       return;
     }
 
-    const contextDocument = materializeDrafts(activeDocument, drafts);
-    const context = buildAssistantContext({
-      surface,
-      activeScope,
-      document: contextDocument,
-      drafts,
-      message,
-      results,
-      selectedBlock: selectedBlock ?? null,
-      currentResult: currentResult ?? null,
-      variables,
-      tools: toolCatalog.tools.map((tool) => ({
-        name: tool.name,
-        category: tool.category,
-        lane: tool.lane,
-        target: tool.target,
-        risk: tool.risk,
-      })),
-    });
-
     const assistantMessageId = `assistant-${Date.now()}`;
     setMessages((current) => [
       ...current,
@@ -156,13 +136,20 @@ export function useAssistantTurnState({
       const { response, streamedContent } = await runAssistantProviderTurn({
         assistantMessageId,
         onConversationId: setConversationId,
-        request: {
+        request: buildAssistantTurnRequest({
+          activeDocument,
+          activeScope,
           conversationId,
           message,
+          currentResult,
+          drafts,
+          results,
+          selectedBlock,
           sessionId,
-          role: "teacher",
-          context,
-        },
+          surface,
+          toolCatalog,
+          variables,
+        }),
         updateMessages: setMessages,
       });
       setConversationId(response.conversationId);
