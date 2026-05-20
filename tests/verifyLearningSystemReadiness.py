@@ -269,7 +269,8 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "specific new learning request reused stale clarification",
                 )),
                 ("src/codaro/ai/teacher/clarificationPolicy.py", (
-                    "\"assumptions\": dict(self.defaults)",
+                    "assumptions: dict[str, str]",
+                    "\"assumptions\": dict(self.assumptions)",
                     "작업 기준:",
                     "questions[:3]",
                     "\"level\"",
@@ -282,6 +283,9 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "missing clarification assumptions payload",
                     "missing clarification assumptions",
                     "작업 기준",
+                )),
+                ("src/codaro/ai/conversation.py", (
+                    "clarification assumptions recorded in the workloop",
                 )),
                 ("src/codaro/ai/conversation.py", (
                     "pendingClarification",

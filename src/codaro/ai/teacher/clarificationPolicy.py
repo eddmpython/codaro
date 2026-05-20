@@ -16,13 +16,13 @@ DEFAULT_LABELS = {
 class ClarificationPlan:
     shouldAsk: bool
     questions: tuple[str, ...] = ()
-    defaults: dict[str, str] = field(default_factory=dict)
+    assumptions: dict[str, str] = field(default_factory=dict)
 
     def payload(self) -> dict[str, Any]:
         return {
             "shouldAsk": self.shouldAsk,
             "questions": list(self.questions),
-            "assumptions": dict(self.defaults),
+            "assumptions": dict(self.assumptions),
         }
 
 
@@ -35,7 +35,7 @@ def clarificationAnswer(plan: ClarificationPlan) -> str:
     )
     defaultLines = "\n".join(
         f"- {DEFAULT_LABELS.get(key, key)}: {value}"
-        for key, value in plan.defaults.items()
+        for key, value in plan.assumptions.items()
     )
     return "\n\n".join(
         part
@@ -80,7 +80,7 @@ def buildClarificationPlan(message: str, context: dict[str, Any] | None = None) 
         return ClarificationPlan(shouldAsk=False)
 
     questions: list[str] = []
-    defaults = {
+    assumptions = {
         "level": "초급-중급 사이",
         "depth": "한 레슨 안에서 바로 실행 가능한 실습 중심",
         "environment": "현재 Codaro 로컬 Python과 uv 패키지 설치",
@@ -99,7 +99,7 @@ def buildClarificationPlan(message: str, context: dict[str, Any] | None = None) 
     return ClarificationPlan(
         shouldAsk=bool(questions),
         questions=tuple(questions[:3]),
-        defaults=defaults,
+        assumptions=assumptions,
     )
 
 

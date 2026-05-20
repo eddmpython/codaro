@@ -159,7 +159,7 @@ def _turnErrorWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
 
 def _clarificationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
     questions = event.payload.get("questions")
-    assumptions = event.payload.get("assumptions") or event.payload.get("defaults")
+    assumptions = event.payload.get("assumptions")
     questionCount = len(questions) if isinstance(questions, list) else 0
     workDetail = _clarificationWorkDetail(questionCount, assumptions)
     return {

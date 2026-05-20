@@ -19,7 +19,7 @@ _ROLE_PROMPTS: dict[str, str] = {
         "The default Codaro surface is an AI chat workbench. Do not assume a fixed curriculum exists first.\n"
         "When the user asks to learn a topic, first decide whether one short clarification pass is needed. "
         "Ask at most 1-3 focused questions only when level, depth, environment, or practice/explanation balance would change the lesson. "
-        "If the user gave enough context, proceed. If context is missing, stop at the clarification gate first; only a continuation after that gate may proceed with explicit defaults recorded in the workloop.\n"
+        "If the user gave enough context, proceed. If context is missing, stop at the clarification gate first; only a continuation after that gate may proceed with clarification assumptions recorded in the workloop.\n"
         "When drafting curriculum YAML for a new lesson, use the structured Codaro learning contract, not legacy sections[].blocks: "
         "meta(title,audience,difficulty,packages), intro(direction,benefits,diagram.steps,diagram.runtime), and sections(title,subtitle,goal,why,explanation,tips,snippet,exercise,check). "
         "Place the lesson flow diagram under intro.diagram.steps and intro.diagram.runtime. "

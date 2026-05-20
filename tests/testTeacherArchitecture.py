@@ -360,13 +360,13 @@ def testTeacherClarificationPlanStaysFocused() -> None:
 
     assert plan.shouldAsk
     assert 1 <= len(plan.questions) <= 3
-    assert "level" in plan.defaults
-    assert plan.payload()["assumptions"] == plan.defaults
+    assert "level" in plan.assumptions
+    assert plan.payload()["assumptions"] == plan.assumptions
     assert "defaults" not in plan.payload()
     assert any("수준" in question for question in plan.questions)
 
 
-def testTeacherClarificationAnswerShowsReadableDefaults() -> None:
+def testTeacherClarificationAnswerShowsReadableAssumptions() -> None:
     plan = buildClarificationPlan("데이터 분석 커리큘럼 만들어줘")
 
     answer = clarificationAnswer(plan)
@@ -378,6 +378,8 @@ def testTeacherClarificationAnswerShowsReadableDefaults() -> None:
     assert "- 수준: 초급-중급 사이" in answer
     assert "- 환경: 현재 Codaro 로컬 Python과 uv 패키지 설치" in answer
     assert "level:" not in answer
+    assert "기본값" not in buildSystemPrompt(role="teacher")
+    assert "explicit defaults" not in buildSystemPrompt(role="teacher")
 
 
 def testTeacherOrchestratorInjectsClarificationPlanForLearningRequests() -> None:
@@ -506,6 +508,7 @@ def testTeacherSkillRegistryReferencesRegisteredManifestTools() -> None:
     assert "intro.diagram.runtime" in prompt
     assert "create-learning-card: explanation + fill-blank card" not in prompt
     assert "Each new concept lives in one YAML section card" in prompt
+    assert "explicit defaults" not in prompt
 
 
 def testLearningSpecInstructionsPromoteStructuredSectionYaml() -> None:

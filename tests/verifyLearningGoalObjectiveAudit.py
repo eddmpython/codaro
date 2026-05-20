@@ -126,12 +126,16 @@ OBJECTIVE_REQUIREMENTS = (
                 "consumePendingClarification",
             )),
             ("src/codaro/ai/teacher/clarificationPolicy.py", (
-                "\"assumptions\": dict(self.defaults)",
+                "assumptions: dict[str, str]",
+                "\"assumptions\": dict(self.assumptions)",
                 "작업 기준:",
                 "questions[:3]",
                 "\"level\"",
                 "\"depth\"",
                 "\"environment\"",
+            )),
+            ("src/codaro/ai/conversation.py", (
+                "clarification assumptions recorded in the workloop",
             )),
             ("src/codaro/ai/teacher/turnRuntime.py", (
                 "shouldApplyPendingClarification",
