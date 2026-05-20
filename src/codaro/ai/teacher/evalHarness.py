@@ -20,6 +20,8 @@ class TeacherEvalCase:
     expectedToolResultFields: tuple[tuple[str, str], ...] = ()
     expectedYamlContract: bool = False
     expectedSectionCardFlow: bool = False
+    expectedLoadedInEditor: bool = False
+    expectedRuntimePackages: tuple[str, ...] = ()
     allowPolicyViolations: bool = False
 
 
@@ -100,6 +102,8 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         expectedToolResultFields=(("write-curriculum-yaml", "document"),),
         expectedYamlContract=True,
         expectedSectionCardFlow=True,
+        expectedLoadedInEditor=True,
+        expectedRuntimePackages=("pandas",),
     ),
     TeacherEvalCase(
         caseId="dependency-preflight-before-install",
@@ -189,6 +193,11 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
         failures.append("missing structured learning YAML contract")
     if case.expectedSectionCardFlow and not _hasStructuredSectionCardFlow(tracePayload):
         failures.append("missing structured section card flow")
+    if case.expectedLoadedInEditor and not _hasLoadedCurriculumDocument(tracePayload):
+        failures.append("curriculum document was not loaded in editor")
+    missingRuntimePackages = _missingRuntimePackages(tracePayload, case.expectedRuntimePackages)
+    if missingRuntimePackages:
+        failures.append(f"missing runtime packages: {', '.join(missingRuntimePackages)}")
     for toolName, fieldName in case.expectedToolResultFields:
         if not _toolResultFieldObserved(tracePayload, toolName, fieldName):
             failures.append(f"missing result field for {toolName}: {fieldName}")
@@ -347,6 +356,33 @@ def _hasStructuredSectionCardFlow(tracePayload: Mapping[str, Any]) -> bool:
         _documentHasStructuredSectionCardFlow(document)
         for document in _iterCurriculumDocuments(tracePayload)
     )
+
+
+def _hasLoadedCurriculumDocument(tracePayload: Mapping[str, Any]) -> bool:
+    return any(
+        result.get("loadedInEditor") is True
+        for result in _toolResultPayloads(tracePayload, "write-curriculum-yaml")
+    )
+
+
+def _missingRuntimePackages(tracePayload: Mapping[str, Any], expectedPackages: Sequence[str]) -> tuple[str, ...]:
+    expected = tuple(normalized for package in expectedPackages if (normalized := _normalizePackageName(package)))
+    if not expected:
+        return ()
+    observed = set[str]()
+    for document in _iterCurriculumDocuments(tracePayload):
+        runtime = document.get("runtime")
+        if not isinstance(runtime, Mapping):
+            continue
+        packages = runtime.get("packages")
+        if not isinstance(packages, list):
+            continue
+        observed.update(_normalizePackageName(package) for package in packages)
+    return tuple(package for package in expected if package not in observed)
+
+
+def _normalizePackageName(value: Any) -> str:
+    return str(value).strip().lower().replace("_", "-") if value is not None else ""
 
 
 def _iterCurriculumDocuments(tracePayload: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...]:

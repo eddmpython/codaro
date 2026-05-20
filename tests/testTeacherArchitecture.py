@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 
 from codaro.ai.conversation import buildSystemPrompt
+from codaro.ai.toolExecutor import ToolExecutor
 from codaro.ai.teacher import (
     TeacherEvalCase,
     TeacherOrchestrator,
@@ -37,6 +38,7 @@ from codaro.ai.teacher import (
     validateTeacherSkills,
 )
 from codaro.ai.types import LLMConfig, ToolCall, ToolResponse
+from codaro.document import createEmptyDocument
 from codaro.document.cellSchema import schemaSummary
 from codaro.ai.tools import toolSchemas
 
@@ -145,6 +147,12 @@ class _ScriptedExecutor:
         return self.results.get(toolName, {"ok": True, "tool": toolName})
 
 
+class _NoSessionManager:
+    def getSession(self, sessionId: str):
+        del sessionId
+        return None
+
+
 class _FailingStreamProvider:
     supportsNativeTools = False
 
@@ -214,6 +222,7 @@ def _structuredSectionContractPayload() -> dict:
 def _structuredCurriculumDocumentPayload() -> dict:
     sectionContract = _structuredSectionContractPayload()
     return {
+        "runtime": {"packages": ["pandas"]},
         "blocks": [
             {
                 "sourceType": "intro",
@@ -512,7 +521,7 @@ def testEvalHarnessCanValidateStructuredCurriculumTrace() -> None:
         "call-1",
         "write-curriculum-yaml",
         {},
-        {"document": _structuredCurriculumDocumentPayload()},
+        {"document": _structuredCurriculumDocumentPayload(), "loadedInEditor": True},
     )
 
     case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
@@ -590,6 +599,30 @@ def testEvalHarnessFailsMissingStructuredSectionCardFlow() -> None:
 
     assert not report.passed
     assert "missing structured section card flow" in report.failures
+
+
+def testEvalHarnessRequiresLoadedEditorDocumentAndRuntimePackages() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
+    document = _structuredCurriculumDocumentPayload()
+    document["runtime"] = {"packages": []}
+    tracePayload = {
+        "toolSequence": ["write-curriculum-yaml"],
+        "toolCalls": [
+            {
+                "name": "write-curriculum-yaml",
+                "result": {
+                    "document": document,
+                    "loadedInEditor": False,
+                },
+            }
+        ],
+    }
+
+    report = evaluateToolTracePayload(case, tracePayload)
+
+    assert not report.passed
+    assert "curriculum document was not loaded in editor" in report.failures
+    assert "missing runtime packages: pandas" in report.failures
 
 
 def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
@@ -696,6 +729,7 @@ def testGoldenProviderCaseValidatesStructuredYamlMaterialization() -> None:
     executor = _ScriptedExecutor({
         "write-curriculum-yaml": {
             "document": _structuredCurriculumDocumentPayload(),
+            "loadedInEditor": True,
         },
     })
 
@@ -711,6 +745,94 @@ def testGoldenProviderCaseValidatesStructuredYamlMaterialization() -> None:
     assert report.passed
     assert report.tracePayload["yamlContractObserved"]
     assert "write-curriculum-yaml.document" in report.evaluation.observedResultSignals
+
+
+def testGoldenProviderCaseUsesRealCurriculumYamlHandlerToChangeDocument() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
+    yamlContent = """
+meta:
+  title: pandas 기초
+  audience: 초급
+  difficulty: easy
+  packages:
+    - pandas
+intro:
+  direction: DataFrame 생성 흐름을 익힌다.
+  benefits:
+    - 표 데이터를 코드로 만들 수 있다.
+sections:
+  - id: dataframe-basics
+    title: DataFrame 만들기
+    subtitle: 행과 열의 감각
+    goal: dict에서 DataFrame을 만드는 흐름을 익힌다.
+    why: 엑셀 표 자동화의 첫 단계다.
+    explanation: pandas.DataFrame은 열 이름과 값 목록으로 표를 만든다.
+    tips:
+      - 모든 열의 길이는 같아야 한다.
+    snippet: |
+      import pandas as pd
+      frame = pd.DataFrame({"sales": [10]})
+      frame
+    exercise:
+      prompt: sales 열을 가진 DataFrame을 직접 만드세요.
+      starterCode: |
+        import pandas as pd
+        frame = ___
+      solution: |
+        import pandas as pd
+        frame = pd.DataFrame({"sales": [10, 20]})
+      hints:
+        - dict의 key가 열 이름이다.
+      check:
+        variable: frame
+    check:
+      noError: 실행 오류가 없어야 한다.
+""".strip()
+    provider = _ScriptedProvider([
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[
+                ToolCall(
+                    id="call-yaml",
+                    name="write-curriculum-yaml",
+                    arguments={"yamlContent": yamlContent, "category": "golden", "contentId": "pandas-real"},
+                )
+            ],
+        ),
+        ToolResponse(answer="커리큘럼을 구성했습니다.", provider="fake", model="test", toolCalls=[]),
+    ])
+    activeDocument = createEmptyDocument("빈 문서")
+    savedDocuments = []
+
+    def getDocument():
+        return activeDocument
+
+    def setDocument(document):
+        nonlocal activeDocument
+        activeDocument = document
+        savedDocuments.append(document)
+
+    executor = ToolExecutor(_NoSessionManager(), documentGetter=getDocument, documentSetter=setDocument)
+
+    report = asyncio.run(runTeacherGoldenProviderCase(
+        case,
+        provider=provider,
+        executor=executor,
+        convManager=_FakeConversationManager(),
+        orchestrator=TeacherOrchestrator.fromContext({}),
+        tools=toolSchemas(),
+    ))
+
+    assert report.passed
+    assert len(savedDocuments) == 1
+    assert activeDocument.title == "pandas 기초"
+    assert activeDocument.runtime.packages == ["pandas"]
+    assert report.turnPayload["toolCalls"][0]["result"]["loadedInEditor"] is True
+    assert "sectionContract:exercise" in {block.sourceType for block in activeDocument.blocks}
+    assert "write-curriculum-yaml.document" in report.evaluation.observedResultSignals
+    assert "write-curriculum-yaml.loadedInEditor" in report.evaluation.observedResultSignals
 
 
 def testEvalHarnessFailsMissingGoldenTracePayload() -> None:
