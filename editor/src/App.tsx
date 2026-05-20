@@ -85,10 +85,10 @@ import {
   type PendingTarget,
 } from "@/lib/assistantResponsePlan";
 import {
-  isProviderAuthError,
   loginOauthProvider,
   logoutOauthProvider as logoutOauthProviderAction,
   openProviderSettings,
+  providerAssistantFailure,
   providerAuthFailureNotice,
   saveApiProvider as saveApiProviderAction,
   selectProvider,
@@ -599,21 +599,14 @@ function App() {
       setNotice(application.notice);
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
-      const providerAuthIssue = isProviderAuthError(detail);
-      const displayDetail = providerAuthIssue
-        ? "provider 로그인이 필요합니다. Provider 설정에서 브라우저 로그인을 완료한 뒤 다시 요청하세요."
-        : detail;
+      const failure = providerAssistantFailure(detail);
       setMessages((current) => failAssistantMessage({
-        action: providerAuthIssue ? "connect-provider" : undefined,
+        action: failure.action,
         assistantMessageId,
-        content: displayDetail,
+        content: failure.content,
         messages: current,
       }));
-      setNotice({
-        tone: "error",
-        title: providerAuthIssue ? "Provider 연결 필요" : "어시스턴트 사용 불가",
-        detail: displayDetail,
-      });
+      setNotice(failure.notice);
     } finally {
       setAssistantLoading(false);
     }

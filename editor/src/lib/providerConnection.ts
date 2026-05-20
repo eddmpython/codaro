@@ -8,6 +8,12 @@ export type ProviderActionResult = {
   profile?: AiProfile;
 };
 
+export type ProviderAssistantFailure = {
+  action?: "connect-provider";
+  content: string;
+  notice: AppNotice;
+};
+
 export function openProviderSettings(apiOnline: boolean): ProviderActionResult {
   if (apiOnline) {
     return {
@@ -92,6 +98,22 @@ export function providerAuthFailureNotice(detail: string): AppNotice {
     tone: "error",
     title: "Provider 로그인 실패",
     detail: isProviderAuthError(detail) ? "provider 로그인을 다시 시작하세요." : detail,
+  };
+}
+
+export function providerAssistantFailure(detail: string): ProviderAssistantFailure {
+  const authIssue = isProviderAuthError(detail);
+  const content = authIssue
+    ? "provider 로그인이 필요합니다. Provider 설정에서 브라우저 로그인을 완료한 뒤 다시 요청하세요."
+    : detail;
+  return {
+    action: authIssue ? "connect-provider" : undefined,
+    content,
+    notice: {
+      tone: "error",
+      title: authIssue ? "Provider 연결 필요" : "어시스턴트 사용 불가",
+      detail: content,
+    },
   };
 }
 
