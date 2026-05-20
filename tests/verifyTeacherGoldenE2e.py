@@ -8,15 +8,19 @@ from typing import Any
 from codaro.ai.teacher import (
     MAXIMUM_TEACHER_EVAL_SCORE,
     MINIMUM_TEACHER_EVAL_SCORE,
+    TeacherEvalCase,
     TeacherOrchestrator,
     buildClarificationPlan,
+    evaluateToolSequence,
     goldenEvalCases,
+    prepareTeacherRuntimeTurn,
     runTeacherGoldenProviderCase,
     scoreTeacherEvalReports,
 )
+from codaro.ai.conversation import ConversationManager
 from codaro.ai.tools import toolSchemas
 from codaro.ai.toolExecutor import ToolExecutor
-from codaro.ai.types import ToolCall, ToolResponse
+from codaro.ai.types import LLMConfig, ToolCall, ToolResponse
 from codaro.document import createEmptyDocument
 
 
@@ -119,9 +123,52 @@ class NoSessionManager:
         return None
 
 
+class ContinuationProvider:
+    supportsNativeTools = True
+
+    def __init__(self) -> None:
+        self.callCount = 0
+        self.messages: list[dict[str, Any]] = []
+
+    def completeWithTools(self, messages: list[dict[str, Any]], tools: list[dict[str, Any]]) -> ToolResponse:
+        del tools
+        self.callCount += 1
+        self.messages = messages
+        return ToolResponse(answer="작업 기준을 이어서 진행합니다.", provider="fake", model="test", toolCalls=[])
+
+    def complete(self, messages: list[dict[str, Any]]) -> ToolResponse:
+        self.callCount += 1
+        self.messages = messages
+        return ToolResponse(answer="작업 기준을 이어서 진행합니다.", provider="fake", model="test", toolCalls=[])
+
+
+class ContinuationProfileManager:
+    def resolve(self, provider: str | None = None, *, role: str | None = None) -> dict[str, Any]:
+        del provider, role
+        return {
+            "provider": "custom",
+            "model": "continuation-test",
+            "apiKey": "test-key",
+            "baseUrl": "http://local.test",
+            "temperature": 0,
+            "maxTokens": 128,
+        }
+
+
+class ContinuationProviderFactory:
+    def __init__(self, provider: ContinuationProvider) -> None:
+        self.provider = provider
+        self.config: LLMConfig | None = None
+
+    def __call__(self, config: LLMConfig) -> ContinuationProvider:
+        self.config = config
+        return self.provider
+
+
 async def mainAsync() -> int:
     reports = [
         await runClarificationCase(),
+        await runClarificationContinuationCase(),
         await runDependencyPreflightCase(),
         await runProviderErrorCase(),
         await runCurriculumMaterializationCase(),
@@ -183,6 +230,67 @@ async def runClarificationCase() -> dict[str, Any]:
     if isinstance(payload, dict) and "defaults" in payload:
         extraFailures.append("clarification payload exposed defaults compatibility alias")
     return reportPayload(report, extraFailures)
+
+
+async def runClarificationContinuationCase() -> dict[str, Any]:
+    caseId = "clarification-continuation-uses-assumptions"
+    manager = ConversationManager()
+    conversation = manager.create(role="teacher")
+    prompt = "데이터 분석 커리큘럼 만들어줘"
+    manager.addUserMessage(conversation.conversationId, prompt)
+    plan = buildClarificationPlan(prompt)
+    await runTeacherGoldenProviderCase(
+        goldenCase("ambiguous-learning-asks-clarification"),
+        provider=ProviderShouldNotBeCalled(),
+        executor=ScriptedExecutor({}),
+        convManager=manager,
+        orchestrator=TeacherOrchestrator.fromContext({}),
+        tools=toolSchemas(),
+        conversationId=conversation.conversationId,
+        messages=manager.buildMessages(conversation.conversationId),
+        clarificationPlan=plan,
+    )
+    provider = ContinuationProvider()
+    runtimeTurn = prepareTeacherRuntimeTurn(
+        convManager=manager,
+        profileManager=ContinuationProfileManager(),
+        sessionManager=NoSessionManager(),
+        documentPath=None,
+        workspaceRoot=None,
+        conversationId=conversation.conversationId,
+        message="진행",
+        roleOverride="teacher",
+        providerOverride="custom",
+        providerFactory=ContinuationProviderFactory(provider),
+    )
+    extraFailures = []
+    if runtimeTurn.turn.clarificationPlan is not None:
+        extraFailures.append("continuation turn re-opened clarification gate")
+    if provider.callCount != 0:
+        extraFailures.append("provider was called before continuation loop")
+    continuationPayload = await runTeacherGoldenProviderCase(
+        TeacherEvalCase(caseId=caseId, prompt="진행", expectedNoTools=True),
+        provider=runtimeTurn.turn.provider,
+        executor=ScriptedExecutor({}),
+        convManager=manager,
+        orchestrator=runtimeTurn.orchestrator,
+        tools=runtimeTurn.turn.tools,
+        conversationId=runtimeTurn.turn.conversationId,
+        messages=runtimeTurn.turn.messages,
+    )
+    userMessages = [message.get("content", "") for message in provider.messages if message.get("role") == "user"]
+    continuationContext = userMessages[-1] if userMessages else ""
+    if "[Clarification plan]" not in continuationContext:
+        extraFailures.append("continuation did not inject clarification plan")
+    if "\"assumptions\"" not in continuationContext:
+        extraFailures.append("continuation did not inject assumptions payload")
+    if "\"defaults\"" in continuationContext:
+        extraFailures.append("continuation leaked defaults alias")
+    if "초급-중급 사이" not in continuationContext:
+        extraFailures.append("continuation lost level assumption")
+    if manager.consumePendingClarification(conversation.conversationId) is not None:
+        extraFailures.append("pending clarification was not consumed")
+    return reportPayload(continuationPayload, extraFailures)
 
 
 async def runProviderErrorCase() -> dict[str, Any]:

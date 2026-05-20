@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 
-from codaro.ai.conversation import buildSystemPrompt
+from codaro.ai.conversation import ConversationManager, buildSystemPrompt
 from codaro.ai.toolExecutor import ToolExecutor
 from codaro.ai.teacher import (
     MAXIMUM_TEACHER_EVAL_SCORE,
@@ -1162,6 +1162,62 @@ def testProviderLoopReturnsClarificationWithoutProviderCall() -> None:
     assert convManager.assistantMessages[0]["content"] == payload["answer"]
 
 
+def testProviderLoopStoresClarificationForContinuation() -> None:
+    convManager = ConversationManager()
+    conversation = convManager.create(role="teacher")
+    convManager.addUserMessage(conversation.conversationId, "데이터 분석 커리큘럼 만들어줘")
+    plan = buildClarificationPlan("데이터 분석 커리큘럼 만들어줘")
+
+    payload = asyncio.run(runTeacherChatLoop(
+        provider=None,
+        convManager=convManager,
+        conversationId=conversation.conversationId,
+        messages=convManager.buildMessages(conversation.conversationId),
+        tools=[],
+        executor=_FakeExecutor(),
+        orchestrator=TeacherOrchestrator.fromContext({}),
+        clarificationPlan=plan,
+    ))
+
+    pending = convManager.consumePendingClarification(conversation.conversationId)
+    assert payload["model"] == "clarification-gate"
+    assert pending is not None
+    assert pending["assumptions"]["level"] == "초급-중급 사이"
+    assert "defaults" not in pending
+
+
+def testPrepareTeacherRuntimeTurnInjectsPendingClarification(tmp_path) -> None:
+    convManager = ConversationManager()
+    conversation = convManager.create(role="teacher")
+    plan = buildClarificationPlan("데이터 분석 커리큘럼 만들어줘")
+    convManager.setPendingClarification(conversation.conversationId, plan.payload())
+    profileManager = _FakeProfileManager()
+    providerFactory = _ProviderFactory()
+    sessionManager = _FakeSessionManager()
+
+    runtimeTurn = prepareTeacherRuntimeTurn(
+        convManager=convManager,
+        profileManager=profileManager,
+        sessionManager=sessionManager,
+        documentPath=None,
+        workspaceRoot=tmp_path,
+        conversationId=conversation.conversationId,
+        message="진행",
+        roleOverride="teacher",
+        providerOverride="custom",
+        providerFactory=providerFactory,
+    )
+
+    finalUserMessage = runtimeTurn.turn.messages[-1]["content"]
+    assert runtimeTurn.turn.clarificationPlan is None
+    assert isinstance(runtimeTurn.turn.provider, _FakeProvider)
+    assert "[Clarification plan]" in finalUserMessage
+    assert '"assumptions"' in finalUserMessage
+    assert '"defaults"' not in finalUserMessage
+    assert "초급-중급 사이" in finalUserMessage
+    assert convManager.consumePendingClarification(conversation.conversationId) is None
+
+
 def testPrepareTeacherTurnOwnsConversationAndProviderSetup() -> None:
     convManager = _FakeConversationManager()
     profileManager = _FakeProfileManager()
@@ -1355,6 +1411,29 @@ def testProviderStreamReturnsClarificationWithoutProviderCall() -> None:
     assert events[-1]["toolCalls"] == []
     assert events[-1]["trace"]["toolSequence"] == []
     assert convManager.assistantMessages[0]["content"] == events[-1]["answer"]
+
+
+def testProviderStreamStoresClarificationForContinuation() -> None:
+    convManager = ConversationManager()
+    conversation = convManager.create(role="teacher")
+    convManager.addUserMessage(conversation.conversationId, "데이터 분석 커리큘럼 만들어줘")
+    plan = buildClarificationPlan("데이터 분석 커리큘럼 만들어줘")
+
+    events = asyncio.run(_collectStreamEvents(runTeacherChatStream(
+        provider=None,
+        convManager=convManager,
+        conversationId=conversation.conversationId,
+        messages=convManager.buildMessages(conversation.conversationId),
+        tools=[],
+        executor=_FakeExecutor(),
+        orchestrator=TeacherOrchestrator.fromContext({}),
+        clarificationPlan=plan,
+    )))
+
+    pending = convManager.consumePendingClarification(conversation.conversationId)
+    assert events[-1]["model"] == "clarification-gate"
+    assert pending is not None
+    assert pending["assumptions"]["balance"] == "설명은 짧게, 섹션마다 직접 입력 셀 포함"
 
 
 def testProviderStreamReportsStreamingErrorsInTrace() -> None:

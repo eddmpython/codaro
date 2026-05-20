@@ -11,6 +11,7 @@ from .providerLoop import (
     finishTeacherTurnPayload,
     finishTeacherToolCall,
     recordTeacherToolRoundRequest,
+    recordPendingClarification,
     startTeacherToolCall,
 )
 from .clarificationPolicy import ClarificationPlan, clarificationAnswer
@@ -66,7 +67,9 @@ async def runTeacherChatStream(
 
     if clarificationPlan and clarificationPlan.shouldAsk:
         answer = clarificationAnswer(clarificationPlan)
-        trace.record("clarification-gate", clarificationPlan.payload())
+        clarificationPayload = clarificationPlan.payload()
+        recordPendingClarification(convManager, conversationId, clarificationPayload)
+        trace.record("clarification-gate", clarificationPayload)
         donePayload = finishTeacherTurnPayload(
             convManager=convManager,
             conversationId=conversationId,

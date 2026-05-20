@@ -85,10 +85,18 @@ OBJECTIVE_REQUIREMENTS = (
             )),
             ("tests/verifyTeacherGoldenE2e.py", (
                 "ProviderShouldNotBeCalled",
+                "clarification-continuation-uses-assumptions",
                 "runClarificationCase",
+                "runClarificationContinuationCase",
                 "clarification gate called provider",
                 "clarification payload exposed defaults compatibility alias",
                 "clarificationAssumptionKeys",
+                "pending clarification was not consumed",
+            )),
+            ("src/codaro/ai/conversation.py", (
+                "pendingClarification",
+                "setPendingClarification",
+                "consumePendingClarification",
             )),
             ("src/codaro/ai/teacher/clarificationPolicy.py", (
                 "\"assumptions\": dict(self.defaults)",

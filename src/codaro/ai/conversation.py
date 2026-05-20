@@ -108,6 +108,7 @@ class ConversationState:
     systemPrompt: str | None = None
     curriculumContext: str | None = None
     documentContext: str | None = None
+    pendingClarification: dict[str, Any] | None = None
     turnCount: int = 0
 
 
@@ -179,6 +180,21 @@ class ConversationManager:
             return None
         state.messages.append(Message(role="tool", content=result, toolCallId=toolCallId))
         return state
+
+    def setPendingClarification(self, conversationId: str, payload: dict[str, Any]) -> ConversationState | None:
+        state = self._conversations.get(conversationId)
+        if state is None:
+            return None
+        state.pendingClarification = dict(payload)
+        return state
+
+    def consumePendingClarification(self, conversationId: str) -> dict[str, Any] | None:
+        state = self._conversations.get(conversationId)
+        if state is None:
+            return None
+        payload = state.pendingClarification
+        state.pendingClarification = None
+        return dict(payload) if isinstance(payload, dict) else None
 
     def delete(self, conversationId: str) -> bool:
         self._lastAccessed.pop(conversationId, None)

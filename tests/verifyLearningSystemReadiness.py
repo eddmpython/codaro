@@ -199,10 +199,13 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
             (
                 ("tests/verifyTeacherGoldenE2e.py", (
                     "ProviderShouldNotBeCalled",
+                    "clarification-continuation-uses-assumptions",
                     "runClarificationCase",
+                    "runClarificationContinuationCase",
                     "clarification gate called provider",
                     "clarification payload exposed defaults compatibility alias",
                     "clarificationAssumptionKeys",
+                    "pending clarification was not consumed",
                 )),
                 ("src/codaro/ai/teacher/clarificationPolicy.py", (
                     "\"assumptions\": dict(self.defaults)",
@@ -218,6 +221,15 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "missing clarification assumptions payload",
                     "missing clarification assumptions",
                     "작업 기준",
+                )),
+                ("src/codaro/ai/conversation.py", (
+                    "pendingClarification",
+                    "setPendingClarification",
+                    "consumePendingClarification",
+                )),
+                ("src/codaro/ai/teacher/turnRuntime.py", (
+                    "consumePendingClarification",
+                    "contextMap[\"clarificationPlan\"] = pendingClarification",
                 )),
             ),
         ),

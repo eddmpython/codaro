@@ -98,8 +98,12 @@ def prepareTeacherRuntimeTurn(
     roleOverride: str | None = None,
     providerFactory: Callable[[LLMConfig], Any] = createProvider,
 ) -> TeacherRuntimeTurn:
-    orchestrator = TeacherOrchestrator.fromContext(context)
-    contextMap = context if isinstance(context, dict) else {}
+    contextMap = teacherTurnContext(
+        context=context,
+        convManager=convManager,
+        conversationId=conversationId,
+    )
+    orchestrator = TeacherOrchestrator.fromContext(contextMap)
     clarificationPlan = buildClarificationPlan(message, contextMap)
     gateClarification = clarificationPlan.shouldAsk
     turn = prepareTeacherTurn(
@@ -120,6 +124,24 @@ def prepareTeacherRuntimeTurn(
         sessionId=sessionId,
     )
     return TeacherRuntimeTurn(turn=turn, orchestrator=orchestrator, executor=executor)
+
+
+def teacherTurnContext(*, context: Any, convManager: Any, conversationId: str | None) -> dict[str, Any]:
+    contextMap = dict(context) if isinstance(context, dict) else {}
+    pendingClarification = consumePendingClarification(convManager, conversationId)
+    if pendingClarification is not None and "clarificationPlan" not in contextMap:
+        contextMap["clarificationPlan"] = pendingClarification
+    return contextMap
+
+
+def consumePendingClarification(convManager: Any, conversationId: str | None) -> dict[str, Any] | None:
+    if not conversationId:
+        return None
+    consumer = getattr(convManager, "consumePendingClarification", None)
+    if not callable(consumer):
+        return None
+    payload = consumer(conversationId)
+    return dict(payload) if isinstance(payload, dict) else None
 
 
 def createTeacherToolExecutor(

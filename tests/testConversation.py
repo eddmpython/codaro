@@ -64,6 +64,23 @@ class TestConversationManager:
         assert conv.messages[0].role == "tool"
         assert conv.messages[0].toolCallId == "call_123"
 
+    def test_pending_clarification_is_consumed_once(self):
+        manager = ConversationManager()
+        conv = manager.create(role="teacher")
+
+        stored = manager.setPendingClarification(
+            conv.conversationId,
+            {"assumptions": {"level": "초급"}, "questions": ["수준은?"]},
+        )
+
+        assert stored is conv
+        assert manager.consumePendingClarification(conv.conversationId) == {
+            "assumptions": {"level": "초급"},
+            "questions": ["수준은?"],
+        }
+        assert manager.consumePendingClarification(conv.conversationId) is None
+        assert manager.setPendingClarification("missing", {"assumptions": {}}) is None
+
     def test_delete(self):
         manager = ConversationManager()
         conv = manager.create()

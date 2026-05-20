@@ -124,7 +124,9 @@ async def runTeacherChatLoop(
 
     if clarificationPlan and clarificationPlan.shouldAsk:
         answer = clarificationAnswer(clarificationPlan)
-        trace.record("clarification-gate", clarificationPlan.payload())
+        clarificationPayload = clarificationPlan.payload()
+        recordPendingClarification(convManager, conversationId, clarificationPayload)
+        trace.record("clarification-gate", clarificationPayload)
         return finishTeacherTurnPayload(
             convManager=convManager,
             conversationId=conversationId,
@@ -230,6 +232,12 @@ def toolCallsToProviderPayloads(toolCalls: list[ToolCall]) -> list[dict[str, Any
         }
         for toolCall in toolCalls
     ]
+
+
+def recordPendingClarification(convManager: Any, conversationId: str, payload: dict[str, Any]) -> None:
+    setter = getattr(convManager, "setPendingClarification", None)
+    if callable(setter):
+        setter(conversationId, payload)
 
 
 def recordAssistantToolRequest(
