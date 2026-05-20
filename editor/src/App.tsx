@@ -142,7 +142,7 @@ function App() {
     variables,
   } = useNotebookRuntimeState({
     apiOnline,
-    document,
+    document: activeDocument,
     drafts,
     onNotice: setNotice,
     selectCurriculumBlock: setSelectedCurriculumBlockId,

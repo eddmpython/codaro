@@ -1,4 +1,5 @@
 import { blockLabel, executionKindLabel } from "@/lib/cellModel";
+import { inferAssistantPackages } from "@/lib/packageInference";
 import type { BlockConfig, CodaroDocument, ExecutionResult } from "@/types";
 
 export type ResultMap = Record<string, ExecutionResult>;
@@ -110,41 +111,5 @@ export function buildDependencyPreflight(message: string, document: CodaroDocume
 }
 
 export function inferRequiredPackages(message: string, document: CodaroDocument) {
-  const packages = new Set<string>(document.runtime?.packages ?? []);
-  const normalized = message.toLowerCase();
-  const keywordPackages: Record<string, string> = {
-    pandas: "pandas",
-    dataframe: "pandas",
-    csv: "pandas",
-    numpy: "numpy",
-    matplotlib: "matplotlib",
-    plotly: "plotly",
-    altair: "altair",
-    browser: "playwright",
-    "브라우저": "playwright",
-    selenium: "selenium",
-    requests: "requests",
-  };
-  for (const [keyword, packageName] of Object.entries(keywordPackages)) {
-    if (normalized.includes(keyword)) packages.add(packageName);
-  }
-  for (const block of document.blocks) {
-    if (block.type !== "code") continue;
-    const content = block.content;
-    for (const match of content.matchAll(/^\s*(?:import|from)\s+([A-Za-z_][\w]*)/gm)) {
-      const moduleName = match[1];
-      const packageName = importPackageName(moduleName);
-      if (packageName) packages.add(packageName);
-    }
-  }
-  return Array.from(packages).filter(Boolean);
-}
-
-function importPackageName(moduleName: string) {
-  const standardModules = new Set(["abc", "asyncio", "collections", "csv", "datetime", "functools", "glob", "itertools", "json", "math", "os", "pathlib", "random", "re", "statistics", "string", "sys", "time", "typing"]);
-  if (standardModules.has(moduleName)) return "";
-  if (moduleName === "PIL") return "pillow";
-  if (moduleName === "sklearn") return "scikit-learn";
-  if (moduleName === "cv2") return "opencv-python";
-  return moduleName;
+  return inferAssistantPackages(message, document);
 }

@@ -1,0 +1,264 @@
+from __future__ import annotations
+
+import json
+import shutil
+import subprocess
+import sys
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+EDITOR_DIR = ROOT / "editor"
+NOTEBOOK_RUNTIME = EDITOR_DIR / "src" / "lib" / "notebookRuntime.ts"
+PACKAGE_INFERENCE = EDITOR_DIR / "src" / "lib" / "packageInference.ts"
+
+
+def main() -> int:
+    failures = sourceContractFailures()
+    nodeFailure, nodeOutput = runRuntimeProbe()
+    if nodeFailure:
+        failures.append(nodeFailure)
+
+    if failures:
+        for failure in failures:
+            print(f"FAIL: {failure}", file=sys.stderr)
+        if nodeOutput:
+            print(nodeOutput, file=sys.stderr)
+        return 1
+
+    print(f"ok: editor runtime package preflight verified {nodeOutput}")
+    return 0
+
+
+def sourceContractFailures() -> list[str]:
+    failures: list[str] = []
+    for path in (NOTEBOOK_RUNTIME, PACKAGE_INFERENCE):
+        if not path.is_file():
+            failures.append(f"missing {path.relative_to(ROOT)}")
+
+    if failures:
+        return failures
+
+    runtimeText = NOTEBOOK_RUNTIME.read_text(encoding="utf-8")
+    inferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
+    required = {
+        NOTEBOOK_RUNTIME: (
+            "preflightRuntimePackages",
+            "sessionPackagesList",
+            "sessionPackageInstall",
+            "executeCode",
+            "executeReactive",
+            "라이브러리 준비 실패",
+            "uv로 준비한 뒤 실행했습니다",
+        ),
+        PACKAGE_INFERENCE: (
+            "inferCodePackages",
+            "inferDocumentPackages",
+            "inferAssistantPackages",
+            "normalizePackageName",
+            "PYTHON_STDLIB_MODULES",
+            "PACKAGE_ALIASES",
+        ),
+    }
+    for path, tokens in required.items():
+        text = runtimeText if path == NOTEBOOK_RUNTIME else inferenceText
+        for token in tokens:
+            if token not in text:
+                failures.append(f"{path.relative_to(ROOT)} missing {token}")
+    return failures
+
+
+def runRuntimeProbe() -> tuple[str | None, str]:
+    node = shutil.which("node")
+    if not node:
+        return "node is required for editor runtime preflight verification", ""
+
+    result = subprocess.run(
+        [node, "-e", nodeProbeScript()],
+        cwd=EDITOR_DIR,
+        text=True,
+        encoding="utf-8",
+        errors="replace",
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        check=False,
+    )
+    output = result.stdout.strip()
+    if result.returncode != 0:
+        return "editor runtime preflight probe failed", output
+    return None, output
+
+
+def nodeProbeScript() -> str:
+    runtimePath = json.dumps(str(NOTEBOOK_RUNTIME), ensure_ascii=False)
+    inferencePath = json.dumps(str(PACKAGE_INFERENCE), ensure_ascii=False)
+    editorDir = json.dumps(str(EDITOR_DIR), ensure_ascii=False)
+    return f"""
+(async () => {{
+const assert = require("node:assert/strict");
+const fs = require("node:fs");
+const path = require("node:path");
+const esbuild = require(require.resolve("esbuild", {{ paths: [{editorDir}] }}));
+
+function loadModule(filePath, customRequire) {{
+  const source = fs.readFileSync(filePath, "utf8");
+  const transformed = esbuild.transformSync(source, {{
+    loader: "ts",
+    format: "cjs",
+    platform: "node",
+    target: "es2022",
+  }});
+  const moduleObject = {{ exports: {{}} }};
+  new Function("exports", "require", "module", "__filename", "__dirname", transformed.code)(
+    moduleObject.exports,
+    customRequire,
+    moduleObject,
+    filePath,
+    path.dirname(filePath),
+  );
+  return moduleObject.exports;
+}}
+
+const calls = [];
+let installFails = false;
+const fakeResult = {{
+  type: "execute_result",
+  blockId: "cell-1",
+  data: "done",
+  stdout: "done\\n",
+  stderr: "",
+  variables: [],
+  stateDelta: {{ added: [], updated: [], removed: [] }},
+  executionCount: 1,
+  status: "ok",
+}};
+const fakeApi = {{
+  createSession: async () => {{
+    calls.push(["createSession"]);
+    return {{ sessionId: "session-1", status: "ready" }};
+  }},
+  sessionPackagesList: async (sessionId) => {{
+    calls.push(["packages-check", sessionId]);
+    return [{{ name: "numpy", version: "1.0.0" }}];
+  }},
+  sessionPackageInstall: async (sessionId, name) => {{
+    calls.push(["packages-install", sessionId, name]);
+    if (installFails) {{
+      return {{
+        package: name,
+        success: false,
+        message: "install failed",
+        installer: "uv",
+        environment: "project .venv",
+        durationMs: 12,
+        skipped: false,
+      }};
+    }}
+    return {{
+      package: name,
+      success: true,
+      message: "installed",
+      installer: "uv",
+      environment: "project .venv",
+      durationMs: 42,
+      skipped: false,
+    }};
+  }},
+  executeCode: async (sessionId, code, blockId) => {{
+    calls.push(["cell-call", sessionId, blockId, code]);
+    return {{ ...fakeResult, blockId }};
+  }},
+  executeReactive: async (sessionId, blockId, blocks) => {{
+    calls.push(["cell-call-reactive", sessionId, blockId, blocks.map((block) => block.id)]);
+    return {{ results: [{{ ...fakeResult, blockId }}], executionOrder: [blockId] }};
+  }},
+}};
+const inference = loadModule({inferencePath}, (specifier) => {{
+  if (specifier === "@/types") return {{}};
+  return require(specifier);
+}});
+const runtime = loadModule({runtimePath}, (specifier) => {{
+  if (specifier === "@/lib/api") return {{ codaroApi: fakeApi }};
+  if (specifier === "@/lib/localFallback") return {{
+    buildLocalExecutionResult: () => fakeResult,
+    firstOutputLine: (result) => result.stdout.trim(),
+  }};
+  if (specifier === "@/lib/packageInference") return inference;
+  if (specifier === "@/types") return {{}};
+  return require(specifier);
+}});
+
+assert.deepEqual(inference.inferCodePackages("import os\\nfrom PIL import Image\\nimport yaml\\nfrom sklearn.model_selection import train_test_split"), [
+  "pillow",
+  "pyyaml",
+  "scikit-learn",
+]);
+assert.equal(inference.normalizePackageName("Pandas>=2"), "pandas");
+
+const block = {{ id: "cell-1", type: "code", content: "" }};
+const outcome = await runtime.runNotebookBlock({{
+  apiOnline: true,
+  block,
+  code: "import pandas as pd\\nimport os\\nfrom sklearn.model_selection import train_test_split\\nprint('done')",
+  localExecutionCount: 1,
+  runtimePackages: ["numpy"],
+  sessionId: null,
+}});
+assert.equal(outcome.sessionId, "session-1");
+assert.equal(outcome.result.status, "ok");
+assert.match(outcome.notice.detail, /pandas, scikit-learn를 uv로 준비한 뒤 실행했습니다/);
+assert.deepEqual(calls.map((call) => call[0]), [
+  "createSession",
+  "packages-check",
+  "packages-install",
+  "packages-install",
+  "cell-call",
+]);
+assert.deepEqual(calls.slice(2, 4).map((call) => call[2]), ["pandas", "scikit-learn"]);
+
+calls.length = 0;
+installFails = true;
+const failed = await runtime.runNotebookBlock({{
+  apiOnline: true,
+  block,
+  code: "import pandas as pd\\nprint('done')",
+  localExecutionCount: 1,
+  runtimePackages: [],
+  sessionId: "session-1",
+}});
+assert.equal(failed.result, undefined);
+assert.equal(failed.notice.title, "라이브러리 준비 실패");
+assert.deepEqual(calls.map((call) => call[0]), ["packages-check", "packages-install"]);
+
+calls.length = 0;
+installFails = false;
+await runtime.runReactiveNotebook({{
+  apiOnline: true,
+  codeBlocks: [block],
+  document: {{
+    id: "doc-1",
+    title: "Doc",
+    runtime: {{ defaultEngine: "local", reactiveMode: "hybrid", packages: ["pandas"] }},
+    blocks: [{{ ...block, content: "import pandas as pd\\nprint('done')" }}],
+  }},
+  drafts: {{}},
+  firstBlock: block,
+  previousVariables: [],
+  sessionId: "session-1",
+}});
+assert.deepEqual(calls.map((call) => call[0]), ["packages-check", "packages-install", "cell-call-reactive"]);
+
+process.stdout.write(JSON.stringify({{
+  directRun: outcome.notice.detail,
+  failure: failed.notice.title,
+  reactiveOrder: calls.map((call) => call[0]),
+}}, null, 2));
+}})().catch((error) => {{
+  console.error(error);
+  process.exit(1);
+}});
+"""
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

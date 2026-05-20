@@ -65,6 +65,12 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyAssistantWorkloopContract.py")),),
         ci_required=False,
     ),
+    "editor-runtime-preflight": Gate(
+        tier="fast",
+        description="editor 직접 실행 경로가 패키지 확인, uv 설치, 셀 실행 순서를 지키는지 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyEditorRuntimePreflight.py")),),
+        ci_required=False,
+    ),
     "learning-system-readiness": Gate(
         tier="fast",
         description="학습 YAML, 카드 UI, teacher loop, workloop, gate SSOT readiness score를 확인한다.",
@@ -167,8 +173,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 12:
-        failures.append(f"expected 12 gates, found {len(GATES)}")
+    if len(GATES) != 13:
+        failures.append(f"expected 13 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

@@ -1,11 +1,13 @@
 import { codaroApi } from "@/lib/api";
 import type { ResultMap } from "@/lib/assistantContext";
 import { buildLocalExecutionResult, firstOutputLine } from "@/lib/localFallback";
+import { inferCodePackages, normalizePackageName } from "@/lib/packageInference";
 import type {
   AppNotice,
   BlockConfig,
   CodaroDocument,
   ExecutionResult,
+  PackageInstallResult,
   VariableInfo,
 } from "@/types";
 
@@ -22,6 +24,13 @@ export type RunBlockResult = RuntimeSessionResult & {
 export type RunNotebookResult = RuntimeSessionResult & {
   results?: ResultMap;
   variables?: VariableInfo[];
+};
+
+export type RuntimePackagePreflight = {
+  required: string[];
+  missing: string[];
+  installedByUv: string[];
+  failed?: PackageInstallResult;
 };
 
 export async function ensureRuntimeSession(sessionId: string | null): Promise<RuntimeSessionResult> {
@@ -55,12 +64,14 @@ export async function runNotebookBlock({
   block,
   code,
   localExecutionCount,
+  runtimePackages = [],
   sessionId,
 }: {
   apiOnline: boolean;
   block: BlockConfig;
   code: string;
   localExecutionCount: number;
+  runtimePackages?: string[];
   sessionId: string | null;
 }): Promise<RunBlockResult> {
   if (!apiOnline) {
@@ -82,6 +93,16 @@ export async function runNotebookBlock({
   if (!activeSession.sessionId) return activeSession;
 
   try {
+    const preflight = await preflightRuntimePackages(activeSession.sessionId, [
+      ...runtimePackages,
+      ...inferCodePackages(code),
+    ]);
+    if (preflight.failed) {
+      return {
+        sessionId: activeSession.sessionId,
+        notice: packagePreflightFailureNotice(preflight.failed),
+      };
+    }
     const result = await codaroApi.executeCode(activeSession.sessionId, code, block.id);
     return {
       sessionId: activeSession.sessionId,
@@ -90,7 +111,7 @@ export async function runNotebookBlock({
       notice: {
         tone: result.status === "error" ? "error" : "success",
         title: result.status === "error" ? "셀 실행 실패" : "셀 실행 완료",
-        detail: firstOutputLine(result) || "출력 없음",
+        detail: runDetail(firstOutputLine(result) || "출력 없음", preflight),
       },
     };
   } catch (error) {
@@ -147,6 +168,13 @@ export async function runReactiveNotebook({
   if (!activeSession.sessionId) return activeSession;
 
   try {
+    const preflight = await preflightRuntimePackages(activeSession.sessionId, inferDocumentRuntimePackages(document, drafts));
+    if (preflight.failed) {
+      return {
+        sessionId: activeSession.sessionId,
+        notice: packagePreflightFailureNotice(preflight.failed),
+      };
+    }
     const payload = await codaroApi.executeReactive(
       activeSession.sessionId,
       firstBlock.id,
@@ -168,7 +196,7 @@ export async function runReactiveNotebook({
       notice: {
         tone: "success",
         title: "노트북 실행 완료",
-        detail: `${payload.executionOrder.length}개 셀을 평가했습니다.`,
+        detail: runDetail(`${payload.executionOrder.length}개 셀을 평가했습니다.`, preflight),
       },
     };
   } catch (error) {
@@ -183,8 +211,69 @@ export async function runReactiveNotebook({
   }
 }
 
+export async function preflightRuntimePackages(
+  sessionId: string,
+  packageNames: string[],
+): Promise<RuntimePackagePreflight> {
+  const required = uniquePackages(packageNames);
+  if (!required.length) return { required, missing: [], installedByUv: [] };
+
+  const installedPackages = await codaroApi.sessionPackagesList(sessionId);
+  const installedNames = new Set(installedPackages.map((item) => normalizePackageName(item.name)));
+  const missing = required.filter((packageName) => !installedNames.has(normalizePackageName(packageName)));
+  const installedByUv: string[] = [];
+
+  for (const packageName of missing) {
+    const result = await codaroApi.sessionPackageInstall(sessionId, packageName);
+    if (!result.success) {
+      return { required, missing, installedByUv, failed: result };
+    }
+    installedByUv.push(packageName);
+  }
+
+  return { required, missing, installedByUv };
+}
+
+function inferDocumentRuntimePackages(document: CodaroDocument, drafts: Record<string, string>) {
+  const packages = new Set<string>((document.runtime?.packages ?? []).map(String).filter(Boolean));
+  for (const block of document.blocks) {
+    if (block.type !== "code") continue;
+    for (const packageName of inferCodePackages(drafts[block.id] ?? block.content)) {
+      packages.add(packageName);
+    }
+  }
+  return Array.from(packages);
+}
+
+function uniquePackages(packageNames: string[]) {
+  const packagesByName = new Map<string, string>();
+  for (const packageName of packageNames.map(String)) {
+    const trimmed = packageName.trim();
+    if (!trimmed) continue;
+    packagesByName.set(normalizePackageName(trimmed), trimmed);
+  }
+  return Array.from(packagesByName.values()).sort((left, right) => left.localeCompare(right));
+}
+
+function packagePreflightFailureNotice(result: PackageInstallResult): AppNotice {
+  return {
+    tone: "error",
+    title: "라이브러리 준비 실패",
+    detail: firstMessageLine(result.message) || `${result.package} 설치에 실패했습니다.`,
+  };
+}
+
+function runDetail(baseDetail: string, preflight: RuntimePackagePreflight) {
+  if (!preflight.installedByUv.length) return baseDetail;
+  return `${preflight.installedByUv.join(", ")}를 uv로 준비한 뒤 실행했습니다. · ${baseDetail}`;
+}
+
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error);
+}
+
+function firstMessageLine(value: string) {
+  return value.split(/\r?\n/).map((line) => line.trim()).find(Boolean) ?? "";
 }
 
 function sleep(milliseconds: number) {

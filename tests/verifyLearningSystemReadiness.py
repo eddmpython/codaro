@@ -75,6 +75,7 @@ class LiveGateCheck:
 LIVE_GATE_NAMES = (
     "teacher-e2e",
     "assistant-workloop-contract",
+    "editor-runtime-preflight",
     "learning-card-contract",
     "learning-card-browser",
 )
@@ -209,6 +210,35 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                 )),
             ),
         ),
+        fileCriterion(
+            "editor-runtime-preflight",
+            "Editor direct run paths check session packages, install missing packages with uv, then execute cells.",
+            (
+                ("editor/src/lib/notebookRuntime.ts", (
+                    "preflightRuntimePackages",
+                    "sessionPackagesList",
+                    "sessionPackageInstall",
+                    "executeCode",
+                    "executeReactive",
+                    "uv로 준비한 뒤 실행했습니다",
+                )),
+                ("editor/src/lib/packageInference.ts", (
+                    "inferCodePackages",
+                    "inferDocumentPackages",
+                    "inferAssistantPackages",
+                    "normalizePackageName",
+                )),
+                ("tests/verifyEditorRuntimePreflight.py", (
+                    "packages-check",
+                    "packages-install",
+                    "cell-call",
+                    "cell-call-reactive",
+                    "라이브러리 준비 실패",
+                )),
+            ),
+            liveChecks=(liveChecks["editor-runtime-preflight"],),
+            blocking=True,
+        ),
         goldenCaseCriterion(
             "provider-error-workloop",
             "Provider failures are returned as trace/workloop rows that the user can read.",
@@ -301,6 +331,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "\"teacher-eval\"",
                     "\"teacher-e2e\"",
                     "\"assistant-workloop-contract\"",
+                    "\"editor-runtime-preflight\"",
                     "\"learning-card-contract\"",
                     "\"learning-card-browser\"",
                     "\"learning-system-readiness\"",
@@ -309,6 +340,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "`teacher-eval`",
                     "`teacher-e2e`",
                     "`assistant-workloop-contract`",
+                    "`editor-runtime-preflight`",
                     "`learning-card-contract`",
                     "`learning-card-browser`",
                     "`learning-system-readiness`",

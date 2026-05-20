@@ -68,6 +68,7 @@ export function useNotebookRuntimeState({
         block,
         code,
         localExecutionCount: Object.keys(results).length + 1,
+        runtimePackages: document.runtime?.packages ?? [],
         sessionId,
       });
       if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
