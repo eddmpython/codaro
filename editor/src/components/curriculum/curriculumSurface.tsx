@@ -471,7 +471,7 @@ function CurriculumSectionCard({
           onSelectBlock={onSelectBlock}
         />
       ) : (
-        <div className="space-y-3 p-3">
+        <div className="divide-y">
           {section.blocks.map((block) => (
             <CurriculumLearningCell
               block={block}
@@ -799,7 +799,7 @@ function StructuredSectionLearningBody({
       ) : null}
 
       {parts.extraBlocks.length ? (
-        <div className="space-y-3 p-3">
+        <div className="divide-y">
           {parts.extraBlocks.map((block) => (
             <CurriculumLearningCell
               block={block}
@@ -1194,14 +1194,14 @@ function CurriculumLearningCell({
         <section
           id={cellDomId(block.id)}
           className={cn(
-            "group min-w-0 rounded-md border bg-background/60 px-3 py-3",
-            isSelected && "ring-1 ring-ring/30",
+            "group min-w-0 px-4 py-4",
+            isSelected && "bg-muted/20",
             tone.frame,
           )}
           onClick={onSelect}
         >
           <div className="mb-2 flex min-w-0 items-center gap-2">
-            <span className={cn("flex size-6 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground", tone.icon)}>
+            <span className={cn("flex size-6 shrink-0 items-center justify-center rounded-md bg-muted/70 text-muted-foreground", tone.icon)}>
               <Icon className="size-3.5" />
             </span>
             <span className="min-w-0 flex-1 truncate text-sm font-semibold">{blockLabel(block)}</span>
@@ -1263,16 +1263,15 @@ function CurriculumLearningCell({
     <section
       id={cellDomId(block.id)}
       className={cn(
-        "group min-w-0 overflow-hidden rounded-md border text-card-foreground",
-        embedded ? "bg-background/60" : "bg-card shadow-sm",
-        isSelected && "bg-muted/20 ring-1 ring-ring/30",
+        embedded ? "group min-w-0 text-card-foreground" : "group min-w-0 overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm",
+        isSelected && (embedded ? "bg-muted/20" : "bg-muted/20 ring-1 ring-ring/30"),
         tone.frame,
       )}
     >
       <div className="min-w-0">
-        <div className="flex items-center gap-3 border-b bg-muted/20 px-3 py-2">
+        <div className={cn("flex items-center gap-3", embedded ? "px-4 py-3" : "border-b bg-muted/20 px-3 py-2")}>
           <button className="flex min-w-0 flex-1 items-center gap-2 text-left" type="button" onClick={onSelect}>
-            <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-background text-muted-foreground", tone.icon)}>
+            <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-muted/70 text-muted-foreground", !embedded && "bg-background", tone.icon)}>
               <Icon className="size-4" />
             </span>
             <span className="min-w-0 flex-1">
@@ -1298,7 +1297,7 @@ function CurriculumLearningCell({
           </IconButton>
           <CellAiActions onAsk={onAsk} selected={isSelected} />
         </div>
-        <div className="space-y-3 px-3 py-3">
+        <div className={cn("space-y-3", embedded ? "px-4 pb-4" : "px-3 py-3")}>
           {isSnippetCode ? <SnippetPracticeIntro block={block} /> : null}
           {!isSnippetCode && block.guide ? <ExerciseBrief block={block} lineCount={lineCount} /> : null}
           <div className="space-y-1.5">
@@ -1335,15 +1334,15 @@ function SnippetPracticeIntro({ block }: { block: BlockConfig }) {
   const description = block.description?.trim();
 
   return (
-    <div className="overflow-hidden rounded-md border bg-muted/15">
-      <div className="space-y-2 px-3 py-2.5">
+    <div className="border-l-2 border-emerald-400/40 pl-3">
+      <div className="space-y-2 pb-2.5">
         <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
           <TerminalSquare className="size-3.5" />
           <span>예제 스니펫</span>
         </div>
         {description ? <p className="text-sm leading-6 text-foreground">{description}</p> : null}
       </div>
-      <div className="border-t p-3">
+      <div>
         <CodePayload value={block.content} />
       </div>
     </div>
@@ -1454,7 +1453,7 @@ function ExerciseBrief({ block, lineCount }: { block: BlockConfig; lineCount: nu
   if (!block.guide) return null;
   const hints = block.guide.hints ?? [];
   return (
-    <div className="rounded-md border bg-emerald-400/5 px-3 py-3">
+    <div className="border-l-2 border-emerald-400/40 pl-3">
       <div className="flex flex-wrap items-start justify-between gap-2">
         <div className="min-w-0">
           <div className="text-sm font-semibold tracking-normal">실습</div>
