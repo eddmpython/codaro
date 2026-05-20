@@ -13,15 +13,19 @@ import {
   categoryTitle,
   fallbackBootstrap,
   fallbackCategories,
-  fallbackContents,
-  fallbackLesson,
 } from "@/lib/fallbackData";
 import {
-  defaultRegistrySelection,
   registryCategories,
-  registryContents,
-  registryLesson,
 } from "@/lib/curriculaRegistry";
+import {
+  curriculumContentsFallback,
+  defaultCurriculumState,
+  lessonFallback,
+  selectCategory,
+  selectContent,
+  selectedContentOrFirst,
+  selectCustomCurriculum as selectCustomCurriculumState,
+} from "@/lib/curriculumSelection";
 import {
   CUSTOM_CURRICULUM_CATEGORY,
   createCustomCurriculumEntry,
@@ -125,12 +129,7 @@ const emptyToolCatalog: AiToolCatalogPayload = {
 };
 
 const builtInCurriculumCategories = registryCategories();
-const defaultCurriculumSelection = defaultRegistrySelection();
-const builtInCurriculumContents = registryContents(defaultCurriculumSelection.category);
-const initialCurriculumDocument = registryLesson(
-  defaultCurriculumSelection.category,
-  defaultCurriculumSelection.contentId,
-)?.document ?? null;
+const initialCurriculum = defaultCurriculumState();
 const initialAutomationSnapshot = fallbackAutomationSnapshot();
 
 function initialSurfaceFromLocation(): SurfaceMode {
@@ -148,22 +147,22 @@ function App() {
     builtInCurriculumCategories.categories.length ? builtInCurriculumCategories.categories : fallbackCategories.categories,
   );
   const [contents, setContents] = useState<CurriculumContentSummary[]>(
-    builtInCurriculumContents.contents.length ? builtInCurriculumContents.contents : fallbackContents.contents,
+    initialCurriculum.contents.contents,
   );
-  const [selectedCategory, setSelectedCategory] = useState(defaultCurriculumSelection.category);
-  const [selectedContentId, setSelectedContentId] = useState(defaultCurriculumSelection.contentId);
+  const [selectedCategory, setSelectedCategory] = useState(initialCurriculum.selectedCategory);
+  const [selectedContentId, setSelectedContentId] = useState(initialCurriculum.selectedContentId);
   const [contentsLoading, setContentsLoading] = useState(false);
   const [referenceLoading, setReferenceLoading] = useState(false);
   const [document, setDocument] = useState<CodaroDocument>(starterDocument);
-  const [curriculumDocument, setCurriculumDocument] = useState<CodaroDocument | null>(initialCurriculumDocument);
-  const [selectedCurriculumBlockId, setSelectedCurriculumBlockId] = useState(initialCurriculumDocument?.blocks[0]?.id ?? "");
+  const [curriculumDocument, setCurriculumDocument] = useState<CodaroDocument | null>(initialCurriculum.document);
+  const [selectedCurriculumBlockId, setSelectedCurriculumBlockId] = useState(initialCurriculum.document?.blocks[0]?.id ?? "");
   const [drafts, setDrafts] = useState<Record<string, string>>(
     draftsFromDocument(starterDocument),
   );
   const [pendingBlocks, setPendingBlocks] = useState<BlockConfig[]>([]);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget>("notebook");
   const [customCurricula, setCustomCurricula] = useState<CustomCurriculumEntry[]>(() => loadCustomCurricula());
-  const [selectedCustomCurriculumId, setSelectedCustomCurriculumId] = useState("");
+  const [selectedCustomCurriculumId, setSelectedCustomCurriculumId] = useState(initialCurriculum.selectedCustomCurriculumId);
   const [selectedBlockId, setSelectedBlockId] = useState(starterDocument.blocks[1]?.id ?? starterDocument.blocks[0]?.id ?? "");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [variables, setVariables] = useState<VariableInfo[]>([]);
@@ -259,8 +258,8 @@ function App() {
       if (!shouldUseApi()) {
         setApiOnline(false);
         setCategories(builtInCurriculumCategories.categories.length ? builtInCurriculumCategories.categories : fallbackCategories.categories);
-        setContents(builtInCurriculumContents.contents.length ? builtInCurriculumContents.contents : fallbackContents.contents);
-        setCurriculumDocument(initialCurriculumDocument);
+        setContents(initialCurriculum.contents.contents);
+        setCurriculumDocument(initialCurriculum.document);
         setToolCatalog(emptyToolCatalog);
         setAiProfile({
           activeProvider: "provider 없음",
@@ -354,20 +353,13 @@ function App() {
       }
       setContentsLoading(true);
       try {
-        const registryFallback = registryContents(selectedCategory);
-        const fallback = registryFallback.contents.length
-          ? registryFallback
-          : selectedCategory === fallbackContents.category
-            ? fallbackContents
-            : { ...fallbackContents, category: selectedCategory, categoryName: categoryTitle(selectedCategory) };
+        const fallback = curriculumContentsFallback(selectedCategory);
         const result = shouldUseApi()
           ? await optional(() => codaroApi.curriculumContents(selectedCategory), fallback)
           : { data: fallback, online: false };
         if (cancelled) return;
         setContents(result.data.contents);
-        if (result.data.contents.length && !result.data.contents.some((content) => content.contentId === selectedContentId)) {
-          setSelectedContentId(result.data.contents[0].contentId);
-        }
+        setSelectedContentId((current) => selectedContentOrFirst(result.data, current));
       } finally {
         if (!cancelled) setContentsLoading(false);
       }
@@ -391,24 +383,15 @@ function App() {
       }
       setReferenceLoading(true);
       try {
-        const registryFallback = registryLesson(selectedCategory, selectedContentId);
-        const lessonFallback = registryFallback ?? {
-          ...fallbackLesson,
-          category: selectedCategory,
-          contentId: selectedContentId,
-        };
+        const fallback = lessonFallback(selectedCategory, selectedContentId);
         const result = shouldUseApi()
-          ? await optional(() => codaroApi.curriculumLesson(selectedCategory, selectedContentId), lessonFallback)
-          : { data: lessonFallback, online: false };
+          ? await optional(() => codaroApi.curriculumLesson(selectedCategory, selectedContentId), fallback)
+          : { data: fallback, online: false };
         if (cancelled) return;
         setCurriculumDocument(result.data.document);
         setDrafts((current) => ({
           ...current,
-          ...Object.fromEntries(
-            result.data.document.blocks
-              .filter((block) => block.type === "code")
-              .map((block) => [block.id, block.role === "snippet" ? "" : block.content]),
-          ),
+          ...draftsFromBlocks(result.data.document.blocks, { emptySnippetDraft: true }),
         }));
         setSelectedCurriculumBlockId(result.data.document.blocks[0]?.id ?? "");
         setNotice({
@@ -827,35 +810,34 @@ function App() {
   }
 
   function selectCurriculumCategory(key: string) {
-    const firstContentId = registryContents(key).contents[0]?.contentId ?? "";
-    setSelectedCategory(key);
-    setSelectedContentId(firstContentId);
-    setSelectedCustomCurriculumId("");
+    const selection = selectCategory(key);
+    setSelectedCategory(selection.selectedCategory);
+    setSelectedContentId(selection.selectedContentId);
+    setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
     setSurface("curriculum");
   }
 
   function selectCurriculumContent(contentId: string) {
-    setSelectedCustomCurriculumId("");
-    setSelectedContentId(contentId);
+    const selection = selectContent(contentId, selectedCategory);
+    setSelectedCategory(selection.selectedCategory);
+    setSelectedContentId(selection.selectedContentId);
+    setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
     setSurface("curriculum");
   }
 
   function selectCustomCurriculum(id: string) {
     const entry = customCurricula.find((item) => item.id === id);
     if (!entry) return;
-    setSelectedCategory(CUSTOM_CURRICULUM_CATEGORY);
-    setSelectedContentId(id);
-    setSelectedCustomCurriculumId(id);
-    setCurriculumDocument(entry.document);
+    const selection = selectCustomCurriculumState(entry);
+    setSelectedCategory(selection.selectedCategory);
+    setSelectedContentId(selection.selectedContentId);
+    setSelectedCustomCurriculumId(selection.selectedCustomCurriculumId);
+    setCurriculumDocument(selection.document);
     setDrafts((current) => ({
       ...current,
-      ...Object.fromEntries(
-        entry.document.blocks
-          .filter((block) => block.type === "code")
-          .map((block) => [block.id, block.role === "snippet" ? "" : block.content]),
-      ),
+      ...draftsFromBlocks(selection.document.blocks, { emptySnippetDraft: true }),
     }));
-    setSelectedCurriculumBlockId(entry.document.blocks[0]?.id ?? "");
+    setSelectedCurriculumBlockId(selection.document.blocks[0]?.id ?? "");
     setSurface("curriculum");
   }
 
