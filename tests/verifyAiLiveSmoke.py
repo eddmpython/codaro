@@ -205,6 +205,7 @@ def runLiveProvider(selection: LiveProviderSelection) -> LiveProviderRun:
         runTeacherAnswerCase(selection.config),
         runClarificationGateCase(),
         asyncio.run(runToolLoopCase(selection.config)),
+        asyncio.run(runCellCallLoopCase(selection.config)),
     )
     passed = all(case.passed for case in cases)
     return LiveProviderRun(
@@ -475,8 +476,8 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
     except LIVE_PROVIDER_ERRORS as exc:
         return failedCase("live-tool-loop", startedAt, config, exc)
 
-    toolNames = [str(call.get("name")) for call in payload.get("toolCalls", []) if isinstance(call, dict)]
-    trace = payload.get("trace") if isinstance(payload.get("trace"), dict) else {}
+    toolNames = toolNamesFromPayload(payload)
+    trace = traceFromPayload(payload)
     usedCurriculumTool = "write-curriculum-yaml" in toolNames
     passed = usedCurriculumTool and str(payload.get("provider") or "") != ""
     error = None
@@ -498,6 +499,106 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
         },
         error=error,
     )
+
+
+async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
+    startedAt = time.monotonic()
+    executor = LiveSmokeExecutor()
+    convManager = ConversationManager()
+    conversation = convManager.create(role="teacher")
+    orchestrator = TeacherOrchestrator.fromContext({"dependencyPreflight": {"packages": ["numpy"]}})
+    provider = createProvider(config)
+    messages = [
+        {
+            "role": "system",
+            "content": buildSystemPrompt(
+                role="teacher",
+                documentContext=(
+                    "현재 학습 셀: id=live-smoke-cell, role=exercise, executionKind=code, "
+                    "content=`numbers = [1, 2, 3]\\nprint(sum(numbers))`"
+                ),
+            ),
+        },
+        {
+            "role": "user",
+            "content": (
+                "실제 실행 도구 smoke입니다. 대상 셀 id는 live-smoke-cell입니다. "
+                "먼저 packages-check tool로 numpy 준비 상태를 확인한 뒤, "
+                "packages-check 결과가 ready이면 cell-call tool로 live-smoke-cell을 run 하세요. "
+                "답변만 하지 말고 반드시 도구 호출로 확인하세요."
+            ),
+        },
+    ]
+    try:
+        payload = await runTeacherChatLoop(
+            provider=provider,
+            convManager=convManager,
+            conversationId=conversation.conversationId,
+            messages=messages,
+            tools=toolSchemas(),
+            executor=executor,
+            orchestrator=orchestrator,
+            maxToolRounds=4,
+        )
+    except LIVE_PROVIDER_ERRORS as exc:
+        return failedCase("live-cell-call-loop", startedAt, config, exc)
+
+    toolNames = toolNamesFromPayload(payload)
+    trace = traceFromPayload(payload)
+    executorCalls = [call["tool"] for call in executor.calls]
+    usedPackageCheck = "packages-check" in executorCalls
+    usedCellCall = "cell-call" in executorCalls
+    ordered = toolsInOrder(executorCalls, "packages-check", "cell-call")
+    policyViolationCount = int(trace.get("policyViolationCount") or 0)
+    passed = (
+        usedPackageCheck
+        and usedCellCall
+        and ordered
+        and policyViolationCount == 0
+        and str(payload.get("provider") or "") != ""
+    )
+    error = None
+    if not usedCellCall:
+        error = "live provider did not call cell-call; prompt/tool schema tuning required"
+    elif not usedPackageCheck:
+        error = "live provider did not call packages-check before cell-call"
+    elif not ordered:
+        error = "live provider called cell-call before packages-check"
+    elif policyViolationCount:
+        error = "live provider cell-call triggered tool policy violation"
+    return LiveSmokeCase(
+        caseId="live-cell-call-loop",
+        passed=passed,
+        status="passed" if passed else "missing live cell-call",
+        durationMs=elapsedMs(startedAt),
+        provider=str(payload.get("provider") or config.provider),
+        model=str(payload.get("model") or provider.resolvedModel),
+        signals={
+            "toolSequence": trace.get("toolSequence") or toolNames,
+            "toolCount": len(toolNames),
+            "workloopCount": len(trace.get("workloop") or []),
+            "policyViolationCount": policyViolationCount,
+            "executorCalls": executorCalls,
+            "answerChars": len(str(payload.get("answer") or "")),
+        },
+        error=error,
+    )
+
+
+def toolNamesFromPayload(payload: dict[str, Any]) -> list[str]:
+    return [str(call.get("name")) for call in payload.get("toolCalls", []) if isinstance(call, dict)]
+
+
+def traceFromPayload(payload: dict[str, Any]) -> dict[str, Any]:
+    trace = payload.get("trace")
+    return trace if isinstance(trace, dict) else {}
+
+
+def toolsInOrder(toolNames: list[str], before: str, after: str) -> bool:
+    try:
+        return toolNames.index(before) < toolNames.index(after)
+    except ValueError:
+        return False
 
 
 def failedCase(caseId: str, startedAt: float, config: LLMConfig, exc: BaseException) -> LiveSmokeCase:

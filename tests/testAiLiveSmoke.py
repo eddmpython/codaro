@@ -110,3 +110,46 @@ def testMainRunsMatrixWithoutCallingNetwork(monkeypatch, capsys) -> None:
     assert payload["status"] == "partial credential missing"
     assert [item["provider"] for item in payload["providers"]] == ["oauth-chatgpt", "openai"]
 
+
+def testRunLiveProviderIncludesCellCallCase(monkeypatch) -> None:
+    smoke = loadSmoke()
+
+    def passedCase(caseId):
+        return smoke.LiveSmokeCase(caseId=caseId, passed=True, status="passed", durationMs=1)
+
+    async def passedToolCase(_config):
+        return passedCase("live-tool-loop")
+
+    async def passedCellCase(_config):
+        return passedCase("live-cell-call-loop")
+
+    selection = smoke.LiveProviderSelection(
+        provider="oauth-chatgpt",
+        config=smoke.LLMConfig(provider="oauth-chatgpt", model="test-model"),
+    )
+    monkeypatch.setattr(smoke, "runProviderAvailabilityCase", lambda _config: passedCase("provider-availability"))
+    monkeypatch.setattr(smoke, "runShortAnswerCase", lambda _config: passedCase("short-answer"))
+    monkeypatch.setattr(smoke, "runTeacherAnswerCase", lambda _config: passedCase("teacher-answer"))
+    monkeypatch.setattr(smoke, "runClarificationGateCase", lambda: passedCase("clarification-before-provider"))
+    monkeypatch.setattr(smoke, "runToolLoopCase", passedToolCase)
+    monkeypatch.setattr(smoke, "runCellCallLoopCase", passedCellCase)
+
+    run = smoke.runLiveProvider(selection)
+
+    assert run.passed
+    assert [case.caseId for case in run.cases] == [
+        "provider-availability",
+        "short-answer",
+        "teacher-answer",
+        "clarification-before-provider",
+        "live-tool-loop",
+        "live-cell-call-loop",
+    ]
+
+
+def testToolsInOrderRequiresBothTools() -> None:
+    smoke = loadSmoke()
+
+    assert smoke.toolsInOrder(["packages-check", "cell-call"], "packages-check", "cell-call")
+    assert not smoke.toolsInOrder(["cell-call", "packages-check"], "packages-check", "cell-call")
+    assert not smoke.toolsInOrder(["packages-check"], "packages-check", "cell-call")
