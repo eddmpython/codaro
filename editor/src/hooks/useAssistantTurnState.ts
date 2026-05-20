@@ -22,9 +22,9 @@ import {
 } from "@/lib/assistantResponsePlan";
 import { buildAssistantTurnRequest } from "@/lib/assistantTurnRequest";
 import {
-  buildLocalAssistantDraft,
-  completeLocalAssistantDraft,
-} from "@/lib/localFallback";
+  runAssistantLocalTurn,
+  type SaveCurriculum,
+} from "@/lib/assistantLocalTurn";
 import { providerAssistantFailure } from "@/lib/providerConnection";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
@@ -37,11 +37,6 @@ import type {
   ExecutionResult,
   VariableInfo,
 } from "@/types";
-
-type SaveCurriculum = (
-  blocks: BlockConfig[],
-  title?: string,
-) => { title: string } | null;
 
 type UseAssistantTurnStateOptions = {
   activeDocument: CodaroDocument;
@@ -103,20 +98,17 @@ export function useAssistantTurnState({
     setAssistantLoading(true);
 
     if (!apiOnline) {
-      const localDraft = buildLocalAssistantDraft(message, activeScope);
-      const savedEntry = localDraft.shouldSaveCurriculum
-        ? saveCurriculum(localDraft.generatedBlocks)
-        : null;
-      if (localDraft.clearPendingBlocks) {
-        setPendingBlocks([]);
-        setPendingTarget("notebook");
-      }
-      const localResult = completeLocalAssistantDraft({
-        draft: localDraft,
+      const localResult = runAssistantLocalTurn({
         message,
-        savedTitle: savedEntry?.title,
+        saveCurriculum,
         scope: activeScope,
       });
+      if (localResult.clearPendingBlocks) {
+        setPendingBlocks([]);
+      }
+      if (localResult.pendingTarget) {
+        setPendingTarget(localResult.pendingTarget);
+      }
       setMessages((current) => [...current, localResult.assistantMessage]);
       onNotice(localResult.notice);
       setAssistantLoading(false);
