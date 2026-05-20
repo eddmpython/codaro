@@ -1,6 +1,21 @@
-from .checker import CheckResult, checkByOutput, checkByVariable, checkContains, checkNoError
+from .checker import (
+    CheckResult,
+    checkByOutput,
+    checkByVariable,
+    checkContains,
+    checkExpectedOutput,
+    checkNoError,
+    checkOutputContains,
+    checkVariableSnapshotContains,
+)
 from .contentCache import CurriculumContentCache, CurriculumContentPayload
-from .exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
+from .exerciseCheck import (
+    ExerciseCheckInput,
+    InvalidExerciseCheck,
+    ToolExerciseCheckInput,
+    runExerciseCheck,
+    runToolExerciseCheck,
+)
 from .studyLoader import (
     CATEGORY_GROUPS,
     CATEGORY_MAPPING,
@@ -30,12 +45,17 @@ __all__ = [
     "LessonProgress",
     "PHILOSOPHY",
     "ProgressTracker",
+    "ToolExerciseCheckInput",
     "UserProgress",
     "InvalidExerciseCheck",
     "checkByOutput",
     "checkByVariable",
     "checkContains",
+    "checkExpectedOutput",
     "checkNoError",
+    "checkOutputContains",
+    "checkVariableSnapshotContains",
     "runExerciseCheck",
+    "runToolExerciseCheck",
     "yamlToDocument",
 ]

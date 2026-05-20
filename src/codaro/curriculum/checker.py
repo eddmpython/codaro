@@ -152,6 +152,104 @@ async def checkByVariable(
     )
 
 
+async def checkExpectedOutput(
+    session: KernelSession,
+    studentCode: str,
+    expectedOutput: str,
+) -> CheckResult:
+    result = await session.execute(studentCode, blockId="_check_expected_output")
+    if result.status == "error":
+        return CheckResult(
+            passed=False,
+            feedback=_explainError(result.data),
+            studentOutput=result.data,
+            expectedOutput=expectedOutput,
+            detail="execution_error",
+        )
+
+    actual = _composeOutput(result)
+    expected = expectedOutput.strip()
+    if _normalize(actual) == _normalize(expected):
+        return CheckResult(
+            passed=True,
+            feedback="정답입니다!",
+            studentOutput=actual,
+            expectedOutput=expected,
+        )
+    return CheckResult(
+        passed=False,
+        feedback="출력이 다릅니다.",
+        studentOutput=actual,
+        expectedOutput=expected,
+        detail="output_mismatch",
+    )
+
+
+async def checkOutputContains(
+    session: KernelSession,
+    studentCode: str,
+    expectedPattern: str,
+) -> CheckResult:
+    result = await session.execute(studentCode, blockId="_check_output_contains")
+    if result.status == "error":
+        return CheckResult(
+            passed=False,
+            feedback=_explainError(result.data),
+            studentOutput=result.data,
+            expectedOutput=expectedPattern,
+            detail="execution_error",
+        )
+
+    actual = _composeOutput(result)
+    if expectedPattern in actual:
+        return CheckResult(
+            passed=True,
+            feedback="출력이 조건을 만족합니다!",
+            studentOutput=actual,
+            expectedOutput=expectedPattern,
+        )
+    return CheckResult(
+        passed=False,
+        feedback=f"출력에 `{expectedPattern}`이 포함되어야 합니다.",
+        studentOutput=actual,
+        expectedOutput=expectedPattern,
+        detail="output_pattern_missing",
+    )
+
+
+async def checkVariableSnapshotContains(
+    session: KernelSession,
+    studentCode: str,
+    expectedPattern: str,
+) -> CheckResult:
+    result = await session.execute(studentCode, blockId="_check_variable_snapshot")
+    if result.status == "error":
+        return CheckResult(
+            passed=False,
+            feedback=_explainError(result.data),
+            studentOutput=result.data,
+            expectedOutput=expectedPattern,
+            detail="execution_error",
+        )
+
+    variables = {variable.name: variable.repr for variable in result.variables}
+    snapshot = _variablesSnapshot(variables)
+    if expectedPattern in snapshot:
+        return CheckResult(
+            passed=True,
+            feedback="변수 상태가 조건을 만족합니다!",
+            studentOutput=snapshot,
+            expectedOutput=expectedPattern,
+        )
+    return CheckResult(
+        passed=False,
+        feedback=f"변수 상태에 `{expectedPattern}`이 포함되어야 합니다.",
+        studentOutput=snapshot,
+        expectedOutput=expectedPattern,
+        detail="variable_pattern_missing",
+    )
+
+
 async def checkContains(
     studentCode: str,
     requiredPatterns: list[str],
@@ -203,6 +301,10 @@ def _composeOutput(result) -> str:
     if result.data:
         parts.append(result.data.strip())
     return "\n".join(parts)
+
+
+def _variablesSnapshot(variables: dict[str, str]) -> str:
+    return " ".join(f"{name}={value}" for name, value in sorted(variables.items()))
 
 
 def _explainError(errorText: str) -> str:

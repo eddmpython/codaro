@@ -24,6 +24,7 @@ from codaro.ai.toolManifest import (
     toolDescriptor,
 )
 from codaro.document.models import BlockConfig, CodaroDocument
+from codaro.kernel.session import KernelSession
 
 
 EXPECTED_BUILTIN_TOOLS = {
@@ -200,6 +201,28 @@ class TestDocumentTools:
         executor, _ = _makeExecutor()
         result = asyncio.run(executor.execute("get-variables", {}))
         assert "error" in result
+
+    def test_check_exercise_uses_curriculum_check_dispatch(self):
+        session = KernelSession()
+        sessionManager = _MockSessionManager()
+        sessionManager._sessions[session.sessionId] = session
+        doc = _makeDoc([BlockConfig(id="answer", type="code", content="print(42)")])
+        executor = ToolExecutor(
+            sessionManager=sessionManager,
+            documentGetter=lambda: doc,
+            documentSetter=lambda d: None,
+        )
+        executor.setActiveSession(session.sessionId)
+
+        result = asyncio.run(executor.execute("check-exercise", {
+            "blockId": "answer",
+            "checkType": "outputMatch",
+            "expected": "42",
+        }))
+
+        assert result["passed"] is True
+        assert result["actual"] == "42"
+        session.dispose()
 
 
 class TestGuide:

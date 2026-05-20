@@ -5,8 +5,22 @@ import asyncio
 import pytest
 
 from codaro.kernel.session import KernelSession
-from codaro.curriculum.checker import checkByOutput, checkByVariable, checkContains, checkNoError
-from codaro.curriculum.exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
+from codaro.curriculum.checker import (
+    checkByOutput,
+    checkByVariable,
+    checkContains,
+    checkExpectedOutput,
+    checkNoError,
+    checkOutputContains,
+    checkVariableSnapshotContains,
+)
+from codaro.curriculum.exerciseCheck import (
+    ExerciseCheckInput,
+    InvalidExerciseCheck,
+    ToolExerciseCheckInput,
+    runExerciseCheck,
+    runToolExerciseCheck,
+)
 
 
 def _run(coro):
@@ -92,6 +106,33 @@ def testCheckVariableMissing() -> None:
     session.dispose()
 
 
+def testCheckExpectedOutput() -> None:
+    session = KernelSession()
+    result = _run(checkExpectedOutput(session, "print(42)", "42"))
+
+    assert result.passed is True
+    assert result.studentOutput == "42"
+    session.dispose()
+
+
+def testCheckOutputContains() -> None:
+    session = KernelSession()
+    result = _run(checkOutputContains(session, "print('hello world')", "world"))
+
+    assert result.passed is True
+    assert result.expectedOutput == "world"
+    session.dispose()
+
+
+def testCheckVariableSnapshotContains() -> None:
+    session = KernelSession()
+    result = _run(checkVariableSnapshotContains(session, "answer = 42", "42"))
+
+    assert result.passed is True
+    assert "answer" in result.studentOutput
+    session.dispose()
+
+
 def testCheckContainsPass() -> None:
     result = _run(checkContains("for i in range(10):\n    print(i)", ["for", "range", "print"]))
     assert result.passed is True
@@ -138,4 +179,27 @@ def testExerciseCheckRejectsInvalidContract() -> None:
     session = KernelSession()
     with pytest.raises(InvalidExerciseCheck, match="Invalid check type"):
         _run(runExerciseCheck(session, ExerciseCheckInput(studentCode="print(1)", checkType="output")))
+    session.dispose()
+
+
+def testToolExerciseCheckDispatchesRuntimeToolContract() -> None:
+    session = KernelSession()
+    output = _run(runToolExerciseCheck(
+        session,
+        ToolExerciseCheckInput(studentCode="print(42)", checkType="outputMatch", expected="42"),
+    ))
+    variable = _run(runToolExerciseCheck(
+        session,
+        ToolExerciseCheckInput(studentCode="answer = 42", checkType="variableCheck", expected="42"),
+    ))
+    contains = _run(runToolExerciseCheck(
+        session,
+        ToolExerciseCheckInput(studentCode="for item in items:\n    print(item)", checkType="codeContains", expected="for"),
+    ))
+
+    assert output["passed"] is True
+    assert output["actual"] == "42"
+    assert variable["passed"] is True
+    assert contains["passed"] is True
+    assert contains["pattern"] == "for"
     session.dispose()

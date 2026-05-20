@@ -1,7 +1,8 @@
 from __future__ import annotations
 
-import json
 from typing import Any
+
+from ...curriculum.exerciseCheck import InvalidExerciseCheck, ToolExerciseCheckInput, runToolExerciseCheck
 
 
 class RuntimeToolHandlers:
@@ -104,33 +105,14 @@ class RuntimeToolHandlers:
         if block is None:
             return {"error": f"Block not found: {blockId}"}
 
-        if checkType == "noError":
-            result = await session.execute(block.content, blockId=blockId)
-            passed = result.status != "error"
-            return {"passed": passed, "status": result.status, "stdout": result.stdout, "stderr": result.stderr}
-
-        if checkType == "outputMatch":
-            result = await session.execute(block.content, blockId=blockId)
-            actual = (result.stdout or "").strip()
-            expectedStripped = expected.strip()
-            passed = actual == expectedStripped
-            return {"passed": passed, "actual": actual, "expected": expectedStripped}
-
-        if checkType == "outputContains":
-            result = await session.execute(block.content, blockId=blockId)
-            actual = result.stdout or ""
-            passed = expected in actual
-            return {"passed": passed, "actual": actual, "pattern": expected}
-
-        if checkType == "variableCheck":
-            result = await session.execute(block.content, blockId=blockId)
-            variables = session.getVariables()
-            varMap = {v.name: v.repr for v in variables}
-            passed = expected in json.dumps(varMap, ensure_ascii=False)
-            return {"passed": passed, "variables": varMap}
-
-        if checkType == "codeContains":
-            passed = expected in block.content
-            return {"passed": passed, "pattern": expected}
-
-        return {"error": f"Unknown check type: {checkType}"}
+        try:
+            return await runToolExerciseCheck(
+                session,
+                ToolExerciseCheckInput(
+                    studentCode=block.content,
+                    checkType=checkType,
+                    expected=expected,
+                ),
+            )
+        except InvalidExerciseCheck as exc:
+            return {"error": str(exc)}
