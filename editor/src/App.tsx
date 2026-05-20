@@ -15,13 +15,7 @@ import {
   buildCustomCurriculumApplication,
   type CustomCurriculumApplication,
 } from "@/lib/customCurricula";
-import {
-  buildAcceptPendingChangesApplication,
-  buildRejectPendingChangesApplication,
-  type PendingChangesApplication,
-} from "@/lib/pendingChanges";
 import type { AutomationSection } from "@/lib/surfaceModel";
-import type { PendingTarget } from "@/lib/assistantResponsePlan";
 import { useAppBootstrapEffect } from "@/hooks/useAppBootstrapEffect";
 import { useAssistantTurnState } from "@/hooks/useAssistantTurnState";
 import { useAutomationState } from "@/hooks/useAutomationState";
@@ -29,6 +23,7 @@ import { useCustomCurriculaState } from "@/hooks/useCustomCurriculaState";
 import { useCurriculumLibraryState } from "@/hooks/useCurriculumLibraryState";
 import { useNotebookDocumentState } from "@/hooks/useNotebookDocumentState";
 import { useNotebookRuntimeState } from "@/hooks/useNotebookRuntimeState";
+import { usePendingChangesState } from "@/hooks/usePendingChangesState";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import { useThemeMode } from "@/hooks/useThemeMode";
@@ -77,8 +72,6 @@ function App() {
     onDraftUpdates: applyDraftUpdates,
     onNotice: setNotice,
   });
-  const [pendingBlocks, setPendingBlocks] = useState<BlockConfig[]>([]);
-  const [pendingTarget, setPendingTarget] = useState<PendingTarget>("notebook");
   const {
     customCurricula,
     findCustomCurriculum,
@@ -161,13 +154,28 @@ function App() {
     selectedBlock,
     surface,
   });
+  const {
+    acceptPendingBlocks,
+    clearPendingChanges,
+    pendingBlocks,
+    rejectPendingBlocks,
+    setPendingBlocks,
+    setPendingTarget,
+  } = usePendingChangesState({
+    applyDraftUpdates,
+    document,
+    replaceDocument,
+    saveCurriculum: saveCustomCurriculum,
+    selectNotebookBlock: selectBlock,
+    setSurface,
+    onNotice: setNotice,
+  });
 
   const applyDocument = useCallback((nextDocument: CodaroDocument) => {
     applyNotebookDocument(nextDocument);
     resetRuntimeState();
-    setPendingBlocks([]);
-    setPendingTarget("notebook");
-  }, [applyNotebookDocument, resetRuntimeState]);
+    clearPendingChanges();
+  }, [applyNotebookDocument, clearPendingChanges, resetRuntimeState]);
 
   useAppBootstrapEffect({
     applyBootstrapCurriculumState,
@@ -222,44 +230,6 @@ function App() {
     applyCurriculumSelectionState(application);
     setSelectedCustomCurriculumId(application.selectedCustomCurriculumId);
     setSurface(application.surfaceToOpen);
-    if (application.notice) {
-      setNotice(application.notice);
-    }
-  }
-
-  function acceptPendingBlocks() {
-    applyPendingChangesApplication(buildAcceptPendingChangesApplication({
-      document,
-      pendingBlocks,
-      pendingTarget,
-    }));
-  }
-
-  function rejectPendingBlocks() {
-    applyPendingChangesApplication(buildRejectPendingChangesApplication(pendingBlocks));
-  }
-
-  function applyPendingChangesApplication(application: PendingChangesApplication | null) {
-    if (!application) return;
-    if (application.curriculumToSave) {
-      saveCustomCurriculum(application.curriculumToSave.blocks, application.curriculumToSave.title);
-    }
-    if (application.documentToApply) {
-      replaceDocument(application.documentToApply);
-    }
-    if (Object.keys(application.draftUpdates).length) {
-      applyDraftUpdates(application.draftUpdates);
-    }
-    if (application.selectedBlockId) {
-      selectBlock(application.selectedBlockId);
-    }
-    if (application.clearPendingBlocks) {
-      setPendingBlocks([]);
-    }
-    setPendingTarget(application.pendingTarget);
-    if (application.surfaceToOpen) {
-      setSurface(application.surfaceToOpen);
-    }
     if (application.notice) {
       setNotice(application.notice);
     }
