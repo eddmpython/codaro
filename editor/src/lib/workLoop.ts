@@ -68,9 +68,16 @@ export function finishAssistantWorkLoop({
   trace?: AssistantTraceSummary;
 } {
   const trace = normalizeAssistantTrace(response.trace);
-  const toolSteps = response.toolCalls.length ? finishAssistantSteps(steps, response.toolCalls) : undefined;
+  const shouldKeepBaseSteps = response.toolCalls.length > 0 || hasTraceWorkloopSignal(trace);
+  const toolSteps = response.toolCalls.length
+    ? finishAssistantSteps(steps, response.toolCalls)
+    : shouldKeepBaseSteps
+      ? finishAssistantSteps(steps, [])
+      : undefined;
+  const traceSteps = withTraceWorkloopSteps(toolSteps, trace);
+  const policySteps = withTracePolicySteps(traceSteps, trace);
   return {
-    steps: withTracePolicySteps(toolSteps ?? steps, trace) ?? toolSteps,
+    steps: policySteps ?? traceSteps,
     trace,
   };
 }
@@ -211,6 +218,74 @@ function withTracePolicySteps(
     next.push(policyViolationStep(violation, index));
   });
   return next;
+}
+
+function withTraceWorkloopSteps(
+  steps: AssistantWorkStep[] | undefined,
+  trace: AssistantTraceSummary | undefined,
+): AssistantWorkStep[] | undefined {
+  const traceSteps = traceWorkloopSteps(trace);
+  if (!traceSteps.length) return steps;
+
+  const next = (steps ?? []).map((step) => (
+    step.status === "running" ? { ...step, status: "done" as const, finishedAt: step.finishedAt ?? Date.now() } : step
+  ));
+  for (const step of traceSteps) {
+    const existingIndex = next.findIndex((item) => item.id === step.id);
+    if (existingIndex >= 0) {
+      next[existingIndex] = { ...next[existingIndex], ...step };
+    } else {
+      next.push(step);
+    }
+  }
+  return next;
+}
+
+function traceWorkloopSteps(trace: AssistantTraceSummary | undefined): AssistantWorkStep[] {
+  const workloop = trace?.workloop ?? [];
+  return workloop
+    .map((event, index) => traceWorkloopStep(event, index))
+    .filter((step): step is AssistantWorkStep => Boolean(step));
+}
+
+function traceWorkloopStep(event: AiTraceWorkloopEvent, index: number): AssistantWorkStep | undefined {
+  if (!shouldPromoteTraceWorkloopEvent(event)) return undefined;
+  const now = Date.now();
+  return {
+    id: `trace-${event.eventIndex ?? index}-${policyStepIdPart(event.eventType || event.target || event.workLabel || "work")}`,
+    label: event.workLabel || event.eventType || "작업",
+    status: traceWorkloopStatus(event),
+    detail: event.error || event.workDetail,
+    error: event.error,
+    toolName: event.toolName,
+    traceEventIndex: event.eventIndex,
+    turnElapsedMs: event.elapsedMs,
+    category: event.category,
+    lane: event.lane,
+    target: event.target,
+    risk: event.risk,
+    startedAt: now,
+    finishedAt: now,
+  };
+}
+
+function shouldPromoteTraceWorkloopEvent(event: AiTraceWorkloopEvent) {
+  if (event.eventType === "tool-start" || event.eventType === "tool-result") return false;
+  if (event.eventType === "tool-policy-violation") return false;
+  if (event.toolCallId) return false;
+  return Boolean(event.workLabel || event.eventType === "clarification-gate" || event.eventType === "turn-error");
+}
+
+function traceWorkloopStatus(event: AiTraceWorkloopEvent): AssistantWorkStep["status"] {
+  if (event.error || event.status === "error") return "error";
+  return "done";
+}
+
+function hasTraceWorkloopSignal(trace: AssistantTraceSummary | undefined) {
+  if (!trace) return false;
+  if ((trace.errorCount ?? 0) > 0) return true;
+  if ((trace.policyViolationCount ?? 0) > 0 || Boolean(trace.policyViolations?.length)) return true;
+  return (trace.workloop ?? []).some((event) => shouldPromoteTraceWorkloopEvent(event));
 }
 
 function policyViolationStep(violation: AiTracePolicyViolation, index: number): AssistantWorkStep {
