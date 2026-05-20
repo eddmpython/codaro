@@ -287,6 +287,18 @@ export type AiChatRequest = {
   context?: Record<string, unknown>;
 };
 
+export type AiTraceSummary = {
+  traceId?: string;
+  conversationId?: string | null;
+  elapsedMs?: number;
+  eventCount?: number;
+  toolCount?: number;
+  errorCount?: number;
+  policyViolationCount?: number;
+  toolSequence?: string[];
+  [key: string]: unknown;
+};
+
 export type AiChatResponse = {
   conversationId: string;
   answer: string;
@@ -294,17 +306,7 @@ export type AiChatResponse = {
   model?: string | null;
   usage?: unknown;
   toolCalls: AiToolCall[];
-  trace?: {
-    traceId?: string;
-    conversationId?: string | null;
-    elapsedMs?: number;
-    eventCount?: number;
-    toolCount?: number;
-    errorCount?: number;
-    policyViolationCount?: number;
-    toolSequence?: string[];
-    [key: string]: unknown;
-  };
+  trace?: AiTraceSummary;
 };
 
 export type OauthAuthorizePayload = {

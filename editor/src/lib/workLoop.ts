@@ -2,7 +2,9 @@ import type {
   AssistantMessage,
   AssistantWorkStep,
 } from "@/components/assistant/assistantPanel";
-import type { AiToolCall } from "@/types";
+import type { AiChatResponse, AiToolCall, AiTraceSummary } from "@/types";
+
+export type AssistantTraceSummary = AiTraceSummary;
 
 export function createComposeStep(): AssistantWorkStep {
   return { id: "compose", label: "요청 분석", status: "running", startedAt: Date.now() };
@@ -48,9 +50,42 @@ export function finishAssistantSteps(steps: AssistantWorkStep[] | undefined, too
   ));
 }
 
+export function finishAssistantWorkLoop({
+  response,
+  steps,
+}: {
+  response: AiChatResponse;
+  steps: AssistantWorkStep[] | undefined;
+}): {
+  steps?: AssistantWorkStep[];
+  trace?: AssistantTraceSummary;
+} {
+  return {
+    steps: response.toolCalls.length ? finishAssistantSteps(steps, response.toolCalls) : undefined,
+    trace: normalizeAssistantTrace(response.trace),
+  };
+}
+
 export function markAssistantStepsError(steps: AssistantWorkStep[] | undefined): AssistantWorkStep[] {
   const base = steps?.length ? steps : [createComposeStep()];
   return base.map((step) => step.status === "running" ? { ...step, status: "error" as const } : step);
+}
+
+export function normalizeAssistantTrace(trace: AiChatResponse["trace"]): AssistantTraceSummary | undefined {
+  if (!trace) return undefined;
+  const normalized: AssistantTraceSummary = {};
+  if (typeof trace.traceId === "string" && trace.traceId) normalized.traceId = trace.traceId;
+  if (typeof trace.conversationId === "string" && trace.conversationId) normalized.conversationId = trace.conversationId;
+  if (typeof trace.elapsedMs === "number") normalized.elapsedMs = trace.elapsedMs;
+  if (typeof trace.eventCount === "number") normalized.eventCount = trace.eventCount;
+  if (typeof trace.toolCount === "number") normalized.toolCount = trace.toolCount;
+  if (typeof trace.errorCount === "number") normalized.errorCount = trace.errorCount;
+  if (typeof trace.policyViolationCount === "number") normalized.policyViolationCount = trace.policyViolationCount;
+  if (Array.isArray(trace.toolSequence)) {
+    const toolSequence = trace.toolSequence.filter((item): item is string => typeof item === "string");
+    if (toolSequence.length) normalized.toolSequence = toolSequence;
+  }
+  return Object.keys(normalized).length ? normalized : undefined;
 }
 
 function assistantWorkStepFromToolCall(toolCall: AiToolCall, status: AssistantWorkStep["status"]): AssistantWorkStep {

@@ -2,7 +2,7 @@ import type { AssistantMessage } from "@/components/assistant/assistantPanel";
 import type { StreamEvent } from "@/lib/api";
 import {
   createComposeStep,
-  finishAssistantSteps,
+  finishAssistantWorkLoop,
   markAssistantStepsError,
   withToolStartStep,
   withToolWorkStep,
@@ -93,15 +93,19 @@ export function finalizeAssistantMessage({
   response: AiChatResponse;
   streamedContent: string;
 }): AssistantMessage[] {
-  return updateAssistantMessage(messages, assistantMessageId, (item) => ({
-    ...item,
-    content: response.answer || streamedContent || "완료했습니다.",
-    provider: response.provider,
-    model: response.model,
-    toolCalls: response.toolCalls,
-    steps: response.toolCalls.length ? finishAssistantSteps(item.steps, response.toolCalls) : undefined,
-    loading: false,
-  }));
+  return updateAssistantMessage(messages, assistantMessageId, (item) => {
+    const workLoop = finishAssistantWorkLoop({ steps: item.steps, response });
+    return {
+      ...item,
+      content: response.answer || streamedContent || "완료했습니다.",
+      provider: response.provider,
+      model: response.model,
+      toolCalls: response.toolCalls,
+      steps: workLoop.steps,
+      trace: workLoop.trace,
+      loading: false,
+    };
+  });
 }
 
 export function failAssistantMessage({

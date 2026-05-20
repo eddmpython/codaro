@@ -22,7 +22,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import type { TeacherScope } from "@/lib/teacherScope";
 import { cn } from "@/lib/utils";
-import type { AiProfile, AiToolCall, BlockConfig } from "@/types";
+import type { AiProfile, AiToolCall, AiTraceSummary, BlockConfig } from "@/types";
 
 export type AssistantMessage = {
   id: string;
@@ -31,6 +31,7 @@ export type AssistantMessage = {
   provider?: string;
   model?: string | null;
   toolCalls?: AiToolCall[];
+  trace?: AiTraceSummary;
   steps?: AssistantWorkStep[];
   tone?: "default" | "warning" | "error";
   action?: "connect-provider";
