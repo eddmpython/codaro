@@ -198,6 +198,17 @@ def testToolSequenceHarnessCapturesCoreExpectations() -> None:
     assert "packages-check must run before packages-install" in report.failures
 
 
+def testGoldenEvalCasesReferenceRegisteredTools() -> None:
+    registeredTools = {schema["function"]["name"] for schema in toolSchemas()}
+    caseIds = [case.caseId for case in goldenEvalCases]
+
+    assert len(caseIds) == len(set(caseIds))
+    for case in goldenEvalCases:
+        referencedTools = set(case.expectedTools) | set(case.forbiddenTools)
+        referencedTools.update(toolName for orderedPair in case.orderedBefore for toolName in orderedPair)
+        assert referencedTools <= registeredTools
+
+
 def testTracePayloadsHaveStableTraceId() -> None:
     toolSchemas()
     orchestrator = TeacherOrchestrator.fromContext({})
