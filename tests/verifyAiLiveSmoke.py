@@ -3,6 +3,7 @@ from __future__ import annotations
 import asyncio
 import json
 import os
+import re
 import sys
 import time
 from dataclasses import dataclass, field
@@ -12,7 +13,7 @@ from codaro.ai.conversation import ConversationManager, buildSystemPrompt
 from codaro.ai.factory import createProvider
 from codaro.ai.oauthToken import TokenRefreshError, loadToken
 from codaro.ai.profile import getProfileManager
-from codaro.ai.providerSpec import getProviderSpec, normalizeProvider
+from codaro.ai.providerSpec import getProviderSpec, normalizeProvider, publicProviderIds
 from codaro.ai.providers.oauthChatgptProvider import ChatGPTOAuthError
 from codaro.ai.teacher import TeacherOrchestrator, buildClarificationPlan, runTeacherChatLoop
 from codaro.ai.tools import toolSchemas
@@ -85,6 +86,31 @@ class LiveSmokeCase:
         return data
 
 
+@dataclass(frozen=True)
+class LiveProviderRun:
+    selection: LiveProviderSelection
+    passed: bool
+    status: str
+    cases: tuple[LiveSmokeCase, ...] = ()
+    nextAction: str | None = None
+
+    @property
+    def credentialMissing(self) -> bool:
+        return self.status == "live credential missing"
+
+    def payload(self) -> dict[str, Any]:
+        data: dict[str, Any] = {
+            "provider": self.selection.provider,
+            "passed": self.passed,
+            "status": self.status,
+            "selection": self.selection.payload(),
+            "cases": [case.payload() for case in self.cases],
+        }
+        if self.nextAction is not None:
+            data["nextAction"] = self.nextAction
+        return data
+
+
 class LiveSmokeExecutor:
     def __init__(self) -> None:
         self.calls: list[dict[str, Any]] = []
@@ -126,32 +152,22 @@ class LiveSmokeExecutor:
 
 
 def main() -> int:
+    matrixProviderIds = liveProviderIdsFromEnv()
+    if matrixProviderIds:
+        return runProviderMatrix(matrixProviderIds)
+    return runSingleProvider()
+
+
+def runSingleProvider() -> int:
     selection = selectLiveProvider()
-    if selection.credentialMissing:
-        payload = {
-            "passed": False,
-            "status": "live credential missing",
-            "selection": selection.payload(),
-            "nextAction": liveCredentialNextAction(selection.provider),
-        }
+    run = runLiveProvider(selection)
+    if run.credentialMissing:
+        payload = singleRunPayload(run)
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return MISSING_CREDENTIAL_EXIT
 
-    cases = [
-        runProviderAvailabilityCase(selection.config),
-        runShortAnswerCase(selection.config),
-        runTeacherAnswerCase(selection.config),
-        runClarificationGateCase(),
-        asyncio.run(runToolLoopCase(selection.config)),
-    ]
-    passed = all(case.passed for case in cases)
-    payload = {
-        "passed": passed,
-        "status": "passed" if passed else "failed",
-        "selection": selection.payload(),
-        "cases": [case.payload() for case in cases],
-    }
-    if passed:
+    payload = singleRunPayload(run)
+    if run.passed:
         print(f"ok: AI live smoke passed for {selection.provider}")
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return 0
@@ -160,10 +176,117 @@ def main() -> int:
     return 1
 
 
-def selectLiveProvider() -> LiveProviderSelection:
+def runProviderMatrix(providerIds: tuple[str, ...]) -> int:
+    runs = tuple(runLiveProvider(selectLiveProvider(providerId)) for providerId in providerIds)
+    payload = matrixRunPayload(runs)
+    exitCode = matrixExitCode(runs)
+    if exitCode == 0:
+        print(f"ok: AI live smoke matrix passed for {len(runs)} provider(s)")
+        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        return 0
+    target = sys.stderr if any(run.status == "failed" for run in runs) else sys.stdout
+    print("FAIL: AI live smoke matrix did not fully pass", file=target)
+    print(json.dumps(payload, ensure_ascii=False, indent=2), file=target)
+    return exitCode
+
+
+def runLiveProvider(selection: LiveProviderSelection) -> LiveProviderRun:
+    if selection.credentialMissing:
+        return LiveProviderRun(
+            selection=selection,
+            passed=False,
+            status="live credential missing",
+            nextAction=liveCredentialNextAction(selection.provider),
+        )
+
+    cases = (
+        runProviderAvailabilityCase(selection.config),
+        runShortAnswerCase(selection.config),
+        runTeacherAnswerCase(selection.config),
+        runClarificationGateCase(),
+        asyncio.run(runToolLoopCase(selection.config)),
+    )
+    passed = all(case.passed for case in cases)
+    return LiveProviderRun(
+        selection=selection,
+        passed=passed,
+        status="passed" if passed else "failed",
+        cases=cases,
+    )
+
+
+def liveProviderIdsFromEnv() -> tuple[str, ...]:
+    return parseLiveProviderIds(os.environ.get("CODARO_AI_LIVE_PROVIDERS"))
+
+
+def parseLiveProviderIds(raw: str | None) -> tuple[str, ...]:
+    if raw is None or not raw.strip():
+        return ()
+    providerIds: list[str] = []
+    seen: set[str] = set()
+    for token in re.split(r"[\s,;]+", raw.strip()):
+        if token in {"*", "all"}:
+            expanded = publicProviderIds()
+        else:
+            expanded = (normalizeProvider(token) or token,)
+        for providerId in expanded:
+            if providerId not in seen:
+                providerIds.append(providerId)
+                seen.add(providerId)
+    return tuple(providerIds)
+
+
+def singleRunPayload(run: LiveProviderRun) -> dict[str, Any]:
+    payload = {
+        "passed": run.passed,
+        "status": run.status,
+        "selection": run.selection.payload(),
+    }
+    if run.cases:
+        payload["cases"] = [case.payload() for case in run.cases]
+    if run.nextAction is not None:
+        payload["nextAction"] = run.nextAction
+    return payload
+
+
+def matrixRunPayload(runs: tuple[LiveProviderRun, ...]) -> dict[str, Any]:
+    summary = {
+        "passed": sum(1 for run in runs if run.passed),
+        "failed": sum(1 for run in runs if run.status == "failed"),
+        "credentialMissing": sum(1 for run in runs if run.credentialMissing),
+        "total": len(runs),
+    }
+    return {
+        "passed": matrixExitCode(runs) == 0,
+        "status": matrixStatus(runs),
+        "matrix": True,
+        "summary": summary,
+        "providers": [run.payload() for run in runs],
+    }
+
+
+def matrixStatus(runs: tuple[LiveProviderRun, ...]) -> str:
+    if any(run.status == "failed" for run in runs):
+        return "failed"
+    if any(run.credentialMissing for run in runs):
+        if any(run.passed for run in runs):
+            return "partial credential missing"
+        return "live credential missing"
+    return "passed"
+
+
+def matrixExitCode(runs: tuple[LiveProviderRun, ...]) -> int:
+    if any(run.status == "failed" for run in runs):
+        return 1
+    if any(run.credentialMissing for run in runs):
+        return MISSING_CREDENTIAL_EXIT
+    return 0
+
+
+def selectLiveProvider(providerOverride: str | None = None) -> LiveProviderSelection:
     profileManager = getProfileManager()
     profileProvider = profileManager.load().defaultProvider
-    provider = normalizeProvider(os.environ.get("CODARO_AI_LIVE_PROVIDER")) or profileProvider
+    provider = providerOverride or normalizeProvider(os.environ.get("CODARO_AI_LIVE_PROVIDER")) or profileProvider
     spec = getProviderSpec(provider)
     if spec is None:
         return LiveProviderSelection(

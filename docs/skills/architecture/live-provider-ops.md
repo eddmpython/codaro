@@ -61,6 +61,21 @@ set CODARO_AI_LIVE_MODEL=gpt-5.4
 
 `CODARO_AI_LIVE_PROVIDER`가 없으면 현재 profile의 default provider를 쓴다. credential이 없으면 gate는 `live credential missing`을 JSON으로 출력하고 실패 코드로 끝난다. 이것은 skip이 아니다. live credential이 없다는 사실을 명확히 보고하는 상태다.
 
+여러 provider를 한 번에 확인할 때는 matrix 환경을 명시한다.
+
+```bash
+set CODARO_AI_LIVE_PROVIDERS=oauth-chatgpt,openai,ollama,custom
+uv run python -X utf8 tests/run.py gate ai-live-smoke
+```
+
+`CODARO_AI_LIVE_PROVIDERS=all`은 공개 provider 전체를 뜻한다. matrix 모드는 provider별 결과를 `providers[]`에 남기고 `summary.passed`, `summary.failed`, `summary.credentialMissing`를 함께 출력한다.
+
+- 전체 통과: exit `0`, status `passed`.
+- provider 실행 실패: exit `1`, status `failed`.
+- 하나라도 credential이 없고 실행 실패는 없을 때: exit `2`, status `live credential missing` 또는 `partial credential missing`.
+
+matrix에서 missing credential은 silent skip이 아니다. 사용자가 여러 provider를 명시했으면 어떤 provider가 준비되지 않았는지 보고서에 남겨야 한다.
+
 현재 live smoke는 다음을 확인한다.
 
 - provider availability.
