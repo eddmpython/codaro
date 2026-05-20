@@ -27,6 +27,7 @@ uv run python -X utf8 tests/run.py list
 uv run python -X utf8 tests/run.py preflight
 uv run python -X utf8 tests/run.py gate backend
 uv run python -X utf8 tests/run.py gate teacher-eval
+uv run python -X utf8 tests/run.py gate teacher-e2e
 uv run python -X utf8 tests/run.py gate learning-card-contract
 uv run python -X utf8 tests/run.py gate learning-card-browser
 ```
@@ -40,6 +41,7 @@ uv run python -X utf8 tests/run.py gate learning-card-browser
 | `docs` | fast | 운영 문서 포인터, gate 정의, CI 연결 상태를 확인한다. |
 | `backend` | fast | Python backend 전체 테스트를 실행한다. |
 | `teacher-eval` | fast | teacher tool policy, trace, golden eval 계약을 빠르게 확인한다. |
+| `teacher-e2e` | fast | scripted provider loop, tool policy, 실제 curriculum YAML handler를 통과하는 golden e2e harness를 실행한다. |
 | `learning-card-contract` | surface | structured section card marker 계약과 editor build를 확인한다. |
 | `learning-card-browser` | surface | Playwright CLI로 structured section card의 desktop/mobile 렌더링을 확인한다. |
 | `editor-build` | surface | 제품 editor surface의 TypeScript/Vite build를 확인한다. |
@@ -47,7 +49,7 @@ uv run python -X utf8 tests/run.py gate learning-card-browser
 | `launcher-check` | release | launcher Rust crate의 type/build 계약을 확인한다. |
 | `launcher-test` | release | launcher Rust crate 테스트를 직렬 실행한다. |
 
-`preflight`는 로컬 기본 확인이며 현재 `docs`와 `backend`를 실행한다. `backend`가 전체 pytest를 포함하므로 `teacher-eval`은 빠른 집중 확인용으로 둔다.
+`preflight`는 로컬 기본 확인이며 현재 `docs`와 `backend`를 실행한다. `backend`가 전체 pytest를 포함하므로 `teacher-eval`과 `teacher-e2e`는 빠른 집중 확인용으로 둔다.
 
 ## 추가 규칙
 
@@ -55,6 +57,7 @@ uv run python -X utf8 tests/run.py gate learning-card-browser
 - 새 pytest 파일은 가능한 한 제품/도메인 경계를 드러내는 이름을 쓴다.
 - teacher/tool 변경은 최소한 tool sequence, policy violation, workloop label/detail, structured YAML contract, provider loop result signal 중 변경 표면 하나를 고정한다.
 - provider loop 변경은 가능한 한 실제 scripted provider run으로 `packages-check` → `packages-install` → `cell-call`의 정확한 순서와 결과 필드(`missing`, `success`, `passed`)를 함께 검증한다. golden case가 요구하는 exact sequence에 불필요한 tool call이 끼면 실패해야 한다.
+- provider loop, clarification, curriculum materializer를 함께 건드린 변경은 `teacher-e2e`로 실제 turn payload까지 확인한다.
 - clarification gate 변경은 실제 provider 호출 없이 멈추는 golden provider run을 검증한다. `toolSequence`가 비어 있고, 질문 수 1-3개와 기본값 key, workloop label이 빠지면 실패해야 한다.
 - curriculum YAML/provider golden 변경은 실제 `write-curriculum-yaml` 핸들러를 통과한 document 변경을 검증한다. `loadedInEditor`, structured section card flow, document runtime packages가 빠지면 실패해야 한다.
 - 학습카드/YAML 변경은 backend materializer 테스트, `learning-card-contract`, 레이아웃 변경 시 `learning-card-browser`를 함께 확인한다.

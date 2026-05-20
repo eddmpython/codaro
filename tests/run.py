@@ -53,6 +53,12 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "pytest", "tests/testTeacherArchitecture.py", "-q", "--tb=short")),),
         ci_required=False,
     ),
+    "teacher-e2e": Gate(
+        tier="fast",
+        description="teacher provider loop golden e2e harness를 실행한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyTeacherGoldenE2e.py")),),
+        ci_required=False,
+    ),
     "learning-card-contract": Gate(
         tier="surface",
         description="structured learning section card marker와 editor build를 확인한다.",
@@ -149,8 +155,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 9:
-        failures.append(f"expected 9 gates, found {len(GATES)}")
+    if len(GATES) != 10:
+        failures.append(f"expected 10 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
