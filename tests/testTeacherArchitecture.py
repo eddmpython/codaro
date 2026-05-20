@@ -496,6 +496,26 @@ def testToolPolicyRequiresInstallBeforeExecutionWhenPackageIsMissing() -> None:
     assert policy.validateStart("cell-call", {"operation": "run", "blockId": "cell-1"}) is None
 
 
+def testToolPolicyDoesNotTrustFailedPackageCheck() -> None:
+    policy = ToolPolicyState.fromContext({"dependencyPreflight": {"packages": ["matplotlib"]}})
+
+    policy.recordResult("packages-check", {"names": ["matplotlib"]}, {"error": "kernel offline"})
+    violation = policy.validateStart("cell-call", {"operation": "run", "blockId": "cell-1"})
+
+    assert violation is not None
+    assert violation.code == "dependency-preflight-required"
+    assert policy.validateStart("packages-install", {"name": "matplotlib"}) is not None
+
+
+def testToolPolicyOnlyTrustsMissingPackagesThatWereChecked() -> None:
+    policy = ToolPolicyState.fromContext({"dependencyPreflight": {"packages": ["pandas"]}})
+
+    policy.recordResult("packages-check", {"names": ["pandas"]}, {"missing": ["requests"]})
+
+    assert policy.validateStart("packages-install", {"name": "requests"}) is not None
+    assert policy.validateStart("cell-call", {"operation": "run", "blockId": "cell-1"}) is None
+
+
 def testToolSequenceHarnessCapturesCoreExpectations() -> None:
     curriculumCase = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
     dependencyCase = next(case for case in goldenEvalCases if case.caseId == "dependency-preflight-before-install")

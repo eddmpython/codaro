@@ -116,14 +116,16 @@ class ToolPolicyState:
             return
 
         if toolName == "packages-check":
+            if result.get("error"):
+                return
             names = arguments.get("names")
             checked = set()
             if isinstance(names, list):
                 checked = {normalizePackageName(name) for name in names if normalizePackageName(name)}
             missing = result.get("missing")
-            missingNames = set()
-            if isinstance(missing, list):
-                missingNames = {normalizePackageName(name) for name in missing if normalizePackageName(name)}
+            if not isinstance(missing, list):
+                return
+            missingNames = {normalizePackageName(name) for name in missing if normalizePackageName(name)} & checked
             self.checkedPackages.update(checked)
             self.missingPackages.update(missingNames)
             self.installedPackages.update(checked - missingNames)
