@@ -102,6 +102,14 @@ class _FakeProvider:
         return ToolResponse(answer="완료", provider="fake", model="test", toolCalls=[])
 
 
+class _FailingStreamProvider:
+    supportsNativeTools = False
+
+    def stream(self, messages: list[dict]):
+        yield "부분 응답"
+        raise RuntimeError("stream broken")
+
+
 class _FakeProfileManager:
     def __init__(self) -> None:
         self.resolvedRole = ""
@@ -460,6 +468,29 @@ def testProviderStreamOwnsStreamingToolEvents() -> None:
     assert events[-1]["toolCalls"][0]["name"] == "read-cells"
     assert events[-1]["trace"]["toolSequence"] == ["read-cells"]
     assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
+
+
+def testProviderStreamReportsStreamingErrorsInTrace() -> None:
+    convManager = _FakeConversationManager()
+    messages: list[dict] = [{"role": "user", "content": "말해줘"}]
+    orchestrator = TeacherOrchestrator.fromContext({})
+
+    events = asyncio.run(_collectStreamEvents(runTeacherChatStream(
+        provider=_FailingStreamProvider(),
+        convManager=convManager,
+        conversationId="conv-stream-error",
+        messages=messages,
+        tools=[],
+        executor=_FakeExecutor(),
+        orchestrator=orchestrator,
+    )))
+
+    assert [event["type"] for event in events] == ["start", "delta", "error"]
+    assert events[1]["content"] == "부분 응답"
+    assert events[-1]["error"] == "stream broken"
+    assert events[-1]["trace"]["conversationId"] == "conv-stream-error"
+    assert events[-1]["trace"]["errorCount"] == 1
+    assert events[-1]["trace"]["eventCount"] == 2
 
 
 def testTeacherSkillsAndCellSchemaAreVisibleSsot() -> None:

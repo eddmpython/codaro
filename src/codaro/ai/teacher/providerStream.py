@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import asyncio
+import logging
 import threading
 from collections.abc import AsyncIterator
+from dataclasses import dataclass
 from typing import Any
 
 from .providerLoop import (
@@ -14,6 +16,25 @@ from .providerLoop import (
 )
 from .teacherOrchestrator import TeacherOrchestrator
 from .traceModel import TeacherTrace
+
+logger = logging.getLogger(__name__)
+
+PROVIDER_STREAM_ERRORS = (
+    AttributeError,
+    ConnectionError,
+    FileNotFoundError,
+    ImportError,
+    OSError,
+    PermissionError,
+    RuntimeError,
+    TypeError,
+    ValueError,
+)
+
+
+@dataclass(frozen=True)
+class ProviderStreamError:
+    message: str
 
 
 async def runTeacherChatStream(
@@ -119,12 +140,15 @@ async def streamTeacherTokens(
     toolCalls: list[dict[str, Any]] | None = None,
 ) -> AsyncIterator[dict[str, Any]]:
     loop = asyncio.get_running_loop()
-    queue: asyncio.Queue[str | None] = asyncio.Queue()
+    queue: asyncio.Queue[str | ProviderStreamError | None] = asyncio.Queue()
 
     def runStream() -> None:
         try:
             for token in provider.stream(messages):
                 loop.call_soon_threadsafe(queue.put_nowait, token)
+        except PROVIDER_STREAM_ERRORS as exc:
+            logger.info("provider stream failed: %s", exc)
+            loop.call_soon_threadsafe(queue.put_nowait, ProviderStreamError(str(exc)))
         finally:
             loop.call_soon_threadsafe(queue.put_nowait, None)
 
@@ -132,12 +156,23 @@ async def streamTeacherTokens(
     thread.start()
 
     accumulated = ""
+    streamError: ProviderStreamError | None = None
     while True:
-        token = await queue.get()
-        if token is None:
+        item = await queue.get()
+        if item is None:
             break
+        if isinstance(item, ProviderStreamError):
+            streamError = item
+            break
+        token = item
         accumulated += token
         yield {"type": "delta", "delta": token, "content": accumulated}
+
+    if streamError is not None:
+        trace.record("turn-error", {"message": streamError.message})
+        yield {"type": "error", "error": streamError.message, "trace": trace.summary()}
+        thread.join(timeout=2)
+        return
 
     donePayload = finishTeacherTurnPayload(
         convManager=convManager,

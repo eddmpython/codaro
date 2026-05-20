@@ -53,8 +53,10 @@ class TeacherTrace:
     def summary(self, *, includeEvents: bool = False) -> dict[str, Any]:
         toolResults = [event for event in self.events if event.eventType == "tool-result"]
         errors = [
-            event for event in toolResults
-            if str(event.payload.get("status", "")).lower() == "error"
+            event
+            for event in self.events
+            if event.eventType == "turn-error"
+            or (event.eventType == "tool-result" and str(event.payload.get("status", "")).lower() == "error")
         ]
         policyViolations = [
             event for event in self.events

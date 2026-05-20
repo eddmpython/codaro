@@ -94,6 +94,7 @@ export type StreamEvent = {
   toolCall?: AiChatResponse["toolCalls"][number];
   toolCalls?: AiChatResponse["toolCalls"];
   trace?: AiChatResponse["trace"];
+  error?: string;
 };
 
 async function postStreamChat(
@@ -131,6 +132,29 @@ async function postStreamChat(
   let buffer = "";
   let donePayload: AiChatResponse | null = null;
   let streamConversationId = body.conversationId ?? "";
+  let streamError: string | null = null;
+
+  const handleEvent = (event: StreamEvent) => {
+    if (event.conversationId) {
+      streamConversationId = event.conversationId;
+    }
+    onEvent(event);
+    if (event.type === "error") {
+      streamError = event.error ?? "provider stream failed";
+      return;
+    }
+    if (event.type === "done") {
+      donePayload = {
+        conversationId: event.conversationId ?? streamConversationId,
+        answer: event.answer ?? event.content ?? "",
+        provider: event.provider ?? "",
+        model: event.model,
+        usage: event.usage,
+        toolCalls: event.toolCalls ?? [],
+        trace: event.trace,
+      };
+    }
+  };
 
   while (true) {
     const { done, value } = await reader.read();
@@ -141,41 +165,17 @@ async function postStreamChat(
     for (const rawEvent of events) {
       const event = parseStreamEvent(rawEvent);
       if (!event) continue;
-      if (event.conversationId) {
-        streamConversationId = event.conversationId;
-      }
-      onEvent(event);
-      if (event.type === "done") {
-        donePayload = {
-          conversationId: event.conversationId ?? streamConversationId,
-          answer: event.answer ?? event.content ?? "",
-          provider: event.provider ?? "",
-          model: event.model,
-          usage: event.usage,
-          toolCalls: event.toolCalls ?? [],
-          trace: event.trace,
-        };
-      }
+      handleEvent(event);
     }
   }
 
   const tail = parseStreamEvent(buffer);
   if (tail) {
-    if (tail.conversationId) {
-      streamConversationId = tail.conversationId;
-    }
-    onEvent(tail);
-    if (tail.type === "done") {
-      donePayload = {
-        conversationId: tail.conversationId ?? streamConversationId,
-        answer: tail.answer ?? tail.content ?? "",
-        provider: tail.provider ?? "",
-        model: tail.model,
-        usage: tail.usage,
-        toolCalls: tail.toolCalls ?? [],
-        trace: tail.trace,
-      };
-    }
+    handleEvent(tail);
+  }
+
+  if (streamError) {
+    throw new Error(streamError);
   }
 
   if (!donePayload) {

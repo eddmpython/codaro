@@ -4,6 +4,7 @@ import {
   createComposeStep,
   finishAssistantWorkLoop,
   markAssistantStepsError,
+  normalizeAssistantTrace,
   withToolStartStep,
   withToolWorkStep,
 } from "@/lib/workLoop";
@@ -64,6 +65,20 @@ export function applyAssistantStreamEvent({
       messages: updateAssistantMessage(messages, assistantMessageId, (item) => ({
         ...item,
         steps: withToolWorkStep(item.steps, event.toolCalls ?? []),
+      })),
+    };
+  }
+
+  if (event.type === "error") {
+    return {
+      streamedContent,
+      messages: updateAssistantMessage(messages, assistantMessageId, (item) => ({
+        ...item,
+        tone: "error",
+        content: event.error ?? "요청 처리 중 오류가 발생했습니다.",
+        steps: markAssistantStepsError(item.steps),
+        trace: normalizeAssistantTrace(event.trace),
+        loading: false,
       })),
     };
   }

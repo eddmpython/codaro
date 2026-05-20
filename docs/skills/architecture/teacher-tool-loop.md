@@ -58,6 +58,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - 모든 turn은 `traceId`를 가진다.
    - tool payload에는 `category`, `lane`, `target`, `risk`, `traceEventIndex`, `turnElapsedMs`를 붙인다.
    - response의 `trace.toolSequence`와 `trace.policyViolationCount`는 평가 harness의 입력으로 쓴다.
+   - streaming 중 provider 오류는 `error` event와 trace `turn-error`로 남긴다.
    - golden case는 명시적으로 허용한 경우가 아니면 policy violation이 1건이라도 있으면 실패다.
    - 새 provider 동작을 추가하면 golden case가 그 순서를 검증해야 한다.
 
