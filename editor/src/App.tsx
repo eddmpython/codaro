@@ -27,11 +27,6 @@ import {
   completeLocalAssistantDraft,
 } from "@/lib/localFallback";
 import {
-  resolveBlockRunCode,
-  runNotebookBlock,
-  runReactiveNotebook,
-} from "@/lib/notebookRuntime";
-import {
   buildAcceptPendingChangesApplication,
   buildRejectPendingChangesApplication,
   type PendingChangesApplication,
@@ -39,13 +34,11 @@ import {
 import type { AutomationSection } from "@/lib/surfaceModel";
 import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
 import {
-  blockLabel,
   buildCellAiPrompt,
   type CellAiAction,
 } from "@/lib/cellModel";
 import {
   buildAssistantContext,
-  type ResultMap,
 } from "@/lib/assistantContext";
 import {
   createAssistantPlaceholder,
@@ -65,6 +58,7 @@ import { useAutomationState } from "@/hooks/useAutomationState";
 import { useCustomCurriculaState } from "@/hooks/useCustomCurriculaState";
 import { useCurriculumLibraryState } from "@/hooks/useCurriculumLibraryState";
 import { useNotebookDocumentState } from "@/hooks/useNotebookDocumentState";
+import { useNotebookRuntimeState } from "@/hooks/useNotebookRuntimeState";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import { useThemeMode } from "@/hooks/useThemeMode";
@@ -77,7 +71,6 @@ import type {
   BlockConfig,
   CodaroDocument,
   LoadState,
-  VariableInfo,
 } from "@/types";
 
 function App() {
@@ -126,11 +119,6 @@ function App() {
     initialSelectedCustomCurriculumId: initialBootstrapState.selectedCustomCurriculumId,
     onNotice: setNotice,
   });
-  const [sessionId, setSessionId] = useState<string | null>(null);
-  const [variables, setVariables] = useState<VariableInfo[]>([]);
-  const [results, setResults] = useState<ResultMap>({});
-  const [runningBlockId, setRunningBlockId] = useState<string | null>(null);
-  const [notebookRunning, setNotebookRunning] = useState(false);
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
   const [query, setQuery] = useState("");
   const { themeMode, toggleThemeMode } = useThemeMode();
@@ -165,26 +153,6 @@ function App() {
     startOauthProviderLogin,
   } = useProviderConnection({ apiOnline, onNotice: setNotice });
 
-  const applyDocument = useCallback((nextDocument: CodaroDocument) => {
-    applyNotebookDocument(nextDocument);
-    setResults({});
-    setVariables([]);
-    setPendingBlocks([]);
-    setPendingTarget("notebook");
-  }, [applyNotebookDocument]);
-
-  useAppBootstrapEffect({
-    applyBootstrapCurriculumState,
-    applyDocument,
-    onApiOnline: setApiOnline,
-    onLoadState: setLoadState,
-    onNotice: setNotice,
-    onProfile: setAiProfile,
-    onSessionId: setSessionId,
-    onToolCatalog: setToolCatalog,
-    refreshAutomation,
-  });
-
   const filteredCategories = useMemo(() => {
     const trimmed = query.trim().toLowerCase();
     if (!trimmed) return categories;
@@ -204,67 +172,49 @@ function App() {
 
   const activeDocument = surface === "curriculum" && curriculumDocument ? curriculumDocument : document;
   const activeSelectedBlockId = surface === "curriculum" ? selectedCurriculumBlockId : selectedBlockId;
-  const codeBlocks = useMemo(() => document.blocks.filter((block) => block.type === "code"), [document.blocks]);
-  const hasRunnableNotebook = codeBlocks.some((block) => (drafts[block.id] ?? block.content).trim());
   const selectedBlock = activeDocument.blocks.find((block) => block.id === activeSelectedBlockId) ?? activeDocument.blocks.find((block) => block.type === "code") ?? activeDocument.blocks[0];
-  const currentResult = selectedBlock ? results[selectedBlock.id] : undefined;
-  const canRun = apiOnline ? Boolean(sessionId) : true;
+  const {
+    canRun,
+    currentResult,
+    hasRunnableNotebook,
+    notebookRunning,
+    resetRuntimeState,
+    results,
+    runBlock,
+    runNotebook,
+    runningBlockId,
+    sessionId,
+    setSessionId,
+    variables,
+  } = useNotebookRuntimeState({
+    apiOnline,
+    document,
+    drafts,
+    onNotice: setNotice,
+    selectCurriculumBlock: setSelectedCurriculumBlockId,
+    selectNotebookBlock: selectBlock,
+    selectedBlock,
+    surface,
+  });
 
-  async function runBlock(block: BlockConfig) {
-    if (block.type !== "code") return;
-    const code = resolveBlockRunCode(block, drafts, { emptySnippetFallback: surface === "curriculum" });
-    if (surface === "curriculum") {
-      setSelectedCurriculumBlockId(block.id);
-    } else {
-      selectBlock(block.id);
-    }
-    setRunningBlockId(block.id);
-    setNotice({ tone: "default", title: "셀 실행 중", detail: blockLabel(block) });
+  const applyDocument = useCallback((nextDocument: CodaroDocument) => {
+    applyNotebookDocument(nextDocument);
+    resetRuntimeState();
+    setPendingBlocks([]);
+    setPendingTarget("notebook");
+  }, [applyNotebookDocument, resetRuntimeState]);
 
-    try {
-      const outcome = await runNotebookBlock({
-        apiOnline,
-        block,
-        code,
-        localExecutionCount: Object.keys(results).length + 1,
-        sessionId,
-      });
-      if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
-      if (outcome.result) {
-        const result = outcome.result;
-        setResults((current) => ({ ...current, [block.id]: result }));
-      }
-      if (outcome.variables) setVariables(outcome.variables);
-      if (outcome.notice) setNotice(outcome.notice);
-    } finally {
-      setRunningBlockId(null);
-    }
-  }
-
-  async function runNotebook() {
-    const firstBlock = selectedBlock?.type === "code" ? selectedBlock : codeBlocks[0];
-    if (!firstBlock) return;
-    setNotice({ tone: "default", title: "노트북 실행 중", detail: document.title });
-    setNotebookRunning(true);
-
-    try {
-      const outcome = await runReactiveNotebook({
-        apiOnline,
-        codeBlocks,
-        document,
-        drafts,
-        firstBlock,
-        previousVariables: variables,
-        sessionId,
-      });
-      if (outcome.sessionId && outcome.sessionId !== sessionId) setSessionId(outcome.sessionId);
-      if (outcome.results) setResults((current) => ({ ...current, ...outcome.results }));
-      if (outcome.variables) setVariables(outcome.variables);
-      if (outcome.notice) setNotice(outcome.notice);
-    } finally {
-      setNotebookRunning(false);
-    }
-  }
+  useAppBootstrapEffect({
+    applyBootstrapCurriculumState,
+    applyDocument,
+    onApiOnline: setApiOnline,
+    onLoadState: setLoadState,
+    onNotice: setNotice,
+    onProfile: setAiProfile,
+    onSessionId: setSessionId,
+    onToolCatalog: setToolCatalog,
+    refreshAutomation,
+  });
 
   async function askAssistant(messageOverride?: string, scopeOverride?: TeacherScope) {
     const message = (messageOverride ?? prompt).trim();
