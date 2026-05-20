@@ -174,6 +174,8 @@ OBJECTIVE_REQUIREMENTS = (
             ("editor/src/lib/workLoop.ts", (
                 "traceWorkloopDetail",
                 "toolResultDetail",
+                "sectionCount",
+                "exerciseCellCount",
                 "shouldPromoteTraceWorkloopEvent",
                 "clarification-gate",
                 "turn-error",
@@ -183,6 +185,8 @@ OBJECTIVE_REQUIREMENTS = (
             ("tests/verifyAssistantWorkloopContract.py", (
                 "작업 전 확인 질문",
                 "작업 기준",
+                "섹션 카드 2개",
+                "실습 셀 2개",
                 "provider 응답 처리 중단",
                 "packages-check",
                 "packages-install",
@@ -203,11 +207,15 @@ OBJECTIVE_REQUIREMENTS = (
                 "scoreTeacherEvalReports",
                 "expectedDiagramRuntimeDetails",
                 "_missingDiagramRuntimeDetails",
+                "(\"write-curriculum-yaml\", \"sectionCount\")",
+                "(\"write-curriculum-yaml\", \"exerciseCellCount\")",
             )),
             ("tests/verifyTeacherGoldenE2e.py", (
                 "teacher golden e2e score",
                 "\"score\": score",
                 "\"minimumScore\": MINIMUM_TEACHER_EVAL_SCORE",
+                "write-curriculum-yaml.sectionCount",
+                "write-curriculum-yaml.exerciseCellCount",
                 "uv 사전 확인",
                 "검증 결과",
             )),

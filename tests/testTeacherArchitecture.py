@@ -549,6 +549,31 @@ def testTracePayloadsHaveStableTraceId() -> None:
     assert trace.summary()["workloop"][0]["lane"] == "read"
 
 
+def testToolResultWorkDetailSummarizesCurriculumMaterialization() -> None:
+    orchestrator = TeacherOrchestrator.fromContext({})
+    trace = orchestrator.startTrace("conv-curriculum-detail")
+    document = _structuredCurriculumDocumentPayload()
+
+    done = orchestrator.toolCallResult(
+        trace,
+        "call-yaml",
+        "write-curriculum-yaml",
+        {},
+        {
+            "title": "pandas 기초",
+            "document": document,
+            "loadedInEditor": True,
+        },
+    )
+
+    assert "pandas 기초" in done["workDetail"]
+    assert "섹션 카드 1개" in done["workDetail"]
+    assert "실습 셀 1개" in done["workDetail"]
+    assert "실행 패키지 1개" in done["workDetail"]
+    assert "에디터 반영" in done["workDetail"]
+    assert trace.summary()["workloop"][0]["workDetail"] == done["workDetail"]
+
+
 def testEvalHarnessCanReadTraceSequence() -> None:
     orchestrator = TeacherOrchestrator.fromContext({})
     trace = orchestrator.startTrace("conv-2")
@@ -610,7 +635,12 @@ def testEvalHarnessCanValidateStructuredCurriculumTrace() -> None:
         "call-1",
         "write-curriculum-yaml",
         {},
-        {"document": _structuredCurriculumDocumentPayload(), "loadedInEditor": True},
+        {
+            "document": _structuredCurriculumDocumentPayload(),
+            "sectionCount": 1,
+            "exerciseCellCount": 1,
+            "loadedInEditor": True,
+        },
     )
 
     case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
@@ -618,6 +648,7 @@ def testEvalHarnessCanValidateStructuredCurriculumTrace() -> None:
 
     assert report.passed
     assert trace.summary()["yamlContractObserved"]
+    assert any("섹션 카드" in detail for detail in report.observedWorkDetails)
 
 
 def testEvalHarnessValidatesClarificationGateTrace() -> None:
@@ -941,6 +972,8 @@ def testGoldenProviderCaseValidatesStructuredYamlMaterialization() -> None:
     executor = _ScriptedExecutor({
         "write-curriculum-yaml": {
             "document": _structuredCurriculumDocumentPayload(),
+            "sectionCount": 1,
+            "exerciseCellCount": 1,
             "loadedInEditor": True,
         },
     })

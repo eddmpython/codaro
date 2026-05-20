@@ -202,9 +202,17 @@ class WorkbenchToolHandlers:
             self._saveDocument(document)
             loadedInEditor = self._documentSetter is not None
 
+        sectionCount = sum(1 for block in document.blocks if block.sourceType == "section")
+        exerciseCellCount = sum(1 for block in document.blocks if block.sourceType == "sectionContract:exercise")
+        snippetCellCount = sum(1 for block in document.blocks if block.sourceType == "sectionContract:snippet")
+
         return {
             "documentId": document.id,
             "title": document.title,
+            "sectionCount": sectionCount,
+            "exerciseCellCount": exerciseCellCount,
+            "snippetCellCount": snippetCellCount,
+            "runtimePackageCount": len(document.runtime.packages),
             "blockCount": len(document.blocks),
             "solutionCount": len(solutions),
             "loadedInEditor": loadedInEditor,

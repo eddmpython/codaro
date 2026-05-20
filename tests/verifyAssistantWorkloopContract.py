@@ -53,6 +53,8 @@ def sourceContractFailures() -> list[str]:
             "cell-call",
             "durationMs",
             "skipped",
+            "sectionCount",
+            "exerciseCellCount",
         ),
         ASSISTANT_PANEL: (
             "AssistantTraceDetails",
@@ -205,6 +207,7 @@ const toolRun = finish({{
     toolCallId: "call-install",
     name: "packages-install",
     arguments: {{ name: "pandas" }},
+    workDetail: "pandas를 uv로 설치",
     result: {{ success: true, package: "pandas", installer: "uv", environment: "project .venv", durationMs: 42 }},
     status: "done",
     category: "files",
@@ -230,6 +233,35 @@ assert.match(packageInstall.detail, /project \\.venv/);
 assert.match(packageInstall.detail, /42ms/);
 assert.match(cellCall.detail, /cell-1 검증 통과/);
 assert.deepEqual((toolRun.trace || {{}}).toolSequence, ["packages-check", "packages-install", "cell-call"]);
+
+const curriculumRun = finish({{
+  traceId: "trace-curriculum",
+  toolSequence: ["write-curriculum-yaml"],
+}}, [
+  {{
+    toolCallId: "call-yaml",
+    name: "write-curriculum-yaml",
+    arguments: {{ yamlContent: "meta:\\n  title: pandas 기초" }},
+    workDetail: "구조화된 YAML을 섹션 카드와 실행 셀로 변환",
+    result: {{
+      title: "pandas 기초",
+      sectionCount: 2,
+      exerciseCellCount: 2,
+      runtimePackageCount: 1,
+      loadedInEditor: true,
+    }},
+    status: "done",
+    category: "learning",
+    lane: "curriculum",
+  }},
+]);
+const curriculumStep = findStep(curriculumRun, "커리큘럼 YAML 전개");
+assert.match(curriculumStep.detail, /pandas 기초/);
+assert.match(curriculumStep.detail, /섹션 카드 2개/);
+assert.match(curriculumStep.detail, /실습 셀 2개/);
+assert.match(curriculumStep.detail, /실행 패키지 1개/);
+assert.match(curriculumStep.detail, /에디터 반영/);
+assert.doesNotMatch(curriculumStep.detail, /구조화된 YAML을 섹션 카드와 실행 셀로 변환/);
 
 const skippedInstall = finish({{
   traceId: "trace-skip-install",
@@ -281,7 +313,7 @@ assert.equal(normalized.events.length, 1);
 process.stdout.write(JSON.stringify({{
   clarification: clarificationStep.detail,
   providerError: providerErrorStep.detail,
-  tools: [packageCheck.label, packageInstall.label, cellCall.label],
+  tools: [packageCheck.label, packageInstall.label, cellCall.label, curriculumStep.label],
   policy: policyStep.detail,
 }}, null, 2));
 """

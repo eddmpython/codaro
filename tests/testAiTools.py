@@ -460,6 +460,54 @@ sections:
         assert "document" in result
         assert captured["doc"].title == "AI Pandas Starter"
 
+    def test_write_structured_curriculum_yaml_reports_materialization_counts(self):
+        captured = {}
+        executor = ToolExecutor(
+            sessionManager=_MockSessionManager(),
+            documentGetter=lambda: _makeDoc(),
+            documentSetter=lambda d: captured.update(doc=d),
+        )
+
+        yamlContent = """
+meta:
+  title: Structured Pandas
+  packages:
+    - pandas
+intro:
+  direction: 표 데이터를 직접 만듭니다.
+sections:
+  - title: DataFrame 만들기
+    goal: dict에서 표를 만듭니다.
+    why: 반복 리포트의 출발점입니다.
+    explanation: key가 열 이름입니다.
+    snippet: |
+      import pandas as pd
+      frame = pd.DataFrame({"sales": [10]})
+    exercise:
+      prompt: sales 열을 직접 만드세요.
+      starterCode: |
+        import pandas as pd
+        frame = ___
+      solution: |
+        import pandas as pd
+        frame = pd.DataFrame({"sales": [10, 20]})
+      hints:
+        - dict를 사용합니다.
+      check:
+        variable: frame
+    check:
+      noError: 에러 없이 실행되어야 합니다.
+"""
+
+        result = asyncio.run(executor.execute("write-curriculum-yaml", {"yamlContent": yamlContent}))
+
+        assert result["sectionCount"] == 1
+        assert result["exerciseCellCount"] == 1
+        assert result["snippetCellCount"] == 1
+        assert result["runtimePackageCount"] == 1
+        assert result["loadedInEditor"] is True
+        assert captured["doc"].runtime.packages == ["pandas"]
+
 
 class TestGenerateNotebook:
 

@@ -340,7 +340,7 @@ function assistantWorkStepFromToolCall(toolCall: AiToolCall, status: AssistantWo
     id: toolStepId(toolCall),
     label: stringField(toolCall.workLabel) || workLabelFromToolCall(toolCall, name),
     status,
-    detail: stringField(toolCall.workDetail) || toolCallDetail(toolCall, name),
+    detail: toolCallDetail(toolCall, name) || stringField(toolCall.workDetail),
     toolName: name,
     arguments: toolCallArguments(toolCall),
     result: toolCall.result,
@@ -463,6 +463,22 @@ function toolResultDetail(result: unknown, name: string, args: Record<string, un
       const status = textArg(payload, "status");
       return status && blockId ? `${blockId} 실행 결과 · ${status}` : "";
     }
+    case "write-curriculum-yaml": {
+      const title = textArg(payload, "title");
+      const sectionCount = numberArg(payload, "sectionCount");
+      const exerciseCellCount = numberArg(payload, "exerciseCellCount");
+      const blockCount = numberArg(payload, "blockCount");
+      const runtimePackageCount = numberArg(payload, "runtimePackageCount");
+      const parts = [
+        title,
+        sectionCount !== undefined ? `섹션 카드 ${sectionCount}개` : "",
+        exerciseCellCount !== undefined ? `실습 셀 ${exerciseCellCount}개` : "",
+        exerciseCellCount === undefined && blockCount !== undefined ? `학습 셀 ${blockCount}개` : "",
+        runtimePackageCount !== undefined ? `실행 패키지 ${runtimePackageCount}개` : "",
+        payload.loadedInEditor === true ? "에디터 반영" : "",
+      ].filter(Boolean);
+      return parts.join(" · ");
+    }
     default:
       return "";
   }
@@ -503,6 +519,11 @@ function textArg(args: Record<string, unknown>, key: string) {
 function listArg(args: Record<string, unknown>, key: string) {
   const value = args[key];
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
+function numberArg(args: Record<string, unknown>, key: string) {
+  const value = args[key];
+  return typeof value === "number" && Number.isFinite(value) ? value : undefined;
 }
 
 function firstLine(value: string) {

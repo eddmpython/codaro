@@ -63,6 +63,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - `tool_results`가 오면 각 tool row를 done/error로 갱신한다.
    - 단계는 `lane`/`category` 기준으로 묶어 보여주고, 오류가 있는 그룹은 바로 식별 가능해야 한다.
    - 노트북/커리큘럼 작성 중에는 "YAML을 섹션 카드와 실행 셀로 변환", "{blockId} 셀 내용 반영", "{package}를 uv로 설치"처럼 현재 상태를 문장으로 보여준다.
+   - tool result가 도착하면 시작 문장을 그대로 두지 않고 결과 문장으로 갱신한다. 예: `pandas 기초 · 섹션 카드 2개 · 실습 셀 2개 · 실행 패키지 1개 · 에디터 반영`, `pandas 설치 완료 · uv · project .venv · 42ms`.
    - `clarification-gate`, `tool-policy-violation`, `turn-error`도 사용자용 `trace.workloop` row로 변환한다. 사용자는 작업 전 질문, 정책 차단, provider 오류를 raw JSON 없이 먼저 이해할 수 있어야 한다.
    - clarification workloop detail은 질문 수만 쓰지 않고 실제 작업 기준 요약을 포함한다. 예: `핵심 질문 3개 · 작업 기준: 초급-중급 사이 / 실습 중심 / 현재 Codaro 로컬 Python과 uv 패키지 설치`.
    - 프론트 `workLoop` state는 도구 row와 중복되지 않는 `clarification-gate`/`turn-error`를 메인 작업 단계로 승격한다. raw trace 안쪽에만 묻히면 실패다.
@@ -72,7 +73,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
 7. **Trace와 평가**
    - 모든 turn은 `traceId`를 가진다.
    - tool payload에는 `category`, `lane`, `target`, `risk`, `traceEventIndex`, `turnElapsedMs`, `workLabel`, `workDetail`을 붙인다.
-   - `tool-result` trace event에는 평가 가능한 result signal을 보존한다. 예: `write-curriculum-yaml.document`, `packages-check.missing`, `packages-install.success`, `cell-call.passed`.
+   - `tool-result` trace event에는 평가 가능한 result signal을 보존한다. 예: `write-curriculum-yaml.document`, `write-curriculum-yaml.sectionCount`, `packages-check.missing`, `packages-install.success`, `cell-call.passed`.
    - `packages-install` result signal은 `success`뿐 아니라 `installer: uv`, `environment: project .venv`, `durationMs`, `skipped`를 보존한다. 이미 설치된 plain package는 `skipped: true`로 남긴다. 프론트 workloop detail은 이 result signal을 사용해 `설치 완료 · uv · project .venv · 42ms` 또는 `이미 준비됨 · project .venv`처럼 결과까지 읽히게 한다.
    - response의 `trace.toolSequence`와 `trace.policyViolationCount`는 평가 harness의 입력으로 쓴다.
    - response의 `trace.workloop`은 사용자가 읽을 수 있는 단계 품질 평가에 쓴다. golden case는 `workLabel`뿐 아니라 핵심 `workDetail` 문장도 검증한다. 정책 위반, 작업 전 확인 질문, provider 오류는 반드시 사람이 읽을 수 있는 `workLabel`/`workDetail`/`error`를 가진다.

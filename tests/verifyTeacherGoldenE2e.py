@@ -463,6 +463,11 @@ async def runCurriculumMaterializationCase() -> dict[str, Any]:
     sourceTypes = {block.sourceType for block in activeDocument.blocks}
     if "sectionContract:exercise" not in sourceTypes:
         extraFailures.append("materialized document is missing sectionContract:exercise")
+    signals = set(report.evaluation.observedResultSignals)
+    if "write-curriculum-yaml.sectionCount" not in signals:
+        extraFailures.append("curriculum materialization result is missing sectionCount")
+    if "write-curriculum-yaml.exerciseCellCount" not in signals:
+        extraFailures.append("curriculum materialization result is missing exerciseCellCount")
     return reportPayload(report, extraFailures)
 
 
