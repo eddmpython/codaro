@@ -28,6 +28,7 @@ def testGateNamesAreStable() -> None:
         "teacher-eval",
         "teacher-e2e",
         "assistant-workloop-contract",
+        "ai-live-smoke",
         "editor-runtime-preflight",
         "learning-system-readiness",
         "learning-goal-audit",

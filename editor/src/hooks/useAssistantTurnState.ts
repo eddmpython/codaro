@@ -225,8 +225,7 @@ export function useAssistantTurnState({
       }
       onNotice(application.notice);
     } catch (error) {
-      const detail = error instanceof Error ? error.message : String(error);
-      const failure = providerAssistantFailure(detail);
+      const failure = providerAssistantFailure(error);
       setMessages((current) => failAssistantMessage({
         action: failure.action,
         assistantMessageId,

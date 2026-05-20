@@ -1,4 +1,4 @@
-import type { AiChatRequest, AiChatResponse } from "@/types";
+import type { AiChatRequest, AiChatResponse, ProviderDiagnostic } from "@/types";
 
 export type StreamEvent = {
   type?: string;
@@ -13,12 +13,14 @@ export type StreamEvent = {
   toolCalls?: AiChatResponse["toolCalls"];
   trace?: AiChatResponse["trace"];
   error?: string;
+  diagnostic?: ProviderDiagnostic;
 };
 
 export type AssistantStreamState = {
   conversationId: string;
   donePayload: AiChatResponse | null;
   error: string | null;
+  diagnostic?: ProviderDiagnostic;
 };
 
 export function initialAssistantStreamState(request: AiChatRequest): AssistantStreamState {
@@ -39,6 +41,7 @@ export function applyAssistantStreamProtocolEvent(
       ...state,
       conversationId,
       error: event.error ?? "provider stream failed",
+      diagnostic: event.diagnostic,
     };
   }
   if (event.type === "done") {

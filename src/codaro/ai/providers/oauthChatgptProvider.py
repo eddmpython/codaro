@@ -9,6 +9,7 @@ import requests
 from codaro.ai.baseProvider import BaseProvider
 from codaro.ai import oauthToken
 from codaro.ai.oauthToken import TokenRefreshError
+from codaro.ai.providerErrors import ProviderRuntimeError
 from codaro.ai.types import LLMResponse, ToolCall, ToolResponse
 
 log = logging.getLogger(__name__)
@@ -33,12 +34,12 @@ AVAILABLE_MODELS = [
 ]
 
 
-class ChatGPTOAuthError(Exception):
+class ChatGPTOAuthError(ProviderRuntimeError):
     def __init__(self, action: str, message: str, *, detail: str = ""):
         self.action = action
         self.message = message
         self.detail = detail
-        super().__init__(message)
+        super().__init__(message, action=action, provider="oauth-chatgpt", detail=detail)
 
 
 def _raiseHttpError(status: int, body: str) -> None:
@@ -80,10 +81,7 @@ class OAuthChatGPTProvider(BaseProvider):
         return "gpt-5.4"
 
     def checkAvailable(self) -> bool:
-        try:
-            return oauthToken.isAuthenticated()
-        except TokenRefreshError:
-            return False
+        return bool(self._getTokenOrRaise())
 
     @property
     def supportsNativeTools(self) -> bool:

@@ -17,6 +17,8 @@ import type {
   OauthStatusPayload,
   PackageInfo,
   PackageInstallResult,
+  ProviderDiagnostic,
+  ProviderValidationPayload,
   ProgressSummary,
   SchedulerStatus,
   TaskListPayload,
@@ -31,6 +33,18 @@ import {
 } from "@/lib/assistantStream";
 
 const configuredApiBase = import.meta.env.VITE_CODARO_API_BASE?.replace(/\/$/, "") ?? "";
+
+export class CodaroApiError extends Error {
+  readonly status: number;
+  readonly diagnostic?: ProviderDiagnostic;
+
+  constructor(status: number, message: string, diagnostic?: ProviderDiagnostic) {
+    super(message);
+    this.name = "CodaroApiError";
+    this.status = status;
+    this.diagnostic = diagnostic;
+  }
+}
 
 export function shouldUseApi() {
   if (configuredApiBase) return true;
@@ -49,20 +63,16 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
 
   if (!response.ok) {
     let detail = response.statusText;
+    let diagnostic: ProviderDiagnostic | undefined;
     try {
-      const payload = (await response.json()) as {
-        detail?: string;
-        message?: string;
-        error?: {
-          code?: string;
-          message?: string;
-        };
-      };
-      detail = payload.detail ?? payload.message ?? payload.error?.message ?? detail;
+      const payload = (await response.json()) as ApiErrorPayload;
+      const parsed = parseApiErrorPayload(payload, detail);
+      detail = parsed.message;
+      diagnostic = parsed.diagnostic;
     } catch {
       detail = response.statusText;
     }
-    throw new Error(`${response.status} ${detail}`);
+    throw new CodaroApiError(response.status, `${response.status} ${detail}`, diagnostic);
   }
 
   if (response.status === 204) {
@@ -103,17 +113,16 @@ async function postStreamChat(
 
   if (!response.ok) {
     let detail = response.statusText;
+    let diagnostic: ProviderDiagnostic | undefined;
     try {
-      const payload = (await response.json()) as {
-        detail?: string;
-        message?: string;
-        error?: { message?: string };
-      };
-      detail = payload.detail ?? payload.message ?? payload.error?.message ?? detail;
+      const payload = (await response.json()) as ApiErrorPayload;
+      const parsed = parseApiErrorPayload(payload, detail);
+      detail = parsed.message;
+      diagnostic = parsed.diagnostic;
     } catch {
       detail = response.statusText;
     }
-    throw new Error(`${response.status} ${detail}`);
+    throw new CodaroApiError(response.status, `${response.status} ${detail}`, diagnostic);
   }
 
   if (!response.body) {
@@ -149,7 +158,7 @@ async function postStreamChat(
   }
 
   if (streamState.error) {
-    throw new Error(streamState.error);
+    throw new CodaroApiError(503, streamState.error, streamState.diagnostic);
   }
 
   if (!streamState.donePayload) {
@@ -228,6 +237,11 @@ export const codaroApi = {
   aiProviders: () => requestJson<AiProviderCatalogPayload>("/api/ai/providers"),
   aiTools: () => requestJson<AiToolCatalogPayload>("/api/ai/tools"),
   aiProfile: () => requestJson<AiProfile>("/api/ai/profile"),
+  validateAiProvider: (provider: string, model?: string | null) => {
+    const params = new URLSearchParams({ provider });
+    if (model) params.set("model", model);
+    return postJson<ProviderValidationPayload>(`/api/ai/provider/validate?${params.toString()}`, {});
+  },
   updateAiProfile: (payload: {
     provider?: string | null;
     model?: string | null;
@@ -250,6 +264,38 @@ export const codaroApi = {
   putJson,
   requestJson,
 };
+
+type ApiErrorPayload = {
+  detail?: string | ProviderDiagnostic;
+  message?: string;
+  error?: ProviderDiagnostic;
+};
+
+function parseApiErrorPayload(payload: ApiErrorPayload, fallback: string): {
+  message: string;
+  diagnostic?: ProviderDiagnostic;
+} {
+  const detail = payload.detail;
+  if (isProviderDiagnostic(detail)) {
+    return {
+      message: detail.message ?? fallback,
+      diagnostic: detail,
+    };
+  }
+  if (payload.error) {
+    return {
+      message: payload.error.message ?? payload.message ?? fallback,
+      diagnostic: payload.error,
+    };
+  }
+  return {
+    message: typeof detail === "string" ? detail : payload.message ?? fallback,
+  };
+}
+
+function isProviderDiagnostic(value: unknown): value is ProviderDiagnostic {
+  return Boolean(value) && typeof value === "object" && !Array.isArray(value);
+}
 
 export async function optional<T>(load: () => Promise<T>, fallback: T): Promise<{ data: T; online: boolean; error?: string }> {
   try {

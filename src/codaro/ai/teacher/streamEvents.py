@@ -28,8 +28,16 @@ def teacherStreamDoneEvent(payload: dict[str, Any]) -> dict[str, Any]:
     return {"type": "done", **payload}
 
 
-def teacherStreamErrorEvent(*, error: str, trace: dict[str, Any]) -> dict[str, Any]:
-    return {"type": "error", "error": error, "trace": trace}
+def teacherStreamErrorEvent(
+    *,
+    error: str,
+    trace: dict[str, Any],
+    diagnostic: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    event: dict[str, Any] = {"type": "error", "error": error, "trace": trace}
+    if diagnostic:
+        event["diagnostic"] = diagnostic
+    return event
 
 
 def teacherStreamSseFrame(event: dict[str, Any]) -> str:

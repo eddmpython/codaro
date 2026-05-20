@@ -10,6 +10,7 @@ from typing import Any
 from urllib.parse import urlencode
 
 from .providerSpec import oauthSecretName
+from .providerErrors import safeProviderDetail
 from .secrets import getSecretStore
 
 CHATGPT_AUTH_URL = "https://auth.openai.com/oauth/authorize"
@@ -49,22 +50,38 @@ def buildAuthUrl() -> tuple[str, str, str]:
     return url, verifier, state
 
 
+class TokenExchangeError(Exception):
+    def __init__(self, reason: str, detail: str = ""):
+        self.reason = reason
+        self.detail = detail
+        super().__init__(f"Token exchange failed ({reason}): {detail}")
+
+
 def exchangeCode(code: str, verifier: str) -> dict[str, Any]:
     import requests
 
-    resp = requests.post(
-        CHATGPT_TOKEN_URL,
-        data={
-            "grant_type": "authorization_code",
-            "client_id": CHATGPT_CLIENT_ID,
-            "code": code,
-            "redirect_uri": OAUTH_REDIRECT_URI,
-            "code_verifier": verifier,
-        },
-        headers={"Content-Type": "application/x-www-form-urlencoded"},
-        timeout=15,
-    )
-    resp.raise_for_status()
+    try:
+        resp = requests.post(
+            CHATGPT_TOKEN_URL,
+            data={
+                "grant_type": "authorization_code",
+                "client_id": CHATGPT_CLIENT_ID,
+                "code": code,
+                "redirect_uri": OAUTH_REDIRECT_URI,
+                "code_verifier": verifier,
+            },
+            headers={"Content-Type": "application/x-www-form-urlencoded"},
+            timeout=15,
+        )
+    except requests.ConnectionError as exc:
+        raise TokenExchangeError("network", "Cannot connect to OpenAI auth server.") from exc
+    except requests.Timeout as exc:
+        raise TokenExchangeError("network", "OpenAI auth server response timeout.") from exc
+
+    if resp.status_code != 200:
+        errorCode, errorDesc = _responseOAuthError(resp)
+        raise TokenExchangeError(_oauthFailureReason(errorCode, errorDesc), errorDesc)
+
     data = resp.json()
     _saveToken(data)
     return data
@@ -107,22 +124,16 @@ def refreshAccessToken() -> dict[str, Any] | None:
         _saveToken(data)
         return data
 
-    errorBody = {}
-    try:
-        errorBody = resp.json()
-    except (json.JSONDecodeError, ValueError):
-        pass
+    errorCode, errorDesc = _responseOAuthError(resp)
+    reason = _oauthFailureReason(errorCode, errorDesc)
 
-    errorCode = errorBody.get("error", "")
-    errorDesc = errorBody.get("error_description", resp.text[:200])
-
-    if "expired" in errorCode or "expired" in errorDesc.lower():
+    if reason == "expired":
         raise TokenRefreshError("expired", "refresh_token expired. Re-login required.")
-    if "reuse" in errorCode or "already" in errorDesc.lower():
+    if reason == "reused":
         raise TokenRefreshError("reused", "refresh_token already used. Re-login required.")
-    if "revoke" in errorCode or "invalid_grant" in errorCode:
+    if reason == "revoked":
         raise TokenRefreshError("revoked", "refresh_token revoked. Re-login required.")
-    if "invalid_client" in errorCode:
+    if reason == "client_changed":
         raise TokenRefreshError(
             "client_changed",
             "OAuth Client ID may have changed. Check openai/codex repo for latest Client ID.",
@@ -185,3 +196,27 @@ def _saveToken(data: dict[str, Any]) -> None:
     expiresIn = data.get("expires_in", 3600)
     data["expires_at"] = time.time() + expiresIn
     getSecretStore().setJson(_TOKEN_SECRET_NAME, data)
+
+
+def _responseOAuthError(resp: Any) -> tuple[str, str]:
+    errorBody = {}
+    try:
+        errorBody = resp.json()
+    except (json.JSONDecodeError, ValueError):
+        pass
+    errorCode = str(errorBody.get("error", ""))
+    errorDesc = str(errorBody.get("error_description", safeProviderDetail(resp.text[:300])))
+    return errorCode, errorDesc
+
+
+def _oauthFailureReason(errorCode: str, errorDesc: str) -> str:
+    combined = f"{errorCode} {errorDesc}".lower()
+    if "expired" in combined:
+        return "expired"
+    if "reuse" in combined or "already" in combined:
+        return "reused"
+    if "revoke" in combined or "invalid_grant" in combined:
+        return "revoked"
+    if "invalid_client" in combined:
+        return "client_changed"
+    return "unknown"

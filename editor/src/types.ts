@@ -234,6 +234,23 @@ export type AiProviderCatalogPayload = {
   catalog: AiProvider[] | Record<string, AiProvider>;
 };
 
+export type ProviderDiagnostic = {
+  code?: string;
+  message?: string;
+  action?: string;
+  provider?: string;
+  detail?: string;
+  recoverable?: boolean;
+  statusCode?: number;
+};
+
+export type ProviderValidationPayload = {
+  valid: boolean;
+  model?: string | null;
+  error?: string | null;
+  diagnostic?: ProviderDiagnostic | null;
+};
+
 export type AiToolCatalogPayload = {
   groups: Array<{
     id: string;
@@ -367,6 +384,8 @@ export type OauthAuthorizePayload = {
 export type OauthStatusPayload = {
   done: boolean;
   error?: string | null;
+  message?: string | null;
+  diagnostic?: ProviderDiagnostic | null;
 };
 
 export type AppNotice = {

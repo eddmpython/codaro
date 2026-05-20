@@ -12,6 +12,7 @@ from codaro.ai.completion import (
 from codaro.ai.providerModels import DEFAULT_OPENAI_CHAT_MODELS, filterOpenaiChatModelIds, providerModelList
 from codaro.ai.providerValidation import providerValidationConfig, validateProviderConnection
 from codaro.ai.oauthFlow import OAuthLoginFlow
+from codaro.ai.oauthToken import TokenExchangeError
 from codaro.ai.types import LLMConfig, LLMResponse, ToolCall, ToolResponse
 from codaro.ai.factory import createProvider, availableProviders, registerProvider
 from codaro.ai.providerSpec import (
@@ -294,7 +295,12 @@ class TestProviderValidation:
             providerFactory=providerFactory,
         )
 
-        assert result.payload() == {"valid": False, "error": "not reachable"}
+        payload = result.payload()
+        assert payload["valid"] is False
+        assert payload["error"] == "not reachable"
+        assert payload["diagnostic"]["code"] == "provider_unavailable"
+        assert payload["diagnostic"]["action"] == "check-provider"
+        assert payload["diagnostic"]["provider"] == "custom"
 
 
 class TestCompletion:
@@ -440,8 +446,32 @@ class TestOAuthLoginFlow:
 
         response = flow.handleCallback("/auth/callback?code=code-test&state=wrong")
 
-        assert response.title == "Authentication Failed"
-        assert flow.status() == {"done": True, "error": "state_mismatch"}
+        assert response.title == "Provider Login Failed"
+        status = flow.status()
+        assert status["done"] is True
+        assert status["error"] == "state_mismatch"
+        assert status["diagnostic"]["code"] == "oauth_state_mismatch"
+        assert status["diagnostic"]["action"] == "restart-login"
+
+    def test_callback_reports_token_exchange_network_failure(self):
+        flow = OAuthLoginFlow(
+            authUrlBuilder=lambda: ("http://auth.test", "verifier-test", "state-test"),
+            codeExchanger=lambda code, verifier: (_ for _ in ()).throw(
+                TokenExchangeError("network", "Cannot connect to auth server.")
+            ),
+            profileManagerFactory=lambda: _OAuthProfileManager(),
+            tokenRevoker=lambda: None,
+        )
+        flow.authorize(startServer=False)
+
+        response = flow.handleCallback("/auth/callback?code=code-test&state=state-test")
+
+        assert response.title == "Provider Login Failed"
+        status = flow.status()
+        assert status["done"] is True
+        assert status["error"] == "oauth_network_error"
+        assert status["diagnostic"]["code"] == "oauth_network_error"
+        assert status["diagnostic"]["action"] == "check-network"
 
     def test_logout_revokes_token_and_updates_profile(self):
         revoked: list[bool] = []

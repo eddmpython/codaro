@@ -6,6 +6,7 @@ import os
 from dataclasses import dataclass
 from typing import Any
 
+from ..providerErrors import ProviderRuntimeError, providerErrorDiagnostic
 from ..types import ToolCall
 from .clarificationPolicy import ClarificationPlan, clarificationAnswer
 from .teacherOrchestrator import TeacherOrchestrator
@@ -35,6 +36,7 @@ PROVIDER_LOOP_ERRORS = (
     RuntimeError,
     TypeError,
     ValueError,
+    ProviderRuntimeError,
 )
 
 PROVIDER_TOOL_RESULT_SIGNAL_KEYS = (
@@ -125,12 +127,18 @@ def finishTeacherTurnErrorPayload(
     orchestrator: TeacherOrchestrator,
     trace: TeacherTrace,
     provider: Any,
-    error: str,
+    error: str | BaseException,
     toolCalls: list[dict[str, Any]],
 ) -> dict[str, Any]:
-    logger.info("provider loop failed: %s", error)
-    trace.record("turn-error", {"message": error})
-    answer = f"provider 응답 중 오류가 발생했습니다: {error}"
+    diagnostic = (
+        providerErrorDiagnostic(error, provider=providerName(provider))
+        if isinstance(error, ProviderRuntimeError)
+        else None
+    )
+    message = diagnostic.message if diagnostic else str(error)
+    logger.info("provider loop failed: %s", message)
+    trace.record("turn-error", diagnostic.payload() if diagnostic else {"message": message})
+    answer = message if diagnostic else f"provider 응답 중 오류가 발생했습니다: {message}"
     return finishTeacherTurnPayload(
         convManager=convManager,
         conversationId=conversationId,
@@ -190,7 +198,7 @@ async def runTeacherChatLoop(
                 orchestrator=orchestrator,
                 trace=trace,
                 provider=provider,
-                error=str(exc) or "provider unavailable",
+                error=exc,
                 toolCalls=allToolResults,
             )
 
@@ -242,7 +250,7 @@ async def runTeacherChatLoop(
             orchestrator=orchestrator,
             trace=trace,
             provider=provider,
-            error=str(exc) or "provider unavailable",
+            error=exc,
             toolCalls=allToolResults,
         )
     return finishTeacherTurnPayload(

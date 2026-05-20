@@ -7,8 +7,9 @@ from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any, Callable
 from urllib.parse import parse_qs, urlparse
 
-from .oauthToken import OAUTH_REDIRECT_PORT, buildAuthUrl, exchangeCode, revokeToken
+from .oauthToken import OAUTH_REDIRECT_PORT, TokenExchangeError, buildAuthUrl, exchangeCode, revokeToken
 from .profile import AiProfileManager, getProfileManager
+from .providerErrors import ProviderErrorDiagnostic, safeProviderDetail
 
 
 @dataclass(frozen=True)
@@ -63,7 +64,13 @@ class OAuthLoginFlow:
 
     def status(self) -> dict[str, Any]:
         if self._state.get("error"):
-            return {"done": True, "error": self._state["error"]}
+            diagnostic = self._state.get("diagnostic")
+            return {
+                "done": True,
+                "error": self._state["error"],
+                "message": diagnostic.get("message") if isinstance(diagnostic, dict) else None,
+                "diagnostic": diagnostic,
+            }
         if self._state.get("done"):
             return {"done": True, "error": None}
         return {"done": False}
@@ -84,16 +91,33 @@ class OAuthLoginFlow:
         error = params.get("error", [None])[0]
 
         if error:
-            self._finish(error=error)
-            return OAuthCallbackResponse(200, "Authentication Failed", f"Error: {error}")
+            diagnostic = _oauthDiagnostic(
+                "oauth_denied",
+                "브라우저 로그인이 완료되지 않았습니다. Provider 설정에서 다시 로그인하세요.",
+                action="relogin-provider",
+                detail=error,
+            )
+            self._finish(error="oauth_denied", diagnostic=diagnostic)
+            return OAuthCallbackResponse(200, "Provider Login Failed", diagnostic.message)
 
         if callbackState != self._state.get("state"):
-            self._finish(error="state_mismatch")
-            return OAuthCallbackResponse(200, "Authentication Failed", "Security validation failed (state mismatch)")
+            diagnostic = _oauthDiagnostic(
+                "oauth_state_mismatch",
+                "보안 검증이 실패했습니다. Provider 설정에서 로그인을 다시 시작하세요.",
+                action="restart-login",
+                detail="state mismatch",
+            )
+            self._finish(error="state_mismatch", diagnostic=diagnostic)
+            return OAuthCallbackResponse(200, "Provider Login Failed", diagnostic.message)
 
         if not code:
-            self._finish(error="no_code")
-            return OAuthCallbackResponse(200, "Authentication Failed", "No authorization code received")
+            diagnostic = _oauthDiagnostic(
+                "oauth_no_code",
+                "인증 코드가 전달되지 않았습니다. Provider 설정에서 다시 로그인하세요.",
+                action="restart-login",
+            )
+            self._finish(error="no_code", diagnostic=diagnostic)
+            return OAuthCallbackResponse(200, "Provider Login Failed", diagnostic.message)
 
         try:
             self._codeExchanger(code, str(self._state["verifier"]))
@@ -104,9 +128,19 @@ class OAuthLoginFlow:
                 "Authentication Successful",
                 "Codaro authentication complete. You may close this window.",
             )
+        except TokenExchangeError as exc:
+            diagnostic = _oauthExchangeDiagnostic(exc)
+            self._finish(error=diagnostic.code, diagnostic=diagnostic)
+            return OAuthCallbackResponse(200, "Provider Login Failed", diagnostic.message)
         except Exception as exc:  # noqa: BLE001 - browser callback must return an HTML failure page
-            self._finish(error=str(exc))
-            return OAuthCallbackResponse(200, "Authentication Failed", f"Token exchange failed: {exc}")
+            diagnostic = _oauthDiagnostic(
+                "oauth_exchange_failed",
+                "토큰 교환에 실패했습니다. Provider 설정에서 다시 로그인하세요.",
+                action="relogin-provider",
+                detail=safeProviderDetail(str(exc)),
+            )
+            self._finish(error=diagnostic.code, diagnostic=diagnostic)
+            return OAuthCallbackResponse(200, "Provider Login Failed", diagnostic.message)
 
     def startCallbackServer(self, port: int) -> None:
         flow = self
@@ -131,8 +165,9 @@ class OAuthLoginFlow:
         thread = threading.Thread(target=runServer, daemon=True)
         thread.start()
 
-    def _finish(self, *, error: str | None = None) -> None:
+    def _finish(self, *, error: str | None = None, diagnostic: ProviderErrorDiagnostic | None = None) -> None:
         self._state["error"] = error
+        self._state["diagnostic"] = diagnostic.payload() if diagnostic else None
         self._state["done"] = True
 
 
@@ -144,3 +179,53 @@ def getOAuthLoginFlow() -> OAuthLoginFlow:
     if _oauthLoginFlow is None:
         _oauthLoginFlow = OAuthLoginFlow()
     return _oauthLoginFlow
+
+
+def _oauthDiagnostic(
+    code: str,
+    message: str,
+    *,
+    action: str,
+    detail: str = "",
+    recoverable: bool = True,
+) -> ProviderErrorDiagnostic:
+    return ProviderErrorDiagnostic(
+        code=code,
+        message=message,
+        action=action,
+        provider="oauth-chatgpt",
+        detail=safeProviderDetail(detail),
+        recoverable=recoverable,
+        statusCode=503,
+    )
+
+
+def _oauthExchangeDiagnostic(exc: TokenExchangeError) -> ProviderErrorDiagnostic:
+    if exc.reason == "network":
+        return _oauthDiagnostic(
+            "oauth_network_error",
+            "인증 서버에 연결하지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도하세요.",
+            action="check-network",
+            detail=exc.detail,
+        )
+    if exc.reason == "client_changed":
+        return _oauthDiagnostic(
+            "oauth_compatibility_error",
+            "OAuth provider 호환성 점검이 필요합니다. 외부 인증 설정이 바뀌었을 수 있습니다.",
+            action="check-provider-compatibility",
+            detail=exc.detail,
+            recoverable=False,
+        )
+    if exc.reason in {"expired", "reused", "revoked"}:
+        return _oauthDiagnostic(
+            "oauth_relogin_required",
+            "로그인 세션을 사용할 수 없습니다. Provider 설정에서 다시 로그인하세요.",
+            action="relogin-provider",
+            detail=exc.detail,
+        )
+    return _oauthDiagnostic(
+        "oauth_exchange_failed",
+        "토큰 교환에 실패했습니다. Provider 설정에서 다시 로그인하세요.",
+        action="relogin-provider",
+        detail=exc.detail,
+    )

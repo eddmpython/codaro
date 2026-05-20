@@ -45,8 +45,7 @@ export function useProviderConnection({
       onNotice({ tone: "default", title: "Provider 로그인 열림", detail: "새 탭에서 provider 로그인을 완료하세요." });
       applyProviderActionResult(await loginOauthProvider(providerId));
     } catch (error) {
-      const detail = error instanceof Error ? error.message : String(error);
-      onNotice(providerAuthFailureNotice(detail));
+      onNotice(providerAuthFailureNotice(error));
     } finally {
       setAiConnecting(false);
     }

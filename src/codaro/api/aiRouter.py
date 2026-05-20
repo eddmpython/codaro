@@ -26,6 +26,7 @@ from ..ai.profileMutation import (
     updateProviderSecret,
 )
 from ..ai.providerValidation import validateProviderConnection
+from ..ai.providerErrors import ProviderRuntimeError, providerErrorPayload
 from ..ai.providers.oauthChatgptProvider import ChatGPTOAuthError
 from ..ai.providerSpec import (
     buildProviderCatalog,
@@ -44,6 +45,7 @@ logger = logging.getLogger(__name__)
 _HANDLED_ERRORS = (
     AttributeError,
     ChatGPTOAuthError,
+    ProviderRuntimeError,
     ConnectionError,
     FileNotFoundError,
     ImportError,
@@ -72,8 +74,8 @@ class AiSecretUpdateRequest(BaseModel):
 
 
 def _providerUnavailable(exc: Exception) -> HTTPException:
-    detail = str(exc) or "AI provider unavailable"
-    logger.info("ai provider unavailable: %s", detail)
+    detail = providerErrorPayload(exc)
+    logger.info("provider unavailable: %s", detail.get("message"))
     return HTTPException(status_code=503, detail=detail)
 
 

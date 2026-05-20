@@ -7,9 +7,11 @@ from collections.abc import AsyncIterator
 from dataclasses import dataclass
 from typing import Any
 
+from ..providerErrors import ProviderRuntimeError, providerErrorDiagnostic
 from .providerLoop import (
     finishTeacherTurnPayload,
     finishTeacherToolCall,
+    providerName,
     recordTeacherToolRoundRequest,
     recordPendingClarification,
     startTeacherToolCall,
@@ -39,12 +41,14 @@ PROVIDER_STREAM_ERRORS = (
     RuntimeError,
     TypeError,
     ValueError,
+    ProviderRuntimeError,
 )
 
 
 @dataclass(frozen=True)
 class ProviderStreamError:
     message: str
+    diagnostic: dict[str, Any] | None = None
 
 
 async def runTeacherChatStream(
@@ -101,9 +105,18 @@ async def runTeacherChatStream(
         try:
             response = provider.completeWithTools(messages, tools)
         except PROVIDER_STREAM_ERRORS as exc:
-            error = str(exc) or "provider unavailable"
-            logger.info("provider stream tool loop failed: %s", error)
-            yield providerStreamErrorEvent(trace, error)
+            diagnostic = (
+                providerErrorDiagnostic(exc, provider=providerName(provider))
+                if isinstance(exc, ProviderRuntimeError)
+                else None
+            )
+            message = diagnostic.message if diagnostic else str(exc) or "provider unavailable"
+            logger.info("provider stream tool loop failed: %s", message)
+            yield providerStreamErrorEvent(
+                trace,
+                message,
+                diagnostic=diagnostic.payload() if diagnostic else None,
+            )
             return
 
         if not response.toolCalls:
@@ -183,8 +196,17 @@ async def streamTeacherTokens(
             for token in provider.stream(messages):
                 loop.call_soon_threadsafe(queue.put_nowait, token)
         except PROVIDER_STREAM_ERRORS as exc:
-            logger.info("provider stream failed: %s", exc)
-            loop.call_soon_threadsafe(queue.put_nowait, ProviderStreamError(str(exc)))
+            diagnostic = (
+                providerErrorDiagnostic(exc, provider=providerName(provider))
+                if isinstance(exc, ProviderRuntimeError)
+                else None
+            )
+            message = diagnostic.message if diagnostic else str(exc) or "provider unavailable"
+            logger.info("provider stream failed: %s", message)
+            loop.call_soon_threadsafe(
+                queue.put_nowait,
+                ProviderStreamError(message, diagnostic.payload() if diagnostic else None),
+            )
         finally:
             loop.call_soon_threadsafe(queue.put_nowait, None)
 
@@ -205,7 +227,7 @@ async def streamTeacherTokens(
         yield teacherStreamDeltaEvent(delta=token, content=accumulated)
 
     if streamError is not None:
-        yield providerStreamErrorEvent(trace, streamError.message)
+        yield providerStreamErrorEvent(trace, streamError.message, diagnostic=streamError.diagnostic)
         thread.join(timeout=2)
         return
 
@@ -224,7 +246,12 @@ async def streamTeacherTokens(
     thread.join(timeout=2)
 
 
-def providerStreamErrorEvent(trace: TeacherTrace, error: str) -> dict[str, Any]:
+def providerStreamErrorEvent(
+    trace: TeacherTrace,
+    error: str,
+    *,
+    diagnostic: dict[str, Any] | None = None,
+) -> dict[str, Any]:
     message = error or "provider unavailable"
-    trace.record("turn-error", {"message": message})
-    return teacherStreamErrorEvent(error=message, trace=trace.summary())
+    trace.record("turn-error", diagnostic if diagnostic else {"message": message})
+    return teacherStreamErrorEvent(error=message, trace=trace.summary(), diagnostic=diagnostic)

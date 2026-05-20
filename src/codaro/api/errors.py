@@ -20,16 +20,24 @@ def fail(statusCode: int, code: str, message: str) -> None:
     raise ApiError(statusCode=statusCode, code=code, message=message)
 
 
-def buildErrorBody(code: str, message: str) -> dict[str, dict[str, str]]:
-    return {"error": {"code": code, "message": message}}
+def buildErrorBody(code: str, message: str, extra: dict[str, object] | None = None) -> dict[str, dict[str, object]]:
+    error: dict[str, object] = {"code": code, "message": message}
+    if extra:
+        error.update(extra)
+    return {"error": error}
 
 
-def normalizeHttpDetail(statusCode: int, detail: object) -> tuple[str, str]:
+def normalizeHttpDetail(statusCode: int, detail: object) -> tuple[str, str, dict[str, object]]:
     if isinstance(detail, dict):
         code = str(detail.get("code", defaultErrorCode(statusCode)))
         message = str(detail.get("message", detail))
-        return code, message
-    return defaultErrorCode(statusCode), str(detail)
+        extra = {
+            str(key): value
+            for key, value in detail.items()
+            if key not in {"code", "message"} and value is not None
+        }
+        return code, message, extra
+    return defaultErrorCode(statusCode), str(detail), {}
 
 
 def defaultErrorCode(statusCode: int) -> str:
@@ -61,7 +69,7 @@ async def apiErrorHandler(request: Request, error: ApiError) -> JSONResponse:
 
 
 async def httpExceptionHandler(request: Request, error: HTTPException) -> JSONResponse:
-    code, message = normalizeHttpDetail(error.status_code, error.detail)
+    code, message, extra = normalizeHttpDetail(error.status_code, error.detail)
     logger = getServerLogger()
     logger.warning(
         "http-error %s",
@@ -75,7 +83,7 @@ async def httpExceptionHandler(request: Request, error: HTTPException) -> JSONRe
     )
     return JSONResponse(
         status_code=error.status_code,
-        content=buildErrorBody(code, message),
+        content=buildErrorBody(code, message, extra),
     )
 
 

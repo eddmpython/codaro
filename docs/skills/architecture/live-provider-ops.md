@@ -40,6 +40,8 @@ Codaro의 기본 gate는 deterministic scripted provider를 사용한다. 실제
 - network timeout/connection: 네트워크 문제.
 - endpoint/header/SSE 변경: OAuth provider compatibility 점검 필요.
 
+HTTP/stream/UI 경계에는 `code`, `message`, `action`, `provider`, `detail`, `recoverable`을 가진 진단 payload를 넘긴다. 기본 화면은 `message`만 보여주고, raw detail은 trace나 확장 진단에서만 본다. editor는 `connect-provider`, `relogin-provider`, `restart-login`, `check-network`, `check-provider-compatibility` action을 구분해 설정 열기/재로그인/네트워크 점검/호환성 점검으로 안내한다.
+
 ## Live Smoke Gate
 
 명령:
