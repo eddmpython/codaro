@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 from dataclasses import dataclass
 from pathlib import Path
@@ -19,6 +20,7 @@ class ReadinessCriterion:
     requirement: str
     evidence: tuple[str, ...]
     missing: tuple[str, ...]
+    blocking: bool = False
 
     @property
     def passed(self) -> bool:
@@ -31,22 +33,26 @@ class ReadinessCriterion:
             "requirement": self.requirement,
             "evidence": list(self.evidence),
             "missing": list(self.missing),
+            "blocking": self.blocking,
         }
 
 
 def main() -> int:
-    criteria = readinessCriteria()
+    liveChecks = runLiveGateChecks()
+    criteria = readinessCriteria(liveChecks)
     score = sum(1 for criterion in criteria if criterion.passed)
+    blockingFailures = [criterion.criterionId for criterion in criteria if criterion.blocking and not criterion.passed]
     payload = {
         "score": score,
         "maxScore": len(criteria),
         "minimumScore": MINIMUM_SCORE,
-        "passed": score >= MINIMUM_SCORE,
+        "passed": score >= MINIMUM_SCORE and not blockingFailures,
+        "blockingFailures": blockingFailures,
         "criteria": [criterion.payload() for criterion in criteria],
     }
 
-    if score < MINIMUM_SCORE:
-        print("FAIL: learning system readiness score is below threshold", file=sys.stderr)
+    if score < MINIMUM_SCORE or blockingFailures:
+        print("FAIL: learning system readiness score is below threshold or blocking checks failed", file=sys.stderr)
         print(json.dumps(payload, ensure_ascii=False, indent=2), file=sys.stderr)
         return 1
 
@@ -55,7 +61,25 @@ def main() -> int:
     return 0
 
 
-def readinessCriteria() -> tuple[ReadinessCriterion, ...]:
+@dataclass(frozen=True)
+class LiveGateCheck:
+    name: str
+    returnCode: int
+    output: str
+
+    @property
+    def passed(self) -> bool:
+        return self.returnCode == 0
+
+
+LIVE_GATE_NAMES = (
+    "teacher-e2e",
+    "learning-card-contract",
+    "learning-card-browser",
+)
+
+
+def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCriterion, ...]:
     casesById = {case.caseId: case for case in goldenEvalCases}
     return (
         fileCriterion(
@@ -252,7 +276,7 @@ def readinessCriteria() -> tuple[ReadinessCriterion, ...]:
         ),
         fileCriterion(
             "ops-gates-and-ssot",
-            "Operational docs and named gates expose the required verification surface.",
+            "Operational docs, named gates, and live targeted gates expose the required verification surface.",
             (
                 ("tests/run.py", (
                     "\"teacher-eval\"",
@@ -275,14 +299,35 @@ def readinessCriteria() -> tuple[ReadinessCriterion, ...]:
                     "learning YAML contract",
                 )),
             ),
+            liveChecks=tuple(liveChecks[name] for name in LIVE_GATE_NAMES),
+            blocking=True,
         ),
     )
+
+
+def runLiveGateChecks() -> dict[str, LiveGateCheck]:
+    return {name: runGateCheck(name) for name in LIVE_GATE_NAMES}
+
+
+def runGateCheck(name: str) -> LiveGateCheck:
+    result = subprocess.run(
+        [sys.executable, "-X", "utf8", str(ROOT / "tests" / "run.py"), "gate", name],
+        capture_output=True,
+        text=True,
+        cwd=ROOT,
+        check=False,
+    )
+    output = (result.stdout + "\n" + result.stderr).strip()
+    return LiveGateCheck(name=name, returnCode=result.returncode, output=output)
 
 
 def fileCriterion(
     criterionId: str,
     requirement: str,
     fileChecks: tuple[tuple[str, tuple[str, ...]], ...],
+    *,
+    liveChecks: tuple[LiveGateCheck, ...] = (),
+    blocking: bool = False,
 ) -> ReadinessCriterion:
     evidence: list[str] = []
     missing: list[str] = []
@@ -290,11 +335,17 @@ def fileCriterion(
         found, absent = fileNeedleReport(relPath, needles)
         evidence.extend(found)
         missing.extend(absent)
+    for check in liveChecks:
+        if check.passed:
+            evidence.append(f"gate {check.name}: passed")
+        else:
+            missing.append(f"gate {check.name}: failed with exit {check.returnCode}\n{check.output}")
     return ReadinessCriterion(
         criterionId=criterionId,
         requirement=requirement,
         evidence=tuple(evidence),
         missing=tuple(missing),
+        blocking=blocking,
     )
 
 
