@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import asyncio
+
 import pytest
 
 from codaro.ai.completion import (
@@ -9,11 +11,15 @@ from codaro.ai.completion import (
     completeCodeFromRequest,
     completionTextFromAnswer,
 )
+from codaro.ai.conversation import ConversationManager
 from codaro.ai.providerModels import DEFAULT_OPENAI_CHAT_MODELS, filterOpenaiChatModelIds, providerModelList
 from codaro.ai.providerErrors import providerErrorDiagnostic
+from codaro.ai.profile import AiProfileManager
 from codaro.ai.providerValidation import providerValidationConfig, validateProviderConnection
 from codaro.ai.oauthFlow import OAuthLoginFlow
 from codaro.ai.oauthToken import TokenExchangeError, TokenRefreshError
+from codaro.ai.secrets import SecretStore
+from codaro.ai.teacher import TeacherRuntimeTurnRequest, prepareTeacherRuntimeTurnFromRequest, runTeacherChatLoop
 from codaro.ai.types import LLMConfig, LLMResponse, ToolCall, ToolResponse
 from codaro.ai.factory import createProvider, availableProviders, registerProvider
 from codaro.ai.providerSpec import (
@@ -111,6 +117,28 @@ class _OAuthProfileManager:
 
     def update(self, *, provider: str, updatedBy: str):
         self.updates.append({"provider": provider, "updatedBy": updatedBy})
+
+
+class _OAuthE2EProvider:
+    supportsNativeTools = False
+
+    def complete(self, messages: list[dict[str, str]]) -> LLMResponse:
+        return LLMResponse(answer="OAuth provider answer", provider="oauth-chatgpt", model="oauth-model")
+
+
+class _OAuthE2EProviderFactory:
+    def __init__(self) -> None:
+        self.config: LLMConfig | None = None
+
+    def __call__(self, config: LLMConfig) -> _OAuthE2EProvider:
+        self.config = config
+        return _OAuthE2EProvider()
+
+
+class _NoSessionManager:
+    def getSession(self, sessionId: str):
+        del sessionId
+        return None
 
 
 class TestLLMConfig:
@@ -686,3 +714,64 @@ class TestOAuthLoginFlow:
         assert flow.logout() == {"ok": True}
         assert revoked == [True]
         assert profileManager.updates == [{"provider": "oauth-chatgpt", "updatedBy": "ui"}]
+
+    def test_callback_success_feeds_teacher_question_path(self, tmp_path):
+        secretStore = SecretStore(path=tmp_path / "secrets.json")
+        profileManager = AiProfileManager(path=tmp_path / "ai_profile.json", secretStore=secretStore)
+
+        def exchangeCode(code: str, verifier: str) -> dict[str, object]:
+            assert (code, verifier) == ("code-test", "verifier-test")
+            secretStore.setJson(
+                oauthSecretName("oauth-chatgpt"),
+                {
+                    "access_token": "access-test",
+                    "refresh_token": "refresh-test",
+                    "expires_at": 4_102_444_800,
+                },
+            )
+            return {"access_token": "access-test"}
+
+        flow = OAuthLoginFlow(
+            authUrlBuilder=lambda: ("http://auth.test", "verifier-test", "state-test"),
+            codeExchanger=exchangeCode,
+            profileManagerFactory=lambda: profileManager,
+            tokenRevoker=lambda: None,
+        )
+        providerFactory = _OAuthE2EProviderFactory()
+        convManager = ConversationManager()
+
+        flow.authorize(startServer=False)
+        response = flow.handleCallback("/auth/callback?code=code-test&state=state-test")
+        runtimeTurn = prepareTeacherRuntimeTurnFromRequest(
+            convManager=convManager,
+            profileManager=profileManager,
+            sessionManager=_NoSessionManager(),
+            documentPath=None,
+            workspaceRoot=tmp_path,
+            request=TeacherRuntimeTurnRequest.fromPayload({
+                "message": "현재 provider 상태를 짧게 확인해줘",
+                "role": "teacher",
+            }),
+            providerFactory=providerFactory,
+        )
+        payload = asyncio.run(runTeacherChatLoop(
+            provider=runtimeTurn.turn.provider,
+            convManager=convManager,
+            conversationId=runtimeTurn.turn.conversationId,
+            messages=runtimeTurn.turn.messages,
+            tools=runtimeTurn.turn.tools,
+            executor=runtimeTurn.executor,
+            orchestrator=runtimeTurn.orchestrator,
+            clarificationPlan=runtimeTurn.turn.clarificationPlan,
+        ))
+
+        assert response.title == "Authentication Successful"
+        assert flow.status() == {"done": True, "error": None}
+        assert profileManager.serialize()["activeProvider"] == "oauth-chatgpt"
+        assert profileManager.serialize()["ready"] is True
+        assert providerFactory.config is not None
+        assert providerFactory.config.provider == "oauth-chatgpt"
+        assert runtimeTurn.turn.role == "teacher"
+        assert runtimeTurn.turn.clarificationPlan is None
+        assert payload["provider"] == "oauth-chatgpt"
+        assert payload["answer"] == "OAuth provider answer"

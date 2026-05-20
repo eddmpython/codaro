@@ -32,6 +32,8 @@ Codaro의 기본 gate는 deterministic scripted provider를 사용한다. 실제
 4. code exchange가 성공하면 token을 secret store에 저장하고 active provider를 `oauth-chatgpt`로 갱신한다.
 5. 질문 turn은 `prepareTeacherRuntimeTurn` → provider → tool loop → trace/workloop 순서로 실행된다.
 
+`tests/testAiProvider.py`는 callback 성공 후 같은 profile/secret store로 teacher 질문을 준비해 `oauth-chatgpt` provider config가 생성되고 응답 payload가 반환되는 경로를 검증한다. live credential을 쓰는 외부 smoke와 별개로, OAuth login → callback → token 저장 → profile active provider 갱신 → 질문 준비/응답 경로의 제품 내부 연결은 이 테스트가 담당한다.
+
 실패는 raw exception으로 끝내지 않는다.
 
 - token 없음: `live credential missing` 또는 provider 로그인 필요.
