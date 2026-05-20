@@ -290,6 +290,31 @@ async def runClarificationContinuationCase() -> dict[str, Any]:
         extraFailures.append("continuation lost level assumption")
     if manager.consumePendingClarification(conversation.conversationId) is not None:
         extraFailures.append("pending clarification was not consumed")
+
+    manager.setPendingClarification(conversation.conversationId, plan.payload())
+    staleProvider = ContinuationProvider()
+    staleFactory = ContinuationProviderFactory(staleProvider)
+    staleRuntimeTurn = prepareTeacherRuntimeTurn(
+        convManager=manager,
+        profileManager=ContinuationProfileManager(),
+        sessionManager=NoSessionManager(),
+        documentPath=None,
+        workspaceRoot=None,
+        conversationId=conversation.conversationId,
+        message="취소하고 SQL 커리큘럼은 새로 만들어줘",
+        roleOverride="teacher",
+        providerOverride="custom",
+        providerFactory=staleFactory,
+    )
+    staleUserMessage = staleRuntimeTurn.turn.messages[-1]["content"]
+    if "[Clarification plan]" in staleUserMessage:
+        extraFailures.append("stale clarification leaked into a new request")
+    if "초급-중급 사이" in staleUserMessage:
+        extraFailures.append("stale clarification assumptions leaked into a new request")
+    if staleRuntimeTurn.turn.provider is not None or staleFactory.config is not None:
+        extraFailures.append("ambiguous new request bypassed clarification gate after stale pending reset")
+    if manager.consumePendingClarification(conversation.conversationId) is not None:
+        extraFailures.append("stale pending clarification was not cleared")
     return reportPayload(continuationPayload, extraFailures)
 
 

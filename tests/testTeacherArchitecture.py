@@ -1218,6 +1218,66 @@ def testPrepareTeacherRuntimeTurnInjectsPendingClarification(tmp_path) -> None:
     assert convManager.consumePendingClarification(conversation.conversationId) is None
 
 
+def testPrepareTeacherRuntimeTurnAppliesPendingClarificationToAxisAnswer(tmp_path) -> None:
+    convManager = ConversationManager()
+    conversation = convManager.create(role="teacher")
+    plan = buildClarificationPlan("데이터 분석 커리큘럼 만들어줘")
+    convManager.setPendingClarification(conversation.conversationId, plan.payload())
+    profileManager = _FakeProfileManager()
+    providerFactory = _ProviderFactory()
+    sessionManager = _FakeSessionManager()
+
+    runtimeTurn = prepareTeacherRuntimeTurn(
+        convManager=convManager,
+        profileManager=profileManager,
+        sessionManager=sessionManager,
+        documentPath=None,
+        workspaceRoot=tmp_path,
+        conversationId=conversation.conversationId,
+        message="초급 실습 중심으로 pandas까지 진행",
+        roleOverride="teacher",
+        providerOverride="custom",
+        providerFactory=providerFactory,
+    )
+
+    finalUserMessage = runtimeTurn.turn.messages[-1]["content"]
+    assert runtimeTurn.turn.clarificationPlan is None
+    assert isinstance(runtimeTurn.turn.provider, _FakeProvider)
+    assert "[Clarification plan]" in finalUserMessage
+    assert "초급-중급 사이" in finalUserMessage
+    assert convManager.consumePendingClarification(conversation.conversationId) is None
+
+
+def testPrepareTeacherRuntimeTurnDropsPendingClarificationForNewRequest(tmp_path) -> None:
+    convManager = ConversationManager()
+    conversation = convManager.create(role="teacher")
+    plan = buildClarificationPlan("데이터 분석 커리큘럼 만들어줘")
+    convManager.setPendingClarification(conversation.conversationId, plan.payload())
+    profileManager = _FakeProfileManager()
+    providerFactory = _ProviderFactory()
+    sessionManager = _FakeSessionManager()
+
+    runtimeTurn = prepareTeacherRuntimeTurn(
+        convManager=convManager,
+        profileManager=profileManager,
+        sessionManager=sessionManager,
+        documentPath=None,
+        workspaceRoot=tmp_path,
+        conversationId=conversation.conversationId,
+        message="취소하고 SQL 커리큘럼은 새로 만들어줘",
+        roleOverride="teacher",
+        providerOverride="custom",
+        providerFactory=providerFactory,
+    )
+
+    finalUserMessage = runtimeTurn.turn.messages[-1]["content"]
+    assert runtimeTurn.turn.clarificationPlan is not None
+    assert runtimeTurn.turn.provider is None
+    assert "[Clarification plan]" not in finalUserMessage
+    assert "초급-중급 사이" not in finalUserMessage
+    assert convManager.consumePendingClarification(conversation.conversationId) is None
+
+
 def testPrepareTeacherTurnOwnsConversationAndProviderSetup() -> None:
     convManager = _FakeConversationManager()
     profileManager = _FakeProfileManager()

@@ -76,6 +76,9 @@ def buildClarificationPlan(message: str, context: dict[str, Any] | None = None) 
         return ClarificationPlan(shouldAsk=False)
 
     contextMap = context if isinstance(context, dict) else {}
+    if isinstance(contextMap.get("clarificationPlan"), dict):
+        return ClarificationPlan(shouldAsk=False)
+
     questions: list[str] = []
     defaults = {
         "level": "초급-중급 사이",

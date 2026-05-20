@@ -92,6 +92,7 @@ OBJECTIVE_REQUIREMENTS = (
                 "clarification payload exposed defaults compatibility alias",
                 "clarificationAssumptionKeys",
                 "pending clarification was not consumed",
+                "stale clarification leaked into a new request",
             )),
             ("src/codaro/ai/conversation.py", (
                 "pendingClarification",
@@ -105,6 +106,10 @@ OBJECTIVE_REQUIREMENTS = (
                 "\"level\"",
                 "\"depth\"",
                 "\"environment\"",
+            )),
+            ("src/codaro/ai/teacher/turnRuntime.py", (
+                "shouldApplyPendingClarification",
+                "STALE_CLARIFICATION_RESET_MARKERS",
             )),
         ),
     ),

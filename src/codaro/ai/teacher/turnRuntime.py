@@ -8,7 +8,13 @@ from typing import Any, Callable
 from ..factory import createProvider
 from ..toolExecutor import ToolExecutor
 from ..types import LLMConfig
-from .clarificationPolicy import buildClarificationPlan
+from .clarificationPolicy import (
+    BALANCE_MARKERS,
+    DEPTH_MARKERS,
+    ENVIRONMENT_MARKERS,
+    LEVEL_MARKERS,
+    buildClarificationPlan,
+)
 from .teacherOrchestrator import TeacherOrchestrator
 from .turnSession import TeacherTurnSession, prepareTeacherTurn
 
@@ -102,6 +108,7 @@ def prepareTeacherRuntimeTurn(
         context=context,
         convManager=convManager,
         conversationId=conversationId,
+        message=message,
     )
     orchestrator = TeacherOrchestrator.fromContext(contextMap)
     clarificationPlan = buildClarificationPlan(message, contextMap)
@@ -126,12 +133,85 @@ def prepareTeacherRuntimeTurn(
     return TeacherRuntimeTurn(turn=turn, orchestrator=orchestrator, executor=executor)
 
 
-def teacherTurnContext(*, context: Any, convManager: Any, conversationId: str | None) -> dict[str, Any]:
+def teacherTurnContext(
+    *,
+    context: Any,
+    convManager: Any,
+    conversationId: str | None,
+    message: str,
+) -> dict[str, Any]:
     contextMap = dict(context) if isinstance(context, dict) else {}
     pendingClarification = consumePendingClarification(convManager, conversationId)
-    if pendingClarification is not None and "clarificationPlan" not in contextMap:
+    if (
+        pendingClarification is not None
+        and "clarificationPlan" not in contextMap
+        and shouldApplyPendingClarification(message, pendingClarification)
+    ):
         contextMap["clarificationPlan"] = pendingClarification
     return contextMap
+
+
+CONTINUATION_MARKERS = (
+    "진행",
+    "그대로",
+    "좋아",
+    "좋습니다",
+    "네",
+    "예",
+    "응",
+    "ㅇㅇ",
+    "맞아",
+    "맞습니다",
+    "ok",
+    "okay",
+    "yes",
+    "go",
+    "continue",
+    "proceed",
+)
+
+STALE_CLARIFICATION_RESET_MARKERS = (
+    "취소",
+    "무시",
+    "처음부터",
+    "새로",
+    "새 주제",
+    "새 커리큘럼",
+    "다른 주제",
+    "다른 걸",
+    "다른거",
+    "cancel",
+    "ignore",
+    "reset",
+    "new topic",
+    "different topic",
+)
+
+CLARIFICATION_AXIS_MARKERS = (
+    *LEVEL_MARKERS,
+    *DEPTH_MARKERS,
+    *BALANCE_MARKERS,
+    *ENVIRONMENT_MARKERS,
+)
+
+
+def shouldApplyPendingClarification(message: str, pendingClarification: Mapping[str, Any]) -> bool:
+    assumptions = pendingClarification.get("assumptions")
+    if not isinstance(assumptions, dict):
+        return False
+
+    normalized = " ".join(message.lower().split())
+    if not normalized or _hasPendingMarker(normalized, STALE_CLARIFICATION_RESET_MARKERS):
+        return False
+    if normalized in CONTINUATION_MARKERS:
+        return True
+    if len(normalized) <= 80 and _hasPendingMarker(normalized, CONTINUATION_MARKERS):
+        return True
+    return len(normalized) <= 120 and _hasPendingMarker(normalized, CLARIFICATION_AXIS_MARKERS)
+
+
+def _hasPendingMarker(normalizedMessage: str, markers: tuple[str, ...]) -> bool:
+    return any(marker in normalizedMessage for marker in markers)
 
 
 def consumePendingClarification(convManager: Any, conversationId: str | None) -> dict[str, Any] | None:
