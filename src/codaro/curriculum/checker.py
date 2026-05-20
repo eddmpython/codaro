@@ -16,6 +16,17 @@ class CheckResult:
     expectedOutput: str = ""
     detail: str = ""
 
+    def payload(self) -> dict[str, object]:
+        return {
+            "passed": self.passed,
+            "feedback": self.feedback,
+            "hintLevel": self.hintLevel,
+            "hints": self.hints,
+            "studentOutput": self.studentOutput,
+            "expectedOutput": self.expectedOutput,
+            "detail": self.detail,
+        }
+
 
 COMMON_ERROR_PATTERNS = {
     "NameError": "변수 이름을 확인하세요. 오타가 있거나 정의하지 않은 변수를 사용했을 수 있습니다.",

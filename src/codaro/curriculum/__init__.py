@@ -1,4 +1,5 @@
 from .checker import CheckResult, checkByOutput, checkByVariable, checkContains, checkNoError
+from .exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
 from .studyLoader import (
     CATEGORY_GROUPS,
     CATEGORY_MAPPING,
@@ -17,6 +18,7 @@ __all__ = [
     "CATEGORY_MAPPING",
     "CategoryInfo",
     "CheckResult",
+    "ExerciseCheckInput",
     "StudyLoader",
     "StudySummary",
     "EXERCISE_TYPES",
@@ -26,9 +28,11 @@ __all__ = [
     "PHILOSOPHY",
     "ProgressTracker",
     "UserProgress",
+    "InvalidExerciseCheck",
     "checkByOutput",
     "checkByVariable",
     "checkContains",
     "checkNoError",
+    "runExerciseCheck",
     "yamlToDocument",
 ]

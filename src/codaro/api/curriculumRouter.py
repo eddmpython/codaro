@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from fastapi import APIRouter
 
-from ..curriculum.checker import checkByOutput, checkByVariable, checkContains, checkNoError
+from ..curriculum.exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
 from ..curriculum.studyLoader import CATEGORY_GROUPS, CATEGORY_MAPPING, LEARNING_PATHS
 from ..curriculum.converter import yamlToDocument
 from ..curriculum.learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, LESSON_STRUCTURE, PHILOSOPHY
@@ -130,23 +130,22 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
         if session is None:
             fail(404, "session_not_found", "Session not found.")
 
-        if request.checkType == "output" and request.expectedCode:
-            result = await checkByOutput(
-                session, request.studentCode, request.expectedCode,
-                hints=request.hints, currentHintLevel=request.currentHintLevel,
+        try:
+            result = await runExerciseCheck(
+                session,
+                ExerciseCheckInput(
+                    studentCode=request.studentCode,
+                    expectedCode=request.expectedCode,
+                    checkType=request.checkType,
+                    variableName=request.variableName,
+                    expectedValue=request.expectedValue,
+                    requiredPatterns=request.requiredPatterns,
+                    hints=request.hints,
+                    currentHintLevel=request.currentHintLevel,
+                ),
             )
-        elif request.checkType == "variable" and request.variableName:
-            result = await checkByVariable(
-                session, request.studentCode, request.variableName,
-                request.expectedValue, hints=request.hints,
-                currentHintLevel=request.currentHintLevel,
-            )
-        elif request.checkType == "contains" and request.requiredPatterns:
-            result = await checkContains(request.studentCode, request.requiredPatterns)
-        elif request.checkType == "noError":
-            result = await checkNoError(session, request.studentCode)
-        else:
-            fail(400, "curriculum_invalid_check", "Invalid check type or missing parameters.")
+        except InvalidExerciseCheck as error:
+            fail(400, "curriculum_invalid_check", str(error))
 
         logger.debug(
             "curriculum %s",
@@ -158,15 +157,7 @@ def createCurriculumRouter(state: ServerState) -> APIRouter:
                 hintLevel=result.hintLevel,
             ),
         )
-        return {
-            "passed": result.passed,
-            "feedback": result.feedback,
-            "hintLevel": result.hintLevel,
-            "hints": result.hints,
-            "studentOutput": result.studentOutput,
-            "expectedOutput": result.expectedOutput,
-            "detail": result.detail,
-        }
+        return result.payload()
 
     @router.get("/api/curriculum/learning-spec")
     def apiLearningSpec() -> dict[str, object]:

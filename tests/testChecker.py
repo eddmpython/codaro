@@ -2,8 +2,11 @@ from __future__ import annotations
 
 import asyncio
 
+import pytest
+
 from codaro.kernel.session import KernelSession
 from codaro.curriculum.checker import checkByOutput, checkByVariable, checkContains, checkNoError
+from codaro.curriculum.exerciseCheck import ExerciseCheckInput, InvalidExerciseCheck, runExerciseCheck
 
 
 def _run(coro):
@@ -16,6 +19,7 @@ def testCheckOutputCorrect() -> None:
 
     assert result.passed is True
     assert "정답" in result.feedback
+    assert result.payload()["passed"] is True
     session.dispose()
 
 
@@ -111,4 +115,27 @@ def testCheckNoErrorFail() -> None:
     result = _run(checkNoError(session, "1/0"))
     assert result.passed is False
     assert "0으로 나눌 수 없습니다" in result.feedback
+    session.dispose()
+
+
+def testExerciseCheckDispatchesByType() -> None:
+    session = KernelSession()
+    result = _run(runExerciseCheck(
+        session,
+        ExerciseCheckInput(
+            studentCode="answer = 42",
+            checkType="variable",
+            variableName="answer",
+            expectedValue="42",
+        ),
+    ))
+
+    assert result.payload()["passed"] is True
+    session.dispose()
+
+
+def testExerciseCheckRejectsInvalidContract() -> None:
+    session = KernelSession()
+    with pytest.raises(InvalidExerciseCheck, match="Invalid check type"):
+        _run(runExerciseCheck(session, ExerciseCheckInput(studentCode="print(1)", checkType="output")))
     session.dispose()
