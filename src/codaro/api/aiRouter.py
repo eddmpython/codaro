@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import asyncio
 import json
 import logging
 from typing import Any
@@ -11,6 +10,7 @@ from pydantic import BaseModel
 from ..ai.completion import CodeCompletionRequest, completeCodeFromRequest, emptyCompletionResult
 from ..ai.oauthFlow import getOAuthLoginFlow
 from ..ai.profile import AiProfileManager, getProfileManager
+from ..ai.profileEvents import streamProfileChangeEvents
 from ..ai.providerModels import providerModelList
 from ..ai.profileMutation import (
     ProfileMutationError,
@@ -133,21 +133,13 @@ def createAiRouter(state: Any) -> APIRouter:
     async def apiAiProfileEvents(request: Request):
         from starlette.responses import StreamingResponse
 
-        manager = getProfileManager()
-
-        async def _generate():
-            lastFingerprint = ""
-            while True:
-                if await request.is_disconnected():
-                    break
-                payload = manager.serialize()
-                fingerprint = manager.fingerprint()
-                if fingerprint != lastFingerprint:
-                    lastFingerprint = fingerprint
-                    yield f"event: profile_changed\ndata: {json.dumps(payload, ensure_ascii=False)}\n\n"
-                await asyncio.sleep(1.0)
-
-        return StreamingResponse(_generate(), media_type="text/event-stream")
+        return StreamingResponse(
+            streamProfileChangeEvents(
+                manager=getProfileManager(),
+                isDisconnected=request.is_disconnected,
+            ),
+            media_type="text/event-stream",
+        )
 
     @router.get("/api/oauth/authorize")
     def apiOauthAuthorize():

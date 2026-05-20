@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from codaro.ai.profileEvents import PROFILE_CHANGED_EVENT, profileEventFrame, streamProfileChangeEvents
 from codaro.ai.profile import AiProfile, AiProfileManager, ProviderProfile, RoleBinding
 from codaro.ai.profileMutation import (
     ProfileMutationError,
@@ -22,6 +23,24 @@ def tmpProfile(tmp_path):
     secretPath = tmp_path / "secrets.json"
     secretStore = SecretStore(path=secretPath)
     return AiProfileManager(path=profilePath, secretStore=secretStore)
+
+
+def _run(coro):
+    import asyncio
+
+    return asyncio.new_event_loop().run_until_complete(coro)
+
+
+class _ProfileEventManager:
+    def __init__(self) -> None:
+        self.payload = {"defaultProvider": "openai"}
+        self.fingerprintValue = "fp-1"
+
+    def serialize(self):
+        return self.payload
+
+    def fingerprint(self):
+        return self.fingerprintValue
 
 
 class TestAiProfileBootstrap:
@@ -177,3 +196,37 @@ class TestAiProfileSerialize:
         tmpProfile.update(temperature=0.9, updatedBy="test")
         fp2 = tmpProfile.fingerprint()
         assert fp1 != fp2
+
+
+class TestAiProfileEvents:
+    def test_profile_event_frame_uses_stable_sse_shape(self):
+        frame = profileEventFrame(PROFILE_CHANGED_EVENT, {"provider": "openai"})
+
+        assert frame == 'event: profile_changed\ndata: {"provider": "openai"}\n\n'
+
+    def test_stream_profile_change_events_emits_fingerprint_changes(self):
+        manager = _ProfileEventManager()
+        disconnected = False
+
+        async def isDisconnected():
+            return disconnected
+
+        async def sleeper(_seconds: float):
+            return None
+
+        async def collectOne():
+            nonlocal disconnected
+            stream = streamProfileChangeEvents(
+                manager=manager,
+                isDisconnected=isDisconnected,
+                sleeper=sleeper,
+            )
+            first = await stream.__anext__()
+            disconnected = True
+            try:
+                await stream.__anext__()
+            except StopAsyncIteration:
+                pass
+            return first
+
+        assert _run(collectOne()) == 'event: profile_changed\ndata: {"defaultProvider": "openai"}\n\n'
