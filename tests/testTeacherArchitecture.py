@@ -4,17 +4,20 @@ import asyncio
 
 from codaro.ai.conversation import buildSystemPrompt
 from codaro.ai.teacher import (
+    TeacherEvalCase,
     TeacherOrchestrator,
     ToolPolicyState,
     executeTeacherToolRound,
     evaluateToolSequence,
     evaluateToolTrace,
+    evaluateToolTracePayload,
     goldenEvalCases,
     prepareTeacherTurn,
     runTeacherChatLoop,
     runTeacherChatStream,
     teacherSkills,
     toolCallsToProviderPayloads,
+    ToolPolicyViolation,
 )
 from codaro.ai.types import LLMConfig, ToolCall, ToolResponse
 from codaro.document.cellSchema import schemaSummary
@@ -240,6 +243,36 @@ def testEvalHarnessCanReadTraceSequence() -> None:
 
     assert report.passed
     assert report.observedTools == ("read-cells", "cell-call")
+
+
+def testEvalHarnessCanReadTracePayload() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "answer-check-uses-cell-call")
+    tracePayload = {
+        "toolSequence": ["read-cells", "cell-call"],
+        "policyViolationCount": 0,
+    }
+
+    report = evaluateToolTracePayload(case, tracePayload)
+
+    assert report.passed
+    assert report.observedTools == ("read-cells", "cell-call")
+    assert report.policyViolationCount == 0
+
+
+def testEvalHarnessFailsPolicyViolationsByDefault() -> None:
+    orchestrator = TeacherOrchestrator.fromContext({})
+    trace = orchestrator.startTrace("conv-policy")
+    orchestrator.toolPolicyViolation(
+        trace,
+        ToolPolicyViolation("dependency-preflight-required", "packages-check가 필요합니다.", "cell-call"),
+    )
+
+    case = TeacherEvalCase(caseId="no-policy-violations", prompt="셀 실행해줘")
+    report = evaluateToolTrace(case, trace)
+
+    assert not report.passed
+    assert report.policyViolationCount == 1
+    assert "policy violations observed: 1" in report.failures
 
 
 def testProviderLoopOwnsToolRoundRecording() -> None:

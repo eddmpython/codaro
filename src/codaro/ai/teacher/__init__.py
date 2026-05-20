@@ -1,7 +1,13 @@
 from __future__ import annotations
 
 from .contextBuilder import injectContext
-from .evalHarness import TeacherEvalCase, evaluateToolSequence, evaluateToolTrace, goldenEvalCases
+from .evalHarness import (
+    TeacherEvalCase,
+    evaluateToolSequence,
+    evaluateToolTrace,
+    evaluateToolTracePayload,
+    goldenEvalCases,
+)
 from .providerLoop import (
     TeacherToolRound,
     executeTeacherToolRound,
@@ -33,6 +39,7 @@ __all__ = [
     "executeTeacherToolRound",
     "evaluateToolSequence",
     "evaluateToolTrace",
+    "evaluateToolTracePayload",
     "finishTeacherToolCall",
     "goldenEvalCases",
     "injectContext",
