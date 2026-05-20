@@ -82,7 +82,7 @@ function deleteJson<T>(path: string): Promise<T> {
   return requestJson<T>(path, { method: "DELETE" });
 }
 
-type StreamEvent = {
+export type StreamEvent = {
   type?: string;
   conversationId?: string;
   delta?: string;

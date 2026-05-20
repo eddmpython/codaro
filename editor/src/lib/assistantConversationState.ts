@@ -1,0 +1,144 @@
+import type { AssistantMessage } from "@/components/assistant/assistantPanel";
+import type { StreamEvent } from "@/lib/api";
+import {
+  createComposeStep,
+  finishAssistantSteps,
+  markAssistantStepsError,
+  withToolStartStep,
+  withToolWorkStep,
+} from "@/lib/workLoop";
+import type { AiChatResponse } from "@/types";
+
+export function createUserMessage(content: string, now = Date.now()): AssistantMessage {
+  return {
+    id: `user-${now}`,
+    role: "user",
+    content,
+  };
+}
+
+export function createAssistantPlaceholder({
+  id,
+  provider,
+}: {
+  id: string;
+  provider: string;
+}): AssistantMessage {
+  return {
+    id,
+    role: "assistant",
+    content: "",
+    provider,
+    steps: [createComposeStep()],
+    loading: true,
+  };
+}
+
+export function applyAssistantStreamEvent({
+  assistantMessageId,
+  event,
+  messages,
+  streamedContent,
+}: {
+  assistantMessageId: string;
+  event: StreamEvent;
+  messages: AssistantMessage[];
+  streamedContent: string;
+}): {
+  messages: AssistantMessage[];
+  streamedContent: string;
+} {
+  if (event.type === "tool_start" && event.toolCall) {
+    return {
+      streamedContent,
+      messages: updateAssistantMessage(messages, assistantMessageId, (item) => ({
+        ...item,
+        steps: withToolStartStep(item.steps, event.toolCall!),
+      })),
+    };
+  }
+
+  if (event.type === "tool_results" && event.toolCalls?.length) {
+    return {
+      streamedContent,
+      messages: updateAssistantMessage(messages, assistantMessageId, (item) => ({
+        ...item,
+        steps: withToolWorkStep(item.steps, event.toolCalls ?? []),
+      })),
+    };
+  }
+
+  const nextContent = nextStreamedContent(event, streamedContent);
+  if (nextContent === streamedContent) {
+    return { messages, streamedContent };
+  }
+  return {
+    streamedContent: nextContent,
+    messages: updateAssistantMessage(messages, assistantMessageId, (item) => ({
+      ...item,
+      content: nextContent,
+      loading: true,
+    })),
+  };
+}
+
+export function finalizeAssistantMessage({
+  assistantMessageId,
+  messages,
+  response,
+  streamedContent,
+}: {
+  assistantMessageId: string;
+  messages: AssistantMessage[];
+  response: AiChatResponse;
+  streamedContent: string;
+}): AssistantMessage[] {
+  return updateAssistantMessage(messages, assistantMessageId, (item) => ({
+    ...item,
+    content: response.answer || streamedContent || "완료했습니다.",
+    provider: response.provider,
+    model: response.model,
+    toolCalls: response.toolCalls,
+    steps: response.toolCalls.length ? finishAssistantSteps(item.steps, response.toolCalls) : undefined,
+    loading: false,
+  }));
+}
+
+export function failAssistantMessage({
+  action,
+  assistantMessageId,
+  content,
+  messages,
+}: {
+  action?: AssistantMessage["action"];
+  assistantMessageId: string;
+  content: string;
+  messages: AssistantMessage[];
+}): AssistantMessage[] {
+  return updateAssistantMessage(messages, assistantMessageId, (item) => ({
+    ...item,
+    tone: "error",
+    action,
+    content,
+    steps: markAssistantStepsError(item.steps),
+    loading: false,
+  }));
+}
+
+function updateAssistantMessage(
+  messages: AssistantMessage[],
+  assistantMessageId: string,
+  updater: (item: AssistantMessage) => AssistantMessage,
+): AssistantMessage[] {
+  return messages.map((item) => (item.id === assistantMessageId ? updater(item) : item));
+}
+
+function nextStreamedContent(event: StreamEvent, streamedContent: string) {
+  if (event.type === "delta") {
+    return event.content ?? `${streamedContent}${event.delta ?? ""}`;
+  }
+  if (event.type === "token" && event.content) {
+    return `${streamedContent}${event.content}`;
+  }
+  return streamedContent;
+}

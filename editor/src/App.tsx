@@ -64,12 +64,12 @@ import {
   type ResultMap,
 } from "@/lib/assistantContext";
 import {
-  createComposeStep,
-  finishAssistantSteps,
-  markAssistantStepsError,
-  withToolStartStep,
-  withToolWorkStep,
-} from "@/lib/workLoop";
+  applyAssistantStreamEvent,
+  createAssistantPlaceholder,
+  createUserMessage,
+  failAssistantMessage,
+  finalizeAssistantMessage,
+} from "@/lib/assistantConversationState";
 import {
   SidebarInset,
   SidebarProvider,
@@ -687,11 +687,7 @@ function App() {
     const activeScope = scopeOverride ?? inferTeacherScope(message, teacherScope);
     if (!message || assistantLoading) return;
 
-    const userMessage: AssistantMessage = {
-      id: `user-${Date.now()}`,
-      role: "user",
-      content: message,
-    };
+    const userMessage = createUserMessage(message);
     setMessages((current) => [...current, userMessage]);
     setPrompt("");
     setAssistantLoading(true);
@@ -756,14 +752,10 @@ function App() {
     let streamedContent = "";
     setMessages((current) => [
       ...current,
-      {
+      createAssistantPlaceholder({
         id: assistantMessageId,
-        role: "assistant",
-        content: "",
         provider: aiProviderName(aiProfile),
-        steps: [createComposeStep()],
-        loading: true,
-      },
+      }),
     ]);
 
     try {
@@ -779,33 +771,16 @@ function App() {
           if (event.conversationId) {
             setConversationId(event.conversationId);
           }
-          if (event.type === "tool_start" && event.toolCall) {
-            const toolCall = event.toolCall;
-            setMessages((current) => current.map((item) => (
-              item.id === assistantMessageId
-                ? { ...item, steps: withToolStartStep(item.steps, toolCall) }
-                : item
-            )));
-            return;
-          }
-          if (event.type === "tool_results" && event.toolCalls?.length) {
-            setMessages((current) => current.map((item) => (
-              item.id === assistantMessageId
-                ? { ...item, steps: withToolWorkStep(item.steps, event.toolCalls ?? []) }
-                : item
-            )));
-            return;
-          }
-          if (event.type === "delta") {
-            streamedContent = event.content ?? `${streamedContent}${event.delta ?? ""}`;
-          } else if (event.type === "token" && event.content) {
-            streamedContent = `${streamedContent}${event.content}`;
-          } else {
-            return;
-          }
-          setMessages((current) => current.map((item) => (
-            item.id === assistantMessageId ? { ...item, content: streamedContent, loading: true } : item
-          )));
+          setMessages((current) => {
+            const next = applyAssistantStreamEvent({
+              assistantMessageId,
+              event,
+              messages: current,
+              streamedContent,
+            });
+            streamedContent = next.streamedContent;
+            return next.messages;
+          });
         },
       );
       let savedCurriculumTitle = "";
@@ -842,19 +817,12 @@ function App() {
         setPendingBlocks([]);
         setPendingTarget("notebook");
       }
-      setMessages((current) => current.map((item) => (
-        item.id === assistantMessageId
-          ? {
-            ...item,
-            content: response.answer || streamedContent || "완료했습니다.",
-            provider: response.provider,
-            model: response.model,
-            toolCalls: response.toolCalls,
-            steps: response.toolCalls.length ? finishAssistantSteps(item.steps, response.toolCalls) : undefined,
-            loading: false,
-          }
-          : item
-      )));
+      setMessages((current) => finalizeAssistantMessage({
+        assistantMessageId,
+        messages: current,
+        response,
+        streamedContent,
+      }));
       setNotice({
         tone: response.toolCalls.length ? "success" : "default",
         title: response.toolCalls.length
@@ -870,18 +838,12 @@ function App() {
       const displayDetail = providerAuthIssue
         ? "provider 로그인이 필요합니다. Provider 설정에서 브라우저 로그인을 완료한 뒤 다시 요청하세요."
         : detail;
-      setMessages((current) => current.map((item) => (
-        item.id === assistantMessageId
-          ? {
-            ...item,
-            tone: "error",
-            action: providerAuthIssue ? "connect-provider" : undefined,
-            content: displayDetail,
-            steps: markAssistantStepsError(item.steps),
-            loading: false,
-          }
-          : item
-      )));
+      setMessages((current) => failAssistantMessage({
+        action: providerAuthIssue ? "connect-provider" : undefined,
+        assistantMessageId,
+        content: displayDetail,
+        messages: current,
+      }));
       setNotice({
         tone: "error",
         title: providerAuthIssue ? "Provider 연결 필요" : "어시스턴트 사용 불가",
