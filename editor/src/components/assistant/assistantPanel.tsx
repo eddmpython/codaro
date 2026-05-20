@@ -46,6 +46,13 @@ export type AssistantWorkStep = {
   arguments?: unknown;
   result?: unknown;
   error?: string | null;
+  traceId?: string;
+  traceEventIndex?: number;
+  turnElapsedMs?: number;
+  category?: string;
+  lane?: string;
+  target?: string;
+  risk?: string;
   startedAt?: number;
   finishedAt?: number;
 };
@@ -272,6 +279,7 @@ function AssistantWorkLoop({ steps }: { steps?: AssistantWorkStep[] }) {
 
 function AssistantWorkStepRow({ step }: { step: AssistantWorkStep }) {
   const duration = step.startedAt && step.finishedAt ? formatDuration(step.finishedAt - step.startedAt) : null;
+  const traceElapsed = typeof step.turnElapsedMs === "number" ? `+${formatDuration(step.turnElapsedMs)}` : null;
   const icon = step.status === "running" ? (
     <Loader2 className="mt-1 size-3 animate-spin" />
   ) : step.status === "error" ? (
@@ -298,7 +306,9 @@ function AssistantWorkStepRow({ step }: { step: AssistantWorkStep }) {
         {icon}
         <span className="text-foreground">{step.label}</span>
         <span className="font-mono text-[10px] text-muted-foreground">{step.toolName}</span>
-        {duration ? <span className="ml-auto font-mono text-[10px] text-muted-foreground">{duration}</span> : null}
+        {duration || traceElapsed ? (
+          <span className="ml-auto font-mono text-[10px] text-muted-foreground">{duration ?? traceElapsed}</span>
+        ) : null}
       </summary>
       <div className="mt-2 space-y-2">
         <ToolPayloadBlock label="In" value={step.arguments} />

@@ -52,6 +52,12 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - `tool_results`가 오면 각 tool row를 done/error로 갱신한다.
    - raw payload는 기본 노출하지 않고, 필요할 때 `In`/`Out`으로 펼쳐 본다.
 
+7. **Trace와 평가**
+   - 모든 turn은 `traceId`를 가진다.
+   - tool payload에는 `category`, `lane`, `target`, `risk`, `traceEventIndex`, `turnElapsedMs`를 붙인다.
+   - response의 `trace.toolSequence`는 평가 harness의 입력으로 쓴다.
+   - 새 provider 동작을 추가하면 golden case가 그 순서를 검증해야 한다.
+
 ## 코드 경계
 
 ```

@@ -263,6 +263,13 @@ export type AiToolCall = {
   arguments?: Record<string, unknown>;
   status?: string;
   error?: string | null;
+  traceId?: string;
+  traceEventIndex?: number;
+  turnElapsedMs?: number;
+  category?: string;
+  lane?: string;
+  target?: string;
+  risk?: string;
   function?: {
     name?: string;
     arguments?: string;
@@ -287,6 +294,17 @@ export type AiChatResponse = {
   model?: string | null;
   usage?: unknown;
   toolCalls: AiToolCall[];
+  trace?: {
+    traceId?: string;
+    conversationId?: string | null;
+    elapsedMs?: number;
+    eventCount?: number;
+    toolCount?: number;
+    errorCount?: number;
+    policyViolationCount?: number;
+    toolSequence?: string[];
+    [key: string]: unknown;
+  };
 };
 
 export type OauthAuthorizePayload = {

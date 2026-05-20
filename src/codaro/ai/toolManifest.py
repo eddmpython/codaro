@@ -229,6 +229,21 @@ def toolManifest() -> dict[str, Any]:
     }
 
 
+def toolDescriptor(toolName: str) -> dict[str, Any]:
+    from .toolRegistry import getTool
+
+    tool = getTool(toolName)
+    if tool is None:
+        return {
+            "name": toolName,
+            "category": TOOL_CATEGORIES.get(toolName, "workbench"),
+            "lane": TOOL_LANES.get(toolName, "write"),
+            "target": TOOL_TARGETS.get(toolName, "learning-editor"),
+            "risk": TOOL_RISK.get(toolName, "normal"),
+        }
+    return _toolManifestItem(tool)
+
+
 def _toolManifestItem(tool: ToolDef) -> dict[str, Any]:
     required = tool.parameters.get("required", [])
     properties = tool.parameters.get("properties", {})

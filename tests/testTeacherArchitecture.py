@@ -5,10 +5,12 @@ from codaro.ai.teacher import (
     TeacherOrchestrator,
     ToolPolicyState,
     evaluateToolSequence,
+    evaluateToolTrace,
     goldenEvalCases,
     teacherSkills,
 )
 from codaro.document.cellSchema import schemaSummary
+from codaro.ai.tools import toolSchemas
 
 
 def testTeacherContextInjectionIncludesCellMapAndPreflight() -> None:
@@ -67,6 +69,7 @@ def testToolSequenceHarnessCapturesCoreExpectations() -> None:
 
 
 def testTracePayloadsHaveStableTraceId() -> None:
+    toolSchemas()
     orchestrator = TeacherOrchestrator.fromContext({})
     trace = orchestrator.startTrace("conv-1")
 
@@ -75,7 +78,27 @@ def testTracePayloadsHaveStableTraceId() -> None:
 
     assert start["traceId"] == trace.traceId
     assert done["traceId"] == trace.traceId
+    assert start["lane"] == "read"
+    assert done["target"] == "learning-editor"
+    assert start["traceEventIndex"] == 2
+    assert done["traceEventIndex"] == 3
     assert [event.eventType for event in trace.events] == ["turn-start", "tool-start", "tool-result"]
+    assert trace.summary()["toolSequence"] == ["read-cells"]
+
+
+def testEvalHarnessCanReadTraceSequence() -> None:
+    orchestrator = TeacherOrchestrator.fromContext({})
+    trace = orchestrator.startTrace("conv-2")
+    orchestrator.toolCallStart(trace, "call-1", "read-cells", {})
+    orchestrator.toolCallResult(trace, "call-1", "read-cells", {}, {"blocks": []})
+    orchestrator.toolCallStart(trace, "call-2", "cell-call", {"operation": "check"})
+    orchestrator.toolCallResult(trace, "call-2", "cell-call", {"operation": "check"}, {"passed": True})
+
+    case = next(case for case in goldenEvalCases if case.caseId == "answer-check-uses-cell-call")
+    report = evaluateToolTrace(case, trace)
+
+    assert report.passed
+    assert report.observedTools == ("read-cells", "cell-call")
 
 
 def testTeacherSkillsAndCellSchemaAreVisibleSsot() -> None:

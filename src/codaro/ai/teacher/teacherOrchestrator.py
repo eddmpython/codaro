@@ -28,8 +28,8 @@ class TeacherOrchestrator:
         return trace
 
     def toolCallStart(self, trace: TeacherTrace, toolCallId: str, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
-        payload = toolCallStart(toolCallId, name, arguments, traceId=trace.traceId)
-        trace.record("tool-start", {"toolCallId": toolCallId, "name": name})
+        event = trace.record("tool-start", {"toolCallId": toolCallId, "name": name})
+        payload = toolCallStart(toolCallId, name, arguments, traceId=trace.traceId, traceEvent=event)
         return payload
 
     def toolPolicyViolation(
@@ -49,6 +49,29 @@ class TeacherOrchestrator:
         arguments: dict[str, Any],
         result: dict[str, Any],
     ) -> dict[str, Any]:
-        payload = toolCallResult(toolCallId, name, arguments, result, traceId=trace.traceId)
-        trace.record("tool-result", {"toolCallId": toolCallId, "name": name, "status": payload["status"]})
+        event = trace.record("tool-result", {"toolCallId": toolCallId, "name": name, "status": resultStatus(result)})
+        payload = toolCallResult(toolCallId, name, arguments, result, traceId=trace.traceId, traceEvent=event)
         return payload
+
+    def finishTrace(
+        self,
+        trace: TeacherTrace,
+        *,
+        answer: str | None = None,
+        toolCalls: list[dict[str, Any]] | None = None,
+        includeEvents: bool = False,
+    ) -> dict[str, Any]:
+        trace.record(
+            "turn-finish",
+            {
+                "answerLength": len(answer or ""),
+                "toolCount": len(toolCalls or []),
+            },
+        )
+        return trace.summary(includeEvents=includeEvents)
+
+
+def resultStatus(result: dict[str, Any]) -> str:
+    if isinstance(result, dict) and result.get("error"):
+        return "error"
+    return "done"

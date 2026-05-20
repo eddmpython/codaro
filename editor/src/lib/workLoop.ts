@@ -57,13 +57,20 @@ function assistantWorkStepFromToolCall(toolCall: AiToolCall, status: AssistantWo
   const name = toolCallName(toolCall);
   return {
     id: toolStepId(toolCall),
-    label: workLabelFromToolName(name),
+    label: workLabelFromToolCall(toolCall, name),
     status,
-    detail: name,
+    detail: toolCallDetail(toolCall, name),
     toolName: name,
     arguments: toolCallArguments(toolCall),
     result: toolCall.result,
     error: toolCall.error,
+    traceId: toolCall.traceId,
+    traceEventIndex: toolCall.traceEventIndex,
+    turnElapsedMs: toolCall.turnElapsedMs,
+    category: toolCall.category,
+    lane: toolCall.lane,
+    target: toolCall.target,
+    risk: toolCall.risk,
     startedAt: Date.now(),
     finishedAt: status === "running" ? undefined : Date.now(),
   };
@@ -88,7 +95,7 @@ function toolCallArguments(toolCall: AiToolCall) {
   }
 }
 
-function workLabelFromToolName(name: string) {
+function workLabelFromToolCall(toolCall: AiToolCall, name: string) {
   switch (name) {
     case "write-curriculum-yaml":
       return "커리큘럼 구성";
@@ -112,7 +119,29 @@ function workLabelFromToolName(name: string) {
     case "click-element":
     case "type-text":
       return "화면 자동화";
+  }
+  switch (toolCall.lane) {
+    case "curriculum":
+      return "커리큘럼 구성";
+    case "read":
+      return "상태 확인";
+    case "write":
+      return "내용 반영";
+    case "cell-call":
+      return "셀 요청";
+    case "progress":
+      return "진도 기록";
+    case "automation":
+      return "자동화 처리";
+    case "safety":
+      return "안전 확인";
     default:
       return "작업 결과";
   }
+}
+
+function toolCallDetail(toolCall: AiToolCall, name: string) {
+  return [name, toolCall.target, toolCall.risk && toolCall.risk !== "normal" ? toolCall.risk : null]
+    .filter(Boolean)
+    .join(" · ");
 }

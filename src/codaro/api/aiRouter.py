@@ -320,6 +320,7 @@ def createAiRouter(state: Any) -> APIRouter:
 
             if not provider.supportsNativeTools or not tools:
                 convManager.addAssistantMessage(conversationId, response.answer)
+                tracePayload = orchestrator.finishTrace(trace, answer=response.answer, toolCalls=allToolResults)
                 return {
                     "conversationId": conversationId,
                     "answer": response.answer,
@@ -327,10 +328,12 @@ def createAiRouter(state: Any) -> APIRouter:
                     "model": response.model,
                     "usage": response.usage,
                     "toolCalls": allToolResults,
+                    "trace": tracePayload,
                 }
 
             if not response.toolCalls:
                 convManager.addAssistantMessage(conversationId, response.answer)
+                tracePayload = orchestrator.finishTrace(trace, answer=response.answer, toolCalls=allToolResults)
                 return {
                     "conversationId": conversationId,
                     "answer": response.answer,
@@ -338,6 +341,7 @@ def createAiRouter(state: Any) -> APIRouter:
                     "model": response.model,
                     "usage": response.usage,
                     "toolCalls": allToolResults,
+                    "trace": tracePayload,
                 }
 
             toolCallsData = [
@@ -348,6 +352,7 @@ def createAiRouter(state: Any) -> APIRouter:
             messages.append({"role": "assistant", "content": response.answer or "", "tool_calls": toolCallsData})
 
             for tc in response.toolCalls:
+                orchestrator.toolCallStart(trace, tc.id, tc.name, tc.arguments)
                 violation = policy.validateStart(tc.name, tc.arguments)
                 if violation is not None:
                     result = orchestrator.toolPolicyViolation(trace, violation)
@@ -364,6 +369,7 @@ def createAiRouter(state: Any) -> APIRouter:
         except _HANDLED_ERRORS as exc:
             raise _providerUnavailable(exc) from exc
         convManager.addAssistantMessage(conversationId, finalResponse.answer)
+        tracePayload = orchestrator.finishTrace(trace, answer=finalResponse.answer, toolCalls=allToolResults)
         return {
             "conversationId": conversationId,
             "answer": finalResponse.answer,
@@ -371,6 +377,7 @@ def createAiRouter(state: Any) -> APIRouter:
             "model": finalResponse.model,
             "usage": finalResponse.usage,
             "toolCalls": allToolResults,
+            "trace": tracePayload,
         }
 
     @router.post("/api/ai/chat/stream")
@@ -450,7 +457,8 @@ def createAiRouter(state: Any) -> APIRouter:
                 yield f"data: {json.dumps({'type': 'delta', 'delta': token, 'content': accumulated}, ensure_ascii=False)}\n\n"
 
             convManager.addAssistantMessage(conversationId, accumulated)
-            yield f"data: {json.dumps({'type': 'done', 'answer': accumulated, 'provider': llmProvider.config.provider, 'model': llmProvider.resolvedModel, 'usage': None, 'toolCalls': toolCalls or []}, ensure_ascii=False)}\n\n"
+            tracePayload = orchestrator.finishTrace(trace, answer=accumulated, toolCalls=toolCalls or [])
+            yield f"data: {json.dumps({'type': 'done', 'answer': accumulated, 'provider': llmProvider.config.provider, 'model': llmProvider.resolvedModel, 'usage': None, 'toolCalls': toolCalls or [], 'trace': tracePayload}, ensure_ascii=False)}\n\n"
             thread.join(timeout=2)
 
         async def _streamGenerate():
@@ -468,8 +476,9 @@ def createAiRouter(state: Any) -> APIRouter:
 
                 if not response.toolCalls:
                     convManager.addAssistantMessage(conversationId, response.answer)
+                    tracePayload = orchestrator.finishTrace(trace, answer=response.answer, toolCalls=allToolResults)
                     yield f"data: {json.dumps({'type': 'token', 'content': response.answer}, ensure_ascii=False)}\n\n"
-                    yield f"data: {json.dumps({'type': 'done', 'answer': response.answer, 'provider': response.provider, 'model': response.model, 'usage': response.usage, 'toolCalls': allToolResults}, ensure_ascii=False)}\n\n"
+                    yield f"data: {json.dumps({'type': 'done', 'answer': response.answer, 'provider': response.provider, 'model': response.model, 'usage': response.usage, 'toolCalls': allToolResults, 'trace': tracePayload}, ensure_ascii=False)}\n\n"
                     return
 
                 toolCallsData = [

@@ -93,6 +93,7 @@ type StreamEvent = {
   usage?: unknown;
   toolCall?: AiChatResponse["toolCalls"][number];
   toolCalls?: AiChatResponse["toolCalls"];
+  trace?: AiChatResponse["trace"];
 };
 
 async function postStreamChat(
@@ -152,6 +153,7 @@ async function postStreamChat(
           model: event.model,
           usage: event.usage,
           toolCalls: event.toolCalls ?? [],
+          trace: event.trace,
         };
       }
     }
@@ -171,6 +173,7 @@ async function postStreamChat(
         model: tail.model,
         usage: tail.usage,
         toolCalls: tail.toolCalls ?? [],
+        trace: tail.trace,
       };
     }
   }

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from .contextBuilder import injectContext
-from .evalHarness import TeacherEvalCase, evaluateToolSequence, goldenEvalCases
+from .evalHarness import TeacherEvalCase, evaluateToolSequence, evaluateToolTrace, goldenEvalCases
 from .skillRegistry import TeacherSkill, teacherSkillPrompt, teacherSkills
 from .teacherOrchestrator import TeacherOrchestrator
 from .toolLifecycle import toolCallResult, toolCallStart
@@ -16,6 +16,7 @@ __all__ = [
     "ToolPolicyState",
     "ToolPolicyViolation",
     "evaluateToolSequence",
+    "evaluateToolTrace",
     "goldenEvalCases",
     "injectContext",
     "teacherSkillPrompt",

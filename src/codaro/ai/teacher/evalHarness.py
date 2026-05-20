@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 
+from .traceModel import TeacherTrace
+
 
 @dataclass(frozen=True)
 class TeacherEvalCase:
@@ -17,6 +19,7 @@ class ToolSequenceReport:
     caseId: str
     passed: bool
     failures: tuple[str, ...] = field(default_factory=tuple)
+    observedTools: tuple[str, ...] = field(default_factory=tuple)
 
 
 goldenEvalCases: tuple[TeacherEvalCase, ...] = (
@@ -36,6 +39,18 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         prompt="내 답 맞아?",
         expectedTools=("read-cells", "cell-call"),
     ),
+    TeacherEvalCase(
+        caseId="cell-run-does-not-skip-package-preflight",
+        prompt="seaborn으로 그래프 셀 실행해줘",
+        expectedTools=("packages-check", "cell-call"),
+        orderedBefore=(("packages-check", "cell-call"),),
+    ),
+    TeacherEvalCase(
+        caseId="automation-uses-guarded-input-tools",
+        prompt="브라우저에서 버튼을 찾아 클릭하는 자동화를 만들어줘",
+        expectedTools=("find-element", "click-element"),
+        orderedBefore=(("find-element", "click-element"),),
+    ),
 )
 
 
@@ -52,4 +67,13 @@ def evaluateToolSequence(case: TeacherEvalCase, toolNames: list[str]) -> ToolSeq
             continue
         if toolNames.index(before) > toolNames.index(after):
             failures.append(f"{before} must run before {after}")
-    return ToolSequenceReport(caseId=case.caseId, passed=not failures, failures=tuple(failures))
+    return ToolSequenceReport(
+        caseId=case.caseId,
+        passed=not failures,
+        failures=tuple(failures),
+        observedTools=tuple(toolNames),
+    )
+
+
+def evaluateToolTrace(case: TeacherEvalCase, trace: TeacherTrace) -> ToolSequenceReport:
+    return evaluateToolSequence(case, trace.toolSequence())
