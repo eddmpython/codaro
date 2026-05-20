@@ -477,9 +477,12 @@ intro:
   direction: 표 데이터를 직접 만듭니다.
 sections:
   - title: DataFrame 만들기
+    subtitle: 행과 열의 감각
     goal: dict에서 표를 만듭니다.
     why: 반복 리포트의 출발점입니다.
     explanation: key가 열 이름입니다.
+    tips:
+      - 열 길이는 같아야 합니다.
     snippet: |
       import pandas as pd
       frame = pd.DataFrame({"sales": [10]})
@@ -504,9 +507,41 @@ sections:
         assert result["sectionCount"] == 1
         assert result["exerciseCellCount"] == 1
         assert result["snippetCellCount"] == 1
+        assert result["contractGapCount"] == 0
+        assert result["contractGaps"] == []
         assert result["runtimePackageCount"] == 1
         assert result["loadedInEditor"] is True
         assert captured["doc"].runtime.packages == ["pandas"]
+
+    def test_write_structured_curriculum_yaml_reports_contract_gaps(self):
+        executor = ToolExecutor(
+            sessionManager=_MockSessionManager(),
+            documentGetter=lambda: _makeDoc(),
+            documentSetter=lambda _doc: None,
+        )
+
+        yamlContent = """
+meta:
+  title: Partial Structured Pandas
+sections:
+  - title: DataFrame 만들기
+    goal: dict에서 표를 만듭니다.
+"""
+
+        result = asyncio.run(executor.execute("write-curriculum-yaml", {"yamlContent": yamlContent}))
+
+        assert result["contractGapCount"] == 8
+        assert result["contractGaps"][0]["title"] == "DataFrame 만들기"
+        assert result["contractGaps"][0]["missingFields"] == [
+            "subtitle",
+            "why",
+            "explanation",
+            "tips",
+            "snippet",
+            "exercise.prompt",
+            "exercise.starterCode",
+            "check",
+        ]
 
 
 class TestGenerateNotebook:

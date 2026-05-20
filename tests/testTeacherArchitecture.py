@@ -256,6 +256,7 @@ def _structuredSectionContractPayload() -> dict:
             "difficulty": "easy",
         },
         "check": {"noError": "실행 오류가 없어야 한다."},
+        "contractGaps": [],
     }
 
 
@@ -639,6 +640,7 @@ def testEvalHarnessCanValidateStructuredCurriculumTrace() -> None:
             "document": _structuredCurriculumDocumentPayload(),
             "sectionCount": 1,
             "exerciseCellCount": 1,
+            "contractGapCount": 0,
             "loadedInEditor": True,
         },
     )
@@ -974,6 +976,7 @@ def testGoldenProviderCaseValidatesStructuredYamlMaterialization() -> None:
             "document": _structuredCurriculumDocumentPayload(),
             "sectionCount": 1,
             "exerciseCellCount": 1,
+            "contractGapCount": 0,
             "loadedInEditor": True,
         },
     })
@@ -990,6 +993,35 @@ def testGoldenProviderCaseValidatesStructuredYamlMaterialization() -> None:
     assert report.passed
     assert report.tracePayload["yamlContractObserved"]
     assert "write-curriculum-yaml.document" in report.evaluation.observedResultSignals
+    assert "write-curriculum-yaml.contractGapCount" in report.evaluation.observedResultSignals
+
+
+def testEvalHarnessFailsStructuredYamlContractGaps() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
+    document = copy.deepcopy(_structuredCurriculumDocumentPayload())
+    sectionContract = document["blocks"][1]["payload"]["sectionContract"]
+    sectionContract["contractGaps"] = ["snippet"]
+    tracePayload = {
+        "toolSequence": ["write-curriculum-yaml"],
+        "toolCalls": [
+            {
+                "name": "write-curriculum-yaml",
+                "result": {
+                    "document": document,
+                    "sectionCount": 1,
+                    "exerciseCellCount": 1,
+                    "contractGapCount": 1,
+                    "contractGaps": [{"title": "DataFrame 만들기", "missingFields": ["snippet"]}],
+                    "loadedInEditor": True,
+                },
+            }
+        ],
+    }
+
+    report = evaluateToolTracePayload(case, tracePayload)
+
+    assert not report.passed
+    assert any("structured YAML contract gaps observed" in failure for failure in report.failures)
 
 
 def testGoldenProviderCaseUsesRealCurriculumYamlHandlerToChangeDocument() -> None:
@@ -1090,9 +1122,11 @@ sections:
     assert activeDocument.title == "pandas 기초"
     assert activeDocument.runtime.packages == ["pandas"]
     assert report.turnPayload["toolCalls"][0]["result"]["loadedInEditor"] is True
+    assert report.turnPayload["toolCalls"][0]["result"]["contractGapCount"] == 0
     assert "sectionContract:exercise" in {block.sourceType for block in activeDocument.blocks}
     assert "write-curriculum-yaml.document" in report.evaluation.observedResultSignals
     assert "write-curriculum-yaml.loadedInEditor" in report.evaluation.observedResultSignals
+    assert "write-curriculum-yaml.contractGapCount" in report.evaluation.observedResultSignals
 
 
 def testEvalHarnessFailsMissingGoldenTracePayload() -> None:

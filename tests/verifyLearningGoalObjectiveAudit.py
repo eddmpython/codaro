@@ -43,6 +43,7 @@ OBJECTIVE_REQUIREMENTS = (
                 "sections:",
                 "title → subtitle → goal → why → explanation → tips → snippet → exercise → result → check",
                 "sectionContract:*",
+                "contractGapCount: 0",
             )),
             ("tests/verifyLearningSystemReadiness.py", (
                 "learning-yaml-contract-ssot",
@@ -181,6 +182,7 @@ OBJECTIVE_REQUIREMENTS = (
                 "turn-error",
                 "durationMs",
                 "skipped",
+                "contractGapCount",
             )),
             ("tests/verifyAssistantWorkloopContract.py", (
                 "작업 전 확인 질문",
@@ -193,6 +195,7 @@ OBJECTIVE_REQUIREMENTS = (
                 "cell-call",
                 "project .venv",
                 "pandas 이미 준비됨",
+                "계약 gap 2개",
             )),
         ),
     ),
@@ -209,6 +212,8 @@ OBJECTIVE_REQUIREMENTS = (
                 "_missingDiagramRuntimeDetails",
                 "(\"write-curriculum-yaml\", \"sectionCount\")",
                 "(\"write-curriculum-yaml\", \"exerciseCellCount\")",
+                "(\"write-curriculum-yaml\", \"contractGapCount\")",
+                "expectedNoContractGaps",
             )),
             ("tests/verifyTeacherGoldenE2e.py", (
                 "teacher golden e2e score",
@@ -219,6 +224,8 @@ OBJECTIVE_REQUIREMENTS = (
                 "provider did not receive tool result",
                 "write-curriculum-yaml.sectionCount",
                 "write-curriculum-yaml.exerciseCellCount",
+                "write-curriculum-yaml.contractGapCount",
+                "provider received curriculum tool result with contract gaps",
                 "uv 사전 확인",
                 "검증 결과",
             )),

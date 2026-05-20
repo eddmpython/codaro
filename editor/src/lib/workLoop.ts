@@ -469,12 +469,14 @@ function toolResultDetail(result: unknown, name: string, args: Record<string, un
       const exerciseCellCount = numberArg(payload, "exerciseCellCount");
       const blockCount = numberArg(payload, "blockCount");
       const runtimePackageCount = numberArg(payload, "runtimePackageCount");
+      const contractGapCount = numberArg(payload, "contractGapCount");
       const parts = [
         title,
         sectionCount !== undefined ? `섹션 카드 ${sectionCount}개` : "",
         exerciseCellCount !== undefined ? `실습 셀 ${exerciseCellCount}개` : "",
         exerciseCellCount === undefined && blockCount !== undefined ? `학습 셀 ${blockCount}개` : "",
         runtimePackageCount !== undefined ? `실행 패키지 ${runtimePackageCount}개` : "",
+        contractGapCount !== undefined && contractGapCount > 0 ? `계약 gap ${contractGapCount}개` : "",
         payload.loadedInEditor === true ? "에디터 반영" : "",
       ].filter(Boolean);
       return parts.join(" · ");

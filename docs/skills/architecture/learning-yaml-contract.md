@@ -99,6 +99,8 @@ sections:
 
 새 YAML에서 `blocks`가 없고 structured section fields가 있으면 materializer가 설명, 스니펫, 실습, 검증 셀을 직접 생성한다.
 
+새 structured section이 `subtitle`, `goal`, `why`, `explanation`, `tips`, `snippet`, `exercise.prompt`, `exercise.starterCode`, `check` 중 일부를 빠뜨리면 materializer는 이를 조용히 추측하지 않는다. `sectionContract.contractGaps`, `sectionContractGaps`, `contractGapCount`, `contractGaps`로 누락 필드를 보고한다. teacher가 생성하는 신규 YAML과 golden provider run은 `contractGapCount: 0`이어야 한다.
+
 ## 구현 경계
 
 - Python SSOT 모델: `src/codaro/curriculum/sectionContract.py`
@@ -118,6 +120,7 @@ teacher/provider loop의 golden case는 다음을 확인해야 한다.
 - 섹션 카드가 goal, why, explanation, tips를 contract에서 읽는다.
 - golden provider run은 `section` 블록 뒤에 `sectionContract:explanation → sectionContract:snippet → sectionContract:exercise → sectionContract:check`가 같은 섹션 범위 안에서 materialize됐는지 확인한다.
 - golden provider run은 가능한 한 실제 `write-curriculum-yaml` 핸들러를 통과해야 한다. synthetic trace만으로 통과시키지 않고, 결과 document가 에디터에 로드됐는지(`loadedInEditor`)와 `meta.packages`가 document runtime packages에 보존됐는지 확인한다.
+- golden provider run은 `contractGapCount` result signal을 확인하고, 새 structured YAML에 누락 필드가 남으면 실패해야 한다.
 - `learning-card-contract` gate가 structured section marker와 editor build를 고정해야 한다.
 - `learning-card-browser` gate가 실제 `yamlToDocument` materializer 산출물의 contract flow와 runtime package를 먼저 검증한 뒤, 같은 산출물의 렌더링 필드를 custom curriculum으로 주입해 Playwright CLI로 데스크톱과 모바일 structured section card 흐름과 실습 입력 셀/실행 결과/검증 구역 겹침 여부를 확인한다.
 - 패키지 흐름은 `packages-check → packages-install(필요할 때만) → cell-call` 순서를 지킨다.

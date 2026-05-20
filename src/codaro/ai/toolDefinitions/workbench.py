@@ -163,7 +163,8 @@ TOOL_WRITE_CURRICULUM_YAML = ToolDef(
     description=(
         "Convert a structured Codaro curriculum YAML draft into section-card learning cells and load it into the editor. "
         "For new lessons, use meta, intro, and sections with title/subtitle/goal/why/explanation/tips/snippet/exercise/check; "
-        "do not use sections[].blocks unless converting a legacy curriculum."
+        "do not use sections[].blocks unless converting a legacy curriculum. "
+        "The result reports contractGapCount/contractGaps, and new structured lessons should produce zero gaps."
     ),
     parameters={
         "type": "object",

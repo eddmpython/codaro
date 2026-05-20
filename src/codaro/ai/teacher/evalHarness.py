@@ -30,6 +30,7 @@ class TeacherEvalCase:
     expectedClarificationAssumptionKeys: tuple[str, ...] = ()
     expectedYamlContract: bool = False
     expectedSectionCardFlow: bool = False
+    expectedNoContractGaps: bool = False
     expectedLoadedInEditor: bool = False
     expectedRuntimePackages: tuple[str, ...] = ()
     expectedDiagramRuntimeDetails: tuple[str, ...] = ()
@@ -148,9 +149,11 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
             ("write-curriculum-yaml", "document"),
             ("write-curriculum-yaml", "sectionCount"),
             ("write-curriculum-yaml", "exerciseCellCount"),
+            ("write-curriculum-yaml", "contractGapCount"),
         ),
         expectedYamlContract=True,
         expectedSectionCardFlow=True,
+        expectedNoContractGaps=True,
         expectedLoadedInEditor=True,
         expectedRuntimePackages=("pandas",),
         expectedDiagramRuntimeDetails=("uv 사전 확인", "검증 결과"),
@@ -280,6 +283,8 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
         failures.append("missing structured learning YAML contract")
     if case.expectedSectionCardFlow and not _hasStructuredSectionCardFlow(tracePayload):
         failures.append("missing structured section card flow")
+    if case.expectedNoContractGaps:
+        failures.extend(_contractGapFailures(tracePayload))
     if case.expectedLoadedInEditor and not _hasLoadedCurriculumDocument(tracePayload):
         failures.append("curriculum document was not loaded in editor")
     missingRuntimePackages = _missingRuntimePackages(tracePayload, case.expectedRuntimePackages)
@@ -513,6 +518,29 @@ def _hasLoadedCurriculumDocument(tracePayload: Mapping[str, Any]) -> bool:
     )
 
 
+def _contractGapFailures(tracePayload: Mapping[str, Any]) -> list[str]:
+    gapSummaries: list[str] = []
+    for result in _toolResultPayloads(tracePayload, "write-curriculum-yaml"):
+        count = result.get("contractGapCount")
+        if isinstance(count, int) and not isinstance(count, bool) and count > 0:
+            gapSummaries.append(f"result contractGapCount={count}")
+        contractGaps = result.get("contractGaps")
+        if isinstance(contractGaps, list):
+            for item in contractGaps:
+                if not isinstance(item, Mapping):
+                    continue
+                title = item.get("title")
+                missingFields = item.get("missingFields")
+                if isinstance(missingFields, list) and missingFields:
+                    label = str(title) if _hasText(title) else "section"
+                    gapSummaries.append(f"{label}: {', '.join(str(field) for field in missingFields)}")
+        for document in _iterCurriculumDocuments(tracePayload):
+            gapSummaries.extend(_documentContractGapSummaries(document))
+    if not gapSummaries:
+        return []
+    return [f"structured YAML contract gaps observed: {'; '.join(dict.fromkeys(gapSummaries))}"]
+
+
 def _missingRuntimePackages(tracePayload: Mapping[str, Any], expectedPackages: Sequence[str]) -> tuple[str, ...]:
     expected = tuple(normalized for package in expectedPackages if (normalized := _normalizePackageName(package)))
     if not expected:
@@ -527,6 +555,26 @@ def _missingRuntimePackages(tracePayload: Mapping[str, Any], expectedPackages: S
             continue
         observed.update(_normalizePackageName(package) for package in packages)
     return tuple(package for package in expected if package not in observed)
+
+
+def _documentContractGapSummaries(document: Mapping[str, Any]) -> list[str]:
+    blocks = document.get("blocks")
+    if not isinstance(blocks, list):
+        return []
+    summaries: list[str] = []
+    for block in blocks:
+        if not isinstance(block, Mapping):
+            continue
+        contract = _sectionContractFromBlock(block)
+        if not isinstance(contract, Mapping):
+            continue
+        gaps = contract.get("contractGaps")
+        if not isinstance(gaps, list) or not gaps:
+            continue
+        title = contract.get("title")
+        label = str(title) if _hasText(title) else "section"
+        summaries.append(f"{label}: {', '.join(str(field) for field in gaps)}")
+    return summaries
 
 
 def _missingDiagramRuntimeDetails(tracePayload: Mapping[str, Any], expectedDetails: Sequence[str]) -> tuple[str, ...]:

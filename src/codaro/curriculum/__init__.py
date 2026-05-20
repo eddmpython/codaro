@@ -33,7 +33,9 @@ from .sectionContract import (
     LearningSectionContract,
     LessonIntroContract,
     LessonMetaContract,
+    REQUIRED_STRUCTURED_SECTION_FIELDS,
     lessonContractFromYaml,
+    sectionContractGaps,
     sectionHasStructuredFields,
 )
 
@@ -58,6 +60,7 @@ __all__ = [
     "LessonIntroContract",
     "LessonMetaContract",
     "PHILOSOPHY",
+    "REQUIRED_STRUCTURED_SECTION_FIELDS",
     "ProgressTracker",
     "ToolExerciseCheckInput",
     "UserProgress",
@@ -72,6 +75,7 @@ __all__ = [
     "runExerciseCheck",
     "runToolExerciseCheck",
     "lessonContractFromYaml",
+    "sectionContractGaps",
     "sectionHasStructuredFields",
     "yamlToDocument",
 ]

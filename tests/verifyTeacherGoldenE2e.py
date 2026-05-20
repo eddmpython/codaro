@@ -477,11 +477,15 @@ async def runCurriculumMaterializationCase() -> dict[str, Any]:
         extraFailures.append("provider did not receive curriculum materialization tool result")
     elif yamlResult.get("loadedInEditor") is not True:
         extraFailures.append("provider received curriculum tool result without loadedInEditor")
+    elif yamlResult.get("contractGapCount") != 0:
+        extraFailures.append(f"provider received curriculum tool result with contract gaps: {yamlResult.get('contractGaps')}")
     signals = set(report.evaluation.observedResultSignals)
     if "write-curriculum-yaml.sectionCount" not in signals:
         extraFailures.append("curriculum materialization result is missing sectionCount")
     if "write-curriculum-yaml.exerciseCellCount" not in signals:
         extraFailures.append("curriculum materialization result is missing exerciseCellCount")
+    if "write-curriculum-yaml.contractGapCount" not in signals:
+        extraFailures.append("curriculum materialization result is missing contractGapCount")
     return reportPayload(report, extraFailures)
 
 

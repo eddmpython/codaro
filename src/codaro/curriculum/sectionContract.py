@@ -15,6 +15,18 @@ STRUCTURED_SECTION_FIELDS = {
     "check",
 }
 
+REQUIRED_STRUCTURED_SECTION_FIELDS = (
+    "subtitle",
+    "goal",
+    "why",
+    "explanation",
+    "tips",
+    "snippet",
+    "exercise.prompt",
+    "exercise.starterCode",
+    "check",
+)
+
 
 class LessonMetaContract(BaseModel):
     title: str = ""
@@ -50,6 +62,7 @@ class LearningSectionContract(BaseModel):
     exercise: LearningExerciseContract = Field(default_factory=LearningExerciseContract)
     check: dict[str, str] = Field(default_factory=dict)
     rawBlocks: list[dict[str, Any]] = Field(default_factory=list)
+    contractGaps: list[str] = Field(default_factory=list)
 
 
 class LearningLessonContract(BaseModel):
@@ -87,13 +100,36 @@ def sectionHasStructuredFields(section: dict[str, Any]) -> bool:
     return any(fieldName in section for fieldName in STRUCTURED_SECTION_FIELDS)
 
 
+def sectionContractGaps(section: LearningSectionContract) -> list[str]:
+    gaps: list[str] = []
+    if not section.subtitle:
+        gaps.append("subtitle")
+    if not section.goal:
+        gaps.append("goal")
+    if not section.why:
+        gaps.append("why")
+    if not section.explanation:
+        gaps.append("explanation")
+    if not section.tips:
+        gaps.append("tips")
+    if not section.snippet:
+        gaps.append("snippet")
+    if not section.exercise.prompt:
+        gaps.append("exercise.prompt")
+    if not section.exercise.starterCode:
+        gaps.append("exercise.starterCode")
+    if not (section.check or section.exercise.check):
+        gaps.append("check")
+    return gaps
+
+
 def _sectionContract(section: dict[str, Any], index: int) -> LearningSectionContract:
     blocks = _arrayOfMaps(section.get("blocks"))
     directExercise = _exerciseContract(section.get("exercise"))
     inferredExercise = _firstExerciseFromBlocks(blocks)
     exercise = directExercise if _hasExerciseData(directExercise) else inferredExercise
     check = _checkMap(section.get("check")) or exercise.check
-    return LearningSectionContract(
+    contract = LearningSectionContract(
         id=_textValue(section.get("id")) or f"section-{index}",
         title=_textValue(section.get("title")) or f"{index}단계",
         subtitle=_textValue(section.get("subtitle")),
@@ -107,6 +143,9 @@ def _sectionContract(section: dict[str, Any], index: int) -> LearningSectionCont
         check=check,
         rawBlocks=blocks,
     )
+    if not sectionHasStructuredFields(section):
+        return contract
+    return contract.model_copy(update={"contractGaps": sectionContractGaps(contract)})
 
 
 def _exerciseContract(value: Any) -> LearningExerciseContract:

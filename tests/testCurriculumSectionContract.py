@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from codaro.curriculum.converter import yamlToDocument
-from codaro.curriculum.sectionContract import lessonContractFromYaml
+from codaro.curriculum.sectionContract import lessonContractFromYaml, sectionContractGaps
 
 
 def testLessonContractExtractsStructuredSectionFields() -> None:
@@ -59,6 +59,8 @@ def testLessonContractExtractsStructuredSectionFields() -> None:
     assert section.exercise.prompt.startswith("sales")
     assert section.exercise.check == {"contains": "DataFrame"}
     assert section.check == {"variable": "sales"}
+    assert section.contractGaps == []
+    assert sectionContractGaps(section) == []
 
 
 def testYamlToDocumentMaterializesStructuredSectionContract() -> None:
@@ -68,6 +70,7 @@ def testYamlToDocumentMaterializesStructuredSectionContract() -> None:
         "sections": [
             {
                 "title": "섹션 카드",
+                "subtitle": "계약 흐름",
                 "goal": "섹션 하나를 카드 하나로 봅니다.",
                 "why": "학습 흐름이 한곳에 모입니다.",
                 "explanation": "설명, 스니펫, 실습, 검증이 한 카드 안에서 이어집니다.",
@@ -92,6 +95,7 @@ def testYamlToDocumentMaterializesStructuredSectionContract() -> None:
 
     sectionTitle = next(block for block in document.blocks if block.sourceType == "section")
     assert sectionTitle.payload["sectionContract"]["goal"] == "섹션 하나를 카드 하나로 봅니다."
+    assert sectionTitle.payload["sectionContractGaps"] == []
 
     snippet = next(block for block in document.blocks if block.sourceType == "sectionContract:snippet")
     exercise = next(block for block in document.blocks if block.sourceType == "sectionContract:exercise")
@@ -148,3 +152,36 @@ def testStructuredSectionMaterializesSingleCardFlowBlocks() -> None:
     assert contract["title"] == "한 섹션 카드"
     assert contract["subtitle"] == "설명에서 검증까지 한 흐름"
     assert contract["goal"] == "스니펫을 보고 직접 입력합니다."
+    assert contract["contractGaps"] == []
+
+
+def testStructuredSectionContractReportsMissingFields() -> None:
+    content = {
+        "meta": {"title": "Incomplete structured lesson"},
+        "sections": [
+            {
+                "id": "partial",
+                "title": "부분 구조화 섹션",
+                "goal": "goal 하나만 있는 새 계약 초안입니다.",
+            }
+        ],
+    }
+
+    contract = lessonContractFromYaml(content)
+    section = contract.sections[0]
+
+    assert section.contractGaps == [
+        "subtitle",
+        "why",
+        "explanation",
+        "tips",
+        "snippet",
+        "exercise.prompt",
+        "exercise.starterCode",
+        "check",
+    ]
+
+    document, _solutions = yamlToDocument(content, "ai", "partial")
+    sectionBlock = next(block for block in document.blocks if block.sourceType == "section")
+    assert sectionBlock.payload["sectionContractGaps"] == section.contractGaps
+    assert sectionBlock.payload["sectionContract"]["contractGaps"] == section.contractGaps

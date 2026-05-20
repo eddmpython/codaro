@@ -48,6 +48,7 @@ type LearningSectionContract = {
   exercise: LearningExerciseContract;
   check: Record<string, string>;
   rawBlocks: YamlMap[];
+  contractGaps: string[];
 };
 
 type LearningLessonContract = {
@@ -317,7 +318,13 @@ function documentFromCurriculumYaml(raw: string, category: string, contentId: st
       blocks.push(markdownBlock({
         content: [sectionTitle ? `## ${sectionTitle}` : "", sectionSubtitle].filter(Boolean).join("\n\n"),
         displayKind: "title",
-        payload: { title: sectionTitle, subtitle: sectionSubtitle, id: textValue(section.id), sectionContract },
+        payload: {
+          title: sectionTitle,
+          subtitle: sectionSubtitle,
+          id: textValue(section.id),
+          sectionContract,
+          sectionContractGaps: sectionContract.contractGaps,
+        },
         role: "title",
         sourceType: "section",
         title: sectionTitle || sectionSubtitle,
@@ -630,7 +637,7 @@ function sectionContractFromYaml(section: YamlMap, index: number): LearningSecti
   const inferredExercise = firstExerciseFromBlocks(rawBlocks);
   const exercise = hasExerciseData(directExercise) ? directExercise : inferredExercise;
   const check = checkMap(section.check);
-  return {
+  const contract = {
     id: textValue(section.id) || `section-${index}`,
     title: textValue(section.title) || `${index}단계`,
     subtitle: textValue(section.subtitle),
@@ -642,6 +649,11 @@ function sectionContractFromYaml(section: YamlMap, index: number): LearningSecti
     exercise,
     check: Object.keys(check).length ? check : exercise.check,
     rawBlocks,
+    contractGaps: [],
+  };
+  return {
+    ...contract,
+    contractGaps: sectionHasStructuredFields(section) ? sectionContractGaps(contract) : [],
   };
 }
 
@@ -707,6 +719,20 @@ function structuredBlocksFromSectionContract(section: LearningSectionContract): 
 
 function sectionHasStructuredFields(section: YamlMap) {
   return ["goal", "why", "explanation", "tips", "snippet", "exercise", "check"].some((fieldName) => fieldName in section);
+}
+
+function sectionContractGaps(section: LearningSectionContract) {
+  const gaps: string[] = [];
+  if (!section.subtitle) gaps.push("subtitle");
+  if (!section.goal) gaps.push("goal");
+  if (!section.why) gaps.push("why");
+  if (!section.explanation) gaps.push("explanation");
+  if (!section.tips.length) gaps.push("tips");
+  if (!section.snippet) gaps.push("snippet");
+  if (!section.exercise.prompt) gaps.push("exercise.prompt");
+  if (!section.exercise.starterCode) gaps.push("exercise.starterCode");
+  if (!Object.keys(section.check).length && !Object.keys(section.exercise.check).length) gaps.push("check");
+  return gaps;
 }
 
 function exerciseContract(value: unknown): LearningExerciseContract {

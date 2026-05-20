@@ -205,6 +205,8 @@ class WorkbenchToolHandlers:
         sectionCount = sum(1 for block in document.blocks if block.sourceType == "section")
         exerciseCellCount = sum(1 for block in document.blocks if block.sourceType == "sectionContract:exercise")
         snippetCellCount = sum(1 for block in document.blocks if block.sourceType == "sectionContract:snippet")
+        contractGaps = _curriculumContractGaps(document)
+        contractGapCount = sum(len(item["missingFields"]) for item in contractGaps)
 
         return {
             "documentId": document.id,
@@ -212,6 +214,8 @@ class WorkbenchToolHandlers:
             "sectionCount": sectionCount,
             "exerciseCellCount": exerciseCellCount,
             "snippetCellCount": snippetCellCount,
+            "contractGapCount": contractGapCount,
+            "contractGaps": contractGaps,
             "runtimePackageCount": len(document.runtime.packages),
             "blockCount": len(document.blocks),
             "solutionCount": len(solutions),
@@ -219,3 +223,26 @@ class WorkbenchToolHandlers:
             "document": document.model_dump(),
             "solutions": solutions,
         }
+
+
+def _curriculumContractGaps(document: Any) -> list[dict[str, Any]]:
+    gaps: list[dict[str, Any]] = []
+    for index, block in enumerate(document.blocks):
+        if block.sourceType != "section" or not isinstance(block.payload, dict):
+            continue
+        sectionContract = block.payload.get("sectionContract")
+        if not isinstance(sectionContract, dict):
+            continue
+        missingFields = sectionContract.get("contractGaps")
+        if not isinstance(missingFields, list):
+            continue
+        normalizedFields = [str(fieldName) for fieldName in missingFields if str(fieldName).strip()]
+        if not normalizedFields:
+            continue
+        gaps.append({
+            "sectionIndex": index,
+            "sectionId": str(sectionContract.get("id") or block.payload.get("id") or ""),
+            "title": str(sectionContract.get("title") or block.title or ""),
+            "missingFields": normalizedFields,
+        })
+    return gaps

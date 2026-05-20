@@ -60,6 +60,7 @@ def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[Codaro
                         "subtitle": sectionSubtitle,
                         "id": section.get("id"),
                         "sectionContract": sectionContract.model_dump(mode="json") if sectionContract else None,
+                        "sectionContractGaps": sectionContract.contractGaps if sectionContract else [],
                     },
                 )
             )

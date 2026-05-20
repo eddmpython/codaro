@@ -147,6 +147,8 @@ def _resultWorkDetail(name: str, arguments: dict[str, Any], result: dict[str, An
             parts.append(f"학습 셀 {stats['blockCount']}개")
         if stats["runtimePackageCount"] is not None:
             parts.append(f"실행 패키지 {stats['runtimePackageCount']}개")
+        if stats["contractGapCount"] is not None and stats["contractGapCount"] > 0:
+            parts.append(f"계약 gap {stats['contractGapCount']}개")
         if result.get("loadedInEditor") is True:
             parts.append("에디터 반영")
         return " · ".join(parts)
@@ -189,6 +191,7 @@ def _curriculumResultStats(result: dict[str, Any]) -> dict[str, int | None]:
     exerciseCellCount = _intResult(result, "exerciseCellCount")
     blockCount = _intResult(result, "blockCount")
     runtimePackageCount = _intResult(result, "runtimePackageCount")
+    contractGapCount = _intResult(result, "contractGapCount")
     return {
         "sectionCount": sectionCount if sectionCount is not None else _sourceTypeCount(blockList, "section"),
         "exerciseCellCount": (
@@ -198,6 +201,7 @@ def _curriculumResultStats(result: dict[str, Any]) -> dict[str, int | None]:
         "runtimePackageCount": runtimePackageCount if runtimePackageCount is not None else (
             len(packages) if isinstance(packages, list) else None
         ),
+        "contractGapCount": contractGapCount,
     }
 
 

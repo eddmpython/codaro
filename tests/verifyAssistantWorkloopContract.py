@@ -263,6 +263,29 @@ assert.match(curriculumStep.detail, /실행 패키지 1개/);
 assert.match(curriculumStep.detail, /에디터 반영/);
 assert.doesNotMatch(curriculumStep.detail, /구조화된 YAML을 섹션 카드와 실행 셀로 변환/);
 
+const curriculumGapRun = finish({{
+  traceId: "trace-curriculum-gap",
+  toolSequence: ["write-curriculum-yaml"],
+}}, [
+  {{
+    toolCallId: "call-yaml-gap",
+    name: "write-curriculum-yaml",
+    arguments: {{ yamlContent: "meta:\\n  title: pandas 기초" }},
+    result: {{
+      title: "pandas 기초",
+      sectionCount: 1,
+      exerciseCellCount: 1,
+      contractGapCount: 2,
+      loadedInEditor: true,
+    }},
+    status: "done",
+    category: "learning",
+    lane: "curriculum",
+  }},
+]);
+const curriculumGapStep = findStep(curriculumGapRun, "커리큘럼 YAML 전개");
+assert.match(curriculumGapStep.detail, /계약 gap 2개/);
+
 const skippedInstall = finish({{
   traceId: "trace-skip-install",
 }}, [
