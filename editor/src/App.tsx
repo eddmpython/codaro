@@ -1,5 +1,4 @@
 ﻿import { useCallback, useEffect, useMemo, useState } from "react";
-import { codaroApi, optional, shouldUseApi } from "@/lib/api";
 import {
   initialAppNotice,
   initialBootstrapState,
@@ -18,16 +17,14 @@ import {
   categoryTitle,
 } from "@/lib/fallbackData";
 import {
-  curriculumContentsFallback,
-  lessonFallback,
+  loadCurriculumContentsState,
+  loadCurriculumLessonState,
   selectCategory,
   selectContent,
-  selectedContentOrFirst,
 } from "@/lib/curriculumSelection";
 import {
   buildCustomCurriculumApplication,
   type CustomCurriculumApplication,
-  CUSTOM_CURRICULUM_CATEGORY,
   createCustomCurriculumEntry,
   customCurriculaStorageKey,
   loadCustomCurricula,
@@ -35,7 +32,6 @@ import {
   type CustomCurriculumEntry,
 } from "@/lib/customCurricula";
 import {
-  draftsFromBlocks,
   draftsFromDocument,
   materializeDrafts,
   starterDocument,
@@ -268,21 +264,14 @@ function App() {
     let cancelled = false;
 
     async function loadContents() {
-      if (!selectedCategory) return;
-      if (selectedCategory === CUSTOM_CURRICULUM_CATEGORY) {
-        setContents([]);
-        setContentsLoading(false);
-        return;
-      }
       setContentsLoading(true);
       try {
-        const fallback = curriculumContentsFallback(selectedCategory);
-        const result = shouldUseApi()
-          ? await optional(() => codaroApi.curriculumContents(selectedCategory), fallback)
-          : { data: fallback, online: false };
+        const result = await loadCurriculumContentsState(selectedCategory, selectedContentId);
         if (cancelled) return;
-        setContents(result.data.contents);
-        setSelectedContentId((current) => selectedContentOrFirst(result.data, current));
+        if (result) {
+          setContents(result.contents);
+          setSelectedContentId(result.selectedContentId);
+        }
       } finally {
         if (!cancelled) setContentsLoading(false);
       }
@@ -299,29 +288,19 @@ function App() {
     let cancelled = false;
 
     async function loadReferenceLesson() {
-      if (!selectedCategory || !selectedContentId) return;
-      if (selectedCategory === CUSTOM_CURRICULUM_CATEGORY) {
-        setReferenceLoading(false);
-        return;
-      }
       setReferenceLoading(true);
       try {
-        const fallback = lessonFallback(selectedCategory, selectedContentId);
-        const result = shouldUseApi()
-          ? await optional(() => codaroApi.curriculumLesson(selectedCategory, selectedContentId), fallback)
-          : { data: fallback, online: false };
+        const result = await loadCurriculumLessonState(selectedCategory, selectedContentId);
         if (cancelled) return;
-        setCurriculumDocument(result.data.document);
-        setDrafts((current) => ({
-          ...current,
-          ...draftsFromBlocks(result.data.document.blocks, { emptySnippetDraft: true }),
-        }));
-        setSelectedCurriculumBlockId(result.data.document.blocks[0]?.id ?? "");
-        setNotice({
-          tone: result.online ? "success" : "warning",
-          title: "커리큘럼 열림",
-          detail: result.data.document.title,
-        });
+        if (result) {
+          setCurriculumDocument(result.document);
+          setDrafts((current) => ({
+            ...current,
+            ...result.draftUpdates,
+          }));
+          setSelectedCurriculumBlockId(result.selectedBlockId);
+          setNotice(result.notice);
+        }
       } finally {
         if (!cancelled) setReferenceLoading(false);
       }
