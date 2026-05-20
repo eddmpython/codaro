@@ -1,5 +1,10 @@
 ﻿import { useCallback, useEffect, useMemo, useState } from "react";
 import { codaroApi, optional, shouldUseApi } from "@/lib/api";
+import {
+  initialAppNotice,
+  initialBootstrapState,
+  loadAppBootstrapState,
+} from "@/lib/appBootstrap";
 import { MainSurface } from "@/components/app/mainSurface";
 import { TopBar } from "@/components/app/topBar";
 import { ProductSidebar, type SidebarCustomCurriculum } from "@/components/app/productSidebar";
@@ -11,15 +16,9 @@ import { ProviderSettingsSheet } from "@/components/assistant/providerSettingsSh
 import {
   categorySubtitle,
   categoryTitle,
-  fallbackBootstrap,
-  fallbackCategories,
 } from "@/lib/fallbackData";
 import {
-  registryCategories,
-} from "@/lib/curriculaRegistry";
-import {
   curriculumContentsFallback,
-  defaultCurriculumState,
   lessonFallback,
   selectCategory,
   selectContent,
@@ -42,7 +41,6 @@ import {
   materializeDrafts,
   starterDocument,
 } from "@/lib/documentModel";
-import { shortPath } from "@/lib/displayFormat";
 import {
   fallbackAutomationSnapshot,
   loadAutomationSnapshot,
@@ -98,12 +96,9 @@ import {
 } from "@/components/ui/sidebar";
 import type {
   AiProfile,
-  AiToolCatalogPayload,
   AppNotice,
   BlockConfig,
   CodaroDocument,
-  CurriculumCategory,
-  CurriculumContentSummary,
   EStopStatus,
   LoadState,
   SchedulerStatus,
@@ -114,22 +109,6 @@ import type {
 
 type PendingTarget = "notebook" | "curriculum";
 
-const emptyNotice: AppNotice = {
-  tone: "default",
-  title: "준비됨",
-  detail: "Codaro에게 커리큘럼, 실습 셀, 검증 셀, 자동화를 요청하세요.",
-};
-
-const emptyToolCatalog: AiToolCatalogPayload = {
-  groups: [],
-  lanes: [],
-  tools: [],
-  grouped: {},
-  byLane: {},
-};
-
-const builtInCurriculumCategories = registryCategories();
-const initialCurriculum = defaultCurriculumState();
 const initialAutomationSnapshot = fallbackAutomationSnapshot();
 
 function initialSurfaceFromLocation(): SurfaceMode {
@@ -141,28 +120,24 @@ function initialSurfaceFromLocation(): SurfaceMode {
 function App() {
   const [surface, setSurface] = useState<SurfaceMode>(() => initialSurfaceFromLocation());
   const [loadState, setLoadState] = useState<LoadState>("loading");
-  const [apiOnline, setApiOnline] = useState(false);
-  const [notice, setNotice] = useState<AppNotice>(emptyNotice);
-  const [categories, setCategories] = useState<CurriculumCategory[]>(
-    builtInCurriculumCategories.categories.length ? builtInCurriculumCategories.categories : fallbackCategories.categories,
-  );
-  const [contents, setContents] = useState<CurriculumContentSummary[]>(
-    initialCurriculum.contents.contents,
-  );
-  const [selectedCategory, setSelectedCategory] = useState(initialCurriculum.selectedCategory);
-  const [selectedContentId, setSelectedContentId] = useState(initialCurriculum.selectedContentId);
+  const [apiOnline, setApiOnline] = useState(initialBootstrapState.apiOnline);
+  const [notice, setNotice] = useState<AppNotice>(initialAppNotice);
+  const [categories, setCategories] = useState(initialBootstrapState.categories);
+  const [contents, setContents] = useState(initialBootstrapState.contents);
+  const [selectedCategory, setSelectedCategory] = useState(initialBootstrapState.selectedCategory);
+  const [selectedContentId, setSelectedContentId] = useState(initialBootstrapState.selectedContentId);
   const [contentsLoading, setContentsLoading] = useState(false);
   const [referenceLoading, setReferenceLoading] = useState(false);
   const [document, setDocument] = useState<CodaroDocument>(starterDocument);
-  const [curriculumDocument, setCurriculumDocument] = useState<CodaroDocument | null>(initialCurriculum.document);
-  const [selectedCurriculumBlockId, setSelectedCurriculumBlockId] = useState(initialCurriculum.document?.blocks[0]?.id ?? "");
+  const [curriculumDocument, setCurriculumDocument] = useState<CodaroDocument | null>(initialBootstrapState.curriculumDocument);
+  const [selectedCurriculumBlockId, setSelectedCurriculumBlockId] = useState(initialBootstrapState.curriculumDocument?.blocks[0]?.id ?? "");
   const [drafts, setDrafts] = useState<Record<string, string>>(
     draftsFromDocument(starterDocument),
   );
   const [pendingBlocks, setPendingBlocks] = useState<BlockConfig[]>([]);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget>("notebook");
   const [customCurricula, setCustomCurricula] = useState<CustomCurriculumEntry[]>(() => loadCustomCurricula());
-  const [selectedCustomCurriculumId, setSelectedCustomCurriculumId] = useState(initialCurriculum.selectedCustomCurriculumId);
+  const [selectedCustomCurriculumId, setSelectedCustomCurriculumId] = useState(initialBootstrapState.selectedCustomCurriculumId);
   const [selectedBlockId, setSelectedBlockId] = useState(starterDocument.blocks[1]?.id ?? starterDocument.blocks[0]?.id ?? "");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [variables, setVariables] = useState<VariableInfo[]>([]);
@@ -174,7 +149,7 @@ function App() {
   const [eStop, setEStop] = useState<EStopStatus>(initialAutomationSnapshot.eStop);
   const [auditCount, setAuditCount] = useState(initialAutomationSnapshot.auditCount);
   const [automationSection, setAutomationSection] = useState<AutomationSection>("codaro");
-  const [toolCatalog, setToolCatalog] = useState<AiToolCatalogPayload>(emptyToolCatalog);
+  const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
   const [aiProfile, setAiProfile] = useState<AiProfile | null>(null);
   const [aiConnecting, setAiConnecting] = useState(false);
   const [providerSettingsOpen, setProviderSettingsOpen] = useState(false);
@@ -255,75 +230,21 @@ function App() {
 
     async function initialize() {
       setLoadState("loading");
-      if (!shouldUseApi()) {
-        setApiOnline(false);
-        setCategories(builtInCurriculumCategories.categories.length ? builtInCurriculumCategories.categories : fallbackCategories.categories);
-        setContents(initialCurriculum.contents.contents);
-        setCurriculumDocument(initialCurriculum.document);
-        setToolCatalog(emptyToolCatalog);
-        setAiProfile({
-          activeProvider: "provider 없음",
-          activeModel: null,
-          ready: false,
-        });
-        setNotice(emptyNotice);
-        setLoadState("ready");
-        return;
-      }
-
-      const health = await optional(codaroApi.health, { status: "offline" });
+      const bootstrap = await loadAppBootstrapState();
       if (cancelled) return;
-
-      const [
-        bootstrapResult,
-        categoryResult,
-        toolsResult,
-        profileResult,
-      ] = await Promise.all([
-        optional(codaroApi.bootstrap, fallbackBootstrap),
-        optional(codaroApi.curriculumCategories, builtInCurriculumCategories.categories.length ? builtInCurriculumCategories : fallbackCategories),
-        optional(codaroApi.aiTools, emptyToolCatalog),
-        optional(codaroApi.aiProfile, {}),
-      ]);
-
-      if (cancelled) return;
-
-      setApiOnline(health.online && bootstrapResult.online);
-      setCategories(categoryResult.data.categories.length ? categoryResult.data.categories : fallbackCategories.categories);
-      setToolCatalog(toolsResult.data);
-      setAiProfile(profileResult.data);
-      if (health.online && bootstrapResult.online) {
-        const sessionResult = await optional(() => codaroApi.createSession(), { sessionId: "", status: "offline" });
-        if (!cancelled && sessionResult.data.sessionId) {
-          setSessionId(sessionResult.data.sessionId);
-        }
-      }
-
-      if (!cancelled && bootstrapResult.data.documentPath && bootstrapResult.online) {
-        try {
-          const loaded = await codaroApi.loadDocument(bootstrapResult.data.documentPath);
-          applyDocument(loaded.document);
-          setNotice({
-            tone: "success",
-            title: "노트북 불러옴",
-            detail: shortPath(loaded.path),
-          });
-        } catch (error) {
-          setNotice({
-            tone: "warning",
-            title: "노트북을 열 수 없음",
-            detail: error instanceof Error ? error.message : String(error),
-          });
-        }
-      }
-
-      if (health.online) {
+      setApiOnline(bootstrap.apiOnline);
+      setCategories(bootstrap.categories);
+      setContents(bootstrap.contents);
+      setCurriculumDocument(bootstrap.curriculumDocument);
+      setToolCatalog(bootstrap.toolCatalog);
+      setAiProfile(bootstrap.profile);
+      if (bootstrap.sessionId) setSessionId(bootstrap.sessionId);
+      if (bootstrap.documentToApply) applyDocument(bootstrap.documentToApply);
+      if (bootstrap.notice) setNotice(bootstrap.notice);
+      if (bootstrap.refreshAutomation) {
         await refreshAutomation();
       }
-
-      if (!cancelled) {
-        setLoadState("ready");
-      }
+      if (!cancelled) setLoadState("ready");
     }
 
     void initialize().catch((error) => {
