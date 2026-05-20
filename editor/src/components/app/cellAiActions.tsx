@@ -60,10 +60,11 @@ export function CellAiActions({
         aria-expanded={open}
         aria-label="이 셀에서 AI 도움 요청"
         className={cn(
-          "h-7 gap-1.5 px-2 text-xs opacity-90 lg:opacity-0 lg:transition group-hover:opacity-100 focus-visible:opacity-100",
-          open && "opacity-100",
+          "h-7 gap-1.5 px-2 text-xs",
+          open && "border-ring bg-muted",
         )}
-        tabIndex={selected ? 0 : -1}
+        data-cell-ai-help-trigger="always-visible"
+        data-cell-ai-selected={selected ? "true" : "false"}
         title="이 셀에서 AI 도움 요청"
         type="button"
         variant="outline"

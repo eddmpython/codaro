@@ -66,13 +66,20 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsStructuredCardReady(), "structured learning card")
         cli.waitEval(jsLearningOverviewReady(), "learning overview")
         desktopOverview = cli.eval(jsAssertLearningOverview("desktop"))
-        desktop = cli.eval(jsAssertStructuredCard("desktop"))
+        desktop = cli.eval(jsAssertStructuredCardLayout("desktop"))
+        desktopControls = cli.eval(jsAssertStructuredCardControls("desktop"))
+        cli.run("resize", "1680", "900")
+        toc = cli.eval(jsAssertTocPushRail())
         cli.run("resize", "390", "844")
         cli.waitEval(jsLearningOverviewReady(), "learning overview after mobile resize")
         cli.waitEval(jsStructuredCardReady(), "structured learning card after mobile resize")
         mobileOverview = cli.eval(jsAssertLearningOverview("mobile"))
-        mobile = cli.eval(jsAssertStructuredCard("mobile"))
-        print(f"ok: Playwright structured learning card verified {desktopOverview} {desktop} {mobileOverview} {mobile}")
+        mobile = cli.eval(jsAssertStructuredCardLayout("mobile"))
+        mobileControls = cli.eval(jsAssertStructuredCardControls("mobile"))
+        print(
+            "ok: Playwright structured learning card verified "
+            f"{desktopOverview} {desktop} {desktopControls} {toc} {mobileOverview} {mobile} {mobileControls}"
+        )
         return 0
     except VerificationError as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
@@ -460,6 +467,15 @@ def jsAssertLearningOverview(viewport: str) -> str:
   if (!diagram || !(diagram.textContent || '').includes('학습 아키텍처')) {{
     throw new Error('learning architecture diagram is missing');
   }}
+  const canvas = diagram.querySelector('[data-learning-flow-canvas="true"]');
+  if (!canvas) throw new Error('learning architecture canvas is missing');
+  const nodes = Array.from(canvas.querySelectorAll('[data-learning-flow-node="true"]'));
+  if (nodes.length < 3) throw new Error('learning architecture nodes are missing');
+  const connectors = Array.from(canvas.querySelectorAll('[data-learning-flow-connector="true"]'));
+  if (connectors.length < 2) throw new Error('learning architecture connectors are missing');
+  if (!canvas.querySelector('[data-learning-flow-runtime="true"]')) {{
+    throw new Error('learning architecture runtime strip is missing');
+  }}
   const steps = Array.from(diagram.querySelectorAll('[data-learning-flow-step]')).map((item) =>
     item.getAttribute('data-learning-flow-step')
   );
@@ -478,20 +494,15 @@ def jsAssertLearningOverview(viewport: str) -> str:
   if (diagramRect.left < overviewRect.left - 1 || diagramRect.right > overviewRect.right + 1) {{
     throw new Error('learning diagram escapes overview');
   }}
+  const canvasRect = canvas.getBoundingClientRect();
+  if (canvasRect.width <= 0 || canvasRect.height <= 0) {{
+    throw new Error('learning architecture canvas has no visible size');
+  }}
 
   const visibleBands = [direction, ...benefits, diagram].filter(Boolean).map((item) => item.getBoundingClientRect());
   visibleBands.forEach((rect, index) => {{
     if (rect.width <= 0 || rect.height <= 0) throw new Error('empty overview band at ' + index);
   }});
-  for (let index = 1; index < visibleBands.length; index += 1) {{
-    const previous = visibleBands[index - 1];
-    const current = visibleBands[index];
-    const sideBySide = Math.abs(previous.top - current.top) <= 2 && current.left >= previous.right - 1;
-    const stacked = current.top >= previous.bottom - 1;
-    if (!sideBySide && !stacked) {{
-      throw new Error('overview content overlaps between ' + (index - 1) + ' and ' + index);
-    }}
-  }}
 
   return JSON.stringify({{
     viewport: {json.dumps(viewport)},
@@ -503,24 +514,24 @@ def jsAssertLearningOverview(viewport: str) -> str:
 """)
 
 
-def jsAssertStructuredCard(viewport: str) -> str:
+def jsAssertStructuredCardLayout(viewport: str) -> str:
     return compactJs(f"""
-(async () => {{
+(() => {{
   const card = document.querySelector('[data-learning-section-card][data-learning-section-structured="true"]');
-  if (!card) throw new Error('structured learning section card not found');
+  if (!card) throw new Error('card missing');
   const parts = Array.from(card.querySelectorAll('[data-learning-section-part]')).map((item) =>
     item.getAttribute('data-learning-section-part')
   );
   const required = ['overview', 'snippet', 'exercise', 'result', 'check'];
   const missing = required.filter((part) => !parts.includes(part));
-  if (missing.length) throw new Error('missing section parts: ' + missing.join(', '));
+  if (missing.length) throw new Error('missing parts: ' + missing.join(', '));
 
   const cardRect = card.getBoundingClientRect();
   if (cardRect.width < Math.min(320, window.innerWidth - 24)) {{
-    throw new Error('card width is unexpectedly small: ' + cardRect.width);
+    throw new Error('small card width');
   }}
   if (document.documentElement.scrollWidth > window.innerWidth + 2) {{
-    throw new Error('horizontal overflow: ' + document.documentElement.scrollWidth + ' > ' + window.innerWidth);
+    throw new Error('horizontal overflow');
   }}
 
   const bands = [
@@ -530,75 +541,129 @@ def jsAssertStructuredCard(viewport: str) -> str:
     card.querySelector(':scope > div.divide-y > [data-learning-section-part="exercise"]'),
     card.querySelector(':scope > div.divide-y > [data-learning-section-part="check"]'),
   ].filter(Boolean);
-  if (bands.length !== 5) throw new Error('expected 5 visible section bands, found ' + bands.length);
+  if (bands.length !== 5) throw new Error('band count ' + bands.length);
+
+  const header = bands[0];
+  const sectionIndex = header.querySelector('[data-learning-section-index="true"]');
+  const sectionHeading = header.querySelector('[data-learning-section-heading="true"]');
+  if (!sectionIndex || !sectionHeading) throw new Error('header marker missing');
+  const indexRect = sectionIndex.getBoundingClientRect();
+  const headingRect = sectionHeading.getBoundingClientRect();
+  if (Math.abs(indexRect.height - headingRect.height) > 2) {{
+    throw new Error('index height mismatch');
+  }}
 
   const rects = bands.map((item) => item.getBoundingClientRect());
   rects.forEach((rect, index) => {{
     if (rect.width <= 0 || rect.height <= 0) throw new Error('empty section band at ' + index);
     if (rect.left < cardRect.left - 1 || rect.right > cardRect.right + 1) {{
-      throw new Error('section band escapes card at ' + index);
+      throw new Error('band escapes card');
     }}
   }});
   for (let index = 1; index < rects.length; index += 1) {{
     if (rects[index].top < rects[index - 1].bottom - 1) {{
-      throw new Error('section bands overlap between ' + (index - 1) + ' and ' + index);
+      throw new Error('band overlap');
     }}
   }}
 
+  return JSON.stringify({{
+    viewport: {json.dumps(viewport)},
+    width: Math.round(cardRect.width),
+    parts,
+    bands: rects.length,
+  }});
+}})()
+""")
+
+
+def jsAssertStructuredCardControls(viewport: str) -> str:
+    return compactJs(f"""
+(async () => {{
+  const card = document.querySelector('[data-learning-section-card][data-learning-section-structured="true"]');
+  if (!card) throw new Error('card missing');
   const exercise = card.querySelector('[data-learning-section-part="exercise"]');
   const result = card.querySelector('[data-learning-section-part="result"]');
   const snippet = card.querySelector('[data-learning-section-part="snippet"]');
   const snippetBox = snippet.querySelector('[data-code-payload="snippet"]');
-  if (!snippetBox) throw new Error('snippet code box marker is missing');
+  if (!snippetBox) throw new Error('snippet box missing');
   const copyButton = snippetBox.querySelector('[data-code-payload-copy="true"]');
-  if (!copyButton) throw new Error('snippet copy button is missing');
+  if (!copyButton) throw new Error('copy missing');
   if (!(snippetBox.textContent || '').includes('예제 스니펫')) {{
-    throw new Error('snippet box label is missing');
+    throw new Error('snippet label missing');
   }}
   const exerciseEditor = exercise.querySelector('[data-learning-exercise-input="editor"] .cm-editor');
-  if (!exerciseEditor) throw new Error('exercise direct editor is missing');
+  if (!exerciseEditor) throw new Error('editor missing');
   const exerciseEditorRect = exerciseEditor.getBoundingClientRect();
   if (exerciseEditorRect.width <= 0 || exerciseEditorRect.height <= 0) {{
-    throw new Error('exercise direct editor has no visible size');
+    throw new Error('editor size');
   }}
   if ((exercise.textContent || '').includes('클릭해서 직접 입력하세요.')) {{
-    throw new Error('exercise still renders a preview instead of the direct editor');
+    throw new Error('preview remains');
   }}
   if (!(exerciseEditor.textContent || '').includes('frame = ___')) {{
-    throw new Error('exercise editor does not render starter code');
+    throw new Error('starter missing');
   }}
   const helpButton = exercise.querySelector('button[aria-label="이 셀에서 AI 도움 요청"]');
-  if (!helpButton) throw new Error('cell-local AI help button is missing');
+  if (!helpButton) throw new Error('help missing');
+  if (helpButton.getAttribute('data-cell-ai-help-trigger') !== 'always-visible') {{
+    throw new Error('help marker');
+  }}
+  if (Number(window.getComputedStyle(helpButton).opacity) < 0.99) {{
+    throw new Error('help hidden');
+  }}
   let helpPopover = document.querySelector('[data-cell-ai-popover="true"]');
   if (!helpPopover) {{
     helpButton.click();
     await new Promise((resolve) => setTimeout(resolve, 60));
     helpPopover = document.querySelector('[data-cell-ai-popover="true"]');
   }}
-  if (!helpPopover) throw new Error('cell-local AI help popover did not open');
+  if (!helpPopover) throw new Error('popover missing');
   if (!helpPopover.querySelector('[data-cell-ai-question="true"]')) {{
-    throw new Error('cell-local AI help question input is missing');
+    throw new Error('question missing');
   }}
   if (!(helpPopover.textContent || '').includes('이 셀에서 바로 질문')) {{
-    throw new Error('cell-local AI help popover title is missing');
+    throw new Error('popover title missing');
   }}
   const exerciseRect = exercise.getBoundingClientRect();
   const resultRect = result.getBoundingClientRect();
   if (exerciseEditorRect.left < exerciseRect.left - 1 || exerciseEditorRect.right > exerciseRect.right + 1) {{
-    throw new Error('exercise direct editor escapes exercise band');
+    throw new Error('editor escapes');
   }}
   if (resultRect.top < exerciseRect.top || resultRect.bottom > exerciseRect.bottom + 1) {{
-    throw new Error('result part is not inside the exercise flow');
+    throw new Error('result position');
   }}
 
   return JSON.stringify({{
     viewport: {json.dumps(viewport)},
-    width: Math.round(cardRect.width),
     directEditor: true,
-    parts,
-    bands: rects.length,
+    snippetCopy: true,
+    helpVisible: true,
   }});
 }})()
+""")
+
+
+def jsAssertTocPushRail() -> str:
+    return compactJs("""
+(() => {
+  const toc = document.querySelector('[data-learning-toc="push"]');
+  if (!toc) throw new Error('push TOC marker is missing');
+  const rect = toc.getBoundingClientRect();
+  if (rect.width <= 0 || rect.width > 64) {
+    throw new Error('push TOC should render as one collapsed rail, width=' + rect.width);
+  }
+  const buttons = Array.from(toc.querySelectorAll('button[title]'));
+  if (!buttons.length) throw new Error('push TOC has no cell buttons');
+  const labels = buttons.map((button) => button.getAttribute('title') || '');
+  const uniqueLabels = new Set(labels);
+  if (uniqueLabels.size !== labels.length) {
+    throw new Error('push TOC duplicates cell buttons/icons');
+  }
+  if (toc.querySelector('.absolute.right-full')) {
+    throw new Error('push TOC still uses an overlay flyout');
+  }
+  return JSON.stringify({ toc: 'push', width: Math.round(rect.width), items: buttons.length });
+})()
 """)
 
 

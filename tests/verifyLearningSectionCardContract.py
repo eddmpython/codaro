@@ -45,6 +45,11 @@ def main() -> int:
         "section card marker": "data-learning-section-card={section.id}",
         "structured section marker": 'data-learning-section-structured={structured ? "true" : "false"}',
         "overview marker": 'data-learning-section-part="overview"',
+        "overview route marker": 'data-learning-overview-part="route"',
+        "diagram canvas marker": 'data-learning-flow-canvas="true"',
+        "diagram node marker": 'data-learning-flow-node="true"',
+        "diagram connector marker": 'data-learning-flow-connector="true"',
+        "diagram runtime marker": 'data-learning-flow-runtime="true"',
         "exercise marker": 'data-learning-section-part="exercise"',
         "exercise direct editor marker": 'data-learning-exercise-input="editor"',
         "result marker": 'data-learning-section-part="result"',
@@ -54,6 +59,11 @@ def main() -> int:
         "structured detector": "function hasStructuredSectionBlocks",
         "structured parts resolver": "function structuredSectionParts",
         "contract overview before body": "<SectionContractOverview contract={section.contract} />",
+        "section index marker": 'data-learning-section-index="true"',
+        "section heading marker": 'data-learning-section-heading="true"',
+        "section index height": "min-h-11 w-11",
+        "push toc marker": 'data-learning-toc="push"',
+        "push toc width expansion": "hover:w-72",
         "single-card structured branch": "structured ? (",
         "legacy fallback branch": "variant=\"embedded\"",
         "contract source detector": 'block.sourceType?.startsWith("sectionContract:")',
@@ -73,6 +83,7 @@ def main() -> int:
         "cell help popover marker": 'data-cell-ai-popover="true"',
         "cell help question input": 'data-cell-ai-question="true"',
         "cell help answer marker": 'data-cell-ai-answer="true"',
+        "cell help always visible marker": 'data-cell-ai-help-trigger="always-visible"',
         "cell-local question title": "이 셀에서 바로 질문",
         "cell-local answer label": "이 셀 답변",
         "visible help request label": "도움 요청",
@@ -145,14 +156,25 @@ def main() -> int:
             "LightweightCodePreview",
             "클릭해서 직접 입력하세요.",
             "클릭해서 코드를 편집하세요.",
+            "absolute right-full",
         ),
         AI_PANEL: (
             "Codaro 어시스턴트",
             "Bot,",
         ),
+        CELL_ACTIONS: (
+            "group-hover:opacity-100",
+            "lg:opacity-0",
+            "tabIndex={selected ? 0 : -1}",
+        ),
+    }
+    sourceByPath = {
+        SURFACE: text,
+        AI_PANEL: aiPanelText,
+        CELL_ACTIONS: cellActionsText,
     }
     for path, tokens in forbidden_tokens.items():
-        source = text if path == SURFACE else aiPanelText
+        source = sourceByPath[path]
         for token in tokens:
             if token in source:
                 failures.append(f"forbidden token remains in {path.relative_to(ROOT)}: {token}")

@@ -1,8 +1,10 @@
 import {
+  ArrowRight,
   BookOpen,
   Boxes,
   CheckCircle2,
   Code2,
+  GitBranch,
   GraduationCap,
   Layers3,
   Lightbulb,
@@ -209,8 +211,8 @@ function LearningOverviewHeader({
       data-learning-overview="true"
       id={introBlock ? cellDomId(introBlock.id) : undefined}
     >
-      <div className="grid gap-4 p-4 2xl:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="min-w-0">
+      <div className="grid gap-4 p-4 xl:grid-cols-[minmax(0,1fr)_410px]">
+        <div className="flex min-w-0 flex-col">
           <div className="flex flex-wrap items-center gap-2">
             <Badge variant="secondary">커리큘럼</Badge>
             <Badge variant="outline">{selectedCategoryLabel || selectedCategory}</Badge>
@@ -221,6 +223,22 @@ function LearningOverviewHeader({
           {overview.direction ? (
             <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground" data-learning-overview-part="direction">{overview.direction}</p>
           ) : null}
+          <div className="mt-4 flex flex-wrap items-center gap-2 text-xs text-muted-foreground" data-learning-overview-part="route">
+            <span className="inline-flex items-center gap-1.5 rounded-md border bg-background/70 px-2.5 py-1.5">
+              <GitBranch className="size-3.5 text-sky-500" />
+              YAML 설계
+            </span>
+            <ArrowRight className="size-3.5" />
+            <span className="inline-flex items-center gap-1.5 rounded-md border bg-background/70 px-2.5 py-1.5">
+              <Layers3 className="size-3.5 text-amber-500" />
+              섹션 카드
+            </span>
+            <ArrowRight className="size-3.5" />
+            <span className="inline-flex items-center gap-1.5 rounded-md border bg-background/70 px-2.5 py-1.5">
+              <TerminalSquare className="size-3.5 text-emerald-500" />
+              직접 실행
+            </span>
+          </div>
           {overview.benefits.length ? (
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               {overview.benefits.slice(0, 4).map((benefit, index) => (
@@ -235,7 +253,9 @@ function LearningOverviewHeader({
               ))}
             </div>
           ) : null}
-          <CurriculumDependencyPanel apiOnline={apiOnline} document={document} />
+          <div className="mt-auto">
+            <CurriculumDependencyPanel apiOnline={apiOnline} document={document} />
+          </div>
         </div>
         <LearningFlowDiagram diagram={overview.diagram} />
       </div>
@@ -265,6 +285,7 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
       tone: stepTones[index % stepTones.length],
     }))
     : fallbackSteps;
+  const visibleSteps = steps.slice(0, 4);
 
   return (
     <div className="rounded-md border bg-background/70 p-3" data-learning-flow-diagram="true" data-learning-overview-part="diagram">
@@ -278,23 +299,68 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
           uv
         </Badge>
       </div>
-      <div className="relative grid gap-2">
-        {steps.map(({ Icon, detail, label, tone }, index) => (
-          <div
-            className="relative flex items-start gap-3 rounded-md bg-muted/40 px-3 py-2"
-            data-learning-flow-step={label}
-            key={label}
-          >
-            {index < steps.length - 1 ? <span className="absolute left-[21px] top-[34px] h-4 w-px bg-border" /> : null}
-            <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-background shadow-xs ring-1 ring-border", tone)}>
-              <Icon className="size-4" />
-            </span>
-            <span className="min-w-0 flex-1">
-              <span className="block text-sm font-medium">{label}</span>
-              <span className="block truncate text-xs text-muted-foreground">{detail}</span>
-            </span>
-          </div>
-        ))}
+      <div
+        className="relative overflow-hidden rounded-md border bg-muted/20 p-3"
+        data-learning-flow-canvas="true"
+      >
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-stretch">
+          {visibleSteps.map(({ Icon, detail, label, tone }, index) => (
+            <div className="contents" key={label}>
+              <div
+                className="relative z-10 flex min-h-20 min-w-0 flex-1 flex-col justify-between rounded-md border bg-background px-3 py-2 shadow-xs"
+                data-learning-flow-node="true"
+                data-learning-flow-step={label}
+              >
+                <div className="flex items-start gap-2">
+                  <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-muted/50 ring-1 ring-border", tone)}>
+                    <Icon className="size-4" />
+                  </span>
+                  <span className="min-w-0">
+                    <span className="block truncate text-sm font-semibold">{label}</span>
+                    <span className="mt-0.5 block truncate text-xs text-muted-foreground">{detail}</span>
+                  </span>
+                </div>
+                <span className="mt-3 h-1 rounded-full bg-muted">
+                  <span
+                    className={cn(
+                      "block h-full rounded-full",
+                      index === 0 && "bg-sky-500",
+                      index === 1 && "bg-amber-500",
+                      index === 2 && "bg-emerald-500",
+                      index === 3 && "bg-rose-500",
+                    )}
+                    style={{ width: `${Math.round(((index + 1) / visibleSteps.length) * 100)}%` }}
+                  />
+                </span>
+              </div>
+              {index < visibleSteps.length - 1 ? (
+                <div
+                  aria-hidden="true"
+                  className="flex items-center justify-center text-muted-foreground sm:w-6"
+                  data-learning-flow-connector="true"
+                >
+                  <ArrowRight className="hidden size-4 sm:block" />
+                  <span className="h-4 w-px bg-border sm:hidden" />
+                </div>
+              ) : null}
+            </div>
+          ))}
+        </div>
+        <div className="mt-3 grid gap-2 sm:grid-cols-3" data-learning-flow-runtime="true">
+          {[
+            { label: "계약", detail: "YAML SSOT", Icon: GitBranch },
+            { label: "환경", detail: "uv 패키지", Icon: Wrench },
+            { label: "검증", detail: "실행 결과", Icon: CheckCircle2 },
+          ].map(({ Icon, detail, label }) => (
+            <div className="flex min-w-0 items-center gap-2 rounded-md bg-background/70 px-2 py-1.5 text-xs" key={label}>
+              <Icon className="size-3.5 shrink-0 text-muted-foreground" />
+              <span className="min-w-0">
+                <span className="mr-1 font-medium">{label}</span>
+                <span className="text-muted-foreground">{detail}</span>
+              </span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -462,14 +528,17 @@ function CurriculumSectionCard({
       id={cellDomId(section.anchorBlockId)}
     >
       <button
-        className="flex w-full min-w-0 items-start gap-3 border-b bg-muted/15 px-4 py-3 text-left"
+        className="flex w-full min-w-0 items-stretch gap-3 border-b bg-muted/15 px-4 py-3 text-left"
         type="button"
         onClick={() => onSelectBlock(section.anchorBlockId)}
       >
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-md border bg-background text-sm font-semibold text-muted-foreground">
+        <span
+          className="flex min-h-11 w-11 shrink-0 items-center justify-center rounded-md border bg-background text-sm font-semibold tabular-nums text-muted-foreground"
+          data-learning-section-index="true"
+        >
           {index + 1}
         </span>
-        <span className="min-w-0 flex-1">
+        <span className="flex min-w-0 flex-1 flex-col justify-center" data-learning-section-heading="true">
           <span className="block text-lg font-semibold tracking-normal">{section.title}</span>
           {section.subtitle ? <span className="mt-1 block text-sm leading-6 text-muted-foreground">{section.subtitle}</span> : null}
         </span>
@@ -1029,13 +1098,22 @@ export function CurriculumCellToc({
   const items = meaningfulItems.length ? meaningfulItems : rawItems;
 
   return (
-    <aside className="group/toc relative hidden h-full min-h-0 border-l bg-background/95 2xl:block" aria-label="셀 목차">
-      <div className="flex h-full min-h-0 w-11 flex-col items-center gap-2 py-3">
-        <div className="flex size-7 items-center justify-center rounded-md border bg-card text-muted-foreground">
+    <aside
+      aria-label="셀 목차"
+      className="group/toc hidden h-full min-h-0 w-12 shrink-0 overflow-hidden border-l bg-background/95 transition-[width] duration-150 hover:w-72 2xl:block"
+      data-learning-toc="push"
+    >
+      <div className="flex h-full min-h-0 w-72 flex-col py-3">
+        <div className="flex h-8 items-center gap-2 px-2">
+          <span className="flex size-7 shrink-0 items-center justify-center rounded-md border bg-card text-muted-foreground">
           <ListChecks className="size-3.5" />
+          </span>
+          <span className="min-w-0 truncate text-sm font-semibold tracking-normal opacity-0 transition-opacity group-hover/toc:opacity-100">
+            셀 목차
+          </span>
         </div>
         <ScrollArea className="min-h-0 w-full flex-1">
-          <div className="flex flex-col items-center gap-1 py-1">
+          <div className="space-y-0.5 px-2 py-2">
             {items.map(({ block, label, meta }) => {
               const Icon = meta.Icon;
               const active = block.id === selectedBlockId;
@@ -1043,7 +1121,7 @@ export function CurriculumCellToc({
                 <button
                   aria-label={label}
                   className={cn(
-                    "flex size-7 items-center justify-center rounded-md text-muted-foreground transition-colors hover:bg-muted hover:text-foreground",
+                    "flex h-7 w-7 min-w-0 items-center gap-2 rounded-md px-1.5 text-left text-xs text-muted-foreground transition-[width,background-color,color] duration-150 hover:bg-muted/60 hover:text-foreground group-hover/toc:w-full group-hover/toc:px-2",
                     active && "bg-muted text-foreground ring-1 ring-border",
                   )}
                   key={block.id}
@@ -1051,39 +1129,12 @@ export function CurriculumCellToc({
                   type="button"
                   onClick={() => selectTocBlock(block.id, onSelectBlock)}
                 >
-                  <Icon className="size-3.5" />
-                </button>
-              );
-            })}
-          </div>
-        </ScrollArea>
-      </div>
-
-      <div className="pointer-events-none absolute right-full top-0 z-40 h-full w-72 -translate-x-2 border-r bg-background/98 opacity-0 shadow-xl shadow-background/40 transition duration-150 group-hover/toc:pointer-events-auto group-hover/toc:translate-x-0 group-hover/toc:opacity-100">
-        <div className="border-b px-3 py-3">
-          <div className="text-sm font-semibold tracking-normal">셀 목차</div>
-          <div className="mt-1 text-xs leading-5 text-muted-foreground">마우스를 올려 현재 레슨의 셀로 이동합니다.</div>
-        </div>
-        <ScrollArea className="h-[calc(100%-57px)] min-h-0">
-          <div className="space-y-0.5 p-1.5">
-            {items.map(({ block, label, meta }) => {
-              const Icon = meta.Icon;
-              const active = block.id === selectedBlockId;
-              return (
-                <button
-                  className={cn(
-                    "flex h-7 w-full min-w-0 items-center gap-2 rounded-md px-2 text-left text-xs transition-colors hover:bg-muted/60",
-                    active && "bg-muted text-foreground ring-1 ring-border",
-                  )}
-                  key={block.id}
-                  title={label}
-                  type="button"
-                  onClick={() => selectTocBlock(block.id, onSelectBlock)}
-                >
-                  <span className="flex size-5 shrink-0 items-center justify-center rounded-sm bg-background text-muted-foreground">
-                    <Icon className="size-3" />
+                  <span className="flex size-4 shrink-0 items-center justify-center">
+                    <Icon className="size-3.5" />
                   </span>
-                  <span className="min-w-0 flex-1 truncate font-medium">{label}</span>
+                  <span className="min-w-0 flex-1 truncate font-medium opacity-0 transition-opacity group-hover/toc:opacity-100">
+                    {label}
+                  </span>
                 </button>
               );
             })}

@@ -70,12 +70,15 @@ sections:
 ## 렌더링 원칙
 
 - 레슨 상단은 `intro.direction`, `intro.benefits`, `intro.diagram`을 읽어 무엇을 공부하는지, 왜 유용한지, 전체 흐름을 보여준다.
+- `intro.diagram`은 제품 화면에서 노드, 연결선, 런타임 스트립을 가진 학습 아키텍처 캔버스로 렌더링한다. 단순 목록 박스로 축소하지 않는다.
 - 섹션 하나가 학습카드 하나다. `sections[].blocks[]`의 작은 카드 반복을 기본 구조로 삼지 않는다.
 - 섹션 카드는 `title → subtitle → goal → why → explanation → tips → snippet → exercise → result → check` 순서로 이어진다.
 - 카드 내부 정보는 라벨, 구획선, 여백으로 구분한다. 카드 안에 또 카드가 덕지덕지 쌓이는 구조는 피한다.
 - `sectionContract:*`로 materialize된 신규 섹션은 작은 block card를 반복 렌더링하지 않고, 하나의 섹션 카드 안에서 예제 스니펫, 직접 입력 실습, 실행 결과, 검증/피드백을 흐름형 band로 보여준다.
 - 카드 헤더와 본문은 같은 제목을 반복하지 않는다. legacy list/prose block에서 첫 목록 항목이나 첫 markdown heading이 셀 제목과 같으면 렌더러가 한 번만 보이게 정리한다.
 - `snippet` band는 코드임을 명확히 알 수 있는 박스와 `예제 스니펫` 라벨, 우측 상단 복사 버튼을 가진다.
+- 섹션 헤더 번호는 타이틀/서브타이틀 묶음과 높이를 맞춘다. 셀 도움 요청 액션은 hover-only가 아니라 항상 보이는 control로 둔다.
+- 셀 TOC는 push rail이다. overlay flyout으로 같은 아이콘 목록을 한 번 더 띄우지 않는다.
 - structured 섹션의 `exercise` band는 클릭해야 열리는 preview가 아니라 바로 보이는 실제 입력 editor를 가진다. `learning-card-browser` gate는 이 editor가 desktop/mobile에서 보이고 starter code를 렌더링하는지 확인한다.
 - 레슨 overview는 `data-learning-overview`, `data-learning-overview-part`, `data-learning-flow-diagram`, `data-learning-flow-step` marker를 가진다. `learning-card-browser` gate는 방향, 학습 효과, 플로우 step이 실제 desktop/mobile 화면에 보이는지 확인한다.
 - structured section card는 브라우저 검증을 위해 `data-learning-section-card`, `data-learning-section-structured`, `data-learning-section-part` marker를 가진다. 검증 대상 part는 `overview`, `snippet`, `exercise`, `result`, `check`다.
