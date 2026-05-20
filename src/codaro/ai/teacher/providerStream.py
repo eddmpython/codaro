@@ -1,0 +1,151 @@
+from __future__ import annotations
+
+import asyncio
+import threading
+from collections.abc import AsyncIterator
+from typing import Any
+
+from .providerLoop import (
+    finishTeacherToolCall,
+    recordAssistantToolRequest,
+    startTeacherToolCall,
+    toolCallsToProviderPayloads,
+)
+from .teacherOrchestrator import TeacherOrchestrator
+from .traceModel import TeacherTrace
+
+
+async def runTeacherChatStream(
+    *,
+    provider: Any,
+    convManager: Any,
+    conversationId: str,
+    messages: list[dict[str, Any]],
+    tools: list[dict[str, Any]],
+    executor: Any,
+    orchestrator: TeacherOrchestrator,
+    maxToolRounds: int = 10,
+) -> AsyncIterator[dict[str, Any]]:
+    allToolResults: list[dict[str, Any]] = []
+    policy = orchestrator.createToolPolicy()
+    trace = orchestrator.startTrace(conversationId)
+
+    yield {"type": "start", "conversationId": conversationId}
+
+    if not (provider.supportsNativeTools and tools):
+        async for event in streamTeacherTokens(
+            provider=provider,
+            convManager=convManager,
+            conversationId=conversationId,
+            messages=messages,
+            orchestrator=orchestrator,
+            trace=trace,
+        ):
+            yield event
+        return
+
+    for _round in range(maxToolRounds):
+        response = provider.completeWithTools(messages, tools)
+
+        if not response.toolCalls:
+            convManager.addAssistantMessage(conversationId, response.answer)
+            tracePayload = orchestrator.finishTrace(trace, answer=response.answer, toolCalls=allToolResults)
+            if response.answer:
+                yield {"type": "token", "content": response.answer}
+            yield {
+                "type": "done",
+                "answer": response.answer,
+                "provider": response.provider,
+                "model": response.model,
+                "usage": response.usage,
+                "toolCalls": allToolResults,
+                "trace": tracePayload,
+            }
+            return
+
+        providerToolCalls = toolCallsToProviderPayloads(response.toolCalls)
+        recordAssistantToolRequest(
+            convManager=convManager,
+            conversationId=conversationId,
+            messages=messages,
+            assistantAnswer=response.answer or "",
+            providerToolCalls=providerToolCalls,
+        )
+
+        if response.answer:
+            yield {"type": "token", "content": response.answer}
+
+        toolResults: list[dict[str, Any]] = []
+        for toolCall in response.toolCalls:
+            toolStart = startTeacherToolCall(orchestrator=orchestrator, trace=trace, toolCall=toolCall)
+            yield {"type": "tool_start", "toolCall": toolStart}
+            payload = await finishTeacherToolCall(
+                convManager=convManager,
+                conversationId=conversationId,
+                messages=messages,
+                executor=executor,
+                policy=policy,
+                orchestrator=orchestrator,
+                trace=trace,
+                toolCall=toolCall,
+            )
+            toolResults.append(payload)
+            allToolResults.append(payload)
+
+        yield {"type": "tool_results", "toolCalls": toolResults}
+
+    async for event in streamTeacherTokens(
+        provider=provider,
+        convManager=convManager,
+        conversationId=conversationId,
+        messages=messages,
+        orchestrator=orchestrator,
+        trace=trace,
+        toolCalls=allToolResults,
+    ):
+        yield event
+
+
+async def streamTeacherTokens(
+    *,
+    provider: Any,
+    convManager: Any,
+    conversationId: str,
+    messages: list[dict[str, Any]],
+    orchestrator: TeacherOrchestrator,
+    trace: TeacherTrace,
+    toolCalls: list[dict[str, Any]] | None = None,
+) -> AsyncIterator[dict[str, Any]]:
+    loop = asyncio.get_running_loop()
+    queue: asyncio.Queue[str | None] = asyncio.Queue()
+
+    def runStream() -> None:
+        try:
+            for token in provider.stream(messages):
+                loop.call_soon_threadsafe(queue.put_nowait, token)
+        finally:
+            loop.call_soon_threadsafe(queue.put_nowait, None)
+
+    thread = threading.Thread(target=runStream, daemon=True)
+    thread.start()
+
+    accumulated = ""
+    while True:
+        token = await queue.get()
+        if token is None:
+            break
+        accumulated += token
+        yield {"type": "delta", "delta": token, "content": accumulated}
+
+    convManager.addAssistantMessage(conversationId, accumulated)
+    tracePayload = orchestrator.finishTrace(trace, answer=accumulated, toolCalls=toolCalls or [])
+    yield {
+        "type": "done",
+        "answer": accumulated,
+        "provider": provider.config.provider,
+        "model": provider.resolvedModel,
+        "usage": None,
+        "toolCalls": toolCalls or [],
+        "trace": tracePayload,
+    }
+    thread.join(timeout=2)

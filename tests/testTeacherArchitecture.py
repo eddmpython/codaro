@@ -11,6 +11,7 @@ from codaro.ai.teacher import (
     evaluateToolTrace,
     goldenEvalCases,
     runTeacherChatLoop,
+    runTeacherChatStream,
     teacherSkills,
     toolCallsToProviderPayloads,
 )
@@ -63,6 +64,10 @@ class _FakeProvider:
 
     def complete(self, messages: list[dict]):
         return ToolResponse(answer="완료", provider="fake", model="test", toolCalls=[])
+
+
+async def _collectStreamEvents(stream) -> list[dict]:
+    return [event async for event in stream]
 
 
 def testTeacherContextInjectionIncludesCellMapAndPreflight() -> None:
@@ -221,6 +226,30 @@ def testProviderLoopOwnsNonStreamingTurn() -> None:
     assert payload["answer"] == "완료"
     assert payload["toolCalls"][0]["name"] == "read-cells"
     assert payload["trace"]["toolSequence"] == ["read-cells"]
+    assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
+
+
+def testProviderStreamOwnsStreamingToolEvents() -> None:
+    convManager = _FakeConversationManager()
+    messages: list[dict] = [{"role": "user", "content": "셀 읽어줘"}]
+    orchestrator = TeacherOrchestrator.fromContext({})
+
+    events = asyncio.run(_collectStreamEvents(runTeacherChatStream(
+        provider=_FakeProvider(),
+        convManager=convManager,
+        conversationId="conv-5",
+        messages=messages,
+        tools=[{"type": "function"}],
+        executor=_FakeExecutor(),
+        orchestrator=orchestrator,
+    )))
+
+    assert [event["type"] for event in events] == ["start", "tool_start", "tool_results", "token", "done"]
+    assert events[0]["conversationId"] == "conv-5"
+    assert events[1]["toolCall"]["name"] == "read-cells"
+    assert events[2]["toolCalls"][0]["status"] == "done"
+    assert events[-1]["toolCalls"][0]["name"] == "read-cells"
+    assert events[-1]["trace"]["toolSequence"] == ["read-cells"]
     assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
 
 

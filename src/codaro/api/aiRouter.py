@@ -22,11 +22,8 @@ from ..ai.providerSpec import (
 )
 from ..ai.teacher import (
     TeacherOrchestrator,
-    finishTeacherToolCall,
-    recordAssistantToolRequest,
     runTeacherChatLoop,
-    startTeacherToolCall,
-    toolCallsToProviderPayloads,
+    runTeacherChatStream,
 )
 
 logger = logging.getLogger(__name__)
@@ -240,8 +237,6 @@ def createAiRouter(state: Any) -> APIRouter:
         role: str = Query("copilot"),
         systemPrompt: str | None = Query(None),
     ):
-        from ..ai.conversation import ConversationManager
-
         manager = _getConversationManager()
         conv = manager.create(role=role, systemPrompt=systemPrompt)
         return {"conversationId": conv.conversationId, "role": conv.role}
@@ -271,9 +266,7 @@ def createAiRouter(state: Any) -> APIRouter:
         orchestrator = TeacherOrchestrator.fromContext(context)
         message = orchestrator.injectContext(message)
 
-        from ..ai.conversation import ConversationManager
         from ..ai.factory import createProvider
-        from ..ai.toolExecutor import ToolExecutor
         from ..ai.tools import toolSchemas
         from ..ai.types import LLMConfig
 
@@ -339,7 +332,6 @@ def createAiRouter(state: Any) -> APIRouter:
         message = orchestrator.injectContext(message)
 
         from ..ai.factory import createProvider
-        from ..ai.toolExecutor import ToolExecutor
         from ..ai.tools import toolSchemas
         from ..ai.types import LLMConfig
 
@@ -373,91 +365,17 @@ def createAiRouter(state: Any) -> APIRouter:
         msgs = convManager.buildMessages(conversationId)
         tools = toolSchemas()
 
-        executor = _createToolExecutor(state, sessionId)
-        allToolResults: list[dict[str, Any]] = []
-        policy = orchestrator.createToolPolicy()
-        trace = orchestrator.startTrace(conversationId)
-
-        async def _yieldTokenStream(messages, toolCalls: list[dict[str, Any]] | None = None):
-            loop = asyncio.get_running_loop()
-            queue: asyncio.Queue[str | None] = asyncio.Queue()
-
-            def _runStream():
-                try:
-                    for token in llmProvider.stream(messages):
-                        loop.call_soon_threadsafe(queue.put_nowait, token)
-                finally:
-                    loop.call_soon_threadsafe(queue.put_nowait, None)
-
-            thread = threading.Thread(target=_runStream, daemon=True)
-            thread.start()
-
-            accumulated = ""
-            while True:
-                token = await queue.get()
-                if token is None:
-                    break
-                accumulated += token
-                yield f"data: {json.dumps({'type': 'delta', 'delta': token, 'content': accumulated}, ensure_ascii=False)}\n\n"
-
-            convManager.addAssistantMessage(conversationId, accumulated)
-            tracePayload = orchestrator.finishTrace(trace, answer=accumulated, toolCalls=toolCalls or [])
-            yield f"data: {json.dumps({'type': 'done', 'answer': accumulated, 'provider': llmProvider.config.provider, 'model': llmProvider.resolvedModel, 'usage': None, 'toolCalls': toolCalls or [], 'trace': tracePayload}, ensure_ascii=False)}\n\n"
-            thread.join(timeout=2)
-
         async def _streamGenerate():
-            nonlocal msgs, conversationId
-            yield f"data: {json.dumps({'type': 'start', 'conversationId': conversationId}, ensure_ascii=False)}\n\n"
-
-            if not (llmProvider.supportsNativeTools and tools):
-                async for chunk in _yieldTokenStream(msgs):
-                    yield chunk
-                return
-
-            maxToolRounds = 10
-            for _round in range(maxToolRounds):
-                response = llmProvider.completeWithTools(msgs, tools)
-
-                if not response.toolCalls:
-                    convManager.addAssistantMessage(conversationId, response.answer)
-                    tracePayload = orchestrator.finishTrace(trace, answer=response.answer, toolCalls=allToolResults)
-                    yield f"data: {json.dumps({'type': 'token', 'content': response.answer}, ensure_ascii=False)}\n\n"
-                    yield f"data: {json.dumps({'type': 'done', 'answer': response.answer, 'provider': response.provider, 'model': response.model, 'usage': response.usage, 'toolCalls': allToolResults, 'trace': tracePayload}, ensure_ascii=False)}\n\n"
-                    return
-
-                toolCallsData = toolCallsToProviderPayloads(response.toolCalls)
-                recordAssistantToolRequest(
-                    convManager=convManager,
-                    conversationId=conversationId,
-                    messages=msgs,
-                    assistantAnswer=response.answer or "",
-                    providerToolCalls=toolCallsData,
-                )
-
-                if response.answer:
-                    yield f"data: {json.dumps({'type': 'token', 'content': response.answer}, ensure_ascii=False)}\n\n"
-
-                toolResults = []
-                for tc in response.toolCalls:
-                    toolStart = startTeacherToolCall(orchestrator=orchestrator, trace=trace, toolCall=tc)
-                    yield f"data: {json.dumps({'type': 'tool_start', 'toolCall': toolStart}, ensure_ascii=False)}\n\n"
-                    payload = await finishTeacherToolCall(
-                        convManager=convManager,
-                        conversationId=conversationId,
-                        messages=msgs,
-                        executor=executor,
-                        policy=policy,
-                        orchestrator=orchestrator,
-                        trace=trace,
-                        toolCall=tc,
-                    )
-                    toolResults.append(payload)
-                    allToolResults.append(payload)
-
-                yield f"data: {json.dumps({'type': 'tool_results', 'toolCalls': toolResults}, ensure_ascii=False)}\n\n"
-
-            async for chunk in _yieldTokenStream(msgs, allToolResults):
-                yield chunk
+            async for event in runTeacherChatStream(
+                provider=llmProvider,
+                convManager=convManager,
+                conversationId=conversationId,
+                messages=msgs,
+                tools=tools,
+                executor=_createToolExecutor(state, sessionId),
+                orchestrator=orchestrator,
+            ):
+                yield f"data: {json.dumps(event, ensure_ascii=False)}\n\n"
 
         return StreamingResponse(_streamGenerate(), media_type="text/event-stream")
 

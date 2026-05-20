@@ -12,6 +12,7 @@ from .providerLoop import (
     teacherTurnPayload,
     toolCallsToProviderPayloads,
 )
+from .providerStream import runTeacherChatStream, streamTeacherTokens
 from .skillRegistry import TeacherSkill, teacherSkillPrompt, teacherSkills
 from .teacherOrchestrator import TeacherOrchestrator
 from .toolLifecycle import toolCallResult, toolCallStart
@@ -34,7 +35,9 @@ __all__ = [
     "injectContext",
     "recordAssistantToolRequest",
     "runTeacherChatLoop",
+    "runTeacherChatStream",
     "startTeacherToolCall",
+    "streamTeacherTokens",
     "teacherTurnPayload",
     "teacherSkillPrompt",
     "teacherSkills",

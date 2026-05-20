@@ -67,6 +67,7 @@ src/codaro/ai/
 ├── teacher/
 │   ├── teacherOrchestrator.py
 │   ├── providerLoop.py
+│   ├── providerStream.py
 │   ├── contextBuilder.py
 │   ├── toolPolicy.py
 │   ├── traceModel.py
