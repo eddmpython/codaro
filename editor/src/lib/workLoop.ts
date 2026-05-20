@@ -2,7 +2,12 @@ import type {
   AssistantMessage,
   AssistantWorkStep,
 } from "@/components/assistant/assistantPanel";
-import type { AiChatResponse, AiToolCall, AiTraceSummary } from "@/types";
+import type {
+  AiChatResponse,
+  AiToolCall,
+  AiTracePolicyViolation,
+  AiTraceSummary,
+} from "@/types";
 
 export type AssistantTraceSummary = AiTraceSummary;
 
@@ -81,11 +86,34 @@ export function normalizeAssistantTrace(trace: AiChatResponse["trace"]): Assista
   if (typeof trace.toolCount === "number") normalized.toolCount = trace.toolCount;
   if (typeof trace.errorCount === "number") normalized.errorCount = trace.errorCount;
   if (typeof trace.policyViolationCount === "number") normalized.policyViolationCount = trace.policyViolationCount;
+  const policyViolations = normalizeTracePolicyViolations(trace.policyViolations);
+  if (policyViolations.length) normalized.policyViolations = policyViolations;
   if (Array.isArray(trace.toolSequence)) {
     const toolSequence = trace.toolSequence.filter((item): item is string => typeof item === "string");
     if (toolSequence.length) normalized.toolSequence = toolSequence;
   }
   return Object.keys(normalized).length ? normalized : undefined;
+}
+
+function normalizeTracePolicyViolations(value: unknown): AiTracePolicyViolation[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => normalizeTracePolicyViolation(item))
+    .filter((item): item is AiTracePolicyViolation => Boolean(item));
+}
+
+function normalizeTracePolicyViolation(value: unknown): AiTracePolicyViolation | undefined {
+  if (!value || typeof value !== "object") return undefined;
+  const item = value as Record<string, unknown>;
+  const policyCode = stringField(item.policyCode) || stringField(item.policy);
+  const toolName = stringField(item.toolName) || stringField(item.tool);
+  const message = stringField(item.message) || stringField(item.error);
+  if (!policyCode && !toolName && !message) return undefined;
+  return { policyCode, toolName, message };
+}
+
+function stringField(value: unknown): string {
+  return typeof value === "string" ? value : "";
 }
 
 function assistantWorkStepFromToolCall(toolCall: AiToolCall, status: AssistantWorkStep["status"]): AssistantWorkStep {

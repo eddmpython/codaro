@@ -287,6 +287,12 @@ export type AiChatRequest = {
   context?: Record<string, unknown>;
 };
 
+export type AiTracePolicyViolation = {
+  policyCode: string;
+  toolName: string;
+  message: string;
+};
+
 export type AiTraceSummary = {
   traceId?: string;
   conversationId?: string | null;
@@ -295,6 +301,7 @@ export type AiTraceSummary = {
   toolCount?: number;
   errorCount?: number;
   policyViolationCount?: number;
+  policyViolations?: AiTracePolicyViolation[];
   toolSequence?: string[];
   [key: string]: unknown;
 };
