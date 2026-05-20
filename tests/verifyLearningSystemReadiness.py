@@ -546,6 +546,8 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "playwright-product-verification",
                     "goal-audit-gate-covers-builds-and-tests",
                     "MINIMUM_SCORE = 9",
+                    "requiredScore",
+                    "requirementFailures",
                 )),
                 ("tests/run.py", (
                     "tests/verifyLearningGoalObjectiveAudit.py",
@@ -557,6 +559,8 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                 ("docs/skills/ops/foundation/testing-and-gates.md", (
                     "명시 요구사항 audit",
                     "`learning-goal-audit`",
+                    "`requiredScore`",
+                    "`requirementFailures`",
                 )),
             ),
             blocking=True,

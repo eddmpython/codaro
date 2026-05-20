@@ -285,6 +285,8 @@ OBJECTIVE_REQUIREMENTS = (
                 "명시 요구사항 audit",
                 "전체 backend",
                 "landing build",
+                "`requiredScore`",
+                "`requirementFailures`",
             )),
         ),
     ),
@@ -295,6 +297,9 @@ OBJECTIVE_REQUIREMENTS = (
             ("tests/verifyLearningGoalObjectiveAudit.py", (
                 "OBJECTIVE_REQUIREMENTS",
                 "MINIMUM_SCORE = 9",
+                "requiredScore",
+                "requirementFailures",
+                "buildAuditPayload",
                 "learning goal objective audit score",
             )),
             ("tests/verifyLearningSystemReadiness.py", (
@@ -308,22 +313,31 @@ OBJECTIVE_REQUIREMENTS = (
 
 def main() -> int:
     results = tuple(requirement.evaluate() for requirement in OBJECTIVE_REQUIREMENTS)
+    payload = buildAuditPayload(results)
+
+    if not payload["passed"]:
+        print("FAIL: learning goal objective audit score is below threshold or explicit requirements failed", file=sys.stderr)
+        print(json.dumps(payload, ensure_ascii=False, indent=2), file=sys.stderr)
+        return 1
+
+    print(f"ok: learning goal objective audit score {payload['score']}/{payload['maxScore']}")
+    print(json.dumps(payload, ensure_ascii=False, indent=2))
+    return 0
+
+
+def buildAuditPayload(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:
     score = sum(1 for result in results if result["passed"])
+    requirementFailures = [result["id"] for result in results if not result["passed"]]
     payload = {
         "score": score,
         "maxScore": len(results),
         "minimumScore": MINIMUM_SCORE,
-        "passed": score >= MINIMUM_SCORE,
+        "requiredScore": len(results),
+        "requirementFailures": requirementFailures,
+        "passed": score >= MINIMUM_SCORE and not requirementFailures,
         "requirements": list(results),
     }
-    if score < MINIMUM_SCORE:
-        print("FAIL: learning goal objective audit score is below threshold", file=sys.stderr)
-        print(json.dumps(payload, ensure_ascii=False, indent=2), file=sys.stderr)
-        return 1
-
-    print(f"ok: learning goal objective audit score {score}/{len(results)}")
-    print(json.dumps(payload, ensure_ascii=False, indent=2))
-    return 0
+    return payload
 
 
 def fileNeedleReport(relPath: str, needles: tuple[str, ...]) -> tuple[list[str], list[str]]:
