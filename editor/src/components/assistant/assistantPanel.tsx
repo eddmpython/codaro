@@ -1,7 +1,6 @@
 import {
   AlertCircle,
   ArrowUp,
-  Bot,
   CheckCircle2,
   ListTree,
   LogIn,
@@ -613,8 +612,8 @@ function AssistantHeader({
     <div className="mb-3 flex items-start justify-between gap-3">
       <div className="min-w-0">
         <div className="flex items-center gap-2 text-sm font-semibold">
-          <Bot className="size-4" />
-          Codaro 어시스턴트
+          <CodaroAiAvatar className="size-4" />
+          Codaro AI
         </div>
         {compact ? (
           <div className="mt-1 text-xs leading-5 text-muted-foreground">{assistantStatusText(apiOnline, aiProfile)}</div>
@@ -638,7 +637,7 @@ function AssistantHeader({
         ) : (
           <>
             <IconButton disabled={aiConnecting} label="Provider 연결" onClick={onConnectAi}>
-              {aiConnecting ? <Loader2 className="animate-spin" /> : <Bot />}
+              {aiConnecting ? <Loader2 className="animate-spin" /> : <CodaroAiAvatar className="size-4" />}
             </IconButton>
             <IconButton label="새 채팅" onClick={onNewChat}>
               <RotateCcw />
@@ -651,9 +650,20 @@ function AssistantHeader({
 }
 
 function assistantStatusText(apiOnline: boolean, profile: AiProfile | null) {
-  if (!apiOnline) return "기본 안내 모드입니다.";
-  if (!aiProfileReady(profile)) return "provider를 연결하면 실제 응답을 사용할 수 있습니다.";
+  if (!apiOnline) return "로컬 안내 모드입니다.";
+  if (!aiProfileReady(profile)) return "provider를 연결하면 실제 AI 응답을 사용할 수 있습니다.";
   return "대화로 셀, 레슨, 커리큘럼을 다룹니다.";
+}
+
+function CodaroAiAvatar({ className }: { className?: string }) {
+  return (
+    <img
+      alt=""
+      aria-hidden="true"
+      className={cn("rounded-sm object-contain", className)}
+      src="/brand/avatar-small.png"
+    />
+  );
 }
 
 function LoadingState({ title, detail }: { title: string; detail: string }) {

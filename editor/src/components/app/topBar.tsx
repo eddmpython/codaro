@@ -72,7 +72,7 @@ export function TopBar({
         <SocialLinks />
         {showAssistantToggle ? (
           <TopBarIconButton
-            label={assistantCollapsed ? "어시스턴트 열기" : "어시스턴트 접기"}
+            label={assistantCollapsed ? "AI 패널 열기" : "AI 패널 접기"}
             onClick={onToggleAssistant}
           >
             {assistantCollapsed ? <PanelRightOpen /> : <PanelRightClose />}

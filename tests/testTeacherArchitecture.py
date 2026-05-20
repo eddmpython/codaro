@@ -349,7 +349,9 @@ def testTeacherClarificationAnswerShowsReadableDefaults() -> None:
 
     answer = clarificationAnswer(plan)
 
-    assert "답이 없으면 아래 기본값으로 진행합니다." in answer
+    assert "바로 만들기 전에 결과가 달라지는 부분만 되묻겠습니다." in answer
+    assert "답을 주면 그 기준으로 만들겠습니다." in answer
+    assert "현재 가정:" in answer
     assert "- 수준: 초급-중급 사이" in answer
     assert "- 환경: 현재 Codaro 로컬 Python과 uv 패키지 설치" in answer
     assert "level:" not in answer

@@ -178,15 +178,15 @@ def _clarificationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
 
 def _clarificationWorkDetail(questionCount: int, defaults: Any) -> str:
     if not isinstance(defaults, dict):
-        return f"핵심 질문 {questionCount}개 · 기본값 0개"
+        return f"핵심 질문 {questionCount}개 · 현재 가정 0개"
     summary = [
         value
         for key in ("level", "depth", "environment", "balance")
         if isinstance(value := defaults.get(key), str) and value
     ]
     if not summary:
-        return f"핵심 질문 {questionCount}개 · 기본값 {len(defaults)}개"
-    return f"핵심 질문 {questionCount}개 · 기본값: {' / '.join(summary)}"
+        return f"핵심 질문 {questionCount}개 · 현재 가정 {len(defaults)}개"
+    return f"핵심 질문 {questionCount}개 · 현재 가정: {' / '.join(summary)}"
 
 
 def _payloadText(payload: dict[str, Any], key: str) -> str:

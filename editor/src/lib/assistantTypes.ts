@@ -37,3 +37,11 @@ export type AssistantWorkStep = {
   startedAt?: number;
   finishedAt?: number;
 };
+
+export type CellAiHelpState = {
+  blockId: string;
+  question: string;
+  answer: string;
+  loading: boolean;
+  tone?: "default" | "warning" | "error";
+};

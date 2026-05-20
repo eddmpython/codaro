@@ -1,6 +1,6 @@
 import { useCallback, useState, type Dispatch, type SetStateAction } from "react";
 import { aiProviderName } from "@/components/assistant/assistantPanel";
-import type { AssistantMessage } from "@/lib/assistantTypes";
+import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
 import {
   buildCellAiPrompt,
   type CellAiAction,
@@ -83,12 +83,29 @@ export function useAssistantTurnState({
   const [prompt, setPrompt] = useState("");
   const [teacherScope, setTeacherScope] = useState<TeacherScope>("cell");
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
+  const [cellHelpByBlockId, setCellHelpByBlockId] = useState<Record<string, CellAiHelpState>>({});
   const [assistantLoading, setAssistantLoading] = useState(false);
 
-  const askAssistant = useCallback(async (messageOverride?: string, scopeOverride?: TeacherScope) => {
+  const askAssistant = useCallback(async (
+    messageOverride?: string,
+    scopeOverride?: TeacherScope,
+    options?: { cellTargetBlockId?: string; cellQuestion?: string },
+  ) => {
     const message = (messageOverride ?? prompt).trim();
     const activeScope = scopeOverride ?? inferTeacherScope(message, teacherScope);
     if (!message || assistantLoading) return;
+    const cellTargetBlockId = options?.cellTargetBlockId;
+    if (cellTargetBlockId) {
+      setCellHelpByBlockId((current) => ({
+        ...current,
+        [cellTargetBlockId]: {
+          blockId: cellTargetBlockId,
+          question: options?.cellQuestion?.trim() || "이 셀 설명",
+          answer: "",
+          loading: true,
+        },
+      }));
+    }
 
     const userMessage = createUserMessage(message);
     setMessages((current) => [...current, userMessage]);
@@ -108,6 +125,18 @@ export function useAssistantTurnState({
         setPendingTarget(localResult.pendingTarget);
       }
       setMessages((current) => [...current, localResult.assistantMessage]);
+      if (cellTargetBlockId) {
+        setCellHelpByBlockId((current) => ({
+          ...current,
+          [cellTargetBlockId]: {
+            blockId: cellTargetBlockId,
+            question: options?.cellQuestion?.trim() || "이 셀 설명",
+            answer: localResult.assistantMessage.content,
+            loading: false,
+            tone: localResult.assistantMessage.tone ?? "default",
+          },
+        }));
+      }
       onNotice(localResult.notice);
       setAssistantLoading(false);
       return;
@@ -140,7 +169,19 @@ export function useAssistantTurnState({
           toolCatalog,
           variables,
         }),
-        updateMessages: setMessages,
+        updateMessages: (updater) => {
+          setMessages((current) => {
+            const nextMessages = updater(current);
+            mirrorCellHelpMessage({
+              assistantMessageId,
+              cellTargetBlockId,
+              messages: nextMessages,
+              question: options?.cellQuestion,
+              setCellHelpByBlockId,
+            });
+            return nextMessages;
+          });
+        },
       });
       setConversationId(response.conversationId);
 
@@ -171,6 +212,17 @@ export function useAssistantTurnState({
         response,
         streamedContent,
       }));
+      if (cellTargetBlockId) {
+        setCellHelpByBlockId((current) => ({
+          ...current,
+          [cellTargetBlockId]: {
+            blockId: cellTargetBlockId,
+            question: options?.cellQuestion?.trim() || "이 셀 설명",
+            answer: response.answer || streamedContent || "완료했습니다.",
+            loading: false,
+          },
+        }));
+      }
       onNotice(application.notice);
     } catch (error) {
       const detail = error instanceof Error ? error.message : String(error);
@@ -181,6 +233,18 @@ export function useAssistantTurnState({
         content: failure.content,
         messages: current,
       }));
+      if (cellTargetBlockId) {
+        setCellHelpByBlockId((current) => ({
+          ...current,
+          [cellTargetBlockId]: {
+            blockId: cellTargetBlockId,
+            question: options?.cellQuestion?.trim() || "이 셀 설명",
+            answer: failure.content,
+            loading: false,
+            tone: "error",
+          },
+        }));
+      }
       onNotice(failure.notice);
     } finally {
       setAssistantLoading(false);
@@ -209,19 +273,23 @@ export function useAssistantTurnState({
     variables,
   ]);
 
-  const askCellAssistant = useCallback((action: CellAiAction, block: BlockConfig) => {
+  const askCellAssistant = useCallback((action: CellAiAction, block: BlockConfig, question?: string) => {
     if (surface === "curriculum") {
       selectCurriculumBlock(block.id);
     } else {
       selectNotebookBlock(block.id);
     }
     setTeacherScope("cell");
-    void askAssistant(buildCellAiPrompt(action, block), "cell");
+    void askAssistant(buildCellAiPrompt(action, block, question), "cell", {
+      cellQuestion: question,
+      cellTargetBlockId: block.id,
+    });
   }, [askAssistant, selectCurriculumBlock, selectNotebookBlock, surface]);
 
   const startNewChat = useCallback(() => {
     setConversationId(null);
     setMessages([]);
+    setCellHelpByBlockId({});
     setPrompt("");
   }, []);
 
@@ -229,10 +297,39 @@ export function useAssistantTurnState({
     askAssistant,
     askCellAssistant,
     assistantLoading,
+    cellHelpByBlockId,
     messages,
     prompt,
     setPrompt,
     startNewChat,
     teacherScope,
   };
+}
+
+function mirrorCellHelpMessage({
+  assistantMessageId,
+  cellTargetBlockId,
+  messages,
+  question,
+  setCellHelpByBlockId,
+}: {
+  assistantMessageId: string;
+  cellTargetBlockId?: string;
+  messages: AssistantMessage[];
+  question?: string;
+  setCellHelpByBlockId: Dispatch<SetStateAction<Record<string, CellAiHelpState>>>;
+}) {
+  if (!cellTargetBlockId) return;
+  const message = messages.find((item) => item.id === assistantMessageId);
+  if (!message) return;
+  setCellHelpByBlockId((current) => ({
+    ...current,
+    [cellTargetBlockId]: {
+      blockId: cellTargetBlockId,
+      question: question?.trim() || "이 셀 설명",
+      answer: message.content,
+      loading: Boolean(message.loading),
+      tone: message.tone ?? "default",
+    },
+  }));
 }

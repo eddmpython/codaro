@@ -9,7 +9,7 @@ import {
   CodeCellEditor,
   NotebookPanel,
 } from "@/components/notebook/notebookPanel";
-import type { AssistantMessage } from "@/lib/assistantTypes";
+import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
 import { CUSTOM_CURRICULUM_CATEGORY } from "@/lib/customCurricula";
 import { cn } from "@/lib/utils";
 import type { CellAiAction } from "@/lib/cellModel";
@@ -40,6 +40,7 @@ type MainSurfaceProps = {
   assistantCollapsed: boolean;
   assistantLoading: boolean;
   canRun: boolean;
+  cellHelpByBlockId: Record<string, CellAiHelpState>;
   categories: CurriculumCategory[];
   contents: CurriculumContentSummary[];
   curriculumDocument: CodaroDocument | null;
@@ -63,7 +64,7 @@ type MainSurfaceProps = {
   onAcceptPendingBlocks: () => void;
   onAddCell: (type: "code" | "markdown") => void;
   onAsk: (messageOverride?: string, scopeOverride?: TeacherScope) => void;
-  onCellAsk: (action: CellAiAction, block: BlockConfig) => void;
+  onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onConnectAi: () => void;
   onDraftChange: (blockId: string, value: string) => void;
   onNewChat: () => void;
@@ -109,6 +110,7 @@ export function MainSurface(props: MainSurfaceProps) {
       >
         <NotebookPanel
           canRun={props.canRun}
+          cellHelpByBlockId={props.cellHelpByBlockId}
           document={props.document}
           drafts={props.drafts}
           pendingBlocks={props.pendingBlocks}
@@ -169,6 +171,7 @@ export function MainSurface(props: MainSurfaceProps) {
         <CurriculumView
           apiOnline={props.apiOnline}
           canRun={props.canRun}
+          cellHelpByBlockId={props.cellHelpByBlockId}
           document={curriculumDoc}
           drafts={props.drafts}
           pendingBlocks={props.pendingBlocks}

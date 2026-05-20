@@ -108,7 +108,7 @@ export function assistantResponseNotice({
   if (!response.toolCalls.length) {
     return {
       tone: "default",
-      title: "어시스턴트 답변 완료",
+      title: "AI 답변 완료",
       detail: response.provider,
     };
   }

@@ -33,6 +33,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { codaroApi } from "@/lib/api";
+import type { CellAiHelpState } from "@/lib/assistantTypes";
 import {
   blockLabel,
   classifyLearningCell,
@@ -65,6 +66,7 @@ type RenderCodeCellEditor = (args: {
 export function CurriculumView({
   apiOnline,
   canRun,
+  cellHelpByBlockId,
   document,
   drafts,
   pendingBlocks,
@@ -86,6 +88,7 @@ export function CurriculumView({
 }: {
   apiOnline: boolean;
   canRun: boolean;
+  cellHelpByBlockId: Record<string, CellAiHelpState>;
   document: CodaroDocument;
   drafts: Record<string, string>;
   pendingBlocks: BlockConfig[];
@@ -99,7 +102,7 @@ export function CurriculumView({
   selectedContentLabel: string;
   selectedContentId: string;
   onAcceptPendingBlocks: () => void;
-  onCellAsk: (action: CellAiAction, block: BlockConfig) => void;
+  onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig) => void;
@@ -130,6 +133,7 @@ export function CurriculumView({
             {curriculumSections.sections.map((section, index) => (
               <CurriculumSectionCard
                 canRun={canRun}
+                cellHelpByBlockId={cellHelpByBlockId}
                 drafts={drafts}
                 index={index}
                 key={section.id}
@@ -416,6 +420,7 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
 
 function CurriculumSectionCard({
   canRun,
+  cellHelpByBlockId,
   drafts,
   index,
   renderCodeCellEditor,
@@ -429,6 +434,7 @@ function CurriculumSectionCard({
   onSelectBlock,
 }: {
   canRun: boolean;
+  cellHelpByBlockId: Record<string, CellAiHelpState>;
   drafts: Record<string, string>;
   index: number;
   renderCodeCellEditor: RenderCodeCellEditor;
@@ -436,7 +442,7 @@ function CurriculumSectionCard({
   runningBlockId: string | null;
   section: CurriculumSectionGroup;
   selectedBlockId: string;
-  onCellAsk: (action: CellAiAction, block: BlockConfig) => void;
+  onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onRunBlock: (block: BlockConfig) => void;
   onSelectBlock: (blockId: string) => void;
@@ -478,6 +484,7 @@ function CurriculumSectionCard({
       {structured ? (
         <StructuredSectionLearningBody
           canRun={canRun}
+          cellHelpByBlockId={cellHelpByBlockId}
           drafts={drafts}
           renderCodeCellEditor={renderCodeCellEditor}
           results={results}
@@ -495,6 +502,7 @@ function CurriculumSectionCard({
             <CurriculumLearningCell
               block={block}
               canRun={canRun}
+              cellHelp={cellHelpByBlockId[block.id]}
               draft={drafts[block.id] ?? curriculumInitialDraft(block)}
               isRunning={runningBlockId === block.id}
               isSelected={block.id === selectedBlockId}
@@ -502,7 +510,7 @@ function CurriculumSectionCard({
               renderCodeCellEditor={renderCodeCellEditor}
               result={results[block.id]}
               variant="embedded"
-              onAsk={(action) => onCellAsk(action, block)}
+              onAsk={(action, question) => onCellAsk(action, block, question)}
               onDraftChange={(value) => onDraftChange(block.id, value)}
               onRun={() => onRunBlock(block)}
               onSelect={() => onSelectBlock(block.id)}
@@ -688,6 +696,7 @@ function SectionContractOverview({ contract }: { contract?: CurriculumSectionCon
 
 function StructuredSectionLearningBody({
   canRun,
+  cellHelpByBlockId,
   drafts,
   renderCodeCellEditor,
   results,
@@ -700,13 +709,14 @@ function StructuredSectionLearningBody({
   onSelectBlock,
 }: {
   canRun: boolean;
+  cellHelpByBlockId: Record<string, CellAiHelpState>;
   drafts: Record<string, string>;
   renderCodeCellEditor: RenderCodeCellEditor;
   results: ResultMap;
   runningBlockId: string | null;
   section: CurriculumSectionGroup;
   selectedBlockId: string;
-  onCellAsk: (action: CellAiAction, block: BlockConfig) => void;
+  onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onRunBlock: (block: BlockConfig) => void;
   onSelectBlock: (blockId: string) => void;
@@ -769,7 +779,11 @@ function StructuredSectionLearningBody({
               >
                 {exerciseRunning ? <Loader2 className="animate-spin" /> : <Play />}
               </IconButton>
-              <CellAiActions onAsk={(action) => onCellAsk(action, exercise)} selected={exerciseSelected} />
+              <CellAiActions
+                helpState={cellHelpByBlockId[exercise.id]}
+                selected={exerciseSelected}
+                onAsk={(action, question) => onCellAsk(action, exercise, question)}
+              />
             </div>
           </div>
 
@@ -789,7 +803,13 @@ function StructuredSectionLearningBody({
               <span>실습 입력 셀</span>
               <Badge className="hidden sm:inline-flex" variant="outline">Ctrl+Enter 실행</Badge>
             </div>
-            <div data-learning-exercise-input="editor">
+            <div
+              className={cn(
+                "rounded-md border bg-code shadow-inner transition-colors",
+                exerciseSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/60",
+              )}
+              data-learning-exercise-input="editor"
+            >
               {renderCodeCellEditor({
                 autoFocus: exerciseSelected,
                 block: exercise,
@@ -836,6 +856,7 @@ function StructuredSectionLearningBody({
             <CurriculumLearningCell
               block={block}
               canRun={canRun}
+              cellHelp={cellHelpByBlockId[block.id]}
               draft={drafts[block.id] ?? curriculumInitialDraft(block)}
               isRunning={runningBlockId === block.id}
               isSelected={block.id === selectedBlockId}
@@ -843,7 +864,7 @@ function StructuredSectionLearningBody({
               renderCodeCellEditor={renderCodeCellEditor}
               result={results[block.id]}
               variant="embedded"
-              onAsk={(action) => onCellAsk(action, block)}
+              onAsk={(action, question) => onCellAsk(action, block, question)}
               onDraftChange={(value) => onDraftChange(block.id, value)}
               onRun={() => onRunBlock(block)}
               onSelect={() => onSelectBlock(block.id)}
@@ -1114,6 +1135,7 @@ function shouldShowTocItem(block: BlockConfig, label: string) {
 function CurriculumLearningCell({
   block,
   canRun,
+  cellHelp,
   draft,
   isRunning,
   isSelected,
@@ -1127,13 +1149,14 @@ function CurriculumLearningCell({
 }: {
   block: BlockConfig;
   canRun: boolean;
+  cellHelp?: CellAiHelpState;
   draft: string;
   isRunning: boolean;
   isSelected: boolean;
   renderCodeCellEditor: RenderCodeCellEditor;
   result?: ExecutionResult;
   variant?: "standalone" | "embedded";
-  onAsk: (action: CellAiAction) => void;
+  onAsk: (action: CellAiAction, question?: string) => void;
   onDraftChange: (value: string) => void;
   onRun: () => void;
   onSelect: () => void;
@@ -1195,7 +1218,7 @@ function CurriculumLearningCell({
               <TypeIcon className="size-3" />
               {typeMeta.label}
             </Badge>
-            <CellAiActions onAsk={onAsk} selected={isSelected} />
+            <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
           </div>
           <CurriculumMarkdownBody block={block} />
         </section>
@@ -1218,7 +1241,7 @@ function CurriculumLearningCell({
             <TypeIcon className="size-3" />
             {typeMeta.label}
               </Badge>
-              <CellAiActions onAsk={onAsk} selected={isSelected} />
+              <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
             </div>
           ) : (
             <div className="flex items-center gap-3 border-b bg-muted/20 px-3 py-2">
@@ -1234,7 +1257,7 @@ function CurriculumLearningCell({
                 <TypeIcon className="size-3" />
                 {typeMeta.label}
               </Badge>
-              <CellAiActions onAsk={onAsk} selected={isSelected} />
+              <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
             </div>
           )}
           <div className={cn("space-y-3 px-3 pb-3", bodyFirst ? "pt-2" : "pt-3")}>
@@ -1281,7 +1304,7 @@ function CurriculumLearningCell({
           >
             {isRunning ? <Loader2 className="animate-spin" /> : <Play />}
           </IconButton>
-          <CellAiActions onAsk={onAsk} selected={isSelected} />
+          <CellAiActions helpState={cellHelp} onAsk={onAsk} selected={isSelected} />
         </div>
         <div className={cn("space-y-3", embedded ? "px-4 pb-4" : "px-3 py-3")}>
           {isSnippetCode ? <SnippetPracticeIntro block={block} /> : null}
@@ -1294,20 +1317,23 @@ function CurriculumLearningCell({
                 {isSnippetCode && !draft.trim() ? <Badge variant="outline">직접 입력</Badge> : null}
               </span>
             </div>
-            {isSelected ? renderCodeCellEditor({
-              autoFocus: isSelected,
-              block,
-              draft,
-              onChange: onDraftChange,
-              onFocus: onSelect,
-              onRun,
-            }) : (
-              <LightweightCodePreview
-                draft={draft}
-                placeholder={isSnippetCode ? "클릭해서 직접 입력하세요." : "클릭해서 코드를 편집하세요."}
-                onSelect={onSelect}
-              />
-            )}
+            <div
+              className={cn(
+                "rounded-md border bg-code shadow-inner transition-colors",
+                isSelected ? "border-ring ring-2 ring-ring/20" : "border-border hover:border-ring/60",
+              )}
+              data-learning-code-input="editor"
+              onClick={onSelect}
+            >
+              {renderCodeCellEditor({
+                autoFocus: isSelected,
+                block,
+                draft,
+                onChange: onDraftChange,
+                onFocus: onSelect,
+                onRun,
+              })}
+            </div>
           </div>
           {result ? <ExecutionOutput result={result} /> : null}
           {isRunning && !result ? <LoadingInline label="셀 실행 중" /> : null}
@@ -1333,27 +1359,6 @@ function SnippetPracticeIntro({ block }: { block: BlockConfig }) {
         <CodePayload value={block.content} />
       </div>
     </div>
-  );
-}
-
-function LightweightCodePreview({
-  draft,
-  placeholder,
-  onSelect,
-}: {
-  draft: string;
-  placeholder: string;
-  onSelect: () => void;
-}) {
-  const preview = draft.trim() || placeholder;
-  return (
-    <button
-      className="block w-full rounded-md bg-code px-3 py-2 text-left font-mono text-xs leading-5 text-code-foreground transition-colors hover:ring-1 hover:ring-ring/35"
-      type="button"
-      onClick={onSelect}
-    >
-      <pre className={cn("max-h-24 overflow-hidden whitespace-pre-wrap", !draft.trim() && "text-muted-foreground")}>{preview}</pre>
-    </button>
   );
 }
 

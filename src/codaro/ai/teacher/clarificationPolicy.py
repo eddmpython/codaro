@@ -40,9 +40,10 @@ def clarificationAnswer(plan: ClarificationPlan) -> str:
     return "\n\n".join(
         part
         for part in [
-            "바로 만들기 전에 결과가 달라지는 핵심만 확인하겠습니다.",
+            "바로 만들기 전에 결과가 달라지는 부분만 되묻겠습니다.",
             questionLines,
-            "답이 없으면 아래 기본값으로 진행합니다.",
+            "답을 주면 그 기준으로 만들겠습니다. 지금 기준이 맞으면 그대로 진행해도 됩니다.",
+            "현재 가정:",
             defaultLines,
         ]
         if part

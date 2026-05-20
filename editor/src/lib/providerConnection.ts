@@ -111,7 +111,7 @@ export function providerAssistantFailure(detail: string): ProviderAssistantFailu
     content,
     notice: {
       tone: "error",
-      title: authIssue ? "Provider 연결 필요" : "어시스턴트 사용 불가",
+      title: authIssue ? "Provider 연결 필요" : "AI 사용 불가",
       detail: content,
     },
   };

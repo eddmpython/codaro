@@ -22,6 +22,7 @@ import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Textarea } from "@/components/ui/textarea";
 import type { CellAiAction } from "@/lib/cellModel";
+import type { CellAiHelpState } from "@/lib/assistantTypes";
 import { statusLabel } from "@/lib/displayFormat";
 import { cn } from "@/lib/utils";
 import type { BlockConfig, CodaroDocument, ExecutionResult } from "@/types";
@@ -74,6 +75,7 @@ const codeCellEditorTheme = EditorView.theme({
 
 export function NotebookPanel({
   canRun,
+  cellHelpByBlockId,
   document,
   drafts,
   pendingBlocks,
@@ -89,6 +91,7 @@ export function NotebookPanel({
   onSelectBlock,
 }: {
   canRun: boolean;
+  cellHelpByBlockId: Record<string, CellAiHelpState>;
   document: CodaroDocument;
   drafts: Record<string, string>;
   pendingBlocks: BlockConfig[];
@@ -97,7 +100,7 @@ export function NotebookPanel({
   selectedBlockId: string;
   onAddCell: (type: "code" | "markdown") => void;
   onAcceptPendingBlocks: () => void;
-  onCellAsk: (action: CellAiAction, block: BlockConfig) => void;
+  onCellAsk: (action: CellAiAction, block: BlockConfig, question?: string) => void;
   onDraftChange: (blockId: string, value: string) => void;
   onRejectPendingBlocks: () => void;
   onRunBlock: (block: BlockConfig) => void;
@@ -137,8 +140,9 @@ export function NotebookPanel({
               key={block.id}
               ordinal={index + 1}
               result={results[block.id]}
+              cellHelp={cellHelpByBlockId[block.id]}
               isRunning={runningBlockId === block.id}
-              onCellAsk={(action) => onCellAsk(action, block)}
+              onCellAsk={(action, question) => onCellAsk(action, block, question)}
               onDraftChange={(value) => onDraftChange(block.id, value)}
               onRun={() => onRunBlock(block)}
               onSelect={() => onSelectBlock(block.id)}
@@ -267,6 +271,7 @@ function DocumentBlock({
   isRunning,
   ordinal,
   result,
+  cellHelp,
   onDraftChange,
   onRun,
   onSelect,
@@ -279,7 +284,8 @@ function DocumentBlock({
   isRunning: boolean;
   ordinal: number;
   result?: ExecutionResult;
-  onCellAsk: (action: CellAiAction) => void;
+  cellHelp?: CellAiHelpState;
+  onCellAsk: (action: CellAiAction, question?: string) => void;
   onDraftChange: (value: string) => void;
   onRun: () => void;
   onSelect: () => void;
@@ -300,6 +306,7 @@ function DocumentBlock({
               title={cellTitle}
               type="markdown"
               selected={isSelected}
+              cellHelp={cellHelp}
               onCellAsk={onCellAsk}
               onSelect={onSelect}
             />
@@ -336,6 +343,7 @@ function DocumentBlock({
             title={cellTitle}
             type="code"
             selected={isSelected}
+            cellHelp={cellHelp}
             onCellAsk={onCellAsk}
             onSelect={onSelect}
           />
@@ -398,6 +406,7 @@ function CellHeader({
   title,
   type,
   selected,
+  cellHelp,
   onCellAsk,
   onSelect,
 }: {
@@ -406,7 +415,8 @@ function CellHeader({
   title: string;
   type: "code" | "markdown";
   selected: boolean;
-  onCellAsk: (action: CellAiAction) => void;
+  cellHelp?: CellAiHelpState;
+  onCellAsk: (action: CellAiAction, question?: string) => void;
   onSelect: () => void;
 }) {
   const Icon = type === "code" ? TerminalSquare : MessageSquare;
@@ -426,7 +436,7 @@ function CellHeader({
         {lineCount ? <span className="hidden text-xs text-muted-foreground sm:inline">{lineCount}줄</span> : null}
         {status !== "idle" ? <Badge variant={status === "error" ? "destructive" : "outline"}>{statusLabel(status)}</Badge> : null}
       </button>
-      <CellAiActions selected={selected} onAsk={onCellAsk} />
+      <CellAiActions helpState={cellHelp} selected={selected} onAsk={onCellAsk} />
     </div>
   );
 }

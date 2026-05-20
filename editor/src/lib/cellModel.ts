@@ -36,25 +36,27 @@ export function classifyLearningCell(block: BlockConfig, draft: string): Learnin
   return "practice";
 }
 
-export function buildCellAiPrompt(action: CellAiAction, block: BlockConfig) {
+export function buildCellAiPrompt(action: CellAiAction, block: BlockConfig, question?: string) {
   const label = blockLabel(block);
   const typeLabel = block.type === "code" ? "코드 셀" : "학습 셀";
   const preview = block.content.length > 900 ? `${block.content.slice(0, 900)}...` : block.content;
   const base = `선택한 ${typeLabel}: ${label}\n\n셀 내용:\n${preview}`;
+  const customQuestion = question?.trim();
+  const questionLine = customQuestion ? `\n\n사용자 질문:\n${customQuestion}` : "";
 
   if (action === "hint") {
-    return `${base}\n\n이미 풀린 셀이 아니라면 전체 정답을 바로 공개하지 말고, 이 셀을 풀 수 있는 실용적인 힌트를 줘.`;
+    return `${base}${questionLine}\n\n이미 풀린 셀이 아니라면 전체 정답을 바로 공개하지 말고, 이 셀을 풀 수 있는 실용적인 힌트를 줘.`;
   }
 
   if (action === "check") {
-    return `${base}\n\n학습자 답과 현재 출력이 맞는지 확인해줘. 틀렸다면 셀을 수정하기 전에 가장 작은 다음 수정부터 설명해줘.`;
+    return `${base}${questionLine}\n\n학습자 답과 현재 출력이 맞는지 확인해줘. 틀렸다면 셀을 수정하기 전에 가장 작은 다음 수정부터 설명해줘.`;
   }
 
   if (action === "revise") {
-    return `${base}\n\n명확성과 학습 가치를 높이도록 이 셀을 수정해줘. 먼저 변경안을 제안하고, 확실히 유익할 때만 write-cell을 사용해줘.`;
+    return `${base}${questionLine}\n\n명확성과 학습 가치를 높이도록 이 셀을 수정해줘. 먼저 변경안을 제안하고, 확실히 유익할 때만 write-cell을 사용해줘.`;
   }
 
-  return `${base}\n\n이 셀을 맥락 안에서 설명해줘. 학습자가 이해해야 할 것, 다음에 실행하거나 수정할 것, 답을 검증하는 방법을 포함해줘.`;
+  return `${base}${questionLine}\n\n이 셀을 맥락 안에서 설명해줘. 학습자가 이해해야 할 것, 다음에 실행하거나 수정할 것, 답을 검증하는 방법을 포함해줘.`;
 }
 
 export function cellRoleLabel(role?: BlockConfig["role"]) {

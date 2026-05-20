@@ -505,7 +505,7 @@ def jsAssertLearningOverview(viewport: str) -> str:
 
 def jsAssertStructuredCard(viewport: str) -> str:
     return compactJs(f"""
-(() => {{
+(async () => {{
   const card = document.querySelector('[data-learning-section-card][data-learning-section-structured="true"]');
   if (!card) throw new Error('structured learning section card not found');
   const parts = Array.from(card.querySelectorAll('[data-learning-section-part]')).map((item) =>
@@ -558,6 +558,21 @@ def jsAssertStructuredCard(viewport: str) -> str:
   }}
   if (!(exerciseEditor.textContent || '').includes('frame = ___')) {{
     throw new Error('exercise editor does not render starter code');
+  }}
+  const helpButton = exercise.querySelector('button[aria-label="이 셀에서 AI 도움 요청"]');
+  if (!helpButton) throw new Error('cell-local AI help button is missing');
+  let helpPopover = document.querySelector('[data-cell-ai-popover="true"]');
+  if (!helpPopover) {{
+    helpButton.click();
+    await new Promise((resolve) => setTimeout(resolve, 60));
+    helpPopover = document.querySelector('[data-cell-ai-popover="true"]');
+  }}
+  if (!helpPopover) throw new Error('cell-local AI help popover did not open');
+  if (!helpPopover.querySelector('[data-cell-ai-question="true"]')) {{
+    throw new Error('cell-local AI help question input is missing');
+  }}
+  if (!(helpPopover.textContent || '').includes('이 셀에서 바로 질문')) {{
+    throw new Error('cell-local AI help popover title is missing');
   }}
   const exerciseRect = exercise.getBoundingClientRect();
   const resultRect = result.getBoundingClientRect();

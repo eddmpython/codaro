@@ -189,6 +189,7 @@ function App() {
     askAssistant,
     askCellAssistant,
     assistantLoading,
+    cellHelpByBlockId,
     messages,
     prompt,
     setPrompt,
@@ -267,6 +268,7 @@ function App() {
           automationSection={automationSection}
           assistantLoading={assistantLoading}
           canRun={canRun}
+          cellHelpByBlockId={cellHelpByBlockId}
           categories={filteredCategories}
           contents={contents}
           curriculumDocument={curriculumDocument}

@@ -51,7 +51,7 @@ export function completeLocalAssistantDraft({
     },
     notice: {
       tone: blockCount ? "success" : "default",
-      title: saved ? "나만의 커리큘럼 저장됨" : blockCount ? "커리큘럼 초안 준비됨" : "어시스턴트 답변 완료",
+      title: saved ? "나만의 커리큘럼 저장됨" : blockCount ? "커리큘럼 초안 준비됨" : "AI 답변 완료",
       detail: savedTitle ?? (blockCount ? `${blockCount}개 학습 셀을 생성했습니다.` : "셀 안내가 준비됐습니다."),
     },
   };

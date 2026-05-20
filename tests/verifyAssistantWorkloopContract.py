@@ -147,7 +147,7 @@ const clarification = finish({{
     elapsedMs: 12,
     eventType: "clarification-gate",
     workLabel: "작업 전 확인 질문",
-    workDetail: "핵심 질문 3개 · 기본값: 초급 / 실습 중심 / 현재 Codaro 로컬 Python과 uv 패키지 설치",
+    workDetail: "핵심 질문 3개 · 현재 가정: 초급 / 실습 중심 / 현재 Codaro 로컬 Python과 uv 패키지 설치",
     category: "learning",
     lane: "safety",
     target: "clarification-gate",
@@ -155,7 +155,7 @@ const clarification = finish({{
 }});
 const clarificationStep = findStep(clarification, "작업 전 확인 질문");
 assert.equal(clarificationStep.status, "done");
-assert.match(clarificationStep.detail, /기본값/);
+assert.match(clarificationStep.detail, /현재 가정/);
 assert.equal(clarificationStep.category, "learning");
 assert.equal(clarificationStep.lane, "safety");
 assert.equal(clarificationStep.target, "clarification-gate");
