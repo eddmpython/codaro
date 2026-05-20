@@ -53,6 +53,7 @@ import {
 type ResultMap = Record<string, ExecutionResult>;
 
 type RenderCodeCellEditor = (args: {
+  autoFocus?: boolean;
   block: BlockConfig;
   draft: string;
   onChange: (value: string) => void;
@@ -787,19 +788,16 @@ function StructuredSectionLearningBody({
               <span>실습 입력 셀</span>
               <Badge className="hidden sm:inline-flex" variant="outline">Ctrl+Enter 실행</Badge>
             </div>
-            {exerciseSelected ? renderCodeCellEditor({
-              block: exercise,
-              draft: exerciseDraft,
-              onChange: (value) => onDraftChange(exercise.id, value),
-              onFocus: () => onSelectBlock(exercise.id),
-              onRun: () => onRunBlock(exercise),
-            }) : (
-              <LightweightCodePreview
-                draft={exerciseDraft}
-                placeholder="클릭해서 직접 입력하세요."
-                onSelect={() => onSelectBlock(exercise.id)}
-              />
-            )}
+            <div data-learning-exercise-input="editor">
+              {renderCodeCellEditor({
+                autoFocus: exerciseSelected,
+                block: exercise,
+                draft: exerciseDraft,
+                onChange: (value) => onDraftChange(exercise.id, value),
+                onFocus: () => onSelectBlock(exercise.id),
+                onRun: () => onRunBlock(exercise),
+              })}
+            </div>
           </div>
 
           <div className="mt-3" data-learning-section-part="result">
@@ -1359,6 +1357,7 @@ function CurriculumLearningCell({
               </span>
             </div>
             {isSelected ? renderCodeCellEditor({
+              autoFocus: isSelected,
               block,
               draft,
               onChange: onDraftChange,

@@ -37,6 +37,7 @@ def main() -> int:
         "structured section marker": 'data-learning-section-structured={structured ? "true" : "false"}',
         "overview marker": 'data-learning-section-part="overview"',
         "exercise marker": 'data-learning-section-part="exercise"',
+        "exercise direct editor marker": 'data-learning-exercise-input="editor"',
         "result marker": 'data-learning-section-part="result"',
         "section overview renderer": "function SectionContractOverview",
         "structured body renderer": "function StructuredSectionLearningBody",
@@ -52,6 +53,7 @@ def main() -> int:
         "check source mapping": 'block.sourceType === "sectionContract:check"',
         "snippet part assignment": 'part="snippet"',
         "check part assignment": 'part="check"',
+        "structured exercise direct editor": "autoFocus: exerciseSelected",
     }
     for label, token in required_tokens.items():
         require(text, token, label, failures)

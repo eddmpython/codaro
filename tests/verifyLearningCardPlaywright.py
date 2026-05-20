@@ -547,8 +547,23 @@ def jsAssertStructuredCard(viewport: str) -> str:
 
   const exercise = card.querySelector('[data-learning-section-part="exercise"]');
   const result = card.querySelector('[data-learning-section-part="result"]');
+  const exerciseEditor = exercise.querySelector('[data-learning-exercise-input="editor"] .cm-editor');
+  if (!exerciseEditor) throw new Error('exercise direct editor is missing');
+  const exerciseEditorRect = exerciseEditor.getBoundingClientRect();
+  if (exerciseEditorRect.width <= 0 || exerciseEditorRect.height <= 0) {{
+    throw new Error('exercise direct editor has no visible size');
+  }}
+  if ((exercise.textContent || '').includes('클릭해서 직접 입력하세요.')) {{
+    throw new Error('exercise still renders a preview instead of the direct editor');
+  }}
+  if (!(exerciseEditor.textContent || '').includes('frame = ___')) {{
+    throw new Error('exercise editor does not render starter code');
+  }}
   const exerciseRect = exercise.getBoundingClientRect();
   const resultRect = result.getBoundingClientRect();
+  if (exerciseEditorRect.left < exerciseRect.left - 1 || exerciseEditorRect.right > exerciseRect.right + 1) {{
+    throw new Error('exercise direct editor escapes exercise band');
+  }}
   if (resultRect.top < exerciseRect.top || resultRect.bottom > exerciseRect.bottom + 1) {{
     throw new Error('result part is not inside the exercise flow');
   }}
@@ -556,6 +571,7 @@ def jsAssertStructuredCard(viewport: str) -> str:
   return JSON.stringify({{
     viewport: {json.dumps(viewport)},
     width: Math.round(cardRect.width),
+    directEditor: true,
     parts,
     bands: rects.length,
   }});

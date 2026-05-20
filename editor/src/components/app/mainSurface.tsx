@@ -180,9 +180,9 @@ export function MainSurface(props: MainSurfaceProps) {
           selectedCategoryLabel={selectedCategoryLabel}
           selectedContentId={props.selectedContentId}
           selectedContentLabel={selectedContentLabel}
-          renderCodeCellEditor={({ block, draft, onChange, onFocus, onRun }) => (
+          renderCodeCellEditor={({ autoFocus = true, block, draft, onChange, onFocus, onRun }) => (
             <CodeCellEditor
-              autoFocus
+              autoFocus={autoFocus}
               placeholderText={block.role === "snippet" ? "예제를 보고 직접 입력하세요." : "여기에 Python 코드를 입력하세요."}
               value={draft}
               onChange={onChange}
