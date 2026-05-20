@@ -1,4 +1,12 @@
 from .baseProvider import BaseProvider
+from .completion import (
+    CodeCompletionResult,
+    buildCompletionMessages,
+    completeCode,
+    completionContextText,
+    completionTextFromAnswer,
+    emptyCompletionResult,
+)
 from .conversation import ConversationManager, ConversationState, buildSystemPrompt
 from .factory import createProvider, registerProvider, availableProviders
 from .profile import AiProfileManager, AiProfile, getProfileManager
@@ -19,10 +27,16 @@ from .types import LLMConfig, LLMResponse, ToolCall, ToolResponse
 
 __all__ = [
     "BaseProvider",
+    "CodeCompletionResult",
     "ConversationManager",
     "ConversationState",
     "buildSystemPrompt",
+    "buildCompletionMessages",
+    "completeCode",
+    "completionContextText",
+    "completionTextFromAnswer",
     "createProvider",
+    "emptyCompletionResult",
     "registerProvider",
     "availableProviders",
     "AiProfileManager",

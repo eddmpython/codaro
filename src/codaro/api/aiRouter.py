@@ -12,6 +12,7 @@ from urllib.parse import parse_qs, urlparse
 from fastapi import APIRouter, HTTPException, Query, Request
 from pydantic import BaseModel
 
+from ..ai.completion import completeCode, emptyCompletionResult
 from ..ai.profile import AiProfileManager, getProfileManager
 from ..ai.providers.oauthChatgptProvider import ChatGPTOAuthError
 from ..ai.providerSpec import (
@@ -349,74 +350,23 @@ def createAiRouter(state: Any) -> APIRouter:
         body = await request.json()
         prefix = body.get("prefix", "")
         suffix = body.get("suffix", "")
-        blockId = body.get("blockId", "")
         providerOverride = body.get("provider")
         context = body.get("context")
 
         if not prefix.strip():
-            return {"completions": [], "provider": "", "model": ""}
-
-        from ..ai.factory import createProvider
-        from ..ai.types import LLMConfig
-
-        profileManager = getProfileManager()
-        resolved = profileManager.resolve(provider=providerOverride, role="copilot")
-
-        config = LLMConfig(
-            provider=resolved["provider"],
-            model=resolved.get("model"),
-            apiKey=resolved.get("apiKey"),
-            baseUrl=resolved.get("baseUrl"),
-            temperature=0,
-            maxTokens=120,
-        )
-
-        contextParts: list[str] = []
-        if context:
-            if context.get("variables"):
-                varLines = [f"  {v['name']}: {v['type']}" for v in context["variables"][:20]]
-                contextParts.append("Available variables:\n" + "\n".join(varLines))
-            if context.get("blocks"):
-                blockLines = [f"  [{b['type']}] {b.get('content', '')[:100]}" for b in context["blocks"][:10]]
-                contextParts.append("Other cells:\n" + "\n".join(blockLines))
-
-        systemPrompt = (
-            "You are a Python code completion engine.\n"
-            "Given a code prefix and optional suffix, return ONLY the code that should be inserted at the cursor.\n"
-            "Do NOT include the prefix or suffix in your response.\n"
-            "Do NOT include any explanation, markdown, or code fences.\n"
-            "Return exactly the completion text, nothing else.\n"
-            "If no completion is appropriate, return an empty string."
-        )
-        if contextParts:
-            systemPrompt += "\n\n" + "\n\n".join(contextParts)
-
-        userMessage = f"Complete this Python code:\n```\n{prefix}█{suffix}\n```\nReturn only the text that replaces █."
-
-        messages = [
-            {"role": "system", "content": systemPrompt},
-            {"role": "user", "content": userMessage},
-        ]
+            return emptyCompletionResult().payload()
 
         try:
-            provider = createProvider(config)
-            response = provider.complete(messages)
-            completion = response.answer.strip()
-            if completion.startswith("```"):
-                lines = completion.split("\n")
-                if len(lines) > 2:
-                    completion = "\n".join(lines[1:-1]).strip()
-                else:
-                    completion = ""
-            completions = [completion] if completion else []
-            return {
-                "completions": completions,
-                "provider": response.provider,
-                "model": response.model,
-            }
+            return completeCode(
+                profileManager=getProfileManager(),
+                prefix=prefix,
+                suffix=suffix,
+                context=context,
+                providerOverride=providerOverride,
+            ).payload()
         except _HANDLED_ERRORS as exc:
             logger.info("completion failed: %s", exc)
-            return {"completions": [], "provider": "", "model": ""}
+            return emptyCompletionResult().payload()
 
     return router
 

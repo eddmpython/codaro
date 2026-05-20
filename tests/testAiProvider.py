@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from codaro.ai.completion import buildCompletionMessages, completeCode, completionTextFromAnswer
 from codaro.ai.types import LLMConfig, LLMResponse, ToolCall, ToolResponse
 from codaro.ai.factory import createProvider, availableProviders, registerProvider
 from codaro.ai.providerSpec import (
@@ -17,6 +18,32 @@ from codaro.ai.providerSpec import (
 from codaro.ai.baseProvider import BaseProvider
 from codaro.ai.providers.oauthChatgptProvider import OAuthChatGPTProvider, _parseSseResponseDetailed
 from codaro.ai.tools import toolManifest
+
+
+class _CompletionProfileManager:
+    def __init__(self) -> None:
+        self.resolvedProvider: str | None = None
+        self.resolvedRole: str | None = None
+
+    def resolve(self, provider: str | None = None, *, role: str | None = None):
+        self.resolvedProvider = provider
+        self.resolvedRole = role
+        return {
+            "provider": "custom",
+            "model": "completion-model",
+            "apiKey": "secret",
+            "baseUrl": "http://local.test",
+        }
+
+
+class _CompletionProvider:
+    def __init__(self, config: LLMConfig) -> None:
+        self.config = config
+        self.messages: list[dict[str, str]] = []
+
+    def complete(self, messages: list[dict[str, str]]) -> LLMResponse:
+        self.messages = messages
+        return LLMResponse(answer="```python\nvalue + 1\n```", provider=self.config.provider, model=self.config.model)
 
 
 class TestLLMConfig:
@@ -157,6 +184,58 @@ class TestToolManifest:
         assert tools["cell-call"]["lane"] == "cell-call"
         assert tools["write-curriculum-yaml"]["target"] == "curriculum-yaml"
         assert tools["click-element"]["risk"] == "input"
+
+
+class TestCompletion:
+    def test_build_completion_messages_includes_context(self):
+        messages = buildCompletionMessages(
+            prefix="value = ",
+            suffix="\nprint(value)",
+            context={
+                "variables": [{"name": "value", "type": "int"}],
+                "blocks": [{"type": "code", "content": "value = 10"}],
+            },
+        )
+
+        assert "Available variables" in messages[0]["content"]
+        assert "value: int" in messages[0]["content"]
+        assert "Other cells" in messages[0]["content"]
+        assert "value = █" in messages[1]["content"]
+        assert "print(value)" in messages[1]["content"]
+
+    def test_completion_text_strips_code_fence(self):
+        assert completionTextFromAnswer("```python\nvalue + 1\n```") == "value + 1"
+        assert completionTextFromAnswer("value + 1") == "value + 1"
+        assert completionTextFromAnswer("```") == ""
+
+    def test_complete_code_owns_provider_config_and_payload(self):
+        profileManager = _CompletionProfileManager()
+        providers: list[_CompletionProvider] = []
+
+        def providerFactory(config: LLMConfig):
+            provider = _CompletionProvider(config)
+            providers.append(provider)
+            return provider
+
+        result = completeCode(
+            profileManager=profileManager,
+            prefix="value = ",
+            suffix="",
+            context={"variables": [{"name": "value", "type": "int"}]},
+            providerOverride="custom",
+            providerFactory=providerFactory,
+        )
+
+        assert result.payload() == {
+            "completions": ["value + 1"],
+            "provider": "custom",
+            "model": "completion-model",
+        }
+        assert profileManager.resolvedProvider == "custom"
+        assert profileManager.resolvedRole == "copilot"
+        assert providers[0].config.temperature == 0
+        assert providers[0].config.maxTokens == 120
+        assert "Available variables" in providers[0].messages[0]["content"]
 
 
 class TestOAuthChatGPTTools:
