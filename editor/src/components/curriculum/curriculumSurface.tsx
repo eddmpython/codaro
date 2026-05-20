@@ -198,7 +198,11 @@ function LearningOverviewHeader({
   const overview = curriculumOverview(document, introBlock);
 
   return (
-    <header id={introBlock ? cellDomId(introBlock.id) : undefined} className="overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm">
+    <header
+      className="overflow-hidden rounded-md border bg-card text-card-foreground shadow-sm"
+      data-learning-overview="true"
+      id={introBlock ? cellDomId(introBlock.id) : undefined}
+    >
       <div className="grid gap-4 p-4 2xl:grid-cols-[minmax(0,1fr)_360px]">
         <div className="min-w-0">
           <div className="flex flex-wrap items-center gap-2">
@@ -207,14 +211,18 @@ function LearningOverviewHeader({
             {selectedContentLabel || selectedContentId ? <Badge variant="outline">{selectedContentLabel || selectedContentId}</Badge> : null}
             {referenceLoading ? <LoadingInline label="레슨 불러오는 중" /> : null}
           </div>
-          <h1 className="mt-3 text-2xl font-semibold tracking-normal">{overview.title}</h1>
+          <h1 className="mt-3 text-2xl font-semibold tracking-normal" data-learning-overview-part="title">{overview.title}</h1>
           {overview.direction ? (
-            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground">{overview.direction}</p>
+            <p className="mt-2 max-w-3xl text-sm leading-6 text-muted-foreground" data-learning-overview-part="direction">{overview.direction}</p>
           ) : null}
           {overview.benefits.length ? (
             <div className="mt-4 grid gap-2 sm:grid-cols-2">
               {overview.benefits.slice(0, 4).map((benefit, index) => (
-                <div className="flex min-w-0 items-start gap-2 rounded-md border bg-background/60 px-3 py-2 text-sm leading-5" key={`${benefit}-${index}`}>
+                <div
+                  className="flex min-w-0 items-start gap-2 rounded-md border bg-background/60 px-3 py-2 text-sm leading-5"
+                  data-learning-overview-part="benefit"
+                  key={`${benefit}-${index}`}
+                >
                   <CheckCircle2 className="mt-0.5 size-3.5 shrink-0 text-emerald-500" />
                   <span className="min-w-0 text-muted-foreground">{benefit}</span>
                 </div>
@@ -253,7 +261,7 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
     : fallbackSteps;
 
   return (
-    <div className="rounded-md border bg-background/70 p-3">
+    <div className="rounded-md border bg-background/70 p-3" data-learning-flow-diagram="true" data-learning-overview-part="diagram">
       <div className="mb-3 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-semibold">
           <Boxes className="size-4 text-muted-foreground" />
@@ -266,9 +274,13 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
       </div>
       <div className="relative grid gap-2">
         {steps.map(({ Icon, detail, label, tone }, index) => (
-          <div className="relative flex items-center gap-3 rounded-md border bg-card px-3 py-2" key={label}>
-            {index < steps.length - 1 ? <span className="absolute left-[21px] top-[36px] h-4 w-px bg-border" /> : null}
-            <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-muted", tone)}>
+          <div
+            className="relative flex items-start gap-3 rounded-md bg-muted/40 px-3 py-2"
+            data-learning-flow-step={label}
+            key={label}
+          >
+            {index < steps.length - 1 ? <span className="absolute left-[21px] top-[34px] h-4 w-px bg-border" /> : null}
+            <span className={cn("flex size-8 shrink-0 items-center justify-center rounded-md bg-background shadow-xs ring-1 ring-border", tone)}>
               <Icon className="size-4" />
             </span>
             <span className="min-w-0 flex-1">

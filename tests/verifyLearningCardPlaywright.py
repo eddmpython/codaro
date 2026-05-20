@@ -60,11 +60,15 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsReferenceLessonIdle(), "reference lesson loading to settle")
         clickCustomCurriculum(cli)
         cli.waitEval(jsStructuredCardReady(), "structured learning card")
+        cli.waitEval(jsLearningOverviewReady(), "learning overview")
+        desktopOverview = cli.eval(jsAssertLearningOverview("desktop"))
         desktop = cli.eval(jsAssertStructuredCard("desktop"))
         cli.run("resize", "390", "844")
+        cli.waitEval(jsLearningOverviewReady(), "learning overview after mobile resize")
         cli.waitEval(jsStructuredCardReady(), "structured learning card after mobile resize")
+        mobileOverview = cli.eval(jsAssertLearningOverview("mobile"))
         mobile = cli.eval(jsAssertStructuredCard("mobile"))
-        print(f"ok: Playwright structured learning card verified {desktop} {mobile}")
+        print(f"ok: Playwright structured learning card verified {desktopOverview} {desktop} {mobileOverview} {mobile}")
         return 0
     except VerificationError as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
@@ -343,6 +347,70 @@ def jsReferenceLessonIdle() -> str:
 
 def jsStructuredCardReady() -> str:
     return "Boolean(document.querySelector('[data-learning-section-card][data-learning-section-structured=\"true\"]'))"
+
+
+def jsLearningOverviewReady() -> str:
+    return "Boolean(document.querySelector('[data-learning-overview=\"true\"] [data-learning-flow-diagram=\"true\"]'))"
+
+
+def jsAssertLearningOverview(viewport: str) -> str:
+    return compactJs(f"""
+(() => {{
+  const overview = document.querySelector('[data-learning-overview="true"]');
+  if (!overview) throw new Error('learning overview not found');
+  const direction = overview.querySelector('[data-learning-overview-part="direction"]');
+  if (!direction || !(direction.textContent || '').includes('DataFrame 생성부터 직접 입력 실습과 검증까지')) {{
+    throw new Error('learning direction is missing or incorrect');
+  }}
+  const benefits = Array.from(overview.querySelectorAll('[data-learning-overview-part="benefit"]'));
+  if (!benefits.some((item) => (item.textContent || '').includes('작은 카드 반복 없이 섹션 흐름'))) {{
+    throw new Error('learning benefit is missing');
+  }}
+  const diagram = overview.querySelector('[data-learning-flow-diagram="true"]');
+  if (!diagram || !(diagram.textContent || '').includes('학습 아키텍처')) {{
+    throw new Error('learning architecture diagram is missing');
+  }}
+  const steps = Array.from(diagram.querySelectorAll('[data-learning-flow-step]')).map((item) =>
+    item.getAttribute('data-learning-flow-step')
+  );
+  const requiredSteps = ['목표', '스니펫', '실행'];
+  const missingSteps = requiredSteps.filter((step) => !steps.includes(step));
+  if (missingSteps.length) throw new Error('missing learning flow steps: ' + missingSteps.join(', '));
+
+  const overviewRect = overview.getBoundingClientRect();
+  const diagramRect = diagram.getBoundingClientRect();
+  if (overviewRect.width < Math.min(320, window.innerWidth - 24)) {{
+    throw new Error('overview width is unexpectedly small: ' + overviewRect.width);
+  }}
+  if (diagramRect.width <= 0 || diagramRect.height <= 0) {{
+    throw new Error('learning diagram has no visible size');
+  }}
+  if (diagramRect.left < overviewRect.left - 1 || diagramRect.right > overviewRect.right + 1) {{
+    throw new Error('learning diagram escapes overview');
+  }}
+
+  const visibleBands = [direction, ...benefits, diagram].filter(Boolean).map((item) => item.getBoundingClientRect());
+  visibleBands.forEach((rect, index) => {{
+    if (rect.width <= 0 || rect.height <= 0) throw new Error('empty overview band at ' + index);
+  }});
+  for (let index = 1; index < visibleBands.length; index += 1) {{
+    const previous = visibleBands[index - 1];
+    const current = visibleBands[index];
+    const sideBySide = Math.abs(previous.top - current.top) <= 2 && current.left >= previous.right - 1;
+    const stacked = current.top >= previous.bottom - 1;
+    if (!sideBySide && !stacked) {{
+      throw new Error('overview content overlaps between ' + (index - 1) + ' and ' + index);
+    }}
+  }}
+
+  return JSON.stringify({{
+    viewport: {json.dumps(viewport)},
+    title: (overview.querySelector('[data-learning-overview-part="title"]')?.textContent || '').trim(),
+    benefitCount: benefits.length,
+    steps,
+  }});
+}})()
+""")
 
 
 def jsAssertStructuredCard(viewport: str) -> str:

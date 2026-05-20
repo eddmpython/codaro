@@ -43,7 +43,7 @@ uv run python -X utf8 tests/run.py gate learning-card-browser
 | `teacher-eval` | fast | teacher tool policy, trace, golden eval 계약을 빠르게 확인한다. |
 | `teacher-e2e` | fast | scripted provider loop, tool policy, 실제 curriculum YAML handler를 통과하는 golden e2e harness를 실행한다. |
 | `learning-card-contract` | surface | structured section card marker 계약과 editor build를 확인한다. |
-| `learning-card-browser` | surface | Playwright CLI로 structured section card의 desktop/mobile 렌더링을 확인한다. |
+| `learning-card-browser` | surface | Playwright CLI로 lesson overview와 structured section card의 desktop/mobile 렌더링을 확인한다. |
 | `editor-build` | surface | 제품 editor surface의 TypeScript/Vite build를 확인한다. |
 | `landing-build` | surface | 문서/landing surface의 static build를 확인한다. |
 | `launcher-check` | release | launcher Rust crate의 type/build 계약을 확인한다. |
