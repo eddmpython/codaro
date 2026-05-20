@@ -151,9 +151,12 @@ OBJECTIVE_REQUIREMENTS = (
             )),
             ("editor/src/lib/workLoop.ts", (
                 "traceWorkloopDetail",
+                "toolResultDetail",
                 "shouldPromoteTraceWorkloopEvent",
                 "clarification-gate",
                 "turn-error",
+                "durationMs",
+                "skipped",
             )),
             ("tests/verifyAssistantWorkloopContract.py", (
                 "작업 전 확인 질문",
@@ -162,6 +165,8 @@ OBJECTIVE_REQUIREMENTS = (
                 "packages-check",
                 "packages-install",
                 "cell-call",
+                "project .venv",
+                "pandas 이미 준비됨",
             )),
         ),
     ),

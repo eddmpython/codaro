@@ -423,10 +423,49 @@ function workLabelFromToolCall(toolCall: AiToolCall, name: string) {
 
 function toolCallDetail(toolCall: AiToolCall, name: string) {
   const args = toolCallArguments(toolCall);
+  const resultDetail = toolResultDetail(toolCall.result, name, args);
+  if (resultDetail) return resultDetail;
   const specific = toolSpecificDetail(name, args);
   return [specific, toolCall.target, toolCall.risk && toolCall.risk !== "normal" ? toolCall.risk : null]
     .filter(Boolean)
     .join(" · ");
+}
+
+function toolResultDetail(result: unknown, name: string, args: Record<string, unknown>) {
+  if (!result || typeof result !== "object") return "";
+  const payload = result as Record<string, unknown>;
+  switch (name) {
+    case "packages-check": {
+      const missing = listArg(payload, "missing");
+      if (missing.length) return `${missing.join(", ")} 누락 확인`;
+      const checked = listArg(args, "names");
+      return checked.length ? `${checked.join(", ")} 준비됨` : "필요 패키지 준비됨";
+    }
+    case "packages-install": {
+      const packageName = textArg(payload, "package") || textArg(args, "name") || "패키지";
+      if (payload.success === false) {
+        const message = firstLine(textArg(payload, "message") || textArg(payload, "error"));
+        return message || `${packageName} 설치 실패`;
+      }
+      const environment = textArg(payload, "environment") || "project .venv";
+      const installer = textArg(payload, "installer") || "uv";
+      if (payload.skipped === true) return `${packageName} 이미 준비됨 · ${environment}`;
+      if (payload.success === true) {
+        const duration = typeof payload.durationMs === "number" ? ` · ${formatDuration(payload.durationMs)}` : "";
+        return `${packageName} 설치 완료 · ${installer} · ${environment}${duration}`;
+      }
+      return "";
+    }
+    case "cell-call": {
+      const blockId = textArg(args, "blockId");
+      if (payload.passed === true) return blockId ? `${blockId} 검증 통과` : "셀 검증 통과";
+      if (payload.passed === false) return blockId ? `${blockId} 검증 실패` : "셀 검증 실패";
+      const status = textArg(payload, "status");
+      return status && blockId ? `${blockId} 실행 결과 · ${status}` : "";
+    }
+    default:
+      return "";
+  }
 }
 
 function toolSpecificDetail(name: string, args: Record<string, unknown>) {
@@ -464,4 +503,14 @@ function textArg(args: Record<string, unknown>, key: string) {
 function listArg(args: Record<string, unknown>, key: string) {
   const value = args[key];
   return Array.isArray(value) ? value.filter((item): item is string => typeof item === "string") : [];
+}
+
+function firstLine(value: string) {
+  return value.split(/\r?\n/)[0]?.trim() ?? "";
+}
+
+function formatDuration(value: number) {
+  if (!Number.isFinite(value)) return "";
+  if (value < 1000) return `${Math.max(0, Math.round(value))}ms`;
+  return `${(value / 1000).toFixed(value < 10000 ? 1 : 0)}s`;
 }

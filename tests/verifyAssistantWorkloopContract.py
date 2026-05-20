@@ -44,12 +44,15 @@ def sourceContractFailures() -> list[str]:
     required = {
         WORK_LOOP: (
             "traceWorkloopDetail",
+            "toolResultDetail",
             "clarification-gate",
             "turn-error",
             "workLabelFromToolCall",
             "packages-check",
             "packages-install",
             "cell-call",
+            "durationMs",
+            "skipped",
         ),
         ASSISTANT_PANEL: (
             "AssistantTraceDetails",
@@ -202,7 +205,7 @@ const toolRun = finish({{
     toolCallId: "call-install",
     name: "packages-install",
     arguments: {{ name: "pandas" }},
-    result: {{ success: true, installer: "uv" }},
+    result: {{ success: true, package: "pandas", installer: "uv", environment: "project .venv", durationMs: 42 }},
     status: "done",
     category: "files",
     lane: "write",
@@ -211,7 +214,7 @@ const toolRun = finish({{
     toolCallId: "call-cell",
     name: "cell-call",
     arguments: {{ blockId: "cell-1", operation: "check" }},
-    result: {{ passed: true }},
+    result: {{ passed: true, status: "ok" }},
     status: "done",
     category: "runtime",
     lane: "cell-call",
@@ -220,10 +223,30 @@ const toolRun = finish({{
 const packageCheck = findStep(toolRun, "라이브러리 확인");
 const packageInstall = findStep(toolRun, "uv 라이브러리 설치");
 const cellCall = findStep(toolRun, "셀 실행/검증");
-assert.match(packageCheck.detail, /pandas 설치 여부 확인/);
-assert.match(packageInstall.detail, /pandas를 uv로 설치/);
-assert.match(cellCall.detail, /cell-1 실행 또는 검증/);
+assert.match(packageCheck.detail, /pandas 누락 확인/);
+assert.match(packageInstall.detail, /pandas 설치 완료/);
+assert.match(packageInstall.detail, /uv/);
+assert.match(packageInstall.detail, /project \\.venv/);
+assert.match(packageInstall.detail, /42ms/);
+assert.match(cellCall.detail, /cell-1 검증 통과/);
 assert.deepEqual((toolRun.trace || {{}}).toolSequence, ["packages-check", "packages-install", "cell-call"]);
+
+const skippedInstall = finish({{
+  traceId: "trace-skip-install",
+}}, [
+  {{
+    toolCallId: "call-skip-install",
+    name: "packages-install",
+    arguments: {{ name: "pandas" }},
+    result: {{ success: true, package: "pandas", installer: "uv", environment: "project .venv", skipped: true }},
+    status: "done",
+    category: "files",
+    lane: "write",
+  }},
+]);
+const skippedStep = findStep(skippedInstall, "uv 라이브러리 설치");
+assert.match(skippedStep.detail, /pandas 이미 준비됨/);
+assert.match(skippedStep.detail, /project \\.venv/);
 
 const policy = finish({{
   traceId: "trace-policy",
