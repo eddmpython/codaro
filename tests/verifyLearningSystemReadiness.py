@@ -202,6 +202,52 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
             ),
         ),
         fileCriterion(
+            "inline-help-and-codaro-identity-surface",
+            "Cell help stays local to the cell and Codaro identity avoids robot/bot framing.",
+            (
+                ("editor/src/components/app/cellAiActions.tsx", (
+                    "data-cell-ai-popover=\"true\"",
+                    "data-cell-ai-question=\"true\"",
+                    "data-cell-ai-answer=\"true\"",
+                    "data-cell-ai-help-trigger=\"always-visible\"",
+                    "이 셀에서 바로 질문",
+                    "이 셀 답변",
+                    "onAsk(action, question)",
+                )),
+                ("editor/src/components/assistant/assistantPanel.tsx", (
+                    "Codaro AI",
+                    "/brand/avatar-small.png",
+                )),
+                ("docs/skills/architecture/frontend-product-surface.md", (
+                    "해당 셀 안의 도움 요청 팝오버에서 바로 질문",
+                    "로봇 아이콘을 쓰지 않고 브랜드 아바타를 쓴다",
+                    "셀 도움 요청 버튼은 호버 때만 나타나지 않고 기본 상태에서도 항상 보인다",
+                )),
+                ("tests/verifyLearningSectionCardContract.py", (
+                    "Codaro avatar",
+                    "forbidden token remains",
+                )),
+            ),
+            forbiddenChecks=(
+                ("editor/src/components/assistant/assistantPanel.tsx", (
+                    "Codaro 어시스턴트",
+                    "Bot,",
+                    "Robot",
+                    "robot",
+                )),
+                ("editor/src/components/app/cellAiActions.tsx", (
+                    "group-hover:opacity-100",
+                    "lg:opacity-0",
+                    "tabIndex={selected ? 0 : -1}",
+                )),
+                ("editor/src/components/curriculum/curriculumSurface.tsx", (
+                    "클릭해서 직접 입력하세요.",
+                    "클릭해서 코드를 편집하세요.",
+                    "absolute right-full",
+                )),
+            ),
+        ),
+        fileCriterion(
             "lesson-overview-browser-contract",
             "Lesson overview direction, benefit, and flow diagram are verified in desktop and mobile browser rendering.",
             (
@@ -578,6 +624,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                 ("tests/verifyLearningGoalObjectiveAudit.py", (
                     "OBJECTIVE_REQUIREMENTS",
                     "structured-yaml-and-section-card-ssot",
+                    "inline-help-and-codaro-identity-surface",
                     "deterministic-clarification-gate",
                     "uv-package-tool-policy",
                     "workloop-and-trace-visibility",
@@ -628,6 +675,7 @@ def fileCriterion(
     requirement: str,
     fileChecks: tuple[tuple[str, tuple[str, ...]], ...],
     *,
+    forbiddenChecks: tuple[tuple[str, tuple[str, ...]], ...] = (),
     liveChecks: tuple[LiveGateCheck, ...] = (),
     blocking: bool = False,
 ) -> ReadinessCriterion:
@@ -637,6 +685,10 @@ def fileCriterion(
         found, absent = fileNeedleReport(relPath, needles)
         evidence.extend(found)
         missing.extend(absent)
+    for relPath, needles in forbiddenChecks:
+        absent, present = fileForbiddenNeedleReport(relPath, needles)
+        evidence.extend(absent)
+        missing.extend(present)
     for check in liveChecks:
         if check.passed:
             evidence.append(f"gate {check.name}: passed")
@@ -694,6 +746,21 @@ def fileNeedleReport(relPath: str, needles: tuple[str, ...]) -> tuple[list[str],
         else:
             missing.append(f"{relPath}: missing {needle}")
     return found, missing
+
+
+def fileForbiddenNeedleReport(relPath: str, needles: tuple[str, ...]) -> tuple[list[str], list[str]]:
+    path = ROOT / relPath
+    if not path.is_file():
+        return [], [f"{relPath}: missing file"]
+    text = path.read_text(encoding="utf-8")
+    absent = []
+    present = []
+    for needle in needles:
+        if needle in text:
+            present.append(f"{relPath}: forbidden {needle}")
+        else:
+            absent.append(f"{relPath}: absent forbidden {needle}")
+    return absent, present
 
 
 if __name__ == "__main__":

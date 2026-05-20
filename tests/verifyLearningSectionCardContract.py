@@ -183,6 +183,8 @@ def main() -> int:
         AI_PANEL: (
             "Codaro 어시스턴트",
             "Bot,",
+            "Robot",
+            "robot",
         ),
         CELL_ACTIONS: (
             "group-hover:opacity-100",
