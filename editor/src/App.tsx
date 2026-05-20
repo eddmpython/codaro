@@ -25,11 +25,6 @@ import {
 import {
   buildCustomCurriculumApplication,
   type CustomCurriculumApplication,
-  createCustomCurriculumEntry,
-  customCurriculaStorageKey,
-  loadCustomCurricula,
-  upsertCustomCurriculumEntry,
-  type CustomCurriculumEntry,
 } from "@/lib/customCurricula";
 import {
   draftsFromDocument,
@@ -50,7 +45,7 @@ import {
   buildRejectPendingChangesApplication,
   type PendingChangesApplication,
 } from "@/lib/pendingChanges";
-import type { AutomationSection, ThemeMode } from "@/lib/surfaceModel";
+import type { AutomationSection } from "@/lib/surfaceModel";
 import { inferTeacherScope, type TeacherScope } from "@/lib/teacherScope";
 import {
   blockLabel,
@@ -75,8 +70,10 @@ import {
 } from "@/lib/assistantResponsePlan";
 import { providerAssistantFailure } from "@/lib/providerConnection";
 import { useAutomationState } from "@/hooks/useAutomationState";
+import { useCustomCurriculaState } from "@/hooks/useCustomCurriculaState";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
+import { useThemeMode } from "@/hooks/useThemeMode";
 import {
   SidebarInset,
   SidebarProvider,
@@ -108,8 +105,16 @@ function App() {
   );
   const [pendingBlocks, setPendingBlocks] = useState<BlockConfig[]>([]);
   const [pendingTarget, setPendingTarget] = useState<PendingTarget>("notebook");
-  const [customCurricula, setCustomCurricula] = useState<CustomCurriculumEntry[]>(() => loadCustomCurricula());
-  const [selectedCustomCurriculumId, setSelectedCustomCurriculumId] = useState(initialBootstrapState.selectedCustomCurriculumId);
+  const {
+    customCurricula,
+    findCustomCurriculum,
+    saveCustomCurriculumEntry,
+    selectedCustomCurriculumId,
+    setSelectedCustomCurriculumId,
+  } = useCustomCurriculaState({
+    initialSelectedCustomCurriculumId: initialBootstrapState.selectedCustomCurriculumId,
+    onNotice: setNotice,
+  });
   const [selectedBlockId, setSelectedBlockId] = useState(starterDocument.blocks[1]?.id ?? starterDocument.blocks[0]?.id ?? "");
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [variables, setVariables] = useState<VariableInfo[]>([]);
@@ -118,10 +123,7 @@ function App() {
   const [notebookRunning, setNotebookRunning] = useState(false);
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
   const [query, setQuery] = useState("");
-  const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
-    const stored = window.localStorage.getItem("codaro-theme");
-    return stored === "light" ? "light" : "dark";
-  });
+  const { themeMode, toggleThemeMode } = useThemeMode();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [assistantCollapsed, setAssistantCollapsed] = useState(false);
   const [conversationId, setConversationId] = useState<string | null>(null);
@@ -177,23 +179,6 @@ function App() {
     setDrafts((current) => ({ ...current, [id]: "" }));
     setSelectedBlockId(id);
   }, []);
-
-  useEffect(() => {
-    window.document.documentElement.classList.toggle("dark", themeMode === "dark");
-    window.localStorage.setItem("codaro-theme", themeMode);
-  }, [themeMode]);
-
-  useEffect(() => {
-    try {
-      window.localStorage.setItem(customCurriculaStorageKey, JSON.stringify(customCurricula));
-    } catch {
-      setNotice({
-        tone: "warning",
-        title: "커리큘럼 저장 제한",
-        detail: "브라우저 저장소에 나만의 커리큘럼을 기록하지 못했습니다.",
-      });
-    }
-  }, [customCurricula]);
 
   useEffect(() => {
     let cancelled = false;
@@ -485,9 +470,8 @@ function App() {
   }
 
   function saveCustomCurriculum(blocks: BlockConfig[], title?: string) {
-    if (!blocks.length) return null;
-    const entry = createCustomCurriculumEntry(blocks, title);
-    setCustomCurricula((current) => upsertCustomCurriculumEntry(current, entry));
+    const entry = saveCustomCurriculumEntry(blocks, title);
+    if (!entry) return null;
     applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry, { showNotice: true }));
     return entry;
   }
@@ -576,7 +560,7 @@ function App() {
   }
 
   function selectCustomCurriculum(id: string) {
-    const entry = customCurricula.find((item) => item.id === id);
+    const entry = findCustomCurriculum(id);
     if (!entry) return;
     applyCustomCurriculumApplication(buildCustomCurriculumApplication(entry));
   }
@@ -609,7 +593,7 @@ function App() {
         onSelectContent={selectCurriculumContent}
         onSelectCustomCurriculum={selectCustomCurriculum}
         onSurfaceChange={setSurface}
-        onToggleTheme={() => setThemeMode((current) => (current === "dark" ? "light" : "dark"))}
+        onToggleTheme={toggleThemeMode}
       />
 
       <SidebarInset className="grid h-svh min-h-0 min-w-0 grid-rows-[40px_minmax(0,1fr)] overflow-hidden">
