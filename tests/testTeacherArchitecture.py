@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import copy
 
 from codaro.ai.conversation import ConversationManager, buildSystemPrompt
 from codaro.ai.toolExecutor import ToolExecutor
@@ -267,7 +268,21 @@ def _structuredCurriculumDocumentPayload() -> dict:
                 "payload": {
                     "learningContract": {
                         "meta": {"title": "pandas 기초", "packages": ["pandas"]},
-                        "intro": {"direction": "DataFrame 흐름을 익힌다."},
+                        "intro": {
+                            "direction": "DataFrame 흐름을 익힌다.",
+                            "diagram": {
+                                "steps": [
+                                    {"label": "목표", "detail": "무슨 공부"},
+                                    {"label": "스니펫", "detail": "따라 칠 코드"},
+                                    {"label": "실행", "detail": "입력과 검증"},
+                                ],
+                                "runtime": [
+                                    {"label": "계약", "detail": "YAML SSOT"},
+                                    {"label": "준비", "detail": "uv 사전 확인"},
+                                    {"label": "피드백", "detail": "검증 결과"},
+                                ],
+                            },
+                        },
                         "sections": [sectionContract],
                     }
                 },
@@ -754,6 +769,30 @@ def testEvalHarnessRequiresLoadedEditorDocumentAndRuntimePackages() -> None:
     assert "missing runtime packages: pandas" in report.failures
 
 
+def testEvalHarnessRequiresDiagramRuntimeContract() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "curriculum-yaml-materialized")
+    document = copy.deepcopy(_structuredCurriculumDocumentPayload())
+    learningContract = document["blocks"][0]["payload"]["learningContract"]
+    learningContract["intro"]["diagram"]["runtime"] = []
+    tracePayload = {
+        "toolSequence": ["write-curriculum-yaml"],
+        "toolCalls": [
+            {
+                "name": "write-curriculum-yaml",
+                "result": {
+                    "document": document,
+                    "loadedInEditor": True,
+                },
+            }
+        ],
+    }
+
+    report = evaluateToolTracePayload(case, tracePayload)
+
+    assert not report.passed
+    assert "missing diagram runtime detail: uv 사전 확인, 검증 결과" in report.failures
+
+
 def testEvalHarnessEvaluatesGoldenTracePayloadSet() -> None:
     tracePayloads = {
         "answer-check-uses-cell-call": {
@@ -917,6 +956,21 @@ intro:
   direction: DataFrame 생성 흐름을 익힌다.
   benefits:
     - 표 데이터를 코드로 만들 수 있다.
+  diagram:
+    steps:
+      - label: 목표
+        detail: 무슨 공부
+      - label: 스니펫
+        detail: 따라 칠 코드
+      - label: 실행
+        detail: 입력과 검증
+    runtime:
+      - label: 계약
+        detail: YAML SSOT
+      - label: 준비
+        detail: uv 사전 확인
+      - label: 피드백
+        detail: 검증 결과
 sections:
   - id: dataframe-basics
     title: DataFrame 만들기

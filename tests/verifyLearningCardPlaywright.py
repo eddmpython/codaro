@@ -387,9 +387,9 @@ intro:
       - label: 계약
         detail: YAML SSOT
       - label: 준비
-        detail: uv preflight
+        detail: uv 사전 확인
       - label: 피드백
-        detail: check result
+        detail: 검증 결과
 sections:
   - id: dataframe
     title: DataFrame 만들기
@@ -507,7 +507,7 @@ def jsAssertLearningOverview(viewport: str) -> str:
     throw new Error('learning architecture runtime nodes are missing');
   }}
   const runtimeText = runtime.textContent || '';
-  if (!runtimeText.includes('uv preflight') || !runtimeText.includes('check result')) {{
+  if (!runtimeText.includes('uv 사전 확인') || !runtimeText.includes('검증 결과')) {{
     throw new Error('learning architecture runtime nodes did not render YAML contract data');
   }}
   const steps = Array.from(diagram.querySelectorAll('[data-learning-flow-step]')).map((item) =>

@@ -548,6 +548,21 @@ intro:
   direction: DataFrame 생성 흐름을 익힌다.
   benefits:
     - 표 데이터를 코드로 만들 수 있다.
+  diagram:
+    steps:
+      - label: 목표
+        detail: 무슨 공부
+      - label: 스니펫
+        detail: 따라 칠 코드
+      - label: 실행
+        detail: 입력과 검증
+    runtime:
+      - label: 계약
+        detail: YAML SSOT
+      - label: 준비
+        detail: uv 사전 확인
+      - label: 피드백
+        detail: 검증 결과
 sections:
   - id: dataframe-basics
     title: DataFrame 만들기

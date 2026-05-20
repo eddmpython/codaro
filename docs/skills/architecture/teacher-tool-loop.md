@@ -44,7 +44,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
 4. **Curriculum YAML 우선**
    - 학습 요청은 `meta`, `intro`, `sections` 구조의 YAML로 설계한다.
    - 신규 YAML은 structured section contract를 우선한다. `sections[].blocks[]`는 기존 curriculum 호환용이다.
-   - provider system prompt, teacher skill registry, `write-curriculum-yaml` tool schema는 모두 신규 레슨에서 `sections[].blocks[]` 대신 `title/subtitle/goal/why/explanation/tips/snippet/exercise/check` fields를 쓰도록 안내해야 한다.
+   - provider system prompt, teacher skill registry, `write-curriculum-yaml` tool schema는 모두 신규 레슨에서 `sections[].blocks[]` 대신 `intro.diagram.steps`, `intro.diagram.runtime`, `title/subtitle/goal/why/explanation/tips/snippet/exercise/check` fields를 쓰도록 안내해야 한다.
    - 섹션 하나가 학습카드 하나다. 한 개념을 작은 카드 여러 개로 쪼개 반복하지 않는다.
    - `meta.packages`는 패키지 preflight의 1차 입력이다.
    - YAML을 만들면 반드시 `write-curriculum-yaml`로 materialize한다.
@@ -84,7 +84,7 @@ Codaro의 채팅은 답변 창이 아니라 **skill-guided tool loop**의 입구
    - `uv run python -X utf8 tests/run.py gate assistant-workloop-contract`는 프론트 workloop state가 clarification 작업 기준, provider 오류 detail+error, packages-check/install/cell-call 표시 문장을 보존하는지 확인하는 집중 gate다.
    - clarification golden case는 provider를 호출하지 않고 `toolSequence`가 비어 있어야 한다. trace에는 `clarification-gate`, workloop에는 `작업 전 확인 질문`, payload에는 1-3개 질문과 `level`/`depth`/`environment`/`balance` 작업 기준이 남아야 한다.
    - clarification continuation golden case는 첫 turn의 `pendingClarification.assumptions`가 다음 provider turn의 `[Clarification plan]`에 machine-readable JSON으로 들어가고, `defaults` alias 없이 소비되는지 확인한다. 이어 답변이 아닌 새 요청과 이미 구체적인 새 학습 요청에서는 stale clarification이 주입되지 않고 pending이 비워지는지도 함께 확인한다.
-   - 커리큘럼 YAML golden case는 실제 `write-curriculum-yaml` 핸들러가 에디터 document를 바꾸는지까지 확인한다. 결과 payload의 `loadedInEditor`, materialize된 `sectionContract:*` block, document runtime packages는 평가 신호로 남겨야 한다.
+   - 커리큘럼 YAML golden case는 실제 `write-curriculum-yaml` 핸들러가 에디터 document를 바꾸는지까지 확인한다. 결과 payload의 `loadedInEditor`, materialize된 `sectionContract:*` block, document runtime packages, `intro.diagram.runtime` detail은 평가 신호로 남겨야 한다.
 
 ## 코드 경계
 

@@ -32,6 +32,7 @@ class TeacherEvalCase:
     expectedSectionCardFlow: bool = False
     expectedLoadedInEditor: bool = False
     expectedRuntimePackages: tuple[str, ...] = ()
+    expectedDiagramRuntimeDetails: tuple[str, ...] = ()
     allowPolicyViolations: bool = False
 
 
@@ -148,6 +149,7 @@ goldenEvalCases: tuple[TeacherEvalCase, ...] = (
         expectedSectionCardFlow=True,
         expectedLoadedInEditor=True,
         expectedRuntimePackages=("pandas",),
+        expectedDiagramRuntimeDetails=("uv 사전 확인", "검증 결과"),
     ),
     TeacherEvalCase(
         caseId="dependency-preflight-before-install",
@@ -279,6 +281,9 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
     missingRuntimePackages = _missingRuntimePackages(tracePayload, case.expectedRuntimePackages)
     if missingRuntimePackages:
         failures.append(f"missing runtime packages: {', '.join(missingRuntimePackages)}")
+    missingDiagramRuntimeDetails = _missingDiagramRuntimeDetails(tracePayload, case.expectedDiagramRuntimeDetails)
+    if missingDiagramRuntimeDetails:
+        failures.append(f"missing diagram runtime detail: {', '.join(missingDiagramRuntimeDetails)}")
     for toolName, fieldName in case.expectedToolResultFields:
         if not _toolResultFieldObserved(tracePayload, toolName, fieldName):
             failures.append(f"missing result field for {toolName}: {fieldName}")
@@ -518,6 +523,53 @@ def _missingRuntimePackages(tracePayload: Mapping[str, Any], expectedPackages: S
             continue
         observed.update(_normalizePackageName(package) for package in packages)
     return tuple(package for package in expected if package not in observed)
+
+
+def _missingDiagramRuntimeDetails(tracePayload: Mapping[str, Any], expectedDetails: Sequence[str]) -> tuple[str, ...]:
+    expected = tuple(detail for detail in expectedDetails if _hasText(detail))
+    if not expected:
+        return ()
+    observed = _diagramRuntimeText(tracePayload)
+    return tuple(detail for detail in expected if detail not in observed)
+
+
+def _diagramRuntimeText(tracePayload: Mapping[str, Any]) -> str:
+    textParts: list[str] = []
+    for document in _iterCurriculumDocuments(tracePayload):
+        for contract in _documentLearningContracts(document):
+            intro = contract.get("intro")
+            if not isinstance(intro, Mapping):
+                continue
+            diagram = intro.get("diagram")
+            if not isinstance(diagram, Mapping):
+                continue
+            for key in ("runtime", "runtimeLayer", "layers"):
+                runtimeNodes = diagram.get(key)
+                if not isinstance(runtimeNodes, list):
+                    continue
+                for node in runtimeNodes:
+                    if isinstance(node, Mapping):
+                        textParts.extend(str(value) for value in node.values() if _hasText(value))
+                    elif _hasText(node):
+                        textParts.append(str(node))
+    return "\n".join(textParts)
+
+
+def _documentLearningContracts(document: Mapping[str, Any]) -> tuple[Mapping[str, Any], ...]:
+    blocks = document.get("blocks")
+    if not isinstance(blocks, list):
+        return ()
+    contracts: list[Mapping[str, Any]] = []
+    for block in blocks:
+        if not isinstance(block, Mapping):
+            continue
+        payload = block.get("payload")
+        if not isinstance(payload, Mapping):
+            continue
+        learningContract = payload.get("learningContract")
+        if isinstance(learningContract, Mapping):
+            contracts.append(learningContract)
+    return tuple(contracts)
 
 
 def _normalizePackageName(value: Any) -> str:
