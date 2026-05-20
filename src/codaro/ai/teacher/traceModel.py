@@ -70,6 +70,7 @@ class TeacherTrace:
             "toolCount": len(toolResults),
             "errorCount": len(errors),
             "policyViolationCount": len(policyViolations),
+            "policyViolations": [event.payload for event in policyViolations],
             "toolSequence": self.toolSequence(),
         }
         if includeEvents:

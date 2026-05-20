@@ -40,7 +40,12 @@ from .skillRegistry import (
 )
 from .teacherOrchestrator import TeacherOrchestrator
 from .toolLifecycle import toolCallResult, toolCallStart
-from .toolPolicy import ToolPolicyState, ToolPolicyViolation, toolRequiresDependencyPreflight
+from .toolPolicy import (
+    ToolPolicyState,
+    ToolPolicyViolation,
+    toolPolicyViolationPayload,
+    toolRequiresDependencyPreflight,
+)
 from .traceModel import TeacherTrace
 from .turnRuntime import (
     TeacherRuntimeTurn,
@@ -95,6 +100,7 @@ __all__ = [
     "teacherStreamToolStartEvent",
     "toolCallResult",
     "toolCallStart",
+    "toolPolicyViolationPayload",
     "toolCallsToProviderPayloads",
     "toolRequiresDependencyPreflight",
     "validateTeacherSkills",

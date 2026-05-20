@@ -24,6 +24,7 @@ class ToolSequenceReport:
     failures: tuple[str, ...] = field(default_factory=tuple)
     observedTools: tuple[str, ...] = field(default_factory=tuple)
     policyViolationCount: int = 0
+    policyViolations: tuple[dict[str, str], ...] = field(default_factory=tuple)
 
 
 goldenEvalCases: tuple[TeacherEvalCase, ...] = (
@@ -63,8 +64,10 @@ def evaluateToolSequence(
     toolNames: Sequence[str],
     *,
     policyViolationCount: int = 0,
+    policyViolations: Sequence[Mapping[str, Any]] = (),
 ) -> ToolSequenceReport:
     failures: list[str] = []
+    normalizedPolicyViolations = _normalizePolicyViolations(policyViolations)
     for toolName in case.expectedTools:
         if toolName not in toolNames:
             failures.append(f"missing expected tool: {toolName}")
@@ -77,13 +80,16 @@ def evaluateToolSequence(
         if toolNames.index(before) > toolNames.index(after):
             failures.append(f"{before} must run before {after}")
     if policyViolationCount and not case.allowPolicyViolations:
-        failures.append(f"policy violations observed: {policyViolationCount}")
+        details = _policyViolationDetails(normalizedPolicyViolations)
+        suffix = f" ({details})" if details else ""
+        failures.append(f"policy violations observed: {policyViolationCount}{suffix}")
     return ToolSequenceReport(
         caseId=case.caseId,
         passed=not failures,
         failures=tuple(failures),
         observedTools=tuple(toolNames),
         policyViolationCount=policyViolationCount,
+        policyViolations=normalizedPolicyViolations,
     )
 
 
@@ -96,6 +102,7 @@ def evaluateToolTracePayload(case: TeacherEvalCase, tracePayload: Mapping[str, A
         case,
         _toolSequenceFromPayload(tracePayload),
         policyViolationCount=_policyViolationCountFromPayload(tracePayload),
+        policyViolations=_policyViolationsFromPayload(tracePayload),
     )
 
 
@@ -130,4 +137,43 @@ def _policyViolationCountFromPayload(tracePayload: Mapping[str, Any]) -> int:
         1
         for event in events
         if isinstance(event, dict) and event.get("eventType") == "tool-policy-violation"
+    )
+
+
+def _policyViolationsFromPayload(tracePayload: Mapping[str, Any]) -> tuple[dict[str, str], ...]:
+    explicit = tracePayload.get("policyViolations")
+    if isinstance(explicit, list | tuple):
+        return _normalizePolicyViolations(item for item in explicit if isinstance(item, Mapping))
+
+    events = tracePayload.get("events")
+    if not isinstance(events, list):
+        return ()
+    return _normalizePolicyViolations(
+        event.get("payload")
+        for event in events
+        if isinstance(event, dict)
+        and event.get("eventType") == "tool-policy-violation"
+        and isinstance(event.get("payload"), Mapping)
+    )
+
+
+def _normalizePolicyViolations(violations: Sequence[Mapping[str, Any]] | Any) -> tuple[dict[str, str], ...]:
+    normalized: list[dict[str, str]] = []
+    for violation in violations:
+        code = str(violation.get("policyCode") or violation.get("policy") or "")
+        toolName = str(violation.get("toolName") or violation.get("tool") or "")
+        message = str(violation.get("message") or violation.get("error") or "")
+        if code or toolName or message:
+            normalized.append({
+                "policyCode": code,
+                "toolName": toolName,
+                "message": message,
+            })
+    return tuple(normalized)
+
+
+def _policyViolationDetails(violations: Sequence[Mapping[str, str]]) -> str:
+    return ", ".join(
+        ":".join(part for part in (violation.get("policyCode"), violation.get("toolName")) if part)
+        for violation in violations
     )

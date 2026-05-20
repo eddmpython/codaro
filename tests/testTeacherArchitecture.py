@@ -24,6 +24,7 @@ from codaro.ai.teacher import (
     teacherStreamDoneEvent,
     teacherStreamErrorEvent,
     teacherStreamToolResultsEvent,
+    toolPolicyViolationPayload,
     toolCallsToProviderPayloads,
     toolRequiresDependencyPreflight,
     validateTeacherSkills,
@@ -200,6 +201,18 @@ def testToolPolicyRequiresPreflightBeforeExecution() -> None:
     assert policy.validateStart("cell-call", {"operation": "run", "blockId": "cell-1"}) is None
 
 
+def testToolPolicyViolationPayloadOwnsTraceAndResultShape() -> None:
+    violation = ToolPolicyViolation("dependency-preflight-required", "packages-check가 필요합니다.", "cell-call")
+    payload = toolPolicyViolationPayload(violation)
+
+    assert payload["error"] == "packages-check가 필요합니다."
+    assert payload["message"] == "packages-check가 필요합니다."
+    assert payload["policy"] == "dependency-preflight-required"
+    assert payload["policyCode"] == "dependency-preflight-required"
+    assert payload["tool"] == "cell-call"
+    assert payload["toolName"] == "cell-call"
+
+
 def testToolPolicyUsesManifestCellCallLaneForPreflight() -> None:
     policy = ToolPolicyState.fromContext({"dependencyPreflight": {"packages": ["numpy"]}})
 
@@ -317,6 +330,7 @@ def testEvalHarnessCanReadTracePayload() -> None:
     assert report.passed
     assert report.observedTools == ("read-cells", "cell-call")
     assert report.policyViolationCount == 0
+    assert report.policyViolations == ()
 
 
 def testEvalHarnessFailsPolicyViolationsByDefault() -> None:
@@ -332,7 +346,13 @@ def testEvalHarnessFailsPolicyViolationsByDefault() -> None:
 
     assert not report.passed
     assert report.policyViolationCount == 1
-    assert "policy violations observed: 1" in report.failures
+    assert any("policy violations observed: 1" in failure for failure in report.failures)
+    assert report.policyViolations == ({
+        "policyCode": "dependency-preflight-required",
+        "toolName": "cell-call",
+        "message": "packages-check가 필요합니다.",
+    },)
+    assert "dependency-preflight-required:cell-call" in report.failures[0]
 
 
 def testProviderLoopOwnsToolRoundRecording() -> None:

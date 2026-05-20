@@ -13,11 +13,18 @@ class ToolPolicyViolation:
     toolName: str
 
     def asResult(self) -> dict[str, Any]:
-        return {
-            "error": self.message,
-            "policy": self.code,
-            "tool": self.toolName,
-        }
+        return toolPolicyViolationPayload(self)
+
+
+def toolPolicyViolationPayload(violation: ToolPolicyViolation) -> dict[str, Any]:
+    return {
+        "error": violation.message,
+        "message": violation.message,
+        "policy": violation.code,
+        "policyCode": violation.code,
+        "tool": violation.toolName,
+        "toolName": violation.toolName,
+    }
 
 
 @dataclass
