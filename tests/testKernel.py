@@ -3,8 +3,7 @@ from __future__ import annotations
 import asyncio
 from pathlib import Path
 
-from codaro.kernel.manager import SessionManager
-from codaro.kernel.session import KernelSession
+from codaro.kernel import SessionManager, KernelSession, executeKernelBlock, executeKernelReactive
 
 
 def _run(coro):
@@ -129,6 +128,46 @@ def testExecutionCount() -> None:
     result = _run(session.execute("3", blockId="b3"))
 
     assert result.executionCount == 3
+    session.dispose()
+
+
+def testExecutionPayloadOwnsHttpAndWsResultShapes() -> None:
+    session = KernelSession()
+    payload = _run(executeKernelBlock(session, "value = 7\nvalue", blockId="b1"))
+
+    httpPayload = payload.httpPayload()
+    wsPayload = payload.wsResultPayload("req-1")
+
+    assert payload.durationMs >= 0
+    assert httpPayload["blockId"] == "b1"
+    assert httpPayload["status"] == "done"
+    assert wsPayload["type"] == "result"
+    assert wsPayload["requestId"] == "req-1"
+    assert wsPayload["blockId"] == "b1"
+    assert wsPayload["status"] == "done"
+    session.dispose()
+
+
+def testReactivePayloadOwnsHttpWsAndToolShapes() -> None:
+    session = KernelSession()
+    blocks = [
+        {"id": "b1", "type": "code", "content": "x = 3"},
+        {"id": "b2", "type": "code", "content": "y = x + 4\ny"},
+    ]
+    payload = _run(executeKernelReactive(session, blocks, "b1"))
+
+    assert payload.executionOrder == ("b1", "b2")
+    assert payload.httpPayload()["executionOrder"] == ["b1", "b2"]
+    assert payload.wsCompletePayload("req-r") == {
+        "type": "reactiveComplete",
+        "requestId": "req-r",
+        "executionOrder": ["b1", "b2"],
+    }
+
+    toolPayload = payload.toolPayload()
+    assert toolPayload["executionOrder"] == ["b1", "b2"]
+    assert toolPayload["results"][0]["blockId"] == "b1"
+    assert set(toolPayload["results"][0]) == {"blockId", "status", "stdout", "stderr", "data"}
     session.dispose()
 
 

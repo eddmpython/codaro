@@ -26,6 +26,8 @@
   - 세션 레지스트리
 - `protocol.py`
   - REST/WebSocket 요청/응답 모델
+- `executionPayload.py`
+  - 실행 결과를 HTTP/WebSocket/tool payload로 변환하는 기준
 
 ## 실행 모델
 

@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import time
 from typing import Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 from pydantic import ValidationError
 
+from ..kernel.executionPayload import executeKernelBlock, executeKernelReactive, previewKernelReactiveOrder
 from ..kernel.protocol import (
     CreateSessionRequest,
     CreateSessionResponse,
@@ -17,10 +17,8 @@ from ..kernel.protocol import (
     WsGetVariablesMessage,
     WsInterruptMessage,
     WsResetMessage,
-    WsResultMessage,
     WsStatusMessage,
 )
-from ..kernel.reactive import executeReactive, previewReactiveOrder
 from ..serverLog import formatLogFields, getServerLogger
 from ..system.fileOps import MoveRequest, WorkspacePathError, WriteFileRequest
 from ..system.packageOps import PackageEnvironmentError
@@ -60,20 +58,19 @@ def createKernelRouter(state: ServerState) -> APIRouter:
     @router.post("/api/kernel/{sessionId}/execute")
     async def apiExecute(sessionId: str, request: ExecuteRequest) -> dict[str, Any]:
         session = requireSession(state, sessionId)
-        startedAt = time.perf_counter()
-        result = await session.execute(request.code, blockId=request.blockId)
+        payload = await executeKernelBlock(session, request.code, blockId=request.blockId)
         logger.debug(
             "kernel-execute %s",
             formatLogFields(
                 transport="http",
                 sessionId=sessionId,
                 blockId=request.blockId,
-                status=result.status,
-                durationMs=round((time.perf_counter() - startedAt) * 1000, 1),
-                executionCount=result.executionCount,
+                status=payload.result.status,
+                durationMs=payload.durationMs,
+                executionCount=payload.result.executionCount,
             ),
         )
-        return result.model_dump()
+        return payload.httpPayload()
 
     @router.post("/api/kernel/{sessionId}/interrupt")
     def apiInterrupt(sessionId: str) -> dict[str, Any]:
@@ -121,28 +118,24 @@ def createKernelRouter(state: ServerState) -> APIRouter:
     @router.post("/api/kernel/{sessionId}/execute-reactive")
     async def apiExecuteReactive(sessionId: str, request: ReactiveExecuteRequest) -> dict[str, Any]:
         session = requireSession(state, sessionId)
-        startedAt = time.perf_counter()
         blocks = [block.model_dump() for block in request.blocks]
-        results, executionOrder = await executeReactive(session, blocks, request.blockId)
+        payload = await executeKernelReactive(session, blocks, request.blockId)
         logger.debug(
             "kernel-reactive %s",
             formatLogFields(
                 transport="http",
                 sessionId=sessionId,
                 changedBlockId=request.blockId,
-                resultCount=len(results),
-                executionCount=len(executionOrder),
-                durationMs=round((time.perf_counter() - startedAt) * 1000, 1),
+                resultCount=payload.resultCount,
+                executionCount=payload.executionCount,
+                durationMs=payload.durationMs,
             ),
         )
-        return {
-            "results": [result.model_dump() for result in results],
-            "executionOrder": executionOrder,
-        }
+        return payload.httpPayload()
 
     @router.post("/api/kernel/reactive-preview")
     def apiReactivePreview(request: ReactiveExecuteRequest) -> dict[str, Any]:
-        executionOrder = previewReactiveOrder([block.model_dump() for block in request.blocks], request.blockId)
+        executionOrder = previewKernelReactiveOrder([block.model_dump() for block in request.blocks], request.blockId)
         logger.debug(
             "kernel-reactive %s",
             formatLogFields(
@@ -184,7 +177,9 @@ def createKernelRouter(state: ServerState) -> APIRouter:
             content = await session.readFile(request.path)
             logger.debug(
                 "kernel-fs %s",
-                formatLogFields(action="read", sessionId=sessionId, path=request.path, contentLength=len(content.content)),
+                formatLogFields(
+                    action="read", sessionId=sessionId, path=request.path, contentLength=len(content.content)
+                ),
             )
             return content.model_dump()
         except WorkspacePathError as error:
@@ -350,10 +345,13 @@ def createKernelRouter(state: ServerState) -> APIRouter:
                     session.interrupt()
                     logger.debug("kernel-interrupt %s", formatLogFields(transport="ws", sessionId=sessionId))
                 elif isinstance(parsedMessage, WsGetVariablesMessage):
-                    await _safeSendJson(websocket, {
-                        "type": "variables",
-                        "variables": [variable.model_dump() for variable in session.getVariables()],
-                    })
+                    await _safeSendJson(
+                        websocket,
+                        {
+                            "type": "variables",
+                            "variables": [variable.model_dump() for variable in session.getVariables()],
+                        },
+                    )
                     logger.debug("kernel-variables %s", formatLogFields(transport="ws", sessionId=sessionId))
                 elif isinstance(parsedMessage, WsExecuteReactiveMessage):
                     await handleReactiveMessage(websocket, session, parsedMessage, logger)
@@ -409,10 +407,10 @@ async def handleExecuteMessage(websocket: WebSocket, session, message: WsExecute
     code = message.code
     blockId = message.blockId
 
-    startedAt = time.perf_counter()
     if not await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="busy").model_dump()):
         return
-    result = await session.execute(
+    payload = await executeKernelBlock(
+        session,
         code,
         blockId=blockId,
         eventHandler=lambda event: sendExecutionEvent(websocket, requestId, event),
@@ -424,26 +422,12 @@ async def handleExecuteMessage(websocket: WebSocket, session, message: WsExecute
             sessionId=session.sessionId,
             requestId=requestId,
             blockId=blockId,
-            status=result.status,
-            durationMs=round((time.perf_counter() - startedAt) * 1000, 1),
-            executionCount=result.executionCount,
+            status=payload.result.status,
+            durationMs=payload.durationMs,
+            executionCount=payload.result.executionCount,
         ),
     )
-    if not await _safeSendJson(
-        websocket,
-        WsResultMessage(
-            type="result",
-            requestId=requestId,
-            blockId=blockId,
-            status=result.status,
-            data=result.data,
-            stdout=result.stdout,
-            stderr=result.stderr,
-            variables=result.variables,
-            stateDelta=result.stateDelta,
-            executionCount=result.executionCount,
-        ).model_dump(),
-    ):
+    if not await _safeSendJson(websocket, payload.wsResultPayload(requestId)):
         return
     await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="ready").model_dump())
 
@@ -458,7 +442,6 @@ async def handleReactiveMessage(
     changedBlockId = message.blockId
     blocks = [block.model_dump() for block in message.blocks]
 
-    startedAt = time.perf_counter()
     if not await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="busy").model_dump()):
         return
     reactiveEvents: list[dict[str, Any]] = []
@@ -472,7 +455,7 @@ async def handleReactiveMessage(
         )
         await sendExecutionEvent(websocket, requestId, event)
 
-    results, executionOrder = await executeReactive(session, blocks, changedBlockId, eventHandler=eventHandler)
+    payload = await executeKernelReactive(session, blocks, changedBlockId, eventHandler=eventHandler)
     logger.debug(
         "kernel-reactive %s",
         formatLogFields(
@@ -480,34 +463,16 @@ async def handleReactiveMessage(
             sessionId=session.sessionId,
             requestId=requestId,
             changedBlockId=changedBlockId,
-            resultCount=len(results),
-            executionCount=len(executionOrder),
+            resultCount=payload.resultCount,
+            executionCount=payload.executionCount,
             eventCount=len(reactiveEvents),
-            durationMs=round((time.perf_counter() - startedAt) * 1000, 1),
+            durationMs=payload.durationMs,
         ),
     )
-    for result in results:
-        if not await _safeSendJson(
-            websocket,
-            WsResultMessage(
-                type="result",
-                requestId=requestId,
-                blockId=result.blockId,
-                status=result.status,
-                data=result.data,
-                stdout=result.stdout,
-                stderr=result.stderr,
-                variables=result.variables,
-                stateDelta=result.stateDelta,
-                executionCount=result.executionCount,
-            ).model_dump(),
-        ):
+    for resultPayload in payload.wsResultPayloads(requestId):
+        if not await _safeSendJson(websocket, resultPayload):
             return
-    if not await _safeSendJson(websocket, {
-        "type": "reactiveComplete",
-        "requestId": requestId,
-        "executionOrder": executionOrder,
-    }):
+    if not await _safeSendJson(websocket, payload.wsCompletePayload(requestId)):
         return
     await _safeSendJson(websocket, WsStatusMessage(type="status", engineStatus="ready").model_dump())
 

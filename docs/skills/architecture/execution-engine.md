@@ -18,6 +18,7 @@ whenToUse: 새 엔진 구현, capability 추가 (execute/interrupt/variables/fil
 - 편집기는 `execute`, `interrupt`, `variables`, `files`, `packages`, `docs` 같은 capability를 호출하고, 개별 엔진 구현을 직접 알지 않아야 한다.
 - AI teacher와 `editor/` 제품 표면도 같은 capability surface를 호출한다.
 - 셀 실행/검증은 장기적으로 `cell-call` 계약으로 수렴한다. `execute-reactive`, `check-exercise`는 하위 호환 및 세부 구현 도구다.
+- kernel 실행 결과를 HTTP, websocket, tool payload로 바꾸는 기준은 `src/codaro/kernel/executionPayload.py`에 둔다.
 
 ## 관련
 
