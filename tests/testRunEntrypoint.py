@@ -27,6 +27,7 @@ def testGateNamesAreStable() -> None:
         "backend",
         "teacher-eval",
         "teacher-e2e",
+        "learning-system-readiness",
         "learning-card-contract",
         "learning-card-browser",
         "editor-build",
