@@ -201,9 +201,11 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "ProviderShouldNotBeCalled",
                     "runClarificationCase",
                     "clarification gate called provider",
+                    "clarification payload exposed defaults compatibility alias",
+                    "clarificationAssumptionKeys",
                 )),
                 ("src/codaro/ai/teacher/clarificationPolicy.py", (
-                    "\"assumptions\": self.defaults",
+                    "\"assumptions\": dict(self.defaults)",
                     "작업 기준:",
                     "questions[:3]",
                     "\"level\"",
@@ -213,6 +215,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                 )),
                 ("src/codaro/ai/teacher/evalHarness.py", (
                     "expectedClarificationAssumptionKeys",
+                    "missing clarification assumptions payload",
                     "missing clarification assumptions",
                     "작업 기준",
                 )),

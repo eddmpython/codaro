@@ -81,14 +81,17 @@ OBJECTIVE_REQUIREMENTS = (
                 "expectedNoTools=True",
                 "expectedClarificationQuestionRange=(1, 3)",
                 "expectedClarificationAssumptionKeys",
+                "missing clarification assumptions payload",
             )),
             ("tests/verifyTeacherGoldenE2e.py", (
                 "ProviderShouldNotBeCalled",
                 "runClarificationCase",
                 "clarification gate called provider",
+                "clarification payload exposed defaults compatibility alias",
+                "clarificationAssumptionKeys",
             )),
             ("src/codaro/ai/teacher/clarificationPolicy.py", (
-                "\"assumptions\": self.defaults",
+                "\"assumptions\": dict(self.defaults)",
                 "작업 기준:",
                 "questions[:3]",
                 "\"level\"",

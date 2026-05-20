@@ -345,6 +345,7 @@ def testTeacherClarificationPlanStaysFocused() -> None:
     assert 1 <= len(plan.questions) <= 3
     assert "level" in plan.defaults
     assert plan.payload()["assumptions"] == plan.defaults
+    assert "defaults" not in plan.payload()
     assert any("수준" in question for question in plan.questions)
 
 
@@ -616,7 +617,6 @@ def testEvalHarnessFailsWeakClarificationGateTrace() -> None:
                 "payload": {
                     "questions": [],
                     "assumptions": {"level": "초급"},
-                    "defaults": {"level": "초급"},
                 },
             }
         ],
@@ -628,6 +628,31 @@ def testEvalHarnessFailsWeakClarificationGateTrace() -> None:
     assert "clarification question count out of range: 0" in report.failures
     assert "missing clarification assumptions: depth, environment, balance" in report.failures
     assert "missing expected work detail: 핵심 질문" in report.failures
+
+
+def testEvalHarnessRequiresClarificationAssumptionsPayload() -> None:
+    case = next(case for case in goldenEvalCases if case.caseId == "ambiguous-learning-asks-clarification")
+    tracePayload = {
+        "events": [
+            {
+                "eventType": "clarification-gate",
+                "payload": {
+                    "questions": ["학습자 수준은 어느 정도로 잡을까요?"],
+                    "defaults": {
+                        "level": "초급",
+                        "depth": "실습 중심",
+                        "environment": "uv",
+                        "balance": "실습",
+                    },
+                },
+            }
+        ],
+    }
+
+    report = evaluateToolTracePayload(case, tracePayload)
+
+    assert not report.passed
+    assert "missing clarification assumptions payload" in report.failures
 
 
 def testEvalHarnessChecksWorkloopAndStructuredYamlContract() -> None:

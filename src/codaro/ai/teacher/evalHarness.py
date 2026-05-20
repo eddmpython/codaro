@@ -470,8 +470,12 @@ def _clarificationGateFailures(tracePayload: Mapping[str, Any], case: TeacherEva
         if not minimum <= questionCount <= maximum:
             failures.append(f"clarification question count out of range: {questionCount}")
 
-    assumptions = payload.get("assumptions") or payload.get("defaults")
-    assumptionKeys = set(assumptions.keys()) if isinstance(assumptions, Mapping) else set()
+    assumptions = payload.get("assumptions")
+    if not isinstance(assumptions, Mapping):
+        failures.append("missing clarification assumptions payload")
+        assumptionKeys: set[str] = set()
+    else:
+        assumptionKeys = set(str(key) for key in assumptions.keys())
     missingAssumptionKeys = [key for key in case.expectedClarificationAssumptionKeys if key not in assumptionKeys]
     if missingAssumptionKeys:
         failures.append(f"missing clarification assumptions: {', '.join(missingAssumptionKeys)}")

@@ -169,6 +169,19 @@ async def runClarificationCase() -> dict[str, Any]:
         extraFailures.append("clarification gate called provider")
     if report.turnPayload.get("model") != "clarification-gate":
         extraFailures.append("clarification gate did not return clarification model")
+    answer = str(report.turnPayload.get("answer", ""))
+    if "기본값" in answer or "default" in answer.lower():
+        extraFailures.append("clarification answer exposed default wording")
+    payload = firstTraceEventPayload(report.tracePayload, "clarification-gate")
+    assumptions = payload.get("assumptions") if isinstance(payload, dict) else None
+    if not isinstance(assumptions, dict):
+        extraFailures.append("clarification payload is missing assumptions")
+    else:
+        missingKeys = [key for key in case.expectedClarificationAssumptionKeys if key not in assumptions]
+        if missingKeys:
+            extraFailures.append(f"clarification payload missing assumption keys: {missingKeys}")
+    if isinstance(payload, dict) and "defaults" in payload:
+        extraFailures.append("clarification payload exposed defaults compatibility alias")
     return reportPayload(report, extraFailures)
 
 
@@ -316,7 +329,9 @@ def reportPayload(report, extraFailures: list[str]) -> dict[str, Any]:
         "evaluation": evaluation,
         "toolSequence": list(report.evaluation.observedTools),
         "workLabels": list(report.evaluation.observedWorkLabels),
+        "workDetails": list(report.evaluation.observedWorkDetails),
         "signals": list(report.evaluation.observedResultSignals),
+        "clarificationAssumptionKeys": clarificationAssumptionKeys(report.tracePayload),
     }
 
 
@@ -326,8 +341,32 @@ def publicReportPayload(report: dict[str, Any]) -> dict[str, Any]:
         "passed": report["passed"],
         "failures": report["failures"],
         "toolSequence": report["toolSequence"],
+        "workDetails": report["workDetails"],
         "signals": report["signals"],
+        "clarificationAssumptionKeys": report["clarificationAssumptionKeys"],
     }
+
+
+def firstTraceEventPayload(tracePayload: dict[str, Any], eventType: str) -> dict[str, Any] | None:
+    events = tracePayload.get("events")
+    if not isinstance(events, list):
+        return None
+    for event in events:
+        if not isinstance(event, dict) or event.get("eventType") != eventType:
+            continue
+        payload = event.get("payload")
+        return payload if isinstance(payload, dict) else None
+    return None
+
+
+def clarificationAssumptionKeys(tracePayload: dict[str, Any]) -> list[str]:
+    payload = firstTraceEventPayload(tracePayload, "clarification-gate")
+    if not isinstance(payload, dict):
+        return []
+    assumptions = payload.get("assumptions")
+    if not isinstance(assumptions, dict):
+        return []
+    return sorted(str(key) for key in assumptions.keys())
 
 
 def goldenCase(caseId: str):

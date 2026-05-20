@@ -22,8 +22,7 @@ class ClarificationPlan:
         return {
             "shouldAsk": self.shouldAsk,
             "questions": list(self.questions),
-            "assumptions": self.defaults,
-            "defaults": self.defaults,
+            "assumptions": dict(self.defaults),
         }
 
 
