@@ -37,13 +37,6 @@ import {
   starterDocument,
 } from "@/lib/documentModel";
 import {
-  fallbackAutomationSnapshot,
-  loadAutomationSnapshot,
-  runAutomationTask,
-  toggleAutomationStop,
-  type AutomationSnapshot,
-} from "@/lib/automationState";
-import {
   buildLocalAssistantDraft,
   completeLocalAssistantDraft,
 } from "@/lib/localFallback";
@@ -81,6 +74,7 @@ import {
   type PendingTarget,
 } from "@/lib/assistantResponsePlan";
 import { providerAssistantFailure } from "@/lib/providerConnection";
+import { useAutomationState } from "@/hooks/useAutomationState";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
 import {
   SidebarInset,
@@ -90,15 +84,9 @@ import type {
   AppNotice,
   BlockConfig,
   CodaroDocument,
-  EStopStatus,
   LoadState,
-  SchedulerStatus,
-  TaskDefinition,
-  TaskListPayload,
   VariableInfo,
 } from "@/types";
-
-const initialAutomationSnapshot = fallbackAutomationSnapshot();
 
 function initialSurfaceFromLocation(): SurfaceMode {
   const value = window.location.hash.replace(/^#/, "");
@@ -133,11 +121,6 @@ function App() {
   const [results, setResults] = useState<ResultMap>({});
   const [runningBlockId, setRunningBlockId] = useState<string | null>(null);
   const [notebookRunning, setNotebookRunning] = useState(false);
-  const [tasks, setTasks] = useState<TaskListPayload>(initialAutomationSnapshot.tasks);
-  const [scheduler, setScheduler] = useState<SchedulerStatus>(initialAutomationSnapshot.scheduler);
-  const [eStop, setEStop] = useState<EStopStatus>(initialAutomationSnapshot.eStop);
-  const [auditCount, setAuditCount] = useState(initialAutomationSnapshot.auditCount);
-  const [automationSection, setAutomationSection] = useState<AutomationSection>("codaro");
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
   const [query, setQuery] = useState("");
   const [themeMode, setThemeMode] = useState<ThemeMode>(() => {
@@ -151,6 +134,17 @@ function App() {
   const [teacherScope, setTeacherScope] = useState<TeacherScope>("cell");
   const [messages, setMessages] = useState<AssistantMessage[]>([]);
   const [assistantLoading, setAssistantLoading] = useState(false);
+  const {
+    auditCount,
+    automationSection,
+    eStop,
+    refreshAutomation,
+    runTask,
+    scheduler,
+    setAutomationSection,
+    tasks,
+    toggleEStop,
+  } = useAutomationState({ apiOnline, onNotice: setNotice });
   const {
     aiConnecting,
     aiProfile,
@@ -211,17 +205,6 @@ function App() {
       window.history.replaceState(null, "", `#${surface}`);
     }
   }, [surface]);
-
-  const applyAutomationSnapshot = useCallback((snapshot: AutomationSnapshot) => {
-    setTasks(snapshot.tasks);
-    setScheduler(snapshot.scheduler);
-    setEStop(snapshot.eStop);
-    setAuditCount(snapshot.auditCount);
-  }, []);
-
-  const refreshAutomation = useCallback(async () => {
-    applyAutomationSnapshot(await loadAutomationSnapshot());
-  }, [applyAutomationSnapshot]);
 
   useEffect(() => {
     let cancelled = false;
@@ -509,35 +492,6 @@ function App() {
       setNotice(failure.notice);
     } finally {
       setAssistantLoading(false);
-    }
-  }
-
-  async function toggleEStop() {
-    try {
-      const result = await toggleAutomationStop(eStop, apiOnline);
-      setEStop(result.eStop);
-      setNotice(result.notice);
-      if (result.refresh) await refreshAutomation();
-    } catch (error) {
-      setNotice({
-        tone: "error",
-        title: "긴급 정지 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
-    }
-  }
-
-  async function runTask(task: TaskDefinition) {
-    try {
-      const result = await runAutomationTask(task, apiOnline);
-      setNotice(result.notice);
-      if (result.refresh) await refreshAutomation();
-    } catch (error) {
-      setNotice({
-        tone: "error",
-        title: "태스크 실행 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
     }
   }
 
