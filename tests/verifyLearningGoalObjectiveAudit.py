@@ -421,7 +421,7 @@ OBJECTIVE_REQUIREMENTS = (
                 "\"landing-build\"",
                 "\"launcher-test\"",
             )),
-            ("tests/verifyServiceReadinessAudit.py", (
+            ("tests/verifyProductQualityAudit.py", (
                 "\"gate\": \"product-quality-audit\"",
                 "ProductQualityRequirement",
                 "generated-docs-freshness",

@@ -126,7 +126,7 @@ GATES: dict[str, Gate] = {
     "service-readiness-audit": Gate(
         tier="surface",
         description="product-quality-audit의 기존 호환 alias다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyServiceReadinessAudit.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyProductQualityAudit.py")),),
         ci_required=False,
     ),
     "diagnostic-summary-contract": Gate(
