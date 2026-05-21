@@ -508,14 +508,49 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
         and yamlContractObserved
     )
     error = None
+    failureSignals: dict[str, Any] = {}
     if not usedCurriculumTool:
         error = "live provider did not call write-curriculum-yaml; prompt/tool schema tuning required"
+        failureSignals = toolLoopTuningSignals(
+            reason="missing-required-tool",
+            requiredTools=("write-curriculum-yaml",),
+            observedTools=toolNames,
+            answer=str(payload.get("answer") or ""),
+        )
     elif contractGapCount != 0:
         error = f"live provider YAML has contract gaps: {yamlResult.get('contractGaps')}"
+        failureSignals = {
+            "failureReason": "yaml-contract-gaps",
+            "contractGaps": yamlResult.get("contractGaps"),
+            "tuningRequired": True,
+            "tuningHints": [
+                "strengthen curriculum YAML prompt with required section contract fields",
+                "inspect write-curriculum-yaml schema examples and materializer contract gaps",
+            ],
+        }
     elif not yamlContractObserved:
         error = "live provider YAML materialization did not expose learning/section contract"
+        failureSignals = {
+            "failureReason": "yaml-contract-not-observed",
+            "tuningRequired": True,
+            "tuningHints": [
+                "check write-curriculum-yaml result mapping into structured section cards",
+                "inspect materializer trace for yamlContractObserved signal",
+            ],
+        }
     elif sectionCount < 1 or exerciseCellCount < 1 or snippetCellCount < 1:
         error = "live provider YAML did not materialize section, snippet, and exercise cells"
+        failureSignals = {
+            "failureReason": "missing-structured-section-cells",
+            "sectionCount": sectionCount,
+            "exerciseCellCount": exerciseCellCount,
+            "snippetCellCount": snippetCellCount,
+            "tuningRequired": True,
+            "tuningHints": [
+                "tighten prompt to require section, snippet, and exercise cell fields",
+                "inspect converter mapping from section contract to editor blocks",
+            ],
+        }
     return LiveSmokeCase(
         caseId="live-tool-loop",
         passed=passed,
@@ -534,7 +569,7 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
             "snippetCellCount": snippetCellCount,
             "yamlContractObserved": yamlContractObserved,
             "answerChars": len(str(payload.get("answer") or "")),
-        },
+        } | failureSignals,
         error=error,
     )
 
@@ -600,16 +635,49 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
         and str(payload.get("provider") or "") != ""
     )
     error = None
+    failureSignals: dict[str, Any] = {}
     if not usedCellCall:
         error = "live provider did not call cell-call; prompt/tool schema tuning required"
+        failureSignals = toolLoopTuningSignals(
+            reason="missing-required-tool",
+            requiredTools=("packages-check", "cell-call"),
+            observedTools=executorCalls,
+            answer=str(payload.get("answer") or ""),
+        )
     elif not usedPackageCheck:
         error = "live provider did not call packages-check before cell-call"
+        failureSignals = toolLoopTuningSignals(
+            reason="missing-preflight-tool",
+            requiredTools=("packages-check", "cell-call"),
+            observedTools=executorCalls,
+            answer=str(payload.get("answer") or ""),
+        )
     elif not ordered:
         error = "live provider called cell-call before packages-check"
+        failureSignals = toolLoopTuningSignals(
+            reason="tool-order-violation",
+            requiredTools=("packages-check", "cell-call"),
+            observedTools=executorCalls,
+            answer=str(payload.get("answer") or ""),
+        )
     elif not exactSequence:
         error = f"live provider made unnecessary tool calls: {executorCalls}"
+        failureSignals = toolLoopTuningSignals(
+            reason="unnecessary-tool-calls",
+            requiredTools=("packages-check", "cell-call"),
+            observedTools=executorCalls,
+            answer=str(payload.get("answer") or ""),
+        )
     elif policyViolationCount:
         error = "live provider cell-call triggered tool policy violation"
+        failureSignals = {
+            "failureReason": "tool-policy-violation",
+            "tuningRequired": True,
+            "tuningHints": [
+                "inspect tool policy violation before changing provider prompt",
+                "ensure packages-check result is passed back before cell-call",
+            ],
+        }
     return LiveSmokeCase(
         caseId="live-cell-call-loop",
         passed=passed,
@@ -625,7 +693,7 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
             "executorCalls": executorCalls,
             "exactSequence": exactSequence,
             "answerChars": len(str(payload.get("answer") or "")),
-        },
+        } | failureSignals,
         error=error,
     )
 
@@ -644,6 +712,34 @@ def toolsInOrder(toolNames: list[str], before: str, after: str) -> bool:
         return toolNames.index(before) < toolNames.index(after)
     except ValueError:
         return False
+
+
+def toolLoopTuningSignals(
+    *,
+    reason: str,
+    requiredTools: tuple[str, ...],
+    observedTools: list[str],
+    answer: str,
+) -> dict[str, Any]:
+    return {
+        "failureReason": reason,
+        "tuningRequired": True,
+        "expectedTools": list(requiredTools),
+        "observedTools": observedTools,
+        "answerPreview": boundedSignalText(answer),
+        "tuningHints": [
+            "verify the provider supports native tool calls for this model",
+            f"tighten the prompt to require these tools before final answer: {', '.join(requiredTools)}",
+            "inspect the exposed tool schema names and response tool-call parser",
+        ],
+    }
+
+
+def boundedSignalText(text: str, *, limit: int = 240) -> str:
+    normalized = " ".join(text.split())
+    if len(normalized) <= limit:
+        return normalized
+    return f"{normalized[:limit]}...[truncated]"
 
 
 def materializeLiveSmokeYaml(arguments: dict[str, Any]) -> dict[str, Any]:

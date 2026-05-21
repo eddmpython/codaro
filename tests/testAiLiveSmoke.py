@@ -155,6 +155,25 @@ def testToolsInOrderRequiresBothTools() -> None:
     assert not smoke.toolsInOrder(["packages-check"], "packages-check", "cell-call")
 
 
+def testToolLoopTuningSignalsExposeActionableFailureContext() -> None:
+    smoke = loadSmoke()
+
+    signals = smoke.toolLoopTuningSignals(
+        reason="missing-required-tool",
+        requiredTools=("write-curriculum-yaml",),
+        observedTools=[],
+        answer="답변만 하고 도구를 호출하지 않았습니다. " * 20,
+    )
+
+    assert signals["failureReason"] == "missing-required-tool"
+    assert signals["tuningRequired"] is True
+    assert signals["expectedTools"] == ["write-curriculum-yaml"]
+    assert signals["observedTools"] == []
+    assert signals["answerPreview"].endswith("...[truncated]")
+    assert any("native tool calls" in hint for hint in signals["tuningHints"])
+    assert any("write-curriculum-yaml" in hint for hint in signals["tuningHints"])
+
+
 def testMaterializeLiveSmokeYamlReportsStructuredContractSignals() -> None:
     smoke = loadSmoke()
     yamlContent = """
