@@ -19,6 +19,7 @@ CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 GATE_WORK_ROOT = ROOT / "output" / "test-runner"
 GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "ai-live-smoke": ("output/test-runner/ai-live-smoke/live-smoke-report.json",),
+    "frontend-performance-budget": ("output/test-runner/frontend-performance-budget/performance-report.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
     "preflight": ("output/test-runner/preflight/sequence-summary.json",),
 }

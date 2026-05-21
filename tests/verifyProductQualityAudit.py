@@ -277,11 +277,18 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("editor/vite.config.ts", ("manualChunks", "@codemirror", "yaml", "vendor")),
             ("docs/skills/ops/product/service-candidate.md", ("React와 일반 vendor를 억지로 나눠 순환 chunk를 만들지 않는다",)),
             ("docs/skills/ops/product/service-candidate.md", ("docsPages/page*.js", "nav chunk")),
+            ("docs/skills/ops/product/service-candidate.md", ("output/test-runner/frontend-performance-budget/performance-report.json", "gitHead")),
+            ("docs/skills/ops/foundation/testing-and-gates.md", ("frontend-performance-budget/performance-report.json", "payloadGitHead")),
             ("tests/verifyFrontendPerformanceBudget.py", (
                 "MIN_JS_CHUNKS",
                 "MAX_SINGLE_JS_BYTES",
                 "MAX_TOTAL_JS_BYTES",
                 "REQUIRED_CHUNK_LABELS",
+                "REPORT_PATH",
+                "gitHead",
+                "startedAt",
+                "completedAt",
+                "durationMs",
             )),
             ("tests/verifyLandingDocsBundleSplit.py", (
                 "MAX_BUILT_DOCS_NAV_BYTES",
@@ -292,6 +299,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "docsPagesWithContent",
             )),
             ("tests/run.py", (
+                "GATE_ARTIFACTS",
+                "frontend-performance-budget/performance-report.json",
                 "tests/verifyFrontendPerformanceBudget.py",
                 "\"frontend-performance-budget\"",
                 "tests/verifyLandingDocsBundleSplit.py",

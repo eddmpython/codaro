@@ -1,7 +1,10 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 import json
+import subprocess
 import sys
+import time
 from pathlib import Path
 
 
@@ -10,6 +13,7 @@ APP_DIR = ROOT / "src" / "codaro" / "webBuild" / "_app"
 VITE_CONFIG = ROOT / "editor" / "vite.config.ts"
 CURRICULA_REGISTRY = ROOT / "editor" / "src" / "lib" / "curriculaRegistry.ts"
 CURRICULUM_SELECTION = ROOT / "editor" / "src" / "lib" / "curriculumSelection.ts"
+REPORT_PATH = ROOT / "output" / "test-runner" / "frontend-performance-budget" / "performance-report.json"
 
 MIN_JS_CHUNKS = 4
 MAX_SINGLE_JS_BYTES = 400_000
@@ -19,7 +23,22 @@ MAX_CSS_BYTES = 160_000
 REQUIRED_CHUNK_LABELS = ("codemirror", "vendor", "yaml", "curriculumSurface")
 
 
+def currentGitHead() -> str | None:
+    result = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=ROOT,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    if result.returncode != 0:
+        return None
+    return result.stdout.strip() or None
+
+
 def main() -> int:
+    startedAt = datetime.now(UTC).isoformat()
+    started = time.monotonic()
     failures: list[str] = []
     jsFiles = sorted(APP_DIR.glob("*.js"))
     cssFiles = sorted(APP_DIR.glob("*.css"))
@@ -68,6 +87,12 @@ def main() -> int:
     payload = {
         "gate": "frontend-performance-budget",
         "passed": not failures,
+        "status": "passed" if not failures else "failed",
+        "gitHead": currentGitHead(),
+        "startedAt": startedAt,
+        "completedAt": datetime.now(UTC).isoformat(),
+        "durationMs": round((time.monotonic() - started) * 1000),
+        "reportPath": "output/test-runner/frontend-performance-budget/performance-report.json",
         "minJsChunks": MIN_JS_CHUNKS,
         "maxSingleJsBytes": MAX_SINGLE_JS_BYTES,
         "maxEntryJsBytes": MAX_ENTRY_JS_BYTES,
@@ -82,6 +107,8 @@ def main() -> int:
         "css": cssStats,
         "failures": failures,
     }
+    REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    REPORT_PATH.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     if failures:
         print("FAIL: frontend performance budget exceeded", file=sys.stderr)
