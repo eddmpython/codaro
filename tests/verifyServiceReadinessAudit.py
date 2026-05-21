@@ -83,8 +83,18 @@ PRODUCT_QUALITY_REQUIREMENTS = (
         requirementId="product-quality-gates-are-named",
         requirement="The product quality gate sequence is wired into the local runner and docs.",
         evidenceChecks=(
-            ("tests/run.py", (*tuple(f"\"{gateName}\"" for gateName in PRODUCT_QUALITY_GATES), "PRODUCT_QUALITY_GATES", "\"quality-cycle\"")),
-            ("docs/skills/ops/foundation/testing-and-gates.md", (*tuple(f"`{gateName}`" for gateName in PRODUCT_QUALITY_GATES), "`quality-cycle`")),
+            ("tests/run.py", (
+                *tuple(f"\"{gateName}\"" for gateName in PRODUCT_QUALITY_GATES),
+                "PRODUCT_QUALITY_GATES",
+                "\"quality-cycle\"",
+                "writeGateSequenceSummary",
+                "sequence-summary.json",
+            )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", (
+                *tuple(f"`{gateName}`" for gateName in PRODUCT_QUALITY_GATES),
+                "`quality-cycle`",
+                "`output/test-runner/quality-cycle/sequence-summary.json`",
+            )),
             ("docs/skills/ops/product/service-candidate.md", ("잘 만들어진 로컬 제품", "tests/run.py quality-cycle")),
             ("tests/testRunEntrypoint.py", (*tuple(f"\"{gateName}\"" for gateName in PRODUCT_QUALITY_GATES), "PRODUCT_QUALITY_GATES")),
         ),

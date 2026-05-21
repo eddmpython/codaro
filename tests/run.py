@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import re
 import shutil
@@ -317,14 +318,26 @@ def runGate(gateName: str) -> int:
     return 0
 
 
-def runGateSequence(gateNames: tuple[str, ...]) -> int:
+def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-sequence") -> int:
     startedAt = time.monotonic()
-    passed: list[str] = []
+    results: list[dict[str, int | str]] = []
     for gateName in gateNames:
         gateStartedAt = time.monotonic()
         returnCode = runGate(gateName)
         durationMs = round((time.monotonic() - gateStartedAt) * 1000)
+        results.append({
+            "gate": gateName,
+            "returnCode": returnCode,
+            "durationMs": durationMs,
+        })
         if returnCode != 0:
+            writeGateSequenceSummary(
+                sequenceName=sequenceName,
+                gateNames=gateNames,
+                results=results,
+                totalMs=round((time.monotonic() - startedAt) * 1000),
+            )
+            passed = tuple(f"{result['gate']}({result['durationMs']}ms)" for result in results if result["returnCode"] == 0)
             print(
                 f"FAIL: gate sequence stopped at {gateName} after {len(passed)}/{len(gateNames)} gates "
                 f"(exit {returnCode}, {durationMs} ms)",
@@ -333,11 +346,41 @@ def runGateSequence(gateNames: tuple[str, ...]) -> int:
             if passed:
                 print(f"passed gates: {', '.join(passed)}", file=sys.stderr)
             return returnCode
-        passed.append(f"{gateName}({durationMs}ms)")
     totalMs = round((time.monotonic() - startedAt) * 1000)
+    writeGateSequenceSummary(
+        sequenceName=sequenceName,
+        gateNames=gateNames,
+        results=results,
+        totalMs=totalMs,
+    )
+    passed = tuple(f"{result['gate']}({result['durationMs']}ms)" for result in results)
     print(f"ok: gate sequence passed {len(passed)}/{len(gateNames)} gates in {totalMs} ms")
     print(f"gates: {', '.join(passed)}")
     return 0
+
+
+def writeGateSequenceSummary(
+    *,
+    sequenceName: str,
+    gateNames: tuple[str, ...],
+    results: list[dict[str, int | str]],
+    totalMs: int,
+) -> Path:
+    summaryDir = localGateWorkspace(sequenceName)
+    summaryDir.mkdir(parents=True, exist_ok=True)
+    failed = next((result for result in results if result["returnCode"] != 0), None)
+    payload = {
+        "sequence": sequenceName,
+        "passed": failed is None and len(results) == len(gateNames),
+        "completedGateCount": sum(1 for result in results if result["returnCode"] == 0),
+        "totalGateCount": len(gateNames),
+        "totalMs": totalMs,
+        "failedGate": failed["gate"] if failed else None,
+        "gates": results,
+    }
+    summaryPath = summaryDir / "sequence-summary.json"
+    summaryPath.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return summaryPath
 
 
 def gateNamesForTier(tier: str) -> tuple[str, ...]:
@@ -438,15 +481,15 @@ def main(argv: list[str] | None = None) -> int:
     if args.command == "list":
         return listGates()
     if args.command == "preflight":
-        return runGateSequence(PREFLIGHT_GATES)
+        return runGateSequence(PREFLIGHT_GATES, sequenceName="preflight")
     if args.command == "quality-cycle":
-        return runGateSequence(PRODUCT_QUALITY_GATES)
+        return runGateSequence(PRODUCT_QUALITY_GATES, sequenceName="quality-cycle")
     if args.command == "audit-self":
         return auditSelf()
     if args.command == "gate":
         return runGate(args.name)
     if args.command == "tier":
-        return runGateSequence(gateNamesForTier(args.name))
+        return runGateSequence(gateNamesForTier(args.name), sequenceName=f"tier-{args.name}")
 
     raise ValueError(f"Unsupported command: {args.command}")
 

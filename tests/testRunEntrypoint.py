@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 
@@ -89,7 +90,7 @@ def testAuditSelfPasses() -> None:
     assert runner.auditSelf() == 0
 
 
-def testGateSequencePrintsReadableSummary(monkeypatch, capsys) -> None:
+def testGateSequencePrintsReadableSummary(monkeypatch, capsys, tmp_path) -> None:
     runner = loadRunner()
     calls: list[str] = []
 
@@ -97,9 +98,10 @@ def testGateSequencePrintsReadableSummary(monkeypatch, capsys) -> None:
         calls.append(name)
         return 0
 
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path)
     monkeypatch.setattr(runner, "runGate", fakeRunGate)
 
-    assert runner.runGateSequence(("docs", "backend")) == 0
+    assert runner.runGateSequence(("docs", "backend"), sequenceName="unit-sequence") == 0
 
     captured = capsys.readouterr()
     assert calls == ["docs", "backend"]
@@ -107,17 +109,33 @@ def testGateSequencePrintsReadableSummary(monkeypatch, capsys) -> None:
     assert "gates: docs(" in captured.out
     assert "backend(" in captured.out
 
+    payload = json.loads((tmp_path / "unit-sequence" / "sequence-summary.json").read_text(encoding="utf-8"))
+    assert payload["sequence"] == "unit-sequence"
+    assert payload["passed"] is True
+    assert payload["completedGateCount"] == 2
+    assert payload["totalGateCount"] == 2
+    assert payload["failedGate"] is None
+    assert [item["gate"] for item in payload["gates"]] == ["docs", "backend"]
 
-def testGateSequenceFailureReportsCompletedGates(monkeypatch, capsys) -> None:
+
+def testGateSequenceFailureReportsCompletedGates(monkeypatch, capsys, tmp_path) -> None:
     runner = loadRunner()
 
     def fakeRunGate(name: str) -> int:
         return 7 if name == "backend" else 0
 
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path)
     monkeypatch.setattr(runner, "runGate", fakeRunGate)
 
-    assert runner.runGateSequence(("docs", "backend", "landing-build")) == 7
+    assert runner.runGateSequence(("docs", "backend", "landing-build"), sequenceName="failing-sequence") == 7
 
     captured = capsys.readouterr()
     assert "FAIL: gate sequence stopped at backend after 1/3 gates" in captured.err
     assert "passed gates: docs(" in captured.err
+
+    payload = json.loads((tmp_path / "failing-sequence" / "sequence-summary.json").read_text(encoding="utf-8"))
+    assert payload["passed"] is False
+    assert payload["completedGateCount"] == 1
+    assert payload["totalGateCount"] == 3
+    assert payload["failedGate"] == "backend"
+    assert [item["returnCode"] for item in payload["gates"]] == [0, 7]
