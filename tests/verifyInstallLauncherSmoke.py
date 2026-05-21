@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 import json
 import shutil
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
@@ -14,6 +16,7 @@ SMOKE_WORK_ROOT = ROOT / "output" / "test-runner" / "install-launcher-smoke"
 LAUNCHER_ROOT = SMOKE_WORK_ROOT / "launcher-cli-root"
 CARGO_TARGET_DIR = SMOKE_WORK_ROOT / "cargo-target"
 LAUNCHER_MANIFEST = ROOT / "launcher" / "codaro-launcher" / "Cargo.toml"
+INSTALL_LAUNCHER_REPORT_PATH = SMOKE_WORK_ROOT / "install-launcher-report.json"
 
 
 class VerificationError(RuntimeError):
@@ -116,6 +119,8 @@ EVIDENCE = (
 
 
 def main() -> int:
+    startedAt = utcTimestamp()
+    started = time.monotonic()
     results = [evidence.evaluate() for evidence in EVIDENCE]
     try:
         results.append(verifyLauncherCliSmoke())
@@ -134,10 +139,18 @@ def main() -> int:
     payload = {
         "gate": "install-launcher-smoke",
         "passed": not failures,
+        "status": "passed" if not failures else "failed",
+        "startedAt": startedAt,
+        "completedAt": utcTimestamp(),
+        "durationMs": round((time.monotonic() - started) * 1000),
+        "gitHead": currentGitHead(),
+        "reportPath": reportDisplayPath(INSTALL_LAUNCHER_REPORT_PATH),
         "evidenceCount": len(results),
+        "summary": launcherSmokeSummary(results),
         "results": results,
         "failures": failures,
     }
+    writeInstallLauncherReport(payload)
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     if failures:
         print("FAIL: install launcher smoke evidence is incomplete", file=sys.stderr)
@@ -216,8 +229,62 @@ def verifyLauncherCliSmoke() -> dict[str, Any]:
             "launcherVersion": doctor["launcherVersion"],
             "layoutDirs": list(expectedDirs),
             "updateConfig": updateConfig,
+            "freshStateNulls": {
+                "activeRelease": state.get("activeRelease") is None,
+                "lastKnownGoodRelease": state.get("lastKnownGoodRelease") is None,
+                "crashState": state.get("crashState") is None,
+                "rollbackMarker": state.get("rollbackMarker") is None,
+            },
         },
     }
+
+
+def launcherSmokeSummary(results: list[dict[str, Any]]) -> dict[str, Any]:
+    cliEvidence = next((result.get("evidence") for result in results if result.get("id") == "launcher-cli-smoke"), {})
+    cliEvidence = cliEvidence if isinstance(cliEvidence, dict) else {}
+    return {
+        "allEvidencePassed": all(bool(result.get("passed")) for result in results),
+        "evidenceIds": [str(result.get("id")) for result in results],
+        "cliCommands": cliEvidence.get("commands", []),
+        "layoutDirs": cliEvidence.get("layoutDirs", []),
+        "freshStateNulls": cliEvidence.get("freshStateNulls", {}),
+        "updateConfig": cliEvidence.get("updateConfig", {}),
+    }
+
+
+def writeInstallLauncherReport(payload: dict[str, Any]) -> Path:
+    INSTALL_LAUNCHER_REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    INSTALL_LAUNCHER_REPORT_PATH.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return INSTALL_LAUNCHER_REPORT_PATH
+
+
+def reportDisplayPath(reportPath: Path) -> str:
+    try:
+        return str(reportPath.relative_to(ROOT))
+    except ValueError:
+        return str(reportPath)
+
+
+def utcTimestamp() -> str:
+    return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def currentGitHead() -> str | None:
+    try:
+        result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+    except (FileNotFoundError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() or None
 
 
 def resetLauncherRoot() -> None:

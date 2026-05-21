@@ -192,6 +192,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
         requirement="Launcher/install smoke checks doctor diagnostics, health timeout, rollback, and packaging SSOT.",
         evidenceChecks=(
             ("tests/verifyInstallLauncherSmoke.py", (
+                "INSTALL_LAUNCHER_REPORT_PATH",
+                "install-launcher-report.json",
                 "Command::Doctor",
                 "verifyLauncherCliSmoke",
                 "runLauncherJson",
@@ -203,15 +205,25 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "rollback-marker.json",
                 "exact wheel",
                 "제품 품질 검증용 내부 빌드",
+                "freshStateNulls",
+                "allEvidencePassed",
             )),
-            ("tests/run.py", ("tests/verifyInstallLauncherSmoke.py", "cargo", "check")),
+            ("tests/run.py", (
+                "tests/verifyInstallLauncherSmoke.py",
+                "cargo",
+                "check",
+                "output/test-runner/install-launcher-smoke/install-launcher-report.json",
+            )),
             ("docs/skills/ops/product/service-candidate.md", (
                 "실제 launcher CLI `doctor`와 `state show`",
                 "repo-local `output/test-runner/install-launcher-smoke/launcher-cli-root`",
                 "JSON payload",
                 "기본 update config",
                 "layout directory 생성",
+                "install-launcher-report.json",
+                "freshStateNulls",
             )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", ("install-launcher-smoke/install-launcher-report.json", "payloadGitHead")),
         ),
     ),
     ProductQualityRequirement(

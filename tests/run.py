@@ -21,6 +21,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "ai-live-smoke": ("output/test-runner/ai-live-smoke/live-smoke-report.json",),
     "curriculum-quality-matrix": ("output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json",),
     "frontend-performance-budget": ("output/test-runner/frontend-performance-budget/performance-report.json",),
+    "install-launcher-smoke": ("output/test-runner/install-launcher-smoke/install-launcher-report.json",),
     "onboarding-browser": ("output/test-runner/onboarding-browser/onboarding-report.json",),
     "provider-settings-browser": ("output/test-runner/provider-settings-browser/provider-settings-report.json",),
     "runtime-recovery-browser": ("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",),
