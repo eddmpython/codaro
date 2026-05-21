@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+from datetime import UTC, datetime
 import json
 import socket
+import subprocess
 import sys
 import threading
 import time
@@ -18,13 +20,27 @@ from playwrightCli import PlaywrightCli, PlaywrightCliError, repoLocalPlaywright
 
 
 ROOT = Path(__file__).resolve().parents[1]
+ONBOARDING_REPORT_PATH = ROOT / "output" / "test-runner" / "onboarding-browser" / "onboarding-report.json"
 
 
 def main(argv: list[str] | None = None) -> int:
+    startedAt = utcTimestamp()
+    started = time.monotonic()
+    checks: list[dict[str, Any]] = []
     args = buildParser().parse_args(argv)
     try:
         cliPath = resolvePlaywrightCli(ROOT)
     except PlaywrightCliError as exc:
+        writeOnboardingReport(
+            {
+                "passed": False,
+                "status": "failed",
+                "checks": checks,
+                "error": str(exc),
+            },
+            startedAt=startedAt,
+            startedAtMonotonic=started,
+        )
         print(f"FAIL: {exc}", file=sys.stderr)
         return 1
 
@@ -44,37 +60,61 @@ def main(argv: list[str] | None = None) -> int:
         cli.run("open", url)
         cli.run("resize", "1280", "900")
         cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "first onboarding screen")
-        fallback = cli.eval(jsAssertFallbackOnboarding())
+        fallback = recordCheck(checks, "fallback-onboarding", cli.eval(jsAssertFallbackOnboarding()))
         cli.eval(jsInstallClipboardStub())
-        diagnosticExport = cli.eval(jsClickDiagnosticExportCopy())
-        providerCta = cli.eval(jsClickOnboardingProviderConnect())
+        diagnosticExport = recordCheck(checks, "diagnostic-export-copy", cli.eval(jsClickDiagnosticExportCopy()))
+        providerCta = recordCheck(checks, "provider-connect-cta", cli.eval(jsClickOnboardingProviderConnect()))
         cli.waitEval(jsTextPresent("기본 안내 모드"), "provider fallback copy from onboarding CTA")
-        fallbackSettings = cli.eval(jsAssertProviderFallbackSettings())
+        fallbackSettings = recordCheck(checks, "provider-fallback-settings", cli.eval(jsAssertProviderFallbackSettings()))
         cli.eval(jsCloseProviderSettings())
         cli.waitEval(jsProviderSettingsClosed(), "provider settings closed after onboarding CTA")
         cli.eval(jsOpenSurface("커리큘럼"))
         cli.waitEval(jsTextPresent("Codaro 커리큘럼"), "curriculum sidebar")
-        sidebar = cli.eval(jsAssertCurriculumSidebarGroups())
+        sidebar = recordCheck(checks, "curriculum-sidebar-groups", cli.eval(jsAssertCurriculumSidebarGroups()))
         cli.eval(jsOpenSurface("채팅"))
         cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "chat surface after sidebar check")
         api.ready = True
         cli.run("reload")
         cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "ready onboarding screen")
-        ready = cli.eval(jsAssertReadyOnboarding())
+        ready = recordCheck(checks, "ready-onboarding", cli.eval(jsAssertReadyOnboarding()))
         cli.eval(jsOpenProviderSettings())
         cli.eval(jsClickProviderValidate())
         cli.waitEval(jsTextPresent("실제 응답 사용 중"), "provider ready copy")
-        settings = cli.eval(jsAssertProviderReadySettings())
+        settings = recordCheck(checks, "provider-ready-settings", cli.eval(jsAssertProviderReadySettings()))
         api.assertExpectedCalls()
+        recordCheck(checks, "expected-api-calls", "expected-api-calls-ok")
+        writeOnboardingReport(
+            {
+                "passed": True,
+                "status": "passed",
+                "checks": checks,
+                "signals": onboardingSignals(api.calls, checks),
+            },
+            startedAt=startedAt,
+            startedAtMonotonic=started,
+        )
         print(
             f"ok: onboarding browser verified {fallback} {diagnosticExport} {providerCta} "
             f"{fallbackSettings} {sidebar} {ready} {settings}"
         )
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
+        debugText = debugPageState(cli) if cli is not None else ""
+        writeOnboardingReport(
+            {
+                "passed": False,
+                "status": "failed",
+                "checks": checks,
+                "error": str(exc),
+                "debugText": debugText[:2000],
+                "signals": onboardingSignals(api.calls, checks),
+            },
+            startedAt=startedAt,
+            startedAtMonotonic=started,
+        )
         print(f"FAIL: {exc}", file=sys.stderr)
         if cli is not None:
-            print(debugPageState(cli), file=sys.stderr)
+            print(debugText, file=sys.stderr)
         print("API calls: " + json.dumps(api.calls, ensure_ascii=False), file=sys.stderr)
         return 1
     finally:
@@ -92,6 +132,66 @@ def buildParser() -> argparse.ArgumentParser:
 
 class VerificationError(RuntimeError):
     pass
+
+
+def recordCheck(checks: list[dict[str, Any]], caseId: str, result: str) -> str:
+    checks.append({"caseId": caseId, "passed": True, "status": "passed", "result": result})
+    return result
+
+
+def onboardingSignals(apiCalls: list[str], checks: list[dict[str, Any]]) -> dict[str, Any]:
+    checkIds = [str(check["caseId"]) for check in checks]
+    return {
+        "apiCallCount": len(apiCalls),
+        "apiCalls": apiCalls,
+        "checkIds": checkIds,
+        "diagnosticExportCopied": "diagnostic-export-copy" in checkIds,
+        "providerCtaOpenedSettings": "provider-connect-cta" in checkIds,
+        "providerFallbackBeforeReady": "provider-fallback-settings" in checkIds,
+        "providerReadyAfterValidate": "provider-ready-settings" in checkIds,
+        "curriculumGroupsVisible": "curriculum-sidebar-groups" in checkIds,
+    }
+
+
+def writeOnboardingReport(payload: dict[str, Any], *, startedAt: str, startedAtMonotonic: float) -> Path:
+    report = dict(payload)
+    report["gate"] = "onboarding-browser"
+    report["startedAt"] = startedAt
+    report["completedAt"] = utcTimestamp()
+    report["durationMs"] = round((time.monotonic() - startedAtMonotonic) * 1000)
+    gitHead = currentGitHead()
+    if gitHead:
+        report["gitHead"] = gitHead
+    report["reportPath"] = reportDisplayPath(ONBOARDING_REPORT_PATH)
+    ONBOARDING_REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    ONBOARDING_REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return ONBOARDING_REPORT_PATH
+
+
+def reportDisplayPath(reportPath: Path) -> str:
+    try:
+        return str(reportPath.relative_to(ROOT))
+    except ValueError:
+        return str(reportPath)
+
+
+def utcTimestamp() -> str:
+    return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def currentGitHead() -> str | None:
+    try:
+        result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+    except (FileNotFoundError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() or None
 
 
 class OnboardingStubApi:

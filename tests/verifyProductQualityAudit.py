@@ -243,6 +243,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("tests/verifyOnboardingPlaywright.py", (
                 "Codaro로 무엇을 만들까요?",
                 "Provider 연결",
+                "ONBOARDING_REPORT_PATH",
+                "onboarding-report.json",
                 "GET /api/system/diagnostics",
                 "GET /api/system/diagnostics/export",
                 "시작 진단 필요",
@@ -252,8 +254,17 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "기본 안내 모드",
                 "provider 연결됨",
                 "Pandas 레슨",
+                "diagnosticExportCopied",
+                "providerFallbackBeforeReady",
+                "providerReadyAfterValidate",
             )),
-            ("tests/run.py", ("tests/verifyOnboardingPlaywright.py", "\"onboarding-browser\"")),
+            ("tests/run.py", (
+                "tests/verifyOnboardingPlaywright.py",
+                "\"onboarding-browser\"",
+                "output/test-runner/onboarding-browser/onboarding-report.json",
+            )),
+            ("docs/skills/ops/product/service-candidate.md", ("onboarding-report.json", "providerFallbackBeforeReady")),
+            ("docs/skills/ops/foundation/testing-and-gates.md", ("onboarding-browser/onboarding-report.json", "payloadGitHead")),
         ),
     ),
     ProductQualityRequirement(

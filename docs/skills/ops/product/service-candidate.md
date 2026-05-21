@@ -89,6 +89,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - provider 연결 후에는 실제 응답 사용 상태가 분명해야 한다.
 - 기본 curriculum, AI 생성 curriculum, 나만의 curriculum의 차이를 자연스럽게 구분한다.
 - 첫 레슨 생성부터 실행까지 UI가 한 흐름으로 이어진다.
+- `onboarding-browser`는 `output/test-runner/onboarding-browser/onboarding-report.json`에 첫 화면 fallback, 진단 복사, Provider 연결 CTA, provider fallback 설정, 커리큘럼 그룹, provider ready 검증을 case로 남긴다. report의 `providerFallbackBeforeReady`, `providerReadyAfterValidate`, `diagnosticExportCopied` signal은 첫 사용자 흐름이 문구만 맞춘 것이 아니라 실제 클릭 흐름으로 확인됐다는 증거다.
 
 ## Frontend 성능
 
@@ -147,7 +148,7 @@ uv run python -X utf8 tests/run.py gate landing-build
 uv run python -X utf8 tests/run.py gate launcher-test
 ```
 
-`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, `frontend-performance-budget/performance-report.json`의 fresh 여부와 `gitHead`도 sequence artifact evidence로 대조한다. launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
+`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, `frontend-performance-budget/performance-report.json`의 fresh 여부와 `gitHead`도 sequence artifact evidence로 대조한다. 첫 사용자 흐름은 `onboarding-browser/onboarding-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
 
 ## 완료 판단
 
