@@ -126,6 +126,35 @@ PRODUCT_QUALITY_REQUIREMENTS = (
         ),
     ),
     ProductQualityRequirement(
+        requirementId="turn-state-durability",
+        requirement="Repeated teacher turns do not reuse stale clarification or prior tool results as current turn state.",
+        evidenceChecks=(
+            ("docs/skills/ops/product/service-candidate.md", (
+                "provider 연결 후 여러 질문을 보내도 stale provider status가 섞이지 않는다",
+                "pending clarification은 이어지는 답변에서 한 번만 소비",
+                "실패한 tool result가 다음 요청의 성공 경로에 섞이지 않는다",
+            )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", (
+                "turn-state durability",
+                "이전 tool result가 다음 turn의 tool policy state를 통과시키면 실패",
+            )),
+            ("tests/testTeacherArchitecture.py", (
+                "testProviderLoopDoesNotReusePriorToolResultsForNextTurnPolicy",
+                "call-check-1",
+                "call-cell-2",
+                "dependency-preflight-required",
+                "secondExecutor.calls == []",
+            )),
+            ("tests/verifyTeacherGoldenE2e.py", (
+                "pending clarification was not consumed",
+                "stale clarification leaked into a new request",
+                "specific new learning request reused stale clarification",
+                "specific new learning request did not clear stale pending",
+            )),
+            ("tests/run.py", ("teacher-eval", "teacher-e2e", "learning-system-readiness")),
+        ),
+    ),
+    ProductQualityRequirement(
         requirementId="launcher-install-smoke",
         requirement="Launcher/install smoke checks doctor diagnostics, health timeout, rollback, and packaging SSOT.",
         evidenceChecks=(

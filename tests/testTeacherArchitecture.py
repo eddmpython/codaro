@@ -1443,6 +1443,73 @@ def testProviderLoopOwnsNonStreamingTurn() -> None:
     assert [message["role"] for message in messages] == ["user", "assistant", "tool"]
 
 
+def testProviderLoopDoesNotReusePriorToolResultsForNextTurnPolicy() -> None:
+    convManager = ConversationManager()
+    conversation = convManager.create(role="teacher")
+    context = {"dependencyPreflight": {"packages": ["numpy"]}}
+    convManager.addUserMessage(conversation.conversationId, "numpy 셀 실행 준비해줘")
+    firstProvider = _ScriptedProvider([
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-check-1", name="packages-check", arguments={"names": ["numpy"]})],
+        ),
+        ToolResponse(answer="준비됐습니다.", provider="fake", model="test", toolCalls=[]),
+    ])
+    firstExecutor = _ScriptedExecutor({
+        "packages-check": {
+            "missing": [],
+            "packages": [{"name": "numpy", "installed": True}],
+            "ready": True,
+        },
+    })
+
+    firstPayload = asyncio.run(runTeacherChatLoop(
+        provider=firstProvider,
+        convManager=convManager,
+        conversationId=conversation.conversationId,
+        messages=convManager.buildMessages(conversation.conversationId),
+        tools=toolSchemas(),
+        executor=firstExecutor,
+        orchestrator=TeacherOrchestrator.fromContext(context),
+    ))
+
+    convManager.addUserMessage(conversation.conversationId, "다음 셀 바로 실행해줘")
+    secondProvider = _ScriptedProvider([
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-cell-2", name="cell-call", arguments={"operation": "run", "blockId": "cell-2"})],
+        ),
+        ToolResponse(answer="새 turn에서는 먼저 확인해야 합니다.", provider="fake", model="test", toolCalls=[]),
+    ])
+    secondExecutor = _ScriptedExecutor({"cell-call": {"passed": True, "status": "should-not-run"}})
+
+    secondPayload = asyncio.run(runTeacherChatLoop(
+        provider=secondProvider,
+        convManager=convManager,
+        conversationId=conversation.conversationId,
+        messages=convManager.buildMessages(conversation.conversationId),
+        tools=toolSchemas(),
+        executor=secondExecutor,
+        orchestrator=TeacherOrchestrator.fromContext(context),
+    ))
+
+    assert firstPayload["trace"]["toolSequence"] == ["packages-check"]
+    assert [call["tool"] for call in firstExecutor.calls] == ["packages-check"]
+    assert secondExecutor.calls == []
+    assert secondPayload["trace"]["policyViolations"] == [{
+        "policyCode": "dependency-preflight-required",
+        "toolName": "cell-call",
+        "message": "실행 전 packages-check가 필요합니다: numpy",
+    }]
+    assert secondPayload["toolCalls"][0]["result"]["policyCode"] == "dependency-preflight-required"
+    assert convManager.buildMessages(conversation.conversationId)[-2]["tool_call_id"] == "call-cell-2"
+    assert "call-check-1" in json.dumps(convManager.buildMessages(conversation.conversationId), ensure_ascii=False)
+
+
 def testProviderLoopReportsProviderErrorsInTrace() -> None:
     convManager = _FakeConversationManager()
     provider = _FailingProvider()
