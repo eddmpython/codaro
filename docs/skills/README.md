@@ -99,7 +99,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [teacher-tool-loop](architecture/teacher-tool-loop.md)
 - [live-provider-ops](architecture/live-provider-ops.md)
 
-## Ops (11) — 운영 규칙
+## Ops (12) — 운영 규칙
 
 - [ops index](ops/README.md)
 
@@ -126,6 +126,7 @@ Product:
 
 - [branding](ops/product/branding.md)
 - [dogfood-alpha](ops/product/dogfood-alpha.md)
+- [service-candidate](ops/product/service-candidate.md)
 
 ## 후속 (PR 2 이후)
 

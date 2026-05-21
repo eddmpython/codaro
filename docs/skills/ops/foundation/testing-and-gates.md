@@ -34,6 +34,13 @@ uv run python -X utf8 tests/run.py gate editor-runtime-preflight
 uv run python -X utf8 tests/run.py gate learning-system-readiness
 uv run python -X utf8 tests/run.py gate learning-goal-audit
 uv run python -X utf8 tests/run.py gate dogfood-alpha-audit
+uv run python -X utf8 tests/run.py gate service-readiness-audit
+uv run python -X utf8 tests/run.py gate install-launcher-smoke
+uv run python -X utf8 tests/run.py gate runtime-recovery-contract
+uv run python -X utf8 tests/run.py gate runtime-recovery-browser
+uv run python -X utf8 tests/run.py gate curriculum-quality-matrix
+uv run python -X utf8 tests/run.py gate onboarding-browser
+uv run python -X utf8 tests/run.py gate frontend-performance-budget
 uv run python -X utf8 tests/run.py gate learning-card-contract
 uv run python -X utf8 tests/run.py gate learning-card-browser
 uv run python -X utf8 tests/run.py gate provider-settings-browser
@@ -55,6 +62,13 @@ uv run python -X utf8 tests/run.py gate provider-settings-browser
 | `learning-system-readiness` | fast | 학습 YAML, 섹션 카드, teacher loop, workloop, gate SSOT의 readiness score를 확인한다. |
 | `learning-goal-audit` | surface | 목표 완료 전 docs, readiness, backend, landing build를 묶어 확인한다. |
 | `dogfood-alpha-audit` | surface | 사용자 플로우 audit으로 provider 연결, 질문, clarification, YAML 생성, 학습카드 렌더링, 실습 셀 입력, 셀 실행, 피드백, 실패 복구의 증거를 확인한다. |
+| `service-readiness-audit` | surface | private beta/service-ready candidate 기준과 새 내구성 gate wiring을 확인한다. |
+| `install-launcher-smoke` | release | launcher doctor, health check, rollback, exact artifact 설치 경계와 `cargo check`를 확인한다. |
+| `runtime-recovery-contract` | fast | runtime worker crash, package preflight, uv 설치 실패, cell 실행 실패 복구 계약을 확인한다. |
+| `runtime-recovery-browser` | surface | 브라우저에서 package install 실패가 셀 근처 복구 UX로 보이고 cell-call로 번지지 않는지 확인한다. |
+| `curriculum-quality-matrix` | fast | Python 기초, 파일 처리, 데이터 분석, 시각화, 웹 자동화 structured YAML이 섹션 카드 계약으로 materialize되는지 확인한다. |
+| `onboarding-browser` | surface | 브라우저에서 첫 화면 fallback, Provider 연결 행동, provider 연결 후 실제 응답 상태를 확인한다. |
+| `frontend-performance-budget` | surface | editor build 후 chunk 분리와 JS/CSS asset size budget을 확인한다. |
 | `learning-card-contract` | surface | structured section card marker 계약과 editor build를 확인한다. |
 | `learning-card-browser` | surface | Playwright CLI로 lesson overview와 structured section card의 desktop/mobile 렌더링을 확인한다. |
 | `provider-settings-browser` | surface | Playwright CLI로 provider 설정 sheet의 fallback, OAuth login/status polling, 선택, 응답 검증, 실패 안내 렌더링을 확인한다. |
@@ -82,5 +96,11 @@ uv run python -X utf8 tests/run.py gate provider-settings-browser
 - 목표 완료를 말하기 전에는 `learning-system-readiness`가 최소 9점을 증명해야 한다. 이 gate는 완료 선언을 대체하지 않고, YAML 계약, 카드 UI, clarification, uv 패키지 정책, editor runtime preflight, provider 오류 workloop, frontend workloop, golden eval/e2e, 운영 SSOT 증거가 현재 저장소에 남아 있는지 확인한다. 또한 `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`를 실제로 실행하는 blocking probe가 실패하면 점수와 무관하게 실패해야 한다.
 - 목표를 닫기 전 최종 검증은 `learning-goal-audit`로 남긴다. 이 gate는 docs 정합성, dogfood alpha 사용자 플로우 audit, 명시 요구사항 audit, `learning-system-readiness`, 전체 backend, landing build를 한 번에 실행해 "9점 readiness는 통과했지만 제품 빌드/문서/첫 사용자 완주 증거가 따로 깨진" 상태를 막는다. 명시 요구사항 audit은 `score`, `maxScore`, `minimumScore`, `requiredScore`, `requirementFailures`를 남기며, `minimumScore` 이상이어도 `requirementFailures`가 하나라도 있으면 실패한다. teacher/provider loop 자체의 산출물은 `score`, `maxScore`, `minimumScore`를 포함해야 하며 `minimumScore`는 9.0이다.
 - `dogfood-alpha-audit`는 첫 실행부터 provider 연결, 질문, clarification, YAML 생성, 학습카드 렌더링, 실습 셀 입력, 셀 실행, 피드백, 실패 복구까지 9단계가 문서와 코드 gate로 연결되어 있는지 확인한다. 서비스 출시 판단은 이 audit과 live provider credential이 있는 환경의 `ai-live-smoke` 결과가 나온 뒤에만 한다.
+- `service-readiness-audit`는 dogfood alpha 다음 단계의 private beta/service-ready candidate 기준이다. 이 audit은 단독으로 제품 완성을 증명하지 않고, `install-launcher-smoke`, `runtime-recovery-contract`, `runtime-recovery-browser`, `curriculum-quality-matrix`, `onboarding-browser`, `frontend-performance-budget`가 runner와 문서에 연결되어 있고 각 gate가 실제 실패 표면을 보는지 확인한다.
+- `install-launcher-smoke`는 launcher doctor, active/last-known-good/crash/rollback state, backend health timeout, exact wheel/sha256 packaging 경계를 본다. launcher 작업에서 이 gate를 통과하지 못하면 사용자 설치/실행/복구 경로가 service candidate 판단에 올라갈 수 없다.
+- `runtime-recovery-contract`는 backend runtime 테스트, editor runtime preflight, workloop copy를 묶어 worker crash, package delay/failure, cell execution failure가 한 오류로 뭉개지지 않는지 확인한다. `runtime-recovery-browser`는 이 계약이 실제 learning surface에서 셀 근처 문구로 보이는지 확인한다.
+- `curriculum-quality-matrix`는 pandas 하나가 아니라 Python 기초, 파일 처리, 데이터 분석, 시각화, 웹 자동화 대표 주제를 실제 `yamlToDocument`로 materialize한다. `contractGapCount`가 0이 아니거나 섹션 흐름이 `section → explanation → snippet → exercise → check`를 벗어나면 실패한다.
+- `onboarding-browser`는 첫 화면에서 provider 연결 전 fallback이 명확하고 provider 연결 후 실제 응답 사용 상태가 분명한지 본다. 이 gate는 product surface 기준이며 landing page 상태를 대체하지 않는다.
+- `frontend-performance-budget`는 `editor/vite.config.ts`의 chunk split과 build output을 함께 본다. 큰 bundle 경고를 baseline 없이 방치하지 않고, 가장 큰 JS chunk와 전체 JS/CSS 크기를 수치로 남긴다.
 - 기존 부채를 새 테스트로 한 번에 해결하지 못하면 별도 baseline 또는 명시적 TODO 문서로 분리한다.
 - CI YAML은 세부 명령을 소유하지 않고 `tests/run.py gate <name>`만 호출한다.

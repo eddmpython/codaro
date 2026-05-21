@@ -104,6 +104,58 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyDogfoodAlphaAudit.py")),),
         ci_required=False,
     ),
+    "service-readiness-audit": Gate(
+        tier="surface",
+        description="private beta/service-ready candidate 기준과 새 내구성 gate 증거를 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyServiceReadinessAudit.py")),),
+        ci_required=False,
+    ),
+    "install-launcher-smoke": Gate(
+        tier="release",
+        description="launcher doctor, health check, rollback, exact artifact 설치 경계의 smoke 증거를 확인한다.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyInstallLauncherSmoke.py")),
+            command(("cargo", "check"), cwd="launcher/codaro-launcher"),
+        ),
+        ci_required=False,
+    ),
+    "runtime-recovery-contract": Gate(
+        tier="fast",
+        description="runtime worker crash, package preflight, cell 실행 실패 복구 계약을 확인한다.",
+        commands=(
+            command(("uv", "run", "pytest", "tests/testRuntime.py", "-q", "--tb=short")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyEditorRuntimePreflight.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyRuntimeRecoveryContract.py")),
+        ),
+        ci_required=False,
+    ),
+    "runtime-recovery-browser": Gate(
+        tier="surface",
+        description="브라우저에서 package install 실패가 셀 근처 복구 UX로 보이는지 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyRuntimeRecoveryPlaywright.py")),),
+        ci_required=False,
+    ),
+    "curriculum-quality-matrix": Gate(
+        tier="fast",
+        description="대표 주제별 curriculum YAML이 섹션 카드 계약으로 materialize되는지 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumQualityMatrix.py")),),
+        ci_required=False,
+    ),
+    "onboarding-browser": Gate(
+        tier="surface",
+        description="브라우저에서 첫 화면 fallback과 provider 연결 후 상태를 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyOnboardingPlaywright.py")),),
+        ci_required=False,
+    ),
+    "frontend-performance-budget": Gate(
+        tier="surface",
+        description="editor build 후 chunk 분리와 asset size budget을 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="editor"),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyFrontendPerformanceBudget.py")),
+        ),
+        ci_required=False,
+    ),
     "learning-card-contract": Gate(
         tier="surface",
         description="structured learning section card marker와 editor build를 확인한다.",
@@ -206,8 +258,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 17:
-        failures.append(f"expected 17 gates, found {len(GATES)}")
+    if len(GATES) != 24:
+        failures.append(f"expected 24 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
