@@ -615,6 +615,7 @@ def evaluateGateCommandLogs(
             evidence.append(f"{label} path: {path}")
         else:
             missing.append(f"{label}: missing path")
+            path = None
         checkEqual(evidence, missing, log.get("exists"), True, f"{label} exists")
         checkEqual(evidence, missing, log.get("fresh"), True, f"{label} fresh")
         bytesValue = log.get("bytes")
@@ -622,6 +623,38 @@ def evaluateGateCommandLogs(
             evidence.append(f"{label} bytes: {bytesValue}")
         else:
             missing.append(f"{label}: expected non-empty log bytes, got {bytesValue!r}")
+        if isinstance(path, str) and path:
+            evaluatePhysicalCommandLog(path, bytesValue, label, evidence, missing)
+
+
+def evaluatePhysicalCommandLog(
+    pathValue: str,
+    expectedBytes: Any,
+    label: str,
+    evidence: list[str],
+    missing: list[str],
+) -> None:
+    path = ROOT / pathValue
+    try:
+        resolved = path.resolve()
+        root = ROOT.resolve()
+    except OSError as exc:
+        missing.append(f"{label}: unable to resolve physical log path ({type(exc).__name__})")
+        return
+    if root not in resolved.parents and resolved != root:
+        missing.append(f"{label}: physical log path escapes repo ({pathValue})")
+        return
+    if not resolved.is_file():
+        missing.append(f"{label}: physical log file missing at {pathValue}")
+        return
+    actualBytes = resolved.stat().st_size
+    if actualBytes <= 0:
+        missing.append(f"{label}: physical log file is empty")
+        return
+    if isinstance(expectedBytes, int) and expectedBytes != actualBytes:
+        missing.append(f"{label}: summary bytes {expectedBytes} != physical bytes {actualBytes}")
+        return
+    evidence.append(f"{label} physical file verified: {actualBytes} bytes")
 
 
 def evaluateLiveSmokeArtifactSummary(

@@ -106,6 +106,11 @@ def writeQualityCycleSummary(audit: Any, root: Path, head: str) -> None:
     }
     gates = []
     for gateName in audit.PRODUCT_QUALITY_GATES:
+        logPath = root / f"output/test-runner/{gateName}/logs/fake.log"
+        logPath.parent.mkdir(parents=True, exist_ok=True)
+        logText = f"{gateName} command log\n"
+        logPath.write_text(logText, encoding="utf-8")
+        logBytes = logPath.stat().st_size
         gate = {
             "gate": gateName,
             "returnCode": 0,
@@ -115,7 +120,7 @@ def writeQualityCycleSummary(audit: Any, root: Path, head: str) -> None:
                 "path": f"output/test-runner/{gateName}/logs/fake.log",
                 "exists": True,
                 "fresh": True,
-                "bytes": 128,
+                "bytes": logBytes,
             }],
             "artifacts": [],
         }
