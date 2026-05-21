@@ -9,7 +9,7 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 MINIMUM_SCORE = 9
-NEW_SERVICE_GATES = (
+PRODUCT_QUALITY_GATES = (
     "service-readiness-audit",
     "install-launcher-smoke",
     "runtime-recovery-contract",
@@ -49,11 +49,12 @@ class ServiceRequirement:
 
 SERVICE_REQUIREMENTS = (
     ServiceRequirement(
-        requirementId="service-candidate-ssot",
-        requirement="Private beta/service-ready candidate criteria are documented as an ops/product SSOT.",
+        requirementId="product-quality-ssot",
+        requirement="Product quality criteria are documented as an ops/product SSOT.",
         evidenceChecks=(
             ("docs/skills/ops/product/service-candidate.md", (
-                "service-ready candidate",
+                "잘 만들어진 로컬 제품",
+                "quality-cycle",
                 "반복 사용 내구성",
                 "설치/실행/런처",
                 "Runtime 복구",
@@ -64,18 +65,19 @@ SERVICE_REQUIREMENTS = (
                 "Diagnostic",
                 "Gate",
             )),
-            ("docs/skills/ops/README.md", ("service-candidate", "private beta")),
+            ("docs/skills/ops/README.md", ("service-candidate", "잘 만들어진 로컬 제품")),
             ("docs/skills/README.md", ("service-candidate", "Ops (12)")),
-            ("docs/skills/architecture/ssot-map.md", ("service candidate", "docs/skills/ops/product/service-candidate.md")),
+            ("docs/skills/architecture/ssot-map.md", ("product quality", "docs/skills/ops/product/service-candidate.md")),
         ),
     ),
     ServiceRequirement(
-        requirementId="service-gates-are-named",
-        requirement="The service candidate gate names are wired into the local runner and docs.",
+        requirementId="product-quality-gates-are-named",
+        requirement="The product quality gate sequence is wired into the local runner and docs.",
         evidenceChecks=(
-            ("tests/run.py", tuple(f"\"{gateName}\"" for gateName in NEW_SERVICE_GATES)),
-            ("docs/skills/ops/foundation/testing-and-gates.md", tuple(f"`{gateName}`" for gateName in NEW_SERVICE_GATES)),
-            ("tests/testRunEntrypoint.py", tuple(f"\"{gateName}\"" for gateName in NEW_SERVICE_GATES)),
+            ("tests/run.py", (*tuple(f"\"{gateName}\"" for gateName in PRODUCT_QUALITY_GATES), "PRODUCT_QUALITY_GATES", "\"quality-cycle\"")),
+            ("docs/skills/ops/foundation/testing-and-gates.md", (*tuple(f"`{gateName}`" for gateName in PRODUCT_QUALITY_GATES), "`quality-cycle`")),
+            ("docs/skills/ops/product/service-candidate.md", ("잘 만들어진 로컬 제품", "tests/run.py quality-cycle")),
+            ("tests/testRunEntrypoint.py", (*tuple(f"\"{gateName}\"" for gateName in PRODUCT_QUALITY_GATES), "PRODUCT_QUALITY_GATES")),
         ),
     ),
     ServiceRequirement(
@@ -178,7 +180,7 @@ SERVICE_REQUIREMENTS = (
     ),
     ServiceRequirement(
         requirementId="no-secret-diagnostics",
-        requirement="Service candidate diagnostics keep secrets out of logs and outputs.",
+        requirement="Product quality diagnostics keep secrets out of logs and outputs.",
         evidenceChecks=(
             ("docs/skills/ops/product/service-candidate.md", (
                 "token/API key/secret은 diagnostic summary와 로그에 남기지 않는다",

@@ -108,7 +108,7 @@ GATES: dict[str, Gate] = {
     ),
     "service-readiness-audit": Gate(
         tier="surface",
-        description="private beta/service-ready candidate 기준과 새 내구성 gate 증거를 확인한다.",
+        description="제품 품질 기준과 새 내구성 gate 증거를 확인한다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyServiceReadinessAudit.py")),),
         ci_required=False,
     ),
@@ -202,6 +202,15 @@ GATES: dict[str, Gate] = {
 }
 
 PREFLIGHT_GATES = ("docs", "backend")
+PRODUCT_QUALITY_GATES = (
+    "service-readiness-audit",
+    "install-launcher-smoke",
+    "runtime-recovery-contract",
+    "runtime-recovery-browser",
+    "curriculum-quality-matrix",
+    "onboarding-browser",
+    "frontend-performance-budget",
+)
 TIER_ORDER = ("fast", "surface", "release")
 
 
@@ -301,6 +310,9 @@ def listGates() -> int:
     print("preflight:")
     for name in PREFLIGHT_GATES:
         print(f"  {name}")
+    print("quality-cycle:")
+    for name in PRODUCT_QUALITY_GATES:
+        print(f"  {name}")
     return 0
 
 
@@ -322,6 +334,10 @@ def auditSelf() -> int:
     if unknownPreflight:
         failures.append(f"unknown preflight gates: {', '.join(unknownPreflight)}")
 
+    unknownProductQuality = [name for name in PRODUCT_QUALITY_GATES if name not in gateNames]
+    if unknownProductQuality:
+        failures.append(f"unknown product quality gates: {', '.join(unknownProductQuality)}")
+
     unknownTiers = sorted({gate.tier for gate in GATES.values()} - set(TIER_ORDER))
     if unknownTiers:
         failures.append(f"unknown tiers: {', '.join(unknownTiers)}")
@@ -340,6 +356,8 @@ def auditSelf() -> int:
         missingDocNames = sorted(name for name in GATES if f"`{name}`" not in docText)
         if missingDocNames:
             failures.append(f"gate doc does not mention: {', '.join(missingDocNames)}")
+        if "`quality-cycle`" not in docText:
+            failures.append("gate doc does not mention: quality-cycle")
     else:
         failures.append(f"missing gate doc: {GATE_DOC.relative_to(ROOT)}")
 
@@ -358,6 +376,7 @@ def buildParser() -> argparse.ArgumentParser:
 
     subparsers.add_parser("list", help="show available gates")
     subparsers.add_parser("preflight", help="run the default local preflight gates")
+    subparsers.add_parser("quality-cycle", help="run the product quality gate sequence")
     subparsers.add_parser("audit-self", help="validate runner, docs, and CI wiring")
 
     gateParser = subparsers.add_parser("gate", help="run one named gate")
@@ -376,6 +395,8 @@ def main(argv: list[str] | None = None) -> int:
         return listGates()
     if args.command == "preflight":
         return runGateSequence(PREFLIGHT_GATES)
+    if args.command == "quality-cycle":
+        return runGateSequence(PRODUCT_QUALITY_GATES)
     if args.command == "audit-self":
         return auditSelf()
     if args.command == "gate":

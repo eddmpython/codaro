@@ -49,6 +49,15 @@ def testGateNamesAreStable() -> None:
         "launcher-test",
     }
     assert runner.PREFLIGHT_GATES == ("docs", "backend")
+    assert runner.PRODUCT_QUALITY_GATES == (
+        "service-readiness-audit",
+        "install-launcher-smoke",
+        "runtime-recovery-contract",
+        "runtime-recovery-browser",
+        "curriculum-quality-matrix",
+        "onboarding-browser",
+        "frontend-performance-budget",
+    )
 
 
 def testCiWorkflowReferencesKnownRequiredGates() -> None:
