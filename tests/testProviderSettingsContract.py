@@ -26,6 +26,7 @@ def test_provider_validation_state_is_persisted_for_settings_ui() -> None:
             "const [providerValidation",
             "result.validation",
             "providerValidationFailure(providerId, error",
+            "providerOauthLoginPending(providerId)",
             "providerValidation,",
         ),
     )
@@ -35,6 +36,7 @@ def test_provider_validation_state_is_persisted_for_settings_ui() -> None:
             "validation?: ProviderValidationSnapshot",
             "snapshotProviderValidation",
             'validateProvider(providerId, model, "response")',
+            "oauth_login_timeout",
             "checkedAt: new Date().toISOString()",
         ),
     )
@@ -48,7 +50,10 @@ def test_provider_settings_shows_live_fallback_and_failure_actions() -> None:
         sheet,
         (
             "data-provider-fallback-state",
+            "data-provider-validation-pending",
             "data-provider-validation-status",
+            "브라우저 로그인 대기",
+            "로그인 탭 완료",
             "실제 응답 사용 중",
             "기본 안내 모드",
             "다시 로그인 필요",

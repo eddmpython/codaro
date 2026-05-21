@@ -81,7 +81,30 @@ export async function loginOauthProvider(providerId = "oauth-chatgpt"): Promise<
       title: "Provider 로그인 대기 중",
       detail: "로그인 탭을 완료한 뒤 상태를 다시 확인하세요.",
     },
+    validation: snapshotProviderValidation(providerId, {
+      valid: false,
+      diagnostic: {
+        action: "restart-login",
+        code: "oauth_login_timeout",
+        message: "로그인 완료를 확인하지 못했습니다. 열린 탭을 완료했는지 확인하거나 다시 로그인하세요.",
+        provider: providerId,
+        recoverable: true,
+      },
+    }, "login"),
   };
+}
+
+export function providerOauthLoginPending(providerId = "oauth-chatgpt"): ProviderValidationSnapshot {
+  return snapshotProviderValidation(providerId, {
+    valid: false,
+    pending: true,
+    diagnostic: {
+      code: "oauth_login_polling",
+      message: "브라우저 로그인 탭을 기다리는 중입니다. 완료되면 Codaro가 상태를 확인하고 실제 응답 검증으로 이어갑니다.",
+      provider: providerId,
+      recoverable: true,
+    },
+  }, "login");
 }
 
 export async function logoutOauthProvider(providerId = "oauth-chatgpt"): Promise<ProviderActionResult> {

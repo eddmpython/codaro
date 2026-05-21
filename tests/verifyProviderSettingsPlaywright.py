@@ -577,6 +577,15 @@ def jsLoginOauthFailure() -> str:
     return compactJs("""
 (async () => {
   clickProviderButton('oauth-chatgpt', '브라우저 로그인');
+  await waitForProviderStatus('oauth-chatgpt', 'oauth-polling', 3000);
+  const pending = providerStatus(providerCard('oauth-chatgpt'));
+  const pendingText = pending.textContent || '';
+  if (pending.getAttribute('data-provider-validation-pending') !== 'true') {
+    throw new Error('OAuth login did not expose polling state');
+  }
+  if (!pendingText.includes('브라우저 로그인 대기') || !pendingText.includes('로그인 탭 완료')) {
+    throw new Error('OAuth polling copy missing: ' + pendingText);
+  }
   await waitForProviderStatus('oauth-chatgpt', 'needs-action', 9000);
   const card = providerCard('oauth-chatgpt');
   const status = providerStatus(card);
@@ -591,7 +600,7 @@ def jsLoginOauthFailure() -> str:
   if (!opened.some((url) => url.includes('/oauth/stub'))) {
     throw new Error('OAuth login did not open auth URL');
   }
-  return JSON.stringify({ login: 'state_mismatch', action: '로그인 다시 시작' });
+  return JSON.stringify({ login: 'state_mismatch', pending: true, action: '로그인 다시 시작' });
 })()
 """)
 

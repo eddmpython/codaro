@@ -353,10 +353,11 @@ function ProviderConnectionStatus({
     <div
       className={cn("mt-3 rounded-md border px-3 py-2 text-xs leading-5", status.className)}
       data-provider-fallback-state={status.mode}
+      data-provider-validation-pending={validation?.pending ? "true" : "false"}
       data-provider-validation-status={validation ? validation.valid ? "valid" : "invalid" : "unchecked"}
     >
       <div className="flex items-start gap-2">
-        <StatusIcon className="mt-0.5 size-3.5 shrink-0" />
+        <StatusIcon className={cn("mt-0.5 size-3.5 shrink-0", status.spin && "animate-spin")} />
         <div className="min-w-0">
           <div className="font-medium tracking-normal">{status.title}</div>
           <div className="text-muted-foreground">{status.detail}</div>
@@ -391,6 +392,7 @@ function providerStatusCopy({
   icon: LucideIcon;
   meta?: string;
   mode: string;
+  spin?: boolean;
   title: string;
 } {
   if (validation?.valid) {
@@ -404,6 +406,19 @@ function providerStatusCopy({
       meta: validationMeta(validation),
       mode: liveActive ? "live" : "validated",
       title: liveActive ? "실제 응답 사용 중" : "응답 검증 완료",
+    };
+  }
+
+  if (validation?.pending) {
+    return {
+      action: providerActionLabel(validation.diagnostic?.action) ?? "로그인 탭 완료",
+      className: "border-sky-500/30 bg-sky-500/10 text-sky-950 dark:text-sky-100",
+      detail: validation.diagnostic?.message ?? "브라우저 로그인 상태를 확인하는 중입니다.",
+      icon: Loader2,
+      meta: validationMeta(validation),
+      mode: "oauth-polling",
+      spin: true,
+      title: "브라우저 로그인 대기",
     };
   }
 

@@ -246,6 +246,7 @@ export type ProviderDiagnostic = {
 
 export type ProviderValidationPayload = {
   valid: boolean;
+  pending?: boolean;
   model?: string | null;
   error?: string | null;
   diagnostic?: ProviderDiagnostic | null;

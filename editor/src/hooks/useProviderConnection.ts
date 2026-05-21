@@ -5,6 +5,7 @@ import {
   openProviderSettings,
   providerActionFailureNotice,
   providerAuthFailureNotice,
+  providerOauthLoginPending,
   providerValidationFailure,
   saveApiProvider as saveApiProviderAction,
   selectProvider,
@@ -64,6 +65,10 @@ export function useProviderConnection({
     }
 
     setAiConnecting(true);
+    setProviderValidation((current) => ({
+      ...current,
+      [providerId]: providerOauthLoginPending(providerId),
+    }));
     try {
       onNotice({ tone: "default", title: "Provider 로그인 열림", detail: "새 탭에서 provider 로그인을 완료하세요." });
       applyProviderActionResult(await loginOauthProvider(providerId));
