@@ -90,7 +90,11 @@ export function ExecutionOutput({ result }: { result: ExecutionResult }) {
   const hasError = result.status === "error" || Boolean(result.stderr);
   const output = result.stderr || result.stdout || stringifyData(result.data) || "출력 없음";
   return (
-    <div className={cn("rounded-md bg-muted/30 p-3", hasError && "bg-destructive/10")}>
+    <div
+      className={cn("rounded-md bg-muted/30 p-3", hasError && "bg-destructive/10")}
+      data-execution-output="true"
+      data-execution-output-status={hasError ? "error" : "ok"}
+    >
       <div className="mb-2 flex items-center justify-between gap-2 text-xs">
         <span className="font-medium uppercase text-muted-foreground">출력</span>
         <Badge variant={hasError ? "destructive" : "outline"}>
@@ -100,6 +104,20 @@ export function ExecutionOutput({ result }: { result: ExecutionResult }) {
       <ScrollArea className="max-h-72">
         <pre className="whitespace-pre-wrap font-mono text-sm leading-6">{output}</pre>
       </ScrollArea>
+      {hasError ? (
+        <div
+          className="mt-3 flex gap-2 rounded-md border border-destructive/25 bg-background/70 px-3 py-2 text-xs leading-5"
+          data-runtime-recovery="cell-error"
+        >
+          <XCircle className="mt-0.5 size-3.5 shrink-0 text-destructive" />
+          <div className="min-w-0">
+            <div className="font-medium text-foreground">셀 실행 실패</div>
+            <div className="text-muted-foreground">
+              오류 메시지의 마지막 줄부터 확인하고, import·변수명·입력값을 고친 뒤 이 셀을 다시 실행할 수 있습니다.
+            </div>
+          </div>
+        </div>
+      ) : null}
     </div>
   );
 }

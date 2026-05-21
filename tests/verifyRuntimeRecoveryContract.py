@@ -82,6 +82,25 @@ EVIDENCE = (
         ),
     ),
     Evidence(
+        "editor-runtime-cell-error-recovery",
+        "editor/src/components/app/appPrimitives.tsx",
+        (
+            "data-runtime-recovery=\"cell-error\"",
+            "오류 메시지의 마지막 줄부터 확인",
+            "다시 실행할 수 있습니다",
+        ),
+    ),
+    Evidence(
+        "runtime-recovery-browser",
+        "tests/verifyRuntimeRecoveryPlaywright.py",
+        (
+            "package-failure-recovery-ok",
+            "cell-failure-recovery-ok",
+            "cell-call package-failure",
+            "cell-call cell-failure",
+        ),
+    ),
+    Evidence(
         "teacher-policy-recovery",
         "src/codaro/ai/teacher/toolPolicy.py",
         (

@@ -24,8 +24,10 @@ from playwrightCli import PlaywrightCli, PlaywrightCliError, resolvePlaywrightCl
 
 ROOT = Path(__file__).resolve().parents[1]
 STORAGE_KEY = "codaro-custom-curricula"
-FIXTURE_TITLE = "Runtime recovery browser fixture"
+PACKAGE_FAILURE_TITLE = "Runtime package recovery fixture"
+CELL_FAILURE_TITLE = "Runtime cell failure fixture"
 MISSING_PACKAGE = "codaro_missing_runtime_pkg"
+CELL_FAILURE_SYMBOL = "undefined_runtime_value"
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -51,17 +53,25 @@ def main(argv: list[str] | None = None) -> int:
         cli = PlaywrightCli(cliPath=cliPath, cwd=tempRoot, session=session)
         cli.run("open", url)
         cli.run("resize", "1280", "900")
-        cli.run("localstorage-set", STORAGE_KEY, json.dumps([customCurriculumEntry()], ensure_ascii=False))
+        cli.run("localstorage-set", STORAGE_KEY, json.dumps([
+            customCurriculumEntry(PACKAGE_FAILURE_TITLE, customCurriculumDocument("package-failure")),
+            customCurriculumEntry(CELL_FAILURE_TITLE, customCurriculumDocument("cell-failure")),
+        ], ensure_ascii=False))
         cli.run("reload")
-        cli.waitEval(jsTextPresent(FIXTURE_TITLE), "custom runtime recovery curriculum")
-        cli.eval(jsClickText(FIXTURE_TITLE))
+        cli.waitEval(jsTextPresent(PACKAGE_FAILURE_TITLE), "custom runtime recovery curriculum")
+        cli.eval(jsClickText(PACKAGE_FAILURE_TITLE))
         cli.waitEval(jsTextPresent("셀을 실행하면 결과와 오류가 여기에 표시됩니다."), "idle result recovery copy")
         idle = cli.eval(jsAssertIdleRuntimeRecovery())
         cli.eval(jsClickFirstRunButton())
         cli.waitEval(jsTextPresent("라이브러리 준비 실패"), "package install failure notice")
         failure = cli.eval(jsAssertPackageFailureRecovery())
+        cli.eval(jsClickText(CELL_FAILURE_TITLE))
+        cli.waitEval(jsTextPresent("셀을 실행하면 결과와 오류가 여기에 표시됩니다."), "cell failure idle result copy")
+        cli.eval(jsClickFirstRunButton())
+        cli.waitEval(jsTextPresent("셀 실행 실패"), "cell execution failure recovery")
+        cellFailure = cli.eval(jsAssertCellFailureRecovery())
         api.assertExpectedCalls()
-        print(f"ok: runtime recovery browser verified {idle} {failure}")
+        print(f"ok: runtime recovery browser verified {idle} {failure} {cellFailure}")
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
@@ -108,11 +118,12 @@ class RuntimeRecoveryStubApi:
             "POST /api/kernel/create",
             "GET /api/kernel/session-runtime-recovery/packages/list packages-check",
             f"POST /api/kernel/session-runtime-recovery/packages/install packages-install {MISSING_PACKAGE}",
+            "POST /api/kernel/session-runtime-recovery/execute cell-call cell-failure",
         }
         missing = sorted(required - set(self.calls))
         if missing:
             raise VerificationError("runtime recovery API calls missing: " + ", ".join(missing))
-        if any("execute" in call for call in self.calls):
+        if any("cell-call package-failure" in call for call in self.calls):
             raise VerificationError("cell-call endpoint should not run after package install failure")
 
     def _handler(self):
@@ -138,9 +149,9 @@ class RuntimeRecoveryStubApi:
                         "learningPaths": {},
                     })
                 elif path.startswith("/api/curriculum/contents/"):
-                    self._sendJson({"category": "30days", "categoryName": "파이썬 기초", "contents": [{"contentId": "runtime-recovery", "title": FIXTURE_TITLE}]})
+                    self._sendJson({"category": "30days", "categoryName": "파이썬 기초", "contents": [{"contentId": "runtime-recovery", "title": PACKAGE_FAILURE_TITLE}]})
                 elif path.startswith("/api/curriculum/content/"):
-                    self._sendJson({"document": customCurriculumDocument(), "solutions": {}})
+                    self._sendJson({"document": customCurriculumDocument("package-failure"), "solutions": {}})
                 elif path == "/api/ai/tools":
                     self._sendJson({"groups": [], "lanes": [], "tools": [], "grouped": {}, "byLane": {}})
                 elif path == "/api/ai/profile":
@@ -177,8 +188,22 @@ class RuntimeRecoveryStubApi:
                         "skipped": False,
                     })
                 elif path.endswith("/execute"):
-                    owner.calls.append(f"POST {path} cell-call")
-                    self._sendJson({"type": "text", "status": "error", "data": "should not execute", "blockId": payload.get("blockId")})
+                    code = str(payload.get("code") or "")
+                    if MISSING_PACKAGE in code:
+                        owner.calls.append(f"POST {path} cell-call package-failure")
+                    else:
+                        owner.calls.append(f"POST {path} cell-call cell-failure")
+                    self._sendJson({
+                        "type": "error",
+                        "status": "error",
+                        "data": f"NameError: name '{CELL_FAILURE_SYMBOL}' is not defined",
+                        "stdout": "",
+                        "stderr": f"Traceback (most recent call last):\nNameError: name '{CELL_FAILURE_SYMBOL}' is not defined",
+                        "blockId": payload.get("blockId"),
+                        "variables": [],
+                        "stateDelta": {"added": [], "updated": [], "removed": []},
+                        "executionCount": 1,
+                    })
                 else:
                     self._sendJson({"error": f"unhandled {path}"}, status=404)
 
@@ -298,6 +323,21 @@ def jsAssertPackageFailureRecovery() -> str:
 """)
 
 
+def jsAssertCellFailureRecovery() -> str:
+    return compactJs(f"""
+(() => {{
+  const text = document.body.innerText;
+  const required = ['셀 실행 실패', '{CELL_FAILURE_SYMBOL}', '오류 메시지의 마지막 줄부터 확인', '다시 실행할 수 있습니다'];
+  const missing = required.filter((item) => !text.includes(item));
+  if (missing.length) throw new Error('cell failure recovery missing: ' + missing.join(', '));
+  if (!document.querySelector('[data-runtime-recovery="cell-error"]')) {{
+    throw new Error('cell failure recovery hint missing near execution output');
+  }}
+  return 'cell-failure-recovery-ok';
+}})()
+""")
+
+
 def debugPageState(cli: PlaywrightCli) -> str:
     try:
         return cli.eval("document.body.innerText.slice(0, 2000)")
@@ -309,17 +349,17 @@ def compactJs(source: str) -> str:
     return " ".join(line.strip() for line in source.strip().splitlines() if line.strip())
 
 
-def customCurriculumEntry() -> dict[str, Any]:
+def customCurriculumEntry(title: str, document: dict[str, Any]) -> dict[str, Any]:
     return {
-        "id": "custom-runtime-recovery",
-        "title": FIXTURE_TITLE,
-        "document": customCurriculumDocument(),
+        "id": f"custom-{title.lower().replace(' ', '-')}",
+        "title": title,
+        "document": document,
         "createdAt": 1_700_000_000_000,
     }
 
 
-def customCurriculumDocument() -> dict[str, Any]:
-    document, _solutions = yamlToDocument(yaml.safe_load(structuredLessonYaml()), "runtime-recovery", "package-failure")
+def customCurriculumDocument(caseId: str) -> dict[str, Any]:
+    document, _solutions = yamlToDocument(yaml.safe_load(structuredLessonYaml(caseId)), "runtime-recovery", caseId)
     payload = document.model_dump(mode="json")
     payload["id"] = "runtime-recovery-document"
     return compactDocumentForBrowserStorage(payload)
@@ -416,14 +456,27 @@ def compactSectionContract(contract: dict[str, Any]) -> dict[str, Any]:
     }
 
 
-def structuredLessonYaml() -> str:
+def structuredLessonYaml(caseId: str) -> str:
+    if caseId == "cell-failure":
+        title = CELL_FAILURE_TITLE
+        packages = " []"
+        snippet = f"print({CELL_FAILURE_SYMBOL})"
+        starterCode = f"print({CELL_FAILURE_SYMBOL})"
+        subtitle = "셀 실행 오류를 결과 근처에서 확인"
+        why = "실행 오류가 package failure와 섞이지 않아야 코드를 고쳐 다시 실행하기 쉽다."
+    else:
+        title = PACKAGE_FAILURE_TITLE
+        packages = f"\n    - {MISSING_PACKAGE}"
+        snippet = f"import {MISSING_PACKAGE}\nprint(\"ready\")"
+        starterCode = f"import {MISSING_PACKAGE}\nprint(\"ready\")"
+        subtitle = "패키지 설치 실패를 셀 근처에서 확인"
+        why = "설치 실패가 cell-call로 번지지 않아야 다시 실행 경로가 분명하다."
     return f"""
 meta:
-  title: {FIXTURE_TITLE}
+  title: {title}
   audience: local dogfood learner
   difficulty: beginner
-  packages:
-    - {MISSING_PACKAGE}
+  packages:{packages}
 intro:
   direction: runtime recovery path
   benefits:
@@ -433,21 +486,19 @@ intro:
 sections:
   - id: recovery
     title: Runtime 복구
-    subtitle: 패키지 설치 실패를 셀 근처에서 확인
+    subtitle: {subtitle}
     goal: runtime preflight가 실행 전에 필요한 패키지를 확인한다.
-    why: 설치 실패가 cell-call로 번지지 않아야 다시 실행 경로가 분명하다.
+    why: {why}
     explanation: 실행 전 package preflight가 필요한 패키지를 확인하고 실패를 사용자 문장으로 돌려준다.
     tips:
       - 실패한 패키지 이름과 설치 경로를 먼저 본다.
       - 설치 실패 뒤에는 셀 실행을 진행하지 않는다.
     snippet: |
-      import {MISSING_PACKAGE}
-      print("ready")
+{indentYamlBlock(snippet, 6)}
     exercise:
       prompt: 실패를 확인하기 위해 실습 셀을 실행하세요.
       starterCode: |
-        import {MISSING_PACKAGE}
-        print("ready")
+{indentYamlBlock(starterCode, 8)}
       solution: |
         print("fallback")
       check:
@@ -457,6 +508,11 @@ sections:
     check:
       noError: 실행 오류가 없어야 한다.
 """
+
+
+def indentYamlBlock(value: str, spaces: int) -> str:
+    prefix = " " * spaces
+    return "\n".join(f"{prefix}{line}" for line in value.splitlines())
 
 
 if __name__ == "__main__":

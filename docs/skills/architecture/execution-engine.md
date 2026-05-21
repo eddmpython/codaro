@@ -20,6 +20,8 @@ whenToUse: 새 엔진 구현, capability 추가 (execute/interrupt/variables/fil
 - 셀 실행/검증은 장기적으로 `cell-call` 계약으로 수렴한다. `execute-reactive`, `check-exercise`는 하위 호환 및 세부 구현 도구다.
 - editor의 직접 실행 버튼도 kernel execute로 바로 들어가지 않는다. `editor/src/lib/notebookRuntime.ts`가 세션 패키지 목록을 확인하고, 누락 패키지를 세션 `packages/install` capability의 uv 경로로 준비한 뒤 `execute` 또는 `execute-reactive`를 호출한다.
 - `editor-runtime-preflight` gate는 이 순서가 `packages-check → packages-install → cell-call` 의미와 어긋나지 않는지 확인한다.
+- runtime 복구 UX는 실패 종류를 섞지 않는다. 패키지 준비 실패는 `라이브러리 준비 실패`로 표시하고 cell-call을 막는다. 셀 실행 자체가 실패하면 결과 박스 안에 `셀 실행 실패`와 마지막 오류 줄 확인, 코드 수정 후 재실행 가능 안내를 함께 보여준다.
+- `runtime-recovery-browser` gate는 실제 제품 화면에서 package failure와 cell execution failure가 각각 셀 근처 복구 UX로 보이는지 확인한다.
 - kernel 실행 결과를 HTTP, websocket, tool payload로 바꾸는 기준은 `src/codaro/kernel/executionPayload.py`에 둔다.
 
 ## 관련
