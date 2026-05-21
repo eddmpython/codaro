@@ -56,6 +56,8 @@ Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자
 
 `provider-settings-browser`와 `learning-card-browser` 같은 브라우저 gate는 제품 표면 증거다. 로컬 구현이 통과해도 브라우저 gate가 실패하면 사용자가 완주할 수 있다고 말하지 않는다.
 
+`dogfood-alpha-audit`는 `output/test-runner/dogfood-alpha-audit/dogfood-alpha-report.json`에 `gitHead`, `startedAt`, `completedAt`, `durationMs`, `status`, `summary`, `requirementFailures`를 남긴다. `quality-cycle`은 이 report의 fresh 여부와 `payloadGitHead`/`gitHeadMatches`를 대조해야 하며, report가 없거나 현재 커밋과 다르면 “첫 사용자 완주 경로가 검증됐다”고 말하지 않는다.
+
 ## 운영
 
 - 별도 브랜치를 만들지 않고 main에서 로컬 작업한다.

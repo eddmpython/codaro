@@ -91,6 +91,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "tests/verifyProductQualityAudit.py",
                 "writeGateSequenceSummary",
                 "gateArtifactSummaries",
+                "dogfood-alpha-audit/dogfood-alpha-report.json",
                 "sequence-summary.json",
                 "gitHead",
                 "startedAt",
@@ -109,6 +110,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 *tuple(f"`{gateName}`" for gateName in PRODUCT_QUALITY_GATES),
                 "`quality-cycle`",
                 "`output/test-runner/quality-cycle/sequence-summary.json`",
+                "`dogfood-alpha-audit/dogfood-alpha-report.json`",
                 "`softFailure: true`",
                 "`softFailureCount`",
                 "artifact freshness",
@@ -121,6 +123,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("docs/skills/ops/product/service-candidate.md", (
                 "잘 만들어진 로컬 제품",
                 "tests/run.py quality-cycle",
+                "dogfood-alpha-report.json",
                 "`softFailureCount`",
                 "`softFailure: true`",
                 "`payloadGitHead`/`gitHeadMatches`",

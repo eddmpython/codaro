@@ -1,14 +1,18 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 import json
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
+import time
 from typing import Any
 
 
 ROOT = Path(__file__).resolve().parents[1]
 MINIMUM_SCORE = 9
+DOGFOOD_ALPHA_REPORT_PATH = ROOT / "output" / "test-runner" / "dogfood-alpha-audit" / "dogfood-alpha-report.json"
 
 
 @dataclass(frozen=True)
@@ -289,8 +293,21 @@ DOGFOOD_REQUIREMENTS = (
 
 
 def main() -> int:
+    startedAt = utcTimestamp()
+    started = time.monotonic()
     results = tuple(requirement.evaluate() for requirement in DOGFOOD_REQUIREMENTS)
     payload = buildAuditPayload(results)
+    payload.update({
+        "gate": "dogfood-alpha-audit",
+        "status": "passed" if payload["passed"] else "failed",
+        "startedAt": startedAt,
+        "completedAt": utcTimestamp(),
+        "durationMs": round((time.monotonic() - started) * 1000),
+        "gitHead": currentGitHead(),
+        "reportPath": reportDisplayPath(DOGFOOD_ALPHA_REPORT_PATH),
+        "summary": dogfoodAuditSummary(results),
+    })
+    writeDogfoodAlphaReport(payload)
 
     if not payload["passed"]:
         print("FAIL: dogfood alpha audit score is below threshold or explicit requirements failed", file=sys.stderr)
@@ -315,6 +332,58 @@ def buildAuditPayload(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:
         "requirements": list(results),
     }
     return payload
+
+
+def dogfoodAuditSummary(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:
+    passedIds = [str(result["id"]) for result in results if result["passed"]]
+    failedIds = [str(result["id"]) for result in results if not result["passed"]]
+    return {
+        "allRequirementsPassed": not failedIds,
+        "passedRequirementCount": len(passedIds),
+        "failedRequirementCount": len(failedIds),
+        "passedRequirementIds": passedIds,
+        "failedRequirementIds": failedIds,
+        "firstUserFlowCovered": "first-user-flow-is-versioned" in passedIds,
+        "providerRecoveryCovered": "provider-oauth-recovery-boundary" in passedIds,
+        "learningCompletionCovered": "learning-card-completion-path" in passedIds,
+        "workloopTraceCovered": "workloop-trace-progress-path" in passedIds,
+        "runtimeRecoveryCovered": "runtime-failure-recovery-path" in passedIds,
+    }
+
+
+def writeDogfoodAlphaReport(payload: dict[str, Any]) -> Path:
+    DOGFOOD_ALPHA_REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    DOGFOOD_ALPHA_REPORT_PATH.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return DOGFOOD_ALPHA_REPORT_PATH
+
+
+def reportDisplayPath(reportPath: Path) -> str:
+    try:
+        return str(reportPath.relative_to(ROOT))
+    except ValueError:
+        return str(reportPath)
+
+
+def utcTimestamp() -> str:
+    return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def currentGitHead() -> str | None:
+    try:
+        result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+    except (FileNotFoundError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() or None
 
 
 def fileNeedleReport(relPath: str, needles: tuple[str, ...]) -> tuple[list[str], list[str]]:
