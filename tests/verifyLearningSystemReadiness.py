@@ -272,7 +272,6 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "yamlToDocument",
                     "materializedStructuredLessonDocument",
                     "assertMaterializedContract",
-                    "isPlaywrightEvalError",
                     "jsAssertLearningOverview",
                     "jsAssertLearningVisualIntegrity",
                     "data-learning-flow-canvas",
@@ -291,6 +290,11 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "data-cell-ai-popover",
                     "visibleBands",
                     "visualIntegrity",
+                )),
+                ("tests/playwrightCli.py", (
+                    "isPlaywrightEvalError",
+                    "PlaywrightCliError",
+                    "repoLocalPlaywrightWorkspace",
                 )),
             ),
         ),
@@ -630,7 +634,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
         ),
         fileCriterion(
             "goal-objective-audit-contract",
-            "Learning goal audit maps the original objective requirements to named evidence before completion.",
+            "Learning goal audit maps the original objective and product quality requirements to named evidence before completion.",
             (
                 ("tests/verifyLearningGoalObjectiveAudit.py", (
                     "OBJECTIVE_REQUIREMENTS",
@@ -642,13 +646,19 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                     "real-provider-golden-e2e-score",
                     "playwright-product-verification",
                     "goal-audit-gate-covers-builds-and-tests",
+                    "well-built-product-quality-gates",
+                    "generated-docs-freshness",
+                    "repo-local-gate-isolation",
                     "MINIMUM_SCORE = 9",
                     "requiredScore",
                     "requirementFailures",
                 )),
                 ("tests/run.py", (
                     "tests/verifyLearningGoalObjectiveAudit.py",
+                    "tests/verifyServiceReadinessAudit.py",
                     "\"learning-goal-audit\"",
+                    "\"product-quality-audit\"",
+                    "\"quality-cycle\"",
                     "tests/verifyLearningSystemReadiness.py",
                     "\"pytest\", \"tests/\"",
                     "\"npm\", \"run\", \"build\"",
@@ -656,6 +666,8 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                 ("docs/skills/ops/foundation/testing-and-gates.md", (
                     "명시 요구사항 audit",
                     "`learning-goal-audit`",
+                    "`product-quality-audit`",
+                    "`quality-cycle`",
                     "`requiredScore`",
                     "`requirementFailures`",
                 )),

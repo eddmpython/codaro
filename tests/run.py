@@ -88,11 +88,12 @@ GATES: dict[str, Gate] = {
     ),
     "learning-goal-audit": Gate(
         tier="surface",
-        description="목표 완료 전 docs, readiness, backend, landing build를 묶어 확인한다.",
+        description="목표 완료 전 docs, product quality, readiness, backend, landing build를 묶어 확인한다.",
         commands=(
             command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/syncAgentsMd.py", "--check")),
             command(("uv", "run", "python", "-X", "utf8", "tests/run.py", "audit-self")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyDogfoodAlphaAudit.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyServiceReadinessAudit.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningGoalObjectiveAudit.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningSystemReadiness.py")),
             command(("uv", "run", "pytest", "tests/", "-q", "--tb=short")),
