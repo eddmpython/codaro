@@ -15,6 +15,7 @@ PRODUCT_QUALITY_GATES = (
     "learning-system-readiness",
     "dogfood-alpha-audit",
     "service-readiness-audit",
+    "diagnostic-summary-contract",
     "ai-live-smoke",
     "provider-settings-browser",
     "install-launcher-smoke",
@@ -200,15 +201,41 @@ SERVICE_REQUIREMENTS = (
     ),
     ServiceRequirement(
         requirementId="no-secret-diagnostics",
-        requirement="Product quality diagnostics keep secrets out of logs and outputs.",
+        requirement="Product quality diagnostics separate failure categories and keep secrets out of logs and outputs.",
         evidenceChecks=(
+            ("src/codaro/system/diagnosticSummary.py", (
+                "DIAGNOSTIC_CATEGORIES",
+                "\"provider\", \"runtime\", \"package\", \"frontend\"",
+                "buildDiagnosticSummary",
+                "safeDiagnosticValue",
+                "safeDiagnosticText",
+            )),
+            ("tests/testDiagnosticSummary.py", (
+                "testDiagnosticSummarySeparatesFailureCategoriesAndActions",
+                "testDiagnosticSummaryRedactsSecretsInTextAndMetadata",
+                "Bearer [redacted]",
+            )),
+            ("tests/verifyDiagnosticSummaryContract.py", (
+                "local diagnostic summary",
+                "provider failure, runtime failure, package failure, frontend failure",
+            )),
+            ("tests/run.py", (
+                "\"diagnostic-summary-contract\"",
+                "tests/testDiagnosticSummary.py",
+                "tests/verifyDiagnosticSummaryContract.py",
+            )),
             ("docs/skills/ops/product/service-candidate.md", (
                 "token/API key/secret은 diagnostic summary와 로그에 남기지 않는다",
                 "raw JSON은 확장 진단",
+                "diagnostic-summary-contract",
             )),
             ("docs/skills/architecture/live-provider-ops.md", (
                 "실제 token과 API key는 저장소에 남기지 않는다",
                 "raw detail은 기본 UI에 노출하지 않는다",
+            )),
+            ("docs/skills/architecture/ssot-map.md", (
+                "diagnostic summary",
+                "src/codaro/system/diagnosticSummary.py",
             )),
         ),
     ),

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-import os
-import re
 from dataclasses import dataclass
 from typing import Any
+
+from ..system.diagnosticSummary import safeDiagnosticText
 
 
 @dataclass(frozen=True)
@@ -194,13 +194,4 @@ def providerErrorPayload(exc: BaseException, *, provider: str | None = None) -> 
 
 
 def safeProviderDetail(value: str, *, limit: int = 500) -> str:
-    text = value
-    for envName in ("OPENAI_API_KEY", "CODARO_LLM_API_KEY"):
-        secret = os.environ.get(envName)
-        if secret:
-            text = text.replace(secret, "[redacted]")
-    text = re.sub(r"Bearer\s+[A-Za-z0-9._~+/=-]+", "Bearer [redacted]", text)
-    text = re.sub(r"sk-[A-Za-z0-9_-]{12,}", "sk-[redacted]", text)
-    text = re.sub(r'"access_token"\s*:\s*"[^"]+"', '"access_token":"[redacted]"', text)
-    text = re.sub(r'"refresh_token"\s*:\s*"[^"]+"', '"refresh_token":"[redacted]"', text)
-    return text[:limit]
+    return safeDiagnosticText(value, limit=limit)

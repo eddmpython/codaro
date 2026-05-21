@@ -104,6 +104,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 문제가 생겼을 때 사용자는 raw JSON을 먼저 보지 않아야 한다.
 
 - local diagnostic summary는 provider failure, runtime failure, package failure, frontend failure를 분리한다.
+- summary payload는 `provider`, `runtime`, `package`, `frontend` category count와 다음 action을 가진다.
 - raw JSON은 확장 진단으로만 본다.
 - token/API key/secret은 diagnostic summary와 로그에 남기지 않는다.
 - 문제 재현에는 provider/model/latency/error/tool sequence/workloop trace가 충분해야 한다.
@@ -121,6 +122,7 @@ uv run python -X utf8 tests/run.py gate backend
 uv run python -X utf8 tests/run.py gate learning-system-readiness
 uv run python -X utf8 tests/run.py gate dogfood-alpha-audit
 uv run python -X utf8 tests/run.py gate service-readiness-audit
+uv run python -X utf8 tests/run.py gate diagnostic-summary-contract
 uv run python -X utf8 tests/run.py gate ai-live-smoke
 uv run python -X utf8 tests/run.py gate provider-settings-browser
 uv run python -X utf8 tests/run.py gate install-launcher-smoke
@@ -133,7 +135,7 @@ uv run python -X utf8 tests/run.py gate landing-build
 uv run python -X utf8 tests/run.py gate launcher-test
 ```
 
-`editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
+`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
 
 ## 완료 판단
 
