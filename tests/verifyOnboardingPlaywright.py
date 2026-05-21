@@ -105,7 +105,7 @@ class OnboardingStubApi:
         self._thread.join(timeout=4)
 
     def assertExpectedCalls(self) -> None:
-        required = {"GET /api/health", "GET /api/bootstrap", "GET /api/ai/profile"}
+        required = {"GET /api/health", "GET /api/bootstrap", "GET /api/system/diagnostics", "GET /api/ai/profile"}
         missing = sorted(required - set(self.calls))
         if missing:
             raise VerificationError("onboarding API calls missing: " + ", ".join(missing))
@@ -140,6 +140,8 @@ class OnboardingStubApi:
                     self._sendJson({"status": "ok"})
                 elif path == "/api/bootstrap":
                     self._sendJson({"appMode": False, "documentPath": None, "workspaceRoot": str(ROOT), "rootPath": str(ROOT)})
+                elif path == "/api/system/diagnostics":
+                    self._sendJson(diagnosticPayload(owner.ready))
                 elif path == "/api/curriculum/categories":
                     self._sendJson({
                         "categories": [
@@ -244,7 +246,7 @@ def jsAssertFallbackOnboarding() -> str:
   const text = document.body.innerText;
   const providerButton = [...document.querySelectorAll('button')].find((button) => button.textContent?.includes('Provider 연결'));
   const avatar = [...document.querySelectorAll('img')].some((img) => img.getAttribute('src')?.includes('/brand/avatar-small.png'));
-  const required = ['Codaro로 무엇을 만들까요?', '목표부터 말하세요', 'Provider 연결', 'Pandas 레슨', '브라우저 루틴', '자동화 노트북'];
+  const required = ['Codaro로 무엇을 만들까요?', '목표부터 말하세요', 'Provider 연결', '시작 진단 필요', 'Pandas 레슨', '브라우저 루틴', '자동화 노트북'];
   const missing = required.filter((item) => !text.includes(item));
   if (missing.length) throw new Error('fallback onboarding missing: ' + missing.join(', '));
   if (!providerButton || providerButton.disabled) throw new Error('Provider 연결 button is missing or disabled');
@@ -262,6 +264,7 @@ def jsAssertReadyOnboarding() -> str:
   const providerButton = [...document.querySelectorAll('button')].find((button) => button.textContent?.includes('Provider 연결'));
   if (!text.includes('Codaro로 무엇을 만들까요?')) throw new Error('ready onboarding hero missing');
   if (providerButton) throw new Error('Provider 연결 button should not remain after provider is ready');
+  if (text.includes('시작 진단 필요')) throw new Error('startup diagnostic warning should clear after provider is ready');
   return 'ready-onboarding-ok';
 })()
 """)
@@ -359,6 +362,34 @@ def providerCatalog() -> list[dict[str, Any]]:
         {"id": "ollama", "name": "Ollama", "label": "Ollama", "authKind": "local"},
         {"id": "custom", "name": "Custom", "label": "Custom", "authKind": "custom", "envKey": "CUSTOM_API_KEY"},
     ]
+
+
+def diagnosticPayload(ready: bool) -> dict[str, Any]:
+    if ready:
+        return {
+            "version": 1,
+            "status": "ok",
+            "items": [],
+            "categories": {"provider": 0, "runtime": 0, "package": 0, "frontend": 0},
+            "nextActions": [],
+        }
+    return {
+        "version": 1,
+        "status": "needs-action",
+        "items": [
+            {
+                "category": "provider",
+                "code": "provider_not_connected",
+                "message": "브라우저 로그인 후 실제 provider 응답을 사용할 수 있습니다.",
+                "action": "connect-provider",
+                "severity": "error",
+                "recoverable": True,
+                "metadata": {"provider": "oauth-chatgpt", "authKind": "oauth"},
+            }
+        ],
+        "categories": {"provider": 1, "runtime": 0, "package": 0, "frontend": 0},
+        "nextActions": ["connect-provider"],
+    }
 
 
 def curriculumLessonPayload() -> dict[str, Any]:

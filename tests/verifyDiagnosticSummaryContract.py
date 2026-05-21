@@ -51,6 +51,24 @@ CHECKS = (
         ),
     ),
     (
+        "editor/src/lib/appBootstrap.ts",
+        (
+            "systemDiagnostics",
+            "diagnosticNoticeFromSummary",
+            "시작 진단 필요",
+            "readableDiagnosticAction",
+            "connect-provider",
+        ),
+    ),
+    (
+        "editor/src/components/app/topBar.tsx",
+        (
+            "showStatusNotice",
+            "notice.tone === \"warning\"",
+            "text-amber-500",
+        ),
+    ),
+    (
         "editor/src/types.ts",
         (
             "DiagnosticSummary",
@@ -81,6 +99,7 @@ CHECKS = (
         "docs/skills/ops/product/service-candidate.md",
         (
             "local diagnostic summary",
+            "부트스트랩은 `/api/system/diagnostics`를 읽어 시작 진단 안내를 제품 상단 상태로 보여준다",
             "provider failure, runtime failure, package failure, frontend failure",
             "token/API key/secret은 diagnostic summary와 로그에 남기지 않는다",
         ),

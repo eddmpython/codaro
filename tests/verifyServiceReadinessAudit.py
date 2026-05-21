@@ -148,6 +148,8 @@ SERVICE_REQUIREMENTS = (
             ("tests/verifyOnboardingPlaywright.py", (
                 "Codaro로 무엇을 만들까요?",
                 "Provider 연결",
+                "GET /api/system/diagnostics",
+                "시작 진단 필요",
                 "기본 안내 모드",
                 "provider 연결됨",
                 "Pandas 레슨",
@@ -237,6 +239,15 @@ SERVICE_REQUIREMENTS = (
             ("editor/src/lib/api.ts", (
                 "systemDiagnostics",
                 "/api/system/diagnostics",
+            )),
+            ("editor/src/lib/appBootstrap.ts", (
+                "diagnosticNoticeFromSummary",
+                "시작 진단 필요",
+                "readableDiagnosticAction",
+            )),
+            ("editor/src/components/app/topBar.tsx", (
+                "showStatusNotice",
+                "notice.tone === \"warning\"",
             )),
             ("editor/src/types.ts", (
                 "DiagnosticSummary",
