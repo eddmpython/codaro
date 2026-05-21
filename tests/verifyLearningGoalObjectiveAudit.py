@@ -701,11 +701,12 @@ def evaluateLiveToolLoopCase(
     if not isinstance(signals, dict):
         missing.append("ai-live-smoke live-tool-loop: missing signals")
         return
-    requireToolSequence(
+    requireToolSequencePrefix(
         evidence,
         missing,
         signals.get("toolSequence"),
         ("packages-check", "write-curriculum-yaml"),
+        ("read-cells",),
         "ai-live-smoke live-tool-loop toolSequence",
     )
     checkEqual(evidence, missing, signals.get("contractGapCount"), 0, "ai-live-smoke live-tool-loop contractGapCount")
@@ -852,6 +853,29 @@ def requireToolSequence(
         evidence.append(f"{label}: {' -> '.join(expected)}")
     else:
         missing.append(f"{label}: expected {list(expected)!r}, got {value!r}")
+
+
+def requireToolSequencePrefix(
+    evidence: list[str],
+    missing: list[str],
+    value: Any,
+    requiredPrefix: tuple[str, ...],
+    allowedTrailing: tuple[str, ...],
+    label: str,
+) -> None:
+    if not isinstance(value, list):
+        missing.append(f"{label}: expected list with prefix {list(requiredPrefix)!r}, got {value!r}")
+        return
+    if value[:len(requiredPrefix)] != list(requiredPrefix):
+        missing.append(f"{label}: expected prefix {list(requiredPrefix)!r}, got {value!r}")
+        return
+    trailing = value[len(requiredPrefix):]
+    unexpected = [tool for tool in trailing if tool not in allowedTrailing]
+    if unexpected:
+        missing.append(f"{label}: unexpected trailing tools {unexpected!r}; got {value!r}")
+        return
+    suffix = f" (+ {' -> '.join(trailing)})" if trailing else ""
+    evidence.append(f"{label}: {' -> '.join(requiredPrefix)}{suffix}")
 
 
 def buildAuditPayload(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:

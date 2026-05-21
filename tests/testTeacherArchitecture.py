@@ -147,11 +147,14 @@ class _ScriptedProvider:
     def __init__(self, responses: list[ToolResponse]) -> None:
         self.responses = responses
         self.callCount = 0
+        self.messagesByCall: list[list[dict]] = []
 
     def completeWithTools(self, messages: list[dict], tools: list[dict]):
+        self.messagesByCall.append(copy.deepcopy(messages))
         return self._next()
 
     def complete(self, messages: list[dict]):
+        self.messagesByCall.append(copy.deepcopy(messages))
         return self._next()
 
     def _next(self) -> ToolResponse:
@@ -1510,6 +1513,93 @@ def testProviderLoopDoesNotReusePriorToolResultsForNextTurnPolicy() -> None:
     assert secondPayload["toolCalls"][0]["result"]["policyCode"] == "dependency-preflight-required"
     assert convManager.buildMessages(conversation.conversationId)[-2]["tool_call_id"] == "call-cell-2"
     assert "call-check-1" in json.dumps(convManager.buildMessages(conversation.conversationId), ensure_ascii=False)
+
+
+def testProviderLoopKeepsRetryTurnTraceSeparateAfterFailedPreflight() -> None:
+    convManager = ConversationManager()
+    conversation = convManager.create(role="teacher")
+    context = {"dependencyPreflight": {"packages": ["numpy"]}}
+    convManager.addUserMessage(conversation.conversationId, "numpy 셀 실행해줘")
+    firstProvider = _ScriptedProvider([
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-check-failed", name="packages-check", arguments={"names": ["numpy"]})],
+        ),
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-cell-blocked", name="cell-call", arguments={"operation": "run", "blockId": "cell-1"})],
+        ),
+        ToolResponse(answer="패키지 확인 실패로 멈췄습니다.", provider="fake", model="test", toolCalls=[]),
+    ])
+    firstExecutor = _ScriptedExecutor({
+        "packages-check": {"error": "kernel offline"},
+        "cell-call": {"passed": True, "status": "should-not-run"},
+    })
+
+    firstPayload = asyncio.run(runTeacherChatLoop(
+        provider=firstProvider,
+        convManager=convManager,
+        conversationId=conversation.conversationId,
+        messages=convManager.buildMessages(conversation.conversationId),
+        tools=toolSchemas(),
+        executor=firstExecutor,
+        orchestrator=TeacherOrchestrator.fromContext(context),
+    ))
+
+    convManager.addUserMessage(conversation.conversationId, "다시 확인하고 같은 셀 실행해줘")
+    secondProvider = _ScriptedProvider([
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-check-retry", name="packages-check", arguments={"names": ["numpy"]})],
+        ),
+        ToolResponse(
+            answer="",
+            provider="fake",
+            model="test",
+            toolCalls=[ToolCall(id="call-cell-retry", name="cell-call", arguments={"operation": "run", "blockId": "cell-1"})],
+        ),
+        ToolResponse(answer="재시도 실행 완료", provider="fake", model="test", toolCalls=[]),
+    ])
+    secondExecutor = _ScriptedExecutor({
+        "packages-check": {
+            "missing": [],
+            "packages": [{"name": "numpy", "installed": True}],
+            "ready": True,
+        },
+        "cell-call": {"passed": True, "status": "ok"},
+    })
+
+    secondPayload = asyncio.run(runTeacherChatLoop(
+        provider=secondProvider,
+        convManager=convManager,
+        conversationId=conversation.conversationId,
+        messages=convManager.buildMessages(conversation.conversationId),
+        tools=toolSchemas(),
+        executor=secondExecutor,
+        orchestrator=TeacherOrchestrator.fromContext(context),
+    ))
+
+    secondPayloadText = json.dumps(secondPayload, ensure_ascii=False)
+    secondTraceText = json.dumps(secondPayload["trace"], ensure_ascii=False)
+
+    assert [call["tool"] for call in firstExecutor.calls] == ["packages-check"]
+    assert firstPayload["trace"]["policyViolationCount"] == 1
+    assert "kernel offline" in json.dumps(firstPayload, ensure_ascii=False)
+    assert [call["tool"] for call in secondExecutor.calls] == ["packages-check", "cell-call"]
+    assert secondPayload["trace"]["toolSequence"] == ["packages-check", "cell-call"]
+    assert secondPayload["trace"]["policyViolationCount"] == 0
+    assert [call["toolCallId"] for call in secondPayload["toolCalls"]] == ["call-check-retry", "call-cell-retry"]
+    assert "kernel offline" not in secondPayloadText
+    assert "call-check-failed" not in secondPayloadText
+    assert "call-cell-blocked" not in secondPayloadText
+    assert "tool-policy-violation" not in secondTraceText
+    assert "call-check-failed" in json.dumps(secondProvider.messagesByCall[0], ensure_ascii=False)
 
 
 def testProviderLoopReportsProviderErrorsInTrace() -> None:

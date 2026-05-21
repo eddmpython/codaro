@@ -164,13 +164,19 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("docs/skills/ops/foundation/testing-and-gates.md", (
                 "turn-state durability",
                 "이전 tool result가 다음 turn의 tool policy state를 통과시키면 실패",
+                "이전 실패 result가 새 성공 turn의 toolCalls/trace/workloop payload에 섞이면 실패",
             )),
             ("tests/testTeacherArchitecture.py", (
                 "testProviderLoopDoesNotReusePriorToolResultsForNextTurnPolicy",
+                "testProviderLoopKeepsRetryTurnTraceSeparateAfterFailedPreflight",
                 "call-check-1",
                 "call-cell-2",
+                "call-check-failed",
+                "call-check-retry",
+                "kernel offline",
                 "dependency-preflight-required",
                 "secondExecutor.calls == []",
+                "tool-policy-violation",
             )),
             ("tests/verifyTeacherGoldenE2e.py", (
                 "pending clarification was not consumed",
