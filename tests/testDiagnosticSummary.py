@@ -4,6 +4,7 @@ import json
 
 from codaro.ai.providerErrors import ProviderRuntimeError, providerErrorDiagnostic, safeProviderDetail
 from codaro.system.diagnosticSummary import (
+    buildDiagnosticExport,
     buildDiagnosticSummary,
     frontendDiagnosticItem,
     itemFromProviderDiagnostic,
@@ -89,6 +90,18 @@ def testDiagnosticSummaryRedactsSecretsInTextAndMetadata(monkeypatch) -> None:
     assert '"access_token":"[redacted]"' in redacted["nested"]["message"]
 
 
+def testDiagnosticRedactionPreservesSafeSecretConfiguredState() -> None:
+    redacted = safeDiagnosticValue({
+        "secretConfigured": False,
+        "nested": {"secret_configured": True},
+        "secret": "actual-secret-value",
+    })
+
+    assert redacted["secretConfigured"] is False
+    assert redacted["nested"]["secret_configured"] is True
+    assert redacted["secret"] == "[redacted]"
+
+
 def testProviderDetailUsesSharedDiagnosticRedaction(monkeypatch) -> None:
     monkeypatch.setenv("CODARO_LLM_API_KEY", "sk-codaroenv123456")
 
@@ -120,3 +133,42 @@ def testDiagnosticSummaryProvidesReadableOkState() -> None:
     assert summary["status"] == "ok"
     assert summary["readableActions"] == []
     assert summary["summaryText"] == "진단 정상"
+
+
+def testDiagnosticExportPackagesRedactedSummaryAndContext(monkeypatch) -> None:
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-exportenv123456")
+    summary = buildDiagnosticSummary([
+        providerDiagnosticItem(
+            code="provider_not_connected",
+            message="Provider API 키가 필요합니다. sk-exportenv123456",
+            action="configure-api-key",
+            metadata={"provider": "openai", "apiKey": "sk-directexport123456"},
+        )
+    ])
+
+    export = buildDiagnosticExport(
+        summary,
+        context={
+            "provider": {
+                "activeProvider": "openai",
+                "authorization": "Bearer abc.def.ghi",
+                "access_token": "oauth-access-value",
+            },
+            "package": {"installer": "uv"},
+        },
+        generatedAt="2026-05-22T00:00:00Z",
+    )
+    encoded = json.dumps(export, ensure_ascii=False)
+
+    assert export["kind"] == "codaro-local-diagnostic-export"
+    assert export["generatedAt"] == "2026-05-22T00:00:00Z"
+    assert export["status"] == "needs-action"
+    assert export["summaryText"] == export["summary"]["summaryText"]
+    assert export["readableActions"] == ["API 키 입력"]
+    assert export["context"]["package"]["installer"] == "uv"
+    assert export["context"]["provider"]["authorization"] == "[redacted]"
+    assert export["context"]["provider"]["access_token"] == "[redacted]"
+    assert "sk-exportenv123456" not in encoded
+    assert "sk-directexport123456" not in encoded
+    assert "abc.def.ghi" not in encoded
+    assert "oauth-access-value" not in encoded

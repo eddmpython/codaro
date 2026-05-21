@@ -106,12 +106,14 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 문제가 생겼을 때 사용자는 raw JSON을 먼저 보지 않아야 한다.
 
 - local diagnostic summary는 provider failure, runtime failure, package failure, frontend failure를 분리한다.
+- local diagnostic export는 같은 summary를 `codaro-local-diagnostic-export` payload로 감싸고, 문제 공유에 필요한 앱/provider/runtime/package/frontend context만 redaction 후 담는다.
 - summary payload는 `provider`, `runtime`, `package`, `frontend` category count와 다음 action을 가진다.
 - summary payload는 운영자가 바로 읽을 수 있는 `summaryText`와 사용자 조치 문구인 `readableActions`도 가져야 한다.
 - `/api/system/diagnostics`는 provider 연결 상태, uv/project `.venv`, runtime status, editor build 산출물을 같은 summary payload로 반환한다.
+- `/api/system/diagnostics/export`는 같은 summary와 context를 반환하되 token/API key/secret/Authorization/OAuth access/refresh token/sk 값은 `[redacted]`로 제거한다.
 - 부트스트랩은 `/api/system/diagnostics`를 읽어 시작 진단 안내를 제품 상단 상태로 보여준다. 사용자는 Provider 연결 필요, uv 설치 필요, `.venv` 준비 필요, Editor 빌드 필요를 첫 화면에서 사람 문장으로 본다.
 - raw JSON은 확장 진단으로만 본다.
-- token/API key/secret은 diagnostic summary와 로그에 남기지 않는다.
+- token/API key/secret은 diagnostic summary/export와 로그에 남기지 않는다.
 - 문제 재현에는 provider/model/latency/error/tool sequence/workloop trace가 충분해야 한다.
 - gate 실행은 `tests/run.py`가 repo-local `output/test-runner/<gate>/` 아래로 실행 작업공간을 격리하고, uv/pytest cache는 비활성화하며, pytest basetemp, cargo target, scratch env를 고정해 사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다.
 - 브라우저 gate 직접 실행도 repo-local `output/test-runner/<verifier>/scratch/playwright` 아래에서 Playwright daemon/session 파일을 만든다. OS temp에 임의 디렉터리를 만들지 않고, 외부 Playwright session env가 남아 있어도 wrapper가 repo-local workspace로 덮어쓴다.

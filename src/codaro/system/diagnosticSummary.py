@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 import re
 from dataclasses import dataclass, field
+from datetime import UTC, datetime
 from typing import Any, Literal
 
 
@@ -89,6 +90,31 @@ def buildDiagnosticSummary(items: list[DiagnosticItem] | tuple[DiagnosticItem, .
         "nextActions": actions,
         "readableActions": readableActions,
         "summaryText": readableDiagnosticSummaryText(payloadItems, counts, readableActions),
+    }
+
+
+def buildDiagnosticExport(
+    summary: dict[str, Any],
+    *,
+    context: dict[str, Any] | None = None,
+    generatedAt: str | None = None,
+) -> dict[str, Any]:
+    safeSummary = safeDiagnosticValue(summary)
+    return {
+        "version": 1,
+        "kind": "codaro-local-diagnostic-export",
+        "generatedAt": generatedAt or datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        "status": safeDiagnosticText(str(safeSummary.get("status") or "unknown")),
+        "summaryText": safeDiagnosticText(str(safeSummary.get("summaryText") or "")),
+        "readableActions": safeDiagnosticValue(safeSummary.get("readableActions") or []),
+        "categories": safeDiagnosticValue(safeSummary.get("categories") or {}),
+        "items": safeDiagnosticValue(safeSummary.get("items") or []),
+        "summary": safeSummary,
+        "context": safeDiagnosticValue(context or {}),
+        "redaction": {
+            "secrets": "redacted",
+            "policy": "token/apiKey/secret/authorization/oauth/sk values are removed",
+        },
     }
 
 
@@ -193,7 +219,7 @@ def safeDiagnosticValue(value: Any) -> Any:
         redacted: dict[str, Any] = {}
         for key, item in value.items():
             textKey = str(key)
-            if _isSecretKey(textKey):
+            if _isSecretKey(textKey) and not _isSafeSecretState(textKey, item):
                 redacted[textKey] = "[redacted]"
             else:
                 redacted[textKey] = safeDiagnosticValue(item)
@@ -221,3 +247,8 @@ def safeDiagnosticText(value: str, *, limit: int = 500) -> str:
 def _isSecretKey(key: str) -> bool:
     normalized = key.replace("-", "_").lower()
     return any(secretKey.lower() in normalized for secretKey in SECRET_KEYS)
+
+
+def _isSafeSecretState(key: str, value: Any) -> bool:
+    normalized = key.replace("-", "_").lower()
+    return normalized in {"secretconfigured", "secret_configured"} and isinstance(value, bool)

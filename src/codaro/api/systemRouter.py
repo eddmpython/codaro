@@ -13,6 +13,7 @@ from ..serverLog import formatLogFields, getServerLogger
 from ..system import packageOps
 from ..system.diagnosticSummary import (
     DiagnosticItem,
+    buildDiagnosticExport,
     buildDiagnosticSummary,
     frontendDiagnosticItem,
     packageDiagnosticItem,
@@ -192,6 +193,10 @@ def createSystemRouter(state: ServerState) -> APIRouter:
     async def apiSystemDiagnostics() -> dict[str, Any]:
         return buildLocalDiagnosticSummary(state)
 
+    @router.get("/api/system/diagnostics/export")
+    async def apiSystemDiagnosticsExport() -> dict[str, Any]:
+        return buildLocalDiagnosticExport(state)
+
     return router
 
 
@@ -202,6 +207,57 @@ def buildLocalDiagnosticSummary(state: ServerState) -> dict[str, Any]:
     items.extend(_runtimeDiagnostics(state))
     items.extend(_frontendDiagnostics(state.webBuildRoot))
     return buildDiagnosticSummary(items)
+
+
+def buildLocalDiagnosticExport(state: ServerState) -> dict[str, Any]:
+    summary = buildLocalDiagnosticSummary(state)
+    return buildDiagnosticExport(summary, context=_diagnosticExportContext(state))
+
+
+def _diagnosticExportContext(state: ServerState) -> dict[str, Any]:
+    profile = getProfileManager().serialize()
+    activeProvider = str(profile.get("activeProvider") or profile.get("defaultProvider") or "")
+    catalog = _catalogById(profile.get("catalog"))
+    providers = profile.get("providers") if isinstance(profile.get("providers"), dict) else {}
+    runtime = providers.get(activeProvider) if isinstance(providers.get(activeProvider), dict) else {}
+    spec = catalog.get(activeProvider, {})
+    projectPython: str | None = None
+    packageEnvironmentReady = True
+    try:
+        projectPython = packageOps.getProjectPythonPath().as_posix()
+    except PackageEnvironmentError:
+        packageEnvironmentReady = False
+
+    return {
+        "app": {
+            "mode": state.mode,
+            "documentPath": state.documentPath.as_posix() if state.documentPath else None,
+            "workspaceRoot": state.workspaceRoot.as_posix(),
+            "studyRootExists": state.studyRoot.exists(),
+        },
+        "provider": {
+            "activeProvider": activeProvider or None,
+            "ready": profile.get("ready") is True,
+            "authKind": spec.get("authKind"),
+            "secretConfigured": runtime.get("secretConfigured"),
+        },
+        "runtime": {
+            "engineStatus": getattr(state.workspaceEngine, "status", "unknown"),
+            "sessionCount": state.sessionManager.sessionCount,
+            "executionCount": getattr(state.workspaceEngine, "executionCount", None),
+        },
+        "package": {
+            "installer": "uv",
+            "uvExecutableFound": shutil.which("uv") is not None,
+            "projectEnvironmentReady": packageEnvironmentReady,
+            "projectPython": projectPython,
+        },
+        "frontend": {
+            "webBuildRoot": state.webBuildRoot.as_posix(),
+            "indexHtmlFound": (state.webBuildRoot / "index.html").is_file(),
+            "assetsDirFound": (state.webBuildRoot / "_app").is_dir(),
+        },
+    }
 
 
 def _providerDiagnostics(profile: dict[str, Any]) -> list[DiagnosticItem]:

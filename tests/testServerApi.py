@@ -294,6 +294,61 @@ def testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets(monkeypatch,
     assert any(item["code"] == "uv-missing" for item in payload["items"])
 
 
+def testSystemDiagnosticsExportEndpointProvidesShareableRedactedPayload(monkeypatch, tmp_path: Path) -> None:
+    class _ProfileManager:
+        def serialize(self):
+            return {
+                "ready": False,
+                "activeProvider": "openai",
+                "defaultProvider": "openai",
+                "providers": {
+                    "openai": {
+                        "secretConfigured": False,
+                        "apiKey": "sk-exportdirect123456",
+                        "authorization": "Bearer abc.def.ghi",
+                    }
+                },
+                "catalog": [{"id": "openai", "authKind": "api_key"}],
+            }
+
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-exportenv123456")
+    monkeypatch.setattr(systemRouterModule, "getProfileManager", lambda: _ProfileManager())
+    monkeypatch.setattr(systemRouterModule.shutil, "which", lambda name: None if name == "uv" else "tool")
+
+    def missingProjectPython():
+        raise packageOps.PackageEnvironmentError(
+            "package_environment_missing",
+            "Project .venv missing with sk-exportenv123456",
+        )
+
+    monkeypatch.setattr(systemRouterModule.packageOps, "getProjectPythonPath", missingProjectPython)
+    monkeypatch.setattr(serverModule, "WEB_BUILD_ROOT", tmp_path / "missing-web-build")
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+
+    response = client.get("/api/system/diagnostics/export")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["kind"] == "codaro-local-diagnostic-export"
+    assert payload["status"] == "needs-action"
+    assert payload["summary"]["summaryText"] == payload["summaryText"]
+    assert payload["readableActions"] == ["API 키 입력", "uv 설치", ".venv 준비", "Editor 빌드"]
+    assert payload["context"]["provider"] == {
+        "activeProvider": "openai",
+        "ready": False,
+        "authKind": "api_key",
+        "secretConfigured": False,
+    }
+    assert payload["context"]["package"]["installer"] == "uv"
+    assert payload["context"]["package"]["uvExecutableFound"] is False
+    assert payload["context"]["package"]["projectEnvironmentReady"] is False
+    assert payload["context"]["frontend"]["indexHtmlFound"] is False
+    encoded = json.dumps(payload, ensure_ascii=False)
+    assert "sk-exportenv123456" not in encoded
+    assert "sk-exportdirect123456" not in encoded
+    assert "abc.def.ghi" not in encoded
+
+
 def testProviderValidateUsesProviderValidationDomain(monkeypatch) -> None:
     captured: dict[str, object] = {}
 

@@ -11,6 +11,7 @@ import type {
   CurriculumCategoriesPayload,
   CurriculumContentsPayload,
   CurriculumLessonPayload,
+  DiagnosticExportPayload,
   DiagnosticSummary,
   EStopStatus,
   ExecutionResult,
@@ -172,6 +173,7 @@ export const codaroApi = {
   health: () => requestJson<{ status: string }>("/api/health"),
   bootstrap: () => requestJson<BootstrapPayload>("/api/bootstrap"),
   systemDiagnostics: () => requestJson<DiagnosticSummary>("/api/system/diagnostics"),
+  systemDiagnosticsExport: () => requestJson<DiagnosticExportPayload>("/api/system/diagnostics/export"),
   loadDocument: (path: string) => postJson<{ path: string; document: CodaroDocument; exists: boolean }>(
     "/api/document/load",
     { path },

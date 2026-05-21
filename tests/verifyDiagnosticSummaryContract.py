@@ -14,12 +14,14 @@ CHECKS = (
             "DIAGNOSTIC_CATEGORIES",
             "\"provider\", \"runtime\", \"package\", \"frontend\"",
             "buildDiagnosticSummary",
+            "buildDiagnosticExport",
             "safeDiagnosticValue",
             "safeDiagnosticText",
             "readableDiagnosticAction",
             "readableDiagnosticSummaryText",
             "summaryText",
             "readableActions",
+            "codaro-local-diagnostic-export",
             "itemFromProviderDiagnostic",
             "providerDiagnosticItem",
             "runtimeDiagnosticItem",
@@ -39,7 +41,10 @@ CHECKS = (
         "src/codaro/api/systemRouter.py",
         (
             "/api/system/diagnostics",
+            "/api/system/diagnostics/export",
             "buildLocalDiagnosticSummary",
+            "buildLocalDiagnosticExport",
+            "_diagnosticExportContext",
             "_providerDiagnostics",
             "_packageDiagnostics",
             "_runtimeDiagnostics",
@@ -51,7 +56,10 @@ CHECKS = (
         (
             "systemDiagnostics",
             "/api/system/diagnostics",
+            "systemDiagnosticsExport",
+            "/api/system/diagnostics/export",
             "DiagnosticSummary",
+            "DiagnosticExportPayload",
         ),
     ),
     (
@@ -77,8 +85,10 @@ CHECKS = (
         "editor/src/types.ts",
         (
             "DiagnosticSummary",
+            "DiagnosticExportPayload",
             "DiagnosticCategory",
             "\"provider\" | \"runtime\" | \"package\" | \"frontend\"",
+            "codaro-local-diagnostic-export",
         ),
     ),
     (
@@ -86,7 +96,9 @@ CHECKS = (
         (
             "testDiagnosticSummarySeparatesFailureCategoriesAndActions",
             "testDiagnosticSummaryRedactsSecretsInTextAndMetadata",
+            "testDiagnosticRedactionPreservesSafeSecretConfiguredState",
             "testDiagnosticSummaryProvidesReadableOkState",
+            "testDiagnosticExportPackagesRedactedSummaryAndContext",
             "testProviderDetailUsesSharedDiagnosticRedaction",
             "testProviderDiagnosticItemUsesSharedPayloadContract",
             "Bearer [redacted]",
@@ -99,7 +111,9 @@ CHECKS = (
         "tests/testServerApi.py",
         (
             "testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets",
+            "testSystemDiagnosticsExportEndpointProvidesShareableRedactedPayload",
             "/api/system/diagnostics",
+            "/api/system/diagnostics/export",
             "configure-base-url",
         ),
     ),
@@ -107,15 +121,18 @@ CHECKS = (
         "docs/skills/ops/product/service-candidate.md",
         (
             "local diagnostic summary",
+            "local diagnostic export",
             "부트스트랩은 `/api/system/diagnostics`를 읽어 시작 진단 안내를 제품 상단 상태로 보여준다",
+            "`/api/system/diagnostics/export`",
             "provider failure, runtime failure, package failure, frontend failure",
-            "token/API key/secret은 diagnostic summary와 로그에 남기지 않는다",
+            "token/API key/secret은 diagnostic summary/export와 로그에 남기지 않는다",
         ),
     ),
     (
         "docs/skills/architecture/ssot-map.md",
         (
             "diagnostic summary",
+            "diagnostic export",
             "src/codaro/system/diagnosticSummary.py",
         ),
     ),

@@ -141,6 +141,23 @@ export type DiagnosticSummary = {
   summaryText: string;
 };
 
+export type DiagnosticExportPayload = {
+  version: number;
+  kind: "codaro-local-diagnostic-export";
+  generatedAt: string;
+  status: DiagnosticSummary["status"] | "unknown";
+  summaryText: string;
+  readableActions: string[];
+  categories: Record<DiagnosticCategory, number>;
+  items: DiagnosticSummaryItem[];
+  summary: DiagnosticSummary;
+  context: Record<string, unknown>;
+  redaction: {
+    secrets: "redacted";
+    policy: string;
+  };
+};
+
 export type CurriculumCategory = {
   key: string;
   name: string;
