@@ -577,6 +577,36 @@ class TestOAuthChatGPTTools:
         assert diagnostic.action == "relogin-provider"
         assert diagnostic.provider == "oauth-chatgpt"
 
+    def test_refresh_missing_token_prompts_login(self, monkeypatch):
+        def failToken():
+            raise TokenRefreshError("no_token", "No saved token. Re-login required.")
+
+        monkeypatch.setattr(oauthProviderModule.oauthToken, "getValidToken", failToken)
+        provider = OAuthChatGPTProvider(LLMConfig(provider="oauth-chatgpt"))
+
+        with pytest.raises(ChatGPTOAuthError) as excinfo:
+            provider.checkAvailable()
+
+        diagnostic = providerErrorDiagnostic(excinfo.value)
+        assert diagnostic.code == "provider_login_required"
+        assert diagnostic.action == "connect-provider"
+        assert diagnostic.provider == "oauth-chatgpt"
+
+    def test_refresh_client_change_keeps_compatibility_action(self, monkeypatch):
+        def failToken():
+            raise TokenRefreshError("client_changed", "OAuth Client ID may have changed.")
+
+        monkeypatch.setattr(oauthProviderModule.oauthToken, "getValidToken", failToken)
+        provider = OAuthChatGPTProvider(LLMConfig(provider="oauth-chatgpt"))
+
+        with pytest.raises(ChatGPTOAuthError) as excinfo:
+            provider.checkAvailable()
+
+        diagnostic = providerErrorDiagnostic(excinfo.value)
+        assert diagnostic.code == "provider_compatibility_error"
+        assert diagnostic.action == "check-provider-compatibility"
+        assert diagnostic.provider == "oauth-chatgpt"
+
     def test_retry_refresh_network_failure_keeps_network_action(self, monkeypatch):
         monkeypatch.setattr(oauthProviderModule.oauthToken, "getAccountId", lambda: None)
         monkeypatch.setattr(

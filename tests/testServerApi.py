@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 import pytest
@@ -8,12 +9,42 @@ from pydantic import ValidationError
 
 import codaro.api.aiRouter as aiRouterModule
 from codaro.api.kernelWebSocket import firstKernelWsValidationMessage, validateKernelWsMessage
+from codaro.ai.conversation import ConversationManager
+from codaro.ai.oauthToken import TokenRefreshError
+from codaro.ai.profile import AiProfileManager
+from codaro.ai.providerSpec import oauthSecretName
+from codaro.ai.providers import oauthChatgptProvider as oauthProviderModule
+from codaro.ai.secrets import SecretStore
 import codaro.server as serverModule
 from codaro.document import createEmptyDocument
 from codaro.kernel.protocol import WsExecuteMessage
 from codaro.runtime import LocalEngine
 from codaro.server import createServerApp
 from codaro.system import packageOps
+
+
+def oauthChatProfile(tmp_path: Path) -> AiProfileManager:
+    secretStore = SecretStore(path=tmp_path / "secrets.json")
+    profileManager = AiProfileManager(path=tmp_path / "ai_profile.json", secretStore=secretStore)
+    profileManager.update(provider="oauth-chatgpt", updatedBy="test")
+    secretStore.setJson(
+        oauthSecretName("oauth-chatgpt"),
+        {
+            "access_token": "expired-access-test",
+            "refresh_token": "expired-refresh-test",
+            "expires_at": 0,
+        },
+    )
+    return profileManager
+
+
+def sseJsonEvents(text: str) -> list[dict]:
+    events: list[dict] = []
+    for frame in text.strip().split("\n\n"):
+        dataLines = [line[6:] for line in frame.splitlines() if line.startswith("data: ")]
+        if dataLines:
+            events.append(json.loads("\n".join(dataLines)))
+    return events
 
 
 def testLoadMissingDocument(tmp_path: Path) -> None:
@@ -264,6 +295,69 @@ def testProviderValidatePassesResponseProbe(monkeypatch) -> None:
     assert response.status_code == 200
     assert captured["provider"] == "custom"
     assert captured["probe"] == "response"
+
+
+def testAiChatReportsOauthRefreshExpiredAsReloginDiagnostic(monkeypatch, tmp_path: Path) -> None:
+    profileManager = oauthChatProfile(tmp_path)
+    conversationManager = ConversationManager()
+
+    def failValidToken():
+        raise TokenRefreshError("expired", "refresh_token expired. Re-login required.")
+
+    monkeypatch.setattr(aiRouterModule, "getProfileManager", lambda: profileManager)
+    monkeypatch.setattr(aiRouterModule, "getConversationManager", lambda: conversationManager)
+    monkeypatch.setattr(oauthProviderModule.oauthToken, "getValidToken", failValidToken)
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+
+    response = client.post(
+        "/api/ai/chat",
+        json={"message": "현재 provider 상태를 한 문장으로 확인해줘", "role": "teacher"},
+    )
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["provider"] == "oauth-chatgpt"
+    assert payload["model"] == "gpt-5.4"
+    assert payload["answer"] == "로그인 세션이 만료되었습니다. Provider 설정에서 다시 로그인하세요."
+    assert "refresh_token" not in payload["answer"]
+    workloop = payload["trace"]["workloop"][0]
+    assert workloop["workLabel"] == "provider 오류"
+    assert workloop["provider"] == "oauth-chatgpt"
+    assert workloop["diagnosticCode"] == "provider_relogin_required"
+    assert workloop["diagnosticAction"] == "relogin-provider"
+    assert workloop["error"] == "로그인 세션이 만료되었습니다. Provider 설정에서 다시 로그인하세요."
+
+
+def testAiChatStreamReportsOauthRefreshExpiredAsDiagnosticEvent(monkeypatch, tmp_path: Path) -> None:
+    profileManager = oauthChatProfile(tmp_path)
+    conversationManager = ConversationManager()
+
+    def failValidToken():
+        raise TokenRefreshError("expired", "refresh_token expired. Re-login required.")
+
+    monkeypatch.setattr(aiRouterModule, "getProfileManager", lambda: profileManager)
+    monkeypatch.setattr(aiRouterModule, "getConversationManager", lambda: conversationManager)
+    monkeypatch.setattr(oauthProviderModule.oauthToken, "getValidToken", failValidToken)
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+
+    response = client.post(
+        "/api/ai/chat/stream",
+        json={"message": "현재 provider 상태를 한 문장으로 확인해줘", "role": "teacher"},
+    )
+
+    assert response.status_code == 200
+    events = sseJsonEvents(response.text)
+    assert [event["type"] for event in events] == ["start", "error"]
+    errorEvent = events[-1]
+    assert errorEvent["error"] == "로그인 세션이 만료되었습니다. Provider 설정에서 다시 로그인하세요."
+    assert errorEvent["diagnostic"]["code"] == "provider_relogin_required"
+    assert errorEvent["diagnostic"]["action"] == "relogin-provider"
+    assert errorEvent["diagnostic"]["provider"] == "oauth-chatgpt"
+    workloop = errorEvent["trace"]["workloop"][0]
+    assert workloop["provider"] == "oauth-chatgpt"
+    assert workloop["diagnosticCode"] == "provider_relogin_required"
+    assert workloop["diagnosticAction"] == "relogin-provider"
+    assert "refresh_token" not in errorEvent["error"]
 
 
 def testEnvironmentInfo() -> None:
