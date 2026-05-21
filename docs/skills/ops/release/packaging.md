@@ -13,6 +13,7 @@ whenToUse: 새 bundle 정의, manifest 스키마 변경, 외부 앱(xlwings 등)
 
 - 최종 사용자 배포는 `CodaroLauncher.exe` 하나를 기준으로 한다.
 - launcher는 embedded Python runtime과 manifest가 지정한 exact wheel 기반 curated bundle만 설치한다.
+- Codaro editor frontend는 기본적으로 `codaro` wheel 내부 `codaro/webBuild`에 포함한다. launcher manifest는 `editor.source: "backendWheel"`을 우선하고, 별도 editor zip은 legacy/internal archive release에서만 쓴다.
 - launcher는 index에서 arbitrary latest package를 해석하거나 무제한 `pip install` 경로를 제품 기본으로 삼지 않는다.
 - `codaro-excel` 같은 automation bundle은 Python package, helper runtime, capability probe, bootstrap을 launcher가 관리한다.
 - 외부 앱과 드라이버 의존성은 별도 경계로 둔다.

@@ -30,8 +30,8 @@ pub fn check_launcher_update(
     include_prerelease: bool,
 ) -> Result<Option<LauncherRelease>> {
     let client = build_http_client()?;
-    let api_root = std::env::var("CODARO_GITHUB_API_ROOT")
-        .unwrap_or_else(|_| "https://api.github.com".into());
+    let api_root =
+        std::env::var("CODARO_GITHUB_API_ROOT").unwrap_or_else(|_| "https://api.github.com".into());
     let url = format!("{}/repos/{}/releases", api_root, repo);
 
     let response: Vec<serde_json::Value> = client
@@ -43,13 +43,15 @@ pub fn check_launcher_update(
         .json()
         .context("failed to parse releases")?;
 
-    let current = Version::parse(current_version)
-        .context("invalid current version")?;
+    let current = Version::parse(current_version).context("invalid current version")?;
 
     let mut best: Option<(Version, &serde_json::Value)> = None;
 
     for release in &response {
-        let is_prerelease = release.get("prerelease").and_then(|v| v.as_bool()).unwrap_or(false);
+        let is_prerelease = release
+            .get("prerelease")
+            .and_then(|v| v.as_bool())
+            .unwrap_or(false);
         if is_prerelease && !include_prerelease {
             continue;
         }
@@ -90,30 +92,34 @@ pub fn check_launcher_update(
 
     let download_url = assets
         .and_then(|list| {
-            list.iter().find(|a| {
-                a.get("name").and_then(|n| n.as_str()) == Some(&exe_asset_name)
-            })
+            list.iter()
+                .find(|a| a.get("name").and_then(|n| n.as_str()) == Some(&exe_asset_name))
         })
         .and_then(|a| a.get("browser_download_url").and_then(|u| u.as_str()))
         .map(|s| s.to_string());
 
     let download_url = match download_url {
         Some(url) => url,
-        None => bail!("launcher asset '{}' not found in release v{}", exe_asset_name, version),
+        None => bail!(
+            "launcher asset '{}' not found in release v{}",
+            exe_asset_name,
+            version
+        ),
     };
 
     let sha_asset_name = format!("{}.sha256", exe_asset_name);
     let sha256 = assets
         .and_then(|list| {
-            list.iter().find(|a| {
-                a.get("name").and_then(|n| n.as_str()) == Some(&sha_asset_name)
-            })
+            list.iter()
+                .find(|a| a.get("name").and_then(|n| n.as_str()) == Some(&sha_asset_name))
         })
         .and_then(|a| a.get("browser_download_url").and_then(|u| u.as_str()))
         .and_then(|sha_url| {
-            client.get(sha_url)
+            client
+                .get(sha_url)
                 .header("User-Agent", format!("codaro-launcher/{}", CURRENT_VERSION))
-                .send().ok()
+                .send()
+                .ok()
                 .and_then(|r| r.text().ok())
                 .map(|t| t.trim().split_whitespace().next().unwrap_or("").to_string())
         });
@@ -135,8 +141,7 @@ pub fn download_launcher_update(
     release: &LauncherRelease,
     download_dir: &Path,
 ) -> Result<SelfUpdateResult> {
-    fs::create_dir_all(download_dir)
-        .context("failed to create download directory")?;
+    fs::create_dir_all(download_dir).context("failed to create download directory")?;
 
     let asset_name = launcher_asset_name();
     let dest = download_dir.join(&asset_name);
@@ -152,13 +157,12 @@ pub fn download_launcher_update(
         bail!("download failed with status {}", response.status());
     }
 
-    let mut file = fs::File::create(&dest)
-        .context("failed to create destination file")?;
+    let mut file = fs::File::create(&dest).context("failed to create destination file")?;
     let mut hasher = Sha256::new();
     let mut buf = [0u8; 8192];
     loop {
-        let n = std::io::Read::read(&mut response, &mut buf)
-            .context("read error during download")?;
+        let n =
+            std::io::Read::read(&mut response, &mut buf).context("read error during download")?;
         if n == 0 {
             break;
         }
@@ -190,19 +194,14 @@ pub fn download_launcher_update(
     })
 }
 
-pub fn apply_self_update(
-    downloaded: &Path,
-    current_exe: &Path,
-) -> Result<PathBuf> {
+pub fn apply_self_update(downloaded: &Path, current_exe: &Path) -> Result<PathBuf> {
     let backup = current_exe.with_extension("old");
 
     if backup.exists() {
-        fs::remove_file(&backup)
-            .context("failed to remove previous backup")?;
+        fs::remove_file(&backup).context("failed to remove previous backup")?;
     }
 
-    fs::rename(current_exe, &backup)
-        .context("failed to rename current exe to backup")?;
+    fs::rename(current_exe, &backup).context("failed to rename current exe to backup")?;
 
     if let Err(err) = fs::copy(downloaded, current_exe) {
         fs::rename(&backup, current_exe).ok();

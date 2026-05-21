@@ -37,10 +37,11 @@ impl BackendLaunchConfig {
     ) -> Result<Self> {
         let release_dir = paths.release_dir(&state.release_id);
         let python_runtime_dir = paths.release_python_runtime_dir(&state.release_id);
+        let backend_python_path = release_dir.join("backend").join("site-packages");
         Ok(Self {
             python_executable: LauncherPaths::resolve_python_executable(&python_runtime_dir)?,
-            backend_python_path: release_dir.join("backend").join("site-packages"),
-            editor_root: paths.release_editor_dir(&state.release_id),
+            editor_root: resolve_editor_root(paths, state, &backend_python_path),
+            backend_python_path,
             workspace_root,
             entry_module: state.backend_entry_module.clone(),
             host,
@@ -95,6 +96,20 @@ impl BackendLaunchConfig {
             "--no-browser".into(),
         ]
     }
+}
+
+fn resolve_editor_root(
+    paths: &LauncherPaths,
+    state: &ActiveReleaseState,
+    backend_python_path: &std::path::Path,
+) -> PathBuf {
+    let staged_editor_root = paths.release_editor_dir(&state.release_id);
+    if staged_editor_root.join("index.html").is_file() {
+        return staged_editor_root;
+    }
+    backend_python_path
+        .join(state.backend_package_name.replace('-', "_"))
+        .join("webBuild")
 }
 
 pub fn wait_for_health(url: &str, timeout: Duration) -> Result<()> {
@@ -216,6 +231,51 @@ mod tests {
                 .current_dir
                 .contains(temp_dir.path().to_string_lossy().as_ref())
         );
+    }
+
+    #[test]
+    fn launch_config_uses_bundled_editor_when_archive_editor_is_missing() {
+        let temp_dir = tempdir().unwrap();
+        let paths = LauncherPaths::discover(Some(temp_dir.path().join("Codaro"))).unwrap();
+        let runtime_dir = paths.release_python_runtime_dir("2026.03.18-1");
+        fs::create_dir_all(&runtime_dir).unwrap();
+        if cfg!(windows) {
+            fs::write(runtime_dir.join("python.cmd"), "@echo off\r\n").unwrap();
+        } else {
+            fs::create_dir_all(runtime_dir.join("bin")).unwrap();
+            fs::write(runtime_dir.join("bin").join("python3"), "#!/bin/sh\n").unwrap();
+        }
+        let bundled_editor = paths
+            .release_dir("2026.03.18-1")
+            .join("backend")
+            .join("site-packages")
+            .join("codaro")
+            .join("webBuild");
+        fs::create_dir_all(bundled_editor.join("_app")).unwrap();
+        fs::write(bundled_editor.join("index.html"), "<!doctype html>").unwrap();
+
+        let state = ActiveReleaseState {
+            release_id: "2026.03.18-1".into(),
+            channel: "stable".into(),
+            launcher_version: "0.3.0".into(),
+            backend_package_name: "codaro".into(),
+            backend_version: "0.3.0".into(),
+            backend_entry_module: "codaro.cli".into(),
+            backend_console_script: "codaro".into(),
+            editor_version: "0.3.0".into(),
+            installed_at_unix_seconds: 1234,
+        };
+
+        let config = BackendLaunchConfig::from_active_release(
+            &paths,
+            &state,
+            "127.0.0.1".into(),
+            8765,
+            temp_dir.path().to_path_buf(),
+        )
+        .unwrap();
+
+        assert_eq!(config.editor_root, bundled_editor);
     }
 
     #[test]

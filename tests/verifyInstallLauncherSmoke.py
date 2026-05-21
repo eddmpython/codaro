@@ -77,10 +77,42 @@ EVIDENCE = (
         "launcher/codaro-launcher/src/backend.rs",
         (
             "pub struct BackendLaunchConfig",
+            "resolve_editor_root",
+            "CODARO_WEB_BUILD_ROOT",
+            "launch_config_uses_bundled_editor_when_archive_editor_is_missing",
             "pub fn wait_for_backend_ready",
             "health_url",
             "wait_for_backend_ready_fails_when_process_exits_early",
             "health_check_succeeds_when_server_replies",
+        ),
+    ),
+    Evidence(
+        "launcher-editor-backend-wheel-manifest",
+        "launcher/codaro-launcher/src/manifest.rs",
+        (
+            "EditorArtifact",
+            "backendWheel",
+            "is_backend_wheel_source",
+            "manifest_validation_accepts_backend_wheel_editor_source",
+        ),
+    ),
+    Evidence(
+        "launcher-editor-backend-wheel-stage",
+        "launcher/codaro-launcher/src/provision.rs",
+        (
+            "backendWheel:codaro/webBuild",
+            "backend_wheel_editor_root",
+            "verify_editor_build_root",
+            "stage_release_can_use_editor_build_bundled_in_backend_wheel",
+        ),
+    ),
+    Evidence(
+        "packaged-editor-wheel-publish-gate",
+        ".github/workflows/pypi-publish.yml",
+        (
+            "Verify wheel includes editor frontend",
+            "codaro/webBuild/index.html",
+            "codaro/webBuild/_app/",
         ),
     ),
     Evidence(
@@ -99,6 +131,9 @@ EVIDENCE = (
         (
             "exact wheel",
             "sha256",
+            "editor.source",
+            "backendWheel",
+            "codaro/webBuild",
             "제품 품질 검증용 내부 빌드",
             "launcher-managed bundle",
             "uv run codaro",
@@ -111,6 +146,8 @@ EVIDENCE = (
             "Python 없는 설치 경험",
             "last-known-good runtime",
             "backend health timeout",
+            "backendWheel",
+            "codaro/webBuild",
             "doctor",
             "state show",
         ),

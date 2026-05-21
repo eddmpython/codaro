@@ -12,7 +12,7 @@ pub struct ReleaseManifest {
     pub launcher_version: String,
     pub min_launcher_version: String,
     pub python_runtime: RuntimeArtifact,
-    pub editor: RuntimeArtifact,
+    pub editor: EditorArtifact,
     pub backend: BackendArtifact,
     #[serde(default)]
     pub bundles: Vec<BundleArtifact>,
@@ -25,6 +25,16 @@ pub struct RuntimeArtifact {
     pub version: String,
     pub url: String,
     pub sha256: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct EditorArtifact {
+    pub version: String,
+    #[serde(default = "default_editor_source")]
+    pub source: String,
+    pub url: Option<String>,
+    pub sha256: Option<String>,
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq)]
@@ -59,7 +69,7 @@ impl ReleaseManifest {
         ensure_present("launcherVersion", &self.launcher_version)?;
         ensure_present("minLauncherVersion", &self.min_launcher_version)?;
         self.python_runtime.validate("pythonRuntime")?;
-        self.editor.validate("editor")?;
+        self.editor.validate()?;
         self.backend.validate()?;
         for bundle in &self.bundles {
             bundle.validate()?;
@@ -93,6 +103,33 @@ impl RuntimeArtifact {
         ensure_valid_url(&format!("{field_name}.url"), &self.url)?;
         ensure_sha256(&format!("{field_name}.sha256"), &self.sha256)?;
         Ok(())
+    }
+}
+
+impl EditorArtifact {
+    pub fn is_backend_wheel_source(&self) -> bool {
+        self.source == "backendWheel"
+    }
+
+    fn validate(&self) -> Result<()> {
+        ensure_present("editor.version", &self.version)?;
+        match self.source.as_str() {
+            "archive" => {
+                let url = self.url.as_deref().context(
+                    "Manifest field `editor.url` is required when editor.source is `archive`.",
+                )?;
+                ensure_valid_url("editor.url", url)?;
+                let sha256 = self.sha256.as_deref().context(
+                    "Manifest field `editor.sha256` is required when editor.source is `archive`.",
+                )?;
+                ensure_sha256("editor.sha256", sha256)?;
+                Ok(())
+            }
+            "backendWheel" => Ok(()),
+            other => bail!(
+                "Manifest field `editor.source` must be `archive` or `backendWheel`, got `{other}`."
+            ),
+        }
     }
 }
 
@@ -142,6 +179,10 @@ fn ensure_sha256(field_name: &str, value: &str) -> Result<()> {
     Ok(())
 }
 
+fn default_editor_source() -> String {
+    "archive".into()
+}
+
 #[cfg(test)]
 mod tests {
     use super::ReleaseManifest;
@@ -189,6 +230,41 @@ mod tests {
         .unwrap();
 
         manifest.validate().unwrap();
+    }
+
+    #[test]
+    fn manifest_validation_accepts_backend_wheel_editor_source() {
+        let manifest: ReleaseManifest = serde_json::from_str(
+            r#"{
+                "manifestVersion": 1,
+                "channel": "stable",
+                "releaseId": "2026.03.18-1",
+                "launcherVersion": "0.3.0",
+                "minLauncherVersion": "0.3.0",
+                "pythonRuntime": {
+                    "version": "3.12.12",
+                    "url": "https://example.com/python.zip",
+                    "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                },
+                "editor": {
+                    "version": "0.3.0",
+                    "source": "backendWheel"
+                },
+                "backend": {
+                    "name": "codaro",
+                    "version": "0.3.0",
+                    "wheelUrl": "https://example.com/codaro.whl",
+                    "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+                    "entryModule": "codaro.cli",
+                    "consoleScript": "codaro"
+                },
+                "bundles": []
+            }"#,
+        )
+        .unwrap();
+
+        manifest.validate().unwrap();
+        assert!(manifest.editor.is_backend_wheel_source());
     }
 
     #[test]

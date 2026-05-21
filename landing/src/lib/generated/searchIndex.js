@@ -260,7 +260,7 @@ export const searchEntries = [
     "title": "로컬 배포 bundle 원칙",
     "description": "Packaging rules for local distribution and bundled assets.",
     "url": "/codaro/docs/skills/ops/release/packaging",
-    "text": "로컬 배포 bundle 원칙 최종 사용자 배포는 하나를 기준으로 한다. launcher는 embedded Python runtime과 manifest가 지정한 exact wheel 기반 curated bundle만 설치한다. launcher는 index에서 arbitrary latest package를 해석하거나 무제한 경로를 제품 기본으로 삼지 않는다. 같은 automation bundle은 Python package, helper runtime, capability probe, bootstrap을 launcher가 관리한다. 외부 앱과 드라이버 의존성은 별도 경계로 둔다. 예: 기반 Excel app automation은 launcher가 Python 쪽 의존성과 bootstrap을 관리하지만, Microsoft Excel 자체는 사용자가 설치해야 한다. 세부 배포 설계의 source of truth는 , 다.",
+    "text": "로컬 배포 bundle 원칙 최종 사용자 배포는 하나를 기준으로 한다. launcher는 embedded Python runtime과 manifest가 지정한 exact wheel 기반 curated bundle만 설치한다. Codaro editor frontend는 기본적으로 wheel 내부 에 포함한다. launcher manifest는 을 우선하고, 별도 editor zip은 legacy/internal archive release에서만 쓴다. launcher는 index에서 arbitrary latest package를 해석하거나 무제한 경로를 제품 기본으로 삼지 않는다. 같은 automation bundle은 Python package, helper runtime, capability probe, bootstrap을 launcher가 관리한다. 외부 앱과 드라이버 의존성은 별도 경계로 둔다. 예: 기반 Excel app automation은 launcher가 Python 쪽 의존성과 bootstrap을 관리하지만, Microsoft Excel 자체는 사용자가 설치해야 한다. 세부 배포 설계의 source of truth는 , 다.",
     "category": "ops"
   },
   {

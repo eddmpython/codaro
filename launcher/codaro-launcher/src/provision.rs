@@ -21,7 +21,7 @@ pub struct StagedReleaseSummary {
     pub release_id: String,
     pub manifest_path: PathBuf,
     pub backend_wheel_path: PathBuf,
-    pub editor_archive_path: PathBuf,
+    pub editor_archive_path: Option<PathBuf>,
     pub editor_root_path: PathBuf,
     pub python_runtime_archive_path: PathBuf,
     pub python_executable_path: PathBuf,
@@ -81,21 +81,24 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
     let backend_site_packages_path = release_dir.join("backend").join("site-packages");
     let backend_wheels_dir = release_dir.join("backend").join("wheels");
     let editor_archive_dir = release_dir.join("editor").join("archive");
-    let editor_root_path = paths.release_editor_dir(&manifest.release_id);
+    let staged_editor_root_path = paths.release_editor_dir(&manifest.release_id);
     let runtime_archive_dir = release_dir.join("runtime").join("archive");
     let python_runtime_dir = paths.release_python_runtime_dir(&manifest.release_id);
     let bundle_wheels_dir = release_dir.join("bundles").join("wheels");
 
-    for directory in [
+    let mut directories = vec![
         backend_site_packages_path.clone(),
         backend_wheels_dir.clone(),
-        editor_archive_dir.clone(),
-        editor_root_path.clone(),
         runtime_archive_dir.clone(),
         python_runtime_dir.clone(),
         bundle_wheels_dir.clone(),
         downloads_dir.clone(),
-    ] {
+    ];
+    if !manifest.editor.is_backend_wheel_source() {
+        directories.push(editor_archive_dir.clone());
+        directories.push(staged_editor_root_path.clone());
+    }
+    for directory in directories {
         fs::create_dir_all(&directory).with_context(|| {
             format!(
                 "Failed to create staged release directory `{}`.",
@@ -110,19 +113,34 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
         &manifest.backend.wheel_url,
         &manifest.backend.sha256,
     )?;
-    let editor_archive_path = stage_artifact(
-        &downloads_dir.join("editor"),
-        &editor_archive_dir,
-        &manifest.editor.url,
-        &manifest.editor.sha256,
-    )?;
     let python_runtime_archive_path = stage_artifact(
         &downloads_dir.join("runtime"),
         &runtime_archive_dir,
         &manifest.python_runtime.url,
         &manifest.python_runtime.sha256,
     )?;
-    extract_zip_archive(&editor_archive_path, &editor_root_path)?;
+    let editor_archive_path = if manifest.editor.is_backend_wheel_source() {
+        None
+    } else {
+        let editor_url = manifest
+            .editor
+            .url
+            .as_deref()
+            .context("editor.url is required for archive-backed editor releases.")?;
+        let editor_sha256 = manifest
+            .editor
+            .sha256
+            .as_deref()
+            .context("editor.sha256 is required for archive-backed editor releases.")?;
+        let archive_path = stage_artifact(
+            &downloads_dir.join("editor"),
+            &editor_archive_dir,
+            editor_url,
+            editor_sha256,
+        )?;
+        extract_zip_archive(&archive_path, &staged_editor_root_path)?;
+        Some(archive_path)
+    };
     extract_zip_archive(&python_runtime_archive_path, &python_runtime_dir)?;
     let python_executable_path = LauncherPaths::resolve_python_executable(&python_runtime_dir)?;
 
@@ -146,6 +164,31 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
         &backend_site_packages_path,
         &wheel_paths,
     )?;
+    let editor_root_path = if manifest.editor.is_backend_wheel_source() {
+        let bundled_editor_root =
+            backend_wheel_editor_root(&backend_site_packages_path, &manifest.backend.name);
+        verify_editor_build_root(&bundled_editor_root)?;
+        bundled_editor_root
+    } else {
+        verify_editor_build_root(&staged_editor_root_path)?;
+        staged_editor_root_path
+    };
+    let (editor_source, editor_sha256, editor_staged_path) =
+        if manifest.editor.is_backend_wheel_source() {
+            (
+                "backendWheel:codaro/webBuild".to_string(),
+                manifest.backend.sha256.clone(),
+                editor_root_path.clone(),
+            )
+        } else {
+            (
+                manifest.editor.url.clone().unwrap_or_default(),
+                manifest.editor.sha256.clone().unwrap_or_default(),
+                editor_archive_path
+                    .clone()
+                    .context("editor archive path missing for archive-backed editor release.")?,
+            )
+        };
 
     let manifest_path = release_dir.join("manifest.json");
     fs::write(&manifest_path, serde_json::to_string_pretty(&manifest)?).with_context(|| {
@@ -167,9 +210,9 @@ pub fn stage_release(paths: &LauncherPaths, manifest_source: &str) -> Result<Sta
         editor: InstalledArtifact {
             name: "editor".into(),
             version: manifest.editor.version.clone(),
-            sha256: manifest.editor.sha256.clone(),
-            source: manifest.editor.url.clone(),
-            staged_path: editor_archive_path.clone(),
+            sha256: editor_sha256,
+            source: editor_source,
+            staged_path: editor_staged_path,
         },
         python_runtime: InstalledArtifact {
             name: "python-runtime".into(),
@@ -232,6 +275,24 @@ fn installed_bundle(bundle: &BundleArtifact, staged_path: PathBuf) -> InstalledA
         source: bundle.wheel_url.clone(),
         staged_path,
     }
+}
+
+fn backend_wheel_editor_root(site_packages_dir: &Path, backend_package_name: &str) -> PathBuf {
+    site_packages_dir
+        .join(backend_package_name.replace('-', "_"))
+        .join("webBuild")
+}
+
+fn verify_editor_build_root(editor_root: &Path) -> Result<()> {
+    let index_path = editor_root.join("index.html");
+    let assets_path = editor_root.join("_app");
+    if index_path.is_file() && assets_path.is_dir() {
+        return Ok(());
+    }
+    bail!(
+        "Editor build root `{}` is incomplete. Expected `index.html` and `_app/`.",
+        editor_root.display()
+    );
 }
 
 fn stage_artifact(
@@ -714,7 +775,12 @@ mod tests {
 
         assert!(summary.manifest_path.is_file());
         assert!(summary.backend_wheel_path.is_file());
-        assert!(summary.editor_archive_path.is_file());
+        assert!(
+            summary
+                .editor_archive_path
+                .as_ref()
+                .is_some_and(|path| path.is_file())
+        );
         assert!(summary.python_runtime_archive_path.is_file());
         assert!(summary.editor_root_path.join("index.html").is_file());
         assert!(
@@ -736,6 +802,74 @@ mod tests {
         assert_eq!(install_record.release_id, "2026.03.18-1");
         assert_eq!(install_record.backend.name, "codaro");
         assert_eq!(install_record.bundles[0].name, "codaro-excel");
+    }
+
+    #[test]
+    fn stage_release_can_use_editor_build_bundled_in_backend_wheel() {
+        let temp_dir = tempdir().unwrap();
+        let source_dir = temp_dir.path().join("source");
+        fs::create_dir_all(&source_dir).unwrap();
+
+        let python_path = write_runtime_archive(&source_dir, "python-runtime.zip");
+        let backend_path = write_wheel_archive(
+            &source_dir,
+            "codaro-0.3.0-py3-none-any.whl",
+            "codaro",
+            "0.3.0",
+            vec![
+                (
+                    "codaro/cli.py".into(),
+                    "def main():\n    return 'ok'\n".as_bytes().to_vec(),
+                ),
+                (
+                    "codaro/webBuild/index.html".into(),
+                    "<!doctype html><title>Codaro</title>".as_bytes().to_vec(),
+                ),
+                (
+                    "codaro/webBuild/_app/app.js".into(),
+                    "console.log('codaro')\n".as_bytes().to_vec(),
+                ),
+            ],
+        );
+
+        let manifest_path = temp_dir.path().join("manifest.json");
+        fs::write(
+            &manifest_path,
+            sample_backend_wheel_editor_manifest_json(
+                "2026.03.18-wheel",
+                &Url::from_file_path(&python_path).unwrap().to_string(),
+                sha256_hex(&fs::read(&python_path).unwrap()),
+                &Url::from_file_path(&backend_path).unwrap().to_string(),
+                sha256_hex(&fs::read(&backend_path).unwrap()),
+            ),
+        )
+        .unwrap();
+
+        let paths = LauncherPaths::discover(Some(temp_dir.path().join("Codaro"))).unwrap();
+        paths.ensure_layout().unwrap();
+
+        let summary = stage_release(&paths, manifest_path.to_str().unwrap()).unwrap();
+        let install_record: InstallRecord = serde_json::from_str(
+            &fs::read_to_string(
+                paths
+                    .release_dir("2026.03.18-wheel")
+                    .join("backend")
+                    .join("install-record.json"),
+            )
+            .unwrap(),
+        )
+        .unwrap();
+
+        assert!(summary.editor_archive_path.is_none());
+        assert!(summary.editor_root_path.join("index.html").is_file());
+        assert!(summary.editor_root_path.join("_app").is_dir());
+        assert!(
+            summary
+                .editor_root_path
+                .ends_with(Path::new("site-packages").join("codaro").join("webBuild"))
+        );
+        assert_eq!(install_record.editor.source, "backendWheel:codaro/webBuild");
+        assert_eq!(install_record.editor.staged_path, summary.editor_root_path);
     }
 
     #[test]
@@ -819,10 +953,16 @@ mod tests {
         let archive_path = directory.join(file_name);
         write_zip_archive(
             &archive_path,
-            vec![(
-                "editor/index.html".into(),
-                "<!doctype html><title>Codaro</title>".as_bytes().to_vec(),
-            )],
+            vec![
+                (
+                    "editor/index.html".into(),
+                    "<!doctype html><title>Codaro</title>".as_bytes().to_vec(),
+                ),
+                (
+                    "editor/_app/app.js".into(),
+                    "console.log('codaro')\n".as_bytes().to_vec(),
+                ),
+            ],
         );
         archive_path
     }
@@ -949,6 +1089,41 @@ mod tests {
                 "consoleScript": "codaro",
             },
             "bundles": bundle_payload,
+        })
+        .to_string()
+    }
+
+    fn sample_backend_wheel_editor_manifest_json(
+        release_id: &str,
+        python_url: &str,
+        python_sha256: String,
+        backend_url: &str,
+        backend_sha256: String,
+    ) -> String {
+        serde_json::json!({
+            "manifestVersion": 1,
+            "channel": "stable",
+            "releaseId": release_id,
+            "launcherVersion": "0.3.0",
+            "minLauncherVersion": "0.3.0",
+            "pythonRuntime": {
+                "version": "3.12.12",
+                "url": python_url,
+                "sha256": python_sha256,
+            },
+            "editor": {
+                "version": "0.3.0",
+                "source": "backendWheel",
+            },
+            "backend": {
+                "name": "codaro",
+                "version": "0.3.0",
+                "wheelUrl": backend_url,
+                "sha256": backend_sha256,
+                "entryModule": "codaro.cli",
+                "consoleScript": "codaro",
+            },
+            "bundles": [],
         })
         .to_string()
     }

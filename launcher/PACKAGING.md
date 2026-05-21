@@ -16,6 +16,7 @@
 ## 결론 요약
 
 - core runtime은 `codaro` wheel로 배포한다
+- editor frontend는 `codaro` wheel 안의 `codaro/webBuild`로 함께 배포한다
 - 자동화 capability는 `extras`가 아니라 별도 package로 배포한다
 - launcher는 index에서 최신을 해석하지 않고 manifest가 지정한 exact wheel만 설치한다
 - GitHub Releases는 control plane, PyPI는 package artifact plane이다
@@ -45,6 +46,7 @@
 
 - `codaro`
   - editor server
+  - `codaro/webBuild` editor frontend build
   - document model
   - runtime contracts
   - LocalEngine / Pyodide adapter entrypoints
@@ -160,10 +162,23 @@ package 쪽 상세 규칙은 아래를 따른다.
 - `wheelUrl`
 - `sha256`
 
+### editor artifact 필수 필드
+
+일반 제품 release는 별도 editor zip을 만들지 않는다. `editor.source`를 `backendWheel`로 두고, launcher는 backend wheel 설치 후 `site-packages/codaro/webBuild`를 editor root로 사용한다.
+
+- `version`
+- `source`: `backendWheel`
+
+legacy 또는 내부 archive 검증이 필요할 때만 `source: "archive"`를 사용하며, 이 경우 `url`과 `sha256`이 필수다.
+
 예시:
 
 ```json
 {
+  "editor": {
+    "version": "0.3.0",
+    "source": "backendWheel"
+  },
   "backend": {
     "name": "codaro",
     "version": "0.3.0",
@@ -233,11 +248,13 @@ package 쪽 상세 규칙은 아래를 따른다.
 ### Core package
 
 1. Python package version bump
-2. wheel build
-3. tests
-4. publish to PyPI
-5. release manifest 생성
-6. GitHub Release에 manifest와 launcher/editor/python runtime asset 업로드
+2. editor build to `src/codaro/webBuild`
+3. wheel build
+4. wheel 내부 `codaro/webBuild/index.html`와 `_app/` asset 검증
+5. tests
+6. publish to PyPI
+7. release manifest 생성
+8. GitHub Release에 manifest와 launcher/python runtime asset 업로드
 
 ### Bundle package
 
@@ -359,10 +376,11 @@ launcher channel과 version 정책은 아래를 따른다.
 release 하나는 보통 아래 asset을 가진다.
 
 - launcher binary or installer
-- editor zip
 - embedded python zip
 - manifest json
 - optional release notes
+
+editor frontend는 기본적으로 PyPI의 `codaro` wheel 내부 `codaro/webBuild`로 들어간다. editor zip은 `editor.source: "archive"`를 쓰는 legacy/internal smoke release에서만 별도 asset으로 둔다.
 
 wheel은 원칙적으로 PyPI에 두고, manifest가 PyPI wheel URL을 가리킨다.
 
@@ -384,10 +402,15 @@ wheel은 원칙적으로 PyPI에 두고, manifest가 PyPI wheel URL을 가리킨
 
 - `launcher-release.yml`
   - build launcher
-  - package editor
   - package embedded python
   - generate manifest
   - create GitHub Release
+
+- `.github/workflows/pypi-publish.yml`
+  - build editor
+  - build wheel
+  - verify wheel includes `codaro/webBuild`
+  - trusted publish to PyPI
 
 - `bundle-release.yml`
   - bundle wheel publish
@@ -425,6 +448,8 @@ core repo + bundle repos
 - launcher manifest schema는 `entryModule`, `consoleScript`, `packageName`까지 반영됐다
 - launcher는 exact wheel과 archive를 stage하고 `install-record.json`에 기록할 수 있다
 - launcher는 staged release의 release-local Python runtime으로 exact backend wheel과 bundle wheel을 `backend/site-packages`에 실제 설치한다
+- launcher는 `editor.source: "backendWheel"` manifest에서 별도 editor zip 없이 backend wheel 내부 `codaro/webBuild`를 editor root로 사용한다
+- publish workflow는 wheel 안에 `codaro/webBuild/index.html`와 `_app/` asset이 포함됐는지 검증한다
 - bundle package는 아직 구현되지 않았다
 - `extras`는 아직 정리되지 않았지만 제품 capability용으로 쓰지 않는 것이 확정 방향이다
 - launcher-managed bundle과 user-managed external dependency 경계가 문서로 고정됐다

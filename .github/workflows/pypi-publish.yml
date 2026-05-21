@@ -47,6 +47,22 @@ jobs:
       - name: Build wheel
         run: uv build
 
+      - name: Verify wheel includes editor frontend
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import zipfile
+
+          wheel = next(Path("dist").glob("codaro-*.whl"))
+          with zipfile.ZipFile(wheel) as archive:
+              names = set(archive.namelist())
+          if "codaro/webBuild/index.html" not in names:
+              raise SystemExit("codaro/webBuild/index.html missing from wheel")
+          if not any(name.startswith("codaro/webBuild/_app/") for name in names):
+              raise SystemExit("codaro/webBuild/_app/ assets missing from wheel")
+          print(f"verified packaged editor frontend in {wheel}")
+          PY
+
       - name: Upload dist artifact
         uses: actions/upload-artifact@v4
         with:

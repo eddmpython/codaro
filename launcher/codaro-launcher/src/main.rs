@@ -296,23 +296,29 @@ fn main() -> Result<()> {
 }
 
 fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
-    use ipc::{IpcMessage, StatusPayload, LaunchStatus, ProgressPayload, ErrorPayload, encode_ipc};
-    use webview::{detect_webview_backend, WebviewBackend, open_in_system_browser};
+    use ipc::{ErrorPayload, IpcMessage, LaunchStatus, ProgressPayload, StatusPayload, encode_ipc};
+    use webview::{WebviewBackend, detect_webview_backend, open_in_system_browser};
 
     let stores = LauncherStateStores::new(paths);
     let active = stores.active_release.load_optional()?;
 
-    println!("{}", encode_ipc(&IpcMessage::SetStatus(StatusPayload {
-        status: LaunchStatus::Initializing,
-        url: None,
-    })));
+    println!(
+        "{}",
+        encode_ipc(&IpcMessage::SetStatus(StatusPayload {
+            status: LaunchStatus::Initializing,
+            url: None,
+        }))
+    );
 
     if active.is_none() {
-        println!("{}", encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
-            stage: "provision".into(),
-            message: "No active release. Checking for updates...".into(),
-            percent: None,
-        })));
+        println!(
+            "{}",
+            encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                stage: "provision".into(),
+                message: "No active release. Checking for updates...".into(),
+                percent: None,
+            }))
+        );
         let update_config = load_update_config(&stores)?;
         let source = update_config
             .manifest_source
@@ -320,22 +326,28 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
             .map(|s| s.to_string());
 
         if source.is_none() {
-            println!("{}", encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
-                stage: "provision".into(),
-                message: "Discovering release from GitHub...".into(),
-                percent: Some(10.0),
-            })));
+            println!(
+                "{}",
+                encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                    stage: "provision".into(),
+                    message: "Discovering release from GitHub...".into(),
+                    percent: Some(10.0),
+                }))
+            );
             let found = discover_manifest_for_repo(
                 &update_config.github_repo,
                 &update_config.github_manifest_asset_name,
                 update_config.allows_prerelease(),
                 LAUNCHER_VERSION,
             )?;
-            println!("{}", encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
-                stage: "provision".into(),
-                message: format!("Staging release {}...", found.release_tag),
-                percent: Some(30.0),
-            })));
+            println!(
+                "{}",
+                encode_ipc(&IpcMessage::SetProgress(ProgressPayload {
+                    stage: "provision".into(),
+                    message: format!("Staging release {}...", found.release_tag),
+                    percent: Some(30.0),
+                }))
+            );
             let summary = stage_release(paths, &found.manifest_source)?;
             activate_release(paths, &summary.release_id)?;
         } else if let Some(manifest_source) = source {
@@ -356,10 +368,13 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
         args.port
     };
 
-    println!("{}", encode_ipc(&IpcMessage::SetStatus(StatusPayload {
-        status: LaunchStatus::Starting,
-        url: None,
-    })));
+    println!(
+        "{}",
+        encode_ipc(&IpcMessage::SetStatus(StatusPayload {
+            status: LaunchStatus::Starting,
+            url: None,
+        }))
+    );
 
     let workspace_root = args
         .workspace_root
@@ -378,19 +393,25 @@ fn run_launch(paths: &LauncherPaths, args: LaunchArgs) -> Result<()> {
 
     match wait_for_backend_ready(&mut child, &health_url, Duration::from_secs(30)) {
         Ok(()) => {
-            println!("{}", encode_ipc(&IpcMessage::SetStatus(StatusPayload {
-                status: LaunchStatus::Healthy,
-                url: Some(url.clone()),
-            })));
+            println!(
+                "{}",
+                encode_ipc(&IpcMessage::SetStatus(StatusPayload {
+                    status: LaunchStatus::Healthy,
+                    url: Some(url.clone()),
+                }))
+            );
         }
         Err(err) => {
             let _ = child.kill();
-            println!("{}", encode_ipc(&IpcMessage::SetError(ErrorPayload {
-                code: "HEALTH_TIMEOUT".into(),
-                message: "Backend failed to become healthy.".into(),
-                detail: Some(format!("{}", err)),
-                recoverable: false,
-            })));
+            println!(
+                "{}",
+                encode_ipc(&IpcMessage::SetError(ErrorPayload {
+                    code: "HEALTH_TIMEOUT".into(),
+                    message: "Backend failed to become healthy.".into(),
+                    detail: Some(format!("{}", err)),
+                    recoverable: false,
+                }))
+            );
             bail!("Backend health check failed: {}", err);
         }
     }

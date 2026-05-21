@@ -228,9 +228,7 @@ mod tests {
     #[test]
     fn test_detect_backend() {
         let backend = detect_webview_backend();
-        assert!(
-            backend == WebviewBackend::Wry || backend == WebviewBackend::SystemBrowser
-        );
+        assert!(backend == WebviewBackend::Wry || backend == WebviewBackend::SystemBrowser);
     }
 
     #[test]
