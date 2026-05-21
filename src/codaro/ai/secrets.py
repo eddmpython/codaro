@@ -4,9 +4,14 @@ import base64
 import json
 import os
 import tempfile
+import time
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
+
+
+SECRET_STORE_REPLACE_ATTEMPTS = 5
+SECRET_STORE_REPLACE_RETRY_SECONDS = 0.05
 
 
 def _codaroHome() -> Path:
@@ -56,7 +61,7 @@ class SecretStore:
             tmp = Path(tmpPath)
             if os.name != "nt":
                 tmp.chmod(0o600)
-            tmp.replace(self.path)
+            _replaceSecretFile(tmp, self.path)
         finally:
             if fd >= 0:
                 os.close(fd)
@@ -113,6 +118,17 @@ class SecretStore:
         if entry.backend == "plain":
             return raw.decode("utf-8")
         raise SecretStoreError(f"Unsupported secret backend: {entry.backend}")
+
+
+def _replaceSecretFile(tmp: Path, target: Path) -> None:
+    for attempt in range(SECRET_STORE_REPLACE_ATTEMPTS):
+        try:
+            tmp.replace(target)
+            return
+        except PermissionError as exc:
+            if attempt + 1 >= SECRET_STORE_REPLACE_ATTEMPTS:
+                raise SecretStoreError(f"Secret store save failed: {target}") from exc
+            time.sleep(SECRET_STORE_REPLACE_RETRY_SECONDS * (attempt + 1))
 
 
 def _protectWindows(data: bytes) -> bytes:

@@ -49,6 +49,24 @@ class TestSecretStore:
         tmpStore.set("key", "new")
         assert tmpStore.get("key") == "new"
 
+    def test_overwrite_retries_transient_replace_permission_error(self, tmpStore, monkeypatch):
+        originalReplace = Path.replace
+        attempts = []
+
+        def flakyReplace(path: Path, target: str | Path) -> Path:
+            if Path(target).name == "secrets.json" and not attempts:
+                attempts.append(str(path))
+                raise PermissionError("transient replace lock")
+            return originalReplace(path, target)
+
+        monkeypatch.setattr(Path, "replace", flakyReplace)
+
+        tmpStore.set("key", "old")
+        tmpStore.set("key", "new")
+
+        assert attempts
+        assert tmpStore.get("key") == "new"
+
     def test_unicode(self, tmpStore):
         tmpStore.set("key", "한국어 테스트 🎉")
         assert tmpStore.get("key") == "한국어 테스트 🎉"
