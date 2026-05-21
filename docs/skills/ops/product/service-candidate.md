@@ -116,7 +116,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 ## Gate
 
-제품 품질 판단은 아래 gate 조합으로 한다. 수동으로 일부만 골라 실행하지 말고 같은 순서를 고정한 `quality-cycle`을 우선 사용한다.
+제품 품질 판단은 아래 gate 조합으로 한다. 수동으로 일부만 골라 실행하지 말고 같은 순서를 고정한 `quality-cycle`을 우선 사용한다. runner는 `output/test-runner/quality-cycle/sequence-summary.json`에 현재 `gitHead`, `startedAt`/`completedAt`, gate별 duration, return code, artifact freshness를 남겨 어떤 커밋에서 어떤 증거가 나온 것인지 확인할 수 있게 한다.
 
 ```bash
 uv run python -X utf8 tests/run.py quality-cycle

@@ -84,6 +84,24 @@ def testCiWorkflowReferencesKnownRequiredGates() -> None:
     } <= ciNames
 
 
+def testCurrentGitHeadReadsCommonWorktreeRefs(monkeypatch, tmp_path) -> None:
+    runner = loadRunner()
+    sha = "a" * 40
+    commonGitDir = tmp_path / "git-store"
+    worktreeGitDir = commonGitDir / "worktrees" / "codaro"
+    refPath = commonGitDir / "refs" / "heads" / "main"
+    worktreeGitDir.mkdir(parents=True)
+    refPath.parent.mkdir(parents=True)
+    (tmp_path / ".git").write_text(f"gitdir: {worktreeGitDir}\n", encoding="utf-8")
+    (worktreeGitDir / "HEAD").write_text("ref: refs/heads/main\n", encoding="utf-8")
+    (worktreeGitDir / "commondir").write_text("../..\n", encoding="utf-8")
+    refPath.write_text(f"{sha}\n", encoding="utf-8")
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+
+    assert runner.currentGitHead() == sha
+
+
 def testAuditSelfPasses() -> None:
     runner = loadRunner()
 
@@ -93,12 +111,19 @@ def testAuditSelfPasses() -> None:
 def testGateSequencePrintsReadableSummary(monkeypatch, capsys, tmp_path) -> None:
     runner = loadRunner()
     calls: list[str] = []
+    artifactRelPath = "output/test-runner/backend/evidence.json"
 
     def fakeRunGate(name: str) -> int:
         calls.append(name)
+        if name == "backend":
+            artifactPath = tmp_path / artifactRelPath
+            artifactPath.parent.mkdir(parents=True, exist_ok=True)
+            artifactPath.write_text('{"passed": true}\n', encoding="utf-8")
         return 0
 
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
     monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_ARTIFACTS", {"backend": (artifactRelPath,)})
     monkeypatch.setattr(runner, "runGate", fakeRunGate)
 
     assert runner.runGateSequence(("docs", "backend"), sequenceName="unit-sequence") == 0
@@ -114,8 +139,20 @@ def testGateSequencePrintsReadableSummary(monkeypatch, capsys, tmp_path) -> None
     assert payload["passed"] is True
     assert payload["completedGateCount"] == 2
     assert payload["totalGateCount"] == 2
+    summaryPath = payload["summaryPath"]
+    assert summaryPath.endswith("unit-sequence\\sequence-summary.json") or summaryPath.endswith(
+        "unit-sequence/sequence-summary.json"
+    )
+    assert payload["gitHead"] is None
     assert payload["failedGate"] is None
     assert [item["gate"] for item in payload["gates"]] == ["docs", "backend"]
+    assert payload["gates"][0]["artifacts"] == []
+    backendArtifacts = payload["gates"][1]["artifacts"]
+    assert len(backendArtifacts) == 1
+    assert backendArtifacts[0]["path"] == artifactRelPath
+    assert backendArtifacts[0]["exists"] is True
+    assert backendArtifacts[0]["fresh"] is True
+    assert isinstance(backendArtifacts[0]["modifiedAtNs"], int)
 
 
 def testGateSequenceFailureReportsCompletedGates(monkeypatch, capsys, tmp_path) -> None:

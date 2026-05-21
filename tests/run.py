@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+from datetime import UTC, datetime
 import json
 import os
 import re
@@ -16,6 +17,11 @@ ROOT = Path(__file__).resolve().parents[1]
 GATE_DOC = ROOT / "docs" / "skills" / "ops" / "foundation" / "testing-and-gates.md"
 CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 GATE_WORK_ROOT = ROOT / "output" / "test-runner"
+GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
+    "ai-live-smoke": ("output/test-runner/ai-live-smoke/live-smoke-report.json",),
+    "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
+    "preflight": ("output/test-runner/preflight/sequence-summary.json",),
+}
 
 
 @dataclass(frozen=True)
@@ -320,15 +326,18 @@ def runGate(gateName: str) -> int:
 
 def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-sequence") -> int:
     startedAt = time.monotonic()
-    results: list[dict[str, int | str]] = []
+    sequenceStartedAt = utcTimestamp()
+    results: list[dict[str, object]] = []
     for gateName in gateNames:
         gateStartedAt = time.monotonic()
+        gateStartedAtNs = time.time_ns()
         returnCode = runGate(gateName)
         durationMs = round((time.monotonic() - gateStartedAt) * 1000)
         results.append({
             "gate": gateName,
             "returnCode": returnCode,
             "durationMs": durationMs,
+            "artifacts": gateArtifactSummaries(gateName, gateStartedAtNs),
         })
         if returnCode != 0:
             writeGateSequenceSummary(
@@ -336,6 +345,7 @@ def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-seq
                 gateNames=gateNames,
                 results=results,
                 totalMs=round((time.monotonic() - startedAt) * 1000),
+                startedAt=sequenceStartedAt,
             )
             passed = tuple(f"{result['gate']}({result['durationMs']}ms)" for result in results if result["returnCode"] == 0)
             print(
@@ -352,6 +362,7 @@ def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-seq
         gateNames=gateNames,
         results=results,
         totalMs=totalMs,
+        startedAt=sequenceStartedAt,
     )
     passed = tuple(f"{result['gate']}({result['durationMs']}ms)" for result in results)
     print(f"ok: gate sequence passed {len(passed)}/{len(gateNames)} gates in {totalMs} ms")
@@ -363,24 +374,117 @@ def writeGateSequenceSummary(
     *,
     sequenceName: str,
     gateNames: tuple[str, ...],
-    results: list[dict[str, int | str]],
+    results: list[dict[str, object]],
     totalMs: int,
+    startedAt: str,
 ) -> Path:
     summaryDir = localGateWorkspace(sequenceName)
     summaryDir.mkdir(parents=True, exist_ok=True)
     failed = next((result for result in results if result["returnCode"] != 0), None)
+    summaryPath = summaryDir / "sequence-summary.json"
     payload = {
         "sequence": sequenceName,
         "passed": failed is None and len(results) == len(gateNames),
         "completedGateCount": sum(1 for result in results if result["returnCode"] == 0),
         "totalGateCount": len(gateNames),
         "totalMs": totalMs,
+        "startedAt": startedAt,
+        "completedAt": utcTimestamp(),
+        "gitHead": currentGitHead(),
+        "summaryPath": displayPath(summaryPath),
         "failedGate": failed["gate"] if failed else None,
         "gates": results,
     }
-    summaryPath = summaryDir / "sequence-summary.json"
     summaryPath.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     return summaryPath
+
+
+def gateArtifactSummaries(gateName: str, gateStartedAtNs: int) -> list[dict[str, bool | int | str | None]]:
+    summaries: list[dict[str, bool | int | str | None]] = []
+    for relPath in GATE_ARTIFACTS.get(gateName, ()):
+        path = ROOT / relPath
+        if not path.exists():
+            summaries.append({
+                "path": relPath,
+                "exists": False,
+                "fresh": False,
+                "modifiedAtNs": None,
+            })
+            continue
+        modifiedAtNs = path.stat().st_mtime_ns
+        summaries.append({
+            "path": relPath,
+            "exists": True,
+            "fresh": modifiedAtNs >= gateStartedAtNs,
+            "modifiedAtNs": modifiedAtNs,
+        })
+    return summaries
+
+
+def displayPath(path: Path) -> str:
+    try:
+        return str(path.relative_to(ROOT))
+    except ValueError:
+        return str(path)
+
+
+def currentGitHead() -> str | None:
+    gitDir = resolveGitDir()
+    if gitDir is None:
+        return None
+    commonGitDir = resolveCommonGitDir(gitDir)
+    headPath = gitDir / "HEAD"
+    if not headPath.exists():
+        return None
+    head = headPath.read_text(encoding="utf-8").strip()
+    if head.startswith("ref: "):
+        refName = head.removeprefix("ref: ").strip()
+        refPath = gitDir / refName
+        if not refPath.exists():
+            refPath = commonGitDir / refName
+        if refPath.exists():
+            return refPath.read_text(encoding="utf-8").strip()
+        packedRefsPath = commonGitDir / "packed-refs"
+        if packedRefsPath.exists():
+            for line in packedRefsPath.read_text(encoding="utf-8").splitlines():
+                if not line or line.startswith("#") or line.startswith("^"):
+                    continue
+                sha, _, name = line.partition(" ")
+                if name == refName:
+                    return sha
+        return None
+    return head or None
+
+
+def resolveCommonGitDir(gitDir: Path) -> Path:
+    commonDirPath = gitDir / "commondir"
+    if not commonDirPath.exists():
+        return gitDir
+    rawPath = commonDirPath.read_text(encoding="utf-8").strip()
+    path = Path(rawPath)
+    if not path.is_absolute():
+        path = gitDir / path
+    return path.resolve()
+
+
+def resolveGitDir() -> Path | None:
+    gitPath = ROOT / ".git"
+    if gitPath.is_dir():
+        return gitPath
+    if not gitPath.is_file():
+        return None
+    content = gitPath.read_text(encoding="utf-8").strip()
+    if not content.startswith("gitdir:"):
+        return None
+    rawPath = content.removeprefix("gitdir:").strip()
+    path = Path(rawPath)
+    if not path.is_absolute():
+        path = ROOT / path
+    return path
+
+
+def utcTimestamp() -> str:
+    return datetime.now(UTC).isoformat(timespec="seconds")
 
 
 def gateNamesForTier(tier: str) -> tuple[str, ...]:
