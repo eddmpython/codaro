@@ -443,6 +443,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "summaryText",
             )),
             ("tests/verifyDiagnosticSummaryContract.py", (
+                "DIAGNOSTIC_SUMMARY_REPORT_PATH",
+                "diagnostic-summary-report.json",
                 "local diagnostic summary",
                 "local diagnostic export",
                 "provider failure, runtime failure, package failure, frontend failure",
@@ -450,6 +452,12 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "buildDiagnosticExport",
                 "summaryText",
                 "readableActions",
+                "allChecksPassed",
+                "categoryContractCovered",
+                "providerErrorRedactionCovered",
+                "systemEndpointsCovered",
+                "frontendNoticeCovered",
+                "onboardingExportCovered",
             )),
             ("editor/src/lib/api.ts", (
                 "systemDiagnostics",
@@ -485,6 +493,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "\"diagnostic-summary-contract\"",
                 "tests/testDiagnosticSummary.py",
                 "tests/verifyDiagnosticSummaryContract.py",
+                "output/test-runner/diagnostic-summary-contract/diagnostic-summary-report.json",
             )),
             ("docs/skills/ops/product/service-candidate.md", (
                 "token/API key/secret은 diagnostic summary/export와 로그에 남기지 않는다",
@@ -494,7 +503,10 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "readableActions",
                 "raw JSON은 확장 진단",
                 "diagnostic-summary-contract",
+                "diagnostic-summary-report.json",
+                "allChecksPassed",
             )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", ("diagnostic-summary-contract/diagnostic-summary-report.json", "payloadGitHead")),
             ("docs/skills/architecture/live-provider-ops.md", (
                 "실제 token과 API key는 저장소에 남기지 않는다",
                 "raw detail은 기본 UI에 노출하지 않는다",
