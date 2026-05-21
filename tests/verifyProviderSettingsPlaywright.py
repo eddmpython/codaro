@@ -64,12 +64,20 @@ def main(argv: list[str] | None = None) -> int:
         cli.run("open", url)
         cli.run("resize", "1280", "900")
         cli.waitEval(jsPageReady(), "app ready")
+        cli.eval(jsDisablePopup())
         cli.eval(jsOpenProviderSettings())
         cli.waitEval(jsProviderSheetReady(), "provider settings sheet")
         initial = cli.eval(jsAssertInitialProviderSettings())
+        oauthLoginFailure = cli.eval(jsLoginOauthFailure())
+        cli.eval(jsConfigureStub({"oauthStatusMode": "success", "oauthValidationMode": "valid"}))
+        oauthLoginSuccess = cli.eval(jsLoginOauthSuccess())
+        cli.eval(jsOpenProviderSettings())
+        cli.waitEval(jsProviderSheetReady(), "provider settings sheet after OAuth login")
+        oauthLive = cli.eval(jsAssertOauthLive())
         selected = cli.eval(jsSelectStoredOpenaiProvider())
         cli.waitEval(jsOpenaiLiveReady(), "openai provider live validation")
         openai = cli.eval(jsAssertOpenaiLive())
+        cli.eval(jsConfigureStub({"oauthValidationMode": "compat"}))
         oauth = cli.eval(jsValidateProviderFailure("oauth-chatgpt", "OAuth 호환성 점검", "다시 로그인 필요"))
         ollama = cli.eval(jsValidateProviderFailure("ollama", "네트워크 문제", None))
         custom = cli.eval(jsValidateProviderFailure("custom", "Base URL 입력 필요", None))
@@ -80,7 +88,8 @@ def main(argv: list[str] | None = None) -> int:
         api.assertExpectedCalls()
         print(
             "ok: provider settings browser smoke verified "
-            f"{initial} {selected} {openai} {oauth} {ollama} {custom} {desktopVisual} {mobileVisual}"
+            f"{initial} {oauthLoginFailure} {oauthLoginSuccess} {oauthLive} "
+            f"{selected} {openai} {oauth} {ollama} {custom} {desktopVisual} {mobileVisual}"
         )
         return 0
     except VerificationError as exc:
@@ -123,6 +132,9 @@ class ProviderStubApi:
         self.baseUrl = f"http://127.0.0.1:{port}"
         self.calls: list[str] = []
         self.activeProvider = "oauth-chatgpt"
+        self.oauthSecretConfigured = False
+        self.oauthStatusMode = "state_mismatch"
+        self.oauthValidationMode = "compat"
         self._server = ThreadingHTTPServer(("127.0.0.1", port), self._handler())
         self._thread = threading.Thread(target=self._server.serve_forever, daemon=True)
 
@@ -137,10 +149,14 @@ class ProviderStubApi:
     def assertExpectedCalls(self) -> None:
         required = {
             "PUT /api/ai/profile openai",
-            "POST /api/ai/provider/validate openai",
-            "POST /api/ai/provider/validate oauth-chatgpt",
-            "POST /api/ai/provider/validate ollama",
-            "POST /api/ai/provider/validate custom",
+            "GET /api/oauth/authorize",
+            "GET /api/oauth/status state_mismatch",
+            "GET /api/oauth/status success",
+            "POST /api/ai/provider/validate openai valid",
+            "POST /api/ai/provider/validate oauth-chatgpt compat",
+            "POST /api/ai/provider/validate oauth-chatgpt valid",
+            "POST /api/ai/provider/validate ollama network",
+            "POST /api/ai/provider/validate custom base_url_missing",
         }
         missing = sorted(required - set(self.calls))
         if missing:
@@ -151,10 +167,10 @@ class ProviderStubApi:
             "defaultProvider": "oauth-chatgpt",
             "activeProvider": self.activeProvider,
             "activeModel": "gpt-4o-mini" if self.activeProvider == "openai" else "gpt-5.4",
-            "ready": self.activeProvider == "openai",
+            "ready": self.activeProvider == "openai" or (self.activeProvider == "oauth-chatgpt" and self.oauthSecretConfigured),
             "catalog": providerCatalog(),
             "providers": {
-                "oauth-chatgpt": {"model": "gpt-5.4", "secretConfigured": False},
+                "oauth-chatgpt": {"model": "gpt-5.4", "secretConfigured": self.oauthSecretConfigured},
                 "openai": {"model": "gpt-4o-mini", "secretConfigured": True},
                 "ollama": {"model": "llama3.2", "secretConfigured": False},
                 "custom": {"model": "custom-model", "baseUrl": None, "secretConfigured": False},
@@ -201,6 +217,31 @@ class ProviderStubApi:
                     self._sendJson(owner.profile())
                 elif path == "/api/ai/providers":
                     self._sendJson({"catalog": providerCatalog()})
+                elif path == "/api/oauth/authorize":
+                    owner.calls.append("GET /api/oauth/authorize")
+                    self._sendJson({"authUrl": f"{owner.baseUrl}/oauth/stub", "state": "state-test"})
+                elif path == "/api/oauth/status":
+                    owner.calls.append(f"GET /api/oauth/status {owner.oauthStatusMode}")
+                    if owner.oauthStatusMode == "success":
+                        owner.oauthSecretConfigured = True
+                        owner.activeProvider = "oauth-chatgpt"
+                        self._sendJson({"done": True, "error": None})
+                    elif owner.oauthStatusMode == "state_mismatch":
+                        self._sendJson({
+                            "done": True,
+                            "error": "state_mismatch",
+                            "message": "보안 검증이 실패했습니다. Provider 설정에서 로그인을 다시 시작하세요.",
+                            "diagnostic": {
+                                "code": "oauth_state_mismatch",
+                                "message": "보안 검증이 실패했습니다. Provider 설정에서 로그인을 다시 시작하세요.",
+                                "action": "restart-login",
+                                "provider": "oauth-chatgpt",
+                                "recoverable": True,
+                                "statusCode": 503,
+                            },
+                        })
+                    else:
+                        self._sendJson({"done": False})
                 elif path == "/api/tasks":
                     self._sendJson({"tasks": [], "total": 0})
                 elif path == "/api/scheduler/status":
@@ -219,8 +260,14 @@ class ProviderStubApi:
                     self._sendJson({"sessionId": "provider-settings-session", "status": "ready"})
                 elif path == "/api/ai/provider/validate":
                     provider = urllib.parse.parse_qs(parsed.query).get("provider", [""])[0]
-                    owner.calls.append(f"POST /api/ai/provider/validate {provider}")
-                    self._sendJson(validationPayload(provider))
+                    payload = owner.validationPayload(provider)
+                    outcome = validationOutcome(provider, payload)
+                    owner.calls.append(f"POST /api/ai/provider/validate {provider} {outcome}")
+                    self._sendJson(payload)
+                elif path == "/api/provider-settings-test":
+                    payload = self._readJson()
+                    owner.applyControlPayload(payload)
+                    self._sendJson({"ok": True})
                 elif path == "/api/ai/profile/secrets":
                     self._sendJson(owner.profile())
                 elif path == "/api/oauth/logout":
@@ -283,6 +330,55 @@ class ProviderStubApi:
 
         return Handler
 
+    def applyControlPayload(self, payload: dict[str, Any]) -> None:
+        if "oauthStatusMode" in payload:
+            self.oauthStatusMode = str(payload["oauthStatusMode"])
+        if "oauthValidationMode" in payload:
+            self.oauthValidationMode = str(payload["oauthValidationMode"])
+
+    def validationPayload(self, provider: str) -> dict[str, Any]:
+        if provider == "openai":
+            return {"valid": True, "model": "gpt-4o-mini", "probe": "response"}
+        if provider == "oauth-chatgpt" and self.oauthValidationMode == "valid":
+            return {"valid": True, "model": "gpt-5.4", "probe": "response"}
+        if provider == "oauth-chatgpt":
+            return {
+                "valid": False,
+                "probe": "response",
+                "diagnostic": {
+                    "code": "provider_compatibility_error",
+                    "message": "OAuth provider 호환성 점검이 필요합니다. 외부 endpoint가 바뀌었을 수 있습니다.",
+                    "action": "check-provider-compatibility",
+                    "provider": "oauth-chatgpt",
+                    "recoverable": False,
+                },
+            }
+        if provider == "ollama":
+            return {
+                "valid": False,
+                "probe": "response",
+                "diagnostic": {
+                    "code": "provider_network_error",
+                    "message": "Provider 서버에 연결하지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도하세요.",
+                    "action": "check-network",
+                    "provider": "ollama",
+                    "recoverable": True,
+                },
+            }
+        if provider == "custom":
+            return {
+                "valid": False,
+                "probe": "response",
+                "diagnostic": {
+                    "code": "provider_base_url_missing",
+                    "message": "호환 provider 서버 주소가 필요합니다. Provider 설정에서 base URL을 입력하세요.",
+                    "action": "configure-base-url",
+                    "provider": "custom",
+                    "recoverable": True,
+                },
+            }
+        return {"valid": False, "error": f"unknown provider {provider}"}
+
 
 def providerCatalog() -> list[dict[str, Any]]:
     return [
@@ -318,46 +414,19 @@ def providerCatalog() -> list[dict[str, Any]]:
     ]
 
 
-def validationPayload(provider: str) -> dict[str, Any]:
-    if provider == "openai":
-        return {"valid": True, "model": "gpt-4o-mini", "probe": "response"}
-    if provider == "oauth-chatgpt":
-        return {
-            "valid": False,
-            "probe": "response",
-            "diagnostic": {
-                "code": "provider_compatibility_error",
-                "message": "OAuth provider 호환성 점검이 필요합니다. 외부 endpoint가 바뀌었을 수 있습니다.",
-                "action": "check-provider-compatibility",
-                "provider": "oauth-chatgpt",
-                "recoverable": False,
-            },
-        }
-    if provider == "ollama":
-        return {
-            "valid": False,
-            "probe": "response",
-            "diagnostic": {
-                "code": "provider_network_error",
-                "message": "Provider 서버에 연결하지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도하세요.",
-                "action": "check-network",
-                "provider": "ollama",
-                "recoverable": True,
-            },
-        }
-    if provider == "custom":
-        return {
-            "valid": False,
-            "probe": "response",
-            "diagnostic": {
-                "code": "provider_base_url_missing",
-                "message": "호환 provider 서버 주소가 필요합니다. Provider 설정에서 base URL을 입력하세요.",
-                "action": "configure-base-url",
-                "provider": "custom",
-                "recoverable": True,
-            },
-        }
-    return {"valid": False, "error": f"unknown provider {provider}"}
+def validationOutcome(provider: str, payload: dict[str, Any]) -> str:
+    if payload.get("valid"):
+        return "valid"
+    diagnostic = payload.get("diagnostic")
+    if isinstance(diagnostic, dict):
+        code = diagnostic.get("code")
+        if code == "provider_network_error":
+            return "network"
+        if code == "provider_base_url_missing":
+            return "base_url_missing"
+        if code == "provider_compatibility_error":
+            return "compat"
+    return f"{provider}_invalid"
 
 
 def curriculumLessonPayload() -> dict[str, Any]:
@@ -475,6 +544,24 @@ def jsPageReady() -> str:
     return "Boolean(document.querySelector('button[aria-label=\"Provider 설정\"]')) && !document.body.innerText.includes('Codaro 여는 중')"
 
 
+def jsDisablePopup() -> str:
+    return "(() => { window.__codaroOpenedUrls = []; window.open = (url) => { window.__codaroOpenedUrls.push(String(url)); return null; }; return true; })()"
+
+
+def jsConfigureStub(payload: dict[str, Any]) -> str:
+    return compactJs(f"""
+(async () => {{
+  const response = await fetch('/api/provider-settings-test', {{
+    method: 'POST',
+    headers: {{ 'Content-Type': 'application/json' }},
+    body: JSON.stringify({json.dumps(payload)}),
+  }});
+  if (!response.ok) throw new Error('stub control failed: ' + response.status);
+  return true;
+}})()
+""")
+
+
 def jsOpenProviderSettings() -> str:
     return compactJs("""
 (() => {
@@ -482,6 +569,59 @@ def jsOpenProviderSettings() -> str:
   if (!button) throw new Error('provider settings button missing');
   button.click();
   return true;
+})()
+""")
+
+
+def jsLoginOauthFailure() -> str:
+    return compactJs("""
+(async () => {
+  clickProviderButton('oauth-chatgpt', '브라우저 로그인');
+  await waitForProviderStatus('oauth-chatgpt', 'needs-action', 9000);
+  const card = providerCard('oauth-chatgpt');
+  const status = providerStatus(card);
+  const text = status.textContent || '';
+  if (status.getAttribute('data-provider-validation-status') !== 'invalid') {
+    throw new Error('OAuth login failure did not persist validation failure');
+  }
+  if (!text.includes('로그인 다시 시작') || !text.includes('보안 검증이 실패했습니다')) {
+    throw new Error('OAuth state mismatch copy missing: ' + text);
+  }
+  const opened = window.__codaroOpenedUrls || [];
+  if (!opened.some((url) => url.includes('/oauth/stub'))) {
+    throw new Error('OAuth login did not open auth URL');
+  }
+  return JSON.stringify({ login: 'state_mismatch', action: '로그인 다시 시작' });
+})()
+""")
+
+
+def jsLoginOauthSuccess() -> str:
+    return compactJs("""
+(async () => {
+  clickProviderButton('oauth-chatgpt', '브라우저 로그인');
+  await waitForNoProviderSheet(9000);
+  return JSON.stringify({ login: 'success', sheetClosed: true });
+})()
+""")
+
+
+def jsAssertOauthLive() -> str:
+    return compactJs("""
+(() => {
+  const card = providerCard('oauth-chatgpt');
+  const status = providerStatus(card);
+  if (status.getAttribute('data-provider-fallback-state') !== 'live') {
+    throw new Error('oauth provider did not enter live mode after login');
+  }
+  if (status.getAttribute('data-provider-validation-status') !== 'valid') {
+    throw new Error('oauth validation status is not valid after login');
+  }
+  const text = card.textContent || '';
+  if (!text.includes('실제 응답 사용 중') || !text.includes('gpt-5.4')) {
+    throw new Error('oauth live copy missing');
+  }
+  return JSON.stringify({ provider: 'oauth-chatgpt', mode: 'live' });
 })()
 """)
 
@@ -629,14 +769,22 @@ function clickProviderButton(provider, label) {
   if (!button) throw new Error('button not found for ' + provider + ': ' + label);
   button.click();
 }
-async function waitForProviderStatus(provider, mode) {
+async function waitForProviderStatus(provider, mode, timeout = 7000) {
   const started = Date.now();
-  while (Date.now() - started < 7000) {
+  while (Date.now() - started < timeout) {
     const status = providerStatus(providerCard(provider));
     if (status.getAttribute('data-provider-fallback-state') === mode) return true;
     await new Promise((resolve) => setTimeout(resolve, 80));
   }
   throw new Error('timed out waiting for ' + provider + ' status ' + mode);
+}
+async function waitForNoProviderSheet(timeout = 7000) {
+  const started = Date.now();
+  while (Date.now() - started < timeout) {
+    if (!document.querySelector('[data-provider-card="oauth-chatgpt"]')) return true;
+    await new Promise((resolve) => setTimeout(resolve, 80));
+  }
+  throw new Error('timed out waiting for provider sheet to close');
 }
 """
     wrapped = f"""
