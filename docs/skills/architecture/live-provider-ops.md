@@ -102,6 +102,8 @@ matrix에서 missing credential은 silent skip이 아니다. 사용자가 여러
 - 응답 payload에 provider/model, case latency, tool sequence, workloop count, executor call summary가 남는지.
 - `oauth-chatgpt` text bridge가 unsupported `previous_response_id`를 보내지 않고, `codaroToolPolicy` 힌트로 다음 tool을 명확히 전달하는지.
 
+실행 결과는 stdout만 믿지 않는다. gate는 성공, 실패, credential missing, matrix partial 상태 모두 `output/test-runner/ai-live-smoke/live-smoke-report.json`에 같은 payload를 남긴다. 이 파일에는 provider/model, case별 latency, diagnostic action, tool sequence, tuning signal을 넣되 token/API key 값은 넣지 않는다.
+
 ## 평가 기준
 
 Live 응답은 deterministic하지 않으므로 exact text를 비교하지 않는다. 아래 구조와 행동을 본다.

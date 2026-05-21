@@ -7,6 +7,7 @@ import re
 import sys
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -24,6 +25,8 @@ from codaro.ai.types import LLMConfig
 
 
 MISSING_CREDENTIAL_EXIT = 2
+ROOT = Path(__file__).resolve().parents[1]
+LIVE_SMOKE_REPORT_PATH = ROOT / "output" / "test-runner" / "ai-live-smoke" / "live-smoke-report.json"
 
 LIVE_PROVIDER_ERRORS = (
     AttributeError,
@@ -181,12 +184,12 @@ def main() -> int:
 def runSingleProvider() -> int:
     selection = selectLiveProvider()
     run = runLiveProvider(selection)
+    payload = singleRunPayload(run)
+    writeLiveSmokeReport(payload)
     if run.credentialMissing:
-        payload = singleRunPayload(run)
         print(json.dumps(payload, ensure_ascii=False, indent=2))
         return MISSING_CREDENTIAL_EXIT
 
-    payload = singleRunPayload(run)
     if run.passed:
         print(f"ok: AI live smoke passed for {selection.provider}")
         print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -199,6 +202,7 @@ def runSingleProvider() -> int:
 def runProviderMatrix(providerIds: tuple[str, ...]) -> int:
     runs = tuple(runLiveProvider(selectLiveProvider(providerId)) for providerId in providerIds)
     payload = matrixRunPayload(runs)
+    writeLiveSmokeReport(payload)
     exitCode = matrixExitCode(runs)
     if exitCode == 0:
         print(f"ok: AI live smoke matrix passed for {len(runs)} provider(s)")
@@ -302,6 +306,21 @@ def matrixExitCode(runs: tuple[LiveProviderRun, ...]) -> int:
     if any(run.credentialMissing for run in runs):
         return MISSING_CREDENTIAL_EXIT
     return 0
+
+
+def writeLiveSmokeReport(payload: dict[str, Any], reportPath: Path = LIVE_SMOKE_REPORT_PATH) -> Path:
+    reportPath.parent.mkdir(parents=True, exist_ok=True)
+    reportPayload = dict(payload)
+    reportPayload["reportPath"] = reportDisplayPath(reportPath)
+    reportPath.write_text(json.dumps(reportPayload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return reportPath
+
+
+def reportDisplayPath(reportPath: Path) -> str:
+    try:
+        return str(reportPath.relative_to(ROOT))
+    except ValueError:
+        return str(reportPath)
 
 
 def selectLiveProvider(providerOverride: str | None = None) -> LiveProviderSelection:

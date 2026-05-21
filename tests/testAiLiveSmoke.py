@@ -109,6 +109,7 @@ def testMatrixExitCodePrioritizesProviderFailures() -> None:
 
 def testMainRunsMatrixWithoutCallingNetwork(monkeypatch, capsys) -> None:
     smoke = loadSmoke()
+    writtenReports: list[dict] = []
 
     def fakeSelectLiveProvider(providerOverride=None):
         return smoke.LiveProviderSelection(
@@ -134,12 +135,38 @@ def testMainRunsMatrixWithoutCallingNetwork(monkeypatch, capsys) -> None:
     monkeypatch.setenv("CODARO_AI_LIVE_PROVIDERS", "oauth-chatgpt,openai")
     monkeypatch.setattr(smoke, "selectLiveProvider", fakeSelectLiveProvider)
     monkeypatch.setattr(smoke, "runLiveProvider", fakeRunLiveProvider)
+    monkeypatch.setattr(smoke, "writeLiveSmokeReport", lambda payload: writtenReports.append(payload))
 
     assert smoke.main() == smoke.MISSING_CREDENTIAL_EXIT
     output = capsys.readouterr().out
     payload = json.loads(output.split("\n", 1)[1])
     assert payload["status"] == "partial credential missing"
     assert [item["provider"] for item in payload["providers"]] == ["oauth-chatgpt", "openai"]
+    assert writtenReports == [payload]
+
+
+def testWriteLiveSmokeReportPersistsBoundedPayload(tmp_path) -> None:
+    smoke = loadSmoke()
+    reportPath = tmp_path / "ai-live-smoke" / "live-smoke-report.json"
+    payload = {
+        "passed": True,
+        "status": "passed",
+        "selection": {
+            "provider": "openai",
+            "model": "test-model",
+            "apiKeyConfigured": True,
+        },
+        "cases": [{"caseId": "short-answer", "passed": True}],
+    }
+
+    resultPath = smoke.writeLiveSmokeReport(payload, reportPath=reportPath)
+
+    assert resultPath == reportPath
+    saved = json.loads(reportPath.read_text(encoding="utf-8"))
+    assert saved["passed"] is True
+    assert saved["selection"]["apiKeyConfigured"] is True
+    assert saved["cases"][0]["caseId"] == "short-answer"
+    assert saved["reportPath"].endswith("live-smoke-report.json")
 
 
 def testRunLiveProviderIncludesCellCallCase(monkeypatch) -> None:
