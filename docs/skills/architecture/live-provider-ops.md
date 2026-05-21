@@ -99,10 +99,11 @@ matrix에서 missing credential은 silent skip이 아니다. 사용자가 여러
 - 모호한 학습 요청이 provider 호출 전에 deterministic clarification gate에서 멈추는지.
 - 구체적 학습 요청이 실제 provider 응답에서 `write-curriculum-yaml` tool call로 이어지고, provider가 보낸 YAML이 실제 materializer에서 섹션/스니펫/실습 셀과 `contractGapCount=0`으로 변환되는지.
 - 실행 요청이 실제 provider 응답에서 `packages-check` 이후 `cell-call` tool call로 이어지는지.
-- 응답 payload에 provider/model, case latency, tool sequence, workloop count, executor call summary가 남는지.
+- 응답 payload에 provider/model, case latency, tool sequence, executor call summary가 남는지.
+- live tool loop와 cell-call loop의 workloop는 count만 남기지 않는다. report에는 `workloopReadable`, `workloopLabels`, `workloopSamples`를 남겨 사용자가 본 진행 문장과 같은 label/detail 품질을 확인한다.
 - `oauth-chatgpt` text bridge가 unsupported `previous_response_id`를 보내지 않고, `codaroToolPolicy` 힌트로 다음 tool을 명확히 전달하는지.
 
-실행 결과는 stdout만 믿지 않는다. gate는 성공, 실패, credential missing, matrix partial 상태 모두 `output/test-runner/ai-live-smoke/live-smoke-report.json`에 같은 payload를 남긴다. 이 파일에는 provider/model, case별 latency, diagnostic action, tool sequence, tuning signal을 넣되 token/API key 값은 넣지 않는다.
+실행 결과는 stdout만 믿지 않는다. gate는 성공, 실패, credential missing, matrix partial 상태 모두 `output/test-runner/ai-live-smoke/live-smoke-report.json`에 같은 payload를 남긴다. 이 파일에는 provider/model, case별 latency, diagnostic action, tool sequence, workloop readable samples, tuning signal을 넣되 token/API key 값은 넣지 않는다.
 
 ## 평가 기준
 

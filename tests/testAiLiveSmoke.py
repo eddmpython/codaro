@@ -232,6 +232,47 @@ def testToolLoopTuningSignalsExposeActionableFailureContext() -> None:
     assert any("write-curriculum-yaml" in hint for hint in signals["tuningHints"])
 
 
+def testWorkloopSignalReportsReadableBoundedSamples() -> None:
+    smoke = loadSmoke()
+    trace = {
+        "workloop": [
+            {
+                "toolName": "packages-check",
+                "status": "done",
+                "workLabel": "라이브러리 확인",
+                "workDetail": "numpy " * 80,
+                "error": "sk-secret-should-not-be-copied",
+            },
+            {
+                "toolName": "cell-call",
+                "status": "done",
+                "workLabel": "셀 실행/검증",
+                "workDetail": "live-smoke-cell 검증 통과",
+            },
+        ],
+    }
+
+    signals = smoke.workloopSignal(trace)
+
+    assert signals["workloopCount"] == 2
+    assert signals["workloopReadableCount"] == 2
+    assert signals["workloopReadable"] is True
+    assert signals["workloopLabels"] == ["라이브러리 확인", "셀 실행/검증"]
+    assert signals["workloopSamples"][0]["toolName"] == "packages-check"
+    assert signals["workloopSamples"][0]["detail"].endswith("...[truncated]")
+    assert "sk-secret" not in json.dumps(signals, ensure_ascii=False)
+
+
+def testWorkloopSignalFailsUnreadableEvents() -> None:
+    smoke = loadSmoke()
+
+    signals = smoke.workloopSignal({"workloop": [{"workLabel": "라이브러리 확인"}]})
+
+    assert signals["workloopCount"] == 1
+    assert signals["workloopReadableCount"] == 0
+    assert signals["workloopReadable"] is False
+
+
 def testFailedCasePayloadUsesProviderDiagnostic() -> None:
     smoke = loadSmoke()
 

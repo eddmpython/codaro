@@ -544,6 +544,7 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
 
     toolNames = toolNamesFromPayload(payload)
     trace = traceFromPayload(payload)
+    workloopSignals = workloopSignal(trace)
     yamlResults = toolResultsByName(executor.results, "write-curriculum-yaml")
     yamlResult = yamlResults[-1] if yamlResults else {}
     contractGapCount = intSignal(yamlResult, "contractGapCount")
@@ -560,6 +561,7 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
         and exerciseCellCount >= 1
         and snippetCellCount >= 1
         and yamlContractObserved
+        and workloopSignals["workloopReadable"]
     )
     error = None
     failureSignals: dict[str, Any] = {}
@@ -592,6 +594,14 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
                 "inspect materializer trace for yamlContractObserved signal",
             ],
         }
+    elif not workloopSignals["workloopReadable"]:
+        error = "live provider tool loop did not expose readable workloop label/detail"
+        failureSignals = workloopTuningSignals(
+            reason="missing-readable-workloop",
+            requiredTools=("write-curriculum-yaml",),
+            observedTools=toolNames,
+            answer=str(payload.get("answer") or ""),
+        )
     elif sectionCount < 1 or exerciseCellCount < 1 or snippetCellCount < 1:
         error = "live provider YAML did not materialize section, snippet, and exercise cells"
         failureSignals = {
@@ -615,7 +625,6 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
         signals={
             "toolSequence": trace.get("toolSequence") or toolNames,
             "toolCount": len(toolNames),
-            "workloopCount": len(trace.get("workloop") or []),
             "executorCalls": [call["tool"] for call in executor.calls],
             "contractGapCount": contractGapCount,
             "sectionCount": sectionCount,
@@ -623,7 +632,7 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
             "snippetCellCount": snippetCellCount,
             "yamlContractObserved": yamlContractObserved,
             "answerChars": len(str(payload.get("answer") or "")),
-        } | failureSignals,
+        } | workloopSignals | failureSignals,
         error=error,
     )
 
@@ -674,6 +683,7 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
 
     toolNames = toolNamesFromPayload(payload)
     trace = traceFromPayload(payload)
+    workloopSignals = workloopSignal(trace)
     executorCalls = [call["tool"] for call in executor.calls]
     usedPackageCheck = "packages-check" in executorCalls
     usedCellCall = "cell-call" in executorCalls
@@ -687,6 +697,7 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
         and exactSequence
         and policyViolationCount == 0
         and str(payload.get("provider") or "") != ""
+        and workloopSignals["workloopReadable"]
     )
     error = None
     failureSignals: dict[str, Any] = {}
@@ -732,6 +743,14 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
                 "ensure packages-check result is passed back before cell-call",
             ],
         }
+    elif not workloopSignals["workloopReadable"]:
+        error = "live provider cell-call loop did not expose readable workloop label/detail"
+        failureSignals = workloopTuningSignals(
+            reason="missing-readable-workloop",
+            requiredTools=("packages-check", "cell-call"),
+            observedTools=executorCalls,
+            answer=str(payload.get("answer") or ""),
+        )
     return LiveSmokeCase(
         caseId="live-cell-call-loop",
         passed=passed,
@@ -742,12 +761,11 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
         signals={
             "toolSequence": trace.get("toolSequence") or toolNames,
             "toolCount": len(toolNames),
-            "workloopCount": len(trace.get("workloop") or []),
             "policyViolationCount": policyViolationCount,
             "executorCalls": executorCalls,
             "exactSequence": exactSequence,
             "answerChars": len(str(payload.get("answer") or "")),
-        } | failureSignals,
+        } | workloopSignals | failureSignals,
         error=error,
     )
 
@@ -759,6 +777,43 @@ def toolNamesFromPayload(payload: dict[str, Any]) -> list[str]:
 def traceFromPayload(payload: dict[str, Any]) -> dict[str, Any]:
     trace = payload.get("trace")
     return trace if isinstance(trace, dict) else {}
+
+
+def workloopSignal(trace: dict[str, Any]) -> dict[str, Any]:
+    rawEvents = trace.get("workloop")
+    events = [event for event in rawEvents if isinstance(event, dict)] if isinstance(rawEvents, list) else []
+    samples: list[dict[str, str]] = []
+    labels: list[str] = []
+    readableCount = 0
+    for event in events:
+        label = boundedSignalText(str(event.get("workLabel") or ""), limit=80)
+        detail = boundedSignalText(str(event.get("workDetail") or ""), limit=160)
+        toolName = boundedSignalText(str(event.get("toolName") or ""), limit=80)
+        status = boundedSignalText(str(event.get("status") or ""), limit=40)
+        if label:
+            labels.append(label)
+        if label and detail:
+            readableCount += 1
+        if len(samples) < 6:
+            sample = {
+                key: value
+                for key, value in {
+                    "toolName": toolName,
+                    "status": status,
+                    "label": label,
+                    "detail": detail,
+                }.items()
+                if value
+            }
+            if sample:
+                samples.append(sample)
+    return {
+        "workloopCount": len(events),
+        "workloopReadableCount": readableCount,
+        "workloopReadable": bool(events) and readableCount == len(events),
+        "workloopLabels": labels[:6],
+        "workloopSamples": samples,
+    }
 
 
 def toolsInOrder(toolNames: list[str], before: str, after: str) -> bool:
@@ -790,10 +845,20 @@ def toolLoopTuningSignals(
 
 
 def boundedSignalText(text: str, *, limit: int = 240) -> str:
-    normalized = " ".join(text.split())
+    normalized = " ".join(redactSignalText(text).split())
     if len(normalized) <= limit:
         return normalized
     return f"{normalized[:limit]}...[truncated]"
+
+
+def redactSignalText(text: str) -> str:
+    redacted = text
+    for value in (os.environ.get("OPENAI_API_KEY"), os.environ.get("CODARO_LLM_API_KEY")):
+        if value:
+            redacted = redacted.replace(value, "[redacted]")
+    redacted = re.sub(r"sk-[A-Za-z0-9_-]{8,}", "sk-[redacted]", redacted)
+    redacted = re.sub(r"Bearer\s+[A-Za-z0-9._~+/-]+", "Bearer [redacted]", redacted)
+    return redacted
 
 
 def materializeLiveSmokeYaml(arguments: dict[str, Any]) -> dict[str, Any]:
