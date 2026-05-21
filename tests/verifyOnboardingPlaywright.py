@@ -45,6 +45,8 @@ def main(argv: list[str] | None = None) -> int:
         cli.run("resize", "1280", "900")
         cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "first onboarding screen")
         fallback = cli.eval(jsAssertFallbackOnboarding())
+        cli.eval(jsInstallClipboardStub())
+        diagnosticExport = cli.eval(jsClickDiagnosticExportCopy())
         cli.eval(jsOpenSurface("커리큘럼"))
         cli.waitEval(jsTextPresent("Codaro 커리큘럼"), "curriculum sidebar")
         sidebar = cli.eval(jsAssertCurriculumSidebarGroups())
@@ -62,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsTextPresent("실제 응답 사용 중"), "provider ready copy")
         settings = cli.eval(jsAssertProviderReadySettings())
         api.assertExpectedCalls()
-        print(f"ok: onboarding browser verified {fallback} {sidebar} {fallbackSettings} {ready} {settings}")
+        print(f"ok: onboarding browser verified {fallback} {diagnosticExport} {sidebar} {fallbackSettings} {ready} {settings}")
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
@@ -105,7 +107,13 @@ class OnboardingStubApi:
         self._thread.join(timeout=4)
 
     def assertExpectedCalls(self) -> None:
-        required = {"GET /api/health", "GET /api/bootstrap", "GET /api/system/diagnostics", "GET /api/ai/profile"}
+        required = {
+            "GET /api/health",
+            "GET /api/bootstrap",
+            "GET /api/system/diagnostics",
+            "GET /api/system/diagnostics/export",
+            "GET /api/ai/profile",
+        }
         missing = sorted(required - set(self.calls))
         if missing:
             raise VerificationError("onboarding API calls missing: " + ", ".join(missing))
@@ -142,6 +150,8 @@ class OnboardingStubApi:
                     self._sendJson({"appMode": False, "documentPath": None, "workspaceRoot": str(ROOT), "rootPath": str(ROOT)})
                 elif path == "/api/system/diagnostics":
                     self._sendJson(diagnosticPayload(owner.ready))
+                elif path == "/api/system/diagnostics/export":
+                    self._sendJson(diagnosticExportPayload(owner.ready))
                 elif path == "/api/curriculum/categories":
                     self._sendJson({
                         "categories": [
@@ -246,13 +256,51 @@ def jsAssertFallbackOnboarding() -> str:
   const text = document.body.innerText;
   const providerButton = [...document.querySelectorAll('button')].find((button) => button.textContent?.includes('Provider 연결'));
   const avatar = [...document.querySelectorAll('img')].some((img) => img.getAttribute('src')?.includes('/brand/avatar-small.png'));
-  const required = ['Codaro로 무엇을 만들까요?', '목표부터 말하세요', 'Provider 연결', '시작 진단 필요', 'Pandas 레슨', '브라우저 루틴', '자동화 노트북'];
+  const diagnosticExport = document.querySelector('[data-diagnostic-export-copy="true"]');
+  const required = ['Codaro로 무엇을 만들까요?', '목표부터 말하세요', 'Provider 연결', '시작 진단 필요', '진단 복사', 'Pandas 레슨', '브라우저 루틴', '자동화 노트북'];
   const missing = required.filter((item) => !text.includes(item));
   if (missing.length) throw new Error('fallback onboarding missing: ' + missing.join(', '));
   if (!providerButton || providerButton.disabled) throw new Error('Provider 연결 button is missing or disabled');
+  if (!diagnosticExport) throw new Error('diagnostic export copy button is missing');
   if (!avatar) throw new Error('Codaro avatar is missing on first screen');
   if (text.includes('provider 연결됨')) throw new Error('ready provider copy shown before provider connection');
   return 'fallback-onboarding-ok';
+})()
+""")
+
+
+def jsInstallClipboardStub() -> str:
+    return compactJs("""
+(() => {
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: {
+      writeText: async (text) => {
+        window.__codaroCopiedDiagnosticExport = text;
+      },
+    },
+  });
+  return 'clipboard-stub-installed';
+})()
+""")
+
+
+def jsClickDiagnosticExportCopy() -> str:
+    return compactJs("""
+(async () => {
+  const button = document.querySelector('[data-diagnostic-export-copy="true"]');
+  if (!button) throw new Error('diagnostic export copy button missing');
+  button.click();
+  const deadline = Date.now() + 4000;
+  while (!window.__codaroCopiedDiagnosticExport && Date.now() < deadline) {
+    await new Promise((resolve) => setTimeout(resolve, 80));
+  }
+  const copied = String(window.__codaroCopiedDiagnosticExport || '');
+  if (!copied) throw new Error('diagnostic export was not copied');
+  if (!copied.includes('codaro-local-diagnostic-export')) throw new Error('diagnostic export kind missing');
+  if (!copied.includes('Provider 연결')) throw new Error('diagnostic readable action missing');
+  if (copied.includes('oauth-secret-value') || copied.includes('sk-onboarding-secret')) throw new Error('diagnostic export leaked secret');
+  return 'diagnostic-export-copy-ok';
 })()
 """)
 
@@ -393,6 +441,34 @@ def diagnosticPayload(ready: bool) -> dict[str, Any]:
         "nextActions": ["connect-provider"],
         "readableActions": ["Provider 연결"],
         "summaryText": "Provider 1 · 브라우저 로그인 후 실제 provider 응답을 사용할 수 있습니다. · 다음: Provider 연결",
+    }
+
+
+def diagnosticExportPayload(ready: bool) -> dict[str, Any]:
+    summary = diagnosticPayload(ready)
+    return {
+        "version": 1,
+        "kind": "codaro-local-diagnostic-export",
+        "generatedAt": "2026-05-22T00:00:00Z",
+        "status": summary["status"],
+        "summaryText": summary["summaryText"],
+        "readableActions": summary["readableActions"],
+        "categories": summary["categories"],
+        "items": summary["items"],
+        "summary": summary,
+        "context": {
+            "provider": {
+                "activeProvider": "oauth-chatgpt",
+                "ready": ready,
+                "authKind": "oauth",
+                "access_token": "[redacted]",
+            },
+            "package": {"installer": "uv"},
+        },
+        "redaction": {
+            "secrets": "redacted",
+            "policy": "token/apiKey/secret/authorization/oauth/sk values are removed",
+        },
     }
 
 

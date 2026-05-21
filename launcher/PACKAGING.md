@@ -368,7 +368,7 @@ wheel은 원칙적으로 PyPI에 두고, manifest가 PyPI wheel URL을 가리킨
 
 예외:
 
-- private beta
+- 제품 품질 검증용 내부 빌드
 - temporary internal smoke build
 
 이 경우만 GitHub asset wheel을 허용할 수 있다.
@@ -449,4 +449,4 @@ core repo + bundle repos
 - bundle entrypoint registry 표면
 - core/bundle dependency pin을 manifest와 wheel metadata 중 어디까지 중복 표현할지
 - compiled wheel과 optional native dependency를 launcher가 어디까지 검사할지
-- private beta channel에서 GitHub wheel fallback 정책
+- 제품 품질 검증용 내부 채널에서 GitHub wheel fallback 정책

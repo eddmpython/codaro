@@ -191,7 +191,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "last-known-good-release.json",
                 "rollback-marker.json",
                 "exact wheel",
-                "private beta",
+                "제품 품질 검증용 내부 빌드",
             )),
             ("tests/run.py", ("tests/verifyInstallLauncherSmoke.py", "cargo", "check")),
         ),
@@ -226,7 +226,10 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "Codaro로 무엇을 만들까요?",
                 "Provider 연결",
                 "GET /api/system/diagnostics",
+                "GET /api/system/diagnostics/export",
                 "시작 진단 필요",
+                "진단 복사",
+                "diagnostic-export-copy-ok",
                 "기본 안내 모드",
                 "provider 연결됨",
                 "Pandas 레슨",
@@ -344,6 +347,11 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "systemDiagnosticsExport",
                 "/api/system/diagnostics/export",
             )),
+            ("editor/src/App.tsx", (
+                "systemDiagnosticsExport",
+                "copyDiagnosticExport",
+                "writeClipboardText",
+            )),
             ("editor/src/lib/appBootstrap.ts", (
                 "diagnosticNoticeFromSummary",
                 "시작 진단 필요",
@@ -353,6 +361,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("editor/src/components/app/topBar.tsx", (
                 "showStatusNotice",
                 "notice.tone === \"warning\"",
+                "data-diagnostic-export-copy",
+                "진단 복사",
             )),
             ("editor/src/types.ts", (
                 "DiagnosticSummary",
@@ -369,6 +379,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("docs/skills/ops/product/service-candidate.md", (
                 "token/API key/secret은 diagnostic summary/export와 로그에 남기지 않는다",
                 "local diagnostic export",
+                "`진단 복사`",
                 "summaryText",
                 "readableActions",
                 "raw JSON은 확장 진단",

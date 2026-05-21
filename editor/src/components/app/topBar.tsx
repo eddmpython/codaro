@@ -1,7 +1,10 @@
+import { useState } from "react";
 import {
   AlertTriangle,
   CheckCircle2,
   Clock3,
+  Clipboard,
+  ClipboardCheck,
   Loader2,
   PanelRightClose,
   PanelRightOpen,
@@ -25,6 +28,7 @@ export function TopBar({
   showSidebarTrigger,
   surface,
   notebookRunning,
+  onCopyDiagnosticExport,
   onRunNotebook,
   onToggleAssistant,
 }: {
@@ -35,6 +39,7 @@ export function TopBar({
   showSidebarTrigger: boolean;
   surface: SurfaceMode;
   notebookRunning: boolean;
+  onCopyDiagnosticExport?: () => Promise<void>;
   onRunNotebook: () => void;
   onToggleAssistant: () => void;
 }) {
@@ -71,6 +76,9 @@ export function TopBar({
 
       <div className="relative z-10 flex shrink-0 items-center gap-1">
         <SocialLinks />
+        {showStatusNotice && onCopyDiagnosticExport ? (
+          <DiagnosticExportButton onCopyDiagnosticExport={onCopyDiagnosticExport} />
+        ) : null}
         {showAssistantToggle ? (
           <TopBarIconButton
             label={assistantCollapsed ? "AI 패널 열기" : "AI 패널 접기"}
@@ -86,6 +94,46 @@ export function TopBar({
         ) : null}
       </div>
     </header>
+  );
+}
+
+function DiagnosticExportButton({ onCopyDiagnosticExport }: { onCopyDiagnosticExport: () => Promise<void> }) {
+  const [copyState, setCopyState] = useState<"idle" | "copying" | "copied" | "error">("idle");
+
+  async function copyDiagnosticExport() {
+    if (copyState === "copying") return;
+    setCopyState("copying");
+    try {
+      await onCopyDiagnosticExport();
+      setCopyState("copied");
+      window.setTimeout(() => setCopyState("idle"), 1800);
+    } catch {
+      setCopyState("error");
+      window.setTimeout(() => setCopyState("idle"), 2200);
+    }
+  }
+
+  const label = copyState === "copied" ? "복사됨" : copyState === "error" ? "복사 실패" : "진단 복사";
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <Button
+          aria-label="진단 복사"
+          className="h-6 shrink-0 gap-1 px-2 text-[11px] [&_svg]:size-3"
+          data-diagnostic-export-copy="true"
+          disabled={copyState === "copying"}
+          size="sm"
+          title="진단 복사"
+          variant="outline"
+          onClick={copyDiagnosticExport}
+        >
+          {copyState === "copied" ? <ClipboardCheck /> : <Clipboard />}
+          <span>{label}</span>
+        </Button>
+      </TooltipTrigger>
+      <TooltipContent>{label}</TooltipContent>
+    </Tooltip>
   );
 }
 
@@ -139,7 +187,7 @@ function StatusNotice({ notice }: { notice: AppNotice }) {
           notice.tone === "warning" && "text-amber-500",
         )}
       />
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="truncate text-xs font-medium">{notice.title}</div>
         <div className="hidden truncate text-xs text-muted-foreground 2xl:block">{notice.detail}</div>
       </div>

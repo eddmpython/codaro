@@ -112,6 +112,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - `/api/system/diagnostics`는 provider 연결 상태, uv/project `.venv`, runtime status, editor build 산출물을 같은 summary payload로 반환한다.
 - `/api/system/diagnostics/export`는 같은 summary와 context를 반환하되 token/API key/secret/Authorization/OAuth access/refresh token/sk 값은 `[redacted]`로 제거한다.
 - 부트스트랩은 `/api/system/diagnostics`를 읽어 시작 진단 안내를 제품 상단 상태로 보여준다. 사용자는 Provider 연결 필요, uv 설치 필요, `.venv` 준비 필요, Editor 빌드 필요를 첫 화면에서 사람 문장으로 본다.
+- 상단 시작 진단 경고는 `진단 복사` 행동을 제공하고, 이 행동은 `/api/system/diagnostics/export`의 redacted payload를 클립보드로 복사한다.
 - raw JSON은 확장 진단으로만 본다.
 - token/API key/secret은 diagnostic summary/export와 로그에 남기지 않는다.
 - 문제 재현에는 provider/model/latency/error/tool sequence/workloop trace가 충분해야 한다.

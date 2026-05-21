@@ -20,6 +20,7 @@ import { usePendingChangesState } from "@/hooks/usePendingChangesState";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import { useThemeMode } from "@/hooks/useThemeMode";
+import { codaroApi } from "@/lib/api";
 import {
   SidebarInset,
   SidebarProvider,
@@ -193,6 +194,11 @@ function App() {
     refreshAutomation,
   });
 
+  const copyDiagnosticExport = useCallback(async () => {
+    const payload = await codaroApi.systemDiagnosticsExport();
+    await writeClipboardText(JSON.stringify(payload, null, 2));
+  }, []);
+
   const {
     askAssistant,
     askCellAssistant,
@@ -265,6 +271,7 @@ function App() {
           showSidebarTrigger={!sidebarOpen}
           surface={surface}
           notebookRunning={notebookRunning}
+          onCopyDiagnosticExport={copyDiagnosticExport}
           onRunNotebook={runNotebook}
           onToggleAssistant={() => setAssistantCollapsed((current) => !current)}
         />
@@ -342,6 +349,25 @@ function shouldKeepCurrentNotice(currentNotice: AppNotice, nextNotice: AppNotice
   const nextIsBackground =
     nextNotice.tone === "success" && backgroundNoticeTitles.has(nextNotice.title);
   return currentIsDiagnostic && nextIsBackground;
+}
+
+async function writeClipboardText(text: string) {
+  if (navigator.clipboard?.writeText) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+  const textArea = globalThis.document.createElement("textarea");
+  textArea.value = text;
+  textArea.setAttribute("readonly", "true");
+  textArea.style.position = "fixed";
+  textArea.style.left = "-9999px";
+  globalThis.document.body.appendChild(textArea);
+  textArea.select();
+  try {
+    globalThis.document.execCommand("copy");
+  } finally {
+    textArea.remove();
+  }
 }
 
 export default App;

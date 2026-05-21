@@ -86,7 +86,7 @@ EVIDENCE = (
         (
             "exact wheel",
             "sha256",
-            "private beta",
+            "제품 품질 검증용 내부 빌드",
             "launcher-managed bundle",
             "uv run codaro",
         ),

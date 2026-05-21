@@ -63,6 +63,14 @@ CHECKS = (
         ),
     ),
     (
+        "editor/src/App.tsx",
+        (
+            "systemDiagnosticsExport",
+            "copyDiagnosticExport",
+            "writeClipboardText",
+        ),
+    ),
+    (
         "editor/src/lib/appBootstrap.ts",
         (
             "systemDiagnostics",
@@ -79,6 +87,8 @@ CHECKS = (
             "showStatusNotice",
             "notice.tone === \"warning\"",
             "text-amber-500",
+            "data-diagnostic-export-copy",
+            "진단 복사",
         ),
     ),
     (
@@ -118,12 +128,22 @@ CHECKS = (
         ),
     ),
     (
+        "tests/verifyOnboardingPlaywright.py",
+        (
+            "진단 복사",
+            "diagnostic-export-copy-ok",
+            "GET /api/system/diagnostics/export",
+            "codaro-local-diagnostic-export",
+        ),
+    ),
+    (
         "docs/skills/ops/product/service-candidate.md",
         (
             "local diagnostic summary",
             "local diagnostic export",
             "부트스트랩은 `/api/system/diagnostics`를 읽어 시작 진단 안내를 제품 상단 상태로 보여준다",
             "`/api/system/diagnostics/export`",
+            "`진단 복사`",
             "provider failure, runtime failure, package failure, frontend failure",
             "token/API key/secret은 diagnostic summary/export와 로그에 남기지 않는다",
         ),
