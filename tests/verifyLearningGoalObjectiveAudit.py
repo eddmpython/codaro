@@ -706,7 +706,7 @@ def evaluateLiveToolLoopCase(
         missing,
         signals.get("toolSequence"),
         ("packages-check", "write-curriculum-yaml"),
-        ("read-cells",),
+        ("read-cells", "cell-call"),
         "ai-live-smoke live-tool-loop toolSequence",
     )
     checkEqual(evidence, missing, signals.get("contractGapCount"), 0, "ai-live-smoke live-tool-loop contractGapCount")

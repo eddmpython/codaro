@@ -61,7 +61,7 @@ runtime failure는 한 덩어리 오류가 아니다.
 
 scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지 못한다.
 
-- `ai-live-smoke`는 실제 provider credential이 있는 환경에서 짧은 일반 질문, teacher 질문, clarification gate, `packages-check → write-curriculum-yaml` 필수 prefix를 가진 YAML tool loop, `packages-check → cell-call` exact sequence를 가진 cell-call loop를 확인하고 `output/test-runner/ai-live-smoke/live-smoke-report.json`에 provider/model, latency, diagnostic action, tool sequence, workloop readable samples, tuning signal, `gitHead`, `startedAt`, `completedAt`, `durationMs`를 남긴다.
+- `ai-live-smoke`는 실제 provider credential이 있는 환경에서 짧은 일반 질문, teacher 질문, clarification gate, `packages-check → write-curriculum-yaml` 필수 prefix와 선택적 `read-cells`/정책 순서 준수 `cell-call` 후속 도구를 가진 YAML tool loop, `packages-check → cell-call` exact sequence를 가진 cell-call loop를 확인하고 `output/test-runner/ai-live-smoke/live-smoke-report.json`에 provider/model, latency, diagnostic action, tool sequence, workloop readable samples, tuning signal, `gitHead`, `startedAt`, `completedAt`, `durationMs`를 남긴다.
 - 모호한 학습 요청은 provider 호출 전에 clarification gate에서 멈춘다.
 - 구체적인 학습 요청은 structured YAML 생성과 tool loop로 이어진다.
 - 실제 provider가 tool call을 하지 않으면 실패 이유와 prompt/tool schema 개선 포인트를 남긴다.
