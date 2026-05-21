@@ -116,7 +116,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 ## Gate
 
-제품 품질 판단은 아래 gate 조합으로 한다. 수동으로 일부만 골라 실행하지 말고 같은 순서를 고정한 `quality-cycle`을 우선 사용한다. runner는 `output/test-runner/quality-cycle/sequence-summary.json`에 현재 `gitHead`, `startedAt`/`completedAt`, gate별 duration, return code, artifact freshness를 남겨 어떤 커밋에서 어떤 증거가 나온 것인지 확인할 수 있게 한다.
+제품 품질 판단은 아래 gate 조합으로 한다. 수동으로 일부만 골라 실행하지 말고 같은 순서를 고정한 `quality-cycle`을 우선 사용한다. runner는 `output/test-runner/quality-cycle/sequence-summary.json`에 현재 `gitHead`, `startedAt`/`completedAt`, gate별 duration, return code, `softFailureCount`, artifact freshness를 남겨 어떤 커밋에서 어떤 증거가 나온 것인지 확인할 수 있게 한다. `ai-live-smoke` credential missing exit code 2는 `softFailure: true`로 남기고 다음 gate를 계속 실행한다. 실제 provider 실패 exit code 1은 hard failure로 처리해 quality-cycle을 중단한다.
 
 ```bash
 uv run python -X utf8 tests/run.py quality-cycle
@@ -142,4 +142,4 @@ uv run python -X utf8 tests/run.py gate launcher-test
 
 ## 완료 판단
 
-목표 완료 선언은 “잘 만들어졌다”는 품질 판단을 증명해야 한다. `quality-cycle`, `product-quality-audit`, 개별 gate 결과가 있어야 하며, live provider credential이 없는 환경에서는 `ai-live-smoke`의 `live credential missing`을 증거로 남기되, 실제 provider 품질 판단은 credential이 있는 환경에서 다시 실행한 결과를 붙인다. `service-readiness-audit`는 이전 자동화를 위한 호환 alias일 뿐 완료 기준의 이름으로 쓰지 않는다.
+목표 완료 선언은 “잘 만들어졌다”는 품질 판단을 증명해야 한다. `quality-cycle`, `product-quality-audit`, 개별 gate 결과가 있어야 하며, live provider credential이 없는 환경에서는 `ai-live-smoke`의 `live credential missing`과 quality-cycle `softFailureCount`를 증거로 남기되, 실제 provider 품질 판단은 credential이 있는 환경에서 다시 실행한 결과를 붙인다. `service-readiness-audit`는 이전 자동화를 위한 호환 alias일 뿐 완료 기준의 이름으로 쓰지 않는다.

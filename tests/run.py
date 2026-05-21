@@ -37,6 +37,7 @@ class Gate:
     commands: tuple[GateCommand, ...]
     blocking: bool = True
     ci_required: bool = True
+    softExitCodes: tuple[int, ...] = ()
 
 
 def command(args: tuple[str, ...], cwd: str = ".") -> GateCommand:
@@ -81,6 +82,7 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyAiLiveSmoke.py")),),
         blocking=False,
         ci_required=False,
+        softExitCodes=(2,),
     ),
     "editor-runtime-preflight": Gate(
         tier="fast",
@@ -332,14 +334,16 @@ def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-seq
         gateStartedAt = time.monotonic()
         gateStartedAtNs = time.time_ns()
         returnCode = runGate(gateName)
+        softFailure = isSoftGateExit(gateName, returnCode)
         durationMs = round((time.monotonic() - gateStartedAt) * 1000)
         results.append({
             "gate": gateName,
             "returnCode": returnCode,
+            "softFailure": softFailure,
             "durationMs": durationMs,
             "artifacts": gateArtifactSummaries(gateName, gateStartedAtNs),
         })
-        if returnCode != 0:
+        if returnCode != 0 and not softFailure:
             writeGateSequenceSummary(
                 sequenceName=sequenceName,
                 gateNames=gateNames,
@@ -365,9 +369,25 @@ def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-seq
         startedAt=sequenceStartedAt,
     )
     passed = tuple(f"{result['gate']}({result['durationMs']}ms)" for result in results)
-    print(f"ok: gate sequence passed {len(passed)}/{len(gateNames)} gates in {totalMs} ms")
+    softFailures = tuple(result for result in results if result.get("softFailure"))
+    if softFailures:
+        softLabels = ", ".join(f"{result['gate']}(exit {result['returnCode']})" for result in softFailures)
+        print(
+            f"ok: gate sequence completed {len(passed)}/{len(gateNames)} gates "
+            f"with {len(softFailures)} soft status in {totalMs} ms"
+        )
+        print(f"soft gates: {softLabels}")
+    else:
+        print(f"ok: gate sequence passed {len(passed)}/{len(gateNames)} gates in {totalMs} ms")
     print(f"gates: {', '.join(passed)}")
     return 0
+
+
+def isSoftGateExit(gateName: str, returnCode: int) -> bool:
+    if returnCode == 0:
+        return False
+    gate = GATES[gateName]
+    return returnCode in gate.softExitCodes
 
 
 def writeGateSequenceSummary(
@@ -380,12 +400,16 @@ def writeGateSequenceSummary(
 ) -> Path:
     summaryDir = localGateWorkspace(sequenceName)
     summaryDir.mkdir(parents=True, exist_ok=True)
-    failed = next((result for result in results if result["returnCode"] != 0), None)
+    failed = next(
+        (result for result in results if result["returnCode"] != 0 and not result.get("softFailure")),
+        None,
+    )
     summaryPath = summaryDir / "sequence-summary.json"
     payload = {
         "sequence": sequenceName,
         "passed": failed is None and len(results) == len(gateNames),
         "completedGateCount": sum(1 for result in results if result["returnCode"] == 0),
+        "softFailureCount": sum(1 for result in results if result.get("softFailure")),
         "totalGateCount": len(gateNames),
         "totalMs": totalMs,
         "startedAt": startedAt,

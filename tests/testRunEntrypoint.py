@@ -176,3 +176,60 @@ def testGateSequenceFailureReportsCompletedGates(monkeypatch, capsys, tmp_path) 
     assert payload["totalGateCount"] == 3
     assert payload["failedGate"] == "backend"
     assert [item["returnCode"] for item in payload["gates"]] == [0, 7]
+
+
+def testGateSequenceContinuesThroughSoftLiveCredentialMissing(monkeypatch, capsys, tmp_path) -> None:
+    runner = loadRunner()
+    calls: list[str] = []
+
+    def fakeRunGate(name: str) -> int:
+        calls.append(name)
+        return 2 if name == "ai-live-smoke" else 0
+
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "runGate", fakeRunGate)
+
+    assert runner.runGateSequence(
+        ("docs", "ai-live-smoke", "backend"),
+        sequenceName="soft-sequence",
+    ) == 0
+
+    captured = capsys.readouterr()
+    assert calls == ["docs", "ai-live-smoke", "backend"]
+    assert "soft gates: ai-live-smoke(exit 2)" in captured.out
+
+    payload = json.loads((tmp_path / "soft-sequence" / "sequence-summary.json").read_text(encoding="utf-8"))
+    assert payload["passed"] is True
+    assert payload["failedGate"] is None
+    assert payload["completedGateCount"] == 2
+    assert payload["softFailureCount"] == 1
+    assert [item["returnCode"] for item in payload["gates"]] == [0, 2, 0]
+    assert payload["gates"][1]["softFailure"] is True
+
+
+def testGateSequenceStillFailsHardLiveProviderFailure(monkeypatch, capsys, tmp_path) -> None:
+    runner = loadRunner()
+    calls: list[str] = []
+
+    def fakeRunGate(name: str) -> int:
+        calls.append(name)
+        return 1 if name == "ai-live-smoke" else 0
+
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "runGate", fakeRunGate)
+
+    assert runner.runGateSequence(
+        ("docs", "ai-live-smoke", "backend"),
+        sequenceName="hard-live-sequence",
+    ) == 1
+
+    captured = capsys.readouterr()
+    assert calls == ["docs", "ai-live-smoke"]
+    assert "FAIL: gate sequence stopped at ai-live-smoke after 1/3 gates" in captured.err
+
+    payload = json.loads((tmp_path / "hard-live-sequence" / "sequence-summary.json").read_text(encoding="utf-8"))
+    assert payload["passed"] is False
+    assert payload["failedGate"] == "ai-live-smoke"
+    assert payload["completedGateCount"] == 1
+    assert payload["softFailureCount"] == 0
+    assert payload["gates"][1]["softFailure"] is False
