@@ -406,6 +406,7 @@ def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-seq
         gateStartedAtNs = time.time_ns()
         commandReturnCode = runGate(gateName)
         artifacts = gateArtifactSummaries(gateName, gateStartedAtNs, expectedGitHead=sequenceGitHead)
+        logs = commandLogSummaries(gateName, gateStartedAtNs)
         artifactFailure = commandReturnCode == 0 and hasArtifactEvidenceFailure(artifacts)
         returnCode = 1 if artifactFailure else commandReturnCode
         softFailure = isSoftGateExit(gateName, returnCode)
@@ -417,6 +418,7 @@ def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-seq
             "softFailure": softFailure,
             "artifactFailure": artifactFailure,
             "durationMs": durationMs,
+            "logs": logs,
             "artifacts": artifacts,
         })
         if returnCode != 0 and not softFailure:
@@ -528,6 +530,25 @@ def gateArtifactSummaries(
         }
         summary.update(jsonArtifactEvidence(path, expectedGitHead=expectedGitHead))
         summaries.append(summary)
+    return summaries
+
+
+def commandLogSummaries(gateName: str, gateStartedAtNs: int) -> list[dict[str, object]]:
+    logsDir = localGateWorkspace(gateName) / "logs"
+    if not logsDir.exists():
+        return []
+    summaries: list[dict[str, object]] = []
+    for logPath in sorted(logsDir.glob("*.log"), key=lambda path: path.stat().st_mtime_ns):
+        modifiedAtNs = logPath.stat().st_mtime_ns
+        if modifiedAtNs < gateStartedAtNs:
+            continue
+        summaries.append({
+            "path": displayPath(logPath),
+            "exists": True,
+            "fresh": True,
+            "modifiedAtNs": modifiedAtNs,
+            "bytes": logPath.stat().st_size,
+        })
     return summaries
 
 

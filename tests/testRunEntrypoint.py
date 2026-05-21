@@ -312,6 +312,38 @@ def testGateSequenceFailureReportsCompletedGates(monkeypatch, capsys, tmp_path) 
     assert [item["returnCode"] for item in payload["gates"]] == [0, 7]
 
 
+def testGateSequenceSummaryIncludesCommandLogs(monkeypatch, tmp_path) -> None:
+    runner = loadRunner()
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
+    monkeypatch.setattr(runner, "GATES", {
+        "unit-log": runner.Gate(
+            tier="fast",
+            description="unit log gate",
+            commands=(
+                runner.GateCommand(
+                    args=(sys.executable, "-c", "print('sequence evidence log')"),
+                    cwd=".",
+                ),
+            ),
+        ),
+    })
+
+    assert runner.runGateSequence(("unit-log",), sequenceName="unit-log-sequence") == 0
+
+    payload = json.loads(
+        (tmp_path / "output" / "test-runner" / "unit-log-sequence" / "sequence-summary.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    logs = payload["gates"][0]["logs"]
+    assert len(logs) == 1
+    assert logs[0]["path"].endswith(".log")
+    assert logs[0]["exists"] is True
+    assert logs[0]["fresh"] is True
+    assert logs[0]["bytes"] > 0
+
+
 def testGateSequenceContinuesThroughSoftLiveCredentialMissing(monkeypatch, capsys, tmp_path) -> None:
     runner = loadRunner()
     calls: list[str] = []
