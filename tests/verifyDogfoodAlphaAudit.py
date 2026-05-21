@@ -206,7 +206,7 @@ DOGFOOD_REQUIREMENTS = (
                 "\"quality-cycle\"",
                 "PRODUCT_QUALITY_GATES",
                 "tests/verifyDogfoodAlphaAudit.py",
-                "tests/verifyServiceReadinessAudit.py",
+                "tests/verifyProductQualityAudit.py",
                 "\"backend\"",
                 "\"diagnostic-summary-contract\"",
                 "\"provider-settings-browser\"",

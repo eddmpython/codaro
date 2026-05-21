@@ -655,7 +655,7 @@ def readinessCriteria(liveChecks: dict[str, LiveGateCheck]) -> tuple[ReadinessCr
                 )),
                 ("tests/run.py", (
                     "tests/verifyLearningGoalObjectiveAudit.py",
-                    "tests/verifyServiceReadinessAudit.py",
+                    "tests/verifyProductQualityAudit.py",
                     "\"learning-goal-audit\"",
                     "\"product-quality-audit\"",
                     "\"quality-cycle\"",

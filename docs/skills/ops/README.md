@@ -44,7 +44,7 @@ Git, 릴리즈, 라이선스, 패키징처럼 외부 배포와 권리 경계에 
 
 - [branding](product/branding.md)
 - [dogfood-alpha](product/dogfood-alpha.md)
-- [service-candidate](product/service-candidate.md)
+- [product-quality](product/service-candidate.md)
 
 ## Tools
 

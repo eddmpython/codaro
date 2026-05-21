@@ -385,7 +385,7 @@ OBJECTIVE_REQUIREMENTS = (
         evidenceChecks=(
             ("tests/run.py", (
                 "\"learning-goal-audit\"",
-                "tests/verifyServiceReadinessAudit.py",
+                "tests/verifyProductQualityAudit.py",
                 "\"product-quality-audit\"",
                 "tests/verifyLearningGoalObjectiveAudit.py",
                 "tests/verifyLearningSystemReadiness.py",

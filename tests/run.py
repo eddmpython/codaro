@@ -95,7 +95,7 @@ GATES: dict[str, Gate] = {
             command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/syncAgentsMd.py", "--check")),
             command(("uv", "run", "python", "-X", "utf8", "tests/run.py", "audit-self")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyDogfoodAlphaAudit.py")),
-            command(("uv", "run", "python", "-X", "utf8", "tests/verifyServiceReadinessAudit.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyProductQualityAudit.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningGoalObjectiveAudit.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningSystemReadiness.py")),
             command(("uv", "run", "pytest", "tests/", "-q", "--tb=short")),
@@ -112,7 +112,7 @@ GATES: dict[str, Gate] = {
     "product-quality-audit": Gate(
         tier="surface",
         description="제품 품질 기준과 새 내구성 gate 증거를 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyServiceReadinessAudit.py")),),
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyProductQualityAudit.py")),),
         ci_required=False,
     ),
     "service-readiness-audit": Gate(

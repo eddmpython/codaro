@@ -62,6 +62,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
         requirement="Product quality criteria are documented as an ops/product SSOT.",
         evidenceChecks=(
             ("docs/skills/ops/product/service-candidate.md", (
+                "id: product-quality",
                 "잘 만들어진 로컬 제품",
                 "quality-cycle",
                 "반복 사용 내구성",
@@ -74,9 +75,9 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "Diagnostic",
                 "Gate",
             )),
-            ("docs/skills/ops/README.md", ("service-candidate", "잘 만들어진 로컬 제품")),
-            ("docs/skills/README.md", ("service-candidate", "Ops (12)")),
-            ("docs/skills/architecture/ssot-map.md", ("product quality", "docs/skills/ops/product/service-candidate.md")),
+            ("docs/skills/ops/README.md", ("product-quality", "잘 만들어진 로컬 제품")),
+            ("docs/skills/README.md", ("product-quality", "Ops (12)")),
+            ("docs/skills/architecture/ssot-map.md", ("product quality", "`product-quality` 기준 id", "legacy path")),
         ),
     ),
     ProductQualityRequirement(
@@ -87,6 +88,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 *tuple(f"\"{gateName}\"" for gateName in PRODUCT_QUALITY_GATES),
                 "PRODUCT_QUALITY_GATES",
                 "\"quality-cycle\"",
+                "tests/verifyProductQualityAudit.py",
                 "writeGateSequenceSummary",
                 "sequence-summary.json",
             )),

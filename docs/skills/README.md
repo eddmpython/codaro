@@ -126,7 +126,7 @@ Product:
 
 - [branding](ops/product/branding.md)
 - [dogfood-alpha](ops/product/dogfood-alpha.md)
-- [service-candidate](ops/product/service-candidate.md)
+- [product-quality](ops/product/service-candidate.md)
 
 ## 후속 (PR 2 이후)
 

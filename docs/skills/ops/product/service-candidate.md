@@ -1,5 +1,5 @@
 ---
-id: service-candidate
+id: product-quality
 title: 제품 품질 기준
 description: Product quality proof contract for Codaro.
 category: ops
@@ -11,7 +11,7 @@ whenToUse: 제품 품질 판단, 설치/실행/복구, provider 반복 사용, r
 
 # 제품 품질 기준
 
-Codaro의 목표는 출시 딱지를 붙이는 것이 아니라 실제로 잘 만들어진 로컬 제품이 되는 것이다. 이 파일의 `service-candidate` id는 기존 문서 링크를 유지하기 위한 운영 이름일 뿐이다. 실제 사용자가 설치/실행/연결/질문/학습/셀 실행/오류 복구를 반복해도 상태가 꼬이지 않고, 실패가 생겨도 다음 행동을 알 수 있는지가 기준이다.
+Codaro의 목표는 출시 딱지를 붙이는 것이 아니라 실제로 잘 만들어진 로컬 제품이 되는 것이다. 이 문서의 기준 id는 `product-quality`다. 파일 경로의 `service-candidate` 이름은 기존 문서 링크를 유지하기 위한 legacy path일 뿐이다. 실제 사용자가 설치/실행/연결/질문/학습/셀 실행/오류 복구를 반복해도 상태가 꼬이지 않고, 실패가 생겨도 다음 행동을 알 수 있는지가 기준이다.
 
 `dogfood-alpha`가 첫 완주 경로를 고정한다면, 이 문서는 반복 사용 내구성과 잘 만들어진 제품 품질 판단 gate를 고정한다. 완료 선언은 감으로 하지 않는다. 아래 gate와 audit payload가 증거다.
 
