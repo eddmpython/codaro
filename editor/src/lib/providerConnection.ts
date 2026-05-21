@@ -21,6 +21,14 @@ export type ProviderAssistantFailure = {
   notice: AppNotice;
 };
 
+const providerSettingsActions = new Set([
+  "connect-provider",
+  "relogin-provider",
+  "restart-login",
+  "configure-api-key",
+  "configure-base-url",
+]);
+
 export function openProviderSettings(apiOnline: boolean): ProviderActionResult {
   if (apiOnline) {
     return {
@@ -157,6 +165,15 @@ export function providerAuthFailureNotice(error: unknown): AppNotice {
   };
 }
 
+export function providerActionFailureNotice(title: string, error: unknown): AppNotice {
+  const diagnostic = providerDiagnosticFromError(error);
+  return {
+    tone: "error",
+    title,
+    detail: diagnostic?.message ?? errorMessage(error).replace(/^\d+\s+/, ""),
+  };
+}
+
 export function providerAssistantFailure(error: unknown): ProviderAssistantFailure {
   const diagnostic = providerDiagnosticFromError(error);
   const authIssue = isProviderAuthError(error);
@@ -176,11 +193,8 @@ export function providerAssistantFailure(error: unknown): ProviderAssistantFailu
 
 export function isProviderAuthError(error: unknown) {
   const diagnostic = providerDiagnosticFromError(error);
-  if (
-    diagnostic?.action
-    && ["connect-provider", "relogin-provider", "restart-login", "configure-api-key", "configure-base-url"].includes(diagnostic.action)
-  ) {
-    return true;
+  if (diagnostic?.action) {
+    return providerSettingsActions.has(diagnostic.action);
   }
   const normalized = errorMessage(error).toLowerCase();
   return (

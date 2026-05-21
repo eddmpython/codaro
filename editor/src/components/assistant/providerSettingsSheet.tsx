@@ -469,6 +469,7 @@ function providerActionLabel(action?: string | null) {
     "configure-base-url": "Base URL 입력 필요",
     "connect-provider": "다시 로그인 필요",
     "relogin-provider": "다시 로그인 필요",
+    "retry-later": "잠시 후 재시도",
     "restart-login": "로그인 다시 시작",
   };
   return labels[action] ?? action;

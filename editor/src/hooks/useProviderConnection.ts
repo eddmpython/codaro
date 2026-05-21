@@ -3,6 +3,7 @@ import {
   loginOauthProvider,
   logoutOauthProvider as logoutOauthProviderAction,
   openProviderSettings,
+  providerActionFailureNotice,
   providerAuthFailureNotice,
   providerValidationFailure,
   saveApiProvider as saveApiProviderAction,
@@ -81,11 +82,7 @@ export function useProviderConnection({
       applyProviderActionResult(await logoutOauthProviderAction(providerId));
     } catch (error) {
       recordProviderFailure(providerId, error, "logout");
-      onNotice({
-        tone: "error",
-        title: "Provider 로그아웃 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
+      onNotice(providerActionFailureNotice("Provider 로그아웃 실패", error));
     } finally {
       setAiConnecting(false);
     }
@@ -98,11 +95,7 @@ export function useProviderConnection({
       applyProviderActionResult(await selectProvider(providerId));
     } catch (error) {
       recordProviderFailure(providerId, error, "select");
-      onNotice({
-        tone: "error",
-        title: "Provider 선택 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
+      onNotice(providerActionFailureNotice("Provider 선택 실패", error));
     } finally {
       setAiConnecting(false);
     }
@@ -115,11 +108,7 @@ export function useProviderConnection({
       applyProviderActionResult(await saveApiProviderAction(providerId, apiKey, baseUrl));
     } catch (error) {
       recordProviderFailure(providerId, error, "save");
-      onNotice({
-        tone: "error",
-        title: "Provider 저장 실패",
-        detail: error instanceof Error ? error.message : String(error),
-      });
+      onNotice(providerActionFailureNotice("Provider 저장 실패", error));
     } finally {
       setAiConnecting(false);
     }

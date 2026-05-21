@@ -56,5 +56,25 @@ def test_provider_settings_shows_live_fallback_and_failure_actions() -> None:
             "Base URL 입력 필요",
             "네트워크 문제",
             "OAuth 호환성 점검",
+            "잠시 후 재시도",
         ),
     )
+
+
+def test_provider_failure_notice_and_assistant_auth_boundary_use_diagnostics() -> None:
+    hook = read("editor/src/hooks/useProviderConnection.ts")
+    connection = read("editor/src/lib/providerConnection.ts")
+
+    assert_markers(
+        connection,
+        (
+            "providerSettingsActions",
+            "export function providerActionFailureNotice",
+            "diagnostic?.message ?? errorMessage(error).replace(/^\\d+\\s+/, \"\")",
+            "return providerSettingsActions.has(diagnostic.action)",
+        ),
+    )
+    assert "diagnostic?.action" in connection
+    assert "normalized.includes(\"oauth\")" in connection
+    assert "providerActionFailureNotice" in hook
+    assert hook.count("providerActionFailureNotice(") >= 3
