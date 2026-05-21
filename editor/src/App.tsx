@@ -35,6 +35,11 @@ function App() {
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [apiOnline, setApiOnline] = useState(initialBootstrapState.apiOnline);
   const [notice, setNotice] = useState<AppNotice>(initialAppNotice);
+  const applyNotice = useCallback((nextNotice: AppNotice) => {
+    setNotice((currentNotice) =>
+      shouldKeepCurrentNotice(currentNotice, nextNotice) ? currentNotice : nextNotice,
+    );
+  }, []);
   const {
     addNotebookCell,
     applyDraftUpdates,
@@ -63,7 +68,7 @@ function App() {
     setSelectedCurriculumBlockId,
   } = useCurriculumLibraryState({
     onDraftUpdates: applyDraftUpdates,
-    onNotice: setNotice,
+    onNotice: applyNotice,
   });
   const {
     customCurricula,
@@ -73,7 +78,7 @@ function App() {
     setSelectedCustomCurriculumId,
   } = useCustomCurriculaState({
     initialSelectedCustomCurriculumId: initialBootstrapState.selectedCustomCurriculumId,
-    onNotice: setNotice,
+    onNotice: applyNotice,
   });
   const [toolCatalog, setToolCatalog] = useState(initialBootstrapState.toolCatalog);
   const { themeMode, toggleThemeMode } = useThemeMode();
@@ -89,7 +94,7 @@ function App() {
     setAutomationSection,
     tasks,
     toggleEStop,
-  } = useAutomationState({ apiOnline, onNotice: setNotice });
+  } = useAutomationState({ apiOnline, onNotice: applyNotice });
   const {
     aiConnecting,
     aiProfile,
@@ -103,7 +108,7 @@ function App() {
     setProviderSettingsOpen,
     startOauthProviderLogin,
     validateAiProvider,
-  } = useProviderConnection({ apiOnline, onNotice: setNotice });
+  } = useProviderConnection({ apiOnline, onNotice: applyNotice });
 
   const {
     filteredCategories,
@@ -124,7 +129,7 @@ function App() {
     selectCurriculumContentState,
     setSelectedCustomCurriculumId,
     setSurface,
-    onNotice: setNotice,
+    onNotice: applyNotice,
   });
 
   const activeDocument = surface === "curriculum" && curriculumDocument ? curriculumDocument : document;
@@ -147,7 +152,7 @@ function App() {
     apiOnline,
     document: activeDocument,
     drafts,
-    onNotice: setNotice,
+    onNotice: applyNotice,
     selectCurriculumBlock: setSelectedCurriculumBlockId,
     selectNotebookBlock: selectBlock,
     selectedBlock,
@@ -167,7 +172,7 @@ function App() {
     saveCurriculum: saveCustomCurriculum,
     selectNotebookBlock: selectBlock,
     setSurface,
-    onNotice: setNotice,
+    onNotice: applyNotice,
   });
 
   const applyDocument = useCallback((nextDocument: CodaroDocument) => {
@@ -181,7 +186,7 @@ function App() {
     applyDocument,
     onApiOnline: setApiOnline,
     onLoadState: setLoadState,
-    onNotice: setNotice,
+    onNotice: applyNotice,
     onProfile: setAiProfile,
     onSessionId: setSessionId,
     onToolCatalog: setToolCatalog,
@@ -216,7 +221,7 @@ function App() {
     surface,
     toolCatalog,
     variables,
-    onNotice: setNotice,
+    onNotice: applyNotice,
   });
 
   function selectAutomationSection(section: AutomationSection) {
@@ -328,6 +333,15 @@ function App() {
       />
     </SidebarProvider>
   );
+}
+
+const backgroundNoticeTitles = new Set(["커리큘럼 열림"]);
+
+function shouldKeepCurrentNotice(currentNotice: AppNotice, nextNotice: AppNotice) {
+  const currentIsDiagnostic = currentNotice.tone === "warning" || currentNotice.tone === "error";
+  const nextIsBackground =
+    nextNotice.tone === "success" && backgroundNoticeTitles.has(nextNotice.title);
+  return currentIsDiagnostic && nextIsBackground;
 }
 
 export default App;
