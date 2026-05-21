@@ -10,7 +10,13 @@ from typing import Any
 ROOT = Path(__file__).resolve().parents[1]
 MINIMUM_SCORE = 9
 PRODUCT_QUALITY_GATES = (
+    "docs",
+    "backend",
+    "learning-system-readiness",
+    "dogfood-alpha-audit",
     "service-readiness-audit",
+    "ai-live-smoke",
+    "provider-settings-browser",
     "install-launcher-smoke",
     "runtime-recovery-contract",
     "runtime-recovery-browser",
@@ -18,6 +24,7 @@ PRODUCT_QUALITY_GATES = (
     "onboarding-browser",
     "frontend-performance-budget",
     "landing-build",
+    "launcher-test",
 )
 
 
@@ -207,7 +214,7 @@ SERVICE_REQUIREMENTS = (
     ),
     ServiceRequirement(
         requirementId="live-provider-diagnostics",
-        requirement="AI live smoke reports provider failure categories with reusable provider diagnostics.",
+        requirement="AI live smoke reports provider failure categories and keeps OAuth tool-result continuation explicit.",
         evidenceChecks=(
             ("tests/verifyAiLiveSmoke.py", (
                 "providerErrorDiagnostic",
@@ -222,10 +229,31 @@ SERVICE_REQUIREMENTS = (
                 "provider_network_error",
                 "configure-api-key",
             )),
+            ("tests/testAiProvider.py", (
+                "test_oauth_body_bridges_tool_results_as_user_text",
+                "[tool_result id=call-check]",
+                "previous_response_id",
+            )),
+            ("tests/testTeacherArchitecture.py", (
+                "testProviderToolResultSerializationGuidesCellCallAfterReadyPackageCheck",
+                "codaroToolPolicy",
+                "nextRequiredTool",
+                "Do not call packages-check again",
+            )),
+            ("src/codaro/ai/providers/oauthChatgptProvider.py", (
+                "[tool_result id=",
+            )),
+            ("src/codaro/ai/teacher/providerLoop.py", (
+                "codaroToolPolicy",
+                "nextRequiredTool",
+                "providerToolPolicyHint",
+            )),
             ("docs/skills/architecture/live-provider-ops.md", (
                 "diagnostic.code",
                 "diagnostic.action",
                 "liveCredentialDiagnostic",
+                "text bridge",
+                "codaroToolPolicy.nextRequiredTool",
             )),
         ),
     ),
@@ -287,9 +315,9 @@ def main() -> int:
     payload = buildAuditPayload(results)
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     if payload["requirementFailures"]:
-        print("FAIL: service readiness audit requirements are incomplete", file=sys.stderr)
+        print("FAIL: product quality audit requirements are incomplete", file=sys.stderr)
         return 1
-    print(f"ok: service readiness audit score {payload['score']}/{payload['maxScore']}")
+    print(f"ok: product quality audit score {payload['score']}/{payload['maxScore']}")
     return 0
 
 
@@ -302,7 +330,7 @@ def buildAuditPayload(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:
         requirementFailures.append({
             "id": "minimum-score",
             "passed": False,
-            "requirement": f"service readiness audit score must be at least {MINIMUM_SCORE}",
+            "requirement": f"product quality audit score must be at least {MINIMUM_SCORE}",
             "evidence": [],
             "missing": [f"score {score} < {MINIMUM_SCORE}"],
         })

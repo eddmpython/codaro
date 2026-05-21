@@ -528,7 +528,7 @@ export const docsPages = [
       "service-candidate"
     ],
     "title": "제품 품질 기준",
-    "description": "Product quality readiness contract for Codaro.",
+    "description": "Product quality proof contract for Codaro.",
     "section": "ops",
     "sectionLabel": "Operations",
     "order": 322,
@@ -1130,7 +1130,7 @@ export const docsSections = [
           "service-candidate"
         ],
         "title": "제품 품질 기준",
-        "description": "Product quality readiness contract for Codaro.",
+        "description": "Product quality proof contract for Codaro.",
         "section": "ops",
         "sectionLabel": "Operations",
         "order": 322,

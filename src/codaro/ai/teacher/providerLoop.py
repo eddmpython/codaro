@@ -344,18 +344,118 @@ async def finishTeacherToolCall(
         result = await executor.execute(toolCall.name, toolCall.arguments)
     policy.recordResult(toolCall.name, toolCall.arguments, result)
 
-    resultText = serializeToolResultForProvider(result)
+    resultText = serializeToolResultForProvider(
+        result,
+        toolName=toolCall.name,
+        arguments=toolCall.arguments,
+        policy=policy,
+    )
     convManager.addToolResult(conversationId, toolCall.id, resultText)
     messages.append({"role": "tool", "tool_call_id": toolCall.id, "content": resultText})
     return orchestrator.toolCallResult(trace, toolCall.id, toolCall.name, toolCall.arguments, result)
 
 
-def serializeToolResultForProvider(result: dict[str, Any], *, maxChars: int | None = None) -> str:
-    fullText = json.dumps(result, ensure_ascii=False, default=str)
+def serializeToolResultForProvider(
+    result: dict[str, Any],
+    *,
+    maxChars: int | None = None,
+    toolName: str | None = None,
+    arguments: dict[str, Any] | None = None,
+    policy: ToolPolicyState | None = None,
+) -> str:
+    providerResult = providerToolResultWithPolicyHint(
+        result,
+        toolName=toolName,
+        arguments=arguments,
+        policy=policy,
+    )
+    fullText = json.dumps(providerResult, ensure_ascii=False, default=str)
     limit = providerToolResultMaxChars(maxChars)
     if len(fullText) <= limit:
         return fullText
-    return _boundedToolResultEnvelope(result, fullText, limit)
+    return _boundedToolResultEnvelope(providerResult, fullText, limit)
+
+
+def providerToolResultWithPolicyHint(
+    result: dict[str, Any],
+    *,
+    toolName: str | None,
+    arguments: dict[str, Any] | None,
+    policy: ToolPolicyState | None,
+) -> dict[str, Any]:
+    if not isinstance(result, dict):
+        return result
+    hint = providerToolPolicyHint(toolName=toolName, arguments=arguments or {}, result=result, policy=policy)
+    if not hint:
+        return result
+    return {**result, "codaroToolPolicy": hint}
+
+
+def providerToolPolicyHint(
+    *,
+    toolName: str | None,
+    arguments: dict[str, Any],
+    result: dict[str, Any],
+    policy: ToolPolicyState | None,
+) -> dict[str, Any] | None:
+    if result.get("error"):
+        return None
+    if toolName == "packages-check":
+        checked = _argumentNames(arguments)
+        missing = _resultNames(result.get("missing"))
+        if missing:
+            return {
+                "status": "packages-missing",
+                "checkedPackages": checked,
+                "missingPackages": missing,
+                "nextRequiredTool": "packages-install",
+                "instruction": (
+                    "packages-check is complete. Do not call packages-check again for these packages; "
+                    "call packages-install for each missing package before cell-call."
+                ),
+            }
+        return {
+            "status": "packages-ready",
+            "checkedPackages": checked,
+            "nextRequiredTool": "cell-call",
+            "instruction": (
+                "packages-check is complete and all required packages are ready. "
+                "Do not call packages-check again for these packages; call cell-call for the target learning cell."
+            ),
+        }
+    if toolName == "packages-install" and result.get("success") is True:
+        unresolved = _unresolvedPackages(policy)
+        return {
+            "status": "package-installed",
+            "nextRequiredTool": "packages-install" if unresolved else "cell-call",
+            "unresolvedPackages": unresolved,
+            "instruction": (
+                "Package installation result is recorded. "
+                "Install any remaining missing packages, otherwise call cell-call for the target learning cell."
+            ),
+        }
+    return None
+
+
+def _argumentNames(arguments: dict[str, Any]) -> list[str]:
+    names = arguments.get("names")
+    if isinstance(names, list):
+        return [str(name) for name in names if str(name).strip()]
+    name = arguments.get("name")
+    return [str(name)] if str(name or "").strip() else []
+
+
+def _resultNames(value: Any) -> list[str]:
+    if not isinstance(value, list):
+        return []
+    return [str(name) for name in value if str(name).strip()]
+
+
+def _unresolvedPackages(policy: ToolPolicyState | None) -> list[str]:
+    if policy is None:
+        return []
+    unresolved = (policy.requiredPackages & policy.missingPackages) - policy.installedPackages
+    return sorted(unresolved)
 
 
 def providerToolResultMaxChars(maxChars: int | None = None) -> int:

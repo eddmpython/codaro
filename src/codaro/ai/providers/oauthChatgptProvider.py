@@ -95,7 +95,6 @@ def _raiseHttpError(status: int, body: str) -> None:
 
 
 class OAuthChatGPTProvider(BaseProvider):
-
     @property
     def defaultModel(self) -> str:
         return "gpt-5.4"
@@ -177,16 +176,15 @@ class OAuthChatGPTProvider(BaseProvider):
         return headers
 
     def _buildBody(self, messages: list[dict[str, str]], tools: list[dict] | None = None) -> dict:
-        systemParts = []
+        systemParts = _systemInstructions(messages)
         inputItems = []
 
         for m in messages:
             role = str(m.get("role") or "user")
             content = str(m.get("content") or "")
             if role == "system":
-                if content:
-                    systemParts.append(content)
-            elif role == "tool":
+                continue
+            if role == "tool":
                 inputItems.append(
                     {
                         "type": "message",
@@ -336,6 +334,14 @@ class OAuthChatGPTProvider(BaseProvider):
     def _parseSseResponse(self, raw: str) -> str:
         answer, _toolCalls = _parseSseResponseDetailed(raw)
         return answer
+
+
+def _systemInstructions(messages: list[dict[str, str]]) -> list[str]:
+    return [
+        str(message.get("content") or "")
+        for message in messages
+        if str(message.get("role") or "") == "system" and str(message.get("content") or "")
+    ]
 
 
 def _responseTools(tools: list[dict]) -> list[dict]:

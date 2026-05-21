@@ -5,13 +5,13 @@ description: Local alpha readiness standard for the first Codaro user flow.
 category: ops
 section: product
 order: 331
-purpose: 서비스 출시 판단 전에 provider 연결부터 학습 생성, 셀 실행, 실패 복구까지 실제 사용 흐름을 증거로 확인한다.
-whenToUse: local alpha, dogfood, provider 연결, 학습 생성, 셀 실행, 실패 복구, 출시 판단을 다룰 때.
+purpose: 잘 만들어진 제품 품질 판단 전에 provider 연결부터 학습 생성, 셀 실행, 실패 복구까지 실제 사용 흐름을 증거로 확인한다.
+whenToUse: local alpha, dogfood, provider 연결, 학습 생성, 셀 실행, 실패 복구, 제품 품질 판단을 다룰 때.
 ---
 
 # Dogfood Alpha 기준
 
-Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자가 한 사이클을 끝까지 완주할 수 있는가다. 이 문서는 dogfood alpha 판단의 SSOT다. 서비스 출시 판단은 이 기준과 gate 결과가 나온 뒤에만 하며, 판단은 감이 아니라 증거 기반으로 남긴다.
+Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자가 한 사이클을 끝까지 완주할 수 있는가다. 이 문서는 dogfood alpha 판단의 SSOT다. 잘 만들어진 제품 품질 판단은 이 기준과 gate 결과가 나온 뒤에만 하며, 판단은 감이 아니라 증거 기반으로 남긴다.
 
 ## 첫 사용자 플로우
 
@@ -51,7 +51,7 @@ Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자
 - `uv run python -X utf8 tests/run.py gate docs`
 - `uv run python -X utf8 tests/run.py gate landing-build`
 
-`ai-live-smoke`는 opt-in live gate다. credential/token/API key를 저장소에 남기지 않는다. credential이 없는 환경에서는 그 사실을 결과로 남기고, 실제 서비스 판단에는 credential이 있는 환경에서 다시 실행한 결과를 붙인다.
+`ai-live-smoke`는 opt-in live gate다. credential/token/API key를 저장소에 남기지 않는다. credential이 없는 환경에서는 그 사실을 결과로 남기고, 실제 제품 품질 판단에는 credential이 있는 환경에서 다시 실행한 결과를 붙인다.
 
 `provider-settings-browser`와 `learning-card-browser` 같은 브라우저 gate는 제품 표면 증거다. 로컬 구현이 통과해도 브라우저 gate가 실패하면 사용자가 완주할 수 있다고 말하지 않는다.
 
@@ -66,6 +66,6 @@ Codaro의 다음 기준은 기능을 더 붙였는지가 아니라 첫 사용자
 
 ## 관련 gate
 
-`dogfood-alpha-audit`는 문서와 코드에 9단계 완주 경로, provider/OAuth 복구, live provider smoke, 학습카드 완주 UX, workloop/trace, 서비스 판단 gate가 연결되어 있는지 확인한다.
+`dogfood-alpha-audit`는 문서와 코드에 9단계 완주 경로, provider/OAuth 복구, live provider smoke, 학습카드 완주 UX, workloop/trace, 제품 품질 판단 gate가 연결되어 있는지 확인한다.
 
-`learning-goal-audit`는 최종 묶음 gate다. `dogfood-alpha-audit`, 기존 학습 목표 audit, readiness, backend, landing build를 한 번에 묶어 "부분 gate는 통과했지만 출시 판단 증거가 빠진" 상태를 막는다.
+`learning-goal-audit`는 최종 묶음 gate다. `dogfood-alpha-audit`, 기존 학습 목표 audit, readiness, backend, landing build를 한 번에 묶어 "부분 gate는 통과했지만 제품 품질 증거가 빠진" 상태를 막는다.

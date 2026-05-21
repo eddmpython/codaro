@@ -50,7 +50,13 @@ def testGateNamesAreStable() -> None:
     }
     assert runner.PREFLIGHT_GATES == ("docs", "backend")
     assert runner.PRODUCT_QUALITY_GATES == (
+        "docs",
+        "backend",
+        "learning-system-readiness",
+        "dogfood-alpha-audit",
         "service-readiness-audit",
+        "ai-live-smoke",
+        "provider-settings-browser",
         "install-launcher-smoke",
         "runtime-recovery-contract",
         "runtime-recovery-browser",
@@ -58,6 +64,7 @@ def testGateNamesAreStable() -> None:
         "onboarding-browser",
         "frontend-performance-budget",
         "landing-build",
+        "launcher-test",
     )
 
 

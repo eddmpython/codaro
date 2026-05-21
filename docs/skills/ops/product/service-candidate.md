@@ -1,7 +1,7 @@
 ---
 id: service-candidate
 title: 제품 품질 기준
-description: Product quality readiness contract for Codaro.
+description: Product quality proof contract for Codaro.
 category: ops
 section: product
 order: 322
@@ -13,7 +13,7 @@ whenToUse: 제품 품질 판단, 설치/실행/복구, provider 반복 사용, r
 
 Codaro의 목표는 출시 딱지를 붙이는 것이 아니라 실제로 잘 만들어진 로컬 제품이 되는 것이다. 이 파일의 `service-candidate` id는 기존 문서 링크를 유지하기 위한 운영 이름일 뿐이다. 실제 사용자가 설치/실행/연결/질문/학습/셀 실행/오류 복구를 반복해도 상태가 꼬이지 않고, 실패가 생겨도 다음 행동을 알 수 있는지가 기준이다.
 
-`dogfood-alpha`가 첫 완주 경로를 고정한다면, 이 문서는 반복 사용 내구성과 private beta 판단 gate를 고정한다. 완료 선언은 감으로 하지 않는다. 아래 gate와 audit payload가 증거다.
+`dogfood-alpha`가 첫 완주 경로를 고정한다면, 이 문서는 반복 사용 내구성과 잘 만들어진 제품 품질 판단 gate를 고정한다. 완료 선언은 감으로 하지 않는다. 아래 gate와 audit payload가 증거다.
 
 ## 판단 원칙
 
@@ -96,7 +96,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - 기본 커리큘럼 YAML 원문은 bootstrap bundle에 싣지 않는다. 목록은 경량 registry로 만들고, 레슨 YAML은 선택한 레슨을 열 때 lazy loading한다.
 - 공개 문서 surface도 generated docs 본문 HTML을 nav chunk에 싣지 않는다. 문서 목록은 metadata만 들고, 본문은 `docsPages/page*.js`로 분리해 slug route에서 필요한 문서만 로딩한다.
 - `frontend-performance-budget`는 chunk count, 가장 큰 JS chunk, entry JS chunk, 전체 JS/CSS 크기, curriculum lazy loading 계약을 확인한다.
-- 현재 service candidate budget은 가장 큰 JS chunk 400KB 이하, entry JS chunk 300KB 이하, 전체 JS 7.5MB 이하, CSS 160KB 이하로 둔다.
+- 현재 제품 품질 budget은 가장 큰 JS chunk 400KB 이하, entry JS chunk 300KB 이하, 전체 JS 7.5MB 이하, CSS 160KB 이하로 둔다.
 - desktop/mobile에서 텍스트, 버튼, 카드, TOC, popover가 겹치지 않아야 한다.
 
 ## Diagnostic
@@ -112,20 +112,28 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 ## Gate
 
-제품 품질 판단은 아래 gate 조합으로 한다. 수동 실행 대신 같은 순서를 고정한 `quality-cycle`을 우선 사용한다.
+제품 품질 판단은 아래 gate 조합으로 한다. 수동으로 일부만 골라 실행하지 말고 같은 순서를 고정한 `quality-cycle`을 우선 사용한다.
 
 ```bash
 uv run python -X utf8 tests/run.py quality-cycle
+uv run python -X utf8 tests/run.py gate docs
+uv run python -X utf8 tests/run.py gate backend
+uv run python -X utf8 tests/run.py gate learning-system-readiness
+uv run python -X utf8 tests/run.py gate dogfood-alpha-audit
 uv run python -X utf8 tests/run.py gate service-readiness-audit
+uv run python -X utf8 tests/run.py gate ai-live-smoke
+uv run python -X utf8 tests/run.py gate provider-settings-browser
 uv run python -X utf8 tests/run.py gate install-launcher-smoke
 uv run python -X utf8 tests/run.py gate runtime-recovery-contract
 uv run python -X utf8 tests/run.py gate runtime-recovery-browser
 uv run python -X utf8 tests/run.py gate curriculum-quality-matrix
 uv run python -X utf8 tests/run.py gate onboarding-browser
 uv run python -X utf8 tests/run.py gate frontend-performance-budget
+uv run python -X utf8 tests/run.py gate landing-build
+uv run python -X utf8 tests/run.py gate launcher-test
 ```
 
-기존 `backend`, `editor-build`, `landing-build`, `launcher-check`, `launcher-test`, `provider-settings-browser`, `ai-live-smoke`, `learning-card-contract`, `learning-card-browser`, `assistant-workloop-contract`, `dogfood-alpha-audit`, `learning-system-readiness`, `learning-goal-audit`, `docs` gate도 유지한다.
+`editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
 
 ## 완료 판단
 

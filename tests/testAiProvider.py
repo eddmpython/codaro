@@ -670,6 +670,39 @@ class TestOAuthChatGPTTools:
         assert toolCalls[0].name == "get-variables"
         assert toolCalls[0].arguments == {"limit": 5}
 
+    def test_oauth_body_bridges_tool_results_as_user_text(self):
+        provider = OAuthChatGPTProvider(LLMConfig(provider="oauth-chatgpt", model="test-model"))
+        messages = [
+            {"role": "system", "content": "system prompt"},
+            {"role": "user", "content": "run the cell"},
+            {
+                "role": "assistant",
+                "content": "checking packages",
+                "tool_calls": [
+                    {
+                        "id": "call-check",
+                        "type": "function",
+                        "function": {
+                            "name": "packages-check",
+                            "arguments": "{\"names\":[\"numpy\"]}",
+                        },
+                    }
+                ],
+            },
+            {
+                "role": "tool",
+                "tool_call_id": "call-check",
+                "content": "{\"missing\":[],\"ready\":true}",
+            },
+        ]
+
+        body = provider._buildBody(messages)
+
+        assert body["instructions"] == "system prompt"
+        assert "[tool_result id=call-check]" in str(body["input"])
+        assert "function_call_output" not in str(body["input"])
+        assert "previous_response_id" not in body
+
 
 class TestOAuthLoginFlow:
     def test_authorize_and_callback_success(self):

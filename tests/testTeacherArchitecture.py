@@ -1384,6 +1384,25 @@ def testProviderToolResultSerializationPreservesSmallPayloads() -> None:
     assert json.loads(content) == result
 
 
+def testProviderToolResultSerializationGuidesCellCallAfterReadyPackageCheck() -> None:
+    policy = ToolPolicyState.fromContext({"dependencyPreflight": {"packages": ["numpy"]}})
+    result = {"missing": [], "packages": [{"name": "numpy", "installed": True}], "ready": True}
+    policy.recordResult("packages-check", {"names": ["numpy"]}, result)
+
+    content = teacherProviderLoop.serializeToolResultForProvider(
+        result,
+        toolName="packages-check",
+        arguments={"names": ["numpy"]},
+        policy=policy,
+    )
+    payload = json.loads(content)
+
+    assert payload["missing"] == []
+    assert payload["codaroToolPolicy"]["status"] == "packages-ready"
+    assert payload["codaroToolPolicy"]["nextRequiredTool"] == "cell-call"
+    assert "Do not call packages-check again" in payload["codaroToolPolicy"]["instruction"]
+
+
 def testProviderToolResultSerializationBoundsLargeSignalText() -> None:
     result = {
         "ok": False,

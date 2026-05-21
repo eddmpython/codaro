@@ -206,7 +206,13 @@ GATES: dict[str, Gate] = {
 
 PREFLIGHT_GATES = ("docs", "backend")
 PRODUCT_QUALITY_GATES = (
+    "docs",
+    "backend",
+    "learning-system-readiness",
+    "dogfood-alpha-audit",
     "service-readiness-audit",
+    "ai-live-smoke",
+    "provider-settings-browser",
     "install-launcher-smoke",
     "runtime-recovery-contract",
     "runtime-recovery-browser",
@@ -214,6 +220,7 @@ PRODUCT_QUALITY_GATES = (
     "onboarding-browser",
     "frontend-performance-budget",
     "landing-build",
+    "launcher-test",
 )
 TIER_ORDER = ("fast", "surface", "release")
 

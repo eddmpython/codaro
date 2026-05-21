@@ -198,7 +198,7 @@ DOGFOOD_REQUIREMENTS = (
     ),
     DogfoodRequirement(
         requirementId="service-judgement-gates",
-        requirement="Service readiness is blocked on named gates plus the first-user audit.",
+        requirement="Product quality judgement is blocked on named gates plus the first-user audit.",
         evidenceChecks=(
             ("tests/run.py", (
                 "\"dogfood-alpha-audit\"",
@@ -234,7 +234,7 @@ DOGFOOD_REQUIREMENTS = (
         evidenceChecks=(
             ("docs/skills/ops/product/dogfood-alpha.md", (
                 "dogfood alpha",
-                "서비스 출시 판단",
+                "잘 만들어진 제품 품질 판단",
                 "증거 기반",
                 "docs/skills",
                 "main",
