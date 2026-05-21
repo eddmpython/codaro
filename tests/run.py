@@ -22,6 +22,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "frontend-performance-budget": ("output/test-runner/frontend-performance-budget/performance-report.json",),
     "onboarding-browser": ("output/test-runner/onboarding-browser/onboarding-report.json",),
     "provider-settings-browser": ("output/test-runner/provider-settings-browser/provider-settings-report.json",),
+    "runtime-recovery-browser": ("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
     "preflight": ("output/test-runner/preflight/sequence-summary.json",),
 }

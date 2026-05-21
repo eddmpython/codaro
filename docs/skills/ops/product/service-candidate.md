@@ -56,6 +56,7 @@ runtime failure는 한 덩어리 오류가 아니다.
 - 설치 결과는 `installer: uv`, `environment: project .venv`, `durationMs`, `skipped`를 보존한다.
 - 학습 화면의 라이브러리 패널은 설치 중인 패키지와 `N/M` 진행 단계를 보여준다. 설치가 오래 걸릴 때도 사용자는 어떤 패키지가 `uv`로 준비 중인지 알아야 한다.
 - 셀 근처에는 “왜 실패했는지 / 무엇을 고쳐야 하는지 / 다시 실행 가능한지”가 보여야 한다.
+- `runtime-recovery-browser`는 `output/test-runner/runtime-recovery-browser/runtime-recovery-report.json`에 idle 안내, package install failure, cell execution failure를 case로 남긴다. report의 `cellCallBlockedAfterPackageFailure`, `cellCallExecutedForRuntimeFailure`, `packageFailureShownNearCell`, `cellFailureShownNearCell` signal은 패키지 실패와 셀 실행 실패가 같은 오류로 뭉개지지 않았다는 증거다.
 
 ## Provider/Teacher Loop
 
@@ -149,7 +150,7 @@ uv run python -X utf8 tests/run.py gate landing-build
 uv run python -X utf8 tests/run.py gate launcher-test
 ```
 
-`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, `frontend-performance-budget/performance-report.json`의 fresh 여부와 `gitHead`도 sequence artifact evidence로 대조한다. 첫 사용자 흐름은 `onboarding-browser/onboarding-report.json`의 fresh 여부와 `gitHead`로 대조하고, provider 설정 흐름은 `provider-settings-browser/provider-settings-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
+`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, `frontend-performance-budget/performance-report.json`의 fresh 여부와 `gitHead`도 sequence artifact evidence로 대조한다. 첫 사용자 흐름은 `onboarding-browser/onboarding-report.json`의 fresh 여부와 `gitHead`로 대조하고, provider 설정 흐름은 `provider-settings-browser/provider-settings-report.json`의 fresh 여부와 `gitHead`로 대조한다. runtime 복구 UX는 `runtime-recovery-browser/runtime-recovery-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
 
 ## 완료 판단
 

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+from datetime import UTC, datetime
 import json
 import socket
+import subprocess
 import sys
 import threading
 import time
@@ -26,13 +28,27 @@ PACKAGE_FAILURE_TITLE = "Runtime package recovery fixture"
 CELL_FAILURE_TITLE = "Runtime cell failure fixture"
 MISSING_PACKAGE = "codaro_missing_runtime_pkg"
 CELL_FAILURE_SYMBOL = "undefined_runtime_value"
+RUNTIME_RECOVERY_REPORT_PATH = ROOT / "output" / "test-runner" / "runtime-recovery-browser" / "runtime-recovery-report.json"
 
 
 def main(argv: list[str] | None = None) -> int:
+    startedAt = utcTimestamp()
+    started = time.monotonic()
+    checks: list[dict[str, Any]] = []
     args = buildParser().parse_args(argv)
     try:
         cliPath = resolvePlaywrightCli(ROOT)
     except PlaywrightCliError as exc:
+        writeRuntimeRecoveryReport(
+            {
+                "passed": False,
+                "status": "failed",
+                "checks": checks,
+                "error": str(exc),
+            },
+            startedAt=startedAt,
+            startedAtMonotonic=started,
+        )
         print(f"FAIL: {exc}", file=sys.stderr)
         return 1
 
@@ -59,22 +75,46 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsTextPresent(PACKAGE_FAILURE_TITLE), "custom runtime recovery curriculum")
         cli.eval(jsClickText(PACKAGE_FAILURE_TITLE))
         cli.waitEval(jsTextPresent("셀을 실행하면 결과와 오류가 여기에 표시됩니다."), "idle result recovery copy")
-        idle = cli.eval(jsAssertIdleRuntimeRecovery())
+        idle = recordCheck(checks, "idle-runtime-copy", cli.eval(jsAssertIdleRuntimeRecovery()))
         cli.eval(jsClickFirstRunButton())
         cli.waitEval(jsTextPresent("라이브러리 준비 실패"), "package install failure notice")
-        failure = cli.eval(jsAssertPackageFailureRecovery())
+        failure = recordCheck(checks, "package-install-failure", cli.eval(jsAssertPackageFailureRecovery()))
         cli.eval(jsClickText(CELL_FAILURE_TITLE))
         cli.waitEval(jsTextPresent("셀을 실행하면 결과와 오류가 여기에 표시됩니다."), "cell failure idle result copy")
         cli.eval(jsClickFirstRunButton())
         cli.waitEval(jsTextPresent("셀 실행 실패"), "cell execution failure recovery")
-        cellFailure = cli.eval(jsAssertCellFailureRecovery())
+        cellFailure = recordCheck(checks, "cell-execution-failure", cli.eval(jsAssertCellFailureRecovery()))
         api.assertExpectedCalls()
+        recordCheck(checks, "expected-api-calls", "expected-api-calls-ok")
+        writeRuntimeRecoveryReport(
+            {
+                "passed": True,
+                "status": "passed",
+                "checks": checks,
+                "signals": runtimeRecoverySignals(api.calls, checks),
+            },
+            startedAt=startedAt,
+            startedAtMonotonic=started,
+        )
         print(f"ok: runtime recovery browser verified {idle} {failure} {cellFailure}")
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
+        debugText = debugPageState(cli) if cli is not None else ""
+        writeRuntimeRecoveryReport(
+            {
+                "passed": False,
+                "status": "failed",
+                "checks": checks,
+                "error": str(exc),
+                "debugText": debugText[:2000],
+                "signals": runtimeRecoverySignals(api.calls, checks),
+            },
+            startedAt=startedAt,
+            startedAtMonotonic=started,
+        )
         print(f"FAIL: {exc}", file=sys.stderr)
         if cli is not None:
-            print(debugPageState(cli), file=sys.stderr)
+            print(debugText, file=sys.stderr)
         print("API calls: " + json.dumps(api.calls, ensure_ascii=False), file=sys.stderr)
         return 1
     finally:
@@ -92,6 +132,68 @@ def buildParser() -> argparse.ArgumentParser:
 
 class VerificationError(RuntimeError):
     pass
+
+
+def recordCheck(checks: list[dict[str, Any]], caseId: str, result: str) -> str:
+    checks.append({"caseId": caseId, "passed": True, "status": "passed", "result": result})
+    return result
+
+
+def runtimeRecoverySignals(apiCalls: list[str], checks: list[dict[str, Any]]) -> dict[str, Any]:
+    checkIds = [str(check["caseId"]) for check in checks]
+    return {
+        "apiCallCount": len(apiCalls),
+        "apiCalls": apiCalls,
+        "checkIds": checkIds,
+        "idleCopyVisible": "idle-runtime-copy" in checkIds,
+        "packageFailureShownNearCell": "package-install-failure" in checkIds,
+        "cellFailureShownNearCell": "cell-execution-failure" in checkIds,
+        "packagesCheckCalled": any("packages/list packages-check" in call for call in apiCalls),
+        "packagesInstallAttempted": any("packages/install packages-install" in call for call in apiCalls),
+        "cellCallBlockedAfterPackageFailure": not any("cell-call package-failure" in call for call in apiCalls),
+        "cellCallExecutedForRuntimeFailure": any("cell-call cell-failure" in call for call in apiCalls),
+    }
+
+
+def writeRuntimeRecoveryReport(payload: dict[str, Any], *, startedAt: str, startedAtMonotonic: float) -> Path:
+    report = dict(payload)
+    report["gate"] = "runtime-recovery-browser"
+    report["startedAt"] = startedAt
+    report["completedAt"] = utcTimestamp()
+    report["durationMs"] = round((time.monotonic() - startedAtMonotonic) * 1000)
+    gitHead = currentGitHead()
+    if gitHead:
+        report["gitHead"] = gitHead
+    report["reportPath"] = reportDisplayPath(RUNTIME_RECOVERY_REPORT_PATH)
+    RUNTIME_RECOVERY_REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    RUNTIME_RECOVERY_REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return RUNTIME_RECOVERY_REPORT_PATH
+
+
+def reportDisplayPath(reportPath: Path) -> str:
+    try:
+        return str(reportPath.relative_to(ROOT))
+    except ValueError:
+        return str(reportPath)
+
+
+def utcTimestamp() -> str:
+    return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def currentGitHead() -> str | None:
+    try:
+        result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+    except (FileNotFoundError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() or None
 
 
 class RuntimeRecoveryStubApi:

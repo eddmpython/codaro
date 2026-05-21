@@ -306,13 +306,25 @@ PRODUCT_QUALITY_REQUIREMENTS = (
         requirement="Runtime recovery browser gate verifies user-facing failure/retry copy near the learning surface.",
         evidenceChecks=(
             ("tests/verifyRuntimeRecoveryPlaywright.py", (
+                "RUNTIME_RECOVERY_REPORT_PATH",
+                "runtime-recovery-report.json",
                 "라이브러리 준비 실패",
                 "셀 실행 실패",
                 "셀을 실행하면 결과와 오류가 여기에 표시됩니다.",
                 "packages-check",
                 "packages-install",
+                "cellCallBlockedAfterPackageFailure",
+                "cellCallExecutedForRuntimeFailure",
+                "packageFailureShownNearCell",
+                "cellFailureShownNearCell",
             )),
-            ("tests/run.py", ("tests/verifyRuntimeRecoveryPlaywright.py", "\"runtime-recovery-browser\"")),
+            ("tests/run.py", (
+                "tests/verifyRuntimeRecoveryPlaywright.py",
+                "\"runtime-recovery-browser\"",
+                "output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",
+            )),
+            ("docs/skills/ops/product/service-candidate.md", ("runtime-recovery-report.json", "cellCallBlockedAfterPackageFailure")),
+            ("docs/skills/ops/foundation/testing-and-gates.md", ("runtime-recovery-browser/runtime-recovery-report.json", "payloadGitHead")),
         ),
     ),
     ProductQualityRequirement(
