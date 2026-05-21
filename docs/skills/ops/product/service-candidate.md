@@ -119,7 +119,9 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - token/API key/secret은 diagnostic summary/export와 로그에 남기지 않는다.
 - 문제 재현에는 provider/model/latency/error/tool sequence/workloop trace가 충분해야 한다.
 - gate 실행은 `tests/run.py`가 repo-local `output/test-runner/<gate>/` 아래로 실행 작업공간을 격리하고, uv/pytest cache는 비활성화하며, pytest basetemp, cargo target, scratch env를 고정해 사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다.
+- gate runner는 각 명령 stdout/stderr를 `output/test-runner/<gate>/logs` 아래에 남긴다. 실패하면 콘솔과 sequence summary를 보고 해당 log로 바로 들어가 원인을 확인할 수 있어야 한다. Windows에서 child process가 stdout pipe handle을 물고 있어도 runner가 EOF를 기다리며 멈추지 않도록 stdout/stderr는 log 파일에 직접 연결하고, timeout은 process tree 종료와 `exit: 124` 기록으로 마감한다.
 - 브라우저 gate 직접 실행도 repo-local `output/test-runner/<verifier>/scratch/playwright` 아래에서 Playwright daemon/session 파일을 만든다. OS temp에 임의 디렉터리를 만들지 않고, 외부 Playwright session env가 남아 있어도 wrapper가 repo-local workspace로 덮어쓴다.
+- launcher Rust 테스트는 고정 temp 이름을 쓰지 않는다. runner가 주입한 repo-local temp 아래에서 테스트별 `tempdir`을 만들고 drop으로 정리해 반복 실행 중 stale scratch와 충돌하지 않게 한다.
 
 ## Gate
 

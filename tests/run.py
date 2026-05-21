@@ -28,6 +28,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
 class GateCommand:
     args: tuple[str, ...]
     cwd: str = "."
+    timeoutSeconds: int = 900
 
 
 @dataclass(frozen=True)
@@ -40,8 +41,8 @@ class Gate:
     softExitCodes: tuple[int, ...] = ()
 
 
-def command(args: tuple[str, ...], cwd: str = ".") -> GateCommand:
-    return GateCommand(args=args, cwd=cwd)
+def command(args: tuple[str, ...], cwd: str = ".", timeoutSeconds: int = 900) -> GateCommand:
+    return GateCommand(args=args, cwd=cwd, timeoutSeconds=timeoutSeconds)
 
 
 GATES: dict[str, Gate] = {
@@ -259,9 +260,78 @@ def runCommand(gateName: str, gateCommand: GateCommand) -> int:
     executable = shutil.which(commandArgs[0])
     args = (executable, *commandArgs[1:]) if executable else commandArgs
     displayCwd = gateCommand.cwd
+    logPath = commandLogPath(gateName, commandArgs)
+    logPath.parent.mkdir(parents=True, exist_ok=True)
     print(f"\n[{gateName}] {displayCwd}> {' '.join(commandArgs)}", flush=True)
-    result = subprocess.run(args, cwd=cwd, check=False, env=env)
-    return result.returncode
+    with logPath.open("w", encoding="utf-8", newline="", buffering=1) as log:
+        log.write(f"[{gateName}] {displayCwd}> {' '.join(commandArgs)}\n")
+        log.write(f"cwd: {displayPath(cwd)}\n\n")
+        log.flush()
+        try:
+            process = subprocess.Popen(
+                args,
+                cwd=cwd,
+                env=env,
+                stdout=log,
+                stderr=subprocess.STDOUT,
+            )
+        except OSError as exc:
+            log.write(f"failed to start command: {type(exc).__name__}: {exc}\n")
+            log.flush()
+            print(f"[{gateName}] failed to start command; log: {displayPath(logPath)}", file=sys.stderr)
+            return 127
+        try:
+            returnCode = process.wait(timeout=gateCommand.timeoutSeconds)
+        except subprocess.TimeoutExpired:
+            log.write(f"\ntimeout: exceeded {gateCommand.timeoutSeconds}s\n")
+            log.flush()
+            terminateProcess(process)
+            returnCode = 124
+        log.write(f"\nexit: {returnCode}\n")
+        log.flush()
+    if returnCode != 0:
+        print(f"[{gateName}] command log: {displayPath(logPath)}", file=sys.stderr)
+        printLogTail(logPath)
+    return returnCode
+
+
+def commandLogPath(gateName: str, commandArgs: tuple[str, ...]) -> Path:
+    commandName = commandArgs[0] if commandArgs else "command"
+    safeCommand = re.sub(r"[^A-Za-z0-9_.-]+", "-", commandName).strip("-") or "command"
+    return localGateWorkspace(gateName) / "logs" / f"{time.time_ns()}-{safeCommand}.log"
+
+
+def terminateProcess(process: subprocess.Popen[object]) -> None:
+    if os.name == "nt" and shutil.which("taskkill"):
+        try:
+            subprocess.run(
+                ("taskkill", "/PID", str(process.pid), "/T", "/F"),
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=15,
+            )
+        except (OSError, subprocess.TimeoutExpired):
+            process.kill()
+    else:
+        process.kill()
+    try:
+        process.wait(timeout=5)
+    except subprocess.TimeoutExpired:
+        pass
+
+
+def printLogTail(logPath: Path, maxLines: int = 200) -> None:
+    try:
+        lines = logPath.read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return
+    if not lines:
+        return
+    if len(lines) > maxLines:
+        print(f"[log tail] showing last {maxLines} of {len(lines)} lines from {displayPath(logPath)}")
+        lines = lines[-maxLines:]
+    for line in lines:
+        print(line)
 
 
 def localGateEnvironment(gateName: str) -> dict[str, str]:

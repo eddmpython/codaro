@@ -1740,9 +1740,13 @@ port = int(arg_value("--port", "0"))
 class ReusableHTTPServer(HTTPServer):
     allow_reuse_address = True
 
+    def handle_error(self, request, client_address):
+        return
+
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/api/health":
+            self.server.seen_health = True
             body = b'{"status":"ok"}'
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -1757,7 +1761,9 @@ class Handler(BaseHTTPRequestHandler):
         return
 
 server = ReusableHTTPServer((host, port), Handler)
-server.handle_request()
+server.seen_health = False
+while not server.seen_health:
+    server.handle_request()
 "#
             }
             FakeBackendBehavior::HealthForever => {
@@ -1779,6 +1785,9 @@ port = int(arg_value("--port", "0"))
 
 class ReusableHTTPServer(HTTPServer):
     allow_reuse_address = True
+
+    def handle_error(self, request, client_address):
+        return
 
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
@@ -1826,9 +1835,19 @@ counter_path.write_text(str(attempt + 1), encoding="utf-8")
 class ReusableHTTPServer(HTTPServer):
     allow_reuse_address = True
 
+    def handle_error(self, request, client_address):
+        return
+
+def stop_server(server):
+    time.sleep(0.6)
+    server.shutdown()
+
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/api/health":
+            if not self.server.seen_health:
+                self.server.seen_health = True
+                threading.Thread(target=stop_server, args=(self.server,), daemon=True).start()
             body = b'{"status":"ok"}'
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -1843,11 +1862,7 @@ class Handler(BaseHTTPRequestHandler):
         return
 
 server = ReusableHTTPServer((host, port), Handler)
-def stop_server():
-    time.sleep(0.6)
-    server.shutdown()
-
-threading.Thread(target=stop_server, daemon=True).start()
+server.seen_health = False
 server.serve_forever()
 if attempt == 0:
     raise SystemExit(1)
@@ -1875,9 +1890,19 @@ port = int(arg_value("--port", "0"))
 class ReusableHTTPServer(HTTPServer):
     allow_reuse_address = True
 
+    def handle_error(self, request, client_address):
+        return
+
+def stop_server(server):
+    time.sleep(0.6)
+    server.shutdown()
+
 class Handler(BaseHTTPRequestHandler):
     def do_GET(self):
         if self.path == "/api/health":
+            if not self.server.seen_health:
+                self.server.seen_health = True
+                threading.Thread(target=stop_server, args=(self.server,), daemon=True).start()
             body = b'{"status":"ok"}'
             self.send_response(200)
             self.send_header("Content-Type", "application/json")
@@ -1892,11 +1917,7 @@ class Handler(BaseHTTPRequestHandler):
         return
 
 server = ReusableHTTPServer((host, port), Handler)
-def stop_server():
-    time.sleep(0.6)
-    server.shutdown()
-
-threading.Thread(target=stop_server, daemon=True).start()
+server.seen_health = False
 server.serve_forever()
 raise SystemExit(1)
 "#

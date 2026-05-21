@@ -239,6 +239,7 @@ fn build_http_client() -> Result<Client> {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use tempfile::tempdir;
 
     #[test]
     fn test_launcher_asset_name() {
@@ -257,15 +258,12 @@ mod tests {
 
     #[test]
     fn test_apply_self_update_missing_source() {
-        let tmp = std::env::temp_dir().join("codaro-test-self-update");
-        let _ = fs::create_dir_all(&tmp);
-        let fake_src = tmp.join("nonexistent.exe");
-        let fake_dst = tmp.join("current.exe");
+        let temp_dir = tempdir().unwrap();
+        let fake_src = temp_dir.path().join("nonexistent.exe");
+        let fake_dst = temp_dir.path().join("current.exe");
         fs::write(&fake_dst, b"current").unwrap();
 
         let result = apply_self_update(&fake_src, &fake_dst);
         assert!(result.is_err());
-
-        let _ = fs::remove_dir_all(&tmp);
     }
 }

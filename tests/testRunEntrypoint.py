@@ -155,6 +155,66 @@ def testGateSequencePrintsReadableSummary(monkeypatch, capsys, tmp_path) -> None
     assert isinstance(backendArtifacts[0]["modifiedAtNs"], int)
 
 
+def testRunCommandWritesRepoLocalFailureLog(monkeypatch, capsys, tmp_path) -> None:
+    runner = loadRunner()
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
+
+    returnCode = runner.runCommand(
+        "unit-gate",
+        runner.GateCommand(
+            args=(
+                sys.executable,
+                "-c",
+                "import sys; print('visible stdout'); print('visible stderr', file=sys.stderr); sys.exit(3)",
+            ),
+            cwd=".",
+        ),
+    )
+
+    assert returnCode == 3
+    captured = capsys.readouterr()
+    assert "visible stdout" in captured.out
+    assert "visible stderr" in captured.out
+    assert "command log:" in captured.err
+    logs = sorted((tmp_path / "output" / "test-runner" / "unit-gate" / "logs").glob("*.log"))
+    assert len(logs) == 1
+    logText = logs[0].read_text(encoding="utf-8")
+    assert "visible stdout" in logText
+    assert "visible stderr" in logText
+    assert "exit: 3" in logText
+
+
+def testRunCommandTimesOutWithLog(monkeypatch, capsys, tmp_path) -> None:
+    runner = loadRunner()
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path / "output" / "test-runner")
+
+    returnCode = runner.runCommand(
+        "unit-timeout",
+        runner.GateCommand(
+            args=(
+                sys.executable,
+                "-c",
+                "import time; print('starting long command', flush=True); time.sleep(10)",
+            ),
+            cwd=".",
+            timeoutSeconds=1,
+        ),
+    )
+
+    assert returnCode == 124
+    captured = capsys.readouterr()
+    assert "command log:" in captured.err
+    assert "timeout: exceeded 1s" in captured.out
+    logs = sorted((tmp_path / "output" / "test-runner" / "unit-timeout" / "logs").glob("*.log"))
+    assert len(logs) == 1
+    logText = logs[0].read_text(encoding="utf-8")
+    assert "starting long command" in logText
+    assert "timeout: exceeded 1s" in logText
+    assert "exit: 124" in logText
+
+
 def testGateSequenceRecordsArtifactPayloadMetadata(monkeypatch, tmp_path) -> None:
     runner = loadRunner()
     artifactRelPath = "output/test-runner/ai-live-smoke/live-smoke-report.json"
