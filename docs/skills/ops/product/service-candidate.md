@@ -84,7 +84,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 첫 화면은 사용자가 무엇을 먼저 해야 하는지 보여야 한다.
 
-- provider 연결 전에는 fallback 안내와 Provider 연결 행동이 보인다.
+- provider 연결 전에는 fallback 안내가 보이고, 첫 화면의 `Provider 연결` 행동이 provider 설정으로 바로 이어진다.
 - provider 연결 전에는 실제 provider 응답을 쓰는 것처럼 보이면 안 된다.
 - provider 연결 후에는 실제 응답 사용 상태가 분명해야 한다.
 - 기본 curriculum, AI 생성 curriculum, 나만의 curriculum의 차이를 자연스럽게 구분한다.

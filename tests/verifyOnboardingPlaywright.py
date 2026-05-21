@@ -47,14 +47,16 @@ def main(argv: list[str] | None = None) -> int:
         fallback = cli.eval(jsAssertFallbackOnboarding())
         cli.eval(jsInstallClipboardStub())
         diagnosticExport = cli.eval(jsClickDiagnosticExportCopy())
+        providerCta = cli.eval(jsClickOnboardingProviderConnect())
+        cli.waitEval(jsTextPresent("기본 안내 모드"), "provider fallback copy from onboarding CTA")
+        fallbackSettings = cli.eval(jsAssertProviderFallbackSettings())
+        cli.eval(jsCloseProviderSettings())
+        cli.waitEval(jsProviderSettingsClosed(), "provider settings closed after onboarding CTA")
         cli.eval(jsOpenSurface("커리큘럼"))
         cli.waitEval(jsTextPresent("Codaro 커리큘럼"), "curriculum sidebar")
         sidebar = cli.eval(jsAssertCurriculumSidebarGroups())
         cli.eval(jsOpenSurface("채팅"))
         cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "chat surface after sidebar check")
-        cli.eval(jsOpenProviderSettings())
-        cli.waitEval(jsTextPresent("기본 안내 모드"), "provider fallback copy")
-        fallbackSettings = cli.eval(jsAssertProviderFallbackSettings())
         api.ready = True
         cli.run("reload")
         cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "ready onboarding screen")
@@ -64,7 +66,10 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsTextPresent("실제 응답 사용 중"), "provider ready copy")
         settings = cli.eval(jsAssertProviderReadySettings())
         api.assertExpectedCalls()
-        print(f"ok: onboarding browser verified {fallback} {diagnosticExport} {sidebar} {fallbackSettings} {ready} {settings}")
+        print(
+            f"ok: onboarding browser verified {fallback} {diagnosticExport} {providerCta} "
+            f"{fallbackSettings} {sidebar} {ready} {settings}"
+        )
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
@@ -303,6 +308,33 @@ def jsClickDiagnosticExportCopy() -> str:
   return 'diagnostic-export-copy-ok';
 })()
 """)
+
+
+def jsClickOnboardingProviderConnect() -> str:
+    return compactJs("""
+(() => {
+  const button = [...document.querySelectorAll('button')].find((item) => item.textContent?.includes('Provider 연결'));
+  if (!button) throw new Error('onboarding Provider 연결 CTA missing');
+  if (button.disabled) throw new Error('onboarding Provider 연결 CTA disabled');
+  button.click();
+  return 'onboarding-provider-connect-ok';
+})()
+""")
+
+
+def jsCloseProviderSettings() -> str:
+    return compactJs("""
+(() => {
+  const button = [...document.querySelectorAll('button')].find((item) => item.textContent?.includes('닫기'));
+  if (!button) throw new Error('provider settings close button missing');
+  button.click();
+  return 'provider-settings-closed';
+})()
+""")
+
+
+def jsProviderSettingsClosed() -> str:
+    return "(() => !document.body.innerText.includes('AI Provider'))()"
 
 
 def jsAssertReadyOnboarding() -> str:

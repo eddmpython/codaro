@@ -248,6 +248,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "시작 진단 필요",
                 "진단 복사",
                 "diagnostic-export-copy-ok",
+                "onboarding-provider-connect-ok",
                 "기본 안내 모드",
                 "provider 연결됨",
                 "Pandas 레슨",
