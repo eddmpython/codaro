@@ -700,6 +700,7 @@ const providerSettingsMessageActions = new Set([
   "restart-login",
   "configure-api-key",
   "configure-base-url",
+  "check-permission",
 ]);
 
 function shouldOfferProviderSettings(message: AssistantMessage) {

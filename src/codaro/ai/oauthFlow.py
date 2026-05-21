@@ -92,12 +92,12 @@ class OAuthLoginFlow:
 
         if error:
             diagnostic = _oauthDiagnostic(
-                "oauth_denied",
-                "브라우저 로그인이 완료되지 않았습니다. Provider 설정에서 다시 로그인하세요.",
-                action="relogin-provider",
+                "oauth_permission_denied",
+                "Provider 권한이 허용되지 않았습니다. 브라우저에서 권한을 허용한 뒤 다시 로그인하세요.",
+                action="check-permission",
                 detail=error,
             )
-            self._finish(error="oauth_denied", diagnostic=diagnostic)
+            self._finish(error="oauth_permission_denied", diagnostic=diagnostic)
             return OAuthCallbackResponse(200, "Provider Login Failed", diagnostic.message)
 
         if callbackState != self._state.get("state"):

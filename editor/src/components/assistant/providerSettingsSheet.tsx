@@ -479,6 +479,7 @@ function providerActionLabel(action?: string | null) {
   if (!action) return undefined;
   const labels: Record<string, string> = {
     "check-network": "네트워크 문제",
+    "check-permission": "권한 문제",
     "check-provider": "Provider 상태 확인",
     "check-provider-compatibility": "OAuth 호환성 점검",
     "configure-api-key": "API 키 입력 필요",

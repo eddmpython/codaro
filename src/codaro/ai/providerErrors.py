@@ -95,6 +95,12 @@ _ACTION_DIAGNOSTICS = {
         "Provider 서버에 연결하지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도하세요.",
         True,
     ),
+    "permission": (
+        "provider_permission_denied",
+        "check-permission",
+        "Provider 권한이 허용되지 않았습니다. Provider 설정에서 권한을 확인한 뒤 다시 시도하세요.",
+        True,
+    ),
     "rate_limit": (
         "provider_rate_limited",
         "retry-later",

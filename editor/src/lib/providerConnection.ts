@@ -28,6 +28,7 @@ const providerSettingsActions = new Set([
   "restart-login",
   "configure-api-key",
   "configure-base-url",
+  "check-permission",
 ]);
 
 export function openProviderSettings(apiOnline: boolean): ProviderActionResult {

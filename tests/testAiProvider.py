@@ -711,6 +711,25 @@ class TestOAuthLoginFlow:
         assert status["diagnostic"]["code"] == "oauth_state_mismatch"
         assert status["diagnostic"]["action"] == "restart-login"
 
+    def test_callback_reports_permission_denied(self):
+        flow = OAuthLoginFlow(
+            authUrlBuilder=lambda: ("http://auth.test", "verifier-test", "state-test"),
+            codeExchanger=lambda code, verifier: {},
+            profileManagerFactory=lambda: _OAuthProfileManager(),
+            tokenRevoker=lambda: None,
+        )
+        flow.authorize(startServer=False)
+
+        response = flow.handleCallback("/auth/callback?error=access_denied&state=state-test")
+
+        assert response.title == "Provider Login Failed"
+        status = flow.status()
+        assert status["done"] is True
+        assert status["error"] == "oauth_permission_denied"
+        assert status["diagnostic"]["code"] == "oauth_permission_denied"
+        assert status["diagnostic"]["action"] == "check-permission"
+        assert "권한" in status["diagnostic"]["message"]
+
     def test_callback_reports_token_exchange_network_failure(self):
         flow = OAuthLoginFlow(
             authUrlBuilder=lambda: ("http://auth.test", "verifier-test", "state-test"),

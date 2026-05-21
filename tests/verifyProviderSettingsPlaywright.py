@@ -69,6 +69,8 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsProviderSheetReady(), "provider settings sheet")
         initial = cli.eval(jsAssertInitialProviderSettings())
         oauthLoginFailure = cli.eval(jsLoginOauthFailure())
+        cli.eval(jsConfigureStub({"oauthStatusMode": "permission_denied"}))
+        oauthPermissionFailure = cli.eval(jsLoginOauthPermissionFailure())
         cli.eval(jsConfigureStub({"oauthStatusMode": "success", "oauthValidationMode": "valid"}))
         oauthLoginSuccess = cli.eval(jsLoginOauthSuccess())
         cli.eval(jsOpenProviderSettings())
@@ -88,7 +90,7 @@ def main(argv: list[str] | None = None) -> int:
         api.assertExpectedCalls()
         print(
             "ok: provider settings browser smoke verified "
-            f"{initial} {oauthLoginFailure} {oauthLoginSuccess} {oauthLive} "
+            f"{initial} {oauthLoginFailure} {oauthPermissionFailure} {oauthLoginSuccess} {oauthLive} "
             f"{selected} {openai} {oauth} {ollama} {custom} {desktopVisual} {mobileVisual}"
         )
         return 0
@@ -151,6 +153,7 @@ class ProviderStubApi:
             "PUT /api/ai/profile openai",
             "GET /api/oauth/authorize",
             "GET /api/oauth/status state_mismatch",
+            "GET /api/oauth/status permission_denied",
             "GET /api/oauth/status success",
             "POST /api/ai/provider/validate openai valid",
             "POST /api/ai/provider/validate oauth-chatgpt compat",
@@ -235,6 +238,20 @@ class ProviderStubApi:
                                 "code": "oauth_state_mismatch",
                                 "message": "보안 검증이 실패했습니다. Provider 설정에서 로그인을 다시 시작하세요.",
                                 "action": "restart-login",
+                                "provider": "oauth-chatgpt",
+                                "recoverable": True,
+                                "statusCode": 503,
+                            },
+                        })
+                    elif owner.oauthStatusMode == "permission_denied":
+                        self._sendJson({
+                            "done": True,
+                            "error": "oauth_permission_denied",
+                            "message": "Provider 권한이 허용되지 않았습니다. 브라우저에서 권한을 허용한 뒤 다시 로그인하세요.",
+                            "diagnostic": {
+                                "code": "oauth_permission_denied",
+                                "message": "Provider 권한이 허용되지 않았습니다. 브라우저에서 권한을 허용한 뒤 다시 로그인하세요.",
+                                "action": "check-permission",
                                 "provider": "oauth-chatgpt",
                                 "recoverable": True,
                                 "statusCode": 503,
@@ -615,6 +632,26 @@ def jsLoginOauthSuccess() -> str:
 """)
 
 
+def jsLoginOauthPermissionFailure() -> str:
+    return compactJs("""
+(async () => {
+  clickProviderButton('oauth-chatgpt', '브라우저 로그인');
+  await waitForProviderStatus('oauth-chatgpt', 'oauth-polling', 3000);
+  await waitForProviderText('oauth-chatgpt', '권한 문제', 9000);
+  const card = providerCard('oauth-chatgpt');
+  const status = providerStatus(card);
+  const text = status.textContent || '';
+  if (status.getAttribute('data-provider-validation-status') !== 'invalid') {
+    throw new Error('OAuth permission failure did not persist validation failure');
+  }
+  if (!text.includes('권한 문제') || !text.includes('권한이 허용되지 않았습니다')) {
+    throw new Error('OAuth permission copy missing: ' + text);
+  }
+  return JSON.stringify({ login: 'permission_denied', action: '권한 문제' });
+})()
+""")
+
+
 def jsAssertOauthLive() -> str:
     return compactJs("""
 (() => {
@@ -708,6 +745,7 @@ def jsValidateProviderFailure(provider: str, expectedAction: str, forbiddenActio
 (async () => {{
   clickProviderButton({json.dumps(provider)}, '응답 검증');
   await waitForProviderStatus({json.dumps(provider)}, 'needs-action');
+  await waitForProviderText({json.dumps(provider)}, {json.dumps(expectedAction, ensure_ascii=False)});
   const card = providerCard({json.dumps(provider)});
   const status = providerStatus(card);
   if (status.getAttribute('data-provider-validation-status') !== 'invalid') {{
@@ -786,6 +824,15 @@ async function waitForProviderStatus(provider, mode, timeout = 7000) {
     await new Promise((resolve) => setTimeout(resolve, 80));
   }
   throw new Error('timed out waiting for ' + provider + ' status ' + mode);
+}
+async function waitForProviderText(provider, text, timeout = 7000) {
+  const started = Date.now();
+  while (Date.now() - started < timeout) {
+    const status = providerStatus(providerCard(provider));
+    if ((status.textContent || '').includes(text)) return true;
+    await new Promise((resolve) => setTimeout(resolve, 80));
+  }
+  throw new Error('timed out waiting for ' + provider + ' text ' + text);
 }
 async function waitForNoProviderSheet(timeout = 7000) {
   const started = Date.now();
