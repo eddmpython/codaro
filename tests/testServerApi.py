@@ -8,6 +8,7 @@ from fastapi.testclient import TestClient
 from pydantic import ValidationError
 
 import codaro.api.aiRouter as aiRouterModule
+import codaro.api.systemRouter as systemRouterModule
 from codaro.api.kernelWebSocket import firstKernelWsValidationMessage, validateKernelWsMessage
 from codaro.ai.conversation import ConversationManager
 from codaro.ai.oauthToken import TokenRefreshError
@@ -250,6 +251,44 @@ def testPackagesListUsesWorkspaceEngine(monkeypatch) -> None:
 
     assert response.status_code == 200
     assert response.json() == [{"name": "WorkspacePkg", "version": "9.9.9"}]
+
+
+def testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets(monkeypatch, tmp_path: Path) -> None:
+    class _ProfileManager:
+        def serialize(self):
+            return {
+                "ready": False,
+                "activeProvider": "custom",
+                "defaultProvider": "custom",
+                "providers": {"custom": {"baseUrl": None, "secretConfigured": False}},
+                "catalog": [{"id": "custom", "authKind": "api_key"}],
+            }
+
+    monkeypatch.setenv("OPENAI_API_KEY", "sk-diagnosticenv123456")
+    monkeypatch.setattr(systemRouterModule, "getProfileManager", lambda: _ProfileManager())
+    monkeypatch.setattr(systemRouterModule.shutil, "which", lambda name: None if name == "uv" else "tool")
+
+    def missingProjectPython():
+        raise packageOps.PackageEnvironmentError(
+            "package_environment_missing",
+            "Project .venv missing with sk-diagnosticenv123456",
+        )
+
+    monkeypatch.setattr(systemRouterModule.packageOps, "getProjectPythonPath", missingProjectPython)
+    monkeypatch.setattr(serverModule, "WEB_BUILD_ROOT", tmp_path / "missing-web-build")
+    client = TestClient(createServerApp(workspaceRoot=tmp_path))
+
+    response = client.get("/api/system/diagnostics")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload["status"] == "needs-action"
+    assert payload["categories"] == {"provider": 1, "runtime": 0, "package": 2, "frontend": 1}
+    assert payload["nextActions"] == ["configure-base-url", "install-uv", "create-project-venv", "build-editor"]
+    encoded = json.dumps(payload, ensure_ascii=False)
+    assert "sk-diagnosticenv123456" not in encoded
+    assert any(item["code"] == "editor-build-missing" for item in payload["items"])
+    assert any(item["code"] == "uv-missing" for item in payload["items"])
 
 
 def testProviderValidateUsesProviderValidationDomain(monkeypatch) -> None:

@@ -8,6 +8,7 @@ from codaro.system.diagnosticSummary import (
     frontendDiagnosticItem,
     itemFromProviderDiagnostic,
     packageDiagnosticItem,
+    providerDiagnosticItem,
     runtimeDiagnosticItem,
     safeDiagnosticValue,
 )
@@ -86,3 +87,18 @@ def testProviderDetailUsesSharedDiagnosticRedaction(monkeypatch) -> None:
     detail = safeProviderDetail('Bearer abc.def.ghi {"refresh_token":"secret-refresh"} sk-codaroenv123456')
 
     assert detail == 'Bearer [redacted] {"refresh_token":"[redacted]"} [redacted]'
+
+
+def testProviderDiagnosticItemUsesSharedPayloadContract() -> None:
+    summary = buildDiagnosticSummary([
+        providerDiagnosticItem(
+            code="provider_not_connected",
+            message="Provider API 키가 필요합니다.",
+            action="configure-api-key",
+            metadata={"provider": "openai", "apiKey": "sk-directsecret123456"},
+        )
+    ])
+
+    assert summary["categories"]["provider"] == 1
+    assert summary["nextActions"] == ["configure-api-key"]
+    assert summary["items"][0]["metadata"]["apiKey"] == "[redacted]"

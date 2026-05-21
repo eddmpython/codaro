@@ -17,6 +17,7 @@ CHECKS = (
             "safeDiagnosticValue",
             "safeDiagnosticText",
             "itemFromProviderDiagnostic",
+            "providerDiagnosticItem",
             "runtimeDiagnosticItem",
             "packageDiagnosticItem",
             "frontendDiagnosticItem",
@@ -31,13 +32,49 @@ CHECKS = (
         ),
     ),
     (
+        "src/codaro/api/systemRouter.py",
+        (
+            "/api/system/diagnostics",
+            "buildLocalDiagnosticSummary",
+            "_providerDiagnostics",
+            "_packageDiagnostics",
+            "_runtimeDiagnostics",
+            "_frontendDiagnostics",
+        ),
+    ),
+    (
+        "editor/src/lib/api.ts",
+        (
+            "systemDiagnostics",
+            "/api/system/diagnostics",
+            "DiagnosticSummary",
+        ),
+    ),
+    (
+        "editor/src/types.ts",
+        (
+            "DiagnosticSummary",
+            "DiagnosticCategory",
+            "\"provider\" | \"runtime\" | \"package\" | \"frontend\"",
+        ),
+    ),
+    (
         "tests/testDiagnosticSummary.py",
         (
             "testDiagnosticSummarySeparatesFailureCategoriesAndActions",
             "testDiagnosticSummaryRedactsSecretsInTextAndMetadata",
             "testProviderDetailUsesSharedDiagnosticRedaction",
+            "testProviderDiagnosticItemUsesSharedPayloadContract",
             "Bearer [redacted]",
             "\"access_token\":\"[redacted]\"",
+        ),
+    ),
+    (
+        "tests/testServerApi.py",
+        (
+            "testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets",
+            "/api/system/diagnostics",
+            "configure-base-url",
         ),
     ),
     (

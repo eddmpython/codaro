@@ -11,6 +11,7 @@ import type {
   CurriculumCategoriesPayload,
   CurriculumContentsPayload,
   CurriculumLessonPayload,
+  DiagnosticSummary,
   EStopStatus,
   ExecutionResult,
   OauthAuthorizePayload,
@@ -170,6 +171,7 @@ async function postStreamChat(
 export const codaroApi = {
   health: () => requestJson<{ status: string }>("/api/health"),
   bootstrap: () => requestJson<BootstrapPayload>("/api/bootstrap"),
+  systemDiagnostics: () => requestJson<DiagnosticSummary>("/api/system/diagnostics"),
   loadDocument: (path: string) => postJson<{ path: string; document: CodaroDocument; exists: boolean }>(
     "/api/document/load",
     { path },

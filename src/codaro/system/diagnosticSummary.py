@@ -77,6 +77,24 @@ def itemFromProviderDiagnostic(diagnostic: dict[str, Any]) -> DiagnosticItem:
     )
 
 
+def providerDiagnosticItem(
+    *,
+    code: str,
+    message: str,
+    action: str,
+    detail: str = "",
+    metadata: dict[str, Any] | None = None,
+) -> DiagnosticItem:
+    return DiagnosticItem(
+        category="provider",
+        code=code,
+        message=message,
+        action=action,
+        detail=detail,
+        metadata=metadata or {},
+    )
+
+
 def runtimeDiagnosticItem(*, code: str, message: str, action: str, detail: str = "", metadata: dict[str, Any] | None = None) -> DiagnosticItem:
     return DiagnosticItem(
         category="runtime",

@@ -207,17 +207,40 @@ SERVICE_REQUIREMENTS = (
                 "DIAGNOSTIC_CATEGORIES",
                 "\"provider\", \"runtime\", \"package\", \"frontend\"",
                 "buildDiagnosticSummary",
+                "providerDiagnosticItem",
                 "safeDiagnosticValue",
                 "safeDiagnosticText",
+            )),
+            ("src/codaro/api/systemRouter.py", (
+                "/api/system/diagnostics",
+                "buildLocalDiagnosticSummary",
+                "_providerDiagnostics",
+                "_packageDiagnostics",
+                "_runtimeDiagnostics",
+                "_frontendDiagnostics",
             )),
             ("tests/testDiagnosticSummary.py", (
                 "testDiagnosticSummarySeparatesFailureCategoriesAndActions",
                 "testDiagnosticSummaryRedactsSecretsInTextAndMetadata",
+                "testProviderDiagnosticItemUsesSharedPayloadContract",
                 "Bearer [redacted]",
+            )),
+            ("tests/testServerApi.py", (
+                "testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets",
+                "/api/system/diagnostics",
+                "configure-base-url",
             )),
             ("tests/verifyDiagnosticSummaryContract.py", (
                 "local diagnostic summary",
                 "provider failure, runtime failure, package failure, frontend failure",
+            )),
+            ("editor/src/lib/api.ts", (
+                "systemDiagnostics",
+                "/api/system/diagnostics",
+            )),
+            ("editor/src/types.ts", (
+                "DiagnosticSummary",
+                "\"provider\" | \"runtime\" | \"package\" | \"frontend\"",
             )),
             ("tests/run.py", (
                 "\"diagnostic-summary-contract\"",

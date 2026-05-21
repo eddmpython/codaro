@@ -105,6 +105,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 - local diagnostic summary는 provider failure, runtime failure, package failure, frontend failure를 분리한다.
 - summary payload는 `provider`, `runtime`, `package`, `frontend` category count와 다음 action을 가진다.
+- `/api/system/diagnostics`는 provider 연결 상태, uv/project `.venv`, runtime status, editor build 산출물을 같은 summary payload로 반환한다.
 - raw JSON은 확장 진단으로만 본다.
 - token/API key/secret은 diagnostic summary와 로그에 남기지 않는다.
 - 문제 재현에는 provider/model/latency/error/tool sequence/workloop trace가 충분해야 한다.

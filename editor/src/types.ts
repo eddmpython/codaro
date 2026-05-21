@@ -118,6 +118,27 @@ export type BootstrapPayload = {
   rootPath: string;
 };
 
+export type DiagnosticCategory = "provider" | "runtime" | "package" | "frontend";
+
+export type DiagnosticSummaryItem = {
+  category: DiagnosticCategory;
+  code: string;
+  message: string;
+  action: string;
+  severity: "info" | "warning" | "error";
+  recoverable: boolean;
+  detail?: string;
+  metadata?: Record<string, unknown>;
+};
+
+export type DiagnosticSummary = {
+  version: number;
+  status: "ok" | "needs-action";
+  items: DiagnosticSummaryItem[];
+  categories: Record<DiagnosticCategory, number>;
+  nextActions: string[];
+};
+
 export type CurriculumCategory = {
   key: string;
   name: string;
