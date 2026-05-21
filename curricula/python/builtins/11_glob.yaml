@@ -69,7 +69,7 @@ sections:
       numberPattern = 'file[0-9].txt'
       numberPattern
   - type: "tip"
-    content: "Codaro local Python 환경에서는 가상 파일시스템만 검색됩니다. 실제 파일이 없으면 빈 리스트가 반환됩니다."
+    content: "Codaro 로컬 커널에서는 현재 작업 디렉터리와 지정한 로컬 경로를 검색합니다. 패턴에 맞는 파일이 없으면 빈 리스트가 반환됩니다."
 
 - id: "recursive_search"
   title: "재귀 검색"

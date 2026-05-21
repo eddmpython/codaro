@@ -22,7 +22,7 @@ sections:
   subtitle: sklearn 샘플 이미지
   blocks:
   - type: text
-    content: sklearn에 내장된 샘플 이미지를 사용합니다. Codaro local Python 환경에서 외부 URL 접근이 제한되므로, 내장 이미지가 가장 안정적입니다. flower.jpg와 china.jpg 두 개의 샘플 이미지가 있습니다.
+    content: 네트워크 상태에 영향을 받지 않도록 sklearn에 내장된 샘플 이미지를 사용합니다. flower.jpg와 china.jpg 두 개의 샘플 이미지가 있습니다.
   - type: code
     language: python
     title: 라이브러리 불러오기

@@ -1,17 +1,19 @@
 from __future__ import annotations
 
+import re
 from pathlib import Path
 
 import yaml
 from pydantic import ValidationError
 
 from codaro.curriculum.contentCache import CurriculumContentCache
-from codaro.curriculum.studyLoader import StudyLoader
+from codaro.curriculum.studyLoader import CATEGORY_GROUPS, StudyLoader
 from codaro.curriculum.converter import yamlToDocument
 from codaro.curriculum.progress import ProgressTracker
 
 
-CURRICULA_DIR = Path(__file__).resolve().parent.parent / "curricula" / "python"
+ROOT = Path(__file__).resolve().parent.parent
+CURRICULA_DIR = ROOT / "curricula" / "python"
 
 
 class _CountingStudyLoader:
@@ -46,6 +48,69 @@ def testListCategories() -> None:
     assert len(categories) > 0
     names = [c.key for c in categories]
     assert "30days" in names
+
+
+def testCategoryGroupsCoverListedCategoriesAndTracks() -> None:
+    if not CURRICULA_DIR.exists():
+        return
+    loader = StudyLoader(str(CURRICULA_DIR))
+    categories = loader.listCategories()
+
+    groupedKeys = [key for keys in CATEGORY_GROUPS.values() for key in keys]
+    assert len(groupedKeys) == len(set(groupedKeys))
+
+    categoryKeys = {category.key for category in categories}
+    assert categoryKeys.issubset(set(groupedKeys))
+
+    expectedTracks = {
+        categoryKey: groupName
+        for groupName, groupKeys in CATEGORY_GROUPS.items()
+        for categoryKey in groupKeys
+    }
+    assert all(category.track == expectedTracks[category.key] for category in categories)
+
+
+def testBuiltinsRuntimeCompatibilityDocsUseLocalContract() -> None:
+    builtinsDir = CURRICULA_DIR / "builtins"
+    localGuide = builtinsDir / "LOCAL_RUNTIME_COMPATIBILITY.md"
+    legacyGuide = builtinsDir / "PYODIDE_COMPATIBILITY.md"
+    registryDoc = ROOT / "docs" / "skills" / "architecture" / "curriculum-registry.md"
+
+    assert localGuide.exists()
+    assert legacyGuide.exists()
+    assert registryDoc.exists()
+
+    localText = localGuide.read_text(encoding="utf-8")
+    legacyText = legacyGuide.read_text(encoding="utf-8")
+    registryText = registryDoc.read_text(encoding="utf-8")
+    assert "로컬 Python" in localText
+    assert "LOCAL_RUNTIME_COMPATIBILITY.md" in legacyText
+    assert "source of truth" in legacyText
+    assert "CATEGORY_GROUPS" in registryText
+    assert "LOCAL_RUNTIME_COMPATIBILITY.md" in registryText
+
+
+def testCurriculaAvoidBrowserRuntimeAndBarePipCopy() -> None:
+    forbiddenPatterns = (
+        re.compile(r"(?<!uv )\bpip\s+(install|list|--version)\b", re.IGNORECASE),
+        re.compile(r"\bmicropip\b", re.IGNORECASE),
+        re.compile(r"\bpyodide\b", re.IGNORECASE),
+        re.compile("브라우저 파이썬"),
+        re.compile("가상 파일시스템"),
+        re.compile("브라우저 보안"),
+    )
+    failures: list[str] = []
+    for path in CURRICULA_DIR.rglob("*"):
+        if path.name == "PYODIDE_COMPATIBILITY.md":
+            continue
+        if path.suffix.lower() not in {".yaml", ".md"}:
+            continue
+        text = path.read_text(encoding="utf-8")
+        for pattern in forbiddenPatterns:
+            if pattern.search(text):
+                failures.append(f"{path.relative_to(ROOT)}: {pattern.pattern}")
+
+    assert not failures
 
 
 def testListContents() -> None:

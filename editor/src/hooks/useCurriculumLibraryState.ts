@@ -28,6 +28,7 @@ export function useCurriculumLibraryState({
   onNotice,
 }: UseCurriculumLibraryStateOptions) {
   const [categories, setCategories] = useState(initialBootstrapState.categories);
+  const [categoryGroups, setCategoryGroups] = useState(initialBootstrapState.categoryGroups);
   const [contents, setContents] = useState(initialBootstrapState.contents);
   const [selectedCategory, setSelectedCategory] = useState(initialBootstrapState.selectedCategory);
   const [selectedContentId, setSelectedContentId] = useState(initialBootstrapState.selectedContentId);
@@ -88,6 +89,7 @@ export function useCurriculumLibraryState({
 
   const applyBootstrapCurriculumState = useCallback((bootstrap: AppBootstrapState) => {
     setCategories(bootstrap.categories);
+    setCategoryGroups(bootstrap.categoryGroups);
     setContents(bootstrap.contents);
     setCurriculumDocument(bootstrap.curriculumDocument);
   }, []);
@@ -118,6 +120,7 @@ export function useCurriculumLibraryState({
     applyBootstrapCurriculumState,
     applyCurriculumSelectionState,
     categories,
+    categoryGroups,
     contents,
     contentsLoading,
     curriculumDocument,

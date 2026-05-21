@@ -249,14 +249,14 @@ sections:
 - id: local_runtime_note
   blocks:
     - type: sectionHeader
-      title: "⚠️ Codaro local Python 환경 참고사항"
-      subtitle: "브라우저에서 실행 시 주의점"
+      title: "⚠️ Codaro 로컬 Python 환경 참고사항"
+      subtitle: "로컬 실행 시 확인할 점"
 
     - type: note
       style: warning
       title: "제한사항"
       content: |-
-        Pydantic V2는 Codaro local Python에서 완벽히 지원됩니다(버전 2.10.6). 모든 핵심 기능이 정상 작동합니다. 다만 일부 고급 기능(pydantic-settings의 파일 시스템 접근)은 브라우저 환경에서 제한될 수 있습니다.
+        Pydantic V2는 Codaro 로컬 Python에서 실행됩니다. 모델 검증, 설정 파일, 환경변수 실습을 로컬 파일 시스템 기준으로 다룰 수 있습니다.
 
     - type: featureCards
       cards:
@@ -268,28 +268,28 @@ sections:
           description: "파일 시스템 기반 설정 로딩"
         - emoji: "📦"
           title: "설치 방법"
-          description: "pip install pydantic"
+          description: "uv pip install pydantic"
 
 - id: installation
   blocks:
     - type: sectionHeader
       title: "📦 설치 및 시작"
-      subtitle: "Codaro local Python 환경에서 바로 사용"
+      subtitle: "Codaro 로컬 Python 환경에서 바로 사용"
 
     - type: note
       style: info
-      title: "브라우저에서 바로 실행"
+      title: "로컬에서 바로 실행"
       content: |-
-        이 강의는 Codaro Codaro local Python 환경에서 실행됩니다. 별도 설치 없이 브라우저에서 바로 코드를 실행할 수 있습니다. pip.install()로 pydantic을 불러오면 모든 준비가 끝납니다. 로컬 환경에서는 pip install pydantic으로 설치하면 됩니다.
+        이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 Codaro가 uv로 준비하고, 터미널에서는 uv pip install pydantic으로 설치할 수 있습니다.
 
     - type: featureCards
       cards:
         - emoji: "🌐"
-          title: "Codaro local Python 환경"
-          description: "브라우저에서 Python 실행"
+          title: "Codaro 로컬 Python 환경"
+          description: "로컬 Python 실행"
         - emoji: "📦"
-          title: "pip 설치"
-          description: "pip install pydantic"
+          title: "uv 설치"
+          description: "uv pip install pydantic"
         - emoji: "🚀"
           title: "바로 시작"
           description: "from pydantic import BaseModel"

@@ -17,15 +17,15 @@
 - 과학/공학 분야 표준
 - 다양한 백엔드 지원 (PNG, PDF, SVG 등)
 
-### 4. Pyodide 완벽 호환
-- 브라우저에서 바로 실행
+### 4. Codaro 로컬 Python 완벽 호환
+- Codaro 로컬 커널에서 바로 실행
 - 별도 설치 없이 사용 가능
 
 ---
 
 ## 데이터셋
 
-**사용할 데이터** (pyodide 완벽 호환):
+**사용할 데이터** (Codaro 로컬 Python 완벽 호환):
 ```python
 import numpy as np
 import pandas as pd
@@ -278,7 +278,7 @@ matplotlib/
 - [ ] 변수명 카멜케이스
 - [ ] print() 사용 금지
 - [ ] 주석 사용 금지
-- [ ] marimo 변수 재할당 주의 (각 셀마다 다른 변수명)
+- [ ] Codaro 변수 재할당 주의 (각 셀마다 다른 변수명)
 - [ ] 실습 섹션 2개 미션 (독립적, import 포함)
 
 ### 3. 개념 첫 등장 시
@@ -293,7 +293,7 @@ matplotlib/
 
 ### 4. 데이터 로드 규칙
 - 첫 섹션에서만 import 및 데이터 로드
-- 이후 섹션은 변수 공유 (marimo 특성)
+- 이후 섹션은 변수 공유 (Codaro 특성)
 - seaborn 내장 데이터: sns.load_dataset()
 - GitHub 데이터: baseUrl + raw URL
 
@@ -347,7 +347,7 @@ resultFinal = ...
 - `**강조**` 마크다운 문법 (text 블록에서)
 - print() 함수
 - 주석 (#)
-- plt.show() (marimo에서 불필요)
+- plt.show() (Codaro에서 불필요)
 - 같은 변수 재할당 (다른 셀에서)
 
 ---

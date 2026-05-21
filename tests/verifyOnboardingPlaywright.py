@@ -47,6 +47,11 @@ def main(argv: list[str] | None = None) -> int:
         cli.run("resize", "1280", "900")
         cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "first onboarding screen")
         fallback = cli.eval(jsAssertFallbackOnboarding())
+        cli.eval(jsOpenSurface("커리큘럼"))
+        cli.waitEval(jsTextPresent("Codaro 커리큘럼"), "curriculum sidebar")
+        sidebar = cli.eval(jsAssertCurriculumSidebarGroups())
+        cli.eval(jsOpenSurface("채팅"))
+        cli.waitEval(jsTextPresent("Codaro로 무엇을 만들까요?"), "chat surface after sidebar check")
         cli.eval(jsOpenProviderSettings())
         cli.waitEval(jsTextPresent("기본 안내 모드"), "provider fallback copy")
         fallbackSettings = cli.eval(jsAssertProviderFallbackSettings())
@@ -59,7 +64,7 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsTextPresent("실제 응답 사용 중"), "provider ready copy")
         settings = cli.eval(jsAssertProviderReadySettings())
         api.assertExpectedCalls()
-        print(f"ok: onboarding browser verified {fallback} {fallbackSettings} {ready} {settings}")
+        print(f"ok: onboarding browser verified {fallback} {sidebar} {fallbackSettings} {ready} {settings}")
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
@@ -140,8 +145,16 @@ class OnboardingStubApi:
                     self._sendJson({"appMode": False, "documentPath": None, "workspaceRoot": str(ROOT), "rootPath": str(ROOT)})
                 elif path == "/api/curriculum/categories":
                     self._sendJson({
-                        "categories": [{"key": "python", "name": "Python", "description": "기본", "count": 1}],
-                        "groups": {"기본": ["python"]},
+                        "categories": [
+                            {"key": "30days", "name": "파이썬 기초", "description": "첫 경로", "count": 30, "track": "Python 기초"},
+                            {"key": "pandas", "name": "Pandas", "description": "데이터 분석", "count": 11, "track": "데이터 분석"},
+                            {"key": "excel", "name": "엑셀 자동화", "description": "반복 작업 자동화", "count": 3, "track": "자동화·실무"},
+                        ],
+                        "groups": {
+                            "Python 기초": ["30days"],
+                            "데이터 분석": ["pandas"],
+                            "자동화·실무": ["excel"],
+                        },
                         "learningPaths": {},
                     })
                 elif path.startswith("/api/curriculum/contents/"):
@@ -254,6 +267,31 @@ def jsAssertReadyOnboarding() -> str:
   if (providerButton) throw new Error('Provider 연결 button should not remain after provider is ready');
   return 'ready-onboarding-ok';
 })()
+""")
+
+
+def jsAssertCurriculumSidebarGroups() -> str:
+    return compactJs("""
+(() => {
+  const text = document.body.innerText;
+  const required = ['Codaro 커리큘럼', 'Python 기초', '데이터 분석', '자동화·실무'];
+  const missing = required.filter((item) => !text.includes(item));
+  if (missing.length) throw new Error('curriculum sidebar groups missing: ' + missing.join(', '));
+  const groupButtons = [...document.querySelectorAll('button')].filter((button) => ['Python 기초', '데이터 분석', '자동화·실무'].some((label) => button.textContent?.includes(label)));
+  if (groupButtons.length < 3) throw new Error('curriculum sidebar group buttons missing');
+  return 'curriculum-sidebar-groups-ok';
+})()
+""")
+
+
+def jsOpenSurface(label: str) -> str:
+    return compactJs(f"""
+(() => {{
+  const button = [...document.querySelectorAll('button')].find((item) => item.textContent?.trim() === {json.dumps(label, ensure_ascii=False)});
+  if (!button) throw new Error({json.dumps(label + ' surface button missing', ensure_ascii=False)});
+  button.click();
+  return {json.dumps(label + '-surface-opened', ensure_ascii=False)};
+}})()
 """)
 
 

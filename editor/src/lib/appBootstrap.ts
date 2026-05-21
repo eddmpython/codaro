@@ -29,6 +29,7 @@ export const emptyToolCatalog: AiToolCatalogPayload = {
 export type AppBootstrapState = {
   apiOnline: boolean;
   categories: CurriculumCategory[];
+  categoryGroups: Record<string, string[]>;
   contents: CurriculumContentSummary[];
   curriculumDocument: CodaroDocument | null;
   documentToApply: CodaroDocument | null;
@@ -53,6 +54,7 @@ const fallbackProfile: AiProfile = {
 export const initialBootstrapState: AppBootstrapState = {
   apiOnline: false,
   categories: preferredCategories(builtInCategories.categories),
+  categoryGroups: builtInCategories.groups,
   contents: initialCurriculum.contents.contents,
   curriculumDocument: initialCurriculum.document,
   documentToApply: null,
@@ -92,6 +94,7 @@ export async function loadAppBootstrapState(): Promise<AppBootstrapState> {
     ...initialBootstrapState,
     apiOnline,
     categories: preferredCategories(categoryResult.data.categories),
+    categoryGroups: categoryResult.data.groups,
     documentToApply: loadedDocument.document,
     notice: loadedDocument.notice,
     profile: profileResult.data,

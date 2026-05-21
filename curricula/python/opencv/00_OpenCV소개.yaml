@@ -323,11 +323,11 @@ sections:
   blocks:
     - type: sectionHeader
       title: "📋 시각화 안내"
-      subtitle: "Codaro local Python 환경에서의 출력"
+      subtitle: "Codaro 로컬 Python 환경에서의 출력"
 
     - type: note
       title: "matplotlib으로 출력"
-      content: "이 커리큘럼은 Codaro local Python(브라우저 파이썬) 환경에서 실행됩니다. cv2.imshow()는 GUI 창을 필요로 하므로 사용할 수 없습니다. 대신 matplotlib의 plt.imshow()로 이미지를 출력합니다. 이때 BGR을 RGB로 변환해야 올바른 색상이 표시됩니다."
+      content: "이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. cv2.imshow()는 별도 GUI 창을 필요로 하므로 노트북 출력에서는 matplotlib의 plt.imshow()로 이미지를 확인합니다. 이때 BGR을 RGB로 변환해야 올바른 색상이 표시됩니다."
 
 - id: curriculum
   blocks:

@@ -20,7 +20,7 @@
 
 ---
 
-## 대상 데이터셋 (다른 카테고리 미사용 + CORS 제약 없음)
+## 대상 데이터셋 (다른 카테고리 미사용 + 네트워크/사이트 정책 없음)
 
 | 번호 | 데이터셋 | 출처 | 용도 | 비즈니스 가치 |
 |------|----------|------|------|--------------|
@@ -37,9 +37,9 @@
 
 **데이터 확인**:
 - ✅ 기존 카테고리 미사용 (titanic, tips, iris, gapminder, stocks 등 제외)
-- ✅ GitHub raw.githubusercontent.com (CORS 허용)
+- ✅ GitHub raw.githubusercontent.com (사이트 정책 허용)
 - ✅ statsmodels 내장 데이터 (패키지 내부 포함)
-- ✅ pyodide 환경에서 `pd.read_csv(url)` 직접 사용 가능
+- ✅ Codaro 로컬 Python 환경에서 `pd.read_csv(url)` 직접 사용 가능
 
 ---
 
@@ -181,19 +181,19 @@ intro:
 sections:
 - id: step1_install
   title: 1단계. statsmodels 설치
-  subtitle: pyodide 환경에서 라이브러리 설치
+  subtitle: Codaro 로컬 Python 환경에서 라이브러리 설치
   blocks:
   - type: text
-    content: statsmodels는 Python 통계 분석의 표준 라이브러리입니다. 회귀분석, 시계열, 가설검정 등 다양한 통계 모델을 제공합니다. pyodide 환경에서는 micropip으로 설치합니다.
+    content: statsmodels는 Python 통계 분석의 표준 라이브러리입니다. 회귀분석, 시계열, 가설검정 등 다양한 통계 모델을 제공합니다. Codaro 로컬 Python 환경에서는 uv으로 설치합니다.
   - type: code
     language: python
-    title: statsmodels 설치
-    description: micropip으로 패키지 설치
+    title: statsmodels 확인
+    description: 패키지 import 확인
     content: |-
-      import micropip
-      await micropip.install('statsmodels')
+      import statsmodels
+      statsmodels.__version__
   - type: tip
-    content: pyodide는 브라우저에서 실행되는 Python 환경입니다. micropip.install()로 필요한 패키지를 설치할 수 있습니다. await 키워드는 비동기 작업이 완료될 때까지 기다립니다.
+    content: 필요한 패키지는 레슨 실행 전에 uv로 준비합니다. 레슨 안에서는 import가 성공하는지 확인하고 통계 모델링 흐름에 집중합니다.
 
 - id: step2_load
   title: 2단계. 데이터 불러오기
@@ -512,7 +512,7 @@ sections:
 - [x] print() 금지 (표현식만)
 - [x] 주석 금지 (text 블록으로 설명)
 - [x] 카멜케이스 변수명
-- [x] marimo 변수 재할당 고려
+- [x] Codaro 변수 재할당 고려
 
 ---
 
@@ -522,4 +522,4 @@ sections:
 2. **00_statsmodels소개.yaml** 작성 (코드 없는 소개 파일)
 3. **01-10 프로젝트 파일** 순차 작성
 4. **각 파일마다 YAML 검증** 수행
-5. **marimo 변수 재할당 이슈 사전 체크**
+5. **Codaro 변수 재할당 이슈 사전 체크**

@@ -9,7 +9,7 @@ intro:
   - "async/await 문법"
   - "비동기 작업 동시 실행"
   - "이벤트 루프 제어"
-  - "Codaro local Python 완벽 지원"
+  - "Codaro 로컬 Python 완벽 지원"
 
 sections:
 - id: "module_import"
@@ -37,7 +37,7 @@ sections:
       result = await greet()
       result
   - type: "note"
-    content: "Codaro local Python 환경에서 asyncio는 JavaScript 이벤트 루프와 완벽하게 통합됩니다. 웹 브라우저에서도 모든 asyncio 기능을 사용할 수 있습니다."
+    content: "Codaro 로컬 Python 환경에서 asyncio는 Python 이벤트 루프 기준으로 실행됩니다. 파일, 네트워크, 태스크 자동화처럼 오래 걸리는 작업을 단계적으로 다룰 때 유용합니다."
 
 - id: "basic_async"
   title: "기본 비동기 함수"

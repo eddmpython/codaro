@@ -43,7 +43,7 @@ available = [
 7. **longley** - Longley의 경제 회귀 데이터
    - 용도: 다중공선성 문제 분석
 
-## 2. GitHub Raw CSV 데이터셋 (CORS 제약 없음)
+## 2. GitHub Raw CSV 데이터셋 (네트워크/사이트 정책 없음)
 
 ### 회귀 분석 (Linear/Multiple Regression)
 
@@ -198,14 +198,14 @@ available = [
     - 목표: HR 지표로 퇴사 확률 예측
     - 비즈니스 가치: 인재 유지, 채용 계획
 
-## 5. pyodide 환경 확인사항
+## 5. Codaro 로컬 Python 환경 확인사항
 
 ### statsmodels 내장 데이터
-- ✅ 패키지 내부에 포함, CORS 문제 없음
+- ✅ 패키지 내부에 포함, 사이트 정책 문제 없음
 - ✅ `sm.datasets.load()` 직접 사용 가능
 
 ### GitHub Raw URLs
-- ✅ raw.githubusercontent.com은 CORS 허용
+- ✅ raw.githubusercontent.com은 사이트 정책 허용
 - ✅ `pd.read_csv(url)` 직접 사용 가능
 
 ### Our World in Data
@@ -248,4 +248,4 @@ available = [
 9. Insurance Cost (가격 책정)
 10. Macrodata (경제 지표)
 
-모든 데이터셋은 pyodide 환경에서 CORS 제약 없이 사용 가능하며, statsmodels의 회귀/시계열 기능을 충분히 활용할 수 있습니다.
+모든 데이터셋은 Codaro 로컬 Python 환경에서 네트워크/사이트 정책 없이 사용 가능하며, statsmodels의 회귀/시계열 기능을 충분히 활용할 수 있습니다.

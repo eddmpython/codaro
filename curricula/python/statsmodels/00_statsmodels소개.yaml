@@ -323,22 +323,22 @@ sections:
   blocks:
     - type: sectionHeader
       title: "📦 설치 및 시작"
-      subtitle: "Codaro local Python 환경에서 바로 사용"
+      subtitle: "Codaro 로컬 Python 환경에서 바로 사용"
 
     - type: note
       style: info
-      title: "브라우저에서 바로 실행"
+      title: "로컬에서 바로 실행"
       content: |-
-        이 강의는 Codaro Codaro local Python 환경에서 실행됩니다. 별도 설치 없이 브라우저에서 바로 코드를 실행할 수 있습니다. pip.install()로 statsmodels를 불러오면 모든 준비가 끝납니다. 로컬 환경에서는 pip install statsmodels로 설치하면 됩니다.
+        이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. 필요한 패키지는 Codaro가 uv로 준비하고, 터미널에서는 uv pip install statsmodels로 설치할 수 있습니다.
 
     - type: featureCards
       cards:
         - emoji: "🌐"
-          title: "Codaro local Python 환경"
-          description: "브라우저에서 Python 실행"
+          title: "Codaro 로컬 Python 환경"
+          description: "로컬 Python 실행"
         - emoji: "📦"
-          title: "pip 설치"
-          description: "pip install statsmodels"
+          title: "uv 설치"
+          description: "uv pip install statsmodels"
         - emoji: "🚀"
           title: "바로 시작"
           description: "import statsmodels.api as sm"

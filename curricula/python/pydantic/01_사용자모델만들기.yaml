@@ -22,7 +22,7 @@ sections:
   subtitle: Pydantic 설치 및 import
   blocks:
   - type: text
-    content: "Pydantic은 Python의 타입 힌트를 활용하여 런타임에 데이터를 검증하는 라이브러리입니다. V2 버전은 Rust로 작성된 pydantic-core를 사용하여 V1보다 5~50배 빠른 성능을 자랑합니다. Codaro local Python 환경에서는 pip으로 설치하며, BaseModel 클래스를 상속하여 데이터 모델을 정의합니다."
+    content: "Pydantic은 Python의 타입 힌트를 활용하여 런타임에 데이터를 검증하는 라이브러리입니다. V2 버전은 Rust로 작성된 pydantic-core를 사용하여 V1보다 5~50배 빠른 성능을 자랑합니다. Codaro 로컬 환경에서는 필요한 패키지를 uv로 준비하며, BaseModel 클래스를 상속하여 데이터 모델을 정의합니다."
   - type: code
     language: python
     title: 패키지 설치

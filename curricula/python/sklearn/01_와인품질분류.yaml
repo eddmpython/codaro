@@ -22,7 +22,7 @@ sections:
   subtitle: pip
   blocks:
   - type: text
-    content: scikit-learn은 Python 머신러닝의 표준 라이브러리입니다. Codaro local Python 환경에서는 pip으로 설치합니다. 처음 설치 시 약간의 시간이 걸릴 수 있습니다.
+    content: scikit-learn은 Python 머신러닝의 표준 라이브러리입니다. Codaro 로컬 환경에서는 필요한 패키지를 uv로 준비합니다. 처음 준비할 때 약간의 시간이 걸릴 수 있습니다.
   - type: code
     language: python
     title: 패키지 설치

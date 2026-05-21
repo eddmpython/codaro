@@ -4,8 +4,8 @@
 SymPy는 파이썬 기호 수학 라이브러리입니다. 숫자 계산이 아닌 **수식 자체**를 다룹니다.
 데이터셋 대신 **수학 문제/수식**이 프로젝트 소재입니다.
 
-## Pyodide 환경
-- SymPy는 순수 파이썬으로 pyodide에서 완벽 지원
+## Codaro 로컬 Python 환경
+- SymPy는 순수 파이썬으로 Codaro 로컬 Python에서 완벽 지원
 - import sympy로 바로 사용 가능
 - matplotlib과 연동하여 수식 시각화 가능
 

@@ -22,7 +22,7 @@ sections:
   subtitle: Pydantic 설치 및 import
   blocks:
   - type: text
-    content: "FastAPI는 Codaro local Python 환경에서 직접 실행하기 어렵지만, Pydantic 모델 설계는 동일합니다. FastAPI에서 요청 본문은 BaseModel로 정의하고, 응답도 BaseModel로 정의하여 자동 직렬화와 OpenAPI 문서 생성이 가능합니다. 이 패턴을 익히면 실제 FastAPI 프로젝트에 바로 적용할 수 있습니다."
+    content: "FastAPI는 Codaro 로컬 Python 환경에서 직접 실행하기 어렵지만, Pydantic 모델 설계는 동일합니다. FastAPI에서 요청 본문은 BaseModel로 정의하고, 응답도 BaseModel로 정의하여 자동 직렬화와 OpenAPI 문서 생성이 가능합니다. 이 패턴을 익히면 실제 FastAPI 프로젝트에 바로 적용할 수 있습니다."
   - type: code
     language: python
     title: 패키지 설치

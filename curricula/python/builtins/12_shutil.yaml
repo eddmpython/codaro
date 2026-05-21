@@ -223,7 +223,7 @@ sections:
   subtitle: "압축 생성 및 해제"
   blocks:
   - type: "text"
-    content: "make_archive는 압축 파일을 생성합니다. unpack_archive는 압축 파일을 해제합니다. Codaro local Python에서는 제한적으로 동작할 수 있습니다."
+    content: "make_archive는 압축 파일을 생성합니다. unpack_archive는 압축 파일을 해제합니다. Codaro 로컬 커널에서는 임시 디렉터리에서 안전하게 생성과 해제를 실습할 수 있습니다."
   - type: "code"
     language: "python"
     title: "압축 파일 생성"
@@ -313,7 +313,7 @@ sections:
   subtitle: "디스크 정보 확인"
   blocks:
   - type: "text"
-    content: "disk_usage는 디스크 사용량 정보를 반환합니다. total, used, free 값을 튜플로 제공합니다. Codaro local Python에서는 가상 파일시스템 정보를 반환합니다."
+    content: "disk_usage는 디스크 사용량 정보를 반환합니다. total, used, free 값을 튜플로 제공하며, Codaro 로컬 커널에서는 지정한 로컬 경로가 위치한 디스크 기준으로 확인합니다."
   - type: "code"
     language: "python"
     title: "디스크 사용량 타입"

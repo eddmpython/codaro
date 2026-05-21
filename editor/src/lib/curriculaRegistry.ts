@@ -68,52 +68,52 @@ type LearningLessonContract = {
 const categoryLabels: Record<string, { title: string; track: string; description: string }> = {
   main: {
     title: "파이썬 시작",
-    track: "핵심",
+    track: "Python 기초",
     description: "Codaro에서 바로 시작하는 짧은 파이썬 입문 경로입니다.",
   },
   "30days": {
     title: "파이썬 기초",
-    track: "핵심",
+    track: "Python 기초",
     description: "값, 흐름, 컬렉션, 파일, 작은 도구를 차례로 익히는 첫 경로입니다.",
   },
   advancedPython: {
     title: "고급 파이썬",
-    track: "핵심",
+    track: "Python 기초",
     description: "패턴, 이터레이터, 데이터 모델, 타입, 유지보수 가능한 모듈을 다룹니다.",
   },
   builtins: {
     title: "표준 라이브러리",
-    track: "핵심",
+    track: "Python 기초",
     description: "실행 가능한 셀로 파이썬 표준 라이브러리를 익힙니다.",
   },
   excel: {
     title: "엑셀 자동화",
-    track: "자동화",
+    track: "자동화·실무",
     description: "반복되는 워크북 작업을 Python 자동화로 바꿉니다.",
   },
   numpy: {
     title: "NumPy",
-    track: "데이터",
+    track: "데이터 분석",
     description: "배열, 벡터화, 수치 계산의 기본 흐름을 익힙니다.",
   },
   pandas: {
     title: "Pandas",
-    track: "데이터",
+    track: "데이터 분석",
     description: "실제 데이터로 정제, 조인, 그룹화, 변형, 리포팅을 익힙니다.",
   },
   duckdb: {
     title: "DuckDB",
-    track: "데이터",
+    track: "데이터 분석",
     description: "Python 안에서 로컬 SQL 분석을 수행합니다.",
   },
   polars: {
     title: "Polars",
-    track: "데이터",
+    track: "데이터 분석",
     description: "빠른 로컬 데이터프레임 워크플로를 익힙니다.",
   },
   pydantic: {
     title: "Pydantic",
-    track: "데이터",
+    track: "데이터 분석",
     description: "타입 기반 검증과 데이터 계약을 다룹니다.",
   },
   matplotlib: {
@@ -143,49 +143,58 @@ const categoryLabels: Record<string, { title: string; track: string; description
   },
   sympy: {
     title: "SymPy",
-    track: "수학/ML",
+    track: "수학·통계·ML",
     description: "기호 수학, 방정식, 변환을 다룹니다.",
   },
   scipy: {
     title: "SciPy",
-    track: "수학/ML",
+    track: "수학·통계·ML",
     description: "과학 계산, 신호 처리, 최적화를 다룹니다.",
   },
   statsmodels: {
     title: "Statsmodels",
-    track: "수학/ML",
+    track: "수학·통계·ML",
     description: "통계 모델링과 추론을 다룹니다.",
   },
   sklearn: {
     title: "Scikit-learn",
-    track: "수학/ML",
+    track: "수학·통계·ML",
     description: "로컬 Python 기반 머신러닝 워크플로를 익힙니다.",
   },
   networkx: {
     title: "NetworkX",
-    track: "수학/ML",
+    track: "수학·통계·ML",
     description: "그래프와 네트워크 분석을 다룹니다.",
   },
   regex: {
     title: "Regex",
-    track: "텍스트",
+    track: "자동화·실무",
     description: "텍스트 처리용 정규식을 익힙니다.",
   },
   pillow: {
     title: "Pillow",
-    track: "이미지",
+    track: "이미지·비전",
     description: "이미지 편집과 처리 흐름을 다룹니다.",
   },
   opencv: {
     title: "OpenCV",
-    track: "이미지",
+    track: "이미지·비전",
     description: "컴퓨터 비전의 기본 흐름을 익힙니다.",
   },
   practical: {
     title: "실전 파이썬",
-    track: "프로젝트",
+    track: "자동화·실무",
     description: "실행 가능한 Python 셀로 작은 프로젝트를 만듭니다.",
   },
+};
+
+const categoryGroups: Record<string, string[]> = {
+  "Python 기초": ["main", "30days", "advancedPython", "builtins"],
+  "데이터 분석": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
+  "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
+  "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
+  "자동화·실무": ["excel", "regex", "practical"],
+  "이미지·비전": ["pillow", "opencv"],
 };
 
 const lessons = Object.entries(rawCurricula)
@@ -219,13 +228,10 @@ export function registryCategories(): CurriculumCategoriesPayload {
     name: categoryTitleFromRegistry(key),
     description: categoryLabels[key]?.description ?? `${categoryTitleFromRegistry(key)} 커리큘럼`,
     count: items.length,
+    track: categoryLabels[key]?.track ?? "기타",
   }));
 
-  const groups = categories.reduce<Record<string, string[]>>((acc, category) => {
-    const track = categoryLabels[category.key]?.track ?? "기타";
-    acc[track] = [...(acc[track] ?? []), category.key];
-    return acc;
-  }, {});
+  const groups = groupsFromCategories(categories.map((category) => category.key));
 
   return {
     categories,
@@ -655,6 +661,19 @@ function sectionContractFromYaml(section: YamlMap, index: number): LearningSecti
     ...contract,
     contractGaps: sectionHasStructuredFields(section) ? sectionContractGaps(contract) : [],
   };
+}
+
+function groupsFromCategories(categoryKeys: string[]) {
+  const keySet = new Set(categoryKeys);
+  const groups = Object.fromEntries(
+    Object.entries(categoryGroups)
+      .map(([groupName, keys]) => [groupName, keys.filter((key) => keySet.has(key))])
+      .filter(([, keys]) => keys.length),
+  ) as Record<string, string[]>;
+  const groupedKeys = new Set(Object.values(groups).flat());
+  const remaining = categoryKeys.filter((key) => !groupedKeys.has(key));
+  if (remaining.length) groups["기타"] = remaining;
+  return groups;
 }
 
 function structuredBlocksFromSectionContract(section: LearningSectionContract): BlockConfig[] {

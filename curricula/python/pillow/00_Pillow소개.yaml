@@ -293,11 +293,11 @@ sections:
   blocks:
     - type: sectionHeader
       title: "📋 이미지 소스 안내"
-      subtitle: "Codaro local Python 환경에서의 이미지"
+      subtitle: "Codaro 로컬 Python 환경에서의 이미지"
 
     - type: note
       title: "이미지 데이터 소스"
-      content: "이 커리큘럼은 Codaro local Python(브라우저 파이썬) 환경에서 실행됩니다. 외부 이미지 URL은 CORS 제약이 있어, sklearn 내장 이미지(china.jpg, flower.jpg)와 CORS를 지원하는 Lorem Picsum 서비스를 활용합니다. 일부 프로젝트에서는 Image.new()로 합성 이미지를 직접 생성합니다."
+      content: "이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. 로컬 파일, 예제 이미지, URL 이미지를 모두 다룰 수 있으며, 재현성을 위해 일부 프로젝트에서는 내장 이미지와 Image.new() 합성 이미지를 함께 사용합니다."
 
 - id: curriculum
   blocks:

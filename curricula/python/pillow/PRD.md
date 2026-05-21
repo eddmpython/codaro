@@ -1,20 +1,20 @@
 # Pillow (이미지 처리) PRD
 
 ## 개요
-Pillow(PIL Fork)를 활용한 이미지 처리 기초 학습. Pyodide 환경에서 실행.
+Pillow(PIL Fork)를 활용한 이미지 처리 기초 학습. Codaro 로컬 Python 환경에서 실행.
 
 ---
 
 ## 이미지 소스
 
-### 1. sklearn 내장 이미지 (CORS 무관)
+### 1. sklearn 내장 이미지 (사이트 정책 무관)
 ```python
 from sklearn.datasets import load_sample_image
 china = load_sample_image('china.jpg')
 flower = load_sample_image('flower.jpg')
 ```
 
-### 2. Lorem Picsum (CORS 지원)
+### 2. Lorem Picsum (네트워크 접근 가능)
 ```python
 from urllib.request import urlopen
 from PIL import Image
@@ -218,8 +218,8 @@ img = Image.new('RGB', (400, 300), color='skyblue')
 
 ## 주의사항
 
-1. **CORS**: Lorem Picsum은 CORS 지원, 다른 외부 URL은 사용 금지
-2. **변수 재할당 금지**: 각 code 블록은 marimo 셀, 파일 전체 변수 중복 금지
+1. **사이트 정책**: Lorem Picsum은 네트워크 접근 가능, 다른 외부 URL은 사용 금지
+2. **변수 재할당 금지**: 각 code 블록은 Codaro 셀, 파일 전체 변수 중복 금지
 3. **변수명 우선순위**: 1단어 > 유사어 > 짧은2단어 > 숫자접미사(2개까지)
 4. **코드 분리**: 5-10줄 단위, 마지막 라인 = 확인용 변수
 5. **tip 위치**: 새 개념 첫 등장 코드 직후

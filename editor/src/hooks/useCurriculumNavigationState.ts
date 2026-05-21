@@ -48,7 +48,7 @@ export function useCurriculumNavigationState({
     const trimmed = query.trim().toLowerCase();
     if (!trimmed) return categories;
     return categories.filter((category) => {
-      const label = `${category.name} ${category.description} ${categoryTitle(category.key)} ${categorySubtitle(category.key, category.description)} ${category.key}`;
+      const label = `${category.name} ${category.description} ${category.track ?? ""} ${categoryTitle(category.key)} ${categorySubtitle(category.key, category.description)} ${category.key}`;
       return label.toLowerCase().includes(trimmed);
     });
   }, [categories, query]);

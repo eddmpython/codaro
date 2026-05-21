@@ -91,8 +91,8 @@ sections:
           title: "다양한 도구"
           description: "교차검증, 그리드서치, 특성선택"
         - emoji: "🌐"
-          title: "Codaro local Python 지원"
-          description: "브라우저에서 바로 실행 가능"
+          title: "Codaro 로컬 Python 지원"
+          description: "로컬 Python에서 바로 실행 가능"
 
 - id: statsmodels_vs_sklearn
   blocks:
@@ -274,14 +274,14 @@ sections:
 - id: local_runtime_note
   blocks:
     - type: sectionHeader
-      title: "⚠️ Codaro local Python 환경 참고사항"
-      subtitle: "브라우저에서 실행 시 주의점"
+      title: "⚠️ Codaro 로컬 Python 환경 참고사항"
+      subtitle: "로컬 실행 시 확인할 점"
 
     - type: note
       style: warning
       title: "제한사항"
       content: |-
-        이 강의는 브라우저 기반 Codaro local Python 환경에서 실행됩니다. 대부분의 sklearn 기능이 정상 작동하지만 몇 가지 제한이 있습니다. n_jobs=-1 (병렬 처리)은 WebAssembly 제한으로 작동하지 않습니다. 초기 로딩 시 약 10-20MB를 다운로드합니다. 대용량 데이터셋 처리는 브라우저 메모리 한계가 있을 수 있습니다.
+        이 강의는 Codaro 로컬 Python 환경에서 실행됩니다. scikit-learn의 병렬 처리, 모델 평가, 파이프라인 기능을 로컬 CPU와 메모리 기준으로 실습할 수 있습니다. 대용량 데이터셋은 실행 시간을 고려해 샘플링하면서 다룹니다.
 
     - type: featureCards
       cards:
@@ -293,7 +293,7 @@ sections:
           description: "n_jobs=-1 → n_jobs=1로 변경 필요"
         - emoji: "📦"
           title: "설치 방법"
-          description: "pip install scikit-learn"
+          description: "uv pip install scikit-learn"
 
 - id: projects_preview
   blocks:

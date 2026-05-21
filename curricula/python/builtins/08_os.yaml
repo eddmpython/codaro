@@ -138,7 +138,7 @@ sections:
       absPath = os.path.abspath(relPath)
       absPath
   - type: "tip"
-    content: "Codaro local Python(웹 환경)에서는 가상 파일시스템만 접근 가능합니다. 실제 로컬 파일시스템은 접근할 수 없습니다."
+    content: "Codaro 로컬 커널에서는 현재 작업 디렉터리와 권한이 허용된 로컬 경로를 다룰 수 있습니다. 예제는 안전한 임시 경로 중심으로 진행합니다."
 
 - id: "directory_operations"
   title: "디렉토리 작업"
@@ -186,7 +186,7 @@ sections:
       dirRemoved = not os.path.exists(removeDir)
       dirRemoved
   - type: "note"
-    content: "Codaro local Python에서 mkdir/rmdir은 가상 메모리 파일시스템에만 작동하며, 브라우저 새로고침 시 모두 사라집니다."
+    content: "Codaro 로컬 커널에서 mkdir/rmdir은 실제 로컬 임시 디렉터리에 적용됩니다. 실습용 경로를 먼저 만들고 삭제 대상을 확인한 뒤 실행하세요."
 
 - id: "file_operations"
   title: "파일 작업"
@@ -292,7 +292,7 @@ sections:
       pathDelimiter = os.pathsep
       pathDelimiter
   - type: "tip"
-    content: "Codaro local Python에서는 environ 읽기만 가능하고 수정은 제한적입니다."
+    content: "Codaro 로컬 커널에서는 프로세스 환경 변수를 읽고 현재 실행 프로세스 범위에서 수정할 수 있습니다. 영구 설정은 운영체제 환경 변수 설정에서 관리하세요."
 
 - id: "practice"
   title: "os 모듈 종합 복습"

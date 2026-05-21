@@ -6,10 +6,10 @@ meta:
   badge: 소개
   source: eddmpython
   sourceUrl: https://eddmpython.com
-  tags: ["DuckDB", "OLAP", "SQL", "분석용DB", "인메모리", "WASM"]
+  tags: ["DuckDB", "OLAP", "SQL", "분석용DB", "인메모리", "로컬SQL"]
   seo:
     title: "DuckDB 입문 - 분석에 특화된 SQL 데이터베이스"
-    description: "DuckDB로 빠른 데이터 분석을 시작하세요. 설치 없이 브라우저에서도 실행되는 분석용 SQL 데이터베이스입니다."
+    description: "DuckDB로 빠른 데이터 분석을 시작하세요. 로컬 Python에서 바로 실행되는 분석용 SQL 데이터베이스입니다."
     keywords: ["DuckDB", "OLAP", "SQL", "데이터분석", "인메모리DB", "분석용데이터베이스"]
 
 sections:
@@ -30,7 +30,7 @@ sections:
         - emoji: "⚡"
           title: "분석 쿼리에 최적화"
         - emoji: "🌐"
-          title: "브라우저에서도 실행"
+          title: "로컬에서도 실행"
         - emoji: "🐼"
           title: "pandas와 완벽 호환"
 
@@ -73,10 +73,10 @@ sections:
           description: "pandas보다 10~100배 빠른 분석 쿼리 처리"
         - emoji: "📦"
           title: "설치가 간단"
-          description: "pip install duckdb 한 줄이면 끝"
+          description: "uv pip install duckdb 한 줄이면 끝"
         - emoji: "🌐"
-          title: "브라우저 실행"
-          description: "WebAssembly로 웹에서도 동작"
+          title: "로컬 실행"
+          description: "로컬 Python 패키지로 바로 동작"
         - emoji: "📁"
           title: "다양한 포맷"
           description: "CSV, Parquet, JSON, Excel 직접 쿼리"
@@ -184,30 +184,30 @@ sections:
           description: "빠른 프로토타이핑으로 인사이트 발견"
         - emoji: "🌐"
           title: "웹 앱 분석"
-          description: "WASM으로 브라우저 내 데이터 분석"
+          description: "로컬 파일과 DataFrame을 SQL로 분석"
 
-- id: wasm_intro
+- id: local_duckdb
   blocks:
     - type: sectionHeader
-      title: "🌐 브라우저에서 DuckDB"
-      subtitle: "WebAssembly로 설치 없이 바로 실행"
+      title: "💻 로컬에서 DuckDB"
+      subtitle: "uv 패키지로 바로 실행"
 
     - type: note
       style: info
-      title: "WebAssembly(WASM)란?"
-      content: "브라우저에서 네이티브 수준의 성능으로 코드를 실행하는 기술입니다. DuckDB는 WASM으로 컴파일되어 있어서 웹 브라우저에서도 동작합니다. 서버 없이 클라이언트에서 데이터 분석이 가능해요!"
+      title: "로컬 DuckDB란?"
+      content: "DuckDB는 별도 데이터베이스 서버 없이 Python 프로세스 안에서 실행되는 분석 엔진입니다. CSV, Parquet, pandas DataFrame을 로컬에서 바로 SQL로 다룰 수 있습니다."
 
     - type: featureCards
       cards:
         - emoji: "🚫"
-          title: "설치 불필요"
-          description: "브라우저만 있으면 바로 실행"
+          title: "서버 불필요"
+          description: "별도 DB 서버 없이 바로 실행"
         - emoji: "🔒"
           title: "데이터 보안"
           description: "데이터가 서버로 안 나감"
         - emoji: "⚡"
           title: "네이티브급 속도"
-          description: "WASM으로 빠른 처리"
+          description: "네이티브 엔진으로 빠른 처리"
 
 - id: comparison_table
   blocks:

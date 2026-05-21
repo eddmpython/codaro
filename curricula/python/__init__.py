@@ -11,8 +11,10 @@ BASE_URL = "https://eddmpython.com"
 DEFAULT_OG_IMAGE = f"{BASE_URL}/assets/og/eddmpythonOg.png"
 
 categoryMapping = {
+    'main': 'Python 입문',
     '30days': '30일완성',
     'advancedPython': '고급파이썬',
+    'builtins': '표준라이브러리',
     'excel': '엑셀자동화',
     'numpy': 'NumPy 수치연산',
     'sympy': 'SymPy 기호수학',
@@ -23,15 +25,25 @@ categoryMapping = {
     'seaborn': 'seaborn 시각화',
     'plotly': 'plotly 시각화',
     'altair': 'altair 시각화',
+    'folium': 'folium 지도시각화',
+    'scipy': 'SciPy 과학계산',
     'statsmodels': 'statsmodels 통계모델',
     'sklearn': 'sklearn 머신러닝',
+    'networkx': 'NetworkX 그래프분석',
     'regex': 'regex 비정형데이터',
     'pillow': 'Pillow 이미지처리',
     'opencv': 'OpenCV 컴퓨터비전',
+    'pydantic': 'Pydantic 데이터검증',
     'practical': '실전파이썬',
 }
 
 categoryMeta = {
+    'main': {
+        'icon': 'play_circle',
+        'color': 'emerald',
+        'description': 'Codaro 로컬 학습을 시작하는 짧은 Python 입문',
+        'imageUrl': None,
+    },
     '30days': {
         'icon': 'calendar_month',
         'color': 'blue',
@@ -42,6 +54,12 @@ categoryMeta = {
         'icon': 'bolt',
         'color': 'purple',
         'description': '고급 문법과 패턴으로 레벨업',
+        'imageUrl': None,
+    },
+    'builtins': {
+        'icon': 'library_books',
+        'color': 'zinc',
+        'description': 'Python 표준 라이브러리를 로컬 환경에서 익히는 경로',
         'imageUrl': None,
     },
     'excel': {
@@ -104,6 +122,18 @@ categoryMeta = {
         'description': '선언적 시각화 문법',
         'imageUrl': None,
     },
+    'folium': {
+        'icon': 'map',
+        'color': 'emerald',
+        'description': '지도와 위치 데이터를 Python으로 시각화',
+        'imageUrl': None,
+    },
+    'scipy': {
+        'icon': 'science',
+        'color': 'cyan',
+        'description': '과학 계산과 최적화',
+        'imageUrl': None,
+    },
     'statsmodels': {
         'icon': 'query_stats',
         'color': 'slate',
@@ -116,10 +146,22 @@ categoryMeta = {
         'description': '머신러닝 입문과 실전',
         'imageUrl': None,
     },
+    'networkx': {
+        'icon': 'hub',
+        'color': 'violet',
+        'description': '그래프와 네트워크 분석',
+        'imageUrl': None,
+    },
     'regex': {
         'icon': 'text_fields',
         'color': 'lime',
         'description': '정규표현식으로 텍스트 처리',
+        'imageUrl': None,
+    },
+    'pydantic': {
+        'icon': 'verified',
+        'color': 'indigo',
+        'description': '타입 기반 데이터 검증',
         'imageUrl': None,
     },
     'pillow': {
@@ -144,12 +186,12 @@ categoryMeta = {
 
 categoryGroups = {
     '전체': None,
-    '기초': ['30days', 'advancedPython'],
-    '데이터분석': ['pandas', 'numpy', 'polars', 'duckdb', 'excel'],
-    '시각화': ['matplotlib', 'seaborn', 'plotly', 'altair'],
-    '수학/통계/ML': ['sympy', 'statsmodels', 'sklearn'],
-    '이미지': ['pillow', 'opencv'],
-    '기타': ['regex', 'practical'],
+    'Python 기초': ['main', '30days', 'advancedPython', 'builtins'],
+    '데이터 분석': ['pandas', 'numpy', 'polars', 'duckdb', 'pydantic'],
+    '시각화': ['matplotlib', 'seaborn', 'plotly', 'altair', 'folium'],
+    '수학·통계·ML': ['sympy', 'scipy', 'statsmodels', 'sklearn', 'networkx'],
+    '자동화·실무': ['excel', 'regex', 'practical'],
+    '이미지·비전': ['pillow', 'opencv'],
 }
 
 featuredCategories = ['30days', 'pandas', 'advancedPython', 'matplotlib']
@@ -158,20 +200,26 @@ learningPaths = {
     '초급': {
         'icon': 'school',
         'color': 'emerald',
-        'categories': ['30days'],
+        'categories': ['main', '30days'],
         'description': '프로그래밍이 처음이라면',
     },
     '중급': {
         'icon': 'trending_up',
         'color': 'blue',
-        'categories': ['advancedPython', 'pandas', 'numpy'],
+        'categories': ['advancedPython', 'builtins', 'pandas', 'numpy'],
         'description': '기초를 마쳤다면',
+    },
+    '실무': {
+        'icon': 'construction',
+        'color': 'orange',
+        'categories': ['duckdb', 'pydantic', 'excel', 'regex', 'practical'],
+        'description': '로컬 자동화와 데이터 작업으로 확장',
     },
     '고급': {
         'icon': 'rocket_launch',
         'color': 'purple',
-        'categories': ['sklearn', 'practical'],
-        'description': '실무에 적용하고 싶다면',
+        'categories': ['scipy', 'statsmodels', 'sklearn', 'networkx'],
+        'description': '모델링과 분석을 깊게 다룬다면',
     },
 }
 

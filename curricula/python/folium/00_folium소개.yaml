@@ -39,7 +39,7 @@ sections:
   - type: text
     content: "**핵심 차이**: Folium은 HTML/JavaScript를 생성합니다. 브라우저에서 실제 지도처럼 동작합니다."
   - type: tip
-    content: Folium은 순수 파이썬으로 작성되어 Codaro local Python(브라우저 파이썬)에서도 완벽히 동작합니다.
+    content: Folium은 순수 파이썬으로 작성되어 Codaro 로컬 Python에서도 바로 실행할 수 있습니다. 결과는 HTML 지도 객체로 렌더링됩니다.
 
 - id: what_can_do
   title: 무엇을 만들 수 있나?

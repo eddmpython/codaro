@@ -2,8 +2,8 @@
 
 ## Altair 핵심 장점
 
-### 1. Marimo 자동 인터랙티브 지원
-- `mo.ui.altair_chart()`로 자동 반응형 차트
+### 1. Codaro 자동 인터랙티브 지원
+- `Altair chart object()`로 자동 반응형 차트
 - 브러싱, 선택이 자동으로 데이터와 연동
 - 추가 코드 없이 인터랙티브 차트 생성
 
@@ -123,61 +123,61 @@ data.airports()   # 공항 데이터 (URL)
 **결과물**: 마력-연비 산점도
 **데이터**: cars
 **개념**: A1(point), B1(x,y), B2(color), B5(tooltip), C1(Q), C2(N)
-**Marimo 장점**: 점 클릭/호버 자동 인터랙션
+**Codaro 장점**: 점 클릭/호버 자동 인터랙션
 
 ### P02. 붓꽃 품종 구분 (입문)
 **결과물**: 품종별 특성 비교 차트
 **데이터**: iris
 **개념**: A1, A5(circle), B1, B2, B3(size), B4(shape), G6(마크스타일)
-**Marimo 장점**: 자동 브러싱으로 품종 선택
+**Codaro 장점**: 자동 브러싱으로 품종 선택
 
 ### P03. 주식 시계열 분석 (기초)
 **결과물**: 다중 주식 라인 차트
 **데이터**: stocks
 **개념**: A2(line), B1, B2, C4(T), F1(layer), G1(properties)
-**Marimo 장점**: 범례 클릭으로 주식 필터링
+**Codaro 장점**: 범례 클릭으로 주식 필터링
 
 ### P04. 시애틀 날씨 패턴 (기초)
 **결과물**: 월별 기온/강수량 시각화
 **데이터**: seattle_weather
 **개념**: A3(bar), A4(area), B1, B2, C3(O), C4, D1(aggregate), G2(axis)
-**Marimo 장점**: 기간 브러싱으로 상세 조회
+**Codaro 장점**: 기간 브러싱으로 상세 조회
 
 ### P05. 보리 수확량 비교 (기초)
 **결과물**: 농장/품종별 수확량 비교
 **데이터**: barley
 **개념**: A1, A3, B1, B2, B7(row/column), D2(filter), F5(facet)
-**Marimo 장점**: 농장 선택 시 품종별 비교
+**Codaro 장점**: 농장 선택 시 품종별 비교
 
 ### P06. 영화 평점 분석 (중급)
 **결과물**: 장르별 평점 분포 히트맵
 **데이터**: movies
 **개념**: A6(rect), A8(boxplot), B1, B2, D1, D4(bin), G3(legend), G4(scale)
-**Marimo 장점**: 구간 선택으로 영화 목록 표시
+**Codaro 장점**: 구간 선택으로 영화 목록 표시
 
 ### P07. 인터랙티브 필터 대시보드 (중급)
 **결과물**: 동적 필터링 차트
 **데이터**: cars
 **개념**: E1(interval), E2(point), E3(add_params), E4(when), E5(bind)
-**Marimo 장점**: 슬라이더/드롭다운 자동 연동
+**Codaro 장점**: 슬라이더/드롭다운 자동 연동
 
 ### P08. 다중 뷰 연결 (중급)
 **결과물**: 브러싱 연동 다중 차트
 **데이터**: iris
 **개념**: E1, E3, E4, F1(layer), F2(hconcat), F3(vconcat), F4(repeat)
-**Marimo 장점**: 하나 선택 시 전체 차트 연동
+**Codaro 장점**: 하나 선택 시 전체 차트 연동
 
 ### P09. 고급 데이터 변환 (심화)
 **결과물**: 복합 통계 시각화
 **데이터**: movies + stocks
 **개념**: D1, D3(calculate), D5(fold), D6(lookup), D7(window), A7(text)
-**Marimo 장점**: 변환 결과 실시간 확인
+**Codaro 장점**: 변환 결과 실시간 확인
 
 ### P10. 종합 인터랙티브 대시보드 (심화)
 **결과물**: 완전한 탐색형 대시보드
 **데이터**: cars
 **개념**: 모든 개념 종합
-**Marimo 장점**: 전체 인터랙션 통합
+**Codaro 장점**: 전체 인터랙션 통합
 
 ---
 
@@ -254,25 +254,25 @@ altair/
 
 ---
 
-## Marimo 연동 특별 고려사항
+## Codaro 연동 특별 고려사항
 
 ### 자동 인터랙션 활용
 ```python
-import marimo as mo
+
 import altair as alt
 
 chart = alt.Chart(data).mark_point().encode(...)
-mo.ui.altair_chart(chart)
+chart
 ```
 
 ### 선택 데이터 활용
 ```python
-chart = mo.ui.altair_chart(alt.Chart(data).mark_point().encode(...))
+chart = Altair chart object(alt.Chart(data).mark_point().encode(...))
 selectedData = chart.value
 ```
 
 ### 브러싱 연동
-- Marimo가 mark 타입에 따라 자동으로 적절한 selection 추가
+- Codaro가 mark 타입에 따라 자동으로 적절한 selection 추가
 - 별도 add_params 없이도 기본 인터랙션 제공
 - 고급 커스터마이징은 직접 selection 정의
 
@@ -282,6 +282,6 @@ selectedData = chart.value
 
 - [Altair 공식 문서](https://altair-viz.github.io/)
 - [Altair 갤러리](https://altair-viz.github.io/gallery/index.html)
-- [Marimo Altair 연동](https://marimo.io/blog/altair)
+- [Codaro Altair 연동](https://Codaro.io/blog/altair)
 - [Vega-Lite 문법](https://vega.github.io/vega-lite/)
 - [인터랙션 가이드](https://altair-viz.github.io/user_guide/interactions.html)

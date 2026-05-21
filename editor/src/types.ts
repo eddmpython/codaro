@@ -123,6 +123,7 @@ export type CurriculumCategory = {
   name: string;
   description: string;
   count: number;
+  track?: string;
 };
 
 export type CurriculumContentSummary = {

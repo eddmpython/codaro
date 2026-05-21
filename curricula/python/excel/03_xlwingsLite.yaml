@@ -3,11 +3,11 @@ meta:
   title: "xlwings lite 완벽 가이드"
   order: 3
   category: "excel"
-  tags: ["xlwings", "xlwings-lite", "WASM", "Codaro local Python"]
+  tags: ["xlwings", "excel", "로컬Python", "자동화"]
   seo:
-    title: "xlwings lite - 설치 없이 브라우저에서 엑셀 자동화"
-    description: "xlwings lite로 설치 없이 브라우저에서 엑셀 자동화를 시작하세요. WASM/Codaro local Python 기반으로 어디서나 실행 가능합니다."
-    keywords: ["xlwings lite", "브라우저 엑셀", "WASM 파이썬", "Codaro local Python", "온라인 엑셀 자동화"]
+    title: "xlwings와 로컬 Python으로 엑셀 자동화"
+    description: "xlwings와 로컬 Python으로 Excel 자동화를 시작하세요. Codaro 로컬 커널에서 workbook 작업 흐름을 실습합니다."
+    keywords: ["xlwings", "엑셀 자동화", "로컬 파이썬", "Codaro 로컬 Python", "워크북 자동화"]
 
 sections:
   - id: "mainHeader"
@@ -16,8 +16,8 @@ sections:
       - type: mainHeader
         emoji: "☁️"
         title: "xlwings lite 완벽 가이드"
-        subtitle: "설치 없이 브라우저에서 바로 시작하는 Excel 자동화!"
-        description: "복잡한 설정 없이 브라우저에서 바로 Excel 자동화를 경험해보세요"
+        subtitle: "로컬 Python으로 시작하는 Excel 자동화!"
+        description: "Codaro 로컬 Python에서 Excel 자동화 흐름을 경험해보세요"
         gradient: "from-blue-500 via-cyan-500 to-teal-500"
 
   - id: "whatIsXlwingsLite"
@@ -26,7 +26,7 @@ sections:
       - type: sectionHeader
         emoji: "🚀"
         title: "xlwings lite란?"
-        subtitle: "Office.js 애드인으로 구현된 브라우저 기반 Excel 자동화 솔루션"
+        subtitle: "Excel 추가 기능과 Python을 연결하는 자동화 솔루션"
         color: "cyan"
 
       - type: video
@@ -40,7 +40,7 @@ sections:
       - type: sectionHeader
         emoji: "🌟"
         title: "xlwings Lite가 뭔가요?"
-        subtitle: "브라우저만 있으면 Excel에서 Python을 바로 사용할 수 있는 무료 도구입니다"
+        subtitle: "Excel과 Python을 연결해 자동화 흐름을 체험할 수 있는 도구입니다"
         color: "cyan"
 
       - type: info
@@ -54,7 +54,7 @@ sections:
               </h4>
               <p class="text-gray-700 leading-relaxed">
                 Excel에 Python 편집기가 내장된 것처럼 사용할 수 있는 무료 도구입니다.
-                <strong>Python 설치 없이</strong> 브라우저에서 바로 Python 코드를 작성하고 실행할 수 있어요!
+                <strong>VBA 없이</strong> Python 코드로 Excel 작업을 자동화할 수 있어요!
               </p>
             </div>
             <div class="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-200">
@@ -63,7 +63,7 @@ sections:
                 어떻게 작동하나요?
               </h4>
               <p class="text-gray-700 leading-relaxed">
-                WASM(WebAssembly) 기술로 브라우저에서 Python을 실행합니다.
+                Python 코드가 Excel 객체 모델과 연결되어 실행됩니다.
                 Office.js API를 통해 Excel과 직접 통신하여 <strong>셀 읽기/쓰기, 차트 생성, 데이터 분석</strong> 등이 가능해요!
               </p>
             </div>
@@ -73,16 +73,16 @@ sections:
       - type: featureCards
         cards:
           - emoji: "🔧"
-            title: "Codaro local Python 기반"
-            description: "• Codaro local Python: WebAssembly로 실행\n• Office.js로 내부의 브라우저 엔진 활용\n• 로컬에서 실행되는 완전한 Python 환경\n• pandas등 파이썬 주요 라이브러리 지원"
+            title: "Codaro 로컬 Python 기반"
+            description: "• Codaro 로컬 Python: PC의 Python 커널로 실행\n• Excel 파일과 데이터를 로컬에서 처리\n• pandas 등 주요 라이브러리 지원\n• 실행 결과를 셀과 리포트로 확인"
             color: "blue"
           - emoji: "⚡"
-            title: "Python 설치 불필요"
-            description: "• 별도 Python 설치 없이 바로 사용\n• 애드인만 설치하면 끝\n• Excel 365 및 Office 2021+ 지원\n• 웹브라우저 환경에서 실행"
+            title: "로컬 Python 준비"
+            description: "• Codaro 로컬 Python 커널로 실습\n• Excel 추가 기능과 워크북 흐름 이해\n• Excel 365 및 Office 2021+ 지원\n• 워크북 데이터를 로컬에서 검증"
             color: "green"
           - emoji: "🌐"
             title: "Office.js 애드인 구조"
-            description: "• 모던 Excel 애드인 기술 사용\n• 브라우저가 Excel 내부에서 실행\n• Excel 객체 모델에 직접 접근 가능\n• 시트 추가, 서식 변경 등 완전한 제어"
+            description: "• 모던 Excel 애드인 기술 사용\n• 추가 기능이 Excel 내부 패널에서 실행\n• Excel 객체 모델에 직접 접근 가능\n• 시트 추가, 서식 변경 등 완전한 제어"
             color: "purple"
           - emoji: "🔒"
             title: "프라이버시 우선 설계"
@@ -104,7 +104,7 @@ sections:
         description: "xlwings lite가 제대로 작동하려면 다음 조건들이 필요합니다. 하나씩 확인해보세요!"
         tips:
           - "✅ Excel 365 또는 Excel 2021 이상 버전 설치"
-          - "✅ 최신 웹브라우저 (Chrome, Firefox, Safari, Edge)"
+          - "✅ 최신 Office 추가 기능 런타임"
           - "✅ 안정적인 인터넷 연결 (초기 로딩용)"
           - "⚠️ Excel 2019, 2016 등 구버전에서는 작동하지 않음"
         color: "blue"
@@ -120,7 +120,7 @@ sections:
       - type: sectionHeader
         emoji: "🌟"
         title: "2단계: xlwings lite 설치하기"
-        subtitle: "브라우저만 있으면 5분 안에 Excel 자동화를 시작할 수 있어요!"
+        subtitle: "Excel과 Codaro 로컬 Python으로 자동화를 시작할 수 있어요!"
         color: "green"
 
       - type: stepCard
@@ -129,8 +129,8 @@ sections:
         description: "먼저 xlwings lite 공식 웹사이트에 접속해보겠습니다. 별도 가입 없이 바로 사용할 수 있어요!"
         imageUrl: "python/excel/xlwingslite설치1.png"
         tips:
-          - "🌐 웹브라우저에서 xlwings lite 사이트로 이동하세요"
-          - "💻 Chrome, Firefox, Safari 등 모든 브라우저에서 작동해요"
+          - "🌐 xlwings Lite 공식 사이트로 이동하세요"
+          - "💻 지원되는 Microsoft Office 환경에서 작동해요"
           - "🔑 별도 회원가입이나 로그인이 필요하지 않습니다"
           - "🚀 'Try Now' 또는 '시작하기' 버튼을 찾아보세요"
         color: "green"
@@ -221,17 +221,17 @@ sections:
         color: "indigo"
 
       - type: info
-        title: "🤔 WASM과 Codaro local Python가 뭔가요?"
+        title: "🤔 로컬 Python과 Excel은 어떻게 연결되나요?"
         htmlContent: |
           <p class="mb-4">xlwings Lite는 최신 웹 기술을 사용해서 Excel 내부에서 Python을 실행합니다.</p>
           <ul class="space-y-3 mb-4">
-            <li>🔧 <strong>WebAssembly (WASM):</strong> 브라우저에서 네이티브 수준의 성능으로 다양한 언어를 실행하는 기술</li>
-            <li>🐍 <strong>Codaro local Python:</strong> CPython을 WebAssembly로 컴파일한 Python 배포판. 브라우저에서 완전한 Python 환경을 제공</li>
-            <li>📱 <strong>Office.js:</strong> Excel 내부에 웹브라우저를 임베드하는 Microsoft의 애드인 플랫폼</li>
-            <li>🔗 <strong>연결 구조:</strong> Python(Codaro local Python) ↔ JavaScript ↔ Office.js ↔ Excel</li>
+            <li>🔧 <strong>로컬 Python:</strong> 사용자의 PC에서 파일과 패키지를 직접 다루는 실행 환경</li>
+            <li>🐍 <strong>Codaro 로컬 Python:</strong> CPython 커널을 통해 Excel 데이터 처리와 분석 코드를 실행</li>
+            <li>📱 <strong>Office.js:</strong> Excel 내부 추가 기능 패널을 제공하는 Microsoft의 애드인 플랫폼</li>
+            <li>🔗 <strong>연결 구조:</strong> Python(Codaro 로컬 Python) ↔ JavaScript ↔ Office.js ↔ Excel</li>
           </ul>
           <div class="bg-gray-100 p-4 rounded-lg">
-            <p class="font-bold text-indigo-600">Excel이 내부적으로 웹브라우저를 실행하고, 그 브라우저에서 Python이 동작합니다!</p>
+            <p class="font-bold text-indigo-600">Codaro에서는 로컬 Python 커널이 Excel 데이터 처리 흐름을 실행합니다!</p>
           </div>
         color: "indigo"
 
@@ -239,8 +239,8 @@ sections:
         title: "🤷‍♂️ Excel과 Python이 어떻게 통신하나요?"
         htmlContent: |
           핵심 동작 원리를 쉽게 설명드릴게요!<br/><br/>
-          1️⃣ Excel 내부에 브라우저 창이 열립니다 (Office.js 애드인)<br/>
-          2️⃣ 브라우저에서 Codaro local Python가 Python 환경을 제공합니다<br/>
+          1️⃣ Excel 내부에 Office.js 추가 기능 패널이 열립니다<br/>
+          2️⃣ Codaro 로컬 Python 커널이 Python 실행 환경을 제공합니다<br/>
           3️⃣ Python 코드가 JavaScript API를 통해 Excel과 통신합니다<br/>
           4️⃣ 모든 작업이 로컬 컴퓨터에서 실행됩니다 (클라우드 X)<br/><br/>
           📊 결과: Python 코드로 Excel 셀 읽기/쓰기, 시트 추가, 서식 변경 등이 가능!<br/>
@@ -261,21 +261,21 @@ sections:
         htmlContent: |
           • Excel 365 또는 Excel 2021 이상 버전 필수<br>
           • Excel 2019, 2016 등 구버전에서는 작동하지 않음<br>
-          • 최신 웹브라우저 필요 (Internet Explorer 불가)<br>
+          • 최신 Office 추가 기능 런타임 필요<br>
           • 초기 로딩 시 인터넷 연결 필요
         warningType: "warning"
 
       - type: warning
         title: "🔧 기능 제한사항"
         htmlContent: |
-          <strong>💻 WebAssembly 환경 제약:</strong><br>
-          • 일부 Python 패키지는 WASM에서 지원되지 않음 (PyTorch, TensorFlow 등)<br>
-          • 네이티브 바이너리 의존성이 있는 패키지는 제한적<br>
-          • 메모리 사용량이 브라우저 제한을 받음<br><br>
+          <strong>💻 로컬 실행 확인사항:</strong><br>
+          • 필요한 패키지는 uv로 먼저 준비<br>
+          • 네이티브 의존성이 있는 패키지는 설치 로그 확인<br>
+          • 큰 워크북은 샘플로 먼저 검증<br><br>
           <strong>🌐 웹 환경 보안 제약:</strong><br>
-          • 로컬 파일 시스템에 직접 접근 불가<br>
-          • 데이터베이스 직접 연결 불가 (웹 API를 통해서만 가능)<br>
-          • CORS가 설정된 웹 API만 호출 가능<br><br>
+          • 로컬 파일 경로와 권한 확인<br>
+          • 데이터베이스 연결 정보는 로컬 환경변수로 관리<br>
+          • 외부 API는 네트워크 상태와 인증 정보를 확인<br><br>
           <strong>📊 Excel 호환성:</strong><br>
           • VBA 매크로와는 별개의 환경<br>
           • Office.js API 범위 내에서만 Excel 제어 가능<br>
@@ -310,7 +310,7 @@ sections:
             icon: "🐍"
             items:
               - "Anaconda Inc. 솔루션"
-              - "Codaro local Python 기반 (로컬 실행)"
+              - "Codaro 로컬 Python 기반 (로컬 실행)"
               - "Anaconda 계정 로그인 필요"
               - "사용 데이터 외부 수집됨"
             colors:
@@ -322,7 +322,7 @@ sections:
             icon: "🌟"
             items:
               - "로그인 불필요"
-              - "Codaro local Python 기반 (로컬 실행)"
+              - "Codaro 로컬 Python 기반 (로컬 실행)"
               - "Excel 객체 모델 접근 가능"
               - "프라이버시 우선 설계"
             colors:

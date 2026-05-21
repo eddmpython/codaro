@@ -14,6 +14,7 @@ class CategoryInfo(BaseModel):
     name: str
     description: str = ""
     count: int = 0
+    track: str = ""
 
 
 class StudySummary(BaseModel):
@@ -86,18 +87,19 @@ CATEGORY_META = {
 }
 
 CATEGORY_GROUPS = {
-    "기초": ["main", "30days", "advancedPython", "builtins"],
-    "데이터분석": ["pandas", "numpy", "polars", "duckdb", "excel", "pydantic"],
+    "Python 기초": ["main", "30days", "advancedPython", "builtins"],
+    "데이터 분석": ["pandas", "numpy", "polars", "duckdb", "pydantic"],
     "시각화": ["matplotlib", "seaborn", "plotly", "altair", "folium"],
-    "수학/통계/ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
-    "이미지": ["pillow", "opencv"],
-    "기타": ["regex", "practical"],
+    "수학·통계·ML": ["sympy", "scipy", "statsmodels", "sklearn", "networkx"],
+    "자동화·실무": ["excel", "regex", "practical"],
+    "이미지·비전": ["pillow", "opencv"],
 }
 
 LEARNING_PATHS = {
     "초급": {"categories": ["main", "30days"], "description": "프로그래밍이 처음이라면"},
     "중급": {"categories": ["advancedPython", "builtins", "pandas", "numpy"], "description": "기초를 마쳤다면"},
-    "고급": {"categories": ["scipy", "statsmodels", "sklearn", "practical"], "description": "실무에 적용하고 싶다면"},
+    "실무": {"categories": ["duckdb", "pydantic", "excel", "regex", "practical"], "description": "로컬 자동화와 데이터 작업으로 확장"},
+    "고급": {"categories": ["scipy", "statsmodels", "sklearn", "networkx"], "description": "모델링과 분석을 깊게 다룬다면"},
 }
 
 
@@ -128,6 +130,7 @@ class StudyLoader:
                 name=name,
                 description=meta.get("description", ""),
                 count=count,
+                track=_categoryTrack(key),
             ))
         return result
 
@@ -266,6 +269,13 @@ def _extractSortKey(name: str) -> tuple:
         return (num * 100 + subNum, name)
 
     return (999999, name)
+
+
+def _categoryTrack(category: str) -> str:
+    for groupName, categories in CATEGORY_GROUPS.items():
+        if category in categories:
+            return groupName
+    return "기타"
 
 
 def _buildMenuTitle(contentId: str, metaTitle: str) -> str:

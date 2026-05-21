@@ -2,18 +2,18 @@
 
 ## DuckDB의 핵심 장점
 
-1. **브라우저 실행**: WebAssembly로 컴파일되어 서버 없이 브라우저에서 실행
+1. **로컬 실행**: Python 프로세스 안에서 파일과 메모리 데이터를 바로 쿼리
 2. **SQL 표준**: 50년 역사의 표준 언어, 모든 DB에서 통용
 3. **OLAP 특화**: 분석 쿼리에 최적화된 컬럼 기반 엔진
 4. **pandas 연동**: `duckdb.from_df()`로 DataFrame을 바로 쿼리
-5. **제로 설정**: `pip install duckdb` 한 줄로 설치 완료
+5. **제로 설정**: `uv pip install duckdb` 한 줄로 설치 완료
 6. **무료 오픈소스**: MIT 라이선스, 상업적 사용 가능
 
-## pyodide 환경 고려사항
+## Codaro 로컬 Python 환경 고려사항
 
-- httpfs 확장 미지원 → pandas로 CSV 로드 후 `duckdb.from_df()` 변환
-- 싱글 스레드 기본 (멀티스레딩 실험적)
-- `duckdb.sql("쿼리")` 형태로 실행
+- 로컬 파일은 `duckdb.read_csv()`나 `read_csv_auto()`로 직접 읽기
+- pandas 데이터프레임은 `duckdb.from_df()`로 바로 쿼리
+- `duckdb.sql("쿼리")` 또는 Relation API 형태로 실행
 - 결과는 DuckDB Relation 객체, `.df()`로 pandas 변환 가능
 
 ---
@@ -312,7 +312,7 @@ duckdb/
 - "팁 비율이 높은 요일은?" → GROUP BY + AVG
 - "생존율 상위 그룹은?" → HAVING + ORDER BY
 
-### 4. pyodide 환경 최적화
+### 4. Codaro 로컬 Python 환경 최적화
 - pandas로 데이터 로드 → duckdb.from_df() 변환
 - 결과는 DuckDB Relation 객체로 바로 확인
 - .df()로 pandas 변환 가능
@@ -322,6 +322,6 @@ duckdb/
 ## 참고 자료
 
 - [DuckDB 공식 문서](https://duckdb.org/docs/)
-- [DuckDB in Pyodide](https://duckdb.org/2024/10/02/pyodide)
+- [DuckDB in Codaro 로컬 Python](https://duckdb.org/2024/10/02/Codaro 로컬 Python)
 - [DuckDB Window Functions](https://duckdb.org/2025/02/10/window-catchup)
 - [MotherDuck Blog](https://motherduck.com/blog/)

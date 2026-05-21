@@ -37,10 +37,10 @@ sections:
 
 - id: step1_font
   title: 1-1단계. 한글 폰트 설정
-  subtitle: Codaro local Python 환경 폰트
+  subtitle: Codaro 로컬 Python 환경 폰트
   blocks:
   - type: text
-    content: Codaro local Python(웹 브라우저) 환경에서는 시스템 폰트를 사용할 수 없어 한글이 깨집니다. CDN에서 폰트 파일을 다운로드하여 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
+    content: Codaro 로컬 Python에서는 실행 환경에 따라 기본 폰트에 한글 글리프가 없을 수 있습니다. CDN 또는 로컬 폰트 파일을 matplotlib에 등록하는 방식으로 해결합니다. Pretendard는 무료 오픈소스 폰트로, 한글과 영문 모두 깔끔하게 표시됩니다.
   - type: code
     language: python
     title: 한글 폰트 설정
@@ -56,7 +56,7 @@ sections:
               break
       plt.rcParams["axes.unicode_minus"] = False
   - type: tip
-    content: Codaro local Python 환경에서는 fetch API로 외부 리소스를 가져옵니다. font_manager.addfont()로 폰트를 등록하고, rcParams로 기본 폰트를 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
+    content: font_manager로 현재 환경의 폰트 목록을 확인하고, 사용 가능한 한글 폰트를 rcParams에 설정합니다. axes.unicode_minus = False는 마이너스 기호가 깨지는 것을 방지합니다.
 
 - id: step2_data
   title: 2단계. 데이터 로드

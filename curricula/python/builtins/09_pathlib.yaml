@@ -35,7 +35,7 @@ sections:
       currentPath = Path('.')
       currentPath
   - type: "tip"
-    content: "Codaro local Python 환경에서는 가상 파일시스템에서만 작동합니다. Path 객체는 경로를 문자열 대신 객체로 관리합니다."
+    content: "Codaro 로컬 커널에서는 현재 작업 디렉터리와 권한이 허용된 로컬 경로에서 작동합니다. Path 객체는 경로를 문자열 대신 객체로 관리합니다."
 
 - id: "path_basics"
   title: "Path 객체 기초"
@@ -207,7 +207,7 @@ sections:
       testPath = Path('.')
       {'exists': testPath.exists(), 'is_dir': testPath.is_dir(), 'is_file': testPath.is_file(), 'is_absolute': testPath.is_absolute()}
   - type: "tip"
-    content: "Codaro local Python에서는 가상 파일시스템 범위 내에서만 작동합니다. Windows에서 절대 경로는 C:\\로 시작하고, Unix에서는 /로 시작합니다."
+    content: "Codaro 로컬 커널에서는 로컬 파일시스템 경로를 다룹니다. Windows에서 절대 경로는 C:\\로 시작하고, Unix에서는 /로 시작합니다."
 
 - id: "directory_navigation"
   title: "디렉토리 탐색"
@@ -329,7 +329,7 @@ sections:
       fileSize = sampleFile.stat().st_size
       fileSize
   - type: "tip"
-    content: "Codaro local Python 환경에서는 가상 파일시스템에 저장됩니다. write_text()와 write_bytes()는 기존 파일을 덮어씁니다."
+    content: "Codaro 로컬 커널에서는 지정한 로컬 경로에 저장됩니다. write_text()와 write_bytes()는 기존 파일을 덮어쓰므로 실습용 경로에서 실행하세요."
 
 - id: "practice"
   title: "pathlib 모듈 종합 복습"

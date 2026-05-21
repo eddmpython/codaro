@@ -28,7 +28,7 @@ sections:
     content: |-
       import re
       import json
-      from Codaro local Python.http import open_url
+      from urllib.request import urlopen
 
 - id: step2_load_data
   title: 2단계. 실제 웹 데이터 로드
@@ -365,7 +365,7 @@ sections:
       content: |-
         import re
         import json
-        from Codaro local Python.http import open_url
+        from urllib.request import urlopen
 
         posts = json.loads(
             urlopen("https://jsonplaceholder.typicode.com/posts").read()

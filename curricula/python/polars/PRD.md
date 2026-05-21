@@ -8,11 +8,11 @@
 4. **표현식 API**: 직관적이고 체이닝 가능한 문법
 5. **타입 안정성**: 스키마 에러를 실행 전에 감지
 
-## pyodide 환경 고려사항
+## Codaro 로컬 Python 환경 고려사항
 
-- Polars는 pyodide 0.27+에서 공식 지원
-- `pl.read_csv()` 사용 (scan_csv의 일부 기능 제한)
-- 브라우저 환경에서도 빠른 성능 체감 가능
+- Polars는 Codaro 로컬 Python 커널에서 프로젝트 의존성으로 준비
+- `pl.read_csv()`와 `scan_csv()`를 데이터 규모에 맞춰 선택
+- 로컬 CPU와 메모리를 활용해 빠른 성능 체감 가능
 
 ---
 
@@ -273,7 +273,7 @@ polars/
 - explain()으로 쿼리 계획 확인
 - 실제 실행 시간 측정
 
-### 4. pyodide 환경 최적화
+### 4. Codaro 로컬 Python 환경 최적화
 - read_csv 사용 (scan_csv 대신)
 - 작은 데이터셋으로 개념 학습
 - 결과물 즉시 확인 가능

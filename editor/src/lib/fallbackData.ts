@@ -11,40 +11,55 @@ import type {
 } from "@/types";
 
 export const categoryMeta: Record<string, { title: string; subtitle: string; track: string }> = {
+  main: {
+    title: "파이썬 시작",
+    subtitle: "Codaro에서 바로 시작하는 짧은 파이썬 입문 경로입니다.",
+    track: "Python 기초",
+  },
   "30days": {
     title: "파이썬 기초",
     subtitle: "값, 흐름, 컬렉션, 파일, 작은 도구를 차례로 익히는 첫 경로입니다.",
-    track: "핵심",
+    track: "Python 기초",
   },
   advancedPython: {
     title: "고급 파이썬",
     subtitle: "패턴, 이터레이터, 데이터 모델, 타입, 유지보수 가능한 모듈을 다룹니다.",
-    track: "핵심",
+    track: "Python 기초",
+  },
+  builtins: {
+    title: "표준 라이브러리",
+    subtitle: "실행 가능한 셀로 Python 표준 라이브러리를 익힙니다.",
+    track: "Python 기초",
   },
   excel: {
     title: "엑셀 자동화",
     subtitle: "반복되는 워크북 작업을 감사 가능한 Python 태스크로 바꿉니다.",
-    track: "자동화",
+    track: "자동화·실무",
   },
   numpy: {
     title: "NumPy",
     subtitle: "빠른 배열, 벡터화 사고, 수치 워크플로를 익힙니다.",
-    track: "데이터",
+    track: "데이터 분석",
   },
   pandas: {
     title: "Pandas",
     subtitle: "실제 데이터로 정제, 조인, 그룹화, 변형, 리포팅을 익힙니다.",
-    track: "데이터",
+    track: "데이터 분석",
   },
   duckdb: {
     title: "DuckDB",
     subtitle: "Python 워크플로 안에서 로컬 분석 SQL을 사용합니다.",
-    track: "데이터",
+    track: "데이터 분석",
   },
   polars: {
     title: "Polars",
     subtitle: "지연 실행 패턴으로 현대적인 데이터프레임 작업을 익힙니다.",
-    track: "데이터",
+    track: "데이터 분석",
+  },
+  pydantic: {
+    title: "Pydantic",
+    subtitle: "타입 기반 검증과 데이터 계약을 다룹니다.",
+    track: "데이터 분석",
   },
   matplotlib: {
     title: "Matplotlib",
@@ -66,35 +81,55 @@ export const categoryMeta: Record<string, { title: string; subtitle: string; tra
     subtitle: "데이터 계약에서 출발하는 선언형 시각화를 익힙니다.",
     track: "시각화",
   },
+  folium: {
+    title: "Folium",
+    subtitle: "지도와 위치 데이터 시각화를 다룹니다.",
+    track: "시각화",
+  },
+  sympy: {
+    title: "SymPy",
+    subtitle: "기호 수학, 방정식, 변환을 다룹니다.",
+    track: "수학·통계·ML",
+  },
+  scipy: {
+    title: "SciPy",
+    subtitle: "과학 계산, 신호 처리, 최적화를 다룹니다.",
+    track: "수학·통계·ML",
+  },
   statsmodels: {
     title: "Statsmodels",
     subtitle: "가정을 확인할 수 있는 통계 모델링을 다룹니다.",
-    track: "모델링",
+    track: "수학·통계·ML",
   },
   sklearn: {
     title: "Scikit-learn",
     subtitle: "실용적인 머신러닝 파이프라인과 평가를 익힙니다.",
-    track: "모델링",
+    track: "수학·통계·ML",
+  },
+  networkx: {
+    title: "NetworkX",
+    subtitle: "그래프와 네트워크 분석을 다룹니다.",
+    track: "수학·통계·ML",
   },
   regex: {
     title: "Regex",
     subtitle: "복잡한 텍스트를 안정적으로 추출하고 변환합니다.",
-    track: "자동화",
+    track: "자동화·실무",
   },
   pillow: {
     title: "Pillow",
     subtitle: "파일, 이미지, 작은 도구에 쓰는 처리 레시피를 익힙니다.",
-    track: "자동화",
+    track: "이미지·비전",
   },
   opencv: {
     title: "OpenCV",
     subtitle: "화면과 이미지 자동화를 위한 컴퓨터 비전 기초를 다룹니다.",
-    track: "자동화",
+    track: "이미지·비전",
   },
   practical: {
     title: "실전 파이썬",
     subtitle: "반복 가능한 도구가 되는 작은 프로젝트를 만듭니다.",
-    track: "스튜디오",
+    track: "자동화·실무",
   },
 };
 
@@ -124,24 +159,27 @@ export const fallbackCategories: CurriculumCategoriesPayload = {
       name: "파이썬 기초",
       description: categorySubtitle("30days"),
       count: 30,
+      track: categoryTrack("30days"),
     },
     {
       key: "excel",
       name: "엑셀 자동화",
       description: categorySubtitle("excel"),
-      count: 12,
+      count: 3,
+      track: categoryTrack("excel"),
     },
     {
       key: "pandas",
       name: "Pandas",
       description: categorySubtitle("pandas"),
-      count: 18,
+      count: 11,
+      track: categoryTrack("pandas"),
     },
   ],
   groups: {
-    핵심: ["30days"],
-    자동화: ["excel"],
-    데이터: ["pandas"],
+    "Python 기초": ["30days"],
+    "데이터 분석": ["pandas"],
+    "자동화·실무": ["excel"],
   },
   learningPaths: {
     입문: {

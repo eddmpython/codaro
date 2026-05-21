@@ -2,7 +2,7 @@
 
 ## 데이터셋
 
-**px.data 내장 데이터** (pyodide 완벽 호환):
+**px.data 내장 데이터** (Codaro 로컬 Python 완벽 호환):
 ```python
 px.data.gapminder()  # 세계 발전 데이터 (1704행, 8컬럼)
 px.data.iris()       # 붓꽃 데이터 (150행, 6컬럼)

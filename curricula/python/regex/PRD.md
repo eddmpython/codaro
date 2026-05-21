@@ -2,7 +2,7 @@
 
 ## 데이터셋
 
-**텍스트 샘플 데이터** (pyodide 호환):
+**텍스트 샘플 데이터** (Codaro 로컬 Python 호환):
 
 ### 방법 1: 코드 내 멀티라인 문자열 (권장)
 ```python
@@ -14,34 +14,34 @@ Date: 2025-12-26, 26/12/2025, Dec 26, 2025
 """
 ```
 
-### 방법 2: 공개 API (CORS 지원, pyodide 호환)
+### 방법 2: 공개 API (네트워크 접근 가능, Codaro 로컬 Python 호환)
 ```python
-from pyodide.http import open_url
+from urllib.request import urlopen
 import json
 
 # JSONPlaceholder - 이메일, 전화번호, URL 포함
-usersData = json.loads(open_url("https://jsonplaceholder.typicode.com/users").read())
+usersData = json.load(urlopen("https://jsonplaceholder.typicode.com/users"))
 for user in usersData:
     user['email']  # 'Sincere@april.biz'
     user['phone']  # '1-770-736-8031 x56442'
     user['website']  # 'hildegard.org'
 
 # Bacon Ipsum - 긴 텍스트 생성 (텍스트 정제 실습)
-textData = json.loads(open_url("https://baconipsum.com/api/?type=all-meat&paras=5").read())
+textData = json.load(urlopen("https://baconipsum.com/api/?type=all-meat&paras=5"))
 longText = " ".join(textData)
 ```
 
 ### 방법 3: GitHub raw 파일
 ```python
-from pyodide.http import open_url
+from urllib.request import urlopen
 
 baseUrl = "https://raw.githubusercontent.com"
 
 # CSV 파일 (도시, 국가 데이터 - 특수문자 포함)
-csvData = open_url(f"{baseUrl}/datasets/world-cities/master/data/world-cities.csv").read()
+csvData = urlopen(f"{baseUrl}/datasets/world-cities/master/data/world-cities.csv").read().decode("utf-8")
 
 # 샘플 텍스트 파일 (직접 제작 권장)
-# textData = open_url(f"{baseUrl}/your-username/your-repo/main/sample.txt").read()
+# textData = urlopen(f"{baseUrl}/your-username/your-repo/main/sample.txt").read().decode("utf-8")
 ```
 
 **실전 데이터 소스 (10개 프로젝트용):**
@@ -60,9 +60,9 @@ csvData = open_url(f"{baseUrl}/datasets/world-cities/master/data/world-cities.cs
 | P10 LLM 전처리 | JSONPlaceholder /posts + HTML | 실전 파이프라인 |
 
 **주의사항:**
-- `requests` 모듈은 pyodide에서 작동하지 않음 (socket 미지원)
-- 대신 `pyodide.http.open_url()` 사용 (동기식, 간단)
-- 또는 `pyodide.http.pyfetch()` 사용 (비동기, await 필요)
+- 네트워크 예제는 `urllib.request.urlopen()`을 기본으로 사용
+- API 응답은 JSON이면 `json.load()`, 텍스트면 `read().decode("utf-8")`로 처리
+- 인증이 필요한 API나 사이트 정책이 강한 URL은 로컬 환경 변수와 예외 처리를 함께 설계
 
 ---
 

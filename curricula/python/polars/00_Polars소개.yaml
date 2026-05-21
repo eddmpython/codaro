@@ -176,28 +176,28 @@ sections:
       title: "프로젝트 기반 학습"
       content: "각 프로젝트는 완성된 결과물을 만듭니다. 개념만 배우는 게 아니라 실제 분석을 수행합니다."
 
-- id: Codaro local Python_support
+- id: local_python_support
   blocks:
     - type: sectionHeader
-      title: "🌐 브라우저에서도 동작"
-      subtitle: "Codaro local Python 지원"
+      title: "💻 로컬에서 빠르게 동작"
+      subtitle: "Codaro 로컬 Python 지원"
 
     - type: note
       style: tip
-      title: "Codaro local Python에서 Polars 사용"
-      content: "Polars는 WebAssembly로 컴파일되어 브라우저에서도 동작합니다. 별도 서버 없이 웹에서 대용량 데이터 분석이 가능합니다."
+      title: "Codaro 로컬 Python에서 Polars 사용"
+      content: "Polars는 Rust 기반 엔진과 Apache Arrow 메모리 모델을 사용합니다. Codaro 로컬 Python에서는 멀티코어와 로컬 파일을 활용해 대용량 데이터 분석을 실습할 수 있습니다."
 
     - type: featureCards
       cards:
         - emoji: "🌐"
-          title: "브라우저 실행"
-          description: "서버 없이 웹에서 바로 실행"
+          title: "로컬 실행"
+          description: "로컬 파일을 바로 읽고 분석"
         - emoji: "📦"
-          title: "WASM 컴파일"
-          description: "Rust에서 WebAssembly로 빌드"
+          title: "Rust 기반 엔진"
+          description: "Rust 엔진과 Arrow 기반 메모리"
         - emoji: "⚡"
           title: "네이티브급 성능"
-          description: "브라우저에서도 빠른 처리"
+          description: "로컬 CPU에서도 빠른 처리"
 
 - id: comparison_table
   blocks:

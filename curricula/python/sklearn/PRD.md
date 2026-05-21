@@ -10,7 +10,7 @@
 2. **완전한 파이프라인**: 전처리 → 학습 → 평가 → 튜닝
 3. **다양한 알고리즘**: 분류, 회귀, 클러스터링, 차원축소
 4. **실무 표준**: 산업계와 학계 모두에서 가장 널리 사용
-5. **Pyodide 지원**: 브라우저 환경에서 완전 동작
+5. **Codaro 로컬 Python 지원**: 로컬 커널에서 모델 학습과 평가를 실행
 
 ### statsmodels와의 차이 (학습 순서 이유)
 
@@ -21,17 +21,12 @@
 
 ---
 
-## Pyodide 환경 고려사항
+## Codaro 로컬 Python 환경 고려사항
 
-```python
-import micropip
-await micropip.install('scikit-learn')
-```
-
-**제한사항**:
-- `n_jobs=-1` 병렬처리 불가 (WebAssembly 제한)
-- 초기 로딩 약 10-20MB
-- 일부 희귀 모듈 미지원
+**실행 기준**:
+- 패키지는 레슨 밖에서 `uv pip install scikit-learn` 또는 프로젝트 의존성으로 준비
+- `n_jobs=-1`처럼 병렬 처리를 켜는 옵션은 학습 PC의 CPU와 메모리 상태를 보고 선택
+- 데이터셋 다운로드가 필요한 레슨은 네트워크 실패 시 대체 샘플을 함께 준비
 
 **정상 동작 확인된 기능**:
 - LinearRegression, LogisticRegression, Ridge, Lasso
@@ -43,7 +38,7 @@ await micropip.install('scikit-learn')
 
 ---
 
-## 대상 데이터셋 (기존 카테고리 미사용 + Pyodide 호환)
+## 대상 데이터셋 (기존 카테고리 미사용 + Codaro 로컬 Python 호환)
 
 | 번호 | 데이터셋 | 출처 | 용도 | 비즈니스 가치 |
 |------|----------|------|------|--------------|
@@ -62,7 +57,7 @@ await micropip.install('scikit-learn')
 - ✅ statsmodels 카테고리 미사용
 - ✅ seaborn 카테고리 미사용 (iris, tips, penguins, titanic, diamonds, mpg 제외)
 - ✅ sklearn 내장 데이터 (패키지 내부 포함)
-- ✅ GitHub raw.githubusercontent.com (CORS 허용)
+- ✅ GitHub raw.githubusercontent.com (사이트 정책 허용)
 
 ---
 
@@ -207,19 +202,19 @@ intro:
 sections:
 - id: step1_install
   title: 1단계. scikit-learn 설치
-  subtitle: pyodide 환경 설정
+  subtitle: Codaro 로컬 Python 환경 설정
   blocks:
   - type: text
-    content: scikit-learn은 Python 머신러닝의 표준 라이브러리입니다. pyodide 환경에서는 micropip으로 설치합니다. 초기 로딩에 약간의 시간이 걸릴 수 있습니다.
-  - type: code
+    content: scikit-learn은 Python 머신러닝의 표준 라이브러리입니다. Codaro 로컬 Python 환경에서는 uv으로 설치합니다. 초기 로딩에 약간의 시간이 걸릴 수 있습니다.
+- type: code
     language: python
-    title: scikit-learn 설치
-    description: micropip으로 패키지 설치
+    title: scikit-learn 확인
+    description: 패키지 import 확인
     content: |-
-      import micropip
-      await micropip.install('scikit-learn')
+      import sklearn
+      sklearn.__version__
   - type: tip
-    content: scikit-learn 설치 시 약 10-20MB의 데이터를 다운로드합니다. 처음 한 번만 설치하면 세션 동안 유지됩니다.
+    content: 필요한 패키지는 레슨 실행 전에 uv로 준비합니다. 레슨 안에서는 import가 성공하는지 확인하고 바로 모델링 흐름으로 들어갑니다.
 
 - id: step2_load
   title: 2단계. 데이터 불러오기
@@ -356,7 +351,7 @@ sections:
 
 ### 각 프로젝트 공통 구조 (10-15 단계)
 
-1. **설치**: micropip.install('scikit-learn')
+1. **환경 확인**: import sklearn
 2. **데이터 로드**: sklearn.datasets 또는 URL
 3. **탐색**: shape, head(), describe()
 4. **데이터 분할**: train_test_split
@@ -414,10 +409,10 @@ sections:
 - [x] print() 금지 (표현식만)
 - [x] 주석 금지 (text 블록으로 설명)
 - [x] camelCase 변수명
-- [x] marimo 변수 재할당 고려
+- [x] Codaro 변수 재할당 고려
 
-### Pyodide 호환성
-- [x] micropip 설치 방식
+### Codaro 로컬 Python 호환성
+- [x] uv 설치 방식
 - [x] n_jobs 파라미터 제거 또는 n_jobs=1
 - [x] 지원되는 모듈만 사용
 
@@ -429,4 +424,4 @@ sections:
 2. **00_sklearn소개.yaml** 작성 (코드 없는 소개 파일)
 3. **01-10 프로젝트 파일** 순차 작성
 4. **각 파일마다 YAML 검증** 수행
-5. **Pyodide 환경 테스트** 수행
+5. **Codaro 로컬 Python 환경 테스트** 수행

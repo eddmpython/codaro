@@ -50,6 +50,7 @@ function App() {
     applyBootstrapCurriculumState,
     applyCurriculumSelectionState,
     categories,
+    categoryGroups,
     contents,
     contentsLoading,
     curriculumDocument,
@@ -227,6 +228,7 @@ function App() {
     <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <ProductSidebar
         categories={filteredCategories}
+        categoryGroups={categoryGroups}
         contentsLoading={contentsLoading}
         contents={contents}
         customCurricula={sidebarCustomCurricula}

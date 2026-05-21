@@ -69,25 +69,25 @@ def validateFile(filePath):
     else:
         print(f"FAIL: Found {printCount} print() statements")
 
-    # Agent 4: Pyodide Compatibility
-    print("\n=== Pyodide Compatibility ===")
+    # Agent 4: Local Runtime Compatibility
+    print("\n=== Local Runtime Compatibility ===")
     imports = re.findall(r'^\s*(?:import|from)\s+(\w+)', content, re.MULTILINE)
     uniqueImports = set(imports)
 
-    incompatible = {'threading', 'multiprocessing', 'subprocess', 'socket'}
-    found = uniqueImports & incompatible
+    risky = {'threading', 'multiprocessing', 'subprocess', 'socket'}
+    found = uniqueImports & risky
 
     if found:
-        print(f"FAIL: Incompatible modules: {found}")
+        print(f"WARN: Advanced runtime modules need explicit local-runtime notes: {found}")
     else:
-        print(f"PASS: All imports Pyodide compatible")
+        print("PASS: Imports are straightforward for local Python")
         print(f"  Modules: {uniqueImports}")
 
     print(f"\n{'='*60}")
     print("VALIDATION COMPLETE")
     print(f"{'='*60}\n")
 
-    return len(duplicates) == 0 and printCount == 0 and not found
+    return len(duplicates) == 0 and printCount == 0
 
 if __name__ == '__main__':
     import sys

@@ -1,20 +1,20 @@
-# 고급 파이썬 커리큘럼 (Pyodide 호환)
+# 고급 파이썬 커리큘럼 (Codaro 로컬 Python)
 
-## ⚠️ Pyodide 환경 제약
+## Codaro 로컬 Python 실행 기준
 
-모든 콘텐츠는 브라우저 내 Pyodide에서 실행됩니다.
+모든 콘텐츠는 Codaro 로컬 Python 커널에서 실행됩니다.
 
 **사용 가능**:
 - 순수 파이썬 표준 라이브러리
 - functools, itertools, collections, typing, dataclasses
 - abc, enum, re, math, random, heapq, bisect
-- 메모리 내 자료구조 처리
+- 안전한 로컬 임시 파일과 메모리 내 자료구조 처리
 
-**사용 불가**:
+**심화로 분리할 주제**:
 - asyncio, threading, multiprocessing
 - 파일 I/O, subprocess
-- 네트워크 요청 (aiohttp, requests)
-- C 확장 (Cython)
+- 네트워크 요청
+- C 확장 패키지와 빌드 의존성
 
 ---
 

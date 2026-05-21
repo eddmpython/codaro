@@ -42,7 +42,7 @@ sections:
 
       outcome.wasSuccessful()
   - type: "note"
-    content: "Codaro/Codaro local Python 환경에서는 TestLoader와 TextTestRunner를 사용하여 테스트를 실행합니다. 일반적으로는 python -m unittest 명령으로 실행합니다."
+    content: "Codaro/Codaro 로컬 Python 환경에서는 TestLoader와 TextTestRunner를 사용하여 테스트를 실행합니다. 일반적으로는 python -m unittest 명령으로 실행합니다."
 
 - id: "assert_methods"
   title: "Assert 메서드"

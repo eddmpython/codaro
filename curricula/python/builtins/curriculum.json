@@ -4,9 +4,9 @@
     "category": "builtins",
     "created": "2024-12-29",
     "updated": "2025-12-30",
-    "description": "파이썬 내장 모듈 완전 정복 - 30개 Pyodide 호환 표준 라이브러리",
-    "pyodide_optimized": true,
-    "excluded_modules": ["http.client", "socket", "threading", "multiprocessing", "subprocess"]
+    "description": "파이썬 내장 모듈 완전 정복 - 30개 로컬 Python 표준 라이브러리",
+    "local_runtime_optimized": true,
+    "advanced_modules": ["http.client", "socket", "threading", "multiprocessing", "subprocess"]
   },
   "modules": [
     {
@@ -87,7 +87,7 @@
       "phase": 2,
       "prerequisites": [],
       "keywords": ["os", "파일", "디렉토리", "경로", "환경변수"],
-      "description": "파일/디렉토리 조작, 경로 처리, 환경 변수 (Pyodide 제한적)"
+      "description": "파일/디렉토리 조작, 경로 처리, 환경 변수 (로컬 실행 확인 필요)"
     },
     {
       "id": "09_pathlib",
@@ -97,7 +97,7 @@
       "phase": 2,
       "prerequisites": ["08_os"],
       "keywords": ["pathlib", "Path", "경로", "파일"],
-      "description": "Path 객체로 파일 경로를 객체지향적으로 처리 (Pyodide 제한적)"
+      "description": "Path 객체로 파일 경로를 객체지향적으로 처리 (로컬 실행 확인 필요)"
     },
     {
       "id": "10_sys",
@@ -117,7 +117,7 @@
       "phase": 2,
       "prerequisites": ["08_os"],
       "keywords": ["glob", "와일드카드", "파일검색", "패턴"],
-      "description": "와일드카드로 파일 검색, 재귀 검색 (Pyodide 제한적)"
+      "description": "와일드카드로 파일 검색, 재귀 검색 (로컬 실행 확인 필요)"
     },
     {
       "id": "12_shutil",
@@ -127,7 +127,7 @@
       "phase": 2,
       "prerequisites": ["08_os"],
       "keywords": ["shutil", "복사", "이동", "삭제", "압축"],
-      "description": "파일 복사, 이동, 삭제, 압축 파일 처리 (Pyodide 제한적)"
+      "description": "파일 복사, 이동, 삭제, 압축 파일 처리 (로컬 실행 확인 필요)"
     },
     {
       "id": "13_json",
@@ -217,7 +217,7 @@
       "phase": 5,
       "prerequisites": [],
       "keywords": ["urllib", "URL", "HTTP", "웹", "스크래핑"],
-      "description": "URL 열기, 파싱, HTTP 요청 (Pyodide CORS 제약)"
+      "description": "URL 열기, 파싱, HTTP 요청 (Codaro 로컬 Python 네트워크/사이트 정책)"
     },
     {
       "id": "22_email",
@@ -227,7 +227,7 @@
       "phase": 5,
       "prerequisites": [],
       "keywords": ["email", "MIME", "메시지", "파싱"],
-      "description": "이메일 메시지 생성, 파싱, MIME (Pyodide 생성/파싱만 가능)"
+      "description": "이메일 메시지 생성, 파싱, MIME (Codaro 로컬 Python 생성/파싱만 가능)"
     },
     {
       "id": "23_asyncio",
@@ -237,7 +237,7 @@
       "phase": 6,
       "prerequisites": [],
       "keywords": ["asyncio", "async", "await", "비동기", "이벤트루프"],
-      "description": "async/await, 이벤트 루프, 비동기 프로그래밍 (Pyodide 완벽 지원)"
+      "description": "async/await, 이벤트 루프, 비동기 프로그래밍 (Codaro 로컬 Python 완벽 지원)"
     },
     {
       "id": "24_argparse",

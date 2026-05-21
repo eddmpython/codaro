@@ -12,6 +12,7 @@ import {
   TerminalSquare,
   Workflow,
 } from "lucide-react";
+import { useState } from "react";
 
 import { ScrollArea } from "@/components/ui/scroll-area";
 import {
@@ -37,6 +38,7 @@ import type { CurriculumCategory, CurriculumContentSummary } from "@/types";
 
 type ProductSidebarProps = {
   categories: CurriculumCategory[];
+  categoryGroups: Record<string, string[]>;
   contentsLoading: boolean;
   contents: CurriculumContentSummary[];
   customCurricula: SidebarCustomCurriculum[];
@@ -75,6 +77,7 @@ const navItems: Array<{ value: SurfaceMode; label: string; Icon: React.Component
 
 export function ProductSidebar({
   categories,
+  categoryGroups,
   contentsLoading,
   contents,
   customCurricula,
@@ -171,6 +174,7 @@ export function ProductSidebar({
             <div className="group-data-[collapsible=icon]:hidden">
               <CurriculumTree
                 categories={categories}
+                categoryGroups={categoryGroups}
                 contents={contents}
                 contentsLoading={contentsLoading}
                 customCurricula={customCurricula}
@@ -202,6 +206,7 @@ export function ProductSidebar({
 
 function CurriculumTree({
   categories,
+  categoryGroups,
   contents,
   contentsLoading,
   customCurricula,
@@ -215,6 +220,7 @@ function CurriculumTree({
   onSelectCustomCurriculum,
 }: {
   categories: CurriculumCategory[];
+  categoryGroups: Record<string, string[]>;
   contents: CurriculumContentSummary[];
   contentsLoading: boolean;
   customCurricula: SidebarCustomCurriculum[];
@@ -227,11 +233,13 @@ function CurriculumTree({
   onSelectContent: (contentId: string) => void;
   onSelectCustomCurriculum: (id: string) => void;
 }) {
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const customItems = customCurricula.filter((item) => {
     const trimmed = query.trim().toLowerCase();
     if (!trimmed) return true;
     return item.title.toLowerCase().includes(trimmed);
   });
+  const groupedCategories = buildSidebarCategoryGroups(categories, categoryGroups);
 
   return (
     <>
@@ -239,50 +247,77 @@ function CurriculumTree({
         <SidebarGroupLabel className="h-6 px-2 text-[11px]">Codaro 커리큘럼</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
-            {categories.map((category) => {
-              const isSelectedCategory = category.key === selectedCategory;
-              const categoryLabel = category.name || categoryTitle(category.key);
+            {groupedCategories.map((group) => {
+              const hasSelectedCategory = group.categories.some((category) => category.key === selectedCategory);
+              const isExpanded = Boolean(query.trim()) || hasSelectedCategory || expandedGroups[group.name] === true;
               return (
-                <SidebarMenuItem key={category.key}>
+                <SidebarMenuItem key={group.name}>
                   <SidebarMenuButton
                     className="h-7 px-2 text-[13px] [&>svg]:size-3.5"
-                    isActive={isSelectedCategory}
-                    tooltip={categoryLabel}
-                    onClick={() => onSelectCategory(category.key)}
+                    isActive={hasSelectedCategory}
+                    tooltip={group.name}
+                    onClick={() => setExpandedGroups((current) => ({ ...current, [group.name]: !isExpanded }))}
                   >
-                    <ChevronRight className={isSelectedCategory ? "rotate-90 transition-transform" : "transition-transform"} />
-                    <span>{categoryLabel}</span>
+                    <ChevronRight className={isExpanded ? "rotate-90 transition-transform" : "transition-transform"} />
+                    <span>{group.name}</span>
                   </SidebarMenuButton>
-                  <SidebarMenuBadge>{category.count}</SidebarMenuBadge>
-                  {isSelectedCategory ? (
+                  <SidebarMenuBadge>{group.count}</SidebarMenuBadge>
+                  {isExpanded ? (
                     <SidebarMenuSub>
-                      {contentsLoading ? (
-                        <SidebarMenuSubItem>
-                          <div className="flex h-7 items-center gap-2 px-2 text-xs text-muted-foreground">
-                            <Loader2 className="size-3 animate-spin" />
-                            불러오는 중
-                          </div>
-                        </SidebarMenuSubItem>
-                      ) : contents.map((content) => (
-                        <SidebarMenuSubItem key={content.contentId}>
-                          <SidebarMenuSubButton
-                            asChild
-                            isActive={content.contentId === selectedContentId}
-                            size="sm"
-                          >
-                            <button
-                              className="text-[12px]"
-                              type="button"
-                              onClick={() => onSelectContent(content.contentId)}
+                      {group.categories.map((category) => {
+                        const isSelectedCategory = category.key === selectedCategory;
+                        const categoryLabel = category.name || categoryTitle(category.key);
+                        return (
+                          <SidebarMenuSubItem key={category.key}>
+                            <SidebarMenuSubButton
+                              asChild
+                              isActive={isSelectedCategory}
+                              size="sm"
                             >
-                              <span className="truncate">{content.title}</span>
-                              {referenceLoading && content.contentId === selectedContentId ? (
-                                <Loader2 className="ml-auto size-3 animate-spin" />
-                              ) : null}
-                            </button>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      ))}
+                              <button
+                                className="text-[12px]"
+                                type="button"
+                                onClick={() => onSelectCategory(category.key)}
+                              >
+                                <ChevronRight className={isSelectedCategory ? "rotate-90 transition-transform" : "transition-transform"} />
+                                <span className="truncate">{categoryLabel}</span>
+                                <span className="ml-auto text-[11px] text-sidebar-foreground/55">{category.count}</span>
+                              </button>
+                            </SidebarMenuSubButton>
+                            {isSelectedCategory ? (
+                              <SidebarMenuSub className="ml-2">
+                                {contentsLoading ? (
+                                  <SidebarMenuSubItem>
+                                    <div className="flex h-7 items-center gap-2 px-2 text-xs text-muted-foreground">
+                                      <Loader2 className="size-3 animate-spin" />
+                                      불러오는 중
+                                    </div>
+                                  </SidebarMenuSubItem>
+                                ) : contents.map((content) => (
+                                  <SidebarMenuSubItem key={content.contentId}>
+                                    <SidebarMenuSubButton
+                                      asChild
+                                      isActive={content.contentId === selectedContentId}
+                                      size="sm"
+                                    >
+                                      <button
+                                        className="text-[12px]"
+                                        type="button"
+                                        onClick={() => onSelectContent(content.contentId)}
+                                      >
+                                        <span className="truncate">{content.title}</span>
+                                        {referenceLoading && content.contentId === selectedContentId ? (
+                                          <Loader2 className="ml-auto size-3 animate-spin" />
+                                        ) : null}
+                                      </button>
+                                    </SidebarMenuSubButton>
+                                  </SidebarMenuSubItem>
+                                ))}
+                              </SidebarMenuSub>
+                            ) : null}
+                          </SidebarMenuSubItem>
+                        );
+                      })}
                     </SidebarMenuSub>
                   ) : null}
                 </SidebarMenuItem>
@@ -321,6 +356,34 @@ function CurriculumTree({
       </SidebarGroup>
     </>
   );
+}
+
+function buildSidebarCategoryGroups(
+  categories: CurriculumCategory[],
+  categoryGroups: Record<string, string[]>,
+) {
+  const categoriesByKey = new Map(categories.map((category) => [category.key, category]));
+  const groupedKeys = new Set<string>();
+  const groups = Object.entries(categoryGroups).map(([name, keys]) => {
+    const groupCategories = keys
+      .map((key) => categoriesByKey.get(key))
+      .filter((category): category is CurriculumCategory => Boolean(category));
+    groupCategories.forEach((category) => groupedKeys.add(category.key));
+    return {
+      name,
+      categories: groupCategories,
+      count: groupCategories.reduce((total, category) => total + category.count, 0),
+    };
+  }).filter((group) => group.categories.length);
+  const remaining = categories.filter((category) => !groupedKeys.has(category.key));
+  if (remaining.length) {
+    groups.push({
+      name: "기타",
+      categories: remaining,
+      count: remaining.reduce((total, category) => total + category.count, 0),
+    });
+  }
+  return groups;
 }
 
 function AutomationTree({

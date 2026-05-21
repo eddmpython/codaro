@@ -315,7 +315,7 @@ sections:
       print(f"Total fit time: {totalTime:.2f}s")
       print(f"Mean time per combination: {meanTime:.4f}s")
   - type: tip
-    content: "시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(Codaro local Python에서는 불가), 4) 조기 종료(early stopping)"
+    content: "시간 절약 팁: 1) 작은 그리드로 시작, 2) RandomizedSearchCV 사용, 3) 병렬화(Codaro 로컬 Python에서는 불가), 4) 조기 종료(early stopping)"
 
 - id: practice
   title: 실습

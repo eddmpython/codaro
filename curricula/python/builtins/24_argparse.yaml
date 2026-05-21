@@ -37,7 +37,7 @@ sections:
       args = parser.parse_args(['홍길동'])
       args.name
   - type: "note"
-    content: "Codaro/Codaro local Python 환경에서는 parse_args()에 직접 인자 리스트를 전달합니다. 실제 CLI 프로그램에서는 sys.argv에서 자동으로 읽어옵니다."
+    content: "Codaro/Codaro 로컬 Python 환경에서는 parse_args()에 직접 인자 리스트를 전달합니다. 실제 CLI 프로그램에서는 sys.argv에서 자동으로 읽어옵니다."
 
 - id: "positional_args"
   title: "위치 인자"

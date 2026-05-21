@@ -44,6 +44,21 @@ curricula/
 - AI가 채팅에서 만든 임시 curriculum YAML도 같은 변환기를 통과한다.
 - `study.yaml` 파일명과 `/study/...` URL은 기존 콘텐츠 포맷과 라우트 계약이므로 폴더명 변경과 별개로 유지한다.
 
+## 카테고리 그룹 계약
+
+- 커리큘럼 목록은 평면 카테고리 나열이 아니라 track 단위 그룹으로 노출한다.
+- backend SSOT는 `src/codaro/curriculum/studyLoader.py`의 `CATEGORY_GROUPS`다.
+- editor fallback/bundled registry는 같은 그룹 이름을 유지한다: `Python 기초`, `데이터 분석`, `시각화`, `수학·통계·ML`, `자동화·실무`, `이미지·비전`.
+- `/api/curriculum/categories`는 `categories[].track`과 `groups`를 함께 내려준다.
+- 제품 사이드바는 `groups`를 먼저 렌더링하고, 선택된 group 안에서 category와 lesson을 펼친다. 새 카테고리는 반드시 한 그룹에만 속해야 한다.
+
+## 로컬 Runtime 호환성
+
+- Codaro 커리큘럼은 브라우저 전용 Python이 아니라 로컬 Python 커널을 기준으로 작성한다.
+- builtins 작성 기준은 `curricula/python/builtins/LOCAL_RUNTIME_COMPATIBILITY.md`에 둔다.
+- 과거 Pyodide 기준 문서는 삭제하지 않고 레거시 링크 포인터로 유지하며, 현재 source of truth는 `LOCAL_RUNTIME_COMPATIBILITY.md`다.
+- 표준 라이브러리 레슨은 `tempfile` 같은 안전한 실습 경로를 사용하고, 파일 삭제/외부 프로세스/네트워크 예제는 실행 영향과 복구 절차를 설명해야 한다.
+
 ## 정리 원칙
 
 - 백업성 커리큘럼 폴더는 레지스트리에 두지 않는다.

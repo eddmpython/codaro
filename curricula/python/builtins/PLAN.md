@@ -1,4 +1,4 @@
-# 내장함수 카테고리 완전 계획 (Pyodide 호환)
+# 내장함수 카테고리 완전 계획 (Codaro 로컬 Python 호환)
 
 ## 카테고리 개요
 
@@ -6,7 +6,7 @@
 
 파이썬이 기본으로 제공하는 표준 라이브러리를 깊이 있게 학습합니다. 별도 설치 없이 `import`만으로 사용할 수 있는 강력한 도구들을 마스터합니다.
 
-**Pyodide 환경 최적화**: 웹 브라우저에서 실행되는 Pyodide 환경에 맞춰 실제로 동작하는 모듈만 선별했습니다. threading, multiprocessing, subprocess, socket, http.client 등 브라우저 환경에서 제약이 있는 모듈은 제외되었습니다.
+**Codaro 로컬 Python 환경 최적화**: 로컬 Python 커널에서 실제로 실행하며 배울 수 있는 표준 라이브러리를 중심으로 구성했습니다. threading, multiprocessing, subprocess, socket, http.client 같은 고급 모듈은 플랫폼 권한과 정리 절차를 함께 설명해야 하므로 별도 심화 주제로 관리합니다.
 
 ## 왜 이 카테고리인가?
 
@@ -29,7 +29,7 @@
 - 모듈의 핵심 기능 완전 정복
 - 실전 예제 중심
 
-### 2. Marimo 네이티브 스타일
+### 2. Codaro 네이티브 스타일
 - print() 사용 금지
 - 마지막 표현식 자동 출력
 - 단일 값 또는 튜플 출력
@@ -175,13 +175,13 @@
 - urlopen, urlparse
 - 요청, 응답
 - **실전**: 웹 스크래핑, API 호출
-- **Pyodide**: CORS 제약 있음
+- **Codaro 로컬 Python**: 네트워크/사이트 정책 있음
 
 #### 22. email - 이메일 처리
 - 메시지 생성, 파싱
 - MIME
 - **실전**: 이메일 자동화
-- **Pyodide**: 생성/파싱 가능 (발송 불가)
+- **Codaro 로컬 Python**: 생성/파싱 가능 (발송 불가)
 
 ### 비동기 프로그래밍 (Async Programming)
 
@@ -189,7 +189,7 @@
 - async/await
 - 이벤트 루프
 - **실전**: 비동기 웹, I/O
-- **Pyodide**: JavaScript 이벤트 루프와 완벽 통합
+- **Codaro 로컬 Python**: JavaScript 이벤트 루프와 완벽 통합
 
 ### 고급 도구 (Advanced Tools)
 
@@ -225,7 +225,7 @@
 - 소스 코드 추출
 - **실전**: 메타프로그래밍
 
-## 파일 구조 (Pyodide 호환 30개 모듈)
+## 파일 구조 (Codaro 로컬 Python 호환 30개 모듈)
 
 ```
 pages/studyPython/content/builtins/
@@ -263,12 +263,12 @@ pages/studyPython/content/builtins/
 └── 30_inspect.yaml
 ```
 
-### 제외된 모듈 (Pyodide 미지원)
-- http.client: HTTPConnection/HTTPSConnection (소켓 미지원)
-- socket: TCP/UDP 소켓 (브라우저 보안 제약)
-- threading: 스레드 (Web Worker로 제한적 대체 가능하나 실용성 낮음)
-- multiprocessing: 멀티프로세싱 (fork 불가능)
-- subprocess: 외부 프로세스 실행 (브라우저 환경 제약)
+### 심화로 분리한 모듈
+- http.client: HTTPConnection/HTTPSConnection (소켓과 인증/타임아웃 처리 설명 필요)
+- socket: TCP/UDP 소켓 (플랫폼 권한과 네트워크 정책 확인 필요)
+- threading: 스레드 (동시성 설계와 종료 절차 설명 필요)
+- multiprocessing: 멀티프로세싱 (플랫폼별 시작 방식과 리소스 정리 설명 필요)
+- subprocess: 외부 프로세스 실행 (플랫폼 권한과 보안 영향 확인 필요)
 
 ## 파일 작성 규칙
 
@@ -489,12 +489,12 @@ python -c "import yaml; yaml.safe_load(open('XX_module.yaml'))"
 
 ## 성공 기준
 
-1. **완전성**: 30개 Pyodide 호환 모듈 100% 완성
+1. **완전성**: 30개 Codaro 로컬 Python 호환 모듈 100% 완성
 2. **품질**: 모든 파일 Multi-Agent 검증 통과
 3. **실용성**: 즉시 실무 적용 가능한 예제
 4. **독립성**: 각 파일 독립 학습 가능
 5. **일관성**: 모든 파일 동일한 구조와 품질
-6. **Pyodide 호환**: 브라우저 환경에서 100% 동작 보장
+6. **Codaro 로컬 Python 호환**: 로컬 커널에서 재현 가능한 예제 중심
 
 ## 예상 효과
 
