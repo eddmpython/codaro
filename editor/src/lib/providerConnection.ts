@@ -23,6 +23,8 @@ export type ProviderAssistantFailure = {
 };
 
 const providerSettingsActions = new Set([
+  "check-network",
+  "check-provider-compatibility",
   "connect-provider",
   "relogin-provider",
   "restart-login",
@@ -283,7 +285,7 @@ async function validateProvider(provider: string, model?: unknown, probe = "avai
   try {
     return await codaroApi.validateAiProvider(provider, typeof model === "string" ? model : undefined, probe);
   } catch (error) {
-    const diagnostic = providerDiagnosticFromError(error);
+    const diagnostic = providerDiagnosticFromError(error) ?? providerNetworkDiagnostic(provider, error);
     return {
       valid: false,
       error: diagnostic?.message ?? errorMessage(error),
@@ -294,6 +296,19 @@ async function validateProvider(provider: string, model?: unknown, probe = "avai
 
 function errorMessage(error: unknown) {
   return error instanceof Error ? error.message : String(error);
+}
+
+function providerNetworkDiagnostic(provider: string, error: unknown): ProviderDiagnostic {
+  const detail = errorMessage(error).replace(/^\d+\s+/, "");
+  return {
+    action: "check-network",
+    code: "provider_network_error",
+    detail,
+    message: "Provider 서버에 연결하지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도하세요.",
+    provider,
+    recoverable: true,
+    statusCode: error instanceof CodaroApiError ? error.status : 503,
+  };
 }
 
 function snapshotProviderValidation(

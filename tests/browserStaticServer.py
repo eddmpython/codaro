@@ -3,6 +3,7 @@ from __future__ import annotations
 import mimetypes
 import posixpath
 import threading
+import time
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -113,29 +114,39 @@ class StaticAppServer:
                     for key, value in self.headers.items()
                     if key.lower() not in {"host", "connection", "content-length"}
                 }
-                request = urllib.request.Request(
-                    f"{apiBaseUrl}{self.path}",
-                    data=body,
-                    headers=headers,
-                    method=self.command,
-                )
-                try:
-                    with urllib.request.urlopen(request, timeout=8) as response:
-                        data = response.read()
-                        self.send_response(response.status)
-                        self._copyHeaders(response.headers, len(data))
+                lastError: BaseException | None = None
+                for attempt in range(2):
+                    request = urllib.request.Request(
+                        f"{apiBaseUrl}{self.path}",
+                        data=body,
+                        headers=headers,
+                        method=self.command,
+                    )
+                    try:
+                        with urllib.request.urlopen(request, timeout=8) as response:
+                            data = response.read()
+                            self.send_response(response.status)
+                            self._copyHeaders(response.headers, len(data))
+                            self.end_headers()
+                            if sendBody:
+                                self.wfile.write(data)
+                            return
+                    except urllib.error.HTTPError as error:
+                        data = error.read()
+                        self.send_response(error.code)
+                        self._copyHeaders(error.headers, len(data))
                         self.end_headers()
                         if sendBody:
                             self.wfile.write(data)
-                except urllib.error.HTTPError as error:
-                    data = error.read()
-                    self.send_response(error.code)
-                    self._copyHeaders(error.headers, len(data))
-                    self.end_headers()
-                    if sendBody:
-                        self.wfile.write(data)
-                except urllib.error.URLError:
-                    self.send_error(502, "API proxy request failed")
+                        return
+                    except (urllib.error.URLError, OSError, TimeoutError) as error:
+                        lastError = error
+                        if attempt == 0:
+                            time.sleep(0.1)
+                            continue
+                        break
+                message = f"API proxy request failed: {type(lastError).__name__}" if lastError else "API proxy request failed"
+                self.send_error(502, message)
 
             def _copyHeaders(self, headers: object, length: int) -> None:
                 for key, value in headers.items():
