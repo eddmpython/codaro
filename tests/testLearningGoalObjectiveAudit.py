@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import importlib.util
+import json
 import sys
 from pathlib import Path
 from typing import Any
@@ -57,3 +58,141 @@ def testGoalAuditPassesWhenAllRequirementsPass() -> None:
     assert payload["score"] == len(results)
     assert payload["requirementFailures"] == []
     assert payload["passed"] is True
+
+
+def testLatestQualityCycleArtifactsRequireCurrentHeadAndLiveToolLoop(monkeypatch, tmp_path) -> None:
+    audit = loadAuditModule()
+    head = "abcdef1234567890abcdef1234567890abcdef12"
+    monkeypatch.setattr(audit, "ROOT", tmp_path)
+    monkeypatch.setattr(audit, "currentGitHead", lambda: head)
+    monkeypatch.setattr(audit, "currentTrackedWorktreeChanges", lambda: ())
+
+    writeQualityCycleSummary(audit, tmp_path, head)
+    writeLiveSmokeReport(tmp_path, head[:7])
+
+    result = audit.evaluateLatestQualityCycleArtifacts()
+
+    assert result["passed"] is True
+    assert result["id"] == "latest-quality-cycle-artifacts"
+    assert any("quality-cycle completed gate count" in item for item in result["evidence"])
+    assert any("ai-live-smoke live-cell-call-loop toolSequence" in item for item in result["evidence"])
+
+
+def testLatestQualityCycleArtifactsRejectStaleQualityCycleHead(monkeypatch, tmp_path) -> None:
+    audit = loadAuditModule()
+    head = "abcdef1234567890abcdef1234567890abcdef12"
+    monkeypatch.setattr(audit, "ROOT", tmp_path)
+    monkeypatch.setattr(audit, "currentGitHead", lambda: head)
+    monkeypatch.setattr(audit, "currentTrackedWorktreeChanges", lambda: ())
+
+    writeQualityCycleSummary(audit, tmp_path, "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef")
+    writeLiveSmokeReport(tmp_path, head[:7])
+
+    result = audit.evaluateLatestQualityCycleArtifacts()
+
+    assert result["passed"] is False
+    assert any("quality-cycle gitHead" in item for item in result["missing"])
+
+
+def writeQualityCycleSummary(audit: Any, root: Path, head: str) -> None:
+    aiArtifact = {
+        "path": "output/test-runner/ai-live-smoke/live-smoke-report.json",
+        "exists": True,
+        "fresh": True,
+        "payloadReadable": True,
+        "payloadPassed": True,
+        "payloadStatus": "passed",
+        "gitHeadMatches": True,
+    }
+    gates = []
+    for gateName in audit.PRODUCT_QUALITY_GATES:
+        gate = {
+            "gate": gateName,
+            "returnCode": 0,
+            "commandReturnCode": 0,
+            "artifactFailure": False,
+            "artifacts": [],
+        }
+        if gateName == "ai-live-smoke":
+            gate["artifacts"] = [aiArtifact]
+        gates.append(gate)
+    payload = {
+        "sequence": "quality-cycle",
+        "passed": True,
+        "completedGateCount": len(audit.PRODUCT_QUALITY_GATES),
+        "totalGateCount": len(audit.PRODUCT_QUALITY_GATES),
+        "softFailureCount": 0,
+        "gitHead": head,
+        "gates": gates,
+    }
+    writeJson(root / "output/test-runner/quality-cycle/sequence-summary.json", payload)
+
+
+def writeLiveSmokeReport(root: Path, head: str) -> None:
+    payload = {
+        "passed": True,
+        "status": "passed",
+        "gitHead": head,
+        "selection": {
+            "provider": "oauth-chatgpt",
+            "model": "gpt-5.4",
+            "credentialMissing": False,
+        },
+        "cases": [
+            {
+                "caseId": "provider-availability",
+                "passed": True,
+                "status": "passed",
+                "signals": {"supportsNativeTools": True},
+            },
+            {
+                "caseId": "short-answer",
+                "passed": True,
+                "status": "passed",
+                "signals": {"answerChars": 24},
+            },
+            {
+                "caseId": "teacher-answer",
+                "passed": True,
+                "status": "passed",
+                "signals": {"answerChars": 72},
+            },
+            {
+                "caseId": "clarification-before-provider",
+                "passed": True,
+                "status": "passed",
+                "signals": {"providerCalled": False, "questionCount": 2},
+            },
+            {
+                "caseId": "live-tool-loop",
+                "passed": True,
+                "status": "passed",
+                "signals": {
+                    "toolSequence": ["packages-check", "write-curriculum-yaml"],
+                    "contractGapCount": 0,
+                    "yamlContractObserved": True,
+                    "sectionCount": 1,
+                    "exerciseCellCount": 1,
+                    "snippetCellCount": 1,
+                    "workloopReadable": True,
+                },
+            },
+            {
+                "caseId": "live-cell-call-loop",
+                "passed": True,
+                "status": "passed",
+                "signals": {
+                    "toolSequence": ["packages-check", "cell-call"],
+                    "exactSequence": True,
+                    "policyViolationCount": 0,
+                    "workloopReadable": True,
+                },
+            },
+        ],
+    }
+    writeJson(root / "output/test-runner/ai-live-smoke/live-smoke-report.json", payload)
+
+
+def writeJson(path: Path, payload: dict[str, Any]) -> None:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload), encoding="utf-8")

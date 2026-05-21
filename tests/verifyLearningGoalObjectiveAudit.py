@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 import sys
 from dataclasses import dataclass, field
 from pathlib import Path
@@ -9,6 +10,32 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 MINIMUM_SCORE = 9
+PRODUCT_QUALITY_GATES = (
+    "docs",
+    "backend",
+    "learning-system-readiness",
+    "dogfood-alpha-audit",
+    "product-quality-audit",
+    "diagnostic-summary-contract",
+    "ai-live-smoke",
+    "provider-settings-browser",
+    "install-launcher-smoke",
+    "runtime-recovery-contract",
+    "runtime-recovery-browser",
+    "curriculum-quality-matrix",
+    "onboarding-browser",
+    "frontend-performance-budget",
+    "landing-build",
+    "launcher-test",
+)
+REQUIRED_LIVE_CASES = (
+    "provider-availability",
+    "short-answer",
+    "teacher-answer",
+    "clarification-before-provider",
+    "live-tool-loop",
+    "live-cell-call-loop",
+)
 
 
 @dataclass(frozen=True)
@@ -480,7 +507,10 @@ OBJECTIVE_REQUIREMENTS = (
 
 
 def main() -> int:
-    results = tuple(requirement.evaluate() for requirement in OBJECTIVE_REQUIREMENTS)
+    results = (
+        *(requirement.evaluate() for requirement in OBJECTIVE_REQUIREMENTS),
+        evaluateLatestQualityCycleArtifacts(),
+    )
     payload = buildAuditPayload(results)
 
     if not payload["passed"]:
@@ -491,6 +521,337 @@ def main() -> int:
     print(f"ok: learning goal objective audit score {payload['score']}/{payload['maxScore']}")
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     return 0
+
+
+def evaluateLatestQualityCycleArtifacts() -> dict[str, Any]:
+    evidence: list[str] = []
+    missing: list[str] = []
+    currentHead = currentGitHead()
+    if currentHead:
+        evidence.append(f"current git head: {currentHead[:12]}")
+    else:
+        missing.append("git: unable to resolve current HEAD")
+    trackedChanges = currentTrackedWorktreeChanges()
+    if trackedChanges is None:
+        missing.append("git: unable to inspect tracked working tree changes")
+    elif trackedChanges:
+        preview = ", ".join(trackedChanges[:5])
+        missing.append(f"git: tracked working tree changes remain before final audit ({preview})")
+    else:
+        evidence.append("git tracked working tree: clean")
+
+    qualitySummary = readJsonArtifact("output/test-runner/quality-cycle/sequence-summary.json", missing)
+    if isinstance(qualitySummary, dict):
+        evaluateQualityCycleSummary(qualitySummary, currentHead, evidence, missing)
+
+    liveReport = readJsonArtifact("output/test-runner/ai-live-smoke/live-smoke-report.json", missing)
+    if isinstance(liveReport, dict):
+        evaluateLiveSmokeReport(liveReport, currentHead, evidence, missing)
+
+    return {
+        "id": "latest-quality-cycle-artifacts",
+        "passed": not missing,
+        "requirement": "Latest quality-cycle and ai-live-smoke artifacts prove the current HEAD, not a stale or text-only audit.",
+        "evidence": evidence,
+        "missing": missing,
+    }
+
+
+def evaluateQualityCycleSummary(
+    payload: dict[str, Any],
+    currentHead: str | None,
+    evidence: list[str],
+    missing: list[str],
+) -> None:
+    checkEqual(evidence, missing, payload.get("sequence"), "quality-cycle", "quality-cycle sequence")
+    checkEqual(evidence, missing, payload.get("passed"), True, "quality-cycle passed")
+    checkEqual(evidence, missing, payload.get("completedGateCount"), len(PRODUCT_QUALITY_GATES), "quality-cycle completed gate count")
+    checkEqual(evidence, missing, payload.get("totalGateCount"), len(PRODUCT_QUALITY_GATES), "quality-cycle total gate count")
+    checkEqual(evidence, missing, payload.get("softFailureCount"), 0, "quality-cycle soft failure count")
+    checkGitHead(evidence, missing, payload.get("gitHead"), currentHead, "quality-cycle gitHead")
+
+    gates = payload.get("gates")
+    if not isinstance(gates, list):
+        missing.append("quality-cycle: missing gates array")
+        return
+
+    gatesByName = {
+        gate.get("gate"): gate
+        for gate in gates
+        if isinstance(gate, dict) and isinstance(gate.get("gate"), str)
+    }
+    for gateName in PRODUCT_QUALITY_GATES:
+        gate = gatesByName.get(gateName)
+        if not isinstance(gate, dict):
+            missing.append(f"quality-cycle: missing gate {gateName}")
+            continue
+        checkEqual(evidence, missing, gate.get("returnCode"), 0, f"quality-cycle {gateName} returnCode")
+        checkEqual(evidence, missing, gate.get("commandReturnCode"), 0, f"quality-cycle {gateName} commandReturnCode")
+        checkEqual(evidence, missing, gate.get("artifactFailure"), False, f"quality-cycle {gateName} artifactFailure")
+
+    liveGate = gatesByName.get("ai-live-smoke")
+    if isinstance(liveGate, dict):
+        evaluateLiveSmokeArtifactSummary(liveGate, evidence, missing)
+
+
+def evaluateLiveSmokeArtifactSummary(
+    liveGate: dict[str, Any],
+    evidence: list[str],
+    missing: list[str],
+) -> None:
+    artifacts = liveGate.get("artifacts")
+    if not isinstance(artifacts, list):
+        missing.append("quality-cycle ai-live-smoke: missing artifact summary")
+        return
+    artifact = next(
+        (
+            item
+            for item in artifacts
+            if isinstance(item, dict)
+            and item.get("path") == "output/test-runner/ai-live-smoke/live-smoke-report.json"
+        ),
+        None,
+    )
+    if not isinstance(artifact, dict):
+        missing.append("quality-cycle ai-live-smoke: live-smoke-report artifact missing")
+        return
+    for key, expected in (
+        ("exists", True),
+        ("fresh", True),
+        ("payloadReadable", True),
+        ("payloadPassed", True),
+        ("payloadStatus", "passed"),
+        ("gitHeadMatches", True),
+    ):
+        checkEqual(evidence, missing, artifact.get(key), expected, f"quality-cycle ai-live-smoke artifact {key}")
+
+
+def evaluateLiveSmokeReport(
+    payload: dict[str, Any],
+    currentHead: str | None,
+    evidence: list[str],
+    missing: list[str],
+) -> None:
+    checkEqual(evidence, missing, payload.get("passed"), True, "ai-live-smoke passed")
+    checkEqual(evidence, missing, payload.get("status"), "passed", "ai-live-smoke status")
+    checkGitHead(evidence, missing, payload.get("gitHead"), currentHead, "ai-live-smoke gitHead")
+
+    selection = payload.get("selection")
+    if isinstance(selection, dict):
+        checkEqual(evidence, missing, selection.get("credentialMissing"), False, "ai-live-smoke credentialMissing")
+        requireNonEmptyString(evidence, missing, selection.get("provider"), "ai-live-smoke provider")
+        requireNonEmptyString(evidence, missing, selection.get("model"), "ai-live-smoke model")
+    else:
+        missing.append("ai-live-smoke: missing selection")
+
+    cases = payload.get("cases")
+    if not isinstance(cases, list):
+        missing.append("ai-live-smoke: missing cases array")
+        return
+
+    casesById = {
+        case.get("caseId"): case
+        for case in cases
+        if isinstance(case, dict) and isinstance(case.get("caseId"), str)
+    }
+    for caseId in REQUIRED_LIVE_CASES:
+        case = casesById.get(caseId)
+        if not isinstance(case, dict):
+            missing.append(f"ai-live-smoke: missing case {caseId}")
+            continue
+        checkEqual(evidence, missing, case.get("passed"), True, f"ai-live-smoke {caseId} passed")
+        checkEqual(evidence, missing, case.get("status"), "passed", f"ai-live-smoke {caseId} status")
+
+    evaluateClarificationLiveCase(casesById.get("clarification-before-provider"), evidence, missing)
+    evaluateLiveToolLoopCase(casesById.get("live-tool-loop"), evidence, missing)
+    evaluateLiveCellCallCase(casesById.get("live-cell-call-loop"), evidence, missing)
+
+
+def evaluateClarificationLiveCase(
+    case: Any,
+    evidence: list[str],
+    missing: list[str],
+) -> None:
+    if not isinstance(case, dict):
+        return
+    signals = case.get("signals")
+    if not isinstance(signals, dict):
+        missing.append("ai-live-smoke clarification-before-provider: missing signals")
+        return
+    providerCalled = signals.get("providerCalled")
+    if providerCalled is False:
+        evidence.append("ai-live-smoke clarification-before-provider providerCalled: false")
+    else:
+        missing.append(f"ai-live-smoke clarification-before-provider providerCalled expected false, got {providerCalled!r}")
+    questionCount = signals.get("questionCount")
+    if isinstance(questionCount, int) and 1 <= questionCount <= 3:
+        evidence.append(f"ai-live-smoke clarification-before-provider questionCount: {questionCount}")
+    else:
+        missing.append(f"ai-live-smoke clarification-before-provider questionCount expected 1-3, got {questionCount!r}")
+
+
+def evaluateLiveToolLoopCase(
+    case: Any,
+    evidence: list[str],
+    missing: list[str],
+) -> None:
+    if not isinstance(case, dict):
+        return
+    signals = case.get("signals")
+    if not isinstance(signals, dict):
+        missing.append("ai-live-smoke live-tool-loop: missing signals")
+        return
+    requireToolSequence(
+        evidence,
+        missing,
+        signals.get("toolSequence"),
+        ("packages-check", "write-curriculum-yaml"),
+        "ai-live-smoke live-tool-loop toolSequence",
+    )
+    checkEqual(evidence, missing, signals.get("contractGapCount"), 0, "ai-live-smoke live-tool-loop contractGapCount")
+    checkEqual(evidence, missing, signals.get("yamlContractObserved"), True, "ai-live-smoke live-tool-loop yamlContractObserved")
+    checkPositiveInt(evidence, missing, signals.get("sectionCount"), "ai-live-smoke live-tool-loop sectionCount")
+    checkPositiveInt(evidence, missing, signals.get("exerciseCellCount"), "ai-live-smoke live-tool-loop exerciseCellCount")
+    checkPositiveInt(evidence, missing, signals.get("snippetCellCount"), "ai-live-smoke live-tool-loop snippetCellCount")
+    checkEqual(evidence, missing, signals.get("workloopReadable"), True, "ai-live-smoke live-tool-loop workloopReadable")
+
+
+def evaluateLiveCellCallCase(
+    case: Any,
+    evidence: list[str],
+    missing: list[str],
+) -> None:
+    if not isinstance(case, dict):
+        return
+    signals = case.get("signals")
+    if not isinstance(signals, dict):
+        missing.append("ai-live-smoke live-cell-call-loop: missing signals")
+        return
+    requireToolSequence(
+        evidence,
+        missing,
+        signals.get("toolSequence"),
+        ("packages-check", "cell-call"),
+        "ai-live-smoke live-cell-call-loop toolSequence",
+    )
+    checkEqual(evidence, missing, signals.get("exactSequence"), True, "ai-live-smoke live-cell-call-loop exactSequence")
+    checkEqual(evidence, missing, signals.get("policyViolationCount"), 0, "ai-live-smoke live-cell-call-loop policyViolationCount")
+    checkEqual(evidence, missing, signals.get("workloopReadable"), True, "ai-live-smoke live-cell-call-loop workloopReadable")
+
+
+def readJsonArtifact(relPath: str, missing: list[str]) -> dict[str, Any] | None:
+    path = ROOT / relPath
+    if not path.is_file():
+        missing.append(f"{relPath}: missing artifact")
+        return None
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError) as exc:
+        missing.append(f"{relPath}: unreadable JSON ({type(exc).__name__})")
+        return None
+    if not isinstance(payload, dict):
+        missing.append(f"{relPath}: JSON root must be object")
+        return None
+    return payload
+
+
+def currentGitHead() -> str | None:
+    result = subprocess.run(
+        ("git", "rev-parse", "HEAD"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    head = result.stdout.strip()
+    return head or None
+
+
+def currentTrackedWorktreeChanges() -> tuple[str, ...] | None:
+    result = subprocess.run(
+        ("git", "status", "--short", "--untracked-files=no"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    return tuple(line for line in result.stdout.splitlines() if line.strip())
+
+
+def checkEqual(
+    evidence: list[str],
+    missing: list[str],
+    actual: Any,
+    expected: Any,
+    label: str,
+) -> None:
+    if actual == expected:
+        evidence.append(f"{label}: {expected!r}")
+    else:
+        missing.append(f"{label}: expected {expected!r}, got {actual!r}")
+
+
+def checkGitHead(
+    evidence: list[str],
+    missing: list[str],
+    artifactHead: Any,
+    currentHead: str | None,
+    label: str,
+) -> None:
+    if not isinstance(artifactHead, str) or not artifactHead:
+        missing.append(f"{label}: missing git head")
+        return
+    if currentHead and gitHeadsMatch(artifactHead, currentHead):
+        evidence.append(f"{label}: {artifactHead}")
+    else:
+        missing.append(f"{label}: expected current HEAD {currentHead!r}, got {artifactHead!r}")
+
+
+def gitHeadsMatch(artifactHead: str, expectedHead: str) -> bool:
+    artifact = artifactHead.strip()
+    expected = expectedHead.strip()
+    return bool(artifact and expected) and (artifact == expected or artifact.startswith(expected) or expected.startswith(artifact))
+
+
+def requireNonEmptyString(
+    evidence: list[str],
+    missing: list[str],
+    value: Any,
+    label: str,
+) -> None:
+    if isinstance(value, str) and value.strip():
+        evidence.append(f"{label}: {value}")
+    else:
+        missing.append(f"{label}: missing non-empty string")
+
+
+def checkPositiveInt(
+    evidence: list[str],
+    missing: list[str],
+    value: Any,
+    label: str,
+) -> None:
+    if isinstance(value, int) and value > 0:
+        evidence.append(f"{label}: {value}")
+    else:
+        missing.append(f"{label}: expected positive int, got {value!r}")
+
+
+def requireToolSequence(
+    evidence: list[str],
+    missing: list[str],
+    value: Any,
+    expected: tuple[str, ...],
+    label: str,
+) -> None:
+    if value == list(expected):
+        evidence.append(f"{label}: {' -> '.join(expected)}")
+    else:
+        missing.append(f"{label}: expected {list(expected)!r}, got {value!r}")
 
 
 def buildAuditPayload(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:
