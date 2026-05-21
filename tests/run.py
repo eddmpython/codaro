@@ -13,7 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 GATE_DOC = ROOT / "docs" / "skills" / "ops" / "foundation" / "testing-and-gates.md"
 CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
-RUN_OUTPUT = ROOT / "output" / "test-runner"
+GATE_WORK_ROOT = ROOT / "output" / "test-runner"
 
 
 @dataclass(frozen=True)
@@ -218,14 +218,14 @@ def runCommand(gateName: str, gateCommand: GateCommand) -> int:
 
 
 def localGateEnvironment(gateName: str) -> dict[str, str]:
-    runRoot = localGateRunRoot(gateName)
-    tempDir = runRoot / "temp"
-    tempDir.mkdir(parents=True, exist_ok=True)
+    runRoot = localGateWorkspace(gateName)
+    scratchDir = runRoot / "scratch"
+    scratchDir.mkdir(parents=True, exist_ok=True)
     env = os.environ.copy()
     env["UV_NO_CACHE"] = "1"
-    env["TMP"] = str(tempDir)
-    env["TEMP"] = str(tempDir)
-    env["TMPDIR"] = str(tempDir)
+    env["TMP"] = str(scratchDir)
+    env["TEMP"] = str(scratchDir)
+    env["TMPDIR"] = str(scratchDir)
     return env
 
 
@@ -249,7 +249,7 @@ def normalizePytestArgs(gateName: str, args: tuple[str, ...]) -> tuple[str, ...]
     if "-p" not in nextArgs:
         nextArgs.extend(("-p", "no:cacheprovider"))
     if not any(item == "--basetemp" or item.startswith("--basetemp=") for item in nextArgs):
-        nextArgs.extend(("--basetemp", str(localGateRunRoot(gateName) / "pytest")))
+        nextArgs.extend(("--basetemp", str(localGateWorkspace(gateName) / "pytest")))
     return tuple(nextArgs)
 
 
@@ -258,16 +258,16 @@ def normalizeCargoArgs(gateName: str, args: tuple[str, ...]) -> tuple[str, ...]:
         return args
     if any(item == "--target-dir" or item.startswith("--target-dir=") for item in args):
         return args
-    targetDirArgs = ("--target-dir", str(localGateRunRoot(gateName) / "cargo-target"))
+    targetDirArgs = ("--target-dir", str(localGateWorkspace(gateName) / "cargo-target"))
     if "--" in args:
         splitIndex = args.index("--")
         return (*args[:splitIndex], *targetDirArgs, *args[splitIndex:])
     return (*args, *targetDirArgs)
 
 
-def localGateRunRoot(gateName: str) -> Path:
+def localGateWorkspace(gateName: str) -> Path:
     safeName = re.sub(r"[^A-Za-z0-9_.-]+", "-", gateName).strip("-") or "gate"
-    return RUN_OUTPUT / safeName
+    return GATE_WORK_ROOT / safeName
 
 
 def runGate(gateName: str) -> int:

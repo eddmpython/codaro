@@ -50,13 +50,13 @@ uv run python -X utf8 tests/run.py gate provider-settings-browser
 
 ## 실행 격리
 
-`tests/run.py`는 로컬/CI gate 실행 시 도구별 임시 위치를 저장소 안의 `output/test-runner/<gate>/` 아래로 고정한다. 사용자 홈의 uv cache, OS temp의 pytest 디렉터리, 기존 launcher `target` lock, 외부 `npx` fetch 상태가 gate 결과를 흔들면 안 된다.
+`tests/run.py`는 로컬/CI gate 실행 시 도구가 반드시 만드는 실행 작업공간만 저장소 안의 `output/test-runner/<gate>/` 아래로 고정한다. 제품 소스와 원래 build 설정은 건드리지 않고, 사용자 홈의 uv cache, OS temp, 기존 launcher `target` lock, 외부 `npx` fetch 상태가 gate 결과를 흔들지 않게 한다.
 
-- `uv run` 명령은 runner 안에서 `uv --no-cache run`으로 실행한다.
-- pytest suite는 `-p no:cacheprovider`와 `--basetemp output/test-runner/<gate>/pytest`를 자동으로 붙인다.
+- `uv run` 명령은 runner 안에서 `uv --no-cache run`으로 실행한다. gate runner는 uv cache를 만들거나 재사용하지 않는다.
+- pytest suite는 cache provider를 끄고 `--basetemp output/test-runner/<gate>/pytest`를 자동으로 붙인다.
 - cargo suite는 `--target-dir output/test-runner/<gate>/cargo-target`를 자동으로 붙여 기존 `target` lock과 충돌하지 않는다.
-- `TMP`, `TEMP`, `TMPDIR`도 `output/test-runner/<gate>/temp`로 고정한다.
-- `output/test-runner`는 disposable 실행 산출물이며 제품 SSOT나 커밋 대상이 아니다.
+- `TMP`, `TEMP`, `TMPDIR`은 도구 실행 중 필요한 scratch 용도로만 `output/test-runner/<gate>/scratch`를 가리킨다.
+- `output/test-runner`는 disposable 실행 작업공간이며 제품 SSOT나 커밋 대상이 아니다.
 
 ## Gate 목록
 

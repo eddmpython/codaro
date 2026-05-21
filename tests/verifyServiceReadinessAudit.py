@@ -192,25 +192,28 @@ SERVICE_REQUIREMENTS = (
     ),
     ServiceRequirement(
         requirementId="repo-local-gate-isolation",
-        requirement="The local gate runner isolates uv, pytest, cargo, and temp output inside repo-local disposable paths.",
+        requirement="The local gate runner disables caches and isolates required tool scratch work inside repo-local disposable paths.",
         evidenceChecks=(
             ("tests/run.py", (
-                "RUN_OUTPUT",
+                "GATE_WORK_ROOT",
                 "UV_NO_CACHE",
                 "normalizePytestArgs",
                 "--basetemp",
                 "normalizeCargoArgs",
                 "--target-dir",
                 "TMPDIR",
+                "scratch",
             )),
             ("docs/skills/ops/foundation/testing-and-gates.md", (
                 "`output/test-runner/<gate>/`",
                 "`uv --no-cache run`",
                 "`--basetemp output/test-runner/<gate>/pytest`",
                 "`--target-dir output/test-runner/<gate>/cargo-target`",
+                "`output/test-runner/<gate>/scratch`",
             )),
             ("docs/skills/ops/product/service-candidate.md", (
                 "repo-local `output/test-runner/<gate>/`",
+                "uv/pytest cache는 비활성화",
                 "사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다",
             )),
         ),

@@ -105,7 +105,7 @@ scripted provider만 통과하는 상태는 service-ready가 아니다.
 - raw JSON은 확장 진단으로만 본다.
 - token/API key/secret은 diagnostic summary와 로그에 남기지 않는다.
 - 문제 재현에는 provider/model/latency/error/tool sequence/workloop trace가 충분해야 한다.
-- gate 실행은 `tests/run.py`가 repo-local `output/test-runner/<gate>/` 아래로 uv cache 회피, pytest basetemp, cargo target, temp env를 고정해 사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다.
+- gate 실행은 `tests/run.py`가 repo-local `output/test-runner/<gate>/` 아래로 실행 작업공간을 격리하고, uv/pytest cache는 비활성화하며, pytest basetemp, cargo target, scratch env를 고정해 사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다.
 
 ## Gate
 
