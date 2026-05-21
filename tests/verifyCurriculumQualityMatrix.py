@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from datetime import UTC, datetime
 import json
+import subprocess
 import sys
+import time
 from dataclasses import dataclass
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -11,6 +15,8 @@ from codaro.ai.toolHandlers.workbench import _curriculumContractGaps
 from codaro.curriculum.converter import yamlToDocument
 
 
+ROOT = Path(__file__).resolve().parents[1]
+CURRICULUM_QUALITY_REPORT_PATH = ROOT / "output" / "test-runner" / "curriculum-quality-matrix" / "curriculum-quality-report.json"
 REQUIRED_SECTION_FLOW = (
     "section",
     "sectionContract:explanation",
@@ -40,15 +46,25 @@ class CurriculumCase:
 
 
 def main() -> int:
+    startedAt = utcTimestamp()
+    started = time.monotonic()
     results = [evaluateCase(case) for case in curriculumCases()]
     failures = [failure for result in results for failure in result["failures"]]
     payload = {
         "gate": "curriculum-quality-matrix",
         "caseCount": len(results),
         "passed": not failures,
+        "status": "passed" if not failures else "failed",
+        "startedAt": startedAt,
+        "completedAt": utcTimestamp(),
+        "durationMs": round((time.monotonic() - started) * 1000),
+        "gitHead": currentGitHead(),
+        "reportPath": reportDisplayPath(CURRICULUM_QUALITY_REPORT_PATH),
+        "summary": matrixSummary(results),
         "results": results,
         "failures": failures,
     }
+    writeCurriculumQualityReport(payload)
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     if failures:
         print("FAIL: curriculum quality matrix has contract failures", file=sys.stderr)
@@ -119,9 +135,62 @@ def evaluateCase(case: CurriculumCase) -> dict[str, Any]:
         "exerciseCellCount": sourceTypes.count("sectionContract:exercise"),
         "checkCellCount": sourceTypes.count("sectionContract:check"),
         "contractGapCount": gapCount,
+        "requiredFlowObserved": all(
+            sourceTypes[index:index + len(REQUIRED_SECTION_FLOW)] == REQUIRED_SECTION_FLOW
+            for index in sectionIndexes
+        ),
+        "solutionsCaptured": bool(solutions),
         "packages": document.runtime.packages,
         "failures": failures,
     }
+
+
+def matrixSummary(results: list[dict[str, Any]]) -> dict[str, Any]:
+    return {
+        "caseIds": [str(result["caseId"]) for result in results],
+        "totalSections": sum(int(result["sectionCount"]) for result in results),
+        "totalSnippetCells": sum(int(result["snippetCellCount"]) for result in results),
+        "totalExerciseCells": sum(int(result["exerciseCellCount"]) for result in results),
+        "totalCheckCells": sum(int(result["checkCellCount"]) for result in results),
+        "totalContractGaps": sum(int(result["contractGapCount"]) for result in results),
+        "allRequiredFlowsObserved": all(bool(result["requiredFlowObserved"]) for result in results),
+        "allSolutionsCaptured": all(bool(result["solutionsCaptured"]) for result in results),
+    }
+
+
+def writeCurriculumQualityReport(payload: dict[str, Any]) -> Path:
+    CURRICULUM_QUALITY_REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    CURRICULUM_QUALITY_REPORT_PATH.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    return CURRICULUM_QUALITY_REPORT_PATH
+
+
+def reportDisplayPath(reportPath: Path) -> str:
+    try:
+        return str(reportPath.relative_to(ROOT))
+    except ValueError:
+        return str(reportPath)
+
+
+def utcTimestamp() -> str:
+    return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def currentGitHead() -> str | None:
+    try:
+        result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+    except (FileNotFoundError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() or None
 
 
 def curriculumCases() -> tuple[CurriculumCase, ...]:

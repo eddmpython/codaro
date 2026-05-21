@@ -82,6 +82,8 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 각 주제는 structured YAML 계약을 지키고, 섹션 하나당 카드 하나 원칙을 유지한다. 섹션은 `title`, `subtitle`, `goal`, `why`, `explanation`, `tips`, `snippet`, `exercise`, `result`, `check` 흐름을 가진다.
 
+`curriculum-quality-matrix`는 `output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json`에 대표 주제별 section/snippet/exercise/check count, package 보존 여부, contract gap count를 남긴다. report의 `allRequiredFlowsObserved`, `allSolutionsCaptured`, `totalContractGaps: 0`은 학습 YAML이 카드 렌더링에 필요한 구조를 실제로 만족한다는 증거다.
+
 ## 온보딩/첫 화면
 
 첫 화면은 사용자가 무엇을 먼저 해야 하는지 보여야 한다.
@@ -150,7 +152,7 @@ uv run python -X utf8 tests/run.py gate landing-build
 uv run python -X utf8 tests/run.py gate launcher-test
 ```
 
-`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, `frontend-performance-budget/performance-report.json`의 fresh 여부와 `gitHead`도 sequence artifact evidence로 대조한다. 첫 사용자 흐름은 `onboarding-browser/onboarding-report.json`의 fresh 여부와 `gitHead`로 대조하고, provider 설정 흐름은 `provider-settings-browser/provider-settings-report.json`의 fresh 여부와 `gitHead`로 대조한다. runtime 복구 UX는 `runtime-recovery-browser/runtime-recovery-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
+`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, `frontend-performance-budget/performance-report.json`의 fresh 여부와 `gitHead`도 sequence artifact evidence로 대조한다. 첫 사용자 흐름은 `onboarding-browser/onboarding-report.json`의 fresh 여부와 `gitHead`로 대조하고, provider 설정 흐름은 `provider-settings-browser/provider-settings-report.json`의 fresh 여부와 `gitHead`로 대조한다. runtime 복구 UX는 `runtime-recovery-browser/runtime-recovery-report.json`의 fresh 여부와 `gitHead`로 대조한다. 학습 품질 matrix는 `curriculum-quality-matrix/curriculum-quality-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
 
 ## 완료 판단
 

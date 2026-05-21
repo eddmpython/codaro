@@ -219,6 +219,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
         requirement="Representative learning topics are materialized through the structured YAML contract.",
         evidenceChecks=(
             ("tests/verifyCurriculumQualityMatrix.py", (
+                "CURRICULUM_QUALITY_REPORT_PATH",
+                "curriculum-quality-report.json",
                 "python-basics",
                 "file-handling",
                 "data-analysis",
@@ -226,6 +228,9 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "web-automation",
                 "sectionContract:exercise",
                 "contractGapCount",
+                "allRequiredFlowsObserved",
+                "allSolutionsCaptured",
+                "totalContractGaps",
             )),
             ("docs/skills/ops/product/service-candidate.md", (
                 "Python 기초",
@@ -233,7 +238,15 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "데이터 분석",
                 "시각화",
                 "웹 자동화",
+                "curriculum-quality-report.json",
+                "allRequiredFlowsObserved",
             )),
+            ("tests/run.py", (
+                "tests/verifyCurriculumQualityMatrix.py",
+                "\"curriculum-quality-matrix\"",
+                "output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json",
+            )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", ("curriculum-quality-matrix/curriculum-quality-report.json", "payloadGitHead")),
         ),
     ),
     ProductQualityRequirement(
