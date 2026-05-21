@@ -14,7 +14,7 @@ PRODUCT_QUALITY_GATES = (
     "backend",
     "learning-system-readiness",
     "dogfood-alpha-audit",
-    "service-readiness-audit",
+    "product-quality-audit",
     "diagnostic-summary-contract",
     "ai-live-smoke",
     "provider-settings-browser",
@@ -30,7 +30,7 @@ PRODUCT_QUALITY_GATES = (
 
 
 @dataclass(frozen=True)
-class ServiceRequirement:
+class ProductQualityRequirement:
     requirementId: str
     requirement: str
     evidenceChecks: tuple[tuple[str, tuple[str, ...]], ...]
@@ -56,8 +56,8 @@ class ServiceRequirement:
         }
 
 
-SERVICE_REQUIREMENTS = (
-    ServiceRequirement(
+PRODUCT_QUALITY_REQUIREMENTS = (
+    ProductQualityRequirement(
         requirementId="product-quality-ssot",
         requirement="Product quality criteria are documented as an ops/product SSOT.",
         evidenceChecks=(
@@ -79,7 +79,7 @@ SERVICE_REQUIREMENTS = (
             ("docs/skills/architecture/ssot-map.md", ("product quality", "docs/skills/ops/product/service-candidate.md")),
         ),
     ),
-    ServiceRequirement(
+    ProductQualityRequirement(
         requirementId="product-quality-gates-are-named",
         requirement="The product quality gate sequence is wired into the local runner and docs.",
         evidenceChecks=(
@@ -89,7 +89,7 @@ SERVICE_REQUIREMENTS = (
             ("tests/testRunEntrypoint.py", (*tuple(f"\"{gateName}\"" for gateName in PRODUCT_QUALITY_GATES), "PRODUCT_QUALITY_GATES")),
         ),
     ),
-    ServiceRequirement(
+    ProductQualityRequirement(
         requirementId="runtime-recovery-contract",
         requirement="Runtime recovery gate covers worker crash, package preflight, cell-call, and user-readable errors.",
         evidenceChecks=(
@@ -104,7 +104,7 @@ SERVICE_REQUIREMENTS = (
             ("tests/run.py", ("tests/verifyRuntimeRecoveryContract.py", "tests/verifyEditorRuntimePreflight.py", "tests/testRuntime.py")),
         ),
     ),
-    ServiceRequirement(
+    ProductQualityRequirement(
         requirementId="launcher-install-smoke",
         requirement="Launcher/install smoke checks doctor diagnostics, health timeout, rollback, and packaging SSOT.",
         evidenceChecks=(
@@ -119,7 +119,7 @@ SERVICE_REQUIREMENTS = (
             ("tests/run.py", ("tests/verifyInstallLauncherSmoke.py", "cargo", "check")),
         ),
     ),
-    ServiceRequirement(
+    ProductQualityRequirement(
         requirementId="curriculum-quality-matrix",
         requirement="Representative learning topics are materialized through the structured YAML contract.",
         evidenceChecks=(
@@ -141,7 +141,7 @@ SERVICE_REQUIREMENTS = (
             )),
         ),
     ),
-    ServiceRequirement(
+    ProductQualityRequirement(
         requirementId="onboarding-browser-flow",
         requirement="Onboarding browser gate verifies first screen fallback and provider-ready status in the product surface.",
         evidenceChecks=(
@@ -157,7 +157,7 @@ SERVICE_REQUIREMENTS = (
             ("tests/run.py", ("tests/verifyOnboardingPlaywright.py", "\"onboarding-browser\"")),
         ),
     ),
-    ServiceRequirement(
+    ProductQualityRequirement(
         requirementId="runtime-recovery-browser-flow",
         requirement="Runtime recovery browser gate verifies user-facing failure/retry copy near the learning surface.",
         evidenceChecks=(
@@ -171,7 +171,7 @@ SERVICE_REQUIREMENTS = (
             ("tests/run.py", ("tests/verifyRuntimeRecoveryPlaywright.py", "\"runtime-recovery-browser\"")),
         ),
     ),
-    ServiceRequirement(
+    ProductQualityRequirement(
         requirementId="frontend-performance-budget",
         requirement="Editor and landing bundle splitting are enforced after build without forcing React into a circular split.",
         evidenceChecks=(
@@ -201,7 +201,7 @@ SERVICE_REQUIREMENTS = (
             ("editor/vite.config.ts", ("react-dom",)),
         ),
     ),
-    ServiceRequirement(
+    ProductQualityRequirement(
         requirementId="no-secret-diagnostics",
         requirement="Product quality diagnostics separate failure categories and keep secrets out of logs and outputs.",
         evidenceChecks=(
@@ -273,7 +273,7 @@ SERVICE_REQUIREMENTS = (
             )),
         ),
     ),
-    ServiceRequirement(
+    ProductQualityRequirement(
         requirementId="live-provider-diagnostics",
         requirement="AI live smoke reports provider failure categories and keeps OAuth tool-result continuation explicit.",
         evidenceChecks=(
@@ -318,7 +318,7 @@ SERVICE_REQUIREMENTS = (
             )),
         ),
     ),
-    ServiceRequirement(
+    ProductQualityRequirement(
         requirementId="repo-local-gate-isolation",
         requirement="The local gate runner disables caches and isolates required tool scratch work inside repo-local disposable paths.",
         evidenceChecks=(
@@ -372,7 +372,7 @@ SERVICE_REQUIREMENTS = (
 
 
 def main() -> int:
-    results = tuple(requirement.evaluate() for requirement in SERVICE_REQUIREMENTS)
+    results = tuple(requirement.evaluate() for requirement in PRODUCT_QUALITY_REQUIREMENTS)
     payload = buildAuditPayload(results)
     print(json.dumps(payload, ensure_ascii=False, indent=2))
     if payload["requirementFailures"]:
@@ -396,7 +396,7 @@ def buildAuditPayload(results: tuple[dict[str, Any], ...]) -> dict[str, Any]:
             "missing": [f"score {score} < {MINIMUM_SCORE}"],
         })
     return {
-        "gate": "service-readiness-audit",
+        "gate": "product-quality-audit",
         "score": score,
         "maxScore": 10,
         "minimumScore": MINIMUM_SCORE,

@@ -123,7 +123,7 @@ uv run python -X utf8 tests/run.py gate docs
 uv run python -X utf8 tests/run.py gate backend
 uv run python -X utf8 tests/run.py gate learning-system-readiness
 uv run python -X utf8 tests/run.py gate dogfood-alpha-audit
-uv run python -X utf8 tests/run.py gate service-readiness-audit
+uv run python -X utf8 tests/run.py gate product-quality-audit
 uv run python -X utf8 tests/run.py gate diagnostic-summary-contract
 uv run python -X utf8 tests/run.py gate ai-live-smoke
 uv run python -X utf8 tests/run.py gate provider-settings-browser
@@ -141,4 +141,4 @@ uv run python -X utf8 tests/run.py gate launcher-test
 
 ## 완료 판단
 
-목표 완료 선언은 “잘 만들어졌다”는 품질 판단을 증명해야 한다. `quality-cycle`, `service-readiness-audit`, 개별 gate 결과가 있어야 하며, live provider credential이 없는 환경에서는 `ai-live-smoke`의 `live credential missing`을 증거로 남기되, 실제 provider 품질 판단은 credential이 있는 환경에서 다시 실행한 결과를 붙인다.
+목표 완료 선언은 “잘 만들어졌다”는 품질 판단을 증명해야 한다. `quality-cycle`, `product-quality-audit`, 개별 gate 결과가 있어야 하며, live provider credential이 없는 환경에서는 `ai-live-smoke`의 `live credential missing`을 증거로 남기되, 실제 provider 품질 판단은 credential이 있는 환경에서 다시 실행한 결과를 붙인다. `service-readiness-audit`는 이전 자동화를 위한 호환 alias일 뿐 완료 기준의 이름으로 쓰지 않는다.

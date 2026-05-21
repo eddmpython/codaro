@@ -106,9 +106,15 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyDogfoodAlphaAudit.py")),),
         ci_required=False,
     ),
-    "service-readiness-audit": Gate(
+    "product-quality-audit": Gate(
         tier="surface",
         description="제품 품질 기준과 새 내구성 gate 증거를 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyServiceReadinessAudit.py")),),
+        ci_required=False,
+    ),
+    "service-readiness-audit": Gate(
+        tier="surface",
+        description="product-quality-audit의 기존 호환 alias다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyServiceReadinessAudit.py")),),
         ci_required=False,
     ),
@@ -219,7 +225,7 @@ PRODUCT_QUALITY_GATES = (
     "backend",
     "learning-system-readiness",
     "dogfood-alpha-audit",
-    "service-readiness-audit",
+    "product-quality-audit",
     "diagnostic-summary-contract",
     "ai-live-smoke",
     "provider-settings-browser",
@@ -348,8 +354,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 25:
-        failures.append(f"expected 25 gates, found {len(GATES)}")
+    if len(GATES) != 26:
+        failures.append(f"expected 26 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

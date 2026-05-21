@@ -35,7 +35,7 @@ uv run python -X utf8 tests/run.py gate editor-runtime-preflight
 uv run python -X utf8 tests/run.py gate learning-system-readiness
 uv run python -X utf8 tests/run.py gate learning-goal-audit
 uv run python -X utf8 tests/run.py gate dogfood-alpha-audit
-uv run python -X utf8 tests/run.py gate service-readiness-audit
+uv run python -X utf8 tests/run.py gate product-quality-audit
 uv run python -X utf8 tests/run.py gate diagnostic-summary-contract
 uv run python -X utf8 tests/run.py gate install-launcher-smoke
 uv run python -X utf8 tests/run.py gate runtime-recovery-contract
@@ -79,7 +79,8 @@ uv run python -X utf8 tests/run.py gate launcher-test
 | `learning-system-readiness` | fast | 학습 YAML, 섹션 카드, teacher loop, workloop, gate SSOT의 readiness score를 확인한다. |
 | `learning-goal-audit` | surface | 목표 완료 전 docs, readiness, backend, landing build를 묶어 확인한다. |
 | `dogfood-alpha-audit` | surface | 사용자 플로우 audit으로 provider 연결, 질문, clarification, YAML 생성, 학습카드 렌더링, 실습 셀 입력, 셀 실행, 피드백, 실패 복구의 증거를 확인한다. |
-| `service-readiness-audit` | surface | 제품 품질 기준과 새 내구성 gate wiring을 확인한다. |
+| `product-quality-audit` | surface | 제품 품질 기준과 새 내구성 gate wiring을 확인한다. |
+| `service-readiness-audit` | surface | 기존 자동화와 문서 링크를 위한 `product-quality-audit` 호환 alias다. |
 | `diagnostic-summary-contract` | fast | local diagnostic summary가 provider/runtime/package/frontend 실패 범주와 secret redaction 계약을 지키는지 확인한다. |
 | `install-launcher-smoke` | release | launcher doctor, health check, rollback, exact artifact 설치 경계와 `cargo check`를 확인한다. |
 | `runtime-recovery-contract` | fast | runtime worker crash, package preflight, uv 설치 실패, cell 실행 실패 복구 계약을 확인한다. |
@@ -96,7 +97,7 @@ uv run python -X utf8 tests/run.py gate launcher-test
 | `launcher-test` | release | launcher Rust crate 테스트를 직렬 실행한다. |
 
 `preflight`는 로컬 기본 확인이며 현재 `docs`와 `backend`를 실행한다. `backend`가 전체 pytest를 포함하므로 `teacher-eval`과 `teacher-e2e`는 빠른 집중 확인용으로 둔다.
-`quality-cycle`은 제품이 잘 만들어졌는지 보는 반복 검증 단위다. 순서는 `docs` → `backend` → `learning-system-readiness` → `dogfood-alpha-audit` → `service-readiness-audit` → `diagnostic-summary-contract` → `ai-live-smoke` → `provider-settings-browser` → `install-launcher-smoke` → `runtime-recovery-contract` → `runtime-recovery-browser` → `curriculum-quality-matrix` → `onboarding-browser` → `frontend-performance-budget` → `landing-build` → `launcher-test`다. 이 명령은 완료 선언을 대신하지 않고, provider, 학습, runtime, 설치/런처, 온보딩, 프론트 성능이 한 사이클에서 함께 버티는지 확인한다.
+`quality-cycle`은 제품이 잘 만들어졌는지 보는 반복 검증 단위다. 순서는 `docs` → `backend` → `learning-system-readiness` → `dogfood-alpha-audit` → `product-quality-audit` → `diagnostic-summary-contract` → `ai-live-smoke` → `provider-settings-browser` → `install-launcher-smoke` → `runtime-recovery-contract` → `runtime-recovery-browser` → `curriculum-quality-matrix` → `onboarding-browser` → `frontend-performance-budget` → `landing-build` → `launcher-test`다. 이 명령은 완료 선언을 대신하지 않고, provider, 학습, runtime, 설치/런처, 온보딩, 프론트 성능이 한 사이클에서 함께 버티는지 확인한다.
 
 ## 추가 규칙
 
@@ -115,7 +116,7 @@ uv run python -X utf8 tests/run.py gate launcher-test
 - 목표 완료를 말하기 전에는 `learning-system-readiness`가 최소 9점을 증명해야 한다. 이 gate는 완료 선언을 대체하지 않고, YAML 계약, 카드 UI, clarification, uv 패키지 정책, editor runtime preflight, provider 오류 workloop, frontend workloop, golden eval/e2e, 운영 SSOT 증거가 현재 저장소에 남아 있는지 확인한다. 또한 `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`를 실제로 실행하는 blocking probe가 실패하면 점수와 무관하게 실패해야 한다.
 - 목표를 닫기 전 최종 검증은 `learning-goal-audit`로 남긴다. 이 gate는 docs 정합성, dogfood alpha 사용자 플로우 audit, 명시 요구사항 audit, `learning-system-readiness`, 전체 backend, landing build를 한 번에 실행해 "9점 readiness는 통과했지만 제품 빌드/문서/첫 사용자 완주 증거가 따로 깨진" 상태를 막는다. 명시 요구사항 audit은 `score`, `maxScore`, `minimumScore`, `requiredScore`, `requirementFailures`를 남기며, `minimumScore` 이상이어도 `requirementFailures`가 하나라도 있으면 실패한다. teacher/provider loop 자체의 산출물은 `score`, `maxScore`, `minimumScore`를 포함해야 하며 `minimumScore`는 9.0이다.
 - `dogfood-alpha-audit`는 첫 실행부터 provider 연결, 질문, clarification, YAML 생성, 학습카드 렌더링, 실습 셀 입력, 셀 실행, 피드백, 실패 복구까지 9단계가 문서와 코드 gate로 연결되어 있는지 확인한다. 제품 품질 판단은 이 audit과 live provider credential이 있는 환경의 `ai-live-smoke` 결과가 나온 뒤에만 한다.
-- `service-readiness-audit`는 기존 id를 유지하는 제품 품질 wiring audit이다. 이 audit은 단독으로 제품 완성을 증명하지 않고, `docs`, `backend`, `learning-system-readiness`, `dogfood-alpha-audit`, `diagnostic-summary-contract`, `ai-live-smoke`, `provider-settings-browser`, `install-launcher-smoke`, `runtime-recovery-contract`, `runtime-recovery-browser`, `curriculum-quality-matrix`, `onboarding-browser`, `frontend-performance-budget`, `landing-build`, `launcher-test`가 runner와 문서에 연결되어 있고 각 gate가 실제 실패 표면을 보는지 확인한다.
+- `product-quality-audit`는 제품 품질 wiring audit이다. 이 audit은 단독으로 제품 완성을 증명하지 않고, `docs`, `backend`, `learning-system-readiness`, `dogfood-alpha-audit`, `diagnostic-summary-contract`, `ai-live-smoke`, `provider-settings-browser`, `install-launcher-smoke`, `runtime-recovery-contract`, `runtime-recovery-browser`, `curriculum-quality-matrix`, `onboarding-browser`, `frontend-performance-budget`, `landing-build`, `launcher-test`가 runner와 문서에 연결되어 있고 각 gate가 실제 실패 표면을 보는지 확인한다. `service-readiness-audit`는 이전 이름을 참조하는 자동화를 위한 호환 alias로만 둔다.
 - `diagnostic-summary-contract`는 local diagnostic summary의 최소 제품 계약이다. `/api/system/diagnostics`가 provider 연결 상태, uv/project `.venv`, runtime status, editor build 산출물을 provider/runtime/package/frontend category/count/action으로 분리하며, editor bootstrap이 이 summary를 시작 진단 안내로 보여주고, `token`, `apiKey`, `secret`, `Authorization`, OAuth access/refresh token, `sk-...` 값이 summary/detail/metadata에 남지 않는지 확인한다.
 - `install-launcher-smoke`는 launcher doctor, active/last-known-good/crash/rollback state, backend health timeout, exact wheel/sha256 packaging 경계를 본다. launcher 작업에서 이 gate를 통과하지 못하면 사용자 설치/실행/복구 경로가 제품 품질 판단에 올라갈 수 없다.
 - `runtime-recovery-contract`는 backend runtime 테스트, editor runtime preflight, workloop copy를 묶어 worker crash, package delay/failure, cell execution failure가 한 오류로 뭉개지지 않는지 확인한다. `runtime-recovery-browser`는 이 계약이 실제 learning surface에서 셀 근처 문구로 보이는지 확인한다.
