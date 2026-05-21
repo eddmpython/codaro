@@ -34,6 +34,7 @@ def testGateNamesAreStable() -> None:
         "learning-goal-audit",
         "learning-card-contract",
         "learning-card-browser",
+        "provider-settings-browser",
         "editor-build",
         "landing-build",
         "launcher-check",

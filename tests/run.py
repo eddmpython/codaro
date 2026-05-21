@@ -112,6 +112,12 @@ GATES: dict[str, Gate] = {
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningCardPlaywright.py")),),
         ci_required=False,
     ),
+    "provider-settings-browser": Gate(
+        tier="surface",
+        description="Playwright CLI로 provider 설정 sheet의 fallback, 선택, 검증, 실패 안내 렌더링을 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyProviderSettingsPlaywright.py")),),
+        ci_required=False,
+    ),
     "editor-build": Gate(
         tier="surface",
         description="제품 editor surface의 TypeScript/Vite build를 확인한다.",
@@ -193,8 +199,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 15:
-        failures.append(f"expected 15 gates, found {len(GATES)}")
+    if len(GATES) != 16:
+        failures.append(f"expected 16 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

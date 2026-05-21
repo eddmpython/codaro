@@ -6,6 +6,7 @@ import react from "@vitejs/plugin-react";
 import { defineConfig } from "vite";
 
 const dirname = path.dirname(fileURLToPath(import.meta.url));
+const apiProxyTarget = process.env.CODARO_DEV_API_PROXY?.replace(/\/$/, "");
 
 export default defineConfig({
   plugins: [react(), tailwindcss()],
@@ -13,6 +14,14 @@ export default defineConfig({
     fs: {
       allow: [dirname, path.resolve(dirname, "..")],
     },
+    proxy: apiProxyTarget
+      ? {
+          "/api": {
+            changeOrigin: true,
+            target: apiProxyTarget,
+          },
+        }
+      : undefined,
   },
   build: {
     assetsDir: "_app",

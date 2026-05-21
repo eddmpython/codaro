@@ -174,6 +174,7 @@ function ProviderCard({
         "rounded-md border bg-card p-3 transition-colors",
         active && "border-primary/40 bg-primary/5",
       )}
+      data-provider-card={providerId}
     >
       <div className="flex items-start gap-3">
         <span className="flex size-9 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">
