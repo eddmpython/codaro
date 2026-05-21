@@ -63,6 +63,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - 구체적인 학습 요청은 structured YAML 생성과 tool loop로 이어진다.
 - 실제 provider가 tool call을 하지 않으면 실패 이유와 prompt/tool schema 개선 포인트를 남긴다.
 - trace에는 provider, model, latency, error, tool sequence가 남는다.
+- live gate 실패 payload에는 `diagnostic.code`와 `diagnostic.action`이 남아야 한다. credential missing, 다시 로그인, 네트워크 문제, 권한 문제, OAuth 호환성 점검, API 키 필요, Base URL 필요를 같은 provider diagnostic 계약으로 구분한다.
 
 ## 학습 품질 Matrix
 

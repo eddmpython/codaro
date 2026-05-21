@@ -206,6 +206,30 @@ SERVICE_REQUIREMENTS = (
         ),
     ),
     ServiceRequirement(
+        requirementId="live-provider-diagnostics",
+        requirement="AI live smoke reports provider failure categories with reusable provider diagnostics.",
+        evidenceChecks=(
+            ("tests/verifyAiLiveSmoke.py", (
+                "providerErrorDiagnostic",
+                "liveCredentialDiagnostic",
+                "liveProviderExceptionDiagnostic",
+                "diagnosticCode",
+                "diagnosticAction",
+            )),
+            ("tests/testAiLiveSmoke.py", (
+                "testCredentialMissingPayloadIncludesProviderDiagnostic",
+                "testFailedCasePayloadUsesProviderDiagnostic",
+                "provider_network_error",
+                "configure-api-key",
+            )),
+            ("docs/skills/architecture/live-provider-ops.md", (
+                "diagnostic.code",
+                "diagnostic.action",
+                "liveCredentialDiagnostic",
+            )),
+        ),
+    ),
+    ServiceRequirement(
         requirementId="repo-local-gate-isolation",
         requirement="The local gate runner disables caches and isolates required tool scratch work inside repo-local disposable paths.",
         evidenceChecks=(

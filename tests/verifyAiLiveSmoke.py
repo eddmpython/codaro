@@ -15,6 +15,7 @@ from codaro.ai.conversation import ConversationManager, buildSystemPrompt
 from codaro.ai.factory import createProvider
 from codaro.ai.oauthToken import TokenRefreshError, loadToken
 from codaro.ai.profile import getProfileManager
+from codaro.ai.providerErrors import ProviderRuntimeError, providerErrorDiagnostic
 from codaro.ai.providerSpec import getProviderSpec, normalizeProvider, publicProviderIds
 from codaro.ai.providers.oauthChatgptProvider import ChatGPTOAuthError
 from codaro.ai.teacher import TeacherOrchestrator, buildClarificationPlan, runTeacherChatLoop
@@ -32,6 +33,7 @@ LIVE_PROVIDER_ERRORS = (
     ImportError,
     OSError,
     PermissionError,
+    ProviderRuntimeError,
     RuntimeError,
     TokenRefreshError,
     TypeError,
@@ -57,7 +59,11 @@ class LiveProviderSelection:
             "apiKeyConfigured": bool(self.config.apiKey),
             "credentialMissing": self.credentialMissing,
             "missingReasons": list(self.missingReasons),
-        }
+        } | (
+            {"diagnostic": liveCredentialDiagnostic(self.provider, self.missingReasons)}
+            if self.credentialMissing
+            else {}
+        )
 
 
 @dataclass(frozen=True)
@@ -69,6 +75,7 @@ class LiveSmokeCase:
     provider: str | None = None
     model: str | None = None
     error: str | None = None
+    diagnostic: dict[str, Any] | None = None
     signals: dict[str, Any] = field(default_factory=dict)
 
     def payload(self) -> dict[str, Any]:
@@ -85,6 +92,8 @@ class LiveSmokeCase:
             data["model"] = self.model
         if self.error is not None:
             data["error"] = self.error
+        if self.diagnostic is not None:
+            data["diagnostic"] = self.diagnostic
         return data
 
 
@@ -110,6 +119,8 @@ class LiveProviderRun:
         }
         if self.nextAction is not None:
             data["nextAction"] = self.nextAction
+        if self.credentialMissing:
+            data["diagnostic"] = liveCredentialDiagnostic(self.selection.provider, self.selection.missingReasons)
         return data
 
 
@@ -358,6 +369,30 @@ def liveCredentialNextAction(provider: str) -> str:
     if provider == "ollama":
         return "Ollama 서버를 실행하고 필요한 모델을 설치한 뒤 다시 실행하세요."
     return "지원 provider를 CODARO_AI_LIVE_PROVIDER에 지정하세요."
+
+
+def liveCredentialDiagnostic(provider: str, missingReasons: tuple[str, ...]) -> dict[str, Any]:
+    detail = ", ".join(missingReasons) or "live credential missing"
+    if any(reason.startswith("unsupported provider") for reason in missingReasons):
+        action = "unavailable"
+    elif provider == "oauth-chatgpt" or any("oauth token" in reason for reason in missingReasons):
+        action = "login"
+    elif provider == "custom" and any("BASE_URL" in reason or "base url" in reason.lower() for reason in missingReasons):
+        action = "base_url_missing"
+    elif any("api key" in reason.lower() or "OPENAI_API_KEY" in reason for reason in missingReasons):
+        action = "api_key_missing"
+    else:
+        action = "unavailable"
+    diagnostic = providerErrorDiagnostic(
+        ProviderRuntimeError(
+            "live provider credential is missing",
+            action=action,
+            provider=provider,
+            detail=detail,
+        ),
+        provider=provider,
+    )
+    return diagnostic.payload()
 
 
 def runProviderAvailabilityCase(config: LLMConfig) -> LiveSmokeCase:
@@ -797,15 +832,48 @@ def intSignal(payload: dict[str, Any], key: str) -> int:
 
 
 def failedCase(caseId: str, startedAt: float, config: LLMConfig, exc: BaseException) -> LiveSmokeCase:
+    diagnostic = liveProviderExceptionDiagnostic(exc, provider=config.provider)
     return LiveSmokeCase(
         caseId=caseId,
         passed=False,
-        status="provider error",
+        status=str(diagnostic.get("code") or "provider_unavailable"),
         durationMs=elapsedMs(startedAt),
         provider=config.provider,
         model=config.model,
-        error=safeError(exc),
+        error=str(diagnostic.get("message") or safeError(exc)),
+        diagnostic=diagnostic,
+        signals={
+            "diagnosticCode": diagnostic.get("code"),
+            "diagnosticAction": diagnostic.get("action"),
+            "recoverable": diagnostic.get("recoverable"),
+        },
     )
+
+
+def liveProviderExceptionDiagnostic(exc: BaseException, *, provider: str) -> dict[str, Any]:
+    if getattr(exc, "action", None) or getattr(exc, "reason", None):
+        return providerErrorDiagnostic(exc, provider=provider).payload()
+    if isinstance(exc, ConnectionError):
+        return providerErrorDiagnostic(
+            ProviderRuntimeError(
+                "live provider network failure",
+                action="network",
+                provider=provider,
+                detail=str(exc),
+            ),
+            provider=provider,
+        ).payload()
+    if isinstance(exc, PermissionError):
+        return providerErrorDiagnostic(
+            ProviderRuntimeError(
+                "live provider permission denied",
+                action="permission",
+                provider=provider,
+                detail=str(exc),
+            ),
+            provider=provider,
+        ).payload()
+    return providerErrorDiagnostic(exc, provider=provider).payload()
 
 
 def safeError(exc: BaseException) -> str:

@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 import json
 import sys
+import time
 from pathlib import Path
 
 
@@ -63,6 +64,36 @@ def testMatrixExitCodeTreatsMissingCredentialsAsExplicitStatus() -> None:
     payload = smoke.matrixRunPayload(runs)
     assert payload["summary"]["passed"] == 1
     assert payload["summary"]["credentialMissing"] == 1
+
+
+def testCredentialMissingPayloadIncludesProviderDiagnostic() -> None:
+    smoke = loadSmoke()
+    selection = smoke.LiveProviderSelection(
+        provider="openai",
+        config=smoke.LLMConfig(provider="openai", model="test-model"),
+        missingReasons=("OPENAI_API_KEY missing",),
+    )
+    run = smoke.LiveProviderRun(
+        selection=selection,
+        passed=False,
+        status="live credential missing",
+        nextAction="configure provider",
+    )
+
+    payload = run.payload()
+
+    assert payload["diagnostic"]["code"] == "provider_credential_missing"
+    assert payload["diagnostic"]["action"] == "configure-api-key"
+    assert payload["selection"]["diagnostic"]["code"] == "provider_credential_missing"
+
+
+def testCredentialMissingPayloadClassifiesCustomBaseUrl() -> None:
+    smoke = loadSmoke()
+
+    diagnostic = smoke.liveCredentialDiagnostic("custom", ("CODARO_LLM_BASE_URL missing",))
+
+    assert diagnostic["code"] == "provider_base_url_missing"
+    assert diagnostic["action"] == "configure-base-url"
 
 
 def testMatrixExitCodePrioritizesProviderFailures() -> None:
@@ -172,6 +203,30 @@ def testToolLoopTuningSignalsExposeActionableFailureContext() -> None:
     assert signals["answerPreview"].endswith("...[truncated]")
     assert any("native tool calls" in hint for hint in signals["tuningHints"])
     assert any("write-curriculum-yaml" in hint for hint in signals["tuningHints"])
+
+
+def testFailedCasePayloadUsesProviderDiagnostic() -> None:
+    smoke = loadSmoke()
+
+    case = smoke.failedCase(
+        "short-answer",
+        time.monotonic(),
+        smoke.LLMConfig(provider="oauth-chatgpt", model="test-model"),
+        ConnectionError("network down"),
+    )
+    payload = case.payload()
+
+    assert payload["status"] == "provider_network_error"
+    assert payload["diagnostic"]["code"] == "provider_network_error"
+    assert payload["diagnostic"]["action"] == "check-network"
+    assert payload["signals"]["diagnosticAction"] == "check-network"
+    assert payload["error"] == "Provider 서버에 연결하지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도하세요."
+
+
+def testLiveProviderErrorsCatchProviderRuntimeError() -> None:
+    smoke = loadSmoke()
+
+    assert smoke.ProviderRuntimeError in smoke.LIVE_PROVIDER_ERRORS
 
 
 def testMaterializeLiveSmokeYamlReportsStructuredContractSignals() -> None:
