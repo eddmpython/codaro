@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import os
 import re
 import shutil
 import subprocess
@@ -12,6 +13,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 GATE_DOC = ROOT / "docs" / "skills" / "ops" / "foundation" / "testing-and-gates.md"
 CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
+RUN_OUTPUT = ROOT / "output" / "test-runner"
 
 
 @dataclass(frozen=True)
@@ -205,12 +207,67 @@ TIER_ORDER = ("fast", "surface", "release")
 
 def runCommand(gateName: str, gateCommand: GateCommand) -> int:
     cwd = ROOT / gateCommand.cwd
-    executable = shutil.which(gateCommand.args[0])
-    args = (executable, *gateCommand.args[1:]) if executable else gateCommand.args
+    env = localGateEnvironment(gateName)
+    commandArgs = localGateArgs(gateName, gateCommand)
+    executable = shutil.which(commandArgs[0])
+    args = (executable, *commandArgs[1:]) if executable else commandArgs
     displayCwd = gateCommand.cwd
-    print(f"\n[{gateName}] {displayCwd}> {' '.join(gateCommand.args)}", flush=True)
-    result = subprocess.run(args, cwd=cwd, check=False)
+    print(f"\n[{gateName}] {displayCwd}> {' '.join(commandArgs)}", flush=True)
+    result = subprocess.run(args, cwd=cwd, check=False, env=env)
     return result.returncode
+
+
+def localGateEnvironment(gateName: str) -> dict[str, str]:
+    runRoot = localGateRunRoot(gateName)
+    tempDir = runRoot / "temp"
+    tempDir.mkdir(parents=True, exist_ok=True)
+    env = os.environ.copy()
+    env["UV_NO_CACHE"] = "1"
+    env["TMP"] = str(tempDir)
+    env["TEMP"] = str(tempDir)
+    env["TMPDIR"] = str(tempDir)
+    return env
+
+
+def localGateArgs(gateName: str, gateCommand: GateCommand) -> tuple[str, ...]:
+    args = normalizeUvArgs(gateCommand.args)
+    args = normalizePytestArgs(gateName, args)
+    args = normalizeCargoArgs(gateName, args)
+    return args
+
+
+def normalizeUvArgs(args: tuple[str, ...]) -> tuple[str, ...]:
+    if len(args) >= 2 and args[0] == "uv" and args[1] == "run":
+        return ("uv", "--no-cache", *args[1:])
+    return args
+
+
+def normalizePytestArgs(gateName: str, args: tuple[str, ...]) -> tuple[str, ...]:
+    if "pytest" not in args:
+        return args
+    nextArgs = list(args)
+    if "-p" not in nextArgs:
+        nextArgs.extend(("-p", "no:cacheprovider"))
+    if not any(item == "--basetemp" or item.startswith("--basetemp=") for item in nextArgs):
+        nextArgs.extend(("--basetemp", str(localGateRunRoot(gateName) / "pytest")))
+    return tuple(nextArgs)
+
+
+def normalizeCargoArgs(gateName: str, args: tuple[str, ...]) -> tuple[str, ...]:
+    if not args or args[0] != "cargo":
+        return args
+    if any(item == "--target-dir" or item.startswith("--target-dir=") for item in args):
+        return args
+    targetDirArgs = ("--target-dir", str(localGateRunRoot(gateName) / "cargo-target"))
+    if "--" in args:
+        splitIndex = args.index("--")
+        return (*args[:splitIndex], *targetDirArgs, *args[splitIndex:])
+    return (*args, *targetDirArgs)
+
+
+def localGateRunRoot(gateName: str) -> Path:
+    safeName = re.sub(r"[^A-Za-z0-9_.-]+", "-", gateName).strip("-") or "gate"
+    return RUN_OUTPUT / safeName
 
 
 def runGate(gateName: str) -> int:

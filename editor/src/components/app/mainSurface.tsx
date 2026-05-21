@@ -1,14 +1,4 @@
-import { TeacherPanel } from "@/components/assistant/assistantPanel";
-import { AutomationView } from "@/components/automation/automationSurface";
-import { ChatSurface } from "@/components/chat/chatSurface";
-import {
-  CurriculumCellToc,
-  CurriculumView,
-} from "@/components/curriculum/curriculumSurface";
-import {
-  CodeCellEditor,
-  NotebookPanel,
-} from "@/components/notebook/notebookPanel";
+import { lazy, Suspense } from "react";
 import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
 import { CUSTOM_CURRICULUM_CATEGORY } from "@/lib/customCurricula";
 import { cn } from "@/lib/utils";
@@ -30,6 +20,14 @@ import type {
 } from "@/types";
 
 type ResultMap = Record<string, ExecutionResult>;
+
+const TeacherPanel = lazy(() => import("@/components/assistant/teacherPanel").then((module) => ({ default: module.TeacherPanel })));
+const AutomationView = lazy(() => import("@/components/automation/automationSurface").then((module) => ({ default: module.AutomationView })));
+const ChatSurface = lazy(() => import("@/components/chat/chatSurface").then((module) => ({ default: module.ChatSurface })));
+const NotebookPanel = lazy(() => import("@/components/notebook/notebookPanel").then((module) => ({ default: module.NotebookPanel })));
+const CodeCellEditor = lazy(() => import("@/components/notebook/notebookPanel").then((module) => ({ default: module.CodeCellEditor })));
+const CurriculumView = lazy(() => import("@/components/curriculum/curriculumSurface").then((module) => ({ default: module.CurriculumView })));
+const CurriculumCellToc = lazy(() => import("@/components/curriculum/curriculumSurface").then((module) => ({ default: module.CurriculumCellToc })));
 
 type MainSurfaceProps = {
   aiConnecting: boolean;
@@ -80,6 +78,14 @@ type MainSurfaceProps = {
 };
 
 export function MainSurface(props: MainSurfaceProps) {
+  return (
+    <Suspense fallback={<SurfaceLoading />}>
+      <MainSurfaceContent {...props} />
+    </Suspense>
+  );
+}
+
+function MainSurfaceContent(props: MainSurfaceProps) {
   if (props.surface === "chat") {
     return (
       <ChatSurface
@@ -238,5 +244,13 @@ export function MainSurface(props: MainSurfaceProps) {
       onRunTask={props.onRunTask}
       onToggleEStop={props.onToggleEStop}
     />
+  );
+}
+
+function SurfaceLoading() {
+  return (
+    <div className="grid h-[calc(100vh-40px)] min-h-0 place-items-center px-4 text-sm text-muted-foreground">
+      화면을 불러오는 중
+    </div>
   );
 }

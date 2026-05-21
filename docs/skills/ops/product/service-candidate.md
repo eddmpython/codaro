@@ -91,9 +91,10 @@ scripted provider만 통과하는 상태는 service-ready가 아니다.
 제품 표면 기준으로 검증한다. landing page만 빠른 상태는 충분하지 않다.
 
 - editor build의 큰 bundle 경고는 baseline 없이 방치하지 않는다.
-- Monaco/CodeMirror, provider/settings, learning surface, 일반 vendor를 한 chunk에 몰아넣지 않는다.
-- `frontend-performance-budget`는 chunk count, 가장 큰 JS chunk, 전체 JS/CSS 크기를 확인한다.
-- 현재 service candidate baseline은 가장 큰 JS chunk 6MB 이하, 전체 JS 7.5MB 이하, CSS 160KB 이하로 둔다. 이 baseline은 합격 선언이 아니라 lazy loading/code splitting으로 더 낮출 기준선이다.
+- Monaco/CodeMirror, provider/settings, learning surface, 일반 vendor를 한 chunk에 몰아넣지 않는다. React와 일반 vendor를 억지로 나눠 순환 chunk를 만들지 않는다.
+- 기본 커리큘럼 YAML 원문은 bootstrap bundle에 싣지 않는다. 목록은 경량 registry로 만들고, 레슨 YAML은 선택한 레슨을 열 때 lazy loading한다.
+- `frontend-performance-budget`는 chunk count, 가장 큰 JS chunk, entry JS chunk, 전체 JS/CSS 크기, curriculum lazy loading 계약을 확인한다.
+- 현재 service candidate budget은 가장 큰 JS chunk 400KB 이하, entry JS chunk 300KB 이하, 전체 JS 7.5MB 이하, CSS 160KB 이하로 둔다.
 - desktop/mobile에서 텍스트, 버튼, 카드, TOC, popover가 겹치지 않아야 한다.
 
 ## Diagnostic
@@ -104,6 +105,7 @@ scripted provider만 통과하는 상태는 service-ready가 아니다.
 - raw JSON은 확장 진단으로만 본다.
 - token/API key/secret은 diagnostic summary와 로그에 남기지 않는다.
 - 문제 재현에는 provider/model/latency/error/tool sequence/workloop trace가 충분해야 한다.
+- gate 실행은 `tests/run.py`가 repo-local `output/test-runner/<gate>/` 아래로 uv cache 회피, pytest basetemp, cargo target, temp env를 고정해 사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다.
 
 ## Gate
 

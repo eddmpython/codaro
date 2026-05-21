@@ -8,12 +8,15 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 APP_DIR = ROOT / "src" / "codaro" / "webBuild" / "_app"
 VITE_CONFIG = ROOT / "editor" / "vite.config.ts"
+CURRICULA_REGISTRY = ROOT / "editor" / "src" / "lib" / "curriculaRegistry.ts"
+CURRICULUM_SELECTION = ROOT / "editor" / "src" / "lib" / "curriculumSelection.ts"
 
 MIN_JS_CHUNKS = 4
-MAX_SINGLE_JS_BYTES = 6_000_000
+MAX_SINGLE_JS_BYTES = 400_000
+MAX_ENTRY_JS_BYTES = 300_000
 MAX_TOTAL_JS_BYTES = 7_500_000
 MAX_CSS_BYTES = 160_000
-REQUIRED_CHUNK_LABELS = ("codemirror", "react", "vendor")
+REQUIRED_CHUNK_LABELS = ("codemirror", "vendor", "yaml", "curriculumSurface")
 
 
 def main() -> int:
@@ -30,10 +33,13 @@ def main() -> int:
     cssStats = [{"name": path.name, "bytes": path.stat().st_size} for path in cssFiles]
     totalJsBytes = sum(item["bytes"] for item in chunkStats)
     biggestJs = max((item["bytes"] for item in chunkStats), default=0)
+    entryJsBytes = max((item["bytes"] for item in chunkStats if item["name"].startswith("index-")), default=0)
     totalCssBytes = sum(item["bytes"] for item in cssStats)
 
     if biggestJs > MAX_SINGLE_JS_BYTES:
         failures.append(f"largest JS chunk {biggestJs} exceeds budget {MAX_SINGLE_JS_BYTES}")
+    if entryJsBytes > MAX_ENTRY_JS_BYTES:
+        failures.append(f"entry JS chunk {entryJsBytes} exceeds budget {MAX_ENTRY_JS_BYTES}")
     if totalJsBytes > MAX_TOTAL_JS_BYTES:
         failures.append(f"total JS {totalJsBytes} exceeds baseline budget {MAX_TOTAL_JS_BYTES}")
     if totalCssBytes > MAX_CSS_BYTES:
@@ -45,20 +51,32 @@ def main() -> int:
             failures.append(f"expected a named {label} chunk in built assets")
 
     configText = VITE_CONFIG.read_text(encoding="utf-8")
-    for token in ("manualChunks", "@codemirror", "@radix-ui", "react-dom", "vendor"):
+    for token in ("manualChunks", "@codemirror", "@radix-ui", "vendor"):
         if token not in configText:
             failures.append(f"vite config missing performance split token {token}")
+
+    registryText = CURRICULA_REGISTRY.read_text(encoding="utf-8")
+    selectionText = CURRICULUM_SELECTION.read_text(encoding="utf-8")
+    if "eager: true" in registryText:
+        failures.append("curriculum registry still eagerly imports YAML lessons")
+    for token in ("loadRaw", "export async function registryLesson"):
+        if token not in registryText:
+            failures.append(f"curriculum registry missing lazy lesson token {token}")
+    if "document: null" not in selectionText:
+        failures.append("default curriculum state should not materialize a lesson document at bootstrap")
 
     payload = {
         "gate": "frontend-performance-budget",
         "passed": not failures,
         "minJsChunks": MIN_JS_CHUNKS,
         "maxSingleJsBytes": MAX_SINGLE_JS_BYTES,
+        "maxEntryJsBytes": MAX_ENTRY_JS_BYTES,
         "maxTotalJsBytes": MAX_TOTAL_JS_BYTES,
         "maxCssBytes": MAX_CSS_BYTES,
         "chunkCount": len(jsFiles),
         "totalJsBytes": totalJsBytes,
         "biggestJsBytes": biggestJs,
+        "entryJsBytes": entryJsBytes,
         "totalCssBytes": totalCssBytes,
         "chunks": chunkStats,
         "css": cssStats,

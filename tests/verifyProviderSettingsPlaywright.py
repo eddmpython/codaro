@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import os
 import shutil
 import socket
-import subprocess
 import sys
 import tempfile
 import threading
@@ -17,17 +15,19 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from typing import Any
 
+from browserStaticServer import StaticAppServer
+from playwrightCli import PlaywrightCli, PlaywrightCliError, resolvePlaywrightCli
+
 
 ROOT = Path(__file__).resolve().parents[1]
-EDITOR_DIR = ROOT / "editor"
 
 
 def main(argv: list[str] | None = None) -> int:
     args = buildParser().parse_args(argv)
-    npx = shutil.which("npx")
-    npm = shutil.which("npm")
-    if not npx or not npm:
-        print("FAIL: npx and npm are required for provider settings browser verification", file=sys.stderr)
+    try:
+        cliPath = resolvePlaywrightCli(ROOT)
+    except PlaywrightCliError as exc:
+        print(f"FAIL: {exc}", file=sys.stderr)
         return 1
 
     appPort = args.port or freeAppPort()
@@ -36,31 +36,13 @@ def main(argv: list[str] | None = None) -> int:
     url = f"http://127.0.0.1:{appPort}/#chat"
     tempRoot = Path(tempfile.mkdtemp(prefix="codaro-provider-settings-pw-"))
     session = f"codaro-provider-settings-{int(time.time())}"
-    env = {
-        **os.environ,
-        "CODARO_DEV_API_PROXY": api.baseUrl,
-    }
-    server = subprocess.Popen(
-        [
-            npm,
-            "run",
-            "dev",
-            "--",
-            "--host",
-            "127.0.0.1",
-            "--port",
-            str(appPort),
-        ],
-        cwd=EDITOR_DIR,
-        env=env,
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.STDOUT,
-    )
+    server = StaticAppServer(port=appPort, apiBaseUrl=api.baseUrl)
+    server.start()
     cli: PlaywrightCli | None = None
 
     try:
         waitForHttp(url)
-        cli = PlaywrightCli(npx=npx, cwd=tempRoot, session=session)
+        cli = PlaywrightCli(cliPath=cliPath, cwd=tempRoot, session=session)
         cli.run("open", url)
         cli.run("resize", "1280", "900")
         cli.waitEval(jsPageReady(), "app ready")
@@ -94,26 +76,16 @@ def main(argv: list[str] | None = None) -> int:
             f"{selected} {openai} {oauth} {ollama} {custom} {desktopVisual} {mobileVisual}"
         )
         return 0
-    except VerificationError as exc:
+    except (VerificationError, PlaywrightCliError) as exc:
         print(f"FAIL: {exc}", file=sys.stderr)
         if cli is not None:
             print(debugPageState(cli), file=sys.stderr)
         print("API calls: " + json.dumps(api.calls, ensure_ascii=False), file=sys.stderr)
         return 1
     finally:
-        subprocess.run(
-            [npx, "--yes", "--package", "@playwright/cli", "playwright-cli", "--session", session, "close"],
-            cwd=tempRoot,
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            check=False,
-        )
-        server.terminate()
-        try:
-            server.wait(timeout=8)
-        except subprocess.TimeoutExpired:
-            server.kill()
-            server.wait(timeout=8)
+        if cli is not None:
+            cli.close()
+        server.stop()
         api.stop()
         shutil.rmtree(tempRoot, ignore_errors=True)
 
@@ -464,57 +436,6 @@ def curriculumLessonPayload() -> dict[str, Any]:
     }
 
 
-class PlaywrightCli:
-    def __init__(self, *, npx: str, cwd: Path, session: str) -> None:
-        self._npx = npx
-        self._cwd = cwd
-        self._session = session
-
-    def run(self, *args: str) -> str:
-        command = [
-            self._npx,
-            "--yes",
-            "--package",
-            "@playwright/cli",
-            "playwright-cli",
-            "--session",
-            self._session,
-            *args,
-        ]
-        result = subprocess.run(
-            command,
-            cwd=self._cwd,
-            text=True,
-            encoding="utf-8",
-            errors="replace",
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            check=False,
-        )
-        if result.returncode != 0:
-            raise VerificationError(f"playwright-cli {' '.join(args)} failed:\n{result.stdout}")
-        return result.stdout.strip()
-
-    def eval(self, expression: str) -> str:
-        output = self.run("eval", expression, "--raw")
-        if isPlaywrightEvalError(output):
-            raise VerificationError(output)
-        return output
-
-    def waitEval(self, expression: str, label: str, timeout: float = 25.0) -> None:
-        deadline = time.monotonic() + timeout
-        lastOutput = ""
-        while time.monotonic() < deadline:
-            try:
-                lastOutput = self.eval(expression)
-                if lastOutput.strip() == "true":
-                    return
-            except VerificationError as exc:
-                lastOutput = str(exc)
-            time.sleep(0.35)
-        raise VerificationError(f"timed out waiting for {label}: {lastOutput}")
-
-
 def waitForHttp(url: str, timeout: float = 30.0) -> None:
     deadline = time.monotonic() + timeout
     lastError = ""
@@ -527,20 +448,6 @@ def waitForHttp(url: str, timeout: float = 30.0) -> None:
             lastError = str(exc)
         time.sleep(0.25)
     raise VerificationError(f"dev server did not become ready: {lastError}")
-
-
-def isPlaywrightEvalError(output: str) -> bool:
-    stripped = output.lstrip()
-    if stripped.startswith("### Error"):
-        return True
-    errorPrefixes = (
-        "Error:",
-        "ReferenceError:",
-        "TypeError:",
-        "SyntaxError:",
-        "RangeError:",
-    )
-    return stripped.startswith(errorPrefixes) and "\n    at " in stripped
 
 
 def freePort() -> int:

@@ -160,9 +160,10 @@ SERVICE_REQUIREMENTS = (
     ),
     ServiceRequirement(
         requirementId="frontend-performance-budget",
-        requirement="Editor bundle splitting and asset budgets are enforced after build.",
+        requirement="Editor bundle splitting and asset budgets are enforced after build without forcing React into a circular split.",
         evidenceChecks=(
-            ("editor/vite.config.ts", ("manualChunks", "@codemirror", "react-dom", "vendor")),
+            ("editor/vite.config.ts", ("manualChunks", "@codemirror", "yaml", "vendor")),
+            ("docs/skills/ops/product/service-candidate.md", ("React와 일반 vendor를 억지로 나눠 순환 chunk를 만들지 않는다",)),
             ("tests/verifyFrontendPerformanceBudget.py", (
                 "MIN_JS_CHUNKS",
                 "MAX_SINGLE_JS_BYTES",
@@ -170,6 +171,9 @@ SERVICE_REQUIREMENTS = (
                 "REQUIRED_CHUNK_LABELS",
             )),
             ("tests/run.py", ("tests/verifyFrontendPerformanceBudget.py", "\"frontend-performance-budget\"")),
+        ),
+        forbiddenChecks=(
+            ("editor/vite.config.ts", ("react-dom",)),
         ),
     ),
     ServiceRequirement(
@@ -183,6 +187,31 @@ SERVICE_REQUIREMENTS = (
             ("docs/skills/architecture/live-provider-ops.md", (
                 "실제 token과 API key는 저장소에 남기지 않는다",
                 "raw detail은 기본 UI에 노출하지 않는다",
+            )),
+        ),
+    ),
+    ServiceRequirement(
+        requirementId="repo-local-gate-isolation",
+        requirement="The local gate runner isolates uv, pytest, cargo, and temp output inside repo-local disposable paths.",
+        evidenceChecks=(
+            ("tests/run.py", (
+                "RUN_OUTPUT",
+                "UV_NO_CACHE",
+                "normalizePytestArgs",
+                "--basetemp",
+                "normalizeCargoArgs",
+                "--target-dir",
+                "TMPDIR",
+            )),
+            ("docs/skills/ops/foundation/testing-and-gates.md", (
+                "`output/test-runner/<gate>/`",
+                "`uv --no-cache run`",
+                "`--basetemp output/test-runner/<gate>/pytest`",
+                "`--target-dir output/test-runner/<gate>/cargo-target`",
+            )),
+            ("docs/skills/ops/product/service-candidate.md", (
+                "repo-local `output/test-runner/<gate>/`",
+                "사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다",
             )),
         ),
     ),

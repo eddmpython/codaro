@@ -41,13 +41,12 @@ export type CurriculumLessonState = {
 export function defaultCurriculumState(): DefaultCurriculumState {
   const selection = defaultRegistrySelection();
   const contents = curriculumContentsFallback(selection.category);
-  const lesson = registryLesson(selection.category, selection.contentId);
   return {
     selectedCategory: selection.category,
     selectedContentId: selection.contentId,
     selectedCustomCurriculumId: "",
     contents,
-    document: lesson?.document ?? null,
+    document: null,
   };
 }
 
@@ -87,8 +86,8 @@ export async function loadCurriculumContentsState(
   };
 }
 
-export function lessonFallback(category: string, contentId: string): CurriculumLessonPayload {
-  return registryLesson(category, contentId) ?? {
+export async function lessonFallback(category: string, contentId: string): Promise<CurriculumLessonPayload> {
+  return (await registryLesson(category, contentId)) ?? {
     ...fallbackLesson,
     category,
     contentId,
@@ -102,7 +101,7 @@ export async function loadCurriculumLessonState(
   if (!selectedCategory || !selectedContentId) return null;
   if (selectedCategory === CUSTOM_CURRICULUM_CATEGORY) return null;
 
-  const fallback = lessonFallback(selectedCategory, selectedContentId);
+  const fallback = await lessonFallback(selectedCategory, selectedContentId);
   const result = shouldUseApi()
     ? await optional(() => codaroApi.curriculumLesson(selectedCategory, selectedContentId), fallback)
     : { data: fallback, online: false };
