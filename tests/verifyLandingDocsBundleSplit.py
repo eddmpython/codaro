@@ -16,6 +16,7 @@ def main() -> int:
     results = (
         verifyGeneratedDocsNavIsMetadataOnly(),
         verifyDocsPageContentModules(),
+        verifyGeneratedDocsFreshness(),
         verifyDocsRouteLoadsContentOnDemand(),
         verifyPostbuildLoadsDocsContent(),
         verifyBuiltDocsNavChunk(),
@@ -62,6 +63,43 @@ def verifyDocsPageContentModules() -> dict[str, Any]:
     if files and "export const pageContent" not in files[0].read_text(encoding="utf-8"):
         missing.append("docs page modules do not export pageContent")
     return result("docs-page-content-modules", missing, {"moduleCount": len(files)})
+
+
+def verifyGeneratedDocsFreshness() -> dict[str, Any]:
+    checks = (
+        (
+            "docs/skills/ops/foundation/testing-and-gates.md",
+            ("product-quality-audit",),
+            ("product-quality-audit",),
+        ),
+        (
+            "docs/skills/ops/product/service-candidate.md",
+            ("product-quality-audit", "시작 진단 안내"),
+            ("product-quality-audit", "부트스트랩은 <code>/api/system/diagnostics</code>를 읽어 시작 진단 안내"),
+        ),
+    )
+    generatedText = generatedDocsPageText()
+    missing: list[str] = []
+    for relPath, sourceNeedles, generatedNeedles in checks:
+        sourcePath = ROOT / relPath
+        if not sourcePath.exists():
+            missing.append(f"missing source doc {relPath}")
+            continue
+        sourceText = sourcePath.read_text(encoding="utf-8")
+        for needle in sourceNeedles:
+            if needle not in sourceText:
+                missing.append(f"{relPath} missing source needle {needle}")
+        for needle in generatedNeedles:
+            if needle not in generatedText:
+                missing.append(f"generated docs missing {needle}")
+    return result("generated-docs-freshness", missing)
+
+
+def generatedDocsPageText() -> str:
+    path = ROOT / "landing" / "src" / "lib" / "generated" / "docsPages"
+    if not path.exists():
+        return ""
+    return "\n".join(file.read_text(encoding="utf-8") for file in sorted(path.glob("page*.js")))
 
 
 def verifyDocsRouteLoadsContentOnDemand() -> dict[str, Any]:

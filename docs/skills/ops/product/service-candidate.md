@@ -98,6 +98,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - `frontend-performance-budget`는 chunk count, 가장 큰 JS chunk, entry JS chunk, 전체 JS/CSS 크기, curriculum lazy loading 계약을 확인한다.
 - 현재 제품 품질 budget은 가장 큰 JS chunk 400KB 이하, entry JS chunk 300KB 이하, 전체 JS 7.5MB 이하, CSS 160KB 이하로 둔다.
 - desktop/mobile에서 텍스트, 버튼, 카드, TOC, popover가 겹치지 않아야 한다.
+- `landing-build`는 `docs/skills` 핵심 SSOT 문구가 generated docs에 반영된 상태인지도 확인한다.
 
 ## Diagnostic
 

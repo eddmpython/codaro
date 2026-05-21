@@ -123,6 +123,6 @@ uv run python -X utf8 tests/run.py gate launcher-test
 - `curriculum-quality-matrix`는 pandas 하나가 아니라 Python 기초, 파일 처리, 데이터 분석, 시각화, 웹 자동화 대표 주제를 실제 `yamlToDocument`로 materialize한다. `contractGapCount`가 0이 아니거나 섹션 흐름이 `section → explanation → snippet → exercise → check`를 벗어나면 실패한다.
 - `onboarding-browser`는 첫 화면에서 provider 연결 전 fallback이 명확하고 provider 연결 후 실제 응답 사용 상태가 분명한지 본다. 이 gate는 product surface 기준이며 landing page 상태를 대체하지 않는다.
 - `frontend-performance-budget`는 `editor/vite.config.ts`의 chunk split과 build output을 함께 본다. 큰 bundle 경고를 baseline 없이 방치하지 않고, 가장 큰 JS chunk와 전체 JS/CSS 크기를 수치로 남긴다.
-- `landing-build`는 공개 문서 surface가 generated docs 본문 HTML을 nav chunk에 싣지 않는지도 확인한다. `docsNav.js`는 metadata와 `contentModule`만 담고, 각 문서 본문은 `landing/src/lib/generated/docsPages/page*.js`로 분리되어 slug route에서 동적 로딩되어야 한다.
+- `landing-build`는 공개 문서 surface가 generated docs 본문 HTML을 nav chunk에 싣지 않는지도 확인한다. `docsNav.js`는 metadata와 `contentModule`만 담고, 각 문서 본문은 `landing/src/lib/generated/docsPages/page*.js`로 분리되어 slug route에서 동적 로딩되어야 한다. `docs/skills` 핵심 SSOT 문구가 generated docs에 반영되지 않은 stale 상태도 실패로 본다.
 - 기존 부채를 새 테스트로 한 번에 해결하지 못하면 별도 baseline 또는 명시적 TODO 문서로 분리한다.
 - CI YAML은 세부 명령을 소유하지 않고 `tests/run.py gate <name>`만 호출한다.

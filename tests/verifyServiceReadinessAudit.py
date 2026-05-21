@@ -186,6 +186,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             )),
             ("tests/verifyLandingDocsBundleSplit.py", (
                 "MAX_BUILT_DOCS_NAV_BYTES",
+                "generated-docs-freshness",
+                "product-quality-audit",
                 "docsNav.js still contains",
                 "import.meta.glob",
                 "docsPagesWithContent",
