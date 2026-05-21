@@ -54,6 +54,14 @@ def testDiagnosticSummarySeparatesFailureCategoriesAndActions() -> None:
         "retry-package-install",
         "reload-editor",
     ]
+    assert summary["readableActions"] == [
+        "네트워크 점검",
+        "Runtime 재시작",
+        "라이브러리 설치 재시도",
+        "Editor 새로고침",
+    ]
+    assert "Provider 1, Runtime 1, 패키지 1, Frontend 1" in summary["summaryText"]
+    assert "다음: 네트워크 점검, Runtime 재시작, 라이브러리 설치 재시도" in summary["summaryText"]
     assert summary["items"][0]["detail"] == "Bearer [redacted]"
 
 
@@ -101,4 +109,14 @@ def testProviderDiagnosticItemUsesSharedPayloadContract() -> None:
 
     assert summary["categories"]["provider"] == 1
     assert summary["nextActions"] == ["configure-api-key"]
+    assert summary["readableActions"] == ["API 키 입력"]
+    assert "다음: API 키 입력" in summary["summaryText"]
     assert summary["items"][0]["metadata"]["apiKey"] == "[redacted]"
+
+
+def testDiagnosticSummaryProvidesReadableOkState() -> None:
+    summary = buildDiagnosticSummary([])
+
+    assert summary["status"] == "ok"
+    assert summary["readableActions"] == []
+    assert summary["summaryText"] == "진단 정상"

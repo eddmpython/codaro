@@ -64,6 +64,8 @@ const emptyDiagnosticSummary: DiagnosticSummary = {
     frontend: 0,
   },
   nextActions: [],
+  readableActions: [],
+  summaryText: "진단 정상",
 };
 
 export const initialBootstrapState: AppBootstrapState = {
@@ -133,6 +135,13 @@ export function diagnosticNoticeFromSummary(summary: DiagnosticSummary, error?: 
   }
   if (summary.status !== "needs-action" || summary.items.length === 0) {
     return null;
+  }
+  if (summary.summaryText) {
+    return {
+      tone: "warning",
+      title: "시작 진단 필요",
+      detail: summary.summaryText,
+    };
   }
 
   const categories = diagnosticCategoryText(summary.categories);

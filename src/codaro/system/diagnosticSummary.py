@@ -11,6 +11,30 @@ DiagnosticSeverity = Literal["info", "warning", "error"]
 
 DIAGNOSTIC_CATEGORIES: tuple[DiagnosticCategory, ...] = ("provider", "runtime", "package", "frontend")
 SECRET_KEYS = ("token", "apiKey", "api_key", "secret", "password", "authorization")
+CATEGORY_LABELS: dict[DiagnosticCategory, str] = {
+    "provider": "Provider",
+    "runtime": "Runtime",
+    "package": "패키지",
+    "frontend": "Frontend",
+}
+ACTION_LABELS = {
+    "build-editor": "Editor 빌드",
+    "check-network": "네트워크 점검",
+    "check-permission": "권한 확인",
+    "check-provider": "Provider 확인",
+    "check-provider-compatibility": "OAuth 호환성 점검",
+    "configure-api-key": "API 키 입력",
+    "configure-base-url": "Base URL 입력",
+    "connect-provider": "Provider 연결",
+    "create-project-venv": ".venv 준비",
+    "install-uv": "uv 설치",
+    "relogin-provider": "Provider 다시 로그인",
+    "restart-login": "로그인 다시 시작",
+    "restart-runtime": "Runtime 재시작",
+    "retry-later": "잠시 후 재시도",
+    "retry-package-install": "라이브러리 설치 재시도",
+    "reload-editor": "Editor 새로고침",
+}
 
 
 @dataclass(frozen=True)
@@ -56,12 +80,15 @@ def buildDiagnosticSummary(items: list[DiagnosticItem] | tuple[DiagnosticItem, .
             seenActions.add(action)
             actions.append(action)
 
+    readableActions = [readableDiagnosticAction(action) for action in actions]
     return {
         "version": 1,
         "status": "needs-action" if payloadItems else "ok",
         "items": payloadItems,
         "categories": counts,
         "nextActions": actions,
+        "readableActions": readableActions,
+        "summaryText": readableDiagnosticSummaryText(payloadItems, counts, readableActions),
     }
 
 
@@ -126,6 +153,37 @@ def frontendDiagnosticItem(*, code: str, message: str, action: str, detail: str 
         detail=detail,
         metadata=metadata or {},
     )
+
+
+def readableDiagnosticAction(action: str) -> str:
+    return ACTION_LABELS.get(action, action)
+
+
+def readableDiagnosticSummaryText(
+    payloadItems: list[dict[str, Any]],
+    counts: dict[DiagnosticCategory, int],
+    readableActions: list[str],
+) -> str:
+    if not payloadItems:
+        return "진단 정상"
+
+    categories = ", ".join(
+        f"{CATEGORY_LABELS[category]} {count}"
+        for category, count in counts.items()
+        if count > 0
+    )
+    messages = [str(item.get("message") or "") for item in payloadItems[:2]]
+    hiddenCount = max(0, len(payloadItems) - len(messages))
+    issueText = " · ".join(message for message in messages if message)
+    if hiddenCount:
+        issueText = f"{issueText} 외 {hiddenCount}건" if issueText else f"{hiddenCount}건"
+    actionText = ", ".join(readableActions[:3])
+    parts = [
+        categories,
+        issueText,
+        f"다음: {actionText}" if actionText else "",
+    ]
+    return safeDiagnosticText(" · ".join(part for part in parts if part), limit=700)
 
 
 def safeDiagnosticValue(value: Any) -> Any:

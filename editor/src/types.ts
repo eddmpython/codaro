@@ -137,6 +137,8 @@ export type DiagnosticSummary = {
   items: DiagnosticSummaryItem[];
   categories: Record<DiagnosticCategory, number>;
   nextActions: string[];
+  readableActions: string[];
+  summaryText: string;
 };
 
 export type CurriculumCategory = {

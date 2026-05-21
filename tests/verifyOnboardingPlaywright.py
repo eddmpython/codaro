@@ -372,6 +372,8 @@ def diagnosticPayload(ready: bool) -> dict[str, Any]:
             "items": [],
             "categories": {"provider": 0, "runtime": 0, "package": 0, "frontend": 0},
             "nextActions": [],
+            "readableActions": [],
+            "summaryText": "진단 정상",
         }
     return {
         "version": 1,
@@ -389,6 +391,8 @@ def diagnosticPayload(ready: bool) -> dict[str, Any]:
         ],
         "categories": {"provider": 1, "runtime": 0, "package": 0, "frontend": 0},
         "nextActions": ["connect-provider"],
+        "readableActions": ["Provider 연결"],
+        "summaryText": "Provider 1 · 브라우저 로그인 후 실제 provider 응답을 사용할 수 있습니다. · 다음: Provider 연결",
     }
 
 

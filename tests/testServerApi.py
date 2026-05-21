@@ -285,6 +285,9 @@ def testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets(monkeypatch,
     assert payload["status"] == "needs-action"
     assert payload["categories"] == {"provider": 1, "runtime": 0, "package": 2, "frontend": 1}
     assert payload["nextActions"] == ["configure-base-url", "install-uv", "create-project-venv", "build-editor"]
+    assert payload["readableActions"] == ["Base URL 입력", "uv 설치", ".venv 준비", "Editor 빌드"]
+    assert "Provider 1, 패키지 2, Frontend 1" in payload["summaryText"]
+    assert "다음: Base URL 입력, uv 설치, .venv 준비" in payload["summaryText"]
     encoded = json.dumps(payload, ensure_ascii=False)
     assert "sk-diagnosticenv123456" not in encoded
     assert any(item["code"] == "editor-build-missing" for item in payload["items"])

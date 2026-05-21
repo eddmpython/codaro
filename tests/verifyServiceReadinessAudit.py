@@ -277,9 +277,13 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "DIAGNOSTIC_CATEGORIES",
                 "\"provider\", \"runtime\", \"package\", \"frontend\"",
                 "buildDiagnosticSummary",
+                "readableDiagnosticSummaryText",
+                "readableDiagnosticAction",
                 "providerDiagnosticItem",
                 "safeDiagnosticValue",
                 "safeDiagnosticText",
+                "summaryText",
+                "readableActions",
             )),
             ("src/codaro/api/systemRouter.py", (
                 "/api/system/diagnostics",
@@ -292,17 +296,25 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("tests/testDiagnosticSummary.py", (
                 "testDiagnosticSummarySeparatesFailureCategoriesAndActions",
                 "testDiagnosticSummaryRedactsSecretsInTextAndMetadata",
+                "testDiagnosticSummaryProvidesReadableOkState",
                 "testProviderDiagnosticItemUsesSharedPayloadContract",
                 "Bearer [redacted]",
+                "summaryText",
+                "readableActions",
             )),
             ("tests/testServerApi.py", (
                 "testSystemDiagnosticsEndpointSeparatesFailuresAndRedactsSecrets",
                 "/api/system/diagnostics",
                 "configure-base-url",
+                "Base URL 입력",
+                "summaryText",
             )),
             ("tests/verifyDiagnosticSummaryContract.py", (
                 "local diagnostic summary",
                 "provider failure, runtime failure, package failure, frontend failure",
+                "readableDiagnosticSummaryText",
+                "summaryText",
+                "readableActions",
             )),
             ("editor/src/lib/api.ts", (
                 "systemDiagnostics",
@@ -311,6 +323,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("editor/src/lib/appBootstrap.ts", (
                 "diagnosticNoticeFromSummary",
                 "시작 진단 필요",
+                "summary.summaryText",
                 "readableDiagnosticAction",
             )),
             ("editor/src/components/app/topBar.tsx", (
@@ -320,6 +333,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             ("editor/src/types.ts", (
                 "DiagnosticSummary",
                 "\"provider\" | \"runtime\" | \"package\" | \"frontend\"",
+                "summaryText",
+                "readableActions",
             )),
             ("tests/run.py", (
                 "\"diagnostic-summary-contract\"",
@@ -328,6 +343,8 @@ PRODUCT_QUALITY_REQUIREMENTS = (
             )),
             ("docs/skills/ops/product/service-candidate.md", (
                 "token/API key/secret은 diagnostic summary와 로그에 남기지 않는다",
+                "summaryText",
+                "readableActions",
                 "raw JSON은 확장 진단",
                 "diagnostic-summary-contract",
             )),
