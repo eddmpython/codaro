@@ -93,6 +93,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - editor build의 큰 bundle 경고는 baseline 없이 방치하지 않는다.
 - Monaco/CodeMirror, provider/settings, learning surface, 일반 vendor를 한 chunk에 몰아넣지 않는다. React와 일반 vendor를 억지로 나눠 순환 chunk를 만들지 않는다.
 - 기본 커리큘럼 YAML 원문은 bootstrap bundle에 싣지 않는다. 목록은 경량 registry로 만들고, 레슨 YAML은 선택한 레슨을 열 때 lazy loading한다.
+- 공개 문서 surface도 generated docs 본문 HTML을 nav chunk에 싣지 않는다. 문서 목록은 metadata만 들고, 본문은 `docsPages/page*.js`로 분리해 slug route에서 필요한 문서만 로딩한다.
 - `frontend-performance-budget`는 chunk count, 가장 큰 JS chunk, entry JS chunk, 전체 JS/CSS 크기, curriculum lazy loading 계약을 확인한다.
 - 현재 service candidate budget은 가장 큰 JS chunk 400KB 이하, entry JS chunk 300KB 이하, 전체 JS 7.5MB 이하, CSS 160KB 이하로 둔다.
 - desktop/mobile에서 텍스트, 버튼, 카드, TOC, popover가 겹치지 않아야 한다.

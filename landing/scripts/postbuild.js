@@ -8,6 +8,7 @@ const buildRoot = resolve(landingRoot, "build");
 
 const { posts } = await import(pathToFileURL(resolve(landingRoot, "src", "lib", "generated", "posts.js")));
 const { docsPages } = await import(pathToFileURL(resolve(landingRoot, "src", "lib", "generated", "docsNav.js")));
+const docsPagesWithContent = await Promise.all(docsPages.map(loadDocsPageContent));
 
 const siteUrl = "https://eddmpython.github.io/codaro";
 
@@ -65,8 +66,21 @@ writeFileSync(
 
 writeFileSync(
   resolve(buildRoot, "llms-full.txt"),
-  ["# Codaro Full Site Mirror", "", ...posts.map((post) => `## ${post.title}\n\nURL: ${siteUrl}${post.url}\n\n${stripHtml(post.html)}`), ...docsPages.map((page) => `## ${page.title}\n\nURL: ${siteUrl}${page.url}\n\n${stripHtml(page.html)}`), ""].join("\n\n"),
+  ["# Codaro Full Site Mirror", "", ...posts.map((post) => `## ${post.title}\n\nURL: ${siteUrl}${post.url}\n\n${stripHtml(post.html)}`), ...docsPagesWithContent.map((page) => `## ${page.title}\n\nURL: ${siteUrl}${page.url}\n\n${stripHtml(page.html)}`), ""].join("\n\n"),
   "utf-8",
 );
 
 console.log(`[postbuild] sitemap=${urls.length} feed=${posts.length} docs=${docsPages.length}`);
+
+async function loadDocsPageContent(page) {
+  const moduleUrl = pathToFileURL(resolve(
+    landingRoot,
+    "src",
+    "lib",
+    "generated",
+    "docsPages",
+    `${page.contentModule}.js`,
+  ));
+  const { pageContent } = await import(moduleUrl);
+  return { ...page, ...pageContent };
+}

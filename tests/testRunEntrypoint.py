@@ -57,6 +57,7 @@ def testGateNamesAreStable() -> None:
         "curriculum-quality-matrix",
         "onboarding-browser",
         "frontend-performance-budget",
+        "landing-build",
     )
 
 

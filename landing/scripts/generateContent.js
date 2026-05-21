@@ -1,4 +1,5 @@
-import { readFileSync, readdirSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { mkdirSync, readFileSync, readdirSync, writeFileSync } from "node:fs";
 import { dirname, extname, posix, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 import matter from "gray-matter";
@@ -9,6 +10,7 @@ const projectRoot = resolve(__dirname, "..", "..");
 const docsRoot = resolve(projectRoot, "docs");
 const blogRoot = resolve(docsRoot, "blog");
 const generatedRoot = resolve(projectRoot, "landing", "src", "lib", "generated");
+const generatedDocsPageRoot = resolve(generatedRoot, "docsPages");
 const basePath = process.env.NODE_ENV === "development" ? "" : "/codaro";
 
 const blogCategoryMeta = new Map([
@@ -47,6 +49,11 @@ function sortByDateDesc(items) {
 
 function escapeForModule(value) {
   return JSON.stringify(value, null, 2);
+}
+
+function docsContentModuleName(pathValue) {
+  const digest = createHash("sha1").update(pathValue || "index").digest("hex").slice(0, 12);
+  return `page${digest}`;
 }
 
 function collectBlogPosts() {
@@ -236,9 +243,39 @@ function buildDocsSections(pages) {
   })).filter((section) => section.pages.length > 0);
 }
 
+function toDocsNavPage(page) {
+  return {
+    path: page.path,
+    slugSegments: page.slugSegments,
+    title: page.title,
+    description: page.description,
+    section: page.section,
+    sectionLabel: page.sectionLabel,
+    order: page.order,
+    url: page.url,
+    contentModule: docsContentModuleName(page.path),
+  };
+}
+
+function writeDocsPageModules(pages) {
+  mkdirSync(generatedDocsPageRoot, { recursive: true });
+  for (const page of pages) {
+    const content = {
+      html: page.html,
+      text: page.text,
+    };
+    writeFileSync(
+      resolve(generatedDocsPageRoot, `${docsContentModuleName(page.path)}.js`),
+      `export const pageContent = ${escapeForModule(content)};\n`,
+      "utf-8",
+    );
+  }
+}
+
 const posts = collectBlogPosts();
 const docsPages = collectDocsPages();
-const docsSections = buildDocsSections(docsPages);
+const docsNavPages = docsPages.map(toDocsNavPage);
+const docsSections = buildDocsSections(docsNavPages);
 const postCategories = [...new Map(posts.map((post) => [post.category, { slug: post.category, label: post.categoryLabel }])).values()];
 const postSeries = [...new Map(posts.map((post) => [post.series, { slug: post.series, label: post.series }])).values()];
 const searchEntries = [
@@ -262,9 +299,11 @@ const searchEntries = [
 
 const modules = [
   ["posts.js", `export const posts = ${escapeForModule(posts)};\nexport const postCategories = ${escapeForModule(postCategories)};\nexport const postSeries = ${escapeForModule(postSeries)};\n`],
-  ["docsNav.js", `export const docsPages = ${escapeForModule(docsPages)};\nexport const docsSections = ${escapeForModule(docsSections)};\n`],
+  ["docsNav.js", `export const docsPages = ${escapeForModule(docsNavPages)};\nexport const docsSections = ${escapeForModule(docsSections)};\n`],
   ["searchIndex.js", `export const searchEntries = ${escapeForModule(searchEntries)};\n`],
 ];
+
+writeDocsPageModules(docsPages);
 
 for (const [fileName, content] of modules) {
   writeFileSync(resolve(generatedRoot, fileName), content, "utf-8");

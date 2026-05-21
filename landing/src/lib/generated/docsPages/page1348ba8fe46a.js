@@ -1,0 +1,4 @@
+export const pageContent = {
+  "html": "<h1>실행 모델: 투명 스코프 격리</h1>\n<ul>\n<li>사용자는 <strong>그냥 Python을 쓴다</strong>. 함수 래핑 없음, return 없음, 보일러플레이트 없음.</li>\n<li>엔진이 내부에서 셀마다 격리된 네임스페이스로 실행한다.</li>\n<li>AST 분석으로 각 셀이 정의하는 변수(defines)와 사용하는 변수(uses)를 자동 추론한다.</li>\n<li>셀 실행 시 해당 셀이 사용하는 변수만 레지스트리에서 주입한다.</li>\n<li>셀이 삭제되면 그 셀이 정의한 변수도 레지스트리에서 사라진다.</li>\n<li><strong>Jupyter의 편리함 + 리액티브 안전성</strong>, 사용자에게 보이지 않는 곳에서.</li>\n</ul>\n<h2>관련</h2>\n<ul>\n<li>[[reactive-execution]] — 변수 변경의 하위 셀 전파</li>\n<li>[[percent-format]] — 셀 경계 정의</li>\n</ul>\n",
+  "text": "실행 모델: 투명 스코프 격리 사용자는 그냥 Python을 쓴다 . 함수 래핑 없음, return 없음, 보일러플레이트 없음. 엔진이 내부에서 셀마다 격리된 네임스페이스로 실행한다. AST 분석으로 각 셀이 정의하는 변수(defines)와 사용하는 변수(uses)를 자동 추론한다. 셀 실행 시 해당 셀이 사용하는 변수만 레지스트리에서 주입한다. 셀이 삭제되면 그 셀이 정의한 변수도 레지스트리에서 사라진다. Jupyter의 편리함 + 리액티브 안전성 , 사용자에게 보이지 않는 곳에서. 관련 [[reactive execution]] — 변수 변경의 하위 셀 전파 [[percent format]] — 셀 경계 정의"
+};

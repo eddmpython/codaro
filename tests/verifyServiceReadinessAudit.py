@@ -17,6 +17,7 @@ PRODUCT_QUALITY_GATES = (
     "curriculum-quality-matrix",
     "onboarding-browser",
     "frontend-performance-budget",
+    "landing-build",
 )
 
 
@@ -162,17 +163,29 @@ SERVICE_REQUIREMENTS = (
     ),
     ServiceRequirement(
         requirementId="frontend-performance-budget",
-        requirement="Editor bundle splitting and asset budgets are enforced after build without forcing React into a circular split.",
+        requirement="Editor and landing bundle splitting are enforced after build without forcing React into a circular split.",
         evidenceChecks=(
             ("editor/vite.config.ts", ("manualChunks", "@codemirror", "yaml", "vendor")),
             ("docs/skills/ops/product/service-candidate.md", ("React와 일반 vendor를 억지로 나눠 순환 chunk를 만들지 않는다",)),
+            ("docs/skills/ops/product/service-candidate.md", ("docsPages/page*.js", "nav chunk")),
             ("tests/verifyFrontendPerformanceBudget.py", (
                 "MIN_JS_CHUNKS",
                 "MAX_SINGLE_JS_BYTES",
                 "MAX_TOTAL_JS_BYTES",
                 "REQUIRED_CHUNK_LABELS",
             )),
-            ("tests/run.py", ("tests/verifyFrontendPerformanceBudget.py", "\"frontend-performance-budget\"")),
+            ("tests/verifyLandingDocsBundleSplit.py", (
+                "MAX_BUILT_DOCS_NAV_BYTES",
+                "docsNav.js still contains",
+                "import.meta.glob",
+                "docsPagesWithContent",
+            )),
+            ("tests/run.py", (
+                "tests/verifyFrontendPerformanceBudget.py",
+                "\"frontend-performance-budget\"",
+                "tests/verifyLandingDocsBundleSplit.py",
+                "\"landing-build\"",
+            )),
         ),
         forbiddenChecks=(
             ("editor/vite.config.ts", ("react-dom",)),

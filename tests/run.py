@@ -186,8 +186,11 @@ GATES: dict[str, Gate] = {
     ),
     "landing-build": Gate(
         tier="surface",
-        description="문서/landing surface의 static build를 확인한다.",
-        commands=(command(("npm", "run", "build"), cwd="landing"),),
+        description="문서/landing surface의 static build와 docs content bundle split을 확인한다.",
+        commands=(
+            command(("npm", "run", "build"), cwd="landing"),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyLandingDocsBundleSplit.py")),
+        ),
     ),
     "launcher-check": Gate(
         tier="release",
@@ -210,6 +213,7 @@ PRODUCT_QUALITY_GATES = (
     "curriculum-quality-matrix",
     "onboarding-browser",
     "frontend-performance-budget",
+    "landing-build",
 )
 TIER_ORDER = ("fast", "surface", "release")
 
