@@ -6,6 +6,7 @@ import re
 import shutil
 import subprocess
 import sys
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -317,10 +318,25 @@ def runGate(gateName: str) -> int:
 
 
 def runGateSequence(gateNames: tuple[str, ...]) -> int:
+    startedAt = time.monotonic()
+    passed: list[str] = []
     for gateName in gateNames:
+        gateStartedAt = time.monotonic()
         returnCode = runGate(gateName)
+        durationMs = round((time.monotonic() - gateStartedAt) * 1000)
         if returnCode != 0:
+            print(
+                f"FAIL: gate sequence stopped at {gateName} after {len(passed)}/{len(gateNames)} gates "
+                f"(exit {returnCode}, {durationMs} ms)",
+                file=sys.stderr,
+            )
+            if passed:
+                print(f"passed gates: {', '.join(passed)}", file=sys.stderr)
             return returnCode
+        passed.append(f"{gateName}({durationMs}ms)")
+    totalMs = round((time.monotonic() - startedAt) * 1000)
+    print(f"ok: gate sequence passed {len(passed)}/{len(gateNames)} gates in {totalMs} ms")
+    print(f"gates: {', '.join(passed)}")
     return 0
 
 

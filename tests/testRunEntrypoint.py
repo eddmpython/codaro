@@ -87,3 +87,37 @@ def testAuditSelfPasses() -> None:
     runner = loadRunner()
 
     assert runner.auditSelf() == 0
+
+
+def testGateSequencePrintsReadableSummary(monkeypatch, capsys) -> None:
+    runner = loadRunner()
+    calls: list[str] = []
+
+    def fakeRunGate(name: str) -> int:
+        calls.append(name)
+        return 0
+
+    monkeypatch.setattr(runner, "runGate", fakeRunGate)
+
+    assert runner.runGateSequence(("docs", "backend")) == 0
+
+    captured = capsys.readouterr()
+    assert calls == ["docs", "backend"]
+    assert "ok: gate sequence passed 2/2 gates" in captured.out
+    assert "gates: docs(" in captured.out
+    assert "backend(" in captured.out
+
+
+def testGateSequenceFailureReportsCompletedGates(monkeypatch, capsys) -> None:
+    runner = loadRunner()
+
+    def fakeRunGate(name: str) -> int:
+        return 7 if name == "backend" else 0
+
+    monkeypatch.setattr(runner, "runGate", fakeRunGate)
+
+    assert runner.runGateSequence(("docs", "backend", "landing-build")) == 7
+
+    captured = capsys.readouterr()
+    assert "FAIL: gate sequence stopped at backend after 1/3 gates" in captured.err
+    assert "passed gates: docs(" in captured.err

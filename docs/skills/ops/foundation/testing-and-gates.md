@@ -97,7 +97,7 @@ uv run python -X utf8 tests/run.py gate launcher-test
 | `launcher-test` | release | launcher Rust crate 테스트를 직렬 실행한다. |
 
 `preflight`는 로컬 기본 확인이며 현재 `docs`와 `backend`를 실행한다. `backend`가 전체 pytest를 포함하므로 `teacher-eval`과 `teacher-e2e`는 빠른 집중 확인용으로 둔다.
-`quality-cycle`은 제품이 잘 만들어졌는지 보는 반복 검증 단위다. 순서는 `docs` → `backend` → `learning-system-readiness` → `dogfood-alpha-audit` → `product-quality-audit` → `diagnostic-summary-contract` → `ai-live-smoke` → `provider-settings-browser` → `install-launcher-smoke` → `runtime-recovery-contract` → `runtime-recovery-browser` → `curriculum-quality-matrix` → `onboarding-browser` → `frontend-performance-budget` → `landing-build` → `launcher-test`다. 이 명령은 완료 선언을 대신하지 않고, provider, 학습, runtime, 설치/런처, 온보딩, 프론트 성능이 한 사이클에서 함께 버티는지 확인한다.
+`quality-cycle`은 제품이 잘 만들어졌는지 보는 반복 검증 단위다. 순서는 `docs` → `backend` → `learning-system-readiness` → `dogfood-alpha-audit` → `product-quality-audit` → `diagnostic-summary-contract` → `ai-live-smoke` → `provider-settings-browser` → `install-launcher-smoke` → `runtime-recovery-contract` → `runtime-recovery-browser` → `curriculum-quality-matrix` → `onboarding-browser` → `frontend-performance-budget` → `landing-build` → `launcher-test`다. 이 명령은 완료 선언을 대신하지 않고, provider, 학습, runtime, 설치/런처, 온보딩, 프론트 성능이 한 사이클에서 함께 버티는지 확인한다. 묶음 실행이 끝나면 runner는 통과한 gate 수와 gate별 duration summary를 출력해 완료 증거를 사람이 바로 읽을 수 있게 한다.
 
 ## 추가 규칙
 
