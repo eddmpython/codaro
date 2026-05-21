@@ -1,9 +1,11 @@
 from __future__ import annotations
 
 import asyncio
+from datetime import UTC, datetime
 import json
 import os
 import re
+import subprocess
 import sys
 import time
 from dataclasses import dataclass, field
@@ -182,9 +184,11 @@ def main() -> int:
 
 
 def runSingleProvider() -> int:
+    startedAt = utcTimestamp()
+    startedAtMonotonic = time.monotonic()
     selection = selectLiveProvider()
     run = runLiveProvider(selection)
-    payload = singleRunPayload(run)
+    payload = stampLiveSmokePayload(singleRunPayload(run), startedAt=startedAt, startedAtMonotonic=startedAtMonotonic)
     writeLiveSmokeReport(payload)
     if run.credentialMissing:
         print(json.dumps(payload, ensure_ascii=False, indent=2))
@@ -200,8 +204,10 @@ def runSingleProvider() -> int:
 
 
 def runProviderMatrix(providerIds: tuple[str, ...]) -> int:
+    startedAt = utcTimestamp()
+    startedAtMonotonic = time.monotonic()
     runs = tuple(runLiveProvider(selectLiveProvider(providerId)) for providerId in providerIds)
-    payload = matrixRunPayload(runs)
+    payload = stampLiveSmokePayload(matrixRunPayload(runs), startedAt=startedAt, startedAtMonotonic=startedAtMonotonic)
     writeLiveSmokeReport(payload)
     exitCode = matrixExitCode(runs)
     if exitCode == 0:
@@ -308,6 +314,17 @@ def matrixExitCode(runs: tuple[LiveProviderRun, ...]) -> int:
     return 0
 
 
+def stampLiveSmokePayload(payload: dict[str, Any], *, startedAt: str, startedAtMonotonic: float) -> dict[str, Any]:
+    stamped = dict(payload)
+    stamped["startedAt"] = startedAt
+    stamped["completedAt"] = utcTimestamp()
+    stamped["durationMs"] = elapsedMs(startedAtMonotonic)
+    gitHead = currentGitHead()
+    if gitHead:
+        stamped["gitHead"] = gitHead
+    return stamped
+
+
 def writeLiveSmokeReport(payload: dict[str, Any], reportPath: Path = LIVE_SMOKE_REPORT_PATH) -> Path:
     reportPath.parent.mkdir(parents=True, exist_ok=True)
     reportPayload = dict(payload)
@@ -321,6 +338,25 @@ def reportDisplayPath(reportPath: Path) -> str:
         return str(reportPath.relative_to(ROOT))
     except ValueError:
         return str(reportPath)
+
+
+def utcTimestamp() -> str:
+    return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def currentGitHead() -> str | None:
+    try:
+        result = subprocess.run(
+            ["git", "rev-parse", "--short", "HEAD"],
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+    except (FileNotFoundError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() or None
 
 
 def selectLiveProvider(providerOverride: str | None = None) -> LiveProviderSelection:

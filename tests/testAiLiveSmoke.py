@@ -169,6 +169,25 @@ def testWriteLiveSmokeReportPersistsBoundedPayload(tmp_path) -> None:
     assert saved["reportPath"].endswith("live-smoke-report.json")
 
 
+def testStampLiveSmokePayloadAddsEvidenceMetadata(monkeypatch) -> None:
+    smoke = loadSmoke()
+
+    monkeypatch.setattr(smoke, "utcTimestamp", lambda: "2026-05-21T10:00:03+00:00")
+    monkeypatch.setattr(smoke, "currentGitHead", lambda: "abc1234")
+    monkeypatch.setattr(smoke.time, "monotonic", lambda: 103.25)
+
+    payload = smoke.stampLiveSmokePayload(
+        {"passed": True, "status": "passed"},
+        startedAt="2026-05-21T10:00:00+00:00",
+        startedAtMonotonic=100.0,
+    )
+
+    assert payload["startedAt"] == "2026-05-21T10:00:00+00:00"
+    assert payload["completedAt"] == "2026-05-21T10:00:03+00:00"
+    assert payload["durationMs"] == 3250
+    assert payload["gitHead"] == "abc1234"
+
+
 def testRunLiveProviderIncludesCellCallCase(monkeypatch) -> None:
     smoke = loadSmoke()
 

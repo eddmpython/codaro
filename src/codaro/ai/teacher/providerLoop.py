@@ -388,7 +388,12 @@ def providerToolResultWithPolicyHint(
     hint = providerToolPolicyHint(toolName=toolName, arguments=arguments or {}, result=result, policy=policy)
     if not hint:
         return result
-    return {**result, "codaroToolPolicy": hint}
+    return {
+        **result,
+        "codaroNextRequiredTool": hint.get("nextRequiredTool"),
+        "codaroProviderInstruction": hint.get("instruction"),
+        "codaroToolPolicy": hint,
+    }
 
 
 def providerToolPolicyHint(

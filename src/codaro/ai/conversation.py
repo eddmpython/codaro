@@ -31,6 +31,7 @@ _ROLE_PROMPTS: dict[str, str] = {
         "Before writing or running cells that need third-party packages, call packages-check with the required package names; "
         "only call packages-install for packages reported missing, then continue the curriculum or cell-call flow.\n"
         "Tool order for executable learning must be packages-check -> packages-install only when missing -> cell-call.\n"
+        "After a tool result includes codaroProviderInstruction or codaroNextRequiredTool, follow that next tool and do not repeat the completed tool for the same target.\n"
         "Use concise progress text before or around tool work so the user can see steps such as YAML structuring, package check, uv install, cell writing, execution, and validation.\n"
         "Use the provided cell map to choose the right target cell by role/displayKind/executionKind: title cells explain goals, "
         "snippet cells show examples, exercise cells are for student input, check cells validate answers, and automation cells drive workflows.\n"

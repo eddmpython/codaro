@@ -1398,6 +1398,8 @@ def testProviderToolResultSerializationGuidesCellCallAfterReadyPackageCheck() ->
     payload = json.loads(content)
 
     assert payload["missing"] == []
+    assert payload["codaroNextRequiredTool"] == "cell-call"
+    assert "Do not call packages-check again" in payload["codaroProviderInstruction"]
     assert payload["codaroToolPolicy"]["status"] == "packages-ready"
     assert payload["codaroToolPolicy"]["nextRequiredTool"] == "cell-call"
     assert "Do not call packages-check again" in payload["codaroToolPolicy"]["instruction"]
