@@ -1,6 +1,7 @@
 import type {
   AiToolCall,
   AiTraceSummary,
+  ProviderDiagnostic,
 } from "@/types";
 
 export type AssistantMessage = {
@@ -11,6 +12,7 @@ export type AssistantMessage = {
   model?: string | null;
   toolCalls?: AiToolCall[];
   trace?: AiTraceSummary;
+  diagnostic?: ProviderDiagnostic;
   steps?: AssistantWorkStep[];
   tone?: "default" | "warning" | "error";
   action?: "connect-provider";

@@ -18,6 +18,7 @@ export type ProviderActionResult = {
 export type ProviderAssistantFailure = {
   action?: "connect-provider";
   content: string;
+  diagnostic?: ProviderDiagnostic;
   notice: AppNotice;
 };
 
@@ -183,6 +184,7 @@ export function providerAssistantFailure(error: unknown): ProviderAssistantFailu
   return {
     action: authIssue ? "connect-provider" : undefined,
     content,
+    diagnostic,
     notice: {
       tone: "error",
       title: authIssue ? "Provider 연결 필요" : "Provider 사용 불가",

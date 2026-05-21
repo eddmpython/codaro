@@ -230,6 +230,7 @@ export function useAssistantTurnState({
         action: failure.action,
         assistantMessageId,
         content: failure.content,
+        diagnostic: failure.diagnostic,
         messages: current,
       }));
       if (cellTargetBlockId) {

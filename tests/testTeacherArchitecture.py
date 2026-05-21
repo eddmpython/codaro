@@ -6,6 +6,7 @@ import json
 
 import codaro.ai.teacher.providerLoop as teacherProviderLoop
 from codaro.ai.conversation import ConversationManager, buildSystemPrompt
+from codaro.ai.providerErrors import ProviderRuntimeError
 from codaro.ai.toolExecutor import ToolExecutor
 from codaro.ai.teacher import (
     MAXIMUM_TEACHER_EVAL_SCORE,
@@ -182,6 +183,21 @@ class _FailingStreamProvider:
     def stream(self, messages: list[dict]):
         yield "부분 응답"
         raise RuntimeError("stream broken")
+
+
+class _FailingDiagnosticStreamProvider:
+    supportsNativeTools = False
+    provider = "oauth-chatgpt"
+    resolvedModel = "gpt-5.4"
+
+    def stream(self, messages: list[dict]):
+        del messages
+        raise ProviderRuntimeError(
+            "refresh_token expired",
+            action="relogin",
+            provider="oauth-chatgpt",
+            detail="refresh_token expired. Re-login required.",
+        )
 
 
 class _FailingProvider:
@@ -1857,6 +1873,35 @@ def testProviderStreamReportsStreamingErrorsInTrace() -> None:
     assert events[-1]["trace"]["eventCount"] == 2
     assert events[-1]["trace"]["workloop"][0]["workLabel"] == "provider 오류"
     assert events[-1]["trace"]["workloop"][0]["error"] == "stream broken"
+
+
+def testProviderStreamPromotesDiagnosticActionToWorkloop() -> None:
+    convManager = _FakeConversationManager()
+    messages: list[dict] = [{"role": "user", "content": "질문해줘"}]
+    orchestrator = TeacherOrchestrator.fromContext({})
+
+    events = asyncio.run(_collectStreamEvents(runTeacherChatStream(
+        provider=_FailingDiagnosticStreamProvider(),
+        convManager=convManager,
+        conversationId="conv-stream-oauth-refresh",
+        messages=messages,
+        tools=[],
+        executor=_FakeExecutor(),
+        orchestrator=orchestrator,
+    )))
+
+    assert [event["type"] for event in events] == ["start", "error"]
+    assert events[-1]["diagnostic"]["code"] == "provider_relogin_required"
+    assert events[-1]["diagnostic"]["action"] == "relogin-provider"
+    assert events[-1]["diagnostic"]["provider"] == "oauth-chatgpt"
+    workloop = events[-1]["trace"]["workloop"][0]
+    assert workloop["workLabel"] == "provider 오류"
+    assert workloop["provider"] == "oauth-chatgpt"
+    assert workloop["diagnosticCode"] == "provider_relogin_required"
+    assert workloop["diagnosticAction"] == "relogin-provider"
+    assert workloop["workDetail"] == (
+        "provider:oauth-chatgpt · code:provider_relogin_required · action:relogin-provider"
+    )
 
 
 def testProviderStreamReportsToolLoopProviderErrorsInTrace() -> None:

@@ -142,6 +142,10 @@ def _policyViolationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
 
 def _turnErrorWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
     message = _payloadText(event.payload, "message") or _payloadText(event.payload, "error")
+    provider = _payloadText(event.payload, "provider")
+    code = _payloadText(event.payload, "code")
+    action = _payloadText(event.payload, "action")
+    workDetail = _turnErrorWorkDetail(provider=provider, code=code, action=action)
     return {
         "eventIndex": event.eventIndex,
         "eventType": event.eventType,
@@ -152,9 +156,22 @@ def _turnErrorWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:
         "target": "provider-loop",
         "risk": "normal",
         "workLabel": "provider 오류",
-        "workDetail": "provider 응답 처리 중단",
+        "workDetail": workDetail,
+        **({"provider": provider} if provider else {}),
+        **({"diagnosticCode": code} if code else {}),
+        **({"diagnosticAction": action} if action else {}),
         "elapsedMs": event.elapsedMs,
     }
+
+
+def _turnErrorWorkDetail(*, provider: str, code: str, action: str) -> str:
+    parts = [
+        f"provider:{provider}" if provider else "",
+        f"code:{code}" if code else "",
+        f"action:{action}" if action else "",
+    ]
+    detail = " · ".join(part for part in parts if part)
+    return detail or "provider 응답 처리 중단"
 
 
 def _clarificationWorkloopEvent(event: TeacherTraceEvent) -> dict[str, Any]:

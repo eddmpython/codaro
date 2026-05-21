@@ -143,7 +143,7 @@ export function AssistantMessages({
           <LoadingState title="Codaro 여는 중" detail="노트북, 커리큘럼, 자동화 상태를 불러오고 있습니다." />
         ) : messages.length ? (
           messages.map((message) => {
-            const needsProvider = message.action === "connect-provider" || isProviderAuthMessage(message.content);
+            const needsProvider = shouldOfferProviderSettings(message);
             const isWriting = message.role === "assistant" && message.loading;
             const hasWorkSteps = Boolean(message.steps?.length);
             return (
@@ -164,7 +164,7 @@ export function AssistantMessages({
                       <div className="flex items-start gap-2 text-destructive">
                         <AlertCircle className="mt-1 size-4 shrink-0" />
                         <div className="min-w-0">
-                          <AssistantMarkdown content={cleanAssistantMessage(message.content)} />
+                          <AssistantMarkdown content={cleanAssistantMessage(message.content, message.diagnostic)} />
                           {needsProvider ? (
                             <ProviderConnectAction
                               aiConnecting={aiConnecting}
@@ -177,7 +177,7 @@ export function AssistantMessages({
                     ) : (
                       <>
                         {message.content.trim() ? (
-                          <AssistantMarkdown content={cleanAssistantMessage(message.content)} />
+                          <AssistantMarkdown content={cleanAssistantMessage(message.content, message.diagnostic)} />
                         ) : null}
                         <AssistantWorkLoop steps={message.steps} trace={message.trace} />
                         {isWriting ? (
@@ -694,7 +694,23 @@ function isProviderAuthMessage(content: string) {
   );
 }
 
-function cleanAssistantMessage(content: string) {
+const providerSettingsMessageActions = new Set([
+  "connect-provider",
+  "relogin-provider",
+  "restart-login",
+  "configure-api-key",
+  "configure-base-url",
+]);
+
+function shouldOfferProviderSettings(message: AssistantMessage) {
+  if (message.action === "connect-provider") return true;
+  const diagnosticAction = message.diagnostic?.action;
+  if (diagnosticAction) return providerSettingsMessageActions.has(diagnosticAction);
+  return isProviderAuthMessage(message.content);
+}
+
+function cleanAssistantMessage(content: string, diagnostic?: AssistantMessage["diagnostic"]) {
+  if (diagnostic?.message) return diagnostic.message;
   return isProviderAuthMessage(content)
     ? "provider 로그인이 필요합니다. Provider 설정에서 브라우저 로그인을 완료한 뒤 다시 요청하세요."
     : content.replace(/^503\s+/, "");
@@ -715,7 +731,7 @@ function ProviderConnectAction({
   return (
     <Button className="mt-2 h-8 gap-1.5 px-3 text-xs" disabled={aiConnecting || !onConnectAi} size="sm" onClick={onConnectAi}>
       {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogIn className="size-3.5" />}
-      Provider 연결
+      Provider 설정
     </Button>
   );
 }

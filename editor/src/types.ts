@@ -343,6 +343,9 @@ export type AiTraceWorkloopEvent = {
   lane?: string;
   target?: string;
   risk?: string;
+  provider?: string;
+  diagnosticCode?: string;
+  diagnosticAction?: string;
   workLabel?: string;
   workDetail?: string;
   elapsedMs?: number;

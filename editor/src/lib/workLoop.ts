@@ -132,6 +132,9 @@ function normalizeTraceWorkloopEvent(value: unknown): AiTraceWorkloopEvent | und
   copyStringField(item, normalized, "lane");
   copyStringField(item, normalized, "target");
   copyStringField(item, normalized, "risk");
+  copyStringField(item, normalized, "provider");
+  copyStringField(item, normalized, "diagnosticCode");
+  copyStringField(item, normalized, "diagnosticAction");
   copyStringField(item, normalized, "workLabel");
   copyStringField(item, normalized, "workDetail");
   if (typeof item.error === "string" || item.error === null) normalized.error = item.error;

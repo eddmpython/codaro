@@ -76,6 +76,7 @@ export function applyAssistantStreamEvent({
         ...item,
         tone: "error",
         content: event.error ?? "요청 처리 중 오류가 발생했습니다.",
+        diagnostic: event.diagnostic,
         steps: markAssistantStepsError(item.steps),
         trace: normalizeAssistantTrace(event.trace),
         loading: false,
@@ -127,11 +128,13 @@ export function failAssistantMessage({
   action,
   assistantMessageId,
   content,
+  diagnostic,
   messages,
 }: {
   action?: AssistantMessage["action"];
   assistantMessageId: string;
   content: string;
+  diagnostic?: AssistantMessage["diagnostic"];
   messages: AssistantMessage[];
 }): AssistantMessage[] {
   return updateAssistantMessage(messages, assistantMessageId, (item) => ({
@@ -139,6 +142,7 @@ export function failAssistantMessage({
     tone: "error",
     action,
     content,
+    diagnostic,
     steps: markAssistantStepsError(item.steps),
     loading: false,
   }));

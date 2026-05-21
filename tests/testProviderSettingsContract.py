@@ -63,7 +63,10 @@ def test_provider_settings_shows_live_fallback_and_failure_actions() -> None:
 
 def test_provider_failure_notice_and_assistant_auth_boundary_use_diagnostics() -> None:
     hook = read("editor/src/hooks/useProviderConnection.ts")
+    assistantTurn = read("editor/src/hooks/useAssistantTurnState.ts")
+    conversation = read("editor/src/lib/assistantConversationState.ts")
     connection = read("editor/src/lib/providerConnection.ts")
+    panel = read("editor/src/components/assistant/assistantPanel.tsx")
 
     assert_markers(
         connection,
@@ -76,5 +79,9 @@ def test_provider_failure_notice_and_assistant_auth_boundary_use_diagnostics() -
     )
     assert "diagnostic?.action" in connection
     assert "normalized.includes(\"oauth\")" in connection
+    assert "diagnostic: event.diagnostic" in conversation
+    assert "diagnostic: failure.diagnostic" in assistantTurn
+    assert "shouldOfferProviderSettings(message)" in panel
+    assert "providerSettingsMessageActions.has(diagnosticAction)" in panel
     assert "providerActionFailureNotice" in hook
     assert hook.count("providerActionFailureNotice(") >= 3
