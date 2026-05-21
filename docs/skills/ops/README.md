@@ -40,9 +40,10 @@ Git, 릴리즈, 라이선스, 패키징처럼 외부 배포와 권리 경계에 
 
 ## Product
 
-사용자에게 보이는 제품 정체성과 브랜드 자산 규칙.
+사용자에게 보이는 제품 정체성, 브랜드 자산, local alpha 판단 규칙.
 
 - [branding](product/branding.md)
+- [dogfood-alpha](product/dogfood-alpha.md)
 
 ## Tools
 

@@ -32,6 +32,7 @@ def testGateNamesAreStable() -> None:
         "editor-runtime-preflight",
         "learning-system-readiness",
         "learning-goal-audit",
+        "dogfood-alpha-audit",
         "learning-card-contract",
         "learning-card-browser",
         "provider-settings-browser",

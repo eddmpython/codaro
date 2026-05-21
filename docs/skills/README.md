@@ -125,6 +125,7 @@ Release:
 Product:
 
 - [branding](ops/product/branding.md)
+- [dogfood-alpha](ops/product/dogfood-alpha.md)
 
 ## 후속 (PR 2 이후)
 

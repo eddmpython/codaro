@@ -90,11 +90,18 @@ GATES: dict[str, Gate] = {
         commands=(
             command(("uv", "run", "python", "-X", "utf8", "docs/skills/ops/tools/syncAgentsMd.py", "--check")),
             command(("uv", "run", "python", "-X", "utf8", "tests/run.py", "audit-self")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyDogfoodAlphaAudit.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningGoalObjectiveAudit.py")),
             command(("uv", "run", "python", "-X", "utf8", "tests/verifyLearningSystemReadiness.py")),
             command(("uv", "run", "pytest", "tests/", "-q", "--tb=short")),
             command(("npm", "run", "build"), cwd="landing"),
         ),
+        ci_required=False,
+    ),
+    "dogfood-alpha-audit": Gate(
+        tier="surface",
+        description="첫 사용자 provider 연결, 질문, 학습 생성, 셀 실행, 실패 복구 플로우의 증거를 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyDogfoodAlphaAudit.py")),),
         ci_required=False,
     ),
     "learning-card-contract": Gate(
@@ -199,8 +206,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 16:
-        failures.append(f"expected 16 gates, found {len(GATES)}")
+    if len(GATES) != 17:
+        failures.append(f"expected 17 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
