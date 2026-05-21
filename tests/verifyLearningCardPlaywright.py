@@ -3,10 +3,8 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import shutil
 import socket
 import sys
-import tempfile
 import time
 import urllib.request
 from pathlib import Path
@@ -16,7 +14,7 @@ import yaml
 
 from browserStaticServer import StaticAppServer
 from codaro.curriculum.converter import yamlToDocument
-from playwrightCli import PlaywrightCli, PlaywrightCliError, resolvePlaywrightCli
+from playwrightCli import PlaywrightCli, PlaywrightCliError, repoLocalPlaywrightWorkspace, resolvePlaywrightCli
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,7 +32,7 @@ def main(argv: list[str] | None = None) -> int:
 
     port = args.port or freePort()
     url = f"http://127.0.0.1:{port}/#curriculum"
-    tempRoot = Path(tempfile.mkdtemp(prefix="codaro-learning-card-pw-"))
+    workspace = repoLocalPlaywrightWorkspace(ROOT, "learning-card-browser")
     session = f"codaro-learning-card-{int(time.time())}"
     server = StaticAppServer(port=port)
     server.start()
@@ -42,7 +40,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         waitForHttp(url)
-        cli = PlaywrightCli(cliPath=cliPath, cwd=tempRoot, session=session)
+        cli = PlaywrightCli(cliPath=cliPath, cwd=workspace, session=session)
         cli.run("open", url)
         cli.run("resize", "1280", "900")
         cli.run("localstorage-set", STORAGE_KEY, json.dumps([customCurriculumEntry()], ensure_ascii=False))
@@ -82,7 +80,6 @@ def main(argv: list[str] | None = None) -> int:
         if cli is not None:
             cli.close()
         server.stop()
-        shutil.rmtree(tempRoot, ignore_errors=True)
 
 
 def buildParser() -> argparse.ArgumentParser:

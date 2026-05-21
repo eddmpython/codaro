@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import subprocess
 import time
 from pathlib import Path
@@ -75,9 +76,9 @@ class PlaywrightCli:
 
     def _env(self) -> dict[str, str]:
         env = os.environ.copy()
-        env.setdefault("PLAYWRIGHT_DAEMON_SESSION_DIR", str(self._daemonDir))
-        env.setdefault("PLAYWRIGHT_SERVER_REGISTRY", str(self._serverRegistryDir))
-        env.setdefault("PLAYWRIGHT_SKIP_BROWSER_GC", "1")
+        env["PLAYWRIGHT_DAEMON_SESSION_DIR"] = str(self._daemonDir)
+        env["PLAYWRIGHT_SERVER_REGISTRY"] = str(self._serverRegistryDir)
+        env["PLAYWRIGHT_SKIP_BROWSER_GC"] = "1"
         return env
 
 
@@ -110,6 +111,23 @@ def resolvePlaywrightCli(root: Path) -> Path:
         "playwright-cli is not available locally. Install editor dev dependencies or set CODARO_PLAYWRIGHT_CLI "
         "to an existing playwright-cli executable."
     )
+
+
+def repoLocalPlaywrightWorkspace(root: Path, name: str) -> Path:
+    safeName = re.sub(r"[^A-Za-z0-9_.-]+", "-", name).strip("-") or "playwright"
+    outputRoot = (root / "output" / "test-runner").resolve()
+    envScratch = os.environ.get("TMPDIR") or os.environ.get("TEMP") or os.environ.get("TMP")
+
+    if envScratch:
+        scratchPath = Path(envScratch).resolve()
+        if scratchPath == outputRoot or outputRoot in scratchPath.parents:
+            workspace = scratchPath / "playwright" / safeName
+            workspace.mkdir(parents=True, exist_ok=True)
+            return workspace
+
+    workspace = outputRoot / safeName / "scratch" / "playwright"
+    workspace.mkdir(parents=True, exist_ok=True)
+    return workspace
 
 
 def isPlaywrightEvalError(output: str) -> bool:

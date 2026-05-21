@@ -107,6 +107,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - token/API key/secret은 diagnostic summary와 로그에 남기지 않는다.
 - 문제 재현에는 provider/model/latency/error/tool sequence/workloop trace가 충분해야 한다.
 - gate 실행은 `tests/run.py`가 repo-local `output/test-runner/<gate>/` 아래로 실행 작업공간을 격리하고, uv/pytest cache는 비활성화하며, pytest basetemp, cargo target, scratch env를 고정해 사용자 홈 권한이나 기존 build lock과 충돌하지 않게 한다.
+- 브라우저 gate 직접 실행도 repo-local `output/test-runner/<verifier>/scratch/playwright` 아래에서 Playwright daemon/session 파일을 만든다. OS temp에 임의 디렉터리를 만들지 않고, 외부 Playwright session env가 남아 있어도 wrapper가 repo-local workspace로 덮어쓴다.
 
 ## Gate
 

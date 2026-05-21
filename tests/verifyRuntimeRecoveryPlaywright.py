@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 import socket
 import sys
-import tempfile
 import threading
 import time
 import urllib.error
@@ -19,7 +17,7 @@ import yaml
 
 from browserStaticServer import StaticAppServer
 from codaro.curriculum.converter import yamlToDocument
-from playwrightCli import PlaywrightCli, PlaywrightCliError, resolvePlaywrightCli
+from playwrightCli import PlaywrightCli, PlaywrightCliError, repoLocalPlaywrightWorkspace, resolvePlaywrightCli
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -42,7 +40,7 @@ def main(argv: list[str] | None = None) -> int:
     api = RuntimeRecoveryStubApi(port=freePort())
     api.start()
     url = f"http://127.0.0.1:{appPort}/#curriculum"
-    tempRoot = Path(tempfile.mkdtemp(prefix="codaro-runtime-recovery-pw-"))
+    workspace = repoLocalPlaywrightWorkspace(ROOT, "runtime-recovery-browser")
     session = f"codaro-runtime-recovery-{int(time.time())}"
     server = StaticAppServer(port=appPort, apiBaseUrl=api.baseUrl)
     server.start()
@@ -50,7 +48,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         waitForHttp(url)
-        cli = PlaywrightCli(cliPath=cliPath, cwd=tempRoot, session=session)
+        cli = PlaywrightCli(cliPath=cliPath, cwd=workspace, session=session)
         cli.run("open", url)
         cli.run("resize", "1280", "900")
         cli.run("localstorage-set", STORAGE_KEY, json.dumps([
@@ -84,7 +82,6 @@ def main(argv: list[str] | None = None) -> int:
             cli.close()
         server.stop()
         api.stop()
-        shutil.rmtree(tempRoot, ignore_errors=True)
 
 
 def buildParser() -> argparse.ArgumentParser:

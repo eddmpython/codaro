@@ -2,10 +2,8 @@ from __future__ import annotations
 
 import argparse
 import json
-import shutil
 import socket
 import sys
-import tempfile
 import threading
 import time
 import urllib.error
@@ -16,7 +14,7 @@ from pathlib import Path
 from typing import Any
 
 from browserStaticServer import StaticAppServer
-from playwrightCli import PlaywrightCli, PlaywrightCliError, resolvePlaywrightCli
+from playwrightCli import PlaywrightCli, PlaywrightCliError, repoLocalPlaywrightWorkspace, resolvePlaywrightCli
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -34,7 +32,7 @@ def main(argv: list[str] | None = None) -> int:
     api = ProviderStubApi(port=freePort())
     api.start()
     url = f"http://127.0.0.1:{appPort}/#chat"
-    tempRoot = Path(tempfile.mkdtemp(prefix="codaro-provider-settings-pw-"))
+    workspace = repoLocalPlaywrightWorkspace(ROOT, "provider-settings-browser")
     session = f"codaro-provider-settings-{int(time.time())}"
     server = StaticAppServer(port=appPort, apiBaseUrl=api.baseUrl)
     server.start()
@@ -42,7 +40,7 @@ def main(argv: list[str] | None = None) -> int:
 
     try:
         waitForHttp(url)
-        cli = PlaywrightCli(cliPath=cliPath, cwd=tempRoot, session=session)
+        cli = PlaywrightCli(cliPath=cliPath, cwd=workspace, session=session)
         cli.run("open", url)
         cli.run("resize", "1280", "900")
         cli.waitEval(jsPageReady(), "app ready")
@@ -87,7 +85,6 @@ def main(argv: list[str] | None = None) -> int:
             cli.close()
         server.stop()
         api.stop()
-        shutil.rmtree(tempRoot, ignore_errors=True)
 
 
 def buildParser() -> argparse.ArgumentParser:
