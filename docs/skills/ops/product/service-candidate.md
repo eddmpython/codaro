@@ -118,7 +118,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 
 ## Gate
 
-제품 품질 판단은 아래 gate 조합으로 한다. 수동으로 일부만 골라 실행하지 말고 같은 순서를 고정한 `quality-cycle`을 우선 사용한다. runner는 `output/test-runner/quality-cycle/sequence-summary.json`에 현재 `gitHead`, `startedAt`/`completedAt`, gate별 duration, return code, `softFailureCount`, artifact freshness를 남겨 어떤 커밋에서 어떤 증거가 나온 것인지 확인할 수 있게 한다. `ai-live-smoke` credential missing exit code 2는 `softFailure: true`로 남기고 다음 gate를 계속 실행한다. 실제 provider 실패 exit code 1은 hard failure로 처리해 quality-cycle을 중단한다.
+제품 품질 판단은 아래 gate 조합으로 한다. 수동으로 일부만 골라 실행하지 말고 같은 순서를 고정한 `quality-cycle`을 우선 사용한다. runner는 `output/test-runner/quality-cycle/sequence-summary.json`에 현재 `gitHead`, `startedAt`/`completedAt`, gate별 duration, return code, `softFailureCount`, artifact freshness, artifact `payloadGitHead`/`gitHeadMatches`를 남겨 어떤 커밋에서 어떤 증거가 나온 것인지 확인할 수 있게 한다. `ai-live-smoke`처럼 report가 있는 gate의 payload git head가 sequence head와 다르면 artifact failure로 처리한다. `ai-live-smoke` credential missing exit code 2는 `softFailure: true`로 남기고 다음 gate를 계속 실행한다. 실제 provider 실패 exit code 1은 hard failure로 처리해 quality-cycle을 중단한다.
 
 ```bash
 uv run python -X utf8 tests/run.py quality-cycle

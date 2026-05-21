@@ -329,19 +329,25 @@ def runGate(gateName: str) -> int:
 def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-sequence") -> int:
     startedAt = time.monotonic()
     sequenceStartedAt = utcTimestamp()
+    sequenceGitHead = currentGitHead()
     results: list[dict[str, object]] = []
     for gateName in gateNames:
         gateStartedAt = time.monotonic()
         gateStartedAtNs = time.time_ns()
-        returnCode = runGate(gateName)
+        commandReturnCode = runGate(gateName)
+        artifacts = gateArtifactSummaries(gateName, gateStartedAtNs, expectedGitHead=sequenceGitHead)
+        artifactFailure = commandReturnCode == 0 and hasArtifactEvidenceFailure(artifacts)
+        returnCode = 1 if artifactFailure else commandReturnCode
         softFailure = isSoftGateExit(gateName, returnCode)
         durationMs = round((time.monotonic() - gateStartedAt) * 1000)
         results.append({
             "gate": gateName,
             "returnCode": returnCode,
+            "commandReturnCode": commandReturnCode,
             "softFailure": softFailure,
+            "artifactFailure": artifactFailure,
             "durationMs": durationMs,
-            "artifacts": gateArtifactSummaries(gateName, gateStartedAtNs),
+            "artifacts": artifacts,
         })
         if returnCode != 0 and not softFailure:
             writeGateSequenceSummary(
@@ -350,6 +356,7 @@ def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-seq
                 results=results,
                 totalMs=round((time.monotonic() - startedAt) * 1000),
                 startedAt=sequenceStartedAt,
+                gitHead=sequenceGitHead,
             )
             passed = tuple(f"{result['gate']}({result['durationMs']}ms)" for result in results if result["returnCode"] == 0)
             print(
@@ -367,6 +374,7 @@ def runGateSequence(gateNames: tuple[str, ...], *, sequenceName: str = "gate-seq
         results=results,
         totalMs=totalMs,
         startedAt=sequenceStartedAt,
+        gitHead=sequenceGitHead,
     )
     passed = tuple(f"{result['gate']}({result['durationMs']}ms)" for result in results)
     softFailures = tuple(result for result in results if result.get("softFailure"))
@@ -397,6 +405,7 @@ def writeGateSequenceSummary(
     results: list[dict[str, object]],
     totalMs: int,
     startedAt: str,
+    gitHead: str | None,
 ) -> Path:
     summaryDir = localGateWorkspace(sequenceName)
     summaryDir.mkdir(parents=True, exist_ok=True)
@@ -414,7 +423,7 @@ def writeGateSequenceSummary(
         "totalMs": totalMs,
         "startedAt": startedAt,
         "completedAt": utcTimestamp(),
-        "gitHead": currentGitHead(),
+        "gitHead": gitHead,
         "summaryPath": displayPath(summaryPath),
         "failedGate": failed["gate"] if failed else None,
         "gates": results,
@@ -423,8 +432,13 @@ def writeGateSequenceSummary(
     return summaryPath
 
 
-def gateArtifactSummaries(gateName: str, gateStartedAtNs: int) -> list[dict[str, bool | int | str | None]]:
-    summaries: list[dict[str, bool | int | str | None]] = []
+def gateArtifactSummaries(
+    gateName: str,
+    gateStartedAtNs: int,
+    *,
+    expectedGitHead: str | None = None,
+) -> list[dict[str, object]]:
+    summaries: list[dict[str, object]] = []
     for relPath in GATE_ARTIFACTS.get(gateName, ()):
         path = ROOT / relPath
         if not path.exists():
@@ -436,13 +450,72 @@ def gateArtifactSummaries(gateName: str, gateStartedAtNs: int) -> list[dict[str,
             })
             continue
         modifiedAtNs = path.stat().st_mtime_ns
-        summaries.append({
+        summary: dict[str, object] = {
             "path": relPath,
             "exists": True,
             "fresh": modifiedAtNs >= gateStartedAtNs,
             "modifiedAtNs": modifiedAtNs,
-        })
+        }
+        summary.update(jsonArtifactEvidence(path, expectedGitHead=expectedGitHead))
+        summaries.append(summary)
     return summaries
+
+
+def jsonArtifactEvidence(path: Path, *, expectedGitHead: str | None) -> dict[str, object]:
+    if path.suffix.lower() != ".json":
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError, UnicodeDecodeError):
+        return {"payloadReadable": False}
+    if not isinstance(payload, dict):
+        return {"payloadReadable": False}
+    evidence: dict[str, object] = {"payloadReadable": True}
+    copyScalarEvidence(evidence, payload, "passed", "payloadPassed", bool)
+    copyScalarEvidence(evidence, payload, "status", "payloadStatus", str)
+    copyScalarEvidence(evidence, payload, "startedAt", "payloadStartedAt", str)
+    copyScalarEvidence(evidence, payload, "completedAt", "payloadCompletedAt", str)
+    copyScalarEvidence(evidence, payload, "durationMs", "payloadDurationMs", int)
+    copyScalarEvidence(evidence, payload, "softFailureCount", "payloadSoftFailureCount", int)
+    gitHead = payload.get("gitHead")
+    if isinstance(gitHead, str) and gitHead:
+        evidence["payloadGitHead"] = gitHead
+        if expectedGitHead:
+            evidence["gitHeadMatches"] = gitHeadsMatch(gitHead, expectedGitHead)
+    elif expectedGitHead:
+        evidence["gitHeadMatches"] = False
+    return evidence
+
+
+def copyScalarEvidence(
+    evidence: dict[str, object],
+    payload: dict[str, object],
+    sourceKey: str,
+    targetKey: str,
+    expectedType: type,
+) -> None:
+    value = payload.get(sourceKey)
+    if isinstance(value, expectedType):
+        evidence[targetKey] = value
+
+
+def gitHeadsMatch(artifactGitHead: str, expectedGitHead: str) -> bool:
+    artifact = artifactGitHead.strip()
+    expected = expectedGitHead.strip()
+    if not artifact or not expected:
+        return False
+    return artifact == expected or artifact.startswith(expected) or expected.startswith(artifact)
+
+
+def hasArtifactEvidenceFailure(summaries: list[dict[str, object]]) -> bool:
+    for summary in summaries:
+        if summary.get("exists") is False or summary.get("fresh") is False:
+            return True
+        if summary.get("payloadReadable") is False:
+            return True
+        if summary.get("gitHeadMatches") is False:
+            return True
+    return False
 
 
 def displayPath(path: Path) -> str:

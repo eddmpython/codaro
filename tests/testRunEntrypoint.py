@@ -155,6 +155,80 @@ def testGateSequencePrintsReadableSummary(monkeypatch, capsys, tmp_path) -> None
     assert isinstance(backendArtifacts[0]["modifiedAtNs"], int)
 
 
+def testGateSequenceRecordsArtifactPayloadMetadata(monkeypatch, tmp_path) -> None:
+    runner = loadRunner()
+    artifactRelPath = "output/test-runner/ai-live-smoke/live-smoke-report.json"
+
+    def fakeRunGate(name: str) -> int:
+        artifactPath = tmp_path / artifactRelPath
+        artifactPath.parent.mkdir(parents=True, exist_ok=True)
+        artifactPath.write_text(
+            json.dumps({
+                "passed": True,
+                "status": "passed",
+                "startedAt": "2026-05-22T00:00:00+00:00",
+                "completedAt": "2026-05-22T00:00:03+00:00",
+                "durationMs": 3000,
+                "gitHead": "abcdef1",
+            }),
+            encoding="utf-8",
+        )
+        return 0
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_ARTIFACTS", {"ai-live-smoke": (artifactRelPath,)})
+    monkeypatch.setattr(runner, "currentGitHead", lambda: "abcdef1234567890")
+    monkeypatch.setattr(runner, "runGate", fakeRunGate)
+
+    assert runner.runGateSequence(("ai-live-smoke",), sequenceName="artifact-sequence") == 0
+
+    payload = json.loads((tmp_path / "artifact-sequence" / "sequence-summary.json").read_text(encoding="utf-8"))
+    artifact = payload["gates"][0]["artifacts"][0]
+    assert payload["gitHead"] == "abcdef1234567890"
+    assert artifact["payloadReadable"] is True
+    assert artifact["payloadPassed"] is True
+    assert artifact["payloadStatus"] == "passed"
+    assert artifact["payloadGitHead"] == "abcdef1"
+    assert artifact["gitHeadMatches"] is True
+    assert artifact["payloadDurationMs"] == 3000
+
+
+def testGateSequenceFailsWhenArtifactGitHeadDoesNotMatch(monkeypatch, capsys, tmp_path) -> None:
+    runner = loadRunner()
+    artifactRelPath = "output/test-runner/ai-live-smoke/live-smoke-report.json"
+
+    def fakeRunGate(name: str) -> int:
+        artifactPath = tmp_path / artifactRelPath
+        artifactPath.parent.mkdir(parents=True, exist_ok=True)
+        artifactPath.write_text(
+            json.dumps({"passed": True, "status": "passed", "gitHead": "deadbeef"}),
+            encoding="utf-8",
+        )
+        return 0
+
+    monkeypatch.setattr(runner, "ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_WORK_ROOT", tmp_path)
+    monkeypatch.setattr(runner, "GATE_ARTIFACTS", {"ai-live-smoke": (artifactRelPath,)})
+    monkeypatch.setattr(runner, "currentGitHead", lambda: "abcdef1234567890")
+    monkeypatch.setattr(runner, "runGate", fakeRunGate)
+
+    assert runner.runGateSequence(("ai-live-smoke", "backend"), sequenceName="stale-artifact-sequence") == 1
+
+    captured = capsys.readouterr()
+    assert "FAIL: gate sequence stopped at ai-live-smoke" in captured.err
+    payload = json.loads((tmp_path / "stale-artifact-sequence" / "sequence-summary.json").read_text(encoding="utf-8"))
+    firstGate = payload["gates"][0]
+    artifact = firstGate["artifacts"][0]
+    assert payload["passed"] is False
+    assert payload["failedGate"] == "ai-live-smoke"
+    assert firstGate["commandReturnCode"] == 0
+    assert firstGate["returnCode"] == 1
+    assert firstGate["artifactFailure"] is True
+    assert artifact["payloadGitHead"] == "deadbeef"
+    assert artifact["gitHeadMatches"] is False
+
+
 def testGateSequenceFailureReportsCompletedGates(monkeypatch, capsys, tmp_path) -> None:
     runner = loadRunner()
 
