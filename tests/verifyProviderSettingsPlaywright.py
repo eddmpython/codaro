@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import argparse
+from datetime import UTC, datetime
 import json
 import socket
+import subprocess
 import sys
 import threading
 import time
@@ -18,13 +20,27 @@ from playwrightCli import PlaywrightCli, PlaywrightCliError, repoLocalPlaywright
 
 
 ROOT = Path(__file__).resolve().parents[1]
+PROVIDER_SETTINGS_REPORT_PATH = ROOT / "output" / "test-runner" / "provider-settings-browser" / "provider-settings-report.json"
 
 
 def main(argv: list[str] | None = None) -> int:
+    startedAt = utcTimestamp()
+    started = time.monotonic()
+    checks: list[dict[str, Any]] = []
     args = buildParser().parse_args(argv)
     try:
         cliPath = resolvePlaywrightCli(ROOT)
     except PlaywrightCliError as exc:
+        writeProviderSettingsReport(
+            {
+                "passed": False,
+                "status": "failed",
+                "checks": checks,
+                "error": str(exc),
+            },
+            startedAt=startedAt,
+            startedAtMonotonic=started,
+        )
         print(f"FAIL: {exc}", file=sys.stderr)
         return 1
 
@@ -47,27 +63,58 @@ def main(argv: list[str] | None = None) -> int:
         cli.eval(jsDisablePopup())
         cli.eval(jsOpenProviderSettings())
         cli.waitEval(jsProviderSheetReady(), "provider settings sheet")
-        initial = cli.eval(jsAssertInitialProviderSettings())
-        oauthLoginFailure = cli.eval(jsLoginOauthFailure())
+        initial = recordCheck(checks, "initial-provider-settings", cli.eval(jsAssertInitialProviderSettings()))
+        oauthLoginFailure = recordCheck(checks, "oauth-state-mismatch", cli.eval(jsLoginOauthFailure()))
         cli.eval(jsConfigureStub({"oauthStatusMode": "permission_denied"}))
-        oauthPermissionFailure = cli.eval(jsLoginOauthPermissionFailure())
+        oauthPermissionFailure = recordCheck(checks, "oauth-permission-denied", cli.eval(jsLoginOauthPermissionFailure()))
         cli.eval(jsConfigureStub({"oauthStatusMode": "success", "oauthValidationMode": "valid"}))
-        oauthLoginSuccess = cli.eval(jsLoginOauthSuccess())
+        oauthLoginSuccess = recordCheck(checks, "oauth-login-success", cli.eval(jsLoginOauthSuccess()))
         cli.eval(jsOpenProviderSettings())
         cli.waitEval(jsProviderSheetReady(), "provider settings sheet after OAuth login")
-        oauthLive = cli.eval(jsAssertOauthLive())
-        selected = cli.eval(jsSelectStoredOpenaiProvider())
+        oauthLive = recordCheck(checks, "oauth-live-status", cli.eval(jsAssertOauthLive()))
+        selected = recordCheck(checks, "openai-provider-selected", cli.eval(jsSelectStoredOpenaiProvider()))
         cli.waitEval(jsOpenaiLiveReady(), "openai provider live validation")
-        openai = cli.eval(jsAssertOpenaiLive())
+        openai = recordCheck(checks, "openai-live-status", cli.eval(jsAssertOpenaiLive()))
         cli.eval(jsConfigureStub({"oauthValidationMode": "compat"}))
-        oauth = cli.eval(jsValidateProviderFailure("oauth-chatgpt", "OAuth 호환성 점검", "다시 로그인 필요"))
-        ollama = cli.eval(jsValidateProviderFailure("ollama", "네트워크 문제", None))
-        custom = cli.eval(jsValidateProviderFailure("custom", "Base URL 입력 필요", None))
-        desktopVisual = cli.eval(jsAssertProviderSettingsVisualIntegrity("desktop"))
+        oauth = recordCheck(
+            checks,
+            "oauth-compatibility-failure",
+            cli.eval(jsValidateProviderFailure("oauth-chatgpt", "OAuth 호환성 점검", "다시 로그인 필요")),
+        )
+        ollama = recordCheck(
+            checks,
+            "ollama-network-failure",
+            cli.eval(jsValidateProviderFailure("ollama", "네트워크 문제", None)),
+        )
+        custom = recordCheck(
+            checks,
+            "custom-base-url-failure",
+            cli.eval(jsValidateProviderFailure("custom", "Base URL 입력 필요", None)),
+        )
+        desktopVisual = recordCheck(
+            checks,
+            "desktop-visual-integrity",
+            cli.eval(jsAssertProviderSettingsVisualIntegrity("desktop")),
+        )
         cli.run("resize", "390", "844")
         cli.waitEval(jsProviderSheetReady(), "provider settings sheet after mobile resize")
-        mobileVisual = cli.eval(jsAssertProviderSettingsVisualIntegrity("mobile"))
+        mobileVisual = recordCheck(
+            checks,
+            "mobile-visual-integrity",
+            cli.eval(jsAssertProviderSettingsVisualIntegrity("mobile")),
+        )
         api.assertExpectedCalls()
+        recordCheck(checks, "expected-api-calls", "expected-api-calls-ok")
+        writeProviderSettingsReport(
+            {
+                "passed": True,
+                "status": "passed",
+                "checks": checks,
+                "signals": providerSettingsSignals(api.calls, checks),
+            },
+            startedAt=startedAt,
+            startedAtMonotonic=started,
+        )
         print(
             "ok: provider settings browser smoke verified "
             f"{initial} {oauthLoginFailure} {oauthPermissionFailure} {oauthLoginSuccess} {oauthLive} "
@@ -75,9 +122,22 @@ def main(argv: list[str] | None = None) -> int:
         )
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
+        debugText = debugPageState(cli) if cli is not None else ""
+        writeProviderSettingsReport(
+            {
+                "passed": False,
+                "status": "failed",
+                "checks": checks,
+                "error": str(exc),
+                "debugText": debugText[:2000],
+                "signals": providerSettingsSignals(api.calls, checks),
+            },
+            startedAt=startedAt,
+            startedAtMonotonic=started,
+        )
         print(f"FAIL: {exc}", file=sys.stderr)
         if cli is not None:
-            print(debugPageState(cli), file=sys.stderr)
+            print(debugText, file=sys.stderr)
         print("API calls: " + json.dumps(api.calls, ensure_ascii=False), file=sys.stderr)
         return 1
     finally:
@@ -95,6 +155,71 @@ def buildParser() -> argparse.ArgumentParser:
 
 class VerificationError(RuntimeError):
     pass
+
+
+def recordCheck(checks: list[dict[str, Any]], caseId: str, result: str) -> str:
+    checks.append({"caseId": caseId, "passed": True, "status": "passed", "result": result})
+    return result
+
+
+def providerSettingsSignals(apiCalls: list[str], checks: list[dict[str, Any]]) -> dict[str, Any]:
+    checkIds = [str(check["caseId"]) for check in checks]
+    return {
+        "apiCallCount": len(apiCalls),
+        "apiCalls": apiCalls,
+        "checkIds": checkIds,
+        "oauthStateMismatchHandled": "oauth-state-mismatch" in checkIds,
+        "oauthPermissionDeniedHandled": "oauth-permission-denied" in checkIds,
+        "oauthLoginSucceeded": "oauth-login-success" in checkIds,
+        "oauthLiveAfterLogin": "oauth-live-status" in checkIds,
+        "openaiSelectedAndLive": "openai-live-status" in checkIds,
+        "oauthCompatibilityFailureHandled": "oauth-compatibility-failure" in checkIds,
+        "ollamaNetworkFailureHandled": "ollama-network-failure" in checkIds,
+        "customBaseUrlFailureHandled": "custom-base-url-failure" in checkIds,
+        "desktopVisualIntegrity": "desktop-visual-integrity" in checkIds,
+        "mobileVisualIntegrity": "mobile-visual-integrity" in checkIds,
+    }
+
+
+def writeProviderSettingsReport(payload: dict[str, Any], *, startedAt: str, startedAtMonotonic: float) -> Path:
+    report = dict(payload)
+    report["gate"] = "provider-settings-browser"
+    report["startedAt"] = startedAt
+    report["completedAt"] = utcTimestamp()
+    report["durationMs"] = round((time.monotonic() - startedAtMonotonic) * 1000)
+    gitHead = currentGitHead()
+    if gitHead:
+        report["gitHead"] = gitHead
+    report["reportPath"] = reportDisplayPath(PROVIDER_SETTINGS_REPORT_PATH)
+    PROVIDER_SETTINGS_REPORT_PATH.parent.mkdir(parents=True, exist_ok=True)
+    PROVIDER_SETTINGS_REPORT_PATH.write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    return PROVIDER_SETTINGS_REPORT_PATH
+
+
+def reportDisplayPath(reportPath: Path) -> str:
+    try:
+        return str(reportPath.relative_to(ROOT))
+    except ValueError:
+        return str(reportPath)
+
+
+def utcTimestamp() -> str:
+    return datetime.now(UTC).isoformat(timespec="seconds")
+
+
+def currentGitHead() -> str | None:
+    try:
+        result = subprocess.run(
+            ("git", "rev-parse", "HEAD"),
+            cwd=ROOT,
+            capture_output=True,
+            text=True,
+            timeout=5,
+            check=True,
+        )
+    except (FileNotFoundError, OSError, subprocess.CalledProcessError, subprocess.TimeoutExpired):
+        return None
+    return result.stdout.strip() or None
 
 
 class ProviderStubApi:

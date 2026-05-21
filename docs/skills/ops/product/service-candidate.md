@@ -67,6 +67,7 @@ scripted provider만 통과하는 상태는 제품 품질 기준을 만족하지
 - 실제 provider가 tool call을 하지 않으면 실패 이유와 prompt/tool schema 개선 포인트를 남긴다.
 - trace에는 provider, model, latency, error, tool sequence가 남는다.
 - live gate 실패 payload에는 `diagnostic.code`와 `diagnostic.action`이 남아야 한다. credential missing, 다시 로그인, 네트워크 문제, 권한 문제, OAuth 호환성 점검, API 키 필요, Base URL 필요를 같은 provider diagnostic 계약으로 구분한다.
+- `provider-settings-browser`는 `output/test-runner/provider-settings-browser/provider-settings-report.json`에 OAuth state mismatch, permission denied, 로그인 성공, 저장된 OpenAI 선택, OAuth 호환성 실패, Ollama 네트워크 실패, custom Base URL 실패, desktop/mobile visual integrity를 case로 남긴다. report의 `oauthStateMismatchHandled`, `oauthPermissionDeniedHandled`, `oauthLoginSucceeded`, `openaiSelectedAndLive` signal은 provider 설정이 문구만 있는 화면이 아니라 실제 클릭/검증 흐름임을 증명한다.
 
 ## 학습 품질 Matrix
 
@@ -148,7 +149,7 @@ uv run python -X utf8 tests/run.py gate landing-build
 uv run python -X utf8 tests/run.py gate launcher-test
 ```
 
-`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, `frontend-performance-budget/performance-report.json`의 fresh 여부와 `gitHead`도 sequence artifact evidence로 대조한다. 첫 사용자 흐름은 `onboarding-browser/onboarding-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
+`diagnostic-summary-contract`는 local diagnostic summary의 category/action/redaction 계약을 고정한다. `editor-build`와 `launcher-check`는 집중 확인 gate로 유지한다. `quality-cycle`에서는 editor build 증거를 `learning-system-readiness`의 `learning-card-contract` probe와 `frontend-performance-budget`로 보고, `frontend-performance-budget/performance-report.json`의 fresh 여부와 `gitHead`도 sequence artifact evidence로 대조한다. 첫 사용자 흐름은 `onboarding-browser/onboarding-report.json`의 fresh 여부와 `gitHead`로 대조하고, provider 설정 흐름은 `provider-settings-browser/provider-settings-report.json`의 fresh 여부와 `gitHead`로 대조한다. launcher check 증거를 `install-launcher-smoke`와 `launcher-test`로 본다. `teacher-eval`, `teacher-e2e`, `assistant-workloop-contract`, `editor-runtime-preflight`, `learning-card-contract`, `learning-card-browser`는 `learning-system-readiness`의 blocking probe로 실행된다.
 
 ## 완료 판단
 
