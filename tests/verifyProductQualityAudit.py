@@ -187,6 +187,11 @@ PRODUCT_QUALITY_REQUIREMENTS = (
         evidenceChecks=(
             ("tests/verifyInstallLauncherSmoke.py", (
                 "Command::Doctor",
+                "verifyLauncherCliSmoke",
+                "runLauncherJson",
+                "launcher-cli-smoke",
+                "launcher-cli-root",
+                "\"commands\": [\"doctor\", \"state show\"]",
                 "HEALTH_TIMEOUT",
                 "last-known-good-release.json",
                 "rollback-marker.json",
@@ -194,6 +199,13 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "제품 품질 검증용 내부 빌드",
             )),
             ("tests/run.py", ("tests/verifyInstallLauncherSmoke.py", "cargo", "check")),
+            ("docs/skills/ops/product/service-candidate.md", (
+                "실제 launcher CLI `doctor`와 `state show`",
+                "repo-local `output/test-runner/install-launcher-smoke/launcher-cli-root`",
+                "JSON payload",
+                "기본 update config",
+                "layout directory 생성",
+            )),
         ),
     ),
     ProductQualityRequirement(
