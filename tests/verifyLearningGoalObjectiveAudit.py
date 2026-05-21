@@ -588,10 +588,40 @@ def evaluateQualityCycleSummary(
         checkEqual(evidence, missing, gate.get("returnCode"), 0, f"quality-cycle {gateName} returnCode")
         checkEqual(evidence, missing, gate.get("commandReturnCode"), 0, f"quality-cycle {gateName} commandReturnCode")
         checkEqual(evidence, missing, gate.get("artifactFailure"), False, f"quality-cycle {gateName} artifactFailure")
+        evaluateGateCommandLogs(gateName, gate, evidence, missing)
 
     liveGate = gatesByName.get("ai-live-smoke")
     if isinstance(liveGate, dict):
         evaluateLiveSmokeArtifactSummary(liveGate, evidence, missing)
+
+
+def evaluateGateCommandLogs(
+    gateName: str,
+    gate: dict[str, Any],
+    evidence: list[str],
+    missing: list[str],
+) -> None:
+    logs = gate.get("logs")
+    if not isinstance(logs, list) or not logs:
+        missing.append(f"quality-cycle {gateName}: missing command logs")
+        return
+    for index, log in enumerate(logs, start=1):
+        label = f"quality-cycle {gateName} command log #{index}"
+        if not isinstance(log, dict):
+            missing.append(f"{label}: invalid summary {log!r}")
+            continue
+        path = log.get("path")
+        if isinstance(path, str) and path:
+            evidence.append(f"{label} path: {path}")
+        else:
+            missing.append(f"{label}: missing path")
+        checkEqual(evidence, missing, log.get("exists"), True, f"{label} exists")
+        checkEqual(evidence, missing, log.get("fresh"), True, f"{label} fresh")
+        bytesValue = log.get("bytes")
+        if isinstance(bytesValue, int) and bytesValue > 0:
+            evidence.append(f"{label} bytes: {bytesValue}")
+        else:
+            missing.append(f"{label}: expected non-empty log bytes, got {bytesValue!r}")
 
 
 def evaluateLiveSmokeArtifactSummary(

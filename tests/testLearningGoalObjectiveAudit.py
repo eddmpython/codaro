@@ -111,6 +111,12 @@ def writeQualityCycleSummary(audit: Any, root: Path, head: str) -> None:
             "returnCode": 0,
             "commandReturnCode": 0,
             "artifactFailure": False,
+            "logs": [{
+                "path": f"output/test-runner/{gateName}/logs/fake.log",
+                "exists": True,
+                "fresh": True,
+                "bytes": 128,
+            }],
             "artifacts": [],
         }
         if gateName == "ai-live-smoke":
