@@ -51,6 +51,7 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsStructuredCardReady(), "structured learning card")
         cli.waitEval(jsLearningOverviewReady(), "learning overview")
         desktopOverview = cli.eval(jsAssertLearningOverview("desktop"))
+        desktopDependency = cli.eval(jsAssertDependencyPanel("desktop"))
         desktop = cli.eval(jsAssertStructuredCardLayout("desktop"))
         desktopControls = cli.eval(jsAssertStructuredCardControls("desktop"))
         desktopVisual = cli.eval(jsAssertLearningVisualIntegrity("desktop"))
@@ -61,14 +62,15 @@ def main(argv: list[str] | None = None) -> int:
         cli.waitEval(jsLearningOverviewReady(), "learning overview after mobile resize")
         cli.waitEval(jsStructuredCardReady(), "structured learning card after mobile resize")
         mobileOverview = cli.eval(jsAssertLearningOverview("mobile"))
+        mobileDependency = cli.eval(jsAssertDependencyPanel("mobile"))
         mobile = cli.eval(jsAssertStructuredCardLayout("mobile"))
         mobileControls = cli.eval(jsAssertStructuredCardControls("mobile"))
         mobileVisual = cli.eval(jsAssertLearningVisualIntegrity("mobile"))
         mobileContractGaps = cli.eval(jsAssertContractGapWarning("mobile"))
         print(
             "ok: Playwright structured learning card verified "
-            f"{desktopOverview} {desktop} {desktopControls} {desktopVisual} {desktopContractGaps} "
-            f"{toc} {mobileOverview} {mobile} {mobileControls} {mobileVisual} {mobileContractGaps}"
+            f"{desktopOverview} {desktopDependency} {desktop} {desktopControls} {desktopVisual} {desktopContractGaps} "
+            f"{toc} {mobileOverview} {mobileDependency} {mobile} {mobileControls} {mobileVisual} {mobileContractGaps}"
         )
         return 0
     except (VerificationError, PlaywrightCliError) as exc:
@@ -487,6 +489,31 @@ def jsAssertLearningOverview(viewport: str) -> str:
     steps,
   }});
 }})()
+""")
+
+
+def jsAssertDependencyPanel(viewport: str) -> str:
+    return compactJs("""
+(() => {
+  const panel = document.querySelector('[data-learning-package-panel="true"]');
+  if (!panel) throw new Error('learning package panel missing');
+  const status = panel.getAttribute('data-learning-package-status');
+  if (!['checking', 'missing', 'ready', 'error'].includes(status || '')) {
+    throw new Error('unexpected package panel status: ' + status);
+  }
+  const installButton = panel.querySelector('[data-learning-package-install="true"]');
+  if (!installButton) throw new Error('package install action missing');
+  const item = panel.querySelector('[data-learning-package-item="pandas"]');
+  if (!item) throw new Error('pandas package badge missing');
+  if (!item.hasAttribute('data-learning-package-installed')) {
+    throw new Error('package installed marker missing');
+  }
+  const text = panel.textContent || '';
+  if (!text.includes('라이브러리') || !text.includes('uv로 준비')) {
+    throw new Error('package panel copy missing');
+  }
+  return 'dependency-panel-ok';
+})()
 """)
 
 

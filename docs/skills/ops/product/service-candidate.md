@@ -52,6 +52,7 @@ runtime failure는 한 덩어리 오류가 아니다.
 - kernel/session failure와 cell execution failure를 구분한다.
 - package install delay/failure는 `packages-check → packages-install → cell-call` 순서 안에서 보여준다.
 - 설치 결과는 `installer: uv`, `environment: project .venv`, `durationMs`, `skipped`를 보존한다.
+- 학습 화면의 라이브러리 패널은 설치 중인 패키지와 `N/M` 진행 단계를 보여준다. 설치가 오래 걸릴 때도 사용자는 어떤 패키지가 `uv`로 준비 중인지 알아야 한다.
 - 셀 근처에는 “왜 실패했는지 / 무엇을 고쳐야 하는지 / 다시 실행 가능한지”가 보여야 한다.
 
 ## Provider/Teacher Loop

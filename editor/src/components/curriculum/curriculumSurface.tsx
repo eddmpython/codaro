@@ -448,21 +448,36 @@ function LearningFlowDiagram({ diagram }: { diagram?: Record<string, unknown> })
   );
 }
 
+type PackageInstallProgress = {
+  name: string;
+  index: number;
+  total: number;
+};
+
 function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean; document: CodaroDocument }) {
   const requiredPackages = useMemo(() => inferDocumentPackages(document), [document]);
   const [installedPackages, setInstalledPackages] = useState<PackageInfo[]>([]);
   const [checking, setChecking] = useState(false);
-  const [installing, setInstalling] = useState<string | null>(null);
+  const [installProgress, setInstallProgress] = useState<PackageInstallProgress | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [lastMessage, setLastMessage] = useState<string | null>(null);
 
   const installedNames = useMemo(() => new Set(installedPackages.map((item) => normalizePackageName(item.name))), [installedPackages]);
   const missingPackages = requiredPackages.filter((item) => !installedNames.has(normalizePackageName(item)));
-  const activeMessage = installing
-    ? `${installing} 패키지를 uv로 설치 중입니다. 처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.`
+  const activeMessage = installProgress
+    ? `${installProgress.name} 패키지를 uv로 설치 중입니다. ${installProgress.index}/${installProgress.total} 단계입니다. 처음 설치는 네트워크와 wheel 준비 때문에 시간이 걸릴 수 있습니다.`
     : checking
       ? "필요한 라이브러리 설치 상태를 확인 중입니다."
       : null;
+  const packageStatus = installProgress
+    ? "installing"
+    : checking
+      ? "checking"
+      : error
+        ? "error"
+        : missingPackages.length
+          ? "missing"
+          : "ready";
 
   useEffect(() => {
     let cancelled = false;
@@ -497,8 +512,9 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
   const installMissing = async () => {
     setError(null);
     setLastMessage(null);
-    for (const packageName of missingPackages) {
-      setInstalling(packageName);
+    const packagesToInstall = [...missingPackages];
+    for (const [index, packageName] of packagesToInstall.entries()) {
+      setInstallProgress({ name: packageName, index: index + 1, total: packagesToInstall.length });
       try {
         const result = await codaroApi.packageInstall(packageName);
         setLastMessage(packageInstallStatusText(result));
@@ -510,7 +526,7 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
         setError(errorText(installError));
         break;
       } finally {
-        setInstalling(null);
+        setInstallProgress(null);
       }
     }
 
@@ -525,7 +541,12 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
   };
 
   return (
-    <div className="mt-4 rounded-md border bg-background/60 px-3 py-2.5">
+    <div
+      aria-live="polite"
+      className="mt-4 rounded-md border bg-background/60 px-3 py-2.5"
+      data-learning-package-panel="true"
+      data-learning-package-status={packageStatus}
+    >
       <div className="flex flex-wrap items-center justify-between gap-2">
         <div className="flex min-w-0 items-center gap-2">
           <Package className="size-4 text-muted-foreground" />
@@ -536,14 +557,15 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
           {checking ? <Loader2 className="size-3.5 animate-spin text-muted-foreground" /> : null}
           <Button
             className="h-7 gap-1.5 px-2 text-xs"
-            disabled={!apiOnline || !missingPackages.length || checking || Boolean(installing)}
+            data-learning-package-install="true"
+            disabled={!apiOnline || !missingPackages.length || checking || Boolean(installProgress)}
             size="sm"
             type="button"
             variant="outline"
             onClick={installMissing}
           >
-            {installing ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />}
-            {apiOnline ? (installing ? `${installing} 설치 중` : missingPackages.length ? "누락 설치" : "준비됨") : "서버 필요"}
+            {installProgress ? <Loader2 className="size-3.5 animate-spin" /> : <RefreshCw className="size-3.5" />}
+            {apiOnline ? (installProgress ? `${installProgress.index}/${installProgress.total} 설치 중` : missingPackages.length ? "누락 설치" : "준비됨") : "서버 필요"}
           </Button>
         </div>
       </div>
@@ -551,7 +573,13 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
         {requiredPackages.map((packageName) => {
           const installed = installedNames.has(normalizePackageName(packageName));
           return (
-            <Badge className="gap-1" key={packageName} variant={installed ? "secondary" : "outline"}>
+            <Badge
+              className="gap-1"
+              data-learning-package-installed={installed ? "true" : "false"}
+              data-learning-package-item={packageName}
+              key={packageName}
+              variant={installed ? "secondary" : "outline"}
+            >
               <span className={cn("size-1.5 rounded-full", installed ? "bg-emerald-500" : "bg-amber-500")} />
               {packageName}
             </Badge>
@@ -559,7 +587,11 @@ function CurriculumDependencyPanel({ apiOnline, document }: { apiOnline: boolean
         })}
       </div>
       {!apiOnline ? <div className="mt-2 text-xs leading-5 text-muted-foreground">서버 세션이 열리면 uv 설치를 실행할 수 있습니다.</div> : null}
-      {activeMessage ? <div className="mt-2 text-xs leading-5 text-muted-foreground">{activeMessage}</div> : null}
+      {activeMessage ? (
+        <div className="mt-2 text-xs leading-5 text-muted-foreground" data-learning-package-progress="true">
+          {activeMessage}
+        </div>
+      ) : null}
       {error ? <div className="mt-2 text-xs leading-5 text-destructive">{error}</div> : null}
       {!activeMessage && !error && lastMessage ? <div className="mt-2 text-xs leading-5 text-muted-foreground">{lastMessage}</div> : null}
     </div>
