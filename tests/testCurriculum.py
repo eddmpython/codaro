@@ -151,7 +151,6 @@ def testYamlToDocument() -> None:
     assert "markdown" in types
     assert "code" in types
     assert any(b.sourceType for b in document.blocks)
-    assert all(b.sourceType != "marimoIDE" for b in document.blocks)
 
     assert len(solutions) > 0
 
@@ -185,11 +184,11 @@ def testYamlBlockTypesDriveCellMetadata() -> None:
                 "id": "types",
                 "title": "Types",
                 "blocks": [
-                    {"type": "marimoIDE", "title": "Legacy workbench"},
+                    {"type": "localWorkbench", "title": "Local workbench"},
                     {
                         "type": "code",
                         "title": "Folium display",
-                        "content": "import marimo as mo\nm = make_map()\nmo.iframe(m._repr_html_())",
+                        "content": "m = make_map()\nm",
                     },
                     {
                         "type": "expansion",
@@ -237,7 +236,6 @@ def testAllCurriculaConvertToLocalDocuments() -> None:
         converted += 1
         assert document.runtime.defaultEngine == "local"
         assert document.blocks
-        assert all(block.sourceType != "marimoIDE" for block in document.blocks)
 
     assert not failures
     assert converted > 0

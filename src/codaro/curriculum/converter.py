@@ -15,9 +15,6 @@ COMPARE_TYPES = {"compare", "fullWidthComparison"}
 MEDIA_TYPES = {"image", "video", "youtube", "videoCarousel", "pdf", "MIME"}
 LINK_TYPES = {"link", "links", "linkButtons"}
 CALLOUT_TYPES = {"tip", "tipCard", "note", "info", "warning", "codeDescription"}
-SOURCE_TYPE_ALIASES = {
-    "marimoIDE": "localWorkbench",
-}
 
 
 def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[CodaroDocument, dict[str, str]]:
@@ -29,14 +26,18 @@ def yamlToDocument(content: dict, category: str, contentId: str) -> tuple[Codaro
     lessonContract = lessonContractFromYaml(content, fallbackTitle=title)
     contractPayload = lessonContract.model_dump(mode="json")
     title = lessonContract.meta.title or title
+    displayIntro = intro or {
+        "description": lessonContract.intro.direction,
+        "points": lessonContract.intro.benefits,
+    }
     blocks: list[BlockConfig] = [
         _markdownBlock(
-            _buildIntroMarkdown(title, intro),
+            _buildIntroMarkdown(title, displayIntro),
             displayKind="hero",
             role="title",
             sourceType="intro",
             title=title,
-            payload={"title": title, **intro, "learningContract": contractPayload},
+            payload={"title": title, **displayIntro, "learningContract": contractPayload},
         )
     ]
     solutions: dict[str, str] = {}
@@ -419,6 +420,15 @@ def _convertExpansionBlock(block: dict[str, Any], solutions: dict[str, str]) -> 
     ]
 
     for nested in _arrayOfMaps(block.get("blocks")):
+        nestedSourceType = _normalizeSourceType(_textValue(nested.get("type")) or "text")
+        if nestedSourceType == "code":
+            result.append(_convertExpansionSolutionCodeBlock(
+                nested,
+                solutions,
+                expansionTitle=title,
+                expansionDescription=description or content,
+            ))
+            continue
         result.extend(_convertBlock(nested, solutions, parentRole="exercise"))
 
     solutionCode = _localizeCode(_textValue(block.get("code")))
@@ -444,6 +454,37 @@ def _convertExpansionBlock(block: dict[str, Any], solutions: dict[str, str]) -> 
             solutions[exerciseCell.id] = solutionCode
 
     return result
+
+
+def _convertExpansionSolutionCodeBlock(
+    block: dict[str, Any],
+    solutions: dict[str, str],
+    *,
+    expansionTitle: str,
+    expansionDescription: str,
+) -> BlockConfig:
+    title = _textValue(block.get("title")) or expansionTitle
+    description = _textValue(block.get("description")) or expansionDescription or title
+    solutionCode = _localizeCode(_textValue(block.get("content") or block.get("code")))
+    exerciseCell = _codeBlock(
+        "",
+        role="exercise",
+        executionKind=_executionKindFromLanguage(_textValue(block.get("language"))),
+        sourceType="expansion",
+        title=title,
+        description=description,
+        guide=GuideConfig(
+            exerciseType=_exerciseTypeFromTitle(expansionTitle or title),
+            hints=_arrayOfText(block.get("hints")),
+            checkConfig=_checkConfig(block),
+            difficulty=_difficultyFromTitle(expansionTitle or title),
+            solution=solutionCode,
+            description=description,
+        ),
+    )
+    if solutionCode:
+        solutions[exerciseCell.id] = solutionCode
+    return exerciseCell
 
 
 def _buildIntroMarkdown(title: str, intro: dict[str, Any]) -> str:
@@ -504,7 +545,7 @@ def _codeBlock(
 
 
 def _normalizeSourceType(sourceType: str) -> str:
-    return SOURCE_TYPE_ALIASES.get(sourceType, sourceType)
+    return sourceType
 
 
 def _payload(block: dict[str, Any], sourceType: str) -> dict[str, Any]:
@@ -571,10 +612,26 @@ def _formatCardList(cards: list[dict[str, Any]], fallbackTitle: str, *, intro: s
         bodyParts = [
             _textValue(card.get("subtitle")),
             _textValue(card.get("description") or card.get("content")),
-            _pointLines(card.get("items") or card.get("tips") or card.get("stats")),
+            _pointLines(card.get("items") or card.get("points") or card.get("tips") or card.get("stats")),
+            _formatCardCode(card),
+            _formatCardFooter(card),
         ]
         lines.append("\n".join(item for item in [f"#### {heading or 'Item'}", *bodyParts] if item))
     return "\n\n".join(lines)
+
+
+def _formatCardCode(card: dict[str, Any]) -> str:
+    code = _textValue(card.get("code") or card.get("snippet"))
+    if not code:
+        return ""
+    return f"```python\n{code}\n```"
+
+
+def _formatCardFooter(card: dict[str, Any]) -> str:
+    footer = _mapValue(card.get("footer"))
+    if footer:
+        return _textValue(footer.get("text") or footer.get("description") or footer.get("content"))
+    return _textValue(card.get("footer"))
 
 
 def _formatCompare(block: dict[str, Any], fallbackTitle: str) -> str:
@@ -666,11 +723,10 @@ def _localizeCode(code: str) -> str:
         return ""
     localized = code.replace("from pyodide.http import open_url", "from urllib.request import urlopen")
     localized = localized.replace("open_url(", "urlopen(")
-    localized = re.sub(r"\bmo\.iframe\(([A-Za-z_][A-Za-z0-9_]*)\._repr_html_\(\)\)", r"\1", localized)
     lines = []
     for line in localized.splitlines():
         stripped = line.strip()
-        if stripped in {"import marimo as mo", "import marimo", "import micropip", "import pyodide_http", "pyodide_http.patch_all()"}:
+        if stripped in {"import micropip", "import pyodide_http", "pyodide_http.patch_all()"}:
             continue
         if stripped.startswith("await micropip.install("):
             continue

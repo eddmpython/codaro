@@ -75,6 +75,7 @@ def lessonContractFromYaml(content: dict[str, Any], *, fallbackTitle: str = "") 
     meta = _mapValue(content.get("meta"))
     intro = _mapValue(content.get("intro"))
     runtime = _mapValue(content.get("runtime"))
+    seo = _mapValue(meta.get("seo"))
     title = _textValue(meta.get("title") or content.get("title")) or fallbackTitle
     sections = [
         _sectionContract(section, index)
@@ -88,7 +89,13 @@ def lessonContractFromYaml(content: dict[str, Any], *, fallbackTitle: str = "") 
             packages=_uniqueTextList(meta.get("packages") or runtime.get("packages") or content.get("packages")),
         ),
         intro=LessonIntroContract(
-            direction=_textValue(intro.get("direction") or intro.get("goal") or intro.get("description")),
+            direction=_textValue(
+                intro.get("direction")
+                or intro.get("goal")
+                or intro.get("description")
+                or meta.get("description")
+                or seo.get("description")
+            ),
             benefits=_uniqueTextList(intro.get("benefits") or intro.get("points") or intro.get("outcomes")),
             diagram=_diagramValue(intro.get("diagram") or intro.get("flow") or intro.get("architecture")),
         ),
