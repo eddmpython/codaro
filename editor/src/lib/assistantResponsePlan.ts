@@ -1,4 +1,5 @@
 import { buildLocalBlocksFromPrompt } from "@/lib/localFallback";
+import { translate } from "@/lib/localeCopy";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
 import {
@@ -108,7 +109,7 @@ export function assistantResponseNotice({
   if (!response.toolCalls.length) {
     return {
       tone: "default",
-      title: "AI 답변 완료",
+      title: translate("assistant.responseDone"),
       detail: response.provider,
     };
   }
@@ -116,7 +117,7 @@ export function assistantResponseNotice({
   if (savedCurriculumTitle) {
     return {
       tone: "success",
-      title: "나만의 커리큘럼 저장됨",
+      title: translate("assistant.curriculumSaved"),
       detail: savedCurriculumTitle,
     };
   }
@@ -124,15 +125,15 @@ export function assistantResponseNotice({
   if (activeScope === "cell") {
     return {
       tone: "success",
-      title: "노트북 변경 준비됨",
-      detail: "검토할 노트북 변경이 생성됐습니다.",
+      title: translate("assistant.notebookChangeReady"),
+      detail: translate("assistant.notebookChangeReadyDetail"),
     };
   }
 
   return {
     tone: "success",
-    title: "커리큘럼 초안 준비됨",
-    detail: "나만의 커리큘럼으로 저장할 초안이 생성됐습니다.",
+    title: translate("assistant.curriculumDraftReady"),
+    detail: translate("assistant.curriculumDraftReadyDetail"),
   };
 }
 

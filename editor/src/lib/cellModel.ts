@@ -1,4 +1,5 @@
 import type { BlockConfig } from "@/types";
+import { getActiveLocale, type AppLocale } from "@/lib/localeCopy";
 
 export type LearningCellKind = "concept" | "visual" | "snippet" | "practice" | "check" | "reflection" | "automation";
 export type CellAiAction = "explain" | "hint" | "check" | "revise";
@@ -36,12 +37,28 @@ export function classifyLearningCell(block: BlockConfig, draft: string): Learnin
   return "practice";
 }
 
-export function buildCellAiPrompt(action: CellAiAction, block: BlockConfig, question?: string) {
+export function buildCellAiPrompt(action: CellAiAction, block: BlockConfig, question?: string, locale: AppLocale = getActiveLocale()) {
   const label = blockLabel(block);
-  const typeLabel = block.type === "code" ? "코드 셀" : "학습 셀";
   const preview = block.content.length > 900 ? `${block.content.slice(0, 900)}...` : block.content;
-  const base = `선택한 ${typeLabel}: ${label}\n\n셀 내용:\n${preview}`;
   const customQuestion = question?.trim();
+  if (locale === "en") {
+    const typeLabel = block.type === "code" ? "code cell" : "learning cell";
+    const base = `Selected ${typeLabel}: ${label}\n\nCell content:\n${preview}`;
+    const questionLine = customQuestion ? `\n\nUser question:\n${customQuestion}` : "";
+    if (action === "hint") {
+      return `${base}${questionLine}\n\nGive a practical hint for solving this cell. Do not reveal the full answer unless it is already solved.`;
+    }
+    if (action === "check") {
+      return `${base}${questionLine}\n\nCheck whether the learner's answer and current output are correct. If not, explain the smallest next fix before editing the cell.`;
+    }
+    if (action === "revise") {
+      return `${base}${questionLine}\n\nRevise this cell to improve clarity and learning value. Propose the change first, and use write-cell only when the edit is clearly useful.`;
+    }
+    return `${base}${questionLine}\n\nExplain this cell in context. Include what the learner should understand, what to run or change next, and how to verify the answer.`;
+  }
+
+  const typeLabel = block.type === "code" ? "코드 셀" : "학습 셀";
+  const base = `선택한 ${typeLabel}: ${label}\n\n셀 내용:\n${preview}`;
   const questionLine = customQuestion ? `\n\n사용자 질문:\n${customQuestion}` : "";
 
   if (action === "hint") {
@@ -60,24 +77,26 @@ export function buildCellAiPrompt(action: CellAiAction, block: BlockConfig, ques
 }
 
 export function cellRoleLabel(role?: BlockConfig["role"]) {
-  if (role === "title") return "타이틀";
-  if (role === "learning") return "학습";
-  if (role === "snippet") return "스니펫";
-  if (role === "exercise") return "실습";
-  if (role === "check") return "검증";
-  if (role === "visual") return "시각화";
-  if (role === "automation") return "자동화";
-  if (role === "skill") return "스킬";
-  return "설명";
+  const en = getActiveLocale() === "en";
+  if (role === "title") return en ? "Title" : "타이틀";
+  if (role === "learning") return en ? "Learning" : "학습";
+  if (role === "snippet") return en ? "Snippet" : "스니펫";
+  if (role === "exercise") return en ? "Practice" : "실습";
+  if (role === "check") return en ? "Check" : "검증";
+  if (role === "visual") return en ? "Visual" : "시각화";
+  if (role === "automation") return en ? "Automation" : "자동화";
+  if (role === "skill") return en ? "Skill" : "스킬";
+  return en ? "Explanation" : "설명";
 }
 
 export function executionKindLabel(kind?: BlockConfig["executionKind"]) {
-  if (kind === "browser") return "브라우저";
+  const en = getActiveLocale() === "en";
+  if (kind === "browser") return en ? "Browser" : "브라우저";
   if (kind === "os") return "OS";
-  if (kind === "mouse") return "마우스";
-  if (kind === "image") return "이미지";
-  if (kind === "task") return "태스크";
-  if (kind === "skill") return "스킬";
+  if (kind === "mouse") return en ? "Mouse" : "마우스";
+  if (kind === "image") return en ? "Image" : "이미지";
+  if (kind === "task") return en ? "Task" : "태스크";
+  if (kind === "skill") return en ? "Skill" : "스킬";
   return "Python";
 }
 
@@ -89,10 +108,10 @@ export function blockLabel(block: BlockConfig) {
     if (firstItem) return stripMarkdown(stripBullet(firstItem));
   }
   if (block.type === "markdown") {
-    return stripMarkdown(block.content.split("\n").find((line) => line.trim()) ?? "마크다운");
+    return stripMarkdown(block.content.split("\n").find((line) => line.trim()) ?? (getActiveLocale() === "en" ? "Markdown" : "마크다운"));
   }
   const firstLine = block.content.split("\n").find((line) => line.trim());
-  return firstLine ? firstLine.slice(0, 80) : "빈 코드 셀";
+  return firstLine ? firstLine.slice(0, 80) : getActiveLocale() === "en" ? "Empty code cell" : "빈 코드 셀";
 }
 
 export function stripBullet(line: string) {

@@ -12,6 +12,7 @@ import {
   validateProviderAction,
   type ProviderActionResult,
 } from "@/lib/providerConnection";
+import { translate } from "@/lib/localeCopy";
 import type { AiProfile, AppNotice, ProviderValidationSnapshot } from "@/types";
 
 export function useProviderConnection({
@@ -70,7 +71,11 @@ export function useProviderConnection({
       [providerId]: providerOauthLoginPending(providerId),
     }));
     try {
-      onNotice({ tone: "default", title: "Provider 로그인 열림", detail: "새 탭에서 provider 로그인을 완료하세요." });
+      onNotice({
+        tone: "default",
+        title: translate("provider.loginOpened.title"),
+        detail: translate("provider.loginOpened.detail"),
+      });
       applyProviderActionResult(await loginOauthProvider(providerId));
     } catch (error) {
       recordProviderFailure(providerId, error, "login");
@@ -87,7 +92,7 @@ export function useProviderConnection({
       applyProviderActionResult(await logoutOauthProviderAction(providerId));
     } catch (error) {
       recordProviderFailure(providerId, error, "logout");
-      onNotice(providerActionFailureNotice("Provider 로그아웃 실패", error));
+      onNotice(providerActionFailureNotice(translate("provider.logoutFailed.title"), error));
     } finally {
       setAiConnecting(false);
     }
@@ -100,7 +105,7 @@ export function useProviderConnection({
       applyProviderActionResult(await selectProvider(providerId));
     } catch (error) {
       recordProviderFailure(providerId, error, "select");
-      onNotice(providerActionFailureNotice("Provider 선택 실패", error));
+      onNotice(providerActionFailureNotice(translate("provider.selectFailed.title"), error));
     } finally {
       setAiConnecting(false);
     }
@@ -113,7 +118,7 @@ export function useProviderConnection({
       applyProviderActionResult(await saveApiProviderAction(providerId, apiKey, baseUrl));
     } catch (error) {
       recordProviderFailure(providerId, error, "save");
-      onNotice(providerActionFailureNotice("Provider 저장 실패", error));
+      onNotice(providerActionFailureNotice(translate("provider.saveFailed.title"), error));
     } finally {
       setAiConnecting(false);
     }

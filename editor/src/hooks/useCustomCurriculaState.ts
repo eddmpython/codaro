@@ -6,6 +6,7 @@ import {
   upsertCustomCurriculumEntry,
   type CustomCurriculumEntry,
 } from "@/lib/customCurricula";
+import { translate } from "@/lib/localeCopy";
 import type { AppNotice, BlockConfig } from "@/types";
 
 type UseCustomCurriculaStateOptions = {
@@ -27,8 +28,8 @@ export function useCustomCurriculaState({
       const detail = error instanceof Error ? error.message : String(error);
       onNotice({
         tone: "warning",
-        title: "커리큘럼 저장 제한",
-        detail: `브라우저 저장소에 나만의 커리큘럼을 기록하지 못했습니다. ${detail}`,
+        title: translate("system.customCurriculumStorageLimited.title"),
+        detail: translate("system.customCurriculumStorageLimited.detail", { detail }),
       });
     }
   }, [customCurricula, onNotice]);

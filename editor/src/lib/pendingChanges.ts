@@ -4,6 +4,7 @@ import {
   draftsFromBlocks,
   firstCodeBlockId,
 } from "@/lib/documentModel";
+import { translate } from "@/lib/localeCopy";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { AppNotice, BlockConfig, CodaroDocument } from "@/types";
 
@@ -53,8 +54,8 @@ export function buildAcceptPendingChangesApplication({
     draftUpdates: draftsFromBlocks(pendingBlocks, { includeMarkdown: true }),
     notice: {
       tone: "success",
-      title: "노트북 변경 적용됨",
-      detail: `${appended.addedBlocks.length || pendingBlocks.length}개 셀을 추가했습니다.`,
+      title: translate("system.pendingApplied.title"),
+      detail: translate("system.pendingApplied.detail", { count: appended.addedBlocks.length || pendingBlocks.length }),
     },
     pendingTarget: "notebook",
     selectedBlockId: firstCodeBlockId(pendingBlocks),
@@ -72,8 +73,8 @@ export function buildRejectPendingChangesApplication(pendingBlocks: BlockConfig[
     draftUpdates: {},
     notice: {
       tone: "default",
-      title: "생성 항목 버림",
-      detail: "현재 문서는 변경하지 않았습니다.",
+      title: translate("system.pendingDiscarded.title"),
+      detail: translate("system.pendingDiscarded.detail"),
     },
     pendingTarget: "notebook",
     selectedBlockId: "",

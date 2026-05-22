@@ -1,6 +1,7 @@
 import { codaroApi } from "@/lib/api";
 import type { ResultMap } from "@/lib/assistantContext";
 import { buildLocalExecutionResult, firstOutputLine } from "@/lib/localFallback";
+import { translate } from "@/lib/localeCopy";
 import { inferCodePackages, normalizePackageName } from "@/lib/packageInference";
 import type {
   AppNotice,
@@ -44,7 +45,7 @@ export async function ensureRuntimeSession(sessionId: string | null): Promise<Ru
       sessionId: null,
       notice: {
         tone: "error",
-        title: "런타임 사용 불가",
+        title: translate("runtime.unavailable"),
         detail: errorMessage(error),
       },
     };
@@ -83,8 +84,8 @@ export async function runNotebookBlock({
       variables: result.variables,
       notice: {
         tone: "success",
-        title: "셀 실행 완료",
-        detail: firstOutputLine(result) || "출력 준비됨",
+        title: translate("runtime.cellRunDone"),
+        detail: firstOutputLine(result) || translate("runtime.outputReady"),
       },
     };
   }
@@ -110,8 +111,8 @@ export async function runNotebookBlock({
       variables: result.variables,
       notice: {
         tone: result.status === "error" ? "error" : "success",
-        title: result.status === "error" ? "셀 실행 실패" : "셀 실행 완료",
-        detail: runDetail(firstOutputLine(result) || "출력 없음", preflight),
+        title: result.status === "error" ? translate("runtime.cellRunFailed") : translate("runtime.cellRunDone"),
+        detail: runDetail(firstOutputLine(result) || translate("runtime.noOutput"), preflight),
       },
     };
   } catch (error) {
@@ -119,7 +120,7 @@ export async function runNotebookBlock({
       sessionId: activeSession.sessionId,
       notice: {
         tone: "error",
-        title: "실행 실패",
+        title: translate("runtime.executionFailed"),
         detail: errorMessage(error),
       },
     };
@@ -158,8 +159,8 @@ export async function runReactiveNotebook({
       variables: lastResult?.variables ?? [],
       notice: {
         tone: "success",
-        title: "노트북 실행 완료",
-        detail: `${codeBlocks.length}개 셀을 평가했습니다.`,
+        title: translate("runtime.notebookRunDone"),
+        detail: translate("runtime.evaluatedCells", { count: codeBlocks.length }),
       },
     };
   }
@@ -195,8 +196,8 @@ export async function runReactiveNotebook({
       variables: payload.results.at(-1)?.variables ?? previousVariables,
       notice: {
         tone: "success",
-        title: "노트북 실행 완료",
-        detail: runDetail(`${payload.executionOrder.length}개 셀을 평가했습니다.`, preflight),
+        title: translate("runtime.notebookRunDone"),
+        detail: runDetail(translate("runtime.evaluatedCells", { count: payload.executionOrder.length }), preflight),
       },
     };
   } catch (error) {
@@ -204,7 +205,7 @@ export async function runReactiveNotebook({
       sessionId: activeSession.sessionId,
       notice: {
         tone: "error",
-        title: "노트북 실행 실패",
+        title: translate("runtime.notebookRunFailed"),
         detail: errorMessage(error),
       },
     };
@@ -258,14 +259,14 @@ function uniquePackages(packageNames: string[]) {
 function packagePreflightFailureNotice(result: PackageInstallResult): AppNotice {
   return {
     tone: "error",
-    title: "라이브러리 준비 실패",
-    detail: firstMessageLine(result.message) || `${result.package} 설치에 실패했습니다.`,
+    title: translate("runtime.libraryFailed"),
+    detail: firstMessageLine(result.message) || translate("runtime.packageInstallFailed", { package: result.package }),
   };
 }
 
 function runDetail(baseDetail: string, preflight: RuntimePackagePreflight) {
   if (!preflight.installedByUv.length) return baseDetail;
-  return `${preflight.installedByUv.join(", ")}를 uv로 준비한 뒤 실행했습니다. · ${baseDetail}`;
+  return translate("runtime.uvPrepared", { packages: preflight.installedByUv.join(", "), detail: baseDetail });
 }
 
 function errorMessage(error: unknown) {

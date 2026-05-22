@@ -26,6 +26,12 @@ import type {
   AssistantWorkStep,
 } from "@/lib/assistantTypes";
 import type { TeacherScope } from "@/lib/teacherScope";
+import { useLocale } from "@/lib/localeContext";
+import {
+  getActiveLocale,
+  translate,
+  translateWithLocale,
+} from "@/lib/localeCopy";
 import { cn } from "@/lib/utils";
 import type { AiProfile, AiTraceSummary, AiTraceWorkloopEvent, BlockConfig } from "@/types";
 
@@ -60,6 +66,7 @@ export function TeacherPanel({
   onPromptChange: (value: string) => void;
   onRejectPendingBlocks: () => void;
 }) {
+  const { t } = useLocale();
   return (
     <aside
       className={cn(
@@ -97,7 +104,7 @@ export function TeacherPanel({
       <AssistantComposer
         className="mt-3"
         loading={loading}
-        placeholder="설명, 답 확인, 셀 수정, 레슨 재구성, 자동화를 자연어로 요청하세요."
+        placeholder={t("assistant.panelPlaceholder")}
         prompt={prompt}
         variant="panel"
         onAsk={() => onAsk()}
@@ -124,6 +131,7 @@ export function AssistantMessages({
   messages: AssistantMessage[];
   onConnectAi?: () => void;
 }) {
+  const { t } = useLocale();
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const latestMessageLength = messages.at(-1)?.content.length ?? 0;
 
@@ -140,7 +148,7 @@ export function AssistantMessages({
     <ScrollArea className="h-full min-h-0" viewportRef={viewportRef}>
       <div className="mx-auto w-full max-w-3xl space-y-1 pr-3">
         {appLoading ? (
-          <LoadingState title="Codaro 여는 중" detail="노트북, 커리큘럼, 자동화 상태를 불러오고 있습니다." />
+          <LoadingState title={t("assistant.appLoading.title")} detail={t("assistant.appLoading.detail")} />
         ) : messages.length ? (
           messages.map((message) => {
             const needsProvider = shouldOfferProviderSettings(message);
@@ -183,7 +191,7 @@ export function AssistantMessages({
                         {isWriting ? (
                           <div className={cn("flex items-center gap-2 py-1 text-sm text-muted-foreground", hasWorkSteps && "sr-only")}>
                             <Loader2 className="size-3.5 animate-spin" />
-                            <span>{message.content.trim() ? "답변 작성 중" : "응답 준비 중"}</span>
+                            <span>{message.content.trim() ? t("assistant.writingResponse") : t("assistant.startingResponse")}</span>
                           </div>
                         ) : null}
                         {needsProvider && !aiProfileReady(aiProfile) ? (
@@ -202,14 +210,14 @@ export function AssistantMessages({
           })
         ) : (
           <EmptyState
-            detail="Codaro에게 다음 설명, 실습 셀, 검증, 자동화를 만들어 달라고 요청하세요."
-            title="채팅에서 시작"
+            detail={t("assistant.empty.detail")}
+            title={t("assistant.empty.title")}
           />
         )}
         {loading && !messages.some((message) => message.loading) ? (
           <div className="flex items-center gap-2 px-1 py-3 text-sm text-muted-foreground">
             <Loader2 className="size-4 animate-spin" />
-            응답 작성 중
+            {t("assistant.writingResponse")}
           </div>
         ) : null}
       </div>
@@ -425,7 +433,7 @@ function ToolPayloadBlock({ label, tone = "default", value }: { label: string; t
 }
 
 function formatPayload(value: unknown) {
-  if (value === undefined || value === null || value === "") return "없음";
+  if (value === undefined || value === null || value === "") return translate("common.none");
   if (typeof value === "string") return value;
   try {
     return JSON.stringify(value, null, 2).slice(0, 2000);
@@ -518,7 +526,7 @@ export function AssistantComposer({
   autoFocus = false,
   className,
   loading,
-  placeholder = "Codaro에게 커리큘럼 생성, 실습 셀 구성, 코드 실행, 변수 확인, 워크플로 자동화를 요청하세요.",
+  placeholder,
   prompt,
   variant = "dock",
   onAsk,
@@ -533,6 +541,8 @@ export function AssistantComposer({
   onAsk: () => void;
   onPromptChange: (value: string) => void;
 }) {
+  const { t } = useLocale();
+  const resolvedPlaceholder = placeholder ?? t("assistant.defaultPlaceholder");
   const canAsk = Boolean(prompt.trim()) && !loading;
   const submit = () => {
     if (!canAsk) return;
@@ -558,7 +568,7 @@ export function AssistantComposer({
           "min-h-10 max-h-48 flex-1 resize-none overflow-y-auto py-2.5",
           variant === "panel" && "max-h-40 border-0 bg-transparent shadow-none focus-visible:ring-0",
         )}
-        placeholder={placeholder}
+        placeholder={resolvedPlaceholder}
         rows={1}
         value={prompt}
         onChange={(event) => onPromptChange(event.target.value)}
@@ -572,11 +582,11 @@ export function AssistantComposer({
         }}
       />
       <Button
-        aria-label="전송"
+        aria-label={t("common.send")}
         className="size-9 shrink-0 rounded-full [&_svg]:size-4"
         disabled={!canAsk}
         size="icon"
-        title="전송"
+        title={t("common.send")}
         type="submit"
       >
         {loading ? <Loader2 className="animate-spin" /> : <ArrowUp />}
@@ -586,7 +596,7 @@ export function AssistantComposer({
 }
 
 export function aiProviderName(profile: AiProfile | null) {
-  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? "provider 없음");
+  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? translate("common.defaultProvider"));
 }
 
 export function aiProfileReady(profile: AiProfile | null) {
@@ -608,6 +618,7 @@ function AssistantHeader({
   onConnectAi: () => void;
   onNewChat: () => void;
 }) {
+  const { t } = useLocale();
   return (
     <div className="mb-3 flex items-start justify-between gap-3">
       <div className="min-w-0">
@@ -620,7 +631,7 @@ function AssistantHeader({
         ) : (
           <div className="mt-1 flex flex-wrap gap-2">
             <Badge variant={apiOnline && aiProfileReady(aiProfile) ? "secondary" : "outline"}>
-              {apiOnline && aiProfileReady(aiProfile) ? "provider 연결됨" : "기본 안내 모드"}
+              {apiOnline && aiProfileReady(aiProfile) ? t("assistant.providerConnected") : t("provider.fallbackMode")}
             </Badge>
             <Badge variant={aiProfileReady(aiProfile) ? "secondary" : "outline"}>{aiProviderName(aiProfile)}</Badge>
           </div>
@@ -636,7 +647,7 @@ function AssistantHeader({
           ) : null
         ) : (
           <>
-            <IconButton disabled={aiConnecting} label="Provider 연결" onClick={onConnectAi}>
+            <IconButton disabled={aiConnecting} label={t("assistant.connectProvider")} onClick={onConnectAi}>
               {aiConnecting ? <Loader2 className="animate-spin" /> : <CodaroAiAvatar className="size-4" />}
             </IconButton>
             <IconButton label="새 채팅" onClick={onNewChat}>
@@ -650,9 +661,10 @@ function AssistantHeader({
 }
 
 function assistantStatusText(apiOnline: boolean, profile: AiProfile | null) {
-  if (!apiOnline) return "로컬 안내 모드입니다.";
-  if (!aiProfileReady(profile)) return "provider를 연결하면 실제 AI 응답을 사용할 수 있습니다.";
-  return "대화로 셀, 레슨, 커리큘럼을 다룹니다.";
+  const locale = getActiveLocale();
+  if (!apiOnline) return translateWithLocale(locale, "assistant.providerFallbackDetail");
+  if (!aiProfileReady(profile)) return translateWithLocale(locale, "assistant.providerNeedsConnection");
+  return translateWithLocale(locale, "assistant.providerLiveDetail");
 }
 
 function CodaroAiAvatar({ className }: { className?: string }) {
@@ -713,7 +725,7 @@ function shouldOfferProviderSettings(message: AssistantMessage) {
 function cleanAssistantMessage(content: string, diagnostic?: AssistantMessage["diagnostic"]) {
   if (diagnostic?.message) return diagnostic.message;
   return isProviderAuthMessage(content)
-    ? "provider 로그인이 필요합니다. Provider 설정에서 브라우저 로그인을 완료한 뒤 다시 요청하세요."
+    ? translate("assistant.providerLoginRequired")
     : content.replace(/^503\s+/, "");
 }
 
@@ -726,13 +738,14 @@ function ProviderConnectAction({
   apiOnline: boolean;
   onConnectAi?: () => void;
 }) {
+  const { t } = useLocale();
   if (!apiOnline) {
-    return <div className="mt-2 text-xs text-muted-foreground">서버 세션이 열리면 provider를 연결할 수 있습니다.</div>;
+    return <div className="mt-2 text-xs text-muted-foreground">{t("assistant.serverRequiredForProvider")}</div>;
   }
   return (
     <Button className="mt-2 h-8 gap-1.5 px-3 text-xs" disabled={aiConnecting || !onConnectAi} size="sm" onClick={onConnectAi}>
       {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogIn className="size-3.5" />}
-      Provider 설정
+      {t("assistant.providerConnectAction")}
     </Button>
   );
 }

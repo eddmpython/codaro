@@ -111,9 +111,13 @@ const transformed = esbuild.transformSync(source, {{
   target: "es2022",
 }});
 const moduleObject = {{ exports: {{}} }};
+function customRequire(specifier) {{
+  if (specifier === "@/lib/localeCopy") return {{ getActiveLocale: () => "ko" }};
+  return require(specifier);
+}}
 new Function("exports", "require", "module", "__filename", "__dirname", transformed.code)(
   moduleObject.exports,
-  require,
+  customRequire,
   moduleObject,
   workLoopPath,
   path.dirname(workLoopPath),

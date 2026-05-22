@@ -5,6 +5,7 @@ import {
 } from "@/components/assistant/assistantPanel";
 import { PendingNotebookBar } from "@/components/app/appPrimitives";
 import { Button } from "@/components/ui/button";
+import { useLocale } from "@/lib/localeContext";
 import type { AssistantMessage } from "@/lib/assistantTypes";
 import type { TeacherScope } from "@/lib/teacherScope";
 import type {
@@ -42,6 +43,7 @@ export function ChatSurface({
   onPromptChange: (value: string) => void;
   onRejectPendingBlocks: () => void;
 }) {
+  const { t } = useLocale();
   const isEmptyChat = !messages.length && !pendingBlocks.length && loadState !== "loading";
   const providerReady = apiOnline && aiProfileReady(aiProfile);
   if (isEmptyChat) {
@@ -50,15 +52,15 @@ export function ChatSurface({
         <section className="w-full max-w-3xl">
           <img alt="" className="mx-auto mb-5 size-52 object-contain sm:size-56" src="/brand/avatar-small.png" />
           <div className="mb-5 text-center">
-            <div className="text-xl font-semibold tracking-normal">Codaro로 무엇을 만들까요?</div>
+            <div className="text-xl font-semibold tracking-normal">{t("chat.empty.title")}</div>
             <p className="mx-auto mt-2 max-w-xl text-sm leading-6 text-muted-foreground">
-              목표부터 말하세요. Codaro는 커리큘럼을 설계하고, 셀을 전개하고, 답을 확인하고, 루틴을 자동화로 바꿀 수 있습니다.
+              {t("chat.empty.detail")}
             </p>
           </div>
           <AssistantComposer
             autoFocus
             loading={loading}
-            placeholder="레슨, 실습 노트북, 브라우저 루틴, 자동화, 태스크를 요청하세요."
+            placeholder={t("chat.placeholder")}
             prompt={prompt}
             variant="hero"
             onAsk={onAsk}
@@ -67,19 +69,19 @@ export function ChatSurface({
           {!providerReady ? (
             <div className="mt-3 flex justify-center">
               <Button className="h-8 px-3 text-xs" disabled={aiConnecting || !apiOnline} size="sm" type="button" variant="secondary" onClick={onConnectAi}>
-                {aiConnecting ? "연결 대기 중" : "Provider 연결"}
+                {aiConnecting ? t("chat.connecting") : t("chat.connectProvider")}
               </Button>
             </div>
           ) : null}
           <div className="mt-4 flex flex-wrap justify-center gap-2">
-            <Button size="sm" type="button" variant="outline" onClick={() => onPromptChange("실습 검증이 포함된 3단계 pandas 레슨을 만들어줘.")}>
-              Pandas 레슨
+            <Button size="sm" type="button" variant="outline" onClick={() => onPromptChange(t("chat.example.pandas.prompt"))}>
+              {t("chat.example.pandas")}
             </Button>
-            <Button size="sm" type="button" variant="outline" onClick={() => onPromptChange("브라우저 자동화 학습 루틴을 처음부터 만들어줘.")}>
-              브라우저 루틴
+            <Button size="sm" type="button" variant="outline" onClick={() => onPromptChange(t("chat.example.browser.prompt"))}>
+              {t("chat.example.browser")}
             </Button>
-            <Button size="sm" type="button" variant="outline" onClick={() => onPromptChange("반복 업무를 공유 가능한 자동화 노트북으로 바꿔줘.")}>
-              자동화 노트북
+            <Button size="sm" type="button" variant="outline" onClick={() => onPromptChange(t("chat.example.automation.prompt"))}>
+              {t("chat.example.automation")}
             </Button>
           </div>
         </section>

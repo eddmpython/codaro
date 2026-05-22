@@ -1849,6 +1849,7 @@ def testPrepareTeacherRuntimeTurnOwnsContextAndExecutorSetup(tmp_path) -> None:
         documentPath=None,
         workspaceRoot=tmp_path,
         message="check answer",
+        displayLocale="en",
         context={
             "cellMap": [{
                 "id": "cell-1",
@@ -1866,6 +1867,8 @@ def testPrepareTeacherRuntimeTurnOwnsContextAndExecutorSetup(tmp_path) -> None:
     )
 
     assert runtimeTurn.turn.conversationId == "conv-created"
+    assert "[Display language]" in runtimeTurn.turn.messages[0]["content"]
+    assert "Answer user-facing prose in English" in runtimeTurn.turn.messages[0]["content"]
     assert "[Cell map]" in runtimeTurn.turn.messages[0]["content"]
     assert "[Dependency preflight]" in runtimeTurn.turn.messages[0]["content"]
     result = asyncio.run(runtimeTurn.executor.execute("get-variables", {}))
@@ -1931,6 +1934,7 @@ def testTeacherRuntimeTurnRequestOwnsPayloadShape(tmp_path) -> None:
 
     request = TeacherRuntimeTurnRequest.fromPayload({
         "message": "상태 확인",
+        "displayLocale": "en-US",
         "context": {"dependencyPreflight": {"packages": ["pandas"]}},
         "sessionId": "session-payload",
         "provider": "custom",
@@ -1948,8 +1952,10 @@ def testTeacherRuntimeTurnRequestOwnsPayloadShape(tmp_path) -> None:
     )
 
     assert request.message == "상태 확인"
+    assert request.displayLocale == "en-US"
     assert request.sessionId == "session-payload"
     assert runtimeTurn.turn.conversationId == "conv-created"
+    assert "Answer user-facing prose in English" in runtimeTurn.turn.messages[0]["content"]
     assert "[Dependency preflight]" in runtimeTurn.turn.messages[0]["content"]
     assert profileManager.resolvedRole == "teacher"
     assert profileManager.resolvedProvider == "custom"

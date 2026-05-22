@@ -361,6 +361,7 @@ export type AiToolCall = {
 
 export type AiChatRequest = {
   conversationId?: string | null;
+  displayLocale?: "ko" | "en";
   message: string;
   sessionId?: string | null;
   provider?: string | null;

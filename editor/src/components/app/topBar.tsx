@@ -15,7 +15,8 @@ import {
 import { Button } from "@/components/ui/button";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { surfaceTitle, type SurfaceMode } from "@/lib/surfaceModel";
+import { useLocale } from "@/lib/localeContext";
+import type { SurfaceMode } from "@/lib/surfaceModel";
 import { cn } from "@/lib/utils";
 import type { AppNotice, LoadState } from "@/types";
 import { SocialLinks } from "./socialLinks";
@@ -43,6 +44,7 @@ export function TopBar({
   onRunNotebook: () => void;
   onToggleAssistant: () => void;
 }) {
+  const { t } = useLocale();
   const isBusy = loadState === "loading" || notebookRunning;
   const showRunNotebook = surface === "editor" && canRun;
   const showAssistantToggle = surface === "editor" || surface === "curriculum";
@@ -62,7 +64,7 @@ export function TopBar({
       <div className="relative z-10 flex min-w-0 items-center gap-2">
         {showSidebarTrigger ? <SidebarTrigger /> : null}
         <div className={cn("min-w-0", surface === "chat" && "sr-only")}>
-          <div className="truncate text-[13px] font-semibold leading-none">{surfaceTitle(surface)}</div>
+          <div className="truncate text-[13px] font-semibold leading-none">{t(`nav.${surface}`)}</div>
         </div>
       </div>
 
@@ -81,14 +83,14 @@ export function TopBar({
         ) : null}
         {showAssistantToggle ? (
           <TopBarIconButton
-            label={assistantCollapsed ? "AI 패널 열기" : "AI 패널 접기"}
+            label={assistantCollapsed ? t("topbar.aiOpen") : t("topbar.aiClose")}
             onClick={onToggleAssistant}
           >
             {assistantCollapsed ? <PanelRightOpen /> : <PanelRightClose />}
           </TopBarIconButton>
         ) : null}
         {showRunNotebook ? (
-          <TopBarIconButton disabled={isBusy} label="노트북 실행" variant="default" onClick={onRunNotebook}>
+          <TopBarIconButton disabled={isBusy} label={t("topbar.runNotebook")} variant="default" onClick={onRunNotebook}>
             {notebookRunning ? <Loader2 className="animate-spin" /> : <Play />}
           </TopBarIconButton>
         ) : null}
@@ -98,6 +100,7 @@ export function TopBar({
 }
 
 function DiagnosticExportButton({ onCopyDiagnosticExport }: { onCopyDiagnosticExport: () => Promise<void> }) {
+  const { t } = useLocale();
   const [copyState, setCopyState] = useState<"idle" | "copying" | "copied" | "error">("idle");
 
   async function copyDiagnosticExport() {
@@ -113,18 +116,18 @@ function DiagnosticExportButton({ onCopyDiagnosticExport }: { onCopyDiagnosticEx
     }
   }
 
-  const label = copyState === "copied" ? "복사됨" : copyState === "error" ? "복사 실패" : "진단 복사";
+  const label = copyState === "copied" ? t("common.copied") : copyState === "error" ? t("common.copyFailed") : t("topbar.copyDiagnostic");
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          aria-label="진단 복사"
+          aria-label={t("topbar.copyDiagnostic")}
           className="h-6 shrink-0 gap-1 px-2 text-[11px] [&_svg]:size-3"
           data-diagnostic-export-copy="true"
           disabled={copyState === "copying"}
           size="sm"
-          title="진단 복사"
+          title={t("topbar.copyDiagnostic")}
           variant="outline"
           onClick={copyDiagnosticExport}
         >

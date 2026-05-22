@@ -32,6 +32,7 @@ class TeacherRuntimeTurnRequest:
     message: str
     context: Any = None
     conversationId: str | None = None
+    displayLocale: str | None = None
     sessionId: str | None = None
     providerOverride: str | None = None
     roleOverride: str | None = None
@@ -40,6 +41,7 @@ class TeacherRuntimeTurnRequest:
     def fromPayload(cls, payload: Mapping[str, Any]) -> TeacherRuntimeTurnRequest:
         return cls(
             conversationId=_optionalPayloadText(payload.get("conversationId")),
+            displayLocale=_optionalPayloadText(payload.get("displayLocale")),
             message=_payloadText(payload.get("message"), fallback=""),
             sessionId=_optionalPayloadText(payload.get("sessionId")),
             providerOverride=_optionalPayloadText(payload.get("provider")),
@@ -81,6 +83,7 @@ def prepareTeacherRuntimeTurnFromRequest(
         documentPath=documentPath,
         workspaceRoot=workspaceRoot,
         conversationId=request.conversationId,
+        displayLocale=request.displayLocale,
         message=request.message,
         context=request.context,
         sessionId=request.sessionId,
@@ -100,6 +103,7 @@ def prepareTeacherRuntimeTurn(
     message: str,
     context: Any = None,
     conversationId: str | None = None,
+    displayLocale: str | None = None,
     sessionId: str | None = None,
     providerOverride: str | None = None,
     roleOverride: str | None = None,
@@ -109,6 +113,7 @@ def prepareTeacherRuntimeTurn(
         context=context,
         convManager=convManager,
         conversationId=conversationId,
+        displayLocale=displayLocale,
         message=message,
     )
     orchestrator = TeacherOrchestrator.fromContext(contextMap)
@@ -139,9 +144,13 @@ def teacherTurnContext(
     context: Any,
     convManager: Any,
     conversationId: str | None,
+    displayLocale: str | None,
     message: str,
 ) -> dict[str, Any]:
     contextMap = dict(context) if isinstance(context, dict) else {}
+    normalizedLocale = _normalizedDisplayLocale(displayLocale)
+    if normalizedLocale and "displayLocale" not in contextMap:
+        contextMap["displayLocale"] = normalizedLocale
     pendingClarification = consumePendingClarification(convManager, conversationId)
     if (
         pendingClarification is not None
@@ -150,6 +159,17 @@ def teacherTurnContext(
     ):
         contextMap["clarificationPlan"] = pendingClarification
     return contextMap
+
+
+def _normalizedDisplayLocale(value: str | None) -> str | None:
+    if value is None:
+        return None
+    normalized = value.strip().lower()
+    if normalized.startswith("en"):
+        return "en"
+    if normalized.startswith("ko"):
+        return "ko"
+    return None
 
 
 CONTINUATION_MARKERS = (

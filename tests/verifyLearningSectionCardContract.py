@@ -10,6 +10,7 @@ MARKDOWN_BODY = ROOT / "editor" / "src" / "components" / "curriculum" / "curricu
 APP_PRIMITIVES = ROOT / "editor" / "src" / "components" / "app" / "appPrimitives.tsx"
 CELL_ACTIONS = ROOT / "editor" / "src" / "components" / "app" / "cellAiActions.tsx"
 AI_PANEL = ROOT / "editor" / "src" / "components" / "assistant" / "assistantPanel.tsx"
+LOCALE_COPY = ROOT / "editor" / "src" / "lib" / "localeCopy.ts"
 
 
 def require(text: str, token: str, label: str, failures: list[str]) -> None:
@@ -30,7 +31,7 @@ def require_order(text: str, before: str, after: str, label: str, failures: list
 def main() -> int:
     failures: list[str] = []
 
-    for path in (SURFACE, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL):
+    for path in (SURFACE, MARKDOWN_BODY, APP_PRIMITIVES, CELL_ACTIONS, AI_PANEL, LOCALE_COPY):
         if not path.exists():
             print(f"FAIL: missing editor surface: {path.relative_to(ROOT)}", file=sys.stderr)
             return 1
@@ -40,6 +41,7 @@ def main() -> int:
     aiPanelText = AI_PANEL.read_text(encoding="utf-8")
     markdownBodyText = MARKDOWN_BODY.read_text(encoding="utf-8")
     appPrimitivesText = APP_PRIMITIVES.read_text(encoding="utf-8")
+    localeCopyText = LOCALE_COPY.read_text(encoding="utf-8")
 
     required_tokens = {
         "section card marker": "data-learning-section-card={section.id}",
@@ -142,12 +144,19 @@ def main() -> int:
     code_payload_tokens = {
         "snippet code box marker": 'data-code-payload="snippet"',
         "snippet copy marker": 'data-code-payload-copy="true"',
-        "copy action label": "스니펫 복사",
-        "copy button text": "복사",
+        "copy action label key": "system.copySnippet",
+        "copy button text key": "common.copy",
         "snippet box label": "예제 스니펫",
     }
     for label, token in code_payload_tokens.items():
         require(appPrimitivesText, token, label, failures)
+
+    locale_copy_tokens = {
+        "copy action label": "스니펫 복사",
+        "copy button text": "복사",
+    }
+    for label, token in locale_copy_tokens.items():
+        require(localeCopyText, token, label, failures)
 
     require_order(
         text,

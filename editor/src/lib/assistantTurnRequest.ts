@@ -3,6 +3,9 @@ import { materializeDrafts } from "@/lib/documentModel";
 import type { SurfaceMode } from "@/lib/surfaceModel";
 import type { TeacherScope } from "@/lib/teacherScope";
 import type {
+  AppLocale,
+} from "@/lib/localeCopy";
+import type {
   AiChatRequest,
   AiToolCatalogPayload,
   BlockConfig,
@@ -16,6 +19,7 @@ export type AssistantTurnRequestInput = {
   activeScope: TeacherScope;
   conversationId: string | null;
   currentResult: ExecutionResult | null | undefined;
+  displayLocale: AppLocale;
   drafts: Record<string, string>;
   message: string;
   results: ResultMap;
@@ -31,6 +35,7 @@ export function buildAssistantTurnRequest({
   activeScope,
   conversationId,
   currentResult,
+  displayLocale,
   drafts,
   message,
   results,
@@ -43,6 +48,7 @@ export function buildAssistantTurnRequest({
   const contextDocument = materializeDrafts(activeDocument, drafts);
   return {
     conversationId,
+    displayLocale,
     message,
     sessionId,
     role: "teacher",
@@ -55,6 +61,7 @@ export function buildAssistantTurnRequest({
       results,
       selectedBlock: selectedBlock ?? null,
       currentResult: currentResult ?? null,
+      displayLocale,
       variables,
       tools: toolCatalog.tools.map((tool) => ({
         name: tool.name,

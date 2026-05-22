@@ -5,6 +5,7 @@ import {
   fallbackTasks,
 } from "@/lib/fallbackData";
 import { statusLabel } from "@/lib/displayFormat";
+import { translate } from "@/lib/localeCopy";
 import type {
   AppNotice,
   EStopStatus,
@@ -53,21 +54,22 @@ export async function loadAutomationSnapshot(): Promise<AutomationSnapshot> {
 }
 
 export async function toggleAutomationStop(current: EStopStatus, apiOnline: boolean): Promise<AutomationActionResult & { eStop: EStopStatus }> {
+  const manualStopReason = translate("automation.manualStopReason");
   const next = apiOnline
     ? current.active
       ? await codaroApi.clearEStop()
-      : await codaroApi.triggerEStop("Codaro에서 수동으로 정지함")
+      : await codaroApi.triggerEStop(manualStopReason)
     : current.active
       ? { active: false, reason: "", triggeredAt: null }
-      : { active: true, reason: "Codaro에서 수동으로 정지함", triggeredAt: Date.now() };
+      : { active: true, reason: manualStopReason, triggeredAt: Date.now() };
 
   return {
     eStop: next,
     refresh: apiOnline,
     notice: {
       tone: next.active ? "warning" : "success",
-      title: next.active ? "긴급 정지 활성화" : "긴급 정지 해제",
-      detail: next.active ? next.reason : "자동화 작업을 다시 실행할 수 있습니다.",
+      title: next.active ? translate("automation.eStopActive.title") : translate("automation.eStopCleared.title"),
+      detail: next.active ? next.reason : translate("automation.eStopCleared.detail"),
     },
   };
 }
@@ -78,8 +80,8 @@ export async function runAutomationTask(task: TaskDefinition, apiOnline: boolean
       refresh: false,
       notice: {
         tone: "success",
-        title: "태스크 성공",
-        detail: `${task.name} 실행을 완료했습니다.`,
+        title: translate("automation.taskSuccess.title"),
+        detail: translate("automation.taskSuccess.detail", { name: task.name }),
       },
     };
   }
@@ -89,7 +91,7 @@ export async function runAutomationTask(task: TaskDefinition, apiOnline: boolean
     refresh: true,
     notice: {
       tone: run.status === "success" ? "success" : "warning",
-      title: `태스크 ${statusLabel(run.status)}`,
+      title: translate("automation.taskStatus.title", { status: statusLabel(run.status) }),
       detail: run.output || run.error || task.name,
     },
   };

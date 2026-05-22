@@ -73,9 +73,9 @@ EVIDENCE = (
         "editor-runtime-user-messages",
         "editor/src/lib/notebookRuntime.ts",
         (
-            "셀 실행 실패",
-            "노트북 실행 실패",
-            "라이브러리 준비 실패",
+            "runtime.cellRunFailed",
+            "runtime.notebookRunFailed",
+            "runtime.libraryFailed",
             "preflightRuntimePackages",
             "sessionPackagesList",
             "sessionPackageInstall",
@@ -86,6 +86,17 @@ EVIDENCE = (
         "editor/src/components/app/appPrimitives.tsx",
         (
             "data-runtime-recovery=\"cell-error\"",
+            "system.recoverCellError.detail",
+            "system.recoverCellError.title",
+        ),
+    ),
+    Evidence(
+        "editor-runtime-locale-copy",
+        "editor/src/lib/localeCopy.ts",
+        (
+            "셀 실행 실패",
+            "노트북 실행 실패",
+            "라이브러리 준비 실패",
             "오류 메시지의 마지막 줄부터 확인",
             "다시 실행할 수 있습니다",
         ),

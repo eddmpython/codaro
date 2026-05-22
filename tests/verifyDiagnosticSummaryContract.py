@@ -80,7 +80,7 @@ CHECKS = (
         (
             "systemDiagnostics",
             "diagnosticNoticeFromSummary",
-            "시작 진단 필요",
+            "diagnostic.startRequired.title",
             "summary.summaryText",
             "readableDiagnosticAction",
             "connect-provider",
@@ -93,6 +93,13 @@ CHECKS = (
             "notice.tone === \"warning\"",
             "text-amber-500",
             "data-diagnostic-export-copy",
+            "topbar.copyDiagnostic",
+        ),
+    ),
+    (
+        "editor/src/lib/localeCopy.ts",
+        (
+            "시작 진단 필요",
             "진단 복사",
         ),
     ),

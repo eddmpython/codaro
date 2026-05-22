@@ -24,6 +24,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useLocale } from "@/lib/localeContext";
+import { localeDateFormat } from "@/lib/localeCopy";
 import { cn } from "@/lib/utils";
 import type { AiProfile, AiProvider, ProviderValidationSnapshot } from "@/types";
 
@@ -66,6 +68,25 @@ const providerKoreanCopy: Record<string, { label: string; description: string }>
   },
 };
 
+const providerEnglishCopy: Record<string, { label: string; description: string }> = {
+  "oauth-chatgpt": {
+    label: "ChatGPT subscription",
+    description: "Connect Codaro chat and cell help through browser login.",
+  },
+  openai: {
+    label: "OpenAI API key",
+    description: "Save an API key and use it as the Codaro provider.",
+  },
+  ollama: {
+    label: "Local Ollama",
+    description: "Use a local model. Ollama must already be running.",
+  },
+  custom: {
+    label: "Compatible API",
+    description: "Use an OpenAI-compatible server URL and key.",
+  },
+};
+
 export function ProviderSettingsSheet({
   aiConnecting,
   aiProfile,
@@ -79,6 +100,7 @@ export function ProviderSettingsSheet({
   onSelectProvider,
   onValidateProvider,
 }: ProviderSettingsSheetProps) {
+  const { t } = useLocale();
   const providers = useMemo(() => providerCatalog(aiProfile), [aiProfile]);
   const runtime = useMemo(() => providerRuntime(aiProfile), [aiProfile]);
   const activeProvider = String(aiProfile?.activeProvider ?? aiProfile?.defaultProvider ?? "");
@@ -90,7 +112,7 @@ export function ProviderSettingsSheet({
         <SheetHeader>
           <SheetTitle>AI Provider</SheetTitle>
           <SheetDescription>
-            Codaro가 채팅, 학습 셀, 자동화 요청에 사용할 provider를 연결합니다.
+            {t("provider.sheet.description")}
           </SheetDescription>
         </SheetHeader>
 
@@ -98,7 +120,7 @@ export function ProviderSettingsSheet({
           <div className="space-y-2 pb-4">
             {!apiOnline ? (
               <div className="rounded-md border bg-muted/30 p-3 text-sm leading-6 text-muted-foreground">
-                서버 세션이 열리면 provider를 연결할 수 있습니다.
+                {t("assistant.serverRequiredForProvider")}
               </div>
             ) : null}
 
@@ -122,7 +144,7 @@ export function ProviderSettingsSheet({
               ))
             ) : (
               <div className="rounded-md border bg-muted/30 p-3 text-sm leading-6 text-muted-foreground">
-                provider 목록을 불러오지 못했습니다. 서버 상태를 확인하세요.
+                {t("provider.sheet.loadFailed")}
               </div>
             )}
           </div>
@@ -159,14 +181,21 @@ function ProviderCard({
   onSelectProvider: (providerId: string) => void;
   onValidateProvider: (providerId: string) => void;
 }) {
+  const { t } = useLocale();
   const providerId = provider.id ?? "";
-  const copy = providerCopy(provider);
+  const copy = providerCopy(provider, t);
   const authKind = provider.authKind ?? "runtime";
   const [apiKey, setApiKey] = useState("");
   const [baseUrl, setBaseUrl] = useState(runtime.baseUrl ?? "");
   const Icon = providerIcon(authKind, providerId);
   const canUseStoredSecret = Boolean(runtime.secretConfigured);
-  const activeStatus = ready ? "연결됨" : authKind === "oauth" ? "로그인 필요" : authKind === "api_key" ? "키 필요" : "선택됨";
+  const activeStatus = ready
+    ? t("assistant.providerConnected")
+    : authKind === "oauth"
+      ? t("provider.loginRequired")
+      : authKind === "api_key"
+        ? t("provider.apiKeyRequired")
+        : t("provider.selected");
 
   return (
     <section
@@ -185,7 +214,7 @@ function ProviderCard({
             <div className="truncate text-sm font-semibold tracking-normal">{copy.label}</div>
             <div className="ml-auto flex shrink-0 items-center gap-1">
               {active ? <Badge variant={ready ? "secondary" : "outline"}>{activeStatus}</Badge> : null}
-              {!active && canUseStoredSecret ? <Badge variant="outline">설정됨</Badge> : null}
+              {!active && canUseStoredSecret ? <Badge variant="outline">{t("provider.saved")}</Badge> : null}
             </div>
           </div>
           <p className="mt-1 text-xs leading-5 text-muted-foreground">{copy.description}</p>
@@ -213,11 +242,11 @@ function ProviderCard({
               onClick={() => onOauthLogin(providerId)}
             >
               {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogIn className="size-3.5" />}
-              브라우저 로그인
+              {t("provider.browserLogin")}
             </Button>
             {canUseStoredSecret && !active ? (
               <Button disabled={!apiOnline || aiConnecting} size="sm" type="button" variant="outline" onClick={() => onSelectProvider(providerId)}>
-                사용
+                {t("provider.select")}
               </Button>
             ) : null}
             {canUseStoredSecret ? (
@@ -230,7 +259,7 @@ function ProviderCard({
                 onClick={() => onOauthLogout(providerId)}
               >
                 {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <LogOut className="size-3.5" />}
-                로그아웃
+                {t("provider.logout")}
               </Button>
             ) : null}
             <Button
@@ -242,7 +271,7 @@ function ProviderCard({
               onClick={() => onValidateProvider(providerId)}
             >
               {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5" />}
-              응답 검증
+              {t("provider.verifyResponse")}
             </Button>
           </div>
         ) : null}
@@ -258,7 +287,7 @@ function ProviderCard({
             ) : null}
             <div className="grid grid-cols-[1fr_auto] gap-2">
               <Input
-                placeholder={provider.envKey ? `${provider.envKey} 또는 API 키` : "API 키"}
+                placeholder={provider.envKey ? `${provider.envKey} ${t("provider.orApiKey")}` : t("provider.apiKey")}
                 type="password"
                 value={apiKey}
                 onChange={(event) => setApiKey(event.target.value)}
@@ -272,12 +301,12 @@ function ProviderCard({
                   setApiKey("");
                 }}
               >
-                저장
+                {t("provider.save")}
               </Button>
             </div>
             {canUseStoredSecret && !active ? (
               <Button disabled={!apiOnline || aiConnecting} size="sm" type="button" variant="outline" onClick={() => onSelectProvider(providerId)}>
-                저장된 키 사용
+                {t("provider.useSavedKey")}
               </Button>
             ) : null}
             <Button
@@ -289,7 +318,7 @@ function ProviderCard({
               onClick={() => onValidateProvider(providerId)}
             >
               {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5" />}
-              응답 검증
+              {t("provider.verifyResponse")}
             </Button>
           </div>
         ) : null}
@@ -300,10 +329,10 @@ function ProviderCard({
               {active ? (
                 <>
                   <Check className="size-3.5" />
-                  사용 중
+                  {t("automation.task.enabled")}
                 </>
               ) : (
-                "사용"
+                t("provider.select")
               )}
             </Button>
             <Button
@@ -315,7 +344,7 @@ function ProviderCard({
               onClick={() => onValidateProvider(providerId)}
             >
               {aiConnecting ? <Loader2 className="size-3.5 animate-spin" /> : <Check className="size-3.5" />}
-              응답 검증
+              {t("provider.verifyResponse")}
             </Button>
           </div>
         ) : null}
@@ -339,10 +368,12 @@ function ProviderConnectionStatus({
   ready: boolean;
   validation?: ProviderValidationSnapshot;
 }) {
+  const { locale } = useLocale();
   const status = providerStatusCopy({
     active,
     authKind,
     canUseStoredSecret,
+    locale,
     providerId,
     ready,
     validation,
@@ -362,7 +393,7 @@ function ProviderConnectionStatus({
           <div className="font-medium tracking-normal">{status.title}</div>
           <div className="text-muted-foreground">{status.detail}</div>
           {status.action ? (
-            <div className="mt-1 font-medium text-foreground">권장 조치: {status.action}</div>
+            <div className="mt-1 font-medium text-foreground">{locale === "en" ? "Recommended action" : "권장 조치"}: {status.action}</div>
           ) : null}
           {status.meta ? <div className="mt-1 font-mono text-[11px] text-muted-foreground">{status.meta}</div> : null}
         </div>
@@ -375,6 +406,7 @@ function providerStatusCopy({
   active,
   authKind,
   canUseStoredSecret,
+  locale,
   providerId,
   ready,
   validation,
@@ -382,6 +414,7 @@ function providerStatusCopy({
   active: boolean;
   authKind: string;
   canUseStoredSecret: boolean;
+  locale: "ko" | "en";
   providerId: string;
   ready: boolean;
   validation?: ProviderValidationSnapshot;
@@ -400,84 +433,115 @@ function providerStatusCopy({
     return {
       className: "border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-100",
       detail: liveActive
-        ? `${validation.model ?? providerId} 응답 검증을 통과했습니다.`
-        : `${validation.model ?? providerId} 응답 검증을 통과했습니다. 사용으로 전환하면 이 provider를 쓸 수 있습니다.`,
+        ? locale === "en"
+          ? `${validation.model ?? providerId} passed response verification.`
+          : `${validation.model ?? providerId} 응답 검증을 통과했습니다.`
+        : locale === "en"
+          ? `${validation.model ?? providerId} passed response verification. Switch to it to use this provider.`
+          : `${validation.model ?? providerId} 응답 검증을 통과했습니다. 사용으로 전환하면 이 provider를 쓸 수 있습니다.`,
       icon: CircleCheck,
-      meta: validationMeta(validation),
+      meta: validationMeta(validation, locale),
       mode: liveActive ? "live" : "validated",
-      title: liveActive ? "실제 응답 사용 중" : "응답 검증 완료",
+      title: liveActive
+        ? locale === "en" ? "Live responses enabled" : "실제 응답 사용 중"
+        : locale === "en" ? "Response verified" : "응답 검증 완료",
     };
   }
 
   if (validation?.pending) {
     return {
-      action: providerActionLabel(validation.diagnostic?.action) ?? "로그인 탭 완료",
+      action: providerActionLabel(validation.diagnostic?.action, locale) ?? (locale === "en" ? "Finish the login tab" : "로그인 탭 완료"),
       className: "border-sky-500/30 bg-sky-500/10 text-sky-950 dark:text-sky-100",
-      detail: validation.diagnostic?.message ?? "브라우저 로그인 상태를 확인하는 중입니다.",
+      detail: validation.diagnostic?.message ?? (locale === "en" ? "Checking the browser login state." : "브라우저 로그인 상태를 확인하는 중입니다."),
       icon: Loader2,
-      meta: validationMeta(validation),
+      meta: validationMeta(validation, locale),
       mode: "oauth-polling",
       spin: true,
-      title: "브라우저 로그인 대기",
+      title: locale === "en" ? "Waiting for browser login" : "브라우저 로그인 대기",
     };
   }
 
   if (validation && !validation.valid) {
     return {
-      action: providerActionLabel(validation.diagnostic?.action),
+      action: providerActionLabel(validation.diagnostic?.action, locale),
       className: "border-amber-500/30 bg-amber-500/10 text-amber-950 dark:text-amber-100",
-      detail: validation.diagnostic?.message ?? validation.error ?? "Provider 응답을 확인하지 못했습니다.",
+      detail: validation.diagnostic?.message ?? validation.error ?? (locale === "en" ? "Could not verify the provider response." : "Provider 응답을 확인하지 못했습니다."),
       icon: AlertTriangle,
-      meta: validationMeta(validation),
+      meta: validationMeta(validation, locale),
       mode: "needs-action",
-      title: "연결 확인 필요",
+      title: locale === "en" ? "Connection needs attention" : "연결 확인 필요",
     };
   }
 
   if (active && ready) {
     return {
       className: "border-sky-500/25 bg-sky-500/10 text-sky-950 dark:text-sky-100",
-      detail: "프로필은 연결됨 상태입니다. 응답 검증으로 현재 모델의 실제 응답까지 확인하세요.",
+      detail: locale === "en"
+        ? "The profile is connected. Run response verification to confirm the current model replies."
+        : "프로필은 연결됨 상태입니다. 응답 검증으로 현재 모델의 실제 응답까지 확인하세요.",
       icon: Info,
       mode: "live-unverified",
-      title: "실제 응답 확인 전",
+      title: locale === "en" ? "Live response not verified" : "실제 응답 확인 전",
     };
   }
 
   if (active) {
     return {
-      action: authKind === "oauth" ? "다시 로그인 필요" : authKind === "api_key" ? "키 또는 Base URL 확인" : undefined,
+      action: authKind === "oauth"
+        ? locale === "en" ? "Login again" : "다시 로그인 필요"
+        : authKind === "api_key" ? locale === "en" ? "Check key or Base URL" : "키 또는 Base URL 확인" : undefined,
       className: "bg-muted/40 text-muted-foreground",
-      detail: "연결 전에는 기본 안내만 사용합니다. 로그인이나 키 저장 후 응답 검증을 통과해야 실제 응답을 사용합니다.",
+      detail: locale === "en"
+        ? "Codaro uses local guide mode until this provider is connected and response verification passes."
+        : "연결 전에는 기본 안내만 사용합니다. 로그인이나 키 저장 후 응답 검증을 통과해야 실제 응답을 사용합니다.",
       icon: Info,
       mode: "fallback",
-      title: "기본 안내 모드",
+      title: locale === "en" ? "Local guide mode" : "기본 안내 모드",
     };
   }
 
   if (canUseStoredSecret) {
     return {
       className: "bg-muted/40 text-muted-foreground",
-      detail: "저장된 인증이 있습니다. 사용으로 전환한 뒤 응답 검증을 실행하세요.",
+      detail: locale === "en"
+        ? "Saved authentication is available. Switch to it, then run response verification."
+        : "저장된 인증이 있습니다. 사용으로 전환한 뒤 응답 검증을 실행하세요.",
       icon: Info,
       mode: "candidate",
-      title: "저장된 인증 있음",
+      title: locale === "en" ? "Saved authentication available" : "저장된 인증 있음",
     };
   }
 
   return {
-    action: authKind === "oauth" ? "브라우저 로그인" : authKind === "api_key" ? "키 저장" : undefined,
+    action: authKind === "oauth"
+      ? locale === "en" ? "Browser login" : "브라우저 로그인"
+      : authKind === "api_key" ? locale === "en" ? "Save a key" : "키 저장" : undefined,
     className: "bg-muted/40 text-muted-foreground",
-    detail: "아직 연결되지 않았습니다. 연결 전에는 이 provider의 실제 응답을 사용하지 않습니다.",
+    detail: locale === "en"
+      ? "This provider is not connected yet. Codaro will not use live responses from it until setup is complete."
+      : "아직 연결되지 않았습니다. 연결 전에는 이 provider의 실제 응답을 사용하지 않습니다.",
     icon: Info,
     mode: "not-configured",
-    title: authKind === "oauth" ? "로그인 필요" : authKind === "api_key" ? "키 필요" : "미선택",
+    title: authKind === "oauth"
+      ? locale === "en" ? "Login required" : "로그인 필요"
+      : authKind === "api_key" ? locale === "en" ? "Key required" : "키 필요" : locale === "en" ? "Not selected" : "미선택",
   };
 }
 
-function providerActionLabel(action?: string | null) {
+function providerActionLabel(action?: string | null, locale: "ko" | "en" = "ko") {
   if (!action) return undefined;
-  const labels: Record<string, string> = {
+  const labels: Record<string, string> = locale === "en" ? {
+    "check-network": "Network issue",
+    "check-permission": "Permission issue",
+    "check-provider": "Check provider state",
+    "check-provider-compatibility": "Check OAuth compatibility",
+    "configure-api-key": "Enter API key",
+    "configure-base-url": "Enter Base URL",
+    "connect-provider": "Login again",
+    "relogin-provider": "Login again",
+    "retry-later": "Try again later",
+    "restart-login": "Restart login",
+  } : {
     "check-network": "네트워크 문제",
     "check-permission": "권한 문제",
     "check-provider": "Provider 상태 확인",
@@ -492,8 +556,8 @@ function providerActionLabel(action?: string | null) {
   return labels[action] ?? action;
 }
 
-function validationMeta(validation: ProviderValidationSnapshot) {
-  const checkedAt = formatCheckedAt(validation.checkedAt);
+function validationMeta(validation: ProviderValidationSnapshot, locale: "ko" | "en") {
+  const checkedAt = formatCheckedAt(validation.checkedAt, locale);
   const parts = [
     validation.phase ? `phase=${validation.phase}` : null,
     validation.probe ? `probe=${validation.probe}` : null,
@@ -503,11 +567,11 @@ function validationMeta(validation: ProviderValidationSnapshot) {
   return parts.length ? parts.join(" · ") : undefined;
 }
 
-function formatCheckedAt(value?: string) {
+function formatCheckedAt(value: string | undefined, locale: "ko" | "en") {
   if (!value) return undefined;
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return undefined;
-  return new Intl.DateTimeFormat("ko-KR", {
+  return new Intl.DateTimeFormat(localeDateFormat(locale), {
     hour: "2-digit",
     minute: "2-digit",
   }).format(parsed);
@@ -529,10 +593,11 @@ function providerRuntime(profile: AiProfile | null): Record<string, ProviderRunt
   );
 }
 
-function providerCopy(provider: AiProvider) {
-  return providerKoreanCopy[provider.id ?? ""] ?? {
+function providerCopy(provider: AiProvider, t: (key: string) => string) {
+  const localized = t("nav.chat") === "Chat" ? providerEnglishCopy : providerKoreanCopy;
+  return localized[provider.id ?? ""] ?? {
     label: provider.label ?? provider.name ?? provider.id ?? "provider",
-    description: provider.description ?? "Codaro provider로 사용합니다.",
+    description: provider.description ?? (t("nav.chat") === "Chat" ? "Use as a Codaro provider." : "Codaro provider로 사용합니다."),
   };
 }
 

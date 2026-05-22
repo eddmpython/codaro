@@ -1,4 +1,5 @@
 import { blockLabel, executionKindLabel } from "@/lib/cellModel";
+import { aiLanguageInstruction, type AppLocale } from "@/lib/localeCopy";
 import { inferAssistantPackages } from "@/lib/packageInference";
 import type { BlockConfig, CodaroDocument, ExecutionResult } from "@/types";
 
@@ -7,6 +8,7 @@ export type ResultMap = Record<string, ExecutionResult>;
 export function buildAssistantContext({
   activeScope,
   currentResult,
+  displayLocale,
   document,
   drafts,
   message,
@@ -18,6 +20,7 @@ export function buildAssistantContext({
 }: {
   activeScope: string;
   currentResult: ExecutionResult | null;
+  displayLocale: AppLocale;
   document: CodaroDocument;
   drafts: Record<string, string>;
   message: string;
@@ -29,6 +32,8 @@ export function buildAssistantContext({
 }) {
   return {
     surface,
+    displayLocale,
+    responseLanguage: displayLocale === "en" ? "English" : "Korean",
     teacherScope: activeScope,
     document: {
       id: document.id,
@@ -59,15 +64,26 @@ export function buildAssistantContext({
         }
       : null,
     variables: variables.slice(0, 24),
-    cellMap: buildCellMap(document, drafts, results),
-    dependencyPreflight: buildDependencyPreflight(message, document),
+    cellMap: buildCellMap(document, drafts, results, displayLocale),
+    dependencyPreflight: buildDependencyPreflight(message, document, displayLocale),
     tools,
-    instruction:
-      `채팅 우선 노트북 생성을 기본으로 한다. 현재 판단 범위는 ${activeScope}이다. 학습 요청은 커리큘럼 YAML을 먼저 초안화하고 write-curriculum-yaml로 셀을 전개한 뒤 read-cells, write-cell, cell-call로 셀 단위 작업을 수행한다. 외부 패키지가 필요한 셀은 packages-check로 확인한 뒤 없으면 packages-install을 먼저 호출한다. 셀 수정 전에는 cellMap의 role/displayKind/executionKind/purpose를 보고 설명/스니펫/실습/검증 셀 중 올바른 대상만 수정한다.`,
+    instruction: assistantProcedureInstruction(activeScope, displayLocale),
   };
 }
 
-export function buildCellMap(document: CodaroDocument, drafts: Record<string, string>, results: ResultMap) {
+function assistantProcedureInstruction(activeScope: string, locale: AppLocale) {
+  if (locale === "en") {
+    return `${aiLanguageInstruction(locale)} Prefer a chat-first notebook workflow. Current decision scope: ${activeScope}. For learning requests, draft curriculum YAML first, expand it into cells with write-curriculum-yaml, then work cell-by-cell with read-cells, write-cell, and cell-call. Before writing or running cells that need external packages, use packages-check and call packages-install first when any package is missing. Before editing cells, use cellMap role/displayKind/executionKind/purpose and edit only the right explanation, snippet, practice, or check cell.`;
+  }
+  return `${aiLanguageInstruction(locale)} 채팅 우선 노트북 생성을 기본으로 한다. 현재 판단 범위는 ${activeScope}이다. 학습 요청은 커리큘럼 YAML을 먼저 초안화하고 write-curriculum-yaml로 셀을 전개한 뒤 read-cells, write-cell, cell-call로 셀 단위 작업을 수행한다. 외부 패키지가 필요한 셀은 packages-check로 확인한 뒤 없으면 packages-install을 먼저 호출한다. 셀 수정 전에는 cellMap의 role/displayKind/executionKind/purpose를 보고 설명/스니펫/실습/검증 셀 중 올바른 대상만 수정한다.`;
+}
+
+export function buildCellMap(
+  document: CodaroDocument,
+  drafts: Record<string, string>,
+  results: ResultMap,
+  locale: AppLocale = "ko",
+) {
   return document.blocks.map((block, index) => {
     const content = drafts[block.id] ?? block.content;
     return {
@@ -79,7 +95,7 @@ export function buildCellMap(document: CodaroDocument, drafts: Record<string, st
       executionKind: block.type === "code" ? executionKindLabel(block.executionKind) : null,
       title: blockLabel(block),
       sourceType: block.sourceType ?? null,
-      purpose: cellPurpose(block),
+      purpose: cellPurpose(block, locale),
       canRun: block.type === "code",
       draftEmpty: block.type === "code" ? !content.trim() : false,
       resultStatus: results[block.id]?.status ?? null,
@@ -88,25 +104,31 @@ export function buildCellMap(document: CodaroDocument, drafts: Record<string, st
   });
 }
 
-export function cellPurpose(block: BlockConfig) {
-  if (block.role === "title" || block.displayKind === "hero" || block.displayKind === "title") return "학습 흐름의 제목과 목표를 보여준다.";
-  if (block.role === "snippet") return "학습자가 따라 칠 예제 스니펫을 보여준다.";
-  if (block.role === "exercise" || block.displayKind === "practice") return "학습자가 직접 수정하거나 작성하는 실습 셀이다.";
-  if (block.role === "check" || block.displayKind === "quiz") return "학습자의 답이나 실행 결과를 검증하는 셀이다.";
-  if (block.role === "visual" || block.displayKind === "media" || block.displayKind === "cardGrid") return "개념을 시각적으로 정리하는 학습 카드다.";
-  if (block.role === "automation" || block.executionKind === "browser" || block.executionKind === "os") return "자동화 작업을 실행하거나 준비하는 셀이다.";
-  if (block.type === "code") return "실행 가능한 코드 셀이다.";
-  return "설명과 개념을 읽기 좋게 정리하는 셀이다.";
+export function cellPurpose(block: BlockConfig, locale: AppLocale = "ko") {
+  const en = locale === "en";
+  if (block.role === "title" || block.displayKind === "hero" || block.displayKind === "title") return en ? "Shows the title and goal of the learning flow." : "학습 흐름의 제목과 목표를 보여준다.";
+  if (block.role === "snippet") return en ? "Shows an example snippet the learner can type and adapt." : "학습자가 따라 칠 예제 스니펫을 보여준다.";
+  if (block.role === "exercise" || block.displayKind === "practice") return en ? "An editable practice cell for the learner to modify or write." : "학습자가 직접 수정하거나 작성하는 실습 셀이다.";
+  if (block.role === "check" || block.displayKind === "quiz") return en ? "Checks the learner's answer or execution result." : "학습자의 답이나 실행 결과를 검증하는 셀이다.";
+  if (block.role === "visual" || block.displayKind === "media" || block.displayKind === "cardGrid") return en ? "Organizes the concept visually as a learning card or media block." : "개념을 시각적으로 정리하는 학습 카드다.";
+  if (block.role === "automation" || block.executionKind === "browser" || block.executionKind === "os") return en ? "Runs or prepares automation work." : "자동화 작업을 실행하거나 준비하는 셀이다.";
+  if (block.type === "code") return en ? "An executable code cell." : "실행 가능한 코드 셀이다.";
+  return en ? "A prose cell that explains concepts in context." : "설명과 개념을 읽기 좋게 정리하는 셀이다.";
 }
 
-export function buildDependencyPreflight(message: string, document: CodaroDocument) {
+export function buildDependencyPreflight(message: string, document: CodaroDocument, locale: AppLocale = "ko") {
   const packages = inferRequiredPackages(message, document);
+  const en = locale === "en";
   return {
-    policy: "필요한 외부 라이브러리는 실행 셀 작성 또는 실행 전에 packages-check로 확인하고, missing이면 packages-install을 먼저 호출한다.",
+    policy: en
+      ? "Before writing or running cells that require external libraries, use packages-check and call packages-install first when any package is missing."
+      : "필요한 외부 라이브러리는 실행 셀 작성 또는 실행 전에 packages-check로 확인하고, missing이면 packages-install을 먼저 호출한다.",
     packages,
     checkTool: "packages-check",
     installTool: "packages-install",
-    beginnerCopy: "학습자에게는 패키지 설치 대신 필요한 도구를 준비 중이라고 설명한다.",
+    beginnerCopy: en
+      ? "Tell the learner that Codaro is preparing the required tools instead of focusing on package installation details."
+      : "학습자에게는 패키지 설치 대신 필요한 도구를 준비 중이라고 설명한다.",
   };
 }
 

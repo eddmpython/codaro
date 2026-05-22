@@ -305,11 +305,17 @@ function documentFromCurriculumYaml(raw: string, category: string, contentId: st
   const title = learningContract.meta.title || baseTitle;
   const blocks: BlockConfig[] = [];
   const intro = mapValue(yaml.intro);
+  const displayIntro = Object.keys(intro).length
+    ? intro
+    : {
+      description: learningContract.intro.direction,
+      points: learningContract.intro.benefits,
+    };
 
   blocks.push(markdownBlock({
-    content: introMarkdown(title, intro),
+    content: introMarkdown(title, displayIntro),
     displayKind: "hero",
-    payload: { title, ...intro, learningContract },
+    payload: { title, ...displayIntro, learningContract },
     role: "title",
     sourceType: "intro",
     title,
@@ -537,6 +543,13 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
       title: displayTitle || title || "실습",
     })];
     for (const nested of arrayOfMaps(block.blocks)) {
+      if (normalizeSourceType(textValue(nested.type) || "text") === "code") {
+        cells.push(expansionSolutionCodeBlock(nested, {
+          description: description || content || title,
+          title: displayTitle || title || "실습",
+        }));
+        continue;
+      }
       cells.push(...convertYamlBlock(nested, "exercise"));
     }
     const solution = localizeCode(textValue(block.code));
@@ -608,6 +621,29 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
   })];
 }
 
+function expansionSolutionCodeBlock(block: YamlMap, expansion: { description: string; title: string }) {
+  const title = textValue(block.title) || expansion.title;
+  const description = textValue(block.description) || expansion.description || title;
+  const solution = localizeCode(textValue(block.content) || textValue(block.code));
+  return codeBlock({
+    content: "",
+    description,
+    executionKind: executionKindFromLanguage(textValue(block.language)),
+    guide: {
+      checkConfig: checkMap(block.check ?? block.checkConfig),
+      description,
+      difficulty: expansionDifficulty(expansion.title),
+      exerciseType: "curriculum-expansion",
+      hints: arrayOfText(block.hints),
+      solution,
+      studentAnswer: "",
+    },
+    role: "exercise",
+    sourceType: "expansion",
+    title,
+  });
+}
+
 function parseYaml(raw: string): YamlMap {
   const parsed = parse(raw);
   return mapValue(parsed);
@@ -621,6 +657,7 @@ function learningContractFromYaml(yaml: YamlMap, fallbackTitle: string): Learnin
   const meta = mapValue(yaml.meta);
   const intro = mapValue(yaml.intro);
   const runtime = mapValue(yaml.runtime);
+  const seo = mapValue(meta.seo);
   return {
     meta: {
       title: textValue(meta.title ?? yaml.title) || fallbackTitle,
@@ -629,7 +666,7 @@ function learningContractFromYaml(yaml: YamlMap, fallbackTitle: string): Learnin
       packages: uniqueTextList(meta.packages ?? runtime.packages ?? yaml.packages),
     },
     intro: {
-      direction: textValue(intro.direction ?? intro.goal ?? intro.description),
+      direction: textValue(intro.direction ?? intro.goal ?? intro.description ?? meta.description ?? seo.description),
       benefits: uniqueTextList(intro.benefits ?? intro.points ?? intro.outcomes),
       diagram: diagramValue(intro.diagram ?? intro.flow ?? intro.architecture),
     },
@@ -941,8 +978,17 @@ function formatCardList(cards: YamlMap[], fallbackTitle: string) {
   return [
     `### ${fallbackTitle}`,
     ...cards.map((card) => {
-      const heading = [textValue(card.emoji), textValue(card.title)].filter(Boolean).join(" ");
-      return [`#### ${heading || "카드"}`, textValue(card.description ?? card.content)].filter(Boolean).join("\n");
+      const heading = [textValue(card.emoji ?? card.icon), textValue(card.title ?? card.label ?? card.text)].filter(Boolean).join(" ");
+      const code = textValue(card.code ?? card.snippet);
+      const footer = mapValue(card.footer);
+      return [
+        `#### ${heading || "카드"}`,
+        textValue(card.subtitle),
+        textValue(card.description ?? card.content),
+        pointLines(card.items ?? card.points ?? card.tips ?? card.stats),
+        code ? `\`\`\`python\n${code}\n\`\`\`` : "",
+        textValue(footer.text ?? footer.description ?? footer.content) || textValue(card.footer),
+      ].filter(Boolean).join("\n");
     }),
   ].join("\n\n");
 }
@@ -1071,11 +1117,10 @@ function localizeCode(value: string) {
   if (!value) return "";
   const localized = value
     .replaceAll("from pyodide.http import open_url", "from urllib.request import urlopen")
-    .replaceAll("open_url(", "urlopen(")
-    .replace(/\bmo\.iframe\(([A-Za-z_][A-Za-z0-9_]*)\._repr_html_\(\)\)/g, "$1");
+    .replaceAll("open_url(", "urlopen(");
   const lines = localized.split("\n").filter((line) => {
     const stripped = line.trim();
-    if (["import marimo as mo", "import marimo", "import micropip", "import pyodide_http", "pyodide_http.patch_all()"].includes(stripped)) return false;
+    if (["import micropip", "import pyodide_http", "pyodide_http.patch_all()"].includes(stripped)) return false;
     if (stripped.startsWith("await micropip.install(")) return false;
     return true;
   });
@@ -1095,9 +1140,7 @@ function executionKindFromLanguage(language: string): ExecutionKind {
 }
 
 function normalizeSourceType(value: string) {
-  const normalized = value.trim().replace(/^['"]|['"]$/g, "");
-  if (normalized === "marimoIDE") return "localRunner";
-  return normalized;
+  return value.trim().replace(/^['"]|['"]$/g, "");
 }
 
 function blockTypeLabel(type: string) {

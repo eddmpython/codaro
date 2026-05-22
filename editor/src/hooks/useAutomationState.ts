@@ -5,6 +5,7 @@ import {
   runAutomationTask,
   toggleAutomationStop,
 } from "@/lib/automationState";
+import { translate } from "@/lib/localeCopy";
 import type { AutomationSection } from "@/lib/surfaceModel";
 import type { AppNotice, TaskDefinition } from "@/types";
 
@@ -43,7 +44,7 @@ export function useAutomationState({
     } catch (error) {
       onNotice({
         tone: "error",
-        title: "긴급 정지 실패",
+        title: translate("automation.eStopFailed.title"),
         detail: error instanceof Error ? error.message : String(error),
       });
     }
@@ -57,7 +58,7 @@ export function useAutomationState({
     } catch (error) {
       onNotice({
         tone: "error",
-        title: "태스크 실행 실패",
+        title: translate("automation.taskRunFailed.title"),
         detail: error instanceof Error ? error.message : String(error),
       });
     }

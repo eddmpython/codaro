@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import type { AssistantMessage, CellAiHelpState } from "@/lib/assistantTypes";
 import { CUSTOM_CURRICULUM_CATEGORY } from "@/lib/customCurricula";
+import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
 import type { CellAiAction } from "@/lib/cellModel";
 import type { AutomationSection, SurfaceMode } from "@/lib/surfaceModel";
@@ -86,6 +87,7 @@ export function MainSurface(props: MainSurfaceProps) {
 }
 
 function MainSurfaceContent(props: MainSurfaceProps) {
+  const { t } = useLocale();
   if (props.surface === "chat") {
     return (
       <ChatSurface
@@ -158,7 +160,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
     const isCustomCurriculum = props.selectedCategory === CUSTOM_CURRICULUM_CATEGORY;
     const selectedCategoryLabel =
       isCustomCurriculum
-        ? "나만의 커리큘럼"
+        ? t("sidebar.myCurriculum")
         : props.categories.find((category) => category.key === props.selectedCategory)?.name ?? props.selectedCategory;
     const selectedContentLabel =
       isCustomCurriculum
@@ -192,7 +194,7 @@ function MainSurfaceContent(props: MainSurfaceProps) {
           renderCodeCellEditor={({ autoFocus = true, block, draft, onChange, onFocus, onRun }) => (
             <CodeCellEditor
               autoFocus={autoFocus}
-              placeholderText={block.role === "snippet" ? "예제를 보고 직접 입력하세요." : "여기에 Python 코드를 입력하세요."}
+              placeholderText={block.role === "snippet" ? t("cell.placeholder.snippet") : t("cell.placeholder.code")}
               value={draft}
               onChange={onChange}
               onFocus={onFocus}
@@ -248,9 +250,10 @@ function MainSurfaceContent(props: MainSurfaceProps) {
 }
 
 function SurfaceLoading() {
+  const { t } = useLocale();
   return (
     <div className="grid h-[calc(100vh-40px)] min-h-0 place-items-center px-4 text-sm text-muted-foreground">
-      화면을 불러오는 중
+      {t("surface.loading")}
     </div>
   );
 }

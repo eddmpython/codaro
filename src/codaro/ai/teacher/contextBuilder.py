@@ -6,6 +6,7 @@ from typing import Any
 
 def injectContext(message: str, context: dict[str, Any]) -> str:
     parts: list[str] = []
+    _appendDisplayLanguage(parts, context)
     _appendInstruction(parts, context)
     _appendClarificationPlan(parts, context)
     _appendSelectedCell(parts, context)
@@ -19,6 +20,20 @@ def injectContext(message: str, context: dict[str, Any]) -> str:
         return message
     contextText = "\n\n".join(parts)
     return f"{message}\n\n---\nContext:\n{contextText}"
+
+
+def _appendDisplayLanguage(parts: list[str], context: dict[str, Any]) -> None:
+    locale = str(context.get("displayLocale") or "").lower()
+    if locale.startswith("en"):
+        parts.append(
+            "[Display language]\n"
+            "Answer user-facing prose in English. Preserve code, identifiers, file paths, package names, API names, stdout, stderr, traceback text, and tool payloads exactly unless the user explicitly asks to translate them."
+        )
+    elif locale.startswith("ko"):
+        parts.append(
+            "[Display language]\n"
+            "Answer user-facing prose in Korean. Preserve code, identifiers, file paths, package names, API names, stdout, stderr, traceback text, and tool payloads exactly unless the user explicitly asks to translate them."
+        )
 
 
 def _appendInstruction(parts: list[str], context: dict[str, Any]) -> None:

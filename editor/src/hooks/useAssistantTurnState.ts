@@ -5,6 +5,7 @@ import {
   buildCellAiPrompt,
   type CellAiAction,
 } from "@/lib/cellModel";
+import { translate, type AppLocale } from "@/lib/localeCopy";
 import type { ResultMap } from "@/lib/assistantContext";
 import {
   createAssistantPlaceholder,
@@ -41,6 +42,7 @@ type UseAssistantTurnStateOptions = {
   apiOnline: boolean;
   applyDocument: (document: CodaroDocument) => void;
   currentResult: ExecutionResult | null | undefined;
+  displayLocale: AppLocale;
   drafts: Record<string, string>;
   profile: AiProfile | null;
   results: ResultMap;
@@ -63,6 +65,7 @@ export function useAssistantTurnState({
   apiOnline,
   applyDocument,
   currentResult,
+  displayLocale,
   drafts,
   profile,
   results,
@@ -100,7 +103,7 @@ export function useAssistantTurnState({
         ...current,
         [cellTargetBlockId]: {
           blockId: cellTargetBlockId,
-          question: options?.cellQuestion?.trim() || "이 셀 설명",
+          question: options?.cellQuestion?.trim() || translate("cell.defaultQuestion"),
           answer: "",
           loading: true,
         },
@@ -130,7 +133,7 @@ export function useAssistantTurnState({
           ...current,
           [cellTargetBlockId]: {
             blockId: cellTargetBlockId,
-            question: options?.cellQuestion?.trim() || "이 셀 설명",
+            question: options?.cellQuestion?.trim() || translate("cell.defaultQuestion"),
             answer: localResult.assistantMessage.content,
             loading: false,
             tone: localResult.assistantMessage.tone ?? "default",
@@ -159,6 +162,7 @@ export function useAssistantTurnState({
           activeDocument,
           activeScope,
           conversationId,
+          displayLocale,
           message,
           currentResult,
           drafts,
@@ -217,8 +221,8 @@ export function useAssistantTurnState({
           ...current,
           [cellTargetBlockId]: {
             blockId: cellTargetBlockId,
-            question: options?.cellQuestion?.trim() || "이 셀 설명",
-            answer: response.answer || streamedContent || "완료했습니다.",
+            question: options?.cellQuestion?.trim() || translate("cell.defaultQuestion"),
+            answer: response.answer || streamedContent || translate("assistant.done"),
             loading: false,
           },
         }));
@@ -238,7 +242,7 @@ export function useAssistantTurnState({
           ...current,
           [cellTargetBlockId]: {
             blockId: cellTargetBlockId,
-            question: options?.cellQuestion?.trim() || "이 셀 설명",
+            question: options?.cellQuestion?.trim() || translate("cell.defaultQuestion"),
             answer: failure.content,
             loading: false,
             tone: "error",
@@ -256,6 +260,7 @@ export function useAssistantTurnState({
     assistantLoading,
     conversationId,
     currentResult,
+    displayLocale,
     drafts,
     onNotice,
     profile,
@@ -280,11 +285,11 @@ export function useAssistantTurnState({
       selectNotebookBlock(block.id);
     }
     setTeacherScope("cell");
-    void askAssistant(buildCellAiPrompt(action, block, question), "cell", {
+    void askAssistant(buildCellAiPrompt(action, block, question, displayLocale), "cell", {
       cellQuestion: question,
       cellTargetBlockId: block.id,
     });
-  }, [askAssistant, selectCurriculumBlock, selectNotebookBlock, surface]);
+  }, [askAssistant, displayLocale, selectCurriculumBlock, selectNotebookBlock, surface]);
 
   const startNewChat = useCallback(() => {
     setConversationId(null);
@@ -326,7 +331,7 @@ function mirrorCellHelpMessage({
     ...current,
     [cellTargetBlockId]: {
       blockId: cellTargetBlockId,
-      question: question?.trim() || "이 셀 설명",
+      question: question?.trim() || translate("cell.defaultQuestion"),
       answer: message.content,
       loading: Boolean(message.loading),
       tone: message.tone ?? "default",

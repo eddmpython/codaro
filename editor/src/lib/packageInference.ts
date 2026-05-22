@@ -4,8 +4,10 @@ const PACKAGE_ALIASES: Record<string, string> = {
   PIL: "pillow",
   cv2: "opencv-python",
   matplotlib: "matplotlib",
+  mpl_toolkits: "matplotlib",
   numpy: "numpy",
   pandas: "pandas",
+  pydantic_settings: "pydantic-settings",
   sklearn: "scikit-learn",
   yaml: "pyyaml",
 };

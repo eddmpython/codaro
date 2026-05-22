@@ -3,6 +3,7 @@ import {
   type AppBootstrapState,
   loadAppBootstrapState,
 } from "@/lib/appBootstrap";
+import { translate } from "@/lib/localeCopy";
 import type {
   AiProfile,
   AiToolCatalogPayload,
@@ -59,7 +60,7 @@ export function useAppBootstrapEffect({
       onLoadState("error");
       onNotice({
         tone: "error",
-        title: "시작 실패",
+        title: translate("system.startFailed"),
         detail: error instanceof Error ? error.message : String(error),
       });
     });

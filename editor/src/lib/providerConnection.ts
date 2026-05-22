@@ -1,4 +1,5 @@
 import { CodaroApiError, codaroApi } from "@/lib/api";
+import { translate } from "@/lib/localeCopy";
 import type {
   AiProfile,
   AppNotice,
@@ -39,16 +40,16 @@ export function openProviderSettings(apiOnline: boolean): ProviderActionResult {
       openSettings: true,
       notice: {
         tone: "default",
-        title: "Provider 설정",
-        detail: "연결할 provider를 선택하세요.",
+        title: translate("provider.openSettings.title"),
+        detail: translate("provider.openSettings.detail"),
       },
     };
   }
   return {
     notice: {
       tone: "warning",
-      title: "Provider 연결 불가",
-      detail: "서버 세션이 없어서 실제 provider 연결은 사용할 수 없습니다.",
+      title: translate("provider.connectUnavailable.title"),
+      detail: translate("provider.connectUnavailable.detail"),
     },
   };
 }
@@ -81,15 +82,15 @@ export async function loginOauthProvider(providerId = "oauth-chatgpt"): Promise<
   return {
     notice: {
       tone: "warning",
-      title: "Provider 로그인 대기 중",
-      detail: "로그인 탭을 완료한 뒤 상태를 다시 확인하세요.",
+      title: translate("provider.loginPending.title"),
+      detail: translate("provider.loginPending.detail"),
     },
     validation: snapshotProviderValidation(providerId, {
       valid: false,
       diagnostic: {
         action: "restart-login",
         code: "oauth_login_timeout",
-        message: "로그인 완료를 확인하지 못했습니다. 열린 탭을 완료했는지 확인하거나 다시 로그인하세요.",
+        message: translate("provider.loginTimeout.message"),
         provider: providerId,
         recoverable: true,
       },
@@ -103,7 +104,7 @@ export function providerOauthLoginPending(providerId = "oauth-chatgpt"): Provide
     pending: true,
     diagnostic: {
       code: "oauth_login_polling",
-      message: "브라우저 로그인 탭을 기다리는 중입니다. 완료되면 Codaro가 상태를 확인하고 실제 응답 검증으로 이어갑니다.",
+      message: translate("provider.loginPolling.message"),
       provider: providerId,
       recoverable: true,
     },
@@ -114,14 +115,14 @@ export async function logoutOauthProvider(providerId = "oauth-chatgpt"): Promise
   await codaroApi.oauthLogout();
   const profile = await codaroApi.aiProfile();
   return {
-    notice: { tone: "success", title: "Provider 로그아웃됨", detail: providerId },
+    notice: { tone: "success", title: translate("provider.loggedOut.title"), detail: providerId },
     profile,
     validation: snapshotProviderValidation(providerId, {
       valid: false,
       diagnostic: {
         action: "connect-provider",
         code: "provider_logged_out",
-        message: "로그아웃되었습니다. 실제 응답을 사용하려면 다시 로그인하세요.",
+        message: translate("provider.loggedOut.message"),
         provider: providerId,
         recoverable: true,
       },
@@ -154,7 +155,7 @@ export async function validateProviderAction(providerId: string, model?: string 
     return {
       notice: {
         tone: "success",
-        title: "Provider 응답 확인됨",
+        title: translate("provider.responseVerified.title"),
         detail: validation.model ? `${providerId} · ${validation.model}` : providerId,
       },
       validation: snapshotProviderValidation(providerId, validation, "manual"),
@@ -163,8 +164,8 @@ export async function validateProviderAction(providerId: string, model?: string 
   return {
     notice: {
       tone: "warning",
-      title: "Provider 확인 필요",
-      detail: validation.diagnostic?.message ?? validation.error ?? "Provider 응답 검증에 실패했습니다.",
+      title: translate("provider.needsCheck.title"),
+      detail: validation.diagnostic?.message ?? validation.error ?? translate("provider.verifyFailed.detail"),
     },
     validation: snapshotProviderValidation(providerId, validation, "manual"),
   };
@@ -187,7 +188,7 @@ export function providerAuthFailureNotice(error: unknown): AppNotice {
   const diagnostic = providerDiagnosticFromError(error);
   return {
     tone: "error",
-    title: "Provider 로그인 실패",
+    title: translate("provider.loginFailed.title"),
     detail: diagnostic?.message ?? errorMessage(error),
   };
 }
@@ -205,7 +206,7 @@ export function providerAssistantFailure(error: unknown): ProviderAssistantFailu
   const diagnostic = providerDiagnosticFromError(error);
   const authIssue = isProviderAuthError(error);
   const content = authIssue
-    ? diagnostic?.message ?? "Provider 로그인이 필요합니다. Provider 설정에서 브라우저 로그인을 완료한 뒤 다시 요청하세요."
+    ? diagnostic?.message ?? translate("assistant.providerLoginRequired")
     : diagnostic?.message ?? errorMessage(error);
   return {
     action: authIssue ? "connect-provider" : undefined,
@@ -213,7 +214,7 @@ export function providerAssistantFailure(error: unknown): ProviderAssistantFailu
     diagnostic,
     notice: {
       tone: "error",
-      title: authIssue ? "Provider 연결 필요" : "Provider 사용 불가",
+      title: authIssue ? translate("provider.connectionRequired.title") : translate("provider.unavailable.title"),
       detail: content,
     },
   };
@@ -253,7 +254,7 @@ async function withProviderValidation(
   if (!provider) {
     return {
       ...base,
-      notice: { tone: "warning", title: "Provider 확인 필요", detail: "선택된 provider가 없습니다." },
+      notice: { tone: "warning", title: translate("provider.needsCheck.title"), detail: translate("provider.noneSelected.detail") },
     };
   }
   const validation = await validateProvider(provider, profile.activeModel, "response");
@@ -263,7 +264,7 @@ async function withProviderValidation(
       ...base,
       notice: {
         tone: "success",
-        title: "Provider 연결됨",
+        title: translate("provider.connected.title"),
         detail: validation.model ? `${provider} · ${validation.model}` : providerName(profile),
       },
       validation: validationSnapshot,
@@ -274,8 +275,8 @@ async function withProviderValidation(
     ...failureBase,
     notice: {
       tone: "warning",
-      title: "Provider 확인 필요",
-      detail: validation.diagnostic?.message ?? validation.error ?? "Provider 연결 상태를 확인하지 못했습니다.",
+      title: translate("provider.needsCheck.title"),
+      detail: validation.diagnostic?.message ?? validation.error ?? translate("provider.connectionUnknown.detail"),
     },
     validation: validationSnapshot,
   };
@@ -304,7 +305,7 @@ function providerNetworkDiagnostic(provider: string, error: unknown): ProviderDi
     action: "check-network",
     code: "provider_network_error",
     detail,
-    message: "Provider 서버에 연결하지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도하세요.",
+    message: translate("provider.networkFailed.message"),
     provider,
     recoverable: true,
     statusCode: error instanceof CodaroApiError ? error.status : 503,
@@ -325,7 +326,7 @@ function snapshotProviderValidation(
 }
 
 function providerName(profile: AiProfile | null) {
-  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? "provider 없음");
+  return String(profile?.activeProvider ?? profile?.provider ?? profile?.defaultProvider ?? translate("common.defaultProvider"));
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {

@@ -1,9 +1,12 @@
+import { getActiveLocale } from "@/lib/localeCopy";
+
 export type TeacherScope = "cell" | "lesson" | "curriculum";
 
 export function teacherScopeLabel(scope: TeacherScope) {
-  if (scope === "lesson") return "레슨";
-  if (scope === "curriculum") return "커리큘럼";
-  return "셀";
+  const en = getActiveLocale() === "en";
+  if (scope === "lesson") return en ? "lesson" : "레슨";
+  if (scope === "curriculum") return en ? "curriculum" : "커리큘럼";
+  return en ? "cell" : "셀";
 }
 
 export function inferTeacherScope(message: string, fallback: TeacherScope): TeacherScope {

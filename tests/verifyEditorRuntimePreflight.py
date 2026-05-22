@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 EDITOR_DIR = ROOT / "editor"
 NOTEBOOK_RUNTIME = EDITOR_DIR / "src" / "lib" / "notebookRuntime.ts"
 PACKAGE_INFERENCE = EDITOR_DIR / "src" / "lib" / "packageInference.ts"
+LOCALE_COPY = EDITOR_DIR / "src" / "lib" / "localeCopy.ts"
 
 
 def main() -> int:
@@ -32,7 +33,7 @@ def main() -> int:
 
 def sourceContractFailures() -> list[str]:
     failures: list[str] = []
-    for path in (NOTEBOOK_RUNTIME, PACKAGE_INFERENCE):
+    for path in (NOTEBOOK_RUNTIME, PACKAGE_INFERENCE, LOCALE_COPY):
         if not path.is_file():
             failures.append(f"missing {path.relative_to(ROOT)}")
 
@@ -41,6 +42,7 @@ def sourceContractFailures() -> list[str]:
 
     runtimeText = NOTEBOOK_RUNTIME.read_text(encoding="utf-8")
     inferenceText = PACKAGE_INFERENCE.read_text(encoding="utf-8")
+    localeText = LOCALE_COPY.read_text(encoding="utf-8")
     required = {
         NOTEBOOK_RUNTIME: (
             "preflightRuntimePackages",
@@ -48,8 +50,8 @@ def sourceContractFailures() -> list[str]:
             "sessionPackageInstall",
             "executeCode",
             "executeReactive",
-            "라이브러리 준비 실패",
-            "uv로 준비한 뒤 실행했습니다",
+            "runtime.libraryFailed",
+            "runtime.uvPrepared",
         ),
         PACKAGE_INFERENCE: (
             "inferCodePackages",
@@ -59,9 +61,13 @@ def sourceContractFailures() -> list[str]:
             "PYTHON_STDLIB_MODULES",
             "PACKAGE_ALIASES",
         ),
+        LOCALE_COPY: (
+            "라이브러리 준비 실패",
+            "uv로 준비한 뒤 실행했습니다",
+        ),
     }
     for path, tokens in required.items():
-        text = runtimeText if path == NOTEBOOK_RUNTIME else inferenceText
+        text = runtimeText if path == NOTEBOOK_RUNTIME else inferenceText if path == PACKAGE_INFERENCE else localeText
         for token in tokens:
             if token not in text:
                 failures.append(f"{path.relative_to(ROOT)} missing {token}")
@@ -177,8 +183,26 @@ const inference = loadModule({inferencePath}, (specifier) => {{
   if (specifier === "@/types") return {{}};
   return require(specifier);
 }});
+function translate(key, values) {{
+  const messages = {{
+    "runtime.cellRunDone": "셀 실행 완료",
+    "runtime.executionFailed": "실행 실패",
+    "runtime.evaluatedCells": "{{count}}개 셀을 평가했습니다.",
+    "runtime.libraryFailed": "라이브러리 준비 실패",
+    "runtime.noOutput": "출력 없음",
+    "runtime.notebookRunDone": "노트북 실행 완료",
+    "runtime.notebookRunFailed": "노트북 실행 실패",
+    "runtime.outputReady": "출력 준비됨",
+    "runtime.packageInstallFailed": "{{package}} 설치에 실패했습니다.",
+    "runtime.unavailable": "런타임 사용 불가",
+    "runtime.uvPrepared": "{{packages}}를 uv로 준비한 뒤 실행했습니다. · {{detail}}",
+  }};
+  const template = messages[key] || key;
+  return template.replace(/\\{{(\\w+)\\}}/g, (_, name) => String((values || {{}})[name] ?? ""));
+}}
 const runtime = loadModule({runtimePath}, (specifier) => {{
   if (specifier === "@/lib/api") return {{ codaroApi: fakeApi }};
+  if (specifier === "@/lib/localeCopy") return {{ translate }};
   if (specifier === "@/lib/localFallback") return {{
     buildLocalExecutionResult: () => fakeResult,
     firstOutputLine: (result) => result.stdout.trim(),

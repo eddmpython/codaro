@@ -2,6 +2,7 @@ import type {
   AssistantMessage,
   AssistantWorkStep,
 } from "@/lib/assistantTypes";
+import { getActiveLocale } from "@/lib/localeCopy";
 import type {
   AiChatResponse,
   AiTraceEvent,
@@ -14,7 +15,7 @@ import type {
 export type AssistantTraceSummary = AiTraceSummary;
 
 export function createComposeStep(): AssistantWorkStep {
-  return { id: "compose", label: "요청 분석", status: "running", startedAt: Date.now() };
+  return { id: "compose", label: localText("Analyze request", "요청 분석"), status: "running", startedAt: Date.now() };
 }
 
 export function withToolStartStep(steps: AssistantWorkStep[] | undefined, toolCall: AiToolCall): AssistantWorkStep[] {
@@ -256,7 +257,7 @@ function traceWorkloopStep(event: AiTraceWorkloopEvent, index: number): Assistan
   const now = Date.now();
   return {
     id: `trace-${event.eventIndex ?? index}-${policyStepIdPart(event.eventType || event.target || event.workLabel || "work")}`,
-    label: event.workLabel || event.eventType || "작업",
+    label: event.workLabel || event.eventType || localText("Work", "작업"),
     status: traceWorkloopStatus(event),
     detail: traceWorkloopDetail(event),
     error: event.error,
@@ -302,7 +303,7 @@ function policyViolationStep(violation: AiTracePolicyViolation, index: number): 
   const now = Date.now();
   return {
     id: `policy-${index}-${policyStepIdPart(violation.policyCode || violation.toolName || "violation")}`,
-    label: "도구 정책 확인",
+    label: localText("Check tool policy", "도구 정책 확인"),
     status: "error",
     detail: policyViolationDetail(violation),
     error: violation.message,
@@ -328,7 +329,7 @@ function tracePolicyViolations(trace: AssistantTraceSummary | undefined): AiTrac
     {
       policyCode: "policy-violation",
       toolName: "",
-      message: `도구 정책 확인 필요 ${count}건`,
+      message: localText(`Tool policy needs review: ${count}`, `도구 정책 확인 필요 ${count}건`),
     },
   ];
 }
@@ -382,45 +383,45 @@ function toolCallArguments(toolCall: AiToolCall) {
 function workLabelFromToolCall(toolCall: AiToolCall, name: string) {
   switch (name) {
     case "write-curriculum-yaml":
-      return "커리큘럼 YAML 전개";
+      return localText("Expand curriculum YAML", "커리큘럼 YAML 전개");
     case "packages-check":
-      return "라이브러리 확인";
+      return localText("Check libraries", "라이브러리 확인");
     case "packages-install":
-      return "uv 라이브러리 설치";
+      return localText("Install uv libraries", "uv 라이브러리 설치");
     case "create-notebook-exercise":
-      return "실습 구성";
+      return localText("Build practice", "실습 구성");
     case "insert-block":
     case "write-cell":
-      return "노트북 셀 작성";
+      return localText("Write notebook cell", "노트북 셀 작성");
     case "read-cells":
-      return "노트북 셀 읽기";
+      return localText("Read notebook cells", "노트북 셀 읽기");
     case "cell-call":
-      return "셀 실행/검증";
+      return localText("Run/check cell", "셀 실행/검증");
     case "execute-reactive":
-      return "셀 실행";
+      return localText("Run cell", "셀 실행");
     case "get-variables":
-      return "변수 확인";
+      return localText("Inspect variables", "변수 확인");
     case "click-element":
     case "type-text":
-      return "화면 자동화";
+      return localText("Screen automation", "화면 자동화");
   }
   switch (toolCall.lane) {
     case "curriculum":
-      return "커리큘럼 구성";
+      return localText("Build curriculum", "커리큘럼 구성");
     case "read":
-      return "상태 확인";
+      return localText("Check state", "상태 확인");
     case "write":
-      return "내용 반영";
+      return localText("Apply content", "내용 반영");
     case "cell-call":
-      return "셀 요청";
+      return localText("Cell request", "셀 요청");
     case "progress":
-      return "진도 기록";
+      return localText("Record progress", "진도 기록");
     case "automation":
-      return "자동화 처리";
+      return localText("Handle automation", "자동화 처리");
     case "safety":
-      return "안전 확인";
+      return localText("Safety check", "안전 확인");
     default:
-      return "작업 결과";
+      return localText("Work result", "작업 결과");
   }
 }
 
@@ -440,31 +441,33 @@ function toolResultDetail(result: unknown, name: string, args: Record<string, un
   switch (name) {
     case "packages-check": {
       const missing = listArg(payload, "missing");
-      if (missing.length) return `${missing.join(", ")} 누락 확인`;
+      if (missing.length) return localText(`Missing: ${missing.join(", ")}`, `${missing.join(", ")} 누락 확인`);
       const checked = listArg(args, "names");
-      return checked.length ? `${checked.join(", ")} 준비됨` : "필요 패키지 준비됨";
+      return checked.length
+        ? localText(`${checked.join(", ")} ready`, `${checked.join(", ")} 준비됨`)
+        : localText("Required packages ready", "필요 패키지 준비됨");
     }
     case "packages-install": {
-      const packageName = textArg(payload, "package") || textArg(args, "name") || "패키지";
+      const packageName = textArg(payload, "package") || textArg(args, "name") || localText("package", "패키지");
       if (payload.success === false) {
         const message = firstLine(textArg(payload, "message") || textArg(payload, "error"));
-        return message || `${packageName} 설치 실패`;
+        return message || localText(`${packageName} install failed`, `${packageName} 설치 실패`);
       }
       const environment = textArg(payload, "environment") || "project .venv";
       const installer = textArg(payload, "installer") || "uv";
-      if (payload.skipped === true) return `${packageName} 이미 준비됨 · ${environment}`;
+      if (payload.skipped === true) return localText(`${packageName} already ready · ${environment}`, `${packageName} 이미 준비됨 · ${environment}`);
       if (payload.success === true) {
         const duration = typeof payload.durationMs === "number" ? ` · ${formatDuration(payload.durationMs)}` : "";
-        return `${packageName} 설치 완료 · ${installer} · ${environment}${duration}`;
+        return localText(`${packageName} installed · ${installer} · ${environment}${duration}`, `${packageName} 설치 완료 · ${installer} · ${environment}${duration}`);
       }
       return "";
     }
     case "cell-call": {
       const blockId = textArg(args, "blockId");
-      if (payload.passed === true) return blockId ? `${blockId} 검증 통과` : "셀 검증 통과";
-      if (payload.passed === false) return blockId ? `${blockId} 검증 실패` : "셀 검증 실패";
+      if (payload.passed === true) return blockId ? localText(`${blockId} check passed`, `${blockId} 검증 통과`) : localText("Cell check passed", "셀 검증 통과");
+      if (payload.passed === false) return blockId ? localText(`${blockId} check failed`, `${blockId} 검증 실패`) : localText("Cell check failed", "셀 검증 실패");
       const status = textArg(payload, "status");
-      return status && blockId ? `${blockId} 실행 결과 · ${status}` : "";
+      return status && blockId ? localText(`${blockId} run result · ${status}`, `${blockId} 실행 결과 · ${status}`) : "";
     }
     case "write-curriculum-yaml": {
       const title = textArg(payload, "title");
@@ -475,12 +478,12 @@ function toolResultDetail(result: unknown, name: string, args: Record<string, un
       const contractGapCount = numberArg(payload, "contractGapCount");
       const parts = [
         title,
-        sectionCount !== undefined ? `섹션 카드 ${sectionCount}개` : "",
-        exerciseCellCount !== undefined ? `실습 셀 ${exerciseCellCount}개` : "",
-        exerciseCellCount === undefined && blockCount !== undefined ? `학습 셀 ${blockCount}개` : "",
-        runtimePackageCount !== undefined ? `실행 패키지 ${runtimePackageCount}개` : "",
-        contractGapCount !== undefined && contractGapCount > 0 ? `계약 gap ${contractGapCount}개` : "",
-        payload.loadedInEditor === true ? "에디터 반영" : "",
+        sectionCount !== undefined ? localText(`${sectionCount} section cards`, `섹션 카드 ${sectionCount}개`) : "",
+        exerciseCellCount !== undefined ? localText(`${exerciseCellCount} practice cells`, `실습 셀 ${exerciseCellCount}개`) : "",
+        exerciseCellCount === undefined && blockCount !== undefined ? localText(`${blockCount} learning cells`, `학습 셀 ${blockCount}개`) : "",
+        runtimePackageCount !== undefined ? localText(`${runtimePackageCount} runtime packages`, `실행 패키지 ${runtimePackageCount}개`) : "",
+        contractGapCount !== undefined && contractGapCount > 0 ? localText(`${contractGapCount} contract gaps`, `계약 gap ${contractGapCount}개`) : "",
+        payload.loadedInEditor === true ? localText("Loaded in editor", "에디터 반영") : "",
       ].filter(Boolean);
       return parts.join(" · ");
     }
@@ -492,25 +495,35 @@ function toolResultDetail(result: unknown, name: string, args: Record<string, un
 function toolSpecificDetail(name: string, args: Record<string, unknown>) {
   switch (name) {
     case "write-curriculum-yaml":
-      return textArg(args, "title") || "YAML을 섹션 카드와 실행 셀로 변환";
+      return textArg(args, "title") || localText("Convert YAML into section cards and executable cells", "YAML을 섹션 카드와 실행 셀로 변환");
     case "packages-check":
       return listArg(args, "names").length
-        ? `${listArg(args, "names").join(", ")} 설치 여부 확인`
-        : "필요한 패키지 설치 여부 확인";
+        ? localText(`Check whether ${listArg(args, "names").join(", ")} is installed`, `${listArg(args, "names").join(", ")} 설치 여부 확인`)
+        : localText("Check required package installation", "필요한 패키지 설치 여부 확인");
     case "packages-install":
-      return textArg(args, "name") ? `${textArg(args, "name")}를 uv로 설치` : "누락 패키지를 uv로 설치";
+      return textArg(args, "name")
+        ? localText(`Install ${textArg(args, "name")} with uv`, `${textArg(args, "name")}를 uv로 설치`)
+        : localText("Install missing packages with uv", "누락 패키지를 uv로 설치");
     case "write-cell":
-      return textArg(args, "blockId") ? `${textArg(args, "blockId")} 셀 내용 반영` : "셀 내용 반영";
+      return textArg(args, "blockId")
+        ? localText(`Apply content to ${textArg(args, "blockId")}`, `${textArg(args, "blockId")} 셀 내용 반영`)
+        : localText("Apply cell content", "셀 내용 반영");
     case "insert-block":
-      return textArg(args, "anchorBlockId") ? `${textArg(args, "anchorBlockId")} 주변에 셀 추가` : "새 셀 추가";
+      return textArg(args, "anchorBlockId")
+        ? localText(`Add cells near ${textArg(args, "anchorBlockId")}`, `${textArg(args, "anchorBlockId")} 주변에 셀 추가`)
+        : localText("Add new cell", "새 셀 추가");
     case "read-cells":
-      return "현재 노트북 구조와 셀 역할 확인";
+      return localText("Check the current notebook structure and cell roles", "현재 노트북 구조와 셀 역할 확인");
     case "cell-call":
-      return textArg(args, "blockId") ? `${textArg(args, "blockId")} 실행 또는 검증` : "셀 실행 또는 검증";
+      return textArg(args, "blockId")
+        ? localText(`Run or check ${textArg(args, "blockId")}`, `${textArg(args, "blockId")} 실행 또는 검증`)
+        : localText("Run or check cell", "셀 실행 또는 검증");
     case "execute-reactive":
-      return textArg(args, "blockId") ? `${textArg(args, "blockId")}부터 의존 셀 재실행` : "의존 셀 재실행";
+      return textArg(args, "blockId")
+        ? localText(`Rerun dependent cells from ${textArg(args, "blockId")}`, `${textArg(args, "blockId")}부터 의존 셀 재실행`)
+        : localText("Rerun dependent cells", "의존 셀 재실행");
     case "get-variables":
-      return "현재 런타임 변수 확인";
+      return localText("Inspect current runtime variables", "현재 런타임 변수 확인");
     default:
       return name;
   }
@@ -539,4 +552,8 @@ function formatDuration(value: number) {
   if (!Number.isFinite(value)) return "";
   if (value < 1000) return `${Math.max(0, Math.round(value))}ms`;
   return `${(value / 1000).toFixed(value < 10000 ? 1 : 0)}s`;
+}
+
+function localText(en: string, ko: string) {
+  return getActiveLocale() === "en" ? en : ko;
 }

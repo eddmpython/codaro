@@ -7,6 +7,7 @@ import {
 } from "@/lib/curriculaRegistry";
 import { CUSTOM_CURRICULUM_CATEGORY, type CustomCurriculumEntry } from "@/lib/customCurricula";
 import { draftsFromBlocks } from "@/lib/documentModel";
+import { translate } from "@/lib/localeCopy";
 import type {
   AppNotice,
   CodaroDocument,
@@ -110,7 +111,7 @@ export async function loadCurriculumLessonState(
     draftUpdates: draftsFromBlocks(result.data.document.blocks, { emptySnippetDraft: true }),
     notice: {
       tone: result.online ? "success" : "warning",
-      title: "커리큘럼 열림",
+      title: translate("curriculum.opened"),
       detail: result.data.document.title,
     },
     selectedBlockId: result.data.document.blocks[0]?.id ?? "",

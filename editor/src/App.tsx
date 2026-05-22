@@ -20,7 +20,9 @@ import { usePendingChangesState } from "@/hooks/usePendingChangesState";
 import { useProviderConnection } from "@/hooks/useProviderConnection";
 import { useSurfaceRoute } from "@/hooks/useSurfaceRoute";
 import { useThemeMode } from "@/hooks/useThemeMode";
+import { useLocaleState } from "@/hooks/useLocaleState";
 import { codaroApi } from "@/lib/api";
+import { LocaleProvider } from "@/lib/localeContext";
 import {
   SidebarInset,
   SidebarProvider,
@@ -32,6 +34,7 @@ import type {
 } from "@/types";
 
 function App() {
+  const localeState = useLocaleState();
   const [surface, setSurface] = useSurfaceRoute();
   const [loadState, setLoadState] = useState<LoadState>("loading");
   const [apiOnline, setApiOnline] = useState(initialBootstrapState.apiOnline);
@@ -227,6 +230,7 @@ function App() {
     surface,
     toolCatalog,
     variables,
+    displayLocale: localeState.locale,
     onNotice: applyNotice,
   });
 
@@ -236,6 +240,7 @@ function App() {
   }
 
   return (
+    <LocaleProvider value={localeState}>
     <SidebarProvider open={sidebarOpen} onOpenChange={setSidebarOpen}>
       <ProductSidebar
         categories={filteredCategories}
@@ -339,10 +344,11 @@ function App() {
         onValidateProvider={validateAiProvider}
       />
     </SidebarProvider>
+    </LocaleProvider>
   );
 }
 
-const backgroundNoticeTitles = new Set(["커리큘럼 열림"]);
+const backgroundNoticeTitles = new Set(["커리큘럼 열림", "Curriculum opened"]);
 
 function shouldKeepCurrentNotice(currentNotice: AppNotice, nextNotice: AppNotice) {
   const currentIsDiagnostic = currentNotice.tone === "warning" || currentNotice.tone === "error";

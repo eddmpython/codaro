@@ -3,6 +3,7 @@ import {
   Clock3,
   FileCode2,
   GraduationCap,
+  Languages,
   Loader2,
   MessageSquare,
   Moon,
@@ -33,6 +34,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar";
 import { categoryTitle } from "@/lib/fallbackData";
+import { useLocale } from "@/lib/localeContext";
 import type { AutomationSection, SurfaceMode, ThemeMode } from "@/lib/surfaceModel";
 import type { CurriculumCategory, CurriculumContentSummary } from "@/types";
 
@@ -68,13 +70,6 @@ export type SidebarCustomCurriculum = {
   createdAt: number;
 };
 
-const navItems: Array<{ value: SurfaceMode; label: string; Icon: React.ComponentType<{ className?: string }> }> = [
-  { value: "chat", label: "채팅", Icon: MessageSquare },
-  { value: "editor", label: "에디터", Icon: FileCode2 },
-  { value: "curriculum", label: "커리큘럼", Icon: GraduationCap },
-  { value: "automation", label: "자동화", Icon: Workflow },
-];
-
 export function ProductSidebar({
   categories,
   categoryGroups,
@@ -99,6 +94,16 @@ export function ProductSidebar({
   onSurfaceChange,
   onToggleTheme,
 }: ProductSidebarProps) {
+  const { locale, t, toggleLocale } = useLocale();
+  const navItems: Array<{ value: SurfaceMode; label: string; Icon: React.ComponentType<{ className?: string }> }> = [
+    { value: "chat", label: t("nav.chat"), Icon: MessageSquare },
+    { value: "editor", label: t("nav.editor"), Icon: FileCode2 },
+    { value: "curriculum", label: t("nav.curriculum"), Icon: GraduationCap },
+    { value: "automation", label: t("nav.automation"), Icon: Workflow },
+  ];
+  const themeLabel = themeMode === "dark" ? t("sidebar.lightMode") : t("sidebar.darkMode");
+  const localeLabel = locale === "en" ? t("locale.switchToKorean") : t("locale.switchToEnglish");
+
   return (
     <Sidebar collapsible="icon" variant="sidebar">
       <SidebarHeader>
@@ -114,23 +119,33 @@ export function ProductSidebar({
             </SidebarMenuItem>
           </SidebarMenu>
           <button
-            aria-label="Provider 설정"
+            aria-label={t("provider.openSettings.title")}
             className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"
             disabled={aiConnecting}
-            title="Provider 설정"
+            title={t("provider.openSettings.title")}
             type="button"
             onClick={onConnectProvider}
           >
             {aiConnecting ? <Loader2 className="size-4 animate-spin" /> : <Settings className="size-4" />}
           </button>
           <button
-            aria-label={themeMode === "dark" ? "라이트 모드" : "다크 모드"}
+            aria-label={themeLabel}
             className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"
-            title={themeMode === "dark" ? "라이트 모드" : "다크 모드"}
+            title={themeLabel}
             type="button"
             onClick={onToggleTheme}
           >
             {themeMode === "dark" ? <Sun className="size-4" /> : <Moon className="size-4" />}
+          </button>
+          <button
+            aria-label={localeLabel}
+            className="flex size-8 shrink-0 items-center justify-center rounded-md text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground group-data-[collapsible=icon]:hidden"
+            title={localeLabel}
+            type="button"
+            onClick={toggleLocale}
+          >
+            <Languages className="size-4" />
+            <span className="sr-only">{localeLabel}</span>
           </button>
         </div>
 
@@ -138,9 +153,9 @@ export function ProductSidebar({
           <div className="relative group-data-[collapsible=icon]:hidden">
             <Search className="pointer-events-none absolute left-2 top-2 size-3.5 text-muted-foreground" />
             <SidebarInput
-              aria-label="커리큘럼 검색"
+              aria-label={t("sidebar.curriculumSearch")}
               className="h-7 pl-7 text-[13px]"
-              placeholder="커리큘럼 검색"
+              placeholder={t("sidebar.curriculumSearch")}
               value={query}
               onChange={(event) => onQueryChange(event.target.value)}
             />
@@ -183,6 +198,13 @@ export function ProductSidebar({
                 selectedCategory={selectedCategory}
                 selectedCustomCurriculumId={selectedCustomCurriculumId}
                 selectedContentId={selectedContentId}
+                text={{
+                  codaroCurriculum: t("sidebar.codaroCurriculum"),
+                  curriculumEmpty: t("sidebar.curriculumEmpty"),
+                  loading: t("sidebar.curriculumLoading"),
+                  myCurriculum: t("sidebar.myCurriculum"),
+                  other: locale === "en" ? "Other" : "기타",
+                }}
                 onSelectCategory={onSelectCategory}
                 onSelectContent={onSelectContent}
                 onSelectCustomCurriculum={onSelectCustomCurriculum}
@@ -193,6 +215,12 @@ export function ProductSidebar({
           {surface === "automation" ? (
             <AutomationTree
               selectedSection={selectedAutomationSection}
+              text={{
+                automation: t("sidebar.automation"),
+                codaro: t("automation.codaro.title"),
+                custom: t("automation.custom.title"),
+                tasks: t("automation.tasks.title"),
+              }}
               onSelectSection={onSelectAutomationSection}
             />
           ) : null}
@@ -218,6 +246,7 @@ function CurriculumTree({
   onSelectCategory,
   onSelectContent,
   onSelectCustomCurriculum,
+  text,
 }: {
   categories: CurriculumCategory[];
   categoryGroups: Record<string, string[]>;
@@ -232,6 +261,13 @@ function CurriculumTree({
   onSelectCategory: (key: string) => void;
   onSelectContent: (contentId: string) => void;
   onSelectCustomCurriculum: (id: string) => void;
+  text: {
+    codaroCurriculum: string;
+    curriculumEmpty: string;
+    loading: string;
+    myCurriculum: string;
+    other: string;
+  };
 }) {
   const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
   const customItems = customCurricula.filter((item) => {
@@ -239,12 +275,12 @@ function CurriculumTree({
     if (!trimmed) return true;
     return item.title.toLowerCase().includes(trimmed);
   });
-  const groupedCategories = buildSidebarCategoryGroups(categories, categoryGroups);
+  const groupedCategories = buildSidebarCategoryGroups(categories, categoryGroups, text.other);
 
   return (
     <>
       <SidebarGroup className="py-0.5">
-        <SidebarGroupLabel className="h-6 px-2 text-[11px]">Codaro 커리큘럼</SidebarGroupLabel>
+        <SidebarGroupLabel className="h-6 px-2 text-[11px]">{text.codaroCurriculum}</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
             {groupedCategories.map((group) => {
@@ -290,7 +326,7 @@ function CurriculumTree({
                                   <SidebarMenuSubItem>
                                     <div className="flex h-7 items-center gap-2 px-2 text-xs text-muted-foreground">
                                       <Loader2 className="size-3 animate-spin" />
-                                      불러오는 중
+                                      {text.loading}
                                     </div>
                                   </SidebarMenuSubItem>
                                 ) : contents.map((content) => (
@@ -328,7 +364,7 @@ function CurriculumTree({
       </SidebarGroup>
 
       <SidebarGroup className="py-0.5">
-        <SidebarGroupLabel className="h-6 px-2 text-[11px]">나만의 커리큘럼</SidebarGroupLabel>
+        <SidebarGroupLabel className="h-6 px-2 text-[11px]">{text.myCurriculum}</SidebarGroupLabel>
         <SidebarGroupContent>
           <SidebarMenu>
             {customItems.length ? customItems.map((item) => (
@@ -347,7 +383,7 @@ function CurriculumTree({
             )) : (
               <SidebarMenuItem>
                 <div className="px-2 py-2 text-xs leading-5 text-sidebar-foreground/60 group-data-[collapsible=icon]:hidden">
-                  채팅에서 만든 커리큘럼이 여기에 쌓입니다.
+                  {text.curriculumEmpty}
                 </div>
               </SidebarMenuItem>
             )}
@@ -361,6 +397,7 @@ function CurriculumTree({
 function buildSidebarCategoryGroups(
   categories: CurriculumCategory[],
   categoryGroups: Record<string, string[]>,
+  fallbackGroupName: string,
 ) {
   const categoriesByKey = new Map(categories.map((category) => [category.key, category]));
   const groupedKeys = new Set<string>();
@@ -378,7 +415,7 @@ function buildSidebarCategoryGroups(
   const remaining = categories.filter((category) => !groupedKeys.has(category.key));
   if (remaining.length) {
     groups.push({
-      name: "기타",
+      name: fallbackGroupName,
       categories: remaining,
       count: remaining.reduce((total, category) => total + category.count, 0),
     });
@@ -388,20 +425,27 @@ function buildSidebarCategoryGroups(
 
 function AutomationTree({
   selectedSection,
+  text,
   onSelectSection,
 }: {
   selectedSection: AutomationSection;
+  text: {
+    automation: string;
+    codaro: string;
+    custom: string;
+    tasks: string;
+  };
   onSelectSection: (section: AutomationSection) => void;
 }) {
   const items: Array<{ section: AutomationSection; label: string; Icon: React.ComponentType<{ className?: string }> }> = [
-    { section: "codaro", label: "Codaro 자동화", Icon: Workflow },
-    { section: "custom", label: "나만의 자동화", Icon: TerminalSquare },
-    { section: "tasks", label: "태스크", Icon: Clock3 },
+    { section: "codaro", label: text.codaro, Icon: Workflow },
+    { section: "custom", label: text.custom, Icon: TerminalSquare },
+    { section: "tasks", label: text.tasks, Icon: Clock3 },
   ];
 
   return (
     <SidebarGroup className="py-0.5">
-      <SidebarGroupLabel className="h-6 px-2 text-[11px]">자동화</SidebarGroupLabel>
+      <SidebarGroupLabel className="h-6 px-2 text-[11px]">{text.automation}</SidebarGroupLabel>
       <SidebarGroupContent>
         <SidebarMenu>
           {items.map(({ Icon, label, section }) => (

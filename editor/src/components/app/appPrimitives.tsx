@@ -15,6 +15,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { blockLabel } from "@/lib/cellModel";
 import { statusLabel, stringifyData } from "@/lib/displayFormat";
+import { useLocale } from "@/lib/localeContext";
 import { cn } from "@/lib/utils";
 import type { BlockConfig, ExecutionResult } from "@/types";
 
@@ -46,8 +47,11 @@ export function IconButton({
 }
 
 export function CodePayload({ label = "예제 스니펫", value }: { label?: string; value: unknown }) {
+  const { t } = useLocale();
   const [copied, setCopied] = useState(false);
   const text = stringifyData(value);
+  const resolvedLabel = label === "예제 스니펫" ? t("system.snippet") : label;
+  const copyLabel = label === "예제 스니펫" ? t("system.copySnippet") : `${resolvedLabel} ${t("common.copy")}`;
 
   const copySnippet = async () => {
     try {
@@ -64,19 +68,20 @@ export function CodePayload({ label = "예제 스니펫", value }: { label?: str
       <div className="flex items-center justify-between gap-2 border-b border-border/70 bg-background/35 px-3 py-2">
         <div className="flex min-w-0 items-center gap-1.5 text-[10px] font-medium uppercase text-muted-foreground">
           <span className="size-1.5 rounded-full bg-emerald-400" />
-          <span className="truncate">{label}</span>
+          <span className="truncate">{resolvedLabel}</span>
         </div>
         <Button
-          aria-label="스니펫 복사"
+          aria-label={copyLabel}
           className="h-6 gap-1.5 px-2 text-[11px]"
           data-code-payload-copy="true"
           size="sm"
+          title={copyLabel}
           type="button"
           variant="ghost"
           onClick={copySnippet}
         >
           {copied ? <Check className="size-3" /> : <Copy className="size-3" />}
-          {copied ? "복사됨" : "복사"}
+          {copied ? t("common.copied") : t("common.copy")}
         </Button>
       </div>
       <ScrollArea className="max-h-64">
@@ -87,8 +92,9 @@ export function CodePayload({ label = "예제 스니펫", value }: { label?: str
 }
 
 export function ExecutionOutput({ result }: { result: ExecutionResult }) {
+  const { t } = useLocale();
   const hasError = result.status === "error" || Boolean(result.stderr);
-  const output = result.stderr || result.stdout || stringifyData(result.data) || "출력 없음";
+  const output = result.stderr || result.stdout || stringifyData(result.data) || t("runtime.noOutput");
   return (
     <div
       className={cn("rounded-md bg-muted/30 p-3", hasError && "bg-destructive/10")}
@@ -96,7 +102,7 @@ export function ExecutionOutput({ result }: { result: ExecutionResult }) {
       data-execution-output-status={hasError ? "error" : "ok"}
     >
       <div className="mb-2 flex items-center justify-between gap-2 text-xs">
-        <span className="font-medium uppercase text-muted-foreground">출력</span>
+        <span className="font-medium uppercase text-muted-foreground">{t("system.output")}</span>
         <Badge variant={hasError ? "destructive" : "outline"}>
           {statusLabel(result.status || "done")} #{result.executionCount}
         </Badge>
@@ -111,9 +117,9 @@ export function ExecutionOutput({ result }: { result: ExecutionResult }) {
         >
           <XCircle className="mt-0.5 size-3.5 shrink-0 text-destructive" />
           <div className="min-w-0">
-            <div className="font-medium text-foreground">셀 실행 실패</div>
+            <div className="font-medium text-foreground">{t("system.recoverCellError.title")}</div>
             <div className="text-muted-foreground">
-              오류 메시지의 마지막 줄부터 확인하고, import·변수명·입력값을 고친 뒤 이 셀을 다시 실행할 수 있습니다.
+              {t("system.recoverCellError.detail")}
             </div>
           </div>
         </div>
@@ -160,6 +166,7 @@ export function PendingNotebookBar({
   onAccept: () => void;
   onReject: () => void;
 }) {
+  const { t } = useLocale();
   if (!pendingBlocks.length) return null;
 
   return (
@@ -167,15 +174,18 @@ export function PendingNotebookBar({
       <CardContent className="flex flex-wrap items-center gap-3 p-3">
         <Sparkles className="size-4 text-muted-foreground" />
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-medium">대기 중인 생성 항목</div>
+          <div className="text-sm font-medium">{t("system.pendingGenerated")}</div>
           <div className="truncate text-xs text-muted-foreground">
-            생성된 셀 {pendingBlocks.length}개: {pendingBlocks.slice(0, 3).map(blockLabel).join(", ")}
+            {t("system.pendingGeneratedDetail", {
+              count: pendingBlocks.length,
+              items: pendingBlocks.slice(0, 3).map(blockLabel).join(", "),
+            })}
           </div>
         </div>
-        <IconButton label="적용" variant="default" onClick={onAccept}>
+        <IconButton label={t("system.apply")} variant="default" onClick={onAccept}>
           <CheckCircle2 />
         </IconButton>
-        <IconButton label="버리기" variant="ghost" onClick={onReject}>
+        <IconButton label={t("system.discard")} variant="ghost" onClick={onReject}>
           <XCircle />
         </IconButton>
       </CardContent>

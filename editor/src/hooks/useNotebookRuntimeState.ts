@@ -1,6 +1,7 @@
 import { useCallback, useMemo, useState } from "react";
 import { blockLabel } from "@/lib/cellModel";
 import type { ResultMap } from "@/lib/assistantContext";
+import { translate } from "@/lib/localeCopy";
 import {
   resolveBlockRunCode,
   runNotebookBlock,
@@ -60,7 +61,7 @@ export function useNotebookRuntimeState({
       selectNotebookBlock(block.id);
     }
     setRunningBlockId(block.id);
-    onNotice({ tone: "default", title: "셀 실행 중", detail: blockLabel(block) });
+    onNotice({ tone: "default", title: translate("runtime.cellRunning"), detail: blockLabel(block) });
 
     try {
       const outcome = await runNotebookBlock({
@@ -86,7 +87,7 @@ export function useNotebookRuntimeState({
   const runNotebook = useCallback(async () => {
     const firstBlock = selectedBlock?.type === "code" ? selectedBlock : codeBlocks[0];
     if (!firstBlock) return;
-    onNotice({ tone: "default", title: "노트북 실행 중", detail: document.title });
+    onNotice({ tone: "default", title: translate("runtime.notebookRunning"), detail: document.title });
     setNotebookRunning(true);
 
     try {

@@ -1,5 +1,6 @@
 import type { AssistantMessage } from "@/lib/assistantTypes";
 import type { StreamEvent } from "@/lib/assistantStream";
+import { translate } from "@/lib/localeCopy";
 import {
   createComposeStep,
   finishAssistantWorkLoop,
@@ -75,7 +76,7 @@ export function applyAssistantStreamEvent({
       messages: updateAssistantMessage(messages, assistantMessageId, (item) => ({
         ...item,
         tone: "error",
-        content: event.error ?? "요청 처리 중 오류가 발생했습니다.",
+        content: event.error ?? translate("assistant.requestError"),
         diagnostic: event.diagnostic,
         steps: markAssistantStepsError(item.steps),
         trace: normalizeAssistantTrace(event.trace),
@@ -113,7 +114,7 @@ export function finalizeAssistantMessage({
     const workLoop = finishAssistantWorkLoop({ steps: item.steps, response });
     return {
       ...item,
-      content: response.answer || streamedContent || "완료했습니다.",
+      content: response.answer || streamedContent || translate("assistant.done"),
       provider: response.provider,
       model: response.model,
       toolCalls: response.toolCalls,

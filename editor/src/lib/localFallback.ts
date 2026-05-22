@@ -1,5 +1,6 @@
 import { teacherScopeLabel, type TeacherScope } from "@/lib/teacherScope";
 import { stringifyData } from "@/lib/displayFormat";
+import { getActiveLocale, translate } from "@/lib/localeCopy";
 import type { AppNotice, BlockConfig, ExecutionResult, VariableInfo } from "@/types";
 
 export type LocalAssistantDraft = {
@@ -46,13 +47,13 @@ export function completeLocalAssistantDraft({
       id: `assistant-preview-${now}`,
       role: "assistant",
       content: buildLocalAssistantAnswer(message, scope, blockCount, saved),
-      provider: "기본 안내",
-      model: "기본 안내",
+      provider: translate("provider.fallbackMode"),
+      model: translate("provider.fallbackMode"),
     },
     notice: {
       tone: blockCount ? "success" : "default",
-      title: saved ? "나만의 커리큘럼 저장됨" : blockCount ? "커리큘럼 초안 준비됨" : "AI 답변 완료",
-      detail: savedTitle ?? (blockCount ? `${blockCount}개 학습 셀을 생성했습니다.` : "셀 안내가 준비됐습니다."),
+      title: saved ? translate("local.curriculumSaved") : blockCount ? translate("local.curriculumDraftReady") : translate("local.aiAnswerDone"),
+      detail: savedTitle ?? (blockCount ? translate("local.cellsGenerated", { count: blockCount }) : translate("local.cellGuideReady")),
     },
   };
 }
@@ -142,8 +143,28 @@ export function buildLocalBlocksFromPrompt(message: string, scope: TeacherScope)
 }
 
 export function buildLocalAssistantAnswer(message: string, scope: TeacherScope, blockCount: number, saved = false) {
+  const locale = getActiveLocale();
   const topic = inferLocalTopic(message);
   const scopeLabel = teacherScopeLabel(scope);
+  if (locale === "en") {
+    if (scope === "cell") {
+      const cellSubject = /선택한|셀 내용|cell/i.test(message) ? "the selected cell" : topic;
+      return [
+        "Local guide mode is active, so I can only show a short learning direction.",
+        `This is cell-level guidance for ${cellSubject}.`,
+        "Read and run the selected cell, then compare its output against the expected learning goal.",
+        "Connect a provider to continue with explanations, hints, and validation based on the current cell and execution result.",
+      ].join("\n\n");
+    }
+    return [
+      "Local guide mode is active, so I can only prepare a compact curriculum draft.",
+      `I drafted a ${scope} notebook for ${topic}.`,
+      saved
+        ? `Saved ${blockCount} learning cells to My Curriculum and opened the curriculum surface.`
+        : `${blockCount} learning cells are ready for review. Apply them to save them to My Curriculum and open the curriculum surface.`,
+      "Connect a provider to adjust the draft through chat and continue by reading or editing only the cells that matter.",
+    ].join("\n\n");
+  }
   if (scope === "cell") {
     const cellSubject = /선택한|셀 내용|cell/i.test(message) ? "선택한 셀" : topic;
     return [
@@ -190,7 +211,7 @@ export function firstOutputLine(result: ExecutionResult) {
 
 function extractStdout(code: string, assignmentMap: Record<string, string>) {
   const printMatches = [...code.matchAll(/print\(([^)]*)\)/g)];
-  if (!printMatches.length) return "로컬 실행 완료";
+  if (!printMatches.length) return translate("runtime.localDone");
   return printMatches
     .map((match) => {
       const raw = match[1].trim();

@@ -3,6 +3,7 @@ import { fallbackBootstrap, fallbackCategories } from "@/lib/fallbackData";
 import { registryCategories } from "@/lib/curriculaRegistry";
 import { defaultCurriculumState } from "@/lib/curriculumSelection";
 import { shortPath } from "@/lib/displayFormat";
+import { translate } from "@/lib/localeCopy";
 import type {
   AiProfile,
   AiToolCatalogPayload,
@@ -16,8 +17,8 @@ import type {
 
 export const initialAppNotice: AppNotice = {
   tone: "default",
-  title: "준비됨",
-  detail: "Codaro에게 커리큘럼, 실습 셀, 검증 셀, 자동화를 요청하세요.",
+  title: translate("app.ready.title"),
+  detail: translate("app.ready.detail"),
 };
 
 export const emptyToolCatalog: AiToolCatalogPayload = {
@@ -49,7 +50,7 @@ export type AppBootstrapState = {
 const builtInCategories = registryCategories();
 const initialCurriculum = defaultCurriculumState();
 const fallbackProfile: AiProfile = {
-  activeProvider: "provider 없음",
+  activeProvider: translate("common.defaultProvider"),
   activeModel: null,
   ready: false,
 };
@@ -65,7 +66,7 @@ const emptyDiagnosticSummary: DiagnosticSummary = {
   },
   nextActions: [],
   readableActions: [],
-  summaryText: "진단 정상",
+  summaryText: "diagnostic ok",
 };
 
 export const initialBootstrapState: AppBootstrapState = {
@@ -129,8 +130,8 @@ export function diagnosticNoticeFromSummary(summary: DiagnosticSummary, error?: 
   if (error) {
     return {
       tone: "warning",
-      title: "시작 진단 확인 필요",
-      detail: `진단 API 응답을 읽지 못했습니다. ${error}`,
+      title: translate("diagnostic.startCheckRequired.title"),
+      detail: translate("diagnostic.apiUnread", { error }),
     };
   }
   if (summary.status !== "needs-action" || summary.items.length === 0) {
@@ -139,7 +140,7 @@ export function diagnosticNoticeFromSummary(summary: DiagnosticSummary, error?: 
   if (summary.summaryText) {
     return {
       tone: "warning",
-      title: "시작 진단 필요",
+      title: translate("diagnostic.startRequired.title"),
       detail: summary.summaryText,
     };
   }
@@ -148,12 +149,12 @@ export function diagnosticNoticeFromSummary(summary: DiagnosticSummary, error?: 
   const messages = summary.items.slice(0, 2).map((item) => item.message);
   const hiddenCount = Math.max(0, summary.items.length - messages.length);
   const actionText = summary.nextActions.slice(0, 2).map(readableDiagnosticAction).join(", ");
-  const issueText = `${messages.join(" · ")}${hiddenCount ? ` 외 ${hiddenCount}건` : ""}`;
-  const detailParts = [categories, issueText, actionText ? `다음: ${actionText}` : ""].filter(Boolean);
+  const issueText = `${messages.join(" · ")}${hiddenCount ? ` ${translate("diagnostic.hiddenCount", { count: hiddenCount })}` : ""}`;
+  const detailParts = [categories, issueText, actionText ? translate("diagnostic.next", { action: actionText }) : ""].filter(Boolean);
 
   return {
     tone: "warning",
-    title: "시작 진단 필요",
+    title: translate("diagnostic.startRequired.title"),
     detail: detailParts.join(" · "),
   };
 }
@@ -178,20 +179,20 @@ function diagnosticCategoryText(categories: DiagnosticSummary["categories"]): st
 function diagnosticCategoryLabel(category: DiagnosticCategory): string {
   if (category === "provider") return "Provider";
   if (category === "runtime") return "Runtime";
-  if (category === "package") return "패키지";
+  if (category === "package") return translate("diagnostic.category.package");
   return "Frontend";
 }
 
 function readableDiagnosticAction(action: string): string {
   const labels: Record<string, string> = {
-    "build-editor": "Editor 빌드",
-    "check-provider": "Provider 확인",
-    "configure-api-key": "API 키 입력",
-    "configure-base-url": "Base URL 입력",
-    "connect-provider": "Provider 연결",
-    "create-project-venv": ".venv 준비",
-    "install-uv": "uv 설치",
-    "restart-runtime": "Runtime 재시작",
+    "build-editor": translate("diagnostic.action.buildEditor"),
+    "check-provider": translate("diagnostic.action.checkProvider"),
+    "configure-api-key": translate("diagnostic.action.configureApiKey"),
+    "configure-base-url": translate("diagnostic.action.configureBaseUrl"),
+    "connect-provider": translate("diagnostic.action.connectProvider"),
+    "create-project-venv": translate("diagnostic.action.createProjectVenv"),
+    "install-uv": translate("diagnostic.action.installUv"),
+    "restart-runtime": translate("diagnostic.action.restartRuntime"),
   };
   return labels[action] ?? action;
 }
@@ -218,7 +219,7 @@ async function loadBootstrapDocument(documentPath: string): Promise<{
       document: loaded.document,
       notice: {
         tone: "success",
-        title: "노트북 불러옴",
+        title: translate("document.loaded"),
         detail: shortPath(loaded.path),
       },
     };
@@ -227,7 +228,7 @@ async function loadBootstrapDocument(documentPath: string): Promise<{
       document: null,
       notice: {
         tone: "warning",
-        title: "노트북을 열 수 없음",
+        title: translate("document.openFailed"),
         detail: error instanceof Error ? error.message : String(error),
       },
     };
