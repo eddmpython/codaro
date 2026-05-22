@@ -16,7 +16,6 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SOURCE_ROOT = REPO_ROOT / "curricula" / "python" / "30days"
 COLAB_DIR = ROOT / "colab"
-MARIMO_DIR = ROOT / "marimo"
 LOGGER = logging.getLogger(__name__)
 SAFE_EXEC_ERRORS = (
     ArithmeticError,
@@ -37,9 +36,6 @@ LEGACY_TEXT = [
     "오류 고쳐보기",
     "틀린 이유 적기",
     "비슷한 문제 3단계",
-    "Marimo 환경",
-    "Marimo에서 자동 출력",
-    "Marimo로 계산",
     "assert ",
     "print() 함수",
     "유니코드(Unicode)",
@@ -182,7 +178,6 @@ def validateManifest(curriculum: dict[str, object]) -> None:
             "manifest source YAML mismatch",
         )
         assertCondition((ROOT / str(manifestDay["colab"])).exists(), f"missing colab: {manifestDay['colab']}")
-        assertCondition((ROOT / str(manifestDay["marimo"])).exists(), f"missing marimo: {manifestDay['marimo']}")
     reviews = manifest.get("reviews", [])
     assertCondition(isinstance(reviews, list), "manifest reviews must be a list")
     assertCondition(len(reviews) == 6, "manifest must list exactly 6 review notebooks")
@@ -263,33 +258,6 @@ def validateReviewNotebook(path: Path) -> None:
     validateCodeCells(path, cells)
 
 
-def validateMarimoNotebook(path: Path, sourceYaml: Path | None) -> None:
-    content = path.read_text(encoding="utf-8")
-    validateNoLegacyText(path, content)
-    requiredText = ["import marimo", "app = marimo.App", "@app.cell", "app.run()"]
-    missing = [text for text in requiredText if text not in content]
-    assertCondition(not missing, f"{path.name} missing marimo markers: {missing}")
-    assertCondition("# %%" not in content, f"{path.name} still uses percent markers")
-    assertCondition("runCell(" not in content, f"{path.name} must not wrap code in runCell strings")
-    if sourceYaml is not None:
-        sourceText = str(sourceYaml.relative_to(REPO_ROOT)).replace("\\", "/")
-        assertCondition(sourceText in content, f"{path.name} missing YAML source")
-        yamlContent = loadYaml(sourceYaml)
-        codeBlockCount = countBlocks(yamlContent, "code")
-        expansionCount = countBlocks(yamlContent, "expansion")
-        assertCondition(content.count("```python") >= codeBlockCount, f"{path.name} missing visible code previews")
-        if expansionCount:
-            assertCondition(
-                content.count("직접 작성하세요.") >= expansionCount,
-                f"{path.name} missing editable learner cells",
-            )
-        assertCondition("@app.cell(hide_code=True)" in content, f"{path.name} must hide generated runner cells")
-    try:
-        ast.parse(content)
-    except SyntaxError as exc:
-        raise AssertionError(f"{path.name} syntax error: {exc.msg}") from exc
-
-
 def countBlocks(yamlContent: dict[str, object], blockType: str) -> int:
     count = 0
     sections = yamlContent.get("sections", [])
@@ -323,17 +291,11 @@ def main() -> None:
         manifestDays = loadJson(ROOT / "manifest.json")["days"]
         manifestDay = manifestDays[day - 1]
         colabPath = ROOT / str(manifestDay["colab"])
-        marimoPath = ROOT / str(manifestDay["marimo"])
         validateNotebookAgainstYaml(colabPath, sourceYaml, dayEntry)
-        validateMarimoNotebook(marimoPath, sourceYaml)
     reviewNotebooks = sorted(COLAB_DIR.glob("review*.ipynb"))
     assertCondition(len(reviewNotebooks) == 6, "notebooks directory must contain exactly 6 review notebooks")
     for path in reviewNotebooks:
         validateReviewNotebook(path)
-    marimoReviews = sorted(MARIMO_DIR.glob("review*.py"))
-    assertCondition(len(marimoReviews) == 6, "marimo directory must contain exactly 6 review notebooks")
-    for path in marimoReviews:
-        validateMarimoNotebook(path, None)
     print("course validation ok")
 
 

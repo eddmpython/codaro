@@ -17,7 +17,7 @@
 
 ### Changed
 
-- Renamed the marimo-compatible document adapter to `reactiveAppFormat`.
+- Removed the legacy reactive document adapter from the active document surface.
 - Expanded tool rendering across editor, automation, learning, and integration actions.
 - Split large frontend bundles with AutomationMode lazy loading and vendor manual chunking.
 - Tightened Svelte 5 runes and accessibility handling across key editor components.

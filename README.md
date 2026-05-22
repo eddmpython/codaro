@@ -7,7 +7,6 @@
 <p align="center">
   <a href="notebooks/python30DaysComplete/readme.md"><img alt="Python 30 Days" src="https://img.shields.io/badge/Python_30_Days-open-2563eb" /></a>
   <a href="https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb"><img alt="Open Day 01 in Colab" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
-  <a href="https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day01Helloworld.py"><img alt="Open Day 01 in molab" src="https://img.shields.io/badge/Day_01-open_in_molab-ff5a5f" /></a>
 </p>
 
 Codaro는 코드가 인터페이스가 되는 **개인 학습 + 자동화 스튜디오**입니다.
@@ -29,7 +28,6 @@ Codaro는 코드가 인터페이스가 되는 **개인 학습 + 자동화 스튜
 | [프론트 구조 기준](docs/skills/architecture/frontend-product-surface.md) | `editor/` 제품 표면과 UI 판단 기준 |
 | [Python 30일 완성 안내](notebooks/python30DaysComplete/readme.md) | 전체 Day 목록, 리뷰 노트북, 진행표 |
 | [Day 01 Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb) | 브라우저에서 바로 실행 |
-| [Day 01 marimo 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day01Helloworld.py) | molab에서 바로 실행 |
 | [코스 가이드](notebooks/python30DaysComplete/courseGuide.md) | 학습 방법, 평가 기준, 최종 프로젝트 |
 
 ## Python 30일 완성
@@ -39,9 +37,8 @@ Codaro는 코드가 인터페이스가 되는 **개인 학습 + 자동화 스튜
 | 형식 | 바로 실행 |
 |---|---|
 | Colab | [Day 01 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb) |
-| marimo | [Day 01 열기](https://molab.marimo.io/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/marimo/day01Helloworld.py) |
 
-전체 Day별 Colab/marimo 실행 링크는 [Python 30일 완성 안내](notebooks/python30DaysComplete/readme.md)에 있습니다.
+전체 Day별 Colab 실행 링크는 [Python 30일 완성 안내](notebooks/python30DaysComplete/readme.md)에 있습니다.
 
 ## 30일 흐름
 

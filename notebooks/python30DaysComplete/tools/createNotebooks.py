@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import ast
 import json
 from pathlib import Path
 from textwrap import dedent
@@ -13,7 +12,6 @@ ROOT = Path(__file__).resolve().parents[1]
 REPO_ROOT = Path(__file__).resolve().parents[3]
 SOURCE_ROOT = REPO_ROOT / "curricula" / "python" / "30days"
 COLAB_DIR = ROOT / "colab"
-MARIMO_DIR = ROOT / "marimo"
 REPOSITORY = "eddmpython/codaro"
 BRANCH = "main"
 COURSE_PATH = "notebooks/python30DaysComplete"
@@ -123,10 +121,6 @@ def colabName(day: int) -> str:
     return f"{OUTPUT_STEMS[day]}.ipynb"
 
 
-def marimoName(day: int) -> str:
-    return f"{OUTPUT_STEMS[day]}.py"
-
-
 def reviewNotebookName(startDay: int, endDay: int) -> str:
     return f"reviewDay{startDay:02d}To{endDay:02d}.ipynb"
 
@@ -138,15 +132,6 @@ def encodeCoursePath(relativePath: str) -> str:
 def colabUrl(relativePath: str) -> str:
     path = encodeCoursePath(relativePath)
     return f"https://colab.research.google.com/github/{REPOSITORY}/blob/{BRANCH}/{path}"
-
-
-def molabUrl(relativePath: str) -> str:
-    path = encodeCoursePath(relativePath)
-    return f"https://molab.marimo.io/github/{REPOSITORY}/blob/{BRANCH}/{path}"
-
-
-def codeFence(source: str) -> str:
-    return f"```python\n{cleanCode(source).rstrip()}\n```"
 
 
 def markdownList(items: object) -> str:
@@ -408,185 +393,20 @@ def makeReviewNotebook(startDay: int, endDay: int, dayEntries: list[dict[str, ob
     }
 
 
-def indentCode(source: str, spaces: int = 4) -> list[str]:
-    prefix = " " * spaces
-    lines = cleanCode(source).rstrip("\n").splitlines()
-    if not lines:
-        return [f"{prefix}pass"]
-    return [f"{prefix}{line}" if line else prefix.rstrip() for line in lines]
-
-
-def escapeTripleQuotes(source: str) -> str:
-    return source.replace('"""', '\\"\\"\\"')
-
-
-def escapeMarkdownString(source: str) -> str:
-    return escapeTripleQuotes(cleanMarkdown(source)).replace('""', '\\"\\"')
-
-
-def appendMarimoMarkdown(chunks: list[str], source: str) -> None:
-    escaped = escapeMarkdownString(source)
-    chunks.extend(
-        [
-            "",
-            "@app.cell",
-            "def _(mo):",
-            '    mo.md(r"""',
-            *[f"    {line}" if line else "" for line in escaped.splitlines()],
-            '    """)',
-            "    return",
-        ]
-    )
-
-
-def isLearnerPlaceholder(source: str) -> bool:
-    lines = [line.strip() for line in source.splitlines() if line.strip()]
-    return bool(lines) and all(line.startswith("#") for line in lines)
-
-
-def appendMarimoCodePreview(chunks: list[str], source: str) -> None:
-    appendMarimoMarkdown(chunks, codeFence(source))
-
-
-def appendMarimoLearnerCode(chunks: list[str]) -> None:
-    chunks.extend(
-        [
-            "",
-            "@app.cell",
-            "def _():",
-            "    # 아래 두 줄을 지우고 직접 작성하세요.",
-            "    _result = None",
-            "    _result",
-            "    return",
-        ]
-    )
-
-
-def sourceHasGlobalStatement(source: str) -> bool:
-    tree = ast.parse(source)
-    return any(isinstance(node, ast.Global) for node in ast.walk(tree))
-
-
-def sourceWithReturnValue(source: str) -> str:
-    cleanSource = cleanCode(source).rstrip()
-    tree = ast.parse(cleanSource)
-    if not tree.body or not isinstance(tree.body[-1], ast.Expr):
-        return cleanSource
-    lastExpr = tree.body[-1]
-    lines = cleanSource.splitlines()
-    start = lastExpr.lineno - 1
-    end = lastExpr.end_lineno or lastExpr.lineno
-    lines[start:end] = [f"return {ast.unparse(lastExpr.value)}"]
-    return "\n".join(lines)
-
-
-def appendMarimoLocalCode(chunks: list[str], source: str, cellIndex: int) -> None:
-    functionName = f"_snippet_{cellIndex:04d}"
-    transformed = sourceWithReturnValue(source)
-    chunks.extend(
-        [
-            "",
-            "@app.cell(hide_code=True)",
-            "def _():",
-            f"    def {functionName}():",
-            *indentCode(transformed, spaces=8),
-            f"    {functionName}()",
-            "    return",
-        ]
-    )
-
-
-def appendMarimoRunnerCode(chunks: list[str], source: str) -> None:
-    escaped = escapeTripleQuotes(cleanCode(source).rstrip())
-    chunks.extend(
-        [
-            "",
-            "@app.cell(hide_code=True)",
-            "def _(_runSnippet):",
-            '    _runSnippet(r"""',
-            *escaped.splitlines(),
-            '    """)',
-            "    return",
-        ]
-    )
-
-
-def appendMarimoCode(chunks: list[str], source: str, cellIndex: int) -> None:
-    if isLearnerPlaceholder(source):
-        appendMarimoLearnerCode(chunks)
-        return
-    appendMarimoCodePreview(chunks, source)
-    if sourceHasGlobalStatement(source):
-        appendMarimoRunnerCode(chunks, source)
-        return
-    appendMarimoLocalCode(chunks, source, cellIndex)
-
-
-def notebookToMarimoPython(notebook: dict[str, object], title: str) -> str:
-    appTitle = title.replace("\\", "\\\\").replace('"', '\\"')
-    chunks = [
-        "import marimo",
-        "",
-        '__generated_with = "0.23.6"',
-        "",
-        f'app = marimo.App(app_title="{appTitle}")',
-        "",
-        "",
-        "@app.cell",
-        "def _():",
-        "    import marimo as mo",
-        "    return (mo,)",
-        "",
-        "@app.cell(hide_code=True)",
-        "def _():",
-        "    import ast",
-        "",
-        "    def _runSnippet(source):",
-        '        namespace = {"__builtins__": __builtins__}',
-        '        tree = ast.parse(source, mode="exec")',
-        "        if tree.body and isinstance(tree.body[-1], ast.Expr):",
-        "            lastExpr = ast.Expression(tree.body.pop().value)",
-        "            ast.fix_missing_locations(tree)",
-        "            ast.fix_missing_locations(lastExpr)",
-        '            exec(compile(tree, "<marimo-snippet>", "exec"), namespace)',
-        '            return eval(compile(lastExpr, "<marimo-snippet>", "eval"), namespace)',
-        "        ast.fix_missing_locations(tree)",
-        '        exec(compile(tree, "<marimo-snippet>", "exec"), namespace)',
-        "        return None",
-        "",
-        "    return (_runSnippet,)",
-    ]
-    for cellIndex, cell in enumerate(notebook["cells"], start=1):
-        source = str(cell.get("source", ""))
-        if cell.get("cell_type") == "markdown":
-            appendMarimoMarkdown(chunks, source)
-        elif cell.get("cell_type") == "code":
-            appendMarimoCode(chunks, source, cellIndex)
-    chunks.extend(["", "", 'if __name__ == "__main__":', "    app.run()", ""])
-    return "\n".join(chunks)
-
-
 def writeDayNotebooks(dayEntries: list[dict[str, object]]) -> None:
     COLAB_DIR.mkdir(parents=True, exist_ok=True)
-    MARIMO_DIR.mkdir(parents=True, exist_ok=True)
     for dayEntry in dayEntries:
         day = int(dayEntry["day"])
         content = loadDayContent(dayEntry)
         notebook = makeNotebook(dayEntry, content)
         (COLAB_DIR / colabName(day)).write_text(json.dumps(notebook, ensure_ascii=False, indent=2), encoding="utf-8")
-        title = f"Day {day:02d}. {content.get('meta', {}).get('title', dayEntry['title'])}"
-        (MARIMO_DIR / marimoName(day)).write_text(notebookToMarimoPython(notebook, title), encoding="utf-8")
 
 
 def writeReviewNotebooks(dayEntries: list[dict[str, object]]) -> None:
     for startDay, endDay in REVIEW_RANGES:
         notebook = makeReviewNotebook(startDay, endDay, dayEntries)
         colabPath = COLAB_DIR / reviewNotebookName(startDay, endDay)
-        marimoPath = MARIMO_DIR / reviewNotebookName(startDay, endDay).replace(".ipynb", ".py")
         colabPath.write_text(json.dumps(notebook, ensure_ascii=False, indent=2), encoding="utf-8")
-        marimoPath.write_text(
-            notebookToMarimoPython(notebook, f"Review Day {startDay:02d}-{endDay:02d}"), encoding="utf-8"
-        )
 
 
 def writeManifest(dayEntries: list[dict[str, object]]) -> None:
@@ -594,14 +414,13 @@ def writeManifest(dayEntries: list[dict[str, object]]) -> None:
         {
             "range": f"Day {startDay:02d}-{endDay:02d}",
             "colab": f"colab/{reviewNotebookName(startDay, endDay)}",
-            "marimo": f"marimo/{reviewNotebookName(startDay, endDay).replace('.ipynb', '.py')}",
         }
         for startDay, endDay in REVIEW_RANGES
     ]
     manifest = {
         "title": "Python 30일 완성",
         "source": "curricula/python/30days/curriculum.json",
-        "description": "curricula/python/30days YAML을 원본으로 생성한 Colab 및 marimo 학습 노트북",
+        "description": "curricula/python/30days YAML을 원본으로 생성한 Colab 학습 노트북",
         "days": [
             {
                 "day": int(entry["day"]),
@@ -618,7 +437,6 @@ def writeManifest(dayEntries: list[dict[str, object]]) -> None:
                 "forbidden": entry.get("forbidden", []),
                 "forbiddenLabels": [conceptLabel(item) for item in entry.get("forbidden", []) if isinstance(item, str)],
                 "colab": f"colab/{colabName(int(entry['day']))}",
-                "marimo": f"marimo/{marimoName(int(entry['day']))}",
             }
             for entry in dayEntries
         ],
@@ -636,15 +454,13 @@ def writeReadme(dayEntries: list[dict[str, object]]) -> None:
         newConcepts = formatConcepts(entry.get("newConcepts", []))
         rows.append(
             f"| {day:02d} | {entry['title']} | {newConcepts} | "
-            f"[Colab 열기]({colabUrl('colab/' + colabName(day))}) | "
-            f"[marimo 열기]({molabUrl('marimo/' + marimoName(day))}) |"
+            f"[Colab 열기]({colabUrl('colab/' + colabName(day))}) |"
         )
     reviewRows = []
     for startDay, endDay in REVIEW_RANGES:
         reviewRows.append(
             f"| Day {startDay:02d}-{endDay:02d} | 누적 복습 | "
-            f"[Colab 열기]({colabUrl('colab/' + reviewNotebookName(startDay, endDay))}) | "
-            f"[marimo 열기]({molabUrl('marimo/' + reviewNotebookName(startDay, endDay).replace('.ipynb', '.py'))}) |"
+            f"[Colab 열기]({colabUrl('colab/' + reviewNotebookName(startDay, endDay))}) |"
         )
     content = f"""
     # Python 30일 완성
@@ -652,7 +468,6 @@ def writeReadme(dayEntries: list[dict[str, object]]) -> None:
     이 폴더의 노트북은 `curricula/python/30days` YAML 커리큘럼을 원본으로 생성한 배포용 산출물입니다. 노트북 안에는 원본 YAML의 설명, 예제 코드, 연습 미션이 순서대로 들어 있습니다.
 
     [![Open Day 01 in Colab](https://colab.research.google.com/assets/colab-badge.svg)]({colabUrl("colab/day01Helloworld.ipynb")})
-    [![Open Day 01 in marimo](https://img.shields.io/badge/Day_01-open_in_marimo-ff5a5f)]({molabUrl("marimo/day01Helloworld.py")})
 
     ## 학습 방식
 
@@ -662,14 +477,14 @@ def writeReadme(dayEntries: list[dict[str, object]]) -> None:
 
     ## 전체 Day
 
-    | Day | 제목 | 새 개념 | Colab | marimo |
-    |---|---|---|---|---|
+    | Day | 제목 | 새 개념 | Colab |
+    |---|---|---|---|
     {chr(10).join(rows)}
 
     ## 리뷰
 
-    | 범위 | 목적 | Colab | marimo |
-    |---|---|---|---|
+    | 범위 | 목적 | Colab |
+    |---|---|---|
     {chr(10).join(reviewRows)}
     """
     (ROOT / "readme.md").write_text(cleanMarkdown(content) + "\n", encoding="utf-8")
@@ -691,7 +506,7 @@ def writeCourseGuide(dayEntries: list[dict[str, object]]) -> None:
     ## 원본과 산출물
 
     - 원본: `curricula/python/30days/curriculum.json` 및 Day별 YAML
-    - 산출물: `notebooks/python30DaysComplete/colab`, `notebooks/python30DaysComplete/marimo`
+    - 산출물: `notebooks/python30DaysComplete/colab`
     - 생성기: `notebooks/python30DaysComplete/tools/createNotebooks.py`
     - 검증기: `notebooks/python30DaysComplete/tools/validateCourse.py`
 

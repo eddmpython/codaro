@@ -1,7 +1,7 @@
 {
   "title": "Python 30일 완성",
   "source": "curricula/python/30days/curriculum.json",
-  "description": "curricula/python/30days YAML을 원본으로 생성한 Colab 및 marimo 학습 노트북",
+  "description": "curricula/python/30days YAML을 원본으로 생성한 Colab 학습 노트북",
   "days": [
     {
       "day": 1,
@@ -33,8 +33,7 @@
         "딕셔너리",
         "import"
       ],
-      "colab": "colab/day01Helloworld.ipynb",
-      "marimo": "marimo/day01Helloworld.py"
+      "colab": "colab/day01Helloworld.ipynb"
     },
     {
       "day": 2,
@@ -86,8 +85,7 @@
         "클래스",
         "import"
       ],
-      "colab": "colab/day02Variablestypes.ipynb",
-      "marimo": "marimo/day02Variablestypes.py"
+      "colab": "colab/day02Variablestypes.ipynb"
     },
     {
       "day": 3,
@@ -135,8 +133,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day03Operators.ipynb",
-      "marimo": "marimo/day03Operators.py"
+      "colab": "colab/day03Operators.ipynb"
     },
     {
       "day": 4,
@@ -186,8 +183,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day04Stringbasics.ipynb",
-      "marimo": "marimo/day04Stringbasics.py"
+      "colab": "colab/day04Stringbasics.ipynb"
     },
     {
       "day": 5,
@@ -225,8 +221,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day05Stringindexingslicing.ipynb",
-      "marimo": "marimo/day05Stringindexingslicing.py"
+      "colab": "colab/day05Stringindexingslicing.ipynb"
     },
     {
       "day": 6,
@@ -272,8 +267,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day06Stringmethods.ipynb",
-      "marimo": "marimo/day06Stringmethods.py"
+      "colab": "colab/day06Stringmethods.ipynb"
     },
     {
       "day": 7,
@@ -321,8 +315,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day07Listbasics.ipynb",
-      "marimo": "marimo/day07Listbasics.py"
+      "colab": "colab/day07Listbasics.ipynb"
     },
     {
       "day": 8,
@@ -370,8 +363,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day08Listmethods.ipynb",
-      "marimo": "marimo/day08Listmethods.py"
+      "colab": "colab/day08Listmethods.ipynb"
     },
     {
       "day": 9,
@@ -409,8 +401,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day09Tuples.ipynb",
-      "marimo": "marimo/day09Tuples.py"
+      "colab": "colab/day09Tuples.ipynb"
     },
     {
       "day": 10,
@@ -454,8 +445,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day10Sets.ipynb",
-      "marimo": "marimo/day10Sets.py"
+      "colab": "colab/day10Sets.ipynb"
     },
     {
       "day": 11,
@@ -495,8 +485,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day11Dictbasics.ipynb",
-      "marimo": "marimo/day11Dictbasics.py"
+      "colab": "colab/day11Dictbasics.ipynb"
     },
     {
       "day": 12,
@@ -536,8 +525,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day12Dictmethods.ipynb",
-      "marimo": "marimo/day12Dictmethods.py"
+      "colab": "colab/day12Dictmethods.ipynb"
     },
     {
       "day": 13,
@@ -575,8 +563,7 @@
         "반복문",
         "import"
       ],
-      "colab": "colab/day13Conditionals.ipynb",
-      "marimo": "marimo/day13Conditionals.py"
+      "colab": "colab/day13Conditionals.ipynb"
     },
     {
       "day": 14,
@@ -616,8 +603,7 @@
         "직접 만드는 함수",
         "import"
       ],
-      "colab": "colab/day14Loops.ipynb",
-      "marimo": "marimo/day14Loops.py"
+      "colab": "colab/day14Loops.ipynb"
     },
     {
       "day": 15,
@@ -657,8 +643,7 @@
         "import",
         "클래스"
       ],
-      "colab": "colab/day15Functionbasics.ipynb",
-      "marimo": "marimo/day15Functionbasics.py"
+      "colab": "colab/day15Functionbasics.ipynb"
     },
     {
       "day": 16,
@@ -694,8 +679,7 @@
         "클래스",
         "데코레이터"
       ],
-      "colab": "colab/day16Functionadvanced.ipynb",
-      "marimo": "marimo/day16Functionadvanced.py"
+      "colab": "colab/day16Functionadvanced.ipynb"
     },
     {
       "day": 17,
@@ -727,8 +711,7 @@
         "import",
         "클래스"
       ],
-      "colab": "colab/day17Scopeclosure.ipynb",
-      "marimo": "marimo/day17Scopeclosure.py"
+      "colab": "colab/day17Scopeclosure.ipynb"
     },
     {
       "day": 18,
@@ -768,8 +751,7 @@
         "클래스",
         "외부 라이브러리"
       ],
-      "colab": "colab/day18Modulesimport.ipynb",
-      "marimo": "marimo/day18Modulesimport.py"
+      "colab": "colab/day18Modulesimport.ipynb"
     },
     {
       "day": 19,
@@ -807,8 +789,7 @@
         "클래스",
         "외부 라이브러리"
       ],
-      "colab": "colab/day19Fileio.ipynb",
-      "marimo": "marimo/day19Fileio.py"
+      "colab": "colab/day19Fileio.ipynb"
     },
     {
       "day": 20,
@@ -846,8 +827,7 @@
         "클래스",
         "사용자 정의 예외"
       ],
-      "colab": "colab/day20Exceptionhandling.ipynb",
-      "marimo": "marimo/day20Exceptionhandling.py"
+      "colab": "colab/day20Exceptionhandling.ipynb"
     },
     {
       "day": 21,
@@ -867,8 +847,7 @@
       "forbiddenLabels": [
         "클래스"
       ],
-      "colab": "colab/day21Midreview.ipynb",
-      "marimo": "marimo/day21Midreview.py"
+      "colab": "colab/day21Midreview.ipynb"
     },
     {
       "day": 22,
@@ -910,8 +889,7 @@
         "특수 메서드",
         "데코레이터"
       ],
-      "colab": "colab/day22Classbasics.ipynb",
-      "marimo": "marimo/day22Classbasics.py"
+      "colab": "colab/day22Classbasics.ipynb"
     },
     {
       "day": 23,
@@ -943,8 +921,7 @@
         "특수 메서드",
         "데코레이터"
       ],
-      "colab": "colab/day23Classadvanced.ipynb",
-      "marimo": "marimo/day23Classadvanced.py"
+      "colab": "colab/day23Classadvanced.ipynb"
     },
     {
       "day": 24,
@@ -980,8 +957,7 @@
         "데코레이터",
         "메타클래스"
       ],
-      "colab": "colab/day24Specialmethods.ipynb",
-      "marimo": "marimo/day24Specialmethods.py"
+      "colab": "colab/day24Specialmethods.ipynb"
     },
     {
       "day": 25,
@@ -1019,8 +995,7 @@
         "메타클래스",
         "외부 라이브러리"
       ],
-      "colab": "colab/day25Propertydecorator.ipynb",
-      "marimo": "marimo/day25Propertydecorator.py"
+      "colab": "colab/day25Propertydecorator.ipynb"
     },
     {
       "day": 26,
@@ -1056,8 +1031,7 @@
         "제너레이터 표현식",
         "외부 라이브러리"
       ],
-      "colab": "colab/day26Comprehensions.ipynb",
-      "marimo": "marimo/day26Comprehensions.py"
+      "colab": "colab/day26Comprehensions.ipynb"
     },
     {
       "day": 27,
@@ -1093,8 +1067,7 @@
       "forbiddenLabels": [
         "외부 라이브러리"
       ],
-      "colab": "colab/day27Generatorsiterators.ipynb",
-      "marimo": "marimo/day27Generatorsiterators.py"
+      "colab": "colab/day27Generatorsiterators.ipynb"
     },
     {
       "day": 28,
@@ -1122,8 +1095,7 @@
       "forbiddenLabels": [
         "외부 라이브러리"
       ],
-      "colab": "colab/day28Advancedsyntaxreview.ipynb",
-      "marimo": "marimo/day28Advancedsyntaxreview.py"
+      "colab": "colab/day28Advancedsyntaxreview.ipynb"
     },
     {
       "day": 29,
@@ -1151,8 +1123,7 @@
       "forbiddenLabels": [
         "외부 라이브러리"
       ],
-      "colab": "colab/day29Algorithmpractice.ipynb",
-      "marimo": "marimo/day29Algorithmpractice.py"
+      "colab": "colab/day29Algorithmpractice.ipynb"
     },
     {
       "day": 30,
@@ -1172,40 +1143,33 @@
       "forbiddenLabels": [
         "외부 라이브러리"
       ],
-      "colab": "colab/day30Finalproject.ipynb",
-      "marimo": "marimo/day30Finalproject.py"
+      "colab": "colab/day30Finalproject.ipynb"
     }
   ],
   "reviews": [
     {
       "range": "Day 01-05",
-      "colab": "colab/reviewDay01To05.ipynb",
-      "marimo": "marimo/reviewDay01To05.py"
+      "colab": "colab/reviewDay01To05.ipynb"
     },
     {
       "range": "Day 06-10",
-      "colab": "colab/reviewDay06To10.ipynb",
-      "marimo": "marimo/reviewDay06To10.py"
+      "colab": "colab/reviewDay06To10.ipynb"
     },
     {
       "range": "Day 11-15",
-      "colab": "colab/reviewDay11To15.ipynb",
-      "marimo": "marimo/reviewDay11To15.py"
+      "colab": "colab/reviewDay11To15.ipynb"
     },
     {
       "range": "Day 16-20",
-      "colab": "colab/reviewDay16To20.ipynb",
-      "marimo": "marimo/reviewDay16To20.py"
+      "colab": "colab/reviewDay16To20.ipynb"
     },
     {
       "range": "Day 21-25",
-      "colab": "colab/reviewDay21To25.ipynb",
-      "marimo": "marimo/reviewDay21To25.py"
+      "colab": "colab/reviewDay21To25.ipynb"
     },
     {
       "range": "Day 26-30",
-      "colab": "colab/reviewDay26To30.ipynb",
-      "marimo": "marimo/reviewDay26To30.py"
+      "colab": "colab/reviewDay26To30.ipynb"
     }
   ]
 }
