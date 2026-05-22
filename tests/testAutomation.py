@@ -9,8 +9,25 @@ import pytest
 
 from codaro.automation.taskModel import TaskDefinition, TaskRun, TaskStatus
 from codaro.automation.taskRegistry import TaskRegistry
+from codaro.automation.taskRunner import TaskRunner
 from codaro.automation.scheduler import parseScheduleSeconds, TaskScheduler
 from codaro.automation.workflow import Workflow, WorkflowStep, WorkflowEngine
+from codaro.automation.eStop import getEmergencyStop
+
+
+class _MemoryAudit:
+    def __init__(self) -> None:
+        self.records = []
+
+    def record(self, actionType, source, parameters=None, sessionId=None, success=True, error=None):
+        self.records.append({
+            "actionType": actionType,
+            "source": source,
+            "parameters": parameters or {},
+            "sessionId": sessionId,
+            "success": success,
+            "error": error,
+        })
 
 
 class TestTaskDefinition:
@@ -119,6 +136,27 @@ class TestTaskRegistry:
         for i in range(60):
             registry.addRun(TaskRun(taskId=task.id, status=TaskStatus.SUCCESS, output=str(i)))
         assert len(registry.getRuns(task.id, limit=100)) == 50
+
+
+class TestTaskRunner:
+    def test_e_stop_cancels_task_before_document_execution(self, monkeypatch, tmp_path):
+        audit = _MemoryAudit()
+        monkeypatch.setattr("codaro.automation.taskRunner.getAuditTrail", lambda: audit)
+        eStop = getEmergencyStop()
+        eStop.clear()
+        assert eStop.trigger("objective safety check")
+        try:
+            runner = TaskRunner(workspaceRoot=tmp_path)
+            task = TaskDefinition(name="Stopped", documentPath="missing.py")
+            run = asyncio.run(runner.run(task))
+        finally:
+            eStop.clear()
+
+        assert run.status == TaskStatus.CANCELLED
+        assert "Emergency stop is active" in (run.error or "")
+        assert audit.records[-1]["actionType"] == "taskRun"
+        assert audit.records[-1]["parameters"]["status"] == "cancelled"
+        assert audit.records[-1]["success"] is False
 
 
 class TestScheduler:

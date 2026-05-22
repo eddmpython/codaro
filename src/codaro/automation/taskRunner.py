@@ -5,6 +5,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from .audit import getAuditTrail
+from .eStop import EmergencyStopActive, getEmergencyStop
 from .taskModel import TaskDefinition, TaskRun, TaskStatus
 
 
@@ -19,10 +21,14 @@ class TaskRunner:
         startTime = time.monotonic()
 
         try:
+            getEmergencyStop().check()
             result = await self._executeDocument(task)
             run.status = TaskStatus.SUCCESS
             run.output = result.get("stdout", "")
             run.variables = result.get("variables", {})
+        except EmergencyStopActive as exc:
+            run.status = TaskStatus.CANCELLED
+            run.error = str(exc)
         except Exception as exc:  # noqa: BLE001 — task execution boundary
             run.status = TaskStatus.FAILED
             run.error = str(exc)
@@ -30,6 +36,18 @@ class TaskRunner:
             elapsed = time.monotonic() - startTime
             run.durationMs = int(elapsed * 1000)
             run.finishedAt = datetime.now(timezone.utc).isoformat()
+            getAuditTrail().record(
+                "taskRun",
+                "task-runner",
+                {
+                    "taskId": task.id,
+                    "documentPath": task.documentPath,
+                    "status": run.status.value,
+                    "durationMs": run.durationMs,
+                },
+                success=run.status == TaskStatus.SUCCESS,
+                error=run.error,
+            )
 
         return run
 
@@ -48,6 +66,7 @@ class TaskRunner:
 
         try:
             for block in document.blocks:
+                getEmergencyStop().check()
                 if block.type != "code":
                     continue
                 if not block.content.strip():

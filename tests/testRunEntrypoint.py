@@ -35,6 +35,7 @@ def testGateNamesAreStable() -> None:
         "learning-goal-audit",
         "dogfood-alpha-audit",
         "product-quality-audit",
+        "automation-ide-audit",
         "service-readiness-audit",
         "diagnostic-summary-contract",
         "install-launcher-smoke",
@@ -50,6 +51,7 @@ def testGateNamesAreStable() -> None:
         "landing-build",
         "launcher-check",
         "launcher-test",
+        "objective-nineplus-audit",
     }
     assert runner.PREFLIGHT_GATES == ("docs", "backend")
     assert runner.PRODUCT_QUALITY_GATES == (
@@ -58,6 +60,7 @@ def testGateNamesAreStable() -> None:
         "learning-system-readiness",
         "dogfood-alpha-audit",
         "product-quality-audit",
+        "automation-ide-audit",
         "diagnostic-summary-contract",
         "ai-live-smoke",
         "provider-settings-browser",

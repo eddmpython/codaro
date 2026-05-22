@@ -19,6 +19,7 @@ CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 GATE_WORK_ROOT = ROOT / "output" / "test-runner"
 GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "ai-live-smoke": ("output/test-runner/ai-live-smoke/live-smoke-report.json",),
+    "automation-ide-audit": ("output/test-runner/automation-ide-audit/automation-ide-report.json",),
     "curriculum-quality-matrix": (
         "output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json",
         "output/test-runner/curriculum-quality-matrix/curriculum-flow-quality-report.json",
@@ -31,6 +32,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "provider-settings-browser": ("output/test-runner/provider-settings-browser/provider-settings-report.json",),
     "runtime-recovery-browser": ("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
+    "objective-nineplus-audit": ("output/test-runner/objective-nineplus-audit/objective-nineplus-report.json",),
     "preflight": ("output/test-runner/preflight/sequence-summary.json",),
 }
 
@@ -133,6 +135,12 @@ GATES: dict[str, Gate] = {
         tier="surface",
         description="제품 품질 기준과 새 내구성 gate 증거를 확인한다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyProductQualityAudit.py")),),
+        ci_required=False,
+    ),
+    "automation-ide-audit": Gate(
+        tier="surface",
+        description="자동화 IDE의 task/schedule/webhook/workflow/E-Stop/audit/frontend surface 연결을 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyAutomationIdeAudit.py")),),
         ci_required=False,
     ),
     "service-readiness-audit": Gate(
@@ -243,6 +251,12 @@ GATES: dict[str, Gate] = {
         description="launcher Rust crate 테스트를 실행한다.",
         commands=(command(("cargo", "test", "--", "--test-threads=1"), cwd="launcher/codaro-launcher"),),
     ),
+    "objective-nineplus-audit": Gate(
+        tier="release",
+        description="객관 9점대 scorecard의 모든 분야가 9.0 이상인지 최신 gate artifact와 기준 출처로 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyObjectiveNinePlusScorecard.py")),),
+        ci_required=False,
+    ),
 }
 
 PREFLIGHT_GATES = ("docs", "backend")
@@ -252,6 +266,7 @@ PRODUCT_QUALITY_GATES = (
     "learning-system-readiness",
     "dogfood-alpha-audit",
     "product-quality-audit",
+    "automation-ide-audit",
     "diagnostic-summary-contract",
     "ai-live-smoke",
     "provider-settings-browser",
@@ -720,8 +735,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 26:
-        failures.append(f"expected 26 gates, found {len(GATES)}")
+    if len(GATES) != 28:
+        failures.append(f"expected 28 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:

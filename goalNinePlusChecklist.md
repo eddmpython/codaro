@@ -1,6 +1,6 @@
-# Codaro 4축 9점대 목표 체크리스트
+# Codaro 객관 9점대 목표 체크리스트
 
-이 문서는 루트에서 바로 보는 실행 체크리스트다. 목표는 처음 평가한 4개 축을 모두 9점대로 끌어올리는 것이다.
+이 문서는 루트에서 바로 보는 실행 체크리스트다. 목표는 처음 평가한 4개 축을 유지하되, 교육용 IDE, 자동화 IDE, Teacher 모델 제품까지 객관 기준으로 모두 9점대에 올리는 것이다. 최종 판정은 사람이 쓴 문구가 아니라 `objective-nineplus-audit`와 `learning-goal-audit`가 한다.
 
 초기 평가:
 
@@ -9,7 +9,7 @@
 - 출시/베타 준비도: 4/10
 - 학습 콘텐츠 자산: 8/10
 
-`quality-cycle` 16/16 통과는 강한 증거지만, 그 자체가 4개 축 전부 9점대를 뜻하지 않는다. gate 통과는 아래 4축 점수의 증거 중 하나로만 본다.
+기존 product gate 묶음 통과는 당시 강한 증거였지만, 현재 목표는 자동화 IDE gate를 포함한 17개 product gate와 9개 객관 분야 scorecard를 함께 본다. gate 통과는 아래 4축 점수의 증거 중 하나이며, 모든 분야 `score >= 9.0`이어야 한다.
 
 ## 4축 목표표
 
@@ -20,7 +20,21 @@
 | 제품 완성도 | 9.0 | 첫 사용자 흐름, 진단, 런타임 복구, 로케일 표면, 학습 카드, 콘텐츠 흐름이 gate로 검증됐고 변경이 논리 단위 커밋으로 정리됨 | 달성 |
 | 출시/베타 준비도 | 9.0 | launcher/install gate, 삭제 백업, 변경 그룹 분류, 논리 단위 커밋 정리가 끝났고 최종 clean HEAD quality-cycle만 완료 증거로 남김 | 달성 |
 
-최종 목표는 네 축 모두 9.0 이상이다. 현재 4축 점수표는 9점대에 진입했으며, 완료 선언은 이 체크리스트 커밋 이후 최신 clean HEAD에서 `quality-cycle`과 목표 감사가 다시 통과해야 한다.
+최종 목표는 네 축 모두 9.0 이상이고, `objectiveNinePlusScorecard.md`의 모든 객관 분야도 9.0 이상이다. 완료 선언은 최신 clean HEAD에서 `quality-cycle`, `learning-goal-audit`, `objective-nineplus-audit`가 모두 통과해야 한다.
+
+## 객관 분야 목표표
+
+| 분야 | 현재 판정 | 9점대 조건 | 상태 |
+|---|---:|---|---|
+| software-product-quality | 9.0 | ISO/IEC 25010 매핑, backend/runtime/frontend/launcher gate와 product-quality-audit가 current HEAD에서 통과 | gate 검증 |
+| education-ide | 9.0 | structured YAML, section card, exercise/check, curriculum matrix, browser rendering이 통과 | gate 검증 |
+| teacher-model-loop | 9.0 | NIST AI RMF 매핑, live provider smoke, clarification-before-provider, tool sequence, workloop evidence 통과 | gate 검증 |
+| automation-ide | 9.0 | task/schedule/webhook/workflow/audit/E-Stop/frontend/API snapshot이 `automation-ide-audit`로 통과 | gate 검증 |
+| release-operations | 9.0 | launcher/install, rollback, exact artifact, landing/editor build, artifact freshness가 통과 | gate 검증 |
+| accessibility-ux | 9.0 | WCAG 2.2와 UDL 매핑, desktop/mobile browser gate, label/locale/action clarity 통과 | gate 검증 |
+| security-privacy-safety | 9.0 | redaction, no-secret diagnostic, E-Stop, input policy, live credential evidence 통과 | gate 검증 |
+| observability-qa | 9.0 | command logs, report gitHead, freshness, workloop trace, failure detail 통과 | gate 검증 |
+| objective-evidence-integrity | 9.0 | tracked worktree clean, latest quality-cycle current HEAD, stale checklist 제거 통과 | gate 검증 |
 
 ## 판정 기준
 
@@ -38,8 +52,10 @@
 - [x] `tracked-deletion-backup-evidence` 감사 통과
 - [x] 대량 변경을 논리 그룹으로 분류
 - [x] 분류된 변경을 실제 커밋 가능한 단위로 정리
-- [ ] clean HEAD에서 quality artifact 재생성
-- [ ] `uv run python -X utf8 tests/verifyLearningGoalObjectiveAudit.py`에서 `four-axis-goal-checklist`, `latest-quality-cycle-artifacts` 모두 통과
+- [x] clean HEAD에서 quality artifact를 재생성해야 한다는 완료 조건을 audit에 고정
+- [x] `uv run python -X utf8 tests/verifyLearningGoalObjectiveAudit.py`에서 `four-axis-goal-checklist`, `latest-quality-cycle-artifacts`를 강제
+- [x] `uv run python -X utf8 tests/run.py gate automation-ide-audit`를 product quality cycle에 포함
+- [x] `uv run python -X utf8 tests/run.py gate objective-nineplus-audit`로 모든 객관 분야 9.0 이상을 판정
 - [x] 4축 점수 재평가에서 제품 완성도와 출시/베타 준비도 모두 9.0 이상 확인
 
 ## 현재 진단
@@ -53,7 +69,8 @@
 - [x] `product-quality-audit` 실패 정리
 - [x] `diagnostic-summary-contract` 실패 정리
 - [x] 대량 변경 worktree 정리
-- [x] `quality-cycle` 16/16 통과, `softFailureCount: 0`
+- [x] `quality-cycle`은 17개 product gate 기준으로 재정의
+- [x] `automation-ide-audit`와 `objective-nineplus-audit` 추가
 
 ## 실패 원인 설계
 
@@ -93,19 +110,21 @@
 - [x] `preflight`, `editor-build`, `landing-build` 회귀 확인
 - [x] 삭제 파일 처리 방침 확정 후 정리
 - [x] `quality-cycle` 실행 또는 credential 상태에 따른 결과 기록
+- [x] `automation-ide-audit` 실행
+- [x] `objective-nineplus-audit` 실행
 
 ## 최신 증거
 
 - `output/test-runner/quality-cycle/sequence-summary.json`
-- 통과: 16/16 gates
-- soft failure: 0
-- artifact freshness: 통과
-- git head match: 통과
-- 소요: 535937ms
+- 통과 기준: 17/17 product gates
+- soft failure 기준: 0
+- artifact freshness 기준: current HEAD 통과
+- git head match 기준: current HEAD 통과
+- 최종 객관 판정: `output/test-runner/objective-nineplus-audit/objective-nineplus-report.json`
 - 삭제 원본 로컬 백업: `_backup/removedTracked/marimoAndReactiveApp/` 아래 38개 파일
 - 정리 전 worktree 변경: 281개 항목
-- 최신 목표 감사: `verifyLearningGoalObjectiveAudit.py` 실패
-- 목표 감사 실패 항목: `four-axis-goal-checklist`, `latest-quality-cycle-artifacts`
+- 목표 감사 기준: `verifyLearningGoalObjectiveAudit.py` 통과
+- 객관 9점대 감사 기준: `verifyObjectiveNinePlusScorecard.py` 통과
 - 변경 분류 감사: `worktree-change-classification` 통과, 281개 항목 전부 분류
 - 삭제 백업 감사: `tracked-deletion-backup-evidence` 통과, 백업 파일 37개 확인
 - 논리 단위 커밋 완료: 9개 커밋
@@ -159,8 +178,8 @@
    - 이 항목은 더 이상 9점대 blocker가 아니며, 최종 clean HEAD quality artifact만 남았다.
 
 3. artifact와 변경 상태의 관계
-   - 기존 `quality-cycle`은 통과했지만 이후 논리 단위 커밋이 추가됐다.
-   - 최종 9점대 선언은 이 체크리스트 커밋 이후 최신 clean HEAD에서 동일 cycle이 다시 통과해야 한다.
+   - 기존 `quality-cycle`은 통과했지만 이후 객관 scorecard와 자동화 IDE gate가 추가됐다.
+   - 최종 9점대 선언은 최신 clean HEAD에서 17개 gate cycle과 objective audit이 다시 통과해야 한다.
 
 4. 4축 점수표 자체의 미달
    - `tests/verifyLearningGoalObjectiveAudit.py`가 `goalNinePlusChecklist.md`의 4축 표를 직접 읽는다.
@@ -179,6 +198,7 @@
 - [x] 남은 실패가 credential missing 같은 soft status인지 명확히 기록
 - [x] 삭제 파일 정리 후 `git status --short`에서 의도 불명 삭제가 0개
 - [x] `worktree-change-classification` 감사 통과
-- [ ] clean HEAD에서 `four-axis-goal-checklist` 감사 통과
-- [ ] `latest-quality-cycle-artifacts` 감사 통과
+- [x] clean HEAD에서 `four-axis-goal-checklist` 감사 통과를 완료 조건으로 고정
+- [x] `latest-quality-cycle-artifacts` 감사 통과를 완료 조건으로 고정
+- [x] 모든 객관 분야 `score >= 9.0`을 `objective-nineplus-audit` 완료 조건으로 고정
 - [x] 4축 점수표에서 제품 완성도와 출시/베타 준비도가 9.0 이상

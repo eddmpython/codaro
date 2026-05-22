@@ -78,7 +78,7 @@ sections:
 
 - 레슨 상단은 `intro.direction`, `intro.benefits`, `intro.diagram`을 읽어 무엇을 공부하는지, 왜 유용한지, 전체 흐름을 보여준다.
 - `intro.diagram`은 제품 화면에서 blueprint 질감, 좌측 overview rail, 번호가 있는 노드, 연결선, 흐름 트랙, 런타임 스트립을 가진 학습 아키텍처 캔버스로 렌더링한다. `diagram.steps`는 상단 학습 흐름, `diagram.runtime`은 계약/환경/검증 같은 런타임 레이어를 정의한다. 단순 목록 박스로 축소하지 않고, 상단 benefit은 작은 박스 반복이 아니라 흐름을 보조하는 체크 리스트로 둔다.
-- 섹션 하나가 학습카드 하나다. `sections[].blocks[]`의 작은 카드 반복을 기본 구조로 삼지 않는다.
+- 섹션 하나가 학습카드 하나다. 이 섹션 단위 학습카드 원칙 때문에 `sections[].blocks[]`의 작은 카드 반복을 기본 구조로 삼지 않는다.
 - 섹션 카드는 `title → subtitle → goal → why → explanation → tips → snippet → exercise → result → check` 순서로 이어진다.
 - 카드 내부 정보는 라벨, 구획선, 여백으로 구분한다. 카드 안에 또 카드가 덕지덕지 쌓이는 구조는 피한다.
 - `sectionContract:*`로 materialize된 신규 섹션은 작은 block card를 반복 렌더링하지 않고, 하나의 섹션 카드 안에서 예제 스니펫, 직접 입력 실습, 실행 결과, 검증/피드백을 흐름형 band로 보여준다.
