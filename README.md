@@ -26,6 +26,7 @@ Codaro는 코드가 인터페이스가 되는 **개인 학습 + 자동화 스튜
 |---|---|
 | [제품 사상](docs/skills/README.md) | 채팅, 에디터, 커리큘럼, 자동화 네 표면 기준 |
 | [프론트 구조 기준](docs/skills/architecture/frontend-product-surface.md) | `editor/` 제품 표면과 UI 판단 기준 |
+| [공개 준비 체크리스트](publicReadinessChecklist.md) | 보안, 개인정보, 지원, 공급망, 객관 gate 완료 조건 |
 | [Python 30일 완성 안내](notebooks/python30DaysComplete/readme.md) | 전체 Day 목록, 리뷰 노트북, 진행표 |
 | [Day 01 Colab 열기](https://colab.research.google.com/github/eddmpython/codaro/blob/main/notebooks/python30DaysComplete/colab/day01Helloworld.ipynb) | 브라우저에서 바로 실행 |
 | [코스 가이드](notebooks/python30DaysComplete/courseGuide.md) | 학습 방법, 평가 기준, 최종 프로젝트 |
@@ -62,3 +63,14 @@ Codaro는 공개 학습과 검토를 허용하지만, 상업적 재사용을 허
 | 이름, 로고, 아바타, 마스코트, 브랜드 자산 | [All rights reserved](TRADEMARKS.md) |
 
 상업적 사용, 재판매, 유료 강의 편입, 호스팅 서비스 제공, 브랜드 자산 재사용은 사전 서면 허가가 필요합니다.
+
+## 공개 사용 신뢰 문서
+
+| 문서 | 용도 |
+|---|---|
+| [Security Policy](SECURITY.md) | 취약점 신고, supported version, safe harbor, response target |
+| [Privacy Policy](PRIVACY.md) | local-first 데이터 경계, provider credential, diagnostic export redaction |
+| [Support](SUPPORT.md) | bug/support/security 경로 분리와 diagnostic 공유 기준 |
+| [Contributing](CONTRIBUTING.md) | 개발 환경, gate, secret 금지, 공개 준비 기준 |
+| [Code of Conduct](CODE_OF_CONDUCT.md) | 커뮤니티 행동 기준과 enforcement |
+| [Public Readiness Checklist](publicReadinessChecklist.md) | 대중 사용 목표 완료 조건과 객관 gate |

@@ -488,6 +488,22 @@ export const docsPages = [
     "contentModule": "page9161bdf74323"
   },
   {
+    "path": "skills/ops/release/public-release",
+    "slugSegments": [
+      "skills",
+      "ops",
+      "release",
+      "public-release"
+    ],
+    "title": "Public Release Readiness",
+    "description": "Public distribution readiness rules for security, privacy, support, supply chain, and objective gate evidence.",
+    "section": "ops",
+    "sectionLabel": "Operations",
+    "order": 307,
+    "url": "/codaro/docs/skills/ops/release/public-release",
+    "contentModule": "paged350c930b3e5"
+  },
+  {
     "path": "skills/ops/workflow/doc-and-session",
     "slugSegments": [
       "skills",
@@ -1088,6 +1104,22 @@ export const docsSections = [
         "order": 306,
         "url": "/codaro/docs/skills/ops/release/packaging",
         "contentModule": "page9161bdf74323"
+      },
+      {
+        "path": "skills/ops/release/public-release",
+        "slugSegments": [
+          "skills",
+          "ops",
+          "release",
+          "public-release"
+        ],
+        "title": "Public Release Readiness",
+        "description": "Public distribution readiness rules for security, privacy, support, supply chain, and objective gate evidence.",
+        "section": "ops",
+        "sectionLabel": "Operations",
+        "order": 307,
+        "url": "/codaro/docs/skills/ops/release/public-release",
+        "contentModule": "paged350c930b3e5"
       },
       {
         "path": "skills/ops/workflow/doc-and-session",

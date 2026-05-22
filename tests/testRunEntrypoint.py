@@ -52,6 +52,7 @@ def testGateNamesAreStable() -> None:
         "launcher-check",
         "launcher-test",
         "objective-nineplus-audit",
+        "public-readiness-audit",
     }
     assert runner.PREFLIGHT_GATES == ("docs", "backend")
     assert runner.PRODUCT_QUALITY_GATES == (

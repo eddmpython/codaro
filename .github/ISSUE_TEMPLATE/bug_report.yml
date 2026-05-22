@@ -1,0 +1,56 @@
+name: Bug report
+description: Reproducible Codaro issue with diagnostic context.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        보안 취약점은 public issue로 올리지 말고 SECURITY.md 절차를 따르세요.
+  - type: input
+    id: version
+    attributes:
+      label: Commit or version
+      description: Git commit SHA, tag, or release version.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS, Python, Node, Rust versions.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Commands, notebook, curriculum, or automation script needed to reproduce.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: diagnostics
+    attributes:
+      label: Diagnostic context
+      description: Paste redacted diagnostic export or relevant gate output. Do not include secrets.
+    validations:
+      required: false
+  - type: checkboxes
+    id: redaction
+    attributes:
+      label: Safety checks
+      options:
+        - label: I removed tokens, API keys, Authorization headers, private file contents, and provider secrets.
+          required: true
