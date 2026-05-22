@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from codaro.document import createEmptyDocument, writeReactiveAppDocument
 from codaro.document.analysis import analyzeCode
 
 
@@ -38,40 +37,3 @@ def testAnalyzeCodeKeepsComprehensionLocalsScoped() -> None:
 
     assert defines == ["items"]
     assert uses == ["scale"]
-
-
-def testWriteReactiveAppDocumentDoesNotExposeFunctionParameterDependency() -> None:
-    document = createEmptyDocument("Notebook")
-    document.blocks[0] = document.blocks[0].model_copy(
-        update={
-            "content": """
-def f(x):
-    temp = x + 1
-    return temp
-
-y = f(1)
-""".strip()
-        }
-    )
-
-    payload = writeReactiveAppDocument(document)
-
-    assert "def _(x):" not in payload
-
-
-def testWriteReactiveAppDocumentIncludesNestedFreeVariableDependency() -> None:
-    document = createEmptyDocument("Notebook")
-    document.blocks[0] = document.blocks[0].model_copy(
-        update={
-            "content": """
-def f():
-    return offset + 1
-
-y = f()
-""".strip()
-        }
-    )
-
-    payload = writeReactiveAppDocument(document)
-
-    assert "def _(offset):" in payload

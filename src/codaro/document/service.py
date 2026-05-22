@@ -5,7 +5,6 @@ import uuid
 
 from .codaroFormat import parseCodaroDocument, writeCodaroDocument
 from .jupyterFormat import parseJupyterDocument, writeJupyterDocument
-from .reactiveAppFormat import parseReactiveAppDocument, writeReactiveAppDocument
 from .percentFormat import isPercentFormat, parsePercentDocument, writePercentDocument
 from .models import AppConfig, BlockConfig, CodaroDocument, DocumentMetadata, RuntimeConfig
 
@@ -28,9 +27,6 @@ def loadDocument(pathLike: str) -> CodaroDocument:
 
     if suffix == ".ipynb":
         return parseJupyterDocument(source, path)
-
-    if "marimo.App" in source or "@app.cell" in source:
-        return parseReactiveAppDocument(source, path)
 
     if isPercentFormat(source):
         return parsePercentDocument(source, path)
@@ -60,7 +56,7 @@ def saveDocument(pathLike: str, document: CodaroDocument) -> Path:
 def exportDocument(pathLike: str, formatName: str, outputPathLike: str | None = None) -> Path:
     document = loadDocument(pathLike)
     formatName = formatName.lower()
-    defaultSuffix = ".py" if formatName in {"codaro", "reactive-app", "percent"} else ".ipynb"
+    defaultSuffix = ".py" if formatName in {"codaro", "percent"} else ".ipynb"
     outputPath = (
         Path(outputPathLike).expanduser().resolve()
         if outputPathLike
@@ -72,8 +68,6 @@ def exportDocument(pathLike: str, formatName: str, outputPathLike: str | None = 
         text = writePercentDocument(document)
     elif formatName == "codaro":
         text = writeCodaroDocument(document)
-    elif formatName == "reactive-app":
-        text = writeReactiveAppDocument(document)
     elif formatName == "ipynb":
         text = writeJupyterDocument(document)
     else:

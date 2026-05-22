@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from codaro.document import createEmptyDocument, parseCodaroDocument, parseJupyterDocument, parseReactiveAppDocument
-from codaro.document import writeCodaroDocument, writeJupyterDocument, writeReactiveAppDocument
+from codaro.document import createEmptyDocument, parseCodaroDocument, parseJupyterDocument
+from codaro.document import writeCodaroDocument, writeJupyterDocument
 from codaro.document import parsePercentDocument, writePercentDocument, isPercentFormat
 
 
@@ -22,18 +22,6 @@ def testCodaroRoundTrip() -> None:
     assert "value = 3" in parsed.blocks[0].content
     assert parsed.blocks[1].type == "markdown"
     assert parsed.blocks[1].content == "# Title"
-
-
-def testReactiveAppRoundTrip() -> None:
-    document = createEmptyDocument("Notebook")
-    document.blocks[0] = document.blocks[0].model_copy(update={"content": "sales = 10\nsales"})
-    payload = writeReactiveAppDocument(document)
-    parsed = parseReactiveAppDocument(payload, Path("notebook.py"))
-
-    assert parsed.title == "Notebook"
-    assert parsed.blocks[0].type == "code"
-    assert "sales = 10" in parsed.blocks[0].content
-
 
 def testJupyterRoundTrip() -> None:
     document = createEmptyDocument("Notebook")
