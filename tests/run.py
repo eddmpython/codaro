@@ -19,7 +19,10 @@ CI_WORKFLOW = ROOT / ".github" / "workflows" / "ci.yml"
 GATE_WORK_ROOT = ROOT / "output" / "test-runner"
 GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "ai-live-smoke": ("output/test-runner/ai-live-smoke/live-smoke-report.json",),
-    "curriculum-quality-matrix": ("output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json",),
+    "curriculum-quality-matrix": (
+        "output/test-runner/curriculum-quality-matrix/curriculum-quality-report.json",
+        "output/test-runner/curriculum-quality-matrix/curriculum-flow-quality-report.json",
+    ),
     "diagnostic-summary-contract": ("output/test-runner/diagnostic-summary-contract/diagnostic-summary-report.json",),
     "dogfood-alpha-audit": ("output/test-runner/dogfood-alpha-audit/dogfood-alpha-report.json",),
     "frontend-performance-budget": ("output/test-runner/frontend-performance-budget/performance-report.json",),
@@ -174,8 +177,11 @@ GATES: dict[str, Gate] = {
     ),
     "curriculum-quality-matrix": Gate(
         tier="fast",
-        description="대표 주제별 curriculum YAML이 섹션 카드 계약으로 materialize되는지 확인한다.",
-        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumQualityMatrix.py")),),
+        description="대표 structured YAML과 실제 전체 curriculum YAML의 학습 흐름, 패키지, 실습 계약을 확인한다.",
+        commands=(
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumQualityMatrix.py")),
+            command(("uv", "run", "python", "-X", "utf8", "tests/verifyCurriculumFlowQuality.py")),
+        ),
         ci_required=False,
     ),
     "onboarding-browser": Gate(
