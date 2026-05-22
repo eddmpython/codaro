@@ -10,6 +10,17 @@ from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
 MINIMUM_SCORE = 9
+TRACKED_REMOVAL_BACKUP_ROOT = Path("_backup") / "removedTracked" / "marimoAndReactiveApp"
+WORKTREE_CHANGE_GROUPS = (
+    ("root-release-docs", ("CHANGELOG.md", "README.md", "goalNinePlusChecklist.md")),
+    ("ops-docs", ("docs/skills/",)),
+    ("curriculum-matrix", ("curricula/python/",)),
+    ("editor-product-surface", ("editor/",)),
+    ("landing-generated", ("landing/src/lib/generated/",)),
+    ("python30-colab-artifacts", ("notebooks/python30DaysComplete/",)),
+    ("python-core-and-documents", ("src/codaro/",)),
+    ("quality-gates", ("tests/",)),
+)
 PRODUCT_QUALITY_GATES = (
     "docs",
     "backend",
@@ -509,6 +520,9 @@ OBJECTIVE_REQUIREMENTS = (
 def main() -> int:
     results = (
         *(requirement.evaluate() for requirement in OBJECTIVE_REQUIREMENTS),
+        evaluateFourAxisGoalChecklist(),
+        evaluateWorktreeChangeClassification(),
+        evaluateTrackedDeletionBackup(),
         evaluateLatestQualityCycleArtifacts(),
     )
     payload = buildAuditPayload(results)
@@ -555,6 +569,229 @@ def evaluateLatestQualityCycleArtifacts() -> dict[str, Any]:
         "evidence": evidence,
         "missing": missing,
     }
+
+
+def evaluateFourAxisGoalChecklist() -> dict[str, Any]:
+    evidence: list[str] = []
+    missing: list[str] = []
+    relPath = "goalNinePlusChecklist.md"
+    path = ROOT / relPath
+    if not path.is_file():
+        missing.append(f"{relPath}: missing root checklist")
+        rows: dict[str, tuple[float | None, str]] = {}
+    else:
+        rows = parseFourAxisRows(path.read_text(encoding="utf-8"))
+
+    requiredAxes = (
+        "기술 기반",
+        "제품 완성도",
+        "출시/베타 준비도",
+        "학습 콘텐츠 자산",
+    )
+    for axis in requiredAxes:
+        row = rows.get(axis)
+        if row is None:
+            missing.append(f"{relPath}: missing 4-axis row for {axis}")
+            continue
+        score, status = row
+        if score is None:
+            missing.append(f"{relPath}: {axis} score is not numeric")
+        elif score >= 9:
+            evidence.append(f"{relPath}: {axis} score {score:.1f}")
+        else:
+            missing.append(f"{relPath}: {axis} score {score:.1f} is below 9.0")
+        if "미달" in status:
+            missing.append(f"{relPath}: {axis} status remains {status}")
+        else:
+            evidence.append(f"{relPath}: {axis} status {status}")
+
+    return {
+        "id": "four-axis-goal-checklist",
+        "passed": not missing,
+        "requirement": "The root 4-axis checklist proves every original assessment axis is at least 9.0.",
+        "evidence": evidence,
+        "missing": missing,
+    }
+
+
+def evaluateTrackedDeletionBackup() -> dict[str, Any]:
+    evidence: list[str] = []
+    missing: list[str] = []
+    backupRoot = ROOT / TRACKED_REMOVAL_BACKUP_ROOT
+    backupReadme = backupRoot / "README.md"
+    if backupReadme.is_file():
+        readmeText = backupReadme.read_text(encoding="utf-8")
+        for needle in (
+            "notebooks/python30DaysComplete/marimo/",
+            "src/codaro/document/reactiveAppFormat.py",
+        ):
+            if needle in readmeText:
+                evidence.append(f"{displayRelPath(backupReadme)}: {needle}")
+            else:
+                missing.append(f"{displayRelPath(backupReadme)}: missing {needle}")
+    else:
+        missing.append(f"{displayRelPath(backupReadme)}: missing backup README")
+
+    backupFiles = tuple(path for path in backupRoot.rglob("*") if path.is_file() and path.name != "README.md")
+    if len(backupFiles) >= 37:
+        evidence.append(f"{displayRelPath(backupRoot)}: {len(backupFiles)} backup files")
+    else:
+        missing.append(f"{displayRelPath(backupRoot)}: expected at least 37 backup files, found {len(backupFiles)}")
+
+    deletedPaths = currentTrackedDeletedPaths()
+    if deletedPaths is None:
+        missing.append("git: unable to inspect tracked deleted paths")
+    else:
+        unexpectedDeleted = tuple(path for path in deletedPaths if not isExpectedTrackedRemoval(path))
+        if unexpectedDeleted:
+            missing.append(f"git: unexpected tracked deletions remain ({', '.join(unexpectedDeleted[:5])})")
+        else:
+            evidence.append(f"git tracked deletions are limited to expected migration paths: {len(deletedPaths)}")
+        for deletedPath in deletedPaths:
+            backupPath = backupRoot / deletedPath
+            if backupPath.is_file():
+                evidence.append(f"{displayRelPath(backupPath)}: backup for deleted tracked path")
+            else:
+                missing.append(f"{displayRelPath(backupPath)}: missing backup for deleted tracked path")
+
+    return {
+        "id": "tracked-deletion-backup-evidence",
+        "passed": not missing,
+        "requirement": "Tracked removals are either absent or backed up under the local removal backup root.",
+        "evidence": evidence,
+        "missing": missing,
+    }
+
+
+def evaluateWorktreeChangeClassification() -> dict[str, Any]:
+    evidence: list[str] = []
+    missing: list[str] = []
+    paths = currentWorktreeChangePaths()
+    if paths is None:
+        missing.append("git: unable to inspect working tree changes")
+        paths = ()
+    elif not paths:
+        evidence.append("git worktree changes: clean")
+
+    groupCounts: dict[str, int] = {}
+    unclassified: list[str] = []
+    for path in paths:
+        group = classifyWorktreePath(path)
+        if group is None:
+            unclassified.append(path.as_posix())
+        else:
+            groupCounts[group] = groupCounts.get(group, 0) + 1
+
+    for groupName, _prefixes in WORKTREE_CHANGE_GROUPS:
+        count = groupCounts.get(groupName)
+        if count:
+            evidence.append(f"worktree group {groupName}: {count} paths")
+
+    if unclassified:
+        missing.append(f"git: unclassified working tree changes ({', '.join(unclassified[:10])})")
+    elif paths:
+        evidence.append(f"git worktree changes classified: {len(paths)} paths")
+
+    return {
+        "id": "worktree-change-classification",
+        "passed": not missing,
+        "requirement": "Current worktree changes are separated into named logical groups before final clean audit.",
+        "evidence": evidence,
+        "missing": missing,
+    }
+
+
+def currentWorktreeChangePaths() -> tuple[Path, ...] | None:
+    result = subprocess.run(
+        ("git", "status", "--porcelain=v1", "-z"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    paths: list[Path] = []
+    entries = [entry for entry in result.stdout.split("\0") if entry]
+    index = 0
+    while index < len(entries):
+        entry = entries[index]
+        status = entry[:2]
+        pathValue = entry[3:]
+        if pathValue:
+            paths.append(Path(pathValue))
+        if "R" in status or "C" in status:
+            index += 1
+        index += 1
+    return tuple(paths)
+
+
+def classifyWorktreePath(path: Path) -> str | None:
+    value = path.as_posix()
+    for groupName, prefixes in WORKTREE_CHANGE_GROUPS:
+        for prefix in prefixes:
+            if value == prefix or value.startswith(prefix):
+                return groupName
+    return None
+
+
+def currentTrackedDeletedPaths() -> tuple[Path, ...] | None:
+    result = subprocess.run(
+        ("git", "status", "--porcelain=v1", "-z", "--untracked-files=no"),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    deletedPaths: list[Path] = []
+    for entry in result.stdout.split("\0"):
+        if not entry:
+            continue
+        status = entry[:2]
+        pathValue = entry[3:]
+        if "D" in status and pathValue:
+            deletedPaths.append(Path(pathValue))
+    return tuple(deletedPaths)
+
+
+def isExpectedTrackedRemoval(path: Path) -> bool:
+    value = path.as_posix()
+    return (
+        value.startswith("notebooks/python30DaysComplete/marimo/")
+        or value == "src/codaro/document/reactiveAppFormat.py"
+    )
+
+
+def parseFourAxisRows(text: str) -> dict[str, tuple[float | None, str]]:
+    rows: dict[str, tuple[float | None, str]] = {}
+    for rawLine in text.splitlines():
+        line = rawLine.strip()
+        if not line.startswith("|") or "---" in line:
+            continue
+        cells = [cell.strip() for cell in line.strip("|").split("|")]
+        if len(cells) < 4 or cells[0] == "축":
+            continue
+        axis = cells[0]
+        score = parseScore(cells[1])
+        status = cells[3]
+        rows[axis] = (score, status)
+    return rows
+
+
+def parseScore(value: str) -> float | None:
+    try:
+        return float(value)
+    except ValueError:
+        return None
+
+
+def displayRelPath(path: Path) -> str:
+    try:
+        return path.relative_to(ROOT).as_posix()
+    except ValueError:
+        return path.as_posix()
 
 
 def evaluateQualityCycleSummary(
