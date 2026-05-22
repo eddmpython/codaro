@@ -32,10 +32,18 @@ jobs:
         run: |
           Copy-Item "launcher/codaro-launcher/target/release/codaro-launcher.exe" "launcher/codaro-launcher/target/release/CodaroLauncher.exe"
 
+      - name: Generate SPDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: launcher/codaro-launcher
+          format: spdx-json
+          output-file: launcher/codaro-launcher/target/release/CodaroLauncher.spdx.json
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           files: |
             launcher/codaro-launcher/target/release/CodaroLauncher.exe
             launcher/codaro-launcher/target/release/CodaroLauncher.exe.sha256
+            launcher/codaro-launcher/target/release/CodaroLauncher.spdx.json
           generate_release_notes: true

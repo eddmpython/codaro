@@ -47,6 +47,13 @@ jobs:
       - name: Build wheel
         run: uv build
 
+      - name: Generate SPDX SBOM
+        uses: anchore/sbom-action@v0
+        with:
+          path: .
+          format: spdx-json
+          output-file: dist/codaro.spdx.json
+
       - name: Verify wheel includes editor frontend
         run: |
           python - <<'PY'

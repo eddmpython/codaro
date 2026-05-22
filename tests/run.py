@@ -33,6 +33,7 @@ GATE_ARTIFACTS: dict[str, tuple[str, ...]] = {
     "runtime-recovery-browser": ("output/test-runner/runtime-recovery-browser/runtime-recovery-report.json",),
     "quality-cycle": ("output/test-runner/quality-cycle/sequence-summary.json",),
     "objective-nineplus-audit": ("output/test-runner/objective-nineplus-audit/objective-nineplus-report.json",),
+    "public-readiness-audit": ("output/test-runner/public-readiness-audit/public-readiness-report.json",),
     "preflight": ("output/test-runner/preflight/sequence-summary.json",),
 }
 
@@ -255,6 +256,12 @@ GATES: dict[str, Gate] = {
         tier="release",
         description="객관 9점대 scorecard의 모든 분야가 9.0 이상인지 최신 gate artifact와 기준 출처로 확인한다.",
         commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyObjectiveNinePlusScorecard.py")),),
+        ci_required=False,
+    ),
+    "public-readiness-audit": Gate(
+        tier="release",
+        description="대중 사용 목표에서 보안, 개인정보, 공급망, 지원, 문서, 접근성, 최신 증거가 모두 9.0 이상인지 확인한다.",
+        commands=(command(("uv", "run", "python", "-X", "utf8", "tests/verifyPublicReadinessAudit.py")),),
         ci_required=False,
     ),
 }
@@ -735,8 +742,8 @@ def auditSelf() -> int:
     failures: list[str] = []
     gateNames = set(GATES)
 
-    if len(GATES) != 28:
-        failures.append(f"expected 28 gates, found {len(GATES)}")
+    if len(GATES) != 29:
+        failures.append(f"expected 29 gates, found {len(GATES)}")
 
     unknownPreflight = [name for name in PREFLIGHT_GATES if name not in gateNames]
     if unknownPreflight:
