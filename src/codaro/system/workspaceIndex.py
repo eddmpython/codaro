@@ -147,8 +147,6 @@ def detectNotebookType(filePath: Path) -> str | None:
         return "jupyter"
 
     source = filePath.read_text(encoding="utf-8", errors="ignore")
-    if "marimo.App" in source or "@app.cell" in source:
-        return "reactive-app"
     if "codaro:app" in source or "import codaro" in source or "@app.block" in source:
         return "codaro"
     if isPercentFormat(source):

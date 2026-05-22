@@ -18,7 +18,7 @@ def buildParser() -> argparse.ArgumentParser:
             "  codaro\n"
             "  codaro notebook.py\n"
             "  codaro app notebook.py\n"
-            "  codaro export notebook.py --format reactive-app"
+            "  codaro export notebook.py --format ipynb"
         ),
         formatter_class=argparse.RawTextHelpFormatter,
     )
@@ -40,7 +40,7 @@ def buildParser() -> argparse.ArgumentParser:
 
     exportParser = subparsers.add_parser("export", help="Export document.")
     exportParser.add_argument("path", help="Source document path.")
-    exportParser.add_argument("--format", required=True, choices=["codaro", "reactive-app", "ipynb"])
+    exportParser.add_argument("--format", required=True, choices=["codaro", "percent", "ipynb"])
     exportParser.add_argument("--output", help="Output file path.")
 
     taskParser = subparsers.add_parser("task", help="Manage automation tasks.")

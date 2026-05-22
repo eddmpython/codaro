@@ -530,7 +530,6 @@ def testWorkspaceIndexClassifiesNotebookTypes(tmp_path: Path) -> None:
     notebookDir.mkdir()
     (notebookDir / "demo.codaro.py").write_text("# codaro:app\nimport codaro\n", encoding="utf-8")
     (tmp_path / "scratch.py").write_text("# %% [code]\nvalue = 1\n", encoding="utf-8")
-    (notebookDir / "demo.marimo.py").write_text("import marimo\napp = marimo.App()\n@app.cell\ndef _():\n    return\n", encoding="utf-8")
     (notebookDir / "demo.ipynb").write_text('{"cells":[],"metadata":{},"nbformat":4,"nbformat_minor":5}', encoding="utf-8")
     (tmp_path / "src").mkdir()
     (tmp_path / "src" / "server.py").write_text("print('notebook 아님')\n", encoding="utf-8")
@@ -542,15 +541,15 @@ def testWorkspaceIndexClassifiesNotebookTypes(tmp_path: Path) -> None:
     assert payload["workspaceRoot"] == str(tmp_path.resolve())
     assert len(payload["recentDocuments"]) == 3
     recentTypes = {entry["notebookType"] for entry in payload["recentDocuments"]}
-    assert recentTypes <= {"codaro", "reactive-app", "jupyter"}
+    assert recentTypes <= {"codaro", "jupyter"}
     assert payload["totalCodaroDocuments"] == 2
-    assert payload["totalCompatibleDocuments"] == 2
+    assert payload["totalCompatibleDocuments"] == 1
 
     topDirectory = next(node for node in payload["codaroTree"] if node["name"] == "notebooks")
     fileTypes = {child["name"]: child["notebookType"] for child in topDirectory["children"]}
     assert fileTypes["demo.codaro.py"] == "codaro"
     compatibleNames = {entry["name"] for entry in payload["compatibleDocuments"]}
-    assert {"demo.marimo.py", "demo.ipynb"} <= compatibleNames
+    assert compatibleNames == {"demo.ipynb"}
 
     rootFileNames = {node["name"] for node in payload["codaroTree"] if not node["isDirectory"]}
     assert "scratch.py" in rootFileNames
