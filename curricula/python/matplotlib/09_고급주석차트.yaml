@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
   id: matplotlib_09
   title: 고급주석차트
   order: 9

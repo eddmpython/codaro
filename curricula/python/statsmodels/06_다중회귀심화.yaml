@@ -1,4 +1,12 @@
 meta:
+  packages:
+    - altair
+    - matplotlib
+    - numpy
+    - pandas
+    - plotly
+    - seaborn
+    - statsmodels
   id: statsmodels_06
   title: 다중회귀심화
   order: 6

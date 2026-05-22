@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - sympy
   id: sympy_04
   title: 미분기초
   order: 4

@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scikit-learn
   id: sklearn_10
   title: 종합ML파이프라인
   order: 10

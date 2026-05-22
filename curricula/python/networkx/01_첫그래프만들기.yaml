@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - networkx
   id: networkx_01
   title: 첫그래프만들기
   order: 1

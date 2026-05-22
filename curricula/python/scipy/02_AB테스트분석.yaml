@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scipy
   id: scipy_02
   title: AB테스트분석
   order: 2

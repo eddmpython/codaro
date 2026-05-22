@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scikit-learn
   id: sklearn_07
   title: 소나신호분류
   order: 7

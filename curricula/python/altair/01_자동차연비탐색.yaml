@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - altair
+    - pandas
   id: altair_01
   title: 자동차연비탐색
   order: 1

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - altair
+    - pandas
   id: altair_10
   title: 종합대시보드
   order: 10

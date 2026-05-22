@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - sympy
   id: sympy_01
   title: 기초수식계산
   order: 1

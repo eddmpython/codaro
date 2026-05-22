@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - folium
   id: folium_06
   title: GeoJSON 활용
   order: 6

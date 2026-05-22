@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - numpy
+    - pandas
   id: numpy_01
   title: 포켓몬스탯분석
   order: 1

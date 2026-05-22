@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pydantic
   id: pydantic_03
   title: 중첩모델설계
   order: 3

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - altair
+    - pandas
   id: altair_06
   title: 항공편분석
   order: 6

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - duckdb
+    - pandas
   id: duckdb_03
   title: 팁패턴분석
   order: 3

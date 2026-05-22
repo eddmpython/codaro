@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - altair
+    - pandas
   id: altair_07
   title: 인터랙티브필터
   order: 7

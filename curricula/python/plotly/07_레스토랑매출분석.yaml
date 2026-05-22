@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pandas
+    - plotly
   id: plotly_07
   title: 레스토랑매출분석
   order: 7

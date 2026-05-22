@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - duckdb
+    - pandas
   id: duckdb_08
   title: 고급윈도우분석
   order: 8

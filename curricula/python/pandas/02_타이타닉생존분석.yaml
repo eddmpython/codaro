@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pandas
   id: pandas_02
   title: 타이타닉생존분석
   order: 2

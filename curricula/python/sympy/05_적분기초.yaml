@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - sympy
   id: sympy_05
   title: 적분기초
   order: 5

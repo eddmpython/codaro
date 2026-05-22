@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scikit-learn
   id: sklearn_06
   title: 고객세분화
   order: 6

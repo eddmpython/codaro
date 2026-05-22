@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - polars
   id: polars_05
   title: 음악스트리밍분석
   order: 5

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pillow
+    - scikit-learn
   id: pillow_09
   title: 포토콜라주메이커
   order: 9

@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pydantic
   id: pydantic_09
   title: FastAPI통합
   order: 9

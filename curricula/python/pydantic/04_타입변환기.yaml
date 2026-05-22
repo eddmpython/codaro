@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pydantic
   id: pydantic_04
   title: 타입변환기
   order: 4

@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - folium
   id: folium_01
   title: 첫지도만들기
   order: 1

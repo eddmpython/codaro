@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - opencv-python
+    - scikit-learn
   id: opencv_09
   title: 컨투어탐지기
   order: 9

@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - polars
   id: polars_02
   title: 날씨데이터분석
   order: 2

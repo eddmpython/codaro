@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - opencv-python
+    - scikit-learn
   id: opencv_04
   title: 이미지필터랩
   order: 4

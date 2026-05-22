@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - polars
   id: polars_09
   title: 대용량로그분석
   order: 9

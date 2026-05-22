@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pandas
   id: pandas_01
   title: 레스토랑팁분석
   order: 1

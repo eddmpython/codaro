@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - duckdb
+    - pandas
   id: duckdb_04
   title: 타이타닉심층분석
   order: 4

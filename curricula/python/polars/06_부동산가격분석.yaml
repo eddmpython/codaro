@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - polars
   id: polars_06
   title: 부동산가격분석
   order: 6

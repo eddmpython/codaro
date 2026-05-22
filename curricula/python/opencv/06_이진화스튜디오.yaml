@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - opencv-python
+    - scikit-learn
   id: opencv_06
   title: 이진화스튜디오
   order: 6

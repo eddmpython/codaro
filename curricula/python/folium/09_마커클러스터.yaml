@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - folium
   id: folium_09
   title: 마커 클러스터
   order: 9

@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pydantic
   id: pydantic_08
   title: 에러처리기법
   order: 8

@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - pandas
+    - seaborn
   id: seaborn_09
   title: 자동차연비종합분석
   order: 9

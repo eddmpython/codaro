@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scipy
   id: scipy_03
   title: 데이터보간기
   order: 3

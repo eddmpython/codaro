@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - sympy
   id: sympy_07
   title: 삼각함수활용
   order: 7

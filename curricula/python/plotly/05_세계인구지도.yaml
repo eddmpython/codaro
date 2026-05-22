@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pandas
+    - plotly
   id: plotly_05
   title: 세계인구지도
   order: 5

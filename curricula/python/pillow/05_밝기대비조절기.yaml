@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pillow
+    - scikit-learn
   id: pillow_05
   title: 밝기대비조절기
   order: 5

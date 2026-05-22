@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - numpy
+    - pandas
   id: numpy_07
   title: 대기질시계열
   order: 7

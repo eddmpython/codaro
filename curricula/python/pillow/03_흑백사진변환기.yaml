@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pillow
+    - scikit-learn
   id: pillow_03
   title: 흑백사진변환기
   order: 3

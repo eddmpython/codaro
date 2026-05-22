@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - seaborn
   id: matplotlib_06
   title: 상관관계히트맵
   order: 6

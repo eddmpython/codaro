@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pandas
   id: pandas_07
   title: 다이아몬드가격분석
   order: 7

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - networkx
   id: networkx_06
   title: 연결성분석
   order: 6

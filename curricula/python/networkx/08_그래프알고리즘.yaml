@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - networkx
   id: networkx_08
   title: 그래프알고리즘
   order: 8

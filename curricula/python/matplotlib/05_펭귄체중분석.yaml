@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - seaborn
   id: matplotlib_05
   title: 펭귄체중분석
   order: 5

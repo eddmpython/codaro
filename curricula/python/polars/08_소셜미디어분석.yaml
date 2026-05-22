@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - polars
   id: polars_08
   title: 소셜미디어분석
   order: 8

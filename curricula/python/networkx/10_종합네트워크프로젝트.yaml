@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - networkx
   id: networkx_10
   title: 종합네트워크프로젝트
   order: 10

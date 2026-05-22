@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - branca
+    - folium
   id: folium_07
   title: 단계구분도
   order: 7

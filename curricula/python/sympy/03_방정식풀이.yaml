@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - sympy
   id: sympy_03
   title: 방정식풀이
   order: 3

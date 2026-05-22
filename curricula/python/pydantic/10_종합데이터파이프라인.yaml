@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pydantic
   id: pydantic_10
   title: 종합데이터파이프라인
   order: 10

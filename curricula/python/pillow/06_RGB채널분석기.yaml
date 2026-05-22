@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pillow
+    - scikit-learn
   id: pillow_06
   title: RGB채널분석기
   order: 6

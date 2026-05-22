@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
   id: matplotlib_07
   title: 시계열다중축차트
   order: 7

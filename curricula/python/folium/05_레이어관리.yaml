@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - folium
   id: folium_05
   title: 레이어 관리
   order: 5

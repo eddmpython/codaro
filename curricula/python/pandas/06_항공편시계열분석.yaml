@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pandas
   id: pandas_06
   title: 항공편시계열분석
   order: 6

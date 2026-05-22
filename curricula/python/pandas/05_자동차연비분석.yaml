@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pandas
   id: pandas_05
   title: 자동차연비분석
   order: 5

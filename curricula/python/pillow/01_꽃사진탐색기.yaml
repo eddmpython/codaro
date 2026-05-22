@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pillow
+    - scikit-learn
   id: pillow_01
   title: 꽃사진탐색기
   order: 1

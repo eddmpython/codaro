@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scikit-learn
   id: sklearn_08
   title: 심장병예측
   order: 8

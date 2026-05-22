@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - opencv-python
+    - scikit-learn
   id: opencv_08
   title: 히스토그램분석기
   order: 8

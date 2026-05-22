@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - numpy
+    - pandas
   id: numpy_06
   title: 심장병위험분석
   order: 6

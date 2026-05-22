@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - numpy
+    - pandas
+    - plotly
+    - statsmodels
   id: statsmodels_04
   title: 항공수요예측
   order: 4

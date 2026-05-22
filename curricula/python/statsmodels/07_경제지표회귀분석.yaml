@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - numpy
+    - pandas
+    - plotly
+    - statsmodels
   id: statsmodels_07
   title: 경제지표회귀분석
   order: 7

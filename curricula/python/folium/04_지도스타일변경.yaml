@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - folium
   id: folium_04
   title: 지도 스타일 변경
   order: 4

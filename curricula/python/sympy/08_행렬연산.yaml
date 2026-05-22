@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - sympy
   id: sympy_08
   title: 행렬연산
   order: 8

@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - pandas
+    - seaborn
   id: seaborn_07
   title: 세계기대수명분석
   order: 7

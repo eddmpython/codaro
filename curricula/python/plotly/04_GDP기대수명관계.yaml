@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pandas
+    - plotly
   id: plotly_04
   title: GDP기대수명관계
   order: 4

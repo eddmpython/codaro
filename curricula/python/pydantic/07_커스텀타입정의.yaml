@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pydantic
   id: pydantic_07
   title: 커스텀타입정의
   order: 7

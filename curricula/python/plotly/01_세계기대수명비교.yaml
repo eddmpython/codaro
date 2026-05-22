@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pandas
+    - plotly
   id: plotly_01
   title: 세계기대수명비교
   order: 1

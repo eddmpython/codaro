@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - altair
+    - pandas
   id: altair_02
   title: 붓꽃품종구분
   order: 2

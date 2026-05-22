@@ -1,4 +1,14 @@
 meta:
+  packages:
+    - altair
+    - matplotlib
+    - numpy
+    - pandas
+    - plotly
+    - scikit-learn
+    - scipy
+    - seaborn
+    - statsmodels
   id: statsmodels_08
   title: 직원퇴사예측
   order: 8

@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - pandas
+    - scikit-learn
+    - seaborn
   id: sklearn_01
   title: 와인품질분류
   order: 1

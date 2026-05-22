@@ -1,4 +1,13 @@
 meta:
+  packages:
+    - altair
+    - matplotlib
+    - numpy
+    - pandas
+    - plotly
+    - scikit-learn
+    - seaborn
+    - statsmodels
   id: statsmodels_05
   title: 고객이탈예측
   order: 5

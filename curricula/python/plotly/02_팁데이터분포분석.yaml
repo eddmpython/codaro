@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pandas
+    - plotly
   id: plotly_02
   title: 팁데이터분포분석
   order: 2

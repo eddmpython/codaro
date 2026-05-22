@@ -1,4 +1,10 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scikit-learn
+    - seaborn
   id: sklearn_05
   title: 손글씨숫자인식
   order: 5

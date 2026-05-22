@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - pandas
+    - seaborn
   id: seaborn_06
   title: 항공편승객시계열
   order: 6

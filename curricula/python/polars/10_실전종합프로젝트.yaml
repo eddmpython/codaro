@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - polars
   id: polars_10
   title: 실전종합프로젝트
   order: 10

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - numpy
+    - pandas
   id: numpy_08
   title: 행복지수국가비교
   order: 8

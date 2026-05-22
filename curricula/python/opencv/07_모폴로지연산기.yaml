@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - opencv-python
+    - scikit-learn
   id: opencv_07
   title: 모폴로지연산기
   order: 7

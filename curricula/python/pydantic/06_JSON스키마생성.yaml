@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pydantic
   id: pydantic_06
   title: JSON스키마생성
   order: 6

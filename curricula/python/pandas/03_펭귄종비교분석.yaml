@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pandas
   id: pandas_03
   title: 펭귄종비교분석
   order: 3

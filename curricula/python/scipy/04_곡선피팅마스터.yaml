@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scipy
   id: scipy_04
   title: 곡선피팅마스터
   order: 4

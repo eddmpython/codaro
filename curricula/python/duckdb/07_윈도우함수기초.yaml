@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - duckdb
+    - pandas
   id: duckdb_07
   title: 윈도우함수기초
   order: 7

@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - pandas
+    - seaborn
   id: seaborn_04
   title: 광고비판매액회귀
   order: 4

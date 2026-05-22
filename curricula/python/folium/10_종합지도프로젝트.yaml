@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - branca
+    - folium
   id: folium_10
   title: 종합 지도 프로젝트
   order: 10

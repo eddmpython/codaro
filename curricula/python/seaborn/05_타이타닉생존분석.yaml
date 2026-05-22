@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - seaborn
   id: seaborn_05
   title: 타이타닉생존분석
   order: 5

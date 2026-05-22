@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - pandas
   id: matplotlib_04
   title: 대륙별인구비교
   order: 4

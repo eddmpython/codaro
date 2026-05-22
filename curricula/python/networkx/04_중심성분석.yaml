@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - networkx
   id: networkx_04
   title: 중심성분석
   order: 4

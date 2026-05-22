@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scipy
   id: scipy_07
   title: 신호필터링
   order: 7

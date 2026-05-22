@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - seaborn
   id: seaborn_03
   title: 펭귄체중분포비교
   order: 3

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - numpy
+    - pandas
   id: numpy_02
   title: 기온데이터탐색
   order: 2

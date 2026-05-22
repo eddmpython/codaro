@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - pandas
+    - seaborn
   id: matplotlib_02
   title: 팁데이터분포탐색
   order: 2

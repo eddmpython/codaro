@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - altair
+    - pandas
   id: altair_04
   title: 펭귄서식지분석
   order: 4

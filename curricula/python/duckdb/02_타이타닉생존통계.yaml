@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - duckdb
+    - pandas
   id: duckdb_02
   title: 타이타닉생존통계
   order: 2

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pydantic
+    - pydantic-settings
   id: pydantic_05
   title: 설정관리기
   order: 5

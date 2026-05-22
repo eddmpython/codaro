@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scipy
   id: scipy_08
   title: 수치적분기
   order: 8

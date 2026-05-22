@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - folium
   id: folium_08
   title: 히트맵
   order: 8

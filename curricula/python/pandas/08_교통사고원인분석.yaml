@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pandas
   id: pandas_08
   title: 교통사고원인분석
   order: 8

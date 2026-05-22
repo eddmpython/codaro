@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - pandas
+    - scikit-learn
+    - seaborn
   id: sklearn_02
   title: 유방암진단
   order: 2

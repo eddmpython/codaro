@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
   id: matplotlib_01
   title: 주가추세분석
   order: 1

@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - sympy
   id: sympy_06
   title: 극한과급수
   order: 6

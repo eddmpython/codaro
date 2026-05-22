@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - altair
+    - pandas
   id: altair_05
   title: 타이타닉생존분석
   order: 5

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - duckdb
+    - pandas
   id: duckdb_05
   title: 팁서브쿼리분석
   order: 5

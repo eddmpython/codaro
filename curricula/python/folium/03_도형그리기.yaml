@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - folium
   id: folium_03
   title: 도형 그리기
   order: 3

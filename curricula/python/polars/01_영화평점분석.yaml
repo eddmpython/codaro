@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - polars
   id: polars_01
   title: 영화평점분석
   order: 1

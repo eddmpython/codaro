@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - pandas
+    - seaborn
   id: seaborn_10
   title: 종합EDA리포트
   order: 10

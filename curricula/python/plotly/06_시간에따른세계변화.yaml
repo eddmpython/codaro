@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pandas
+    - plotly
   id: plotly_06
   title: 시간에따른세계변화
   order: 6

@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - sympy
   id: sympy_10
   title: 종합수학문제
   order: 10

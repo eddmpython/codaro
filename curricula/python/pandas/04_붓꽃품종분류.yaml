@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pandas
   id: pandas_04
   title: 붓꽃품종분류
   order: 4

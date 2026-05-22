@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pandas
+    - requests
   id: pandas_10
   title: 실전종합프로젝트
   order: 10

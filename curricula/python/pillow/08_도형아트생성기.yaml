@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pillow
   id: pillow_08
   title: 도형아트생성기
   order: 8

@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - scikit-learn
   id: sklearn_03
   title: 당뇨병진행도예측
   order: 3

@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - sympy
   id: sympy_09
   title: 수식시각화
   order: 9

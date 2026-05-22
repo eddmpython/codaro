@@ -1,4 +1,12 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - plotly
+    - scipy
+    - seaborn
+    - statsmodels
   id: statsmodels_02
   title: 부동산가격예측
   order: 2

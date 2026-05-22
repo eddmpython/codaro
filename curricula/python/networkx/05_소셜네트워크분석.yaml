@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - networkx
   id: networkx_05
   title: 소셜네트워크분석
   order: 5

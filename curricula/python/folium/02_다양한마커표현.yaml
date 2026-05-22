@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - folium
   id: folium_02
   title: 다양한마커표현
   order: 2

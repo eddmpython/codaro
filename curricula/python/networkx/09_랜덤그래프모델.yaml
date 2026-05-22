@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - networkx
   id: networkx_09
   title: 랜덤그래프모델
   order: 9

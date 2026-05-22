@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - sympy
   id: sympy_02
   title: 대입과계산
   order: 2

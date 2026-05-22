@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - seaborn
   id: matplotlib_08
   title: 다중패널대시보드
   order: 8

@@ -1,4 +1,12 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - plotly
+    - scikit-learn
+    - seaborn
+    - statsmodels
   id: statsmodels_10
   title: 종합프로젝트
   order: 10

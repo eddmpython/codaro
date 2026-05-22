@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pydantic
   id: pydantic_02
   title: 필드검증기
   order: 2

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - networkx
   id: networkx_02
   title: 방향그래프와가중치
   order: 2

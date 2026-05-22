@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pandas
   id: pandas_09
   title: 두데이터합치기
   order: 9

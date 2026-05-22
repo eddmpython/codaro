@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - seaborn
   id: seaborn_01
   title: 붓꽃품종산점도
   order: 1

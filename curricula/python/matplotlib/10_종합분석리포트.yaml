@@ -1,4 +1,9 @@
 meta:
+  packages:
+    - matplotlib
+    - numpy
+    - pandas
+    - seaborn
   id: matplotlib_10
   title: 종합분석리포트
   order: 10

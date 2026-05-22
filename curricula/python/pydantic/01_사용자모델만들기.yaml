@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pydantic
   id: pydantic_01
   title: 사용자모델만들기
   order: 1

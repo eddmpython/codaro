@@ -1,4 +1,11 @@
 meta:
+  packages:
+    - altair
+    - numpy
+    - pandas
+    - plotly
+    - scipy
+    - statsmodels
   id: statsmodels_01
   title: 광고비매출예측
   order: 1

@@ -1,4 +1,8 @@
 meta:
+  packages:
+    - matplotlib
+    - pandas
+    - seaborn
   id: matplotlib_03
   title: 붓꽃품종산점도
   order: 3

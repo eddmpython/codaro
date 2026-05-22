@@ -1,4 +1,10 @@
 meta:
+  packages:
+    - altair
+    - numpy
+    - pandas
+    - plotly
+    - statsmodels
   id: statsmodels_03
   title: 의료보험비용예측
   order: 3

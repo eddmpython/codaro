@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - polars
   id: polars_07
   title: 스포츠통계분석
   order: 7

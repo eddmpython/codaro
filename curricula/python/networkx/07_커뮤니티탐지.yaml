@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - networkx
   id: networkx_07
   title: 커뮤니티탐지
   order: 7

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pandas
+    - plotly
   id: plotly_08
   title: 대륙별계층구조
   order: 8
