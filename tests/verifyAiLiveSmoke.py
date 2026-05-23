@@ -10,7 +10,7 @@ import sys
 import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Any
+from typing import Any, Awaitable, Callable
 
 import yaml
 
@@ -44,6 +44,8 @@ LIVE_PROVIDER_ERRORS = (
     TypeError,
     ValueError,
 )
+
+AsyncLiveCaseRunner = Callable[[LLMConfig], Awaitable["LiveSmokeCase"]]
 
 
 @dataclass(frozen=True)
@@ -229,13 +231,15 @@ def runLiveProvider(selection: LiveProviderSelection) -> LiveProviderRun:
             nextAction=liveCredentialNextAction(selection.provider),
         )
 
+    toolLoopCase = asyncio.run(runAsyncLiveCaseWithNetworkRetry(selection.config, runToolLoopCase))
+    cellCallCase = asyncio.run(runAsyncLiveCaseWithNetworkRetry(selection.config, runCellCallLoopCase))
     cases = (
         runProviderAvailabilityCase(selection.config),
         runShortAnswerCase(selection.config),
         runTeacherAnswerCase(selection.config),
         runClarificationGateCase(),
-        asyncio.run(runToolLoopCase(selection.config)),
-        asyncio.run(runCellCallLoopCase(selection.config)),
+        toolLoopCase,
+        cellCallCase,
     )
     passed = all(case.passed for case in cases)
     return LiveProviderRun(
@@ -243,6 +247,75 @@ def runLiveProvider(selection: LiveProviderSelection) -> LiveProviderRun:
         passed=passed,
         status="passed" if passed else "failed",
         cases=cases,
+    )
+
+
+async def runAsyncLiveCaseWithNetworkRetry(
+    config: LLMConfig,
+    runner: AsyncLiveCaseRunner,
+) -> LiveSmokeCase:
+    maxAttempts = liveNetworkRetryAttempts()
+    networkFailures: list[LiveSmokeCase] = []
+    for attempt in range(1, maxAttempts + 1):
+        case = await runner(config)
+        if case.passed:
+            return caseWithNetworkRetrySignals(case, attempt, networkFailures)
+        if not isRecoverableNetworkCase(case) or attempt == maxAttempts:
+            return caseWithNetworkRetrySignals(case, attempt, networkFailures)
+        networkFailures.append(case)
+    return caseWithNetworkRetrySignals(case, maxAttempts, networkFailures)
+
+
+def liveNetworkRetryAttempts() -> int:
+    rawValue = os.environ.get("CODARO_AI_LIVE_NETWORK_RETRIES", "2")
+    try:
+        value = int(rawValue)
+    except ValueError:
+        value = 2
+    return max(1, min(value, 3))
+
+
+def isRecoverableNetworkCase(case: LiveSmokeCase) -> bool:
+    return (
+        case.status == "provider_network_error"
+        or case.signals.get("diagnosticCode") == "provider_network_error"
+        or case.signals.get("failureReason") == "provider-network-error"
+    )
+
+
+def caseWithNetworkRetrySignals(
+    case: LiveSmokeCase,
+    attempt: int,
+    previousFailures: list[LiveSmokeCase],
+) -> LiveSmokeCase:
+    if attempt == 1 and not previousFailures:
+        return case
+    retrySignals = {
+        "attemptCount": attempt,
+        "networkRetryCount": len(previousFailures),
+        "previousNetworkFailures": [
+            {
+                "caseId": failure.caseId,
+                "status": failure.status,
+                "durationMs": failure.durationMs,
+                "diagnosticCode": failure.signals.get("diagnosticCode"),
+                "diagnosticAction": failure.signals.get("diagnosticAction"),
+            }
+            for failure in previousFailures
+        ],
+    }
+    if case.passed and previousFailures:
+        retrySignals["recoveredAfterNetworkRetry"] = True
+    return LiveSmokeCase(
+        caseId=case.caseId,
+        passed=case.passed,
+        status=case.status,
+        durationMs=case.durationMs,
+        provider=case.provider,
+        model=case.model,
+        error=case.error,
+        diagnostic=case.diagnostic,
+        signals=case.signals | retrySignals,
     )
 
 
@@ -581,6 +654,7 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
     toolNames = toolNamesFromPayload(payload)
     trace = traceFromPayload(payload)
     workloopSignals = workloopSignal(trace)
+    networkSignals = providerNetworkFailureSignals(trace, payload)
     yamlResults = toolResultsByName(executor.results, "write-curriculum-yaml")
     yamlResult = yamlResults[-1] if yamlResults else {}
     contractGapCount = intSignal(yamlResult, "contractGapCount")
@@ -600,8 +674,13 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
         and workloopSignals["workloopReadable"]
     )
     error = None
+    failureStatus = "live curriculum quality failed"
     failureSignals: dict[str, Any] = {}
-    if not usedCurriculumTool:
+    if not usedCurriculumTool and networkSignals:
+        error = "live provider network error interrupted write-curriculum-yaml continuation"
+        failureStatus = "provider_network_error"
+        failureSignals = networkSignals
+    elif not usedCurriculumTool:
         error = "live provider did not call write-curriculum-yaml; prompt/tool schema tuning required"
         failureSignals = toolLoopTuningSignals(
             reason="missing-required-tool",
@@ -654,7 +733,7 @@ async def runToolLoopCase(config: LLMConfig) -> LiveSmokeCase:
     return LiveSmokeCase(
         caseId="live-tool-loop",
         passed=passed,
-        status="passed" if passed else "live curriculum quality failed",
+        status="passed" if passed else failureStatus,
         durationMs=elapsedMs(startedAt),
         provider=str(payload.get("provider") or config.provider),
         model=str(payload.get("model") or provider.resolvedModel),
@@ -720,6 +799,7 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
     toolNames = toolNamesFromPayload(payload)
     trace = traceFromPayload(payload)
     workloopSignals = workloopSignal(trace)
+    networkSignals = providerNetworkFailureSignals(trace, payload)
     executorCalls = [call["tool"] for call in executor.calls]
     usedPackageCheck = "packages-check" in executorCalls
     usedCellCall = "cell-call" in executorCalls
@@ -736,8 +816,13 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
         and workloopSignals["workloopReadable"]
     )
     error = None
+    failureStatus = "missing live cell-call"
     failureSignals: dict[str, Any] = {}
-    if not usedCellCall:
+    if not usedCellCall and networkSignals:
+        error = "live provider network error interrupted cell-call continuation"
+        failureStatus = "provider_network_error"
+        failureSignals = networkSignals
+    elif not usedCellCall:
         error = "live provider did not call cell-call; prompt/tool schema tuning required"
         failureSignals = toolLoopTuningSignals(
             reason="missing-required-tool",
@@ -790,7 +875,7 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
     return LiveSmokeCase(
         caseId="live-cell-call-loop",
         passed=passed,
-        status="passed" if passed else "missing live cell-call",
+        status="passed" if passed else failureStatus,
         durationMs=elapsedMs(startedAt),
         provider=str(payload.get("provider") or config.provider),
         model=str(payload.get("model") or provider.resolvedModel),
@@ -849,6 +934,24 @@ def workloopSignal(trace: dict[str, Any]) -> dict[str, Any]:
         "workloopReadable": bool(events) and readableCount == len(events),
         "workloopLabels": labels[:6],
         "workloopSamples": samples,
+    }
+
+
+def providerNetworkFailureSignals(trace: dict[str, Any], payload: dict[str, Any]) -> dict[str, Any]:
+    answer = str(payload.get("answer") or payload.get("error") or "")
+    traceText = json.dumps(trace, ensure_ascii=False)
+    diagnostic = payload.get("diagnostic")
+    diagnosticCode = diagnostic.get("code") if isinstance(diagnostic, dict) else None
+    if diagnosticCode != "provider_network_error" and "provider_network_error" not in traceText:
+        return {}
+    return {
+        "failureReason": "provider-network-error",
+        "tuningRequired": False,
+        "diagnosticCode": "provider_network_error",
+        "diagnosticAction": "check-network",
+        "recoverable": True,
+        "answerPreview": boundedSignalText(answer),
+        "retryable": True,
     }
 
 
