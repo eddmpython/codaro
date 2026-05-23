@@ -45,6 +45,13 @@ export function buildWebsiteJsonLd() {
   };
 }
 
+/**
+ * @param {string | undefined} path
+ */
+function siteUrl(path) {
+  return brand.toSiteUrl(path || "/");
+}
+
 export function buildOrganizationJsonLd() {
   return {
     "@type": "Organization",
@@ -65,13 +72,13 @@ export function buildBlogPostJsonLd(post) {
     headline: post.title,
     description: post.description || "",
     datePublished: post.date ? new Date(post.date).toISOString() : undefined,
-    url: `${brand.siteUrl}${post.url || ""}`,
-    image: post.thumbnail ? `${brand.siteUrl}${post.thumbnail}` : `${brand.siteUrl}/brand/codaro-character.png`,
+    url: siteUrl(post.url),
+    image: post.thumbnail ? siteUrl(post.thumbnail) : brand.toSiteUrl("/brand/codaro-character.png"),
     author: buildOrganizationJsonLd(),
     publisher: buildOrganizationJsonLd(),
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${brand.siteUrl}${post.url || ""}`,
+      "@id": siteUrl(post.url),
     },
   };
 }
@@ -85,12 +92,12 @@ export function buildDocsPageJsonLd(page) {
     "@type": "TechArticle",
     headline: page.title,
     description: page.description || "",
-    url: `${brand.siteUrl}${page.url || ""}`,
+    url: siteUrl(page.url),
     author: buildOrganizationJsonLd(),
     publisher: buildOrganizationJsonLd(),
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": `${brand.siteUrl}${page.url || ""}`,
+      "@id": siteUrl(page.url),
     },
   };
 }
@@ -106,7 +113,7 @@ export function buildBreadcrumbJsonLd(items) {
       "@type": "ListItem",
       position: index + 1,
       name: item.name,
-      item: item.url ? `${brand.siteUrl}${item.url}` : undefined,
+      item: item.url ? siteUrl(item.url) : undefined,
     })),
   };
 }
@@ -117,10 +124,11 @@ export function buildSoftwareJsonLd() {
     "@type": "SoftwareApplication",
     name: brand.name,
     applicationCategory: "DeveloperApplication",
-    operatingSystem: "Windows, macOS, Linux",
+    operatingSystem: "Windows",
     description: brand.description,
     url: brand.siteUrl,
-    downloadUrl: `${brand.repoUrl}/releases`,
+    downloadUrl: brand.launcherDownloadUrl,
+    installUrl: brand.releaseUrl,
     author: buildOrganizationJsonLd(),
     offers: {
       "@type": "Offer",
@@ -134,10 +142,10 @@ export function buildSoftwareJsonLd() {
  * @param {MetaInput} input
  */
 export function buildMeta({ title, description, url, image, type }) {
-  const resolvedTitle = title ? `${title} — ${brand.name}` : brand.name;
+  const resolvedTitle = title ? `${title} - ${brand.name}` : brand.name;
   const resolvedDescription = description || brand.description;
-  const resolvedUrl = url ? `${brand.siteUrl}${url}` : brand.siteUrl;
-  const resolvedImage = image || `${brand.siteUrl}/brand/codaro-character.png`;
+  const resolvedUrl = url ? siteUrl(url) : brand.siteUrl;
+  const resolvedImage = image || brand.toSiteUrl("/brand/codaro-character.png");
   const resolvedType = type || "website";
 
   return {

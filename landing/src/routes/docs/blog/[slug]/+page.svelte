@@ -20,10 +20,10 @@
   <meta property="og:type" content="article" />
   <meta property="og:title" content="{data.post.title} · Codaro Docs" />
   <meta property="og:description" content={data.post.description} />
-  <meta property="og:url" content="{brand.siteUrl}{data.post.url}" />
-  <meta property="og:image" content="{brand.siteUrl}{data.post.thumbnail}" />
+  <meta property="og:url" content={brand.toSiteUrl(data.post.url)} />
+  <meta property="og:image" content={brand.toSiteUrl(data.post.thumbnail)} />
   <meta property="article:published_time" content={data.post.date ? new Date(data.post.date).toISOString() : ""} />
-  <link rel="canonical" href="{brand.siteUrl}{data.post.url}" />
+  <link rel="canonical" href={brand.toSiteUrl(data.post.url)} />
   {@html `<script type="application/ld+json">${postJsonLd}</script>`}
   {@html `<script type="application/ld+json">${breadcrumbJsonLd}</script>`}
 </svelte:head>

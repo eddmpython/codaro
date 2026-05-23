@@ -8,9 +8,10 @@
   let { children } = $props();
 
   let pathname = $derived(page.url.pathname);
+  let canonicalPath = $derived(pathname.startsWith(base) ? pathname.slice(base.length) || "/" : pathname);
 
   const navDefs = [
-    { path: "/", label: "Home" },
+    { path: "/", label: "Product" },
     { path: "/docs", label: "Docs" },
     { path: "/tools", label: "Tools" },
     { path: "/search", label: "Search" },
@@ -32,19 +33,19 @@
   <title>{brand.name}</title>
   <meta name="description" content={brand.description} />
   <meta property="og:type" content="website" />
-  <meta property="og:title" content="{brand.name} — {brand.tagline}" />
+  <meta property="og:title" content="{brand.name} - {brand.tagline}" />
   <meta property="og:description" content={brand.description} />
   <meta property="og:url" content={brand.siteUrl} />
   <meta property="og:image" content="{brand.siteUrl}/brand/codaro-character.png" />
   <meta property="og:site_name" content={brand.name} />
   <meta property="og:locale" content="en_US" />
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="{brand.name} — {brand.tagline}" />
+  <meta name="twitter:title" content="{brand.name} - {brand.tagline}" />
   <meta name="twitter:description" content={brand.description} />
   <meta name="twitter:image" content="{brand.siteUrl}/brand/codaro-character.png" />
   <link rel="alternate" type="application/atom+xml" title="Codaro Writing" href="{base}/feed.xml" />
-  <link rel="canonical" href="{brand.siteUrl}{pathname}" />
-  <meta name="theme-color" content="#09090b" />
+  <link rel="canonical" href={brand.toSiteUrl(canonicalPath)} />
+  <meta name="theme-color" content="#fafafa" />
   {@html `<script type="application/ld+json">${websiteJsonLd}</script>`}
   {@html `<script type="application/ld+json">${softwareJsonLd}</script>`}
 </svelte:head>
@@ -65,6 +66,7 @@
           {item.label}
         </a>
       {/each}
+      <a class="navPill navDownload" href="{base}/#download">Download</a>
     </nav>
     <button class="mobileMenuBtn" onclick={toggleMobile} aria-label="Toggle menu">
       <span class="hamburger" class:open={mobileOpen}></span>
@@ -85,6 +87,9 @@
           {item.label}
         </a>
       {/each}
+      <a class="mobileNavLink" href="{base}/#download" onclick={() => mobileOpen = false}>
+        Download
+      </a>
     </div>
   </nav>
 {/if}
@@ -94,6 +99,9 @@
 <footer class="siteFooter">
   <div class="siteShell footerBottom">
     <span>{brand.name}</span>
-    <a href={brand.repoUrl}>GitHub</a>
+    <div class="footerLinks">
+      <a href={brand.launcherDownloadUrl}>Download</a>
+      <a href={brand.repoUrl}>GitHub</a>
+    </div>
   </div>
 </footer>

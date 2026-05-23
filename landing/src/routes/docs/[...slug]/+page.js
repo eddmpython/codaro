@@ -18,7 +18,7 @@ export async function load({ params }) {
   if (!loadContent) {
     throw error(404, "Docs page content not found");
   }
-  const { pageContent } = await loadContent();
-  const page = { ...pageMeta, ...pageContent };
+  const { pageContent } = /** @type {{ pageContent: object }} */ (await loadContent());
+  const page = /** @type {any} */ ({ ...pageMeta, ...pageContent });
   return { page, docsSections };
 }

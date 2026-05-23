@@ -26,8 +26,8 @@
   <meta property="og:type" content="article" />
   <meta property="og:title" content="{data.page.title} · Codaro Docs" />
   <meta property="og:description" content={data.page.description} />
-  <meta property="og:url" content="{brand.siteUrl}{data.page.url}" />
-  <link rel="canonical" href="{brand.siteUrl}{data.page.url}" />
+  <meta property="og:url" content={brand.toSiteUrl(data.page.url)} />
+  <link rel="canonical" href={brand.toSiteUrl(data.page.url)} />
   {@html `<script type="application/ld+json">${pageJsonLd}</script>`}
   {@html `<script type="application/ld+json">${breadcrumbJsonLd}</script>`}
 </svelte:head>

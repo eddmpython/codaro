@@ -1,19 +1,21 @@
 :root {
-  color-scheme: dark;
-  --background: #09090b;
-  --surface: #18181b;
-  --surface-muted: #27272a;
-  --border: #3f3f46;
-  --border-strong: #52525b;
-  --text: #fafafa;
-  --text-muted: #a1a1aa;
+  color-scheme: light;
+  --background: #fafafa;
+  --surface: #ffffff;
+  --surface-subtle: #f4f4f5;
+  --surface-muted: #e4e4e7;
+  --border: #e4e4e7;
+  --border-strong: #a1a1aa;
+  --text: #18181b;
+  --text-muted: #52525b;
   --text-soft: #71717a;
-  --accent: #fb923c;
-  --accent-soft: rgba(251, 146, 60, 0.1);
-  --shadow: 0 16px 40px rgba(0, 0, 0, 0.3);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
-  --radius: 16px;
-  --radius-sm: 10px;
+  --accent: #18181b;
+  --accent-soft: rgba(24, 24, 27, 0.06);
+  --success: #15803d;
+  --shadow: 0 24px 60px rgba(24, 24, 27, 0.12);
+  --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.06);
+  --radius: 10px;
+  --radius-sm: 8px;
   font-family: "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -56,7 +58,7 @@ input {
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  padding: 20px 0 16px;
+  padding: 16px 0;
 }
 
 .brandMark {
@@ -64,13 +66,13 @@ input {
   align-items: center;
   gap: 12px;
   font-weight: 700;
-  font-size: 1.1rem;
+  font-size: 0.98rem;
 }
 
 .brandMark img {
-  width: 38px;
-  height: 38px;
-  border-radius: 10px;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
   object-fit: contain;
 }
 
@@ -84,17 +86,20 @@ input {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 14px;
-  border-radius: 999px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: var(--radius-sm);
   border: 1px solid transparent;
   background: transparent;
   color: var(--text-muted);
+  font-size: 0.88rem;
+  font-weight: 500;
   transition: all 0.2s ease;
 }
 
 .navPill:hover {
   color: var(--text);
-  background: var(--surface-muted);
+  background: var(--surface-subtle);
 }
 
 .navPill.active {
@@ -103,11 +108,22 @@ input {
   background: var(--surface);
 }
 
+.navDownload {
+  border-color: var(--text);
+  color: var(--background);
+  background: var(--text);
+}
+
+.navDownload:hover {
+  color: var(--background);
+  background: #27272a;
+}
+
 .mobileMenuBtn {
   display: none;
   background: none;
   border: 1px solid var(--border);
-  border-radius: 10px;
+  border-radius: var(--radius-sm);
   padding: 10px;
   cursor: pointer;
   color: var(--text);
@@ -230,40 +246,52 @@ input {
 }
 
 .primaryButton,
-.ghostButton {
+.ghostButton,
+.textButton {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
-  padding: 10px 18px;
-  min-height: 42px;
+  padding: 0 16px;
+  min-height: 40px;
   border-radius: var(--radius-sm);
   border: 1px solid transparent;
   cursor: pointer;
-  font-size: 0.92rem;
-  font-weight: 500;
+  font-size: 0.9rem;
+  font-weight: 600;
   transition: all 0.2s ease;
 }
 
 .primaryButton {
-  background: var(--accent);
-  color: white;
-  box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);
+  background: var(--text);
+  color: var(--background);
+  box-shadow: var(--shadow-sm);
 }
 
 .primaryButton:hover {
-  box-shadow: 0 6px 20px rgba(249, 115, 22, 0.35);
+  background: #27272a;
+  box-shadow: 0 8px 24px rgba(24, 24, 27, 0.14);
   transform: translateY(-1px);
 }
 
 .ghostButton {
-  background: transparent;
+  background: var(--surface);
   border-color: var(--border);
   color: var(--text-muted);
 }
 
 .ghostButton:hover {
   border-color: var(--border-strong);
+  color: var(--text);
+  background: var(--surface-subtle);
+}
+
+.textButton {
+  padding-inline: 4px;
+  color: var(--text-muted);
+}
+
+.textButton:hover {
   color: var(--text);
 }
 
@@ -432,9 +460,9 @@ input {
 .contentCard :global(pre) {
   overflow-x: auto;
   padding: 16px;
-  border-radius: 12px;
-  background: #1e1e2e;
-  color: #cdd6f4;
+  border-radius: var(--radius-sm);
+  background: #0f172a;
+  color: #e2e8f0;
 }
 
 .contentCard :global(pre code) {
@@ -561,16 +589,24 @@ input {
 .siteFooter {
   margin-top: 60px;
   border-top: 1px solid var(--border);
-  background: var(--surface);
+  background: var(--background);
 }
 
 .footerBottom {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 16px;
   padding: 16px 0 24px;
   font-size: 0.82rem;
   color: var(--text-soft);
+}
+
+.footerLinks {
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .footerBottom a {
