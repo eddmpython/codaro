@@ -20,6 +20,7 @@ Rules:
 - public tone is zinc-based and calm
 - `landing/` must stay separate from the local editor `editor/`
 - launcher download CTAs must point to GitHub Release assets, not repo-internal build paths
+- `.github/workflows/launcher-release.yml` is responsible for publishing `CodaroLauncher.exe`, checksum, and SBOM with stable asset names
 - writing asset URLs are flattened to `/docs/blog/assets/*` during build
 - `landing/` is the only shipped public docs surface
 - long-form docs, writing, and search must not be embedded back into the IDE as a full docs browser

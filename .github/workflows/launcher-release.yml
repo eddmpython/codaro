@@ -4,6 +4,12 @@ on:
   push:
     tags:
       - "v*-launcher"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag to create, for example v0.1.0-launcher"
+        required: true
+        type: string
 
 permissions:
   contents: write
@@ -11,6 +17,8 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
     steps:
       - uses: actions/checkout@v4
 
@@ -42,6 +50,14 @@ jobs:
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          target_commitish: ${{ github.sha }}
+          name: Codaro Launcher ${{ env.RELEASE_TAG }}
+          fail_on_unmatched_files: true
+          body: |
+            Download `CodaroLauncher.exe`, verify `CodaroLauncher.exe.sha256`, then run the launcher.
+
+            The release also includes `CodaroLauncher.spdx.json` for dependency transparency.
           files: |
             launcher/codaro-launcher/target/release/CodaroLauncher.exe
             launcher/codaro-launcher/target/release/CodaroLauncher.exe.sha256

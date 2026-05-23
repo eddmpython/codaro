@@ -18,8 +18,10 @@ def main() -> int:
         verifyDocsPageContentModules(),
         verifyGeneratedDocsFreshness(),
         verifyDocsRouteLoadsContentOnDemand(),
+        verifyLandingHomeDownloadSeo(),
         verifyPostbuildLoadsDocsContent(),
         verifyBuiltDocsNavChunk(),
+        verifyBuiltHomeSeoAndDownload(),
     )
     failures = [result for result in results if not result["passed"]]
     payload = {
@@ -117,6 +119,60 @@ def verifyDocsRouteLoadsContentOnDemand() -> dict[str, Any]:
     )
 
 
+def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
+    checks = (
+        (
+            "landing/src/routes/+page.svelte",
+            (
+                "Download CodaroLauncher.exe",
+                "Codaro - Local Python learning and automation studio",
+                "GitHub Releases",
+                "brand.launcherDownloadUrl",
+            ),
+        ),
+        (
+            "landing/src/lib/brand.js",
+            (
+                "launcherDownloadUrl",
+                "releases/latest/download/CodaroLauncher.exe",
+                "launcherChecksumUrl",
+                "launcherSbomUrl",
+                "toSiteUrl",
+            ),
+        ),
+        (
+            "landing/src/lib/seo.js",
+            (
+                "SoftwareApplication",
+                "downloadUrl: brand.launcherDownloadUrl",
+                "operatingSystem: \"Windows\"",
+                "brand.toSiteUrl",
+            ),
+        ),
+        (
+            ".github/workflows/launcher-release.yml",
+            (
+                "workflow_dispatch",
+                "CodaroLauncher.exe",
+                "CodaroLauncher.exe.sha256",
+                "CodaroLauncher.spdx.json",
+                "fail_on_unmatched_files: true",
+            ),
+        ),
+    )
+    missing: list[str] = []
+    for relPath, needles in checks:
+        path = ROOT / relPath
+        if not path.exists():
+            missing.append(f"missing file {relPath}")
+            continue
+        text = path.read_text(encoding="utf-8")
+        for needle in needles:
+            if needle not in text:
+                missing.append(f"{relPath} missing {needle}")
+    return result("landing-home-download-seo", missing)
+
+
 def verifyPostbuildLoadsDocsContent() -> dict[str, Any]:
     path = ROOT / "landing" / "scripts" / "postbuild.js"
     return requireNeedles(
@@ -129,6 +185,27 @@ def verifyPostbuildLoadsDocsContent() -> dict[str, Any]:
             "pageContent",
         ),
     )
+
+
+def verifyBuiltHomeSeoAndDownload() -> dict[str, Any]:
+    path = ROOT / "landing" / "build" / "index.html"
+    missing: list[str] = []
+    if not path.exists():
+        missing.append("missing built home page; run landing build first")
+        return result("built-home-seo-download", missing)
+    text = path.read_text(encoding="utf-8")
+    for needle in (
+        "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe",
+        "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.exe.sha256",
+        "https://github.com/eddmpython/codaro/releases/latest/download/CodaroLauncher.spdx.json",
+        "Codaro - Local Python learning and automation studio",
+        'rel="canonical" href="https://eddmpython.github.io/codaro"',
+    ):
+        if needle not in text:
+            missing.append(f"built index missing {needle}")
+    if "https://eddmpython.github.io/codaro/codaro" in text:
+        missing.append("built index contains duplicated GitHub Pages base path")
+    return result("built-home-seo-download", missing, {"bytes": path.stat().st_size})
 
 
 def verifyBuiltDocsNavChunk() -> dict[str, Any]:

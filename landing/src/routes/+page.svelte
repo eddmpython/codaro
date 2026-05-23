@@ -309,15 +309,15 @@ clean = df.drop_duplicates()</code></pre>
     position: relative;
     display: grid;
     align-content: center;
-    gap: 32px;
-    min-height: clamp(620px, 82svh, 820px);
-    padding: 64px 0 40px;
+    gap: 18px;
+    min-height: auto;
+    padding: 28px 0 26px;
   }
 
   .heroCopy {
     display: grid;
     justify-items: center;
-    gap: 18px;
+    gap: 14px;
     max-width: 860px;
     margin: 0 auto;
     text-align: center;
@@ -335,7 +335,7 @@ clean = df.drop_duplicates()</code></pre>
   .heroCopy h1 {
     margin: 0;
     color: var(--text);
-    font-size: clamp(4rem, 12vw, 9.2rem);
+    font-size: clamp(3.8rem, 8vw, 7rem);
     line-height: 0.85;
     font-weight: 760;
   }
@@ -406,7 +406,7 @@ clean = df.drop_duplicates()</code></pre>
   .previewGrid {
     display: grid;
     grid-template-columns: 150px minmax(0, 1fr);
-    min-height: 290px;
+    min-height: 210px;
   }
 
   .previewRail {
@@ -437,13 +437,13 @@ clean = df.drop_duplicates()</code></pre>
   .previewMain {
     display: grid;
     align-content: start;
-    gap: 10px;
-    padding: 18px;
+    gap: 8px;
+    padding: 14px;
   }
 
   .chatLine {
     max-width: 72%;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border-radius: 8px;
     line-height: 1.45;
     font-size: 0.88rem;
@@ -473,7 +473,7 @@ clean = df.drop_duplicates()</code></pre>
     display: flex;
     align-items: center;
     justify-content: space-between;
-    min-height: 36px;
+    min-height: 32px;
     padding: 0 12px;
     border-bottom: 1px solid rgba(148, 163, 184, 0.22);
     color: #94a3b8;
@@ -492,9 +492,9 @@ clean = df.drop_duplicates()</code></pre>
   .cellBlock pre {
     margin: 0;
     overflow-x: auto;
-    padding: 14px;
-    font-size: 0.86rem;
-    line-height: 1.5;
+    padding: 12px;
+    font-size: 0.82rem;
+    line-height: 1.42;
   }
 
   .resultStrip {
@@ -502,7 +502,7 @@ clean = df.drop_duplicates()</code></pre>
     align-items: center;
     justify-content: space-between;
     gap: 10px;
-    padding: 10px 12px;
+    padding: 8px 10px;
     border: 1px solid var(--border);
     border-radius: 8px;
     color: var(--text-muted);
@@ -754,6 +754,42 @@ clean = df.drop_duplicates()</code></pre>
     }
   }
 
+  @media (max-height: 760px) and (min-width: 760px) {
+    .heroShell {
+      gap: 14px;
+      padding: 20px 0 18px;
+    }
+
+    .heroCopy {
+      gap: 10px;
+    }
+
+    .heroCopy h1 {
+      font-size: clamp(3.5rem, 7vw, 5.8rem);
+    }
+
+    .heroLead {
+      max-width: 720px;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .heroProof,
+    .systemLine,
+    .resultStrip {
+      display: none;
+    }
+
+    .runtimePreview {
+      width: min(780px, 100%);
+    }
+
+    .previewGrid {
+      grid-template-columns: 130px minmax(0, 1fr);
+      min-height: 0;
+    }
+  }
+
   @media (max-width: 620px) {
     .landingHero {
       border-top: 0;
@@ -761,7 +797,7 @@ clean = df.drop_duplicates()</code></pre>
 
     .heroShell {
       min-height: auto;
-      padding: 42px 0 26px;
+      padding: 34px 0 24px;
     }
 
     .heroMascot {
