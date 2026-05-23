@@ -520,6 +520,22 @@ export const docsPages = [
     "contentModule": "page93674194e801"
   },
   {
+    "path": "skills/ops/release/launch-playbook",
+    "slugSegments": [
+      "skills",
+      "ops",
+      "release",
+      "launch-playbook"
+    ],
+    "title": "Launch Playbook",
+    "description": "Public launch skeleton for positioning, demos, video, release notes, and first-user feedback.",
+    "section": "ops",
+    "sectionLabel": "Operations",
+    "order": 308,
+    "url": "/codaro/docs/skills/ops/release/launch-playbook",
+    "contentModule": "page4974f45b264e"
+  },
+  {
     "path": "skills/ops/workflow/reference-impl",
     "slugSegments": [
       "skills",
@@ -1136,6 +1152,22 @@ export const docsSections = [
         "order": 307,
         "url": "/codaro/docs/skills/ops/workflow/doc-and-session",
         "contentModule": "page93674194e801"
+      },
+      {
+        "path": "skills/ops/release/launch-playbook",
+        "slugSegments": [
+          "skills",
+          "ops",
+          "release",
+          "launch-playbook"
+        ],
+        "title": "Launch Playbook",
+        "description": "Public launch skeleton for positioning, demos, video, release notes, and first-user feedback.",
+        "section": "ops",
+        "sectionLabel": "Operations",
+        "order": 308,
+        "url": "/codaro/docs/skills/ops/release/launch-playbook",
+        "contentModule": "page4974f45b264e"
       },
       {
         "path": "skills/ops/workflow/reference-impl",

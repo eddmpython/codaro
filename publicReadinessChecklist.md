@@ -9,6 +9,7 @@
 - [x] `public-readiness-audit`가 같은 `gitHead`에서 모든 공개 준비 domain을 9.0 이상으로 통과한다.
 - [x] Tracked worktree가 clean일 때만 완료를 선언한다.
 - [x] 공개 준비 증거는 `output/test-runner/public-readiness-audit/public-readiness-report.json`에 남긴다.
+- [x] 대중 공개용 launch kit, 5분 quickstart, 영상 storyboard, dry-run demo가 루트와 `demos/publicLaunch/`에 있다.
 
 ## Public Trust Surface
 
@@ -40,3 +41,4 @@
 - [x] NIST SSDF SP 800-218, OWASP ASVS, CISA Secure by Design, OpenSSF Scorecard, SLSA, SPDX SBOM, WCAG 2.2, GitHub security policy guidance를 공개 준비 기준의 외부 baseline으로 둔다.
 - [x] 외부 baseline은 `docs/skills/ops/release/public-release.md`와 `public-readiness-audit` report에 URL로 남긴다.
 - [x] 대중 사용 목표는 hosted service launch가 아니라 local-first public distribution readiness로 한정한다.
+- [x] 런칭 메시지는 `docs/skills/ops/release/launch-playbook.md`와 `launchKit.md`를 SSOT로 삼는다.
