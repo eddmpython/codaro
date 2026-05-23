@@ -103,6 +103,8 @@ TOOL_METADATA: dict[str, ToolManifestMetadata] = {
     "http-request": ToolManifestMetadata("automation", "automation", "external-api", "external"),
     "start-recording": ToolManifestMetadata("automation", "automation", "desktop-automation"),
     "stop-recording": ToolManifestMetadata("automation", "automation", "desktop-automation"),
+    "write-automation-recipe": ToolManifestMetadata("automation", "write", "automation-recipe", "writes"),
+    "create-automation-task": ToolManifestMetadata("automation", "automation", "task-registry", "writes"),
     "run-automation": ToolManifestMetadata("automation", "automation", "desktop-automation", "input"),
     "capture-screen": ToolManifestMetadata("sensory", "read", "screen"),
     "read-screen-text": ToolManifestMetadata("sensory", "read", "screen"),

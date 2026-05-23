@@ -5,6 +5,7 @@ import json
 
 import pytest
 
+import codaro.automation.taskRegistry as taskRegistryModule
 from codaro.ai.tools import (
     allTools,
     defaultTools,
@@ -32,6 +33,7 @@ EXPECTED_BUILTIN_TOOLS = {
     "insert-block", "update-block", "delete-block",
     "execute-reactive", "get-variables", "get-blocks",
     "read-cells", "write-cell", "cell-call", "write-curriculum-yaml",
+    "write-automation-recipe", "create-automation-task",
     "fs-write", "packages-install", "check-exercise", "create-guide",
     "create-learning-card", "create-quiz",
     "create-notebook-exercise", "track-achievement",
@@ -272,6 +274,78 @@ class TestDocumentTools:
             "durationMs": 42,
             "skipped": True,
         }
+
+
+class TestAutomationAuthoringTools:
+
+    def test_write_automation_recipe_creates_file_and_automation_cell(self, tmp_path):
+        doc = _makeDoc(blocks=[])
+        executor, doc = _makeExecutor(doc=doc, workspaceRoot=str(tmp_path))
+
+        result = asyncio.run(executor.execute("write-automation-recipe", {
+            "title": "Daily Report",
+            "description": "Prepare the recurring report.",
+            "code": "print('report ready')",
+        }))
+
+        recipePath = tmp_path / "automations" / "daily-report.py"
+        assert result["saved"] is True
+        assert result["path"] == str(recipePath)
+        assert result["loadedInEditor"] is True
+        assert result["blockId"] == doc.blocks[0].id
+        assert recipePath.exists()
+
+        recipe = recipePath.read_text(encoding="utf-8")
+        assert "# %% [markdown]" in recipe
+        assert "# %% [automation]" in recipe
+        assert "DRY_RUN = True" in recipe
+        assert "print('report ready')" in recipe
+
+        block = doc.blocks[0]
+        assert block.type == "automation"
+        assert block.role == "automation"
+        assert block.executionKind == "python"
+        assert block.sourceType == "automationAuthoring"
+        assert block.payload["recipePath"] == str(recipePath)
+        assert "DRY_RUN = True" in block.content
+
+    def test_create_automation_task_registers_validated_recipe(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("CODARO_HOME", str(tmp_path / "home"))
+        taskRegistryModule._registry = None
+        recipePath = tmp_path / "recipes" / "report.py"
+        recipePath.parent.mkdir()
+        recipePath.write_text("# %% [automation]\nprint('ok')\n", encoding="utf-8")
+        executor, _ = _makeExecutor(workspaceRoot=str(tmp_path))
+
+        result = asyncio.run(executor.execute("create-automation-task", {
+            "name": "Run report",
+            "description": "Daily report task",
+            "documentPath": "recipes/report.py",
+            "schedule": "@every_15m",
+            "inputs": {"dryRun": True},
+        }))
+
+        taskRegistryModule._registry = None
+        assert result["created"] is True
+        assert result["documentPath"] == str(recipePath)
+        assert result["task"]["name"] == "Run report"
+        assert result["task"]["description"] == "Daily report task"
+        assert result["task"]["schedule"] == "@every_15m"
+        assert result["task"]["inputs"] == {"dryRun": True}
+        assert (tmp_path / "home" / "tasks" / "index.json").exists()
+
+    def test_create_automation_task_rejects_missing_recipe(self, tmp_path, monkeypatch):
+        monkeypatch.setenv("CODARO_HOME", str(tmp_path / "home"))
+        taskRegistryModule._registry = None
+        executor, _ = _makeExecutor(workspaceRoot=str(tmp_path))
+
+        result = asyncio.run(executor.execute("create-automation-task", {
+            "name": "Missing",
+            "documentPath": "missing.py",
+        }))
+
+        taskRegistryModule._registry = None
+        assert result["error"] == "Automation recipe not found: missing.py"
 
 
 class TestGuide:

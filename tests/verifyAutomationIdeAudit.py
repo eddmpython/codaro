@@ -238,6 +238,44 @@ AUTOMATION_REQUIREMENTS = (
         ),
     ),
     AutomationRequirement(
+        requirementId="automation-authoring-loop",
+        requirement="Automation authoring is a first-class loop from cells to recipe, dry-run, validation, and task registration.",
+        evidenceChecks=(
+            ("docs/skills/architecture/automation-authoring-loop.md", (
+                "read-cells",
+                "write-automation-recipe",
+                "write-cell",
+                "packages-check",
+                "cell-call",
+                "create-automation-task",
+                "dry-run",
+            )),
+            ("src/codaro/ai/toolDefinitions/automation.py", (
+                "TOOL_WRITE_AUTOMATION_RECIPE",
+                "TOOL_CREATE_AUTOMATION_TASK",
+                "write-automation-recipe",
+                "create-automation-task",
+            )),
+            ("src/codaro/ai/toolHandlers/automation.py", (
+                "_handle_writeAutomationRecipe",
+                "_handle_createAutomationTask",
+                "DRY_RUN =",
+                "automationAuthoring",
+            )),
+            ("src/codaro/ai/toolManifest.py", (
+                "write-automation-recipe",
+                "create-automation-task",
+                "automation-recipe",
+                "task-registry",
+            )),
+            ("tests/testAiTools.py", (
+                "test_write_automation_recipe_creates_file_and_automation_cell",
+                "test_create_automation_task_registers_validated_recipe",
+                "test_create_automation_task_rejects_missing_recipe",
+            )),
+        ),
+    ),
+    AutomationRequirement(
         requirementId="automation-docs-and-objective-scorecard",
         requirement="Automation product requirements are documented and tied to objective 9+ scoring.",
         evidenceChecks=(

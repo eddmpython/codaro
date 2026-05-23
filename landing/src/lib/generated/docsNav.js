@@ -150,6 +150,21 @@ export const docsPages = [
     "contentModule": "page6868d6b52792"
   },
   {
+    "path": "skills/architecture/automation-authoring-loop",
+    "slugSegments": [
+      "skills",
+      "architecture",
+      "automation-authoring-loop"
+    ],
+    "title": "Automation Authoring Loop",
+    "description": "Provider-guided loop for turning chat automation requests into percent-format recipes, editor cells, checks, and registered tasks.",
+    "section": "architecture",
+    "sectionLabel": "Architecture",
+    "order": 209,
+    "url": "/codaro/docs/skills/architecture/automation-authoring-loop",
+    "contentModule": "page277209dcb10e"
+  },
+  {
     "path": "skills/architecture/live-provider-ops",
     "slugSegments": [
       "skills",
@@ -941,6 +956,21 @@ export const docsSections = [
         "order": 208,
         "url": "/codaro/docs/skills/architecture/teacher-tool-loop",
         "contentModule": "page6868d6b52792"
+      },
+      {
+        "path": "skills/architecture/automation-authoring-loop",
+        "slugSegments": [
+          "skills",
+          "architecture",
+          "automation-authoring-loop"
+        ],
+        "title": "Automation Authoring Loop",
+        "description": "Provider-guided loop for turning chat automation requests into percent-format recipes, editor cells, checks, and registered tasks.",
+        "section": "architecture",
+        "sectionLabel": "Architecture",
+        "order": 209,
+        "url": "/codaro/docs/skills/architecture/automation-authoring-loop",
+        "contentModule": "page277209dcb10e"
       },
       {
         "path": "skills/architecture/live-provider-ops",

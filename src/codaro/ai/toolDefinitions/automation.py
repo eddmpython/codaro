@@ -246,6 +246,76 @@ TOOL_STOP_RECORDING = ToolDef(
     handler="stopRecording",
 )
 
+TOOL_WRITE_AUTOMATION_RECIPE = ToolDef(
+    name="write-automation-recipe",
+    description=(
+        "Create or update a Python percent-format automation recipe and optionally load it as an automation cell."
+    ),
+    parameters={
+        "type": "object",
+        "properties": {
+            "title": {
+                "type": "string",
+                "description": "Human-readable title for the automation recipe.",
+            },
+            "code": {
+                "type": "string",
+                "description": "Python automation body to place in the automation cell.",
+            },
+            "description": {
+                "type": "string",
+                "description": "Short purpose and safety notes for the recipe.",
+            },
+            "outputPath": {
+                "type": "string",
+                "description": "Optional recipe path relative to the active workspace.",
+            },
+            "dryRunFirst": {
+                "type": "boolean",
+                "description": "Whether the generated recipe should start in dry-run mode (default true).",
+            },
+            "loadInEditor": {
+                "type": "boolean",
+                "description": "Whether to append the automation body to the active editor document (default true).",
+            },
+        },
+        "required": ["title", "code"],
+    },
+    handler="writeAutomationRecipe",
+)
+
+TOOL_CREATE_AUTOMATION_TASK = ToolDef(
+    name="create-automation-task",
+    description="Register a saved automation recipe or document as a runnable task.",
+    parameters={
+        "type": "object",
+        "properties": {
+            "name": {
+                "type": "string",
+                "description": "Task name shown in the automation surface.",
+            },
+            "documentPath": {
+                "type": "string",
+                "description": "Path to a saved recipe or document inside the active workspace.",
+            },
+            "description": {
+                "type": "string",
+                "description": "Short task description.",
+            },
+            "schedule": {
+                "type": "string",
+                "description": "Optional schedule such as @daily, @every_15m, or @every_1h.",
+            },
+            "inputs": {
+                "type": "object",
+                "description": "Optional task input defaults.",
+            },
+        },
+        "required": ["name", "documentPath"],
+    },
+    handler="createAutomationTask",
+)
+
 TOOL_RUN_AUTOMATION = ToolDef(
     name="run-automation",
     description="Execute a multi-step automation plan with vision verification at each step.",

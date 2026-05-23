@@ -3,6 +3,7 @@ from __future__ import annotations
 from .toolDefinitions.automation import (
     TOOL_CAPTURE_SCREEN,
     TOOL_CLICK_ELEMENT,
+    TOOL_CREATE_AUTOMATION_TASK,
     TOOL_DETECT_ELEMENTS,
     TOOL_EMERGENCY_STOP,
     TOOL_FIND_ELEMENT,
@@ -17,6 +18,7 @@ from .toolDefinitions.automation import (
     TOOL_VOICE_LISTEN,
     TOOL_VOICE_SPEAK,
     TOOL_WAIT_FOR,
+    TOOL_WRITE_AUTOMATION_RECIPE,
 )
 from .toolDefinitions.learning import (
     TOOL_CREATE_GUIDE,
@@ -81,6 +83,8 @@ DEFAULT_TOOLS: tuple[ToolDef, ...] = (
     TOOL_WAIT_FOR,
     TOOL_START_RECORDING,
     TOOL_STOP_RECORDING,
+    TOOL_WRITE_AUTOMATION_RECIPE,
+    TOOL_CREATE_AUTOMATION_TASK,
     TOOL_RUN_AUTOMATION,
     TOOL_DETECT_ELEMENTS,
     TOOL_VOICE_LISTEN,

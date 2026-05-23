@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import time
+import uuid
 from pathlib import Path
 from typing import Any
 
@@ -43,14 +44,14 @@ class AutomationToolHandlers:
             return {"error": f"Request timed out after {timeout}s"}
 
     async def _handle_captureScreen(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
         import base64
 
-        from ..automation.vision.capture import Region
-        from ..automation.vision.captureFactory import createCapture
+        from codaro.automation.vision.capture import Region
+        from codaro.automation.vision.captureFactory import createCapture
 
         regionArg = args.get("region")
         region = None
@@ -101,12 +102,12 @@ class AutomationToolHandlers:
         }
 
     async def _handle_readScreenText(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
-        from ..automation.vision.capture import Region
-        from ..automation.vision.captureFactory import createCapture
+        from codaro.automation.vision.capture import Region
+        from codaro.automation.vision.captureFactory import createCapture
 
         regionArg = args.get("region")
         region = None
@@ -129,11 +130,11 @@ class AutomationToolHandlers:
 
         backend = args.get("backend", "paddle")
         if backend == "easyocr":
-            from ..automation.vision.easyOcr import EasyOcrEngine
+            from codaro.automation.vision.easyOcr import EasyOcrEngine
 
             ocr = EasyOcrEngine()
         else:
-            from ..automation.vision.paddleOcr import PaddleOcrEngine
+            from codaro.automation.vision.paddleOcr import PaddleOcrEngine
 
             ocr = PaddleOcrEngine()
 
@@ -149,13 +150,13 @@ class AutomationToolHandlers:
         }
 
     def _getInputGuard(self):
-        from ..automation.shared import getSharedInputGuard
+        from codaro.automation.shared import getSharedInputGuard
 
         return getSharedInputGuard()
 
     async def _handle_clickElement(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.audit import getAuditTrail
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.audit import getAuditTrail
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
@@ -165,8 +166,8 @@ class AutomationToolHandlers:
         clicks = args.get("clicks", 1)
 
         if text:
-            from ..automation.vision.capture import Region
-            from ..automation.vision.captureFactory import createCapture
+            from codaro.automation.vision.capture import Region
+            from codaro.automation.vision.captureFactory import createCapture
 
             regionArg = args.get("region")
             region = Region(**regionArg) if regionArg else None
@@ -177,7 +178,7 @@ class AutomationToolHandlers:
             finally:
                 capture.dispose()
 
-            from ..automation.vision.paddleOcr import PaddleOcrEngine
+            from codaro.automation.vision.paddleOcr import PaddleOcrEngine
 
             ocr = PaddleOcrEngine()
             try:
@@ -205,8 +206,8 @@ class AutomationToolHandlers:
         return {"clicked": True, "x": x, "y": y, "button": button}
 
     async def _handle_typeText(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.audit import getAuditTrail
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.audit import getAuditTrail
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
@@ -219,8 +220,8 @@ class AutomationToolHandlers:
         return {"typed": True, "length": len(text)}
 
     async def _handle_pressHotkey(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.audit import getAuditTrail
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.audit import getAuditTrail
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
@@ -232,15 +233,15 @@ class AutomationToolHandlers:
         return {"pressed": True, "keys": keys}
 
     async def _handle_findElement(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
         text = args["text"]
         regionArg = args.get("region")
 
-        from ..automation.vision.capture import Region
-        from ..automation.vision.captureFactory import createCapture
+        from codaro.automation.vision.capture import Region
+        from codaro.automation.vision.captureFactory import createCapture
 
         region = Region(**regionArg) if regionArg else None
 
@@ -250,7 +251,7 @@ class AutomationToolHandlers:
         finally:
             capture.dispose()
 
-        from ..automation.vision.paddleOcr import PaddleOcrEngine
+        from codaro.automation.vision.paddleOcr import PaddleOcrEngine
 
         ocr = PaddleOcrEngine()
         try:
@@ -281,16 +282,16 @@ class AutomationToolHandlers:
     async def _handle_waitFor(self, args: dict[str, Any]) -> dict[str, Any]:
         import asyncio
 
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.eStop import getEmergencyStop
 
         text = args["text"]
         timeout = min(args.get("timeout", 10), 60)
         interval = max(args.get("interval", 0.5), 0.2)
         regionArg = args.get("region")
 
-        from ..automation.vision.capture import Region
-        from ..automation.vision.captureFactory import createCapture
-        from ..automation.vision.paddleOcr import PaddleOcrEngine
+        from codaro.automation.vision.capture import Region
+        from codaro.automation.vision.captureFactory import createCapture
+        from codaro.automation.vision.paddleOcr import PaddleOcrEngine
 
         region = Region(**regionArg) if regionArg else None
         deadline = time.monotonic() + timeout
@@ -325,13 +326,13 @@ class AutomationToolHandlers:
         return {"found": False, "timeout": timeout, "text": text}
 
     def _getRecorder(self):
-        from ..automation.shared import getSharedRecorder
+        from codaro.automation.shared import getSharedRecorder
 
         return getSharedRecorder()
 
     async def _handle_startRecording(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.audit import getAuditTrail
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.audit import getAuditTrail
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
@@ -341,8 +342,8 @@ class AutomationToolHandlers:
         return {"recordingId": recordingId, "status": "recording"}
 
     async def _handle_stopRecording(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.audit import getAuditTrail
-        from ..automation.recorder.recipeGenerator import RecipeGenerator
+        from codaro.automation.audit import getAuditTrail
+        from codaro.automation.recorder.recipeGenerator import RecipeGenerator
 
         recorder = self._getRecorder()
         actions = recorder.stop()
@@ -373,9 +374,117 @@ class AutomationToolHandlers:
             "saved": saved,
         }
 
+    async def _handle_writeAutomationRecipe(self, args: dict[str, Any]) -> dict[str, Any]:
+        title = str(args.get("title", "")).strip()
+        code = str(args.get("code", "")).rstrip()
+        description = str(args.get("description", "")).strip()
+        dryRunFirst = args.get("dryRunFirst", True) is not False
+        loadInEditor = args.get("loadInEditor", True) is not False
+
+        if not title:
+            return {"error": "title is required"}
+        if not code.strip():
+            return {"error": "code is required"}
+
+        automationBody = _automationBodyText(code=code, dryRunFirst=dryRunFirst)
+        recipe = _automationRecipeText(
+            title=title,
+            description=description,
+            automationBody=automationBody,
+        )
+
+        outputPath = args.get("outputPath")
+        if not outputPath and self._workspaceRoot:
+            outputPath = f"automations/{_safeAutomationSlug(title)}.py"
+
+        saved = False
+        savedPath: str | None = None
+        if outputPath and self._workspaceRoot:
+            filePath = Path(self._validatePath(str(outputPath)))
+            try:
+                filePath.parent.mkdir(parents=True, exist_ok=True)
+                filePath.write_text(recipe, encoding="utf-8")
+            except OSError as exc:
+                return {"error": f"Failed to write automation recipe: {exc}"}
+            saved = True
+            savedPath = str(filePath)
+
+        loadedInEditor = False
+        blockId: str | None = None
+        if loadInEditor:
+            from codaro.document.models import BlockConfig
+
+            doc = self._getDocument()
+            blockId = f"automation-{uuid.uuid4().hex[:8]}"
+            doc.blocks.append(BlockConfig(
+                id=blockId,
+                type="automation",
+                role="automation",
+                executionKind="python",
+                displayKind="cell",
+                sourceType="automationAuthoring",
+                title=title,
+                description=description,
+                content=automationBody,
+                payload={
+                    "recipePath": savedPath,
+                    "dryRunFirst": dryRunFirst,
+                    "authoringTool": "write-automation-recipe",
+                },
+            ))
+            self._saveDocument(doc)
+            loadedInEditor = self._documentSetter is not None
+
+        return {
+            "saved": saved,
+            "path": savedPath,
+            "loadedInEditor": loadedInEditor,
+            "blockId": blockId,
+            "dryRunFirst": dryRunFirst,
+            "recipe": None if saved else recipe,
+        }
+
+    async def _handle_createAutomationTask(self, args: dict[str, Any]) -> dict[str, Any]:
+        from codaro.automation.scheduler import parseScheduleSeconds
+        from codaro.automation.taskRegistry import getTaskRegistry
+
+        name = str(args.get("name", "")).strip()
+        documentPath = str(args.get("documentPath", "")).strip()
+        description = str(args.get("description", "")).strip()
+        rawSchedule = args.get("schedule")
+        schedule = str(rawSchedule).strip() if rawSchedule else None
+
+        if not name:
+            return {"error": "name is required"}
+        if not documentPath:
+            return {"error": "documentPath is required"}
+        if schedule and parseScheduleSeconds(schedule) is None:
+            return {"error": f"Invalid schedule: {schedule}"}
+
+        recipePath = Path(self._validatePath(documentPath))
+        if not recipePath.is_file():
+            return {"error": f"Automation recipe not found: {documentPath}"}
+
+        inputs = args.get("inputs")
+        if inputs is not None and not isinstance(inputs, dict):
+            return {"error": "inputs must be an object"}
+
+        task = getTaskRegistry().create(
+            name=name,
+            documentPath=str(recipePath),
+            description=description,
+            schedule=schedule,
+            inputs=inputs or {},
+        )
+        return {
+            "created": True,
+            "task": task.serialize(),
+            "documentPath": str(recipePath),
+        }
+
     async def _handle_runAutomation(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.eStop import getEmergencyStop
-        from ..automation.loop.automationLoop import AutomationLoop, LoopConfig
+        from codaro.automation.eStop import getEmergencyStop
+        from codaro.automation.loop.automationLoop import AutomationLoop, LoopConfig
 
         getEmergencyStop().check()
 
@@ -409,13 +518,13 @@ class AutomationToolHandlers:
         return result
 
     async def _handle_detectElements(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
-        from ..automation.vision.capture import Region
-        from ..automation.vision.captureFactory import createCapture
-        from ..automation.vision.elementDetector import ElementDetector
+        from codaro.automation.vision.capture import Region
+        from codaro.automation.vision.captureFactory import createCapture
+        from codaro.automation.vision.elementDetector import ElementDetector
 
         regionArg = args.get("region")
         region = Region(**regionArg) if regionArg else None
@@ -453,14 +562,14 @@ class AutomationToolHandlers:
     async def _handle_voiceListen(self, args: dict[str, Any]) -> dict[str, Any]:
         import asyncio
 
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
         duration = min(args.get("duration", 5), 30)
         language = args.get("language", "en")
 
-        from ..automation.voice.whisperEngine import WhisperEngine
+        from codaro.automation.voice.whisperEngine import WhisperEngine
 
         engine = WhisperEngine()
         try:
@@ -476,14 +585,14 @@ class AutomationToolHandlers:
         return result.serialize()
 
     async def _handle_voiceSpeak(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
         text = args["text"]
         rate = args.get("rate", 150)
 
-        from ..automation.voice.pyttsx3Speaker import Pyttsx3Speaker
+        from codaro.automation.voice.pyttsx3Speaker import Pyttsx3Speaker
 
         speaker = Pyttsx3Speaker()
         try:
@@ -494,15 +603,15 @@ class AutomationToolHandlers:
         return {"spoken": True, "text": text, "rate": rate}
 
     async def _handle_sendNotification(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.audit import getAuditTrail
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.audit import getAuditTrail
+        from codaro.automation.eStop import getEmergencyStop
 
         getEmergencyStop().check()
 
         channel = args["channel"]
         message = args["message"]
 
-        from ..automation.shared import getSharedMessageBridge
+        from codaro.automation.shared import getSharedMessageBridge
 
         bridge = getSharedMessageBridge()
 
@@ -519,7 +628,7 @@ class AutomationToolHandlers:
         return result.serialize()
 
     async def _handle_emergencyStop(self, args: dict[str, Any]) -> dict[str, Any]:
-        from ..automation.eStop import getEmergencyStop
+        from codaro.automation.eStop import getEmergencyStop
 
         reason = args.get("reason", "AI triggered emergency stop")
         eStop = getEmergencyStop()
@@ -529,3 +638,30 @@ class AutomationToolHandlers:
             "reason": reason,
             "status": eStop.serialize(),
         }
+
+
+def _safeAutomationSlug(title: str) -> str:
+    chars: list[str] = []
+    for char in title.lower():
+        if char.isascii() and char.isalnum():
+            chars.append(char)
+        elif chars and chars[-1] != "-":
+            chars.append("-")
+    slug = "".join(chars).strip("-")[:60].rstrip("-")
+    return slug or "automation-recipe"
+
+
+def _automationBodyText(code: str, dryRunFirst: bool) -> str:
+    dryRunLiteral = "True" if dryRunFirst else "False"
+    return f"DRY_RUN = {dryRunLiteral}\n\n{code.rstrip()}\n"
+
+
+def _automationRecipeText(title: str, description: str, automationBody: str) -> str:
+    summary = description or "Automation recipe."
+    return (
+        "# %% [markdown]\n"
+        f"# {title}\n\n"
+        f"{summary}\n\n"
+        "# %% [automation]\n"
+        f"{automationBody}"
+    )
