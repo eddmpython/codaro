@@ -23,7 +23,7 @@
   "dependencies": {
     "fflate": "^0.8.2",
     "gray-matter": "^4.0.3",
-    "lucide-svelte": "^0.575.0",
+    "lucide-svelte": "^1.0.1",
     "marked": "^16.4.1",
     "pdf-lib": "^1.17.1",
     "pdfjs-dist": "^4.7.76",
