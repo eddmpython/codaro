@@ -152,12 +152,19 @@ def buildDomains(context: AuditContext) -> list[dict[str, Any]]:
             textCheck("README privacy link", "README.md", "PRIVACY.md"),
             textCheck("README support link", "README.md", "SUPPORT.md"),
             textCheck("README public checklist link", "README.md", "publicReadinessChecklist.md"),
+            textCheck("README launch kit link", "README.md", "launchKit.md"),
             textCheck("public checklist completion rule", "publicReadinessChecklist.md", "Completion Rule"),
             textAbsent("public checklist has no open boxes", "publicReadinessChecklist.md", "- [ ]"),
             textCheck("contributing public readiness gate", "CONTRIBUTING.md", "public-readiness-audit"),
             textCheck("conduct enforcement", "CODE_OF_CONDUCT.md", "Enforcement"),
             textCheck("skills index includes public release", "docs/skills/README.md", "public-release"),
             textCheck("ops index includes public release", "docs/skills/ops/README.md", "release/public-release.md"),
+            textCheck("launch kit positioning", "launchKit.md", "First Five Minutes"),
+            textCheck("launch playbook exists", "docs/skills/ops/release/launch-playbook.md", "Required Launch Assets"),
+            textCheck("quickstart exists", "demos/publicLaunch/fiveMinuteQuickstart.md", "Five Minute Quickstart"),
+            textCheck("video storyboard exists", "demos/publicLaunch/videoStoryboard.md", "Video Storyboard"),
+            scriptOutputContains("expense summary demo runs", "demos/publicLaunch/expenseSummaryDemo.py", ("expense summary", "top category")),
+            scriptOutputContains("file organizer demo runs", "demos/publicLaunch/fileOrganizerDemo.py", ("safe file organizer", "mode: dry-run")),
         )),
         domain("accessibility-user-safety", (
             textCheck("WCAG 2.2 baseline", "docs/skills/ops/release/public-release.md", REFERENCE_SOURCES["wcag22"]),
@@ -308,6 +315,25 @@ def textAbsent(label: str, relPath: str, needle: str) -> CheckResult:
         return CheckResult(label, False, f"{relPath}: {exc}")
     passed = needle not in text
     return CheckResult(label, passed, f"{relPath}: absent {needle}" if passed else f"{relPath}: stale token remains {needle}")
+
+
+def scriptOutputContains(label: str, relPath: str, needles: tuple[str, ...]) -> CheckResult:
+    path = ROOT / relPath
+    if not path.is_file():
+        return CheckResult(label, False, f"{relPath} missing")
+    result = subprocess.run(
+        (sys.executable, "-X", "utf8", str(path)),
+        cwd=ROOT,
+        check=False,
+        capture_output=True,
+        text=True,
+        timeout=30,
+    )
+    output = f"{result.stdout}\n{result.stderr}"
+    missing = [needle for needle in needles if needle not in output]
+    passed = result.returncode == 0 and not missing
+    detail = f"{relPath} output contains {', '.join(needles)}" if passed else f"exit {result.returncode}, missing: {', '.join(missing)}"
+    return CheckResult(label, passed, detail)
 
 
 def readJson(relPath: str) -> dict[str, Any]:

@@ -99,7 +99,7 @@ whenToUse: 트리거 상황 또는 검색 키워드
 - [teacher-tool-loop](architecture/teacher-tool-loop.md)
 - [live-provider-ops](architecture/live-provider-ops.md)
 
-## Ops (13) — 운영 규칙
+## Ops (14) — 운영 규칙
 
 - [ops index](ops/README.md)
 
@@ -122,6 +122,7 @@ Release:
 - [licensing](ops/release/licensing.md)
 - [packaging](ops/release/packaging.md)
 - [public-release](ops/release/public-release.md)
+- [launch-playbook](ops/release/launch-playbook.md)
 
 Product:
 

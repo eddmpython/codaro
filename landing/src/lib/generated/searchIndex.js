@@ -8,6 +8,14 @@ export const searchEntries = [
     "category": "product-and-runtime"
   },
   {
+    "kind": "writing",
+    "title": "Codaro public launch skeleton",
+    "description": "A launch-oriented overview of Codaro as a local-first Python learning and automation studio.",
+    "url": "/codaro/docs/blog/codaro-public-launch-skeleton",
+    "text": "Codaro public launch skeleton Codaro is a local first studio for learning Python, running code, and growing useful scripts into personal automation. The first public story should be simple: 1. Learn with structured cards. 2. Run code in cells. 3. Use real local data. 4. Turn repeated work into a safe automation plan. The first five minutes The launch path starts with two runnable demos: The first demo reads a small CSV and summarizes spending by category. The second demo builds a dry run file organization plan without moving or deleting anything. That is the product story in miniature: learn, run, inspect, automate. Why local first matters Codaro should remain useful before any provider is connected. A beginner can open the Python course, run cells, and inspect outputs without sending private files elsewhere. Provider backed features can improve personalization, but they are not the foundation of the first run path. What makes the release credible Public readiness is not a claim in a README. It is checked by gates: The release also ships with security, privacy, support, contribution, license, and trademark boundaries at the repository root. What to show in the video The 90 second demo should show: a learning card and a code cell CSV summary output a dry run automation plan diagnostic and support paths the public readiness checklist The goal is not to explain every feature. The goal is to make the viewer think: “I can try this right now.”",
+    "category": "product-and-runtime"
+  },
+  {
     "kind": "docs",
     "title": "SSOT Map",
     "description": "Single source of truth map for Codaro schema, provider loop, tool policy, and product surface boundaries.",
@@ -281,6 +289,14 @@ export const searchEntries = [
   },
   {
     "kind": "docs",
+    "title": "Launch Playbook",
+    "description": "Public launch skeleton for positioning, demos, video, release notes, and first-user feedback.",
+    "url": "/codaro/docs/skills/ops/release/launch-playbook",
+    "text": "Launch Playbook 대중 공개는 기능 목록 발표가 아니라 첫 사용자가 5분 안에 “내가 왜 써야 하는지”를 이해하는 경험이다. Positioning Codaro는 Python 학습, 코드 실행, 개인 자동화를 한 화면에서 이어 주는 local first 스튜디오다. 피해야 할 설명: 단순 notebook clone 일반 code assistant hosted automation service 강의 자료 모음 써야 할 설명: 배우는 코드가 바로 실행된다. 실행한 코드가 자동화 루틴으로 커진다. 기본 학습은 provider 없이도 된다. 공개 준비 증거는 gate report로 남긴다. Required Launch Assets | 자산 | 위치 | 완료 기준 | | | | | | Launch kit | | positioning, proof point, metric, checklist 포함 | | Quickstart | | 5분 안에 실행할 명령과 확인 장면 포함 | | Video storyboard | | 90초 장면, 화면, 말할 문장 포함 | | Runnable demos | | clean repo에서 읽기 전용 또는 dry run으로 실행 | | Social copy | | 짧은 글, 커뮤니티 글, release note opening 포함 | | Public post | | landing build에 포함 | Demo Rules 첫 장면은 실제 제품 또는 실행 결과여야 한다. 코드가 실제 파일을 삭제하거나 이동하지 않는다. Provider 연결이 없어도 demo가 돌아간다. 오류가 생기면 사용자가 다음 행동을 알 수 있어야 한다. 영상에는 학습, 실행, 자동화가 모두 등장해야 한다. Launch Sequence 1. 2. 3. 4. 5. 6. README, launch kit, video storyboard, social copy를 최종 확인한다. 7. Release note에는 install, quickstart, support, known limits를 함께 둔다. First Feedback To Ask For 설치가 막힌 지점 README 첫 화면에서 이해 안 된 문장 5분 quickstart에서 멈춘 단계 더 보고 싶은 자동화 예제 Python 30일 과정에서 가장 막힌 Day Do Not Ship If Demo command가 실패한다. 영상 첫 10초가 제품 가치를 보여주지 못한다. README가 quickstart보다 내부 철학을 먼저 설명한다. 공개 준비 gate가 최신 HEAD가 아니다.",
+    "category": "ops"
+  },
+  {
+    "kind": "docs",
     "title": "참고 구현 사용 원칙",
     "description": "Reference implementation rules for borrowing patterns without coupling.",
     "url": "/codaro/docs/skills/ops/workflow/reference-impl",
@@ -308,7 +324,7 @@ export const searchEntries = [
     "title": "Codaro Skills",
     "description": "Codaro project rules and shared skill documents for humans and maintainers.",
     "url": "/codaro/docs/skills",
-    "text": "Codaro Skills Codaro의 사람 + AI 공용 SSOT. 한 마크다운 파일이 두 청중을 동시에 섬긴다 — 사람은 직접 읽고, AI는 같은 파일을 컨텍스트로 받는다. 문서 구조 결정 Codaro의 저장소 문서는 두 축만 둔다. — 제품 사상, 아키텍처, 운영 규칙의 SSOT. — 공개 글, 릴리즈 스토리, 긴 설명형 콘텐츠. — 문서가 아니라 제품이 읽는 기본 curriculum YAML 레지스트리. , , , , 같은 별도 문서 폴더는 유지하지 않는다. 필요한 내용은 , , 중 하나로 흡수한다. 운영 문서는 아래에서 다시 foundation, workflow, release, product 카테고리로 나눈다. README는 외부 진입점이다. 제품 철학 전체를 README에 길게 복사하지 않고, 바로 시작 링크와 현재 공개 배포 상태만 둔다. 제품 사상 Codaro의 제품 표면은 다. 현재 는 React + shadcn/ui 기준이며, 기존 Svelte 편집기는 제품 기준에서 제외한다. 제품은 네 개의 1급 표면으로 정리한다. 채팅 — 기본 진입점. 목표, 학습 요청, 자동화 요청을 자연어로 받는다. 에디터 — 빈 노트북에서 시작하는 실행/편집 표면. 기본 셀은 Python 셀과 Markdown 셀이고, 특수 셀은 메타데이터로 표현한다. 커리큘럼 — 순수 학습 공간. YAML과 AI가 만든 YAML을 학습 셀 카드로 펼친다. 자동화 — 에디터와 채팅에서 만든 셀 조합/스크립트를 모으고, 태스크로 예약 실행한다. 기본 흐름은 아래와 같다. 핵심 계약: YAML은 학습 설계도의 source of truth다. 기본 curriculum YAML은 에 둔다. 는 제품 프론트 폴더명이다. 사용자에게 보이는 표면 이름은 채팅, 에디터, 커리큘럼, 자동화다. 커리큘럼 셀은 물리 타입을 과도하게 늘리지 않는다. 기본은 markdown/code이고, 학습셀/타이틀셀/설명셀/실행셀/시각화셀 같은 의미는 , , , 로 표현한다. Tool call은 숨겨진 내부 로그가 아니라 사용자가 필요할 때 검토할 수 있는 제품 액션이다. 다만 학습 화면의 기본 정보 구조는 셀과 대화가 우선이다. AI 없이도 기본 curriculum YAML로 학습이 가능해야 한다. AI가 붙으면 개인화, 셀 조율, 답 검증, 자동화 생성이 추가된다. DartLab에서 가져올 점 DartLab은 와 skills를 분리하고, AI가 읽을 작업 지식은 skills에 모은다. Codaro도 같은 원칙을 따르되 공개 사이트가 를 기준으로 동작하므로 루트 를 만들지 않고 를 유지한다. DartLab의 generated reference처럼 코드에서 자동 생성되는 API 표가 필요해지면 별도 를 만들지 말고 또는 아래의 생성 파일로 둔다. 각 스킬은 5필드 frontmatter를 가진다: Identity (11) — 절대 흔들리지 않는 사상 Architecture (11) — 5층 구조 Ops (13) — 운영 규칙 Foundation: Workflow: Release: Product: 후속 (PR 2 이후) — 기존 src/codaro/ /DEV.md 본문 이관 — launcher/PRD.md 530줄 분할",
+    "text": "Codaro Skills Codaro의 사람 + AI 공용 SSOT. 한 마크다운 파일이 두 청중을 동시에 섬긴다 — 사람은 직접 읽고, AI는 같은 파일을 컨텍스트로 받는다. 문서 구조 결정 Codaro의 저장소 문서는 두 축만 둔다. — 제품 사상, 아키텍처, 운영 규칙의 SSOT. — 공개 글, 릴리즈 스토리, 긴 설명형 콘텐츠. — 문서가 아니라 제품이 읽는 기본 curriculum YAML 레지스트리. , , , , 같은 별도 문서 폴더는 유지하지 않는다. 필요한 내용은 , , 중 하나로 흡수한다. 운영 문서는 아래에서 다시 foundation, workflow, release, product 카테고리로 나눈다. README는 외부 진입점이다. 제품 철학 전체를 README에 길게 복사하지 않고, 바로 시작 링크와 현재 공개 배포 상태만 둔다. 제품 사상 Codaro의 제품 표면은 다. 현재 는 React + shadcn/ui 기준이며, 기존 Svelte 편집기는 제품 기준에서 제외한다. 제품은 네 개의 1급 표면으로 정리한다. 채팅 — 기본 진입점. 목표, 학습 요청, 자동화 요청을 자연어로 받는다. 에디터 — 빈 노트북에서 시작하는 실행/편집 표면. 기본 셀은 Python 셀과 Markdown 셀이고, 특수 셀은 메타데이터로 표현한다. 커리큘럼 — 순수 학습 공간. YAML과 AI가 만든 YAML을 학습 셀 카드로 펼친다. 자동화 — 에디터와 채팅에서 만든 셀 조합/스크립트를 모으고, 태스크로 예약 실행한다. 기본 흐름은 아래와 같다. 핵심 계약: YAML은 학습 설계도의 source of truth다. 기본 curriculum YAML은 에 둔다. 는 제품 프론트 폴더명이다. 사용자에게 보이는 표면 이름은 채팅, 에디터, 커리큘럼, 자동화다. 커리큘럼 셀은 물리 타입을 과도하게 늘리지 않는다. 기본은 markdown/code이고, 학습셀/타이틀셀/설명셀/실행셀/시각화셀 같은 의미는 , , , 로 표현한다. Tool call은 숨겨진 내부 로그가 아니라 사용자가 필요할 때 검토할 수 있는 제품 액션이다. 다만 학습 화면의 기본 정보 구조는 셀과 대화가 우선이다. AI 없이도 기본 curriculum YAML로 학습이 가능해야 한다. AI가 붙으면 개인화, 셀 조율, 답 검증, 자동화 생성이 추가된다. DartLab에서 가져올 점 DartLab은 와 skills를 분리하고, AI가 읽을 작업 지식은 skills에 모은다. Codaro도 같은 원칙을 따르되 공개 사이트가 를 기준으로 동작하므로 루트 를 만들지 않고 를 유지한다. DartLab의 generated reference처럼 코드에서 자동 생성되는 API 표가 필요해지면 별도 를 만들지 말고 또는 아래의 생성 파일로 둔다. 각 스킬은 5필드 frontmatter를 가진다: Identity (11) — 절대 흔들리지 않는 사상 Architecture (11) — 5층 구조 Ops (14) — 운영 규칙 Foundation: Workflow: Release: Product: 후속 (PR 2 이후) — 기존 src/codaro/ /DEV.md 본문 이관 — launcher/PRD.md 530줄 분할",
     "category": "skills"
   }
 ];

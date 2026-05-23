@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Codaro public launch map</title>
+  <desc id="desc">A launch flow from learning to execution to automation to public trust.</desc>
+  <rect width="1200" height="630" fill="#0f172a"/>
+  <rect x="72" y="78" width="1056" height="474" rx="28" fill="#f8fafc"/>
+  <text x="120" y="155" fill="#111827" font-size="54" font-family="Segoe UI, Arial" font-weight="700">Codaro Launch Path</text>
+  <text x="120" y="205" fill="#475569" font-size="25" font-family="Segoe UI, Arial">Learn Python, run code, automate safely.</text>
+  <g font-family="Segoe UI, Arial">
+    <rect x="120" y="270" width="210" height="130" rx="18" fill="#dbeafe"/>
+    <text x="150" y="325" fill="#1e3a8a" font-size="28" font-weight="700">Learn</text>
+    <text x="150" y="363" fill="#1e40af" font-size="19">cards + cells</text>
+    <rect x="365" y="270" width="210" height="130" rx="18" fill="#dcfce7"/>
+    <text x="395" y="325" fill="#14532d" font-size="28" font-weight="700">Run</text>
+    <text x="395" y="363" fill="#166534" font-size="19">local data</text>
+    <rect x="610" y="270" width="210" height="130" rx="18" fill="#fef3c7"/>
+    <text x="640" y="325" fill="#78350f" font-size="28" font-weight="700">Plan</text>
+    <text x="640" y="363" fill="#92400e" font-size="19">dry-run first</text>
+    <rect x="855" y="270" width="210" height="130" rx="18" fill="#ede9fe"/>
+    <text x="885" y="325" fill="#4c1d95" font-size="28" font-weight="700">Trust</text>
+    <text x="885" y="363" fill="#5b21b6" font-size="19">gates + docs</text>
+    <path d="M338 335h19" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
+    <path d="M583 335h19" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
+    <path d="M828 335h19" stroke="#64748b" stroke-width="6" stroke-linecap="round"/>
+  </g>
+  <text x="120" y="482" fill="#334155" font-size="24" font-family="Segoe UI, Arial">First demo: expense summary + safe file organizer</text>
+</svg>

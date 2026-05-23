@@ -77,7 +77,7 @@ PRODUCT_QUALITY_REQUIREMENTS = (
                 "Gate",
             )),
             ("docs/skills/ops/README.md", ("product-quality", "잘 만들어진 로컬 제품")),
-            ("docs/skills/README.md", ("product-quality", "Ops (13)")),
+            ("docs/skills/README.md", ("product-quality", "Ops (14)")),
             ("docs/skills/architecture/ssot-map.md", ("product quality", "`product-quality` 기준 id", "legacy path")),
         ),
     ),
