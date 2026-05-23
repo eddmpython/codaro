@@ -12,6 +12,8 @@ wheels/
 .venv-wsl
 
 
+CLAUDE.md
+AGENTS.md
 .agents/
 .claude/
 # Data (available via gh release)
