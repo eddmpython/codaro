@@ -338,7 +338,7 @@
   }
 
   .dirtyTag {
-    color: var(--accent);
+    color: var(--brand-accent);
     margin-left: 4px;
   }
 
@@ -421,7 +421,7 @@
     padding: 4px 10px;
     border-radius: 999px;
     background: var(--accent-soft);
-    color: var(--accent);
+    color: var(--brand-accent);
     font-size: 0.78rem;
     font-weight: 600;
   }

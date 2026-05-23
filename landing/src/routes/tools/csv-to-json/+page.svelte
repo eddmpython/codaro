@@ -174,7 +174,7 @@
 
   .textInput:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--brand-accent);
     box-shadow: 0 0 0 3px var(--accent-soft);
   }
 

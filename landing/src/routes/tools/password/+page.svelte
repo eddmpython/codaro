@@ -141,7 +141,7 @@
 
   .lengthLabel input[type="range"] {
     flex: 1;
-    accent-color: var(--accent);
+    accent-color: var(--brand-accent);
   }
 
   .checkRow {
@@ -161,7 +161,7 @@
   }
 
   .check input {
-    accent-color: var(--accent);
+    accent-color: var(--brand-accent);
   }
 
   .countRow {

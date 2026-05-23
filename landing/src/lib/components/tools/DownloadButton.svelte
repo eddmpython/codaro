@@ -28,8 +28,8 @@
     gap: 10px;
     padding: 12px 20px;
     border-radius: var(--radius-sm);
-    background: var(--accent);
-    color: white;
+    background: var(--brand-accent);
+    color: var(--primary-foreground);
     font-weight: 600;
     text-decoration: none;
     box-shadow: 0 4px 14px rgba(249, 115, 22, 0.25);

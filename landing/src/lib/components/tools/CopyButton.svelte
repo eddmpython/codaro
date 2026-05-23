@@ -63,8 +63,8 @@
   }
 
   .copyBtn.copied {
-    color: var(--accent);
-    border-color: var(--accent);
+    color: var(--brand-accent);
+    border-color: var(--brand-accent);
     background: var(--accent-soft);
   }
 
@@ -78,9 +78,9 @@
   }
 
   .copyBtn.primary {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: white;
+    background: var(--brand-accent);
+    border-color: var(--brand-accent);
+    color: var(--primary-foreground);
   }
 
   .copyBtn.primary:hover {

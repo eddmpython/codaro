@@ -101,20 +101,20 @@
 
   .dropzone:hover,
   .dropzone:focus-visible {
-    border-color: var(--accent);
+    border-color: var(--brand-accent);
     background: var(--accent-soft);
     outline: none;
   }
 
   .dropzone.active {
-    border-color: var(--accent);
+    border-color: var(--brand-accent);
     background: var(--accent-soft);
     transform: scale(1.005);
   }
 
   .icon {
     font-size: 1.6rem;
-    color: var(--accent);
+    color: var(--brand-accent);
   }
 
   .label {

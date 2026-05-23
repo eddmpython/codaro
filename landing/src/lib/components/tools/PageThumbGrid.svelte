@@ -254,8 +254,8 @@
   }
 
   .thumbCard.selected {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent), 0 4px 14px rgba(249, 115, 22, 0.15);
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 0 1px var(--brand-accent), 0 4px 14px rgba(249, 115, 22, 0.15);
   }
 
   .selectChip {
@@ -269,7 +269,7 @@
     border: 1.5px solid var(--border-strong);
     background: rgba(15, 15, 17, 0.7);
     backdrop-filter: blur(6px);
-    color: white;
+    color: var(--primary-foreground);
     font-size: 0.78rem;
     cursor: pointer;
     display: grid;
@@ -280,18 +280,18 @@
 
   .selectChip:hover,
   .thumbCard:hover .selectChip {
-    border-color: var(--accent);
-    color: var(--accent);
+    border-color: var(--brand-accent);
+    color: var(--brand-accent);
   }
 
   .selectChip.on {
-    background: var(--accent);
-    border-color: var(--accent);
-    color: white;
+    background: var(--brand-accent);
+    border-color: var(--brand-accent);
+    color: var(--primary-foreground);
   }
 
   .selectChip.on:hover {
-    color: white;
+    color: var(--primary-foreground);
   }
 
   .rotationBadge {
@@ -302,7 +302,7 @@
     border-radius: 6px;
     background: rgba(15, 15, 17, 0.78);
     backdrop-filter: blur(6px);
-    color: var(--accent);
+    color: var(--brand-accent);
     font-size: 0.72rem;
     font-weight: 600;
     z-index: 2;
@@ -313,7 +313,7 @@
     position: relative;
     display: grid;
     place-items: center;
-    background: #fff;
+    background: var(--card);
     border-radius: 6px;
     overflow: hidden;
     aspect-ratio: 0.707;
@@ -357,7 +357,7 @@
   }
 
   .slot {
-    color: var(--accent);
+    color: var(--brand-accent);
     font-weight: 600;
   }
 
@@ -366,7 +366,7 @@
     top: 4px;
     bottom: 4px;
     width: 3px;
-    background: var(--accent);
+    background: var(--brand-accent);
     border-radius: 999px;
     pointer-events: none;
     box-shadow: 0 0 12px rgba(251, 146, 60, 0.6);

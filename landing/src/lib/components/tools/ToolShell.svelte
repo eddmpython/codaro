@@ -46,14 +46,14 @@
     width: fit-content;
     border-radius: 999px;
     background: var(--accent-soft);
-    color: var(--accent);
-    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    color: var(--brand-accent);
+    border: 1px solid color-mix(in srgb, var(--brand-accent) 30%, transparent);
     font-size: 0.78rem;
     font-weight: 500;
   }
 
   .lock {
-    color: var(--accent);
+    color: var(--brand-accent);
     font-size: 0.5rem;
   }
 

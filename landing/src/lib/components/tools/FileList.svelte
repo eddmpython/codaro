@@ -187,7 +187,7 @@
   }
 
   .fileList.listDropTarget {
-    border-color: var(--accent);
+    border-color: var(--brand-accent);
     background: var(--accent-soft);
   }
 
@@ -209,8 +209,8 @@
   }
 
   .fileRow.active {
-    border-color: var(--accent);
-    box-shadow: 0 0 0 1px var(--accent);
+    border-color: var(--brand-accent);
+    box-shadow: 0 0 0 1px var(--brand-accent);
   }
 
   .fileRow.hasError {
@@ -246,11 +246,11 @@
   }
 
   .infoNote {
-    color: var(--accent);
+    color: var(--brand-accent);
   }
 
   .progressNote {
-    color: var(--accent);
+    color: var(--brand-accent);
     font-weight: 500;
   }
 
@@ -293,7 +293,7 @@
     left: 8px;
     right: 8px;
     height: 3px;
-    background: var(--accent);
+    background: var(--brand-accent);
     border-radius: 999px;
     pointer-events: none;
     box-shadow: 0 0 12px rgba(251, 146, 60, 0.6);

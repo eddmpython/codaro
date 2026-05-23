@@ -150,6 +150,17 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
             ),
         ),
         (
+            "landing/src/app.css",
+            (
+                "--foreground: oklch(0.141 0.005 285.823);",
+                "--card: oklch(1 0 0);",
+                "--muted: oklch(0.967 0.001 286.375);",
+                "--primary: oklch(0.21 0.006 285.885);",
+                "--ring: oklch(0.705 0.015 286.067);",
+                "--brand-accent: var(--primary);",
+            ),
+        ),
+        (
             ".github/workflows/launcher-release.yml",
             (
                 "workflow_dispatch",
@@ -176,6 +187,13 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
     workflowText = (ROOT / ".github/workflows/launcher-release.yml").read_text(encoding="utf-8")
     if "launcher/codaro-launcher/target/release" in workflowText:
         missing.append("launcher release workflow uses crate-local target path instead of workspace target path")
+    sourceText = "\n".join(
+        path.read_text(encoding="utf-8")
+        for path in (ROOT / "landing" / "src").rglob("*")
+        if path.suffix in {".css", ".svelte"} and path.is_file()
+    )
+    if "var(--accent)" in sourceText:
+        missing.append("landing source still uses shadcn accent token as the brand emphasis color")
     return result("landing-home-download-seo", missing)
 
 

@@ -60,7 +60,7 @@
   }
 
   .seg.active {
-    background: var(--accent);
-    color: white;
+    background: var(--brand-accent);
+    color: var(--primary-foreground);
   }
 </style>

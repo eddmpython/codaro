@@ -205,7 +205,7 @@
 
   .patternInput:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--brand-accent);
   }
 
   .flagChips {
@@ -226,9 +226,9 @@
   }
 
   .flagChip.active {
-    background: var(--accent);
-    color: white;
-    border-color: var(--accent);
+    background: var(--brand-accent);
+    color: var(--primary-foreground);
+    border-color: var(--brand-accent);
   }
 
   .quickActions {
@@ -264,8 +264,8 @@
   }
 
   .highlightView mark {
-    background: var(--accent);
-    color: white;
+    background: var(--brand-accent);
+    color: var(--primary-foreground);
     padding: 0 3px;
     border-radius: 4px;
   }

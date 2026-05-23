@@ -248,7 +248,7 @@
   }
 
   .check input {
-    accent-color: var(--accent);
+    accent-color: var(--brand-accent);
   }
 
   .fileCard {

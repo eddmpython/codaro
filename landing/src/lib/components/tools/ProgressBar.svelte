@@ -43,7 +43,7 @@
 
   .fill {
     height: 100%;
-    background: var(--accent);
+    background: var(--brand-accent);
     transition: width 0.2s ease;
     border-radius: 999px;
   }
@@ -52,7 +52,7 @@
     position: absolute;
     inset: 0;
     width: 30%;
-    background: var(--accent);
+    background: var(--brand-accent);
     border-radius: 999px;
     animation: slide 1.2s ease-in-out infinite;
   }
