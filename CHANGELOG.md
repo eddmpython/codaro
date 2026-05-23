@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Public GitHub Pages landing page focused on Codaro desktop download, local-first positioning, product surfaces, and release trust signals.
+- Landing SEO metadata for the desktop product surface, including `SoftwareApplication` structured data and canonical URL handling for GitHub Pages.
+- Launcher release workflow manual dispatch with stable `CodaroLauncher.exe`, checksum, and SPDX SBOM asset names.
+- Landing build verification for launcher download links, checksum/SBOM URLs, canonical URL output, and release workflow artifact paths.
+
+### Fixed
+
+- Corrected the launcher release workflow to upload artifacts from the Cargo workspace target directory at `launcher/target/release`.
+
 ## 0.1.0 - 2026-03-24
 
 ### Added
