@@ -56,17 +56,20 @@ teacherSkills: tuple[TeacherSkill, ...] = (
     ),
     TeacherSkill(
         skillId="automation-authoring",
-        purpose="자동화 요청을 automation/skill/task 셀 조합으로 만든다.",
+        purpose="자동화 요청을 percent-format recipe, automation 셀, dry-run 검증으로 전개한다.",
         trigger="사용자가 브라우저, OS, 마우스, 이미지, 반복 업무 자동화를 요청할 때",
-        requiredTools=("write-cell", "run-automation"),
-        policy="자동화는 실행 가능한 셀과 검증 가능한 단계로 나눈다.",
+        requiredTools=("read-cells", "write-automation-recipe", "packages-check", "cell-call"),
+        policy=(
+            "자동화 작성은 curriculum YAML이 아니라 write-automation-recipe로 만든 percent-format recipe를 기준으로 한다. "
+            "기본은 dry-run이며, 외부 패키지가 필요하면 packages-check 이후 cell-call로 검증한다."
+        ),
     ),
     TeacherSkill(
         skillId="task-scheduling",
         purpose="자동화 셀에서 만든 루틴을 예약 실행 가능한 task로 정리한다.",
         trigger="사용자가 매일, 특정 시각, 반복 실행, 루틴 예약을 요청할 때",
-        requiredTools=("write-cell",),
-        policy="task는 자동화의 실행 스케줄이며 커리큘럼 학습 공간과 섞지 않는다.",
+        requiredTools=("read-cells", "create-automation-task"),
+        policy="검증된 recipe 또는 documentPath만 task로 등록하며 커리큘럼 학습 공간과 섞지 않는다.",
     ),
 )
 

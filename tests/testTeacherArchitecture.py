@@ -565,18 +565,40 @@ def testTeacherSkillRegistryReferencesRegisteredManifestTools() -> None:
 
     summary = teacherSkillToolSummary()
     curriculum = next(item for item in summary if item["skillId"] == "curriculum-authoring")
+    automation = next(item for item in summary if item["skillId"] == "automation-authoring")
+    scheduling = next(item for item in summary if item["skillId"] == "task-scheduling")
     tools = {tool["name"]: tool for tool in curriculum["tools"]}
+    automationTools = {tool["name"]: tool for tool in automation["tools"]}
+    schedulingTools = {tool["name"]: tool for tool in scheduling["tools"]}
     prompt = buildSystemPrompt(role="teacher")
 
     assert tools["write-curriculum-yaml"]["lane"] == "curriculum"
     assert tools["read-cells"]["target"] == "learning-editor"
+    assert automationTools["write-automation-recipe"]["target"] == "automation-recipe"
+    assert automationTools["cell-call"]["lane"] == "cell-call"
+    assert schedulingTools["create-automation-task"]["target"] == "task-registry"
     assert "write-curriculum-yaml(lane=curriculum,target=curriculum-yaml,risk=writes)" in prompt
+    assert "write-automation-recipe(lane=write,target=automation-recipe,risk=writes)" in prompt
+    assert "create-automation-task(lane=automation,target=task-registry,risk=writes)" in prompt
+    assert "percent-format recipe" in prompt
+    assert "dry-run" in prompt
     assert "sections[].blocks는 legacy 변환에만" in prompt
     assert "one learning card" in prompt
     assert "intro.diagram.runtime" in prompt
     assert "create-learning-card: explanation + fill-blank card" not in prompt
     assert "Each new concept lives in one YAML section card" in prompt
     assert "explicit defaults" not in prompt
+
+
+def testAutomationRolePromptPromotesRecipeAuthoringLoop() -> None:
+    prompt = buildSystemPrompt(role="automation")
+
+    assert "write-automation-recipe" in prompt
+    assert "read-cells" in prompt
+    assert "packages-check" in prompt
+    assert "cell-call" in prompt
+    assert "create-automation-task" in prompt
+    assert "dry-run" in prompt
 
 
 def testLearningSpecInstructionsPromoteStructuredSectionYaml() -> None:
@@ -593,10 +615,18 @@ def testLearningSpecInstructionsPromoteStructuredSectionYaml() -> None:
 
 def testTeacherSkillRegistryReportsMissingRequiredTools() -> None:
     issues = validateTeacherSkills({"read-cells"})
-    missing = {issue.toolName: issue for issue in issues if issue.code == "missing-required-tool"}
+    missingPairs = {
+        (issue.skillId, issue.toolName)
+        for issue in issues
+        if issue.code == "missing-required-tool"
+    }
 
-    assert missing["write-curriculum-yaml"].skillId == "curriculum-authoring"
-    assert missing["packages-check"].skillId == "package-preflight"
+    assert ("curriculum-authoring", "write-curriculum-yaml") in missingPairs
+    assert ("package-preflight", "packages-check") in missingPairs
+    assert ("automation-authoring", "write-automation-recipe") in missingPairs
+    assert ("automation-authoring", "packages-check") in missingPairs
+    assert ("automation-authoring", "cell-call") in missingPairs
+    assert ("task-scheduling", "create-automation-task") in missingPairs
 
 
 def testTracePayloadsHaveStableTraceId() -> None:
