@@ -32,20 +32,20 @@ jobs:
       - name: Compute SHA256
         shell: pwsh
         run: |
-          $hash = (Get-FileHash "launcher/codaro-launcher/target/release/codaro-launcher.exe" -Algorithm SHA256).Hash.ToLower()
-          "$hash  CodaroLauncher.exe" | Out-File -FilePath "launcher/codaro-launcher/target/release/CodaroLauncher.exe.sha256" -Encoding utf8
+          $hash = (Get-FileHash "launcher/target/release/codaro-launcher.exe" -Algorithm SHA256).Hash.ToLower()
+          "$hash  CodaroLauncher.exe" | Out-File -FilePath "launcher/target/release/CodaroLauncher.exe.sha256" -Encoding utf8
 
       - name: Rename binary
         shell: pwsh
         run: |
-          Copy-Item "launcher/codaro-launcher/target/release/codaro-launcher.exe" "launcher/codaro-launcher/target/release/CodaroLauncher.exe"
+          Copy-Item "launcher/target/release/codaro-launcher.exe" "launcher/target/release/CodaroLauncher.exe"
 
       - name: Generate SPDX SBOM
         uses: anchore/sbom-action@v0
         with:
           path: launcher/codaro-launcher
           format: spdx-json
-          output-file: launcher/codaro-launcher/target/release/CodaroLauncher.spdx.json
+          output-file: launcher/target/release/CodaroLauncher.spdx.json
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -59,7 +59,7 @@ jobs:
 
             The release also includes `CodaroLauncher.spdx.json` for dependency transparency.
           files: |
-            launcher/codaro-launcher/target/release/CodaroLauncher.exe
-            launcher/codaro-launcher/target/release/CodaroLauncher.exe.sha256
-            launcher/codaro-launcher/target/release/CodaroLauncher.spdx.json
+            launcher/target/release/CodaroLauncher.exe
+            launcher/target/release/CodaroLauncher.exe.sha256
+            launcher/target/release/CodaroLauncher.spdx.json
           generate_release_notes: true

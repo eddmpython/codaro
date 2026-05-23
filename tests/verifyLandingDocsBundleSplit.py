@@ -156,6 +156,9 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
                 "CodaroLauncher.exe",
                 "CodaroLauncher.exe.sha256",
                 "CodaroLauncher.spdx.json",
+                "launcher/target/release/CodaroLauncher.exe",
+                "launcher/target/release/CodaroLauncher.exe.sha256",
+                "launcher/target/release/CodaroLauncher.spdx.json",
                 "fail_on_unmatched_files: true",
             ),
         ),
@@ -170,6 +173,9 @@ def verifyLandingHomeDownloadSeo() -> dict[str, Any]:
         for needle in needles:
             if needle not in text:
                 missing.append(f"{relPath} missing {needle}")
+    workflowText = (ROOT / ".github/workflows/launcher-release.yml").read_text(encoding="utf-8")
+    if "launcher/codaro-launcher/target/release" in workflowText:
+        missing.append("launcher release workflow uses crate-local target path instead of workspace target path")
     return result("landing-home-download-seo", missing)
 
 
