@@ -51,6 +51,8 @@ def sourceContractFailures() -> list[str]:
             "packages-check",
             "packages-install",
             "cell-call",
+            "write-automation-recipe",
+            "create-automation-task",
             "durationMs",
             "skipped",
             "sectionCount",
@@ -307,6 +309,54 @@ const skippedStep = findStep(skippedInstall, "uv 라이브러리 설치");
 assert.match(skippedStep.detail, /pandas 이미 준비됨/);
 assert.match(skippedStep.detail, /project \\.venv/);
 
+const automationRun = finish({{
+  traceId: "trace-automation-authoring",
+  toolSequence: ["write-automation-recipe", "create-automation-task"],
+}}, [
+  {{
+    toolCallId: "call-recipe",
+    name: "write-automation-recipe",
+    arguments: {{ title: "Daily Report" }},
+    result: {{
+      saved: true,
+      path: "automations/daily-report.py",
+      loadedInEditor: true,
+      blockId: "automation-1",
+      dryRunFirst: true,
+    }},
+    status: "done",
+    category: "automation",
+    lane: "write",
+    target: "automation-recipe",
+  }},
+  {{
+    toolCallId: "call-task",
+    name: "create-automation-task",
+    arguments: {{ name: "Daily Report", documentPath: "automations/daily-report.py" }},
+    result: {{
+      created: true,
+      documentPath: "automations/daily-report.py",
+      task: {{
+        name: "Daily Report",
+        schedule: "@daily",
+        documentPath: "automations/daily-report.py",
+      }},
+    }},
+    status: "done",
+    category: "automation",
+    lane: "automation",
+    target: "task-registry",
+  }},
+]);
+const recipeStep = findStep(automationRun, "자동화 recipe 작성");
+const taskStep = findStep(automationRun, "자동화 태스크 등록");
+assert.match(recipeStep.detail, /automations\\/daily-report\\.py 저장/);
+assert.match(recipeStep.detail, /automation-1 셀 반영/);
+assert.match(recipeStep.detail, /dry-run 우선/);
+assert.match(taskStep.detail, /Daily Report 등록/);
+assert.match(taskStep.detail, /@daily/);
+assert.match(taskStep.detail, /automations\\/daily-report\\.py/);
+
 const policy = finish({{
   traceId: "trace-policy",
   policyViolationCount: 1,
@@ -340,7 +390,7 @@ assert.equal(normalized.events.length, 1);
 process.stdout.write(JSON.stringify({{
   clarification: clarificationStep.detail,
   providerError: providerErrorStep.detail,
-  tools: [packageCheck.label, packageInstall.label, cellCall.label, curriculumStep.label],
+  tools: [packageCheck.label, packageInstall.label, cellCall.label, curriculumStep.label, recipeStep.label, taskStep.label],
   policy: policyStep.detail,
 }}, null, 2));
 """

@@ -676,6 +676,65 @@ def testToolResultWorkDetailSummarizesCurriculumMaterialization() -> None:
     assert trace.summary()["workloop"][0]["workDetail"] == done["workDetail"]
 
 
+def testToolWorkDetailSummarizesAutomationAuthoring() -> None:
+    orchestrator = TeacherOrchestrator.fromContext({})
+    trace = orchestrator.startTrace("conv-automation-detail")
+
+    startRecipe = orchestrator.toolCallStart(
+        trace,
+        "call-recipe",
+        "write-automation-recipe",
+        {"title": "Daily Report"},
+    )
+    doneRecipe = orchestrator.toolCallResult(
+        trace,
+        "call-recipe",
+        "write-automation-recipe",
+        {"title": "Daily Report"},
+        {
+            "saved": True,
+            "path": "automations/daily-report.py",
+            "loadedInEditor": True,
+            "blockId": "automation-1",
+            "dryRunFirst": True,
+        },
+    )
+    startTask = orchestrator.toolCallStart(
+        trace,
+        "call-task",
+        "create-automation-task",
+        {"name": "Daily Report", "documentPath": "automations/daily-report.py"},
+    )
+    doneTask = orchestrator.toolCallResult(
+        trace,
+        "call-task",
+        "create-automation-task",
+        {"name": "Daily Report", "documentPath": "automations/daily-report.py"},
+        {
+            "created": True,
+            "documentPath": "automations/daily-report.py",
+            "task": {
+                "name": "Daily Report",
+                "schedule": "@daily",
+                "documentPath": "automations/daily-report.py",
+            },
+        },
+    )
+
+    assert startRecipe["workLabel"] == "자동화 recipe 작성"
+    assert startRecipe["workDetail"] == "Daily Report recipe와 automation 셀 작성"
+    assert doneRecipe["workLabel"] == "자동화 recipe 작성"
+    assert "automations/daily-report.py 저장" in doneRecipe["workDetail"]
+    assert "automation-1 셀 반영" in doneRecipe["workDetail"]
+    assert "dry-run 우선" in doneRecipe["workDetail"]
+    assert startTask["workLabel"] == "자동화 태스크 등록"
+    assert startTask["workDetail"] == "Daily Report 태스크 등록"
+    assert "Daily Report 등록" in doneTask["workDetail"]
+    assert "@daily" in doneTask["workDetail"]
+    assert "automations/daily-report.py" in doneTask["workDetail"]
+    assert trace.summary()["toolSequence"] == ["write-automation-recipe", "create-automation-task"]
+
+
 def testEvalHarnessCanReadTraceSequence() -> None:
     orchestrator = TeacherOrchestrator.fromContext({})
     trace = orchestrator.startTrace("conv-2")

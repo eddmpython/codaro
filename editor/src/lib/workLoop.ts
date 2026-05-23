@@ -401,6 +401,10 @@ function workLabelFromToolCall(toolCall: AiToolCall, name: string) {
       return localText("Run cell", "셀 실행");
     case "get-variables":
       return localText("Inspect variables", "변수 확인");
+    case "write-automation-recipe":
+      return localText("Write automation recipe", "자동화 recipe 작성");
+    case "create-automation-task":
+      return localText("Register automation task", "자동화 태스크 등록");
     case "click-element":
     case "type-text":
       return localText("Screen automation", "화면 자동화");
@@ -487,6 +491,30 @@ function toolResultDetail(result: unknown, name: string, args: Record<string, un
       ].filter(Boolean);
       return parts.join(" · ");
     }
+    case "write-automation-recipe": {
+      const path = textArg(payload, "path");
+      const blockId = textArg(payload, "blockId");
+      const parts = [
+        payload.saved === true && path ? localText(`Saved ${path}`, `${path} 저장`) : "",
+        payload.saved !== true && payload.recipe ? localText("Recipe draft created", "recipe 초안 생성") : "",
+        payload.loadedInEditor === true ? (blockId ? localText(`Loaded ${blockId} cell`, `${blockId} 셀 반영`) : localText("Loaded automation cell", "automation 셀 반영")) : "",
+        payload.dryRunFirst === true ? localText("dry-run first", "dry-run 우선") : "",
+      ].filter(Boolean);
+      return parts.join(" · ");
+    }
+    case "create-automation-task": {
+      const task = payload.task && typeof payload.task === "object" && !Array.isArray(payload.task)
+        ? payload.task as Record<string, unknown>
+        : {};
+      const taskName = textArg(task, "name") || textArg(args, "name");
+      const schedule = textArg(task, "schedule") || textArg(args, "schedule");
+      const documentPath = textArg(payload, "documentPath") || textArg(task, "documentPath");
+      return [
+        taskName ? localText(`${taskName} registered`, `${taskName} 등록`) : localText("Task registered", "태스크 등록"),
+        schedule,
+        documentPath,
+      ].filter(Boolean).join(" · ");
+    }
     default:
       return "";
   }
@@ -524,6 +552,18 @@ function toolSpecificDetail(name: string, args: Record<string, unknown>) {
         : localText("Rerun dependent cells", "의존 셀 재실행");
     case "get-variables":
       return localText("Inspect current runtime variables", "현재 런타임 변수 확인");
+    case "write-automation-recipe": {
+      const title = textArg(args, "title");
+      return title
+        ? localText(`Write ${title} recipe and automation cell`, `${title} recipe와 automation 셀 작성`)
+        : localText("Write percent-format recipe and automation cell", "percent-format recipe와 automation 셀 작성");
+    }
+    case "create-automation-task": {
+      const taskName = textArg(args, "name");
+      return taskName
+        ? localText(`Register ${taskName} task`, `${taskName} 태스크 등록`)
+        : localText("Register verified recipe as task", "검증된 recipe를 태스크로 등록");
+    }
     default:
       return name;
   }

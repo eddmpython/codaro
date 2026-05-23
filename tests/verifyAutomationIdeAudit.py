@@ -289,6 +289,20 @@ AUTOMATION_REQUIREMENTS = (
                 "packages-check",
                 "cell-call",
             )),
+            ("src/codaro/ai/teacher/toolLifecycle.py", (
+                "자동화 recipe 작성",
+                "자동화 태스크 등록",
+                "dry-run 우선",
+                "write-automation-recipe",
+                "create-automation-task",
+            )),
+            ("editor/src/lib/workLoop.ts", (
+                "자동화 recipe 작성",
+                "자동화 태스크 등록",
+                "dry-run 우선",
+                "write-automation-recipe",
+                "create-automation-task",
+            )),
             ("tests/testAiTools.py", (
                 "test_write_automation_recipe_creates_file_and_automation_cell",
                 "test_create_automation_task_registers_validated_recipe",
@@ -296,8 +310,14 @@ AUTOMATION_REQUIREMENTS = (
             )),
             ("tests/testTeacherArchitecture.py", (
                 "testAutomationRolePromptPromotesRecipeAuthoringLoop",
+                "testToolWorkDetailSummarizesAutomationAuthoring",
                 "automationTools[\"write-automation-recipe\"]",
                 "schedulingTools[\"create-automation-task\"]",
+            )),
+            ("tests/verifyAssistantWorkloopContract.py", (
+                "trace-automation-authoring",
+                "자동화 recipe 작성",
+                "자동화 태스크 등록",
             )),
             ("tests/testAutomationAuthoring.py", (
                 "testBuildAutomationRecipeDraftCreatesPercentFormatRecipe",

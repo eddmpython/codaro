@@ -96,6 +96,8 @@ def _workLabel(name: str) -> str:
         "get-variables": "변수 확인",
         "create-notebook-exercise": "실습 구성",
         "track-achievement": "진도 기록",
+        "write-automation-recipe": "자동화 recipe 작성",
+        "create-automation-task": "자동화 태스크 등록",
         "find-element": "화면 요소 확인",
         "click-element": "화면 클릭",
         "type-text": "화면 입력",
@@ -131,6 +133,12 @@ def _workDetail(name: str, arguments: dict[str, Any]) -> str:
         return "현재 노트북 구조와 셀 역할 확인"
     if name == "get-variables":
         return "현재 런타임 변수와 값 확인"
+    if name == "write-automation-recipe":
+        title = _textArg(arguments, "title")
+        return f"{title} recipe와 automation 셀 작성" if title else "percent-format recipe와 automation 셀 작성"
+    if name == "create-automation-task":
+        taskName = _textArg(arguments, "name")
+        return f"{taskName} 태스크 등록" if taskName else "검증된 recipe를 태스크로 등록"
     return name
 
 
@@ -181,6 +189,31 @@ def _resultWorkDetail(name: str, arguments: dict[str, Any], result: dict[str, An
             return f"{blockId} 검증 실패" if blockId else "셀 검증 실패"
         status = _textResult(result, "status")
         return f"{blockId} 실행 결과 · {status}" if blockId and status else ""
+    if name == "write-automation-recipe":
+        parts = []
+        path = _textResult(result, "path")
+        blockId = _textResult(result, "blockId")
+        if result.get("saved") is True and path:
+            parts.append(f"{path} 저장")
+        elif result.get("recipe"):
+            parts.append("recipe 초안 생성")
+        if result.get("loadedInEditor") is True:
+            parts.append(f"{blockId} 셀 반영" if blockId else "automation 셀 반영")
+        if result.get("dryRunFirst") is True:
+            parts.append("dry-run 우선")
+        return " · ".join(parts)
+    if name == "create-automation-task":
+        task = result.get("task")
+        taskPayload = task if isinstance(task, dict) else {}
+        taskName = _textResult(taskPayload, "name") or _textArg(arguments, "name")
+        schedule = _textResult(taskPayload, "schedule") or _textArg(arguments, "schedule")
+        documentPath = _textResult(result, "documentPath") or _textResult(taskPayload, "documentPath")
+        parts = [
+            f"{taskName} 등록" if taskName else "태스크 등록",
+            schedule,
+            documentPath,
+        ]
+        return " · ".join(part for part in parts if part)
     return ""
 
 
