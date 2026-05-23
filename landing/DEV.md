@@ -3,7 +3,8 @@
 `landing/` is the public GitHub Pages surface for Codaro.
 
 Current goals:
-- home
+- home product landing
+- desktop launcher download path
 - docs
 - docs writing
 - search
@@ -18,12 +19,14 @@ Rules:
 - public UI language is English only
 - public tone is zinc-based and calm
 - `landing/` must stay separate from the local editor `editor/`
+- launcher download CTAs must point to GitHub Release assets, not repo-internal build paths
 - writing asset URLs are flattened to `/docs/blog/assets/*` during build
 - `landing/` is the only shipped public docs surface
 - long-form docs, writing, and search must not be embedded back into the IDE as a full docs browser
 - IDE help affordances may link here, but product-internal `DEV.md`, `PRD.md`, `SPEC.md`, and launcher design docs stay out of public navigation
 
 Current State:
+- the home page is the public product landing and links to the latest launcher release asset
 - docs/build/search generation is the only public documentation path
 - writing is generated from `../docs/blog/` and published under `/docs/blog/...`
 - legacy `/blog/...` routes redirect to `/docs/blog/...`
