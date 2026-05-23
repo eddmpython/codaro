@@ -375,27 +375,22 @@ class AutomationToolHandlers:
         }
 
     async def _handle_writeAutomationRecipe(self, args: dict[str, Any]) -> dict[str, Any]:
-        title = str(args.get("title", "")).strip()
-        code = str(args.get("code", "")).rstrip()
-        description = str(args.get("description", "")).strip()
-        dryRunFirst = args.get("dryRunFirst", True) is not False
+        from codaro.automation.recipeAuthoring import buildAutomationRecipeDraft
+
+        try:
+            draft = buildAutomationRecipeDraft(
+                title=str(args.get("title", "")),
+                code=str(args.get("code", "")),
+                description=str(args.get("description", "")),
+                dryRunFirst=args.get("dryRunFirst", True) is not False,
+            )
+        except ValueError as exc:
+            return {"error": str(exc)}
         loadInEditor = args.get("loadInEditor", True) is not False
-
-        if not title:
-            return {"error": "title is required"}
-        if not code.strip():
-            return {"error": "code is required"}
-
-        automationBody = _automationBodyText(code=code, dryRunFirst=dryRunFirst)
-        recipe = _automationRecipeText(
-            title=title,
-            description=description,
-            automationBody=automationBody,
-        )
 
         outputPath = args.get("outputPath")
         if not outputPath and self._workspaceRoot:
-            outputPath = f"automations/{_safeAutomationSlug(title)}.py"
+            outputPath = draft.outputPath
 
         saved = False
         savedPath: str | None = None
@@ -403,7 +398,7 @@ class AutomationToolHandlers:
             filePath = Path(self._validatePath(str(outputPath)))
             try:
                 filePath.parent.mkdir(parents=True, exist_ok=True)
-                filePath.write_text(recipe, encoding="utf-8")
+                filePath.write_text(draft.recipe, encoding="utf-8")
             except OSError as exc:
                 return {"error": f"Failed to write automation recipe: {exc}"}
             saved = True
@@ -423,12 +418,12 @@ class AutomationToolHandlers:
                 executionKind="python",
                 displayKind="cell",
                 sourceType="automationAuthoring",
-                title=title,
-                description=description,
-                content=automationBody,
+                title=draft.title,
+                description=draft.description,
+                content=draft.automationBody,
                 payload={
                     "recipePath": savedPath,
-                    "dryRunFirst": dryRunFirst,
+                    "dryRunFirst": draft.dryRunFirst,
                     "authoringTool": "write-automation-recipe",
                 },
             ))
@@ -440,41 +435,35 @@ class AutomationToolHandlers:
             "path": savedPath,
             "loadedInEditor": loadedInEditor,
             "blockId": blockId,
-            "dryRunFirst": dryRunFirst,
-            "recipe": None if saved else recipe,
+            "dryRunFirst": draft.dryRunFirst,
+            "recipe": None if saved else draft.recipe,
         }
 
     async def _handle_createAutomationTask(self, args: dict[str, Any]) -> dict[str, Any]:
-        from codaro.automation.scheduler import parseScheduleSeconds
+        from codaro.automation.recipeAuthoring import buildAutomationTaskDraft
         from codaro.automation.taskRegistry import getTaskRegistry
 
-        name = str(args.get("name", "")).strip()
-        documentPath = str(args.get("documentPath", "")).strip()
-        description = str(args.get("description", "")).strip()
-        rawSchedule = args.get("schedule")
-        schedule = str(rawSchedule).strip() if rawSchedule else None
+        try:
+            draft = buildAutomationTaskDraft(
+                name=str(args.get("name", "")),
+                documentPath=str(args.get("documentPath", "")),
+                description=str(args.get("description", "")),
+                schedule=str(args["schedule"]) if args.get("schedule") else None,
+                inputs=args.get("inputs"),
+            )
+        except (TypeError, ValueError) as exc:
+            return {"error": str(exc)}
 
-        if not name:
-            return {"error": "name is required"}
-        if not documentPath:
-            return {"error": "documentPath is required"}
-        if schedule and parseScheduleSeconds(schedule) is None:
-            return {"error": f"Invalid schedule: {schedule}"}
-
-        recipePath = Path(self._validatePath(documentPath))
+        recipePath = Path(self._validatePath(draft.documentPath))
         if not recipePath.is_file():
-            return {"error": f"Automation recipe not found: {documentPath}"}
-
-        inputs = args.get("inputs")
-        if inputs is not None and not isinstance(inputs, dict):
-            return {"error": "inputs must be an object"}
+            return {"error": f"Automation recipe not found: {draft.documentPath}"}
 
         task = getTaskRegistry().create(
-            name=name,
+            name=draft.name,
             documentPath=str(recipePath),
-            description=description,
-            schedule=schedule,
-            inputs=inputs or {},
+            description=draft.description,
+            schedule=draft.schedule,
+            inputs=draft.inputs,
         )
         return {
             "created": True,
@@ -638,30 +627,3 @@ class AutomationToolHandlers:
             "reason": reason,
             "status": eStop.serialize(),
         }
-
-
-def _safeAutomationSlug(title: str) -> str:
-    chars: list[str] = []
-    for char in title.lower():
-        if char.isascii() and char.isalnum():
-            chars.append(char)
-        elif chars and chars[-1] != "-":
-            chars.append("-")
-    slug = "".join(chars).strip("-")[:60].rstrip("-")
-    return slug or "automation-recipe"
-
-
-def _automationBodyText(code: str, dryRunFirst: bool) -> str:
-    dryRunLiteral = "True" if dryRunFirst else "False"
-    return f"DRY_RUN = {dryRunLiteral}\n\n{code.rstrip()}\n"
-
-
-def _automationRecipeText(title: str, description: str, automationBody: str) -> str:
-    summary = description or "Automation recipe."
-    return (
-        "# %% [markdown]\n"
-        f"# {title}\n\n"
-        f"{summary}\n\n"
-        "# %% [automation]\n"
-        f"{automationBody}"
-    )

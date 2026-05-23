@@ -259,8 +259,15 @@ AUTOMATION_REQUIREMENTS = (
             ("src/codaro/ai/toolHandlers/automation.py", (
                 "_handle_writeAutomationRecipe",
                 "_handle_createAutomationTask",
-                "DRY_RUN =",
                 "automationAuthoring",
+            )),
+            ("src/codaro/automation/recipeAuthoring.py", (
+                "class AutomationRecipeDraft",
+                "class AutomationTaskDraft",
+                "buildAutomationRecipeDraft",
+                "buildAutomationTaskDraft",
+                "DRY_RUN =",
+                "automationRecipeSlug",
             )),
             ("src/codaro/ai/toolManifest.py", (
                 "write-automation-recipe",
@@ -291,6 +298,11 @@ AUTOMATION_REQUIREMENTS = (
                 "testAutomationRolePromptPromotesRecipeAuthoringLoop",
                 "automationTools[\"write-automation-recipe\"]",
                 "schedulingTools[\"create-automation-task\"]",
+            )),
+            ("tests/testAutomationAuthoring.py", (
+                "testBuildAutomationRecipeDraftCreatesPercentFormatRecipe",
+                "testBuildAutomationTaskDraftNormalizesAndValidatesInputs",
+                "testBuildAutomationTaskDraftRejectsInvalidSchedule",
             )),
         ),
     ),
