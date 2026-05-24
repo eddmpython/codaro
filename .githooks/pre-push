@@ -1,0 +1,22 @@
+#!/bin/sh
+# Block pushes to any branch except main.
+allowed_remote_ref="refs/heads/main"
+allowed_local_ref="refs/heads/main"
+
+while read local_ref local_sha remote_ref remote_sha
+do
+  case "$remote_ref" in
+    refs/heads/*)
+      if [ "$remote_ref" != "$allowed_remote_ref" ]; then
+        echo "blocked: refusing push to non-main branch $remote_ref" >&2
+        exit 1
+      fi
+      if [ "$local_ref" != "$allowed_local_ref" ]; then
+        echo "blocked: refusing push from non-main ref $local_ref" >&2
+        exit 1
+      fi
+      ;;
+  esac
+done
+
+exit 0
