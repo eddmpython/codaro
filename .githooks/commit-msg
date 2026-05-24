@@ -1,0 +1,20 @@
+#!/bin/sh
+# Block commit messages that expose tool or contributor traces.
+message_file="$1"
+
+if [ -z "$message_file" ] || [ ! -f "$message_file" ]; then
+  echo "blocked: commit message file is missing" >&2
+  exit 1
+fi
+
+if grep -Eiq '(^|[^[:alnum:]_])ai([^[:alnum:]_]|$)' "$message_file"; then
+  echo "blocked: commit message must not contain AI trace term: AI" >&2
+  exit 1
+fi
+
+if grep -Eiq '(gpt|chatgpt|openai|codex|claude|anthropic|generated[[:space:]]+by|co-authored-by|assisted-by)' "$message_file"; then
+  echo "blocked: commit message must not contain tool, generated-by, or contributor trace terms" >&2
+  exit 1
+fi
+
+exit 0
