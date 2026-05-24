@@ -3,7 +3,7 @@ meta:
   title: "정규표현식 고급"
   day: 25
   category: "advancedPython"
-  tags: ["regex", "lookahead", "lookbehind", "backreference", "group"]
+  tags: ["regex", "lookahead", "lookbehind", "backreference", "group", "검증", "로그파싱"]
   seo:
     title: "파이썬 정규표현식 고급"
     description: "룩어헤드, 룩비하인드, 그룹, 백레퍼런스 등 고급 정규표현식 기법 학습"
@@ -296,6 +296,79 @@ sections:
       mailMasked = re.sub(r'(\w+)@([\w.]+)', maskMail, mailText)
       mailResult = mailMasked
       mailResult
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 로그 파싱과 마스킹"
+  subtitle: "명명 그룹, 룩어라운드, 치환 콜백을 검증 가능한 로그 처리로 연결합니다"
+  blocks:
+  - type: "text"
+    content: "정규표현식은 한 줄 마술이 아니라 실패를 드러내야 하는 파서입니다. 주문 로그에서 필드를 추출하고, 잘못된 라인을 거절하고, 개인정보를 마스킹하는 과정을 작은 함수로 나누어 검증하세요."
+  - type: "code"
+    language: "python"
+    title: "명명 그룹으로 로그 파싱"
+    description: "필드 추출 결과를 딕셔너리로 바꾸고 숫자 타입까지 검증합니다."
+    content: |-
+      import re
+
+      logPattern = re.compile(
+          r"(?P<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}) "
+          r"(?P<level>INFO|WARN|ERROR) "
+          r"service=(?P<service>[a-z-]+) "
+          r"order=(?P<orderId>O-\d+) "
+          r"status=(?P<status>paid|failed|draft) "
+          r"amount=(?P<amount>\d+)"
+      )
+
+      def parseOrderLog(line):
+          match = logPattern.fullmatch(line)
+          if match is None:
+              raise ValueError("invalid order log")
+          data = match.groupdict()
+          data["amount"] = int(data["amount"])
+          return data
+
+      line = "2026-05-24T09:30 INFO service=checkout order=O-100 status=paid amount=12000"
+      parsed = parseOrderLog(line)
+
+      assert parsed["orderId"] == "O-100"
+      assert parsed["amount"] == 12000
+      assert parsed["service"] == "checkout"
+  - type: "code"
+    language: "python"
+    title: "실패 로그와 고객명 마스킹"
+    description: "룩어라운드로 customer 값만 치환하고, 잘못된 로그는 ValueError로 확인합니다."
+    content: |-
+      import re
+
+      logPattern = re.compile(
+          r"(?P<timestamp>\d{4}-\d{2}-\d{2}T\d{2}:\d{2}) "
+          r"(?P<level>INFO|WARN|ERROR) "
+          r"service=(?P<service>[a-z-]+) "
+          r"order=(?P<orderId>O-\d+) "
+          r"status=(?P<status>paid|failed|draft) "
+          r"amount=(?P<amount>\d+)"
+      )
+
+      def parseOrderLog(line):
+          if logPattern.fullmatch(line) is None:
+              raise ValueError("invalid order log")
+          return True
+
+      def maskCustomer(line):
+          return re.sub(r"(?<=customer=)[^\s]+", "***", line)
+
+      try:
+          parseOrderLog("broken log")
+      except ValueError as exc:
+          message = str(exc)
+
+      masked = maskCustomer("order=O-100 customer=Mina amount=12000")
+
+      assert message == "invalid order log"
+      assert masked == "order=O-100 customer=*** amount=12000"
+  - type: "tip"
+    title: "변주 실험"
+    content: "`status=failed`인 로그만 모아 장애 리포트를 만들고, `ERROR` 레벨이 아닌 실패 로그도 잡히는지 테스트 데이터를 추가하세요."
 
 - id: "practice"
   title: "종합 연습"

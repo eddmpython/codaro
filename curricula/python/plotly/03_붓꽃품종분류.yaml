@@ -2,6 +2,7 @@ meta:
   packages:
     - pandas
     - plotly
+    - statsmodels
   id: plotly_03
   title: 붓꽃품종분류
   order: 3
@@ -359,3 +360,71 @@ sections:
     - "px.scatter_matrix(df, dimensions) - 모든 변수 조합 산점도"
   - type: text
     content: 다음 시간에는 세계 인구 데이터로 애니메이션 차트를 만듭니다. 시간에 따른 변화를 동적으로 표현합니다.
+
+- id: workflow_validation
+  title: 15단계. 붓꽃 분류 Figure 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      산점도, 추세선, 바이올린 플롯은 품종 분리 가능성을 다른 각도에서 보여 줍니다. 품종 컬럼과 Figure trace를 함께 확인해 분류 해석이 깨지지 않게 합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 분리 예측
+    description: 꽃잎 변수로 setosa가 분리되는지 확인합니다
+    content: |-
+      import plotly.express as px
+      from codaro.curriculum.localData import loadLocalDataset
+
+      irisFlow = loadLocalDataset("iris")
+      requiredColumns = {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"}
+      missingColumns = requiredColumns - set(irisFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert sorted(irisFlow["species"].unique()) == ["setosa", "versicolor", "virginica"]
+      assert irisFlow.loc[irisFlow["species"] == "setosa", "petal_length"].max() < irisFlow.loc[irisFlow["species"] != "setosa", "petal_length"].min()
+  - type: code
+    language: python
+    title: Scatter Figure 검증
+    description: 품종별 scatter trace와 hover 컬럼을 확인합니다
+    content: |-
+      figIrisScatter = px.scatter(irisFlow, x="petal_length", y="petal_width", color="species", hover_data=["sepal_length", "sepal_width"], title="Iris petal separation")
+
+      assert len(figIrisScatter.data) == irisFlow["species"].nunique()
+      assert all(trace.type == "scatter" for trace in figIrisScatter.data)
+      assert figIrisScatter.layout.title.text == "Iris petal separation"
+      figIrisScatter
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 품종 컬럼이 빠진 입력은 분류 차트로 쓰지 않습니다
+    content: |-
+      def validateIrisClassificationFrame(frame):
+          if "species" not in frame.columns:
+              raise ValueError("species 컬럼이 있어야 품종별 색상을 지정할 수 있습니다")
+          assert frame["petal_length"].gt(0).all()
+          return True
+
+      brokenIris = irisFlow.drop(columns=["species"])
+      try:
+          validateIrisClassificationFrame(brokenIris)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateIrisClassificationFrame(irisFlow)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 꽃잎 축과 꽃받침 축의 품종 분리력을 비교합니다
+    content: |-
+      featurePairs = [("petal_length", "petal_width"), ("sepal_length", "sepal_width")]
+      pairReport = []
+      for xColumn, yColumn in featurePairs:
+          speciesMeans = irisFlow.groupby("species")[[xColumn, yColumn]].mean()
+          spread = (speciesMeans[xColumn].max() - speciesMeans[xColumn].min()) + (speciesMeans[yColumn].max() - speciesMeans[yColumn].min())
+          pairReport.append({"x": xColumn, "y": yColumn, "meanSpread": round(float(spread), 2)})
+
+      assert pairReport[0]["meanSpread"] > pairReport[1]["meanSpread"]
+      pairReport
+  - type: tip
+    content: "분류용 시각화는 색상이 보이는지보다, 어떤 변수 조합이 실제로 집단을 분리하는지 확인하는 것이 핵심입니다."

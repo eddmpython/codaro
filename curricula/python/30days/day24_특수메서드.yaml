@@ -3,7 +3,7 @@ meta:
   title: "특수 메서드"
   day: 24
   category: "30days"
-  tags: []
+  tags: ["특수메서드", "dunder", "repr", "연산자오버로딩", "컨테이너", "검증"]
   seo:
     title: "파이썬 특수 메서드 - 매직 메서드로 객체 동작 정의"
     description: "__str__, __repr__, __len__, __add__, __eq__, __getitem__ 등 특수 메서드를 배웁니다."
@@ -497,6 +497,76 @@ sections:
       repr(chained)
   - type: "tip"
     content: "특수 메서드를 잘 활용하면 사용자 정의 클래스가 파이썬 내장 타입만큼 자연스럽게 동작합니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 장바구니를 파이썬답게 다루기"
+  blocks:
+  - type: "text"
+    content: "특수 메서드는 객체를 len(), 인덱싱, 비교, 더하기 같은 파이썬 기본 문법과 자연스럽게 연결합니다. 장바구니 예제로 동작을 검증해봅니다."
+  - type: "code"
+    language: "python"
+    title: "장바구니 특수 메서드"
+    code: |
+      class Money:
+          def __init__(self, amount):
+              if amount < 0:
+                  raise ValueError("amount must not be negative")
+              self.amount = amount
+
+          def __add__(self, other):
+              if not isinstance(other, Money):
+                  raise TypeError("Money can only be added to Money")
+              return Money(self.amount + other.amount)
+
+          def __eq__(self, other):
+              return isinstance(other, Money) and self.amount == other.amount
+
+          def __repr__(self):
+              return f"Money({self.amount})"
+
+      class Cart:
+          def __init__(self):
+              self.lines = []
+
+          def add(self, name, price):
+              self.lines.append({"name": name, "price": Money(price)})
+
+          def __len__(self):
+              return len(self.lines)
+
+          def __getitem__(self, index):
+              return self.lines[index]
+
+          def total(self):
+              totalMoney = Money(0)
+              for line in self.lines:
+                  totalMoney = totalMoney + line["price"]
+              return totalMoney
+
+          def __repr__(self):
+              return f"Cart(lines={self.lines!r})"
+
+      cart = Cart()
+      cart.add("keyboard", 50000)
+      cart.add("mouse", 20000)
+
+      assert len(cart) == 2
+      assert cart[0]["name"] == "keyboard"
+      assert cart.total() == Money(70000)
+      assert repr(cart).startswith("Cart(")
+
+      try:
+          Money(1000) + 500
+      except TypeError as exc:
+          assert "Money" in str(exc)
+
+      print("장바구니 특수 메서드 흐름 통과")
+  - type: "list"
+    items:
+    - "__repr__은 디버깅할 때 객체 상태가 보이도록 만듭니다."
+    - "__len__, __getitem__을 구현하면 직접 만든 객체도 컨테이너처럼 쓸 수 있습니다."
+    - "연산자 오버로딩은 허용할 타입을 명확히 제한해야 합니다."
+    - "실무 변주: Cart에 __iter__와 할인 Money 계산을 추가하고, 장바구니를 for문과 sum 흐름에 연결해 보세요."
 
 - id: "practice"
   title: "Day 24 종합 복습"

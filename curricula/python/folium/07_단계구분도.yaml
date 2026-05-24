@@ -541,6 +541,166 @@ sections:
 
       statMap
 
+- id: step11_workflow
+  title: 11단계. 단계구분도 검증 루프
+  subtitle: 지역 키 매칭과 구간 해석
+  blocks:
+  - type: text
+    content: 단계구분도는 색이 칠해진다고 끝이 아닙니다. GeoJSON의 지역 키와 데이터 키가 정확히 맞는지, 임계값을 바꾸면 어떤 지역의 등급이 달라지는지 예측하고 검증해야 실무 리포트로 쓸 수 있습니다.
+  - type: list
+    items:
+    - "GeoJSON에는 있는데 데이터가 없는 지역을 먼저 찾습니다."
+    - "데이터에는 있는데 경계가 없는 지역도 오류로 확인합니다."
+    - "색상 구간은 업무 해석을 바꾸므로 임계값을 실험합니다."
+    - "렌더된 HTML에 지역명과 범례가 들어갔는지 검증합니다."
+  - type: code
+    language: python
+    title: 민원 밀도 데이터 준비
+    description: 지역별 민원 수와 인구를 결합해 1만 명당 민원 밀도를 계산합니다.
+    content: |-
+      serviceGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"id": "north", "name": "북구"},
+                  "geometry": {"type": "Polygon", "coordinates": [[[126.94, 37.58], [126.99, 37.58], [126.99, 37.62], [126.94, 37.62], [126.94, 37.58]]]},
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "central", "name": "중앙구"},
+                  "geometry": {"type": "Polygon", "coordinates": [[[126.94, 37.54], [126.99, 37.54], [126.99, 37.58], [126.94, 37.58], [126.94, 37.54]]]},
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"id": "south", "name": "남구"},
+                  "geometry": {"type": "Polygon", "coordinates": [[[126.94, 37.50], [126.99, 37.50], [126.99, 37.54], [126.94, 37.54], [126.94, 37.50]]]},
+              },
+          ],
+      }
+
+      serviceData = {
+          "north": {"complaints": 180, "population": 120000},
+          "central": {"complaints": 260, "population": 90000},
+          "south": {"complaints": 130, "population": 110000},
+      }
+
+      complaintDensity = {
+          regionId: round(values["complaints"] / values["population"] * 10000, 1)
+          for regionId, values in serviceData.items()
+      }
+      complaintDensity
+  - type: code
+    language: python
+    title: 지역 키 매칭 오류 확인
+    description: 경계와 데이터의 지역 키가 맞는지 검증합니다.
+    content: |-
+      def validateRegionKeys(geoJson, data):
+          geoIds = {feature["properties"]["id"] for feature in geoJson["features"]}
+          dataIds = set(data)
+          missingData = sorted(geoIds - dataIds)
+          missingGeo = sorted(dataIds - geoIds)
+          if missingData or missingGeo:
+              raise ValueError(f"지역 키 불일치: dataMissing={missingData}, geoMissing={missingGeo}")
+          return True
+
+      brokenData = {**serviceData, "east": {"complaints": 50, "population": 80000}}
+
+      try:
+          validateRegionKeys(serviceGeo, brokenData)
+      except ValueError as exc:
+          regionErrorMessage = str(exc)
+
+      validateRegionKeys(serviceGeo, serviceData), regionErrorMessage
+  - type: code
+    language: python
+    title: 민원 밀도 단계구분도
+    description: 민원 밀도가 높은 지역이 더 진하게 보이도록 색상 구간을 적용합니다.
+    content: |-
+      import branca.colormap as cm
+
+      complaintMap = folium.Map(location=[37.56, 126.965], zoom_start=12)
+      complaintScale = cm.StepColormap(
+          colors=["#d9f0a3", "#addd8e", "#31a354"],
+          index=[0, 15, 25, 35],
+          vmin=0,
+          vmax=35,
+          caption="1만 명당 민원 수",
+      )
+
+      def complaintStyle(feature):
+          regionId = feature["properties"]["id"]
+          density = complaintDensity[regionId]
+          return {
+              "fillColor": complaintScale(density),
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.75,
+          }
+
+      for feature in serviceGeo["features"]:
+          regionId = feature["properties"]["id"]
+          feature["properties"]["density"] = complaintDensity[regionId]
+
+      folium.GeoJson(
+          serviceGeo,
+          style_function=complaintStyle,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["name", "density"],
+              aliases=["지역:", "1만 명당 민원:"],
+          ),
+      ).add_to(complaintMap)
+      complaintScale.add_to(complaintMap)
+
+      complaintMap
+  - type: code
+    language: python
+    title: 렌더 결과 검증
+    description: 지역명, 범례, 오류 메시지가 모두 예상대로 들어갔는지 확인합니다.
+    content: |-
+      complaintHtml = complaintMap.get_root().render()
+      regionNames = [feature["properties"]["name"] for feature in serviceGeo["features"]]
+
+      import json
+      def renderedContains(html, text):
+          escaped = json.dumps(text, ensure_ascii=True)[1:-1]
+          return text in html or escaped in html
+
+      checks = {
+          "regionsRendered": all(renderedContains(complaintHtml, name) for name in regionNames),
+          "legendRendered": renderedContains(complaintHtml, "1만 명당 민원 수"),
+          "errorOk": "geoMissing=['east']" in regionErrorMessage,
+      }
+
+      assert all(checks.values()), checks
+      checks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 경고 기준을 낮추면 어느 지역이 위험 등급으로 바뀌는지 비교합니다.
+    content: |-
+      def classifyDensity(density, warningThreshold):
+          if density >= warningThreshold:
+              return "위험"
+          if density >= 15:
+              return "주의"
+          return "안정"
+
+      defaultClasses = {
+          regionId: classifyDensity(density, 30)
+          for regionId, density in complaintDensity.items()
+      }
+      strictClasses = {
+          regionId: classifyDensity(density, 20)
+          for regionId, density in complaintDensity.items()
+      }
+
+      assert defaultClasses["central"] == "주의"
+      assert strictClasses["central"] == "위험"
+      defaultClasses, strictClasses
+  - type: tip
+    content: 단계구분도는 색상보다 키 매칭과 기준선 검증이 먼저입니다. 데이터-경계 불일치를 잡고 임계값 실험을 거쳐야 의사결정용 지도가 됩니다.
+
 - id: practice
   title: 실습
   subtitle: 단계구분도

@@ -263,3 +263,75 @@ sections:
         duoPen.rectangle([8, 8, 312, 212], outline='white', width=2)
         duoPen.rectangle([318, 8, 612, 212], outline='white', width=2)
         duoCanvas
+
+- id: workflow_validation
+  title: 7단계. 콜라주 레이아웃 검증 루프
+  subtitle: grid, padding, paste 위치 확인
+  blocks:
+  - type: text
+    content: 콜라주는 이미지를 붙이는 과제가 아니라 레이아웃 계산 문제입니다. 이미지 개수와 그리드가 맞는지 검증하고, 각 타일이 의도한 좌표에 배치됐는지 픽셀로 확인합니다.
+  - type: code
+    language: python
+    title: 콜라주 입력 준비
+    description: 색이 다른 4개의 썸네일 이미지를 만듭니다.
+    content: |-
+      from PIL import Image, ImageOps
+
+      collageTiles = [
+          Image.new("RGB", (80, 60), color)
+          for color in [(220, 80, 80), (80, 180, 120), (80, 120, 220), (230, 190, 80)]
+      ]
+
+      def validateGrid(tiles, rows, cols):
+          if len(tiles) != rows * cols:
+              raise ValueError(f"타일 수와 그리드가 맞지 않습니다: tiles={len(tiles)}, grid={rows}x{cols}")
+          return True
+
+      validateGrid(collageTiles, 2, 2)
+  - type: code
+    language: python
+    title: 그리드 오류 확인
+    description: 3칸 그리드에 4장을 넣어 오류를 확인합니다.
+    content: |-
+      try:
+          validateGrid(collageTiles, 1, 3)
+      except ValueError as exc:
+          collageErrorMessage = str(exc)
+
+      collageErrorMessage
+  - type: code
+    language: python
+    title: 콜라주 배치 검증
+    description: padding을 포함한 캔버스 크기와 주요 좌표 색을 확인합니다.
+    content: |-
+      rows, cols, padding = 2, 2, 8
+      tileWidth, tileHeight = 80, 60
+      collageSize = (cols * tileWidth + (cols + 1) * padding, rows * tileHeight + (rows + 1) * padding)
+      collageImage = Image.new("RGB", collageSize, (245, 245, 245))
+
+      for index, tile in enumerate(collageTiles):
+          row, col = divmod(index, cols)
+          x = padding + col * (tileWidth + padding)
+          y = padding + row * (tileHeight + padding)
+          collageImage.paste(ImageOps.expand(tile, border=2, fill="white"), (x, y))
+
+      collageChecks = {
+          "sizeOk": collageImage.size == collageSize,
+          "topLeftTileOk": collageImage.getpixel((20, 20)) == (220, 80, 80),
+          "bottomRightTileOk": collageImage.getpixel((100, 80)) == (230, 190, 80),
+          "errorOk": collageErrorMessage == "타일 수와 그리드가 맞지 않습니다: tiles=4, grid=1x3",
+      }
+
+      assert all(collageChecks.values()), collageChecks
+      collageChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: padding을 늘리면 전체 캔버스가 커지는지 확인합니다.
+    content: |-
+      largerPadding = 16
+      largerSize = (cols * tileWidth + (cols + 1) * largerPadding, rows * tileHeight + (rows + 1) * largerPadding)
+
+      assert largerSize[0] > collageSize[0]
+      assert largerSize[1] > collageSize[1]
+      collageSize, largerSize

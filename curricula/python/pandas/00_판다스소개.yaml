@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pandas
   id: pandas_00
   title: 판다스소개
   order: 0
@@ -6,7 +8,7 @@ meta:
   badge: 소개
   source: eddmpython
   sourceUrl: https://eddmpython.com
-  tags: ["판다스", "데이터분석", "입문"]
+  tags: ["판다스", "데이터분석", "입문", "검증", "로컬실행"]
   seo:
     title: "판다스(Pandas) 입문 - 파이썬 데이터분석 시작하기"
     description: "파이썬 pandas 라이브러리로 데이터분석을 시작하세요. 실제 데이터(tips, titanic, penguins)로 바로 실습하며 배웁니다."
@@ -257,3 +259,51 @@ sections:
       emoji: "👉"
       title: "다음: DataFrame 완전 정복"
       subtitle: "엑셀 시트처럼 생긴 DataFrame, 직접 만들고 다뤄봅시다!"
+
+- id: workflow_validation
+  title: "현업 흐름 검증: 주문 DataFrame 기본 점검"
+  subtitle: "DataFrame 생성, 컬럼 검증, 집계, 실패 케이스"
+  blocks:
+    - type: text
+      content: "Pandas는 표를 읽고 바로 업무 질문에 답하는 도구입니다. 처음에는 컬럼이 있는지, 금액이 올바른지, 집계가 원본과 맞는지 확인하는 습관부터 잡아야 합니다."
+    - type: code
+      language: python
+      title: "주문 표 생성과 일별 집계"
+      description: "DataFrame 기본 조작을 업무 검증 흐름으로 확인합니다."
+      content: |-
+        import pandas as pd
+
+        orders = pd.DataFrame({
+            "orderId": ["O-1", "O-2", "O-3"],
+            "day": ["Mon", "Mon", "Tue"],
+            "amount": [12000, 8000, 15000],
+        })
+
+        daily = orders.groupby("day", as_index=False)["amount"].sum()
+
+        assert list(orders.columns) == ["orderId", "day", "amount"]
+        assert daily.set_index("day").loc["Mon", "amount"] == 20000
+        assert daily["amount"].sum() == orders["amount"].sum()
+    - type: code
+      language: python
+      title: "필수 컬럼 오류 확인"
+      description: "필수 컬럼이 빠진 표는 분석 전에 멈춥니다."
+      content: |-
+        import pandas as pd
+
+        def validateOrders(frame):
+            required = {"orderId", "day", "amount"}
+            missing = required - set(frame.columns)
+            if missing:
+                raise ValueError(f"missing columns: {sorted(missing)}")
+            return True
+
+        try:
+            validateOrders(pd.DataFrame({"orderId": ["O-1"]}))
+        except ValueError as exc:
+            message = str(exc)
+
+        assert "amount" in message
+    - type: tip
+      title: "변주 실험"
+      content: "요일 대신 지점별 매출을 집계하고, 지점 컬럼이 누락됐을 때 어떤 오류 메시지가 더 업무적으로 명확한지 바꿔보세요."

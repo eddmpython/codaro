@@ -71,7 +71,7 @@ sections:
   subtitle: 스마트 변환 기능
   blocks:
   - type: text
-    content: "Pydantic의 강력한 기능 중 하나는 타입 강제 변환(coercion)입니다. 문자열 \"30\"을 int 필드에 넣으면 자동으로 정수 30으로 변환됩니다. 숫자 123을 str 필드에 넣으면 \"123\"으로 변환됩니다. 이 기능 덕분에 외부 데이터(JSON, CSV 등)를 유연하게 처리할 수 있습니다."
+    content: "Pydantic의 강력한 기능 중 하나는 타입 강제 변환(coercion)입니다. 문자열 \"30\"을 int 필드에 넣으면 자동으로 정수 30으로 변환됩니다. 다만 Pydantic v2 기본 설정에서는 숫자 123을 str 필드에 넣는 변환은 허용하지 않습니다. 외부 데이터(JSON, CSV 등)를 유연하게 받되, 어떤 변환이 실제로 허용되는지는 실행으로 확인해야 합니다."
   - type: code
     language: python
     title: 문자열에서 정수로
@@ -81,11 +81,18 @@ sections:
       converted.age, type(converted.age)
   - type: code
     language: python
-    title: 숫자에서 문자열로
-    description: 역방향 변환
+    title: 숫자에서 문자열은 실패
+    description: Pydantic v2 기본 검증
     content: |-
-      numToStr = User(name=123, age=28, email="test@test.com")
-      numToStr.name, type(numToStr.name)
+      from pydantic import ValidationError
+
+      try:
+          User(name=123, age=28, email="test@test.com")
+      except ValidationError as exc:
+          numNameError = exc.errors()[0]["type"]
+
+      assert numNameError == "string_type"
+      numNameError
   - type: tip
     content: "변환이 불가능한 경우(예: \"invalid\"를 int로)에는 ValidationError가 발생합니다. Pydantic은 \"스마트\" 변환만 수행합니다."
 
@@ -104,8 +111,8 @@ sections:
 
       try:
           invalid = User(name="Charlie", age="not_a_number", email="c@c.com")
-      except ValidationError as e:
-          errorInfo = e.errors()
+      except ValidationError as exc:
+          errorInfo = exc.errors()
           errorInfo
   - type: code
     language: python
@@ -114,8 +121,8 @@ sections:
     content: |-
       try:
           multiError = User(name="", age="bad", email="")
-      except ValidationError as e:
-          errorCount = e.error_count()
+      except ValidationError as exc:
+          errorCount = exc.error_count()
           errorCount
   - type: tip
     content: "errors() 리스트의 각 항목은 'loc'(필드 위치), 'msg'(메시지), 'type'(에러 타입), 'input'(입력값)을 포함합니다."
@@ -209,10 +216,12 @@ sections:
     title: 수정 시도
     description: 에러 발생 확인
     content: |-
+      from pydantic import ValidationError
+
       try:
           frozen.name = "Changed"
-      except Exception as e:
-          freezeError = type(e).__name__
+      except ValidationError as exc:
+          freezeError = type(exc).__name__
           freezeError
 
 - id: result
@@ -335,12 +344,14 @@ sections:
     - type: code
       title: 불변성 및 직렬화 테스트
       content: |-
+        from pydantic import ValidationError
+
         orderJson = order.model_dump_json(indent=2)
 
         try:
             order.status = "completed"
             immutableTest = "FAILED"
-        except Exception:
+        except ValidationError:
             immutableTest = "PASSED"
 
         orderData = Order.model_validate_json('{"orderId": "ORD-002", "customerId": "C200", "amount": "75000"}')
@@ -351,3 +362,113 @@ sections:
             "fields": list(Order.model_fields.keys())
         }
         testResult
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 입력 계약과 배치 검증"
+  subtitle: "예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주"
+  blocks:
+  - type: "text"
+    content: "Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "주문 입력 모델과 정상 데이터 예측"
+    description: "타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다."
+    content: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+  - type: "code"
+    language: "python"
+    title: "잘못된 입력을 먼저 실패시킨다"
+    description: "금액과 상태가 틀린 입력을 ValidationError로 분리합니다."
+    content: |-
+      try:
+          OrderInput.model_validate({
+              'orderId': 'A-101',
+              'customer': 'lee',
+              'amount': 0,
+              'status': 'refunded',
+          })
+      except ValidationError as exc:
+          orderValidationErrors = exc.errors()
+      else:
+          raise AssertionError('잘못된 주문 입력은 실패해야 합니다')
+
+      errorFields = {error['loc'][0] for error in orderValidationErrors}
+      assert {'amount', 'status'} <= errorFields
+      orderValidationErrors
+  - type: "code"
+    language: "python"
+    title: "배치 입력을 정상/오류로 분리"
+    description: "여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다."
+    content: |-
+      rawOrders = [
+          {'orderId': 'A-100', 'customer': 'kim', 'amount': '120000', 'status': 'paid'},
+          {'orderId': 'A-101', 'customer': 'lee', 'amount': '20000', 'status': 'pending'},
+          {'orderId': ' ', 'customer': 'park', 'amount': '50000', 'status': 'paid'},
+          {'orderId': 'A-103', 'customer': 'choi', 'amount': '-1', 'status': 'paid'},
+      ]
+
+      def validateOrderBatch(rows):
+          accepted = []
+          rejected = []
+          for index, row in enumerate(rows, start=1):
+              try:
+                  accepted.append(OrderInput.model_validate(row))
+              except ValidationError as exc:
+                  rejected.append({'rowNumber': index, 'errors': exc.errors()})
+          return accepted, rejected
+
+      acceptedOrders, rejectedOrders = validateOrderBatch(rawOrders)
+      paidRevenue = sum(order.amount for order in acceptedOrders if order.isRevenue)
+
+      assert len(acceptedOrders) == 2
+      assert len(rejectedOrders) == 2
+      assert paidRevenue == 120000
+      acceptedOrders, rejectedOrders
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 최소 결제 금액 정책 바꾸기"
+    description: "정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다."
+    content: |-
+      def filterRevenueOrders(orders, minAmount):
+          if minAmount <= 0:
+              raise ValueError('minAmount must be positive')
+          return [order for order in orders if order.isRevenue and order.amount >= minAmount]
+
+      revenueOver50000 = filterRevenueOrders(acceptedOrders, 50000)
+      revenueOver150000 = filterRevenueOrders(acceptedOrders, 150000)
+
+      assert [order.orderId for order in revenueOver50000] == ['A-100']
+      assert revenueOver150000 == []
+      revenueOver50000, revenueOver150000

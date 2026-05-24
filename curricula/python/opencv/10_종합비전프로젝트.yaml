@@ -373,3 +373,87 @@ sections:
         axEdge[2].set_title(f'Detected: {len(largeCnts)}')
         axEdge[2].axis('off')
         plt.tight_layout()
+
+- id: workflow_validation
+  title: 8단계. 종합 비전 파이프라인 검증
+  subtitle: 색상 마스크 → 형태 정제 → 컨투어 분석
+  blocks:
+  - type: text
+    content: 종합 비전 프로젝트는 색상 필터링, 마스크 정제, 컨투어 분석이 한 번에 이어지는 파이프라인입니다. HSV 범위 계약을 검증하고, 마스크 픽셀 수와 객체 면적을 확인한 뒤, 기준을 바꾸는 실무 변주까지 점검합니다.
+  - type: code
+    language: python
+    title: 컬러 객체 이미지 준비
+    description: 빨간 객체 두 개와 배경 잡음을 가진 BGR 이미지를 만듭니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      visionImage = np.zeros((140, 180, 3), dtype=np.uint8)
+      visionImage[:] = [35, 35, 35]
+      cv2.circle(visionImage, (55, 70), 24, (0, 0, 255), -1)
+      cv2.rectangle(visionImage, (110, 45), (155, 95), (0, 0, 230), -1)
+      cv2.circle(visionImage, (20, 20), 3, (0, 0, 255), -1)
+
+      def validateHsvRange(lower, upper):
+          if len(lower) != 3 or len(upper) != 3:
+              raise ValueError("HSV 범위는 길이 3이어야 합니다")
+          if any(lo > hi for lo, hi in zip(lower, upper)):
+              raise ValueError(f"HSV lower가 upper보다 큽니다: {lower} > {upper}")
+          return True
+
+      validateHsvRange((0, 80, 80), (10, 255, 255))
+  - type: code
+    language: python
+    title: HSV 범위 오류 확인
+    description: lower가 upper보다 큰 범위를 넣어 오류를 확인합니다.
+    content: |-
+      try:
+          validateHsvRange((20, 200, 200), (10, 255, 255))
+      except ValueError as exc:
+          hsvRangeErrorMessage = str(exc)
+
+      hsvRangeErrorMessage
+  - type: code
+    language: python
+    title: 종합 파이프라인 실행
+    description: 빨간 객체를 마스크로 분리하고 모폴로지로 정제한 뒤 컨투어를 찾습니다.
+    content: |-
+      visionHsv = cv2.cvtColor(visionImage, cv2.COLOR_BGR2HSV)
+      lowerRed1 = np.array([0, 80, 80])
+      upperRed1 = np.array([10, 255, 255])
+      lowerRed2 = np.array([170, 80, 80])
+      upperRed2 = np.array([180, 255, 255])
+      redVisionMask = cv2.bitwise_or(
+          cv2.inRange(visionHsv, lowerRed1, upperRed1),
+          cv2.inRange(visionHsv, lowerRed2, upperRed2),
+      )
+      cleanVisionMask = cv2.morphologyEx(redVisionMask, cv2.MORPH_OPEN, np.ones((5, 5), dtype=np.uint8))
+      visionContours, _ = cv2.findContours(cleanVisionMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+      cleanVisionContours = [contour for contour in visionContours if cv2.contourArea(contour) >= 1000]
+      visionAreas = sorted([cv2.contourArea(contour) for contour in cleanVisionContours], reverse=True)
+      visionChecks = {
+          "maskHasPixels": int(np.count_nonzero(redVisionMask)) > 3000,
+          "noiseRemoved": int(np.count_nonzero(cleanVisionMask)) < int(np.count_nonzero(redVisionMask)),
+          "objectCountOk": len(cleanVisionContours) == 2,
+          "areaOk": visionAreas[0] > 1500 and visionAreas[1] > 1400,
+          "errorOk": hsvRangeErrorMessage.startswith("HSV lower가 upper보다 큽니다"),
+      }
+
+      assert all(visionChecks.values()), visionChecks
+      visionChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 최소 면적 기준을 높이면 어떤 객체만 남는지 확인합니다.
+    content: |-
+      def selectContoursByArea(contours, minArea):
+          if minArea <= 0:
+              raise ValueError("minArea는 양수여야 합니다")
+          return [contour for contour in contours if cv2.contourArea(contour) >= minArea]
+
+      defaultObjects = selectContoursByArea(visionContours, 1000)
+      strictObjects = selectContoursByArea(visionContours, 2000)
+
+      assert len(defaultObjects) == 2
+      assert len(strictObjects) == 1
+      len(defaultObjects), len(strictObjects)

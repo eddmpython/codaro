@@ -296,6 +296,110 @@ sections:
   - type: "tip"
     content: "로그 파일에는 time.strftime()으로 읽기 쉬운 형식의 타임스탬프를 기록하세요."
 
+- id: "workflow_validation"
+  title: "검증 루프: 시간 측정 운영 리포트"
+  subtitle: "SLA, 재시도 간격, 타임스탬프 검증"
+  blocks:
+  - type: "text"
+    content: "시간 측정 코드는 출력값보다 기준이 중요합니다. 성능 측정에는 perf_counter()를 쓰고, 재시도 간격이나 SLA 판단은 계산 결과를 검증해야 운영 자동화에 안전하게 넣을 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "지연 시간 리포트 검증"
+    description: "초 단위 측정값을 밀리초 리포트로 바꾸고 SLA를 확인합니다."
+    content: |-
+      latencySamples = [0.012, 0.018, 0.041, 0.025, 0.033]
+
+      def summarizeLatencies(secondsSamples, slaMs):
+          milliseconds = [round(sample * 1000, 2) for sample in secondsSamples]
+          return {
+              "count": len(milliseconds),
+              "averageMs": sum(milliseconds) / len(milliseconds),
+              "maxMs": max(milliseconds),
+              "withinSla": max(milliseconds) <= slaMs,
+          }
+
+      latencyReport = summarizeLatencies(latencySamples, slaMs=50)
+
+      assert latencyReport["count"] == 5
+      assert 25.0 < latencyReport["averageMs"] < 26.0
+      assert latencyReport["maxMs"] == 41.0
+      assert latencyReport["withinSla"] is True
+
+      latencyReport
+  - type: "code"
+    language: "python"
+    title: "재시도 간격 오류 잡기"
+    description: "선형 증가와 지수 백오프를 구분해 검증합니다."
+    content: |-
+      def buildRetrySchedule(maxRetries, baseDelay):
+          return [baseDelay * (2 ** attempt) for attempt in range(maxRetries)]
+
+      def brokenRetrySchedule(maxRetries, baseDelay):
+          return [baseDelay * attempt for attempt in range(maxRetries)]
+
+      expectedSchedule = buildRetrySchedule(maxRetries=4, baseDelay=0.25)
+
+      try:
+          assert brokenRetrySchedule(4, 0.25) == expectedSchedule
+      except AssertionError as exc:
+          retryProblem = "재시도 간격이 지수 백오프가 아닙니다."
+
+      assert expectedSchedule == [0.25, 0.5, 1.0, 2.0]
+      retryProblem, expectedSchedule
+  - type: "code"
+    language: "python"
+    title: "실행 시간 계측 함수"
+    description: "perf_counter()로 작업 실행 시간을 측정하고 결과를 함께 반환합니다."
+    content: |-
+      def measureOperation(operation):
+          start = time.perf_counter()
+          result = operation()
+          elapsed = time.perf_counter() - start
+          return {"result": result, "elapsedSeconds": elapsed}
+
+      measured = measureOperation(lambda: sum(range(1000)))
+
+      assert measured["result"] == 499500
+      assert measured["elapsedSeconds"] >= 0
+      assert measured["elapsedSeconds"] < 1
+
+      measured
+  - type: "code"
+    language: "python"
+    title: "고정 UTC 로그 타임스탬프"
+    description: "테스트 가능한 고정 timestamp로 로그 포맷을 검증합니다."
+    content: |-
+      fixedTimestamp = 1704067200
+      fixedUtc = time.gmtime(fixedTimestamp)
+      logTimestamp = time.strftime("[%Y-%m-%d %H:%M:%S UTC]", fixedUtc)
+
+      assert logTimestamp == "[2024-01-01 00:00:00 UTC]"
+      assert time.mktime(time.localtime(fixedTimestamp)) >= 1704067200
+
+      logTimestamp
+  - type: "code"
+    language: "python"
+    title: "재시도 설정 오류 확인"
+    description: "0 이하 지연 시간은 운영 재시도 설정에서 막습니다."
+    content: |-
+      def safeRetrySchedule(maxRetries, baseDelay):
+          if maxRetries <= 0:
+              raise ValueError("maxRetries must be positive")
+          if baseDelay <= 0:
+              raise ValueError("baseDelay must be positive")
+          return [baseDelay * (2 ** attempt) for attempt in range(maxRetries)]
+
+      try:
+          safeRetrySchedule(3, 0)
+      except ValueError as exc:
+          retryConfigMessage = str(exc)
+
+      assert retryConfigMessage == "baseDelay must be positive"
+      assert safeRetrySchedule(3, 0.5) == [0.5, 1.0, 2.0]
+  - type: "tip"
+    title: "변주 실험"
+    content: "SLA 기준을 50ms에서 30ms로 바꾸고, 같은 지연 샘플에서 `withinSla`가 어떻게 달라지는지 확인하세요."
+
 - id: "practice"
   title: "time 모듈 종합 복습"
   subtitle: "시간 측정 마스터하기"

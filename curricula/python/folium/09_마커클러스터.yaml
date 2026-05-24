@@ -377,6 +377,127 @@ sections:
 
       storeMap
 
+- id: step11_workflow
+  title: 11단계. 실무 클러스터 검증
+  subtitle: 예측 → 분류 오류 확인 → 렌더 검증 → 임계값 실험
+  blocks:
+  - type: text
+    content: 마커 클러스터는 대량 위치를 빠르게 보여주지만, 데이터 분류가 틀리면 숫자가 그럴듯해도 업무 판단은 틀립니다. 클러스터에 넣기 전에 좌표와 카테고리를 검증하고, 렌더된 HTML에 지점명과 레이어 이름이 들어갔는지 확인해야 합니다.
+  - type: list
+    items:
+    - "실행 전에는 어떤 카테고리 클러스터가 가장 많은 마커를 가질지 먼저 예측합니다."
+    - "정의하지 않은 카테고리가 들어오면 기본 클러스터에 섞지 말고 오류로 확인합니다."
+    - "대량 마커는 이름, 레이어, 카테고리 수가 렌더 결과에 반영됐는지 검증합니다."
+    - "집중 관리 기준을 바꾸면 어느 카테고리가 운영 대상이 되는지 실험합니다."
+  - type: code
+    language: python
+    title: 현장 티켓 위치 데이터 준비
+    description: 현장 방문, 설치, 장애 티켓을 카테고리별 클러스터로 묶을 데이터를 만듭니다.
+    content: |-
+      fieldTickets = [
+          {"id": "T-101", "name": "강남 설치", "loc": [37.4979, 127.0276], "category": "install", "priority": "high"},
+          {"id": "T-102", "name": "역삼 설치", "loc": [37.5005, 127.0360], "category": "install", "priority": "medium"},
+          {"id": "T-103", "name": "성수 장애", "loc": [37.5446, 127.0557], "category": "incident", "priority": "high"},
+          {"id": "T-104", "name": "마포 방문", "loc": [37.5663, 126.9019], "category": "visit", "priority": "low"},
+          {"id": "T-105", "name": "여의도 장애", "loc": [37.5219, 126.9245], "category": "incident", "priority": "medium"},
+          {"id": "T-106", "name": "종로 방문", "loc": [37.5796, 126.9770], "category": "visit", "priority": "medium"},
+      ]
+
+      clusterStyle = {
+          "install": {"layerName": "설치", "color": "blue", "icon": "wrench"},
+          "incident": {"layerName": "장애", "color": "red", "icon": "exclamation-sign"},
+          "visit": {"layerName": "방문", "color": "green", "icon": "user"},
+      }
+
+      ticketCountByCategory = {}
+      for ticket in fieldTickets:
+          ticketCountByCategory[ticket["category"]] = ticketCountByCategory.get(ticket["category"], 0) + 1
+
+      busiestCategory = max(ticketCountByCategory, key=ticketCountByCategory.get)
+      busiestCategory, ticketCountByCategory
+  - type: code
+    language: python
+    title: 클러스터 데이터 검증 함수
+    description: 좌표와 카테고리를 클러스터 생성 전에 점검합니다.
+    content: |-
+      def validateClusterTicket(ticket, styleByCategory):
+          lat, lon = ticket["loc"]
+          if not (33 <= lat <= 39 and 124 <= lon <= 132):
+              raise ValueError(f"좌표 범위 오류: {ticket['id']}")
+          if ticket["category"] not in styleByCategory:
+              raise KeyError(f"클러스터 카테고리 누락: {ticket['category']}")
+          return True
+
+      clusterValidation = [validateClusterTicket(ticket, clusterStyle) for ticket in fieldTickets]
+      clusterValidation
+  - type: code
+    language: python
+    title: 분류 오류 확인
+    description: 등록되지 않은 카테고리를 일부러 넣고 오류를 확인합니다.
+    content: |-
+      brokenTicket = {"id": "T-999", "name": "분류 누락", "loc": [37.55, 126.98], "category": "repair", "priority": "low"}
+
+      try:
+          validateClusterTicket(brokenTicket, clusterStyle)
+      except KeyError as exc:
+          clusterCategoryError = str(exc).strip("'")
+
+      clusterCategoryError
+  - type: code
+    language: python
+    title: 현장 티켓 클러스터 지도 만들기
+    description: 카테고리별 MarkerCluster와 LayerControl로 운영 지도를 만듭니다.
+    content: |-
+      ticketMap = folium.Map(location=[37.54, 126.98], zoom_start=12, tiles="CartoDB Positron")
+      ticketClusters = {
+          category: MarkerCluster(name=style["layerName"]).add_to(ticketMap)
+          for category, style in clusterStyle.items()
+      }
+
+      for ticket in fieldTickets:
+          validateClusterTicket(ticket, clusterStyle)
+          style = clusterStyle[ticket["category"]]
+          popupHtml = f"<b>{ticket['id']}</b><br>{ticket['name']}<br>우선순위: {ticket['priority']}"
+          folium.Marker(
+              location=ticket["loc"],
+              popup=popupHtml,
+              tooltip=f"{ticket['id']} {ticket['name']}",
+              icon=folium.Icon(color=style["color"], icon=style["icon"]),
+          ).add_to(ticketClusters[ticket["category"]])
+
+      folium.LayerControl().add_to(ticketMap)
+      ticketMap
+  - type: code
+    language: python
+    title: 렌더 결과 검증
+    description: 티켓 ID, 레이어 이름, 오류 메시지, 최다 카테고리 예측이 맞는지 확인합니다.
+    content: |-
+      ticketHtml = ticketMap.get_root().render()
+      clusterChecks = {
+          "allTicketsRendered": all(ticket["id"] in ticketHtml for ticket in fieldTickets),
+          "layersRendered": all(style["layerName"] in ticketHtml for style in clusterStyle.values()),
+          "categoryErrorOk": clusterCategoryError == "클러스터 카테고리 누락: repair",
+          "busiestPredictionOk": busiestCategory == "install",
+          "validationOk": all(clusterValidation),
+      }
+
+      assert all(clusterChecks.values()), clusterChecks
+      clusterChecks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 집중 관리 기준을 바꾸면 어떤 카테고리가 운영 대상이 되는지 비교합니다.
+    content: |-
+      def selectBusyCategories(countByCategory, minimumTicketCount):
+          return sorted(category for category, count in countByCategory.items() if count >= minimumTicketCount)
+
+      broadTargetCategories = selectBusyCategories(ticketCountByCategory, 2)
+      narrowTargetCategories = selectBusyCategories(ticketCountByCategory, 3)
+
+      broadTargetCategories, narrowTargetCategories
+  - type: tip
+    content: 클러스터 지도는 마커 수를 줄이는 기술이 아니라 대량 위치 데이터를 운영 단위로 묶는 방법입니다. 좌표, 카테고리, 레이어, 렌더 결과를 검증해야 숫자를 믿고 업무 판단을 내릴 수 있습니다.
+
 - id: practice
   title: 실습
   subtitle: 마커 클러스터

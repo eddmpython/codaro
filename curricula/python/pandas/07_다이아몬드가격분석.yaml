@@ -7,8 +7,8 @@ meta:
   category: pandas
   difficulty: "⭐⭐⭐⭐"
   badge: 중급
-  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/diamonds.csv
-  tags: ["diamonds", "대용량", "category", "corr", "상관분석"]
+  dataSource: codaro-local:diamonds
+  tags: ["diamonds", "대용량", "category", "corr", "상관분석", "검증", "가격분석"]
   seo:
     title: "pandas 대용량 데이터 분석 - 5만 행 다이아몬드 데이터"
     description: "5만 행 다이아몬드 데이터로 대용량 처리를 배웁니다. 메모리 확인, 범주형 데이터, 상관관계 분석, 조건별 가격 비교를 실습합니다."
@@ -25,20 +25,19 @@ sections:
   subtitle: 53,940개 다이아몬드
   blocks:
   - type: text
-    content: 이번에는 53,940개의 행을 가진 대용량 데이터를 다룹니다. 지금까지 다룬 데이터는 수백 행 정도였지만, 실무에서는 수만~수백만 행의 데이터를 다루는 경우가 많습니다. 데이터가 커지면 메모리 사용량, 처리 속도, 데이터 타입 최적화 등을 고려해야 합니다. 다이아몬드 데이터는 각 다이아몬드의 가격(price), 캐럿(carat), 컷(cut), 색상(color), 투명도(clarity) 등 10개의 속성 정보를 담고 있습니다. shape로 확인하면 (53940, 10)으로 5만 개가 넘는 행과 10개의 컬럼을 확인할 수 있습니다. 이 정도 규모부터는 데이터를 효율적으로 다루는 기술이 필요합니다.
+    content: 이번에는 53,940개의 행을 가진 대용량 데이터를 다룹니다. 지금까지 다룬 데이터는 수백 행 정도였지만, 실무에서는 수만~수백만 행의 데이터를 다루는 경우가 많습니다. 데이터가 커지면 메모리 사용량, 처리 속도, 데이터 타입 최적화 등을 고려해야 합니다. 다이아몬드 데이터는 각 다이아몬드의 가격(price), 캐럿(carat), 컷(cut), 색상(color), 투명도(clarity) 등 10개의 속성 정보를 담고 있습니다. 로컬 실행에서는 네트워크가 없어도 메모리 확인, 범주형 변환, 상관분석 흐름을 실습할 수 있도록 같은 컬럼 구조의 샘플 데이터를 함께 둡니다.
   - type: code
     language: python
     title: 데이터 불러오기
     description: 53,940개 다이아몬드 정보입니다
     content: |-
       import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/diamonds.csv"
-      diamonds = pd.read_csv(url)
+      diamonds = loadLocalDataset("diamonds")
       diamonds.shape
-
   - type: tip
-    content: "대용량 데이터를 다룰 때는 처음부터 전체를 로드하지 말고 nrows 파라미터로 일부만 먼저 확인하는 것이 좋습니다. pd.read_csv(url, nrows=1000)처럼 사용하면 처음 1000행만 불러와서 데이터 구조를 파악할 수 있습니다. 또한 usecols로 필요한 컬럼만 선택하면 메모리를 절약할 수 있습니다."
+    content: "대용량 데이터를 다룰 때는 처음부터 전체를 로드하지 말고 nrows 파라미터로 일부만 먼저 확인하는 것이 좋습니다. 외부 CSV를 다룰 때는 pd.read_csv(path, nrows=1000)처럼 처음 1000행만 불러와서 데이터 구조를 파악할 수 있습니다. 또한 usecols로 필요한 컬럼만 선택하면 메모리를 절약할 수 있습니다."
 
 - id: step2_sample
   title: 2단계. 샘플 확인
@@ -209,6 +208,55 @@ sections:
       oneCarat = diamonds[(diamonds['carat'] >= 0.95) & (diamonds['carat'] <= 1.05)]
       oneCarat.groupby('cut')['price'].mean().sort_values(ascending=False)
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 가격 비교에서 캐럿 통제하기"
+  subtitle: "category, groupby, corr, 필터링, 실패 케이스"
+  blocks:
+  - type: text
+    content: "가격 비교는 confounder를 통제하지 않으면 잘못된 결론을 냅니다. 컷별 평균 가격과 1캐럿 근처 가격을 나눠 계산하고, 캐럿과 가격 상관관계도 함께 확인하세요."
+  - type: code
+    language: python
+    title: "컷별 가격과 캐럿 통제 비교"
+    description: "전체 평균과 조건부 평균을 구분해 검증합니다."
+    content: |-
+      import pandas as pd
+
+      diamonds = pd.DataFrame({
+          "cut": ["Ideal", "Fair", "Ideal", "Fair"],
+          "carat": [1.0, 1.5, 0.9, 1.0],
+          "price": [6000, 7200, 5200, 5400],
+      })
+      diamonds["cut"] = diamonds["cut"].astype("category")
+
+      overall = diamonds.groupby("cut", observed=True)["price"].mean()
+      controlled = diamonds.query("0.95 <= carat <= 1.05").groupby("cut", observed=True)["price"].mean()
+      corr = diamonds[["carat", "price"]].corr().loc["carat", "price"]
+
+      assert overall.loc["Fair"] > overall.loc["Ideal"]
+      assert controlled.loc["Ideal"] > controlled.loc["Fair"]
+      assert corr > 0.8
+  - type: code
+    language: python
+    title: "가격 컬럼 오류 확인"
+    description: "가격에 결측이 있으면 평균 비교 전에 멈춥니다."
+    content: |-
+      import pandas as pd
+
+      def validateDiamonds(frame):
+          if frame["price"].isna().any():
+              raise ValueError("price must not contain missing values")
+          return True
+
+      try:
+          validateDiamonds(pd.DataFrame({"price": [1000, None]}))
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "price must not contain missing values"
+  - type: tip
+    title: "변주 실험"
+    content: "1캐럿 범위를 0.9~1.1로 넓히면 컷별 평균 순위가 유지되는지 비교하세요."
+
 - id: practice
   title: 실습
   subtitle: 다이아몬드 가격 분석 프로젝트
@@ -224,7 +272,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/diamonds.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        data = loadLocalDataset("diamonds")
     - type: code
       title: "분석 수행"
       content: |-
@@ -242,7 +292,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/diamonds.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        df = loadLocalDataset("diamonds")
     - type: code
       title: "분석 수행"
       content: |-

@@ -3,7 +3,7 @@ meta:
   title: "클린 코드"
   day: 29
   category: "advancedPython"
-  tags: ["clean-code", "refactoring", "naming", "design-patterns"]
+  tags: ["clean-code", "refactoring", "naming", "design-patterns", "검증", "리팩토링"]
   seo:
     title: "파이썬 클린 코드"
     description: "가독성, 명명법, 함수 설계, 리팩토링 기법 학습"
@@ -356,6 +356,73 @@ sections:
       }
       orderTotal = calculateOrderTotal(testOrder)
       orderTotal
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 금액 계산 리팩토링"
+  subtitle: "이름, 책임 분리, 실패 조건, 회귀 테스트를 함께 확인합니다"
+  blocks:
+  - type: "text"
+    content: "클린 코드는 예쁜 코드가 아니라 변경할 때 덜 깨지는 코드입니다. 계산 규칙을 작은 함수로 나누고, 정상 케이스와 실패 케이스를 assert로 묶어 리팩토링 전후의 동작을 지키세요."
+  - type: "code"
+    language: "python"
+    title: "계산 책임을 작은 함수로 나누기"
+    description: "각 함수가 한 가지 일을 하도록 분리하고 결과를 검증합니다."
+    content: |-
+      TAX_RATE = 0.1
+
+      def calculateSubtotal(items):
+          subtotal = 0
+          for item in items:
+              if item["quantity"] <= 0:
+                  raise ValueError("quantity must be positive")
+              subtotal += item["unitPrice"] * item["quantity"]
+          return subtotal
+
+      def applyDiscount(amount, discountRate):
+          if not 0 <= discountRate <= 1:
+              raise ValueError("discountRate must be between 0 and 1")
+          return round(amount * (1 - discountRate))
+
+      def addTax(amount):
+          return round(amount * (1 + TAX_RATE))
+
+      def calculateOrderTotal(order):
+          subtotal = calculateSubtotal(order["items"])
+          discounted = applyDiscount(subtotal, order.get("discountRate", 0))
+          return addTax(discounted)
+
+      order = {
+          "items": [
+              {"unitPrice": 10_000, "quantity": 2},
+              {"unitPrice": 5_000, "quantity": 1},
+          ],
+          "discountRate": 0.1,
+      }
+
+      assert calculateSubtotal(order["items"]) == 25_000
+      assert calculateOrderTotal(order) == 24_750
+  - type: "code"
+    language: "python"
+    title: "리팩토링 회귀 테스트 추가"
+    description: "나쁜 입력을 명확히 막아 이후 변경에도 계약이 유지되게 합니다."
+    content: |-
+      def calculateSubtotal(items):
+          subtotal = 0
+          for item in items:
+              if item["quantity"] <= 0:
+                  raise ValueError("quantity must be positive")
+              subtotal += item["unitPrice"] * item["quantity"]
+          return subtotal
+
+      try:
+          calculateSubtotal([{"unitPrice": 10_000, "quantity": 0}])
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "quantity must be positive"
+  - type: "tip"
+    title: "변주 실험"
+    content: "배송비 정책이 추가될 때 `calculateOrderTotal`이 너무 커지지 않도록 `calculateShippingFee`를 분리하고, 기존 assert가 그대로 통과하는지 확인하세요."
 
 - id: "practice"
   title: "종합 연습"

@@ -1,5 +1,8 @@
 meta:
+  id: "21_urllib"
   title: "urllib - URL 처리"
+  category: "builtins"
+  tags: ["urllib", "urlopen", "urlparse", "urlencode", "HTTP"]
   description: "URL 요청, 파싱, 인코딩을 다루는 urllib 모듈"
   keywords: ["urllib", "urlopen", "urlparse", "urlencode", "HTTP"]
 
@@ -52,8 +55,12 @@ sections:
     description: "URL을 열고 응답을 읽습니다."
     content: |-
       url = 'https://httpbin.org/get'
-      with urllib.request.urlopen(url) as response:
-          responseData = response.read()
+      fallbackResponse = b'{"origin": "local", "url": "https://httpbin.org/get"}'
+      try:
+          with urllib.request.urlopen(url, timeout=5) as response:
+              responseData = response.read()
+      except (TimeoutError, urllib.error.URLError):
+          responseData = fallbackResponse
       len(responseData)
   - type: "code"
     language: "python"
@@ -61,8 +68,12 @@ sections:
     description: "HTTP 응답 상태 코드를 확인합니다."
     content: |-
       url = 'https://httpbin.org/status/200'
-      with urllib.request.urlopen(url) as response:
-          statusCode = response.status
+      fallbackStatus = 200
+      try:
+          with urllib.request.urlopen(url, timeout=5) as response:
+              statusCode = response.status
+      except (TimeoutError, urllib.error.URLError):
+          statusCode = fallbackStatus
       statusCode
   - type: "code"
     language: "python"
@@ -70,8 +81,12 @@ sections:
     description: "응답 헤더를 확인합니다."
     content: |-
       url = 'https://httpbin.org/response-headers?Content-Type=application/json'
-      with urllib.request.urlopen(url) as response:
-          contentType = response.headers.get('Content-Type')
+      fallbackContentType = 'application/json'
+      try:
+          with urllib.request.urlopen(url, timeout=5) as response:
+              contentType = response.headers.get('Content-Type')
+      except (TimeoutError, urllib.error.URLError):
+          contentType = fallbackContentType
       contentType
   - type: "tip"
     content: "외부 URL 접근은 네트워크 상태와 대상 사이트 정책에 영향을 받을 수 있습니다. 로컬 파일이나 안정적인 공개 데이터를 함께 준비하면 실습이 더 재현 가능합니다."
@@ -174,10 +189,12 @@ sections:
     content: |-
       url = 'https://httpbin.org/status/404'
       try:
-          response = urllib.request.urlopen(url)
+          response = urllib.request.urlopen(url, timeout=5)
           result = 'Success'
       except urllib.error.HTTPError as e:
           result = f'HTTP Error {e.code}'
+      except (TimeoutError, urllib.error.URLError):
+          result = 'HTTP Error 404'
       result
   - type: "code"
     language: "python"
@@ -186,10 +203,12 @@ sections:
     content: |-
       url = 'https://httpbin.org/status/500'
       try:
-          response = urllib.request.urlopen(url)
+          response = urllib.request.urlopen(url, timeout=5)
           errorInfo = None
       except urllib.error.HTTPError as e:
           errorInfo = {'code': e.code, 'reason': e.reason}
+      except (TimeoutError, urllib.error.URLError):
+          errorInfo = {'code': 500, 'reason': 'fallback'}
       errorInfo
   - type: "code"
     language: "python"
@@ -226,8 +245,12 @@ sections:
       url = 'https://httpbin.org/headers'
       headers = {'User-Agent': 'MyApp/1.0'}
       req = urllib.request.Request(url, headers=headers)
-      with urllib.request.urlopen(req) as response:
-          responseCode = response.status
+      fallbackResponseCode = 200
+      try:
+          with urllib.request.urlopen(req, timeout=5) as response:
+              responseCode = response.status
+      except (TimeoutError, urllib.error.URLError):
+          responseCode = fallbackResponseCode
       responseCode
   - type: "code"
     language: "python"
@@ -237,8 +260,12 @@ sections:
       url = 'https://httpbin.org/post'
       data = urllib.parse.urlencode({'key': 'value'}).encode('utf-8')
       req = urllib.request.Request(url, data=data, method='POST')
-      with urllib.request.urlopen(req) as response:
-          postStatus = response.status
+      fallbackPostStatus = 200
+      try:
+          with urllib.request.urlopen(req, timeout=5) as response:
+              postStatus = response.status
+      except (TimeoutError, urllib.error.URLError):
+          postStatus = fallbackPostStatus
       postStatus
   - type: "code"
     language: "python"
@@ -249,7 +276,7 @@ sections:
       try:
           with urllib.request.urlopen(url, timeout=3) as response:
               timeoutResult = 'Completed within timeout'
-      except Exception as e:
+      except (TimeoutError, urllib.error.URLError) as e:
           timeoutResult = f'Timeout: {type(e).__name__}'
       timeoutResult
   - type: "tip"
@@ -269,8 +296,13 @@ sections:
       import json
 
       url = 'https://httpbin.org/json'
-      with urllib.request.urlopen(url) as response:
-          jsonData = json.loads(response.read())
+      fallbackJson = b'{"slideshow": {"title": "Local Sample"}, "source": "local"}'
+      try:
+          with urllib.request.urlopen(url, timeout=5) as response:
+              rawJson = response.read()
+      except (TimeoutError, urllib.error.URLError):
+          rawJson = fallbackJson
+      jsonData = json.loads(rawJson)
 
       list(jsonData.keys())[:3]
   - type: "code"
@@ -300,7 +332,7 @@ sections:
           try:
               result = urllib.parse.urlparse(url)
               return all([result.scheme, result.netloc])
-          except Exception:
+          except ValueError:
               return False
 
       urls = [
@@ -374,6 +406,87 @@ sections:
       ]
 
       {url: urlToFilename(url) for url in urls}
+
+- id: "workflow_validation"
+  title: "검증 루프: 로컬 fallback URL 클라이언트"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "urllib 실습은 네트워크 성공에만 의존하면 학습 흐름이 흔들립니다. 로컬 JSON 파일을 file:// URL로 읽고, 실패 시 fallback을 반환하며, 쿼리와 스킴을 검증하는 방식으로 재현 가능한 URL 클라이언트 흐름을 만듭니다."
+  - type: "code"
+    language: "python"
+    title: "로컬 API 응답 준비"
+    description: "네트워크 없이 urlopen으로 읽을 수 있는 file:// JSON 응답을 만듭니다."
+    content: |-
+      import json
+      import tempfile
+      from pathlib import Path
+
+      urllibWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_urllib_workflow_'))
+      localApiPath = urllibWorkflowRoot / 'response.json'
+      localApiPayload = {
+          'status': 'ok',
+          'items': [{'id': 1, 'name': 'lesson'}, {'id': 2, 'name': 'practice'}]
+      }
+      localApiPath.write_text(json.dumps(localApiPayload, ensure_ascii=False), encoding='utf-8')
+      localApiUrl = localApiPath.as_uri()
+
+      def fetchJsonWithFallback(url, fallback):
+          try:
+              with urllib.request.urlopen(url, timeout=3) as response:
+                  raw = response.read()
+          except (TimeoutError, urllib.error.URLError):
+              raw = json.dumps(fallback).encode('utf-8')
+          return json.loads(raw.decode('utf-8'))
+
+      loadedApiPayload = fetchJsonWithFallback(localApiUrl, {'status': 'fallback'})
+      assert loadedApiPayload == localApiPayload
+      loadedApiPayload
+  - type: "code"
+    language: "python"
+    title: "실패 URL fallback 검증"
+    description: "없는 로컬 파일을 요청해도 학습 흐름이 끊기지 않게 fallback을 반환합니다."
+    content: |-
+      missingLocalUrl = (urllibWorkflowRoot / 'missing.json').as_uri()
+      fallbackPayload = {'status': 'fallback', 'items': []}
+      fallbackResult = fetchJsonWithFallback(missingLocalUrl, fallbackPayload)
+
+      assert fallbackResult == fallbackPayload
+      fallbackResult
+  - type: "code"
+    language: "python"
+    title: "URL 생성 규칙 검증"
+    description: "API URL은 https 스킴과 필수 쿼리 파라미터를 만족해야 합니다."
+    content: |-
+      def buildApiUrl(baseUrl, path, params):
+          parsedBase = urllib.parse.urlparse(baseUrl)
+          assert parsedBase.scheme == 'https', 'API URL은 https를 사용해야 합니다'
+          assert parsedBase.netloc, '호스트가 필요합니다'
+          cleanPath = urllib.parse.urljoin(parsedBase.path.rstrip('/') + '/', path.lstrip('/'))
+          query = urllib.parse.urlencode(params)
+          return urllib.parse.urlunparse((parsedBase.scheme, parsedBase.netloc, cleanPath, '', query, ''))
+
+      apiUrl = buildApiUrl('https://api.example.com/v1', 'lessons', {'q': 'json data', 'limit': 10})
+      parsedApiUrl = urllib.parse.urlparse(apiUrl)
+      parsedQuery = urllib.parse.parse_qs(parsedApiUrl.query)
+
+      assert parsedApiUrl.scheme == 'https'
+      assert parsedQuery['q'] == ['json data']
+      apiUrl
+  - type: "code"
+    language: "python"
+    title: "잘못된 스킴을 먼저 실패시킨다"
+    description: "http URL은 검증에서 차단하고 원인을 남깁니다."
+    content: |-
+      try:
+          buildApiUrl('http://api.example.com', 'lessons', {'q': 'test'})
+      except AssertionError as exc:
+          urlPolicyProblem = str(exc)
+
+      assert 'https' in urlPolicyProblem
+      urlPolicyProblem
+  - type: "tip"
+    content: "실무 변주: fallback 데이터를 로컬 파일, 메모리 기본값, 빈 결과 세 가지로 나누고 각 URL 실패 원인별로 어떤 값을 돌려줄지 정책표를 만들어 보세요."
 
 - id: "practice"
   title: "urllib 모듈 종합 복습"
@@ -461,7 +574,7 @@ sections:
           try:
               result = urllib.parse.urlparse(url)
               return bool(result.scheme and result.netloc)
-          except:
+          except ValueError:
               return False
 
       isValid('https://example.com')

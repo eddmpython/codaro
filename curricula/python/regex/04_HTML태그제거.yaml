@@ -27,23 +27,50 @@ sections:
     description: 정규표현식 모듈
     content: |-
       import re
-      import json
-      from urllib.request import urlopen
-
 - id: step2_load
   title: 2단계. 데이터 불러오기
-  subtitle: JSONPlaceholder posts
+  subtitle: 로컬 게시글 샘플
   blocks:
   - type: text
-    content: JSONPlaceholder의 게시글 데이터를 가져와서 HTML 태그를 추가합니다. 실제 웹 크롤링에서 가져온 데이터에는 다양한 HTML 태그가 포함되어 있습니다. LLM에 텍스트를 입력하거나 분석하기 전에 이런 태그들을 제거하는 전처리가 필수적입니다.
+    content: 로컬 게시글 샘플에 HTML 태그를 추가해 크롤링 결과와 비슷한 입력을 만듭니다. 실제 웹 데이터에는 본문, 제목, 작성자 정보와 함께 태그가 섞여 있으므로 LLM 입력이나 분석 전에 태그 제거와 공백 정리가 필요합니다.
   - type: code
     language: python
     title: 게시글 데이터 로드
-    description: posts 데이터를 가져옵니다
+    description: 로컬 게시글 샘플을 준비합니다
     content: |-
-      postsData = json.loads(
-          urlopen("https://jsonplaceholder.typicode.com/posts").read()
-      )
+      postsData = [
+          {
+              "userId": 1,
+              "id": 1,
+              "title": "HTML cleaning checklist",
+              "body": "Remove tags, normalize whitespace, and keep the meaningful text.",
+          },
+          {
+              "userId": 2,
+              "id": 2,
+              "title": "Script tags are not content",
+              "body": "Tracking scripts and inline styles should not reach the analysis step.",
+          },
+          {
+              "userId": 3,
+              "id": 3,
+              "title": "LLM input preparation",
+              "body": "Clean text reduces token waste and keeps prompts focused.",
+          },
+          {
+              "userId": 4,
+              "id": 4,
+              "title": "Crawler output review",
+              "body": "Raw pages often mix navigation, metadata, and article paragraphs.",
+          },
+          {
+              "userId": 5,
+              "id": 5,
+              "title": "Batch preprocessing note",
+              "body": "A reusable function makes hundreds of pages easier to clean.",
+          },
+      ]
+
       postsData[0]['body']
   - type: code
     language: python
@@ -299,22 +326,37 @@ sections:
 
         strip(raw)
   - type: expansion
-    title: "미션2: JSONPlaceholder 게시글 텍스트 추출"
+    title: "미션2: 로컬 게시글 텍스트 추출"
     blocks:
     - type: code
       title: "데이터 로드 및 HTML 생성"
       content: |-
         import re
-        import json
-        from urllib.request import urlopen
 
-        posts = json.loads(
-            urlopen("https://jsonplaceholder.typicode.com/posts").read()
-        )
+        posts = [
+            {
+                "userId": 1,
+                "id": 1,
+                "title": "HTML cleaning checklist",
+                "body": "Remove tags, normalize whitespace, and keep the meaningful text.",
+            },
+            {
+                "userId": 2,
+                "id": 2,
+                "title": "Script tags are not content",
+                "body": "Tracking scripts and inline styles should not reach the analysis step.",
+            },
+            {
+                "userId": 3,
+                "id": 3,
+                "title": "LLM input preparation",
+                "body": "Clean text reduces token waste and keeps prompts focused.",
+            },
+        ]
 
         content = [
             f"<h1>{p['title']}</h1><p>{p['body']}</p>"
-            for p in posts[:3]
+            for p in posts
         ]
         content[0]
     - type: code
@@ -342,3 +384,89 @@ sections:
     - "re.sub() - 패턴 치환"
   - type: text
     content: 다음 프로젝트에서는 로그 파일을 파싱하는 방법을 배웁니다!
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 연락처 텍스트 정제 파이프라인"
+  subtitle: "예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주"
+  blocks:
+  - type: text
+    content: "정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다."
+  - type: code
+    language: python
+    title: "이메일과 전화번호 추출"
+    description: "실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다."
+    content: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+  - type: code
+    language: python
+    title: "패턴 오류와 빈 입력을 먼저 실패시킨다"
+    description: "컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다."
+    content: |-
+      try:
+          re.compile(r'([A-Z]+')
+      except re.error as exc:
+          regexCompileError = str(exc)
+
+      def extractRequiredEmails(text):
+          found = emailPattern.findall(text)
+          if not found:
+              raise ValueError('email not found')
+          return found
+
+      try:
+          extractRequiredEmails('no contact here')
+      except ValueError as exc:
+          emailExtractError = str(exc)
+
+      assert regexCompileError
+      assert emailExtractError == 'email not found'
+      regexCompileError, emailExtractError
+  - type: code
+    language: python
+    title: "정제 결과를 업무 구조로 검증"
+    description: "추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다."
+    content: |-
+      def maskEmail(email):
+          name, domain = email.split('@')
+          return name[0] + '***@' + domain
+
+      contactReport = [
+          {'email': email, 'masked': maskEmail(email), 'domain': email.split('@')[1]}
+          for email in emails
+      ]
+      domainCounts = {row['domain']: 0 for row in contactReport}
+      for row in contactReport:
+          domainCounts[row['domain']] += 1
+
+      assert contactReport[0]['masked'] == 'k***@example.com'
+      assert domainCounts == {'example.com': 1, 'company.co.kr': 1}
+      contactReport
+  - type: code
+    language: python
+    title: "실무 변주: 허용 도메인 정책 바꾸기"
+    description: "회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다."
+    content: |-
+      def filterAllowedDomains(report, allowedDomains):
+          if not allowedDomains:
+              raise ValueError('allowedDomains must not be empty')
+          return [row for row in report if row['domain'] in allowedDomains]
+
+      companyOnly = filterAllowedDomains(contactReport, {'company.co.kr'})
+      assert [row['email'] for row in companyOnly] == ['lee@company.co.kr']
+      companyOnly

@@ -32,6 +32,7 @@ sections:
     description: seaborn과 matplotlib을 불러옵니다
     content: |-
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
 
 - id: step2_data
@@ -45,7 +46,9 @@ sections:
     title: tips 데이터 로드
     description: 레스토랑 팁 데이터를 불러옵니다
     content: |-
-      tips = sns.load_dataset('tips')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tips = loadLocalDataset('tips')
       tips.head()
 
 - id: step3_basic_hist
@@ -256,9 +259,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        data = sns.load_dataset('penguins').dropna()
+        data = loadLocalDataset('penguins').dropna()
     - type: code
       title: "차트 생성"
       content: |-
@@ -283,9 +287,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        df = sns.load_dataset('iris')
+        df = loadLocalDataset('iris')
     - type: code
       title: "히스토그램"
       content: |-
@@ -302,7 +307,8 @@ sections:
       title: "산점도"
       content: |-
         sns.stripplot(data=df, x='species', y='petal_length',
-                     palette='Set2', alpha=0.7, ax=panels[1, 0])
+                     hue='species', palette='Set2', legend=False,
+                     alpha=0.7, ax=panels[1, 0])
         panels[1, 0].set_title('Strip Plot')
 
         sns.scatterplot(data=df, x='petal_length', y='petal_width',
@@ -327,3 +333,78 @@ sections:
     - "dodge=True로 그룹 나란히 배치"
   - type: text
     content: 다음 시간에는 boxplot과 violinplot으로 분포를 비교합니다.
+
+- id: workflow_validation
+  title: 13단계. 팁 분포 분석 검증 루프
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      분포 차트는 평균만 보는 습관을 깨기 위한 도구입니다. 팁 금액이 한쪽으로 치우쳐 있는지 예측하고, 히스토그램이 그 질문을 정확히 보여 주는지 검증합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 분포 예측
+    description: 결제액, 팁, 시간대 컬럼을 확인하고 저녁 팁 평균이 더 높다는 가설을 검증합니다
+    content: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tipsFlow = loadLocalDataset("tips")
+      requiredColumns = {"total_bill", "tip", "time", "day", "size"}
+      missingColumns = requiredColumns - set(tipsFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert tipsFlow["tip"].between(0, tipsFlow["total_bill"]).all()
+
+      timeTipMean = tipsFlow.groupby("time")["tip"].mean()
+      assert timeTipMean["Dinner"] > timeTipMean["Lunch"]
+      timeTipMean.round(2)
+  - type: code
+    language: python
+    title: 분포 차트 검증
+    description: histplot이 팁 축, 빈 막대, KDE 선을 모두 갖는지 확인합니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+      figTipHist, axTipHist = plt.subplots(figsize=(8, 5))
+      sns.histplot(data=tipsFlow, x="tip", hue="time", bins=12, kde=True, ax=axTipHist)
+      axTipHist.set_title("Tip distribution by meal time")
+      axTipHist.set_xlabel("Tip amount")
+
+      assert axTipHist.get_xlabel() == "Tip amount"
+      assert "Tip distribution" in axTipHist.get_title()
+      assert len(axTipHist.patches) > 0
+      assert len(axTipHist.lines) >= 1
+      figTipHist
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 음수 팁이 섞인 입력을 검증 함수가 막는지 확인합니다
+    content: |-
+      def validateTipFrame(frame):
+          if not frame["tip"].ge(0).all():
+              raise ValueError("tip은 0 이상이어야 합니다")
+          assert frame["total_bill"].gt(0).all()
+          return True
+
+      brokenTips = tipsFlow.copy()
+      brokenTips.loc[brokenTips.index[0], "tip"] = -1
+      try:
+          validateTipFrame(brokenTips)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateTipFrame(tipsFlow)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 요일별 팁률을 비교해 다음 분석 축을 고릅니다
+    content: |-
+      tipsVariant = tipsFlow.assign(tipRate=tipsFlow["tip"] / tipsFlow["total_bill"])
+      dayRate = tipsVariant.groupby("day")["tipRate"].mean().sort_values(ascending=False)
+
+      assert dayRate.max() - dayRate.min() > 0.01
+      assert dayRate.index[0] in set(tipsVariant["day"])
+      dayRate.round(3)
+  - type: tip
+    content: "분포 분석은 히스토그램을 그린 뒤 끝내지 말고, 어떤 집단의 분포가 왜 다른지 다음 질문을 뽑아야 합니다."

@@ -3,7 +3,7 @@ meta:
   title: "연산자"
   day: 3
   category: 30days
-  tags: []
+  tags: ["연산자", "산술연산", "비교연산", "논리연산", "멤버십", "검증"]
   seo:
     title: "파이썬 연산자 완벽 가이드"
     description: "산술, 비교, 논리, 멤버십 연산자를 배우고 연산자 우선순위를 이해합니다."
@@ -376,6 +376,106 @@ sections:
       print('with_paren:', grouped)
   - type: tip
     content: "헷갈릴 때는 괄호를 사용하면 명확해집니다."
+
+- id: workflow_validation
+  title: "검증 루프: 주문 계산식과 승인 조건"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: text
+    content: "연산자는 계산 결과를 맞히는 문법 문제가 아니라, 업무 규칙을 숫자와 조건식으로 정확히 옮기는 도구입니다. 실행 전에는 소계, 할인, 세금, 승인 여부를 먼저 예측하고, 괄호 하나가 결과를 어떻게 바꾸는지 검증해야 합니다."
+  - type: code
+    language: python
+    title: "주문 합계 계산을 예상값으로 검증"
+    description: "산술 연산자를 조합해 소계, 할인, 세금, 최종 금액을 계산합니다."
+    content: |-
+      unitPrice = 12000
+      quantity = 4
+      discountRate = 10
+      taxRate = 8
+
+      subtotal = unitPrice * quantity
+      discount = subtotal * discountRate / 100
+      taxableAmount = subtotal - discount
+      tax = taxableAmount * taxRate / 100
+      total = taxableAmount + tax
+
+      assert subtotal == 48000
+      assert discount == 4800
+      assert total == 46656
+      total
+  - type: code
+    language: python
+    title: "잘못된 입력을 먼저 실패시킨다"
+    description: "수량과 단가는 양수여야 한다는 업무 규칙을 계산 전에 확인합니다."
+    content: |-
+      def calculateSubtotal(unitPrice, quantity):
+          if unitPrice <= 0:
+              raise ValueError("unitPrice must be positive")
+          if quantity <= 0:
+              raise ValueError("quantity must be positive")
+          return unitPrice * quantity
+
+      try:
+          calculateSubtotal(12000, 0)
+      except ValueError as exc:
+          operatorInputError = str(exc)
+
+      assert "quantity" in operatorInputError
+      operatorInputError
+  - type: code
+    language: python
+    title: "괄호 누락 오류를 확인한다"
+    description: "연산자 우선순위 때문에 할인 계산이 달라지는 상황을 비교합니다."
+    content: |-
+      wrongTotal = subtotal - discountRate / 100
+      rightTotal = subtotal * (1 - discountRate / 100)
+
+      assert wrongTotal != rightTotal
+      assert rightTotal == 43200
+
+      badShippingRule = subtotal + tax >= 50000
+      correctShippingRule = total >= 50000
+
+      assert badShippingRule is True
+      assert correctShippingRule is False
+      badShippingRule, correctShippingRule
+  - type: code
+    language: python
+    title: "승인 조건을 논리 연산자로 표현"
+    description: "비교 연산자와 and/or/not을 조합해 업무 조건을 만듭니다."
+    content: |-
+      customerAge = 29
+      monthlySpend = 180000
+      hasOverduePayment = False
+      membership = "gold"
+
+      eligibleForCoupon = (
+          customerAge >= 20
+          and monthlySpend >= 100000
+          and not hasOverduePayment
+          and membership in ("gold", "vip")
+      )
+
+      assert eligibleForCoupon is True
+      eligibleForCoupon
+  - type: code
+    language: python
+    title: "실무 변주: 계산 리포트 만들기"
+    description: "계산값과 조건값을 한 딕셔너리에 담아 다음 단계에서 재사용합니다."
+    content: |-
+      orderReport = {
+          "subtotal": subtotal,
+          "discount": discount,
+          "tax": tax,
+          "total": total,
+          "freeShipping": correctShippingRule,
+          "couponEligible": eligibleForCoupon
+      }
+
+      assert orderReport["total"] == 46656
+      assert orderReport["freeShipping"] is False
+      assert orderReport["couponEligible"] is True
+      orderReport
 
 - id: practice
   title: "Day 3 종합 복습"

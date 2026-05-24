@@ -26,7 +26,7 @@ sections:
   subtitle: import
   blocks:
   - type: text
-    content: seaborn의 내장 데이터셋인 tips를 사용합니다. tips 데이터는 레스토랑에서 수집한 팁 정보로, 총 결제금액, 팁, 요일, 시간대, 인원수 등이 포함되어 있습니다. 실제 서비스업 데이터 분석에 자주 사용되는 예제입니다.
+    content: Codaro 로컬 데이터셋인 tips를 사용합니다. tips 데이터는 레스토랑에서 수집한 팁 정보로, 총 결제금액, 팁, 요일, 시간대, 인원수 등이 포함되어 있습니다. 실제 서비스업 데이터 분석에 자주 사용되는 예제입니다.
   - type: code
     language: python
     title: 라이브러리 불러오기
@@ -34,6 +34,7 @@ sections:
     content: |-
       import matplotlib.pyplot as plt
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import pandas as pd
   - type: tip
     content: import matplotlib.pyplot as plt는 matplotlib의 pyplot 모듈을 plt라는 짧은 이름으로 불러오는 관례입니다. seaborn은 sns로, pandas는 pd로 줄여 쓰는 것이 데이터 과학 커뮤니티의 표준입니다.
@@ -63,19 +64,21 @@ sections:
 
 - id: step2_data
   title: 2단계. 데이터 로드
-  subtitle: sns.load_dataset()
+  subtitle: loadLocalDataset()
   blocks:
   - type: text
-    content: seaborn의 load_dataset() 함수로 tips 데이터를 불러옵니다. 이 데이터셋은 244개의 레스토랑 결제 기록을 담고 있으며, 팁 예측 모델이나 고객 분석에 자주 사용됩니다.
+    content: loadLocalDataset() 함수로 tips 데이터를 불러옵니다. 이 데이터셋은 레스토랑 결제 기록을 담고 있으며, 팁 예측 모델이나 고객 분석에 자주 사용됩니다. 인터넷 연결 없이 같은 실습 흐름을 재현할 수 있습니다.
   - type: code
     language: python
     title: tips 데이터 로드
-    description: seaborn 내장 데이터셋을 불러옵니다
+    description: Codaro 로컬 데이터셋을 불러옵니다
     content: |-
-      tips = sns.load_dataset('tips')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tips = loadLocalDataset('tips')
       tips.head()
   - type: tip
-    content: sns.load_dataset('데이터셋명')은 seaborn에 내장된 예제 데이터를 불러옵니다. 'tips', 'iris', 'penguins', 'titanic' 등 다양한 데이터셋이 있습니다. 인터넷 연결이 필요하지만 한 번 다운로드하면 캐시됩니다.
+    content: loadLocalDataset('tips')처럼 Codaro가 함께 제공하는 로컬 예제 데이터를 불러옵니다. 'tips', 'iris', 'penguins', 'titanic' 등 다양한 데이터셋을 인터넷 연결 없이 바로 재현할 수 있습니다.
 
 - id: step3_explore
   title: 3단계. 데이터 탐색
@@ -277,8 +280,9 @@ sections:
       content: |-
         import matplotlib.pyplot as plt
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
 
-        tips2 = sns.load_dataset('tips')
+        tips2 = loadLocalDataset('tips')
     - type: code
       title: "차트 생성"
       content: |-
@@ -308,8 +312,9 @@ sections:
       content: |-
         import matplotlib.pyplot as plt
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
 
-        tips3 = sns.load_dataset('tips')
+        tips3 = loadLocalDataset('tips')
         lunch = tips3[tips3['time'] == 'Lunch']['total_bill']
         dinner = tips3[tips3['time'] == 'Dinner']['total_bill']
     - type: code
@@ -358,3 +363,93 @@ sections:
     - "plt.suptitle() - 전체 Figure의 제목"
   - type: text
     content: 다음 시간에는 붓꽃 데이터로 산점도와 마커 스타일을 배웁니다.
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 보고서 차트 품질 게이트
+  blocks:
+  - type: text
+    content: "Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다."
+  - type: code
+    language: python
+    title: 보고서 데이터 검증
+    description: 필수 컬럼과 금액 범위를 확인합니다.
+    content: |-
+      import pandas as pd
+      import matplotlib.pyplot as plt
+
+      reportData = pd.DataFrame({
+          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          "revenue": [82, 91, 105, 112, 121, 130],
+          "cost": [55, 58, 62, 64, 68, 72],
+          "target": [100, 100, 100, 100, 100, 100],
+      })
+
+      def validateChartFrame(frame: pd.DataFrame) -> bool:
+          requiredColumns = {"month", "revenue", "cost", "target"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame[["revenue", "cost", "target"]].lt(0).any().any():
+              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+          return True
+
+      validateChartFrame(reportData)
+      reportData
+  - type: code
+    language: python
+    title: 실패 입력 확인
+    description: 목표선 컬럼이 빠진 데이터를 검증 함수가 거부하는지 확인합니다.
+    content: |-
+      try:
+          validateChartFrame(reportData.drop(columns=["target"]))
+      except ValueError as exc:
+          chartValidationMessage = str(exc)
+
+      assert "필수 컬럼" in chartValidationMessage
+      chartValidationMessage
+  - type: code
+    language: python
+    title: 예측 후 차트 구성
+    description: 4개월이 목표를 넘을 것이라고 예측하고 선 차트로 확인합니다.
+    content: |-
+      # 예측: 3월부터 6월까지 4개월은 매출이 목표선을 넘습니다.
+      figReport, axReport = plt.subplots(figsize=(8, 4))
+      axReport.plot(reportData["month"], reportData["revenue"], marker="o", label="Revenue")
+      axReport.plot(reportData["month"], reportData["cost"], marker="o", label="Cost")
+      axReport.axhline(100, color="gray", linestyle="--", label="Target")
+      axReport.set_title("Monthly Revenue vs Cost")
+      axReport.set_xlabel("Month")
+      axReport.set_ylabel("Amount")
+      axReport.legend()
+
+      monthsAboveTarget = int((reportData["revenue"] >= reportData["target"]).sum())
+      figReport
+  - type: code
+    language: python
+    title: 차트 품질 검증
+    description: 보고서에 필요한 구성 요소와 수치 메시지를 assert로 확인합니다.
+    content: |-
+      chartChecks = {
+          "has_three_lines": len(axReport.lines) == 3,
+          "has_title": axReport.get_title() == "Monthly Revenue vs Cost",
+          "has_axis_labels": axReport.get_xlabel() == "Month" and axReport.get_ylabel() == "Amount",
+          "target_reached_for_four_months": monthsAboveTarget == 4,
+          "legend_is_present": axReport.get_legend() is not None,
+      }
+
+      assert all(chartChecks.values()), chartChecks
+      chartChecks
+  - type: expansion
+    title: "실무 변주: 목표선을 올리면 달성 개월 수가 어떻게 줄어들까?"
+    blocks:
+    - type: code
+      language: python
+      title: 목표선 민감도 분석
+      content: |-
+        targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
+            monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
+        )
+
+        assert targetScenario["monthsPassed"].is_monotonic_decreasing
+        targetScenario

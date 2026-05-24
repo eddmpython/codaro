@@ -3,7 +3,7 @@ meta:
   title: "클래스 고급"
   day: 23
   category: "30days"
-  tags: []
+  tags: ["상속", "오버라이딩", "super", "다형성", "객체설계", "검증"]
   seo:
     title: "파이썬 클래스 고급 - 상속과 다형성"
     description: "상속, super(), 메서드 오버라이딩, 다중 상속을 배웁니다."
@@ -419,6 +419,80 @@ sections:
       junior.bonus(), senior.bonus()
   - type: "tip"
     content: "상속은 비슷하지만 약간 다른 클래스들을 효율적으로 관리하는 도구입니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 알림 채널을 다형성으로 처리하기"
+  blocks:
+  - type: "text"
+    content: "상속은 공통 규칙을 부모에 두고, 달라지는 부분만 자식 클래스에서 바꿀 때 효과가 있습니다. 아래 예시는 이메일과 문자 알림을 같은 방식으로 처리합니다."
+  - type: "code"
+    language: "python"
+    title: "알림 채널 다형성"
+    code: |
+      class Notification:
+          def __init__(self, recipient):
+              if not recipient:
+                  raise ValueError("recipient is required")
+              self.recipient = recipient
+
+          def send(self, message):
+              if not message.strip():
+                  raise ValueError("message is required")
+              return {
+                  "channel": "base",
+                  "recipient": self.recipient,
+                  "message": message,
+              }
+
+      class EmailNotification(Notification):
+          def __init__(self, recipient):
+              if "@" not in recipient:
+                  raise ValueError("email recipient must contain @")
+              super().__init__(recipient)
+
+          def send(self, message):
+              payload = super().send(message)
+              payload["channel"] = "email"
+              payload["subject"] = "system notice"
+              return payload
+
+      class SmsNotification(Notification):
+          def __init__(self, recipient):
+              if not recipient.isdigit():
+                  raise ValueError("sms recipient must contain digits only")
+              super().__init__(recipient)
+
+          def send(self, message):
+              payload = super().send(message)
+              payload["channel"] = "sms"
+              payload["message"] = message[:40]
+              return payload
+
+      senders = [
+          EmailNotification("team@example.com"),
+          SmsNotification("01012345678"),
+      ]
+
+      results = []
+      for sender in senders:
+          results.append(sender.send("배포가 완료되었습니다"))
+
+      assert [item["channel"] for item in results] == ["email", "sms"]
+      assert results[0]["subject"] == "system notice"
+      assert results[1]["message"] == "배포가 완료되었습니다"
+
+      try:
+          EmailNotification("team.example.com")
+      except ValueError as exc:
+          assert "email" in str(exc)
+
+      print("알림 다형성 흐름 통과")
+  - type: "list"
+    items:
+    - "부모 클래스는 공통 검증과 공통 반환 구조를 책임집니다."
+    - "자식 클래스는 채널별 입력 검증과 추가 필드만 책임집니다."
+    - "호출하는 쪽은 구체 클래스 이름을 몰라도 send()만 호출하면 됩니다."
+    - "실무 변주: SlackNotification 클래스를 추가하고, 같은 senders 리스트에서 이메일·문자·슬랙 결과가 같은 구조로 나오는지 검증해 보세요."
 
 - id: "practice"
   title: "Day 23 종합 복습"

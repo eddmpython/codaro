@@ -1,5 +1,8 @@
 meta:
+  id: "28_copy"
   title: "copy - 객체 복사"
+  category: "builtins"
+  tags: ["copy", "복사", "deepcopy", "shallow", "clone"]
   description: "얕은 복사와 깊은 복사를 위한 copy 모듈"
   keywords: ["copy", "복사", "deepcopy", "shallow", "clone"]
 
@@ -124,12 +127,12 @@ sections:
     content: |-
       import copy
 
-      complex = {'users': ['Alice', 'Bob'], 'scores': [100, 200]}
-      fullCopy = copy.deepcopy(complex)
+      complexData = {'users': ['Alice', 'Bob'], 'scores': [100, 200]}
+      fullCopy = copy.deepcopy(complexData)
 
       fullCopy['users'].append('Charlie')
 
-      complex, fullCopy
+      complexData, fullCopy
   - type: "code"
     language: "python"
     title: "다층 중첩 구조"
@@ -393,6 +396,106 @@ sections:
       rawData, processedData
   - type: "tip"
     content: "원본 데이터를 보존해야 할 때는 항상 복사본을 만들어 작업하세요. 특히 설정, 상태, 데이터 변환에서 중요합니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 원본을 지키는 복사 전략"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "copy를 배울 때 핵심은 copy()와 deepcopy() 이름을 외우는 것이 아니라, 원본 데이터가 언제 오염되는지 먼저 예측하고 검증으로 막는 것입니다. 설정, 작업 큐, 데이터 전처리처럼 원본 보존이 중요한 흐름에서는 독립성 검사가 함께 있어야 합니다."
+  - type: "code"
+    language: "python"
+    title: "얕은 복사 위험을 먼저 재현한다"
+    description: "최상위 객체만 복사하면 내부 리스트는 공유된다는 사실을 assert로 확인합니다."
+    content: |-
+      import copy
+
+      baseJob = {
+          'name': 'daily-sales-report',
+          'owner': 'analytics',
+          'retry': {'max': 2, 'delaySeconds': 30},
+          'steps': ['extract', 'validate', 'publish']
+      }
+
+      shallowJob = copy.copy(baseJob)
+      shallowJob['steps'].append('notify')
+
+      leakedToOriginal = 'notify' in baseJob['steps']
+
+      assert shallowJob is not baseJob
+      assert shallowJob['steps'] is baseJob['steps']
+      assert leakedToOriginal is True
+      {'risk': 'nested list is shared', 'leakedToOriginal': leakedToOriginal}
+  - type: "code"
+    language: "python"
+    title: "업무 설정은 깊은 복사 후 수정한다"
+    description: "템플릿을 보존하면서 실행별 설정을 안전하게 만듭니다."
+    content: |-
+      def buildJobConfig(template, *, owner, schedule, retries):
+          config = copy.deepcopy(template)
+          config['owner'] = owner
+          config['schedule'] = schedule
+          config['retry']['max'] = retries
+
+          assert config is not template
+          assert config['retry'] is not template['retry']
+          assert config['steps'] is not template['steps']
+          assert isinstance(config['retry']['max'], int) and config['retry']['max'] >= 0
+          return config
+
+      nightlyJob = buildJobConfig(
+          baseJob,
+          owner='data-platform',
+          schedule='0 2 * * *',
+          retries=4
+      )
+
+      assert baseJob['owner'] == 'analytics'
+      assert baseJob['retry']['max'] == 2
+      assert nightlyJob['owner'] == 'data-platform'
+      nightlyJob
+  - type: "code"
+    language: "python"
+    title: "잘못된 복사 방식을 검증에서 잡는다"
+    description: "내부 가변 객체가 공유되면 배포 전에 실패하게 만듭니다."
+    content: |-
+      def assertIndependentJob(template, candidate):
+          assert candidate is not template, '최상위 객체가 같습니다'
+          assert candidate['retry'] is not template['retry'], 'retry 설정이 공유됩니다'
+          assert candidate['steps'] is not template['steps'], 'steps 목록이 공유됩니다'
+
+      unsafeJob = copy.copy(baseJob)
+
+      try:
+          assertIndependentJob(baseJob, unsafeJob)
+      except AssertionError as exc:
+          copyProblem = str(exc)
+
+      assert '공유' in copyProblem
+      copyProblem
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 원본 보존 전처리"
+    description: "입력 행을 훼손하지 않고 계산 컬럼을 붙입니다."
+    content: |-
+      rawRows = [
+          {'id': 1, 'scores': [82, 90, 88]},
+          {'id': 2, 'scores': [71, 77, 80]}
+      ]
+
+      def enrichRows(rows):
+          result = copy.deepcopy(rows)
+          for row in result:
+              row['total'] = sum(row['scores'])
+              row['passed'] = min(row['scores']) >= 70
+          return result
+
+      enrichedRows = enrichRows(rawRows)
+
+      assert 'total' not in rawRows[0]
+      assert enrichedRows[0]['total'] == 260
+      assert enrichedRows[1]['passed'] is True
+      enrichedRows
 
 - id: "practice"
   title: "종합 복습"

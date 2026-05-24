@@ -6,7 +6,7 @@
 2. **SQL 표준**: 50년 역사의 표준 언어, 모든 DB에서 통용
 3. **OLAP 특화**: 분석 쿼리에 최적화된 컬럼 기반 엔진
 4. **pandas 연동**: `duckdb.from_df()`로 DataFrame을 바로 쿼리
-5. **제로 설정**: `uv pip install duckdb` 한 줄로 설치 완료
+5. **제로 설정**: `uv run --with duckdb`로 별도 환경 공사 없이 실행
 6. **무료 오픈소스**: MIT 라이선스, 상업적 사용 가능
 
 ## Codaro 로컬 Python 환경 고려사항

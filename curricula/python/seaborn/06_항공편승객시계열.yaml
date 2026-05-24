@@ -33,10 +33,11 @@ sections:
     description: seaborn과 matplotlib을 불러옵니다
     content: |-
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
       import pandas as pd
 
-      flights = sns.load_dataset('flights')
+      flights = loadLocalDataset('flights')
       flights
 
 - id: step2_lineplot
@@ -175,7 +176,7 @@ sections:
     content: |-
       yearlyPassengers = flights.groupby('year')['passengers'].sum().reset_index()
       figBar, axBar = plt.subplots(figsize=(10, 5))
-      sns.barplot(data=yearlyPassengers, x='year', y='passengers', palette='Blues_d', ax=axBar)
+      sns.barplot(data=yearlyPassengers, x='year', y='passengers', hue='year', palette='Blues_d', legend=False, ax=axBar)
       axBar.set_title('Total Passengers by Year')
       figBar
 
@@ -191,7 +192,7 @@ sections:
     description: 월별 평균 승객 수로 계절성을 확인합니다
     content: |-
       figMonthly, axMonthly = plt.subplots(figsize=(10, 5))
-      sns.barplot(data=flights, x='month', y='passengers', palette='coolwarm', ax=axMonthly)
+      sns.barplot(data=flights, x='month', y='passengers', hue='month', palette='coolwarm', legend=False, ax=axMonthly)
       axMonthly.set_title('Average Passengers by Month')
       axMonthly.tick_params(axis='x', rotation=45)
       figMonthly
@@ -217,6 +218,84 @@ sections:
   - type: tip
     content: 상관계수 히트맵은 변수 간 관계를 한눈에 보여줍니다. 인접한 달끼리 높은 상관관계(1에 가까움)를 보이고, 6개월 차이 나는 달은 낮은 상관관계를 보입니다.
 
+- id: workflow_validation
+  title: 12단계. 항공편 시계열 검증 루프
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      시계열 히트맵은 계절성과 장기 추세를 동시에 보여 줍니다. 월과 연도가 빠짐없이 있는지 먼저 확인하고, 피크 시즌과 성장 흐름을 검증합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 추세 예측
+    description: 12개월 x 12년 구조와 승객 수 증가 흐름을 확인합니다
+    content: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      flightFlow = loadLocalDataset("flights")
+      requiredColumns = {"year", "month", "passengers"}
+      missingColumns = requiredColumns - set(flightFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert flightFlow["month"].nunique() == 12
+      assert flightFlow["year"].nunique() == 12
+
+      firstYearTotal = flightFlow.loc[flightFlow["year"] == flightFlow["year"].min(), "passengers"].sum()
+      lastYearTotal = flightFlow.loc[flightFlow["year"] == flightFlow["year"].max(), "passengers"].sum()
+      assert lastYearTotal > firstYearTotal
+      (firstYearTotal, lastYearTotal)
+  - type: code
+    language: python
+    title: 히트맵 검증
+    description: pivot 결과와 heatmap 축 라벨이 일치하는지 확인합니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+      flightPivotFlow = flightFlow.pivot(index="month", columns="year", values="passengers")
+      figFlightHeat, axFlightHeat = plt.subplots(figsize=(10, 6))
+      sns.heatmap(flightPivotFlow, cmap="YlOrRd", ax=axFlightHeat)
+      axFlightHeat.set_title("Flight passengers heatmap")
+
+      assert flightPivotFlow.shape == (12, 12)
+      assert "Flight passengers" in axFlightHeat.get_title()
+      assert len(axFlightHeat.collections) >= 1
+      figFlightHeat
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 월-연도 조합이 중복되면 pivot 전에 실패시킵니다
+    content: |-
+      def validateFlightKeys(frame):
+          duplicatedCount = frame.duplicated(["year", "month"]).sum()
+          if duplicatedCount:
+              raise ValueError(f"중복된 월별 행이 있습니다: {duplicatedCount}")
+          assert frame["passengers"].gt(0).all()
+          return True
+
+      brokenFlights = flightFlow.copy()
+      brokenFlights.loc[len(brokenFlights)] = brokenFlights.iloc[0]
+      try:
+          validateFlightKeys(brokenFlights)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateFlightKeys(flightFlow)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 여름 성수기와 겨울 비수기의 성장 폭을 비교합니다
+    content: |-
+      seasonFlow = flightFlow.assign(season=flightFlow["month"].map(lambda month: "summer" if month in {"Jun", "Jul", "Aug"} else "other"))
+      seasonYear = seasonFlow.groupby(["year", "season"])["passengers"].mean().unstack()
+      seasonGrowth = seasonYear.iloc[-1] - seasonYear.iloc[0]
+
+      assert seasonGrowth["summer"] > 0
+      assert seasonYear["summer"].mean() > seasonYear["other"].mean()
+      seasonGrowth.round(1).to_dict()
+  - type: tip
+    content: "시계열 차트는 축이 맞아도 데이터 키가 중복되면 틀어집니다. pivot 전 키 검증을 습관으로 가져가세요."
+
 - id: practice
   title: 실습
   subtitle: 시계열 시각화
@@ -232,9 +311,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        data = sns.load_dataset('tips')
+        data = loadLocalDataset('tips')
         matrix = data.pivot_table(index='day', columns='time', values='total_bill', aggfunc='mean')
     - type: code
       title: "차트 생성"
@@ -250,9 +330,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        df = sns.load_dataset('exercise')
+        df = loadLocalDataset('exercise')
     - type: code
       title: "차트 생성"
       content: |-

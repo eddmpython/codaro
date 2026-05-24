@@ -3,7 +3,7 @@ meta:
   title: "딕셔너리메서드"
   day: 12
   category: "30days"
-  tags: []
+  tags: ["딕셔너리", "get", "update", "items", "설정병합", "검증"]
   seo:
     title: "파이썬 딕셔너리 메서드 - 효율적인 데이터 관리"
     description: "get, keys, values, items, update, pop, popitem, clear 메서드를 배웁니다."
@@ -378,6 +378,79 @@ sections:
       setting
   - type: "tip"
     content: "상황에 맞는 메서드를 선택하면 코드가 간결해집니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 기본 설정과 사용자 설정 병합하기"
+  subtitle: "get, update, pop, items로 안전한 설정 레코드 만들기"
+  blocks:
+  - type: "text"
+    content: "딕셔너리 메서드는 설정, 요청 파라미터, 사용자 입력처럼 일부 값이 빠질 수 있는 데이터를 다룰 때 강합니다. 기본값을 안전하게 읽고, 사용자 설정으로 덮어쓰고, 내부 전용 키를 제거한 뒤 검증하는 흐름을 익혀야 합니다."
+  - type: "list"
+    items:
+    - "예측: 기본 설정 위에 사용자 설정이 덮어쓴다고 정한다."
+    - "실행: update로 병합하고 get으로 기본값을 읽는다."
+    - "오류 수정: pop 기본값 없이 없는 키를 제거할 때 KeyError를 확인한다."
+    - "검증: 공개 설정, 필수 키, 값 목록을 assert로 확인한다."
+  - type: "code"
+    language: "python"
+    title: "설정 병합과 기본값"
+    description: "기본 설정과 사용자 설정을 병합하고 누락된 값은 get 기본값으로 처리합니다."
+    content: |-
+      defaultConfig = {'timeout': 30, 'retries': 3, 'debug': False}
+      userConfig = {'timeout': 60, 'region': 'kr'}
+      finalConfig = {}
+      finalConfig.update(defaultConfig)
+      finalConfig.update(userConfig)
+
+      timeout = finalConfig.get('timeout', 10)
+      retries = finalConfig.get('retries', 1)
+      locale = finalConfig.get('locale', 'ko-KR')
+
+      assert timeout == 60
+      assert retries == 3
+      assert locale == 'ko-KR'
+      assert finalConfig['region'] == 'kr'
+  - type: "code"
+    language: "python"
+    title: "내부 키 제거와 실패 확인"
+    description: "pop으로 내부 전용 키를 제거하고, 없는 키 제거 실패를 확인합니다."
+    content: |-
+      payload = {'name': '김고객', 'email': 'kim@example.com', '_token': 'secret'}
+      removedToken = payload.pop('_token')
+
+      try:
+          payload.pop('_missing')
+      except KeyError as exc:
+          missingKey = exc.args[0]
+      else:
+          raise AssertionError('기본값 없는 pop은 없는 키에서 실패해야 합니다')
+
+      assert removedToken == 'secret'
+      assert '_token' not in payload
+      assert missingKey == '_missing'
+  - type: "code"
+    language: "python"
+    title: "items로 공개 필드 검증"
+    description: "items()를 사용해 공개 가능한 필드만 남았는지 확인합니다."
+    content: |-
+      profile = {'name': '김고객', 'email': 'kim@example.com'}
+      publicPairs = list(profile.items())
+      publicKeys = list(profile.keys())
+      publicValues = list(profile.values())
+
+      assert ('name', '김고객') in publicPairs
+      assert publicKeys == ['name', 'email']
+      assert 'kim@example.com' in publicValues
+  - type: "expansion"
+    title: "실무 변주: 로그 카운터 초기화"
+    code: |-
+      counters = {}
+      counters.setdefault('success', 0)
+      counters.setdefault('failed', 0)
+      counters['success'] = counters['success'] + 1
+
+      assert counters == {'success': 1, 'failed': 0}
+      counters
 
 - id: "practice"
   title: "Day 12 종합 복습"

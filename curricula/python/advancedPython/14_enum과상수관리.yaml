@@ -3,7 +3,7 @@ meta:
   title: "enum과 상수 관리"
   day: 14
   category: "advancedPython"
-  tags: ["Enum", "IntEnum", "Flag", "auto", "StrEnum"]
+  tags: ["Enum", "IntEnum", "Flag", "auto", "StrEnum", "검증", "상태모델"]
   seo:
     title: "파이썬 Enum 완벽 가이드 - 열거형과 상수 관리"
     description: "Enum으로 명명된 상수를 관리합니다. IntEnum, StrEnum, Flag, auto() 완벽 이해."
@@ -384,6 +384,93 @@ sections:
   - type: "tip"
     content: "Enum은 딕셔너리 키로 사용할 수 있어 상태별 처리 함수 매핑에 유용합니다."
 
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 상태 머신과 권한 플래그"
+  subtitle: "StrEnum, IntEnum, Flag로 문자열 상수와 매직 넘버를 제거합니다"
+  blocks:
+  - type: "text"
+    content: "Enum은 값 목록을 예쁘게 묶는 수준에서 끝나면 약합니다. 주문 상태 전이, 경고 심각도, 권한 조합처럼 실수 비용이 큰 규칙을 Enum으로 모델링하고 잘못된 값이 어디서 차단되는지 검증하세요."
+  - type: "code"
+    language: "python"
+    title: "상태 전이와 권한 조합 검증"
+    description: "상태 변경 규칙과 권한 비트를 코드로 고정하고 assert로 확인합니다."
+    content: |-
+      from enum import Flag, IntEnum, StrEnum, auto
+
+      class OrderStatus(StrEnum):
+          DRAFT = "draft"
+          PAID = "paid"
+          SHIPPED = "shipped"
+          CANCELLED = "cancelled"
+
+      class Severity(IntEnum):
+          INFO = 1
+          WARNING = 2
+          CRITICAL = 3
+
+      class Permission(Flag):
+          READ = auto()
+          WRITE = auto()
+          REFUND = auto()
+
+      allowedTransitions = {
+          OrderStatus.DRAFT: {OrderStatus.PAID, OrderStatus.CANCELLED},
+          OrderStatus.PAID: {OrderStatus.SHIPPED, OrderStatus.CANCELLED},
+          OrderStatus.SHIPPED: set(),
+          OrderStatus.CANCELLED: set(),
+      }
+
+      def transition(current: OrderStatus, nextStatus: OrderStatus) -> OrderStatus:
+          if nextStatus not in allowedTransitions[current]:
+              raise ValueError(f"cannot move {current.value} to {nextStatus.value}")
+          return nextStatus
+
+      operatorPermission = Permission.READ | Permission.WRITE
+
+      assert transition(OrderStatus.DRAFT, OrderStatus.PAID) is OrderStatus.PAID
+      assert Severity.CRITICAL > Severity.WARNING
+      assert operatorPermission & Permission.WRITE
+      assert not operatorPermission & Permission.REFUND
+      assert OrderStatus("paid") is OrderStatus.PAID
+  - type: "code"
+    language: "python"
+    title: "잘못된 상태값과 전이 막기"
+    description: "문자열 오타와 금지된 상태 전이를 각각 ValueError로 확인합니다."
+    content: |-
+      from enum import StrEnum
+
+      class OrderStatus(StrEnum):
+          DRAFT = "draft"
+          PAID = "paid"
+          SHIPPED = "shipped"
+
+      allowedTransitions = {
+          OrderStatus.DRAFT: {OrderStatus.PAID},
+          OrderStatus.PAID: {OrderStatus.SHIPPED},
+          OrderStatus.SHIPPED: set(),
+      }
+
+      def transition(current: OrderStatus, nextStatus: OrderStatus) -> OrderStatus:
+          if nextStatus not in allowedTransitions[current]:
+              raise ValueError(f"cannot move {current.value} to {nextStatus.value}")
+          return nextStatus
+
+      try:
+          OrderStatus("shiped")
+      except ValueError as exc:
+          typoMessage = str(exc)
+
+      try:
+          transition(OrderStatus.SHIPPED, OrderStatus.PAID)
+      except ValueError as exc:
+          transitionMessage = str(exc)
+
+      assert "shiped" in typoMessage
+      assert transitionMessage == "cannot move shipped to paid"
+  - type: "tip"
+    title: "변주 실험"
+    content: "`REFUND_REQUESTED` 상태와 `Permission.REFUND` 권한을 연결하고, 권한이 없는 사용자는 환불 전이를 실행할 수 없도록 함수를 확장하세요."
+
 - id: "practice"
   title: "종합 복습"
   subtitle: "Enum 마스터하기"
@@ -413,7 +500,7 @@ sections:
           GREEN = "#00FF00"
           BLUE = "#0000FF"
 
-      Color['RED'], Color('0000FF')
+      Color['RED'], Color('#0000FF')
 
   - type: "expansion"
     title: "🟢 기본3: 반복"

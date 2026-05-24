@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - duckdb
   id: duckdb_00
   title: DuckDB소개
   order: 0
@@ -73,7 +75,7 @@ sections:
           description: "pandas보다 10~100배 빠른 분석 쿼리 처리"
         - emoji: "📦"
           title: "설치가 간단"
-          description: "uv pip install duckdb 한 줄이면 끝"
+          description: "uv run --with duckdb로 바로 실행"
         - emoji: "🌐"
           title: "로컬 실행"
           description: "로컬 Python 패키지로 바로 동작"
@@ -276,3 +278,108 @@ sections:
       emoji: "👉"
       title: "다음: 기본 SQL 쿼리"
       subtitle: "SELECT, WHERE로 데이터를 조회해봅니다"
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트"
+  subtitle: "예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주"
+  blocks:
+  - type: "text"
+    content: "DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로 고정합니다."
+  - type: "code"
+    language: "python"
+    title: "로컬 주문 테이블 준비와 예측"
+    description: "네트워크나 외부 DB 없이 인메모리 DuckDB 테이블로 재현 가능한 분석 흐름을 만듭니다."
+    content: |-
+      import duckdb
+
+      workflowCon = duckdb.connect()
+      workflowCon.sql("""
+          CREATE OR REPLACE TABLE lessonOrders AS
+          SELECT * FROM (VALUES
+              ('A-100', 'paid', 50000, 'web'),
+              ('A-101', 'pending', 20000, 'app'),
+              ('A-102', 'paid', 120000, 'web'),
+              ('A-103', 'cancelled', 15000, 'store'),
+              ('A-104', 'paid', 62000, 'app')
+          ) AS t(orderId, status, amount, channel)
+      """)
+
+      expectedPaidRevenue = 232000
+      expectedPaidCount = 3
+      rowCount = workflowCon.sql("SELECT COUNT(*) FROM lessonOrders").fetchone()[0]
+
+      assert rowCount == 5
+      rowCount
+  - type: "code"
+    language: "python"
+    title: "SQL 오류를 먼저 확인한다"
+    description: "없는 컬럼을 조회해 BinderException을 확인하고, 컬럼명을 고쳐 다시 실행합니다."
+    content: |-
+      try:
+          workflowCon.sql("SELECT missingAmount FROM lessonOrders").fetchall()
+      except duckdb.BinderException as exc:
+          duckdbColumnError = str(exc).splitlines()[0]
+      else:
+          raise AssertionError("없는 컬럼 조회는 실패해야 합니다")
+
+      fixedAmounts = workflowCon.sql("""
+          SELECT orderId, amount
+          FROM lessonOrders
+          WHERE status = 'paid'
+          ORDER BY amount DESC
+      """).fetchall()
+
+      assert "missingAmount" in duckdbColumnError
+      assert fixedAmounts[0] == ('A-102', 120000)
+      duckdbColumnError
+  - type: "code"
+    language: "python"
+    title: "집계 결과를 업무 규칙으로 검증"
+    description: "상태별 매출 집계가 예상한 paid 건수와 금액을 만족하는지 확인합니다."
+    content: |-
+      def validateRevenueReport(rows):
+          if not rows:
+              raise ValueError("report must not be empty")
+
+          revenueByStatus = {status: revenue for status, count, revenue in rows}
+          countByStatus = {status: count for status, count, revenue in rows}
+          if revenueByStatus.get('paid') != expectedPaidRevenue:
+              raise ValueError("paid revenue mismatch")
+          if countByStatus.get('paid') != expectedPaidCount:
+              raise ValueError("paid count mismatch")
+          return True
+
+      revenueReport = workflowCon.sql("""
+          SELECT
+              status,
+              COUNT(*) AS orderCount,
+              SUM(amount) AS revenue
+          FROM lessonOrders
+          GROUP BY status
+          ORDER BY status
+      """).fetchall()
+
+      assert validateRevenueReport(revenueReport)
+      assert dict((status, count) for status, count, revenue in revenueReport)['paid'] == 3
+      revenueReport
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 기준 금액을 바꿔 대상 추출"
+    description: "고액 결제 기준을 바꾸며 대상 주문이 어떻게 달라지는지 비교합니다."
+    content: |-
+      def findHighValuePaidOrders(minAmount):
+          if minAmount <= 0:
+              raise ValueError("minAmount must be positive")
+          return workflowCon.sql(f"""
+              SELECT orderId, amount
+              FROM lessonOrders
+              WHERE status = 'paid' AND amount >= {minAmount}
+              ORDER BY amount DESC
+          """).fetchall()
+
+      highValue60000 = findHighValuePaidOrders(60000)
+      highValue100000 = findHighValuePaidOrders(100000)
+
+      assert [row[0] for row in highValue60000] == ['A-102', 'A-104']
+      assert [row[0] for row in highValue100000] == ['A-102']
+      highValue60000, highValue100000

@@ -8,7 +8,7 @@ meta:
   category: numpy
   difficulty: "⭐⭐⭐"
   badge: 중급
-  tags: ["numpy", "concatenate", "vstack", "any", "all", "sort", "argsort", "cumsum"]
+  tags: ["numpy", "concatenate", "vstack", "any", "all", "sort", "argsort", "cumsum", "검증", "위험점수"]
   seo:
     title: "NumPy 배열 결합과 정렬 - 심장병 위험 분석"
     description: "NumPy의 배열 결합과 정렬을 배우며 심장병 위험 요인 데이터를 분석합니다."
@@ -43,10 +43,11 @@ sections:
   - type: code
     language: python
     title: 심장병 데이터 로드
-    description: GitHub에서 심장병 데이터를 불러옵니다
+    description: Codaro 로컬 데이터셋에서 심장병 데이터를 불러옵니다
     content: |-
-      url = "https://raw.githubusercontent.com"
-      df = pd.read_csv(f"{url}/sharmaroshan/Heart-UCI-Dataset/master/heart.csv")
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("heart")
       df.head()
 
 - id: step3_columns
@@ -280,6 +281,54 @@ sections:
           rows.append([r, np.sum(mask), round(rate * 100, 1)])
       pd.DataFrame(rows, columns=['RiskScore', 'Count', 'DiseaseRate(%)'])
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 심장병 위험 점수 배치 계산"
+  subtitle: "조건 배열, 정렬, cumsum, 실패 케이스"
+  blocks:
+  - type: text
+    content: "위험 점수는 조건을 많이 더하는 만큼 기준을 잘못 잡기 쉽습니다. 각 조건 배열을 분리해 예측하고, 정렬 후 누적 환자 수가 의도대로 계산되는지 검증하세요."
+  - type: code
+    language: python
+    title: "위험 점수와 누적 환자 수"
+    description: "불리언 조건을 정수로 바꾸고 나이순 누적을 확인합니다."
+    content: |-
+      import numpy as np
+
+      age = np.array([45, 62, 58, 39])
+      chol = np.array([180, 230, 205, 190])
+      bp = np.array([120, 145, 135, 118])
+      disease = np.array([0, 1, 1, 0])
+
+      riskScore = (chol > 200).astype(int) + (bp > 130).astype(int) + (age > 55).astype(int)
+      order = np.argsort(age)
+      cumulativeDisease = np.cumsum(disease[order])
+
+      assert riskScore.tolist() == [0, 3, 3, 0]
+      assert age[order].tolist() == [39, 45, 58, 62]
+      assert cumulativeDisease.tolist() == [0, 0, 1, 2]
+  - type: code
+    language: python
+    title: "입력 길이 오류 확인"
+    description: "특성 배열과 정답 배열 길이가 다르면 분석 전에 멈춥니다."
+    content: |-
+      import numpy as np
+
+      def validateSameLength(*arrays):
+          lengths = {len(array) for array in arrays}
+          if len(lengths) != 1:
+              raise ValueError("all arrays must have the same length")
+          return [np.asarray(array) for array in arrays]
+
+      try:
+          validateSameLength([1, 2], [1])
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "all arrays must have the same length"
+  - type: tip
+    title: "변주 실험"
+    content: "나이 기준을 55세에서 60세로 바꾸면 위험 점수 분포와 누적 환자 수 해석이 어떻게 달라지는지 비교하세요."
+
 - id: practice
   title: 실습
   subtitle: 심장병 위험 분석
@@ -297,8 +346,19 @@ sections:
         import numpy as np
         import pandas as pd
 
-        url = "https://raw.githubusercontent.com"
-        data = pd.read_csv(f"{url}/sharmaroshan/Heart-UCI-Dataset/master/heart.csv")
+        heartIdx = np.arange(303)
+        data = pd.DataFrame({
+            'age': 35 + (heartIdx * 3) % 38,
+            'trestbps': 112 + (heartIdx * 5) % 48,
+            'chol': 165 + (heartIdx * 7) % 155,
+            'thalach': 178 - (heartIdx * 4) % 58,
+        })
+        data['target'] = (
+            (data['chol'] > 225).astype(int)
+            + (data['trestbps'] > 135).astype(int)
+            + (data['age'] > 56).astype(int)
+            >= 2
+        ).astype(int)
         age = data['age'].values
         hr = data['thalach'].values
         target = data['target'].values
@@ -325,8 +385,18 @@ sections:
         import numpy as np
         import pandas as pd
 
-        src = "https://raw.githubusercontent.com"
-        df = pd.read_csv(f"{src}/sharmaroshan/Heart-UCI-Dataset/master/heart.csv")
+        heartIdx = np.arange(303)
+        df = pd.DataFrame({
+            'age': 35 + (heartIdx * 3) % 38,
+            'trestbps': 112 + (heartIdx * 5) % 48,
+            'chol': 165 + (heartIdx * 7) % 155,
+        })
+        df['target'] = (
+            (df['chol'] > 225).astype(int)
+            + (df['trestbps'] > 135).astype(int)
+            + (df['age'] > 56).astype(int)
+            >= 2
+        ).astype(int)
         age = df['age'].values
         chol = df['chol'].values
         bp = df['trestbps'].values

@@ -377,3 +377,69 @@ sections:
         axScene[1, 1].set_title('C = 10')
         axScene[1, 1].axis('off')
         plt.tight_layout()
+
+- id: workflow_validation
+  title: 7단계. 이진화 검증 루프
+  subtitle: 임계값, OTSU, 마스크 비율 확인
+  blocks:
+  - type: text
+    content: 이진화는 흑백 결과를 만드는 일이 아니라, 객체 픽셀과 배경 픽셀이 의도대로 분리되는지 확인하는 일입니다. 임계값 범위를 검증하고 전역 이진화와 OTSU 결과를 마스크 비율로 비교합니다.
+  - type: code
+    language: python
+    title: 그레이스케일 샘플 준비
+    description: 밝은 객체와 어두운 배경이 있는 이미지를 만듭니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      thresholdImage = np.full((100, 140), 70, dtype=np.uint8)
+      cv2.rectangle(thresholdImage, (35, 25), (105, 75), 190, -1)
+      cv2.circle(thresholdImage, (70, 50), 18, 230, -1)
+
+      def validateThresholdValue(value):
+          if not (0 <= value <= 255):
+              raise ValueError(f"임계값은 0~255 범위여야 합니다: {value}")
+          return True
+
+      validateThresholdValue(120)
+  - type: code
+    language: python
+    title: 임계값 오류 확인
+    description: 범위를 벗어난 임계값을 넣어 오류를 확인합니다.
+    content: |-
+      try:
+          validateThresholdValue(300)
+      except ValueError as exc:
+          thresholdErrorMessage = str(exc)
+
+      thresholdErrorMessage
+  - type: code
+    language: python
+    title: 이진화 결과 검증
+    description: 결과가 0과 255만 포함하고 객체 비율이 적정한지 확인합니다.
+    content: |-
+      _, binaryImage = cv2.threshold(thresholdImage, 120, 255, cv2.THRESH_BINARY)
+      otsuValue, otsuImage = cv2.threshold(thresholdImage, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+      foregroundRatio = float(np.count_nonzero(binaryImage) / binaryImage.size)
+      thresholdChecks = {
+          "binaryValuesOk": set(np.unique(binaryImage)).issubset({0, 255}),
+          "otsuValuesOk": set(np.unique(otsuImage)).issubset({0, 255}),
+          "foregroundRatioOk": 0.20 <= foregroundRatio <= 0.35,
+          "otsuValueOk": 70 <= otsuValue <= 190,
+          "errorOk": thresholdErrorMessage == "임계값은 0~255 범위여야 합니다: 300",
+      }
+
+      assert all(thresholdChecks.values()), thresholdChecks
+      thresholdChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 임계값을 낮추면 전경 픽셀이 늘어나는지 확인합니다.
+    content: |-
+      _, lowThresholdImage = cv2.threshold(thresholdImage, 90, 255, cv2.THRESH_BINARY)
+      _, highThresholdImage = cv2.threshold(thresholdImage, 180, 255, cv2.THRESH_BINARY)
+      lowRatio = float(np.count_nonzero(lowThresholdImage) / lowThresholdImage.size)
+      highRatio = float(np.count_nonzero(highThresholdImage) / highThresholdImage.size)
+
+      assert lowRatio >= highRatio
+      lowRatio, highRatio

@@ -233,3 +233,68 @@ sections:
         muted = ImageEnhance.Contrast(faded).enhance(0.9)
         vintageResult = ImageEnhance.Brightness(muted).enhance(1.1)
         vintageResult
+
+- id: workflow_validation
+  title: 7단계. 보정 품질 검증 루프
+  subtitle: 밝기, 대비, 채도 factor 확인
+  blocks:
+  - type: text
+    content: 밝기와 대비 조정은 보기 좋은 값을 찾는 작업이지만, 자동화에서는 factor 범위와 평균 밝기 변화가 먼저 검증되어야 합니다. 잘못된 factor를 잡고 보정 전후 통계를 비교합니다.
+  - type: code
+    language: python
+    title: 보정 샘플 준비
+    description: 어두운 배경과 밝은 피사체가 있는 이미지를 만듭니다.
+    content: |-
+      from PIL import Image, ImageDraw, ImageEnhance, ImageStat
+
+      enhanceImage = Image.new("RGB", (150, 100), (70, 80, 95))
+      enhanceDraw = ImageDraw.Draw(enhanceImage)
+      enhanceDraw.rectangle((35, 25, 115, 75), fill=(150, 120, 80))
+
+      def validateEnhanceFactor(factor):
+          if factor <= 0:
+              raise ValueError(f"보정 factor는 양수여야 합니다: {factor}")
+          return True
+
+      validateEnhanceFactor(1.2)
+  - type: code
+    language: python
+    title: factor 오류 확인
+    description: 0 factor를 넣어 오류를 확인합니다.
+    content: |-
+      try:
+          validateEnhanceFactor(0)
+      except ValueError as exc:
+          enhanceErrorMessage = str(exc)
+
+      enhanceErrorMessage
+  - type: code
+    language: python
+    title: 보정 결과 검증
+    description: 밝기와 대비 조정이 통계에 반영되는지 확인합니다.
+    content: |-
+      brighterImage = ImageEnhance.Brightness(enhanceImage).enhance(1.4)
+      contrastImage = ImageEnhance.Contrast(enhanceImage).enhance(1.6)
+      originalMean = sum(ImageStat.Stat(enhanceImage).mean) / 3
+      brighterMean = sum(ImageStat.Stat(brighterImage).mean) / 3
+      originalStd = sum(ImageStat.Stat(enhanceImage).stddev) / 3
+      contrastStd = sum(ImageStat.Stat(contrastImage).stddev) / 3
+      enhanceChecks = {
+          "brightnessIncreased": brighterMean > originalMean,
+          "contrastIncreased": contrastStd > originalStd,
+          "sizeKept": brighterImage.size == enhanceImage.size == contrastImage.size,
+          "errorOk": enhanceErrorMessage == "보정 factor는 양수여야 합니다: 0",
+      }
+
+      assert all(enhanceChecks.values()), enhanceChecks
+      enhanceChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 밝기 factor를 낮췄을 때 평균 밝기가 줄어드는지 확인합니다.
+    content: |-
+      darkerImage = ImageEnhance.Brightness(enhanceImage).enhance(0.7)
+      darkerMean = sum(ImageStat.Stat(darkerImage).mean) / 3
+
+      assert darkerMean < originalMean
+      darkerMean, originalMean

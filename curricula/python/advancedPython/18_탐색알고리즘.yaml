@@ -3,7 +3,7 @@ meta:
   title: "탐색 알고리즘"
   day: 18
   category: "advancedPython"
-  tags: ["search", "binary-search", "bisect", "bfs", "dfs", "graph"]
+  tags: ["search", "binary-search", "bisect", "bfs", "dfs", "graph", "검증", "탐색전략"]
   seo:
     title: "파이썬 탐색 알고리즘 - 선형, 이진, BFS, DFS"
     description: "선형 탐색, 이진 탐색, bisect 모듈, BFS, DFS, 해시 탐색까지 파이썬 탐색 알고리즘 완벽 가이드"
@@ -437,6 +437,89 @@ sections:
       f"가장 빈번한 3개: {topChars}"
   - type: "tip"
     content: "리스트에서 in 연산은 O(n), set에서는 O(1)입니다. 반복 탐색은 set을 사용하세요."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 재고 조회와 장애 경로 찾기"
+  subtitle: "정렬 데이터 이진 탐색과 그래프 BFS를 각각 맞는 문제에 적용합니다"
+  blocks:
+  - type: "text"
+    content: "탐색 알고리즘은 데이터 모양을 먼저 봐야 합니다. 정렬된 재고 목록은 이진 탐색으로 찾고, 서비스 의존성처럼 관계가 얽힌 문제는 BFS로 최단 경로를 찾습니다."
+  - type: "code"
+    language: "python"
+    title: "정렬된 재고 목록에서 SKU 찾기"
+    description: "bisect를 쓰기 전에 정렬 전제 조건을 확인합니다."
+    content: |-
+      from bisect import bisect_left
+
+      def findSku(rows, sku):
+          keys = [row["sku"] for row in rows]
+          if keys != sorted(keys):
+              raise ValueError("rows must be sorted by sku")
+          index = bisect_left(keys, sku)
+          if index < len(rows) and rows[index]["sku"] == sku:
+              return rows[index]
+          return None
+
+      inventory = [
+          {"sku": "A-100", "stock": 5},
+          {"sku": "B-200", "stock": 0},
+          {"sku": "C-300", "stock": 12},
+      ]
+
+      assert findSku(inventory, "C-300")["stock"] == 12
+      assert findSku(inventory, "D-400") is None
+  - type: "code"
+    language: "python"
+    title: "서비스 의존성 최단 경로 찾기"
+    description: "BFS로 장애 영향 경로를 가장 짧게 찾습니다."
+    content: |-
+      from collections import deque
+
+      def shortestPath(graph, start, target):
+          queue = deque([(start, [start])])
+          visited = {start}
+          while queue:
+              node, path = queue.popleft()
+              if node == target:
+                  return path
+              for nextNode in graph.get(node, []):
+                  if nextNode not in visited:
+                      visited.add(nextNode)
+                      queue.append((nextNode, path + [nextNode]))
+          return []
+
+      graph = {
+          "api": ["auth", "orders"],
+          "auth": ["db"],
+          "orders": ["payments", "warehouse"],
+          "payments": ["bank"],
+      }
+
+      assert shortestPath(graph, "api", "bank") == ["api", "orders", "payments", "bank"]
+      assert shortestPath(graph, "warehouse", "bank") == []
+  - type: "code"
+    language: "python"
+    title: "정렬 전제 위반 확인"
+    description: "이진 탐색 전제가 깨졌을 때 조용히 틀린 값을 내지 않게 막습니다."
+    content: |-
+      from bisect import bisect_left
+
+      def findSku(rows, sku):
+          keys = [row["sku"] for row in rows]
+          if keys != sorted(keys):
+              raise ValueError("rows must be sorted by sku")
+          index = bisect_left(keys, sku)
+          return rows[index] if index < len(rows) and rows[index]["sku"] == sku else None
+
+      try:
+          findSku([{"sku": "B-200"}, {"sku": "A-100"}], "A-100")
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "rows must be sorted by sku"
+  - type: "tip"
+    title: "변주 실험"
+    content: "재고가 품절인 SKU만 set으로 만들고, 주문 목록을 돌며 품절 SKU가 포함되어 있는지 O(1) 멤버십으로 검사하세요."
 
 - id: "practice"
   title: "종합 복습"

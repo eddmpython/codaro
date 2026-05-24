@@ -31,6 +31,8 @@ sections:
     description: "glob 모듈을 불러오고 정상 작동을 확인합니다."
     content: |-
       import glob
+      import os
+      import tempfile
   - type: "tip"
     content: "Codaro에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다. 중복 import는 에러를 발생시킵니다."
 
@@ -235,6 +237,123 @@ sections:
       csvNames
   - type: "tip"
     content: "os.path, pathlib과 함께 사용하면 강력한 파일 관리 도구가 됩니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 파일 패턴 수집 리포트"
+  subtitle: "임시 작업공간, 재귀 검색, 패턴 누락 검증"
+  blocks:
+  - type: "text"
+    content: "glob 검색은 현재 디렉터리 상태에 영향을 받기 쉽습니다. 실습용 임시 작업공간을 만들고 기대 파일을 고정하면, 패턴이 정확히 무엇을 포함하고 제외하는지 검증할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "검색용 작업공간 만들기"
+    description: "CSV, 로그, 백업 파일을 만들고 패턴별 검색 결과를 검증합니다."
+    content: |-
+      globRoot = tempfile.mkdtemp(prefix='codaro_glob_workflow_')
+      dataDir = os.path.join(globRoot, 'data')
+      logsDir = os.path.join(globRoot, 'logs', '2026')
+      os.makedirs(dataDir, exist_ok=True)
+      os.makedirs(logsDir, exist_ok=True)
+
+      samplePaths = [
+          os.path.join(dataDir, 'sales_01.csv'),
+          os.path.join(dataDir, 'sales_02.csv'),
+          os.path.join(dataDir, 'customers.csv'),
+          os.path.join(logsDir, 'app_20260524.log'),
+          os.path.join(logsDir, 'app_20260525.log'),
+          os.path.join(globRoot, 'README.md'),
+      ]
+
+      for path in samplePaths:
+          with open(path, 'w', encoding='utf-8') as file:
+              file.write(os.path.basename(path))
+
+      csvFiles = sorted(glob.glob(os.path.join(dataDir, '*.csv')))
+      logFiles = sorted(glob.glob(os.path.join(globRoot, '**', '*.log'), recursive=True))
+
+      assert [os.path.basename(path) for path in csvFiles] == ['customers.csv', 'sales_01.csv', 'sales_02.csv']
+      assert [os.path.basename(path) for path in logFiles] == ['app_20260524.log', 'app_20260525.log']
+
+      {"csv": csvFiles, "logs": logFiles}
+  - type: "code"
+    language: "python"
+    title: "패턴 누락 오류 잡기"
+    description: "재귀 옵션이 빠진 검색이 하위 로그를 놓치는지 확인합니다."
+    content: |-
+      nonRecursivePattern = os.path.join(globRoot, '*.log')
+      recursivePattern = os.path.join(globRoot, '**', '*.log')
+
+      nonRecursiveLogs = list(glob.glob(nonRecursivePattern))
+      recursiveLogs = list(glob.glob(recursivePattern, recursive=True))
+
+      try:
+          assert len(nonRecursiveLogs) == len(recursiveLogs)
+      except AssertionError as exc:
+          globProblem = "하위 디렉터리 검색에는 ** 패턴과 recursive=True가 필요합니다."
+
+      assert nonRecursiveLogs == []
+      assert len(recursiveLogs) == 2
+      assert "recursive=True" in globProblem
+
+      globProblem
+  - type: "code"
+    language: "python"
+    title: "iglob 제한 처리"
+    description: "대량 파일 검색에서는 필요한 개수만 소비하는 패턴을 사용합니다."
+    content: |-
+      for index in range(20):
+          with open(os.path.join(dataDir, f'batch_{index:02d}.json'), 'w', encoding='utf-8') as file:
+              file.write('{}')
+
+      jsonIterator = glob.iglob(os.path.join(dataDir, 'batch_*.json'))
+      firstFiveJson = [os.path.basename(path) for _, path in zip(range(5), jsonIterator)]
+
+      assert firstFiveJson == [
+          'batch_00.json',
+          'batch_01.json',
+          'batch_02.json',
+          'batch_03.json',
+          'batch_04.json',
+      ]
+
+      firstFiveJson
+  - type: "code"
+    language: "python"
+    title: "수집 매니페스트 작성"
+    description: "검색 결과를 확장자별 파일 수 리포트로 변환합니다."
+    content: |-
+      allFiles = glob.glob(os.path.join(globRoot, '**', '*.*'), recursive=True)
+      manifest = {}
+      for path in allFiles:
+          extension = os.path.splitext(path)[1]
+          manifest[extension] = manifest.get(extension, 0) + 1
+
+      assert manifest['.csv'] == 3
+      assert manifest['.log'] == 2
+      assert manifest['.json'] == 20
+      assert manifest['.md'] == 1
+
+      manifest
+  - type: "code"
+    language: "python"
+    title: "빈 패턴 입력 오류 확인"
+    description: "사용자 입력 패턴이 비어 있으면 파일 전체 검색으로 번지지 않게 막습니다."
+    content: |-
+      def safeGlob(rootDir, pattern):
+          if not pattern:
+              raise ValueError("glob pattern must not be empty")
+          return glob.glob(os.path.join(rootDir, pattern))
+
+      try:
+          safeGlob(globRoot, "")
+      except ValueError as exc:
+          patternMessage = str(exc)
+
+      assert patternMessage == "glob pattern must not be empty"
+      assert len(safeGlob(globRoot, "**/*.log")) == 0
+  - type: "tip"
+    title: "변주 실험"
+    content: "`**/*.log` 검색에 `recursive=True`를 반드시 넘기도록 `safeGlob`을 확장하고, 하위 로그 파일 2개가 잡히는지 확인하세요."
 
 - id: "practice"
   title: "glob 모듈 종합 복습"

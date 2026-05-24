@@ -33,11 +33,11 @@ sections:
     description: seaborn과 matplotlib을 불러옵니다
     content: |-
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
       import pandas as pd
 
-      baseUrl = "https://raw.githubusercontent.com"
-      gapminder = pd.read_csv(f"{baseUrl}/plotly/datasets/master/gapminder_unfiltered.csv")
+      gapminder = loadLocalDataset("gapminder")
       gapminder
   - type: tip
     content: Gapminder 데이터는 Hans Rosling 교수가 유명하게 만든 데이터로, 국가별 인구(pop), 1인당 GDP(gdpPercap), 기대수명(lifeExp), 대륙(continent) 정보를 포함합니다.
@@ -226,9 +226,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        data = sns.load_dataset('penguins').dropna()
+        data = loadLocalDataset('penguins').dropna()
     - type: code
       title: "차트 생성"
       content: |-
@@ -242,12 +243,90 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        df = sns.load_dataset('mpg').dropna()
+        df = loadLocalDataset('mpg').dropna()
     - type: code
       title: "차트 생성"
       content: |-
         canvas = sns.relplot(data=df, x='model_year', y='mpg', hue='origin', style='origin', kind='line', markers=True, palette='Dark2', height=5, aspect=1.3)
         canvas.figure.suptitle('MPG Trend by Origin', y=1.02)
         canvas.figure
+
+- id: workflow_validation
+  title: 12단계. 다차원 산점도 검증 루프
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      Gapminder 산점도는 GDP, 기대수명, 인구, 대륙을 한 번에 보여 줍니다. 로그 축을 쓰기 전 양수 조건을 확인하고, 최신 연도 기준으로 해석을 고정합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 최신 연도 예측
+    description: 최신 연도 데이터에서 기대수명과 GDP가 모두 양수인지 확인합니다
+    content: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      gapFlow = loadLocalDataset("gapminder")
+      requiredColumns = {"country", "continent", "year", "pop", "lifeExp", "gdpPercap"}
+      missingColumns = requiredColumns - set(gapFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert gapFlow[["pop", "lifeExp", "gdpPercap"]].gt(0).all().all()
+
+      latestYear = int(gapFlow["year"].max())
+      gapLatest = gapFlow[gapFlow["year"] == latestYear].copy()
+      assert gapLatest["continent"].nunique() >= 5
+      latestYear, gapLatest.shape
+  - type: code
+    language: python
+    title: 다차원 차트 검증
+    description: scatterplot이 hue와 size 의미를 모두 가지는지 확인합니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+      figGap, axGap = plt.subplots(figsize=(9, 6))
+      sns.scatterplot(data=gapLatest, x="gdpPercap", y="lifeExp", hue="continent", size="pop", sizes=(60, 500), ax=axGap)
+      axGap.set_xscale("log")
+      axGap.set_title(f"Life expectancy and GDP in {latestYear}")
+      axGap.set_xlabel("GDP per capita")
+
+      assert axGap.get_xscale() == "log"
+      assert axGap.get_xlabel() == "GDP per capita"
+      assert axGap.get_legend() is not None
+      assert len(axGap.collections) >= 1
+      figGap
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 로그 축에 맞지 않는 0 이하 GDP를 사전에 막습니다
+    content: |-
+      def validateGapminderForLog(frame):
+          if not frame["gdpPercap"].gt(0).all():
+              raise ValueError("로그 축에는 0 이하 GDP를 사용할 수 없습니다")
+          assert frame["lifeExp"].between(30, 90).all()
+          return True
+
+      brokenGap = gapLatest.copy()
+      brokenGap.loc[brokenGap.index[0], "gdpPercap"] = 0
+      try:
+          validateGapminderForLog(brokenGap)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateGapminderForLog(gapLatest)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 최신 연도와 1952년의 대륙별 기대수명 격차를 비교합니다
+    content: |-
+      continentLife = gapFlow.groupby(["year", "continent"])["lifeExp"].mean().unstack()
+      lifeChange = continentLife.loc[latestYear] - continentLife.loc[continentLife.index.min()]
+
+      assert lifeChange.min() > 0
+      assert lifeChange.sort_values(ascending=False).index[0] in set(gapFlow["continent"])
+      lifeChange.round(1).sort_values(ascending=False)
+  - type: tip
+    content: "다차원 차트는 멋있지만, 로그 축과 size 의미가 데이터 조건을 만족해야 해석 가능한 보고서가 됩니다."

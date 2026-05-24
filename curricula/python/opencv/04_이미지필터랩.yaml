@@ -379,3 +379,68 @@ sections:
         axNoise[1, 1].set_title('Bilateral')
         axNoise[1, 1].axis('off')
         plt.tight_layout()
+
+- id: workflow_validation
+  title: 7단계. 필터 품질 검증 루프
+  subtitle: 노이즈 감소와 커널 입력 확인
+  blocks:
+  - type: text
+    content: 필터는 흐리게 보이면 성공이 아니라, 노이즈가 줄면서 구조가 보존되는지 확인해야 합니다. 커널 크기 오류를 잡고, 필터 전후 표준편차를 비교해 품질을 검증합니다.
+  - type: code
+    language: python
+    title: 노이즈 이미지 준비
+    description: 재현 가능한 난수로 노이즈가 섞인 이미지를 만듭니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      rng = np.random.default_rng(42)
+      cleanFilterImage = np.full((96, 128), 120, dtype=np.uint8)
+      cv2.rectangle(cleanFilterImage, (32, 24), (96, 72), 190, -1)
+      noise = rng.normal(0, 18, cleanFilterImage.shape).astype(np.int16)
+      noisyFilterImage = np.clip(cleanFilterImage.astype(np.int16) + noise, 0, 255).astype(np.uint8)
+
+      def validateOddKernel(kernelSize):
+          if kernelSize <= 1 or kernelSize % 2 == 0:
+              raise ValueError(f"커널 크기는 3 이상의 홀수여야 합니다: {kernelSize}")
+          return True
+
+      validateOddKernel(5)
+  - type: code
+    language: python
+    title: 커널 오류 확인
+    description: 짝수 커널이 들어왔을 때 오류를 확인합니다.
+    content: |-
+      try:
+          validateOddKernel(4)
+      except ValueError as exc:
+          kernelErrorMessage = str(exc)
+
+      kernelErrorMessage
+  - type: code
+    language: python
+    title: 필터 결과 검증
+    description: GaussianBlur와 medianBlur가 노이즈 변동을 줄이는지 확인합니다.
+    content: |-
+      gaussianFilterImage = cv2.GaussianBlur(noisyFilterImage, (5, 5), 0)
+      medianFilterImage = cv2.medianBlur(noisyFilterImage, 5)
+      filterChecks = {
+          "gaussianShapeOk": gaussianFilterImage.shape == noisyFilterImage.shape,
+          "medianShapeOk": medianFilterImage.shape == noisyFilterImage.shape,
+          "gaussianReducedNoise": float(gaussianFilterImage.std()) < float(noisyFilterImage.std()),
+          "medianReducedNoise": float(medianFilterImage.std()) < float(noisyFilterImage.std()),
+          "errorOk": kernelErrorMessage == "커널 크기는 3 이상의 홀수여야 합니다: 4",
+      }
+
+      assert all(filterChecks.values()), filterChecks
+      filterChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 커널을 키우면 더 강한 smoothing이 되는지 비교합니다.
+    content: |-
+      softBlur = cv2.GaussianBlur(noisyFilterImage, (3, 3), 0)
+      strongBlur = cv2.GaussianBlur(noisyFilterImage, (9, 9), 0)
+
+      assert float(strongBlur.std()) <= float(softBlur.std())
+      float(softBlur.std()), float(strongBlur.std())

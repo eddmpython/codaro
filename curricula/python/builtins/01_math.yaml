@@ -255,6 +255,108 @@ sections:
   - type: "tip"
     content: "hypot()는 여러 인자를 받을 수 있습니다. math.hypot(3, 4, 5)로 3차원 거리를 계산할 수 있습니다."
 
+- id: "workflow_validation"
+  title: "검증 루프: 업무 계산 리포트"
+  subtitle: "오차 허용, 단위 확인, 운영 기준 계산"
+  blocks:
+  - type: "text"
+    content: "실무 계산에서는 값이 출력되는 것보다 검증 기준이 더 중요합니다. 부동소수점 결과는 math.isclose()로 비교하고, 각도 단위처럼 자주 틀리는 입력은 일부러 깨뜨려 보면서 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "거리와 면적 계산 검증"
+    description: "현장 좌표와 반경을 계산하고 기대값을 assert로 확인합니다."
+    content: |-
+      sites = [
+          {"name": "warehouseA", "x": 0, "y": 0, "radius": 4},
+          {"name": "warehouseB", "x": 3, "y": 4, "radius": 6},
+          {"name": "warehouseC", "x": -5, "y": 12, "radius": 3},
+      ]
+
+      def buildSiteMathReport(siteRows):
+          report = []
+          for site in siteRows:
+              distance = math.hypot(site["x"], site["y"])
+              coverageArea = math.pi * site["radius"] ** 2
+              report.append({
+                  "name": site["name"],
+                  "distanceFromOrigin": distance,
+                  "coverageArea": coverageArea,
+              })
+          return report
+
+      siteReport = buildSiteMathReport(sites)
+
+      assert math.isclose(siteReport[1]["distanceFromOrigin"], 5.0)
+      assert math.isclose(siteReport[2]["distanceFromOrigin"], 13.0)
+      assert math.isclose(siteReport[0]["coverageArea"], 50.26548245743669)
+
+      siteReport
+  - type: "code"
+    language: "python"
+    title: "각도 단위 오류 잡기"
+    description: "sin()에 degree를 그대로 넣는 실수를 검증으로 잡습니다."
+    content: |-
+      def triangleArea(sideA, sideB, angleDegrees):
+          return 0.5 * sideA * sideB * math.sin(math.radians(angleDegrees))
+
+      def brokenTriangleArea(sideA, sideB, angleDegrees):
+          return 0.5 * sideA * sideB * math.sin(angleDegrees)
+
+      expectedArea = triangleArea(5, 7, 60)
+
+      try:
+          assert math.isclose(brokenTriangleArea(5, 7, 60), expectedArea, rel_tol=1e-9)
+      except AssertionError as exc:
+          angleUnitProblem = "degree를 radians()로 변환하지 않았습니다."
+
+      assert math.isclose(expectedArea, 15.155444566227676)
+      angleUnitProblem, expectedArea
+  - type: "code"
+    language: "python"
+    title: "업무 기준 인원 산정"
+    description: "처리량, 올림, 활용률을 조합해 필요한 작업자 수를 계산합니다."
+    content: |-
+      def planStaffing(dailyTickets, ticketsPerPerson):
+          requiredPeople = math.ceil(dailyTickets / ticketsPerPerson)
+          capacity = requiredPeople * ticketsPerPerson
+          utilization = dailyTickets / capacity
+          return {
+              "dailyTickets": dailyTickets,
+              "requiredPeople": requiredPeople,
+              "capacity": capacity,
+              "utilization": utilization,
+          }
+
+      staffingPlan = planStaffing(dailyTickets=1285, ticketsPerPerson=120)
+
+      assert staffingPlan["requiredPeople"] == 11
+      assert staffingPlan["capacity"] == 1320
+      assert 0.97 < staffingPlan["utilization"] < 0.98
+
+      staffingPlan
+  - type: "code"
+    language: "python"
+    title: "잘못된 반경 입력 차단"
+    description: "면적 계산에 음수 반경이 들어오면 계산 전에 멈춥니다."
+    content: |-
+      import math
+
+      def safeCircleArea(radius):
+          if radius < 0:
+              raise ValueError("radius must be non-negative")
+          return math.pi * radius ** 2
+
+      try:
+          safeCircleArea(-1)
+      except ValueError as exc:
+          radiusMessage = str(exc)
+
+      assert radiusMessage == "radius must be non-negative"
+      assert math.isclose(safeCircleArea(3), 28.274333882308138)
+  - type: "tip"
+    title: "변주 실험"
+    content: "거리 계산을 2차원 좌표에서 3차원 좌표로 바꾸고, `math.hypot(x, y, z)` 결과가 직접 제곱합을 계산한 값과 같은지 비교하세요."
+
 - id: "practice"
   title: "math 모듈 종합 복습"
   subtitle: "수학 함수 마스터하기"

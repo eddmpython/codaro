@@ -3,7 +3,7 @@ meta:
   title: "중간 종합 복습"
   day: 21
   category: "30days"
-  tags: []
+  tags: ["종합복습", "자료구조", "제어문", "함수", "파일입출력", "예외처리", "검증"]
   seo:
     title: "파이썬 중간 종합 복습 - Day 1~20 완전 정복"
     description: "변수, 자료구조, 제어문, 함수, 모듈, 파일, 예외처리를 종합 복습합니다."
@@ -301,6 +301,86 @@ sections:
       findMax([3, 7, 2, 9, 4])
   - type: "tip"
     content: "여러 개념을 함께 사용하면 더 강력한 프로그램을 만들 수 있습니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 데이터를 정제하고 리포트 만들기"
+  blocks:
+  - type: "text"
+    content: "중간 복습에서는 문법을 따로따로 외우는 것보다, 작은 업무 흐름을 끝까지 통과시키는지가 중요합니다. 아래 코드는 문자열 정제, 딕셔너리 검증, 함수 분리, 반복문, 예외 처리, 파일 입출력을 한 번에 연결합니다."
+  - type: "code"
+    language: "python"
+    title: "주문 정제와 리포트 검증"
+    code: |
+      from pathlib import Path
+      import tempfile
+
+      rawOrders = [
+          {"id": " A-100 ", "status": " PAID ", "amount": "12000"},
+          {"id": "A-101", "status": "cancelled", "amount": "8000"},
+          {"id": "A-102", "status": "paid", "amount": "15000"},
+      ]
+
+      def normalizeOrder(row):
+          requiredKeys = {"id", "status", "amount"}
+          missingKeys = sorted(requiredKeys - set(row))
+          if missingKeys:
+              raise KeyError(f"missing keys: {missingKeys}")
+
+          orderId = row["id"].strip()
+          status = row["status"].strip().lower()
+
+          try:
+              amount = int(row["amount"])
+          except ValueError as exc:
+              raise ValueError(f"invalid amount: {row['amount']}") from exc
+
+          return {"id": orderId, "status": status, "amount": amount}
+
+      def summarizePaidOrders(orders):
+          paidIds = []
+          paidAmount = 0
+
+          for order in orders:
+              if order["status"] != "paid":
+                  continue
+              paidIds.append(order["id"])
+              paidAmount += order["amount"]
+
+          return {
+              "paidCount": len(paidIds),
+              "paidAmount": paidAmount,
+              "paidIds": paidIds,
+          }
+
+      normalizedOrders = [normalizeOrder(row) for row in rawOrders]
+      summary = summarizePaidOrders(normalizedOrders)
+
+      assert summary["paidCount"] == 2
+      assert summary["paidAmount"] == 27000
+      assert summary["paidIds"] == ["A-100", "A-102"]
+
+      try:
+          normalizeOrder({"id": "A-999", "status": "paid", "amount": "twelve"})
+      except ValueError as exc:
+          assert "invalid amount" in str(exc)
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          reportPath = Path(tempDir) / "midReviewReport.txt"
+          reportPath.write_text(
+              f"paidCount={summary['paidCount']}\npaidAmount={summary['paidAmount']}",
+              encoding="utf-8",
+          )
+          loadedReport = reportPath.read_text(encoding="utf-8")
+
+      assert "paidCount=2" in loadedReport
+      assert "paidAmount=27000" in loadedReport
+      print("중간 복습 흐름 통과")
+  - type: "list"
+    items:
+    - "입력값은 함수 초반에서 검증하고, 실패 이유를 예외 메시지로 남깁니다."
+    - "정제 함수와 집계 함수를 나누면 어느 단계가 틀렸는지 바로 찾을 수 있습니다."
+    - "파일 실습은 임시 폴더 안에서 수행하면 로컬 환경을 더럽히지 않고 반복 검증할 수 있습니다."
+    - "실무 변주: 주문 상태를 paid/cancelled/refunded로 늘리고 환불 금액을 별도 집계하는 리포트로 바꿔 보세요."
 
 - id: "practice"
   title: "Day 21 종합 복습"

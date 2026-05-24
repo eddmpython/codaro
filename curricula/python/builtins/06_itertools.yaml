@@ -289,6 +289,116 @@ sections:
   - type: "tip"
     content: "itertools 함수들은 제너레이터를 반환하므로 메모리를 절약합니다. 필요한 만큼만 소비하세요."
 
+- id: "workflow_validation"
+  title: "검증 루프: 이터레이터 데이터 파이프라인"
+  subtitle: "배치, groupby 정렬, 조합 탐색 검증"
+  blocks:
+  - type: "text"
+    content: "itertools는 메모리를 아끼는 대신 이터레이터가 한 번 소비된다는 점과 groupby의 정렬 조건을 반드시 이해해야 합니다. 여기서는 작은 주문 데이터를 배치 처리하고, 일부러 정렬 누락 버그를 잡은 뒤, 조합 탐색을 제한해 안전하게 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "배치 처리 검증"
+    description: "주문 데이터를 일정 크기 배치로 나누고 전체 누락이 없는지 확인합니다."
+    content: |-
+      orderRows = [
+          {"orderId": "O-101", "region": "KR", "amount": 120},
+          {"orderId": "O-102", "region": "US", "amount": 80},
+          {"orderId": "O-103", "region": "KR", "amount": 150},
+          {"orderId": "O-104", "region": "JP", "amount": 60},
+          {"orderId": "O-105", "region": "US", "amount": 90},
+      ]
+
+      def chunkRecords(records, size):
+          if size <= 0:
+              raise ValueError("size must be positive")
+          iterator = iter(records)
+          while True:
+              batch = list(islice(iterator, size))
+              if not batch:
+                  break
+              yield batch
+
+      orderBatches = list(chunkRecords(orderRows, size=2))
+      flattenedOrders = list(chain.from_iterable(orderBatches))
+
+      assert [len(batch) for batch in orderBatches] == [2, 2, 1]
+      assert flattenedOrders == orderRows
+      assert sum(row["amount"] for row in flattenedOrders) == 500
+
+      orderBatches
+  - type: "code"
+    language: "python"
+    title: "groupby 정렬 누락 잡기"
+    description: "groupby는 인접 항목만 묶으므로 먼저 정렬해야 합니다."
+    content: |-
+      def countByRegion(rows):
+          sortedRows = sorted(rows, key=lambda row: row["region"])
+          return {
+              region: sum(1 for _ in group)
+              for region, group in groupby(sortedRows, key=lambda row: row["region"])
+          }
+
+      def brokenCountByRegion(rows):
+          return {
+              region: sum(1 for _ in group)
+              for region, group in groupby(rows, key=lambda row: row["region"])
+          }
+
+      expectedRegionCounts = countByRegion(orderRows)
+
+      try:
+          assert brokenCountByRegion(orderRows) == expectedRegionCounts
+      except AssertionError as exc:
+          groupbyProblem = "groupby 전에 region 정렬이 필요합니다."
+
+      assert expectedRegionCounts == {"JP": 1, "KR": 2, "US": 2}
+      groupbyProblem, expectedRegionCounts
+  - type: "code"
+    language: "python"
+    title: "조합 탐색 제한"
+    description: "product와 islice로 후보를 필요한 만큼만 소비합니다."
+    content: |-
+      channels = ["email", "push", "sms"]
+      variants = ["A", "B"]
+      sendHours = [9, 14, 18]
+
+      allExperimentOptions = product(channels, variants, sendHours)
+      firstFiveOptions = list(islice(allExperimentOptions, 5))
+      totalOptionCount = len(channels) * len(variants) * len(sendHours)
+
+      assert len(firstFiveOptions) == 5
+      assert firstFiveOptions[0] == ("email", "A", 9)
+      assert totalOptionCount == 18
+
+      firstFiveOptions
+  - type: "code"
+    language: "python"
+    title: "누적 매출 리포트"
+    description: "accumulate로 일별 누적 금액을 만들고 마지막 합계를 검증합니다."
+    content: |-
+      dailyRevenue = [120, 80, 150, 60, 90]
+      cumulativeRevenue = list(accumulate(dailyRevenue))
+      revenueMilestones = list(zip(range(1, len(dailyRevenue) + 1), cumulativeRevenue))
+
+      assert cumulativeRevenue == [120, 200, 350, 410, 500]
+      assert revenueMilestones[-1] == (5, 500)
+
+      revenueMilestones
+  - type: "code"
+    language: "python"
+    title: "배치 크기 오류 확인"
+    description: "0 이하 배치 크기는 무한 루프나 빈 결과로 숨기지 않고 차단합니다."
+    content: |-
+      try:
+          list(chunkRecords(orderRows, 0))
+      except ValueError as exc:
+          chunkMessage = str(exc)
+
+      assert chunkMessage == "size must be positive"
+  - type: "tip"
+    title: "변주 실험"
+    content: "프로모션 후보를 전부 만들지 않고 `islice(product(...), 10)`으로 상위 10개만 검토하는 흐름으로 바꿔 메모리 사용을 비교하세요."
+
 - id: "practice"
   title: "itertools 모듈 종합 복습"
   subtitle: "이터레이터 도구 마스터하기"
@@ -430,9 +540,10 @@ sections:
   - type: "expansion"
     title: "🔴 심화9: 로또 번호 조합"
     code: |-
-      lotto = range(1, 46)
-      picks = list(combinations(lotto, 6))
-      len(picks)
+      from math import comb
+
+      totalLottoCombinations = comb(45, 6)
+      totalLottoCombinations
 
   - type: "expansion"
     title: "🔴 심화10: 이동 평균"

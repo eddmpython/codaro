@@ -1,5 +1,8 @@
 meta:
+  id: "19_difflib"
   title: "difflib - 시퀀스 비교"
+  category: "builtins"
+  tags: ["difflib", "SequenceMatcher", "unified_diff", "get_close_matches", "Differ"]
   description: "텍스트와 시퀀스 간의 차이점을 찾고 비교하는 difflib 모듈"
   keywords: ["difflib", "SequenceMatcher", "unified_diff", "get_close_matches", "Differ"]
 
@@ -639,6 +642,120 @@ sections:
 
           result = suggestCommand(userInput, commands)
           result
+
+  - name: "workflow_validation"
+    title: "검증 루프: 변경 리포트 품질 게이트"
+    blocks:
+      - type: "content"
+        title: "diff를 리포트로 연결하기"
+        content: |-
+          difflib는 차이를 보여주는 데서 끝나면 실무 가치가 약합니다.
+          변경 유형을 요약하고, 위험한 대규모 변경을 감지하고, 사람이 읽을 수 있는 diff까지 함께 만드는 흐름으로 익혀야 코드 리뷰와 문서 검토에 바로 쓸 수 있습니다.
+
+      - type: "code"
+        language: "python"
+        title: "변경 분석 함수 만들기"
+        description: "두 버전의 줄 목록을 비교해 similarity, 변경 수, unified diff를 반환합니다."
+        content: |-
+          oldDocument = [
+              "title: Codaro\n",
+              "runtime: remote-sandbox\n",
+              "lesson: constrained-ui\n",
+              "status: draft\n"
+          ]
+          newDocument = [
+              "title: Codaro\n",
+              "runtime: local-python\n",
+              "lesson: local workflow\n",
+              "status: reviewed\n",
+              "validation: required\n"
+          ]
+
+          def buildChangeReport(oldLines, newLines, threshold=0.2):
+              matcher = difflib.SequenceMatcher(None, oldLines, newLines)
+              similarity = matcher.ratio()
+              assert similarity >= threshold, "변경 폭이 너무 커서 수동 리뷰가 필요합니다"
+
+              changes = [
+                  {
+                      "type": tag,
+                      "old": f"{i1 + 1}-{i2}",
+                      "new": f"{j1 + 1}-{j2}"
+                  }
+                  for tag, i1, i2, j1, j2 in matcher.get_opcodes()
+                  if tag != "equal"
+              ]
+              unified = list(difflib.unified_diff(
+                  oldLines,
+                  newLines,
+                  fromfile="before.yaml",
+                  tofile="after.yaml",
+                  lineterm=""
+              ))
+              return {
+                  "similarity": round(similarity, 2),
+                  "changeCount": len(changes),
+                  "changes": changes,
+                  "diff": unified
+              }
+
+          changeReport = buildChangeReport(oldDocument, newDocument)
+          assert changeReport["changeCount"] >= 1
+          changeReport
+
+      - type: "code"
+        language: "python"
+        title: "과도한 변경을 먼저 실패시킨다"
+        description: "유사도가 낮은 변경은 자동 요약 대신 수동 리뷰로 돌립니다."
+        content: |-
+          unrelatedDocument = [
+              "completely different topic\n",
+              "no shared structure\n"
+          ]
+
+          try:
+              buildChangeReport(oldDocument, unrelatedDocument, threshold=0.7)
+          except AssertionError as exc:
+              reviewProblem = str(exc)
+
+          assert "수동 리뷰" in reviewProblem
+          reviewProblem
+
+      - type: "code"
+        language: "python"
+        title: "오타 교정 후보 검증"
+        description: "명령어 후보를 점수와 함께 정렬하고 충분히 가까운 후보만 남깁니다."
+        content: |-
+          validActions = ["verify", "convert", "preview", "publish", "rollback"]
+          userAction = "verfy"
+          rankedActions = [
+              {
+                  "action": action,
+                  "score": round(difflib.SequenceMatcher(None, userAction, action).ratio(), 2)
+              }
+              for action in validActions
+          ]
+          rankedActions.sort(key=lambda item: item["score"], reverse=True)
+
+          assert rankedActions[0]["action"] == "verify"
+          assert rankedActions[0]["score"] >= 0.8
+          rankedActions[:3]
+
+      - type: "code"
+        language: "python"
+        title: "실무 변주: 리뷰 요약 문장"
+        description: "diff 결과를 사람이 읽는 리뷰 요약으로 변환합니다."
+        content: |-
+          summaryLines = [
+              f"similarity={changeReport['similarity']}",
+              f"changes={changeReport['changeCount']}",
+              "preview=" + " | ".join(line for line in changeReport["diff"][:4])
+          ]
+          reviewSummary = "\n".join(summaryLines)
+
+          assert "before.yaml" in reviewSummary
+          assert "after.yaml" in reviewSummary
+          reviewSummary
 
   - name: "practice"
     title: "연습 문제"

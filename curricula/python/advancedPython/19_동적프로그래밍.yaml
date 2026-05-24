@@ -3,7 +3,7 @@ meta:
   title: "동적 프로그래밍"
   day: 19
   category: "advancedPython"
-  tags: ["dynamic-programming", "memoization", "tabulation", "dp"]
+  tags: ["dynamic-programming", "memoization", "tabulation", "dp", "검증", "최적화"]
   seo:
     title: "파이썬 동적 프로그래밍 - 메모이제이션과 타뷸레이션"
     description: "복잡한 문제를 하위 문제로 분해하고 메모이제이션과 타뷸레이션으로 효율적으로 해결합니다."
@@ -410,6 +410,83 @@ sections:
       f"최소 곱셈 연산: {matResult}"
   - type: "tip"
     content: "구간 DP는 대각선 방향으로 테이블을 채웁니다. 작은 구간부터 큰 구간으로 확장합니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 제한된 예산으로 캠페인 조합 고르기"
+  subtitle: "점화식, 테이블 채우기, 선택 복원을 한 번에 검증합니다"
+  blocks:
+  - type: "text"
+    content: "동적 프로그래밍은 코딩 테스트 공식이 아니라 제한 조건 아래에서 최선의 조합을 찾는 방식입니다. 캠페인 후보의 비용과 기대 효과를 보고 예산 안에서 최대 효과를 내는 조합을 구해보세요."
+  - type: "code"
+    language: "python"
+    title: "캠페인 예산 배분 DP"
+    description: "0/1 배낭 문제로 최대 효과와 선택 항목을 함께 복원합니다."
+    content: |-
+      def bestCampaigns(items, budget):
+          if budget < 0:
+              raise ValueError("budget must be non-negative")
+
+          dp = [[0] * (budget + 1) for _ in range(len(items) + 1)]
+          keep = [[False] * (budget + 1) for _ in range(len(items) + 1)]
+
+          for row, item in enumerate(items, start=1):
+              for costLimit in range(budget + 1):
+                  withoutItem = dp[row - 1][costLimit]
+                  withItem = -1
+                  if item["cost"] <= costLimit:
+                      withItem = dp[row - 1][costLimit - item["cost"]] + item["value"]
+                  if withItem > withoutItem:
+                      dp[row][costLimit] = withItem
+                      keep[row][costLimit] = True
+                  else:
+                      dp[row][costLimit] = withoutItem
+
+          selected = []
+          remaining = budget
+          for row in range(len(items), 0, -1):
+              if keep[row][remaining]:
+                  item = items[row - 1]
+                  selected.append(item["name"])
+                  remaining -= item["cost"]
+
+          return dp[-1][budget], list(reversed(selected))
+
+      campaigns = [
+          {"name": "email", "cost": 1, "value": 5},
+          {"name": "search", "cost": 3, "value": 12},
+          {"name": "retargeting", "cost": 4, "value": 14},
+          {"name": "content", "cost": 2, "value": 8},
+      ]
+
+      bestValue, selected = bestCampaigns(campaigns, budget=5)
+
+      assert bestValue == 20
+      assert selected == ["search", "content"]
+  - type: "code"
+    language: "python"
+    title: "기저 조건과 오류 입력 확인"
+    description: "예산이 0일 때와 음수일 때를 따로 검증합니다."
+    content: |-
+      def bestCampaigns(items, budget):
+          if budget < 0:
+              raise ValueError("budget must be non-negative")
+          dp = [0] * (budget + 1)
+          for item in items:
+              for costLimit in range(budget, item["cost"] - 1, -1):
+                  dp[costLimit] = max(dp[costLimit], dp[costLimit - item["cost"]] + item["value"])
+          return dp[budget]
+
+      assert bestCampaigns([{"cost": 1, "value": 5}], 0) == 0
+
+      try:
+          bestCampaigns([], -1)
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "budget must be non-negative"
+  - type: "tip"
+    title: "변주 실험"
+    content: "같은 캠페인을 여러 번 살 수 있는 무한 배낭 문제로 바꾸려면 반복문의 방향이 어떻게 달라지는지 실험하고 결과를 비교하세요."
 
 - id: "practice"
   title: "종합 복습"

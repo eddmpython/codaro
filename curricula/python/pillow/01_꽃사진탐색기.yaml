@@ -187,3 +187,73 @@ sections:
       title: "썸네일 출력"
       content: |-
         preview
+
+- id: workflow_validation
+  title: 6단계. 이미지 메타데이터 검증 루프
+  subtitle: size, mode, thumbnail 확인
+  blocks:
+  - type: text
+    content: 이미지를 여는 법을 배웠다면 다음 단계는 입력 이미지가 기대한 크기와 mode인지 검증하는 것입니다. 로컬에서 꽃 모양 이미지를 만들고 썸네일 생성 규칙을 assert로 확인합니다.
+  - type: code
+    language: python
+    title: 꽃 이미지 샘플 만들기
+    description: 외부 사진 없이 꽃잎과 중심을 가진 RGB 이미지를 만듭니다.
+    content: |-
+      from PIL import Image, ImageDraw, ImageStat
+
+      flowerImage = Image.new("RGB", (180, 120), (235, 245, 255))
+      flowerDraw = ImageDraw.Draw(flowerImage)
+      for box in [(55, 20, 95, 60), (85, 20, 125, 60), (55, 55, 95, 95), (85, 55, 125, 95)]:
+          flowerDraw.ellipse(box, fill=(238, 90, 150))
+      flowerDraw.ellipse((75, 45, 105, 75), fill=(245, 210, 70))
+
+      def validateImageInfo(image):
+          if image.mode != "RGB":
+              raise ValueError(f"RGB 이미지가 아닙니다: {image.mode}")
+          if image.size[0] < 100 or image.size[1] < 80:
+              raise ValueError(f"이미지가 너무 작습니다: {image.size}")
+          return True
+
+      validateImageInfo(flowerImage)
+  - type: code
+    language: python
+    title: 작은 이미지 오류 확인
+    description: 너무 작은 이미지를 넣어 검증 실패를 확인합니다.
+    content: |-
+      tinyFlower = Image.new("RGB", (40, 40), "white")
+
+      try:
+          validateImageInfo(tinyFlower)
+      except ValueError as exc:
+          flowerErrorMessage = str(exc)
+
+      flowerErrorMessage
+  - type: code
+    language: python
+    title: 썸네일과 색상 검증
+    description: thumbnail 결과 크기와 꽃 영역의 평균 색을 확인합니다.
+    content: |-
+      flowerThumb = flowerImage.copy()
+      flowerThumb.thumbnail((90, 90))
+      flowerStat = ImageStat.Stat(flowerImage)
+      flowerChecks = {
+          "thumbnailKeepsRatio": flowerThumb.size == (90, 60),
+          "modeOk": flowerImage.mode == "RGB",
+          "sizeOk": flowerImage.size == (180, 120),
+          "redChannelDominant": flowerStat.mean[0] > flowerStat.mean[2] * 0.8,
+          "errorOk": flowerErrorMessage == "이미지가 너무 작습니다: (40, 40)",
+      }
+
+      assert all(flowerChecks.values()), flowerChecks
+      flowerChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 다른 썸네일 제한을 적용해도 원본이 변하지 않는지 확인합니다.
+    content: |-
+      reviewThumb = flowerImage.copy()
+      reviewThumb.thumbnail((60, 50))
+
+      assert reviewThumb.size == (60, 40)
+      assert flowerImage.size == (180, 120)
+      reviewThumb.size, flowerImage.size

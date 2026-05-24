@@ -247,3 +247,71 @@ sections:
       content: |-
         sceneSwap = Image.merge('RGB', (sRed, sBlue, sGreen))
         sceneSwap
+
+- id: workflow_validation
+  title: 7단계. RGB 채널 검증 루프
+  subtitle: split, histogram, merge 확인
+  blocks:
+  - type: text
+    content: RGB 채널 분석은 채널을 분리해 보는 데서 끝나지 않습니다. 각 채널의 평균과 histogram 총합이 이미지 크기와 맞는지 확인하고, 채널 교환 결과가 의도대로 바뀌는지 검증합니다.
+  - type: code
+    language: python
+    title: RGB 패치 이미지 준비
+    description: 채널별 특성이 분명한 이미지를 만듭니다.
+    content: |-
+      from PIL import Image, ImageStat
+
+      channelImage = Image.new("RGB", (120, 90))
+      for x in range(120):
+          for y in range(90):
+              if x < 40:
+                  channelImage.putpixel((x, y), (220, 40, 40))
+              elif x < 80:
+                  channelImage.putpixel((x, y), (40, 220, 40))
+              else:
+                  channelImage.putpixel((x, y), (40, 40, 220))
+
+      def validateRgbMode(image):
+          if image.mode != "RGB":
+              raise ValueError(f"RGB 이미지가 필요합니다: {image.mode}")
+          return True
+
+      validateRgbMode(channelImage)
+  - type: code
+    language: python
+    title: mode 오류 확인
+    description: L mode 이미지를 넣어 검증 실패를 확인합니다.
+    content: |-
+      try:
+          validateRgbMode(channelImage.convert("L"))
+      except ValueError as exc:
+          channelErrorMessage = str(exc)
+
+      channelErrorMessage
+  - type: code
+    language: python
+    title: 채널 통계 검증
+    description: split 결과와 histogram 총합을 확인합니다.
+    content: |-
+      redChannel, greenChannel, blueChannel = channelImage.split()
+      redMean, greenMean, blueMean = ImageStat.Stat(channelImage).mean
+      redHist = redChannel.histogram()
+      channelChecks = {
+          "splitSizeOk": redChannel.size == channelImage.size,
+          "histMassOk": sum(redHist) == channelImage.size[0] * channelImage.size[1],
+          "meansBalanced": abs(redMean - greenMean) < 2 and abs(greenMean - blueMean) < 2,
+          "errorOk": channelErrorMessage == "RGB 이미지가 필요합니다: L",
+      }
+
+      assert all(channelChecks.values()), channelChecks
+      channelChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: R과 B 채널을 바꾸면 첫 패치의 색이 파랑 계열로 바뀌는지 확인합니다.
+    content: |-
+      swappedImage = Image.merge("RGB", (blueChannel, greenChannel, redChannel))
+      firstPatchPixel = swappedImage.getpixel((10, 10))
+
+      assert firstPatchPixel[2] > firstPatchPixel[0]
+      firstPatchPixel

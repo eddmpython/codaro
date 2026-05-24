@@ -32,6 +32,7 @@ sections:
     description: seaborn과 matplotlib을 불러옵니다
     content: |-
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
   - type: tip
     content: import seaborn as sns는 seaborn을 sns라는 짧은 이름으로 불러오는 관례입니다. sns.scatterplot(), sns.histplot()처럼 간결하게 사용할 수 있습니다.
@@ -45,12 +46,14 @@ sections:
   - type: code
     language: python
     title: iris 데이터 로드
-    description: seaborn 내장 데이터셋을 불러옵니다
+    description: Codaro 로컬 데이터셋을 불러옵니다
     content: |-
-      iris = sns.load_dataset('iris')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      iris = loadLocalDataset('iris')
       iris.head()
   - type: tip
-    content: sns.load_dataset('데이터셋명')은 seaborn의 GitHub 저장소에서 CSV 파일을 다운로드하여 DataFrame으로 반환합니다. 인터넷 연결이 필요하며, 한 번 로드하면 캐시됩니다.
+    content: loadLocalDataset('iris')처럼 Codaro가 함께 제공하는 로컬 샘플 데이터를 DataFrame으로 반환합니다. 인터넷 연결 없이 같은 분석 흐름을 재현할 수 있습니다.
 
 - id: step3_basic_scatter
   title: 3단계. 기본 산점도
@@ -210,6 +213,103 @@ sections:
 
       figFinal
 
+- id: workflow_validation
+  title: 11단계. 산점도 검증 루프
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: 산점도는 보기 좋게 그리는 것만으로 끝나지 않습니다. 데이터가 기대한 구조인지 확인하고, 차트가 실제로 세 품종을 색으로 구분했는지 검증해야 합니다. 이 단계에서는 setosa가 꽃잎 길이만으로도 다른 품종과 분리될 것이라고 먼저 예측한 뒤, 차트와 데이터 요약이 그 예측을 뒷받침하는지 확인합니다.
+  - type: code
+    language: python
+    title: 데이터 구조와 예측 확인
+    description: 필수 컬럼, 품종 수, setosa 분리 여부를 assert로 검증합니다
+    content: |-
+      requiredColumns = {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"}
+      missingColumns = requiredColumns - set(iris.columns)
+      speciesNames = sorted(iris["species"].unique())
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert speciesNames == ["setosa", "versicolor", "virginica"]
+
+      setosaMaxPetalLength = iris.loc[iris["species"] == "setosa", "petal_length"].max()
+      nonSetosaMinPetalLength = iris.loc[iris["species"] != "setosa", "petal_length"].min()
+
+      assert setosaMaxPetalLength < nonSetosaMinPetalLength
+
+      iris.groupby("species")[["petal_length", "petal_width", "sepal_length", "sepal_width"]].mean().round(2)
+  - type: code
+    language: python
+    title: 완성 차트 검증
+    description: Axes 객체에서 제목, 축 라벨, 범례, 점 개수를 확인합니다
+    content: |-
+      def validateIrisScatter(axis, expectedPointCount):
+          legend = axis.get_legend()
+          assert legend is not None, "품종 범례가 필요합니다."
+
+          labels = [text.get_text() for text in legend.get_texts()]
+          totalPointCount = sum(len(collection.get_offsets()) for collection in axis.collections)
+
+          assert axis.get_xlabel() == "Petal Length (cm)"
+          assert axis.get_ylabel() == "Petal Width (cm)"
+          assert "Iris Dataset" in axis.get_title()
+          assert set(["setosa", "versicolor", "virginica"]).issubset(set(labels))
+          assert totalPointCount == expectedPointCount
+
+          return labels, totalPointCount
+
+      legendLabels, pointCount = validateIrisScatter(axFinal, len(iris))
+      print("검증 통과:", legendLabels, pointCount)
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: hue 없이 만든 차트를 검증 함수가 실패시키는지 확인합니다
+    content: |-
+      figBroken, axBroken = plt.subplots(figsize=(8, 6))
+      sns.scatterplot(data=iris, x="petal_length", y="petal_width", ax=axBroken)
+      axBroken.set_xlabel("Petal Length (cm)")
+      axBroken.set_ylabel("Petal Width (cm)")
+      axBroken.set_title("Iris Dataset: Broken Scatter")
+
+      try:
+          validateIrisScatter(axBroken, len(iris))
+      except AssertionError as exc:
+          print("검증 실패 확인:", exc)
+
+      plt.close(figBroken)
+
+      figFixed, axFixed = plt.subplots(figsize=(8, 6))
+      sns.scatterplot(data=iris, x="petal_length", y="petal_width", hue="species", palette="Set2", ax=axFixed)
+      axFixed.set_xlabel("Petal Length (cm)")
+      axFixed.set_ylabel("Petal Width (cm)")
+      axFixed.set_title("Iris Dataset: Fixed Scatter")
+
+      assert validateIrisScatter(axFixed, len(iris))
+      plt.close(figFixed)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 꽃잎 변수와 꽃받침 변수 중 품종 구분에 더 강한 축을 비교합니다
+    content: |-
+      featureReport = []
+
+      for xColumn, yColumn in [
+          ("petal_length", "petal_width"),
+          ("sepal_length", "sepal_width"),
+      ]:
+          speciesMeans = iris.groupby("species")[[xColumn, yColumn]].mean()
+          xSpread = speciesMeans[xColumn].max() - speciesMeans[xColumn].min()
+          ySpread = speciesMeans[yColumn].max() - speciesMeans[yColumn].min()
+          featureReport.append({
+              "xColumn": xColumn,
+              "yColumn": yColumn,
+              "meanSpread": round(xSpread + ySpread, 2),
+          })
+
+      assert featureReport[0]["meanSpread"] > featureReport[1]["meanSpread"]
+      featureReport
+  - type: tip
+    content: "시각화 수업에서도 검증 함수가 필요합니다. 데이터 구조, 범례, 축 라벨, 점 개수를 확인하면 차트가 보고서에 들어가기 전에 깨진 상태를 잡을 수 있습니다."
+
 - id: practice
   title: 실습
   subtitle: 산점도 프로젝트
@@ -225,9 +325,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        data = sns.load_dataset('penguins').dropna()
+        data = loadLocalDataset('penguins').dropna()
     - type: code
       title: "차트 생성"
       content: |-
@@ -250,9 +351,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        df = sns.load_dataset('tips')
+        df = loadLocalDataset('tips')
     - type: code
       title: "차트 생성"
       content: |-
@@ -280,7 +382,7 @@ sections:
     content: Seaborn scatterplot으로 붓꽃 품종별 산점도를 만들었습니다.
   - type: list
     items:
-    - "sns.load_dataset('iris') - seaborn 내장 데이터 로드"
+    - "loadLocalDataset('iris') - Codaro 로컬 데이터 로드"
     - "sns.scatterplot(data, x, y) - 기본 산점도"
     - "hue='species' - 범주형 변수를 색상으로 구분"
     - "palette='Set2' - 색상 팔레트 변경"

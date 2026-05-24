@@ -47,7 +47,8 @@ code 세개 네개 가능. 코드가 긴 경우 탐색적으로 확인 가능하
     title: "데이터 로드"
     content: |-
       import seaborn as sns
-      data = sns.load_dataset('iris')
+      from codaro.curriculum.localData import loadLocalDataset
+      data = loadLocalDataset('iris')
   - type: code
     title: "차트 생성"
     content: |-

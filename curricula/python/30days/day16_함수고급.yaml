@@ -3,7 +3,7 @@ meta:
   title: "함수고급"
   day: 16
   category: "30days"
-  tags: []
+  tags: ["함수", "기본값", "args", "kwargs", "lambda", "설정함수", "검증"]
   seo:
     title: "파이썬 함수 고급 - 기본값, 가변인자, 람다"
     description: "기본값 매개변수, 키워드 인자, *args, **kwargs, lambda를 배웁니다."
@@ -467,6 +467,108 @@ sections:
       absVal(-42)
   - type: "tip"
     content: "복잡한 조건은 lambda보다 일반 함수가 읽기 쉽습니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 주문 요약 함수를 유연하게 설계하기"
+  subtitle: "기본값, 키워드 인자, args, kwargs를 실무 옵션으로 연결"
+  blocks:
+  - type: "text"
+    content: "고급 함수 문법은 인자를 많이 받기 위한 장식이 아닙니다. 같은 주문 계산 함수가 기본 세율, VIP 할인, 태그, 출력 옵션처럼 선택값을 안정적으로 받아야 할 때 필요합니다."
+  - type: "list"
+    items:
+    - "예측: 필수 값은 orderId와 item 금액들이고, 세율/할인/태그는 선택값이라고 정한다."
+    - "실행: *items로 여러 금액을 받고, taxRate와 **options로 정책을 바꾼다."
+    - "오류 수정: 빈 주문과 잘못된 금액을 ValueError/TypeError로 확인한다."
+    - "검증: 기본 호출, 키워드 호출, 옵션 호출 결과를 assert로 확인한다."
+  - type: "code"
+    language: "python"
+    title: "유연한 주문 요약 함수"
+    description: "*args와 **kwargs를 사용해 주문 금액과 선택 옵션을 한 함수로 처리합니다."
+    content: |-
+      def buildOrderSummary(orderId, *itemPrices, taxRate=0.1, **options):
+          if len(itemPrices) == 0:
+              raise ValueError('주문에는 금액이 하나 이상 필요합니다')
+          for price in itemPrices:
+              if not isinstance(price, int):
+                  raise TypeError('금액은 정수여야 합니다')
+
+          subtotal = sum(itemPrices)
+          discountRate = options.get('discountRate', 0)
+          discount = int(subtotal * discountRate)
+          tax = int((subtotal - discount) * taxRate)
+          total = subtotal - discount + tax
+          tag = options.get('tag', 'normal')
+          return {
+              'orderId': orderId,
+              'subtotal': subtotal,
+              'discount': discount,
+              'tax': tax,
+              'total': total,
+              'tag': tag,
+          }
+
+
+      baseSummary = buildOrderSummary('ORD-1', 10000, 5000)
+      vipSummary = buildOrderSummary('ORD-2', 10000, 5000, taxRate=0.08, discountRate=0.2, tag='vip')
+
+      assert baseSummary['total'] == 16500
+      assert vipSummary['total'] == 12960
+      assert vipSummary['tag'] == 'vip'
+  - type: "code"
+    language: "python"
+    title: "잘못된 호출 검증"
+    description: "빈 주문과 잘못된 타입을 조용히 넘기지 않고 명확한 예외로 확인합니다."
+    content: |-
+      try:
+          buildOrderSummary('EMPTY')
+      except ValueError as exc:
+          emptyError = str(exc)
+      else:
+          raise AssertionError('빈 주문은 실패해야 합니다')
+
+      try:
+          buildOrderSummary('BAD', 10000, '5000')
+      except TypeError as exc:
+          typeError = str(exc)
+      else:
+          raise AssertionError('문자열 금액은 실패해야 합니다')
+
+      assert emptyError == '주문에는 금액이 하나 이상 필요합니다'
+      assert typeError == '금액은 정수여야 합니다'
+  - type: "code"
+    language: "python"
+    title: "기본값 공유 실수 확인"
+    description: "mutable 기본값을 쓰면 호출 사이에 상태가 섞인다는 사실을 확인하고 안전한 형태로 고칩니다."
+    content: |-
+      def addTagBad(tag, tags=[]):
+          tags.append(tag)
+          return tags
+
+
+      firstTags = addTagBad('paid')
+      secondTags = addTagBad('vip')
+
+      def addTagSafe(tag, tags=None):
+          if tags is None:
+              tags = []
+          tags.append(tag)
+          return tags
+
+
+      safeFirst = addTagSafe('paid')
+      safeSecond = addTagSafe('vip')
+
+      assert firstTags is secondTags
+      assert secondTags == ['paid', 'vip']
+      assert safeFirst == ['paid']
+      assert safeSecond == ['vip']
+  - type: "expansion"
+    title: "실무 변주: lambda로 짧은 판정만 분리"
+    code: |-
+      isHighValue = lambda summary: summary['total'] >= 15000
+      assert isHighValue(baseSummary) is True
+      assert isHighValue(vipSummary) is False
+      isHighValue(baseSummary)
 
 - id: "practice"
   title: "Day 16 종합 복습"

@@ -3,6 +3,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
+import pytest
 import yaml
 from pydantic import ValidationError
 
@@ -95,6 +96,8 @@ def testCurriculaAvoidBrowserRuntimeAndBarePipCopy() -> None:
         re.compile(r"(?<!uv )\bpip\s+(install|list|--version)\b", re.IGNORECASE),
         re.compile(r"\bmicropip\b", re.IGNORECASE),
         re.compile(r"\bpyodide\b", re.IGNORECASE),
+        re.compile(r"\bmarimo\b", re.IGNORECASE),
+        re.compile(r"\b(?:sns|seaborn)\.load_dataset\s*\(", re.IGNORECASE),
         re.compile("브라우저 파이썬"),
         re.compile("가상 파일시스템"),
         re.compile("브라우저 보안"),
@@ -111,6 +114,73 @@ def testCurriculaAvoidBrowserRuntimeAndBarePipCopy() -> None:
                 failures.append(f"{path.relative_to(ROOT)}: {pattern.pattern}")
 
     assert not failures
+
+
+def testActiveRuntimeDocsUseLocalExecutionContract() -> None:
+    checkedPaths = (
+        ROOT / "src" / "codaro" / "DEV.md",
+        ROOT / "src" / "codaro" / "runtime" / "DEV.md",
+        ROOT / "launcher" / "PACKAGING.md",
+    )
+    forbiddenPatterns = (
+        re.compile(r"\bpyodide\b", re.IGNORECASE),
+        re.compile(r"\bmarimo\b", re.IGNORECASE),
+    )
+    failures: list[str] = []
+    for path in checkedPaths:
+        text = path.read_text(encoding="utf-8")
+        for pattern in forbiddenPatterns:
+            if pattern.search(text):
+                failures.append(f"{path.relative_to(ROOT)}: {pattern.pattern}")
+
+    assert not failures
+
+
+def testLocalCurriculumDatasetsCoverVisualizationLessons() -> None:
+    pytest.importorskip("pandas")
+
+    from codaro.curriculum.localData import loadLocalDataset
+
+    expectedColumns = {
+        "abalone": {"Sex", "Length", "Diameter", "Height", "WholeWeight", "Rings"},
+        "advertising": {"TV", "Radio", "Newspaper", "Sales"},
+        "tips": {"total_bill", "tip", "sex", "smoker", "day", "time", "size"},
+        "iris": {"sepal_length", "sepal_width", "petal_length", "petal_width", "species"},
+        "penguins": {"species", "island", "bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"},
+        "titanic": {"survived", "pclass", "sex", "age", "fare", "embarked"},
+        "titanic_passengers": {"PassengerId", "Survived", "Pclass", "Sex", "Age", "Embarked"},
+        "airline_passengers": {"Month", "Passengers"},
+        "airquality": {"Ozone", "Solar.R", "Wind", "Temp", "Month", "Day"},
+        "apple_stock": {"Date", "AAPL.Open", "AAPL.High", "AAPL.Low", "AAPL.Close", "AAPL.Volume"},
+        "bike_demand": {"Date", "Demand"},
+        "boston_housing": {"rm", "lstat", "tax", "ptratio", "medv"},
+        "churn": {"tenure", "MonthlyCharges", "TotalCharges", "Contract", "TechSupport", "Churn"},
+        "daily_births": {"Date", "Births"},
+        "diabetes": {"Pregnancies", "Glucose", "BloodPressure", "BMI", "Age", "Outcome"},
+        "earthquakes": {"Date", "Latitude", "Longitude", "Magnitude", "Depth"},
+        "fifa_players": {"Name", "Position", "Overall", "Pace", "Shooting", "Defending"},
+        "flights": {"year", "month", "passengers"},
+        "gapminder": {"country", "continent", "year", "pop", "lifeExp", "gdpPercap"},
+        "global_temp": {"Source", "Date", "Mean"},
+        "heart": {"age", "sex", "cp", "trestbps", "chol", "target"},
+        "hr_attrition": {"Age", "MonthlyIncome", "YearsAtCompany", "OverTime", "Department", "Attrition"},
+        "happiness": {"Country or region", "Score", "GDP per capita", "Social support"},
+        "imdb_movies": {"Title", "Genre", "Director", "Year", "Rating", "Revenue (Millions)"},
+        "insurance": {"age", "sex", "bmi", "children", "smoker", "region", "charges"},
+        "diamonds": {"carat", "cut", "color", "clarity", "price"},
+        "mpg": {"mpg", "cylinders", "horsepower", "weight", "model_year", "origin"},
+        "car_crashes": {"total", "speeding", "alcohol", "not_distracted", "no_previous", "abbrev"},
+        "exercise": {"id", "diet", "pulse", "time", "kind"},
+        "pokemon": {"Name", "Generation", "HP", "Attack", "Defense", "Sp. Atk", "Sp. Def", "Speed"},
+        "sonar": {"f0", "f1", "f2", "f59", "label"},
+        "spotify_songs": {"track_name", "track_artist", "playlist_genre", "track_popularity", "danceability"},
+        "video_games": {"Name", "Platform", "Year", "Genre", "Publisher", "Global_Sales"},
+        "weight_height": {"Gender", "Height", "Weight"},
+    }
+    for datasetName, columns in expectedColumns.items():
+        data = loadLocalDataset(datasetName)
+        assert len(data) >= 30
+        assert columns.issubset(set(data.columns))
 
 
 def testListContents() -> None:

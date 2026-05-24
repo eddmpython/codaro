@@ -386,3 +386,66 @@ sections:
         plt.title('Crop + Rotate + Resize')
         plt.axis('off')
         plt.tight_layout()
+
+- id: workflow_validation
+  title: 7단계. 기하 변환 검증 루프
+  subtitle: 크기, 회전, crop 계약 확인
+  blocks:
+  - type: text
+    content: 기하학적 변환은 화면에 맞춰 보정하는 작업이지만, 실무에서는 출력 크기와 관심 영역이 정확한지가 더 중요합니다. 스케일 오류를 먼저 잡고 resize, rotate, crop 결과를 수치로 검증합니다.
+  - type: code
+    language: python
+    title: 기준 이미지와 변환 함수
+    description: 중앙 사각형이 있는 이미지를 만들고 스케일 입력을 검증합니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      geoImage = np.zeros((80, 120, 3), dtype=np.uint8)
+      cv2.rectangle(geoImage, (30, 20), (90, 60), (0, 255, 0), -1)
+
+      def resizeByScale(image, scale):
+          if scale <= 0:
+              raise ValueError(f"scale은 양수여야 합니다: {scale}")
+          return cv2.resize(image, None, fx=scale, fy=scale, interpolation=cv2.INTER_NEAREST)
+
+      resizedGeo = resizeByScale(geoImage, 0.5)
+      resizedGeo.shape
+  - type: code
+    language: python
+    title: 잘못된 스케일 확인
+    description: 0 이하 스케일을 넣어 오류를 확인합니다.
+    content: |-
+      try:
+          resizeByScale(geoImage, 0)
+      except ValueError as exc:
+          scaleErrorMessage = str(exc)
+
+      scaleErrorMessage
+  - type: code
+    language: python
+    title: 회전과 crop 검증
+    description: 변환 후 shape와 관심 영역 픽셀을 확인합니다.
+    content: |-
+      h, w = geoImage.shape[:2]
+      rotationMatrix = cv2.getRotationMatrix2D((w / 2, h / 2), 90, 1.0)
+      rotatedGeo = cv2.warpAffine(geoImage, rotationMatrix, (w, h))
+      cropGeo = geoImage[20:60, 30:90]
+      geoChecks = {
+          "resizeShapeOk": resizedGeo.shape == (40, 60, 3),
+          "rotateShapeOk": rotatedGeo.shape == geoImage.shape,
+          "cropShapeOk": cropGeo.shape == (40, 60, 3),
+          "cropHasObject": int(np.count_nonzero(cropGeo[:, :, 1])) > 2000,
+          "errorOk": scaleErrorMessage == "scale은 양수여야 합니다: 0",
+      }
+
+      assert all(geoChecks.values()), geoChecks
+      geoChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 다른 배율을 적용해 결과 크기가 예측대로 바뀌는지 확인합니다.
+    content: |-
+      doubleGeo = resizeByScale(geoImage, 2.0)
+      assert doubleGeo.shape == (160, 240, 3)
+      resizedGeo.shape, doubleGeo.shape

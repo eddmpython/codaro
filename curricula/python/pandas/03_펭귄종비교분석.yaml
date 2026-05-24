@@ -7,8 +7,8 @@ meta:
   category: pandas
   difficulty: "⭐⭐⭐"
   badge: 기초
-  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv
-  tags: ["penguins", "groupby", "query", "agg"]
+  dataSource: codaro-local:penguins
+  tags: ["penguins", "groupby", "query", "agg", "검증", "그룹분석"]
   seo:
     title: "pandas groupby 완전정복 - 펭귄 데이터로 그룹별 통계"
     description: "펭귄 데이터로 groupby를 배웁니다. 종별 평균 체중, agg로 여러 통계 한번에, query로 간결한 필터링을 실습합니다."
@@ -25,18 +25,17 @@ sections:
   subtitle: 펭귄 데이터
   blocks:
   - type: text
-    content: 펭귄 데이터셋은 남극 팔머 제도의 3개 섬에서 관찰된 펭귄 344마리의 신체 측정 데이터입니다. Adelie(아델리), Gentoo(젠투), Chinstrap(턱끈) 3종의 펭귄이 포함되어 있으며, 각 개체의 부리 길이, 부리 깊이, 날개 길이, 체중, 성별, 서식 섬 등이 기록되어 있습니다. 이 데이터는 iris 데이터의 현대적 대안으로 자주 사용되며, groupby를 배우기에 매우 적합한 구조를 가지고 있습니다. 종별 비교를 통해 각 펭귄 종의 신체적 특징을 파악할 수 있습니다.
+    content: 펭귄 데이터셋은 남극 팔머 제도의 3개 섬에서 관찰된 펭귄 344마리의 신체 측정 데이터입니다. Adelie(아델리), Gentoo(젠투), Chinstrap(턱끈) 3종의 펭귄이 포함되어 있으며, 각 개체의 부리 길이, 부리 깊이, 날개 길이, 체중, 성별, 서식 섬 등이 기록되어 있습니다. 이 데이터는 iris 데이터의 현대적 대안으로 자주 사용되며, groupby를 배우기에 매우 적합한 구조를 가지고 있습니다. 로컬 실행에서는 네트워크가 없어도 종별 비교 흐름을 유지하도록 같은 컬럼의 샘플 데이터를 함께 둡니다.
   - type: code
     language: python
     title: 데이터 불러오기
     description: 펭귄 데이터를 불러옵니다
     content: |-
       import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv"
-      penguins = pd.read_csv(url)
+      penguins = loadLocalDataset("penguins")
       penguins.shape
-
 - id: step2_value_counts
   title: 2단계. 종별 개수
   subtitle: value_counts로 확인
@@ -264,6 +263,57 @@ sections:
   - type: tip
     content: "idxmax()와 idxmin()은 결측치(NaN)가 있으면 무시하고 계산합니다. 만약 결측치가 있는 행도 고려하려면 skipna=False 파라미터를 추가하면 됩니다. 예: penguins['body_mass_g'].idxmax(skipna=False)"
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 종별 펭귄 특성 리포트"
+  subtitle: "query, groupby, agg, idxmax, 실패 케이스"
+  blocks:
+  - type: text
+    content: "그룹 비교는 평균만 보고 끝내면 약합니다. 필터링 조건, 그룹별 표본 수, 극값 행이 모두 기대와 맞는지 확인해야 리포트로 쓸 수 있습니다."
+  - type: code
+    language: python
+    title: "종별 체중 통계와 최대 개체 찾기"
+    description: "groupby/agg와 idxmax를 함께 검증합니다."
+    content: |-
+      import pandas as pd
+
+      penguins = pd.DataFrame({
+          "species": ["Adelie", "Adelie", "Gentoo", "Gentoo"],
+          "sex": ["FEMALE", "MALE", "FEMALE", "MALE"],
+          "body_mass_g": [3200, 3600, 4700, 5200],
+      })
+
+      female = penguins.query('sex == "FEMALE"')
+      report = penguins.groupby("species").agg(
+          count=("body_mass_g", "size"),
+          avgMass=("body_mass_g", "mean"),
+      )
+      maxRow = penguins.loc[penguins["body_mass_g"].idxmax()]
+
+      assert female["body_mass_g"].tolist() == [3200, 4700]
+      assert report.loc["Gentoo", "avgMass"] == 4950
+      assert maxRow["species"] == "Gentoo"
+  - type: code
+    language: python
+    title: "결측 체중 오류 확인"
+    description: "핵심 분석 컬럼에 결측이 있으면 리포트 전에 확인합니다."
+    content: |-
+      import pandas as pd
+
+      def validatePenguins(frame):
+          if frame["body_mass_g"].isna().any():
+              raise ValueError("body_mass_g must not contain missing values")
+          return True
+
+      try:
+          validatePenguins(pd.DataFrame({"body_mass_g": [3200, None]}))
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "body_mass_g must not contain missing values"
+  - type: tip
+    title: "변주 실험"
+    content: "성별까지 groupby에 포함해 `species, sex` 조합별 평균을 만들고, 표본 수가 1개인 그룹을 리포트에서 제외할지 정책을 정하세요."
+
 - id: practice
   title: 실습
   subtitle: 펭귄 종 비교 프로젝트
@@ -279,7 +329,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        data = loadLocalDataset("penguins")
     - type: code
       title: "분석 수행"
       content: |-
@@ -293,7 +345,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/penguins.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        df = loadLocalDataset("penguins")
     - type: code
       title: "분석 수행"
       content: |-

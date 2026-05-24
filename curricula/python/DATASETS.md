@@ -4,33 +4,25 @@ Codaro 로컬 Python 환경에서 사용 가능한 모든 데이터셋을 정리
 
 ---
 
-## 1. Seaborn 내장 데이터셋
+## 1. Codaro 로컬 교육 데이터셋
 
 ```python
-import seaborn as sns
-df = sns.load_dataset('데이터셋명')
+from codaro.curriculum.localData import loadLocalDataset
+df = loadLocalDataset('tips')
 ```
 
 | 데이터셋 | 행 수 | 컬럼 | 도메인 | 적합한 분석 |
 |----------|-------|------|--------|-------------|
-| tips | 244 | total_bill, tip, sex, smoker, day, time, size | 레스토랑 | 회귀, EDA |
+| tips | 120 | total_bill, tip, sex, smoker, day, time, size | 레스토랑 | 회귀, EDA |
 | iris | 150 | sepal_length, sepal_width, petal_length, petal_width, species | 생물학 | 분류, 클러스터링 |
-| penguins | 344 | species, island, bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g, sex | 생물학 | 분류, EDA |
-| titanic | 891 | survived, pclass, sex, age, sibsp, parch, fare, embarked 등 15개 | 역사 | 분류, 생존분석 |
-| diamonds | 53,940 | carat, cut, color, clarity, depth, table, price, x, y, z | 상업 | 회귀, 가격예측 |
-| mpg | 398 | mpg, cylinders, displacement, horsepower, weight, acceleration, model_year, origin, name | 자동차 | 회귀 |
+| penguins | 120 | species, island, bill_length_mm, bill_depth_mm, flipper_length_mm, body_mass_g, sex | 생물학 | 분류, EDA |
+| titanic | 180 | survived, pclass, sex, age, sibsp, parch, fare, embarked 등 15개 | 역사 | 분류, 생존분석 |
+| diamonds | 5,400 | carat, cut, color, clarity, depth, table, price, x, y, z | 상업 | 회귀, 가격예측 |
+| mpg | 144 | mpg, cylinders, displacement, horsepower, weight, acceleration, model_year, origin, name | 자동차 | 회귀 |
 | flights | 144 | year, month, passengers | 항공 | 시계열, 히트맵 |
-| fmri | 1,064 | subject, timepoint, event, region, signal | 뇌과학 | 시계열, ANOVA |
-| geyser | 272 | duration, waiting, kind | 자연 | 분포분석, 클러스터링 |
-| car_crashes | 51 | total, speeding, alcohol, not_distracted, no_previous, ins_premium, ins_losses, abbrev | 안전 | 상관분석 |
-| planets | 1,035 | method, number, orbital_period, mass, distance, year | 천문학 | EDA |
+| car_crashes | 51 | total, speeding, alcohol, not_distracted, no_previous, ins_premium, ins_losses, abbrev | 교통 | 지역 비교, 순위 |
+| exercise | 90 | id, diet, pulse, time, kind | 건강 | 선 그래프, 그룹 비교 |
 | anscombe | 44 | dataset, x, y | 통계 | 시각화 중요성 |
-| attention | 60 | subject, attention, solutions, score | 심리학 | ANOVA |
-| dots | 848 | align, choice, time, coherence, firing_rate | 신경과학 | 시계열 |
-| exercise | 90 | id, diet, pulse, time, kind | 건강 | ANOVA |
-| healthexp | 274 | Year, Country, Spending_USD, Life_Expectancy | 의료 | 시계열, 비교 |
-| dowjones | 649 | Date, Price | 금융 | 시계열 |
-| taxis | 6,433 | pickup, dropoff, passengers, distance, fare, tip 등 14개 | 교통 | 회귀, 지리 |
 
 ---
 
@@ -356,11 +348,11 @@ df = pd.read_csv(f"{baseUrl}/airlines/airlines.csv")
 
 ## 사용 가이드
 
-### 1. 라이브러리 내장 데이터 (권장)
+### 1. Codaro 로컬/라이브러리 내장 데이터 (권장)
 
 ```python
-import seaborn as sns
-df = sns.load_dataset('tips')
+from codaro.curriculum.localData import loadLocalDataset
+df = loadLocalDataset('tips')
 
 from sklearn.datasets import load_iris
 data = load_iris()
@@ -379,7 +371,7 @@ df = pd.read_csv(url)
 
 ### 3. 데이터 선택 기준
 
-1. **Codaro 로컬 Python 호환성**: 네트워크 fetch 가능
+1. **Codaro 로컬 Python 호환성**: 인터넷 연결 없이 핵심 학습 흐름을 재현 가능
 2. **크기**: 100~50,000행 권장
 3. **도메인 다양성**: 기존 카테고리와 중복 최소화
 4. **학습 적합성**: 해당 개념을 가르치기에 적절한 구조

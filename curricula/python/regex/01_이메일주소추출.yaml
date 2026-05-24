@@ -5,7 +5,7 @@ meta:
   category: regex
   difficulty: "⭐"
   badge: 입문
-  tags: ["이메일", "findall", "문자 클래스", "기본 패턴", "JSONPlaceholder"]
+  tags: ["이메일", "findall", "문자 클래스", "기본 패턴", "로컬 JSON"]
   seo:
     title: "정규표현식 입문 - 이메일 주소 추출"
     description: "정규표현식으로 텍스트에서 이메일 주소를 추출합니다. 기본 패턴, 문자 클래스, findall 사용법을 배웁니다."
@@ -13,7 +13,7 @@ meta:
 
 intro:
   emoji: "📧"
-  goal: JSONPlaceholder 사용자 데이터에서 모든 이메일 주소를 추출합니다.
+  goal: 로컬 사용자 JSON 샘플에서 모든 이메일 주소를 추출합니다.
   description: 정규표현식의 첫 프로젝트입니다. 기본 패턴과 문자 클래스로 이메일을 찾아내는 방법을 배웁니다. 웹 데이터 정제의 기초를 다집니다.
 
 sections:
@@ -26,11 +26,10 @@ sections:
   - type: code
     language: python
     title: 라이브러리 불러오기
-    description: re 모듈과 데이터 로드를 위한 모듈을 불러옵니다
+    description: 정규표현식과 JSON 변환 모듈을 불러옵니다
     content: |-
       import re
       import json
-      from urllib.request import urlopen
   - type: note
     style: tip
     title: re 모듈이란?
@@ -38,23 +37,33 @@ sections:
 
 - id: step2_load
   title: 2단계. 데이터 불러오기
-  subtitle: urlopen, JSON 파싱
+  subtitle: 로컬 JSON 샘플
   blocks:
   - type: text
-    content: JSONPlaceholder API에서 사용자 데이터를 가져옵니다. 이 API는 개발자들이 테스트 목적으로 사용하는 무료 서비스로, 10명의 가상 사용자 정보를 제공합니다. 각 사용자 데이터에는 이름, 이메일, 주소, 회사 정보 등이 포함되어 있어 정규표현식 학습에 적합한 실습 데이터입니다.
+    content: 정규표현식 학습에 필요한 사용자 데이터를 로컬 JSON 구조로 준비합니다. 이름, 이메일, 팀 정보가 들어 있는 리스트를 쓰면 네트워크와 무관하게 데이터 탐색, 문자열 변환, 이메일 추출 흐름을 반복 연습할 수 있습니다.
   - type: code
     language: python
     title: 데이터 로드
-    description: JSONPlaceholder에서 사용자 데이터를 가져옵니다
+    description: 로컬 사용자 샘플을 준비합니다
     content: |-
-      usersData = json.loads(
-          urlopen("https://jsonplaceholder.typicode.com/users").read()
-      )
+      usersData = [
+          {"name": "Hana Kim", "email": "hana.kim@codaro.io", "team": "education"},
+          {"name": "Min Park", "email": "min.park@dataworks.com", "team": "analytics"},
+          {"name": "Jae Lee", "email": "jae_lee@codaro.io", "team": "automation"},
+          {"name": "Soo Choi", "email": "soo.choi@insightlab.kr", "team": "research"},
+          {"name": "Yuna Jung", "email": "yuna.jung@sample.org", "team": "support"},
+          {"name": "Alex Morgan", "email": "alex.morgan@service.net", "team": "platform"},
+          {"name": "Rina Han", "email": "rina.han@codaro.io", "team": "education"},
+          {"name": "Noah Shin", "email": "noah.shin@opsmail.co", "team": "operations"},
+          {"name": "Mina Kwon", "email": "mina.kwon@dataworks.com", "team": "analytics"},
+          {"name": "Leo Yu", "email": "leo.yu@sample.org", "team": "support"},
+      ]
+
       usersData[:2]
   - type: note
     style: tip
-    title: JSONPlaceholder란?
-    content: JSONPlaceholder는 무료 REST API로, 테스트와 학습용 데이터를 제공합니다. 로컬 Python에서도 바로 가져와 JSON 파싱 실습에 사용할 수 있습니다.
+    title: 로컬 JSON 샘플
+    content: 리스트 안에 딕셔너리를 담으면 실제 API 응답과 비슷한 JSON 구조를 만들 수 있습니다. 이 구조를 문자열로 변환하면 정규표현식 추출 연습에 바로 사용할 수 있습니다.
 
 - id: step3_explore
   title: 3단계. 이메일 형식 탐색
@@ -72,11 +81,11 @@ sections:
   - type: text
     content: |-
       확인된 이메일 형식:
-      - Sincere@april.biz
-      - Shanna@melissa.tv
-      - Nathan@yesenia.net
-      - Julianne.OConner@kory.org
-      - Lucio_Hettinger@annie.ca
+      - hana.kim@codaro.io
+      - min.park@dataworks.com
+      - jae_lee@codaro.io
+      - soo.choi@insightlab.kr
+      - yuna.jung@sample.org
 
       공통 패턴: **단어@단어.단어** 형식입니다. 단어 부분에는 문자, 숫자, 마침표(.), 언더스코어(_)가 올 수 있습니다.
 
@@ -184,12 +193,125 @@ sections:
   - type: text
     content: 정규표현식으로 비정형 텍스트에서 구조화된 정보를 추출했습니다. JSON 구조를 파싱하지 않고도 패턴만으로 원하는 데이터를 찾아낸 것입니다. 이것이 정규표현식의 첫 번째 강력함입니다. 웹 크롤링, 로그 분석, 데이터 정제 등 다양한 분야에서 이 기법이 활용됩니다.
 
+- id: step8_workflow
+  title: 8단계. 실무 이메일 추출 검증
+  subtitle: 예측 → 오류 확인 → 검증 → 도메인 기준 실험
+  blocks:
+  - type: text
+    content: |-
+      실무에서는 이메일처럼 보이는 문자열을 많이 찾는 것보다, 잘못 잡은 값과 놓친 값을 줄이는 것이 더 중요합니다. 특히 `alerts+ops@codaro.io`처럼 `+`가 들어간 주소는 단순 패턴에서 누락되거나 일부만 잘릴 수 있습니다.
+
+      이번 단계에서는 먼저 기대 결과를 정해두고, 단순 패턴이 실패하는 모습을 확인합니다. 그다음 검증 함수를 만들어 추출 개수·도메인 통계·허용 도메인 필터가 모두 맞는지 확인합니다.
+  - type: code
+    language: python
+    title: 기대 결과 먼저 정하기
+    description: 업무 연락처 텍스트와 정답 세트
+    content: |-
+      workflowText = """
+      고객 문의: support@codaro.io
+      데이터 팀: min.park@dataworks.com
+      운영 알림: alerts+ops@codaro.io
+      연구 협업: soo.choi@insightlab.kr
+      잘못된 값: broken@codaro, user@@example.com, @missing.local
+      """
+
+      expectedEmails = {
+          "support@codaro.io",
+          "min.park@dataworks.com",
+          "alerts+ops@codaro.io",
+          "soo.choi@insightlab.kr",
+      }
+
+      print("예상 추출 개수:", len(expectedEmails))
+  - type: code
+    language: python
+    title: 단순 패턴의 실패 확인
+    description: + 주소가 잘리는 문제 잡기
+    content: |-
+      naivePattern = r"[\w.]+@[\w.]+\.\w+"
+      naiveEmails = set(re.findall(naivePattern, workflowText))
+
+      try:
+          assert naiveEmails == expectedEmails
+      except AssertionError:
+          print("의도한 오류 확인:", sorted(naiveEmails ^ expectedEmails))
+      else:
+          raise AssertionError("단순 패턴은 + 문자가 포함된 이메일 문제를 드러내야 합니다.")
+  - type: code
+    language: python
+    title: 검증 가능한 추출 함수 만들기
+    description: 후보 추출 후 fullmatch로 재검증
+    content: |-
+      emailPattern = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
+
+
+      def extractValidatedEmails(text):
+          emails = []
+          for candidate in emailPattern.findall(text):
+              localPart, domainPart = candidate.rsplit("@", 1)
+              if not localPart or not domainPart:
+                  raise ValueError(f"이메일 구조가 비었습니다: {candidate}")
+              if ".." in localPart or domainPart.startswith(".") or domainPart.endswith("."):
+                  raise ValueError(f"점 위치가 잘못된 이메일입니다: {candidate}")
+              if emailPattern.fullmatch(candidate) is None:
+                  raise ValueError(f"검증에 실패한 이메일입니다: {candidate}")
+              emails.append(candidate.lower())
+          return emails
+
+
+      validatedEmails = extractValidatedEmails(workflowText)
+      assert set(validatedEmails) == expectedEmails
+      assert len(validatedEmails) == len(expectedEmails)
+
+      validatedEmails
+  - type: code
+    language: python
+    title: 도메인 리포트 검증
+    description: 추출 결과를 업무 리포트로 만들기
+    content: |-
+      domainReport = {}
+      for email in validatedEmails:
+          domain = email.split("@")[1]
+          domainReport[domain] = domainReport.get(domain, 0) + 1
+
+      assert sum(domainReport.values()) == len(validatedEmails)
+      assert domainReport["codaro.io"] == 2
+      assert "broken@codaro" not in validatedEmails
+
+      domainReport
+  - type: code
+    language: python
+    title: 허용 도메인 기준 실험
+    description: 기준을 넓힐 때 결과가 늘어나는지 확인
+    content: |-
+      def filterByAllowedDomains(emails, allowedDomains):
+          return [
+              email
+              for email in emails
+              if email.split("@")[1] in allowedDomains
+          ]
+
+
+      codaroOnly = filterByAllowedDomains(validatedEmails, {"codaro.io"})
+      codaroAndDataworks = filterByAllowedDomains(
+          validatedEmails,
+          {"codaro.io", "dataworks.com"},
+      )
+
+      assert len(codaroAndDataworks) >= len(codaroOnly)
+      assert codaroOnly == ["support@codaro.io", "alerts+ops@codaro.io"]
+
+      {
+          "codaroOnly": codaroOnly,
+          "codaroAndDataworks": codaroAndDataworks,
+      }
+
 - id: practice
   title: 실습
   subtitle: 이메일 추출 프로젝트
   blocks:
   - type: text
-    content: 정규표현식 개발자가 되어 이메일 추출 도구를 만들어봅시다. 미션1에서는 회사 연락처에서 특정 도메인(.com)의 이메일만 필터링하고, 미션2에서는 JSONPlaceholder API에서 실제 데이터를 가져와 도메인별 통계를 분석합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
+    content: 정규표현식 개발자가 되어 이메일 추출 도구를 만들어봅시다. 미션1에서는 회사 연락처에서 특정 도메인(.com)의 이메일만 필터링하고, 미션2에서는 로컬 사용자 JSON 샘플에서 이메일을 추출해 도메인별 통계를 분석합니다. 각 미션은 import문부터 시작하여 독립적으로 실행할 수 있습니다.
   - type: tip
     content: 각 미션은 import문부터 시작하지만, 위 연습 예제를 실행했다면 이미 라이브러리가 로딩되었으므로 import문은 제거해도 됩니다.
   - type: expansion
@@ -217,18 +339,22 @@ sections:
         filtered = [e for e in emails if e.endswith('.com')]
         filtered
   - type: expansion
-    title: "미션2: JSONPlaceholder 이메일 추출 및 도메인 통계"
+    title: "미션2: 로컬 사용자 이메일 추출 및 도메인 통계"
     blocks:
     - type: code
       title: "데이터 로드 및 이메일 추출"
       content: |-
         import re
         import json
-        from urllib.request import urlopen
 
-        data = json.loads(
-            urlopen("https://jsonplaceholder.typicode.com/users").read()
-        )
+        data = [
+            {"name": "Hana Kim", "email": "hana.kim@codaro.io", "team": "education"},
+            {"name": "Min Park", "email": "min.park@dataworks.com", "team": "analytics"},
+            {"name": "Jae Lee", "email": "jae_lee@codaro.io", "team": "automation"},
+            {"name": "Soo Choi", "email": "soo.choi@insightlab.kr", "team": "research"},
+            {"name": "Yuna Jung", "email": "yuna.jung@sample.org", "team": "support"},
+        ]
+
         raw = json.dumps(data)
         found = re.findall(r"[\w.]+@[\w.]+\.\w+", raw)
         found
@@ -256,3 +382,89 @@ sections:
     - "re.findall() - 모든 매칭 결과를 리스트로 반환"
   - type: text
     content: 다음 프로젝트에서는 전화번호 형식을 통일하는 방법을 배웁니다!
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 연락처 텍스트 정제 파이프라인"
+  subtitle: "예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주"
+  blocks:
+  - type: text
+    content: "정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다."
+  - type: code
+    language: python
+    title: "이메일과 전화번호 추출"
+    description: "실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다."
+    content: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+  - type: code
+    language: python
+    title: "패턴 오류와 빈 입력을 먼저 실패시킨다"
+    description: "컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다."
+    content: |-
+      try:
+          re.compile(r'([A-Z]+')
+      except re.error as exc:
+          regexCompileError = str(exc)
+
+      def extractRequiredEmails(text):
+          found = emailPattern.findall(text)
+          if not found:
+              raise ValueError('email not found')
+          return found
+
+      try:
+          extractRequiredEmails('no contact here')
+      except ValueError as exc:
+          emailExtractError = str(exc)
+
+      assert regexCompileError
+      assert emailExtractError == 'email not found'
+      regexCompileError, emailExtractError
+  - type: code
+    language: python
+    title: "정제 결과를 업무 구조로 검증"
+    description: "추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다."
+    content: |-
+      def maskEmail(email):
+          name, domain = email.split('@')
+          return name[0] + '***@' + domain
+
+      contactReport = [
+          {'email': email, 'masked': maskEmail(email), 'domain': email.split('@')[1]}
+          for email in emails
+      ]
+      domainCounts = {row['domain']: 0 for row in contactReport}
+      for row in contactReport:
+          domainCounts[row['domain']] += 1
+
+      assert contactReport[0]['masked'] == 'k***@example.com'
+      assert domainCounts == {'example.com': 1, 'company.co.kr': 1}
+      contactReport
+  - type: code
+    language: python
+    title: "실무 변주: 허용 도메인 정책 바꾸기"
+    description: "회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다."
+    content: |-
+      def filterAllowedDomains(report, allowedDomains):
+          if not allowedDomains:
+              raise ValueError('allowedDomains must not be empty')
+          return [row for row in report if row['domain'] in allowedDomains]
+
+      companyOnly = filterAllowedDomains(contactReport, {'company.co.kr'})
+      assert [row['email'] for row in companyOnly] == ['lee@company.co.kr']
+      companyOnly

@@ -3,7 +3,7 @@ meta:
   title: "typing 고급"
   day: 15
   category: "advancedPython"
-  tags: ["Literal", "Final", "TypedDict", "Annotated", "NewType"]
+  tags: ["Literal", "Final", "TypedDict", "Annotated", "NewType", "검증", "데이터계약"]
   seo:
     title: "파이썬 typing 고급 - Literal, Final, TypedDict, Annotated"
     description: "고급 타이핑을 마스터합니다. Literal, Final, TypedDict, Annotated, NewType, TypeGuard 완벽 이해."
@@ -392,6 +392,102 @@ sections:
       process("hello"), process(None)
   - type: "tip"
     content: "Python 3.13+에서는 TypeIs가 더 정확한 타입 좁히기를 제공합니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 결제 요청 데이터 계약 만들기"
+  subtitle: "Literal, Final, TypedDict, Annotated, NewType을 실행 가능한 검증 흐름으로 연결합니다"
+  blocks:
+  - type: "text"
+    content: "정밀한 typing은 API 경계에서 특히 효과가 큽니다. 결제 요청 딕셔너리의 필수 키, 허용 값, 금액 제한을 타입으로 표현하고, 런타임 검증 함수가 같은 계약을 지키는지 확인하세요."
+  - type: "code"
+    language: "python"
+    title: "결제 요청 타입과 검증 함수"
+    description: "TypedDict와 Literal로 구조를 표현하고, Annotated 메타데이터와 Final 상수를 함께 확인합니다."
+    content: |-
+      from typing import Annotated, Final, Literal, NewType, TypedDict, get_args, get_origin
+
+      OrderId = NewType("OrderId", str)
+      Currency = Literal["KRW", "USD"]
+      Method = Literal["card", "bank"]
+      PositiveAmount = Annotated[int, "positive"]
+      MAX_AMOUNT: Final[int] = 1_000_000
+
+      class PaymentPayload(TypedDict):
+          orderId: str
+          amount: int
+          currency: Currency
+          method: Method
+
+      def validatePayment(payload: PaymentPayload) -> PaymentPayload:
+          required = {"orderId", "amount", "currency", "method"}
+          missing = required - payload.keys()
+          if missing:
+              raise KeyError(f"missing keys: {sorted(missing)}")
+          if payload["currency"] not in get_args(Currency):
+              raise ValueError("unsupported currency")
+          if payload["method"] not in get_args(Method):
+              raise ValueError("unsupported method")
+          if not 0 < payload["amount"] <= MAX_AMOUNT:
+              raise ValueError("amount out of range")
+          return payload
+
+      request: PaymentPayload = {
+          "orderId": OrderId("O-100"),
+          "amount": 49_000,
+          "currency": "KRW",
+          "method": "card",
+      }
+
+      checked = validatePayment(request)
+
+      assert checked["orderId"] == "O-100"
+      assert get_origin(PositiveAmount) is Annotated
+      assert get_args(Currency) == ("KRW", "USD")
+  - type: "code"
+    language: "python"
+    title: "API 경계 오류 확인"
+    description: "잘못된 통화와 누락 키가 다른 예외로 드러나는지 확인합니다."
+    content: |-
+      from typing import Final, Literal, TypedDict, get_args
+
+      Currency = Literal["KRW", "USD"]
+      Method = Literal["card", "bank"]
+      MAX_AMOUNT: Final[int] = 1_000_000
+
+      class PaymentPayload(TypedDict):
+          orderId: str
+          amount: int
+          currency: Currency
+          method: Method
+
+      def validatePayment(payload: PaymentPayload) -> PaymentPayload:
+          required = {"orderId", "amount", "currency", "method"}
+          missing = required - payload.keys()
+          if missing:
+              raise KeyError(f"missing keys: {sorted(missing)}")
+          if payload["currency"] not in get_args(Currency):
+              raise ValueError("unsupported currency")
+          if payload["method"] not in get_args(Method):
+              raise ValueError("unsupported method")
+          if not 0 < payload["amount"] <= MAX_AMOUNT:
+              raise ValueError("amount out of range")
+          return payload
+
+      try:
+          validatePayment({"orderId": "O-101", "amount": 10_000, "currency": "EUR", "method": "card"})
+      except ValueError as exc:
+          currencyMessage = str(exc)
+
+      try:
+          validatePayment({"orderId": "O-102", "amount": 10_000, "currency": "KRW"})
+      except KeyError as exc:
+          missingMessage = str(exc)
+
+      assert currencyMessage == "unsupported currency"
+      assert "method" in missingMessage
+  - type: "tip"
+    title: "변주 실험"
+    content: "`refund` 메서드를 추가할 때 허용 통화와 금액 범위를 어떻게 바꿔야 하는지 `Literal`과 검증 함수를 같이 수정한 뒤 실패 케이스를 먼저 작성하세요."
 
 - id: "practice"
   title: "종합 복습"

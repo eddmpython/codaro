@@ -25,7 +25,7 @@ sections:
   subtitle: import
   blocks:
   - type: text
-    content: gapminder 데이터를 사용하여 대륙별 인구를 분석합니다. 이 데이터는 세계 각국의 발전 지표를 담고 있으며, GitHub에서 직접 불러옵니다. pandas의 read_csv로 URL에서 바로 데이터를 로드할 수 있습니다.
+    content: gapminder 데이터를 사용하여 대륙별 인구를 분석합니다. 이 데이터는 세계 각국의 발전 지표를 담고 있으며, Codaro 로컬 데이터셋에서 직접 불러와 인터넷 연결 없이 실행할 수 있습니다.
   - type: code
     language: python
     title: 라이브러리 불러오기
@@ -61,17 +61,18 @@ sections:
 
 - id: step2_data
   title: 2단계. 데이터 로드
-  subtitle: GitHub에서 로드
+  subtitle: Codaro 로컬 데이터셋에서 로드
   blocks:
   - type: text
-    content: gapminder 데이터를 GitHub raw URL에서 직접 불러옵니다. 이 데이터는 1952년부터 2007년까지 세계 각국의 기대수명, 인구, GDP 정보를 담고 있습니다. plotly datasets 저장소에서 제공하는 공개 데이터입니다.
+    content: gapminder 데이터를 Codaro 로컬 데이터셋에서 불러옵니다. 이 데이터는 세계 각국의 기대수명, 인구, GDP 정보를 담고 있어 대륙별 비교 연습에 적합합니다.
   - type: code
     language: python
     title: gapminder 데이터 로드
-    description: GitHub에서 CSV 파일을 불러옵니다
+    description: Codaro 로컬 데이터셋에서 CSV 파일을 불러옵니다
     content: |-
-      baseUrl = "https://raw.githubusercontent.com"
-      gapminder = pd.read_csv(f"{baseUrl}/plotly/datasets/master/gapminder_unfiltered.csv")
+      from codaro.curriculum.localData import loadLocalDataset
+
+      gapminder = loadLocalDataset("gapminder")
       gapminder.head()
 
 - id: step3_filter
@@ -299,9 +300,9 @@ sections:
       content: |-
         import matplotlib.pyplot as plt
         import pandas as pd
+        from codaro.curriculum.localData import loadLocalDataset
 
-        url = "https://raw.githubusercontent.com"
-        data = pd.read_csv(f"{url}/plotly/datasets/master/gapminder_unfiltered.csv")
+        data = loadLocalDataset("gapminder")
 
         year2007 = data[data['year'] == 2007]
         lifeByContinent = year2007.groupby('continent')['lifeExp'].mean().reset_index()
@@ -337,9 +338,9 @@ sections:
       content: |-
         import matplotlib.pyplot as plt
         import pandas as pd
+        from codaro.curriculum.localData import loadLocalDataset
 
-        source = "https://raw.githubusercontent.com"
-        df = pd.read_csv(f"{source}/plotly/datasets/master/gapminder_unfiltered.csv")
+        df = loadLocalDataset("gapminder")
 
         asia = df[df['continent'] == 'Asia']
         popByYear = asia.groupby('year')['pop'].sum().reset_index()
@@ -383,3 +384,93 @@ sections:
     - "spines[].set_visible(False) - 테두리 제거"
   - type: text
     content: 다음 시간에는 펭귄 데이터로 바이올린 플롯과 박스플롯을 비교합니다.
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 보고서 차트 품질 게이트
+  blocks:
+  - type: text
+    content: "Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다."
+  - type: code
+    language: python
+    title: 보고서 데이터 검증
+    description: 필수 컬럼과 금액 범위를 확인합니다.
+    content: |-
+      import pandas as pd
+      import matplotlib.pyplot as plt
+
+      reportData = pd.DataFrame({
+          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          "revenue": [82, 91, 105, 112, 121, 130],
+          "cost": [55, 58, 62, 64, 68, 72],
+          "target": [100, 100, 100, 100, 100, 100],
+      })
+
+      def validateChartFrame(frame: pd.DataFrame) -> bool:
+          requiredColumns = {"month", "revenue", "cost", "target"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame[["revenue", "cost", "target"]].lt(0).any().any():
+              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+          return True
+
+      validateChartFrame(reportData)
+      reportData
+  - type: code
+    language: python
+    title: 실패 입력 확인
+    description: 목표선 컬럼이 빠진 데이터를 검증 함수가 거부하는지 확인합니다.
+    content: |-
+      try:
+          validateChartFrame(reportData.drop(columns=["target"]))
+      except ValueError as exc:
+          chartValidationMessage = str(exc)
+
+      assert "필수 컬럼" in chartValidationMessage
+      chartValidationMessage
+  - type: code
+    language: python
+    title: 예측 후 차트 구성
+    description: 4개월이 목표를 넘을 것이라고 예측하고 선 차트로 확인합니다.
+    content: |-
+      # 예측: 3월부터 6월까지 4개월은 매출이 목표선을 넘습니다.
+      figReport, axReport = plt.subplots(figsize=(8, 4))
+      axReport.plot(reportData["month"], reportData["revenue"], marker="o", label="Revenue")
+      axReport.plot(reportData["month"], reportData["cost"], marker="o", label="Cost")
+      axReport.axhline(100, color="gray", linestyle="--", label="Target")
+      axReport.set_title("Monthly Revenue vs Cost")
+      axReport.set_xlabel("Month")
+      axReport.set_ylabel("Amount")
+      axReport.legend()
+
+      monthsAboveTarget = int((reportData["revenue"] >= reportData["target"]).sum())
+      figReport
+  - type: code
+    language: python
+    title: 차트 품질 검증
+    description: 보고서에 필요한 구성 요소와 수치 메시지를 assert로 확인합니다.
+    content: |-
+      chartChecks = {
+          "has_three_lines": len(axReport.lines) == 3,
+          "has_title": axReport.get_title() == "Monthly Revenue vs Cost",
+          "has_axis_labels": axReport.get_xlabel() == "Month" and axReport.get_ylabel() == "Amount",
+          "target_reached_for_four_months": monthsAboveTarget == 4,
+          "legend_is_present": axReport.get_legend() is not None,
+      }
+
+      assert all(chartChecks.values()), chartChecks
+      chartChecks
+  - type: expansion
+    title: "실무 변주: 목표선을 올리면 달성 개월 수가 어떻게 줄어들까?"
+    blocks:
+    - type: code
+      language: python
+      title: 목표선 민감도 분석
+      content: |-
+        targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
+            monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
+        )
+
+        assert targetScenario["monthsPassed"].is_monotonic_decreasing
+        targetScenario

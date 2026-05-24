@@ -3,7 +3,7 @@ meta:
   title: "집합"
   day: 10
   category: "30days"
-  tags: []
+  tags: ["집합", "중복제거", "교집합", "차집합", "권한관리", "검증"]
   seo:
     title: "파이썬 집합(Set) - 중복 없는 데이터 관리"
     description: "집합 자료구조와 합집합, 교집합, 차집합 연산을 배웁니다."
@@ -380,6 +380,80 @@ sections:
       len(dups)
   - type: "tip"
     content: "set([1,2,2,3])의 길이는 3입니다. 중복이 제거되기 때문입니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 권한과 참석자 집합 비교하기"
+  subtitle: "중복 제거와 집합 연산을 운영 점검에 사용"
+  blocks:
+  - type: "text"
+    content: "집합은 중복을 지우는 도구를 넘어, 두 목록의 공통점과 차이를 빠르게 비교하는 도구입니다. 권한 관리, 참석자 확인, 캠페인 대상 선별처럼 실제 업무에서 '누가 포함되고 빠졌는지'를 검증할 때 특히 유용합니다."
+  - type: "list"
+    items:
+    - "예측: 전체 직원, 승인자, 실제 접근자 집합의 관계를 먼저 정한다."
+    - "실행: 중복 목록을 set으로 정리하고 교집합/차집합을 계산한다."
+    - "오류 수정: 없는 값을 remove할 때 KeyError가 나는지 확인한다."
+    - "검증: 무단 접근자, 미사용 승인자, 감사 대상 수를 assert로 확인한다."
+  - type: "code"
+    language: "python"
+    title: "권한 목록 비교"
+    description: "승인된 사용자와 실제 접근 로그를 비교해 감사 대상을 찾습니다."
+    content: |-
+      approvedUsers = {'kim', 'lee', 'park', 'choi'}
+      accessLog = ['kim', 'kim', 'lee', 'guest', 'park', 'guest']
+      actualUsers = set(accessLog)
+
+      validAccess = approvedUsers & actualUsers
+      unauthorizedUsers = actualUsers - approvedUsers
+      unusedApprovals = approvedUsers - actualUsers
+
+      assert validAccess == {'kim', 'lee', 'park'}
+      assert unauthorizedUsers == {'guest'}
+      assert unusedApprovals == {'choi'}
+      assert len(actualUsers) == 4
+  - type: "code"
+    language: "python"
+    title: "remove와 discard 차이 검증"
+    description: "없는 값을 지울 때 remove는 실패하고 discard는 안전하게 넘어갑니다."
+    content: |-
+      blockedUsers = {'guest', 'bot'}
+
+      try:
+          blockedUsers.remove('unknown')
+      except KeyError as exc:
+          missingUser = exc.args[0]
+      else:
+          raise AssertionError('없는 사용자를 remove하면 실패해야 합니다')
+
+      blockedUsers.discard('unknown')
+
+      assert missingUser == 'unknown'
+      assert blockedUsers == {'guest', 'bot'}
+  - type: "code"
+    language: python
+    title: "캠페인 대상 선별"
+    description: "중복 고객 목록을 정리하고 제외 대상을 빼서 최종 발송 대상을 만듭니다."
+    content: |-
+      newsletterUsers = {'kim', 'lee', 'park'}
+      buyers = {'lee', 'choi', 'yoon'}
+      unsubscribed = {'park'}
+
+      campaignTargets = (newsletterUsers | buyers) - unsubscribed
+      repeatTargets = newsletterUsers & buyers
+
+      assert campaignTargets == {'kim', 'lee', 'choi', 'yoon'}
+      assert repeatTargets == {'lee'}
+      assert 'park' not in campaignTargets
+  - type: "expansion"
+    title: "실무 변주: 이벤트 2회 이상 참석자"
+    code: |-
+      dayOne = {'A', 'B', 'C', 'D'}
+      dayTwo = {'B', 'D', 'E'}
+      dayThree = {'C', 'D', 'F'}
+      repeatAttendees = (dayOne & dayTwo) | (dayTwo & dayThree) | (dayOne & dayThree)
+
+      assert repeatAttendees == {'B', 'C', 'D'}
+      assert 'A' not in repeatAttendees
+      repeatAttendees
 
 - id: "practice"
   title: "Day 10 종합 복습"

@@ -361,3 +361,72 @@ sections:
     - "make_subplots() - 여러 차트 배치"
   - type: text
     content: 다음 시간에는 모든 개념을 종합한 대시보드 프로젝트를 진행합니다.
+
+- id: workflow_validation
+  title: 12단계. 주식 시계열 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      시계열 선 그래프는 날짜 정렬과 종목 컬럼 검증이 먼저입니다. Figure trace가 종목 수와 맞는지 확인하고, 수익률 기준으로 변주합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 추세 예측
+    description: stocks 데이터의 날짜와 종목 컬럼을 확인합니다
+    content: |-
+      import plotly.express as px
+
+      stockFlow = px.data.stocks()
+      stockColumns = ["GOOG", "AAPL", "AMZN", "FB", "NFLX", "MSFT"]
+      requiredColumns = {"date", *stockColumns}
+      missingColumns = requiredColumns - set(stockFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert stockFlow[stockColumns].gt(0).all().all()
+      assert stockFlow["date"].is_monotonic_increasing
+  - type: code
+    language: python
+    title: Line Figure 검증
+    description: long format 변환 후 종목별 trace 수를 확인합니다
+    content: |-
+      stockLong = stockFlow.melt(id_vars="date", value_vars=stockColumns, var_name="stock", value_name="price")
+      figStockLine = px.line(stockLong, x="date", y="price", color="stock", title="Stock comparison")
+
+      assert len(figStockLine.data) == len(stockColumns)
+      assert all(trace.type == "scatter" and trace.mode == "lines" for trace in figStockLine.data)
+      assert figStockLine.layout.title.text == "Stock comparison"
+      figStockLine
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 날짜 정렬이 깨진 입력을 시계열로 쓰지 않습니다
+    content: |-
+      def validateStockSeries(frame):
+          if not frame["date"].is_monotonic_increasing:
+              raise ValueError("date 컬럼은 오름차순이어야 합니다")
+          assert frame[stockColumns].notna().all().all()
+          return True
+
+      brokenStocks = stockFlow.sort_values("date", ascending=False).reset_index(drop=True)
+      try:
+          validateStockSeries(brokenStocks)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateStockSeries(stockFlow)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 마지막 수익률과 변동성을 함께 비교합니다
+    content: |-
+      returnReport = []
+      for stock in stockColumns:
+          normalizedReturn = stockFlow[stock].iloc[-1] / stockFlow[stock].iloc[0] - 1
+          volatility = stockFlow[stock].pct_change().dropna().std()
+          returnReport.append({"stock": stock, "return": round(float(normalizedReturn), 3), "volatility": round(float(volatility), 4)})
+
+      assert max(item["return"] for item in returnReport) > min(item["return"] for item in returnReport)
+      assert all(item["volatility"] > 0 for item in returnReport)
+      returnReport
+  - type: tip
+    content: "시계열 차트는 trace가 보이는지만 보지 말고 날짜 정렬, 누락, 수익률 기준을 함께 검증해야 합니다."

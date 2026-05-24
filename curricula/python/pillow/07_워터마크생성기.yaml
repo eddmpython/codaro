@@ -228,3 +228,71 @@ sections:
       content: |-
         patternResult = Image.alpha_composite(photo, pattern)
         patternResult
+
+- id: workflow_validation
+  title: 7단계. 워터마크 합성 검증 루프
+  subtitle: alpha와 위치 확인
+  blocks:
+  - type: text
+    content: 워터마크는 글자가 보이는지보다 원본 크기를 유지하면서 지정 위치의 픽셀이 실제로 변했는지 확인해야 합니다. alpha 범위를 검증하고 합성 전후 픽셀 차이를 비교합니다.
+  - type: code
+    language: python
+    title: 워터마크 베이스 준비
+    description: RGBA 베이스와 반투명 워터마크 레이어를 만듭니다.
+    content: |-
+      from PIL import Image, ImageDraw, ImageChops
+
+      watermarkBase = Image.new("RGBA", (180, 110), (80, 120, 170, 255))
+      baseDraw = ImageDraw.Draw(watermarkBase)
+      baseDraw.rectangle((20, 20, 160, 90), fill=(120, 170, 210, 255))
+
+      def validateAlpha(alpha):
+          if not (0 <= alpha <= 255):
+              raise ValueError(f"alpha는 0~255 범위여야 합니다: {alpha}")
+          return True
+
+      validateAlpha(120)
+  - type: code
+    language: python
+    title: alpha 오류 확인
+    description: 범위를 벗어난 alpha를 넣어 오류를 확인합니다.
+    content: |-
+      try:
+          validateAlpha(300)
+      except ValueError as exc:
+          alphaErrorMessage = str(exc)
+
+      alphaErrorMessage
+  - type: code
+    language: python
+    title: 워터마크 합성 검증
+    description: 합성 후 이미지 크기와 픽셀 변화 영역을 확인합니다.
+    content: |-
+      watermarkLayer = Image.new("RGBA", watermarkBase.size, (0, 0, 0, 0))
+      watermarkDraw = ImageDraw.Draw(watermarkLayer)
+      watermarkDraw.rectangle((95, 72, 170, 100), fill=(0, 0, 0, 90))
+      watermarkDraw.text((105, 78), "CODARO", fill=(255, 255, 255, 160))
+      watermarkedImage = Image.alpha_composite(watermarkBase, watermarkLayer)
+      diffBox = ImageChops.difference(watermarkBase.convert("RGB"), watermarkedImage.convert("RGB")).getbbox()
+      watermarkChecks = {
+          "sizeKept": watermarkedImage.size == watermarkBase.size,
+          "modeOk": watermarkedImage.mode == "RGBA",
+          "diffExists": diffBox is not None,
+          "errorOk": alphaErrorMessage == "alpha는 0~255 범위여야 합니다: 300",
+      }
+
+      assert all(watermarkChecks.values()), watermarkChecks
+      watermarkChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 다른 코너에 워터마크를 배치했을 때 변화 영역이 이동하는지 확인합니다.
+    content: |-
+      topLayer = Image.new("RGBA", watermarkBase.size, (0, 0, 0, 0))
+      topDraw = ImageDraw.Draw(topLayer)
+      topDraw.rectangle((10, 10, 85, 38), fill=(0, 0, 0, 90))
+      topWatermark = Image.alpha_composite(watermarkBase, topLayer)
+      topDiffBox = ImageChops.difference(watermarkBase.convert("RGB"), topWatermark.convert("RGB")).getbbox()
+
+      assert topDiffBox[0] < diffBox[0]
+      diffBox, topDiffBox

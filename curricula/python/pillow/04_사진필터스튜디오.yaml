@@ -1,5 +1,6 @@
 meta:
   packages:
+    - numpy
     - pillow
     - scikit-learn
   id: pillow_04
@@ -211,3 +212,70 @@ sections:
       content: |-
         chinaEmboss = china.filter(ImageFilter.EMBOSS)
         chinaEmboss
+
+- id: workflow_validation
+  title: 7단계. 필터 효과 검증 루프
+  subtitle: blur, sharpen, edge 수치 확인
+  blocks:
+  - type: text
+    content: 필터는 분위기 효과처럼 보이지만 자동화에서는 픽셀 분산과 경계 검출량을 확인해야 합니다. 반지름 입력을 검증하고 blur와 edge 결과를 수치로 비교합니다.
+  - type: code
+    language: python
+    title: 필터 테스트 이미지 준비
+    description: 선명한 경계가 있는 이미지를 만듭니다.
+    content: |-
+      from PIL import Image, ImageDraw, ImageFilter, ImageStat
+      import numpy as np
+
+      filterImage = Image.new("L", (140, 100), 80)
+      filterDraw = ImageDraw.Draw(filterImage)
+      filterDraw.rectangle((30, 25, 110, 75), fill=210)
+      filterDraw.line((30, 25, 110, 75), fill=20, width=4)
+
+      def validateBlurRadius(radius):
+          if radius < 0:
+              raise ValueError(f"blur radius는 0 이상이어야 합니다: {radius}")
+          return True
+
+      validateBlurRadius(2)
+  - type: code
+    language: python
+    title: 필터 파라미터 오류 확인
+    description: 음수 blur radius를 넣어 오류를 확인합니다.
+    content: |-
+      try:
+          validateBlurRadius(-1)
+      except ValueError as exc:
+          filterErrorMessage = str(exc)
+
+      filterErrorMessage
+  - type: code
+    language: python
+    title: 필터 결과 검증
+    description: blur는 표준편차를 낮추고 edge 필터는 경계 신호를 만드는지 확인합니다.
+    content: |-
+      blurredImage = filterImage.filter(ImageFilter.GaussianBlur(radius=2))
+      sharpenedImage = filterImage.filter(ImageFilter.SHARPEN)
+      edgeImage = filterImage.filter(ImageFilter.FIND_EDGES)
+      filterStd = ImageStat.Stat(filterImage).stddev[0]
+      blurStd = ImageStat.Stat(blurredImage).stddev[0]
+      edgePixels = int((np.array(edgeImage) > 0).sum())
+      filterChecks = {
+          "blurReducedStd": blurStd < filterStd,
+          "sharpenKeepsSize": sharpenedImage.size == filterImage.size,
+          "edgeHasPixels": edgePixels > 500,
+          "errorOk": filterErrorMessage == "blur radius는 0 이상이어야 합니다: -1",
+      }
+
+      assert all(filterChecks.values()), filterChecks
+      filterChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: blur radius를 키웠을 때 분산이 더 줄어드는지 확인합니다.
+    content: |-
+      softBlur = filterImage.filter(ImageFilter.GaussianBlur(radius=1))
+      strongBlur = filterImage.filter(ImageFilter.GaussianBlur(radius=4))
+
+      assert ImageStat.Stat(strongBlur).stddev[0] <= ImageStat.Stat(softBlur).stddev[0]
+      ImageStat.Stat(softBlur).stddev[0], ImageStat.Stat(strongBlur).stddev[0]

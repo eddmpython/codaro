@@ -8,7 +8,7 @@ meta:
   category: numpy
   difficulty: "⭐⭐⭐"
   badge: 중급
-  tags: ["numpy", "stack", "split", "tile", "repeat", "meshgrid", "einsum"]
+  tags: ["numpy", "stack", "split", "tile", "repeat", "meshgrid", "einsum", "검증", "지표비교"]
   seo:
     title: "NumPy 배열 조작 - 세계 행복지수 국가 비교"
     description: "NumPy의 고급 배열 조작을 배우며 세계 행복지수 데이터로 국가를 비교 분석합니다."
@@ -43,10 +43,11 @@ sections:
   - type: code
     language: python
     title: 행복지수 데이터 로드
-    description: GitHub에서 행복지수 데이터를 불러옵니다
+    description: Codaro 로컬 데이터셋에서 행복지수 데이터를 불러옵니다
     content: |-
-      baseUrl = "https://raw.githubusercontent.com"
-      happyDf = pd.read_csv(f"{baseUrl}/datasets/world-happiness/main/2019.csv")
+      from codaro.curriculum.localData import loadLocalDataset
+
+      happyDf = loadLocalDataset("happiness")
       happyDf.head()
 
 - id: step3_extract
@@ -270,6 +271,57 @@ sections:
           'OriginalScore': score[compositeRank[:10]]
       })
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 국가 지표 가중 점수 계산"
+  subtitle: "stack, broadcasting, einsum, 실패 케이스"
+  blocks:
+  - type: text
+    content: "여러 지표를 합친 점수는 가중치 합이 1인지, 행렬 shape이 맞는지 확인해야 합니다. NumPy로 빠르게 계산하되 점수 해석이 틀리지 않게 검증하세요."
+  - type: code
+    language: python
+    title: "가중 행복 점수 계산"
+    description: "지표 행렬과 가중치 벡터를 곱해 국가별 점수를 만듭니다."
+    content: |-
+      import numpy as np
+
+      countries = np.array(["A", "B", "C"])
+      indicators = np.array([
+          [0.8, 0.7, 0.9],
+          [0.6, 0.9, 0.8],
+          [0.9, 0.6, 0.7],
+      ])
+      weights = np.array([0.4, 0.3, 0.3])
+
+      scores = np.einsum("ij,j->i", indicators, weights)
+      rank = np.argsort(scores)[::-1]
+
+      assert np.isclose(weights.sum(), 1.0)
+      assert np.allclose(scores, [0.8, 0.75, 0.75])
+      assert countries[rank[0]] == "A"
+  - type: code
+    language: python
+    title: "가중치 오류 확인"
+    description: "가중치 개수와 합계를 분석 전에 검증합니다."
+    content: |-
+      import numpy as np
+
+      def validateWeights(indicators, weights):
+          if indicators.shape[1] != len(weights):
+              raise ValueError("weight count must match indicator columns")
+          if not np.isclose(np.sum(weights), 1.0):
+              raise ValueError("weights must sum to 1")
+          return True
+
+      try:
+          validateWeights(np.ones((3, 2)), np.array([0.5, 0.3]))
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "weights must sum to 1"
+  - type: tip
+    title: "변주 실험"
+    content: "건강 지표 가중치를 0.5로 올리고 나머지를 줄이면 국가 순위가 바뀌는지 `np.argsort` 결과를 비교하세요."
+
 - id: practice
   title: 실습
   subtitle: 행복지수 국가 비교
@@ -287,8 +339,16 @@ sections:
         import numpy as np
         import pandas as pd
 
-        url = "https://raw.githubusercontent.com"
-        data = pd.read_csv(f"{url}/datasets/world-happiness/main/2019.csv")
+        happyIdx = np.arange(156)
+        countryNames = ['Korea' if i == 53 else f'Country {i + 1:03d}' for i in happyIdx]
+        data = pd.DataFrame({
+            'Country or region': countryNames,
+            'Score': np.round(7.85 - happyIdx * 0.023, 3),
+            'GDP per capita': np.round(1.45 - happyIdx * 0.006, 3),
+            'Social support': np.round(1.62 - happyIdx * 0.004, 3),
+            'Healthy life expectancy': np.round(1.05 - happyIdx * 0.003, 3),
+            'Freedom to make life choices': np.round(0.62 - happyIdx * 0.0015, 3),
+        })
         score = data['Score'].values
         country = data['Country or region'].values
     - type: code
@@ -319,8 +379,16 @@ sections:
         import numpy as np
         import pandas as pd
 
-        src = "https://raw.githubusercontent.com"
-        df = pd.read_csv(f"{src}/datasets/world-happiness/main/2019.csv")
+        happyIdx = np.arange(156)
+        countryNames = ['Korea' if i == 53 else f'Country {i + 1:03d}' for i in happyIdx]
+        df = pd.DataFrame({
+            'Country or region': countryNames,
+            'Score': np.round(7.85 - happyIdx * 0.023, 3),
+            'GDP per capita': np.round(1.45 - happyIdx * 0.006, 3),
+            'Social support': np.round(1.62 - happyIdx * 0.004, 3),
+            'Healthy life expectancy': np.round(1.05 - happyIdx * 0.003, 3),
+            'Freedom to make life choices': np.round(0.62 - happyIdx * 0.0015, 3),
+        })
         gdp = df['GDP per capita'].values
         social = df['Social support'].values
         health = df['Healthy life expectancy'].values

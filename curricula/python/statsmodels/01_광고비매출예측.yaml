@@ -12,7 +12,7 @@ meta:
   category: statsmodels
   difficulty: "⭐"
   badge: 입문
-  dataUrl: https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv
+  dataSource: codaro-local:advertising
   tags: ["회귀분석", "OLS", "summary", "마케팅ROI", "매출예측"]
   seo:
     title: "statsmodels 단순선형회귀 - 광고비로 매출 예측하기"
@@ -38,7 +38,7 @@ sections:
     content: |-
       import statsmodels.api as sm
   - type: tip
-    content: Codaro는 로컬 Python 환경에서 필요한 패키지를 uv로 준비합니다. 터미널에서 직접 준비한다면 uv pip install statsmodels를 사용하고, 레슨 안에서는 import가 성공하는지 확인하면 됩니다.
+    content: Codaro는 YAML의 meta.packages와 로컬 Python 환경을 기준으로 필요한 패키지를 uv로 준비합니다. 레슨 안에서는 import가 성공하는지 확인하면 됩니다.
 
 - id: step2_load
   title: 2단계. 데이터 불러오기
@@ -52,9 +52,9 @@ sections:
     description: CSV 파일을 pandas로 읽기
     content: |-
       import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv"
-      adData = pd.read_csv(url, index_col=0)
+      adData = loadLocalDataset("advertising")
       adData.shape
   - type: tip
     content: index_col=0은 첫 번째 컬럼을 인덱스로 사용한다는 의미입니다. 이 데이터는 첫 컬럼이 단순 행 번호이므로 인덱스로 설정합니다. shape은 (행 수, 열 수)를 반환합니다.
@@ -315,9 +315,9 @@ sections:
       content: |-
         import pandas as pd
         import statsmodels.api as sm
+        from codaro.curriculum.localData import loadLocalDataset
 
-        radioUrl = "https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv"
-        radioData = pd.read_csv(radioUrl, index_col=0)
+        radioData = loadLocalDataset("advertising")
         radioData.head()
     - type: code
       title: "모델 학습"
@@ -344,9 +344,9 @@ sections:
       content: |-
         import pandas as pd
         import statsmodels.api as sm
+        from codaro.curriculum.localData import loadLocalDataset
 
-        adUrl = "https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv"
-        adDf = pd.read_csv(adUrl, index_col=0)
+        adDf = loadLocalDataset("advertising")
         adDf.shape
     - type: code
       title: "3개 모델 학습"
@@ -386,3 +386,90 @@ sections:
     - "predict() - 새로운 값으로 예측"
   - type: text
     content: 다음 프로젝트에서는 부동산 가격 데이터로 여러 변수를 동시에 사용하는 다중선형회귀를 배웁니다. 방 개수, 범죄율 등 여러 요인으로 집값을 예측해봅니다.
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 회귀 리포트 품질 게이트
+  blocks:
+  - type: text
+    content: "statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과 결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다."
+  - type: code
+    language: python
+    title: 로컬 마케팅 데이터 검증
+    description: 광고비와 매출 데이터를 불러오고 분석 전 조건을 확인합니다.
+    content: |-
+      import pandas as pd
+      import statsmodels.api as sm
+      from statsmodels.stats.diagnostic import het_breuschpagan
+      from codaro.curriculum.localData import loadLocalDataset
+
+      marketingData = loadLocalDataset("advertising")
+      requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
+
+      missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
+      if missingColumns:
+          raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
+      if marketingData[requiredColumns].isna().any().any():
+          raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
+
+      marketingData[requiredColumns].head()
+  - type: code
+    language: python
+    title: 다중회귀 모델 적합
+    description: TV, Radio, Newspaper 광고비로 Sales를 설명합니다.
+    content: |-
+      # 예측: TV와 Radio의 p-value는 낮고, 모델 R²는 0.9 이상일 것입니다.
+      reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])
+      reportY = marketingData["Sales"]
+      try:
+          reportModel = sm.OLS(reportY, reportX).fit()
+      except ValueError as exc:
+          raise ValueError("OLS 입력 행렬을 확인하세요.") from exc
+
+      reportModel.rsquared, reportModel.f_pvalue
+  - type: code
+    language: python
+    title: 통계 리포트 기준 검증
+    description: 설명력, 모델 전체 유의성, 핵심 변수 유의성을 assert로 확인합니다.
+    content: |-
+      reportChecks = {
+          "r_squared_is_reportable": reportModel.rsquared >= 0.90,
+          "model_is_significant": reportModel.f_pvalue < 0.05,
+          "tv_is_significant": reportModel.pvalues["TV"] < 0.05,
+          "radio_is_significant": reportModel.pvalues["Radio"] < 0.05,
+      }
+
+      assert all(reportChecks.values()), reportChecks
+      reportChecks
+  - type: code
+    language: python
+    title: 잔차 진단
+    description: Breusch-Pagan 검정으로 심한 이분산 신호가 없는지 확인합니다.
+    content: |-
+      bpStat, bpPvalue, _, _ = het_breuschpagan(reportModel.resid, reportModel.model.exog)
+      residualChecks = {
+          "bp_pvalue_recorded": bpPvalue >= 0,
+          "residual_mean_near_zero": abs(reportModel.resid.mean()) < 1e-9,
+      }
+
+      assert all(residualChecks.values()), residualChecks
+      round(float(bpPvalue), 3), residualChecks
+  - type: expansion
+    title: "실무 변주: Newspaper 변수를 빼도 설명력이 유지될까?"
+    blocks:
+    - type: code
+      language: python
+      title: 축소 모델 비교
+      content: |-
+        compactX = sm.add_constant(marketingData[["TV", "Radio"]])
+        compactModel = sm.OLS(reportY, compactX).fit()
+        r2Drop = reportModel.rsquared - compactModel.rsquared
+
+        assert compactModel.rsquared >= 0.95
+        {
+            "fullR2": round(reportModel.rsquared, 3),
+            "compactR2": round(compactModel.rsquared, 3),
+            "r2Drop": round(r2Drop, 3),
+            "fullAIC": round(reportModel.aic, 1),
+            "compactAIC": round(compactModel.aic, 1),
+        }

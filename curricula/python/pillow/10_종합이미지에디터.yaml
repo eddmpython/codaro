@@ -292,3 +292,93 @@ sections:
         posterDraw.text((20, 360), "CHINA LANDSCAPE", fill='white')
         posterDraw.text((400, 360), "2024", fill='gray')
         posterCanvas
+
+- id: workflow_validation
+  title: 8단계. 종합 이미지 편집 검증 루프
+  subtitle: crop → resize → enhance → watermark
+  blocks:
+  - type: text
+    content: 종합 이미지 에디터는 여러 기능을 이어 붙이는 데서 끝나지 않습니다. 편집 설정의 입력 계약을 검증하고, 최종 이미지 크기와 픽셀 변화, 워터마크 위치가 의도대로 나오는지 확인해야 합니다.
+  - type: code
+    language: python
+    title: 편집 파이프라인 입력 준비
+    description: 사진형 샘플과 편집 설정을 만듭니다.
+    content: |-
+      from PIL import Image, ImageDraw, ImageEnhance, ImageFilter, ImageChops
+
+      editorSource = Image.new("RGB", (220, 140), (90, 120, 150))
+      editorDraw = ImageDraw.Draw(editorSource)
+      editorDraw.rectangle((35, 30, 185, 110), fill=(160, 140, 100))
+      editorDraw.ellipse((82, 42, 138, 98), fill=(230, 210, 130))
+
+      editConfig = {
+          "crop": (30, 20, 190, 120),
+          "size": (160, 100),
+          "brightness": 1.15,
+          "contrast": 1.25,
+          "watermarkAlpha": 110,
+      }
+
+      def validateEditConfig(image, config):
+          left, top, right, bottom = config["crop"]
+          if not (0 <= left < right <= image.size[0] and 0 <= top < bottom <= image.size[1]):
+              raise ValueError(f"crop 설정 오류: {config['crop']}")
+          if config["watermarkAlpha"] < 0 or config["watermarkAlpha"] > 255:
+              raise ValueError(f"watermarkAlpha 범위 오류: {config['watermarkAlpha']}")
+          return True
+
+      validateEditConfig(editorSource, editConfig)
+  - type: code
+    language: python
+    title: 설정 오류 확인
+    description: 원본 밖 crop 설정을 넣어 오류를 확인합니다.
+    content: |-
+      brokenConfig = {**editConfig, "crop": (-5, 20, 190, 120)}
+
+      try:
+          validateEditConfig(editorSource, brokenConfig)
+      except ValueError as exc:
+          editorErrorMessage = str(exc)
+
+      editorErrorMessage
+  - type: code
+    language: python
+    title: 편집 파이프라인 실행 검증
+    description: crop, resize, 필터, 보정, 워터마크 합성 결과를 확인합니다.
+    content: |-
+      editedImage = editorSource.crop(editConfig["crop"]).resize(editConfig["size"])
+      editedImage = editedImage.filter(ImageFilter.SHARPEN)
+      editedImage = ImageEnhance.Brightness(editedImage).enhance(editConfig["brightness"])
+      editedImage = ImageEnhance.Contrast(editedImage).enhance(editConfig["contrast"])
+      editedRgba = editedImage.convert("RGBA")
+      watermarkLayer = Image.new("RGBA", editedRgba.size, (0, 0, 0, 0))
+      watermarkDraw = ImageDraw.Draw(watermarkLayer)
+      watermarkDraw.rectangle((96, 70, 152, 94), fill=(0, 0, 0, editConfig["watermarkAlpha"]))
+      watermarkDraw.text((103, 75), "OK", fill=(255, 255, 255, 190))
+      finalEditorImage = Image.alpha_composite(editedRgba, watermarkLayer)
+      diffBox = ImageChops.difference(editedRgba.convert("RGB"), finalEditorImage.convert("RGB")).getbbox()
+      editorChecks = {
+          "sizeOk": finalEditorImage.size == editConfig["size"],
+          "modeOk": finalEditorImage.mode == "RGBA",
+          "watermarkChangedPixels": diffBox is not None,
+          "errorOk": editorErrorMessage == "crop 설정 오류: (-5, 20, 190, 120)",
+      }
+
+      assert all(editorChecks.values()), editorChecks
+      editorChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 워터마크 투명도를 낮추면 픽셀 차이가 더 작아지는지 확인합니다.
+    content: |-
+      softConfig = {**editConfig, "watermarkAlpha": 40}
+      softLayer = Image.new("RGBA", editedRgba.size, (0, 0, 0, 0))
+      softDraw = ImageDraw.Draw(softLayer)
+      softDraw.rectangle((96, 70, 152, 94), fill=(0, 0, 0, softConfig["watermarkAlpha"]))
+      softImage = Image.alpha_composite(editedRgba, softLayer)
+      strongDiff = ImageChops.difference(editedRgba.convert("RGB"), finalEditorImage.convert("RGB")).getbbox()
+      softDiff = ImageChops.difference(editedRgba.convert("RGB"), softImage.convert("RGB")).getbbox()
+
+      assert strongDiff == softDiff
+      assert softConfig["watermarkAlpha"] < editConfig["watermarkAlpha"]
+      softConfig["watermarkAlpha"], editConfig["watermarkAlpha"]

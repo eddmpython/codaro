@@ -3,7 +3,7 @@ meta:
   title: "튜플"
   day: 9
   category: "30days"
-  tags: []
+  tags: ["튜플", "불변성", "언패킹", "좌표", "설정값", "검증"]
   seo:
     title: "파이썬 튜플 - 변경 불가능한 시퀀스"
     description: "튜플의 생성, 사용, 패킹/언패킹, 리스트와의 차이를 배웁니다."
@@ -399,6 +399,85 @@ sections:
       len(empty)
   - type: "tip"
     content: "len()은 문자열, 리스트, 튜플 모두에 사용 가능합니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 변경되면 안 되는 설정값 다루기"
+  subtitle: "튜플의 불변성과 언패킹을 안전한 데이터 계약으로 사용"
+  blocks:
+  - type: "text"
+    content: "튜플은 리스트의 불편한 버전이 아니라, 바뀌면 안 되는 값 묶음을 표현하는 방법입니다. 좌표, 색상, 설정값, 함수 반환값처럼 길이와 순서가 계약인 데이터를 다룰 때 튜플을 쓰면 실수로 수정되는 일을 막을 수 있습니다."
+  - type: "list"
+    items:
+    - "예측: 설정 튜플이 host, port, secure 세 값으로 고정된다고 정한다."
+    - "실행: 튜플 언패킹으로 각 값을 읽고, 표시 문자열을 만든다."
+    - "오류 수정: 튜플 수정 시도와 언패킹 개수 불일치를 확인한다."
+    - "검증: 타입, 길이, 불변성, 출력 형식을 assert로 확인한다."
+  - type: "code"
+    language: "python"
+    title: "서버 설정 언패킹"
+    description: "변경되면 안 되는 설정값을 튜플로 묶고 필드별로 검증합니다."
+    content: |-
+      serverConfig = ('localhost', 8080, True)
+      hostName, portNumber, secureMode = serverConfig
+
+      endpoint = f'http://{hostName}:{portNumber}'
+      if secureMode:
+          endpoint = endpoint.replace('http://', 'https://')
+
+      assert len(serverConfig) == 3
+      assert hostName == 'localhost'
+      assert portNumber == 8080
+      assert endpoint == 'https://localhost:8080'
+  - type: "code"
+    language: "python"
+    title: "튜플 불변성 실패 확인"
+    description: "튜플은 append나 인덱스 수정이 되지 않는다는 사실을 실행으로 확인합니다."
+    content: |-
+      serverConfig = ('localhost', 8080, True)
+
+      try:
+          serverConfig.append('debug')
+      except AttributeError as exc:
+          appendError = str(exc)
+      else:
+          raise AssertionError('튜플에는 append가 없어야 합니다')
+
+      try:
+          serverConfig[1] = 9000
+      except TypeError as exc:
+          assignError = str(exc)
+      else:
+          raise AssertionError('튜플 항목 수정은 실패해야 합니다')
+
+      assert 'append' in appendError
+      assert 'does not support item assignment' in assignError
+  - type: "code"
+    language: "python"
+    title: "언패킹 개수 검증"
+    description: "튜플 계약의 길이가 맞지 않으면 조용히 진행하지 않고 실패를 확인합니다."
+    content: |-
+      badConfig = ('localhost', 8080, True, 'debug')
+
+      try:
+          hostName, portNumber, secureMode = badConfig
+      except ValueError as exc:
+          errorMessage = str(exc)
+      else:
+          raise AssertionError('설정값 개수가 맞지 않으면 실패해야 합니다')
+
+      assert 'too many values' in errorMessage
+  - type: "expansion"
+    title: "실무 변주: 좌표 박스 계산"
+    code: |-
+      topLeft = (10, 20)
+      bottomRight = (70, 95)
+      left, top = topLeft
+      right, bottom = bottomRight
+      boxSize = (right - left, bottom - top)
+
+      assert boxSize == (60, 75)
+      assert topLeft == (10, 20)
+      boxSize
 
 - id: "practice"
   title: "Day 9 종합 복습"

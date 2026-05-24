@@ -26,7 +26,7 @@ sections:
   blocks:
   - type: text
     content: |-
-      GitHub에서 mpg(Miles Per Gallon, 연비) 데이터를 불러옵니다. 1970-1980년대 자동차들의 연비 정보가 담긴 데이터입니다.
+      Codaro 로컬 데이터셋에서 mpg(Miles Per Gallon, 연비) 데이터를 불러옵니다. 1970-1980년대 자동차들의 연비 정보가 담긴 데이터입니다.
 
       horsepower는 마력(엔진 힘), mpg는 연비(갤런당 주행거리), origin은 생산국(usa, europe, japan)을 나타냅니다. 이 데이터로 사용자가 클릭하고 드래그해서 조작할 수 있는 인터랙티브 차트를 만들어봅니다.
 
@@ -40,11 +40,9 @@ sections:
       import pandas as pd
       import warnings
       warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
 
-      mpgUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
-      mpg = pd.read_csv(mpgUrl)
-      mpg.head()
-
+      mpg = loadLocalDataset("mpg")
 - id: step2_basic_chart
   title: 2단계. 기본 차트
   subtitle: 인터랙션 없는 상태
@@ -331,6 +329,170 @@ sections:
 
       세 가지 필터가 동시에 적용되어 데이터를 탐색합니다.
 
+- id: step10_workflow
+  title: 10단계. 실무 인터랙션 검증
+  subtitle: 예측 → 파라미터 오류 확인 → 사양 검증 → 기준 실험
+  blocks:
+  - type: text
+    content: |-
+      인터랙티브 차트는 눈으로만 확인하면 놓치는 부분이 많습니다. 슬라이더와 드롭다운이 실제 차트 사양에 연결됐는지, 브러싱 파라미터가 색상 조건에 들어갔는지, 툴팁에 필요한 필드가 있는지 코드로 검사해야 합니다.
+
+      이번 단계에서는 생산국별 연비를 먼저 예측하고, 파라미터가 빠진 차트를 일부러 실패시킨 뒤, 완성 차트의 인터랙션 사양을 검증합니다. 마지막에는 마력 기준을 바꿔 필터 결과가 어떻게 줄어드는지 실험합니다.
+  - type: code
+    language: python
+    title: 필터 결과 예측하기
+    description: 생산국별 연비와 고마력 차량 수 확인
+    content: |-
+      requiredColumns = {"name", "origin", "horsepower", "mpg", "cylinders"}
+      missingColumns = requiredColumns - set(mpg.columns)
+      if missingColumns:
+          raise ValueError(f"mpg 데이터에 필요한 컬럼이 없습니다: {sorted(missingColumns)}")
+
+      mpgFiltered = mpg.dropna(subset=["horsepower", "mpg", "origin"]).copy()
+      mpgByOrigin = (
+          mpgFiltered.groupby("origin")["mpg"]
+          .mean()
+          .round(1)
+          .sort_values(ascending=False)
+      )
+      bestMpgOrigin = mpgByOrigin.index[0]
+
+      highPowerCountByOrigin = {
+          origin: len(mpgFiltered[(mpgFiltered["origin"] == origin) & (mpgFiltered["horsepower"] >= 120)])
+          for origin in sorted(mpgFiltered["origin"].unique())
+      }
+
+      print("생산국별 평균 연비:", mpgByOrigin.to_dict())
+      print("예상: 평균 연비가 가장 높은 생산국은", bestMpgOrigin)
+      print("120마력 이상 차량 수:", highPowerCountByOrigin)
+  - type: code
+    language: python
+    title: 인터랙션 사양 검사 함수
+    description: add_params 누락을 먼저 잡아내기
+    content: |-
+      def readTooltipFields(encoding):
+          return {
+              item["field"]
+              for item in encoding.get("tooltip", [])
+              if isinstance(item, dict) and "field" in item
+          }
+
+
+      def validateInteractiveChart(chart, expectedRows):
+          spec = chart.to_dict()
+
+          paramNames = {param.get("name") for param in spec.get("params", [])}
+          requiredParams = {"workflowBrush", "workflowOrigin", "workflowHp"}
+          missingParams = requiredParams - paramNames
+          if missingParams:
+              raise ValueError(f"인터랙션 파라미터가 차트에 연결되지 않았습니다: {sorted(missingParams)}")
+
+          encoding = spec.get("encoding", {})
+          requiredEncodings = {"x", "y", "color", "opacity", "tooltip"}
+          missingEncodings = requiredEncodings - set(encoding)
+          if missingEncodings:
+              raise ValueError(f"차트 인코딩이 부족합니다: {sorted(missingEncodings)}")
+
+          if "condition" not in encoding.get("opacity", {}):
+              raise ValueError("opacity는 드롭다운과 슬라이더 조건으로 제어되어야 합니다.")
+
+          requiredTooltips = {"name", "origin", "horsepower", "mpg", "cylinders"}
+          missingTooltips = requiredTooltips - readTooltipFields(encoding)
+          if missingTooltips:
+              raise ValueError(f"툴팁 필드가 부족합니다: {sorted(missingTooltips)}")
+
+          rowCount = sum(len(rows) for rows in spec.get("datasets", {}).values())
+          if rowCount != expectedRows:
+              raise ValueError(f"차트 데이터 행 수가 다릅니다: {rowCount} != {expectedRows}")
+
+          return spec
+
+
+      brokenInteractiveChart = alt.Chart(mpgFiltered).mark_circle(size=60).encode(
+          x="horsepower:Q",
+          y="mpg:Q",
+          color="origin:N",
+          opacity=alt.value(0.8),
+          tooltip=["name", "origin", "horsepower", "mpg", "cylinders"],
+      )
+
+      try:
+          validateInteractiveChart(brokenInteractiveChart, len(mpgFiltered))
+      except ValueError as exc:
+          print("의도한 오류 확인:", exc)
+      else:
+          raise AssertionError("인터랙션 파라미터가 빠진 차트를 통과시키면 안 됩니다.")
+  - type: code
+    language: python
+    title: 완성 인터랙션 검증하기
+    description: 브러싱·드롭다운·슬라이더 연결 확인
+    content: |-
+      workflowOrigins = sorted(mpgFiltered["origin"].unique().tolist())
+      workflowOrigin = alt.param(
+          name="workflowOrigin",
+          bind=alt.binding_select(
+              options=[None] + workflowOrigins,
+              labels=["전체"] + workflowOrigins,
+              name="생산국: ",
+          ),
+      )
+      workflowHp = alt.param(
+          name="workflowHp",
+          value=80,
+          bind=alt.binding_range(min=0, max=220, step=10, name="최소 마력: "),
+      )
+      workflowBrush = alt.selection_interval(name="workflowBrush")
+
+      workflowInteractiveChart = alt.Chart(mpgFiltered).mark_circle(size=75).encode(
+          x=alt.X("horsepower:Q", title="마력"),
+          y=alt.Y("mpg:Q", title="연비 (MPG)"),
+          color=alt.when(workflowBrush).then("origin:N").otherwise(alt.value("lightgray")),
+          opacity=alt.when(
+              ((workflowOrigin == None) | (alt.datum.origin == workflowOrigin)) &
+              (alt.datum.horsepower >= workflowHp)
+          ).then(alt.value(0.85)).otherwise(alt.value(0.12)),
+          tooltip=["name", "origin", "horsepower", "mpg", "cylinders"],
+      ).add_params(
+          workflowBrush,
+          workflowOrigin,
+          workflowHp,
+      ).properties(
+          title="자동차 연비 인터랙션 검증 차트",
+          width=550,
+          height=350,
+      )
+
+      workflowSpec = validateInteractiveChart(workflowInteractiveChart, len(mpgFiltered))
+      workflowParamNames = {param["name"] for param in workflowSpec["params"]}
+
+      assert bestMpgOrigin == "europe"
+      assert {"workflowBrush", "workflowOrigin", "workflowHp"} <= workflowParamNames
+
+      print("검증 완료: 파라미터", sorted(workflowParamNames))
+      workflowInteractiveChart
+  - type: code
+    language: python
+    title: 필터 기준 실험하기
+    description: 마력 기준이 올라갈수록 대상이 줄어드는지 확인
+    content: |-
+      def countInteractiveTarget(data, origin=None, minimumHorsepower=0):
+          target = data[data["horsepower"] >= minimumHorsepower]
+          if origin is not None:
+              target = target[target["origin"] == origin]
+          return len(target)
+
+
+      allOver120 = countInteractiveTarget(mpgFiltered, minimumHorsepower=120)
+      usaOver120 = countInteractiveTarget(mpgFiltered, origin="usa", minimumHorsepower=120)
+      usaOver160 = countInteractiveTarget(mpgFiltered, origin="usa", minimumHorsepower=160)
+
+      assert allOver120 >= usaOver120 >= usaOver160
+      assert usaOver120 > 0
+
+      print("전체 120마력 이상:", allOver120)
+      print("미국 120마력 이상:", usaOver120)
+      print("미국 160마력 이상:", usaOver160)
+
 - id: practice
   title: 실습
   subtitle: 인터랙티브 차트 프로젝트
@@ -350,8 +512,8 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        carUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
-        car = pd.read_csv(carUrl)
+        from codaro.curriculum.localData import loadLocalDataset
+        car = loadLocalDataset("mpg")
         kinds = [3, 4, 5, 6, 8]
         selectCyl = alt.binding_select(options=[None] + kinds, labels=['전체'] + [str(c) for c in kinds], name='실린더: ')
         filterCyl = alt.param(name='cylFilter', bind=selectCyl)
@@ -375,8 +537,8 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        autoUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
-        auto = pd.read_csv(autoUrl)
+        from codaro.curriculum.localData import loadLocalDataset
+        auto = loadLocalDataset("mpg")
         rangeBar = alt.binding_range(min=0, max=50, step=5, name='최소 연비: ')
         filterMpg = alt.param(name='mpgFilter', value=10, bind=rangeBar)
     - type: code

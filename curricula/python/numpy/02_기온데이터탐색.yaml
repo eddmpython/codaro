@@ -8,7 +8,7 @@ meta:
   category: numpy
   difficulty: "⭐"
   badge: 입문
-  tags: ["numpy", "arange", "linspace", "indexing", "slicing", "reshape"]
+  tags: ["numpy", "arange", "linspace", "indexing", "slicing", "reshape", "검증", "시계열배열"]
   seo:
     title: "NumPy 인덱싱/슬라이싱 - 기온 데이터 탐색"
     description: "NumPy 배열의 인덱싱과 슬라이싱을 배우며 전 세계 기온 변화 데이터를 탐색합니다."
@@ -43,10 +43,11 @@ sections:
   - type: code
     language: python
     title: 기온 데이터 로드
-    description: GitHub에서 기온 데이터를 불러옵니다
+    description: Codaro 로컬 데이터셋에서 기온 데이터를 불러옵니다
     content: |-
-      url = "https://raw.githubusercontent.com"
-      temps = pd.read_csv(f"{url}/datasets/global-temp/master/data/monthly.csv")
+      from codaro.curriculum.localData import loadLocalDataset
+
+      temps = loadLocalDataset("global_temp")
       temps.head()
   - type: tip
     content: 이 데이터는 기준 기간(1951-1980) 대비 기온 편차(anomaly)를 나타냅니다. Mean 값이 양수면 기준보다 따뜻했고, 음수면 추웠습니다.
@@ -248,6 +249,55 @@ sections:
       avg2 = np.mean(past)
       f"최근 10년 평균: {avg1:.3f}, 과거 10년 평균: {avg2:.3f}, 차이: {avg1 - avg2:.3f}"
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 월별 기온 편차 행렬 만들기"
+  subtitle: "reshape 전제, 월 선택, 기간 비교, 실패 케이스"
+  blocks:
+  - type: text
+    content: "시계열을 행렬로 바꿀 때는 데이터 개수가 월 단위로 딱 맞는지 먼저 확인해야 합니다. reshape는 강력하지만 전제 조건이 틀리면 분석 전체가 잘못됩니다."
+  - type: code
+    language: python
+    title: "연도-월 행렬로 기간 비교"
+    description: "월별 데이터를 2차원 배열로 바꾸고 최근/과거 평균을 비교합니다."
+    content: |-
+      import numpy as np
+
+      monthly = np.array([
+          -0.2, -0.1, 0.0, 0.1,
+          -0.1, 0.0, 0.2, 0.3,
+          0.0, 0.1, 0.3, 0.4,
+      ])
+
+      matrix = monthly.reshape(3, 4)
+      yearlyMean = matrix.mean(axis=1)
+      warmestYearIndex = int(np.argmax(yearlyMean))
+
+      assert matrix.shape == (3, 4)
+      assert np.allclose(yearlyMean, [-0.05, 0.1, 0.2])
+      assert warmestYearIndex == 2
+      assert matrix[:, 2].tolist() == [0.0, 0.2, 0.3]
+  - type: code
+    language: python
+    title: "reshape 전제 오류 확인"
+    description: "월 수가 맞지 않으면 명시적 오류로 멈춥니다."
+    content: |-
+      import numpy as np
+
+      def reshapeMonthly(values, monthsPerYear):
+          if len(values) % monthsPerYear != 0:
+              raise ValueError("monthly values must fill complete years")
+          return np.array(values).reshape(-1, monthsPerYear)
+
+      try:
+          reshapeMonthly([0.1, 0.2, 0.3], 2)
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "monthly values must fill complete years"
+  - type: tip
+    title: "변주 실험"
+    content: "분기별 데이터라면 `monthsPerYear=4` 대신 실제 분기 수를 쓰고, `axis=1` 평균이 무엇을 뜻하는지 다시 설명해보세요."
+
 - id: practice
   title: 실습
   subtitle: 기온 데이터 분석
@@ -265,8 +315,17 @@ sections:
         import numpy as np
         import pandas as pd
 
-        url = "https://raw.githubusercontent.com"
-        data = pd.read_csv(f"{url}/datasets/global-temp/master/data/monthly.csv")
+        data = pd.DataFrame({
+            'Source': ['GCAG'] * 24 + ['GISTEMP'] * 4,
+            'Date': [f"1880-{m:02d}-01" for m in range(1, 13)]
+                    + [f"1881-{m:02d}-01" for m in range(1, 13)]
+                    + [f"1880-{m:02d}-01" for m in range(1, 5)],
+            'Mean': [-0.20, -0.14, -0.10, -0.02, 0.04, 0.10,
+                     0.18, 0.21, 0.15, 0.08, -0.01, -0.07,
+                     -0.16, -0.09, -0.03, 0.05, 0.12, 0.19,
+                     0.26, 0.29, 0.22, 0.14, 0.06, -0.02,
+                     -0.18, -0.08, 0.02, 0.10],
+        })
         gcag = data[data['Source'] == 'GCAG']
         temps = gcag['Mean'].values
     - type: code
@@ -288,8 +347,17 @@ sections:
         import numpy as np
         import pandas as pd
 
-        src = "https://raw.githubusercontent.com"
-        df = pd.read_csv(f"{src}/datasets/global-temp/master/data/monthly.csv")
+        df = pd.DataFrame({
+            'Source': ['GCAG'] * 24 + ['GISTEMP'] * 4,
+            'Date': [f"1880-{m:02d}-01" for m in range(1, 13)]
+                    + [f"1881-{m:02d}-01" for m in range(1, 13)]
+                    + [f"1880-{m:02d}-01" for m in range(1, 5)],
+            'Mean': [-0.20, -0.14, -0.10, -0.02, 0.04, 0.10,
+                     0.18, 0.21, 0.15, 0.08, -0.01, -0.07,
+                     -0.16, -0.09, -0.03, 0.05, 0.12, 0.19,
+                     0.26, 0.29, 0.22, 0.14, 0.06, -0.02,
+                     -0.18, -0.08, 0.02, 0.10],
+        })
         raw = df[df['Source'] == 'GCAG']
         vals = raw['Mean'].values
     - type: code

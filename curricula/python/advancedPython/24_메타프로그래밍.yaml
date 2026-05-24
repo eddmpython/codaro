@@ -3,7 +3,7 @@ meta:
   title: "메타프로그래밍"
   day: 24
   category: "advancedPython"
-  tags: ["metaclass", "descriptor", "dynamic", "metaprogramming"]
+  tags: ["metaclass", "descriptor", "dynamic", "metaprogramming", "검증", "프레임워크설계"]
   seo:
     title: "파이썬 메타프로그래밍"
     description: "메타클래스, 디스크립터, 동적 속성, 코드 생성을 학습합니다."
@@ -401,6 +401,99 @@ sections:
       dataClassResult = (dataClassEq, dataClassNeq, dataClassRepr)
       dataClassResult
 
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 선언형 주문 모델 만들기"
+  subtitle: "descriptor와 metaclass로 필드 계약을 자동 수집하고 검증합니다"
+  blocks:
+  - type: "text"
+    content: "메타프로그래밍은 신기한 문법이 아니라 프레임워크가 반복 규칙을 대신 적용하게 만드는 방법입니다. 필드 정의를 클래스 선언에 적으면 메타클래스가 필드를 모으고, 디스크립터가 타입 검증을 수행하는 흐름을 확인하세요."
+  - type: "code"
+    language: "python"
+    title: "descriptor와 metaclass 결합"
+    description: "필드 목록이 자동 수집되고 타입 검증이 실행되는지 확인합니다."
+    content: |-
+      class Field:
+          def __init__(self, expectedType):
+              self.expectedType = expectedType
+              self.storageName = ""
+
+          def __set_name__(self, owner, name):
+              self.storageName = f"_{name}"
+
+          def __get__(self, instance, owner):
+              if instance is None:
+                  return self
+              return getattr(instance, self.storageName)
+
+          def __set__(self, instance, value):
+              if not isinstance(value, self.expectedType):
+                  raise TypeError(f"{self.storageName[1:]} must be {self.expectedType.__name__}")
+              setattr(instance, self.storageName, value)
+
+      class ModelMeta(type):
+          def __new__(mcls, name, bases, namespace):
+              fields = {
+                  key: value
+                  for key, value in namespace.items()
+                  if isinstance(value, Field)
+              }
+              namespace["fields"] = tuple(fields.keys())
+              return super().__new__(mcls, name, bases, namespace)
+
+      class Model(metaclass=ModelMeta):
+          def toDict(self):
+              return {field: getattr(self, field) for field in self.fields}
+
+      class Order(Model):
+          orderId = Field(str)
+          amount = Field(int)
+
+          def __init__(self, orderId, amount):
+              self.orderId = orderId
+              self.amount = amount
+
+      order = Order("O-100", 12000)
+
+      assert Order.fields == ("orderId", "amount")
+      assert order.toDict() == {"orderId": "O-100", "amount": 12000}
+  - type: "code"
+    language: "python"
+    title: "필드 타입 오류 확인"
+    description: "동적으로 만든 규칙이 실제 인스턴스 할당에서 동작하는지 검증합니다."
+    content: |-
+      class Field:
+          def __init__(self, expectedType):
+              self.expectedType = expectedType
+              self.storageName = ""
+
+          def __set_name__(self, owner, name):
+              self.storageName = f"_{name}"
+
+          def __get__(self, instance, owner):
+              if instance is None:
+                  return self
+              return getattr(instance, self.storageName)
+
+          def __set__(self, instance, value):
+              if not isinstance(value, self.expectedType):
+                  raise TypeError(f"{self.storageName[1:]} must be {self.expectedType.__name__}")
+              setattr(instance, self.storageName, value)
+
+      class Order:
+          amount = Field(int)
+
+      order = Order()
+
+      try:
+          order.amount = "12000"
+      except TypeError as exc:
+          message = str(exc)
+
+      assert message == "amount must be int"
+  - type: "tip"
+    title: "변주 실험"
+    content: "`required=False` 옵션을 Field에 추가하고, 비어 있어도 되는 필드와 반드시 채워야 하는 필드를 `toDict()` 전에 검증해보세요."
+
 - id: "practice"
   title: "종합 연습"
   subtitle: "메타프로그래밍 실습"
@@ -543,7 +636,7 @@ sections:
                   for attrName, attr in base.__dict__.items():
                       if getattr(attr, '_abstract', False):
                           abstractMethods.add(attrName)
-              for method in abstractMethods:
+              for method in set(abstractMethods):
                   if method in cls.__dict__:
                       if not getattr(cls.__dict__[method], '_abstract', False):
                           abstractMethods.discard(method)
@@ -655,9 +748,9 @@ sections:
     code: |-
       class AutoPropertyMeta(type):
           def __new__(mcs, name, bases, namespace):
-              slots = namespace.get('__slots__', [])
-              for slot in slots:
-                  privateName = f'_{slot}'
+              fields = namespace.get('__fields__', [])
+              for field in fields:
+                  privateName = f'_{field}'
 
                   def makeGetter(pn):
                       return lambda self: getattr(self, pn, None)
@@ -665,11 +758,12 @@ sections:
                   def makeSetter(pn):
                       return lambda self, value: setattr(self, pn, value)
 
-                  namespace[slot] = property(makeGetter(privateName), makeSetter(privateName))
+                  namespace[field] = property(makeGetter(privateName), makeSetter(privateName))
               return super().__new__(mcs, name, bases, namespace)
 
       class AutoPropPerson(metaclass=AutoPropertyMeta):
-          __slots__ = ['name', 'age']
+          __fields__ = ['name', 'age']
+          __slots__ = ['_name', '_age']
 
           def __init__(self, name, age):
               self._name = name
@@ -1075,16 +1169,20 @@ sections:
           @classmethod
           def register(cls, name):
               def decorator(pluginCls):
-                  cls._plugins[name] = pluginCls()
+                  instance = pluginCls()
+                  cls._plugins[name] = instance
+                  for attrName in dir(instance):
+                      method = getattr(instance, attrName)
+                      hookName = getattr(getattr(method, "__func__", method), "_hookName", None)
+                      if hookName is not None:
+                          cls._hooks.setdefault(hookName, []).append(method)
                   return pluginCls
               return decorator
 
           @classmethod
           def hook(cls, hookName):
               def decorator(fn):
-                  if hookName not in cls._hooks:
-                      cls._hooks[hookName] = []
-                  cls._hooks[hookName].append(fn)
+                  fn._hookName = hookName
                   return fn
               return decorator
 

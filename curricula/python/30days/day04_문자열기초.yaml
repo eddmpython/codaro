@@ -3,7 +3,7 @@ meta:
   title: "문자열 기초"
   day: 4
   category: 30days
-  tags: []
+  tags: ["문자열", "f-string", "이스케이프", "포맷팅", "영수증", "검증"]
   seo:
     title: "파이썬 문자열 기초 완벽 가이드"
     description: "문자열 연결, 이스케이프 문자, 여러 줄 문자열, 문자열 반복을 배웁니다."
@@ -258,6 +258,97 @@ sections:
     content: |-
       sentence = 'Hello World'
       'Python' not in sentence
+
+- id: workflow_validation
+  title: "검증 루프: 영수증 문자열을 안전하게 만들기"
+  subtitle: "문자열을 업무 출력물로 조립하고 검증하기"
+  blocks:
+  - type: text
+    content: "문자열 기초는 단어를 붙이는 데서 끝나지 않습니다. 실제 업무에서는 영수증, 알림 문구, 로그 메시지처럼 사람이 읽을 출력물을 만들고, 빠진 줄이나 잘못된 변환이 없는지 검증해야 합니다."
+  - type: list
+    items:
+    - "예측: 어떤 줄과 값이 들어가야 하는지 먼저 정한다."
+    - "실행: f-string, 줄바꿈, 반복 문자열로 출력물을 만든다."
+    - "오류 수정: 숫자를 문자열과 직접 연결할 때 생기는 TypeError를 확인한다."
+    - "검증: 핵심 문구, 줄 수, 합계가 맞는지 assert로 확인한다."
+  - type: code
+    language: python
+    title: "실무 영수증 만들기"
+    description: "f-string, 줄바꿈, 반복 문자열을 조합해 검증 가능한 영수증을 만듭니다."
+    content: |-
+      storeName = '코다로 문구'
+      itemName = '노트'
+      quantity = 3
+      unitPrice = 2500
+      totalPrice = quantity * unitPrice
+      divider = '=' * 24
+
+      receipt = (
+          f'{divider}\n'
+          f'{storeName}\n'
+          f'{divider}\n'
+          f'품목: {itemName}\n'
+          f'수량: {quantity}\n'
+          f'합계: {totalPrice}원'
+      )
+
+      assert storeName in receipt
+      assert f'합계: {totalPrice}원' in receipt
+      assert receipt.count('\n') == 5
+      print(receipt)
+  - type: code
+    language: python
+    title: "깨지는 연결식 확인"
+    description: "+ 연결은 숫자를 자동 변환하지 않으므로, 실패를 확인한 뒤 f-string으로 고칩니다."
+    content: |-
+      itemName = '노트'
+      quantity = 3
+
+      try:
+          brokenLine = itemName + ' x ' + quantity
+      except TypeError as exc:
+          validationMessage = str(exc)
+      else:
+          raise AssertionError('문자열과 숫자 직접 연결은 실패해야 합니다')
+
+      fixedLine = f'{itemName} x {quantity}'
+
+      assert 'str' in validationMessage
+      assert fixedLine == '노트 x 3'
+  - type: code
+    language: python
+    title: "영수증 필수 줄 검증"
+    description: "출력 문자열에 합계 줄이 없으면 명확한 ValueError로 실패시킵니다."
+    content: |-
+      def requireReceiptTotal(receiptText):
+          if '합계:' not in receiptText:
+              raise ValueError('영수증에는 합계 줄이 필요합니다')
+          return receiptText
+
+
+      validReceipt = '코다로 문구\n노트 x 3\n합계: 7500원'
+      assert requireReceiptTotal(validReceipt) == validReceipt
+
+      try:
+          requireReceiptTotal('코다로 문구\n노트 x 3')
+      except ValueError as exc:
+          errorMessage = str(exc)
+      else:
+          raise AssertionError('합계 줄이 없으면 실패해야 합니다')
+
+      assert errorMessage == '영수증에는 합계 줄이 필요합니다'
+  - type: expansion
+    title: "실무 변주: 로그 메시지 템플릿"
+    code: |-
+      level = 'INFO'
+      action = 'order_created'
+      orderId = 'ORD-2026-0007'
+      logLine = f'[{level}] {action}: {orderId}'
+
+      assert logLine.startswith('[INFO]')
+      assert 'order_created' in logLine
+      assert 'ERROR' not in logLine
+      logLine
 
 - id: practice
   title: "Day 4 종합 복습"

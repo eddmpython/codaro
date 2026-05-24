@@ -32,13 +32,11 @@ sections:
     description: pandas로 읽어서 DuckDB 테이블로 변환
     content: |-
       import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
       import duckdb
 
-      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
-      df = pd.read_csv(f"{url}/tips.csv")
+      df = loadLocalDataset("tips")
       tips = duckdb.from_df(df)
-      tips
-
 - id: step2_explore
   title: 2단계. 팁 분포 확인
   subtitle: 팁 통계 보기
@@ -262,6 +260,147 @@ sections:
           ORDER BY day, time
       """)
 
+- id: "workflow_validation"
+  title: 12단계. 실무 CASE 리포트 검증
+  subtitle: 예측 → SQL 오류 확인 → 집계 검증 → 기준 실험
+  blocks:
+  - type: text
+    content: |-
+      CASE WHEN 리포트는 결과 표가 그럴듯해 보여도 분류 기준이 빠지거나 행 수가 틀어질 수 있습니다. 실무에서는 쿼리 오류를 명확히 잡고, 등급별 합계가 전체 건수와 맞는지 검증해야 합니다.
+
+      이번 단계에서는 팁 비율이 가장 높은 요일·시간대를 먼저 예상하고, 잘못된 컬럼명을 쓴 SQL을 일부러 실패시킵니다. 그다음 CASE WHEN 리포트의 행 수와 등급 합계를 검증하고, high 기준을 바꿔 세그먼트가 어떻게 줄어드는지 실험합니다.
+  - type: code
+    language: python
+    title: 분석 테이블과 예측 만들기
+    description: 로컬 DataFrame을 DuckDB에 등록
+    content: |-
+      workflowCon = duckdb.connect()
+      workflowCon.register("tipsWorkflow", df)
+
+      tipRatePrediction = workflowCon.sql("""
+          SELECT
+              day,
+              time,
+              ROUND(AVG(tip / total_bill), 4) AS avgTipRate,
+              COUNT(*) AS cnt
+          FROM tipsWorkflow
+          GROUP BY day, time
+          ORDER BY avgTipRate DESC
+      """).df()
+
+      predictedBestSegment = tipRatePrediction.iloc[0]
+      print(
+          "예상 최고 팁 비율:",
+          predictedBestSegment["day"],
+          predictedBestSegment["time"],
+          predictedBestSegment["avgTipRate"],
+      )
+  - type: code
+    language: python
+    title: SQL 오류 먼저 확인하기
+    description: 잘못된 컬럼명을 BinderException으로 잡기
+    content: |-
+      try:
+          workflowCon.sql("""
+              SELECT tip_amount
+              FROM tipsWorkflow
+          """).df()
+      except duckdb.BinderException as exc:
+          print("의도한 오류 확인:", str(exc).splitlines()[0])
+      else:
+          raise AssertionError("없는 컬럼을 조회한 SQL은 실패해야 합니다.")
+  - type: code
+    language: python
+    title: CASE 리포트 검증하기
+    description: 등급 합계와 원본 행 수 대조
+    content: |-
+      def validateTipCaseReport(report, expectedRows):
+          requiredColumns = {
+              "day",
+              "time",
+              "totalCnt",
+              "avgTip",
+              "avgTipRate",
+              "lowCnt",
+              "midCnt",
+              "highCnt",
+          }
+          missingColumns = requiredColumns - set(report.columns)
+          if missingColumns:
+              raise ValueError(f"리포트 컬럼이 부족합니다: {sorted(missingColumns)}")
+
+          levelTotal = report["lowCnt"] + report["midCnt"] + report["highCnt"]
+          if (levelTotal.astype(int) != report["totalCnt"].astype(int)).any():
+              raise ValueError("low/mid/high 합계가 totalCnt와 맞지 않습니다.")
+
+          if int(report["totalCnt"].sum()) != expectedRows:
+              raise ValueError(f"전체 행 수가 맞지 않습니다: {report['totalCnt'].sum()} != {expectedRows}")
+
+          if (report["avgTipRate"] <= 0).any():
+              raise ValueError("평균 팁 비율은 0보다 커야 합니다.")
+
+          return True
+
+
+      caseReport = workflowCon.sql("""
+          WITH classified AS (
+              SELECT
+                  day,
+                  time,
+                  tip,
+                  total_bill,
+                  tip / total_bill AS tipRate,
+                  CASE
+                      WHEN tip < 2 THEN 'low'
+                      WHEN tip >= 4 THEN 'high'
+                      ELSE 'mid'
+                  END AS tipLevel
+              FROM tipsWorkflow
+          )
+          SELECT
+              day,
+              time,
+              COUNT(*) AS totalCnt,
+              ROUND(AVG(tip), 2) AS avgTip,
+              ROUND(AVG(tipRate), 4) AS avgTipRate,
+              SUM(CASE WHEN tipLevel = 'low' THEN 1 ELSE 0 END) AS lowCnt,
+              SUM(CASE WHEN tipLevel = 'mid' THEN 1 ELSE 0 END) AS midCnt,
+              SUM(CASE WHEN tipLevel = 'high' THEN 1 ELSE 0 END) AS highCnt
+          FROM classified
+          GROUP BY day, time
+          ORDER BY avgTipRate DESC
+      """).df()
+
+      assert validateTipCaseReport(caseReport, len(df))
+      assert caseReport.iloc[0]["day"] == "Sun"
+      assert caseReport.iloc[0]["time"] == "Dinner"
+
+      caseReport
+  - type: code
+    language: python
+    title: high 기준 실험하기
+    description: 기준이 올라갈수록 대상이 줄어드는지 검증
+    content: |-
+      def countHighTipOrders(minimumTip):
+          result = workflowCon.sql(f"""
+              SELECT
+                  {minimumTip} AS minimumTip,
+                  SUM(CASE WHEN tip >= {minimumTip} THEN 1 ELSE 0 END) AS highCnt,
+                  COUNT(*) AS totalCnt,
+                  ROUND(AVG(CASE WHEN tip >= {minimumTip} THEN tip ELSE NULL END), 2) AS avgHighTip
+              FROM tipsWorkflow
+          """).df()
+          return result.iloc[0]
+
+
+      high4 = countHighTipOrders(4)
+      high6 = countHighTipOrders(6)
+
+      assert high4["highCnt"] >= high6["highCnt"]
+      assert high6["avgHighTip"] >= high4["avgHighTip"]
+
+      pd.DataFrame([high4, high6])
+
 - id: practice
   title: 실습
   subtitle: 팁 패턴 분석 프로젝트
@@ -278,8 +417,15 @@ sections:
       content: |-
         import pandas as pd
         import duckdb
-        baseUrl1 = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
-        data = pd.read_csv(f"{baseUrl1}/tips.csv")
+        data = pd.DataFrame({
+            "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
+            "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
+            "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
+            "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
+            "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
+            "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
+            "size": [2, 4, 3, 2, 5, 2, 2, 3],
+        })
         tbl1 = duckdb.from_df(data)
     - type: code
       title: "등급 분류 및 집계"
@@ -306,8 +452,15 @@ sections:
       content: |-
         import pandas as pd
         import duckdb
-        baseUrl2 = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
-        frame = pd.read_csv(f"{baseUrl2}/tips.csv")
+        frame = pd.DataFrame({
+            "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
+            "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
+            "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
+            "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
+            "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
+            "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
+            "size": [2, 4, 3, 2, 5, 2, 2, 3],
+        })
         tbl2 = duckdb.from_df(frame)
     - type: code
       title: "다중 그룹화 및 등급별 카운트"

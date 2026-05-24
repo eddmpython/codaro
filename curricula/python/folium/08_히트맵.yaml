@@ -372,6 +372,130 @@ sections:
 
       densityMap
 
+- id: step11_workflow
+  title: 11단계. 실무 히트맵 검증
+  subtitle: 예측 → 데이터 오류 확인 → 렌더 검증 → 기준 실험
+  blocks:
+  - type: text
+    content: 히트맵은 색이 진한 곳을 보는 도구지만, 실무에서는 그 색이 믿을 만한 데이터에서 나온 것인지가 먼저입니다. 좌표 범위, 가중치 범위, 권역별 합계, 렌더 결과를 검증한 뒤 radius와 임계값을 바꿔 해석이 어떻게 달라지는지 실험해야 합니다.
+  - type: list
+    items:
+    - "실행 전에는 어느 권역이 가장 뜨거운 지역으로 보일지 먼저 예측합니다."
+    - "가중치가 0보다 작거나 1보다 크면 히트맵 색 해석이 무너지는 오류입니다."
+    - "지도 HTML에는 분석 기준을 설명하는 마커와 권역명이 들어갔는지 확인합니다."
+    - "가중치 기준을 바꾸면 고위험 권역 목록이 어떻게 달라지는지 실험합니다."
+  - type: code
+    language: python
+    title: 민원 히트맵 데이터 준비
+    description: 권역별 민원 위치와 심각도 가중치를 준비합니다.
+    content: |-
+      complaintHeatRows = [
+          {"district": "강남", "loc": [37.4979, 127.0276], "weight": 0.95, "type": "배송지연"},
+          {"district": "강남", "loc": [37.5010, 127.0310], "weight": 0.80, "type": "재고부족"},
+          {"district": "강남", "loc": [37.4930, 127.0240], "weight": 0.70, "type": "배송지연"},
+          {"district": "홍대", "loc": [37.5563, 126.9236], "weight": 0.65, "type": "응대지연"},
+          {"district": "홍대", "loc": [37.5580, 126.9255], "weight": 0.55, "type": "응대지연"},
+          {"district": "여의도", "loc": [37.5219, 126.9245], "weight": 0.45, "type": "배송지연"},
+          {"district": "여의도", "loc": [37.5260, 126.9290], "weight": 0.35, "type": "문의증가"},
+      ]
+
+      districtHeatScore = {}
+      for row in complaintHeatRows:
+          districtHeatScore[row["district"]] = districtHeatScore.get(row["district"], 0) + row["weight"]
+
+      hottestDistrict = max(districtHeatScore, key=districtHeatScore.get)
+      hottestDistrict, round(districtHeatScore[hottestDistrict], 2)
+  - type: code
+    language: python
+    title: 히트맵 데이터 검증 함수
+    description: 좌표와 가중치가 업무 기준 안에 있는지 확인합니다.
+    content: |-
+      def validateHeatRow(row):
+          lat, lon = row["loc"]
+          if not (33 <= lat <= 39 and 124 <= lon <= 132):
+              raise ValueError(f"좌표 범위 오류: {row['district']}")
+          if not (0 <= row["weight"] <= 1):
+              raise ValueError(f"가중치 범위 오류: {row['district']}={row['weight']}")
+          return True
+
+      heatValidation = [validateHeatRow(row) for row in complaintHeatRows]
+      heatValidation
+  - type: code
+    language: python
+    title: 가중치 오류 확인
+    description: 잘못된 심각도 값을 일부러 넣고 오류를 확인합니다.
+    content: |-
+      brokenHeatRow = {"district": "강남", "loc": [37.50, 127.03], "weight": 1.4, "type": "오입력"}
+
+      try:
+          validateHeatRow(brokenHeatRow)
+      except ValueError as exc:
+          heatWeightError = str(exc)
+
+      heatWeightError
+  - type: code
+    language: python
+    title: 민원 히트맵 만들기
+    description: 검증된 좌표와 가중치로 히트맵을 만들고 권역 설명 마커를 추가합니다.
+    content: |-
+      complaintHeatMap = folium.Map(location=[37.52, 126.98], zoom_start=12, tiles="CartoDB Positron")
+      heatInput = [[row["loc"][0], row["loc"][1], row["weight"]] for row in complaintHeatRows]
+
+      HeatMap(
+          heatInput,
+          radius=28,
+          blur=18,
+          min_opacity=0.35,
+          gradient={0.2: "#2c7bb6", 0.5: "#ffffbf", 0.8: "#fdae61", 1.0: "#d7191c"},
+      ).add_to(complaintHeatMap)
+
+      districtCenters = {
+          "강남": [37.4979, 127.0276],
+          "홍대": [37.5563, 126.9236],
+          "여의도": [37.5219, 126.9245],
+      }
+      for district, score in districtHeatScore.items():
+          folium.CircleMarker(
+              location=districtCenters[district],
+              radius=7,
+              color="black",
+              fill=True,
+              popup=f"{district} 민원 가중합 {score:.2f}",
+              tooltip=f"{district} 민원 밀도",
+          ).add_to(complaintHeatMap)
+
+      complaintHeatMap
+  - type: code
+    language: python
+    title: 렌더 결과 검증
+    description: 권역명, 히트맵 레이어, 오류 메시지가 예상대로 준비됐는지 점검합니다.
+    content: |-
+      heatHtml = complaintHeatMap.get_root().render()
+      heatChecks = {
+          "districtsRendered": all(district in heatHtml for district in districtHeatScore),
+          "heatLayerRendered": "heatLayer" in heatHtml,
+          "weightErrorOk": heatWeightError == "가중치 범위 오류: 강남=1.4",
+          "hottestPredictionOk": hottestDistrict == "강남",
+          "validationOk": all(heatValidation),
+      }
+
+      assert all(heatChecks.values()), heatChecks
+      heatChecks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 고위험 기준을 낮추면 어떤 권역이 추가되는지 비교합니다.
+    content: |-
+      def selectHotDistricts(scoreByDistrict, threshold):
+          return sorted(district for district, score in scoreByDistrict.items() if score >= threshold)
+
+      strictHotDistricts = selectHotDistricts(districtHeatScore, 2.0)
+      relaxedHotDistricts = selectHotDistricts(districtHeatScore, 1.0)
+
+      strictHotDistricts, relaxedHotDistricts
+  - type: tip
+    content: 히트맵은 색보다 데이터 계약이 먼저입니다. 좌표, 가중치, 권역 합계, 렌더 결과를 검증하면 밀도 지도를 업무 리포트의 근거로 사용할 수 있습니다.
+
 - id: practice
   title: 실습
   subtitle: 히트맵

@@ -239,6 +239,99 @@ sections:
   - type: text
     content: 모든 개인정보가 자동으로 마스킹되어 안전하게 로그에 기록됩니다!
 
+- id: workflow_validation
+  title: 10단계. 보안 검증 루프
+  subtitle: 예측 → 잔존 탐지 → 오류 수정 → 운영 정책
+  blocks:
+  - type: text
+    content: |-
+      개인정보 마스킹은 화면에 별표가 보인다고 끝나는 작업이 아닙니다. 원문 주민번호, 카드번호, 계좌번호, 전화번호가 결과에 남아 있지 않은지 자동으로 검사해야 합니다.
+
+      이번 단계에서는 마스킹 후 원문 패턴이 0개 남을 것이라고 먼저 예측합니다. 그다음 일부러 깨진 마스킹 결과를 넣어 검증 함수가 실패하는지 확인하고, 운영 로그 정책에 맞게 재사용 가능한 함수로 고칩니다.
+  - type: code
+    language: python
+    title: 잔존 개인정보 탐지 함수
+    description: 마스킹 결과에 원문 개인정보 패턴이 남아 있는지 확인합니다
+    content: |-
+      sensitivePatterns = {
+          "residentNumber": r"\d{6}-\d{7}",
+          "cardNumber": r"\d{4}-\d{4}-\d{4}-\d{4}",
+          "accountNumber": r"\b\d{3}-\d{3}-\d{6}\b",
+          "phoneNumber": r"\b010-\d{3,4}-\d{4}\b",
+      }
+
+      def findSensitiveLeaks(text):
+          return {
+              name: re.findall(pattern, text)
+              for name, pattern in sensitivePatterns.items()
+              if re.findall(pattern, text)
+          }
+
+      predictedLeakCount = 0
+      leaks = findSensitiveLeaks(maskedData)
+
+      assert len(leaks) == predictedLeakCount, leaks
+      leaks
+  - type: code
+    language: python
+    title: 마스킹 결과 계약 검증
+    description: 원문은 없어지고 필요한 일부 식별자만 남는지 확인합니다
+    content: |-
+      def validateMaskedPersonalInfo(text):
+          leaks = findSensitiveLeaks(text)
+          assert not leaks, f"원문 개인정보 잔존: {leaks}"
+
+          assert "901225-*******" in text
+          assert "1234-****-****-3456" in text
+          assert "***-***-***789" in text
+          assert "010-****-5678" in text
+
+          return True
+
+      assert validateMaskedPersonalInfo(maskedData)
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 카드번호 마스킹이 빠진 결과를 검증 함수가 잡아내는지 확인합니다
+    content: |-
+      def brokenMaskPersonalInfo(text):
+          text = re.sub(r"(\d{6})-(\d{7})", r"\1-*******", text)
+          text = re.sub(r"(\d{3})-(\d{3})-(\d{3})(\d{3})", r"***-***-***\4", text)
+          text = re.sub(r"(\d{3})-(\d{3,4})-(\d{4})", r"\1-****-\3", text)
+          return text
+
+      brokenMaskedData = brokenMaskPersonalInfo(personalData)
+
+      try:
+          validateMaskedPersonalInfo(brokenMaskedData)
+      except AssertionError as exc:
+          print("검증 실패 확인:", exc)
+
+      fixedMaskedData = maskPersonalInfo(personalData)
+      assert validateMaskedPersonalInfo(fixedMaskedData)
+  - type: code
+    language: python
+    title: 운영 로그 정책 실험
+    description: 로그 묶음 전체에 원문 개인정보가 남지 않는지 확인합니다
+    content: |-
+      def safeLogBatch(messages):
+          return [safeLog(message) for message in messages]
+
+      operationLogs = safeLogBatch([
+          "회원 조회: 주민번호 901225-1234567, 전화 010-1234-5678",
+          "결제 승인: 카드 1234-5678-9012-3456",
+          "정산 계좌: 110-123-456789",
+      ])
+
+      joinedLogs = "\n".join(operationLogs)
+
+      assert all(log.startswith("[LOG] ") for log in operationLogs)
+      assert validateMaskedPersonalInfo(joinedLogs)
+
+      operationLogs
+  - type: tip
+    content: "보안 커리큘럼은 마스킹 함수를 만드는 데서 멈추면 부족합니다. 원문 패턴이 남지 않는지 검사하는 검증 함수까지 있어야 업무 로그와 리포트에 안전하게 적용할 수 있습니다."
+
 - id: practice
   title: 실습
   subtitle: 개인정보 마스킹 프로젝트

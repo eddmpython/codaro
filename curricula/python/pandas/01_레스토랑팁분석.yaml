@@ -7,7 +7,7 @@ meta:
   category: pandas
   difficulty: "⭐"
   badge: 입문
-  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv
+  dataSource: codaro-local:tips
   tags: ["tips", "기초", "read_csv", "describe"]
   seo:
     title: "pandas 팁 데이터 분석 - read_csv, describe 기초"
@@ -41,24 +41,25 @@ sections:
   subtitle: pd.read_csv()
   blocks:
   - type: text
-    content: CSV(Comma-Separated Values) 파일을 pandas의 DataFrame으로 불러옵니다. CSV는 콤마로 구분된 텍스트 파일로, 가장 흔하게 사용되는 데이터 형식입니다. pandas는 로컬 파일뿐만 아니라 인터넷 URL에서도 직접 데이터를 읽어올 수 있어 매우 편리합니다.
+    content: CSV(Comma-Separated Values)는 콤마로 구분된 텍스트 파일이며, pandas는 이런 표 데이터를 DataFrame으로 다룹니다. 이 레슨에서는 Codaro가 제공하는 로컬 예제 DataFrame으로 분석 흐름을 안정적으로 연습합니다.
   - type: code
     language: python
     title: 데이터 불러오기
-    description: URL에서 CSV 파일을 가져와서 tips 변수에 저장
+    description: Codaro 로컬 데이터셋을 DataFrame으로 불러옵니다
     content: |-
-      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-      tips = pd.read_csv(url)
+      import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
 
+      tips = loadLocalDataset("tips")
   - type: tip
-    content: "pd.read_csv()는 CSV 파일을 DataFrame으로 변환합니다. 로컬 경로('data.csv')나 URL 모두 사용 가능합니다. DataFrame은 pandas의 핵심 데이터 구조로, 행과 열로 구성된 2차원 표입니다."
+    content: "pd.read_csv()는 CSV 파일을 DataFrame으로 변환합니다. 이번 실습은 Codaro 로컬 데이터셋을 쓰므로 인터넷 연결과 무관하게 이후 셀을 그대로 실행할 수 있습니다."
 
 - id: step3_preview
   title: 3단계. 표 확인하기
   subtitle: 변수명만 입력
   blocks:
   - type: text
-    content: Jupyter나 Codaro 같은 노트북 환경에서는 변수명만 입력하면 자동으로 표 형태로 예쁘게 출력됩니다. 이 데이터는 244명의 레스토랑 손님 정보로, 각 손님의 결제 금액, 팁, 성별, 흡연 여부, 요일, 시간대, 일행 수 등 7가지 정보가 담겨 있습니다.
+    content: Jupyter나 Codaro 같은 노트북 환경에서는 변수명만 입력하면 자동으로 표 형태로 예쁘게 출력됩니다. 로컬 데이터셋은 레스토랑 손님 기록과 같은 7개 컬럼을 가진 표입니다. 각 행에는 결제 금액, 팁, 성별, 흡연 여부, 요일, 시간대, 일행 수가 담겨 있습니다.
   - type: code
     language: python
     title: 표 확인하기
@@ -71,7 +72,7 @@ sections:
   subtitle: .shape
   blocks:
   - type: text
-    content: shape 속성은 DataFrame의 크기를 (행 수, 열 수) 튜플 형태로 반환합니다. 이 데이터는 (244, 7)로, 244개의 행(레코드)과 7개의 열(컬럼)을 가지고 있습니다. 데이터 분석을 시작할 때 전체 데이터의 규모를 파악하는 것이 중요합니다.
+    content: shape 속성은 DataFrame의 크기를 (행 수, 열 수) 튜플 형태로 반환합니다. 로컬 데이터셋을 읽으면 행과 열 개수를 바로 확인할 수 있습니다. 데이터 분석을 시작할 때 전체 데이터의 규모를 파악하는 것이 중요합니다.
   - type: code
     language: python
     title: 크기 확인
@@ -113,7 +114,7 @@ sections:
   subtitle: 대괄호로 선택
   blocks:
   - type: text
-    content: DataFrame에서 특정 컬럼만 선택하려면 대괄호 []를 사용합니다. DataFrame['컬럼명'] 형태로 작성하면 해당 컬럼의 모든 값들을 Series 형태로 가져올 수 있습니다. Series는 pandas의 1차원 데이터 구조로, 하나의 열을 나타냅니다. 여기서는 244명 손님의 팁 금액만 선택합니다.
+    content: DataFrame에서 특정 컬럼만 선택하려면 대괄호 []를 사용합니다. DataFrame['컬럼명'] 형태로 작성하면 해당 컬럼의 모든 값들을 Series 형태로 가져올 수 있습니다. Series는 pandas의 1차원 데이터 구조로, 하나의 열을 나타냅니다. 여기서는 로컬 예제 데이터에 담긴 손님의 팁 금액만 선택합니다.
   - type: code
     language: python
     title: tip 컬럼 선택
@@ -129,7 +130,7 @@ sections:
   subtitle: .mean()
   blocks:
   - type: text
-    content: Series나 DataFrame의 숫자 컬럼에 .mean() 메서드를 붙이면 평균값을 계산합니다. 이 프로젝트의 목표인 "평균 팁은 얼마일까?"의 답을 드디어 구할 수 있습니다! 244명의 팁을 모두 더해서 개수로 나눈 값이 자동으로 계산됩니다. 평균 팁은 약 $3.00입니다.
+    content: Series나 DataFrame의 숫자 컬럼에 .mean() 메서드를 붙이면 평균값을 계산합니다. 이 프로젝트의 목표인 "평균 팁은 얼마일까?"의 답을 드디어 구할 수 있습니다! 현재 불러온 모든 행의 팁을 더해서 개수로 나눈 값이 자동으로 계산됩니다.
   - type: code
     language: python
     title: 평균 팁 구하기
@@ -142,7 +143,7 @@ sections:
   subtitle: .max(), .min()
   blocks:
   - type: text
-    content: mean()과 마찬가지로 max()는 최대값, min()은 최소값을 구하는 메서드입니다. 평균뿐만 아니라 데이터의 범위(최소~최대)를 파악하면 데이터를 더 잘 이해할 수 있습니다. 이 데이터에서 가장 많이 준 팁은 $10.00, 가장 적게 준 팁은 $1.00입니다. 두 값을 콤마로 연결하면 한 번에 볼 수 있습니다.
+    content: mean()과 마찬가지로 max()는 최대값, min()은 최소값을 구하는 메서드입니다. 평균뿐만 아니라 데이터의 범위(최소~최대)를 파악하면 데이터를 더 잘 이해할 수 있습니다. 실행할 때마다 같은 로컬 데이터셋을 사용하므로 결과를 안정적으로 비교할 수 있습니다. 두 값을 콤마로 연결하면 한 번에 볼 수 있습니다.
   - type: code
     language: python
     title: 최대/최소 팁
@@ -166,6 +167,99 @@ sections:
   - type: tip
     content: "describe()는 숫자형 컬럼만 자동으로 선택해서 통계를 보여줍니다. 문자형 컬럼(sex, day 등)은 제외됩니다. 만약 문자형 컬럼의 통계를 보고 싶다면 describe(include='object')를 사용하면 됩니다."
 
+- id: workflow_validation
+  title: 11단계. 실무 팁 리포트 검증
+  subtitle: 예측 → 오류 확인 → 검증 → 기준 실험
+  blocks:
+  - type: text
+    content: |-
+      평균 팁 하나만 보면 업무에 쓰기 어렵습니다. 실제 분석에서는 필수 컬럼을 확인하고, 잘못된 데이터가 들어왔을 때 바로 실패시키고, 계산 결과가 원본 행 수와 맞는지 검증해야 합니다.
+
+      이번 단계에서는 팁 비율이 가장 높은 요일을 먼저 예상하고, 컬럼이 빠진 데이터를 일부러 검사에 실패시킵니다. 그다음 요일별 리포트를 만들고, 결제 금액 기준을 바꿔 결과가 어떻게 달라지는지 실험합니다.
+  - type: code
+    language: python
+    title: 분석용 데이터 점검 함수
+    description: 필수 컬럼과 결제 금액 검증
+    content: |-
+      def prepareTipMetrics(data):
+          requiredColumns = {"total_bill", "tip", "day", "time", "size"}
+          missingColumns = requiredColumns - set(data.columns)
+          if missingColumns:
+              raise ValueError(f"팁 분석에 필요한 컬럼이 없습니다: {sorted(missingColumns)}")
+
+          if (data["total_bill"] <= 0).any():
+              raise ValueError("결제 금액은 0보다 커야 팁 비율을 계산할 수 있습니다.")
+
+          result = data.copy()
+          result["tipRate"] = result["tip"] / result["total_bill"]
+          return result
+
+
+      try:
+          prepareTipMetrics(tips.drop(columns=["tip"]))
+      except ValueError as exc:
+          print("의도한 오류 확인:", exc)
+      else:
+          raise AssertionError("tip 컬럼이 빠진 데이터를 통과시키면 안 됩니다.")
+  - type: code
+    language: python
+    title: 요일별 팁 리포트 만들기
+    description: 평균 팁과 팁 비율 검증
+    content: |-
+      tipMetrics = prepareTipMetrics(tips)
+      dayReport = (
+          tipMetrics.groupby("day")
+          .agg(
+              orderCount=("tip", "size"),
+              avgBill=("total_bill", "mean"),
+              avgTip=("tip", "mean"),
+              avgTipRate=("tipRate", "mean"),
+              revenue=("total_bill", "sum"),
+          )
+          .round({"avgBill": 2, "avgTip": 2, "avgTipRate": 4, "revenue": 2})
+          .sort_values("avgTipRate", ascending=False)
+      )
+
+      bestTipRateDay = dayReport.index[0]
+      assert len(tipMetrics) == len(tips)
+      assert dayReport["orderCount"].sum() == len(tips)
+      assert round(dayReport["revenue"].sum(), 2) == round(tips["total_bill"].sum(), 2)
+      assert bestTipRateDay == "Sun"
+
+      print("예상: 팁 비율이 가장 높은 요일은", bestTipRateDay)
+      dayReport
+  - type: code
+    language: python
+    title: 결제 금액 기준 실험
+    description: 기준을 바꾸며 리포트 해석하기
+    content: |-
+      def summarizeBillSegment(data, minimumBill):
+          metrics = prepareTipMetrics(data)
+          target = metrics[metrics["total_bill"] >= minimumBill]
+          if target.empty:
+              raise ValueError(f"{minimumBill} 이상 결제한 주문이 없습니다.")
+
+          return pd.Series({
+              "minimumBill": minimumBill,
+              "orderCount": len(target),
+              "avgBill": round(target["total_bill"].mean(), 2),
+              "avgTip": round(target["tip"].mean(), 2),
+              "avgTipRate": round(target["tipRate"].mean(), 4),
+          })
+
+
+      over20 = summarizeBillSegment(tips, 20)
+      over30 = summarizeBillSegment(tips, 30)
+
+      assert over20["orderCount"] >= over30["orderCount"]
+      assert over30["avgBill"] >= over20["avgBill"]
+      assert over30["avgTip"] >= over20["avgTip"]
+
+      pd.DataFrame([over20, over30])
+  - type: tip
+    title: "변주 실험"
+    content: "결제 금액 기준을 20/30달러가 아니라 15/25달러로 바꾸고, 주문 수와 평균 팁 비율이 어떻게 변하는지 같은 assert 구조로 비교하세요."
+
 - id: practice
   title: 실습
   subtitle: 팁 데이터 분석 프로젝트
@@ -181,7 +275,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        data = loadLocalDataset("tips")
     - type: code
       title: "분석 수행"
       content: |-
@@ -196,7 +292,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        df = loadLocalDataset("tips")
     - type: code
       title: "분석 수행"
       content: |-
@@ -213,7 +311,7 @@ sections:
   - type: list
     items:
     - "import pandas as pd - pandas 불러오기"
-    - "pd.read_csv(url) - CSV를 DataFrame으로"
+    - "loadLocalDataset(\"tips\") - Codaro 로컬 예제 데이터를 DataFrame으로"
     - "df.shape - 크기 (행, 열)"
     - "df.head() - 처음 5행"
     - "df.columns - 컬럼 목록"

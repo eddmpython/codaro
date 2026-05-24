@@ -291,6 +291,120 @@ sections:
   - type: "tip"
     content: "OrderedDict는 Python 3.7+에서는 일반 dict도 순서를 유지하므로 특별한 경우를 제외하면 dict 사용을 권장합니다."
 
+- id: "workflow_validation"
+  title: "검증 루프: 티켓 운영 집계"
+  subtitle: "Counter, defaultdict, deque, ChainMap 조합"
+  blocks:
+  - type: "text"
+    content: "collections는 단일 함수 암기가 아니라 운영 데이터 구조를 깔끔하게 만드는 도구입니다. 티켓 로그를 집계하고, 누락 키 오류를 잡고, 최근 이벤트와 설정 우선순위를 함께 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "티켓 집계 리포트"
+    description: "Counter와 defaultdict로 카테고리/담당자별 티켓을 집계합니다."
+    content: |-
+      ticketRows = [
+          {"ticketId": "T-101", "owner": "min", "category": "bug", "priority": "high"},
+          {"ticketId": "T-102", "owner": "seo", "category": "billing", "priority": "medium"},
+          {"ticketId": "T-103", "owner": "min", "category": "bug", "priority": "low"},
+          {"ticketId": "T-104", "owner": "jin", "category": "feature", "priority": "medium"},
+          {"ticketId": "T-105", "owner": "seo", "category": "bug", "priority": "high"},
+      ]
+
+      def summarizeTickets(rows):
+          categoryCounts = Counter(row["category"] for row in rows)
+          priorityCounts = Counter(row["priority"] for row in rows)
+          ticketsByOwner = defaultdict(list)
+
+          for row in rows:
+              ticketsByOwner[row["owner"]].append(row["ticketId"])
+
+          return {
+              "categoryCounts": categoryCounts,
+              "priorityCounts": priorityCounts,
+              "ticketsByOwner": dict(ticketsByOwner),
+              "topCategory": categoryCounts.most_common(1)[0],
+          }
+
+      ticketSummary = summarizeTickets(ticketRows)
+
+      assert ticketSummary["categoryCounts"]["bug"] == 3
+      assert ticketSummary["priorityCounts"]["high"] == 2
+      assert ticketSummary["ticketsByOwner"]["min"] == ["T-101", "T-103"]
+      assert ticketSummary["topCategory"] == ("bug", 3)
+
+      ticketSummary
+  - type: "code"
+    language: "python"
+    title: "누락 키 오류 잡기"
+    description: "일반 dict 그룹화에서 생기는 KeyError를 defaultdict로 고칩니다."
+    content: |-
+      def groupTicketsWithoutDefault(rows):
+          grouped = {}
+          for row in rows:
+              grouped[row["owner"]].append(row["ticketId"])
+          return grouped
+
+      try:
+          groupTicketsWithoutDefault(ticketRows)
+      except KeyError as exc:
+          groupingProblem = f"담당자 키가 먼저 초기화되지 않았습니다: {exc}"
+
+      fixedGroups = defaultdict(list)
+      for row in ticketRows:
+          fixedGroups[row["owner"]].append(row["ticketId"])
+
+      assert groupingProblem.startswith("담당자 키가 먼저 초기화되지 않았습니다")
+      assert dict(fixedGroups)["seo"] == ["T-102", "T-105"]
+
+      groupingProblem, dict(fixedGroups)
+  - type: "code"
+    language: "python"
+    title: "최근 이벤트와 설정 우선순위"
+    description: "deque(maxlen)와 ChainMap으로 운영 상태를 관리합니다."
+    content: |-
+      recentTickets = deque(maxlen=3)
+      for row in ticketRows:
+          recentTickets.append(row["ticketId"])
+
+      defaults = {"pageSize": 20, "retry": 2, "alertPriority": "high"}
+      teamConfig = {"pageSize": 50}
+      userConfig = {"alertPriority": "medium"}
+      effectiveConfig = ChainMap(userConfig, teamConfig, defaults)
+
+      assert list(recentTickets) == ["T-103", "T-104", "T-105"]
+      assert effectiveConfig["pageSize"] == 50
+      assert effectiveConfig["retry"] == 2
+      assert effectiveConfig["alertPriority"] == "medium"
+
+      {"recentTickets": list(recentTickets), "config": dict(effectiveConfig)}
+  - type: "code"
+    language: "python"
+    title: "슬라이딩 에러율 계산"
+    description: "deque로 최근 N개 상태의 에러율을 추적합니다."
+    content: |-
+      def rollingErrorRates(statuses, windowSize):
+          window = deque(maxlen=windowSize)
+          rates = []
+          for status in statuses:
+              window.append(status)
+              if len(window) == windowSize:
+                  failures = Counter(window)["fail"]
+                  rates.append(failures / windowSize)
+          return rates
+
+      errorRates = rollingErrorRates(
+          ["ok", "fail", "ok", "fail", "fail", "ok"],
+          windowSize=3,
+      )
+
+      assert errorRates == [1 / 3, 2 / 3, 2 / 3, 2 / 3]
+      assert max(errorRates) > 0.5
+
+      errorRates
+  - type: "tip"
+    title: "변주 실험"
+    content: "최근 3개가 아니라 최근 5개 상태를 기준으로 에러율을 계산하고, 경보 기준을 50%에서 40%로 낮췄을 때 경보 횟수가 어떻게 달라지는지 비교하세요."
+
 - id: "practice"
   title: "collections 모듈 종합 복습"
   subtitle: "특수 컨테이너 마스터하기"

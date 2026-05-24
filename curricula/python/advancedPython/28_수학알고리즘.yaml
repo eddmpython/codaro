@@ -3,7 +3,7 @@ meta:
   title: "수학 알고리즘"
   day: 28
   category: "advancedPython"
-  tags: ["수학", "알고리즘", "정수론", "행렬"]
+  tags: ["수학", "알고리즘", "정수론", "행렬", "검증", "수치검증"]
   seo:
     title: "파이썬 수학 알고리즘"
     description: "소수, GCD, 조합론, 행렬 연산 학습"
@@ -311,6 +311,61 @@ sections:
       triVal = triArea((0, 0), (4, 0), (2, 3))
       geoResult = (distVal, triVal)
       geoResult
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 배치 주기와 체크섬 계산"
+  subtitle: "GCD/LCM, 빠른 거듭제곱, 입력 검증을 운영 계산에 적용합니다"
+  blocks:
+  - type: "text"
+    content: "수학 알고리즘은 추상 문제가 아니라 운영 주기, 체크섬, 샤딩 같은 계산에 바로 쓰입니다. 정수론 함수가 경계값에서 틀리지 않는지 표준 함수와 비교하며 검증하세요."
+  - type: "code"
+    language: "python"
+    title: "여러 배치가 동시에 도는 주기 구하기"
+    description: "GCD로 LCM을 만들고 운영 주기 계산을 검증합니다."
+    content: |-
+      from math import gcd
+      from functools import reduce
+
+      def lcm(a, b):
+          if a <= 0 or b <= 0:
+              raise ValueError("period must be positive")
+          return a * b // gcd(a, b)
+
+      def lcmMany(periods):
+          return reduce(lcm, periods)
+
+      periods = [6, 10, 15]
+
+      assert lcmMany(periods) == 30
+      assert [30 % period for period in periods] == [0, 0, 0]
+  - type: "code"
+    language: "python"
+    title: "빠른 모듈러 거듭제곱 검증"
+    description: "직접 구현 결과를 Python 내장 pow와 비교합니다."
+    content: |-
+      def modPow(base, exponent, modulus):
+          if modulus <= 0:
+              raise ValueError("modulus must be positive")
+          result = 1
+          base %= modulus
+          while exponent > 0:
+              if exponent % 2 == 1:
+                  result = (result * base) % modulus
+              base = (base * base) % modulus
+              exponent //= 2
+          return result
+
+      assert modPow(7, 128, 13) == pow(7, 128, 13)
+
+      try:
+          modPow(2, 10, 0)
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "modulus must be positive"
+  - type: "tip"
+    title: "변주 실험"
+    content: "배치 주기가 하루 24시간을 넘으면 경고를 내도록 함수를 확장하고, `[8, 9, 10]` 같은 입력에서 경고가 필요한지 검증하세요."
 
 - id: "practice"
   title: "종합 연습"

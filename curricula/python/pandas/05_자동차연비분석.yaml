@@ -7,8 +7,8 @@ meta:
   category: pandas
   difficulty: "⭐⭐⭐⭐"
   badge: 기초
-  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv
-  tags: ["mpg", "sort", "pivot_table", "nlargest"]
+  dataSource: codaro-local:mpg
+  tags: ["mpg", "sort", "pivot_table", "nlargest", "검증", "피벗분석"]
   seo:
     title: "pandas 정렬과 피벗테이블 - 자동차 연비 TOP 10 분석"
     description: "자동차 연비 데이터로 정렬(sort_values), TOP N(nlargest), 피벗테이블(pivot_table)을 배웁니다. 연도별 연비 추이 분석."
@@ -25,18 +25,17 @@ sections:
   subtitle: 자동차 연비 데이터
   blocks:
   - type: text
-    content: 자동차 연비 데이터셋은 1970년대~1980년대 미국, 일본, 유럽에서 생산된 자동차 398대의 연비와 성능 정보를 담고 있습니다. mpg(miles per gallon, 갤런당 마일)는 연비를 나타내며, 숫자가 클수록 연비가 좋습니다. cylinders(실린더 수), displacement(배기량), horsepower(마력), weight(무게), acceleration(가속력), model_year(연식), origin(제조국) 등 9개의 컬럼이 있습니다. 이 데이터로 정렬(sort), TOP N 추출(nlargest), 피벗테이블(pivot_table) 등 pandas의 핵심 분석 기법을 배웁니다. 기초 과정의 마지막 프로젝트입니다!
+    content: 자동차 연비 데이터셋은 1970년대~1980년대 미국, 일본, 유럽에서 생산된 자동차 398대의 연비와 성능 정보를 담고 있습니다. mpg(miles per gallon, 갤런당 마일)는 연비를 나타내며, 숫자가 클수록 연비가 좋습니다. cylinders(실린더 수), displacement(배기량), horsepower(마력), weight(무게), acceleration(가속력), model_year(연식), origin(제조국) 등 9개의 컬럼이 있습니다. 이 데이터로 정렬(sort), TOP N 추출(nlargest), 피벗테이블(pivot_table) 등 pandas의 핵심 분석 기법을 배웁니다. 로컬 실행에서는 같은 분석 질문을 계속 풀 수 있도록 작은 자동차 샘플을 함께 둡니다.
   - type: code
     language: python
     title: 데이터 불러오기
     description: 자동차 연비 데이터
     content: |-
       import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
-      mpg = pd.read_csv(url)
+      mpg = loadLocalDataset("mpg")
       mpg.shape
-
 - id: step2_head
   title: 2단계. 미리보기
   subtitle: 데이터 구조 파악
@@ -234,6 +233,54 @@ sections:
   - type: tip
     content: "복잡한 체이닝은 가독성을 위해 줄바꿈할 수 있습니다. mpg[mpg['cylinders'] >= 6]\n    .nlargest(5, 'mpg')\n    .[ ['name', 'mpg']]처럼 작성하면 각 단계가 명확해집니다. 또는 괄호로 감싸면 됩니다."
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 연비 리포트와 피벗 점검"
+  subtitle: "sort, nlargest, pivot_table, 실패 케이스"
+  blocks:
+  - type: text
+    content: "자동차 연비 분석은 정렬 결과와 그룹 평균이 맞는지 같이 봐야 합니다. 상위 차량 목록과 제조국별 피벗이 같은 원본에서 나왔는지 검증하세요."
+  - type: code
+    language: python
+    title: "상위 연비와 제조국 피벗"
+    description: "nlargest와 pivot_table 결과를 검증합니다."
+    content: |-
+      import pandas as pd
+
+      mpg = pd.DataFrame({
+          "name": ["a", "b", "c", "d"],
+          "mpg": [30, 22, 35, 18],
+          "cylinders": [4, 6, 4, 8],
+          "origin": ["japan", "usa", "japan", "usa"],
+      })
+
+      top = mpg.nlargest(2, "mpg")
+      pivot = mpg.pivot_table(index="origin", values="mpg", aggfunc="mean")
+
+      assert top["name"].tolist() == ["c", "a"]
+      assert pivot.loc["japan", "mpg"] == 32.5
+      assert pivot.loc["usa", "mpg"] == 20.0
+  - type: code
+    language: python
+    title: "연비 타입 오류 확인"
+    description: "숫자가 아닌 mpg 컬럼은 정렬 전에 막습니다."
+    content: |-
+      import pandas as pd
+
+      def validateMpg(frame):
+          if not pd.api.types.is_numeric_dtype(frame["mpg"]):
+              raise ValueError("mpg must be numeric")
+          return True
+
+      try:
+          validateMpg(pd.DataFrame({"mpg": ["bad"]}))
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "mpg must be numeric"
+  - type: tip
+    title: "변주 실험"
+    content: "제조국별 평균 대신 중앙값을 쓰면 순위가 달라지는지 pivot_table의 aggfunc만 바꿔 비교하세요."
+
 - id: practice
   title: 실습
   subtitle: 자동차 연비 분석 프로젝트
@@ -249,7 +296,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        data = loadLocalDataset("mpg")
     - type: code
       title: "분석 수행"
       content: |-
@@ -266,7 +315,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        df = loadLocalDataset("mpg")
     - type: code
       title: "분석 수행"
       content: |-

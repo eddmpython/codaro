@@ -3,7 +3,7 @@ meta:
   title: "리스트기초"
   day: 7
   category: "30days"
-  tags: []
+  tags: ["리스트", "인덱싱", "슬라이싱", "재고관리", "정합성", "검증"]
   seo:
     title: "파이썬 리스트 기초 - 리스트 생성과 활용"
     description: "리스트의 기본 개념, 생성, 인덱싱, 슬라이싱, 수정 방법을 배웁니다."
@@ -373,6 +373,96 @@ sections:
       '딸기' not in cart
   - type: "tip"
     content: "in 연산자는 문자열에서 부분 문자열 검색에도 사용됩니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 재고 목록 정합성 확인"
+  subtitle: "여러 리스트를 같은 순서로 맞춰 업무 데이터로 쓰기"
+  blocks:
+  - type: "text"
+    content: "리스트는 값 여러 개를 담는 상자에서 끝나지 않습니다. 제품명 리스트와 재고 수량 리스트처럼 서로 같은 순서를 공유하는 데이터를 다룰 때는 길이, 인덱스, 수정 결과를 계속 검증해야 합니다."
+  - type: "list"
+    items:
+    - "예측: 제품명과 재고 수량은 같은 개수여야 한다."
+    - "실행: 인덱스로 같은 위치의 제품과 수량을 함께 읽는다."
+    - "오류 수정: 범위를 벗어난 인덱스 접근을 IndexError로 확인한다."
+    - "검증: 수정 후에도 리스트 길이와 핵심 값이 맞는지 assert로 확인한다."
+  - type: "code"
+    language: "python"
+    title: "재고 목록 읽기"
+    description: "제품명과 수량 리스트를 같은 인덱스로 연결해 읽습니다."
+    content: |-
+      productNames = ['노트북', '마우스', '키보드', '모니터']
+      stockCounts = [5, 20, 0, 8]
+
+      assert len(productNames) == len(stockCounts)
+
+      firstProduct = productNames[0]
+      firstStock = stockCounts[0]
+      lastProduct = productNames[-1]
+      lastStock = stockCounts[-1]
+
+      assert firstProduct == '노트북'
+      assert firstStock == 5
+      assert lastProduct == '모니터'
+      assert lastStock == 8
+  - type: "code"
+    language: "python"
+    title: "재입고 후 검증"
+    description: "품절된 항목을 수정한 뒤, 변경된 위치와 전체 길이를 확인합니다."
+    content: |-
+      productNames = ['노트북', '마우스', '키보드', '모니터']
+      stockCounts = [5, 20, 0, 8]
+
+      stockCounts[2] = 12
+      restockSummary = [productNames[2], stockCounts[2]]
+
+      assert restockSummary == ['키보드', 12]
+      assert len(productNames) == 4
+      assert len(stockCounts) == 4
+      assert 0 not in stockCounts
+  - type: "code"
+    language: "python"
+    title: "범위 오류와 길이 검증"
+    description: "존재하지 않는 인덱스 접근과 길이가 맞지 않는 리스트를 명확히 실패시킵니다."
+    content: |-
+      def requireAlignedLists(names, quantities):
+          if len(names) != len(quantities):
+              raise ValueError('제품명과 수량 리스트 길이가 같아야 합니다')
+          return True
+
+
+      productNames = ['노트북', '마우스', '키보드', '모니터']
+      stockCounts = [5, 20, 0, 8]
+      assert requireAlignedLists(productNames, stockCounts) is True
+
+      try:
+          missingProduct = productNames[4]
+      except IndexError as exc:
+          indexMessage = str(exc)
+      else:
+          raise AssertionError('없는 다섯 번째 제품 접근은 실패해야 합니다')
+
+      try:
+          requireAlignedLists(['노트북', '마우스'], [5])
+      except ValueError as exc:
+          lengthMessage = str(exc)
+      else:
+          raise AssertionError('길이가 다른 리스트는 실패해야 합니다')
+
+      assert 'range' in indexMessage
+      assert lengthMessage == '제품명과 수량 리스트 길이가 같아야 합니다'
+  - type: "expansion"
+    title: "실무 변주: 오늘 할 일 우선순위 나누기"
+    code: |-
+      dailyTasks = ['메일 확인', '견적서 작성', '고객 연락', '보고서 정리']
+      urgentTasks = dailyTasks[:2]
+      laterTasks = dailyTasks[2:]
+      orderedTasks = urgentTasks + laterTasks
+
+      assert urgentTasks == ['메일 확인', '견적서 작성']
+      assert laterTasks == ['고객 연락', '보고서 정리']
+      assert orderedTasks == dailyTasks
+      orderedTasks
 
 - id: "practice"
   title: "Day 7 종합 복습"

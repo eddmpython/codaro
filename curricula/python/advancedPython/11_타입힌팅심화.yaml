@@ -3,7 +3,7 @@ meta:
   title: "타입 힌팅 심화"
   day: 11
   category: "advancedPython"
-  tags: ["typing", "Generic", "TypeVar", "Protocol", "overload"]
+  tags: ["typing", "Generic", "TypeVar", "Protocol", "overload", "검증", "타입계약"]
   seo:
     title: "파이썬 타입 힌팅 심화 - Generic, TypeVar, Protocol 완벽 가이드"
     description: "고급 타입 힌팅을 마스터합니다. Generic 클래스, TypeVar, Protocol, @overload, Callable 타입 힌팅."
@@ -420,6 +420,94 @@ sections:
       process(42), process("hello"), process(None)
   - type: "tip"
     content: "Any는 타입 검사를 무력화하므로 꼭 필요한 경우에만 사용하세요."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 타입 힌트로 주문 저장소 계약 표현하기"
+  subtitle: "Generic, Protocol, Callable, overload가 실제 코드 계약을 어떻게 돕는지 확인합니다"
+  blocks:
+  - type: "text"
+    content: "타입 힌트는 실행 속도를 높이는 기능이 아니라, 저장소·필터·조회 함수 사이의 계약을 명확히 하는 장치입니다. 먼저 어떤 객체가 저장 가능한지 예측하고, 로컬 Python에서 실행한 뒤, 잘못된 조건은 좁힌 예외로 막아보세요."
+  - type: "code"
+    language: "python"
+    title: "주문 저장소 계약 만들기"
+    description: "Protocol로 필요한 동작을 표현하고 Generic 저장소가 같은 타입을 끝까지 유지하는지 검증합니다."
+    content: |-
+      from typing import Callable, Generic, Protocol, TypeVar, overload
+
+      class HasKey(Protocol):
+          def key(self) -> str:
+              ...
+
+      T = TypeVar("T", bound=HasKey)
+
+      class Repository(Generic[T]):
+          def __init__(self) -> None:
+              self._items: dict[str, T] = {}
+
+          def add(self, item: T) -> None:
+              self._items[item.key()] = item
+
+          def all(self) -> list[T]:
+              return list(self._items.values())
+
+          @overload
+          def get(self, key: str) -> T | None:
+              ...
+
+          @overload
+          def get(self, key: str, default: T) -> T:
+              ...
+
+          def get(self, key: str, default: T | None = None) -> T | None:
+              return self._items.get(key, default)
+
+      class OrderRecord:
+          def __init__(self, orderId: str, amount: int, status: str) -> None:
+              self.orderId = orderId
+              self.amount = amount
+              self.status = status
+
+          def key(self) -> str:
+              return self.orderId
+
+      def pick(records: list[T], predicate: Callable[[T], bool]) -> list[T]:
+          if not callable(predicate):
+              raise TypeError("predicate must be callable")
+          return [record for record in records if predicate(record)]
+
+      orders = Repository[OrderRecord]()
+      orders.add(OrderRecord("A-100", 48_000, "paid"))
+      orders.add(OrderRecord("A-101", 0, "draft"))
+
+      paidOrders = pick(orders.all(), lambda order: order.status == "paid")
+      fallback = OrderRecord("missing", 0, "missing")
+
+      assert [order.orderId for order in paidOrders] == ["A-100"]
+      assert orders.get("A-100").amount == 48_000
+      assert orders.get("not-found", fallback).status == "missing"
+  - type: "code"
+    language: "python"
+    title: "잘못된 필터 계약 막기"
+    description: "타입 체커가 잡아야 할 실수를 런타임 방어 코드로도 한 번 확인합니다."
+    content: |-
+      from typing import Callable, TypeVar
+
+      T = TypeVar("T")
+
+      def pick(records: list[T], predicate: Callable[[T], bool]) -> list[T]:
+          if not callable(predicate):
+              raise TypeError("predicate must be callable")
+          return [record for record in records if predicate(record)]
+
+      try:
+          pick([1, 2, 3], "not-callable")
+      except TypeError as exc:
+          message = str(exc)
+
+      assert message == "predicate must be callable"
+  - type: "tip"
+    title: "변주 실험"
+    content: "status 대신 amount 기준 필터를 추가하고, `Repository[OrderRecord]`에 key 메서드가 없는 객체를 넣으면 타입 체커와 런타임에서 각각 어떤 신호가 나는지 비교하세요."
 
 - id: "practice"
   title: "종합 복습"

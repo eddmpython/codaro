@@ -3,7 +3,7 @@ meta:
   title: "문자열 인덱싱/슬라이싱"
   day: 5
   category: 30days
-  tags: []
+  tags: ["문자열", "인덱싱", "슬라이싱", "오프바이원", "전화번호", "검증"]
   seo:
     title: "파이썬 문자열 인덱싱과 슬라이싱 완벽 가이드"
     description: "문자열 인덱싱, 음수 인덱싱, 슬라이싱, 스텝 슬라이싱을 배웁니다."
@@ -270,6 +270,86 @@ sections:
     content: |-
       chars = 'abcdefghij'
       chars[::3]
+
+- id: workflow_validation
+  title: "검증 루프: 주문코드와 전화번호 파싱하기"
+  subtitle: "고정 형식 문자열을 잘라 업무 데이터로 바꾸기"
+  blocks:
+  - type: text
+    content: "인덱싱과 슬라이싱은 글자를 꺼내는 문법이 아니라, 주문코드·전화번호·파일명처럼 정해진 형식의 문자열을 데이터로 바꾸는 도구입니다. 특히 끝 인덱스가 포함되지 않는 규칙 때문에 한 칸씩 밀리는 오류를 직접 확인해야 합니다."
+  - type: list
+    items:
+    - "예측: 각 구간이 몇 번째 문자부터 어디까지인지 먼저 적는다."
+    - "실행: [start:end]로 주문 연도, 일련번호, 지역 코드를 자른다."
+    - "오류 수정: 끝 인덱스 미포함 규칙을 틀렸을 때 값을 비교한다."
+    - "검증: 길이와 형식을 assert와 ValueError로 확인한다."
+  - type: code
+    language: python
+    title: "주문코드 구간 추출"
+    description: "고정 길이 주문코드를 의미 있는 필드로 나눕니다."
+    content: |-
+      orderCode = 'ORD-2026-0007-KR'
+
+      prefix = orderCode[:3]
+      orderYear = orderCode[4:8]
+      sequence = orderCode[9:13]
+      country = orderCode[-2:]
+
+      assert prefix == 'ORD'
+      assert orderYear == '2026'
+      assert sequence == '0007'
+      assert country == 'KR'
+
+      summary = f'{orderYear}년 주문 {sequence}번 ({country})'
+      assert summary == '2026년 주문 0007번 (KR)'
+      summary
+  - type: code
+    language: python
+    title: "오프바이원 오류 잡기"
+    description: "슬라이싱의 end가 포함되지 않는 규칙을 틀렸을 때 어떤 값이 나오는지 비교합니다."
+    content: |-
+      orderCode = 'ORD-2026-0007-KR'
+
+      wrongYear = orderCode[3:7]
+      rightYear = orderCode[4:8]
+
+      assert wrongYear == '-202'
+      assert wrongYear != '2026'
+      assert rightYear == '2026'
+  - type: code
+    language: python
+    title: "전화번호 마스킹 함수"
+    description: "문자열 길이를 검증한 뒤 슬라이싱으로 사람이 읽는 전화번호를 만듭니다."
+    content: |-
+      def maskPhoneNumber(rawPhone):
+          if len(rawPhone) != 11:
+              raise ValueError('휴대폰 번호는 숫자 11자리여야 합니다')
+          return rawPhone[:3] + '-' + rawPhone[3:7] + '-' + rawPhone[7:]
+
+
+      maskedPhone = maskPhoneNumber('01012345678')
+      assert maskedPhone == '010-1234-5678'
+
+      try:
+          maskPhoneNumber('0101234')
+      except ValueError as exc:
+          errorMessage = str(exc)
+      else:
+          raise AssertionError('짧은 전화번호는 실패해야 합니다')
+
+      assert errorMessage == '휴대폰 번호는 숫자 11자리여야 합니다'
+  - type: expansion
+    title: "실무 변주: 파일명에서 날짜 꺼내기"
+    code: |-
+      fileName = 'sales_20260524.csv'
+      datePart = fileName[6:14]
+      year = datePart[:4]
+      month = datePart[4:6]
+      day = datePart[6:]
+
+      assert datePart == '20260524'
+      assert f'{year}-{month}-{day}' == '2026-05-24'
+      f'{year}-{month}-{day}'
 
 - id: practice
   title: "Day 5 종합 복습"

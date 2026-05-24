@@ -20,6 +20,9 @@ whenToUse: 새 머신 셋업, 인코딩 깨짐 디버그, WSL/PowerShell 동시 
 # 실행 인코딩 규칙
 
 - Python 실행은 기본적으로 `uv run python -X utf8 ...` 형태를 사용한다.
+- `uv` 명령은 기본 캐시를 쓰는 기본 실행을 우선한다. `uv run ...`이 첫 선택이며, uv cache 권한 오류가 나와도 권한 상승을 묻지 말고 현재 세션 권한으로 즉시 재실행한다.
+- Codex/agent 실행에서 `uv` 때문에 `sandbox_permissions=require_escalated` 같은 승인 요청을 사용하지 않는다. 승인이 막힌 환경에서는 승인 요청 자체가 실패 원인이며, `pip` 직접 실행이나 수동 venv 변경으로 우회하지 않는다.
+- 재실행 후에도 같은 uv cache 오류가 지속될 때만 원인을 기록하고, 필요하면 작업 단위에서 `UV_CACHE_DIR` 같은 우회를 명시적으로 남긴다.
 - PowerShell에서 인코딩이 의심되면 실행 전에 아래를 적용한다.
   - `[Console]::OutputEncoding = [System.Text.UTF8Encoding]::new()`
 - 파일 읽기/쓰기 명령은 가능한 한 UTF-8을 명시한다.

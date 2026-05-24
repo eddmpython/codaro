@@ -1,5 +1,8 @@
 meta:
+  id: "18_textwrap"
   title: "textwrap - 텍스트 래핑과 포맷팅"
+  category: "builtins"
+  tags: ["textwrap", "wrap", "fill", "dedent", "indent", "shorten"]
   description: "텍스트 래핑, 들여쓰기, 축약 등 텍스트 포맷팅 기능을 제공하는 textwrap 모듈"
   keywords: ["textwrap", "wrap", "fill", "dedent", "indent", "shorten"]
 
@@ -504,6 +507,87 @@ sections:
 
           hierarchy = "\n".join(formatHierarchy(structure))
           hierarchy
+
+  - name: "workflow_validation"
+    title: "검증 루프: CLI 출력 품질 게이트"
+    blocks:
+      - type: "content"
+        title: "출력 품질을 테스트하는 흐름"
+        content: |-
+          textwrap는 보기 좋은 출력만 만드는 도구가 아닙니다.
+          터미널 폭을 넘지 않는지, 들여쓰기가 깨지지 않는지, 너무 긴 설명을 안전하게 줄이는지 검증하면 실제 CLI/리포트 출력 품질을 안정화할 수 있습니다.
+
+      - type: "code"
+        language: "python"
+        title: "도움말 렌더러 만들기"
+        description: "명령어, 설명, 폭 제한을 받아 정렬된 도움말을 생성합니다."
+        content: |-
+          def renderCliHelp(commands, width=56):
+              assert width >= 36, "도움말 폭은 최소 36 이상이어야 합니다"
+              rows = []
+              for command, description in commands:
+                  wrapper = textwrap.TextWrapper(
+                      width=width,
+                      initial_indent=f"  {command:<12} ",
+                      subsequent_indent=" " * 14
+                  )
+                  rows.append(wrapper.fill(description))
+              return "\n".join(rows)
+
+          cliCommands = [
+              ("run", "Execute the selected curriculum lesson in the local Python runtime"),
+              ("verify", "Run validation checks and show actionable feedback"),
+              ("export", "Create a formatted report for the current learning session")
+          ]
+          helpOutput = renderCliHelp(cliCommands)
+          assert all(len(line) <= 56 for line in helpOutput.splitlines())
+          helpOutput
+
+      - type: "code"
+        language: "python"
+        title: "잘못된 폭 설정을 먼저 실패시킨다"
+        description: "출력 폭이 너무 좁으면 포맷팅 전에 오류로 돌려보냅니다."
+        content: |-
+          try:
+              renderCliHelp(cliCommands, width=24)
+          except AssertionError as exc:
+              widthProblem = str(exc)
+
+          assert "최소" in widthProblem
+          widthProblem
+
+      - type: "code"
+        language: "python"
+        title: "docstring 정리와 들여쓰기 검증"
+        description: "여러 줄 설명을 dedent로 정리하고 Markdown 인용 블록으로 변환합니다."
+        content: |-
+          rawDoc = """
+              Run the local lesson.
+
+              The command executes code blocks, captures failures,
+              and reports the exact lesson section to fix.
+          """
+          cleanDoc = textwrap.dedent(rawDoc).strip()
+          quotedDoc = textwrap.indent(textwrap.fill(cleanDoc, width=50), "> ")
+
+          assert cleanDoc.startswith("Run the local lesson.")
+          assert all(line.startswith("> ") for line in quotedDoc.splitlines())
+          quotedDoc
+
+      - type: "code"
+        language: "python"
+        title: "짧은 요약 변주"
+        description: "대시보드 셀에 들어갈 길이로 설명을 축약하고 placeholder를 검증합니다."
+        content: |-
+          dashboardSummary = textwrap.shorten(
+              "Curriculum verification finished with all examples passing in the local runtime.",
+              width=52,
+              placeholder="..."
+          )
+
+          assert len(dashboardSummary) <= 52
+          assert dashboardSummary.endswith("...")
+          dashboardSummary
 
   - name: "practice"
     title: "연습 문제"

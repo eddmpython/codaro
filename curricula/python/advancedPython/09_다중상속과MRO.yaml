@@ -3,7 +3,7 @@ meta:
   title: "다중 상속과 MRO"
   day: 9
   category: "advancedPython"
-  tags: ["multiple inheritance", "MRO", "super", "mixin"]
+  tags: ["multiple inheritance", "MRO", "super", "mixin", "검증", "협력상속"]
   seo:
     title: "파이썬 다중 상속과 MRO - 메서드 해석 순서 완벽 이해"
     description: "다중 상속의 동작 원리와 MRO를 이해합니다. C3 선형화, super() 심화, Mixin 패턴, 상속 vs 합성."
@@ -492,6 +492,63 @@ sections:
       gasCar.drive(), electricCar.drive()
   - type: "tip"
     content: "변하지 않는 is-a 관계에는 상속을, 변할 수 있는 기능 조합에는 합성을 사용하세요."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 믹스인 처리 순서 고정하기"
+  subtitle: "예측 → MRO 확인 → super 체인 → 오류 검증"
+  blocks:
+  - type: "text"
+    content: "다중 상속은 믹스인이 모두 cooperative super를 지킬 때만 안전합니다. 처리 파이프라인에서 검증, 감사, 기본 처리 순서가 MRO와 일치하는지 확인합니다."
+  - type: "code"
+    language: "python"
+    title: "주문 처리 믹스인 체인"
+    description: "MRO 순서대로 검증과 감사 단계가 실행되는지 고정합니다."
+    content: |-
+      class BaseProcessor:
+          def process(self, payload):
+              payload["steps"].append("base")
+              payload["status"] = "processed"
+              return payload
+
+      class ValidateMixin:
+          def process(self, payload):
+              if "orderId" not in payload:
+                  raise ValueError("orderId is required")
+              payload["steps"].append("validate")
+              return super().process(payload)
+
+      class AuditMixin:
+          def process(self, payload):
+              payload["steps"].append("audit")
+              return super().process(payload)
+
+      class OrderProcessor(ValidateMixin, AuditMixin, BaseProcessor):
+          pass
+
+      processor = OrderProcessor()
+      payload = {"orderId": "A-100", "steps": []}
+      result = processor.process(payload)
+
+      assert result["steps"] == ["validate", "audit", "base"]
+      assert result["status"] == "processed"
+      assert [cls.__name__ for cls in OrderProcessor.__mro__[:4]] == [
+          "OrderProcessor", "ValidateMixin", "AuditMixin", "BaseProcessor"
+      ]
+
+      try:
+          processor.process({"steps": []})
+      except ValueError as exc:
+          assert "orderId" in str(exc)
+
+      print("다중 상속 MRO 검증 흐름 통과")
+  - type: "list"
+    items:
+    - "믹스인은 직접 부모 이름을 호출하지 말고 super() 체인을 유지해야 합니다."
+    - "MRO는 코드 실행 순서이므로 예측값을 assert로 고정합니다."
+    - "검증 믹스인은 체인의 앞에 두어 실패를 빠르게 드러내게 합니다."
+  - type: "tip"
+    title: "변주 실험"
+    content: "`AuditMixin`과 `ValidateMixin`의 상속 순서를 바꾸고, 실패 요청이 감사 로그에 남아야 하는지 업무 정책에 맞춰 기대 순서를 고정하세요."
 
 - id: "practice"
   title: "종합 복습"

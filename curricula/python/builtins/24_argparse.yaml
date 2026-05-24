@@ -1,5 +1,8 @@
 meta:
+  id: "24_argparse"
   title: "argparse - 명령줄 인자 파싱"
+  category: "builtins"
+  tags: ["argparse", "CLI", "명령줄", "argument", "parser"]
   description: "명령줄 인터페이스를 위한 argparse 모듈"
   keywords: ["argparse", "CLI", "명령줄", "argument", "parser"]
 
@@ -37,7 +40,7 @@ sections:
       args = parser.parse_args(['홍길동'])
       args.name
   - type: "note"
-    content: "Codaro/Codaro 로컬 Python 환경에서는 parse_args()에 직접 인자 리스트를 전달합니다. 실제 CLI 프로그램에서는 sys.argv에서 자동으로 읽어옵니다."
+    content: "Codaro 로컬 Python 환경에서는 parse_args()에 직접 인자 리스트를 전달합니다. 실제 CLI 프로그램에서는 sys.argv에서 자동으로 읽어옵니다."
 
 - id: "positional_args"
   title: "위치 인자"
@@ -391,6 +394,92 @@ sections:
       {'command': dbArgs.command, 'target': dbArgs.target}
   - type: "tip"
     content: "실제 CLI 프로그램에서는 parse_args()에 인자를 전달하지 않으면 sys.argv에서 자동으로 읽어옵니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 데이터 처리 CLI 품질 게이트"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "argparse 실습은 옵션을 추가하는 데서 끝나면 부족합니다. 정상 입력, 잘못된 타입, 허용되지 않은 선택지, 서브커맨드 누락을 모두 테스트해야 실제 CLI 도구로 가져갈 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "조용히 실패하는 테스트용 파서"
+    description: "실습 중 stderr와 SystemExit 대신 ArgumentError를 받는 파서를 만듭니다."
+    content: |-
+      class NoExitParser(argparse.ArgumentParser):
+          def error(self, message):
+              raise argparse.ArgumentError(None, message)
+
+      def positiveLimit(value):
+          limit = int(value)
+          if limit <= 0:
+              raise argparse.ArgumentTypeError('limit은 양수여야 합니다')
+          return limit
+
+      def buildDataCliParser():
+          parser = NoExitParser(prog='codaro-data', description='데이터 처리 CLI')
+          subparsers = parser.add_subparsers(dest='command', required=True)
+
+          convert = subparsers.add_parser('convert')
+          convert.add_argument('source')
+          convert.add_argument('--format', choices=['json', 'csv'], default='json')
+          convert.add_argument('--limit', type=positiveLimit, default=100)
+          convert.add_argument('--dry-run', action='store_true')
+
+          report = subparsers.add_parser('report')
+          report.add_argument('--since', required=True)
+          report.add_argument('--output', default='report.md')
+          return parser
+
+      dataCliParser = buildDataCliParser()
+      cliArgs = dataCliParser.parse_args(['convert', 'input.csv', '--format', 'json', '--limit', '10', '--dry-run'])
+      assert cliArgs.command == 'convert'
+      assert cliArgs.limit == 10
+      cliArgs
+  - type: "code"
+    language: "python"
+    title: "잘못된 입력을 먼저 실패시킨다"
+    description: "선택지 오류와 타입 오류를 실제 파싱 단계에서 확인합니다."
+    content: |-
+      try:
+          dataCliParser.parse_args(['convert', 'input.csv', '--format', 'xml'])
+      except argparse.ArgumentError as exc:
+          formatProblem = str(exc)
+
+      try:
+          dataCliParser.parse_args(['convert', 'input.csv', '--limit', '0'])
+      except argparse.ArgumentError as exc:
+          limitProblem = str(exc)
+
+      assert 'invalid choice' in formatProblem
+      assert 'limit' in limitProblem
+      formatProblem, limitProblem
+  - type: "code"
+    language: "python"
+    title: "서브커맨드 누락 검증"
+    description: "명령어가 빠졌을 때도 테스트 가능한 오류로 처리합니다."
+    content: |-
+      try:
+          dataCliParser.parse_args(['--format', 'json'])
+      except argparse.ArgumentError as exc:
+          commandProblem = str(exc)
+
+      assert 'command' in commandProblem or 'invalid choice' in commandProblem
+      commandProblem
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 설정 딕셔너리 변환"
+    description: "Namespace를 실행 설정 딕셔너리로 바꾸고 필요한 키를 검증합니다."
+    content: |-
+      reportArgs = dataCliParser.parse_args(['report', '--since', '2026-05-01', '--output', 'weekly.md'])
+      runtimeConfig = vars(reportArgs)
+
+      assert runtimeConfig == {
+          'command': 'report',
+          'since': '2026-05-01',
+          'output': 'weekly.md'
+      }
+      runtimeConfig
 
 - id: "practice"
   title: "종합 복습"

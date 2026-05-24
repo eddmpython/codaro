@@ -1,5 +1,8 @@
 meta:
+  id: "29_pprint"
   title: "pprint - 예쁜 출력"
+  category: "builtins"
+  tags: ["pprint", "출력", "포맷", "디버깅", "pretty print"]
   description: "데이터 구조를 읽기 쉽게 출력하는 pprint 모듈"
   keywords: ["pprint", "출력", "포맷", "디버깅", "pretty print"]
 
@@ -86,7 +89,7 @@ sections:
     content: |-
       import pprint
 
-      complex = {
+      complexData = {
           'users': [
               {'name': 'Alice', 'role': 'admin'},
               {'name': 'Bob', 'role': 'user'}
@@ -97,7 +100,7 @@ sections:
           }
       }
 
-      prettyComplex = pprint.pformat(complex)
+      prettyComplex = pprint.pformat(complexData)
       prettyComplex
   - type: "tip"
     content: "pformat()은 객체를 수정하지 않고 문자열만 반환하므로, 로그 파일이나 디버그 메시지에 안전하게 사용할 수 있습니다."
@@ -246,10 +249,10 @@ sections:
 
       unordered = {'z': 1, 'a': 2, 'm': 3, 'b': 4}
 
-      sorted = pprint.pformat(unordered, sort_dicts=True)
+      sortedOutput = pprint.pformat(unordered, sort_dicts=True)
       unsorted = pprint.pformat(unordered, sort_dicts=False)
 
-      sorted, unsorted
+      sortedOutput, unsorted
   - type: "code"
     language: "python"
     title: "중첩 딕셔너리 정렬"
@@ -422,6 +425,109 @@ sections:
       logFormatted
   - type: "tip"
     content: "pprint는 JSON과 달리 파이썬 객체 그대로 출력하므로, None, True, False 등이 파이썬 형식으로 표시됩니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 안전한 진단 리포트"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "pprint는 보기 좋은 출력만 만드는 도구가 아닙니다. 운영 진단 리포트에서는 읽기 쉬운 줄 길이, 안정적인 키 순서, 민감정보 마스킹까지 검증해야 업무 로그로 쓸 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "민감정보를 제거한 뒤 포맷한다"
+    description: "출력 전에 password, token 같은 값을 마스킹합니다."
+    content: |-
+      import pprint
+
+      diagnosticPayload = {
+          'service': 'billing-api',
+          'health': {'database': 'ok', 'queue': 'slow'},
+          'credentials': {
+              'user': 'service-account',
+              'password': 'plain-text-password',
+              'token': 'secret-token'
+          },
+          'recentErrors': [
+              {'code': 'QUEUE_LAG', 'count': 3},
+              {'code': 'TIMEOUT', 'count': 1}
+          ]
+      }
+
+      sensitiveKeys = {'password', 'token', 'api_key'}
+
+      def redactSecrets(value):
+          if isinstance(value, dict):
+              return {
+                  key: '***' if key.lower() in sensitiveKeys else redactSecrets(item)
+                  for key, item in value.items()
+              }
+          if isinstance(value, list):
+              return [redactSecrets(item) for item in value]
+          return value
+
+      safePayload = redactSecrets(diagnosticPayload)
+      reportText = pprint.pformat(safePayload, sort_dicts=True, width=72)
+
+      assert 'plain-text-password' not in reportText
+      assert 'secret-token' not in reportText
+      assert "'password': '***'" in reportText
+      reportText
+  - type: "code"
+    language: "python"
+    title: "출력 품질을 검증한다"
+    description: "운영 로그에 넣기 좋은 폭과 필수 섹션을 확인합니다."
+    content: |-
+      reportLines = reportText.splitlines()
+      requiredSections = ["'health'", "'recentErrors'", "'service'"]
+
+      assert all(len(line) <= 90 for line in reportLines)
+      assert all(section in reportText for section in requiredSections)
+
+      qualityReport = {
+          'lineCount': len(reportLines),
+          'maxLineLength': max(len(line) for line in reportLines),
+          'containsRequiredSections': True
+      }
+      qualityReport
+  - type: "code"
+    language: "python"
+    title: "안전하지 않은 덤프를 실패시킨다"
+    description: "마스킹 없이 바로 pformat()을 쓰면 검증에서 잡히게 만듭니다."
+    content: |-
+      unsafeText = pprint.pformat(diagnosticPayload, sort_dicts=True)
+
+      try:
+          assert 'plain-text-password' not in unsafeText, '민감정보가 출력에 남았습니다'
+      except AssertionError as exc:
+          pprintProblem = str(exc)
+
+      assert '민감정보' in pprintProblem
+      pprintProblem
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 예상값과 실제값 비교 리포트"
+    description: "테스트 실패 시 사람이 바로 읽을 수 있는 구조로 비교합니다."
+    content: |-
+      expectedSummary = {'status': 'ok', 'rows': 1200, 'warnings': []}
+      actualSummary = {'status': 'ok', 'rows': 1197, 'warnings': ['missing rows']}
+
+      mismatchKeys = [
+          key for key in expectedSummary
+          if expectedSummary[key] != actualSummary.get(key)
+      ]
+      comparisonReport = pprint.pformat(
+          {
+              'expected': expectedSummary,
+              'actual': actualSummary,
+              'mismatchKeys': mismatchKeys
+          },
+          sort_dicts=True,
+          width=72
+      )
+
+      assert mismatchKeys == ['rows', 'warnings']
+      assert "'mismatchKeys': ['rows', 'warnings']" in comparisonReport
+      comparisonReport
 
 - id: "practice"
   title: "종합 복습"

@@ -8,7 +8,7 @@ meta:
   category: numpy
   difficulty: "⭐"
   badge: 입문
-  tags: ["numpy", "array", "shape", "dtype", "mean", "max", "argmax"]
+  tags: ["numpy", "array", "shape", "dtype", "mean", "max", "argmax", "검증", "배열분석"]
   seo:
     title: "NumPy 배열 기초 - 포켓몬 스탯 분석"
     description: "NumPy 배열의 기본을 배우며 포켓몬 능력치 데이터를 분석합니다. shape, dtype, mean, max, argmax를 익힙니다."
@@ -45,10 +45,11 @@ sections:
   - type: code
     language: python
     title: 포켓몬 데이터 로드
-    description: GitHub에서 포켓몬 데이터를 불러옵니다
+    description: Codaro 로컬 데이터셋에서 포켓몬 데이터를 불러옵니다
     content: |-
-      url = "https://raw.githubusercontent.com"
-      pokemon = pd.read_csv(f"{url}/lgreski/pokemonData/master/Pokemon.csv")
+      from codaro.curriculum.localData import loadLocalDataset
+
+      pokemon = loadLocalDataset("pokemon")
       pokemon.head()
 
 - id: step3_extract
@@ -253,6 +254,59 @@ sections:
   - type: tip
     content: np.std()는 표준편차를 계산합니다. 표준편차가 크면 데이터가 평균에서 많이 떨어져 있다는 의미입니다. np.round()로 소수점 자릿수를 조절할 수 있습니다.
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 능력치 테이블 품질 점검"
+  subtitle: "shape, axis, argmax, 실패 케이스, 변주 실험"
+  blocks:
+  - type: text
+    content: "배열 분석은 결과 숫자가 그럴듯해 보이는 순간이 위험합니다. 스탯 행렬의 shape을 먼저 고정하고, axis별 계산이 무엇을 의미하는지 assert로 확인하세요."
+  - type: code
+    language: python
+    title: "스탯 행렬에서 최강 후보 찾기"
+    description: "행 방향 합계와 열 방향 평균을 분리해서 검증합니다."
+    content: |-
+      import numpy as np
+
+      names = np.array(["Bulbasaur", "Pikachu", "Snorlax"])
+      cols = np.array(["HP", "Attack", "Defense", "Speed"])
+      stats = np.array([
+          [45, 49, 49, 45],
+          [35, 55, 40, 90],
+          [160, 110, 65, 30],
+      ])
+
+      totals = stats.sum(axis=1)
+      averages = stats.mean(axis=0)
+      strongestIndex = int(np.argmax(totals))
+
+      assert stats.shape == (3, 4)
+      assert names[strongestIndex] == "Snorlax"
+      assert totals.tolist() == [188, 220, 365]
+      assert dict(zip(cols, averages.round(1)))["Speed"] == 55.0
+  - type: code
+    language: python
+    title: "잘못된 스탯 행렬 차단"
+    description: "이름 수와 행 수가 다르면 분석 전에 멈춥니다."
+    content: |-
+      import numpy as np
+
+      def validateStatTable(names, stats):
+          if stats.ndim != 2:
+              raise ValueError("stats must be a 2D matrix")
+          if len(names) != stats.shape[0]:
+              raise ValueError("name count must match stat rows")
+          return True
+
+      try:
+          validateStatTable(np.array(["A", "B"]), np.array([[1, 2, 3]]))
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "name count must match stat rows"
+  - type: tip
+    title: "변주 실험"
+    content: "Speed에 가중치 2를 주는 weighted total을 만들고, 가장 강한 포켓몬이 그대로인지 `np.argmax` 결과를 비교하세요."
+
 - id: practice
   title: 실습
   subtitle: 포켓몬 능력치 분석
@@ -270,8 +324,17 @@ sections:
         import numpy as np
         import pandas as pd
 
-        url = "https://raw.githubusercontent.com"
-        data = pd.read_csv(f"{url}/lgreski/pokemonData/master/Pokemon.csv")
+        data = pd.DataFrame({
+            'Name': ['Bulbasaur', 'Charmander', 'Squirtle', 'Pikachu', 'Onix',
+                     'Gengar', 'Snorlax', 'Chikorita', 'Treecko', 'Mudkip'],
+            'Generation': [1, 1, 1, 1, 1, 1, 1, 2, 3, 3],
+            'HP': [45, 39, 44, 35, 35, 60, 160, 45, 40, 50],
+            'Attack': [49, 52, 48, 55, 45, 65, 110, 49, 45, 70],
+            'Defense': [49, 43, 65, 40, 160, 60, 65, 65, 35, 50],
+            'Sp. Atk': [65, 60, 50, 50, 30, 130, 65, 49, 65, 50],
+            'Sp. Def': [65, 50, 64, 50, 45, 75, 110, 65, 55, 50],
+            'Speed': [45, 65, 43, 90, 70, 110, 30, 45, 70, 40],
+        })
     - type: code
       title: "분석 수행"
       content: |-
@@ -290,8 +353,17 @@ sections:
         import numpy as np
         import pandas as pd
 
-        src = "https://raw.githubusercontent.com"
-        df = pd.read_csv(f"{src}/lgreski/pokemonData/master/Pokemon.csv")
+        df = pd.DataFrame({
+            'Name': ['Bulbasaur', 'Charmander', 'Squirtle', 'Pikachu', 'Onix',
+                     'Gengar', 'Snorlax', 'Chikorita', 'Treecko', 'Mudkip'],
+            'Generation': [1, 1, 1, 1, 1, 1, 1, 2, 3, 3],
+            'HP': [45, 39, 44, 35, 35, 60, 160, 45, 40, 50],
+            'Attack': [49, 52, 48, 55, 45, 65, 110, 49, 45, 70],
+            'Defense': [49, 43, 65, 40, 160, 60, 65, 65, 35, 50],
+            'Sp. Atk': [65, 60, 50, 50, 30, 130, 65, 49, 65, 50],
+            'Sp. Def': [65, 50, 64, 50, 45, 75, 110, 65, 55, 50],
+            'Speed': [45, 65, 43, 90, 70, 110, 30, 45, 70, 40],
+        })
         cols = ['HP', 'Attack', 'Defense', 'Sp. Atk', 'Sp. Def', 'Speed']
     - type: code
       title: "비교 분석"

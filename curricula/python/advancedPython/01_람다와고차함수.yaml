@@ -3,7 +3,7 @@ meta:
   title: "람다와 고차 함수"
   day: 1
   category: "advancedPython"
-  tags: ["lambda", "map", "filter", "reduce", "고차함수"]
+  tags: ["lambda", "map", "filter", "reduce", "고차함수", "검증", "실무파이프라인"]
   seo:
     title: "파이썬 람다와 고차 함수 - 함수형 프로그래밍 마스터"
     description: "lambda 표현식과 map, filter, reduce를 완벽히 이해하고 고차 함수의 개념을 마스터합니다."
@@ -263,6 +263,60 @@ sections:
       outcome
   - type: "tip"
     content: "파이썬에서는 map/filter보다 리스트 컴프리헨션이 더 선호됩니다. 하지만 고차 함수 개념을 알아두면 데코레이터, 콜백 등에서 유용합니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 결제 이벤트를 고차 함수로 처리하기"
+  subtitle: "예측 → 변환 → 필터링 → 축약 → 검증"
+  blocks:
+  - type: "text"
+    content: "람다와 고차 함수는 문법 묘기가 아니라, 규칙이 짧고 명확한 데이터 파이프라인에서 힘을 발휘합니다. 아래 흐름은 결제 이벤트를 정제하고, 성공 결제만 골라 매출을 계산한 뒤, 잘못된 금액 입력까지 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "결제 이벤트 파이프라인"
+    description: "map, filter, reduce를 조합하되 복잡한 검증은 일반 함수로 분리합니다."
+    content: |-
+      from functools import reduce
+
+      rawEvents = [
+          {"id": "P-100", "status": "paid", "amount": "12000"},
+          {"id": "P-101", "status": "failed", "amount": "9000"},
+          {"id": "P-102", "status": "paid", "amount": "18000"},
+          {"id": "P-103", "status": "refunded", "amount": "5000"},
+      ]
+
+      def normalizePayment(event):
+          amountText = event["amount"].strip()
+          if not amountText.isdigit():
+              raise ValueError(f"invalid amount: {event['amount']}")
+          return {
+              "id": event["id"],
+              "status": event["status"].lower(),
+              "amount": int(amountText),
+          }
+
+      normalizedEvents = list(map(normalizePayment, rawEvents))
+      paidEvents = list(filter(lambda event: event["status"] == "paid", normalizedEvents))
+      paidRevenue = reduce(lambda total, event: total + event["amount"], paidEvents, 0)
+      paidIds = list(map(lambda event: event["id"], paidEvents))
+
+      assert paidIds == ["P-100", "P-102"]
+      assert paidRevenue == 30000
+      assert normalizedEvents[1]["status"] == "failed"
+
+      try:
+          normalizePayment({"id": "P-999", "status": "paid", "amount": "unknown"})
+      except ValueError as exc:
+          assert "invalid amount" in str(exc)
+
+      print("고차 함수 결제 파이프라인 통과")
+  - type: "list"
+    items:
+    - "짧은 변환과 필터 조건은 lambda로 표현해도 좋습니다."
+    - "입력 검증, 예외 메시지, 복잡한 분기는 일반 함수로 빼야 디버깅이 쉽습니다."
+    - "reduce는 합계처럼 누적 의미가 분명할 때만 쓰고, 결과는 assert로 고정합니다."
+  - type: "tip"
+    title: "변주 실험"
+    content: "`refunded` 이벤트를 음수 매출로 처리할지 별도 환불 합계로 분리할지 정책을 정하고, 같은 입력에서 assert 기대값이 어떻게 달라지는지 확인하세요."
 
 - id: "practice"
   title: "종합 복습"

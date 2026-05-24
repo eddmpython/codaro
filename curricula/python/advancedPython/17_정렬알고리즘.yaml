@@ -3,7 +3,7 @@ meta:
   title: "정렬 알고리즘"
   day: 17
   category: "advancedPython"
-  tags: ["sorting", "bubble sort", "merge sort", "quick sort", "timsort"]
+  tags: ["sorting", "bubble sort", "merge sort", "quick sort", "timsort", "검증", "실무정렬"]
   seo:
     title: "파이썬 정렬 알고리즘 - 버블, 선택, 삽입, 병합, 퀵 정렬"
     description: "정렬 알고리즘을 직접 구현하고 이해합니다. O(n²) 기본 정렬부터 O(n log n) 고급 정렬까지."
@@ -442,6 +442,60 @@ sections:
       byScore
   - type: "tip"
     content: "operator.itemgetter, operator.attrgetter로 key 함수를 더 효율적으로 만들 수 있습니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 처리 우선순위 정렬하기"
+  subtitle: "안정 정렬, key 함수, 입력 검증을 업무 데이터로 확인합니다"
+  blocks:
+  - type: "text"
+    content: "실무 정렬은 알고리즘을 직접 구현하는 것보다 기준을 틀리지 않는 것이 중요합니다. 접수 시간으로 한 번 정렬한 뒤 SLA로 다시 정렬하면 Python의 안정 정렬 때문에 같은 SLA 안에서는 접수 순서가 유지됩니다."
+  - type: "code"
+    language: "python"
+    title: "안정 정렬로 처리 순서 만들기"
+    description: "같은 SLA 그룹에서 접수 순서가 유지되는지 검증합니다."
+    content: |-
+      orders = [
+          {"id": "O-3", "sla": 2, "createdAt": "09:20", "amount": 80_000},
+          {"id": "O-1", "sla": 1, "createdAt": "09:00", "amount": 30_000},
+          {"id": "O-2", "sla": 2, "createdAt": "09:05", "amount": 120_000},
+          {"id": "O-4", "sla": 1, "createdAt": "09:10", "amount": 40_000},
+      ]
+
+      byCreated = sorted(orders, key=lambda order: order["createdAt"])
+      bySlaStable = sorted(byCreated, key=lambda order: order["sla"])
+
+      assert [order["id"] for order in bySlaStable] == ["O-1", "O-4", "O-2", "O-3"]
+  - type: "code"
+    language: "python"
+    title: "정렬 기준을 함수로 제한하기"
+    description: "허용되지 않은 정렬 기준은 ValueError로 막습니다."
+    content: |-
+      def sortOrders(orders, sortKey):
+          keyMap = {
+              "amountDesc": lambda order: -order["amount"],
+              "createdAt": lambda order: order["createdAt"],
+              "sla": lambda order: order["sla"],
+          }
+          if sortKey not in keyMap:
+              raise ValueError(f"unsupported sort key: {sortKey}")
+          return sorted(orders, key=keyMap[sortKey])
+
+      orders = [
+          {"id": "O-1", "sla": 1, "createdAt": "09:00", "amount": 30_000},
+          {"id": "O-2", "sla": 2, "createdAt": "09:05", "amount": 120_000},
+      ]
+
+      assert [order["id"] for order in sortOrders(orders, "amountDesc")] == ["O-2", "O-1"]
+
+      try:
+          sortOrders(orders, "unknown")
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "unsupported sort key: unknown"
+  - type: "tip"
+    title: "변주 실험"
+    content: "환불 요청은 금액보다 생성 시간이 중요하다는 규칙을 추가하고, 정렬 기준 함수만 바꿔 기대 순서가 바뀌는지 검증하세요."
 
 - id: "practice"
   title: "종합 복습"

@@ -10,7 +10,7 @@ meta:
   category: statsmodels
   difficulty: "⭐⭐⭐"
   badge: 중급
-  dataUrl: https://raw.githubusercontent.com/jbrownlee/Datasets/master/airline-passengers.csv
+  dataSource: codaro-local:airline_passengers
   tags: ["시계열", "ARIMA", "계절성", "추세", "항공수요"]
   seo:
     title: "statsmodels ARIMA 시계열 예측 - 항공 승객 수요 예측"
@@ -39,9 +39,9 @@ sections:
       import statsmodels.api as sm
       from statsmodels.tsa.seasonal import seasonal_decompose
       from statsmodels.tsa.arima.model import ARIMA
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/airline-passengers.csv"
-      airData = pd.read_csv(url)
+      airData = loadLocalDataset("airline_passengers")
       airData.shape
   - type: tip
     content: 시계열 분석을 위해 여러 모듈을 import 합니다. seasonal_decompose는 시계열을 추세/계절/잔차로 분해, plot_acf/plot_pacf는 자기상관 그래프, ARIMA는 시계열 예측 모델입니다. 한 번에 필요한 모듈을 모두 불러오면 나중에 편리합니다.
@@ -324,7 +324,7 @@ sections:
                       if fit.aic < bestAic:
                           bestAic = fit.aic
                           bestOrder = (p, d, q)
-                  except:
+                  except (ValueError, np.linalg.LinAlgError):
                       continue
 
       f"최적 파라미터: {bestOrder}"
@@ -370,9 +370,9 @@ sections:
         import pandas as pd
         import numpy as np
         from statsmodels.tsa.arima.model import ARIMA
+        from codaro.curriculum.localData import loadLocalDataset
 
-        logUrl = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/airline-passengers.csv"
-        logData = pd.read_csv(logUrl)
+        logData = loadLocalDataset("airline_passengers")
         logData['Month'] = pd.to_datetime(logData['Month'])
         logData = logData.set_index('Month')
         logData['LogPassengers'] = np.log(logData['Passengers'])
@@ -414,9 +414,9 @@ sections:
         import pandas as pd
         import numpy as np
         from statsmodels.tsa.seasonal import seasonal_decompose
+        from codaro.curriculum.localData import loadLocalDataset
 
-        sznUrl = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/airline-passengers.csv"
-        sznData = pd.read_csv(sznUrl)
+        sznData = loadLocalDataset("airline_passengers")
         sznData['Month'] = pd.to_datetime(sznData['Month'])
         sznData = sznData.set_index('Month')
 
@@ -467,3 +467,90 @@ sections:
     - "SARIMA - 계절성 명시적 처리"
   - type: text
     content: 다음 프로젝트에서는 소매 매출 데이터로 외생변수를 포함한 시계열 회귀를 배웁니다. 날씨, 프로모션 같은 외부 요인으로 매출을 예측해봅니다.
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 회귀 리포트 품질 게이트
+  blocks:
+  - type: text
+    content: "statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과 결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다."
+  - type: code
+    language: python
+    title: 로컬 마케팅 데이터 검증
+    description: 광고비와 매출 데이터를 불러오고 분석 전 조건을 확인합니다.
+    content: |-
+      import pandas as pd
+      import statsmodels.api as sm
+      from statsmodels.stats.diagnostic import het_breuschpagan
+      from codaro.curriculum.localData import loadLocalDataset
+
+      marketingData = loadLocalDataset("advertising")
+      requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
+
+      missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
+      if missingColumns:
+          raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
+      if marketingData[requiredColumns].isna().any().any():
+          raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
+
+      marketingData[requiredColumns].head()
+  - type: code
+    language: python
+    title: 다중회귀 모델 적합
+    description: TV, Radio, Newspaper 광고비로 Sales를 설명합니다.
+    content: |-
+      # 예측: TV와 Radio의 p-value는 낮고, 모델 R²는 0.9 이상일 것입니다.
+      reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])
+      reportY = marketingData["Sales"]
+      try:
+          reportModel = sm.OLS(reportY, reportX).fit()
+      except ValueError as exc:
+          raise ValueError("OLS 입력 행렬을 확인하세요.") from exc
+
+      reportModel.rsquared, reportModel.f_pvalue
+  - type: code
+    language: python
+    title: 통계 리포트 기준 검증
+    description: 설명력, 모델 전체 유의성, 핵심 변수 유의성을 assert로 확인합니다.
+    content: |-
+      reportChecks = {
+          "r_squared_is_reportable": reportModel.rsquared >= 0.90,
+          "model_is_significant": reportModel.f_pvalue < 0.05,
+          "tv_is_significant": reportModel.pvalues["TV"] < 0.05,
+          "radio_is_significant": reportModel.pvalues["Radio"] < 0.05,
+      }
+
+      assert all(reportChecks.values()), reportChecks
+      reportChecks
+  - type: code
+    language: python
+    title: 잔차 진단
+    description: Breusch-Pagan 검정으로 심한 이분산 신호가 없는지 확인합니다.
+    content: |-
+      bpStat, bpPvalue, _, _ = het_breuschpagan(reportModel.resid, reportModel.model.exog)
+      residualChecks = {
+          "bp_pvalue_recorded": bpPvalue >= 0,
+          "residual_mean_near_zero": abs(reportModel.resid.mean()) < 1e-9,
+      }
+
+      assert all(residualChecks.values()), residualChecks
+      round(float(bpPvalue), 3), residualChecks
+  - type: expansion
+    title: "실무 변주: Newspaper 변수를 빼도 설명력이 유지될까?"
+    blocks:
+    - type: code
+      language: python
+      title: 축소 모델 비교
+      content: |-
+        compactX = sm.add_constant(marketingData[["TV", "Radio"]])
+        compactModel = sm.OLS(reportY, compactX).fit()
+        r2Drop = reportModel.rsquared - compactModel.rsquared
+
+        assert compactModel.rsquared >= 0.95
+        {
+            "fullR2": round(reportModel.rsquared, 3),
+            "compactR2": round(compactModel.rsquared, 3),
+            "r2Drop": round(r2Drop, 3),
+            "fullAIC": round(reportModel.aic, 1),
+            "compactAIC": round(compactModel.aic, 1),
+        }

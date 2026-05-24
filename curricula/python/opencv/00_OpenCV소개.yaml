@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - opencv-python
+    - numpy
   id: opencv_00
   title: OpenCV소개
   order: 0
@@ -327,7 +330,7 @@ sections:
 
     - type: note
       title: "matplotlib으로 출력"
-      content: "이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. cv2.imshow()는 별도 GUI 창을 필요로 하므로 노트북 출력에서는 matplotlib의 plt.imshow()로 이미지를 확인합니다. 이때 BGR을 RGB로 변환해야 올바른 색상이 표시됩니다."
+      content: "이 커리큘럼은 Codaro 로컬 Python 환경에서 실행됩니다. 결과 확인은 배열 shape, 픽셀 통계, 저장 파일, matplotlib 출력처럼 재현 가능한 방식으로 진행합니다. 컬러 이미지를 matplotlib으로 볼 때는 BGR을 RGB로 변환해야 올바른 색상이 표시됩니다."
 
 - id: curriculum
   blocks:
@@ -385,3 +388,80 @@ sections:
     - type: text
       content: |-
         OpenCV를 배우면 이미지를 단순히 보는 것을 넘어 분석하고 이해할 수 있습니다. 에지 검출로 물체의 경계를 찾고, 컨투어로 윤곽을 추출하고, 색상 필터링으로 특정 영역을 분리하는 등 컴퓨터 비전의 핵심 기술을 익힐 수 있습니다. 첫 번째 프로젝트에서 이미지가 NumPy 배열로 어떻게 표현되는지 알아봅시다.
+
+- id: workflow_validation
+  title: 로컬 비전 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: OpenCV는 화면에 이미지를 띄우는 도구가 아니라, 배열을 입력받아 검증 가능한 결과를 만드는 로컬 비전 파이프라인입니다. 먼저 입력 이미지의 형태와 dtype을 확인하고, 의도적으로 잘못된 입력을 넣어 오류를 확인한 뒤, 에지 검출 결과를 수치로 검증합니다.
+  - type: list
+    items:
+      - 실행 전에는 이미지 크기, 채널 수, 에지 픽셀 수가 어느 정도 나올지 예측합니다.
+      - GUI 창 대신 배열 shape, dtype, 픽셀 수, 마스크 비율을 코드로 확인합니다.
+      - 잘못된 dtype이나 채널 수는 조용히 넘기지 말고 오류로 잡습니다.
+      - 임계값을 바꿔도 검증 기준이 함께 움직이는지 실험합니다.
+  - type: code
+    language: python
+    title: 합성 이미지와 입력 검증
+    description: 외부 이미지 없이 로컬에서 바로 실행되는 테스트 이미지를 만듭니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      introImage = np.zeros((96, 144, 3), dtype=np.uint8)
+      cv2.rectangle(introImage, (20, 24), (124, 72), (255, 255, 255), -1)
+      cv2.line(introImage, (20, 24), (124, 72), (0, 0, 255), 3)
+
+      def validateBgrImage(image):
+          if image.dtype != np.uint8:
+              raise ValueError(f"uint8 이미지가 아닙니다: {image.dtype}")
+          if image.ndim != 3 or image.shape[2] != 3:
+              raise ValueError(f"BGR 3채널 이미지가 아닙니다: {image.shape}")
+          return True
+
+      validateBgrImage(introImage)
+  - type: code
+    language: python
+    title: 잘못된 입력 확인
+    description: float 이미지가 들어왔을 때 검증 함수가 실패하는지 확인합니다.
+    content: |-
+      brokenIntroImage = introImage.astype(float) / 255
+
+      try:
+          validateBgrImage(brokenIntroImage)
+      except ValueError as exc:
+          introErrorMessage = str(exc)
+
+      introErrorMessage
+  - type: code
+    language: python
+    title: 에지 검출과 수치 검증
+    description: Canny 결과를 픽셀 수로 검증합니다.
+    content: |-
+      introGray = cv2.cvtColor(introImage, cv2.COLOR_BGR2GRAY)
+      introEdges = cv2.Canny(introGray, 60, 150)
+      introEdgePixels = int(np.count_nonzero(introEdges))
+      introChecks = {
+          "shapeOk": introImage.shape == (96, 144, 3),
+          "dtypeOk": introImage.dtype == np.uint8,
+          "errorOk": introErrorMessage.startswith("uint8 이미지가 아닙니다"),
+          "edgesDetected": introEdgePixels > 100,
+      }
+
+      assert all(introChecks.values()), introChecks
+      introChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: Canny 임계값을 바꾸면 검출량이 어떻게 달라지는지 비교합니다.
+    content: |-
+      relaxedEdges = cv2.Canny(introGray, 30, 90)
+      strictEdges = cv2.Canny(introGray, 120, 220)
+      relaxedCount = int(np.count_nonzero(relaxedEdges))
+      strictCount = int(np.count_nonzero(strictEdges))
+
+      assert relaxedCount >= strictCount
+      relaxedCount, strictCount
+  - type: tip
+    content: OpenCV 학습의 핵심은 이미지를 눈으로만 확인하지 않고 배열 계약과 결과 지표로 검증하는 습관입니다.

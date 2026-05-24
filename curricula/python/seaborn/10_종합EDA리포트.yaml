@@ -33,11 +33,12 @@ sections:
     description: 데이터 로드와 테마 설정
     content: |-
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
       import pandas as pd
 
       sns.set_theme(style='whitegrid', palette='Set2', font_scale=1.1)
-      penguins = sns.load_dataset('penguins').dropna()
+      penguins = loadLocalDataset('penguins').dropna()
       penguins
   - type: tip
     content: "set_theme()은 전역 스타일을 설정합니다. style은 'white', 'dark', 'whitegrid', 'darkgrid', 'ticks' 중 선택합니다. palette는 색상 팔레트, font_scale은 글꼴 크기 배율입니다."
@@ -266,7 +267,7 @@ sections:
       figStyles, axesStyles = plt.subplots(1, 5, figsize=(20, 4))
       for idx, styleName in enumerate(styles):
           with sns.axes_style(styleName):
-              sns.boxplot(data=penguins, x='species', y='body_mass_g', palette='Set2', ax=axesStyles[idx])
+              sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='species', palette='Set2', legend=False, ax=axesStyles[idx])
               axesStyles[idx].set_title(styleName)
               axesStyles[idx].set_xlabel('')
       figStyles.suptitle('Seaborn Style Comparison', y=1.02)
@@ -291,13 +292,90 @@ sections:
       axesFlat = axesContext.flatten()
       for idx, contextName in enumerate(contexts):
           with sns.plotting_context(contextName):
-              sns.barplot(data=penguins, x='species', y='body_mass_g', palette='Set2', ax=axesFlat[idx])
+              sns.barplot(data=penguins, x='species', y='body_mass_g', hue='species', palette='Set2', legend=False, ax=axesFlat[idx])
               axesFlat[idx].set_title(f'Context: {contextName}')
       figContext.suptitle('Seaborn Context Comparison', y=1.02)
       figContext.tight_layout()
       figContext
   - type: tip
     content: "plotting_context()로 출력 목적에 맞는 크기를 설정합니다. 'paper'(논문), 'notebook'(기본), 'talk'(발표), 'poster'(포스터) 순으로 요소 크기가 커집니다."
+
+- id: workflow_validation
+  title: 17단계. 종합 EDA 리포트 검증 루프
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      종합 리포트는 차트를 많이 넣는 것이 아니라 질문, 데이터 계약, 핵심 지표, 검증 가능한 차트를 일관되게 묶는 일입니다. 펭귄 데이터로 보고서에 들어갈 주장과 차트를 같이 검증합니다.
+  - type: code
+    language: python
+    title: 리포트 데이터 계약과 핵심 주장
+    description: 결측 제거 후 종, 섬, 체중, 날개 길이 구조를 확인합니다
+    content: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      edaPenguins = loadLocalDataset("penguins").dropna()
+      requiredColumns = {"species", "island", "bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g", "sex"}
+      missingColumns = requiredColumns - set(edaPenguins.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert not edaPenguins[list(requiredColumns)].isna().any().any()
+
+      summaryClaim = edaPenguins.groupby("species")["body_mass_g"].mean().sort_values(ascending=False)
+      assert summaryClaim.index[0] == "Gentoo"
+      summaryClaim.round(1)
+  - type: code
+    language: python
+    title: 리포트 차트 검증
+    description: 상관 히트맵이 핵심 수치형 변수 네 개를 담는지 확인합니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+      numericColumns = ["bill_length_mm", "bill_depth_mm", "flipper_length_mm", "body_mass_g"]
+      corrFlow = edaPenguins[numericColumns].corr()
+      figEdaHeat, axEdaHeat = plt.subplots(figsize=(7, 6))
+      sns.heatmap(corrFlow, annot=True, fmt=".2f", cmap="vlag", center=0, ax=axEdaHeat)
+      axEdaHeat.set_title("Penguin measurement correlations")
+
+      assert corrFlow.shape == (4, 4)
+      assert "Penguin measurement" in axEdaHeat.get_title()
+      assert len(axEdaHeat.collections) >= 1
+      figEdaHeat
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 리포트 필수 컬럼 누락을 초기에 잡습니다
+    content: |-
+      def validateEdaInput(frame):
+          missing = requiredColumns - set(frame.columns)
+          if missing:
+              raise ValueError(f"EDA 리포트 필수 컬럼 누락: {sorted(missing)}")
+          assert len(frame) >= 50
+          return True
+
+      brokenEda = edaPenguins.drop(columns=["island"])
+      try:
+          validateEdaInput(brokenEda)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateEdaInput(edaPenguins)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 보고서 질문을 바꿔도 핵심 관계가 유지되는지 확인합니다
+    content: |-
+      reportVariants = []
+      for metric in ["body_mass_g", "flipper_length_mm", "bill_length_mm"]:
+          speciesMean = edaPenguins.groupby("species")[metric].mean().sort_values(ascending=False)
+          reportVariants.append({"metric": metric, "leader": speciesMean.index[0], "spread": round(float(speciesMean.max() - speciesMean.min()), 2)})
+
+      assert reportVariants[0]["leader"] == "Gentoo"
+      assert all(item["spread"] > 0 for item in reportVariants)
+      reportVariants
+  - type: tip
+    content: "종합 EDA의 품질은 차트 수가 아니라, 입력 검증과 주장 검증이 리포트 안에 남아 있는지로 판단합니다."
 
 - id: practice
   title: 실습
@@ -314,10 +392,11 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
         sns.set_theme(style='whitegrid', palette='husl')
-        data = sns.load_dataset('tips')
+        data = loadLocalDataset('tips')
     - type: code
       title: "상단 패널"
       content: |-
@@ -343,10 +422,11 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
         sns.set_theme(style='ticks', palette='Dark2')
-        df = sns.load_dataset('iris')
+        df = loadLocalDataset('iris')
     - type: code
       title: "차트 생성"
       content: |-

@@ -7,7 +7,7 @@ meta:
   category: polars
   difficulty: "⭐⭐⭐"
   badge: 중급
-  dataUrl: https://raw.githubusercontent.com/rashida048/Datasets/master/fifa.csv
+  dataSource: codaro-local:fifa_players
   tags: ["FIFA", "exclude", "concat", "pivot", "능력치분석"]
   seo:
     title: "Polars 피벗과 결합 - FIFA 선수 능력치 분석"
@@ -32,9 +32,11 @@ sections:
     description: FIFA 선수 데이터 로드
     content: |-
       import polars as pl
+      from io import StringIO
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/rashida048/Datasets/master/fifa.csv"
-      df = pl.read_csv(url)
+      fifaCsv = loadLocalDataset("fifa_players").to_csv(index=False)
+      df = pl.read_csv(StringIO(fifaCsv))
       df.shape
   - type: tip
     content: FIFA 데이터는 실제 스포츠 분석에서 자주 사용되는 구조를 가지고 있습니다. 선수(Entity), 포지션(Category), 능력치(Metrics)의 조합으로 구성되어 있어, 실무 스포츠 데이터 분석과 동일한 패턴을 연습할 수 있습니다.
@@ -297,9 +299,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import polars as pl
+        from io import StringIO
+        from codaro.curriculum.localData import loadLocalDataset
 
-        fifaUrl = "https://raw.githubusercontent.com/rashida048/Datasets/master/fifa.csv"
-        fifaRaw = pl.read_csv(fifaUrl)
+        fifaRaw = pl.read_csv(StringIO(loadLocalDataset("fifa_players").to_csv(index=False)))
     - type: code
       title: "포지션별 데이터 추출 및 결합"
       content: |-
@@ -323,9 +326,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import polars as pl
+        from io import StringIO
+        from codaro.curriculum.localData import loadLocalDataset
 
-        playerUrl = "https://raw.githubusercontent.com/rashida048/Datasets/master/fifa.csv"
-        playerRaw = pl.read_csv(playerUrl)
+        playerRaw = pl.read_csv(StringIO(loadLocalDataset("fifa_players").to_csv(index=False)))
     - type: code
       title: "등급 부여"
       content: |-
@@ -359,3 +363,105 @@ sections:
     - "is_in([값 목록]) - 여러 조건 필터링, SQL IN과 동일"
   - type: text
     content: 다음 시간에는 소셜미디어 데이터로 over, rolling, unpivot을 활용한 복잡한 표현식 체이닝을 배웁니다.
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 주문 매출 파이프라인
+  blocks:
+  - type: text
+    content: "Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제 집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다."
+  - type: code
+    language: python
+    title: 주문 데이터와 입력 검증
+    description: 필수 컬럼, 수량, 단가 조건을 로컬에서 검증합니다.
+    content: |-
+      import polars as pl
+
+      orderFrame = pl.DataFrame({
+          "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+          "channel": ["web", "store", "web", "partner", "store", "web"],
+          "quantity": [3, 2, 5, 1, 4, 2],
+          "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+          "refund": [0, 0, 1, 0, 0, 0],
+      })
+
+      def validateOrderFrame(frame: pl.DataFrame) -> bool:
+          requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame.select((pl.col("quantity") <= 0).any()).item():
+              raise ValueError("quantity는 0보다 커야 합니다.")
+          if frame.select((pl.col("unitPrice") <= 0).any()).item():
+              raise ValueError("unitPrice는 0보다 커야 합니다.")
+          return True
+
+      validateOrderFrame(orderFrame)
+      orderFrame
+  - type: code
+    language: python
+    title: 예측 후 채널별 매출 집계
+    description: store 채널이 가장 클 것이라고 예측하고 집계로 확인합니다.
+    content: |-
+      # 예측: store는 주문 수는 적지만 단가가 높아 순매출 1위일 가능성이 큽니다.
+      expectedTopChannel = "store"
+      revenueByChannel = (
+          orderFrame
+          .with_columns((pl.col("quantity") * pl.col("unitPrice") * (1 - pl.col("refund"))).alias("netRevenue"))
+          .group_by("channel")
+          .agg([
+              pl.len().alias("orders"),
+              pl.sum("netRevenue").alias("netRevenue"),
+              pl.mean("quantity").round(2).alias("avgQuantity"),
+          ])
+          .sort("netRevenue", descending=True)
+      )
+
+      topChannel = revenueByChannel.row(0, named=True)["channel"]
+      revenueByChannel
+  - type: code
+    language: python
+    title: 실패 입력을 잡는 오류 처리
+    description: 수량이 0인 주문을 검증 함수가 거부하는지 확인합니다.
+    content: |-
+      brokenOrderFrame = orderFrame.with_columns(
+          pl.when(pl.col("orderId") == 1001).then(0).otherwise(pl.col("quantity")).alias("quantity")
+      )
+
+      try:
+          validateOrderFrame(brokenOrderFrame)
+      except ValueError as exc:
+          validationMessage = str(exc)
+
+      assert "quantity" in validationMessage
+      validationMessage
+  - type: code
+    language: python
+    title: 업무 기준 검증
+    description: 집계 결과가 보고서에 들어갈 수 있는 상태인지 assert로 확인합니다.
+    content: |-
+      pipelineChecks = {
+          "top_channel_matches_prediction": topChannel == expectedTopChannel,
+          "net_revenue_positive": revenueByChannel.select((pl.col("netRevenue") > 0).all()).item(),
+          "all_channels_present": revenueByChannel.height == orderFrame.select(pl.col("channel").n_unique()).item(),
+          "refund_removed_from_revenue": revenueByChannel.filter(pl.col("channel") == "web").row(0, named=True)["netRevenue"] == 80000,
+      }
+
+      assert all(pipelineChecks.values()), pipelineChecks
+      pipelineChecks
+  - type: expansion
+    title: "실무 변주: 매출 기준선을 바꾸면 후보 채널 수가 어떻게 변할까?"
+    blocks:
+    - type: code
+      language: python
+      title: 기준값 민감도 분석
+      content: |-
+        thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
+            pl.col("threshold").map_elements(
+                lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,
+                return_dtype=pl.Int64,
+            ).alias("qualifiedChannels")
+        )
+
+        assert thresholdFrame.select((pl.col("qualifiedChannels").diff().fill_null(0) <= 0).all()).item()
+        thresholdFrame

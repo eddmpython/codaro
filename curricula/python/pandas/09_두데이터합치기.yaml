@@ -7,7 +7,7 @@ meta:
   category: pandas
   difficulty: "⭐⭐⭐⭐⭐"
   badge: 심화
-  tags: ["merge", "concat", "join", "병합", "실무"]
+  tags: ["merge", "concat", "join", "병합", "실무", "검증", "데이터결합"]
   seo:
     title: "pandas merge, concat 완전정복 - 데이터 합치기"
     description: "여러 데이터프레임을 합치는 방법을 배웁니다. concat으로 세로/가로 연결, merge로 키 기준 병합, left/right/outer join을 실습합니다."
@@ -209,6 +209,58 @@ sections:
       targets = pd.DataFrame({'year': [2023, 2023, 2024], 'month': [1, 2, 1], 'target': [90, 140, 130]})
 
       pd.merge(sales, targets, on=['year', 'month'])
+
+- id: workflow_validation
+  title: "현업 흐름 검증: 주문과 고객 테이블 안전하게 병합하기"
+  subtitle: "merge, validate, indicator, 실패 케이스"
+  blocks:
+  - type: text
+    content: "데이터 병합은 행 수가 늘거나 줄어도 겉으로는 성공처럼 보입니다. 키 중복, 미매칭 행, 병합 후 합계 보존을 반드시 검증하세요."
+  - type: code
+    language: python
+    title: "주문-고객 병합과 합계 검증"
+    description: "many_to_one 계약과 indicator로 병합 품질을 확인합니다."
+    content: |-
+      import pandas as pd
+
+      orders = pd.DataFrame({
+          "orderId": ["O-1", "O-2"],
+          "customerId": [1, 2],
+          "amount": [12000, 8000],
+      })
+      customers = pd.DataFrame({
+          "customerId": [1, 2],
+          "segment": ["vip", "standard"],
+      })
+
+      merged = orders.merge(customers, on="customerId", how="left", validate="many_to_one", indicator=True)
+      if not merged["_merge"].eq("both").all():
+          raise ValueError("all orders must match a customer")
+
+      assert len(merged) == len(orders)
+      assert merged["_merge"].eq("both").all()
+      assert merged["amount"].sum() == orders["amount"].sum()
+      assert merged.loc[merged["orderId"] == "O-1", "segment"].iloc[0] == "vip"
+  - type: code
+    language: python
+    title: "중복 키 병합 오류 확인"
+    description: "고객 테이블 키가 중복되면 validate가 MergeError로 알려줍니다."
+    content: |-
+      import pandas as pd
+      from pandas.errors import MergeError
+
+      orders = pd.DataFrame({"customerId": [1], "amount": [100]})
+      duplicatedCustomers = pd.DataFrame({"customerId": [1, 1], "segment": ["a", "b"]})
+
+      try:
+          orders.merge(duplicatedCustomers, on="customerId", validate="many_to_one")
+      except MergeError as exc:
+          message = str(exc)
+
+      assert "not a many-to-one merge" in message
+  - type: tip
+    title: "변주 실험"
+    content: "left join에서 `_merge == left_only`가 있는 주문을 별도 오류 리포트로 분리하고, 누락 고객 수를 assert로 고정하세요."
 
 - id: practice
   title: 실습

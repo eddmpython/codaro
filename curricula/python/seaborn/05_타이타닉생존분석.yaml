@@ -33,6 +33,7 @@ sections:
     description: seaborn과 matplotlib을 불러옵니다
     content: |-
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
 
 - id: step2_data
@@ -46,7 +47,9 @@ sections:
     title: titanic 데이터 로드
     description: 타이타닉 승객 데이터를 불러옵니다
     content: |-
-      titanic = sns.load_dataset('titanic')
+      from codaro.curriculum.localData import loadLocalDataset
+
+      titanic = loadLocalDataset('titanic')
       titanic.head()
 
 - id: step3_countplot
@@ -255,9 +258,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        data = sns.load_dataset('tips')
+        data = loadLocalDataset('tips')
     - type: code
       title: "차트 생성"
       content: |-
@@ -280,9 +284,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        df = sns.load_dataset('penguins').dropna()
+        df = loadLocalDataset('penguins').dropna()
     - type: code
       title: "차트 생성"
       content: |-
@@ -309,3 +314,79 @@ sections:
     - "sns.catplot() - Figure-level, col/row로 다중 패널"
   - type: text
     content: 다음 시간에는 heatmap과 lineplot으로 항공편 시계열을 분석합니다.
+
+- id: workflow_validation
+  title: 12단계. 생존율 비교 검증 루프
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      범주형 차트는 집단별 비율을 빠르게 보여 줍니다. 하지만 생존 여부가 0/1인지, 집단 표본이 충분한지 확인한 뒤에야 barplot 해석이 안전합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 생존율 예측
+    description: 성별과 객실 등급별 생존율이 분석 가능한 구조인지 확인합니다
+    content: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      titanicFlow = loadLocalDataset("titanic")
+      requiredColumns = {"survived", "pclass", "sex", "age", "fare"}
+      missingColumns = requiredColumns - set(titanicFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert set(titanicFlow["survived"].unique()).issubset({0, 1})
+
+      survivalBySex = titanicFlow.groupby("sex")["survived"].mean()
+      assert survivalBySex["female"] > survivalBySex["male"]
+      survivalBySex.round(2)
+  - type: code
+    language: python
+    title: 범주형 차트 검증
+    description: barplot이 객실 등급과 성별 hue를 제대로 표현하는지 확인합니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+      figTitanicBar, axTitanicBar = plt.subplots(figsize=(8, 5))
+      sns.barplot(data=titanicFlow, x="pclass", y="survived", hue="sex", ax=axTitanicBar)
+      axTitanicBar.set_title("Titanic survival rate by class and sex")
+      axTitanicBar.set_ylabel("Survival rate")
+
+      legendLabels = [text.get_text() for text in axTitanicBar.get_legend().get_texts()]
+      assert axTitanicBar.get_ylabel() == "Survival rate"
+      assert set(legendLabels) == {"female", "male"}
+      assert len(axTitanicBar.patches) >= 6
+      figTitanicBar
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 생존 컬럼이 0/1이 아니면 분석을 중단합니다
+    content: |-
+      def validateSurvivalColumn(frame):
+          values = set(frame["survived"].dropna().unique())
+          if not values.issubset({0, 1}):
+              raise ValueError(f"survived는 0/1이어야 합니다: {values}")
+          assert frame["pclass"].between(1, 3).all()
+          return True
+
+      brokenTitanic = titanicFlow.copy()
+      brokenTitanic.loc[brokenTitanic.index[0], "survived"] = 2
+      try:
+          validateSurvivalColumn(brokenTitanic)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateSurvivalColumn(titanicFlow)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 성별 대신 객실 등급을 기준으로 리스크가 큰 집단을 찾습니다
+    content: |-
+      classSurvival = titanicFlow.groupby("pclass")["survived"].mean().sort_values(ascending=False)
+      fareBand = titanicFlow.assign(fareBand=titanicFlow["fare"] >= titanicFlow["fare"].median()).groupby("fareBand")["survived"].mean()
+
+      assert classSurvival.index[0] == 1
+      assert fareBand[True] > fareBand[False]
+      {"classSurvival": classSurvival.round(2).to_dict(), "fareBand": fareBand.round(2).to_dict()}
+  - type: tip
+    content: "범주형 시각화는 비율, 표본 수, 기준 집단을 함께 봐야 의사결정에 쓸 수 있습니다."

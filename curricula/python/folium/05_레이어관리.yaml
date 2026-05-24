@@ -374,7 +374,7 @@ sections:
       filterMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
 
       folium.TileLayer("CartoDB Positron", name="기본").add_to(filterMap)
-      folium.TileLayer("Stamen Terrain", name="지형").add_to(filterMap)
+      folium.TileLayer("OpenStreetMap", name="도로").add_to(filterMap)
 
       palaceGroup = folium.FeatureGroup(name="궁궐")
       parkGroup = folium.FeatureGroup(name="공원")
@@ -430,6 +430,114 @@ sections:
       folium.LayerControl(collapsed=False).add_to(filterMap)
 
       filterMap
+
+- id: step11_workflow
+  title: 11단계. 운영 레이어 검증
+  subtitle: 카테고리 누락과 표시 상태 확인
+  blocks:
+  - type: text
+    content: 레이어 지도는 정보가 많아질수록 누락과 과표시가 생기기 쉽습니다. 업무용 운영 지도에서는 시설, 리스크, 고객 접점을 분리하고, 어떤 레이어가 기본으로 보일지 예측한 뒤 HTML 렌더 결과로 검증합니다.
+  - type: list
+    items:
+    - "기본 레이어는 자주 보는 정보만 켭니다."
+    - "리스크나 참고 정보는 show=False로 숨겨 과밀한 지도를 피합니다."
+    - "정의하지 않은 카테고리가 들어오면 조용히 무시하지 말고 오류로 확인합니다."
+    - "LayerControl에 필요한 이름이 모두 들어갔는지 검증합니다."
+  - type: code
+    language: python
+    title: 운영 지점 데이터 준비
+    description: 시설과 리스크를 카테고리로 분리합니다.
+    content: |-
+      operationSites = [
+          {"name": "강남 고객센터", "category": "support", "loc": [37.4979, 127.0276]},
+          {"name": "홍대 체험존", "category": "showroom", "loc": [37.5563, 126.9236]},
+          {"name": "여의도 장애 접수", "category": "risk", "loc": [37.5219, 126.9245]},
+          {"name": "종로 교육장", "category": "training", "loc": [37.5796, 126.9770]},
+      ]
+
+      layerConfig = {
+          "support": {"label": "고객센터", "color": "blue", "show": True},
+          "showroom": {"label": "체험존", "color": "green", "show": True},
+          "training": {"label": "교육장", "color": "purple", "show": True},
+          "risk": {"label": "리스크", "color": "red", "show": False},
+      }
+
+      sorted(layerConfig)
+  - type: code
+    language: python
+    title: 카테고리 오류 확인
+    description: 정의하지 않은 카테고리가 들어오면 어떤 오류가 나는지 확인합니다.
+    content: |-
+      def validateLayerCategory(site):
+          category = site["category"]
+          if category not in layerConfig:
+              raise KeyError(f"정의되지 않은 레이어: {category}")
+          return category
+
+      try:
+          validateLayerCategory({"name": "미분류 지점", "category": "unknown", "loc": [37.55, 126.98]})
+      except KeyError as exc:
+          layerErrorMessage = str(exc).strip("'")
+
+      layerErrorMessage
+  - type: code
+    language: python
+    title: 레이어 지도 생성
+    description: 카테고리별 FeatureGroup을 만들고 표시 상태를 분리합니다.
+    content: |-
+      operationMap = folium.Map(location=[37.54, 126.98], zoom_start=12)
+      operationGroups = {
+          category: folium.FeatureGroup(
+              name=config["label"],
+              show=config["show"],
+          )
+          for category, config in layerConfig.items()
+      }
+
+      for site in operationSites:
+          category = validateLayerCategory(site)
+          config = layerConfig[category]
+          folium.Marker(
+              location=site["loc"],
+              popup=f"{config['label']} - {site['name']}",
+              tooltip=site["name"],
+              icon=folium.Icon(color=config["color"], icon="info-sign"),
+          ).add_to(operationGroups[category])
+
+      for group in operationGroups.values():
+          group.add_to(operationMap)
+      folium.LayerControl(collapsed=False).add_to(operationMap)
+
+      operationMap
+  - type: code
+    language: python
+    title: 레이어 렌더 검증
+    description: 필요한 레이어명과 지점명이 HTML에 모두 들어갔는지 확인합니다.
+    content: |-
+      operationHtml = operationMap.get_root().render()
+      requiredLayerLabels = [config["label"] for config in layerConfig.values()]
+      checks = {
+          "layersRendered": all(label in operationHtml for label in requiredLayerLabels),
+          "sitesRendered": all(site["name"] in operationHtml for site in operationSites),
+          "errorOk": layerErrorMessage == "정의되지 않은 레이어: unknown",
+      }
+
+      assert all(checks.values()), checks
+      checks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 리스크 레이어를 기본 표시로 바꾸면 설정이 어떻게 달라지는지 비교합니다.
+    content: |-
+      riskHiddenBefore = layerConfig["risk"]["show"]
+      layerConfig["risk"] = {**layerConfig["risk"], "show": True}
+      riskVisibleAfter = layerConfig["risk"]["show"]
+
+      assert riskHiddenBefore is False
+      assert riskVisibleAfter is True
+      riskHiddenBefore, riskVisibleAfter
+  - type: tip
+    content: 레이어 관리는 지도 꾸미기가 아니라 정보 과밀도를 제어하는 설계입니다. 기본 표시, 숨김 표시, 미분류 오류를 코드로 검증해야 운영 지도가 믿을 만해집니다.
 
 - id: practice
   title: 실습
@@ -505,7 +613,7 @@ sections:
         themeMap = folium.Map(location=[37.55, 127.0], zoom_start=11, tiles=None)
 
         folium.TileLayer("CartoDB Positron", name="기본").add_to(themeMap)
-        folium.TileLayer("Stamen Terrain", name="자연").add_to(themeMap)
+        folium.TileLayer("OpenStreetMap", name="도로").add_to(themeMap)
 
         cultureGroup = folium.FeatureGroup(name="문화시설")
         natureGroup = folium.FeatureGroup(name="자연명소")

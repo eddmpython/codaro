@@ -3,7 +3,7 @@ meta:
   title: "리스트메서드"
   day: 8
   category: "30days"
-  tags: []
+  tags: ["리스트", "append", "remove", "sort", "queue", "원본변경", "검증"]
   seo:
     title: "파이썬 리스트 메서드 - 리스트 조작 완벽 가이드"
     description: "append, insert, remove, pop, sort, reverse 등 리스트 메서드를 배웁니다."
@@ -322,6 +322,73 @@ sections:
       basket.index('오렌지')
   - type: "tip"
     content: "in 연산자로 값의 존재 여부를 먼저 확인한 후 index()를 사용하면 안전합니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 주문 처리 큐 관리하기"
+  subtitle: "리스트 메서드의 원본 변경을 업무 흐름으로 확인"
+  blocks:
+  - type: "text"
+    content: "리스트 메서드는 값을 추가하고 지우는 기능 목록이 아닙니다. 주문 처리 큐처럼 순서가 중요하고 상태가 계속 바뀌는 데이터를 다룰 때, 어떤 메서드가 원본을 바꾸는지와 실패 조건을 검증해야 합니다."
+  - type: "list"
+    items:
+    - "예측: append, insert, pop, remove 뒤에 남을 큐 상태를 먼저 적는다."
+    - "실행: 신규 주문 추가, 긴급 주문 삽입, 처리 완료 pop을 순서대로 실행한다."
+    - "오류 수정: 없는 주문 remove와 sort 반환값 None을 확인한다."
+    - "검증: 처리된 주문, 남은 주문 수, 우선순위 순서를 assert로 확인한다."
+  - type: "code"
+    language: "python"
+    title: "주문 처리 큐"
+    description: "append, insert, pop으로 처리 순서가 있는 주문 큐를 관리합니다."
+    content: |-
+      orderQueue = ['ORD-1001', 'ORD-1002']
+      orderQueue.append('ORD-1003')
+      orderQueue.insert(0, 'URG-9001')
+
+      processedOrder = orderQueue.pop(0)
+      orderQueue.remove('ORD-1002')
+
+      assert processedOrder == 'URG-9001'
+      assert orderQueue == ['ORD-1001', 'ORD-1003']
+      assert len(orderQueue) == 2
+  - type: "code"
+    language: "python"
+    title: "없는 주문 삭제 실패"
+    description: "remove()는 값이 없으면 ValueError를 내므로, 삭제 전 확인이 필요합니다."
+    content: |-
+      orderQueue = ['ORD-1001', 'ORD-1003']
+
+      try:
+          orderQueue.remove('ORD-4040')
+      except ValueError as exc:
+          errorMessage = str(exc)
+      else:
+          raise AssertionError('없는 주문 삭제는 실패해야 합니다')
+
+      assert 'not in list' in errorMessage
+      assert orderQueue == ['ORD-1001', 'ORD-1003']
+  - type: "code"
+    language: "python"
+    title: "정렬은 원본을 바꾼다"
+    description: "sort()의 반환값이 아니라 정렬된 원본 리스트를 검증합니다."
+    content: |-
+      scores = [82, 95, 77, 91]
+      returnedValue = scores.sort(reverse=True)
+
+      assert returnedValue is None
+      assert scores == [95, 91, 82, 77]
+      assert scores[:2] == [95, 91]
+  - type: "expansion"
+    title: "실무 변주: 처리 로그 보관"
+    code: |-
+      pendingTasks = ['메일 발송', '입금 확인', '송장 출력']
+      doneTasks = []
+
+      doneTasks.append(pendingTasks.pop(0))
+      doneTasks.append(pendingTasks.pop(0))
+
+      assert doneTasks == ['메일 발송', '입금 확인']
+      assert pendingTasks == ['송장 출력']
+      doneTasks
 
 - id: "practice"
   title: "Day 8 종합 복습"
@@ -686,4 +753,4 @@ sections:
         names = ['철수', '영희', '민수', '지은', '동욱']
         scores = [1500, 2300, 1800, 2100, 1900]
         value = scores[names.index('영희')]
-        print('younghee_score:', target)
+        print('younghee_score:', value)

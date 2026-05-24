@@ -107,7 +107,7 @@ def _convertStructuredSection(section: LearningSectionContract, solutions: dict[
     if section.snippet:
         result.append(
             _codeBlock(
-                _localizeCode(section.snippet),
+                _normalizeCode(section.snippet),
                 role="snippet",
                 executionKind="python",
                 sourceType="sectionContract:snippet",
@@ -118,8 +118,8 @@ def _convertStructuredSection(section: LearningSectionContract, solutions: dict[
 
     exercise = section.exercise
     if _hasStructuredExercise(section):
-        starterCode = _localizeCode(exercise.starterCode)
-        solutionCode = _localizeCode(exercise.solution)
+        starterCode = _normalizeCode(exercise.starterCode)
+        solutionCode = _normalizeCode(exercise.solution)
         exerciseCell = _codeBlock(
             starterCode,
             role="exercise",
@@ -377,7 +377,7 @@ def _convertCodeBlock(block: dict[str, Any], role: str, sourceType: str) -> list
             )
         )
 
-    code = _localizeCode(_textValue(block.get("content")))
+    code = _normalizeCode(_textValue(block.get("content")))
     expectedOutput = _textValue(block.get("output"))
     codeCell = _codeBlock(
         code,
@@ -431,7 +431,7 @@ def _convertExpansionBlock(block: dict[str, Any], solutions: dict[str, str]) -> 
             continue
         result.extend(_convertBlock(nested, solutions, parentRole="exercise"))
 
-    solutionCode = _localizeCode(_textValue(block.get("code")))
+    solutionCode = _normalizeCode(_textValue(block.get("code")))
     if solutionCode or not _arrayOfMaps(block.get("blocks")):
         exerciseCell = _codeBlock(
             "",
@@ -465,7 +465,7 @@ def _convertExpansionSolutionCodeBlock(
 ) -> BlockConfig:
     title = _textValue(block.get("title")) or expansionTitle
     description = _textValue(block.get("description")) or expansionDescription or title
-    solutionCode = _localizeCode(_textValue(block.get("content") or block.get("code")))
+    solutionCode = _normalizeCode(_textValue(block.get("content") or block.get("code")))
     exerciseCell = _codeBlock(
         "",
         role="exercise",
@@ -718,18 +718,11 @@ def _pointLines(value: Any) -> str:
     return "\n".join(f"- {item}" for item in _arrayOfText(value))
 
 
-def _localizeCode(code: str) -> str:
+def _normalizeCode(code: str) -> str:
     if not code:
         return ""
-    localized = code.replace("from pyodide.http import open_url", "from urllib.request import urlopen")
-    localized = localized.replace("open_url(", "urlopen(")
     lines = []
-    for line in localized.splitlines():
-        stripped = line.strip()
-        if stripped in {"import micropip", "import pyodide_http", "pyodide_http.patch_all()"}:
-            continue
-        if stripped.startswith("await micropip.install("):
-            continue
+    for line in code.splitlines():
         lines.append(line.rstrip())
     result = "\n".join(lines).strip("\n")
     return result if result.strip() else "pass"

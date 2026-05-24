@@ -3,7 +3,7 @@ meta:
   title: "컴프리헨션"
   day: 26
   category: "30days"
-  tags: []
+  tags: ["컴프리헨션", "리스트", "딕셔너리", "집합", "데이터정제", "검증"]
   seo:
     title: "파이썬 컴프리헨션 - 간결한 데이터 구조 생성"
     description: "리스트, 딕셔너리, 집합 컴프리헨션으로 간결하고 효율적인 코드를 작성합니다."
@@ -286,6 +286,64 @@ sections:
       jTags
   - type: "tip"
     content: "컴프리헨션은 강력하지만, 복잡한 로직은 일반 반복문이 더 명확할 수 있습니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 행을 컴프리헨션으로 정제하기"
+  subtitle: "예측 → 변환 → 필터링 → 오류 확인 → 검증"
+  blocks:
+  - type: "text"
+    content: "컴프리헨션은 짧게 쓰는 문법이 아니라, 입력 데이터에서 필요한 행을 고르고 같은 규칙으로 변환할 때 강력합니다. 다만 검증 로직이 복잡해지면 작은 함수와 함께 써야 흐름이 읽힙니다."
+  - type: "code"
+    language: "python"
+    title: "주문 행 정제 파이프라인"
+    description: "취소 주문을 제외하고, 결제 주문의 금액과 고액 주문 ID를 검증합니다."
+    content: |-
+      rawRows = [
+          {"id": " A-100 ", "status": " PAID ", "amount": "50,000", "customer": "kim"},
+          {"id": "A-101", "status": "cancelled", "amount": "8,000", "customer": "lee"},
+          {"id": " A-102", "status": "paid", "amount": "120,000", "customer": "kim"},
+          {"id": "A-103", "status": "pending", "amount": "30,000", "customer": "park"},
+      ]
+
+      def parseAmount(text):
+          cleanedText = text.replace(",", "").strip()
+          if not cleanedText.isdigit():
+              raise ValueError(f"invalid amount: {text}")
+          return int(cleanedText)
+
+      activeRows = [
+          {
+              "id": row["id"].strip(),
+              "status": row["status"].strip().lower(),
+              "amount": parseAmount(row["amount"]),
+              "customer": row["customer"].strip(),
+          }
+          for row in rawRows
+          if row["status"].strip().lower() != "cancelled"
+      ]
+
+      paidRows = [row for row in activeRows if row["status"] == "paid"]
+      amountByOrderId = {row["id"]: row["amount"] for row in paidRows}
+      highValueOrderIds = {orderId for orderId, amount in amountByOrderId.items() if amount >= 100000}
+      reportLines = [f"{orderId}:{amount}" for orderId, amount in sorted(amountByOrderId.items())]
+
+      assert [row["id"] for row in activeRows] == ["A-100", "A-102", "A-103"]
+      assert amountByOrderId == {"A-100": 50000, "A-102": 120000}
+      assert highValueOrderIds == {"A-102"}
+      assert reportLines == ["A-100:50000", "A-102:120000"]
+
+      try:
+          parseAmount("unknown")
+      except ValueError as exc:
+          assert "invalid amount" in str(exc)
+
+      print("컴프리헨션 정제 흐름 통과")
+  - type: "list"
+    items:
+    - "변환 규칙은 컴프리헨션 안에 두되, 검증은 parseAmount 같은 함수로 분리합니다."
+    - "리스트 컴프리헨션은 행 선택과 변환, 딕셔너리 컴프리헨션은 조회용 매핑, 집합 컴프리헨션은 중복 없는 후보 추출에 맞습니다."
+    - "조건이 2개를 넘어가거나 예외 처리가 길어지면 일반 반복문이 더 좋은 선택입니다."
+    - "실무 변주: 고객별 총액 딕셔너리와 상태별 주문 수 집합을 추가해 작은 매출 요약 대시보드 입력으로 바꿔 보세요."
 
 - id: "practice"
   title: "Day 26 종합 복습"

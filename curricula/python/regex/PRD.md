@@ -14,55 +14,48 @@ Date: 2025-12-26, 26/12/2025, Dec 26, 2025
 """
 ```
 
-### 방법 2: 공개 API (네트워크 접근 가능, Codaro 로컬 Python 호환)
+### 방법 2: 구조화된 로컬 JSON 샘플 (권장)
 ```python
-from urllib.request import urlopen
-import json
+usersData = [
+    {
+        "name": "Hana Kim",
+        "email": "hana.kim@codaro.io",
+        "phone": "010-1234-5678",
+        "website": "docs.codaro.local",
+    },
+    {
+        "name": "Min Park",
+        "email": "min.park@dataworks.com",
+        "phone": "010.9876.5432 x102",
+        "website": "analytics.dataworks.com",
+    },
+]
 
-# JSONPlaceholder - 이메일, 전화번호, URL 포함
-usersData = json.load(urlopen("https://jsonplaceholder.typicode.com/users"))
 for user in usersData:
-    user['email']  # 'Sincere@april.biz'
-    user['phone']  # '1-770-736-8031 x56442'
-    user['website']  # 'hildegard.org'
-
-# Bacon Ipsum - 긴 텍스트 생성 (텍스트 정제 실습)
-textData = json.load(urlopen("https://baconipsum.com/api/?type=all-meat&paras=5"))
-longText = " ".join(textData)
-```
-
-### 방법 3: GitHub raw 파일
-```python
-from urllib.request import urlopen
-
-baseUrl = "https://raw.githubusercontent.com"
-
-# CSV 파일 (도시, 국가 데이터 - 특수문자 포함)
-csvData = urlopen(f"{baseUrl}/datasets/world-cities/master/data/world-cities.csv").read().decode("utf-8")
-
-# 샘플 텍스트 파일 (직접 제작 권장)
-# textData = urlopen(f"{baseUrl}/your-username/your-repo/main/sample.txt").read().decode("utf-8")
+    user["email"]
+    user["phone"]
+    user["website"]
 ```
 
 **실전 데이터 소스 (10개 프로젝트용):**
 
 | 프로젝트 | 데이터 소스 | 포함 패턴 |
 |---------|-----------|----------|
-| P01 이메일 추출 | JSONPlaceholder /users | 다양한 이메일 형식 |
-| P02 전화번호 통일 | JSONPlaceholder /users | 여러 전화번호 형식, 확장번호 |
-| P03 URL 파싱 | JSONPlaceholder /users | 웹사이트 URL |
-| P04 HTML 태그 제거 | JSONPlaceholder /posts (body) + HTML 태그 추가 | HTML 마크업 |
+| P01 이메일 추출 | 로컬 사용자 JSON 샘플 | 다양한 이메일 형식 |
+| P02 전화번호 통일 | 로컬 사용자 JSON 샘플 | 여러 전화번호 형식, 확장번호 |
+| P03 URL 파싱 | 로컬 사용자 JSON 샘플 | 웹사이트 URL |
+| P04 HTML 태그 제거 | 로컬 게시글 샘플 + HTML 태그 추가 | HTML 마크업 |
 | P05 로그 파싱 | 코드 내 서버 로그 샘플 | 타임스탬프, IP, 에러 메시지 |
 | P06 날짜 변환 | 코드 내 다양한 날짜 형식 | YYYY-MM-DD, MM/DD/YYYY, 영문 날짜 |
 | P07 개인정보 마스킹 | 코드 내 샘플 (가상 데이터) | 주민번호, 카드번호, 계좌번호 |
-| P08 텍스트 정제 | Bacon Ipsum API | 특수문자, 공백, 대소문자 혼재 |
+| P08 텍스트 정제 | 로컬 노이즈 텍스트 샘플 | 특수문자, 공백, 대소문자 혼재 |
 | P09 고급 패턴 | 코드 내 복잡한 텍스트 | 중첩 구조, 조건부 패턴 |
-| P10 LLM 전처리 | JSONPlaceholder /posts + HTML | 실전 파이프라인 |
+| P10 LLM 전처리 | 로컬 게시글 샘플 + HTML | 실전 파이프라인 |
 
 **주의사항:**
-- 네트워크 예제는 `urllib.request.urlopen()`을 기본으로 사용
-- API 응답은 JSON이면 `json.load()`, 텍스트면 `read().decode("utf-8")`로 처리
-- 인증이 필요한 API나 사이트 정책이 강한 URL은 로컬 환경 변수와 예외 처리를 함께 설계
+- 정규식 레슨의 기본 데이터는 로컬 샘플을 사용해 네트워크 상태와 무관하게 실행한다.
+- API 응답 구조가 필요할 때는 리스트/딕셔너리 형태의 로컬 JSON 샘플로 먼저 학습한다.
+- 네트워크 호출은 urllib 전용 수업처럼 네트워크 자체가 학습 목표일 때만 사용한다.
 
 ---
 

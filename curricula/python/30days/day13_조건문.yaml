@@ -3,7 +3,7 @@ meta:
   title: "조건문"
   day: 13
   category: "30days"
-  tags: []
+  tags: ["조건문", "if", "elif", "else", "승인규칙", "경계값", "검증"]
   seo:
     title: "파이썬 조건문 - if, elif, else로 흐름 제어"
     description: "if, elif, else, 삼항연산자, 중첩 조건문을 배웁니다."
@@ -516,6 +516,117 @@ sections:
       discounted
   - type: "tip"
     content: "삼항 연산자는 간단한 조건에만 사용하세요. 복잡하면 일반 if-else가 더 읽기 쉽습니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 주문 승인 규칙 만들기"
+  subtitle: "조건 순서와 경계값을 테스트하는 실무 분기"
+  blocks:
+  - type: "text"
+    content: "조건문은 참/거짓 예제를 맞히는 데서 끝나지 않습니다. 실제 업무에서는 승인, 반려, 검토 같은 상태를 결정하므로 조건 순서와 경계값이 틀리면 결과가 바로 잘못됩니다."
+  - type: "list"
+    items:
+    - "예측: 재고, 결제금액, 위험 점수에 따라 confirmed/review/rejected가 나뉜다고 정한다."
+    - "실행: if-elif-else로 가장 위험한 조건부터 검사한다."
+    - "오류 수정: 조건 순서를 틀렸을 때 결과가 달라지는지 비교한다."
+    - "검증: 정상, 재고 부족, 고위험, 경계값 케이스를 assert로 확인한다."
+  - type: "code"
+    language: "python"
+    title: "주문 승인 규칙"
+    description: "조건문으로 주문 상태를 결정하고 대표 케이스를 검증합니다."
+    content: |-
+      stockCount = 5
+      requestCount = 3
+      paidAmount = 90000
+      riskScore = 20
+
+      if riskScore >= 80:
+          orderStatus = 'review'
+      elif requestCount > stockCount:
+          orderStatus = 'rejected'
+      elif paidAmount <= 0:
+          orderStatus = 'rejected'
+      else:
+          orderStatus = 'confirmed'
+
+      assert orderStatus == 'confirmed'
+  - type: "code"
+    language: "python"
+    title: "조건 순서 오류 비교"
+    description: "고위험 주문은 재고가 있어도 먼저 검토로 보내야 합니다."
+    content: |-
+      stockCount = 5
+      requestCount = 3
+      paidAmount = 90000
+      riskScore = 90
+
+      if requestCount <= stockCount and paidAmount > 0:
+          wrongStatus = 'confirmed'
+      elif riskScore >= 80:
+          wrongStatus = 'review'
+      else:
+          wrongStatus = 'rejected'
+
+      if riskScore >= 80:
+          rightStatus = 'review'
+      elif requestCount <= stockCount and paidAmount > 0:
+          rightStatus = 'confirmed'
+      else:
+          rightStatus = 'rejected'
+
+      assert wrongStatus == 'confirmed'
+      assert rightStatus == 'review'
+  - type: "code"
+    language: "python"
+    title: "경계값 케이스 검증"
+    description: "조건문은 대표값뿐 아니라 경계값도 함께 확인해야 합니다."
+    content: |-
+      def decideOrder(stockCount, requestCount, paidAmount, riskScore):
+          if riskScore >= 80:
+              return 'review'
+          if requestCount > stockCount:
+              return 'rejected'
+          if paidAmount <= 0:
+              return 'rejected'
+          return 'confirmed'
+
+
+      assert decideOrder(5, 5, 10000, 79) == 'confirmed'
+      assert decideOrder(5, 6, 10000, 10) == 'rejected'
+      assert decideOrder(5, 1, 0, 10) == 'rejected'
+      assert decideOrder(5, 1, 10000, 80) == 'review'
+  - type: "code"
+    language: "python"
+    title: "잘못된 조건값을 먼저 실패시킨다"
+    description: "조건문에 들어가기 전에 음수 수량과 잘못된 위험 점수를 차단합니다."
+    content: |-
+      def decideOrderSafely(stockCount, requestCount, paidAmount, riskScore):
+          if stockCount < 0 or requestCount < 0:
+              raise ValueError('count must not be negative')
+          if not 0 <= riskScore <= 100:
+              raise ValueError('riskScore must be between 0 and 100')
+          return decideOrder(stockCount, requestCount, paidAmount, riskScore)
+
+      try:
+          decideOrderSafely(5, -1, 10000, 10)
+      except ValueError as exc:
+          conditionInputError = str(exc)
+
+      assert 'count' in conditionInputError
+      conditionInputError
+  - type: "expansion"
+    title: "실무 변주: 알림 등급 결정"
+    code: |-
+      errorCount = 3
+      latencyMs = 850
+      if errorCount >= 10 or latencyMs >= 1000:
+          alertLevel = 'critical'
+      elif errorCount >= 3 or latencyMs >= 700:
+          alertLevel = 'warning'
+      else:
+          alertLevel = 'normal'
+
+      assert alertLevel == 'warning'
+      alertLevel
 
 - id: "practice"
   title: "Day 13 종합 복습"

@@ -351,3 +351,105 @@ sections:
           'Model': ['All 10 Features', f'Top 5: {top5}'],
           'R²': [r2_score(yTeF, predF), r2_score(yTe5, pred5)]
       })
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 예측 모델 품질 게이트
+  blocks:
+  - type: text
+    content: "실무 머신러닝은 모델을 fit하는 데서 끝나지 않습니다. 먼저 어떤 성능이 나올지 예측하고, 학습/평가 데이터를 분리한 뒤, 잘못된 입력을 명확한 오류로 막고, 정확도와 F1 점수를 assert로 검증해야 합니다. 마지막에는 하이퍼파라미터를 바꾸는 변주로 성능과 안정성을 비교합니다."
+  - type: code
+    language: python
+    title: 분류 데이터와 파이프라인 준비
+    description: 재현 가능한 이탈 고객 위험 예측 데이터를 만듭니다.
+    content: |-
+      from sklearn.datasets import make_classification
+      from sklearn.model_selection import train_test_split
+      from sklearn.pipeline import Pipeline
+      from sklearn.preprocessing import StandardScaler
+      from sklearn.linear_model import LogisticRegression
+      from sklearn.metrics import accuracy_score, f1_score
+
+      features, target = make_classification(
+          n_samples=240,
+          n_features=6,
+          n_informative=4,
+          n_redundant=0,
+          class_sep=1.4,
+          random_state=42,
+      )
+      xTrain, xTest, yTrain, yTest = train_test_split(
+          features, target, test_size=0.25, random_state=42, stratify=target
+      )
+
+      riskPipeline = Pipeline([
+          ("scaler", StandardScaler()),
+          ("classifier", LogisticRegression(max_iter=1000, random_state=42)),
+      ])
+      xTrain.shape, xTest.shape
+  - type: code
+    language: python
+    title: 입력 검증이 있는 학습 함수
+    description: 행 수 불일치나 단일 클래스 데이터를 학습 전에 차단합니다.
+    content: |-
+      def fitRiskModel(model, features, labels):
+          if features.shape[0] != len(labels):
+              raise ValueError("특성 행 수와 타깃 길이가 다릅니다.")
+          if len(set(labels)) < 2:
+              raise ValueError("분류 모델은 최소 두 개 이상의 클래스가 필요합니다.")
+          try:
+              return model.fit(features, labels)
+          except ValueError as exc:
+              raise ValueError("모델 학습 입력을 다시 확인하세요.") from exc
+
+      trainedRiskModel = fitRiskModel(riskPipeline, xTrain, yTrain)
+      trainedRiskModel
+  - type: code
+    language: python
+    title: 예측과 지표 계산
+    description: 실행 전에는 정확도와 F1이 0.8 이상일 것으로 예측하고 확인합니다.
+    content: |-
+      # 예측: class_sep이 충분히 커서 정확도와 F1이 모두 0.8 이상일 가능성이 높습니다.
+      riskPred = trainedRiskModel.predict(xTest)
+      riskAccuracy = accuracy_score(yTest, riskPred)
+      riskF1 = f1_score(yTest, riskPred)
+
+      round(riskAccuracy, 3), round(riskF1, 3)
+  - type: code
+    language: python
+    title: 운영 배포 전 품질 검증
+    description: 최소 성능과 예측 라벨 범위를 assert로 고정합니다.
+    content: |-
+      modelChecks = {
+          "accuracy_gate": riskAccuracy >= 0.80,
+          "f1_gate": riskF1 >= 0.80,
+          "prediction_labels_are_valid": set(riskPred).issubset({0, 1}),
+          "test_rows_preserved": len(riskPred) == len(yTest),
+      }
+
+      assert all(modelChecks.values()), modelChecks
+      modelChecks
+  - type: expansion
+    title: "실무 변주: 정규화 강도를 바꾸면 안정성이 유지될까?"
+    blocks:
+    - type: code
+      language: python
+      title: 하이퍼파라미터 변경 비교
+      content: |-
+        conservativePipeline = Pipeline([
+            ("scaler", StandardScaler()),
+            ("classifier", LogisticRegression(C=0.3, max_iter=1000, random_state=42)),
+        ])
+        conservativeModel = fitRiskModel(conservativePipeline, xTrain, yTrain)
+        conservativePred = conservativeModel.predict(xTest)
+        conservativeAccuracy = accuracy_score(yTest, conservativePred)
+        conservativeF1 = f1_score(yTest, conservativePred)
+
+        assert conservativeAccuracy >= 0.75
+        {
+            "baselineAccuracy": round(riskAccuracy, 3),
+            "baselineF1": round(riskF1, 3),
+            "conservativeAccuracy": round(conservativeAccuracy, 3),
+            "conservativeF1": round(conservativeF1, 3),
+            "accuracyDelta": round(conservativeAccuracy - riskAccuracy, 3),
+        }

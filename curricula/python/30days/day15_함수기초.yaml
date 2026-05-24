@@ -3,7 +3,7 @@ meta:
   title: "함수기초"
   day: 15
   category: "30days"
-  tags: []
+  tags: ["함수", "def", "return", "매개변수", "주문계산", "검증"]
   seo:
     title: "파이썬 함수 기초 - def, return으로 코드 재사용"
     description: "def, return, parameter, argument를 배웁니다."
@@ -498,6 +498,94 @@ sections:
       results
   - type: "tip"
     content: "자주 사용하는 로직은 함수로 만들어 재사용하세요."
+
+- id: "workflow_validation"
+  title: "실무 함수 설계 루프"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "업무 코드는 보통 숫자 하나를 출력하는 데서 끝나지 않습니다. 주문 금액처럼 규칙이 있는 계산을 함수로 감싸고, 실행 전에 결과를 예측한 뒤, 오류 메시지를 읽고 호출을 고치고, 마지막에 검증합니다."
+  - type: "list"
+    items:
+    - "실무 규칙을 함수 이름과 매개변수에 드러냅니다."
+    - "실행 전에는 subtotal, discount, total이 어떻게 나올지 먼저 예측합니다."
+    - "오류가 나면 함수 정의와 호출 인자 개수를 비교해서 고칩니다."
+    - "정답이라고 느끼는 데서 멈추지 말고 예상값과 비교해 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "주문 금액 함수 만들기"
+    description: "주문 금액 계산 규칙을 함수 하나로 묶습니다. 실행 전에 subtotal, discount, total을 먼저 예측해보세요."
+    content: |-
+      order = {
+          "items": [12000, 8000, 5000],
+          "couponRate": 0.1,
+          "deliveryFee": 3000,
+      }
+
+      def estimateOrderTotal(items, couponRate, deliveryFee):
+          subtotal = sum(items)
+          discount = int(subtotal * couponRate)
+          total = subtotal - discount + deliveryFee
+          return {
+              "subtotal": subtotal,
+              "discount": discount,
+              "total": total,
+          }
+
+      estimateOrderTotal(order["items"], order["couponRate"], order["deliveryFee"])
+  - type: "code"
+    language: "python"
+    title: "오류 메시지로 호출 고치기"
+    description: "일부러 인자를 하나 빼고 호출한 뒤, 오류 메시지가 무엇을 말하는지 확인합니다."
+    content: |-
+      try:
+          estimateOrderTotal(order["items"], order["couponRate"])
+      except TypeError as exc:
+          errorMessage = str(exc)
+
+      errorMessage
+  - type: "code"
+    language: "python"
+    title: "고친 호출 다시 실행"
+    description: "함수 정의에 맞게 deliveryFee까지 전달합니다."
+    content: |-
+      fixedResult = estimateOrderTotal(
+          order["items"],
+          order["couponRate"],
+          order["deliveryFee"],
+      )
+
+      fixedResult
+  - type: "code"
+    language: "python"
+    title: "예상값으로 검증"
+    description: "실행 결과를 업무 규칙으로 계산한 예상값과 비교합니다."
+    content: |-
+      expectedResult = {
+          "subtotal": 25000,
+          "discount": 2500,
+          "total": 25500,
+      }
+
+      checks = {
+          "subtotalOk": fixedResult["subtotal"] == expectedResult["subtotal"],
+          "discountOk": fixedResult["discount"] == expectedResult["discount"],
+          "totalOk": fixedResult["total"] == expectedResult["total"],
+      }
+
+      assert all(checks.values())
+      checks
+  - type: "code"
+    language: "python"
+    title: "수정 실험"
+    description: "쿠폰율을 바꿔 함수 결과가 어떻게 달라지는지 비교합니다."
+    content: |-
+      normalResult = estimateOrderTotal(order["items"], 0, order["deliveryFee"])
+      vipResult = estimateOrderTotal(order["items"], 0.2, order["deliveryFee"])
+
+      normalResult["total"], vipResult["total"]
+  - type: "tip"
+    content: "함수 학습은 def 문법을 외우는 데서 끝내지 말고, 예측 → 실행 → 오류 수정 → 검증 루프를 한 번씩 통과해야 실제 업무 코드로 이어집니다."
 
 - id: "practice"
   title: "Day 15 종합 복습"

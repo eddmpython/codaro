@@ -1,5 +1,8 @@
 meta:
+  id: "22_email"
   title: "email - 이메일 처리"
+  category: "builtins"
+  tags: ["email", "MIME", "EmailMessage", "메일", "첨부파일"]
   description: "이메일 메시지 생성과 파싱을 위한 email 모듈"
   keywords: ["email", "MIME", "EmailMessage", "메일", "첨부파일"]
 
@@ -428,6 +431,99 @@ sections:
       ]
 
       formattedAddrs
+
+- id: "workflow_validation"
+  title: "검증 루프: 발송 전 이메일 품질 게이트"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "실무 이메일은 생성보다 발송 전 검증이 중요합니다. 필수 헤더, 수신자 주소, 첨부 파일 개수, 직렬화 후 재파싱을 한 번에 확인해야 실제 발송 단계에서 사고를 줄일 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "검증 가능한 리포트 메일 생성"
+    description: "본문과 첨부 파일을 포함한 EmailMessage를 만듭니다."
+    content: |-
+      from email import message_from_bytes
+      from email.utils import parseaddr
+
+      def createReportEmail(sender, recipients, subject, body, attachmentBytes):
+          msg = EmailMessage()
+          msg['From'] = sender
+          msg['To'] = ', '.join(recipients)
+          msg['Subject'] = subject
+          msg.set_content(body)
+          msg.add_attachment(
+              attachmentBytes,
+              maintype='text',
+              subtype='csv',
+              filename='report.csv'
+          )
+          return msg
+
+      reportMsg = createReportEmail(
+          'teacher@example.com',
+          ['learner@example.com', 'reviewer@example.com'],
+          'Curriculum Report',
+          'All local checks passed.',
+          b'id,status\n1,passed\n'
+      )
+
+      assert reportMsg['Subject'] == 'Curriculum Report'
+      assert len(list(reportMsg.iter_attachments())) == 1
+      reportMsg['To']
+  - type: "code"
+    language: "python"
+    title: "필수 헤더와 주소 검증"
+    description: "발송 전에 필수 헤더와 수신자 주소 형식을 확인합니다."
+    content: |-
+      def validateOutgoingEmail(msg):
+          for header in ['From', 'To', 'Subject']:
+              assert msg.get(header), f'{header} 헤더가 필요합니다'
+
+          recipients = [part.strip() for part in msg['To'].split(',')]
+          parsedRecipients = [parseaddr(recipient)[1] for recipient in recipients]
+          assert all('@' in addr and '.' in addr.split('@')[-1] for addr in parsedRecipients), '수신자 주소가 올바르지 않습니다'
+          assert len(list(msg.iter_attachments())) <= 3, '첨부 파일은 최대 3개까지 허용합니다'
+          return parsedRecipients
+
+      parsedRecipients = validateOutgoingEmail(reportMsg)
+      assert parsedRecipients == ['learner@example.com', 'reviewer@example.com']
+      parsedRecipients
+  - type: "code"
+    language: "python"
+    title: "깨진 메일을 먼저 실패시킨다"
+    description: "제목 누락과 잘못된 주소를 검증 단계에서 잡습니다."
+    content: |-
+      badMsg = EmailMessage()
+      badMsg['From'] = 'teacher@example.com'
+      badMsg['To'] = 'not-an-email'
+      badMsg.set_content('Missing subject')
+
+      try:
+          validateOutgoingEmail(badMsg)
+      except AssertionError as exc:
+          emailProblem = str(exc)
+
+      assert 'Subject' in emailProblem or '주소' in emailProblem
+      emailProblem
+  - type: "code"
+    language: "python"
+    title: "직렬화 후 재파싱 검증"
+    description: "발송 직전 bytes로 변환한 메시지를 다시 파싱해 정보가 유지되는지 확인합니다."
+    content: |-
+      rawMessage = reportMsg.as_bytes()
+      reparsedMsg = message_from_bytes(rawMessage)
+      reparsedAttachments = [
+          part for part in reparsedMsg.walk()
+          if part.get_content_disposition() == 'attachment'
+      ]
+
+      assert reparsedMsg['Subject'] == reportMsg['Subject']
+      assert reparsedAttachments[0].get_filename() == 'report.csv'
+      assert b'passed' in reparsedAttachments[0].get_payload(decode=True)
+      reparsedMsg['Subject'], reparsedAttachments[0].get_filename()
+  - type: "tip"
+    content: "실무 변주: 수신자 도메인 allowlist, 첨부 파일 크기 제한, 제목 접두어 규칙을 추가해서 발송 전 품질 게이트를 팀 정책으로 확장해 보세요."
 
 - id: "practice"
   title: "email 모듈 종합 복습"

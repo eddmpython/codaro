@@ -3,7 +3,7 @@ meta:
   title: "클래스 기초"
   day: 22
   category: "30days"
-  tags: []
+  tags: ["클래스", "객체", "인스턴스", "메서드", "상태관리", "검증"]
   seo:
     title: "파이썬 클래스 기초 - 객체지향 프로그래밍 시작"
     description: "class, __init__, self, 메서드, 속성, 인스턴스를 배웁니다."
@@ -317,6 +317,72 @@ sections:
       students[0].name, students[0].grade
   - type: "tip"
     content: "클래스는 재사용 가능한 코드 템플릿입니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 객체로 상태와 합계 관리하기"
+  blocks:
+  - type: "text"
+    content: "클래스의 핵심은 관련 데이터와 행동을 한 곳에 묶는 것입니다. 주문처럼 상태가 변하고 규칙이 붙는 데이터는 딕셔너리만으로 계속 다루면 실수가 늘어납니다."
+  - type: "code"
+    language: "python"
+    title: "주문 객체 상태 검증"
+    code: |
+      class Order:
+          def __init__(self, orderId):
+              self.orderId = orderId
+              self.items = []
+              self.status = "draft"
+
+          def addItem(self, name, price, quantity=1):
+              if price <= 0:
+                  raise ValueError("price must be positive")
+              if quantity <= 0:
+                  raise ValueError("quantity must be positive")
+
+              self.items.append({
+                  "name": name,
+                  "price": price,
+                  "quantity": quantity,
+              })
+
+          def total(self):
+              amount = 0
+              for item in self.items:
+                  amount += item["price"] * item["quantity"]
+              return amount
+
+          def markPaid(self):
+              if not self.items:
+                  raise ValueError("empty order cannot be paid")
+              self.status = "paid"
+
+      firstOrder = Order("A-100")
+      secondOrder = Order("A-101")
+
+      firstOrder.addItem("keyboard", 50000, 1)
+      firstOrder.addItem("mouse", 20000, 2)
+      secondOrder.addItem("monitor", 180000, 1)
+
+      assert firstOrder.total() == 90000
+      assert secondOrder.total() == 180000
+      assert firstOrder.items != secondOrder.items
+
+      firstOrder.markPaid()
+      assert firstOrder.status == "paid"
+      assert secondOrder.status == "draft"
+
+      try:
+          secondOrder.addItem("broken item", -1000)
+      except ValueError as exc:
+          assert "price" in str(exc)
+
+      print("주문 객체 흐름 통과")
+  - type: "list"
+    items:
+    - "__init__에서 객체가 반드시 가져야 할 기본 상태를 만듭니다."
+    - "addItem, markPaid처럼 상태를 바꾸는 메서드에는 검증을 넣습니다."
+    - "서로 다른 인스턴스의 리스트가 독립적으로 움직이는지 반드시 확인합니다."
+    - "실무 변주: Order에 cancel()과 refund()를 추가하고, paid 이후에만 환불할 수 있도록 상태 전이를 검증해 보세요."
 
 - id: "practice"
   title: "Day 22 종합 복습"

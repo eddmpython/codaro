@@ -455,6 +455,125 @@ sections:
       result = shutil.make_archive(releaseArchive, 'zip', releaseDir)
       os.path.exists(result)
 
+- id: "workflow_validation"
+  title: "검증 루프: 안전한 백업 파이프라인"
+  subtitle: "복사, 압축, 검증, _backup 이동"
+  blocks:
+  - type: "text"
+    content: "shutil은 실제 파일을 복사·이동·삭제할 수 있으므로 실무에서는 작업공간을 먼저 격리하고, 복사 전후 파일 수와 압축 결과를 검증해야 합니다. 삭제 대신 _backup 이동 패턴을 사용하면 되돌릴 여지도 남길 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "백업 대상 프로젝트 준비"
+    description: "임시 프로젝트를 만들고 복사 전 파일 매니페스트를 계산합니다."
+    content: |-
+      import os
+      import shutil
+      import tempfile
+
+      backupRoot = tempfile.mkdtemp(prefix='codaro_shutil_workflow_')
+      projectDir = os.path.join(backupRoot, 'project')
+      os.makedirs(os.path.join(projectDir, 'src'), exist_ok=True)
+      os.makedirs(os.path.join(projectDir, 'data'), exist_ok=True)
+
+      projectFiles = {
+          os.path.join(projectDir, 'src', 'main.py'): "print('hello')\n",
+          os.path.join(projectDir, 'src', 'utils.py'): "VALUE = 42\n",
+          os.path.join(projectDir, 'data', 'sample.csv'): "id,value\n1,10\n",
+      }
+
+      for path, content in projectFiles.items():
+          with open(path, 'w', encoding='utf-8') as file:
+              file.write(content)
+
+      def countFiles(folder):
+          total = 0
+          for root, dirs, files in os.walk(folder):
+              total += len(files)
+          return total
+
+      sourceFileCount = countFiles(projectDir)
+
+      assert sourceFileCount == 3
+      assert os.path.exists(os.path.join(projectDir, 'src', 'main.py'))
+
+      sourceFileCount
+  - type: "code"
+    language: "python"
+    title: "copytree 충돌 오류 잡기"
+    description: "대상 폴더가 이미 있으면 copytree가 실패하는 상황을 검증합니다."
+    content: |-
+      backupDir = os.path.join(backupRoot, 'backup_copy')
+      shutil.copytree(projectDir, backupDir)
+
+      try:
+          shutil.copytree(projectDir, backupDir)
+      except FileExistsError as exc:
+          copyProblem = str(exc)
+
+      assert countFiles(backupDir) == sourceFileCount
+      assert copyProblem
+
+      copyProblem
+  - type: "code"
+    language: "python"
+    title: "압축 백업 검증"
+    description: "백업 폴더를 zip으로 압축하고 해제 후 파일 수를 비교합니다."
+    content: |-
+      archiveBase = os.path.join(backupRoot, 'project_backup')
+      archivePath = shutil.make_archive(archiveBase, 'zip', backupDir)
+      unpackDir = os.path.join(backupRoot, 'unpacked')
+      shutil.unpack_archive(archivePath, unpackDir)
+
+      assert os.path.exists(archivePath)
+      assert archivePath.endswith('.zip')
+      assert countFiles(unpackDir) == sourceFileCount
+
+      {"archive": archivePath, "unpackedFiles": countFiles(unpackDir)}
+  - type: "code"
+    language: "python"
+    title: "삭제 대신 _backup 이동"
+    description: "정리 대상 폴더를 삭제하지 않고 _backup 아래로 이동합니다."
+    content: |-
+      cleanupTarget = os.path.join(backupRoot, 'old_output')
+      os.makedirs(cleanupTarget, exist_ok=True)
+      with open(os.path.join(cleanupTarget, 'result.txt'), 'w', encoding='utf-8') as file:
+          file.write('old result')
+
+      backupShelf = os.path.join(backupRoot, '_backup')
+      os.makedirs(backupShelf, exist_ok=True)
+      archivedTarget = os.path.join(backupShelf, 'old_output')
+
+      if os.path.exists(archivedTarget):
+          raise FileExistsError(f"이미 백업 대상이 있습니다: {archivedTarget}")
+
+      shutil.move(cleanupTarget, archivedTarget)
+
+      assert not os.path.exists(cleanupTarget)
+      assert os.path.exists(os.path.join(archivedTarget, 'result.txt'))
+      assert os.path.commonpath([backupShelf, archivedTarget]) == backupShelf
+
+      archivedTarget
+  - type: "code"
+    language: "python"
+    title: "백업 이름 오류 확인"
+    description: "경로 구분자가 들어간 백업 이름은 작업공간 밖 이동 위험이 있어 차단합니다."
+    content: |-
+      def validateBackupName(name):
+          if os.path.basename(name) != name:
+              raise ValueError("backup name must not contain path separators")
+          return name
+
+      try:
+          validateBackupName("../old_output")
+      except ValueError as exc:
+          backupNameMessage = str(exc)
+
+      assert backupNameMessage == "backup name must not contain path separators"
+      assert validateBackupName("old_output") == "old_output"
+  - type: "tip"
+    title: "변주 실험"
+    content: "압축 파일 이름에 날짜를 붙이고, 같은 이름이 이미 있으면 덮어쓰기 대신 새 버전을 만들도록 백업 정책을 확장하세요."
+
 - id: "practice"
   title: "shutil 모듈 종합 복습"
   subtitle: "파일 연산 마스터하기"

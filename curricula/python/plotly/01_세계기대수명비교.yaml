@@ -192,6 +192,128 @@ sections:
   - type: tip
     content: title 파라미터는 문자열로 지정하며, 차트 상단 중앙에 표시됩니다. 제목은 간결하면서도 핵심 정보(무엇을, 언제, 어떻게)를 담아야 합니다. 나중에 update_layout(title=dict(text='제목', x=0.5, font_size=20))처럼 위치와 스타일을 세밀하게 조정할 수도 있습니다.
 
+- id: workflow_validation
+  title: 실무 막대 차트 검증
+  subtitle: 예측 → 오류 확인 → figure 검증 → 연도 기준 실험
+  blocks:
+  - type: text
+    content: |-
+      Plotly 차트는 화면에 보이는 것만으로 충분하지 않습니다. 실무 보고서에서는 어떤 연도 데이터인지, 몇 개 대륙이 들어갔는지, 제목·축·색상 그룹이 빠지지 않았는지 코드로 확인해야 합니다.
+
+      이번 단계에서는 기대수명 평균이 가장 높은 대륙을 먼저 예상하고, 색상 그룹이 빠진 차트를 일부러 실패시킵니다. 그다음 Figure 구조를 검증하고, 분석 연도를 바꿨을 때 결과가 어떻게 달라지는지 실험합니다.
+  - type: code
+    language: python
+    title: 분석 데이터 검증
+    description: 필수 컬럼과 최신 연도 확인
+    content: |-
+      requiredColumns = {"continent", "year", "lifeExp", "gdpPercap", "country"}
+      missingColumns = requiredColumns - set(df.columns)
+      if missingColumns:
+          raise ValueError(f"gapminder 데이터에 필요한 컬럼이 없습니다: {sorted(missingColumns)}")
+
+      latestYear = int(df["year"].max())
+      latestData = df[df["year"] == latestYear].copy()
+      latestLifeReport = (
+          latestData.groupby("continent", as_index=False)["lifeExp"]
+          .mean()
+          .sort_values("lifeExp", ascending=False)
+      )
+      expectedBestContinent = latestLifeReport.iloc[0]["continent"]
+
+      print("예상: 최신 연도 평균 기대수명이 가장 높은 대륙은", expectedBestContinent)
+      latestLifeReport
+  - type: code
+    language: python
+    title: Plotly 막대 차트 검사 함수
+    description: trace, 제목, 데이터 포인트 확인
+    content: |-
+      def validateContinentBarFigure(fig, expectedContinents, expectedTitle):
+          spec = fig.to_dict()
+          traces = spec.get("data", [])
+          if len(traces) != len(expectedContinents):
+              raise ValueError(f"색상 그룹 trace 수가 대륙 수와 다릅니다: {len(traces)} != {len(expectedContinents)}")
+
+          if not all(trace.get("type") == "bar" for trace in traces):
+              raise ValueError("모든 trace는 막대 그래프여야 합니다.")
+
+          observedContinents = {
+              xValue
+              for trace in traces
+              for xValue in trace.get("x", [])
+          }
+          if observedContinents != set(expectedContinents):
+              raise ValueError(f"차트 대륙 구성이 다릅니다: {sorted(observedContinents)}")
+
+          titleText = spec.get("layout", {}).get("title", {}).get("text", "")
+          if expectedTitle not in titleText:
+              raise ValueError("차트 제목에 분석 기준이 드러나지 않습니다.")
+
+          return spec
+
+
+      brokenBar = px.bar(latestLifeReport, x="continent", y="lifeExp")
+      try:
+          validateContinentBarFigure(
+              brokenBar,
+              expectedContinents=latestLifeReport["continent"].tolist(),
+              expectedTitle=str(latestYear),
+          )
+      except ValueError as exc:
+          print("의도한 오류 확인:", exc)
+      else:
+          raise AssertionError("색상 그룹이 없는 막대 차트를 통과시키면 안 됩니다.")
+  - type: code
+    language: python
+    title: 완성 차트 검증
+    description: 최신 연도 리포트 차트 구조 확인
+    content: |-
+      workflowBar = px.bar(
+          latestLifeReport,
+          x="continent",
+          y="lifeExp",
+          color="continent",
+          labels={"continent": "대륙", "lifeExp": "평균 기대수명(년)"},
+          title=f"{latestYear}년 대륙별 평균 기대수명 비교",
+      )
+
+      workflowSpec = validateContinentBarFigure(
+          workflowBar,
+          expectedContinents=latestLifeReport["continent"].tolist(),
+          expectedTitle=str(latestYear),
+      )
+
+      assert expectedBestContinent == "Oceania"
+      assert len(workflowSpec["data"]) == latestLifeReport["continent"].nunique()
+
+      print("검증 완료: trace", len(workflowSpec["data"]), "개")
+      workflowBar
+  - type: code
+    language: python
+    title: 연도 기준 실험
+    description: 과거와 최신 연도 평균 기대수명 비교
+    content: |-
+      def summarizeLifeByYear(data, year):
+          target = data[data["year"] == year]
+          if target.empty:
+              raise ValueError(f"{year}년 데이터가 없습니다.")
+          return (
+              target.groupby("continent", as_index=False)["lifeExp"]
+              .mean()
+              .rename(columns={"lifeExp": f"lifeExp_{year}"})
+          )
+
+
+      firstYear = int(df["year"].min())
+      firstSummary = summarizeLifeByYear(df, firstYear)
+      latestSummary = summarizeLifeByYear(df, latestYear)
+      comparison = firstSummary.merge(latestSummary, on="continent")
+      comparison["improvement"] = comparison[f"lifeExp_{latestYear}"] - comparison[f"lifeExp_{firstYear}"]
+
+      assert (comparison["improvement"] > 0).all()
+      assert comparison["improvement"].max() > comparison["improvement"].min()
+
+      comparison.sort_values("improvement", ascending=False)
+
 - id: practice
   title: 실습
   subtitle: gapminder 데이터 분석 프로젝트

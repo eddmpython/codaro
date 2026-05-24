@@ -3,7 +3,7 @@ meta:
   title: "제너레이터와 이터레이터"
   day: 27
   category: "30days"
-  tags: []
+  tags: ["제너레이터", "이터레이터", "yield", "스트리밍", "메모리효율", "검증"]
   seo:
     title: "파이썬 제너레이터와 이터레이터 - 효율적인 순회"
     description: "yield, generator, iter, next, iterator protocol을 배웁니다."
@@ -353,6 +353,140 @@ sections:
       outcomes
   - type: "tip"
     content: "제너레이터는 필요한 만큼만 값을 생성하므로 대용량 데이터 처리에 이상적입니다."
+
+- id: "workflow_validation"
+  title: "실무 스트리밍 처리 루프"
+  subtitle: "예측 → 지연 처리 → 소진 확인 → 검증"
+  blocks:
+  - type: "text"
+    content: "제너레이터는 단순히 yield를 쓰는 문법이 아니라, 로그나 이벤트처럼 많은 데이터를 한 번에 메모리에 올리지 않고 필요한 만큼만 처리하는 방식입니다. 실행 전에는 어떤 이벤트가 통과할지 예측하고, 제너레이터가 한 번 소진되면 다시 쓸 수 없다는 점까지 검증해야 합니다."
+  - type: "list"
+    items:
+    - "필터 제너레이터는 조건에 맞는 이벤트만 흘려보냅니다."
+    - "변환 제너레이터는 원본 이벤트를 리포트용 구조로 바꿉니다."
+    - "배치 제너레이터는 스트림을 작은 묶음으로 나눕니다."
+    - "한 번 순회한 제너레이터를 다시 쓰면 빈 결과가 나오는 오류를 확인합니다."
+  - type: "code"
+    language: "python"
+    title: "이벤트 스트림 준비"
+    description: "실행 전에 어떤 이벤트가 경고 리포트에 들어갈지 먼저 예측해보세요."
+    content: |-
+      eventRows = [
+          {"id": "E-1", "level": "info", "service": "api", "latencyMs": 120},
+          {"id": "E-2", "level": "warning", "service": "worker", "latencyMs": 480},
+          {"id": "E-3", "level": "error", "service": "api", "latencyMs": 900},
+          {"id": "E-4", "level": "info", "service": "web", "latencyMs": 80},
+          {"id": "E-5", "level": "error", "service": "worker", "latencyMs": 1100},
+      ]
+
+      len(eventRows)
+  - type: "code"
+    language: "python"
+    title: "필터와 변환 제너레이터"
+    description: "경고 이상 이벤트만 통과시키고 리포트 행으로 바꿉니다."
+    content: |-
+      def iterAlertEvents(events):
+          for event in events:
+              if event["level"] in {"warning", "error"}:
+                  yield event
+
+      def iterReportRows(events):
+          for event in events:
+              yield {
+                  "id": event["id"],
+                  "service": event["service"],
+                  "severity": event["level"].upper(),
+                  "slow": event["latencyMs"] >= 800,
+              }
+
+      alertStream = iterAlertEvents(eventRows)
+      reportStream = iterReportRows(alertStream)
+      reportRows = list(reportStream)
+      reportRows
+  - type: "code"
+    language: "python"
+    title: "소진된 제너레이터 오류 확인"
+    description: "한 번 사용한 제너레이터를 다시 읽으면 빈 결과가 나오는지 확인합니다."
+    content: |-
+      secondRead = list(alertStream)
+      generatorConsumed = secondRead == []
+      generatorConsumed
+  - type: "code"
+    language: "python"
+    title: "필수 키 오류 확인"
+    description: "스트림 처리 중 필수 키가 빠진 이벤트를 잡아냅니다."
+    content: |-
+      def iterValidatedEvents(events):
+          requiredKeys = {"id", "level", "service", "latencyMs"}
+          for rowNumber, event in enumerate(events, start=1):
+              missingKeys = sorted(requiredKeys - set(event))
+              if missingKeys:
+                  raise ValueError(f"{rowNumber}번째 이벤트 필수값 누락: {missingKeys}")
+              yield event
+
+      brokenEvents = eventRows + [{"id": "E-999", "level": "error", "service": "api"}]
+      try:
+          list(iterValidatedEvents(brokenEvents))
+      except ValueError as exc:
+          eventErrorMessage = str(exc)
+
+      eventErrorMessage
+  - type: "code"
+    language: "python"
+    title: "배치 제너레이터로 나누기"
+    description: "리포트 행을 일정 크기씩 묶어 전송 가능한 단위로 만듭니다."
+    content: |-
+      def iterBatches(rows, size):
+          batch = []
+          for row in rows:
+              batch.append(row)
+              if len(batch) == size:
+                  yield batch
+                  batch = []
+          if batch:
+              yield batch
+
+      alertRows = list(iterReportRows(iterAlertEvents(eventRows)))
+      alertBatches = list(iterBatches(alertRows, 2))
+      alertBatches
+  - type: "code"
+    language: "python"
+    title: "예상값으로 검증"
+    description: "스트리밍 처리 결과를 예상한 리포트와 비교합니다."
+    content: |-
+      expectedReportRows = [
+          {"id": "E-2", "service": "worker", "severity": "WARNING", "slow": False},
+          {"id": "E-3", "service": "api", "severity": "ERROR", "slow": True},
+          {"id": "E-5", "service": "worker", "severity": "ERROR", "slow": True},
+      ]
+
+      checks = {
+          "rowsOk": reportRows == expectedReportRows,
+          "consumedOk": generatorConsumed,
+          "errorOk": eventErrorMessage == "6번째 이벤트 필수값 누락: ['latencyMs']",
+          "batchOk": [len(batch) for batch in alertBatches] == [2, 1],
+      }
+
+      assert all(checks.values())
+      checks
+  - type: "code"
+    language: "python"
+    title: "수정 실험"
+    description: "느림 기준을 바꾸면 slow 판정이 어떻게 달라지는지 비교합니다."
+    content: |-
+      def iterReportRowsWithThreshold(events, slowThreshold):
+          for event in events:
+              yield {
+                  "id": event["id"],
+                  "slow": event["latencyMs"] >= slowThreshold,
+              }
+
+      slow800 = list(iterReportRowsWithThreshold(iterAlertEvents(eventRows), 800))
+      slow400 = list(iterReportRowsWithThreshold(iterAlertEvents(eventRows), 400))
+
+      slow800, slow400
+  - type: "tip"
+    content: "제너레이터는 대용량 데이터에서 강력하지만 한 번 흘러간 스트림은 다시 읽을 수 없습니다. 필요한 결과는 리스트나 파일로 남기고, 검증은 작은 샘플 스트림으로 먼저 통과시키세요."
 
 - id: "practice"
   title: "Day 27 종합 복습"

@@ -3,7 +3,7 @@ meta:
   title: "추상 클래스와 프로토콜"
   day: 8
   category: "advancedPython"
-  tags: ["abc", "abstractmethod", "Protocol", "duck typing"]
+  tags: ["abc", "abstractmethod", "Protocol", "duck typing", "검증", "인터페이스설계"]
   seo:
     title: "파이썬 ABC와 Protocol - 인터페이스 설계 완벽 가이드"
     description: "추상 클래스와 프로토콜로 인터페이스를 설계합니다. ABC, abstractmethod, 덕 타이핑, typing.Protocol 완벽 이해."
@@ -556,6 +556,80 @@ sections:
       isinstance(ExternalClass(), Printable)
   - type: "tip"
     content: "가상 서브클래스는 isinstance를 통과하지만 실제로 추상 메서드 구현을 강제하지는 않습니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 내보내기 인터페이스 설계하기"
+  subtitle: "예측 → 명시 계약 → 구조적 타입 → 실패 확인"
+  blocks:
+  - type: "text"
+    content: "ABC는 런타임 계약을 강제하고, Protocol은 구조적 타입으로 기존 객체와의 결합을 줄입니다. 리포트 내보내기 흐름에서 저장소는 ABC로 강제하고 포맷터는 Protocol로 유연하게 받습니다."
+  - type: "code"
+    language: "python"
+    title: "ABC와 Protocol을 함께 쓰는 내보내기"
+    description: "메모리 저장소와 포맷터 계약을 검증합니다."
+    content: |-
+      from abc import ABC, abstractmethod
+      from typing import Protocol, runtime_checkable
+
+      @runtime_checkable
+      class RowFormatter(Protocol):
+          def render(self, rows: list[dict]) -> str:
+              ...
+
+      class ReportSink(ABC):
+          @abstractmethod
+          def write(self, name: str, content: str) -> str:
+              pass
+
+      class CsvFormatter:
+          def render(self, rows):
+              header = ",".join(rows[0])
+              lines = [header]
+              for row in rows:
+                  lines.append(",".join(str(row[key]) for key in rows[0]))
+              return "\n".join(lines)
+
+      class MemorySink(ReportSink):
+          def __init__(self):
+              self.files = {}
+
+          def write(self, name, content):
+              self.files[name] = content
+              return name
+
+      def exportRows(formatter: RowFormatter, sink: ReportSink, name: str, rows: list[dict]):
+          if not isinstance(formatter, RowFormatter):
+              raise TypeError("formatter must implement render")
+          content = formatter.render(rows)
+          return sink.write(name, content)
+
+      rows = [{"id": "A-100", "amount": 12000}, {"id": "A-101", "amount": 9000}]
+      sink = MemorySink()
+      savedName = exportRows(CsvFormatter(), sink, "orders.csv", rows)
+
+      assert savedName == "orders.csv"
+      assert sink.files["orders.csv"] == "id,amount\nA-100,12000\nA-101,9000"
+      assert isinstance(CsvFormatter(), RowFormatter)
+
+      try:
+          ReportSink()
+      except TypeError as exc:
+          assert "abstract" in str(exc)
+
+      try:
+          exportRows(object(), sink, "broken.csv", rows)
+      except TypeError as exc:
+          assert "formatter" in str(exc)
+
+      print("ABC와 Protocol 내보내기 흐름 통과")
+  - type: "list"
+    items:
+    - "런타임에 반드시 강제해야 하는 저장 동작은 ABC로 막습니다."
+    - "포맷터처럼 기존 객체도 받아야 하는 계약은 Protocol이 더 유연합니다."
+    - "인터페이스 설계는 정상 경로보다 계약 위반이 어떻게 실패하는지까지 보여야 합니다."
+  - type: "tip"
+    title: "변주 실험"
+    content: "JSON 포맷터를 추가하고, 기존 `exportRows` 함수는 수정하지 않은 채 저장 결과만 assert로 추가하세요."
 
 - id: "practice"
   title: "종합 복습"

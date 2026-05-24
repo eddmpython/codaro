@@ -8,7 +8,7 @@ meta:
   category: numpy
   difficulty: "⭐⭐"
   badge: 기초
-  tags: ["numpy", "boolean indexing", "where", "unique", "percentile", "argsort"]
+  tags: ["numpy", "boolean indexing", "where", "unique", "percentile", "argsort", "검증", "조건선택"]
   seo:
     title: "NumPy 불리언 인덱싱 - 지진 데이터 분석"
     description: "NumPy의 불리언 인덱싱과 조건 선택을 배우며 전 세계 지진 발생 데이터를 분석합니다."
@@ -45,8 +45,9 @@ sections:
     title: 지진 데이터 로드
     description: Plotly 데이터셋에서 지진 데이터를 불러옵니다
     content: |-
-      url = "https://raw.githubusercontent.com"
-      df = pd.read_csv(f"{url}/plotly/datasets/master/earthquakes-23k.csv")
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("earthquakes")
       df.head()
 
 - id: step3_extract
@@ -258,6 +259,52 @@ sections:
   - type: tip
     content: np.argsort()는 정렬된 인덱스를 반환합니다. [::-1]로 역순으로 만들어 내림차순 정렬 인덱스를 얻습니다.
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 지진 위험 이벤트 필터링"
+  subtitle: "불리언 인덱싱, percentile, argsort, 실패 케이스"
+  blocks:
+  - type: text
+    content: "조건 선택은 눈으로 맞아 보이는 결과보다 마스크의 의미가 중요합니다. 규모와 깊이 조건을 분리해서 예측하고, 상위 위험 이벤트가 올바른 순서로 뽑히는지 검증하세요."
+  - type: code
+    language: python
+    title: "위험 지진 후보 추출"
+    description: "규모, 깊이, 분위수 기준을 조합해 후보를 정렬합니다."
+    content: |-
+      import numpy as np
+
+      magnitude = np.array([4.8, 5.1, 6.3, 4.2, 7.0])
+      depth = np.array([10, 70, 25, 12, 40])
+      eventIds = np.array(["E-1", "E-2", "E-3", "E-4", "E-5"])
+
+      shallowStrong = (magnitude >= 5.0) & (depth <= 50)
+      threshold = np.percentile(magnitude, 80)
+      topOrder = np.argsort(magnitude)[::-1]
+
+      assert eventIds[shallowStrong].tolist() == ["E-3", "E-5"]
+      assert round(float(threshold), 2) == 6.44
+      assert eventIds[topOrder[:2]].tolist() == ["E-5", "E-3"]
+  - type: code
+    language: python
+    title: "배열 길이 불일치 차단"
+    description: "규모와 깊이 배열 길이가 다르면 조건 결합 전에 멈춥니다."
+    content: |-
+      import numpy as np
+
+      def validateEarthquakeArrays(magnitude, depth):
+          if len(magnitude) != len(depth):
+              raise ValueError("magnitude and depth must have the same length")
+          return np.array(magnitude), np.array(depth)
+
+      try:
+          validateEarthquakeArrays([5.0, 6.0], [10])
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "magnitude and depth must have the same length"
+  - type: tip
+    title: "변주 실험"
+    content: "깊이가 얕은 지진보다 대도시 근접 지진을 더 위험하게 보는 정책으로 바꾸고, 정렬 기준 배열을 새로 만들어 비교하세요."
+
 - id: practice
   title: 실습
   subtitle: 지진 데이터 분석
@@ -275,8 +322,14 @@ sections:
         import numpy as np
         import pandas as pd
 
-        url = "https://raw.githubusercontent.com"
-        data = pd.read_csv(f"{url}/plotly/datasets/master/earthquakes-23k.csv")
+        data = pd.DataFrame({
+            'Date': ['2026-01-01', '2026-01-03', '2026-01-05', '2026-01-07',
+                     '2026-01-09', '2026-01-11', '2026-01-13', '2026-01-15'],
+            'Latitude': [35.2, -6.1, 38.4, -12.7, 52.1, 19.4, -3.2, 41.7],
+            'Longitude': [139.1, 106.8, -122.3, -77.0, -168.4, -155.2, 142.1, 29.0],
+            'Magnitude': [4.8, 5.6, 3.2, 6.1, 7.0, 4.2, 5.9, 6.5],
+            'Depth': [35, 12, 8, 70, 25, 18, 45, 10],
+        })
         mag = data['Magnitude'].values
     - type: code
       title: "규모별 분석"
@@ -298,8 +351,14 @@ sections:
         import numpy as np
         import pandas as pd
 
-        src = "https://raw.githubusercontent.com"
-        df = pd.read_csv(f"{src}/plotly/datasets/master/earthquakes-23k.csv")
+        df = pd.DataFrame({
+            'Date': ['2026-01-01', '2026-01-03', '2026-01-05', '2026-01-07',
+                     '2026-01-09', '2026-01-11', '2026-01-13', '2026-01-15'],
+            'Latitude': [35.2, -6.1, 38.4, -12.7, 52.1, 19.4, -3.2, 41.7],
+            'Longitude': [139.1, 106.8, -122.3, -77.0, -168.4, -155.2, 142.1, 29.0],
+            'Magnitude': [4.8, 5.6, 3.2, 6.1, 7.0, 4.2, 5.9, 6.5],
+            'Depth': [35, 12, 8, 70, 25, 18, 45, 10],
+        })
         mag = df['Magnitude'].values
         lat = df['Latitude'].values
     - type: code

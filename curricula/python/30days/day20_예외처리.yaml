@@ -3,7 +3,7 @@ meta:
   title: "예외처리"
   day: 20
   category: "30days"
-  tags: []
+  tags: ["예외처리", "try", "except", "finally", "raise", "validation"]
   seo:
     title: "파이썬 예외 처리 - try, except, finally"
     description: "try, except, finally, raise로 에러를 처리하는 방법을 배웁니다."
@@ -27,7 +27,7 @@ sections:
   - type: "list"
     items:
     - "try: 실행할 코드"
-    - "except: 에러 처리"
+    - "except 예외타입: 예상한 에러 처리"
     - "에러 발생시 except 실행"
     - "프로그램 중단 방지"
   - type: "code"
@@ -37,7 +37,7 @@ sections:
     content: |-
       try:
           result = 10 / 0
-      except:
+      except ZeroDivisionError:
           result = 'Error occurred'
 
       result
@@ -48,7 +48,7 @@ sections:
     content: |-
       try:
           value = 10 / 2
-      except:
+      except ZeroDivisionError:
           value = 'Error'
 
       value
@@ -60,7 +60,7 @@ sections:
       def safeDivide(a, b):
           try:
               return a / b
-          except:
+          except ZeroDivisionError:
               return 0
 
       safeDivide(10, 0)
@@ -164,8 +164,8 @@ sections:
           elem = nums[1]
       except IndexError:
           elem = 'Index error'
-      except:
-          elem = 'Other error'
+      except TypeError:
+          elem = 'Type error'
 
       elem
   - type: "tip"
@@ -190,7 +190,7 @@ sections:
     content: |-
       try:
           calc = 10 / 2
-      except:
+      except ZeroDivisionError:
           calc = 0
       finally:
           status = 'Completed'
@@ -214,16 +214,20 @@ sections:
     title: "리소스 정리"
     description: "파일 등의 리소스를 정리합니다."
     content: |-
-      opened = False
+      import tempfile
+      from pathlib import Path
+
+      handle = None
       try:
-          f = open('test.txt', 'w')
-          opened = True
-          f.write('Data')
-      except:
+          with tempfile.TemporaryDirectory() as tempDir:
+              filePath = Path(tempDir) / 'test.txt'
+              handle = filePath.open('w', encoding='utf-8')
+              handle.write('Data')
+      except OSError:
           content = 'Error'
       finally:
-          if opened:
-              f.close()
+          if handle is not None and not handle.closed:
+              handle.close()
           content = 'Closed'
 
       content
@@ -335,12 +339,108 @@ sections:
       def safeConvert(text):
           try:
               return int(text)
-          except ValueError as e:
-              return str(e)
+          except ValueError as exc:
+              return str(exc)
 
       safeConvert('abc')
   - type: "tip"
     content: "예외 메시지를 확인하면 문제를 파악하기 쉽습니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 실패를 설명하는 예외 처리"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "좋은 예외 처리는 프로그램을 조용히 살리는 것이 아니라, 어떤 입력이 왜 실패했는지 설명하고 필요한 곳에서만 복구하는 것입니다. 이 루프에서는 숫자 변환, 필수 필드 검증, 파일 읽기를 좁힌 예외로 처리합니다."
+  - type: "code"
+    language: "python"
+    title: "입력 변환 실패를 명확히 설명한다"
+    description: "원래 ValueError를 보존하면서 업무 메시지를 붙입니다."
+    content: |-
+      def parseQuantity(text):
+          try:
+              quantity = int(text)
+          except ValueError as exc:
+              raise ValueError(f'quantity must be integer: {text!r}') from exc
+
+          if quantity <= 0:
+              raise ValueError('quantity must be positive')
+          return quantity
+
+      assert parseQuantity('3') == 3
+
+      try:
+          parseQuantity('3개')
+      except ValueError as exc:
+          quantityProblem = str(exc)
+
+      assert 'integer' in quantityProblem
+      quantityProblem
+  - type: "code"
+    language: "python"
+    title: "필수 필드 누락을 데이터 오류로 반환한다"
+    description: "KeyError와 ValueError를 각각 의미 있는 결과로 바꿉니다."
+    content: |-
+      def normalizeOrder(row):
+          try:
+              orderId = row['id']
+              quantity = parseQuantity(row['quantity'])
+          except KeyError as exc:
+              return {'ok': False, 'error': f'missing field: {exc.args[0]}'}
+          except ValueError as exc:
+              return {'ok': False, 'error': str(exc)}
+
+          return {'ok': True, 'orderId': orderId, 'quantity': quantity}
+
+      validOrder = normalizeOrder({'id': 'A-100', 'quantity': '2'})
+      invalidOrder = normalizeOrder({'id': 'A-101', 'quantity': 'zero'})
+      missingOrder = normalizeOrder({'quantity': '1'})
+
+      assert validOrder == {'ok': True, 'orderId': 'A-100', 'quantity': 2}
+      assert invalidOrder['ok'] is False and 'integer' in invalidOrder['error']
+      assert missingOrder['error'] == 'missing field: id'
+      [validOrder, invalidOrder, missingOrder]
+  - type: "code"
+    language: "python"
+    title: "파일 오류는 OSError 계열로 좁힌다"
+    description: "없는 파일과 읽기 오류를 예상 가능한 실패 결과로 처리합니다."
+    content: |-
+      from pathlib import Path
+
+      def readConfig(path):
+          try:
+              return {'ok': True, 'text': Path(path).read_text(encoding='utf-8')}
+          except FileNotFoundError:
+              return {'ok': False, 'error': 'config file not found'}
+          except OSError as exc:
+              return {'ok': False, 'error': f'config read failed: {exc}'}
+
+      configResult = readConfig('missing-config.json')
+
+      assert configResult == {'ok': False, 'error': 'config file not found'}
+      configResult
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 처리 요약 만들기"
+    description: "성공/실패를 집계해 다음 단계에서 판단할 수 있게 만듭니다."
+    content: |-
+      orders = [
+          {'id': 'A-100', 'quantity': '2'},
+          {'id': 'A-101', 'quantity': '0'},
+          {'quantity': '5'}
+      ]
+
+      normalizedOrders = [normalizeOrder(order) for order in orders]
+      summary = {
+          'successCount': sum(item['ok'] for item in normalizedOrders),
+          'failureCount': sum(not item['ok'] for item in normalizedOrders),
+          'errors': [item['error'] for item in normalizedOrders if not item['ok']]
+      }
+
+      assert summary['successCount'] == 1
+      assert summary['failureCount'] == 2
+      assert any('positive' in error for error in summary['errors'])
+      summary
 
 - id: "practice"
   title: "Day 20 종합 복습"
@@ -354,7 +454,7 @@ sections:
     code: |-
       try:
           divResult = 10 / 0
-      except:
+      except ZeroDivisionError:
           divResult = 'Error'
 
       divResult
@@ -374,7 +474,7 @@ sections:
     code: |-
       try:
           calcRes = 10 / 2
-      except:
+      except ZeroDivisionError:
           calcRes = 0
       finally:
           state = 'Done'
@@ -500,11 +600,11 @@ sections:
     code: |-
       def readFile(path):
           try:
-              with open(path, 'r') as f:
+              with open(path, 'r', encoding='utf-8') as f:
                   return f.read()
           except FileNotFoundError:
               return 'File not found'
-          except:
+          except OSError:
               return 'Error'
 
       readFile('missing.txt')
@@ -512,15 +612,22 @@ sections:
   - type: "expansion"
     title: "🔴 심화2-2: 안전한 파일 쓰기"
     code: |-
+      import tempfile
+      from pathlib import Path
+
       def writeFile(path, content):
           try:
-              with open(path, 'w') as writer:
+              with open(path, 'w', encoding='utf-8') as writer:
                   writer.write(content)
               return 'Success'
-          except:
+          except OSError:
               return 'Failed'
 
-      writeFile('output.txt', 'Test')
+      with tempfile.TemporaryDirectory() as tempDir:
+          outputPath = Path(tempDir) / 'output.txt'
+          writeStatus = writeFile(outputPath, 'Test')
+
+      writeStatus
 
   - type: "expansion"
     title: "🔴 심화3-1: 계산기"
@@ -571,7 +678,7 @@ sections:
               for key in dict2:
                   merged[key] = dict2[key]
               return merged
-          except:
+          except (TypeError, KeyError):
               return {}
 
       merge({'a': 1}, {'b': 2})

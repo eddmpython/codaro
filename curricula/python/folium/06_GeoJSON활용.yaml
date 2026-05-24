@@ -526,6 +526,206 @@ sections:
 
       zoneMap
 
+- id: step11_workflow
+  title: 11단계. GeoJSON 경계 데이터 검증
+  subtitle: 좌표 순서와 속성 누락 확인
+  blocks:
+  - type: text
+    content: GeoJSON 업무에서 가장 흔한 오류는 지도가 안 그려지는 문제가 아니라, 그럴듯하게 그려졌지만 좌표 순서나 속성 키가 틀린 상태입니다. 실행 전에 [경도, 위도] 순서를 예측하고, 폴리곤이 닫혔는지, 필수 속성이 있는지 검증해야 합니다.
+  - type: list
+    items:
+    - "GeoJSON 좌표는 [경도, 위도] 순서입니다."
+    - "Polygon의 첫 좌표와 마지막 좌표는 같아야 합니다."
+    - "업무 지도에 필요한 properties 키는 렌더 전에 검증합니다."
+    - "경계 수정 실험은 면적/구역 수/HTML 렌더 결과를 함께 확인합니다."
+  - type: code
+    language: python
+    title: 배달 권역 GeoJSON 준비
+    description: 권역 경계를 만들고 검증할 필수 속성을 정합니다.
+    content: |-
+      deliveryZonesGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.970, 37.560],
+                          [126.985, 37.560],
+                          [126.985, 37.572],
+                          [126.970, 37.572],
+                          [126.970, 37.560],
+                      ]],
+                  },
+                  "properties": {"zoneId": "A", "name": "중심 권역", "slaMinutes": 25},
+              },
+              {
+                  "type": "Feature",
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [126.985, 37.560],
+                          [127.000, 37.560],
+                          [127.000, 37.572],
+                          [126.985, 37.572],
+                          [126.985, 37.560],
+                      ]],
+                  },
+                  "properties": {"zoneId": "B", "name": "동부 권역", "slaMinutes": 35},
+              },
+          ],
+      }
+
+      requiredProperties = {"zoneId", "name", "slaMinutes"}
+      len(deliveryZonesGeo["features"]), requiredProperties
+  - type: code
+    language: python
+    title: 구조 검증 함수 만들기
+    description: 좌표 순서, 닫힌 폴리곤, 필수 속성을 실행 전에 검사합니다.
+    content: |-
+      def validateDeliveryZones(geoJson):
+          for feature in geoJson["features"]:
+              properties = feature.get("properties", {})
+              missing = sorted(requiredProperties - set(properties))
+              if missing:
+                  raise ValueError(f"필수 속성 누락: {properties.get('name', 'unknown')} {missing}")
+
+              ring = feature["geometry"]["coordinates"][0]
+              if ring[0] != ring[-1]:
+                  raise ValueError(f"닫히지 않은 폴리곤: {properties['name']}")
+
+              for lon, lat in ring:
+                  if not (124 <= lon <= 132 and 33 <= lat <= 39):
+                      raise ValueError(f"좌표 순서 오류: {properties['name']}")
+          return True
+
+      validateDeliveryZones(deliveryZonesGeo)
+  - type: code
+    language: python
+    title: 좌표 순서 오류 확인
+    description: Folium 좌표 순서처럼 [위도, 경도]를 넣으면 검증에서 잡히는지 확인합니다.
+    content: |-
+      brokenCoordinateGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  **deliveryZonesGeo["features"][0],
+                  "geometry": {
+                      "type": "Polygon",
+                      "coordinates": [[
+                          [37.560, 126.970],
+                          [37.560, 126.985],
+                          [37.572, 126.985],
+                          [37.572, 126.970],
+                          [37.560, 126.970],
+                      ]],
+                  },
+              }
+          ],
+      }
+
+      try:
+          validateDeliveryZones(brokenCoordinateGeo)
+      except ValueError as exc:
+          coordinateOrderError = str(exc)
+
+      coordinateOrderError
+  - type: code
+    language: python
+    title: 속성 누락 오류 확인
+    description: SLA 속성이 빠진 권역을 검증해 오류 메시지를 읽습니다.
+    content: |-
+      brokenPropertyGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "geometry": deliveryZonesGeo["features"][0]["geometry"],
+                  "properties": {"zoneId": "C", "name": "누락 권역"},
+              }
+          ],
+      }
+
+      try:
+          validateDeliveryZones(brokenPropertyGeo)
+      except ValueError as exc:
+          propertyError = str(exc)
+
+      propertyError
+  - type: code
+    language: python
+    title: 검증된 권역 지도 생성
+    description: SLA 기준으로 색을 나누고 렌더링합니다.
+    content: |-
+      validateDeliveryZones(deliveryZonesGeo)
+      deliveryMap = folium.Map(location=[37.566, 126.985], zoom_start=13, tiles="CartoDB Positron")
+
+      def deliveryStyle(feature):
+          sla = feature["properties"]["slaMinutes"]
+          fillColor = "#2ecc71" if sla <= 30 else "#f39c12"
+          return {
+              "fillColor": fillColor,
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.55,
+          }
+
+      folium.GeoJson(
+          deliveryZonesGeo,
+          style_function=deliveryStyle,
+          tooltip=folium.GeoJsonTooltip(
+              fields=["zoneId", "name", "slaMinutes"],
+              aliases=["권역:", "이름:", "목표 배송분:"],
+          ),
+      ).add_to(deliveryMap)
+
+      deliveryMap
+  - type: code
+    language: python
+    title: 렌더 결과 검증
+    description: 권역 이름과 오류 메시지가 예상대로 준비됐는지 점검합니다.
+    content: |-
+      deliveryHtml = deliveryMap.get_root().render()
+      zoneNames = [feature["properties"]["name"] for feature in deliveryZonesGeo["features"]]
+
+      import json
+      def renderedContains(html, text):
+          escaped = json.dumps(text, ensure_ascii=True)[1:-1]
+          return text in html or escaped in html
+
+      checks = {
+          "zonesRendered": all(renderedContains(deliveryHtml, name) for name in zoneNames),
+          "coordinateErrorOk": coordinateOrderError == "좌표 순서 오류: 중심 권역",
+          "propertyErrorOk": propertyError == "필수 속성 누락: 누락 권역 ['slaMinutes']",
+      }
+
+      assert all(checks.values()), checks
+      checks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: SLA 기준을 바꾸면 어떤 권역이 지연 위험으로 분류되는지 비교합니다.
+    content: |-
+      def classifySla(feature, targetMinutes):
+          sla = feature["properties"]["slaMinutes"]
+          return "정상" if sla <= targetMinutes else "지연 위험"
+
+      currentClasses = {
+          feature["properties"]["zoneId"]: classifySla(feature, 30)
+          for feature in deliveryZonesGeo["features"]
+      }
+      relaxedClasses = {
+          feature["properties"]["zoneId"]: classifySla(feature, 40)
+          for feature in deliveryZonesGeo["features"]
+      }
+
+      assert currentClasses["B"] == "지연 위험"
+      assert relaxedClasses["B"] == "정상"
+      currentClasses, relaxedClasses
+  - type: tip
+    content: GeoJSON은 좌표 순서와 속성 키가 맞아야 분석 지도로 믿을 수 있습니다. 지도 렌더링 전 검증 함수를 통과시키는 습관이 실무 품질을 만듭니다.
+
 - id: practice
   title: 실습
   subtitle: GeoJSON 활용

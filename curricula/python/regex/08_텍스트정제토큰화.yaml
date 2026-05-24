@@ -13,7 +13,7 @@ meta:
 
 intro:
   emoji: "🧹"
-  goal: Bacon Ipsum 텍스트를 정제하고 토큰화하여 LLM 입력 준비합니다.
+  goal: 로컬 노이즈 텍스트를 정제하고 토큰화하여 LLM 입력을 준비합니다.
   description: LLM 전처리의 핵심 단계입니다. 노이즈 제거, 정규화, 토큰화를 통해 토큰 수를 최소화하고 품질을 높입니다.
 
 sections:
@@ -24,26 +24,28 @@ sections:
   - type: code
     language: python
     title: 라이브러리 불러오기
-    description: 정규표현식과 데이터 로드
+    description: 정규표현식 모듈
     content: |-
       import re
-      import json
-      from urllib.request import urlopen
-
 - id: step2_load_text
   title: 2단계. 텍스트 데이터 로드
-  subtitle: Bacon Ipsum API
+  subtitle: 로컬 노이즈 텍스트
   blocks:
   - type: text
-    content: Bacon Ipsum API에서 더미 텍스트를 가져옵니다. Bacon Ipsum은 Lorem Ipsum의 재미있는 대안으로, 고기 관련 단어로 구성된 가짜 텍스트를 생성합니다. 실제 웹 콘텐츠처럼 다양한 형태의 노이즈가 포함되어 있어 텍스트 정제 실습에 적합합니다.
+    content: 실제 고객 피드백, 지원 티켓, 검색 로그처럼 노이즈가 섞인 로컬 문단을 준비합니다. 특수문자, 반복 단어, 줄바꿈, 대소문자 혼재가 들어 있어 텍스트 정제와 토큰화 흐름을 네트워크 없이 안정적으로 연습할 수 있습니다.
   - type: code
     language: python
-    title: Bacon Ipsum 로드
-    description: 5개 문단의 텍스트 생성
+    title: 로컬 텍스트 로드
+    description: 노이즈가 포함된 로컬 텍스트를 준비합니다
     content: |-
-      textData = json.loads(
-          urlopen("https://baconipsum.com/api/?type=all-meat&paras=5").read()
-      )
+      textData = [
+          "Customer feedback!!!  Delivery was fast, but packaging   had extra spaces.",
+          "Support tickets mention login-errors, slow pages, and repeated repeated words.",
+          "LLM preprocessing should remove noise; normalize whitespace; keep useful terms.",
+          "Product reviews include UPPERCASE words, punctuation??? and line\nbreaks.",
+          "Search logs contain query fragments, duplicate tokens, and messy separators.",
+      ]
+
       rawText = " ".join(textData)
       rawText[:300]
   - type: text
@@ -292,18 +294,19 @@ sections:
             stats[d] = stats.get(d, 0) + 1
         stats
   - type: expansion
-    title: "미션2: Bacon Ipsum 전처리 파이프라인"
+    title: "미션2: 로컬 텍스트 전처리 파이프라인"
     blocks:
     - type: code
       title: "데이터 로드"
       content: |-
         import re
-        import json
-        from urllib.request import urlopen
 
-        data = json.loads(
-            urlopen("https://baconipsum.com/api/?type=all-meat&paras=3").read()
-        )
+        data = [
+            "Customer feedback!!!  Delivery was fast, but packaging   had extra spaces.",
+            "Support tickets mention login-errors, slow pages, and repeated repeated words.",
+            "LLM preprocessing should remove noise; normalize whitespace; keep useful terms.",
+        ]
+
         raw = " ".join(data)
         raw[:100]
     - type: code
@@ -333,3 +336,89 @@ sections:
     - "토큰화 - 단어 단위 분리"
   - type: text
     content: 다음은 심화 단계입니다! lookahead와 lookbehind를 배웁니다.
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 연락처 텍스트 정제 파이프라인"
+  subtitle: "예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주"
+  blocks:
+  - type: text
+    content: "정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다."
+  - type: code
+    language: python
+    title: "이메일과 전화번호 추출"
+    description: "실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다."
+    content: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+  - type: code
+    language: python
+    title: "패턴 오류와 빈 입력을 먼저 실패시킨다"
+    description: "컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다."
+    content: |-
+      try:
+          re.compile(r'([A-Z]+')
+      except re.error as exc:
+          regexCompileError = str(exc)
+
+      def extractRequiredEmails(text):
+          found = emailPattern.findall(text)
+          if not found:
+              raise ValueError('email not found')
+          return found
+
+      try:
+          extractRequiredEmails('no contact here')
+      except ValueError as exc:
+          emailExtractError = str(exc)
+
+      assert regexCompileError
+      assert emailExtractError == 'email not found'
+      regexCompileError, emailExtractError
+  - type: code
+    language: python
+    title: "정제 결과를 업무 구조로 검증"
+    description: "추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다."
+    content: |-
+      def maskEmail(email):
+          name, domain = email.split('@')
+          return name[0] + '***@' + domain
+
+      contactReport = [
+          {'email': email, 'masked': maskEmail(email), 'domain': email.split('@')[1]}
+          for email in emails
+      ]
+      domainCounts = {row['domain']: 0 for row in contactReport}
+      for row in contactReport:
+          domainCounts[row['domain']] += 1
+
+      assert contactReport[0]['masked'] == 'k***@example.com'
+      assert domainCounts == {'example.com': 1, 'company.co.kr': 1}
+      contactReport
+  - type: code
+    language: python
+    title: "실무 변주: 허용 도메인 정책 바꾸기"
+    description: "회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다."
+    content: |-
+      def filterAllowedDomains(report, allowedDomains):
+          if not allowedDomains:
+              raise ValueError('allowedDomains must not be empty')
+          return [row for row in report if row['domain'] in allowedDomains]
+
+      companyOnly = filterAllowedDomains(contactReport, {'company.co.kr'})
+      assert [row['email'] for row in companyOnly] == ['lee@company.co.kr']
+      companyOnly

@@ -186,6 +186,90 @@ sections:
       axFinal.grid(True, alpha=0.3)
       figFinal
 
+- id: workflow_validation
+  title: 실무 확률분포 리포트 검증
+  subtitle: 예측 → 오류 확인 → 면적 검증 → 기준 실험
+  blocks:
+  - type: text
+    content: |-
+      분포 함수는 숫자가 나오기 때문에 맞아 보이기 쉽습니다. 하지만 표준편차가 0 이하이거나, 상위 비율을 0~1 범위 밖으로 넣으면 리포트 자체가 잘못됩니다.
+
+      이번 단계에서는 합격률과 상위권 컷오프를 먼저 예상하고, 잘못된 입력을 일부러 실패시킨 뒤, PDF 면적과 CDF/PPF 결과를 검증합니다. 마지막에는 합격 기준과 상위권 기준을 바꾸며 의사결정이 어떻게 달라지는지 실험합니다.
+  - type: code
+    language: python
+    title: 점수 모델 입력 검증 함수
+    description: 평균, 표준편차, 기준값 점검
+    content: |-
+      def validateScoreModel(meanScore, stdScore, passScore, topRate):
+          if stdScore <= 0:
+              raise ValueError("표준편차는 0보다 커야 합니다.")
+          if not 0 < topRate < 1:
+              raise ValueError("상위 비율은 0과 1 사이여야 합니다.")
+          if passScore < 0 or passScore > 100:
+              raise ValueError("합격 기준은 0~100점 범위 안에 있어야 합니다.")
+
+          return stats.norm(loc=meanScore, scale=stdScore)
+
+
+      try:
+          validateScoreModel(meanScore=70, stdScore=0, passScore=60, topRate=0.1)
+      except ValueError as exc:
+          print("의도한 오류 확인:", exc)
+      else:
+          raise AssertionError("표준편차가 0인 분포는 통과시키면 안 됩니다.")
+  - type: code
+    language: python
+    title: 리포트 계산과 검증
+    description: PDF 면적과 컷오프 대조
+    content: |-
+      workflowDist = validateScoreModel(meanScore=70, stdScore=15, passScore=60, topRate=0.1)
+      workflowX = np.linspace(70 - 5 * 15, 70 + 5 * 15, 1000)
+      workflowPdf = workflowDist.pdf(workflowX)
+      pdfArea = np.trapezoid(workflowPdf, workflowX)
+
+      workflowPassRate = 1 - workflowDist.cdf(60)
+      workflowTop10Cutoff = workflowDist.ppf(0.9)
+      workflowMiddleRate = workflowDist.cdf(80) - workflowDist.cdf(60)
+
+      assert 0.99 < pdfArea < 1.01
+      assert workflowPassRate > 0.7
+      assert workflowTop10Cutoff > 70
+      assert 0 < workflowMiddleRate < workflowPassRate
+
+      print("예상: 60점 이상 합격률은 70%보다 높고, 상위 10% 컷오프는 평균보다 높습니다.")
+      pd.DataFrame({
+          "Metric": ["PDF 면적", "60점 이상 합격률", "상위 10% 컷오프", "60~80점 구간 확률"],
+          "Value": [
+              round(pdfArea, 4),
+              f"{workflowPassRate:.1%}",
+              f"{workflowTop10Cutoff:.1f}점",
+              f"{workflowMiddleRate:.1%}",
+          ],
+      })
+  - type: code
+    language: python
+    title: 기준값 바꿔보기
+    description: 합격 기준과 상위권 기준 실험
+    content: |-
+      def summarizeScorePolicy(passScore, topRate):
+          dist = validateScoreModel(meanScore=70, stdScore=15, passScore=passScore, topRate=topRate)
+          return {
+              "passScore": passScore,
+              "topRate": topRate,
+              "passRate": 1 - dist.cdf(passScore),
+              "topCutoff": dist.ppf(1 - topRate),
+          }
+
+
+      policy60 = summarizeScorePolicy(passScore=60, topRate=0.1)
+      policy70 = summarizeScorePolicy(passScore=70, topRate=0.1)
+      policyTop5 = summarizeScorePolicy(passScore=60, topRate=0.05)
+
+      assert policy60["passRate"] > policy70["passRate"]
+      assert policyTop5["topCutoff"] > policy60["topCutoff"]
+
+      pd.DataFrame([policy60, policy70, policyTop5])
+
 - id: practice
   title: 실습
   subtitle: 확률분포 활용 프로젝트

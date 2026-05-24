@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - altair
+    - pandas
   id: altair_00
   title: Altair소개
   order: 0
@@ -34,8 +37,10 @@ sections:
         - emoji: "🎯"
           title: "Codaro에서 자동 인터랙티브"
 
-    - type: image
-      src: "https://raw.githubusercontent.com/altair-viz/altair/main/images/cars_scatter_bar.gif"
+    - type: note
+      style: info
+      title: "로컬 미리보기"
+      content: "이 과정의 모든 차트는 Codaro 로컬 데이터셋과 Altair spec으로 재현합니다. 외부 이미지나 원격 데이터 없이도 같은 학습 흐름을 실행할 수 있습니다."
 
 - id: what_is_altair
   blocks:
@@ -314,6 +319,77 @@ sections:
         - text: Codaro 문서
           url: https://altair-viz.github.io/
           icon: "🔗"
+
+- id: workflow_validation
+  title: 10단계. Altair 학습 흐름 검증
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      Altair는 선언적 시각화이므로 차트를 그린 뒤 Vega-Lite 사양을 확인할 수 있습니다. 입문 단계부터 데이터 계약과 spec 검증을 같이 익히면 이후 인터랙션과 대시보드가 훨씬 안전해집니다.
+  - type: code
+    language: python
+    title: 로컬 데이터와 분석 예측
+    description: 자동차 데이터에서 무게와 연비 관계를 확인합니다
+    content: |-
+      import altair as alt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      altairMpg = loadLocalDataset("mpg")
+      requiredColumns = {"mpg", "horsepower", "weight", "origin"}
+      missingColumns = requiredColumns - set(altairMpg.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert altairMpg[["mpg", "horsepower", "weight"]].gt(0).all().all()
+      assert altairMpg[["weight", "mpg"]].corr().loc["weight", "mpg"] < -0.5
+  - type: code
+    language: python
+    title: Vega-Lite spec 검증
+    description: point 차트의 mark와 encoding 필드를 확인합니다
+    content: |-
+      introChart = alt.Chart(altairMpg).mark_point().encode(
+          x="horsepower:Q",
+          y="mpg:Q",
+          color="origin:N",
+          tooltip=["origin:N", "horsepower:Q", "mpg:Q"],
+      ).properties(title="MPG by horsepower")
+      introSpec = introChart.to_dict()
+
+      assert introSpec["mark"]["type"] == "point"
+      assert introSpec["encoding"]["x"]["field"] == "horsepower"
+      assert introSpec["encoding"]["y"]["field"] == "mpg"
+      assert introSpec["encoding"]["color"]["field"] == "origin"
+      introChart
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 필수 인코딩 컬럼이 빠지면 차트 생성을 중단합니다
+    content: |-
+      def requireAltairColumns(frame, columns):
+          missing = set(columns) - set(frame.columns)
+          if missing:
+              raise ValueError(f"Altair 차트 필수 컬럼 누락: {sorted(missing)}")
+          return True
+
+      brokenMpg = altairMpg.drop(columns=["mpg"])
+      try:
+          requireAltairColumns(brokenMpg, ["horsepower", "mpg"])
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert requireAltairColumns(altairMpg, ["horsepower", "mpg"])
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 생산국별 평균 연비와 고마력 차량 수를 비교합니다
+    content: |-
+      originReport = altairMpg.groupby("origin").agg(avgMpg=("mpg", "mean"), highPowerCount=("horsepower", lambda values: int((values >= 120).sum()))).round(1)
+
+      assert originReport["avgMpg"].idxmax() == "europe"
+      assert originReport["highPowerCount"].sum() > 0
+      originReport
+  - type: tip
+    content: "Altair는 spec을 검사할 수 있다는 점이 강점입니다. 학습자에게 차트 결과와 사양을 같이 보게 해야 합니다."
 
 - id: next
   blocks:

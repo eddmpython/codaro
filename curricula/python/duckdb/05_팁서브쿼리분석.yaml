@@ -32,14 +32,11 @@ sections:
     description: tips.csv 로드
     content: |-
       import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
       import duckdb
 
-      baseUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
-      df = pd.read_csv(f"{baseUrl}/tips.csv")
+      df = loadLocalDataset("tips")
       tips = duckdb.from_df(df)
-
-      duckdb.sql("SELECT * FROM tips LIMIT 5").show()
-
 - id: step2_subquery_intro
   title: 2단계. 서브쿼리란?
   subtitle: 쿼리 안의 쿼리
@@ -300,6 +297,134 @@ sections:
               '집계 결과 테이블화'
       """).show()
 
+- id: "workflow_validation"
+  title: 12단계. 실무 서브쿼리 검증
+  subtitle: 예측 → 스칼라 오류 확인 → 결과 검증 → 기준 실험
+  blocks:
+  - type: text
+    content: 서브쿼리는 결과가 나왔다고 끝이 아닙니다. 실무에서는 스칼라 서브쿼리가 정말 1행 1열인지, 동적 기준이 예상한 그룹을 고르는지, 최종 결과가 전체 평균과 그룹 평균을 모두 넘는지 검증해야 합니다.
+  - type: list
+    items:
+    - "실행 전에는 어느 요일의 평균 팁이 가장 높을지 먼저 예측합니다."
+    - "스칼라 서브쿼리가 여러 행을 반환하면 SQL 오류로 확인합니다."
+    - "최종 결과는 show()만 보지 말고 df()로 받아 행 수와 첫 행을 검증합니다."
+    - "평균 초과 기준을 바꾸며 운영 대상 주문 수가 어떻게 달라지는지 실험합니다."
+  - type: code
+    language: python
+    title: 업무 기준 예측
+    description: 전체 평균, 요일 평균, 평균 초과 주문 수를 먼저 계산합니다.
+    content: |-
+      dayTipSummary = duckdb.sql("""
+          SELECT
+              day,
+              ROUND(AVG(tip), 2) AS avgTip,
+              COUNT(*) AS orderCount
+          FROM tips
+          GROUP BY day
+          ORDER BY avgTip DESC
+      """).df()
+
+      aboveTotalAvgCount = duckdb.sql("""
+          SELECT COUNT(*) AS cnt
+          FROM tips
+          WHERE tip > (SELECT AVG(tip) FROM tips)
+      """).fetchone()[0]
+
+      bestTipDay = dayTipSummary.iloc[0]["day"]
+      bestTipDay, aboveTotalAvgCount, dayTipSummary.to_dict("records")
+  - type: code
+    language: python
+    title: 스칼라 서브쿼리 오류 확인
+    description: 여러 행을 반환하는 서브쿼리를 SELECT 절에 넣으면 어떤 오류가 나는지 확인합니다.
+    content: |-
+      try:
+          duckdb.sql("""
+              SELECT
+                  day,
+                  (SELECT tip FROM tips) AS brokenTip
+              FROM tips
+              LIMIT 1
+          """).df()
+      except duckdb.InvalidInputException as exc:
+          scalarSubqueryError = str(exc).splitlines()[0]
+
+      scalarSubqueryError
+  - type: code
+    language: python
+    title: 평균 초과 주문 추출
+    description: 전체 평균과 요일 평균을 모두 넘는 주문을 FROM 서브쿼리로 비교합니다.
+    content: |-
+      aboveAverageOrders = duckdb.sql("""
+          SELECT
+              t.day,
+              t.time,
+              t.total_bill,
+              t.tip,
+              ROUND(t.tip - totalAvg.avgTip, 2) AS diffTotalAvg,
+              ROUND(t.tip - dayAvg.avgTip, 2) AS diffDayAvg
+          FROM tips t
+          CROSS JOIN (
+              SELECT AVG(tip) AS avgTip
+              FROM tips
+          ) AS totalAvg
+          JOIN (
+              SELECT day, AVG(tip) AS avgTip
+              FROM tips
+              GROUP BY day
+          ) AS dayAvg ON t.day = dayAvg.day
+          WHERE t.tip > totalAvg.avgTip
+            AND t.tip > dayAvg.avgTip
+          ORDER BY diffDayAvg DESC
+          LIMIT 10
+      """).df()
+
+      aboveAverageOrders
+  - type: code
+    language: python
+    title: 결과 검증
+    description: 예측한 최고 요일, 오류 메시지, 최종 결과 첫 행을 검증합니다.
+    content: |-
+      subqueryChecks = {
+          "bestDayOk": bestTipDay == "Sun",
+          "aboveTotalCountOk": aboveTotalAvgCount == 60,
+          "scalarErrorOk": scalarSubqueryError.startswith("Invalid Input Error: More than one row returned"),
+          "resultRowsOk": len(aboveAverageOrders) == 10,
+          "topOrderOk": aboveAverageOrders.iloc[0].to_dict() == {
+              "day": "Sun",
+              "time": "Dinner",
+              "total_bill": 46.65,
+              "tip": 8.21,
+              "diffTotalAvg": 3.16,
+              "diffDayAvg": 1.77,
+          },
+      }
+
+      assert all(subqueryChecks.values()), subqueryChecks
+      subqueryChecks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 요일 평균보다 얼마나 더 높은 주문만 볼지 기준을 바꿔 비교합니다.
+    content: |-
+      def countOrdersAboveDayAverage(minDiff):
+          return duckdb.sql(f"""
+              SELECT COUNT(*) AS cnt
+              FROM tips t
+              JOIN (
+                  SELECT day, AVG(tip) AS avgTip
+                  FROM tips
+                  GROUP BY day
+              ) AS dayAvg ON t.day = dayAvg.day
+              WHERE t.tip - dayAvg.avgTip >= {minDiff}
+          """).fetchone()[0]
+
+      broadOrderCount = countOrdersAboveDayAverage(0.5)
+      strictOrderCount = countOrdersAboveDayAverage(1.5)
+
+      broadOrderCount, strictOrderCount
+  - type: tip
+    content: 서브쿼리 학습은 문법 암기가 아니라 기준을 코드로 고정하는 연습입니다. 오류가 나는 서브쿼리와 통과해야 하는 결과를 함께 검증하면 SQL을 업무 리포트에 사용할 수 있습니다.
+
 - id: practice
   title: 실습
   subtitle: 서브쿼리 프로젝트
@@ -316,7 +441,15 @@ sections:
       content: |-
         import pandas as pd
         import duckdb
-        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+        data = pd.DataFrame({
+            "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
+            "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
+            "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
+            "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
+            "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
+            "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
+            "size": [2, 4, 3, 2, 5, 2, 2, 3],
+        })
         tbl1 = duckdb.from_df(data)
     - type: code
       title: 쿼리 실행
@@ -342,7 +475,15 @@ sections:
       content: |-
         import pandas as pd
         import duckdb
-        frame = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+        frame = pd.DataFrame({
+            "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
+            "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
+            "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
+            "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
+            "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
+            "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
+            "size": [2, 4, 3, 2, 5, 2, 2, 3],
+        })
         tbl2 = duckdb.from_df(frame)
     - type: code
       title: 쿼리 실행

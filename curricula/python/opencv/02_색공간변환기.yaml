@@ -345,3 +345,68 @@ sections:
         axScene[1, 1].set_title('B Channel')
         axScene[1, 1].axis('off')
         plt.tight_layout()
+
+- id: workflow_validation
+  title: 8단계. 색공간 변환 검증 루프
+  subtitle: BGR → HSV → 마스크 확인
+  blocks:
+  - type: text
+    content: 색공간 변환은 결과 이미지가 예쁘게 보이는지보다, 원하는 색이 안정적으로 분리되는지가 중요합니다. 기준 색 패치를 만들고 HSV 마스크 면적을 검증한 뒤, 변환 코드 오류와 임계값 변주를 확인합니다.
+  - type: code
+    language: python
+    title: 색상 패치 데이터 준비
+    description: 빨강과 초록 영역이 분명한 BGR 이미지를 만듭니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      colorImage = np.zeros((90, 120, 3), dtype=np.uint8)
+      colorImage[:, :60] = [0, 0, 255]
+      colorImage[:, 60:] = [0, 180, 0]
+
+      def validateColorImage(image):
+          if image.ndim != 3 or image.shape[2] != 3:
+              raise ValueError("색공간 변환에는 BGR 3채널 이미지가 필요합니다")
+          return True
+
+      validateColorImage(colorImage)
+  - type: code
+    language: python
+    title: 변환 코드 오류 확인
+    description: 잘못된 OpenCV 변환 코드를 넣어 cv2.error를 확인합니다.
+    content: |-
+      try:
+          cv2.cvtColor(colorImage, -1)
+      except cv2.error as exc:
+          colorErrorMessage = str(exc).splitlines()[0]
+
+      colorErrorMessage
+  - type: code
+    language: python
+    title: HSV 마스크 검증
+    description: 빨간 영역이 전체의 절반 정도로 분리되는지 확인합니다.
+    content: |-
+      hsvImage = cv2.cvtColor(colorImage, cv2.COLOR_BGR2HSV)
+      redMask1 = cv2.inRange(hsvImage, np.array([0, 80, 80]), np.array([10, 255, 255]))
+      redMask2 = cv2.inRange(hsvImage, np.array([170, 80, 80]), np.array([180, 255, 255]))
+      redMask = cv2.bitwise_or(redMask1, redMask2)
+      redRatio = float(np.count_nonzero(redMask) / redMask.size)
+      colorChecks = {
+          "hsvShapeOk": hsvImage.shape == colorImage.shape,
+          "redAreaOk": 0.45 <= redRatio <= 0.55,
+          "errorOk": "Unknown/unsupported color conversion code" in colorErrorMessage,
+      }
+
+      assert all(colorChecks.values()), colorChecks
+      colorChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 채도 기준을 높여도 빨간 패치가 유지되는지 확인합니다.
+    content: |-
+      strictRedMask = cv2.inRange(hsvImage, np.array([0, 200, 120]), np.array([10, 255, 255]))
+      strictRatio = float(np.count_nonzero(strictRedMask) / strictRedMask.size)
+
+      assert strictRatio <= redRatio
+      assert strictRatio > 0.40
+      redRatio, strictRatio

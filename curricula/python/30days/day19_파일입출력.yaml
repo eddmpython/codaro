@@ -3,7 +3,7 @@ meta:
   title: "파일입출력"
   day: 19
   category: "30days"
-  tags: []
+  tags: ["파일입출력", "with", "pathlib", "tempfile", "CSV", "로컬파일", "검증"]
   seo:
     title: "파이썬 파일 입출력 - 파일 읽고 쓰기"
     description: "open, read, write, with문으로 파일을 다루는 방법을 배웁니다."
@@ -330,6 +330,110 @@ sections:
       passCount
   - type: "tip"
     content: "strip()으로 줄바꿈 문자를 제거할 수 있습니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 임시 작업 폴더에서 리포트 파일 만들기"
+  subtitle: "로컬 파일을 안전하게 쓰고 읽고 검증하기"
+  blocks:
+  - type: "text"
+    content: "로컬 Python에서는 파일 입출력 제약이 줄어드는 대신, 현재 작업 폴더를 지저분하게 만들 위험이 생깁니다. 실습과 자동화 코드는 임시 작업 폴더나 명시한 출력 폴더를 쓰고, 파일 내용까지 검증해야 합니다."
+  - type: "list"
+    items:
+    - "예측: 어떤 파일을 만들고 어떤 줄이 들어가야 하는지 먼저 정한다."
+    - "실행: tempfile.TemporaryDirectory와 pathlib.Path로 안전한 경로를 만든다."
+    - "오류 수정: 없는 파일 읽기와 잘못된 CSV 행을 명확한 예외로 확인한다."
+    - "검증: 파일 존재 여부, 내용, 집계 결과를 assert로 확인한다."
+  - type: "code"
+    language: "python"
+    title: "임시 폴더에 리포트 쓰기"
+    description: "프로젝트 루트를 오염시키지 않고 파일을 만들고 읽습니다."
+    content: |-
+      from pathlib import Path
+      import tempfile
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          workDir = Path(tempDir)
+          reportPath = workDir / 'dailyReport.txt'
+          reportPath.write_text('orderId,total\nA-100,12000\nA-101,8000\n', encoding='utf-8')
+
+          reportText = reportPath.read_text(encoding='utf-8')
+          lines = reportText.strip().splitlines()
+
+          assert reportPath.exists()
+          assert lines[0] == 'orderId,total'
+          assert len(lines) == 3
+  - type: "code"
+    language: "python"
+    title: "CSV 행 읽고 합계 검증"
+    description: "파일에서 읽은 텍스트를 업무 데이터로 바꾸고 합계를 확인합니다."
+    content: |-
+      from pathlib import Path
+      import tempfile
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          dataPath = Path(tempDir) / 'orders.csv'
+          dataPath.write_text('orderId,total\nA-100,12000\nA-101,8000\n', encoding='utf-8')
+
+          rows = dataPath.read_text(encoding='utf-8').strip().splitlines()
+          totalAmount = 0
+          for row in rows[1:]:
+              orderId, totalText = row.split(',')
+              totalAmount = totalAmount + int(totalText)
+
+          assert totalAmount == 20000
+          assert rows[1].startswith('A-100')
+  - type: "code"
+    language: "python"
+    title: "없는 파일과 잘못된 행 검증"
+    description: "파일 입출력 실패와 데이터 형식 실패를 각각 구분해 확인합니다."
+    content: |-
+      from pathlib import Path
+      import tempfile
+
+      def parseOrderRow(row):
+          parts = row.split(',')
+          if len(parts) != 2:
+              raise ValueError('주문 행은 orderId,total 두 칸이어야 합니다')
+          return parts[0], int(parts[1])
+
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          missingPath = Path(tempDir) / 'missing.csv'
+          try:
+              missingPath.read_text(encoding='utf-8')
+          except FileNotFoundError as exc:
+              missingName = Path(exc.filename).name
+          else:
+              raise AssertionError('없는 파일 읽기는 실패해야 합니다')
+
+          try:
+              parseOrderRow('A-100,12000,extra')
+          except ValueError as exc:
+              rowError = str(exc)
+          else:
+              raise AssertionError('잘못된 CSV 행은 실패해야 합니다')
+
+          assert missingName == 'missing.csv'
+          assert rowError == '주문 행은 orderId,total 두 칸이어야 합니다'
+  - type: "expansion"
+    title: "실무 변주: 원본 대신 결과 파일 만들기"
+    code: |-
+      from pathlib import Path
+      import tempfile
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          workDir = Path(tempDir)
+          sourcePath = workDir / 'raw.txt'
+          resultPath = workDir / 'upper.txt'
+          sourcePath.write_text('hello\npython\n', encoding='utf-8')
+
+          upperLines = []
+          for line in sourcePath.read_text(encoding='utf-8').splitlines():
+              upperLines.append(line.upper())
+          resultPath.write_text('\n'.join(upperLines), encoding='utf-8')
+
+          assert resultPath.read_text(encoding='utf-8') == 'HELLO\nPYTHON'
+          resultPath.name
 
 - id: "practice"
   title: "Day 19 종합 복습"

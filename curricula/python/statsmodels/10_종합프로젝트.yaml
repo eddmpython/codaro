@@ -518,3 +518,90 @@ sections:
     - "10: VAR, 그랜저 인과성, IRF"
   - type: text
     content: 이제 실전 데이터에 이 기법들을 적용해보세요. 광고 ROI 분석, 고객 이탈 예측, 매출 예측, HR 분석 등 다양한 비즈니스 문제를 해결할 수 있습니다!
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 회귀 리포트 품질 게이트
+  blocks:
+  - type: text
+    content: "statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과 결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다."
+  - type: code
+    language: python
+    title: 로컬 마케팅 데이터 검증
+    description: 광고비와 매출 데이터를 불러오고 분석 전 조건을 확인합니다.
+    content: |-
+      import pandas as pd
+      import statsmodels.api as sm
+      from statsmodels.stats.diagnostic import het_breuschpagan
+      from codaro.curriculum.localData import loadLocalDataset
+
+      marketingData = loadLocalDataset("advertising")
+      requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
+
+      missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
+      if missingColumns:
+          raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
+      if marketingData[requiredColumns].isna().any().any():
+          raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
+
+      marketingData[requiredColumns].head()
+  - type: code
+    language: python
+    title: 다중회귀 모델 적합
+    description: TV, Radio, Newspaper 광고비로 Sales를 설명합니다.
+    content: |-
+      # 예측: TV와 Radio의 p-value는 낮고, 모델 R²는 0.9 이상일 것입니다.
+      reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])
+      reportY = marketingData["Sales"]
+      try:
+          reportModel = sm.OLS(reportY, reportX).fit()
+      except ValueError as exc:
+          raise ValueError("OLS 입력 행렬을 확인하세요.") from exc
+
+      reportModel.rsquared, reportModel.f_pvalue
+  - type: code
+    language: python
+    title: 통계 리포트 기준 검증
+    description: 설명력, 모델 전체 유의성, 핵심 변수 유의성을 assert로 확인합니다.
+    content: |-
+      reportChecks = {
+          "r_squared_is_reportable": reportModel.rsquared >= 0.90,
+          "model_is_significant": reportModel.f_pvalue < 0.05,
+          "tv_is_significant": reportModel.pvalues["TV"] < 0.05,
+          "radio_is_significant": reportModel.pvalues["Radio"] < 0.05,
+      }
+
+      assert all(reportChecks.values()), reportChecks
+      reportChecks
+  - type: code
+    language: python
+    title: 잔차 진단
+    description: Breusch-Pagan 검정으로 심한 이분산 신호가 없는지 확인합니다.
+    content: |-
+      bpStat, bpPvalue, _, _ = het_breuschpagan(reportModel.resid, reportModel.model.exog)
+      residualChecks = {
+          "bp_pvalue_recorded": bpPvalue >= 0,
+          "residual_mean_near_zero": abs(reportModel.resid.mean()) < 1e-9,
+      }
+
+      assert all(residualChecks.values()), residualChecks
+      round(float(bpPvalue), 3), residualChecks
+  - type: expansion
+    title: "실무 변주: Newspaper 변수를 빼도 설명력이 유지될까?"
+    blocks:
+    - type: code
+      language: python
+      title: 축소 모델 비교
+      content: |-
+        compactX = sm.add_constant(marketingData[["TV", "Radio"]])
+        compactModel = sm.OLS(reportY, compactX).fit()
+        r2Drop = reportModel.rsquared - compactModel.rsquared
+
+        assert compactModel.rsquared >= 0.95
+        {
+            "fullR2": round(reportModel.rsquared, 3),
+            "compactR2": round(compactModel.rsquared, 3),
+            "r2Drop": round(r2Drop, 3),
+            "fullAIC": round(reportModel.aic, 1),
+            "compactAIC": round(compactModel.aic, 1),
+        }

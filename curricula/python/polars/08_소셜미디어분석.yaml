@@ -127,13 +127,13 @@ sections:
     description: group_by와 agg
     content: |-
       df.group_by("platform").agg([
-          pl.count().alias("postCount"),
+          pl.len().alias("postCount"),
           pl.col("likes").mean().round(1).alias("avgLikes"),
           pl.col("comments").mean().round(1).alias("avgComments"),
           pl.col("shares").mean().round(1).alias("avgShares")
       ])
   - type: tip
-    content: pl.count()는 그룹 내 행 개수를 세는 집계 함수입니다. pl.len()과 동일하지만, pl.count()가 더 명시적이고 SQL과 유사합니다.
+    content: pl.len()은 그룹 내 행 개수를 세는 집계 함수입니다. 최신 Polars에서는 그룹 행 수 집계에 pl.len()을 사용합니다.
 
 - id: step6_multi_group
   title: 6단계. 다중 그룹 집계
@@ -154,7 +154,7 @@ sections:
       )
 
       df.group_by(["platform", "timeSlot"]).agg([
-          pl.count().alias("postCount"),
+          pl.len().alias("postCount"),
           pl.col("likes").mean().round(1).alias("avgLikes")
       ]).sort(["platform", "timeSlot"])
   - type: tip
@@ -191,7 +191,7 @@ sections:
     description: rolling_mean으로 7일 평균
     content: |-
       dailyStats = df.group_by(pl.col("postTime").dt.date().alias("date")).agg([
-          pl.count().alias("postCount"),
+          pl.len().alias("postCount"),
           pl.col("likes").sum().alias("totalLikes")
       ]).sort("date")
 
@@ -260,7 +260,7 @@ sections:
     description: 해시태그별 성과 분석
     content: |-
       result = withEngagement.group_by("tag").agg([
-          pl.count().alias("postCount"),
+          pl.len().alias("postCount"),
           pl.col("engagement").mean().round(1).alias("avgEngagement"),
           pl.col("engagement").max().alias("maxEngagement")
       ]).sort("avgEngagement", descending=True)
@@ -280,7 +280,7 @@ sections:
     description: 0-23시 각 시간대 통계
     content: |-
       hourlyStats = df.group_by("hour").agg([
-          pl.count().alias("postCount"),
+          pl.len().alias("postCount"),
           pl.col("likes").mean().round(1).alias("avgLikes"),
           pl.col("comments").mean().round(1).alias("avgComments"),
           pl.col("shares").mean().round(1).alias("avgShares"),
@@ -331,7 +331,7 @@ sections:
     description: 0=월요일, 6=일요일
     content: |-
       weekdayStats = df.group_by("weekday").agg([
-          pl.count().alias("postCount"),
+          pl.len().alias("postCount"),
           (pl.col("likes") + pl.col("comments") + pl.col("shares")).mean().round(1).alias("avgEngagement")
       ])
       weekdayStats
@@ -419,7 +419,7 @@ sections:
             (pl.col("likes") + pl.col("comments") + pl.col("shares")).alias("engagement")
         )
         hourlyAgg = withEngagement.group_by("hour").agg([
-            pl.count().alias("postCount"),
+            pl.len().alias("postCount"),
             pl.col("engagement").mean().round(1).alias("avgEngagement")
         ])
         hourlyAgg.head()
@@ -449,3 +449,105 @@ sections:
     - "over(pl.lit(1)) - 전체 데이터를 하나의 윈도우로, 전체 통계 계산"
   - type: text
     content: 다음 시간에는 대용량 로그 데이터로 Lazy Evaluation과 쿼리 최적화를 배웁니다. explain()으로 쿼리 실행 계획을 확인하고 Predicate Pushdown을 경험합니다.
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 주문 매출 파이프라인
+  blocks:
+  - type: text
+    content: "Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제 집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다."
+  - type: code
+    language: python
+    title: 주문 데이터와 입력 검증
+    description: 필수 컬럼, 수량, 단가 조건을 로컬에서 검증합니다.
+    content: |-
+      import polars as pl
+
+      orderFrame = pl.DataFrame({
+          "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+          "channel": ["web", "store", "web", "partner", "store", "web"],
+          "quantity": [3, 2, 5, 1, 4, 2],
+          "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+          "refund": [0, 0, 1, 0, 0, 0],
+      })
+
+      def validateOrderFrame(frame: pl.DataFrame) -> bool:
+          requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame.select((pl.col("quantity") <= 0).any()).item():
+              raise ValueError("quantity는 0보다 커야 합니다.")
+          if frame.select((pl.col("unitPrice") <= 0).any()).item():
+              raise ValueError("unitPrice는 0보다 커야 합니다.")
+          return True
+
+      validateOrderFrame(orderFrame)
+      orderFrame
+  - type: code
+    language: python
+    title: 예측 후 채널별 매출 집계
+    description: store 채널이 가장 클 것이라고 예측하고 집계로 확인합니다.
+    content: |-
+      # 예측: store는 주문 수는 적지만 단가가 높아 순매출 1위일 가능성이 큽니다.
+      expectedTopChannel = "store"
+      revenueByChannel = (
+          orderFrame
+          .with_columns((pl.col("quantity") * pl.col("unitPrice") * (1 - pl.col("refund"))).alias("netRevenue"))
+          .group_by("channel")
+          .agg([
+              pl.len().alias("orders"),
+              pl.sum("netRevenue").alias("netRevenue"),
+              pl.mean("quantity").round(2).alias("avgQuantity"),
+          ])
+          .sort("netRevenue", descending=True)
+      )
+
+      topChannel = revenueByChannel.row(0, named=True)["channel"]
+      revenueByChannel
+  - type: code
+    language: python
+    title: 실패 입력을 잡는 오류 처리
+    description: 수량이 0인 주문을 검증 함수가 거부하는지 확인합니다.
+    content: |-
+      brokenOrderFrame = orderFrame.with_columns(
+          pl.when(pl.col("orderId") == 1001).then(0).otherwise(pl.col("quantity")).alias("quantity")
+      )
+
+      try:
+          validateOrderFrame(brokenOrderFrame)
+      except ValueError as exc:
+          validationMessage = str(exc)
+
+      assert "quantity" in validationMessage
+      validationMessage
+  - type: code
+    language: python
+    title: 업무 기준 검증
+    description: 집계 결과가 보고서에 들어갈 수 있는 상태인지 assert로 확인합니다.
+    content: |-
+      pipelineChecks = {
+          "top_channel_matches_prediction": topChannel == expectedTopChannel,
+          "net_revenue_positive": revenueByChannel.select((pl.col("netRevenue") > 0).all()).item(),
+          "all_channels_present": revenueByChannel.height == orderFrame.select(pl.col("channel").n_unique()).item(),
+          "refund_removed_from_revenue": revenueByChannel.filter(pl.col("channel") == "web").row(0, named=True)["netRevenue"] == 80000,
+      }
+
+      assert all(pipelineChecks.values()), pipelineChecks
+      pipelineChecks
+  - type: expansion
+    title: "실무 변주: 매출 기준선을 바꾸면 후보 채널 수가 어떻게 변할까?"
+    blocks:
+    - type: code
+      language: python
+      title: 기준값 민감도 분석
+      content: |-
+        thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
+            pl.col("threshold").map_elements(
+                lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,
+                return_dtype=pl.Int64,
+            ).alias("qualifiedChannels")
+        )
+
+        assert thresholdFrame.select((pl.col("qualifiedChannels").diff().fill_null(0) <= 0).all()).item()
+        thresholdFrame

@@ -26,6 +26,7 @@ from .studyLoader import (
 )
 from .converter import yamlToDocument
 from .learningSpec import AI_TEACHER_INSTRUCTIONS, EXERCISE_TYPES, HINT_STRATEGY, PHILOSOPHY
+from .localData import loadLocalDataset
 from .progress import LessonProgress, ProgressTracker, UserProgress
 from .sectionContract import (
     LearningExerciseContract,
@@ -57,6 +58,7 @@ __all__ = [
     "LearningLessonContract",
     "LearningSectionContract",
     "LessonProgress",
+    "loadLocalDataset",
     "LessonIntroContract",
     "LessonMetaContract",
     "PHILOSOPHY",

@@ -8,7 +8,7 @@ meta:
   category: numpy
   difficulty: "⭐⭐"
   badge: 기초
-  tags: ["numpy", "reshape", "normalization", "corrcoef", "broadcasting", "nan"]
+  tags: ["numpy", "reshape", "normalization", "corrcoef", "broadcasting", "nan", "검증", "특성분석"]
   seo:
     title: "NumPy 정규화와 상관관계 - Spotify 음악 분석"
     description: "NumPy의 배열 변형과 정규화를 배우며 Spotify 음악 특성 데이터의 상관관계를 분석합니다."
@@ -45,8 +45,9 @@ sections:
     title: Spotify 데이터 로드
     description: TidyTuesday에서 Spotify 데이터를 불러옵니다
     content: |-
-      url = "https://raw.githubusercontent.com"
-      df = pd.read_csv(f"{url}/rfordatascience/tidytuesday/main/data/2020/2020-01-21/spotify_songs.csv")
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("spotify_songs")
       df.head()
 
 - id: step3_extract
@@ -264,6 +265,60 @@ sections:
   - type: tip
     content: np.triu(arr, k=1)은 상삼각 행렬을 반환합니다. 대각선(k=0)을 제외하면 자기 자신과의 상관(1.0)이 제거됩니다.
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 음악 특성 정규화와 결측 처리"
+  subtitle: "nanmean, min-max scaling, corrcoef, 실패 케이스"
+  blocks:
+  - type: text
+    content: "음악 특성처럼 단위가 섞인 배열은 먼저 정규화하고 결측값을 처리해야 합니다. 결측을 무시한 평균과 정규화 범위를 검증한 뒤 상관관계를 해석하세요."
+  - type: code
+    language: python
+    title: "특성 행렬 정규화"
+    description: "NaN을 평균으로 대체하고 0~1 범위로 정규화합니다."
+    content: |-
+      import numpy as np
+
+      features = np.array([
+          [0.8, 120.0, 0.6],
+          [0.5, np.nan, 0.7],
+          [0.9, 140.0, 0.4],
+      ])
+
+      columnMeans = np.nanmean(features, axis=0)
+      filled = np.where(np.isnan(features), columnMeans, features)
+      minimum = filled.min(axis=0)
+      maximum = filled.max(axis=0)
+      scaled = (filled - minimum) / (maximum - minimum)
+      corr = np.corrcoef(scaled, rowvar=False)
+
+      assert not np.isnan(filled).any()
+      assert np.allclose(scaled.min(axis=0), [0.0, 0.0, 0.0])
+      assert np.allclose(scaled.max(axis=0), [1.0, 1.0, 1.0])
+      assert corr.shape == (3, 3)
+  - type: code
+    language: python
+    title: "상수 컬럼 정규화 오류 확인"
+    description: "분모가 0이 되는 특성은 정규화 전에 잡습니다."
+    content: |-
+      import numpy as np
+
+      def minMaxScale(values):
+          values = np.asarray(values, dtype=float)
+          span = values.max(axis=0) - values.min(axis=0)
+          if np.any(span == 0):
+              raise ValueError("constant feature cannot be min-max scaled")
+          return (values - values.min(axis=0)) / span
+
+      try:
+          minMaxScale([[1, 10], [2, 10]])
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "constant feature cannot be min-max scaled"
+  - type: tip
+    title: "변주 실험"
+    content: "템포 컬럼만 표준화(z-score)하고 나머지는 min-max로 유지하면 상관계수 해석이 달라지는지 비교하세요."
+
 - id: practice
   title: 실습
   subtitle: Spotify 음악 분석
@@ -281,8 +336,22 @@ sections:
         import numpy as np
         import pandas as pd
 
-        url = "https://raw.githubusercontent.com"
-        data = pd.read_csv(f"{url}/rfordatascience/tidytuesday/main/data/2020/2020-01-21/spotify_songs.csv")
+        data = pd.DataFrame({
+            'track_name': ['Local Groove', 'Quiet Pulse', 'Bright Run', 'Deep Focus',
+                           'Night Drive', 'Warm Echo', 'Fast Steps', 'Soft Rain'],
+            'playlist_genre': ['pop', 'acoustic', 'pop', 'ambient',
+                               'rock', 'acoustic', 'edm', 'ambient'],
+            'track_popularity': [72, 44, 81, 35, 67, 58, 89, 39],
+            'danceability': [0.72, 0.42, 0.81, 0.33, 0.64, 0.58, 0.89, 0.37],
+            'energy': [0.80, 0.35, 0.76, 0.28, 0.70, 0.45, 0.91, 0.30],
+            'loudness': [-5.1, -12.4, -6.3, -15.0, -7.8, -10.2, -4.5, -14.1],
+            'speechiness': [0.05, 0.03, 0.08, 0.04, 0.06, 0.05, 0.10, 0.03],
+            'acousticness': [0.12, 0.72, 0.18, 0.86, 0.22, 0.55, 0.08, 0.90],
+            'instrumentalness': [0.01, 0.35, 0.02, 0.60, 0.12, 0.28, 0.00, 0.50],
+            'liveness': [0.10, 0.12, 0.18, 0.09, 0.16, 0.11, 0.22, 0.08],
+            'valence': [0.74, 0.30, 0.82, 0.24, 0.66, 0.48, 0.88, 0.27],
+            'tempo': [118, 86, 128, 72, 104, 94, 140, 68],
+        })
         cols = ['danceability', 'energy', 'valence', 'tempo']
     - type: code
       title: "장르별 분석"
@@ -304,8 +373,22 @@ sections:
         import numpy as np
         import pandas as pd
 
-        src = "https://raw.githubusercontent.com"
-        df = pd.read_csv(f"{src}/rfordatascience/tidytuesday/main/data/2020/2020-01-21/spotify_songs.csv")
+        df = pd.DataFrame({
+            'track_name': ['Local Groove', 'Quiet Pulse', 'Bright Run', 'Deep Focus',
+                           'Night Drive', 'Warm Echo', 'Fast Steps', 'Soft Rain'],
+            'playlist_genre': ['pop', 'acoustic', 'pop', 'ambient',
+                               'rock', 'acoustic', 'edm', 'ambient'],
+            'track_popularity': [72, 44, 81, 35, 67, 58, 89, 39],
+            'danceability': [0.72, 0.42, 0.81, 0.33, 0.64, 0.58, 0.89, 0.37],
+            'energy': [0.80, 0.35, 0.76, 0.28, 0.70, 0.45, 0.91, 0.30],
+            'loudness': [-5.1, -12.4, -6.3, -15.0, -7.8, -10.2, -4.5, -14.1],
+            'speechiness': [0.05, 0.03, 0.08, 0.04, 0.06, 0.05, 0.10, 0.03],
+            'acousticness': [0.12, 0.72, 0.18, 0.86, 0.22, 0.55, 0.08, 0.90],
+            'instrumentalness': [0.01, 0.35, 0.02, 0.60, 0.12, 0.28, 0.00, 0.50],
+            'liveness': [0.10, 0.12, 0.18, 0.09, 0.16, 0.11, 0.22, 0.08],
+            'valence': [0.74, 0.30, 0.82, 0.24, 0.66, 0.48, 0.88, 0.27],
+            'tempo': [118, 86, 128, 72, 104, 94, 140, 68],
+        })
         cols = ['danceability', 'energy', 'loudness', 'speechiness',
                 'acousticness', 'instrumentalness', 'liveness', 'valence', 'tempo']
     - type: code

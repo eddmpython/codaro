@@ -8,7 +8,7 @@ meta:
   category: numpy
   difficulty: "⭐⭐⭐"
   badge: 중급
-  tags: ["numpy", "nan", "isnan", "nanmean", "nanstd", "zeros", "flatten"]
+  tags: ["numpy", "nan", "isnan", "nanmean", "nanstd", "zeros", "flatten", "검증", "결측시계열"]
   seo:
     title: "NumPy 결측값 처리 - 대기질 시계열 분석"
     description: "NumPy의 결측값 처리와 시계열 분석을 배우며 대기질 데이터의 추세를 파악합니다."
@@ -45,8 +45,9 @@ sections:
     title: 대기질 데이터 로드
     description: Rdatasets에서 대기질 데이터를 불러옵니다
     content: |-
-      url = "https://raw.githubusercontent.com"
-      df = pd.read_csv(f"{url}/vincentarelbundock/Rdatasets/master/csv/datasets/airquality.csv")
+      from codaro.curriculum.localData import loadLocalDataset
+
+      df = loadLocalDataset("airquality")
       df.head(10)
 
 - id: step3_extract
@@ -271,6 +272,56 @@ sections:
       r = np.corrcoef(o, t)[0, 1]
       f"오존-기온 상관계수: {r:.3f}"
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 대기질 결측값과 경보일 계산"
+  subtitle: "isnan, nanmean, where, corrcoef, 실패 케이스"
+  blocks:
+  - type: text
+    content: "환경 데이터는 결측값을 어떻게 처리했는지가 분석 결과를 좌우합니다. NaN을 유지한 평균, 대체한 누적합, 유효한 날짜만 쓰는 상관관계를 구분해 검증하세요."
+  - type: code
+    language: python
+    title: "결측 처리와 경보일 계산"
+    description: "NaN을 무시한 평균과 경보 마스크를 함께 확인합니다."
+    content: |-
+      import numpy as np
+
+      ozone = np.array([41.0, np.nan, 80.0, 120.0, 55.0])
+      temp = np.array([67.0, 72.0, 79.0, 85.0, 70.0])
+
+      valid = ~np.isnan(ozone)
+      filled = np.where(valid, ozone, np.nanmean(ozone))
+      alertDays = ozone >= 80
+      corr = np.corrcoef(ozone[valid], temp[valid])[0, 1]
+
+      assert round(float(np.nanmean(ozone)), 2) == 74.0
+      assert filled[1] == 74.0
+      assert alertDays.tolist() == [False, False, True, True, False]
+      assert corr > 0.9
+  - type: code
+    language: python
+    title: "유효 데이터 부족 오류 확인"
+    description: "상관관계는 최소 2개 이상의 유효 쌍이 있어야 계산합니다."
+    content: |-
+      import numpy as np
+
+      def safeCorrelation(left, right):
+          left = np.asarray(left, dtype=float)
+          right = np.asarray(right, dtype=float)
+          valid = ~np.isnan(left) & ~np.isnan(right)
+          if np.sum(valid) < 2:
+              raise ValueError("at least two valid pairs are required")
+          return np.corrcoef(left[valid], right[valid])[0, 1]
+
+      try:
+          safeCorrelation([np.nan, 1.0], [2.0, np.nan])
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "at least two valid pairs are required"
+  - type: tip
+    title: "변주 실험"
+    content: "결측을 평균으로 채우는 대신 직전 유효값으로 채우면 누적 오존 추세가 어떻게 달라지는지 비교하세요."
+
 - id: practice
   title: 실습
   subtitle: 대기질 데이터 분석
@@ -288,8 +339,14 @@ sections:
         import numpy as np
         import pandas as pd
 
-        url = "https://raw.githubusercontent.com"
-        data = pd.read_csv(f"{url}/vincentarelbundock/Rdatasets/master/csv/datasets/airquality.csv")
+        data = pd.DataFrame({
+            'Ozone': [41, 36, 12, np.nan, 18, 28, np.nan, 23, 45, 60, 32, 29],
+            'Solar.R': [190, 118, 149, 313, np.nan, 299, 99, 19, 256, 290, 274, 65],
+            'Wind': [7.4, 8.0, 12.6, 11.5, 14.3, 8.6, 13.8, 20.1, 9.7, 6.9, 10.9, 13.2],
+            'Temp': [67, 72, 74, 62, 65, 79, 68, 61, 81, 86, 82, 58],
+            'Month': [5, 5, 5, 5, 5, 6, 6, 6, 7, 7, 8, 9],
+            'Day': [1, 2, 3, 4, 5, 1, 2, 3, 1, 2, 1, 1],
+        })
         ozone = data['Ozone'].values
         solar = data['Solar.R'].values
         month = data['Month'].values
@@ -314,8 +371,14 @@ sections:
         import numpy as np
         import pandas as pd
 
-        src = "https://raw.githubusercontent.com"
-        df = pd.read_csv(f"{src}/vincentarelbundock/Rdatasets/master/csv/datasets/airquality.csv")
+        df = pd.DataFrame({
+            'Ozone': [41, 36, 12, np.nan, 18, 28, np.nan, 23, 45, 60, 32, 29],
+            'Solar.R': [190, 118, 149, 313, np.nan, 299, 99, 19, 256, 290, 274, 65],
+            'Wind': [7.4, 8.0, 12.6, 11.5, 14.3, 8.6, 13.8, 20.1, 9.7, 6.9, 10.9, 13.2],
+            'Temp': [67, 72, 74, 62, 65, 79, 68, 61, 81, 86, 82, 58],
+            'Month': [5, 5, 5, 5, 5, 6, 6, 6, 7, 7, 8, 9],
+            'Day': [1, 2, 3, 4, 5, 1, 2, 3, 1, 2, 1, 1],
+        })
         ozone = df['Ozone'].values
         solar = df['Solar.R'].values
         wind = df['Wind'].values

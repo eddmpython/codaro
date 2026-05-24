@@ -453,3 +453,113 @@ sections:
             "guests": reservation.guests
         }
         reserveInfo
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 입력 계약과 배치 검증"
+  subtitle: "예측 → 검증 실패 확인 → 정제 → 결과 검증 → 실무 변주"
+  blocks:
+  - type: "text"
+    content: "Pydantic은 모델을 만드는 데서 끝나지 않고, 외부 입력을 업무 계약으로 바꾸고 실패 이유를 구조화하는 데서 가치가 큽니다. 여기서는 주문 입력을 검증하고, 잘못된 행을 분리한 뒤, 정상 데이터만 다음 단계로 넘기는 흐름을 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "주문 입력 모델과 정상 데이터 예측"
+    description: "타입 변환, 필수값, 상태 제한, 계산 필드를 하나의 입력 계약으로 묶습니다."
+    content: |-
+      from typing import Literal
+      from pydantic import BaseModel, Field, ValidationError, computed_field, field_validator
+
+      class OrderInput(BaseModel):
+          orderId: str
+          customer: str
+          amount: int = Field(gt=0)
+          status: Literal['paid', 'pending', 'cancelled']
+
+          @field_validator('orderId', 'customer')
+          @classmethod
+          def stripRequiredText(cls, value):
+              cleaned = value.strip()
+              if not cleaned:
+                  raise ValueError('text field must not be empty')
+              return cleaned
+
+          @computed_field
+          @property
+          def isRevenue(self) -> bool:
+              return self.status == 'paid'
+
+      validOrder = OrderInput.model_validate({
+          'orderId': ' A-100 ',
+          'customer': ' kim ',
+          'amount': '120000',
+          'status': 'paid',
+      })
+
+      assert validOrder.orderId == 'A-100'
+      assert validOrder.amount == 120000
+      assert validOrder.isRevenue is True
+      validOrder.model_dump()
+  - type: "code"
+    language: "python"
+    title: "잘못된 입력을 먼저 실패시킨다"
+    description: "금액과 상태가 틀린 입력을 ValidationError로 분리합니다."
+    content: |-
+      try:
+          OrderInput.model_validate({
+              'orderId': 'A-101',
+              'customer': 'lee',
+              'amount': 0,
+              'status': 'refunded',
+          })
+      except ValidationError as exc:
+          orderValidationErrors = exc.errors()
+      else:
+          raise AssertionError('잘못된 주문 입력은 실패해야 합니다')
+
+      errorFields = {error['loc'][0] for error in orderValidationErrors}
+      assert {'amount', 'status'} <= errorFields
+      orderValidationErrors
+  - type: "code"
+    language: "python"
+    title: "배치 입력을 정상/오류로 분리"
+    description: "여러 입력 행을 한 번에 검증하고 다음 단계로 넘길 데이터만 남깁니다."
+    content: |-
+      rawOrders = [
+          {'orderId': 'A-100', 'customer': 'kim', 'amount': '120000', 'status': 'paid'},
+          {'orderId': 'A-101', 'customer': 'lee', 'amount': '20000', 'status': 'pending'},
+          {'orderId': ' ', 'customer': 'park', 'amount': '50000', 'status': 'paid'},
+          {'orderId': 'A-103', 'customer': 'choi', 'amount': '-1', 'status': 'paid'},
+      ]
+
+      def validateOrderBatch(rows):
+          accepted = []
+          rejected = []
+          for index, row in enumerate(rows, start=1):
+              try:
+                  accepted.append(OrderInput.model_validate(row))
+              except ValidationError as exc:
+                  rejected.append({'rowNumber': index, 'errors': exc.errors()})
+          return accepted, rejected
+
+      acceptedOrders, rejectedOrders = validateOrderBatch(rawOrders)
+      paidRevenue = sum(order.amount for order in acceptedOrders if order.isRevenue)
+
+      assert len(acceptedOrders) == 2
+      assert len(rejectedOrders) == 2
+      assert paidRevenue == 120000
+      acceptedOrders, rejectedOrders
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 최소 결제 금액 정책 바꾸기"
+    description: "정상 주문 중 추가 업무 정책을 바꾸며 대상 수가 어떻게 달라지는지 확인합니다."
+    content: |-
+      def filterRevenueOrders(orders, minAmount):
+          if minAmount <= 0:
+              raise ValueError('minAmount must be positive')
+          return [order for order in orders if order.isRevenue and order.amount >= minAmount]
+
+      revenueOver50000 = filterRevenueOrders(acceptedOrders, 50000)
+      revenueOver150000 = filterRevenueOrders(acceptedOrders, 150000)
+
+      assert [order.orderId for order in revenueOver50000] == ['A-100']
+      assert revenueOver150000 == []
+      revenueOver50000, revenueOver150000

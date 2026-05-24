@@ -3,7 +3,7 @@ meta:
   title: "알고리즘 연습"
   day: 29
   category: "30days"
-  tags: []
+  tags: ["알고리즘", "정렬", "검색", "재귀", "복잡도", "검증"]
   seo:
     title: "파이썬 알고리즘 연습 - 정렬, 검색, 재귀"
     description: "정렬 알고리즘, 검색 알고리즘, 재귀 함수를 배웁니다."
@@ -368,6 +368,102 @@ sections:
       maxSubarraySum(scores, 3)
   - type: "tip"
     content: "복잡한 문제는 작은 함수로 나누어 구현하면 이해와 디버깅이 쉬워집니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 알고리즘 전제를 확인하고 선택하기"
+  subtitle: "예측 → 전제 검증 → 구현 → 경계값 테스트"
+  blocks:
+  - type: "text"
+    content: "알고리즘은 답만 맞히는 코드가 아니라, 어떤 전제가 있을 때 빠르고 안전한지 판단하는 과정입니다. 이진 검색은 정렬된 데이터에서만 동작하고, 빈도 분석은 동률 처리 규칙이 있어야 합니다."
+  - type: "code"
+    language: "python"
+    title: "정렬, 검색, 빈도 분석 통합 검증"
+    description: "정렬 전제를 확인한 뒤 검색과 집계 알고리즘을 검증합니다."
+    content: |-
+      def isSorted(values):
+          for index in range(len(values) - 1):
+              if values[index] > values[index + 1]:
+                  return False
+          return True
+
+      def mergeSort(values):
+          if len(values) <= 1:
+              return values[:]
+
+          middle = len(values) // 2
+          left = mergeSort(values[:middle])
+          right = mergeSort(values[middle:])
+          merged = []
+          leftIndex = 0
+          rightIndex = 0
+
+          while leftIndex < len(left) and rightIndex < len(right):
+              if left[leftIndex] <= right[rightIndex]:
+                  merged.append(left[leftIndex])
+                  leftIndex += 1
+              else:
+                  merged.append(right[rightIndex])
+                  rightIndex += 1
+
+          return merged + left[leftIndex:] + right[rightIndex:]
+
+      def binarySearch(values, target):
+          if not isSorted(values):
+              raise ValueError("binary search requires sorted input")
+
+          left = 0
+          right = len(values) - 1
+          while left <= right:
+              middle = (left + right) // 2
+              if values[middle] == target:
+                  return middle
+              if values[middle] < target:
+                  left = middle + 1
+              else:
+                  right = middle - 1
+          return -1
+
+      def topKFrequent(values, limit):
+          frequency = {}
+          for value in values:
+              frequency[value] = frequency.get(value, 0) + 1
+          ordered = sorted(frequency.items(), key=lambda item: (-item[1], item[0]))
+          return ordered[:limit]
+
+      def maxWindowSum(values, size):
+          if size <= 0:
+              raise ValueError("window size must be positive")
+          if len(values) < size:
+              return 0
+
+          currentSum = sum(values[:size])
+          bestSum = currentSum
+          for index in range(size, len(values)):
+              currentSum = currentSum - values[index - size] + values[index]
+              bestSum = max(bestSum, currentSum)
+          return bestSum
+
+      latencies = [310, 120, 480, 200, 900, 480]
+      sortedLatencies = mergeSort(latencies)
+
+      assert sortedLatencies == [120, 200, 310, 480, 480, 900]
+      assert binarySearch(sortedLatencies, 480) == 4
+      assert binarySearch(sortedLatencies, 777) == -1
+      assert topKFrequent(["E2", "E1", "E2", "E3", "E1", "E2"], 2) == [("E2", 3), ("E1", 2)]
+      assert maxWindowSum([3, 1, 8, 2, 5, 4], 3) == 15
+
+      try:
+          binarySearch(latencies, 480)
+      except ValueError as exc:
+          assert "sorted" in str(exc)
+
+      print("알고리즘 전제 검증 흐름 통과")
+  - type: "list"
+    items:
+    - "빠른 알고리즘일수록 입력 전제가 있는지 먼저 확인합니다."
+    - "동률, 빈 입력, 잘못된 크기 같은 경계값을 테스트에 포함합니다."
+    - "직접 구현한 알고리즘은 작은 샘플에서 예상 결과를 assert로 고정합니다."
+    - "실무 변주: 지연 시간 대신 주문 금액, 장애 코드, 사용자 활동 로그를 넣어 같은 알고리즘 선택 기준이 유지되는지 비교해 보세요."
 
 - id: "practice"
   title: "Day 29 종합 복습"

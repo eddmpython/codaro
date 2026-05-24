@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - folium
   id: folium_00
   title: Folium 소개
   order: 0
@@ -138,8 +140,109 @@ sections:
   - type: text
     content: Folium은 OpenStreetMap 기반이라 API 키가 필요 없습니다. 설치 후 바로 사용할 수 있습니다.
   - type: text
-    content: "**무료 타일 제공자**: OpenStreetMap, CartoDB, Stamen 등 여러 무료 타일을 사용할 수 있습니다."
+    content: "**무료 타일 제공자**: OpenStreetMap, CartoDB, attribution을 명시한 OpenTopoMap 같은 무료 타일을 사용할 수 있습니다."
   - type: text
     content: "**제한 없음**: 구글맵 API처럼 일일 요청 제한이 없습니다. 학습과 프로토타이핑에 적합합니다."
   - type: tip
     content: 상업적 용도나 대량 트래픽의 경우 타일 제공자의 이용약관을 확인하세요.
+
+- id: workflow_validation
+  title: 로컬 지도 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: Folium 입문은 지도 객체를 만드는 데서 끝나지 않습니다. 업무에서는 좌표가 맞는지, 이름이 렌더 결과에 들어갔는지, 새 지점을 추가해도 검증 기준이 유지되는지 코드로 확인해야 합니다.
+  - type: list
+    items:
+      - 실행 전에는 어떤 지점이 지도 중심에 가까운지 먼저 예측합니다.
+      - 좌표는 Folium의 [위도, 경도] 순서인지 검사합니다.
+      - 렌더된 HTML에 지점명과 레이어명이 들어갔는지 확인합니다.
+      - 임계값이나 지점 수를 바꿔도 검증 코드가 함께 움직이도록 만듭니다.
+  - type: code
+    language: python
+    title: 지도 데이터와 검증 함수
+    description: 로컬 Python에서 바로 실행할 수 있는 지점 데이터를 준비합니다.
+    content: |-
+      import folium
+
+      officeSites = [
+          {"name": "서울 운영센터", "loc": [37.5665, 126.9780], "priority": "core"},
+          {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
+          {"name": "홍대 체험존", "loc": [37.5563, 126.9236], "priority": "medium"},
+      ]
+
+      def validateSite(site):
+          lat, lon = site["loc"]
+          if not (33 <= lat <= 39 and 124 <= lon <= 132):
+              raise ValueError(f"한국 좌표 범위 밖: {site['name']}")
+          if site["priority"] not in {"core", "high", "medium"}:
+              raise ValueError(f"알 수 없는 우선순위: {site['priority']}")
+          return True
+
+      validationResult = [validateSite(site) for site in officeSites]
+      validationResult
+  - type: code
+    language: python
+    title: 좌표 오류 확인
+    description: 위도와 경도를 뒤집은 데이터를 넣어 검증 함수가 잡는지 확인합니다.
+    content: |-
+      brokenSite = {"name": "좌표 뒤집힘", "loc": [126.9780, 37.5665], "priority": "core"}
+
+      try:
+          validateSite(brokenSite)
+      except ValueError as exc:
+          coordinateError = str(exc)
+
+      coordinateError
+  - type: code
+    language: python
+    title: 로컬 지도 생성
+    description: 우선순위에 따라 마커 색을 나누고 지도 객체를 만듭니다.
+    content: |-
+      priorityColor = {"core": "red", "high": "orange", "medium": "blue"}
+      officeMap = folium.Map(location=[37.54, 126.98], zoom_start=12, tiles="CartoDB Positron")
+
+      for site in officeSites:
+          folium.Marker(
+              location=site["loc"],
+              popup=f"{site['name']} / {site['priority']}",
+              tooltip=site["name"],
+              icon=folium.Icon(color=priorityColor[site["priority"]], icon="info-sign"),
+          ).add_to(officeMap)
+
+      officeMap.fit_bounds([site["loc"] for site in officeSites])
+      officeMap
+  - type: code
+    language: python
+    title: 렌더 결과 검증
+    description: 눈으로 보기 전에 이름, 오류, 마커 수를 코드로 확인합니다.
+    content: |-
+      officeHtml = officeMap.get_root().render()
+      officeChecks = {
+          "allNamesRendered": all(site["name"] in officeHtml for site in officeSites),
+          "coordinateErrorOk": coordinateError == "한국 좌표 범위 밖: 좌표 뒤집힘",
+          "validationOk": all(validationResult),
+          "markerCountOk": officeHtml.count("marker_") >= len(officeSites),
+      }
+
+      assert all(officeChecks.values()), officeChecks
+      officeChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 우선순위 기준을 바꾸면 운영 대상이 어떻게 달라지는지 비교합니다.
+    content: |-
+      def pickPrioritySites(sites, allowed):
+          selected = [site["name"] for site in sites if site["priority"] in allowed]
+          if not selected:
+              raise ValueError("선택된 지점이 없습니다")
+          return selected
+
+      coreOnly = pickPrioritySites(officeSites, {"core"})
+      expandedTargets = pickPrioritySites(officeSites, {"core", "high"})
+
+      assert coreOnly == ["서울 운영센터"]
+      assert "강남 상담센터" in expandedTargets
+      coreOnly, expandedTargets
+  - type: tip
+    content: Folium 결과가 지도로 보인다는 사실과 별개로, 업무 품질은 데이터 계약과 렌더 검증에서 결정됩니다.

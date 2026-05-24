@@ -3,7 +3,7 @@ meta:
   title: "모듈과import"
   day: 18
   category: "30days"
-  tags: []
+  tags: ["모듈", "import", "표준라이브러리", "datetime", "pathlib", "리포트", "검증"]
   seo:
     title: "파이썬 모듈과 import - 표준 라이브러리 활용"
     description: "import, from, as와 math, random, datetime 모듈을 배웁니다."
@@ -263,6 +263,106 @@ sections:
       tomorrow.day
   - type: "tip"
     content: "datetime 객체는 여러 속성과 메서드를 제공합니다."
+
+- id: "workflow_validation"
+  title: "실무 import 조합 루프"
+  subtitle: "필요한 도구를 고르고 오류를 읽기"
+  blocks:
+  - type: "text"
+    content: "실무에서는 모듈 하나만 외워서 쓰기보다, 표준 라이브러리 여러 개를 필요한 만큼 가져와 작은 리포트 흐름을 만듭니다. 실행 전에 어떤 모듈이 어떤 역할을 하는지 예측하고, 이름 오류가 나면 import 방식과 별칭을 확인해 고칩니다."
+  - type: "list"
+    items:
+    - "datetime은 문자열 날짜를 계산 가능한 시간 값으로 바꿉니다."
+    - "statistics는 평균처럼 자주 쓰는 통계 계산을 맡깁니다."
+    - "pathlib은 파일을 실제로 만들지 않아도 경로를 안전하게 조립합니다."
+    - "NameError가 나오면 모듈 이름, 별칭, from import 대상을 먼저 확인합니다."
+  - type: "code"
+    language: "python"
+    title: "표준 라이브러리로 업무 리포트 준비"
+    description: "날짜, 평균, 리포트 파일명을 각 모듈에 맡깁니다. 실행 전에 latestDate와 averageMinutes를 예측해보세요."
+    content: |-
+      from datetime import datetime
+      from pathlib import Path
+      from statistics import mean
+
+      workLogs = [
+          {"startedAt": "2026-05-01 09:15", "minutes": 18, "status": "done"},
+          {"startedAt": "2026-05-02 10:30", "minutes": 32, "status": "done"},
+          {"startedAt": "2026-05-03 13:10", "minutes": 21, "status": "done"},
+          {"startedAt": "2026-05-03 16:00", "minutes": 12, "status": "todo"},
+      ]
+
+      def summarizeWorkLogs(logs):
+          finishedLogs = [log for log in logs if log["status"] == "done"]
+          latestStartedAt = max(
+              datetime.strptime(log["startedAt"], "%Y-%m-%d %H:%M")
+              for log in finishedLogs
+          )
+          reportPath = Path("reports") / f"daily-{latestStartedAt:%Y-%m-%d}.txt"
+          return {
+              "doneCount": len(finishedLogs),
+              "averageMinutes": round(mean(log["minutes"] for log in finishedLogs), 1),
+              "latestDate": latestStartedAt.strftime("%Y-%m-%d"),
+              "reportFile": reportPath.name,
+          }
+
+      workSummary = summarizeWorkLogs(workLogs)
+      workSummary
+  - type: "code"
+    language: "python"
+    title: "별칭 오류 읽기"
+    description: "stats라는 별칭을 import하지 않고 사용하면 어떤 오류가 나는지 확인합니다."
+    content: |-
+      try:
+          stats.mean([18, 32, 21])
+      except NameError as exc:
+          moduleErrorMessage = str(exc)
+
+      moduleErrorMessage
+  - type: "code"
+    language: "python"
+    title: "별칭을 정하고 다시 실행"
+    description: "import as로 별칭을 만든 뒤 같은 계산을 다시 실행합니다."
+    content: |-
+      import statistics as stats
+
+      stats.mean([18, 32, 21])
+  - type: "code"
+    language: "python"
+    title: "리포트 결과 검증"
+    description: "리포트 요약이 예상한 업무 규칙과 맞는지 점검합니다."
+    content: |-
+      expectedSummary = {
+          "doneCount": 3,
+          "averageMinutes": 23.7,
+          "latestDate": "2026-05-03",
+          "reportFile": "daily-2026-05-03.txt",
+      }
+
+      checks = {
+          key: workSummary[key] == expectedSummary[key]
+          for key in expectedSummary
+      }
+
+      assert all(checks.values())
+      checks
+  - type: "code"
+    language: "python"
+    title: "수정 실험"
+    description: "작업 시간이 줄어들면 평균 리포트가 어떻게 바뀌는지 비교합니다."
+    content: |-
+      from datetime import timedelta
+
+      shorterLogs = [
+          {**log, "minutes": max(log["minutes"] - 5, 1)}
+          for log in workLogs
+      ]
+      shorterSummary = summarizeWorkLogs(shorterLogs)
+      nextReviewAt = datetime.strptime(workSummary["latestDate"], "%Y-%m-%d") + timedelta(days=7)
+
+      workSummary["averageMinutes"], shorterSummary["averageMinutes"], nextReviewAt.strftime("%Y-%m-%d")
+  - type: "tip"
+    content: "import는 코드 맨 위를 꾸미는 문장이 아니라, 문제를 해결할 도구를 명확히 고르는 과정입니다. 모듈 이름을 바꾸거나 별칭을 쓰면 호출 코드도 함께 검증하세요."
 
 - id: "practice"
   title: "Day 18 종합 복습"

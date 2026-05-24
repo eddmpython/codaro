@@ -3,7 +3,7 @@ meta:
   title: "헬로월드"
   day: 1
   category: 30days
-  tags: []
+  tags: ["헬로월드", "print", "주석", "출력", "첫실행", "검증"]
   seo:
     title: "파이썬 시작 - 헬로월드"
     description: "파이썬의 첫 시작, 헬로월드와 주석을 배웁니다."
@@ -199,6 +199,85 @@ sections:
     description: "마지막 줄의 값이 자동으로 출력됩니다."
     content: |-
       'Hello Notebook'
+
+- id: workflow_validation
+  title: "첫 실행 검증 루프"
+  subtitle: "예측 → 실행 → 오류 확인 → 실무 출력"
+  blocks:
+  - type: text
+    content: "처음 배우는 print()도 업무 코드처럼 검증할 수 있습니다. 화면에 보일 문장을 먼저 예상하고, 실제 출력 문자열을 캡처해서 비교합니다. 이렇게 하면 단순히 눈으로 보는 연습에서 벗어나 자동으로 맞고 틀림을 확인하는 습관을 만들 수 있습니다."
+  - type: code
+    language: python
+    title: "출력 결과 예측하기"
+    description: "stdout을 캡처해서 print 결과가 예상과 같은지 확인합니다."
+    content: |-
+      from contextlib import redirect_stdout
+      from io import StringIO
+
+      def capturePrintOutput(action):
+          stream = StringIO()
+          with redirect_stdout(stream):
+              action()
+          return stream.getvalue()
+
+      expectedOutput = "Hello World\n"
+      actualOutput = capturePrintOutput(lambda: print("Hello World"))
+
+      assert actualOutput == expectedOutput
+      actualOutput
+  - type: code
+    language: python
+    title: "의도한 오류 확인하기"
+    description: "출력 문구가 바뀌면 검증이 실패하는지 확인합니다."
+    content: |-
+      brokenOutput = capturePrintOutput(lambda: print("Hello Python"))
+
+      try:
+          assert brokenOutput == expectedOutput
+      except AssertionError as exc:
+          print("검증 실패 확인:", exc)
+
+      fixedOutput = capturePrintOutput(lambda: print("Hello World"))
+      assert fixedOutput == expectedOutput
+  - type: code
+    language: python
+    title: "실무 출력 카드 만들기"
+    description: "처음 배운 print 흐름을 작은 리포트 출력으로 확장합니다."
+    content: |-
+      def printStudyCard(name, day, minutes):
+          print("=" * 20)
+          print(f"학습자: {name}")
+          print(f"진도: Day {day}")
+          print(f"학습 시간: {minutes}분")
+          print("=" * 20)
+
+      cardOutput = capturePrintOutput(lambda: printStudyCard("홍길동", 1, 50))
+
+      assert "학습자: 홍길동" in cardOutput
+      assert "진도: Day 1" in cardOutput
+      assert "학습 시간: 50분" in cardOutput
+      cardOutput
+  - type: code
+    language: python
+    title: "기준 변경 실험"
+    description: "출력에 들어가는 숫자를 바꾸면 합계도 함께 바뀌는지 확인합니다."
+    content: |-
+      def buildMenuReceipt(pizzaCount, burgerCount):
+          pizzaPrice = 15000
+          burgerPrice = 8000
+          total = pizzaCount * pizzaPrice + burgerCount * burgerPrice
+          return f"피자 {pizzaCount}개, 햄버거 {burgerCount}개, 합계: {total}원"
+
+      smallOrder = buildMenuReceipt(1, 1)
+      largeOrder = buildMenuReceipt(2, 1)
+
+      assert "합계: 23000원" in smallOrder
+      assert "합계: 38000원" in largeOrder
+      assert smallOrder != largeOrder
+
+      print(largeOrder)
+  - type: tip
+    content: "초보 단계에서도 assert를 쓰면 내가 예상한 출력과 실제 출력이 같은지 자동으로 확인할 수 있습니다. 이 습관이 나중에 데이터 분석, 자동화, 테스트 코드로 그대로 이어집니다."
 
 - id: practice
   title: "Day 1 종합 복습"

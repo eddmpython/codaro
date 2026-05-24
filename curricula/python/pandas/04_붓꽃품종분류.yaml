@@ -7,8 +7,8 @@ meta:
   category: pandas
   difficulty: "⭐⭐⭐"
   badge: 기초
-  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv
-  tags: ["iris", "결측치", "apply", "map", "새컬럼"]
+  dataSource: codaro-local:iris
+  tags: ["iris", "결측치", "apply", "map", "새컬럼", "검증", "데이터정제"]
   seo:
     title: "pandas 결측치 처리와 새 컬럼 만들기 - 붓꽃 데이터"
     description: "붓꽃 데이터로 결측치 처리(dropna, fillna)와 새 컬럼 추가(assign, apply, map)를 배웁니다. 꽃잎 면적 계산 실습."
@@ -25,18 +25,17 @@ sections:
   subtitle: 붓꽃 데이터
   blocks:
   - type: text
-    content: 150송이 붓꽃, 3품종(setosa, versicolor, virginica) 각 50송이씩입니다.
+    content: 150송이 붓꽃, 3품종(setosa, versicolor, virginica) 각 50송이씩입니다. 로컬 실행에서는 네트워크가 없어도 결측치 처리, 새 컬럼, apply/map 흐름을 연습할 수 있도록 같은 컬럼 구조의 샘플 데이터를 함께 둡니다.
   - type: code
     language: python
     title: 데이터 불러오기
     description: 붓꽃 데이터를 불러옵니다
     content: |-
       import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv"
-      iris = pd.read_csv(url)
+      iris = loadLocalDataset("iris")
       iris.shape
-
 - id: step2_head
   title: 2단계. 미리보기
   subtitle: 데이터 구조 파악
@@ -256,6 +255,55 @@ sections:
       unique = iris.drop_duplicates()
       len(iris), len(unique)
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 붓꽃 데이터 정제와 파생 컬럼"
+  subtitle: "결측 처리, apply/map, 중복 제거, 실패 케이스"
+  blocks:
+  - type: text
+    content: "데이터 정제는 값을 채우는 것보다 정제 전후 행 수와 파생 컬럼 의미를 검증하는 것이 중요합니다. 결측, 중복, 분류 컬럼을 한 흐름에서 확인하세요."
+  - type: code
+    language: python
+    title: "면적 파생 컬럼과 품종 라벨 만들기"
+    description: "apply/map으로 만든 컬럼이 기대값과 맞는지 검증합니다."
+    content: |-
+      import pandas as pd
+
+      iris = pd.DataFrame({
+          "sepal_length": [5.1, 4.9, 5.1],
+          "sepal_width": [3.5, 3.0, 3.5],
+          "species": ["setosa", "versicolor", "setosa"],
+      })
+
+      iris["sepal_area"] = iris.apply(lambda row: row["sepal_length"] * row["sepal_width"], axis=1)
+      iris["species_label"] = iris["species"].map({"setosa": "S", "versicolor": "V"})
+      unique = iris.drop_duplicates()
+
+      assert round(iris.loc[0, "sepal_area"], 2) == 17.85
+      assert iris["species_label"].tolist() == ["S", "V", "S"]
+      assert len(unique) == 2
+  - type: code
+    language: python
+    title: "필수 측정값 누락 확인"
+    description: "면적 계산에 필요한 컬럼 결측은 먼저 잡습니다."
+    content: |-
+      import pandas as pd
+
+      def validateMeasurements(frame):
+          required = ["sepal_length", "sepal_width"]
+          if frame[required].isna().any().any():
+              raise ValueError("sepal measurements must not be missing")
+          return True
+
+      try:
+          validateMeasurements(pd.DataFrame({"sepal_length": [5.1], "sepal_width": [None]}))
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "sepal measurements must not be missing"
+  - type: tip
+    title: "변주 실험"
+    content: "꽃잎 면적 컬럼도 추가하고, 꽃받침 면적과 꽃잎 면적 중 어떤 값이 품종 분리에 더 유용한지 groupby 평균으로 비교하세요."
+
 - id: practice
   title: 실습
   subtitle: 붓꽃 분석 프로젝트
@@ -271,7 +319,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        data = loadLocalDataset("iris")
     - type: code
       title: "분석 수행"
       content: |-
@@ -287,7 +337,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/iris.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        df = loadLocalDataset("iris")
     - type: code
       title: "분석 수행"
       content: |-

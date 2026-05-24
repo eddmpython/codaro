@@ -10,13 +10,13 @@ meta:
   tags: ["folium", "tiles", "TileLayer", "스타일", "테마"]
   seo:
     title: "Folium 지도 스타일 - 타일 레이어 변경"
-    description: "Folium으로 지도 스타일을 변경합니다. OpenStreetMap, CartoDB, Stamen 등 다양한 타일을 사용합니다."
-    keywords: ["folium", "tiles", "TileLayer", "CartoDB", "Stamen", "지도 스타일"]
+    description: "Folium으로 지도 스타일을 변경합니다. OpenStreetMap, CartoDB, OpenTopoMap 등 다양한 타일을 사용합니다."
+    keywords: ["folium", "tiles", "TileLayer", "CartoDB", "OpenTopoMap", "지도 스타일"]
 
 intro:
   emoji: "🎨"
   goal: 다양한 타일 레이어로 지도 스타일을 변경합니다.
-  description: Folium은 여러 지도 스타일을 지원합니다. 기본 OpenStreetMap 외에 CartoDB, Stamen 등 다양한 타일을 사용할 수 있습니다. 용도에 맞는 스타일을 선택하여 지도를 꾸밉니다.
+  description: Folium은 여러 지도 스타일을 지원합니다. 기본 OpenStreetMap 외에 CartoDB, attribution을 명시한 커스텀 타일을 사용할 수 있습니다. 용도에 맞는 스타일을 선택하여 지도를 꾸밉니다.
 
 sections:
 - id: step1_import
@@ -90,47 +90,50 @@ sections:
   - type: tip
     content: Positron은 데이터 시각화 배경으로 적합합니다. 마커와 도형이 잘 보입니다. DarkMatter는 야간 모드나 밝은 색 데이터에 적합합니다.
 
-- id: step4_stamen
-  title: 4단계. Stamen 타일
-  subtitle: Terrain, Toner, Watercolor
+- id: step4_custom_tiles
+  title: 4단계. 커스텀 타일
+  subtitle: attribution 있는 외부 타일
   blocks:
   - type: text
-    content: Stamen은 예술적인 지도 타일을 제공합니다. Terrain은 지형, Toner는 흑백, Watercolor는 수채화 스타일입니다.
+    content: 외부 타일 서버를 사용할 때는 URL과 attribution을 함께 지정합니다. attribution이 없으면 최신 Folium에서는 실행 오류가 납니다.
   - type: code
     language: python
-    title: Stamen Terrain
+    title: OpenTopoMap 지형도
     description: 지형 강조
     content: |-
-      m5 = folium.Map(
-          location=[37.6608, 126.9933],
-          zoom_start=12,
-          tiles="Stamen Terrain"
-      )
+      m5 = folium.Map(location=[37.6608, 126.9933], zoom_start=12)
+
+      folium.TileLayer(
+          tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          attr="Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+          name="OpenTopoMap 지형도"
+      ).add_to(m5)
+
       m5
   - type: code
     language: python
-    title: Stamen Toner
+    title: CartoDB Positron
     description: 흑백 스타일
     content: |-
       m6 = folium.Map(
           location=seoulCenter,
           zoom_start=12,
-          tiles="Stamen Toner"
+          tiles="CartoDB Positron"
       )
       m6
   - type: code
     language: python
-    title: Stamen Watercolor
-    description: 수채화 스타일
+    title: CartoDB Dark Matter
+    description: 어두운 대시보드 스타일
     content: |-
       m7 = folium.Map(
           location=seoulCenter,
           zoom_start=12,
-          tiles="Stamen Watercolor"
+          tiles="CartoDB Dark_Matter"
       )
       m7
   - type: tip
-    content: Terrain은 산악 지역이나 등산 지도에 적합합니다. Watercolor는 인쇄물이나 예술적 표현에 좋습니다.
+    content: 외부 타일은 attr이 필수입니다. 기본 제공 이름이 아닌 URL 템플릿을 쓸 때는 저작권 표시를 반드시 넣으세요.
 
 - id: step5_tile_comparison
   title: 5단계. 타일 비교
@@ -147,8 +150,7 @@ sections:
           "OpenStreetMap",
           "CartoDB Positron",
           "CartoDB Dark_Matter",
-          "Stamen Terrain",
-          "Stamen Toner"
+          "OpenTopoMap URL + attr"
       ]
       tiles
   - type: code
@@ -244,9 +246,10 @@ sections:
       m13 = folium.Map(location=seoulCenter, zoom_start=12)
 
       folium.TileLayer(
-          tiles="Stamen Toner",
+          tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+          attr="Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
           opacity=0.3,
-          name="톤 오버레이"
+          name="지형 오버레이"
       ).add_to(m13)
 
       m13
@@ -361,6 +364,140 @@ sections:
   - type: tip
     content: 우측 상단의 레이어 컨트롤에서 낮 모드/밤 모드를 선택할 수 있습니다.
 
+- id: step11_workflow
+  title: 11단계. 실무 타일 선택 검증
+  subtitle: 예측 → attribution 오류 확인 → 렌더 검증 → 용도 실험
+  blocks:
+  - type: text
+    content: 지도 스타일은 취향 문제가 아니라 데이터가 잘 읽히는지와 라이선스 표시가 맞는지의 문제입니다. 업무용 지도에서는 타일 프로필을 정의하고, 커스텀 URL에는 attribution이 있는지 검증한 뒤, 레이어 이름이 HTML에 렌더링되는지 확인해야 합니다.
+  - type: list
+    items:
+    - "실행 전에는 어떤 업무 목적에 어떤 타일이 맞을지 먼저 예측합니다."
+    - "커스텀 타일 URL에 attribution이 없으면 실행 전에 오류로 확인합니다."
+    - "LayerControl에 업무용 레이어 이름이 모두 들어갔는지 검증합니다."
+    - "목적을 바꾸는 실험으로 타일 선택 기준이 어떻게 달라지는지 비교합니다."
+  - type: code
+    language: python
+    title: 타일 프로필 정의
+    description: 운영 지도에서 사용할 타일 후보와 권장 용도를 구조화합니다.
+    content: |-
+      tileProfiles = {
+          "operations": {"name": "운영 기본", "tiles": "OpenStreetMap", "attr": None, "useCase": "현장 위치 확인"},
+          "report": {"name": "리포트 배경", "tiles": "CartoDB Positron", "attr": None, "useCase": "데이터 시각화"},
+          "night": {"name": "야간 관제", "tiles": "CartoDB Dark_Matter", "attr": None, "useCase": "야간 대시보드"},
+          "terrain": {
+              "name": "지형 점검",
+              "tiles": "https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+              "attr": "Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+              "useCase": "산악/고도 맥락",
+          },
+      }
+
+      recommendedProfile = tileProfiles["report"]
+      recommendedProfile["name"], recommendedProfile["useCase"]
+  - type: code
+    language: python
+    title: 타일 프로필 검증 함수
+    description: URL 타일에는 attribution이 있는지 확인합니다.
+    content: |-
+      def validateTileProfile(profileKey, profile):
+          tileValue = profile["tiles"]
+          isCustomUrl = isinstance(tileValue, str) and tileValue.startswith("http")
+          if isCustomUrl and not profile.get("attr"):
+              raise ValueError(f"타일 attribution 누락: {profileKey}")
+          return True
+
+      tileValidation = [
+          validateTileProfile(profileKey, profile)
+          for profileKey, profile in tileProfiles.items()
+      ]
+      tileValidation
+  - type: code
+    language: python
+    title: attribution 오류 확인
+    description: 커스텀 URL에서 attribution을 뺀 프로필을 검증해 오류를 읽습니다.
+    content: |-
+      brokenTileProfile = {
+          "name": "깨진 외부 타일",
+          "tiles": "https://example.com/{z}/{x}/{y}.png",
+          "attr": "",
+          "useCase": "오류 확인",
+      }
+
+      try:
+          validateTileProfile("broken", brokenTileProfile)
+      except ValueError as exc:
+          tileAttributionError = str(exc)
+
+      tileAttributionError
+  - type: code
+    language: python
+    title: 업무용 타일 레이어 지도
+    description: 검증된 타일 프로필을 LayerControl에 모두 등록합니다.
+    content: |-
+      tileAuditMap = folium.Map(location=seoulCenter, zoom_start=12, tiles=None)
+
+      for profileKey, profile in tileProfiles.items():
+          validateTileProfile(profileKey, profile)
+          layerArgs = {"tiles": profile["tiles"], "name": profile["name"]}
+          if profile["attr"]:
+              layerArgs["attr"] = profile["attr"]
+          folium.TileLayer(**layerArgs).add_to(tileAuditMap)
+
+      folium.Marker(
+          seoulCenter,
+          popup="타일 레이어 검증 기준점",
+          tooltip="서울 중심",
+          icon=folium.Icon(color="red", icon="ok-sign"),
+      ).add_to(tileAuditMap)
+      folium.LayerControl().add_to(tileAuditMap)
+
+      tileAuditMap
+  - type: code
+    language: python
+    title: 렌더 결과 검증
+    description: 레이어 이름, attribution 오류, 추천 프로필이 예상대로 준비됐는지 확인합니다.
+    content: |-
+      tileAuditHtml = tileAuditMap.get_root().render()
+
+      import json
+
+      def renderedTextExists(text, html):
+          escapedText = json.dumps(text, ensure_ascii=True).strip('"')
+          return text in html or escapedText in html
+
+      tileChecks = {
+          "layersRendered": all(renderedTextExists(profile["name"], tileAuditHtml) for profile in tileProfiles.values()),
+          "markerRendered": renderedTextExists("타일 레이어 검증 기준점", tileAuditHtml),
+          "attributionErrorOk": tileAttributionError == "타일 attribution 누락: broken",
+          "recommendationOk": recommendedProfile["name"] == "리포트 배경",
+          "validationOk": all(tileValidation),
+      }
+
+      assert all(tileChecks.values()), tileChecks
+      tileChecks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 업무 목적을 바꾸면 어떤 타일 프로필을 선택하는지 비교합니다.
+    content: |-
+      def recommendTileProfile(goal):
+          goalToProfile = {
+              "field": "operations",
+              "report": "report",
+              "night": "night",
+              "mountain": "terrain",
+          }
+          profileKey = goalToProfile[goal]
+          return tileProfiles[profileKey]["name"]
+
+      reportTile = recommendTileProfile("report")
+      mountainTile = recommendTileProfile("mountain")
+
+      reportTile, mountainTile
+  - type: tip
+    content: 타일 선택은 보기 좋은 배경 고르기가 아닙니다. 데이터 대비, 업무 목적, attribution, LayerControl 렌더링을 함께 검증해야 로컬에서 반복 실행 가능한 지도 커리큘럼이 됩니다.
+
 - id: practice
   title: 실습
   subtitle: 타일 스타일
@@ -386,8 +523,14 @@ sections:
         hikingMap = folium.Map(
             location=[37.58, 127.0],
             zoom_start=11,
-            tiles="Stamen Terrain"
+            tiles=None
         )
+
+        folium.TileLayer(
+            tiles="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png",
+            attr="Map data: OpenStreetMap contributors, SRTM | Map style: OpenTopoMap",
+            name="지형도"
+        ).add_to(hikingMap)
 
         for mt in mountains:
             folium.Marker(

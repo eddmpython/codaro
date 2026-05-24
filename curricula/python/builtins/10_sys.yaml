@@ -31,6 +31,7 @@ sections:
     description: "sys 모듈을 불러옵니다."
     content: |-
       import sys
+      import tempfile
   - type: "tip"
     content: "Codaro에서는 한 번 import하면 이후 모든 셀에서 사용 가능합니다."
 
@@ -147,17 +148,23 @@ sections:
     title: "새 경로 추가"
     description: "경로 목록 끝에 새 경로를 추가합니다."
     content: |-
-      sys.path.append('/custom/path')
-      updatedPaths = sys.path
-      updatedPaths
+      pathSnapshot = sys.path.copy()
+      customPath = tempfile.mkdtemp(prefix='codaro_sys_custom_')
+      sys.path.append(customPath)
+      updatedPaths = sys.path.copy()
+      sys.path[:] = pathSnapshot
+      customPath in updatedPaths
   - type: "code"
     language: "python"
     title: "경로 앞에 삽입"
     description: "우선순위를 높이기 위해 맨 앞에 삽입합니다."
     content: |-
-      sys.path.insert(0, '/priority/path')
-      pathsWithPriority = sys.path
-      pathsWithPriority
+      pathSnapshot = sys.path.copy()
+      priorityPath = tempfile.mkdtemp(prefix='codaro_sys_priority_')
+      sys.path.insert(0, priorityPath)
+      pathsWithPriority = sys.path.copy()
+      sys.path[:] = pathSnapshot
+      pathsWithPriority[0] == priorityPath
   - type: "code"
     language: "python"
     title: "로드된 모듈 딕셔너리"
@@ -394,6 +401,95 @@ sections:
       systemInfo
   - type: "tip"
     content: "CPython, PyPy, Jython 등 다양한 파이썬 구현체를 구분할 수 있습니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 실행 환경 진단 리포트"
+  subtitle: "버전 요구사항, 경로 변경 복구, 인자 파싱 검증"
+  blocks:
+  - type: "text"
+    content: "sys는 실행 환경을 직접 다루므로 상태를 바꾼 뒤 반드시 되돌리는 습관이 필요합니다. 여기서는 런타임 요구사항을 검증하고, sys.path 변경을 복구하고, 명령행 인자 파싱 오류를 명시적으로 잡습니다."
+  - type: "code"
+    language: "python"
+    title: "런타임 요구사항 검증"
+    description: "로컬 커리큘럼 실행에 필요한 Python 버전과 인코딩 정보를 확인합니다."
+    content: |-
+      def buildRuntimeReport():
+          return {
+              "python": f"{sys.version_info.major}.{sys.version_info.minor}.{sys.version_info.micro}",
+              "implementation": sys.implementation.name,
+              "platform": sys.platform,
+              "encoding": sys.stdout.encoding,
+              "is64Bit": sys.maxsize > 2 ** 32,
+              "recursionLimit": sys.getrecursionlimit(),
+          }
+
+      runtimeReport = buildRuntimeReport()
+
+      assert sys.version_info >= (3, 12), runtimeReport["python"]
+      assert runtimeReport["implementation"] == "cpython"
+      assert runtimeReport["is64Bit"] is True
+      assert runtimeReport["recursionLimit"] >= 1000
+
+      runtimeReport
+  - type: "code"
+    language: "python"
+    title: "sys.path 변경 후 복구"
+    description: "임시 모듈 경로를 추가하고 검증한 뒤 원래 상태로 되돌립니다."
+    content: |-
+      originalPath = sys.path.copy()
+      pluginPath = tempfile.mkdtemp(prefix='codaro_sys_plugin_')
+
+      try:
+          sys.path.insert(0, pluginPath)
+          assert sys.path[0] == pluginPath
+          assert pluginPath in sys.path
+      finally:
+          sys.path[:] = originalPath
+
+      assert sys.path == originalPath
+
+      {"addedPath": pluginPath, "restored": sys.path == originalPath}
+  - type: "code"
+    language: "python"
+    title: "명령행 인자 파싱"
+    description: "argv 스타일 리스트를 파싱하고 필수 인자 누락을 검증합니다."
+    content: |-
+      def parseCliArgs(argv):
+          if len(argv) < 3:
+              raise ValueError("사용법: script.py --input path")
+          if argv[1] != "--input":
+              raise ValueError(f"알 수 없는 옵션입니다: {argv[1]}")
+          return {"script": argv[0], "input": argv[2]}
+
+      parsedArgs = parseCliArgs(["build_report.py", "--input", "data/sales.csv"])
+
+      try:
+          parseCliArgs(["build_report.py", "--output", "report.html"])
+      except ValueError as exc:
+          argProblem = str(exc)
+
+      assert parsedArgs == {"script": "build_report.py", "input": "data/sales.csv"}
+      assert "알 수 없는 옵션" in argProblem
+
+      parsedArgs, argProblem
+  - type: "code"
+    language: "python"
+    title: "모듈 로딩 상태 점검"
+    description: "필수 표준 모듈이 로드되어 있는지 확인하고 리포트로 정리합니다."
+    content: |-
+      requiredModules = ["sys", "tempfile"]
+      loadedModuleReport = {
+          moduleName: moduleName in sys.modules
+          for moduleName in requiredModules
+      }
+
+      assert all(loadedModuleReport.values())
+      assert len(sys.modules) > 0
+
+      loadedModuleReport
+  - type: "tip"
+    title: "변주 실험"
+    content: "`--input` 외에 `--limit` 옵션을 추가하고, 숫자가 아닌 값이 들어오면 `ValueError`로 막는 CLI 검증을 확장하세요."
 
 - id: "practice"
   title: "sys 모듈 종합 복습"

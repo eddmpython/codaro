@@ -32,10 +32,10 @@ sections:
     description: tips 데이터 로드
     content: |-
       import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
       import duckdb
 
-      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master"
-      df = pd.read_csv(f"{url}/tips.csv")
+      df = loadLocalDataset("tips")
       tips = duckdb.from_df(df)
   - type: tip
     content: "DuckDB는 duckdb.read_csv('파일.csv')나 SQL의 read_csv_auto() 함수로 로컬 파일과 URL을 직접 읽을 수 있습니다. 이 레슨은 pandas로 데이터를 먼저 확인한 뒤 duckdb.from_df()로 넘기는 흐름을 보여주며, 로컬 파일을 다룰 때는 DuckDB의 직접 읽기 기능도 함께 활용할 수 있습니다."
@@ -300,7 +300,15 @@ sections:
       content: |-
         import pandas as pd
         import duckdb
-        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+        data = pd.DataFrame({
+            "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
+            "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
+            "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
+            "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
+            "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
+            "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
+            "size": [2, 4, 3, 2, 5, 2, 2, 3],
+        })
         tbl = duckdb.from_df(data)
     - type: code
       title: 쿼리 실행
@@ -321,7 +329,15 @@ sections:
       content: |-
         import pandas as pd
         import duckdb
-        frame = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv")
+        frame = pd.DataFrame({
+            "total_bill": [16.99, 24.59, 32.40, 10.34, 40.17, 21.01, 18.78, 29.85],
+            "tip": [1.01, 3.61, 5.15, 1.66, 6.50, 3.50, 2.00, 4.20],
+            "sex": ["Female", "Male", "Male", "Female", "Male", "Female", "Female", "Male"],
+            "smoker": ["No", "No", "Yes", "No", "Yes", "No", "Yes", "No"],
+            "day": ["Sun", "Sat", "Sat", "Thur", "Sun", "Fri", "Thur", "Sat"],
+            "time": ["Dinner", "Dinner", "Dinner", "Lunch", "Dinner", "Lunch", "Lunch", "Dinner"],
+            "size": [2, 4, 3, 2, 5, 2, 2, 3],
+        })
         rel = duckdb.from_df(frame)
     - type: code
       title: 쿼리 실행
@@ -357,3 +373,108 @@ sections:
     - "ROUND - 반올림"
   - type: text
     content: 다음 시간에는 ORDER BY와 집계 함수를 배웁니다.
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 로컬 DuckDB 쿼리 품질 게이트"
+  subtitle: "예측 → 실행 → SQL 오류 수정 → 결과 검증 → 실무 변주"
+  blocks:
+  - type: "text"
+    content: "DuckDB 학습은 쿼리 결과를 눈으로 보는 데서 끝나면 실무로 이어지기 어렵습니다. 작은 로컬 테이블을 만들고, 잘못된 컬럼명을 먼저 실패시킨 뒤, 집계 결과와 기준 변경 실험을 assert로 고정합니다."
+  - type: "code"
+    language: "python"
+    title: "로컬 주문 테이블 준비와 예측"
+    description: "네트워크나 외부 DB 없이 인메모리 DuckDB 테이블로 재현 가능한 분석 흐름을 만듭니다."
+    content: |-
+      import duckdb
+
+      workflowCon = duckdb.connect()
+      workflowCon.sql("""
+          CREATE OR REPLACE TABLE lessonOrders AS
+          SELECT * FROM (VALUES
+              ('A-100', 'paid', 50000, 'web'),
+              ('A-101', 'pending', 20000, 'app'),
+              ('A-102', 'paid', 120000, 'web'),
+              ('A-103', 'cancelled', 15000, 'store'),
+              ('A-104', 'paid', 62000, 'app')
+          ) AS t(orderId, status, amount, channel)
+      """)
+
+      expectedPaidRevenue = 232000
+      expectedPaidCount = 3
+      rowCount = workflowCon.sql("SELECT COUNT(*) FROM lessonOrders").fetchone()[0]
+
+      assert rowCount == 5
+      rowCount
+  - type: "code"
+    language: "python"
+    title: "SQL 오류를 먼저 확인한다"
+    description: "없는 컬럼을 조회해 BinderException을 확인하고, 컬럼명을 고쳐 다시 실행합니다."
+    content: |-
+      try:
+          workflowCon.sql("SELECT missingAmount FROM lessonOrders").fetchall()
+      except duckdb.BinderException as exc:
+          duckdbColumnError = str(exc).splitlines()[0]
+      else:
+          raise AssertionError("없는 컬럼 조회는 실패해야 합니다")
+
+      fixedAmounts = workflowCon.sql("""
+          SELECT orderId, amount
+          FROM lessonOrders
+          WHERE status = 'paid'
+          ORDER BY amount DESC
+      """).fetchall()
+
+      assert "missingAmount" in duckdbColumnError
+      assert fixedAmounts[0] == ('A-102', 120000)
+      duckdbColumnError
+  - type: "code"
+    language: "python"
+    title: "집계 결과를 업무 규칙으로 검증"
+    description: "상태별 매출 집계가 예상한 paid 건수와 금액을 만족하는지 확인합니다."
+    content: |-
+      def validateRevenueReport(rows):
+          if not rows:
+              raise ValueError("report must not be empty")
+
+          revenueByStatus = {status: revenue for status, count, revenue in rows}
+          countByStatus = {status: count for status, count, revenue in rows}
+          if revenueByStatus.get('paid') != expectedPaidRevenue:
+              raise ValueError("paid revenue mismatch")
+          if countByStatus.get('paid') != expectedPaidCount:
+              raise ValueError("paid count mismatch")
+          return True
+
+      revenueReport = workflowCon.sql("""
+          SELECT
+              status,
+              COUNT(*) AS orderCount,
+              SUM(amount) AS revenue
+          FROM lessonOrders
+          GROUP BY status
+          ORDER BY status
+      """).fetchall()
+
+      assert validateRevenueReport(revenueReport)
+      assert dict((status, count) for status, count, revenue in revenueReport)['paid'] == 3
+      revenueReport
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 기준 금액을 바꿔 대상 추출"
+    description: "고액 결제 기준을 바꾸며 대상 주문이 어떻게 달라지는지 비교합니다."
+    content: |-
+      def findHighValuePaidOrders(minAmount):
+          if minAmount <= 0:
+              raise ValueError("minAmount must be positive")
+          return workflowCon.sql(f"""
+              SELECT orderId, amount
+              FROM lessonOrders
+              WHERE status = 'paid' AND amount >= {minAmount}
+              ORDER BY amount DESC
+          """).fetchall()
+
+      highValue60000 = findHighValuePaidOrders(60000)
+      highValue100000 = findHighValuePaidOrders(100000)
+
+      assert [row[0] for row in highValue60000] == ['A-102', 'A-104']
+      assert [row[0] for row in highValue100000] == ['A-102']
+      highValue60000, highValue100000

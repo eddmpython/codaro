@@ -45,10 +45,15 @@ sections:
     title: 데이터 로드
     description: pl.read_csv로 CSV 파일을 불러옵니다
     content: |-
-      baseUrl = "https://raw.githubusercontent.com"
-      movies = pl.read_csv(f"{baseUrl}/LearnDataSci/articles/master/Python%20Pandas%20Tutorial%20A%20Complete%20Introduction%20for%20Beginners/IMDB-Movie-Data.csv")
+      import polars as pl
+      from io import StringIO
+      from codaro.curriculum.localData import loadLocalDataset
+
+      moviesCsv = loadLocalDataset("imdb_movies").to_csv(index=False)
+      movies = pl.read_csv(StringIO(moviesCsv))
+      movies.head()
   - type: tip
-    content: "pl.read_csv()는 CSV 파일을 DataFrame으로 변환합니다. URL이나 로컬 파일 경로 모두 지원하며, pandas와 달리 자동으로 멀티스레드를 활용하여 큰 파일도 빠르게 읽습니다. f-string으로 URL을 조합하면 가독성이 좋아집니다."
+    content: "이번 수업은 Codaro 로컬 데이터를 CSV 문자열로 만든 뒤 StringIO와 pl.read_csv()로 읽습니다. 실제 업무에서는 같은 함수에 파일 경로나 내부 데이터 경로를 넣어 대용량 CSV를 빠르게 읽을 수 있습니다."
 
 - id: step3_schema
   title: 3단계. 스키마 확인
@@ -183,6 +188,93 @@ sections:
   - type: tip
     content: "agg() 안에 여러 집계를 리스트로 묶으면 한 번에 여러 통계를 계산합니다. 각 집계마다 alias()로 의미 있는 컬럼명을 지정하세요. 이렇게 하면 평균, 개수, 합계 등을 동시에 구할 수 있어 효율적입니다."
 
+- id: workflow_validation
+  title: 11단계. 실무 검증 루프
+  subtitle: 예측 → 오류 수정 → 검증 → 기준 변경
+  blocks:
+  - type: text
+    content: 업무에서 집계 결과를 보고서나 자동화 파이프라인에 넘길 때는 DataFrame이 만들어졌다는 사실만으로 충분하지 않습니다. 먼저 필요한 컬럼이 있는지 확인하고, 결과가 말이 되는지 예측한 뒤, 의도적으로 깨진 결과를 검증 함수가 잡아내는지 확인합니다. 마지막으로 기준값을 바꿔도 결론이 안정적인지 실험합니다.
+  - type: code
+    language: python
+    title: 데이터 계약 확인
+    description: 분석에 필요한 컬럼과 평점 범위를 assert로 검증합니다
+    content: |-
+      requiredColumns = {"Title", "Genre", "Director", "Year", "Rating", "Revenue (Millions)"}
+      missingColumns = requiredColumns - set(movies.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert movies.height == 1000, "로컬 IMDB 샘플은 1000행이어야 합니다."
+      assert movies.select(pl.col("Rating").is_between(0, 10).all()).item(), "평점은 0~10 범위여야 합니다."
+
+      print("데이터 계약 통과:", movies.shape)
+  - type: code
+    language: python
+    title: 결과 예측과 검증
+    description: 장르별 집계 결과의 1위 장르와 표본 수를 확인합니다
+    content: |-
+      genreStatsCheck = moviesWithGenre.group_by("MainGenre").agg([
+          pl.col("Rating").mean().round(2).alias("AvgRating"),
+          pl.col("Rating").count().alias("MovieCount"),
+          pl.col("Revenue (Millions)").mean().round(2).alias("AvgRevenue")
+      ]).sort(["AvgRating", "MovieCount"], descending=[True, True])
+
+      predictedBestGenre = "Drama"
+      bestGenre = genreStatsCheck.row(0, named=True)
+
+      assert bestGenre["MainGenre"] == predictedBestGenre
+      assert bestGenre["MovieCount"] >= 300
+      assert bestGenre["AvgRating"] >= 7.7
+
+      genreStatsCheck
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 깨진 집계 컬럼명을 검증 함수가 잡아내는지 확인합니다
+    content: |-
+      def validateGenreStats(frame):
+          requiredResultColumns = {"MainGenre", "AvgRating", "MovieCount"}
+          missingResultColumns = requiredResultColumns - set(frame.columns)
+
+          assert not missingResultColumns, f"결과 컬럼 누락: {missingResultColumns}"
+          assert frame.schema["AvgRating"] in (pl.Float32, pl.Float64)
+          assert frame.select((pl.col("MovieCount") > 0).all()).item()
+          return True
+
+      brokenStats = genreStatsCheck.rename({"AvgRating": "RatingAverage"})
+
+      try:
+          validateGenreStats(brokenStats)
+      except AssertionError as exc:
+          print("검증 실패 확인:", exc)
+
+      fixedStats = brokenStats.rename({"RatingAverage": "AvgRating"})
+      assert validateGenreStats(fixedStats)
+  - type: code
+    language: python
+    title: 기준 변경 실험
+    description: 최소 영화 수 기준을 바꿔도 추천 장르가 어떻게 달라지는지 확인합니다
+    content: |-
+      thresholdReport = []
+
+      for minimumCount in [1, 100, 200, 300]:
+          candidates = genreStatsCheck.filter(pl.col("MovieCount") >= minimumCount)
+          bestCandidate = candidates.row(0, named=True)
+          thresholdReport.append({
+              "MinimumCount": minimumCount,
+              "CandidateGenres": candidates.height,
+              "BestGenre": bestCandidate["MainGenre"],
+              "AvgRating": bestCandidate["AvgRating"],
+          })
+
+      thresholdFrame = pl.DataFrame(thresholdReport)
+
+      assert thresholdFrame.select((pl.col("CandidateGenres").diff().fill_null(0) <= 0).all()).item()
+      assert thresholdFrame.row(-1, named=True)["BestGenre"] == "Drama"
+
+      thresholdFrame
+  - type: tip
+    content: "실무 집계는 결과를 눈으로만 보는 것이 아니라 데이터 계약, 예상 결론, 실패 케이스, 기준값 변화까지 함께 남겨야 재사용할 수 있습니다."
+
 - id: practice
   title: 실습
   subtitle: IMDB 영화 데이터 분석 프로젝트
@@ -198,9 +290,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import polars as pl
+        from io import StringIO
+        from codaro.curriculum.localData import loadLocalDataset
 
-        srcUrl = "https://raw.githubusercontent.com"
-        imdb = pl.read_csv(f"{srcUrl}/LearnDataSci/articles/master/Python%20Pandas%20Tutorial%20A%20Complete%20Introduction%20for%20Beginners/IMDB-Movie-Data.csv")
+        imdb = pl.read_csv(StringIO(loadLocalDataset("imdb_movies").to_csv(index=False)))
     - type: code
       title: "필터링 및 집계"
       content: |-
@@ -218,9 +311,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import polars as pl
+        from io import StringIO
+        from codaro.curriculum.localData import loadLocalDataset
 
-        csvUrl = "https://raw.githubusercontent.com"
-        film = pl.read_csv(f"{csvUrl}/LearnDataSci/articles/master/Python%20Pandas%20Tutorial%20A%20Complete%20Introduction%20for%20Beginners/IMDB-Movie-Data.csv")
+        film = pl.read_csv(StringIO(loadLocalDataset("imdb_movies").to_csv(index=False)))
     - type: code
       title: "연도별 집계"
       content: |-

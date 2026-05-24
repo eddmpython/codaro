@@ -3,7 +3,7 @@ meta:
   title: "프로퍼티와 데코레이터"
   day: 25
   category: "30days"
-  tags: []
+  tags: ["프로퍼티", "데코레이터", "classmethod", "staticmethod", "검증", "객체설계"]
   seo:
     title: "파이썬 프로퍼티와 데코레이터 - 메서드 활용 고급 기법"
     description: "property, setter, deleter, staticmethod, classmethod, 데코레이터를 배웁니다."
@@ -445,6 +445,86 @@ sections:
       cfg.host, cfg.port
   - type: "tip"
     content: "프로퍼티와 데코레이터를 적절히 조합하면 파이썬스러운 깔끔한 코드를 작성할 수 있습니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 상품 입력값을 안전하게 객체로 만들기"
+  blocks:
+  - type: "text"
+    content: "프로퍼티와 데코레이터는 문법 장식이 아니라, 객체의 규칙을 코드 안에 고정하는 도구입니다. 상품 행 데이터를 객체로 만들고 가격 규칙을 검증해봅니다."
+  - type: "code"
+    language: "python"
+    title: "상품 객체와 데코레이터 검증"
+    code: |
+      from functools import wraps
+
+      class Product:
+          def __init__(self, name, price):
+              if not name.strip():
+                  raise ValueError("name is required")
+              self.name = name.strip()
+              self.price = price
+
+          @property
+          def price(self):
+              return self._price
+
+          @price.setter
+          def price(self, value):
+              if value <= 0:
+                  raise ValueError("price must be positive")
+              self._price = value
+
+          @property
+          def taxIncludedPrice(self):
+              return int(self.price * 1.1)
+
+          @staticmethod
+          def parsePrice(text):
+              cleanedText = text.replace(",", "").replace("원", "").strip()
+              return int(cleanedText)
+
+          @classmethod
+          def fromRow(cls, row):
+              return cls(row["name"], cls.parsePrice(row["price"]))
+
+      def auditCall(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              result = func(*args, **kwargs)
+              return {"function": func.__name__, "result": result}
+          return wrapper
+
+      @auditCall
+      def calculateMargin(salePrice, cost):
+          if salePrice < cost:
+              raise ValueError("sale price must be greater than or equal to cost")
+          return salePrice - cost
+
+      product = Product.fromRow({"name": "  keyboard ", "price": "50,000원"})
+
+      assert product.name == "keyboard"
+      assert product.price == 50000
+      assert product.taxIncludedPrice == 55000
+
+      product.price = 60000
+      assert product.taxIncludedPrice == 66000
+
+      auditedMargin = calculateMargin(product.price, 42000)
+      assert auditedMargin == {"function": "calculateMargin", "result": 18000}
+      assert calculateMargin.__name__ == "calculateMargin"
+
+      try:
+          product.price = 0
+      except ValueError as exc:
+          assert "price" in str(exc)
+
+      print("상품 객체 검증 흐름 통과")
+  - type: "list"
+    items:
+    - "프로퍼티 setter는 잘못된 상태가 객체 안에 들어오는 순간을 막습니다."
+    - "@classmethod는 외부 행 데이터를 객체로 바꾸는 대체 생성자에 잘 맞습니다."
+    - "데코레이터를 만들 때는 functools.wraps로 원래 함수의 이름과 메타데이터를 보존합니다."
+    - "실무 변주: Product에 category 프로퍼티를 추가하고, 데코레이터가 실행 시간과 결과를 함께 남기도록 확장해 보세요."
 
 - id: "practice"
   title: "Day 25 종합 복습"

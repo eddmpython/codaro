@@ -26,7 +26,7 @@ sections:
   blocks:
   - type: text
     content: |-
-      GitHub에서 tips(팁) 데이터를 불러옵니다. 레스토랑에서 고객들이 낸 팁을 기록한 데이터입니다.
+      Codaro 로컬 데이터셋에서 tips(팁) 데이터를 불러옵니다. 레스토랑에서 고객들이 낸 팁을 기록한 데이터입니다.
 
       total_bill은 총 계산 금액, tip은 팁 금액, sex는 성별, smoker는 흡연 여부, day는 요일, time은 시간대(Lunch/Dinner), size는 일행 수입니다.
 
@@ -40,11 +40,9 @@ sections:
       import pandas as pd
       import warnings
       warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
 
-      tipsUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-      tips = pd.read_csv(tipsUrl)
-      tips.head()
-
+      tips = loadLocalDataset("tips")
 - id: step2_calculate
   title: 2단계. 계산 필드 생성
   subtitle: transform_calculate
@@ -331,8 +329,8 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        billUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-        bill = pd.read_csv(billUrl)
+        from codaro.curriculum.localData import loadLocalDataset
+        bill = loadLocalDataset("tips")
     - type: code
       title: "차트 생성"
       content: |-
@@ -352,8 +350,8 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        payUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-        pay = pd.read_csv(payUrl)
+        from codaro.curriculum.localData import loadLocalDataset
+        pay = loadLocalDataset("tips")
     - type: code
       title: "차트 생성"
       content: |-
@@ -383,3 +381,82 @@ sections:
     - "transform_fold([컬럼], as_) - wide to long 변환"
   - type: text
     content: 다음 프로젝트에서는 모든 기법을 종합한 대시보드를 만듭니다.
+
+- id: workflow_validation
+  title: 10단계. 데이터 변환 spec 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      Altair transform은 pandas 전처리와 Vega-Lite 사양의 경계입니다. calculate, aggregate, window가 spec에 정확히 들어갔는지 확인합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 계산 예측
+    description: tips 데이터의 팁률 계산 가능성을 확인합니다
+    content: |-
+      import altair as alt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tipsTransform = loadLocalDataset("tips")
+      requiredColumns = {"total_bill", "tip", "time", "day"}
+      missingColumns = requiredColumns - set(tipsTransform.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert tipsTransform["total_bill"].gt(0).all()
+      assert (tipsTransform["tip"] / tipsTransform["total_bill"]).between(0, 1).all()
+  - type: code
+    language: python
+    title: Transform spec 검증
+    description: calculate와 aggregate transform이 모두 있는지 확인합니다
+    content: |-
+      transformChart = alt.Chart(tipsTransform).transform_calculate(
+          tipRate="datum.tip / datum.total_bill"
+      ).transform_aggregate(
+          meanTipRate="mean(tipRate)",
+          groupby=["time"]
+      ).mark_bar().encode(
+          x="time:N",
+          y="meanTipRate:Q",
+          tooltip=["time:N", "meanTipRate:Q"],
+      ).properties(title="Mean tip rate by time")
+      transformSpec = transformChart.to_dict()
+      transformKeys = [set(item.keys()) for item in transformSpec.get("transform", [])]
+
+      assert {"calculate", "as"} in transformKeys
+      assert any("aggregate" in item for item in transformKeys)
+      assert transformSpec["mark"]["type"] == "bar"
+      transformChart
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 변환 없는 차트를 고급 변환 예제로 통과시키지 않습니다
+    content: |-
+      def validateTransformSpec(spec):
+          transforms = spec.get("transform", [])
+          if not transforms:
+              raise ValueError("고급 데이터 변환 레슨에는 transform 사양이 필요합니다")
+          assert spec["encoding"]["y"]["field"] == "meanTipRate"
+          return True
+
+      plainSpec = alt.Chart(tipsTransform).mark_bar().encode(x="time:N", y="mean(tip):Q").to_dict()
+      try:
+          validateTransformSpec(plainSpec)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateTransformSpec(transformSpec)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 최소 결제액 기준을 바꿔 팁률 평균을 비교합니다
+    content: |-
+      thresholdReport = []
+      for minimumBill in [10, 20, 30]:
+          subset = tipsTransform[tipsTransform["total_bill"] >= minimumBill]
+          thresholdReport.append({"minimumBill": minimumBill, "rows": int(len(subset)), "meanTipRate": round(float((subset["tip"] / subset["total_bill"]).mean()), 3)})
+
+      assert thresholdReport[0]["rows"] >= thresholdReport[1]["rows"] >= thresholdReport[2]["rows"]
+      assert all(item["meanTipRate"] > 0 for item in thresholdReport)
+      thresholdReport
+  - type: tip
+    content: "Transform 레슨은 차트가 보이는지보다 transform 사양이 의도대로 남았는지 검증해야 업무 자동화에 쓸 수 있습니다."

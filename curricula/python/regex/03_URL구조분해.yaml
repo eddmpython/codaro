@@ -5,7 +5,7 @@ meta:
   category: regex
   difficulty: "⭐⭐"
   badge: 기초
-  tags: ["URL", "이름 있는 그룹", "search", "파싱", "JSONPlaceholder"]
+  tags: ["URL", "이름 있는 그룹", "search", "파싱", "로컬 샘플"]
   seo:
     title: "정규표현식 기초 - URL 구조 분해"
     description: "정규표현식으로 URL을 프로토콜, 도메인, 경로, 쿼리로 분해합니다. 이름 있는 그룹, re.search를 배웁니다."
@@ -26,26 +26,30 @@ sections:
   - type: code
     language: python
     title: 라이브러리 불러오기
-    description: 정규표현식과 데이터 로드 모듈
+    description: 정규표현식 모듈
     content: |-
       import re
-      import json
-      from urllib.request import urlopen
-
 - id: step2_load
   title: 2단계. 데이터 불러오기
-  subtitle: 사용자 웹사이트 확인
+  subtitle: 로컬 웹사이트 확인
   blocks:
   - type: text
-    content: JSONPlaceholder 사용자 데이터에서 웹사이트 주소를 가져옵니다. URL 파싱은 웹 크롤링, 링크 분석, SEO 최적화 등 웹 개발의 다양한 분야에서 사용됩니다. 정규표현식으로 URL 구조를 이해하면 외부 라이브러리 없이도 URL을 효과적으로 처리할 수 있습니다.
+    content: 로컬 사용자 샘플에서 웹사이트 주소를 가져옵니다. URL 파싱은 웹 크롤링, 링크 분석, SEO 최적화 등 웹 개발의 다양한 분야에서 사용됩니다. 정규표현식으로 URL 구조를 이해하면 외부 라이브러리 없이도 URL을 효과적으로 처리할 수 있습니다.
   - type: code
     language: python
     title: 데이터 로드
-    description: 사용자 데이터를 가져옵니다
+    description: 로컬 웹사이트 샘플을 준비합니다
     content: |-
-      usersData = json.loads(
-          urlopen("https://jsonplaceholder.typicode.com/users").read()
-      )
+      usersData = [
+          {"name": "Hana Kim", "website": "docs.codaro.local"},
+          {"name": "Min Park", "website": "analytics.dataworks.com"},
+          {"name": "Jae Lee", "website": "automation.codaro.io"},
+          {"name": "Soo Choi", "website": "insightlab.kr"},
+          {"name": "Yuna Jung", "website": "support.sample.org"},
+          {"name": "Alex Morgan", "website": "platform.service.net"},
+      ]
+
+      usersData[:2]
   - type: code
     language: python
     title: 웹사이트 확인
@@ -56,11 +60,11 @@ sections:
   - type: text
     content: |-
       확인된 웹사이트들:
-      - hildegard.org
-      - anastasia.net
-      - ramiro.info
-      - kale.biz
-      - demarco.info
+      - docs.codaro.local
+      - analytics.dataworks.com
+      - automation.codaro.io
+      - insightlab.kr
+      - support.sample.org
 
       프로토콜이 없는 도메인만 있네요. 실습을 위해 완전한 URL을 만들어봅시다.
 
@@ -69,7 +73,7 @@ sections:
   subtitle: 테스트 데이터 준비
   blocks:
   - type: text
-    content: URL의 모든 구성 요소를 보기 위해 완전한 형태의 URL들을 만들어봅시다. JSONPlaceholder의 website 필드에는 도메인만 있어서, 프로토콜, 경로, 쿼리스트링을 포함한 실제 URL을 별도로 준비합니다. 이렇게 다양한 형태의 URL로 테스트해야 패턴의 범용성을 검증할 수 있습니다.
+    content: URL의 모든 구성 요소를 보기 위해 완전한 형태의 URL들을 만들어봅시다. 샘플의 website 필드에는 도메인만 있어서, 프로토콜, 경로, 쿼리스트링을 포함한 실제 URL을 별도로 준비합니다. 이렇게 다양한 형태의 URL로 테스트해야 패턴의 범용성을 검증할 수 있습니다.
   - type: code
     language: python
     title: 테스트 URL 준비
@@ -232,8 +236,8 @@ sections:
     content: 모든 URL이 깔끔하게 구조화되었습니다!
 
 - id: step9_real_data
-  title: 9단계. 실제 데이터 적용
-  subtitle: JSONPlaceholder 웹사이트 파싱
+  title: 9단계. 샘플 데이터 적용
+  subtitle: 로컬 웹사이트 파싱
   blocks:
   - type: text
     content: 실제 사용자 데이터의 웹사이트에 프로토콜을 추가하여 파싱해봅시다.
@@ -294,18 +298,20 @@ sections:
         parsed = [parse(e) for e in samples]
         parsed
   - type: expansion
-    title: "미션2: JSONPlaceholder 웹사이트 URL 파싱"
+    title: "미션2: 로컬 웹사이트 URL 파싱"
     blocks:
     - type: code
       title: "데이터 로드 및 파싱 함수"
       content: |-
         import re
-        import json
-        from urllib.request import urlopen
 
-        data = json.loads(
-            urlopen("https://jsonplaceholder.typicode.com/users").read()
-        )
+        data = [
+            {"name": "Hana Kim", "website": "docs.codaro.local"},
+            {"name": "Min Park", "website": "analytics.dataworks.com"},
+            {"name": "Jae Lee", "website": "automation.codaro.io"},
+            {"name": "Soo Choi", "website": "insightlab.kr"},
+            {"name": "Yuna Jung", "website": "support.sample.org"},
+        ]
 
         def extract(url):
             pat = r"(?P<protocol>https?)://(?P<domain>[\w.-]+)(?P<path>/[\w/-]*)?"
@@ -334,3 +340,89 @@ sections:
     - "| - or 연산자 (http|https)"
   - type: text
     content: 다음 프로젝트에서는 HTML 태그를 제거하는 방법을 배웁니다!
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 연락처 텍스트 정제 파이프라인"
+  subtitle: "예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주"
+  blocks:
+  - type: text
+    content: "정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다."
+  - type: code
+    language: python
+    title: "이메일과 전화번호 추출"
+    description: "실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다."
+    content: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+  - type: code
+    language: python
+    title: "패턴 오류와 빈 입력을 먼저 실패시킨다"
+    description: "컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다."
+    content: |-
+      try:
+          re.compile(r'([A-Z]+')
+      except re.error as exc:
+          regexCompileError = str(exc)
+
+      def extractRequiredEmails(text):
+          found = emailPattern.findall(text)
+          if not found:
+              raise ValueError('email not found')
+          return found
+
+      try:
+          extractRequiredEmails('no contact here')
+      except ValueError as exc:
+          emailExtractError = str(exc)
+
+      assert regexCompileError
+      assert emailExtractError == 'email not found'
+      regexCompileError, emailExtractError
+  - type: code
+    language: python
+    title: "정제 결과를 업무 구조로 검증"
+    description: "추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다."
+    content: |-
+      def maskEmail(email):
+          name, domain = email.split('@')
+          return name[0] + '***@' + domain
+
+      contactReport = [
+          {'email': email, 'masked': maskEmail(email), 'domain': email.split('@')[1]}
+          for email in emails
+      ]
+      domainCounts = {row['domain']: 0 for row in contactReport}
+      for row in contactReport:
+          domainCounts[row['domain']] += 1
+
+      assert contactReport[0]['masked'] == 'k***@example.com'
+      assert domainCounts == {'example.com': 1, 'company.co.kr': 1}
+      contactReport
+  - type: code
+    language: python
+    title: "실무 변주: 허용 도메인 정책 바꾸기"
+    description: "회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다."
+    content: |-
+      def filterAllowedDomains(report, allowedDomains):
+          if not allowedDomains:
+              raise ValueError('allowedDomains must not be empty')
+          return [row for row in report if row['domain'] in allowedDomains]
+
+      companyOnly = filterAllowedDomains(contactReport, {'company.co.kr'})
+      assert [row['email'] for row in companyOnly] == ['lee@company.co.kr']
+      companyOnly

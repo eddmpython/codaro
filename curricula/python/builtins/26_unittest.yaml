@@ -1,5 +1,8 @@
 meta:
+  id: "26_unittest"
   title: "unittest - 단위 테스트"
+  category: "builtins"
+  tags: ["unittest", "테스트", "test", "assert", "TestCase"]
   description: "자동화된 테스트를 위한 unittest 모듈"
   keywords: ["unittest", "테스트", "test", "assert", "TestCase"]
 
@@ -42,7 +45,7 @@ sections:
 
       outcome.wasSuccessful()
   - type: "note"
-    content: "Codaro/Codaro 로컬 Python 환경에서는 TestLoader와 TextTestRunner를 사용하여 테스트를 실행합니다. 일반적으로는 python -m unittest 명령으로 실행합니다."
+    content: "Codaro 로컬 Python 환경에서는 TestLoader와 TextTestRunner를 사용하여 테스트를 실행합니다. 일반적으로는 python -m unittest 명령으로 실행합니다."
 
 - id: "assert_methods"
   title: "Assert 메서드"
@@ -548,6 +551,95 @@ sections:
       result18.wasSuccessful()
   - type: "tip"
     content: "실제 프로젝트에서는 테스트 파일을 tests/ 디렉토리에 분리하고, python -m unittest discover로 자동 실행합니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 테스트 결과 품질 게이트"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "unittest는 성공하는 테스트만 보여주면 학습 효과가 약합니다. 실패를 재현하고, 실패 원인을 확인한 뒤, 수정된 테스트가 통과하는 흐름까지 확인해야 실제 업무 테스트 작성으로 이어집니다."
+  - type: "code"
+    language: "python"
+    title: "조용한 테스트 실행 헬퍼"
+    description: "StringIO로 테스트 출력을 캡처하고 결과 객체만 검사합니다."
+    content: |-
+      import io
+
+      def runTestCase(testCase):
+          stream = io.StringIO()
+          suite = unittest.TestLoader().loadTestsFromTestCase(testCase)
+          result = unittest.TextTestRunner(stream=stream, verbosity=2).run(suite)
+          return result, stream.getvalue()
+
+      def normalizeEmail(value):
+          normalized = value.strip().lower()
+          if '@' not in normalized:
+              raise ValueError('invalid email')
+          return normalized
+
+      class EmailValidationPassTest(unittest.TestCase):
+          def testNormalizeEmail(self):
+              self.assertEqual(normalizeEmail(' USER@Example.COM '), 'user@example.com')
+
+          def testInvalidEmail(self):
+              with self.assertRaisesRegex(ValueError, 'invalid'):
+                  normalizeEmail('missing-domain')
+
+      passResult, passOutput = runTestCase(EmailValidationPassTest)
+      assert passResult.wasSuccessful()
+      assert passResult.testsRun == 2
+      passResult.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "실패 테스트를 먼저 확인"
+    description: "의도적으로 실패하는 테스트를 실행해 실패 개수와 메시지를 검증합니다."
+    content: |-
+      class EmailValidationFailTest(unittest.TestCase):
+          def testWrongExpectation(self):
+              self.assertEqual(normalizeEmail('A@B.COM'), 'wrong@example.com')
+
+      failResult, failOutput = runTestCase(EmailValidationFailTest)
+
+      assert not failResult.wasSuccessful()
+      assert len(failResult.failures) == 1
+      assert 'wrong@example.com' in failOutput
+      failOutput.splitlines()[:3]
+  - type: "code"
+    language: "python"
+    title: "Mock으로 외부 의존성 제거"
+    description: "외부 호출 없이 저장소 함수가 올바른 인자로 호출됐는지 확인합니다."
+    content: |-
+      from unittest.mock import Mock
+
+      def saveUser(fetchUser, userId):
+          user = fetchUser(userId)
+          return {'saved': True, 'name': user['name']}
+
+      class UserSaveTest(unittest.TestCase):
+          def testSaveUserCallsFetcher(self):
+              fetchUser = Mock(return_value={'id': 7, 'name': 'Alice'})
+              saved = saveUser(fetchUser, 7)
+
+              self.assertTrue(saved['saved'])
+              self.assertEqual(saved['name'], 'Alice')
+              fetchUser.assert_called_once_with(7)
+
+      mockResult, mockOutput = runTestCase(UserSaveTest)
+      assert mockResult.wasSuccessful()
+      mockResult.wasSuccessful()
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 테스트 요약 리포트"
+    description: "성공/실패 테스트 결과를 작은 품질 리포트로 바꿉니다."
+    content: |-
+      testSummary = {
+          'passingTests': passResult.testsRun + mockResult.testsRun,
+          'failingTests': len(failResult.failures),
+          'errors': len(failResult.errors)
+      }
+
+      assert testSummary == {'passingTests': 3, 'failingTests': 1, 'errors': 0}
+      testSummary
 
 - id: "practice"
   title: "종합 복습"

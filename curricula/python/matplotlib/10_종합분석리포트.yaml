@@ -39,6 +39,7 @@ sections:
       from matplotlib.colors import Normalize
       import matplotlib.cm as cm
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import numpy as np
       import pandas as pd
   - type: tip
@@ -78,10 +79,10 @@ sections:
     title: 데이터 로드
     description: gapminder와 tips 데이터를 불러옵니다
     content: |-
-      baseUrl = "https://raw.githubusercontent.com"
-      gapminder = pd.read_csv(f"{baseUrl}/plotly/datasets/master/gapminder_unfiltered.csv")
+      from codaro.curriculum.localData import loadLocalDataset
 
-      tips = sns.load_dataset('tips')
+      gapminder = loadLocalDataset("gapminder")
+      tips = loadLocalDataset("tips")
 
       gapminder2007 = gapminder[gapminder['year'] == 2007].copy()
 
@@ -224,14 +225,19 @@ sections:
     title: 이중 축과 주석
     description: 기대수명 이중 축과 이벤트 주석을 추가합니다
     content: |-
+      import numpy as np
+
       axTwin = axMain.twinx()
       axTwin.plot(years, koreaLife, 's--', color='#E74C3C', linewidth=2, markersize=8, label='기대수명')
       axTwin.set_ylabel('기대수명 (세)', fontsize=11, color='#E74C3C')
       axTwin.tick_params(axis='y', labelcolor='#E74C3C')
 
-      axMain.annotate('IMF 외환위기',
-                     xy=(1997, koreaGdp[years == 1997][0]),
-                     xytext=(1990, koreaGdp[years == 1997][0] + 5000),
+      eventYear = years[np.argmin(np.abs(years - 1997))]
+      eventGdp = koreaGdp[years == eventYear][0]
+
+      axMain.annotate('IMF 외환위기 근접 시점',
+                     xy=(eventYear, eventGdp),
+                     xytext=(eventYear - 7, eventGdp + 5000),
                      fontsize=10, fontweight='bold',
                      bbox=dict(boxstyle='round', facecolor='#FADBD8', edgecolor='#E74C3C'),
                      arrowprops=dict(arrowstyle='->', color='#E74C3C'))
@@ -522,9 +528,10 @@ sections:
         from matplotlib.gridspec import GridSpec
         from mpl_toolkits.axes_grid1.inset_locator import inset_axes
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import numpy as np
 
-        data = sns.load_dataset('penguins').dropna()
+        data = loadLocalDataset('penguins').dropna()
 
         chart = plt.figure(figsize=(16, 12))
         grid = GridSpec(2, 3, figure=chart, hspace=0.35, wspace=0.3)
@@ -609,9 +616,10 @@ sections:
         from matplotlib.colors import Normalize
         import matplotlib.cm as cm
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import numpy as np
 
-        df = sns.load_dataset('iris')
+        df = loadLocalDataset('iris')
 
         canvas = plt.figure(figsize=(16, 12))
         layout = GridSpec(2, 3, figure=canvas, hspace=0.35, wspace=0.35)
@@ -720,3 +728,93 @@ sections:
     - "fig.savefig(path, dpi, bbox_inches) - 고품질 이미지 저장"
   - type: text
     content: Matplotlib 커리큘럼을 완료했습니다. 이제 논문, 보고서, 프레젠테이션에 사용할 수 있는 전문적인 시각화를 만들 수 있습니다.
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 보고서 차트 품질 게이트
+  blocks:
+  - type: text
+    content: "Matplotlib 학습은 차트를 그리는 데서 끝나면 부족합니다. 업무용 차트는 입력 데이터가 맞는지 검증하고, 잘못된 컬럼이나 음수 금액을 오류로 막고, 제목·축·범례·기준선이 실제 보고서 기준을 만족하는지 확인해야 합니다. 마지막에는 목표선을 바꾸는 변주로 메시지가 어떻게 달라지는지 확인합니다."
+  - type: code
+    language: python
+    title: 보고서 데이터 검증
+    description: 필수 컬럼과 금액 범위를 확인합니다.
+    content: |-
+      import pandas as pd
+      import matplotlib.pyplot as plt
+
+      reportData = pd.DataFrame({
+          "month": ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+          "revenue": [82, 91, 105, 112, 121, 130],
+          "cost": [55, 58, 62, 64, 68, 72],
+          "target": [100, 100, 100, 100, 100, 100],
+      })
+
+      def validateChartFrame(frame: pd.DataFrame) -> bool:
+          requiredColumns = {"month", "revenue", "cost", "target"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame[["revenue", "cost", "target"]].lt(0).any().any():
+              raise ValueError("금액 컬럼은 음수가 될 수 없습니다.")
+          return True
+
+      validateChartFrame(reportData)
+      reportData
+  - type: code
+    language: python
+    title: 실패 입력 확인
+    description: 목표선 컬럼이 빠진 데이터를 검증 함수가 거부하는지 확인합니다.
+    content: |-
+      try:
+          validateChartFrame(reportData.drop(columns=["target"]))
+      except ValueError as exc:
+          chartValidationMessage = str(exc)
+
+      assert "필수 컬럼" in chartValidationMessage
+      chartValidationMessage
+  - type: code
+    language: python
+    title: 예측 후 차트 구성
+    description: 4개월이 목표를 넘을 것이라고 예측하고 선 차트로 확인합니다.
+    content: |-
+      # 예측: 3월부터 6월까지 4개월은 매출이 목표선을 넘습니다.
+      figReport, axReport = plt.subplots(figsize=(8, 4))
+      axReport.plot(reportData["month"], reportData["revenue"], marker="o", label="Revenue")
+      axReport.plot(reportData["month"], reportData["cost"], marker="o", label="Cost")
+      axReport.axhline(100, color="gray", linestyle="--", label="Target")
+      axReport.set_title("Monthly Revenue vs Cost")
+      axReport.set_xlabel("Month")
+      axReport.set_ylabel("Amount")
+      axReport.legend()
+
+      monthsAboveTarget = int((reportData["revenue"] >= reportData["target"]).sum())
+      figReport
+  - type: code
+    language: python
+    title: 차트 품질 검증
+    description: 보고서에 필요한 구성 요소와 수치 메시지를 assert로 확인합니다.
+    content: |-
+      chartChecks = {
+          "has_three_lines": len(axReport.lines) == 3,
+          "has_title": axReport.get_title() == "Monthly Revenue vs Cost",
+          "has_axis_labels": axReport.get_xlabel() == "Month" and axReport.get_ylabel() == "Amount",
+          "target_reached_for_four_months": monthsAboveTarget == 4,
+          "legend_is_present": axReport.get_legend() is not None,
+      }
+
+      assert all(chartChecks.values()), chartChecks
+      chartChecks
+  - type: expansion
+    title: "실무 변주: 목표선을 올리면 달성 개월 수가 어떻게 줄어들까?"
+    blocks:
+    - type: code
+      language: python
+      title: 목표선 민감도 분석
+      content: |-
+        targetScenario = pd.DataFrame({"target": [95, 100, 115]}).assign(
+            monthsPassed=lambda frame: frame["target"].map(lambda target: int((reportData["revenue"] >= target).sum()))
+        )
+
+        assert targetScenario["monthsPassed"].is_monotonic_decreasing
+        targetScenario

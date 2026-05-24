@@ -405,3 +405,66 @@ sections:
         axFilter[1].set_title(f'Area > {minArea} ({len(largeCnts)} contours)')
         axFilter[1].axis('off')
         plt.tight_layout()
+
+- id: workflow_validation
+  title: 7단계. 컨투어 분석 검증 루프
+  subtitle: 객체 수, 면적, 필터 기준 확인
+  blocks:
+  - type: text
+    content: 컨투어 탐지는 윤곽선을 그리는 데서 끝나지 않습니다. 객체 수, 면적, 외접 박스가 업무 기준을 만족하는지 검증해야 합니다. 최소 면적 기준 오류를 먼저 확인하고 필터링 결과를 assert로 점검합니다.
+  - type: code
+    language: python
+    title: 객체 마스크 준비
+    description: 사각형과 원이 들어 있는 이진 이미지를 만듭니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      contourMask = np.zeros((140, 180), dtype=np.uint8)
+      cv2.rectangle(contourMask, (25, 30), (80, 95), 255, -1)
+      cv2.circle(contourMask, (130, 70), 28, 255, -1)
+
+      def validateMinArea(minArea):
+          if minArea <= 0:
+              raise ValueError(f"최소 면적은 양수여야 합니다: {minArea}")
+          return True
+
+      validateMinArea(500)
+  - type: code
+    language: python
+    title: 면적 기준 오류 확인
+    description: 잘못된 최소 면적을 넣어 오류를 확인합니다.
+    content: |-
+      try:
+          validateMinArea(0)
+      except ValueError as exc:
+          contourErrorMessage = str(exc)
+
+      contourErrorMessage
+  - type: code
+    language: python
+    title: 컨투어 결과 검증
+    description: 컨투어 개수와 면적 필터링 결과를 확인합니다.
+    content: |-
+      contours, _ = cv2.findContours(contourMask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+      contourAreas = [cv2.contourArea(contour) for contour in contours]
+      largeContours = [contour for contour in contours if cv2.contourArea(contour) >= 500]
+      boundingBoxes = [cv2.boundingRect(contour) for contour in largeContours]
+      contourChecks = {
+          "contourCountOk": len(contours) == 2,
+          "areaFilterOk": len(largeContours) == 2,
+          "boxesOk": all(width > 40 and height > 40 for _, _, width, height in boundingBoxes),
+          "errorOk": contourErrorMessage == "최소 면적은 양수여야 합니다: 0",
+      }
+
+      assert all(contourChecks.values()), contourChecks
+      contourChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 최소 면적을 높이면 작은 객체가 제외되는지 확인합니다.
+    content: |-
+      strictContours = [contour for contour in contours if cv2.contourArea(contour) >= 3000]
+
+      assert len(strictContours) < len(largeContours)
+      [round(area, 1) for area in contourAreas], len(strictContours)

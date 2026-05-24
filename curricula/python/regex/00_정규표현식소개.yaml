@@ -168,16 +168,16 @@ sections:
     - type: table
       headers: ["단계", "프로젝트", "배울 내용", "데이터 소스"]
       rows:
-        - ["입문", "01 이메일주소추출", "기본 패턴, 문자 클래스, findall", "JSONPlaceholder"]
-        - ["입문", "02 전화번호형식통일", "그룹 캡처, sub, 형식 변환", "JSONPlaceholder"]
-        - ["기초", "03 URL구조분해", "이름 있는 그룹, 복잡한 패턴", "JSONPlaceholder"]
+        - ["입문", "01 이메일주소추출", "기본 패턴, 문자 클래스, findall", "로컬 사용자 JSON"]
+        - ["입문", "02 전화번호형식통일", "그룹 캡처, sub, 형식 변환", "로컬 전화번호 샘플"]
+        - ["기초", "03 URL구조분해", "이름 있는 그룹, 복잡한 패턴", "로컬 웹사이트 샘플"]
         - ["기초", "04 HTML태그제거", "비탐욕적 매칭, DOTALL 플래그", "코드 내 샘플"]
         - ["기초", "05 로그파일분석", "멀티라인, 타임스탬프 파싱", "코드 내 로그"]
         - ["중급", "06 날짜형식변환", "복잡한 패턴, 다양한 형식 처리", "코드 내 샘플"]
         - ["중급", "07 개인정보마스킹", "역참조, 부분 치환", "코드 내 샘플"]
-        - ["중급", "08 텍스트정제토큰화", "split, 노이즈 제거, LLM 전처리", "Bacon Ipsum"]
+        - ["중급", "08 텍스트정제토큰화", "split, 노이즈 제거, LLM 전처리", "로컬 노이즈 텍스트"]
         - ["심화", "09 고급패턴매칭", "lookahead, lookbehind, 조건부", "코드 내 샘플"]
-        - ["심화", "10 LLM전처리파이프라인", "모든 개념 종합, 실전 자동화", "JSONPlaceholder"]
+        - ["심화", "10 LLM전처리파이프라인", "모든 개념 종합, 실전 자동화", "로컬 게시글 + HTML"]
 
     - type: note
       style: info
@@ -340,4 +340,90 @@ sections:
     - type: hero
       emoji: "👉"
       title: "다음: 이메일 주소 추출"
-      subtitle: "JSONPlaceholder API에서 다양한 형식의 이메일을 추출하는 첫 프로젝트를 시작합니다"
+      subtitle: "로컬 사용자 샘플에서 다양한 형식의 이메일을 추출하는 첫 프로젝트를 시작합니다"
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 연락처 텍스트 정제 파이프라인"
+  subtitle: "예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주"
+  blocks:
+  - type: text
+    content: "정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다."
+  - type: code
+    language: python
+    title: "이메일과 전화번호 추출"
+    description: "실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다."
+    content: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+  - type: code
+    language: python
+    title: "패턴 오류와 빈 입력을 먼저 실패시킨다"
+    description: "컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다."
+    content: |-
+      try:
+          re.compile(r'([A-Z]+')
+      except re.error as exc:
+          regexCompileError = str(exc)
+
+      def extractRequiredEmails(text):
+          found = emailPattern.findall(text)
+          if not found:
+              raise ValueError('email not found')
+          return found
+
+      try:
+          extractRequiredEmails('no contact here')
+      except ValueError as exc:
+          emailExtractError = str(exc)
+
+      assert regexCompileError
+      assert emailExtractError == 'email not found'
+      regexCompileError, emailExtractError
+  - type: code
+    language: python
+    title: "정제 결과를 업무 구조로 검증"
+    description: "추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다."
+    content: |-
+      def maskEmail(email):
+          name, domain = email.split('@')
+          return name[0] + '***@' + domain
+
+      contactReport = [
+          {'email': email, 'masked': maskEmail(email), 'domain': email.split('@')[1]}
+          for email in emails
+      ]
+      domainCounts = {row['domain']: 0 for row in contactReport}
+      for row in contactReport:
+          domainCounts[row['domain']] += 1
+
+      assert contactReport[0]['masked'] == 'k***@example.com'
+      assert domainCounts == {'example.com': 1, 'company.co.kr': 1}
+      contactReport
+  - type: code
+    language: python
+    title: "실무 변주: 허용 도메인 정책 바꾸기"
+    description: "회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다."
+    content: |-
+      def filterAllowedDomains(report, allowedDomains):
+          if not allowedDomains:
+              raise ValueError('allowedDomains must not be empty')
+          return [row for row in report if row['domain'] in allowedDomains]
+
+      companyOnly = filterAllowedDomains(contactReport, {'company.co.kr'})
+      assert [row['email'] for row in companyOnly] == ['lee@company.co.kr']
+      companyOnly

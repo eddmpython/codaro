@@ -30,6 +30,7 @@ sections:
     title: "Path 클래스 가져오기"
     description: "pathlib의 Path 클래스를 불러오고 정상 작동을 확인합니다."
     content: |-
+      import tempfile
       from pathlib import Path
 
       currentPath = Path('.')
@@ -197,7 +198,7 @@ sections:
     title: "심볼릭 링크 확인"
     description: "is_symlink()로 심볼릭 링크 여부를 확인합니다."
     content: |-
-      linkPath = Path('/tmp/link')
+      linkPath = Path('data') / 'latest'
       linkPath.is_symlink()
   - type: "code"
     language: "python"
@@ -284,7 +285,9 @@ sections:
     title: "텍스트 파일 쓰기"
     description: "write_text()로 간단히 텍스트를 쓰고, 자동으로 파일을 열고 닫습니다."
     content: |-
-      textFile = Path('sample.txt')
+      pathlibScratch = Path(tempfile.gettempdir()) / 'codaro_pathlib_scratch'
+      pathlibScratch.mkdir(parents=True, exist_ok=True)
+      textFile = pathlibScratch / 'sample.txt'
       textFile.write_text('Hello from pathlib!')
       textFile.read_text()
   - type: "code"
@@ -292,7 +295,9 @@ sections:
     title: "텍스트 파일 읽기"
     description: "read_text()로 전체 내용을 문자열로 읽습니다."
     content: |-
-      sampleFile = Path('sample.txt')
+      sampleFile = Path(tempfile.gettempdir()) / 'codaro_pathlib_scratch' / 'sample.txt'
+      sampleFile.parent.mkdir(parents=True, exist_ok=True)
+      sampleFile.write_text('Hello from pathlib!')
       contentText = sampleFile.read_text()
       contentText
   - type: "code"
@@ -300,7 +305,8 @@ sections:
     title: "바이트 파일 쓰기"
     description: "write_bytes()로 바이너리 데이터를 씁니다."
     content: |-
-      binaryFile = Path('data.bin')
+      binaryFile = Path(tempfile.gettempdir()) / 'codaro_pathlib_scratch' / 'data.bin'
+      binaryFile.parent.mkdir(parents=True, exist_ok=True)
       binaryFile.write_bytes(b'\x00\x01\x02\x03')
       binaryFile.read_bytes()
   - type: "code"
@@ -308,7 +314,9 @@ sections:
     title: "바이트 파일 읽기"
     description: "read_bytes()로 바이너리 데이터를 bytes 객체로 읽습니다."
     content: |-
-      binFile = Path('data.bin')
+      binFile = Path(tempfile.gettempdir()) / 'codaro_pathlib_scratch' / 'data.bin'
+      binFile.parent.mkdir(parents=True, exist_ok=True)
+      binFile.write_bytes(b'\x00\x01\x02\x03')
       binaryContent = binFile.read_bytes()
       binaryContent
   - type: "code"
@@ -316,7 +324,8 @@ sections:
     title: "여러 줄 쓰기"
     description: "리스트를 개행 문자로 결합하여 여러 줄을 작성합니다."
     content: |-
-      linesFile = Path('lines.txt')
+      linesFile = Path(tempfile.gettempdir()) / 'codaro_pathlib_scratch' / 'lines.txt'
+      linesFile.parent.mkdir(parents=True, exist_ok=True)
       linesData = ['First line', 'Second line', 'Third line']
       linesFile.write_text('\n'.join(linesData))
       linesFile.read_text()
@@ -325,11 +334,120 @@ sections:
     title: "파일 크기 확인"
     description: "stat()으로 파일 정보를 가져오고, st_size로 바이트 크기를 확인합니다."
     content: |-
-      sampleFile = Path('sample.txt')
+      sampleFile = Path(tempfile.gettempdir()) / 'codaro_pathlib_scratch' / 'sample.txt'
+      sampleFile.parent.mkdir(parents=True, exist_ok=True)
+      sampleFile.write_text('Hello from pathlib!')
       fileSize = sampleFile.stat().st_size
       fileSize
   - type: "tip"
     content: "Codaro 로컬 커널에서는 지정한 로컬 경로에 저장됩니다. write_text()와 write_bytes()는 기존 파일을 덮어쓰므로 실습용 경로에서 실행하세요."
+
+- id: "workflow_validation"
+  title: "검증 루프: Path 기반 파일 파이프라인"
+  subtitle: "작업공간 격리, 파일 매니페스트, 경로 traversal 검증"
+  blocks:
+  - type: "text"
+    content: "pathlib는 경로를 객체로 다루기 때문에 파일 파이프라인을 읽기 쉽게 만들 수 있습니다. 임시 작업공간에 데이터를 만들고, 매니페스트를 검증하고, 사용자 입력 경로가 작업공간 밖으로 나가지 않는지 확인합니다."
+  - type: "code"
+    language: "python"
+    title: "Path 작업공간 준비"
+    description: "임시 폴더에 입력 파일을 만들고 파일 매니페스트를 생성합니다."
+    content: |-
+      pipelineRoot = Path(tempfile.mkdtemp(prefix='codaro_pathlib_workflow_'))
+      inputPath = pipelineRoot / 'input'
+      inputPath.mkdir(parents=True, exist_ok=True)
+
+      (inputPath / 'sales.csv').write_text('id,amount\n1,100\n2,150\n', encoding='utf-8')
+      (inputPath / 'README.md').write_text('# dataset\n', encoding='utf-8')
+      (inputPath / 'errors.log').write_text('ERROR timeout\nINFO recovered\n', encoding='utf-8')
+
+      def buildFileManifest(folder):
+          return [
+              {
+                  "name": path.name,
+                  "suffix": path.suffix,
+                  "size": path.stat().st_size,
+              }
+              for path in sorted(folder.iterdir())
+              if path.is_file()
+          ]
+
+      manifest = buildFileManifest(inputPath)
+
+      assert sorted(item["name"] for item in manifest) == ["README.md", "errors.log", "sales.csv"]
+      assert sum(item["size"] for item in manifest) == sum(path.stat().st_size for path in inputPath.iterdir())
+
+      manifest
+  - type: "code"
+    language: "python"
+    title: "경로 traversal 오류 잡기"
+    description: "relative_to()로 안전한 작업공간 내부 경로인지 검증합니다."
+    content: |-
+      def safePipelinePath(basePath, userPath):
+          resolvedBase = basePath.resolve()
+          resolvedTarget = (resolvedBase / userPath).resolve()
+          try:
+              resolvedTarget.relative_to(resolvedBase)
+          except ValueError as exc:
+              raise ValueError(f"작업공간 밖 경로입니다: {userPath}") from exc
+          return resolvedTarget
+
+      safeOutput = safePipelinePath(pipelineRoot, 'output/report.txt')
+
+      try:
+          safePipelinePath(pipelineRoot, '../secret.txt')
+      except ValueError as exc:
+          pathlibProblem = str(exc)
+
+      assert safeOutput.parent.name == 'output'
+      assert '작업공간 밖 경로입니다' in pathlibProblem
+
+      safeOutput, pathlibProblem
+  - type: "code"
+    language: "python"
+    title: "필수 파일 검증"
+    description: "파이프라인에 필요한 파일이 없으면 명확한 오류로 잡습니다."
+    content: |-
+      def requireFiles(folder, requiredNames):
+          existingNames = {path.name for path in folder.iterdir() if path.is_file()}
+          missingNames = sorted(set(requiredNames) - existingNames)
+          if missingNames:
+              raise FileNotFoundError(f"필수 파일 누락: {missingNames}")
+          return sorted(existingNames)
+
+      existingFiles = requireFiles(inputPath, ['sales.csv', 'README.md'])
+
+      try:
+          requireFiles(inputPath, ['sales.csv', 'customers.csv'])
+      except FileNotFoundError as exc:
+          missingFileProblem = str(exc)
+
+      assert existingFiles == ["README.md", "errors.log", "sales.csv"]
+      assert "customers.csv" in missingFileProblem
+
+      missingFileProblem
+  - type: "code"
+    language: "python"
+    title: "출력 리포트 작성"
+    description: "검증된 경로에 매니페스트 요약 리포트를 저장합니다."
+    content: |-
+      outputReport = safePipelinePath(pipelineRoot, 'output/manifest_summary.txt')
+      outputReport.parent.mkdir(parents=True, exist_ok=True)
+
+      reportLines = [
+          f"{item['name']}: {item['size']} bytes"
+          for item in manifest
+      ]
+      outputReport.write_text('\n'.join(reportLines), encoding='utf-8')
+
+      assert outputReport.exists()
+      assert outputReport.read_text(encoding='utf-8').count('bytes') == 3
+      assert outputReport.relative_to(pipelineRoot).parts == ('output', 'manifest_summary.txt')
+
+      outputReport.read_text(encoding='utf-8')
+  - type: "tip"
+    title: "변주 실험"
+    content: "출력 파일명을 날짜별 하위 폴더로 바꾸고, `relative_to()` 결과가 여전히 `pipelineRoot` 아래에 있는지 검증하세요."
 
 - id: "practice"
   title: "pathlib 모듈 종합 복습"
@@ -435,7 +553,7 @@ sections:
   - type: "expansion"
     title: "🔴 심화5: 텍스트 파일 쓰고 읽기"
     code: |-
-      testFile = Path('test_output.txt')
+      testFile = Path(tempfile.gettempdir()) / 'codaro_pathlib_test_output.txt'
       testFile.write_text('Pathlib is awesome!')
       readContent = testFile.read_text()
       readContent
@@ -443,7 +561,7 @@ sections:
   - type: "expansion"
     title: "🔴 심화6: 바이너리 파일 쓰고 읽기"
     code: |-
-      binaryTestFile = Path('test_binary.bin')
+      binaryTestFile = Path(tempfile.gettempdir()) / 'codaro_pathlib_test_binary.bin'
       binaryTestFile.write_bytes(b'\x48\x65\x6c\x6c\x6f')
       readBinary = binaryTestFile.read_bytes()
       readBinary
@@ -451,7 +569,7 @@ sections:
   - type: "expansion"
     title: "🔴 심화7: 여러 줄 파일 작성"
     code: |-
-      multiLineFile = Path('multi_lines.txt')
+      multiLineFile = Path(tempfile.gettempdir()) / 'codaro_pathlib_multi_lines.txt'
       linesToWrite = ['Line 1', 'Line 2', 'Line 3']
       multiLineFile.write_text('\n'.join(linesToWrite))
       multiLineFile.read_text()
@@ -459,7 +577,8 @@ sections:
   - type: "expansion"
     title: "🔴 심화8: 파일 정보 조회"
     code: |-
-      infoFile = Path('test_output.txt')
+      infoFile = Path(tempfile.gettempdir()) / 'codaro_pathlib_test_output.txt'
+      infoFile.write_text('Pathlib is awesome!')
       fileInfo = infoFile.stat()
       {'size': fileInfo.st_size, 'is_file': infoFile.is_file()}
 

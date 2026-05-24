@@ -230,6 +230,107 @@ sections:
       axFinal2.grid(True, alpha=0.3)
       figFinal
 
+- id: workflow_validation
+  title: 실무 A/B 테스트 의사결정 검증
+  subtitle: 예측 → 오류 확인 → 통계 검증 → 기준 실험
+  blocks:
+  - type: text
+    content: |-
+      A/B 테스트는 p-value 하나로 끝내면 위험합니다. 데이터가 비어 있거나 NaN이 섞인 상태를 먼저 막고, 평균 차이·신뢰구간·효과 크기·최소 실무 효과 기준을 함께 봐야 합니다.
+
+      이번 단계에서는 Treatment가 Control보다 높을 것이라고 먼저 예상하고, 잘못된 입력을 일부러 실패시킵니다. 그다음 검증 가능한 분석 함수를 만들고, 최소 기대 매출 상승 기준을 바꿔 채택 판단이 어떻게 달라지는지 실험합니다.
+  - type: code
+    language: python
+    title: A/B 입력 검증 함수
+    description: 비어 있거나 결측이 있는 표본 차단
+    content: |-
+      def validateAbSamples(control, treatment):
+          control = np.asarray(control, dtype=float)
+          treatment = np.asarray(treatment, dtype=float)
+
+          if len(control) < 2 or len(treatment) < 2:
+              raise ValueError("각 그룹에는 최소 2개 이상의 관측값이 필요합니다.")
+          if np.isnan(control).any() or np.isnan(treatment).any():
+              raise ValueError("A/B 테스트 표본에 결측값이 있으면 먼저 정제해야 합니다.")
+
+          return control, treatment
+
+
+      try:
+          validateAbSamples([50.0], [52.0, 53.0])
+      except ValueError as exc:
+          print("의도한 오류 확인:", exc)
+      else:
+          raise AssertionError("관측값이 부족한 테스트를 통과시키면 안 됩니다.")
+  - type: code
+    language: python
+    title: 검증 가능한 A/B 분석 함수
+    description: p-value, 신뢰구간, 효과 크기 함께 계산
+    content: |-
+      def analyzeAbTest(control, treatment, alpha=0.05, minimumLift=1.0):
+          control, treatment = validateAbSamples(control, treatment)
+
+          tResult = stats.ttest_ind(control, treatment, equal_var=False)
+          meanDifference = treatment.mean() - control.mean()
+          seDifference = np.sqrt(control.var(ddof=1) / len(control) + treatment.var(ddof=1) / len(treatment))
+          ciLow = meanDifference - 1.96 * seDifference
+          ciHigh = meanDifference + 1.96 * seDifference
+          pooledStd = np.sqrt((control.std(ddof=1) ** 2 + treatment.std(ddof=1) ** 2) / 2)
+          effectSize = meanDifference / pooledStd
+
+          recommendation = (
+              "Implement Treatment"
+              if tResult.pvalue < alpha and ciLow > 0 and meanDifference >= minimumLift
+              else "Keep Control"
+          )
+
+          return {
+              "controlMean": control.mean(),
+              "treatmentMean": treatment.mean(),
+              "meanDifference": meanDifference,
+              "pValue": tResult.pvalue,
+              "ciLow": ciLow,
+              "ciHigh": ciHigh,
+              "effectSize": effectSize,
+              "minimumLift": minimumLift,
+              "recommendation": recommendation,
+          }
+
+
+      workflowResult = analyzeAbTest(controlGroup, treatmentGroup, minimumLift=3.0)
+
+      assert workflowResult["treatmentMean"] > workflowResult["controlMean"]
+      assert workflowResult["pValue"] < 0.05
+      assert workflowResult["ciLow"] > 0
+      assert workflowResult["recommendation"] == "Implement Treatment"
+
+      print("예상: Treatment 평균이 더 높고 통계적으로 유의합니다.")
+      pd.DataFrame([workflowResult])
+  - type: code
+    language: python
+    title: 실무 기준 바꿔보기
+    description: 최소 기대 상승액 기준 실험
+    content: |-
+      decisionAt2 = analyzeAbTest(controlGroup, treatmentGroup, minimumLift=2.0)
+      decisionAt5 = analyzeAbTest(controlGroup, treatmentGroup, minimumLift=5.0)
+
+      assert decisionAt2["recommendation"] == "Implement Treatment"
+      assert decisionAt5["recommendation"] == "Keep Control"
+      assert decisionAt2["meanDifference"] == decisionAt5["meanDifference"]
+
+      pd.DataFrame([
+          {
+              "minimumLift": decisionAt2["minimumLift"],
+              "meanDifference": round(decisionAt2["meanDifference"], 2),
+              "recommendation": decisionAt2["recommendation"],
+          },
+          {
+              "minimumLift": decisionAt5["minimumLift"],
+              "meanDifference": round(decisionAt5["meanDifference"], 2),
+              "recommendation": decisionAt5["recommendation"],
+          },
+      ])
+
 - id: practice
   title: 실습
   subtitle: A/B 테스트 분석 프로젝트

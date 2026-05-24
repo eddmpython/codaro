@@ -3,7 +3,7 @@ meta:
   title: "함수 데코레이터 심화"
   day: 2
   category: "advancedPython"
-  tags: ["decorator", "functools", "wraps", "메타프로그래밍"]
+  tags: ["decorator", "functools", "wraps", "메타프로그래밍", "검증", "운영자동화"]
   seo:
     title: "파이썬 데코레이터 심화 - 인자 있는 데코레이터와 클래스 데코레이터"
     description: "데코레이터의 내부 동작 원리를 완벽히 이해하고 인자 있는 데코레이터, 다중 데코레이터, 클래스 데코레이터를 마스터합니다."
@@ -359,10 +359,14 @@ sections:
     description: "클래스 속성에 타입 검증을 추가합니다."
     content: |-
       def enforceTypes(cls):
+          from typing import get_type_hints
+
           originalInit = cls.__init__
+          typeHints = get_type_hints(cls)
+
           def newInit(self, *args, **kwargs):
               originalInit(self, *args, **kwargs)
-              for attr, expected in cls.__annotations__.items():
+              for attr, expected in typeHints.items():
                   value = getattr(self, attr, None)
                   if value is not None and not isinstance(value, expected):
                       raise TypeError(f"{attr}은 {expected.__name__}이어야 합니다")
@@ -378,6 +382,13 @@ sections:
               self.price = price
 
       prod = Product("Apple", 1000)
+      assert (prod.name, prod.price) == ("Apple", 1000)
+
+      try:
+          Product("Broken", "1000")
+      except TypeError as exc:
+          assert "price" in str(exc)
+
       prod.name, prod.price
   - type: "code"
     language: "python"
@@ -484,6 +495,83 @@ sections:
       Factory.create(), Factory.create(), Factory.count
   - type: "tip"
     content: "@property에 데코레이터를 적용하려면 property 객체를 반환하도록 특별히 처리해야 합니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 데코레이터로 권한, 감사 로그, 입력 검증 묶기"
+  subtitle: "예측 → 래핑 → 오류 확인 → 메타데이터 검증"
+  blocks:
+  - type: "text"
+    content: "데코레이터는 반복되는 운영 규칙을 함수 바깥으로 분리하는 도구입니다. 권한 확인, 감사 로그, 입력 검증처럼 여러 함수에 공통으로 붙는 규칙을 한 번에 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "권한과 감사 로그 데코레이터"
+    description: "functools.wraps로 원본 함수 이름을 보존하면서 실행 규칙을 추가합니다."
+    content: |-
+      from functools import wraps
+
+      auditLog = []
+
+      def requireRole(requiredRole):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(user, *args, **kwargs):
+                  if requiredRole not in user.get("roles", []):
+                      raise PermissionError(f"{requiredRole} role required")
+                  return func(user, *args, **kwargs)
+              return wrapper
+          return decorator
+
+      def auditAction(actionName):
+          def decorator(func):
+              @wraps(func)
+              def wrapper(*args, **kwargs):
+                  result = func(*args, **kwargs)
+                  auditLog.append({"action": actionName, "result": result})
+                  return result
+              return wrapper
+          return decorator
+
+      def requirePositiveAmount(func):
+          @wraps(func)
+          def wrapper(user, amount):
+              if amount <= 0:
+                  raise ValueError("amount must be positive")
+              return func(user, amount)
+          return wrapper
+
+      @auditAction("refund")
+      @requireRole("finance")
+      @requirePositiveAmount
+      def approveRefund(user, amount):
+          return {"user": user["name"], "amount": amount, "status": "approved"}
+
+      financeUser = {"name": "Kim", "roles": ["finance", "operator"]}
+      viewerUser = {"name": "Lee", "roles": ["viewer"]}
+
+      result = approveRefund(financeUser, 30000)
+      assert result == {"user": "Kim", "amount": 30000, "status": "approved"}
+      assert auditLog == [{"action": "refund", "result": result}]
+      assert approveRefund.__name__ == "approveRefund"
+
+      try:
+          approveRefund(viewerUser, 10000)
+      except PermissionError as exc:
+          assert "finance" in str(exc)
+
+      try:
+          approveRefund(financeUser, 0)
+      except ValueError as exc:
+          assert "positive" in str(exc)
+
+      print("데코레이터 운영 규칙 통과")
+  - type: "list"
+    items:
+    - "데코레이터 순서는 결과에 영향을 주므로, 권한과 검증이 어느 순서로 실행되는지 의도해야 합니다."
+    - "운영 로그 데코레이터는 원본 함수 결과를 보존하면서 부가 기록만 남깁니다."
+    - "실무 데코레이터는 반드시 wraps로 함수 이름과 문서 정보를 보존합니다."
+  - type: "tip"
+    title: "변주 실험"
+    content: "권한 검사를 감사 로그보다 먼저 실행할지 나중에 실행할지 데코레이터 순서를 바꾸고, 실패한 요청도 로그에 남길지 assert로 정책을 고정하세요."
 
 - id: "practice"
   title: "종합 복습"
@@ -643,7 +731,7 @@ sections:
                   for attempt in range(maxAttempts):
                       try:
                           return func(*args, **kwargs)
-                      except Exception:
+                      except ValueError:
                           if attempt == maxAttempts - 1:
                               raise
                   return None

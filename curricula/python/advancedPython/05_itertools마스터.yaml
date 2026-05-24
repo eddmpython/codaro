@@ -3,7 +3,7 @@ meta:
   title: "itertools 마스터"
   day: 5
   category: "advancedPython"
-  tags: ["itertools", "iterator", "combinations", "groupby"]
+  tags: ["itertools", "iterator", "combinations", "groupby", "스트리밍", "검증"]
   seo:
     title: "파이썬 itertools 마스터 - 무한 이터레이터와 조합 함수"
     description: "itertools 모듈의 모든 함수를 마스터합니다. 무한 이터레이터, 종료 이터레이터, 조합 함수 완벽 이해."
@@ -286,6 +286,163 @@ sections:
       list(accumulate(values, max))
   - type: "tip"
     content: "accumulate는 지연 평가되어 대용량 데이터에서도 효율적입니다."
+
+- id: "workflow_validation"
+  title: "실무 이터레이터 파이프라인"
+  subtitle: "정렬, 그룹화, 조합 실험, 검증"
+  blocks:
+  - type: "text"
+    content: "itertools는 함수 이름을 외우는 것보다, 많은 데이터를 한 번에 만들지 않고 흘려보내며 필요한 결과만 검증하는 감각이 중요합니다. 특히 groupby는 SQL GROUP BY처럼 자동으로 같은 키를 모아주지 않으므로, 실행 전에 정렬 여부가 결과에 어떤 영향을 주는지 예측해야 합니다. 이 실수는 예외가 나지 않는 논리 버그라서 검증이 더 중요합니다."
+  - type: "list"
+    items:
+    - "groupby는 연속된 키만 묶으므로 먼저 정렬합니다."
+    - "오류가 없어도 같은 채널이 나뉘면 버그입니다."
+    - "product는 실험 후보를 빠르게 만들지만 경우의 수를 먼저 계산합니다."
+    - "islice는 긴 이터레이터를 작은 검토 묶음으로 자릅니다."
+    - "accumulate는 누적 매출처럼 중간 결과가 중요한 지표를 확인합니다."
+  - type: "code"
+    language: "python"
+    title: "결제 이벤트를 채널별로 요약"
+    description: "정렬 후 groupby로 채널별 주문 수와 매출을 계산합니다."
+    content: |-
+      from itertools import groupby
+
+      salesEvents = [
+          {"channel": "online", "amount": 120000, "status": "paid"},
+          {"channel": "offline", "amount": 80000, "status": "paid"},
+          {"channel": "online", "amount": 45000, "status": "paid"},
+          {"channel": "online", "amount": 30000, "status": "refund"},
+          {"channel": "partner", "amount": 55000, "status": "paid"},
+          {"channel": "offline", "amount": 70000, "status": "paid"},
+      ]
+
+      def summarizeByChannel(events):
+          paidEvents = sorted(
+              (event for event in events if event["status"] == "paid"),
+              key=lambda event: event["channel"],
+          )
+          summary = {}
+          for channel, groupedEvents in groupby(paidEvents, key=lambda event: event["channel"]):
+              groupList = list(groupedEvents)
+              summary[channel] = {
+                  "orders": len(groupList),
+                  "revenue": sum(event["amount"] for event in groupList),
+              }
+          return summary
+
+      channelSummary = summarizeByChannel(salesEvents)
+      channelSummary
+  - type: "code"
+    language: "python"
+    title: "정렬 없이 groupby 결과 예측"
+    description: "같은 채널이 떨어져 있으면 어떻게 나뉘는지 먼저 예측하고 실행합니다."
+    content: |-
+      unsortedGroups = [
+          (channel, sum(event["amount"] for event in groupedEvents))
+          for channel, groupedEvents in groupby(
+              [event for event in salesEvents if event["status"] == "paid"],
+              key=lambda event: event["channel"],
+          )
+      ]
+
+      unsortedGroups
+  - type: "code"
+    language: "python"
+    title: "예상값으로 검증"
+    description: "정렬한 groupby 결과가 업무 규칙과 맞는지 확인합니다."
+    content: |-
+      expectedSummary = {
+          "offline": {"orders": 2, "revenue": 150000},
+          "online": {"orders": 2, "revenue": 165000},
+          "partner": {"orders": 1, "revenue": 55000},
+      }
+
+      checks = {
+          channel: channelSummary[channel] == expected
+          for channel, expected in expectedSummary.items()
+      }
+
+      all(checks.values()), checks
+  - type: "code"
+    language: "python"
+    title: "프로모션 실험 후보 만들기"
+    description: "product로 세그먼트, 쿠폰율, 채널 조합을 만듭니다."
+    content: |-
+      from itertools import product
+
+      segments = ["new", "vip"]
+      couponRates = [0.05, 0.1]
+      channels = ["online", "offline"]
+      experimentCases = list(product(segments, couponRates, channels))
+
+      len(experimentCases), experimentCases[0], experimentCases[-1]
+  - type: "code"
+    language: "python"
+    title: "검토 묶음으로 자르기"
+    description: "islice로 긴 후보 목록을 작은 배치로 나눕니다."
+    content: |-
+      from itertools import islice
+
+      def makeBatches(iterable, size):
+          if size <= 0:
+              raise ValueError("batch size must be positive")
+          iterator = iter(iterable)
+          batch = list(islice(iterator, size))
+          while batch:
+              yield batch
+              batch = list(islice(iterator, size))
+
+      reviewBatches = list(makeBatches(experimentCases, 3))
+      len(reviewBatches), reviewBatches[0]
+  - type: "code"
+    language: "python"
+    title: "잘못된 배치 크기 확인"
+    description: "이터레이터 유틸리티의 실패 조건도 명시적으로 검증합니다."
+    content: |-
+      try:
+          list(makeBatches(experimentCases, 0))
+      except ValueError as exc:
+          batchErrorMessage = str(exc)
+
+      assert batchErrorMessage == "batch size must be positive"
+  - type: "code"
+    language: "python"
+    title: "누적 매출 흐름 확인"
+    description: "accumulate로 결제 이벤트가 들어오는 순서의 누적 매출을 봅니다."
+    content: |-
+      from itertools import accumulate
+
+      paidAmounts = [
+          event["amount"]
+          for event in salesEvents
+          if event["status"] == "paid"
+      ]
+      runningRevenue = list(accumulate(paidAmounts))
+
+      runningRevenue
+  - type: "code"
+    language: "python"
+    title: "수정 실험"
+    description: "세그먼트를 하나 늘리면 경우의 수가 얼마나 커지는지 비교합니다."
+    content: |-
+      expandedCases = list(product(segments + ["returning"], couponRates, channels))
+
+      len(experimentCases), len(expandedCases)
+  - type: "code"
+    language: "python"
+    title: "최종 검증"
+    description: "정렬, 그룹화, 배치, 누적 결과를 assert로 고정합니다."
+    content: |-
+      assert channelSummary == expectedSummary
+      assert len(unsortedGroups) == 5
+      assert len(experimentCases) == 8
+      assert [len(batch) for batch in reviewBatches] == [3, 3, 2]
+      assert runningRevenue == [120000, 200000, 245000, 300000, 370000]
+      assert len(expandedCases) == 12
+
+      print("itertools 파이프라인 검증 통과")
+  - type: "tip"
+    content: "itertools를 쓸 때는 결과를 전부 만드는 습관보다, 정렬 조건과 경우의 수를 먼저 예측하고 작은 샘플로 검증하는 습관이 더 중요합니다."
 
 - id: "practice"
   title: "종합 복습"

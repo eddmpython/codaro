@@ -26,7 +26,7 @@ sections:
   blocks:
   - type: text
     content: |-
-      GitHub에서 tips 데이터를 불러옵니다. 레스토랑에서 수집한 244건의 팁 데이터입니다.
+      Codaro 로컬 데이터셋에서 tips 데이터를 불러옵니다. 레스토랑 결제와 팁 패턴을 담은 예제 데이터입니다.
 
       total_bill(총 금액), tip(팁), sex(성별), smoker(흡연여부), day(요일), time(시간대), size(인원수) 컬럼이 있습니다.
   - type: code
@@ -38,11 +38,9 @@ sections:
       import pandas as pd
       import warnings
       warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
 
-      tipsUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-      tips = pd.read_csv(tipsUrl)
-      tips.head()
-
+      tips = loadLocalDataset("tips")
 - id: step2_count_bar
   title: 2단계. 개수 세기
   subtitle: count() 집계
@@ -225,6 +223,114 @@ sections:
     content: |-
       Dinner 시간대의 평균 금액이 Lunch보다 높습니다. 흡연자와 비흡연자 간 차이도 확인할 수 있습니다.
 
+- id: workflow_validation
+  title: 9단계. 실무 집계 검증 루프
+  subtitle: 예측 → spec 검증 → 오류 수정 → 기준 실험
+  blocks:
+  - type: text
+    content: |-
+      업무용 차트는 막대가 그려졌다는 사실만으로 충분하지 않습니다. 원본 데이터 구조가 맞는지, 집계 결과가 예상한 방향인지, Altair spec에 집계 함수와 그룹 인코딩이 들어갔는지 확인해야 합니다.
+
+      이 단계에서는 Dinner의 평균 결제 금액이 Lunch보다 높을 것이라고 먼저 예측합니다. 그런 다음 pandas 집계와 Altair spec을 함께 검증해, 보고서에 넣을 수 있는 차트인지 확인합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 예측 검증
+    description: tips 데이터의 필수 컬럼과 시간대별 평균 결제 금액을 확인합니다
+    content: |-
+      requiredColumns = {"total_bill", "tip", "sex", "smoker", "day", "time", "size"}
+      missingColumns = requiredColumns - set(tips.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert tips.shape == (120, 7)
+      assert set(tips["time"].unique()) == {"Lunch", "Dinner"}
+
+      timeSummary = tips.groupby("time")["total_bill"].agg(["mean", "count"]).round(2)
+
+      predictedHigherTime = "Dinner"
+      actualHigherTime = timeSummary["mean"].idxmax()
+
+      assert actualHigherTime == predictedHigherTime
+      assert timeSummary.loc["Dinner", "count"] > timeSummary.loc["Lunch", "count"]
+
+      timeSummary
+  - type: code
+    language: python
+    title: Altair 집계 spec 검증
+    description: 최종 차트가 평균 집계와 smoker 색상 구분을 포함하는지 확인합니다
+    content: |-
+      def validateTipsBarChart(chart):
+          spec = chart.to_dict()
+          encoding = spec["encoding"]
+
+          assert spec["mark"]["type"] == "bar"
+          assert encoding["x"]["field"] == "time"
+          assert encoding["y"]["field"] == "total_bill"
+          assert encoding["y"]["aggregate"] == "mean"
+          assert encoding["color"]["field"] == "smoker"
+          assert spec["width"] >= 300
+          assert spec["height"] >= 250
+
+          tooltipAggregates = {
+              item.get("aggregate")
+              for item in encoding.get("tooltip", [])
+              if isinstance(item, dict)
+          }
+          assert {"mean", "count"}.issubset(tooltipAggregates)
+
+          return sorted(encoding.keys())
+
+      finalKeys = validateTipsBarChart(chartFinal)
+      finalKeys
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: smoker 색상 구분이 빠진 차트를 검증 함수가 잡아내는지 확인합니다
+    content: |-
+      brokenChart = alt.Chart(tips).mark_bar().encode(
+          x="time:N",
+          y="mean(total_bill):Q"
+      ).properties(width=350, height=300)
+
+      try:
+          validateTipsBarChart(brokenChart)
+      except KeyError as exc:
+          print("검증 실패 확인:", exc)
+
+      fixedChart = alt.Chart(tips).mark_bar().encode(
+          x=alt.X("time:N", title="시간대"),
+          y=alt.Y("mean(total_bill):Q", title="평균 금액 ($)"),
+          color=alt.Color("smoker:N", title="흡연 여부"),
+          tooltip=["time", "smoker", "mean(total_bill)", "count()"]
+      ).properties(title="시간대별 평균 금액 (흡연 여부)", width=350, height=300)
+
+      assert validateTipsBarChart(fixedChart)
+  - type: code
+    language: python
+    title: 기준 실험 리포트
+    description: 최소 결제 금액 기준을 바꿔도 시간대 결론이 유지되는지 확인합니다
+    content: |-
+      thresholdRows = []
+
+      for minimumBill in [0, 25, 35]:
+          subset = tips[tips["total_bill"] >= minimumBill]
+          summary = subset.groupby("time")["total_bill"].agg(["mean", "count"]).round(2)
+          bestTime = summary["mean"].idxmax()
+          thresholdRows.append({
+              "minimumBill": minimumBill,
+              "rows": len(subset),
+              "bestTime": bestTime,
+              "dinnerMean": summary.loc["Dinner", "mean"],
+          })
+
+      thresholdReport = pd.DataFrame(thresholdRows)
+
+      assert thresholdReport["rows"].is_monotonic_decreasing
+      assert set(thresholdReport["bestTime"]) == {"Dinner"}
+
+      thresholdReport
+  - type: tip
+    content: "집계 차트는 원본 데이터 계약, 집계 방향, 차트 spec을 함께 검증해야 합니다. 이렇게 만들면 수업 예제가 보고서 자동화 코드로도 이어집니다."
+
 - id: practice
   title: 실습
   subtitle: 팁 데이터 막대 차트 프로젝트
@@ -246,8 +352,8 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        billUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-        bill = pd.read_csv(billUrl)
+        from codaro.curriculum.localData import loadLocalDataset
+        bill = loadLocalDataset("tips")
     - type: code
       title: "차트 생성"
       content: |-
@@ -267,8 +373,8 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        payUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-        pay = pd.read_csv(payUrl)
+        from codaro.curriculum.localData import loadLocalDataset
+        pay = loadLocalDataset("tips")
     - type: code
       title: "차트 생성"
       content: |-

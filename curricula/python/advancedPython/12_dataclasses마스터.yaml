@@ -3,7 +3,7 @@ meta:
   title: "dataclasses 마스터"
   day: 12
   category: "advancedPython"
-  tags: ["dataclass", "field", "frozen", "__post_init__"]
+  tags: ["dataclass", "field", "frozen", "__post_init__", "검증", "데이터모델"]
   seo:
     title: "파이썬 dataclasses 완벽 가이드 - 보일러플레이트 없는 클래스"
     description: "dataclasses로 깔끔한 데이터 클래스를 만듭니다. field(), __post_init__, frozen, slots 옵션 완벽 이해."
@@ -402,6 +402,78 @@ sections:
       Config(host="localhost", port=8080)
   - type: "tip"
     content: "복잡한 상속 구조에서는 합성(composition)을 고려하세요."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 라인 데이터 모델 만들기"
+  subtitle: "field, default_factory, frozen, replace, asdict를 한 흐름에서 검증합니다"
+  blocks:
+  - type: "text"
+    content: "dataclass는 단순한 보일러플레이트 제거 도구가 아니라, 데이터 규칙을 한 곳에 모으는 모델링 도구입니다. 주문 라인의 금액 계산과 세금 규칙을 만들고, 잘못된 입력이 어디서 막히는지 확인하세요."
+  - type: "code"
+    language: "python"
+    title: "주문 라인과 세금 규칙"
+    description: "__post_init__에서 불변 조건을 확인하고 replace/asdict로 결과를 검증합니다."
+    content: |-
+      from dataclasses import asdict, dataclass, field, replace
+
+      @dataclass(frozen=True)
+      class PriceRule:
+          taxRate: float
+
+          def __post_init__(self) -> None:
+              if not 0 <= self.taxRate <= 0.3:
+                  raise ValueError("taxRate must be between 0 and 0.3")
+
+          def tax(self, amount: int) -> int:
+              return round(amount * self.taxRate)
+
+      @dataclass
+      class OrderLine:
+          sku: str
+          unitPrice: int
+          quantity: int
+          tags: list[str] = field(default_factory=list)
+          subtotal: int = field(init=False)
+
+          def __post_init__(self) -> None:
+              if self.unitPrice <= 0:
+                  raise ValueError("unitPrice must be positive")
+              if self.quantity <= 0:
+                  raise ValueError("quantity must be positive")
+              self.subtotal = self.unitPrice * self.quantity
+
+      rule = PriceRule(taxRate=0.1)
+      line = OrderLine("KEYBOARD", 50_000, 2, tags=["office"])
+      updated = replace(line, quantity=3)
+
+      assert line.subtotal == 100_000
+      assert updated.subtotal == 150_000
+      assert rule.tax(updated.subtotal) == 15_000
+      assert asdict(updated)["tags"] == ["office"]
+  - type: "code"
+    language: "python"
+    title: "입력 오류를 데이터 모델에서 차단하기"
+    description: "실패 케이스를 먼저 만들고, 예외 메시지까지 검증합니다."
+    content: |-
+      from dataclasses import dataclass
+
+      @dataclass(frozen=True)
+      class PriceRule:
+          taxRate: float
+
+          def __post_init__(self) -> None:
+              if not 0 <= self.taxRate <= 0.3:
+                  raise ValueError("taxRate must be between 0 and 0.3")
+
+      try:
+          PriceRule(0.9)
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "taxRate must be between 0 and 0.3"
+  - type: "tip"
+    title: "변주 실험"
+    content: "배송비, 할인율, 쿠폰 코드를 필드로 추가하고 `replace()` 후에도 `subtotal`과 최종 금액이 다시 계산되는지 assert로 검증하세요."
 
 - id: "practice"
   title: "종합 복습"

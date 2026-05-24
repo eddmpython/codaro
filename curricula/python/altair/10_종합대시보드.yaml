@@ -26,7 +26,7 @@ sections:
   blocks:
   - type: text
     content: |-
-      GitHub에서 mpg 데이터를 불러옵니다. 이 프로젝트는 Altair 과정의 최종 종합 프로젝트입니다.
+      Codaro 로컬 데이터셋에서 mpg 데이터를 불러옵니다. 이 프로젝트는 Altair 과정의 최종 종합 프로젝트입니다.
 
       지금까지 배운 모든 개념을 하나로 합칩니다: 마크(mark), 인코딩(encode), 인터랙션(selection), 차트 조합(|, &), 데이터 변환(transform), 레이어(layer) 등 모든 기능을 사용합니다.
 
@@ -40,11 +40,9 @@ sections:
       import pandas as pd
       import warnings
       warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
 
-      mpgUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
-      mpg = pd.read_csv(mpgUrl)
-      mpg.head()
-
+      mpg = loadLocalDataset("mpg")
 - id: step2_overview
   title: 2단계. 대시보드 구조
   subtitle: 컴포넌트 설계
@@ -64,7 +62,7 @@ sections:
     title: 공통 선택 정의
     description: 브러싱과 드롭다운
     content: |-
-      brush = alt.selection_interval()
+      brush = alt.selection_interval(name='overviewBrush')
 
       origins = ['usa', 'europe', 'japan']
       dropdown = alt.binding_select(options=[None] + origins, labels=['전체'] + origins, name='생산국: ')
@@ -117,7 +115,7 @@ sections:
           x=alt.X('origin:N', title='생산국'),
           y=alt.Y('mean(mpg):Q', title='평균 연비'),
           color=alt.when(brush).then('origin:N').otherwise(alt.value('lightgray'))
-      ).add_params(brush).properties(
+      ).properties(
           width=150,
           height=200,
           title='생산국별 평균 연비'
@@ -145,7 +143,7 @@ sections:
           opacity=alt.when(
               (originSelect == None) | (alt.datum.origin == originSelect)
           ).then(alt.value(1)).otherwise(alt.value(0.2))
-      ).add_params(originSelect).properties(
+      ).properties(
           width=350,
           height=200,
           title='연도별 평균 연비 추이'
@@ -170,7 +168,7 @@ sections:
           x=alt.X('mpg:Q', bin=alt.Bin(maxbins=20), title='연비'),
           y=alt.Y('count()', title='개수'),
           color=alt.when(brush).then('origin:N').otherwise(alt.value('lightgray'))
-      ).add_params(brush).properties(
+      ).properties(
           width=200,
           height=150,
           title='연비 분포'
@@ -236,7 +234,7 @@ sections:
     title: 인터랙션 정의
     description: 브러싱과 드롭다운 설정
     content: |-
-      brushFinal = alt.selection_interval()
+      brushFinal = alt.selection_interval(name='dashboardBrush')
       originsFinal = ['usa', 'europe', 'japan']
       dropdownFinal = alt.binding_select(options=[None] + originsFinal, labels=['전체'] + originsFinal, name='생산국: ')
       originFinal = alt.param(name='origin', bind=dropdownFinal)
@@ -260,11 +258,11 @@ sections:
       barFinal = alt.Chart(mpg).mark_bar().encode(
           x='origin:N', y='mean(mpg):Q',
           color=alt.when(brushFinal).then('origin:N').otherwise(alt.value('lightgray'))
-      ).add_params(brushFinal).properties(width=120, height=150, title='생산국별')
+      ).properties(width=120, height=150, title='생산국별')
       histFinal = alt.Chart(mpg).mark_bar().encode(
           x=alt.X('mpg:Q', bin=True), y='count()',
           color=alt.when(brushFinal).then('origin:N').otherwise(alt.value('lightgray'))
-      ).add_params(brushFinal).properties(width=120, height=100, title='연비 분포')
+      ).properties(width=120, height=100, title='연비 분포')
   - type: code
     language: python
     title: 대시보드 조합
@@ -273,7 +271,7 @@ sections:
       lineFinal = alt.Chart(mpg).mark_line(point=True).encode(
           x='model_year:O', y='mean(mpg):Q', color='origin:N',
           opacity=alt.when((originFinal == None) | (alt.datum.origin == originFinal)).then(alt.value(1)).otherwise(alt.value(0.2))
-      ).add_params(originFinal).properties(width=480, height=150, title='연도별 추이')
+      ).properties(width=480, height=150, title='연도별 추이')
       dashboardFinal = ((scatterFinal + avgLineFinal) | (barFinal & histFinal)) & lineFinal
       dashboardFinal
   - type: text
@@ -305,16 +303,16 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        carUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
-        car = pd.read_csv(carUrl)
-        drag = alt.selection_interval()
+        from codaro.curriculum.localData import loadLocalDataset
+        car = loadLocalDataset("mpg")
+        drag = alt.selection_interval(name='missionDrag')
     - type: code
       title: "차트 생성"
       content: |-
         dotHp = alt.Chart(car).mark_circle().encode(x='horsepower:Q', y='mpg:Q', color=alt.when(drag).then('origin:N').otherwise(alt.value('lightgray'))).add_params(drag).properties(width=250, height=200)
-        ruleMean = alt.Chart(car).mark_rule(color='red').encode(y='mean(mpg):Q').add_params(drag)
-        barNation = alt.Chart(car).mark_bar().encode(x='origin:N', y='count()', color=alt.when(drag).then('origin:N').otherwise(alt.value('lightgray'))).add_params(drag).properties(width=150, height=100)
-        barCyl = alt.Chart(car).mark_bar().encode(x='cylinders:O', y='count()', color=alt.when(drag).then('origin:N').otherwise(alt.value('lightgray'))).add_params(drag).properties(width=150, height=100, title='실린더별')
+        ruleMean = alt.Chart(car).mark_rule(color='red').encode(y='mean(mpg):Q')
+        barNation = alt.Chart(car).mark_bar().encode(x='origin:N', y='count()', color=alt.when(drag).then('origin:N').otherwise(alt.value('lightgray'))).properties(width=150, height=100)
+        barCyl = alt.Chart(car).mark_bar().encode(x='cylinders:O', y='count()', color=alt.when(drag).then('origin:N').otherwise(alt.value('lightgray'))).properties(width=150, height=100, title='실린더별')
         lineYr = alt.Chart(car).mark_line(point=True).encode(x='model_year:O', y='mean(mpg):Q', color='origin:N').properties(width=500, height=150)
         figCyl = ((dotHp + ruleMean) | (barNation & barCyl)) & lineYr
         figCyl
@@ -326,15 +324,15 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        autoUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
-        auto = pd.read_csv(autoUrl)
-        sweep = alt.selection_interval()
+        from codaro.curriculum.localData import loadLocalDataset
+        auto = loadLocalDataset("mpg")
+        sweep = alt.selection_interval(name='missionSweep')
     - type: code
       title: "차트 생성"
       content: |-
         dotPower = alt.Chart(auto).mark_circle().encode(x='horsepower:Q', y='mpg:Q', color=alt.when(sweep).then('origin:N').otherwise(alt.value('lightgray'))).add_params(sweep).properties(width=250, height=200)
         lineTrend = alt.Chart(auto).mark_line(point=True).encode(x='model_year:O', y='mean(mpg):Q', color='origin:N').properties(width=500, height=150)
-        dotWeight = alt.Chart(auto).mark_circle(size=40).encode(x='weight:Q', y='mpg:Q', color=alt.when(sweep).then('origin:N').otherwise(alt.value('lightgray'))).add_params(sweep).properties(width=250, height=200, title='무게 vs 연비')
+        dotWeight = alt.Chart(auto).mark_circle(size=40).encode(x='weight:Q', y='mpg:Q', color=alt.when(sweep).then('origin:N').otherwise(alt.value('lightgray'))).properties(width=250, height=200, title='무게 vs 연비')
         figWeight = (dotPower | dotWeight) & lineTrend
         figWeight
 
@@ -357,3 +355,76 @@ sections:
       이제 Altair로 다양한 데이터 시각화와 인터랙티브 대시보드를 만들 수 있습니다.
 
       실제 프로젝트에서 이 기술들을 활용해보세요!
+
+- id: workflow_validation
+  title: 10단계. Altair 대시보드 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      대시보드는 여러 차트를 묶는 만큼 입력 데이터, selection, concat 구조가 모두 맞아야 합니다. 완성 spec을 검사하는 루프를 추가합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 KPI 예측
+    description: mpg 데이터의 주요 수치와 생산국 구성을 확인합니다
+    content: |-
+      import altair as alt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      mpgDashboard = loadLocalDataset("mpg")
+      requiredColumns = {"mpg", "horsepower", "weight", "origin", "model_year"}
+      missingColumns = requiredColumns - set(mpgDashboard.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert mpgDashboard[["mpg", "horsepower", "weight"]].gt(0).all().all()
+      assert mpgDashboard["origin"].nunique() == 3
+  - type: code
+    language: python
+    title: Dashboard spec 검증
+    description: hconcat 구조와 selection parameter를 확인합니다
+    content: |-
+      dashboardBrush = alt.selection_interval(name="dashboardValidationBrush")
+      scatterPanel = alt.Chart(mpgDashboard).mark_point().encode(x="horsepower:Q", y="mpg:Q", color="origin:N").add_params(dashboardBrush)
+      barPanel = alt.Chart(mpgDashboard).mark_bar().encode(x="origin:N", y="mean(mpg):Q", color=alt.condition(dashboardBrush, "origin:N", alt.value("lightgray")))
+      dashboardChart = scatterPanel | barPanel
+      dashboardSpec = dashboardChart.to_dict()
+
+      assert "hconcat" in dashboardSpec
+      assert len(dashboardSpec["hconcat"]) == 2
+      assert any(param.get("name") == "dashboardValidationBrush" for param in dashboardSpec.get("params", []))
+      dashboardChart
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: selection 없는 대시보드를 실패시킵니다
+    content: |-
+      def validateDashboardSpec(spec):
+          paramNames = {param.get("name") for param in spec.get("params", [])}
+          if "dashboardValidationBrush" not in paramNames:
+              raise ValueError("대시보드에는 연결 selection이 필요합니다")
+          assert "hconcat" in spec
+          return True
+
+      brokenDashboardSpec = dict(dashboardSpec)
+      brokenDashboardSpec.pop("params", None)
+      try:
+          validateDashboardSpec(brokenDashboardSpec)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateDashboardSpec(dashboardSpec)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 마력 기준별 점검 대상 차량 수를 비교합니다
+    content: |-
+      thresholdReport = []
+      for horsepowerCutoff in [100, 140, 180]:
+          target = mpgDashboard[mpgDashboard["horsepower"] >= horsepowerCutoff]
+          thresholdReport.append({"horsepowerCutoff": horsepowerCutoff, "rows": int(len(target)), "avgMpg": round(float(target["mpg"].mean()), 1)})
+
+      assert thresholdReport[0]["rows"] >= thresholdReport[1]["rows"] >= thresholdReport[2]["rows"]
+      assert thresholdReport[0]["avgMpg"] >= thresholdReport[-1]["avgMpg"]
+      thresholdReport
+  - type: tip
+    content: "Altair 대시보드의 품질은 concat과 selection이 spec으로 검증될 때 올라갑니다."

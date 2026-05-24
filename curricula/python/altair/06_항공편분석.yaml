@@ -26,7 +26,7 @@ sections:
   blocks:
   - type: text
     content: |-
-      GitHub에서 flights 데이터를 불러옵니다. 1949년부터 1960년까지 12년간 매월 비행기를 탄 사람 수를 기록한 데이터입니다.
+      Codaro 로컬 데이터셋에서 flights 데이터를 불러옵니다. 1949년부터 1960년까지 12년간 매월 비행기를 탄 사람 수를 기록한 데이터입니다.
 
       year는 연도(1949~1960), month는 월(Jan, Feb 등), passengers는 승객 수(천 명 단위)를 나타냅니다. 12년 × 12개월 = 총 144개 행이 있습니다.
 
@@ -40,11 +40,9 @@ sections:
       import pandas as pd
       import warnings
       warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
 
-      flightsUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv"
-      flights = pd.read_csv(flightsUrl)
-      flights.head()
-
+      flights = loadLocalDataset("flights")
 - id: step2_line_chart
   title: 2단계. 라인 차트
   subtitle: mark_line()
@@ -282,8 +280,8 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        airUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv"
-        air = pd.read_csv(airUrl)
+        from codaro.curriculum.localData import loadLocalDataset
+        air = loadLocalDataset("flights")
         months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
     - type: code
       title: "차트 생성"
@@ -304,8 +302,8 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        planeUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv"
-        plane = pd.read_csv(planeUrl)
+        from codaro.curriculum.localData import loadLocalDataset
+        plane = loadLocalDataset("flights")
     - type: code
       title: "차트 생성"
       content: |-
@@ -329,3 +327,78 @@ sections:
     - "alt.Tooltip() - 툴팁 상세 설정"
   - type: text
     content: 다음 프로젝트에서는 인터랙티브 필터와 선택 기능을 배웁니다.
+
+- id: workflow_validation
+  title: 10단계. 항공편 Heatmap 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      항공편 시계열은 연도와 월 조합이 정확해야 heatmap이 의미를 가집니다. 키 중복과 색상 인코딩을 함께 검증합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 추세 예측
+    description: 12개월 x 12년 구조와 장기 증가를 확인합니다
+    content: |-
+      import altair as alt
+      from codaro.curriculum.localData import loadLocalDataset
+
+      flightFlow = loadLocalDataset("flights")
+      requiredColumns = {"year", "month", "passengers"}
+      missingColumns = requiredColumns - set(flightFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert flightFlow["month"].nunique() == 12
+      assert flightFlow["year"].nunique() == 12
+      assert flightFlow.groupby("year")["passengers"].sum().iloc[-1] > flightFlow.groupby("year")["passengers"].sum().iloc[0]
+  - type: code
+    language: python
+    title: Heatmap spec 검증
+    description: rect mark와 x/y/color 인코딩을 확인합니다
+    content: |-
+      heatmapChart = alt.Chart(flightFlow).mark_rect().encode(
+          x="month:O",
+          y="year:O",
+          color="passengers:Q",
+          tooltip=["year:O", "month:O", "passengers:Q"],
+      ).properties(title="Flight passengers heatmap")
+      heatmapSpec = heatmapChart.to_dict()
+      encoding = heatmapSpec["encoding"]
+
+      assert heatmapSpec["mark"]["type"] == "rect"
+      assert encoding["x"]["field"] == "month"
+      assert encoding["y"]["field"] == "year"
+      assert encoding["color"]["field"] == "passengers"
+      heatmapChart
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 월-연도 중복을 pivot 전에 차단합니다
+    content: |-
+      def validateFlightKeys(frame):
+          duplicateCount = frame.duplicated(["year", "month"]).sum()
+          if duplicateCount:
+              raise ValueError(f"중복된 월별 행이 있습니다: {duplicateCount}")
+          assert frame["passengers"].gt(0).all()
+          return True
+
+      brokenFlights = flightFlow.copy()
+      brokenFlights.loc[len(brokenFlights)] = brokenFlights.iloc[0]
+      try:
+          validateFlightKeys(brokenFlights)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateFlightKeys(flightFlow)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 여름 성수기와 나머지 월의 평균 승객 차이를 봅니다
+    content: |-
+      seasonFlow = flightFlow.assign(season=flightFlow["month"].map(lambda month: "summer" if month in {"Jun", "Jul", "Aug"} else "other"))
+      seasonSummary = seasonFlow.groupby("season")["passengers"].mean().round(1)
+
+      assert seasonSummary["summer"] > seasonSummary["other"]
+      seasonSummary.to_dict()
+  - type: tip
+    content: "Heatmap은 예쁘게 보이기 전에 키 유일성과 색상 값의 의미를 검증해야 합니다."

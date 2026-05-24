@@ -1,5 +1,6 @@
 meta:
   packages:
+    - numpy
     - pillow
   id: pillow_08
   title: 도형아트생성기
@@ -261,3 +262,74 @@ sections:
       content: |-
         circlePen.ellipse([cx-30, cy-30, cx+30, cy+30], fill='white')
         circleArt
+
+- id: workflow_validation
+  title: 7단계. 도형 렌더 검증 루프
+  subtitle: 좌표 계약과 픽셀 변화 확인
+  blocks:
+  - type: text
+    content: 도형 그리기는 좌표 계약을 잘못 잡으면 화면이 깨집니다. 사각형 박스와 다각형 점 개수를 검증하고, 그려진 픽셀 수와 주요 색상을 확인합니다.
+  - type: code
+    language: python
+    title: 캔버스와 좌표 검증
+    description: 도형을 그릴 빈 캔버스와 검증 함수를 준비합니다.
+    content: |-
+      from PIL import Image, ImageDraw
+      import numpy as np
+
+      shapeCanvas = Image.new("RGB", (160, 120), (250, 250, 245))
+
+      def validateBox(box):
+          left, top, right, bottom = box
+          if left >= right or top >= bottom:
+              raise ValueError(f"도형 박스 좌표가 올바르지 않습니다: {box}")
+          return True
+
+      validateBox((20, 20, 80, 70))
+  - type: code
+    language: python
+    title: 좌표 오류 확인
+    description: 뒤집힌 박스를 넣어 오류를 확인합니다.
+    content: |-
+      try:
+          validateBox((80, 20, 20, 70))
+      except ValueError as exc:
+          shapeErrorMessage = str(exc)
+
+      shapeErrorMessage
+  - type: code
+    language: python
+    title: 도형 그리기 검증
+    description: 사각형, 원, 선, 다각형을 그리고 배경이 아닌 픽셀을 확인합니다.
+    content: |-
+      shapeDraw = ImageDraw.Draw(shapeCanvas)
+      shapeDraw.rectangle((20, 20, 80, 70), fill=(220, 80, 90))
+      shapeDraw.ellipse((95, 25, 140, 70), fill=(80, 140, 220))
+      shapeDraw.line((15, 100, 145, 95), fill=(30, 30, 30), width=4)
+      shapeDraw.polygon([(70, 85), (95, 110), (45, 110)], fill=(90, 180, 120))
+      shapeArray = np.array(shapeCanvas)
+      background = np.array([250, 250, 245])
+      changedPixels = int(np.any(shapeArray != background, axis=2).sum())
+      shapeChecks = {
+          "changedEnough": changedPixels > 3500,
+          "redRectangleOk": shapeCanvas.getpixel((30, 30)) == (220, 80, 90),
+          "blueEllipseOk": shapeCanvas.getpixel((115, 45)) == (80, 140, 220),
+          "errorOk": shapeErrorMessage == "도형 박스 좌표가 올바르지 않습니다: (80, 20, 20, 70)",
+      }
+
+      assert all(shapeChecks.values()), shapeChecks
+      shapeChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 선 두께를 바꾸면 변경 픽셀 수가 늘어나는지 확인합니다.
+    content: |-
+      thinCanvas = Image.new("RGB", (120, 60), "white")
+      thickCanvas = Image.new("RGB", (120, 60), "white")
+      ImageDraw.Draw(thinCanvas).line((10, 30, 110, 30), fill="black", width=1)
+      ImageDraw.Draw(thickCanvas).line((10, 30, 110, 30), fill="black", width=8)
+      thinPixels = int((np.array(thinCanvas)[:, :, 0] == 0).sum())
+      thickPixels = int((np.array(thickCanvas)[:, :, 0] == 0).sum())
+
+      assert thickPixels > thinPixels
+      thinPixels, thickPixels

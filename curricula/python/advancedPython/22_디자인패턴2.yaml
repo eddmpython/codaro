@@ -3,7 +3,7 @@ meta:
   title: "디자인 패턴 2"
   day: 22
   category: "advancedPython"
-  tags: ["design-pattern", "observer", "strategy", "command", "state", "template-method"]
+  tags: ["design-pattern", "observer", "strategy", "command", "state", "template-method", "검증", "행동패턴"]
   seo:
     title: "파이썬 디자인 패턴 2 - 행동 패턴"
     description: "옵저버, 전략, 커맨드, 상태, 템플릿 메서드, 책임 연쇄 패턴을 학습합니다."
@@ -783,6 +783,169 @@ sections:
       ticket4 = {"issue": "Critical failure", "priority": 4}
       supportResult = (frontDesk.handle(ticket1), frontDesk.handle(ticket2), frontDesk.handle(ticket3), frontDesk.handle(ticket4))
       supportResult
+
+- id: "workflow_validation"
+  title: "실무 행동 패턴 선택 루프"
+  subtitle: "요구사항 → 패턴 선택 → 오류 확인 → 검증"
+  blocks:
+  - type: "text"
+    content: "행동 패턴은 이름을 맞히는 문제가 아니라 변경 요구를 어디에 격리할지 정하는 도구입니다. 주문 처리 업무에서 알림은 옵저버, 배송비 정책은 전략, 상태 변경과 되돌리기는 커맨드가 어울립니다. 실행 전에 어떤 변경이 어디로 흘러갈지 예측하고, 빠진 정책 같은 오류를 검증해야 합니다."
+  - type: "list"
+    items:
+    - "옵저버는 한 이벤트를 여러 후속 작업으로 전파합니다."
+    - "전략은 배송비, 할인율처럼 바뀌는 알고리즘을 교체합니다."
+    - "커맨드는 실행과 되돌리기를 같은 객체에 묶습니다."
+    - "패턴을 많이 쓰는 것보다 변경 지점이 줄었는지 확인하는 것이 중요합니다."
+  - type: "code"
+    language: "python"
+    title: "옵저버로 주문 이벤트 전파"
+    description: "결제 완료 이벤트가 어떤 구독자에게 전달될지 먼저 예측합니다."
+    content: |-
+      class OrderEventBus:
+          def __init__(self):
+              self.subscribers = {}
+
+          def subscribe(self, eventName, handler):
+              self.subscribers.setdefault(eventName, []).append(handler)
+
+          def publish(self, eventName, payload):
+              results = []
+              for handler in self.subscribers.get(eventName, []):
+                  results.append(handler(payload))
+              return results
+
+      eventBus = OrderEventBus()
+      notificationLog = []
+      auditLog = []
+
+      eventBus.subscribe(
+          "paid",
+          lambda order: notificationLog.append(f"send message to {order['customer']}"),
+      )
+      eventBus.subscribe(
+          "paid",
+          lambda order: auditLog.append(f"audit {order['id']}"),
+      )
+
+      order = {"id": "O-1001", "customer": "Mina", "amount": 120000}
+      observerResults = eventBus.publish("paid", order)
+      assert notificationLog == ["send message to Mina"]
+      assert auditLog == ["audit O-1001"]
+      assert observerResults == [None, None]
+  - type: "code"
+    language: "python"
+    title: "전략으로 배송비 교체"
+    description: "배송 정책만 바꾸고 주문 계산 코드는 그대로 둡니다."
+    content: |-
+      class StandardShippingPolicy:
+          def calculate(self, order):
+              return 3000 if order["amount"] < 50000 else 0
+
+      class ExpressShippingPolicy:
+          def calculate(self, order):
+              return 8000
+
+      class OrderCheckout:
+          def __init__(self, shippingPolicy=None):
+              self.shippingPolicy = shippingPolicy
+
+          def setShippingPolicy(self, shippingPolicy):
+              self.shippingPolicy = shippingPolicy
+
+          def quote(self, order):
+              if self.shippingPolicy is None:
+                  raise ValueError("shipping policy is required")
+              shippingFee = self.shippingPolicy.calculate(order)
+              return {
+                  "amount": order["amount"],
+                  "shippingFee": shippingFee,
+                  "total": order["amount"] + shippingFee,
+              }
+
+      checkout = OrderCheckout(StandardShippingPolicy())
+      standardQuote = checkout.quote(order)
+      checkout.setShippingPolicy(ExpressShippingPolicy())
+      expressQuote = checkout.quote(order)
+
+      assert standardQuote == {"amount": 120000, "shippingFee": 0, "total": 120000}
+      assert expressQuote == {"amount": 120000, "shippingFee": 8000, "total": 128000}
+  - type: "code"
+    language: "python"
+    title: "빠진 전략 오류 확인"
+    description: "정책 없이 실행했을 때 의도한 오류가 나는지 확인합니다."
+    content: |-
+      brokenCheckout = OrderCheckout()
+
+      try:
+          brokenCheckout.quote(order)
+      except ValueError as exc:
+          strategyErrorMessage = str(exc)
+
+      assert strategyErrorMessage == "shipping policy is required"
+  - type: "code"
+    language: "python"
+    title: "커맨드로 상태 변경 되돌리기"
+    description: "상태 변경 실행과 undo를 하나의 객체로 묶습니다."
+    content: |-
+      class OrderRecord:
+          def __init__(self, orderId, status):
+              self.orderId = orderId
+              self.status = status
+
+      class ChangeOrderStatusCommand:
+          def __init__(self, orderRecord, nextStatus):
+              self.orderRecord = orderRecord
+              self.nextStatus = nextStatus
+              self.previousStatus = orderRecord.status
+
+          def execute(self):
+              self.orderRecord.status = self.nextStatus
+              return self.orderRecord.status
+
+          def undo(self):
+              self.orderRecord.status = self.previousStatus
+              return self.orderRecord.status
+
+      orderRecord = OrderRecord("O-1001", "paid")
+      shipCommand = ChangeOrderStatusCommand(orderRecord, "shipping")
+      shippedStatus = shipCommand.execute()
+      restoredStatus = shipCommand.undo()
+
+      assert (shippedStatus, restoredStatus, orderRecord.status) == ("shipping", "paid", "paid")
+  - type: "code"
+    language: "python"
+    title: "패턴 적용 결과 검증"
+    description: "옵저버, 전략, 커맨드가 각자 맡은 책임을 만족하는지 점검합니다."
+    content: |-
+      checks = {
+          "observerOk": notificationLog == ["send message to Mina"] and auditLog == ["audit O-1001"],
+          "strategyOk": standardQuote["total"] == 120000 and expressQuote["total"] == 128000,
+          "errorOk": strategyErrorMessage == "shipping policy is required",
+          "commandOk": (shippedStatus, restoredStatus, orderRecord.status) == ("shipping", "paid", "paid"),
+      }
+
+      assert all(checks.values()), checks
+  - type: "code"
+    language: "python"
+    title: "수정 실험"
+    description: "무료 배송 기준을 바꾸는 새 전략을 추가해도 checkout 코드는 수정하지 않습니다."
+    content: |-
+      class PromotionShippingPolicy:
+          def __init__(self, freeShippingThreshold):
+              self.freeShippingThreshold = freeShippingThreshold
+
+          def calculate(self, order):
+              return 0 if order["amount"] >= self.freeShippingThreshold else 5000
+
+      checkout.setShippingPolicy(PromotionShippingPolicy(150000))
+      strictPromotionQuote = checkout.quote(order)
+      checkout.setShippingPolicy(PromotionShippingPolicy(100000))
+      loosePromotionQuote = checkout.quote(order)
+
+      assert strictPromotionQuote["total"] == 125000
+      assert loosePromotionQuote["total"] == 120000
+  - type: "tip"
+    content: "패턴은 코드가 멋져 보이게 하는 이름표가 아닙니다. 변경 요구가 들어왔을 때 수정할 위치가 줄고, 오류 조건을 검증하기 쉬워졌을 때 좋은 설계입니다."
 
 - id: "practice"
   title: "종합 복습"

@@ -3,7 +3,7 @@ meta:
   title: "고급 문법 종합"
   day: 28
   category: "30days"
-  tags: []
+  tags: ["고급문법", "컨텍스트매니저", "데코레이터", "제너레이터", "검증"]
   seo:
     title: "파이썬 고급 문법 종합 - 컨텍스트 매니저"
     description: "with 문, context manager, __enter__, __exit__을 배웁니다."
@@ -35,8 +35,13 @@ sections:
     title: "기본 with 문"
     description: "with를 사용하여 파일을 안전하게 처리합니다."
     content: |-
+      from pathlib import Path
+      import tempfile
+
+      day28Scratch = Path(tempfile.mkdtemp(prefix='codaro_day28_'))
+      testFile = day28Scratch / 'test.txt'
       content = ''
-      with open('test.txt', 'w') as f:
+      with open(testFile, 'w') as f:
           f.write('Hello World')
           content = 'written'
       content
@@ -45,7 +50,8 @@ sections:
     title: "with 없이 사용"
     description: "수동으로 파일을 닫아야 합니다."
     content: |-
-      fileHandle = open('manual.txt', 'w')
+      manualFile = day28Scratch / 'manual.txt'
+      fileHandle = open(manualFile, 'w')
       fileHandle.write('Manual close')
       fileHandle.close()
       'closed manually'
@@ -54,7 +60,7 @@ sections:
     title: "with와 읽기"
     description: "파일을 읽고 자동으로 닫습니다."
     content: |-
-      with open('test.txt', 'r') as reader:
+      with open(testFile, 'r') as reader:
           textData = reader.read()
       textData
   - type: "tip"
@@ -299,7 +305,9 @@ sections:
     title: "다중 파일"
     description: "여러 파일을 동시에 관리합니다."
     content: |-
-      with open('source.txt', 'w') as src, open('dest.txt', 'w') as dst:
+      sourceFile = day28Scratch / 'source.txt'
+      destFile = day28Scratch / 'dest.txt'
+      with open(sourceFile, 'w') as src, open(destFile, 'w') as dst:
           src.write('source')
           dst.write('destination')
           combined = 'both written'
@@ -430,6 +438,74 @@ sections:
   - type: "tip"
     content: "컨텍스트 매니저는 '설정-작업-복원' 패턴에 이상적입니다."
 
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 리포트 파일을 안전하게 쓰고 복원하기"
+  subtitle: "예측 → 리소스 열기 → 오류 처리 → 정리 검증"
+  blocks:
+  - type: "text"
+    content: "고급 문법은 멋진 문법을 쓰는 것이 아니라, 열고 닫아야 하는 리소스와 실패 시 복원해야 하는 상태를 안전하게 다루는 데서 가치가 생깁니다. 여기서는 리포트 파일 컨텍스트 매니저를 직접 만들고 정상 기록, 오류, 정리 상태를 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "리포트 파일 컨텍스트 매니저"
+    description: "파일을 열고 쓰고 닫는 책임을 with 블록 안에 고정합니다."
+    content: |-
+      from pathlib import Path
+      import tempfile
+
+      class ReportWriter:
+          def __init__(self, root, filename):
+              self.root = Path(root)
+              self.path = self.root / filename
+              self.fileObj = None
+
+          def __enter__(self):
+              self.root.mkdir(parents=True, exist_ok=True)
+              self.fileObj = self.path.open('w', encoding='utf-8')
+              return self
+
+          def writeLine(self, text):
+              if not text.strip():
+                  raise ValueError('report line must not be empty')
+              self.fileObj.write(text.strip() + '\n')
+
+          def __exit__(self, excType, excValue, traceback):
+              self.fileObj.close()
+              return False
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          with ReportWriter(tempDir, 'dailyReport.txt') as report:
+              report.writeLine('paidCount=2')
+              report.writeLine('paidRevenue=230000')
+              reportClosedInside = report.fileObj.closed
+              reportPath = report.path
+
+          savedReport = reportPath.read_text(encoding='utf-8')
+          reportClosedAfter = report.fileObj.closed
+
+      assert reportClosedInside is False
+      assert reportClosedAfter is True
+      assert 'paidRevenue=230000' in savedReport
+      savedReport
+  - type: "code"
+    language: "python"
+    title: "오류가 나도 정리되는지 확인"
+    description: "빈 줄을 기록하려 하면 실패하지만 파일 핸들은 닫혀야 합니다."
+    content: |-
+      with tempfile.TemporaryDirectory() as tempDir:
+          try:
+              with ReportWriter(tempDir, 'brokenReport.txt') as report:
+                  report.writeLine('paidCount=2')
+                  report.writeLine(' ')
+          except ValueError as exc:
+              reportError = str(exc)
+              closedAfterError = report.fileObj.closed
+
+      assert 'empty' in reportError
+      assert closedAfterError is True
+      reportError
+  - type: "tip"
+    content: "실무 변주: ReportWriter에 append 모드와 dryRun 옵션을 추가하고, 실패 시 기존 파일이 유지되는지까지 검증해 보세요."
+
 - id: "practice"
   title: "Day 28 종합 복습"
   subtitle: "컨텍스트 매니저 마스터하기"
@@ -440,7 +516,12 @@ sections:
   - type: "expansion"
     title: "🟢 기본1: 간단한 with"
     code: |-
-      with open('basic.txt', 'w') as f:
+      from pathlib import Path
+      import tempfile
+
+      basicScratch = Path(tempfile.mkdtemp(prefix='codaro_day28_basic_'))
+      basicFile = basicScratch / 'basic.txt'
+      with open(basicFile, 'w') as f:
           f.write('test')
           written = True
       written
@@ -753,12 +834,11 @@ sections:
               return False
 
       txn = Transaction([1, 2, 3])
-      try:
-          with txn.data as td:
-              td.append(4)
-              raise ValueError()
-      except:
-          pass
+      with txn as td:
+          td.append(4)
+          raise ValueError('rollback')
+
+      assert txn.data == [1, 2, 3]
       txn.data
 
   - type: "expansion"

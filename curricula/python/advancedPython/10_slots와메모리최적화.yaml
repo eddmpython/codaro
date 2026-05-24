@@ -3,7 +3,7 @@ meta:
   title: "slots와 메모리 최적화"
   day: 10
   category: "advancedPython"
-  tags: ["__slots__", "memory", "optimization", "getsizeof"]
+  tags: ["__slots__", "memory", "optimization", "getsizeof", "검증", "데이터모델"]
   seo:
     title: "파이썬 __slots__와 메모리 최적화 - 대량 객체 최적화"
     description: "__slots__로 메모리를 절약합니다. sys.getsizeof, 상속과 slots, 성능 비교, weakref 지원까지."
@@ -407,6 +407,65 @@ sections:
   - type: "tip"
     content: "Python 3.10+에서는 @dataclass(slots=True)로 간단하게 슬롯 데이터클래스를 만들 수 있습니다."
 
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 대량 이벤트 모델을 slots로 고정하기"
+  subtitle: "예측 → 메모리 모델 → 동적 속성 차단 → dataclass slots 검증"
+  blocks:
+  - type: "text"
+    content: "__slots__는 속도를 위한 마법이 아니라, 대량으로 생성되는 단순 객체의 메모리와 속성 계약을 고정하는 선택입니다. 동적 속성이 필요한 모델에는 맞지 않으므로 실패 조건까지 확인해야 합니다."
+  - type: "code"
+    language: "python"
+    title: "이벤트 레코드 slots 검증"
+    description: "일반 객체와 slotted 객체, slots dataclass의 속성 계약을 비교합니다."
+    content: |-
+      from dataclasses import dataclass
+      import sys
+
+      class NormalEvent:
+          def __init__(self, eventId, amount):
+              self.eventId = eventId
+              self.amount = amount
+
+      class SlottedEvent:
+          __slots__ = ("eventId", "amount")
+
+          def __init__(self, eventId, amount):
+              self.eventId = eventId
+              self.amount = amount
+
+      @dataclass(slots=True)
+      class MetricSample:
+          name: str
+          value: int
+
+      normal = NormalEvent("E-100", 12000)
+      slotted = SlottedEvent("E-100", 12000)
+      metric = MetricSample("paidRevenue", 12000)
+
+      assert hasattr(normal, "__dict__")
+      assert not hasattr(slotted, "__dict__")
+      assert not hasattr(metric, "__dict__")
+      assert metric.value == 12000
+      assert sys.getsizeof(slotted) <= sys.getsizeof(normal) + 128
+
+      normal.extra = "allowed"
+      assert normal.extra == "allowed"
+
+      try:
+          slotted.extra = "blocked"
+      except AttributeError as exc:
+          assert "extra" in str(exc)
+
+      print("slots 이벤트 모델 검증 흐름 통과")
+  - type: "list"
+    items:
+    - "__slots__는 동적 속성을 막기 때문에 입력 스키마가 안정적인 대량 객체에 맞습니다."
+    - "메모리 수치는 환경별로 달라질 수 있으므로 핵심 계약은 __dict__ 유무와 속성 차단으로 검증합니다."
+    - "새 코드에서는 dataclass(slots=True)가 명시성과 생산성의 균형이 좋습니다."
+  - type: "tip"
+    title: "변주 실험"
+    content: "나중에 태그를 자유롭게 붙여야 하는 이벤트 모델이라면 slots가 맞지 않습니다. `tags` 슬롯을 명시적으로 추가한 버전과 일반 객체 버전을 비교하세요."
+
 - id: "practice"
   title: "종합 복습"
   subtitle: "__slots__와 메모리 최적화 마스터하기"
@@ -639,8 +698,9 @@ sections:
                   setattr(self, slot, value)
 
       obj = Serializable(1, 2)
-      data = pickle.dumps(obj)
-      restored = pickle.loads(data)
+      data = pickle.dumps(obj.__getstate__())
+      restored = Serializable.__new__(Serializable)
+      restored.__setstate__(pickle.loads(data))
       restored.a, restored.b
 
   - type: "expansion"

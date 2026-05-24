@@ -483,6 +483,171 @@ sections:
 
       jogMap
 
+- id: step11_workflow
+  title: 11단계. 실무 도형 지도 검증
+  subtitle: 예측 → 도형 오류 확인 → 렌더 검증 → 기준 실험
+  blocks:
+  - type: text
+    content: 도형 지도는 영역이 그려졌다고 끝이 아닙니다. 업무용 구역, 경로, 반경 지도에서는 다각형 꼭짓점 수, 좌표 범위, 반경 기준, 렌더 결과를 코드로 검증해야 보고서와 운영 판단에 쓸 수 있습니다.
+  - type: list
+    items:
+    - "실행 전에는 어떤 구역이 우선 점검 대상인지 먼저 예측합니다."
+    - "다각형 꼭짓점이 부족하거나 좌표가 한국 범위를 벗어나면 오류로 확인합니다."
+    - "Circle은 미터 단위, CircleMarker는 픽셀 단위라는 차이를 업무 기준으로 검증합니다."
+    - "반경 기준을 바꾸는 실험으로 점검 대상 구역이 어떻게 달라지는지 비교합니다."
+  - type: code
+    language: python
+    title: 운영 구역 데이터 준비
+    description: 점검 구역, 이동 경로, 서비스 반경을 함께 가진 업무 지도 데이터를 만듭니다.
+    content: |-
+      serviceZones = [
+          {
+              "name": "북부 점검구역",
+              "polygon": [[37.580, 126.940], [37.600, 126.940], [37.600, 126.980], [37.580, 126.980]],
+              "center": [37.590, 126.960],
+              "radiusMeters": 1300,
+              "incidents": 18,
+          },
+          {
+              "name": "중앙 점검구역",
+              "polygon": [[37.550, 126.950], [37.575, 126.950], [37.575, 126.990], [37.550, 126.990]],
+              "center": [37.562, 126.970],
+              "radiusMeters": 900,
+              "incidents": 11,
+          },
+          {
+              "name": "남부 점검구역",
+              "polygon": [[37.515, 126.930], [37.545, 126.930], [37.545, 126.970], [37.515, 126.970]],
+              "center": [37.530, 126.950],
+              "radiusMeters": 1600,
+              "incidents": 24,
+          },
+      ]
+
+      inspectionRoute = [zone["center"] for zone in serviceZones]
+      priorityZoneNames = [zone["name"] for zone in serviceZones if zone["incidents"] >= 15]
+      priorityZoneNames
+  - type: code
+    language: python
+    title: 도형 데이터 검증 함수
+    description: 지도에 그리기 전에 좌표 범위, 다각형 꼭짓점 수, 반경 값을 점검합니다.
+    content: |-
+      def validateMapCoordinate(point, label):
+          lat, lon = point
+          if not (33 <= lat <= 39 and 124 <= lon <= 132):
+              raise ValueError(f"좌표 범위 오류: {label}")
+          return True
+
+      def validateServiceZone(zone):
+          if len(zone["polygon"]) < 3:
+              raise ValueError(f"다각형 꼭짓점 부족: {zone['name']}")
+          if zone["radiusMeters"] <= 0:
+              raise ValueError(f"반경 오류: {zone['name']}")
+          for index, point in enumerate(zone["polygon"]):
+              validateMapCoordinate(point, f"{zone['name']} 꼭짓점 {index + 1}")
+          validateMapCoordinate(zone["center"], f"{zone['name']} 중심")
+          return True
+
+      zoneValidation = [validateServiceZone(zone) for zone in serviceZones]
+      zoneValidation
+  - type: code
+    language: python
+    title: 도형 오류 확인
+    description: 꼭짓점이 부족한 구역을 일부러 넣고 검증 오류를 읽습니다.
+    content: |-
+      brokenZone = {
+          "name": "임시 오류구역",
+          "polygon": [[37.56, 126.95], [37.57, 126.96]],
+          "center": [37.565, 126.955],
+          "radiusMeters": 500,
+          "incidents": 3,
+      }
+
+      try:
+          validateServiceZone(brokenZone)
+      except ValueError as exc:
+          shapeErrorMessage = str(exc)
+
+      shapeErrorMessage
+  - type: code
+    language: python
+    title: 운영 도형 지도 만들기
+    description: Polygon, Circle, PolyLine을 조합해 점검 구역과 이동 경로를 표시합니다.
+    content: |-
+      zoneMap = folium.Map(location=[37.56, 126.96], zoom_start=12)
+
+      for zone in serviceZones:
+          validateServiceZone(zone)
+          zoneColor = "red" if zone["incidents"] >= 15 else "blue"
+          folium.Polygon(
+              locations=zone["polygon"],
+              color=zoneColor,
+              fill=True,
+              fill_color=zoneColor,
+              fill_opacity=0.18,
+              popup=f"{zone['name']} / 사고 {zone['incidents']}건",
+          ).add_to(zoneMap)
+          folium.Circle(
+              location=zone["center"],
+              radius=zone["radiusMeters"],
+              color=zoneColor,
+              fill=False,
+              popup=f"{zone['name']} 서비스 반경 {zone['radiusMeters']}m",
+          ).add_to(zoneMap)
+          folium.CircleMarker(
+              location=zone["center"],
+              radius=7,
+              color="black",
+              fill=True,
+              popup=zone["name"],
+          ).add_to(zoneMap)
+
+      folium.PolyLine(
+          locations=inspectionRoute,
+          color="purple",
+          weight=4,
+          dash_array="8, 6",
+          tooltip="점검 이동 경로",
+      ).add_to(zoneMap)
+      zoneMap.fit_bounds([point for zone in serviceZones for point in zone["polygon"]])
+
+      zoneMap
+  - type: code
+    language: python
+    title: 렌더 결과 검증
+    description: 구역명, 반경, 경로, 오류 메시지가 결과 HTML과 변수에 들어갔는지 확인합니다.
+    content: |-
+      zoneHtml = zoneMap.get_root().render()
+      shapeChecks = {
+          "allZonesRendered": all(zone["name"] in zoneHtml for zone in serviceZones),
+          "radiusRendered": all(str(zone["radiusMeters"]) in zoneHtml for zone in serviceZones),
+          "routeRendered": "점검 이동 경로" in zoneHtml,
+          "shapeErrorOk": shapeErrorMessage == "다각형 꼭짓점 부족: 임시 오류구역",
+          "priorityPredictionOk": priorityZoneNames == ["북부 점검구역", "남부 점검구역"],
+          "validationOk": all(zoneValidation),
+      }
+
+      assert all(shapeChecks.values()), shapeChecks
+      shapeChecks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 우선 점검 기준을 바꾸면 어떤 구역이 위험 등급으로 바뀌는지 비교합니다.
+    content: |-
+      def selectPriorityZones(zones, incidentThreshold, radiusThreshold):
+          return [
+              zone["name"]
+              for zone in zones
+              if zone["incidents"] >= incidentThreshold or zone["radiusMeters"] >= radiusThreshold
+          ]
+
+      defaultPriority = selectPriorityZones(serviceZones, incidentThreshold=15, radiusThreshold=1500)
+      strictPriority = selectPriorityZones(serviceZones, incidentThreshold=20, radiusThreshold=1800)
+
+      defaultPriority, strictPriority
+  - type: tip
+    content: 도형 지도는 시각화와 검증을 분리하지 않습니다. 구역 다각형, 실제 반경, 이동 경로, 기준 변경 실험이 함께 있어야 운영자가 믿고 쓰는 지도 학습이 됩니다.
+
 - id: practice
   title: 실습
   subtitle: 도형 그리기

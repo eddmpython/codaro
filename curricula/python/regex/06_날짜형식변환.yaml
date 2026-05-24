@@ -236,21 +236,62 @@ sections:
     title: 완전한 날짜 변환 함수
     description: 모든 날짜 형식을 YYYY-MM-DD로 통일
     content: |-
+      MONTH_NAME_PATTERN = r"Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec"
+      monthMap = {
+          "Jan": "01", "Feb": "02", "Mar": "03", "Apr": "04",
+          "May": "05", "Jun": "06", "Jul": "07", "Aug": "08",
+          "Sep": "09", "Oct": "10", "Nov": "11", "Dec": "12",
+      }
+
+      def formatDate(year, month, day):
+          return f"{int(year):04d}-{int(month):02d}-{int(day):02d}"
+
       def convertAllDates(text):
-          text = re.sub(r"(\d{4})/(\d{1,2})/(\d{1,2})", r"\1-\2-\3", text)
-          text = re.sub(r"(\d{1,2})\.(\d{1,2})\.(\d{4})", r"\3-\2-\1", text)
-          text = re.sub(r"(\d{1,2})-(\d{1,2})-(\d{4})", r"\3-\2-\1", text)
-          text = re.sub(r"(\d{4})\.(\d{1,2})\.(\d{1,2})", r"\1-\2-\3", text)
-          text = re.sub(r"(\d{1,2})/(\d{1,2})/(\d{4})", r"\3-\2-\1", text)
-
-          def convertMonth(match):
-              monthMap = {"Jan":"01","Feb":"02","Mar":"03","Apr":"04","May":"05","Jun":"06","Jul":"07","Aug":"08","Sep":"09","Oct":"10","Nov":"11","Dec":"12"}
-              return f"{match.group(3)}-{monthMap[match.group(1)]}-{match.group(2).zfill(2)}"
-
-          text = re.sub(r"(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) (\d{1,2}), (\d{4})", convertMonth, text)
-
-          text = re.sub(r"(\d{4})년 (\d{1,2})월 (\d{1,2})일", r"\1-\2-\3", text)
-
+          text = re.sub(
+              r"(\d{4})/(\d{1,2})/(\d{1,2})",
+              lambda match: formatDate(match.group(1), match.group(2), match.group(3)),
+              text,
+          )
+          text = re.sub(
+              r"(\d{1,2})\.(\d{1,2})\.(\d{4})",
+              lambda match: formatDate(match.group(3), match.group(2), match.group(1)),
+              text,
+          )
+          text = re.sub(
+              r"(\d{1,2})-(\d{1,2})-(\d{4})",
+              lambda match: formatDate(match.group(3), match.group(2), match.group(1)),
+              text,
+          )
+          text = re.sub(
+              r"(\d{4})\.(\d{1,2})\.(\d{1,2})",
+              lambda match: formatDate(match.group(1), match.group(2), match.group(3)),
+              text,
+          )
+          text = re.sub(
+              r"(\d{1,2})/(\d{1,2})/(\d{4})",
+              lambda match: formatDate(match.group(3), match.group(2), match.group(1)),
+              text,
+          )
+          text = re.sub(
+              rf"({MONTH_NAME_PATTERN}) (\d{{1,2}}), (\d{{4}})",
+              lambda match: formatDate(match.group(3), monthMap[match.group(1)], match.group(2)),
+              text,
+          )
+          text = re.sub(
+              rf"(\d{{1,2}}) ({MONTH_NAME_PATTERN}) (\d{{4}})",
+              lambda match: formatDate(match.group(3), monthMap[match.group(2)], match.group(1)),
+              text,
+          )
+          text = re.sub(
+              r"(\d{4})년 (\d{1,2})월 (\d{1,2})일",
+              lambda match: formatDate(match.group(1), match.group(2), match.group(3)),
+              text,
+          )
+          text = re.sub(
+              r"(\d{4})-(\d{1,2})-(\d{1,2})",
+              lambda match: formatDate(match.group(1), match.group(2), match.group(3)),
+              text,
+          )
           return text
 
       result = convertAllDates(mixedDates)
@@ -268,10 +309,93 @@ sections:
     description: YYYY-MM-DD 형식 날짜만 찾기
     content: |-
       converted = convertAllDates(mixedDates)
-      standardDates = re.findall(r"\d{4}-\d{1,2}-\d{1,2}", converted)
+      standardDates = re.findall(r"\d{4}-\d{2}-\d{2}", converted)
       standardDates
   - type: text
     content: "모든 날짜가 YYYY-MM-DD 형식으로 통일되었습니다!"
+
+- id: workflow_validation
+  title: 11단계. 날짜 정규화 검증 루프
+  subtitle: 누락과 0-padding을 검증
+  blocks:
+  - type: text
+    content: 날짜 정제는 눈으로 결과를 훑으면 누락을 놓치기 쉽습니다. 변환 후 날짜 개수, 정확한 YYYY-MM-DD 형식, 한 자리 월/일의 0-padding, 영문 일-월-연도 형식까지 검증해야 업무 데이터로 쓸 수 있습니다.
+  - type: code
+    language: python
+    title: 표준 날짜 품질 검증
+    description: 날짜 10개가 모두 YYYY-MM-DD 형식인지 확인
+    content: |-
+      standardDatePattern = re.compile(r"\b\d{4}-\d{2}-\d{2}\b")
+
+      def validateStandardDates(text, expectedCount):
+          dates = standardDatePattern.findall(text)
+
+          assert len(dates) == expectedCount, f"표준 날짜 수가 다릅니다: {len(dates)}"
+          assert all(re.fullmatch(r"\d{4}-\d{2}-\d{2}", date) for date in dates)
+          assert "2023-07-09" in dates, "한 자리 월/일이 0-padding되지 않았습니다."
+          assert "2024-01-05" in dates, "점 형식의 한 자리 월/일이 0-padding되지 않았습니다."
+          assert "2025-12-31" in dates, "DD Mon YYYY 형식이 변환되지 않았습니다."
+
+          return dates
+
+      converted = convertAllDates(mixedDates)
+      standardDates = validateStandardDates(converted, expectedCount=10)
+      standardDates
+  - type: code
+    language: python
+    title: 누락되는 변환 규칙 잡기
+    description: 오래된 변환 함수가 어떤 품질 기준에서 실패하는지 확인
+    content: |-
+      def convertWithoutDayFirstMonth(text):
+          text = re.sub(r"(\d{4})/(\d{1,2})/(\d{1,2})", r"\1-\2-\3", text)
+          text = re.sub(r"(\d{1,2})\.(\d{1,2})\.(\d{4})", r"\3-\2-\1", text)
+          text = re.sub(r"(\d{1,2})-(\d{1,2})-(\d{4})", r"\3-\2-\1", text)
+          text = re.sub(r"(\d{4})\.(\d{1,2})\.(\d{1,2})", r"\1-\2-\3", text)
+          text = re.sub(r"(\d{1,2})/(\d{1,2})/(\d{4})", r"\3-\2-\1", text)
+          text = re.sub(
+              rf"({MONTH_NAME_PATTERN}) (\d{{1,2}}), (\d{{4}})",
+              lambda match: formatDate(match.group(3), monthMap[match.group(1)], match.group(2)),
+              text,
+          )
+          text = re.sub(r"(\d{4})년 (\d{1,2})월 (\d{1,2})일", r"\1-\2-\3", text)
+          return text
+
+      qualityProblem = ""
+      try:
+          validateStandardDates(convertWithoutDayFirstMonth(mixedDates), expectedCount=10)
+      except AssertionError as exc:
+          qualityProblem = str(exc)
+
+      assert qualityProblem
+      qualityProblem
+  - type: code
+    language: python
+    title: 업무용 날짜 레코드 만들기
+    description: 정규화된 날짜를 레이블과 묶어 정렬 가능한 데이터로 변환
+    content: |-
+      def buildDateRecords(text):
+          convertedText = convertAllDates(text)
+          records = []
+
+          for line in convertedText.strip().splitlines():
+              if ":" not in line:
+                  continue
+
+              label, value = line.split(":", 1)
+              match = standardDatePattern.search(value)
+              assert match is not None, f"날짜를 찾지 못한 행: {line}"
+              records.append({"label": label.strip(), "date": match.group(0)})
+
+          return records
+
+      dateRecords = buildDateRecords(mixedDates)
+      sortedDateRecords = sorted(dateRecords, key=lambda record: record["date"])
+
+      assert len(dateRecords) == 10
+      assert sortedDateRecords[0]["date"] == "1990-12-25"
+      assert sortedDateRecords[-1]["date"] == "2025-12-31"
+
+      sortedDateRecords
 
 - id: practice
   title: 실습
@@ -351,3 +475,9 @@ sections:
     - "\\3-\\2-\\1 - 그룹 순서 변경"
   - type: text
     content: 다음 프로젝트에서는 개인정보를 자동으로 마스킹하는 방법을 배웁니다!
+
+- id: "workflow_variation"
+  title: "실무 변주: 날짜 변환 정책 확장"
+  blocks:
+  - type: tip
+    content: "실무 변주: YYYY-MM-DD, YYYY/MM/DD, 2026년 5월 24일 형식을 모두 같은 날짜로 바꾸고, 변환 실패 행은 원본 문자열과 함께 오류 리포트로 분리해 보세요."

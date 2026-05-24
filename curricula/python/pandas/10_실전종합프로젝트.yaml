@@ -1,23 +1,22 @@
 meta:
   packages:
     - pandas
-    - requests
   id: pandas_10
   title: 실전종합프로젝트
   order: 10
   category: pandas
   difficulty: "⭐⭐⭐⭐⭐"
   badge: 심화
-  tags: ["실전", "API", "JSON", "프로젝트", "종합"]
+  tags: ["실전", "API", "JSON", "프로젝트", "종합", "검증", "통합프로젝트"]
   seo:
-    title: "pandas 실전 프로젝트 - API 데이터 수집부터 분석까지"
-    description: "API에서 JSON 데이터를 수집하고 pandas로 분석하는 전체 과정을 실습합니다. 데이터 수집, 정제, 분석, 저장까지 완전한 파이프라인을 경험합니다."
-    keywords: ["pandas API", "JSON", "데이터 수집", "실전 프로젝트", "데이터 파이프라인"]
+    title: "pandas 실전 프로젝트 - API 응답 분석부터 저장까지"
+    description: "API 응답 형태의 JSON 데이터를 pandas로 분석하는 전체 과정을 실습합니다. 데이터 구조 이해, 정제, 분석, 저장까지 완전한 파이프라인을 경험합니다."
+    keywords: ["pandas API", "JSON", "응답 데이터", "실전 프로젝트", "데이터 파이프라인"]
 
 intro:
   emoji: "🚀"
-  goal: API에서 데이터를 수집하고, 정제하고, 분석하는 전체 과정을 경험합니다.
-  description: 지금까지 배운 모든 기술을 총동원합니다. 실제 API에서 JSON 데이터를 가져와 분석하는 실무 워크플로우입니다.
+  goal: API 응답 형태의 JSON 데이터를 정제하고 분석하는 전체 과정을 경험합니다.
+  description: 지금까지 배운 모든 기술을 총동원합니다. 실제 API 응답과 같은 JSON 구조를 로컬 샘플로 재현하고, 수집 이후의 정제와 분석 워크플로우를 끝까지 익힙니다.
 
 sections:
 - id: step1_api_concept
@@ -25,26 +24,104 @@ sections:
   subtitle: 데이터를 가져오는 방법
   blocks:
   - type: text
-    content: API(Application Programming Interface)는 다른 서비스의 데이터를 가져오는 창구입니다. GitHub API에서 pandas 프로젝트의 이슈 목록을 가져와 분석해봅니다. requests 라이브러리로 HTTP 요청을 보내고, JSON 응답을 받아 DataFrame으로 변환합니다. 실무에서 API로 데이터를 수집하는 전형적인 패턴입니다.
+    content: API(Application Programming Interface)는 다른 서비스의 데이터를 가져오는 창구입니다. 이 수업에서는 GitHub Issues API 응답과 같은 리스트/딕셔너리 구조를 로컬 샘플로 만들고 DataFrame으로 변환합니다. 네트워크, 인증, 호출 제한에 흔들리지 않고 JSON 구조 파악, 컬럼 선택, 날짜 변환, 집계, 저장이라는 핵심 pandas 흐름에 집중합니다.
   - type: code
     language: python
-    title: API 호출 + DataFrame 변환
-    description: pandas 리포지토리의 최근 이슈 10개를 가져옵니다
+    title: API 응답 샘플 + DataFrame 변환
+    description: GitHub Issues 응답 형태의 로컬 샘플 10개를 DataFrame으로 바꿉니다
     content: |-
-      import requests
       import pandas as pd
 
-      url = "https://api.github.com/repos/pandas-dev/pandas/issues"
-      params = {'per_page': 10, 'state': 'all'}
-      response = requests.get(url, params=params, timeout=10)
+      def sampleGithubIssues(repo="pandas-dev/pandas"):
+          project = repo.split("/")[-1]
+          return [
+              {
+                  "number": 101,
+                  "title": f"[{project}] Improve groupby documentation for beginners",
+                  "state": "open",
+                  "created_at": "2026-01-15T09:30:00Z",
+                  "comments": 4,
+                  "user": {"login": "dataTeacher"},
+              },
+              {
+                  "number": 102,
+                  "title": f"[{project}] Fix read_csv encoding edge case",
+                  "state": "closed",
+                  "created_at": "2026-01-10T12:00:00Z",
+                  "comments": 8,
+                  "user": {"login": "csvMaintainer"},
+              },
+              {
+                  "number": 103,
+                  "title": f"[{project}] Add examples for datetime parsing",
+                  "state": "open",
+                  "created_at": "2026-01-08T15:45:00Z",
+                  "comments": 2,
+                  "user": {"login": "timeSeriesFan"},
+              },
+              {
+                  "number": 104,
+                  "title": f"[{project}] Clarify nullable integer behavior",
+                  "state": "closed",
+                  "created_at": "2026-01-06T08:10:00Z",
+                  "comments": 12,
+                  "user": {"login": "dtypeReviewer"},
+              },
+              {
+                  "number": 105,
+                  "title": f"[{project}] Add cookbook section for joins",
+                  "state": "open",
+                  "created_at": "2026-01-04T14:20:00Z",
+                  "comments": 6,
+                  "user": {"login": "mergeHelper"},
+              },
+              {
+                  "number": 106,
+                  "title": f"[{project}] Improve error message for missing columns",
+                  "state": "closed",
+                  "created_at": "2025-12-30T11:05:00Z",
+                  "comments": 3,
+                  "user": {"login": "bugReporter"},
+              },
+              {
+                  "number": 107,
+                  "title": f"[{project}] Benchmark rolling window examples",
+                  "state": "open",
+                  "created_at": "2025-12-28T16:40:00Z",
+                  "comments": 10,
+                  "user": {"login": "perfAnalyst"},
+              },
+              {
+                  "number": 108,
+                  "title": f"[{project}] Update plotting guide screenshots",
+                  "state": "closed",
+                  "created_at": "2025-12-24T09:00:00Z",
+                  "comments": 1,
+                  "user": {"login": "docsCurator"},
+              },
+              {
+                  "number": 109,
+                  "title": f"[{project}] Investigate memory spike in concat",
+                  "state": "open",
+                  "created_at": "2025-12-20T18:25:00Z",
+                  "comments": 15,
+                  "user": {"login": "memoryWatch"},
+              },
+              {
+                  "number": 110,
+                  "title": f"[{project}] Add beginner exercise for value_counts",
+                  "state": "closed",
+                  "created_at": "2025-12-18T07:35:00Z",
+                  "comments": 5,
+                  "user": {"login": "courseBuilder"},
+              },
+          ]
 
-      if response.status_code == 200:
-          issues = pd.DataFrame(response.json())
-      else:
-          issues = pd.DataFrame([{'number': 1, 'title': '샘플', 'state': 'open'}])
+      issueRecords = sampleGithubIssues()
+      issues = pd.DataFrame(issueRecords)
       issues.shape
   - type: tip
-    content: requests.get()으로 API를 호출하고, response.json()으로 JSON을 파이썬 딕셔너리/리스트로 변환합니다. pd.DataFrame()에 리스트를 넣으면 자동으로 DataFrame이 됩니다. status_code가 200이면 성공, 그 외는 실패입니다.
+    content: API 응답은 보통 딕셔너리의 리스트 형태로 들어옵니다. pd.DataFrame()에 이 리스트를 넣으면 각 딕셔너리의 키가 컬럼이 됩니다. 실제 API를 붙일 때도 이 구조를 먼저 이해해야 이후 정제와 분석 코드가 안정적입니다.
 
 - id: step2_preview
   title: 2단계. 데이터 확인
@@ -182,7 +259,7 @@ sections:
     title: 중첩 데이터 펼치기
     description: json_normalize로 평탄화
     content: |-
-      flat = pd.json_normalize(response.json(), max_level=1)
+      flat = pd.json_normalize(issueRecords, max_level=1)
       flat[['number', 'user.login']].head()
   - type: tip
     content: pd.json_normalize()는 중첩된 JSON 구조를 평탄화합니다. max_level로 펼칠 깊이를 조절합니다. user.login처럼 점(.)으로 경로를 표시합니다. 복잡한 API 응답을 DataFrame으로 변환할 때 유용합니다.
@@ -207,22 +284,70 @@ sections:
   subtitle: 파이프라인 자동화
   blocks:
   - type: text
-    content: 지금까지 한 과정을 함수로 정리하면 다른 리포지토리에도 쉽게 적용할 수 있습니다.
+    content: 지금까지 한 과정을 함수로 정리하면 같은 응답 구조를 쓰는 다른 리포지토리 샘플에도 쉽게 적용할 수 있습니다.
   - type: code
     language: python
     title: 데이터 수집 함수
-    description: API 호출 + DataFrame 변환
+    description: 응답 샘플 + DataFrame 변환
     content: |-
       def fetchGithubIssues(repo, perPage=10):
-          url = f"https://api.github.com/repos/{repo}/issues"
-          params = {'per_page': perPage, 'state': 'all'}
-          response = requests.get(url, params=params, timeout=10)
-          if response.status_code == 200:
-              return pd.DataFrame(response.json())
-          return None
+          records = sampleGithubIssues(repo)[:perPage]
+          return pd.DataFrame(records)
 
       fetchGithubIssues('numpy/numpy', 5)
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 이슈 응답을 운영 리포트로 변환"
+  subtitle: "JSON 정규화, 날짜 변환, groupby, 실패 케이스"
+  blocks:
+  - type: text
+    content: "실전 프로젝트는 API 호출 자체보다 응답 구조를 안정적으로 표로 바꾸고 검증하는 과정이 중요합니다. 샘플 JSON을 DataFrame으로 변환하고, 상태별 집계와 날짜 파생 컬럼을 확인하세요."
+  - type: code
+    language: python
+    title: "이슈 샘플 리포트 만들기"
+    description: "JSON 레코드를 표로 바꾸고 상태별 집계를 검증합니다."
+    content: |-
+      import pandas as pd
+
+      records = [
+          {"number": 1, "state": "open", "created_at": "2026-05-01", "labels": ["bug"]},
+          {"number": 2, "state": "closed", "created_at": "2026-05-03", "labels": ["docs", "good first issue"]},
+          {"number": 3, "state": "open", "created_at": "2026-05-04", "labels": []},
+      ]
+
+      issues = pd.DataFrame(records)
+      issues["created_at"] = pd.to_datetime(issues["created_at"])
+      issues["labelCount"] = issues["labels"].apply(len)
+      stateReport = issues.groupby("state", as_index=False).agg(
+          issueCount=("number", "size"),
+          avgLabels=("labelCount", "mean"),
+      )
+
+      assert issues["created_at"].dt.month.tolist() == [5, 5, 5]
+      assert stateReport.set_index("state").loc["open", "issueCount"] == 2
+      assert stateReport["issueCount"].sum() == len(issues)
+  - type: code
+    language: python
+    title: "응답 스키마 오류 확인"
+    description: "필수 키가 없는 API 응답은 변환 전에 멈춥니다."
+    content: |-
+      def validateIssueRecords(records):
+          required = {"number", "state", "created_at", "labels"}
+          for record in records:
+              missing = required - set(record)
+              if missing:
+                  raise ValueError(f"missing issue fields: {sorted(missing)}")
+          return True
+
+      try:
+          validateIssueRecords([{"number": 1, "state": "open"}])
+      except ValueError as exc:
+          message = str(exc)
+
+      assert "created_at" in message
+  - type: tip
+    title: "변주 실험"
+    content: "labels를 explode해서 라벨별 이슈 수 리포트를 만들고, 라벨이 없는 이슈를 어떤 그룹으로 처리할지 정책을 정하세요."
 - id: practice
   title: 실습
   subtitle: 실전 분석 프로젝트
@@ -237,15 +362,96 @@ sections:
     - type: code
       title: "데이터 준비"
       content: |-
-        import requests
         import pandas as pd
+
+        def sampleGithubIssues(repo="pandas-dev/pandas"):
+            project = repo.split("/")[-1]
+            return [
+                {
+                    "number": 101,
+                    "title": f"[{project}] Improve groupby documentation for beginners",
+                    "state": "open",
+                    "created_at": "2026-01-15T09:30:00Z",
+                    "comments": 4,
+                    "user": {"login": "dataTeacher"},
+                },
+                {
+                    "number": 102,
+                    "title": f"[{project}] Fix read_csv encoding edge case",
+                    "state": "closed",
+                    "created_at": "2026-01-10T12:00:00Z",
+                    "comments": 8,
+                    "user": {"login": "csvMaintainer"},
+                },
+                {
+                    "number": 103,
+                    "title": f"[{project}] Add examples for datetime parsing",
+                    "state": "open",
+                    "created_at": "2026-01-08T15:45:00Z",
+                    "comments": 2,
+                    "user": {"login": "timeSeriesFan"},
+                },
+                {
+                    "number": 104,
+                    "title": f"[{project}] Clarify nullable integer behavior",
+                    "state": "closed",
+                    "created_at": "2026-01-06T08:10:00Z",
+                    "comments": 12,
+                    "user": {"login": "dtypeReviewer"},
+                },
+                {
+                    "number": 105,
+                    "title": f"[{project}] Add cookbook section for joins",
+                    "state": "open",
+                    "created_at": "2026-01-04T14:20:00Z",
+                    "comments": 6,
+                    "user": {"login": "mergeHelper"},
+                },
+                {
+                    "number": 106,
+                    "title": f"[{project}] Improve error message for missing columns",
+                    "state": "closed",
+                    "created_at": "2025-12-30T11:05:00Z",
+                    "comments": 3,
+                    "user": {"login": "bugReporter"},
+                },
+                {
+                    "number": 107,
+                    "title": f"[{project}] Benchmark rolling window examples",
+                    "state": "open",
+                    "created_at": "2025-12-28T16:40:00Z",
+                    "comments": 10,
+                    "user": {"login": "perfAnalyst"},
+                },
+                {
+                    "number": 108,
+                    "title": f"[{project}] Update plotting guide screenshots",
+                    "state": "closed",
+                    "created_at": "2025-12-24T09:00:00Z",
+                    "comments": 1,
+                    "user": {"login": "docsCurator"},
+                },
+                {
+                    "number": 109,
+                    "title": f"[{project}] Investigate memory spike in concat",
+                    "state": "open",
+                    "created_at": "2025-12-20T18:25:00Z",
+                    "comments": 15,
+                    "user": {"login": "memoryWatch"},
+                },
+                {
+                    "number": 110,
+                    "title": f"[{project}] Add beginner exercise for value_counts",
+                    "state": "closed",
+                    "created_at": "2025-12-18T07:35:00Z",
+                    "comments": 5,
+                    "user": {"login": "courseBuilder"},
+                },
+            ]
+
         def fetchIssues(repo, perPage=10):
-            url = f"https://api.github.com/repos/{repo}/issues"
-            params = {'per_page': perPage, 'state': 'all'}
-            response = requests.get(url, params=params, timeout=10)
-            if response.status_code == 200:
-                return pd.DataFrame(response.json())
-            return None
+            records = sampleGithubIssues(repo)[:perPage]
+            return pd.DataFrame(records)
     - type: code
       title: "분석 수행"
       content: |-
@@ -259,14 +465,97 @@ sections:
     - type: code
       title: "데이터 준비"
       content: |-
-        import requests
         import pandas as pd
-        url = "https://api.github.com/repos/pandas-dev/pandas/issues"
-        params = {'per_page': 10, 'state': 'all'}
-        response = requests.get(url, params=params, timeout=10)
-        df = pd.DataFrame(response.json()) if response.status_code == 200 else pd.DataFrame([{'created_at': '2024-01-01', 'user': {'login': 'sample'}}])
+
+        def sampleGithubIssues(repo="pandas-dev/pandas"):
+            project = repo.split("/")[-1]
+            return [
+                {
+                    "number": 101,
+                    "title": f"[{project}] Improve groupby documentation for beginners",
+                    "state": "open",
+                    "created_at": "2026-01-15T09:30:00Z",
+                    "comments": 4,
+                    "user": {"login": "dataTeacher"},
+                },
+                {
+                    "number": 102,
+                    "title": f"[{project}] Fix read_csv encoding edge case",
+                    "state": "closed",
+                    "created_at": "2026-01-10T12:00:00Z",
+                    "comments": 8,
+                    "user": {"login": "csvMaintainer"},
+                },
+                {
+                    "number": 103,
+                    "title": f"[{project}] Add examples for datetime parsing",
+                    "state": "open",
+                    "created_at": "2026-01-08T15:45:00Z",
+                    "comments": 2,
+                    "user": {"login": "timeSeriesFan"},
+                },
+                {
+                    "number": 104,
+                    "title": f"[{project}] Clarify nullable integer behavior",
+                    "state": "closed",
+                    "created_at": "2026-01-06T08:10:00Z",
+                    "comments": 12,
+                    "user": {"login": "dtypeReviewer"},
+                },
+                {
+                    "number": 105,
+                    "title": f"[{project}] Add cookbook section for joins",
+                    "state": "open",
+                    "created_at": "2026-01-04T14:20:00Z",
+                    "comments": 6,
+                    "user": {"login": "mergeHelper"},
+                },
+                {
+                    "number": 106,
+                    "title": f"[{project}] Improve error message for missing columns",
+                    "state": "closed",
+                    "created_at": "2025-12-30T11:05:00Z",
+                    "comments": 3,
+                    "user": {"login": "bugReporter"},
+                },
+                {
+                    "number": 107,
+                    "title": f"[{project}] Benchmark rolling window examples",
+                    "state": "open",
+                    "created_at": "2025-12-28T16:40:00Z",
+                    "comments": 10,
+                    "user": {"login": "perfAnalyst"},
+                },
+                {
+                    "number": 108,
+                    "title": f"[{project}] Update plotting guide screenshots",
+                    "state": "closed",
+                    "created_at": "2025-12-24T09:00:00Z",
+                    "comments": 1,
+                    "user": {"login": "docsCurator"},
+                },
+                {
+                    "number": 109,
+                    "title": f"[{project}] Investigate memory spike in concat",
+                    "state": "open",
+                    "created_at": "2025-12-20T18:25:00Z",
+                    "comments": 15,
+                    "user": {"login": "memoryWatch"},
+                },
+                {
+                    "number": 110,
+                    "title": f"[{project}] Add beginner exercise for value_counts",
+                    "state": "closed",
+                    "created_at": "2025-12-18T07:35:00Z",
+                    "comments": 5,
+                    "user": {"login": "courseBuilder"},
+                },
+            ]
+
+        records = sampleGithubIssues("pandas-dev/pandas")[:10]
+        df = pd.DataFrame(records)
         df['created_at'] = pd.to_datetime(df['created_at'])
-        flatDf = pd.json_normalize(response.json(), max_level=1) if response.status_code == 200 else pd.DataFrame([{'user.login': 'sample'}])
+        flatDf = pd.json_normalize(records, max_level=1)
     - type: code
       title: "분석 수행"
       content: |-
@@ -279,11 +568,11 @@ sections:
   subtitle: 전체 커리큘럼 완료!
   blocks:
   - type: text
-    content: 실전 API 데이터 파이프라인을 경험했습니다! 수집부터 저장까지 전체 흐름을 익혔습니다.
+    content: API 응답형 JSON 데이터 파이프라인을 경험했습니다! 구조 파악부터 저장까지 전체 흐름을 익혔습니다.
   - type: list
     items:
-    - "requests.get(url, params) - API 호출"
-    - "response.json() - JSON을 파이썬 객체로"
+    - "API 응답 구조 - 리스트/딕셔너리 JSON 형태"
+    - "sampleGithubIssues() - 응답 샘플을 재사용 가능한 함수로 준비"
     - "pd.DataFrame(json) - JSON을 DataFrame으로"
     - "pd.to_datetime() - 문자열을 datetime으로"
     - "df['컬럼'].str.len() - 문자열 길이"

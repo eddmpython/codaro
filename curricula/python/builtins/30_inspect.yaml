@@ -1,5 +1,8 @@
 meta:
+  id: "30_inspect"
   title: "inspect - 객체 검사"
+  category: "builtins"
+  tags: ["inspect", "검사", "introspection", "signature", "메타프로그래밍"]
   description: "런타임 객체 검사를 위한 inspect 모듈"
   keywords: ["inspect", "검사", "introspection", "signature", "메타프로그래밍"]
 
@@ -268,47 +271,98 @@ sections:
   - type: "code"
     language: "python"
     title: "함수 소스 조회"
-    description: "getsource 사용"
+    description: "파일에 정의된 함수에서 getsource 사용"
     content: |-
+      import importlib.util
       import inspect
+      import sys
+      import tempfile
+      import textwrap
+      from pathlib import Path
 
+      moduleCode = textwrap.dedent('''
       def fibonacci(n):
           if n <= 1:
               return n
-          return fibonacci(n-1) + fibonacci(n-2)
+          return fibonacci(n - 1) + fibonacci(n - 2)
+      ''')
 
-      source = inspect.getsource(fibonacci)
+      with tempfile.TemporaryDirectory() as tempDir:
+          modulePath = Path(tempDir) / 'math_tools.py'
+          modulePath.write_text(moduleCode, encoding='utf-8')
+          spec = importlib.util.spec_from_file_location('math_tools', modulePath)
+          assert spec is not None and spec.loader is not None
+          module = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = module
+          spec.loader.exec_module(module)
+          source = inspect.getsource(module.fibonacci)
+
+      assert 'def fibonacci' in source
       source
   - type: "code"
     language: "python"
     title: "클래스 소스 조회"
-    description: "전체 클래스 코드"
+    description: "파일에 정의된 클래스 코드"
     content: |-
+      import importlib.util
       import inspect
+      import sys
+      import tempfile
+      import textwrap
+      from pathlib import Path
 
+      moduleCode = textwrap.dedent('''
       class Counter:
           def __init__(self):
               self.count = 0
 
           def increment(self):
               self.count += 1
+      ''')
 
-      classSource = inspect.getsource(Counter)
+      with tempfile.TemporaryDirectory() as tempDir:
+          modulePath = Path(tempDir) / 'counter_module.py'
+          modulePath.write_text(moduleCode, encoding='utf-8')
+          spec = importlib.util.spec_from_file_location('counter_module', modulePath)
+          assert spec is not None and spec.loader is not None
+          module = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = module
+          spec.loader.exec_module(module)
+          classSource = inspect.getsource(module.Counter)
+
+      assert 'class Counter' in classSource
       classSource
   - type: "code"
     language: "python"
     title: "소스 라인 정보"
-    description: "getsourcelines 사용"
+    description: "파일 기반 객체에서 getsourcelines 사용"
     content: |-
+      import importlib.util
       import inspect
+      import sys
+      import tempfile
+      import textwrap
+      from pathlib import Path
 
+      moduleCode = textwrap.dedent('''
       def sample():
           x = 10
           return x * 2
+      ''')
 
-      lines, startLine = inspect.getsourcelines(sample)
+      with tempfile.TemporaryDirectory() as tempDir:
+          modulePath = Path(tempDir) / 'sample_module.py'
+          modulePath.write_text(moduleCode, encoding='utf-8')
+          spec = importlib.util.spec_from_file_location('sample_module', modulePath)
+          assert spec is not None and spec.loader is not None
+          module = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = module
+          spec.loader.exec_module(module)
+          lines, startLine = inspect.getsourcelines(module.sample)
+
       lineCount = len(lines)
 
+      assert lineCount == 3
       lineCount, startLine
   - type: "tip"
     content: "getsource()는 인터랙티브 셸이나 동적으로 생성된 함수에서는 작동하지 않습니다. 파일에 정의된 객체만 가능합니다."
@@ -461,6 +515,122 @@ sections:
   - type: "tip"
     content: "inspect는 프레임워크나 라이브러리 개발 시 매우 유용합니다. 사용자 정의 함수를 분석하여 자동으로 처리할 수 있습니다."
 
+- id: "workflow_validation"
+  title: "검증 루프: 플러그인 계약 검사"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "inspect의 실무 가치는 런타임 객체를 들여다본 뒤 계약을 자동 검증하는 데 있습니다. 함수 시그니처, 타입 힌트, docstring, 공개 메서드 목록을 검사하면 플러그인이나 자동화 훅을 실행 전에 걸러낼 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "함수 계약을 검사한다"
+    description: "payload/context 인자와 반환 타입 힌트를 강제합니다."
+    content: |-
+      import inspect
+      from typing import get_type_hints
+
+      def validateAction(func):
+          sig = inspect.signature(func)
+          parameters = list(sig.parameters.values())
+          hints = get_type_hints(func)
+
+          assert len(parameters) >= 2, 'payload와 context 인자가 필요합니다'
+          assert parameters[0].name == 'payload', '첫 번째 인자는 payload여야 합니다'
+          assert parameters[1].name == 'context', '두 번째 인자는 context여야 합니다'
+          assert hints.get('payload') is dict, 'payload 타입 힌트는 dict여야 합니다'
+          assert hints.get('context') is dict, 'context 타입 힌트는 dict여야 합니다'
+          assert hints.get('return') is dict, '반환 타입 힌트는 dict여야 합니다'
+
+          return {
+              'name': func.__name__,
+              'signature': str(sig),
+              'requiredParameters': [param.name for param in parameters[:2]]
+          }
+
+      def normalizeOrder(payload: dict, context: dict) -> dict:
+          return {'orderId': payload['id'], 'source': context['source']}
+
+      actionReport = validateAction(normalizeOrder)
+
+      assert actionReport['requiredParameters'] == ['payload', 'context']
+      actionReport
+  - type: "code"
+    language: "python"
+    title: "잘못된 액션을 먼저 실패시킨다"
+    description: "실행 전에 시그니처 문제를 잡습니다."
+    content: |-
+      def badNormalize(payload):
+          return payload
+
+      try:
+          validateAction(badNormalize)
+      except AssertionError as exc:
+          inspectProblem = str(exc)
+
+      assert 'context' in inspectProblem or '인자' in inspectProblem
+      inspectProblem
+  - type: "code"
+    language: "python"
+    title: "클래스 공개 메서드 문서를 점검한다"
+    description: "자동 문서화와 운영 검증에 필요한 메서드 정보를 추출합니다."
+    content: |-
+      class OrderActions:
+          def normalize(self, payload: dict, context: dict) -> dict:
+              """주문 이벤트를 표준 스키마로 변환합니다."""
+              return payload
+
+          def validate(self, payload: dict, context: dict) -> dict:
+              """주문 이벤트의 필수 필드를 검사합니다."""
+              return {'valid': 'id' in payload}
+
+      publicMethods = inspect.getmembers(OrderActions, predicate=inspect.isfunction)
+      methodDocs = {}
+
+      for methodName, method in publicMethods:
+          if methodName.startswith('_'):
+              continue
+          sig = inspect.signature(method)
+          doc = inspect.getdoc(method)
+          assert doc, f'{methodName} 문서가 없습니다'
+          methodDocs[methodName] = {
+              'signature': str(sig),
+              'doc': doc,
+              'params': list(sig.parameters.keys())[1:]
+          }
+
+      assert set(methodDocs) == {'normalize', 'validate'}
+      methodDocs
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 파일 기반 소스 조회"
+    description: "동적 셀이 아니라 실제 파일에 있는 코드에서 소스를 가져오는 패턴입니다."
+    content: |-
+      import importlib.util
+      import sys
+      import tempfile
+      import textwrap
+      from pathlib import Path
+
+      moduleCode = textwrap.dedent('''
+      def transform(payload: dict, context: dict) -> dict:
+          """이벤트를 표준 출력으로 변환합니다."""
+          return {'id': payload['id'], 'source': context['source']}
+      ''')
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          modulePath = Path(tempDir) / 'action_module.py'
+          modulePath.write_text(moduleCode, encoding='utf-8')
+          spec = importlib.util.spec_from_file_location('action_module', modulePath)
+          assert spec is not None and spec.loader is not None
+          module = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = module
+          spec.loader.exec_module(module)
+          sourceText = inspect.getsource(module.transform)
+
+      assert 'def transform' in sourceText
+      assert 'return' in sourceText
+      sourceText
+
 - id: "practice"
   title: "종합 복습"
   blocks:
@@ -508,12 +678,29 @@ sections:
   - type: "expansion"
     title: "🟢 기본5: 소스 코드"
     code: |-
+      import importlib.util
       import inspect
+      import sys
+      import tempfile
+      import textwrap
+      from pathlib import Path
 
+      moduleCode = textwrap.dedent('''
       def simple():
           return 42
+      ''')
 
-      source1 = inspect.getsource(simple)
+      with tempfile.TemporaryDirectory() as tempDir:
+          modulePath = Path(tempDir) / 'simple_module.py'
+          modulePath.write_text(moduleCode, encoding='utf-8')
+          spec = importlib.util.spec_from_file_location('simple_module', modulePath)
+          assert spec is not None and spec.loader is not None
+          module = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = module
+          spec.loader.exec_module(module)
+          source1 = inspect.getsource(module.simple)
+
+      assert 'return 42' in source1
       source1
   - type: "expansion"
     title: "🟡 응용1: 기본값 확인"
@@ -604,16 +791,33 @@ sections:
   - type: "expansion"
     title: "🔴 심화3: 소스 라인 수"
     code: |-
+      import importlib.util
       import inspect
+      import sys
+      import tempfile
+      import textwrap
+      from pathlib import Path
 
+      moduleCode = textwrap.dedent('''
       def multiline():
           x = 1
           y = 2
           z = 3
           return x + y + z
+      ''')
 
-      lines1, start1 = inspect.getsourcelines(multiline)
+      with tempfile.TemporaryDirectory() as tempDir:
+          modulePath = Path(tempDir) / 'multiline_module.py'
+          modulePath.write_text(moduleCode, encoding='utf-8')
+          spec = importlib.util.spec_from_file_location('multiline_module', modulePath)
+          assert spec is not None and spec.loader is not None
+          module = importlib.util.module_from_spec(spec)
+          sys.modules[spec.name] = module
+          spec.loader.exec_module(module)
+          lines1, start1 = inspect.getsourcelines(module.multiline)
+
       lineCount1 = len(lines1)
+      assert lineCount1 == 5
       lineCount1
   - type: "expansion"
     title: "🔴 심화4: 필수 파라미터"

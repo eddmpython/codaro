@@ -31,6 +31,11 @@ sections:
     description: "json 모듈을 불러옵니다."
     content: |-
       import json
+      import tempfile
+      from pathlib import Path
+
+      jsonScratch = Path(tempfile.gettempdir()) / 'codaro_json_scratch'
+      jsonScratch.mkdir(parents=True, exist_ok=True)
 
       'json 모듈이 정상적으로 로드되었습니다'
   - type: "tip"
@@ -93,7 +98,7 @@ sections:
     description: "딕셔너리를 JSON 파일로 저장합니다."
     content: |-
       configData = {'theme': 'dark', 'language': 'ko', 'notifications': True}
-      with open('/tmp/config.json', 'w') as f:
+      with open(jsonScratch / 'config.json', 'w', encoding='utf-8') as f:
           json.dump(configData, f)
       'config.json 저장 완료'
   - type: "code"
@@ -101,7 +106,7 @@ sections:
     title: "JSON 파일 읽기"
     description: "JSON 파일을 읽어서 Python 객체로 변환합니다."
     content: |-
-      with open('/tmp/config.json', 'r') as f:
+      with open(jsonScratch / 'config.json', 'r', encoding='utf-8') as f:
           loadedConfig = json.load(f)
       loadedConfig
   - type: "code"
@@ -116,7 +121,7 @@ sections:
           ],
           'total': 2
       }
-      with open('/tmp/users.json', 'w') as f:
+      with open(jsonScratch / 'users.json', 'w', encoding='utf-8') as f:
           json.dump(complexData, f)
       'users.json 저장 완료'
   - type: "tip"
@@ -296,16 +301,16 @@ sections:
     title: "설정 파일 업데이트"
     description: "기존 설정을 읽고 수정한 후 다시 저장합니다."
     content: |-
-      settingsPath = '/tmp/settings.json'
+      settingsPath = jsonScratch / 'settings.json'
       initialSettings = {'volume': 50, 'brightness': 80}
-      with open(settingsPath, 'w') as f:
+      with open(settingsPath, 'w', encoding='utf-8') as f:
           json.dump(initialSettings, f)
 
-      with open(settingsPath, 'r') as f:
+      with open(settingsPath, 'r', encoding='utf-8') as f:
           currentSettings = json.load(f)
       currentSettings['volume'] = 70
 
-      with open(settingsPath, 'w') as f:
+      with open(settingsPath, 'w', encoding='utf-8') as f:
           json.dump(currentSettings, f, indent=2)
 
       currentSettings
@@ -326,6 +331,102 @@ sections:
       isValidJson(validText), isValidJson(invalidText)
   - type: "tip"
     content: "JSON 파일은 주석을 지원하지 않습니다. 설명이 필요하면 '_comment' 키를 사용하세요."
+
+- id: "workflow_validation"
+  title: "검증 루프: JSON 설정 품질 게이트"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "실무 JSON은 읽고 쓰는 것보다 구조를 검증하고 민감 정보를 제거한 뒤, 다시 읽어도 같은 데이터인지 확인하는 과정이 중요합니다. 여기서는 잘못된 JSON, 누락된 필드, 저장 후 재검증을 한 흐름으로 묶습니다."
+  - type: "code"
+    language: "python"
+    title: "예측 가능한 설정 스키마 정의"
+    description: "필수 키와 타입을 검사하는 작은 검증 함수를 만듭니다."
+    content: |-
+      jsonWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_json_workflow_'))
+      rawConfig = {
+          'app': {'name': 'Codaro', 'version': '1.0.0'},
+          'features': ['curriculum', 'automation'],
+          'limits': {'maxUsers': 25},
+          'token': 'secret-token'
+      }
+
+      def normalizeConfig(config):
+          assert isinstance(config.get('app'), dict), 'app 설정은 딕셔너리여야 합니다'
+          assert isinstance(config['app'].get('name'), str), 'app.name이 필요합니다'
+          assert isinstance(config['app'].get('version'), str), 'app.version이 필요합니다'
+          assert isinstance(config.get('features'), list), 'features는 리스트여야 합니다'
+          assert isinstance(config.get('limits'), dict), 'limits 설정이 필요합니다'
+          assert isinstance(config['limits'].get('maxUsers'), int), 'limits.maxUsers는 정수여야 합니다'
+
+          publicConfig = {key: value for key, value in config.items() if key not in {'password', 'token'}}
+          publicConfig['features'] = sorted(publicConfig['features'])
+          return publicConfig
+
+      normalizedConfig = normalizeConfig(rawConfig)
+      assert 'token' not in normalizedConfig
+      normalizedConfig
+  - type: "code"
+    language: "python"
+    title: "실패 케이스를 먼저 확인"
+    description: "깨진 JSON과 스키마 오류를 좁힌 예외로 분리합니다."
+    content: |-
+      brokenJsonText = '{app: "Codaro"}'
+      try:
+          json.loads(brokenJsonText)
+      except json.JSONDecodeError as exc:
+          jsonParseProblem = f'{exc.lineno}:{exc.colno}'
+
+      invalidConfig = {
+          'app': {'name': 'Codaro'},
+          'features': 'curriculum',
+          'limits': {}
+      }
+      try:
+          normalizeConfig(invalidConfig)
+      except AssertionError as exc:
+          schemaProblem = str(exc)
+
+      assert jsonParseProblem
+      assert 'features' in schemaProblem or 'version' in schemaProblem
+      jsonParseProblem, schemaProblem
+  - type: "code"
+    language: "python"
+    title: "저장 후 다시 읽어 검증"
+    description: "파일에 저장한 JSON이 다시 읽어도 같은 구조인지 확인합니다."
+    content: |-
+      workflowConfigPath = jsonWorkflowRoot / 'app_config.json'
+      with open(workflowConfigPath, 'w', encoding='utf-8') as f:
+          json.dump(normalizedConfig, f, ensure_ascii=False, indent=2, sort_keys=True)
+
+      with open(workflowConfigPath, 'r', encoding='utf-8') as f:
+          loadedWorkflowConfig = json.load(f)
+
+      assert loadedWorkflowConfig == normalizedConfig
+      assert loadedWorkflowConfig['features'] == ['automation', 'curriculum']
+      loadedWorkflowConfig
+  - type: "code"
+    language: "python"
+    title: "JSONL 로그 실무 변주"
+    description: "여러 이벤트를 한 줄씩 저장하고 오류 건수와 민감 정보 제거를 검증합니다."
+    content: |-
+      events = [
+          {'level': 'info', 'message': 'started', 'token': 'remove-me'},
+          {'level': 'error', 'message': 'missing field', 'retry': True},
+          {'level': 'info', 'message': 'finished'}
+      ]
+      jsonlPath = jsonWorkflowRoot / 'events.jsonl'
+      with open(jsonlPath, 'w', encoding='utf-8') as f:
+          for event in events:
+              safeEvent = {key: value for key, value in event.items() if key != 'token'}
+              f.write(json.dumps(safeEvent, ensure_ascii=False) + '\n')
+
+      with open(jsonlPath, 'r', encoding='utf-8') as f:
+          loadedEvents = [json.loads(line) for line in f]
+
+      assert sum(event['level'] == 'error' for event in loadedEvents) == 1
+      assert all('token' not in event for event in loadedEvents)
+      loadedEvents
 
 - id: "practice"
   title: "json 모듈 종합 복습"
@@ -366,7 +467,7 @@ sections:
     title: "🟢 기본5: 파일로 저장"
     code: |-
       saveData = {'status': 'ok', 'code': 200}
-      with open('/tmp/response.json', 'w') as f:
+      with open(jsonScratch / 'response.json', 'w', encoding='utf-8') as f:
           json.dump(saveData, f)
       'Saved'
 
@@ -394,10 +495,10 @@ sections:
   - type: "expansion"
     title: "🟡 응용4: 파일 읽고 수정"
     code: |-
-      testPath = '/tmp/test.json'
-      with open(testPath, 'w') as f:
+      testPath = jsonScratch / 'test.json'
+      with open(testPath, 'w', encoding='utf-8') as f:
           json.dump({'count': 10}, f)
-      with open(testPath, 'r') as f:
+      with open(testPath, 'r', encoding='utf-8') as f:
           content = json.load(f)
       content['count'] += 5
       content
@@ -415,7 +516,7 @@ sections:
       def encodeSet(obj):
           if isinstance(obj, set):
               return list(obj)
-          raise TypeError
+          raise TypeError(f'{type(obj).__name__} is not JSON serializable')
 
       withSet = {'tags': {'python', 'data', 'json'}}
       result = json.dumps(withSet, default=encodeSet)
@@ -439,14 +540,14 @@ sections:
     code: |-
       file1Data = {'a': 1}
       file2Data = {'b': 2}
-      with open('/tmp/f1.json', 'w') as f:
+      with open(jsonScratch / 'f1.json', 'w', encoding='utf-8') as f:
           json.dump(file1Data, f)
-      with open('/tmp/f2.json', 'w') as f:
+      with open(jsonScratch / 'f2.json', 'w', encoding='utf-8') as f:
           json.dump(file2Data, f)
 
       merged = {}
-      for path in ['/tmp/f1.json', '/tmp/f2.json']:
-          with open(path, 'r') as f:
+      for path in [jsonScratch / 'f1.json', jsonScratch / 'f2.json']:
+          with open(path, 'r', encoding='utf-8') as f:
               merged.update(json.load(f))
       merged
 
@@ -478,23 +579,19 @@ sections:
   - type: "expansion"
     title: "🔴 심화7: 조건부 직렬화"
     code: |-
-      def conditionalEncoder(obj):
-          if isinstance(obj, dict):
-              return {k: v for k, v in obj.items() if v is not None}
-          raise TypeError
-
       dataWithNone = {'a': 1, 'b': None, 'c': 3}
-      cleaned = json.loads(json.dumps(dataWithNone, default=conditionalEncoder))
+      serializableData = {k: v for k, v in dataWithNone.items() if v is not None}
+      cleaned = json.loads(json.dumps(serializableData))
       cleaned
 
   - type: "expansion"
     title: "🔴 심화8: 대용량 스트림"
     code: |-
       bigData = [{'id': i, 'value': i * 10} for i in range(100)]
-      streamPath = '/tmp/stream.json'
-      with open(streamPath, 'w') as f:
+      streamPath = jsonScratch / 'stream.json'
+      with open(streamPath, 'w', encoding='utf-8') as f:
           json.dump(bigData, f)
-      with open(streamPath, 'r') as f:
+      with open(streamPath, 'r', encoding='utf-8') as f:
           loaded = json.load(f)
       len(loaded)
 
@@ -519,9 +616,9 @@ sections:
               }
           }
       }
-      configPath = '/tmp/app_config.json'
-      with open(configPath, 'w') as f:
+      configPath = jsonScratch / 'app_config.json'
+      with open(configPath, 'w', encoding='utf-8') as f:
           json.dump(template, f, indent=2)
-      with open(configPath, 'r') as f:
+      with open(configPath, 'r', encoding='utf-8') as f:
           loadedTemplate = json.load(f)
       loadedTemplate['app']['version']

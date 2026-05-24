@@ -3,7 +3,7 @@ meta:
   title: "문자열 메서드"
   day: 6
   category: 30days
-  tags: []
+  tags: ["문자열", "메서드", "strip", "split", "join", "데이터정제", "검증"]
   seo:
     title: "파이썬 문자열 메서드 완벽 가이드"
     description: "upper, lower, split, join, replace, strip, find, count 등 유용한 문자열 메서드를 배웁니다."
@@ -177,6 +177,51 @@ sections:
       allText = 'apple apple orange apple'
       allText.replace('apple', 'banana')
 
+- id: method_split
+  title: "문자열 나누기"
+  subtitle: "split()으로 구분자 기준 분리"
+  blocks:
+  - type: text
+    content: "split() 메서드는 문자열을 특정 구분자 기준으로 나누어 리스트를 만듭니다. 쉼표로 구분된 CSV 한 줄, 공백으로 나뉜 단어, 하이픈이 들어간 코드처럼 정해진 패턴을 데이터로 바꿀 때 자주 사용합니다."
+  - type: list
+    items:
+    - "문자열.split(구분자) 형태"
+    - "결과는 리스트"
+    - "구분자를 생략하면 공백 기준으로 나눔"
+  - type: code
+    language: python
+    title: "쉼표 기준 분리"
+    description: "CSV처럼 쉼표로 나뉜 문자열을 필드 리스트로 바꿉니다."
+    content: |-
+      row = 'kim@example.com,paid,15000'
+      row.split(',')
+  - type: code
+    language: python
+    title: "공백 기준 분리"
+    description: "구분자를 생략하면 연속 공백을 기준으로 단어를 나눕니다."
+    content: |-
+      sentence = 'Python string method'
+      sentence.split()
+
+- id: method_join
+  title: "문자열 합치기"
+  subtitle: "join()으로 리스트를 문자열로 조립"
+  blocks:
+  - type: text
+    content: "join() 메서드는 문자열 리스트를 하나의 문자열로 합칩니다. 어떤 구분자를 사이에 넣을지 먼저 쓰고, 그 뒤에 합칠 리스트를 넘깁니다. split()으로 나눈 데이터를 다시 저장 형식으로 만들 때 함께 사용합니다."
+  - type: list
+    items:
+    - "'구분자'.join(문자열리스트) 형태"
+    - "리스트 안 값은 문자열이어야 함"
+    - "CSV, 태그, 경로 조립에 유용"
+  - type: code
+    language: python
+    title: "파이프 구분자로 합치기"
+    description: "정리된 필드를 저장하기 쉬운 한 줄 문자열로 만듭니다."
+    content: |-
+      fields = ['kim@example.com', 'paid', '15000']
+      '|'.join(fields)
+
 - id: method_count
   title: "문자열 개수 세기"
   subtitle: "count()로 등장 횟수 확인"
@@ -280,6 +325,69 @@ sections:
     content: |-
       file = 'script.py'
       file.endswith('.py')
+
+- id: workflow_validation
+  title: "검증 루프: 고객 행 정제하기"
+  subtitle: "공백, 대소문자, 쉼표 형식을 업무 데이터로 정리"
+  blocks:
+  - type: text
+    content: "문자열 메서드는 입력값을 보기 좋게 꾸미는 기능이 아니라, 사람이 넣은 거친 텍스트를 프로그램이 믿고 처리할 수 있는 데이터로 바꾸는 도구입니다. 공백 제거, 대소문자 통일, 구분자 검사, 숫자 변환까지 한 흐름으로 묶어야 실무에서 다시 쓸 수 있습니다."
+  - type: list
+    items:
+    - "예측: 원본 행이 이메일, 상태, 금액 세 칸으로 나뉘어야 한다고 정한다."
+    - "실행: split, strip, lower, replace로 각 필드를 정리한다."
+    - "오류 수정: 쉼표 개수가 맞지 않는 행을 ValueError로 거른다."
+    - "검증: 정제 결과와 저장용 문자열을 assert로 확인한다."
+  - type: code
+    language: python
+    title: "고객 결제 행 정제"
+    description: "거친 CSV 문자열 한 줄을 검증 가능한 필드로 바꿉니다."
+    content: |-
+      rawLine = '  KIM@Example.COM ,  PAID ,  15000원  '
+      fields = rawLine.split(',')
+
+      email = fields[0].strip().lower()
+      status = fields[1].strip().lower()
+      amountText = fields[2].strip().replace(',', '').replace('원', '')
+      amount = int(amountText)
+      cleanLine = '|'.join([email, status, str(amount)])
+
+      assert email == 'kim@example.com'
+      assert status == 'paid'
+      assert amount == 15000
+      assert cleanLine == 'kim@example.com|paid|15000'
+  - type: code
+    language: python
+    title: "구분자 개수 검증"
+    description: "쉼표가 부족한 행을 조용히 처리하지 않고 명확하게 실패시킵니다."
+    content: |-
+      def requireCustomerFields(rawLine):
+          fields = rawLine.split(',')
+          if len(fields) != 3:
+              raise ValueError('고객 행은 이메일, 상태, 금액 3칸이어야 합니다')
+          return fields
+
+
+      validFields = requireCustomerFields('kim@example.com,paid,15000')
+      assert validFields == ['kim@example.com', 'paid', '15000']
+
+      try:
+          requireCustomerFields('kim@example.com paid 15000')
+      except ValueError as exc:
+          errorMessage = str(exc)
+      else:
+          raise AssertionError('쉼표가 없는 행은 실패해야 합니다')
+
+      assert errorMessage == '고객 행은 이메일, 상태, 금액 3칸이어야 합니다'
+  - type: expansion
+    title: "실무 변주: 파일명 정규화"
+    code: |-
+      rawFileName = '  Sales Report 2026 FINAL.CSV  '
+      cleanFileName = rawFileName.strip().lower().replace(' ', '_')
+
+      assert cleanFileName == 'sales_report_2026_final.csv'
+      assert cleanFileName.endswith('.csv')
+      cleanFileName
 
 - id: practice
   title: "Day 6 종합 복습"

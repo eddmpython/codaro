@@ -3,7 +3,7 @@ meta:
   title: "함수형 패턴"
   day: 23
   category: "advancedPython"
-  tags: ["functional", "currying", "monad", "composition", "pure-function"]
+  tags: ["functional", "currying", "monad", "composition", "pure-function", "검증", "데이터파이프라인"]
   seo:
     title: "파이썬 함수형 패턴 - 커링, 합성, 모나드"
     description: "순수 함수, 고차 함수, 커링, 함수 합성, 모나드 패턴을 학습합니다."
@@ -477,6 +477,70 @@ sections:
       dropWhileResult = dropWhile(lambda x: x < 3, sampleList)
       listUtilResults = (headResult, tailResult, takeResult, dropResult, takeWhileResult, dropWhileResult)
       listUtilResults
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 주문 이벤트 함수형 파이프라인"
+  subtitle: "순수 함수, 합성, 불변 입력, 오류 값을 함께 확인합니다"
+  blocks:
+  - type: "text"
+    content: "함수형 패턴은 어렵게 보이는 문법보다 데이터 흐름을 예측하기 쉬워지는지가 핵심입니다. 주문 이벤트를 정규화하고, 결제 완료 건만 골라 합계를 내는 과정을 순수 함수로 분리해보세요."
+  - type: "code"
+    language: "python"
+    title: "순수 함수 파이프라인 만들기"
+    description: "입력 리스트를 변경하지 않고 단계별 변환 결과를 검증합니다."
+    content: |-
+      from functools import reduce
+
+      def pipe(value, *functions):
+          return reduce(lambda current, function: function(current), functions, value)
+
+      def normalize(events):
+          return [
+              {**event, "status": event["status"].lower(), "amount": int(event["amount"])}
+              for event in events
+          ]
+
+      def onlyPaid(events):
+          return [event for event in events if event["status"] == "paid"]
+
+      def summarize(events):
+          return {
+              "count": len(events),
+              "amount": sum(event["amount"] for event in events),
+              "ids": [event["id"] for event in events],
+          }
+
+      rawEvents = [
+          {"id": "O-1", "status": "PAID", "amount": "12000"},
+          {"id": "O-2", "status": "DRAFT", "amount": "8000"},
+          {"id": "O-3", "status": "PAID", "amount": "5000"},
+      ]
+
+      summary = pipe(rawEvents, normalize, onlyPaid, summarize)
+
+      assert summary == {"count": 2, "amount": 17000, "ids": ["O-1", "O-3"]}
+      assert rawEvents[0]["status"] == "PAID"
+  - type: "code"
+    language: "python"
+    title: "Result 값으로 파싱 실패 다루기"
+    description: "예외를 흘려보내는 대신 성공/실패 값을 명시적으로 반환합니다."
+    content: |-
+      def parseAmount(value):
+          try:
+              amount = int(value)
+          except ValueError as exc:
+              return {"ok": False, "error": str(exc)}
+          return {"ok": True, "value": amount}
+
+      success = parseAmount("12000")
+      failure = parseAmount("12,000")
+
+      assert success == {"ok": True, "value": 12000}
+      assert failure["ok"] is False
+      assert "invalid literal" in failure["error"]
+  - type: "tip"
+    title: "변주 실험"
+    content: "`onlyPaid` 대신 `amount`가 10,000 이상인 주문만 고르는 함수를 추가하고, 파이프라인 순서를 바꿨을 때 결과가 어떻게 달라지는지 확인하세요."
 
 - id: "practice"
   title: "종합 연습"

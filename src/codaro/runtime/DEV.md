@@ -15,9 +15,9 @@
 
 Codaro 목표상 편집기는 엔진 구현을 직접 알면 안 된다.
 장기적으로는 아래 엔진 후보를 공통 capability로 다뤄야 한다.
-- `PyodideEngine`
-- `SandboxEngine`
 - `LocalEngine`
+- `SandboxEngine`
+- 외부 격리 실행 엔진
 
 이 레이어가 완성되면 편집기는 아래만 알면 된다.
 - execute
@@ -51,7 +51,7 @@ Codaro 목표상 편집기는 엔진 구현을 직접 알면 안 된다.
 
 ## 현재 한계
 
-- Pyodide와 capability shape는 아직 완전히 통일되지 않았다
+- app 모드, 편집기 실행, AI tool 실행이 공유하는 capability shape는 더 정리해야 한다
 - interrupt는 현재 child process terminate + 새 worker spawn 방식이라 실행 중 세션 상태를 보존하지 않는다
 - process supervisor, streaming output, resource limit는 아직 없다
 - 이벤트 스트림은 현재 WebSocket과 HTTP result에만 연결되어 있고, 별도 pub/sub 계층은 없다
@@ -60,7 +60,7 @@ Codaro 목표상 편집기는 엔진 구현을 직접 알면 안 된다.
 ## Next Action
 
 - session별 capability와 workspace capability의 권한 경계를 정리한다
-- Pyodide 쪽 adapter도 `ExecutionEngine`과 비슷한 표면으로 맞춘다
+- app 모드와 AI tool 실행도 `ExecutionEngine` 표면을 재사용하게 맞춘다
 - child process를 더 일반적인 supervisor 계층으로 추상화한다
 - soft interrupt와 hard interrupt를 분리한다
 - 이벤트 스트림을 HTTP/WebSocket 외 다른 소비자도 구독할 수 있게 만든다

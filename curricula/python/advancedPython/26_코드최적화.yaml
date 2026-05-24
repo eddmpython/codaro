@@ -3,7 +3,7 @@ meta:
   title: "코드 최적화"
   day: 26
   category: "advancedPython"
-  tags: ["optimization", "performance", "algorithm", "memory"]
+  tags: ["optimization", "performance", "algorithm", "memory", "검증", "성능측정"]
   seo:
     title: "파이썬 코드 최적화"
     description: "시간/공간 복잡도 개선, 메모리 최적화, 알고리즘 튜닝 학습"
@@ -285,6 +285,77 @@ sections:
       fibInfo = fibCached.cache_info()
       fibResult = (fibNc, fibC, fibInfo.hits)
       fibResult
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 중복 주문 탐지 최적화"
+  subtitle: "추측이 아니라 같은 결과와 작업량 비교로 최적화를 검증합니다"
+  blocks:
+  - type: "text"
+    content: "최적화는 빠를 것 같은 코드를 고르는 일이 아닙니다. 먼저 느린 기준 구현과 빠른 구현이 같은 결과를 내는지 확인하고, 반복 횟수나 캐시 hit처럼 측정 가능한 신호를 비교하세요."
+  - type: "code"
+    language: "python"
+    title: "O(n²) 탐지를 set 기반 O(n) 탐지로 바꾸기"
+    description: "두 구현의 결과와 비교 횟수를 함께 검증합니다."
+    content: |-
+      def findDuplicatesSlow(orderIds):
+          duplicates = []
+          comparisons = 0
+          for index, orderId in enumerate(orderIds):
+              for previous in orderIds[:index]:
+                  comparisons += 1
+                  if orderId == previous and orderId not in duplicates:
+                      duplicates.append(orderId)
+          return duplicates, comparisons
+
+      def findDuplicatesFast(orderIds):
+          if not isinstance(orderIds, list):
+              raise TypeError("orderIds must be a list")
+          seen = set()
+          duplicates = []
+          checks = 0
+          for orderId in orderIds:
+              checks += 1
+              if orderId in seen and orderId not in duplicates:
+                  duplicates.append(orderId)
+              seen.add(orderId)
+          return duplicates, checks
+
+      orderIds = ["O-1", "O-2", "O-3", "O-2", "O-4", "O-1"]
+      slowResult, slowChecks = findDuplicatesSlow(orderIds)
+      fastResult, fastChecks = findDuplicatesFast(orderIds)
+
+      assert slowResult == fastResult == ["O-2", "O-1"]
+      assert fastChecks == len(orderIds)
+      assert slowChecks > fastChecks
+
+      try:
+          findDuplicatesFast("O-1,O-2")
+      except TypeError as exc:
+          message = str(exc)
+
+      assert message == "orderIds must be a list"
+  - type: "code"
+    language: "python"
+    title: "캐시 hit로 반복 정규화 비용 줄이기"
+    description: "lru_cache가 실제로 반복 입력을 재사용하는지 확인합니다."
+    content: |-
+      from functools import lru_cache
+
+      @lru_cache(maxsize=32)
+      def normalizeSku(rawSku):
+          return rawSku.strip().upper().replace(" ", "-")
+
+      values = [" a 100 ", "a 100", " b 200 ", " a 100 "]
+      normalized = [normalizeSku(value) for value in values]
+      normalizedAgain = normalizeSku("a 100")
+      cacheInfo = normalizeSku.cache_info()
+
+      assert normalized == ["A-100", "A-100", "B-200", "A-100"]
+      assert normalizedAgain == "A-100"
+      assert cacheInfo.hits >= 1
+  - type: "tip"
+    title: "변주 실험"
+    content: "주문 ID가 10만 개일 때도 결과가 같아야 합니다. 테스트 데이터 크기만 키워도 느린 구현과 빠른 구현의 작업량 차이가 어떻게 커지는지 확인하세요."
 
 - id: "practice"
   title: "종합 연습"

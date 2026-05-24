@@ -189,9 +189,7 @@ sections:
       figTreemap = px.treemap(asia, path=['country'], values='pop', title='아시아 국가 트리맵')
       figSunburst = px.sunburst(asia, path=['country'], values='pop', title='아시아 국가 선버스트')
 
-      figPie.show()
-      figTreemap.show()
-      figSunburst.show()
+      figSunburst
 
 - id: step12_final
   title: 12단계. 결과물 완성
@@ -278,3 +276,73 @@ sections:
     - "color_continuous_scale - 연속형 색상"
   - type: text
     content: 다음 시간에는 주식 데이터로 시계열 분석을 배웁니다.
+
+- id: workflow_validation
+  title: 13단계. 계층 구조 Figure 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      트리맵과 선버스트는 부분-전체 관계를 보여 주므로 값 컬럼이 양수인지, 계층 경로가 유지되는지 확인해야 합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 계층 예측
+    description: 2007년 대륙-국가 계층과 인구 양수 조건을 확인합니다
+    content: |-
+      import plotly.express as px
+
+      gapHierarchy = px.data.gapminder()
+      hierarchy2007 = gapHierarchy.query("year == 2007")
+      requiredColumns = {"continent", "country", "pop", "lifeExp"}
+      missingColumns = requiredColumns - set(hierarchy2007.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert hierarchy2007["pop"].gt(0).all()
+      assert hierarchy2007["continent"].nunique() == 5
+  - type: code
+    language: python
+    title: Treemap Figure 검증
+    description: 트리맵 trace와 label/value 구조를 확인합니다
+    content: |-
+      figTree = px.treemap(hierarchy2007, path=["continent", "country"], values="pop", color="lifeExp", title="Population hierarchy")
+      trace = figTree.data[0]
+
+      assert trace.type == "treemap"
+      assert len(trace.labels) >= hierarchy2007["country"].nunique()
+      assert len(trace.values) == len(trace.labels)
+      assert figTree.layout.title.text == "Population hierarchy"
+      figTree
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 음수 인구가 들어오면 계층 차트를 중단합니다
+    content: |-
+      def validateHierarchyValues(frame):
+          if not frame["pop"].gt(0).all():
+              raise ValueError("계층 차트의 values는 0보다 커야 합니다")
+          assert frame["country"].nunique() > frame["continent"].nunique()
+          return True
+
+      brokenHierarchy = hierarchy2007.copy()
+      brokenHierarchy.loc[brokenHierarchy.index[0], "pop"] = -1
+      try:
+          validateHierarchyValues(brokenHierarchy)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateHierarchyValues(hierarchy2007)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 대륙별 상위 국가 집중도를 비교합니다
+    content: |-
+      concentrationReport = []
+      for continent, frame in hierarchy2007.groupby("continent"):
+          topShare = frame.nlargest(1, "pop")["pop"].iloc[0] / frame["pop"].sum()
+          concentrationReport.append({"continent": continent, "topShare": round(float(topShare), 3), "countryCount": int(frame["country"].nunique())})
+
+      assert all(item["topShare"] > 0 for item in concentrationReport)
+      assert max(item["countryCount"] for item in concentrationReport) > 1
+      concentrationReport
+  - type: tip
+    content: "계층 차트는 큰 조각이 왜 큰지까지 설명할 수 있어야 하므로 집중도 변주를 함께 보는 것이 좋습니다."

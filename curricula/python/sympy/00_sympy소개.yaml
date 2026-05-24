@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - sympy
   id: sympy_00
   title: SymPy소개
   order: 0
@@ -273,3 +275,70 @@ sections:
     - type: text
       content: |-
         SymPy를 배우면 파이썬으로 수학 문제를 정확하게 풀 수 있습니다. 손으로 푸는 것과 병행하며 검증하고, 복잡한 계산은 SymPy에게 맡기세요. 첫 번째 프로젝트에서 기호를 정의하고 수식을 전개하는 것부터 시작합니다.
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 손익분기 수식을 기호로 검증하기"
+  subtitle: "예측 → 수식 구성 → 오류 수정 → 결과 검증 → 실무 변주"
+  blocks:
+  - type: text
+    content: "SymPy는 계산기를 대신하는 도구가 아니라, 업무 규칙을 수식으로 고정하고 전제 조건을 검증하는 도구입니다. 여기서는 고정비와 단위 이익으로 손익분기점을 구하고, 잘못된 계수를 먼저 실패시킨 뒤, 기준 변경 실험을 수행합니다."
+  - type: code
+    language: python
+    title: "손익분기 수식 만들기"
+    description: "수량 x에 대한 매출, 비용, 이익 수식을 만들고 해를 예측합니다."
+    content: |-
+      import sympy as sp
+
+      x = sp.symbols('x', nonnegative=True)
+      fixedCost = 120000
+      unitPrice = 5000
+      unitCost = 2000
+
+      revenueExpr = unitPrice * x
+      costExpr = fixedCost + unitCost * x
+      profitExpr = sp.simplify(revenueExpr - costExpr)
+      breakEvenQuantity = sp.solve(sp.Eq(profitExpr, 0), x)[0]
+
+      assert profitExpr == 3000 * x - 120000
+      assert breakEvenQuantity == 40
+      profitExpr, breakEvenQuantity
+  - type: code
+    language: python
+    title: "잘못된 수식 전제를 먼저 실패시킨다"
+    description: "단위 이익이 0 이하이면 손익분기점을 계산할 수 없게 차단합니다."
+    content: |-
+      def buildProfitExpression(quantitySymbol, fixedCost, unitPrice, unitCost):
+          unitMargin = unitPrice - unitCost
+          if unitMargin <= 0:
+              raise ValueError('unit margin must be positive')
+          return sp.simplify(unitMargin * quantitySymbol - fixedCost)
+
+      try:
+          buildProfitExpression(x, 120000, 2000, 2000)
+      except ValueError as exc:
+          sympyModelError = str(exc)
+
+      assert sympyModelError == 'unit margin must be positive'
+      sympyModelError
+  - type: code
+    language: python
+    title: "대입값과 미분으로 결과 검증"
+    description: "해를 대입하면 이익이 0이고, 이익 함수의 기울기는 단위 이익과 같아야 합니다."
+    content: |-
+      profitAtBreakEven = profitExpr.subs(x, breakEvenQuantity)
+      profitSlope = sp.diff(profitExpr, x)
+
+      assert profitAtBreakEven == 0
+      assert profitSlope == unitPrice - unitCost
+      profitAtBreakEven, profitSlope
+  - type: code
+    language: python
+    title: "실무 변주: 가격 정책 바꾸기"
+    description: "가격을 바꾸면 손익분기 수량이 어떻게 달라지는지 비교합니다."
+    content: |-
+      premiumProfitExpr = buildProfitExpression(x, fixedCost, 6500, unitCost)
+      premiumBreakEven = sp.solve(sp.Eq(premiumProfitExpr, 0), x)[0]
+
+      assert premiumBreakEven < breakEvenQuantity
+      assert premiumBreakEven == sp.Rational(80, 3)
+      premiumProfitExpr, premiumBreakEven

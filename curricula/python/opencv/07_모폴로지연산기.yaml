@@ -423,3 +423,67 @@ sections:
         axKernel[1, 1].set_title('MORPH_CROSS')
         axKernel[1, 1].axis('off')
         plt.tight_layout()
+
+- id: workflow_validation
+  title: 8단계. 모폴로지 검증 루프
+  subtitle: 노이즈 제거와 구멍 메우기 확인
+  blocks:
+  - type: text
+    content: 모폴로지는 형태를 다루는 연산이라 결과가 조금 달라 보여도 좋은지 나쁜지 판단하기 어렵습니다. 노이즈 제거와 구멍 메우기를 픽셀 수로 검증하고, 커널 크기 오류를 먼저 잡습니다.
+  - type: code
+    language: python
+    title: 이진 마스크 준비
+    description: 큰 객체, 구멍, 작은 노이즈가 함께 있는 마스크를 만듭니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      morphMask = np.zeros((100, 130), dtype=np.uint8)
+      cv2.rectangle(morphMask, (30, 25), (100, 75), 255, -1)
+      cv2.circle(morphMask, (65, 50), 10, 0, -1)
+      morphMask[10, 10] = 255
+      morphMask[90, 120] = 255
+
+      def makeMorphKernel(size):
+          if size <= 1 or size % 2 == 0:
+              raise ValueError(f"커널 크기는 3 이상의 홀수여야 합니다: {size}")
+          return np.ones((size, size), dtype=np.uint8)
+
+      morphKernel = makeMorphKernel(5)
+  - type: code
+    language: python
+    title: 커널 오류 확인
+    description: 짝수 커널 크기를 넣어 오류 메시지를 확인합니다.
+    content: |-
+      try:
+          makeMorphKernel(2)
+      except ValueError as exc:
+          morphErrorMessage = str(exc)
+
+      morphErrorMessage
+  - type: code
+    language: python
+    title: 형태 연산 검증
+    description: opening은 노이즈를 줄이고 closing은 구멍을 메우는지 확인합니다.
+    content: |-
+      openedMask = cv2.morphologyEx(morphMask, cv2.MORPH_OPEN, morphKernel)
+      closedMask = cv2.morphologyEx(morphMask, cv2.MORPH_CLOSE, morphKernel)
+      morphChecks = {
+          "openingRemovedNoise": int(np.count_nonzero(openedMask)) < int(np.count_nonzero(morphMask)),
+          "closingFilledPixels": int(np.count_nonzero(closedMask)) > int(np.count_nonzero(morphMask)),
+          "shapeOk": openedMask.shape == morphMask.shape == closedMask.shape,
+          "errorOk": morphErrorMessage == "커널 크기는 3 이상의 홀수여야 합니다: 2",
+      }
+
+      assert all(morphChecks.values()), morphChecks
+      morphChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 커널을 키웠을 때 작은 노이즈 제거가 유지되는지 확인합니다.
+    content: |-
+      largerKernel = makeMorphKernel(7)
+      openedLarge = cv2.morphologyEx(morphMask, cv2.MORPH_OPEN, largerKernel)
+
+      assert int(np.count_nonzero(openedLarge)) <= int(np.count_nonzero(openedMask))
+      int(np.count_nonzero(openedMask)), int(np.count_nonzero(openedLarge))

@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - matplotlib
+    - seaborn
   id: seaborn_00
   title: Seaborn소개
   order: 0
@@ -355,7 +358,7 @@ sections:
 
     - type: text
       content: |-
-        Seaborn은 학습과 예제를 위한 내장 데이터셋을 제공합니다. sns.load_dataset() 함수로 간편하게 불러올 수 있습니다. 이 데이터셋들은 GitHub에서 자동으로 다운로드됩니다.
+        Codaro는 학습과 예제를 위한 로컬 데이터셋을 제공합니다. loadLocalDataset() 함수로 간편하게 불러오며, 인터넷 연결 없이 같은 예제를 재현할 수 있습니다.
 
         이 과정에서는 iris(붓꽃), tips(팁), penguins(펭귄), titanic(타이타닉), flights(항공편), diamonds(다이아몬드), mpg(자동차 연비) 데이터를 사용합니다.
 
@@ -367,7 +370,7 @@ sections:
         - ["penguins", "344", "종, 섬, 부리, 체중", "분포 비교, 다변량"]
         - ["titanic", "891", "생존, 클래스, 성별, 나이", "생존 분석, 범주"]
         - ["flights", "144", "연도, 월, 승객 수", "시계열, 히트맵"]
-        - ["diamonds", "53940", "캐럿, 컷, 색상, 가격", "대용량, 분포"]
+        - ["diamonds", "5400", "캐럿, 컷, 색상, 가격", "대용량, 분포"]
         - ["mpg", "398", "연비, 실린더, 마력, 원산지", "회귀, 다변량"]
 
 - id: when_to_use
@@ -419,3 +422,85 @@ sections:
       emoji: "👉"
       title: "다음: 붓꽃 품종 산점도"
       subtitle: "scatterplot으로 품종별 꽃잎 특성을 시각화합니다"
+
+- id: workflow_validation
+  title: 17단계. Seaborn 학습 흐름 검증
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      Seaborn 입문은 함수 이름을 외우는 과정이 아닙니다. 어떤 질문에 어떤 차트를 고르고, 데이터 구조가 그 차트에 맞는지 확인한 뒤, 완성된 Axes가 보고서에 들어갈 수준인지 점검해야 합니다.
+  - type: code
+    language: python
+    title: 로컬 데이터와 학습 예측 확인
+    description: tips 데이터로 분포와 관계 차트에 필요한 컬럼을 확인합니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
+
+      seabornTips = loadLocalDataset("tips")
+      requiredColumns = {"total_bill", "tip", "sex", "smoker", "day", "time", "size"}
+      missingColumns = requiredColumns - set(seabornTips.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert len(seabornTips) >= 100
+      assert seabornTips["total_bill"].gt(seabornTips["tip"]).all()
+
+      prediction = "계산 금액이 클수록 팁도 대체로 커질 것이다"
+      correlation = seabornTips[["total_bill", "tip"]].corr().loc["total_bill", "tip"]
+      assert correlation > 0.6
+
+      print(prediction, round(correlation, 3))
+  - type: code
+    language: python
+    title: 차트 선택과 객체 검증
+    description: scatterplot이 관계 질문을 실제 축과 제목으로 표현했는지 확인합니다
+    content: |-
+      figIntro, axIntro = plt.subplots(figsize=(7, 5))
+      sns.scatterplot(data=seabornTips, x="total_bill", y="tip", hue="time", ax=axIntro)
+      axIntro.set_title("Tip grows with bill size")
+      axIntro.set_xlabel("Total bill")
+      axIntro.set_ylabel("Tip")
+
+      assert axIntro.get_xlabel() == "Total bill"
+      assert axIntro.get_ylabel() == "Tip"
+      assert "Tip grows" in axIntro.get_title()
+      assert axIntro.get_legend() is not None
+
+      figIntro
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 차트에 필요한 컬럼이 없을 때 조용히 진행하지 않고 실패시킵니다
+    content: |-
+      def requireChartColumns(frame, columns):
+          missing = set(columns) - set(frame.columns)
+          if missing:
+              raise ValueError(f"차트에 필요한 컬럼이 없습니다: {sorted(missing)}")
+          return True
+
+      brokenTips = seabornTips.drop(columns=["tip"])
+      try:
+          requireChartColumns(brokenTips, ["total_bill", "tip"])
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert requireChartColumns(seabornTips, ["total_bill", "tip"])
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: hue 후보를 바꿔 분석 질문이 어떻게 달라지는지 비교합니다
+    content: |-
+      hueCandidates = ["time", "smoker", "day"]
+      hueSummary = []
+      for hueColumn in hueCandidates:
+          groupCount = seabornTips[hueColumn].nunique()
+          tipSpread = seabornTips.groupby(hueColumn)["tip"].mean().max() - seabornTips.groupby(hueColumn)["tip"].mean().min()
+          hueSummary.append({"hue": hueColumn, "groups": int(groupCount), "tipSpread": round(float(tipSpread), 2)})
+
+      assert hueSummary[0]["groups"] == 2
+      assert max(item["tipSpread"] for item in hueSummary) > 1.0
+      hueSummary
+  - type: tip
+    content: "입문 레슨도 로컬 데이터, 예측, 검증, 변주를 한 번 통과해야 뒤 레슨의 차트 선택 기준이 생깁니다."

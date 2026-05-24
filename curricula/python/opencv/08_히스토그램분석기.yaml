@@ -395,3 +395,69 @@ sections:
         axDark[2].set_title('CLAHE Enhanced')
         axDark[2].axis('off')
         plt.tight_layout()
+
+- id: workflow_validation
+  title: 7단계. 히스토그램 개선 검증 루프
+  subtitle: 대비 개선과 입력 채널 확인
+  blocks:
+  - type: text
+    content: 히스토그램 평활화는 대비가 좋아 보이는지보다 실제 동적 범위가 넓어졌는지 확인해야 합니다. 그레이스케일 입력을 검증하고 equalizeHist와 CLAHE 결과를 수치로 비교합니다.
+  - type: code
+    language: python
+    title: 저대비 이미지 준비
+    description: 좁은 밝기 범위를 가진 이미지를 만듭니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      histGradient = np.tile(np.linspace(95, 155, 160, dtype=np.uint8), (100, 1))
+      cv2.rectangle(histGradient, (45, 25), (115, 75), 135, -1)
+
+      def validateGrayImage(image):
+          if image.ndim != 2:
+              raise ValueError(f"히스토그램 평활화는 그레이스케일 입력이 필요합니다: {image.shape}")
+          return True
+
+      validateGrayImage(histGradient)
+  - type: code
+    language: python
+    title: 채널 오류 확인
+    description: 컬러 이미지를 넣어 검증 실패를 확인합니다.
+    content: |-
+      colorHistInput = np.dstack([histGradient, histGradient, histGradient])
+
+      try:
+          validateGrayImage(colorHistInput)
+      except ValueError as exc:
+          histErrorMessage = str(exc)
+
+      histErrorMessage
+  - type: code
+    language: python
+    title: 대비 개선 검증
+    description: 평활화 후 밝기 범위가 넓어졌는지 확인합니다.
+    content: |-
+      equalizedHistImage = cv2.equalizeHist(histGradient)
+      clahe = cv2.createCLAHE(clipLimit=2.0, tileGridSize=(8, 8))
+      claheHistImage = clahe.apply(histGradient)
+      originalRange = int(histGradient.max()) - int(histGradient.min())
+      equalizedRange = int(equalizedHistImage.max()) - int(equalizedHistImage.min())
+      histChecks = {
+          "equalizedExpandedRange": equalizedRange > originalRange,
+          "claheShapeOk": claheHistImage.shape == histGradient.shape,
+          "histogramMassOk": int(cv2.calcHist([histGradient], [0], None, [256], [0, 256]).sum()) == histGradient.size,
+          "errorOk": histErrorMessage.startswith("히스토그램 평활화는 그레이스케일 입력이 필요합니다"),
+      }
+
+      assert all(histChecks.values()), histChecks
+      histChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: CLAHE clipLimit을 바꾸면 대비 표준편차가 달라지는지 확인합니다.
+    content: |-
+      softClahe = cv2.createCLAHE(clipLimit=1.0, tileGridSize=(8, 8)).apply(histGradient)
+      strongClahe = cv2.createCLAHE(clipLimit=4.0, tileGridSize=(8, 8)).apply(histGradient)
+
+      assert float(strongClahe.std()) >= float(softClahe.std())
+      float(softClahe.std()), float(strongClahe.std())

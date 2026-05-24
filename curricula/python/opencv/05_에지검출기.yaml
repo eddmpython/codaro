@@ -375,3 +375,68 @@ sections:
         axHeat[1].axis('off')
         plt.colorbar(im, ax=axHeat[1], fraction=0.046, pad=0.04)
         plt.tight_layout()
+
+- id: workflow_validation
+  title: 7단계. 에지 검출 검증 루프
+  subtitle: 임계값과 에지 픽셀 확인
+  blocks:
+  - type: text
+    content: 에지 검출은 선이 보이는지보다 필요한 경계가 충분히 잡히는지를 검증해야 합니다. Canny 임계값 순서를 확인하고, 검출된 에지 픽셀 수로 결과를 평가합니다.
+  - type: code
+    language: python
+    title: 문서형 테스트 이미지 준비
+    description: 사각형과 대각선이 있는 흑백 이미지를 만듭니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      edgeImage = np.zeros((120, 160), dtype=np.uint8)
+      cv2.rectangle(edgeImage, (30, 25), (130, 95), 255, -1)
+      cv2.line(edgeImage, (35, 30), (125, 90), 0, 4)
+
+      def validateCannyThresholds(low, high):
+          if low <= 0 or high <= 0 or low >= high:
+              raise ValueError(f"Canny 임계값 순서 오류: low={low}, high={high}")
+          return True
+
+      validateCannyThresholds(50, 150)
+  - type: code
+    language: python
+    title: 임계값 오류 확인
+    description: low가 high보다 큰 설정을 넣어 실패를 확인합니다.
+    content: |-
+      try:
+          validateCannyThresholds(180, 80)
+      except ValueError as exc:
+          cannyErrorMessage = str(exc)
+
+      cannyErrorMessage
+  - type: code
+    language: python
+    title: 에지 결과 검증
+    description: Canny, Sobel, Laplacian 결과의 기본 조건을 확인합니다.
+    content: |-
+      cannyEdges = cv2.Canny(edgeImage, 50, 150)
+      sobelX = cv2.Sobel(edgeImage, cv2.CV_64F, 1, 0, ksize=3)
+      laplacianEdges = cv2.Laplacian(edgeImage, cv2.CV_64F)
+      edgeChecks = {
+          "cannyHasEdges": int(np.count_nonzero(cannyEdges)) > 300,
+          "sobelHasSignal": float(np.abs(sobelX).sum()) > 0,
+          "laplacianHasSignal": float(np.abs(laplacianEdges).sum()) > 0,
+          "errorOk": cannyErrorMessage == "Canny 임계값 순서 오류: low=180, high=80",
+      }
+
+      assert all(edgeChecks.values()), edgeChecks
+      edgeChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 임계값을 높이면 검출 에지가 줄거나 같아지는지 비교합니다.
+    content: |-
+      relaxedCanny = cv2.Canny(edgeImage, 30, 90)
+      strictCanny = cv2.Canny(edgeImage, 120, 220)
+      relaxedEdgeCount = int(np.count_nonzero(relaxedCanny))
+      strictEdgeCount = int(np.count_nonzero(strictCanny))
+
+      assert relaxedEdgeCount >= strictEdgeCount
+      relaxedEdgeCount, strictEdgeCount

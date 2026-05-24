@@ -36,8 +36,7 @@ sections:
       import plotly.graph_objects as go
       import pandas as pd
 
-      baseUrl = "https://raw.githubusercontent.com"
-      tips = pd.read_csv(f"{baseUrl}/mwaskom/seaborn-data/master/tips.csv")
+      tips = px.data.tips()
       tips
   - type: tip
     content: "from plotly.subplots import make_subplots는 여러 차트를 하나의 Figure에 배치하는 기능을 제공합니다. plotly.graph_objects는 go로 줄여 쓰며, Bar, Box, Scatter 등 저수준 차트 객체를 직접 생성할 때 사용합니다. px(plotly.express)는 고수준 간편 인터페이스이고, go는 세밀한 제어가 가능한 저수준 인터페이스입니다. 복잡한 대시보드 작업 시 두 방식을 혼용합니다."
@@ -155,7 +154,7 @@ sections:
           nbinsy=25,
           marginal_x='histogram',
           marginal_y='histogram',
-          color_continuous_scale='Viridis',
+          color_continuous_scale=px.colors.sequential.Viridis,
           title='결제금액-팁 관계 (히스토그램 포함)'
       )
       figHeatmapEnhanced
@@ -280,6 +279,119 @@ sections:
       dashboard.update_yaxes(showgrid=True, gridcolor='lightgray')
       dashboard
 
+- id: step10_workflow
+  title: 10단계. 실무 대시보드 검증
+  subtitle: 예측 → 오류 확인 → figure 검증 → 운영 기준 실험
+  blocks:
+  - type: text
+    content: |-
+      대시보드는 차트 여러 개를 붙였다고 끝나지 않습니다. 실무에서는 핵심 지표가 빠지지 않았는지, trace 수와 타입이 맞는지, 분석 기준을 바꿔도 결과가 말이 되는지 확인해야 합니다.
+
+      이번 단계에서는 매출이 가장 높은 요일과 시간대를 먼저 예상합니다. 그다음 일부 trace가 빠진 대시보드를 일부러 실패시킨 뒤, 완성 대시보드의 trace 타입과 데이터 구성을 검증합니다.
+  - type: code
+    language: python
+    title: 매출 리포트 기준 만들기
+    description: 요일과 시간대별 핵심 지표 계산
+    content: |-
+      requiredColumns = {"total_bill", "tip", "day", "time", "sex", "smoker", "size"}
+      missingColumns = requiredColumns - set(tips.columns)
+      if missingColumns:
+          raise ValueError(f"tips 데이터에 필요한 컬럼이 없습니다: {sorted(missingColumns)}")
+
+      revenueByDay = (
+          tips.groupby("day", as_index=False)["total_bill"]
+          .sum()
+          .sort_values("total_bill", ascending=False)
+      )
+      revenueByTime = (
+          tips.groupby("time", as_index=False)["total_bill"]
+          .sum()
+          .sort_values("total_bill", ascending=False)
+      )
+
+      bestRevenueDay = revenueByDay.iloc[0]["day"]
+      bestRevenueTime = revenueByTime.iloc[0]["time"]
+
+      print("예상: 매출 최고 요일/시간대는", bestRevenueDay, bestRevenueTime)
+      revenueByDay
+  - type: code
+    language: python
+    title: 대시보드 검사 함수
+    description: trace 타입과 제목 검증
+    content: |-
+      def validateTipsDashboard(fig, expectedTraceCount):
+          spec = fig.to_dict()
+          traces = spec.get("data", [])
+          if len(traces) != expectedTraceCount:
+              raise ValueError(f"대시보드 trace 수가 다릅니다: {len(traces)} != {expectedTraceCount}")
+
+          traceTypes = [trace.get("type") for trace in traces]
+          requiredTypes = {"bar", "box", "histogram2d"}
+          missingTypes = requiredTypes - set(traceTypes)
+          if missingTypes:
+              raise ValueError(f"필수 차트 타입이 빠졌습니다: {sorted(missingTypes)}")
+
+          titleText = spec.get("layout", {}).get("title", {}).get("text", "")
+          if "팁 분석" not in titleText:
+              raise ValueError("대시보드 제목에 분석 주제가 드러나지 않습니다.")
+
+          return spec
+
+
+      brokenDashboard = make_subplots(rows=1, cols=1, subplot_titles=["요일별 평균 팁"])
+      brokenDashboard.add_trace(
+          go.Bar(x=tipsByDay["day"], y=tipsByDay["tip"]),
+          row=1,
+          col=1,
+      )
+      brokenDashboard.update_layout(title_text="팁 분석 대시보드")
+
+      try:
+          validateTipsDashboard(brokenDashboard, expectedTraceCount=6)
+      except ValueError as exc:
+          print("의도한 오류 확인:", exc)
+      else:
+          raise AssertionError("일부 trace가 빠진 대시보드를 통과시키면 안 됩니다.")
+  - type: code
+    language: python
+    title: 완성 대시보드 검증
+    description: 기존 dashboard 구조 확인
+    content: |-
+      dashboardSpec = validateTipsDashboard(dashboard, expectedTraceCount=6)
+      dashboardTraceTypes = [trace.get("type") for trace in dashboardSpec["data"]]
+
+      assert "histogram2d" in dashboardTraceTypes
+      assert dashboardTraceTypes.count("box") == 4
+      assert bestRevenueTime == "Dinner"
+
+      print("검증 완료:", dashboardTraceTypes)
+      dashboard
+  - type: code
+    language: python
+    title: 운영 기준 실험
+    description: 고액 결제 기준 변경 비교
+    content: |-
+      def summarizeHighValueOrders(data, minimumBill):
+          target = data[data["total_bill"] >= minimumBill]
+          if target.empty:
+              raise ValueError(f"{minimumBill} 이상 결제 건이 없습니다.")
+          return {
+              "minimumBill": minimumBill,
+              "orderCount": len(target),
+              "revenue": round(target["total_bill"].sum(), 2),
+              "avgTip": round(target["tip"].mean(), 2),
+          }
+
+
+      over30 = summarizeHighValueOrders(tips, 30)
+      over40 = summarizeHighValueOrders(tips, 40)
+
+      assert over30["orderCount"] >= over40["orderCount"]
+      assert over30["revenue"] >= over40["revenue"]
+      assert over40["avgTip"] >= over30["avgTip"]
+
+      pd.DataFrame([over30, over40])
+
 - id: practice
   title: 실습
   subtitle: 팁 분석 확장 프로젝트
@@ -297,8 +409,7 @@ sections:
         import plotly.express as px
         import pandas as pd
 
-        billUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-        billData = pd.read_csv(billUrl)
+        billData = px.data.tips()
     - type: code
       title: "차트 생성"
       content: |-
@@ -320,8 +431,7 @@ sections:
         import plotly.express as px
         import pandas as pd
 
-        smokerUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-        smokerDf = pd.read_csv(smokerUrl)
+        smokerDf = px.data.tips()
         smokerDf['tipRate'] = smokerDf['tip'] / smokerDf['total_bill'] * 100
     - type: code
       title: "차트 생성"

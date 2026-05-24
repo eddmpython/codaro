@@ -28,6 +28,7 @@ PACKAGE_ALIASES = {
 }
 STDLIB_MODULES = set(getattr(sys, "stdlib_module_names", set())) | {
     "__future__",
+    "codaro",
     "typing_extensions",
 }
 IMPORT_RE = re.compile(r"^\s*(?:import\s+([A-Za-z_][\w.]*)|from\s+([A-Za-z_][\w.]*)\s+import\s+)", re.M)

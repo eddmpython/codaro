@@ -3,7 +3,7 @@ meta:
   title: "반복문"
   day: 14
   category: "30days"
-  tags: []
+  tags: ["반복문", "for", "while", "break", "continue", "주문처리", "검증"]
   seo:
     title: "파이썬 반복문 - for, while로 반복 작업"
     description: "for, while, range, break, continue, else절을 배웁니다."
@@ -539,6 +539,142 @@ sections:
       coords
   - type: "tip"
     content: "중첩이 깊어지면 성능에 영향을 줄 수 있으니 주의하세요."
+
+- id: "workflow_validation"
+  title: "실무 반복 처리 루프"
+  subtitle: "예측 → 누적 → 오류 확인 → 검증"
+  blocks:
+  - type: "text"
+    content: "반복문은 리스트를 한 번 훑는 문법이 아니라, 업무 데이터를 규칙대로 걸러내고 누적하고 검증하는 도구입니다. 실행 전에는 어떤 주문이 합계에 들어갈지 예측하고, 누락된 컬럼이나 음수 금액 같은 오류를 반복문 안에서 확인해야 합니다."
+  - type: "list"
+    items:
+    - "for는 주문 목록처럼 정해진 데이터를 한 건씩 처리할 때 맞습니다."
+    - "continue는 취소나 대기 상태처럼 이번 건을 건너뛸 때 씁니다."
+    - "break는 목표를 찾으면 더 볼 필요가 없을 때 씁니다."
+    - "while은 재시도 횟수처럼 조건이 끝날 때까지 반복할 때 씁니다."
+  - type: "code"
+    language: "python"
+    title: "주문 데이터 준비"
+    description: "실행 전에 paid 금액 합계와 큰 주문 목록을 먼저 예측해보세요."
+    content: |-
+      dailyOrders = [
+          {"id": "O-101", "status": "paid", "amount": 120000},
+          {"id": "O-102", "status": "cancelled", "amount": 50000},
+          {"id": "O-103", "status": "paid", "amount": 45000},
+          {"id": "O-104", "status": "pending", "amount": 90000},
+          {"id": "O-105", "status": "paid", "amount": 210000},
+      ]
+
+      len(dailyOrders)
+  - type: "code"
+    language: "python"
+    title: "반복문으로 업무 요약 만들기"
+    description: "취소/대기 주문은 건너뛰고 결제 완료 주문만 누적합니다."
+    content: |-
+      def summarizePaidOrders(orders):
+          summary = {
+              "paidCount": 0,
+              "paidAmount": 0,
+              "cancelledCount": 0,
+              "largeOrders": [],
+          }
+          for order in orders:
+              if order["status"] == "cancelled":
+                  summary["cancelledCount"] = summary["cancelledCount"] + 1
+                  continue
+              if order["status"] != "paid":
+                  continue
+
+              summary["paidCount"] = summary["paidCount"] + 1
+              summary["paidAmount"] = summary["paidAmount"] + order["amount"]
+              if order["amount"] >= 100000:
+                  summary["largeOrders"].append(order["id"])
+          return summary
+
+      orderSummary = summarizePaidOrders(dailyOrders)
+      orderSummary
+  - type: "code"
+    language: "python"
+    title: "누락 데이터 오류 확인"
+    description: "반복 처리 전에 필수 키가 빠진 주문을 잡아냅니다."
+    content: |-
+      def validateOrders(orders):
+          requiredKeys = {"id", "status", "amount"}
+          for rowNumber, order in enumerate(orders, start=1):
+              missingKeys = sorted(requiredKeys - set(order))
+              if missingKeys:
+                  raise ValueError(f"{rowNumber}번째 주문 필수값 누락: {missingKeys}")
+              if order["amount"] < 0:
+                  raise ValueError(f"{rowNumber}번째 주문 금액 오류: {order['amount']}")
+          return True
+
+      brokenOrders = dailyOrders + [{"id": "O-999", "amount": 30000}]
+      try:
+          validateOrders(brokenOrders)
+      except ValueError as exc:
+          orderErrorMessage = str(exc)
+
+      orderErrorMessage
+  - type: "code"
+    language: "python"
+    title: "예상값으로 검증"
+    description: "반복문 결과가 업무 규칙과 일치하는지 점검합니다."
+    content: |-
+      expectedSummary = {
+          "paidCount": 3,
+          "paidAmount": 375000,
+          "cancelledCount": 1,
+          "largeOrders": ["O-101", "O-105"],
+      }
+
+      checks = {
+          "summaryOk": orderSummary == expectedSummary,
+          "validationOk": validateOrders(dailyOrders),
+          "errorOk": orderErrorMessage == "6번째 주문 필수값 누락: ['status']",
+      }
+
+      assert all(checks.values())
+      checks
+  - type: "code"
+    language: "python"
+    title: "while 재시도 루프"
+    description: "실패한 전송을 최대 3번까지만 재시도합니다."
+    content: |-
+      retryQueue = [
+          {"id": "M-1", "succeedsAt": 2},
+          {"id": "M-2", "succeedsAt": 4},
+      ]
+
+      retryResults = {}
+      for message in retryQueue:
+          attempt = 0
+          delivered = False
+          while attempt < 3:
+              attempt = attempt + 1
+              if attempt >= message["succeedsAt"]:
+                  delivered = True
+                  break
+          retryResults[message["id"]] = {"delivered": delivered, "attempts": attempt}
+
+      retryResults
+  - type: "code"
+    language: "python"
+    title: "수정 실험"
+    description: "큰 주문 기준을 바꾸면 결과가 어떻게 달라지는지 비교합니다."
+    content: |-
+      def collectLargeOrders(orders, threshold):
+          largeOrders = []
+          for order in orders:
+              if order["status"] == "paid" and order["amount"] >= threshold:
+                  largeOrders.append(order["id"])
+          return largeOrders
+
+      defaultLargeOrders = collectLargeOrders(dailyOrders, 100000)
+      strictLargeOrders = collectLargeOrders(dailyOrders, 200000)
+
+      defaultLargeOrders, strictLargeOrders
+  - type: "tip"
+    content: "반복문은 많이 돌리는 것이 목표가 아닙니다. 어떤 건을 처리하고, 어떤 건을 건너뛰고, 언제 멈추며, 결과가 맞는지 검증하는 흐름까지 함께 설계해야 실제 업무 자동화가 됩니다."
 
 - id: "practice"
   title: "Day 14 종합 복습"

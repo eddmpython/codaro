@@ -31,6 +31,7 @@ sections:
     description: "os 모듈을 불러오고 정상 작동을 확인합니다."
     content: |-
       import os
+      import tempfile
 
       # 정상 로드 확인
       os.name
@@ -172,8 +173,9 @@ sections:
     title: "디렉토리 생성"
     description: "새 디렉토리를 생성합니다."
     content: |-
-      testDir = '/tmp/test_folder'
-      os.mkdir(testDir)
+      testDir = os.path.join(tempfile.gettempdir(), 'codaro_os_test_folder')
+      if not os.path.exists(testDir):
+          os.mkdir(testDir)
       dirCreated = os.path.exists(testDir)
       dirCreated
   - type: "code"
@@ -181,7 +183,8 @@ sections:
     title: "디렉토리 삭제"
     description: "빈 디렉토리를 삭제합니다."
     content: |-
-      removeDir = '/tmp/test_folder'
+      removeDir = os.path.join(tempfile.gettempdir(), 'codaro_os_test_folder')
+      os.makedirs(removeDir, exist_ok=True)
       os.rmdir(removeDir)
       dirRemoved = not os.path.exists(removeDir)
       dirRemoved
@@ -206,7 +209,7 @@ sections:
     title: "파일 크기"
     description: "파일의 크기를 바이트 단위로 확인합니다."
     content: |-
-      testFile = '/tmp/sample.txt'
+      testFile = os.path.join(tempfile.gettempdir(), 'codaro_os_sample.txt')
       with open(testFile, 'w') as f:
           f.write('Hello, World!')
       fileSize = os.path.getsize(testFile)
@@ -216,8 +219,12 @@ sections:
     title: "파일 이름 변경"
     description: "파일의 이름을 변경합니다."
     content: |-
-      oldName = '/tmp/sample.txt'
-      newName = '/tmp/renamed.txt'
+      oldName = os.path.join(tempfile.gettempdir(), 'codaro_os_sample.txt')
+      newName = os.path.join(tempfile.gettempdir(), 'codaro_os_renamed.txt')
+      with open(oldName, 'w') as f:
+          f.write('rename target')
+      if os.path.exists(newName):
+          os.remove(newName)
       os.rename(oldName, newName)
       renamed = os.path.exists(newName)
       renamed
@@ -226,7 +233,9 @@ sections:
     title: "파일 삭제"
     description: "파일을 삭제합니다."
     content: |-
-      fileToDelete = '/tmp/renamed.txt'
+      fileToDelete = os.path.join(tempfile.gettempdir(), 'codaro_os_renamed.txt')
+      with open(fileToDelete, 'w') as f:
+          f.write('delete target')
       os.remove(fileToDelete)
       deleted = not os.path.exists(fileToDelete)
       deleted
@@ -235,7 +244,7 @@ sections:
     title: "파일 정보"
     description: "파일의 상세 정보를 확인합니다."
     content: |-
-      infoFile = '/tmp/info_test.txt'
+      infoFile = os.path.join(tempfile.gettempdir(), 'codaro_os_info_test.txt')
       with open(infoFile, 'w') as f:
           f.write('File info test')
       fileInfo = os.stat(infoFile)
@@ -293,6 +302,126 @@ sections:
       pathDelimiter
   - type: "tip"
     content: "Codaro 로컬 커널에서는 프로세스 환경 변수를 읽고 현재 실행 프로세스 범위에서 수정할 수 있습니다. 영구 설정은 운영체제 환경 변수 설정에서 관리하세요."
+
+- id: "workflow_validation"
+  title: "검증 루프: 파일 수집 자동화"
+  subtitle: "임시 작업공간, 경로 검증, 안전한 파일 집계"
+  blocks:
+  - type: "text"
+    content: "os 모듈은 실제 파일시스템을 바꾸기 때문에 실습용 임시 작업공간을 먼저 만들고, 경로가 그 안에 있는지 검증해야 합니다. 파일 크기 집계와 경로 traversal 방어까지 확인하면 로컬 자동화 스크립트로 바로 가져갈 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "임시 작업공간 파일 집계"
+    description: "임시 폴더에 샘플 파일을 만들고 확장자별 크기를 검증합니다."
+    content: |-
+      workspaceDir = tempfile.mkdtemp(prefix='codaro_os_workflow_')
+      inputDir = os.path.join(workspaceDir, 'input')
+      os.makedirs(inputDir, exist_ok=True)
+
+      sampleFiles = {
+          'sales.csv': 'id,amount\n1,100\n2,150\n',
+          'notes.txt': 'daily notes',
+          'error.log': 'ERROR failed\nINFO ok\n',
+      }
+
+      for filename, content in sampleFiles.items():
+          with open(os.path.join(inputDir, filename), 'w', encoding='utf-8') as file:
+              file.write(content)
+
+      def summarizeFiles(folder):
+          summary = {}
+          for filename in os.listdir(folder):
+              filePath = os.path.join(folder, filename)
+              if not os.path.isfile(filePath):
+                  continue
+              extension = os.path.splitext(filename)[1]
+              summary[extension] = summary.get(extension, 0) + os.path.getsize(filePath)
+          return summary
+
+      fileSummary = summarizeFiles(inputDir)
+
+      assert set(fileSummary) == {'.csv', '.txt', '.log'}
+      assert fileSummary['.csv'] > fileSummary['.txt']
+      assert sum(fileSummary.values()) == sum(os.path.getsize(os.path.join(inputDir, name)) for name in sampleFiles)
+
+      fileSummary
+  - type: "code"
+    language: "python"
+    title: "안전한 경로 결합"
+    description: "사용자 입력 경로가 기준 폴더 밖으로 나가지 못하게 검증합니다."
+    content: |-
+      def safeJoin(baseDir, userPath):
+          basePath = os.path.abspath(baseDir)
+          targetPath = os.path.abspath(os.path.join(basePath, userPath))
+          if os.path.commonpath([basePath, targetPath]) != basePath:
+              raise ValueError(f"허용된 작업공간 밖입니다: {userPath}")
+          return targetPath
+
+      safeReportPath = safeJoin(inputDir, 'reports/result.txt')
+
+      try:
+          safeJoin(inputDir, '../../secrets.txt')
+      except ValueError as exc:
+          pathProblem = str(exc)
+
+      assert safeReportPath.endswith(os.path.join('reports', 'result.txt'))
+      assert '허용된 작업공간 밖입니다' in pathProblem
+
+      safeReportPath, pathProblem
+  - type: "code"
+    language: "python"
+    title: "환경 변수 기본값 검증"
+    description: "환경 변수가 없을 때 안전한 기본값을 사용하는지 확인합니다."
+    content: |-
+      previousMode = os.environ.get('CODARO_ENV')
+      if 'CODARO_ENV' in os.environ:
+          del os.environ['CODARO_ENV']
+
+      modeWithDefault = os.getenv('CODARO_ENV', 'local')
+      os.environ['CODARO_ENV'] = 'test'
+      modeFromEnv = os.getenv('CODARO_ENV', 'local')
+
+      if previousMode is not None:
+          os.environ['CODARO_ENV'] = previousMode
+      else:
+          del os.environ['CODARO_ENV']
+
+      assert modeWithDefault == 'local'
+      assert modeFromEnv == 'test'
+
+      modeWithDefault, modeFromEnv
+  - type: "code"
+    language: "python"
+    title: "일괄 이름 변경 계획"
+    description: "rename 실행 전에 변경 계획을 만들고 충돌 여부를 검증합니다."
+    content: |-
+      renameDir = os.path.join(workspaceDir, 'rename')
+      os.makedirs(renameDir, exist_ok=True)
+      for filename in ['raw_01.tmp', 'raw_02.tmp', 'keep.txt']:
+          with open(os.path.join(renameDir, filename), 'w', encoding='utf-8') as file:
+              file.write(filename)
+
+      renamePlan = []
+      for filename in os.listdir(renameDir):
+          if filename.endswith('.tmp'):
+              source = os.path.join(renameDir, filename)
+              target = os.path.join(renameDir, filename.replace('.tmp', '.bak'))
+              renamePlan.append((source, target))
+
+      assert len(renamePlan) == 2
+      assert all(os.path.commonpath([renameDir, source]) == renameDir for source, target in renamePlan)
+      assert all(not os.path.exists(target) for source, target in renamePlan)
+
+      for source, target in renamePlan:
+          os.rename(source, target)
+
+      renamedFiles = sorted(name for name in os.listdir(renameDir) if name.endswith('.bak'))
+      assert renamedFiles == ['raw_01.bak', 'raw_02.bak']
+
+      renamedFiles
+  - type: "tip"
+    title: "변주 실험"
+    content: "이름 변경을 실제 실행하지 않고 dry-run 목록만 출력하는 모드를 추가하고, 충돌 파일이 있을 때 실행을 중단하는 검증을 붙이세요."
 
 - id: "practice"
   title: "os 모듈 종합 복습"
@@ -375,7 +504,7 @@ sections:
   - type: "expansion"
     title: "🔴 심화1: 디렉토리 구조 생성"
     code: |-
-      projectPath = '/tmp/project/src/utils'
+      projectPath = os.path.join(tempfile.gettempdir(), 'codaro_os_project', 'src', 'utils')
       os.makedirs(projectPath, exist_ok=True)
       created = os.path.exists(projectPath)
       created
@@ -383,7 +512,7 @@ sections:
   - type: "expansion"
     title: "🔴 심화2: 확장자별 파일 필터"
     code: |-
-      testFolder = '/tmp/files'
+      testFolder = os.path.join(tempfile.gettempdir(), 'codaro_os_files')
       os.makedirs(testFolder, exist_ok=True)
       for name in ['file1.txt', 'file2.py', 'file3.txt', 'readme.md']:
           open(os.path.join(testFolder, name), 'w').close()
@@ -394,7 +523,7 @@ sections:
   - type: "expansion"
     title: "🔴 심화3: 파일 크기 합계"
     code: |-
-      sizeFolder = '/tmp/size_test'
+      sizeFolder = os.path.join(tempfile.gettempdir(), 'codaro_os_size_test')
       os.makedirs(sizeFolder, exist_ok=True)
       for i in range(3):
           with open(os.path.join(sizeFolder, f'file{i}.dat'), 'w') as f:
@@ -406,7 +535,7 @@ sections:
   - type: "expansion"
     title: "🔴 심화4: 파일 이름 일괄 변경"
     code: |-
-      renameFolder = '/tmp/rename_test'
+      renameFolder = os.path.join(tempfile.gettempdir(), 'codaro_os_rename_test')
       os.makedirs(renameFolder, exist_ok=True)
       for name in ['data1.tmp', 'data2.tmp', 'keep.txt']:
           open(os.path.join(renameFolder, name), 'w').close()
@@ -414,6 +543,8 @@ sections:
       for oldFile in tmpFiles:
           oldPath = os.path.join(renameFolder, oldFile)
           newPath = os.path.join(renameFolder, oldFile.replace('.tmp', '.bak'))
+          if os.path.exists(newPath):
+              os.remove(newPath)
           os.rename(oldPath, newPath)
       bakFiles = [f for f in os.listdir(renameFolder) if f.endswith('.bak')]
       bakFiles
@@ -421,7 +552,7 @@ sections:
   - type: "expansion"
     title: "🔴 심화5: 디렉토리 트리 출력"
     code: |-
-      treeRoot = '/tmp/tree'
+      treeRoot = os.path.join(tempfile.gettempdir(), 'codaro_os_tree')
       os.makedirs(os.path.join(treeRoot, 'sub1'), exist_ok=True)
       os.makedirs(os.path.join(treeRoot, 'sub2'), exist_ok=True)
       open(os.path.join(treeRoot, 'root.txt'), 'w').close()
@@ -452,7 +583,7 @@ sections:
   - type: "expansion"
     title: "🔴 심화8: 파일 존재 확인 후 생성"
     code: |-
-      checkPath = '/tmp/check_or_create.txt'
+      checkPath = os.path.join(tempfile.gettempdir(), 'codaro_os_check_or_create.txt')
       if not os.path.exists(checkPath):
           with open(checkPath, 'w') as f:
               f.write('Created')
@@ -464,16 +595,17 @@ sections:
   - type: "expansion"
     title: "🔴 심화9: 안전한 경로 결합"
     code: |-
-      baseDir = '/var/www/uploads'
+      baseDir = os.path.join(tempfile.gettempdir(), 'codaro_os_uploads')
+      os.makedirs(baseDir, exist_ok=True)
       userInput = '../../../etc/passwd'
       safePath = os.path.abspath(os.path.join(baseDir, userInput))
-      isSafe = safePath.startswith(os.path.abspath(baseDir))
+      isSafe = os.path.commonpath([os.path.abspath(baseDir), safePath]) == os.path.abspath(baseDir)
       (safePath, isSafe)
 
   - type: "expansion"
     title: "🔴 심화10: 디렉토리 크기 계산"
     code: |-
-      calcRoot = '/tmp/calc_size'
+      calcRoot = os.path.join(tempfile.gettempdir(), 'codaro_os_calc_size')
       os.makedirs(os.path.join(calcRoot, 'sub'), exist_ok=True)
       with open(os.path.join(calcRoot, 'file1.dat'), 'w') as f:
           f.write('a' * 200)

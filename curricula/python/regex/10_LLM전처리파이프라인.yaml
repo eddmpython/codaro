@@ -24,26 +24,52 @@ sections:
   - type: code
     language: python
     title: 라이브러리 불러오기
-    description: 정규표현식과 데이터 로드
+    description: 정규표현식 모듈
     content: |-
       import re
-      import json
-      from urllib.request import urlopen
-
 - id: step2_load_data
   title: 2단계. 실제 웹 데이터 로드
-  subtitle: JSONPlaceholder posts + HTML
+  subtitle: 로컬 게시글 + HTML
   blocks:
   - type: text
-    content: 실제 웹에서 크롤링한 것처럼 HTML이 포함된 데이터를 만듭니다. 웹 페이지에는 본문 외에도 script, style 태그, 메타 정보 등 LLM 입력에 불필요한 요소가 많습니다. 또한 개인정보가 포함되어 있을 수 있어 마스킹이 필요합니다.
+    content: 실제 웹에서 크롤링한 것처럼 HTML이 포함된 로컬 게시글 입력을 만듭니다. 웹 페이지에는 본문 외에도 script, style 태그, 메타 정보 등 LLM 입력에 불필요한 요소가 많습니다. 또한 개인정보가 포함될 수 있으므로 마스킹까지 포함한 종합 파이프라인을 끝까지 실습합니다.
   - type: code
     language: python
     title: 웹 데이터 로드
-    description: JSONPlaceholder에서 게시글을 가져와 HTML 추가
+    description: 로컬 게시글 샘플로 HTML 입력을 만듭니다
     content: |-
-      postsData = json.loads(
-          urlopen("https://jsonplaceholder.typicode.com/posts").read()
-      )
+      postsData = [
+          {
+              "userId": 1,
+              "id": 1,
+              "title": "Support article about account recovery",
+              "body": "Reset flow failed for user hana@blog.com, phone 010-1234-5678.",
+          },
+          {
+              "userId": 2,
+              "id": 2,
+              "title": "Release note draft",
+              "body": "Remove tracking scripts, compress whitespace, and mask private fields.",
+          },
+          {
+              "userId": 3,
+              "id": 3,
+              "title": "Crawler quality report",
+              "body": "Navigation links, style blocks, and duplicate banners polluted the page.",
+          },
+          {
+              "userId": 4,
+              "id": 4,
+              "title": "Knowledge base cleanup",
+              "body": "The source article contains emails, phone numbers, and noisy markup.",
+          },
+          {
+              "userId": 5,
+              "id": 5,
+              "title": "Prompt input budget review",
+              "body": "Shorter cleaned text reduces token cost while preserving the answer context.",
+          },
+      ]
 
       rawWebData = f"""
       <html>
@@ -65,7 +91,6 @@ sections:
       </html>
       """
       len(rawWebData)
-
 - id: step3_step1_html
   title: 3단계. HTML 태그 제거
   subtitle: 순수 텍스트 추출
@@ -281,6 +306,11 @@ sections:
               }
 
           try:
+              if not isinstance(rawHtml, str):
+                  raise TypeError("rawHtml must be a string")
+              if rawHtml == "":
+                  raise ValueError("rawHtml must not be empty")
+
               text = rawHtml
 
               if options.get("remove_html"):
@@ -305,11 +335,11 @@ sections:
 
               return result
 
-          except Exception as e:
+          except (TypeError, ValueError, re.error) as exc:
               return {
                   "success": False,
-                  "error": str(e),
-                  "original_text": rawHtml[:100]
+                  "error": str(exc),
+                  "original_text": str(rawHtml)[:100]
               }
 
       final = productionPreprocess(rawWebData)
@@ -364,12 +394,21 @@ sections:
       title: "데이터 로드 및 HTML 생성"
       content: |-
         import re
-        import json
-        from urllib.request import urlopen
 
-        posts = json.loads(
-            urlopen("https://jsonplaceholder.typicode.com/posts").read()
-        )
+        posts = [
+            {
+                "userId": 1,
+                "id": 1,
+                "title": "Support article about account recovery",
+                "body": "Reset flow failed for user hana@blog.com, phone 010-1234-5678.",
+            },
+            {
+                "userId": 2,
+                "id": 2,
+                "title": "Release note draft",
+                "body": "Remove tracking scripts, compress whitespace, and mask private fields.",
+            },
+        ]
 
         html = f"""
         <html>
@@ -431,3 +470,89 @@ sections:
     - "실전: HTML 제거, 마스킹, 토큰 최적화"
   - type: text
     content: 이제 실무에서 자신있게 정규표현식을 사용하세요!
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 연락처 텍스트 정제 파이프라인"
+  subtitle: "예측 → 패턴 실행 → 오류 수정 → 검증 → 실무 변주"
+  blocks:
+  - type: text
+    content: "정규표현식은 한 번 매칭되면 끝나는 문법이 아니라, 입력 텍스트를 정제하고 실패 패턴을 확인한 뒤 결과를 검증하는 반복 작업입니다. 여기서는 이메일과 전화번호를 추출하고, 잘못된 패턴과 빈 입력을 안전하게 처리합니다."
+  - type: code
+    language: python
+    title: "이메일과 전화번호 추출"
+    description: "실행 전에 어떤 이메일과 전화번호가 잡힐지 먼저 예측합니다."
+    content: |-
+      import re
+
+      contactText = '''
+      김개발 <kim@example.com> 010-1234-5678
+      lee@company.co.kr / 02-987-6543
+      잘못된 주소: hello@ / 번호: 12345
+      '''
+
+      emailPattern = re.compile(r'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}')
+      phonePattern = re.compile(r'(?:010-\d{4}-\d{4}|02-\d{3}-\d{4})')
+
+      emails = emailPattern.findall(contactText)
+      phones = phonePattern.findall(contactText)
+
+      assert emails == ['kim@example.com', 'lee@company.co.kr']
+      assert phones == ['010-1234-5678', '02-987-6543']
+      emails, phones
+  - type: code
+    language: python
+    title: "패턴 오류와 빈 입력을 먼저 실패시킨다"
+    description: "컴파일이 깨지는 패턴과 추출 결과가 없는 입력을 구분합니다."
+    content: |-
+      try:
+          re.compile(r'([A-Z]+')
+      except re.error as exc:
+          regexCompileError = str(exc)
+
+      def extractRequiredEmails(text):
+          found = emailPattern.findall(text)
+          if not found:
+              raise ValueError('email not found')
+          return found
+
+      try:
+          extractRequiredEmails('no contact here')
+      except ValueError as exc:
+          emailExtractError = str(exc)
+
+      assert regexCompileError
+      assert emailExtractError == 'email not found'
+      regexCompileError, emailExtractError
+  - type: code
+    language: python
+    title: "정제 결과를 업무 구조로 검증"
+    description: "추출한 값을 마스킹 리포트와 도메인 집계로 바꿉니다."
+    content: |-
+      def maskEmail(email):
+          name, domain = email.split('@')
+          return name[0] + '***@' + domain
+
+      contactReport = [
+          {'email': email, 'masked': maskEmail(email), 'domain': email.split('@')[1]}
+          for email in emails
+      ]
+      domainCounts = {row['domain']: 0 for row in contactReport}
+      for row in contactReport:
+          domainCounts[row['domain']] += 1
+
+      assert contactReport[0]['masked'] == 'k***@example.com'
+      assert domainCounts == {'example.com': 1, 'company.co.kr': 1}
+      contactReport
+  - type: code
+    language: python
+    title: "실무 변주: 허용 도메인 정책 바꾸기"
+    description: "회사 도메인만 남기는 정책으로 결과가 어떻게 달라지는지 확인합니다."
+    content: |-
+      def filterAllowedDomains(report, allowedDomains):
+          if not allowedDomains:
+              raise ValueError('allowedDomains must not be empty')
+          return [row for row in report if row['domain'] in allowedDomains]
+
+      companyOnly = filterAllowedDomains(contactReport, {'company.co.kr'})
+      assert [row['email'] for row in companyOnly] == ['lee@company.co.kr']
+      companyOnly

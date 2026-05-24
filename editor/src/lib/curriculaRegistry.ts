@@ -552,7 +552,7 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
       }
       cells.push(...convertYamlBlock(nested, "exercise"));
     }
-    const solution = localizeCode(textValue(block.code));
+    const solution = normalizeCode(textValue(block.code));
     if (solution.length || !arrayOfMaps(block.blocks).length) {
       cells.push(codeBlock({
         content: "",
@@ -576,7 +576,7 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
   }
 
   if (sourceType === "code") {
-    const localizedCode = localizeCode(codeContent);
+    const localizedCode = normalizeCode(codeContent);
     return [codeBlock({
       content: localizedCode,
       description,
@@ -624,7 +624,7 @@ function convertYamlBlock(block: YamlMap, parentRole?: CellRole): BlockConfig[] 
 function expansionSolutionCodeBlock(block: YamlMap, expansion: { description: string; title: string }) {
   const title = textValue(block.title) || expansion.title;
   const description = textValue(block.description) || expansion.description || title;
-  const solution = localizeCode(textValue(block.content) || textValue(block.code));
+  const solution = normalizeCode(textValue(block.content) || textValue(block.code));
   return codeBlock({
     content: "",
     description,
@@ -730,7 +730,7 @@ function structuredBlocksFromSectionContract(section: LearningSectionContract): 
 
   if (section.snippet) {
     blocks.push(codeBlock({
-      content: localizeCode(section.snippet),
+      content: normalizeCode(section.snippet),
       description: section.goal,
       executionKind: "python",
       role: "snippet",
@@ -740,9 +740,9 @@ function structuredBlocksFromSectionContract(section: LearningSectionContract): 
   }
 
   if (hasStructuredExercise(section)) {
-    const solution = localizeCode(section.exercise.solution);
+    const solution = normalizeCode(section.exercise.solution);
     blocks.push(codeBlock({
-      content: localizeCode(section.exercise.starterCode),
+      content: normalizeCode(section.exercise.starterCode),
       description: section.exercise.prompt || section.goal,
       executionKind: "python",
       guide: {
@@ -1113,17 +1113,9 @@ function expansionHints(title: string, description: string) {
   ].filter(Boolean);
 }
 
-function localizeCode(value: string) {
+function normalizeCode(value: string) {
   if (!value) return "";
-  const localized = value
-    .replaceAll("from pyodide.http import open_url", "from urllib.request import urlopen")
-    .replaceAll("open_url(", "urlopen(");
-  const lines = localized.split("\n").filter((line) => {
-    const stripped = line.trim();
-    if (["import micropip", "import pyodide_http", "pyodide_http.patch_all()"].includes(stripped)) return false;
-    if (stripped.startsWith("await micropip.install(")) return false;
-    return true;
-  });
+  const lines = value.split("\n").map((line) => line.replace(/\s+$/g, ""));
   const result = lines.join("\n").replace(/^\n+|\n+$/g, "");
   return result.trim() ? result : "pass";
 }

@@ -34,15 +34,11 @@ np.random.seed(42)
 data = pd.DataFrame({...})
 
 import seaborn as sns
-tips = sns.load_dataset('tips')
-iris = sns.load_dataset('iris')
-penguins = sns.load_dataset('penguins')
-```
-
-**GitHub Raw URL 데이터**:
-```python
-baseUrl = "https://raw.githubusercontent.com"
-gapminder = pd.read_csv(f"{baseUrl}/plotly/datasets/master/gapminder_unfiltered.csv")
+from codaro.curriculum.localData import loadLocalDataset
+tips = loadLocalDataset('tips')
+iris = loadLocalDataset('iris')
+penguins = loadLocalDataset('penguins')
+gapminder = loadLocalDataset('gapminder')
 ```
 
 ---
@@ -294,7 +290,7 @@ matplotlib/
 ### 4. 데이터 로드 규칙
 - 첫 섹션에서만 import 및 데이터 로드
 - 이후 섹션은 변수 공유 (Codaro 특성)
-- seaborn 내장 데이터: sns.load_dataset()
+- Codaro 로컬 데이터: loadLocalDataset()
 - GitHub 데이터: baseUrl + raw URL
 
 ### 5. 코드 블록 분리 원칙

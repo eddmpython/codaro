@@ -34,8 +34,7 @@ sections:
       import plotly.express as px
       import pandas as pd
 
-      baseUrl = "https://raw.githubusercontent.com"
-      tips = pd.read_csv(f"{baseUrl}/mwaskom/seaborn-data/master/tips.csv")
+      tips = px.data.tips()
       tips.head()
 
 - id: step2_explore
@@ -276,8 +275,7 @@ sections:
         import plotly.express as px
         import pandas as pd
 
-        tipUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-        data = pd.read_csv(tipUrl)
+        data = px.data.tips()
     - type: code
       title: "차트 생성"
       content: |-
@@ -299,8 +297,7 @@ sections:
         import plotly.express as px
         import pandas as pd
 
-        srcUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/tips.csv"
-        tipDf = pd.read_csv(srcUrl)
+        tipDf = px.data.tips()
         tipDf["tipPct"] = tipDf["tip"] / tipDf["total_bill"] * 100
     - type: code
       title: "차트 생성"
@@ -330,3 +327,72 @@ sections:
     - "facet_col, facet_row - 그래프 분할 비교"
   - type: text
     content: 다음 시간에는 세계 인구 데이터로 지도 시각화를 배웁니다.
+
+- id: workflow_validation
+  title: 14단계. 팁 분포 Figure 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      분포 분석은 bin 개수, 그룹 색상, 이상치 처리에 따라 결론이 달라집니다. 히스토그램과 박스 플롯을 만들고 Figure 내부 구조를 검증합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 분포 예측
+    description: 팁 데이터의 양수 조건과 저녁 팁 우위를 확인합니다
+    content: |-
+      import plotly.express as px
+      from codaro.curriculum.localData import loadLocalDataset
+
+      tipsFlow = loadLocalDataset("tips")
+      requiredColumns = {"total_bill", "tip", "time", "day", "size"}
+      missingColumns = requiredColumns - set(tipsFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert tipsFlow["tip"].between(0, tipsFlow["total_bill"]).all()
+      assert tipsFlow.groupby("time")["tip"].mean()["Dinner"] > tipsFlow.groupby("time")["tip"].mean()["Lunch"]
+  - type: code
+    language: python
+    title: Histogram Figure 검증
+    description: 시간대별 히스토그램 trace와 제목을 확인합니다
+    content: |-
+      figTipDistribution = px.histogram(tipsFlow, x="tip", color="time", nbins=12, title="Tip distribution by time")
+
+      assert all(trace.type == "histogram" for trace in figTipDistribution.data)
+      assert len(figTipDistribution.data) == tipsFlow["time"].nunique()
+      assert figTipDistribution.layout.title.text == "Tip distribution by time"
+      figTipDistribution
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 음수 팁을 분석 전에 차단합니다
+    content: |-
+      def validateTipsForDistribution(frame):
+          if not frame["tip"].ge(0).all():
+              raise ValueError("tip은 0 이상이어야 합니다")
+          assert frame["total_bill"].gt(0).all()
+          return True
+
+      brokenTips = tipsFlow.copy()
+      brokenTips.loc[brokenTips.index[0], "tip"] = -1
+      try:
+          validateTipsForDistribution(brokenTips)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateTipsForDistribution(tipsFlow)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: bin 수와 그룹 기준을 바꿔 분포 안정성을 비교합니다
+    content: |-
+      binCandidates = [8, 12, 20]
+      binReport = []
+      for bins in binCandidates:
+          figure = px.histogram(tipsFlow, x="tip", nbins=bins, color="time")
+          binReport.append({"bins": bins, "traceCount": len(figure.data), "maxTip": round(float(tipsFlow["tip"].max()), 2)})
+
+      assert all(item["traceCount"] == 2 for item in binReport)
+      assert binReport[0]["maxTip"] == binReport[-1]["maxTip"]
+      binReport
+  - type: tip
+    content: "분포 차트는 bin 설정을 바꾸어도 핵심 결론이 유지되는지 확인해야 실무 보고서에 넣을 수 있습니다."

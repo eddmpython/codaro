@@ -82,7 +82,7 @@
 
 1. `codaro run path.py`가 서버를 app 모드로 띄운다
 2. `/app?path=...`가 같은 문서를 읽는다
-3. 현재 App 모드는 Pyodide worker로 전체 코드 블록을 순서 실행한다
+3. App 모드는 로컬 서버 커널 실행 경로를 기준으로 코드 블록을 순서 실행한다
 4. `hideCode`를 기준으로 결과 중심 화면을 보여준다
 
 ## 설계상 중요한 점
@@ -124,7 +124,7 @@
 
 - `api/`가 생겼지만 공통 에러 응답 포맷과 dependency 계층은 아직 더 정리할 여지가 있다
 - 문서 블록 조작 API와 프론트 로컬 상태 조작이 이중화되어 있다
-- App 모드는 아직 서버 커널이 아니라 Pyodide 전용 실행 경로다
+- App 모드와 편집기 실행 경로의 상태/이벤트 표현은 더 통일할 여지가 있다
 - `system/packageOps.py`는 프로젝트 `.venv`를 전제로 한다
   - `.venv`가 없으면 명시적 에러를 반환한다
 - `runtime/`은 이제 서버 커널 실행의 실제 엔진 계층으로 쓰이기 시작했다
@@ -149,7 +149,7 @@
 
 - `api/` 아래 router와 dependency 계층을 더 명확히 분리
 - block 조작을 서버 API 우선으로 재정리
-- 서버 커널과 Pyodide의 capability 표면 통일
+- 서버 커널, app 모드, AI tool 실행이 공유할 capability 표면 통일
 - soft interrupt / hard interrupt 분리
 - 실행 이벤트를 AI tool, diagnostics, audit log가 재사용할 수 있는 공통 표면으로 승격
 - launcher runtime cache/dedupe와 signed artifact 검증 마무리

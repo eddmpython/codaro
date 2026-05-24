@@ -329,16 +329,16 @@ sections:
     title: "재시도 데코레이터"
     description: "실패 시 자동으로 재시도하는 데코레이터입니다."
     content: |-
-      def retry(times):
+      def retry(times, exceptionTypes=(RuntimeError,)):
           def decorator(func):
               @wraps(func)
               def wrapper(*args, **kwargs):
                   for attempt in range(times):
                       try:
                           return func(*args, **kwargs)
-                      except Exception:
+                      except exceptionTypes as exc:
                           if attempt == times - 1:
-                              raise
+                              raise RuntimeError("재시도 횟수를 모두 사용했습니다.") from exc
                   return None
               return wrapper
           return decorator
@@ -373,6 +373,130 @@ sections:
       firstCall, secondCall
   - type: "tip"
     content: "여러 데코레이터를 조합할 때 @wraps는 가장 안쪽(함수에 가장 가까운 곳)에 위치해야 합니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 함수형 업무 파이프라인"
+  subtitle: "partial, reduce, cache, wraps 검증"
+  blocks:
+  - type: "text"
+    content: "functools는 함수형 문법 자체보다 재사용 가능한 업무 파이프라인을 만들 때 가치가 큽니다. 부분 적용으로 설정을 고정하고, reduce로 집계하고, lru_cache와 wraps가 실제로 기대한 효과를 내는지 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "부분 적용 환산 함수"
+    description: "통화와 세율 설정을 고정한 업무용 계산 함수를 만듭니다."
+    content: |-
+      exchangeRates = {"USD": 1350.0, "JPY": 9.0, "EUR": 1450.0}
+
+      def convertToKrw(amount, currency, feeRate):
+          return round(amount * exchangeRates[currency] * (1 + feeRate), 2)
+
+      usdToKrwWithFee = partial(convertToKrw, currency="USD", feeRate=0.015)
+      jpyToKrwWithoutFee = partial(convertToKrw, currency="JPY", feeRate=0.0)
+
+      assert usdToKrwWithFee(10) == 13702.5
+      assert jpyToKrwWithoutFee(1000) == 9000.0
+
+      {"usd": usdToKrwWithFee(10), "jpy": jpyToKrwWithoutFee(1000)}
+  - type: "code"
+    language: "python"
+    title: "거래 요약 reduce"
+    description: "거래 목록을 총액과 카테고리별 집계로 축소합니다."
+    content: |-
+      transactions = [
+          {"category": "infra", "amount": 120},
+          {"category": "support", "amount": 80},
+          {"category": "infra", "amount": 150},
+          {"category": "education", "amount": 60},
+      ]
+
+      def addTransactionSummary(summary, row):
+          summary["total"] += row["amount"]
+          summary["byCategory"][row["category"]] = summary["byCategory"].get(row["category"], 0) + row["amount"]
+          return summary
+
+      transactionSummary = reduce(
+          addTransactionSummary,
+          transactions,
+          {"total": 0, "byCategory": {}},
+      )
+
+      assert transactionSummary["total"] == 410
+      assert transactionSummary["byCategory"] == {"infra": 270, "support": 80, "education": 60}
+
+      transactionSummary
+  - type: "code"
+    language: "python"
+    title: "캐시 효과 검증"
+    description: "같은 설정 조회가 캐시 hit로 처리되는지 확인합니다."
+    content: |-
+      lookupCounter = {"calls": 0}
+
+      @lru_cache(maxsize=8)
+      def getRegionFeeRate(region):
+          lookupCounter["calls"] += 1
+          return {"KR": 0.01, "US": 0.015, "JP": 0.0}[region]
+
+      requestedFees = [
+          getRegionFeeRate("KR"),
+          getRegionFeeRate("US"),
+          getRegionFeeRate("KR"),
+          getRegionFeeRate("JP"),
+          getRegionFeeRate("US"),
+      ]
+      feeCacheInfo = getRegionFeeRate.cache_info()
+
+      assert requestedFees == [0.01, 0.015, 0.01, 0.0, 0.015]
+      assert lookupCounter["calls"] == 3
+      assert feeCacheInfo.hits == 2
+
+      feeCacheInfo
+  - type: "code"
+    language: "python"
+    title: "wraps 누락 검출"
+    description: "데코레이터가 원본 함수명을 보존하는지 검증합니다."
+    content: |-
+      def traceWithoutWraps(func):
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          return wrapper
+
+      @traceWithoutWraps
+      def exportReport():
+          return "exported"
+
+      try:
+          assert exportReport.__name__ == "exportReport"
+      except AssertionError as exc:
+          metadataProblem = "데코레이터가 원본 함수명을 보존하지 못했습니다."
+
+      def traceWithWraps(func):
+          @wraps(func)
+          def wrapper(*args, **kwargs):
+              return func(*args, **kwargs)
+          return wrapper
+
+      @traceWithWraps
+      def importReport():
+          return "imported"
+
+      assert metadataProblem == "데코레이터가 원본 함수명을 보존하지 못했습니다."
+      assert importReport.__name__ == "importReport"
+
+      metadataProblem, importReport()
+  - type: "code"
+    language: "python"
+    title: "부분 적용 입력 오류 확인"
+    description: "지원하지 않는 통화 코드를 명확한 KeyError로 확인합니다."
+    content: |-
+      try:
+          convertToKrw(10, "GBP", 0.01)
+      except KeyError as exc:
+          currencyMessage = str(exc)
+
+      assert "GBP" in currencyMessage
+  - type: "tip"
+    title: "변주 실험"
+    content: "환율표를 함수 인자로 받도록 바꾸고, `lru_cache`를 붙일 때 dict가 해시 불가능하다는 점을 어떻게 우회할지 실험하세요."
 
 - id: "practice"
   title: "functools 모듈 종합 복습"

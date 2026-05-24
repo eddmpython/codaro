@@ -20,26 +20,25 @@
 
 ---
 
-## 대상 데이터셋 (다른 카테고리 미사용 + 네트워크/사이트 정책 없음)
+## 대상 데이터셋 (다른 카테고리 미사용 + 로컬 실행)
 
 | 번호 | 데이터셋 | 출처 | 용도 | 비즈니스 가치 |
 |------|----------|------|------|--------------|
-| 01 | 광고비-매출 | GitHub ISLR Advertising.csv | 단순/다중 회귀 | 마케팅 ROI 최적화 |
-| 02 | 부동산 가격 | GitHub Boston Housing.csv | 다중회귀, 특성 선택 | 부동산 가격 책정 |
-| 03 | 항공 수요 | GitHub AirPassengers.csv | 시계열 분해, ARIMA | 항공사 용량 계획 |
-| 04 | 소매 매출 | GitHub Superstore Sales.csv | 시계열 회귀, 수익 분석 | 재고/수익 관리 |
-| 05 | 의료보험 비용 | GitHub Insurance Cost.csv | 다중회귀, 로그 변환 | 보험 상품 가격 책정 |
-| 06 | 월마트 매출 | GitHub Walmart Sales.csv | SARIMA, 외생변수 | 소매 수요 예측 |
-| 07 | 자전거 공유 | GitHub Bike Sharing.csv | 시계열 회귀, 패턴 분석 | 자전거 배치 최적화 |
-| 08 | 고객 이탈 | GitHub E-commerce Churn.csv | 로지스틱 회귀, ROC-AUC | 고객 유지 전략 |
-| 09 | 직원 퇴사 | GitHub IBM HR Attrition.csv | 로지스틱 회귀, 특성 중요도 | 인재 유지, 채용 계획 |
+| 01 | 광고비-매출 | Codaro `loadLocalDataset("advertising")` | 단순/다중 회귀 | 마케팅 ROI 최적화 |
+| 02 | 부동산 가격 | Codaro `loadLocalDataset("boston_housing")` | 다중회귀, 특성 선택 | 부동산 가격 책정 |
+| 03 | 의료보험 비용 | Codaro `loadLocalDataset("insurance")` | 다중회귀, 로그 변환 | 보험 상품 가격 책정 |
+| 04 | 항공 수요 | Codaro `loadLocalDataset("airline_passengers")` | 시계열 분해, ARIMA | 항공사 용량 계획 |
+| 05 | 고객 이탈 | Codaro `loadLocalDataset("churn")` | 로지스틱 회귀, ROC-AUC | 고객 유지 전략 |
+| 06 | 다중회귀 심화 | Codaro `loadLocalDataset("advertising")` | 다중공선성, 변수 선택 | 마케팅 예산 최적화 |
+| 07 | 경제 지표 | statsmodels.datasets.macrodata | 시계열 회귀, 패턴 분석 | 경제 예측 |
+| 08 | 직원 퇴사 | Codaro `loadLocalDataset("hr_attrition")` | 로지스틱 회귀, 특성 중요도 | 인재 유지, 채용 계획 |
+| 09 | 자전거 수요 | Codaro `loadLocalDataset("bike_demand")` | 시계열 회귀, 패턴 분석 | 자전거 배치 최적화 |
 | 10 | 경제 지표 | statsmodels.datasets.macrodata | 시계열 VAR, 관계 분석 | 경제 예측 |
 
 **데이터 확인**:
 - ✅ 기존 카테고리 미사용 (titanic, tips, iris, gapminder, stocks 등 제외)
-- ✅ GitHub raw.githubusercontent.com (사이트 정책 허용)
 - ✅ statsmodels 내장 데이터 (패키지 내부 포함)
-- ✅ Codaro 로컬 Python 환경에서 `pd.read_csv(url)` 직접 사용 가능
+- ✅ Codaro 로컬 Python 환경에서 외부 다운로드 없이 실행 가능
 
 ---
 
@@ -166,7 +165,7 @@ meta:
   category: statsmodels
   difficulty: "⭐"
   badge: 입문
-  dataUrl: https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv
+  dataSource: codaro-local:advertising
   tags: ["회귀분석", "OLS", "R²", "매출예측", "마케팅ROI"]
   seo:
     title: "statsmodels 회귀분석 - 광고비로 매출 예측하기"
@@ -200,20 +199,20 @@ sections:
   subtitle: 광고비-매출 데이터셋
   blocks:
   - type: text
-    content: ISLR(Introduction to Statistical Learning with R) Advertising 데이터셋을 사용합니다. 200개 시장에서 TV, Radio, Newspaper 광고비와 매출 데이터를 수집했습니다. GitHub raw URL로 직접 불러올 수 있습니다.
+    content: Codaro 로컬 Advertising 데이터셋을 사용합니다. 200개 시장에서 TV, Radio, Newspaper 광고비와 매출 데이터를 수집한 형태의 학습 데이터이며, 외부 다운로드 없이 실행할 수 있습니다.
   - type: code
     language: python
     title: 데이터 불러오기
-    description: GitHub에서 CSV 파일 로드
+    description: 로컬 데이터셋 로드
     content: |-
       import pandas as pd
       import statsmodels.api as sm
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/JWarmenhoven/ISLR-python/master/Notebooks/Data/Advertising.csv"
-      advertising = pd.read_csv(url, index_col=0)
+      advertising = loadLocalDataset("advertising")
       advertising.shape
   - type: tip
-    content: index_col=0은 첫 번째 컬럼을 인덱스로 사용합니다. shape은 (행, 열) 형태로 데이터 크기를 보여줍니다.
+    content: shape은 (행, 열) 형태로 데이터 크기를 보여줍니다. 로컬 데이터셋은 재현성을 위해 같은 값을 반환합니다.
 
 - id: step3_explore
   title: 3단계. 데이터 탐색

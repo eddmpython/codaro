@@ -510,6 +510,226 @@ sections:
 
       finalMap
 
+- id: workflow_validation
+  title: 11단계. 종합 지도 품질 검증
+  subtitle: 데이터 계약과 레이어 렌더 확인
+  blocks:
+  - type: text
+    content: 종합 지도는 기능을 많이 붙이는 과제가 아니라, 데이터 계약과 레이어 의도가 깨지지 않는지 검증하는 프로젝트입니다. 마커, 클러스터, 히트맵, GeoJSON, 경로가 서로 다른 데이터 구조를 쓰므로 먼저 검증 기준을 만들고 마지막에 렌더 결과를 확인합니다.
+  - type: list
+    items:
+      - 실행 전에는 필수 레이어와 지점 수를 먼저 예측합니다.
+      - 좌표 범위와 카테고리 목록을 렌더 전에 검사합니다.
+      - GeoJSON 폴리곤은 닫힌 링인지 확인합니다.
+      - 운영 기준을 바꿨을 때 어떤 레이어가 기본 표시 대상인지 실험합니다.
+  - type: code
+    language: python
+    title: 종합 지도 데이터 계약
+    description: 지도에 올릴 운영 지점, 권역, 코스를 한곳에 모읍니다.
+    content: |-
+      import folium
+      from folium.plugins import HeatMap, MarkerCluster
+      import branca.colormap as cm
+
+      projectSites = [
+          {"name": "경복궁", "category": "landmark", "loc": [37.5796, 126.9770], "visitors": 90},
+          {"name": "남산타워", "category": "landmark", "loc": [37.5512, 126.9882], "visitors": 85},
+          {"name": "명동 카페", "category": "cafe", "loc": [37.5636, 126.9869], "visitors": 70},
+          {"name": "홍대 카페", "category": "cafe", "loc": [37.5563, 126.9236], "visitors": 75},
+          {"name": "종로 맛집", "category": "restaurant", "loc": [37.5701, 126.9995], "visitors": 65},
+      ]
+
+      projectGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "중심 관광권", "score": 92},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [126.96, 37.56], [127.00, 37.56],
+                      [127.00, 37.60], [126.96, 37.60], [126.96, 37.56]
+                  ]]},
+              },
+              {
+                  "type": "Feature",
+                  "properties": {"name": "동부 관광권", "score": 78},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [127.00, 37.54], [127.04, 37.54],
+                      [127.04, 37.58], [127.00, 37.58], [127.00, 37.54]
+                  ]]},
+              },
+          ],
+      }
+
+      routePoints = [
+          [37.5796, 126.9770],
+          [37.5760, 126.9769],
+          [37.5636, 126.9869],
+      ]
+
+      categoryConfig = {
+          "landmark": {"label": "랜드마크", "color": "red", "show": True},
+          "cafe": {"label": "카페", "color": "cadetblue", "show": True},
+          "restaurant": {"label": "음식점", "color": "orange", "show": False},
+      }
+
+      len(projectSites), len(projectGeo["features"]), len(routePoints)
+  - type: code
+    language: python
+    title: 입력 데이터 검증
+    description: 좌표, 카테고리, GeoJSON 링 구조를 지도 생성 전에 검사합니다.
+    content: |-
+      def validateProjectData(sites, geoJson, route):
+          for site in sites:
+              lat, lon = site["loc"]
+              if not (33 <= lat <= 39 and 124 <= lon <= 132):
+                  raise ValueError(f"좌표 범위 오류: {site['name']}")
+              if site["category"] not in categoryConfig:
+                  raise KeyError(f"정의되지 않은 카테고리: {site['category']}")
+
+          for feature in geoJson["features"]:
+              ring = feature["geometry"]["coordinates"][0]
+              if ring[0] != ring[-1]:
+                  raise ValueError(f"닫히지 않은 경계: {feature['properties']['name']}")
+
+          if len(route) < 2:
+              raise ValueError("경로는 최소 2개 지점이 필요합니다")
+          return True
+
+      validateProjectData(projectSites, projectGeo, routePoints)
+  - type: code
+    language: python
+    title: 오류 사례 확인
+    description: 미정의 카테고리와 닫히지 않은 경계를 일부러 넣어 검증 메시지를 확인합니다.
+    content: |-
+      brokenSites = projectSites + [
+          {"name": "분류 누락 지점", "category": "unknown", "loc": [37.56, 126.98], "visitors": 10}
+      ]
+      brokenGeo = {
+          "type": "FeatureCollection",
+          "features": [
+              {
+                  "type": "Feature",
+                  "properties": {"name": "열린 경계", "score": 50},
+                  "geometry": {"type": "Polygon", "coordinates": [[
+                      [126.96, 37.56], [127.00, 37.56],
+                      [127.00, 37.60], [126.96, 37.60]
+                  ]]},
+              }
+          ],
+      }
+
+      try:
+          validateProjectData(brokenSites, projectGeo, routePoints)
+      except KeyError as exc:
+          categoryError = str(exc).strip("'")
+
+      try:
+          validateProjectData(projectSites, brokenGeo, routePoints)
+      except ValueError as exc:
+          boundaryError = str(exc)
+
+      categoryError, boundaryError
+  - type: code
+    language: python
+    title: 검증된 종합 지도 만들기
+    description: 마커, 클러스터, 히트맵, GeoJSON, 경로를 레이어로 조합합니다.
+    content: |-
+      projectMap = folium.Map(location=[37.565, 126.985], zoom_start=12, tiles=None)
+      folium.TileLayer("CartoDB Positron", name="밝은 지도").add_to(projectMap)
+      folium.TileLayer("OpenStreetMap", name="상세 지도").add_to(projectMap)
+
+      layerByCategory = {}
+      for category, config in categoryConfig.items():
+          if category == "landmark":
+              layerByCategory[category] = folium.FeatureGroup(name=config["label"], show=config["show"])
+          else:
+              layerByCategory[category] = MarkerCluster(name=config["label"], show=config["show"])
+
+      for site in projectSites:
+          config = categoryConfig[site["category"]]
+          folium.Marker(
+              location=site["loc"],
+              popup=f"{site['name']} / 방문지수 {site['visitors']}",
+              tooltip=site["name"],
+              icon=folium.Icon(color=config["color"], icon="info-sign"),
+          ).add_to(layerByCategory[site["category"]])
+
+      for layer in layerByCategory.values():
+          layer.add_to(projectMap)
+
+      heatGroup = folium.FeatureGroup(name="방문 밀도", show=False)
+      HeatMap(
+          [[site["loc"][0], site["loc"][1], site["visitors"] / 100] for site in projectSites],
+          radius=22,
+          blur=12,
+      ).add_to(heatGroup)
+      heatGroup.add_to(projectMap)
+
+      scoreScale = cm.LinearColormap(["#edf8fb", "#2c7fb8"], vmin=60, vmax=100, caption="관광 운영 점수")
+      boundaryGroup = folium.FeatureGroup(name="관광권 점수", show=False)
+      folium.GeoJson(
+          projectGeo,
+          style_function=lambda feature: {
+              "fillColor": scoreScale(feature["properties"]["score"]),
+              "color": "white",
+              "weight": 2,
+              "fillOpacity": 0.6,
+          },
+          tooltip=folium.GeoJsonTooltip(fields=["name", "score"], aliases=["권역:", "점수:"]),
+      ).add_to(boundaryGroup)
+      boundaryGroup.add_to(projectMap)
+      scoreScale.add_to(projectMap)
+
+      routeGroup = folium.FeatureGroup(name="추천 코스", show=False)
+      folium.PolyLine(routePoints, color="purple", weight=4, popup="반나절 관광 코스").add_to(routeGroup)
+      routeGroup.add_to(projectMap)
+
+      folium.LayerControl(collapsed=False).add_to(projectMap)
+      projectMap
+  - type: code
+    language: python
+    title: 렌더 결과 검증
+    description: 필수 레이어, 지점명, 오류 메시지가 결과물에 들어갔는지 확인합니다.
+    content: |-
+      projectHtml = projectMap.get_root().render()
+      requiredLabels = [config["label"] for config in categoryConfig.values()] + ["방문 밀도", "관광권 점수", "추천 코스"]
+
+      import json
+      def renderedContains(html, text):
+          escaped = json.dumps(text, ensure_ascii=True)[1:-1]
+          return text in html or escaped in html
+
+      projectChecks = {
+          "sitesRendered": all(renderedContains(projectHtml, site["name"]) for site in projectSites),
+          "layersRendered": all(renderedContains(projectHtml, label) for label in requiredLabels),
+          "legendRendered": renderedContains(projectHtml, "관광 운영 점수"),
+          "categoryErrorOk": categoryError == "정의되지 않은 카테고리: unknown",
+          "boundaryErrorOk": boundaryError == "닫히지 않은 경계: 열린 경계",
+      }
+
+      assert all(projectChecks.values()), projectChecks
+      projectChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 방문지수 기준을 바꾸면 기본 노출 대상이 어떻게 달라지는지 비교합니다.
+    content: |-
+      def selectPrioritySites(sites, minimumVisitors):
+          selected = [site["name"] for site in sites if site["visitors"] >= minimumVisitors]
+          if not selected:
+              raise ValueError("우선 노출 지점이 없습니다")
+          return selected
+
+      defaultPriority = selectPrioritySites(projectSites, 80)
+      relaxedPriority = selectPrioritySites(projectSites, 70)
+
+      assert defaultPriority == ["경복궁", "남산타워"]
+      assert "홍대 카페" in relaxedPriority
+      defaultPriority, relaxedPriority
+  - type: tip
+    content: 종합 프로젝트는 화면 완성도가 아니라 검증 가능한 데이터-지도 파이프라인으로 평가해야 합니다.
+
 - id: practice
   title: 실습
   subtitle: 종합 프로젝트

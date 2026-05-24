@@ -230,6 +230,125 @@ sections:
 
       **플래그 조합**: `re.MULTILINE | re.IGNORECASE`
 
+- id: workflow_validation
+  title: 10단계. 운영 로그 검증 루프
+  subtitle: 파싱 결과를 업무 기준으로 검증
+  blocks:
+  - type: text
+    content: 로그 파서는 "대충 몇 줄 보인다"가 아니라 기대한 줄 수, 로그 레벨 분포, 에러 IP 집계가 모두 맞는지 확인해야 운영에서 믿고 사용할 수 있습니다. 여기서는 파싱 결과를 검증하고, 일부러 잘못된 패턴을 넣어 어떤 문제가 잡히는지 확인합니다.
+  - type: code
+    language: python
+    title: 로그 파싱 결과 검증
+    description: 파싱 개수, 레벨 분포, 에러 IP 집계를 assert로 확인
+    content: |-
+      logPattern = re.compile(
+          r"^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) "
+          r"(?P<level>INFO|WARNING|ERROR) "
+          r"\[(?P<ip>\d{1,3}(?:\.\d{1,3}){3})\] "
+          r"(?P<message>.+)$",
+          flags=re.MULTILINE,
+      )
+
+      parsedLogs = [match.groupdict() for match in logPattern.finditer(serverLog)]
+      errorLogs = [log for log in parsedLogs if log["level"] == "ERROR"]
+
+      def validateParsedLogs(logs):
+          levelCounts = {}
+          for log in logs:
+              levelCounts[log["level"]] = levelCounts.get(log["level"], 0) + 1
+
+          errorIpCounts = {}
+          for log in logs:
+              if log["level"] == "ERROR":
+                  errorIpCounts[log["ip"]] = errorIpCounts.get(log["ip"], 0) + 1
+
+          assert len(logs) == 7, f"파싱된 로그 수가 다릅니다: {len(logs)}"
+          assert levelCounts == {"INFO": 3, "ERROR": 3, "WARNING": 1}, levelCounts
+          assert len(errorLogs) == 3, f"ERROR 로그 수가 다릅니다: {len(errorLogs)}"
+          assert errorIpCounts["192.168.1.101"] == 2, errorIpCounts
+
+          return {
+              "totalLogs": len(logs),
+              "levelCounts": levelCounts,
+              "errorIpCounts": errorIpCounts,
+          }
+
+      validationReport = validateParsedLogs(parsedLogs)
+      validationReport
+  - type: code
+    language: python
+    title: 잘못된 패턴을 일부러 검출
+    description: ERROR만 파싱하는 패턴은 전체 로그 검증을 통과하지 못함
+    content: |-
+      brokenPattern = re.compile(
+          r"^(?P<timestamp>\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}) "
+          r"(?P<level>ERROR) "
+          r"\[(?P<ip>\d{1,3}(?:\.\d{1,3}){3})\] "
+          r"(?P<message>.+)$",
+          flags=re.MULTILINE,
+      )
+
+      brokenLogs = [match.groupdict() for match in brokenPattern.finditer(serverLog)]
+
+      try:
+          validateParsedLogs(brokenLogs)
+      except AssertionError as exc:
+          detectedProblem = str(exc)
+
+      detectedProblem
+  - type: code
+    language: python
+    title: 장애 후보 리포트 만들기
+    description: 반복 에러 IP와 connection 계열 메시지를 운영 리포트로 정리
+    content: |-
+      def buildIncidentReport(logs, minimumErrorCount=2):
+          errorGroups = {}
+          for log in logs:
+              if log["level"] != "ERROR":
+                  continue
+
+              bucket = errorGroups.setdefault(
+                  log["ip"],
+                  {"ip": log["ip"], "errorCount": 0, "messages": []},
+              )
+              bucket["errorCount"] += 1
+              bucket["messages"].append(log["message"])
+
+          suspects = [
+              item
+              for item in errorGroups.values()
+              if item["errorCount"] >= minimumErrorCount
+          ]
+          suspects.sort(key=lambda item: item["errorCount"], reverse=True)
+          return suspects
+
+      incidentReport = buildIncidentReport(parsedLogs)
+
+      assert incidentReport[0]["ip"] == "192.168.1.101"
+      assert incidentReport[0]["errorCount"] == 2
+      assert any("connection" in message.lower() for message in incidentReport[0]["messages"])
+
+      incidentReport
+  - type: code
+    language: python
+    title: 알림 기준 실험
+    description: 임계값을 바꾸며 어느 IP가 알림 대상인지 확인
+    content: |-
+      alertSimulation = []
+
+      for threshold in [1, 2, 3]:
+          suspects = buildIncidentReport(parsedLogs, minimumErrorCount=threshold)
+          alertSimulation.append({
+              "threshold": threshold,
+              "alertIps": [item["ip"] for item in suspects],
+          })
+
+      assert alertSimulation[0]["alertIps"] == ["192.168.1.101", "192.168.1.103"]
+      assert alertSimulation[1]["alertIps"] == ["192.168.1.101"]
+      assert alertSimulation[2]["alertIps"] == []
+
+      alertSimulation
+
 - id: practice
   title: 실습
   subtitle: 로그 분석 프로젝트

@@ -3,7 +3,7 @@ meta:
   title: "collections 심화"
   day: 13
   category: "advancedPython"
-  tags: ["namedtuple", "defaultdict", "Counter", "deque", "ChainMap"]
+  tags: ["namedtuple", "defaultdict", "Counter", "deque", "ChainMap", "검증", "자료구조선택"]
   seo:
     title: "파이썬 collections 모듈 완벽 가이드 - 특수 자료구조"
     description: "collections 모듈을 마스터합니다. namedtuple, defaultdict, Counter, deque, OrderedDict, ChainMap 완벽 이해."
@@ -333,6 +333,73 @@ sections:
       config['debug'], config['port']
   - type: "tip"
     content: "ChainMap은 복사 없이 여러 딕셔너리를 논리적으로 합칩니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 지원 티켓 큐 정리하기"
+  subtitle: "namedtuple, defaultdict, Counter, deque, ChainMap을 하나의 운영 흐름으로 묶습니다"
+  blocks:
+  - type: "text"
+    content: "collections는 암기할 모듈이 아니라 문제에 맞는 자료구조를 고르는 연습입니다. 지원 티켓을 분류하고, 우선순위 큐를 만들고, 설정 우선순위를 합치며 각 선택이 왜 필요한지 확인하세요."
+  - type: "code"
+    language: "python"
+    title: "티켓 분류와 처리 순서 만들기"
+    description: "각 자료구조가 맡는 역할을 분리하고 결과를 assert로 검증합니다."
+    content: |-
+      from collections import ChainMap, Counter, defaultdict, deque, namedtuple
+
+      Ticket = namedtuple("Ticket", ["id", "category", "priority"])
+
+      tickets = [
+          Ticket("T-1", "payment", 2),
+          Ticket("T-2", "login", 1),
+          Ticket("T-3", "payment", 3),
+          Ticket("T-4", "report", 2),
+      ]
+
+      byCategory: defaultdict[str, list[Ticket]] = defaultdict(list)
+      for ticket in tickets:
+          byCategory[ticket.category].append(ticket)
+
+      categoryCounts = Counter(ticket.category for ticket in tickets)
+      workQueue = deque(sorted(tickets, key=lambda ticket: ticket.priority, reverse=True))
+
+      defaults = {"slaHours": 24, "assignee": "support"}
+      paymentOverride = {"slaHours": 4}
+      config = ChainMap(paymentOverride, defaults)
+
+      firstTicket = workQueue.popleft()
+
+      assert [ticket.id for ticket in byCategory["payment"]] == ["T-1", "T-3"]
+      assert categoryCounts.most_common(1) == [("payment", 2)]
+      assert firstTicket.id == "T-3"
+      assert config["slaHours"] == 4
+      assert config["assignee"] == "support"
+  - type: "code"
+    language: "python"
+    title: "빈 그룹과 큐 경계 확인"
+    description: "defaultdict와 deque의 기본 동작을 작은 실패/경계 케이스로 확인합니다."
+    content: |-
+      from collections import defaultdict, deque
+
+      grouped: defaultdict[str, list[str]] = defaultdict(list)
+      grouped["new"].append("T-9")
+
+      queue: deque[str] = deque(["T-9"])
+      processed = queue.popleft()
+
+      assert grouped["missing"] == []
+      assert processed == "T-9"
+      assert len(queue) == 0
+
+      try:
+          queue.popleft()
+      except IndexError as exc:
+          message = str(exc)
+
+      assert message == "pop from an empty deque"
+  - type: "tip"
+    title: "변주 실험"
+    content: "우선순위가 같을 때 생성 순서를 유지해야 한다면 정렬 키를 바꾸고, `deque.appendleft()`로 긴급 티켓을 끼워 넣는 테스트를 추가하세요."
 
 - id: "practice"
   title: "종합 복습"

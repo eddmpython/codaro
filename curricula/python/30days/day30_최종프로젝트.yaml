@@ -3,7 +3,7 @@ meta:
   title: "최종 프로젝트"
   day: 30
   category: "30days"
-  tags: []
+  tags: ["최종프로젝트", "통합실습", "로컬파일", "객체지향", "데이터처리", "검증"]
   seo:
     title: "파이썬 최종 프로젝트 - 30일 완성"
     description: "30일간 배운 모든 파이썬 문법을 종합하여 실전 프로젝트를 완성합니다."
@@ -454,6 +454,120 @@ sections:
       queryFunc(1, 3)
   - type: "tip"
     content: "알고리즘은 문제를 효율적으로 해결하는 절차입니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 로컬 주문 리포트 미니 프로젝트"
+  subtitle: "입력 → 객체화 → 집계 → 파일 저장 → 재실행 검증"
+  blocks:
+  - type: "text"
+    content: "최종 프로젝트는 문법을 많이 나열하는 것이 아니라, 작은 프로그램을 끝까지 완성하는 것입니다. 아래 흐름은 CSV 문자열을 객체로 바꾸고, 결제 주문만 집계한 뒤 로컬 파일에 리포트를 저장하고 다시 읽어 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "로컬 주문 리포트 프로젝트"
+    description: "30일 과정의 문자열, 자료구조, 함수, 클래스, 예외 처리, 파일 입출력을 연결합니다."
+    content: |-
+      from pathlib import Path
+      import tempfile
+
+      class OrderLine:
+          def __init__(self, orderId, customer, sku, price, quantity, status):
+              if price <= 0:
+                  raise ValueError("price must be positive")
+              if quantity <= 0:
+                  raise ValueError("quantity must be positive")
+
+              self.orderId = orderId
+              self.customer = customer
+              self.sku = sku
+              self.price = price
+              self.quantity = quantity
+              self.status = status
+
+          @property
+          def amount(self):
+              return self.price * self.quantity
+
+      def parseInt(value, fieldName):
+          try:
+              return int(value)
+          except ValueError as exc:
+              raise ValueError(f"invalid number for {fieldName}: {value}") from exc
+
+      def parseOrderCsv(csvText):
+          lines = [line.strip() for line in csvText.strip().splitlines() if line.strip()]
+          headers = [header.strip() for header in lines[0].split(",")]
+          requiredHeaders = ["orderId", "customer", "sku", "price", "quantity", "status"]
+          if headers != requiredHeaders:
+              raise ValueError(f"unexpected headers: {headers}")
+
+          orderLines = []
+          for line in lines[1:]:
+              values = [value.strip() for value in line.split(",")]
+              row = dict(zip(headers, values))
+              orderLines.append(OrderLine(
+                  row["orderId"],
+                  row["customer"],
+                  row["sku"],
+                  parseInt(row["price"], "price"),
+                  parseInt(row["quantity"], "quantity"),
+                  row["status"].lower(),
+              ))
+          return orderLines
+
+      def summarizePaidOrders(orderLines):
+          paidLines = [line for line in orderLines if line.status == "paid"]
+          revenueByCustomer = {}
+          for line in paidLines:
+              revenueByCustomer[line.customer] = revenueByCustomer.get(line.customer, 0) + line.amount
+
+          topCustomer = None
+          if revenueByCustomer:
+              topCustomer = max(revenueByCustomer.items(), key=lambda item: item[1])[0]
+
+          return {
+              "paidCount": len(paidLines),
+              "paidRevenue": sum(line.amount for line in paidLines),
+              "revenueByCustomer": revenueByCustomer,
+              "topCustomer": topCustomer,
+          }
+
+      csvText = """orderId,customer,sku,price,quantity,status
+      A-100,kim,keyboard,50000,1,paid
+      A-101,lee,mouse,20000,2,pending
+      A-102,kim,monitor,180000,1,paid
+      """
+
+      orderLines = parseOrderCsv(csvText)
+      summary = summarizePaidOrders(orderLines)
+
+      assert summary["paidCount"] == 2
+      assert summary["paidRevenue"] == 230000
+      assert summary["revenueByCustomer"] == {"kim": 230000}
+      assert summary["topCustomer"] == "kim"
+
+      with tempfile.TemporaryDirectory() as tempDir:
+          reportPath = Path(tempDir) / "orderReport.txt"
+          reportPath.write_text(
+              f"paidCount={summary['paidCount']}\npaidRevenue={summary['paidRevenue']}",
+              encoding="utf-8",
+          )
+          savedReport = reportPath.read_text(encoding="utf-8")
+
+      assert "paidCount=2" in savedReport
+      assert "paidRevenue=230000" in savedReport
+
+      try:
+          parseOrderCsv("orderId,customer,sku,price,quantity,status\nA-999,kim,item,unknown,1,paid")
+      except ValueError as exc:
+          assert "invalid number" in str(exc)
+
+      print("최종 프로젝트 흐름 통과")
+  - type: "list"
+    items:
+    - "최종 프로젝트는 입력 계약, 오류 처리, 결과 검증이 같이 있어야 완성입니다."
+    - "파일 입출력은 임시 폴더로 먼저 검증하면 로컬 환경을 깨끗하게 유지할 수 있습니다."
+    - "문법별 예제가 아니라 하나의 업무 흐름으로 연결해야 실제 업무에 전이됩니다."
+    - "실무 변주: CSV 입력을 여러 고객 파일로 나누고, 고객별 리포트와 전체 리포트를 동시에 저장하는 배치 프로젝트로 확장해 보세요."
 
 - id: "practice"
   title: "Day 30 최종 복습"

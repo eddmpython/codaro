@@ -3,7 +3,7 @@ meta:
   title: "디자인 패턴 1"
   day: 21
   category: "advancedPython"
-  tags: ["design-pattern", "singleton", "factory", "builder", "adapter", "decorator"]
+  tags: ["design-pattern", "singleton", "factory", "builder", "adapter", "decorator", "검증", "설계패턴"]
   seo:
     title: "파이썬 디자인 패턴 1 - 생성 패턴과 구조 패턴"
     description: "싱글톤, 팩토리, 빌더, 어댑터, 데코레이터 패턴을 학습합니다."
@@ -502,6 +502,123 @@ sections:
       circle2.radius = 10
       registryResult = (str(circle1), str(circle2))
       registryResult
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 리포트 내보내기 구조 설계하기"
+  subtitle: "Factory, Builder, Adapter, Decorator를 변경 지점 기준으로 검증합니다"
+  blocks:
+  - type: "text"
+    content: "디자인 패턴은 이름을 외우는 것이 아니라 변경이 잦은 지점을 격리하는 방법입니다. 리포트 내보내기 업무에서 포맷 생성은 Factory, 옵션 조립은 Builder, 외부 API 차이는 Adapter, 로깅은 Decorator로 분리해보세요."
+  - type: "code"
+    language: "python"
+    title: "Factory와 Adapter로 exporter 만들기"
+    description: "포맷 추가가 호출 코드로 번지지 않는지 확인합니다."
+    content: |-
+      import json
+
+      class CsvExporter:
+          def export(self, rows):
+              header = ",".join(rows[0].keys())
+              body = [",".join(str(value) for value in row.values()) for row in rows]
+              return "\n".join([header, *body])
+
+      class JsonExporter:
+          def export(self, rows):
+              return json.dumps(rows, ensure_ascii=False)
+
+      class ExporterFactory:
+          registry = {
+              "csv": CsvExporter,
+              "json": JsonExporter,
+          }
+
+          @classmethod
+          def create(cls, formatName):
+              if formatName not in cls.registry:
+                  raise ValueError(f"unsupported export format: {formatName}")
+              return cls.registry[formatName]()
+
+      class LegacyExcelApi:
+          def makeWorkbook(self, rows):
+              return {"sheet": "orders", "rows": rows}
+
+      class ExcelAdapter:
+          def __init__(self, legacyApi):
+              self.legacyApi = legacyApi
+
+          def export(self, rows):
+              return self.legacyApi.makeWorkbook(rows)
+
+      rows = [{"id": "O-1", "amount": 12000}, {"id": "O-2", "amount": 8000}]
+
+      assert ExporterFactory.create("json").export(rows).startswith("[")
+      assert ExporterFactory.create("csv").export(rows).splitlines()[0] == "id,amount"
+      assert ExcelAdapter(LegacyExcelApi()).export(rows)["sheet"] == "orders"
+  - type: "code"
+    language: "python"
+    title: "Builder와 Decorator로 옵션과 로깅 분리하기"
+    description: "리포트 옵션 생성과 실행 로그를 호출 코드 밖으로 분리합니다."
+    content: |-
+      class ReportConfigBuilder:
+          def __init__(self):
+              self.config = {"columns": [], "includeSummary": False}
+
+          def columns(self, *names):
+              self.config["columns"] = list(names)
+              return self
+
+          def summary(self, enabled=True):
+              self.config["includeSummary"] = enabled
+              return self
+
+          def build(self):
+              if not self.config["columns"]:
+                  raise ValueError("at least one column is required")
+              return dict(self.config)
+
+      def logExport(exporter, log):
+          class LoggedExporter:
+              def export(self, rows):
+                  result = exporter.export(rows)
+                  log.append(f"exported {len(rows)} rows")
+                  return result
+
+          return LoggedExporter()
+
+      class TextExporter:
+          def export(self, rows):
+              return "\n".join(row["id"] for row in rows)
+
+      config = ReportConfigBuilder().columns("id", "amount").summary().build()
+      log = []
+      output = logExport(TextExporter(), log).export([{"id": "O-1"}, {"id": "O-2"}])
+
+      assert config == {"columns": ["id", "amount"], "includeSummary": True}
+      assert output == "O-1\nO-2"
+      assert log == ["exported 2 rows"]
+  - type: "code"
+    language: "python"
+    title: "지원하지 않는 포맷 오류 확인"
+    description: "생성 실패를 조용히 넘기지 않고 명시적 예외로 검증합니다."
+    content: |-
+      class ExporterFactory:
+          registry = {}
+
+          @classmethod
+          def create(cls, formatName):
+              if formatName not in cls.registry:
+                  raise ValueError(f"unsupported export format: {formatName}")
+              return cls.registry[formatName]()
+
+      try:
+          ExporterFactory.create("pdf")
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "unsupported export format: pdf"
+  - type: "tip"
+    title: "변주 실험"
+    content: "PDF exporter를 추가할 때 기존 호출 코드를 수정하지 않고 Factory registry와 어댑터만 바꾸는 구조인지 확인하세요."
 
 - id: "practice"
   title: "종합 연습"

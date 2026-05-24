@@ -1,5 +1,8 @@
 meta:
+  id: "25_logging"
   title: "logging - 로깅"
+  category: "builtins"
+  tags: ["logging", "로그", "logger", "debug", "handler"]
   description: "애플리케이션 로그 기록을 위한 logging 모듈"
   keywords: ["logging", "로그", "logger", "debug", "handler"]
 
@@ -461,6 +464,106 @@ sections:
       "Structured logging"
   - type: "tip"
     content: "구조화된 로그(JSON)는 로그 분석 도구에서 파싱하기 쉽고, 검색과 집계가 용이합니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 구조화 로그 품질 게이트"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "실무 로깅은 화면에 찍히는지보다 필요한 필드가 남는지, 민감 정보가 빠지는지, 실패 로그가 검색 가능한 구조인지가 중요합니다. 여기서는 StringIO로 로그를 캡처해 구조와 보안 필터를 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "캡처 가능한 JSON 로거 만들기"
+    description: "전역 로깅 상태를 건드리지 않는 독립 로거를 구성합니다."
+    content: |-
+      import io
+      import json
+
+      class WorkflowJsonFormatter(logging.Formatter):
+          def format(self, record):
+              data = {
+                  'level': record.levelname,
+                  'logger': record.name,
+                  'message': record.getMessage(),
+                  'requestId': getattr(record, 'requestId', 'unknown')
+              }
+              return json.dumps(data, ensure_ascii=False, sort_keys=True)
+
+      logStream = io.StringIO()
+      workflowLogger = logging.getLogger('codaro.curriculum.workflow')
+      workflowLogger.handlers.clear()
+      workflowLogger.propagate = False
+      workflowLogger.setLevel(logging.INFO)
+
+      streamHandler = logging.StreamHandler(logStream)
+      streamHandler.setFormatter(WorkflowJsonFormatter())
+      workflowLogger.addHandler(streamHandler)
+
+      workflowLogger.info('lesson verified', extra={'requestId': 'req-001'})
+      firstLogLine = logStream.getvalue().strip()
+      parsedLog = json.loads(firstLogLine)
+
+      assert parsedLog['level'] == 'INFO'
+      assert parsedLog['requestId'] == 'req-001'
+      parsedLog
+  - type: "code"
+    language: "python"
+    title: "민감 정보 제거 필터"
+    description: "토큰과 비밀번호가 로그 메시지에 남지 않도록 필터링합니다."
+    content: |-
+      class SecretFilter(logging.Filter):
+          def filter(self, record):
+              message = record.getMessage()
+              for secretKey in ['token=', 'password=']:
+                  if secretKey in message:
+                      record.msg = message.split(secretKey)[0] + secretKey + '[redacted]'
+                      record.args = ()
+              return True
+
+      workflowLogger.addFilter(SecretFilter())
+      logStream.seek(0)
+      logStream.truncate(0)
+
+      workflowLogger.warning('sync failed token=abc123', extra={'requestId': 'req-002'})
+      filteredLog = json.loads(logStream.getvalue())
+
+      assert '[redacted]' in filteredLog['message']
+      assert 'abc123' not in filteredLog['message']
+      filteredLog
+  - type: "code"
+    language: "python"
+    title: "오류 로그를 먼저 검증한다"
+    description: "예외 발생 시 ERROR 로그와 requestId가 함께 남는지 확인합니다."
+    content: |-
+      logStream.seek(0)
+      logStream.truncate(0)
+
+      try:
+          int('not-number')
+      except ValueError as exc:
+          workflowLogger.error(f'parse failed: {exc}', extra={'requestId': 'req-003'})
+
+      errorLog = json.loads(logStream.getvalue())
+      assert errorLog['level'] == 'ERROR'
+      assert errorLog['requestId'] == 'req-003'
+      errorLog
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 로그 품질 요약"
+    description: "캡처한 로그를 대시보드용 요약으로 변환합니다."
+    content: |-
+      logSummary = {
+          'logger': errorLog['logger'],
+          'hasRequestId': errorLog['requestId'].startswith('req-'),
+          'searchable': errorLog['level'] in {'INFO', 'WARNING', 'ERROR'}
+      }
+
+      assert logSummary == {
+          'logger': 'codaro.curriculum.workflow',
+          'hasRequestId': True,
+          'searchable': True
+      }
+      logSummary
 
 - id: "practice"
   title: "종합 복습"

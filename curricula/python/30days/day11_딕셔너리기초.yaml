@@ -3,7 +3,7 @@ meta:
   title: "딕셔너리기초"
   day: 11
   category: "30days"
-  tags: []
+  tags: ["딕셔너리", "key-value", "중첩데이터", "주문데이터", "KeyError", "검증"]
   seo:
     title: "파이썬 딕셔너리 기초 - 키-값 쌍 데이터 관리"
     description: "딕셔너리의 생성, 접근, 수정, 추가, 삭제 방법을 배웁니다."
@@ -370,6 +370,85 @@ sections:
       coords[(0, 0)]
   - type: "tip"
     content: "튜플 키는 좌표나 날짜 같은 복합 키에 유용합니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 주문 레코드 만들고 필수 필드 확인"
+  subtitle: "딕셔너리를 업무 데이터의 작은 레코드로 사용하기"
+  blocks:
+  - type: "text"
+    content: "딕셔너리는 값을 담는 문법이 아니라, 이름이 붙은 업무 데이터를 표현하는 기본 단위입니다. 주문, 사용자, 설정, API 응답처럼 필드가 있는 데이터를 만들고, 필요한 키가 없을 때 바로 실패하도록 검증해야 합니다."
+  - type: "list"
+    items:
+    - "예측: 주문에는 orderId, customer, item, quantity, unitPrice가 필요하다고 정한다."
+    - "실행: 키로 값을 읽고, 새 키 totalPrice와 status를 추가한다."
+    - "오류 수정: 없는 키 접근이 KeyError를 내는지 확인한다."
+    - "검증: 필수 키, 합계, 중첩 배송 정보가 맞는지 assert로 확인한다."
+  - type: "code"
+    language: "python"
+    title: "주문 레코드 생성"
+    description: "딕셔너리로 주문 정보를 만들고 계산 결과를 필드로 추가합니다."
+    content: |-
+      order = {
+          'orderId': 'ORD-2026-001',
+          'customer': '김고객',
+          'item': '키보드',
+          'quantity': 2,
+          'unitPrice': 80000
+      }
+      order['totalPrice'] = order['quantity'] * order['unitPrice']
+      order['status'] = 'ready'
+
+      assert order['orderId'] == 'ORD-2026-001'
+      assert order['totalPrice'] == 160000
+      assert 'status' in order
+      assert len(order) == 7
+  - type: "code"
+    language: "python"
+    title: "필수 키 누락 확인"
+    description: "없는 키를 조용히 넘기지 않고 KeyError로 확인합니다."
+    content: |-
+      order = {'orderId': 'ORD-2026-002', 'item': '마우스'}
+
+      try:
+          customerName = order['customer']
+      except KeyError as exc:
+          missingKey = exc.args[0]
+      else:
+          raise AssertionError('customer 키가 없으면 실패해야 합니다')
+
+      assert missingKey == 'customer'
+      assert 'customer' not in order
+  - type: "code"
+    language: "python"
+    title: "중첩 배송 정보 검증"
+    description: "중첩 딕셔너리에서 배송지와 배송비를 읽어 최종 결제 금액을 검증합니다."
+    content: |-
+      order = {
+          'orderId': 'ORD-2026-003',
+          'totalPrice': 160000,
+          'shipping': {
+              'city': '서울',
+              'fee': 3000
+          }
+      }
+
+      payment = order['totalPrice'] + order['shipping']['fee']
+
+      assert order['shipping']['city'] == '서울'
+      assert payment == 163000
+  - type: "expansion"
+    title: "실무 변주: 좌표별 매장명 조회"
+    code: |-
+      storesByCoord = {
+          (37, 127): '서울점',
+          (35, 129): '부산점'
+      }
+      currentCoord = (37, 127)
+      storeName = storesByCoord[currentCoord]
+
+      assert storeName == '서울점'
+      assert (33, 126) not in storesByCoord
+      storeName
 
 - id: "practice"
   title: "Day 11 종합 복습"

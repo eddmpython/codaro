@@ -3,7 +3,7 @@ meta:
   title: "자료구조 구현"
   day: 20
   category: "advancedPython"
-  tags: ["stack", "queue", "linkedlist", "tree", "heap", "hashtable"]
+  tags: ["stack", "queue", "linkedlist", "tree", "heap", "hashtable", "검증", "자료구조선택"]
   seo:
     title: "파이썬 자료구조 구현 - 스택, 큐, 연결 리스트, 트리, 힙"
     description: "핵심 자료구조를 직접 구현하여 내부 동작을 이해합니다. 스택, 큐, 연결 리스트, 이진 트리, 힙, 해시 테이블을 직접 만들어봅니다."
@@ -678,6 +678,152 @@ sections:
       (lruGet1, lruGet2, lruGet3, lruGet4)
   - type: "tip"
     content: "functools.lru_cache 데코레이터로 함수 결과를 캐싱할 수 있습니다."
+
+- id: "workflow_validation"
+  title: "실무 자료구조 선택 루프"
+  subtitle: "예측 → 구현 → 오류 확인 → 검증"
+  blocks:
+  - type: "text"
+    content: "자료구조는 구현 시험 문제가 아니라 업무 흐름의 병목을 줄이는 선택입니다. 티켓 처리처럼 순서, 우선순위, 되돌리기가 섞인 문제에서는 큐, 힙, 스택을 각각 어디에 써야 하는지 먼저 예측하고, 작은 데이터로 검증한 뒤 수정 실험을 해야 합니다."
+  - type: "list"
+    items:
+    - "큐는 접수 순서를 지켜야 하는 작업 대기열에 맞습니다."
+    - "힙은 가장 급한 작업을 먼저 꺼낼 때 맞습니다."
+    - "스택은 실행 취소처럼 마지막 작업부터 되돌릴 때 맞습니다."
+    - "오류가 나지 않아도 처리 순서가 틀리면 업무 버그입니다."
+  - type: "code"
+    language: "python"
+    title: "접수 순서 큐 구현"
+    description: "실행 전에 어떤 티켓이 먼저 처리될지 예측해보세요."
+    content: |-
+      class TicketQueue:
+          def __init__(self):
+              self.items = []
+
+          def enqueue(self, ticket):
+              self.items.append(ticket)
+
+          def dequeue(self):
+              if not self.items:
+                  raise IndexError("empty ticket queue")
+              return self.items.pop(0)
+
+          def size(self):
+              return len(self.items)
+
+      tickets = [
+          {"id": "T-101", "priority": 3, "title": "결제 실패"},
+          {"id": "T-102", "priority": 1, "title": "비밀번호 초기화"},
+          {"id": "T-103", "priority": 2, "title": "리포트 지연"},
+      ]
+
+      ticketQueue = TicketQueue()
+      for ticket in tickets:
+          ticketQueue.enqueue(ticket)
+
+      firstTicket = ticketQueue.dequeue()
+      secondTicket = ticketQueue.dequeue()
+      assert (firstTicket["id"], secondTicket["id"], ticketQueue.size()) == ("T-101", "T-102", 1)
+  - type: "code"
+    language: "python"
+    title: "빈 큐 오류 확인"
+    description: "자료구조의 실패 조건도 의도한 메시지로 확인합니다."
+    content: |-
+      emptyQueue = TicketQueue()
+
+      try:
+          emptyQueue.dequeue()
+      except IndexError as exc:
+          queueErrorMessage = str(exc)
+
+      assert queueErrorMessage == "empty ticket queue"
+  - type: "code"
+    language: "python"
+    title: "우선순위 힙 구현"
+    description: "긴급도가 높은 티켓을 먼저 처리하도록 힙을 씁니다."
+    content: |-
+      from heapq import heappop, heappush
+
+      class PriorityTicketQueue:
+          def __init__(self):
+              self.heap = []
+              self.sequence = 0
+
+          def push(self, ticket):
+              heappush(self.heap, (ticket["priority"], self.sequence, ticket))
+              self.sequence += 1
+
+          def pop(self):
+              if not self.heap:
+                  raise IndexError("empty priority queue")
+              return heappop(self.heap)[2]
+
+      priorityQueue = PriorityTicketQueue()
+      for ticket in tickets:
+          priorityQueue.push(ticket)
+
+      priorityOrder = [priorityQueue.pop()["id"] for _ in range(3)]
+      assert priorityOrder == ["T-102", "T-103", "T-101"]
+  - type: "code"
+    language: "python"
+    title: "처리 순서 검증"
+    description: "큐와 힙이 서로 다른 업무 규칙을 만족하는지 비교합니다."
+    content: |-
+      expectedFifo = ("T-101", "T-102", 1)
+      expectedPriorityOrder = ["T-102", "T-103", "T-101"]
+
+      checks = {
+          "fifoOk": (firstTicket["id"], secondTicket["id"], ticketQueue.size()) == expectedFifo,
+          "priorityOk": priorityOrder == expectedPriorityOrder,
+      }
+
+      assert all(checks.values()), checks
+  - type: "code"
+    language: "python"
+    title: "스택으로 되돌리기"
+    description: "마지막 상태 변경부터 되돌리는 구조를 직접 확인합니다."
+    content: |-
+      class StatusHistory:
+          def __init__(self, initialStatus):
+              self.currentStatus = initialStatus
+              self.history = []
+
+          def change(self, nextStatus):
+              self.history.append(self.currentStatus)
+              self.currentStatus = nextStatus
+
+          def undo(self):
+              if not self.history:
+                  raise IndexError("empty status history")
+              self.currentStatus = self.history.pop()
+              return self.currentStatus
+
+      statusHistory = StatusHistory("open")
+      statusHistory.change("assigned")
+      statusHistory.change("resolved")
+      undoOne = statusHistory.undo()
+      undoTwo = statusHistory.undo()
+
+      assert (undoOne, undoTwo, statusHistory.currentStatus) == ("assigned", "open", "open")
+  - type: "code"
+    language: "python"
+    title: "수정 실험"
+    description: "긴급도를 바꾸면 힙 처리 순서가 어떻게 달라지는지 실험합니다."
+    content: |-
+      changedTickets = [
+          {**ticket, "priority": 0 if ticket["id"] == "T-103" else ticket["priority"]}
+          for ticket in tickets
+      ]
+
+      changedQueue = PriorityTicketQueue()
+      for ticket in changedTickets:
+          changedQueue.push(ticket)
+
+      changedPriorityOrder = [changedQueue.pop()["id"] for _ in range(3)]
+      assert priorityOrder == ["T-102", "T-103", "T-101"]
+      assert changedPriorityOrder == ["T-103", "T-102", "T-101"]
+  - type: "tip"
+    content: "자료구조 선택은 코드 모양보다 처리 순서와 실패 조건을 검증하는 문제입니다. 작은 입력으로 예측과 검증을 통과한 뒤 데이터 크기를 키우세요."
 
 - id: "practice"
   title: "종합 복습"

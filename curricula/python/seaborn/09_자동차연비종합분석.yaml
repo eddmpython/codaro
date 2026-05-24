@@ -33,10 +33,11 @@ sections:
     description: seaborn과 matplotlib을 불러옵니다
     content: |-
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
       import pandas as pd
 
-      mpg = sns.load_dataset('mpg').dropna()
+      mpg = loadLocalDataset('mpg').dropna()
       mpg
   - type: tip
     content: mpg 데이터는 cylinders(실린더), displacement(배기량), horsepower(마력), weight(무게), acceleration(가속), model_year(연식), origin(원산지) 컬럼을 포함합니다.
@@ -241,6 +242,82 @@ sections:
   - type: tip
     content: 상관계수 히트맵은 모든 변수 쌍의 상관관계를 한눈에 보여줍니다. 양의 상관은 파란색, 음의 상관은 빨간색으로 표시됩니다. mpg는 weight, displacement와 강한 음의 상관을 보입니다.
 
+- id: workflow_validation
+  title: 14단계. 자동차 연비 다변량 검증 루프
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      pairplot과 jointplot은 변수 관계를 빠르게 보여 주지만, 보고서에는 핵심 관계 하나를 검증 가능한 축으로 남겨야 합니다. 무게가 증가하면 연비가 낮아진다는 예측을 확인합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 관계 예측
+    description: 연비, 중량, 마력, 원산지 컬럼을 확인하고 무게-연비 상관을 봅니다
+    content: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      mpgFlow = loadLocalDataset("mpg").dropna()
+      requiredColumns = {"mpg", "weight", "horsepower", "origin", "model_year"}
+      missingColumns = requiredColumns - set(mpgFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert mpgFlow[["mpg", "weight", "horsepower"]].gt(0).all().all()
+
+      weightMpgCorr = mpgFlow[["weight", "mpg"]].corr().loc["weight", "mpg"]
+      assert weightMpgCorr < -0.5
+      round(float(weightMpgCorr), 3)
+  - type: code
+    language: python
+    title: 관계 차트 검증
+    description: regplot이 산점도와 추세선을 모두 포함하는지 확인합니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+      figMpgReg, axMpgReg = plt.subplots(figsize=(8, 5))
+      sns.regplot(data=mpgFlow, x="weight", y="mpg", scatter_kws={"alpha": 0.6}, ax=axMpgReg)
+      axMpgReg.set_title("Vehicle weight and fuel efficiency")
+      axMpgReg.set_xlabel("Weight")
+      axMpgReg.set_ylabel("MPG")
+
+      assert axMpgReg.get_xlabel() == "Weight"
+      assert axMpgReg.get_ylabel() == "MPG"
+      assert len(axMpgReg.collections) >= 1
+      assert len(axMpgReg.lines) >= 1
+      figMpgReg
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 연비가 0 이하인 입력을 모델링 전에 막습니다
+    content: |-
+      def validateMpgFrame(frame):
+          if not frame["mpg"].gt(0).all():
+              raise ValueError("mpg는 0보다 커야 합니다")
+          assert frame["weight"].gt(0).all()
+          return True
+
+      brokenMpg = mpgFlow.copy()
+      brokenMpg.loc[brokenMpg.index[0], "mpg"] = 0
+      try:
+          validateMpgFrame(brokenMpg)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateMpgFrame(mpgFlow)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 원산지와 연식 기준으로 같은 결론이 유지되는지 확인합니다
+    content: |-
+      originMpg = mpgFlow.groupby("origin")["mpg"].mean().sort_values(ascending=False)
+      yearMpgCorr = mpgFlow[["model_year", "mpg"]].corr().loc["model_year", "mpg"]
+
+      assert originMpg.index[0] == "europe"
+      assert yearMpgCorr > 0
+      {"originMpg": originMpg.round(1).to_dict(), "yearMpgCorr": round(float(yearMpgCorr), 3)}
+  - type: tip
+    content: "다변량 차트는 탐색용으로 넓게 보고, 검증 가능한 핵심 관계를 하나씩 좁혀야 업무 분석으로 이어집니다."
+
 - id: practice
   title: 실습
   subtitle: 다변량 분석
@@ -256,9 +333,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        data = sns.load_dataset('penguins').dropna()
+        data = loadLocalDataset('penguins').dropna()
     - type: code
       title: "차트 생성"
       content: |-
@@ -272,9 +350,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        df = sns.load_dataset('tips')
+        df = loadLocalDataset('tips')
     - type: code
       title: "차트 생성"
       content: |-

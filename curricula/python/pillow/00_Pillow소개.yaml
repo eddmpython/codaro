@@ -1,4 +1,6 @@
 meta:
+  packages:
+    - pillow
   id: pillow_00
   title: Pillow소개
   order: 0
@@ -355,3 +357,82 @@ sections:
     - type: text
       content: |-
         Pillow를 배우면 파이썬으로 이미지를 자유롭게 다룰 수 있습니다. 썸네일 생성, 필터 적용, 워터마크 삽입 등 실용적인 작업을 코드 몇 줄로 해결할 수 있게 됩니다. 첫 번째 프로젝트에서 sklearn의 꽃 이미지를 열어보며 Pillow의 기본을 익혀봅시다.
+
+- id: workflow_validation
+  title: 로컬 이미지 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: Pillow 입문은 이미지를 열고 저장하는 문법보다, 이미지의 mode, size, alpha, 픽셀 변화가 의도대로 유지되는지 확인하는 습관이 중요합니다. 로컬에서 이미지를 직접 만들고 잘못된 입력을 넣어 실패를 확인한 뒤, 결과를 수치로 검증합니다.
+  - type: list
+    items:
+      - 실행 전에는 출력 크기와 색상 변화가 어떻게 나올지 예측합니다.
+      - 파일이 없어도 Image.new와 ImageDraw로 재현 가능한 테스트 이미지를 만듭니다.
+      - 잘못된 mode나 크기 설정은 오류로 잡습니다.
+      - 리사이즈, 필터, 저장 포맷 변주가 품질 기준을 깨지 않는지 확인합니다.
+  - type: code
+    language: python
+    title: 로컬 샘플 이미지 준비
+    description: 외부 파일 없이 Pillow 이미지 객체를 만듭니다.
+    content: |-
+      from PIL import Image, ImageDraw, ImageFilter, ImageStat
+
+      introImage = Image.new("RGB", (160, 100), "white")
+      introDraw = ImageDraw.Draw(introImage)
+      introDraw.rectangle((20, 20, 140, 80), fill=(80, 140, 220), outline=(20, 60, 120), width=4)
+      introDraw.ellipse((58, 28, 102, 72), fill=(240, 210, 80))
+
+      def validateRgbImage(image):
+          if image.mode != "RGB":
+              raise ValueError(f"RGB 이미지가 아닙니다: {image.mode}")
+          if image.size[0] < 1 or image.size[1] < 1:
+              raise ValueError(f"이미지 크기가 올바르지 않습니다: {image.size}")
+          return True
+
+      validateRgbImage(introImage)
+  - type: code
+    language: python
+    title: 잘못된 mode 확인
+    description: 그레이스케일 이미지를 넣어 검증 실패를 확인합니다.
+    content: |-
+      brokenIntroImage = introImage.convert("L")
+
+      try:
+          validateRgbImage(brokenIntroImage)
+      except ValueError as exc:
+          introModeError = str(exc)
+
+      introModeError
+  - type: code
+    language: python
+    title: 변환 결과 검증
+    description: 리사이즈와 필터 결과의 크기, mode, 픽셀 변화를 확인합니다.
+    content: |-
+      introThumbnail = introImage.resize((80, 50))
+      introBlur = introImage.filter(ImageFilter.GaussianBlur(radius=2))
+      introDiffBox = introImage.getbbox()
+      introChecks = {
+          "modeOk": introImage.mode == "RGB",
+          "thumbnailSizeOk": introThumbnail.size == (80, 50),
+          "filterKeepsSize": introBlur.size == introImage.size,
+          "imageNotBlank": introDiffBox is not None,
+          "errorOk": introModeError == "RGB 이미지가 아닙니다: L",
+      }
+
+      assert all(introChecks.values()), introChecks
+      introChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 썸네일 크기를 바꿔도 비율이 유지되는지 확인합니다.
+    content: |-
+      largeThumb = introImage.copy()
+      largeThumb.thumbnail((120, 120))
+      smallThumb = introImage.copy()
+      smallThumb.thumbnail((40, 40))
+
+      assert largeThumb.size == (120, 75)
+      assert smallThumb.size == (40, 25)
+      largeThumb.size, smallThumb.size
+  - type: tip
+    content: Pillow 결과물은 눈으로 확인하기 전에 mode, size, histogram, 픽셀 차이를 먼저 검증하면 실무 자동화에서 훨씬 안전합니다.

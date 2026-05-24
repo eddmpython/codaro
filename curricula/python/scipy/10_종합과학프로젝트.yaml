@@ -260,7 +260,7 @@ sections:
           aFit, bFit, cFit = fitParams
           rmsFit = expGrowth(segmentTime, aFit, bFit, cFit)
           fitSuccess = True
-      except:
+      except (RuntimeError, ValueError):
           fitSuccess = False
           rmsFit = np.ones_like(segmentTime) * np.mean(segmentRms)
 
@@ -537,3 +537,101 @@ sections:
 
         plt.tight_layout()
         figWeather
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: SLA 지연시간 통계 게이트
+  blocks:
+  - type: text
+    content: "SciPy는 공식을 호출하는 연습만으로는 부족합니다. 업무에서는 측정값이 분석 가능한지 먼저 검증하고, 기준값을 넘는지 통계 검정으로 확인한 뒤, 보고 가능한 신뢰구간과 개선 기준을 함께 제시해야 합니다. 아래 흐름은 API 지연시간이 SLA 기준을 넘는지 판단하고, 기준을 바꾸는 변주까지 확인합니다."
+  - type: code
+    language: python
+    title: 지연시간 샘플과 입력 검증
+    description: 결측, 음수, 샘플 수 부족을 분석 전에 차단합니다.
+    content: |-
+      import numpy as np
+      from scipy import optimize, stats
+
+      latencySamples = np.array([245, 260, 255, 271, 268, 290, 276, 263, 282, 274, 269, 258], dtype=float)
+
+      def validateLatencySamples(samples):
+          values = np.asarray(samples, dtype=float)
+          if values.size < 5:
+              raise ValueError("통계 검정에는 최소 5개 이상의 측정값이 필요합니다.")
+          if not np.isfinite(values).all():
+              raise ValueError("지연시간 샘플에는 결측값이나 무한대가 없어야 합니다.")
+          if (values <= 0).any():
+              raise ValueError("지연시간은 0보다 커야 합니다.")
+          return values
+
+      cleanLatency = validateLatencySamples(latencySamples)
+      cleanLatency.mean(), cleanLatency.std(ddof=1)
+  - type: code
+    language: python
+    title: 실패 입력 확인
+    description: 잘못된 지연시간이 검증 함수에서 차단되는지 확인합니다.
+    content: |-
+      try:
+          validateLatencySamples([240, 250, -1, 260, 270])
+      except ValueError as exc:
+          latencyValidationMessage = str(exc)
+
+      assert "0보다 커야" in latencyValidationMessage
+      latencyValidationMessage
+  - type: code
+    language: python
+    title: SLA 초과 여부 검정
+    description: 평균 지연시간이 250ms보다 큰지 단측 t-test로 확인합니다.
+    content: |-
+      # 예측: 샘플 평균이 250ms보다 충분히 높으므로 SLA 초과 신호가 유의할 것입니다.
+      targetLatency = 250
+      latencyTest = stats.ttest_1samp(cleanLatency, popmean=targetLatency, alternative="greater")
+      latencyCi = stats.t.interval(
+          confidence=0.95,
+          df=len(cleanLatency) - 1,
+          loc=cleanLatency.mean(),
+          scale=stats.sem(cleanLatency),
+      )
+
+      latencySummary = {
+          "mean": round(float(cleanLatency.mean()), 2),
+          "pValue": round(float(latencyTest.pvalue), 6),
+          "ciLow": round(float(latencyCi[0]), 2),
+          "ciHigh": round(float(latencyCi[1]), 2),
+      }
+      latencySummary
+  - type: code
+    language: python
+    title: 보고서 투입 전 검증
+    description: 통계 결론과 신뢰구간이 업무 기준을 만족하는지 assert로 고정합니다.
+    content: |-
+      latencyChecks = {
+          "mean_exceeds_target": cleanLatency.mean() > targetLatency,
+          "test_is_significant": latencyTest.pvalue < 0.05,
+          "confidence_interval_above_target": latencyCi[0] > targetLatency,
+          "sample_size_is_enough": len(cleanLatency) >= 10,
+      }
+
+      assert all(latencyChecks.values()), latencyChecks
+      latencyChecks
+  - type: expansion
+    title: "실무 변주: 평균을 264ms 이하로 맞추려면 상한선을 어디에 둬야 할까?"
+    blocks:
+    - type: code
+      language: python
+      title: 최적 상한선 계산
+      content: |-
+        allowedMean = 264
+        capThreshold = optimize.brentq(
+            lambda threshold: np.clip(cleanLatency, None, threshold).mean() - allowedMean,
+            cleanLatency.min(),
+            cleanLatency.max(),
+        )
+        cappedMean = np.clip(cleanLatency, None, capThreshold).mean()
+
+        assert abs(cappedMean - allowedMean) < 1e-6
+        {
+            "allowedMean": allowedMean,
+            "capThreshold": round(float(capThreshold), 2),
+            "cappedMean": round(float(cappedMean), 2),
+        }

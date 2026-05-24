@@ -48,7 +48,8 @@ sections:
     title: 기본 산점도
     description: GDP vs 기대수명
     content: |-
-      px.scatter(df2007, x='gdpPercap', y='lifeExp', title='GDP와 기대수명').show()
+      figBasicScatter = px.scatter(df2007, x='gdpPercap', y='lifeExp', title='GDP와 기대수명')
+      figBasicScatter
 
 - id: step3_color
   title: 3단계. 대륙별 색상
@@ -61,7 +62,8 @@ sections:
     title: 대륙별 색상
     description: 색상으로 구분
     content: |-
-      px.scatter(df2007, x='gdpPercap', y='lifeExp', color='continent', title='대륙별 GDP와 기대수명').show()
+      figColorScatter = px.scatter(df2007, x='gdpPercap', y='lifeExp', color='continent', title='대륙별 GDP와 기대수명')
+      figColorScatter
 
 - id: step4_bubble
   title: 4단계. 버블차트
@@ -77,7 +79,8 @@ sections:
     title: 버블차트
     description: 크기로 인구 표현
     content: |-
-      px.scatter(df2007, x='gdpPercap', y='lifeExp', color='continent', size='pop', title='국가별 발전 현황').show()
+      figBubbleScatter = px.scatter(df2007, x='gdpPercap', y='lifeExp', color='continent', size='pop', title='국가별 발전 현황')
+      figBubbleScatter
 
 - id: step5_hover
   title: 5단계. 호버 정보
@@ -90,12 +93,13 @@ sections:
     title: 호버 커스텀
     description: 국가명 표시
     content: |-
-      px.scatter(
+      figHoverScatter = px.scatter(
           df2007, x='gdpPercap', y='lifeExp',
           color='continent', size='pop',
           hover_name='country',
           title='국가별 발전 현황'
-      ).show()
+      )
+      figHoverScatter
 
 - id: step6_log_x
   title: 6단계. 로그 스케일
@@ -130,14 +134,15 @@ sections:
     title: 버블 크기 조정
     description: 최대 크기 60
     content: |-
-      px.scatter(
+      figSizedBubble = px.scatter(
           df2007, x='gdpPercap', y='lifeExp',
           color='continent', size='pop',
           hover_name='country',
           log_x=True,
           size_max=60,
           title='GDP와 기대수명 (버블 크기 조정)'
-      ).show()
+      )
+      figSizedBubble
 
 - id: step8_update_layout
   title: 8단계. 레이아웃 커스텀
@@ -195,7 +200,7 @@ sections:
               x=0.99
           )
       )
-      figLegend.show()
+      figLegend
 
 - id: step10_final
   title: 10단계. 완성본
@@ -227,7 +232,116 @@ sections:
           legend_title='대륙',
           template='plotly_white'
       )
-      figFinal.show()
+      figFinal
+
+- id: workflow_validation
+  title: 11단계. 실무 버블차트 검증 루프
+  subtitle: 예측 → Figure 검증 → 오류 수정 → 연도 변주
+  blocks:
+  - type: text
+    content: 버블차트는 여러 변수를 한 화면에 넣기 때문에 축, 색상, 크기, hover, 로그 스케일 중 하나만 빠져도 해석이 달라집니다. 이 단계에서는 GDP가 높을수록 기대수명이 높아지는 양의 관계가 있을 것이라고 먼저 예측하고, 데이터 요약과 Plotly Figure 구조를 함께 검증합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 관계 예측
+    description: 필수 컬럼, 2007년 국가 수, GDP-기대수명 관계를 검증합니다
+    content: |-
+      import math
+
+      requiredColumns = {"country", "continent", "year", "lifeExp", "pop", "gdpPercap", "iso_alpha"}
+      missingColumns = requiredColumns - set(gapminder.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert df2007.shape[0] == 142
+      assert sorted(df2007["continent"].unique()) == ["Africa", "Americas", "Asia", "Europe", "Oceania"]
+
+      logGdp = df2007["gdpPercap"].map(math.log10)
+      gdpLifeCorrelation = logGdp.corr(df2007["lifeExp"])
+      topPopulationCountry = df2007.nlargest(1, "pop").iloc[0]["country"]
+
+      assert gdpLifeCorrelation > 0.75
+      assert topPopulationCountry == "China"
+
+      {
+          "gdpLifeCorrelation": round(gdpLifeCorrelation, 3),
+          "topPopulationCountry": topPopulationCountry,
+      }
+  - type: code
+    language: python
+    title: 버블차트 Figure 검증
+    description: 최종 차트의 trace, 축, 범례, 제목을 확인합니다
+    content: |-
+      def validateBubbleFigure(fig, expectedContinents):
+          traceNames = [trace.name for trace in fig.data]
+
+          assert len(fig.data) == len(expectedContinents)
+          assert set(traceNames) == set(expectedContinents)
+          assert all(trace.type == "scatter" for trace in fig.data)
+          assert all(trace.mode == "markers" for trace in fig.data)
+          assert all(len(trace.marker.size) > 0 for trace in fig.data)
+          assert fig.layout.xaxis.type == "log"
+          assert "GDP" in fig.layout.xaxis.title.text
+          assert "기대수명" in fig.layout.yaxis.title.text
+          assert "2007" in fig.layout.title.text
+
+          return traceNames
+
+      expectedContinents = sorted(df2007["continent"].unique())
+      traceNames = validateBubbleFigure(figFinal, expectedContinents)
+      traceNames
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 로그 스케일과 대륙 색상이 빠진 차트를 검증 함수가 잡아내는지 확인합니다
+    content: |-
+      brokenFigure = px.scatter(
+          df2007,
+          x="gdpPercap",
+          y="lifeExp",
+          size="pop",
+          hover_name="country",
+          title="2007년 세계 발전 현황"
+      )
+
+      try:
+          validateBubbleFigure(brokenFigure, expectedContinents)
+      except AssertionError as exc:
+          print("검증 실패 확인:", exc)
+
+      fixedFigure = px.scatter(
+          df2007,
+          x="gdpPercap",
+          y="lifeExp",
+          color="continent",
+          size="pop",
+          hover_name="country",
+          log_x=True,
+          size_max=60,
+          title="2007년 세계 발전 현황"
+      )
+      fixedFigure.update_layout(
+          xaxis_title="1인당 GDP (USD, 로그 스케일)",
+          yaxis_title="기대수명 (년)"
+      )
+
+      assert validateBubbleFigure(fixedFigure, expectedContinents)
+  - type: code
+    language: python
+    title: 연도 변주 실험
+    description: 1952년과 2007년의 기대수명 중앙값과 GDP 중앙값을 비교합니다
+    content: |-
+      yearComparison = gapminder[gapminder["year"].isin([1952, 2007])].groupby("year").agg(
+          medianLife=("lifeExp", "median"),
+          medianGdp=("gdpPercap", "median"),
+          countryCount=("country", "count"),
+      ).round(2)
+
+      assert yearComparison.loc[2007, "medianLife"] > yearComparison.loc[1952, "medianLife"]
+      assert yearComparison.loc[2007, "medianGdp"] > yearComparison.loc[1952, "medianGdp"]
+      assert yearComparison.loc[1952, "countryCount"] == yearComparison.loc[2007, "countryCount"]
+
+      yearComparison
+  - type: tip
+    content: "실무 버블차트는 데이터 관계와 Figure 구조를 함께 검증해야 합니다. 특히 로그축과 색상 그룹은 해석을 바꾸므로 테스트로 고정해두는 편이 안전합니다."
 
 - id: practice
   title: 실습

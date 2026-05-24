@@ -30,6 +30,7 @@ sections:
     title: "string 모듈 불러오기"
     description: "string 모듈을 불러옵니다."
     content: |-
+      import secrets
       import string
 
       'string 모듈이 정상적으로 로드되었습니다'
@@ -260,11 +261,10 @@ sections:
   - type: "code"
     language: "python"
     title: "랜덤 문자열 생성"
-    description: "영문자와 숫자로 랜덤 문자열을 만듭니다."
+    description: "영문자와 숫자로 예측하기 어려운 문자열을 만듭니다."
     content: |-
-      import random
       charset = string.ascii_letters + string.digits
-      randomString = ''.join(random.choices(charset, k=8))
+      randomString = ''.join(secrets.choice(charset) for _ in range(8))
       randomString
   - type: "code"
     language: "python"
@@ -295,6 +295,86 @@ sections:
       emailBody
   - type: "tip"
     content: "보안이 중요한 비밀번호 생성은 secrets.choice()를 사용하세요."
+
+- id: "workflow_validation"
+  title: "검증 루프: 초대 코드와 메시지 템플릿"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "string 모듈은 단순 상수 모음이 아니라 입력 검증, 안전한 코드 생성, 템플릿 누락 확인에 연결할 때 실무 가치가 커집니다. 여기서는 계정 초대 메시지를 만들면서 허용 문자, 누락 변수, 출력 형식을 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "허용 문자와 코드 생성기"
+    description: "혼동되는 문자를 제외한 초대 코드를 생성하고 문자 집합을 검증합니다."
+    content: |-
+      safeAlphabet = ''.join(
+          c for c in string.ascii_uppercase + string.digits
+          if c not in {'0', 'O', '1', 'I'}
+      )
+
+      def makeInviteCode(length=10):
+          assert length >= 6, '초대 코드는 최소 6자 이상이어야 합니다'
+          return ''.join(secrets.choice(safeAlphabet) for _ in range(length))
+
+      inviteCode = makeInviteCode()
+      assert len(inviteCode) == 10
+      assert all(c in safeAlphabet for c in inviteCode)
+      inviteCode
+  - type: "code"
+    language: "python"
+    title: "사용자 입력 정규화와 실패 확인"
+    description: "식별자에 허용되지 않은 문자가 들어오면 검증에서 실패시킵니다."
+    content: |-
+      allowedUserChars = string.ascii_letters + string.digits + '_-'
+
+      def normalizeUserId(rawUserId):
+          userId = rawUserId.strip()
+          assert userId, 'userId가 비어 있습니다'
+          assert all(c in allowedUserChars for c in userId), '허용되지 않은 문자가 있습니다'
+          return userId.lower()
+
+      normalizedUserId = normalizeUserId(' Codaro_User-01 ')
+      try:
+          normalizeUserId('bad user!')
+      except AssertionError as exc:
+          userIdProblem = str(exc)
+
+      assert normalizedUserId == 'codaro_user-01'
+      assert '허용되지 않은' in userIdProblem
+      normalizedUserId, userIdProblem
+  - type: "code"
+    language: "python"
+    title: "템플릿 누락 변수 검증"
+    description: "substitute()로 누락된 변수를 먼저 실패시키고 safe_substitute()의 차이를 확인합니다."
+    content: |-
+      inviteTemplate = string.Template('$user님, 프로젝트 $project 초대 코드: $code')
+
+      try:
+          inviteTemplate.substitute(user=normalizedUserId, project='automation')
+      except KeyError as exc:
+          missingTemplateKey = exc.args[0]
+
+      draftMessage = inviteTemplate.safe_substitute(user=normalizedUserId, project='automation')
+      assert missingTemplateKey == 'code'
+      assert '$code' in draftMessage
+      missingTemplateKey, draftMessage
+  - type: "code"
+    language: "python"
+    title: "최종 메시지 형식 검증"
+    description: "모든 변수를 채운 메시지가 정책을 만족하는지 확인합니다."
+    content: |-
+      finalMessage = inviteTemplate.substitute(
+          user=normalizedUserId,
+          project=string.capwords('automation studio'),
+          code=inviteCode
+      )
+
+      assert normalizedUserId in finalMessage
+      assert inviteCode in finalMessage
+      assert '$' not in finalMessage
+      finalMessage
+  - type: "tip"
+    content: "실무 변주: 초대 코드 길이와 허용 문자 정책을 팀별로 다르게 두고, 템플릿 누락 변수 리포트를 운영 로그 형식으로 바꿔 보세요."
 
 - id: "practice"
   title: "string 모듈 종합 복습"
@@ -373,9 +453,8 @@ sections:
   - type: "expansion"
     title: "🔴 심화1: 랜덤 코드 생성"
     code: |-
-      import random
       chars = string.ascii_uppercase + string.digits
-      code = ''.join(random.choices(chars, k=6))
+      code = ''.join(secrets.choice(chars) for _ in range(6))
       len(code)
 
   - type: "expansion"

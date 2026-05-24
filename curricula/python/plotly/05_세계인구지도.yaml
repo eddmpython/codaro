@@ -243,6 +243,118 @@ sections:
       )
       figFinal
 
+- id: workflow_validation
+  title: 11단계. 실무 지도 검증 루프
+  subtitle: 예측 → 지리 코드 검증 → 오류 수정 → 인구 기준 실험
+  blocks:
+  - type: text
+    content: 코로플레스 지도는 색이 칠해진 것처럼 보여도 국가 코드 매칭이 틀리면 일부 국가가 누락됩니다. 따라서 ISO 코드, 국가 수, 색상 값, 지도 투영법, colorbar 표시까지 함께 확인해야 합니다. 이 단계에서는 2007년 인구 1위 국가가 중국이고, 대륙별 총인구도 아시아가 가장 클 것이라고 먼저 예측합니다.
+  - type: code
+    language: python
+    title: 지도 데이터 계약 검증
+    description: ISO 코드와 인구 기준값을 확인합니다
+    content: |-
+      requiredColumns = {"country", "continent", "year", "lifeExp", "pop", "gdpPercap", "iso_alpha"}
+      missingColumns = requiredColumns - set(df.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert df2007.shape[0] == 142
+      assert df2007["iso_alpha"].str.len().eq(3).all()
+      assert df2007["iso_alpha"].isna().sum() == 0
+
+      populationByContinent = df2007.groupby("continent")["pop"].sum().sort_values(ascending=False)
+      mostPopulatedCountry = df2007.loc[df2007["pop"].idxmax(), "country"]
+
+      assert mostPopulatedCountry == "China"
+      assert populationByContinent.index[0] == "Asia"
+
+      {
+          "mostPopulatedCountry": mostPopulatedCountry,
+          "topContinent": populationByContinent.index[0],
+          "countryCount": len(df2007),
+      }
+  - type: code
+    language: python
+    title: 코로플레스 Figure 검증
+    description: 최종 지도 Figure의 trace, locations, projection, colorbar를 확인합니다
+    content: |-
+      def validatePopulationMap(fig, expectedCountryCount):
+          trace = fig.data[0]
+
+          assert len(fig.data) == 1
+          assert trace.type == "choropleth"
+          assert len(trace.locations) == expectedCountryCount
+          assert len(trace.z) == expectedCountryCount
+          assert trace.locationmode in (None, "ISO-3")
+          assert fig.layout.geo.showcoastlines is True
+          assert fig.layout.geo.projection.type == "natural earth"
+          assert fig.layout.coloraxis.colorbar.tickformat == ".2s"
+          assert fig.layout.coloraxis.colorbar.title.text == "인구"
+          assert "2007" in fig.layout.title.text
+
+          return {
+              "traceType": trace.type,
+              "countryCount": len(trace.locations),
+              "projection": fig.layout.geo.projection.type,
+          }
+
+      mapContract = validatePopulationMap(figFinal, len(df2007))
+      mapContract
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 지도 레이아웃이 빠진 Figure를 검증 함수가 잡아내는지 확인합니다
+    content: |-
+      brokenMap = px.choropleth(
+          df2007,
+          locations="iso_alpha",
+          color="pop",
+          hover_name="country",
+          title="2007년 세계 인구 분포"
+      )
+
+      try:
+          validatePopulationMap(brokenMap, len(df2007))
+      except AssertionError as exc:
+          print("검증 실패 확인:", exc)
+
+      fixedMap = px.choropleth(
+          df2007,
+          locations="iso_alpha",
+          color="pop",
+          hover_name="country",
+          hover_data=["continent", "lifeExp", "gdpPercap"],
+          color_continuous_scale="YlOrRd",
+          title="2007년 세계 인구 분포",
+          labels={"pop": "인구", "continent": "대륙", "lifeExp": "기대수명", "gdpPercap": "1인당 GDP"}
+      )
+      fixedMap.update_layout(
+          geo=dict(showframe=False, showcoastlines=True, coastlinecolor="Gray", projection_type="natural earth"),
+          margin=dict(l=0, r=0, t=50, b=0),
+          coloraxis_colorbar=dict(title="인구", tickformat=".2s")
+      )
+
+      assert validatePopulationMap(fixedMap, len(df2007))
+  - type: code
+    language: python
+    title: 인구 기준 실험
+    description: 상위 인구 국가를 추출해 지도 해석의 핵심 국가를 확인합니다
+    content: |-
+      topPopulation = df2007.nlargest(5, "pop")[["country", "continent", "pop", "iso_alpha"]].reset_index(drop=True)
+      topPopulationShare = topPopulation["pop"].sum() / df2007["pop"].sum()
+
+      assert topPopulation.loc[0, "country"] == "China"
+      assert topPopulation.loc[1, "country"] == "India"
+      assert topPopulationShare > 0.35
+      assert set(topPopulation["iso_alpha"]).issubset(set(df2007["iso_alpha"]))
+
+      {
+          "topCountries": topPopulation["country"].tolist(),
+          "topFivePopulationShare": round(topPopulationShare, 3),
+      }
+  - type: tip
+    content: "지도 시각화는 국가 코드가 빠지면 조용히 일부 지역이 사라질 수 있습니다. ISO 코드, locations 개수, 투영법, colorbar까지 검증하면 보고서 지도 품질을 안정적으로 유지할 수 있습니다."
+
 - id: practice
   title: 실습
   subtitle: 세계 지도 프로젝트

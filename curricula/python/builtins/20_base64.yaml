@@ -1,5 +1,8 @@
 meta:
+  id: "20_base64"
   title: "base64 - Base64 인코딩"
+  category: "builtins"
+  tags: ["base64", "b64encode", "b64decode", "urlsafe", "encoding"]
   description: "바이너리 데이터를 ASCII 문자열로 인코딩하는 base64 모듈"
   keywords: ["base64", "b64encode", "b64decode", "urlsafe", "encoding"]
 
@@ -25,6 +28,7 @@ sections:
         description: "base64 모듈을 임포트합니다."
         content: |-
           import base64
+          import binascii
 
   - name: "standard_base64"
     title: "표준 Base64 인코딩"
@@ -176,7 +180,7 @@ sections:
           import secrets
 
           randomBytes = secrets.token_bytes(16)
-          token = base64.urlsafe_b64encode(randomBytes).decode('utf-8')
+          token = base64.urlsafe_b64encode(randomBytes).decode('utf-8').rstrip('=')
 
           {
               "token_length": len(token),
@@ -256,7 +260,7 @@ sections:
           encoded = "JBSWY3DPEBLW64TMMQ======"
 
           upper = base64.b32decode(encoded.upper())
-          lower = base64.b32decode(encoded.lower())
+          lower = base64.b32decode(encoded.lower(), casefold=True)
 
           {
               "upper_decoded": upper.decode('utf-8'),
@@ -383,13 +387,13 @@ sections:
           try:
               result1 = base64.b64decode(validEncoded, validate=True)
               success1 = True
-          except Exception as e:
+          except binascii.Error:
               success1 = False
 
           try:
               result2 = base64.b64decode(invalidEncoded, validate=True)
               success2 = True
-          except Exception as e:
+          except binascii.Error:
               success2 = False
 
           {
@@ -447,8 +451,8 @@ sections:
           try:
               decoded = base64.b32decode(mixedCase, casefold=True)
               result = decoded.decode('utf-8')
-          except Exception as e:
-              result = str(e)
+          except binascii.Error as exc:
+              result = str(exc)
 
           result
 
@@ -628,6 +632,87 @@ sections:
           binaryLog = bytes([0xFF, 0x00, 0x1A, 0x2B, 0x3C])
           logEntry = encodeBinaryLog(binaryLog)
           logEntry
+
+  - name: "workflow_validation"
+    title: "검증 루프: 안전한 텍스트 전송 페이로드"
+    blocks:
+      - type: "content"
+        title: "인코딩은 무결성 검증과 함께"
+        content: |-
+          Base64는 암호화가 아니라 전송 형식입니다.
+          따라서 원본 복원, 유효성 검사, 패딩 복구, 크기 증가를 함께 확인해야 실무에서 안전하게 사용할 수 있습니다.
+
+      - type: "code"
+        language: "python"
+        title: "JSON 페이로드 인코딩"
+        description: "바이너리 전송이 필요한 JSON 페이로드를 URL 안전 Base64로 변환합니다."
+        content: |-
+          import json
+
+          payload = {
+              "lesson": "base64",
+              "status": "verified",
+              "scores": [95, 88, 91]
+          }
+
+          def encodePayload(data):
+              raw = json.dumps(data, ensure_ascii=False, sort_keys=True).encode("utf-8")
+              encoded = base64.urlsafe_b64encode(raw).decode("ascii").rstrip("=")
+              return encoded
+
+          def decodePayload(encoded):
+              padding = (-len(encoded)) % 4
+              restored = encoded + ("=" * padding)
+              raw = base64.urlsafe_b64decode(restored.encode("ascii"))
+              return json.loads(raw.decode("utf-8"))
+
+          encodedPayload = encodePayload(payload)
+          decodedPayload = decodePayload(encodedPayload)
+          assert decodedPayload == payload
+          encodedPayload
+
+      - type: "code"
+        language: "python"
+        title: "깨진 입력을 먼저 실패시킨다"
+        description: "validate=True로 Base64가 아닌 입력을 명확히 거부합니다."
+        content: |-
+          invalidPayload = "not-valid-base64!"
+          try:
+              base64.b64decode(invalidPayload, validate=True)
+          except binascii.Error as exc:
+              payloadProblem = str(exc)
+
+          assert payloadProblem
+          payloadProblem
+
+      - type: "code"
+        language: "python"
+        title: "크기 증가와 캐시 키 검증"
+        description: "Base64 크기 증가를 확인하고, 원본은 SHA-256 기반 키로 추적합니다."
+        content: |-
+          import hashlib
+
+          rawBytes = json.dumps(payload, sort_keys=True).encode("utf-8")
+          encodedBytes = base64.b64encode(rawBytes)
+          digest = hashlib.sha256(rawBytes).digest()
+          cacheKey = base64.urlsafe_b64encode(digest).decode("ascii").rstrip("=")[:16]
+
+          assert len(encodedBytes) > len(rawBytes)
+          assert len(cacheKey) == 16
+          cacheKey
+
+      - type: "code"
+        language: "python"
+        title: "실무 변주: Data URL 검증"
+        description: "Data URL의 MIME 타입과 본문 복원을 함께 확인합니다."
+        content: |-
+          dataUrl = f"data:application/json;base64,{base64.b64encode(rawBytes).decode('ascii')}"
+          prefix, encodedBody = dataUrl.split(",", 1)
+          restoredPayload = json.loads(base64.b64decode(encodedBody).decode("utf-8"))
+
+          assert prefix == "data:application/json;base64"
+          assert restoredPayload == payload
+          restoredPayload
 
   - name: "practice"
     title: "연습 문제"
@@ -890,7 +975,7 @@ sections:
               try:
                   decoded = base64.b64decode(invalidEncoded, validate=True)
                   result = "Success"
-              except Exception as e:
+              except binascii.Error:
                   result = "Error detected"
 
               result
@@ -906,7 +991,7 @@ sections:
               import hashlib
 
               data = "cache key data"
-              hashValue = hashlib.md5(data.encode('utf-8')).digest()
+              hashValue = hashlib.sha256(data.encode('utf-8')).digest()
               cacheKey = base64.urlsafe_b64encode(hashValue).decode('utf-8')[:12]
               cacheKey
 

@@ -3,7 +3,7 @@ meta:
   title: "메타클래스"
   day: 6
   category: "advancedPython"
-  tags: ["metaclass", "type", "class", "__init_subclass__"]
+  tags: ["metaclass", "type", "class", "__init_subclass__", "검증", "프레임워크"]
   seo:
     title: "파이썬 메타클래스 완벽 이해 - 클래스를 만드는 클래스"
     description: "메타클래스의 동작 원리를 이해합니다. type 함수로 동적 클래스 생성, 커스텀 메타클래스, __init_subclass__ 활용법."
@@ -399,6 +399,74 @@ sections:
   - type: "tip"
     content: "Tim Peters: '메타클래스가 필요한지 고민된다면, 아마도 필요하지 않을 것이다.'"
 
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 명령 클래스 자동 등록하기"
+  subtitle: "예측 → 클래스 생성 훅 → 계약 위반 오류 → 레지스트리 검증"
+  blocks:
+  - type: "text"
+    content: "메타클래스는 일반 애플리케이션 코드보다 프레임워크나 플러그인 시스템의 클래스 계약을 강제할 때 가치가 있습니다. 명령 클래스가 생성되는 순간 필수 속성과 메서드를 확인하고 자동 등록하는 흐름을 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "명령 레지스트리 메타클래스"
+    description: "서브클래스 생성 시 commandName과 execute 구현을 강제합니다."
+    content: |-
+      class CommandMeta(type):
+          registry = {}
+
+          def __new__(mcs, name, bases, namespace):
+              cls = super().__new__(mcs, name, bases, namespace)
+              if bases:
+                  commandName = namespace.get("commandName")
+                  if not commandName:
+                      raise TypeError(f"{name} must define commandName")
+                  if "execute" not in namespace:
+                      raise TypeError(f"{name} must implement execute")
+                  mcs.registry[commandName] = cls
+              return cls
+
+      class Command(metaclass=CommandMeta):
+          pass
+
+      class CreateUser(Command):
+          commandName = "create_user"
+
+          def execute(self, payload):
+              return {"created": payload["email"]}
+
+      class DisableUser(Command):
+          commandName = "disable_user"
+
+          def execute(self, payload):
+              return {"disabled": payload["email"]}
+
+      assert sorted(CommandMeta.registry) == ["create_user", "disable_user"]
+      assert CommandMeta.registry["create_user"]().execute({"email": "a@example.com"}) == {
+          "created": "a@example.com"
+      }
+
+      try:
+          class BrokenCommand(Command):
+              commandName = "broken"
+      except TypeError as exc:
+          assert "execute" in str(exc)
+
+      try:
+          class MissingName(Command):
+              def execute(self, payload):
+                  return payload
+      except TypeError as exc:
+          assert "commandName" in str(exc)
+
+      print("메타클래스 명령 등록 흐름 통과")
+  - type: "list"
+    items:
+    - "메타클래스는 클래스가 만들어지는 시점에 계약을 검증합니다."
+    - "계약 위반은 인스턴스 실행 중이 아니라 클래스 정의 시점에 빨리 실패해야 합니다."
+    - "일반 앱 코드에서는 클래스 데코레이터나 __init_subclass__가 더 단순한 대안인지 먼저 판단합니다."
+  - type: "tip"
+    title: "변주 실험"
+    content: "`commandName`이 중복되면 등록을 거부하도록 바꾸고, 두 클래스가 같은 이름을 쓸 때 TypeError가 나는지 확인하세요."
+
 - id: "practice"
   title: "종합 복습"
   subtitle: "메타클래스 마스터하기"
@@ -619,17 +687,15 @@ sections:
               return super().__call__(*args, **kwargs)
 
       class Base(metaclass=AbstractMeta):
-          @property
           def abstract(self):
               raise NotImplementedError
           abstract.__isabstractmethod__ = True
 
       class Concrete(Base):
-          @property
           def abstract(self):
               return "implemented"
 
-      Concrete().abstract
+      Concrete().abstract()
 
   - type: "expansion"
     title: "🔴 심화6: 속성 잠금"
@@ -652,22 +718,23 @@ sections:
     code: |-
       class AutoPropertyMeta(type):
           def __new__(mcs, name, bases, ns):
-              slots = ns.get("__slots__", ())
-              for slot in slots:
-                  if not slot.startswith("_"):
-                      privateName = f"_{slot}"
-                      ns[slot] = property(
-                          lambda self, n=privateName: getattr(self, n, None),
-                          lambda self, v, n=privateName: setattr(self, n, v)
-                      )
+              fields = ns.get("__fields__", ())
+              for field in fields:
+                  privateName = f"_{field}"
+                  ns[field] = property(
+                      lambda self, n=privateName: getattr(self, n, None),
+                      lambda self, v, n=privateName: setattr(self, n, v)
+                  )
               return super().__new__(mcs, name, bases, ns)
 
       class Person(metaclass=AutoPropertyMeta):
-          __slots__ = ("name", "age", "_name", "_age")
+          __slots__ = ("_name", "_age")
+          __fields__ = ("name", "age")
 
       p = Person()
       p.name = "Alice"
-      p.name
+      p.age = 30
+      p.name, p.age
 
   - type: "expansion"
     title: "🔴 심화8: 조건부 상속"

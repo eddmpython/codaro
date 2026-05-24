@@ -49,7 +49,7 @@
   - `codaro/webBuild` editor frontend build
   - document model
   - runtime contracts
-  - LocalEngine / Pyodide adapter entrypoints
+  - LocalEngine and future isolated runtime entrypoints
   - curriculum loader
   - public CLI entrypoint
 

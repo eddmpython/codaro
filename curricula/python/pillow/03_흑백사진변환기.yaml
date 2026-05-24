@@ -1,5 +1,6 @@
 meta:
   packages:
+    - numpy
     - pillow
     - scikit-learn
   id: pillow_03
@@ -208,3 +209,69 @@ sections:
         sepB = bCh.point(lambda x: min(255, int(x * 0.65)))
         chinaSepia = Image.merge('RGB', (sepR, sepG, sepB))
         chinaSepia
+
+- id: workflow_validation
+  title: 6단계. 흑백 변환 검증 루프
+  subtitle: mode와 이진화 기준 확인
+  blocks:
+  - type: text
+    content: 흑백 변환은 convert('L') 한 줄로 끝나지 않습니다. 입력 mode를 확인하고, 이진화 결과가 실제로 0과 255만 가지는지, 임계값 변화가 전경 비율을 어떻게 바꾸는지 검증합니다.
+  - type: code
+    language: python
+    title: 컬러 샘플 준비
+    description: 밝기가 다른 RGB 영역을 가진 이미지를 만듭니다.
+    content: |-
+      from PIL import Image, ImageDraw
+      import numpy as np
+
+      toneImage = Image.new("RGB", (160, 100), (40, 80, 130))
+      toneDraw = ImageDraw.Draw(toneImage)
+      toneDraw.rectangle((20, 20, 75, 80), fill=(230, 220, 170))
+      toneDraw.rectangle((90, 20, 140, 80), fill=(120, 60, 40))
+
+      def validateRgbSource(image):
+          if image.mode != "RGB":
+              raise ValueError(f"RGB 원본이 필요합니다: {image.mode}")
+          return True
+
+      validateRgbSource(toneImage)
+  - type: code
+    language: python
+    title: mode 오류 확인
+    description: 이미 흑백인 이미지를 원본 검증에 넣어 실패를 확인합니다.
+    content: |-
+      try:
+          validateRgbSource(toneImage.convert("L"))
+      except ValueError as exc:
+          toneErrorMessage = str(exc)
+
+      toneErrorMessage
+  - type: code
+    language: python
+    title: 흑백과 이진화 검증
+    description: grayscale mode와 binary 값 집합을 확인합니다.
+    content: |-
+      grayTone = toneImage.convert("L")
+      binaryTone = grayTone.point(lambda value: 255 if value >= 128 else 0)
+      binaryValues = set(np.array(binaryTone).ravel().tolist())
+      toneChecks = {
+          "grayModeOk": grayTone.mode == "L",
+          "binaryValuesOk": binaryValues.issubset({0, 255}),
+          "binaryHasBothClasses": binaryValues == {0, 255},
+          "errorOk": toneErrorMessage == "RGB 원본이 필요합니다: L",
+      }
+
+      assert all(toneChecks.values()), toneChecks
+      toneChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 임계값을 높이면 밝은 전경 비율이 줄어드는지 확인합니다.
+    content: |-
+      lowBinary = grayTone.point(lambda value: 255 if value >= 90 else 0)
+      highBinary = grayTone.point(lambda value: 255 if value >= 180 else 0)
+      lowRatio = float((np.array(lowBinary) == 255).mean())
+      highRatio = float((np.array(highBinary) == 255).mean())
+
+      assert lowRatio >= highRatio
+      lowRatio, highRatio

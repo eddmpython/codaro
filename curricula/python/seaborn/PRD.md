@@ -23,32 +23,32 @@
 - 통계량 자동 계산 및 표시
 
 ### 5. Codaro 로컬 Python 완벽 호환
-- sns.load_dataset()으로 GitHub에서 데이터 로드
+- loadLocalDataset()으로 로컬 데이터 로드
 - Codaro 로컬 커널에서 바로 실행
 
 ---
 
 ## 데이터셋
 
-**Seaborn 내장 데이터** (Codaro 로컬 Python 완벽 호환):
+**Codaro 로컬 데이터** (Codaro 로컬 Python 완벽 호환):
 ```python
 import seaborn as sns
+from codaro.curriculum.localData import loadLocalDataset
 
-iris = sns.load_dataset('iris')
-tips = sns.load_dataset('tips')
-penguins = sns.load_dataset('penguins')
-titanic = sns.load_dataset('titanic')
-flights = sns.load_dataset('flights')
-diamonds = sns.load_dataset('diamonds')
-mpg = sns.load_dataset('mpg')
-exercise = sns.load_dataset('exercise')
-anscombe = sns.load_dataset('anscombe')
+iris = loadLocalDataset('iris')
+tips = loadLocalDataset('tips')
+penguins = loadLocalDataset('penguins')
+titanic = loadLocalDataset('titanic')
+flights = loadLocalDataset('flights')
+diamonds = loadLocalDataset('diamonds')
+mpg = loadLocalDataset('mpg')
+exercise = loadLocalDataset('exercise')
+anscombe = loadLocalDataset('anscombe')
 ```
 
-**GitHub Raw URL 데이터**:
+**Gapminder 로컬 데이터**:
 ```python
-baseUrl = "https://raw.githubusercontent.com"
-gapminder = pd.read_csv(f"{baseUrl}/plotly/datasets/master/gapminder_unfiltered.csv")
+gapminder = loadLocalDataset('gapminder')
 ```
 
 ---
@@ -170,7 +170,7 @@ gapminder = pd.read_csv(f"{baseUrl}/plotly/datasets/master/gapminder_unfiltered.
 
 ### P08. 다이아몬드 가격 분석 (중급)
 **결과물**: 캐럿/컷별 가격 분포
-**데이터**: diamonds (seaborn)
+**데이터**: diamonds (Codaro 로컬 데이터)
 **개념**: B3(displot), B2(kdeplot), G1(hue), G4(col), I1(multiple)
 
 ### P09. 자동차 연비 종합 분석 (심화)
@@ -299,8 +299,8 @@ seaborn/
 ### 4. 데이터 로드 규칙
 - 첫 섹션에서만 import 및 데이터 로드
 - 이후 섹션은 변수 공유 (Codaro 특성)
-- seaborn 내장 데이터: sns.load_dataset()
-- GitHub 데이터: baseUrl + raw URL
+- Codaro 로컬 데이터: loadLocalDataset()
+- Gapminder 로컬 데이터: loadLocalDataset('gapminder')
 
 ### 5. Figure-level vs Axes-level 구분
 ```yaml
@@ -330,6 +330,7 @@ seaborn/
     title: "미션1: [설명]"
     code: |-
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
       # 전체 과정 포함
       fig
@@ -337,6 +338,7 @@ seaborn/
     title: "미션2: [설명]"
     code: |-
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import pandas as pd
       # 전체 과정 포함
       fig2
@@ -354,7 +356,7 @@ g = sns.relplot(...)
 gPair = sns.pairplot(...)
 
 # 데이터
-iris = sns.load_dataset('iris')
+iris = loadLocalDataset('iris')
 irisFiltered = iris[iris['species'] == 'setosa']
 ```
 

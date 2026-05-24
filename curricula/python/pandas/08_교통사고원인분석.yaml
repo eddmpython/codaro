@@ -7,8 +7,8 @@ meta:
   category: pandas
   difficulty: "⭐⭐⭐⭐"
   badge: 중급
-  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/car_crashes.csv
-  tags: ["car_crashes", "지역비교", "rank", "시각화", "heatmap"]
+  dataSource: codaro-local:car_crashes
+  tags: ["car_crashes", "지역비교", "rank", "시각화", "heatmap", "검증", "지역비교"]
   seo:
     title: "pandas 지역별 비교 분석 - 미국 교통사고 데이터"
     description: "미국 주별 교통사고 데이터로 지역 비교를 배웁니다. rank 순위, 상관관계 히트맵, 위험도 점수 계산을 실습합니다."
@@ -25,18 +25,17 @@ sections:
   subtitle: 51개 주 교통사고 통계
   blocks:
   - type: text
-    content: 미국 51개 주(워싱턴DC 포함)의 교통사고 원인별 통계입니다.
+    content: 미국 51개 주(워싱턴DC 포함)의 교통사고 원인별 통계입니다. 로컬 실행에서는 네트워크가 없어도 지역 비교, 순위, 종합 점수 흐름을 연습할 수 있도록 주요 주 약자를 포함한 샘플 데이터를 함께 둡니다.
   - type: code
     language: python
     title: 데이터 불러오기
     description: 51개 행, 8개 컬럼
     content: |-
       import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/car_crashes.csv"
-      crashes = pd.read_csv(url)
+      crashes = loadLocalDataset("car_crashes")
       crashes.shape
-
 - id: step2_head
   title: 2단계. 미리보기
   subtitle: 데이터 구조 파악
@@ -203,6 +202,56 @@ sections:
   - type: tip
     content: nlargest(n, column)와 nsmallest(n, column)은 특정 컬럼 기준으로 상위/하위 n개 행을 빠르게 찾습니다. sort_values()로 정렬한 뒤 head()를 쓰는 것보다 성능이 좋습니다. 대용량 데이터에서 TOP N을 찾을 때 유용합니다.
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 지역별 사고 위험도 산정"
+  subtitle: "rank, nlargest, nsmallest, 실패 케이스"
+  blocks:
+  - type: text
+    content: "종합 위험 점수는 가중치가 바뀌면 순위가 바뀝니다. 점수 계산식과 상위/하위 지역을 assert로 고정해 리포트 정책을 명확히 하세요."
+  - type: code
+    language: python
+    title: "위험 점수와 상하위 지역"
+    description: "여러 원인을 합산한 점수로 TOP/BOTTOM 지역을 검증합니다."
+    content: |-
+      import pandas as pd
+
+      crashes = pd.DataFrame({
+          "state": ["A", "B", "C"],
+          "total": [20, 12, 18],
+          "speeding": [5, 2, 7],
+          "alcohol": [4, 1, 2],
+      }).set_index("state")
+
+      crashes["dangerScore"] = crashes["total"] + crashes["speeding"] * 2 + crashes["alcohol"] * 3
+      top = crashes.nlargest(1, "dangerScore")
+      safe = crashes.nsmallest(1, "dangerScore")
+
+      assert top.index.tolist() == ["A"]
+      assert safe.index.tolist() == ["B"]
+      assert crashes["dangerScore"].rank(ascending=False).loc["A"] == 1
+  - type: code
+    language: python
+    title: "음수 사고 수 오류 확인"
+    description: "사고 수는 음수가 될 수 없으므로 분석 전에 확인합니다."
+    content: |-
+      import pandas as pd
+
+      def validateCrashCounts(frame):
+          numeric = frame[["total", "speeding", "alcohol"]]
+          if (numeric < 0).any().any():
+              raise ValueError("crash counts must be non-negative")
+          return True
+
+      try:
+          validateCrashCounts(pd.DataFrame({"total": [1], "speeding": [-1], "alcohol": [0]}))
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "crash counts must be non-negative"
+  - type: tip
+    title: "변주 실험"
+    content: "음주 사고 가중치를 3에서 5로 올리면 가장 위험한 지역이 바뀌는지 확인하세요."
+
 - id: practice
   title: 실습
   subtitle: 교통안전 분석 프로젝트
@@ -218,8 +267,10 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/car_crashes.csv")
-        dataIndexed = data.set_index('abbrev')
+        from codaro.curriculum.localData import loadLocalDataset
+
+        data = loadLocalDataset("car_crashes")
+        dataIndexed = data.set_index("abbrev")
     - type: code
       title: "분석 수행"
       content: |-
@@ -233,10 +284,12 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/car_crashes.csv")
-        dfIndexed = df.set_index('abbrev')
-        dfIndexed['totalRank'] = dfIndexed['total'].rank(ascending=False)
-        dfIndexed['alcoholRank'] = dfIndexed['alcohol'].rank(ascending=False)
+        from codaro.curriculum.localData import loadLocalDataset
+
+        df = loadLocalDataset("car_crashes")
+        dfIndexed = df.set_index("abbrev")
+        dfIndexed["totalRank"] = dfIndexed["total"].rank(ascending=False)
+        dfIndexed["alcoholRank"] = dfIndexed["alcohol"].rank(ascending=False)
     - type: code
       title: "분석 수행"
       content: |-

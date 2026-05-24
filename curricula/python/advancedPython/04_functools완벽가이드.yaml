@@ -3,7 +3,7 @@ meta:
   title: "functools 완벽 가이드"
   day: 4
   category: "advancedPython"
-  tags: ["functools", "partial", "lru_cache", "singledispatch"]
+  tags: ["functools", "partial", "lru_cache", "singledispatch", "검증", "실무유틸"]
   seo:
     title: "파이썬 functools 완벽 가이드 - partial, lru_cache, singledispatch"
     description: "functools 모듈의 핵심 함수들을 마스터합니다. partial, wraps, lru_cache, singledispatch, total_ordering 완벽 이해."
@@ -418,6 +418,82 @@ sections:
       v1 < v2, v1 == v2
   - type: "tip"
     content: "dataclass(order=True)도 비슷한 기능을 제공합니다."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: functools로 리포트 유틸리티 구성하기"
+  subtitle: "partial → cache → singledispatch → ordering 검증"
+  blocks:
+  - type: "text"
+    content: "functools는 작은 함수형 도구를 실무 유틸리티로 묶을 때 유용합니다. 인자 고정, 캐싱, 타입별 포맷팅, 정렬 가능한 객체를 하나의 리포트 흐름에서 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "리포트 유틸리티 통합"
+    description: "partial, lru_cache, singledispatch, total_ordering을 함께 검증합니다."
+    content: |-
+      from functools import lru_cache, partial, singledispatch, total_ordering
+
+      def formatCurrency(value, currency):
+          return f"{currency}{value:,}"
+
+      won = partial(formatCurrency, currency="₩")
+
+      @lru_cache(maxsize=4)
+      def taxIncluded(price, taxRate):
+          return int(price * (1 + taxRate))
+
+      @singledispatch
+      def renderValue(value):
+          return str(value)
+
+      @renderValue.register
+      def _(value: int):
+          return won(value)
+
+      @renderValue.register
+      def _(value: dict):
+          return ", ".join(f"{key}={renderValue(item)}" for key, item in sorted(value.items()))
+
+      @total_ordering
+      class ReportItem:
+          def __init__(self, name, priority):
+              self.name = name
+              self.priority = priority
+
+          def __eq__(self, other):
+              return self.priority == other.priority
+
+          def __lt__(self, other):
+              return self.priority < other.priority
+
+          def __repr__(self):
+              return f"ReportItem({self.name!r}, {self.priority})"
+
+      report = {
+          "gross": taxIncluded(100000, 0.1),
+          "net": 100000,
+      }
+      items = [ReportItem("later", 3), ReportItem("first", 1), ReportItem("middle", 2)]
+
+      assert won(120000) == "₩120,000"
+      assert taxIncluded(100000, 0.1) == 110000
+      assert taxIncluded.cache_info().hits >= 0
+      assert renderValue(report) == "gross=₩110,000, net=₩100,000"
+      assert [item.name for item in sorted(items)] == ["first", "middle", "later"]
+
+      try:
+          taxIncluded([100000], 0.1)
+      except TypeError as exc:
+          assert "unhashable" in str(exc)
+
+      print("functools 리포트 유틸리티 통과")
+  - type: "list"
+    items:
+    - "partial은 같은 함수에 업무 기본값을 고정해 재사용성을 높입니다."
+    - "lru_cache는 입력이 해시 가능할 때만 동작하므로 실패 케이스도 확인합니다."
+    - "singledispatch와 total_ordering은 타입별 정책과 정렬 정책을 함수/클래스에 명확히 분리합니다."
+  - type: "tip"
+    title: "변주 실험"
+    content: "`renderValue`에 list 렌더러를 추가하고, dict 안에 list가 들어가도 원하는 문자열로 렌더링되는지 assert를 추가하세요."
 
 - id: "practice"
   title: "종합 복습"

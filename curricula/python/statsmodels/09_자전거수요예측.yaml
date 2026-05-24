@@ -11,7 +11,7 @@ meta:
   category: statsmodels
   difficulty: "⭐⭐⭐⭐⭐"
   badge: 심화
-  dataUrl: https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-total-female-births.csv
+  dataSource: codaro-local:bike_demand
   tags: ["ARIMA", "ACF", "PACF", "시계열예측", "자전거공유", "수요예측"]
   seo:
     title: "statsmodels ARIMA 심화 - ACF/PACF로 시계열 예측하기"
@@ -29,7 +29,7 @@ sections:
   subtitle: 일별 시계열 데이터
   blocks:
   - type: text
-    content: "일별 출생 데이터를 자전거 수요 데이터처럼 활용합니다. 이 데이터는 1959년 1월부터 12월까지 365일간 캘리포니아 여성 출생 수를 기록한 것으로, 실제 자전거 공유 데이터와 유사한 일별 변동 패턴을 가집니다. ARIMA 분석 실습에 최적화된 데이터셋으로, 시계열 예측의 전체 파이프라인을 학습하기에 적합합니다. 실제 비즈니스에서 수요 예측은 재고 관리, 인력 배치, 마케팅 계획 수립에 핵심적인 역할을 합니다."
+    content: "일별 자전거 대여 수요 데이터를 사용합니다. 1년 동안의 날짜별 Demand 값에 주중/주말 차이, 계절성, 완만한 증가 추세가 들어 있어 ARIMA 분석 실습에 적합합니다. 실제 비즈니스에서 수요 예측은 재고 관리, 인력 배치, 마케팅 계획 수립에 핵심적인 역할을 합니다."
   - type: code
     language: python
     title: 데이터 로드
@@ -44,13 +44,12 @@ sections:
       import plotly.express as px
       import plotly.graph_objects as go
       from plotly.subplots import make_subplots
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-total-female-births.csv"
-      birthData = pd.read_csv(url)
-      birthData['Date'] = pd.to_datetime(birthData['Date'])
-      birthData = birthData.set_index('Date')
-      birthData.columns = ['Demand']
-      birthData.shape
+      demandData = loadLocalDataset("bike_demand")
+      demandData['Date'] = pd.to_datetime(demandData['Date'])
+      demandData = demandData.set_index('Date')
+      demandData.shape
 
 - id: step2_explore
   title: 2단계. 시계열 탐색
@@ -63,7 +62,7 @@ sections:
     title: 시계열 시각화
     description: 전체 추세 확인
     content: |-
-      demandFig = px.line(birthData, y='Demand',
+      demandFig = px.line(demandData, y='Demand',
                           title='Daily Demand Time Series',
                           labels={'Date': 'Date', 'Demand': 'Daily Demand'})
       demandFig.show()
@@ -81,8 +80,8 @@ sections:
     content: |-
       statsDf = pd.DataFrame({
           'Statistic': ['Mean', 'Std', 'Min', 'Max', 'Count'],
-          'Value': [birthData['Demand'].mean(), birthData['Demand'].std(),
-                   birthData['Demand'].min(), birthData['Demand'].max(), len(birthData)]
+          'Value': [demandData['Demand'].mean(), demandData['Demand'].std(),
+                   demandData['Demand'].min(), demandData['Demand'].max(), len(demandData)]
       })
       statsDf
 
@@ -97,7 +96,7 @@ sections:
     title: ADF 검정
     description: 정상성 확인
     content: |-
-      adfResult = adfuller(birthData['Demand'])
+      adfResult = adfuller(demandData['Demand'])
       adfDf = pd.DataFrame({
           'Metric': ['ADF Statistic', 'p-value', 'Lags Used', 'Observations'],
           'Value': [adfResult[0], adfResult[1], adfResult[2], adfResult[3]]
@@ -117,7 +116,7 @@ sections:
     title: 1차 차분
     description: diff() 적용
     content: |-
-      demandDiff = birthData['Demand'].diff().dropna()
+      demandDiff = demandData['Demand'].diff().dropna()
 
       diffFig = px.line(x=demandDiff.index, y=demandDiff.values,
                         title='Differenced Series (d=1)',
@@ -140,7 +139,7 @@ sections:
     title: ACF 계산
     description: 자기상관 계수
     content: |-
-      acfValues = acf(birthData['Demand'], nlags=20)
+      acfValues = acf(demandData['Demand'], nlags=20)
 
       acfDf = pd.DataFrame({
           'Lag': range(len(acfValues)),
@@ -159,7 +158,7 @@ sections:
     title: ACF 플롯
     description: 막대 그래프
     content: |-
-      confInt = 1.96 / np.sqrt(len(birthData))
+      confInt = 1.96 / np.sqrt(len(demandData))
 
       acfFig = go.Figure()
       acfFig.add_trace(go.Bar(x=list(range(len(acfValues))), y=acfValues, name='ACF'))
@@ -183,7 +182,7 @@ sections:
     title: PACF 계산
     description: 편자기상관
     content: |-
-      pacfValues = pacf(birthData['Demand'], nlags=20)
+      pacfValues = pacf(demandData['Demand'], nlags=20)
 
       pacfDf = pd.DataFrame({
           'Lag': range(len(pacfValues)),
@@ -248,7 +247,7 @@ sections:
     title: ARIMA(1,0,1) 적합
     description: 기본 모델
     content: |-
-      arimaModel = ARIMA(birthData['Demand'], order=(1, 0, 1))
+      arimaModel = ARIMA(demandData['Demand'], order=(1, 0, 1))
       arimaFit = arimaModel.fit()
       arimaFit.summary()
 
@@ -267,7 +266,7 @@ sections:
       aicResults = []
 
       for order in orders:
-          modelTemp = ARIMA(birthData['Demand'], order=order)
+          modelTemp = ARIMA(demandData['Demand'], order=order)
           fitTemp = modelTemp.fit()
           aicResults.append({
               'Order': f"ARIMA{order}",
@@ -292,7 +291,7 @@ sections:
     description: 최저 AIC
     content: |-
       bestOrder = (2, 0, 2)
-      bestModel = ARIMA(birthData['Demand'], order=bestOrder)
+      bestModel = ARIMA(demandData['Demand'], order=bestOrder)
       bestFit = bestModel.fit()
 
       f"Best Model: ARIMA{bestOrder}, AIC: {bestFit.aic:.2f}"
@@ -356,10 +355,10 @@ sections:
       forecastMean = forecast.predicted_mean
       forecastConf = forecast.conf_int()
 
-      forecastIdx = pd.date_range(start=birthData.index[-1] + pd.Timedelta(days=1), periods=forecastSteps)
+      forecastIdx = pd.date_range(start=demandData.index[-1] + pd.Timedelta(days=1), periods=forecastSteps)
 
       forecastFig = go.Figure()
-      forecastFig.add_trace(go.Scatter(x=birthData.index, y=birthData['Demand'], mode='lines', name='Historical'))
+      forecastFig.add_trace(go.Scatter(x=demandData.index, y=demandData['Demand'], mode='lines', name='Historical'))
       forecastFig.add_trace(go.Scatter(x=forecastIdx, y=forecastMean, mode='lines', name='Forecast', line=dict(dash='dash')))
       forecastFig.add_trace(go.Scatter(x=forecastIdx, y=forecastConf.iloc[:, 0], mode='lines', name='Lower CI', line=dict(dash='dot', color='gray')))
       forecastFig.add_trace(go.Scatter(x=forecastIdx, y=forecastConf.iloc[:, 1], mode='lines', name='Upper CI', line=dict(dash='dot', color='gray')))
@@ -385,9 +384,9 @@ sections:
         import numpy as np
         from statsmodels.tsa.arima.model import ARIMA
         from statsmodels.tsa.stattools import adfuller, acf, pacf
+        from codaro.curriculum.localData import loadLocalDataset
 
-        diffUrl = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-total-female-births.csv"
-        diffData = pd.read_csv(diffUrl)
+        diffData = loadLocalDataset("bike_demand")
         diffData['Date'] = pd.to_datetime(diffData['Date'])
         diffData = diffData.set_index('Date')
         diffData.columns = ['Demand']
@@ -444,9 +443,9 @@ sections:
         import pandas as pd
         import numpy as np
         from statsmodels.tsa.arima.model import ARIMA
+        from codaro.curriculum.localData import loadLocalDataset
 
-        evalUrl = "https://raw.githubusercontent.com/jbrownlee/Datasets/master/daily-total-female-births.csv"
-        evalData = pd.read_csv(evalUrl)
+        evalData = loadLocalDataset("bike_demand")
         evalData['Date'] = pd.to_datetime(evalData['Date'])
         evalData = evalData.set_index('Date')
         evalData.columns = ['Demand']
@@ -498,3 +497,90 @@ sections:
     - "get_forecast() - 신뢰구간과 함께 예측"
   - type: text
     content: 다음 프로젝트에서는 VAR 모델로 여러 시계열을 동시에 예측합니다. 지금까지 배운 모든 개념을 종합하여 경제 지표 분석을 완성합니다.
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 회귀 리포트 품질 게이트
+  blocks:
+  - type: text
+    content: "statsmodels 학습의 핵심은 모델을 만들고 summary를 보는 데서 끝나지 않는 것입니다. 먼저 어떤 변수가 유의할지 예측하고, 로컬 데이터의 컬럼과 결측치를 검증하고, 회귀 결과가 보고서에 들어갈 수준인지 R², F-test, 잔차 진단으로 확인해야 합니다. 마지막에는 변수를 빼는 변주로 모델 선택의 근거를 비교합니다."
+  - type: code
+    language: python
+    title: 로컬 마케팅 데이터 검증
+    description: 광고비와 매출 데이터를 불러오고 분석 전 조건을 확인합니다.
+    content: |-
+      import pandas as pd
+      import statsmodels.api as sm
+      from statsmodels.stats.diagnostic import het_breuschpagan
+      from codaro.curriculum.localData import loadLocalDataset
+
+      marketingData = loadLocalDataset("advertising")
+      requiredColumns = ["TV", "Radio", "Newspaper", "Sales"]
+
+      missingColumns = [column for column in requiredColumns if column not in marketingData.columns]
+      if missingColumns:
+          raise ValueError(f"필수 컬럼이 없습니다: {missingColumns}")
+      if marketingData[requiredColumns].isna().any().any():
+          raise ValueError("회귀분석 전 결측치를 처리해야 합니다.")
+
+      marketingData[requiredColumns].head()
+  - type: code
+    language: python
+    title: 다중회귀 모델 적합
+    description: TV, Radio, Newspaper 광고비로 Sales를 설명합니다.
+    content: |-
+      # 예측: TV와 Radio의 p-value는 낮고, 모델 R²는 0.9 이상일 것입니다.
+      reportX = sm.add_constant(marketingData[["TV", "Radio", "Newspaper"]])
+      reportY = marketingData["Sales"]
+      try:
+          reportModel = sm.OLS(reportY, reportX).fit()
+      except ValueError as exc:
+          raise ValueError("OLS 입력 행렬을 확인하세요.") from exc
+
+      reportModel.rsquared, reportModel.f_pvalue
+  - type: code
+    language: python
+    title: 통계 리포트 기준 검증
+    description: 설명력, 모델 전체 유의성, 핵심 변수 유의성을 assert로 확인합니다.
+    content: |-
+      reportChecks = {
+          "r_squared_is_reportable": reportModel.rsquared >= 0.90,
+          "model_is_significant": reportModel.f_pvalue < 0.05,
+          "tv_is_significant": reportModel.pvalues["TV"] < 0.05,
+          "radio_is_significant": reportModel.pvalues["Radio"] < 0.05,
+      }
+
+      assert all(reportChecks.values()), reportChecks
+      reportChecks
+  - type: code
+    language: python
+    title: 잔차 진단
+    description: Breusch-Pagan 검정으로 심한 이분산 신호가 없는지 확인합니다.
+    content: |-
+      bpStat, bpPvalue, _, _ = het_breuschpagan(reportModel.resid, reportModel.model.exog)
+      residualChecks = {
+          "bp_pvalue_recorded": bpPvalue >= 0,
+          "residual_mean_near_zero": abs(reportModel.resid.mean()) < 1e-9,
+      }
+
+      assert all(residualChecks.values()), residualChecks
+      round(float(bpPvalue), 3), residualChecks
+  - type: expansion
+    title: "실무 변주: Newspaper 변수를 빼도 설명력이 유지될까?"
+    blocks:
+    - type: code
+      language: python
+      title: 축소 모델 비교
+      content: |-
+        compactX = sm.add_constant(marketingData[["TV", "Radio"]])
+        compactModel = sm.OLS(reportY, compactX).fit()
+        r2Drop = reportModel.rsquared - compactModel.rsquared
+
+        assert compactModel.rsquared >= 0.95
+        {
+            "fullR2": round(reportModel.rsquared, 3),
+            "compactR2": round(compactModel.rsquared, 3),
+            "r2Drop": round(r2Drop, 3),
+            "fullAIC": round(reportModel.aic, 1),
+            "compactAIC": round(compactModel.aic, 1),
+        }

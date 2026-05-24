@@ -3,7 +3,7 @@ meta:
   title: "종합 문제 풀이"
   day: 30
   category: "advancedPython"
-  tags: ["종합", "실전", "알고리즘", "자료구조", "디자인패턴", "최적화"]
+  tags: ["종합", "실전", "알고리즘", "자료구조", "디자인패턴", "최적화", "검증", "통합프로젝트"]
   seo:
     title: "파이썬 종합 문제 풀이"
     description: "30일간 학습한 고급 파이썬 개념을 종합적으로 활용하는 실전 문제 풀이"
@@ -438,6 +438,116 @@ sections:
           fibStats = fibonacci.stats()
           {"fib30": fibResult[-1], "stats": fibStats}
 
+  - id: "workflow_validation"
+    title: "현업 흐름 검증: 주문 운영 리포트 미니 프로젝트"
+    subtitle: "정규식, 자료구조, 정렬, 집계를 하나의 검증 가능한 문제로 연결"
+    blocks:
+      - type: "text"
+        content: "종합 문제는 여러 개념을 나열하는 데서 끝나면 약합니다. 로그를 파싱하고, 실패 주문을 우선순위 큐로 정리하고, 결제 합계를 집계하는 작은 운영 리포트를 완성해보세요."
+      - type: "code"
+        language: "python"
+        title: "운영 로그를 리포트로 바꾸기"
+        description: "파싱, 필터링, 힙, 집계 결과를 한 번에 검증합니다."
+        content: |
+          import heapq
+          import re
+
+          logPattern = re.compile(
+              r"(?P<timestamp>\d{2}:\d{2}) "
+              r"(?P<level>INFO|WARN|ERROR) "
+              r"order=(?P<orderId>O-\d+) "
+              r"status=(?P<status>paid|failed|draft) "
+              r"amount=(?P<amount>\d+)"
+          )
+
+          severityRank = {"ERROR": 0, "WARN": 1, "INFO": 2}
+
+          def parseLine(line):
+              match = logPattern.fullmatch(line)
+              if match is None:
+                  raise ValueError("invalid operation log")
+              event = match.groupdict()
+              event["amount"] = int(event["amount"])
+              return event
+
+          def buildOperationReport(lines):
+              events = [parseLine(line) for line in lines]
+              paidTotal = sum(event["amount"] for event in events if event["status"] == "paid")
+              incidentHeap = []
+              for event in events:
+                  if event["status"] == "failed":
+                      heapq.heappush(
+                          incidentHeap,
+                          (severityRank[event["level"]], event["timestamp"], event["orderId"]),
+                      )
+              firstIncident = heapq.heappop(incidentHeap)[2] if incidentHeap else None
+              return {
+                  "paidTotal": paidTotal,
+                  "eventCount": len(events),
+                  "firstIncident": firstIncident,
+              }
+
+          logs = [
+              "09:00 INFO order=O-100 status=paid amount=12000",
+              "09:03 WARN order=O-101 status=failed amount=8000",
+              "09:04 ERROR order=O-102 status=failed amount=15000",
+              "09:05 INFO order=O-103 status=draft amount=3000",
+          ]
+
+          report = buildOperationReport(logs)
+
+          assert report == {
+              "paidTotal": 12000,
+              "eventCount": 4,
+              "firstIncident": "O-102",
+          }
+      - type: "code"
+        language: "python"
+        title: "실패 입력과 정책 변경 검증"
+        description: "깨진 로그는 예외로 드러내고, 장애 우선순위 정책을 바꿔 결과 변화를 확인합니다."
+        content: |
+          import heapq
+          import re
+
+          logPattern = re.compile(
+              r"(?P<timestamp>\d{2}:\d{2}) "
+              r"(?P<level>INFO|WARN|ERROR) "
+              r"order=(?P<orderId>O-\d+) "
+              r"status=(?P<status>paid|failed|draft) "
+              r"amount=(?P<amount>\d+)"
+          )
+
+          def parseLine(line):
+              match = logPattern.fullmatch(line)
+              if match is None:
+                  raise ValueError("invalid operation log")
+              event = match.groupdict()
+              event["amount"] = int(event["amount"])
+              return event
+
+          def firstIncidentByTime(lines):
+              heap = []
+              for line in lines:
+                  event = parseLine(line)
+                  if event["status"] == "failed":
+                      heapq.heappush(heap, (event["timestamp"], event["orderId"]))
+              return heapq.heappop(heap)[1] if heap else None
+
+          logs = [
+              "09:03 WARN order=O-101 status=failed amount=8000",
+              "09:04 ERROR order=O-102 status=failed amount=15000",
+          ]
+
+          try:
+              parseLine("broken")
+          except ValueError as exc:
+              message = str(exc)
+
+          assert message == "invalid operation log"
+          assert firstIncidentByTime(logs) == "O-101"
+      - type: "tip"
+        content: "마지막 실험으로 실패 주문을 고객별로 묶고, 금액이 큰 순서와 장애 심각도 순서가 서로 다를 때 어떤 리포트가 더 업무에 맞는지 비교하세요."
+
   - id: "practice-exercises"
     title: "종합 실습 문제"
     subtitle: "30일 과정 종합 문제"
@@ -761,7 +871,7 @@ sections:
                   try:
                       result = func(self.value)
                       return result if isinstance(result, Maybe) else Maybe.just(result)
-                  except:
+                  except (ZeroDivisionError, ValueError, TypeError):
                       return Maybe.nothing()
 
               def getOrElse(self, default):

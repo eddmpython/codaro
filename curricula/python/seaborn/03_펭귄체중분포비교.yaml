@@ -32,6 +32,7 @@ sections:
     description: seaborn과 matplotlib을 불러옵니다
     content: |-
       import seaborn as sns
+      from codaro.curriculum.localData import loadLocalDataset
       import matplotlib.pyplot as plt
 
 - id: step2_data
@@ -45,7 +46,9 @@ sections:
     title: penguins 데이터 로드
     description: 펭귄 데이터를 불러오고 결측값을 제거합니다
     content: |-
-      penguins = sns.load_dataset('penguins').dropna()
+      from codaro.curriculum.localData import loadLocalDataset
+
+      penguins = loadLocalDataset('penguins').dropna()
       penguins.head()
 
 - id: step3_basic_box
@@ -187,7 +190,7 @@ sections:
 
       sns.boxplot(data=penguins, x='species', y='body_mass_g', hue='sex', palette='Set2', ax=axOverlay)
       sns.stripplot(data=penguins, x='species', y='body_mass_g', hue='sex',
-                   dodge=True, color='black', alpha=0.5, size=4, ax=axOverlay, legend=False)
+                   dodge=True, palette='dark:black', alpha=0.5, size=4, ax=axOverlay, legend=False)
 
       axOverlay.set_title('Body Mass with Individual Points')
       axOverlay.set_ylabel('Body Mass (g)')
@@ -263,9 +266,10 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        data = sns.load_dataset('tips')
+        data = loadLocalDataset('tips')
     - type: code
       title: "차트 생성"
       content: |-
@@ -289,26 +293,27 @@ sections:
       title: "데이터 로드"
       content: |-
         import seaborn as sns
+        from codaro.curriculum.localData import loadLocalDataset
         import matplotlib.pyplot as plt
 
-        df = sns.load_dataset('iris')
+        df = loadLocalDataset('iris')
     - type: code
       title: "상단 패널"
       content: |-
         canvas, panels = plt.subplots(2, 2, figsize=(12, 10))
 
-        sns.boxplot(data=df, x='species', y='petal_length', palette='Set2', ax=panels[0, 0])
+        sns.boxplot(data=df, x='species', y='petal_length', hue='species', palette='Set2', legend=False, ax=panels[0, 0])
         sns.stripplot(data=df, x='species', y='petal_length',
                      color='black', alpha=0.5, size=4, ax=panels[0, 0])
         panels[0, 0].set_title('Petal Length (Box + Points)')
 
         sns.violinplot(data=df, x='species', y='petal_width',
-                      palette='Set2', inner='box', ax=panels[0, 1])
+                      hue='species', palette='Set2', legend=False, inner='box', ax=panels[0, 1])
         panels[0, 1].set_title('Petal Width (Violin)')
     - type: code
       title: "하단 패널"
       content: |-
-        sns.boxplot(data=df, x='species', y='sepal_length', palette='Set2', ax=panels[1, 0])
+        sns.boxplot(data=df, x='species', y='sepal_length', hue='species', palette='Set2', legend=False, ax=panels[1, 0])
         panels[1, 0].set_title('Sepal Length (Box)')
 
         sns.scatterplot(data=df, x='petal_length', y='petal_width',
@@ -333,3 +338,79 @@ sections:
     - "stripplot 오버레이로 개별 점 표시"
   - type: text
     content: 다음 시간에는 regplot으로 회귀 분석을 시각화합니다.
+
+- id: workflow_validation
+  title: 12단계. 펭귄 분포 비교 검증 루프
+  subtitle: 예측 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      boxplot과 violinplot은 집단 간 차이를 빠르게 비교하지만, 결측값과 범주 수를 먼저 확인하지 않으면 차트 해석이 흔들립니다. Gentoo가 더 무겁다는 예측을 데이터와 차트 양쪽에서 확인합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 집단 예측
+    description: 펭귄 종, 성별, 체중 컬럼을 확인하고 종별 평균 체중 차이를 검증합니다
+    content: |-
+      from codaro.curriculum.localData import loadLocalDataset
+
+      penguinFlow = loadLocalDataset("penguins").dropna()
+      requiredColumns = {"species", "sex", "body_mass_g", "flipper_length_mm"}
+      missingColumns = requiredColumns - set(penguinFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert sorted(penguinFlow["species"].unique()) == ["Adelie", "Chinstrap", "Gentoo"]
+
+      massBySpecies = penguinFlow.groupby("species")["body_mass_g"].mean()
+      assert massBySpecies["Gentoo"] == massBySpecies.max()
+      massBySpecies.round(1)
+  - type: code
+    language: python
+    title: 비교 차트 검증
+    description: boxplot이 세 종과 성별 범례를 모두 표현하는지 확인합니다
+    content: |-
+      import matplotlib.pyplot as plt
+      import seaborn as sns
+
+      figPenguinBox, axPenguinBox = plt.subplots(figsize=(8, 5))
+      sns.boxplot(data=penguinFlow, x="species", y="body_mass_g", hue="sex", ax=axPenguinBox)
+      axPenguinBox.set_title("Penguin body mass by species and sex")
+      axPenguinBox.set_ylabel("Body mass (g)")
+
+      labels = [text.get_text() for text in axPenguinBox.get_legend().get_texts()]
+      assert axPenguinBox.get_ylabel() == "Body mass (g)"
+      assert set(labels) == {"Female", "Male"}
+      assert len(axPenguinBox.patches) >= 6
+      figPenguinBox
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 체중 컬럼이 숫자가 아닐 때 분석을 중단합니다
+    content: |-
+      def validatePenguinMass(frame):
+          if not frame["body_mass_g"].dtype.kind in "if":
+              raise ValueError("body_mass_g는 숫자 컬럼이어야 합니다")
+          assert frame["body_mass_g"].gt(0).all()
+          return True
+
+      brokenPenguins = penguinFlow.copy()
+      brokenPenguins["body_mass_g"] = "unknown"
+      try:
+          validatePenguinMass(brokenPenguins)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validatePenguinMass(penguinFlow)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 체중 대신 날개 길이를 비교했을 때도 같은 결론인지 확인합니다
+    content: |-
+      comparisonReport = []
+      for metric in ["body_mass_g", "flipper_length_mm"]:
+          speciesMean = penguinFlow.groupby("species")[metric].mean().sort_values(ascending=False)
+          comparisonReport.append({"metric": metric, "leader": speciesMean.index[0], "spread": round(float(speciesMean.max() - speciesMean.min()), 2)})
+
+      assert all(item["leader"] == "Gentoo" for item in comparisonReport)
+      comparisonReport
+  - type: tip
+    content: "분포 비교는 “누가 큰가”에서 멈추지 말고, 다른 지표에서도 같은 결론이 유지되는지 확인해야 실무 보고서가 강해집니다."

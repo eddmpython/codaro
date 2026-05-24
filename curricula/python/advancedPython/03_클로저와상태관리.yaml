@@ -3,7 +3,7 @@ meta:
   title: "클로저와 상태 관리"
   day: 3
   category: "advancedPython"
-  tags: ["closure", "nonlocal", "상태관리", "메모이제이션"]
+  tags: ["closure", "nonlocal", "상태관리", "메모이제이션", "검증", "캡슐화"]
   seo:
     title: "파이썬 클로저와 상태 관리 - 함수형 프로그래밍 핵심"
     description: "클로저의 정의와 동작 원리를 이해하고 상태 캡슐화, 메모이제이션 패턴을 마스터합니다."
@@ -403,6 +403,76 @@ sections:
       callCounter(), callCounter(), callCounter.count
   - type: "tip"
     content: "상태가 하나이고 동작도 하나라면 클로저, 그 외에는 클래스를 고려하세요."
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 클로저로 요청 제한기와 캐시 만들기"
+  subtitle: "예측 → 상태 캡슐화 → 초과 오류 → 캐시 검증"
+  blocks:
+  - type: "text"
+    content: "클로저는 간단한 상태를 함수 안에 숨기고, 외부에서는 정해진 동작으로만 상태를 바꾸게 할 때 좋습니다. 요청 제한기와 계산 캐시를 만들어 상태가 기대대로 유지되는지 확인합니다."
+  - type: "code"
+    language: "python"
+    title: "요청 제한기와 메모이제이션"
+    description: "nonlocal 상태와 클로저 캐시를 검증합니다."
+    content: |-
+      def makeRateLimiter(limit):
+          if limit <= 0:
+              raise ValueError("limit must be positive")
+
+          used = 0
+
+          def allowRequest():
+              nonlocal used
+              if used >= limit:
+                  raise RuntimeError("request limit exceeded")
+              used += 1
+              return {"allowed": True, "remaining": limit - used}
+
+          return allowRequest
+
+      def makeMemoizedSquare():
+          cache = {}
+          callCount = 0
+
+          def square(value):
+              nonlocal callCount
+              if value not in cache:
+                  callCount += 1
+                  cache[value] = value * value
+              return cache[value]
+
+          def stats():
+              return {"callCount": callCount, "cacheKeys": sorted(cache)}
+
+          return square, stats
+
+      limiter = makeRateLimiter(2)
+      assert limiter() == {"allowed": True, "remaining": 1}
+      assert limiter() == {"allowed": True, "remaining": 0}
+
+      try:
+          limiter()
+      except RuntimeError as exc:
+          assert "limit" in str(exc)
+
+      square, stats = makeMemoizedSquare()
+      assert [square(4), square(4), square(5)] == [16, 16, 25]
+      assert stats() == {"callCount": 2, "cacheKeys": [4, 5]}
+
+      try:
+          makeRateLimiter(0)
+      except ValueError as exc:
+          assert "positive" in str(exc)
+
+      print("클로저 상태 관리 흐름 통과")
+  - type: "list"
+    items:
+    - "클로저 상태는 외부에서 직접 바꾸지 못하므로 작은 상태 캡슐화에 적합합니다."
+    - "상태 변경은 nonlocal 위치에서만 일어나게 제한하면 추적이 쉬워집니다."
+    - "캐시는 결과뿐 아니라 호출 횟수까지 검증해야 실제로 중복 계산이 줄었는지 알 수 있습니다."
+  - type: "tip"
+    title: "변주 실험"
+    content: "요청 제한기를 사용자 ID별로 따로 동작하게 바꾸고, A 사용자의 초과가 B 사용자에게 영향을 주지 않는지 검증하세요."
 
 - id: "practice"
   title: "종합 복습"

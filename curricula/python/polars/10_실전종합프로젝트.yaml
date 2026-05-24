@@ -533,3 +533,105 @@ sections:
     - "J. 피벗: pivot, unpivot, 체이닝"
   - type: text
     content: 10개 프로젝트를 완료하며 Polars의 모든 핵심 개념을 마스터했습니다! 영화 평점 분석부터 시작하여 날씨 데이터, 게임 판매, 주식 시계열, 음악 스트리밍, 부동산 가격, 스포츠 통계, 소셜 미디어, 대용량 로그, 그리고 이 종합 프로젝트까지 다양한 도메인의 데이터를 다루며 실전 감각을 익혔습니다. 이제 pandas를 대체하여 월등히 빠른 성능으로 대용량 데이터를 처리할 수 있고, Lazy Evaluation으로 쿼리를 자동 최적화하며, 윈도우 함수와 표현식 API로 복잡한 분석도 간결하게 수행할 수 있습니다. 실전 데이터 파이프라인을 자유롭게 구축할 수 있는 역량을 갖추셨습니다. 다음 단계로 DuckDB, Altair 등 다른 도구와 함께 사용하며 데이터 분석 능력을 더욱 확장해나가세요!
+
+- id: workflow_validation
+  title: 업무 흐름 검증
+  subtitle: 주문 매출 파이프라인
+  blocks:
+  - type: text
+    content: "Polars는 빠른 집계만 배우면 부족합니다. 업무에서는 입력 스키마를 먼저 확인하고, 잘못된 수량이나 단가를 명확한 오류로 막고, 예측한 상위 채널이 실제 집계와 맞는지 검증해야 합니다. 마지막에는 기준값을 바꾸는 변주로 결론이 얼마나 안정적인지 확인합니다."
+  - type: code
+    language: python
+    title: 주문 데이터와 입력 검증
+    description: 필수 컬럼, 수량, 단가 조건을 로컬에서 검증합니다.
+    content: |-
+      import polars as pl
+
+      orderFrame = pl.DataFrame({
+          "orderId": [1001, 1002, 1003, 1004, 1005, 1006],
+          "channel": ["web", "store", "web", "partner", "store", "web"],
+          "quantity": [3, 2, 5, 1, 4, 2],
+          "unitPrice": [12000, 18000, 9000, 40000, 15000, 22000],
+          "refund": [0, 0, 1, 0, 0, 0],
+      })
+
+      def validateOrderFrame(frame: pl.DataFrame) -> bool:
+          requiredColumns = {"orderId", "channel", "quantity", "unitPrice", "refund"}
+          missingColumns = requiredColumns - set(frame.columns)
+          if missingColumns:
+              raise ValueError(f"필수 컬럼 누락: {sorted(missingColumns)}")
+          if frame.select((pl.col("quantity") <= 0).any()).item():
+              raise ValueError("quantity는 0보다 커야 합니다.")
+          if frame.select((pl.col("unitPrice") <= 0).any()).item():
+              raise ValueError("unitPrice는 0보다 커야 합니다.")
+          return True
+
+      validateOrderFrame(orderFrame)
+      orderFrame
+  - type: code
+    language: python
+    title: 예측 후 채널별 매출 집계
+    description: store 채널이 가장 클 것이라고 예측하고 집계로 확인합니다.
+    content: |-
+      # 예측: store는 주문 수는 적지만 단가가 높아 순매출 1위일 가능성이 큽니다.
+      expectedTopChannel = "store"
+      revenueByChannel = (
+          orderFrame
+          .with_columns((pl.col("quantity") * pl.col("unitPrice") * (1 - pl.col("refund"))).alias("netRevenue"))
+          .group_by("channel")
+          .agg([
+              pl.len().alias("orders"),
+              pl.sum("netRevenue").alias("netRevenue"),
+              pl.mean("quantity").round(2).alias("avgQuantity"),
+          ])
+          .sort("netRevenue", descending=True)
+      )
+
+      topChannel = revenueByChannel.row(0, named=True)["channel"]
+      revenueByChannel
+  - type: code
+    language: python
+    title: 실패 입력을 잡는 오류 처리
+    description: 수량이 0인 주문을 검증 함수가 거부하는지 확인합니다.
+    content: |-
+      brokenOrderFrame = orderFrame.with_columns(
+          pl.when(pl.col("orderId") == 1001).then(0).otherwise(pl.col("quantity")).alias("quantity")
+      )
+
+      try:
+          validateOrderFrame(brokenOrderFrame)
+      except ValueError as exc:
+          validationMessage = str(exc)
+
+      assert "quantity" in validationMessage
+      validationMessage
+  - type: code
+    language: python
+    title: 업무 기준 검증
+    description: 집계 결과가 보고서에 들어갈 수 있는 상태인지 assert로 확인합니다.
+    content: |-
+      pipelineChecks = {
+          "top_channel_matches_prediction": topChannel == expectedTopChannel,
+          "net_revenue_positive": revenueByChannel.select((pl.col("netRevenue") > 0).all()).item(),
+          "all_channels_present": revenueByChannel.height == orderFrame.select(pl.col("channel").n_unique()).item(),
+          "refund_removed_from_revenue": revenueByChannel.filter(pl.col("channel") == "web").row(0, named=True)["netRevenue"] == 80000,
+      }
+
+      assert all(pipelineChecks.values()), pipelineChecks
+      pipelineChecks
+  - type: expansion
+    title: "실무 변주: 매출 기준선을 바꾸면 후보 채널 수가 어떻게 변할까?"
+    blocks:
+    - type: code
+      language: python
+      title: 기준값 민감도 분석
+      content: |-
+        thresholdFrame = pl.DataFrame({"threshold": [20000, 50000, 80000]}).with_columns(
+            pl.col("threshold").map_elements(
+                lambda threshold: revenueByChannel.filter(pl.col("netRevenue") >= threshold).height,
+                return_dtype=pl.Int64,
+            ).alias("qualifiedChannels")
+        )
+
+        assert thresholdFrame.select((pl.col("qualifiedChannels").diff().fill_null(0) <= 0).all()).item()
+        thresholdFrame

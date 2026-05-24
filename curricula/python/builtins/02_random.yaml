@@ -275,6 +275,109 @@ sections:
   - type: "tip"
     content: "보안이 중요한 경우 secrets 모듈을 사용하세요. random은 암호학적으로 안전하지 않습니다."
 
+- id: "workflow_validation"
+  title: "검증 루프: 재현 가능한 샘플링"
+  subtitle: "seed, 원본 보호, 확률 분포 점검"
+  blocks:
+  - type: "text"
+    content: "무작위 코드는 테스트하기 어렵기 때문에 seed와 전용 Random 객체로 재현성을 확보해야 합니다. 원본 데이터를 섞어버리지 않는지도 검증해야 실험군 배정, 추첨, 테스트 데이터 생성에 안전하게 쓸 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "실험군 배정 검증"
+    description: "전용 Random 객체로 같은 입력이 같은 결과를 만들도록 합니다."
+    content: |-
+      users = [f"user{i:02d}" for i in range(1, 13)]
+
+      def assignExperimentGroups(userIds, seed=20260524):
+          rng = random.Random(seed)
+          shuffledUsers = list(userIds)
+          rng.shuffle(shuffledUsers)
+          midpoint = len(shuffledUsers) // 2
+          return {
+              "control": sorted(shuffledUsers[:midpoint]),
+              "variant": sorted(shuffledUsers[midpoint:]),
+          }
+
+      firstAssignment = assignExperimentGroups(users)
+      secondAssignment = assignExperimentGroups(users)
+      assignedUsers = set(firstAssignment["control"]) | set(firstAssignment["variant"])
+
+      assert firstAssignment == secondAssignment
+      assert assignedUsers == set(users)
+      assert len(firstAssignment["control"]) == len(firstAssignment["variant"]) == 6
+      assert users == [f"user{i:02d}" for i in range(1, 13)]
+
+      firstAssignment
+  - type: "code"
+    language: "python"
+    title: "원본 변경 버그 잡기"
+    description: "shuffle()이 리스트를 제자리에서 바꾸는 문제를 검증합니다."
+    content: |-
+      def assignWithMutation(userIds):
+          random.seed(20260524)
+          random.shuffle(userIds)
+          midpoint = len(userIds) // 2
+          return userIds[:midpoint], userIds[midpoint:]
+
+      mutatedUsers = users.copy()
+      assignWithMutation(mutatedUsers)
+
+      try:
+          assert mutatedUsers == users, "원본 사용자 목록이 바뀌었습니다."
+      except AssertionError as exc:
+          mutationProblem = str(exc)
+
+      safeAssignment = assignExperimentGroups(users)
+
+      assert mutationProblem == "원본 사용자 목록이 바뀌었습니다."
+      assert users == [f"user{i:02d}" for i in range(1, 13)]
+
+      mutationProblem, safeAssignment
+  - type: "code"
+    language: "python"
+    title: "가중치 샘플링 점검"
+    description: "고정 seed로 티켓 유형 분포가 기대 방향과 맞는지 확인합니다."
+    content: |-
+      def simulateSupportTickets(ticketTypes, weights, count, seed=20260524):
+          rng = random.Random(seed)
+          sampledTickets = rng.choices(ticketTypes, weights=weights, k=count)
+          counts = {ticketType: 0 for ticketType in ticketTypes}
+          for ticketType in sampledTickets:
+              counts[ticketType] += 1
+          return counts
+
+      ticketCounts = simulateSupportTickets(
+          ticketTypes=["billing", "bug", "feature"],
+          weights=[0.5, 0.3, 0.2],
+          count=1000,
+      )
+
+      assert sum(ticketCounts.values()) == 1000
+      assert ticketCounts["billing"] > ticketCounts["bug"] > ticketCounts["feature"]
+      assert ticketCounts == simulateSupportTickets(["billing", "bug", "feature"], [0.5, 0.3, 0.2], 1000)
+
+      ticketCounts
+  - type: "code"
+    language: "python"
+    title: "가중치 입력 오류 확인"
+    description: "항목 수와 가중치 수가 다르면 샘플링 전에 명확히 실패시킵니다."
+    content: |-
+      import random
+
+      def safeWeightedSample(items, weights, count, seed=20260524):
+          if len(items) != len(weights):
+              raise ValueError("items and weights must have the same length")
+          rng = random.Random(seed)
+          return rng.choices(items, weights=weights, k=count)
+
+      try:
+          safeWeightedSample(["A", "B"], [0.7], 3)
+      except ValueError as exc:
+          weightMessage = str(exc)
+
+      assert weightMessage == "items and weights must have the same length"
+      assert len(safeWeightedSample(["A", "B"], [0.7, 0.3], 5)) == 5
+
 - id: "practice"
   title: "random 모듈 종합 복습"
   subtitle: "난수 생성 마스터하기"

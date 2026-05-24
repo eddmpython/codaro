@@ -3,7 +3,7 @@ meta:
   title: "문자열 알고리즘"
   day: 27
   category: "advancedPython"
-  tags: ["문자열", "알고리즘", "패턴매칭", "KMP", "Trie"]
+  tags: ["문자열", "알고리즘", "패턴매칭", "KMP", "Trie", "검증", "검색엔진"]
   seo:
     title: "파이썬 문자열 알고리즘"
     description: "KMP, Rabin-Karp, Trie 등 문자열 알고리즘 학습"
@@ -329,6 +329,93 @@ sections:
       palLongest = longestPalindrome("babad")
       palResult = (palIs, palLongest)
       palResult
+
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 로그 패턴 검색과 SKU 자동완성"
+  subtitle: "KMP와 Trie를 실제 검색 문제에 적용하고 결과를 검증합니다"
+  blocks:
+  - type: "text"
+    content: "문자열 알고리즘은 검색, 자동완성, 로그 분석처럼 실제 텍스트 업무에서 바로 쓰입니다. 패턴이 어디서 발견되는지와 접두어 검색 결과가 맞는지 작은 데이터로 먼저 확인하세요."
+  - type: "code"
+    language: "python"
+    title: "KMP로 오류 패턴 위치 찾기"
+    description: "부분 일치 테이블을 만들고, 로그 안에서 모든 등장 위치를 검증합니다."
+    content: |-
+      def buildLps(pattern):
+          if not pattern:
+              raise ValueError("pattern must not be empty")
+          lps = [0] * len(pattern)
+          length = 0
+          index = 1
+          while index < len(pattern):
+              if pattern[index] == pattern[length]:
+                  length += 1
+                  lps[index] = length
+                  index += 1
+              elif length:
+                  length = lps[length - 1]
+              else:
+                  index += 1
+          return lps
+
+      def kmpSearch(text, pattern):
+          lps = buildLps(pattern)
+          matches = []
+          textIndex = patternIndex = 0
+          while textIndex < len(text):
+              if text[textIndex] == pattern[patternIndex]:
+                  textIndex += 1
+                  patternIndex += 1
+                  if patternIndex == len(pattern):
+                      matches.append(textIndex - patternIndex)
+                      patternIndex = lps[patternIndex - 1]
+              elif patternIndex:
+                  patternIndex = lps[patternIndex - 1]
+              else:
+                  textIndex += 1
+          return matches
+
+      logText = "payment failed; retry ok; payment failed again"
+
+      assert kmpSearch(logText, "payment failed") == [0, 26]
+      assert buildLps("ababaca") == [0, 0, 1, 2, 3, 0, 1]
+  - type: "code"
+    language: "python"
+    title: "Trie로 SKU 자동완성 만들기"
+    description: "접두어별 추천 결과를 정렬된 리스트로 검증합니다."
+    content: |-
+      class TrieNode:
+          def __init__(self):
+              self.children = {}
+              self.words = []
+
+      class SkuTrie:
+          def __init__(self):
+              self.root = TrieNode()
+
+          def insert(self, word):
+              node = self.root
+              for char in word:
+                  node = node.children.setdefault(char, TrieNode())
+                  node.words.append(word)
+
+          def suggest(self, prefix):
+              node = self.root
+              for char in prefix:
+                  if char not in node.children:
+                      return []
+                  node = node.children[char]
+              return sorted(set(node.words))
+
+      trie = SkuTrie()
+      for sku in ["A-100", "A-110", "B-200", "A-200"]:
+          trie.insert(sku)
+
+      assert trie.suggest("A-1") == ["A-100", "A-110"]
+      assert trie.suggest("C") == []
+  - type: "tip"
+    title: "변주 실험"
+    content: "검색어를 소문자로 정규화하는 단계를 추가하고, 사용자가 `a-1`을 입력해도 같은 추천이 나오는지 테스트하세요."
 
 - id: "practice"
   title: "종합 연습"

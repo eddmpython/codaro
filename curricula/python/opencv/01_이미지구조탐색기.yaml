@@ -322,3 +322,72 @@ sections:
         plt.title('Annotated Image')
         plt.axis('off')
         plt.tight_layout()
+
+- id: workflow_validation
+  title: 8단계. 이미지 구조 검증 루프
+  subtitle: shape, dtype, 채널 순서 확인
+  blocks:
+  - type: text
+    content: 이미지 구조를 배울 때는 shape를 출력하는 데서 멈추지 말고, 업무 입력이 정말 BGR uint8 3채널인지 검증해야 합니다. 잘못된 흑백 입력을 일부러 넣고 실패를 확인한 뒤, 채널 통계와 crop 결과를 assert로 점검합니다.
+  - type: code
+    language: python
+    title: BGR 테스트 이미지 준비
+    description: 색상 패치가 분명한 합성 이미지를 만듭니다.
+    content: |-
+      import cv2
+      import numpy as np
+
+      structureImage = np.zeros((80, 120, 3), dtype=np.uint8)
+      structureImage[:, :40] = [255, 0, 0]
+      structureImage[:, 40:80] = [0, 255, 0]
+      structureImage[:, 80:] = [0, 0, 255]
+
+      def validateStructureImage(image):
+          if image.ndim != 3 or image.shape[2] != 3:
+              raise ValueError(f"3채널 BGR 이미지가 아닙니다: {image.shape}")
+          if image.dtype != np.uint8:
+              raise ValueError(f"uint8 이미지가 아닙니다: {image.dtype}")
+          return True
+
+      validateStructureImage(structureImage)
+  - type: code
+    language: python
+    title: 채널 오류 확인
+    description: 흑백 배열을 넣어 shape 검증 실패를 확인합니다.
+    content: |-
+      grayLikeImage = np.zeros((80, 120), dtype=np.uint8)
+
+      try:
+          validateStructureImage(grayLikeImage)
+      except ValueError as exc:
+          structureErrorMessage = str(exc)
+
+      structureErrorMessage
+  - type: code
+    language: python
+    title: 구조와 채널 검증
+    description: BGR 채널 평균과 RGB 변환 결과를 확인합니다.
+    content: |-
+      structureRgb = cv2.cvtColor(structureImage, cv2.COLOR_BGR2RGB)
+      leftPatchMean = structureImage[:, :40].mean(axis=(0, 1))
+      structureChecks = {
+          "shapeOk": structureImage.shape == (80, 120, 3),
+          "dtypeOk": structureImage.dtype == np.uint8,
+          "leftPatchIsBlueInBgr": int(leftPatchMean[0]) == 255,
+          "leftPatchIsRedInRgb": int(structureRgb[:, :40, 2].mean()) == 255,
+          "errorOk": structureErrorMessage.startswith("3채널 BGR 이미지가 아닙니다"),
+      }
+
+      assert all(structureChecks.values()), structureChecks
+      structureChecks
+  - type: code
+    language: python
+    title: 실무 변주
+    description: 관심 영역을 잘라 채널 통계가 유지되는지 확인합니다.
+    content: |-
+      redRegion = structureImage[:, 80:]
+      redMean = redRegion.mean(axis=(0, 1))
+
+      assert redRegion.shape == (80, 40, 3)
+      assert int(redMean[2]) == 255
+      redRegion.shape, redMean.astype(int).tolist()

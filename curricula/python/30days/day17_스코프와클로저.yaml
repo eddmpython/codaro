@@ -3,7 +3,7 @@ meta:
   title: "스코프와클로저"
   day: 17
   category: "30days"
-  tags: []
+  tags: ["스코프", "클로저", "nonlocal", "상태관리", "캡슐화", "검증"]
   seo:
     title: "파이썬 스코프와 클로저 - 변수 범위와 함수 상태"
     description: "지역/전역 스코프, global, nonlocal, closure를 배웁니다."
@@ -393,6 +393,108 @@ sections:
       isValid(50), isValid(5), isValid(150)
   - type: "tip"
     content: "클로저는 클래스 없이도 상태를 관리할 수 있게 해줍니다."
+
+- id: "workflow_validation"
+  title: "검증 루프: 고객별 누적 결제 상태 만들기"
+  subtitle: "global 대신 클로저로 상태를 격리하고 검증"
+  blocks:
+  - type: "text"
+    content: "스코프와 클로저는 시험용 문법이 아니라, 상태가 섞이면 안 되는 업무 흐름을 안전하게 나누는 도구입니다. 고객별 누적 결제 금액처럼 서로 독립이어야 하는 상태는 전역 변수보다 클로저로 관리하는 편이 안전합니다."
+  - type: "list"
+    items:
+    - "예측: 고객 A와 고객 B의 누적 금액은 서로 섞이면 안 된다."
+    - "실행: makePaymentTracker가 고객별 track 함수를 반환하게 만든다."
+    - "오류 수정: 지역 변수 수정 실수로 생기는 UnboundLocalError를 확인한다."
+    - "검증: 각 클로저가 독립 상태를 유지하는지 assert로 확인한다."
+  - type: "code"
+    language: "python"
+    title: "고객별 결제 추적 클로저"
+    description: "nonlocal로 누적 상태를 보존하면서 고객별로 독립적인 추적 함수를 만듭니다."
+    content: |-
+      def makePaymentTracker(customerId):
+          totalPaid = 0
+          paymentCount = 0
+
+          def track(amount):
+              nonlocal totalPaid, paymentCount
+              if amount <= 0:
+                  raise ValueError('결제 금액은 양수여야 합니다')
+              totalPaid = totalPaid + amount
+              paymentCount = paymentCount + 1
+              return {
+                  'customerId': customerId,
+                  'totalPaid': totalPaid,
+                  'paymentCount': paymentCount,
+              }
+
+          return track
+
+
+      kimTracker = makePaymentTracker('kim')
+      leeTracker = makePaymentTracker('lee')
+
+      kimFirst = kimTracker(10000)
+      kimSecond = kimTracker(5000)
+      leeFirst = leeTracker(7000)
+
+      assert kimSecond == {'customerId': 'kim', 'totalPaid': 15000, 'paymentCount': 2}
+      assert leeFirst == {'customerId': 'lee', 'totalPaid': 7000, 'paymentCount': 1}
+      assert kimFirst['totalPaid'] == 10000
+  - type: "code"
+    language: "python"
+    title: "스코프 오류 확인"
+    description: "지역 변수로 판단된 이름을 읽고 수정하면 UnboundLocalError가 납니다."
+    content: |-
+      balance = 10000
+
+      def brokenWithdraw(amount):
+          balance = balance - amount
+          return balance
+
+
+      try:
+          brokenWithdraw(1000)
+      except UnboundLocalError as exc:
+          scopeError = str(exc)
+      else:
+          raise AssertionError('지역 변수 스코프 오류가 발생해야 합니다')
+
+      assert 'balance' in scopeError
+      assert balance == 10000
+  - type: "code"
+    language: "python"
+    title: "잘못된 상태 입력 검증"
+    description: "클로저 내부에서도 업무 규칙을 어기는 입력은 ValueError로 막습니다."
+    content: |-
+      tracker = makePaymentTracker('park')
+
+      try:
+          tracker(0)
+      except ValueError as exc:
+          paymentError = str(exc)
+      else:
+          raise AssertionError('0원 결제는 실패해야 합니다')
+
+      assert paymentError == '결제 금액은 양수여야 합니다'
+      assert tracker(3000)['totalPaid'] == 3000
+  - type: "expansion"
+    title: "실무 변주: 처리 건수 카운터"
+    code: |-
+      def makeStatusCounter(statusName):
+          count = 0
+          def mark():
+              nonlocal count
+              count = count + 1
+              return {'status': statusName, 'count': count}
+          return mark
+
+
+      successCounter = makeStatusCounter('success')
+      failedCounter = makeStatusCounter('failed')
+
+      assert successCounter()['count'] == 1
+      assert successCounter()['count'] == 2
+      assert failedCounter() == {'status': 'failed', 'count': 1}
 
 - id: "practice"
   title: "Day 17 종합 복습"

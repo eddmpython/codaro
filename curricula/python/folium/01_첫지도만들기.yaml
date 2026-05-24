@@ -264,6 +264,104 @@ sections:
 
       tourMap
 
+- id: step11_workflow
+  title: 11단계. 실무 위치 지도 검증
+  subtitle: 예측 → 오류 확인 → 검증
+  blocks:
+  - type: text
+    content: 업무 지도는 마커가 보이는지만 확인하면 부족합니다. 좌표가 한국 범위 안에 있는지, 모든 지점 이름이 지도 HTML에 들어갔는지, 새 지점을 추가했을 때 중심과 경계가 어떻게 달라지는지 예측하고 검증해야 합니다.
+  - type: list
+    items:
+    - "실행 전에는 어느 지점이 지도 중심에 가까운지 먼저 예측합니다."
+    - "위도와 경도가 뒤바뀌면 지도는 엉뚱한 곳을 보여주는 업무 오류가 됩니다."
+    - "마커 이름이 HTML에 들어갔는지 확인하면 누락을 빠르게 찾을 수 있습니다."
+    - "지점이 늘어나면 fit_bounds로 전체 범위가 보이는지 검증합니다."
+  - type: code
+    language: python
+    title: 지점 데이터 준비
+    description: 영업 지점 후보를 지도에 올리기 전 좌표와 우선순위를 확인합니다.
+    content: |-
+      branchSites = [
+          {"name": "강남 상담센터", "loc": [37.4979, 127.0276], "priority": "high"},
+          {"name": "홍대 체험존", "loc": [37.5563, 126.9236], "priority": "medium"},
+          {"name": "여의도 파트너센터", "loc": [37.5219, 126.9245], "priority": "high"},
+      ]
+
+      def validateKoreaCoordinate(site):
+          lat, lon = site["loc"]
+          if not (33 <= lat <= 39 and 124 <= lon <= 132):
+              raise ValueError(f"좌표 범위 오류: {site['name']}")
+          return True
+
+      validationResult = [validateKoreaCoordinate(site) for site in branchSites]
+      validationResult
+  - type: code
+    language: python
+    title: 좌표 오류 확인
+    description: 위도와 경도를 뒤집은 지점을 일부러 넣고 오류 메시지를 읽습니다.
+    content: |-
+      brokenSite = {"name": "좌표 뒤집힘", "loc": [127.0276, 37.4979], "priority": "low"}
+
+      try:
+          validateKoreaCoordinate(brokenSite)
+      except ValueError as exc:
+          coordinateErrorMessage = str(exc)
+
+      coordinateErrorMessage
+  - type: code
+    language: python
+    title: 업무 지도 만들기
+    description: 우선순위에 따라 마커 색상을 바꿔 지도를 만듭니다.
+    content: |-
+      priorityColor = {"high": "red", "medium": "orange", "low": "blue"}
+      branchMap = folium.Map(location=[37.525, 126.96], zoom_start=12)
+
+      for site in branchSites:
+          folium.Marker(
+              location=site["loc"],
+              popup=f"{site['name']} / 우선순위 {site['priority']}",
+              tooltip=site["name"],
+              icon=folium.Icon(color=priorityColor[site["priority"]], icon="info-sign"),
+          ).add_to(branchMap)
+
+      branchMap.fit_bounds([site["loc"] for site in branchSites])
+      branchMap
+  - type: code
+    language: python
+    title: 렌더 결과 검증
+    description: 모든 지점 이름과 오류 메시지가 예상대로 준비됐는지 점검합니다.
+    content: |-
+      branchHtml = branchMap.get_root().render()
+      checks = {
+          "allNamesRendered": all(site["name"] in branchHtml for site in branchSites),
+          "coordinateErrorOk": coordinateErrorMessage == "좌표 범위 오류: 좌표 뒤집힘",
+          "validationOk": all(validationResult),
+      }
+
+      assert all(checks.values()), checks
+      checks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 새 지점을 추가하면 검증해야 할 마커 수와 경계가 어떻게 바뀌는지 확인합니다.
+    content: |-
+      expandedSites = branchSites + [
+          {"name": "종로 교육장", "loc": [37.5796, 126.9770], "priority": "low"}
+      ]
+
+      expandedMap = folium.Map(location=[37.54, 126.96], zoom_start=12)
+      for site in expandedSites:
+          validateKoreaCoordinate(site)
+          folium.Marker(location=site["loc"], popup=site["name"]).add_to(expandedMap)
+      expandedMap.fit_bounds([site["loc"] for site in expandedSites])
+
+      expandedHtml = expandedMap.get_root().render()
+      assert len(expandedSites) == len(branchSites) + 1
+      assert "종로 교육장" in expandedHtml
+      len(branchSites), len(expandedSites), "종로 교육장" in expandedHtml
+  - type: tip
+    content: Folium 지도는 눈으로 보는 결과물이라 더더욱 데이터 검증이 필요합니다. 좌표 범위, 마커 수, 이름 렌더링을 코드로 확인하면 실무 오류를 빠르게 줄일 수 있습니다.
+
 - id: practice
   title: 실습
   subtitle: 지도 만들기

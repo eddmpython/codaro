@@ -31,6 +31,11 @@ sections:
     description: "struct 모듈을 불러옵니다."
     content: |-
       import struct
+      import tempfile
+      from pathlib import Path
+
+      structScratch = Path(tempfile.gettempdir()) / 'codaro_struct_scratch'
+      structScratch.mkdir(parents=True, exist_ok=True)
 
       'struct 모듈이 정상적으로 로드되었습니다'
   - type: "tip"
@@ -263,11 +268,98 @@ sections:
       recordName = b'Alice'
       recordScore = 95
       recordData = struct.pack('i10si', recordId, recordName, recordScore)
-      with open('/tmp/record.bin', 'wb') as f:
+      with open(structScratch / 'record.bin', 'wb') as f:
           f.write(recordData)
       'record.bin 저장 완료'
   - type: "tip"
     content: "바이너리 파일을 읽을 때는 정확한 포맷을 알아야 하므로, 파일 형식 문서를 잘 관리하세요."
+
+- id: "workflow_validation"
+  title: "검증 루프: 바이너리 레코드 품질 게이트"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "struct는 바이트 길이와 엔디안이 하나만 어긋나도 데이터를 잘못 해석합니다. 여기서는 센서 패킷 포맷을 미리 정의하고, 잘린 패킷과 잘못된 매직 넘버를 실패시킨 뒤, 정상 레코드를 파일로 저장하고 다시 검증합니다."
+  - type: "code"
+    language: "python"
+    title: "패킷 포맷과 인코더 정의"
+    description: "매직 넘버, 버전, 센서 ID, 온도, 습도를 고정 포맷으로 패킹합니다."
+    content: |-
+      structWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_struct_workflow_'))
+      packetFormat = '>4sBIfH'
+      packetSize = struct.calcsize(packetFormat)
+      magicBytes = b'CDRO'
+
+      def encodeSensorPacket(sensorId, temperature, humidity):
+          assert 0 <= humidity <= 100, 'humidity는 0~100 범위여야 합니다'
+          return struct.pack(packetFormat, magicBytes, 1, sensorId, temperature, humidity)
+
+      def decodeSensorPacket(packet):
+          assert len(packet) == packetSize, '패킷 길이가 포맷과 다릅니다'
+          magic, version, sensorId, temperature, humidity = struct.unpack(packetFormat, packet)
+          assert magic == magicBytes, '매직 넘버가 다릅니다'
+          assert version == 1, '지원하지 않는 버전입니다'
+          return {
+              'sensorId': sensorId,
+              'temperature': round(temperature, 2),
+              'humidity': humidity
+          }
+
+      sensorPacket = encodeSensorPacket(7, 23.5, 45)
+      decodedSensor = decodeSensorPacket(sensorPacket)
+      assert decodedSensor['sensorId'] == 7
+      decodedSensor
+  - type: "code"
+    language: "python"
+    title: "깨진 패킷을 먼저 실패시킨다"
+    description: "길이 오류와 매직 넘버 오류를 검증 단계에서 잡아냅니다."
+    content: |-
+      try:
+          decodeSensorPacket(sensorPacket[:-1])
+      except AssertionError as exc:
+          sizeProblem = str(exc)
+
+      badMagicPacket = struct.pack(packetFormat, b'BAD!', 1, 7, 23.5, 45)
+      try:
+          decodeSensorPacket(badMagicPacket)
+      except AssertionError as exc:
+          magicProblem = str(exc)
+
+      assert '길이' in sizeProblem
+      assert '매직' in magicProblem
+      sizeProblem, magicProblem
+  - type: "code"
+    language: "python"
+    title: "파일 저장 후 재검증"
+    description: "바이너리 파일에 쓴 뒤 정확한 바이트 수와 값을 다시 확인합니다."
+    content: |-
+      packetFile = structWorkflowRoot / 'sensor_packet.bin'
+      packetFile.write_bytes(sensorPacket)
+      restoredPacket = packetFile.read_bytes()
+      restoredSensor = decodeSensorPacket(restoredPacket)
+
+      assert packetFile.stat().st_size == packetSize
+      assert restoredSensor == decodedSensor
+      restoredSensor
+  - type: "code"
+    language: "python"
+    title: "실무 변주: 여러 레코드 스트림"
+    description: "고정 크기 레코드를 이어 붙이고 packetSize 단위로 안전하게 읽습니다."
+    content: |-
+      packets = [
+          encodeSensorPacket(1, 21.0, 40),
+          encodeSensorPacket(2, 24.2, 55),
+          encodeSensorPacket(3, 20.8, 35)
+      ]
+      streamBytes = b''.join(packets)
+      parsedStream = [
+          decodeSensorPacket(streamBytes[offset:offset + packetSize])
+          for offset in range(0, len(streamBytes), packetSize)
+      ]
+
+      assert len(parsedStream) == 3
+      assert max(item['humidity'] for item in parsedStream) == 55
+      parsedStream
 
 - id: "practice"
   title: "struct 모듈 종합 복습"
@@ -373,7 +465,7 @@ sections:
       recId = 10
       recScore = 85
       recBytes = struct.pack('ii', recId, recScore)
-      with open('/tmp/rec.bin', 'wb') as f:
+      with open(structScratch / 'rec.bin', 'wb') as f:
           f.write(recBytes)
       'Saved'
 
@@ -381,9 +473,9 @@ sections:
     title: "🔴 심화6: 레코드 읽기"
     code: |-
       rec2 = struct.pack('ii', 20, 90)
-      with open('/tmp/rec2.bin', 'wb') as f:
+      with open(structScratch / 'rec2.bin', 'wb') as f:
           f.write(rec2)
-      with open('/tmp/rec2.bin', 'rb') as f:
+      with open(structScratch / 'rec2.bin', 'rb') as f:
           readRec = f.read()
       rid, rscore = struct.unpack('ii', readRec)
       rid, rscore
@@ -411,9 +503,9 @@ sections:
     title: "🔴 심화10: 바이너리 파일 처리"
     code: |-
       fileHeader = struct.pack('>4sHH', b'MYFT', 1, 0)
-      with open('/tmp/myfile.bin', 'wb') as f:
+      with open(structScratch / 'myfile.bin', 'wb') as f:
           f.write(fileHeader)
-      with open('/tmp/myfile.bin', 'rb') as f:
+      with open(structScratch / 'myfile.bin', 'rb') as f:
           readHeader = f.read()
       sig, v1, v2 = struct.unpack('>4sHH', readHeader)
       sig, v1, v2

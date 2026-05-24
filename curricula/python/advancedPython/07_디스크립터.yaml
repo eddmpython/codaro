@@ -3,7 +3,7 @@ meta:
   title: "디스크립터"
   day: 7
   category: "advancedPython"
-  tags: ["descriptor", "__get__", "__set__", "property"]
+  tags: ["descriptor", "__get__", "__set__", "property", "검증", "데이터모델"]
   seo:
     title: "파이썬 디스크립터 프로토콜 - 속성 접근 제어의 핵심"
     description: "디스크립터 프로토콜의 동작 원리를 이해합니다. __get__, __set__, __delete__ 구현과 property의 내부 동작."
@@ -526,6 +526,88 @@ sections:
   - type: "tip"
     content: "cached_property는 스레드 안전하지 않습니다. 멀티스레드에서는 주의가 필요합니다."
 
+- id: "workflow_validation"
+  title: "현업 흐름 검증: 재사용 가능한 필드 검증기 만들기"
+  subtitle: "예측 → descriptor 저장소 → 타입/범위 오류 → 모델 검증"
+  blocks:
+  - type: "text"
+    content: "디스크립터는 여러 모델에서 반복되는 속성 검증 규칙을 한 번에 묶을 때 효과적입니다. 상품 행 모델에 문자열, 가격, 수량 검증을 붙이고 실패 조건까지 확인합니다."
+  - type: "code"
+    language: "python"
+    title: "상품 모델 필드 디스크립터"
+    description: "__set_name__, __get__, __set__으로 재사용 가능한 검증 필드를 만듭니다."
+    content: |-
+      class TypedField:
+          def __init__(self, expectedType):
+              self.expectedType = expectedType
+
+          def __set_name__(self, owner, name):
+              self.publicName = name
+              self.privateName = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              return getattr(obj, self.privateName)
+
+          def __set__(self, obj, value):
+              if not isinstance(value, self.expectedType):
+                  raise TypeError(f"{self.publicName} must be {self.expectedType.__name__}")
+              setattr(obj, self.privateName, value)
+
+      class PositiveNumber:
+          def __set_name__(self, owner, name):
+              self.publicName = name
+              self.privateName = f"_{name}"
+
+          def __get__(self, obj, objtype=None):
+              if obj is None:
+                  return self
+              return getattr(obj, self.privateName)
+
+          def __set__(self, obj, value):
+              if value <= 0:
+                  raise ValueError(f"{self.publicName} must be positive")
+              setattr(obj, self.privateName, value)
+
+      class ProductLine:
+          sku = TypedField(str)
+          price = PositiveNumber()
+          quantity = PositiveNumber()
+
+          def __init__(self, sku, price, quantity):
+              self.sku = sku
+              self.price = price
+              self.quantity = quantity
+
+          @property
+          def amount(self):
+              return self.price * self.quantity
+
+      line = ProductLine("KBD-001", 50000, 2)
+      assert line.amount == 100000
+      assert ProductLine.sku.publicName == "sku"
+
+      try:
+          ProductLine(1001, 50000, 1)
+      except TypeError as exc:
+          assert "sku" in str(exc)
+
+      try:
+          ProductLine("BAD", 0, 1)
+      except ValueError as exc:
+          assert "price" in str(exc)
+
+      print("디스크립터 필드 검증 흐름 통과")
+  - type: "list"
+    items:
+    - "__set_name__으로 실제 속성 이름을 받아 오류 메시지와 저장 키를 안정화합니다."
+    - "디스크립터는 property setter 반복을 줄이고 여러 클래스에 같은 검증 규칙을 재사용하게 합니다."
+    - "타입 오류와 값 범위 오류를 분리하면 사용자에게 고칠 지점을 명확히 알려줄 수 있습니다."
+  - type: "tip"
+    title: "변주 실험"
+    content: "수량에는 정수만 허용하고 가격에는 int와 float를 모두 허용하도록 디스크립터를 분리한 뒤 실패 메시지를 비교하세요."
+
 - id: "practice"
   title: "종합 복습"
   subtitle: "디스크립터 마스터하기"
@@ -813,7 +895,12 @@ sections:
               return {"status": "ok"}
 
       api = API()
-      api.fetchData()
+      firstFetch = api.fetchData
+      secondFetch = api.fetchData
+
+      assert firstFetch == {"status": "ok"}
+      assert firstFetch is secondFetch
+      firstFetch
 
   - type: "expansion"
     title: "🔴 심화4: 의존성 계산"

@@ -279,6 +279,103 @@ sections:
   - type: "tip"
     content: "calendar 모듈과 함께 사용하면 월말일, 윤년 등을 쉽게 처리할 수 있습니다."
 
+- id: "workflow_validation"
+  title: "검증 루프: 일정 데이터 품질"
+  subtitle: "파싱, 마감 상태, 영업일 계산"
+  blocks:
+  - type: "text"
+    content: "날짜 코드는 현재 날짜에 의존하면 테스트가 흔들립니다. 기준일을 고정하고, 문자열 파싱 실패와 마감 상태 계산을 검증하면 일정 관리나 운영 리포트에 그대로 재사용할 수 있습니다."
+  - type: "code"
+    language: "python"
+    title: "업무 일정 파싱"
+    description: "문자열 날짜를 date 객체로 바꾸고 마감 상태를 계산합니다."
+    content: |-
+      referenceDate = date(2026, 5, 24)
+      taskRows = [
+          {"task": "invoiceClose", "due": "2026-05-20"},
+          {"task": "releaseReview", "due": "2026-05-24"},
+          {"task": "securityAudit", "due": "2026-05-27"},
+          {"task": "quarterReport", "due": "2026-06-02"},
+      ]
+
+      def parseTaskRows(rows, today):
+          parsedRows = []
+          for row in rows:
+              dueDate = datetime.strptime(row["due"], "%Y-%m-%d").date()
+              daysLeft = (dueDate - today).days
+              if daysLeft < 0:
+                  status = "overdue"
+              elif daysLeft <= 3:
+                  status = "dueSoon"
+              else:
+                  status = "scheduled"
+
+              parsedRows.append({
+                  "task": row["task"],
+                  "due": dueDate,
+                  "daysLeft": daysLeft,
+                  "status": status,
+              })
+          return parsedRows
+
+      taskSchedule = parseTaskRows(taskRows, referenceDate)
+      statusCounts = {}
+      for item in taskSchedule:
+          statusCounts[item["status"]] = statusCounts.get(item["status"], 0) + 1
+
+      assert statusCounts == {"overdue": 1, "dueSoon": 2, "scheduled": 1}
+      assert taskSchedule[0]["daysLeft"] == -4
+      assert taskSchedule[-1]["due"] == date(2026, 6, 2)
+
+      taskSchedule
+  - type: "code"
+    language: "python"
+    title: "잘못된 날짜 입력 잡기"
+    description: "존재하지 않는 날짜를 파싱할 때 ValueError를 명시적으로 처리합니다."
+    content: |-
+      invalidRows = [{"task": "badDate", "due": "2026-02-30"}]
+
+      try:
+          parseTaskRows(invalidRows, referenceDate)
+      except ValueError as exc:
+          dateQualityProblem = str(exc)
+
+      fixedRows = [{"task": "fixedDate", "due": "2026-02-28"}]
+      fixedSchedule = parseTaskRows(fixedRows, referenceDate)
+
+      assert dateQualityProblem
+      assert fixedSchedule[0]["due"] == date(2026, 2, 28)
+
+      dateQualityProblem, fixedSchedule
+  - type: "code"
+    language: "python"
+    title: "영업일 계산 리포트"
+    description: "주말을 제외한 처리 가능 일수를 계산합니다."
+    content: |-
+      def countBusinessDays(startDate, endDate):
+          current = startDate
+          businessDays = 0
+          while current <= endDate:
+              if current.weekday() < 5:
+                  businessDays += 1
+              current = current + timedelta(days=1)
+          return businessDays
+
+      businessDayReport = {
+          "releaseWeek": countBusinessDays(date(2026, 5, 25), date(2026, 5, 29)),
+          "weekendOnly": countBusinessDays(date(2026, 5, 23), date(2026, 5, 24)),
+          "crossWeekend": countBusinessDays(date(2026, 5, 22), date(2026, 5, 26)),
+      }
+
+      assert businessDayReport["releaseWeek"] == 5
+      assert businessDayReport["weekendOnly"] == 0
+      assert businessDayReport["crossWeekend"] == 3
+
+      businessDayReport
+  - type: "tip"
+    title: "변주 실험"
+    content: "한국 공휴일 목록을 set으로 추가하고, 주말이 아니어도 휴일이면 영업일에서 제외되도록 `countBusinessDays`를 확장하세요."
+
 - id: "practice"
   title: "datetime 모듈 종합 복습"
   subtitle: "날짜와 시간 마스터하기"

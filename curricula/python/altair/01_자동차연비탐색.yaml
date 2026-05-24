@@ -26,9 +26,9 @@ sections:
   blocks:
   - type: text
     content: |-
-      GitHub에서 mpg 데이터를 불러옵니다. mpg는 자동차의 연비(mpg), 마력(horsepower), 생산국(origin) 등 정보가 담긴 데이터입니다.
+      Codaro 로컬 데이터셋에서 mpg 데이터를 불러옵니다. mpg는 자동차의 연비(mpg), 마력(horsepower), 생산국(origin) 등 정보가 담긴 데이터입니다.
 
-      pandas는 데이터 분석을 위한 도구이고, read_csv()는 CSV 파일을 읽어오는 함수입니다. 괄호 안에 URL을 넣으면 인터넷에서 직접 데이터를 가져옵니다.
+      pandas는 데이터 분석을 위한 도구이고, DataFrame은 표 데이터를 담는 구조입니다. 이번 레슨에서는 Codaro 로컬 데이터셋을 불러와 인터넷 연결 없이 같은 결과를 재현합니다.
 
       Altair는 시각화 라이브러리로, 데이터를 차트로 만들어줍니다.
   - type: code
@@ -40,9 +40,9 @@ sections:
       import pandas as pd
       import warnings
       warnings.filterwarnings('ignore', message='.*is_pandas_dataframe.*')
+      from codaro.curriculum.localData import loadLocalDataset
 
-      mpgUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
-      mpg = pd.read_csv(mpgUrl)
+      mpg = loadLocalDataset("mpg")
   - type: tip
     content: |-
       import는 "가져오다"라는 뜻으로, 다른 사람이 만든 도구를 가져와서 사용하겠다는 의미입니다. as alt는 "altair를 alt라는 짧은 이름으로 부르겠다"는 뜻입니다.
@@ -201,6 +201,120 @@ sections:
       )
       figScatter
 
+- id: step8_workflow
+  title: 8단계. 실무 산점도 검증
+  subtitle: 예측 → 오류 확인 → 차트 사양 검증 → 기준 실험
+  blocks:
+  - type: text
+    content: 업무 차트는 화면에 점이 보이는 것만으로 충분하지 않습니다. 어떤 질문을 답하려는지 먼저 예측하고, 필요한 컬럼이 있는지 확인하고, Altair 차트 사양에 x축·y축·색상·툴팁이 의도대로 들어갔는지 검증해야 합니다.
+  - type: list
+    items:
+    - "실행 전에는 어느 생산국의 평균 연비가 가장 높을지 먼저 예측합니다."
+    - "y축에 잘못된 컬럼을 넣으면 차트는 그럴듯하지만 질문에 답하지 못하는 오류가 됩니다."
+    - "to_dict()로 Altair 차트 사양을 확인하면 축과 툴팁 누락을 코드로 잡을 수 있습니다."
+    - "고마력·저연비 기준을 바꾸며 어떤 차량이 점검 대상이 되는지 실험합니다."
+  - type: code
+    language: python
+    title: 분석 질문과 데이터 검증
+    description: 필요한 컬럼과 평균 연비 예측을 먼저 확인합니다.
+    content: |-
+      requiredColumns = {"name", "mpg", "horsepower", "origin", "weight"}
+      missingColumns = sorted(requiredColumns - set(mpg.columns))
+      if missingColumns:
+          raise ValueError(f"필수 컬럼 누락: {missingColumns}")
+
+      originMpgSummary = mpg.groupby("origin")["mpg"].mean().round(1).sort_values(ascending=False)
+      bestMpgOrigin = originMpgSummary.index[0]
+      highPowerLowEfficiency = mpg[(mpg["horsepower"] >= 160) & (mpg["mpg"] <= 22)]
+
+      bestMpgOrigin, originMpgSummary.to_dict(), len(highPowerLowEfficiency)
+  - type: code
+    language: python
+    title: 차트 사양 검증 함수
+    description: Altair 차트의 축과 색상 인코딩이 업무 질문과 맞는지 검사합니다.
+    content: |-
+      def validateScatterEncoding(chart, expectedFields):
+          encoding = chart.to_dict()["encoding"]
+          actualFields = {
+              channel: encoding[channel]["field"]
+              for channel in expectedFields
+          }
+          if actualFields != expectedFields:
+              raise ValueError(f"차트 인코딩 오류: {actualFields}")
+          tooltipFields = [item["field"] for item in encoding.get("tooltip", [])]
+          for field in ["name", "horsepower", "mpg", "origin"]:
+              if field not in tooltipFields:
+                  raise ValueError(f"툴팁 누락: {field}")
+          return True
+
+      expectedScatterFields = {"x": "horsepower", "y": "mpg", "color": "origin"}
+      expectedScatterFields
+  - type: code
+    language: python
+    title: 축 오류 확인
+    description: y축에 weight를 넣은 잘못된 차트를 일부러 검증해 오류를 읽습니다.
+    content: |-
+      brokenScatter = alt.Chart(mpg).mark_point().encode(
+          x="horsepower:Q",
+          y="weight:Q",
+          color="origin:N",
+          tooltip=["name", "horsepower", "mpg", "origin"],
+      )
+
+      try:
+          validateScatterEncoding(brokenScatter, expectedScatterFields)
+      except ValueError as exc:
+          scatterEncodingError = str(exc)
+
+      scatterEncodingError
+  - type: code
+    language: python
+    title: 검증 가능한 업무 산점도 만들기
+    description: 고마력·저연비 차량을 찾는 산점도를 만들고 사양을 검증합니다.
+    content: |-
+      workflowScatter = alt.Chart(mpg).mark_point(filled=True, opacity=0.75).encode(
+          x=alt.X("horsepower:Q", title="마력"),
+          y=alt.Y("mpg:Q", title="연비(mpg)"),
+          color=alt.Color("origin:N", title="생산국"),
+          tooltip=["name", "horsepower", "mpg", "origin", "weight"],
+      )
+
+      workflowSpec = workflowScatter.to_dict()
+      workflowScatter
+  - type: code
+    language: python
+    title: 차트 결과 검증
+    description: 차트 사양, 오류 메시지, 데이터 예측이 모두 맞는지 확인합니다.
+    content: |-
+      scatterChecks = {
+          "encodingOk": validateScatterEncoding(workflowScatter, expectedScatterFields),
+          "errorOk": scatterEncodingError == "차트 인코딩 오류: {'x': 'horsepower', 'y': 'weight', 'color': 'origin'}",
+          "bestOriginOk": bestMpgOrigin == "europe",
+          "targetCountOk": len(highPowerLowEfficiency) == 25,
+          "dataRowsOk": len(workflowSpec["datasets"][next(iter(workflowSpec["datasets"]))]) == len(mpg),
+      }
+
+      assert all(scatterChecks.values()), scatterChecks
+      scatterChecks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 고마력·저연비 기준을 바꾸면 점검 대상 차량 수가 어떻게 달라지는지 비교합니다.
+    content: |-
+      def countTargetCars(data, horsepowerThreshold, mpgThreshold):
+          target = data[(data["horsepower"] >= horsepowerThreshold) & (data["mpg"] <= mpgThreshold)]
+          return {
+              "count": len(target),
+              "byOrigin": target["origin"].value_counts().sort_index().to_dict(),
+          }
+
+      defaultTarget = countTargetCars(mpg, horsepowerThreshold=160, mpgThreshold=22)
+      strictTarget = countTargetCars(mpg, horsepowerThreshold=180, mpgThreshold=18)
+
+      defaultTarget, strictTarget
+  - type: tip
+    content: Altair 입문에서도 차트 사양 검증을 함께 배워야 합니다. 축, 색상, 툴팁, 데이터 행 수를 확인하면 예쁜 차트가 아니라 업무 질문에 답하는 차트를 만들 수 있습니다.
+
 - id: practice
   title: 실습
   subtitle: mpg 데이터 시각화 프로젝트
@@ -222,8 +336,8 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        carUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
-        car = pd.read_csv(carUrl)
+        from codaro.curriculum.localData import loadLocalDataset
+        car = loadLocalDataset("mpg")
     - type: code
       title: "차트 생성"
       content: |-
@@ -242,8 +356,8 @@ sections:
       content: |-
         import altair as alt
         import pandas as pd
-        autoUrl = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/mpg.csv"
-        auto = pd.read_csv(autoUrl)
+        from codaro.curriculum.localData import loadLocalDataset
+        auto = loadLocalDataset("mpg")
     - type: code
       title: "차트 생성"
       content: |-

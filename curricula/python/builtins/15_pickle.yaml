@@ -31,6 +31,12 @@ sections:
     description: "pickle 모듈을 불러옵니다."
     content: |-
       import pickle
+      import os
+      import tempfile
+      from pathlib import Path
+
+      pickleScratch = Path(tempfile.gettempdir()) / 'codaro_pickle_scratch'
+      pickleScratch.mkdir(parents=True, exist_ok=True)
 
       'pickle 모듈이 정상적으로 로드되었습니다'
   - type: "tip"
@@ -54,7 +60,7 @@ sections:
     description: "딕셔너리를 pickle 파일로 저장합니다."
     content: |-
       userData = {'name': 'Alice', 'age': 30, 'scores': [95, 88, 92]}
-      with open('/tmp/user.pkl', 'wb') as f:
+      with open(pickleScratch / 'user.pkl', 'wb') as f:
           pickle.dump(userData, f)
       'user.pkl 저장 완료'
   - type: "code"
@@ -62,7 +68,7 @@ sections:
     title: "딕셔너리 불러오기"
     description: "pickle 파일에서 딕셔너리를 복원합니다."
     content: |-
-      with open('/tmp/user.pkl', 'rb') as f:
+      with open(pickleScratch / 'user.pkl', 'rb') as f:
           loadedUser = pickle.load(f)
       loadedUser
   - type: "code"
@@ -71,9 +77,9 @@ sections:
     description: "복잡한 리스트를 저장하고 불러옵니다."
     content: |-
       complexList = [1, 'text', {'key': 'value'}, [2, 3, 4]]
-      with open('/tmp/complex.pkl', 'wb') as f:
+      with open(pickleScratch / 'complex.pkl', 'wb') as f:
           pickle.dump(complexList, f)
-      with open('/tmp/complex.pkl', 'rb') as f:
+      with open(pickleScratch / 'complex.pkl', 'rb') as f:
           restoredList = pickle.load(f)
       restoredList
   - type: "tip"
@@ -125,22 +131,22 @@ sections:
   subtitle: "직렬화 가능한 객체들"
   blocks:
   - type: "text"
-    content: "pickle은 거의 모든 Python 객체를 직렬화할 수 있습니다. 기본 타입, 컬렉션, 클래스 인스턴스, 함수까지 저장 가능합니다. JSON과 달리 set, datetime, 사용자 정의 클래스도 바로 저장할 수 있어 매우 강력합니다."
+    content: "pickle은 많은 Python 객체를 직렬화할 수 있습니다. 기본 타입, 컬렉션, 날짜 객체, 사용자 정의 클래스의 상태 저장에 활용할 수 있습니다. JSON과 달리 set, datetime 같은 Python 전용 타입도 보존할 수 있어 강력하지만, 신뢰한 로컬 데이터에만 사용해야 합니다."
   - type: "list"
     items:
     - "기본 타입: int, float, str, bool, None"
     - "컬렉션: list, tuple, dict, set"
     - "날짜: datetime, timedelta"
-    - "사용자 정의 클래스 인스턴스"
+    - "사용자 정의 클래스의 상태"
   - type: "code"
     language: "python"
     title: "집합 저장"
     description: "set을 pickle로 저장하고 복원합니다."
     content: |-
       tagSet = {'python', 'pickle', 'tutorial'}
-      with open('/tmp/tags.pkl', 'wb') as f:
+      with open(pickleScratch / 'tags.pkl', 'wb') as f:
           pickle.dump(tagSet, f)
-      with open('/tmp/tags.pkl', 'rb') as f:
+      with open(pickleScratch / 'tags.pkl', 'rb') as f:
           loadedTags = pickle.load(f)
       loadedTags
   - type: "code"
@@ -155,8 +161,8 @@ sections:
       restoredTime
   - type: "code"
     language: "python"
-    title: "클래스 인스턴스 저장"
-    description: "사용자 정의 클래스 객체를 저장합니다."
+    title: "클래스 상태 저장"
+    description: "셀 실행 환경에서도 안정적으로 복원되도록 인스턴스 상태를 저장합니다."
     content: |-
       class Person:
           def __init__(self, name, age):
@@ -164,10 +170,10 @@ sections:
               self.age = age
 
       alice = Person('Alice', 30)
-      with open('/tmp/person.pkl', 'wb') as f:
-          pickle.dump(alice, f)
-      with open('/tmp/person.pkl', 'rb') as f:
-          loadedPerson = pickle.load(f)
+      with open(pickleScratch / 'person.pkl', 'wb') as f:
+          pickle.dump(alice.__dict__, f)
+      with open(pickleScratch / 'person.pkl', 'rb') as f:
+          loadedPerson = Person(**pickle.load(f))
       loadedPerson.name, loadedPerson.age
   - type: "tip"
     content: "pickle은 신뢰할 수 없는 소스의 데이터를 로드하면 위험합니다. 악의적인 코드가 실행될 수 있습니다."
@@ -230,7 +236,7 @@ sections:
       obj1 = {'type': 'config', 'value': 100}
       obj2 = ['item1', 'item2', 'item3']
       obj3 = (1, 2, 3)
-      with open('/tmp/multi.pkl', 'wb') as f:
+      with open(pickleScratch / 'multi.pkl', 'wb') as f:
           pickle.dump(obj1, f)
           pickle.dump(obj2, f)
           pickle.dump(obj3, f)
@@ -240,7 +246,7 @@ sections:
     title: "여러 객체 복원"
     description: "저장된 순서대로 객체를 복원합니다."
     content: |-
-      with open('/tmp/multi.pkl', 'rb') as f:
+      with open(pickleScratch / 'multi.pkl', 'rb') as f:
           first = pickle.load(f)
           second = pickle.load(f)
           third = pickle.load(f)
@@ -255,9 +261,9 @@ sections:
           {'id': 2, 'data': 'second'},
           {'id': 3, 'data': 'third'}
       ]
-      with open('/tmp/batch.pkl', 'wb') as f:
+      with open(pickleScratch / 'batch.pkl', 'wb') as f:
           pickle.dump(allObjects, f)
-      with open('/tmp/batch.pkl', 'rb') as f:
+      with open(pickleScratch / 'batch.pkl', 'rb') as f:
           loadedAll = pickle.load(f)
       len(loadedAll)
   - type: "tip"
@@ -280,8 +286,7 @@ sections:
     title: "결과 캐싱"
     description: "비용이 큰 계산 결과를 캐시합니다."
     content: |-
-      import os
-      cachePath = '/tmp/cache.pkl'
+      cachePath = pickleScratch / 'cache.pkl'
       if os.path.exists(cachePath):
           with open(cachePath, 'rb') as f:
               cachedResult = pickle.load(f)
@@ -300,9 +305,9 @@ sections:
           'login_time': '2024-06-15 14:30',
           'preferences': {'theme': 'dark', 'lang': 'ko'}
       }
-      with open('/tmp/session.pkl', 'wb') as f:
+      with open(pickleScratch / 'session.pkl', 'wb') as f:
           pickle.dump(sessionData, f)
-      with open('/tmp/session.pkl', 'rb') as f:
+      with open(pickleScratch / 'session.pkl', 'rb') as f:
           loadedSession = pickle.load(f)
       loadedSession['user_id']
   - type: "code"
@@ -315,7 +320,7 @@ sections:
           'accuracy': 0.95,
           'weights': [0.1, 0.2, 0.3]
       }
-      checkpointPath = '/tmp/checkpoint.pkl'
+      checkpointPath = pickleScratch / 'checkpoint.pkl'
       with open(checkpointPath, 'wb') as f:
           pickle.dump(checkpoint, f)
       with open(checkpointPath, 'rb') as f:
@@ -323,6 +328,90 @@ sections:
       restored['epoch'], restored['accuracy']
   - type: "tip"
     content: "pickle 파일은 Python 버전이 다르면 호환되지 않을 수 있습니다. 장기 저장은 JSON이나 데이터베이스를 고려하세요."
+
+- id: "workflow_validation"
+  title: "검증 루프: 신뢰된 캐시 체크포인트"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: "text"
+    content: "pickle은 로컬에서 신뢰한 Python 객체를 빠르게 저장할 때만 사용합니다. 이 흐름에서는 체크포인트를 저장하고, 경로와 버전, 필수 필드를 검증하며, 깨진 파일을 좁힌 예외로 처리합니다."
+  - type: "code"
+    language: "python"
+    title: "신뢰된 체크포인트 저장"
+    description: "작업 폴더 안에 있는 정상 체크포인트만 저장하고 복원합니다."
+    content: |-
+      pickleWorkflowRoot = Path(tempfile.mkdtemp(prefix='codaro_pickle_workflow_')).resolve()
+      checkpointData = {
+          'version': 1,
+          'model': {'name': 'baseline', 'features': ['amount', 'region']},
+          'metrics': {'accuracy': 0.91, 'loss': 0.18},
+          'createdBy': 'local'
+      }
+
+      def saveCheckpoint(path, data):
+          path = Path(path).resolve()
+          assert pickleWorkflowRoot in path.parents, '허용된 작업 폴더에만 저장합니다'
+          with open(path, 'wb') as f:
+              pickle.dump(data, f, protocol=pickle.HIGHEST_PROTOCOL)
+          return path
+
+      def loadTrustedCheckpoint(path):
+          path = Path(path).resolve()
+          assert pickleWorkflowRoot in path.parents, '허용된 작업 폴더에서만 읽습니다'
+          with open(path, 'rb') as f:
+              loaded = pickle.load(f)
+          assert loaded.get('version') == 1, '지원하지 않는 체크포인트 버전입니다'
+          assert isinstance(loaded.get('model'), dict), 'model 정보가 필요합니다'
+          assert isinstance(loaded.get('metrics'), dict), 'metrics 정보가 필요합니다'
+          return loaded
+
+      checkpointFile = saveCheckpoint(pickleWorkflowRoot / 'checkpoint.pkl', checkpointData)
+      restoredCheckpoint = loadTrustedCheckpoint(checkpointFile)
+      assert restoredCheckpoint == checkpointData
+      restoredCheckpoint
+  - type: "code"
+    language: "python"
+    title: "구조 오류를 먼저 실패시킨다"
+    description: "버전과 필수 필드가 틀린 체크포인트를 검증에서 걸러냅니다."
+    content: |-
+      invalidCheckpointPath = pickleWorkflowRoot / 'invalid_checkpoint.pkl'
+      saveCheckpoint(invalidCheckpointPath, {'version': 2, 'model': 'bad'})
+
+      try:
+          loadTrustedCheckpoint(invalidCheckpointPath)
+      except AssertionError as exc:
+          checkpointProblem = str(exc)
+
+      assert '버전' in checkpointProblem
+      checkpointProblem
+  - type: "code"
+    language: "python"
+    title: "깨진 파일 복구 판단"
+    description: "pickle 형식이 아닌 파일은 UnpicklingError로 분리해 처리합니다."
+    content: |-
+      corruptedPath = pickleWorkflowRoot / 'corrupted.pkl'
+      corruptedPath.write_bytes(b'not a pickle')
+
+      try:
+          loadTrustedCheckpoint(corruptedPath)
+      except pickle.UnpicklingError as exc:
+          corruptedProblem = str(exc)
+
+      assert corruptedProblem
+      corruptedProblem
+  - type: "code"
+    language: "python"
+    title: "캐시 크기와 재사용성 검증"
+    description: "저장된 바이너리 크기와 복원된 메트릭을 함께 확인합니다."
+    content: |-
+      cacheSize = checkpointFile.stat().st_size
+      loadedAgain = loadTrustedCheckpoint(checkpointFile)
+
+      assert cacheSize > 0
+      assert loadedAgain['metrics']['accuracy'] >= 0.9
+      cacheSize, loadedAgain['metrics']
+  - type: "tip"
+    content: "실무 변주: 체크포인트에 schemaVersion과 expiresAt을 추가하고, 오래된 캐시는 재학습 큐로 보내는 검증 함수를 만들어 보세요."
 
 - id: "practice"
   title: "pickle 모듈 종합 복습"
@@ -335,7 +424,7 @@ sections:
     title: "🟢 기본1: 딕셔너리 저장"
     code: |-
       saveDict = {'a': 1, 'b': 2}
-      with open('/tmp/d1.pkl', 'wb') as f:
+      with open(pickleScratch / 'd1.pkl', 'wb') as f:
           pickle.dump(saveDict, f)
       'Saved'
 
@@ -343,9 +432,9 @@ sections:
     title: "🟢 기본2: 딕셔너리 복원"
     code: |-
       testDict = {'x': 10}
-      with open('/tmp/d2.pkl', 'wb') as f:
+      with open(pickleScratch / 'd2.pkl', 'wb') as f:
           pickle.dump(testDict, f)
-      with open('/tmp/d2.pkl', 'rb') as f:
+      with open(pickleScratch / 'd2.pkl', 'rb') as f:
           loadDict = pickle.load(f)
       loadDict
 
@@ -368,9 +457,9 @@ sections:
     title: "🟢 기본5: 집합 저장"
     code: |-
       mySet = {1, 2, 3}
-      with open('/tmp/s1.pkl', 'wb') as f:
+      with open(pickleScratch / 's1.pkl', 'wb') as f:
           pickle.dump(mySet, f)
-      with open('/tmp/s1.pkl', 'rb') as f:
+      with open(pickleScratch / 's1.pkl', 'rb') as f:
           loadSet = pickle.load(f)
       loadSet
 
@@ -387,9 +476,9 @@ sections:
     title: "🟡 응용2: 튜플 저장"
     code: |-
       coords = (10, 20, 30)
-      with open('/tmp/coords.pkl', 'wb') as f:
+      with open(pickleScratch / 'coords.pkl', 'wb') as f:
           pickle.dump(coords, f)
-      with open('/tmp/coords.pkl', 'rb') as f:
+      with open(pickleScratch / 'coords.pkl', 'rb') as f:
           loadCoords = pickle.load(f)
       loadCoords
 
@@ -421,16 +510,16 @@ sections:
     code: |-
       obj1 = {'first': 1}
       obj2 = ['second']
-      with open('/tmp/multi2.pkl', 'wb') as f:
+      with open(pickleScratch / 'multi2.pkl', 'wb') as f:
           pickle.dump(obj1, f)
           pickle.dump(obj2, f)
-      with open('/tmp/multi2.pkl', 'rb') as f:
+      with open(pickleScratch / 'multi2.pkl', 'rb') as f:
           r1 = pickle.load(f)
           r2 = pickle.load(f)
       r1, r2
 
   - type: "expansion"
-    title: "🔴 심화2: 클래스 인스턴스"
+    title: "🔴 심화2: 클래스 상태 복원"
     code: |-
       class Point:
           def __init__(self, x, y):
@@ -438,15 +527,14 @@ sections:
               self.y = y
 
       p = Point(5, 10)
-      pBytes = pickle.dumps(p)
-      pRestored = pickle.loads(pBytes)
+      pBytes = pickle.dumps(p.__dict__)
+      pRestored = Point(**pickle.loads(pBytes))
       pRestored.x, pRestored.y
 
   - type: "expansion"
     title: "🔴 심화3: 캐시 구현"
     code: |-
-      import os
-      cPath = '/tmp/c1.pkl'
+      cPath = pickleScratch / 'c1.pkl'
       if os.path.exists(cPath):
           with open(cPath, 'rb') as f:
               cached = pickle.load(f)
@@ -460,9 +548,9 @@ sections:
     title: "🔴 심화4: 리스트 일괄 저장"
     code: |-
       items = [{'id': i, 'val': i * 10} for i in range(5)]
-      with open('/tmp/batch2.pkl', 'wb') as f:
+      with open(pickleScratch / 'batch2.pkl', 'wb') as f:
           pickle.dump(items, f)
-      with open('/tmp/batch2.pkl', 'rb') as f:
+      with open(pickleScratch / 'batch2.pkl', 'rb') as f:
           allItems = pickle.load(f)
       len(allItems)
 
@@ -470,9 +558,9 @@ sections:
     title: "🔴 심화5: 세션 데이터"
     code: |-
       session = {'user': 'alice', 'score': 95, 'level': 3}
-      with open('/tmp/sess.pkl', 'wb') as f:
+      with open(pickleScratch / 'sess.pkl', 'wb') as f:
           pickle.dump(session, f)
-      with open('/tmp/sess.pkl', 'rb') as f:
+      with open(pickleScratch / 'sess.pkl', 'rb') as f:
           loadSess = pickle.load(f)
       loadSess['score']
 
@@ -480,7 +568,7 @@ sections:
     title: "🔴 심화6: 상태 체크포인트"
     code: |-
       state = {'step': 100, 'loss': 0.5}
-      stateFile = '/tmp/state.pkl'
+      stateFile = pickleScratch / 'state.pkl'
       with open(stateFile, 'wb') as f:
           pickle.dump(state, f)
       with open(stateFile, 'rb') as f:
@@ -495,21 +583,21 @@ sections:
           'fontSize': 14,
           'enableNotif': True
       }
-      with open('/tmp/cfg.pkl', 'wb') as f:
+      with open(pickleScratch / 'cfg.pkl', 'wb') as f:
           pickle.dump(config, f)
-      with open('/tmp/cfg.pkl', 'rb') as f:
+      with open(pickleScratch / 'cfg.pkl', 'rb') as f:
           loadCfg = pickle.load(f)
       loadCfg['theme']
 
   - type: "expansion"
     title: "🔴 심화8: 복잡한 객체"
     code: |-
-      complex = {
+      complexObject = {
           'data': [1, 2, 3],
           'meta': {'created': '2024-01-01'},
           'tags': {'python', 'pickle'}
       }
-      cBytes = pickle.dumps(complex)
+      cBytes = pickle.dumps(complexObject)
       cRestored = pickle.loads(cBytes)
       len(cRestored['data'])
 
@@ -524,8 +612,7 @@ sections:
   - type: "expansion"
     title: "🔴 심화10: 파일 존재 확인"
     code: |-
-      import os
-      dataFile = '/tmp/exist.pkl'
+      dataFile = pickleScratch / 'exist.pkl'
       defaultData = {'count': 0}
       if os.path.exists(dataFile):
           with open(dataFile, 'rb') as f:

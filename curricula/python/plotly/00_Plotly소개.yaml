@@ -1,4 +1,7 @@
 meta:
+  packages:
+    - pandas
+    - plotly
   id: plotly_00
   title: Plotly소개
   order: 0
@@ -207,6 +210,78 @@ sections:
         - text: Plotly Express Cheat Sheet
           url: https://www.datacamp.com/cheat-sheet/plotly-express-cheat-sheet
           icon: "🔗"
+
+- id: workflow_validation
+  title: 10단계. Plotly 학습 흐름 검증
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      Plotly 입문은 인터랙티브라는 특징을 말로 아는 데서 끝나지 않습니다. 로컬 데이터로 Figure를 만들고, trace와 layout이 분석 질문을 제대로 담는지 확인해야 합니다.
+  - type: code
+    language: python
+    title: 로컬 데이터와 Figure 예측
+    description: tips 데이터에서 결제액과 팁의 관계가 양수인지 확인합니다
+    content: |-
+      import plotly.express as px
+      from codaro.curriculum.localData import loadLocalDataset
+
+      plotlyTips = loadLocalDataset("tips")
+      requiredColumns = {"total_bill", "tip", "time", "day"}
+      missingColumns = requiredColumns - set(plotlyTips.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert plotlyTips["total_bill"].gt(plotlyTips["tip"]).all()
+
+      billTipCorrelation = plotlyTips[["total_bill", "tip"]].corr().loc["total_bill", "tip"]
+      assert billTipCorrelation > 0.6
+      round(float(billTipCorrelation), 3)
+  - type: code
+    language: python
+    title: Figure 구조 검증
+    description: scatter Figure가 trace, hover, 제목을 갖는지 확인합니다
+    content: |-
+      figIntro = px.scatter(plotlyTips, x="total_bill", y="tip", color="time", hover_data=["day"], title="Tip by total bill")
+
+      assert len(figIntro.data) == plotlyTips["time"].nunique()
+      assert all(trace.type == "scatter" for trace in figIntro.data)
+      assert figIntro.layout.title.text == "Tip by total bill"
+      assert figIntro.layout.xaxis.title.text == "total_bill"
+      figIntro
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 필수 컬럼이 빠지면 명확한 오류로 멈춥니다
+    content: |-
+      def requirePlotlyColumns(frame, columns):
+          missing = set(columns) - set(frame.columns)
+          if missing:
+              raise ValueError(f"Plotly 차트 필수 컬럼 누락: {sorted(missing)}")
+          return True
+
+      brokenTips = plotlyTips.drop(columns=["tip"])
+      try:
+          requirePlotlyColumns(brokenTips, ["total_bill", "tip"])
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert requirePlotlyColumns(plotlyTips, ["total_bill", "tip"])
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: color 후보를 바꾸며 분석 질문의 분리력을 비교합니다
+    content: |-
+      colorCandidates = ["time", "day"]
+      colorReport = []
+      for column in colorCandidates:
+          groupTip = plotlyTips.groupby(column)["tip"].mean()
+          colorReport.append({"color": column, "groups": int(groupTip.size), "spread": round(float(groupTip.max() - groupTip.min()), 2)})
+
+      assert colorReport[0]["groups"] == 2
+      assert max(item["spread"] for item in colorReport) > 1.0
+      colorReport
+  - type: tip
+    content: "Plotly도 Figure 객체를 검증하면 “보이는 차트”를 넘어 재사용 가능한 분석 산출물이 됩니다."
 
 - id: next
   blocks:

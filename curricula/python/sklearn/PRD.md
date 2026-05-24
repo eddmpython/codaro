@@ -24,9 +24,9 @@
 ## Codaro 로컬 Python 환경 고려사항
 
 **실행 기준**:
-- 패키지는 레슨 밖에서 `uv pip install scikit-learn` 또는 프로젝트 의존성으로 준비
+- 패키지는 YAML `meta.packages`와 프로젝트 의존성 기준으로 준비하고, 검증은 `uv run python -X utf8 ...`로 실행
 - `n_jobs=-1`처럼 병렬 처리를 켜는 옵션은 학습 PC의 CPU와 메모리 상태를 보고 선택
-- 데이터셋 다운로드가 필요한 레슨은 네트워크 실패 시 대체 샘플을 함께 준비
+- 기본 레슨은 외부 다운로드 없이 sklearn 내장 데이터 또는 `loadLocalDataset()` 로컬 데이터로 실행
 
 **정상 동작 확인된 기능**:
 - LinearRegression, LogisticRegression, Ridge, Lasso
@@ -45,19 +45,19 @@
 | 01 | 와인 품질 | sklearn load_wine() | 다중 분류 입문 | 품질 예측 |
 | 02 | 유방암 진단 | sklearn load_breast_cancer() | 이진 분류 | 의료 진단 |
 | 03 | 당뇨병 예측 | sklearn load_diabetes() | 회귀 입문 | 질병 위험도 |
-| 04 | 캘리포니아 주택 | sklearn fetch_california_housing() | 회귀 심화 | 부동산 가격 |
+| 04 | 로컬 주택 | Codaro `loadLocalDataset("boston_housing")` | 회귀 심화 | 부동산 가격 |
 | 05 | 손글씨 숫자 | sklearn load_digits() | 이미지 분류 | OCR 기초 |
 | 06 | 합성 데이터 | make_blobs(), make_moons() | 클러스터링 | 고객 세분화 |
-| 07 | 소나 신호 | GitHub sonar.csv | 앙상블 기초 | 신호 분류 |
-| 08 | 심장병 예측 | GitHub heart.csv | 앙상블 심화 | 건강 위험도 |
-| 09 | 아이오노스피어 | GitHub ionosphere.csv | 하이퍼파라미터 | 신호 탐지 |
-| 10 | Pima 당뇨병 | GitHub pima-diabetes.csv | 종합 프로젝트 | 실전 ML 파이프라인 |
+| 07 | 소나 신호 | Codaro `loadLocalDataset("sonar")` | 앙상블 기초 | 신호 분류 |
+| 08 | 심장병 예측 | Codaro `loadLocalDataset("heart")` | 앙상블 심화 | 건강 위험도 |
+| 09 | 아이오노스피어형 신호 | sklearn 합성 데이터 | 하이퍼파라미터 | 신호 탐지 |
+| 10 | 타이타닉 생존 | Codaro `loadLocalDataset("titanic_passengers")` | 종합 프로젝트 | 실전 ML 파이프라인 |
 
 **데이터 확인**:
 - ✅ statsmodels 카테고리 미사용
 - ✅ seaborn 카테고리 미사용 (iris, tips, penguins, titanic, diamonds, mpg 제외)
 - ✅ sklearn 내장 데이터 (패키지 내부 포함)
-- ✅ GitHub raw.githubusercontent.com (사이트 정책 허용)
+- ✅ 외부 다운로드 없이 로컬 Python에서 재현 가능
 
 ---
 
@@ -104,7 +104,7 @@
 - **비즈니스 가치**: 건강 위험도 예측
 
 ### 04_주택가격예측 (기초) ⭐⭐⭐
-- **데이터**: fetch_california_housing() (20,640행, 8특성)
+- **데이터**: `loadLocalDataset("boston_housing")` 로컬 주택 데이터
 - **목표**: 다중 특성으로 주택 가격 예측
 - **개념**: A, C, D, F(cross_val_score)
 - **결과물**: 교차 검증 점수, 특성별 영향도
@@ -395,7 +395,7 @@ sections:
 ### 데이터셋 분리 확인
 - [x] statsmodels 미사용 데이터셋
 - [x] seaborn 미사용 (iris, tips, penguins, titanic, diamonds, mpg 제외)
-- [x] sklearn 내장 + GitHub raw URL
+- [x] sklearn 내장 + Codaro 로컬 데이터
 
 ### Principles 준수
 - [x] 파일 하나 = 프로젝트 하나

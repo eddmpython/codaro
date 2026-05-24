@@ -7,8 +7,8 @@ meta:
   category: pandas
   difficulty: "⭐⭐⭐⭐"
   badge: 중급
-  dataUrl: https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv
-  tags: ["flights", "시계열", "datetime", "rolling", "resample"]
+  dataSource: codaro-local:flights
+  tags: ["flights", "시계열", "datetime", "rolling", "resample", "검증", "시계열"]
   seo:
     title: "pandas 시계열 분석 - 항공 승객 데이터로 배우는 datetime"
     description: "항공 승객 데이터로 시계열 분석을 배웁니다. datetime 변환, 월별 패턴, 이동평균(rolling), 연도별 추이 분석을 실습합니다."
@@ -25,18 +25,17 @@ sections:
   subtitle: 1949~1960년 월별 항공 승객 수
   blocks:
   - type: text
-    content: 항공편 데이터는 1949년부터 1960년까지 12년간의 월별 항공 승객 수를 기록한 시계열 데이터입니다. 총 144개의 행(12년 × 12개월)과 3개의 컬럼(year, month, passengers)으로 구성되어 있습니다. 시계열 데이터는 시간의 흐름에 따라 기록된 데이터로, 추세(장기적 방향), 계절성(주기적 패턴), 순환(불규칙한 반복) 등의 특성을 분석할 수 있습니다. 이번 프로젝트에서는 연도별 증가 추세와 월별 계절 패턴을 파악하는 방법을 배웁니다.
+    content: 항공편 데이터는 1949년부터 1960년까지 12년간의 월별 항공 승객 수를 기록한 시계열 데이터입니다. 총 144개의 행(12년 × 12개월)과 3개의 컬럼(year, month, passengers)으로 구성되어 있습니다. 시계열 데이터는 시간의 흐름에 따라 기록된 데이터로, 추세(장기적 방향), 계절성(주기적 패턴), 순환(불규칙한 반복) 등의 특성을 분석할 수 있습니다. 로컬 실행에서는 네트워크가 없어도 월별, 연도별, 이동평균 흐름이 깨지지 않도록 3개 연도의 월별 샘플을 함께 둡니다.
   - type: code
     language: python
     title: 데이터 불러오기
     description: 1949~1960년 월별 항공 승객 수 데이터입니다
     content: |-
       import pandas as pd
+      from codaro.curriculum.localData import loadLocalDataset
 
-      url = "https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv"
-      flights = pd.read_csv(url)
+      flights = loadLocalDataset("flights")
       flights.shape
-
   - type: tip
     content: "시계열 데이터는 시간 순서가 중요한 데이터입니다. 일반 데이터와 달리 행의 순서를 바꾸면 의미가 달라집니다. 주가, 기온, 매출, 트래픽 등 시간에 따라 변하는 모든 데이터가 시계열입니다. pandas는 datetime 인덱스를 활용해 시계열 분석에 특화된 기능들을 제공합니다."
 
@@ -74,14 +73,14 @@ sections:
   subtitle: pd.to_datetime()
   blocks:
   - type: text
-    content: year와 month를 합쳐서 하나의 날짜 컬럼을 만듭니다. 먼저 year를 astype(str)로 문자열로 변환하고, +로 month와 연결해서 '1949-January' 같은 형태를 만듭니다. 그 다음 pd.to_datetime()으로 이 문자열을 datetime 타입으로 변환합니다. format='%Y-%B' 파라미터는 입력 문자열의 형식을 지정하는데, %Y는 4자리 연도(1949), %B는 월의 전체 이름(January)을 의미합니다. 이렇게 만든 date 컬럼은 datetime64 타입이 되어 시계열 분석이 가능해집니다. copy()를 사용하는 이유는 원본 데이터를 보존하고 새로운 DataFrame을 만들기 위함입니다.
+    content: year와 month를 합쳐서 하나의 날짜 컬럼을 만듭니다. 먼저 year를 astype(str)로 문자열로 변환하고, +로 month와 연결해서 '1949-Jan' 같은 형태를 만듭니다. 그 다음 pd.to_datetime()으로 이 문자열을 datetime 타입으로 변환합니다. format='%Y-%b' 파라미터는 입력 문자열의 형식을 지정하는데, %Y는 4자리 연도(1949), %b는 월의 축약 이름(Jan)을 의미합니다. 이렇게 만든 date 컬럼은 datetime64 타입이 되어 시계열 분석이 가능해집니다. copy()를 사용하는 이유는 원본 데이터를 보존하고 새로운 DataFrame을 만들기 위함입니다.
   - type: code
     language: python
     title: 날짜 컬럼 만들기
     description: year와 month를 합쳐서 날짜로 변환합니다
     content: |-
       dated = flights.copy()
-      dated['date'] = pd.to_datetime(dated['year'].astype(str) + '-' + dated['month'], format='%Y-%B')
+      dated['date'] = pd.to_datetime(dated['year'].astype(str) + '-' + dated['month'], format='%Y-%b')
       dated.head()
 
   - type: tip
@@ -217,6 +216,52 @@ sections:
   - type: tip
     content: "axis 파라미터는 집계 방향을 지정합니다. axis=0(기본값)은 열 방향 집계(각 컬럼의 합계/평균), axis=1은 행 방향 집계(각 행의 합계/평균)입니다. sum(), mean(), max(), min() 등 모든 집계 함수에서 사용할 수 있습니다. 헷갈리면 '0은 세로, 1은 가로'로 기억하세요."
 
+- id: workflow_validation
+  title: "현업 흐름 검증: 월별 승객 시계열 리포트"
+  subtitle: "datetime, rolling, pivot_table, 실패 케이스"
+  blocks:
+  - type: text
+    content: "시계열 리포트는 날짜 타입과 정렬이 틀리면 이동평균과 전년 비교가 모두 틀어집니다. 날짜 변환, 월별 집계, rolling 결과를 작은 표로 검증하세요."
+  - type: code
+    language: python
+    title: "월별 승객 이동평균"
+    description: "날짜 인덱스와 rolling 평균을 검증합니다."
+    content: |-
+      import pandas as pd
+
+      flights = pd.DataFrame({
+          "date": ["2026-01-01", "2026-02-01", "2026-03-01"],
+          "passengers": [100, 120, 150],
+      })
+      flights["date"] = pd.to_datetime(flights["date"])
+      flights = flights.set_index("date").sort_index()
+      flights["rolling2"] = flights["passengers"].rolling(2).mean()
+
+      assert pd.api.types.is_datetime64_any_dtype(flights.index)
+      assert flights.loc["2026-03-01", "rolling2"] == 135
+      assert flights["passengers"].pct_change().round(2).iloc[1] == 0.2
+  - type: code
+    language: python
+    title: "날짜 컬럼 오류 확인"
+    description: "날짜 컬럼이 없으면 시계열 분석 전에 멈춥니다."
+    content: |-
+      import pandas as pd
+
+      def validateFlightFrame(frame):
+          if "date" not in frame.columns:
+              raise ValueError("date column is required")
+          return True
+
+      try:
+          validateFlightFrame(pd.DataFrame({"passengers": [100]}))
+      except ValueError as exc:
+          message = str(exc)
+
+      assert message == "date column is required"
+  - type: tip
+    title: "변주 실험"
+    content: "rolling 창을 2개월에서 3개월로 늘리고, 초기 NaN을 그대로 둘지 채울지 리포트 정책을 정하세요."
+
 - id: practice
   title: 실습
   subtitle: 항공 승객 분석 프로젝트
@@ -232,14 +277,17 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        data = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv")
-        data['date'] = pd.to_datetime(data['year'].astype(str) + '-' + data['month'], format='%Y-%B')
-        dataTs = data.set_index('date')
+        from codaro.curriculum.localData import loadLocalDataset
+
+        data = loadLocalDataset("flights")
     - type: code
       title: "분석 수행"
       content: |-
         minMonth = data.groupby('month')['passengers'].mean().idxmin()
         total1955 = data[data['year'] == 1955]['passengers'].sum()
+        dataTs = data.copy()
+        dataTs['date'] = pd.to_datetime(dataTs['year'].astype(str) + '-' + dataTs['month'], format='%Y-%b')
+        dataTs = dataTs.set_index('date').sort_index()
         rolling6 = dataTs['passengers'].rolling(window=6).mean().tail(10)
         (minMonth, total1955, rolling6)
   - type: expansion
@@ -249,7 +297,9 @@ sections:
       title: "데이터 준비"
       content: |-
         import pandas as pd
-        df = pd.read_csv("https://raw.githubusercontent.com/mwaskom/seaborn-data/master/flights.csv")
+        from codaro.curriculum.localData import loadLocalDataset
+
+        df = loadLocalDataset("flights")
     - type: code
       title: "분석 수행"
       content: |-

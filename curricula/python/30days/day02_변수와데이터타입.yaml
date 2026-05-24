@@ -3,7 +3,7 @@ meta:
   title: 변수와 데이터 타입
   day: 2
   category: 30days
-  tags: []
+  tags: ["변수", "데이터타입", "type", "len", "형변환", "검증"]
   seo:
     title: "파이썬 변수와 데이터 타입"
     description: "변수에 값을 저장하고 다양한 데이터 타입을 다루는 방법을 배웁니다."
@@ -345,6 +345,97 @@ sections:
     content: |-
       a = b = c = 0
       a
+
+- id: workflow_validation
+  title: "검증 루프: 입력값을 업무 데이터로 바꾸기"
+  subtitle: "예측 → 실행 → 오류 수정 → 검증"
+  blocks:
+  - type: text
+    content: "변수와 타입은 값을 담는 문법이 아니라, 외부에서 들어온 문자열을 계산 가능한 데이터로 바꾸고 검증하는 출발점입니다. 실행 전에 어떤 값이 str/int/float/bool이 될지 예측하고, 변환 실패를 직접 확인한 뒤, 업무 리포트에 쓸 수 있는 구조로 정리합니다."
+  - type: code
+    language: python
+    title: "문자열 입력을 계산 가능한 타입으로 변환"
+    description: "주문 입력값의 타입을 예측하고 실제 타입을 assert로 확인합니다."
+    content: |-
+      rawProduct = "notebook"
+      rawPrice = "1200000"
+      rawQuantity = "2"
+      rawMember = "yes"
+
+      productName = rawProduct
+      unitPrice = int(rawPrice)
+      quantity = int(rawQuantity)
+      isMember = rawMember == "yes"
+
+      assert type(productName).__name__ == "str"
+      assert type(unitPrice).__name__ == "int"
+      assert type(quantity).__name__ == "int"
+      assert type(isMember).__name__ == "bool"
+
+      orderSubtotal = unitPrice * quantity
+      orderSubtotal
+  - type: code
+    language: python
+    title: "잘못된 숫자 입력은 실패한다"
+    description: "숫자로 바꿀 수 없는 문자열을 ValueError로 확인합니다."
+    content: |-
+      badQuantity = "2개"
+
+      try:
+          int(badQuantity)
+      except ValueError as exc:
+          quantityError = str(exc)
+
+      assert "invalid literal" in quantityError
+      quantityError
+  - type: code
+    language: python
+    title: "검증 함수를 만들어 입력을 정리한다"
+    description: "타입 변환과 값 범위 검사를 함수 하나로 묶습니다."
+    content: |-
+      def parsePositiveInt(text, fieldName):
+          try:
+              value = int(text)
+          except ValueError as exc:
+              raise ValueError(f"{fieldName} must be an integer") from exc
+          if value <= 0:
+              raise ValueError(f"{fieldName} must be positive")
+          return value
+
+      safeQuantity = parsePositiveInt("3", "quantity")
+
+      try:
+          parsePositiveInt("0", "quantity")
+      except ValueError as exc:
+          validationMessage = str(exc)
+
+      assert safeQuantity == 3
+      assert validationMessage == "quantity must be positive"
+      safeQuantity, validationMessage
+  - type: code
+    language: python
+    title: "실무 변주: 주문 요약 데이터 만들기"
+    description: "검증된 값으로 사람이 읽을 수 있는 주문 요약을 만듭니다."
+    content: |-
+      rawOrder = {
+          "product": "keyboard",
+          "unitPrice": "85000",
+          "quantity": "2",
+          "customer": "민수"
+      }
+
+      parsedOrder = {
+          "product": rawOrder["product"],
+          "customer": rawOrder["customer"],
+          "unitPrice": parsePositiveInt(rawOrder["unitPrice"], "unitPrice"),
+          "quantity": parsePositiveInt(rawOrder["quantity"], "quantity")
+      }
+      parsedOrder["total"] = parsedOrder["unitPrice"] * parsedOrder["quantity"]
+      parsedOrder["label"] = parsedOrder["customer"] + " / " + parsedOrder["product"]
+
+      assert parsedOrder["total"] == 170000
+      assert len(parsedOrder["label"]) > len(parsedOrder["product"])
+      parsedOrder
 
 - id: practice
   title: Day 2 종합 복습

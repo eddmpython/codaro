@@ -374,6 +374,131 @@ sections:
 
       foodMap
 
+- id: step11_workflow
+  title: 11단계. 실무 마커 설계 검증
+  subtitle: 예측 → 오류 확인 → 렌더 검증 → 수정 실험
+  blocks:
+  - type: text
+    content: 마커 커스터마이징은 예쁘게 보이는 것으로 끝나지 않습니다. 업무 지도에서는 지점 카테고리, 위험도, 팝업 정보가 빠짐없이 연결되어야 하고, 정의하지 않은 카테고리는 조용히 기본값으로 넘어가지 말고 오류로 확인해야 합니다.
+  - type: list
+    items:
+    - "실행 전에는 어떤 지점이 빨간 마커로 표시될지 먼저 예측합니다."
+    - "카테고리별 색상과 아이콘 매핑이 빠지면 운영 지도에서는 잘못된 의사결정 오류가 됩니다."
+    - "렌더된 HTML에 모든 지점명, 팝업 핵심 정보, 오류 메시지가 들어갔는지 검증합니다."
+    - "위험도 기준을 바꾸는 실험으로 마커 색상 변화가 업무 판단을 어떻게 바꾸는지 확인합니다."
+  - type: code
+    language: python
+    title: 운영 지점 데이터 준비
+    description: 매장, 물류, 고객지원 지점을 한 지도에 올릴 데이터를 만듭니다.
+    content: |-
+      operationSites = [
+          {"name": "강남 플래그십", "loc": [37.4979, 127.0276], "category": "store", "riskScore": 82, "owner": "영업"},
+          {"name": "성수 물류허브", "loc": [37.5446, 127.0557], "category": "warehouse", "riskScore": 64, "owner": "물류"},
+          {"name": "마포 고객센터", "loc": [37.5663, 126.9019], "category": "support", "riskScore": 48, "owner": "CS"},
+          {"name": "여의도 팝업존", "loc": [37.5219, 126.9245], "category": "store", "riskScore": 71, "owner": "마케팅"},
+      ]
+
+      markerStyle = {
+          "store": {"color": "red", "icon": "shopping-cart", "prefix": "fa"},
+          "warehouse": {"color": "blue", "icon": "home", "prefix": "glyphicon"},
+          "support": {"color": "green", "icon": "info-sign", "prefix": "glyphicon"},
+      }
+
+      highRiskNames = [site["name"] for site in operationSites if site["riskScore"] >= 70]
+      highRiskNames
+  - type: code
+    language: python
+    title: 마커 매핑 검증 함수
+    description: 좌표와 카테고리 매핑을 지도 생성 전에 검증합니다.
+    content: |-
+      def validateMarkerSite(site, styleByCategory):
+          lat, lon = site["loc"]
+          if not (33 <= lat <= 39 and 124 <= lon <= 132):
+              raise ValueError(f"좌표 범위 오류: {site['name']}")
+          if site["category"] not in styleByCategory:
+              raise KeyError(f"마커 카테고리 누락: {site['category']}")
+          return True
+
+      markerValidation = [validateMarkerSite(site, markerStyle) for site in operationSites]
+      markerValidation
+  - type: code
+    language: python
+    title: 카테고리 오류 확인
+    description: 새 카테고리가 들어왔을 때 조용히 기본 아이콘을 쓰지 않고 오류로 잡습니다.
+    content: |-
+      brokenMarkerSite = {
+          "name": "임시 수리센터",
+          "loc": [37.5530, 126.9720],
+          "category": "repair",
+          "riskScore": 55,
+          "owner": "운영",
+      }
+
+      try:
+          validateMarkerSite(brokenMarkerSite, markerStyle)
+      except KeyError as exc:
+          markerCategoryError = str(exc).strip("'")
+
+      markerCategoryError
+  - type: code
+    language: python
+    title: 운영 마커 지도 만들기
+    description: 위험도와 카테고리 정보를 팝업, 툴팁, 아이콘에 함께 반영합니다.
+    content: |-
+      operationMap = folium.Map(location=[37.535, 126.98], zoom_start=12)
+
+      for site in operationSites:
+          validateMarkerSite(site, markerStyle)
+          style = markerStyle[site["category"]]
+          popupHtml = f"""
+          <div style="font-family: Arial; width: 190px;">
+              <h4>{site['name']}</h4>
+              <p>담당: {site['owner']}</p>
+              <p>위험도: {site['riskScore']}</p>
+          </div>
+          """
+          iconColor = "red" if site["riskScore"] >= 70 else style["color"]
+
+          folium.Marker(
+              location=site["loc"],
+              popup=folium.Popup(popupHtml, max_width=230),
+              tooltip=f"{site['name']} / 위험도 {site['riskScore']}",
+              icon=folium.Icon(color=iconColor, icon=style["icon"], prefix=style["prefix"]),
+          ).add_to(operationMap)
+
+      operationMap.fit_bounds([site["loc"] for site in operationSites])
+      operationMap
+  - type: code
+    language: python
+    title: 렌더 결과 검증
+    description: 지점명, 담당 부서, 오류 메시지, 고위험 예측 결과가 맞는지 확인합니다.
+    content: |-
+      operationHtml = operationMap.get_root().render()
+      markerChecks = {
+          "allNamesRendered": all(site["name"] in operationHtml for site in operationSites),
+          "allOwnersRendered": all(site["owner"] in operationHtml for site in operationSites),
+          "categoryErrorOk": markerCategoryError == "마커 카테고리 누락: repair",
+          "highRiskPredictionOk": highRiskNames == ["강남 플래그십", "여의도 팝업존"],
+          "validationOk": all(markerValidation),
+      }
+
+      assert all(markerChecks.values()), markerChecks
+      markerChecks
+  - type: code
+    language: python
+    title: 수정 실험
+    description: 고위험 기준을 60점으로 낮추면 빨간 마커 대상이 어떻게 달라지는지 비교합니다.
+    content: |-
+      def selectHighRiskNames(sites, threshold):
+          return [site["name"] for site in sites if site["riskScore"] >= threshold]
+
+      strictHighRisk = selectHighRiskNames(operationSites, 70)
+      relaxedHighRisk = selectHighRiskNames(operationSites, 60)
+
+      strictHighRisk, relaxedHighRisk, len(relaxedHighRisk) - len(strictHighRisk)
+  - type: tip
+    content: 마커 표현은 디자인 문제가 아니라 데이터 계약 문제입니다. 카테고리 매핑, 좌표 범위, 팝업 핵심 정보, 위험도 기준을 코드로 검증하면 지도 결과물을 업무 리포트로 믿고 사용할 수 있습니다.
+
 - id: practice
   title: 실습
   subtitle: 마커 표현

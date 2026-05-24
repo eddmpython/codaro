@@ -390,3 +390,71 @@ sections:
     - "update_layout - 레이아웃 수정 (복습)"
   - type: text
     content: 다음 시간에는 레스토랑 매출 분석 대시보드를 만듭니다.
+
+- id: workflow_validation
+  title: 11단계. 애니메이션 Figure 검증 루프
+  subtitle: 예측 → 실행 → 오류 수정 → 검증 → 실무 변주
+  blocks:
+  - type: text
+    content: |-
+      애니메이션 차트는 프레임, 슬라이더, 축 범위가 맞아야 시간 변화가 왜곡되지 않습니다. 연도별 프레임 수와 데이터 조건을 같이 검증합니다.
+  - type: code
+    language: python
+    title: 데이터 계약과 변화 예측
+    description: Gapminder 연도와 양수 지표 조건을 확인합니다
+    content: |-
+      import plotly.express as px
+
+      gapFlow = px.data.gapminder()
+      requiredColumns = {"country", "continent", "year", "lifeExp", "pop", "gdpPercap"}
+      missingColumns = requiredColumns - set(gapFlow.columns)
+
+      assert not missingColumns, f"필수 컬럼 누락: {missingColumns}"
+      assert gapFlow[["lifeExp", "pop", "gdpPercap"]].gt(0).all().all()
+      assert gapFlow["year"].nunique() >= 10
+  - type: code
+    language: python
+    title: Animation Figure 검증
+    description: 연도 수와 frame 수, 재생 슬라이더를 확인합니다
+    content: |-
+      figAnimation = px.scatter(gapFlow, x="gdpPercap", y="lifeExp", animation_frame="year", animation_group="country", color="continent", size="pop", log_x=True, range_y=[25, 90], title="World change over time")
+
+      assert len(figAnimation.frames) == gapFlow["year"].nunique()
+      assert figAnimation.layout.sliders is not None
+      assert figAnimation.layout.xaxis.type == "log"
+      assert all(frame.name for frame in figAnimation.frames)
+      figAnimation
+  - type: code
+    language: python
+    title: 의도한 오류 고치기
+    description: 프레임 컬럼이 없으면 애니메이션을 만들지 않습니다
+    content: |-
+      def validateAnimationInput(frame):
+          if "year" not in frame.columns:
+              raise ValueError("animation_frame에 사용할 year 컬럼이 필요합니다")
+          assert frame["country"].nunique() > 10
+          return True
+
+      brokenGap = gapFlow.drop(columns=["year"])
+      try:
+          validateAnimationInput(brokenGap)
+      except ValueError as exc:
+          print("검증 실패 확인:", exc)
+
+      assert validateAnimationInput(gapFlow)
+  - type: code
+    language: python
+    title: 실무 변주 실험
+    description: 대륙 필터를 적용해 프레임 수와 국가 수를 비교합니다
+    content: |-
+      continentReport = []
+      for continent in ["Asia", "Europe", "Africa"]:
+          subset = gapFlow[gapFlow["continent"] == continent]
+          figure = px.scatter(subset, x="gdpPercap", y="lifeExp", animation_frame="year", animation_group="country", color="country", log_x=True)
+          continentReport.append({"continent": continent, "frames": len(figure.frames), "countries": int(subset["country"].nunique())})
+
+      assert all(item["frames"] == gapFlow["year"].nunique() for item in continentReport)
+      assert max(item["countries"] for item in continentReport) > min(item["countries"] for item in continentReport)
+      continentReport
+  - type: tip
+    content: "애니메이션은 프레임 수가 데이터의 시간 단위와 일치하는지 검증해야 발표용 장식이 아니라 분석 도구가 됩니다."
