@@ -19,6 +19,8 @@ Rules:
 - public UI language is English only
 - public tone is zinc-based and calm
 - `landing/` must stay separate from the local editor `editor/`
+- `landing/src/app.css` mirrors the editor shadcn token names for color, radius, border, and ring values
+- framework parity is visual/token parity here; React product code stays in `editor/`, while public docs and writing stay in the Svelte static site
 - launcher download CTAs must point to GitHub Release assets, not repo-internal build paths
 - `.github/workflows/launcher-release.yml` is responsible for publishing `CodaroLauncher.exe`, checksum, and SBOM with stable asset names
 - writing asset URLs are flattened to `/docs/blog/assets/*` during build

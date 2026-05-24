@@ -46,6 +46,15 @@ def buildAgentsPointer() -> str:
 
 
 def runCheck() -> int:
+    claudeExists = CLAUDE_PATH.exists()
+    agentsExists = AGENTS_PATH.exists()
+    if not claudeExists and not agentsExists:
+        print("ok: local agent rule files are intentionally untracked")
+        return 0
+    if claudeExists != agentsExists:
+        print("drift: CLAUDE.md and AGENTS.md must be both present locally or both absent", file=sys.stderr)
+        return 1
+
     readText(CLAUDE_PATH)
     agentsText = readText(AGENTS_PATH)
     expectedText = buildAgentsPointer()

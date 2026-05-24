@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import asyncio
 import importlib.util
 import json
 import sys
@@ -249,6 +250,58 @@ def testToolLoopTuningSignalsExposeActionableFailureContext() -> None:
     assert signals["answerPreview"].endswith("...[truncated]")
     assert any("native tool calls" in hint for hint in signals["tuningHints"])
     assert any("write-curriculum-yaml" in hint for hint in signals["tuningHints"])
+
+
+def testProviderNetworkSignalsDoNotRequestPromptTuning() -> None:
+    smoke = loadSmoke()
+    signals = smoke.providerNetworkFailureSignals(
+        {"workloop": [{"workDetail": "provider:oauth-chatgpt · code:provider_network_error · action:check-network"}]},
+        {"answer": "Provider 서버에 연결하지 못했습니다. 네트워크 상태를 확인한 뒤 다시 시도하세요."},
+    )
+
+    assert signals["failureReason"] == "provider-network-error"
+    assert signals["tuningRequired"] is False
+    assert signals["diagnosticAction"] == "check-network"
+    assert signals["retryable"] is True
+
+
+def testAsyncLiveCaseRetriesRecoverableNetworkFailure(monkeypatch) -> None:
+    smoke = loadSmoke()
+    attempts = []
+
+    async def flakyCase(_config):
+        attempts.append("run")
+        if len(attempts) == 1:
+            return smoke.LiveSmokeCase(
+                caseId="live-tool-loop",
+                passed=False,
+                status="provider_network_error",
+                durationMs=90_000,
+                signals={
+                    "failureReason": "provider-network-error",
+                    "diagnosticCode": "provider_network_error",
+                    "diagnosticAction": "check-network",
+                },
+            )
+        return smoke.LiveSmokeCase(
+            caseId="live-tool-loop",
+            passed=True,
+            status="passed",
+            durationMs=100,
+            signals={"toolSequence": ["packages-check", "write-curriculum-yaml"]},
+        )
+
+    monkeypatch.setenv("CODARO_AI_LIVE_NETWORK_RETRIES", "2")
+    case = asyncio.run(smoke.runAsyncLiveCaseWithNetworkRetry(
+        smoke.LLMConfig(provider="oauth-chatgpt", model="test-model"),
+        flakyCase,
+    ))
+
+    assert case.passed
+    assert len(attempts) == 2
+    assert case.signals["attemptCount"] == 2
+    assert case.signals["networkRetryCount"] == 1
+    assert case.signals["recoveredAfterNetworkRetry"] is True
 
 
 def testWorkloopSignalReportsReadableBoundedSamples() -> None:

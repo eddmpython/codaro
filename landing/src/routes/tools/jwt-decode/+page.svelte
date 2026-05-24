@@ -155,7 +155,7 @@
 
   .badge.alg {
     background: var(--accent-soft);
-    color: var(--accent);
+    color: var(--brand-accent);
     font-family: "Fira Mono", ui-monospace, monospace;
   }
 

@@ -139,7 +139,7 @@
 
   .neighborIcon {
     grid-row: span 2;
-    color: var(--accent);
+    color: var(--brand-accent);
     font-size: 1.2rem;
     align-self: center;
   }

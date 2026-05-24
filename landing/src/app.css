@@ -1,21 +1,52 @@
 :root {
   color-scheme: light;
-  --background: #fafafa;
-  --surface: #ffffff;
-  --surface-subtle: #f4f4f5;
-  --surface-muted: #e4e4e7;
-  --border: #e4e4e7;
-  --border-strong: #a1a1aa;
-  --text: #18181b;
-  --text-muted: #52525b;
-  --text-soft: #71717a;
-  --accent: #18181b;
-  --accent-soft: rgba(24, 24, 27, 0.06);
+  --radius: 0.625rem;
+  --background: oklch(1 0 0);
+  --foreground: oklch(0.141 0.005 285.823);
+  --card: oklch(1 0 0);
+  --card-foreground: oklch(0.141 0.005 285.823);
+  --popover: oklch(1 0 0);
+  --popover-foreground: oklch(0.141 0.005 285.823);
+  --primary: oklch(0.21 0.006 285.885);
+  --primary-foreground: oklch(0.985 0 0);
+  --secondary: oklch(0.967 0.001 286.375);
+  --secondary-foreground: oklch(0.21 0.006 285.885);
+  --muted: oklch(0.967 0.001 286.375);
+  --muted-foreground: oklch(0.552 0.016 285.938);
+  --accent: oklch(0.967 0.001 286.375);
+  --accent-foreground: oklch(0.21 0.006 285.885);
+  --destructive: oklch(0.577 0.245 27.325);
+  --border: oklch(0.92 0.004 286.32);
+  --input: oklch(0.92 0.004 286.32);
+  --ring: oklch(0.705 0.015 286.067);
+  --chart-1: oklch(0.646 0.222 41.116);
+  --chart-2: oklch(0.6 0.118 184.704);
+  --chart-3: oklch(0.398 0.07 227.392);
+  --chart-4: oklch(0.828 0.189 84.429);
+  --chart-5: oklch(0.769 0.188 70.08);
+  --sidebar: oklch(0.985 0 0);
+  --sidebar-foreground: oklch(0.141 0.005 285.823);
+  --sidebar-primary: oklch(0.21 0.006 285.885);
+  --sidebar-primary-foreground: oklch(0.985 0 0);
+  --sidebar-accent: oklch(0.967 0.001 286.375);
+  --sidebar-accent-foreground: oklch(0.21 0.006 285.885);
+  --sidebar-border: oklch(0.92 0.004 286.32);
+  --sidebar-ring: oklch(0.705 0.015 286.067);
+  --code: oklch(0.967 0.001 286.375);
+  --code-foreground: oklch(0.141 0.005 285.823);
+  --surface: var(--card);
+  --surface-subtle: var(--muted);
+  --surface-muted: var(--border);
+  --border-strong: var(--ring);
+  --text: var(--foreground);
+  --text-muted: var(--muted-foreground);
+  --text-soft: color-mix(in oklch, var(--muted-foreground) 82%, var(--background));
+  --brand-accent: var(--primary);
+  --accent-soft: color-mix(in oklch, var(--brand-accent) 6%, transparent);
   --success: #15803d;
   --shadow: 0 24px 60px rgba(24, 24, 27, 0.12);
   --shadow-sm: 0 1px 2px rgba(24, 24, 27, 0.06);
-  --radius: 10px;
-  --radius-sm: 8px;
+  --radius-sm: calc(var(--radius) - 2px);
   font-family: "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
 }
 
@@ -420,7 +451,7 @@ input {
   padding: 5px 10px;
   border-radius: 999px;
   background: var(--accent-soft);
-  color: var(--accent);
+  color: var(--brand-accent);
   border: 1px solid transparent;
   font-size: 0.78rem;
   font-weight: 500;
@@ -514,7 +545,7 @@ input {
 }
 
 .docsNavSection a.active {
-  color: var(--accent);
+  color: var(--brand-accent);
   font-weight: 600;
 }
 
@@ -580,7 +611,7 @@ input {
 
 .searchField:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--brand-accent);
   box-shadow: 0 0 0 3px var(--accent-soft);
 }
 

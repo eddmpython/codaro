@@ -185,11 +185,11 @@
     padding: 5px 12px;
     border-radius: 999px;
     background: var(--accent-soft);
-    color: var(--accent);
+    color: var(--brand-accent);
     font-size: 0.78rem;
     font-weight: 500;
     letter-spacing: 0.02em;
-    border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+    border: 1px solid color-mix(in srgb, var(--brand-accent) 30%, transparent);
   }
 
   .toolsHero h1 {
@@ -225,7 +225,7 @@
   }
 
   .promiseIcon {
-    color: var(--accent);
+    color: var(--brand-accent);
     font-size: 0.82rem;
     margin-top: 4px;
   }
@@ -284,7 +284,7 @@
 
   .searchField:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--brand-accent);
     box-shadow: 0 0 0 3px var(--accent-soft);
   }
 
@@ -315,7 +315,7 @@
 
   .catChip.active {
     color: var(--text);
-    border-color: var(--accent);
+    border-color: var(--brand-accent);
     background: var(--accent-soft);
   }
 
@@ -328,7 +328,7 @@
   }
 
   .catChip.active .chipCount {
-    color: var(--accent);
+    color: var(--brand-accent);
     background: rgba(255, 255, 255, 0.06);
   }
 
@@ -374,7 +374,7 @@
   }
 
   .toolIcon {
-    color: var(--accent);
+    color: var(--brand-accent);
     font-size: 1.4rem;
     line-height: 1;
     font-weight: 500;
@@ -435,7 +435,7 @@
 
   .repoLink,
   .brandLink {
-    color: var(--accent);
-    border-bottom: 1px dotted color-mix(in srgb, var(--accent) 50%, transparent);
+    color: var(--brand-accent);
+    border-bottom: 1px dotted color-mix(in srgb, var(--brand-accent) 50%, transparent);
   }
 </style>

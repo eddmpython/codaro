@@ -70,7 +70,7 @@
 
   .lang {
     font-size: 0.72rem;
-    color: var(--accent);
+    color: var(--brand-accent);
     background: var(--accent-soft);
     padding: 2px 8px;
     border-radius: 6px;

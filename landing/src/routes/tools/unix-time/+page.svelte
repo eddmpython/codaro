@@ -151,7 +151,7 @@
     display: grid;
     gap: 10px;
     padding: 16px 18px;
-    border: 1px solid var(--accent);
+    border: 1px solid var(--brand-accent);
     background: var(--accent-soft);
     border-radius: var(--radius-sm);
   }
@@ -166,7 +166,7 @@
     font-size: 0.78rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--accent);
+    color: var(--brand-accent);
     font-weight: 600;
   }
 
@@ -217,7 +217,7 @@
 
   .textInput:focus {
     outline: none;
-    border-color: var(--accent);
+    border-color: var(--brand-accent);
     box-shadow: 0 0 0 3px var(--accent-soft);
   }
 
