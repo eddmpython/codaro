@@ -90,6 +90,21 @@ export const docsPages = [
     "contentModule": "page0ad858b8b134"
   },
   {
+    "path": "skills/architecture/curriculum-authoring",
+    "slugSegments": [
+      "skills",
+      "architecture",
+      "curriculum-authoring"
+    ],
+    "title": "커리큘럼 작성 절차",
+    "description": "Deep procedure for authoring Codaro curricula with lazy uv dependencies, strong intro notebooks, and executable learning flow.",
+    "section": "architecture",
+    "sectionLabel": "Architecture",
+    "order": 206,
+    "url": "/codaro/docs/skills/architecture/curriculum-authoring",
+    "contentModule": "pagedc94212d8486"
+  },
+  {
     "path": "skills/architecture/frontend-product-surface",
     "slugSegments": [
       "skills",
@@ -896,6 +911,21 @@ export const docsSections = [
         "order": 205,
         "url": "/codaro/docs/skills/architecture/widget-bridge",
         "contentModule": "page0ad858b8b134"
+      },
+      {
+        "path": "skills/architecture/curriculum-authoring",
+        "slugSegments": [
+          "skills",
+          "architecture",
+          "curriculum-authoring"
+        ],
+        "title": "커리큘럼 작성 절차",
+        "description": "Deep procedure for authoring Codaro curricula with lazy uv dependencies, strong intro notebooks, and executable learning flow.",
+        "section": "architecture",
+        "sectionLabel": "Architecture",
+        "order": 206,
+        "url": "/codaro/docs/skills/architecture/curriculum-authoring",
+        "contentModule": "pagedc94212d8486"
       },
       {
         "path": "skills/architecture/frontend-product-surface",
