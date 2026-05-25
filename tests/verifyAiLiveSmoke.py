@@ -791,7 +791,7 @@ async def runCellCallLoopCase(config: LLMConfig) -> LiveSmokeCase:
             tools=toolSchemas(),
             executor=executor,
             orchestrator=orchestrator,
-            maxToolRounds=4,
+            maxToolRounds=2,
         )
     except LIVE_PROVIDER_ERRORS as exc:
         return failedCase("live-cell-call-loop", startedAt, config, exc)
